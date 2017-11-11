@@ -223,6 +223,12 @@ typedef HeapTupleHeaderData *HeapTupleHeader;
 	(tup)->t_choice.t_heap.t_xmin = (xid) \
 )
 
+#define HeapTupleHeaderXminInvalid(tup) \
+( \
+    ((tup)->t_infomask & (HEAP_XMIN_COMMITTED|HEAP_XMIN_INVALID)) == \
+        HEAP_XMIN_INVALID \
+)
+
 #define HeapTupleHeaderGetXmax(tup) \
 ( \
 	(tup)->t_choice.t_heap.t_xmax \
