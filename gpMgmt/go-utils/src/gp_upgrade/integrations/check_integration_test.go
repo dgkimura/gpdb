@@ -64,6 +64,7 @@ var _ = Describe("check", func() {
 			go func() {
 				// TODO: Can this flake? if the in-progress window is shorter than the frequency of Eventually(), then yea
 				Eventually(runStatusUpgrade).Should(ContainSubstring("RUNNING - Install binaries on segments"))
+				//close channel here
 				expectationsDuringCommandInFlight <- true
 			}()
 

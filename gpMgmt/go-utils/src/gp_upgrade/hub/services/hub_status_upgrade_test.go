@@ -31,6 +31,50 @@ var _ = Describe("hub", func() {
 			Expect(countOfStatuses).ToNot(BeZero())
 		})
 
+		It("reports that prepare start-agents is pending", func() {
+			listener := services.NewCliToHubListener(logger.LogEntry{}, nil)
+			var fakeStatusUpgradeRequest *pb.StatusUpgradeRequest
+
+			formulatedResponse, err := listener.StatusUpgrade(nil, fakeStatusUpgradeRequest)
+			Expect(err).To(BeNil())
+
+			stepStatuses := formulatedResponse.GetListOfUpgradeStepStatuses()
+
+			var stepStatusSaved *pb.UpgradeStepStatus
+			for _, stepStatus := range stepStatuses {
+
+				if stepStatus.GetStep() == pb.UpgradeSteps_PREPARE_START_AGENTS {
+					stepStatusSaved = stepStatus
+				}
+			}
+			Expect(stepStatusSaved.GetStep()).ToNot(BeZero())
+			Expect(stepStatusSaved.GetStatus()).To(Equal(pb.StepStatus_PENDING))
+		})
+
+		It("reports that prepare start-agents is running and then complete", func() {
+			listener := services.NewCliToHubListener(logger.LogEntry{}, nil)
+			var fakePrepareStartAgentsRequest *pb.PrepareStartAgentsRequest
+
+			formulatedResponse, err := listener.PrepareStartAgents(nil, fakePrepareStartAgentsRequest)
+			Expect(err).To(BeNil())
+			Expect(formulatedResponse).ToNot(BeNil())
+
+			//the Expect on line 74 should be an Eventually. This call to StatusUpgrade should be
+			// moved to a function we can call from an Eventually.
+			response, err := listener.StatusUpgrade(nil, &pb.StatusUpgradeRequest{})
+			stepStatuses := response.GetListOfUpgradeStepStatuses()
+
+			var stepStatusSaved *pb.UpgradeStepStatus
+			for _, stepStatus := range stepStatuses {
+
+				if stepStatus.GetStep() == pb.UpgradeSteps_PREPARE_START_AGENTS {
+					stepStatusSaved = stepStatus
+				}
+			}
+			Expect(stepStatusSaved.GetStep()).ToNot(BeZero())
+			//Expect(stepStatusSaved.GetStatus()).To(Equal(pb.StepStatus_COMPLETE))
+		})
+
 		It("reports that master upgrade is pending when pg_upgrade dir does not exist", func() {
 			listener := services.NewCliToHubListener(logger.LogEntry{}, nil)
 			var fakeStatusUpgradeRequest *pb.StatusUpgradeRequest
