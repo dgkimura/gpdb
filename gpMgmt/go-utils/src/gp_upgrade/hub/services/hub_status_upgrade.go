@@ -42,14 +42,13 @@ func (s *CatchAllCliToHubListenerImpl) StatusUpgrade(ctx context.Context, in *pb
 	shutdownClustersStatus, _ := clusterPair.GetStatus()
 	masterUpgradeStatus, _ := convertMaster.GetStatus()
 
-	prepareStartAgentsStatus := &pb.UpgradeStepStatus{
-		Step:   pb.UpgradeSteps_PREPARE_START_AGENTS,
-		Status: pb.StepStatus_PENDING,
-	}
+	startAgentsStatePath := filepath.Join(homeDirectory, ".gp_upgrade/start-agents")
+	prepareStartAgentsState := upgradestatus.NewStateCheck(startAgentsStatePath, pb.UpgradeSteps_PREPARE_START_AGENTS)
+	startAgentsStatus, _ := prepareStartAgentsState.GetStatus()
 
 	reply := &pb.StatusUpgradeReply{}
 	reply.ListOfUpgradeStepStatuses = append(reply.ListOfUpgradeStepStatuses, demoStepStatus, seginstallStatus,
-		prepareInitStatus, shutdownClustersStatus, masterUpgradeStatus, prepareStartAgentsStatus)
+		prepareInitStatus, shutdownClustersStatus, masterUpgradeStatus, startAgentsStatus)
 	return reply, nil
 }
 
