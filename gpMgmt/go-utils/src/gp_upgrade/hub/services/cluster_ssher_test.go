@@ -12,9 +12,14 @@ import (
 )
 
 var _ = Describe("ClusterSsher", func() {
+
+	AfterEach(func() {
+		utils.System = utils.InitializeSystemFunctions()
+	})
+
 	Describe("VerifySoftware", func() {
 		It("indicates that it is in progress, failed on the hub filesystem", func() {
-			utils.System.ExecCmdOutput = func(name string, args ...string) ([]byte, error) {
+			utils.System.ExecCmdCombinedOutput = func(name string, args ...string) ([]byte, error) {
 				return nil, errors.New("host not found")
 			}
 			cw := newSpyChecklistWriter()
@@ -70,7 +75,8 @@ var _ = Describe("ClusterSsher", func() {
 			Expect(recvdArgs).To(ContainElement("-o"))
 			Expect(recvdArgs).To(ContainElement("StrictHostKeyChecking=no"))
 			Expect(recvdArgs).To(ContainElement("doesnt matter"))
-			Expect(recvdArgs[len(recvdArgs)-1]).To(HaveSuffix("gp_upgrade_agent"))
+			//the ampersand is a hack until gp_upgrade_agent can background itself
+			Expect(recvdArgs[len(recvdArgs)-1]).To(HaveSuffix("gp_upgrade_agent &"))
 			Expect(cw.freshStateDirs).To(ContainElement("start-agent"))
 			Expect(cw.stepsMarkedInProgress).To(ContainElement("start-agent"))
 			Expect(cw.stepsMarkedFailed).ToNot(ContainElement("start-agent"))

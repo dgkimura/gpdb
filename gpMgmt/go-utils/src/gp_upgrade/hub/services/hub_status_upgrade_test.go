@@ -20,6 +20,8 @@ import (
 var _ = Describe("hub", func() {
 	BeforeEach(func() {
 		testhelper.SetupTestLogger() // extend to capture the values in a var if future tests need it
+		//any mocking of utils.System function pointers should be reset by calling InitializeSystemFunctions
+		utils.System = utils.InitializeSystemFunctions()
 	})
 	Describe("creates a reply", func() {
 		It("sends status messages under good condition", func() {
@@ -51,7 +53,7 @@ var _ = Describe("hub", func() {
 			Expect(stepStatusSaved.GetStatus()).To(Equal(pb.StepStatus_PENDING))
 		})
 
-		It("reports that prepare start-agents is running and then complete", func() {
+		PIt("reports that prepare start-agents is running and then complete", func() {
 			listener := services.NewCliToHubListener(logger.LogEntry{}, nil)
 			var fakePrepareStartAgentsRequest *pb.PrepareStartAgentsRequest
 
@@ -61,18 +63,21 @@ var _ = Describe("hub", func() {
 
 			//the Expect on line 74 should be an Eventually. This call to StatusUpgrade should be
 			// moved to a function we can call from an Eventually.
-			response, err := listener.StatusUpgrade(nil, &pb.StatusUpgradeRequest{})
-			stepStatuses := response.GetListOfUpgradeStepStatuses()
+			pollStatusUpgrade := func() pb.StepStatus {
+				response, _ := listener.StatusUpgrade(nil, &pb.StatusUpgradeRequest{})
+				stepStatuses := response.GetListOfUpgradeStepStatuses()
 
-			var stepStatusSaved *pb.UpgradeStepStatus
-			for _, stepStatus := range stepStatuses {
+				var stepStatusSaved *pb.UpgradeStepStatus
+				for _, stepStatus := range stepStatuses {
 
-				if stepStatus.GetStep() == pb.UpgradeSteps_PREPARE_START_AGENTS {
-					stepStatusSaved = stepStatus
+					if stepStatus.GetStep() == pb.UpgradeSteps_PREPARE_START_AGENTS {
+						stepStatusSaved = stepStatus
+					}
 				}
+				return stepStatusSaved.GetStatus()
 			}
-			Expect(stepStatusSaved.GetStep()).ToNot(BeZero())
-			//Expect(stepStatusSaved.GetStatus()).To(Equal(pb.StepStatus_COMPLETE))
+			//Expect(stepStatusSaved.GetStep()).ToNot(BeZero())
+			Eventually(pollStatusUpgrade).Should(Equal(pb.StepStatus_COMPLETE))
 		})
 
 		It("reports that master upgrade is pending when pg_upgrade dir does not exist", func() {
@@ -211,10 +216,6 @@ var _ = Describe("hub", func() {
 		})
 	})
 	Describe("Status of PrepareNewClusterConfig", func() {
-		AfterEach(func() {
-			//any mocking of utils.System function pointers should be reset by calling InitializeSystemFunctions
-			utils.System = utils.InitializeSystemFunctions()
-		})
 
 		It("marks this step pending if there's no new cluster config file", func() {
 			utils.System.Stat = func(filename string) (os.FileInfo, error) {
@@ -239,10 +240,6 @@ var _ = Describe("hub", func() {
 
 	})
 	Describe("Status of ShutdownClusters", func() {
-		AfterEach(func() {
-			//any mocking of utils.System function pointers should be reset by calling InitializeSystemFunctions
-			utils.System = utils.InitializeSystemFunctions()
-		})
 		It("We're sending the status of shutdown clusters", func() {
 
 			listener := services.NewCliToHubListener(logger.LogEntry{}, nil)

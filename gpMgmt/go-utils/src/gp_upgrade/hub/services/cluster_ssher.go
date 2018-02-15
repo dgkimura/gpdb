@@ -33,8 +33,11 @@ func (c *ClusterSsher) VerifySoftware(hostnames []string) {
 func (c *ClusterSsher) Start(hostnames []string) {
 	// ssh -o "StrictHostKeyChecking=no" hostname /path/to/gp_upgrade_agent
 	hubPath, _ := os.Executable()
+	//the ampersand is a hack until gp_upgrade_agent can background itself
 	agentPath := filepath.Join(filepath.Dir(hubPath), "gp_upgrade_agent")
-	c.remoteExec(hostnames, "start-agent", []string{agentPath})
+	//ssh -n -f user@host "sh -c 'cd /whereever; nohup ./whatever > /dev/null 2>&1 &'"
+	completeCommandString := fmt.Sprintf("sh -c 'nohup %s > /dev/null 2>&1 & '", agentPath)
+	c.remoteExec(hostnames, "start-agent", []string{completeCommandString})
 }
 
 func (c *ClusterSsher) remoteExec(hostnames []string, statedir string, command []string) {
