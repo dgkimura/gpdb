@@ -72,7 +72,10 @@ build :
 		$(TARGET_PLATFORM) go build -ldflags "-X gp_upgrade/cli/commanders.GpdbVersion=$(GPDB_VERSION)" -o $(GO_UTILS_DIR)/bin/gp_upgrade_hub$(PLATFORM_POSTFIX) $(MODULE_NAME)/hub
 
 coverage: build
-		./scripts/run_coverage.sh
+		ginkgo -r -cover -covermode=set
+		echo "mode: set" > coverage.out && find . -name '*coverprofile' | xargs cat | grep -v mode: | sort -r | awk '{if($$1 != last) {print $$0;last=$$1}}' >> coverage.out
+		find . -name '*.coverprofile' | xargs rm
+		go tool cover -html=coverage.out
 
 install : build
 	mkdir -p $(prefix)/bin

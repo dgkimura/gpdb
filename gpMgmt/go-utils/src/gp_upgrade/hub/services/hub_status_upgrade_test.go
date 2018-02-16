@@ -15,6 +15,7 @@ import (
 	"gp_upgrade/hub/services"
 	"gp_upgrade/testUtils"
 	"io/ioutil"
+	"path/filepath"
 )
 
 var _ = Describe("hub", func() {
@@ -34,6 +35,9 @@ var _ = Describe("hub", func() {
 		})
 
 		It("reports that prepare start-agents is pending", func() {
+			utils.System.FilePathGlob = func(string) ([]string, error) {
+				return []string{"somefile"}, nil
+			}
 			listener := services.NewCliToHubListener(logger.LogEntry{}, nil)
 			var fakeStatusUpgradeRequest *pb.StatusUpgradeRequest
 
@@ -53,16 +57,17 @@ var _ = Describe("hub", func() {
 			Expect(stepStatusSaved.GetStatus()).To(Equal(pb.StepStatus_PENDING))
 		})
 
-		PIt("reports that prepare start-agents is running and then complete", func() {
+		It("reports that prepare start-agents is running and then complete", func(done Done) {
+			var numInvocations int
+			utils.System.FilePathGlob = func(input string) ([]string, error) {
+				numInvocations += 1
+				if numInvocations == 1 {
+					return []string{filepath.Join(filepath.Dir(input), "in.progress")}, nil
+				}
+				return []string{filepath.Join(filepath.Dir(input), "completed")}, nil
+			}
 			listener := services.NewCliToHubListener(logger.LogEntry{}, nil)
-			var fakePrepareStartAgentsRequest *pb.PrepareStartAgentsRequest
 
-			formulatedResponse, err := listener.PrepareStartAgents(nil, fakePrepareStartAgentsRequest)
-			Expect(err).To(BeNil())
-			Expect(formulatedResponse).ToNot(BeNil())
-
-			//the Expect on line 74 should be an Eventually. This call to StatusUpgrade should be
-			// moved to a function we can call from an Eventually.
 			pollStatusUpgrade := func() pb.StepStatus {
 				response, _ := listener.StatusUpgrade(nil, &pb.StatusUpgradeRequest{})
 				stepStatuses := response.GetListOfUpgradeStepStatuses()
@@ -78,6 +83,7 @@ var _ = Describe("hub", func() {
 			}
 			//Expect(stepStatusSaved.GetStep()).ToNot(BeZero())
 			Eventually(pollStatusUpgrade).Should(Equal(pb.StepStatus_COMPLETE))
+			close(done)
 		})
 
 		It("reports that master upgrade is pending when pg_upgrade dir does not exist", func() {

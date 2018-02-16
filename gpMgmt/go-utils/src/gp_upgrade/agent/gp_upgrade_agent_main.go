@@ -30,14 +30,7 @@ func main() {
 		Use:   "gp_upgrade_agent ",
 		Short: "Start the Command Listener (blocks)",
 		Long:  `Start the Command Listener (blocks)`,
-		//PreRunE: func(cmd *cobra.Command, args []string) error {
-		//	if logdir == "" {
-		//		return errors.New("the required flag '--log-directory' was not specified")
-		//	}
-		//	return nil
-		//},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Do Stuff Here
 			gpbackupUtils.InitializeLogging("gp_upgrade_agent", logdir)
 			errorChannel := make(chan error)
 			defer close(errorChannel)

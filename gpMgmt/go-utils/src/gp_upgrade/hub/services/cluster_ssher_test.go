@@ -76,7 +76,7 @@ var _ = Describe("ClusterSsher", func() {
 			Expect(recvdArgs).To(ContainElement("StrictHostKeyChecking=no"))
 			Expect(recvdArgs).To(ContainElement("doesnt matter"))
 			//the ampersand is a hack until gp_upgrade_agent can background itself
-			Expect(recvdArgs[len(recvdArgs)-1]).To(HaveSuffix("gp_upgrade_agent &"))
+			Expect(recvdArgs[len(recvdArgs)-1]).To(HaveSuffix("gp_upgrade_agent > /dev/null 2>&1 & '"))
 			Expect(cw.freshStateDirs).To(ContainElement("start-agents"))
 			Expect(cw.stepsMarkedInProgress).To(ContainElement("start-agents"))
 			Expect(cw.stepsMarkedFailed).ToNot(ContainElement("start-agents"))
