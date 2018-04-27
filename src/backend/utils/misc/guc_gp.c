@@ -217,6 +217,7 @@ bool		gp_enable_exchange_default_partition = false;
 int			dtx_phase2_retry_count = 0;
 
 bool		log_dispatch_stats = false;
+bool		delay_recovery = false;
 
 int			explain_memory_verbosity = 0;
 char	   *memory_profiler_run_id = "none";
@@ -757,6 +758,15 @@ struct config_bool ConfigureNamesBool_gp[] =
 		},
 		&log_dispatch_stats,
 		false, assign_dispatch_log_stats, NULL
+	},
+	{
+		{"delay_recovery", PGC_USERSET, DEVELOPER_OPTIONS,
+			gettext_noop("delay_recovery"),
+			NULL,
+			GUC_GPDB_ADDOPT
+		},
+		&delay_recovery,
+		false, NULL, NULL
 	},
 
 	{

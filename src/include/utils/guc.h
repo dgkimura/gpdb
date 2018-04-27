@@ -140,6 +140,7 @@ extern List    *gp_guc_list_for_explain;
 extern List    *gp_guc_list_for_no_plan;
 
 /* GUC vars that are actually declared in guc.c, rather than elsewhere */
+extern bool delay_recovery;
 extern bool log_duration;
 extern bool Debug_print_plan;
 extern bool Debug_print_parse;

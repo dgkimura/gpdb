@@ -6199,6 +6199,11 @@ StartupXLOG_InProduction(void)
 	 */
 	CreateCheckPoint(CHECKPOINT_IS_SHUTDOWN | CHECKPOINT_IMMEDIATE);
 
+	if (delay_recovery)
+	{
+		elog(LOG, "delaying recovery");
+		pg_usleep(1000000L * 60);
+	}
 	/*
 	 * If this system was a standby which was promoted (or whose catalog is not
 	 * yet updated after promote), we delay going into actual production till Pass4.
