@@ -212,7 +212,9 @@ create_toast_table(Relation rel, Oid toastOid, Oid toastIndexOid,
 										   /* valid_opts */ false,
 										   /* persistentTid */ NULL,
 										   /* persistentSerialNum */ NULL,
-										   /* is_part_child */ false);
+										   /* is_part_child */ false,
+										   /* is_part_parent */ false);
+	Assert(toast_relid != InvalidOid);
 
 	/* make the toast relation visible, else index creation will fail */
 	CommandCounterIncrement();

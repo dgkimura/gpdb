@@ -1529,15 +1529,17 @@ setNewRelfilenode(Relation relation, TransactionId freezeXid)
 	rd_rel->relfilenode = newrelfilenode;
 	rd_rel->relpages = 0;		/* it's empty until further notice */
 	rd_rel->reltuples = 0;
-	if (should_have_valid_relfrozenxid(HeapTupleGetOid(tuple),
-									   rd_rel->relkind,
-									   rd_rel->relstorage))
+	if (TransactionIdIsValid(rd_rel->relfrozenxid))
 	{
+		Assert(TransactionIdIsNormal(freezeXid));
 		rd_rel->relfrozenxid = freezeXid;
-	}
-	else
-	{
-		rd_rel->relfrozenxid = InvalidTransactionId;
+		/*
+		 * Don't know partition parent or not here but passing false is perfect
+		 * for assertion, as valid relfrozenxid means it shouldn't be parent.
+		 */
+		Assert(should_have_valid_relfrozenxid(HeapTupleGetOid(tuple),
+											  rd_rel->relkind,
+											  rd_rel->relstorage, false));
 	}
 
 	simple_heap_update(pg_class, &tuple->t_self, tuple);

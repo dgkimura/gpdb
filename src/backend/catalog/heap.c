@@ -101,7 +101,8 @@ static void AddNewRelationTuple(Relation pg_class_desc,
 					Oid relowner,
 					char relkind,
 					char relstorage,
-					Datum reloptions);
+					Datum reloptions,
+					bool is_part_parent);
 static Oid AddNewRelationType(const char *typeName,
 				   Oid typeNamespace,
 				   Oid new_rel_oid,
@@ -1038,11 +1039,6 @@ InsertPgClassTuple(Relation pg_class_desc,
 	bool		nulls[Natts_pg_class];
 	HeapTuple	tup;
 
-	Assert(should_have_valid_relfrozenxid(
-			   new_rel_oid, rd_rel->relkind, rd_rel->relstorage) ?
-		   (rd_rel->relfrozenxid != InvalidTransactionId) :
-		   (rd_rel->relfrozenxid == InvalidTransactionId));
-
 	/* This is a tad tedious, but way cleaner than what we used to do... */
 	memset(values, 0, sizeof(values));
 	memset(nulls, false, sizeof(nulls));
@@ -1111,7 +1107,8 @@ AddNewRelationTuple(Relation pg_class_desc,
 					Oid relowner,
 					char relkind,
 					char relstorage,
-					Datum reloptions)
+					Datum reloptions,
+					bool is_part_parent)
 {
 	Form_pg_class new_rel_reltup;
 
@@ -1154,7 +1151,7 @@ AddNewRelationTuple(Relation pg_class_desc,
 	}
 
 	/* Initialize relfrozenxid */
-	if (should_have_valid_relfrozenxid(new_rel_oid, relkind, relstorage))
+	if (should_have_valid_relfrozenxid(new_rel_oid, relkind, relstorage, is_part_parent))
 	{
 		/*
 		 * Initialize to the minimum XID that could put tuples in the table.
@@ -1413,7 +1410,8 @@ heap_create_with_catalog(const char *relname,
 						 bool valid_opts,
 						 ItemPointer persistentTid,
 						 int64 *persistentSerialNum,
-						 bool is_part_child)
+						 bool is_part_child,
+						 bool is_part_parent)
 {
 	Relation	pg_class_desc;
 	Relation	gp_relation_node_desc;
@@ -1752,7 +1750,8 @@ heap_create_with_catalog(const char *relname,
 						ownerid,
 						relkind,
 						relstorage,
-						reloptions);
+						reloptions,
+						is_part_parent);
 
 	if (gp_relation_node_desc != NULL)
 	{
@@ -3545,8 +3544,16 @@ insert_ordered_unique_oid(List *list, Oid datum)
 }
 
 bool
-should_have_valid_relfrozenxid(Oid oid, char relkind, char relstorage)
+should_have_valid_relfrozenxid(Oid oid, char relkind, char relstorage,
+							   bool is_partition_parent)
 {
+	/*
+	 * Parent tables in partition hierarchy (top or internal one) contains no
+	 * data and hence no reason to have valid relfrozenxid.
+	 */
+	if (is_partition_parent)
+		return false;
+
 	switch (relkind)
 	{
 		case RELKIND_RELATION:

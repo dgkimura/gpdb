@@ -14,6 +14,11 @@ subpartition by hash (r_name) subpartitions 3
 (
 partition p1(subpartition sp1,subpartition sp2,subpartition sp3)
 );
+
+-- root and internal parent partitions should have relfrozenxid as 0
+select relname from pg_class where relkind = 'r' and relname like 'region%' and relfrozenxid=0;
+select gp_segment_id, relname from gp_dist_random('pg_class') where relkind = 'r' and relname like 'region%' and relfrozenxid=0;
+
 create unique index region_pkey on region(r_regionkey);
 
 copy region from stdin with delimiter '|';
@@ -3739,8 +3744,16 @@ partition by range(col2)
 insert into pt_td_leak select i,i,i from generate_series(1,9) i;
 copy pt_td_leak to '/tmp/pt_td_leak.out' csv;
 
+-- root partition (and only root) should have relfrozenxid as 0
+select relname from pg_class where relkind = 'r' and relname like 'pt_td_leak%' and relfrozenxid=0;
+select gp_segment_id, relname from gp_dist_random('pg_class') where relkind = 'r' and relname like 'pt_td_leak%' and relfrozenxid=0;
+
 alter table pt_td_leak drop column col3;
 alter table pt_td_leak add column col3 int default 7;
+
+-- root partition (and only root) should have relfrozenxid as 0
+select relname from pg_class where relkind = 'r' and relname like 'pt_td_leak%' and relfrozenxid=0;
+select gp_segment_id, relname from gp_dist_random('pg_class') where relkind = 'r' and relname like 'pt_td_leak%' and relfrozenxid=0;
 
 drop table if exists pt_td_leak_exchange;
 CREATE TABLE pt_td_leak_exchange ( col1 int, col2 int, col3 int) distributed by (col1);

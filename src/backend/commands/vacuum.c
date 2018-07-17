@@ -1912,13 +1912,8 @@ vac_update_datfrozenxid(void)
 	{
 		Form_pg_class classForm = (Form_pg_class) GETSTRUCT(classTup);
 
-		if (!should_have_valid_relfrozenxid(HeapTupleGetOid(classTup),
-											classForm->relkind,
-											classForm->relstorage))
-		{
-			Assert(!TransactionIdIsValid(classForm->relfrozenxid));
+		if (!TransactionIdIsValid(classForm->relfrozenxid))
 			continue;
-		}
 
 		/* GPDB: skip shared object in template0 in order to bring down its
 		 * age */
@@ -1926,6 +1921,13 @@ vac_update_datfrozenxid(void)
 			continue;
 
 		Assert(TransactionIdIsNormal(classForm->relfrozenxid));
+		/*
+		 * Don't know partition parent or not here but passing false is perfect
+		 * for assertion, as valid relfrozenxid means it shouldn't be parent.
+		 */
+		Assert(should_have_valid_relfrozenxid(HeapTupleGetOid(classTup),
+											  classForm->relkind,
+											  classForm->relstorage, false));
 
 		if (TransactionIdPrecedes(classForm->relfrozenxid, newFrozenXid))
 			newFrozenXid = classForm->relfrozenxid;

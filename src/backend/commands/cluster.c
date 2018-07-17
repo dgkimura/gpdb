@@ -755,7 +755,9 @@ make_new_heap(Oid OIDOldHeap, const char *NewName, Oid NewTableSpace,
 										  /* valid_opts */ true,
 						 				  /* persistentTid */ NULL,
 										  /* persistentSerialNum */ NULL,
-										  /* is_part_child */ false);
+										  /* is_part_child */ false,
+										  /* is_part_parent */ false);
+	Assert(OIDNewHeap != InvalidOid);
 
 	ReleaseSysCache(tuple);
 
@@ -1187,14 +1189,16 @@ swap_relation_files(Oid r1, Oid r2, TransactionId frozenXid, bool swap_stats)
 	 * This needs to be performed after the relkind and relstorage has been
 	 * swapped to correctly reflect the relfrozenxid.
 	 */
-	if (should_have_valid_relfrozenxid(r1, relform1->relkind, relform1->relstorage))
+	if (TransactionIdIsValid(relform1->relfrozenxid))
 	{
-		/* set rel1's frozen Xid */
-		Assert(TransactionIdIsNormal(frozenXid));
 		relform1->relfrozenxid = frozenXid;
+		/*
+		 * Don't know partition parent or not here but passing false is perfect
+		 * for assertion, as valid relfrozenxid means it shouldn't be parent.
+		 */
+		Assert(should_have_valid_relfrozenxid(r1, relform1->relkind,
+											  relform1->relstorage, false));
 	}
-	else
-		relform1->relfrozenxid = InvalidTransactionId;
 
 	if (Debug_persistent_print)
 		elog(Persistent_DebugPrintLevel(), 

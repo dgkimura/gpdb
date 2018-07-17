@@ -2279,7 +2279,16 @@ heap_insert(Relation relation, HeapTuple tup, CommandId cid,
 	HeapTuple	heaptup;
 	Buffer		buffer;
 
-	Insist(RelationIsHeap(relation));
+	Assert(RelationIsHeap(relation));
+
+	/*
+	 * We should not be inserting tuples into a relation with invalid
+	 * relfrozenxid. An exception is persistent tables that we know will have
+	 * frozen tuples.
+	 */
+	Assert(IsBootstrapProcessingMode() ||
+		   GpPersistent_IsPersistentRelation(relation->rd_id) ||
+		   TransactionIdIsNormal(relation->rd_rel->relfrozenxid));
 
 	// Fetch gp_persistent_relation_node information that will be added to XLOG record.
 	RelationFetchGpRelationNodeForXLog(relation);

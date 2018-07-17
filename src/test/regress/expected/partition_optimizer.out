@@ -23,6 +23,37 @@ NOTICE:  CREATE TABLE will create partition "region_1_prt_p1_2_prt_sp2_3_prt_2" 
 NOTICE:  CREATE TABLE will create partition "region_1_prt_p1_2_prt_sp3" for table "region_1_prt_p1"
 NOTICE:  CREATE TABLE will create partition "region_1_prt_p1_2_prt_sp3_3_prt_1" for table "region_1_prt_p1_2_prt_sp3"
 NOTICE:  CREATE TABLE will create partition "region_1_prt_p1_2_prt_sp3_3_prt_2" for table "region_1_prt_p1_2_prt_sp3"
+-- root and internal parent partitions should have relfrozenxid as 0
+select relname from pg_class where relkind = 'r' and relname like 'region%' and relfrozenxid=0;
+          relname          
+---------------------------
+ region
+ region_1_prt_p1
+ region_1_prt_p1_2_prt_sp1
+ region_1_prt_p1_2_prt_sp2
+ region_1_prt_p1_2_prt_sp3
+(5 rows)
+
+select gp_segment_id, relname from gp_dist_random('pg_class') where relkind = 'r' and relname like 'region%' and relfrozenxid=0;
+ gp_segment_id |          relname          
+---------------+---------------------------
+             2 | region
+             2 | region_1_prt_p1
+             2 | region_1_prt_p1_2_prt_sp1
+             2 | region_1_prt_p1_2_prt_sp2
+             2 | region_1_prt_p1_2_prt_sp3
+             0 | region
+             0 | region_1_prt_p1
+             0 | region_1_prt_p1_2_prt_sp1
+             0 | region_1_prt_p1_2_prt_sp2
+             0 | region_1_prt_p1_2_prt_sp3
+             1 | region
+             1 | region_1_prt_p1
+             1 | region_1_prt_p1_2_prt_sp1
+             1 | region_1_prt_p1_2_prt_sp2
+             1 | region_1_prt_p1_2_prt_sp3
+(15 rows)
+
 create unique index region_pkey on region(r_regionkey);
 NOTICE:  building index for child partition "region_1_prt_p1"
 NOTICE:  building index for child partition "region_1_prt_p1_2_prt_sp1"
@@ -7812,8 +7843,38 @@ NOTICE:  CREATE TABLE will create partition "pt_td_leak_1_prt_part1" for table "
 NOTICE:  CREATE TABLE will create partition "pt_td_leak_1_prt_part2" for table "pt_td_leak"
 insert into pt_td_leak select i,i,i from generate_series(1,9) i;
 copy pt_td_leak to '/tmp/pt_td_leak.out' csv;
+-- root partition (and only root) should have relfrozenxid as 0
+select relname from pg_class where relkind = 'r' and relname like 'pt_td_leak%' and relfrozenxid=0;
+  relname
+------------
+ pt_td_leak
+(1 row)
+
+select gp_segment_id, relname from gp_dist_random('pg_class') where relkind = 'r' and relname like 'pt_td_leak%' and relfrozenxid=0;
+ gp_segment_id |  relname
+---------------+------------
+             0 | pt_td_leak
+             1 | pt_td_leak
+             2 | pt_td_leak
+(3 rows)
+
 alter table pt_td_leak drop column col3;
 alter table pt_td_leak add column col3 int default 7;
+-- root partition (and only root) should have relfrozenxid as 0
+select relname from pg_class where relkind = 'r' and relname like 'pt_td_leak%' and relfrozenxid=0;
+  relname
+------------
+ pt_td_leak
+(1 row)
+
+select gp_segment_id, relname from gp_dist_random('pg_class') where relkind = 'r' and relname like 'pt_td_leak%' and relfrozenxid=0;
+ gp_segment_id |  relname
+---------------+------------
+             0 | pt_td_leak
+             1 | pt_td_leak
+             2 | pt_td_leak
+(3 rows)
+
 drop table if exists pt_td_leak_exchange;
 NOTICE:  table "pt_td_leak_exchange" does not exist, skipping
 CREATE TABLE pt_td_leak_exchange ( col1 int, col2 int, col3 int) distributed by (col1);

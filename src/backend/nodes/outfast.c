@@ -746,6 +746,7 @@ _outCreateStmt(StringInfo str, CreateStmt *node)
 	/* postCreate - for analysis, QD only */
 	/* deferredStmts - for analysis, QD only */
 	WRITE_BOOL_FIELD(is_part_child);
+	WRITE_BOOL_FIELD(is_part_parent);
 	WRITE_BOOL_FIELD(is_add_part);
 	WRITE_BOOL_FIELD(is_split_part);
 	WRITE_OID_FIELD(ownerid);

@@ -161,7 +161,8 @@ _bitmap_create_lov_heapandindex(Relation rel,
 								 /* valid_opts */ true,
 						 		 /* persistentTid */ NULL,
 								 /* persistentSerialNum */ NULL,
-								 /* is_part_child */ false);
+								 /* is_part_child */ false,
+								 /* is_part_parent */ false);
 	*lovHeapOid = heapid;
 
 	/*

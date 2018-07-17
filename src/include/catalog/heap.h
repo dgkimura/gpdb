@@ -59,7 +59,8 @@ extern Oid heap_create_with_catalog(const char *relname,
 						 bool valid_opts,
 						 ItemPointer persistentTid,
 						 int64 *persistentSerialNum,
-						 bool is_part_child);
+						 bool is_part_child,
+						 bool is_part_parent);
 
 extern void heap_drop_with_catalog(Oid relid);
 
@@ -152,5 +153,5 @@ extern void MetaTrackDropObject(Oid		classid,
 		|| ((relkind) == RELKIND_VIEW)) 
 
 extern void remove_gp_relation_node_and_schedule_drop(Relation rel);
-extern bool should_have_valid_relfrozenxid(Oid oid, char relkind, char relstorage);
+extern bool should_have_valid_relfrozenxid(Oid oid, char relkind, char relstorage, bool is_partition_parent);
 #endif   /* HEAP_H */

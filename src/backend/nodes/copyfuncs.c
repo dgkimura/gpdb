@@ -3178,6 +3178,7 @@ _copyCreateStmt(CreateStmt *from)
 	/* postCreate omitted (why?) */
 	COPY_NODE_FIELD(deferredStmts);
 	COPY_SCALAR_FIELD(is_part_child);
+	COPY_SCALAR_FIELD(is_part_parent);
 	COPY_SCALAR_FIELD(is_add_part);
 	COPY_SCALAR_FIELD(is_split_part);
 	COPY_SCALAR_FIELD(ownerid);

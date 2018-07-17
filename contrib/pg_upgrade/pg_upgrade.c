@@ -640,7 +640,8 @@ set_frozenxids(migratorContext *ctx)
 								  "UPDATE	pg_catalog.pg_class "
 								  "SET	relfrozenxid = '%u' "
 		/* only heap and TOAST are vacuumed */
-								  "WHERE	relkind IN ('r', 't')",
+								  "WHERE	(relkind = 'r' AND relfrozenxid != 0) "
+								  "OR relkind = 't'",
 								  ctx->old.controldata.chkpnt_nxtxid));
 		PQfinish(conn);
 
