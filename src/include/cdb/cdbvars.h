@@ -864,10 +864,6 @@ extern bool gp_cte_sharing;
  */
 extern bool gp_recursive_cte_prototype;
 
-/* MPP-7770: disallow altering storage using SET WITH */
-
-extern bool	gp_setwith_alter_storage;
-
 /* MPP-9772, MPP-9773: remove support for CREATE INDEX CONCURRENTLY */
 extern bool	gp_create_index_concurrently;
 
