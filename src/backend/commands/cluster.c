@@ -1191,6 +1191,7 @@ swap_relation_files(Oid r1, Oid r2, TransactionId frozenXid, bool swap_stats)
 	 */
 	if (TransactionIdIsValid(relform1->relfrozenxid))
 	{
+		Assert(TransactionIdIsNormal(frozenXid));
 		relform1->relfrozenxid = frozenXid;
 		/*
 		 * Don't know partition parent or not here but passing false is perfect
