@@ -1639,7 +1639,8 @@ vacuum_set_xid_limits(int freeze_min_age, bool sharedRel,
 	 * GPDB: if template0, we always ignore other databases.
 	 */
 	AssertImply(IsMyDatabaseTemplate0, sharedRel == false);
-	*oldestXmin = GetOldestXmin(sharedRel, true);
+	*oldestXmin = GetOldestXmin(sharedRel, true); // stores oldest transaction on template0
+	elogif(IsMyDatabaseTemplate0, LOG, "oldestXmin = %d", *oldestXmin);
 
 	Assert(TransactionIdIsNormal(*oldestXmin));
 
@@ -1650,17 +1651,26 @@ vacuum_set_xid_limits(int freeze_min_age, bool sharedRel,
 	 * wraparound won't occur too frequently.
 	 */
 	freezemin = freeze_min_age;
+	elogif(IsMyDatabaseTemplate0, LOG, "freezemin= %d", freezemin);
 	if (freezemin < 0)
+	{
 		freezemin = vacuum_freeze_min_age;
+		elogif(IsMyDatabaseTemplate0, LOG, "freezemin= %d", freezemin);
+	}
 	freezemin = Min(freezemin, autovacuum_freeze_max_age / 2);
+	elogif(IsMyDatabaseTemplate0, LOG, "freezemin= %d", freezemin);
 	Assert(freezemin >= 0);
 
 	/*
 	 * Compute the cutoff XID, being careful not to generate a "permanent" XID
 	 */
 	limit = *oldestXmin - freezemin;
+	elogif(IsMyDatabaseTemplate0, LOG, "limit= %d", limit);
 	if (!TransactionIdIsNormal(limit))
+	{
 		limit = FirstNormalTransactionId;
+		elogif(IsMyDatabaseTemplate0, LOG, "limit= %d", limit);
+	}
 
 	/*
 	 * If oldestXmin is very far back (in practice, more than
@@ -1668,8 +1678,12 @@ vacuum_set_xid_limits(int freeze_min_age, bool sharedRel,
 	 * freeze age of zero.
 	 */
 	safeLimit = ReadNewTransactionId() - autovacuum_freeze_max_age;
+	elogif(IsMyDatabaseTemplate0, LOG, "safeLimit= %d", safeLimit);
 	if (!TransactionIdIsNormal(safeLimit))
+	{
 		safeLimit = FirstNormalTransactionId;
+		elogif(IsMyDatabaseTemplate0, LOG, "safeLimit= %d", safeLimit);
+	}
 
 	if (TransactionIdPrecedes(limit, safeLimit))
 	{
@@ -1677,9 +1691,11 @@ vacuum_set_xid_limits(int freeze_min_age, bool sharedRel,
 				(errmsg("oldest xmin is far in the past"),
 				 errhint("Close open transactions soon to avoid wraparound problems.")));
 		limit = *oldestXmin;
+		elogif(IsMyDatabaseTemplate0, LOG, "limit= %d", limit);
 	}
 
 	*freezeLimit = limit;
+	elogif(IsMyDatabaseTemplate0, LOG, "freezelimit= %d", *freezeLimit);
 }
 
 void
