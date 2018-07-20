@@ -99,6 +99,7 @@
 #include "utils/ps_status.h"
 #include "utils/syscache.h"
 #include "cdb/cdbvars.h"
+#include "utils/faultinjector.h"
 
 
 /*
@@ -1616,7 +1617,9 @@ AutoVacWorkerMain(int argc, char *argv[])
 		SetProcessingMode(NormalProcessing);
 		set_ps_display(dbname, false);
 		ereport(LOG,
-				(errmsg("autovacuum: processing database %s", dbname)));
+				(errmsg("autovacuum: processing database \"%s\"", dbname)));
+
+		SIMPLE_FAULT_INJECTOR(AutoVacWorkerBeforeDoAutovacuum);
 
 		if (PostAuthDelay)
 			pg_usleep(PostAuthDelay * 1000000L);
