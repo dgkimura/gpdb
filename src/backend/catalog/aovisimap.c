@@ -23,7 +23,7 @@
 #include "utils/guc.h"
 
 void
-AlterTableCreateAoVisimapTable(Oid relOid, bool is_part_child)
+AlterTableCreateAoVisimapTable(Oid relOid, bool is_part_child, bool is_part_parent)
 {
 	Relation	rel;
 	IndexInfo  *indexInfo;
@@ -96,7 +96,7 @@ AlterTableCreateAoVisimapTable(Oid relOid, bool is_part_child)
 	(void) CreateAOAuxiliaryTable(rel,
 								  "pg_aovisimap",
 								  RELKIND_AOVISIMAP,
-								  tupdesc, indexInfo, classObjectId, coloptions);
+								  tupdesc, indexInfo, classObjectId, coloptions, is_part_parent);
 
 	heap_close(rel, NoLock);
 }

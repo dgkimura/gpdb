@@ -27,7 +27,7 @@
 
 
 void
-AlterTableCreateAoSegTable(Oid relOid, bool is_part_child)
+AlterTableCreateAoSegTable(Oid relOid, bool is_part_child, bool is_part_parent)
 {
 	TupleDesc	tupdesc;
 	Relation	rel;
@@ -160,7 +160,7 @@ AlterTableCreateAoSegTable(Oid relOid, bool is_part_child)
 	coloptions[0] = 0;
 
 	(void) CreateAOAuxiliaryTable(rel, prefix, RELKIND_AOSEGMENTS,
-								  tupdesc, NULL, classObjectId, coloptions);
+								  tupdesc, NULL, classObjectId, coloptions, is_part_parent);
 
 	heap_close(rel, NoLock);
 }

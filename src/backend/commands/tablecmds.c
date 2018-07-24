@@ -4073,7 +4073,17 @@ ATAddToastIfNeeded(List **wqueue)
 		{
 			bool is_part = !rel_needs_long_lock(tab->relid);
 
-			AlterTableCreateToastTable(tab->relid, is_part);
+			/*
+			 * FIXME: we've passed false as is_part_parent to make_new_heap().
+			 * So it seems ok to pass false for is_part_parent here but is that
+			 * right?  E.g. what happens when a partitioned table goes through
+			 * this code path?  All non-leaf nodes suddenly get a valid
+			 * relfrozenxid, when they shouldn't?  How about creating a new
+			 * function to scan pg_inherits to determine, given a master
+			 * relation's OID, whether an auxiliary table needs valid
+			 * relfrozenxid or not?
+			 */
+			AlterTableCreateToastTable(tab->relid, is_part, false);
 		}
 	}
 }
@@ -12360,6 +12370,36 @@ rel_get_table_oid(Relation rel)
 		heap_close(deprel, AccessShareLock);
 	}
 	return toid;
+}
+
+/*
+ * Check if a relation is a parent in partition hierarchy by probing
+ * pg_inherits catalog table.
+ */
+bool
+rel_is_parent(Oid relid)
+{
+	Relation inhrel;
+	ScanKeyData scankey;
+	SysScanDesc sscan;
+	bool is_parent = false;
+
+	ScanKeyInit(&scankey,
+				Anum_pg_inherits_inhparent,
+				BTEqualStrategyNumber, F_OIDEQ,
+				ObjectIdGetDatum(relid));
+
+	inhrel = heap_open(InheritsRelationId, AccessShareLock);
+
+	sscan = systable_beginscan(inhrel, InvalidOid,
+							   false, SnapshotNow, 1, &scankey);
+
+	if (systable_getnext(sscan))
+		is_parent = true;
+
+	systable_endscan(sscan);
+	heap_close(inhrel, AccessShareLock);
+	return is_parent;
 }
 
 /*

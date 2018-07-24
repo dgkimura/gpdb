@@ -23,7 +23,7 @@
 #include "nodes/makefuncs.h"
 
 void
-AlterTableCreateAoBlkdirTable(Oid relOid, bool is_part_child)
+AlterTableCreateAoBlkdirTable(Oid relOid, bool is_part_child, bool is_part_parent)
 {
 	Relation	rel;
 	TupleDesc	tupdesc;
@@ -99,7 +99,7 @@ AlterTableCreateAoBlkdirTable(Oid relOid, bool is_part_child)
 	(void) CreateAOAuxiliaryTable(rel,
 			"pg_aoblkdir",
 			RELKIND_AOBLOCKDIR,
-			tupdesc, indexInfo, classObjectId, coloptions);
+			tupdesc, indexInfo, classObjectId, coloptions, is_part_parent);
 
 	heap_close(rel, NoLock);
 }

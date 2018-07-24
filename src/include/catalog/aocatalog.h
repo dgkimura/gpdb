@@ -27,6 +27,7 @@ extern bool CreateAOAuxiliaryTable(
 		TupleDesc tupledesc,
 		IndexInfo  *indexInfo,
 		Oid	*classObjectId,
-		int16 *coloptions);
+		int16 *coloptions,
+		bool is_part_parent);
 
 #endif   /* AOCATALOG_H */

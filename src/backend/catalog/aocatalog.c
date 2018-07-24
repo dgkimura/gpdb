@@ -40,7 +40,8 @@ CreateAOAuxiliaryTable(
 		TupleDesc tupledesc,
 		IndexInfo  *indexInfo,
 		Oid	*classObjectId,
-		int16 *coloptions)
+		int16 *coloptions,
+		bool is_part_parent)
 {
 	char aoauxiliary_relname[NAMEDATALEN];
 	char aoauxiliary_idxname[NAMEDATALEN];
@@ -131,7 +132,7 @@ CreateAOAuxiliaryTable(
 											     /* persistentTid */ NULL,
 											     /* persistentSerialNum */ NULL,
 												 /* is_part_child */ false,
-												 /* is_part_parent */ false);
+												 is_part_parent);
 
 	/* Make this table visible, else index creation will fail */
 	CommandCounterIncrement();

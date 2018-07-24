@@ -33,7 +33,7 @@
 
 
 static bool create_toast_table(Relation rel, Oid toastOid, Oid toastIndexOid,
-							   bool is_part_child);
+							   bool is_part_child, bool is_part_parent);
 static bool needs_toast_table(Relation rel);
 
 
@@ -45,9 +45,22 @@ static bool needs_toast_table(Relation rel);
  * We expect the caller to have verified that the relation is a table and have
  * already done any necessary permission checks.  Callers expect this function
  * to end with CommandCounterIncrement if it makes any changes.
+ *
+ * If 'is_create' is true, we are creating the toast table for a new table,
+ * rather than adding it to an existing one. The difference is that the
+ * caller is expected to already hold an AccessExclusiveLock, if we're
+ * creating a new table.
+ *
+ * If 'is_part_child' is true, we are creating a toast table for a non-root
+ * table in a partition hierarchy.  This determines if array type gets created
+ * for the table or not.  If 'is_part_parent' is true, then we are creating a
+ * toast table for a non-leaf table in a partition hierarchy.  This is used to
+ * determine the value of relfrozenxid for the toast table.  Non-leaf tables do
+ * not contain data, so their relfrozenxid need not interfere in database age
+ * computation.
  */
 void
-AlterTableCreateToastTable(Oid relOid, bool is_part_child)
+AlterTableCreateToastTable(Oid relOid, bool is_part_child, bool is_part_parent)
 {
 	Relation	rel;
 
@@ -62,7 +75,7 @@ AlterTableCreateToastTable(Oid relOid, bool is_part_child)
 		rel = heap_open(relOid, AccessExclusiveLock);
 
 	/* create_toast_table does all the work */
-	(void) create_toast_table(rel, InvalidOid, InvalidOid, is_part_child);
+	(void) create_toast_table(rel, InvalidOid, InvalidOid, is_part_child, is_part_parent);
 
 	heap_close(rel, NoLock);
 }
@@ -88,7 +101,7 @@ BootstrapToastTable(char *relName, Oid toastOid, Oid toastIndexOid)
 						relName)));
 
 	/* create_toast_table does all the work */
-	if (!create_toast_table(rel, toastOid, toastIndexOid, false))
+	if (!create_toast_table(rel, toastOid, toastIndexOid, false, false))
 		elog(ERROR, "\"%s\" does not require a toast table",
 			 relName);
 
@@ -105,7 +118,7 @@ BootstrapToastTable(char *relName, Oid toastOid, Oid toastIndexOid)
  */
 static bool
 create_toast_table(Relation rel, Oid toastOid, Oid toastIndexOid,
-				   bool is_part_child)
+				   bool is_part_child, bool is_part_parent)
 {
 	Oid			relOid = RelationGetRelid(rel);
 	HeapTuple	reltup;
@@ -213,7 +226,7 @@ create_toast_table(Relation rel, Oid toastOid, Oid toastIndexOid,
 										   /* persistentTid */ NULL,
 										   /* persistentSerialNum */ NULL,
 										   /* is_part_child */ false,
-										   /* is_part_parent */ false);
+										   is_part_parent);
 	Assert(toast_relid != InvalidOid);
 
 	/* make the toast relation visible, else index creation will fail */
