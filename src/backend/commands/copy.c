@@ -4209,9 +4209,12 @@ CopyFromDispatch(CopyState cstate)
 	resultRelInfo = estate->es_result_relations;
 	for (i = estate->es_num_result_relations; i > 0; i--)
 	{
-		/* update AO tuple counts */
+		/*
+		 * update AO tuple counts. skip if the relation relfrozenxid==0.
+		 */
 		char relstorage = RelinfoGetStorage(resultRelInfo);
-		if (relstorage_is_ao(relstorage))
+		if (relstorage_is_ao(relstorage) &&
+			TransactionIdIsNormal(resultRelInfo->ri_RelationDesc->rd_rel->relfrozenxid))
 		{
 			if (cdbCopy->aotupcounts)
 			{
