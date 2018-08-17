@@ -4321,7 +4321,8 @@ ATRewriteTables(List **wqueue)
 
 		/* We will lock the table iff we decide to actually rewrite it */
 		OldHeap = relation_open(tab->relid, NoLock);
-		if (RelationIsExternal(OldHeap))
+		/* Empty tables do not need to be rewritten */
+		if (RelationIsExternal(OldHeap) || !TransactionIdIsNormal(OldHeap->rd_rel->relfrozenxid))
 		{
 			heap_close(OldHeap, NoLock);
 			continue;
