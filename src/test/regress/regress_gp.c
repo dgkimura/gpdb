@@ -44,6 +44,8 @@
 #include "utils/lsyscache.h"
 #include "utils/memutils.h"
 #include "utils/resource_manager.h"
+#include "replication/walsender_private.h"
+#include "access/xlog_internal.h"
 
 /* table_functions test */
 extern Datum multiset_example(PG_FUNCTION_ARGS);
@@ -88,6 +90,7 @@ extern Datum check_auth_time_constraints(PG_FUNCTION_ARGS);
 
 /* XID wraparound */
 extern Datum test_consume_xids(PG_FUNCTION_ARGS);
+extern Datum xlog_delay(PG_FUNCTION_ARGS);
 
 /* Triggers */
 
@@ -1956,4 +1959,31 @@ test_consume_xids(PG_FUNCTION_ARGS)
 	}
 
 	PG_RETURN_VOID();
+}
+PG_FUNCTION_INFO_V1(xlog_delay);
+Datum
+xlog_delay(PG_FUNCTION_ARGS)
+{
+	int			i;
+	uint lag = 42;
+	for (i = 0; i < max_wal_senders; i++)
+	{
+		/* use volatile pointer to prevent code rearrangement */
+		volatile WalSnd *walsnd = &WalSndCtl->walsnds[i];
+		XLogRecPtr	flush;
+		XLogRecPtr	apply;
+
+		if (walsnd->pid == 0)
+			continue;
+
+		SpinLockAcquire(&walsnd->mutex);
+		flush = walsnd->flush;
+		apply = walsnd->apply;
+		SpinLockRelease(&walsnd->mutex);
+
+		lag = flush.xrecoff - apply.xrecoff;
+		break;
+	}
+
+	PG_RETURN_UINT32(lag);
 }
