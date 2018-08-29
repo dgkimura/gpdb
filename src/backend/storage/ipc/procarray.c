@@ -1261,7 +1261,7 @@ GetOldestXmin(bool allDbs, bool ignoreVacuum)
 	 * done there too. This ensures correct operation of VACUUM FREEZE during
 	 * pg_upgrade.
 	 */
-	if (!IS_QUERY_DISPATCHER() && !IsBinaryUpgrade)
+	if (Gp_role != GP_ROLE_DISPATCH && !IsBinaryUpgrade)
 	{
 		TransactionId distribOldestXmin;
 
@@ -1664,7 +1664,7 @@ getDtxCheckPointInfo(char **result, int *result_size)
 	int			actual;
 	ProcArrayStruct *arrayP = procArray;
 
-	if (!IS_QUERY_DISPATCHER())
+	if (GpIdentity.segindex != MASTER_CONTENT_ID)
 	{
 		gxact_checkpoint = palloc(TMGXACT_CHECKPOINT_BYTES(0));
 		gxact_checkpoint->committedCount = 0;
@@ -1767,7 +1767,7 @@ DistributedSnapshotMappedEntry_Compare(const void *p1, const void *p2)
  * create distributed snapshot based on current visible distributed transaction
  */
 static bool
-CreateDistributedSnapshot(DistributedSnapshot *ds)
+CreateDistributedSnapshot(DistributedSnapshotWithLocalMapping *distribSnapshotWithLocalMapping)
 {
 	int			i;
 	int			count;
@@ -1775,6 +1775,7 @@ CreateDistributedSnapshot(DistributedSnapshot *ds)
 	DistributedTransactionId xmax;
 	DistributedSnapshotId distribSnapshotId;
 	DistributedTransactionId globalXminDistributedSnapshots;
+	DistributedSnapshot *ds;
 	ProcArrayStruct *arrayP = procArray;
 
 	Assert(LWLockHeldByMe(ProcArrayLock));
@@ -1796,6 +1797,7 @@ CreateDistributedSnapshot(DistributedSnapshot *ds)
 	 */
 	globalXminDistributedSnapshots = xmax;
 	count = 0;
+	ds = &distribSnapshotWithLocalMapping->ds;
 
 	Assert(ds->inProgressXidArray != NULL);
 
@@ -1899,6 +1901,22 @@ CreateDistributedSnapshot(DistributedSnapshot *ds)
 		 distribSnapshotId,
 		 MyTmGxact->gxid,
 		 DtxContextToString(DistributedTransactionContext));
+
+	/*
+	 * At snapshot creation time, local xid cache is empty. Gets populated as
+	 * reverse mapping takes place during visibility checks using this
+	 * snapshot.
+	 */
+	distribSnapshotWithLocalMapping->currentLocalXidsCount = 0;
+	distribSnapshotWithLocalMapping->minCachedLocalXid = InvalidTransactionId;
+	distribSnapshotWithLocalMapping->maxCachedLocalXid = InvalidTransactionId;
+
+	Assert(distribSnapshotWithLocalMapping->maxLocalXidsCount != 0);
+	Assert(distribSnapshotWithLocalMapping->inProgressMappedLocalXids != NULL);
+
+	memset(distribSnapshotWithLocalMapping->inProgressMappedLocalXids,
+		   InvalidTransactionId,
+		   sizeof(TransactionId) * distribSnapshotWithLocalMapping->maxLocalXidsCount);
 
 	return true;
 }
@@ -2031,29 +2049,22 @@ GetSnapshotData(Snapshot snapshot)
 			snapshot->distribSnapshotWithLocalMapping.ds.inProgressXidArray =
 				(DistributedTransactionId*)malloc(maxCount * sizeof(DistributedTransactionId));
 			if (snapshot->distribSnapshotWithLocalMapping.ds.inProgressXidArray == NULL)
+			{
 				ereport(ERROR, (errcode(ERRCODE_OUT_OF_MEMORY), errmsg("out of memory")));
-
+			}
 			snapshot->distribSnapshotWithLocalMapping.ds.maxCount = maxCount;
 
-			snapshot->distribSnapshotWithLocalMapping.currentLocalXidsCount = 0;
-			snapshot->distribSnapshotWithLocalMapping.minCachedLocalXid = InvalidTransactionId;
-			snapshot->distribSnapshotWithLocalMapping.maxCachedLocalXid = InvalidTransactionId;
-
-			if (!IS_QUERY_DISPATCHER())
+			/*
+			 * Allocate memory for local xid cache, currently allocating it
+			 * same size as distributed, not necessary.
+			 */
+			snapshot->distribSnapshotWithLocalMapping.inProgressMappedLocalXids =
+				(TransactionId*)malloc(maxCount * sizeof(TransactionId));
+			if (snapshot->distribSnapshotWithLocalMapping.inProgressMappedLocalXids == NULL)
 			{
-				/*
-				 * Allocate memory for local xid cache, currently allocating it
-				 * same size as distributed, not necessary.
-				 */
-				snapshot->distribSnapshotWithLocalMapping.inProgressMappedLocalXids =
-					(TransactionId*)malloc(maxCount * sizeof(TransactionId));
-				if (snapshot->distribSnapshotWithLocalMapping.inProgressMappedLocalXids == NULL)
-					ereport(ERROR, (errcode(ERRCODE_OUT_OF_MEMORY), errmsg("out of memory")));
-
-				snapshot->distribSnapshotWithLocalMapping.maxLocalXidsCount = maxCount;
+				ereport(ERROR, (errcode(ERRCODE_OUT_OF_MEMORY), errmsg("out of memory")));
 			}
-			else
-				snapshot->distribSnapshotWithLocalMapping.maxLocalXidsCount = 0;
+			snapshot->distribSnapshotWithLocalMapping.maxLocalXidsCount = maxCount;
 		}
 	}
 
@@ -2319,7 +2330,7 @@ GetSnapshotData(Snapshot snapshot)
 	 */
 	if (DistributedTransactionContext == DTX_CONTEXT_QD_DISTRIBUTED_CAPABLE)
 	{
-		snapshot->haveDistribSnapshot = CreateDistributedSnapshot(&snapshot->distribSnapshotWithLocalMapping.ds);
+		snapshot->haveDistribSnapshot = CreateDistributedSnapshot(&snapshot->distribSnapshotWithLocalMapping);
 
 		ereport((Debug_print_full_dtm ? LOG : DEBUG5),
 				(errmsg("Got distributed snapshot from DistributedSnapshotWithLocalXids_Create = %s",
@@ -2485,7 +2496,11 @@ GetSnapshotData(Snapshot snapshot)
 	if (TransactionIdPrecedes(xmin, globalxmin))
 		globalxmin = xmin;
 
-	if (!IS_QUERY_DISPATCHER())
+	if (DistributedTransactionContext == DTX_CONTEXT_QD_DISTRIBUTED_CAPABLE)
+	{
+		DistributedLog_AdvanceOldestXminOnQD(globalxmin);
+	}
+	else
 	{
 		/*
 		 * Fill in the distributed snapshot information we received from the

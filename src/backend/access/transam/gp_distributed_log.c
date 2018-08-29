@@ -85,59 +85,57 @@ gp_distributed_log(PG_FUNCTION_ARGS)
 	funcctx = SRF_PERCALL_SETUP();
 	context = (Context *) funcctx->user_fctx;
 
-	if (!IS_QUERY_DISPATCHER())
+	/*
+	 * Go backwards until we don't find a distributed log page
+	 */
+	while (true)
 	{
-		/*
-		 * Go backwards until we don't find a distributed log page
-		 */
-		while (true)
-		{
-			DistributedTransactionTimeStamp distribTimeStamp;
-			DistributedTransactionId 		distribXid;
-			char							distribId[TMGIDSIZE];
-			Datum		values[6];
-			bool		nulls[6];
-			HeapTuple	tuple;
-			Datum		result;
-
-			if (context->indexXid < FirstNormalTransactionId)
-				break;
-
-			if (!DistributedLog_ScanForPrevCommitted(
-					&context->indexXid,
-					&distribTimeStamp,
-					&distribXid))
-				break;
-
-			/*
-			 * Form tuple with appropriate data.
-			 */
-			MemSet(values, 0, sizeof(values));
-			MemSet(nulls, false, sizeof(nulls));
-
-			values[0] = Int16GetDatum((int16)GpIdentity.segindex);
-			values[1] = Int16GetDatum((int16)GpIdentity.dbid);
-			values[2] = TransactionIdGetDatum(distribXid);
-
-			sprintf(distribId, "%u-%.10u",
-					distribTimeStamp, distribXid);
+		DistributedTransactionTimeStamp distribTimeStamp;
+		DistributedTransactionId 		distribXid;
+		char							distribId[TMGIDSIZE];
 		
-			Assert(strlen(distribId) < TMGIDSIZE);
+		Datum		values[6];
+		bool		nulls[6];
+		HeapTuple	tuple;
+		Datum		result;
 
-			values[3] = CStringGetTextDatum(distribId);
+		if (context->indexXid < FirstNormalTransactionId)
+			break;
+		
+		if (!DistributedLog_ScanForPrevCommitted(
+									&context->indexXid,
+									&distribTimeStamp,
+									&distribXid))
+			break;
 
-			/*
-			 * For now, we only log committed distributed transactions.
-			 */
-			values[4] = CStringGetTextDatum("Committed");
+		/*
+		 * Form tuple with appropriate data.
+		 */
+		MemSet(values, 0, sizeof(values));
+		MemSet(nulls, false, sizeof(nulls));
 
-			values[5] = TransactionIdGetDatum(context->indexXid);
+		values[0] = Int16GetDatum((int16)GpIdentity.segindex);
+		values[1] = Int16GetDatum((int16)GpIdentity.dbid);
+		values[2] = TransactionIdGetDatum(distribXid);
+		sprintf(distribId, "%u-%.10u",
+			    distribTimeStamp, distribXid);
+		
+		Assert(strlen(distribId) < TMGIDSIZE);
 
-			tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls);
-			result = HeapTupleGetDatum(tuple);
-			SRF_RETURN_NEXT(funcctx, result);
-		}
+		values[3] = CStringGetTextDatum(distribId);
+
+		/*
+		 * For now, we only log committed distributed transactions.
+		 */
+		values[4] = CStringGetTextDatum("Committed");
+
+		values[5] = TransactionIdGetDatum(context->indexXid);
+
+		tuple = heap_form_tuple(funcctx->tuple_desc, values, nulls);
+		result = HeapTupleGetDatum(tuple);
+		SRF_RETURN_NEXT(funcctx, result);
 	}
+
 	SRF_RETURN_DONE(funcctx);
 }
 

@@ -20,7 +20,6 @@
 #include "access/distributedlog.h"
 #include "access/transam.h"
 #include "access/xact.h"
-#include "cdb/cdbvars.h"
 #include "lib/stringinfo.h"
 #include "utils/builtins.h"
 #include "utils/tqual.h"
@@ -237,8 +236,7 @@ GetTupleVisibilityDistribId(TransactionId xid,
 
 		case TupleTransactionStatus_HintCommitted:
 		case TupleTransactionStatus_CLogCommitted:
-			if ((!IS_QUERY_DISPATCHER()) &&
-				DistributedLog_CommittedCheck(xid,
+			if (DistributedLog_CommittedCheck(xid,
 											  &distribTimeStamp,
 											  &distribXid))
 			{
