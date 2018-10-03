@@ -116,9 +116,13 @@ gen_db_file_maps(DbInfo *old_db, DbInfo *new_db,
 		 * upgraded to 9.0 will get matching TOAST names. If index names don't
 		 * match primary key constraint names, this will fail because pg_dump
 		 * dumps constraint names and pg_upgrade checks index names.
+		 *
+		 * XXX GPDB: for TOAST tables, don't insist on a match at all
+		 * yet; there are other ways for us to get mismatched names. Ideally
+		 * this will go away eventually.
 		 */
 		if (strcmp(old_rel->nspname, new_rel->nspname) != 0 ||
-			((GET_MAJOR_VERSION(old_cluster.major_version) >= 900 ||
+			((/* GET_MAJOR_VERSION(old_cluster.major_version) >= 900 || */
 			  strcmp(old_rel->nspname, "pg_toast") != 0) &&
 			 strcmp(old_rel->relname, new_rel->relname) != 0))
 			pg_log(PG_FATAL, "Mismatch of relation names in database \"%s\": "
