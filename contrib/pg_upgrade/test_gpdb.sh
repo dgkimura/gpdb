@@ -130,6 +130,24 @@ check_vacuum_worked()
 	return 0
 }
 
+freeze_new_master()
+{
+	local datadir="${NEW_DATADIR}/qddir/demoDataDir-1/"
+
+	echo "Freezing new master cluster..."
+
+	# Start the instance using the same pg_ctl invocation used by pg_upgrade.
+	"${NEW_BINDIR}/pg_ctl" -w -l /dev/null -D "${datadir}" \
+		-o "-p 18432 --gp_dbid=1 --gp_num_contents_in_cluster=0 --gp_contentid=-1 --xid_warn_limit=10000000 -b" \
+		start
+
+	# Freeze all databases.
+	PGOPTIONS='-c gp_session_role=utility' "${NEW_BINDIR}/vacuumdb" --port 18432 --all --freeze
+
+	# Stop the instance.
+	"${NEW_BINDIR}/pg_ctl" -l /dev/null -D "${datadir}" stop
+}
+
 upgrade_qd()
 {
 	mkdir -p $1
@@ -364,6 +382,12 @@ fi
 # would be upgraded first and then the mirrors once the segments are verified.
 # In this scenario we can cut corners since we don't have any important data
 # in the test cluster and we only concern ourselves with 100% success rate.
+
+# The master segment must be frozen before we can copy over the QD data
+# directory, because there are distributed transaction references that don't
+# actually exist in its distributed xlog.
+freeze_new_master
+
 for i in 1 2 3
 do
 	j=$(($i-1))
