@@ -1642,7 +1642,7 @@ XidInMVCCSnapshot(TransactionId xid, Snapshot snapshot,
 	 * as the corresponding local ones, so we can rely on the local XIDs.
 	 */
 	if (snapshot->haveDistribSnapshot && !distributedSnapshotIgnore &&
-		GpIdentity.segindex != -1)
+		!IS_QUERY_DISPATCHER())
 	{
 		DistributedSnapshotCommitted	distributedSnapshotCommitted;
 
