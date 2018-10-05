@@ -704,6 +704,17 @@ DistributedLog_Startup(TransactionId oldestActiveXid,
 	 */
 	DistributedLogCtl->shared->latest_page_number = endPage;
 
+	if (IsBinaryUpgrade)
+	{
+		int			currentPage;
+		for (currentPage = startPage; currentPage <= endPage; currentPage++)
+		{
+			elog(LOG, "Zeroing out distributed log page %d", currentPage);
+			DistributedLog_ZeroPage(currentPage, false);
+		}
+	}
+
+
 	/*
 	 * Zero out the remainder of the current DistributedLog page.  Under normal
 	 * circumstances it should be zeroes already, but it seems at least

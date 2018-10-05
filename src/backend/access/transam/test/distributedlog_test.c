@@ -83,13 +83,67 @@ test_DistributedLog_Startup_MPP_20426(void **state)
 	MPP_20426(state, PageEntryToTransactionId(0x100, 1));
 }
 
+void foobar(TransactionId oldestActiveXid, TransactionId nextXid)
+{
+	char			pages[BLCKSZ];
+	int				bytes;
+	int startPage = TransactionIdToPage(oldestActiveXid);
+	int endPage = TransactionIdToPage(nextXid);
+
+	IsBinaryUpgrade = true;
+
+	/* Setup DistributedLogCtl */
+	DistributedLogCtl->shared = (SlruShared) malloc(sizeof(SlruSharedData));
+	DistributedLogCtl->shared->page_buffer =
+			(char **) malloc(DtxLogStartupNumPage * sizeof(char *));
+	DistributedLogCtl->shared->page_dirty =
+			(bool *) malloc(DtxLogStartupNumPage * sizeof(bool));
+	DistributedLogCtl->shared->page_buffer[0] = &pages[0];
+	DistributedLogCtl->shared->page_buffer[1] = &pages[BLCKSZ];
+	memset(pages, 0x7f, sizeof(pages));
+
+	expect_value(LWLockAcquire, lockid, DistributedLogControlLock);
+	expect_value(LWLockAcquire, mode, LW_EXCLUSIVE);
+	will_be_called(LWLockAcquire);
+
+	/* This test is only for the case xid is not on the boundary. */
+	expect_value(SimpleLruReadPage, ctl, DistributedLogCtl);
+	expect_any(SimpleLruReadPage, pageno);
+	expect_any(SimpleLruReadPage, write_ok);
+	expect_value(SimpleLruReadPage, xid, nextXid);
+	will_return(SimpleLruReadPage, 0);
+
+	expect_value(LWLockRelease, lockid, DistributedLogControlLock);
+	will_be_called(LWLockRelease);
+
+	expect_value(SimpleLruZeroPage, ctl, DistributedLogCtl);
+	expect_value(SimpleLruZeroPage, pageno, startPage);
+	will_return(SimpleLruZeroPage, 0);
+
+	expect_value(SimpleLruZeroPage, ctl, DistributedLogCtl);
+	expect_value(SimpleLruZeroPage, pageno, endPage);
+	will_return(SimpleLruZeroPage, 0);
+
+	/* Run the function. */
+	DistributedLog_Startup(oldestActiveXid, nextXid);
+
+	IsBinaryUpgrade = false;
+}
+
+void
+test_DuringBinaryUpgradeDistributedLogIsZeroedOut(void **state)
+{
+	foobar(MaxTransactionId, MaxTransactionId + 10);
+}
+
 int
 main(int argc, char* argv[])
 {
 	cmockery_parse_arguments(argc, argv);
 
 	const UnitTest tests[] = {
-		unit_test(test_DistributedLog_Startup_MPP_20426)
+		unit_test(test_DistributedLog_Startup_MPP_20426),
+		unit_test(test_DuringBinaryUpgradeDistributedLogIsZeroedOut)
 	};
 	return run_tests(tests);
 }
