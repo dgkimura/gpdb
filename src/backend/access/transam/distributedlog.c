@@ -704,16 +704,30 @@ DistributedLog_Startup(TransactionId oldestActiveXid,
 	 */
 	DistributedLogCtl->shared->latest_page_number = endPage;
 
+	/*
+	 * During binary upgrade the distributed logs from the master are copied
+	 * to the segment. This is problematic because the distributed logs on
+	 * master aren't maintained. We can work around this issue by creating
+	 * zeroed out distributed logs on the segment. This is okay because during
+	 * upgrade all transactions so far will be local to the segment. Later in
+	 * the upgrade these zeroed distributed log pages will be blown away and
+	 * replaced with the old segment's previous copies of distributed logs.
+	 *
+	 * TODO: Turn off distributed logging during binary upgrade to avoid the
+	 * issue mentioned above.
+	 */
 	if (IsBinaryUpgrade)
 	{
-		int			currentPage;
-		for (currentPage = startPage; currentPage <= endPage; currentPage++)
+		int currentPage = startPage;
+		do
 		{
-			elog(LOG, "Zeroing out distributed log page %d", currentPage);
+			if (currentPage > TransactionIdToPage(MaxTransactionId))
+				currentPage = 0;
+
 			DistributedLog_ZeroPage(currentPage, false);
 		}
+		while (currentPage++ != endPage);
 	}
-
 
 	/*
 	 * Zero out the remainder of the current DistributedLog page.  Under normal

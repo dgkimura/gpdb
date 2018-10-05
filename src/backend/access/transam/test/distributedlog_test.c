@@ -83,14 +83,10 @@ test_DistributedLog_Startup_MPP_20426(void **state)
 	MPP_20426(state, PageEntryToTransactionId(0x100, 1));
 }
 
-void foobar(TransactionId oldestActiveXid, TransactionId nextXid)
+static void
+setup(TransactionId nextXid)
 {
-	char			pages[BLCKSZ];
-	int				bytes;
-	int startPage = TransactionIdToPage(oldestActiveXid);
-	int endPage = TransactionIdToPage(nextXid);
-
-	IsBinaryUpgrade = true;
+	char *pages = malloc(sizeof(char) * BLCKSZ);
 
 	/* Setup DistributedLogCtl */
 	DistributedLogCtl->shared = (SlruShared) malloc(sizeof(SlruSharedData));
@@ -115,14 +111,21 @@ void foobar(TransactionId oldestActiveXid, TransactionId nextXid)
 
 	expect_value(LWLockRelease, lockid, DistributedLogControlLock);
 	will_be_called(LWLockRelease);
+}
+
+void
+test_BinaryUpgradeZeroesOutDistributedLogFittingOnSinglePage(void **state)
+{
+	TransactionId oldestActiveXid = FirstNormalTransactionId + 1;
+	TransactionId nextXid = FirstNormalTransactionId + 10;
+
+	setup(nextXid);
 
 	expect_value(SimpleLruZeroPage, ctl, DistributedLogCtl);
-	expect_value(SimpleLruZeroPage, pageno, startPage);
+	expect_value(SimpleLruZeroPage, pageno, TransactionIdToPage(oldestActiveXid));
 	will_return(SimpleLruZeroPage, 0);
 
-	expect_value(SimpleLruZeroPage, ctl, DistributedLogCtl);
-	expect_value(SimpleLruZeroPage, pageno, endPage);
-	will_return(SimpleLruZeroPage, 0);
+	IsBinaryUpgrade = true;
 
 	/* Run the function. */
 	DistributedLog_Startup(oldestActiveXid, nextXid);
@@ -131,9 +134,55 @@ void foobar(TransactionId oldestActiveXid, TransactionId nextXid)
 }
 
 void
-test_DuringBinaryUpgradeDistributedLogIsZeroedOut(void **state)
+test_BinaryUpgradeZeroesOutDistributedLogFittingOnThreePages(void **state)
 {
-	foobar(MaxTransactionId, MaxTransactionId + 10);
+	TransactionId oldestActiveXid = FirstNormalTransactionId + 1;
+	TransactionId nextXid = FirstNormalTransactionId + ENTRIES_PER_PAGE * 2;
+
+	setup(nextXid);
+
+	expect_value(SimpleLruZeroPage, ctl, DistributedLogCtl);
+	expect_value(SimpleLruZeroPage, pageno, TransactionIdToPage(oldestActiveXid));
+	will_return(SimpleLruZeroPage, 0);
+
+	expect_value(SimpleLruZeroPage, ctl, DistributedLogCtl);
+	expect_value(SimpleLruZeroPage, pageno, TransactionIdToPage(oldestActiveXid) + 1);
+	will_return(SimpleLruZeroPage, 0);
+
+	expect_value(SimpleLruZeroPage, ctl, DistributedLogCtl);
+	expect_value(SimpleLruZeroPage, pageno, TransactionIdToPage(nextXid));
+	will_return(SimpleLruZeroPage, 0);
+
+	IsBinaryUpgrade = true;
+
+	/* Run the function. */
+	DistributedLog_Startup(oldestActiveXid, nextXid);
+
+	IsBinaryUpgrade = false;
+}
+
+void
+test_BinaryUpgradeZeroesOutDistributedLogWithTransactionIdWraparound(void **state)
+{
+	TransactionId oldestActiveXid = MaxTransactionId;
+	TransactionId nextXid = MaxTransactionId + 10;
+
+	setup(nextXid);
+
+	expect_value(SimpleLruZeroPage, ctl, DistributedLogCtl);
+	expect_value(SimpleLruZeroPage, pageno, TransactionIdToPage(oldestActiveXid));
+	will_return(SimpleLruZeroPage, 0);
+
+	expect_value(SimpleLruZeroPage, ctl, DistributedLogCtl);
+	expect_value(SimpleLruZeroPage, pageno, TransactionIdToPage(nextXid));
+	will_return(SimpleLruZeroPage, 0);
+
+	IsBinaryUpgrade = true;
+
+	/* Run the function. */
+	DistributedLog_Startup(oldestActiveXid, nextXid);
+
+	IsBinaryUpgrade = false;
 }
 
 int
@@ -143,7 +192,9 @@ main(int argc, char* argv[])
 
 	const UnitTest tests[] = {
 		unit_test(test_DistributedLog_Startup_MPP_20426),
-		unit_test(test_DuringBinaryUpgradeDistributedLogIsZeroedOut)
+		unit_test(test_BinaryUpgradeZeroesOutDistributedLogWithTransactionIdWraparound),
+		unit_test(test_BinaryUpgradeZeroesOutDistributedLogFittingOnThreePages),
+		unit_test(test_BinaryUpgradeZeroesOutDistributedLogFittingOnSinglePage)
 	};
 	return run_tests(tests);
 }
