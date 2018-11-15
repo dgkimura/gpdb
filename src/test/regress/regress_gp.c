@@ -106,6 +106,8 @@ extern Datum gp_get_next_oid(PG_FUNCTION_ARGS);
 /* Broken output function, for testing */
 extern Datum broken_int4out(PG_FUNCTION_ARGS);
 
+extern Datum invalidate_rel_shared_buffers(PG_FUNCTION_ARGS);
+
 
 /* Triggers */
 

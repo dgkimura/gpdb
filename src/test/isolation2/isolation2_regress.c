@@ -93,3 +93,20 @@ setAOFormatVersion(PG_FUNCTION_ARGS)
 
 	PG_RETURN_BOOL(true);
 }
+
+PG_FUNCTION_INFO_V1(invalidate_rel_shared_buffers);
+Datum
+invalidate_rel_shared_buffers(PG_FUNCTION_ARGS)
+{
+	uint32		oid = PG_GETARG_OID(0);
+	Relation r;
+	RelFileNodeBackend rnode;
+
+	r = relation_open(oid, AccessExclusiveLock);
+	rnode.node = r->rd_node;
+	DropRelFileNodeBuffers(rnode, MAIN_FORKNUM, 0);
+
+	relation_close(r, NoLock);
+
+	PG_RETURN_VOID();
+}

@@ -1,0 +1,44 @@
+CREATE EXTENSION IF NOT EXISTS gp_inject_fault;
+CREATE
+CREATE OR REPLACE FUNCTION invalidate_rel_shared_buffers(oid) RETURNS VOID AS '@abs_builddir@/isolation2_regress@DLSUFFIX@', 'invalidate_rel_shared_buffers' language C;
+CREATE
+
+CREATE OR REPLACE FUNCTION invalidate_relation_shared_buffers(relname TEXT) RETURNS SETOF RECORD AS $$ SELECT invalidate_rel_shared_buffers(relname::regclass::oid) FROM gp_dist_random('gp_id') $$ LANGUAGE SQL EXECUTE ON ALL SEGMENTS;
+CREATE
+
+CREATE TABLE table_without_shared_buffers(a int);
+CREATE
+INSERT INTO table_without_shared_buffers SELECT i FROM generate_series(1, 12)i;
+INSERT 12
+
+SELECT invalidate_relation_shared_buffers('table_without_shared_buffers');
+invalidate_relation_shared_buffers
+----------------------------------
+("")                              
+("")                              
+("")                              
+(3 rows)
+
+SELECT gp_inject_fault('check_interrupts_before_loading_buffer_from_disk', 'skip', dbid) from gp_segment_configuration where role = 'p' and content=1;
+gp_inject_fault
+---------------
+t              
+(1 row)
+
+SELECT * FROM table_without_shared_buffers;
+a
+-
+(0 rows)
+
+SELECT gp_wait_until_triggered_fault('check_interrupts_before_loading_buffer_from_disk', 1, dbid) from gp_segment_configuration where role = 'p' and content=1;
+gp_wait_until_triggered_fault
+-----------------------------
+t                            
+(1 row)
+
+SELECT gp_inject_fault('check_interrupts_before_loading_buffer_from_disk', 'reset', dbid) from gp_segment_configuration where role = 'p' and content=1;
+gp_inject_fault
+---------------
+t              
+(1 row)
+

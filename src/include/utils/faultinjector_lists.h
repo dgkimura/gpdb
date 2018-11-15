@@ -257,6 +257,8 @@ FI_IDENT(DecreaseToastMaxChunkSize, "decrease_toast_max_chunk_size")
 FI_IDENT(CleanupQE, "cleanup_qe")
 /* inject fault after a writer has cancelled a reader during abort transaction */
 FI_IDENT(CancelledReaderDuringAbort, "cancelled_reader_during_abort")
+/* inject fault immediately before loading shared buffer from disk */
+FI_IDENT(CheckInterruptsBeforeLoadingBufferFromDisk, "check_interrupts_before_loading_buffer_from_disk")
 #endif
 
 /*

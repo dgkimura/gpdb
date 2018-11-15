@@ -9,6 +9,11 @@ RETURNS SETOF RECORD
 AS 'MODULE_PATHNAME', 'pg_buffercache_pages'
 LANGUAGE C;
 
+CREATE FUNCTION invalidate_rel_shared_buffers()
+RETURNS SETOF RECORD
+AS 'MODULE_PATHNAME', 'invalidate_rel_shared_buffers'
+LANGUAGE C;
+
 -- Create a view for convenient access.
 CREATE VIEW pg_buffercache AS
 	SELECT P.* FROM pg_buffercache_pages() AS P

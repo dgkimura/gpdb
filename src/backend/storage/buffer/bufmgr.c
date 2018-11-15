@@ -537,9 +537,12 @@ ReadBuffer_common(SMgrRelation smgr, char relpersistence, ForkNumber forkNum,
 		 * writer has already aborted the transaction.  Check for interrupts
 		 * allows the reader to determine if the writer has sent a cancel
 		 * signal.
+		 *
+		 * Ideally this only needs to be checked from a QE reader, but there
+		 * wasn't an obvious way inject fault on only reader.
 		 */
-		if (!Gp_is_writer)
-			CHECK_FOR_INTERRUPTS();
+		CHECK_FOR_INTERRUPTS();
+		SIMPLE_FAULT_INJECTOR(CheckInterruptsBeforeLoadingBufferFromDisk);
 
 		/*
 		 * Read in the page, unless the caller intends to overwrite it and
