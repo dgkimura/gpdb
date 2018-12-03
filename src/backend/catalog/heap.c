@@ -1855,10 +1855,11 @@ heap_create_with_catalog(const char *relname,
 	 * no guarantee that this will hit the disk before the next checkpoint
 	 * moves the redo pointer.
 	 */
-	if (relpersistence == RELPERSISTENCE_UNLOGGED)
+	if (relpersistence == RELPERSISTENCE_UNLOGGED && !appendOnlyRel)
 	{
 		Assert(relkind == RELKIND_RELATION || relkind == RELKIND_MATVIEW ||
-			   relkind == RELKIND_TOASTVALUE);
+			   relkind == RELKIND_TOASTVALUE || relkind == RELKIND_AOSEGMENTS||
+			   relkind == RELKIND_AOBLOCKDIR || relkind == RELKIND_AOVISIMAP);
 		heap_create_init_fork(new_rel_desc);
 	}
 
