@@ -25,6 +25,12 @@ id|name
 1: checkpoint;
 CHECKPOINT
 
+1U: select * from gp_toolkit.__gp_aoseg('unlogged_appendonly_table_managers');
+segno|eof|tupcount|varblockcount|eof_uncompressed|modcount|formatversion|state
+-----+---+--------+-------------+----------------+--------+-------------+-----
+1    |80 |2       |2            |80              |2       |3            |1    
+(1 row)
+
 -- force an unclean stop and recovery:
 
 -- expect inserts/updates are truncated after crash recovery
@@ -33,6 +39,10 @@ id|name
 --+----
 (0 rows)
 
+2U: select * from gp_toolkit.__gp_aoseg('unlogged_appendonly_table_managers');
+segno|eof|tupcount|varblockcount|eof_uncompressed|modcount|formatversion|state
+-----+---+--------+-------------+----------------+--------+-------------+-----
+(0 rows)
 
 -- expect: insert/update/select works
 3: insert into unlogged_appendonly_table_managers values (1, 'Joe');

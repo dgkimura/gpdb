@@ -19,6 +19,8 @@ select * from unlogged_appendonly_table_managers order by id;
 -- ensure that operations have been written to the xlog before testing recovery
 1: checkpoint;
 
+1U: select * from gp_toolkit.__gp_aoseg('unlogged_appendonly_table_managers');
+
 -- force an unclean stop and recovery:
 -- start_ignore
 select restart_primary_segments_containing_data_for('unlogged_appendonly_table_managers');
@@ -27,6 +29,7 @@ select restart_primary_segments_containing_data_for('unlogged_appendonly_table_m
 -- expect inserts/updates are truncated after crash recovery
 2: select * from unlogged_appendonly_table_managers;
 
+2U: select * from gp_toolkit.__gp_aoseg('unlogged_appendonly_table_managers');
 
 -- expect: insert/update/select works
 3: insert into unlogged_appendonly_table_managers values (1, 'Joe');
