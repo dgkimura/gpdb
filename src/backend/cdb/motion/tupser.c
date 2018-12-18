@@ -687,6 +687,12 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 			}
 
 			tupleSize = memtuple_get_size(tuple);
+
+			paddedSize = TYPEALIGN(TUPLE_CHUNK_ALIGN, tupleSize);
+
+			if (paddedSize + TUPLE_CHUNK_HEADER_SIZE > b->prilen)
+				return 0;
+
 			/* will fit. */
 			memcpy(b->pri + TUPLE_CHUNK_HEADER_SIZE, tuple, tupleSize);
 			if (need_toast)
@@ -694,12 +700,6 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 				pfree(tuple);
 				TupClearVirtualTuple(slot);
 			}
-
-			paddedSize = TYPEALIGN(TUPLE_CHUNK_ALIGN, tupleSize);
-
-			if (paddedSize + TUPLE_CHUNK_HEADER_SIZE > b->prilen)
-				return 0;
-
 			memset(b->pri + TUPLE_CHUNK_HEADER_SIZE + tupleSize, 0, paddedSize - tupleSize);
 
 			dataSize += paddedSize;
