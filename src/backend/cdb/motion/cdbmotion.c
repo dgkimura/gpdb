@@ -539,7 +539,7 @@ SendTuple(MotionLayerState *mlStates,
 		getTransportDirectBuffer(transportStates, motNodeID, targetRoute, &b);
 
 	int			sent = 0;
-	sent = SerializeTupleDirect(slot, &pMNEntry->ser_tup_info, &b, targetRoute);
+	sent = SerializeTupleDirect(slot, &pMNEntry->ser_tup_info, &b, targetRoute, &tcList);
 	if (sent > 0)
 	{
 		putTransportDirectBuffer(transportStates, motNodeID, targetRoute, sent);
@@ -557,8 +557,6 @@ SendTuple(MotionLayerState *mlStates,
 
 	/* Create and store the serialized form, and some stats about it. */
 	oldCtxt = MemoryContextSwitchTo(mlStates->motion_layer_mctx);
-
-	SerializeTupleIntoChunks(slot, &pMNEntry->ser_tup_info, &tcList);
 
 	MemoryContextSwitchTo(oldCtxt);
 
