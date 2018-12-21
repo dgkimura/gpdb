@@ -647,7 +647,7 @@ SerializeTupleIntoChunks(TupleTableSlot *slot, SerTupInfo *pSerInfo, TupleChunkL
  * We're called with at least enough space for a tuple-chunk-header.
  */
 int
-SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTransportBuffer *b)
+SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTransportBuffer *b, int16 targetRoute)
 {
 	int			natts;
 	int			dataSize = TUPLE_CHUNK_HEADER_SIZE;
@@ -660,6 +660,12 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 
 	tupdesc = pSerInfo->tupdesc;
 	natts = tupdesc->natts;
+
+	if (targetRoute == BROADCAST_SEGIDX)
+		return 0;
+
+	if (b->pri != NULL && b->prilen > TUPLE_CHUNK_HEADER_SIZE)
+		return 0;
 
 	do
 	{
