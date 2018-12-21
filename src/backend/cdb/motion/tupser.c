@@ -613,31 +613,6 @@ SerializeTupleIntoChunks(TupleTableSlot *slot, SerTupInfo *pSerInfo, TupleChunkL
 		}
 	}
 
-	/*
-	 * if we have more than 1 chunk we have to set the chunk types on our
-	 * first chunk and last chunk
-	 */
-	if (tcList->num_chunks > 1)
-	{
-		TupleChunkListItem first,
-					last;
-
-		first = tcList->p_first;
-		last = tcList->p_last;
-
-		Assert(first != NULL);
-		Assert(first != last);
-		Assert(last != NULL);
-
-		SetChunkType(first->chunk_data, TC_PARTIAL_START);
-		SetChunkType(last->chunk_data, TC_PARTIAL_END);
-
-		/*
-		 * any intervening chunks are already set to TC_PARTIAL_MID when
-		 * allocated
-		 */
-	}
-
 	return;
 }
 
@@ -649,6 +624,7 @@ SerializeTupleIntoChunks(TupleTableSlot *slot, SerTupInfo *pSerInfo, TupleChunkL
 int
 SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTransportBuffer *b, int16 targetRoute, TupleChunkList tcList)
 {
+	TupleChunkListItem tcItem = NULL;
 	int			natts;
 	int			dataSize = TUPLE_CHUNK_HEADER_SIZE;
 	TupleDesc	tupdesc;
@@ -672,24 +648,25 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 	/* easy case */
 	if (is_memtuple(gtuple))
 	{
+		MemTuple	tuple = (MemTuple) gtuple;
+		bool need_toast = memtuple_get_hasext(tuple);
+
+		if (need_toast)
+		{
+			MemoryContext oldContext;
+			/* Need to detoast */
+			oldContext = MemoryContextSwitchTo(s_tupSerMemCtxt);
+			slot_getallattrs(slot);
+			tuple = memtuple_form_to(slot->tts_mt_bind, slot_get_values(slot), slot_get_isnull(slot),
+									  NULL, NULL, true);
+			MemoryContextSwitchTo(oldContext);
+		}
+
 		if (targetRoute != BROADCAST_SEGIDX && (b->pri == NULL || b->prilen <= TUPLE_CHUNK_HEADER_SIZE))
 		{
 			/* try to serialize directly into buffer */
-			MemTuple	tuple = (MemTuple) gtuple;
 			int			tupleSize;
 			int			paddedSize;
-			bool need_toast = memtuple_get_hasext(tuple);
-
-			if (need_toast)
-			{
-				MemoryContext oldContext;
-				/* Need to detoast */
-				oldContext = MemoryContextSwitchTo(s_tupSerMemCtxt);
-				slot_getallattrs(slot);
-				tuple = memtuple_form_to(slot->tts_mt_bind, slot_get_values(slot), slot_get_isnull(slot),
-										  NULL, NULL, true);
-				MemoryContextSwitchTo(oldContext);
-			}
 
 			tupleSize = memtuple_get_size(tuple);
 
@@ -709,10 +686,34 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 				SetChunkDataSize(b->pri, dataSize - TUPLE_CHUNK_HEADER_SIZE);
 				return dataSize;
 			}
-
-			if (need_toast)
-				pfree(tuple);
 		}
+
+		/* get ready to go */
+		tcList->p_first = NULL;
+		tcList->p_last = NULL;
+		tcList->num_chunks = 0;
+		tcList->serialized_data_length = 0;
+		tcList->max_chunk_length = Gp_max_tuple_chunk_size;
+		tcItem = getChunkFromCache(&pSerInfo->chunkCache);
+		if (tcItem == NULL)
+		{
+			ereport(FATAL,
+					(errcode(ERRCODE_OUT_OF_MEMORY),
+					 errmsg("could not allocate space for first chunk item in new chunk list")));
+		}
+
+		/* assume that we'll take a single chunk */
+		SetChunkType(tcItem->chunk_data, TC_WHOLE);
+		tcItem->chunk_length = TUPLE_CHUNK_HEADER_SIZE;
+		appendChunkToTCList(tcList, tcItem);
+
+		AssertState(s_tupSerMemCtxt != NULL);
+
+		addByteStringToChunkList(tcList, (char *) tuple, memtuple_get_size(tuple), &pSerInfo->chunkCache);
+		addPadding(tcList, &pSerInfo->chunkCache, memtuple_get_size(tuple));
+
+		if (need_toast)
+			MemoryContextReset(s_tupSerMemCtxt);
 	}
 	else
 	{
@@ -768,9 +769,34 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 				return dataSize;
 			}
 		}
+
+		SerializeTupleIntoChunks(slot, pSerInfo, tcList);
 	}
 
-	SerializeTupleIntoChunks(slot, pSerInfo, tcList);
+	/*
+	 * if we have more than 1 chunk we have to set the chunk types on our
+	 * first chunk and last chunk
+	 */
+	if (tcList->num_chunks > 1)
+	{
+		TupleChunkListItem first,
+					last;
+
+		first = tcList->p_first;
+		last = tcList->p_last;
+
+		Assert(first != NULL);
+		Assert(first != last);
+		Assert(last != NULL);
+
+		SetChunkType(first->chunk_data, TC_PARTIAL_START);
+		SetChunkType(last->chunk_data, TC_PARTIAL_END);
+
+		/*
+		 * any intervening chunks are already set to TC_PARTIAL_MID when
+		 * allocated
+		 */
+	}
 
 	/*
 	 * tuple that we can't handle here (big ?) -- do the older
