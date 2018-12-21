@@ -667,47 +667,39 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 	if (b->pri != NULL && b->prilen > TUPLE_CHUNK_HEADER_SIZE)
 		return 0;
 
-	do
+	if (natts == 0)
 	{
-		if (natts == 0)
-		{
-			/* TC_EMTPY is just one chunk */
-			SetChunkType(b->pri, TC_EMPTY);
-			SetChunkDataSize(b->pri, 0);
+		/* TC_EMTPY is just one chunk */
+		SetChunkType(b->pri, TC_EMPTY);
+		SetChunkDataSize(b->pri, 0);
 
-			break;
+		return TUPLE_CHUNK_HEADER_SIZE;
+	}
+	/* easy case */
+	if (is_memtuple(gtuple))
+	{
+		MemTuple	tuple = (MemTuple) gtuple;
+		int			tupleSize;
+		int			paddedSize;
+		bool need_toast = memtuple_get_hasext(tuple);
+
+		if (need_toast)
+		{
+			MemoryContext oldContext;
+			/* Need to detoast */
+			oldContext = MemoryContextSwitchTo(s_tupSerMemCtxt);
+			slot_getallattrs(slot);
+			tuple = memtuple_form_to(slot->tts_mt_bind, slot_get_values(slot), slot_get_isnull(slot),
+									  NULL, NULL, true);
+			MemoryContextSwitchTo(oldContext);
 		}
 
-		/* easy case */
-		if (is_memtuple(gtuple))
+		tupleSize = memtuple_get_size(tuple);
+
+		paddedSize = TYPEALIGN(TUPLE_CHUNK_ALIGN, tupleSize);
+
+		if (paddedSize + TUPLE_CHUNK_HEADER_SIZE <= b->prilen)
 		{
-			MemTuple	tuple = (MemTuple) gtuple;
-			int			tupleSize;
-			int			paddedSize;
-			bool need_toast = memtuple_get_hasext(tuple);
-
-			if (need_toast)
-			{
-				MemoryContext oldContext;
-				/* Need to detoast */
-				oldContext = MemoryContextSwitchTo(s_tupSerMemCtxt);
-				slot_getallattrs(slot);
-				tuple = memtuple_form_to(slot->tts_mt_bind, slot_get_values(slot), slot_get_isnull(slot),
-										  NULL, NULL, true);
-				MemoryContextSwitchTo(oldContext);
-			}
-
-			tupleSize = memtuple_get_size(tuple);
-
-			paddedSize = TYPEALIGN(TUPLE_CHUNK_ALIGN, tupleSize);
-
-			if (paddedSize + TUPLE_CHUNK_HEADER_SIZE > b->prilen)
-			{
-				if (need_toast)
-					pfree(tuple);
-				return 0;
-			}
-
 			/* will fit. */
 			memcpy(b->pri + TUPLE_CHUNK_HEADER_SIZE, tuple, tupleSize);
 			if (need_toast)
@@ -718,34 +710,38 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 
 			SetChunkType(b->pri, TC_WHOLE);
 			SetChunkDataSize(b->pri, dataSize - TUPLE_CHUNK_HEADER_SIZE);
-			break;
+			return dataSize;
 		}
+
+		if (need_toast)
+			pfree(tuple);
+		return 0;
+	}
+	else
+	{
+		HeapTuple	tuple = (HeapTuple) gtuple;
+		TupSerHeader tsh;
+
+		unsigned int datalen;
+		unsigned int nullslen;
+
+		HeapTupleHeader t_data = tuple->t_data;
+
+		unsigned char *pos;
+
+		datalen = tuple->t_len - t_data->t_hoff;
+		if (HeapTupleHasNulls(tuple))
+			nullslen = BITMAPLEN(HeapTupleHeaderGetNatts(t_data));
 		else
+			nullslen = 0;
+
+		tsh.tuplen = sizeof(TupSerHeader) + TYPEALIGN(TUPLE_CHUNK_ALIGN, nullslen) + TYPEALIGN(TUPLE_CHUNK_ALIGN, datalen);
+		tsh.natts = HeapTupleHeaderGetNatts(t_data);
+		tsh.infomask = t_data->t_infomask;
+
+		if (dataSize + tsh.tuplen <= b->prilen &&
+			(tsh.infomask & HEAP_HASEXTERNAL) == 0)
 		{
-			HeapTuple	tuple = (HeapTuple) gtuple;
-			TupSerHeader tsh;
-
-			unsigned int datalen;
-			unsigned int nullslen;
-
-			HeapTupleHeader t_data = tuple->t_data;
-
-			unsigned char *pos;
-
-			datalen = tuple->t_len - t_data->t_hoff;
-			if (HeapTupleHasNulls(tuple))
-				nullslen = BITMAPLEN(HeapTupleHeaderGetNatts(t_data));
-			else
-				nullslen = 0;
-
-			tsh.tuplen = sizeof(TupSerHeader) + TYPEALIGN(TUPLE_CHUNK_ALIGN, nullslen) + TYPEALIGN(TUPLE_CHUNK_ALIGN, datalen);
-			tsh.natts = HeapTupleHeaderGetNatts(t_data);
-			tsh.infomask = t_data->t_infomask;
-
-			if (dataSize + tsh.tuplen > b->prilen ||
-				(tsh.infomask & HEAP_HASEXTERNAL) != 0)
-				return 0;
-
 			pos = b->pri + TUPLE_CHUNK_HEADER_SIZE;
 
 			memcpy(pos, (char *) &tsh, sizeof(TupSerHeader));
@@ -769,18 +765,15 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 			SetChunkType(b->pri, TC_WHOLE);
 			SetChunkDataSize(b->pri, dataSize - TUPLE_CHUNK_HEADER_SIZE);
 
-			break;
+			return dataSize;
 		}
-
-		/*
-		 * tuple that we can't handle here (big ?) -- do the older
-		 * "out-of-line" serialization
-		 */
-		return 0;
 	}
-	while (0);
 
-	return dataSize;
+	/*
+	 * tuple that we can't handle here (big ?) -- do the older
+	 * "out-of-line" serialization
+	 */
+	return 0;
 }
 
 /*
