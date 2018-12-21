@@ -625,6 +625,8 @@ int
 SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTransportBuffer *b, int16 targetRoute, TupleChunkList tcList)
 {
 	TupleChunkListItem tcItem = NULL;
+	MemoryContext oldCtxt;
+	int			i;
 	int			natts;
 	int			dataSize = TUPLE_CHUNK_HEADER_SIZE;
 	TupleDesc	tupdesc;
@@ -770,7 +772,156 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 			}
 		}
 
-		SerializeTupleIntoChunks(slot, pSerInfo, tcList);
+		/* get ready to go */
+		tcList->p_first = NULL;
+		tcList->p_last = NULL;
+		tcList->num_chunks = 0;
+		tcList->serialized_data_length = 0;
+		tcList->max_chunk_length = Gp_max_tuple_chunk_size;
+		tcItem = getChunkFromCache(&pSerInfo->chunkCache);
+		if (tcItem == NULL)
+		{
+			ereport(FATAL,
+					(errcode(ERRCODE_OUT_OF_MEMORY),
+					 errmsg("could not allocate space for first chunk item in new chunk list")));
+		}
+
+		/* assume that we'll take a single chunk */
+		SetChunkType(tcItem->chunk_data, TC_WHOLE);
+		tcItem->chunk_length = TUPLE_CHUNK_HEADER_SIZE;
+		appendChunkToTCList(tcList, tcItem);
+
+		AssertState(s_tupSerMemCtxt != NULL);
+
+		HeapTuple tuple = (HeapTuple) gtuple;
+		HeapTupleHeader t_data = tuple->t_data;
+		TupSerHeader tsh;
+
+		unsigned int datalen;
+		unsigned int nullslen;
+
+		datalen = tuple->t_len - t_data->t_hoff;
+		if (HeapTupleHasNulls(tuple))
+			nullslen = BITMAPLEN(HeapTupleHeaderGetNatts(t_data));
+		else
+			nullslen = 0;
+
+		tsh.tuplen = sizeof(TupSerHeader) + TYPEALIGN(TUPLE_CHUNK_ALIGN, nullslen) + datalen;
+		tsh.natts = HeapTupleHeaderGetNatts(t_data);
+		tsh.infomask = t_data->t_infomask;
+
+		addByteStringToChunkList(tcList, (char *) &tsh, sizeof(TupSerHeader), &pSerInfo->chunkCache);
+
+		/*
+		 * If we don't have any attributes which have been toasted, we can be
+		 * very very simple: just send the raw data.
+		 */
+		if ((tsh.infomask & HEAP_HASEXTERNAL) == 0)
+		{
+			if (nullslen)
+			{
+				addByteStringToChunkList(tcList, (char *) t_data->t_bits, nullslen, &pSerInfo->chunkCache);
+				addPadding(tcList, &pSerInfo->chunkCache, nullslen);
+			}
+
+			addByteStringToChunkList(tcList, (char *) t_data + t_data->t_hoff, datalen, &pSerInfo->chunkCache);
+			addPadding(tcList, &pSerInfo->chunkCache, datalen);
+		}
+		else
+		{
+			/*
+			 * We have to be more careful when we have tuples that have been
+			 * toasted. Ideally we'd like to send the untoasted attributes in
+			 * as "raw" a format as possible but that makes rebuilding the
+			 * tuple harder .
+			 */
+			oldCtxt = MemoryContextSwitchTo(s_tupSerMemCtxt);
+
+			/* deconstruct the tuple (faster than a heap_getattr loop) */
+			heap_deform_tuple(tuple, tupdesc, pSerInfo->values, pSerInfo->nulls);
+
+			MemoryContextSwitchTo(oldCtxt);
+
+			/* Send the nulls character-array. */
+			addByteStringToChunkList(tcList, pSerInfo->nulls, natts, &pSerInfo->chunkCache);
+			addPadding(tcList, &pSerInfo->chunkCache, natts);
+
+			/*
+			 * send the attributes of this tuple: NOTE anything which
+			 * allocates temporary space (e.g. could result in a
+			 * PG_DETOAST_DATUM) should be executed with the memory context
+			 * set to s_tupSerMemCtxt
+			 */
+			for (i = 0; i < natts; ++i)
+			{
+				SerAttrInfo *attrInfo = pSerInfo->myinfo + i;
+				Datum		origattr = pSerInfo->values[i],
+							attr;
+
+				/* skip null attributes (already taken care of above) */
+				if (pSerInfo->nulls[i])
+					continue;
+
+				if (attrInfo->typlen == -1)
+				{
+					int32		sz;
+					char	   *data;
+
+					/*
+					 * If we have a toasted datum, forcibly detoast it here to
+					 * avoid memory leakage: we want to force the detoast
+					 * allocation(s) to happen in our reset-able serialization
+					 * context.
+					 */
+					oldCtxt = MemoryContextSwitchTo(s_tupSerMemCtxt);
+					attr = PointerGetDatum(PG_DETOAST_DATUM_PACKED(origattr));
+					MemoryContextSwitchTo(oldCtxt);
+
+					sz = VARSIZE_ANY_EXHDR(attr);
+					data = VARDATA_ANY(attr);
+
+					/* Send length first, then data */
+					addInt32ToChunkList(tcList, sz, &pSerInfo->chunkCache);
+					addByteStringToChunkList(tcList, data, sz, &pSerInfo->chunkCache);
+					addPadding(tcList, &pSerInfo->chunkCache, sz);
+				}
+				else if (attrInfo->typlen == -2)
+				{
+					int32		sz;
+					char	   *data;
+
+					/*
+					 * CString, we would send the string with the terminating
+					 * '\0'
+					 */
+					data = DatumGetCString(origattr);
+					sz = strlen(data) + 1;
+
+					/* Send length first, then data */
+					addInt32ToChunkList(tcList, sz, &pSerInfo->chunkCache);
+					addByteStringToChunkList(tcList, data, sz, &pSerInfo->chunkCache);
+					addPadding(tcList, &pSerInfo->chunkCache, sz);
+				}
+				else if (attrInfo->typbyval)
+				{
+					/*
+					 * We send a full-width Datum for all pass-by-value types,
+					 * regardless of the actual size.
+					 */
+					addByteStringToChunkList(tcList, (char *) &origattr, sizeof(Datum), &pSerInfo->chunkCache);
+					addPadding(tcList, &pSerInfo->chunkCache, sizeof(Datum));
+				}
+				else
+				{
+					addByteStringToChunkList(tcList, DatumGetPointer(origattr), attrInfo->typlen, &pSerInfo->chunkCache);
+					addPadding(tcList, &pSerInfo->chunkCache, attrInfo->typlen);
+
+					attr = origattr;
+				}
+			}
+
+			MemoryContextReset(s_tupSerMemCtxt);
+		}
 	}
 
 	/*
