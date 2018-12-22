@@ -534,33 +534,25 @@ SendTuple(MotionLayerState *mlStates,
 	elog(DEBUG5, "Serializing HeapTuple for sending.");
 #endif
 
+	struct directTransportBuffer b;
 	if (targetRoute != BROADCAST_SEGIDX)
-	{
-		struct directTransportBuffer b;
-
 		getTransportDirectBuffer(transportStates, motNodeID, targetRoute, &b);
 
-		if (b.pri != NULL && b.prilen > TUPLE_CHUNK_HEADER_SIZE)
-		{
-			int			sent = 0;
+	int			sent = SerializeTupleDirect(slot, &pMNEntry->ser_tup_info, &b, targetRoute);
+	if (sent > 0)
+	{
+		putTransportDirectBuffer(transportStates, motNodeID, targetRoute, sent);
 
-			sent = SerializeTupleDirect(slot, &pMNEntry->ser_tup_info, &b);
-			if (sent > 0)
-			{
-				putTransportDirectBuffer(transportStates, motNodeID, targetRoute, sent);
+		/* fill-in tcList fields to update stats */
+		tcList.num_chunks = 1;
+		tcList.serialized_data_length = sent;
 
-				/* fill-in tcList fields to update stats */
-				tcList.num_chunks = 1;
-				tcList.serialized_data_length = sent;
+		/* update stats */
+		statSendTuple(mlStates, pMNEntry, &tcList);
 
-				/* update stats */
-				statSendTuple(mlStates, pMNEntry, &tcList);
-
-				return SEND_COMPLETE;
-			}
-		}
-		/* Otherwise fall-through */
+		return SEND_COMPLETE;
 	}
+	/* Otherwise fall-through */
 
 	/* Create and store the serialized form, and some stats about it. */
 	oldCtxt = MemoryContextSwitchTo(mlStates->motion_layer_mctx);
