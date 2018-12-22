@@ -667,15 +667,13 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 	if (b->pri == NULL || b->prilen <= TUPLE_CHUNK_HEADER_SIZE)
 		return 0;
 
-	do
-	{
 		if (natts == 0)
 		{
 			/* TC_EMTPY is just one chunk */
 			SetChunkType(b->pri, TC_EMPTY);
 			SetChunkDataSize(b->pri, 0);
 
-			break;
+			return dataSize;
 		}
 
 		/* easy case */
@@ -718,7 +716,7 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 
 			SetChunkType(b->pri, TC_WHOLE);
 			SetChunkDataSize(b->pri, dataSize - TUPLE_CHUNK_HEADER_SIZE);
-			break;
+			return dataSize;
 		}
 		else
 		{
@@ -769,7 +767,7 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 			SetChunkType(b->pri, TC_WHOLE);
 			SetChunkDataSize(b->pri, dataSize - TUPLE_CHUNK_HEADER_SIZE);
 
-			break;
+			return dataSize;
 		}
 
 		/*
@@ -777,10 +775,6 @@ SerializeTupleDirect(TupleTableSlot *slot, SerTupInfo *pSerInfo, struct directTr
 		 * "out-of-line" serialization
 		 */
 		return 0;
-	}
-	while (0);
-
-	return dataSize;
 }
 
 /*
