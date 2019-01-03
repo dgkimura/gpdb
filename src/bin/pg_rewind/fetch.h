@@ -45,5 +45,6 @@ extern void traverse_datadir(const char *datadir, process_file_callback_t callba
 
 extern void GenerateRecoveryConf(void);
 extern void WriteRecoveryConf(void);
+extern void CreateReplicationSlot(const char *slot_name);
 
 #endif   /* FETCH_H */
