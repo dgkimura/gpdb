@@ -21,10 +21,10 @@ PG_LIBS = $(libpq_pgport)
 override CPPFLAGS := -I$(libpq_srcdir) -DFRONTEND $(CPPFLAGS)
 
 OBJS	= pg_rewind.o parsexlog.o xlogreader.o datapagemap.o timeline.o \
-	fetch.o file_ops.o copy_fetch.o libpq_fetch.o filemap.o logging.o compat.o \
+	fetch.o file_ops.o copy_fetch.o libpq_fetch.o filemap.o logging.o compat.o streamutil.o \
 	$(WIN32RES)
 
-EXTRA_CLEAN = xlogreader.c compat.c
+EXTRA_CLEAN = xlogreader.c compat.c streamutil.c
 
 REGRESS = basictest extrafiles databases pg_xlog_symlink unclean_shutdown simple_no_rewind_required ao_rewind bitmaptest
 REGRESS_OPTS=--use-existing --launcher=./launcher
@@ -39,6 +39,9 @@ xlogreader.c: % : $(top_srcdir)/src/backend/access/transam/%
 
 # compat.c is symlinked from the PostgreSQL sources.
 compat.c: % : $(top_srcdir)/contrib/pg_xlogdump/%
+	rm -f $@ && $(LN_S) $< .
+
+streamutil.c: % : $(top_srcdir)/bin/pg_basebackup/%
 	rm -f $@ && $(LN_S) $< .
 
 install: all installdirs

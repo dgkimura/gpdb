@@ -18,6 +18,7 @@
 #include "file_ops.h"
 #include "filemap.h"
 #include "logging.h"
+#include "streamutil.h"
 
 #include "access/timeline.h"
 #include "access/xlog_internal.h"
@@ -66,6 +67,7 @@ usage(const char *progname)
 	printf(_("      --source-pgdata=DIRECTORY  source data directory to synchronize with\n"));
 	printf(_("      --source-server=CONNSTR    source server to synchronize with\n"));
 	printf(_("  -R, --write-recovery-conf      write recovery.conf after backup\n"));
+	printf(_("  -S, --slot=SLOTNAME            replication slot to use\n"));
 	printf(_("  -n, --dry-run                  stop before modifying anything\n"));
 	printf(_("  -P, --progress                 write progress messages\n"));
 	printf(_("      --debug                    write a lot of debug messages\n"));
@@ -82,6 +84,7 @@ main(int argc, char **argv)
 		{"help", no_argument, NULL, '?'},
 		{"target-pgdata", required_argument, NULL, 'D'},
 		{"write-recovery-conf", no_argument, NULL, 'R'},
+		{"slot", required_argument, NULL, 'S'},
 		{"source-pgdata", required_argument, NULL, 1},
 		{"source-server", required_argument, NULL, 2},
 		{"version", no_argument, NULL, 'V'},
@@ -122,7 +125,7 @@ main(int argc, char **argv)
 		}
 	}
 
-	while ((c = getopt_long(argc, argv, "D:nPR", long_options, &option_index)) != -1)
+	while ((c = getopt_long(argc, argv, "D:nPR:S", long_options, &option_index)) != -1)
 	{
 		switch (c)
 		{
@@ -140,6 +143,10 @@ main(int argc, char **argv)
 
 			case 'R':
 				writerecoveryconf = true;
+				break;
+
+			case 'S':
+				replication_slot = pg_strdup(optarg);
 				break;
 
 			case 3:
@@ -188,6 +195,21 @@ main(int argc, char **argv)
 		exit(1);
 	}
 
+	if (datadir_source != NULL && replication_slot != NULL)
+	{
+		fprintf(stderr, _("%s: only one of --source-pgdata or --slot can be specified\n"), progname);
+		fprintf(stderr, _("Try \"%s --help\" for more information.\n"), progname);
+		exit(1);
+	}
+
+	if (writerecoveryconf != NULL && replication_slot == NULL ||
+		writerecoveryconf == NULL && replication_slot != NULL)
+	{
+		fprintf(stderr, _("%s: --write-recovery-conf and --slot must be specified together\n"), progname);
+		fprintf(stderr, _("Try \"%s --help\" for more information.\n"), progname);
+		exit(1);
+	}
+
 	/*
 	 * Don't allow pg_rewind to be run as root, to avoid overwriting the
 	 * ownership of files in the data directory. We need only check for root
@@ -205,7 +227,10 @@ main(int argc, char **argv)
 
 	/* Connect to remote server */
 	if (connstr_source)
+	{
 		libpqConnect(connstr_source);
+		connection_string = connstr_source;
+	}
 
 	/*
 	 * Ok, we have all the options and we're ready to start. Read in all the
@@ -289,8 +314,18 @@ main(int argc, char **argv)
 
 		if (writerecoveryconf && connstr_source)
 		{
-			GenerateRecoveryConf();
+			GenerateRecoveryConf(replication_slot);
 			WriteRecoveryConf();
+			PGconn *replication_conn = NULL;
+
+			/*
+			 * Connect in replication mode to the server
+			 */
+			replication_conn = GetConnection();
+			if (!replication_conn)
+				/* Error message already written in GetConnection() */
+				exit(1);
+			CreateReplicationSlot(replication_conn, replication_slot, NULL, NULL, true);
 		}
 
 		exit(0);
@@ -385,8 +420,18 @@ main(int argc, char **argv)
 
 	if (writerecoveryconf && connstr_source)
 	{
-		GenerateRecoveryConf();
+		GenerateRecoveryConf(replication_slot);
 		WriteRecoveryConf();
+		PGconn *replication_conn = NULL;
+
+		/*
+		 * Connect in replication mode to the server
+		 */
+		replication_conn = GetConnection();
+		if (!replication_conn)
+			/* Error message already written in GetConnection() */
+			exit(1);
+		CreateReplicationSlot(replication_conn, replication_slot, NULL, NULL, true);
 	}
 
 	printf(_("Done!\n"));
