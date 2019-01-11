@@ -15,6 +15,7 @@
 
 #include <sys/stat.h>
 #include <unistd.h>
+#include <replication/slot.h>
 
 #include "access/xlog.h"
 #include "libpq/pqformat.h"
@@ -318,6 +319,43 @@ HandleFtsWalRepSyncRepOff(void)
 	SendFtsResponse(&response, FTS_MSG_SYNCREP_OFF);
 }
 
+
+static void
+CreateReplicationSlotOnPromote(const char *name)
+{
+	int             i;
+
+	Assert(MyReplicationSlot == NULL);
+	/* Check if slot exists */
+	/*
+ * Check for name collision, and identify an allocatable slot.  We need to
+ * hold ReplicationSlotControlLock in shared mode for this, so that nobody
+ * else can change the in_use flags while we're looking at them.
+ */
+	LWLockAcquire(ReplicationSlotControlLock, LW_SHARED);
+	for (i = 0; i < max_replication_slots; i++)
+	{
+		ReplicationSlot *s = &ReplicationSlotCtl->replication_slots[i];
+
+		if (s->in_use && strcmp(name, NameStr(s->data.name)) == 0)
+			MyReplicationSlot = s;
+	}
+	LWLockRelease(ReplicationSlotControlLock);
+
+	if (MyReplicationSlot == NULL)
+		ReplicationSlotCreate(name, false, RS_PERSISTENT);
+
+	/* expecting on promote is the only time slot will be created on mirror. If node is acting as mirror replication on the same will be deleted */
+	if (MyReplicationSlot->data.restart_lsn == 0)
+	{
+		/* Starting reserving WAL right away for pg_rewind to work later */
+		ReplicationSlotReserveWal();
+		/* Write this slot to disk */
+		ReplicationSlotMarkDirty();
+		ReplicationSlotSave();
+	}
+}
+
 static void
 HandleFtsWalRepPromote(void)
 {
@@ -349,6 +387,9 @@ HandleFtsWalRepPromote(void)
 		 * sync_standby_names.
 		 */
 		UnsetSyncStandbysDefined();
+
+		CreateReplicationSlotOnPromote("internal_wal_replication_slot");
+
 		SignalPromote();
 	}
 	else

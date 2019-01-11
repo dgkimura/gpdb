@@ -316,6 +316,7 @@ main(int argc, char **argv)
 		{
 			GenerateRecoveryConf(replication_slot);
 			WriteRecoveryConf();
+#if 0
 			PGconn *replication_conn = NULL;
 
 			/*
@@ -325,7 +326,8 @@ main(int argc, char **argv)
 			if (!replication_conn)
 				/* Error message already written in GetConnection() */
 				exit(1);
-			CreateReplicationSlot(replication_conn, replication_slot, NULL, NULL, true);
+//CreateReplicationSlot(replication_conn, replication_slot, NULL, NULL, true);
+#endif
 		}
 
 		exit(0);
@@ -422,16 +424,19 @@ main(int argc, char **argv)
 	{
 		GenerateRecoveryConf(replication_slot);
 		WriteRecoveryConf();
+#if 0
 		PGconn *replication_conn = NULL;
 
 		/*
 		 * Connect in replication mode to the server
 		 */
+
 		replication_conn = GetConnection();
 		if (!replication_conn)
 			/* Error message already written in GetConnection() */
 			exit(1);
 		CreateReplicationSlot(replication_conn, replication_slot, NULL, NULL, true);
+#endif
 	}
 
 	printf(_("Done!\n"));
