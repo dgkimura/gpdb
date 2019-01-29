@@ -3045,6 +3045,7 @@ typedef struct AlterDatabaseStmt
 	NodeTag		type;
 	char	   *dbname;			/* name of database to alter */
 	List	   *options;		/* List of DefElem nodes */
+	int			phase;
 } AlterDatabaseStmt;
 
 typedef struct AlterDatabaseSetStmt

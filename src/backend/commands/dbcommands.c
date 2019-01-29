@@ -90,7 +90,7 @@ typedef struct
 
 /* non-export function prototypes */
 static void createdb_failure_callback(int code, Datum arg);
-static void movedb(const char *dbname, const char *tblspcname);
+static void movedb(const char *dbname, const char *tblspcname, AlterDatabaseStmt *stmt);
 static void movedb_failure_callback(int code, Datum arg);
 static bool get_db_info(const char *name, LOCKMODE lockmode,
 			Oid *dbIdP, Oid *ownerIdP,
@@ -1116,7 +1116,7 @@ RenameDatabase(const char *oldname, const char *newname)
  * ALTER DATABASE SET TABLESPACE
  */
 static void
-movedb(const char *dbname, const char *tblspcname)
+movedb(const char *dbname, const char *tblspcname, AlterDatabaseStmt *stmt)
 {
 	Oid			db_id;
 	Relation	pgdbrel;
@@ -1222,6 +1222,18 @@ movedb(const char *dbname, const char *tblspcname)
 						dbname),
 				 errdetail_busy_db(notherbackends, npreparedxacts)));
 
+	if (Gp_role == GP_ROLE_DISPATCH)
+	{
+		stmt->phase = 1;
+		CdbDispatchUtilityStatement((Node *) stmt,
+									DF_CANCEL_ON_ERROR |
+									DF_NEED_TWO_PHASE,
+									NIL,
+									NULL);
+	}
+
+	if (stmt->phase == 1)
+	{
 	/*
 	 * Get old and new database paths
 	 */
@@ -1304,6 +1316,8 @@ movedb(const char *dbname, const char *tblspcname)
 	PG_ENSURE_ERROR_CLEANUP(movedb_failure_callback,
 							PointerGetDatum(&fparms));
 	{
+		SIMPLE_FAULT_INJECTOR(InsideMoveDbTransaction);
+
 		/*
 		 * Copy files from the old tablespace to the new one
 		 */
@@ -1401,9 +1415,23 @@ movedb(const char *dbname, const char *tblspcname)
 	 */
 	PopActiveSnapshot();
 	CommitTransactionCommand();
+	}
 
 	/* Start new transaction for the remaining work; don't need a snapshot */
 	StartTransactionCommand();
+
+	if (Gp_role == GP_ROLE_DISPATCH)
+	{
+		stmt->phase = 2;
+		CdbDispatchUtilityStatement((Node *) stmt,
+									DF_CANCEL_ON_ERROR |
+									DF_NEED_TWO_PHASE,
+									NIL,
+									NULL);
+	}
+
+	if (stmt->phase == 2)
+	{
 
 	/*
 	 * Remove files from the old tablespace
@@ -1429,6 +1457,7 @@ movedb(const char *dbname, const char *tblspcname)
 		rdata[0].next = NULL;
 
 		(void) XLogInsert(RM_DBASE_ID, XLOG_DBASE_DROP, rdata);
+	}
 	}
 
 	/* Now it's safe to release the database lock */
@@ -1500,9 +1529,19 @@ AlterDatabase(AlterDatabaseStmt *stmt, bool isTopLevel)
 	{
 		/* currently, can't be specified along with any other options */
 		Assert(!dconnlimit);
-		/* this case isn't allowed within a transaction block */
-		PreventTransactionChain(isTopLevel, "ALTER DATABASE SET TABLESPACE");
-		movedb(stmt->dbname, strVal(dtablespace->arg));
+		if (Gp_role != GP_ROLE_EXECUTE)
+		{
+			/* TODO: Validate that this is in fact true. Example was copied from AlterEnum*/
+			/*
+			 * GPDB: allow this in query executor, as distributed transaction
+			 * participants. The QD already checked this, and should've prevented
+			 * running this in any genuine transaction block.
+			 */
+			/* this case isn't allowed within a transaction block */
+			PreventTransactionChain(isTopLevel, "ALTER DATABASE SET TABLESPACE");
+		}
+		movedb(stmt->dbname, strVal(dtablespace->arg), stmt);
+
 		return InvalidOid;
 	}
 

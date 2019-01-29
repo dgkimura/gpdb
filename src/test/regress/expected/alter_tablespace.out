@@ -1,0 +1,148 @@
+-- Scenrio 1: Where alter database set tablespace successfully changes the
+-- underlying tablespace directory.
+-- Given we create a database
+CREATE EXTENSION IF NOT EXISTS gp_inject_fault;
+DROP DATABASE IF EXISTS mydatabase;
+CREATE DATABASE mydatabase;
+\c mydatabase
+-- And create a table in that database with data
+DROP TABLE IF EXISTS mytable;
+NOTICE:  table "mytable" does not exist, skipping
+CREATE TABLE mytable(id int, name text);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'id' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+INSERT INTO mytable VALUES (1, 'a'), (2, 'b'), (4, 'c');
+-- When we create a tablespace
+-- start_ignore
+DROP TABLESPACE IF EXISTS mytablespace;
+-- end_ignore
+\! rm -rf '/tmp/mytablespace';
+\! mkdir '/tmp/mytablespace';
+CREATE TABLESPACE mytablespace LOCATION '/tmp/mytablespace';
+-- And alter the database to use the new tablespace
+\c postgres
+ALTER DATABASE mydatabase SET TABLESPACE mytablespace;
+-- Then all the database files from QD and all QEs should be moved into the new
+-- tablespace. We use the fact that default tablespace names begin with 'base'
+-- where as user created tablespaces begin with 'pg_tblspc'
+\c mydatabase
+SELECT COUNT(*) FROM (SELECT pg_relation_filepath('mytable')) a where a.pg_relation_filepath LIKE 'pg_tblspc%';
+ count 
+-------
+     1
+(1 row)
+
+SELECT COUNT(*) FROM (SELECT gp_segment_id, pg_relation_filepath('mytable') FROM gp_dist_random('gp_id')) a where a.pg_relation_filepath LIKE 'pg_tblspc%';
+ count 
+-------
+     3
+(1 row)
+
+SELECT COUNT(*) FROM (SELECT pg_relation_filepath('mytable')) a where a.pg_relation_filepath LIKE 'base%';
+ count 
+-------
+     0
+(1 row)
+
+SELECT COUNT(*) FROM (SELECT gp_segment_id, pg_relation_filepath('mytable') FROM gp_dist_random('gp_id')) a where a.pg_relation_filepath LIKE 'base%';
+ count 
+-------
+     0
+(1 row)
+
+SELECT gp_segment_id, * FROM mytable;
+ gp_segment_id | id | name 
+---------------+----+------
+             0 |  4 | c
+             1 |  2 | b
+             2 |  1 | a
+(3 rows)
+
+-- Scenrio 2: Where alter database set tablespace fails on segment. In this
+-- case we expect that the tablespace for database is unchanged.
+\c postgres
+-- Given we create a database
+CREATE EXTENSION IF NOT EXISTS gp_inject_fault;
+NOTICE:  extension "gp_inject_fault" already exists, skipping
+DROP DATABASE IF EXISTS mydatabase;
+CREATE DATABASE mydatabase;
+\c mydatabase
+-- And create a table in that database with data
+DROP TABLE IF EXISTS mytable;
+NOTICE:  table "mytable" does not exist, skipping
+CREATE TABLE mytable(id int, name text);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'id' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+INSERT INTO mytable VALUES (1, 'a'), (2, 'b'), (4, 'c');
+-- When we create a tablespace
+DROP TABLESPACE IF EXISTS mytablespace;
+\! rm -rf '/tmp/mytablespace';
+\! mkdir '/tmp/mytablespace';
+CREATE TABLESPACE mytablespace LOCATION '/tmp/mytablespace';
+\c postgres
+-- And error on a segment while altering the database to use the new tablespace
+SELECT gp_inject_fault_infinite('inside_move_db_transaction', 'error', dbid) FROM gp_segment_configuration WHERE role = 'p' AND content = 0;
+NOTICE:  Success:  (seg0 172.31.11.32:25432 pid=24225)
+ gp_inject_fault_infinite 
+--------------------------
+ t
+(1 row)
+
+-- start_ignore
+ALTER DATABASE mydatabase SET TABLESPACE mytablespace;
+WARNING:  could not open directory "pg_tblspc/139422/GPDB_6_301901111_db2/139415": No such file or directory  (seg0 172.31.11.32:25432 pid=24225)
+ERROR:  fault triggered, fault name:'inside_move_db_transaction' fault type:'error'  (seg0 172.31.11.32:25432 pid=24225)
+-- end_ignore
+-- Then all the database files from QD and all QEs should continue to use the
+-- old tablespace. The physical files may still exist on the new tablespace for
+-- the segments that didn't fail, but the pg_class catalot entries point to the
+-- old tablespace
+\c mydatabase
+SELECT COUNT(*) FROM (SELECT pg_relation_filepath('mytable')) a where a.pg_relation_filepath LIKE 'pg_tblspc%';
+ count 
+-------
+     0
+(1 row)
+
+SELECT COUNT(*) FROM (SELECT gp_segment_id, pg_relation_filepath('mytable') FROM gp_dist_random('gp_id')) a where a.pg_relation_filepath LIKE 'pg_tblspc%';
+ count 
+-------
+     0
+(1 row)
+
+SELECT COUNT(*) FROM (SELECT pg_relation_filepath('mytable')) a where a.pg_relation_filepath LIKE 'base%';
+ count 
+-------
+     1
+(1 row)
+
+SELECT COUNT(*) FROM (SELECT gp_segment_id, pg_relation_filepath('mytable') FROM gp_dist_random('gp_id')) a where a.pg_relation_filepath LIKE 'base%';
+ count 
+-------
+     3
+(1 row)
+
+SELECT gp_segment_id, * FROM mytable;
+ gp_segment_id | id | name 
+---------------+----+------
+             0 |  4 | c
+             1 |  2 | b
+             2 |  1 | a
+(3 rows)
+
+-- Cleanup
+\c postgres
+select gp_wait_until_triggered_fault('inside_move_db_transaction', 1, dbid) FROM gp_segment_configuration WHERE role = 'p' AND content = 0;
+NOTICE:  Success:  (seg0 172.31.11.32:25432 pid=24243)
+ gp_wait_until_triggered_fault 
+-------------------------------
+ t
+(1 row)
+
+SELECT gp_inject_fault('inside_move_db_transaction', 'reset', dbid) FROM gp_segment_configuration WHERE role = 'p' AND content = 0;
+NOTICE:  Success:  (seg0 172.31.11.32:25432 pid=24243)
+ gp_inject_fault 
+-----------------
+ t
+(1 row)
+
