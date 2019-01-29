@@ -1288,6 +1288,15 @@ _outReshuffleExprFast(StringInfo str, ReshuffleExpr *node)
 	WRITE_INT_FIELD(ptype);
 }
 
+static void
+_outAlterDatabaseStmt(StringInfo str, AlterDatabaseStmt *node)
+{
+	WRITE_NODE_TYPE("ALTERDATABASESTMT");
+
+	WRITE_STRING_FIELD(dbname);
+	WRITE_NODE_FIELD(options);
+}
+
 /*
  * _outNode -
  *	  converts a Node into binary string and append it to 'str'
@@ -2240,6 +2249,9 @@ _outNode(StringInfo str, void *obj)
 				break;
 			case T_ReshuffleExpr:
                 _outReshuffleExprFast(str, obj);
+				break;
+			case T_AlterDatabaseStmt:
+				_outAlterDatabaseStmt(str, obj);
 				break;
 			default:
 				elog(ERROR, "could not serialize unrecognized node type: %d",

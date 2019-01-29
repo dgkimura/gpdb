@@ -2940,6 +2940,15 @@ _readReshuffleExprfFast(void)
 	READ_DONE();
 }
 
+static AlterDatabaseStmt *
+_readAlterDatabaseStmt(void)
+{
+	READ_LOCALS(AlterDatabaseStmt);
+
+	READ_STRING_FIELD(dbname);
+	READ_NODE_FIELD(options);
+	READ_DONE();
+}
 
 static Node *
 _readValue(NodeTag nt)
@@ -3884,6 +3893,9 @@ readNodeBinary(void)
 				break;
 			case T_ReshuffleExpr:
 				return_value = _readReshuffleExprfFast();
+				break;
+			case T_AlterDatabaseStmt:
+				return_value = _readAlterDatabaseStmt();
 				break;
 			default:
 				return_value = NULL; /* keep the compiler silent */

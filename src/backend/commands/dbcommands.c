@@ -1502,9 +1502,25 @@ AlterDatabase(AlterDatabaseStmt *stmt, bool isTopLevel)
 	{
 		/* currently, can't be specified along with any other options */
 		Assert(!dconnlimit);
-		/* this case isn't allowed within a transaction block */
-		PreventTransactionChain(isTopLevel, "ALTER DATABASE SET TABLESPACE");
+		if (Gp_role == GP_ROLE_DISPATCH)
+		{
+			/* TODO: Validate that this is in fact true. Example was copied from AlterEnum*/
+			/*
+			 * GPDB: allow this in query executor, as distributed transaction
+			 * participants. The QD already checked this, and should've prevented
+			 * running this in any genuine transaction block.
+			 */
+			/* this case isn't allowed within a transaction block */
+			PreventTransactionChain(isTopLevel, "ALTER DATABASE SET TABLESPACE");
+		}
 		movedb(stmt->dbname, strVal(dtablespace->arg));
+
+		if (Gp_role == GP_ROLE_DISPATCH)
+			CdbDispatchUtilityStatement((Node *) stmt,
+										DF_CANCEL_ON_ERROR |
+										DF_NEED_TWO_PHASE,
+										NIL,
+										NULL);
 		return InvalidOid;
 	}
 
