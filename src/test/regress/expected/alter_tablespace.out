@@ -1,7 +1,8 @@
 -- Given we create a database
-DROP DATABASE IF EXISTS mydatabase;
-CREATE DATABASE mydatabase;
-\c mydatabase
+DROP DATABASE IF EXISTS database_that_successfully_changes_tablespace;
+NOTICE:  database "database_that_successfully_changes_tablespace" does not exist, skipping
+CREATE DATABASE database_that_successfully_changes_tablespace;
+\c database_that_successfully_changes_tablespace
 -- And create a table in that database with data
 DROP TABLE IF EXISTS mytable;
 NOTICE:  table "mytable" does not exist, skipping
@@ -16,9 +17,9 @@ DROP TABLESPACE IF EXISTS mytablespace;
 CREATE TABLESPACE mytablespace LOCATION '/tmp/mytablespace';
 -- And alter the database to use the new tablespace
 \c postgres
-ALTER DATABASE mydatabase SET TABLESPACE mytablespace;
+ALTER DATABASE database_that_successfully_changes_tablespace SET TABLESPACE mytablespace;
 -- Then all the database files from QD and all QEs should be moved into the new tablespace. We use the fact that default tablespace names look like base/<OID>/<TABLE OID> wherease user created tablespaces have format pg_tblspc/<other stuff>
-\c mydatabase
+\c database_that_successfully_changes_tablespace
 SELECT COUNT(*) FROM (SELECT pg_relation_filepath('mytable')) a where a.pg_relation_filepath LIKE '%pg_tblspc%';
  count 
 -------
@@ -31,3 +32,6 @@ SELECT COUNT(*) FROM (SELECT gp_segment_id, pg_relation_filepath('mytable') FROM
      3
 (1 row)
 
+-- Next scenario where alter database set tablespace panics on segment
+CREATE EXTENSION IF NOT EXISTS gp_inject_fault;
+DROP DATABASE IF EXISTS database_that_errors_change_tablespace;

@@ -3375,7 +3375,7 @@ PrePrepare_Locks(void)
 		 * safely.
 		 */
 		if (haveSessionLock)
-			ereport(ERROR,
+			ereport(PANIC,
 					(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
 					 errmsg("cannot PREPARE while holding both session-level and transaction-level locks on the same object")));
 
@@ -3471,7 +3471,7 @@ AtPrepare_Locks(void)
 		 * safely.
 		 */
 		if (haveSessionLock)
-			ereport(ERROR,
+			ereport(PANIC,
 					(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
 					 errmsg("cannot PREPARE while holding both session-level and transaction-level locks on the same object")));
 

@@ -2947,6 +2947,7 @@ _readAlterDatabaseStmt(void)
 
 	READ_STRING_FIELD(dbname);
 	READ_NODE_FIELD(options);
+	READ_INT_FIELD(phase);
 	READ_DONE();
 }
 

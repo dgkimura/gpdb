@@ -1295,6 +1295,7 @@ _outAlterDatabaseStmt(StringInfo str, AlterDatabaseStmt *node)
 
 	WRITE_STRING_FIELD(dbname);
 	WRITE_NODE_FIELD(options);
+	WRITE_INT_FIELD(phase);
 }
 
 /*
