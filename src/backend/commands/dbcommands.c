@@ -1390,6 +1390,8 @@ movedb(const char *dbname, const char *tblspcname)
 	PG_END_ENSURE_ERROR_CLEANUP(movedb_failure_callback,
 								PointerGetDatum(&fparms));
 
+	SIMPLE_FAULT_INJECTOR(InsideMoveDbTransaction);
+
 	/*
 	 * Commit the transaction so that the pg_database update is committed. If
 	 * we crash while removing files, the database won't be corrupt, we'll
