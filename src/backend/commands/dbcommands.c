@@ -1224,6 +1224,13 @@ movedb(const char *dbname, const char *tblspcname, AlterDatabaseStmt *stmt)
 
 	if (Gp_role == GP_ROLE_DISPATCH)
 	{
+		/*
+		 * GPDB needs to first dispatches phase 1 which will copy directries
+		 * and update catalog. This is required to be done before issuing
+		 * delete directory on the segments otherwise it is possible for 1
+		 * segment to fail, but other segments continue and delete the
+		 * directory. In this case segments are left in inconsistent states.
+		 */
 		stmt->phase = 1;
 		CdbDispatchUtilityStatement((Node *) stmt,
 									DF_CANCEL_ON_ERROR |
@@ -1232,13 +1239,14 @@ movedb(const char *dbname, const char *tblspcname, AlterDatabaseStmt *stmt)
 									NULL);
 	}
 
-	if (stmt->phase == 1)
-	{
 	/*
 	 * Get old and new database paths
 	 */
 	src_dbpath = GetDatabasePath(db_id, src_tblspcoid);
 	dst_dbpath = GetDatabasePath(db_id, dst_tblspcoid);
+
+	if (stmt->phase == 2)
+		goto completed_phase1;
 
 	/*
 	 * Force a checkpoint before proceeding. This will force all dirty
@@ -1316,7 +1324,6 @@ movedb(const char *dbname, const char *tblspcname, AlterDatabaseStmt *stmt)
 	PG_ENSURE_ERROR_CLEANUP(movedb_failure_callback,
 							PointerGetDatum(&fparms));
 	{
-		SIMPLE_FAULT_INJECTOR(InsideMoveDbTransaction);
 
 		/*
 		 * Copy files from the old tablespace to the new one
@@ -1414,14 +1421,19 @@ movedb(const char *dbname, const char *tblspcname, AlterDatabaseStmt *stmt)
 	 * really commits.
 	 */
 	PopActiveSnapshot();
+	SIMPLE_FAULT_INJECTOR(InsideMoveDbTransaction);
 	CommitTransactionCommand();
-	}
 
 	/* Start new transaction for the remaining work; don't need a snapshot */
 	StartTransactionCommand();
 
 	if (Gp_role == GP_ROLE_DISPATCH)
 	{
+		/*
+		 * GPDB in phase 2 deletes the old directory after successfully copying
+		 * to new directory on all the segments and sucessfully updating the
+		 * catalog.
+		 */
 		stmt->phase = 2;
 		CdbDispatchUtilityStatement((Node *) stmt,
 									DF_CANCEL_ON_ERROR |
@@ -1429,9 +1441,9 @@ movedb(const char *dbname, const char *tblspcname, AlterDatabaseStmt *stmt)
 									NIL,
 									NULL);
 	}
+	goto end;
 
-	if (stmt->phase == 2)
-	{
+completed_phase1:
 
 	/*
 	 * Remove files from the old tablespace
@@ -1458,7 +1470,8 @@ movedb(const char *dbname, const char *tblspcname, AlterDatabaseStmt *stmt)
 
 		(void) XLogInsert(RM_DBASE_ID, XLOG_DBASE_DROP, rdata);
 	}
-	}
+
+end:
 
 	/* Now it's safe to release the database lock */
 	UnlockSharedObjectForSession(DatabaseRelationId, db_id, 0,

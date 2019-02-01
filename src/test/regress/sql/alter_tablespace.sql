@@ -83,5 +83,4 @@ SELECT gp_segment_id, * FROM mytable;
 
 -- Cleanup
 \c postgres
-select gp_wait_until_triggered_fault('inside_move_db_transaction', 1, dbid) FROM gp_segment_configuration WHERE role = 'p' AND content = 0;
 SELECT gp_inject_fault('inside_move_db_transaction', 'reset', dbid) FROM gp_segment_configuration WHERE role = 'p' AND content = 0;

@@ -3045,7 +3045,9 @@ typedef struct AlterDatabaseStmt
 	NodeTag		type;
 	char	   *dbname;			/* name of database to alter */
 	List	   *options;		/* List of DefElem nodes */
-	int			phase;
+	int			phase;			/* GPDB: uses 2 phases: (1) to copy directory
+								   and update catalog. (2) delete old
+								   directory. */
 } AlterDatabaseStmt;
 
 typedef struct AlterDatabaseSetStmt
