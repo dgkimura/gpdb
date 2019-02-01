@@ -945,9 +945,12 @@ dropdb(const char *dbname, bool missing_ok)
 
 	ReleaseSysCache(tup);
 
-	/*
-	 * Delete any comments or security labels associated with the database.
-	 */
+    SIMPLE_FAULT_INJECTOR(InsideDropDbTransaction);
+
+
+    /*
+     * Delete any comments or security labels associated with the database.
+     */
 	DeleteSharedComments(db_id, DatabaseRelationId);
 	DeleteSharedSecurityLabel(db_id, DatabaseRelationId);
 
@@ -1001,7 +1004,7 @@ dropdb(const char *dbname, bool missing_ok)
 	/*
 	 * Remove all tablespace subdirs belonging to the database.
 	 */
-	remove_dbtablespaces(db_id);
+    remove_dbtablespaces(db_id);
 
 	/*
 	 * Close pg_database, but keep lock till commit.

@@ -255,6 +255,7 @@ FI_IDENT(DecreaseToastMaxChunkSize, "decrease_toast_max_chunk_size")
 FI_IDENT(CleanupQE, "cleanup_qe")
 /* TODO Give a better name for this */
 FI_IDENT(InsideMoveDbTransaction, "inside_move_db_transaction")
+FI_IDENT(InsideDropDbTransaction, "inside_drop_db_transaction")
 #endif
 
 /*
