@@ -43,6 +43,7 @@
 #include "catalog/pg_database.h"
 #include "catalog/pg_db_role_setting.h"
 #include "catalog/pg_tablespace.h"
+#include "catalog/storage.h"
 #include "commands/comment.h"
 #include "commands/dbcommands.h"
 #include "commands/seclabel.h"
@@ -945,9 +946,6 @@ dropdb(const char *dbname, bool missing_ok)
 
 	ReleaseSysCache(tup);
 
-    SIMPLE_FAULT_INJECTOR(InsideDropDbTransaction);
-
-
     /*
      * Delete any comments or security labels associated with the database.
      */
@@ -969,7 +967,12 @@ dropdb(const char *dbname, bool missing_ok)
 	 * is important to ensure that no remaining backend tries to write out a
 	 * dirty buffer to the dead database later...
 	 */
-	DropDatabaseBuffers(db_id);
+	// It seems like this drops dirty pages and doesn't bother to write them to
+	// disk. Maybe we need to add these relations to the pending deletes? Do we
+	// need to clean the dirty buffers when we drop pending deletes (otherwise
+	// could we end up writing the dirty buffers after database has been
+	// deleted?
+	//DropDatabaseBuffers(db_id);
 
 	/*
 	 * Tell the stats collector to forget it immediately, too.
@@ -1004,6 +1007,7 @@ dropdb(const char *dbname, bool missing_ok)
 	/*
 	 * Remove all tablespace subdirs belonging to the database.
 	 */
+    SIMPLE_FAULT_INJECTOR(InsideDropDbTransaction);
     remove_dbtablespaces(db_id);
 
 	/*
@@ -1972,6 +1976,8 @@ remove_dbtablespaces(Oid db_id)
 		char	   *dstpath;
 		struct stat st;
 
+		/* should we add these as entries with dsttablespace db_id in pending delete list? */
+
 		/* Don't mess with the global tablespace */
 		if (dsttablespace == GLOBALTABLESPACE_OID)
 			continue;
@@ -1985,10 +1991,15 @@ remove_dbtablespaces(Oid db_id)
 			continue;
 		}
 
+		/* No need to rmtree */
+		/*
 		if (!rmtree(dstpath, true))
 			ereport(WARNING,
 					(errmsg("some useless files may be left behind in old database directory \"%s\"",
 							dstpath)));
+		*/
+
+		DatabaseDropStorage(db_id, dsttablespace);
 
 		/* Record the filesystem change in XLOG */
 		{

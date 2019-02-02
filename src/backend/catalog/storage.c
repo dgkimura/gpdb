@@ -175,6 +175,31 @@ RelationDropStorage(Relation rel)
 }
 
 /*
+ * DatabaseDropStorage
+ *		Schedule unlinking of physical storage at transaction commit.
+ */
+void
+DatabaseDropStorage(Oid db_id, Oid tablespace_id)
+{
+	PendingRelDelete *pending;
+
+	/* Add the relation to the list of stuff to delete at commit */
+	pending = (PendingRelDelete *)
+		MemoryContextAlloc(TopMemoryContext, sizeof(PendingRelDelete));
+	pending->relnode.node.spcNode = tablespace_id;
+	pending->relnode.node.dbNode = db_id;
+	pending->relnode.node.relNode = InvalidOid;
+
+	/* What should relstorage actually be? */
+	/* pending->relnode.relstorage = rel->rd_rel->relstorage; */
+	pending->backend = InvalidBackendId;
+	pending->atCommit = true;	/* delete if commit */
+	pending->nestLevel = GetCurrentTransactionNestLevel();
+	pending->next = pendingDeletes;
+	pendingDeletes = pending;
+}
+
+/*
  * RelationPreserveStorage
  *		Mark a relation as not to be deleted after all.
  *
@@ -340,6 +365,17 @@ smgrDoPendingDeletes(bool isCommit)
 			/* do deletion if called for */
 			if (pending->atCommit == isCommit)
 			{
+				if (pending->relnode.node.relNode == InvalidOid)
+				{
+					/* rmtree database directory */
+					char	   *dstpath;
+					dstpath = GetDatabasePath(
+						pending->relnode.node.dbNode,
+						pending->relnode.node.spcNode);
+					rmtree(dstpath, true);
+					continue;
+				}
+
 				SMgrRelation srel;
 				srel = smgropen(pending->relnode.node, pending->backend);
 

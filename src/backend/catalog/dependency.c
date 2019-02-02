@@ -1180,6 +1180,10 @@ doDeletion(const ObjectAddress *object, int flags)
 				break;
 			}
 
+		/* Should we add a case for database? */
+		/* case OCLASS_DATABASE: */
+
+
 		case OCLASS_PROC:
 			RemoveFunctionById(object->objectId);
 			break;
