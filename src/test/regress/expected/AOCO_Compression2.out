@@ -3915,11 +3915,91 @@ get_ao_compression_ratio('mpp17012_compress_test2');
  712 bytes      |                    36.75
 (1 row)
 
+create table a_aoro_table_with_zlib_and_invalid_compression_level(col text) WITH (APPENDONLY=true, COMPRESSTYPE=zlib, compresslevel=-1, ORIENTATION=column);
+ERROR:  value -1 out of bounds for option "compresslevel"
+DETAIL:  Valid values are between "0" and "19".
+-- Check that callbacks are registered
+SELECT * FROM pg_compression WHERE compname='zlib';
+ compname |   compconstructor   |   compdestructor   |  compcompressor  |  compdecompressor  |   compvalidator   | compowner 
+----------+---------------------+--------------------+------------------+--------------------+-------------------+-----------
+ zlib     | gp_zlib_constructor | gp_zlib_destructor | gp_zlib_compress | gp_zlib_decompress | gp_zlib_validator |        10
+(1 row)
+
 -- compute compression ratio on empty aorow table
 create table empty_aorow_table (c int) with (appendonly=true) distributed by (c);
+-- Given that we built with and have zstd compression available
+-- Test basic create table for AO/RO table succeeds for zstd compression
+create table a_aoro_table_with_zstd_compression(col text) WITH (APPENDONLY=true, COMPRESSTYPE=zstd, compresslevel=1, ORIENTATION=column);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'col' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_zstd_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_zstd_compression');
+ pg_size_pretty | get_ao_compression_ratio 
+----------------+--------------------------
+ 0 bytes        |                       -1
+(1 row)
+
+insert into a_aoro_table_with_zstd_compression values('ksjdhfksdhfksdhfksjhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_zstd_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_zstd_compression');
+ pg_size_pretty | get_ao_compression_ratio 
+----------------+--------------------------
+ 64 bytes       |                      1.5
+(1 row)
+
+-- Given that we built with and have quicklz compression available
+-- Test basic create table for AO/RO table succeeds for quicklz compression
+create table a_aoro_table_with_quicklz_compression(col text) WITH (APPENDONLY=true, COMPRESSTYPE=quicklz, compresslevel=1, ORIENTATION=column);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'col' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_quicklz_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_quicklz_compression');
+ pg_size_pretty | get_ao_compression_ratio 
+----------------+--------------------------
+ 0 bytes        |                       -1
+(1 row)
+
+insert into a_aoro_table_with_quicklz_compression values('ksjdhfksdhfksdhfksjhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_quicklz_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_quicklz_compression');
+ pg_size_pretty | get_ao_compression_ratio 
+----------------+--------------------------
+ 72 bytes       |                     1.33
+(1 row)
+
+-- Test basic create table for AO/RO table fails for rle compression. rle is only supported for columnar tables.
+create table a_aoro_table_with_rle_type_compression(col text) WITH (APPENDONLY=true, COMPRESSTYPE=rle_type, compresslevel=1, ORIENTATION=column);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'col' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_rle_type_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_rle_type_compression');
+ pg_size_pretty | get_ao_compression_ratio 
+----------------+--------------------------
+ 0 bytes        |                       -1
+(1 row)
+
+insert into a_aoro_table_with_rle_type_compression values('ksjdhfksdhfksdhfksjhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_rle_type_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_rle_type_compression');
+ pg_size_pretty | get_ao_compression_ratio 
+----------------+--------------------------
+ 96 bytes       |                        1
+(1 row)
+
 select get_ao_compression_ratio('empty_aorow_table');
  get_ao_compression_ratio 
 --------------------------
                         1
+(1 row)
+
+-- Test that an AO/CO table with invalid compress level will error at create
+create table a_aoco_table_with_rle_type_and_invalid_compression_level(col text) WITH (APPENDONLY=true, COMPRESSTYPE=rle_type, compresslevel=-1, ORIENTATION=column);
+ERROR:  value -1 out of bounds for option "compresslevel"
+DETAIL:  Valid values are between "0" and "19".
+-- Check that callbacks are registered
+SELECT * FROM pg_compression WHERE compname='rle_type';
+ compname |     compconstructor     |     compdestructor     |    compcompressor    |    compdecompressor    |     compvalidator     | compowner 
+----------+-------------------------+------------------------+----------------------+------------------------+-----------------------+-----------
+ rle_type | gp_rle_type_constructor | gp_rle_type_destructor | gp_rle_type_compress | gp_rle_type_decompress | gp_rle_type_validator |        10
 (1 row)
 

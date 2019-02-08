@@ -1726,6 +1726,13 @@ select typoptions from pg_type_encoding where typid='public.int42'::regtype;
 
 create table ccddl (i int42) with(appendonly = true, orientation=column);
 NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause, and no column type is suitable for a distribution key. Creating a NULL policy entry.
+insert into ccddl select '123456'::int42 from generate_series(1, 1000)i;
+select get_ao_compression_ratio('ccddl') > 21 as zlib_compress_ratio;
+ zlib_compress_ratio 
+---------------------
+ t
+(1 row)
+
 execute ccddlcheck;
  relname | attnum |                     attoptions                      
 ---------+--------+-----------------------------------------------------
@@ -1767,6 +1774,49 @@ execute ccddlcheck;
 ---------+--------+-----------------------------------------------------
  ccddl   |      1 | {compresstype=none,compresslevel=0,blocksize=32768}
 (1 row)
+
+drop table ccddl;
+alter type int42 set default encoding (compresstype=zstd);
+create table ccddl (i int42) with(appendonly = true, orientation=column);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause, and no column type is suitable for a distribution key. Creating a NULL policy entry.
+insert into ccddl select '123456'::int42 from generate_series(1, 1000)i;
+select get_ao_compression_ratio('ccddl') > 21 as zstd_compress_ratio;
+ zstd_compress_ratio 
+---------------------
+ t
+(1 row)
+
+execute ccddlcheck;
+ relname | attnum |                     attoptions                      
+---------+--------+-----------------------------------------------------
+ ccddl   |      1 | {compresstype=zstd,compresslevel=1,blocksize=32768}
+(1 row)
+
+drop table ccddl;
+create table ccddl (i int42) with(appendonly = true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause, and no column type is suitable for a distribution key. Creating a NULL policy entry.
+insert into ccddl select '123456'::int42 from generate_series(1, 1000)i;
+select get_ao_compression_ratio('ccddl') as zstd_compress_ratio;
+ zstd_compress_ratio 
+---------------------
+                   1
+(1 row)
+
+execute ccddlcheck;
+ relname | attnum | attoptions 
+---------+--------+------------
+(0 rows)
+
+drop table ccddl;
+create table ccddl (i int42);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause, and no column type is suitable for a distribution key. Creating a NULL policy entry.
+insert into ccddl select '123456'::int42 from generate_series(1, 1000)i;
+select get_ao_compression_ratio('ccddl') as zstd_compress_ratio;
+ERROR:  'ccddl' is not an append-only relation
+execute ccddlcheck;
+ relname | attnum | attoptions 
+---------+--------+------------
+(0 rows)
 
 drop table ccddl;
 -- We used to accept SQL standard aliases for the built-in types,

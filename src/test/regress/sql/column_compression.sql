@@ -548,6 +548,8 @@ compresslevel=1
 select typoptions from pg_type_encoding where typid='public.int42'::regtype;
 
 create table ccddl (i int42) with(appendonly = true, orientation=column);
+insert into ccddl select '123456'::int42 from generate_series(1, 1000)i;
+select get_ao_compression_ratio('ccddl') > 21 as zlib_compress_ratio;
 execute ccddlcheck;
 
 alter type int42 set default encoding (compresstype=zlib);
@@ -567,6 +569,25 @@ drop table ccddl;
 
 create table ccddl (i int42) with (appendonly = true, orientation=column,
 compresstype=none);
+execute ccddlcheck;
+drop table ccddl;
+
+alter type int42 set default encoding (compresstype=zstd);
+create table ccddl (i int42) with(appendonly = true, orientation=column);
+insert into ccddl select '123456'::int42 from generate_series(1, 1000)i;
+select get_ao_compression_ratio('ccddl') > 21 as zstd_compress_ratio;
+execute ccddlcheck;
+drop table ccddl;
+
+create table ccddl (i int42) with(appendonly = true);
+insert into ccddl select '123456'::int42 from generate_series(1, 1000)i;
+select get_ao_compression_ratio('ccddl') as zstd_compress_ratio;
+execute ccddlcheck;
+drop table ccddl;
+
+create table ccddl (i int42);
+insert into ccddl select '123456'::int42 from generate_series(1, 1000)i;
+select get_ao_compression_ratio('ccddl') as zstd_compress_ratio;
 execute ccddlcheck;
 drop table ccddl;
 

@@ -1568,6 +1568,43 @@ insert into mpp17012_compress_test2 values('a',generate_series(1,250),'ksjdhfksd
 select pg_size_pretty(pg_relation_size('mpp17012_compress_test2')),
 get_ao_compression_ratio('mpp17012_compress_test2');
 
+create table a_aoro_table_with_zlib_and_invalid_compression_level(col text) WITH (APPENDONLY=true, COMPRESSTYPE=zlib, compresslevel=-1, ORIENTATION=column);
+-- Check that callbacks are registered
+SELECT * FROM pg_compression WHERE compname='zlib';
+
 -- compute compression ratio on empty aorow table
 create table empty_aorow_table (c int) with (appendonly=true) distributed by (c);
+
+-- Given that we built with and have zstd compression available
+-- Test basic create table for AO/RO table succeeds for zstd compression
+create table a_aoro_table_with_zstd_compression(col text) WITH (APPENDONLY=true, COMPRESSTYPE=zstd, compresslevel=1, ORIENTATION=column);
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_zstd_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_zstd_compression');
+insert into a_aoro_table_with_zstd_compression values('ksjdhfksdhfksdhfksjhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_zstd_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_zstd_compression');
+
+
+-- Given that we built with and have quicklz compression available
+-- Test basic create table for AO/RO table succeeds for quicklz compression
+create table a_aoro_table_with_quicklz_compression(col text) WITH (APPENDONLY=true, COMPRESSTYPE=quicklz, compresslevel=1, ORIENTATION=column);
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_quicklz_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_quicklz_compression');
+insert into a_aoro_table_with_quicklz_compression values('ksjdhfksdhfksdhfksjhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_quicklz_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_quicklz_compression');
+
+
+-- Test basic create table for AO/RO table fails for rle compression. rle is only supported for columnar tables.
+create table a_aoro_table_with_rle_type_compression(col text) WITH (APPENDONLY=true, COMPRESSTYPE=rle_type, compresslevel=1, ORIENTATION=column);
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_rle_type_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_rle_type_compression');
+insert into a_aoro_table_with_rle_type_compression values('ksjdhfksdhfksdhfksjhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
+select pg_size_pretty(pg_relation_size('a_aoro_table_with_rle_type_compression')),
+       get_ao_compression_ratio('a_aoro_table_with_rle_type_compression');
 select get_ao_compression_ratio('empty_aorow_table');
+
+-- Test that an AO/CO table with invalid compress level will error at create
+create table a_aoco_table_with_rle_type_and_invalid_compression_level(col text) WITH (APPENDONLY=true, COMPRESSTYPE=rle_type, compresslevel=-1, ORIENTATION=column);
+-- Check that callbacks are registered
+SELECT * FROM pg_compression WHERE compname='rle_type';
