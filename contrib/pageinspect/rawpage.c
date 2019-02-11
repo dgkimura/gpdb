@@ -15,6 +15,7 @@
 
 #include "postgres.h"
 
+#include "access/aosegfiles.h"
 #include "access/htup_details.h"
 #include "catalog/catalog.h"
 #include "catalog/namespace.h"
@@ -25,6 +26,7 @@
 #include "utils/builtins.h"
 #include "utils/pg_lsn.h"
 #include "utils/rel.h"
+#include "utils/snapmgr.h"
 
 PG_MODULE_MAGIC;
 
@@ -131,11 +133,22 @@ get_raw_page_internal(text *relname, ForkNumber forknum, BlockNumber blkno)
 				(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
 				 errmsg("cannot access temporary tables of other sessions")));
 
-	if (blkno >= RelationGetNumberOfBlocksInFork(rel, forknum))
+	if (RelationIsHeap(rel) &&
+		blkno >= RelationGetNumberOfBlocksInFork(rel, forknum))
 		ereport(ERROR,
 				(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 				 errmsg("block number %u is out of range for relation \"%s\"",
 						blkno, RelationGetRelationName(rel))));
+
+	if (RelationIsAoRows(rel))
+	{
+		FileSegInfo *seginfo;
+		seginfo = GetFileSegInfo(rel, GetLatestSnapshot(), 1);
+		elog(LOG, "segno %d total_tupcount %ld varblockcount %ld modcount %ld eof %ld eof_uncompressed %ld",
+			 seginfo->segno, seginfo->total_tupcount, seginfo->varblockcount, seginfo->modcount, seginfo->eof, seginfo->eof_uncompressed);
+		// seginfo->tupleVisibilitySummary->tid
+		//return (bytea *) palloc(BLCKSZ + VARHDRSZ);
+	}
 
 	/* Initialize buffer to copy to */
 	raw_page = (bytea *) palloc(BLCKSZ + VARHDRSZ);
