@@ -55,13 +55,60 @@ test_compress_with_dst_size_too_small(void **state)
 	int32 dst_used;
 	CompressionState *cs = DirectFunctionCall3Coll(zstd_constructor, NULL, NULL, PointerGetDatum(&sa), BoolGetDatum(false));
 
+	expect_any(ZSTD_compressCCtx, cctx);
+	expect_any(ZSTD_compressCCtx, dst);
+	expect_any(ZSTD_compressCCtx, dstCapacity);
+	expect_any(ZSTD_compressCCtx, src);
+	expect_any(ZSTD_compressCCtx, srcSize);
+	expect_any(ZSTD_compressCCtx, compressionLevel);
+	will_return(ZSTD_compressCCtx, -1);
+
+	expect_any(ZSTD_getErrorCode, code);
+	will_return(ZSTD_getErrorCode, ZSTD_error_dstSize_tooSmall);
+
 	DirectFunctionCall6(zstd_compress,
-		CStringGetDatum("abcde"), -42,
+		CStringGetDatum("abcde"), 42,
 		NULL, NULL,
 		&dst_used, cs);
 
-	/* dst_sz is too small to compress "abcde" */
-	assert_int_equal(-42, dst_used);
+	/* dst_sz is too small to compress "abcde" so it sets the dst_used to src_sz */
+	assert_int_equal(42, dst_used);
+
+	DirectFunctionCall1(zstd_destructor, PointerGetDatum(cs));
+}
+
+void
+test_compress_throws_error(void **state)
+{
+	StorageAttributes sa = { .comptype = "zstd", .complevel = 0 };
+	int32 dst_used;
+	CompressionState *cs = DirectFunctionCall3Coll(zstd_constructor, NULL, NULL, PointerGetDatum(&sa), BoolGetDatum(false));
+
+	expect_any(ZSTD_compressCCtx, cctx);
+	expect_any(ZSTD_compressCCtx, dst);
+	expect_any(ZSTD_compressCCtx, dstCapacity);
+	expect_any(ZSTD_compressCCtx, src);
+	expect_any(ZSTD_compressCCtx, srcSize);
+	expect_any(ZSTD_compressCCtx, compressionLevel);
+	will_return(ZSTD_compressCCtx, -1);
+
+	expect_any(ZSTD_getErrorCode, code);
+	will_return(ZSTD_getErrorCode, ZSTD_error_GENERIC);
+
+	EXPECT_ELOG(ERROR);
+
+	PG_TRY();
+	{
+		DirectFunctionCall6(zstd_compress,
+			CStringGetDatum("abcde"), 42,
+			NULL, NULL,
+			&dst_used, cs);
+		assert_false("zstd_compress did not throw error");
+	}
+	PG_CATCH();
+	{
+	}
+	PG_END_TRY();
 
 	DirectFunctionCall1(zstd_destructor, PointerGetDatum(cs));
 }
@@ -74,7 +121,8 @@ main(int argc, char *argv[])
 	const		UnitTest tests[] = {
 		unit_test(test_constructed_without_compress_type),
 		unit_test(test_zero_complevel_is_set_to_one),
-		unit_test(test_compress_with_dst_size_too_small)
+		unit_test(test_compress_with_dst_size_too_small),
+		unit_test(test_compress_throws_error)
 	};
 
 	MemoryContextInit();
