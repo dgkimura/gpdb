@@ -1,16 +1,18 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
-#include "cmockery.h"
-#include "utils.h"
 
+#include <zstd.h>
+
+#include "cmockery.h"
 #include "postgres.h"
-#include "utils/memutils.h"
+
+#include "utils.h"
 #include "utils/elog.h"
+#include "utils/memutils.h"
 
 #define UNIT_TESTING
 
-#include "postgres.h"
 #include "../zstd_compression.c"
 
 
@@ -52,6 +54,11 @@ void
 test_compress_with_dst_size_too_small(void **state)
 {
 	StorageAttributes sa = { .comptype = "zstd", .complevel = 0 };
+	const char *src = "abcde";
+	int32 src_sz = -42;
+	const char dst;
+	int32 dst_sz = NULL;
+
 	int32 dst_used;
 	CompressionState *cs = DirectFunctionCall3Coll(zstd_constructor, NULL, NULL, PointerGetDatum(&sa), BoolGetDatum(false));
 
@@ -67,12 +74,12 @@ test_compress_with_dst_size_too_small(void **state)
 	will_return(ZSTD_getErrorCode, ZSTD_error_dstSize_tooSmall);
 
 	DirectFunctionCall6(zstd_compress,
-		CStringGetDatum("abcde"), 42,
-		NULL, NULL,
-		&dst_used, cs);
+						CStringGetDatum(src), src_sz,
+						&dst,  dst_sz,
+						&dst_used, cs);
 
-	/* dst_sz is too small to compress "abcde" so it sets the dst_used to src_sz */
-	assert_int_equal(42, dst_used);
+	/* dst_sz is too small to compress "abcde" */
+	assert_int_equal(src_sz, dst_used);
 
 	DirectFunctionCall1(zstd_destructor, PointerGetDatum(cs));
 }

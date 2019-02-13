@@ -22,8 +22,19 @@ System Under Test (SUT). We will talk more about the System Under Test later.
 For now, it is important to know that the SUT is the port of code tested in a 
 test and that each SUT has its own test executable. Usually a SUT consists of a 
 single file, e.g. heapam.c, but it can also consist of multiple related files.
+
+The GPDB version of CMockery includes some auto-generation of mock files (name
+those here). This workflow is applicable ... If you want to hand-roll the
+mocks, for example when selectively mocking an external dependency, the
+workflow you should follow is the classic CMockery workflow.
+
+We will use an example to describe the two processes.
+This example is a gpcontrib module, so it will differ from if you are adding a
+test for backend server code (maybe document this too?)
  
-== Test Development Process ==
+== GPDB CMockery Unit-test Workflow ==
+
+== Without auto-generated mocks ==
 
 The development of a new test consists of multiple steps:
 
@@ -31,62 +42,80 @@ The development of a new test consists of multiple steps:
     source file of the function to test. But exceptions from this rule of thumb 
     are possible. There are already tests with the given SUT, the new test can 
     be added to the existing executable. Step 2 can be skipped in this case.
+
+	We would like to test the function `zstd_compress` in
+	`gpcontrib/zstd/zstd_compression.c`.
+	Ensure that this is compiled.
     
-2.	Creating the SUT test executable. If the SUT does not exist, a new test 
-    executable needs to be created:
-
-	- Create a new test executable directory, usually named after the SUT source 
-	  file(s) and add a Makefile. The directory template contains template files
-	  for the Makefile and the README file.
+2.	Creating the SUT test executable. 
+	a) The convention in GPDB is to make a test executable directory, usually named after the SUT source file(s).
+	`mkdir gpcontrib/zstd/test`
+	b) Add a Makefile.
 	  
-	  > TARGETS=SOMETHING_test
-	  > include ../Makefile.all
-      > include ${CMOCKERY_DIR}/Makefile
-      > include ${MOCK_DIR}/Makefile
+	  Makefile components:
+	  i.
+	  You will need the top-level Makefile in GPDB in order to get the benefit
+	  of CFLAGS, templates, and patterns contained in other Makefiles
+	  
+	  top_builddir=../../..
+      include $(top_builddir)/src/Makefile.global
 
-      > MOCK_OBJS=
+		ii.
+	  Add a target for your SUT executable
+	  TARGETS= zstd_compression
 	
-      > include ../Makefile.all2
-	  
-	- Change the TARGETS, and <testname>_REAL_OBJS variables in the
-	  Makefile. TARGETS is usually straightforward to set.
-	  
+	iii.
+	Define the target with a '.t' after the name so that you can leverage the
+	pattern that matches .t files in some other Makefile which will help you to
+	exclude the object you mocked from linking and include the mocked object
+	when compiling your test.
+
+	Express as a dependency of this target the object containing your mock.
+	Here we are mocking the ZSTD library compression functions so that we can
+	test our code which calls them. So, we add zstd_mock.o to the list of
+	dependencies.
+
+		zstd_compression.t: zstd_mock.o
+
 	  By default, the test program is linked with mock versions of most
-	  backend files. The <testname>_REAL_OBJS needs to list any files
+	  backend files. 
+	  
+	  TODO: WHAT HAPPENED to this?
+	  The <testname>_REAL_OBJS needs to list any files
 	  that should *not* be mocked, for which the real file should linked
 	  in instead.
 	  
-	- Create a new test source file, also usually named after the SUT. An 
-	  example is heapam_test.c in the heapam SUT directory. In the beginning 
-	  the test source file consists only of the main function.
+	c) Create a new test source file, also usually named after the SUT. 
 	  
-	  Here is an example:
-	  
-      > #include <stdarg.h>
-      > #include <stddef.h>
-      > #include <setjmp.h>
-      > #include "cmockery.h"
-      > 
-      > #include "postgres.h"
-      > 
-      > void test_foo_bar(void** state)
-      > {
-      > 	assert_int_equal(0, 1); /* Do not do this. Provide a real test */
-      > }
+	  Components:
+	  i.
+	  It will consist of a main function, which has boilerplate from CMockery
+	  to run your tests
+
       > 
       > int main(int argc, char* argv[])
       > {
       > 	cmockery_parse_arguments(argc, argv);
       > 
       > 	const UnitTest tests[] = {
-      > 			unit_test(test_foo_bar)
+      > 			unit_test(test_compress_throws_error)
       > 	};
       > 	return run_tests(tests);
       > }
+	  ii.
 
-	  
-3.	Insert new test case functions and register them in the main function. A 
+	  and a function for each test. 
+
+	  TODO: add back in the foo_bar example here
+
+3. Make your mocks
+
+TODO: header files required?
+...
+4.	Add your test case functions. Insert new test case functions and register them in the main function. A 
 	test function usually consists of three steps:
+
+	TODO: describe how the mocks are used here
     
 	- Describe the interaction of the called functions from the SUT with the 
 	  environment. This is only via expect_- and will_-functions from the 
@@ -109,6 +138,96 @@ The development of a new test consists of multiple steps:
     - The return values and the state after each test function call, can be 
       validated by assert_ calls. A list of all available assert_ calls is 
       presented later in this document.
+
+	  Here, `test_compress_throws_error` is testing that our function
+	  `zstd_compress` throws the error we expect given some conditions.
+	  CMockery will register all of the input parameters in a symbol map in
+	  order to use them when the mock is called, so it is important that you do
+	  the incantation below with `expect_any...`
+	  
+      TODO: add includes?
+		void
+		test_compress_throws_error(void **state)
+		{
+			StorageAttributes sa = { .comptype = "zstd", .complevel = 0 };
+			int32 dst_used;
+			CompressionState *cs = DirectFunctionCall3Coll(zstd_constructor, NULL, NULL, PointerGetDatum(&sa), BoolGetDatum(false));
+
+			expect_any(ZSTD_compressCCtx, cctx);
+			expect_any(ZSTD_compressCCtx, dst);
+			expect_any(ZSTD_compressCCtx, dstCapacity);
+			expect_any(ZSTD_compressCCtx, src);
+			expect_any(ZSTD_compressCCtx, srcSize);
+			expect_any(ZSTD_compressCCtx, compressionLevel);
+			will_return(ZSTD_compressCCtx, -1);
+
+			expect_any(ZSTD_getErrorCode, code);
+			will_return(ZSTD_getErrorCode, ZSTD_error_GENERIC);
+
+			EXPECT_ELOG(ERROR);
+
+			PG_TRY();
+			{
+				DirectFunctionCall6(zstd_compress,
+					CStringGetDatum("abcde"), 42,
+					NULL, NULL,
+					&dst_used, cs);
+				assert_false("zstd_compress did not throw error");
+			}
+			PG_CATCH();
+			{
+			}
+			PG_END_TRY();
+
+			DirectFunctionCall1(zstd_destructor, PointerGetDatum(cs));
+		}
+      > 
+      > int main(int argc, char* argv[])
+      > {
+      > 	cmockery_parse_arguments(argc, argv);
+      > 
+      > 	const UnitTest tests[] = {
+      > 			unit_test(test_compress_throws_error)
+      > 	};
+      > 	return run_tests(tests);
+      > }
+
+== With auto-generated mocks ==
+
+some of the steps as above
+
+instead of making mock files yourself, you can use the mock.mk file which is magical
+
+We mocked elog by putting a thing in a place and then doing a thing
+
+void
+test_constructed_without_compress_type(void **state)
+{
+	StorageAttributes sa = {};
+
+	EXPECT_ELOG(ERROR);
+
+	/*
+	 * We need a try/catch because we expect zstd_constructor to throw ERROR.
+	 */
+	PG_TRY();
+	{
+		/*
+		 * zstd_constructor is a SQL function, so we need to do some setup to call it
+		 * DirectFunctionCall is used as a convenience, since it does some of this setup
+		 */
+		DirectFunctionCall3Coll(zstd_constructor, NULL, NULL, &sa, false);
+		assert_false("zstd_constructor did not throw error");
+	}
+	PG_CATCH();
+	{
+	}
+	PG_END_TRY();
+}
+
+
+
+
 
 == CMockery Usage ==
 
@@ -321,10 +440,9 @@ following modifications
 - Adds a better and colored console output
 - Add the parsing of command line parameters
 
+- Add utility file with some commonly used stuff
+
 == Further information ==
 
 - cmockery Project Wiki:
   http://code.google.com/p/cmockery/wiki/Cmockery_Unit_Testing_Framework
-  
-- Wikipedia: 
-  http://en.wikipedia.org/wiki/Unit_testing 

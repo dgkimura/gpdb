@@ -41,7 +41,7 @@ typedef struct zstd_state
 	int			level;			/* Compression level */
 	bool		compress;		/* Compress if true, decompress otherwise */
 
-	zstd_context *ctx;			/* ZSTD compression/decompresion contexts */
+	zstd_context *ctx;			/* ZSTD compression/decompression contexts */
 } zstd_state;
 
 Datum
@@ -98,15 +98,16 @@ zstd_destructor(PG_FUNCTION_ARGS)
 Datum
 zstd_compress(PG_FUNCTION_ARGS)
 {
-	/* FIXME: Change types to ZSTD::size_t */
+	/* FIXME: Change types to ZSTD::size_t -- is it regular size_t*/
 	const void *src = PG_GETARG_POINTER(0);
 	int32		src_sz = PG_GETARG_INT32(1);
-	void	   *dst = PG_GETARG_POINTER(2);
+	void		*dst = PG_GETARG_POINTER(2);
 	int32		dst_sz = PG_GETARG_INT32(3);
-	int32	   *dst_used = (int32 *) PG_GETARG_POINTER(4);
+	int32		*dst_used = (int32 *) PG_GETARG_POINTER(4);
 	CompressionState *cs = (CompressionState *) PG_GETARG_POINTER(5);
 	zstd_state *state = (zstd_state *) cs->opaque;
 
+	/* TODO: add a comment here about why using unsigned long */
 	unsigned long dst_length_used;
 
 	dst_length_used = ZSTD_compressCCtx(state->ctx->cctx,
@@ -114,15 +115,16 @@ zstd_compress(PG_FUNCTION_ARGS)
 										src, src_sz,
 										state->level);
 
+	/* check if ZSTD_compressCCtx returned an error */
 	if (ZSTD_isError(dst_length_used))
 	{
+		/*
+		 * This error is returned when "compressed" output is bigger than
+ 		* uncompressed input. The caller can detect this by checking
+ 		* dst_used >= src_size
+ 		*/
 		if (ZSTD_getErrorCode(dst_length_used) == ZSTD_error_dstSize_tooSmall)
 		{
-			/*
-			 * This error is returned when "compressed" output is bigger than
-			 * uncompressed input. The caller can detect this by checking
-			 * dst_used >= src_size
-			 */
 			dst_length_used = src_sz;
 		}
 		else
