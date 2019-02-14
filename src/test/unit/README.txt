@@ -3,14 +3,6 @@
 The following documentation should help developing unit tests for GPDB using 
 the cmockery framework.
 
-Unit testing is an approach to test a small part of a program isolated from the 
-test. This type of testing is very common in Java community. The benefits are 
-a) that problems are found very early in the development process, 
-b) it simplifies the integration of different modules because unit testing 
-established a basic trust in the small units themselves, c) it serves as 
-documentation about the expected behavior, d) enables easier code reuse because 
-code is already tested via two different code paths [Wikipedia].
-
 The unit test code is stored in src/test/unit. The directory contains the
 modified cmockery library, all mock source files currently in use (mock) and a 
 directory test, which contains all test code.
@@ -23,10 +15,11 @@ For now, it is important to know that the SUT is the port of code tested in a
 test and that each SUT has its own test executable. Usually a SUT consists of a 
 single file, e.g. heapam.c, but it can also consist of multiple related files.
 
-The GPDB version of CMockery includes some auto-generation of mock files (name
-those here). This workflow is applicable ... If you want to hand-roll the
-mocks, for example when selectively mocking an external dependency, the
-workflow you should follow is the classic CMockery workflow.
+As a convenience, GPDB will auto-generate mock files for backend components.
+This workflow is applicable whenever the SUT depends on other backend code that
+needs to be mocked out. If the SUT uses an external dependency that requires
+mocking then you will need to hand-roll the mocks. In order to do that you
+should follow the classic CMockery workflow.
 
 We will use an example to describe the two processes.
 This example is a gpcontrib module, so it will differ from if you are adding a
@@ -38,10 +31,10 @@ test for backend server code (maybe document this too?)
 
 The development of a new test consists of multiple steps:
 
-1.	Selecting an appropriate System Under Test. Often the SUT consists of the 
-    source file of the function to test. But exceptions from this rule of thumb 
-    are possible. There are already tests with the given SUT, the new test can 
-    be added to the existing executable. Step 2 can be skipped in this case.
+1.	Selecting an appropriate System Under Test. Often the SUT consists of the
+	source file of the function to test. But exceptions from this rule of thumb
+	are possible. There are already tests with the given SUT, the new test can
+	be added to the existing executable. Step 2 can be skipped in this case.
 
 	We would like to test the function `zstd_compress` in
 	`gpcontrib/zstd/zstd_compression.c`.
@@ -58,7 +51,7 @@ The development of a new test consists of multiple steps:
 	  of CFLAGS, templates, and patterns contained in other Makefiles
 	  
 	  top_builddir=../../..
-      include $(top_builddir)/src/Makefile.global
+	  include $(top_builddir)/src/Makefile.global
 
 		ii.
 	  Add a target for your SUT executable
@@ -66,9 +59,9 @@ The development of a new test consists of multiple steps:
 	
 	iii.
 	Define the target with a '.t' after the name so that you can leverage the
-	pattern that matches .t files in some other Makefile which will help you to
-	exclude the object you mocked from linking and include the mocked object
-	when compiling your test.
+	pattern that matches .t files in mock.mk which will help you to exclude the
+	object you mocked from linking and include the mocked object when compiling
+	your test.
 
 	Express as a dependency of this target the object containing your mock.
 	Here we are mocking the ZSTD library compression functions so that we can
@@ -196,7 +189,11 @@ TODO: header files required?
 
 some of the steps as above
 
-instead of making mock files yourself, you can use the mock.mk file which is magical
+If the module to mock is a backend component you can leverage mocker.py to
+auto-generate the mocks by adding the dependency to the target. This will
+trigger mocker.py from mock.mk and Makefile.mock.
+
+		zstd_compression.t: $(MOCK_DIR)/backend/utils/error/elog_mock.o
 
 We mocked elog by putting a thing in a place and then doing a thing
 
