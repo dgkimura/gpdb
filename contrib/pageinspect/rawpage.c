@@ -28,6 +28,8 @@
 #include "utils/rel.h"
 #include "utils/snapmgr.h"
 
+#include "access/aomd.h"
+
 PG_MODULE_MAGIC;
 
 static bytea *get_raw_page_internal(text *relname, ForkNumber forknum,
@@ -144,10 +146,23 @@ get_raw_page_internal(text *relname, ForkNumber forknum, BlockNumber blkno)
 	{
 		FileSegInfo *seginfo;
 		seginfo = GetFileSegInfo(rel, GetLatestSnapshot(), 1);
-		elog(LOG, "segno %d total_tupcount %ld varblockcount %ld modcount %ld eof %ld eof_uncompressed %ld",
-			 seginfo->segno, seginfo->total_tupcount, seginfo->varblockcount, seginfo->modcount, seginfo->eof, seginfo->eof_uncompressed);
-		// seginfo->tupleVisibilitySummary->tid
-		//return (bytea *) palloc(BLCKSZ + VARHDRSZ);
+
+		File fd = OpenAOSegmentFile(rel, "fakename", seginfo->segno, seginfo->eof);
+		char *buffer = (char*) malloc (rel->rd_appendonly->blocksize);
+		int bytesRead = FileRead(fd, buffer, seginfo->eof);
+
+		/* Initialize buffer to copy to */
+		raw_page = (bytea *) palloc(seginfo->eof + VARHDRSZ);
+		SET_VARSIZE(raw_page, seginfo->eof + VARHDRSZ);
+		raw_page_data = VARDATA(raw_page);
+
+		memcpy(raw_page_data, buffer, bytesRead);
+
+		free(buffer);
+
+		relation_close(rel, AccessShareLock);
+
+		return raw_page;
 	}
 
 	/* Initialize buffer to copy to */
