@@ -11,6 +11,11 @@ RETURNS bytea
 AS 'MODULE_PATHNAME', 'get_raw_page'
 LANGUAGE C STRICT;
 
+CREATE FUNCTION get_raw_ao_page(text, int4, int4)
+RETURNS bytea
+AS 'MODULE_PATHNAME', 'get_raw_ao_page'
+LANGUAGE C STRICT;
+
 CREATE FUNCTION get_raw_page(text, text, int4)
 RETURNS bytea
 AS 'MODULE_PATHNAME', 'get_raw_page_fork'

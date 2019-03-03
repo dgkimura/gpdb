@@ -35,6 +35,9 @@ PG_MODULE_MAGIC;
 static bytea *get_raw_page_internal(text *relname, ForkNumber forknum,
 					  BlockNumber blkno);
 
+static bytea *get_raw_ao_page_internal(text *relname, ForkNumber forknum,
+					  BlockNumber blkno, uint32 segno);
+
 
 /*
  * get_raw_page
@@ -61,6 +64,27 @@ get_raw_page(PG_FUNCTION_ARGS)
 				 errhint("Run the updated pageinspect.sql script.")));
 
 	raw_page = get_raw_page_internal(relname, MAIN_FORKNUM, blkno);
+
+	PG_RETURN_BYTEA_P(raw_page);
+}
+
+
+/*
+ * get_raw_ao_page
+ *
+ * Returns a copy of a page from shared buffers as a bytea
+ */
+PG_FUNCTION_INFO_V1(get_raw_ao_page);
+
+Datum
+get_raw_ao_page(PG_FUNCTION_ARGS)
+{
+	text	   *relname = PG_GETARG_TEXT_P(0);
+	uint32		blkno = PG_GETARG_UINT32(1);
+	uint32		segno = PG_GETARG_UINT32(2);
+	bytea	   *raw_page;
+
+	raw_page = get_raw_ao_page_internal(relname, MAIN_FORKNUM, blkno, segno);
 
 	PG_RETURN_BYTEA_P(raw_page);
 }
@@ -135,35 +159,16 @@ get_raw_page_internal(text *relname, ForkNumber forknum, BlockNumber blkno)
 				(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
 				 errmsg("cannot access temporary tables of other sessions")));
 
-	if (RelationIsHeap(rel) &&
-		blkno >= RelationGetNumberOfBlocksInFork(rel, forknum))
+	if (RelationIsAppendOptimized(rel))
+		ereport(ERROR,
+				(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+				 errmsg("use get_raw_ao_page for ao tables")));
+
+	if (blkno >= RelationGetNumberOfBlocksInFork(rel, forknum))
 		ereport(ERROR,
 				(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 				 errmsg("block number %u is out of range for relation \"%s\"",
 						blkno, RelationGetRelationName(rel))));
-
-	if (RelationIsAoRows(rel))
-	{
-		FileSegInfo *seginfo;
-		seginfo = GetFileSegInfo(rel, GetLatestSnapshot(), 1);
-
-		File fd = OpenAOSegmentFile(rel, "fakename", seginfo->segno, seginfo->eof);
-		char *buffer = (char*) malloc (rel->rd_appendonly->blocksize);
-		int bytesRead = FileRead(fd, buffer, seginfo->eof);
-
-		/* Initialize buffer to copy to */
-		raw_page = (bytea *) palloc(seginfo->eof + VARHDRSZ);
-		SET_VARSIZE(raw_page, seginfo->eof + VARHDRSZ);
-		raw_page_data = VARDATA(raw_page);
-
-		memcpy(raw_page_data, buffer, bytesRead);
-
-		free(buffer);
-
-		relation_close(rel, AccessShareLock);
-
-		return raw_page;
-	}
 
 	/* Initialize buffer to copy to */
 	raw_page = (bytea *) palloc(BLCKSZ + VARHDRSZ);
@@ -179,6 +184,49 @@ get_raw_page_internal(text *relname, ForkNumber forknum, BlockNumber blkno)
 
 	LockBuffer(buf, BUFFER_LOCK_UNLOCK);
 	ReleaseBuffer(buf);
+
+	relation_close(rel, AccessShareLock);
+
+	return raw_page;
+}
+
+static bytea *
+get_raw_ao_page_internal(text *relname, ForkNumber forknum, BlockNumber blkno, uint32 segno)
+{
+	bytea	   *raw_page;
+	RangeVar   *relrv;
+	Relation	rel;
+	char	   *raw_page_data;
+
+	if (!superuser())
+		ereport(ERROR,
+				(errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
+				 (errmsg("must be superuser to use raw functions"))));
+
+	relrv = makeRangeVarFromNameList(textToQualifiedNameList(relname));
+	rel = relation_openrv(relrv, AccessShareLock);
+
+	if (RelationIsHeap(rel))
+		ereport(ERROR,
+				(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				 errmsg("relation \"%s\" is not a ao relation",
+						RelationGetRelationName(rel))));
+
+	FileSegInfo *seginfo;
+	seginfo = GetFileSegInfo(rel, GetLatestSnapshot(), segno);
+
+	File fd = OpenAOSegmentFile(rel, "fakename", seginfo->segno, seginfo->eof);
+	char *buffer = (char*) malloc (rel->rd_appendonly->blocksize);
+	int bytesRead = FileRead(fd, buffer, seginfo->eof);
+
+	/* Initialize buffer to copy to */
+	raw_page = (bytea *) palloc(seginfo->eof + VARHDRSZ);
+	SET_VARSIZE(raw_page, seginfo->eof + VARHDRSZ);
+	raw_page_data = VARDATA(raw_page);
+
+	memcpy(raw_page_data, buffer, bytesRead);
+
+	free(buffer);
 
 	relation_close(rel, AccessShareLock);
 
