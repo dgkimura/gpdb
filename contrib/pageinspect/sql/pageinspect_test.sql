@@ -22,7 +22,7 @@ INSERT INTO aotable SELECT i FROM generate_series(1, 10)i;
 
 \! PGOPTIONS='-c gp_session_role=utility' psql -p 25432 -d postgres -c "SELECT * FROM get_raw_ao_page('aotable', 0, 1);"
 -- Show items from page on segment
--- \! PGOPTIONS='-c gp_session_role=utility' psql -p 25432 -d postgres -c "SELECT * FROM ao_page_items(get_raw_ao_page('aotable', 0));"
+\! PGOPTIONS='-c gp_session_role=utility' psql -p 25432 -d postgres -c "SELECT * FROM ao_page_items(get_raw_ao_page('aotable', 0, 1));"
 
 -- cdbappendonlystorageread.c:AppendOnlyStorageRead_Init
 -- aosegfile.c:GetFileSegInfo(Relation parentrel, Snapshot appendOnlyMetaDataSnapshot, int segno) 

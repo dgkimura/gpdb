@@ -58,6 +58,13 @@ RETURNS SETOF record
 AS 'MODULE_PATHNAME', 'heap_page_items'
 LANGUAGE C STRICT;
 
+CREATE FUNCTION ao_page_items(IN page bytea,
+    OUT header_kind text,
+    OUT row_count int4) -- TODO: Get the insert transaction from aoseg?
+--RETURNS SETOF record
+AS 'MODULE_PATHNAME', 'ao_page_items'
+LANGUAGE C STRICT;
+
 --
 -- bt_metap()
 --
