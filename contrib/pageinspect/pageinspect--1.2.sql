@@ -37,6 +37,17 @@ CREATE FUNCTION page_header(IN page bytea,
 AS 'MODULE_PATHNAME', 'page_header'
 LANGUAGE C STRICT;
 
+CREATE FUNCTION ao_page_header(IN page bytea,
+    OUT header_kind text,
+    OUT checksum int4,
+    OUT row_count int4,
+    OUT first_row_number int4,
+    OUT header_length int4,
+    OUT compressed_length int4,
+    OUT uncompressed_length int4)
+AS 'MODULE_PATHNAME', 'ao_page_header'
+LANGUAGE C STRICT;
+
 --
 -- heap_page_items()
 --
