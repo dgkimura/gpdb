@@ -2,8 +2,12 @@
 
 #include "funcapi.h"
 #include "fmgr.h"
+
+#include "cdb/cdbappendonlyam.h"
 #include "cdb/cdbappendonlystorageread.h"
 #include "cdb/cdbappendonlystorageformat.h"
+
+#define AO_CO_HEADER_VERSION 2
 
 static char *
 to_string_header_kind(AoHeaderKind kind)
@@ -47,6 +51,29 @@ ao_page_header(PG_FUNCTION_ARGS)
 
 	if (get_call_result_type(fcinfo, NULL, &tupleDesc) != TYPEFUNC_COMPOSITE)
 		elog(ERROR, "return type must be a row type");
+
+	switch(blkHdr.headerKind)
+	{
+		case AoHeaderKind_SmallContent:
+			AppendOnlyStorageFormat_GetSmallContentHeaderInfo (
+				(uint8*)(raw_page->vl_dat),
+				blkHdr.actualHeaderLen,
+				useChecksum,
+				MAX_APPENDONLY_BLOCK_SIZE,
+				&blkHdr.overallBlockLen,
+				&blkHdr.contentOffset,
+				&blkHdr.uncompressedLen,
+				&blkHdr.executorBlockKind,
+				&blkHdr.hasFirstRowNum,
+				AO_CO_HEADER_VERSION,
+				&blkHdr.firstRowNum,
+				&blkHdr.rowCount,
+				&blkHdr.isCompressed,
+				&blkHdr.compressedLen);
+			break;
+		default:
+			break;
+	}
 
 	values[0] = psprintf("%s", to_string_header_kind(blkHdr.headerKind));
 	values[1] = psprintf("%d", 0); /* TODO: add checksum */
