@@ -1488,11 +1488,12 @@ RecordTransactionCommit(void)
 			{
 				xlrec.distribTimeStamp = distribTimeStamp;
 				xlrec.distribXid = distribXid;
-				recptr = XLogInsert(RM_XACT_ID, XLOG_XACT_PREPARE, rdata);
-				recptr = XLogInsert(RM_XACT_ID, XLOG_XACT_COMMIT_PREPARED, rdata);
+				recptr = XLogInsert(RM_XACT_ID, XLOG_XACT_COMMIT, rdata);
 			}
 			else
 			{
+				xlrec.distribTimeStamp = 0;
+				xlrec.distribXid = 0;
 				recptr = XLogInsert(RM_XACT_ID, XLOG_XACT_COMMIT, rdata);
 			}
 
@@ -6391,7 +6392,7 @@ xact_redo(XLogRecPtr beginLoc __attribute__((unused)), XLogRecPtr lsn __attribut
 	{
 		xl_xact_commit *xlrec = (xl_xact_commit *) XLogRecGetData(record);
 
-		xact_redo_commit(xlrec, record->xl_xid, lsn, 0, 0);
+		xact_redo_commit(xlrec, record->xl_xid, lsn, xlrec->distribXid, xlrec->distribTimeStamp);
 	}
 	else if (info == XLOG_XACT_ABORT)
 	{
