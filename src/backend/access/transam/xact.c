@@ -1488,7 +1488,8 @@ RecordTransactionCommit(void)
 			{
 				xlrec.distribTimeStamp = distribTimeStamp;
 				xlrec.distribXid = distribXid;
-				recptr = XLogInsert(RM_XACT_ID, XLOG_XACT_ONE_PHASE_COMMIT, rdata);
+				recptr = XLogInsert(RM_XACT_ID, XLOG_XACT_PREPARE, rdata);
+				recptr = XLogInsert(RM_XACT_ID, XLOG_XACT_COMMIT_PREPARED, rdata);
 			}
 			else
 			{
@@ -6437,12 +6438,6 @@ xact_redo(XLogRecPtr beginLoc __attribute__((unused)), XLogRecPtr lsn __attribut
 		if (standbyState >= STANDBY_INITIALIZED)
 			ProcArrayApplyXidAssignment(xlrec->xtop,
 										xlrec->nsubxacts, xlrec->xsub);
-	}
-	else if (info == XLOG_XACT_ONE_PHASE_COMMIT)
-	{
-		xl_xact_commit *xlrec = (xl_xact_commit *) XLogRecGetData(record);
-
-		xact_redo_commit(xlrec, record->xl_xid, lsn, xlrec->distribTimeStamp, xlrec->distribXid);
 	}
 	else
 		elog(PANIC, "xact_redo: unknown op code %u", info);
