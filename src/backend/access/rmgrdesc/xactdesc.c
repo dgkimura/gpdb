@@ -99,6 +99,8 @@ xact_desc_commit(StringInfo buf, xl_xact_commit *xlrec)
 			pfree(path);
 		}
 	}
+	if (xlrec->tablespace_oid_to_delete_on_commit != InvalidOid)
+		appendStringInfo(buf, " tablespace_oid_to_delete_on_commit %u", xlrec->tablespace_oid_to_delete_on_commit);
 
 	/*
 -	 * MPP: Return end of regular commit information.
