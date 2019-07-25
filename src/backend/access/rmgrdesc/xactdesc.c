@@ -188,6 +188,8 @@ xact_desc_abort(StringInfo buf, xl_xact_abort *xlrec)
 			pfree(path);
 		}
 	}
+	if (xlrec->tablespace_oid_to_delete_on_abort != InvalidOid)
+		appendStringInfo(buf, " tablespace_oid_to_delete_on_abort %u", xlrec->tablespace_oid_to_delete_on_abort);
 }
 
 static void
