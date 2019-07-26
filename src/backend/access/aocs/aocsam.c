@@ -298,6 +298,8 @@ open_next_scan_seg(AOCSScanDesc scan)
 				if (e->eof == 0 || curSegInfo->state == AOSEG_STATE_AWAITING_DROP)
 					emptySeg = true;
 			}
+			else if (scan->num_proj_atts == 0)
+				emptySeg = true;
 
 			if (!emptySeg)
 			{
