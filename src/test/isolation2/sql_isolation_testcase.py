@@ -55,18 +55,19 @@ class SQLIsolationExecutor(object):
         # The re.S flag makes the "." in the regex match newlines.
         # When matched against a command in process_command(), all
         # lines in the command are matched and sent as SQL query.
-        self.command_pattern = re.compile(r"^(-?\d+|[*])([&\\<\\>USIq]*?)\:(.*)", re.S)
+        self.command_pattern = re.compile(r"^(-?\d+|[*])([&\\<\\>USIqo]*?)\:(.*)", re.S)
         if dbname:
             self.dbname = dbname
         else:
             self.dbname = os.environ.get('PGDATABASE')
 
     class SQLConnection(object):
-        def __init__(self, out_file, name, mode, dbname):
+        def __init__(self, out_file, name, mode, dbname, port=None):
             self.name = name
             self.mode = mode
             self.out_file = out_file
             self.dbname = dbname
+            self.port = port
 
             parent_conn, child_conn = multiprocessing.Pipe(True)
             self.p = multiprocessing.Process(target=self.session_process, args=(child_conn,))   
@@ -82,7 +83,7 @@ class SQLIsolationExecutor(object):
 
         def session_process(self, pipe):
             sp = SQLIsolationExecutor.SQLSessionProcess(self.name, 
-                self.mode, pipe, self.dbname)
+                self.mode, pipe, self.dbname, self.port)
             sp.do()
 
         def query(self, command):
@@ -135,7 +136,7 @@ class SQLIsolationExecutor(object):
             self.p.terminate()
 
     class SQLSessionProcess(object):
-        def __init__(self, name, mode, pipe, dbname):
+        def __init__(self, name, mode, pipe, dbname, _port=None):
             """
                 Constructor
             """
@@ -158,6 +159,8 @@ class SQLIsolationExecutor(object):
                 self.con = self.connectdb(given_dbname=self.dbname,
                                           given_host=hostname,
                                           given_port=port)
+            elif _port is not None:
+                self.con = self.connectdb(self.dbname, given_port=_port)
             else:
                 self.con = self.connectdb(self.dbname)
 
@@ -300,7 +303,7 @@ class SQLIsolationExecutor(object):
                 (c, wait) = self.pipe.recv()
 
 
-    def get_process(self, out_file, name, mode="", dbname=""):
+    def get_process(self, out_file, name, mode="", dbname="", oldport=None):
         """
             Gets or creates the process by the given name
         """
@@ -312,7 +315,7 @@ class SQLIsolationExecutor(object):
         if not (name, mode) in self.processes:
             if not dbname:
                 dbname = self.dbname
-            self.processes[(name, mode)] = SQLIsolationExecutor.SQLConnection(out_file, name, mode, dbname)
+            self.processes[(name, mode)] = SQLIsolationExecutor.SQLConnection(out_file, name, mode, dbname, oldport)
         return self.processes[(name, mode)]
 
     def quit_process(self, out_file, name, mode="", dbname=""):
@@ -450,6 +453,8 @@ class SQLIsolationExecutor(object):
             self.quit_process(output_file, process_name, con_mode, dbname=dbname)
         elif flag == "S":
             self.get_process(output_file, process_name, con_mode, dbname=dbname).query(sql.strip())
+        elif flag == "o":
+            self.get_process(output_file, process_name, con_mode, dbname=dbname, oldport=35432).query(sql.strip())
         else:
             raise Exception("Invalid isolation flag")
 
@@ -471,7 +476,7 @@ class SQLIsolationExecutor(object):
                     command_part = line
                 if command_part == "" or command_part == "\n":
                     print >>output_file 
-                elif re.match(r".*;\s*$", command_part) or re.match(r"^\d+[q\\<]:$", line) or re.match(r"^-?\d+[SU][q\\<]:$", line):
+                elif re.match(r".*;\s*$", command_part) or re.match(r"^\d+[q\\<]:$", line) or re.match(r"^-?\d+[SUNO][q\\<]:$", line):
                     command += command_part
                     try:
                         self.process_command(command, output_file)

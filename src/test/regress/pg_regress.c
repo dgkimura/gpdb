@@ -3288,6 +3288,16 @@ regression_main(int argc, char *argv[], init_function ifunc, test_function tfunc
 		 */
 		if (!use_existing)
 		{
+			char *old = getenv("PGPORTOLD");
+			char *new = getenv("PGPORT");
+
+			if (strlen(old) > 0)
+			{
+				doputenv("PGPORT", old);
+				for (sl = dblist; sl; sl = sl->next)
+					drop_database_if_exists(sl->str);
+				doputenv("PGPORT", new);
+			}
 			for (sl = dblist; sl; sl = sl->next)
 				drop_database_if_exists(sl->str);
 			for (sl = extraroles; sl; sl = sl->next)
@@ -3300,6 +3310,16 @@ regression_main(int argc, char *argv[], init_function ifunc, test_function tfunc
 	 */
 	if (!use_existing)
 	{
+		char *old = getenv("PGPORTOLD");
+		char *new = getenv("PGPORT");
+
+		if (strlen(old) > 0)
+		{
+			doputenv("PGPORT", old);
+			for (sl = dblist; sl; sl = sl->next)
+				create_database(sl->str);
+			doputenv("PGPORT", new);
+		}
 		for (sl = dblist; sl; sl = sl->next)
 			create_database(sl->str);
 		for (sl = extraroles; sl; sl = sl->next)
