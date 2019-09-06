@@ -75,7 +75,8 @@ class TestCluster:
                       '%HOSTFILE%': self.hosts_file,
                       '%MASTER_PORT%': self.master_port,
                       '%MASTER_DATA_DIR%': self.master_dir,
-                      '%DATA_DIR%': (self.primary_dir + ' ') * self.number_of_segments
+                      '%DATA_DIR%': (self.primary_dir + ' ') * self.number_of_segments,
+                      '%HBA_HOSTNAMES%' : '1'
                       }
 
         if self.mirror_enabled:
