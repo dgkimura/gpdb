@@ -17,7 +17,7 @@ SELECT 'Test digest md5: EXPECTED ERROR FAIL FIPS' as comment;
 (1 row)
 
 SELECT digest('santa claus', 'md5');
-ERROR:  Cannot use "md5": No such hash algorithm
+ERROR:  Cannot use "md5": Some PX error (not specified)
 SELECT 'Test digest sha256: EXPECTED PASS' as comment;
               comment              
 -----------------------------------
@@ -37,7 +37,7 @@ SELECT 'Test hmac md5: EXPECTED ERROR FAIL FIPS' as comment;
 (1 row)
 
 SELECT hmac('santa claus', 'aaa', 'md5');
-ERROR:  Cannot use "md5": No such hash algorithm
+ERROR:  Cannot use "md5": Some PX error (not specified)
 SELECT 'Test hmac sha256: EXPECTED PASS' as comment;
              comment             
 ---------------------------------
@@ -107,5 +107,5 @@ SELECT 'Test raw encrypt : EXPECTED FAIL FIPS' as comment;
 (1 row)
 
 SELECT encrypt('santa claus', 'mypass', 'bf') as raw_blowfish;
-ERROR:  requested functionality not allowed in FIPS mode (openssl.c:972)
+ERROR:  requested functionality not allowed in FIPS mode (openssl.c:756)
 DROP TABLE fipstest;
