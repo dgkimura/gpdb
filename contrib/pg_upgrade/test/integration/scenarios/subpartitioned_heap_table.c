@@ -92,7 +92,6 @@ aSubpartitionedHeapTableHasDataInAGpdbFiveCluster(void)
 	executeQuery(connection, "set search_path to 'five_to_six_upgrade';");
 	executeQuery(connection, "create table users (id int, age int) distributed by (id) partition by range (id) subpartition by range (age) (partition partition_id start(1) end(3) ( subpartition subpartition_age_first start(1) end(20), subpartition subpartition_age_second start(20) end(30) ))");
 	executeQuery(connection, "insert into users (id, age) values (1, 10), (2, 20)");
-	executeQuery(connection, "vacuum freeze;");
 
 	PQfinish(connection);
 }

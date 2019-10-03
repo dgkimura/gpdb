@@ -972,18 +972,6 @@ set_frozenxids(bool minmxid_only)
 		 */
 		PQclear(executeQueryOrDie(conn, "set allow_system_table_mods=true"));
 
-		/*
-		 * Instead of assuming template0 will be frozen by initdb, its worth
-		 * making sure we freeze it here before updating the relfrozenxid
-		 * directly for the tables in pg_class and datfrozenxid for the
-		 * database in pg_database. Its fast and safe worth than assuming for
-		 * template0.
-		 */
-		if (!minmxid_only && strcmp(datallowconn, "f") == 0)
-		{
-			PQclear(executeQueryOrDie(conn, "VACUUM FREEZE"));
-		}
-
 		if (!minmxid_only)
 			/* set pg_class.relfrozenxid */
 			PQclear(executeQueryOrDie(conn,
@@ -1012,6 +1000,18 @@ set_frozenxids(bool minmxid_only)
 		/* only heap, materialized view, and TOAST are vacuumed */
 								  "WHERE	relkind IN ('r', 'm', 't')",
 								  old_cluster.controldata.chkpnt_nxtmulti));
+
+		/*
+		 * Instead of assuming template0 will be frozen by initdb, its worth
+		 * making sure we freeze it here before updating the relfrozenxid
+		 * directly for the tables in pg_class and datfrozenxid for the
+		 * database in pg_database. Its fast and safe worth than assuming for
+		 * template0.
+		 */
+		if (!minmxid_only && strcmp(datallowconn, "f") == 0)
+		{
+			PQclear(executeQueryOrDie(conn, "VACUUM FREEZE"));
+		}
 		PQfinish(conn);
 
 		/* Reset datallowconn flag */
