@@ -39,6 +39,9 @@
 
 #include "cdb/cdbvars.h"
 #include "cdb/cdbpersistenttablespace.h"
+#include "catalog/pg_filespace_entry.h"
+#include "catalog/pg_filespace.h"
+#include "commands/filespace.h"
 
 
 static int64
@@ -268,6 +271,13 @@ calculate_tablespace_size(Oid tblspcOid)
 	DIR		   *dirdesc;
 	struct dirent *direntry;
 	AclResult	aclresult;
+	Relation	 rel;
+	HeapScanDesc relScan;
+	HeapTuple	tuple;
+	Oid			filespaceOid;
+	Form_pg_tablespace tablespaceForm;
+	Form_pg_filespace_entry filespaceEntryForm;
+	char *location;
 
 	/*
 	 * User must have CREATE privilege for target tablespace, either
@@ -287,7 +297,45 @@ calculate_tablespace_size(Oid tblspcOid)
 	else if (tblspcOid == GLOBALTABLESPACE_OID)
 		snprintf(tblspcPath, MAXPGPATH, "global");
 	else
-		snprintf(tblspcPath, MAXPGPATH, "pg_tblspc/%u", tblspcOid);
+	{
+
+		/*
+		 * Find the filespace oid matching the given tablespace oid.
+		 */
+		rel = heap_open(TableSpaceRelationId, RowExclusiveLock);
+		relScan = heap_beginscan(rel, SnapshotNow, 0, NULL);
+
+		while ((tuple = heap_getnext(relScan, ForwardScanDirection)) != NULL)
+		{
+			tablespaceForm = (Form_pg_tablespace) GETSTRUCT(tuple);
+			if (HeapTupleGetOid(tuple) == tblspcOid)
+			{
+				filespaceOid = tablespaceForm->spcfsoid;
+				break;
+			}
+		}
+		heap_endscan(relScan);
+		relation_close(rel, RowExclusiveLock);
+
+		/*
+		 * Find the filespace location for the found filespace oid.
+		 */
+		rel = heap_open(FileSpaceEntryRelationId, RowExclusiveLock);
+		relScan = heap_beginscan(rel, SnapshotNow, 0, NULL);
+
+		while ((tuple = heap_getnext(relScan, ForwardScanDirection)) != NULL)
+		{
+			filespaceEntryForm = (Form_pg_filespace_entry) GETSTRUCT(tuple);
+			if (filespaceEntryForm->fsefsoid == filespaceOid)
+			{
+				location = text_to_cstring(&filespaceEntryForm->fselocation);
+				snprintf(tblspcPath, MAXPGPATH, "%s", location);
+				break;
+			}
+		}
+		heap_endscan(relScan);
+		relation_close(rel, RowExclusiveLock);
+	}
 
 	dirdesc = AllocateDir(tblspcPath);
 
