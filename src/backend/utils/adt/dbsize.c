@@ -279,6 +279,11 @@ calculate_tablespace_size(Oid tblspcOid)
 	Form_pg_filespace_entry filespaceEntryForm;
 	char *location;
 
+	Relation pg_tablespace;
+	SysScanDesc sscan;
+	Datum	*d;
+	bool	*null;
+
 	/*
 	 * User must have CREATE privilege for target tablespace, either
 	 * explicitly granted or implicitly because it is default for current
@@ -302,20 +307,28 @@ calculate_tablespace_size(Oid tblspcOid)
 		/*
 		 * Find the filespace oid matching the given tablespace oid.
 		 */
-		rel = heap_open(TableSpaceRelationId, RowExclusiveLock);
-		relScan = heap_beginscan(rel, SnapshotNow, 0, NULL);
+		d = (Datum *) palloc(sizeof(Datum) * Natts_pg_tablespace);
+		null = (bool *) palloc(sizeof(bool) * Natts_pg_tablespace);
 
-		while ((tuple = heap_getnext(relScan, ForwardScanDirection)) != NULL)
+		pg_tablespace = heap_open(TableSpaceRelationId, AccessShareLock);
+
+		sscan = systable_beginscan(pg_tablespace, InvalidOid, false, SnapshotNow, 0, NULL);
+
+		while (HeapTupleIsValid(tuple = systable_getnext(sscan)))
 		{
-			tablespaceForm = (Form_pg_tablespace) GETSTRUCT(tuple);
-			if (HeapTupleGetOid(tuple) == tblspcOid)
+			if( HeapTupleGetOid(tuple) == tblspcOid)
 			{
-				filespaceOid = tablespaceForm->spcfsoid;
+				heap_deform_tuple(tuple, RelationGetDescr(pg_tablespace), d, null);
+
+				filespaceOid = DatumGetInt32(d[Anum_pg_tablespace_spcfsoid - 1]);
 				break;
 			}
 		}
-		heap_endscan(relScan);
-		relation_close(rel, RowExclusiveLock);
+		systable_endscan(sscan);
+
+		heap_close(pg_tablespace, AccessShareLock);
+		pfree(d);
+		pfree(null);
 
 		/*
 		 * Find the filespace location for the found filespace oid.
