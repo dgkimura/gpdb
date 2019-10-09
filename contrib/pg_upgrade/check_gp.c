@@ -16,6 +16,7 @@
 
 #include "pg_upgrade.h"
 
+static void check_homogeneous_partition_tables(void);
 static void check_external_partition(void);
 static void check_covering_aoindex(void);
 static void check_partition_indexes(void);
@@ -35,6 +36,7 @@ static void check_gphdfs_user_roles(void);
 void
 check_greenplum(void)
 {
+	check_homogeneous_partition_tables();
 	check_online_expansion();
 	check_external_partition();
 	check_covering_aoindex();
@@ -42,6 +44,91 @@ check_greenplum(void)
 	check_orphaned_toastrels();
 	check_gphdfs_external_tables();
 	check_gphdfs_user_roles();
+}
+
+/*
+ *	check_homogeneous_partition_tables
+ *
+ *	Check if there exist mismatching root-leaf partitioned tables.
+ */
+static void
+check_homogeneous_partition_tables(void)
+{
+	bool		found = false;
+	int			dbnum;
+	char		output_path[MAXPGPATH];
+	FILE	   *script = NULL;
+
+	prep_status("Checking for non-uniform partitioned tables");
+
+	snprintf(output_path, sizeof(output_path), "non_uniform_partitioned_tables.txt");
+
+	for (dbnum = 0; dbnum < old_cluster.dbarr.ndbs; dbnum++)
+	{
+		PGresult   *res;
+		int			ntups;
+		int			rowno;
+		DbInfo	   *active_db = &old_cluster.dbarr.dbs[dbnum];
+		PGconn	   *conn;
+		char	   *root;
+		char	   *child;
+
+		conn = connectToServer(&old_cluster, active_db->db_name);
+		res = executeQueryOrDie(conn,
+			"SELECT pg_catalog.set_config('search_path', '\"$user\",public', false);");
+		res = executeQueryOrDie(conn,
+			 "SELECT tablename AS root, partitiontablename AS child "
+			 "FROM pg_partitions;");
+
+		ntups = PQntuples(res);
+
+		if (ntups > 0)
+		{
+			for (rowno = 0; rowno < ntups; rowno++)
+			{
+				root = PQgetvalue(res, rowno, PQfnumber(res, "root"));
+				child = PQgetvalue(res, rowno, PQfnumber(res, "child"));
+
+				res = executeQueryOrDie(conn,
+					"SELECT a.attrelid AS rootrelid, "
+					"       a.attname AS rootattname, "
+					"       b.attrelid AS childrelid, "
+					"       b.attname AS childattname "
+					"FROM "
+					"   (SELECT * FROM pg_attribute WHERE attrelid='%s'::regclass::oid) AS a "
+					"       FULL OUTER JOIN "
+					"   (SELECT * FROM pg_attribute WHERE attrelid='%s'::regclass::oid) AS b "
+					"       ON a.attname=b.attname "
+					"WHERE a.attname IS NULL OR b.attname IS NULL;",
+					root, child);
+
+				if (PQntuples(res) > 0)
+				{
+					found = true;
+					if (script == NULL && (script = fopen(output_path, "w")) == NULL)
+						pg_log(PG_FATAL, "Could not create necessary file:  %s\n", output_path);
+
+					fprintf(script, "Partition table \"%s\" does not have identical format to child table %s\n", root, child);
+				}
+			}
+		}
+
+		PQclear(res);
+		PQfinish(conn);
+	}
+
+	if (found)
+	{
+		fclose(script);
+		pg_log(PG_REPORT, "fatal\n");
+		pg_log(PG_FATAL,
+			   "| Non uniform partition tables exist,\n"
+			   "| must remove them before the upgrade.\n"
+			   "| A list of the problem tables is in the file:\n"
+			   "| \t%s\n\n", output_path);
+	}
+	else
+		check_ok();
 }
 
 /*
