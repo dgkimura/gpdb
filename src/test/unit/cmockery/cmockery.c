@@ -244,6 +244,7 @@ static SourceLocation global_last_parameter_location;
 // List of all currently allocated blocks.
 static ListNode global_allocated_blocks;
 
+static char *test_name = NULL;
 static int abort_for_missing_check = 0;
 static int generate_suppression = 0;
 static int run_disabled_tests = 0;
@@ -1857,6 +1858,9 @@ int _run_tests(const UnitTest * const tests, const size_t number_of_tests) {
 		const ListNode *test_check_point = NULL;
 		TestState *current_TestState;
 		const UnitTest * const test = &tests[current_test++];
+		if (test_name != NULL && strcmp(test->name, test_name) != 0) {
+			continue;
+		}
 		if (!test->function) {
 			continue;
 		}
@@ -1962,7 +1966,20 @@ void cmockery_parse_arguments(int argc, char** argv)
 			cmockery_enable_generate_suppression();
 		} else if (strcmp(argv[i], "--cmockery_run_disabled_tests") == 0) {
 			cmockery_run_disabled_tests();
+		} else if (strstr(argv[i], "--cmockery_run_test") == 0) {
+			char *delimiter = "=";
+			strtok(argv[i], delimiter);
+			cmockery_run_test(strtok(NULL, delimiter));
 		}
+	}
+}
+
+void cmockery_run_test(char *testname)
+{
+	if (testname != NULL)
+	{
+		print_message(COLOR_DEFAULT, "Run cmockery test \"%s\"\n", testname);
+		test_name = testname;
 	}
 }
 

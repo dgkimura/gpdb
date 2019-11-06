@@ -583,6 +583,7 @@ void cmockery_enable_generate_suppression(void);
 
 // Runs also disabled tests
 void cmockery_run_disabled_tests(void);
+void cmockery_run_test(char *n);
 
 // Prints a message that a test is temporarily disabled
 int cmockery_test_deactivated_(const char * const function, const char* file, const int line);
