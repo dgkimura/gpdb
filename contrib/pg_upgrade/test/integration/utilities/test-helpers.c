@@ -19,6 +19,32 @@ resetGpdbSixDataDirectories(void)
 }
 
 PGconn *
+connectToFiveInSchema(char *schema)
+{
+	PGconn *conn = connectToFive();
+	char buffer[1000];
+
+	sprintf(buffer, "CREATE SCHEMA %s;", schema);
+	executeQueryClearResult(conn, buffer);
+	sprintf(buffer, "SET search_path TO %s", schema);
+	executeQueryClearResult(conn, buffer);
+	return conn;
+}
+
+PGconn *
+connectToSixInSchema(char *schema)
+{
+	PGconn *conn = connectToSix();
+	char buffer[1000];
+
+	sprintf(buffer, "CREATE SCHEMA %s;", schema);
+	executeQueryClearResult(conn, buffer);
+	sprintf(buffer, "SET search_path TO %s", schema);
+	executeQueryClearResult(conn, buffer);
+	return conn;
+}
+
+PGconn *
 connectToFive()
 {
 	return connectTo(50000);

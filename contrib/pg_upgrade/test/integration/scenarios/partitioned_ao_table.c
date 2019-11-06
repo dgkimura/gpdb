@@ -3,6 +3,7 @@
 #include <setjmp.h>
 
 #include "cmockery.h"
+#include "greenplum_five_to_greenplum_six_upgrade_test_suite.h"
 
 #include "partitioned_ao_table.h"
 
@@ -13,13 +14,33 @@
 #include "utilities/test-helpers.h"
 #include "utilities/bdd-helpers.h"
 
-static void
-partitionedTableShouldHaveDataUpgradedToSixCluster()
+void
+partitionedAoTableShouldHaveDataUpgradedToSixCluster(void **state)
 {
 	PGconn	   *connection = connectToSix();
 	PGresult   *result;
 
-	executeQueryClearResult(connection, "SET search_path TO five_to_six_upgrade;");
+	executeQueryClearResult(connection, "SET search_path TO five_to_six_upgrade_partitioned_ao_table;");
+
+	result = executeQuery(connection, "SELECT * FROM users_1_prt_1 WHERE id=1 AND name='Jane';");
+	assert_int_equal(1, PQntuples(result));
+
+	result = executeQuery(connection, "SELECT * FROM users_1_prt_2 WHERE id=2 AND name='John';");
+	assert_int_equal(1, PQntuples(result));
+
+	result = executeQuery(connection, "SELECT * FROM users;");
+	assert_int_equal(2, PQntuples(result));
+
+	PQfinish(connection);
+}
+
+void
+partitionedAocoTableShouldHaveDataUpgradedToSixCluster(void **state)
+{
+	PGconn	   *connection = connectToSix();
+	PGresult   *result;
+
+	executeQueryClearResult(connection, "SET search_path TO five_to_six_upgrade_partitioned_aoco_table;");
 
 	result = executeQuery(connection, "SELECT * FROM users_1_prt_1 WHERE id=1 AND name='Jane';");
 	assert_int_equal(1, PQntuples(result));
@@ -34,12 +55,34 @@ partitionedTableShouldHaveDataUpgradedToSixCluster()
 }
 
 static void
-partitionedTableShouldHaveDataOnMultipleSegfilesUpgradedToSixCluster()
+partitionedAoTableShouldHaveDataOnMultipleSegfilesUpgradedToSixCluster(void **state)
 {
-	PGconn	   *connection = connectToSix();
+	PGconn	   *connection = connectToSixInSchema("five_to_six_upgrade_partitioned_ao_table");
 	PGresult   *result;
 
-	executeQueryClearResult(connection, "SET search_path TO five_to_six_upgrade;");
+	executeQueryClearResult(connection, "CREATE INDEX name_index ON users(name);");
+	executeQueryClearResult(connection, "SET enable_seqscan=OFF");
+
+	result = executeQuery(connection, "SELECT * FROM users;");
+	assert_int_equal(5, PQntuples(result));
+	PQclear(result);
+
+	result = executeQuery(connection, "SET enable_seqscan=OFF; SELECT * FROM users WHERE name='Carolyn';");
+	assert_int_equal(1, PQntuples(result));
+	PQclear(result);
+
+	result = executeQuery(connection, "SET enable_seqscan=OFF; SELECT * FROM users WHERE name='Bob';");
+	assert_int_equal(0, PQntuples(result));
+	PQclear(result);
+
+	PQfinish(connection);
+}
+
+static void
+partitionedAocoTableShouldHaveDataOnMultipleSegfilesUpgradedToSixCluster(void **state)
+{
+	PGconn	   *connection = connectToSixInSchema("five_to_six_upgrade_partitioned_aoco_table");
+	PGresult   *result;
 
 	executeQueryClearResult(connection, "CREATE INDEX name_index ON users(name);");
 	executeQueryClearResult(connection, "SET enable_seqscan=OFF");
@@ -71,8 +114,8 @@ createPartitionedTableWithDataInFiveCluster(char *options)
 	PGconn	   *connection = connectToFive();
 	char buffer[1000];
 
-	executeQueryClearResult(connection, "CREATE SCHEMA five_to_six_upgrade;");
-	executeQueryClearResult(connection, "SET search_path TO five_to_six_upgrade");
+	executeQueryClearResult(connection, "CREATE SCHEMA five_to_six_upgrade_partitioned_ao_table;");
+	executeQueryClearResult(connection, "SET search_path TO five_to_six_upgrade_partitioned_ao_table");
 	sprintf(buffer, "CREATE TABLE users (id integer, name text) %s DISTRIBUTED BY (id) PARTITION BY RANGE(id) (START(1) END(3) EVERY(1));", options);
 	executeQueryClearResult(connection,buffer);
 	executeQueryClearResult(connection, "INSERT INTO users VALUES (1, 'Jane')");
@@ -87,20 +130,17 @@ createPartitionedAOTableWithDataInFiveCluster()
 }
 
 static void
-createPartitionedAOCOTableWithDataInFiveCluster()
+createPartitionedAOCOTableWithDataInFiveCluster(void **state)
 {
 	createPartitionedTableWithDataInFiveCluster("WITH (appendonly=true, orientation=column)");
 }
 
 static void
-createPartitionedTableWithDataOnMultipleSegfilesInFiveCluster(char *options)
+createPartitionedTableWithDataOnMultipleSegfilesInFiveCluster(char *options, char *schemaname)
 {
-	PGconn	   *connection1 = connectToFive();
-	PGconn	   *connection2 = connectToFive();
+	PGconn	   *connection1 = connectToFiveInSchema(schemaname);
+	PGconn	   *connection2 = connectToFiveInSchema(schemaname);
 	char buffer[1000];
-
-	executeQueryClearResult(connection1, "CREATE SCHEMA five_to_six_upgrade;");
-	executeQueryClearResult(connection1, "SET search_path TO five_to_six_upgrade");
 
 	sprintf(buffer,
 			"CREATE TABLE users (id int, name text) %s DISTRIBUTED BY (id) "
@@ -122,7 +162,6 @@ createPartitionedTableWithDataOnMultipleSegfilesInFiveCluster(char *options)
 	executeQueryClearResult(connection1, "INSERT INTO users VALUES (1, 'Jane')");
 	executeQueryClearResult(connection1, "INSERT INTO users VALUES (2, 'Jane')");
 
-	executeQueryClearResult(connection2, "SET search_path TO five_to_six_upgrade");
 	executeQueryClearResult(connection2, "BEGIN;");
 	/*
 	 * (1, 'Jane') and (2, 'Jane') are also being inserted on connection1 in a
@@ -159,39 +198,39 @@ createPartitionedTableWithDataOnMultipleSegfilesInFiveCluster(char *options)
 static void
 createPartitionedAOTableWithDataOnMultipleSegfilesInFiveCluster(void)
 {
-	createPartitionedTableWithDataOnMultipleSegfilesInFiveCluster("WITH (appendonly=true)");
+	createPartitionedTableWithDataOnMultipleSegfilesInFiveCluster("WITH (appendonly=true)", "five_to_six_upgrade_partitioned_ao_table");
 }
 
 static void
-createPartitionedAOCOTableWithDataOnMultipleSegfilesInFiveCluster(void)
+createPartitionedAOCOTableWithDataOnMultipleSegfilesInFiveCluster(void **state)
 {
-	createPartitionedTableWithDataOnMultipleSegfilesInFiveCluster("WITH (appendonly=true)");
+	createPartitionedTableWithDataOnMultipleSegfilesInFiveCluster("WITH (appendonly=true)", "five_to_six_upgrade_partitioned_aoco_table");
 }
 
-void test_a_partitioned_ao_table_with_data_can_be_upgraded(void **state)
+void
+test_a_partitioned_ao_table_with_data_on_multiple_segfiles_can_be_upgraded()
 {
-	given(withinGpdbFiveCluster(createPartitionedAOTableWithDataInFiveCluster));
-	when(anAdministratorPerformsAnUpgrade);
-	then(withinGpdbSixCluster(partitionedTableShouldHaveDataUpgradedToSixCluster));
+	unit_test_given(createPartitionedAOTableWithDataOnMultipleSegfilesInFiveCluster, "test_a_partitioned_ao_table_with_data_on_multiple_segfiles_can_be_upgraded");
+	unit_test_then(partitionedAoTableShouldHaveDataOnMultipleSegfilesUpgradedToSixCluster, "test_a_partitioned_ao_table_with_data_on_multiple_segfiles_can_be_upgraded");
 }
 
-void test_a_partitioned_ao_table_with_data_on_multiple_segfiles_can_be_upgraded(void **state)
+void
+test_a_partitioned_aoco_table_with_data_on_multiple_segfiles_can_be_upgraded()
 {
-	given(withinGpdbFiveCluster(createPartitionedAOTableWithDataOnMultipleSegfilesInFiveCluster));
-	when(anAdministratorPerformsAnUpgrade);
-	then(withinGpdbSixCluster(partitionedTableShouldHaveDataOnMultipleSegfilesUpgradedToSixCluster));
+	unit_test_given(createPartitionedAOCOTableWithDataOnMultipleSegfilesInFiveCluster, "test_a_partitioned_aoco_table_with_data_on_multiple_segfiles_can_be_upgraded");
+	unit_test_then(partitionedAocoTableShouldHaveDataOnMultipleSegfilesUpgradedToSixCluster, "test_a_partitioned_aoco_table_with_data_on_multiple_segfiles_can_be_upgraded");
 }
 
-void test_a_partitioned_aoco_table_with_data_can_be_upgraded(void **state)
+void
+test_a_partitioned_aoco_table_with_data_can_be_upgraded()
 {
-	given(withinGpdbFiveCluster(createPartitionedAOCOTableWithDataInFiveCluster));
-	when(anAdministratorPerformsAnUpgrade);
-	then(withinGpdbSixCluster(partitionedTableShouldHaveDataUpgradedToSixCluster));
+	unit_test_given(createPartitionedAOCOTableWithDataInFiveCluster, "test_a_partitioned_aoco_table_with_data_can_be_upgraded");
+	unit_test_then(partitionedAocoTableShouldHaveDataUpgradedToSixCluster, "test_a_partitioned_aoco_table_with_data_can_be_upgraded");
 }
 
-void test_a_partitioned_aoco_table_with_data_on_multiple_segfiles_can_be_upgraded(void **state)
+void
+test_a_partitioned_ao_table_with_data_can_be_upgraded()
 {
-	given(withinGpdbFiveCluster(createPartitionedAOCOTableWithDataOnMultipleSegfilesInFiveCluster));
-	when(anAdministratorPerformsAnUpgrade);
-	then(withinGpdbSixCluster(partitionedTableShouldHaveDataOnMultipleSegfilesUpgradedToSixCluster));
+	unit_test_given(createPartitionedAOTableWithDataInFiveCluster, "test_a_partitioned_ao_table_with_data_can_be_upgraded");
+	unit_test_then(partitionedAoTableShouldHaveDataUpgradedToSixCluster, "test_a_partitioned_ao_table_with_data_can_be_upgraded");
 }
