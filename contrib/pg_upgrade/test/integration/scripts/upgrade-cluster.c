@@ -1,18 +1,6 @@
-#include <setjmp.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "cmockery.h"
-
-/*
- * implements:
- */
-#include "upgrade-helpers.h"
-
-PQExpBufferData pg_upgrade_output;
-int pg_upgrade_exit_status;
 
 static void
 copy_file_from_backup_to_datadir(char *filename, char *segment_path)
@@ -141,7 +129,7 @@ upgradeContentId2(void)
 	upgradeSegment(segment_path);
 }
 
-void
+static void
 performUpgrade(void)
 {
 	upgradeMaster();
@@ -150,55 +138,8 @@ performUpgrade(void)
 	upgradeContentId2();
 }
 
-void
-performUpgradeCheck(void)
-{
-	char		buffer[2000];
-	char	   *master_data_directory_path = "qddir/demoDataDir-1";
-	FILE	   *output_file;
-	char	   *output;
-	int 	   cmdstatus = 0;
-
-	sprintf(buffer, ""
-			"./gpdb6/bin/pg_upgrade "
-			"--check "
-			"--old-bindir=./gpdb5/bin "
-			"--new-bindir=./gpdb6/bin "
-			"--old-datadir=./gpdb5-data/%s "
-			"--new-datadir=./gpdb6-data/%s ",
-			master_data_directory_path, master_data_directory_path);
-
-#ifndef WIN32
-	output_file = popen(buffer, "r");
-
-	while ((output = fgets(buffer, sizeof(buffer), output_file)) != NULL)
-		appendPQExpBufferStr(&pg_upgrade_output, output);
-	cmdstatus = pclose(output_file);
-	pg_upgrade_exit_status = WEXITSTATUS(cmdstatus);
-#endif
-}
-
-char *
-upgradeCheckOutput(void)
-{
-	return pg_upgrade_output.data;
-}
-
 int
-upgradeCheckStatus(void)
+main(int argc, char *argv[])
 {
-	return pg_upgrade_exit_status;
-}
-
-void
-initializePgUpgradeStatus(void)
-{
-	initPQExpBuffer(&pg_upgrade_output);
-	pg_upgrade_exit_status = 0;
-}
-
-void
-resetPgUpgradeStatus(void)
-{
-	termPQExpBuffer(&pg_upgrade_output);
+	performUpgrade();
 }
