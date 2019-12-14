@@ -1,0 +1,19 @@
+CREATE SCHEMA index_partitioned_table;
+
+CREATE TABLE index_partitioned_table."a partitioned table" (id int, name int, CONSTRAINT "table unique id name" UNIQUE(id, name))
+DISTRIBUTED BY (id)
+PARTITION BY RANGE (id)
+    SUBPARTITION BY RANGE (name)
+        SUBPARTITION TEMPLATE (
+         SUBPARTITION jane START(0) END(3))
+(START (1) END (2) EVERY (1));
+
+CREATE INDEX idx ON index_partitioned_table."a partitioned table"(name);
+
+! ./gpdb6/bin/pg_upgrade --mode=dispatcher --old-gp-dbid=1 --new-gp-dbid=1 --check --old-bindir=@upgrade_test_path@/gpdb5/bin --new-bindir=@upgrade_test_path@/gpdb6/bin --old-datadir=@upgrade_test_path@/gpdb5-data/qddir/demoDataDir-1 --new-datadir=@upgrade_test_path@/gpdb6-data/qddir/demoDataDir-1 --old-port=@old_port@;
+
+CREATE TEMP TABLE partitioned_table_index_report(a text);
+
+COPY partitioned_table_index_report FROM '@upgrade_test_path@/partitioned_tables_indexes.txt';
+
+SELECT * FROM partitioned_table_index_report WHERE a LIKE 'CREATE INDEX %';

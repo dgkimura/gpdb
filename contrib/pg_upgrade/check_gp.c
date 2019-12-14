@@ -606,6 +606,9 @@ check_partition_indexes(void)
 		int			i_nspname;
 		int			i_relname;
 		int			i_indexes;
+		int			i_createstatement;
+		int			i_indexrelid;
+		int			i_isleaf;
 		DbInfo	   *active_db = &old_cluster.dbarr.dbs[dbnum];
 		PGconn	   *conn = connectToServer(&old_cluster, active_db->db_name);
 
@@ -653,6 +656,35 @@ check_partition_indexes(void)
 		}
 
 		PQclear(res);
+
+		if (ntups > 0)
+		{
+			res = executeQueryOrDie(conn,
+					"SELECT pg_get_indexdef(indexrelid) || ';' as create_statement, indexrelid::regclass, parlevel = "
+					"    (SELECT max(parlevel) FROM pg_partition WHERE parrelid = par.parrelid) AS isleaf "
+					"FROM pg_partition_rule rule "
+					"    JOIN pg_partition par ON rule.paroid = par.oid AND NOT par.paristemplate "
+					"    JOIN pg_index ON indrelid=parchildrelid "
+					"WHERE indexrelid NOT IN ( "
+					"    SELECT objid "
+					"    FROM pg_depend "
+					"    WHERE deptype='i' "
+					"        AND classid='pg_class'::regclass "
+					"        AND refclassid='pg_constraint'::regclass);");
+			ntups = PQntuples(res);
+			i_createstatement = PQfnumber(res, "create_statement");
+			i_indexrelid = PQfnumber(res, "indexrelid");
+			i_isleaf = PQfnumber(res, "isleaf");
+			fprintf(script, "Indexes to drop\n");
+			for (rowno = 0; rowno < ntups; rowno++)
+				fprintf(script, "%s\n", PQgetvalue(res, rowno, i_indexrelid));
+			fprintf(script, "Indexes to recreate\n");
+			for (rowno = 0; rowno < ntups; rowno++)
+				if (PQgetvalue(res, rowno, i_isleaf)[0] == 't')
+					fprintf(script, "%s\n", PQgetvalue(res, rowno, i_createstatement));
+
+			PQclear(res);
+		}
 		PQfinish(conn);
 	}
 
