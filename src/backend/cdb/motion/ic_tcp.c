@@ -2765,7 +2765,7 @@ flushBuffer(ChunkTransportState *transportStates,
 static bool
 SendChunkTCP(ChunkTransportState *transportStates, ChunkTransportStateEntry *pEntry, MotionConn *conn, TupleChunkListItem tcItem, int16 motionId)
 {
-	int			length = TYPEALIGN(TUPLE_CHUNK_ALIGN, tcItem->chunk_length);
+	int			length = tcItem->chunk_length;
 
 	Assert(conn->msgSize > 0);
 

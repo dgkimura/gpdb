@@ -1577,3 +1577,88 @@ slot_set_ctid_from_fake(TupleTableSlot *slot, ItemPointerData *fake_ctid)
 
 	slot_set_ctid(slot, fake_ctid);
 }
+
+/* --------------------------------
+ *		ExecFetchSlotMinimalTuple
+ *			Fetch the slot's minimal physical tuple.
+ *
+ *		If the slot contains a virtual tuple, we convert it to minimal
+ *		physical form.  The slot retains ownership of the minimal tuple.
+ *		If it contains a regular tuple we convert to minimal form and store
+ *		that in addition to the regular tuple (not instead of, because
+ *		callers may hold pointers to Datums within the regular tuple).
+ *
+ * As above, the result must be treated as read-only.
+ * --------------------------------
+ */
+MinimalTuple
+ExecFetchSlotMinimalTuple(TupleTableSlot *slot)
+{
+	MemoryContext oldContext;
+
+	/*
+	 * sanity checks
+	 */
+	Assert(slot != NULL);
+	Assert(!slot->tts_isempty);
+
+	/*
+	 * If we have a minimal physical tuple (local or not) then just return it.
+	 */
+	if (slot->tts_mintuple)
+		return slot->tts_mintuple;
+
+	/*
+	 * Otherwise, copy or build a minimal tuple, and store it into the slot.
+	 *
+	 * We may be called in a context that is shorter-lived than the tuple
+	 * slot, but we have to ensure that the materialized tuple will survive
+	 * anyway.
+	 */
+	oldContext = MemoryContextSwitchTo(slot->tts_mcxt);
+	slot->tts_mintuple = ExecCopySlotMinimalTuple(slot);
+	slot->tts_shouldFreeMin = true;
+	MemoryContextSwitchTo(oldContext);
+
+	/*
+	 * Note: we may now have a situation where we have a local minimal tuple
+	 * attached to a virtual or non-local physical tuple.  There seems no harm
+	 * in that at the moment, but if any materializes, we should change this
+	 * function to force the slot into minimal-tuple-only state.
+	 */
+
+	return slot->tts_mintuple;
+}
+
+/* --------------------------------
+ *		ExecCopySlotMinimalTuple
+ *			Obtain a copy of a slot's minimal physical tuple.  The copy is
+ *			palloc'd in the current memory context.
+ *			The slot itself is undisturbed.
+ * --------------------------------
+ */
+MinimalTuple
+ExecCopySlotMinimalTuple(TupleTableSlot *slot)
+{
+	/*
+	 * sanity checks
+	 */
+	Assert(slot != NULL);
+	Assert(!slot->tts_isempty);
+
+	/*
+	 * If we have a physical tuple then just copy it.  Prefer to copy
+	 * tts_mintuple since that's a tad cheaper.
+	 */
+	if (slot->tts_mintuple)
+		return heap_copy_minimal_tuple(slot->tts_mintuple);
+	if (slot->tts_tuple)
+		return minimal_tuple_from_heap_tuple(slot->tts_tuple);
+
+	/*
+	 * Otherwise we need to build a tuple from the Datum array.
+	 */
+	return heap_form_minimal_tuple(slot->tts_tupleDescriptor,
+								   slot->tts_values,
+								   slot->tts_isnull);
+}

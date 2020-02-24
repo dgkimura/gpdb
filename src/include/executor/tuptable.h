@@ -439,4 +439,7 @@ extern TupleTableSlot *ExecCopySlot(TupleTableSlot *dstslot,
 
 #endif /* !FRONTEND */
 
+extern MinimalTuple ExecCopySlotMinimalTuple(TupleTableSlot *slot);
+extern MinimalTuple ExecFetchSlotMinimalTuple(TupleTableSlot *slot);
+
 #endif   /* TUPTABLE_H */
