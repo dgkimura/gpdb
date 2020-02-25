@@ -18,6 +18,7 @@
 #include "tablefuncapi.h"
 #include "miscadmin.h"
 
+#include <time.h>
 #include <float.h>
 #include <math.h>
 #include <unistd.h>
@@ -54,6 +55,7 @@
 #include "utils/memutils.h"
 #include "utils/resource_manager.h"
 #include "utils/timestamp.h"
+#include "utils/numeric.h"
 
 /* table_functions test */
 extern Datum multiset_example(PG_FUNCTION_ARGS);
@@ -2155,4 +2157,59 @@ Datum
 get_tablespace_version_directory_name(PG_FUNCTION_ARGS)
 {
 	PG_RETURN_TEXT_P(CStringGetTextDatum(GP_TABLESPACE_VERSION_DIRECTORY));
+}
+
+PG_FUNCTION_INFO_V1(mem_vs_min);
+Datum
+mem_vs_min(PG_FUNCTION_ARGS)
+{
+	Datum		table_oid = PG_GETARG_OID(0);
+
+	HeapTuple htup;
+
+	Relation rel = heap_open(table_oid, AccessShareLock);
+	TupleDesc tupdesc = rel->rd_att;
+
+	Snapshot snapshot = RegisterSnapshot(GetLatestSnapshot());
+	HeapScanDesc scan = heap_beginscan(rel, snapshot, 0, NULL);
+
+	Datum values[tupdesc->natts];
+	bool nulls[tupdesc->natts];
+
+	Datum nvalues[tupdesc->natts];
+	bool nnulls[tupdesc->natts];
+
+	clock_t t, acc = 0;
+	clock_t tform, accform = 0;
+	int totallen = 0;
+
+	MemTupleBinding *binding = create_memtuple_binding(tupdesc);
+	while ((htup = heap_getnext(scan, ForwardScanDirection)) != NULL)
+	{
+		heap_deform_tuple(htup, tupdesc, values, nulls);
+
+		tform = clock();
+		MemTuple memtup = memtuple_form_to(binding, values, nulls, NULL, NULL, false);
+		tform = clock() - tform;
+		accform += tform;
+		totallen += memtuple_get_size(memtup);
+
+		bool isnull;
+
+		t = clock();
+		//memtuple_deform(memtup, binding, nvalues, nnulls);
+		nvalues[tupdesc->natts-1] = memtuple_getattr(memtup, binding, tupdesc->natts, &isnull);
+		t = clock() - t;
+		acc += t;
+
+		//elog(LOG, "nvalues[natts-1] = %d", DatumGetInt32(nvalues[tupdesc->natts-1]));
+	}
+	elog(LOG, "deform lenth %d in time %f. time to form %f", totallen, ((double)acc)/CLOCKS_PER_SEC, ((double)accform)/CLOCKS_PER_SEC);
+
+	heap_endscan(scan);
+	UnregisterSnapshot(snapshot);
+	heap_close(rel, AccessShareLock);
+
+
+	PG_RETURN_VOID();
 }
