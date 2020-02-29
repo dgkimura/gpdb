@@ -593,12 +593,7 @@ SyncRepGetOldestSyncRecPtr(XLogRecPtr *writePtr, XLogRecPtr *flushPtr,
 	 * Quick exit if we are not managing a sync standby or there are not
 	 * enough synchronous standbys.
 	 */
-	if (IS_QUERY_DISPATCHER())
-	{
-		if (list_length(sync_standbys) == 0)
-			return false;
-	}
-	else if (!(*am_sync) ||
+	if (!(*am_sync) ||
 		SyncRepConfig == NULL ||
 		list_length(sync_standbys) < SyncRepConfig->num_sync)
 	{
@@ -656,35 +651,12 @@ SyncRepGetSyncStandbys(bool *am_sync)
 	int			priority;
 	int			i;
 	bool		am_in_pending = false;
-	bool		syncStandbyPresent;
 	volatile WalSnd *walsnd;	/* Use volatile pointer to prevent code
 								 * rearrangement */
 
 	/* Set default result */
 	if (am_sync != NULL)
 		*am_sync = false;
-
-	if (IS_QUERY_DISPATCHER())
-	{
-		for (i = 0; i < max_wal_senders; i++)
-		{
-			walsnd = &WalSndCtl->walsnds[i];
-			SpinLockAcquire(&walsnd->mutex);
-			syncStandbyPresent = (walsnd->pid != 0)
-				&& ((walsnd->state == WALSNDSTATE_STREAMING)
-				|| (walsnd->state == WALSNDSTATE_CATCHUP &&
-				walsnd->caughtup_within_range));
-			SpinLockRelease(&walsnd->mutex);
-
-			if (syncStandbyPresent)
-			{
-				result = lappend_int(result, i);
-				if (am_sync)
-					*am_sync = true;
-				return result;
-			}
-		}
-	}
 
 	/* Quick exit if sync replication is not requested */
 	if (SyncRepConfig == NULL)
