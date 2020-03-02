@@ -1251,6 +1251,9 @@ CREATE_QD_DB () {
 		SED_PG_CONF ${GP_DIR}/$PG_INTERNAL_CONF "$DBID_TXT" "gp_dbid=1" 0
 		ERROR_CHK $? "set gp_dbid=1 in ${GP_DIR}/$PG_INTERNAL_CONF" 1
 
+		SED_PG_CONF ${GP_DIR}/$PG_INTERNAL_CONF "synchronous_standby_names" "synchronous_standby_names='*'" 0
+		ERROR_CHK $? "set synchronous_standby_names='*' in ${GP_DIR}/$PG_CONF" 1
+
 		if [  x"" != x"$PG_CONF_ADD_FILE" ]; then
 				LOG_MSG "[INFO]:-Processing additional configuration parameters"
 				for NEW_PARAM in `$CAT $PG_CONF_ADD_FILE|$TR -s ' '|$TR -d ' '|$GREP -v "^#"`
