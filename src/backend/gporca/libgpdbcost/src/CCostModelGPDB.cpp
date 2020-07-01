@@ -17,6 +17,7 @@
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPhysicalSequenceProject.h"
 #include "gpopt/operators/CPhysicalIndexScan.h"
+#include "gpopt/operators/CPhysicalIndexOnlyScan.h"
 #include "gpopt/operators/CPhysicalDynamicIndexScan.h"
 #include "gpopt/operators/CPhysicalHashAgg.h"
 #include "gpopt/operators/CPhysicalUnionAll.h"
@@ -42,6 +43,7 @@ const CCostModelGPDB::SCostMapping CCostModelGPDB::m_rgcm[] =
 
 	{COperator::EopPhysicalFilter, CostFilter},
 
+	{COperator::EopPhysicalIndexOnlyScan, CostIndexOnlyScan},
 	{COperator::EopPhysicalIndexScan, CostIndexScan},
 	{COperator::EopPhysicalDynamicIndexScan, CostIndexScan},
 	{COperator::EopPhysicalBitmapTableScan, CostBitmapTableScan},
@@ -1478,6 +1480,49 @@ CCostModelGPDB::CostIndexScan
 	return CCost(pci->NumRebinds() * (dRowsIndex * dCostPerIndexRow + dIndexScanTupRandomFactor));
 }
 
+
+CCost
+CCostModelGPDB::CostIndexOnlyScan
+(
+	CMemoryPool *, // mp
+	CExpressionHandle &exprhdl,
+	const CCostModelGPDB *pcmgpdb,
+	const SCostingInfo *pci
+	)
+{
+	GPOS_ASSERT(NULL != pcmgpdb);
+	GPOS_ASSERT(NULL != pci);
+
+	COperator *pop = exprhdl.Pop();
+	COperator::EOperatorId op_id = pop->Eopid();
+	GPOS_ASSERT(COperator::EopPhysicalIndexOnlyScan == op_id);
+
+	const CDouble dTableWidth = CPhysicalScan::PopConvert(pop)->PstatsBaseTable()->Width();
+
+	const CDouble dIndexFilterCostUnit = pcmgpdb->GetCostModelParams()->PcpLookup(CCostModelParamsGPDB::EcpIndexFilterCostUnit)->Get();
+	const CDouble dIndexScanTupCostUnit = pcmgpdb->GetCostModelParams()->PcpLookup(CCostModelParamsGPDB::EcpIndexScanTupCostUnit)->Get();
+	const CDouble dIndexScanTupRandomFactor = pcmgpdb->GetCostModelParams()->PcpLookup(CCostModelParamsGPDB::EcpIndexScanTupRandomFactor)->Get();
+	GPOS_ASSERT(0 < dIndexFilterCostUnit);
+	GPOS_ASSERT(0 < dIndexScanTupCostUnit);
+	GPOS_ASSERT(0 < dIndexScanTupRandomFactor);
+
+	CDouble dRowsIndex = pci->Rows();
+
+	ULONG ulIndexKeys = CPhysicalIndexOnlyScan::PopConvert(pop)->Pindexdesc()->Keys();
+
+	// TODO: 2014-02-01
+	// Add logic to judge if the index column used in the filter is the first key of a multi-key index or not.
+	// and separate the cost functions for the two cases.
+
+	// index scan cost contains two parts: index-column lookup and output tuple cost.
+	// 1. index-column lookup: correlated with index lookup rows, the number of index columns used in lookup,
+	// table width and a randomIOFactor.
+	// 2. output tuple cost: this is handled by the Filter on top of IndexScan, if no Filter exists, we add output cost
+	// when we sum-up children cost
+
+	CDouble dCostPerIndexRow = ulIndexKeys * dIndexFilterCostUnit + dTableWidth * dIndexScanTupCostUnit;
+	return CCost(0.1 /*hack to artifically reduce cost*/ * pci->NumRebinds() * (dRowsIndex * dCostPerIndexRow + dIndexScanTupRandomFactor));
+}
 
 CCost
 CCostModelGPDB::CostBitmapTableScan

@@ -16,6 +16,7 @@
 #include "gpopt/operators/CLogicalIndexGet.h"
 #include "gpopt/operators/CPatternLeaf.h"
 #include "gpopt/operators/CPhysicalIndexScan.h"
+#include "gpopt/operators/CPhysicalIndexOnlyScan.h"
 #include "gpopt/metadata/CIndexDescriptor.h"
 #include "gpopt/metadata/CTableDescriptor.h"
 
@@ -96,18 +97,24 @@ CXformIndexGet2IndexScan::Transform
 	pindexdesc->AddRef();
 	ptabdesc->AddRef();
 
+	pindexdesc->AddRef();
+	ptabdesc->AddRef();
+
 	CColRefArray *pdrgpcrOutput = pop->PdrgpcrOutput();
 	GPOS_ASSERT(NULL != pdrgpcrOutput);
+	pdrgpcrOutput->AddRef();
 	pdrgpcrOutput->AddRef();
 
 	COrderSpec *pos = pop->Pos();
 	GPOS_ASSERT(NULL != pos);
+	pos->AddRef();
 	pos->AddRef();
 
 	// extract components
 	CExpression *pexprIndexCond = (*pexpr)[0];
 
 	// addref all children
+	pexprIndexCond->AddRef();
 	pexprIndexCond->AddRef();
 
 	CExpression *pexprAlt =
@@ -126,6 +133,24 @@ CXformIndexGet2IndexScan::Transform
 				),
 			pexprIndexCond
 			);
+	pxfres->Add(pexprAlt);
+
+	pexprAlt =
+		GPOS_NEW(mp) CExpression
+		(
+		mp,
+		GPOS_NEW(mp) CPhysicalIndexOnlyScan
+			(
+			mp,
+			pindexdesc,
+			ptabdesc,
+			pexpr->Pop()->UlOpId(),
+			GPOS_NEW(mp) CName (mp, pop->NameAlias()),
+			pdrgpcrOutput,
+			pos
+			),
+		pexprIndexCond
+		);
 	pxfres->Add(pexprAlt);
 }
 

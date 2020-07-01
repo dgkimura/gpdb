@@ -115,6 +115,9 @@ namespace gpdbcost
 			// cost of index scan
 			static
 			CCost CostIndexScan(CMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDB *pcmgpdb, const SCostingInfo *pci);
+        
+            static
+            CCost CostIndexOnlyScan(CMemoryPool *mp, CExpressionHandle &exprhdl, const CCostModelGPDB *pcmgpdb, const SCostingInfo *pci);
 
 			// cost of bitmap table scan
 			static

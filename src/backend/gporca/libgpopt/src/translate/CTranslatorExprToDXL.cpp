@@ -39,6 +39,7 @@
 #include "gpopt/mdcache/CMDAccessorUtils.h"
 #include "gpopt/operators/CPhysicalAgg.h"
 #include "gpopt/operators/CPhysicalMotionRandom.h"
+#include "gpopt/operators/CPhysicalIndexOnlyScan.h"
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/translate/CTranslatorExprToDXL.h"
 #include "gpopt/translate/CTranslatorDXLToExpr.h"
@@ -200,6 +201,7 @@ CTranslatorExprToDXL::InitPhysicalTranslators()
 	{
 			{COperator::EopPhysicalFilter, &gpopt::CTranslatorExprToDXL::PdxlnResult},
 			{COperator::EopPhysicalIndexScan, &gpopt::CTranslatorExprToDXL::PdxlnIndexScan},
+             {COperator::EopPhysicalIndexOnlyScan, &gpopt::CTranslatorExprToDXL::PdxlnIndexOnlyScan},
 			{COperator::EopPhysicalBitmapTableScan, &gpopt::CTranslatorExprToDXL::PdxlnBitmapTableScan},
 			{COperator::EopPhysicalComputeScalar, &gpopt::CTranslatorExprToDXL::PdxlnComputeScalar},
 			{COperator::EopPhysicalScalarAgg, &gpopt::CTranslatorExprToDXL::PdxlnAggregate},
@@ -582,6 +584,105 @@ CTranslatorExprToDXL::PdxlnIndexScan
 	// TODO: vrgahavan; we assume that the index are always forward access.
 	// create the physical index scan operator
 	CDXLPhysicalIndexScan *dxl_op = GPOS_NEW(m_mp) CDXLPhysicalIndexScan(m_mp, table_descr, dxl_index_descr, EdxlisdForward);
+	CDXLNode *pdxlnIndexScan = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+
+	// set properties
+	pdxlnIndexScan->SetProperties(dxl_properties);
+
+	// translate project list
+	CColRefSet *pcrsOutput = prpp->PcrsRequired();
+	CDXLNode *pdxlnPrL = PdxlnProjList(pcrsOutput, colref_array);
+
+	// translate index predicates
+	CExpression *pexprCond = (*pexprIndexScan)[0];
+	CDXLNode *pdxlnIndexCondList = GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarIndexCondList(m_mp));
+
+	CExpressionArray *pdrgpexprConds = CPredicateUtils::PdrgpexprConjuncts(m_mp, pexprCond);
+	const ULONG length = pdrgpexprConds->Size();
+	for (ULONG ul = 0; ul < length; ul++)
+	{
+		CExpression *pexprIndexCond = (*pdrgpexprConds)[ul];
+		CDXLNode *pdxlnIndexCond = PdxlnScalar(pexprIndexCond);
+		pdxlnIndexCondList->AddChild(pdxlnIndexCond);
+	}
+	pdrgpexprConds->Release();
+
+	CDXLNode *pdxlnResidualCond = NULL;
+	if (2 == pexprIndexScan->Arity())
+	{
+		// translate residual predicates into the filter node
+		CExpression *pexprResidualCond = (*pexprIndexScan)[1];
+		if (COperator::EopScalarConst != pexprResidualCond->Pop()->Eopid())
+		{
+			pdxlnResidualCond = PdxlnScalar(pexprResidualCond);
+		}
+	}
+
+	CDXLNode *filter_dxlnode = PdxlnFilter(pdxlnResidualCond);
+
+	pdxlnIndexScan->AddChild(pdxlnPrL);
+	pdxlnIndexScan->AddChild(filter_dxlnode);
+	pdxlnIndexScan->AddChild(pdxlnIndexCondList);
+
+#ifdef GPOS_DEBUG
+	pdxlnIndexScan->GetOperator()->AssertValid(pdxlnIndexScan, false /* validate_children */);
+#endif
+
+
+	return pdxlnIndexScan;
+}
+
+CDXLNode *
+CTranslatorExprToDXL::PdxlnIndexOnlyScan
+	(
+	CExpression *pexprIndexScan,
+	CColRefArray *colref_array,
+	CDistributionSpecArray *pdrgpdsBaseTables, 
+	ULONG *, // pulNonGatherMotions,
+	BOOL * // pfDML
+	)
+{
+	GPOS_ASSERT(NULL != pexprIndexScan);
+	CDXLPhysicalProperties *dxl_properties = GetProperties(pexprIndexScan);
+
+	COptCtxt::PoctxtFromTLS()->AddDirectDispatchableFilterCandidate(pexprIndexScan);
+
+	CDistributionSpec *pds = pexprIndexScan->GetDrvdPropPlan()->Pds();
+	pds->AddRef();
+	pdrgpdsBaseTables->Append(pds);
+	return PdxlnIndexOnlyScan(pexprIndexScan, colref_array, dxl_properties, pexprIndexScan->Prpp());
+}
+
+CDXLNode *
+CTranslatorExprToDXL::PdxlnIndexOnlyScan
+	(
+	CExpression *pexprIndexScan,
+	CColRefArray *colref_array,
+	CDXLPhysicalProperties *dxl_properties,
+	CReqdPropPlan *prpp
+	)
+{
+	GPOS_ASSERT(NULL != pexprIndexScan);
+	GPOS_ASSERT(NULL != dxl_properties);
+	GPOS_ASSERT(NULL != prpp);
+
+	CPhysicalIndexOnlyScan *popIs = CPhysicalIndexOnlyScan::PopConvert(pexprIndexScan->Pop());
+
+	CColRefArray *pdrgpcrOutput = popIs->PdrgpcrOutput();
+
+	// translate table descriptor
+	CDXLTableDescr *table_descr = MakeDXLTableDescr(popIs->Ptabdesc(), pdrgpcrOutput, pexprIndexScan->Prpp());
+
+	// create index descriptor
+	CIndexDescriptor *pindexdesc = popIs->Pindexdesc();
+	CMDName *pmdnameIndex = GPOS_NEW(m_mp) CMDName(m_mp, pindexdesc->Name().Pstr());
+	IMDId *pmdidIndex = pindexdesc->MDId();
+	pmdidIndex->AddRef();
+	CDXLIndexDescr *dxl_index_descr = GPOS_NEW(m_mp) CDXLIndexDescr(m_mp, pmdidIndex, pmdnameIndex);
+
+	// TODO: vrgahavan; we assume that the index are always forward access.
+	// create the physical index scan operator
+	CDXLPhysicalIndexOnlyScan *dxl_op = GPOS_NEW(m_mp) CDXLPhysicalIndexOnlyScan(m_mp, table_descr, dxl_index_descr, EdxlisdForward);
 	CDXLNode *pdxlnIndexScan = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
 	// set properties
@@ -1400,6 +1501,7 @@ CTranslatorExprToDXL::PdxlnIndexScanWithInlinedCondition
 	GPOS_ASSERT(COperator::EopPhysicalIndexScan == op_id ||
 			COperator::EopPhysicalDynamicIndexScan == op_id);
 
+    // TODO: Index only scans work on GiST and SP-GiST only for specific operators
 	// check if index is of type GiST
 	BOOL isGist = false;
 	if (COperator::EopPhysicalIndexScan == op_id)
@@ -1457,6 +1559,10 @@ CTranslatorExprToDXL::PdxlnIndexScanWithInlinedCondition
 	if (COperator::EopPhysicalIndexScan == op_id)
 	{
 		return PdxlnIndexScan(pexprIndexScan, colref_array, pdrgpdsBaseTables, &ulNonGatherMotions, &fDML);
+	}
+	if (COperator::EopPhysicalIndexOnlyScan == op_id)
+	{
+		return PdxlnIndexOnlyScan(pexprIndexScan, colref_array, pdrgpdsBaseTables, &ulNonGatherMotions, &fDML);
 	}
 
 	return PdxlnDynamicIndexScan(pexprIndexScan, colref_array, pdrgpdsBaseTables, &ulNonGatherMotions, &fDML);
