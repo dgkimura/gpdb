@@ -124,6 +124,7 @@ CTranslatorDXLToPlStmt::InitTranslators()
 			{EdxlopPhysicalTableScan,				&gpopt::CTranslatorDXLToPlStmt::TranslateDXLTblScan},
 			{EdxlopPhysicalExternalScan,			&gpopt::CTranslatorDXLToPlStmt::TranslateDXLTblScan},
 			{EdxlopPhysicalIndexScan,				&gpopt::CTranslatorDXLToPlStmt::TranslateDXLIndexScan},
+			{EdxlopPhysicalIndexOnlyScan,           &gpopt::CTranslatorDXLToPlStmt::TranslateDXLIndexOnlyScan},
 			{EdxlopPhysicalHashJoin, 				&gpopt::CTranslatorDXLToPlStmt::TranslateDXLHashJoin},
 			{EdxlopPhysicalNLJoin, 					&gpopt::CTranslatorDXLToPlStmt::TranslateDXLNLJoin},
 			{EdxlopPhysicalMergeJoin,				&gpopt::CTranslatorDXLToPlStmt::TranslateDXLMergeJoin},
@@ -625,6 +626,132 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexScan
 		&index_orig_cond,
 		&index_strategy_list,
 		&index_subtype_list
+		);
+
+	index_scan->indexqual = index_cond;
+	index_scan->indexqualorig = index_orig_cond;
+	/*
+	 * As of 8.4, the indexstrategy and indexsubtype fields are no longer
+	 * available or needed in IndexScan. Ignore them.
+	 */
+	SetParamIds(plan);
+
+	return (Plan *) index_scan;
+}
+
+Plan *
+CTranslatorDXLToPlStmt::TranslateDXLIndexOnlyScan
+(
+ const CDXLNode *index_scan_dxlnode,
+ CDXLTranslateContext *output_context,
+ CDXLTranslationContextArray *ctxt_translation_prev_siblings
+ )
+{
+	// translate table descriptor into a range table entry
+	CDXLPhysicalIndexOnlyScan *physical_idx_scan_dxlop = CDXLPhysicalIndexOnlyScan::Cast(index_scan_dxlnode->GetOperator());
+
+	return TranslateDXLIndexOnlyScan(index_scan_dxlnode, physical_idx_scan_dxlop, output_context, ctxt_translation_prev_siblings);
+}
+
+Plan *
+CTranslatorDXLToPlStmt::TranslateDXLIndexOnlyScan
+(
+ const CDXLNode *index_scan_dxlnode,
+ CDXLPhysicalIndexOnlyScan *physical_idx_scan_dxlop,
+ CDXLTranslateContext *output_context,
+ CDXLTranslationContextArray *ctxt_translation_prev_siblings
+ )
+{
+	// translation context for column mappings in the base relation
+	CDXLTranslateContextBaseTable base_table_context(m_mp);
+
+	Index index = gpdb::ListLength(m_dxl_to_plstmt_context->GetRTableEntriesList()) + 1;
+
+	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(physical_idx_scan_dxlop->GetDXLTableDescr()->MDId());
+
+	RangeTblEntry *rte = TranslateDXLTblDescrToRangeTblEntry(physical_idx_scan_dxlop->GetDXLTableDescr(), index, &base_table_context);
+	GPOS_ASSERT(NULL != rte);
+	rte->requiredPerms |= ACL_SELECT;
+	m_dxl_to_plstmt_context->AddRTE(rte);
+
+	IndexOnlyScan *index_scan = NULL;
+	index_scan = MakeNode(IndexOnlyScan);
+	index_scan->scan.scanrelid = index;
+
+	CMDIdGPDB *mdid_index = CMDIdGPDB::CastMdid(physical_idx_scan_dxlop->GetDXLIndexDescr()->MDId());
+	const IMDIndex *md_index = m_md_accessor->RetrieveIndex(mdid_index);
+	Oid index_oid = mdid_index->Oid();
+
+	GPOS_ASSERT(InvalidOid != index_oid);
+	index_scan->indexid = index_oid;
+
+	Plan *plan = &(index_scan->scan.plan);
+	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
+
+	// translate operator costs
+	TranslatePlanCosts
+		(
+		 CDXLPhysicalProperties::PdxlpropConvert(index_scan_dxlnode->GetProperties())->GetDXLOperatorCost(),
+		 &(plan->startup_cost),
+		 &(plan->total_cost),
+		 &(plan->plan_rows),
+		 &(plan->plan_width)
+		);
+
+	// an index scan node must have 3 children: projection list, filter and index condition list
+	GPOS_ASSERT(3 == index_scan_dxlnode->Arity());
+
+	// translate proj list and filter
+	CDXLNode *project_list_dxlnode = (*index_scan_dxlnode)[EdxlisIndexProjList];
+	CDXLNode *filter_dxlnode = (*index_scan_dxlnode)[EdxlisIndexFilter];
+	CDXLNode *index_cond_list_dxlnode = (*index_scan_dxlnode)[EdxlisIndexCondition];
+
+	// translate proj list
+	plan->targetlist = TranslateDXLProjList(project_list_dxlnode, &base_table_context, NULL /*child_contexts*/, output_context);
+	// Does anything bad happen?
+	index_scan->indextlist = TranslateDXLProjList(project_list_dxlnode, &base_table_context, NULL /*child_contexts*/, output_context);
+	ListCell *t;
+	foreach(t, plan->targetlist)
+	{
+		TargetEntry *te = (TargetEntry *)lfirst(t);
+		if (IsA(te->expr, Var))
+		{
+			Var *v = (Var *)te->expr;
+			v->varno = INDEX_VAR;
+		}
+	}
+
+	// translate index filter
+	plan->qual = TranslateDXLIndexFilter
+		(
+		 filter_dxlnode,
+		 output_context,
+		 &base_table_context,
+		 ctxt_translation_prev_siblings
+		);
+
+	index_scan->indexorderdir = CTranslatorUtils::GetScanDirection(physical_idx_scan_dxlop->GetIndexScanDir());
+
+	// translate index condition list
+	List *index_cond = NIL;
+	List *index_orig_cond = NIL;
+	List *index_strategy_list = NIL;
+	List *index_subtype_list = NIL;
+
+	TranslateIndexConditions
+		(
+		 index_cond_list_dxlnode,
+		 physical_idx_scan_dxlop->GetDXLTableDescr(),
+		 false, // is_bitmap_index_probe
+		 md_index,
+		 md_rel,
+		 output_context,
+		 &base_table_context,
+		 ctxt_translation_prev_siblings,
+		 &index_cond,
+		 &index_orig_cond,
+		 &index_strategy_list,
+		 &index_subtype_list
 		);
 
 	index_scan->indexqual = index_cond;

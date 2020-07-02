@@ -214,6 +214,23 @@ namespace gpdxl
 				CDXLTranslationContextArray *ctxt_translation_prev_siblings // translation contexts of previous siblings
 				);
 
+			// translate DXL index scan node into a IndexScan node
+			Plan *TranslateDXLIndexOnlyScan
+				(
+				 const CDXLNode *index_scan_dxlnode,
+				 CDXLTranslateContext *output_context,
+				 CDXLTranslationContextArray *ctxt_translation_prev_siblings // translation contexts of previous siblings
+				);
+
+			// translates a DXL index scan node into a IndexScan node
+			Plan *TranslateDXLIndexOnlyScan
+				(
+				 const CDXLNode *index_scan_dxlnode,
+				 CDXLPhysicalIndexOnlyScan *dxl_physical_idx_scan_op,
+				 CDXLTranslateContext *output_context,
+				 CDXLTranslationContextArray *ctxt_translation_prev_siblings // translation contexts of previous siblings
+				);
+        
 			// translate DXL hash join into a HashJoin node
 			Plan *TranslateDXLHashJoin
 				(
