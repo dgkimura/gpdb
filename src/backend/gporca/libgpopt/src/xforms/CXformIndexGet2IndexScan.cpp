@@ -11,6 +11,7 @@
 
 #include "gpos/base.h"
 #include "gpopt/xforms/CXformIndexGet2IndexScan.h"
+#include "gpopt/xforms/CXformUtils.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalIndexGet.h"
@@ -94,8 +95,28 @@ CXformIndexGet2IndexScan::Transform
 	CIndexDescriptor *pindexdesc = pop->Pindexdesc();
 	CTableDescriptor *ptabdesc = pop->Ptabdesc();
 
-	pindexdesc->AddRef();
-	ptabdesc->AddRef();
+	bool projectColsSubsetOfIndexCols = true;
+
+	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
+	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pindexdesc->MDId());
+
+	// Logical col ref set
+	CColRefSet *projcolset = CXformUtils::PcrsIndexKeys(mp, pop->PdrgpcrOutput(), pmdindex, pmdrel);
+
+	// FIXME: Why is logical index column count different than MD relation column count?
+	// Ideally this should be something like...
+	// projectColsSubsetOfIndexCols = projcolset->Size() == pop->PdrgpcrOutput()->Size();
+	ULONG i;
+	ULONG tableColsInIndex = 0;
+	for (i=0; i<pop->PdrgpcrOutput()->Size(); i++)
+	{
+		if (!(*pop->PdrgpcrOutput())[i]->FSystemCol() &&
+			(*pop->PdrgpcrOutput())[i]->GetUsage() == CColRef::EUsed)
+			tableColsInIndex++;
+
+	}
+	projectColsSubsetOfIndexCols = projcolset->Size() == tableColsInIndex;
 
 	pindexdesc->AddRef();
 	ptabdesc->AddRef();
@@ -103,18 +124,15 @@ CXformIndexGet2IndexScan::Transform
 	CColRefArray *pdrgpcrOutput = pop->PdrgpcrOutput();
 	GPOS_ASSERT(NULL != pdrgpcrOutput);
 	pdrgpcrOutput->AddRef();
-	pdrgpcrOutput->AddRef();
 
 	COrderSpec *pos = pop->Pos();
 	GPOS_ASSERT(NULL != pos);
-	pos->AddRef();
 	pos->AddRef();
 
 	// extract components
 	CExpression *pexprIndexCond = (*pexpr)[0];
 
 	// addref all children
-	pexprIndexCond->AddRef();
 	pexprIndexCond->AddRef();
 
 	CExpression *pexprAlt =
@@ -135,23 +153,32 @@ CXformIndexGet2IndexScan::Transform
 			);
 	pxfres->Add(pexprAlt);
 
-	pexprAlt =
-		GPOS_NEW(mp) CExpression
-		(
-		mp,
-		GPOS_NEW(mp) CPhysicalIndexOnlyScan
+	if (projectColsSubsetOfIndexCols)
+	{
+		pindexdesc->AddRef();
+		ptabdesc->AddRef();
+		pdrgpcrOutput->AddRef();
+		pos->AddRef();
+		pexprIndexCond->AddRef();
+
+		pexprAlt =
+			GPOS_NEW(mp) CExpression
 			(
 			mp,
-			pindexdesc,
-			ptabdesc,
-			pexpr->Pop()->UlOpId(),
-			GPOS_NEW(mp) CName (mp, pop->NameAlias()),
-			pdrgpcrOutput,
-			pos
-			),
-		pexprIndexCond
-		);
-	pxfres->Add(pexprAlt);
+			GPOS_NEW(mp) CPhysicalIndexOnlyScan
+				(
+				mp,
+				pindexdesc,
+				ptabdesc,
+				pexpr->Pop()->UlOpId(),
+				GPOS_NEW(mp) CName (mp, pop->NameAlias()),
+				pdrgpcrOutput,
+				pos
+				),
+			pexprIndexCond
+			);
+		pxfres->Add(pexprAlt);
+	}
 }
 
 
