@@ -76,6 +76,7 @@ namespace gpopt
 				ExfExpandNAryJoinDP,
 				ExfGet2TableScan,
 				ExfIndexGet2IndexScan,
+				ExfIndexGet2IndexOnlyScan,
 				ExfDynamicGet2DynamicTableScan,
 				ExfDynamicIndexGet2DynamicIndexScan,
 				ExfImplementSequence,

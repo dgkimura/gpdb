@@ -3,14 +3,15 @@
 //	Copyright (C) 2012 EMC Corp.
 //
 //	@filename:
-//		CXformIndexGet2IndexScan.cpp
+//		CXformIndexGet2IndexOnlyScan.cpp
 //
 //	@doc:
 //		Implementation of transform
 //---------------------------------------------------------------------------
 
 #include "gpos/base.h"
-#include "gpopt/xforms/CXformIndexGet2IndexScan.h"
+#include "gpopt/xforms/CXformIndexGet2IndexOnlyScan.h"
+#include "gpopt/xforms/CXformUtils.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalIndexGet.h"
@@ -25,13 +26,13 @@ using namespace gpopt;
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CXformIndexGet2IndexScan::CXformIndexGet2IndexScan
+//		CXformIndexGet2IndexOnlyScan::CXformIndexGet2IndexOnlyScan
 //
 //	@doc:
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CXformIndexGet2IndexScan::CXformIndexGet2IndexScan
+CXformIndexGet2IndexOnlyScan::CXformIndexGet2IndexOnlyScan
 	(
 	CMemoryPool *mp
 	)
@@ -48,7 +49,7 @@ CXformIndexGet2IndexScan::CXformIndexGet2IndexScan
 		)
 {}
 
-CXform::EXformPromise CXformIndexGet2IndexScan::Exfp
+CXform::EXformPromise CXformIndexGet2IndexOnlyScan::Exfp
 (
  CExpressionHandle &exprhdl
 )
@@ -70,14 +71,14 @@ const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CXformIndexGet2IndexScan::Transform
+//		CXformIndexGet2IndexOnlyScan::Transform
 //
 //	@doc:
 //		Actual transformation
 //
 //---------------------------------------------------------------------------
 void
-CXformIndexGet2IndexScan::Transform
+CXformIndexGet2IndexOnlyScan::Transform
 	(
 	CXformContext *pxfctxt,
 	CXformResult *pxfres,
@@ -94,8 +95,31 @@ CXformIndexGet2IndexScan::Transform
 	CIndexDescriptor *pindexdesc = pop->Pindexdesc();
 	CTableDescriptor *ptabdesc = pop->Ptabdesc();
 
-	pindexdesc->AddRef();
-	ptabdesc->AddRef();
+	bool projectColsSubsetOfIndexCols = true;
+
+	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
+	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pindexdesc->MDId());
+
+	// Logical col ref set
+	CColRefSet *projcolset = CXformUtils::PcrsIndexKeys(mp, pop->PdrgpcrOutput(), pmdindex, pmdrel);
+
+	// FIXME: Why is logical index column count different than MD relation column count?
+	// Ideally this should be something like...
+	// projectColsSubsetOfIndexCols = projcolset->Size() == pop->PdrgpcrOutput()->Size();
+	ULONG i;
+	ULONG tableColsInIndex = 0;
+	for (i=0; i<pop->PdrgpcrOutput()->Size(); i++)
+	{
+		if (!(*pop->PdrgpcrOutput())[i]->FSystemCol() &&
+			(*pop->PdrgpcrOutput())[i]->GetUsage() == CColRef::EUsed)
+			tableColsInIndex++;
+
+	}
+	projectColsSubsetOfIndexCols = projcolset->Size() == tableColsInIndex;
+
+	if (projectColsSubsetOfIndexCols)
+		return;
 
 	pindexdesc->AddRef();
 	ptabdesc->AddRef();
@@ -103,11 +127,9 @@ CXformIndexGet2IndexScan::Transform
 	CColRefArray *pdrgpcrOutput = pop->PdrgpcrOutput();
 	GPOS_ASSERT(NULL != pdrgpcrOutput);
 	pdrgpcrOutput->AddRef();
-	pdrgpcrOutput->AddRef();
 
 	COrderSpec *pos = pop->Pos();
 	GPOS_ASSERT(NULL != pos);
-	pos->AddRef();
 	pos->AddRef();
 
 	// extract components
@@ -115,13 +137,12 @@ CXformIndexGet2IndexScan::Transform
 
 	// addref all children
 	pexprIndexCond->AddRef();
-	pexprIndexCond->AddRef();
 
 	CExpression *pexprAlt =
 		GPOS_NEW(mp) CExpression
 			(
 			mp,
-			GPOS_NEW(mp) CPhysicalIndexScan
+			GPOS_NEW(mp) CPhysicalIndexOnlyScan
 				(
 				mp,
 				pindexdesc,
