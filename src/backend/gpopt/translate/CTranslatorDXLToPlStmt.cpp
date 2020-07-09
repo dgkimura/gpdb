@@ -785,12 +785,6 @@ CTranslatorDXLToPlStmt::TranslateIndexConditions
 		{
 			// index key is on the left side
 			attno =  ((Var *) left_arg)->varattno;
-			// GPDB_92_MERGE_FIXME: helluva hack
-			// Upstream commit a0185461 cleaned up how the varno of indices
-			// We are patching up varno here, but it seems this really should
-			// happen in CTranslatorDXLToScalar::PexprFromDXLNodeScalar .
-			// Furthermore, should we guard against nonsensical varno?
-			((Var *) left_arg)->varno = INDEX_VAR;
 		}
 		else
 		{
