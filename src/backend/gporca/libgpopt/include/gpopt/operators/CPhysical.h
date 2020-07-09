@@ -392,6 +392,29 @@ namespace gpopt
 			static
 			BOOL FUnaryUsesDefinedColumns(CColRefSet *pcrs, CExpressionHandle &exprhdl);
 
+			// compute required distribution of the n-th child
+			virtual
+			CDistributionSpec *PdsRequired
+				(
+				CMemoryPool *mp,
+				CExpressionHandle &exprhdl,
+				CDistributionSpec *pdsRequired,
+				ULONG child_index,
+				CDrvdPropArray *pdrgpdpCtxt,
+				ULONG ulOptReq
+				)
+				const = 0;
+
+			// distribution matching type
+			virtual
+			CEnfdDistribution::EDistributionMatching Edm
+				(
+				CReqdPropPlan *prppInput,
+				ULONG child_index,
+				CDrvdPropArray *pdrgpdpCtxt,
+				ULONG ulOptReq
+				);
+
 		public:
 		
 			// ctor
@@ -462,19 +485,6 @@ namespace gpopt
 				CMemoryPool *mp,
 				CExpressionHandle &exprhdl,
 				COrderSpec *posRequired,
-				ULONG child_index,
-				CDrvdPropArray *pdrgpdpCtxt,
-				ULONG ulOptReq
-				)
-				const = 0;
-
-			// compute required distribution of the n-th child
-			virtual
-			CDistributionSpec *PdsRequired
-				(
-				CMemoryPool *mp,
-				CExpressionHandle &exprhdl,
-				CDistributionSpec *pdsRequired,
 				ULONG child_index,
 				CDrvdPropArray *pdrgpdpCtxt,
 				ULONG ulOptReq
@@ -579,16 +589,6 @@ namespace gpopt
 				const CEnfdPartitionPropagation *pepp
 				) 
 				const;
-
-			// distribution matching type
-			virtual
-			CEnfdDistribution::EDistributionMatching Edm
-				(
-				CReqdPropPlan *prppInput,
-				ULONG child_index,
-				CDrvdPropArray *pdrgpdpCtxt,
-				ULONG ulOptReq
-				);
 
 			// order matching type
 			virtual
@@ -705,6 +705,9 @@ namespace gpopt
 			static
 			CDistributionSpecSingleton *PdssMatching(CMemoryPool *mp, CDistributionSpecSingleton *pdss);
 
+			virtual CEnfdDistribution *
+			Ped(CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
+				ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq);
 	}; // class CPhysical
 
 }

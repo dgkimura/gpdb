@@ -221,19 +221,7 @@ CReqdPropPlan::Compute
 						popPhysical->Eom(prppInput, child_index, pdrgpdpCtxt, ulOrderReq)
 						);
 
-	m_ped = GPOS_NEW(mp) CEnfdDistribution
-						(
-						popPhysical->PdsRequired
-							(
-							mp,
-							exprhdl,
-							prppInput->Ped()->PdsRequired(),
-							child_index,
-							pdrgpdpCtxt,
-							ulDistrReq
-							),
-							popPhysical->Edm(prppInput, child_index, pdrgpdpCtxt, ulDistrReq)
-						);
+	m_ped = popPhysical->Ped(mp, exprhdl, prppInput, child_index, pdrgpdpCtxt, ulDistrReq);
 
 	GPOS_ASSERT(CDistributionSpec::EdtUniversal != m_ped->PdsRequired()->Edt() && "CDistributionSpecUniversal is a derive-only, cannot be required");
 
