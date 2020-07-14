@@ -13,6 +13,7 @@
 #include "gpopt/base/CUtils.h"
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
+#include "gpopt/base/CDistributionSpecTaintedReplicated.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPhysicalLimit.h"
 
@@ -346,10 +347,18 @@ CPhysicalLimit::PosDerive(CMemoryPool *,	   // mp
 //
 //---------------------------------------------------------------------------
 CDistributionSpec *
-CPhysicalLimit::PdsDerive(CMemoryPool *,  // mp
+CPhysicalLimit::PdsDerive(CMemoryPool *mp,
 						  CExpressionHandle &exprhdl) const
 {
-	return PdsDerivePassThruOuter(exprhdl);
+	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0)->Pds();
+
+	if (CDistributionSpec::EdtReplicated == pdsOuter->Edt())
+		return GPOS_NEW(mp) CDistributionSpecTaintedReplicated();
+	else
+	{
+		pdsOuter->AddRef();
+		return pdsOuter;
+	}
 }
 
 
