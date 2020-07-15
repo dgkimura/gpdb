@@ -12,6 +12,7 @@
 #include "gpos/base.h"
 
 #include "gpopt/base/COptCtxt.h"
+#include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPhysicalMotionBroadcast.h"
 
@@ -34,7 +35,7 @@ CPhysicalMotionBroadcast::CPhysicalMotionBroadcast
 	CPhysicalMotion(mp),
 	m_pdsReplicated(NULL)
 {
-	m_pdsReplicated = GPOS_NEW(mp) CDistributionSpecReplicated();
+	m_pdsReplicated = GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
 }
 
 

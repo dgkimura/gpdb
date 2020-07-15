@@ -13,6 +13,7 @@
 #include "gpopt/base/CUtils.h"
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
+#include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPhysicalLimit.h"
 
@@ -385,12 +386,28 @@ CPhysicalLimit::PosDerive
 CDistributionSpec*
 CPhysicalLimit::PdsDerive
 	(
-	CMemoryPool *,// mp
+	CMemoryPool *mp,
 	CExpressionHandle &exprhdl
 	)
 	const
 {
-	return PdsDerivePassThruOuter(exprhdl);
+	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0)->Pds();
+
+	if (CDistributionSpec::EdtReplicated == pdsOuter->Edt())
+	{
+		// Limit functions can give unstable results and therefore cannot
+		// guarantee strictly replicated data. For example,
+		//
+		//   SELECT * FROM foo WHERE a<>1 LIMIT 1;
+		//
+		// In this case, if the child was replicated, we can no longer
+		// guarantee that property and must now dervive tainted replicated.
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtTainted);
+	}
+	else
+	{
+		return PdsDerivePassThruOuter(exprhdl);
+	}
 }
 
 

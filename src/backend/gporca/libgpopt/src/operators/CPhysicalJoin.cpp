@@ -310,7 +310,7 @@ CPhysicalJoin::PdsRequired
 		{
 			return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 		}
-		return GPOS_NEW(mp) CDistributionSpecReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral);
 	}
 
 	if (1 == child_index)
@@ -332,7 +332,7 @@ CPhysicalJoin::PdsRequired
 		}
 
 		// otherwise, require inner child to be replicated
-		return GPOS_NEW(mp) CDistributionSpecReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral);
 	}
 
 	// no distribution requirement on the outer side
@@ -1019,7 +1019,7 @@ CPhysicalJoin::Edm
 	CReqdPropPlan *, // prppInput
 	ULONG child_index,
 	CDrvdPropArray *pdrgpdpCtxt,
-	ULONG // ulOptReq
+	ULONG //ulOptReq
 	)
 {
 	if (FFirstChildToOptimize(child_index))
@@ -1037,6 +1037,13 @@ CPhysicalJoin::Edm
 	{
 		// if previous child is replicated or universal, we use
 		// distribution satisfaction for current child
+		return CEnfdDistribution::EdmSatisfy;
+	}
+
+	// FIXME: We need to refactor the PdsRequired method to return a Distribution, Edm
+	// pair instead of adding conditionals here
+	if (1 == child_index && CDistributionSpec::EdtSingleton != edtPrevChild && CDistributionSpec::EdtUniversal != edtPrevChild)
+	{
 		return CEnfdDistribution::EdmSatisfy;
 	}
 

@@ -17,10 +17,10 @@
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CDistributionSpecStrictSingleton.h"
 #include "gpopt/base/CDistributionSpecRouted.h"
+#include "gpopt/base/CDistributionSpecReplicated.h"
 
 #include "gpopt/operators/CPhysicalComputeScalar.h"
 #include "gpopt/operators/CExpressionHandle.h"
-
 
 using namespace gpopt;
 
@@ -402,7 +402,12 @@ CPhysicalComputeScalar::PdsDerive
 	const
 {
 	CDistributionSpec *pds = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
-	
+
+	if (CDistributionSpec::EdtReplicated == pds->Edt() && IMDFunction::EfsVolatile == exprhdl.DeriveScalarFunctionProperties(1)->Efs())
+	{
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtTainted);
+	}
+
 	if (CDistributionSpec::EdtUniversal == pds->Edt() && 
 		IMDFunction::EfsVolatile == exprhdl.DeriveScalarFunctionProperties(1)->Efs())
 	{
