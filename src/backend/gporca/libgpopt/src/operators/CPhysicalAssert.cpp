@@ -119,6 +119,7 @@ CPhysicalAssert::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// pass through singleton and broadcast requests
 	if (CDistributionSpec::EdtSingleton == edt ||
 		CDistributionSpec::EdtStrictSingleton == edt ||
+		CDistributionSpec::EdtGeneralReplicated == edt ||
 		CDistributionSpec::EdtReplicated == edt)
 	{
 		pdsRequired->AddRef();

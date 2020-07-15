@@ -46,6 +46,12 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
 			->FAllowReplicated();
 	}
 
+	// replicated distribution satisfies a general replicated distribution spec
+	if (EdtGeneralReplicated == pdss->Edt())
+	{
+		return true;
+	}
+
 	// a replicated distribution satisfies any non-singleton one,
 	// as well as singleton distributions that are not master-only
 	return !(
@@ -93,5 +99,4 @@ CDistributionSpecReplicated::AppendEnforcers(CMemoryPool *mp,
 		CExpression(mp, GPOS_NEW(mp) CPhysicalMotionBroadcast(mp), pexpr);
 	pdrgpexpr->Append(pexprMotion);
 }
-
 // EOF
