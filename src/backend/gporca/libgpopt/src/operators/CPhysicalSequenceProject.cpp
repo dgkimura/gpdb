@@ -15,6 +15,7 @@
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CDistributionSpecReplicated.h"
+#include "gpopt/base/CDistributionSpecTaintedReplicated.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/base/CWindowFrame.h"
@@ -502,10 +503,18 @@ CPhysicalSequenceProject::PosDerive(CMemoryPool *,	// mp
 //
 //---------------------------------------------------------------------------
 CDistributionSpec *
-CPhysicalSequenceProject::PdsDerive(CMemoryPool *,	// mp
+CPhysicalSequenceProject::PdsDerive(CMemoryPool *mp,
 									CExpressionHandle &exprhdl) const
 {
-	return PdsDerivePassThruOuter(exprhdl);
+	CDistributionSpec *pds = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	if (CDistributionSpec::EdtReplicated == pds->Edt())
+	{
+		return GPOS_NEW(mp) CDistributionSpecTaintedReplicated();
+	}
+	else
+	{
+		return PdsDerivePassThruOuter(exprhdl);
+	}
 }
 
 
