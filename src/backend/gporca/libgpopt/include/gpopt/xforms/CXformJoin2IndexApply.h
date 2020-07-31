@@ -229,7 +229,8 @@ namespace gpopt
 				:
 				CXformExploration(pexprPattern)
 			{
-				m_fOuterJoin = (COperator::EopLogicalLeftOuterJoin == pexprPattern->Pop()->Eopid());
+				m_fOuterJoin = (COperator::EopLogicalLeftOuterJoin == pexprPattern->Pop()->Eopid() || 
+							    COperator::EopLogicalLeftOuterNLJoin == pexprPattern->Pop()->Eopid());
 			}
 
 			// dtor

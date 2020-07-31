@@ -55,6 +55,7 @@
 #include "gpopt/xforms/CXformSimplifyLeftOuterJoin.h"
 #include "gpopt/xforms/CXformLeftOuterJoin2NLJoin.h"
 #include "gpopt/xforms/CXformLeftOuterJoin2HashJoin.h"
+#include "gpopt/xforms/CXformLeftOuter2LeftOuterNLJoin.h"
 #include "gpopt/xforms/CXformLeftSemiJoin2NLJoin.h"
 #include "gpopt/xforms/CXformLeftSemiJoin2HashJoin.h"
 #include "gpopt/xforms/CXformLeftAntiSemiJoin2CrossProduct.h"

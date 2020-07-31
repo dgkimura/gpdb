@@ -92,6 +92,7 @@ OBJS        = CDecorrelator.o \
               CXformLeftOuterApply2LeftOuterJoinNoCorrelations.o \
               CXformLeftOuterJoin2HashJoin.o \
               CXformLeftOuterJoin2NLJoin.o \
+              CXformLeftOuter2LeftOuterNLJoin.o \
               CXformLeftSemiApply2LeftSemiJoin.o \
               CXformLeftSemiApply2LeftSemiJoinNoCorrelations.o \
               CXformLeftSemiApplyWithExternalCorrs2InnerJoin.o \

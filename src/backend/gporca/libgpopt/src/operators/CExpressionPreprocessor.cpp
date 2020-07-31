@@ -1325,7 +1325,8 @@ CExpressionPreprocessor::PexprOuterJoinToInnerJoin
 	const ULONG arity = pexpr->Arity();
 
 	if (COperator::EopLogicalSelect == pop->Eopid() &&
-		COperator::EopLogicalLeftOuterJoin == (*pexpr)[0]->Pop()->Eopid())
+		(COperator::EopLogicalLeftOuterJoin == (*pexpr)[0]->Pop()->Eopid() ||
+		 COperator::EopLogicalLeftOuterNLJoin == (*pexpr)[0]->Pop()->Eopid()))
 	{
 		// a Select on top of LOJ can be turned into InnerJoin by normalization
 		return CNormalizer::PexprNormalize(mp, pexpr);
@@ -1349,7 +1350,8 @@ CExpressionPreprocessor::PexprOuterJoinToInnerJoin
 		{
 			CExpression *pexprChild = (*pexpr)[ul];
 			BOOL fNewChild = false;
-			if (COperator::EopLogicalLeftOuterJoin == pexprChild->Pop()->Eopid())
+			if (COperator::EopLogicalLeftOuterJoin == pexprChild->Pop()->Eopid() ||
+				COperator::EopLogicalLeftOuterNLJoin == pexprChild->Pop()->Eopid())
 			{
 				CColRefSet *pcrsLOJInnerOutput = (*pexprChild)[1]->DeriveOutputColumns();
 				if (!GPOS_FTRACE(EopttraceDisableOuterJoin2InnerJoinRewrite) &&
@@ -1669,7 +1671,8 @@ CExpressionPreprocessor::PexprWithImpliedPredsOnLOJInnerChild
 {
 	GPOS_ASSERT(NULL != pexprLOJ);
 	GPOS_ASSERT(NULL != pfAddedPredicates);
-	GPOS_ASSERT(COperator::EopLogicalLeftOuterJoin == pexprLOJ->Pop()->Eopid());
+	GPOS_ASSERT(COperator::EopLogicalLeftOuterJoin == pexprLOJ->Pop()->Eopid() ||
+				COperator::EopLogicalLeftOuterNLJoin == pexprLOJ->Pop()->Eopid());
 
 	CExpression *pexprOuter = (*pexprLOJ)[0];
 	CExpression *pexprInner = (*pexprLOJ)[1];
@@ -1763,7 +1766,8 @@ CExpressionPreprocessor::PexprOuterJoinInferPredsFromOuterChildToInnerChild
 	GPOS_ASSERT(NULL != pfAddedPredicates);
 
 	COperator *pop = pexpr->Pop();
-	if (COperator::EopLogicalLeftOuterJoin == pop->Eopid())
+	if (COperator::EopLogicalLeftOuterJoin == pop->Eopid() ||
+		COperator::EopLogicalLeftOuterNLJoin == pop->Eopid())
 	{
 		return PexprWithImpliedPredsOnLOJInnerChild(mp, pexpr, pfAddedPredicates);
 	}

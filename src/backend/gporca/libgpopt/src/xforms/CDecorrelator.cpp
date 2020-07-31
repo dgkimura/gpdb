@@ -41,6 +41,7 @@ const CDecorrelator::SOperatorProcessor CDecorrelator::m_rgopproc[] =
 	{COperator::EopLogicalLeftSemiCorrelatedApplyIn, FProcessJoin},
 	{COperator::EopLogicalLeftAntiSemiJoin, FProcessJoin},
 	{COperator::EopLogicalLeftOuterJoin, FProcessJoin},
+	{COperator::EopLogicalLeftOuterNLJoin, FProcessJoin},
 	{COperator::EopLogicalLeftOuterCorrelatedApply, FProcessJoin},
 	{COperator::EopLogicalNAryJoin, FProcessJoin},
 	{COperator::EopLogicalProject, FProcessProject},

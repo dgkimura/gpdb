@@ -171,6 +171,7 @@ CJoinStatsProcessor::CalcAllJoinStats
 			break;
 
 		case COperator::EopLogicalLeftOuterJoin:
+		case COperator::EopLogicalLeftOuterNLJoin:
 			left_outer_2_way_join = true;
 			break;
 
@@ -592,6 +593,7 @@ CJoinStatsProcessor::DeriveJoinStats
 #ifdef GPOS_DEBUG
 	COperator::EOperatorId op_id = exprhdl.Pop()->Eopid();
 	GPOS_ASSERT(COperator::EopLogicalLeftOuterJoin == op_id ||
+				COperator::EopLogicalLeftOuterNLJoin == op_id ||
 				COperator::EopLogicalInnerJoin == op_id ||
 				COperator::EopLogicalNAryJoin == op_id ||
 				COperator::EopLogicalFullOuterJoin == op_id);

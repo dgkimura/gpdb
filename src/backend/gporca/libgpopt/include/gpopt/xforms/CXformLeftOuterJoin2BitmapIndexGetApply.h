@@ -12,7 +12,7 @@
 #include "gpos/base.h"
 #include "gpopt/operators/CLogicalGet.h"
 #include "gpopt/operators/CLogicalIndexApply.h"
-#include "gpopt/operators/CLogicalLeftOuterJoin.h"
+#include "gpopt/operators/CLogicalLeftOuterNLJoin.h"
 #include "gpopt/xforms/CXformJoin2IndexApplyBase.h"
 
 namespace gpopt
@@ -20,7 +20,7 @@ namespace gpopt
 	using namespace gpos;
 
 	class CXformLeftOuterJoin2BitmapIndexGetApply : public CXformJoin2IndexApplyBase
-		<CLogicalLeftOuterJoin, CLogicalIndexApply, CLogicalGet,
+		<CLogicalLeftOuterNLJoin, CLogicalIndexApply, CLogicalGet,
 		false /*fWithSelect*/, false /*is_partial*/, IMDIndex::EmdindBitmap>
 	{
 		private:
@@ -32,7 +32,7 @@ namespace gpopt
 			explicit
 			CXformLeftOuterJoin2BitmapIndexGetApply(CMemoryPool *mp)
 				: CXformJoin2IndexApplyBase
-				<CLogicalLeftOuterJoin, CLogicalIndexApply, CLogicalGet,
+				<CLogicalLeftOuterNLJoin, CLogicalIndexApply, CLogicalGet,
 				false /*fWithSelect*/, false /*is_partial*/, IMDIndex::EmdindBitmap>
 				(mp)
 			{}

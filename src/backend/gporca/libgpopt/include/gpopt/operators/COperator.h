@@ -276,6 +276,7 @@ namespace gpopt
 				
 				EopLogicalDynamicBitmapTableGet,
 				EopPhysicalDynamicBitmapTableScan,
+				EopLogicalLeftOuterNLJoin,
 
 				EopSentinel
 			};

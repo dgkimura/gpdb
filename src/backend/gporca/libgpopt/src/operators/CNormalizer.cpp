@@ -49,6 +49,7 @@ const CNormalizer::SPushThru CNormalizer::m_rgpt[] =
 	{COperator::EopLogicalInnerApply, PushThruJoin},
 	{COperator::EopLogicalInnerCorrelatedApply, PushThruJoin},
 	{COperator::EopLogicalLeftOuterJoin, PushThruJoin},
+	{COperator::EopLogicalLeftOuterNLJoin, PushThruJoin},
 	{COperator::EopLogicalLeftOuterApply, PushThruJoin},
 	{COperator::EopLogicalLeftOuterCorrelatedApply, PushThruJoin},
 	{COperator::EopLogicalLeftSemiApply, PushThruJoin},
@@ -383,7 +384,8 @@ CNormalizer::FSimplifySelectOnOuterJoin
 	)
 {
 	GPOS_ASSERT(NULL != mp);
-	GPOS_ASSERT(COperator::EopLogicalLeftOuterJoin == pexprOuterJoin->Pop()->Eopid());
+	GPOS_ASSERT(COperator::EopLogicalLeftOuterJoin == pexprOuterJoin->Pop()->Eopid() ||
+				COperator::EopLogicalLeftOuterNLJoin == pexprOuterJoin->Pop()->Eopid());
 	GPOS_ASSERT(pexprPred->Pop()->FScalar());
 	GPOS_ASSERT(NULL != ppexprResult);
 
@@ -524,7 +526,7 @@ CNormalizer::PushThruSelect
 
 	COperator::EOperatorId op_id = pexprLogicalChild->Pop()->Eopid();
 	CExpression *pexprSimplified = NULL;
-	if (COperator::EopLogicalLeftOuterJoin == op_id &&
+	if ((COperator::EopLogicalLeftOuterJoin == op_id || COperator::EopLogicalLeftOuterNLJoin == op_id) &&
 		FSimplifySelectOnOuterJoin(mp, pexprLogicalChild, pexprPred, &pexprSimplified))
 	{
 		// simplification succeeded, normalize resulting expression
@@ -606,7 +608,7 @@ CNormalizer::PexprSelect
 
 	// we have a Select on top of Outer Join expression, attempt simplifying expression into InnerJoin
 	CExpression *pexprSimplified = NULL;
-	if (COperator::EopLogicalLeftOuterJoin == eopidChild &&
+	if ((COperator::EopLogicalLeftOuterJoin == eopidChild || COperator::EopLogicalLeftOuterNLJoin == eopidChild) &&
 		FSimplifySelectOnOuterJoin(mp, pexprLogicalChild, (*pexprSelect)[1], &pexprSimplified))
 	{
 		// simplification succeeded, normalize resulting expression
@@ -918,6 +920,7 @@ CNormalizer::PushThruJoin
 	COperator::EOperatorId op_id = pop->Eopid();
 	BOOL fOuterJoin =
 		COperator::EopLogicalLeftOuterJoin == op_id ||
+		COperator::EopLogicalLeftOuterNLJoin == op_id ||
 		COperator::EopLogicalLeftOuterApply == op_id ||
 		COperator::EopLogicalLeftOuterCorrelatedApply == op_id;
 	BOOL fMixedInnerOuterJoin = (popNAryJoin && popNAryJoin->HasOuterJoinChildren());

@@ -3,58 +3,57 @@
 //	Copyright (C) 2011 EMC Corp.
 //
 //	@filename:
-//		CLogicalLeftOuterJoin.h
+//		CLogicalLeftOuterNLJoin.h
 //
 //	@doc:
 //		Left outer join operator
 //---------------------------------------------------------------------------
-#ifndef GPOS_CLogicalLeftOuterJoin_H
-#define GPOS_CLogicalLeftOuterJoin_H
+#ifndef GPOS_CLogicalLeftOuterNLJoin_H
+#define GPOS_CLogicalLeftOuterNLJoin_H
 
 #include "gpos/base.h"
 #include "gpopt/operators/CLogicalJoin.h"
-#include "gpopt/operators/CLogicalLeftOuterNLJoin.h"
 
 namespace gpopt
 {
 	//---------------------------------------------------------------------------
 	//	@class:
-	//		CLogicalLeftOuterJoin
+	//		CLogicalLeftOuterNLJoin
 	//
 	//	@doc:
 	//		Left outer join operator
 	//
 	//---------------------------------------------------------------------------
-	class CLogicalLeftOuterJoin : public CLogicalJoin
+	class CLogicalLeftOuterNLJoin : public CLogicalJoin
 	{
 		private:
 
 			// private copy ctor
-			CLogicalLeftOuterJoin(const CLogicalLeftOuterJoin &);
+			CLogicalLeftOuterNLJoin(const CLogicalLeftOuterNLJoin &);
 
 		public:
 
 			// ctor
 			explicit
-			CLogicalLeftOuterJoin(CMemoryPool *mp);
+			CLogicalLeftOuterNLJoin(CMemoryPool *mp);
 
 			// dtor
 			virtual 
-			~CLogicalLeftOuterJoin() 
+			~CLogicalLeftOuterNLJoin() 
 			{}
 
 			// ident accessors
 			virtual 
 			EOperatorId Eopid() const
 			{
-				return EopLogicalLeftOuterJoin;
+				return EopLogicalLeftOuterNLJoin;
 			}
 			
 			// return a string for operator name
 			virtual 
 			const CHAR *SzId() const
 			{
-				return "CLogicalLeftOuterJoin";
+				return "CLogicalLeftOuterNLJoin";
 			}
 
 			// return true if we can pull projections up past this operator from its given child
@@ -113,22 +112,22 @@ namespace gpopt
 
 			// conversion function
 			static
-			CLogicalLeftOuterJoin *PopConvert
+			CLogicalLeftOuterNLJoin *PopConvert
 				(
 				COperator *pop
 				)
 			{
 				GPOS_ASSERT(NULL != pop);
-				GPOS_ASSERT(EopLogicalLeftOuterJoin == pop->Eopid());
+				GPOS_ASSERT(EopLogicalLeftOuterNLJoin == pop->Eopid());
 				
-				return dynamic_cast<CLogicalLeftOuterJoin*>(pop);
+				return dynamic_cast<CLogicalLeftOuterNLJoin*>(pop);
 			}
 
-	}; // class CLogicalLeftOuterJoin
+	}; // class CLogicalLeftOuterNLJoin
 
 }
 
 
-#endif // !GPOS_CLogicalLeftOuterJoin_H
+#endif // !GPOS_CLogicalLeftOuterNLJoin_H
 
 // EOF

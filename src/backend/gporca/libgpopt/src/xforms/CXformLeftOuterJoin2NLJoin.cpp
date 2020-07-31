@@ -38,7 +38,7 @@ CXformLeftOuterJoin2NLJoin::CXformLeftOuterJoin2NLJoin
 		(
 		GPOS_NEW(mp) CExpression
 					(mp, 
-					 GPOS_NEW(mp) CLogicalLeftOuterJoin(mp),
+					 GPOS_NEW(mp) CLogicalLeftOuterNLJoin(mp),
 					 GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // left child
 					 GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // right child
 					 GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp))) // predicate

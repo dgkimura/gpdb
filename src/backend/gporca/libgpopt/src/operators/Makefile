@@ -55,6 +55,7 @@ OBJS        = CExpression.o \
               CLogicalLeftOuterApply.o \
               CLogicalLeftOuterCorrelatedApply.o \
               CLogicalLeftOuterJoin.o \
+              CLogicalLeftOuterNLJoin.o \
               CLogicalLeftSemiApply.o \
               CLogicalLeftSemiApplyIn.o \
               CLogicalLeftSemiCorrelatedApply.o \

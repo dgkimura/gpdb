@@ -305,7 +305,8 @@ namespace gpopt
 				 CExpression *pexpr
 				)
 			{
-				return COperator::EopLogicalLeftOuterJoin == pexpr->Pop()->Eopid();
+				return COperator::EopLogicalLeftOuterJoin == pexpr->Pop()->Eopid() ||
+					   COperator::EopLogicalLeftOuterNLJoin == pexpr->Pop()->Eopid();
 			}
 
 			// is the given expression either a union or union all operator

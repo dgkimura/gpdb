@@ -10,6 +10,8 @@
 #include "gpos/base.h"
 #include "gpopt/operators/CLogicalDynamicGet.h"
 #include "gpopt/xforms/CXformJoin2IndexApply.h"
+#include "gpopt/operators/CLogicalLeftOuterNLJoin.h"
+#include "gpopt/operators/CLogicalLeftOuterJoin.h"
 
 namespace gpopt
 {

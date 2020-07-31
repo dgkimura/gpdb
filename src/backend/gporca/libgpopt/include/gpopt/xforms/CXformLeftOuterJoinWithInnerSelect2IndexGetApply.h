@@ -11,13 +11,14 @@
 
 #include "gpos/base.h"
 #include "gpopt/xforms/CXformJoin2IndexApplyBase.h"
+#include "gpopt/operators/CLogicalLeftOuterNLJoin.h"
 
 namespace gpopt
 {
 	using namespace gpos;
 
 	class CXformLeftOuterJoinWithInnerSelect2IndexGetApply : public CXformJoin2IndexApplyBase
-		<CLogicalLeftOuterJoin, CLogicalIndexApply, CLogicalGet,
+		<CLogicalLeftOuterNLJoin, CLogicalIndexApply, CLogicalGet,
 		true /*fWithSelect*/, false /*is_partial*/, IMDIndex::EmdindBtree>
 	{
 		private:
@@ -29,7 +30,7 @@ namespace gpopt
 			explicit
 			CXformLeftOuterJoinWithInnerSelect2IndexGetApply(CMemoryPool *mp)
 				: CXformJoin2IndexApplyBase
-				<CLogicalLeftOuterJoin, CLogicalIndexApply, CLogicalGet,
+				<CLogicalLeftOuterNLJoin, CLogicalIndexApply, CLogicalGet,
 				true /*fWithSelect*/, false /*is_partial*/, IMDIndex::EmdindBtree>
 				(mp)
 			{}

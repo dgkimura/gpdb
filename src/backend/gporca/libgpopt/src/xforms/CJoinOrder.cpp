@@ -236,7 +236,8 @@ CJoinOrder::CJoinOrder
 		for (ULONG ul = 0; ul < num_of_nary_children ; ul++)
 		{
 			CExpression *pexpr = (*all_components)[ul];
-			if (COperator::EopLogicalLeftOuterJoin == pexpr->Pop()->Eopid())
+			if (COperator::EopLogicalLeftOuterJoin == pexpr->Pop()->Eopid() ||
+			    COperator::EopLogicalLeftOuterNLJoin == pexpr->Pop()->Eopid())
 			{
 				num_of_lojs++;
 			}
@@ -267,7 +268,8 @@ CJoinOrder::CJoinOrder
 	{
 		CExpression *expr = (*all_components)[ul];
 		if (m_include_loj_childs &&
-			COperator::EopLogicalLeftOuterJoin == expr->Pop()->Eopid())
+			(COperator::EopLogicalLeftOuterJoin == expr->Pop()->Eopid() ||
+			 COperator::EopLogicalLeftOuterNLJoin == expr->Pop()->Eopid()))
 		{
 			// counter for number of loj available in tree
 			++loj_id;
@@ -767,7 +769,8 @@ CJoinOrder::MarkUsedEdges
 	if (0 == pexpr->Arity() ||
 		(COperator::EopLogicalSelect != eopid &&
 		 COperator::EopLogicalInnerJoin != eopid &&
-		 COperator::EopLogicalLeftOuterJoin != eopid))
+		 COperator::EopLogicalLeftOuterJoin != eopid &&
+		 COperator::EopLogicalLeftOuterNLJoin != eopid))
 	{
 		// result component does not have a scalar child, e.g. a Get node
 		return;

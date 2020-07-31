@@ -1828,7 +1828,8 @@ CJoinOrderDPv2::OsPrint
 				{
 					os << "   Child groups: ";
 					expr_info->m_left_child_expr.m_group_info->m_atoms->OsPrint(os);
-					if (COperator::EopLogicalLeftOuterJoin == expr_info->m_expr->Pop()->Eopid())
+					if (COperator::EopLogicalLeftOuterJoin == expr_info->m_expr->Pop()->Eopid() ||
+					    COperator::EopLogicalLeftOuterNLJoin == expr_info->m_expr->Pop()->Eopid())
 					{
 						os << " left";
 					}

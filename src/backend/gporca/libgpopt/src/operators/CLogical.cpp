@@ -1163,7 +1163,8 @@ CLogical::Maxcard
 
 		if ((CUtils::FScalarConstFalse(pexprScalar) &&
 			 COperator::EopLogicalFullOuterJoin != exprhdl.Pop()->Eopid() &&
-			 COperator::EopLogicalLeftOuterJoin != exprhdl.Pop()->Eopid())
+			 COperator::EopLogicalLeftOuterJoin != exprhdl.Pop()->Eopid() &&
+			 COperator::EopLogicalLeftOuterNLJoin != exprhdl.Pop()->Eopid())
 			||
 			exprhdl.DerivePropertyConstraint()->FContradiction())
 		{
