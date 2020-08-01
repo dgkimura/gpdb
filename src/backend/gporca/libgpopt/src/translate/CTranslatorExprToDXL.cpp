@@ -3862,12 +3862,12 @@ CTranslatorExprToDXL::PdxlnNLJoin
 	CExpression *pexprScalar = (*pexprInnerNLJ)[2];
 
 
-#ifdef GPOS_DEBUG
-	GPOS_ASSERT_IMP(COperator::EopPhysicalInnerIndexNLJoin != pop->Eopid() &&
-					COperator::EopPhysicalLeftOuterIndexNLJoin != pop->Eopid()
-			, pexprInnerChild->DeriveOuterReferences()->IsDisjoint(pexprOuterChild->DeriveOutputColumns()) &&
-			"detected outer references in NL inner child");
-#endif // GPOS_DEBUG
+//#ifdef GPOS_DEBUG
+//	GPOS_ASSERT_IMP(COperator::EopPhysicalInnerIndexNLJoin != pop->Eopid() &&
+//					COperator::EopPhysicalLeftOuterIndexNLJoin != pop->Eopid()
+//			, pexprInnerChild->DeriveOuterReferences()->IsDisjoint(pexprOuterChild->DeriveOutputColumns()) &&
+//			"detected outer references in NL inner child");
+//#endif // GPOS_DEBUG
 
 	EdxlJoinType join_type = EdxljtSentinel;
 	BOOL is_index_nlj = false;

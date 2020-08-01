@@ -66,14 +66,12 @@ CXformLeftOuter2LeftOuterNLJoin::Exfp
 	)
 	const
 {
-	CExpression *pexprScalar = exprhdl.PexprScalarChild(2 /*child_index*/);
-	if (CUtils::FScalarConstFalse(pexprScalar))
+	CExpression *pexprScalar = exprhdl.PexprScalarChild(2);
+	if (COperator::EopScalarConst == pexprScalar->Pop()->Eopid())
 	{
-		// if LOJ predicate is False, we can replace inner child with empty table
-		return CXform::ExfpHigh;
+		return CXform::ExfpNone;
 	}
-
-	return CXform::ExfpNone;
+	return CXform::ExfpHigh;
 }
 
 
