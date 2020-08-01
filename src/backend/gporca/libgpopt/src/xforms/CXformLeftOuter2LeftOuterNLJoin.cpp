@@ -12,7 +12,7 @@
 #include "gpos/base.h"
 
 #include "gpopt/base/CUtils.h"
-#include "gpopt/operators/CLogicalConstTableGet.h"
+#include "gpopt/operators/CNormalizer.h"
 #include "gpopt/operators/CLogicalLeftOuterJoin.h"
 #include "gpopt/operators/CLogicalLeftOuterNLJoin.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -44,7 +44,7 @@ CXformLeftOuter2LeftOuterNLJoin::CXformLeftOuter2LeftOuterNLJoin
 					mp,
 					GPOS_NEW(mp) CLogicalLeftOuterJoin(mp),
 					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)), // left child
-					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternLeaf(mp)),  // right child
+					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)),  // right child
 					GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))  // predicate tree
 					)
 		)
@@ -108,9 +108,9 @@ CXformLeftOuter2LeftOuterNLJoin::Transform
 	pexprInner->AddRef();
 	pexprScalar->AddRef();
 	pexprScalar->AddRef();
-	CExpression *pexprResult = NULL;
+	CExpression *pexprNew = NULL;
 
-	pexprResult =
+	pexprNew =
 		GPOS_NEW(mp) CExpression
 			(
 			mp,
@@ -119,6 +119,9 @@ CXformLeftOuter2LeftOuterNLJoin::Transform
 			CUtils::PexprSafeSelect(mp, pexprInner, pexprScalar),
 			pexprScalar
 			);
+
+	CExpression *pexprResult = CNormalizer::PexprNormalize(mp, pexprNew);
+	pexprNew->Release();
 
 	pxfres->Add(pexprResult);
 }

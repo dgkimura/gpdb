@@ -83,6 +83,7 @@ CNormalizer::FPushThruOuterChild
 
 	return
 		COperator::EopLogicalLeftOuterJoin == op_id ||
+		COperator::EopLogicalLeftOuterNLJoin == op_id ||
 		COperator::EopLogicalLeftOuterApply == op_id ||
 		COperator::EopLogicalLeftOuterCorrelatedApply == op_id ||
 		CUtils::FLeftAntiSemiApply(pexprLogical->Pop()) ||
