@@ -44,7 +44,7 @@ CXformPushDownLeftOuterJoin::CXformPushDownLeftOuterJoin
 		GPOS_NEW(mp) CExpression
 					(
 					mp,
-					GPOS_NEW(mp) CLogicalLeftOuterJoin(mp),
+					GPOS_NEW(mp) CLogicalLeftOuterNLJoin(mp),
 					GPOS_NEW(mp) CExpression		// outer child is an NAry-Join
 						(
 						mp,
