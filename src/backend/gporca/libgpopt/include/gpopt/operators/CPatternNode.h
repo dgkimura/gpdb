@@ -1,12 +1,12 @@
 //---------------------------------------------------------------------------
-//	Greenplum Database
-//	Copyright (C) 2009-2011 Greenplum, Inc.
+// Greenplum Database
+// Copyright (c) 2020 VMware and affiliates, Inc.
 //
-//	@filename:
-//		COperator.h
+// CPatternNode.h
 //
-//	@doc:
-//		Base class for all operators: logical, physical, scalar, patterns
+// A node that matches multiple operators, to be used in patterns of xforms.
+// The exact matching algorithm depends on an enum that is passed in the
+// constructor.
 //---------------------------------------------------------------------------
 #ifndef GPOPT_CPatternNode_H
 #define GPOPT_CPatternNode_H
@@ -20,12 +20,9 @@ namespace gpopt
 	using namespace gpos;
 
 	//---------------------------------------------------------------------------
-	//	@class:
-	//		CPatternNode
+	// CPatternNode
 	//
-	//	@doc:
-	//		base class for all operators
-	//
+	// An operator that can match multiple other operator types
 	//---------------------------------------------------------------------------
 	class CPatternNode : public CPattern
 	{

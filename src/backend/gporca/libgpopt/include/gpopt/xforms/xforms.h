@@ -128,6 +128,7 @@
 #include "gpopt/xforms/CXformInnerJoin2DynamicBitmapIndexGetApply.h"
 #include "gpopt/xforms/CXformInnerJoinWithInnerSelect2BitmapIndexGetApply.h"
 #include "gpopt/xforms/CXformInnerJoinWithInnerSelect2DynamicBitmapIndexGetApply.h"
+#include "gpopt/xforms/CXformJoin2IndexApplyGeneric.h"
 
 #include "gpopt/xforms/CXformInnerApply2InnerJoin.h"
 #include "gpopt/xforms/CXformInnerApply2InnerJoinNoCorrelations.h"

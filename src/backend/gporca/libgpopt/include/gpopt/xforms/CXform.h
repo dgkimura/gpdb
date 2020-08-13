@@ -223,6 +223,7 @@ namespace gpopt
 				ExfLeftOuterJoinWithInnerSelect2DynamicBitmapIndexGetApply,
 				ExfLeftOuterJoinWithInnerSelect2DynamicIndexGetApply,
 				ExfIndexGet2IndexOnlyScan,
+				ExfJoin2IndexApplyGeneric,
 				ExfInvalid,
 				ExfSentinel = ExfInvalid
 			};

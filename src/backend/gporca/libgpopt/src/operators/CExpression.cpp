@@ -1036,7 +1036,8 @@ CExpression::FMatchPattern
 		return true;
 	}
 	
-	if (Pop()->Eopid() == op_id)
+	if (Pop()->Eopid() == op_id ||
+		(COperator::EopPatternNode == op_id && CPatternNode::PopConvert(pexprPattern->Pop())->MatchesOperator(Pop()->Eopid())))
 	{
 		// check arity, children
 		return FMatchPatternChildren(pexprPattern);
