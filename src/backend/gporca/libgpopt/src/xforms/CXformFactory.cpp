@@ -289,7 +289,8 @@ CXformFactory::Instantiate()
 	Add(GPOS_NEW(m_mp) CXformImplementFullOuterMergeJoin(m_mp));
 	SkipUnused(4);
 	Add(GPOS_NEW(m_mp) CXformIndexGet2IndexOnlyScan(m_mp));
-	Add(GPOS_NEW(m_mp) CXformJoin2IndexApplyGeneric(m_mp));
+	Add(GPOS_NEW(m_mp) CXformJoin2BitmapIndexGetApply(m_mp));
+	Add(GPOS_NEW(m_mp) CXformJoin2IndexGetApply(m_mp));
 
 	GPOS_ASSERT(NULL != m_rgpxf[CXform::ExfSentinel - 1] &&
 				"Not all xforms have been instantiated");

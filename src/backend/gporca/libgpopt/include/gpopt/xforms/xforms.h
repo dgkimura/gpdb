@@ -118,9 +118,10 @@
 
 #include "gpopt/xforms/CXformSubqJoin2Apply.h"
 #include "gpopt/xforms/CXformSubqNAryJoin2Apply.h"
+#include "gpopt/xforms/CXformJoin2BitmapIndexGetApply.h"
+#include "gpopt/xforms/CXformJoin2IndexGetApply.h"
 #include "gpopt/xforms/CXformInnerJoin2PartialDynamicIndexGetApply.h"
 #include "gpopt/xforms/CXformInnerJoinWithInnerSelect2PartialDynamicIndexGetApply.h"
-#include "gpopt/xforms/CXformJoin2IndexApplyGeneric.h"
 
 #include "gpopt/xforms/CXformInnerApply2InnerJoin.h"
 #include "gpopt/xforms/CXformInnerApply2InnerJoinNoCorrelations.h"

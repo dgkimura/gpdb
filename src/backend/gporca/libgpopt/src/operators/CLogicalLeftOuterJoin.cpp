@@ -90,7 +90,8 @@ CLogicalLeftOuterJoin::PxfsCandidates
 	(void) xform_set->ExchangeSet(CXform::ExfLeftOuterJoin2NLJoin);
 	(void) xform_set->ExchangeSet(CXform::ExfLeftOuterJoin2HashJoin);
 	(void) xform_set->ExchangeSet(CXform::ExfLeftOuter2InnerUnionAllLeftAntiSemiJoin);
-	(void) xform_set->ExchangeSet(CXform::ExfJoin2IndexApplyGeneric);
+	(void) xform_set->ExchangeSet(CXform::ExfJoin2BitmapIndexGetApply);
+	(void) xform_set->ExchangeSet(CXform::ExfJoin2IndexGetApply);
 
 	return xform_set;
 }

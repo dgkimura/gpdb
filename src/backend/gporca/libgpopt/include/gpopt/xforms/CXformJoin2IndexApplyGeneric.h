@@ -23,6 +23,9 @@ namespace gpopt
 	{
 	private:
 
+		// this decides which types of plans are produced, index gets or bitmap gets
+		BOOL m_generateBitmapPlans;
+
 		// no copy ctor
 		CXformJoin2IndexApplyGeneric(const CXformJoin2IndexApplyGeneric &) = delete;
 
@@ -41,7 +44,7 @@ namespace gpopt
 
 		// ctor
 		explicit
-		CXformJoin2IndexApplyGeneric(CMemoryPool *mp)
+		CXformJoin2IndexApplyGeneric(CMemoryPool *mp, BOOL generateBitmapPlans)
 		:
 		// pattern
 		CXformJoin2IndexApply
@@ -54,26 +57,14 @@ namespace gpopt
 		  GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp)), // inner child
 		  GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPatternTree(mp))  // predicate tree operator,
 		 )
-		)
+		),
+		m_generateBitmapPlans(generateBitmapPlans)
 		{}
 
 		// dtor
 		virtual
 		~CXformJoin2IndexApplyGeneric()
 		{}
-
-		// ident accessors
-		virtual
-		EXformId Exfid() const
-		{
-			return ExfJoin2IndexApplyGeneric;
-		}
-
-		virtual
-		const CHAR *SzId() const
-		{
-			return "CXformJoin2IndexApplyGeneric";
-		}
 
 		virtual
 		EXformPromise Exfp(CExpressionHandle &exprhdl) const;
@@ -92,7 +83,6 @@ namespace gpopt
 			return true;
 		}
 
-		// TODO: Remove these later??
 		virtual
 		CLogicalJoin *PopLogicalJoin(CMemoryPool *) const { return NULL; }
 

@@ -253,7 +253,7 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt, CXformResult *px
 		return;
 	}
 
-	// insert the btree alternatives...
+	// insert the btree or bitmap alternatives
 	CreateHomogeneousIndexApplyAlternatives
 		(
 		 mp,
@@ -266,23 +266,8 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt, CXformResult *px
 		 ptabdescInner,
 		 popDynamicGet,
 		 pxfres,
-		 IMDIndex::EmdindBtree
-		 );
+		 (m_generateBitmapPlans ? IMDIndex::EmdindBitmap : IMDIndex::EmdindBtree)
+		);
 
-	// ...followed by the bitmap alternatives
-	CreateHomogeneousIndexApplyAlternatives
-		(
-		 mp,
-		 pexpr->Pop(),
-		 pexprOuter,
-		 pexprGet,
-		 pexprAllPredicates,
-		 nodesToInsertAboveIndexGet,
-		 endOfNodesToInsertAboveIndexGet,
-		 ptabdescInner,
-		 popDynamicGet,
-		 pxfres,
-		 IMDIndex::EmdindBitmap
-		 );
 	CRefCount::SafeRelease(pexprAllPredicates);
 }
