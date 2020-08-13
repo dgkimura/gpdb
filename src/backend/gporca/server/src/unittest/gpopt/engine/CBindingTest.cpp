@@ -144,7 +144,7 @@ CBindingTest::EresUnittest_Basic()
 
 	UlongPtrArray *number_of_bindings = eng.GetNumberOfBindings();
 	ULONG search_stage = 0;
-	ULONG bindings_for_xform = (ULONG) (*number_of_bindings)[search_stage][CXform::ExfInnerJoinWithInnerSelect2IndexGetApply];
+	ULONG bindings_for_xform = (ULONG) (*number_of_bindings)[search_stage][CXform::ExfJoin2IndexApplyGeneric];
 
 	GPOS_RESULT eres = GPOS_FAILED;
 
