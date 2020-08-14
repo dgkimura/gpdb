@@ -181,8 +181,27 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt, CXformResult *px
 
 			case COperator::EopLogicalProject:
 			case COperator::EopLogicalGbAgg:
-				// we tolerate these operators in the tree and will just copy them into the result
-				// of the transform, any selects above this node won't be used for index predicates
+				// We tolerate these operators in the tree (with some conditions, see below) and will
+				// just copy them into the result of the transform, any selects above this node won't
+				// be used for index predicates.
+				{
+					CColRefSet *joinPredUsedCols = GPOS_NEW(mp) CColRefSet(mp, *(pexprScalar->DeriveUsedColumns()));
+
+					joinPredUsedCols->Exclude(pexprOuter->DeriveOutputColumns());
+					joinPredUsedCols->Exclude((*pexprCurrInnerChild)[0]->DeriveOutputColumns());
+					BOOL joinPredUsesProjectedColumns = (0 < joinPredUsedCols->Size());
+					joinPredUsedCols->Release();
+
+					if (joinPredUsesProjectedColumns)
+					{
+						// The join predicate uses columns that neither come from the outer table
+						// nor from the child of this node, therefore it must reference columns that
+						// are produced by pexprCurrInnerChild. Note that in the future we could
+						// also try to split off the join preds and any select preds above this node
+						// that can be applied to the get.
+						return;
+					}
+				}
 				selectThatIsParentOfGet = NULL;
 				break;
 

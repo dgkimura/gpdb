@@ -50,7 +50,7 @@ namespace gpopt
 		virtual
 		const CHAR *SzId() const
 		{
-			return "CXformJoin2IndexApply";
+			return "CXformJoin2IndexGetApply";
 		}
 
 	}; // class CXformJoin2IndexGetApply

@@ -50,7 +50,7 @@ namespace gpopt
 		virtual
 		const CHAR *SzId() const
 		{
-			return "CXformJoin2BitmapIndexApply";
+			return "CXformJoin2BitmapIndexGetApply";
 		}
 
 	}; // class CXformJoin2BitmapIndexGetApply
