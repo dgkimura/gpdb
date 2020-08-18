@@ -2068,7 +2068,42 @@ CTranslatorExprToDXLUtils::SetDirectDispatchInfo
 
 			if (NULL != ppc->Pcnstr())
 			{
-				GPOS_ASSERT(NULL != ppc->Pcnstr());
+				GPOS_ASSERT(NULL != ppc->Pcnstr()); // ppc->Pcnstr() == {"gp_segment_id" (8), ranges: [1, 1] }
+
+				// *((CConstraintInterval*)ppc->Pcnstr())->m_pcr->m_pname->m_str_name
+				CColRefArray *arr = ppc->Pcnstr()->PcrsUsed()->Pdrgpcr(mp);
+				for (ULONG j = 0; j < arr->Size(); j++)
+				{
+					CColRef *c = (*arr)[i];
+					if (std::wcscmp(L"gp_segment_id", c->Name().Pstr()->GetBuffer()) == 0)
+					{
+						//CDistributionSpecHashed *pdsHashed = CDistributionSpecHashed::PdsConvert(pds);
+						//CExpressionArray *pdrgpexprHashed = pdsHashed->Pdrgpexpr();
+
+						CDXLDatumArray *pdrgpdxldatum = GPOS_NEW(mp) CDXLDatumArray(mp);
+
+						CDXLDatum *dxl_datum = NULL;
+
+						CConstraint *pcnstrDistrCol = ppc->Pcnstr()->Pcnstr(mp, c);
+						CConstraintInterval *pci = dynamic_cast<CConstraintInterval *>(pcnstrDistrCol);
+						const CRange *prng = (*pci->Pdrgprng())[0];
+						dxl_datum = CTranslatorExprToDXLUtils::GetDatumVal(mp, md_accessor, prng->PdatumLeft());
+
+						dxl_datum->AddRef();
+						pdrgpdxldatum->Append(dxl_datum);
+						dxl_datum->Release();
+						CDXLDatum2dArray *pdrgpdrgpdxldatum = GPOS_NEW(mp) CDXLDatum2dArray(mp);
+						pdrgpdrgpdxldatum->Append(pdrgpdxldatum);
+						CRefCount::SafeRelease(pcnstrDistrCol);
+						CDXLDirectDispatchInfo *dxl_direct_dispatch_info =  GPOS_NEW(mp) CDXLDirectDispatchInfo(pdrgpdrgpdxldatum);
+
+						//CDXLDirectDispatchInfo *dxl_direct_dispatch_info = GetDXLDirectDispatchInfo(mp, md_accessor, pdrgpexprHashed, ppc->Pcnstr());
+						dxlnode->SetDirectDispatchInfo(dxl_direct_dispatch_info);
+						arr->Release();
+						return;
+					}
+				}
+				arr->Release();
 
 				CDistributionSpecHashed *pdsHashed = CDistributionSpecHashed::PdsConvert(pds);
 				CExpressionArray *pdrgpexprHashed = pdsHashed->Pdrgpexpr();
