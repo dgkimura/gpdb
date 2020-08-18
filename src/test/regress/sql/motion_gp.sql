@@ -29,6 +29,18 @@ INSERT INTO motiondata (id, external) VALUES (5, repeat('1234567890', 1000));
 -- Large datum, external, compressed
 INSERT INTO motiondata (id, extended) VALUES (6, repeat('1234567890', 100000));
 
+EXPLAIN (COSTS OFF) SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=0;
+SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=0;
+
+EXPLAIN (COSTS OFF) SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=1;
+SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=1;
+
+EXPLAIN (COSTS OFF) SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=2;
+SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=2;
+
+EXPLAIN (COSTS OFF) SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=1 or gp_segment_id=2;
+SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=1 or gp_segment_id=2;
+
 -- Check that the sizes are as expected. The exact sizes are not important,
 -- but should be in the right ballpark.
 SELECT id,
