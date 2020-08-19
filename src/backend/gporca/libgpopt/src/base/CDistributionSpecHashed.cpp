@@ -9,6 +9,7 @@
 //		Specification of hashed distribution
 //---------------------------------------------------------------------------
 
+#include "naucrates/dxl/xml/dxltokens.h"
 #include "naucrates/traceflags/traceflags.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
@@ -160,6 +161,19 @@ CDistributionSpecHashed::PdsCopyWithRemappedColumns
 	}
 	// Remapping columns should not change opfamily, used for passing distribution requests in CTEs
 	return GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, m_fNullsColocated, pdshashed, m_opfamilies);
+}
+
+
+BOOL
+CDistributionSpecHashed::FDistributionSpecHashedOnGpSegmentId() const
+{
+	const ULONG length = m_pdrgpexpr->Size();
+	COperator *pop = (*(m_pdrgpexpr))[0]->Pop();
+
+	return length == 1 &&
+		pop->Eopid() == COperator::EopScalarIdent &&
+		CScalarIdent::PopConvert(pop)->Pcr()->IsSystemCol() &&
+		CScalarIdent::PopConvert(pop)->Pcr()->Name().Equals(CDXLTokens::GetDXLTokenStr(EdxltokenGpSegmentIdColName));
 }
 
 
@@ -510,6 +524,8 @@ CDistributionSpecHashed::FMatchHashedDistribution
 		}
 		if (!fSuccess)
 		{
+			if (equiv_distribution_exprs == NULL && pdshashed->FDistributionSpecHashedOnGpSegmentId())
+				fSuccess = true;
 			return fSuccess;
 		}
 	}

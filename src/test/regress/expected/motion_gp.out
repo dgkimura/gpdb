@@ -88,6 +88,48 @@ SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=1 or gp_segment_id=
              2 |  6
 (3 rows)
 
+EXPLAIN (COSTS OFF) SELECT count(*), gp_segment_id FROM motiondata GROUP BY gp_segment_id;
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  HashAggregate
+         Group Key: gp_segment_id
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: gp_segment_id
+               ->  Seq Scan on motiondata
+ Optimizer: Postgres query optimizer
+(7 rows)
+
+SELECT count(*), gp_segment_id FROM motiondata GROUP BY gp_segment_id;
+ count | gp_segment_id 
+-------+---------------
+     1 |             1
+     2 |             2
+     3 |             0
+(3 rows)
+
+EXPLAIN (COSTS OFF) SELECT a.gp_segment_id, b.gp_segment_id, a.id, b.id FROM motiondata as a, motiondata as b WHERE a.gp_segment_id=b.id;
+                         QUERY PLAN                         
+------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Hash Join
+         Hash Cond: (a.gp_segment_id = b.id)
+         ->  Redistribute Motion 3:3  (slice2; segments: 3)
+               Hash Key: a.gp_segment_id
+               ->  Seq Scan on motiondata a
+         ->  Hash
+               ->  Seq Scan on motiondata b
+ Optimizer: Postgres query optimizer
+(9 rows)
+
+SELECT a.gp_segment_id, b.gp_segment_id, a.id, b.id FROM motiondata as a, motiondata as b WHERE a.gp_segment_id=b.id;
+ gp_segment_id | gp_segment_id | id | id 
+---------------+---------------+----+----
+             1 |             1 |  1 |  1
+             2 |             0 |  5 |  2
+             2 |             0 |  6 |  2
+(3 rows)
+
 -- Check that the sizes are as expected. The exact sizes are not important,
 -- but should be in the right ballpark.
 SELECT id,

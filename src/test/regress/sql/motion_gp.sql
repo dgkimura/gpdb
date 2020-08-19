@@ -41,6 +41,12 @@ SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=2;
 EXPLAIN (COSTS OFF) SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=1 or gp_segment_id=2;
 SELECT gp_segment_id, id FROM motiondata WHERE gp_segment_id=1 or gp_segment_id=2;
 
+EXPLAIN (COSTS OFF) SELECT count(*), gp_segment_id FROM motiondata GROUP BY gp_segment_id;
+SELECT count(*), gp_segment_id FROM motiondata GROUP BY gp_segment_id;
+
+EXPLAIN (COSTS OFF) SELECT a.gp_segment_id, b.gp_segment_id, a.id, b.id FROM motiondata as a, motiondata as b WHERE a.gp_segment_id=b.id;
+SELECT a.gp_segment_id, b.gp_segment_id, a.id, b.id FROM motiondata as a, motiondata as b WHERE a.gp_segment_id=b.id;
+
 -- Check that the sizes are as expected. The exact sizes are not important,
 -- but should be in the right ballpark.
 SELECT id,
