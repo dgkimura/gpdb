@@ -33,7 +33,7 @@ namespace gpopt
 	//		Bitmap bool op scalar operator
 	//
 	//---------------------------------------------------------------------------
-	class CScalarBitmapBoolOp : public CScalar
+	class CScalarBitmapBoolOp : public COperator
 	{
 		public:
 			// type of bitmap bool operator
@@ -49,9 +49,6 @@ namespace gpopt
 			// bitmap boolean operator
 			EBitmapBoolOp m_ebitmapboolop;
 
-			// bitmap type id
-			IMDId *m_pmdidBitmapType;
-
 			// private copy ctor
 			CScalarBitmapBoolOp(const CScalarBitmapBoolOp &);
 			
@@ -63,26 +60,18 @@ namespace gpopt
 			CScalarBitmapBoolOp
 				(
 				CMemoryPool *mp,
-				EBitmapBoolOp ebitmapboolop,
-				IMDId *pmdidBitmapType
+				EBitmapBoolOp ebitmapboolop
 				);
 
 
 			// dtor
 			virtual
-			~CScalarBitmapBoolOp();
+			~CScalarBitmapBoolOp() = default;
 
 			// bitmap bool op type
 			EBitmapBoolOp Ebitmapboolop() const
 			{
 				return m_ebitmapboolop;
-			}
-
-			// bitmap type id
-			virtual
-			IMDId *MdidType() const
-			{
-				return m_pmdidBitmapType;
 			}
 
 			// identifier
@@ -125,6 +114,14 @@ namespace gpopt
 			{
 				return PopCopyDefault();
 			}
+
+			// create derived properties container
+			virtual
+			CDrvdProp *PdpCreate(CMemoryPool *mp) const;
+
+			// create required properties container
+			virtual
+			CReqdProp *PrpCreate(CMemoryPool *mp) const;
 
 			// debug print
 			virtual

@@ -476,7 +476,7 @@ CExpressionTest::EresUnittest_BitmapGet()
 			GPOS_NEW(mp) CExpression
 					(
 					mp,
-					GPOS_NEW(mp) CScalarBitmapBoolOp(mp, CScalarBitmapBoolOp::EbitmapboolAnd, mdid),
+					GPOS_NEW(mp) CScalarBitmapBoolOp(mp, CScalarBitmapBoolOp::EbitmapboolAnd),
 					pexprBitmapIndex,
 					pexprBitmapIndex2
 					);
@@ -487,7 +487,7 @@ CExpressionTest::EresUnittest_BitmapGet()
 			GPOS_NEW(mp) CExpression
 					(
 					mp,
-					GPOS_NEW(mp) CScalarBitmapBoolOp(mp, CScalarBitmapBoolOp::EbitmapboolAnd, mdid),
+					GPOS_NEW(mp) CScalarBitmapBoolOp(mp, CScalarBitmapBoolOp::EbitmapboolAnd),
 					pexprBitmapIndex,
 					pexprBitmapIndex2
 					);

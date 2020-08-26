@@ -28,7 +28,7 @@ namespace gpdxl
 	//		Class for representing DXL bitmap boolean operator
 	//
 	//---------------------------------------------------------------------------
-	class CDXLScalarBitmapBoolOp : public CDXLScalar
+	class CDXLScalarBitmapBoolOp : public CDXLOperator
 	{
 
 		public:
@@ -43,9 +43,6 @@ namespace gpdxl
 		
 		private:
 
-			// type id
-			IMDId *m_mdid_type;
-			
 			// operator type
 			const EdxlBitmapBoolOp m_bitmap_op_type;
 
@@ -54,7 +51,7 @@ namespace gpdxl
 
 		public:
 			// ctor
-			CDXLScalarBitmapBoolOp(CMemoryPool *mp, IMDId *mdid_type, EdxlBitmapBoolOp bitmap_op_type);
+			CDXLScalarBitmapBoolOp(CMemoryPool *mp, EdxlBitmapBoolOp bitmap_op_type);
 			
 			// dtor 
 			virtual
@@ -66,17 +63,17 @@ namespace gpdxl
 
 			// bitmap operator type
 			EdxlBitmapBoolOp GetDXLBitmapOpType() const;
-			
-			// return type
-			IMDId *MdidType() const;
 
 			// name of the DXL operator name
 			virtual
 			const CWStringConst *GetOpNameStr() const;
 
-			// does the operator return a boolean result
 			virtual
-			BOOL HasBoolResult(CMDAccessor *md_accessor) const;
+			Edxloptype
+			GetDXLOperatorType() const
+			{
+				return EdxloptypeScalar;
+			}
 			
 			// serialize operator in DXL format
 			virtual

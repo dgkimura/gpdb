@@ -32,16 +32,13 @@ using namespace gpdxl;
 CDXLScalarBitmapBoolOp::CDXLScalarBitmapBoolOp
 	(
 	CMemoryPool *mp,
-	IMDId *mdid_type,
 	EdxlBitmapBoolOp bitmap_op_type
 	)
 	:
-	CDXLScalar(mp),
-	m_mdid_type(mdid_type),
+	CDXLOperator(mp),
 	m_bitmap_op_type(bitmap_op_type)
 {
 	GPOS_ASSERT(EdxlbitmapSentinel > bitmap_op_type);
-	GPOS_ASSERT(IMDId::IsValid(mdid_type));
 }
 
 //---------------------------------------------------------------------------
@@ -54,7 +51,6 @@ CDXLScalarBitmapBoolOp::CDXLScalarBitmapBoolOp
 //---------------------------------------------------------------------------
 CDXLScalarBitmapBoolOp::~CDXLScalarBitmapBoolOp()
 {
-	m_mdid_type->Release();
 }
 
 
@@ -74,20 +70,6 @@ CDXLScalarBitmapBoolOp::GetDXLOperator() const
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CDXLScalarBitmapBoolOp::MdidType
-//
-//	@doc:
-//		Return type
-//
-//---------------------------------------------------------------------------
-IMDId *
-CDXLScalarBitmapBoolOp::MdidType() const
-{
-	return m_mdid_type;
-}
-
-//---------------------------------------------------------------------------
-//	@function:
 //		CDXLScalarBitmapBoolOp::EdxlBitmapBoolOp
 //
 //	@doc:
@@ -98,24 +80,6 @@ CDXLScalarBitmapBoolOp::EdxlBitmapBoolOp
 CDXLScalarBitmapBoolOp::GetDXLBitmapOpType() const
 {
 	return m_bitmap_op_type;
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CDXLScalarBitmapBoolOp::HasBoolResult
-//
-//	@doc:
-//		Is operator returning a boolean value
-//
-//---------------------------------------------------------------------------
-BOOL
-CDXLScalarBitmapBoolOp::HasBoolResult
-	(
-	CMDAccessor *md_accessor
-	) 
-	const
-{
-	return (IMDType::EtiBool == md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
 }
 
 //---------------------------------------------------------------------------
@@ -159,7 +123,7 @@ CDXLScalarBitmapBoolOp::SerializeToDXL
 
 	GPOS_ASSERT(NULL != element_name);
 	xml_serializer->OpenElement(CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
-	m_mdid_type->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
+	//m_mdid_type->Serialize(xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));// FIXME how to serialize?!
 	
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
 

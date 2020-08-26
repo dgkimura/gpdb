@@ -3200,7 +3200,7 @@ CExpression *
 CXformUtils::PexprBitmapBoolOp
 	(
 	CMemoryPool *mp,
-	IMDId *pmdidBitmapType,
+	IMDId *, // pmdidBitmapType,
 	CExpression *pexprLeft,
 	CExpression *pexprRight,
 	BOOL fConjunction
@@ -3219,7 +3219,7 @@ CXformUtils::PexprBitmapBoolOp
 	return GPOS_NEW(mp) CExpression
 				(
 				mp,
-				GPOS_NEW(mp) CScalarBitmapBoolOp(mp, ebitmapboolop, pmdidBitmapType),
+				GPOS_NEW(mp) CScalarBitmapBoolOp(mp, ebitmapboolop),
 				pexprLeft,
 				pexprRight
 				);

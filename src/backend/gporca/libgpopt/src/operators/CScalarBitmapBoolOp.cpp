@@ -45,30 +45,14 @@ const WCHAR CScalarBitmapBoolOp::m_rgwszBitmapOpType[EbitmapboolSentinel][30] =
 CScalarBitmapBoolOp::CScalarBitmapBoolOp
 	(
 	CMemoryPool *mp,
-	EBitmapBoolOp ebitmapboolop,
-	IMDId *pmdidBitmapType
+	EBitmapBoolOp ebitmapboolop
 	)
 	:
-	CScalar(mp),
-	m_ebitmapboolop(ebitmapboolop),
-	m_pmdidBitmapType(pmdidBitmapType)
+	COperator(mp),
+	m_ebitmapboolop(ebitmapboolop)
 {
 	GPOS_ASSERT(NULL != mp);
 	GPOS_ASSERT(EbitmapboolSentinel > ebitmapboolop);
-	GPOS_ASSERT(NULL != pmdidBitmapType);
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CScalarBitmapBoolOp::~CScalarBitmapBoolOp
-//
-//	@doc:
-//		Dtor
-//
-//---------------------------------------------------------------------------
-CScalarBitmapBoolOp::~CScalarBitmapBoolOp()
-{
-	m_pmdidBitmapType->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -108,8 +92,7 @@ CScalarBitmapBoolOp::Matches
 	}
 	CScalarBitmapBoolOp *popBitmapBoolOp = PopConvert(pop);
 
-	return popBitmapBoolOp->Ebitmapboolop() == Ebitmapboolop() &&
-		popBitmapBoolOp->MdidType()->Equals(m_pmdidBitmapType);
+	return popBitmapBoolOp->Ebitmapboolop() == Ebitmapboolop();
 }
 
 //---------------------------------------------------------------------------
@@ -132,6 +115,36 @@ CScalarBitmapBoolOp::OsPrint
 	os << ")";
 	
 	return os;
+}
+
+CDrvdProp *
+CScalarBitmapBoolOp::PdpCreate
+	(
+	CMemoryPool *mp
+	)
+	const
+{
+	return GPOS_NEW(mp) CDrvdPropScalar(mp);
+}
+
+
+//---------------------------------------------------------------------------
+//	@function:
+//		CScalar::PrpCreate
+//
+//	@doc:
+//		Create base container of required properties
+//
+//---------------------------------------------------------------------------
+CReqdProp *
+CScalarBitmapBoolOp::PrpCreate
+	(
+	CMemoryPool * // mp
+	)
+	const
+{
+	GPOS_ASSERT(!"Cannot compute required properties on scalar");
+	return NULL;
 }
 
 // EOF

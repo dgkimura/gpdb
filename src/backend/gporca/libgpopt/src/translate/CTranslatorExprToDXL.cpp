@@ -805,9 +805,6 @@ CTranslatorExprToDXL::PdxlnBitmapBoolOp
 	CDXLNode *dxlnode_left = PdxlnScalar(pexprLeft);
 	CDXLNode *dxlnode_right = PdxlnScalar(pexprRight);
 	
-	IMDId *mdid_type = popBitmapBoolOp->MdidType();
-	mdid_type->AddRef();
-	
 	CDXLScalarBitmapBoolOp::EdxlBitmapBoolOp edxlbitmapop = CDXLScalarBitmapBoolOp::EdxlbitmapAnd;
 	
 	if (CScalarBitmapBoolOp::EbitmapboolOr == popBitmapBoolOp->Ebitmapboolop())
@@ -818,7 +815,7 @@ CTranslatorExprToDXL::PdxlnBitmapBoolOp
 	return GPOS_NEW(m_mp) CDXLNode
 						(
 						m_mp,
-						GPOS_NEW(m_mp) CDXLScalarBitmapBoolOp(m_mp, mdid_type, edxlbitmapop),
+						GPOS_NEW(m_mp) CDXLScalarBitmapBoolOp(m_mp, edxlbitmapop),
 						dxlnode_left,
 						dxlnode_right
 						);
