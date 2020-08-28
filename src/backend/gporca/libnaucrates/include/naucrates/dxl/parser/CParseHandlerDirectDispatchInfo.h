@@ -44,6 +44,8 @@ namespace gpdxl
 		
 			// direct dispatch spec
 			CDXLDirectDispatchInfo *m_direct_dispatch_info;
+
+			BOOL m_dispatch_is_raw;
 			
 			// private copy ctor
 			CParseHandlerDirectDispatchInfo(const CParseHandlerDirectDispatchInfo &);
