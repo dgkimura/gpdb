@@ -58,8 +58,9 @@ CPhysicalScan::CPhysicalScan
 	}
 	else
 	{
-		m_pds = CPhysical::PdsCompute(m_mp, ptabdesc, pdrgpcrOutput);
+		m_pds = CPhysical::PdsCompute(m_mp, ptabdesc, pdrgpcrOutput, true);
 	}
+
 	ComputeTableStats(m_mp);
 }
 

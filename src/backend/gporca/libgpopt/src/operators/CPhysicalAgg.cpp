@@ -251,6 +251,7 @@ CPhysicalAgg::PdsRequiredAgg
 			grpAndDistinctCols->AppendArray(m_pdrgpcr);
 			grpAndDistinctCols->AppendArray(m_pdrgpcrArgDQA);
 			CDistributionSpec *pdsSpec = PdsMaximalHashed(mp, grpAndDistinctCols);
+			CDistributionSpecHashed::FSetExistsDQA(true);
 			grpAndDistinctCols->Release();
 			return pdsSpec;
 		}

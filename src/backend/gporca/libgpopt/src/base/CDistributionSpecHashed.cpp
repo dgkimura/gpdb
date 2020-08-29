@@ -28,6 +28,15 @@
 
 using namespace gpopt;
 
+// FIXME: So hacky I'm embarrassed... executor crashed w/DQA of gp_segment_id and aggregate (and predicate) using distribution column
+// CREATE TABLE foo(a int, b int) DISTRIBUTED BY (a);
+// SELECT COUNT(a), COUNT(DISTINCT gp_segment_id) FROM foo WHERE a = 0;
+BOOL FixmeExistsDQA = false;
+
+void CDistributionSpecHashed::FSetExistsDQA(BOOL val) {
+	FixmeExistsDQA = val;
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CDistributionSpecHashed::CDistributionSpecHashed
@@ -47,6 +56,7 @@ CDistributionSpecHashed::CDistributionSpecHashed
 	m_opfamilies(opfamilies),
 	m_fNullsColocated(fNullsColocated),
 	m_pdshashedEquiv(NULL),
+	m_pdshashedGpSeg(NULL),
 	m_equiv_hash_exprs(NULL)
 {
 	GPOS_ASSERT(NULL != pdrgpexpr);
@@ -74,10 +84,24 @@ CDistributionSpecHashed::CDistributionSpecHashed
 	IMdIdArray *opfamilies
 	)
 	:
+	CDistributionSpecHashed(pdrgpexpr, fNullsColocated, pdshashedEquiv, NULL, opfamilies)
+{
+}
+
+CDistributionSpecHashed::CDistributionSpecHashed
+	(
+	CExpressionArray *pdrgpexpr,
+	BOOL fNullsColocated,
+	CDistributionSpecHashed *pdshashedEquiv,
+	CDistributionSpecHashed *pdshashedGpSeg,
+	IMdIdArray *opfamilies
+	)
+	:
 	m_pdrgpexpr(pdrgpexpr),
 	m_opfamilies(opfamilies),
 	m_fNullsColocated(fNullsColocated),
 	m_pdshashedEquiv(pdshashedEquiv),
+	m_pdshashedGpSeg(pdshashedGpSeg),
 	m_equiv_hash_exprs(NULL)
 {
 	GPOS_ASSERT(NULL != pdrgpexpr);
@@ -101,6 +125,7 @@ CDistributionSpecHashed::~CDistributionSpecHashed()
 {
 	m_pdrgpexpr->Release();
 	CRefCount::SafeRelease(m_pdshashedEquiv);
+	CRefCount::SafeRelease(m_pdshashedGpSeg);
 	CRefCount::SafeRelease(m_equiv_hash_exprs);
 	CRefCount::SafeRelease(m_opfamilies);
 }
@@ -204,6 +229,16 @@ CDistributionSpecHashed::FSatisfies
 	
 	const CDistributionSpecHashed *pdsHashed =
 			dynamic_cast<const CDistributionSpecHashed *>(pds);
+
+	if (NULL != m_pdshashedGpSeg && CDistributionSpec::EdtHashed == pds->Edt() && m_pdshashedGpSeg->FSatisfies(pds))
+	{
+		if (FixmeExistsDQA)
+		{
+			return false;
+		}
+
+		return NULL == pdsHashed->HashSpecEquivExprs();
+	}
 
 	return FMatchSubset(pdsHashed);
 }

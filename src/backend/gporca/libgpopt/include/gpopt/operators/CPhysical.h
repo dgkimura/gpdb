@@ -39,7 +39,7 @@ namespace gpopt
 	class CPartIndexMap;
 	class CTableDescriptor;
 	class CCTEMap;
-	
+
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CPhysical
@@ -453,7 +453,7 @@ namespace gpopt
 
 			// compute distribution spec from the table descriptor
 			static
-			CDistributionSpec *PdsCompute(CMemoryPool *mp, const CTableDescriptor *ptabdesc, CColRefArray *pdrgpcrOutput);
+			CDistributionSpec *PdsCompute(CMemoryPool *mp, const CTableDescriptor *ptabdesc, CColRefArray *pdrgpcrOutput, BOOL computeAlt=false);
 
 			// compute required sort order of the n-th child
 			virtual
