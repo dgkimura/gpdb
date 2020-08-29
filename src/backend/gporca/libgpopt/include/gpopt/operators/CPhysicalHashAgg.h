@@ -59,7 +59,6 @@ namespace gpopt
 			virtual
 			~CPhysicalHashAgg();
 
-
 			// ident accessors
 			virtual
 			EOperatorId Eopid() const

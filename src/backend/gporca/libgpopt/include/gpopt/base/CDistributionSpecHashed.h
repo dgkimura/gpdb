@@ -44,6 +44,8 @@ namespace gpopt
 			// equivalent hashed distribution introduced by a hash join
 			CDistributionSpecHashed *m_pdshashedEquiv;
 
+			CDistributionSpecHashed *m_pdshashedGpSeg;
+
 			// array of expression arrays, an array at position n
 			// is the list of expression which are equivalent to the distribution expr
 			// at position n in m_pdrgpexpr array.
@@ -78,7 +80,7 @@ namespace gpopt
 			CDistributionSpecHashed(const CDistributionSpecHashed &);
 			
 		public:
-		
+
 			// ctor
 			CDistributionSpecHashed(CExpressionArray *pdrgpexpr,
 									BOOL fNullsColocated,
@@ -88,6 +90,14 @@ namespace gpopt
 			CDistributionSpecHashed(CExpressionArray *pdrgpexpr,
 									BOOL fNullsColocated,
 									CDistributionSpecHashed *pdshashedEquiv,
+									IMdIdArray *opfamilies=NULL
+									);
+
+			// ctor
+			CDistributionSpecHashed(CExpressionArray *pdrgpexpr,
+									BOOL fNullsColocated,
+									CDistributionSpecHashed *pdshashedEquiv,
+									CDistributionSpecHashed *pdshashedGpSeg,
 									IMdIdArray *opfamilies=NULL
 									);
 
@@ -256,6 +266,8 @@ namespace gpopt
 				 CDistributionSpecHashed *pdshashed,
 				 CExpression *pexprPred
 				 );
+
+			static void FSetExistsDQA(BOOL val);
 	}; // class CDistributionSpecHashed
 
 }

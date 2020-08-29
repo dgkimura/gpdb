@@ -261,6 +261,40 @@ CPhysical::CReqdColsRequest::Equals
 		prcrFst->GetColRefSet()->Equals(prcrSnd->GetColRefSet());
 }
 
+static CDistributionSpecHashed *
+PdsComputeAlt
+	(
+	CMemoryPool *mp,
+	const CTableDescriptor *ptabdesc,
+	CColRefArray *pdrgpcrOutput
+	)
+{
+	const CColumnDescriptorArray *pdrgpcoldesc = ptabdesc->Pdrgpcoldesc();
+	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
+
+	const ULONG size = pdrgpcoldesc->Size();
+	CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[size-1];
+	ULONG ulPos = ptabdesc->UlPos(pcoldesc, ptabdesc->Pdrgpcoldesc());
+
+	CColRef *colref = (*pdrgpcrOutput)[ulPos];
+	colref_array->Append(colref);
+
+	CExpressionArray *pdrgpexpr = CUtils::PdrgpexprScalarIdents(mp, colref_array);
+	colref_array->Release();
+
+	IMdIdArray *opfamilies = NULL;
+	if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
+	{
+		// FIXME: Use no-hack way to find gp_segment_id pg_opfamily.
+		// select oid from pg_opfamily where opfname='integer_ops' and opfmethod=(select oid from pg_am where amname='hash');
+		opfamilies = GPOS_NEW(mp) IMdIdArray(mp);
+		opfamilies->Append(GPOS_NEW(mp) CMDIdGPDB(1977));
+		GPOS_ASSERT(opfamilies->Size() == pdrgpexpr->Size());
+	}
+	return GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, true /*fNullsColocated*/, opfamilies);
+}
+
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CPhysical::PdsCompute
@@ -274,9 +308,11 @@ CPhysical::PdsCompute
 	(
 	CMemoryPool *mp,
 	const CTableDescriptor *ptabdesc,
-	CColRefArray *pdrgpcrOutput
+	CColRefArray *pdrgpcrOutput,
+	BOOL computeAlt
 	)
 {
+
 	CDistributionSpec *pds = NULL;
 
 	switch (ptabdesc->GetRelDistribution())
@@ -323,7 +359,14 @@ CPhysical::PdsCompute
 				GPOS_ASSERT(opfamilies->Size() == pdrgpexpr->Size());
 			}
 
-			pds = GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, true /*fNullsColocated*/, opfamilies);
+			if (computeAlt)
+			{
+				pds = GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, true /*fNullsColocated*/, NULL, PdsComputeAlt(mp, ptabdesc, pdrgpcrOutput) /*pdshashedEquiv*/, opfamilies);
+			}
+			else
+			{
+				pds = GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, true /*fNullsColocated*/, opfamilies);
+			}
 			break;
 		}
 

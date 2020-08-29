@@ -48,7 +48,7 @@ namespace gpopt
 			
 			// distribution
 			CDistributionSpec *m_pds;
-			
+
 			// stats of base table -- used for costing
 			// if operator is index scan, this is the stats of table on which index is created
 			IStatistics *m_pstatsBaseTable;
