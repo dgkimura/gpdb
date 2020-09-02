@@ -453,7 +453,7 @@ namespace gpopt
 
 			// compute distribution spec from the table descriptor
 			static
-			CDistributionSpec *PdsCompute(CMemoryPool *mp, const CTableDescriptor *ptabdesc, CColRefArray *pdrgpcrOutput, BOOL computeAlt=false);
+			CDistributionSpec *PdsCompute(CMemoryPool *mp, const CTableDescriptor *ptabdesc, CColRefArray *pdrgpcrOutput);
 
 			// compute required sort order of the n-th child
 			virtual

@@ -308,8 +308,7 @@ CPhysical::PdsCompute
 	(
 	CMemoryPool *mp,
 	const CTableDescriptor *ptabdesc,
-	CColRefArray *pdrgpcrOutput,
-	BOOL computeAlt
+	CColRefArray *pdrgpcrOutput
 	)
 {
 
@@ -359,14 +358,7 @@ CPhysical::PdsCompute
 				GPOS_ASSERT(opfamilies->Size() == pdrgpexpr->Size());
 			}
 
-			if (computeAlt)
-			{
-				pds = GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, true /*fNullsColocated*/, NULL, PdsComputeAlt(mp, ptabdesc, pdrgpcrOutput) /*pdshashedEquiv*/, opfamilies);
-			}
-			else
-			{
-				pds = GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, true /*fNullsColocated*/, opfamilies);
-			}
+			pds = GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, true /*fNullsColocated*/, NULL, PdsComputeAlt(mp, ptabdesc, pdrgpcrOutput) /*pdshashedEquiv*/, opfamilies);
 			CDistributionSpecHashed::FSetExistsDQA(false);
 			break;
 		}
