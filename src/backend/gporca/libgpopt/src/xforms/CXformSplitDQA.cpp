@@ -193,18 +193,19 @@ CXformSplitDQA::Transform
 		//				+--CScalarAggFunc (count , Distinct: false , Aggregate Stage: Global)
 		//					+--CScalarIdent "a" (0)
 
-		CExpression *pexprTwoStageScalarDQA = PexprSplitHelper
-				(
-				mp,
-				col_factory,
-				md_accessor,
-				pexpr,
-				pexprRelational,
-				phmexprcr,
-				pdrgpcrArgDQA,
-				CLogicalGbAgg::EasTwoStageScalarDQA
-				);
-		pxfres->Add(pexprTwoStageScalarDQA);
+		// FIXME: Figure out the issue here and maybe special case this transform result?
+		//CExpression *pexprTwoStageScalarDQA = PexprSplitHelper
+		//		(
+		//		mp,
+		//		col_factory,
+		//		md_accessor,
+		//		pexpr,
+		//		pexprRelational,
+		//		phmexprcr,
+		//		pdrgpcrArgDQA,
+		//		CLogicalGbAgg::EasTwoStageScalarDQA
+		//		);
+		//pxfres->Add(pexprTwoStageScalarDQA);
 	}
 	
 	// generate local DQA, global agg for both scalar and non-scalar agg cases.
