@@ -355,12 +355,12 @@
                 </dxl:AggFunc>
               </dxl:ProjElem>
               <dxl:ProjElem ColId="11" Alias="sum">
-                <dxl:AggFunc AggMdid="0.2108.1.0" AggDistinct="false" AggStage="Final">
+                <dxl:AggFunc AggMdid="0.2108.1.0" AggDistinct="false" AggStage="Normal">
                   <dxl:Ident ColId="14" ColName="ColRef_0014" TypeMdid="0.20.1.0"/>
                 </dxl:AggFunc>
               </dxl:ProjElem>
               <dxl:ProjElem ColId="12" Alias="avg">
-                <dxl:AggFunc AggMdid="0.2101.1.0" AggDistinct="false" AggStage="Final">
+                <dxl:AggFunc AggMdid="0.2101.1.0" AggDistinct="false" AggStage="Normal">
                   <dxl:Ident ColId="16" ColName="ColRef_0016" TypeMdid="0.17.1.0"/>
                 </dxl:AggFunc>
               </dxl:ProjElem>

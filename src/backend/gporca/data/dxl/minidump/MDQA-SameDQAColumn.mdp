@@ -399,7 +399,7 @@
                 </dxl:AggFunc>
               </dxl:ProjElem>
               <dxl:ProjElem ColId="12" Alias="avg">
-                <dxl:AggFunc AggMdid="0.2101.1.0" AggDistinct="false" AggStage="Final">
+                <dxl:AggFunc AggMdid="0.2101.1.0" AggDistinct="false" AggStage="Normal">
                   <dxl:Ident ColId="15" ColName="ColRef_0015" TypeMdid="0.17.1.0"/>
                 </dxl:AggFunc>
               </dxl:ProjElem>

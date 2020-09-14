@@ -354,7 +354,7 @@
             </dxl:AggFunc>
           </dxl:ProjElem>
           <dxl:ProjElem ColId="10" Alias="sum">
-            <dxl:AggFunc AggMdid="0.2108.1.0" AggDistinct="false" AggStage="Final">
+            <dxl:AggFunc AggMdid="0.2108.1.0" AggDistinct="false" AggStage="Normal">
               <dxl:Ident ColId="12" ColName="ColRef_0012" TypeMdid="0.20.1.0"/>
             </dxl:AggFunc>
           </dxl:ProjElem>
