@@ -528,7 +528,8 @@ CXformSplitDQA::PexprPrElAgg
 	CExpression *pexprAggFunc,
 	EAggfuncStage eaggfuncstage,
 	CColRef *pcrPreviousStage,
-	CColRef *pcrCurrStage
+	CColRef *pcrCurrStage,
+	BOOL fSplit
 	)
 {
 	GPOS_ASSERT(NULL != pexprAggFunc);
@@ -560,7 +561,7 @@ CXformSplitDQA::PexprPrElAgg
 												GPOS_NEW(mp) CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 												false, /*fdistinct */
 												eaggfuncstage,
-												true /* fSplit */
+												fSplit // true /* fSplit */
 												);
 
 	return CUtils::PexprScalarProjectElement
@@ -611,7 +612,7 @@ CXformSplitDQA::PopulatePrLMultiPhaseAgg
 	// create new column reference for the first stage (local) project element
 	CColRef *pcrLocal = col_factory->PcrCreate(pmdtype, default_type_modifier);
 
-	CExpression *pexprPrElFirstStage = PexprPrElAgg(mp, pexprAggFunc, EaggfuncstageLocal, NULL /*pcrPreviousStage*/, pcrLocal);
+	CExpression *pexprPrElFirstStage = PexprPrElAgg(mp, pexprAggFunc, EaggfuncstageLocal, NULL /*pcrPreviousStage*/, pcrLocal, !fSplit2LevelsOnly);
 	pdrgpexprPrElFirstStage->Append(pexprPrElFirstStage);
 
 	// column reference for the second stage project elements

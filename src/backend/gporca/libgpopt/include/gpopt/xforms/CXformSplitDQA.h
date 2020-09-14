@@ -109,7 +109,8 @@ namespace gpopt
 							CExpression *pexprAggFunc,
 							EAggfuncStage eaggfuncstage,
 							CColRef *pcrPreviousStage,
-							CColRef *pcrGlobal
+							CColRef *pcrGlobal,
+							BOOL fSplit=false
 							);
 
 			// extract arguments of distinct aggs
