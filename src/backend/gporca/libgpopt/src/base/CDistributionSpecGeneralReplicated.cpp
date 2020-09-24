@@ -16,11 +16,7 @@ namespace gpopt
 	(
 	 CMemoryPool *mp,
 	 CExpressionHandle &, // exprhdl
-	 CReqdPropPlan *
-	#ifdef GPOS_DEBUG
-	 prpp
-	#endif // GPOS_DEBUG
-	 ,
+	 CReqdPropPlan *prpp GPOS_UNUSED,
 	 CExpressionArray *pdrgpexpr,
 	 CExpression *pexpr
 	 )
