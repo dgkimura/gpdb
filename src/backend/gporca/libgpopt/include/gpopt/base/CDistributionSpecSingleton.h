@@ -139,10 +139,7 @@ namespace gpopt
 				const CDistributionSpec *pds
 				)
 			{
-				GPOS_ASSERT(NULL != pds);
-				GPOS_ASSERT(EdtSingleton == pds->Edt() || EdtStrictSingleton == pds->Edt());
-
-				return dynamic_cast<const CDistributionSpecSingleton*>(pds);
+				return const_cast<const CDistributionSpecSingleton*>(PdssConvert(pds));
 			}
 
 	}; // class CDistributionSpecSingleton
