@@ -41,8 +41,8 @@ OBJS        = CAutoOptCtxt.o \
               CDistributionSpecSingleton.o \
               CDistributionSpecStrictHashed.o \
               CDistributionSpecStrictRandom.o \
+              CDistributionSpecStrictReplicated.o \
               CDistributionSpecStrictSingleton.o \
-              CDistributionSpecGeneralReplicated.o \
               CDistributionSpecTaintedReplicated.o \
               CDistributionSpecUniversal.o \
               CDrvdProp.o \

@@ -7,7 +7,7 @@
 
 #include "gpos/base.h"
 #include "gpopt/exception.h"
-#include "gpopt/base/CDistributionSpecReplicated.h"
+#include "gpopt/base/CDistributionSpecStrictReplicated.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CDistributionSpecNonSingleton.h"
 #include "gpopt/base/CDistributionSpecAny.h"
@@ -128,7 +128,7 @@ CPhysicalLeftOuterIndexNLJoin::PdsRequired
 	GPOS_RAISE(gpopt::ExmaGPOPT, gpopt::ExmiUnsupportedOp,
 			GPOS_WSZ_LIT("Left outer index nestloop join broadcasting outer side"));
 	// otherwise, require outer child to be replicated
-	return GPOS_NEW(mp) CDistributionSpecReplicated();
+	return GPOS_NEW(mp) CDistributionSpecStrictReplicated();
 }
 
 
