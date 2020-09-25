@@ -14,7 +14,7 @@
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
-#include "gpopt/base/CDistributionSpecReplicated.h"
+#include "gpopt/base/CDistributionSpecStrictReplicated.h"
 #include "gpopt/base/CDistributionSpecTaintedReplicated.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
 #include "gpopt/base/CUtils.h"
@@ -337,7 +337,7 @@ CPhysicalSequenceProject::PdsRequired(CMemoryPool *mp,
 			return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 		}
 
-		return GPOS_NEW(mp) CDistributionSpecReplicated();
+		return GPOS_NEW(mp) CDistributionSpecStrictReplicated();
 	}
 
 	// if the window operator has a partition by clause, then always

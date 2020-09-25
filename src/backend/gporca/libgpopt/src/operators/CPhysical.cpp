@@ -19,8 +19,8 @@
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CDistributionSpecRandom.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
-#include "gpopt/base/CDistributionSpecGeneralReplicated.h"
 #include "gpopt/base/CDistributionSpecReplicated.h"
+#include "gpopt/base/CDistributionSpecStrictReplicated.h"
 #include "gpopt/base/CDistributionSpecAny.h"
 
 #include "gpopt/operators/CExpression.h"
@@ -310,7 +310,7 @@ CPhysical::PdsCompute(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
 		}
 
 		case IMDRelation::EreldistrReplicated:
-			return GPOS_NEW(mp) CDistributionSpecReplicated();
+			return GPOS_NEW(mp) CDistributionSpecStrictReplicated();
 			break;
 
 		default:
@@ -392,7 +392,7 @@ CPhysical::PdsRequireSingletonOrReplicated(CMemoryPool *mp,
 	{
 		if (0 == ulOptReq)
 		{
-			return GPOS_NEW(mp) CDistributionSpecGeneralReplicated();
+			return GPOS_NEW(mp) CDistributionSpecReplicated();
 		}
 
 		return GPOS_NEW(mp) CDistributionSpecSingleton();

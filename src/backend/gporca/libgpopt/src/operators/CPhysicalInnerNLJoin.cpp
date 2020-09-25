@@ -10,8 +10,8 @@
 //---------------------------------------------------------------------------
 
 #include "gpos/base.h"
+#include "gpopt/base/CDistributionSpecStrictReplicated.h"
 #include "gpopt/base/CDistributionSpecReplicated.h"
-#include "gpopt/base/CDistributionSpecGeneralReplicated.h"
 #include "gpopt/base/CDistributionSpecNonSingleton.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CCastUtils.h"
@@ -99,7 +99,7 @@ CPhysicalInnerNLJoin::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		{
 			return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 		}
-		return GPOS_NEW(mp) CDistributionSpecGeneralReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated();
 	}
 
 	if (GPOS_FTRACE(EopttraceDisableReplicateInnerNLJOuterChild) ||
@@ -165,7 +165,7 @@ CPhysicalInnerNLJoin::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	if (0 == child_index)
 	{
-		return GPOS_NEW(mp) CDistributionSpecGeneralReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated();
 	}
 
 	// compute a matching distribution based on derived distribution of outer child
