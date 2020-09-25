@@ -353,7 +353,16 @@ CPhysicalLimit::PdsDerive(CMemoryPool *mp,
 	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0)->Pds();
 
 	if (CDistributionSpec::EdtReplicated == pdsOuter->Edt())
+	{
+		// Limit functions can give unstable results and therefore cannot
+		// guarantee strictly replicated data. For example,
+		//
+		//   SELECT * FROM foo WHERE a<>1 LIMIT 1;
+		//
+		// In this case, if the child was replicated, we can no longer
+		// guarantee that property and must now dervive tainted replicated.
 		return GPOS_NEW(mp) CDistributionSpecTaintedReplicated();
+	}
 	else
 	{
 		pdsOuter->AddRef();

@@ -509,6 +509,9 @@ CPhysicalSequenceProject::PdsDerive(CMemoryPool *mp,
 	CDistributionSpec *pds = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
 	if (CDistributionSpec::EdtReplicated == pds->Edt())
 	{
+		// Sequence project (i.e. window functions) cannot guarantee replicated
+		// data. If the child was replicated, we can no longer guarantee that
+		// property. Therefore we must now dervive tainted replicated.
 		return GPOS_NEW(mp) CDistributionSpecTaintedReplicated();
 	}
 	else
