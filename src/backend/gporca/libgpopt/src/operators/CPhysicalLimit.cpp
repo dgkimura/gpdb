@@ -406,8 +406,7 @@ CPhysicalLimit::PdsDerive
 	}
 	else
 	{
-		pdsOuter->AddRef();
-		return pdsOuter;
+		return PdsDerivePassThruOuter(exprhdl);
 	}
 }
 
