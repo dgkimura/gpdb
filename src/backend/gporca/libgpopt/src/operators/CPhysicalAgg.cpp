@@ -538,6 +538,9 @@ CPhysicalAgg::PdsDerive
 	}
 	else if (CDistributionSpec::EdtReplicated == pds->Edt())
 	{
+		// Aggregate functions cannot guarantee replicated data. If the child
+		// was replicated, we can no longer guarantee that property. Therefore
+		// we must now dervive tainted replicated.
 		return GPOS_NEW(mp) CDistributionSpecTaintedReplicated();
 	}
 
