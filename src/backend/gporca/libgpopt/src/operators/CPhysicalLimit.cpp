@@ -13,7 +13,7 @@
 #include "gpopt/base/CUtils.h"
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
-#include "gpopt/base/CDistributionSpecTaintedReplicated.h"
+#include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPhysicalLimit.h"
 
@@ -361,7 +361,7 @@ CPhysicalLimit::PdsDerive(CMemoryPool *mp,
 		//
 		// In this case, if the child was replicated, we can no longer
 		// guarantee that property and must now dervive tainted replicated.
-		return GPOS_NEW(mp) CDistributionSpecTaintedReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtTainted);
 	}
 	else
 	{

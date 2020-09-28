@@ -20,7 +20,7 @@
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
-#include "gpopt/base/CDistributionSpecStrictReplicated.h"
+#include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/base/CDistributionSpecRandom.h"
 #include "gpopt/base/CDistributionSpecNonSingleton.h"
 #include "gpopt/base/CDrvdPropCtxtPlan.h"
@@ -126,7 +126,7 @@ CPhysicalSerialUnionAll::PdsRequired(
 	if (CDistributionSpec::EdtReplicated == pdsOuter->Edt())
 	{
 		// outer child is replicated, require inner child to be replicated
-		return GPOS_NEW(mp) CDistributionSpecStrictReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
 	}
 
 	if (CDistributionSpec::EdtExternal == pdsOuter->Edt())
