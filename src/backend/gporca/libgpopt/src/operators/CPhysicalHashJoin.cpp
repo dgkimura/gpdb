@@ -15,7 +15,6 @@
 #include "gpopt/base/CCastUtils.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CDistributionSpecReplicated.h"
-#include "gpopt/base/CDistributionSpecStrictReplicated.h"
 #include "gpopt/base/CDistributionSpecNonSingleton.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
@@ -324,7 +323,7 @@ CPhysicalHashJoin::PdsMatch
 			GPOS_ASSERT(0 == ulSourceChildIndex);
 
 			// outer child is replicated, replicate inner child too in order to preserve correctness of semi-join
-			return GPOS_NEW(mp) CDistributionSpecStrictReplicated();
+			return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
 	}
 }
 
@@ -516,7 +515,7 @@ CPhysicalHashJoin::PdsRequiredReplicate
 	if (1 == child_index)
 	{
 		// require inner child to be replicated
-		return GPOS_NEW(mp) CDistributionSpecReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral);
 	}
 	GPOS_ASSERT(0 == child_index);
 
@@ -743,7 +742,7 @@ CPhysicalHashJoin::PdsRequired
 		{
 			return PdsPassThru(mp, exprhdl, pdsInput, child_index);
 		}
-		return GPOS_NEW(mp) CDistributionSpecStrictReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
 	}
 
 	const ULONG ulHashDistributeRequests = m_pdrgpdsRedistributeRequests->Size();

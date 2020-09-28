@@ -17,7 +17,7 @@
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CDistributionSpecStrictSingleton.h"
 #include "gpopt/base/CDistributionSpecRouted.h"
-#include "gpopt/base/CDistributionSpecTaintedReplicated.h"
+#include "gpopt/base/CDistributionSpecReplicated.h"
 
 #include "gpopt/operators/CPhysicalComputeScalar.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -405,7 +405,7 @@ CPhysicalComputeScalar::PdsDerive
 
 	if (CDistributionSpec::EdtReplicated == pds->Edt() && IMDFunction::EfsVolatile == exprhdl.DeriveScalarFunctionProperties(1)->Efs())
 	{
-		return GPOS_NEW(mp) CDistributionSpecTaintedReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtTainted);
 	}
 
 	if (CDistributionSpec::EdtUniversal == pds->Edt() && 

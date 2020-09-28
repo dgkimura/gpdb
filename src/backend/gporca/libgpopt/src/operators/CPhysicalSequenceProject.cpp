@@ -14,8 +14,7 @@
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
-#include "gpopt/base/CDistributionSpecStrictReplicated.h"
-#include "gpopt/base/CDistributionSpecTaintedReplicated.h"
+#include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/base/CWindowFrame.h"
@@ -346,7 +345,7 @@ CPhysicalSequenceProject::PdsRequired
 			return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 		}
 
-		return GPOS_NEW(mp) CDistributionSpecStrictReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
 	}
 
 	// if the window operator has a partition by clause, then always
@@ -535,7 +534,7 @@ CPhysicalSequenceProject::PdsDerive
 		// Sequence project (i.e. window functions) cannot guarantee replicated
 		// data. If the child was replicated, we can no longer guarantee that
 		// property. Therefore we must now dervive tainted replicated.
-		return GPOS_NEW(mp) CDistributionSpecTaintedReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtTainted);
 	}
 	else
 	{

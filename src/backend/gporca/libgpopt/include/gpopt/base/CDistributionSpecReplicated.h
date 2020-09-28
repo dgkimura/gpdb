@@ -15,14 +15,47 @@ namespace gpopt
 	class CDistributionSpecReplicated : public CDistributionSpec
 	{
 		public:
+			enum class EReplicatedType
+			{
+				ErtStrict,
+				ErtTainted,
+				ErtGeneral,
+				ErtSentinel
+			};
+
+		private:
+
+			// replicated support
+			EReplicatedType m_replicated;
+
+		public:
 			// ctor
-			CDistributionSpecReplicated() = default;
+			CDistributionSpecReplicated(EReplicatedType replicated_type)
+				: m_replicated(replicated_type)
+			{
+			}
+
+			EReplicatedType Ert() const
+			{
+				return m_replicated;
+			}
 
 			// accessor
 			virtual
 			EDistributionType Edt() const
 			{
-				return CDistributionSpec::EdtGeneralReplicated;
+				switch (m_replicated)
+				{
+					case EReplicatedType::ErtGeneral:
+						return CDistributionSpec::EdtGeneralReplicated;
+					case EReplicatedType::ErtTainted:
+						return CDistributionSpec::EdtTaintedReplicated;
+					case EReplicatedType::ErtStrict:
+						return CDistributionSpec::EdtReplicated;
+					default:
+						GPOS_ASSERT(!"Replicated type must be General, Tainted, or Strict");
+						return CDistributionSpec::EdtSentinel;
+				}
 			}
 
 			// should never be called on a required-only distribution
@@ -44,7 +77,21 @@ namespace gpopt
 			virtual
 			IOstream &OsPrint(IOstream &os) const
 			{
-				return os << "GENERAL REPLICATED";
+				switch (Edt())
+				{
+					case CDistributionSpec::EdtGeneralReplicated:
+						os << "GENERAL REPLICATED";
+						break;
+					case CDistributionSpec::EdtTaintedReplicated:
+						os << "TAINTED REPLICATED";
+						break;
+					case CDistributionSpec::EdtReplicated:
+						os << "REPLICATED";
+						break;
+					default:
+						GPOS_ASSERT(!"Replicated type must be General, Tainted, or Strict");
+				}
+				return os;
 			}
 
 			// conversion function
@@ -55,7 +102,7 @@ namespace gpopt
 				)
 			{
 				GPOS_ASSERT(NULL != pds);
-				GPOS_ASSERT(EdtGeneralReplicated == pds->Edt());
+				GPOS_ASSERT(EdtReplicated == pds->Edt());
 
 				return dynamic_cast<CDistributionSpecReplicated*>(pds);
 			}

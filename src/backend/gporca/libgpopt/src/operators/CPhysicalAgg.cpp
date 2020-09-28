@@ -15,7 +15,7 @@
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CDistributionSpecRandom.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
-#include "gpopt/base/CDistributionSpecTaintedReplicated.h"
+#include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPhysicalAgg.h"
@@ -541,7 +541,7 @@ CPhysicalAgg::PdsDerive
 		// Aggregate functions cannot guarantee replicated data. If the child
 		// was replicated, we can no longer guarantee that property. Therefore
 		// we must now dervive tainted replicated.
-		return GPOS_NEW(mp) CDistributionSpecTaintedReplicated();
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtTainted);
 	}
 
 	pds->AddRef();

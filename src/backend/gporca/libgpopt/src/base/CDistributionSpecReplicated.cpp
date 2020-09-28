@@ -28,6 +28,7 @@ namespace gpopt
 		GPOS_ASSERT(!GPOS_FTRACE(EopttraceDisableMotions));
 		GPOS_ASSERT(this == prpp->Ped()->PdsRequired() &&
 					"required plan properties don't match enforced distribution spec");
+		GPOS_ASSERT(Ert() != EReplicatedType::ErtTainted);
 
 		if (GPOS_FTRACE(EopttraceDisableMotionBroadcast))
 		{
@@ -48,11 +49,64 @@ namespace gpopt
 	BOOL
 	CDistributionSpecReplicated::FSatisfies
 	(
-	 const CDistributionSpec * // pds
+	 const CDistributionSpec *pds
 	)
 	const
 	{
-		GPOS_ASSERT(!"General Replicated distribution cannot be derived");
+		GPOS_ASSERT(Ert() != EReplicatedType::ErtGeneral);
+
+		if (Ert() == EReplicatedType::ErtTainted)
+		{
+			// TaintedReplicated::FSatisfies logic is similar to Replicated::FSatisifes
+			// except that Replicated can match and satisfy another Replicated Spec.
+			// However, Tainted will never satisfy another TaintedReplicated or
+			// Replicated.
+			switch (pds->Edt())
+			{
+				default:
+					return false;
+				case CDistributionSpec::EdtAny:
+					// tainted replicated distribution satisfies an any required distribution spec
+					return true;
+				case CDistributionSpec::EdtGeneralReplicated:
+					// tainted replicated distribution satisfies a general replicated distribution spec
+					return true;
+				case CDistributionSpec::EdtNonSingleton:
+					// a tainted replicated distribution satisfies the non-singleton
+					// distribution, only if allowed by non-singleton distribution object
+					return CDistributionSpecNonSingleton::PdsConvert(pds)->FAllowReplicated();
+				case CDistributionSpec::EdtSingleton:
+					// a tainted replicated distribution satisfies singleton
+					// distributions that are not master-only
+					return CDistributionSpecSingleton::PdssConvert(pds)->Est() == CDistributionSpecSingleton::EstSegment;
+			}
+		}
+		else if (Ert() == EReplicatedType::ErtStrict)
+		{
+			if (Matches(pds))
+			{
+				// exact match implies satisfaction
+				return true;
+			 }
+
+			if (EdtNonSingleton == pds->Edt())
+			{
+				// a replicated distribution satisfies the non-singleton
+				// distribution, only if allowed by non-singleton distribution object
+				return CDistributionSpecNonSingleton::PdsConvert(const_cast<CDistributionSpec *>(pds))->FAllowReplicated();
+			}
+
+			// replicated distribution satisfies a general replicated distribution spec
+			if (EdtGeneralReplicated == pds->Edt())
+			{
+				return true;
+			}
+
+			// a replicated distribution satisfies any non-singleton one,
+			// as well as singleton distributions that are not master-only
+			return !(EdtSingleton == pds->Edt() &&
+				   (dynamic_cast<const CDistributionSpecSingleton *>(pds))->FOnMaster());
+		}
 
 		return false;
 	}

@@ -13,7 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpopt/base/COrderSpec.h"
-#include "gpopt/base/CDistributionSpecStrictReplicated.h"
+#include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/operators/CPhysicalMotion.h"
 
 namespace gpopt
@@ -32,7 +32,7 @@ namespace gpopt
 		private:
 
 			// output distribution
-			CDistributionSpecStrictReplicated *m_pdsReplicated;
+			CDistributionSpecReplicated *m_pdsReplicated;
 
 			// private copy ctor
 			CPhysicalMotionBroadcast(const CPhysicalMotionBroadcast &);
