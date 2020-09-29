@@ -488,14 +488,17 @@ CPhysicalHashJoin::PdsRequiredSingleton(CMemoryPool *mp,
 CDistributionSpec *
 CPhysicalHashJoin::PdsRequiredReplicate(
 	CMemoryPool *mp, CExpressionHandle &exprhdl, CDistributionSpec *pdsInput,
-	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const
+	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq,
+	CReqdPropPlan *prppInput)
 {
 	EChildExecOrder eceo = Eceo();
 	if (EceoLeftToRight == eceo)
 	{
 		// if optimization order is left to right, fall-back to implementation of parent Join operator
-		return CPhysicalJoin::PdsRequired(mp, exprhdl, pdsInput, child_index,
-										  pdrgpdpCtxt, 0 /*ulOptReq*/);
+		CEnfdDistribution *ped = CPhysicalJoin::Ped(mp, exprhdl, prppInput,
+													child_index, pdrgpdpCtxt,
+													ulOptReq);
+		return ped->PdsRequired();
 	}
 	GPOS_ASSERT(EceoRightToLeft == eceo);
 
@@ -704,19 +707,35 @@ CPhysicalHashJoin::PdsRequiredRedistribute(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 CDistributionSpec *
-CPhysicalHashJoin::PdsRequired(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CDistributionSpec *pdsInput,
-	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
-	ULONG ulOptReq	// identifies which optimization request should be created
+CPhysicalHashJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
+							   CExpressionHandle &exprhdl GPOS_UNUSED,
+							   CDistributionSpec *pdsInput GPOS_UNUSED,
+							   ULONG child_index GPOS_UNUSED,
+							   CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+							   ULONG ulOptReq  GPOS_UNUSED// identifies which optimization request should be created
 ) const
+{
+	std::terminate();
+	return nullptr;
+}
+
+CEnfdDistribution *
+CPhysicalHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
+					   CReqdPropPlan *prppInput, ULONG child_index,
+					   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());
 
+	CEnfdDistribution::EDistributionMatching dmatch = Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
+	CDistributionSpec *const pdsInput = prppInput->Ped()->PdsRequired();
+
 	// if expression has to execute on a single host then we need a gather
 	if (exprhdl.NeedsSingletonExecution())
 	{
-		return PdsRequireSingleton(mp, exprhdl, pdsInput, child_index);
+		return GPOS_NEW(mp) CEnfdDistribution(
+			PdsRequireSingleton(mp, exprhdl, pdsInput, child_index),
+			dmatch);
 	}
 
 	if (exprhdl.HasOuterRefs())
@@ -724,9 +743,13 @@ CPhysicalHashJoin::PdsRequired(
 		if (CDistributionSpec::EdtSingleton == pdsInput->Edt() ||
 			CDistributionSpec::EdtStrictReplicated == pdsInput->Edt())
 		{
-			return PdsPassThru(mp, exprhdl, pdsInput, child_index);
+			return GPOS_NEW(mp) CEnfdDistribution(
+				PdsPassThru(mp, exprhdl, pdsInput, child_index),
+				dmatch);
 		}
-		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
+		return GPOS_NEW(mp) CEnfdDistribution(
+			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict),
+			dmatch);
 	}
 
 	const ULONG ulHashDistributeRequests =
@@ -742,7 +765,9 @@ CPhysicalHashJoin::PdsRequired(
 				CDistributionSpecHashed::PdsConvert(pds);
 			pdsHashed->ComputeEquivHashExprs(mp, exprhdl);
 		}
-		return pds;
+		return GPOS_NEW(mp) CEnfdDistribution(
+			pds,
+			dmatch);
 	}
 
 	if (ulOptReq == ulHashDistributeRequests ||
@@ -751,22 +776,26 @@ CPhysicalHashJoin::PdsRequired(
 		// requests N+1, N+2 are (hashed/non-singleton, replicate)
 
 		CDistributionSpec *pds = PdsRequiredReplicate(
-			mp, exprhdl, pdsInput, child_index, pdrgpdpCtxt, ulOptReq);
+			mp, exprhdl, pdsInput, child_index, pdrgpdpCtxt, ulOptReq,
+			prppInput);
 		if (CDistributionSpec::EdtHashed == pds->Edt())
 		{
 			CDistributionSpecHashed *pdsHashed =
 				CDistributionSpecHashed::PdsConvert(pds);
 			pdsHashed->ComputeEquivHashExprs(mp, exprhdl);
 		}
-		return pds;
+		return GPOS_NEW(mp) CEnfdDistribution(
+			pds,
+			dmatch);
 	}
 
 	GPOS_ASSERT(ulOptReq == ulHashDistributeRequests + 2);
 
 	// requests N+3 is (singleton, singleton)
 
-	return PdsRequiredSingleton(mp, exprhdl, pdsInput, child_index,
-								pdrgpdpCtxt);
+	return GPOS_NEW(mp) CEnfdDistribution(
+		PdsRequiredSingleton(mp, exprhdl, pdsInput, child_index, pdrgpdpCtxt),
+		dmatch);
 }
 
 
