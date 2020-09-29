@@ -160,16 +160,16 @@ namespace gpopt
 			BOOL FFirstChildToOptimize(ULONG child_index) const;
 
 			// helper to compute required distribution of correlated join's children
-			CDistributionSpec *PdsRequiredCorrelatedJoin
+			CEnfdDistribution *
+			PedCorrelatedJoin
 				(
 				CMemoryPool *mp,
 				CExpressionHandle &exprhdl,
-				CDistributionSpec *pdsRequired,
+				CReqdPropPlan *prppInput,
 				ULONG child_index,
 				CDrvdPropArray *pdrgpdpCtxt,
-				ULONG  ulOptReq
-				)
-				const;
+				ULONG ulOptReq
+				);
 
 			// helper to compute required rewindability of correlated join's children
 			CRewindabilitySpec *PrsRequiredCorrelatedJoin
@@ -314,6 +314,15 @@ namespace gpopt
 				ULONG ulOptReq
 				)
 				const;
+			CEnfdDistribution *Ped
+				(
+				CMemoryPool *mp,
+				CExpressionHandle &exprhdl,
+				CReqdPropPlan *prppInput,
+				ULONG child_index,
+				CDrvdPropArray *pdrgpdpCtxt,
+				ULONG ulDistrReq
+				);
 			
 			// compute required partition propagation of the n-th child
 			virtual

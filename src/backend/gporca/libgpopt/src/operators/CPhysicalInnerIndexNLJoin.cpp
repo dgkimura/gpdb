@@ -95,23 +95,42 @@ CPhysicalInnerIndexNLJoin::Matches
 CDistributionSpec *
 CPhysicalInnerIndexNLJoin::PdsRequired
 	(
-	CMemoryPool *mp,
-	CExpressionHandle &exprhdl,
+	CMemoryPool *mp GPOS_UNUSED,
+	CExpressionHandle &exprhdl GPOS_UNUSED,
 	CDistributionSpec *,//pdsRequired,
-	ULONG child_index,
-	CDrvdPropArray *pdrgpdpCtxt,
+	ULONG child_index GPOS_UNUSED,
+	CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
 	ULONG // ulOptReq
 	)
 	const
 {
+	std::terminate();
+	return nullptr;
+}
+
+CEnfdDistribution *
+CPhysicalInnerIndexNLJoin::Ped
+	(
+	CMemoryPool *mp,
+	CExpressionHandle &exprhdl,
+	CReqdPropPlan *prppInput,
+	ULONG child_index,
+	CDrvdPropArray *pdrgpdpCtxt,
+	ULONG ulDistrReq
+	)
+{
 	GPOS_ASSERT(2 > child_index);
+
+	CEnfdDistribution::EDistributionMatching dmatch = Edm(prppInput, child_index, pdrgpdpCtxt, ulDistrReq);
 
 	if (1 == child_index)
 	{
 		// inner (index-scan side) is requested for Any distribution,
 		// we allow outer references on the inner child of the join since it needs
 		// to refer to columns in join's outer child
-		return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid(), true /*fAllowOuterRefs*/);
+		return GPOS_NEW(mp) CEnfdDistribution(
+			GPOS_NEW(mp) CDistributionSpecAny(this->Eopid(), true /*fAllowOuterRefs*/),
+			dmatch);
 	}
 
 	// we need to match distribution of inner
@@ -122,7 +141,9 @@ CPhysicalInnerIndexNLJoin::PdsRequired
 		CDistributionSpec::EdtUniversal == edtInner)
 	{
 		// enforce executing on a single host
-		return GPOS_NEW(mp) CDistributionSpecSingleton();
+		return GPOS_NEW(mp) CEnfdDistribution(
+			GPOS_NEW(mp) CDistributionSpecSingleton(),
+			dmatch);
 	}
 
 	if (CDistributionSpec::EdtHashed == edtInner)
@@ -143,12 +164,16 @@ CPhysicalInnerIndexNLJoin::PdsRequired
 				GPOS_NEW(mp) CDistributionSpecHashed(pdshashedEquiv->Pdrgpexpr(), pdshashedEquiv->FNullsColocated());
 			pdsHashedRequired->ComputeEquivHashExprs(mp, exprhdl);
 
-			return pdsHashedRequired;
+			return GPOS_NEW(mp) CEnfdDistribution(
+				pdsHashedRequired,
+				dmatch);
 		}
 	}
 
 	// otherwise, require outer child to be replicated
-	return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
+	return GPOS_NEW(mp) CEnfdDistribution(
+		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict),
+		dmatch);
 }
 
 

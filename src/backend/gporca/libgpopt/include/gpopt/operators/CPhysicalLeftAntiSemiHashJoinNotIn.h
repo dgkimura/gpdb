@@ -57,6 +57,15 @@ namespace gpopt
 			//-------------------------------------------------------------------------------------
 
 			// compute required distribution of the n-th child
+			CEnfdDistribution *Ped
+				(
+				CMemoryPool *mp,
+				CExpressionHandle &exprhdl,
+				CReqdPropPlan *prppInput,
+				ULONG child_index,
+				CDrvdPropArray *pdrgpdpCtxt,
+				ULONG ulDistrReq
+				);
 			virtual
 			CDistributionSpec *PdsRequired
 				(
