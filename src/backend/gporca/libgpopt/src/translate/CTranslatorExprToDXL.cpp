@@ -7401,7 +7401,7 @@ CTranslatorExprToDXL::GetProperties(const CExpression *pexpr)
 		rows = stats->Rows();
 	}
 
-	if (CDistributionSpec::EdtReplicated ==
+	if (CDistributionSpec::EdtStrictReplicated ==
 		pexpr->GetDrvdPropPlan()->Pds()->Edt())
 	{
 		// if distribution is replicated, multiply number of rows by number of segments

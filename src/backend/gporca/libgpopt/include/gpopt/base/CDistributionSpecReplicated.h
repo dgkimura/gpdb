@@ -49,11 +49,11 @@ public:
 		switch (m_replicated)
 		{
 			case EReplicatedType::ErtGeneral:
-				return CDistributionSpec::EdtGeneralReplicated;
+				return CDistributionSpec::EdtReplicated;
 			case EReplicatedType::ErtTainted:
 				return CDistributionSpec::EdtTaintedReplicated;
 			case EReplicatedType::ErtStrict:
-				return CDistributionSpec::EdtReplicated;
+				return CDistributionSpec::EdtStrictReplicated;
 			default:
 				GPOS_ASSERT(!"Replicated type must be General, Tainted, or Strict");
 				return CDistributionSpec::EdtSentinel;
@@ -85,7 +85,21 @@ public:
 	virtual IOstream &
 	OsPrint(IOstream &os) const
 	{
-		return os << "GENERAL REPLICATED";
+		switch (Edt())
+		{
+			case CDistributionSpec::EdtReplicated:
+				os << "REPLICATED";
+				break;
+			case CDistributionSpec::EdtTaintedReplicated:
+				os << "TAINTED REPLICATED";
+				break;
+			case CDistributionSpec::EdtStrictReplicated:
+				os << "STRICT REPLICATED";
+				break;
+			default:
+				GPOS_ASSERT(!"Replicated type must be General, Tainted, or Strict");
+		}
+		return os;
 	}
 
 	// conversion function
@@ -93,7 +107,9 @@ public:
 	PdsConvert(CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(NULL != pds);
-		GPOS_ASSERT(EdtReplicated == pds->Edt());
+		GPOS_ASSERT(EdtStrictReplicated == pds->Edt() ||
+					EdtReplicated == pds->Edt() ||
+					EdtTaintedReplicated == pds->Edt());
 
 		return dynamic_cast<CDistributionSpecReplicated *>(pds);
 	}
