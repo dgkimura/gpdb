@@ -68,7 +68,7 @@ namespace gpopt
 				case CDistributionSpec::EdtAny:
 					// tainted replicated distribution satisfies an any required distribution spec
 					return true;
-				case CDistributionSpec::EdtGeneralReplicated:
+				case CDistributionSpec::EdtReplicated:
 					// tainted replicated distribution satisfies a general replicated distribution spec
 					return true;
 				case CDistributionSpec::EdtNonSingleton:
@@ -97,7 +97,7 @@ namespace gpopt
 			}
 
 			// replicated distribution satisfies a general replicated distribution spec
-			if (EdtGeneralReplicated == pds->Edt())
+			if (EdtReplicated == pds->Edt())
 			{
 				return true;
 			}

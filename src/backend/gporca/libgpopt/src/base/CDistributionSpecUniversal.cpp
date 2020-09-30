@@ -54,7 +54,7 @@ namespace gpopt
 		return (CDistributionSpec::EdtUniversal == edt ||
 				CDistributionSpec::EdtSingleton == edt ||
 				CDistributionSpec::EdtStrictReplicated == edt ||
-				CDistributionSpec::EdtGeneralReplicated == edt);
+				CDistributionSpec::EdtReplicated == edt);
 	}
 
 	void CDistributionSpecUniversal::AppendEnforcers(CMemoryPool *, CExpressionHandle &, CReqdPropPlan *, CExpressionArray *,
