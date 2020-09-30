@@ -393,7 +393,7 @@ CPhysicalLimit::PdsDerive
 {
 	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0)->Pds();
 
-	if (CDistributionSpec::EdtReplicated == pdsOuter->Edt())
+	if (CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt())
 	{
 		// Limit functions can give unstable results and therefore cannot
 		// guarantee strictly replicated data. For example,

@@ -311,7 +311,7 @@ CPhysicalHashJoin::PdsMatch
 			return PdshashedMatching(mp, CDistributionSpecHashed::PdsConvert(pds), ulSourceChildIndex);
 
 		default:
-			GPOS_ASSERT(CDistributionSpec::EdtReplicated == pds->Edt());
+			GPOS_ASSERT(CDistributionSpec::EdtStrictReplicated == pds->Edt());
 			if (EceoRightToLeft == eceo)
 			{
 				GPOS_ASSERT(1 == ulSourceChildIndex);
@@ -465,11 +465,11 @@ CPhysicalHashJoin::PdsRequiredSingleton
 	}
 
 	if (COptCtxt::PoctxtFromTLS()->OptimizeDMLQueryWithSingletonSegment() &&
-	    CDistributionSpec::EdtReplicated == pdsFirst->Edt())
+	    CDistributionSpec::EdtStrictReplicated == pdsFirst->Edt())
 	{
 		// For a DML query that can be optimized by enforcing a non-master gather motion,
 		// we request singleton-segment distribution on the outer child. If the outer child
-		// is replicated, no enforcer gets added; in which case pdsFirst is EdtReplicated.
+		// is replicated, no enforcer gets added; in which case pdsFirst is EdtStrictReplicated.
 		// Hence handle this scenario here and require a singleton-segment on the
 		// inner child to produce a singleton execution alternavtive for the HJ.
 		return GPOS_NEW(mp) CDistributionSpecSingleton(CDistributionSpecSingleton::EstSegment);
@@ -542,7 +542,7 @@ CPhysicalHashJoin::PdsRequiredReplicate
 	}
 
 	// otherwise, require second child to deliver non-singleton distribution
-	GPOS_ASSERT(CDistributionSpec::EdtReplicated == pdsInner->Edt() || CDistributionSpec::EdtTaintedReplicated == pdsInner->Edt());
+	GPOS_ASSERT(CDistributionSpec::EdtStrictReplicated == pdsInner->Edt() || CDistributionSpec::EdtTaintedReplicated == pdsInner->Edt());
 	return GPOS_NEW(mp) CDistributionSpecNonSingleton();
 }
 
@@ -738,7 +738,7 @@ CPhysicalHashJoin::PdsRequired
 	if (exprhdl.HasOuterRefs())
 	{
 		if (CDistributionSpec::EdtSingleton == pdsInput->Edt() ||
-			CDistributionSpec::EdtReplicated == pdsInput->Edt())
+			CDistributionSpec::EdtStrictReplicated == pdsInput->Edt())
 		{
 			return PdsPassThru(mp, exprhdl, pdsInput, child_index);
 		}

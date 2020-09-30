@@ -403,7 +403,7 @@ CPhysicalComputeScalar::PdsDerive
 {
 	CDistributionSpec *pds = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
 
-	if (CDistributionSpec::EdtReplicated == pds->Edt() && IMDFunction::EfsVolatile == exprhdl.DeriveScalarFunctionProperties(1)->Efs())
+	if (CDistributionSpec::EdtStrictReplicated == pds->Edt() && IMDFunction::EfsVolatile == exprhdl.DeriveScalarFunctionProperties(1)->Efs())
 	{
 		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtTainted);
 	}

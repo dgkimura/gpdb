@@ -938,7 +938,7 @@ const
 			break;
 		}
 
-		if (CDistributionSpec::EdtReplicated == edtChild || CDistributionSpec::EdtTaintedReplicated == edtChild)
+		if (CDistributionSpec::EdtStrictReplicated == edtChild || CDistributionSpec::EdtTaintedReplicated == edtChild)
 		{
 			fReplicatedChild = true;
 			pds = pdsChild;
@@ -1086,7 +1086,7 @@ CheckChildDistributions
 	rgedt[0] = CDistributionSpec::EdtSingleton;
 	rgedt[1] = CDistributionSpec::EdtStrictSingleton;
 	rgedt[2] = CDistributionSpec::EdtUniversal;
-	rgedt[3] = CDistributionSpec::EdtReplicated;
+	rgedt[3] = CDistributionSpec::EdtStrictReplicated;
 	rgedt[4] = CDistributionSpec::EdtTaintedReplicated;
 
 	if (fReplicatedChild)

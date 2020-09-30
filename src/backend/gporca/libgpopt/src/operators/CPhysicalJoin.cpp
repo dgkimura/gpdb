@@ -306,7 +306,7 @@ CPhysicalJoin::PdsRequired
 	if (exprhdl.HasOuterRefs())
 	{
 		if (CDistributionSpec::EdtSingleton == pdsRequired->Edt() ||
-			CDistributionSpec::EdtReplicated == pdsRequired->Edt())
+			CDistributionSpec::EdtStrictReplicated == pdsRequired->Edt())
 		{
 			return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 		}
@@ -361,7 +361,7 @@ CPhysicalJoin::PdsDerive
 
 	CDistributionSpec *pds;
 
-	if (CDistributionSpec::EdtReplicated == pdsOuter->Edt() ||
+	if (CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt() ||
 		CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 	{
 		// if outer is replicated/universal, return inner distribution
@@ -1032,7 +1032,7 @@ CPhysicalJoin::Edm
 	GPOS_ASSERT(NULL != pdrgpdpCtxt);
 	CDistributionSpec::EDistributionType edtPrevChild = CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds()->Edt();
 
-	if (CDistributionSpec::EdtReplicated == edtPrevChild ||
+	if (CDistributionSpec::EdtStrictReplicated == edtPrevChild ||
 	    CDistributionSpec::EdtUniversal == edtPrevChild)
 	{
 		// if previous child is replicated or universal, we use

@@ -151,7 +151,7 @@ CEnfdDistribution::Epet
 	{
 		CDistributionSpec *pds = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
 
-		if (CDistributionSpec::EdtReplicated == pds->Edt() &&
+		if (CDistributionSpec::EdtStrictReplicated == pds->Edt() &&
 			CDistributionSpec::EdtHashed == PdsRequired()->Edt() &&
 			EdmSatisfy == m_edm)
 		{

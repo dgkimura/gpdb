@@ -4566,7 +4566,7 @@ CUtils::FDuplicateHazardMotion
 	CDistributionSpec::EDistributionType edtChild = pdsChild->Edt();
 
 	BOOL fReplicatedInput =
-		CDistributionSpec::EdtReplicated == edtChild ||
+		CDistributionSpec::EdtStrictReplicated == edtChild ||
 		CDistributionSpec::EdtUniversal == edtChild ||
 		CDistributionSpec::EdtTaintedReplicated == edtChild;
 

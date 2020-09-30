@@ -154,7 +154,7 @@ CPhysicalInnerHashJoin::PdsDeriveFromReplicatedOuter
 {
 	GPOS_ASSERT(NULL != pdsOuter);
 	GPOS_ASSERT(NULL != pdsInner);
-	GPOS_ASSERT(CDistributionSpec::EdtReplicated == pdsOuter->Edt());
+	GPOS_ASSERT(CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt());
 
 	// if outer child is replicated, join results distribution is defined by inner child
 	if (CDistributionSpec::EdtHashed == pdsInner->Edt())
@@ -247,7 +247,7 @@ CPhysicalInnerHashJoin::PdsDerive
  		}
  	}
 
- 	if (CDistributionSpec::EdtReplicated == pdsOuter->Edt())
+ 	if (CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt())
  	{
 		return PdsDeriveFromReplicatedOuter(mp, pdsOuter, pdsInner);
  	}

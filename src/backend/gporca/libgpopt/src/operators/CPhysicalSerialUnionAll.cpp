@@ -130,7 +130,7 @@ CPhysicalSerialUnionAll::PdsRequired
 		return GPOS_NEW(mp) CDistributionSpecSingleton();
 	}
 
-	if (CDistributionSpec::EdtReplicated == pdsOuter->Edt())
+	if (CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt())
 	{
 		// outer child is replicated, require inner child to be replicated
 		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);

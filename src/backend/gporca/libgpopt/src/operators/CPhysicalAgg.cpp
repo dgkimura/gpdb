@@ -536,7 +536,7 @@ CPhysicalAgg::PdsDerive
 	{
 		return GPOS_NEW(mp) CDistributionSpecStrictSingleton(CDistributionSpecSingleton::EstMaster);
 	}
-	else if (CDistributionSpec::EdtReplicated == pds->Edt())
+	else if (CDistributionSpec::EdtStrictReplicated == pds->Edt())
 	{
 		// Aggregate functions cannot guarantee replicated data. If the child
 		// was replicated, we can no longer guarantee that property. Therefore

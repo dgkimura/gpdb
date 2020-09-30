@@ -51,7 +51,7 @@ namespace gpopt
 					case EReplicatedType::ErtTainted:
 						return CDistributionSpec::EdtTaintedReplicated;
 					case EReplicatedType::ErtStrict:
-						return CDistributionSpec::EdtReplicated;
+						return CDistributionSpec::EdtStrictReplicated;
 					default:
 						GPOS_ASSERT(!"Replicated type must be General, Tainted, or Strict");
 						return CDistributionSpec::EdtSentinel;
@@ -85,7 +85,7 @@ namespace gpopt
 					case CDistributionSpec::EdtTaintedReplicated:
 						os << "TAINTED REPLICATED";
 						break;
-					case CDistributionSpec::EdtReplicated:
+					case CDistributionSpec::EdtStrictReplicated:
 						os << "REPLICATED";
 						break;
 					default:
@@ -102,7 +102,9 @@ namespace gpopt
 				)
 			{
 				GPOS_ASSERT(NULL != pds);
-				GPOS_ASSERT(EdtReplicated == pds->Edt());
+				GPOS_ASSERT(EdtStrictReplicated == pds->Edt() ||
+							EdtGeneralReplicated == pds->Edt() ||
+							EdtTaintedReplicated == pds->Edt());
 
 				return dynamic_cast<CDistributionSpecReplicated*>(pds);
 			}

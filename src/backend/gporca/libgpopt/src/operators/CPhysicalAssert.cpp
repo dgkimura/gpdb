@@ -138,7 +138,7 @@ CPhysicalAssert::PdsRequired
 	if (CDistributionSpec::EdtSingleton == edt ||
 		CDistributionSpec::EdtStrictSingleton == edt ||
 		CDistributionSpec::EdtGeneralReplicated == edt ||
-		CDistributionSpec::EdtReplicated == edt
+		CDistributionSpec::EdtStrictReplicated == edt
 		)
 	{
 		pdsRequired->AddRef();

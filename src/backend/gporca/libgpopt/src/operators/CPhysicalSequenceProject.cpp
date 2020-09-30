@@ -340,7 +340,7 @@ CPhysicalSequenceProject::PdsRequired
 	if (exprhdl.HasOuterRefs())
 	{
 		if (CDistributionSpec::EdtSingleton == pdsRequired->Edt() ||
-			CDistributionSpec::EdtReplicated == pdsRequired->Edt())
+			CDistributionSpec::EdtStrictReplicated == pdsRequired->Edt())
 		{
 			return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 		}
@@ -529,7 +529,7 @@ CPhysicalSequenceProject::PdsDerive
 	const
 {
 	CDistributionSpec *pds = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
-	if (CDistributionSpec::EdtReplicated == pds->Edt())
+	if (CDistributionSpec::EdtStrictReplicated == pds->Edt())
 	{
 		// Sequence project (i.e. window functions) cannot guarantee replicated
 		// data. If the child was replicated, we can no longer guarantee that
