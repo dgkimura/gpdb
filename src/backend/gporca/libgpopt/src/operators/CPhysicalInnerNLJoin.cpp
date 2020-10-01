@@ -129,7 +129,7 @@ CPhysicalInnerNLJoin::Ped
 				dmatch);
 		}
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral),
+			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
 			dmatch);
 	}
 
@@ -188,7 +188,7 @@ CPhysicalInnerNLJoin::Ped
 	if (0 == child_index)
 	{
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral),
+			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
 			dmatch);
 	}
 

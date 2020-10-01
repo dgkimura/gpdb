@@ -328,7 +328,7 @@ CPhysical::PdsCompute
 		}
 
 		case IMDRelation::EreldistrReplicated:
-			return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
+			return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated);
 			break;
 
 		default:
@@ -418,7 +418,7 @@ CPhysical::PdsRequireSingletonOrReplicated
 	{
 		if (0 == ulOptReq)
 		{
-			return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral);
+			return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated);
 		}
 
 		return GPOS_NEW(mp) CDistributionSpecSingleton();

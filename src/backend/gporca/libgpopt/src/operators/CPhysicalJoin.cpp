@@ -333,7 +333,7 @@ CPhysicalJoin::Ped
 				dmatch);
 		}
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral),
+			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
 			dmatch);
 	}
 
@@ -361,7 +361,7 @@ CPhysicalJoin::Ped
 
 		// otherwise, require inner child to be replicated
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral),
+			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
 			CEnfdDistribution::EdmSatisfy);
 	}
 

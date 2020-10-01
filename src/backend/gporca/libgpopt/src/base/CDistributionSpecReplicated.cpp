@@ -28,7 +28,7 @@ namespace gpopt
 		GPOS_ASSERT(!GPOS_FTRACE(EopttraceDisableMotions));
 		GPOS_ASSERT(this == prpp->Ped()->PdsRequired() &&
 					"required plan properties don't match enforced distribution spec");
-		GPOS_ASSERT(Ert() != EReplicatedType::ErtTainted);
+		GPOS_ASSERT(Edt() != CDistributionSpec::EdtTaintedReplicated);
 
 		if (GPOS_FTRACE(EopttraceDisableMotionBroadcast))
 		{
@@ -53,9 +53,9 @@ namespace gpopt
 	)
 	const
 	{
-		GPOS_ASSERT(Ert() != EReplicatedType::ErtGeneral);
+		GPOS_ASSERT(Edt() != CDistributionSpec::EdtReplicated);
 
-		if (Ert() == EReplicatedType::ErtTainted)
+		if (Edt() == CDistributionSpec::EdtTaintedReplicated)
 		{
 			// TaintedReplicated::FSatisfies logic is similar to Replicated::FSatisifes
 			// except that Replicated can match and satisfy another Replicated Spec.
@@ -81,7 +81,7 @@ namespace gpopt
 					return CDistributionSpecSingleton::PdssConvert(pds)->Est() == CDistributionSpecSingleton::EstSegment;
 			}
 		}
-		else if (Ert() == EReplicatedType::ErtStrict)
+		else if (Edt() == CDistributionSpec::EdtStrictReplicated)
 		{
 			if (Matches(pds))
 			{

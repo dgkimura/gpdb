@@ -35,7 +35,7 @@ CPhysicalMotionBroadcast::CPhysicalMotionBroadcast
 	CPhysicalMotion(mp),
 	m_pdsReplicated(NULL)
 {
-	m_pdsReplicated = GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
+	m_pdsReplicated = GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated);
 }
 
 
