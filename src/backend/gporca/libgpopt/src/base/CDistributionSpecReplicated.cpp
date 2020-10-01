@@ -10,20 +10,32 @@
 using namespace gpopt;
 
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CDistributionSpecReplicated::FSatisfies
+//	Check if this distribution spec satisfies the given one
+//	based on following satisfiability rules:
 //
-//	@doc:
-//		Check if this distribution satisfy the given one
+//	pprs = requested distribution
+//	this = derived distribution
 //
-//---------------------------------------------------------------------------
+//	Table - Distribution satisfiability matrix:
+//	  T - Satisfied
+//	  F - Not satisfied; enforcer required
+//	+-------------------------+------------------+-------------------+
+//	|                         | Replicated       | TaintedReplicated |
+//	+-------------------------+------------------+-------------------+
+//	| Matches                 | T                | (default) F       |
+//	| NonSingleton            | FAllowReplicated | same              |
+//	| GeneralReplicated       | T                | T                 |
+//	| singleton & master      | F                | F                 |
+//	| singleton & segment     | T                | T                 |
+//	| ANY                     | T                | T                 |
+//	| others not Singleton    | T                |(default) F        |
+//	+-------------------------+------------------+-------------------+
 BOOL
 CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pds) const
 {
-	GPOS_ASSERT(Ert() != EReplicatedType::ErtGeneral);
+	GPOS_ASSERT(Edt() != CDistributionSpec::EdtReplicated);
 
-	if (Ert() == EReplicatedType::ErtTainted)
+	if (Edt() == CDistributionSpec::EdtTaintedReplicated)
 	{
 		// TaintedReplicated::FSatisfies logic is similar to Replicated::FSatisifes
 		// except that Replicated can match and satisfy another Replicated Spec.
@@ -49,7 +61,7 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pds) const
 				return CDistributionSpecSingleton::PdssConvert(pds)->Est() == CDistributionSpecSingleton::EstSegment;
 		}
 	}
-	else if (Ert() == EReplicatedType::ErtStrict)
+	else if (Edt() == CDistributionSpec::EdtStrictReplicated)
 	{
 		if (Matches(pds))
 		{
@@ -97,7 +109,7 @@ CDistributionSpecReplicated::AppendEnforcers(CMemoryPool *mp,
 	GPOS_ASSERT(!GPOS_FTRACE(EopttraceDisableMotions));
 	GPOS_ASSERT(this == prpp->Ped()->PdsRequired() &&
 				"required plan properties don't match enforced distribution spec");
-	GPOS_ASSERT(Ert() != EReplicatedType::ErtTainted);
+	GPOS_ASSERT(Edt() != CDistributionSpec::EdtTaintedReplicated);
 
 	if (GPOS_FTRACE(EopttraceDisableMotionBroadcast))
 	{

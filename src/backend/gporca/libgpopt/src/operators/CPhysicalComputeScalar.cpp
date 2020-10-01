@@ -379,7 +379,7 @@ CPhysicalComputeScalar::PdsDerive(CMemoryPool *mp,
 
 	if (CDistributionSpec::EdtStrictReplicated == pds->Edt() && IMDFunction::EfsVolatile == exprhdl.DeriveScalarFunctionProperties(1)->Efs())
 	{
-		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtTainted);
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtTaintedReplicated);
 	}
 
 	if (CDistributionSpec::EdtUniversal == pds->Edt() &&

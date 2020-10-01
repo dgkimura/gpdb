@@ -117,8 +117,8 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				dmatch);
 		}
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral),
-			dmatch);
+			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
+			CEnfdDistribution::EdmSatisfy);
 	}
 
 	if (GPOS_FTRACE(EopttraceDisableReplicateInnerNLJOuterChild) ||
@@ -187,7 +187,7 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (0 == child_index)
 	{
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral),
+			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
 			dmatch);
 	}
 

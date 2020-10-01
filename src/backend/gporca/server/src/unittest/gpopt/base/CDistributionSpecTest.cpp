@@ -189,7 +189,7 @@ CDistributionSpecTest::EresUnittest_Replicated()
 
 	// basic tests with replicated distributions
 	CDistributionSpecReplicated *pdsreplicated =
-		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
+		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated);
 
 	GPOS_ASSERT(pdsreplicated->FSatisfies(pdsreplicated));
 	GPOS_ASSERT(pdsreplicated->Matches(pdsreplicated));
@@ -257,7 +257,7 @@ CDistributionSpecTest::EresUnittest_Singleton()
 
 	// singleton and replicated
 	CDistributionSpecReplicated *pdsreplicated =
-		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
+		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated);
 
 	GPOS_ASSERT(pdsreplicated->FSatisfies(pdssSegment));
 	GPOS_ASSERT(!pdsreplicated->FSatisfies(pdssMaster));
@@ -330,7 +330,7 @@ CDistributionSpecTest::EresUnittest_Universal()
 
 	// universal and replicated
 	CDistributionSpecReplicated *pdsreplicated =
-		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
+		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated);
 
 	GPOS_ASSERT(pdsuniversal->FSatisfies(pdsreplicated));
 
@@ -463,7 +463,7 @@ CDistributionSpecTest::EresUnittest_Hashed()
 
 	// hashed and replicated
 	CDistributionSpecReplicated *pdsreplicated =
-		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
+		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated);
 
 	GPOS_ASSERT(pdsreplicated->FSatisfies(pdshashed1));
 	GPOS_ASSERT(!pdshashed1->FSatisfies(pdsreplicated));

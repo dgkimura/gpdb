@@ -315,7 +315,7 @@ CPhysicalHashJoin::PdsMatch(CMemoryPool *mp, CDistributionSpec *pds,
 			GPOS_ASSERT(0 == ulSourceChildIndex);
 
 			// outer child is replicated, replicate inner child too in order to preserve correctness of semi-join
-			return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict);
+			return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated);
 	}
 }
 
@@ -505,7 +505,7 @@ CPhysicalHashJoin::PdsRequiredReplicate(
 	if (1 == child_index)
 	{
 		// require inner child to be replicated
-		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral);
+		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated);
 	}
 	GPOS_ASSERT(0 == child_index);
 
@@ -748,7 +748,7 @@ CPhysicalHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				dmatch);
 		}
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict),
+			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated),
 			dmatch);
 	}
 

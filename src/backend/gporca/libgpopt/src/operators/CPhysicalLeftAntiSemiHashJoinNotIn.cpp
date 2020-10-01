@@ -77,7 +77,7 @@ CPhysicalLeftAntiSemiHashJoinNotIn::Ped(CMemoryPool *mp,
 		// b. if the inner hash keys are nullable, because every segment needs to
 		//	  detect nulls coming from the inner child
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtGeneral),
+			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
 			CEnfdDistribution::EdmSatisfy);
 	}
 

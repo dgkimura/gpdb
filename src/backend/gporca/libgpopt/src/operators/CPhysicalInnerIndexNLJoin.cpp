@@ -160,7 +160,7 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// otherwise, require outer child to be replicated
 	return GPOS_NEW(mp) CEnfdDistribution(
-		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpecReplicated::EReplicatedType::ErtStrict),
+		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated),
 		dmatch);
 }
 
