@@ -130,7 +130,7 @@ CPhysicalInnerNLJoin::Ped
 		}
 		return GPOS_NEW(mp) CEnfdDistribution(
 			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
-			dmatch);
+			CEnfdDistribution::EdmSatisfy);
 	}
 
 	if (GPOS_FTRACE(EopttraceDisableReplicateInnerNLJOuterChild) || 0 == ulOptReq)
