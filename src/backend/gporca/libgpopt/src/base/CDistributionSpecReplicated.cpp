@@ -54,11 +54,13 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pds) const
 			case CDistributionSpec::EdtNonSingleton:
 				// a tainted replicated distribution satisfies the non-singleton
 				// distribution, only if allowed by non-singleton distribution object
-				return CDistributionSpecNonSingleton::PdsConvert(pds)->FAllowReplicated();
+				return CDistributionSpecNonSingleton::PdsConvert(pds)
+					->FAllowReplicated();
 			case CDistributionSpec::EdtSingleton:
 				// a tainted replicated distribution satisfies singleton
 				// distributions that are not master-only
-				return CDistributionSpecSingleton::PdssConvert(pds)->Est() == CDistributionSpecSingleton::EstSegment;
+				return CDistributionSpecSingleton::PdssConvert(pds)->Est() ==
+					   CDistributionSpecSingleton::EstSegment;
 		}
 	}
 	else if (Edt() == CDistributionSpec::EdtStrictReplicated)
@@ -67,13 +69,15 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pds) const
 		{
 			// exact match implies satisfaction
 			return true;
-		 }
+		}
 
 		if (EdtNonSingleton == pds->Edt())
 		{
 			// a replicated distribution satisfies the non-singleton
 			// distribution, only if allowed by non-singleton distribution object
-			return CDistributionSpecNonSingleton::PdsConvert(const_cast<CDistributionSpec *>(pds))->FAllowReplicated();
+			return CDistributionSpecNonSingleton::PdsConvert(
+					   const_cast<CDistributionSpec *>(pds))
+				->FAllowReplicated();
 		}
 
 		// replicated distribution satisfies a general replicated distribution spec
@@ -85,7 +89,8 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pds) const
 		// a replicated distribution satisfies any non-singleton one,
 		// as well as singleton distributions that are not master-only
 		return !(EdtSingleton == pds->Edt() &&
-			   (dynamic_cast<const CDistributionSpecSingleton *>(pds))->FOnMaster());
+				 (dynamic_cast<const CDistributionSpecSingleton *>(pds))
+					 ->FOnMaster());
 	}
 
 	return false;
@@ -107,8 +112,9 @@ CDistributionSpecReplicated::AppendEnforcers(CMemoryPool *mp,
 	GPOS_ASSERT(NULL != pdrgpexpr);
 	GPOS_ASSERT(NULL != pexpr);
 	GPOS_ASSERT(!GPOS_FTRACE(EopttraceDisableMotions));
-	GPOS_ASSERT(this == prpp->Ped()->PdsRequired() &&
-				"required plan properties don't match enforced distribution spec");
+	GPOS_ASSERT(
+		this == prpp->Ped()->PdsRequired() &&
+		"required plan properties don't match enforced distribution spec");
 	GPOS_ASSERT(Edt() != CDistributionSpec::EdtTaintedReplicated);
 
 	if (GPOS_FTRACE(EopttraceDisableMotionBroadcast))

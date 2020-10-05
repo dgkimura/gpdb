@@ -254,11 +254,11 @@ CPhysicalJoin::FOuterProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CDistributionSpec *
 CPhysicalJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
-						  CExpressionHandle &exprhdl GPOS_UNUSED,
-						  CDistributionSpec *,//pdsRequired,
-						  ULONG child_index GPOS_UNUSED,
-						  CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
-						  ULONG // ulOptReq
+						   CExpressionHandle &exprhdl GPOS_UNUSED,
+						   CDistributionSpec *,	 //pdsRequired,
+						   ULONG child_index GPOS_UNUSED,
+						   CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+						   ULONG  // ulOptReq
 ) const
 {
 	std::terminate();
@@ -272,15 +272,15 @@ CPhysicalJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(2 > child_index);
 
-	CEnfdDistribution::EDistributionMatching dmatch = Edm(prppInput, child_index, pdrgpdpCtxt, ulDistrReq);
+	CEnfdDistribution::EDistributionMatching dmatch =
+		Edm(prppInput, child_index, pdrgpdpCtxt, ulDistrReq);
 	CDistributionSpec *const pdsRequired = prppInput->Ped()->PdsRequired();
 
 	// if expression has to execute on a single host then we need a gather
 	if (exprhdl.NeedsSingletonExecution())
 	{
 		return GPOS_NEW(mp) CEnfdDistribution(
-			PdsRequireSingleton(mp, exprhdl, pdsRequired, child_index),
-			dmatch);
+			PdsRequireSingleton(mp, exprhdl, pdsRequired, child_index), dmatch);
 	}
 
 	if (exprhdl.HasOuterRefs())
@@ -289,11 +289,11 @@ CPhysicalJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 			CDistributionSpec::EdtStrictReplicated == pdsRequired->Edt())
 		{
 			return GPOS_NEW(mp) CEnfdDistribution(
-				PdsPassThru(mp, exprhdl, pdsRequired, child_index),
-				dmatch);
+				PdsPassThru(mp, exprhdl, pdsRequired, child_index), dmatch);
 		}
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
+			GPOS_NEW(mp)
+				CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
 			dmatch);
 	}
 
@@ -307,8 +307,7 @@ CPhysicalJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		{
 			// first child is universal, request second child to execute on a single host to avoid duplicates
 			return GPOS_NEW(mp) CEnfdDistribution(
-				GPOS_NEW(mp) CDistributionSpecSingleton(),
-				dmatch);
+				GPOS_NEW(mp) CDistributionSpecSingleton(), dmatch);
 		}
 
 		if (CDistributionSpec::EdtSingleton == pdsOuter->Edt() ||
@@ -323,14 +322,14 @@ CPhysicalJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 		// otherwise, require inner child to be replicated
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
+			GPOS_NEW(mp)
+				CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
 			CEnfdDistribution::EdmSatisfy);
 	}
 
 	// no distribution requirement on the outer side
 	return GPOS_NEW(mp) CEnfdDistribution(
-		GPOS_NEW(mp) CDistributionSpecAny(this->Eopid()),
-		dmatch);
+		GPOS_NEW(mp) CDistributionSpecAny(this->Eopid()), dmatch);
 }
 
 
@@ -934,9 +933,9 @@ CPhysicalJoin::PrsRequiredCorrelatedJoin(CMemoryPool *mp,
 }
 
 CEnfdDistribution *
-CPhysicalJoin::PedCorrelatedJoin(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
-	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+CPhysicalJoin::PedCorrelatedJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								 CReqdPropPlan *prppInput, ULONG child_index,
+								 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_ASSERT(3 == exprhdl.Arity());
 	GPOS_ASSERT(2 > child_index);
@@ -948,7 +947,8 @@ CPhysicalJoin::PedCorrelatedJoin(
 	{
 		// propagate Singleton request to children to comply with
 		// correlated execution requirements
-		return GPOS_NEW(mp) CEnfdDistribution(PdsPassThru(mp, exprhdl, pdsRequired, child_index),
+		return GPOS_NEW(mp) CEnfdDistribution(
+			PdsPassThru(mp, exprhdl, pdsRequired, child_index),
 			CEnfdDistribution::EdmSatisfy);
 	}
 
@@ -957,8 +957,9 @@ CPhysicalJoin::PedCorrelatedJoin(
 	{
 		// if the inner child has a volatile TVF and has outer refs then request
 		// gather from both children
-		return GPOS_NEW(mp) CEnfdDistribution(GPOS_NEW(mp) CDistributionSpecSingleton(),
-			CEnfdDistribution::EdmSatisfy);
+		return GPOS_NEW(mp)
+			CEnfdDistribution(GPOS_NEW(mp) CDistributionSpecSingleton(),
+							  CEnfdDistribution::EdmSatisfy);
 	}
 
 	if (1 == child_index)
@@ -970,8 +971,9 @@ CPhysicalJoin::PedCorrelatedJoin(
 			// if outer child delivers a universal distribution, request inner child
 			// to match Singleton distribution to detect more than one row generated
 			// at runtime, for example: 'select (select 1 union select 2)'
-			return GPOS_NEW(mp) CEnfdDistribution(GPOS_NEW(mp) CDistributionSpecSingleton(),
-				CEnfdDistribution::EdmSatisfy);
+			return GPOS_NEW(mp)
+				CEnfdDistribution(GPOS_NEW(mp) CDistributionSpecSingleton(),
+								  CEnfdDistribution::EdmSatisfy);
 		}
 	}
 

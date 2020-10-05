@@ -552,9 +552,10 @@ public:
 	static CDistributionSpecSingleton *PdssMatching(
 		CMemoryPool *mp, CDistributionSpecSingleton *pdss);
 
-	virtual CEnfdDistribution *
-	Ped(CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
-		ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq);
+	virtual CEnfdDistribution *Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								   CReqdPropPlan *prppInput, ULONG child_index,
+								   CDrvdPropArray *pdrgpdpCtxt,
+								   ULONG ulDistrReq);
 
 };	// class CPhysical
 

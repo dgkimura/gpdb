@@ -96,9 +96,8 @@ public:
 	}
 
 	CEnfdDistribution *
-	Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CReqdPropPlan *prppInput, ULONG child_index,
-				CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+	Ped(CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
+		ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 	{
 		return PedCorrelatedJoin(mp, exprhdl, prppInput, child_index,
 								 pdrgpdpCtxt, ulOptReq);
@@ -106,12 +105,12 @@ public:
 
 	// compute required distribution of the n-th child
 	virtual CDistributionSpec *
-	PdsRequired(CMemoryPool *,       // mp
-				CExpressionHandle &, // exprhdl,
-				CDistributionSpec *, // pdsRequired,
-				ULONG ,              // child_index,
-				CDrvdPropArray *,    // pdrgpdpCtxt,
-				ULONG                //ulOptReq
+	PdsRequired(CMemoryPool *,		  // mp
+				CExpressionHandle &,  // exprhdl,
+				CDistributionSpec *,  // pdsRequired,
+				ULONG,				  // child_index,
+				CDrvdPropArray *,	  // pdrgpdpCtxt,
+				ULONG				  //ulOptReq
 	) const
 	{
 		std::terminate();

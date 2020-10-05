@@ -33,8 +33,9 @@ public:
 		: m_replicated(replicated_type)
 	{
 		GPOS_ASSERT(replicated_type == CDistributionSpec::EdtReplicated ||
-			replicated_type == CDistributionSpec::EdtTaintedReplicated ||
-			replicated_type == CDistributionSpec::EdtStrictReplicated);
+					replicated_type ==
+						CDistributionSpec::EdtTaintedReplicated ||
+					replicated_type == CDistributionSpec::EdtStrictReplicated);
 	}
 
 	// accessor
@@ -76,7 +77,8 @@ public:
 				os << "STRICT REPLICATED";
 				break;
 			default:
-				GPOS_ASSERT(!"Replicated type must be General, Tainted, or Strict");
+				GPOS_ASSERT(
+					!"Replicated type must be General, Tainted, or Strict");
 		}
 		return os;
 	}

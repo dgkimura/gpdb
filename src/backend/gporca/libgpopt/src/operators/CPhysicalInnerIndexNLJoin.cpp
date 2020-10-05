@@ -87,12 +87,11 @@ CPhysicalInnerIndexNLJoin::Matches(COperator *pop) const
 CDistributionSpec *
 CPhysicalInnerIndexNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 									   CExpressionHandle &exprhdl GPOS_UNUSED,
-									   CDistributionSpec *,//pdsRequired,
+									   CDistributionSpec *,	 //pdsRequired,
 									   ULONG child_index GPOS_UNUSED,
 									   CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
-									   ULONG // ulOptReq
-)
-const
+									   ULONG  // ulOptReq
+) const
 {
 	std::terminate();
 	return nullptr;
@@ -105,7 +104,8 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(2 > child_index);
 
-	CEnfdDistribution::EDistributionMatching dmatch = Edm(prppInput, child_index, pdrgpdpCtxt, ulDistrReq);
+	CEnfdDistribution::EDistributionMatching dmatch =
+		Edm(prppInput, child_index, pdrgpdpCtxt, ulDistrReq);
 
 	if (1 == child_index)
 	{
@@ -113,8 +113,8 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		// we allow outer references on the inner child of the join since it needs
 		// to refer to columns in join's outer child
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecAny(
-				this->Eopid(), true /*fAllowOuterRefs*/),
+			GPOS_NEW(mp)
+				CDistributionSpecAny(this->Eopid(), true /*fAllowOuterRefs*/),
 			dmatch);
 	}
 
@@ -128,8 +128,7 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	{
 		// enforce executing on a single host
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecSingleton(),
-			dmatch);
+			GPOS_NEW(mp) CDistributionSpecSingleton(), dmatch);
 	}
 
 	if (CDistributionSpec::EdtHashed == edtInner)
@@ -152,15 +151,14 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 										pdshashedEquiv->FNullsColocated());
 			pdsHashedRequired->ComputeEquivHashExprs(mp, exprhdl);
 
-			return GPOS_NEW(mp) CEnfdDistribution(
-				pdsHashedRequired,
-				dmatch);
+			return GPOS_NEW(mp) CEnfdDistribution(pdsHashedRequired, dmatch);
 		}
 	}
 
 	// otherwise, require outer child to be replicated
 	return GPOS_NEW(mp) CEnfdDistribution(
-		GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated),
+		GPOS_NEW(mp)
+			CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated),
 		dmatch);
 }
 

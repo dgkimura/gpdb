@@ -336,7 +336,8 @@ CPhysicalSequenceProject::PdsRequired(CMemoryPool *mp,
 			return PdsPassThru(mp, exprhdl, pdsRequired, child_index);
 		}
 
-		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated);
+		return GPOS_NEW(mp)
+			CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated);
 	}
 
 	// if the window operator has a partition by clause, then always
@@ -511,7 +512,8 @@ CPhysicalSequenceProject::PdsDerive(CMemoryPool *mp,
 		// Sequence project (i.e. window functions) cannot guarantee replicated
 		// data. If the child was replicated, we can no longer guarantee that
 		// property. Therefore we must now dervive tainted replicated.
-		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtTaintedReplicated);
+		return GPOS_NEW(mp) CDistributionSpecReplicated(
+			CDistributionSpec::EdtTaintedReplicated);
 	}
 	else
 	{

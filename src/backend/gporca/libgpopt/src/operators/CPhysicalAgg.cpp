@@ -490,7 +490,8 @@ CPhysicalAgg::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		// Aggregate functions cannot guarantee replicated data. If the child
 		// was replicated, we can no longer guarantee that property. Therefore
 		// we must now dervive tainted replicated.
-		return GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtTaintedReplicated);
+		return GPOS_NEW(mp) CDistributionSpecReplicated(
+			CDistributionSpec::EdtTaintedReplicated);
 	}
 
 	pds->AddRef();

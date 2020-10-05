@@ -59,7 +59,7 @@ CPhysicalFullMergeJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 									CExpressionHandle &exprhdl GPOS_UNUSED,
 									CDistributionSpec *pdsRequired GPOS_UNUSED,
 									ULONG child_index GPOS_UNUSED,
-									CDrvdPropArray *, //pdrgpdpCtxt,
+									CDrvdPropArray *,  //pdrgpdpCtxt,
 									ULONG ulOptReq GPOS_UNUSED) const
 {
 	std::terminate();
@@ -67,15 +67,10 @@ CPhysicalFullMergeJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 }
 
 CEnfdDistribution *
-CPhysicalFullMergeJoin::Ped
-	(
-	CMemoryPool *mp,
-	CExpressionHandle &exprhdl,
-	CReqdPropPlan *prppInput,
-	ULONG child_index,
-	CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
-	ULONG ulOptReq
-	)
+CPhysicalFullMergeJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
+							CReqdPropPlan *prppInput, ULONG child_index,
+							CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+							ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 
@@ -114,18 +109,14 @@ CPhysicalFullMergeJoin::Ped
 
 		CDistributionSpecHashed *pds = GPOS_NEW(mp)
 			CDistributionSpecHashed(pdrgpexprCurrent, nulls_collocated);
-		return GPOS_NEW(mp) CEnfdDistribution(
-			pds,
-			CEnfdDistribution::EdmExact);
+		return GPOS_NEW(mp) CEnfdDistribution(pds, CEnfdDistribution::EdmExact);
 	}
 	else if (ulOptReq == num_hash_reqs)
 	{
 		clauses->AddRef();
 		CDistributionSpecHashed *pds =
 			GPOS_NEW(mp) CDistributionSpecHashed(clauses, nulls_collocated);
-		return GPOS_NEW(mp) CEnfdDistribution(
-			pds,
-			CEnfdDistribution::EdmExact);
+		return GPOS_NEW(mp) CEnfdDistribution(pds, CEnfdDistribution::EdmExact);
 	}
 	else
 	{

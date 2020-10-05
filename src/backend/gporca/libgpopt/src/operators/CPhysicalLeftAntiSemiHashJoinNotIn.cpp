@@ -42,27 +42,21 @@ CPhysicalLeftAntiSemiHashJoinNotIn::CPhysicalLeftAntiSemiHashJoinNotIn(
 //---------------------------------------------------------------------------
 CDistributionSpec *
 CPhysicalLeftAntiSemiHashJoinNotIn::PdsRequired(
-	CMemoryPool *mp GPOS_UNUSED,
-	CExpressionHandle &exprhdl GPOS_UNUSED,
-	CDistributionSpec *pdsInput GPOS_UNUSED,
-	ULONG child_index GPOS_UNUSED,
+	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
+	CDistributionSpec *pdsInput GPOS_UNUSED, ULONG child_index GPOS_UNUSED,
 	CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
-	ULONG ulOptReq GPOS_UNUSED// identifies which optimization request should be created
-)
-const
+	ULONG ulOptReq
+		GPOS_UNUSED	 // identifies which optimization request should be created
+) const
 {
 	std::terminate();
 	return nullptr;
 }
 
 CEnfdDistribution *
-CPhysicalLeftAntiSemiHashJoinNotIn::Ped(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										CReqdPropPlan *prppInput,
-										ULONG child_index,
-										CDrvdPropArray *pdrgpdpCtxt,
-										ULONG ulOptReq
-	)
+CPhysicalLeftAntiSemiHashJoinNotIn::Ped(
+	CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
+	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());
@@ -77,7 +71,8 @@ CPhysicalLeftAntiSemiHashJoinNotIn::Ped(CMemoryPool *mp,
 		// b. if the inner hash keys are nullable, because every segment needs to
 		//	  detect nulls coming from the inner child
 		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
+			GPOS_NEW(mp)
+				CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
 			CEnfdDistribution::EdmSatisfy);
 	}
 

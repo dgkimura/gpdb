@@ -861,7 +861,8 @@ CPhysicalUnionAll::PdsDeriveFromChildren(CMemoryPool *
 			break;
 		}
 
-		if (CDistributionSpec::EdtStrictReplicated == edtChild || CDistributionSpec::EdtTaintedReplicated == edtChild)
+		if (CDistributionSpec::EdtStrictReplicated == edtChild ||
+			CDistributionSpec::EdtTaintedReplicated == edtChild)
 		{
 			fReplicatedChild = true;
 			pds = pdsChild;

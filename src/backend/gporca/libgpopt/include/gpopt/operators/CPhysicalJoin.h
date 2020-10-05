@@ -148,12 +148,9 @@ protected:
 	BOOL FFirstChildToOptimize(ULONG child_index) const;
 
 	// helper to compute required distribution of correlated join's children
-	CEnfdDistribution *PedCorrelatedJoin(CMemoryPool *mp,
-												 CExpressionHandle &exprhdl,
-												 CReqdPropPlan *prppInput,
-												 ULONG child_index,
-												 CDrvdPropArray *pdrgpdpCtxt,
-												 ULONG ulOptReq);
+	CEnfdDistribution *PedCorrelatedJoin(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
+		ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
 
 	// helper to compute required rewindability of correlated join's children
 	CRewindabilitySpec *PrsRequiredCorrelatedJoin(

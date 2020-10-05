@@ -69,13 +69,10 @@ private:
 											   ULONG ulOptReq) const;
 
 	// create (non-singleton, replicate) optimization request
-	CDistributionSpec *PdsRequiredReplicate(CMemoryPool *mp,
-											CExpressionHandle &exprhdl,
-											CDistributionSpec *pdsInput,
-											ULONG child_index,
-											CDrvdPropArray *pdrgpdpCtxt,
-											ULONG ulOptReq,
-											CReqdPropPlan *prppInput);
+	CDistributionSpec *PdsRequiredReplicate(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		CDistributionSpec *pdsInput, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq, CReqdPropPlan *prppInput);
 
 	// create (singleton, singleton) optimization request
 	CDistributionSpec *PdsRequiredSingleton(CMemoryPool *mp,
