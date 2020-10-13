@@ -156,10 +156,14 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// otherwise, require outer child to be replicated
+	// The match type for this request has to be "Satisfy" since EdtReplicated
+	// is required only property. Since a Broadcast motion will always
+	// derive a EdtStrictReplicated distribution spec, it will never "Match"
+	// the required distribution spec and hence will not be optimized.
 	return GPOS_NEW(mp) CEnfdDistribution(
 		GPOS_NEW(mp)
-			CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated),
-		dmatch);
+			CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
+		CEnfdDistribution::EdmSatisfy);
 }
 
 
