@@ -730,15 +730,14 @@ CPhysicalHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());
 
-	CEnfdDistribution::EDistributionMatching dmatch =
-		Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
 	CDistributionSpec *const pdsInput = prppInput->Ped()->PdsRequired();
 
 	// if expression has to execute on a single host then we need a gather
 	if (exprhdl.NeedsSingletonExecution())
 	{
 		return GPOS_NEW(mp) CEnfdDistribution(
-			PdsRequireSingleton(mp, exprhdl, pdsInput, child_index), dmatch);
+			PdsRequireSingleton(mp, exprhdl, pdsInput, child_index),
+			CEnfdDistribution::EdmSatisfy);
 	}
 
 	if (exprhdl.HasOuterRefs())
@@ -747,12 +746,13 @@ CPhysicalHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 			CDistributionSpec::EdtStrictReplicated == pdsInput->Edt())
 		{
 			return GPOS_NEW(mp) CEnfdDistribution(
-				PdsPassThru(mp, exprhdl, pdsInput, child_index), dmatch);
+				PdsPassThru(mp, exprhdl, pdsInput, child_index),
+				CEnfdDistribution::EdmSatisfy);
 		}
 		return GPOS_NEW(mp)
 			CEnfdDistribution(GPOS_NEW(mp) CDistributionSpecReplicated(
 								  CDistributionSpec::EdtStrictReplicated),
-							  dmatch);
+							  CEnfdDistribution::EdmSatisfy);
 	}
 
 	const ULONG ulHashDistributeRequests =
@@ -768,7 +768,17 @@ CPhysicalHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				CDistributionSpecHashed::PdsConvert(pds);
 			pdsHashed->ComputeEquivHashExprs(mp, exprhdl);
 		}
-		return GPOS_NEW(mp) CEnfdDistribution(pds, dmatch);
+
+		if (FFirstChildToOptimize(child_index) ||
+			CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds()->Edt() ==
+				CDistributionSpec::EdtStrictReplicated ||
+			CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds()->Edt() ==
+				CDistributionSpec::EdtUniversal)
+		{
+			return GPOS_NEW(mp)
+				CEnfdDistribution(pds, CEnfdDistribution::EdmSatisfy);
+		}
+		return GPOS_NEW(mp) CEnfdDistribution(pds, CEnfdDistribution::EdmExact);
 	}
 
 	if (ulOptReq == ulHashDistributeRequests ||
@@ -784,17 +794,41 @@ CPhysicalHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 			CDistributionSpecHashed *pdsHashed =
 				CDistributionSpecHashed::PdsConvert(pds);
 			pdsHashed->ComputeEquivHashExprs(mp, exprhdl);
+			return GPOS_NEW(mp)
+				CEnfdDistribution(pds, CEnfdDistribution::EdmSatisfy);
 		}
-		return GPOS_NEW(mp) CEnfdDistribution(pds, dmatch);
+
+		if (FFirstChildToOptimize(child_index) ||
+			CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds()->Edt() ==
+				CDistributionSpec::EdtStrictReplicated ||
+			CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds()->Edt() ==
+				CDistributionSpec::EdtUniversal)
+		{
+			return GPOS_NEW(mp)
+				CEnfdDistribution(pds, CEnfdDistribution::EdmSatisfy);
+		}
+		return GPOS_NEW(mp) CEnfdDistribution(pds, CEnfdDistribution::EdmExact);
 	}
 
 	GPOS_ASSERT(ulOptReq == ulHashDistributeRequests + 2);
 
 	// requests N+3 is (singleton, singleton)
 
+	if (FFirstChildToOptimize(child_index) ||
+		CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds()->Edt() ==
+			CDistributionSpec::EdtStrictReplicated ||
+		CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds()->Edt() ==
+			CDistributionSpec::EdtUniversal)
+	{
+		// use satisfaction for the first child to be optimized
+		return GPOS_NEW(mp)
+			CEnfdDistribution(PdsRequiredSingleton(mp, exprhdl, pdsInput,
+												   child_index, pdrgpdpCtxt),
+							  CEnfdDistribution::EdmSatisfy);
+	}
 	return GPOS_NEW(mp) CEnfdDistribution(
 		PdsRequiredSingleton(mp, exprhdl, pdsInput, child_index, pdrgpdpCtxt),
-		dmatch);
+		CEnfdDistribution::EdmExact);
 }
 
 

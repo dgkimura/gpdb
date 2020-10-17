@@ -58,13 +58,12 @@ CPhysicalLeftOuterIndexNLJoin::PdsRequired(
 
 CEnfdDistribution *
 CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CReqdPropPlan *prppInput, ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+								   CReqdPropPlan *prppInput GPOS_UNUSED,
+								   ULONG child_index,
+								   CDrvdPropArray *pdrgpdpCtxt,
+								   ULONG ulOptReq GPOS_UNUSED)
 {
 	GPOS_ASSERT(2 > child_index);
-
-	CEnfdDistribution::EDistributionMatching dmatch =
-		Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
 
 	if (1 == child_index)
 	{
@@ -74,7 +73,7 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		return GPOS_NEW(mp) CEnfdDistribution(
 			GPOS_NEW(mp)
 				CDistributionSpecAny(this->Eopid(), true /*fAllowOuterRefs*/),
-			dmatch);
+			CEnfdDistribution::EdmSatisfy);
 	}
 
 	// we need to match distribution of inner
@@ -86,8 +85,9 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CDistributionSpec::EdtUniversal == edtInner)
 	{
 		// enforce executing on a single host
-		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecSingleton(), dmatch);
+		return GPOS_NEW(mp)
+			CEnfdDistribution(GPOS_NEW(mp) CDistributionSpecSingleton(),
+							  CEnfdDistribution::EdmSatisfy);
 	}
 
 	if (CDistributionSpec::EdtHashed == edtInner)
@@ -120,7 +120,8 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 										pdshashedEquiv->FNullsColocated());
 			pdsHashedRequired->ComputeEquivHashExprs(mp, exprhdl);
 
-			return GPOS_NEW(mp) CEnfdDistribution(pdsHashedRequired, dmatch);
+			return GPOS_NEW(mp) CEnfdDistribution(pdsHashedRequired,
+												  CEnfdDistribution::EdmExact);
 		}
 
 		// if the equivalent spec cannot be used, request the original - even
@@ -128,7 +129,8 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		// enforcement, it is still better than falling back to planner, since
 		// there may be other alternatives that will succeed.
 		pdshashed->AddRef();
-		return GPOS_NEW(mp) CEnfdDistribution(pdshashed, dmatch);
+		return GPOS_NEW(mp)
+			CEnfdDistribution(pdshashed, CEnfdDistribution::EdmExact);
 	}
 
 	// shouldn't come here!
@@ -139,7 +141,7 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	return GPOS_NEW(mp) CEnfdDistribution(
 		GPOS_NEW(mp)
 			CDistributionSpecReplicated(CDistributionSpec::EdtStrictReplicated),
-		dmatch);
+		CEnfdDistribution::EdmSatisfy);
 }
 
 

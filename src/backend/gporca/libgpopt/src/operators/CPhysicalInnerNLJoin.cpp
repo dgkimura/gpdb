@@ -91,20 +91,20 @@ CPhysicalInnerNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 CEnfdDistribution *
 CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						  CReqdPropPlan *prppInput, ULONG child_index,
-						  CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+						  CDrvdPropArray *pdrgpdpCtxt,
+						  ULONG ulOptReq GPOS_UNUSED)
 {
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());
 
-	CEnfdDistribution::EDistributionMatching dmatch =
-		Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
 	CDistributionSpec *const pdsRequired = prppInput->Ped()->PdsRequired();
 
 	// if expression has to execute on a single host then we need a gather
 	if (exprhdl.NeedsSingletonExecution())
 	{
 		return GPOS_NEW(mp) CEnfdDistribution(
-			PdsRequireSingleton(mp, exprhdl, pdsRequired, child_index), dmatch);
+			PdsRequireSingleton(mp, exprhdl, pdsRequired, child_index),
+			CEnfdDistribution::EdmSatisfy);
 	}
 
 	if (exprhdl.HasOuterRefs())
@@ -112,8 +112,15 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		if (CDistributionSpec::EdtSingleton == pdsRequired->Edt() ||
 			CDistributionSpec::EdtStrictReplicated == pdsRequired->Edt())
 		{
+			if (FFirstChildToOptimize(child_index))
+			{
+				return GPOS_NEW(mp) CEnfdDistribution(
+					PdsPassThru(mp, exprhdl, pdsRequired, child_index),
+					CEnfdDistribution::EdmSatisfy);
+			}
 			return GPOS_NEW(mp) CEnfdDistribution(
-				PdsPassThru(mp, exprhdl, pdsRequired, child_index), dmatch);
+				PdsPassThru(mp, exprhdl, pdsRequired, child_index),
+				CEnfdDistribution::EdmExact);
 		}
 		return GPOS_NEW(mp) CEnfdDistribution(
 			GPOS_NEW(mp)
@@ -172,8 +179,8 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexprMatching,
 															 fNullsColocated);
 					pdshashedEquiv->ComputeEquivHashExprs(mp, exprhdl);
-					return GPOS_NEW(mp)
-						CEnfdDistribution(pdshashedEquiv, dmatch);
+					return GPOS_NEW(mp) CEnfdDistribution(
+						pdshashedEquiv, CEnfdDistribution::EdmExact);
 				}
 				pdrgpexprMatching->Release();
 			}
@@ -188,7 +195,7 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		return GPOS_NEW(mp) CEnfdDistribution(
 			GPOS_NEW(mp)
 				CDistributionSpecReplicated(CDistributionSpec::EdtReplicated),
-			dmatch);
+			CEnfdDistribution::EdmSatisfy);
 	}
 
 	// compute a matching distribution based on derived distribution of outer child
@@ -197,12 +204,14 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 	{
 		// first child is universal, request second child to execute on a single host to avoid duplicates
-		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecSingleton(), dmatch);
+		return GPOS_NEW(mp)
+			CEnfdDistribution(GPOS_NEW(mp) CDistributionSpecSingleton(),
+							  CEnfdDistribution::EdmSatisfy);
 	}
 
 	return GPOS_NEW(mp)
-		CEnfdDistribution(GPOS_NEW(mp) CDistributionSpecNonSingleton(), dmatch);
+		CEnfdDistribution(GPOS_NEW(mp) CDistributionSpecNonSingleton(),
+						  CEnfdDistribution::EdmSatisfy);
 }
 
 // EOF

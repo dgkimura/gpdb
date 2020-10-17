@@ -99,13 +99,11 @@ CPhysicalInnerIndexNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 
 CEnfdDistribution *
 CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   CReqdPropPlan *prppInput, ULONG child_index,
-							   CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq)
+							   CReqdPropPlan *prppInput GPOS_UNUSED,
+							   ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+							   ULONG ulDistrReq GPOS_UNUSED)
 {
 	GPOS_ASSERT(2 > child_index);
-
-	CEnfdDistribution::EDistributionMatching dmatch =
-		Edm(prppInput, child_index, pdrgpdpCtxt, ulDistrReq);
 
 	if (1 == child_index)
 	{
@@ -115,7 +113,7 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		return GPOS_NEW(mp) CEnfdDistribution(
 			GPOS_NEW(mp)
 				CDistributionSpecAny(this->Eopid(), true /*fAllowOuterRefs*/),
-			dmatch);
+			CEnfdDistribution::EdmSatisfy);
 	}
 
 	// we need to match distribution of inner
@@ -126,9 +124,17 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CDistributionSpec::EdtStrictSingleton == edtInner ||
 		CDistributionSpec::EdtUniversal == edtInner)
 	{
+		if (FFirstChildToOptimize(child_index))
+		{
+			// use satisfaction for the first child to be optimized
+			return GPOS_NEW(mp)
+				CEnfdDistribution(GPOS_NEW(mp) CDistributionSpecSingleton(),
+								  CEnfdDistribution::EdmSatisfy);
+		}
 		// enforce executing on a single host
-		return GPOS_NEW(mp) CEnfdDistribution(
-			GPOS_NEW(mp) CDistributionSpecSingleton(), dmatch);
+		return GPOS_NEW(mp)
+			CEnfdDistribution(GPOS_NEW(mp) CDistributionSpecSingleton(),
+							  CEnfdDistribution::EdmExact);
 	}
 
 	if (CDistributionSpec::EdtHashed == edtInner)
@@ -151,7 +157,8 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 										pdshashedEquiv->FNullsColocated());
 			pdsHashedRequired->ComputeEquivHashExprs(mp, exprhdl);
 
-			return GPOS_NEW(mp) CEnfdDistribution(pdsHashedRequired, dmatch);
+			return GPOS_NEW(mp) CEnfdDistribution(pdsHashedRequired,
+												  CEnfdDistribution::EdmExact);
 		}
 	}
 
