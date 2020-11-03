@@ -1631,8 +1631,12 @@ CCostModelGPDB::CostIndexOnlyScan(CMemoryPool *mp GPOS_UNUSED,	  // mp
 
 	CDouble dCostPerIndexRow = ulIndexKeys * dIndexFilterCostUnit +
 							   dTableWidth * dIndexScanTupCostUnit;
-	CDouble dPartialVisFrac =
-		1 - (CDouble(stats->RelAllVisible()) / CDouble(stats->RelPages()));
+	CDouble dPartialVisFrac(1);
+	if (stats->RelPages() != 0)
+	{
+		dPartialVisFrac =
+			1 - (CDouble(stats->RelAllVisible()) / CDouble(stats->RelPages()));
+	}
 	return CCost(pci->NumRebinds() *
 				 (dRowsIndex * dCostPerIndexRow +
 				  dIndexScanTupRandomFactor * dPartialVisFrac));
