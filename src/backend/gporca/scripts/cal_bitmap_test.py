@@ -574,13 +574,7 @@ def find_crossover(conn, lowParamValue, highParamLimit, setup, parameterizeMetho
     execDict = {}
     errMessages = []
     timedOutDict = {}
-    expPrevPlan = ""
-    expPrevParamValue = lowParamValue
-    expCrossoverOccurred = False
     expCrossoverLow = lowParamValue - 1
-    expCrossoverHigh = highParamLimit
-    expCrossoverLowPlan = ""
-    expCrossoverHighPlan = ""
     reset_method(conn)
 
     # determine the increment
@@ -603,16 +597,6 @@ def find_crossover(conn, lowParamValue, highParamLimit, setup, parameterizeMetho
         (plan, cost) = explain_method(conn, sqlString)
         explainDict[paramValue] = (plan, cost)
         log_output("For param value %d the optimizer chose %s with a cost of %f" % (paramValue, plan, cost))
-
-        # look for the crossover from one plan to another
-        if not expCrossoverOccurred and paramValue > lowParamValue and plan != expPrevPlan:
-            expCrossoverOccurred = True
-            expCrossoverLow = expPrevParamValue
-            expCrossoverLowPlan = expPrevPlan
-            expCrossoverHigh = paramValue
-            expCrossoverHighPlan = plan
-        expPrevPlan = plan
-        expPrevParamValue = paramValue
 
         # execute the query, if requested
         if execute_n_times > 0:
