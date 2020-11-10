@@ -139,7 +139,7 @@ def dump_query(connectionInfo, query_file):
     p = subprocess.Popen(query_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ)
 
     if p.wait() is not 0:
-        errormsg = p.communicate()[1]
+        errormsg = p.communicate()[1].decode('ascii')
         sys.stderr.writelines('\nError when executing function gp_dump_query_oids.\n\n' + errormsg + '\n\n')
         sys.exit(1)
 
@@ -186,11 +186,11 @@ def pg_dump_object(mr_query, connectionInfo, envOpts):
     print(dmp_cmd)
     p = subprocess.Popen(dmp_cmd, shell=True, stderr=subprocess.PIPE, env=envOpts)
     if p.wait() is not 0:
-        sys.stderr.write('\nError while dumping schema.\n\n' + p.communicate()[1] + '\n\n')
+        sys.stderr.write('\nError while dumping schema.\n\n' + p.communicate()[1].decode('ascii') + '\n\n')
         sys.exit(1)
 
 def dump_tuple_count(cur, oid_str, f_out):
-    stmt = "SELECT pgc.relname, pgn.nspname, pgc.relpages, pgc.reltuples FROM pg_class pgc, pg_namespace pgn " \
+    stmt = "SELECT pgc.relname, pgn.nspname, pgc.relpages, pgc.reltuples, pgc.relallvisible FROM pg_class pgc, pg_namespace pgn " \
             "WHERE pgc.relnamespace = pgn.oid and pgc.oid in (%s) and pgn.nspname NOT LIKE 'pg_temp_%%'" % (oid_str)
 
     templateStmt = '-- Table: {1}\n' \
@@ -201,7 +201,7 @@ def dump_tuple_count(cur, oid_str, f_out):
 
     cur.execute(stmt)
     columns = [x[0] for x in cur.description]
-    types = ['int', 'real']
+    types = ['int', 'real', 'int']
     for vals in result_iter(cur):
         lines = []
         for col, val, typ in zip(columns[2:], vals[2:], types):
