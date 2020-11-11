@@ -440,7 +440,7 @@ explain (costs off)
  Finalize Aggregate
    ->  Gather Motion 3:1  (slice1; segments: 3)
          ->  Partial Aggregate
-               ->  Index Scan using tenk1_thous_tenthous on tenk1
+               ->  Index Only Scan using tenk1_thous_tenthous on tenk1
                      Index Cond: (thousand > 95)
  Optimizer: Pivotal Optimizer (GPORCA)
 (6 rows)
@@ -494,7 +494,7 @@ select * from
          ->  Materialize
                ->  Gather Motion 3:1  (slice1; segments: 3)
                      ->  Partial Aggregate
-                           ->  Index Scan using tenk1_thous_tenthous on tenk1
+                           ->  Index Only Scan using tenk1_thous_tenthous on tenk1
                                  Index Cond: (thousand > 99)
  Optimizer: Pivotal Optimizer (GPORCA)
 (10 rows)
@@ -538,7 +538,7 @@ explain (costs off)
                      ->  Broadcast Motion 3:3  (slice2; segments: 3)
                            ->  Seq Scan on tenk2
                                  Filter: (thousand = 0)
-                     ->  Index Scan using tenk1_hundred on tenk1
+                     ->  Index Only Scan using tenk1_hundred on tenk1
                            Index Cond: (hundred > 1)
  Optimizer: Pivotal Optimizer (GPORCA)
 (11 rows)
@@ -577,10 +577,11 @@ explain (analyze, timing off, summary off, costs off)
                            ->  Seq Scan on tenk2 (actual rows=5 loops=1)
                                  Filter: (thousand = 0)
                                  Rows Removed by Filter: 3363
-                     ->  Index Scan using tenk1_hundred on tenk1 (actual rows=3018 loops=11)
+                     ->  Index Only Scan using tenk1_hundred on tenk1 (actual rows=3018 loops=11)
                            Index Cond: (hundred > 1)
+                           Heap Fetches: 0
  Optimizer: Pivotal Optimizer (GPORCA)
-(12 rows)
+(13 rows)
 
 alter table tenk2 reset (parallel_workers);
 reset work_mem;
