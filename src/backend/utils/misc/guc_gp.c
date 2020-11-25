@@ -455,7 +455,6 @@ static const struct config_enum_entry optimizer_minidump_options[] = {
 };
 
 static const struct config_enum_entry optimizer_cost_model_options[] = {
-	{"legacy", OPTIMIZER_GPDB_LEGACY},
 	{"calibrated", OPTIMIZER_GPDB_CALIBRATED},
 	{"experimental", OPTIMIZER_GPDB_EXPERIMENTAL},
 	{NULL, 0}

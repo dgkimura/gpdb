@@ -52,7 +52,6 @@ class ICostModel : public CRefCount
 public:
 	enum ECostModelType
 	{
-		EcmtGPDBLegacy = 0,
 		EcmtGPDBCalibrated = 1,
 		EcmtSentinel = 2
 	};

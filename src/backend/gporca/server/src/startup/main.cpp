@@ -27,7 +27,7 @@
 #include "gpopt/xforms/CXformFactory.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
 
-#include "gpdbcost/CCostModelGPDBLegacy.h"
+#include "gpdbcost/CCostModelGPDB.h"
 
 // test headers
 

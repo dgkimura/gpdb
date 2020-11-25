@@ -27,7 +27,6 @@
 #include "unittest/gpopt/CTestUtils.h"
 
 #include "gpdbcost/CCostModelGPDB.h"
-#include "gpdbcost/CCostModelGPDBLegacy.h"
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -135,7 +134,7 @@ CCostTest::EresUnittest_Bool()
 //
 //---------------------------------------------------------------------------
 void
-CCostTest::TestParams(CMemoryPool *mp, BOOL fCalibrated)
+CCostTest::TestParams(CMemoryPool *mp)
 {
 	CAutoTrace at(mp);
 	IOstream &os(at.Os());
@@ -150,52 +149,21 @@ CCostTest::TestParams(CMemoryPool *mp, BOOL fCalibrated)
 	CDouble dHashFactor(0.0);
 	CDouble dDefaultCost(0.0);
 
-	if (fCalibrated)
-	{
-		pcp = ((CCostModelGPDB *) COptCtxt::PoctxtFromTLS()->GetCostModel())
-				  ->GetCostModelParams();
+	pcp = ((CCostModelGPDB *) COptCtxt::PoctxtFromTLS()->GetCostModel())
+			  ->GetCostModelParams();
 
-		dSeqIOBandwidth =
-			pcp->PcpLookup(CCostModelParamsGPDB::EcpSeqIOBandwidth)->Get();
-		dRandomIOBandwidth =
-			pcp->PcpLookup(CCostModelParamsGPDB::EcpRandomIOBandwidth)->Get();
-		dTupProcBandwidth =
-			pcp->PcpLookup(CCostModelParamsGPDB::EcpTupProcBandwidth)->Get();
-		dNetBandwidth =
-			pcp->PcpLookup(CCostModelParamsGPDB::EcpNetBandwidth)->Get();
-		dSegments = pcp->PcpLookup(CCostModelParamsGPDB::EcpSegments)->Get();
-		dNLJFactor = pcp->PcpLookup(CCostModelParamsGPDB::EcpNLJFactor)->Get();
-		dHashFactor =
-			pcp->PcpLookup(CCostModelParamsGPDB::EcpHashFactor)->Get();
-		dDefaultCost =
-			pcp->PcpLookup(CCostModelParamsGPDB::EcpDefaultCost)->Get();
-	}
-	else
-	{
-		pcp =
-			((CCostModelGPDBLegacy *) COptCtxt::PoctxtFromTLS()->GetCostModel())
-				->GetCostModelParams();
-
-		dSeqIOBandwidth =
-			pcp->PcpLookup(CCostModelParamsGPDBLegacy::EcpSeqIOBandwidth)
-				->Get();
-		dRandomIOBandwidth =
-			pcp->PcpLookup(CCostModelParamsGPDBLegacy::EcpRandomIOBandwidth)
-				->Get();
-		dTupProcBandwidth =
-			pcp->PcpLookup(CCostModelParamsGPDBLegacy::EcpTupProcBandwidth)
-				->Get();
-		dNetBandwidth =
-			pcp->PcpLookup(CCostModelParamsGPDBLegacy::EcpNetBandwidth)->Get();
-		dSegments =
-			pcp->PcpLookup(CCostModelParamsGPDBLegacy::EcpSegments)->Get();
-		dNLJFactor =
-			pcp->PcpLookup(CCostModelParamsGPDBLegacy::EcpNLJFactor)->Get();
-		dHashFactor =
-			pcp->PcpLookup(CCostModelParamsGPDBLegacy::EcpHashFactor)->Get();
-		dDefaultCost =
-			pcp->PcpLookup(CCostModelParamsGPDBLegacy::EcpDefaultCost)->Get();
-	}
+	dSeqIOBandwidth =
+		pcp->PcpLookup(CCostModelParamsGPDB::EcpSeqIOBandwidth)->Get();
+	dRandomIOBandwidth =
+		pcp->PcpLookup(CCostModelParamsGPDB::EcpRandomIOBandwidth)->Get();
+	dTupProcBandwidth =
+		pcp->PcpLookup(CCostModelParamsGPDB::EcpTupProcBandwidth)->Get();
+	dNetBandwidth =
+		pcp->PcpLookup(CCostModelParamsGPDB::EcpNetBandwidth)->Get();
+	dSegments = pcp->PcpLookup(CCostModelParamsGPDB::EcpSegments)->Get();
+	dNLJFactor = pcp->PcpLookup(CCostModelParamsGPDB::EcpNLJFactor)->Get();
+	dHashFactor = pcp->PcpLookup(CCostModelParamsGPDB::EcpHashFactor)->Get();
+	dDefaultCost = pcp->PcpLookup(CCostModelParamsGPDB::EcpDefaultCost)->Get();
 
 	os << std::endl << "Lookup cost model params by id: " << std::endl;
 	os << "Seq I/O bandwidth: " << dSeqIOBandwidth << std::endl;
@@ -256,21 +224,11 @@ CCostTest::EresUnittest_Params()
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	{
-		// install opt context in TLS
-		CAutoOptCtxt aoc(mp, &mda, NULL, /* pceeval */
-						 CTestUtils::GetCostModel(mp));
+	// install opt context in TLS
+	CAutoOptCtxt aoc(mp, &mda, NULL, /* pceeval */
+					 GPOS_NEW(mp) CCostModelGPDB(mp, GPOPT_TEST_SEGMENTS));
 
-		TestParams(mp, false /*fCalibrated*/);
-	}
-
-	{
-		// install opt context in TLS
-		CAutoOptCtxt aoc(mp, &mda, NULL, /* pceeval */
-						 GPOS_NEW(mp) CCostModelGPDB(mp, GPOPT_TEST_SEGMENTS));
-
-		TestParams(mp, true /*fCalibrated*/);
-	}
+	TestParams(mp);
 
 	return GPOS_OK;
 }

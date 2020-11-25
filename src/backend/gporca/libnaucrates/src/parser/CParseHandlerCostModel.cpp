@@ -23,7 +23,6 @@
 #include "naucrates/dxl/xml/dxltokens.h"
 
 #include "gpdbcost/CCostModelGPDB.h"
-#include "gpdbcost/CCostModelGPDBLegacy.h"
 
 using namespace gpdxl;
 using namespace gpdbcost;
@@ -139,10 +138,6 @@ CParseHandlerCostModel::EndElement(const XMLCh *const,	// element_uri,
 
 	switch (m_cost_model_type)
 	{
-		case ICostModel::EcmtGPDBLegacy:
-			m_cost_model =
-				GPOS_NEW(m_mp) CCostModelGPDBLegacy(m_mp, m_num_of_segments);
-			break;
 		case ICostModel::EcmtGPDBCalibrated:
 			CCostModelParamsGPDB *pcp;
 
