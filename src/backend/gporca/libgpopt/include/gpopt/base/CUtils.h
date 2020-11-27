@@ -1182,6 +1182,8 @@ void
 CUtils::AddRefAppend(CDynamicPtrArray<T, CleanupFn> *pdrgptOutput,
 					 CDynamicPtrArray<T, CleanupFn> *pdrgptInput, ULONG ulStart)
 {
+	static_assert(&gpos::CleanupRelease<T> == CleanupFn, "");
+
 	GPOS_ASSERT(nullptr != pdrgptOutput);
 	GPOS_ASSERT(nullptr != pdrgptInput);
 
