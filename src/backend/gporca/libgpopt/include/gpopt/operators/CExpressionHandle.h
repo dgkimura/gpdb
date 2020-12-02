@@ -239,6 +239,13 @@ public:
 		return DeriveFunctionProperties()->NeedsSingletonExecution();
 	}
 
+	// check if attached expression must execute on a single host
+	BOOL
+	ContainsFunction()
+	{
+		return DeriveFunctionProperties()->ContainsFunction();
+	}
+
 	// check for outer references in the given child
 	BOOL
 	HasOuterRefs(ULONG child_index)

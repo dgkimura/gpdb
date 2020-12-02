@@ -70,6 +70,12 @@ CFunctionProp::NeedsSingletonExecution() const
 					   IMDFunction::EfsStable == m_efs);
 }
 
+BOOL
+CFunctionProp::ContainsFunction() const
+{
+	return IMDFunction::EfsVolatile == m_efs || IMDFunction::EfsStable == m_efs;
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CFunctionProp::OsPrint

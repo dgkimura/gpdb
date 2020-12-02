@@ -78,6 +78,7 @@ public:
 
 	// check if must execute on a single host
 	BOOL NeedsSingletonExecution() const;
+	BOOL ContainsFunction() const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

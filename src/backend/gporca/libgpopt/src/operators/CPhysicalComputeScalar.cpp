@@ -233,7 +233,7 @@ CPhysicalComputeScalar::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		return GPOS_NEW(mp) CDistributionSpecRandom();
 	}
 
-	if (0 == ulOptReq)
+	if (0 == ulOptReq || exprhdl.ContainsFunction())
 	{
 		// Req0: required distribution will be enforced on top of ComputeScalar
 		return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid());
