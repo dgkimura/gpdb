@@ -12,6 +12,7 @@
 #define GPOPT_CSchedulerContext_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #define GPOPT_SCHED_CTXT_MEM_POOL_SIZE (64 * 1024 * 1024)
 
@@ -42,7 +43,7 @@ private:
 	CMemoryPool *m_pmpLocal{nullptr};
 
 	// job factory
-	CJobFactory *m_pjf;
+	gpos::pointer<CJobFactory *> m_pjf;
 
 	// scheduler
 	CScheduler *m_psched{nullptr};
