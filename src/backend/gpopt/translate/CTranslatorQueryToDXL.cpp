@@ -2613,7 +2613,7 @@ CTranslatorQueryToDXL::CreateDXLSetOpFromColumns(
 	CDXLNodeArray *children_dxlnodes, BOOL is_cast_across_input,
 	BOOL keep_res_junked) const
 {
-	GPOS_ASSERT(NULL != output_target_list);
+	//GPOS_ASSERT(NULL != output_target_list);
 	GPOS_ASSERT(NULL != output_colids);
 	GPOS_ASSERT(NULL != input_colids);
 	GPOS_ASSERT(NULL != children_dxlnodes);
@@ -2731,7 +2731,7 @@ CTranslatorQueryToDXL::SetOpNeedsCast(List *target_list,
 									  IMdIdArray *input_col_mdids) const
 {
 	GPOS_ASSERT(NULL != input_col_mdids);
-	GPOS_ASSERT(NULL != target_list);
+	//GPOS_ASSERT(NULL != target_list);
 	GPOS_ASSERT(
 		input_col_mdids->Size() <=
 		gpdb::ListLength(target_list));	 // there may be resjunked columns
@@ -2800,11 +2800,11 @@ CTranslatorQueryToDXL::TranslateSetOpChild(Node *child_node,
 	// Currently there are a lot of asserts on NULL != target_list in the
 	// translator, but most of them are unnecessary. We should instead fix ORCA
 	// to handle empty target list.
-	if (NIL == target_list)
-	{
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiQuery2DXLUnsupportedFeature,
-				   GPOS_WSZ_LIT("Empty target list"));
-	}
+	//if (NIL == target_list)
+	//{
+	//	GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiQuery2DXLUnsupportedFeature,
+	//			   GPOS_WSZ_LIT("Empty target list"));
+	//}
 
 	if (IsA(child_node, RangeTblRef))
 	{
