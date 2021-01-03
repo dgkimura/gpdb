@@ -334,6 +334,8 @@ statext_ndistinct_deserialize(bytea *data)
 	return ndistinct;
 }
 
+extern void statistics_scanner_init(const char *query_string);
+
 /*
  * pg_ndistinct_in
  *		input routine for type pg_ndistinct
@@ -344,11 +346,20 @@ statext_ndistinct_deserialize(bytea *data)
 Datum
 pg_ndistinct_in(PG_FUNCTION_ARGS)
 {
-	ereport(ERROR,
-			(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-			 errmsg("cannot accept a value of type %s", "pg_ndistinct")));
+	char		   *str = PG_GETARG_CSTRING(0);
+	MVNDistinct	   *mvndistinct;
+	int				parse_rc;
 
-	PG_RETURN_VOID();			/* keep compiler quiet */
+	statistics_scanner_init(str);
+	parse_rc = statistic_yyparse();
+	if (parse_rc != 0)
+		ereport(ERROR,
+				(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+				 errmsg("cannot accept a value of type %s", "pg_ndistinct")));
+	statistic_scanner_finish();
+	mvndistinct = mvndistinct_parse_result;
+
+	PG_RETURN_BYTEA_P(statext_ndistinct_serialize(mvndistinct));
 }
 
 /*
