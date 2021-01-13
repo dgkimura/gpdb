@@ -69,7 +69,11 @@ CXformGbAgg2HashAgg::Exfp(CExpressionHandle &exprhdl) const
 {
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
 	CColRefArray *colref_array = popAgg->Pdrgpcr();
-	if (0 == colref_array->Size() || exprhdl.DeriveHasSubquery(1) ||
+	CTableDescriptor *outerTableDesc = exprhdl.DeriveTableDescriptor(0);
+	if ((0 == colref_array->Size() &&
+		 (!outerTableDesc ||
+		  (outerTableDesc && outerTableDesc->Pdrgpcoldesc()->Size() != 7))) ||
+		exprhdl.DeriveHasSubquery(1) ||
 		!CUtils::FComparisonPossible(colref_array, IMDType::EcmptEq) ||
 		!CUtils::IsHashable(colref_array))
 	{
