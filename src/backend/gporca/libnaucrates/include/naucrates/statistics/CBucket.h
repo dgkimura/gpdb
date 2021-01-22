@@ -87,8 +87,7 @@ public:
 	BOOL IsAfter(const CPoint *point) const;
 
 	// what percentage of bucket is covered by [lb,pp]
-	CDouble GetOverlapPercentage(const CPoint *point,
-								 BOOL include_point = true) const;
+	CDouble GetOverlapPercentage(const CPoint *point) const;
 
 	// frequency associated with bucket
 	CDouble
@@ -205,10 +204,9 @@ public:
 									   CDouble rows_new);
 
 	// Attempt a merge with another bucket and return leftovers
-	CBucket *SplitAndMergeBuckets(CMemoryPool *mp, CBucket *bucket_other,
+	CBucket *MakeBucketMerged(CMemoryPool *mp, CBucket *bucket_other,
 								  CDouble rows, CDouble rows_other,
 								  CBucket **bucket1_new, CBucket **bucket2_new,
-								  CDouble *result_rows,
 								  BOOL is_union_all = true);
 
 	// does bucket support sampling
@@ -217,8 +215,6 @@ public:
 	{
 		return m_bucket_lower_bound->GetDatum()->StatsMappable();
 	}
-
-	BOOL Equals(const CBucket *bucket);
 
 	// generate a random data point within bucket boundaries
 	CDouble GetSample(ULONG *seed) const;
