@@ -13,6 +13,7 @@
 
 #include "gpos/common/CAutoP.h"
 #include "gpos/common/CRandom.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/memory/CCacheFactory.h"
@@ -753,7 +754,7 @@ CCacheTest::EresUnittest_DeepObject()
 	CAutoMemoryPool amp(CAutoMemoryPool::ElcNone);
 
 	// construct a key
-	CDeepObject *pdoDummy = GPOS_NEW(amp.Pmp()) CDeepObject();
+	leaked<CDeepObject *> pdoDummy = GPOS_NEW(amp.Pmp()) CDeepObject();
 	pdoDummy->AddEntry(amp.Pmp(), 1, 1);
 	pdoDummy->AddEntry(amp.Pmp(), 2, 2);
 

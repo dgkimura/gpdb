@@ -10,6 +10,8 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/engine/CBindingTest.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/engine/CEngine.h"
 #include "gpopt/minidump/CMinidumperUtils.h"
 #include "gpopt/translate/CTranslatorDXLToExpr.h"
@@ -103,8 +105,8 @@ CBindingTest::EresUnittest_Basic()
 
 	CMDAccessor mda(mp, CMDCache::Pcache(), pdrgpsysid, pdrgpmdp);
 
-	CBitSet *pbsEnabled = nullptr;
-	CBitSet *pbsDisabled = nullptr;
+	leaked<CBitSet *> pbsEnabled = nullptr;
+	leaked<CBitSet *> pbsDisabled = nullptr;
 	SetTraceflags(mp, pdxlmd->Pbs(), &pbsEnabled, &pbsDisabled);
 
 	// setup opt ctx
