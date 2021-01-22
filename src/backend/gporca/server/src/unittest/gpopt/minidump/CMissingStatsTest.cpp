@@ -12,6 +12,7 @@
 #include "unittest/gpopt/minidump/CMissingStatsTest.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/task/CAutoTraceFlag.h"
@@ -99,7 +100,7 @@ CMissingStatsTest::EresUnittest_RunTests()
 
 		CStatisticsConfig *stats_config = optimizer_config->GetStatsConf();
 
-		IMdIdArray *pdrgmdidCol = GPOS_NEW(mp) IMdIdArray(mp);
+		leaked<IMdIdArray *> pdrgmdidCol = GPOS_NEW(mp) IMdIdArray(mp);
 		stats_config->CollectMissingStatsColumns(pdrgmdidCol);
 		ULONG ulMissingStats = pdrgmdidCol->Size();
 

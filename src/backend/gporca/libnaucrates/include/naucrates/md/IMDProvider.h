@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CHashMap.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringBase.h"
 #include "gpos/string/CWStringConst.h"
 
@@ -48,7 +49,7 @@ public:
 	// returns the DXL string of the requested metadata object
 	virtual CWStringBase *GetMDObjDXLStr(CMemoryPool *mp,
 										 CMDAccessor *md_accessor,
-										 IMDId *mdid) const = 0;
+										 gpos::pointer<IMDId *> mdid) const = 0;
 
 	// return the requested metadata object
 	virtual IMDCacheObject *GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,

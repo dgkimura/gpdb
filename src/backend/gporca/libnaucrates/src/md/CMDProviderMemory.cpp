@@ -146,7 +146,7 @@ CMDProviderMemory::~CMDProviderMemory()
 CWStringBase *
 CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 								  CMDAccessor *,  //md_accessor
-								  IMDId *mdid) const
+								  gpos::pointer<IMDId *> mdid) const
 {
 	GPOS_ASSERT(nullptr != m_mdmap);
 

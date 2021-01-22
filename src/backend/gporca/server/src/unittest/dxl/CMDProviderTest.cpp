@@ -12,6 +12,7 @@
 #include "unittest/gpopt/mdcache/CMDProviderTest.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/io/ioutils.h"
 #include "gpos/memory/CAutoMemoryPool.h"
@@ -231,7 +232,7 @@ CMDProviderTest::EresUnittest_Negative()
 		CAutoMDAccessor amda(mp, pmdpFile, CTestUtils::m_sysidDefault, pcache);
 
 		// lookup a non-existing objects
-		CMDIdGPDB *mdid = GPOS_NEW(mp)
+		leaked<CMDIdGPDB *> mdid = GPOS_NEW(mp)
 			CMDIdGPDB(GPOPT_MDCACHE_TEST_OID, 15 /* major version */,
 					  1 /* minor version */);
 
