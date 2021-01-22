@@ -15,6 +15,7 @@
 #define GPMD_CMDProviderMemory_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/md/IMDCacheObject.h"
@@ -64,7 +65,7 @@ public:
 
 	// returns the DXL string of the requested metadata object
 	CWStringBase *GetMDObjDXLStr(CMemoryPool *mp, CMDAccessor *md_accessor,
-								 IMDId *mdid) const override;
+								 gpos::pointer<IMDId *> mdid) const override;
 
 	// returns the requested metadata object
 	IMDCacheObject *GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
