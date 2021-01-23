@@ -205,9 +205,9 @@ public:
 
 	// Attempt a merge with another bucket and return leftovers
 	CBucket *MakeBucketMerged(CMemoryPool *mp, CBucket *bucket_other,
-								  CDouble rows, CDouble rows_other,
-								  CBucket **bucket1_new, CBucket **bucket2_new,
-								  BOOL is_union_all = true);
+							  CDouble rows, CDouble rows_other,
+							  CBucket **bucket1_new, CBucket **bucket2_new,
+							  BOOL is_union_all = true);
 
 	// does bucket support sampling
 	BOOL

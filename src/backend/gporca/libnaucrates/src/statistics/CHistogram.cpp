@@ -1463,7 +1463,8 @@ CHistogram::MakeUnionAllHistogramNormalize(CDouble rows,
 			GPOS_ASSERT(bucket1->Intersects(bucket2));
 			CBucket *bucket1_new = NULL;
 			CBucket *bucket2_new = NULL;
-			CBucket *merge_bucket = bucket1->MakeBucketMerged(m_mp, bucket2, rows, rows_other, &bucket1_new, &bucket2_new);
+			CBucket *merge_bucket = bucket1->MakeBucketMerged(
+				m_mp, bucket2, rows, rows_other, &bucket1_new, &bucket2_new);
 			new_buckets->Append(merge_bucket);
 
 			GPOS_ASSERT(NULL == bucket1_new || NULL == bucket2_new);
@@ -1483,24 +1484,34 @@ CHistogram::MakeUnionAllHistogramNormalize(CDouble rows,
 	GPOS_ASSERT_IFF(NULL == bucket1, idx1 == buckets1);
 	GPOS_ASSERT_IFF(NULL == bucket2, idx2 == buckets2);
 
-	idx1 = AddResidualUnionAllBucket(new_buckets, bucket1, rows_other, rows_new, bucket1_is_residual, idx1);
-	idx2 = AddResidualUnionAllBucket(new_buckets, bucket2, rows, rows_new, bucket2_is_residual, idx2);
+	idx1 = AddResidualUnionAllBucket(new_buckets, bucket1, rows_other, rows_new,
+									 bucket1_is_residual, idx1);
+	idx2 = AddResidualUnionAllBucket(new_buckets, bucket2, rows, rows_new,
+									 bucket2_is_residual, idx2);
 
 	CleanupResidualBucket(bucket1, bucket1_is_residual);
 	CleanupResidualBucket(bucket2, bucket2_is_residual);
 
 	// add any leftover buckets from other histogram
-	AddBuckets(m_mp, histogram->m_histogram_buckets, new_buckets, rows_other, rows_new, idx2, buckets2);
+	AddBuckets(m_mp, histogram->m_histogram_buckets, new_buckets, rows_other,
+			   rows_new, idx2, buckets2);
 
 	// add any leftover buckets from this histogram
-	AddBuckets(m_mp, m_histogram_buckets, new_buckets, rows, rows_new, idx1, buckets1);
+	AddBuckets(m_mp, m_histogram_buckets, new_buckets, rows, rows_new, idx1,
+			   buckets1);
 
-	CDouble new_null_freq = (m_null_freq * rows + histogram->m_null_freq * rows_other) / rows_new;
+	CDouble new_null_freq =
+		(m_null_freq * rows + histogram->m_null_freq * rows_other) / rows_new;
 
-	CDouble distinct_remaining = std::max(m_distinct_remaining, histogram->m_distinct_remaining);
-	CDouble freq_remaining = (m_freq_remaining * rows + histogram->m_freq_remaining * rows_other) / rows_new;
+	CDouble distinct_remaining =
+		std::max(m_distinct_remaining, histogram->m_distinct_remaining);
+	CDouble freq_remaining =
+		(m_freq_remaining * rows + histogram->m_freq_remaining * rows_other) /
+		rows_new;
 
-	CHistogram *result_histogram = GPOS_NEW(m_mp) CHistogram(m_mp, new_buckets, true /*is_well_defined*/, new_null_freq, distinct_remaining, freq_remaining);
+	CHistogram *result_histogram = GPOS_NEW(m_mp)
+		CHistogram(m_mp, new_buckets, true /*is_well_defined*/, new_null_freq,
+				   distinct_remaining, freq_remaining);
 	(void) result_histogram->NormalizeHistogram();
 
 	return result_histogram;
@@ -1629,19 +1640,14 @@ CHistogram::MakeUnionHistogramNormalize(CDouble rows,
 			CBucket *bucket2_new = NULL;
 			CBucket *merge_bucket = NULL;
 
-			merge_bucket = bucket1->MakeBucketMerged
-									(
-									m_mp,
-									bucket2,
-									rows,
-									rows_other,
-									&bucket1_new,
-									&bucket2_new,
-									false /* is_union_all */
-									);
+			merge_bucket = bucket1->MakeBucketMerged(
+				m_mp, bucket2, rows, rows_other, &bucket1_new, &bucket2_new,
+				false /* is_union_all */
+			);
 
 			// add the estimated number of rows in the merged bucket
-			num_tuples_per_bucket->Append(GPOS_NEW(m_mp) CDouble(merge_bucket->GetFrequency() * rows));
+			num_tuples_per_bucket->Append(
+				GPOS_NEW(m_mp) CDouble(merge_bucket->GetFrequency() * rows));
 			histogram_buckets->Append(merge_bucket);
 
 			GPOS_ASSERT(NULL == bucket1_new || NULL == bucket2_new);
@@ -1661,17 +1667,23 @@ CHistogram::MakeUnionHistogramNormalize(CDouble rows,
 	GPOS_ASSERT_IFF(NULL == bucket1, idx1 == buckets1);
 	GPOS_ASSERT_IFF(NULL == bucket2, idx2 == buckets2);
 
-	idx1 = AddResidualUnionBucket(histogram_buckets, bucket1, rows_other, bucket1_is_residual, idx1, num_tuples_per_bucket);
-	idx2 = AddResidualUnionBucket(histogram_buckets, bucket2, rows, bucket2_is_residual, idx2, num_tuples_per_bucket);
+	idx1 = AddResidualUnionBucket(histogram_buckets, bucket1, rows_other,
+								  bucket1_is_residual, idx1,
+								  num_tuples_per_bucket);
+	idx2 = AddResidualUnionBucket(histogram_buckets, bucket2, rows,
+								  bucket2_is_residual, idx2,
+								  num_tuples_per_bucket);
 
 	CleanupResidualBucket(bucket1, bucket1_is_residual);
 	CleanupResidualBucket(bucket2, bucket2_is_residual);
 
 	// add any leftover buckets from other histogram
-	AddBuckets(m_mp, other_histogram->m_histogram_buckets, histogram_buckets, rows_other, num_tuples_per_bucket, idx2, buckets2);
+	AddBuckets(m_mp, other_histogram->m_histogram_buckets, histogram_buckets,
+			   rows_other, num_tuples_per_bucket, idx2, buckets2);
 
 	// add any leftover buckets from this histogram
-	AddBuckets(m_mp, m_histogram_buckets, histogram_buckets, rows, num_tuples_per_bucket, idx1, buckets1);
+	AddBuckets(m_mp, m_histogram_buckets, histogram_buckets, rows,
+			   num_tuples_per_bucket, idx1, buckets1);
 
 	// compute the total number of null values from both histograms
 	CDouble num_null_rows =
@@ -1710,16 +1722,10 @@ CHistogram::MakeUnionHistogramNormalize(CDouble rows,
 	CDouble null_freq = num_null_rows / *num_output_rows;
 	CDouble NDV_remain_freq = NDV_remain_num_rows / *num_output_rows;
 
-	CHistogram *result_histogram = GPOS_NEW(m_mp) CHistogram
-									(
-									m_mp,
-									histogram_buckets,
-									true /* is_well_defined */,
-									null_freq,
-									num_NDV_remain,
-									NDV_remain_freq,
-									false /* is_col_stats_missing */
-									);
+	CHistogram *result_histogram = GPOS_NEW(m_mp) CHistogram(
+		m_mp, histogram_buckets, true /* is_well_defined */, null_freq,
+		num_NDV_remain, NDV_remain_freq, false /* is_col_stats_missing */
+	);
 
 	// clean up
 	num_tuples_per_bucket->Release();
