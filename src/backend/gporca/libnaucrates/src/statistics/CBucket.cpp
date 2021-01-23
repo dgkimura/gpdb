@@ -748,7 +748,8 @@ CBucket::MakeBucketIntersect(CMemoryPool *mp, CBucket *bucket,
 			lower_new_is_closed = bucket->IsLowerClosed();
 			if (lower_new->Equals(this->GetLowerBound()))
 			{
-				lower_new_is_closed = this->IsLowerClosed() && bucket->IsLowerClosed();
+				lower_new_is_closed =
+					this->IsLowerClosed() && bucket->IsLowerClosed();
 			}
 		}
 
@@ -757,7 +758,8 @@ CBucket::MakeBucketIntersect(CMemoryPool *mp, CBucket *bucket,
 			upper_new_is_closed = bucket->IsUpperClosed();
 			if (upper_new->Equals(this->GetUpperBound()))
 			{
-				upper_new_is_closed = this->IsUpperClosed() && bucket->IsUpperClosed();
+				upper_new_is_closed =
+					this->IsUpperClosed() && bucket->IsUpperClosed();
 			}
 		}
 
