@@ -57,9 +57,7 @@ public:
 	// ctor
 	CRefCount() = default;
 
-	// FIXME: should mark this noexcept in non-assert builds
-	// dtor
-	virtual ~CRefCount() noexcept(false)
+	virtual ~CRefCount() GPOS_THROWS_ONLY_IN_ASSERT
 	{
 		// enforce strict ref-counting unless we're in a pending exception,
 		// e.g., a ctor has thrown

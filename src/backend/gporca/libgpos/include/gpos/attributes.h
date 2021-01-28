@@ -23,4 +23,10 @@
 #define GPOS_ASSERTS_ONLY
 #endif
 
+#ifndef GPOS_DEBUG
+#define GPOS_THROWS_ONLY_IN_ASSERT noexcept
+#else
+#define GPOS_THROWS_ONLY_IN_ASSERT noexcept(false)
+#endif
+
 #endif	// !GPOS_attributes_H
