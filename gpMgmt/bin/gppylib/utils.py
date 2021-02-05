@@ -592,3 +592,39 @@ def formatInsertValuesList(row, starelid, inclHLL):
         rowVals.append('\t{0}::{1}'.format(val, typ))
 
     return rowVals
+
+
+def formatUpsertItemsList(rowVals):
+    rowNames = ['starelid',
+                'staattnum',
+                'stainherit',
+                'stanullfrac',
+                'stawidth',
+                'stadistinct',
+                'stakind1',
+                'stakind2',
+                'stakind3',
+                'stakind4',
+                'stakind5',
+                'staop1',
+                'staop2',
+                'staop3',
+                'staop4',
+                'staop5',
+                'stacoll1',
+                'stacoll2',
+                'stacoll3',
+                'stacoll4',
+                'stacoll5',
+                'stanumbers1',
+                'stanumbers2',
+                'stanumbers3',
+                'stanumbers4',
+                'stanumbers5',
+                'stavalues1',
+                'stavalues2',
+                'stavalues3',
+                'stavalues4',
+                'stavalues5'
+               ]
+    return ['\t{0}={1}'.format(name, val.strip()) for name, val in zip(rowNames, rowVals)]

@@ -13,7 +13,7 @@ from contextlib import closing
 from distutils.version import LooseVersion
 from optparse import OptionParser
 import pgdb
-from gppylib.utils import formatInsertValuesList, Escape
+from gppylib.utils import formatInsertValuesList, formatUpsertItemsList, Escape
 
 gpsd_version = '%prog 1.0'
 
@@ -88,14 +88,15 @@ def dumpStats(cur, inclHLL):
         '-- Table: {0}, Attribute: {1}\n' \
         '--\n' \
         'INSERT INTO pg_statistic VALUES (\n' \
-        '{2});\n\n'
+        '{2})\nON CONFLICT ON CONSTRAINT pg_statistic_relid_att_inh_index DO UPDATE SET \n{3};\n\n'
 
     cur.execute(query)
 
     for vals in ResultIter(cur):
         starelid = "'%s.%s'::regclass" % (Escape(vals[1]), Escape(vals[0]))
         rowVals = formatInsertValuesList(vals, starelid, inclHLL)
-        print(pstring.format(vals[0], vals[2], ',\n'.join(rowVals)))
+        upsertItems = formatUpsertItemsList(rowVals)
+        print(pstring.format(vals[0], vals[2], ',\n'.join(rowVals), ',\n'.join(upsertItems)))
 
 
 def parseCmdLine():
