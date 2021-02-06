@@ -41,6 +41,7 @@ CParseHandlerMDIndex::CParseHandlerMDIndex(
 	  m_index_type(IMDIndex::EmdindSentinel),
 	  m_mdid_item_type(nullptr),
 	  m_index_key_cols_array(nullptr),
+	  m_index_can_return_columns(nullptr),
 	  m_included_cols_array(nullptr),
 	  m_part_constraint(nullptr),
 	  m_level_with_default_part_array(nullptr),
@@ -208,8 +209,8 @@ CParseHandlerMDIndex::EndElement(const XMLCh *const,  // element_uri,
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDIndexGPDB(
 		m_mp, m_mdid, m_mdname, m_clustered, m_index_type, m_mdid_item_type,
-		m_index_key_cols_array, m_included_cols_array, mdid_opfamilies_array,
-		m_part_constraint);
+		m_index_key_cols_array, m_index_can_return_columns,
+		m_included_cols_array, mdid_opfamilies_array, m_part_constraint);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

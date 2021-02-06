@@ -56,6 +56,8 @@ private:
 	// index keys
 	ULongPtrArray *m_index_key_cols_array;
 
+	ULongPtrArray *m_index_can_return_columns;
+
 	// included columns
 	ULongPtrArray *m_included_cols_array;
 

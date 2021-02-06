@@ -17,6 +17,7 @@ extern "C" {
 #include "postgres.h"
 
 #include "access/external.h"
+#include "access/genam.h"
 #include "access/heapam.h"
 #include "catalog/namespace.h"
 #include "catalog/pg_am.h"
@@ -976,6 +977,7 @@ CTranslatorRelcacheToDXL::RetrieveIndex(CMemoryPool *mp,
 	IMDId *mdid_item_type = nullptr;
 	bool index_clustered = false;
 	ULongPtrArray *index_key_cols_array = nullptr;
+	ULongPtrArray *index_can_return_columns;
 	ULONG *attno_mapping = nullptr;
 
 	if (!IsIndexSupported(index_rel.get()))
@@ -1049,6 +1051,7 @@ CTranslatorRelcacheToDXL::RetrieveIndex(CMemoryPool *mp,
 
 	// extract the position of the key columns
 	index_key_cols_array = GPOS_NEW(mp) ULongPtrArray(mp);
+	index_can_return_columns = GPOS_NEW(mp) ULongPtrArray(mp);
 
 	for (int i = 0; i < form_pg_index->indnatts; i++)
 	{
@@ -1057,18 +1060,25 @@ CTranslatorRelcacheToDXL::RetrieveIndex(CMemoryPool *mp,
 
 		index_key_cols_array->Append(
 			GPOS_NEW(mp) ULONG(GetAttributePosition(attno, attno_mapping)));
+
+		// FIXME: don't implicit convert BOOL to ULONG...
+		index_can_return_columns->Append(
+			GPOS_NEW(mp) ULONG(index_can_return(index_rel.get(), attno)));
 	}
+
 	mdid_rel->Release();
 
 	ULongPtrArray *included_cols = ComputeIncludedCols(mp, md_rel);
 	mdid_index->AddRef();
 	IMdIdArray *op_families_mdids = RetrieveIndexOpFamilies(mp, mdid_index);
 
-	CMDIndexGPDB *index = GPOS_NEW(mp) CMDIndexGPDB(
-		mp, mdid_index, mdname, index_clustered, index_type, mdid_item_type,
-		index_key_cols_array, included_cols, op_families_mdids,
-		nullptr	 // mdpart_constraint
-	);
+	//TODO: add info about index_can_return()
+	CMDIndexGPDB *index = GPOS_NEW(mp)
+		CMDIndexGPDB(mp, mdid_index, mdname, index_clustered, index_type,
+					 mdid_item_type, index_key_cols_array,
+					 index_can_return_columns, included_cols, op_families_mdids,
+					 nullptr  // mdpart_constraint
+		);
 
 	GPOS_DELETE_ARRAY(attno_mapping);
 	return index;

@@ -58,6 +58,9 @@ private:
 	// index key columns
 	ULongPtrArray *m_index_key_cols_array;
 
+	// index can return columns
+	ULongPtrArray *m_index_can_return_columns;
+
 	// included columns
 	ULongPtrArray *m_included_cols_array;
 
@@ -77,6 +80,7 @@ public:
 	CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 				 BOOL is_clustered, EmdindexType index_type,
 				 IMDId *mdid_item_type, ULongPtrArray *index_key_cols_array,
+				 ULongPtrArray *index_can_return_columns,
 				 ULongPtrArray *included_cols_array,
 				 IMdIdArray *mdid_opfamilies_array,
 				 IMDPartConstraint *mdpart_constraint);

@@ -36,6 +36,7 @@ CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 						   BOOL is_clustered, IMDIndex::EmdindexType index_type,
 						   IMDId *mdid_item_type,
 						   ULongPtrArray *index_key_cols_array,
+						   ULongPtrArray *index_can_return_columns,
 						   ULongPtrArray *included_cols_array,
 						   IMdIdArray *mdid_opfamilies_array,
 						   IMDPartConstraint *mdpart_constraint)
@@ -46,6 +47,7 @@ CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 	  m_index_type(index_type),
 	  m_mdid_item_type(mdid_item_type),
 	  m_index_key_cols_array(index_key_cols_array),
+	  m_index_can_return_columns(index_can_return_columns),
 	  m_included_cols_array(included_cols_array),
 	  m_mdid_opfamilies_array(mdid_opfamilies_array),
 	  m_mdpart_constraint(mdpart_constraint)
@@ -83,6 +85,7 @@ CMDIndexGPDB::~CMDIndexGPDB()
 	m_mdid->Release();
 	CRefCount::SafeRelease(m_mdid_item_type);
 	m_index_key_cols_array->Release();
+	m_index_can_return_columns->Release();
 	m_included_cols_array->Release();
 	m_mdid_opfamilies_array->Release();
 	CRefCount::SafeRelease(m_mdpart_constraint);
