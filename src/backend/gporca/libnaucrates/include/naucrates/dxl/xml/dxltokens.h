@@ -730,6 +730,8 @@ enum Edxltoken
 	EdxltokenCtasOptionType,
 	EdxltokenVarTypeModList,
 
+	EdxltokenIndexCanReturnColumns,
+
 	EdxltokenSentinel
 };
 

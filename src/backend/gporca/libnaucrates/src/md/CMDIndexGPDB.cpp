@@ -311,6 +311,13 @@ CMDIndexGPDB::Serialize(CXMLSerializer *xml_serializer) const
 		available_cols_str);
 	GPOS_DELETE(available_cols_str);
 
+	CWStringDynamic *index_can_return_columns_str =
+		CDXLUtils::Serialize(m_mp, m_index_can_return_columns);
+	xml_serializer->AddAttribute(
+		CDXLTokens::GetDXLTokenStr(EdxltokenIndexCanReturnColumns),
+		index_can_return_columns_str);
+	GPOS_DELETE(index_can_return_columns_str);
+
 	// serialize operator class information
 	SerializeMDIdList(xml_serializer, m_mdid_opfamilies_array,
 					  CDXLTokens::GetDXLTokenStr(EdxltokenOpfamilies),

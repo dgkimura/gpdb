@@ -154,6 +154,13 @@ CParseHandlerMDIndex::StartElement(const XMLCh *const,	// element_uri,
 		m_parse_handler_mgr->GetDXLMemoryManager(), xmlszIndexIncludedCols,
 		EdxltokenIndexIncludedCols, EdxltokenIndex);
 
+	const XMLCh *xmlszIndexCanReturnColumns =
+		CDXLOperatorFactory::ExtractAttrValue(
+			attrs, EdxltokenIndexCanReturnColumns, EdxltokenIndex);
+	m_index_can_return_columns = CDXLOperatorFactory::ExtractIntsToUlongArray(
+		m_parse_handler_mgr->GetDXLMemoryManager(), xmlszIndexCanReturnColumns,
+		EdxltokenIndexCanReturnColumns, EdxltokenIndex);
+
 	// parse handler for operator class list
 	CParseHandlerBase *opfamilies_list_parse_handler =
 		CParseHandlerFactory::GetParseHandler(
