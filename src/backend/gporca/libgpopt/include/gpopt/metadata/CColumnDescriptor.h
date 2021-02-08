@@ -55,11 +55,25 @@ private:
 	// is the column a distribution col
 	BOOL m_is_dist_col;
 
+	BOOL m_index_can_return;
+
 public:
 	// ctor
 	CColumnDescriptor(CMemoryPool *mp, const IMDType *pmdtype,
 					  INT type_modifier, const CName &name, INT attno,
 					  BOOL is_nullable, ULONG ulWidth = gpos::ulong_max);
+	CColumnDescriptor(const CColumnDescriptor &cdisc)
+		: CRefCount(),
+		  m_pmdtype(cdisc.m_pmdtype),
+		  m_type_modifier(cdisc.m_type_modifier),
+		  m_name(cdisc.m_name),
+		  m_iAttno(cdisc.m_iAttno),
+		  m_is_nullable(cdisc.m_is_nullable),
+		  m_width(cdisc.m_width),
+		  m_is_dist_col(cdisc.m_is_dist_col),
+		  m_index_can_return(cdisc.m_index_can_return)
+	{
+	}
 
 	// dtor
 	~CColumnDescriptor() override;
@@ -118,6 +132,18 @@ public:
 	IsDistCol() const
 	{
 		return m_is_dist_col;
+	}
+
+	BOOL
+	IndexCanReturn() const
+	{
+		return m_index_can_return;
+	}
+
+	void
+	SetIndexCanReturn()
+	{
+		m_index_can_return = true;
 	}
 
 	// set this column as a distribution column

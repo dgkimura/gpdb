@@ -16,6 +16,7 @@
 #include "gpopt/base/CColumnFactory.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
+#include "naucrates/md/CMDIndexGPDB.h"
 
 using namespace gpopt;
 
@@ -117,9 +118,24 @@ CIndexDescriptor::Pindexdesc(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
 
 	for (ULONG ul = 0; ul < pmdindex->Keys(); ul++)
 	{
-		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
-		pcoldesc->AddRef();
-		pdrgcoldescKey->Append(pcoldesc);
+		// TODO: Make copy of CColumnDescriptor?
+		//       Ideally we probably want to add can_return attribute on the
+		//       column descriptor, but since it's a ref to the table it would
+		//       be shared across all indexes which isn't correct
+		if ((*((CMDIndexGPDB *) pmdindex)->GetIndexCanReturnColumns())[ul] != 0)
+		{
+			CColumnDescriptor *pcoldesc =
+				GPOS_NEW(mp) CColumnDescriptor(*(*pdrgpcoldesc)[ul]);
+			pcoldesc->SetIndexCanReturn();
+			pcoldesc->AddRef();
+			pdrgcoldescKey->Append(pcoldesc);
+		}
+		else
+		{
+			CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
+			pcoldesc->AddRef();
+			pdrgcoldescKey->Append(pcoldesc);
+		}
 	}
 
 	// array of included column descriptors

@@ -54,8 +54,7 @@ CXformIndexGet2IndexOnlyScan::Exfp(CExpressionHandle &exprhdl) const
 	CIndexDescriptor *pindexdesc = popGet->Pindexdesc();
 
 	if ((pindexdesc->IndexType() == IMDIndex::EmdindBtree &&
-		 ptabdesc->IsAORowOrColTable()) ||
-		!pindexdesc->SupportsIndexOnlyScan())
+		 ptabdesc->IsAORowOrColTable()))
 	{
 		// we don't support btree index scans on AO tables
 		// FIXME: relax btree requirement. GiST and SP-GiST indexes can support some operator classes, but Gin cannot
@@ -123,6 +122,16 @@ CXformIndexGet2IndexOnlyScan::Transform(CXformContext *pxfctxt,
 						  true /*check_distribution_col*/) == CColRef::EUsed)
 		{
 			output_cols->Include(col);
+		}
+	}
+	for (ULONG i = 0; i < pindexdesc->PdrgpcoldescKey()->Size(); i++)
+	{
+		if (!(*pindexdesc->PdrgpcoldescKey())[i]->IndexCanReturn())
+		{
+			ULONG ulPos = pmdindex->KeyAt(i);
+			ULONG ulPosNonDropped = pmdrel->NonDroppedColAt(ulPos);
+			CColRef *colref = (*pdrgpcrOutput)[ulPosNonDropped];
+			matched_cols->Exclude(colref);
 		}
 	}
 

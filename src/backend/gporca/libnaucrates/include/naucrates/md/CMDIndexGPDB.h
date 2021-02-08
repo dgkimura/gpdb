@@ -128,6 +128,13 @@ public:
 		return m_dxl_str;
 	}
 
+	// index can return columns
+	ULongPtrArray *
+	GetIndexCanReturnColumns() const
+	{
+		return m_index_can_return_columns;
+	}
+
 	// serialize MD index in DXL format given a serializer object
 	void Serialize(gpdxl::CXMLSerializer *) const override;
 
