@@ -408,10 +408,21 @@ CBucket::MakeBucketSingleton(CMemoryPool *mp, CPoint *point_singleton) const
 	// if the bucket is not already singleton, scale accordingly
 	if (!this->IsSingleton())
 	{
-		CDouble ratio =
-			CDouble(1.0) / m_bucket_upper_bound->Width(m_bucket_lower_bound,
-													   m_is_lower_closed,
-													   m_is_upper_closed);
+		CDouble width = m_bucket_upper_bound->Width(
+			m_bucket_lower_bound, m_is_lower_closed, m_is_upper_closed);
+		CDouble ratio = CDouble(1.0) / width;
+
+		static const ULONG WidthMethodThreshold = 100.0;
+		if (width / this->m_distinct > WidthMethodThreshold)
+		{
+			// When the width between the upper and lower bounds of the bucket
+			// is large in comparison to the number of NDVs, then the frequency
+			// estimation of a single point becomes more volatile. In this
+			// scenario, it often makes more sense to use a ratio based on NDVs
+			// to estimate the singleton frequency.
+			ratio = CDouble(1.0) / this->m_distinct;
+		}
+
 		frequency_new =
 			std::min(DOUBLE(1.0), (this->m_frequency * ratio).Get());
 		;
