@@ -49,6 +49,9 @@ class Ref
 			RefPtrInfo<T>::Release(p_);
 	}
 
+	template <class To, class From>
+	friend Ref<To> cast(Ref<From> &&);
+
 	template <class U>
 	friend class Ref;  // for swap and move
 
