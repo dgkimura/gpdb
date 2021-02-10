@@ -28,6 +28,9 @@ class Ref
 			p_->AddRef();
 	}
 
+	template <class To, class From>
+	friend Ref<To> cast(Ref<From> &&);
+
 	template <class U>
 	friend Ref RefFromNew(U *);
 	// attach to a pointer that already has a reference. transitional helper
