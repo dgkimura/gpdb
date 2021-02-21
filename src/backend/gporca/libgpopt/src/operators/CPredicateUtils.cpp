@@ -1934,7 +1934,8 @@ CPredicateUtils::PexprIndexLookup(CMemoryPool *mp, CMDAccessor *md_accessor,
 	}
 
 	BOOL gin_or_gist_index = (pmdindex->IndexType() == IMDIndex::EmdindGist ||
-							  pmdindex->IndexType() == IMDIndex::EmdindGin);
+							  pmdindex->IndexType() == IMDIndex::EmdindGin ||
+							  pmdindex->IndexType() == IMDIndex::EmdindBrin);
 
 	if (cmptype == IMDType::EcmptNEq || cmptype == IMDType::EcmptIDF ||
 		(cmptype == IMDType::EcmptOther &&

@@ -1,5 +1,3 @@
-set optimizer to off;
-
 CREATE TABLE brintest (byteacol bytea,
 	charcol "char",
 	namecol name,
@@ -314,6 +312,7 @@ BEGIN
 		-- run the query using the brin index
 		SET enable_seqscan = 0;
 		SET enable_bitmapscan = 1;
+		SET optimizer_enable_bitmapscan = 1;
 
 		plan_ok := false;
 		FOR plan_line IN EXECUTE format($y$EXPLAIN SELECT array_agg(ctid) FROM brintest WHERE %s $y$, cond) LOOP
@@ -331,6 +330,7 @@ BEGIN
 		-- run the query using a seqscan
 		SET enable_seqscan = 1;
 		SET enable_bitmapscan = 0;
+		SET optimizer_enable_bitmapscan = 0;
 
 		plan_ok := false;
 		FOR plan_line IN EXECUTE format($y$EXPLAIN SELECT array_agg(ctid) FROM brintest WHERE %s $y$, cond) LOOP
@@ -355,12 +355,14 @@ BEGIN
 			RAISE WARNING 'something not right in %: count %', r, count;
 			SET enable_seqscan = 1;
 			SET enable_bitmapscan = 0;
+			SET optimizer_enable_bitmapscan = 0;
 			FOR r2 IN EXECUTE 'SELECT ' || r.colname || ' FROM brintest WHERE ' || cond LOOP
 				RAISE NOTICE 'seqscan: %', r2;
 			END LOOP;
 
 			SET enable_seqscan = 0;
 			SET enable_bitmapscan = 1;
+			SET optimizer_enable_bitmapscan = 1;
 			FOR r2 IN EXECUTE 'SELECT ' || r.colname || ' FROM brintest WHERE ' || cond LOOP
 				RAISE NOTICE 'bitmapscan: %', r2;
 			END LOOP;
@@ -374,6 +376,7 @@ $x$;
 
 RESET enable_seqscan;
 RESET enable_bitmapscan;
+RESET optimizer_enable_bitmapscan;
 
 INSERT INTO brintest SELECT
 	repeat(stringu1, 42)::bytea,
@@ -467,5 +470,3 @@ VACUUM ANALYZE brin_test;
 EXPLAIN (COSTS OFF) SELECT * FROM brin_test WHERE a = 1;
 -- Ensure brin index is not used when values are not correlated
 EXPLAIN (COSTS OFF) SELECT * FROM brin_test WHERE b = 1;
-
-reset optimizer;

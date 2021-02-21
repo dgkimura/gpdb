@@ -2124,7 +2124,8 @@ CXformUtils::FIndexApplicable(CMemoryPool *mp, const IMDIndex *pmdindex,
 	if (pmdindex->IndexType() == IMDIndex::EmdindGist ||
 		// GIN can only match with Bitmap Indexes
 		(emdindtype == IMDIndex::EmdindBitmap &&
-		 IMDIndex::EmdindGin == pmdindex->IndexType()))
+		 (IMDIndex::EmdindGin == pmdindex->IndexType() ||
+		  IMDIndex::EmdindBrin == pmdindex->IndexType())))
 	{
 		// continue
 	}
@@ -3109,7 +3110,10 @@ CXformUtils::PexprBitmapSelectBestIndex(
 			// make sure the first key of index is included in the scalar predicate
 			const CColRef *pcrFirstIndexKey = (*indexColumns)[0];
 
-			if (!pcrsScalar->FMember(pcrFirstIndexKey))
+			// FIXME: Do we need to reconsider whether to pick an index based
+			//        on whether the first column of the table is in the index?
+			if (!pcrsScalar->FMember(pcrFirstIndexKey) &&
+				pmdindex->IndexType() != IMDIndex::EmdindBrin)
 			{
 				indexColumns->Release();
 				pdrgpexprIndex->Release();
