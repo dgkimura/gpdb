@@ -2300,7 +2300,8 @@ CXformUtils::FIndexApplicable(CMemoryPool *mp, const IMDIndex *pmdindex,
 	if (pmdindex->IndexType() == IMDIndex::EmdindGist ||
 		// GIN can only match with Bitmap Indexes
 		(emdindtype == IMDIndex::EmdindBitmap &&
-		 IMDIndex::EmdindGin == pmdindex->IndexType()))
+		 (IMDIndex::EmdindGin == pmdindex->IndexType() ||
+		  IMDIndex::EmdindBrin == pmdindex->IndexType())))
 	{
 		if (pmdrel->IsPartialIndex(pmdindex->MDId()))
 		{
