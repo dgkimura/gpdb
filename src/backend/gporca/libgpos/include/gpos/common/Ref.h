@@ -5,7 +5,8 @@
 #ifndef GPOS_Ref_H
 #define GPOS_Ref_H
 #include <type_traits>
-#include <utility>	// for exchange
+#include <typeindex>  // for hash
+#include <utility>	  // for exchange
 
 namespace gpos
 {
@@ -56,6 +57,7 @@ public:
 	{
 		AddRef();
 	}
+
 	Ref(Ref &&other) noexcept : p_(std::exchange(other.p_, nullptr))
 	{
 	}
@@ -142,4 +144,15 @@ RefFromNew(T *p) noexcept
 	return ref;
 }
 }  // namespace gpos
+
+template <class T>
+struct std::hash<gpos::Ref<T>>
+{
+	std::size_t
+	operator()(const gpos::Ref<T> &ref) const noexcept
+	{
+		return std::hash<T *>{}(ref.get());
+	}
+};
+
 #endif
