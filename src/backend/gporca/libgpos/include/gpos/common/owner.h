@@ -4,6 +4,8 @@
 //---------------------------------------------------------------------------
 #ifndef GPOS_Owner_H
 #define GPOS_Owner_H
+#include "gpos/common/Ref.h"
+
 namespace gpos
 {
 template <class T>

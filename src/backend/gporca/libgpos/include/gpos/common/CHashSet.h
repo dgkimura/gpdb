@@ -25,6 +25,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/UnorderedSet.h"
 
 namespace gpos
 {
