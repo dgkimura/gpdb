@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/Vector.h"
 #include "gpos/common/clibwrapper.h"
 
 namespace gpos
