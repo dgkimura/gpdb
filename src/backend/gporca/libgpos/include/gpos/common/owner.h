@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------------
 #ifndef GPOS_Owner_H
 #define GPOS_Owner_H
+#include "gpos/common/Casting.h"
 #include "gpos/common/Ref.h"
 
 namespace gpos
