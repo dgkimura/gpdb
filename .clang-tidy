@@ -3,6 +3,7 @@ Checks: |
   clang-diagnostic-*,
   clang-analyzer-*,
   -*,
+  bugprone-use-after-move,
   modernize-use-override,
   modernize-use-equals-default,
   modernize-use-equals-delete,
