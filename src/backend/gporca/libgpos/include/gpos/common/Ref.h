@@ -10,23 +10,40 @@
 
 namespace gpos
 {
+// Specialize this in case of a forward-declared T
+template <class T>
+struct RefPtrInfo
+{
+	static void
+	AddRef(T *t) noexcept
+	{
+		t->AddRef();
+	}
+
+	static void
+	Release(T *t) noexcept(std::is_nothrow_destructible<T>::value)
+	{
+		t->Release();
+	}
+};
+
 template <class T>
 class Ref
 {
 	T *p_;
 
 	void
-	Release() noexcept(std::is_nothrow_destructible<T>::value)
-	{
-		if (p_)
-			p_->Release();
-	}
-
-	void
 	AddRef() noexcept
 	{
 		if (p_)
-			p_->AddRef();
+			RefPtrInfo<T>::AddRef(p_);
+	}
+
+	void
+	Release() noexcept(noexcept(RefPtrInfo<T>::AddRef(p_)))
+	{
+		if (p_)
+			RefPtrInfo<T>::Release(p_);
 	}
 
 	template <class U>
@@ -166,5 +183,44 @@ struct std::hash<gpos::Ref<T>>
 		return std::hash<T *>{}(ref.get());
 	}
 };
+
+#define REF_PTR_TYPE_ADDREF_RELEASE_FWD_DECL(NS, TYPE, ADD_REF, RELEASE) \
+	namespace NS                                                         \
+	{                                                                    \
+	class TYPE;                                                          \
+	void ADD_REF(TYPE *x) noexcept;                                      \
+	void RELEASE(TYPE *x) noexcept;                                      \
+	}                                                                    \
+                                                                         \
+	template <>                                                          \
+	struct gpos::RefPtrInfo<NS::TYPE>                                    \
+	{                                                                    \
+		static void                                                      \
+		AddRef(NS::TYPE *x) noexcept                                     \
+		{                                                                \
+			NS::ADD_REF(x);                                              \
+		}                                                                \
+		static void                                                      \
+		Release(NS::TYPE *x) noexcept                                    \
+		{                                                                \
+			NS::RELEASE(x);                                              \
+		}                                                                \
+	}
+
+// Common case, we name the methods after a convention
+#define REF_PTR_FWD_DECL(NS, TYPE) \
+	REF_PTR_TYPE_ADDREF_RELEASE_FWD_DECL(NS, TYPE, AddRef##TYPE, Release##TYPE)
+
+// Drop this in namespace scope in the header file that declares TYPE
+#define REF_PTR_ADDREF_RELEASE_INLINE_DEF(TYPE) \
+	inline void AddRef##TYPE(TYPE *x) noexcept  \
+	{                                           \
+		x->AddRef();                            \
+	}                                           \
+	inline void Release##TYPE(TYPE *x) noexcept \
+	{                                           \
+		x->Release();                           \
+	}                                           \
+	static_assert(true, "")
 
 #endif
