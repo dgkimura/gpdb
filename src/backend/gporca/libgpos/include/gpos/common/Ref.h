@@ -29,6 +29,9 @@ class Ref
 			p_->AddRef();
 	}
 
+	template <class U>
+	friend class Ref;  // for swap and move
+
 	template <class To, class From>
 	friend Ref<To> cast(Ref<From> &&);
 
@@ -53,12 +56,21 @@ public:
 		Release();
 	}
 
-	Ref(const Ref &other) noexcept : p_(other.p_)
+	Ref(const Ref &other) noexcept : p_(other.get())
 	{
 		AddRef();
 	}
 
-	Ref(Ref &&other) noexcept : p_(std::exchange(other.p_, nullptr))
+	template <class U,
+			  class = std::enable_if_t<std::is_convertible<U *, T *>::value>>
+	Ref(const Ref<U> &other) noexcept : p_(other.get())
+	{
+		AddRef();
+	}
+
+	template <class U,
+			  class = std::enable_if_t<std::is_convertible<U *, T *>::value>>
+	Ref(Ref<U> &&other) noexcept : p_(std::exchange(other.p_, nullptr))
 	{
 	}
 
