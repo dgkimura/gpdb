@@ -8,6 +8,9 @@
 #include <typeindex>  // for hash
 #include <utility>	  // for exchange
 
+#include "gpos/common/Hash.h"  // FIXME: sneaky
+#include "gpos/types.h"		   // for ULONG
+
 namespace gpos
 {
 // Specialize this in case of a forward-declared T
@@ -172,6 +175,31 @@ RefFromNew(T *p) noexcept
 	ref.Attach(p);
 	return ref;
 }
+
+// Adapter to turn a legacy hash function for CHashMap into a functor for
+// std::unordered_map
+template <class K, ULONG (*HashFn)(const K *)>
+struct RefHash
+{
+	ULONG
+	operator()(const Ref<K> &k) const noexcept
+	{
+		return HashFn(k.get());
+	}
+};
+
+// Adapter to turn a legacy equal function for CHashMap into a functor for the
+// KeyEqual parameter for std::unordered_map
+template <class K, BOOL (*EqFn)(const K *, const K *)>
+struct RefEq
+{
+	BOOL
+	operator()(const Ref<K> &lhs, const Ref<K> &rhs) const noexcept
+	{
+		return EqFn(lhs.get(), rhs.get());
+	}
+};
+
 }  // namespace gpos
 
 template <class T>
