@@ -8,7 +8,8 @@
 #include <typeindex>  // for hash
 #include <utility>	  // for exchange
 
-#include "gpos/types.h"	 // for ULONG
+#include "gpos/common/Hash.h"  // FIXME: sneaky
+#include "gpos/types.h"		   // for ULONG
 
 namespace gpos
 {
