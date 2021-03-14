@@ -19,23 +19,18 @@
 #include "gpos/io/IOstream.h"
 #include "gpos/string/CWStringDynamic.h"
 
+#include "gpopt/optimizer/COptimizerConfig.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/dxltokens.h"
 #include "naucrates/md/CMDIdGPDB.h"
+#include "naucrates/md/CMDRequest.h"
 #include "naucrates/md/IMDCacheObject.h"
 #include "naucrates/statistics/CStatistics.h"
-
-namespace gpmd
-{
-class CMDRequest;
-}
 
 namespace gpopt
 {
 class CEnumeratorConfig;
 class CStatisticsConfig;
-class COptimizerConfig;
-class ICostModel;
 }  // namespace gpopt
 
 namespace gpdxl

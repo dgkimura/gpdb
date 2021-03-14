@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 
 #include "gpopt/base/CColRef.h"
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CReqdProp.h"
 
 namespace gpopt
@@ -23,7 +24,6 @@ using namespace gpos;
 // forward declaration
 class CExpression;
 class CExpressionHandle;
-class CColRefSet;
 
 //---------------------------------------------------------------------------
 //	@class:

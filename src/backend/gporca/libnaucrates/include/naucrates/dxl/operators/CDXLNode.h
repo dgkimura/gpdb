@@ -16,6 +16,8 @@
 #include "gpos/common/CHashMap.h"
 
 #include "naucrates/dxl/gpdb_types.h"
+#include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
+#include "naucrates/dxl/operators/CDXLOperator.h"
 #include "naucrates/dxl/operators/CDXLProperties.h"
 
 namespace gpdxl
@@ -24,9 +26,7 @@ using namespace gpos;
 
 // fwd decl
 class CDXLNode;
-class CDXLOperator;
 class CXMLSerializer;
-class CDXLDirectDispatchInfo;
 
 using CDXLNodeArray = CDynamicPtrArray<CDXLNode, CleanupRelease>;
 

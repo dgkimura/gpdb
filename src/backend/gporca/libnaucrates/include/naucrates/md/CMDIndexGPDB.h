@@ -17,14 +17,12 @@
 #include "gpos/base.h"
 
 #include "naucrates/md/IMDIndex.h"
+#include "naucrates/md/IMDPartConstraint.h"
 
 namespace gpmd
 {
 using namespace gpos;
 using namespace gpdxl;
-
-// fwd decl
-class IMDPartConstraint;
 
 //---------------------------------------------------------------------------
 //	@class:

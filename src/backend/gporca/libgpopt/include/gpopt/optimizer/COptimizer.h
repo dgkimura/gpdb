@@ -17,10 +17,6 @@
 #include "gpopt/search/CSearchStage.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 
-namespace gpdxl
-{
-class CDXLNode;
-}
 
 namespace gpmd
 {
@@ -34,7 +30,6 @@ using namespace gpdxl;
 namespace gpopt
 {
 // forward declarations
-class ICostModel;
 class COptimizerConfig;
 class CQueryContext;
 class CEnumeratorConfig;

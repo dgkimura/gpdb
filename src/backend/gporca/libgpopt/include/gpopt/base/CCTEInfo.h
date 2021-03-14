@@ -15,6 +15,7 @@
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CStack.h"
 
+#include "gpopt/base/CCTEReq.h"
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColumnFactory.h"

@@ -15,13 +15,13 @@
 #include "gpos/base.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalAbstractBitmapScan.h"
+#include "naucrates/dxl/operators/CDXLTableDescr.h"
 
 namespace gpdxl
 {
 using namespace gpos;
 
 // fwd declarations
-class CDXLTableDescr;
 class CXMLSerializer;
 
 //---------------------------------------------------------------------------

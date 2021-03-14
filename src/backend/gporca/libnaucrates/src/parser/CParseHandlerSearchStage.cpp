@@ -12,6 +12,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerSearchStage.h"
 
+#include "gpopt/base/CCostContext.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"

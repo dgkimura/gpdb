@@ -25,8 +25,6 @@ namespace gpdxl
 {
 using namespace gpopt;
 
-class CDXLNode;
-
 //---------------------------------------------------------------------------
 //	@class:
 //		CIndexQualInfo

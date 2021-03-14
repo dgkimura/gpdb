@@ -13,16 +13,16 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/COrderSpec.h"
 #include "gpopt/metadata/CIndexDescriptor.h"
+#include "gpopt/metadata/CName.h"
 #include "gpopt/operators/CLogicalDynamicGetBase.h"
 
 
 namespace gpopt
 {
 // fwd declarations
-class CName;
-class CColRefSet;
 class CPartConstraint;
 
 //---------------------------------------------------------------------------

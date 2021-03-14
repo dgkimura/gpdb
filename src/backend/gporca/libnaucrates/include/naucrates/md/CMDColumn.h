@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 
+#include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/md/CMDName.h"
 #include "naucrates/md/IMDColumn.h"
 
@@ -23,7 +24,6 @@
 // fwd decl
 namespace gpdxl
 {
-class CDXLNode;
 class CXMLSerializer;
 }  // namespace gpdxl
 

@@ -13,14 +13,12 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalUnary.h"
 
 namespace gpopt
 {
-// fwd declaration
-class CColRefSet;
-
 //---------------------------------------------------------------------------
 //	@class:
 //		CLogicalProject
