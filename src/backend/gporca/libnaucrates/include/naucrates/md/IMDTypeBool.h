@@ -16,14 +16,9 @@
 
 #include "gpos/base.h"
 
+#include "naucrates/base/IDatumBool.h"
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/md/IMDType.h"
-
-// fwd decl
-namespace gpnaucrates
-{
-class IDatumBool;
-}
 
 namespace gpmd
 {

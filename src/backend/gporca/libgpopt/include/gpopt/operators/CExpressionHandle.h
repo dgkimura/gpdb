@@ -15,6 +15,7 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/base/CDrvdPropRelational.h"
 #include "gpopt/base/CReqdProp.h"
@@ -29,7 +30,6 @@ class CExpression;
 class COperator;
 class CDrvdPropPlan;
 class CDrvdPropScalar;
-class CColRefSet;
 class CPropConstraint;
 class CCostContext;
 

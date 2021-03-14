@@ -16,6 +16,8 @@
 #include "gpos/common/CHashMapIter.h"
 
 #include "gpopt/base/CColRef.h"
+#include "gpopt/base/CColRefSet.h"
+#include "gpopt/base/CReqdPropRelational.h"
 #include "naucrates/md/CDXLStatsDerivedRelation.h"
 #include "naucrates/statistics/CHistogram.h"
 #include "naucrates/statistics/CStatsPred.h"
@@ -25,8 +27,6 @@
 namespace gpopt
 {
 class CMDAccessor;
-class CReqdPropRelational;
-class CColRefSet;
 }  // namespace gpopt
 
 namespace gpnaucrates

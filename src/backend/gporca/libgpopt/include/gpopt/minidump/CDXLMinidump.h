@@ -12,19 +12,11 @@
 #define GPOPT_CDXLMinidump_H
 
 #include "gpos/base.h"
+#include "gpos/common/CBitSet.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
+#include "naucrates/dxl/operators/CDXLNode.h"
 
-// fwd decl
-namespace gpos
-{
-class CBitSet;
-}
-
-namespace gpdxl
-{
-class CDXLNode;
-}
 
 using namespace gpos;
 using namespace gpdxl;

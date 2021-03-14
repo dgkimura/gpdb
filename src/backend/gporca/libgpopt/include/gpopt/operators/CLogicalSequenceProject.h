@@ -13,15 +13,13 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/COrderSpec.h"
 #include "gpopt/base/CWindowFrame.h"
 #include "gpopt/operators/CLogicalUnary.h"
 
 namespace gpopt
 {
-// fwd declarations
-class CDistributionSpec;
-
 //---------------------------------------------------------------------------
 //	@class:
 //		CLogicalSequenceProject

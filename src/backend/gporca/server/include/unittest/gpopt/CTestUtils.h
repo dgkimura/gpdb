@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CAutoOptCtxt.h"
 #include "gpopt/base/CColRef.h"
+#include "gpopt/base/CConstraintInterval.h"
 #include "gpopt/base/CQueryContext.h"
 #include "gpopt/base/CRange.h"
 #include "gpopt/engine/CEnumeratorConfig.h"
@@ -83,7 +84,6 @@ using namespace gpos;
 using gpmd::CMDIdGPDB;
 
 // forward declarations
-class CConstraintInterval;
 class IConstExprEvaluator;
 
 using CExpressionJoinsArray = CDynamicPtrArray<CExpression, CleanupNULL>;

@@ -25,7 +25,6 @@
 namespace gpopt
 {
 // fwd declarations
-class CColRefSet;
 class CIndexDescriptor;
 
 //---------------------------------------------------------------------------

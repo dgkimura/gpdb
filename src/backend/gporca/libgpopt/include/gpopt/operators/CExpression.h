@@ -17,7 +17,6 @@
 #include "gpos/common/DbgPrintMixin.h"
 
 #include "gpopt/base/CColRef.h"
-#include "gpopt/base/CCostContext.h"
 #include "gpopt/base/CDrvdPropRelational.h"
 #include "gpopt/base/CDrvdPropScalar.h"
 #include "gpopt/base/CKeyCollection.h"
@@ -42,6 +41,7 @@ class CDrvdPropPlan;
 class CDrvdPropCtxt;
 class CDrvdPropCtxtPlan;
 class CPropConstraint;
+class CCostContext;
 
 using namespace gpos;
 using namespace gpnaucrates;
@@ -145,7 +145,7 @@ public:
 	// ctor for n-ary expression with origin group expression
 	CExpression(CMemoryPool *mp, COperator *pop, CGroupExpression *pgexpr,
 				CExpressionArray *pdrgpexpr, CReqdPropPlan *prpp,
-				IStatistics *input_stats, CCost cost = GPOPT_INVALID_COST);
+				IStatistics *input_stats, CCost cost);
 
 	// dtor
 	~CExpression() override;

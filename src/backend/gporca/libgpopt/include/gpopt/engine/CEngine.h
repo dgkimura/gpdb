@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CReqdPropRelational.h"
 #include "gpopt/search/CMemo.h"
 #include "gpopt/search/CSearchStage.h"
 #include "gpopt/xforms/CXform.h"
@@ -31,7 +32,6 @@ class CPhysical;
 class CQueryContext;
 class COptimizationContext;
 class CReqdPropPlan;
-class CReqdPropRelational;
 class CEnumeratorConfig;
 
 //---------------------------------------------------------------------------

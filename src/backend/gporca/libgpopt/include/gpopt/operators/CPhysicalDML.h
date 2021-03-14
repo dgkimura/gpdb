@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/operators/CLogicalDML.h"
 #include "gpopt/operators/CPhysical.h"
 
@@ -20,7 +21,6 @@
 namespace gpopt
 {
 // fwd declaration
-class CDistributionSpec;
 class COptimizerConfig;
 
 //---------------------------------------------------------------------------

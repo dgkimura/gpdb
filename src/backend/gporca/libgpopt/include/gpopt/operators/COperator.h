@@ -18,8 +18,7 @@
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/base/CFunctionProp.h"
-#include "gpopt/base/CReqdPropPlan.h"
-#include "gpopt/base/CReqdPropRelational.h"
+#include "gpopt/base/CReqdProp.h"
 
 namespace gpopt
 {
@@ -27,8 +26,6 @@ using namespace gpos;
 
 // forward declarations
 class CExpressionHandle;
-class CReqdPropPlan;
-class CReqdPropRelational;
 
 // dynamic array for operators
 using COperatorArray = CDynamicPtrArray<COperator, CleanupRelease>;

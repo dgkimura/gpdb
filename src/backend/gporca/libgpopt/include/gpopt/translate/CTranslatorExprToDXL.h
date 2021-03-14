@@ -35,6 +35,8 @@
 #include "naucrates/dxl/operators/CDXLScalarBoolExpr.h"
 #include "naucrates/dxl/operators/CDXLScalarSubPlan.h"
 #include "naucrates/dxl/operators/CDXLScalarWindowRef.h"
+#include "naucrates/dxl/operators/CDXLTableDescr.h"
+#include "naucrates/dxl/operators/CDXLWindowFrame.h"
 
 // fwd declaration
 namespace gpnaucrates
@@ -45,9 +47,7 @@ class IStatistics;
 // forward declarations
 namespace gpdxl
 {
-class CDXLTableDescr;
 class CDXLPhysicalProperties;
-class CDXLWindowFrame;
 }  // namespace gpdxl
 
 namespace gpopt

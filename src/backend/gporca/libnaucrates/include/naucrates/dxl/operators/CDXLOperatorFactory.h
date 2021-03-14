@@ -36,6 +36,9 @@
 #include "naucrates/dxl/xml/CDXLMemoryManager.h"
 #include "naucrates/dxl/xml/dxltokens.h"
 #include "naucrates/md/CMDFunctionGPDB.h"
+#include "naucrates/md/CMDIdCast.h"
+#include "naucrates/md/CMDIdRelStats.h"
+#include "naucrates/md/CMDIdScCmp.h"
 #include "naucrates/md/CMDRelationGPDB.h"
 #include "naucrates/md/IMDId.h"
 #include "naucrates/md/IMDIndex.h"
@@ -48,9 +51,6 @@ namespace gpmd
 {
 class CMDIdGPDB;
 class CMDIdColStats;
-class CMDIdRelStats;
-class CMDIdCast;
-class CMDIdScCmp;
 }  // namespace gpmd
 
 namespace gpdxl
