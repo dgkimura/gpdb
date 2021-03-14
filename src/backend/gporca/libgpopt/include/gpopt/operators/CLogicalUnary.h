@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogical.h"
 #include "naucrates/base/IDatum.h"
@@ -20,9 +21,6 @@
 namespace gpopt
 {
 using namespace gpnaucrates;
-
-// fwd declaration
-class CColRefSet;
 
 //---------------------------------------------------------------------------
 //	@class:

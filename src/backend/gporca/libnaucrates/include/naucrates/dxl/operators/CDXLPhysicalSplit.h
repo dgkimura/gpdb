@@ -19,9 +19,6 @@
 
 namespace gpdxl
 {
-// fwd decl
-class CDXLTableDescr;
-
 //---------------------------------------------------------------------------
 //	@class:
 //		CDXLPhysicalSplit

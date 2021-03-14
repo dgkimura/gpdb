@@ -20,14 +20,12 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CColRefSet.h"
+#include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogical.h"
 
 namespace gpopt
 {
-// fwd declarations
-class CColRefSet;
-class CTableDescriptor;
-
 //---------------------------------------------------------------------------
 //	@class:
 //		CLogicalBitmapTableGet

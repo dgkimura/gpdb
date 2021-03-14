@@ -14,6 +14,7 @@
 #include "gpos/common/CHashSet.h"
 
 #include "gpopt/base/CColRef.h"
+#include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/COrderSpec.h"
 #include "gpopt/base/CWindowFrame.h"
 #include "gpopt/metadata/CTableDescriptor.h"
@@ -39,8 +40,6 @@ using namespace gpos;
 class CMemo;
 class CLogicalCTEConsumer;
 class CLogicalCTEProducer;
-class CDistributionSpec;
-class IConstExprEvaluator;
 class CLogical;
 class CLogicalGbAgg;
 

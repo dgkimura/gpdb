@@ -16,6 +16,7 @@
 #include "gpos/base.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
+#include "naucrates/dxl/operators/CDXLTableDescr.h"
 
 namespace gpdxl
 {
@@ -31,7 +32,6 @@ enum Edxlbs
 };
 
 // fwd declarations
-class CDXLTableDescr;
 class CXMLSerializer;
 
 //---------------------------------------------------------------------------

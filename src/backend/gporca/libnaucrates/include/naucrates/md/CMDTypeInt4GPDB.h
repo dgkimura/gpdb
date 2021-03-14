@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 
+#include "naucrates/base/IDatumInt4.h"
 #include "naucrates/md/CGPDBTypeHelper.h"
 #include "naucrates/md/IMDTypeInt4.h"
 
@@ -44,11 +45,6 @@
 namespace gpdxl
 {
 class CXMLSerializer;
-}
-
-namespace gpnaucrates
-{
-class IDatumInt4;
 }
 
 namespace gpmd

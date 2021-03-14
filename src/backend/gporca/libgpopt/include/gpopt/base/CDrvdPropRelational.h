@@ -15,6 +15,7 @@
 #include "gpos/common/CRefCount.h"
 
 #include "gpopt/base/CColRef.h"
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/base/CFunctionProp.h"
 #include "gpopt/base/CFunctionalDependency.h"
@@ -28,7 +29,6 @@ using namespace gpos;
 
 // fwd declaration
 class CExpressionHandle;
-class CColRefSet;
 class CReqdPropPlan;
 class CKeyCollection;
 class CPropConstraint;

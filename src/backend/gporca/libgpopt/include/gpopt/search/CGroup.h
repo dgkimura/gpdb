@@ -19,6 +19,7 @@
 #include "gpopt/base/CCostContext.h"
 #include "gpopt/base/COptimizationContext.h"
 #include "gpopt/base/CReqdPropPlan.h"
+#include "gpopt/base/CReqdPropRelational.h"
 #include "gpopt/operators/CLogical.h"
 #include "gpopt/search/CJobQueue.h"
 #include "gpopt/search/CTreeMap.h"
@@ -36,7 +37,6 @@ class CGroup;
 class CGroupExpression;
 class CDrvdProp;
 class CDrvdPropCtxtPlan;
-class CReqdPropRelational;
 class CExpression;
 
 // type definitions

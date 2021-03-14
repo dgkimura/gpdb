@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/base/CPartInfo.h"
 #include "gpopt/mdcache/CMDAccessor.h"
@@ -23,9 +24,6 @@ namespace gpopt
 {
 using namespace gpos;
 using namespace gpmd;
-
-// forward declaration
-class CColRefSet;
 
 //---------------------------------------------------------------------------
 //	@class:

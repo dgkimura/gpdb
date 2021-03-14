@@ -19,6 +19,7 @@
 #include "gpos/task/CTask.h"
 #include "gpos/task/CWorker.h"
 
+#include "gpopt/base/CCostContext.h"
 #include "gpopt/base/CIOUtils.h"
 #include "gpopt/base/CUtils.h"
 
