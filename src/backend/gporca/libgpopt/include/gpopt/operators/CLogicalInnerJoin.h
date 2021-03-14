@@ -13,13 +13,11 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CLogicalJoin.h"
 
 namespace gpopt
 {
-// fwd declaration
-class CColRefSet;
-
 //---------------------------------------------------------------------------
 //	@class:
 //		CLogicalInnerJoin

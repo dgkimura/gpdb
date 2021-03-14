@@ -16,6 +16,7 @@
 #include "gpos/common/DbgPrintMixin.h"
 
 #include "gpopt/base/CColRef.h"
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CPropSpec.h"
 #include "naucrates/md/IMDId.h"
 
@@ -26,9 +27,6 @@ class COrderSpec;
 using COrderSpecArray = CDynamicPtrArray<COrderSpec, CleanupRelease>;
 
 using namespace gpos;
-
-// fwd declaration
-class CColRefSet;
 
 //---------------------------------------------------------------------------
 //	@class:

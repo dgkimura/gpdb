@@ -16,7 +16,10 @@
 
 #include "gpopt/base/CColumnFactory.h"
 #include "gpopt/base/COptCtxt.h"
+#include "gpopt/cost/ICostModel.h"
+#include "gpopt/eval/IConstExprEvaluator.h"
 #include "gpopt/mdcache/CMDAccessor.h"
+#include "gpopt/optimizer/COptimizerConfig.h"
 
 namespace gpopt
 {
@@ -24,9 +27,6 @@ using namespace gpos;
 
 // forward declaration
 class CCostParams;
-class ICostModel;
-class COptimizerConfig;
-class IConstExprEvaluator;
 
 //---------------------------------------------------------------------------
 //	@class:

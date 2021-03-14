@@ -15,13 +15,11 @@
 #include "gpos/base.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
+#include "naucrates/dxl/operators/CDXLTableDescr.h"
 
 namespace gpdxl
 {
 using namespace gpmd;
-
-// fwd decl
-class CDXLTableDescr;
 
 //---------------------------------------------------------------------------
 //	@class:

@@ -20,11 +20,7 @@
 
 #include "gpos/base.h"
 
-// forward declaration
-namespace gpdxl
-{
-class CDXLNode;
-}
+#include "naucrates/dxl/operators/CDXLNode.h"
 
 namespace gpopt
 {
