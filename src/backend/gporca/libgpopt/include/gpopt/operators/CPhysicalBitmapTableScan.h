@@ -20,12 +20,12 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/operators/CPhysicalScan.h"
 
 namespace gpopt
 {
 // fwd declarations
-class CDistributionSpec;
 class CTableDescriptor;
 
 //---------------------------------------------------------------------------

@@ -17,12 +17,6 @@
 #include "gpopt/base/CColRef.h"
 #include "naucrates/md/IMDCacheObject.h"
 
-// fwd decl
-namespace gpdxl
-{
-class CDXLNode;
-}
-
 namespace gpopt
 {
 class CExpression;

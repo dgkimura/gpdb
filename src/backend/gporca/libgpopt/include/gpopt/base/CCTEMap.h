@@ -21,7 +21,6 @@
 #include "gpos/common/CHashMapIter.h"
 #include "gpos/common/CRefCount.h"
 
-#include "gpopt/base/CCTEInfo.h"
 #include "gpopt/base/CDrvdPropPlan.h"
 
 namespace gpopt

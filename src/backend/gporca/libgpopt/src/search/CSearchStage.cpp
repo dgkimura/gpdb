@@ -11,6 +11,7 @@
 
 #include "gpopt/search/CSearchStage.h"
 
+#include "gpopt/base/CCostContext.h"
 #include "gpopt/xforms/CXformFactory.h"
 
 using namespace gpopt;

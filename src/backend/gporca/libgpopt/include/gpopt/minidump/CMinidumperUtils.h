@@ -21,7 +21,6 @@ using namespace gpos;
 namespace gpopt
 {
 // fwd decl
-class ICostModel;
 class CMiniDumperDXL;
 class COptimizerConfig;
 class IConstExprEvaluator;

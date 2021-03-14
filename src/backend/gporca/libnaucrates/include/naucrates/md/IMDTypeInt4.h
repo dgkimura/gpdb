@@ -14,13 +14,8 @@
 
 #include "gpos/base.h"
 
+#include "naucrates/base/IDatumInt4.h"
 #include "naucrates/md/IMDType.h"
-
-// fwd decl
-namespace gpnaucrates
-{
-class IDatumInt4;
-}
 
 namespace gpmd
 {

@@ -23,9 +23,6 @@ using namespace gpos;
 
 XERCES_CPP_NAMESPACE_USE
 
-// fwd decl
-class CDXLDirectDispatchInfo;
-
 //---------------------------------------------------------------------------
 //	@class:
 //		CParseHandlerPlan

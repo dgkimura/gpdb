@@ -16,10 +16,14 @@
 #include "gpos/task/CTaskLocalStorageObject.h"
 
 #include "gpopt/base/CCTEInfo.h"
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColumnFactory.h"
 #include "gpopt/base/IComparator.h"
 #include "gpopt/base/SPartSelectorInfo.h"
+#include "gpopt/cost/ICostModel.h"
+#include "gpopt/eval/IConstExprEvaluator.h"
 #include "gpopt/mdcache/CMDAccessor.h"
+#include "gpopt/optimizer/COptimizerConfig.h"
 
 namespace gpopt
 {
@@ -29,12 +33,6 @@ using namespace gpos;
 using UlongToBitSetMap =
 	CHashMap<ULONG, CBitSet, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
 			 CleanupDelete<ULONG>, CleanupRelease<CBitSet>>;
-
-// forward declarations
-class CColRefSet;
-class COptimizerConfig;
-class ICostModel;
-class IConstExprEvaluator;
 
 //---------------------------------------------------------------------------
 //	@class:

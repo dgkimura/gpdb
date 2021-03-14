@@ -13,14 +13,12 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CWindowFrame.h"
 #include "gpopt/operators/CPhysical.h"
 
 namespace gpopt
 {
-// fwd declarations
-class CDistributionSpec;
-
 //---------------------------------------------------------------------------
 //	@class:
 //		CPhysicalSequenceProject
