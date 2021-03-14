@@ -17,9 +17,6 @@
 
 namespace gpopt
 {
-// fwd declaration
-class CDistributionSpec;
-
 //---------------------------------------------------------------------------
 //	@class:
 //		CPhysicalScalarAgg

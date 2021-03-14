@@ -17,6 +17,7 @@
 #include "gpos/base.h"
 #include "gpos/string/CWStringDynamic.h"
 
+#include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/md/CMDColumn.h"
 #include "naucrates/md/CMDName.h"
 #include "naucrates/md/IMDColumn.h"

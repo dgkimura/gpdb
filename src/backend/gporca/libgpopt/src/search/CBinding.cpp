@@ -110,7 +110,7 @@ CBinding::PexprFinalize(CMemoryPool *mp, CGroupExpression *pgexpr,
 	pop->AddRef();
 	CExpression *pexpr =
 		GPOS_NEW(mp) CExpression(mp, pop, pgexpr, pdrgpexpr, nullptr /* prpp */,
-								 nullptr /*input_stats*/);
+								 nullptr /*input_stats*/, GPOPT_INVALID_COST);
 
 	return pexpr;
 }

@@ -18,6 +18,8 @@
 #include "gpos/error/CException.h"
 
 #include "gpopt/base/CColRef.h"
+#include "gpopt/cost/ICostModel.h"
+#include "gpopt/optimizer/COptimizerConfig.h"
 #include "gpopt/search/CSearchStage.h"
 #include "gpopt/translate/CTranslatorUtils.h"
 
@@ -40,8 +42,6 @@ namespace gpopt
 class CExpression;
 class CMDAccessor;
 class CQueryContext;
-class COptimizerConfig;
-class ICostModel;
 }  // namespace gpopt
 
 struct PlannedStmt;

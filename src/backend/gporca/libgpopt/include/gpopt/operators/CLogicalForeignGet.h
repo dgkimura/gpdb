@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CLogicalGet.h"
 
 namespace gpopt
@@ -20,7 +21,6 @@ namespace gpopt
 // fwd declarations
 class CTableDescriptor;
 class CName;
-class CColRefSet;
 
 //---------------------------------------------------------------------------
 //	@class:

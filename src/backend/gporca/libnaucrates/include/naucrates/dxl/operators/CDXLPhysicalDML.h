@@ -15,14 +15,12 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 
+#include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
+#include "naucrates/dxl/operators/CDXLTableDescr.h"
 
 namespace gpdxl
 {
-// fwd decl
-class CDXLTableDescr;
-class CDXLDirectDispatchInfo;
-
 enum EdxlDmlType
 {
 	Edxldmlinsert,

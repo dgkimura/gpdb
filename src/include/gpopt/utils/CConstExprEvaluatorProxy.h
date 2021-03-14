@@ -21,11 +21,10 @@
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/translate/CMappingColIdVar.h"
 #include "gpopt/translate/CTranslatorDXLToScalar.h"
+#include "naucrates/dxl/operators/CDXLNode.h"
 
 namespace gpdxl
 {
-class CDXLNode;
-
 //---------------------------------------------------------------------------
 //	@class:
 //		CConstExprEvaluatorProxy

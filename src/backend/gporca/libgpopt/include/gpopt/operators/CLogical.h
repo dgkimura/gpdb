@@ -13,7 +13,9 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdProp.h"
+#include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/CMaxCard.h"
 #include "gpopt/base/CPartInfo.h"
 #include "gpopt/base/CPropConstraint.h"
@@ -32,9 +34,6 @@ namespace gpopt
 {
 using namespace gpos;
 
-// forward declaration
-class CColRefSet;
-class CKeyCollection;
 
 //---------------------------------------------------------------------------
 //	@class:

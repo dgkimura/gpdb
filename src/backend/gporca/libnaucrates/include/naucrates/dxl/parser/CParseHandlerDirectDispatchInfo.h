@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 
+#include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 
 namespace gpdxl
@@ -21,9 +22,6 @@ namespace gpdxl
 using namespace gpos;
 
 XERCES_CPP_NAMESPACE_USE
-
-// fwd decl
-class CDXLDirectDispatchInfo;
 
 //---------------------------------------------------------------------------
 //	@class:

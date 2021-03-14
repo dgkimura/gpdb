@@ -13,7 +13,11 @@
 
 #include "gpos/base.h"
 
-#include "gpopt/base/CColRef.h"
+#include "gpopt/base/CCTEReq.h"
+#include "gpopt/base/CColRefSet.h"
+#include "gpopt/base/CEnfdDistribution.h"
+#include "gpopt/base/CEnfdOrder.h"
+#include "gpopt/base/CEnfdRewindability.h"
 #include "gpopt/base/CReqdProp.h"
 
 namespace gpopt
@@ -21,15 +25,10 @@ namespace gpopt
 using namespace gpos;
 
 // forward declaration
-class CColRefSet;
 class CDrvdPropRelational;
 class CDrvdPropPlan;
-class CEnfdOrder;
-class CEnfdDistribution;
-class CEnfdRewindability;
 class CEnfdPartitionPropagation;
 class CExpressionHandle;
-class CCTEReq;
 class CPartInfo;
 class CPhysical;
 class CPropSpec;

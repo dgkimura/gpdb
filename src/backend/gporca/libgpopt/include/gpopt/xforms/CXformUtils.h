@@ -15,10 +15,12 @@
 
 #include "gpopt/base/CCastUtils.h"
 #include "gpopt/base/CColRef.h"
+#include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CLogicalDML.h"
 #include "gpopt/operators/CLogicalDynamicIndexGet.h"
+#include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CLogicalIndexGet.h"
 #include "gpopt/operators/CLogicalJoin.h"
 #include "gpopt/operators/CPhysicalJoin.h"
@@ -33,7 +35,6 @@ using namespace gpos;
 
 // forward declarations
 class CGroupExpression;
-class CColRefSet;
 class CExpression;
 class CLogical;
 class CLogicalDynamicGet;

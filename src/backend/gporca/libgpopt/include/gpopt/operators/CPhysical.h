@@ -20,6 +20,7 @@
 #include "gpopt/base/CEnfdOrder.h"
 #include "gpopt/base/CEnfdPartitionPropagation.h"
 #include "gpopt/base/CEnfdRewindability.h"
+#include "gpopt/base/COptimizationContext.h"
 #include "gpopt/base/COrderSpec.h"
 #include "gpopt/base/CPartitionPropagationSpec.h"
 #include "gpopt/base/CRewindabilitySpec.h"
@@ -422,9 +423,9 @@ public:
 
 	// check if optimization contexts is valid
 	virtual BOOL
-	FValidContext(CMemoryPool *,			   // mp
-				  COptimizationContext *,	   // poc,
-				  COptimizationContextArray *  // pdrgpocChild
+	FValidContext(CMemoryPool *,				  // mp
+				  gpopt::COptimizationContext *,  // poc,
+				  COptimizationContextArray *	  // pdrgpocChild
 	) const
 	{
 		return true;

@@ -21,12 +21,7 @@
 #include "gpos/base.h"
 
 #include "gpopt/eval/IConstDXLNodeEvaluator.h"
-
-// forward decl
-namespace gpdxl
-{
-class CDXLNode;
-}
+#include "naucrates/dxl/operators/CDXLNode.h"
 
 namespace gpopt
 {

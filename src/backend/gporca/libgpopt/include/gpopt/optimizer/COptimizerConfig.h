@@ -17,6 +17,7 @@
 #include "gpos/common/CRefCount.h"
 
 #include "gpopt/base/CWindowOids.h"
+#include "gpopt/cost/ICostModel.h"
 #include "gpopt/engine/CCTEConfig.h"
 #include "gpopt/engine/CEnumeratorConfig.h"
 #include "gpopt/engine/CHint.h"
@@ -25,9 +26,6 @@
 namespace gpopt
 {
 using namespace gpos;
-
-// forward decl
-class ICostModel;
 
 //---------------------------------------------------------------------------
 //	@class:

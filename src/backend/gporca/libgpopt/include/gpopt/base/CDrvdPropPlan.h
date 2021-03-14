@@ -15,17 +15,17 @@
 #include "gpos/common/CRefCount.h"
 
 #include "gpopt/base/CColRef.h"
+#include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CDrvdProp.h"
+#include "gpopt/base/COrderSpec.h"
+#include "gpopt/base/CRewindabilitySpec.h"
 
 namespace gpopt
 {
 using namespace gpos;
 
 // fwd declaration
-class CDistributionSpec;
 class CExpressionHandle;
-class COrderSpec;
-class CRewindabilitySpec;
 class CPartitionPropagationSpec;
 class CReqdPropPlan;
 class CCTEMap;
