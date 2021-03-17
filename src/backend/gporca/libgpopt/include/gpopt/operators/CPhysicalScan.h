@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCTEMap.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
@@ -255,10 +256,9 @@ public:
 	}
 
 	// statistics derivation during costing
-	virtual IStatistics *PstatsDerive(CMemoryPool *mp,
-									  CExpressionHandle &exprhdl,
-									  CReqdPropPlan *prpplan,
-									  IStatisticsArray *stats_ctxt) const = 0;
+	virtual IStatistics *PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan,
+		gpos::pointer<IStatisticsArray *> stats_ctxt) const = 0;
 
 	// conversion function
 	static CPhysicalScan *PopConvert(COperator *pop);
