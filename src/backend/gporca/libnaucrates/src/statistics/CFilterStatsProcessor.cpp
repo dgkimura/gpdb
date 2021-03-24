@@ -21,6 +21,7 @@
 #include "naucrates/statistics/CScaleFactorUtils.h"
 #include "naucrates/statistics/CStatistics.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
+#include "naucrates/statistics/PointLess.h"
 
 using namespace gpopt;
 
