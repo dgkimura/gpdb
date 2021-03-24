@@ -33,7 +33,9 @@ OBJS        = CBucket.o \
               CStatsPredUnsupported.o \
               CStatsPredUtils.o \
               CUnionAllStatsProcessor.o \
-              CUpperBoundNDVs.o
+              CUpperBoundNDVs.o \
+              PointLess.o \
+              StatsPredLess.o
 
 include $(top_srcdir)/src/backend/common.mk
 

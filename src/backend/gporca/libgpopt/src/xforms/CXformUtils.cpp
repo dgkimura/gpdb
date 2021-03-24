@@ -9,7 +9,6 @@
 //		Implementation of xform utilities
 //---------------------------------------------------------------------------
 
-
 #include "gpopt/xforms/CXformUtils.h"
 
 #include "gpos/base.h"
@@ -60,6 +59,7 @@
 #include "gpopt/xforms/CDecorrelator.h"
 #include "gpopt/xforms/CSubqueryHandler.h"
 #include "gpopt/xforms/CXformExploration.h"
+#include "gpopt/xforms/ProjectElementArrayLess.h"
 #include "naucrates/base/CDatumInt8GPDB.h"
 #include "naucrates/md/CMDIdGPDB.h"
 #include "naucrates/md/CMDTriggerGPDB.h"
