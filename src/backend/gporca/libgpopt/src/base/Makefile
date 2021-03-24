@@ -74,6 +74,7 @@ OBJS        = CAutoOptCtxt.o \
               CUtils.o \
               CWindowFrame.o \
               CWindowOids.o \
+              DatumLess.o \
               IColConstraintsMapper.o
 
 include $(top_srcdir)/src/backend/common.mk

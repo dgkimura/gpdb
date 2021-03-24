@@ -12,6 +12,7 @@
 #include "naucrates/statistics/CStatsPredDisj.h"
 
 #include "naucrates/statistics/CStatisticsUtils.h"
+#include "naucrates/statistics/StatsPredLess.h"
 
 using namespace gpnaucrates;
 using namespace gpopt;
