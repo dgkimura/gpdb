@@ -20,6 +20,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CHashMapIter.h"
+#include "gpos/common/owner.h"
 
 
 namespace gpopt
@@ -53,7 +54,8 @@ class CTreeMap
 	using DrgPr = CDynamicPtrArray<R, CleanupRelease<R>>;
 
 	// generic rehydrate function
-	using PrFn = R *(*) (CMemoryPool *, T *, DrgPr *, U *);
+	using PrFn = gpos::owner<R *> (*)(CMemoryPool *, T *, gpos::owner<DrgPr *>,
+									  U *);
 
 private:
 	// fwd declaration
@@ -183,7 +185,7 @@ private:
 		}
 
 		// rehydrate tree
-		R *
+		gpos::owner<R *>
 		PrUnrank(CMemoryPool *mp, PrFn prfn, U *pU, ULONG ulChild,
 				 ULLONG ullRank)
 		{
@@ -318,12 +320,12 @@ private:
 		}
 
 		// unrank tree of a given rank with a given rehydrate function
-		R *
+		gpos::owner<R *>
 		PrUnrank(CMemoryPool *mp, PrFn prfn, U *pU, ULLONG ullRank)
 		{
 			GPOS_CHECK_STACK_SIZE;
 
-			R *pr = nullptr;
+			gpos::owner<R *> pr = nullptr;
 
 			if (0 == this->m_ul)
 			{
@@ -348,7 +350,8 @@ private:
 					ullRankRem /= ullLocalCount;
 				}
 
-				pr = prfn(mp, const_cast<T *>(this->Value()), pdrg, pU);
+				pr = prfn(mp, const_cast<T *>(this->Value()), std::move(pdrg),
+						  pU);
 			}
 
 			return pr;
@@ -535,7 +538,7 @@ public:
 	}
 
 	// unrank a specific tree
-	R *
+	gpos::owner<R *>
 	PrUnrank(CMemoryPool *mp, U *pU, ULLONG ullRank) const
 	{
 		return m_ptnRoot->PrUnrank(mp, m_prfn, pU, ullRank);
