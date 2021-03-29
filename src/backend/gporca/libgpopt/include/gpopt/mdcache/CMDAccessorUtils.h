@@ -14,6 +14,8 @@
 #ifndef GPOPT_CMDAccessorUtils_H
 #define GPOPT_CMDAccessorUtils_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/operators/CExpression.h"
 
@@ -70,8 +72,9 @@ public:
 
 	// similar to GetScCmpMdIdConsiderCasts() but also add the appropriate casts
 	static void ApplyCastsForScCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
-								   CExpression *&pexprLeft,
-								   CExpression *&pexprRight, IMDId *op_mdid);
+								   gpos::owner<CExpression *> &pexprLeft,
+								   gpos::owner<CExpression *> &pexprRight,
+								   IMDId *op_mdid);
 
 	// is scalar operator commutative? this can be used with ScalarOp and ScalarCmp
 	static BOOL FCommutativeScalarOp(CMDAccessor *md_accessor, IMDId *mdid_op);
