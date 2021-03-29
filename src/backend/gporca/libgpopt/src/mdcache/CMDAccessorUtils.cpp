@@ -232,8 +232,9 @@ CMDAccessorUtils::GetScCmpMdIdConsiderCasts(CMDAccessor *md_accessor,
 
 void
 CMDAccessorUtils::ApplyCastsForScCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
-									 CExpression *&pexprLeft,
-									 CExpression *&pexprRight, IMDId *op_mdid)
+									 gpos::owner<CExpression *> &pexprLeft,
+									 gpos::owner<CExpression *> &pexprRight,
+									 IMDId *op_mdid)
 {
 	IMDId *left_mdid = CScalar::PopConvert(pexprLeft->Pop())->MdidType();
 	IMDId *right_mdid = CScalar::PopConvert(pexprRight->Pop())->MdidType();
@@ -272,8 +273,8 @@ CMDAccessorUtils::ApplyCastsForScCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 		if (CMDAccessorUtils::FCastExists(md_accessor, left_mdid, op_left_mdid))
 		{
 			// The simple case, a direct cast exists
-			pexprLeft =
-				CUtils::PexprCast(mp, md_accessor, pexprLeft, op_left_mdid);
+			pexprLeft = CUtils::PexprCast(mp, md_accessor, std::move(pexprLeft),
+										  op_left_mdid);
 		}
 		else
 		{
@@ -281,16 +282,16 @@ CMDAccessorUtils::ApplyCastsForScCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 			GPOS_ASSERT(CMDAccessorUtils::FCastExists(md_accessor, left_mdid,
 													  right_mdid));
 			// Create the two casts described above, first from left to right type
-			pexprLeft =
-				CUtils::PexprCast(mp, md_accessor, pexprLeft, right_mdid);
+			pexprLeft = CUtils::PexprCast(mp, md_accessor, std::move(pexprLeft),
+										  right_mdid);
 			if (!right_mdid->Equals(op_left_mdid))
 			{
 				// validate proposition A
 				GPOS_ASSERT(CMDAccessorUtils::FCastExists(
 					md_accessor, right_mdid, op_left_mdid));
 				// and then from right type to the type the comparison operator expects
-				pexprLeft =
-					CUtils::PexprCast(mp, md_accessor, pexprLeft, op_left_mdid);
+				pexprLeft = CUtils::PexprCast(
+					mp, md_accessor, std::move(pexprLeft), op_left_mdid);
 			}
 		}
 	}
@@ -302,8 +303,8 @@ CMDAccessorUtils::ApplyCastsForScCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 										  op_right_mdid))
 		{
 			// The simple case, a direct cast exists
-			pexprRight =
-				CUtils::PexprCast(mp, md_accessor, pexprRight, op_right_mdid);
+			pexprRight = CUtils::PexprCast(
+				mp, md_accessor, std::move(pexprRight), op_right_mdid);
 		}
 		else
 		{
@@ -311,16 +312,16 @@ CMDAccessorUtils::ApplyCastsForScCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 			GPOS_ASSERT(CMDAccessorUtils::FCastExists(md_accessor, right_mdid,
 													  left_mdid));
 			// Create the two casts described above, first from right to left type
-			pexprRight =
-				CUtils::PexprCast(mp, md_accessor, pexprRight, left_mdid);
+			pexprRight = CUtils::PexprCast(mp, md_accessor,
+										   std::move(pexprRight), left_mdid);
 			if (!left_mdid->Equals(op_right_mdid))
 			{
 				// validate proposition A
 				GPOS_ASSERT(CMDAccessorUtils::FCastExists(
 					md_accessor, left_mdid, op_right_mdid));
 				// and then from left type to the type the comparison operator expects
-				pexprRight = CUtils::PexprCast(mp, md_accessor, pexprRight,
-											   op_right_mdid);
+				pexprRight = CUtils::PexprCast(
+					mp, md_accessor, std::move(pexprRight), op_right_mdid);
 			}
 		}
 	}
