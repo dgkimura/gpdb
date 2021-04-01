@@ -13,6 +13,7 @@
 #define GPOPT_CSubqueryHandler_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 
@@ -243,7 +244,8 @@ private:
 
 	// handle subqueries in scalar tree recursively
 	BOOL FRecursiveHandler(CExpression *pexprOuter, CExpression *pexprScalar,
-						   ESubqueryCtxt esqctxt, CExpression **ppexprNewOuter,
+						   ESubqueryCtxt esqctxt,
+						   gpos::owner<CExpression *> *ppexprNewOuter,
 						   CExpression **ppexprNewScalar);
 
 	// handle subqueries on a case-by-case basis
