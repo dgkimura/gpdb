@@ -15,6 +15,7 @@
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/owner.h"
 #include "gpos/io/IOstream.h"
 
 #include "gpopt/base/CKHeap.h"
@@ -548,9 +549,10 @@ public:
 	CExpression *GetNextOfTopK();
 
 	// check for NIJs
-	BOOL IsRightChildOfNIJ(SGroupInfo *groupInfo,
-						   CExpression **onPredToUse = nullptr,
-						   CBitSet **requiredBitsOnLeft = nullptr);
+	BOOL IsRightChildOfNIJ(
+		SGroupInfo *groupInfo,
+		gpos::owner<CExpression *> *onPredToUse = nullptr,
+		gpos::pointer<CBitSet *> *requiredBitsOnLeft = nullptr);
 
 	// print function
 	IOstream &OsPrint(IOstream &) const;
