@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerColStats_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 
@@ -42,7 +43,7 @@ class CParseHandlerColStats : public CParseHandlerMetadataObject
 {
 private:
 	// mdid of the col stats object
-	CMDIdColStats *m_mdid;
+	gpos::owner<CMDIdColStats *> m_mdid;
 
 	// name of the column
 	CMDName *m_md_name;
