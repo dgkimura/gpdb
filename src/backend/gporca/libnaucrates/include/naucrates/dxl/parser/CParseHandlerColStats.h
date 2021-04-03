@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerColStats_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 

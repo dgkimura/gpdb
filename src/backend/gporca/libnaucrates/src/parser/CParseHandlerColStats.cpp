@@ -196,9 +196,10 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 		dxl_stats_bucket_array->Append(dxl_bucket);
 	}
 
-	m_imd_obj = GPOS_NEW(m_mp) CDXLColStats(
-		m_mp, m_mdid, m_md_name, m_width, m_null_freq, m_distinct_remaining,
-		m_freq_remaining, dxl_stats_bucket_array, m_is_column_stats_missing);
+	m_imd_obj = GPOS_NEW(m_mp)
+		CDXLColStats(m_mp, std::move(m_mdid), m_md_name, m_width, m_null_freq,
+					 m_distinct_remaining, m_freq_remaining,
+					 dxl_stats_bucket_array, m_is_column_stats_missing);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();
