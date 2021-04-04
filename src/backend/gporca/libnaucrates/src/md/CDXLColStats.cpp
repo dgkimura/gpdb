@@ -229,16 +229,15 @@ CDXLColStats::CreateDXLDummyColStats(CMemoryPool *mp, IMDId *mdid,
 {
 	CMDIdColStats *mdid_col_stats = CMDIdColStats::CastMdid(mdid);
 
-	CAutoRef<CDXLBucketArray> dxl_bucket_array;
+	CDXLBucketArray *dxl_bucket_array;
 	dxl_bucket_array = GPOS_NEW(mp) CDXLBucketArray(mp);
-	CAutoRef<CDXLColStats> dxl_col_stats;
+	CDXLColStats *dxl_col_stats;
 	dxl_col_stats = GPOS_NEW(mp) CDXLColStats(
 		mp, mdid_col_stats, mdname, width, CHistogram::DefaultNullFreq,
 		CHistogram::DefaultNDVRemain, CHistogram::DefaultNDVFreqRemain,
-		dxl_bucket_array.Value(), true /* is_col_stats_missing */
+		dxl_bucket_array, true /* is_col_stats_missing */
 	);
-	dxl_bucket_array.Reset();
-	return dxl_col_stats.Reset();
+	return dxl_col_stats;
 }
 
 // EOF

@@ -199,12 +199,12 @@ CDXLRelStats::CreateDXLDummyRelStats(CMemoryPool *mp, IMDId *mdid)
 	str = GPOS_NEW(mp) CWStringDynamic(mp, rel_stats_mdid->GetBuffer());
 	CAutoP<CMDName> mdname;
 	mdname = GPOS_NEW(mp) CMDName(mp, str.Value());
-	CAutoRef<CDXLRelStats> rel_stats_dxl;
+	CDXLRelStats *rel_stats_dxl;
 	rel_stats_dxl = GPOS_NEW(mp) CDXLRelStats(
 		mp, rel_stats_mdid, mdname.Value(), CStatistics::DefaultColumnWidth,
 		false /* is_empty */, 0 /* relpages */, 0 /* relallvisible */);
 	mdname.Reset();
-	return rel_stats_dxl.Reset();
+	return rel_stats_dxl;
 }
 
 // EOF
