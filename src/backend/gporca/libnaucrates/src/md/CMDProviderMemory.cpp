@@ -85,10 +85,7 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 {
 	GPOS_ASSERT(nullptr != mdcache_obj_array);
 
-	// load metadata objects from the file
-	CAutoRef<MDIdToSerializedMDIdMap> md_map;
 	m_mdmap = GPOS_NEW(mp) MDIdToSerializedMDIdMap(mp);
-	md_map = m_mdmap;
 
 	const ULONG size = mdcache_obj_array->Size();
 
@@ -100,8 +97,6 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 		IMDCacheObject *mdcache_obj = (*mdcache_obj_array)[ul];
 		IMDId *mdid_key = mdcache_obj->MDId();
 		mdid_key->AddRef();
-		CAutoRef<IMDId> mdid_key_autoref;
-		mdid_key_autoref = mdid_key;
 
 		CAutoP<CWStringDynamic> str;
 		str = CDXLUtils::SerializeMDObj(
@@ -114,12 +109,8 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 			GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryDuplicate,
 					   mdid_key->GetBuffer());
 		}
-		(void) mdid_key_autoref.Reset();
 		(void) str.Reset();
 	}
-
-	// safely completed loading
-	(void) md_map.Reset();
 }
 
 //---------------------------------------------------------------------------
