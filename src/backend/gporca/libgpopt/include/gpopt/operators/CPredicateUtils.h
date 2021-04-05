@@ -12,6 +12,7 @@
 #define GPOPT_CPredicateUtils_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/mdcache/CMDAccessor.h"
@@ -371,8 +372,8 @@ public:
 
 	// extract components of a comparison expression on the given key
 	static void ExtractComponents(CExpression *pexprScCmp, CColRef *pcrKey,
-								  CExpression **ppexprKey,
-								  CExpression **ppexprOther,
+								  gpos::pointer<CExpression *> *ppexprKey,
+								  gpos::pointer<CExpression *> *ppexprOther,
 								  IMDType::ECmpType *pecmpt);
 
 	// Expression is a comparison with a simple identifer on at least one side

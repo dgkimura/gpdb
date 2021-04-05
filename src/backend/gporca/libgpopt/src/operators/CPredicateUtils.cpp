@@ -615,8 +615,8 @@ CPredicateUtils::ExtractLikePredComponents(CExpression *pexprPred,
 // extract components in a comparison expression on the given key
 void
 CPredicateUtils::ExtractComponents(CExpression *pexprScCmp, CColRef *pcrKey,
-								   CExpression **ppexprKey,
-								   CExpression **ppexprOther,
+								   gpos::pointer<CExpression *> *ppexprKey,
+								   gpos::pointer<CExpression *> *ppexprOther,
 								   IMDType::ECmpType *pecmpt)
 {
 	GPOS_ASSERT(nullptr != pexprScCmp);
