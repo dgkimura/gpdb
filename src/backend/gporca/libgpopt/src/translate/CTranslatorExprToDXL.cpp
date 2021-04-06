@@ -1431,7 +1431,8 @@ CTranslatorExprToDXL::PdxlnDynamicTableScan(
 		dxlnode->SetProperties(pdxlpropDTS);
 
 		// ColRef -> index in child table desc (per partition)
-		auto root_col_mapping = (*popDTS->GetRootColMappingPerPart())[ul];
+		const ColRefToUlongMap *root_col_mapping =
+			(*popDTS->GetRootColMappingPerPart())[ul];
 
 		// construct projection list, re-ordered to match root DTS
 		CDXLNode *pdxlnPrL = PdxlnProjListForChildPart(
@@ -1557,7 +1558,8 @@ CTranslatorExprToDXL::PdxlnDynamicBitmapTableScan(
 		pdxlnBitmapTableScan->SetProperties(dxl_properties);
 
 		// build projection list
-		auto *root_col_mapping = (*pop->GetRootColMappingPerPart())[ul];
+		const ColRefToUlongMap *root_col_mapping =
+			(*pop->GetRootColMappingPerPart())[ul];
 
 		// translate scalar predicate into DXL filter only if it is not redundant
 		CExpression *pexprRecheckCond = (*pexprScan)[0];
@@ -1701,7 +1703,8 @@ CTranslatorExprToDXL::PdxlnDynamicIndexScan(
 		dxlnode->SetProperties(dxl_properties);
 
 		// construct projection list
-		auto root_col_mapping = (*popDIS->GetRootColMappingPerPart())[ul];
+		const ColRefToUlongMap *root_col_mapping =
+			(*popDIS->GetRootColMappingPerPart())[ul];
 
 		CDXLNode *pdxlnPrL = PdxlnProjListForChildPart(
 			root_col_mapping, part_colrefs, pcrsOutput, colref_array);
