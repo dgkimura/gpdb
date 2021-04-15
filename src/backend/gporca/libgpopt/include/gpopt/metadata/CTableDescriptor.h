@@ -18,8 +18,8 @@
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/metadata/CColumnDescriptor.h"
-#include "naucrates/md/CMDRelationGPDB.h"
 #include "naucrates/md/IMDId.h"
+#include "naucrates/md/IMDRelation.h"
 
 namespace gpopt
 {

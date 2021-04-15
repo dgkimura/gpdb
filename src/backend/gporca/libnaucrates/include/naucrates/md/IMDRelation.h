@@ -14,11 +14,10 @@
 
 #include "gpos/base.h"
 
+#include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/md/CMDIndexInfo.h"
 #include "naucrates/md/IMDCacheObject.h"
 #include "naucrates/md/IMDColumn.h"
-#include "naucrates/md/IMDPartConstraint.h"
-#include "naucrates/statistics/IStatistics.h"
 
 namespace gpdxl
 {

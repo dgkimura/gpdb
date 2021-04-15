@@ -9,6 +9,8 @@
 //		Implementation of expressions
 //---------------------------------------------------------------------------
 
+#include "gpopt/operators/CExpression.h"
+
 #include "gpos/base.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/io/COstreamString.h"

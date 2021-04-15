@@ -34,6 +34,7 @@
 #include "naucrates/base/CQueryToDXLResult.h"
 #include "naucrates/base/IDatum.h"
 #include "naucrates/dxl/CDXLUtils.h"
+#include "naucrates/md/CMDRelationGPDB.h"
 #include "naucrates/md/CMDTypeInt4GPDB.h"
 #include "naucrates/md/IMDTypeBool.h"
 #include "naucrates/md/IMDTypeInt4.h"
