@@ -17,12 +17,12 @@
 #include "gpos/base.h"
 
 #include "gpopt/base/CColRef.h"
+#include "gpopt/operators/CExpression.h"
 #include "naucrates/md/IMDInterface.h"
 
 // fwd decl
 namespace gpopt
 {
-class CExpression;
 class CMDAccessor;
 }  // namespace gpopt
 

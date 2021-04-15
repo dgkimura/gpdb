@@ -13,14 +13,9 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/operators/CExpression.h"
 #include "naucrates/md/IMDType.h"
 #include "naucrates/statistics/CStatsPred.h"
-
-// fwd decl
-namespace gpopt
-{
-class CExpression;
-}
 
 namespace gpnaucrates
 {
