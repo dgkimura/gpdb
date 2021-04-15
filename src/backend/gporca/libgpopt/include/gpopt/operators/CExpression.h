@@ -22,7 +22,6 @@
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/CPrintPrefix.h"
 #include "gpopt/base/CReqdProp.h"
-#include "gpopt/base/CReqdPropRelational.h"
 #include "gpopt/cost/CCost.h"
 #include "gpopt/operators/COperator.h"
 #include "naucrates/statistics/IStatistics.h"

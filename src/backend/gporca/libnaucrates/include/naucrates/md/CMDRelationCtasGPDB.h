@@ -19,6 +19,7 @@
 #include "naucrates/md/CMDName.h"
 #include "naucrates/md/IMDColumn.h"
 #include "naucrates/md/IMDRelationCtas.h"
+#include "naucrates/statistics/IStatistics.h"
 
 namespace gpdxl
 {
