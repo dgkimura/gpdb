@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalHashJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CPhysicalJoin.h"
@@ -115,7 +116,7 @@ public:
 	// ctor
 	CPhysicalHashJoin(CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
 					  CExpressionArray *pdrgpexprInnerKeys,
-					  IMdIdArray *hash_opfamilies,
+					  gpos::owner<IMdIdArray *> hash_opfamilies,
 					  CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// dtor

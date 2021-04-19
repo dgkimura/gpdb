@@ -5,6 +5,7 @@
 #define GPOPT_CPhysicalFullMergeJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalJoin.h"
 
@@ -23,7 +24,8 @@ public:
 	// ctor
 	explicit CPhysicalFullMergeJoin(
 		CMemoryPool *mp, CExpressionArray *outer_merge_clauses,
-		CExpressionArray *inner_merge_clauses, IMdIdArray *hash_opfamilies,
+		CExpressionArray *inner_merge_clauses,
+		gpos::leaked<IMdIdArray *> hash_opfamilies,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// dtor
