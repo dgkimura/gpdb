@@ -12,6 +12,7 @@
 #define GPOS_CLogicalSetOp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CLogical.h"
@@ -48,9 +49,8 @@ protected:
 	void BuildColumnSets(CMemoryPool *mp);
 
 	// output equivalence classes
-	CColRefSetArray *PdrgpcrsOutputEquivClasses(CMemoryPool *mp,
-												CExpressionHandle &exprhdl,
-												BOOL fIntersect) const;
+	gpos::owner<CColRefSetArray *> PdrgpcrsOutputEquivClasses(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, BOOL fIntersect) const;
 
 	// equivalence classes from one input child, mapped to output columns
 	CColRefSetArray *PdrgpcrsInputMapped(CMemoryPool *mp,

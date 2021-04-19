@@ -12,6 +12,7 @@
 #define GPOPT_CTranslatorExprToDXLUtils_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CRange.h"
 #include "gpopt/mdcache/CMDAccessor.h"
@@ -143,7 +144,7 @@ public:
 
 	// construct predicates to cover the cases of default partition and
 	// open-ended partitions if necessary
-	static CDXLNode *PdxlnRangeFilterDefaultAndOpenEnded(
+	static gpos::owner<CDXLNode *> PdxlnRangeFilterDefaultAndOpenEnded(
 		CMemoryPool *mp, ULONG ulPartLevel, BOOL fLTComparison,
 		BOOL fGTComparison, BOOL fEQComparison, BOOL fDefaultPart);
 

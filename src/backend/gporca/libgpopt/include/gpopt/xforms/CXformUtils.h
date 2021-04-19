@@ -329,7 +329,7 @@ public:
 	static CExpression *PexprNullIndicator(CMemoryPool *mp, CExpression *pexpr);
 
 	// helper for creating a logical DML on top of a project
-	static CExpression *PexprLogicalDMLOverProject(
+	static gpos::owner<CExpression *> PexprLogicalDMLOverProject(
 		CMemoryPool *mp, CExpression *pexprChild,
 		CLogicalDML::EDMLOperator edmlop, CTableDescriptor *ptabdesc,
 		CColRefArray *colref_array, CColRef *pcrCtid, CColRef *pcrSegmentId);
@@ -524,12 +524,10 @@ public:
 
 	// construct a Bitmap(Dynamic)TableGet over BitmapBoolOp for the given
 	// logical operator if bitmap indexes exist
-	static CExpression *PexprBitmapTableGet(CMemoryPool *mp, CLogical *popGet,
-											ULONG ulOriginOpId,
-											CTableDescriptor *ptabdesc,
-											CExpression *pexprScalar,
-											CColRefSet *outer_refs,
-											CColRefSet *pcrsReqd);
+	static gpos::owner<CExpression *> PexprBitmapTableGet(
+		CMemoryPool *mp, CLogical *popGet, ULONG ulOriginOpId,
+		CTableDescriptor *ptabdesc, CExpression *pexprScalar,
+		CColRefSet *outer_refs, CColRefSet *pcrsReqd);
 
 	// transform a Select over a (dynamic) table get into a bitmap table scan
 	// over bitmap bool op

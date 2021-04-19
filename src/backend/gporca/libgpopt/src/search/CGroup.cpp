@@ -12,6 +12,7 @@
 #include "gpopt/search/CGroup.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/task/CAutoSuspendAbort.h"
 #include "gpos/task/CAutoTraceFlag.h"
@@ -1433,7 +1434,7 @@ CGroup::EspDerive(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 //		Derive statistics recursively on group
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::pointer<IStatistics *>
 CGroup::PstatsRecursiveDerive(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 							  CReqdPropRelational *prprel,
 							  IStatisticsArray *stats_ctxt)
@@ -1975,7 +1976,7 @@ CGroup::ResetGroupJobQueues()
 //		Compute stats during costing
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::pointer<IStatistics *>
 CGroup::PstatsCompute(COptimizationContext *poc, CExpressionHandle &exprhdl,
 					  CGroupExpression *pgexpr)
 {

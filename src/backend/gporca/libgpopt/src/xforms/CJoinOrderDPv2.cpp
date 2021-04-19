@@ -15,6 +15,7 @@
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/CBitSetIter.h"
 #include "gpos/common/clibwrapper.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -1192,9 +1193,10 @@ CJoinOrderDPv2::GreedySearchJoinOrders(ULONG left_level, JoinOrderPropType algo)
 //		not consume refcounts from <levelInfo> or <stats_expr_info>.
 //
 //---------------------------------------------------------------------------
-CJoinOrderDPv2::SGroupInfo *
-CJoinOrderDPv2::LookupOrCreateGroupInfo(SLevelInfo *levelInfo, CBitSet *atoms,
-										SExpressionInfo *stats_expr_info)
+gpos::pointer<CJoinOrderDPv2::SGroupInfo *>
+CJoinOrderDPv2::LookupOrCreateGroupInfo(
+	SLevelInfo *levelInfo, CBitSet *atoms,
+	gpos::pointer<SExpressionInfo *> stats_expr_info)
 {
 	SGroupInfo *group_info = m_bitset_to_group_info_map->Find(atoms);
 	SExpressionInfo *real_expr_info_for_stats = stats_expr_info;

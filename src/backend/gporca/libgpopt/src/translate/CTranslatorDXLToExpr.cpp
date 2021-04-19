@@ -14,6 +14,7 @@
 #include "gpopt/translate/CTranslatorDXLToExpr.h"
 
 #include "gpos/common/CAutoTimer.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CAutoOptCtxt.h"
 #include "gpopt/base/CColRef.h"
@@ -3529,7 +3530,7 @@ CTranslatorDXLToExpr::PexprScalarCaseTest(const CDXLNode *pdxlnCaseTest)
 // 		Create a scalar null test expr from a DXL scalar null test
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CTranslatorDXLToExpr::PexprScalarNullTest(const CDXLNode *pdxlnNullTest)
 {
 	// get dxl scalar null test
@@ -3552,7 +3553,7 @@ CTranslatorDXLToExpr::PexprScalarNullTest(const CDXLNode *pdxlnNullTest)
 		// IS NOT NULL test: add a not expression on top
 		pexpr = GPOS_NEW(m_mp) CExpression(
 			m_mp, GPOS_NEW(m_mp) CScalarBoolOp(m_mp, CScalarBoolOp::EboolopNot),
-			pexpr);
+			std::move(pexpr));
 	}
 
 	return pexpr;

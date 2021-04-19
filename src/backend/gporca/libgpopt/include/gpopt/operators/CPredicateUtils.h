@@ -39,11 +39,11 @@ class CPredicateUtils
 private:
 	// collect conjuncts recursively
 	static void CollectConjuncts(CExpression *pexpr,
-								 CExpressionArray *pdrgpexpr);
+								 gpos::pointer<CExpressionArray *> pdrgpexpr);
 
 	// collect disjuncts recursively
-	static void CollectDisjuncts(CExpression *pexpr,
-								 CExpressionArray *pdrgpexpr);
+	static void CollectDisjuncts(gpos::pointer<CExpression *> pexpr,
+								 gpos::pointer<CExpressionArray *> pdrgpexpr);
 
 	// check if a conjunct/disjunct can be skipped
 	static BOOL FSkippable(CExpression *pexpr, BOOL fConjunction);
@@ -266,12 +266,12 @@ public:
 		CExpressionArray *pdrgpexprResult, CColRef2dArray *pdrgdrgpcrResult);
 
 	// extract conjuncts from a scalar tree
-	static CExpressionArray *PdrgpexprConjuncts(CMemoryPool *mp,
-												CExpression *pexpr);
+	static gpos::owner<CExpressionArray *> PdrgpexprConjuncts(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// extract disjuncts from a scalar tree
-	static CExpressionArray *PdrgpexprDisjuncts(CMemoryPool *mp,
-												CExpression *pexpr);
+	static gpos::owner<CExpressionArray *> PdrgpexprDisjuncts(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr);
 
 	// extract equality predicates on scalar identifier from a list of scalar expressions
 	static CExpressionArray *PdrgpexprPlainEqualities(

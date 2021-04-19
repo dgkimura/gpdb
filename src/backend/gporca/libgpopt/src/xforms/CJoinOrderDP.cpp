@@ -15,6 +15,7 @@
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/CBitSetIter.h"
 #include "gpos/common/clibwrapper.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -243,8 +244,9 @@ CJoinOrderDP::PexprLookup(CBitSet *pbs)
 //		Extract predicate joining the two given sets
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprPred(CBitSet *pbsFst, CBitSet *pbsSnd)
+gpos::pointer<CExpression *>
+CJoinOrderDP::PexprPred(gpos::pointer<CBitSet *> pbsFst,
+						gpos::pointer<CBitSet *> pbsSnd)
 {
 	GPOS_ASSERT(nullptr != pbsFst);
 	GPOS_ASSERT(nullptr != pbsSnd);
@@ -403,8 +405,8 @@ CJoinOrderDP::InsertExpressionCost(
 //		Join expressions in the given set
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprJoin(CBitSet *pbs)
+gpos::pointer<CExpression *>
+CJoinOrderDP::PexprJoin(gpos::pointer<CBitSet *> pbs)
 {
 	GPOS_ASSERT(2 == pbs->Size());
 
@@ -463,8 +465,9 @@ CJoinOrderDP::PexprJoin(CBitSet *pbs)
 //
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprBestJoinOrderDP(CBitSet *pbs	 // set of elements to be joined
+gpos::pointer<CExpression *>
+CJoinOrderDP::PexprBestJoinOrderDP(
+	gpos::pointer<CBitSet *> pbs  // set of elements to be joined
 )
 {
 	CDouble dMinCost(0.0);
@@ -544,7 +547,7 @@ CJoinOrderDP::PexprBestJoinOrderDP(CBitSet *pbs	 // set of elements to be joined
 void
 CJoinOrderDP::GenerateSubsets(CMemoryPool *mp, CBitSet *pbsCurrent,
 							  ULONG *pulElems, ULONG size, ULONG ulIndex,
-							  CBitSetArray *pdrgpbsSubsets)
+							  gpos::pointer<CBitSetArray *> pdrgpbsSubsets)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_CHECK_ABORT;
@@ -577,7 +580,7 @@ CJoinOrderDP::GenerateSubsets(CMemoryPool *mp, CBitSet *pbsCurrent,
 //		 Driver of subset generation
 //
 //---------------------------------------------------------------------------
-CBitSetArray *
+gpos::owner<CBitSetArray *>
 CJoinOrderDP::PdrgpbsSubsets(CMemoryPool *mp, CBitSet *pbs)
 {
 	const ULONG size = pbs->Size();
@@ -685,8 +688,8 @@ CJoinOrderDP::PbsCovered(CBitSet *pbsInput)
 //		Generate cross product for the given components
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprCross(CBitSet *pbs)
+gpos::pointer<CExpression *>
+CJoinOrderDP::PexprCross(gpos::pointer<CBitSet *> pbs)
 {
 	GPOS_ASSERT(nullptr != pbs);
 
@@ -707,7 +710,7 @@ CJoinOrderDP::PexprCross(CBitSet *pbs)
 		pexprComp = m_rgpcomp[bsi.Bit()]->m_pexpr;
 		pexprComp->AddRef();
 		pexprCross = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
-			m_mp, pexprComp, pexprCross,
+			m_mp, pexprComp, std::move(pexprCross),
 			CPredicateUtils::PexprConjunction(m_mp, nullptr /*pdrgpexpr*/));
 	}
 
@@ -727,10 +730,10 @@ CJoinOrderDP::PexprCross(CBitSet *pbs)
 //		Join a covered subset with uncovered subset
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprJoinCoveredSubsetWithUncoveredSubset(CBitSet *pbs,
-														CBitSet *pbsCovered,
-														CBitSet *pbsUncovered)
+gpos::pointer<CExpression *>
+CJoinOrderDP::PexprJoinCoveredSubsetWithUncoveredSubset(
+	gpos::pointer<CBitSet *> pbs, gpos::pointer<CBitSet *> pbsCovered,
+	gpos::pointer<CBitSet *> pbsUncovered)
 {
 	GPOS_ASSERT(nullptr != pbs);
 	GPOS_ASSERT(nullptr != pbsCovered);

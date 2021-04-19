@@ -15,6 +15,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/clibwrapper.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -65,7 +66,7 @@ CJoinOrderGreedy::~CJoinOrderGreedy()
 
 
 // function to get the minimal cardinality join pair as the starting pair
-CJoinOrder::SComponent *
+gpos::owner<CJoinOrder::SComponent *>
 CJoinOrderGreedy::GetStartingJoins()
 {
 	CDouble dMinRows(0.0);
