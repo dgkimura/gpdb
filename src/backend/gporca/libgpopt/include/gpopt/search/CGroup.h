@@ -260,7 +260,7 @@ private:
 	// set hash join keys
 	void SetJoinKeys(CExpressionArray *pdrgpexprOuter,
 					 CExpressionArray *pdrgpexprInner,
-					 IMdIdArray *join_opfamilies);
+					 gpos::pointer<IMdIdArray *> join_opfamilies);
 
 	// insert new group expression
 	void Insert(CGroupExpression *pgexpr);

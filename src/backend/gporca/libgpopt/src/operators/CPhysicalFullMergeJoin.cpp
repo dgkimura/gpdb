@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalFullMergeJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCastUtils.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
@@ -28,7 +29,8 @@ using namespace gpopt;
 // ctor
 CPhysicalFullMergeJoin::CPhysicalFullMergeJoin(
 	CMemoryPool *mp, CExpressionArray *outer_merge_clauses,
-	CExpressionArray *inner_merge_clauses, IMdIdArray *,
+	CExpressionArray *inner_merge_clauses,
+	leaked<IMdIdArray *> hash_opfamilies GPOS_UNUSED,
 	CXform::EXformId origin_xform)
 	: CPhysicalJoin(mp, origin_xform),
 	  m_outer_merge_clauses(outer_merge_clauses),
