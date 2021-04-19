@@ -12,6 +12,7 @@
 #define GPOPT_CXformUtils_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCastUtils.h"
 #include "gpopt/base/CColRef.h"
@@ -139,12 +140,10 @@ private:
 
 	// helper function for adding hash join alternative
 	template <class T>
-	static void AddHashOrMergeJoinAlternative(CMemoryPool *mp,
-											  CExpression *pexprJoin,
-											  CExpressionArray *pdrgpexprOuter,
-											  CExpressionArray *pdrgpexprInner,
-											  IMdIdArray *join_opfamilies,
-											  CXformResult *pxfres);
+	static void AddHashOrMergeJoinAlternative(
+		CMemoryPool *mp, CExpression *pexprJoin,
+		CExpressionArray *pdrgpexprOuter, CExpressionArray *pdrgpexprInner,
+		gpos::owner<IMdIdArray *> join_opfamilies, CXformResult *pxfres);
 
 	// helper for transforming SubqueryAll into aggregate subquery
 	static void SubqueryAllToAgg(
@@ -657,7 +656,7 @@ CXformUtils::AddHashOrMergeJoinAlternative(CMemoryPool *mp,
 										   CExpression *pexprJoin,
 										   CExpressionArray *pdrgpexprOuter,
 										   CExpressionArray *pdrgpexprInner,
-										   IMdIdArray *opfamilies,
+										   gpos::owner<IMdIdArray *> opfamilies,
 										   CXformResult *pxfres)
 {
 	GPOS_ASSERT(CUtils::FLogicalJoin(pexprJoin->Pop()));
@@ -671,8 +670,9 @@ CXformUtils::AddHashOrMergeJoinAlternative(CMemoryPool *mp,
 		(*pexprJoin)[ul]->AddRef();
 	}
 	CLogicalJoin *popLogicalJoin = CLogicalJoin::PopConvert(pexprJoin->Pop());
-	T *op = GPOS_NEW(mp) T(mp, pdrgpexprOuter, pdrgpexprInner, opfamilies,
-						   popLogicalJoin->OriginXform());
+	T *op =
+		GPOS_NEW(mp) T(mp, pdrgpexprOuter, pdrgpexprInner,
+					   std::move(opfamilies), popLogicalJoin->OriginXform());
 	CExpression *pexprResult = GPOS_NEW(mp)
 		CExpression(mp, op, (*pexprJoin)[0], (*pexprJoin)[1], (*pexprJoin)[2]);
 	pxfres->Add(pexprResult);
@@ -724,9 +724,9 @@ CXformUtils::ImplementHashJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 		else
 		{
 			// we have computed hash join keys on scalar child before, reuse them
-			AddHashOrMergeJoinAlternative<T>(mp, pexpr, pdrgpexprOuter,
-											 pdrgpexprInner, join_opfamilies,
-											 pxfres);
+			AddHashOrMergeJoinAlternative<T>(
+				mp, pexpr, pdrgpexprOuter, pdrgpexprInner,
+				std::move(join_opfamilies), pxfres);
 		}
 
 		return;
@@ -798,8 +798,8 @@ CXformUtils::ImplementHashJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 	if (0 != pdrgpexprOuter->Size())
 	{
 		AddHashOrMergeJoinAlternative<T>(mp, pexprResult, pdrgpexprOuter,
-										 pdrgpexprInner, join_opfamilies,
-										 pxfres);
+										 pdrgpexprInner,
+										 std::move(join_opfamilies), pxfres);
 	}
 	else
 	{
@@ -849,9 +849,9 @@ CXformUtils::ImplementMergeJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 		else
 		{
 			// we have computed join keys on scalar child before, reuse them
-			AddHashOrMergeJoinAlternative<T>(mp, pexpr, pdrgpexprOuter,
-											 pdrgpexprInner, join_opfamilies,
-											 pxfres);
+			AddHashOrMergeJoinAlternative<T>(
+				mp, pexpr, pdrgpexprOuter, pdrgpexprInner,
+				std::move(join_opfamilies), pxfres);
 		}
 
 		return;
@@ -933,8 +933,8 @@ CXformUtils::ImplementMergeJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 	if (0 != pdrgpexprOuter->Size())
 	{
 		AddHashOrMergeJoinAlternative<T>(mp, pexprResult, pdrgpexprOuter,
-										 pdrgpexprInner, join_opfamilies,
-										 pxfres);
+										 pdrgpexprInner,
+										 std::move(join_opfamilies), pxfres);
 	}
 	else
 	{

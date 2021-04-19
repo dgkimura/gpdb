@@ -5,6 +5,7 @@
 #define GPOPT_CPhysicalFullMergeJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalJoin.h"
 

@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalLeftSemiHashJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalHashJoin.h"
 
@@ -34,7 +35,8 @@ public:
 	// ctor
 	CPhysicalLeftSemiHashJoin(
 		CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-		CExpressionArray *pdrgpexprInnerKeys, IMdIdArray *hash_opfamilies,
+		CExpressionArray *pdrgpexprInnerKeys,
+		gpos::owner<IMdIdArray *> hash_opfamilies,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// dtor

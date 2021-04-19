@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalInnerHashJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalHashJoin.h"
 

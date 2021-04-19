@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalLeftAntiSemiHashJoinNotIn.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -28,8 +29,8 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalLeftAntiSemiHashJoinNotIn::CPhysicalLeftAntiSemiHashJoinNotIn(
 	CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-	CExpressionArray *pdrgpexprInnerKeys, IMdIdArray *hash_opfamilies,
-	CXform::EXformId origin_xform)
+	CExpressionArray *pdrgpexprInnerKeys,
+	gpos::owner<IMdIdArray *> hash_opfamilies, CXform::EXformId origin_xform)
 	: CPhysicalLeftAntiSemiHashJoin(mp, pdrgpexprOuterKeys, pdrgpexprInnerKeys,
 									hash_opfamilies, origin_xform)
 {
