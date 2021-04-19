@@ -13,6 +13,7 @@
 
 #include "gpos/common/CHashSet.h"
 #include "gpos/common/Ref.h"
+#include "gpos/common/owner.h"
 #include "gpos/common/ranges.h"
 
 #include "gpopt/base/CColRef.h"
@@ -506,7 +507,7 @@ public:
 		CColRefSetArray *pdrgpcrsSnd);
 
 	// return a copy of equivalence classes from all children
-	static CColRefSetArray *PdrgpcrsCopyChildEquivClasses(
+	static gpos::owner<CColRefSetArray *> PdrgpcrsCopyChildEquivClasses(
 		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// return a copy of the given array of columns, excluding the columns

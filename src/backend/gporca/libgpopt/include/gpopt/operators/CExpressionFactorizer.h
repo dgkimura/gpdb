@@ -19,6 +19,7 @@
 #define GPOPT_CExpressionFactorizer_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CExpression.h"
@@ -119,16 +120,19 @@ private:
 	// find the array of expression arrays corresponding to the given
 	// operator source id in the given source to array position map
 	// or construct a new array and add it to the map
-	static CExpressionArrays *PdrgPdrgpexprDisjunctArrayForSourceId(
-		CMemoryPool *mp, SourceToArrayPosMap *psrc2array, BOOL fAllowNewSources,
-		ULONG ulOpSourceId);
+	static gpos::pointer<CExpressionArrays *>
+	PdrgPdrgpexprDisjunctArrayForSourceId(CMemoryPool *mp,
+										  SourceToArrayPosMap *psrc2array,
+										  BOOL fAllowNewSources,
+										  ULONG ulOpSourceId);
 
 	// find the array of expression arrays corresponding to the given
 	// column in the given column to array position map
 	// or construct a new array and add it to the map
-	static CExpressionArrays *PdrgPdrgpexprDisjunctArrayForColumn(
-		CMemoryPool *mp, ColumnToArrayPosMap *pcol2array, BOOL fAllowNewSources,
-		CColRef *colref);
+	static gpos::pointer<CExpressionArrays *>
+	PdrgPdrgpexprDisjunctArrayForColumn(CMemoryPool *mp,
+										ColumnToArrayPosMap *pcol2array,
+										BOOL fAllowNewSources, CColRef *colref);
 
 	// if the given expression is a table column to constant comparison,
 	// record it in the map

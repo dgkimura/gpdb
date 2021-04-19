@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/xforms/CXformTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/string/CWStringDynamic.h"
 
@@ -267,7 +268,7 @@ CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os, CExpression *pexpr)
 //		Generate a randomized star join tree
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CXformTest::PexprStarJoinTree(CMemoryPool *mp, ULONG ulTabs)
 {
 	CExpression *pexprLeft = CTestUtils::PexprLogicalGet(mp);

@@ -12,6 +12,7 @@
 #define GPNAUCRATES_CFilterStatsProcessor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/optimizer/COptimizerConfig.h"
 #include "naucrates/statistics/CJoinStatsProcessor.h"
@@ -67,13 +68,13 @@ private:
 		CStatsPred *pred_stats, CDouble *scale_factor);
 
 	// create new hash map of histograms after applying the conjunction predicate
-	static UlongToHistogramMap *MakeHistHashMapConjFilter(
+	static gpos::owner<UlongToHistogramMap *> MakeHistHashMapConjFilter(
 		CMemoryPool *mp, const CStatisticsConfig *stats_config,
 		UlongToHistogramMap *intermediate_histograms, CDouble input_rows,
 		CStatsPredConj *conjunctive_pred_stats, CDouble *scale_factor);
 
 	// create new hash map of histograms after applying the disjunctive predicate
-	static UlongToHistogramMap *MakeHistHashMapDisjFilter(
+	static gpos::owner<UlongToHistogramMap *> MakeHistHashMapDisjFilter(
 		CMemoryPool *mp, const CStatisticsConfig *stats_config,
 		UlongToHistogramMap *input_histograms, CDouble input_rows,
 		CStatsPredDisj *pred_stats, CDouble *scale_factor);
@@ -89,7 +90,7 @@ public:
 										BOOL do_cap_NDVs);
 
 	// derive statistics for filter operation based on given scalar expression
-	static IStatistics *MakeStatsFilterForScalarExpr(
+	static gpos::pointer<IStatistics *> MakeStatsFilterForScalarExpr(
 		CMemoryPool *mp, CExpressionHandle &exprhdl, IStatistics *child_stats,
 		CExpression
 			*local_scalar_expr,	 // filter expression on local columns only

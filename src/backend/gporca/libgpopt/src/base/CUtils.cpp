@@ -11,6 +11,7 @@
 #include "gpopt/base/CUtils.h"
 
 #include "gpos/common/clibwrapper.h"
+#include "gpos/common/owner.h"
 #include "gpos/common/syslibwrapper.h"
 #include "gpos/io/CFileDescriptor.h"
 #include "gpos/io/COstreamString.h"
@@ -2696,7 +2697,7 @@ CUtils::PdrgpcrsIntersectEquivClasses(CMemoryPool *mp,
 }
 
 // return a copy of equivalence classes from all children
-CColRefSetArray *
+gpos::owner<CColRefSetArray *>
 CUtils::PdrgpcrsCopyChildEquivClasses(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl)
 {

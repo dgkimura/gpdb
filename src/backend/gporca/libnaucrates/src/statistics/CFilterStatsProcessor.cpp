@@ -11,6 +11,8 @@
 
 #include "naucrates/statistics/CFilterStatsProcessor.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPredicateUtils.h"
@@ -26,7 +28,7 @@
 using namespace gpopt;
 
 // derive statistics for filter operation based on given scalar expression
-IStatistics *
+gpos::pointer<IStatistics *>
 CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
 	CMemoryPool *mp, CExpressionHandle &exprhdl, IStatistics *child_stats,
 	CExpression *local_scalar_expr,	 // filter expression on local columns only
@@ -298,7 +300,7 @@ CFilterStatsProcessor::MakeHistHashMapConjOrDisjFilter(
 }
 
 // create new hash map of histograms after applying conjunctive predicates
-UlongToHistogramMap *
+gpos::owner<UlongToHistogramMap *>
 CFilterStatsProcessor::MakeHistHashMapConjFilter(
 	CMemoryPool *mp, const CStatisticsConfig *stats_config,
 	UlongToHistogramMap *input_histograms, CDouble input_rows,
@@ -454,7 +456,7 @@ CFilterStatsProcessor::MakeHistHashMapConjFilter(
 }
 
 // create new hash map of histograms after applying disjunctive predicates
-UlongToHistogramMap *
+gpos::owner<UlongToHistogramMap *>
 CFilterStatsProcessor::MakeHistHashMapDisjFilter(
 	CMemoryPool *mp, const CStatisticsConfig *stats_config,
 	UlongToHistogramMap *input_histograms, CDouble input_rows,

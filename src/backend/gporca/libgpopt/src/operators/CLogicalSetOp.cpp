@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalSetOp.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/CConstraintInterval.h"
@@ -274,7 +275,7 @@ CLogicalSetOp::Matches(COperator *pop) const
 //		Get output equivalence classes
 //
 //---------------------------------------------------------------------------
-CColRefSetArray *
+gpos::owner<CColRefSetArray *>
 CLogicalSetOp::PdrgpcrsOutputEquivClasses(CMemoryPool *mp,
 										  CExpressionHandle &exprhdl,
 										  BOOL fIntersect) const

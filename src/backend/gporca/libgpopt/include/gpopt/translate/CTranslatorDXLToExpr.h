@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CHashMap.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CQueryContext.h"
 #include "gpopt/base/CWindowFrame.h"
@@ -294,7 +295,8 @@ private:
 	CExpression *PexprScalarNullIf(const CDXLNode *pdxlnNullIf);
 
 	// translate a DXL scalar null test into a scalar null test
-	CExpression *PexprScalarNullTest(const CDXLNode *pdxlnNullTest);
+	gpos::owner<CExpression *> PexprScalarNullTest(
+		const CDXLNode *pdxlnNullTest);
 
 	// translate a DXL scalar boolean test into a scalar boolean test
 	CExpression *PexprScalarBooleanTest(const CDXLNode *pdxlnScBoolTest);

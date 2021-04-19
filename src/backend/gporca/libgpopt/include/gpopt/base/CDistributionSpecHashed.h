@@ -13,6 +13,7 @@
 #define GPOPT_CDistributionSpecHashed_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CDistributionSpecRandom.h"
@@ -233,8 +234,8 @@ public:
 	CExpressionArrays *GetAllDistributionExprs(CMemoryPool *mp);
 
 	// return a new spec created after merging the current spec with the input spec as equivalents
-	CDistributionSpecHashed *Combine(CMemoryPool *mp,
-									 CDistributionSpecHashed *other_spec);
+	gpos::owner<CDistributionSpecHashed *> Combine(
+		CMemoryPool *mp, CDistributionSpecHashed *other_spec);
 
 	// check if the equivalent spec (if any) has no matching columns with the main spec
 	BOOL HasCompleteEquivSpec(CMemoryPool *mp) const;

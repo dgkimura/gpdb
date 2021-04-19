@@ -15,6 +15,7 @@
 
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPool.h"
 
 #include "gpopt/base/CDrvdPropPlan.h"
@@ -292,7 +293,7 @@ private:
 		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
 		ULONG *pulNonGatherMotions, CDXLPhysicalProperties *dxl_properties);
 
-	CDXLNode *PdxlnResultFromNLJoinOuter(
+	gpos::owner<CDXLNode *> PdxlnResultFromNLJoinOuter(
 		CExpression *pexprRelational, CDXLNode *pdxlnScalar,
 		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
 		ULONG *pulNonGatherMotions, BOOL *pfDML,
@@ -655,18 +656,18 @@ private:
 							 ULONG *pulNonGatherMotions, BOOL *pfDML);
 
 	// helper to build subplans for quantified (ANY/ALL) subqueries
-	CDXLNode *PdxlnQuantifiedSubplan(CColRefArray *pdrgpcrInner,
-									 CExpression *pexprCorrelatedNLJoin,
-									 CDXLColRefArray *dxl_colref_array,
-									 CDistributionSpecArray *pdrgpdsBaseTables,
-									 ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::pointer<CDXLNode *> PdxlnQuantifiedSubplan(
+		CColRefArray *pdrgpcrInner, CExpression *pexprCorrelatedNLJoin,
+		CDXLColRefArray *dxl_colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
 	// helper to build subplans for existential subqueries
-	CDXLNode *PdxlnExistentialSubplan(CColRefArray *pdrgpcrInner,
-									  CExpression *pexprCorrelatedNLJoin,
-									  CDXLColRefArray *dxl_colref_array,
-									  CDistributionSpecArray *pdrgpdsBaseTables,
-									  ULONG *pulNonGatherMotions, BOOL *pfDML);
+	gpos::pointer<CDXLNode *> PdxlnExistentialSubplan(
+		CColRefArray *pdrgpcrInner, CExpression *pexprCorrelatedNLJoin,
+		CDXLColRefArray *dxl_colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML);
 
 	// compute the direct dispatch info for the given DML expression
 	CDXLDirectDispatchInfo *GetDXLDirectDispatchInfo(CExpression *pexprDML);

@@ -11,6 +11,8 @@
 #ifndef GPNAUCRATES_CJoinStatsProcessor_H
 #define GPNAUCRATES_CJoinStatsProcessor_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/optimizer/COptimizerConfig.h"
 #include "naucrates/statistics/CGroupByStatsProcessor.h"
 #include "naucrates/statistics/CScaleFactorUtils.h"
@@ -68,9 +70,9 @@ public:
 										 CExpression *expr, COperator *pop);
 
 	// derive statistics for join operation given array of statistics object
-	static IStatistics *DeriveJoinStats(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										IStatisticsArray *stats_ctxt);
+	static gpos::owner<IStatistics *> DeriveJoinStats(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt);
 
 	// derive statistics when scalar expression has outer references
 	static IStatistics *DeriveStatsWithOuterRefs(
