@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformUtils.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CMessage.h"
 #include "gpos/error/CMessageRepository.h"
 #include "gpos/memory/CAutoMemoryPool.h"
@@ -1320,7 +1321,7 @@ CXformUtils::PexprLogicalPartitionSelector(CMemoryPool *mp,
 // 		Create a logical DML on top of a project
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CXformUtils::PexprLogicalDMLOverProject(CMemoryPool *mp,
 										CExpression *pexprChild,
 										CLogicalDML::EDMLOperator edmlop,
@@ -3553,7 +3554,7 @@ CXformUtils::PexprSelect2BitmapBoolOp(CMemoryPool *mp, CExpression *pexpr)
 //		bitmap indexes exist
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CXformUtils::PexprBitmapTableGet(CMemoryPool *mp, CLogical *popGet,
 								 ULONG ulOriginOpId, CTableDescriptor *ptabdesc,
 								 CExpression *pexprScalar,
@@ -3627,7 +3628,7 @@ CXformUtils::PexprBitmapTableGet(CMemoryPool *mp, CLogical *popGet,
 			// add a selection on top with the residual condition
 			pexprResult =
 				GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalSelect(mp),
-										 pexprResult, pexprResidual);
+										 std::move(pexprResult), pexprResidual);
 		}
 	}
 

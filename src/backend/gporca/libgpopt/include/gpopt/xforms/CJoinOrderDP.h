@@ -15,6 +15,7 @@
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/owner.h"
 #include "gpos/io/IOstream.h"
 
 #include "gpopt/base/CUtils.h"
@@ -124,26 +125,29 @@ private:
 	CExpression *PexprLookup(CBitSet *pbs);
 
 	// extract predicate joining the two given sets
-	CExpression *PexprPred(CBitSet *pbsFst, CBitSet *pbsSnd);
+	gpos::pointer<CExpression *> PexprPred(gpos::pointer<CBitSet *> pbsFst,
+										   gpos::pointer<CBitSet *> pbsSnd);
 
 	// join expressions in the given two sets
 	CExpression *PexprJoin(CBitSet *pbsFst, CBitSet *pbsSnd);
 
 	// join expressions in the given set
-	CExpression *PexprJoin(CBitSet *pbs);
+	gpos::pointer<CExpression *> PexprJoin(gpos::pointer<CBitSet *> pbs);
 
 	// find best join order for given component using dynamic programming
-	CExpression *PexprBestJoinOrderDP(CBitSet *pbs);
+	gpos::pointer<CExpression *> PexprBestJoinOrderDP(
+		gpos::pointer<CBitSet *> pbs);
 
 	// find best join order for given component
 	CExpression *PexprBestJoinOrder(CBitSet *pbs);
 
 	// generate cross product for the given components
-	CExpression *PexprCross(CBitSet *pbs);
+	gpos::pointer<CExpression *> PexprCross(gpos::pointer<CBitSet *> pbs);
 
 	// join a covered subset with uncovered subset
-	CExpression *PexprJoinCoveredSubsetWithUncoveredSubset(
-		CBitSet *pbs, CBitSet *pbsCovered, CBitSet *pbsUncovered);
+	gpos::pointer<CExpression *> PexprJoinCoveredSubsetWithUncoveredSubset(
+		gpos::pointer<CBitSet *> pbs, gpos::pointer<CBitSet *> pbsCovered,
+		gpos::pointer<CBitSet *> pbsUncovered);
 
 	// return a subset of the given set covered by one or more edges
 	CBitSet *PbsCovered(CBitSet *pbsInput);
@@ -164,10 +168,11 @@ private:
 	// generate all subsets of the given array of elements
 	static void GenerateSubsets(CMemoryPool *mp, CBitSet *pbsCurrent,
 								ULONG *pulElems, ULONG size, ULONG ulIndex,
-								CBitSetArray *pdrgpbsSubsets);
+								gpos::pointer<CBitSetArray *> pdrgpbsSubsets);
 
 	// driver of subset generation
-	static CBitSetArray *PdrgpbsSubsets(CMemoryPool *mp, CBitSet *pbs);
+	static gpos::owner<CBitSetArray *> PdrgpbsSubsets(CMemoryPool *mp,
+													  CBitSet *pbs);
 
 public:
 	// ctor

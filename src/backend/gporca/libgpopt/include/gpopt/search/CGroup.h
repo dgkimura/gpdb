@@ -15,6 +15,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CSyncHashtable.h"
 #include "gpos/common/CSyncList.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCostContext.h"
 #include "gpopt/base/COptimizationContext.h"
@@ -562,10 +563,9 @@ public:
 	}
 
 	// derive statistics recursively on group
-	IStatistics *PstatsRecursiveDerive(CMemoryPool *pmpLocal,
-									   CMemoryPool *pmpGlobal,
-									   CReqdPropRelational *prprel,
-									   IStatisticsArray *stats_ctxt);
+	gpos::pointer<IStatistics *> PstatsRecursiveDerive(
+		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
+		CReqdPropRelational *prprel, IStatisticsArray *stats_ctxt);
 
 	// find group expression with best stats promise and the same given children
 	CGroupExpression *PgexprBestPromise(CMemoryPool *mp,
@@ -585,9 +585,9 @@ public:
 	CGroupExpression *PgexprAnyCTEConsumer();
 
 	// compute stats during costing
-	IStatistics *PstatsCompute(COptimizationContext *poc,
-							   CExpressionHandle &exprhdl,
-							   CGroupExpression *pgexpr);
+	gpos::pointer<IStatistics *> PstatsCompute(COptimizationContext *poc,
+											   CExpressionHandle &exprhdl,
+											   CGroupExpression *pgexpr);
 
 	// compute cost lower bound for the plan satisfying given required properties
 	CCost CostLowerBound(CMemoryPool *mp, CReqdPropPlan *prppInput);

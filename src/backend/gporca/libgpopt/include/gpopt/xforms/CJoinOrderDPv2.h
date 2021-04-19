@@ -505,8 +505,9 @@ private:
 	void SearchBushyJoinOrders(ULONG current_level);
 
 	// look up an existing group or create a new one, with an expression to be used for stats
-	SGroupInfo *LookupOrCreateGroupInfo(SLevelInfo *levelInfo, CBitSet *atoms,
-										SExpressionInfo *stats_expr_info);
+	gpos::pointer<SGroupInfo *> LookupOrCreateGroupInfo(
+		SLevelInfo *levelInfo, CBitSet *atoms,
+		gpos::pointer<SExpressionInfo *> stats_expr_info);
 	// add a new expression to a group, unless there already is an existing expression that dominates it
 	void AddExprToGroupIfNecessary(SGroupInfo *group_info,
 								   SExpressionInfo *new_expr_info);
@@ -517,7 +518,7 @@ private:
 
 	void FinalizeDPLevel(ULONG level);
 
-	SGroupInfoArray *
+	gpos::pointer<SGroupInfoArray *>
 	GetGroupsForLevel(ULONG level) const
 	{
 		return (*m_join_levels)[level]->m_groups;

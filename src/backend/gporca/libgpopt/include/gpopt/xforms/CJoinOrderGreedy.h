@@ -12,6 +12,7 @@
 #define GPOPT_CJoinOrderGreedy_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/io/IOstream.h"
 
 #include "gpopt/xforms/CJoinOrder.h"
@@ -35,7 +36,7 @@ private:
 	SComponent *m_pcompResult;
 
 	// returns starting joins with minimal cardinality
-	SComponent *GetStartingJoins();
+	gpos::owner<SComponent *> GetStartingJoins();
 
 public:
 	// ctor

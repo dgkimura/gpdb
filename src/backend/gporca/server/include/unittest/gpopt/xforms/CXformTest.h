@@ -12,6 +12,7 @@
 #define GPOPT_CXformTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/operators/CExpression.h"
@@ -41,7 +42,8 @@ private:
 	static CExpression *PexprJoinTree(CMemoryPool *mp);
 
 	// generate random star join tree
-	static CExpression *PexprStarJoinTree(CMemoryPool *mp, ULONG ulTabs);
+	static gpos::owner<CExpression *> PexprStarJoinTree(CMemoryPool *mp,
+														ULONG ulTabs);
 
 	// application of different xforms for the given expression
 	static void ApplyExprXforms(CMemoryPool *mp, IOstream &os,

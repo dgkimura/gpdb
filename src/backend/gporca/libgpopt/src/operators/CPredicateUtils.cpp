@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPredicateUtils.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCastUtils.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -297,7 +298,7 @@ CPredicateUtils::FHasNegatedChild(CExpression *pexpr)
 // recursively collect conjuncts
 void
 CPredicateUtils::CollectConjuncts(CExpression *pexpr,
-								  CExpressionArray *pdrgpexpr)
+								  gpos::pointer<CExpressionArray *> pdrgpexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -318,8 +319,8 @@ CPredicateUtils::CollectConjuncts(CExpression *pexpr,
 
 // recursively collect disjuncts
 void
-CPredicateUtils::CollectDisjuncts(CExpression *pexpr,
-								  CExpressionArray *pdrgpexpr)
+CPredicateUtils::CollectDisjuncts(gpos::pointer<CExpression *> pexpr,
+								  gpos::pointer<CExpressionArray *> pdrgpexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -339,7 +340,7 @@ CPredicateUtils::CollectDisjuncts(CExpression *pexpr,
 }
 
 // extract conjuncts from a predicate
-CExpressionArray *
+gpos::owner<CExpressionArray *>
 CPredicateUtils::PdrgpexprConjuncts(CMemoryPool *mp, CExpression *pexpr)
 {
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
@@ -349,8 +350,9 @@ CPredicateUtils::PdrgpexprConjuncts(CMemoryPool *mp, CExpression *pexpr)
 }
 
 // extract disjuncts from a predicate
-CExpressionArray *
-CPredicateUtils::PdrgpexprDisjuncts(CMemoryPool *mp, CExpression *pexpr)
+gpos::owner<CExpressionArray *>
+CPredicateUtils::PdrgpexprDisjuncts(CMemoryPool *mp,
+									gpos::pointer<CExpression *> pexpr)
 {
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	CollectDisjuncts(pexpr, pdrgpexpr);

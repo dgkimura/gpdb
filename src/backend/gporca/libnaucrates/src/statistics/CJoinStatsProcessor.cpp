@@ -11,6 +11,8 @@
 
 #include "naucrates/statistics/CJoinStatsProcessor.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalIndexApply.h"
 #include "gpopt/operators/CLogicalNAryJoin.h"
@@ -529,7 +531,7 @@ CJoinStatsProcessor::JoinStatsAreEmpty(BOOL outer_is_empty,
 }
 
 // Derive statistics for join operation given array of statistics object
-IStatistics *
+gpos::owner<IStatistics *>
 CJoinStatsProcessor::DeriveJoinStats(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
 									 IStatisticsArray *stats_ctxt)

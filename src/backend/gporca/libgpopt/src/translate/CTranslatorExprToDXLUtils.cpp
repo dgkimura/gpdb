@@ -12,6 +12,8 @@
 
 #include "gpopt/translate/CTranslatorExprToDXLUtils.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CConstraint.h"
 #include "gpopt/base/CConstraintConjunction.h"
 #include "gpopt/base/CConstraintDisjunction.h"
@@ -415,7 +417,7 @@ CTranslatorExprToDXLUtils::PdxlnRangeFilterPartBound(
 //		open-ended partitions if necessary
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::owner<CDXLNode *>
 CTranslatorExprToDXLUtils::PdxlnRangeFilterDefaultAndOpenEnded(
 	CMemoryPool *mp, ULONG ulPartLevel, BOOL fLTComparison, BOOL fGTComparison,
 	BOOL fEQComparison, BOOL fDefaultPart)
@@ -441,11 +443,11 @@ CTranslatorExprToDXLUtils::PdxlnRangeFilterDefaultAndOpenEnded(
 		{
 			pdxlnResult = GPOS_NEW(mp)
 				CDXLNode(mp, GPOS_NEW(mp) CDXLScalarBoolExpr(mp, Edxlor),
-						 pdxlnResult, pdxlnOpenMax);
+						 std::move(pdxlnResult), std::move(pdxlnOpenMax));
 		}
 		else
 		{
-			pdxlnResult = pdxlnOpenMax;
+			pdxlnResult = std::move(pdxlnOpenMax);
 		}
 	}
 
@@ -459,11 +461,11 @@ CTranslatorExprToDXLUtils::PdxlnRangeFilterDefaultAndOpenEnded(
 		{
 			pdxlnResult = GPOS_NEW(mp)
 				CDXLNode(mp, GPOS_NEW(mp) CDXLScalarBoolExpr(mp, Edxlor),
-						 pdxlnDefault, pdxlnResult);
+						 std::move(pdxlnDefault), std::move(pdxlnResult));
 		}
 		else
 		{
-			pdxlnResult = pdxlnDefault;
+			pdxlnResult = std::move(pdxlnDefault);
 		}
 	}
 

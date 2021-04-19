@@ -11,6 +11,8 @@
 
 #include "gpopt/base/CDistributionSpecHashed.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CCastUtils.h"
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -941,7 +943,7 @@ CDistributionSpecHashed::GetAllDistributionExprs(CMemoryPool *mp)
 
 // create a new spec and which marks the other incoming specs
 // as equivalent
-CDistributionSpecHashed *
+gpos::owner<CDistributionSpecHashed *>
 CDistributionSpecHashed::Combine(CMemoryPool *mp,
 								 CDistributionSpecHashed *other_spec)
 {
