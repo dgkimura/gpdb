@@ -41,9 +41,9 @@ CDXLLogicalUpdate::CDXLLogicalUpdate(CMemoryPool *mp,
 	  m_deletion_colid_array(delete_colid_array),
 	  m_insert_colid_array(insert_colid_array)
 {
-	GPOS_ASSERT(nullptr != table_descr);
-	GPOS_ASSERT(nullptr != delete_colid_array);
-	GPOS_ASSERT(nullptr != insert_colid_array);
+	GPOS_ASSERT(nullptr != m_dxl_table_descr);
+	GPOS_ASSERT(nullptr != m_deletion_colid_array);
+	GPOS_ASSERT(nullptr != m_insert_colid_array);
 }
 
 //---------------------------------------------------------------------------

@@ -59,7 +59,7 @@ CJoinOrder::SComponent::SComponent(CExpression *pexpr, CBitSet *pbs,
 	  m_parent_loj_id(parent_loj_id),
 	  m_position(position)
 {
-	GPOS_ASSERT(nullptr != pbs);
+	GPOS_ASSERT(nullptr != m_pbs);
 	GPOS_ASSERT_IMP(EpSentinel != m_position,
 					NON_LOJ_DEFAULT_ID < m_parent_loj_id);
 }

@@ -42,9 +42,9 @@ CIndexDescriptor::CIndexDescriptor(
 	  m_index_type(index_type)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(pmdidIndex->IsValid());
-	GPOS_ASSERT(nullptr != pdrgcoldescKeyCols);
-	GPOS_ASSERT(nullptr != pdrgcoldescIncludedCols);
+	GPOS_ASSERT(m_pmdidIndex->IsValid());
+	GPOS_ASSERT(nullptr != m_pdrgpcoldescKeyCols);
+	GPOS_ASSERT(nullptr != m_pdrgpcoldescIncludedCols);
 }
 
 //---------------------------------------------------------------------------

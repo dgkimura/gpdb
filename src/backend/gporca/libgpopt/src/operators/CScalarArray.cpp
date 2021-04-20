@@ -31,8 +31,8 @@ CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
 	  m_pmdidArray(array_type_mdid),
 	  m_fMultiDimensional(is_multidimenstional)
 {
-	GPOS_ASSERT(elem_type_mdid->IsValid());
-	GPOS_ASSERT(array_type_mdid->IsValid());
+	GPOS_ASSERT(m_pmdidElem->IsValid());
+	GPOS_ASSERT(m_pmdidArray->IsValid());
 	m_pdrgPconst = GPOS_NEW(mp) CScalarConstArray(mp);
 }
 
@@ -48,8 +48,8 @@ CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
 	  m_fMultiDimensional(is_multidimenstional),
 	  m_pdrgPconst(pdrgPconst)
 {
-	GPOS_ASSERT(elem_type_mdid->IsValid());
-	GPOS_ASSERT(array_type_mdid->IsValid());
+	GPOS_ASSERT(m_pmdidElem->IsValid());
+	GPOS_ASSERT(m_pmdidArray->IsValid());
 }
 
 // Dtor

@@ -41,7 +41,7 @@ CPhysicalLimit::CPhysicalLimit(CMemoryPool *mp, COrderSpec *pos, BOOL fGlobal,
 	  m_pcrsSort(nullptr)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != pos);
+	GPOS_ASSERT(nullptr != m_pos);
 
 	m_pcrsSort = m_pos->PcrsUsed(mp);
 }

@@ -45,9 +45,9 @@ CDXLScalarAggref::CDXLScalarAggref(CMemoryPool *mp,
 	  m_aggkind(aggkind),
 	  m_argtypes(argtypes)
 {
-	GPOS_ASSERT(nullptr != agg_func_mdid);
-	GPOS_ASSERT_IMP(nullptr != resolved_rettype_mdid,
-					resolved_rettype_mdid->IsValid());
+	GPOS_ASSERT(nullptr != m_agg_func_mdid);
+	GPOS_ASSERT_IMP(nullptr != m_resolved_rettype_mdid,
+					m_resolved_rettype_mdid->IsValid());
 	GPOS_ASSERT(m_agg_func_mdid->IsValid());
 }
 

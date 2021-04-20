@@ -30,8 +30,8 @@ FORCE_GENERATE_DBGSTR(CXform);
 //---------------------------------------------------------------------------
 CXform::CXform(CExpression *pexpr) : m_pexpr(pexpr)
 {
-	GPOS_ASSERT(nullptr != pexpr);
-	GPOS_ASSERT(FCheckPattern(pexpr));
+	GPOS_ASSERT(nullptr != m_pexpr);
+	GPOS_ASSERT(FCheckPattern(m_pexpr));
 }
 
 

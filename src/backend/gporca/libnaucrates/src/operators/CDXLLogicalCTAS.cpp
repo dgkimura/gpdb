@@ -54,15 +54,15 @@ CDXLLogicalCTAS::CDXLLogicalCTAS(
 	  m_src_colids_array(src_colids_array),
 	  m_vartypemod_array(vartypemod_array)
 {
-	GPOS_ASSERT(nullptr != mdid && mdid->IsValid());
+	GPOS_ASSERT(nullptr != m_mdid && m_mdid->IsValid());
 	GPOS_ASSERT(nullptr != mdname_rel);
-	GPOS_ASSERT(nullptr != dxl_col_descr_array);
-	GPOS_ASSERT(nullptr != dxl_ctas_storage_options);
+	GPOS_ASSERT(nullptr != m_col_descr_array);
+	GPOS_ASSERT(nullptr != m_dxl_ctas_storage_option);
 	GPOS_ASSERT_IFF(IMDRelation::EreldistrHash == rel_distr_policy,
-					nullptr != distr_column_pos_array);
-	GPOS_ASSERT(nullptr != src_colids_array);
-	GPOS_ASSERT(nullptr != vartypemod_array);
-	GPOS_ASSERT(dxl_col_descr_array->Size() == vartypemod_array->Size());
+					nullptr != m_distr_column_pos_array);
+	GPOS_ASSERT(nullptr != m_src_colids_array);
+	GPOS_ASSERT(nullptr != m_vartypemod_array);
+	GPOS_ASSERT(m_col_descr_array->Size() == m_vartypemod_array->Size());
 	GPOS_ASSERT(IMDRelation::ErelstorageSentinel > rel_storage_type);
 	GPOS_ASSERT(IMDRelation::EreldistrSentinel > rel_distr_policy);
 	GPOS_ASSERT(nullptr == m_distr_column_pos_array ||

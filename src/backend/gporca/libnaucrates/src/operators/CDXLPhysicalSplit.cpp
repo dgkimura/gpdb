@@ -39,8 +39,8 @@ CDXLPhysicalSplit::CDXLPhysicalSplit(CMemoryPool *mp,
 	  m_ctid_colid(ctid_colid),
 	  m_segid_colid(segid_colid)
 {
-	GPOS_ASSERT(nullptr != delete_colid_array);
-	GPOS_ASSERT(nullptr != insert_colid_array);
+	GPOS_ASSERT(nullptr != m_deletion_colid_array);
+	GPOS_ASSERT(nullptr != m_insert_colid_array);
 }
 
 //---------------------------------------------------------------------------

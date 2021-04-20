@@ -36,7 +36,7 @@ CDXLScalarSubqueryQuantified::CDXLScalarSubqueryQuantified(
 	  m_scalar_op_mdname(scalar_op_mdname),
 	  m_colid(colid)
 {
-	GPOS_ASSERT(scalar_op_mdid->IsValid());
+	GPOS_ASSERT(m_scalar_op_mdid->IsValid());
 	GPOS_ASSERT(nullptr != scalar_op_mdname);
 }
 

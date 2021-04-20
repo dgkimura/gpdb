@@ -56,13 +56,13 @@ COptCtxt::COptCtxt(CMemoryPool *mp, CColumnFactory *col_factory,
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != col_factory);
 	GPOS_ASSERT(nullptr != md_accessor);
-	GPOS_ASSERT(nullptr != pceeval);
+	GPOS_ASSERT(nullptr != m_pceeval);
 	GPOS_ASSERT(nullptr != m_pcomp);
-	GPOS_ASSERT(nullptr != optimizer_config);
-	GPOS_ASSERT(nullptr != optimizer_config->GetCostModel());
+	GPOS_ASSERT(nullptr != m_optimizer_config);
+	GPOS_ASSERT(nullptr != m_optimizer_config->GetCostModel());
 
 	m_pcteinfo = GPOS_NEW(m_mp) CCTEInfo(m_mp);
-	m_cost_model = optimizer_config->GetCostModel();
+	m_cost_model = m_optimizer_config->GetCostModel();
 	m_direct_dispatchable_filters = GPOS_NEW(mp) CExpressionArray(mp);
 	m_scanid_to_part_map = GPOS_NEW(m_mp) UlongToBitSetMap(m_mp);
 	m_part_selector_info = GPOS_NEW(m_mp) SPartSelectorInfo(m_mp);

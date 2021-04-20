@@ -40,11 +40,11 @@ COptimizerConfig::COptimizerConfig(CEnumeratorConfig *pec,
 	  m_hint(phint),
 	  m_window_oids(pwindowoids)
 {
-	GPOS_ASSERT(nullptr != pec);
-	GPOS_ASSERT(nullptr != stats_config);
-	GPOS_ASSERT(nullptr != pcteconf);
+	GPOS_ASSERT(nullptr != m_enumerator_cfg);
+	GPOS_ASSERT(nullptr != m_stats_conf);
+	GPOS_ASSERT(nullptr != m_cte_conf);
 	GPOS_ASSERT(nullptr != m_cost_model);
-	GPOS_ASSERT(nullptr != phint);
+	GPOS_ASSERT(nullptr != m_hint);
 	GPOS_ASSERT(nullptr != m_window_oids);
 }
 

@@ -42,7 +42,7 @@ CDXLRelStats::CDXLRelStats(CMemoryPool *mp,
 	  m_relpages(relpages),
 	  m_relallvisible(relallvisible)
 {
-	GPOS_ASSERT(rel_stats_mdid->IsValid());
+	GPOS_ASSERT(m_rel_stats_mdid->IsValid());
 	m_dxl_str = CDXLUtils::SerializeMDObj(
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }

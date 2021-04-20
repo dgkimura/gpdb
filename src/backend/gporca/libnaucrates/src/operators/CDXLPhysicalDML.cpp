@@ -47,8 +47,8 @@ CDXLPhysicalDML::CDXLPhysicalDML(
 	  m_fSplit(fSplit)
 {
 	GPOS_ASSERT(EdxldmlSentinel > dxl_dml_type);
-	GPOS_ASSERT(nullptr != table_descr);
-	GPOS_ASSERT(nullptr != src_colids_array);
+	GPOS_ASSERT(nullptr != m_dxl_table_descr);
+	GPOS_ASSERT(nullptr != m_src_colids_array);
 }
 
 //---------------------------------------------------------------------------

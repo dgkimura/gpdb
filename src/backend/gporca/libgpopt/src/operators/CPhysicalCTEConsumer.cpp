@@ -37,8 +37,8 @@ CPhysicalCTEConsumer::CPhysicalCTEConsumer(CMemoryPool *mp, ULONG id,
 	  m_pdrgpcr(colref_array),
 	  m_phmulcr(colref_mapping)
 {
-	GPOS_ASSERT(nullptr != colref_array);
-	GPOS_ASSERT(nullptr != colref_mapping);
+	GPOS_ASSERT(nullptr != m_pdrgpcr);
+	GPOS_ASSERT(nullptr != m_phmulcr);
 }
 
 //---------------------------------------------------------------------------

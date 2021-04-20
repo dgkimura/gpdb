@@ -40,8 +40,8 @@ CDXLWindowFrame::CDXLWindowFrame(EdxlFrameSpec edxlfs,
 {
 	GPOS_ASSERT(EdxlfsSentinel > m_dxl_win_frame_spec);
 	GPOS_ASSERT(EdxlfesSentinel > m_dxl_frame_exclusion_strategy);
-	GPOS_ASSERT(nullptr != dxlnode_leading);
-	GPOS_ASSERT(nullptr != dxlnode_trailing);
+	GPOS_ASSERT(nullptr != m_dxlnode_leading);
+	GPOS_ASSERT(nullptr != m_dxlnode_trailing);
 }
 
 //---------------------------------------------------------------------------

@@ -52,12 +52,12 @@ CReqdPropPlan::CReqdPropPlan(CColRefSet *pcrs, CEnfdOrder *peo,
 	  m_pepp(pepp),
 	  m_pcter(pcter)
 {
-	GPOS_ASSERT(nullptr != pcrs);
-	GPOS_ASSERT(nullptr != peo);
-	GPOS_ASSERT(nullptr != ped);
-	GPOS_ASSERT(nullptr != per);
-	GPOS_ASSERT(nullptr != pepp);
-	GPOS_ASSERT(nullptr != pcter);
+	GPOS_ASSERT(nullptr != m_pcrs);
+	GPOS_ASSERT(nullptr != m_peo);
+	GPOS_ASSERT(nullptr != m_ped);
+	GPOS_ASSERT(nullptr != m_per);
+	GPOS_ASSERT(nullptr != m_pepp);
+	GPOS_ASSERT(nullptr != m_pcter);
 }
 
 

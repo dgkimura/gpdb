@@ -31,8 +31,8 @@ CDXLScalarNullIf::CDXLScalarNullIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 								   gpos::Ref<IMDId> mdid_type)
 	: CDXLScalar(mp), m_mdid_op(mdid_op), m_mdid_type(mdid_type)
 {
-	GPOS_ASSERT(mdid_op->IsValid());
-	GPOS_ASSERT(mdid_type->IsValid());
+	GPOS_ASSERT(m_mdid_op->IsValid());
+	GPOS_ASSERT(m_mdid_type->IsValid());
 }
 
 //---------------------------------------------------------------------------

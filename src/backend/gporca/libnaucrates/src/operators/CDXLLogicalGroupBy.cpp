@@ -42,7 +42,7 @@ CDXLLogicalGroupBy::CDXLLogicalGroupBy(CMemoryPool *mp,
 									   ULongPtrArray *pdrgpulGrpColIds)
 	: CDXLLogical(mp), m_grouping_colid_array(pdrgpulGrpColIds)
 {
-	GPOS_ASSERT(nullptr != pdrgpulGrpColIds);
+	GPOS_ASSERT(nullptr != m_grouping_colid_array);
 }
 
 //---------------------------------------------------------------------------

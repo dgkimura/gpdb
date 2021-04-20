@@ -53,15 +53,15 @@ CPhysicalHashJoin::CPhysicalHashJoin(CMemoryPool *mp,
 	  m_pdrgpdsRedistributeRequests(nullptr)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != pdrgpexprOuterKeys);
-	GPOS_ASSERT(nullptr != pdrgpexprInnerKeys);
-	GPOS_ASSERT(pdrgpexprOuterKeys->Size() == pdrgpexprInnerKeys->Size());
+	GPOS_ASSERT(nullptr != m_pdrgpexprOuterKeys);
+	GPOS_ASSERT(nullptr != m_pdrgpexprInnerKeys);
+	GPOS_ASSERT(m_pdrgpexprOuterKeys->Size() == m_pdrgpexprInnerKeys->Size());
 
 	if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 	{
 		GPOS_ASSERT(nullptr != hash_opfamilies);
 		m_hash_opfamilies = hash_opfamilies;
-		GPOS_ASSERT(pdrgpexprOuterKeys->Size() == m_hash_opfamilies->Size());
+		GPOS_ASSERT(m_pdrgpexprOuterKeys->Size() == m_hash_opfamilies->Size());
 	}
 
 	CreateOptRequests(mp);

@@ -45,9 +45,9 @@ CLogicalBitmapTableGet::CLogicalBitmapTableGet(CMemoryPool *mp,
 	  m_pnameTableAlias(pnameTableAlias),
 	  m_pdrgpcrOutput(pdrgpcrOutput)
 {
-	GPOS_ASSERT(nullptr != ptabdesc);
+	GPOS_ASSERT(nullptr != m_ptabdesc);
 	GPOS_ASSERT(nullptr != pnameTableAlias);
-	GPOS_ASSERT(nullptr != pdrgpcrOutput);
+	GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
 }
 
 //---------------------------------------------------------------------------

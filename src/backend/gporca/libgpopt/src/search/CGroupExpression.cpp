@@ -62,15 +62,15 @@ CGroupExpression::CGroupExpression(CMemoryPool *mp, COperator *pop,
 
 	  m_ecirculardependency(ecdDefault)
 {
-	GPOS_ASSERT(nullptr != pop);
-	GPOS_ASSERT(nullptr != pdrgpgroup);
+	GPOS_ASSERT(nullptr != m_pop);
+	GPOS_ASSERT(nullptr != m_pdrgpgroup);
 	GPOS_ASSERT_IMP(exfid != CXform::ExfInvalid, nullptr != pgexprOrigin);
 
 	// store sorted array of children for faster comparison
-	if (1 < pdrgpgroup->Size() && !pop->FInputOrderSensitive())
+	if (1 < m_pdrgpgroup->Size() && !m_pop->FInputOrderSensitive())
 	{
-		m_pdrgpgroupSorted = GPOS_NEW(mp) CGroupArray(mp, pdrgpgroup->Size());
-		m_pdrgpgroupSorted->AppendArray(pdrgpgroup);
+		m_pdrgpgroupSorted = GPOS_NEW(mp) CGroupArray(mp, m_pdrgpgroup->Size());
+		m_pdrgpgroupSorted->AppendArray(m_pdrgpgroup);
 		m_pdrgpgroupSorted->Sort();
 
 		GPOS_ASSERT(m_pdrgpgroupSorted->IsSorted());

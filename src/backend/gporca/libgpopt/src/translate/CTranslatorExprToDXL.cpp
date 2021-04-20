@@ -212,7 +212,8 @@ CTranslatorExprToDXL::CTranslatorExprToDXL(CMemoryPool *mp,
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != md_accessor);
-	GPOS_ASSERT_IMP(nullptr != pdrgpiSegments, (0 < pdrgpiSegments->Size()));
+	GPOS_ASSERT_IMP(nullptr != m_pdrgpiSegments,
+					(0 < m_pdrgpiSegments->Size()));
 
 	// initialize hash map
 	m_phmcrdxln = GPOS_NEW(m_mp) ColRefToDXLNodeMap(m_mp);

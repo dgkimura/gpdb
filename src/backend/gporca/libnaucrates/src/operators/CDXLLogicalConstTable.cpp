@@ -34,15 +34,15 @@ CDXLLogicalConstTable::CDXLLogicalConstTable(
 	  m_col_descr_array(col_descr_array),
 	  m_const_tuples_datum_array(const_tuples_datum_array)
 {
-	GPOS_ASSERT(nullptr != col_descr_array);
-	GPOS_ASSERT(nullptr != const_tuples_datum_array);
+	GPOS_ASSERT(nullptr != m_col_descr_array);
+	GPOS_ASSERT(nullptr != m_const_tuples_datum_array);
 
 #ifdef GPOS_DEBUG
-	const ULONG length = const_tuples_datum_array->Size();
+	const ULONG length = m_const_tuples_datum_array->Size();
 	for (ULONG idx = 0; idx < length; idx++)
 	{
-		CDXLDatumArray *pdrgpdxldatum = (*const_tuples_datum_array)[idx];
-		GPOS_ASSERT(pdrgpdxldatum->Size() == col_descr_array->Size());
+		CDXLDatumArray *pdrgpdxldatum = (*m_const_tuples_datum_array)[idx];
+		GPOS_ASSERT(pdrgpdxldatum->Size() == m_col_descr_array->Size());
 	}
 #endif
 }

@@ -33,7 +33,7 @@ using namespace gpmd;
 CScalarConst::CScalarConst(CMemoryPool *mp, IDatum *datum)
 	: CScalar(mp), m_pdatum(datum)
 {
-	GPOS_ASSERT(nullptr != datum);
+	GPOS_ASSERT(nullptr != m_pdatum);
 }
 
 

@@ -42,7 +42,7 @@ CScalarOp::CScalarOp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 	  m_fBoolReturnType(false),
 	  m_fCommutative(false)
 {
-	GPOS_ASSERT(mdid_op->IsValid());
+	GPOS_ASSERT(m_mdid_op->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 

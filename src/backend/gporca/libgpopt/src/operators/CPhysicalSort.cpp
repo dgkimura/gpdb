@@ -33,7 +33,7 @@ CPhysicalSort::CPhysicalSort(CMemoryPool *mp, COrderSpec *pos)
 	  m_pos(pos),  // caller must add-ref pos
 	  m_pcrsSort(nullptr)
 {
-	GPOS_ASSERT(nullptr != pos);
+	GPOS_ASSERT(nullptr != m_pos);
 
 	m_pcrsSort = Pos()->PcrsUsed(mp);
 }

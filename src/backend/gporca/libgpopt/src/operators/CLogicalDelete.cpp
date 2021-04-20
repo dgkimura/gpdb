@@ -56,8 +56,8 @@ CLogicalDelete::CLogicalDelete(CMemoryPool *mp, CTableDescriptor *ptabdesc,
 	  m_pcrSegmentId(pcrSegmentId)
 
 {
-	GPOS_ASSERT(nullptr != ptabdesc);
-	GPOS_ASSERT(nullptr != colref_array);
+	GPOS_ASSERT(nullptr != m_ptabdesc);
+	GPOS_ASSERT(nullptr != m_pdrgpcr);
 	GPOS_ASSERT(nullptr != pcrCtid);
 	GPOS_ASSERT(nullptr != pcrSegmentId);
 

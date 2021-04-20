@@ -146,9 +146,9 @@ public:
 		  m_ulSearchStageIndex(ulSearchStageIndex)
 	{
 		GPOS_ASSERT(nullptr != pgroup);
-		GPOS_ASSERT(nullptr != prpp);
-		GPOS_ASSERT(nullptr != prprel);
-		GPOS_ASSERT(nullptr != stats_ctxt);
+		GPOS_ASSERT(nullptr != m_prpp);
+		GPOS_ASSERT(nullptr != m_prprel);
+		GPOS_ASSERT(nullptr != m_pdrgpstatCtxt);
 	}
 
 	// dtor

@@ -45,16 +45,17 @@ CPhysicalSequenceProject::CPhysicalSequenceProject(CMemoryPool *mp,
 	  m_pos(nullptr),
 	  m_pcrsRequiredLocal(nullptr)
 {
-	GPOS_ASSERT(nullptr != pds);
-	GPOS_ASSERT(nullptr != pdrgpos);
-	GPOS_ASSERT(nullptr != pdrgpwf);
-	GPOS_ASSERT(CDistributionSpec::EdtHashed == pds->Edt() ||
-				CDistributionSpec::EdtSingleton == pds->Edt());
+	GPOS_ASSERT(nullptr != m_pds);
+	GPOS_ASSERT(nullptr != m_pdrgpos);
+	GPOS_ASSERT(nullptr != m_pdrgpwf);
+	GPOS_ASSERT(CDistributionSpec::EdtHashed == m_pds->Edt() ||
+				CDistributionSpec::EdtSingleton == m_pds->Edt());
 	// we don't create LogicalSequenceProject with equivalent hashed distribution specs at this time
-	if (CDistributionSpec::EdtHashed == pds->Edt())
+	if (CDistributionSpec::EdtHashed == m_pds->Edt())
 	{
-		GPOS_ASSERT(nullptr ==
-					CDistributionSpecHashed::PdsConvert(pds)->PdshashedEquiv());
+		GPOS_ASSERT(
+			nullptr ==
+			CDistributionSpecHashed::PdsConvert(m_pds)->PdshashedEquiv());
 	}
 	CreateOrderSpec(mp);
 	ComputeRequiredLocalColumns(mp);

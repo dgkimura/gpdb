@@ -36,17 +36,17 @@ CDXLDirectDispatchInfo::CDXLDirectDispatchInfo(
 	: m_dispatch_identifer_datum_array(dispatch_identifer_datum_array),
 	  m_contains_raw_values(contains_raw_values)
 {
-	GPOS_ASSERT(nullptr != dispatch_identifer_datum_array);
+	GPOS_ASSERT(nullptr != m_dispatch_identifer_datum_array);
 
 #ifdef GPOS_DEBUG
-	const ULONG length = dispatch_identifer_datum_array->Size();
+	const ULONG length = m_dispatch_identifer_datum_array->Size();
 	if (0 < length)
 	{
-		ULONG num_of_datums = ((*dispatch_identifer_datum_array)[0])->Size();
+		ULONG num_of_datums = ((*m_dispatch_identifer_datum_array)[0])->Size();
 		for (ULONG idx = 1; idx < length; idx++)
 		{
 			GPOS_ASSERT(num_of_datums ==
-						((*dispatch_identifer_datum_array)[idx])->Size());
+						((*m_dispatch_identifer_datum_array)[idx])->Size());
 		}
 	}
 #endif	// GPOS_DEBUG

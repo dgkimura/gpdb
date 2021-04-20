@@ -54,7 +54,7 @@ CTableDescriptor::CTableDescriptor(
 	  m_lockmode(lockmode)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(mdid->IsValid());
+	GPOS_ASSERT(m_mdid->IsValid());
 
 	m_pdrgpcoldesc = GPOS_NEW(m_mp) CColumnDescriptorArray(m_mp);
 	m_pdrgpcoldescDist = GPOS_NEW(m_mp) CColumnDescriptorArray(m_mp);

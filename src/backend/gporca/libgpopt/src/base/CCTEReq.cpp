@@ -33,7 +33,7 @@ CCTEReq::CCTEReqEntry::CCTEReqEntry(ULONG id, CCTEMap::ECteType ect,
 	: m_id(id), m_ect(ect), m_fRequired(fRequired), m_pdpplan(pdpplan)
 {
 	GPOS_ASSERT(CCTEMap::EctSentinel > ect);
-	GPOS_ASSERT_IMP(nullptr == pdpplan, CCTEMap::EctProducer == ect);
+	GPOS_ASSERT_IMP(nullptr == m_pdpplan, CCTEMap::EctProducer == ect);
 }
 
 //---------------------------------------------------------------------------

@@ -40,8 +40,8 @@ CPartialPlan::CPartialPlan(CGroupExpression *pgexpr, CReqdPropPlan *prpp,
 	  m_ulChildIndex(child_index)
 {
 	GPOS_ASSERT(nullptr != pgexpr);
-	GPOS_ASSERT(nullptr != prpp);
-	GPOS_ASSERT_IMP(nullptr != pccChild, child_index < pgexpr->Arity());
+	GPOS_ASSERT(nullptr != m_prpp);
+	GPOS_ASSERT_IMP(nullptr != m_pccChild, child_index < pgexpr->Arity());
 }
 
 

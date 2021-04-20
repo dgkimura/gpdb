@@ -45,8 +45,8 @@ CRange::CRange(gpos::Ref<IMDId> mdid, const IComparator *pcomp,
 	GPOS_ASSERT(m_mdid->IsValid());
 	GPOS_ASSERT(nullptr != pcomp);
 	GPOS_ASSERT(CUtils::FConstrainableType(m_mdid.get()));
-	GPOS_ASSERT_IMP(nullptr != pdatumLeft && nullptr != pdatumRight,
-					pcomp->IsLessThanOrEqual(pdatumLeft, pdatumRight));
+	GPOS_ASSERT_IMP(nullptr != m_pdatumLeft && nullptr != m_pdatumRight,
+					pcomp->IsLessThanOrEqual(m_pdatumLeft, m_pdatumRight));
 }
 
 //---------------------------------------------------------------------------

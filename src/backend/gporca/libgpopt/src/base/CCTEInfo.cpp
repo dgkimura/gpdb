@@ -39,7 +39,7 @@ CCTEInfo::CCTEInfoEntry::CCTEInfoEntry(CMemoryPool *mp,
 	  m_fUsed(true)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != pexprCTEProducer);
+	GPOS_ASSERT(nullptr != m_pexprCTEProducer);
 
 	m_phmcrulConsumers = GPOS_NEW(mp) ColRefToUlongMap(mp);
 }
@@ -62,7 +62,7 @@ CCTEInfo::CCTEInfoEntry::CCTEInfoEntry(CMemoryPool *mp,
 	  m_fUsed(fUsed)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != pexprCTEProducer);
+	GPOS_ASSERT(nullptr != m_pexprCTEProducer);
 
 	m_phmcrulConsumers = GPOS_NEW(mp) ColRefToUlongMap(mp);
 }

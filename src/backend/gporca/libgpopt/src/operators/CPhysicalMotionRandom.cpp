@@ -30,7 +30,7 @@ CPhysicalMotionRandom::CPhysicalMotionRandom(CMemoryPool *mp,
 											 CDistributionSpecRandom *pdsRandom)
 	: CPhysicalMotion(mp), m_pdsRandom(pdsRandom)
 {
-	GPOS_ASSERT(nullptr != pdsRandom);
+	GPOS_ASSERT(nullptr != m_pdsRandom);
 }
 
 //---------------------------------------------------------------------------

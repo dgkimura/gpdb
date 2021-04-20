@@ -55,19 +55,19 @@ CPhysicalDML::CPhysicalDML(CMemoryPool *mp, CLogicalDML::EDMLOperator edmlop,
 	  m_fSplit(fSplit)
 {
 	GPOS_ASSERT(CLogicalDML::EdmlSentinel != edmlop);
-	GPOS_ASSERT(nullptr != ptabdesc);
-	GPOS_ASSERT(nullptr != pdrgpcrSource);
-	GPOS_ASSERT(nullptr != pbsModified);
+	GPOS_ASSERT(nullptr != m_ptabdesc);
+	GPOS_ASSERT(nullptr != m_pdrgpcrSource);
+	GPOS_ASSERT(nullptr != m_pbsModified);
 	GPOS_ASSERT(nullptr != pcrAction);
 	GPOS_ASSERT_IMP(
 		CLogicalDML::EdmlDelete == edmlop || CLogicalDML::EdmlUpdate == edmlop,
 		nullptr != pcrCtid && nullptr != pcrSegmentId);
 
 	m_pds =
-		CPhysical::PdsCompute(m_mp, m_ptabdesc, pdrgpcrSource, pcrSegmentId);
+		CPhysical::PdsCompute(m_mp, m_ptabdesc, m_pdrgpcrSource, pcrSegmentId);
 
 	if (CDistributionSpec::EdtHashed == m_pds->Edt() &&
-		ptabdesc->ConvertHashToRandom())
+		m_ptabdesc->ConvertHashToRandom())
 	{
 		// The "convert hash to random" flag indicates that we have a table that was hash-partitioned
 		// originally but then we either entered phase 1 of a gpexpand or we altered some of the partitions
@@ -82,14 +82,39 @@ CPhysicalDML::CPhysicalDML(CMemoryPool *mp, CLogicalDML::EDMLOperator edmlop,
 		// Update of the distribution key: This will be handled with a Split node below the DML node,
 		//         with the split deleting the existing rows and this DML node inserting the new rows,
 		//         so this is handled here like an insert, using hash distribution for all partitions.
+		BOOL is_update_without_changing_distribution_key = false;
 
-		if (CLogicalDML::EdmlDelete == edmlop || !fSplit)
+		if (CLogicalDML::EdmlUpdate == edmlop)
+		{
+			CDistributionSpecHashed *hashDistSpec =
+				CDistributionSpecHashed::PdsConvert(m_pds);
+			CColRefSet *updatedCols = GPOS_NEW(mp) CColRefSet(mp);
+			CColRefSet *distributionCols = hashDistSpec->PcrsUsed(mp);
+
+			// compute a ColRefSet of the updated columns
+			for (ULONG c = 0; c < m_pdrgpcrSource->Size(); c++)
+			{
+				if (m_pbsModified->Get(c))
+				{
+					updatedCols->Include((*m_pdrgpcrSource)[c]);
+				}
+			}
+
+			is_update_without_changing_distribution_key =
+				!updatedCols->FIntersects(distributionCols);
+
+			updatedCols->Release();
+			distributionCols->Release();
+		}
+
+		if (CLogicalDML::EdmlDelete == edmlop ||
+			is_update_without_changing_distribution_key)
 		{
 			m_pds->Release();
 			m_pds = GPOS_NEW(mp) CDistributionSpecRandom();
 		}
 	}
-	m_pos = PosComputeRequired(mp, ptabdesc);
+	m_pos = PosComputeRequired(mp, m_ptabdesc);
 	ComputeRequiredLocalColumns(mp);
 }
 

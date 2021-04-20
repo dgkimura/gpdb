@@ -33,7 +33,7 @@ CPhysicalCTEProducer::CPhysicalCTEProducer(CMemoryPool *mp, ULONG id,
 										   CColRefArray *colref_array)
 	: CPhysical(mp), m_id(id), m_pdrgpcr(colref_array), m_pcrs(nullptr)
 {
-	GPOS_ASSERT(nullptr != colref_array);
+	GPOS_ASSERT(nullptr != m_pdrgpcr);
 	m_pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcr);
 }
 
