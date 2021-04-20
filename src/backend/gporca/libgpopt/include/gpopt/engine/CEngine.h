@@ -12,6 +12,7 @@
 #define GPOPT_CEngine_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CReqdPropRelational.h"
 #include "gpopt/search/CMemo.h"
@@ -220,7 +221,8 @@ public:
 	~CEngine();
 
 	// initialize engine with a query context and search strategy
-	void Init(CQueryContext *pqc, CSearchStageArray *search_stage_array);
+	void Init(CQueryContext *pqc,
+			  gpos::owner<CSearchStageArray *> search_stage_array);
 
 	// accessor of memo's root group
 	CGroup *

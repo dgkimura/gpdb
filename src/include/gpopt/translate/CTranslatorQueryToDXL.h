@@ -18,6 +18,7 @@
 #define GPDXL_CTranslatorQueryToDXL_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/translate/CContextQueryToDXL.h"
 #include "gpopt/translate/CMappingVarColId.h"
@@ -301,9 +302,9 @@ private:
 	// generate a DXL node from column values, where each column value is
 	// either a datum or scalar expression represented as a project element.
 	CDXLNode *TranslateColumnValuesToDXL(
-		CDXLDatumArray *dxl_datum_array,
-		CDXLColDescrArray *dxl_column_descriptors,
-		CDXLNodeArray *dxl_project_elements) const;
+		gpos::pointer<CDXLDatumArray *> dxl_datum_array,
+		gpos::pointer<CDXLColDescrArray *> dxl_column_descriptors,
+		gpos::pointer<CDXLNodeArray *> dxl_project_elements) const;
 
 	// translate a value scan range table entry
 	CDXLNode *TranslateValueScanRTEToDXL(const RangeTblEntry *rte, ULONG rti,

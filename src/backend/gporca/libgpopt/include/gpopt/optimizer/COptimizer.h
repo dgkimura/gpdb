@@ -12,6 +12,7 @@
 #define GPOPT_COptimizer_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/eval/CConstExprEvaluatorDefault.h"
 #include "gpopt/search/CSearchStage.h"
@@ -85,12 +86,14 @@ public:
 		const CDXLNodeArray
 			*query_output_dxlnode_array,  // required output columns
 		const CDXLNodeArray *cte_producers,
-		IConstExprEvaluator *pceeval,  // constant expression evaluator
+		gpos::pointer<IConstExprEvaluator *>
+			pceeval,		// constant expression evaluator
 		ULONG ulHosts,		// number of hosts (data nodes) in the system
 		ULONG ulSessionId,	// session id used for logging and minidumps
 		ULONG ulCmdId,		// command id used for logging and minidumps
 		CSearchStageArray *search_stage_array,	// search strategy
-		COptimizerConfig *optimizer_config,		// optimizer configurations
+		gpos::pointer<COptimizerConfig *>
+			optimizer_config,  // optimizer configurations
 		const CHAR *szMinidumpFileName =
 			nullptr	 // name of minidump file to be created
 	);

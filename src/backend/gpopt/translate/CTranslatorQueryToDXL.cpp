@@ -3604,9 +3604,9 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 //---------------------------------------------------------------------------
 CDXLNode *
 CTranslatorQueryToDXL::TranslateColumnValuesToDXL(
-	CDXLDatumArray *dxl_datum_array_const_tbl_get,
-	CDXLColDescrArray *dxl_column_descriptors,
-	CDXLNodeArray *project_elem_dxlnode_array) const
+	gpos::pointer<CDXLDatumArray *> dxl_datum_array_const_tbl_get,
+	gpos::pointer<CDXLColDescrArray *> dxl_column_descriptors,
+	gpos::pointer<CDXLNodeArray *> project_elem_dxlnode_array) const
 {
 	GPOS_ASSERT(nullptr != dxl_datum_array_const_tbl_get);
 	GPOS_ASSERT(nullptr != project_elem_dxlnode_array);

@@ -19,6 +19,7 @@
 #define GPDXL_CTranslatorRelcacheToDXL_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 extern "C" {
 #include "postgres.h"
@@ -358,7 +359,7 @@ public:
 	static ULONG GetAttributePosition(INT attno, const ULONG *attno_mapping);
 
 	// retrieve a type from the relcache
-	static IMDType *RetrieveType(CMemoryPool *mp, IMDId *mdid);
+	static IMDType *RetrieveType(CMemoryPool *mp, gpos::pointer<IMDId *> mdid);
 
 	// retrieve a scalar operator from the relcache
 	static CMDScalarOpGPDB *RetrieveScOp(CMemoryPool *mp, IMDId *mdid);

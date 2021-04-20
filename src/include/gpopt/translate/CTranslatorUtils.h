@@ -15,6 +15,7 @@
 
 #ifndef GPDXL_CTranslatorUtils_H
 #define GPDXL_CTranslatorUtils_H
+#include "gpos/common/owner.h"
 #define GPDXL_SYSTEM_COLUMNS 8
 
 extern "C" {
@@ -171,8 +172,9 @@ public:
 
 	// get column descriptor from a base type
 	static CDXLColDescrArray *GetColumnDescriptorsFromBase(
-		CMemoryPool *mp, CIdGenerator *id_generator, IMDId *mdid_return_type,
-		INT type_modifier, CMDName *md_name);
+		CMemoryPool *mp, CIdGenerator *id_generator,
+		gpos::pointer<IMDId *> mdid_return_type, INT type_modifier,
+		CMDName *md_name);
 
 	// get column descriptors from a composite type
 	static CDXLColDescrArray *GetColumnDescriptorsFromComposite(
@@ -325,8 +327,8 @@ public:
 	// construct a project element with a const NULL expression
 	static CDXLNode *CreateDXLProjElemConstNULL(CMemoryPool *mp,
 												CMDAccessor *md_accessor,
-												IMDId *mdid, ULONG colid,
-												CHAR *alias_name);
+												gpos::pointer<IMDId *> mdid,
+												ULONG colid, CHAR *alias_name);
 
 	// create a DXL project element node with a Const NULL of type provided
 	// by the column descriptor
