@@ -15,6 +15,7 @@
 #include "gpos/common/CAutoP.h"
 #include "gpos/common/CAutoRef.h"
 #include "gpos/common/CTimerUser.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/task/CAutoSuspendAbort.h"
@@ -474,7 +475,7 @@ CMDAccessor::Pmdp(CSystemId sysid)
 //
 //---------------------------------------------------------------------------
 const IMDCacheObject *
-CMDAccessor::GetImdObj(IMDId *mdid)
+CMDAccessor::GetImdObj(gpos::pointer<IMDId *> mdid)
 {
 	BOOL fPrintOptStats = GPOS_FTRACE(EopttracePrintOptimizationStatistics);
 	CTimerUser timerLookup;	 // timer to measure lookup time

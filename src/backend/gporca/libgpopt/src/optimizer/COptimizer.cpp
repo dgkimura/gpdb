@@ -230,10 +230,11 @@ CDXLNode *
 COptimizer::PdxlnOptimize(
 	CMemoryPool *mp, CMDAccessor *md_accessor, const CDXLNode *query,
 	const CDXLNodeArray *query_output_dxlnode_array,
-	const CDXLNodeArray *cte_producers, IConstExprEvaluator *pceeval,
+	const CDXLNodeArray *cte_producers,
+	gpos::pointer<IConstExprEvaluator *> pceeval,
 	ULONG ulHosts,	// actual number of data nodes in the system
 	ULONG ulSessionId, ULONG ulCmdId, CSearchStageArray *search_stage_array,
-	COptimizerConfig *optimizer_config,
+	gpos::pointer<COptimizerConfig *> optimizer_config,
 	const CHAR *szMinidumpFileName	// name of minidump file to be created
 )
 {

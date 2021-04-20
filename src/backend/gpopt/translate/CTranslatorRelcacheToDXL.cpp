@@ -1025,7 +1025,8 @@ CTranslatorRelcacheToDXL::PopulateAttnoPositionMap(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 IMDType *
-CTranslatorRelcacheToDXL::RetrieveType(CMemoryPool *mp, IMDId *mdid)
+CTranslatorRelcacheToDXL::RetrieveType(CMemoryPool *mp,
+									   gpos::pointer<IMDId *> mdid)
 {
 	OID oid_type = CMDIdGPDB::CastMdid(mdid)->Oid();
 	GPOS_ASSERT(InvalidOid != oid_type);
