@@ -60,7 +60,7 @@ CLogicalLimit::CLogicalLimit(CMemoryPool *mp, COrderSpec *pos, BOOL fGlobal,
 	  m_fHasCount(fHasCount),
 	  m_top_limit_under_dml(fTopLimitUnderDML)
 {
-	GPOS_ASSERT(nullptr != pos);
+	GPOS_ASSERT(nullptr != m_pos);
 	CColRefSet *pcrsSort = m_pos->PcrsUsed(mp);
 	m_pcrsLocalUsed->Include(pcrsSort);
 	pcrsSort->Release();

@@ -45,7 +45,7 @@ CDXLScalarSubPlan::CDXLScalarSubPlan(CMemoryPool *mp,
 	GPOS_ASSERT(EdxlSubPlanTypeSentinel > dxl_subplan_type);
 	GPOS_ASSERT_IMP(EdxlSubPlanTypeAny == dxl_subplan_type ||
 						EdxlSubPlanTypeAll == dxl_subplan_type,
-					nullptr != dxlnode_test_expr);
+					nullptr != m_dxlnode_test_expr);
 }
 
 //---------------------------------------------------------------------------

@@ -56,8 +56,8 @@ CLogicalSetOp::CLogicalSetOp(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
 	  m_pcrsOutput(nullptr),
 	  m_pdrgpcrsInput(nullptr)
 {
-	GPOS_ASSERT(nullptr != pdrgpcrOutput);
-	GPOS_ASSERT(nullptr != pdrgpdrgpcrInput);
+	GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
+	GPOS_ASSERT(nullptr != m_pdrgpdrgpcrInput);
 
 	BuildColumnSets(mp);
 }
@@ -76,7 +76,7 @@ CLogicalSetOp::CLogicalSetOp(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
 							 CColRefArray *pdrgpcrRight)
 	: CLogical(mp), m_pdrgpcrOutput(pdrgpcrOutput), m_pdrgpdrgpcrInput(nullptr)
 {
-	GPOS_ASSERT(nullptr != pdrgpcrOutput);
+	GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
 	GPOS_ASSERT(nullptr != pdrgpcrLeft);
 	GPOS_ASSERT(nullptr != pdrgpcrRight);
 

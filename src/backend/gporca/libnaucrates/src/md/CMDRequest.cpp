@@ -35,8 +35,8 @@ CMDRequest::CMDRequest(CMemoryPool *mp, IMdIdArray *mdid_array,
 	  m_mdtype_request_array(mdtype_request_array)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != mdid_array);
-	GPOS_ASSERT(nullptr != mdtype_request_array);
+	GPOS_ASSERT(nullptr != m_mdid_array);
+	GPOS_ASSERT(nullptr != m_mdtype_request_array);
 }
 
 //---------------------------------------------------------------------------

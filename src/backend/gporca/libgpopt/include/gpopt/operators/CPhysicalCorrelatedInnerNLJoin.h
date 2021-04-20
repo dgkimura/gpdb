@@ -45,7 +45,7 @@ public:
 		  m_pdrgpcrInner(pdrgpcrInner),
 		  m_eopidOriginSubq(eopidOriginSubq)
 	{
-		GPOS_ASSERT(nullptr != pdrgpcrInner);
+		GPOS_ASSERT(nullptr != m_pdrgpcrInner);
 
 		SetDistrRequests(UlDistrRequestsForCorrelatedJoin());
 		GPOS_ASSERT(0 < UlDistrRequests());

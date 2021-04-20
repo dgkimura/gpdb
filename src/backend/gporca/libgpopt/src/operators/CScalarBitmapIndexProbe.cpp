@@ -42,8 +42,8 @@ CScalarBitmapIndexProbe::CScalarBitmapIndexProbe(CMemoryPool *mp,
 	: CScalar(mp), m_pindexdesc(pindexdesc), m_pmdidBitmapType(pmdidBitmapType)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != pindexdesc);
-	GPOS_ASSERT(nullptr != pmdidBitmapType);
+	GPOS_ASSERT(nullptr != m_pindexdesc);
+	GPOS_ASSERT(nullptr != m_pmdidBitmapType);
 }
 
 //---------------------------------------------------------------------------

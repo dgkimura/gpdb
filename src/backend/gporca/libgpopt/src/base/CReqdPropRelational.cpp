@@ -45,7 +45,7 @@ CReqdPropRelational::CReqdPropRelational()
 //---------------------------------------------------------------------------
 CReqdPropRelational::CReqdPropRelational(CColRefSet *pcrs) : m_pcrsStat(pcrs)
 {
-	GPOS_ASSERT(nullptr != pcrs);
+	GPOS_ASSERT(nullptr != m_pcrsStat);
 }
 
 //---------------------------------------------------------------------------
@@ -60,8 +60,9 @@ CReqdPropRelational::CReqdPropRelational(CColRefSet *pcrs,
 										 CExpression *pexprPartPred)
 	: m_pcrsStat(pcrs), m_pexprPartPred(pexprPartPred)
 {
-	GPOS_ASSERT(nullptr != pcrs);
-	GPOS_ASSERT_IMP(nullptr != pexprPartPred, pexprPartPred->Pop()->FScalar());
+	GPOS_ASSERT(nullptr != m_pcrsStat);
+	GPOS_ASSERT_IMP(nullptr != m_pexprPartPred,
+					m_pexprPartPred->Pop()->FScalar());
 }
 
 //---------------------------------------------------------------------------

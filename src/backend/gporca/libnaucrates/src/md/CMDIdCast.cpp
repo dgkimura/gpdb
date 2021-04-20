@@ -30,8 +30,8 @@ CMDIdCast::CMDIdCast(CMDIdGPDB *mdid_src, CMDIdGPDB *mdid_dest)
 	  m_mdid_dest(mdid_dest),
 	  m_str(m_mdid_buffer, GPOS_ARRAY_SIZE(m_mdid_buffer))
 {
-	GPOS_ASSERT(mdid_src->IsValid());
-	GPOS_ASSERT(mdid_dest->IsValid());
+	GPOS_ASSERT(m_mdid_src->IsValid());
+	GPOS_ASSERT(m_mdid_dest->IsValid());
 
 	// serialize mdid into static string
 	Serialize();

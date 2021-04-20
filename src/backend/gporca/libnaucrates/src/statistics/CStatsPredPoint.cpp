@@ -32,7 +32,7 @@ CStatsPredPoint::CStatsPredPoint(ULONG colid,
 								 CPoint *point)
 	: CStatsPred(colid), m_stats_cmp_type(stats_cmp_type), m_pred_point(point)
 {
-	GPOS_ASSERT(nullptr != point);
+	GPOS_ASSERT(nullptr != m_pred_point);
 }
 
 //---------------------------------------------------------------------------

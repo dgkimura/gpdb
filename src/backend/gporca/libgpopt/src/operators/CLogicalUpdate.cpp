@@ -61,10 +61,10 @@ CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp, CTableDescriptor *ptabdesc,
 	  m_pcrTupleOid(pcrTupleOid)
 
 {
-	GPOS_ASSERT(nullptr != ptabdesc);
-	GPOS_ASSERT(nullptr != pdrgpcrDelete);
-	GPOS_ASSERT(nullptr != pdrgpcrInsert);
-	GPOS_ASSERT(pdrgpcrDelete->Size() == pdrgpcrInsert->Size());
+	GPOS_ASSERT(nullptr != m_ptabdesc);
+	GPOS_ASSERT(nullptr != m_pdrgpcrDelete);
+	GPOS_ASSERT(nullptr != m_pdrgpcrInsert);
+	GPOS_ASSERT(m_pdrgpcrDelete->Size() == m_pdrgpcrInsert->Size());
 	GPOS_ASSERT(nullptr != pcrCtid);
 	GPOS_ASSERT(nullptr != pcrSegmentId);
 

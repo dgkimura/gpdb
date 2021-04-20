@@ -42,11 +42,11 @@ CLogicalSequenceProject::CLogicalSequenceProject(CMemoryPool *mp,
 	  m_fHasOrderSpecs(false),
 	  m_fHasFrameSpecs(false)
 {
-	GPOS_ASSERT(nullptr != pds);
-	GPOS_ASSERT(nullptr != pdrgpos);
-	GPOS_ASSERT(nullptr != pdrgpwf);
-	GPOS_ASSERT(CDistributionSpec::EdtHashed == pds->Edt() ||
-				CDistributionSpec::EdtSingleton == pds->Edt());
+	GPOS_ASSERT(nullptr != m_pds);
+	GPOS_ASSERT(nullptr != m_pdrgpos);
+	GPOS_ASSERT(nullptr != m_pdrgpwf);
+	GPOS_ASSERT(CDistributionSpec::EdtHashed == m_pds->Edt() ||
+				CDistributionSpec::EdtSingleton == m_pds->Edt());
 
 	// set flags indicating that current operator has non-empty order specs/frame specs
 	SetHasOrderSpecs(mp);

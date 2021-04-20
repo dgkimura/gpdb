@@ -31,8 +31,8 @@ FORCE_GENERATE_DBGSTR(CPartKeys);
 //---------------------------------------------------------------------------
 CPartKeys::CPartKeys(CColRef2dArray *pdrgpdrgpcr) : m_pdrgpdrgpcr(pdrgpdrgpcr)
 {
-	GPOS_ASSERT(nullptr != pdrgpdrgpcr);
-	m_num_of_part_levels = pdrgpdrgpcr->Size();
+	GPOS_ASSERT(nullptr != m_pdrgpdrgpcr);
+	m_num_of_part_levels = m_pdrgpdrgpcr->Size();
 }
 
 //---------------------------------------------------------------------------

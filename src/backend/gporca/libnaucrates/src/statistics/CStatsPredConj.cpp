@@ -28,8 +28,8 @@ CStatsPredConj::CStatsPredConj(CStatsPredPtrArry *conj_pred_stats_array)
 	: CStatsPred(gpos::ulong_max),
 	  m_conj_pred_stats_array(conj_pred_stats_array)
 {
-	GPOS_ASSERT(nullptr != conj_pred_stats_array);
-	m_colid = CStatisticsUtils::GetColId(conj_pred_stats_array);
+	GPOS_ASSERT(nullptr != m_conj_pred_stats_array);
+	m_colid = CStatisticsUtils::GetColId(m_conj_pred_stats_array);
 }
 
 

@@ -20,7 +20,7 @@ using namespace gpmd;
 CMDIndexInfo::CMDIndexInfo(IMDId *mdid, BOOL is_partial)
 	: m_mdid(mdid), m_is_partial(is_partial)
 {
-	GPOS_ASSERT(mdid->IsValid());
+	GPOS_ASSERT(m_mdid->IsValid());
 }
 
 // dtor

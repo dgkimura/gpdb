@@ -38,7 +38,7 @@ CScalarMinMax::CScalarMinMax(CMemoryPool *mp, IMDId *mdid_type,
 	  m_esmmt(esmmt),
 	  m_fBoolReturnType(false)
 {
-	GPOS_ASSERT(mdid_type->IsValid());
+	GPOS_ASSERT(m_mdid_type->IsValid());
 	GPOS_ASSERT(EsmmtSentinel > esmmt);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

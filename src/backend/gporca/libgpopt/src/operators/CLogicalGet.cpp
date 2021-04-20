@@ -65,7 +65,7 @@ CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
 	  m_pdrgpdrgpcrPart(nullptr),
 	  m_pcrsDist(nullptr)
 {
-	GPOS_ASSERT(nullptr != ptabdesc);
+	GPOS_ASSERT(nullptr != m_ptabdesc);
 	GPOS_ASSERT(nullptr != pnameAlias);
 
 	// generate a default column set for the table descriptor
@@ -98,7 +98,7 @@ CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
 	  m_pdrgpcrOutput(pdrgpcrOutput),
 	  m_pdrgpdrgpcrPart(nullptr)
 {
-	GPOS_ASSERT(nullptr != ptabdesc);
+	GPOS_ASSERT(nullptr != m_ptabdesc);
 	GPOS_ASSERT(nullptr != pnameAlias);
 
 	if (m_ptabdesc->IsPartitioned())

@@ -57,17 +57,17 @@ CLogicalConstTableGet::CLogicalConstTableGet(
 	  m_pdrgpdrgpdatum(pdrgpdrgpdatum),
 	  m_pdrgpcrOutput(nullptr)
 {
-	GPOS_ASSERT(nullptr != pdrgpcoldesc);
-	GPOS_ASSERT(nullptr != pdrgpdrgpdatum);
+	GPOS_ASSERT(nullptr != m_pdrgpcoldesc);
+	GPOS_ASSERT(nullptr != m_pdrgpdrgpdatum);
 
 	// generate a default column set for the list of column descriptors
-	m_pdrgpcrOutput = PdrgpcrCreateMapping(mp, pdrgpcoldesc, UlOpId());
+	m_pdrgpcrOutput = PdrgpcrCreateMapping(mp, m_pdrgpcoldesc, UlOpId());
 
 #ifdef GPOS_DEBUG
-	for (ULONG ul = 0; ul < pdrgpdrgpdatum->Size(); ul++)
+	for (ULONG ul = 0; ul < m_pdrgpdrgpdatum->Size(); ul++)
 	{
-		IDatumArray *pdrgpdatum = (*pdrgpdrgpdatum)[ul];
-		GPOS_ASSERT(pdrgpdatum->Size() == pdrgpcoldesc->Size());
+		IDatumArray *pdrgpdatum = (*m_pdrgpdrgpdatum)[ul];
+		GPOS_ASSERT(pdrgpdatum->Size() == m_pdrgpcoldesc->Size());
 	}
 #endif
 }
@@ -88,16 +88,16 @@ CLogicalConstTableGet::CLogicalConstTableGet(CMemoryPool *mp,
 	  m_pdrgpdrgpdatum(pdrgpdrgpdatum),
 	  m_pdrgpcrOutput(pdrgpcrOutput)
 {
-	GPOS_ASSERT(nullptr != pdrgpcrOutput);
-	GPOS_ASSERT(nullptr != pdrgpdrgpdatum);
+	GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
+	GPOS_ASSERT(nullptr != m_pdrgpdrgpdatum);
 
 	// generate column descriptors for the given output columns
-	m_pdrgpcoldesc = PdrgpcoldescMapping(mp, pdrgpcrOutput);
+	m_pdrgpcoldesc = PdrgpcoldescMapping(mp, m_pdrgpcrOutput);
 
 #ifdef GPOS_DEBUG
-	for (ULONG ul = 0; ul < pdrgpdrgpdatum->Size(); ul++)
+	for (ULONG ul = 0; ul < m_pdrgpdrgpdatum->Size(); ul++)
 	{
-		IDatumArray *pdrgpdatum = (*pdrgpdrgpdatum)[ul];
+		IDatumArray *pdrgpdatum = (*m_pdrgpdrgpdatum)[ul];
 		GPOS_ASSERT(pdrgpdatum->Size() == m_pdrgpcoldesc->Size());
 	}
 #endif

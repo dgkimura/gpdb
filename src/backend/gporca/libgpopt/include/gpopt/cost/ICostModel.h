@@ -76,7 +76,7 @@ public:
 		// ctor
 		CCostingStats(IStatistics *stats) : m_pstats(stats)
 		{
-			GPOS_ASSERT(nullptr != stats);
+			GPOS_ASSERT(nullptr != m_pstats);
 		}
 
 		// dtor
@@ -155,7 +155,7 @@ public:
 			  m_pdCostChildren(nullptr),
 			  m_pdrgstatsChildren(nullptr)
 		{
-			GPOS_ASSERT(nullptr != pcstats);
+			GPOS_ASSERT(nullptr != m_pcstats);
 			if (0 < ulChildren)
 			{
 				m_pdRowsChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);

@@ -52,21 +52,21 @@ CMDRelationCtasGPDB::CMDRelationCtasGPDB(
 	  m_dxl_ctas_storage_option(dxl_ctas_storage_options),
 	  m_vartypemod_array(vartypemod_array)
 {
-	GPOS_ASSERT(mdid->IsValid());
-	GPOS_ASSERT(nullptr != mdcol_array);
-	GPOS_ASSERT(nullptr != dxl_ctas_storage_options);
+	GPOS_ASSERT(m_mdid->IsValid());
+	GPOS_ASSERT(nullptr != m_md_col_array);
+	GPOS_ASSERT(nullptr != m_dxl_ctas_storage_option);
 	GPOS_ASSERT(IMDRelation::ErelstorageSentinel > m_rel_storage_type);
-	GPOS_ASSERT(0 == keyset_array->Size());
-	GPOS_ASSERT(nullptr != vartypemod_array);
+	GPOS_ASSERT(0 == m_keyset_array->Size());
+	GPOS_ASSERT(nullptr != m_vartypemod_array);
 
 	m_attrno_nondrop_col_pos_map = GPOS_NEW(m_mp) IntToUlongMap(m_mp);
 	m_nondrop_col_pos_array = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 	m_col_width_array = GPOS_NEW(mp) CDoubleArray(mp);
 
-	const ULONG arity = mdcol_array->Size();
+	const ULONG arity = m_md_col_array->Size();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		IMDColumn *mdcol = (*mdcol_array)[ul];
+		IMDColumn *mdcol = (*m_md_col_array)[ul];
 		GPOS_ASSERT(!mdcol->IsDropped() &&
 					"Cannot create a table with dropped columns");
 

@@ -73,8 +73,8 @@ CPhysicalUnionAll::CPhysicalUnionAll(CMemoryPool *mp,
 	  m_pdrgpcrsInput(nullptr),
 	  m_pdrgpds(nullptr)
 {
-	GPOS_ASSERT(nullptr != pdrgpcrOutput);
-	GPOS_ASSERT(nullptr != pdrgpdrgpcrInput);
+	GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
+	GPOS_ASSERT(nullptr != m_pdrgpdrgpcrInput);
 
 	// build set representation of input columns
 	m_pdrgpcrsInput = GPOS_NEW(mp) CColRefSetArray(mp);
@@ -84,7 +84,7 @@ CPhysicalUnionAll::CPhysicalUnionAll(CMemoryPool *mp,
 		CColRefArray *colref_array = (*m_pdrgpdrgpcrInput)[ulChild];
 		m_pdrgpcrsInput->Append(GPOS_NEW(mp) CColRefSet(mp, colref_array));
 	}
-	PopulateDistrSpecs(mp, pdrgpcrOutput, pdrgpdrgpcrInput);
+	PopulateDistrSpecs(mp, m_pdrgpcrOutput, m_pdrgpdrgpcrInput);
 }
 
 void

@@ -47,7 +47,7 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
 	COperator::EGbAggType egbaggtype, CColRefArray *pdrgpcrKeys)
 	: CLogicalGbAgg(mp, colref_array, egbaggtype), m_pdrgpcrKeys(pdrgpcrKeys)
 {
-	GPOS_ASSERT(nullptr != pdrgpcrKeys);
+	GPOS_ASSERT(nullptr != m_pdrgpcrKeys);
 }
 
 //---------------------------------------------------------------------------
@@ -64,7 +64,7 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
 	: CLogicalGbAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype),
 	  m_pdrgpcrKeys(pdrgpcrKeys)
 {
-	GPOS_ASSERT(nullptr != pdrgpcrKeys);
+	GPOS_ASSERT(nullptr != m_pdrgpcrKeys);
 }
 
 //---------------------------------------------------------------------------

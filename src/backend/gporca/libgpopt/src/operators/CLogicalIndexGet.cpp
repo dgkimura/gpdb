@@ -72,18 +72,18 @@ CLogicalIndexGet::CLogicalIndexGet(CMemoryPool *mp, const IMDIndex *pmdindex,
 	  m_pcrsDist(nullptr)
 {
 	GPOS_ASSERT(nullptr != pmdindex);
-	GPOS_ASSERT(nullptr != ptabdesc);
+	GPOS_ASSERT(nullptr != m_ptabdesc);
 	GPOS_ASSERT(nullptr != pnameAlias);
-	GPOS_ASSERT(nullptr != pdrgpcrOutput);
+	GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
 
 	// create the index descriptor
-	m_pindexdesc = CIndexDescriptor::Pindexdesc(mp, ptabdesc, pmdindex);
+	m_pindexdesc = CIndexDescriptor::Pindexdesc(mp, m_ptabdesc, pmdindex);
 
 	// compute the order spec
-	m_pos = PosFromIndex(m_mp, pmdindex, m_pdrgpcrOutput, ptabdesc);
+	m_pos = PosFromIndex(m_mp, pmdindex, m_pdrgpcrOutput, m_ptabdesc);
 
 	// create a set representation of output columns
-	m_pcrsOutput = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrOutput);
+	m_pcrsOutput = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
 
 	m_pcrsDist = CLogical::PcrsDist(mp, m_ptabdesc, m_pdrgpcrOutput);
 }

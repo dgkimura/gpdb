@@ -33,11 +33,11 @@ CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
 	  m_pmdidArray(array_type_mdid),
 	  m_mdid_type(return_type_mdid)
 {
-	GPOS_ASSERT(elem_type_mdid->IsValid());
-	GPOS_ASSERT(array_type_mdid->IsValid());
-	GPOS_ASSERT(return_type_mdid->IsValid());
-	GPOS_ASSERT(return_type_mdid->Equals(elem_type_mdid) ||
-				return_type_mdid->Equals(array_type_mdid));
+	GPOS_ASSERT(m_pmdidElem->IsValid());
+	GPOS_ASSERT(m_pmdidArray->IsValid());
+	GPOS_ASSERT(m_mdid_type->IsValid());
+	GPOS_ASSERT(m_mdid_type->Equals(m_pmdidElem) ||
+				m_mdid_type->Equals(m_pmdidArray));
 }
 
 //---------------------------------------------------------------------------

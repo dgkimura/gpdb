@@ -54,17 +54,17 @@ CMDRelationExternalGPDB::CMDRelationExternalGPDB(
 	  m_attrno_nondrop_col_pos_map(nullptr),
 	  m_nondrop_col_pos_array(nullptr)
 {
-	GPOS_ASSERT(mdid->IsValid());
-	GPOS_ASSERT(nullptr != mdcol_array);
-	GPOS_ASSERT(nullptr != md_index_info_array);
-	GPOS_ASSERT(nullptr != mdid_triggers_array);
-	GPOS_ASSERT(nullptr != mdid_check_constraint_array);
+	GPOS_ASSERT(m_mdid->IsValid());
+	GPOS_ASSERT(nullptr != m_md_col_array);
+	GPOS_ASSERT(nullptr != m_mdindex_info_array);
+	GPOS_ASSERT(nullptr != m_mdid_trigger_array);
+	GPOS_ASSERT(nullptr != m_mdid_check_constraint_array);
 	GPOS_ASSERT_IMP(
 		convert_hash_to_random,
 		IMDRelation::EreldistrHash == rel_distr_policy &&
 			"Converting hash distributed table to random only possible for hash distributed tables");
-	GPOS_ASSERT(nullptr == distr_opfamilies ||
-				distr_opfamilies->Size() == m_distr_col_array->Size());
+	GPOS_ASSERT(nullptr == m_distr_opfamilies ||
+				m_distr_opfamilies->Size() == m_distr_col_array->Size());
 
 	m_colpos_nondrop_colpos_map = GPOS_NEW(m_mp) UlongToUlongMap(m_mp);
 	m_attrno_nondrop_col_pos_map = GPOS_NEW(m_mp) IntToUlongMap(m_mp);
@@ -72,10 +72,10 @@ CMDRelationExternalGPDB::CMDRelationExternalGPDB(
 	m_col_width_array = GPOS_NEW(mp) CDoubleArray(mp);
 
 	ULONG ulPosNonDropped = 0;
-	const ULONG arity = mdcol_array->Size();
+	const ULONG arity = m_md_col_array->Size();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		IMDColumn *pmdcol = (*mdcol_array)[ul];
+		IMDColumn *pmdcol = (*m_md_col_array)[ul];
 
 		BOOL isSystemCol = pmdcol->IsSystemColumn();
 		if (isSystemCol)

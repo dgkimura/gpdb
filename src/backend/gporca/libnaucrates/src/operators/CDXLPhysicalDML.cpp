@@ -48,8 +48,8 @@ CDXLPhysicalDML::CDXLPhysicalDML(
 	  m_input_sort_req(input_sort_req)
 {
 	GPOS_ASSERT(EdxldmlSentinel > dxl_dml_type);
-	GPOS_ASSERT(nullptr != table_descr);
-	GPOS_ASSERT(nullptr != src_colids_array);
+	GPOS_ASSERT(nullptr != m_dxl_table_descr);
+	GPOS_ASSERT(nullptr != m_src_colids_array);
 }
 
 //---------------------------------------------------------------------------

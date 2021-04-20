@@ -48,16 +48,16 @@ CPhysicalDynamicScan::CPhysicalDynamicScan(
 	  m_root_col_mapping_per_part(root_col_mapping_per_part)
 
 {
-	GPOS_ASSERT(nullptr != pdrgpdrgpcrParts);
-	GPOS_ASSERT(0 < pdrgpdrgpcrParts->Size());
+	GPOS_ASSERT(nullptr != m_pdrgpdrgpcrPart);
+	GPOS_ASSERT(0 < m_pdrgpdrgpcrPart->Size());
 
 	CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
 	const IMDRelation *root_rel = mda->RetrieveRel(ptabdesc->MDId());
 	IMdIdArray *all_partition_mdids = root_rel->ChildPartitionMdids();
 	ULONG part_ptr = 0;
-	for (ULONG ul = 0; ul < partition_mdids->Size(); ul++)
+	for (ULONG ul = 0; ul < m_partition_mdids->Size(); ul++)
 	{
-		IMDId *part_mdid = (*partition_mdids)[ul];
+		IMDId *part_mdid = (*m_partition_mdids)[ul];
 		while (part_mdid != (*all_partition_mdids)[part_ptr])
 		{
 			part_ptr++;

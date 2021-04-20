@@ -55,7 +55,7 @@ CDatumGenericGPDB::CDatumGenericGPDB(CMemoryPool *mp, IMDId *mdid,
 	  m_stats_comp_val_double(stats_comp_val_double)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(mdid->IsValid());
+	GPOS_ASSERT(m_mdid->IsValid());
 
 	if (!IsNull())
 	{

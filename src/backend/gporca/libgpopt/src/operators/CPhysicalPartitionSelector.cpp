@@ -41,7 +41,7 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector(CMemoryPool *mp,
 	  m_filter_expr(pexprScalar)
 {
 	GPOS_ASSERT(0 < scan_id);
-	GPOS_ASSERT(mdid->IsValid());
+	GPOS_ASSERT(m_mdid->IsValid());
 }
 
 //---------------------------------------------------------------------------

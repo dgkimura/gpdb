@@ -46,7 +46,7 @@ CConstraintInterval::CConstraintInterval(CMemoryPool *mp, const CColRef *colref,
 	  m_fIncludesNull(fIncludesNull)
 {
 	GPOS_ASSERT(nullptr != colref);
-	GPOS_ASSERT(nullptr != pdrgprng);
+	GPOS_ASSERT(nullptr != m_pdrgprng);
 	m_pcrsUsed->Include(colref);
 }
 

@@ -40,10 +40,10 @@ CPartConstraint::CPartConstraint(CMemoryPool *mp,
 	  m_fUninterpreted(false),
 	  m_pdrgpdrgpcr(pdrgpdrgpcr)
 {
-	GPOS_ASSERT(nullptr != phmulcnstr);
-	GPOS_ASSERT(nullptr != pbsDefaultParts);
-	GPOS_ASSERT(nullptr != pdrgpdrgpcr);
-	m_num_of_part_levels = pdrgpdrgpcr->Size();
+	GPOS_ASSERT(nullptr != m_phmulcnstr);
+	GPOS_ASSERT(nullptr != m_pbsDefaultParts);
+	GPOS_ASSERT(nullptr != m_pdrgpdrgpcr);
+	m_num_of_part_levels = m_pdrgpdrgpcr->Size();
 	GPOS_ASSERT_IMP(is_unbounded, FAllDefaultPartsIncluded());
 
 	m_pcnstrCombined = PcnstrBuildCombined(mp);

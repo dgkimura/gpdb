@@ -55,11 +55,11 @@ CLogicalRowTrigger::CLogicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
 	  m_pdrgpcrOld(pdrgpcrOld),
 	  m_pdrgpcrNew(pdrgpcrNew)
 {
-	GPOS_ASSERT(rel_mdid->IsValid());
+	GPOS_ASSERT(m_rel_mdid->IsValid());
 	GPOS_ASSERT(0 != type);
-	GPOS_ASSERT(nullptr != pdrgpcrNew || nullptr != pdrgpcrOld);
-	GPOS_ASSERT_IMP(nullptr != pdrgpcrNew && nullptr != pdrgpcrOld,
-					pdrgpcrNew->Size() == pdrgpcrOld->Size());
+	GPOS_ASSERT(nullptr != m_pdrgpcrNew || nullptr != m_pdrgpcrOld);
+	GPOS_ASSERT_IMP(nullptr != m_pdrgpcrNew && nullptr != m_pdrgpcrOld,
+					m_pdrgpcrNew->Size() == m_pdrgpcrOld->Size());
 	InitFunctionProperties();
 }
 

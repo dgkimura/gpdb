@@ -38,7 +38,7 @@ CScalarArrayCoerceExpr::CScalarArrayCoerceExpr(
 	  m_pmdidElementFunc(element_func),
 	  m_is_explicit(is_explicit)
 {
-	GPOS_ASSERT(nullptr != element_func);
+	GPOS_ASSERT(nullptr != m_pmdidElementFunc);
 }
 
 //---------------------------------------------------------------------------

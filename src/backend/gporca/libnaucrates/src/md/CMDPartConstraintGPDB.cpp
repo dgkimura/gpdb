@@ -35,7 +35,7 @@ CMDPartConstraintGPDB::CMDPartConstraintGPDB(
 	  m_is_unbounded(is_unbounded),
 	  m_dxl_node(dxlnode)
 {
-	GPOS_ASSERT(nullptr != level_with_default_part_array);
+	GPOS_ASSERT(nullptr != m_level_with_default_part_array);
 }
 
 //---------------------------------------------------------------------------

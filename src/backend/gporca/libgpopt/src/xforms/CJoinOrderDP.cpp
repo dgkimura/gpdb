@@ -40,9 +40,9 @@ using namespace gpopt;
 CJoinOrderDP::SComponentPair::SComponentPair(CBitSet *pbsFst, CBitSet *pbsSnd)
 	: m_pbsFst(pbsFst), m_pbsSnd(pbsSnd)
 {
-	GPOS_ASSERT(nullptr != pbsFst);
-	GPOS_ASSERT(nullptr != pbsSnd);
-	GPOS_ASSERT(pbsFst->IsDisjoint(pbsSnd));
+	GPOS_ASSERT(nullptr != m_pbsFst);
+	GPOS_ASSERT(nullptr != m_pbsSnd);
+	GPOS_ASSERT(m_pbsFst->IsDisjoint(m_pbsSnd));
 }
 
 

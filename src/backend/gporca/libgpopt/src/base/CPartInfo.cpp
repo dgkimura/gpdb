@@ -34,9 +34,9 @@ CPartInfo::CPartInfoEntry::CPartInfoEntry(ULONG scan_id, IMDId *mdid,
 										  CPartKeysArray *pdrgppartkeys)
 	: m_scan_id(scan_id), m_mdid(mdid), m_pdrgppartkeys(pdrgppartkeys)
 {
-	GPOS_ASSERT(mdid->IsValid());
-	GPOS_ASSERT(pdrgppartkeys != nullptr);
-	GPOS_ASSERT(0 < pdrgppartkeys->Size());
+	GPOS_ASSERT(m_mdid->IsValid());
+	GPOS_ASSERT(m_pdrgppartkeys != nullptr);
+	GPOS_ASSERT(0 < m_pdrgppartkeys->Size());
 }
 
 //---------------------------------------------------------------------------
@@ -144,7 +144,7 @@ CPartInfo::CPartInfoEntry::PpartinfoentryCopy(CMemoryPool *mp) const
 CPartInfo::CPartInfo(CPartInfoEntryArray *pdrgppartentries)
 	: m_pdrgppartentries(pdrgppartentries)
 {
-	GPOS_ASSERT(nullptr != pdrgppartentries);
+	GPOS_ASSERT(nullptr != m_pdrgppartentries);
 }
 
 //---------------------------------------------------------------------------

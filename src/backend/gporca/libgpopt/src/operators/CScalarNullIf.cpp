@@ -38,8 +38,8 @@ CScalarNullIf::CScalarNullIf(CMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type)
 	  m_returns_null_on_null_input(false),
 	  m_fBoolReturnType(false)
 {
-	GPOS_ASSERT(mdid_op->IsValid());
-	GPOS_ASSERT(mdid_type->IsValid());
+	GPOS_ASSERT(m_mdid_op->IsValid());
+	GPOS_ASSERT(m_mdid_type->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	m_returns_null_on_null_input =

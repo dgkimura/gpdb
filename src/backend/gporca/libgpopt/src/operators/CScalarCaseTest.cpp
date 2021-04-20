@@ -27,7 +27,7 @@ using namespace gpmd;
 CScalarCaseTest::CScalarCaseTest(CMemoryPool *mp, IMDId *mdid_type)
 	: CScalar(mp), m_mdid_type(mdid_type)
 {
-	GPOS_ASSERT(mdid_type->IsValid());
+	GPOS_ASSERT(m_mdid_type->IsValid());
 }
 
 //---------------------------------------------------------------------------

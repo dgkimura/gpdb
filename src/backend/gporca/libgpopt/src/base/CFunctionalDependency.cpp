@@ -32,7 +32,7 @@ CFunctionalDependency::CFunctionalDependency(CColRefSet *pcrsKey,
 											 CColRefSet *pcrsDetermined)
 	: m_pcrsKey(pcrsKey), m_pcrsDetermined(pcrsDetermined)
 {
-	GPOS_ASSERT(0 < pcrsKey->Size());
+	GPOS_ASSERT(0 < m_pcrsKey->Size());
 	GPOS_ASSERT(0 < m_pcrsDetermined->Size());
 }
 

@@ -34,7 +34,7 @@ CDXLScalarBitmapBoolOp::CDXLScalarBitmapBoolOp(CMemoryPool *mp,
 	: CDXLScalar(mp), m_mdid_type(mdid_type), m_bitmap_op_type(bitmap_op_type)
 {
 	GPOS_ASSERT(EdxlbitmapSentinel > bitmap_op_type);
-	GPOS_ASSERT(IMDId::IsValid(mdid_type));
+	GPOS_ASSERT(IMDId::IsValid(m_mdid_type));
 }
 
 //---------------------------------------------------------------------------

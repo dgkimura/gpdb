@@ -38,7 +38,7 @@ CPhysicalStreamAggDeduplicate::CPhysicalStreamAggDeduplicate(
 		  aggStage, should_enforce_distribution),
 	  m_pdrgpcrKeys(pdrgpcrKeys)
 {
-	GPOS_ASSERT(nullptr != pdrgpcrKeys);
+	GPOS_ASSERT(nullptr != m_pdrgpcrKeys);
 	InitOrderSpec(mp, m_pdrgpcrKeys);
 }
 

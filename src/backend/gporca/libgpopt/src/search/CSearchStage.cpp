@@ -34,8 +34,8 @@ CSearchStage::CSearchStage(CXformSet *xform_set, ULONG ulTimeThreshold,
 	  m_pexprBest(nullptr),
 	  m_costBest(GPOPT_INVALID_COST)
 {
-	GPOS_ASSERT(nullptr != xform_set);
-	GPOS_ASSERT(0 < xform_set->Size());
+	GPOS_ASSERT(nullptr != m_xforms);
+	GPOS_ASSERT(0 < m_xforms->Size());
 
 	// include all implementation rules in any search strategy
 	m_xforms->Union(CXformFactory::Pxff()->PxfsImplementation());

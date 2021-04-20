@@ -31,11 +31,11 @@ CMDIdScCmp::CMDIdScCmp(CMDIdGPDB *left_mdid, CMDIdGPDB *right_mdid,
 	  m_comparision_type(cmp_type),
 	  m_str(m_mdid_array, GPOS_ARRAY_SIZE(m_mdid_array))
 {
-	GPOS_ASSERT(left_mdid->IsValid());
-	GPOS_ASSERT(right_mdid->IsValid());
+	GPOS_ASSERT(m_mdid_left->IsValid());
+	GPOS_ASSERT(m_mdid_right->IsValid());
 	GPOS_ASSERT(IMDType::EcmptOther != cmp_type);
 
-	GPOS_ASSERT(left_mdid->Sysid().Equals(right_mdid->Sysid()));
+	GPOS_ASSERT(m_mdid_left->Sysid().Equals(m_mdid_right->Sysid()));
 
 	// serialize mdid into static string
 	Serialize();

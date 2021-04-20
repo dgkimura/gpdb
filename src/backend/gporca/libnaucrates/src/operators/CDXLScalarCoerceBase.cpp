@@ -44,8 +44,8 @@ CDXLScalarCoerceBase::CDXLScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type,
 	  m_dxl_coerce_format(dxl_coerce_format),
 	  m_location(location)
 {
-	GPOS_ASSERT(nullptr != mdid_type);
-	GPOS_ASSERT(mdid_type->IsValid());
+	GPOS_ASSERT(nullptr != m_result_type_mdid);
+	GPOS_ASSERT(m_result_type_mdid->IsValid());
 }
 
 

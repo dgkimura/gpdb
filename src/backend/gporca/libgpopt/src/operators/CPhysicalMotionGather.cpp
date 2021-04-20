@@ -55,7 +55,7 @@ CPhysicalMotionGather::CPhysicalMotionGather(
 	  m_pcrsSort(nullptr)
 {
 	GPOS_ASSERT(CDistributionSpecSingleton::EstSentinel != est);
-	GPOS_ASSERT(nullptr != pos);
+	GPOS_ASSERT(nullptr != m_pos);
 
 	m_pdssSingeton = GPOS_NEW(mp) CDistributionSpecSingleton(est);
 	m_pcrsSort = m_pos->PcrsUsed(mp);

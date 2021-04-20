@@ -57,7 +57,7 @@ CLogicalCTEConsumer::CLogicalCTEConsumer(CMemoryPool *mp, ULONG id,
 	  m_pexprInlined(nullptr),
 	  m_phmulcr(nullptr)
 {
-	GPOS_ASSERT(nullptr != colref_array);
+	GPOS_ASSERT(nullptr != m_pdrgpcr);
 	m_pcrsOutput = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcr);
 	CreateInlinedExpr(mp);
 	m_pcrsLocalUsed->Include(m_pdrgpcr);

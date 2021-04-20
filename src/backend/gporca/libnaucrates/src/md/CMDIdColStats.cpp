@@ -30,7 +30,7 @@ CMDIdColStats::CMDIdColStats(CMDIdGPDB *rel_mdid, ULONG pos)
 	  m_attr_pos(pos),
 	  m_str(m_mdid_buffer, GPOS_ARRAY_SIZE(m_mdid_buffer))
 {
-	GPOS_ASSERT(rel_mdid->IsValid());
+	GPOS_ASSERT(m_rel_mdid->IsValid());
 
 	// serialize mdid into static string
 	Serialize();

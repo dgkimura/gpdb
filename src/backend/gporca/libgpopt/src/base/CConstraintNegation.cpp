@@ -29,7 +29,7 @@ using namespace gpopt;
 CConstraintNegation::CConstraintNegation(CMemoryPool *mp, CConstraint *pcnstr)
 	: CConstraint(mp, pcnstr->PcrsUsed()), m_pcnstr(pcnstr)
 {
-	GPOS_ASSERT(nullptr != pcnstr);
+	GPOS_ASSERT(nullptr != m_pcnstr);
 
 	m_pcrsUsed->AddRef();
 }

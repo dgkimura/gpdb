@@ -26,8 +26,8 @@ CDXLScalarPartListValues::CDXLScalarPartListValues(CMemoryPool *mp,
 	  m_result_type_mdid(result_type_mdid),
 	  m_elem_type_mdid(elem_type_mdid)
 {
-	GPOS_ASSERT(result_type_mdid->IsValid());
-	GPOS_ASSERT(elem_type_mdid->IsValid());
+	GPOS_ASSERT(m_result_type_mdid->IsValid());
+	GPOS_ASSERT(m_elem_type_mdid->IsValid());
 }
 
 
