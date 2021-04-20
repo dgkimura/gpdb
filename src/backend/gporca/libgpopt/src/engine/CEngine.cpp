@@ -154,7 +154,8 @@ CEngine::InitLogicalExpression(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 void
-CEngine::Init(CQueryContext *pqc, CSearchStageArray *search_stage_array)
+CEngine::Init(CQueryContext *pqc,
+			  gpos::owner<CSearchStageArray *> search_stage_array)
 {
 	GPOS_ASSERT(nullptr == m_pqc);
 	GPOS_ASSERT(nullptr != pqc);

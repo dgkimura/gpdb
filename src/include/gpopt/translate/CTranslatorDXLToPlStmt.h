@@ -16,6 +16,7 @@
 #ifndef GPDXL_CTranslatorDxlToPlStmt_H
 #define GPDXL_CTranslatorDxlToPlStmt_H
 
+#include "gpos/common/owner.h"
 extern "C" {
 #include "postgres.h"
 }
@@ -152,7 +153,7 @@ public:
 	// translate DXL operator node into a Plan node
 	Plan *TranslateDXLOperatorToPlan(
 		const CDXLNode *dxlnode, CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 

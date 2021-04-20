@@ -15,6 +15,7 @@
 #define GPOPT_CMDAccessor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CCache.h"
 #include "gpos/memory/CCacheAccessor.h"
 
@@ -223,7 +224,7 @@ private:
 	CDouble m_dFetchTime;
 
 	// interface to a MD cache object
-	const IMDCacheObject *GetImdObj(IMDId *mdid);
+	const IMDCacheObject *GetImdObj(gpos::pointer<IMDId *> mdid);
 
 	// return the type corresponding to the given type info and source system id
 	const IMDType *RetrieveType(CSystemId sysid, IMDType::ETypeInfo type_info);

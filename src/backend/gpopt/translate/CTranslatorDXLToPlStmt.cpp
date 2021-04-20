@@ -14,6 +14,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include "gpos/common/owner.h"
 extern "C" {
 #include "postgres.h"
 
@@ -301,7 +302,7 @@ CTranslatorDXLToPlStmt::GetPlannedStmtFromDXL(const CDXLNode *dxlnode,
 Plan *
 CTranslatorDXLToPlStmt::TranslateDXLOperatorToPlan(
 	const CDXLNode *dxlnode, CDXLTranslateContext *output_context,
-	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
+	gpos::pointer<CDXLTranslationContextArray *> ctxt_translation_prev_siblings)
 {
 	GPOS_ASSERT(nullptr != dxlnode);
 	GPOS_ASSERT(nullptr != ctxt_translation_prev_siblings);
