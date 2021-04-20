@@ -40,7 +40,7 @@ CScalarCmp::CScalarCmp(CMemoryPool *mp, IMDId *mdid_op,
 	  m_comparision_type(cmp_type),
 	  m_returns_null_on_null_input(false)
 {
-	GPOS_ASSERT(mdid_op->IsValid());
+	GPOS_ASSERT(m_mdid_op->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	m_returns_null_on_null_input =

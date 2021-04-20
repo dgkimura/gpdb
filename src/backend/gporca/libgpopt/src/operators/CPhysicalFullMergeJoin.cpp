@@ -35,14 +35,14 @@ CPhysicalFullMergeJoin::CPhysicalFullMergeJoin(
 	  m_inner_merge_clauses(inner_merge_clauses)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != outer_merge_clauses);
-	GPOS_ASSERT(nullptr != inner_merge_clauses);
-	GPOS_ASSERT(outer_merge_clauses->Size() == inner_merge_clauses->Size());
+	GPOS_ASSERT(nullptr != m_outer_merge_clauses);
+	GPOS_ASSERT(nullptr != m_inner_merge_clauses);
+	GPOS_ASSERT(m_outer_merge_clauses->Size() == m_inner_merge_clauses->Size());
 
 	// There is one request per col, up to the max number of requests
 	// plus an additional request for all the cols, and one for the singleton.
 	ULONG num_hash_reqs = std::min((ULONG) GPOPT_MAX_HASH_DIST_REQUESTS,
-								   outer_merge_clauses->Size());
+								   m_outer_merge_clauses->Size());
 	SetDistrRequests(num_hash_reqs + 2);
 }
 

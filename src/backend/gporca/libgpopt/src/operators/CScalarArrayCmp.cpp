@@ -45,7 +45,7 @@ CScalarArrayCmp::CScalarArrayCmp(CMemoryPool *mp, IMDId *mdid_op,
 	  m_earrccmpt(earrcmpt),
 	  m_returns_null_on_null_input(false)
 {
-	GPOS_ASSERT(mdid_op->IsValid());
+	GPOS_ASSERT(m_mdid_op->IsValid());
 	GPOS_ASSERT(EarrcmpSentinel > earrcmpt);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

@@ -42,10 +42,10 @@ CQueryContext::CQueryContext(CMemoryPool *mp, CExpression *pexpr,
 	  m_fDeriveStats(fDeriveStats)
 {
 	GPOS_ASSERT(nullptr != pexpr);
-	GPOS_ASSERT(nullptr != prpp);
-	GPOS_ASSERT(nullptr != colref_array);
-	GPOS_ASSERT(nullptr != pdrgpmdname);
-	GPOS_ASSERT(colref_array->Size() == pdrgpmdname->Size());
+	GPOS_ASSERT(nullptr != m_prpp);
+	GPOS_ASSERT(nullptr != m_pdrgpcr);
+	GPOS_ASSERT(nullptr != m_pdrgpmdname);
+	GPOS_ASSERT(m_pdrgpcr->Size() == m_pdrgpmdname->Size());
 
 #ifdef GPOS_DEBUG
 	const ULONG ulReqdColumns = m_pdrgpcr->Size();
@@ -56,9 +56,9 @@ CQueryContext::CQueryContext(CMemoryPool *mp, CExpression *pexpr,
 	pcteinfo->MarkUnusedCTEs();
 
 	CColRefSet *pcrsOutputAndOrderingCols = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefSet *pcrsOrderSpec = prpp->Peo()->PosRequired()->PcrsUsed(mp);
+	CColRefSet *pcrsOrderSpec = m_prpp->Peo()->PosRequired()->PcrsUsed(mp);
 
-	pcrsOutputAndOrderingCols->Include(colref_array);
+	pcrsOutputAndOrderingCols->Include(m_pdrgpcr);
 	pcrsOutputAndOrderingCols->Include(pcrsOrderSpec);
 	pcrsOrderSpec->Release();
 

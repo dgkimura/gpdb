@@ -37,10 +37,10 @@ CMDCheckConstraintGPDB::CMDCheckConstraintGPDB(CMemoryPool *mp, IMDId *mdid,
 	  m_rel_mdid(rel_mdid),
 	  m_dxl_node(dxlnode)
 {
-	GPOS_ASSERT(mdid->IsValid());
-	GPOS_ASSERT(rel_mdid->IsValid());
+	GPOS_ASSERT(m_mdid->IsValid());
+	GPOS_ASSERT(m_rel_mdid->IsValid());
 	GPOS_ASSERT(nullptr != mdname);
-	GPOS_ASSERT(nullptr != dxlnode);
+	GPOS_ASSERT(nullptr != m_dxl_node);
 
 	m_dxl_str = CDXLUtils::SerializeMDObj(
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);

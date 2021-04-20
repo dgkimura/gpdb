@@ -47,8 +47,8 @@ CLogicalInsert::CLogicalInsert(CMemoryPool *mp, CTableDescriptor *ptabdesc,
 	: CLogical(mp), m_ptabdesc(ptabdesc), m_pdrgpcrSource(pdrgpcrSource)
 
 {
-	GPOS_ASSERT(nullptr != ptabdesc);
-	GPOS_ASSERT(nullptr != pdrgpcrSource);
+	GPOS_ASSERT(nullptr != m_ptabdesc);
+	GPOS_ASSERT(nullptr != m_pdrgpcrSource);
 
 	m_pcrsLocalUsed->Include(m_pdrgpcrSource);
 }

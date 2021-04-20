@@ -65,28 +65,28 @@ CMDRelationGPDB::CMDRelationGPDB(
 	  m_attrno_nondrop_col_pos_map(nullptr),
 	  m_nondrop_col_pos_array(nullptr)
 {
-	GPOS_ASSERT(mdid->IsValid());
-	GPOS_ASSERT(nullptr != mdcol_array);
-	GPOS_ASSERT(nullptr != md_index_info_array);
-	GPOS_ASSERT(nullptr != mdid_triggers_array);
-	GPOS_ASSERT(nullptr != mdid_check_constraint_array);
+	GPOS_ASSERT(m_mdid->IsValid());
+	GPOS_ASSERT(nullptr != m_md_col_array);
+	GPOS_ASSERT(nullptr != m_mdindex_info_array);
+	GPOS_ASSERT(nullptr != m_mdid_trigger_array);
+	GPOS_ASSERT(nullptr != m_mdid_check_constraint_array);
 	GPOS_ASSERT_IMP(
 		convert_hash_to_random,
 		IMDRelation::EreldistrHash == rel_distr_policy &&
 			"Converting hash distributed table to random only possible for hash distributed tables");
-	GPOS_ASSERT(nullptr == distr_opfamilies ||
-				distr_opfamilies->Size() == m_distr_col_array->Size());
+	GPOS_ASSERT(nullptr == m_distr_opfamilies ||
+				m_distr_opfamilies->Size() == m_distr_col_array->Size());
 
 	m_colpos_nondrop_colpos_map = GPOS_NEW(m_mp) UlongToUlongMap(m_mp);
 	m_attrno_nondrop_col_pos_map = GPOS_NEW(m_mp) IntToUlongMap(m_mp);
 	m_nondrop_col_pos_array = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 	m_col_width_array = GPOS_NEW(mp) CDoubleArray(mp);
 
-	const ULONG arity = mdcol_array->Size();
+	const ULONG arity = m_md_col_array->Size();
 	ULONG non_dropped_col_pos = 0;
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		IMDColumn *mdcol = (*mdcol_array)[ul];
+		IMDColumn *mdcol = (*m_md_col_array)[ul];
 		BOOL is_system_col = mdcol->IsSystemColumn();
 		if (is_system_col)
 		{

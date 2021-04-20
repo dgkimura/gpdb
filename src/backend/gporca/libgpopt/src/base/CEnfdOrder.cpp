@@ -35,7 +35,7 @@ const CHAR *CEnfdOrder::m_szOrderMatching[EomSentinel] = {"satisfy"};
 CEnfdOrder::CEnfdOrder(COrderSpec *pos, EOrderMatching eom)
 	: m_pos(pos), m_eom(eom)
 {
-	GPOS_ASSERT(nullptr != pos);
+	GPOS_ASSERT(nullptr != m_pos);
 	GPOS_ASSERT(EomSentinel > eom);
 }
 

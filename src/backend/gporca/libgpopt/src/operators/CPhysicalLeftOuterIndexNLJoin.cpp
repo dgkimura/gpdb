@@ -25,10 +25,10 @@ CPhysicalLeftOuterIndexNLJoin::CPhysicalLeftOuterIndexNLJoin(
 	  m_pdrgpcrOuterRefs(colref_array),
 	  m_origJoinPred(origJoinPred)
 {
-	GPOS_ASSERT(nullptr != colref_array);
-	if (nullptr != origJoinPred)
+	GPOS_ASSERT(nullptr != m_pdrgpcrOuterRefs);
+	if (nullptr != m_origJoinPred)
 	{
-		origJoinPred->AddRef();
+		m_origJoinPred->AddRef();
 	}
 }
 

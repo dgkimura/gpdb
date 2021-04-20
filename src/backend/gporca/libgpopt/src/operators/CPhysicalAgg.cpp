@@ -51,15 +51,15 @@ CPhysicalAgg::CPhysicalAgg(
 	  m_fMultiStage(fMultiStage),
 	  m_should_enforce_distribution(should_enforce_distribution)
 {
-	GPOS_ASSERT(nullptr != colref_array);
+	GPOS_ASSERT(nullptr != m_pdrgpcr);
 	GPOS_ASSERT(COperator::EgbaggtypeSentinel > egbaggtype);
 	GPOS_ASSERT_IMP(EgbaggtypeGlobal != egbaggtype, fMultiStage);
 
 	ULONG ulDistrReqs = 1;
 	if (pdrgpcrMinimal == nullptr || 0 == pdrgpcrMinimal->Size())
 	{
-		colref_array->AddRef();
-		m_pdrgpcrMinimal = colref_array;
+		m_pdrgpcr->AddRef();
+		m_pdrgpcrMinimal = m_pdrgpcr;
 	}
 	else
 	{
@@ -77,7 +77,7 @@ CPhysicalAgg::CPhysicalAgg(
 		//		possible data skew
 
 		ulDistrReqs = 2;
-		if (pdrgpcrArgDQA != nullptr && 0 != pdrgpcrArgDQA->Size())
+		if (m_pdrgpcrArgDQA != nullptr && 0 != m_pdrgpcrArgDQA->Size())
 		{
 			// If the local aggregate has distinct columns we generate
 			// two optimization requests for its children:
@@ -92,15 +92,15 @@ CPhysicalAgg::CPhysicalAgg(
 	}
 	else if (COperator::EgbaggtypeIntermediate == egbaggtype)
 	{
-		GPOS_ASSERT(nullptr != pdrgpcrArgDQA);
-		GPOS_ASSERT(pdrgpcrArgDQA->Size() <= colref_array->Size());
+		GPOS_ASSERT(nullptr != m_pdrgpcrArgDQA);
+		GPOS_ASSERT(m_pdrgpcrArgDQA->Size() <= m_pdrgpcr->Size());
 		// Intermediate Agg generates two optimization requests for its children:
 		// (1) Hash distribution on the group by columns + distinct column
 		// (2) Hash distribution on the group by columns
 
 		ulDistrReqs = 2;
 
-		if (pdrgpcrArgDQA->Size() == colref_array->Size() ||
+		if (m_pdrgpcrArgDQA->Size() == m_pdrgpcr->Size() ||
 			GPOS_FTRACE(EopttraceForceAggSkewAvoidance))
 		{
 			// scalar aggregates so we only request the first case

@@ -44,9 +44,9 @@ CPhysicalSplit::CPhysicalSplit(CMemoryPool *mp, CColRefArray *pdrgpcrDelete,
 	  m_pcrTupleOid(pcrTupleOid),
 	  m_pcrsRequiredLocal(nullptr)
 {
-	GPOS_ASSERT(nullptr != pdrgpcrDelete);
-	GPOS_ASSERT(nullptr != pdrgpcrInsert);
-	GPOS_ASSERT(pdrgpcrInsert->Size() == pdrgpcrDelete->Size());
+	GPOS_ASSERT(nullptr != m_pdrgpcrDelete);
+	GPOS_ASSERT(nullptr != m_pdrgpcrInsert);
+	GPOS_ASSERT(m_pdrgpcrInsert->Size() == m_pdrgpcrDelete->Size());
 	GPOS_ASSERT(nullptr != pcrCtid);
 	GPOS_ASSERT(nullptr != pcrSegmentId);
 	GPOS_ASSERT(nullptr != pcrAction);

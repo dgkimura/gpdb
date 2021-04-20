@@ -75,10 +75,10 @@ CLogicalDynamicGetBase::CLogicalDynamicGetBase(
 	  m_partition_mdids(partition_mdids)
 
 {
-	GPOS_ASSERT(nullptr != ptabdesc);
+	GPOS_ASSERT(nullptr != m_ptabdesc);
 	GPOS_ASSERT(nullptr != pnameAlias);
-	GPOS_ASSERT(nullptr != pdrgpcrOutput);
-	GPOS_ASSERT(nullptr != pdrgpdrgpcrPart);
+	GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
+	GPOS_ASSERT(nullptr != m_pdrgpdrgpcrPart);
 
 	m_pcrsDist = CLogical::PcrsDist(mp, m_ptabdesc, m_pdrgpcrOutput);
 	m_root_col_mapping_per_part =
@@ -107,7 +107,7 @@ CLogicalDynamicGetBase::CLogicalDynamicGetBase(CMemoryPool *mp,
 	  m_pcrsDist(nullptr),
 	  m_partition_mdids(partition_mdids)
 {
-	GPOS_ASSERT(nullptr != ptabdesc);
+	GPOS_ASSERT(nullptr != m_ptabdesc);
 	GPOS_ASSERT(nullptr != pnameAlias);
 
 	// generate a default column set for the table descriptor

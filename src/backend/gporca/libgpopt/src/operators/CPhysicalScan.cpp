@@ -43,18 +43,18 @@ CPhysicalScan::CPhysicalScan(CMemoryPool *mp, const CName *pnameAlias,
 	  m_pds(nullptr),
 	  m_pstatsBaseTable(nullptr)
 {
-	GPOS_ASSERT(nullptr != ptabdesc);
+	GPOS_ASSERT(nullptr != m_ptabdesc);
 	GPOS_ASSERT(nullptr != pnameAlias);
-	GPOS_ASSERT(nullptr != pdrgpcrOutput);
+	GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
 
-	if (ptabdesc->ConvertHashToRandom())
+	if (m_ptabdesc->ConvertHashToRandom())
 	{
 		// Treating a hash distributed table as random during planning
 		m_pds = GPOS_NEW(m_mp) CDistributionSpecRandom();
 	}
 	else
 	{
-		m_pds = CPhysical::PdsCompute(m_mp, ptabdesc, pdrgpcrOutput,
+		m_pds = CPhysical::PdsCompute(m_mp, m_ptabdesc, m_pdrgpcrOutput,
 									  nullptr /* gp_segment_id */);
 	}
 	ComputeTableStats(m_mp);

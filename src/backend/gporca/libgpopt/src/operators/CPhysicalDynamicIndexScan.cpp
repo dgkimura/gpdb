@@ -46,8 +46,8 @@ CPhysicalDynamicIndexScan::CPhysicalDynamicIndexScan(
 	  m_pindexdesc(pindexdesc),
 	  m_pos(pos)
 {
-	GPOS_ASSERT(nullptr != pindexdesc);
-	GPOS_ASSERT(nullptr != pos);
+	GPOS_ASSERT(nullptr != m_pindexdesc);
+	GPOS_ASSERT(nullptr != m_pos);
 }
 
 

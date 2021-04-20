@@ -72,9 +72,9 @@ CLogicalDML::CLogicalDML(CMemoryPool *mp, EDMLOperator edmlop,
 	  m_pcrTupleOid(pcrTupleOid)
 {
 	GPOS_ASSERT(EdmlSentinel != edmlop);
-	GPOS_ASSERT(nullptr != ptabdesc);
-	GPOS_ASSERT(nullptr != pdrgpcrSource);
-	GPOS_ASSERT(nullptr != pbsModified);
+	GPOS_ASSERT(nullptr != m_ptabdesc);
+	GPOS_ASSERT(nullptr != m_pdrgpcrSource);
+	GPOS_ASSERT(nullptr != m_pbsModified);
 	GPOS_ASSERT(nullptr != pcrAction);
 	GPOS_ASSERT_IMP(EdmlDelete == edmlop || EdmlUpdate == edmlop,
 					nullptr != pcrCtid && nullptr != pcrSegmentId);

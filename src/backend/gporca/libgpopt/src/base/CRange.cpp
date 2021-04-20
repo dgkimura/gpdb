@@ -42,11 +42,11 @@ CRange::CRange(IMDId *mdid, const IComparator *pcomp, IDatum *pdatumLeft,
 	  m_pdatumRight(pdatumRight),
 	  m_eriRight(eriRight)
 {
-	GPOS_ASSERT(mdid->IsValid());
+	GPOS_ASSERT(m_mdid->IsValid());
 	GPOS_ASSERT(nullptr != pcomp);
-	GPOS_ASSERT(CUtils::FConstrainableType(mdid));
-	GPOS_ASSERT_IMP(nullptr != pdatumLeft && nullptr != pdatumRight,
-					pcomp->IsLessThanOrEqual(pdatumLeft, pdatumRight));
+	GPOS_ASSERT(CUtils::FConstrainableType(m_mdid));
+	GPOS_ASSERT_IMP(nullptr != m_pdatumLeft && nullptr != m_pdatumRight,
+					pcomp->IsLessThanOrEqual(m_pdatumLeft, m_pdatumRight));
 }
 
 //---------------------------------------------------------------------------

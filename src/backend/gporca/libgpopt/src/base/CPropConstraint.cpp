@@ -34,7 +34,7 @@ CPropConstraint::CPropConstraint(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
 								 CConstraint *pcnstr)
 	: m_pdrgpcrs(pdrgpcrs), m_phmcrcrs(nullptr), m_pcnstr(pcnstr)
 {
-	GPOS_ASSERT(nullptr != pdrgpcrs);
+	GPOS_ASSERT(nullptr != m_pdrgpcrs);
 	InitHashMap(mp);
 }
 

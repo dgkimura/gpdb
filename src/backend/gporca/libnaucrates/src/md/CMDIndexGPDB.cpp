@@ -53,20 +53,20 @@ CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 	  m_mdpart_constraint(mdpart_constraint),
 	  m_child_index_oids(child_index_oids)
 {
-	GPOS_ASSERT(mdid->IsValid());
+	GPOS_ASSERT(m_mdid->IsValid());
 	GPOS_ASSERT(IMDIndex::EmdindSentinel > index_type);
-	GPOS_ASSERT(nullptr != index_key_cols_array);
-	GPOS_ASSERT(0 < index_key_cols_array->Size());
-	GPOS_ASSERT(nullptr != included_cols_array);
-	GPOS_ASSERT_IMP(nullptr != mdid_item_type,
+	GPOS_ASSERT(nullptr != m_index_key_cols_array);
+	GPOS_ASSERT(0 < m_index_key_cols_array->Size());
+	GPOS_ASSERT(nullptr != m_included_cols_array);
+	GPOS_ASSERT_IMP(nullptr != m_mdid_item_type,
 					IMDIndex::EmdindBitmap == index_type ||
 						IMDIndex::EmdindBtree == index_type ||
 						IMDIndex::EmdindGist == index_type ||
 						IMDIndex::EmdindGin == index_type ||
 						IMDIndex::EmdindBrin == index_type);
 	GPOS_ASSERT_IMP(IMDIndex::EmdindBitmap == index_type,
-					nullptr != mdid_item_type && mdid_item_type->IsValid());
-	GPOS_ASSERT(nullptr != mdid_opfamilies_array);
+					nullptr != m_mdid_item_type && m_mdid_item_type->IsValid());
+	GPOS_ASSERT(nullptr != m_mdid_opfamilies_array);
 
 	m_dxl_str = CDXLUtils::SerializeMDObj(
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);

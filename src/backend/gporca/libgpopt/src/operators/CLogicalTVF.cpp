@@ -63,12 +63,12 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 	  m_pdrgpcoldesc(pdrgpcoldesc),
 	  m_pdrgpcrOutput(nullptr)
 {
-	GPOS_ASSERT(mdid_return_type->IsValid());
+	GPOS_ASSERT(m_return_type_mdid->IsValid());
 	GPOS_ASSERT(nullptr != str);
-	GPOS_ASSERT(nullptr != pdrgpcoldesc);
+	GPOS_ASSERT(nullptr != m_pdrgpcoldesc);
 
 	// generate a default column set for the list of column descriptors
-	m_pdrgpcrOutput = PdrgpcrCreateMapping(mp, pdrgpcoldesc, UlOpId());
+	m_pdrgpcrOutput = PdrgpcrCreateMapping(mp, m_pdrgpcoldesc, UlOpId());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	if (mdid_func->IsValid())
@@ -104,11 +104,11 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 	  m_pdrgpcoldesc(pdrgpcoldesc),
 	  m_pdrgpcrOutput(pdrgpcrOutput)
 {
-	GPOS_ASSERT(mdid_func->IsValid());
-	GPOS_ASSERT(mdid_return_type->IsValid());
+	GPOS_ASSERT(m_func_mdid->IsValid());
+	GPOS_ASSERT(m_return_type_mdid->IsValid());
 	GPOS_ASSERT(nullptr != str);
-	GPOS_ASSERT(nullptr != pdrgpcoldesc);
-	GPOS_ASSERT(nullptr != pdrgpcrOutput);
+	GPOS_ASSERT(nullptr != m_pdrgpcoldesc);
+	GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);

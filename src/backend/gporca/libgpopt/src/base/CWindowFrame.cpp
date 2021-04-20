@@ -66,21 +66,21 @@ CWindowFrame::CWindowFrame(CMemoryPool *mp, EFrameSpec efs,
 {
 	GPOS_ASSERT_IMP(EfbBoundedPreceding == m_efbLeading ||
 						EfbBoundedFollowing == m_efbLeading,
-					nullptr != pexprLeading);
+					nullptr != m_pexprLeading);
 	GPOS_ASSERT_IMP(EfbBoundedPreceding == m_efbTrailing ||
 						EfbBoundedFollowing == m_efbTrailing,
-					nullptr != pexprTrailing);
+					nullptr != m_pexprTrailing);
 
 	// include used columns by frame edges
 	m_pcrsUsed = GPOS_NEW(mp) CColRefSet(mp);
-	if (nullptr != pexprLeading)
+	if (nullptr != m_pexprLeading)
 	{
-		m_pcrsUsed->Include(pexprLeading->DeriveUsedColumns());
+		m_pcrsUsed->Include(m_pexprLeading->DeriveUsedColumns());
 	}
 
-	if (nullptr != pexprTrailing)
+	if (nullptr != m_pexprTrailing)
 	{
-		m_pcrsUsed->Include(pexprTrailing->DeriveUsedColumns());
+		m_pcrsUsed->Include(m_pexprTrailing->DeriveUsedColumns());
 	}
 }
 

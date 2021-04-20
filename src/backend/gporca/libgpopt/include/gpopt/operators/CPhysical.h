@@ -98,7 +98,7 @@ private:
 			  m_ulChildIndex(child_index),
 			  m_ulScalarChildIndex(ulScalarChildIndex)
 		{
-			GPOS_ASSERT(nullptr != pcrsRequired);
+			GPOS_ASSERT(nullptr != m_pcrsRequired);
 		}
 
 		// dtor

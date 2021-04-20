@@ -70,7 +70,7 @@ CExpression::CExpression(CMemoryPool *mp, COperator *pop,
 	  m_ulOriginGrpExprId(gpos::ulong_max)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != pop);
+	GPOS_ASSERT(nullptr != m_pop);
 
 	m_pdprel = GPOS_NEW(m_mp) CDrvdPropRelational(m_mp);
 	m_pdpscalar = GPOS_NEW(m_mp) CDrvdPropScalar(m_mp);
@@ -105,7 +105,7 @@ CExpression::CExpression(CMemoryPool *mp, COperator *pop, CExpression *pexpr)
 	  m_ulOriginGrpExprId(gpos::ulong_max)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != pop);
+	GPOS_ASSERT(nullptr != m_pop);
 	GPOS_ASSERT(nullptr != pexpr);
 
 	m_pdprel = GPOS_NEW(m_mp) CDrvdPropRelational(m_mp);
@@ -142,7 +142,7 @@ CExpression::CExpression(CMemoryPool *mp, COperator *pop,
 	  m_ulOriginGrpExprId(gpos::ulong_max)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != pop);
+	GPOS_ASSERT(nullptr != m_pop);
 
 	GPOS_ASSERT(nullptr != pexprChildFirst);
 	GPOS_ASSERT(nullptr != pexprChildSecond);
@@ -183,7 +183,7 @@ CExpression::CExpression(CMemoryPool *mp, COperator *pop,
 	  m_ulOriginGrpExprId(gpos::ulong_max)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != pop);
+	GPOS_ASSERT(nullptr != m_pop);
 
 	GPOS_ASSERT(nullptr != pexprChildFirst);
 	GPOS_ASSERT(nullptr != pexprChildSecond);
@@ -224,8 +224,8 @@ CExpression::CExpression(CMemoryPool *mp, COperator *pop,
 	  m_ulOriginGrpExprId(gpos::ulong_max)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != pop);
-	GPOS_ASSERT(nullptr != pdrgpexpr);
+	GPOS_ASSERT(nullptr != m_pop);
+	GPOS_ASSERT(nullptr != m_pdrgpexpr);
 
 	m_pdprel = GPOS_NEW(m_mp) CDrvdPropRelational(m_mp);
 	m_pdpscalar = GPOS_NEW(m_mp) CDrvdPropScalar(m_mp);
@@ -258,9 +258,9 @@ CExpression::CExpression(CMemoryPool *mp, COperator *pop,
 	  m_ulOriginGrpExprId(gpos::ulong_max)
 {
 	GPOS_ASSERT(nullptr != mp);
-	GPOS_ASSERT(nullptr != pop);
+	GPOS_ASSERT(nullptr != m_pop);
 	GPOS_ASSERT(pgexpr->Arity() ==
-				(pdrgpexpr == nullptr ? 0 : pdrgpexpr->Size()));
+				(m_pdrgpexpr == nullptr ? 0 : m_pdrgpexpr->Size()));
 	GPOS_ASSERT(nullptr != pgexpr->Pgroup());
 
 	m_pdprel = GPOS_NEW(m_mp) CDrvdPropRelational(m_mp);

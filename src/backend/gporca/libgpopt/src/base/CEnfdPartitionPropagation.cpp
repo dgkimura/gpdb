@@ -33,7 +33,7 @@ CEnfdPartitionPropagation::CEnfdPartitionPropagation(
 	: m_ppps(ppps), m_eppm(eppm)
 
 {
-	GPOS_ASSERT(nullptr != ppps);
+	GPOS_ASSERT(nullptr != m_ppps);
 	GPOS_ASSERT(EppmSentinel > eppm);
 }
 

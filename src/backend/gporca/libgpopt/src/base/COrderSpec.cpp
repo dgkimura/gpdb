@@ -41,7 +41,7 @@ COrderSpec::COrderExpression::COrderExpression(gpmd::IMDId *mdid,
 	: m_mdid(mdid), m_pcr(colref), m_ent(ent)
 {
 	GPOS_ASSERT(nullptr != colref);
-	GPOS_ASSERT(mdid->IsValid());
+	GPOS_ASSERT(m_mdid->IsValid());
 }
 
 //---------------------------------------------------------------------------

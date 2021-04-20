@@ -49,10 +49,11 @@ CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 	  m_eaggfuncstage(eaggfuncstage),
 	  m_fSplit(fSplit)
 {
-	GPOS_ASSERT(nullptr != pmdidAggFunc);
+	GPOS_ASSERT(nullptr != m_pmdidAggFunc);
 	GPOS_ASSERT(nullptr != pstrAggFunc);
-	GPOS_ASSERT(pmdidAggFunc->IsValid());
-	GPOS_ASSERT_IMP(nullptr != resolved_rettype, resolved_rettype->IsValid());
+	GPOS_ASSERT(m_pmdidAggFunc->IsValid());
+	GPOS_ASSERT_IMP(nullptr != m_pmdidResolvedRetType,
+					m_pmdidResolvedRetType->IsValid());
 	GPOS_ASSERT(EaggfuncstageSentinel > eaggfuncstage);
 
 	// store id of type obtained by looking up MD cache

@@ -35,7 +35,7 @@ using namespace gpmd;
 CScalarIf::CScalarIf(CMemoryPool *mp, IMDId *mdid)
 	: CScalar(mp), m_mdid_type(mdid), m_fBoolReturnType(false)
 {
-	GPOS_ASSERT(mdid->IsValid());
+	GPOS_ASSERT(m_mdid_type->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	m_fBoolReturnType = CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type);

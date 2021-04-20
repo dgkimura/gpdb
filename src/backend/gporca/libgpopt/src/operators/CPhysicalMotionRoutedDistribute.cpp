@@ -30,7 +30,7 @@ CPhysicalMotionRoutedDistribute::CPhysicalMotionRoutedDistribute(
 	CMemoryPool *mp, CDistributionSpecRouted *pdsRouted)
 	: CPhysicalMotion(mp), m_pdsRouted(pdsRouted), m_pcrsRequiredLocal(nullptr)
 {
-	GPOS_ASSERT(nullptr != pdsRouted);
+	GPOS_ASSERT(nullptr != m_pdsRouted);
 
 	m_pcrsRequiredLocal = GPOS_NEW(mp) CColRefSet(mp);
 

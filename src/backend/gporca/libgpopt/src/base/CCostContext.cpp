@@ -59,11 +59,11 @@ CCostContext::CCostContext(CMemoryPool *mp, COptimizationContext *poc,
 	  m_pstats(nullptr),
 	  m_poc(poc)
 {
-	GPOS_ASSERT(nullptr != poc);
-	GPOS_ASSERT(nullptr != pgexpr);
+	GPOS_ASSERT(nullptr != m_poc);
+	GPOS_ASSERT(nullptr != m_pgexpr);
 	GPOS_ASSERT_IMP(
-		pgexpr->Pop()->FPhysical(),
-		ulOptReq < CPhysical::PopConvert(pgexpr->Pop())->UlOptRequests());
+		m_pgexpr->Pop()->FPhysical(),
+		ulOptReq < CPhysical::PopConvert(m_pgexpr->Pop())->UlOptRequests());
 
 	if (!m_pgexpr->Pop()->FScalar() &&
 		!CPhysical::PopConvert(m_pgexpr->Pop())->FPassThruStats())

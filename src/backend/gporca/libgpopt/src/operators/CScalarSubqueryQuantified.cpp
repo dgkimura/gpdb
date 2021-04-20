@@ -40,7 +40,7 @@ CScalarSubqueryQuantified::CScalarSubqueryQuantified(
 	  m_pstrScalarOp(pstrScalarOp),
 	  m_pcr(colref)
 {
-	GPOS_ASSERT(scalar_op_mdid->IsValid());
+	GPOS_ASSERT(m_scalar_op_mdid->IsValid());
 	GPOS_ASSERT(nullptr != pstrScalarOp);
 	GPOS_ASSERT(nullptr != colref);
 }

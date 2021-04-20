@@ -44,7 +44,7 @@ CEnfdDistribution::CEnfdDistribution(CDistributionSpec *pds,
 									 EDistributionMatching edm)
 	: m_pds(pds), m_edm(edm)
 {
-	GPOS_ASSERT(nullptr != pds);
+	GPOS_ASSERT(nullptr != m_pds);
 	GPOS_ASSERT(EdmSentinel > edm);
 }
 

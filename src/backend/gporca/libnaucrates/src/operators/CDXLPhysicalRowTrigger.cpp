@@ -36,11 +36,11 @@ CDXLPhysicalRowTrigger::CDXLPhysicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
 	  m_colids_old(colids_old),
 	  m_colids_new(colids_new)
 {
-	GPOS_ASSERT(rel_mdid->IsValid());
+	GPOS_ASSERT(m_rel_mdid->IsValid());
 	GPOS_ASSERT(0 != type);
-	GPOS_ASSERT(nullptr != colids_new || nullptr != colids_old);
-	GPOS_ASSERT_IMP(nullptr != colids_new && nullptr != colids_old,
-					colids_new->Size() == colids_old->Size());
+	GPOS_ASSERT(nullptr != m_colids_new || nullptr != m_colids_old);
+	GPOS_ASSERT_IMP(nullptr != m_colids_new && nullptr != m_colids_old,
+					m_colids_new->Size() == m_colids_old->Size());
 }
 
 //---------------------------------------------------------------------------

@@ -49,7 +49,7 @@ CLogicalApply::CLogicalApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
 	  m_pdrgpcrInner(pdrgpcrInner),
 	  m_eopidOriginSubq(eopidOriginSubq)
 {
-	GPOS_ASSERT(nullptr != pdrgpcrInner);
+	GPOS_ASSERT(nullptr != m_pdrgpcrInner);
 }
 
 //---------------------------------------------------------------------------

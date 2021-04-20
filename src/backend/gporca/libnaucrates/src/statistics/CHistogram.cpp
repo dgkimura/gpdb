@@ -64,7 +64,7 @@ CHistogram::CHistogram(CMemoryPool *mp, CBucketArray *histogram_buckets,
 	  m_NDVs_were_scaled(false),
 	  m_is_col_stats_missing(false)
 {
-	GPOS_ASSERT(nullptr != histogram_buckets);
+	GPOS_ASSERT(nullptr != m_histogram_buckets);
 }
 
 // ctor

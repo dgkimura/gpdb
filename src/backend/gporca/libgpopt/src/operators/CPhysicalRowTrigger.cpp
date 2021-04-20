@@ -38,11 +38,11 @@ CPhysicalRowTrigger::CPhysicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
 	  m_pdrgpcrNew(pdrgpcrNew),
 	  m_pcrsRequiredLocal(nullptr)
 {
-	GPOS_ASSERT(rel_mdid->IsValid());
+	GPOS_ASSERT(m_rel_mdid->IsValid());
 	GPOS_ASSERT(0 != type);
-	GPOS_ASSERT(nullptr != pdrgpcrNew || nullptr != pdrgpcrOld);
-	GPOS_ASSERT_IMP(nullptr != pdrgpcrNew && nullptr != pdrgpcrOld,
-					pdrgpcrNew->Size() == pdrgpcrOld->Size());
+	GPOS_ASSERT(nullptr != m_pdrgpcrNew || nullptr != m_pdrgpcrOld);
+	GPOS_ASSERT_IMP(nullptr != m_pdrgpcrNew && nullptr != m_pdrgpcrOld,
+					m_pdrgpcrNew->Size() == m_pdrgpcrOld->Size());
 
 	m_pcrsRequiredLocal = GPOS_NEW(mp) CColRefSet(mp);
 	if (nullptr != m_pdrgpcrOld)
