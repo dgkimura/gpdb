@@ -19,6 +19,7 @@
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CColRefSet.h"
+#include "gpopt/operators/CExpression_Fwd.h"
 #include "naucrates/md/IMDIndex.h"
 
 namespace gpopt
@@ -26,7 +27,6 @@ namespace gpopt
 using namespace gpos;
 
 // fwd declaration
-class CExpression;
 class CConstraint;
 
 // constraint array

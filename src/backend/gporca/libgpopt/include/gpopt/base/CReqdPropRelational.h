@@ -16,13 +16,13 @@
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CReqdProp.h"
+#include "gpopt/operators/CExpression_Fwd.h"
 
 namespace gpopt
 {
 using namespace gpos;
 
 // forward declaration
-class CExpression;
 class CExpressionHandle;
 
 //---------------------------------------------------------------------------
