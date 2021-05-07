@@ -2886,8 +2886,10 @@ CTranslatorExprToDXL::PdxlnAggregate(CExpression *pexprAgg,
 	pdxlnAgg->AddChild(filter_dxlnode);
 	pdxlnAgg->AddChild(child_dxlnode);
 
+#ifdef REFCOUNT_FIXME_ASSERT_AFTER_MOVE
 #ifdef GPOS_DEBUG
 	pdxlopAgg->AssertValid(pdxlnAgg, false /* validate_children */);
+#endif
 #endif
 
 	return pdxlnAgg;
@@ -2956,8 +2958,10 @@ CTranslatorExprToDXL::PdxlnSort(CExpression *pexprSort,
 	pdxlnSort->AddChild(limit_offset_dxlnode);
 	pdxlnSort->AddChild(child_dxlnode);
 
+#ifdef REFCOUNT_FIXME_ASSERT_AFTER_MOVE
 #ifdef GPOS_DEBUG
 	pdxlopSort->AssertValid(pdxlnSort, false /* validate_children */);
+#endif
 #endif
 
 	return pdxlnSort;
@@ -3028,8 +3032,10 @@ CTranslatorExprToDXL::PdxlnLimit(CExpression *pexprLimit,
 	pdxlnLimit->AddChild(limit_count);
 	pdxlnLimit->AddChild(limit_offset);
 
+#ifdef REFCOUNT_FIXME_ASSERT_AFTER_MOVE
 #ifdef GPOS_DEBUG
 	pdxlopLimit->AssertValid(pdxlnLimit, false /* validate_children */);
+#endif
 #endif
 
 	return pdxlnLimit;
@@ -4220,8 +4226,10 @@ CTranslatorExprToDXL::PdxlnNLJoin(CExpression *pexprInnerNLJ,
 	pdxlnNLJ->AddChild(pdxlnOuterChild);
 	pdxlnNLJ->AddChild(pdxlnInnerChild);
 
+#ifdef REFCOUNT_FIXME_ASSERT_AFTER_MOVE
 #ifdef GPOS_DEBUG
 	pdxlopNLJ->AssertValid(pdxlnNLJ, false /* validate_children */);
+#endif
 #endif
 
 	return pdxlnNLJ;
@@ -4519,8 +4527,10 @@ CTranslatorExprToDXL::PdxlnHashJoin(CExpression *pexprHJ,
 	// cleanup
 	pdrgpexprPredicates->Release();
 
+#ifdef REFCOUNT_FIXME_ASSERT_AFTER_MOVE
 #ifdef GPOS_DEBUG
 	pdxlopHJ->AssertValid(pdxlnHJ, false /* validate_children */);
+#endif
 #endif
 
 	return pdxlnHJ;
@@ -4722,8 +4732,10 @@ CTranslatorExprToDXL::PdxlnMaterialize(
 	pdxlnMaterialize->AddChild(filter_dxlnode);
 	pdxlnMaterialize->AddChild(child_dxlnode);
 
+#ifdef REFCOUNT_FIXME_ASSERT_AFTER_MOVE
 #ifdef GPOS_DEBUG
 	pdxlopMat->AssertValid(pdxlnMaterialize, false /* validate_children */);
+#endif
 #endif
 
 	return pdxlnMaterialize;
@@ -6336,8 +6348,10 @@ CTranslatorExprToDXL::PdxlnWindow(CExpression *pexprSeqPrj,
 	pdxlnWindow->AddChild(filter_dxlnode);
 	pdxlnWindow->AddChild(child_dxlnode);
 
+#ifdef REFCOUNT_FIXME_ASSERT_AFTER_MOVE
 #ifdef GPOS_DEBUG
 	pdxlopWindow->AssertValid(pdxlnWindow, false /* validate_children */);
+#endif
 #endif
 
 	pcrsOutput->Release();
