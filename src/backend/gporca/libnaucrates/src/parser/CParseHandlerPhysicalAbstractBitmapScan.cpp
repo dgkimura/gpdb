@@ -154,9 +154,11 @@ CParseHandlerPhysicalAbstractBitmapScan::EndElementHelper(
 
 	AddChildFromParseHandler(bitmap_parse_handler);
 
+#ifdef REFCOUNT_FIXME_ASSERT_AFTER_MOVE
 #ifdef GPOS_DEBUG
 	dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
 #endif	// GPOS_DEBUG
+#endif
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

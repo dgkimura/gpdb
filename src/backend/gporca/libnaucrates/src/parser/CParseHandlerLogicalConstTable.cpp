@@ -145,10 +145,12 @@ CParseHandlerLogicalConstTable::EndElement(
 												 m_const_tuples_datum_array);
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, lg_const_table_get_dxl_op);
 
+#ifdef REFCOUNT_FIXME_ASSERT_AFTER_MOVE
 #ifdef GPOS_DEBUG
 		lg_const_table_get_dxl_op->AssertValid(m_dxl_node,
 											   false /* validate_children */);
 #endif	// GPOS_DEBUG
+#endif
 
 		// deactivate handler
 		m_parse_handler_mgr->DeactivateHandler();
