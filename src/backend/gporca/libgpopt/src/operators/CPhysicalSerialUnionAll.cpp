@@ -95,6 +95,10 @@ CPhysicalSerialUnionAll::PdsRequired(
 
 	if (0 == child_index)
 	{
+		if (exprhdl.FChildrenHaveVolatileFunc())
+		{
+			return GPOS_NEW(mp) CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
+		}
 		// otherwise, ANY distribution is requested from outer child
 		return GPOS_NEW(mp) CDistributionSpecAny(this->Eopid());
 	}

@@ -24,3 +24,18 @@ SELECT A FROM simple_distributed_table UNION ALL SELECT a FROM multilocation_ext
 
 EXPLAIN SELECT * FROM one_external_table UNION ALL SELECT a FROM simple_replicated_table;
 SELECT * FROM one_external_table UNION ALL SELECT a FROM simple_replicated_table;
+
+-- test union all with volatile function
+DROP SEQUENCE IF EXISTS external_table_union_all_sequence;
+CREATE SEQUENCE external_table_union_all_sequence;
+EXPLAIN SELECT * FROM nextval('external_table_union_all_sequence') UNION ALL SELECT a FROM multilocation_external_table;
+SELECT * FROM nextval('external_table_union_all_sequence') UNION ALL SELECT a FROM multilocation_external_table;
+
+EXPLAIN SELECT a FROM multilocation_external_table UNION ALL SELECT * FROM nextval('external_table_union_all_sequence');
+SELECT a FROM multilocation_external_table UNION ALL SELECT * FROM nextval('external_table_union_all_sequence');
+
+EXPLAIN SELECT * FROM nextval('external_table_union_all_sequence') UNION ALL SELECT a FROM one_external_table;
+SELECT * FROM nextval('external_table_union_all_sequence') UNION ALL SELECT a FROM one_external_table;
+
+EXPLAIN SELECT a FROM one_external_table UNION ALL SELECT * FROM nextval('external_table_union_all_sequence');
+SELECT a FROM one_external_table UNION ALL SELECT * FROM nextval('external_table_union_all_sequence');

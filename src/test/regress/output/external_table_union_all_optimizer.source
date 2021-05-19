@@ -115,3 +115,83 @@ SELECT * FROM one_external_table UNION ALL SELECT a FROM simple_replicated_table
  1
 (2 rows)
 
+-- test union all with volatile function
+DROP SEQUENCE IF EXISTS external_table_union_all_sequence;
+NOTICE:  sequence "external_table_union_all_sequence" does not exist, skipping
+CREATE SEQUENCE external_table_union_all_sequence;
+EXPLAIN SELECT * FROM nextval('external_table_union_all_sequence') UNION ALL SELECT a FROM multilocation_external_table;
+                                               QUERY PLAN                                                
+---------------------------------------------------------------------------------------------------------
+ Append  (cost=0.00..470.62 rows=1000001 width=8)
+   ->  Function Scan on nextval  (cost=0.00..0.00 rows=1 width=8)
+   ->  Result  (cost=0.00..462.62 rows=1000000 width=8)
+         ->  Gather Motion 3:1  (slice1; segments: 3)  (cost=0.00..454.62 rows=1000000 width=4)
+               ->  Foreign Scan on multilocation_external_table  (cost=0.00..437.23 rows=333334 width=4)
+ Optimizer: Pivotal Optimizer (GPORCA)
+(6 rows)
+
+SELECT * FROM nextval('external_table_union_all_sequence') UNION ALL SELECT a FROM multilocation_external_table;
+ nextval 
+---------
+       1
+       1
+       2
+       3
+(4 rows)
+
+EXPLAIN SELECT a FROM multilocation_external_table UNION ALL SELECT * FROM nextval('external_table_union_all_sequence');
+                                               QUERY PLAN                                                
+---------------------------------------------------------------------------------------------------------
+ Append  (cost=0.00..470.62 rows=1000001 width=8)
+   ->  Result  (cost=0.00..462.62 rows=1000000 width=8)
+         ->  Gather Motion 3:1  (slice1; segments: 3)  (cost=0.00..454.62 rows=1000000 width=4)
+               ->  Foreign Scan on multilocation_external_table  (cost=0.00..437.23 rows=333334 width=4)
+   ->  Function Scan on nextval  (cost=0.00..0.00 rows=1 width=8)
+ Optimizer: Pivotal Optimizer (GPORCA)
+(6 rows)
+
+SELECT a FROM multilocation_external_table UNION ALL SELECT * FROM nextval('external_table_union_all_sequence');
+ a 
+---
+ 3
+ 1
+ 2
+ 2
+(4 rows)
+
+EXPLAIN SELECT * FROM nextval('external_table_union_all_sequence') UNION ALL SELECT a FROM one_external_table;
+                                           QUERY PLAN                                           
+------------------------------------------------------------------------------------------------
+ Append  (cost=0.00..470.62 rows=1000001 width=8)
+   ->  Function Scan on nextval  (cost=0.00..0.00 rows=1 width=8)
+   ->  Result  (cost=0.00..462.62 rows=1000000 width=8)
+         ->  Gather Motion 3:1  (slice1; segments: 3)  (cost=0.00..454.62 rows=1000000 width=4)
+               ->  Foreign Scan on one_external_table  (cost=0.00..437.23 rows=333334 width=4)
+ Optimizer: Pivotal Optimizer (GPORCA)
+(6 rows)
+
+SELECT * FROM nextval('external_table_union_all_sequence') UNION ALL SELECT a FROM one_external_table;
+ nextval 
+---------
+       3
+       2
+(2 rows)
+
+EXPLAIN SELECT a FROM one_external_table UNION ALL SELECT * FROM nextval('external_table_union_all_sequence');
+                                           QUERY PLAN                                           
+------------------------------------------------------------------------------------------------
+ Append  (cost=0.00..470.62 rows=1000001 width=8)
+   ->  Result  (cost=0.00..462.62 rows=1000000 width=8)
+         ->  Gather Motion 3:1  (slice1; segments: 3)  (cost=0.00..454.62 rows=1000000 width=4)
+               ->  Foreign Scan on one_external_table  (cost=0.00..437.23 rows=333334 width=4)
+   ->  Function Scan on nextval  (cost=0.00..0.00 rows=1 width=8)
+ Optimizer: Pivotal Optimizer (GPORCA)
+(6 rows)
+
+SELECT a FROM one_external_table UNION ALL SELECT * FROM nextval('external_table_union_all_sequence');
+ a 
+---
+ 2
+ 4
+(2 rows)
+

@@ -267,6 +267,7 @@ public:
 
 	// check whether an expression's children have a volatile function
 	BOOL FChildrenHaveVolatileFuncScan() const;
+	BOOL FChildrenHaveVolatileFunc() const;
 
 	// return a representative (inexact) scalar child at given index
 	CExpression *PexprScalarRepChild(ULONG child_index) const;

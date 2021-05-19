@@ -1502,6 +1502,21 @@ CExpressionHandle::FChildrenHaveVolatileFuncScan() const
 	return false;
 }
 
+BOOL
+CExpressionHandle::FChildrenHaveVolatileFunc() const
+{
+	const ULONG arity = Arity();
+	for (ULONG ul = 0; ul < arity; ul++)
+	{
+		if (PfpChild(ul)->Efs() == gpmd::IMDFunction::EfsVolatile)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 
 //---------------------------------------------------------------------------
 //	@function:
