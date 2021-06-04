@@ -125,7 +125,7 @@ CIndexDescriptor::Pindexdesc(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
 	// array of included column descriptors
 	CColumnDescriptorArray *pdrgcoldescIncluded =
 		GPOS_NEW(mp) CColumnDescriptorArray(mp);
-	for (ULONG ul = 0; ul < pmdindex->IncludedCols(); ul++)
+	for (ULONG ul = 0; ul < pdrgpcoldesc->Size(); ul++)
 	{
 		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
 		pcoldesc->AddRef();

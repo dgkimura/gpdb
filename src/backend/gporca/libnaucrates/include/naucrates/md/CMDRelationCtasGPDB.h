@@ -210,6 +210,12 @@ public:
 
 	virtual IMDId *GetDistrOpfamilyAt(ULONG pos) const;
 
+	virtual CMDIndexInfo *
+	GetIndexInfo(IMDId *) const
+	{
+		return NULL;
+	}
+
 	// number of indices
 	virtual ULONG
 	IndexCount() const

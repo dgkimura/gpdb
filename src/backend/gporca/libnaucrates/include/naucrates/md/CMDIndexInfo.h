@@ -26,15 +26,22 @@ using namespace gpdxl;
 class CMDIndexInfo : public IMDInterface
 {
 private:
+	// memory pool
+	CMemoryPool *m_mp;
+
 	// index mdid
 	IMDId *m_mdid;
 
 	// is the index partial
 	BOOL m_is_partial;
 
+	// included columns
+	ULongPtrArray *m_included_cols_array;
+
 public:
 	// ctor
-	CMDIndexInfo(IMDId *mdid, BOOL is_partial);
+	CMDIndexInfo(CMemoryPool *m_mp, IMDId *mdid, BOOL is_partial,
+				 ULongPtrArray *included_cols_array);
 
 	// dtor
 	virtual ~CMDIndexInfo();
@@ -44,6 +51,10 @@ public:
 
 	// is the index partial
 	BOOL IsPartial() const;
+
+	ULONG IncludedCols() const;
+
+	ULONG IncludedColAt(ULONG pos) const;
 
 	// serialize indexinfo in DXL format given a serializer object
 	virtual void Serialize(CXMLSerializer *) const;

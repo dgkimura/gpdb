@@ -139,6 +139,12 @@ public:
 		return m_dxl_str;
 	}
 
+	virtual CMDIndexInfo *
+	GetIndexInfo(IMDId *) const
+	{
+		return NULL;
+	}
+
 	// the metadata id
 	virtual IMDId *MDId() const;
 

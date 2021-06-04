@@ -36,7 +36,6 @@ CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 						   BOOL is_clustered, IMDIndex::EmdindexType index_type,
 						   IMDId *mdid_item_type,
 						   ULongPtrArray *index_key_cols_array,
-						   ULongPtrArray *included_cols_array,
 						   IMdIdArray *mdid_opfamilies_array,
 						   IMDPartConstraint *mdpart_constraint)
 	: m_mp(mp),
@@ -46,7 +45,6 @@ CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 	  m_index_type(index_type),
 	  m_mdid_item_type(mdid_item_type),
 	  m_index_key_cols_array(index_key_cols_array),
-	  m_included_cols_array(included_cols_array),
 	  m_mdid_opfamilies_array(mdid_opfamilies_array),
 	  m_mdpart_constraint(mdpart_constraint)
 {
@@ -54,7 +52,6 @@ CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 	GPOS_ASSERT(IMDIndex::EmdindSentinel > index_type);
 	GPOS_ASSERT(NULL != index_key_cols_array);
 	GPOS_ASSERT(0 < index_key_cols_array->Size());
-	GPOS_ASSERT(NULL != included_cols_array);
 	GPOS_ASSERT_IMP(NULL != mdid_item_type,
 					IMDIndex::EmdindBitmap == index_type ||
 						IMDIndex::EmdindBtree == index_type ||
@@ -83,7 +80,6 @@ CMDIndexGPDB::~CMDIndexGPDB()
 	m_mdid->Release();
 	CRefCount::SafeRelease(m_mdid_item_type);
 	m_index_key_cols_array->Release();
-	m_included_cols_array->Release();
 	m_mdid_opfamilies_array->Release();
 	CRefCount::SafeRelease(m_mdpart_constraint);
 }
@@ -196,59 +192,6 @@ CMDIndexGPDB::GetKeyPos(ULONG column) const
 	return gpos::ulong_max;
 }
 
-//---------------------------------------------------------------------------
-//	@function:
-//		CMDIndexGPDB::IncludedCols
-//
-//	@doc:
-//		Returns the number of included columns
-//
-//---------------------------------------------------------------------------
-ULONG
-CMDIndexGPDB::IncludedCols() const
-{
-	return m_included_cols_array->Size();
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CMDIndexGPDB::IncludedColAt
-//
-//	@doc:
-//		Returns the n-th included column
-//
-//---------------------------------------------------------------------------
-ULONG
-CMDIndexGPDB::IncludedColAt(ULONG pos) const
-{
-	return *((*m_included_cols_array)[pos]);
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CMDIndexGPDB::GetIncludedColPos
-//
-//	@doc:
-//		Return the position of the included column in the index
-//
-//---------------------------------------------------------------------------
-ULONG
-CMDIndexGPDB::GetIncludedColPos(ULONG column) const
-{
-	const ULONG size = IncludedCols();
-
-	for (ULONG ul = 0; ul < size; ul++)
-	{
-		if (IncludedColAt(ul) == column)
-		{
-			return ul;
-		}
-	}
-
-	GPOS_ASSERT("Column not found in Index's included columns");
-
-	return gpos::ulong_max;
-}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -301,13 +244,6 @@ CMDIndexGPDB::Serialize(CXMLSerializer *xml_serializer) const
 		CDXLTokens::GetDXLTokenStr(EdxltokenIndexKeyCols), index_key_cols_str);
 	GPOS_DELETE(index_key_cols_str);
 
-	CWStringDynamic *available_cols_str =
-		CDXLUtils::Serialize(m_mp, m_included_cols_array);
-	xml_serializer->AddAttribute(
-		CDXLTokens::GetDXLTokenStr(EdxltokenIndexIncludedCols),
-		available_cols_str);
-	GPOS_DELETE(available_cols_str);
-
 	// serialize operator class information
 	SerializeMDIdList(xml_serializer, m_mdid_opfamilies_array,
 					  CDXLTokens::GetDXLTokenStr(EdxltokenOpfamilies),
@@ -346,18 +282,6 @@ CMDIndexGPDB::DebugPrint(IOstream &os) const
 	for (ULONG ul = 0; ul < Keys(); ul++)
 	{
 		ULONG ulKey = KeyAt(ul);
-		if (ul > 0)
-		{
-			os << ", ";
-		}
-		os << ulKey;
-	}
-	os << std::endl;
-
-	os << "Included Columns: ";
-	for (ULONG ul = 0; ul < IncludedCols(); ul++)
-	{
-		ULONG ulKey = IncludedColAt(ul);
 		if (ul > 0)
 		{
 			os << ", ";

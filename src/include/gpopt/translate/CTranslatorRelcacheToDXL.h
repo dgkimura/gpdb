@@ -267,8 +267,8 @@ private:
 	static List *RetrievePartTableIndexInfo(Relation rel);
 
 	// compute the array of included columns
-	static ULongPtrArray *ComputeIncludedCols(CMemoryPool *mp,
-											  const IMDRelation *md_rel);
+	static ULongPtrArray *ComputeIncludedCols(
+		CMemoryPool *mp, const CMDColumnArray *mdcol_array);
 
 	// is given level included in the default partitions
 	static BOOL LevelHasDefaultPartition(List *default_levels, ULONG level);
@@ -294,16 +294,16 @@ private:
 	static CMDName *GetRelName(CMemoryPool *mp, Relation rel);
 
 	// return the index info list defined on the given relation
-	static CMDIndexInfoArray *RetrieveRelIndexInfo(CMemoryPool *mp,
-												   Relation rel);
+	static CMDIndexInfoArray *RetrieveRelIndexInfo(
+		CMemoryPool *mp, Relation rel, ULongPtrArray *included_cols);
 
 	// return index info list of indexes defined on a partitoned table
 	static CMDIndexInfoArray *RetrieveRelIndexInfoForPartTable(
-		CMemoryPool *mp, Relation root_rel);
+		CMemoryPool *mp, Relation root_rel, ULongPtrArray *included_cols);
 
 	// return index info list of indexes defined on regular, external tables or leaf partitions
 	static CMDIndexInfoArray *RetrieveRelIndexInfoForNonPartTable(
-		CMemoryPool *mp, Relation rel);
+		CMemoryPool *mp, Relation rel, ULongPtrArray *included_cols);
 
 	// retrieve an index over a partitioned table from the relcache
 	static IMDIndex *RetrievePartTableIndex(CMemoryPool *mp,

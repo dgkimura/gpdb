@@ -58,9 +58,6 @@ private:
 	// index key columns
 	ULongPtrArray *m_index_key_cols_array;
 
-	// included columns
-	ULongPtrArray *m_included_cols_array;
-
 	// operator families for each index key
 	IMdIdArray *m_mdid_opfamilies_array;
 
@@ -78,7 +75,6 @@ public:
 	CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 				 BOOL is_clustered, EmdindexType index_type,
 				 IMDId *mdid_item_type, ULongPtrArray *index_key_cols_array,
-				 ULongPtrArray *included_cols_array,
 				 IMdIdArray *mdid_opfamilies_array,
 				 IMDPartConstraint *mdpart_constraint);
 
@@ -105,15 +101,6 @@ public:
 
 	// return the position of the key column
 	virtual ULONG GetKeyPos(ULONG column) const;
-
-	// number of included columns
-	virtual ULONG IncludedCols() const;
-
-	// return the n-th included column
-	virtual ULONG IncludedColAt(ULONG pos) const;
-
-	// return the position of the included column
-	virtual ULONG GetIncludedColPos(ULONG column) const;
 
 	// part constraint
 	virtual IMDPartConstraint *MDPartConstraint() const;

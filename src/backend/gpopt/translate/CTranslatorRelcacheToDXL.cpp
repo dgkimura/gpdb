@@ -224,17 +224,18 @@ CTranslatorRelcacheToDXL::GetRelName(CMemoryPool *mp, Relation rel)
 //
 //---------------------------------------------------------------------------
 CMDIndexInfoArray *
-CTranslatorRelcacheToDXL::RetrieveRelIndexInfo(CMemoryPool *mp, Relation rel)
+CTranslatorRelcacheToDXL::RetrieveRelIndexInfo(CMemoryPool *mp, Relation rel,
+											   ULongPtrArray *included_cols)
 {
 	GPOS_ASSERT(NULL != rel);
 
 	if (gpdb::RelPartIsNone(rel->rd_id) || gpdb::IsLeafPartition(rel->rd_id))
 	{
-		return RetrieveRelIndexInfoForNonPartTable(mp, rel);
+		return RetrieveRelIndexInfoForNonPartTable(mp, rel, included_cols);
 	}
 	else if (gpdb::RelPartIsRoot(rel->rd_id))
 	{
-		return RetrieveRelIndexInfoForPartTable(mp, rel);
+		return RetrieveRelIndexInfoForPartTable(mp, rel, included_cols);
 	}
 	else
 	{
@@ -247,8 +248,8 @@ CTranslatorRelcacheToDXL::RetrieveRelIndexInfo(CMemoryPool *mp, Relation rel)
 
 // return index info list of indexes defined on a partitioned table
 CMDIndexInfoArray *
-CTranslatorRelcacheToDXL::RetrieveRelIndexInfoForPartTable(CMemoryPool *mp,
-														   Relation root_rel)
+CTranslatorRelcacheToDXL::RetrieveRelIndexInfoForPartTable(
+	CMemoryPool *mp, Relation root_rel, ULongPtrArray *included_cols)
 {
 	CMDIndexInfoArray *md_index_info_array = GPOS_NEW(mp) CMDIndexInfoArray(mp);
 
@@ -284,8 +285,9 @@ CTranslatorRelcacheToDXL::RetrieveRelIndexInfoForPartTable(CMemoryPool *mp,
 				CMDIdGPDB *mdid_index = GPOS_NEW(mp) CMDIdGPDB(index_oid);
 				BOOL is_partial = (NULL != logicalIndexInfo->partCons) ||
 								  (NIL != logicalIndexInfo->defaultLevels);
-				CMDIndexInfo *md_index_info =
-					GPOS_NEW(mp) CMDIndexInfo(mdid_index, is_partial);
+
+				CMDIndexInfo *md_index_info = GPOS_NEW(mp)
+					CMDIndexInfo(mp, mdid_index, is_partial, included_cols);
 				md_index_info_array->Append(md_index_info);
 			}
 
@@ -303,8 +305,8 @@ CTranslatorRelcacheToDXL::RetrieveRelIndexInfoForPartTable(CMemoryPool *mp,
 
 // return index info list of indexes defined on regular, external tables or leaf partitions
 CMDIndexInfoArray *
-CTranslatorRelcacheToDXL::RetrieveRelIndexInfoForNonPartTable(CMemoryPool *mp,
-															  Relation rel)
+CTranslatorRelcacheToDXL::RetrieveRelIndexInfoForNonPartTable(
+	CMemoryPool *mp, Relation rel, ULongPtrArray *included_cols)
 {
 	CMDIndexInfoArray *md_index_info_array = GPOS_NEW(mp) CMDIndexInfoArray(mp);
 
@@ -338,8 +340,9 @@ CTranslatorRelcacheToDXL::RetrieveRelIndexInfoForNonPartTable(CMemoryPool *mp,
 			{
 				CMDIdGPDB *mdid_index = GPOS_NEW(mp) CMDIdGPDB(index_oid);
 				// for a regular table, external table or leaf partition, an index is always complete
-				CMDIndexInfo *md_index_info = GPOS_NEW(mp)
-					CMDIndexInfo(mdid_index, false /* is_partial */);
+
+				CMDIndexInfo *md_index_info = GPOS_NEW(mp) CMDIndexInfo(
+					mp, mdid_index, false /* is_partial */, included_cols);
 				md_index_info_array->Append(md_index_info);
 			}
 
@@ -594,7 +597,8 @@ CTranslatorRelcacheToDXL::RetrieveRel(CMemoryPool *mp, CMDAccessor *md_accessor,
 		convert_hash_to_random = gpdb::IsChildPartDistributionMismatched(rel);
 
 		// collect relation indexes
-		md_index_info_array = RetrieveRelIndexInfo(mp, rel);
+		ULongPtrArray *included_cols = ComputeIncludedCols(mp, mdcol_array);
+		md_index_info_array = RetrieveRelIndexInfo(mp, rel, included_cols);
 
 		// collect relation triggers
 		mdid_triggers_array = RetrieveRelTriggers(mp, rel);
@@ -1140,15 +1144,14 @@ CTranslatorRelcacheToDXL::RetrieveIndex(CMemoryPool *mp,
 	}
 	GPOS_CATCH_END;
 
-	ULongPtrArray *included_cols = ComputeIncludedCols(mp, md_rel);
 	mdid_index->AddRef();
 	IMdIdArray *op_families_mdids = RetrieveIndexOpFamilies(mp, mdid_index);
 
-	CMDIndexGPDB *index = GPOS_NEW(mp) CMDIndexGPDB(
-		mp, mdid_index, mdname, index_clustered, index_type, mdid_item_type,
-		index_key_cols_array, included_cols, op_families_mdids,
-		NULL  // mdpart_constraint
-	);
+	CMDIndexGPDB *index = GPOS_NEW(mp)
+		CMDIndexGPDB(mp, mdid_index, mdname, index_clustered, index_type,
+					 mdid_item_type, index_key_cols_array, op_families_mdids,
+					 NULL  // mdpart_constraint
+		);
 
 	GPOS_DELETE_ARRAY(attno_mapping);
 	return index;
@@ -1259,8 +1262,6 @@ CTranslatorRelcacheToDXL::RetrievePartTableIndex(CMemoryPool *mp,
 	gpdb::CloseRelation(table);
 
 	ULONG *attno_mapping = PopulateAttnoPositionMap(mp, md_rel, size);
-
-	ULongPtrArray *included_cols = ComputeIncludedCols(mp, md_rel);
 
 	// extract the position of the key columns
 	ULongPtrArray *index_key_cols_array = GPOS_NEW(mp) ULongPtrArray(mp);
@@ -1379,7 +1380,7 @@ CTranslatorRelcacheToDXL::RetrievePartTableIndex(CMemoryPool *mp,
 	CMDIndexGPDB *index = GPOS_NEW(mp)
 		CMDIndexGPDB(mp, mdid_index, mdname, form_pg_index->indisclustered,
 					 index_type, mdid_item_type, index_key_cols_array,
-					 included_cols, pdrgpmdidOpFamilies, mdpart_constraint);
+					 pdrgpmdidOpFamilies, mdpart_constraint);
 
 	GPOS_DELETE_ARRAY(attno_mapping);
 
@@ -1426,16 +1427,16 @@ CTranslatorRelcacheToDXL::LevelHasDefaultPartition(List *default_levels,
 //---------------------------------------------------------------------------
 ULongPtrArray *
 CTranslatorRelcacheToDXL::ComputeIncludedCols(CMemoryPool *mp,
-											  const IMDRelation *md_rel)
+											  const CMDColumnArray *mdcol_array)
 {
 	// TODO: 3/19/2012; currently we assume that all the columns
 	// in the table are available from the index.
 
 	ULongPtrArray *included_cols = GPOS_NEW(mp) ULongPtrArray(mp);
-	const ULONG num_included_cols = md_rel->ColumnCount();
+	const ULONG num_included_cols = mdcol_array->Size();
 	for (ULONG ul = 0; ul < num_included_cols; ul++)
 	{
-		if (!md_rel->GetMdCol(ul)->IsDropped())
+		if (!(*mdcol_array)[ul]->IsDropped())
 		{
 			included_cols->Append(GPOS_NEW(mp) ULONG(ul));
 		}

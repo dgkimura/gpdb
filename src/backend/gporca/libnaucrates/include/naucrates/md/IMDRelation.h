@@ -194,6 +194,8 @@ public:
 		return NULL;
 	}
 
+	virtual CMDIndexInfo *GetIndexInfo(IMDId *mdid) const = 0;
+
 	// contains any external partitions (for partitioned tables only)
 	BOOL
 	HasExternalPartitions() const

@@ -72,8 +72,18 @@ CParseHandlerMDIndexInfoList::StartElement(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenIndexPartial, EdxltokenIndexInfo);
 
+		// included cols
+		const XMLCh *xmlszIndexIncludedCols =
+			CDXLOperatorFactory::ExtractAttrValue(
+				attrs, EdxltokenIndexIncludedCols, EdxltokenIndex);
+		ULongPtrArray *included_cols =
+			CDXLOperatorFactory::ExtractIntsToUlongArray(
+				m_parse_handler_mgr->GetDXLMemoryManager(),
+				xmlszIndexIncludedCols, EdxltokenIndexIncludedCols,
+				EdxltokenIndex);
+
 		CMDIndexInfo *md_index_info =
-			GPOS_NEW(m_mp) CMDIndexInfo(mdid, is_partial);
+			GPOS_NEW(m_mp) CMDIndexInfo(m_mp, mdid, is_partial, included_cols);
 		m_mdindex_info_array->Append(md_index_info);
 	}
 	else

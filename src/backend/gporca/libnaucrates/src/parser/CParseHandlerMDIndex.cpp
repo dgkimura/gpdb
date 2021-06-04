@@ -41,7 +41,6 @@ CParseHandlerMDIndex::CParseHandlerMDIndex(
 	  m_index_type(IMDIndex::EmdindSentinel),
 	  m_mdid_item_type(NULL),
 	  m_index_key_cols_array(NULL),
-	  m_included_cols_array(NULL),
 	  m_part_constraint(NULL),
 	  m_level_with_default_part_array(NULL),
 	  m_part_constraint_unbounded(false)
@@ -147,12 +146,6 @@ CParseHandlerMDIndex::StartElement(const XMLCh *const,	// element_uri,
 		m_parse_handler_mgr->GetDXLMemoryManager(), xmlszIndexKeys,
 		EdxltokenIndexKeyCols, EdxltokenIndex);
 
-	const XMLCh *xmlszIndexIncludedCols = CDXLOperatorFactory::ExtractAttrValue(
-		attrs, EdxltokenIndexIncludedCols, EdxltokenIndex);
-	m_included_cols_array = CDXLOperatorFactory::ExtractIntsToUlongArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), xmlszIndexIncludedCols,
-		EdxltokenIndexIncludedCols, EdxltokenIndex);
-
 	// parse handler for operator class list
 	CParseHandlerBase *opfamilies_list_parse_handler =
 		CParseHandlerFactory::GetParseHandler(
@@ -208,8 +201,7 @@ CParseHandlerMDIndex::EndElement(const XMLCh *const,  // element_uri,
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDIndexGPDB(
 		m_mp, m_mdid, m_mdname, m_clustered, m_index_type, m_mdid_item_type,
-		m_index_key_cols_array, m_included_cols_array, mdid_opfamilies_array,
-		m_part_constraint);
+		m_index_key_cols_array, mdid_opfamilies_array, m_part_constraint);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

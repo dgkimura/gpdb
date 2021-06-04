@@ -59,9 +59,6 @@ private:
 	// index keys
 	ULongPtrArray *m_index_key_cols_array;
 
-	// included columns
-	ULongPtrArray *m_included_cols_array;
-
 	// index part constraint
 	CMDPartConstraintGPDB *m_part_constraint;
 

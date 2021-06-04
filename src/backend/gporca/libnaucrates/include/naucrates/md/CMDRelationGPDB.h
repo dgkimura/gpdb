@@ -147,6 +147,19 @@ public:
 	// dtor
 	virtual ~CMDRelationGPDB();
 
+	virtual CMDIndexInfo *
+	GetIndexInfo(IMDId *mdid) const
+	{
+		for (ULONG i = 0; i < m_mdindex_info_array->Size(); i++)
+		{
+			if ((*m_mdindex_info_array)[i]->MDId()->Equals(mdid))
+			{
+				return (*m_mdindex_info_array)[i];
+			}
+		}
+		return NULL;
+	}
+
 	// accessors
 	virtual const CWStringDynamic *
 	GetStrRepr() const

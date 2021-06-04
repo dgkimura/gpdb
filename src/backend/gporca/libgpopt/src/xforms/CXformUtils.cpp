@@ -2252,11 +2252,12 @@ CXformUtils::PdrgpcrIndexColumns(CMemoryPool *mp, CColRefArray *colref_array,
 	GPOS_ASSERT(EicKey == eic || EicIncluded == eic);
 
 	CColRefArray *pdrgpcrIndex = GPOS_NEW(mp) CColRefArray(mp);
+	CMDIndexInfo *pmdindexinfo = pmdrel->GetIndexInfo(pmdindex->MDId());
 
 	ULONG length = pmdindex->Keys();
 	if (EicIncluded == eic)
 	{
-		length = pmdindex->IncludedCols();
+		length = pmdindexinfo->IncludedCols();
 	}
 
 	for (ULONG ul = 0; ul < length; ul++)
@@ -2264,7 +2265,7 @@ CXformUtils::PdrgpcrIndexColumns(CMemoryPool *mp, CColRefArray *colref_array,
 		ULONG ulPos = gpos::ulong_max;
 		if (EicIncluded == eic)
 		{
-			ulPos = pmdindex->IncludedColAt(ul);
+			ulPos = pmdindexinfo->IncludedColAt(ul);
 		}
 		else
 		{
