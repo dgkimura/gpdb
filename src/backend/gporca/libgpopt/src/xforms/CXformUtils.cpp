@@ -2292,10 +2292,9 @@ CXformUtils::PdrgpcrIndexColumns(CMemoryPool *mp, CColRefArray *colref_array,
 //
 //---------------------------------------------------------------------------
 BOOL
-CXformUtils::FIndexApplicable(CMemoryPool *mp, const IMDIndex *pmdindex,
-							  const IMDRelation *pmdrel,
-							  CColRefArray *pdrgpcrOutput, CColRefSet *pcrsReqd,
-							  CColRefSet *pcrsScalar,
+CXformUtils::FIndexApplicable(CMemoryPool *, const IMDIndex *pmdindex,
+							  const IMDRelation *pmdrel, CColRefArray *,
+							  CColRefSet *, CColRefSet *pcrsScalar,
 							  IMDIndex::EmdindexType emdindtype,
 							  IMDIndex::EmdindexType altindtype)
 {
@@ -2330,24 +2329,7 @@ CXformUtils::FIndexApplicable(CMemoryPool *mp, const IMDIndex *pmdindex,
 		return false;
 	}
 
-	BOOL fApplicable = true;
-
-	CColRefSet *pcrsIncludedCols =
-		CXformUtils::PcrsIndexIncludedCols(mp, pdrgpcrOutput, pmdindex, pmdrel);
-	CColRefSet *pcrsIndexCols =
-		CXformUtils::PcrsIndexKeys(mp, pdrgpcrOutput, pmdindex, pmdrel);
-	if (!pcrsIncludedCols->ContainsAll(pcrsReqd) ||	 // index is not covering
-		pcrsScalar->IsDisjoint(
-			pcrsIndexCols))	 // indexing columns disjoint from the columns used in the scalar expression
-	{
-		fApplicable = false;
-	}
-
-	// clean up
-	pcrsIncludedCols->Release();
-	pcrsIndexCols->Release();
-
-	return fApplicable;
+	return true;
 }
 
 //---------------------------------------------------------------------------
