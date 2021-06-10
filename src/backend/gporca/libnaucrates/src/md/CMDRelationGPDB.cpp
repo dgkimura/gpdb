@@ -270,6 +270,32 @@ CMDRelationGPDB::NonDroppedColsCount() const
 	return ColumnCount() - m_dropped_cols;
 }
 
+ULONG
+CMDRelationGPDB::NonDroppedColPosAt(ULONG pos) const
+{
+	GPOS_ASSERT(pos <= ColumnCount());
+
+	if (!HasDroppedColumns())
+	{
+		return pos;
+	}
+
+	ULONG ul = 0;
+	for (ul = 0; ul < m_md_col_array->Size(); ul++)
+	{
+		if (pos == 0)
+		{
+			break;
+		}
+		if (!(*m_md_col_array)[0]->IsDropped())
+		{
+			pos -= 1;
+		}
+	}
+
+	return ul;
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CMDRelationGPDB::NonDroppedColAt

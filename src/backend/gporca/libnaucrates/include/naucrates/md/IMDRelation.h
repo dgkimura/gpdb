@@ -110,6 +110,7 @@ public:
 	// number of non-dropped columns
 	virtual ULONG NonDroppedColsCount() const = 0;
 
+	virtual ULONG NonDroppedColPosAt(ULONG pos) const = 0;
 	// return the position of the given attribute position excluding dropped columns
 	virtual ULONG NonDroppedColAt(ULONG pos) const = 0;
 

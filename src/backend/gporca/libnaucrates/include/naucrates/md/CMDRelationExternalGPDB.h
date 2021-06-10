@@ -201,6 +201,7 @@ public:
 	// number of triggers
 	virtual ULONG TriggerCount() const;
 
+	virtual ULONG NonDroppedColPosAt(ULONG pos) const;
 	// return the absolute position of the given attribute position excluding dropped columns
 	virtual ULONG NonDroppedColAt(ULONG pos) const;
 

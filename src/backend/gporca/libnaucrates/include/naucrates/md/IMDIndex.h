@@ -69,15 +69,6 @@ public:
 	// return the position of the key column
 	virtual ULONG GetKeyPos(ULONG pos) const = 0;
 
-	// number of included columns
-	virtual ULONG IncludedCols() const = 0;
-
-	// return the n-th included column
-	virtual ULONG IncludedColAt(ULONG pos) const = 0;
-
-	// return the position of the included column
-	virtual ULONG GetIncludedColPos(ULONG column) const = 0;
-
 	// part constraint
 	virtual IMDPartConstraint *MDPartConstraint() const = 0;
 

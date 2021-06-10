@@ -224,6 +224,12 @@ public:
 		return 0;
 	}
 
+	virtual ULONG
+	NonDroppedColPosAt(ULONG pos) const
+	{
+		return pos;
+	}
+
 	// return the absolute position of the given attribute position excluding dropped columns
 	virtual ULONG
 	NonDroppedColAt(ULONG pos) const

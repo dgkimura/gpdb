@@ -2256,7 +2256,7 @@ CXformUtils::PdrgpcrIndexColumns(CMemoryPool *mp, CColRefArray *colref_array,
 	ULONG length = pmdindex->Keys();
 	if (EicIncluded == eic)
 	{
-		length = pmdindex->IncludedCols();
+		length = pmdrel->ColumnCount();
 	}
 
 	for (ULONG ul = 0; ul < length; ul++)
@@ -2264,7 +2264,7 @@ CXformUtils::PdrgpcrIndexColumns(CMemoryPool *mp, CColRefArray *colref_array,
 		ULONG ulPos = gpos::ulong_max;
 		if (EicIncluded == eic)
 		{
-			ulPos = pmdindex->IncludedColAt(ul);
+			ulPos = pmdrel->NonDroppedColPosAt(ul);
 		}
 		else
 		{

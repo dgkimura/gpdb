@@ -1140,14 +1140,12 @@ CTranslatorRelcacheToDXL::RetrieveIndex(CMemoryPool *mp,
 	}
 	GPOS_CATCH_END;
 
-	ULongPtrArray *included_cols = ComputeIncludedCols(mp, md_rel);
 	mdid_index->AddRef();
 	IMdIdArray *op_families_mdids = RetrieveIndexOpFamilies(mp, mdid_index);
 
 	CMDIndexGPDB *index = GPOS_NEW(mp) CMDIndexGPDB(
 		mp, mdid_index, mdname, index_clustered, index_type, mdid_item_type,
-		index_key_cols_array, included_cols, op_families_mdids,
-		NULL  // mdpart_constraint
+		index_key_cols_array, op_families_mdids, NULL  // mdpart_constraint
 	);
 
 	GPOS_DELETE_ARRAY(attno_mapping);
@@ -1259,8 +1257,6 @@ CTranslatorRelcacheToDXL::RetrievePartTableIndex(CMemoryPool *mp,
 	gpdb::CloseRelation(table);
 
 	ULONG *attno_mapping = PopulateAttnoPositionMap(mp, md_rel, size);
-
-	ULongPtrArray *included_cols = ComputeIncludedCols(mp, md_rel);
 
 	// extract the position of the key columns
 	ULongPtrArray *index_key_cols_array = GPOS_NEW(mp) ULongPtrArray(mp);
@@ -1379,7 +1375,7 @@ CTranslatorRelcacheToDXL::RetrievePartTableIndex(CMemoryPool *mp,
 	CMDIndexGPDB *index = GPOS_NEW(mp)
 		CMDIndexGPDB(mp, mdid_index, mdname, form_pg_index->indisclustered,
 					 index_type, mdid_item_type, index_key_cols_array,
-					 included_cols, pdrgpmdidOpFamilies, mdpart_constraint);
+					 pdrgpmdidOpFamilies, mdpart_constraint);
 
 	GPOS_DELETE_ARRAY(attno_mapping);
 
