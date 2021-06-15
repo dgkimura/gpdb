@@ -2268,7 +2268,7 @@ CXformUtils::PdrgpcrIndexColumns(CMemoryPool *mp, CColRefArray *colref_array,
 		}
 		else
 		{
-			ulPos = pmdindex->KeyAt(ul);
+			ulPos = pmdrel->NonDroppedColPosAt(pmdindex->KeyAt(ul));
 		}
 		ULONG ulPosNonDropped = pmdrel->NonDroppedColAt(ulPos);
 

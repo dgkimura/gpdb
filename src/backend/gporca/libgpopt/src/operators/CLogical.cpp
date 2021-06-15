@@ -173,7 +173,7 @@ CLogical::PosFromIndex(CMemoryPool *mp, const IMDIndex *pmdindex,
 	for (ULONG ul = 0; ul < ulLenKeys; ul++)
 	{
 		// This is the postion of the index key column relative to the relation
-		const ULONG ulPosRel = pmdindex->KeyAt(ul);
+		const ULONG ulPosRel = pmdrel->NonDroppedColPosAt(pmdindex->KeyAt(ul));
 
 		// get the column and it's attno from the relation
 		const IMDColumn *pmdcol = pmdrel->GetMdCol(ulPosRel);

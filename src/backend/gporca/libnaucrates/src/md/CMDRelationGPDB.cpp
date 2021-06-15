@@ -280,20 +280,17 @@ CMDRelationGPDB::NonDroppedColPosAt(ULONG pos) const
 		return pos;
 	}
 
-	ULONG ul = 0;
-	for (ul = 0; ul < m_md_col_array->Size(); ul++)
+	ULONG _pos = 0;
+	ULONG offset = 0;
+	while (_pos <= pos)
 	{
-		if (pos == 0)
+		if (!(*m_md_col_array)[offset]->IsDropped())
 		{
-			break;
+			_pos += 1;
 		}
-		if (!(*m_md_col_array)[0]->IsDropped())
-		{
-			pos -= 1;
-		}
+		offset += 1;
 	}
-
-	return ul;
+	return offset - 1;
 }
 
 //---------------------------------------------------------------------------
