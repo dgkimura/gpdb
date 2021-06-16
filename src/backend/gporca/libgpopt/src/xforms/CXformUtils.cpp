@@ -2855,7 +2855,7 @@ CXformUtils::PexprBuildIndexPlan(
 	CExpressionArray *pdrgpexprResidual = GPOS_NEW(mp) CExpressionArray(mp);
 	CPredicateUtils::ExtractIndexPredicates(
 		mp, md_accessor, pdrgpexprConds, pmdindex, pdrgppcrIndexCols,
-		pdrgpexprIndex, pdrgpexprResidual, outer_refs);
+		pdrgpexprIndex, pdrgpexprResidual, outer_refs, false, pmdrel);
 	CColRefSet *outer_refs_in_index_get =
 		CUtils::PcrsExtractColumns(mp, pdrgpexprIndex);
 	outer_refs_in_index_get->Intersection(outer_refs);
@@ -3273,7 +3273,7 @@ CXformUtils::PexprBitmapSelectBestIndex(
 			CPredicateUtils::ExtractIndexPredicates(
 				mp, md_accessor, pdrgpexprScalar, pmdindex, pdrgpcrIndexCols,
 				pdrgpexprIndex, pdrgpexprResidual, pcrsOuterRefs,
-				alsoConsiderBTreeIndexes);
+				alsoConsiderBTreeIndexes, pmdrel);
 
 			pdrgpexprScalar->Release();
 
@@ -3958,7 +3958,8 @@ CXformUtils::PpartcnstrUpdateCovered(
 		PdrgpcrIndexKeys(mp, pdrgpcrOutput, pmdindex, pmdrel);
 	CPredicateUtils::ExtractIndexPredicates(
 		mp, md_accessor, pdrgpexprScalar, pmdindex, pdrgpcrIndexCols,
-		pdrgpexprIndex, pdrgpexprResidual, pcrsAcceptedOuterRefs);
+		pdrgpexprIndex, pdrgpexprResidual, pcrsAcceptedOuterRefs, false,
+		pmdrel);
 
 	pdrgpcrIndexCols->Release();
 	if (0 == pdrgpexprIndex->Size())

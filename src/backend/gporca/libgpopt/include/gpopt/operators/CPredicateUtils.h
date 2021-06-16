@@ -394,7 +394,8 @@ public:
 		CExpressionArray *pdrgpexprResidual,
 		CColRefSet *pcrsAcceptedOuterRefs =
 			NULL,  // outer refs that are acceptable in an index predicate
-		BOOL allowArrayCmpForBTreeIndexes = false);
+		BOOL allowArrayCmpForBTreeIndexes = false,
+		const IMDRelation *mdrel = NULL);
 
 	// return the inverse of given comparison expression
 	static CExpression *PexprInverseComparison(CMemoryPool *mp,

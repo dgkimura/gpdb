@@ -1960,6 +1960,38 @@ CPredicateUtils::PexprIndexLookup(CMemoryPool *mp, CMDAccessor *md_accessor,
 	return NULL;
 }
 
+static BOOL
+ContainsAllUsingOffsets(CColRefSet *pcrsFirst, CColRefSet *pcrsSecond,
+						const IMDRelation *pmdrel)
+{
+	BOOL result = true;
+
+	CColRefSetIter it(*pcrsFirst);
+	while (it.Advance())
+	{
+		BOOL match = false;
+
+		CColRef *firstPcr = it.Pcr();
+
+		CColRefSetIter innerIt(*pcrsSecond);
+		while (innerIt.Advance())
+		{
+			CColRef *secondPcr = innerIt.Pcr();
+			if (firstPcr->Id() == pmdrel->NonDroppedColPosAt(secondPcr->Id()))
+			{
+				match = true;
+				break;
+			}
+		}
+
+		if (match == false)
+		{
+			break;
+		}
+	}
+	return result;
+}
+
 // split predicates into those that refer to an index key, and those that don't
 void
 CPredicateUtils::ExtractIndexPredicates(
@@ -1969,7 +2001,7 @@ CPredicateUtils::ExtractIndexPredicates(
 	CExpressionArray *pdrgpexprResidual,
 	CColRefSet *
 		pcrsAcceptedOuterRefs,	// outer refs that are acceptable in an index predicate
-	BOOL allowArrayCmpForBTreeIndexes)
+	BOOL allowArrayCmpForBTreeIndexes, const IMDRelation *pmdrel)
 {
 	const ULONG length = pdrgpexprPredicate->Size();
 
@@ -1989,8 +2021,8 @@ CPredicateUtils::ExtractIndexPredicates(
 			pcrsUsed->Difference(pcrsAcceptedOuterRefs);
 		}
 
-		BOOL fSubset =
-			(0 < pcrsUsed->Size()) && (pcrsIndex->ContainsAll(pcrsUsed));
+		BOOL fSubset = (0 < pcrsUsed->Size()) &&
+					   ContainsAllUsingOffsets(pcrsIndex, pcrsUsed, pmdrel);
 		pcrsUsed->Release();
 
 		if (!fSubset)
