@@ -4603,7 +4603,8 @@ ContainsReplicatedBaseTable(CDistributionSpecArray *pdrgpdsBaseTables)
 
 	for (ULONG i = 0; i < pdrgpdsBaseTables->Size(); i++)
 	{
-		if (CDistributionSpecReplicated::PdsConvert((*pdrgpdsBaseTables)[i]) != NULL)
+		if (CDistributionSpecReplicated::PdsConvert((*pdrgpdsBaseTables)[i]) !=
+			nullptr)
 		{
 			contains = true;
 			break;
@@ -4656,10 +4657,9 @@ CTranslatorExprToDXL::PdxlnMotion(CExpression *pexprMotion,
 			break;
 
 		case COperator::EopPhysicalMotionRandom:
-			motion = GPOS_NEW(m_mp)
-				CDXLPhysicalRandomMotion(m_mp, fDuplicateHazardMotion && (*pfDML) &&
-						!ContainsReplicatedBaseTable(pdrgpdsBaseTables)
-							);
+			motion = GPOS_NEW(m_mp) CDXLPhysicalRandomMotion(
+				m_mp, fDuplicateHazardMotion && (*pfDML) &&
+						  !ContainsReplicatedBaseTable(pdrgpdsBaseTables));
 			break;
 
 		case COperator::EopPhysicalMotionRoutedDistribute:
