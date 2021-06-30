@@ -24,6 +24,7 @@
 #include "gpopt/base/CCastUtils.h"
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CConstraintInterval.h"
+#include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/cost/ICostModel.h"
@@ -4595,6 +4596,23 @@ CTranslatorExprToDXL::PdxlnHashJoin(CExpression *pexprHJ,
 	return pdxlnHJ;
 }
 
+static BOOL
+ContainsReplicatedBaseTable(CDistributionSpecArray *pdrgpdsBaseTables)
+{
+	BOOL contains = false;
+
+	for (ULONG i = 0; i < pdrgpdsBaseTables->Size(); i++)
+	{
+		if (CDistributionSpecReplicated::PdsConvert((*pdrgpdsBaseTables)[i]) != NULL)
+		{
+			contains = true;
+			break;
+		}
+	}
+	return contains;
+}
+
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CTranslatorExprToDXL::PdxlnMotion
@@ -4639,7 +4657,9 @@ CTranslatorExprToDXL::PdxlnMotion(CExpression *pexprMotion,
 
 		case COperator::EopPhysicalMotionRandom:
 			motion = GPOS_NEW(m_mp)
-				CDXLPhysicalRandomMotion(m_mp, fDuplicateHazardMotion);
+				CDXLPhysicalRandomMotion(m_mp, fDuplicateHazardMotion && (*pfDML) &&
+						!ContainsReplicatedBaseTable(pdrgpdsBaseTables)
+							);
 			break;
 
 		case COperator::EopPhysicalMotionRoutedDistribute:
