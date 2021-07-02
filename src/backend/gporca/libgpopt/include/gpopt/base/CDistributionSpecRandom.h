@@ -48,6 +48,8 @@ public:
 	//ctor
 	CDistributionSpecRandom();
 
+	CDistributionSpecRandom(BOOL is_duplicatee_sensitive);
+
 	// accessor
 	EDistributionType
 	Edt() const override
