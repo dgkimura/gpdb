@@ -355,8 +355,8 @@ CPhysicalComputeScalar::PdsDerive(CMemoryPool *mp,
 		IMDFunction::EfsVolatile ==
 			exprhdl.DeriveScalarFunctionProperties(1)->Efs())
 	{
-		return GPOS_NEW(mp) CDistributionSpecReplicated(
-			CDistributionSpec::EdtTaintedReplicated);
+		return GPOS_NEW(mp) CDistributionSpecStrictSingleton(
+			CDistributionSpecSingleton::EstSegment);
 	}
 
 	if (CDistributionSpec::EdtUniversal == pds->Edt() &&
