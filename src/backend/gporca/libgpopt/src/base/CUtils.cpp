@@ -3846,6 +3846,13 @@ CUtils::PcrMap(CColRef *pcrSource, CColRefArray *pdrgpcrSource,
 	return pcrTarget;
 }
 
+BOOL
+CUtils::FDuplicateHazardDistributionSpec(CDistributionSpec *pds)
+{
+	return CDistributionSpec::EdtStrictReplicated == pds->Edt() ||
+		CDistributionSpec::EdtUniversal == pds->Edt();
+}
+
 // Check if duplicate values can be generated when executing the given Motion expression,
 // duplicates occur if Motion's input has strict-replicated/universal distribution,
 // which means that we have exactly the same copy of input on each host. Note that
@@ -3860,13 +3867,8 @@ CUtils::FDuplicateHazardMotion(CExpression *pexprMotion)
 	CDrvdPropPlan *pdpplanChild =
 		CDrvdPropPlan::Pdpplan(pexprChild->PdpDerive());
 	CDistributionSpec *pdsChild = pdpplanChild->Pds();
-	CDistributionSpec::EDistributionType edtChild = pdsChild->Edt();
 
-	BOOL fReplicatedInput =
-		CDistributionSpec::EdtStrictReplicated == edtChild ||
-		CDistributionSpec::EdtUniversal == edtChild;
-
-	return fReplicatedInput;
+	return FDuplicateHazardDistributionSpec(pdsChild);
 }
 
 // Collapse the top two project nodes like this, if unable return NULL;
