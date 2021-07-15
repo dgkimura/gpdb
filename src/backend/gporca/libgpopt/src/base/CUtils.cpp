@@ -3850,7 +3850,7 @@ BOOL
 CUtils::FDuplicateHazardDistributionSpec(CDistributionSpec *pds)
 {
 	return CDistributionSpec::EdtStrictReplicated == pds->Edt() ||
-		CDistributionSpec::EdtUniversal == pds->Edt();
+		   CDistributionSpec::EdtUniversal == pds->Edt();
 }
 
 // Check if duplicate values can be generated when executing the given Motion expression,
