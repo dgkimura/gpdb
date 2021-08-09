@@ -3168,7 +3168,7 @@ CTranslatorExprToDXL::PdxlnRestrictResult(CDXLNode *dxlnode, CColRef *colref)
 			CTranslatorExprToDXLUtils::PdxlpropCopy(m_mp, dxlnode);
 		pdxlnResult->SetProperties(dxl_properties);
 
-		pdxlnResult->AddChild(pdxlnProjListNew);
+		pdxlnResult->AddChild(pdxlnProjListOld);
 		pdxlnResult->AddChild(PdxlnFilter(NULL));
 		pdxlnResult->AddChild(GPOS_NEW(m_mp) CDXLNode(
 			m_mp, GPOS_NEW(m_mp) CDXLScalarOneTimeFilter(m_mp)));
@@ -3731,6 +3731,8 @@ CTranslatorExprToDXL::PdxlnBooleanScalarWithSubPlan(
 	CDXLNode *pdxlnProjListNew =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 	pdxlnProjListNew->AddChild(pdxlnPrEl);
+	CDXLNode *tmp = (*(*pdxlnRelChild)[0])[0];
+	pdxlnProjListNew->AddChild(tmp);
 	CDXLNode *pdxlnResult =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLPhysicalResult(m_mp));
 	CDXLPhysicalProperties *dxl_properties =
@@ -3805,6 +3807,15 @@ CTranslatorExprToDXL::PdxlnTblScanFromNLJoinOuter(
 		// empty filter
 		CDXLNode *filter_dxlnode = PdxlnFilter(pdxlnCond);
 		pdxlnTblScan->ReplaceChild(EdxltsIndexFilter /*ulPos*/, filter_dxlnode);
+
+
+		// TODO: replace project list too...
+		CDXLNode *pdxlnProjList = (*pdxlnTblScan)[EdxltsIndexProjList];
+		pdxlnProjList->AddRef();
+
+		CDXLNode *pdxlnPrEl = (*(*(*(*filter_dxlnode)[0])[0])[0])[1];
+		pdxlnProjList->AddChild(pdxlnPrEl);
+		pdxlnTblScan->ReplaceChild(EdxltsIndexProjList /*ulPos*/, pdxlnProjList);
 	}
 	else
 	{

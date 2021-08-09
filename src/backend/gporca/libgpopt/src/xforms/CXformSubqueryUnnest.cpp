@@ -182,7 +182,7 @@ CXformSubqueryUnnest::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	Transform(pxfctxt, pxfres, pexpr, false /*fEnforceCorrelatedApply*/);
+	//Transform(pxfctxt, pxfres, pexpr, false /*fEnforceCorrelatedApply*/);
 	Transform(pxfctxt, pxfres, pexpr, true /*fEnforceCorrelatedApply*/);
 }
 
