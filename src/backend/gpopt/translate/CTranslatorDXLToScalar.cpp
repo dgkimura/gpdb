@@ -667,8 +667,6 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 
 	SubLinkType slink = CTranslatorUtils::MapDXLSubplanToSublinkType(
 		dxlop->GetDxlSubplanType());
-	Expr *test_expr = TranslateDXLSubplanTestExprToScalar(
-		dxlop->GetDxlTestExpr(), slink, colid_var, &param_ids);
 
 	const CDXLColRefArray *outer_refs = dxlop->GetDxlOuterColRefsArray();
 
@@ -732,12 +730,21 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 	// translate subplan and set test expression
 	SubPlan *subplan =
 		TranslateSubplanFromChildPlan(plan_child, slink, dxl_to_plstmt_ctxt);
-	subplan->testexpr = (Node *) test_expr;
 	subplan->paramIds = param_ids;
 
 	// translate other subplan params
 	TranslateSubplanParams(subplan, &subplan_translate_ctxt, outer_refs,
 						   colid_var);
+
+	// TODO: append subplan_translate_ctxt -> colid_var->m_child_context
+	CDXLTranslationContextArray *child_ctxt_arr =
+		GPOS_NEW(m_mp) CDXLTranslationContextArray(m_mp);
+	child_ctxt_arr->Append(&subplan_translate_ctxt);
+	dynamic_cast<CMappingColIdVarPlStmt *>(colid_var)->m_child_contexts = child_ctxt_arr;
+
+	Expr *test_expr = TranslateDXLSubplanTestExprToScalar(
+		dxlop->GetDxlTestExpr(), slink, colid_var, &param_ids);
+	subplan->testexpr = (Node *) test_expr;
 
 	return (Expr *) subplan;
 }
