@@ -561,6 +561,14 @@ CTranslatorDXLToPlStmt::TranslateDXLTblScan(
 
 	SetParamIds(plan);
 
+	// XXX: if filter contains a project from another table, then need to pass
+	// in another base table to TranslateProjListAndFilter().  Hack fixup Var to map to rtable.
+	if (plan->targetlist->length == 2)
+	{
+		((Var*)((TargetEntry*)plan->targetlist->head->next->data.ptr_value)->expr)->varno = 3;
+		((Var*)((TargetEntry*)plan->targetlist->head->next->data.ptr_value)->expr)->varattno = 1;
+	}
+
 	return plan_return;
 }
 
