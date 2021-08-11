@@ -746,6 +746,9 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 		dxlop->GetDxlTestExpr(), slink, colid_var, &param_ids);
 	subplan->testexpr = (Node *) test_expr;
 
+	if (test_expr)
+		((Var*)((OpExpr*)subplan->testexpr)->args->head->data.ptr_value)->varattno=1;
+
 	return (Expr *) subplan;
 }
 
