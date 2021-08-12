@@ -329,7 +329,7 @@ private:
 							  CDXLNode *dxlnode_left, CDXLNode *dxlnode_right);
 
 	CDXLNode *PdxlnTblScanFromNLJoinOuter(
-		CExpression *pexprRelational, CDXLNode *pdxlnScalar,
+		CExpression *pexprOuterChild, CExpression *pexprInnerChild, CDXLNode *pdxlnScalar,
 		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
 		ULONG *pulNonGatherMotions, CDXLPhysicalProperties *dxl_properties);
 

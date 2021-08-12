@@ -3636,7 +3636,7 @@ CTranslatorExprToDXL::PdxlnCorrelatedNLJoin(
 			dxl_properties->AddRef();
 			// create and return a table scan node
 			dxlnode = PdxlnTblScanFromNLJoinOuter(
-				pexprOuterChild, pdxlnCond, colref_array, pdrgpdsBaseTables,
+				pexprOuterChild, pexprInnerChild, pdxlnCond, colref_array, pdrgpdsBaseTables,
 				pulNonGatherMotions, dxl_properties);
 			break;
 		}
@@ -3731,8 +3731,20 @@ CTranslatorExprToDXL::PdxlnBooleanScalarWithSubPlan(
 	CDXLNode *pdxlnProjListNew =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 	pdxlnProjListNew->AddChild(pdxlnPrEl);
-	CDXLNode *tmp = (*(*pdxlnRelChild)[0])[0];
-	pdxlnProjListNew->AddChild(tmp);
+
+	// FIXME: This feels too hacky... We used to only project a scalar bool, but
+	// now we want to pass along the project of the child.  Also, why is
+	// materialize special?!
+	if (pdxlnRelChild->GetOperator()->GetDXLOperator() == EdxlopPhysicalMaterialize)
+	{
+		for (ULONG ul = 0; ul < (*pdxlnRelChild)[EdxlmatIndexProjList]->Arity(); ul++)
+		{
+			pdxlnPrEl = (*(*pdxlnRelChild)[EdxlmatIndexProjList])[ul];
+			pdxlnPrEl->AddRef();
+			pdxlnProjListNew->AddChild(pdxlnPrEl);
+		}
+	}
+
 	CDXLNode *pdxlnResult =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLPhysicalResult(m_mp));
 	CDXLPhysicalProperties *dxl_properties =
@@ -3789,13 +3801,13 @@ CTranslatorExprToDXL::PdxlnScBoolExpr(EdxlBoolExprType boolexptype,
 //---------------------------------------------------------------------------
 CDXLNode *
 CTranslatorExprToDXL::PdxlnTblScanFromNLJoinOuter(
-	CExpression *pexprRelational, CDXLNode *pdxlnCond,
+	CExpression *pexprOuterChild, CExpression *pexprInnerChild, CDXLNode *pdxlnCond,
 	CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
 	ULONG *,  // pulNonGatherMotions,
 	CDXLPhysicalProperties *dxl_properties)
 {
 	// create a table scan over the input expression, without a filter
-	CDXLNode *pdxlnTblScan = PdxlnTblScan(pexprRelational,
+	CDXLNode *pdxlnTblScan = PdxlnTblScan(pexprOuterChild,
 										  NULL,	 //pcrsOutput
 										  colref_array, pdrgpdsBaseTables,
 										  NULL,	 //pexprScalar
@@ -3808,14 +3820,14 @@ CTranslatorExprToDXL::PdxlnTblScanFromNLJoinOuter(
 		CDXLNode *filter_dxlnode = PdxlnFilter(pdxlnCond);
 		pdxlnTblScan->ReplaceChild(EdxltsIndexFilter /*ulPos*/, filter_dxlnode);
 
+		// add inner required colrefs
+		CColRefSet *pcrsInner = pexprInnerChild->Prpp()->PcrsRequired();
+		CDXLNode *pdxlnPrLInner = PdxlnProjList(pcrsInner, colref_array);
 
-		// TODO: replace project list too...
-		CDXLNode *pdxlnProjList = (*pdxlnTblScan)[EdxltsIndexProjList];
-		pdxlnProjList->AddRef();
-
-		CDXLNode *pdxlnPrEl = (*(*(*(*filter_dxlnode)[0])[0])[0])[1];
-		pdxlnProjList->AddChild(pdxlnPrEl);
-		pdxlnTblScan->ReplaceChild(EdxltsIndexProjList /*ulPos*/, pdxlnProjList);
+		for (ULONG ul = 0; ul < pdxlnPrLInner->Arity(); ul++)
+		{
+			(*pdxlnTblScan)[EdxltsIndexProjList]->AddChild((*pdxlnPrLInner)[ul]);
+		}
 	}
 	else
 	{
