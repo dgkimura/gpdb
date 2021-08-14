@@ -47,10 +47,8 @@ class CMappingColIdVarPlStmt : public CMappingColIdVar
 private:
 	const CDXLTranslateContextBaseTable *m_base_table_context;
 
-public:
 	// the array of translator context (one for each child of the DXL operator)
 	CDXLTranslationContextArray *m_child_contexts;
-private:
 
 	CDXLTranslateContext *m_output_context;
 

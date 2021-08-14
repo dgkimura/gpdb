@@ -667,6 +667,8 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 
 	SubLinkType slink = CTranslatorUtils::MapDXLSubplanToSublinkType(
 		dxlop->GetDxlSubplanType());
+	Expr *test_expr = TranslateDXLSubplanTestExprToScalar(
+		dxlop->GetDxlTestExpr(), slink, colid_var, &param_ids);
 
 	const CDXLColRefArray *outer_refs = dxlop->GetDxlOuterColRefsArray();
 
@@ -730,24 +732,12 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 	// translate subplan and set test expression
 	SubPlan *subplan =
 		TranslateSubplanFromChildPlan(plan_child, slink, dxl_to_plstmt_ctxt);
+	subplan->testexpr = (Node *) test_expr;
 	subplan->paramIds = param_ids;
 
 	// translate other subplan params
 	TranslateSubplanParams(subplan, &subplan_translate_ctxt, outer_refs,
 						   colid_var);
-
-	// TODO: append subplan_translate_ctxt -> colid_var->m_child_context
-	CDXLTranslationContextArray *child_ctxt_arr =
-		GPOS_NEW(m_mp) CDXLTranslationContextArray(m_mp);
-	child_ctxt_arr->Append(&subplan_translate_ctxt);
-	dynamic_cast<CMappingColIdVarPlStmt *>(colid_var)->m_child_contexts = child_ctxt_arr;
-
-	Expr *test_expr = TranslateDXLSubplanTestExprToScalar(
-		dxlop->GetDxlTestExpr(), slink, colid_var, &param_ids);
-	subplan->testexpr = (Node *) test_expr;
-
-	if (test_expr)
-		((Var*)((OpExpr*)subplan->testexpr)->args->head->data.ptr_value)->varattno=1;
 
 	return (Expr *) subplan;
 }
@@ -796,8 +786,26 @@ CTranslatorDXLToScalar::TranslateDXLSubplanTestExprToScalar(
 	CDXLNode *inner_child_node = (*test_expr_node)[1];
 
 	// translate outer expression (can be a deep scalar tree)
-	Expr *outer_arg_expr = TranslateDXLToScalar(outer_child_node, colid_var);
-	args = gpdb::LAppend(args, outer_arg_expr);
+	//Expr *outer_arg_expr = TranslateDXLToScalar(outer_child_node, colid_var);
+	//args = gpdb::LAppend(args, outer_arg_expr);
+	if (EdxlopScalarIdent == outer_child_node->GetOperator()->GetDXLOperator())
+	{
+		Param *param2 = MakeNode(Param);
+		param2->paramkind = PARAM_EXEC;
+		CContextDXLToPlStmt *dxl_to_plstmt_ctxt =
+			(dynamic_cast<CMappingColIdVarPlStmt *>(colid_var))
+				->GetDXLToPlStmtContext();
+		param2->paramid = dxl_to_plstmt_ctxt->GetNextParamId();
+
+		// Ident
+		CDXLScalarIdent *outer_ident = CDXLScalarIdent::Cast(outer_child_node->GetOperator());
+		Expr *outer_expr = (Expr *) param2;
+		param2->paramtype = CMDIdGPDB::CastMdid(outer_ident->MdidType())->Oid();
+		param2->paramtypmod = outer_ident->TypeModifier();
+
+		args = gpdb::LAppend(args, outer_expr);
+		*param_ids = gpdb::LAppendInt(*param_ids, param2->paramid);
+	}
 
 	// translate inner expression (only certain forms supported)
 	// second arg must be an EXEC param which is replaced during query execution with subplan output
