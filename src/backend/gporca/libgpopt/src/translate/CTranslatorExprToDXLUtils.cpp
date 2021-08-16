@@ -1271,6 +1271,8 @@ CTranslatorExprToDXLUtils::PdxlnProjListFromChildProjList(
 	{
 		CDXLNode *pdxlnProjElemChild = (*pdxlnProjListChild)[ul];
 
+		// 2) pass along the CDXLTableDescr from each child.
+
 		// translate proj elem
 		CDXLNode *pdxlnProjElem =
 			PdxlnProjElem(mp, col_factory, phmcrdxln, pdxlnProjElemChild);
@@ -1385,7 +1387,7 @@ CTranslatorExprToDXLUtils::PdxlnProjElem(CMemoryPool *mp,
 				   pdxlopPrElChild->Id());
 	}
 
-	CDXLNode *pdxlnProjElemResult = PdxlnProjElem(mp, phmcrdxln, colref);
+	CDXLNode *pdxlnProjElemResult = PdxlnProjElem(mp, phmcrdxln, colref, pdxlopPrElChild->GetTableDescr());
 
 	return pdxlnProjElemResult;
 }
@@ -1446,7 +1448,8 @@ CTranslatorExprToDXLUtils::PdxlnProjElem(
 	CMemoryPool *mp,
 	ColRefToDXLNodeMap *
 		phmcrdxlnSubplans,	// map of col ref -> subplan: can be modified by this function
-	const CColRef *colref)
+	const CColRef *colref,
+	CDXLTableDescr *table_descr)
 {
 	GPOS_ASSERT(NULL != colref);
 
@@ -1454,6 +1457,7 @@ CTranslatorExprToDXLUtils::PdxlnProjElem(
 
 	CDXLScalarProjElem *pdxlopPrEl =
 		GPOS_NEW(mp) CDXLScalarProjElem(mp, colref->Id(), mdname);
+	pdxlopPrEl->SetTableDescr(table_descr);
 	CDXLNode *pdxlnPrEl = GPOS_NEW(mp) CDXLNode(mp, pdxlopPrEl);
 
 	// create a scalar identifier for the proj element expression

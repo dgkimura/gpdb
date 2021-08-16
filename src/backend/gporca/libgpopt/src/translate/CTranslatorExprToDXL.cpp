@@ -573,7 +573,8 @@ CTranslatorExprToDXL::PdxlnTblScan(CExpression *pexprTblScan,
 	{
 		pcrsOutput = pexprTblScan->Prpp()->PcrsRequired();
 	}
-	CDXLNode *pdxlnPrL = PdxlnProjList(pcrsOutput, colref_array);
+	// 1) Add CDXLTableDescr to each PdxlnProjElem()
+	CDXLNode *pdxlnPrL = PdxlnProjList(pcrsOutput, colref_array, table_descr);
 
 	CDXLNode *pdxlnCond = NULL;
 	if (NULL != pexprScalar)
@@ -3826,7 +3827,24 @@ CTranslatorExprToDXL::PdxlnTblScanFromNLJoinOuter(
 
 		for (ULONG ul = 0; ul < pdxlnPrLInner->Arity(); ul++)
 		{
-			(*pdxlnTblScan)[EdxltsIndexProjList]->AddChild((*pdxlnPrLInner)[ul]);
+			// 3) grab CDXLTableDesc off the PdxlnProjElem
+			if (pdxlnCond->GetOperator()->GetDXLOperator() == EdxlopScalarSubPlan)
+			{
+				CDXLNode *result = (*pdxlnCond)[0];
+				CDXLNode *scalarProjList = (*result)[0];
+				for (ULONG ul2 = 0; ul2 < scalarProjList->Arity(); ul2++)
+				{
+					CDXLTableDescr *ptable_descr = CDXLScalarProjElem::Cast((*scalarProjList)[ul2]->GetOperator())->GetTableDescr();
+					if (ptable_descr != NULL &&
+						CDXLScalarProjElem::Cast((*scalarProjList)[ul2]->GetOperator())->Id() == CDXLScalarProjElem::Cast((*pdxlnPrLInner)[ul]->GetOperator())->Id())
+					{
+						CDXLScalarProjElem::Cast((*pdxlnPrLInner)[ul]->GetOperator())->SetTableDescr(ptable_descr);
+						CDXLScalarProjElem::Cast((*pdxlnPrLInner)[ul]->GetOperator())->SetUseDecriptor(true);
+
+						(*pdxlnTblScan)[EdxltsIndexProjList]->AddChild((*pdxlnPrLInner)[ul]);
+					}
+				}
+			}
 		}
 	}
 	else
@@ -7665,7 +7683,8 @@ CTranslatorExprToDXL::GetProperties(const CExpression *pexpr)
 //---------------------------------------------------------------------------
 CDXLNode *
 CTranslatorExprToDXL::PdxlnProjList(const CColRefSet *pcrsOutput,
-									CColRefArray *colref_array)
+									CColRefArray *colref_array,
+									CDXLTableDescr *table_descr)
 {
 	GPOS_ASSERT(NULL != pcrsOutput);
 
@@ -7681,7 +7700,7 @@ CTranslatorExprToDXL::PdxlnProjList(const CColRefSet *pcrsOutput,
 			CColRef *colref = (*colref_array)[ul];
 
 			CDXLNode *pdxlnPrEl = CTranslatorExprToDXLUtils::PdxlnProjElem(
-				m_mp, m_phmcrdxln, colref);
+				m_mp, m_phmcrdxln, colref, table_descr);
 			pdxlnPrL->AddChild(pdxlnPrEl);
 			pcrs->Include(colref);
 		}
@@ -7695,7 +7714,7 @@ CTranslatorExprToDXL::PdxlnProjList(const CColRefSet *pcrsOutput,
 			if (!pcrs->FMember(colref))
 			{
 				CDXLNode *pdxlnPrEl = CTranslatorExprToDXLUtils::PdxlnProjElem(
-					m_mp, m_phmcrdxln, colref);
+					m_mp, m_phmcrdxln, colref, table_descr);
 				pdxlnPrL->AddChild(pdxlnPrEl);
 				pcrs->Include(colref);
 			}
@@ -7710,7 +7729,7 @@ CTranslatorExprToDXL::PdxlnProjList(const CColRefSet *pcrsOutput,
 		{
 			CColRef *colref = crsi.Pcr();
 			CDXLNode *pdxlnPrEl = CTranslatorExprToDXLUtils::PdxlnProjElem(
-				m_mp, m_phmcrdxln, colref);
+				m_mp, m_phmcrdxln, colref, table_descr);
 			pdxlnPrL->AddChild(pdxlnPrEl);
 		}
 	}

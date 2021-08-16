@@ -26,7 +26,7 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLScalarProjElem::CDXLScalarProjElem(CMemoryPool *mp, ULONG id,
 									   const CMDName *mdname)
-	: CDXLScalar(mp), m_id(id), m_mdname(mdname)
+	: CDXLScalar(mp), m_id(id), m_mdname(mdname), m_table_descr(NULL), m_use_descriptor(false)
 {
 	GPOS_ASSERT(NULL != mdname);
 }
@@ -42,6 +42,10 @@ CDXLScalarProjElem::CDXLScalarProjElem(CMemoryPool *mp, ULONG id,
 CDXLScalarProjElem::~CDXLScalarProjElem()
 {
 	GPOS_DELETE(m_mdname);
+	if (m_table_descr)
+	{
+		m_table_descr->Release();
+	}
 }
 
 //---------------------------------------------------------------------------

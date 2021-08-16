@@ -561,14 +561,6 @@ CTranslatorDXLToPlStmt::TranslateDXLTblScan(
 
 	SetParamIds(plan);
 
-	// XXX: if filter contains a project from another table, then need to pass
-	// in another base table to TranslateProjListAndFilter().  Hack fixup Var to map to rtable.
-	if (plan->targetlist->length == 2)
-	{
-		((Var*)((TargetEntry*)plan->targetlist->head->next->data.ptr_value)->expr)->varno = 3;
-		((Var*)((TargetEntry*)plan->targetlist->head->next->data.ptr_value)->expr)->varattno = 1;
-	}
-
 	return plan_return;
 }
 
@@ -4753,6 +4745,15 @@ CTranslatorDXLToPlStmt::TranslateDXLProjList(
 
 		// translate proj element expression
 		CDXLNode *expr_dxlnode = (*proj_elem_dxlnode)[0];
+
+		CDXLTranslateContextBaseTable new_base_table_context(m_mp);
+		if (CDXLScalarProjElem::Cast(proj_elem_dxlnode->GetOperator())->GetTableDescr() != NULL && CDXLScalarProjElem::Cast(proj_elem_dxlnode->GetOperator())->UseDescriptor()) {
+			Index index = gpdb::ListLength(m_dxl_to_plstmt_context->GetRTableEntriesList()) + 1;
+			RangeTblEntry *rte = TranslateDXLTblDescrToRangeTblEntry(
+				CDXLScalarProjElem::Cast(proj_elem_dxlnode->GetOperator())->GetTableDescr(),
+						  index, &new_base_table_context);
+			base_table_context = &new_base_table_context;
+		}
 
 		CMappingColIdVarPlStmt colid_var_mapping =
 			CMappingColIdVarPlStmt(m_mp, base_table_context, child_contexts,

@@ -285,7 +285,8 @@ public:
 	// create a project elem from a given col ref
 	static CDXLNode *PdxlnProjElem(CMemoryPool *mp,
 								   ColRefToDXLNodeMap *phmcrdxlnSubplans,
-								   const CColRef *colref);
+								   const CColRef *colref,
+								   CDXLTableDescr *table_descr=NULL);
 
 	// construct an array of NULL datums for a given array of columns
 	static IDatumArray *PdrgpdatumNulls(CMemoryPool *mp,

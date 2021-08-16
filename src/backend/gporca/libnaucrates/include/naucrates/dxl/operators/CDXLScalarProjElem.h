@@ -17,6 +17,7 @@
 #include "gpos/base.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
+#include "naucrates/dxl/operators/CDXLTableDescr.h"
 #include "naucrates/md/CMDName.h"
 
 namespace gpdxl
@@ -41,6 +42,10 @@ private:
 	// alias
 	const CMDName *m_mdname;
 
+	CDXLTableDescr *m_table_descr;
+
+	BOOL m_use_descriptor;
+
 	// private copy ctor
 	CDXLScalarProjElem(CDXLScalarProjElem &);
 
@@ -49,6 +54,18 @@ public:
 	CDXLScalarProjElem(CMemoryPool *mp, ULONG id, const CMDName *mdname);
 
 	virtual ~CDXLScalarProjElem();
+
+	CDXLTableDescr *GetTableDescr() {return m_table_descr;}
+	void SetTableDescr(CDXLTableDescr *table_descr)
+	{
+		if (table_descr)
+		{
+			m_table_descr=table_descr;
+			m_table_descr->AddRef();
+		}
+	}
+	BOOL UseDescriptor() {return m_use_descriptor;}
+	void SetUseDecriptor(BOOL use_descriptor) {m_use_descriptor = use_descriptor;}
 
 	// ident accessors
 	Edxlopid GetDXLOperator() const;
