@@ -329,9 +329,10 @@ private:
 							  CDXLNode *dxlnode_left, CDXLNode *dxlnode_right);
 
 	CDXLNode *PdxlnTblScanFromNLJoinOuter(
-		CExpression *pexprOuterChild, CExpression *pexprInnerChild, CDXLNode *pdxlnScalar,
-		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
-		ULONG *pulNonGatherMotions, CDXLPhysicalProperties *dxl_properties);
+		CExpression *pexprOuterChild, CExpression *pexprInnerChild,
+		CDXLNode *pdxlnScalar, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		CDXLPhysicalProperties *dxl_properties);
 
 	CDXLNode *PdxlnResultFromNLJoinOuter(
 		CExpression *pexprRelational, CDXLNode *pdxlnScalar,
@@ -652,7 +653,7 @@ private:
 	// translate a colref set of output col into a dxl proj list
 	CDXLNode *PdxlnProjList(const CColRefSet *pcrsOutput,
 							CColRefArray *colref_array,
-							CDXLTableDescr *table_descr=NULL);
+							CDXLTableDescr *table_descr = NULL);
 
 	// translate a project list expression into a DXL proj list node
 	// according to the order specified in the dynamic array

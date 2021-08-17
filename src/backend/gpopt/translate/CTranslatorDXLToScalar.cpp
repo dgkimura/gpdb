@@ -798,7 +798,8 @@ CTranslatorDXLToScalar::TranslateDXLSubplanTestExprToScalar(
 		param2->paramid = dxl_to_plstmt_ctxt->GetNextParamId();
 
 		// Ident
-		CDXLScalarIdent *outer_ident = CDXLScalarIdent::Cast(outer_child_node->GetOperator());
+		CDXLScalarIdent *outer_ident =
+			CDXLScalarIdent::Cast(outer_child_node->GetOperator());
 		Expr *outer_expr = (Expr *) param2;
 		param2->paramtype = CMDIdGPDB::CastMdid(outer_ident->MdidType())->Oid();
 		param2->paramtypmod = outer_ident->TypeModifier();

@@ -4747,11 +4747,18 @@ CTranslatorDXLToPlStmt::TranslateDXLProjList(
 		CDXLNode *expr_dxlnode = (*proj_elem_dxlnode)[0];
 
 		CDXLTranslateContextBaseTable new_base_table_context(m_mp);
-		if (CDXLScalarProjElem::Cast(proj_elem_dxlnode->GetOperator())->GetTableDescr() != NULL && CDXLScalarProjElem::Cast(proj_elem_dxlnode->GetOperator())->UseDescriptor()) {
-			Index index = gpdb::ListLength(m_dxl_to_plstmt_context->GetRTableEntriesList()) + 1;
+		if (CDXLScalarProjElem::Cast(proj_elem_dxlnode->GetOperator())
+					->GetTableDescr() != NULL &&
+			CDXLScalarProjElem::Cast(proj_elem_dxlnode->GetOperator())
+				->UseDescriptor())
+		{
+			Index index = gpdb::ListLength(
+							  m_dxl_to_plstmt_context->GetRTableEntriesList()) +
+						  1;
 			RangeTblEntry *rte = TranslateDXLTblDescrToRangeTblEntry(
-				CDXLScalarProjElem::Cast(proj_elem_dxlnode->GetOperator())->GetTableDescr(),
-						  index, &new_base_table_context);
+				CDXLScalarProjElem::Cast(proj_elem_dxlnode->GetOperator())
+					->GetTableDescr(),
+				index, &new_base_table_context);
 			base_table_context = &new_base_table_context;
 		}
 

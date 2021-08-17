@@ -55,17 +55,30 @@ public:
 
 	virtual ~CDXLScalarProjElem();
 
-	CDXLTableDescr *GetTableDescr() {return m_table_descr;}
-	void SetTableDescr(CDXLTableDescr *table_descr)
+	CDXLTableDescr *
+	GetTableDescr()
+	{
+		return m_table_descr;
+	}
+	void
+	SetTableDescr(CDXLTableDescr *table_descr)
 	{
 		if (table_descr)
 		{
-			m_table_descr=table_descr;
+			m_table_descr = table_descr;
 			m_table_descr->AddRef();
 		}
 	}
-	BOOL UseDescriptor() {return m_use_descriptor;}
-	void SetUseDecriptor(BOOL use_descriptor) {m_use_descriptor = use_descriptor;}
+	BOOL
+	UseDescriptor()
+	{
+		return m_use_descriptor;
+	}
+	void
+	SetUseDecriptor(BOOL use_descriptor)
+	{
+		m_use_descriptor = use_descriptor;
+	}
 
 	// ident accessors
 	Edxlopid GetDXLOperator() const;

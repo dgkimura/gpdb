@@ -1387,7 +1387,8 @@ CTranslatorExprToDXLUtils::PdxlnProjElem(CMemoryPool *mp,
 				   pdxlopPrElChild->Id());
 	}
 
-	CDXLNode *pdxlnProjElemResult = PdxlnProjElem(mp, phmcrdxln, colref, pdxlopPrElChild->GetTableDescr());
+	CDXLNode *pdxlnProjElemResult =
+		PdxlnProjElem(mp, phmcrdxln, colref, pdxlopPrElChild->GetTableDescr());
 
 	return pdxlnProjElemResult;
 }
@@ -1448,8 +1449,7 @@ CTranslatorExprToDXLUtils::PdxlnProjElem(
 	CMemoryPool *mp,
 	ColRefToDXLNodeMap *
 		phmcrdxlnSubplans,	// map of col ref -> subplan: can be modified by this function
-	const CColRef *colref,
-	CDXLTableDescr *table_descr)
+	const CColRef *colref, CDXLTableDescr *table_descr)
 {
 	GPOS_ASSERT(NULL != colref);
 

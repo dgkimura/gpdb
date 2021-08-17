@@ -26,7 +26,11 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLScalarProjElem::CDXLScalarProjElem(CMemoryPool *mp, ULONG id,
 									   const CMDName *mdname)
-	: CDXLScalar(mp), m_id(id), m_mdname(mdname), m_table_descr(NULL), m_use_descriptor(false)
+	: CDXLScalar(mp),
+	  m_id(id),
+	  m_mdname(mdname),
+	  m_table_descr(NULL),
+	  m_use_descriptor(false)
 {
 	GPOS_ASSERT(NULL != mdname);
 }

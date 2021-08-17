@@ -3637,8 +3637,8 @@ CTranslatorExprToDXL::PdxlnCorrelatedNLJoin(
 			dxl_properties->AddRef();
 			// create and return a table scan node
 			dxlnode = PdxlnTblScanFromNLJoinOuter(
-				pexprOuterChild, pexprInnerChild, pdxlnCond, colref_array, pdrgpdsBaseTables,
-				pulNonGatherMotions, dxl_properties);
+				pexprOuterChild, pexprInnerChild, pdxlnCond, colref_array,
+				pdrgpdsBaseTables, pulNonGatherMotions, dxl_properties);
 			break;
 		}
 
@@ -3736,9 +3736,11 @@ CTranslatorExprToDXL::PdxlnBooleanScalarWithSubPlan(
 	// FIXME: This feels too hacky... We used to only project a scalar bool, but
 	// now we want to pass along the project of the child.  Also, why is
 	// materialize special?!
-	if (pdxlnRelChild->GetOperator()->GetDXLOperator() == EdxlopPhysicalMaterialize)
+	if (pdxlnRelChild->GetOperator()->GetDXLOperator() ==
+		EdxlopPhysicalMaterialize)
 	{
-		for (ULONG ul = 0; ul < (*pdxlnRelChild)[EdxlmatIndexProjList]->Arity(); ul++)
+		for (ULONG ul = 0; ul < (*pdxlnRelChild)[EdxlmatIndexProjList]->Arity();
+			 ul++)
 		{
 			pdxlnPrEl = (*(*pdxlnRelChild)[EdxlmatIndexProjList])[ul];
 			pdxlnPrEl->AddRef();
@@ -3802,8 +3804,9 @@ CTranslatorExprToDXL::PdxlnScBoolExpr(EdxlBoolExprType boolexptype,
 //---------------------------------------------------------------------------
 CDXLNode *
 CTranslatorExprToDXL::PdxlnTblScanFromNLJoinOuter(
-	CExpression *pexprOuterChild, CExpression *pexprInnerChild, CDXLNode *pdxlnCond,
-	CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
+	CExpression *pexprOuterChild, CExpression *pexprInnerChild,
+	CDXLNode *pdxlnCond, CColRefArray *colref_array,
+	CDistributionSpecArray *pdrgpdsBaseTables,
 	ULONG *,  // pulNonGatherMotions,
 	CDXLPhysicalProperties *dxl_properties)
 {
@@ -3828,20 +3831,34 @@ CTranslatorExprToDXL::PdxlnTblScanFromNLJoinOuter(
 		for (ULONG ul = 0; ul < pdxlnPrLInner->Arity(); ul++)
 		{
 			// 3) grab CDXLTableDesc off the PdxlnProjElem
-			if (pdxlnCond->GetOperator()->GetDXLOperator() == EdxlopScalarSubPlan)
+			if (pdxlnCond->GetOperator()->GetDXLOperator() ==
+				EdxlopScalarSubPlan)
 			{
 				CDXLNode *result = (*pdxlnCond)[0];
 				CDXLNode *scalarProjList = (*result)[0];
 				for (ULONG ul2 = 0; ul2 < scalarProjList->Arity(); ul2++)
 				{
-					CDXLTableDescr *ptable_descr = CDXLScalarProjElem::Cast((*scalarProjList)[ul2]->GetOperator())->GetTableDescr();
+					CDXLTableDescr *ptable_descr =
+						CDXLScalarProjElem::Cast(
+							(*scalarProjList)[ul2]->GetOperator())
+							->GetTableDescr();
 					if (ptable_descr != NULL &&
-						CDXLScalarProjElem::Cast((*scalarProjList)[ul2]->GetOperator())->Id() == CDXLScalarProjElem::Cast((*pdxlnPrLInner)[ul]->GetOperator())->Id())
+						CDXLScalarProjElem::Cast(
+							(*scalarProjList)[ul2]->GetOperator())
+								->Id() ==
+							CDXLScalarProjElem::Cast(
+								(*pdxlnPrLInner)[ul]->GetOperator())
+								->Id())
 					{
-						CDXLScalarProjElem::Cast((*pdxlnPrLInner)[ul]->GetOperator())->SetTableDescr(ptable_descr);
-						CDXLScalarProjElem::Cast((*pdxlnPrLInner)[ul]->GetOperator())->SetUseDecriptor(true);
+						CDXLScalarProjElem::Cast(
+							(*pdxlnPrLInner)[ul]->GetOperator())
+							->SetTableDescr(ptable_descr);
+						CDXLScalarProjElem::Cast(
+							(*pdxlnPrLInner)[ul]->GetOperator())
+							->SetUseDecriptor(true);
 
-						(*pdxlnTblScan)[EdxltsIndexProjList]->AddChild((*pdxlnPrLInner)[ul]);
+						(*pdxlnTblScan)[EdxltsIndexProjList]->AddChild(
+							(*pdxlnPrLInner)[ul]);
 					}
 				}
 			}
