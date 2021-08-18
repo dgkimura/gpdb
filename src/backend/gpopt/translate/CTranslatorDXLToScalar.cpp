@@ -796,7 +796,11 @@ CTranslatorDXLToScalar::TranslateDXLSubplanTestExprToScalar(
 	CDXLNode *inner_child_node = (*test_expr_node)[1];
 
 	// translate outer expression (can be a deep scalar tree)
-	if (EdxlopScalarIdent == outer_child_node->GetOperator()->GetDXLOperator())
+	if (EdxlopScalarIdent ==
+			outer_child_node->GetOperator()->GetDXLOperator() &&
+		!(dynamic_cast<CMappingColIdVarPlStmt *>(colid_var))
+			 ->VarFromDXLNodeScId(
+				 CDXLScalarIdent::Cast(outer_child_node->GetOperator())))
 	{
 		Param *param2 = MakeNode(Param);
 		param2->paramkind = PARAM_EXEC;
