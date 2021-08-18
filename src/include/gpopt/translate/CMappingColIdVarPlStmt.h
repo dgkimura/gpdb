@@ -68,7 +68,7 @@ public:
 	virtual Var *VarFromDXLNodeScId(const CDXLScalarIdent *dxlop);
 
 	// translate DXL ScalarIdent node into GPDB Param node
-	Param *ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop);
+	virtual Param *ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop);
 
 	// get the output translator context
 	CDXLTranslateContext *GetOutputContext();

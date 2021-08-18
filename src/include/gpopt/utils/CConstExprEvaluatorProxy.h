@@ -63,6 +63,12 @@ private:
 		}
 
 		virtual Var *VarFromDXLNodeScId(const CDXLScalarIdent *scalar_ident);
+
+		virtual Param *
+		ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop)
+		{
+			return NULL;
+		}
 	};
 
 	// memory pool, not owned
