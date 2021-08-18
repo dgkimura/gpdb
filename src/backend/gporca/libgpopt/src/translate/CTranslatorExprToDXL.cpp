@@ -3168,7 +3168,7 @@ CTranslatorExprToDXL::PdxlnRestrictResult(CDXLNode *dxlnode, CColRef *colref)
 			CTranslatorExprToDXLUtils::PdxlpropCopy(m_mp, dxlnode);
 		pdxlnResult->SetProperties(dxl_properties);
 
-		pdxlnResult->AddChild(pdxlnProjListOld);
+		pdxlnResult->AddChild(pdxlnProjListNew);
 		pdxlnResult->AddChild(PdxlnFilter(NULL));
 		pdxlnResult->AddChild(GPOS_NEW(m_mp) CDXLNode(
 			m_mp, GPOS_NEW(m_mp) CDXLScalarOneTimeFilter(m_mp)));
