@@ -3075,7 +3075,6 @@ CTranslatorDXLToPlStmt::TranslateDXLResult(
 
 	if (result_dxlnode->Arity() - 1 == EdxlresultIndexChild)
 	{
-		// XXX: where is colid 16??
 		// translate child plan
 		child_dxlnode = (*result_dxlnode)[EdxlresultIndexChild];
 
@@ -3083,32 +3082,78 @@ CTranslatorDXLToPlStmt::TranslateDXLResult(
 			child_dxlnode, &child_context, ctxt_translation_prev_siblings);
 
 		// add child_context into output_context
-		//if ((*result_dxlnode)[EdxlresultIndexFilter]->Arity() > 0)
+		CDXLNode *project_list_dxlnode =
+			(*result_dxlnode)[EdxlresultIndexProjList];
+		std::set<ULONG> projset;
+		for (ULONG ul = 0; ul < project_list_dxlnode->Arity(); ul++)
 		{
-			CDXLNode *project_list_dxlnode =
-				(*result_dxlnode)[EdxlresultIndexProjList];
-			std::set<ULONG> projset;
-			for (ULONG ul = 0; ul < project_list_dxlnode->Arity(); ul++)
+			if ((*project_list_dxlnode)[ul]->Arity() == 1)
+			{
+				CDXLNode *pscalarProjectElem = (*project_list_dxlnode)[ul];
+
+				if (EdxlopScalarOpExpr ==
+					(*pscalarProjectElem)[0]->GetOperator()->GetDXLOperator())
+				{
+					CDXLNode *pscalarOpExpr = (*pscalarProjectElem)[0];
+
+					if (EdxlopScalarCast ==
+						(*pscalarOpExpr)[0]->GetOperator()->GetDXLOperator())
+					{
+						CDXLNode *pscalarCast = (*pscalarOpExpr)[0];
+
+						if (EdxlopScalarIdent ==
+							(*pscalarCast)[0]->GetOperator()->GetDXLOperator())
+						{
+							CDXLNode *psi = (*pscalarCast)[0];
+							projset.insert(
+								CDXLScalarIdent::Cast(psi->GetOperator())
+									->GetDXLColRef()
+									->Id());
+						}
+						else
+						{
+							projset.insert(
+								CDXLScalarProjElem::Cast(
+									(*project_list_dxlnode)[ul]->GetOperator())
+									->Id());
+						}
+					}
+					else
+					{
+						projset.insert(
+							CDXLScalarProjElem::Cast(
+								(*project_list_dxlnode)[ul]->GetOperator())
+								->Id());
+					}
+				}
+				else
+				{
+					projset.insert(
+						CDXLScalarProjElem::Cast(
+							(*project_list_dxlnode)[ul]->GetOperator())
+							->Id());
+				}
+			}
+			else
 			{
 				projset.insert(CDXLScalarProjElem::Cast(
 								   (*project_list_dxlnode)[ul]->GetOperator())
 								   ->Id());
 			}
+		}
 
-			// XXX: KIMURA -- FIXME
-			ULongToColTargetEntryMapIter iter(
-				child_context.GetColIdToTargetEntryMap());
-			while (iter.Advance())
+		ULongToColTargetEntryMapIter iter(
+			child_context.GetColIdToTargetEntryMap());
+		while (iter.Advance())
+		{
+			const TargetEntry *value = iter.Value();
+			const ULONG *key = iter.Key();
+			if (projset.find(*key) == projset.end() && *value->resname &&
+				value->expr->type == T_Var &&
+				((Var *) value->expr)->varattno > 0)
 			{
-				const TargetEntry *value = iter.Value();
-				const ULONG *key = iter.Key();
-				if (projset.find(*key) == projset.end() && *value->resname &&
-					value->expr->type == T_Var &&
-					((Var *) value->expr)->varattno > 0)
-				{
-					output_context->InsertMapping(
-						*key, const_cast<TargetEntry *>(value));
-				}
+				output_context->InsertMapping(*key,
+											  const_cast<TargetEntry *>(value));
 			}
 		}
 
