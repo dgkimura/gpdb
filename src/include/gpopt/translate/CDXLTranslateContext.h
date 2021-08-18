@@ -36,6 +36,10 @@ typedef CHashMap<ULONG, TargetEntry, gpos::HashValue<ULONG>,
 				 gpos::Equals<ULONG>, CleanupDelete<ULONG>, CleanupNULL>
 	ULongToTargetEntryMap;
 
+typedef CHashMapIter<ULONG, TargetEntry, gpos::HashValue<ULONG>,
+					 gpos::Equals<ULONG>, CleanupDelete<ULONG>, CleanupNULL>
+	ULongToColTargetEntryMapIter;
+
 // hash maps mapping ULONG -> CMappingElementColIdParamId
 typedef CHashMap<ULONG, CMappingElementColIdParamId, gpos::HashValue<ULONG>,
 				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
@@ -98,6 +102,12 @@ public:
 	GetColIdToParamIdMap()
 	{
 		return m_colid_to_paramid_map;
+	}
+
+	ULongToTargetEntryMap *
+	GetColIdToTargetEntryMap()
+	{
+		return m_colid_to_target_entry_map;
 	}
 
 	// return the target entry corresponding to the given ColId

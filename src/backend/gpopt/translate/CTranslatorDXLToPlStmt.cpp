@@ -31,6 +31,8 @@ extern "C" {
 #include "utils/typcache.h"
 #include "utils/uri.h"
 }
+#include <set>
+
 #include "gpos/base.h"
 
 #include "gpopt/gpdbwrappers.h"
@@ -3073,11 +3075,42 @@ CTranslatorDXLToPlStmt::TranslateDXLResult(
 
 	if (result_dxlnode->Arity() - 1 == EdxlresultIndexChild)
 	{
+		// XXX: where is colid 16??
 		// translate child plan
 		child_dxlnode = (*result_dxlnode)[EdxlresultIndexChild];
 
 		Plan *child_plan = TranslateDXLOperatorToPlan(
 			child_dxlnode, &child_context, ctxt_translation_prev_siblings);
+
+		// add child_context into output_context
+		//if ((*result_dxlnode)[EdxlresultIndexFilter]->Arity() > 0)
+		{
+			CDXLNode *project_list_dxlnode =
+				(*result_dxlnode)[EdxlresultIndexProjList];
+			std::set<ULONG> projset;
+			for (ULONG ul = 0; ul < project_list_dxlnode->Arity(); ul++)
+			{
+				projset.insert(CDXLScalarProjElem::Cast(
+								   (*project_list_dxlnode)[ul]->GetOperator())
+								   ->Id());
+			}
+
+			// XXX: KIMURA -- FIXME
+			ULongToColTargetEntryMapIter iter(
+				child_context.GetColIdToTargetEntryMap());
+			while (iter.Advance())
+			{
+				const TargetEntry *value = iter.Value();
+				const ULONG *key = iter.Key();
+				if (projset.find(*key) == projset.end() && *value->resname &&
+					value->expr->type == T_Var &&
+					((Var *) value->expr)->varattno > 0)
+				{
+					output_context->InsertMapping(
+						*key, const_cast<TargetEntry *>(value));
+				}
+			}
+		}
 
 		GPOS_ASSERT(NULL != child_plan && "child plan cannot be NULL");
 
