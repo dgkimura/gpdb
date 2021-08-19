@@ -3123,7 +3123,8 @@ CTranslatorExprToDXL::BuildSubplans(
 //
 //---------------------------------------------------------------------------
 CDXLNode *
-CTranslatorExprToDXL::PdxlnRestrictResult(CDXLNode *dxlnode, CColRef *colref)
+CTranslatorExprToDXL::PdxlnRestrictResult(CDXLNode *dxlnode, CColRef *colref,
+										  BOOL hackme)
 {
 	GPOS_ASSERT(NULL != dxlnode);
 	GPOS_ASSERT(NULL != colref);
@@ -3168,7 +3169,7 @@ CTranslatorExprToDXL::PdxlnRestrictResult(CDXLNode *dxlnode, CColRef *colref)
 			CTranslatorExprToDXLUtils::PdxlpropCopy(m_mp, dxlnode);
 		pdxlnResult->SetProperties(dxl_properties);
 
-		pdxlnResult->AddChild(pdxlnProjListNew);
+		pdxlnResult->AddChild(hackme ? pdxlnProjListOld : pdxlnProjListNew);
 		pdxlnResult->AddChild(PdxlnFilter(NULL));
 		pdxlnResult->AddChild(GPOS_NEW(m_mp) CDXLNode(
 			m_mp, GPOS_NEW(m_mp) CDXLScalarOneTimeFilter(m_mp)));
@@ -3234,7 +3235,18 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan(
 		pcrsUsed->Release();
 	}
 
-	CDXLNode *inner_dxlnode = PdxlnRestrictResult(pdxlnInnerChild, pcrInner);
+	bool hackme = true;
+	for (ULONG ul = 0; ul < (*pdxlnInnerChild)[0]->Arity(); ul++)
+	{
+		CDXLNode *elem = (*(*pdxlnInnerChild)[0])[ul];
+		if (EdxlopScalarConstValue ==
+			((*elem)[0])->GetOperator()->GetDXLOperator())
+		{
+			hackme = false;
+		}
+	}
+	CDXLNode *inner_dxlnode =
+		PdxlnRestrictResult(pdxlnInnerChild, pcrInner, hackme);
 	if (NULL == inner_dxlnode)
 	{
 		GPOS_RAISE(

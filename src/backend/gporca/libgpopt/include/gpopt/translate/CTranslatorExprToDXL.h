@@ -731,7 +731,8 @@ private:
 	CDXLNode *PdxlnProjectBoolConst(CDXLNode *dxlnode, BOOL value);
 
 	// helper to build a Result expression with project list restricted to required column
-	CDXLNode *PdxlnRestrictResult(CDXLNode *dxlnode, CColRef *colref);
+	CDXLNode *PdxlnRestrictResult(CDXLNode *dxlnode, CColRef *colref,
+								  BOOL hackme = false);
 
 	//	helper to build subplans from correlated LOJ
 	void BuildSubplansForCorrelatedLOJ(
