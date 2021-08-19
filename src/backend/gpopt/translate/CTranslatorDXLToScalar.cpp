@@ -749,7 +749,11 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 	{
 		const TargetEntry *value = iter.Value();
 		const ULONG *key = iter.Key();
-		output_context->InsertMapping(*key, const_cast<TargetEntry *>(value));
+		if (value->expr->type == T_Var && ((Var *) value->expr)->varattno > 0)
+		{
+			output_context->InsertMapping(*key,
+										  const_cast<TargetEntry *>(value));
+		}
 	}
 
 	return (Expr *) subplan;
