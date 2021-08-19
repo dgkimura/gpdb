@@ -170,10 +170,10 @@ private:
 		CContextDXLToPlStmt *dxl_to_plstmt_ctxt);
 
 	// translate subplan test expression
-	Expr *TranslateDXLSubplanTestExprToScalar(
-		CDXLNode *test_expr_node, SubLinkType slink,
-		CMappingColIdVar *colid_var, List **param_ids_list,
-		const CDXLColRefArray *outer_refs);
+	Expr *TranslateDXLSubplanTestExprToScalar(CDXLNode *test_expr_node,
+											  SubLinkType slink,
+											  CMappingColIdVar *colid_var,
+											  List **param_ids_list);
 
 	// translate subplan parameters
 	void TranslateSubplanParams(SubPlan *sub_plan,

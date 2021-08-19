@@ -23,8 +23,6 @@ extern "C" {
 #include "utils/datum.h"
 }
 
-#include <set>
-
 #include "gpos/base.h"
 
 #include "gpopt/base/COptCtxt.h"
@@ -668,14 +666,14 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 	// translate subplan test expression
 	List *param_ids = NIL;
 
-	const CDXLColRefArray *outer_refs = dxlop->GetDxlOuterColRefsArray();
-
-	const ULONG len = outer_refs->Size();
-
 	SubLinkType slink = CTranslatorUtils::MapDXLSubplanToSublinkType(
 		dxlop->GetDxlSubplanType());
 	Expr *test_expr = TranslateDXLSubplanTestExprToScalar(
-		dxlop->GetDxlTestExpr(), slink, colid_var, &param_ids, outer_refs);
+		dxlop->GetDxlTestExpr(), slink, colid_var, &param_ids);
+
+	const CDXLColRefArray *outer_refs = dxlop->GetDxlOuterColRefsArray();
+
+	const ULONG len = outer_refs->Size();
 
 	// Translate a copy of the translate context: the param mappings from the outer scope get copied in the constructor
 	CDXLTranslateContext subplan_translate_ctxt(
@@ -770,7 +768,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 Expr *
 CTranslatorDXLToScalar::TranslateDXLSubplanTestExprToScalar(
 	CDXLNode *test_expr_node, SubLinkType slink, CMappingColIdVar *colid_var,
-	List **param_ids, const CDXLColRefArray *outer_refs)
+	List **param_ids)
 {
 	if (EXPR_SUBLINK == slink || EXISTS_SUBLINK == slink ||
 		NOT_EXISTS_SUBLINK == slink)
@@ -802,24 +800,11 @@ CTranslatorDXLToScalar::TranslateDXLSubplanTestExprToScalar(
 	CDXLNode *outer_child_node = (*test_expr_node)[0];
 	CDXLNode *inner_child_node = (*test_expr_node)[1];
 
-	std::set<std::wstring> s;
-	for (ULONG ul = 0; ul < outer_refs->Size(); ul++)
-	{
-		s.insert(std::wstring(
-			(*outer_refs)[ul]->MdName()->GetMDName()->GetBuffer()));
-	}
-
 	// translate outer expression (can be a deep scalar tree)
 	if (EdxlopScalarIdent ==
 			outer_child_node->GetOperator()->GetDXLOperator() &&
 		dynamic_cast<CMappingColIdVarPlStmt *>(colid_var)->VarFromDXLNodeScId(
 			CDXLScalarIdent::Cast(outer_child_node->GetOperator())) == NULL &&
-		s.find(
-			std::wstring(CDXLScalarIdent::Cast(outer_child_node->GetOperator())
-							 ->GetDXLColRef()
-							 ->MdName()
-							 ->GetMDName()
-							 ->GetBuffer())) == s.end() &&
 		dynamic_cast<CMappingColIdVarPlStmt *>(colid_var)->ParamFromDXLNodeScId(
 			CDXLScalarIdent::Cast(outer_child_node->GetOperator())) == NULL)
 	{
