@@ -131,6 +131,8 @@ initNextTableToScan(DynamicBitmapHeapScanState *node)
 
 	CleanupOnePartition(node);
 
+	MemoryContext oldCxt = MemoryContextSwitchTo(node->partitionMemoryContext);
+
 	currentRelation = scanState->ss_currentRelation = heap_open(currentPartitionOid, AccessShareLock);
 	lastScannedRel = heap_open(node->lastRelOid, AccessShareLock);
 	lastTupDesc = RelationGetDescr(lastScannedRel);
@@ -159,16 +161,12 @@ initNextTableToScan(DynamicBitmapHeapScanState *node)
 	if (attMap || node->firstPartition)
 	{
 		node->firstPartition = false;
-		MemoryContextReset(node->partitionMemoryContext);
-		MemoryContext oldCxt = MemoryContextSwitchTo(node->partitionMemoryContext);
 
 		/* Initialize child expressions */
 		scanState->ps.qual = (List *) ExecInitExpr((Expr *) scanState->ps.plan->qual,
 												   (PlanState *) scanState);
 		scanState->ps.targetlist = (List *) ExecInitExpr((Expr *) scanState->ps.plan->targetlist,
 														 (PlanState *) scanState);
-
-		MemoryContextSwitchTo(oldCxt);
 	}
 
 	if (attMap)
@@ -187,6 +185,8 @@ initNextTableToScan(DynamicBitmapHeapScanState *node)
 	bhsPlanState = &node->bhsState->ss.ps;
 	InitPlanNodeGpmonPkt(bhsPlanState->plan, &bhsPlanState->gpmon_pkt, estate);
 	bhsPlanState->gpmon_pkt.u.qexec.rowsout = node->ss.ps.gpmon_pkt.u.qexec.rowsout;
+
+	MemoryContextSwitchTo(oldCxt);
 
 	/*
 	 * Rescan the child node, and attach it to the sidecar BitmapHeapScan.
@@ -302,6 +302,7 @@ CleanupOnePartition(DynamicBitmapHeapScanState *scanState)
 		ExecCloseScanRelation(scanState->ss.ss_currentRelation);
 		scanState->ss.ss_currentRelation = NULL;
 	}
+	MemoryContextReset(scanState->partitionMemoryContext);
 }
 
 /*

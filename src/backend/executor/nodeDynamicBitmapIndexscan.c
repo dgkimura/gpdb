@@ -185,6 +185,7 @@ endCurrentBitmapIndexScan(DynamicBitmapIndexScanState *node)
 		ExecEndBitmapIndexScan(node->bitmapIndexScanState);
 		node->bitmapIndexScanState = NULL;
 	}
+	MemoryContextReset(node->partitionMemoryContext);
 }
 
 /*

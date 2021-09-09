@@ -122,6 +122,7 @@ initNextTableToScan(DynamicSeqScanState *node)
 	}
 
 	CleanupOnePartition(node);
+	MemoryContext oldCxt = MemoryContextSwitchTo(node->partitionMemoryContext);
 
 	currentRelation = scanState->ss_currentRelation = heap_open(*pid, AccessShareLock);
 	lastScannedRel = heap_open(node->lastRelOid, AccessShareLock);
@@ -151,8 +152,6 @@ initNextTableToScan(DynamicSeqScanState *node)
 	if (attMap || node->firstPartition)
 	{
 		node->firstPartition = false;
-		MemoryContextReset(node->partitionMemoryContext);
-		MemoryContext oldCxt = MemoryContextSwitchTo(node->partitionMemoryContext);
 
 		/* Initialize child expressions */
 		scanState->ps.qual = (List *) ExecInitExpr((Expr *) scanState->ps.plan->qual,
@@ -169,6 +168,8 @@ initNextTableToScan(DynamicSeqScanState *node)
 	DynamicScan_SetTableOid(&node->ss, *pid);
 	node->seqScanState = ExecInitSeqScanForPartition(&plan->seqscan, estate, node->eflags,
 													 currentRelation);
+
+	MemoryContextSwitchTo(oldCxt);
 
 	/*
 	 * Setup gpmon counters for SeqScan. Rows count for sidecar partition scan should
@@ -282,6 +283,7 @@ CleanupOnePartition(DynamicSeqScanState *scanState)
 		ExecCloseScanRelation(scanState->ss.ss_currentRelation);
 		scanState->ss.ss_currentRelation = NULL;
 	}
+	MemoryContextReset(scanState->partitionMemoryContext);
 }
 
 /*
