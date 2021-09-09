@@ -302,7 +302,8 @@ CleanupOnePartition(DynamicBitmapHeapScanState *scanState)
 		ExecCloseScanRelation(scanState->ss.ss_currentRelation);
 		scanState->ss.ss_currentRelation = NULL;
 	}
-	MemoryContextReset(scanState->partitionMemoryContext);
+	if (scanState->bhsState || (scanState->scan_state & SCAN_SCAN) != 0)
+		MemoryContextReset(scanState->partitionMemoryContext);
 }
 
 /*
