@@ -386,6 +386,10 @@ FaultInjector_InjectFaultIfSet_out_of_line(
 							FaultInjectorTypeEnumToString[entryLocal->faultInjectorType])));	
 			break;
 
+		case FaultInjectorTypeVmemProtectLimit:
+			ereport(ERROR, (errmsg("Canceling query because of high VMEM usage.")));
+			break;
+
 		case FaultInjectorTypeInfiniteLoop:
 			ereport(LOG, 
 					(errcode(ERRCODE_FAULT_INJECT),
