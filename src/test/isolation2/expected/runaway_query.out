@@ -1,0 +1,42 @@
+CREATE EXTENSION IF NOT EXISTS gp_inject_fault;
+CREATE
+CREATE OR REPLACE LANGUAGE plpgsql;
+CREATE
+
+CREATE OR REPLACE FUNCTION wait_for_gpdb_wrappers_get_comparison_operator_fault() returns void as $$ DECLARE optimizer text; /* in func */ BEGIN /* in func */ SELECT setting INTO optimizer FROM pg_settings WHERE name='optimizer'; /* in func */ IF (optimizer = 'on') THEN /* in func */ PERFORM gp_wait_until_triggered_fault('gpdbwrappers_get_comparison_operator', 1, 1); /* in func */ ELSE /*in func*/ RAISE EXCEPTION 'optimizer=off - gpdbwrappers_get_comparison_operator vmem_protect_limit fault will not triggered'; /*in func*/ END IF; /* in func */ END; /* in func */ $$ LANGUAGE PLPGSQL EXECUTE ON MASTER;
+CREATE
+
+CREATE TABLE runaway_query_test_table(a bigint NOT NULL) DISTRIBUTED BY (a);
+CREATE
+
+-- Use vmem_protect_limit fault to simulate vmem protect error and force cancel query.
+SELECT gp_inject_fault_infinite('gpdbwrappers_get_comparison_operator', 'vmem_protect_limit', 1);
+ gp_inject_fault_infinite 
+--------------------------
+ Success:                 
+(1 row)
+
+-- Run query that will trip the vmem protect limit fault.
+EXPLAIN (COSTS OFF) SELECT a FROM runaway_query_test_table WHERE (a = ANY ((ARRAY[42])));
+ QUERY PLAN                                    
+-----------------------------------------------
+ Gather Motion 1:1  (slice1; segments: 1)      
+   ->  Seq Scan on runaway_query_test_table    
+         Filter: (a = ANY ('{42}'::integer[])) 
+ Optimizer: Postgres query optimizer           
+(4 rows)
+
+SELECT wait_for_gpdb_wrappers_get_comparison_operator_fault();
+ERROR:  optimizer=off - gpdbwrappers_get_comparison_operator vmem_protect_limit fault will not triggered
+
+SELECT gp_inject_fault('all', 'reset', dbid) FROM gp_segment_configuration;
+ gp_inject_fault 
+-----------------
+ Success:        
+ Success:        
+ Success:        
+ Success:        
+ Success:        
+ Success:        
+ Success:        
+(7 rows)
