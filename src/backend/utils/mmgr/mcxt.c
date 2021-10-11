@@ -996,6 +996,9 @@ MemoryContextContainsGenericAllocation(MemoryContext context, void *pointer)
 
 	AllocSet set = (AllocSet)context;
 
+	if (header->sharedHeader == NULL)
+		return false;
+
 	if (header->sharedHeader == set->sharedHeaderList ||
 			(set->sharedHeaderList != NULL && set->sharedHeaderList->next == header->sharedHeader) ||
 			(set->sharedHeaderList != NULL && set->sharedHeaderList->next != NULL && set->sharedHeaderList->next->next == header->sharedHeader))
