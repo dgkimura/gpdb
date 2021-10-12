@@ -842,16 +842,37 @@ MemoryContextCheck(MemoryContext context)
  *		Detect whether an allocated chunk of memory belongs to a given
  *		context or not.
  *
- * Caution: this test is reliable as long as 'pointer' does point to
- * a chunk of memory allocated from *some* context.  If 'pointer' points
- * at memory obtained in some other way, there is a small chance of a
- * false-positive result, since the bits right before it might look like
- * a valid chunk header by chance.
+ * CAUTION: this function should only be called on a pointer which is known
+ * to point to the beginning of a chunk of memory allocated with palloc()
+ * or MemoryContextAlloc().
+ *
+ * Do not pass a pointer which might point to an offset into a palloc()'d region,
+ * or to memory allocated outside of the MemoryContext/palloc system.  For
+ * example, do not pass pointers returned from malloc() or mpool_alloc().
+ *
+ * If the context param is an AllocSet, consider using AlllocSetContains()
+ * instead, which can safely handle any valid pointer, regardless of how the
+ * memory region they point to was allocated.  This includes pointers to
+ * an offset within a memory region, as well as unaligned pointers... neither
+ * of which can be safely passed to MemoryContextContains()
+ *
  */
 bool
 MemoryContextContains(MemoryContext context, void *pointer)
 {
 	MemoryContext ptr_context;
+
+	/*
+	 * In GPDB, pointer is not guaranteed to always be palloc aligned. Due to
+	 * our use of MemTuples, the pointer may instead point into the palloc'd
+	 * region to an attr offset. Therefore we cannot assume the MemoryContext
+	 * from which the pointer was palloc'd exists in the bytes immediately in
+	 * front of the pointer.
+	 *
+	 * Instead use fMemoryContextContainsGenericAllocation() which correctly
+	 * handles the above scenario.
+	 */
+	Assert(false);
 
 	/*
 	 * NB: Can't use GetMemoryChunkContext() here - that performs assertions
@@ -874,6 +895,29 @@ MemoryContextContains(MemoryContext context, void *pointer)
 }
 
 /*
+ * MemoryContextContainsGenericAllocation
+ *
+ * Detects whether a generic (may or may not be allocated by palloc) chunk of
+ * memory belongs to a given context or not.  Note, the "generic" means it will
+ * be ready to handle chunks not allocated using palloc, not at the start of an
+ * allocated region, and not necessarily aligned.
+ *
+ * Currently only supports AllocSet, will error out if called on any other type
+ * of MemoryContext (AllocSlab, ALlocGenerate, custom)
+ */
+bool
+MemoryContextContainsGenericAllocation(MemoryContext context, void *pointer)
+{
+	if (context->type != T_AllocSetContext)
+		MemoryContextError(ERRCODE_INTERNAL_ERROR,
+			context, CDB_MCXT_WHERE(context),
+			"MemoryContextContainsGenericAllocation is not available for type %u",
+			context->type);
+
+	return AllocSetContains(context, pointer);
+}
+
+/*--------------------
  * MemoryContextCreate
  *		Context-type-independent part of context creation.
  *
