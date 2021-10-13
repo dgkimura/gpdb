@@ -2110,3 +2110,35 @@ get_tablespace_version_directory_name(PG_FUNCTION_ARGS)
 {
 	PG_RETURN_TEXT_P(CStringGetTextDatum(GP_TABLESPACE_VERSION_DIRECTORY));
 }
+
+typedef struct WindowObjectData
+{
+	NodeTag		type;
+	WindowAggState *winstate;	/* parent WindowAggState */
+	List	   *argstates;		/* ExprState trees for fn's arguments */
+	void	   *localmem;		/* WinGetPartitionLocalMemory's chunk */
+	int			markptr;		/* tuplestore mark pointer for this fn */
+	int			readptr;		/* tuplestore read pointer for this fn */
+	int64		markpos;		/* row that markptr is positioned on */
+	int64		seekpos;		/* row that readptr is positioned on */
+} WindowObjectData;
+
+PG_FUNCTION_INFO_V1(bad_window);
+Datum
+bad_window(PG_FUNCTION_ARGS)
+{
+	MemoryContext oldcontext = MemoryContextSwitchTo(((WindowObjectData*)fcinfo->context)->winstate->tmpcontext->ecxt_per_tuple_memory);
+
+	char *data = palloc(sizeof(char) * 16);
+	memcpy(data, &oldcontext, 8);
+
+	MemoryContextSwitchTo(oldcontext);
+
+	StringInfoData result_str;
+	initStringInfo(&result_str);
+	appendStringInfoString(&result_str, "my text");
+	memcpy(VARDATA(data+8), result_str.data, 8);
+	SET_VARSIZE(data+8, 8);
+
+	PG_RETURN_POINTER(data + 8);
+}

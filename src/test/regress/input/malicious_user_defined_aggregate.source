@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS t;
+CREATE TABLE t(a text);
+INSERT INTO t SELECT 'food' FROM generate_series(1, 10);
+
+DROP FUNCTION IF EXISTS bad_window(text) CASCADE;
+CREATE FUNCTION bad_window(text)
+   RETURNS text
+   AS '@libdir@/regress@DLSUFFIX@'
+   LANGUAGE C WINDOW IMMUTABLE;
+
+SELECT bad_window(a) OVER (partition by a ORDER BY a) FROM t;
