@@ -6589,9 +6589,9 @@ CTranslatorExprToDXL::PdxlnScAggref(CExpression *pexprAggFunc)
 		edxlaggrefstage = EdxlaggstagePartial;
 	}
 
-	CDXLScalarAggref *pdxlopAggRef = GPOS_NEW(m_mp)
-		CDXLScalarAggref(m_mp, pmdidAggFunc, resolved_rettype,
-						 popScAggFunc->IsDistinct(), edxlaggrefstage);
+	CDXLScalarAggref *pdxlopAggRef = GPOS_NEW(m_mp) CDXLScalarAggref(
+		m_mp, pmdidAggFunc, resolved_rettype, popScAggFunc->IsDistinct(),
+		edxlaggrefstage, popScAggFunc->IsOrdered());
 
 	CDXLNode *pdxlnAggref = GPOS_NEW(m_mp) CDXLNode(m_mp, pdxlopAggRef);
 	TranslateScalarChildren(pexprAggFunc, pdxlnAggref);

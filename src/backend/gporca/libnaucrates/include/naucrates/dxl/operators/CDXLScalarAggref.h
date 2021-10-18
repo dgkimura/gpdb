@@ -57,13 +57,16 @@ private:
 	// Denotes the MPP Stage
 	EdxlAggrefStage m_agg_stage;
 
+	BOOL m_is_ordered;
+
 	// private copy ctor
 	CDXLScalarAggref(const CDXLScalarAggref &);
 
 public:
 	// ctor/dtor
 	CDXLScalarAggref(CMemoryPool *mp, IMDId *agg_mdid, IMDId *resolved_rettype,
-					 BOOL is_distinct, EdxlAggrefStage agg_stage);
+					 BOOL is_distinct, EdxlAggrefStage agg_stage,
+					 BOOL is_ordered);
 
 	virtual ~CDXLScalarAggref();
 
@@ -81,6 +84,8 @@ public:
 	EdxlAggrefStage GetDXLAggStage() const;
 
 	BOOL IsDistinct() const;
+
+	BOOL IsOrdered() const;
 
 	// serialize operator in DXL format
 	virtual void SerializeToDXL(CXMLSerializer *xml_serializer,

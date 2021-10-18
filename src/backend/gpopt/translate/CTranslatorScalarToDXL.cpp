@@ -1225,6 +1225,7 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 	GPOS_ASSERT(IsA(expr, Aggref));
 	const Aggref *aggref = (Aggref *) expr;
 	BOOL is_distinct = false;
+	BOOL is_ordered = false;
 
 	static ULONG mapping[][2] = {
 		{AGGSTAGE_NORMAL, EdxlaggstageNormal},
@@ -1235,8 +1236,7 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 
 	if (aggref->aggorder != NIL)
 	{
-		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiPlStmt2DXLConversion,
-				   GPOS_WSZ_LIT("Ordered aggregates"));
+		is_ordered = true;
 	}
 
 	if (aggref->aggdistinct)
@@ -1292,7 +1292,7 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 	}
 
 	CDXLScalarAggref *aggref_scalar = GPOS_NEW(m_mp) CDXLScalarAggref(
-		m_mp, agg_mdid, resolved_ret_type, is_distinct, agg_stage);
+		m_mp, agg_mdid, resolved_ret_type, is_distinct, agg_stage, is_ordered);
 
 	// create the DXL node holding the scalar aggref
 	CDXLNode *dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, aggref_scalar);

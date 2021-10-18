@@ -60,6 +60,8 @@ private:
 	// distinct aggregate computation
 	BOOL m_is_distinct;
 
+	BOOL m_is_ordered;
+
 	// stage of the aggregate function
 	EAggfuncStage m_eaggfuncstage;
 
@@ -73,7 +75,8 @@ public:
 	// ctor
 	CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 				   IMDId *resolved_rettype, const CWStringConst *pstrAggFunc,
-				   BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit);
+				   BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
+				   BOOL is_ordered);
 
 	// dtor
 	virtual ~CScalarAggFunc()
@@ -151,6 +154,12 @@ public:
 	SetIsDistinct(BOOL val)
 	{
 		m_is_distinct = val;
+	}
+
+	BOOL
+	IsOrdered() const
+	{
+		return m_is_ordered;
 	}
 
 	// stage of the aggregate function

@@ -1693,8 +1693,8 @@ CUtils::PopAggFunc(
 	CMemoryPool *mp, IMDId *pmdidAggFunc, const CWStringConst *pstrAggFunc,
 	BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
 	IMDId *
-		pmdidResolvedReturnType	 // return type to be used if original return type is ambiguous
-)
+		pmdidResolvedReturnType,  // return type to be used if original return type is ambiguous
+	BOOL is_ordered)
 {
 	GPOS_ASSERT(NULL != pmdidAggFunc);
 	GPOS_ASSERT(NULL != pstrAggFunc);
@@ -1703,7 +1703,7 @@ CUtils::PopAggFunc(
 
 	return GPOS_NEW(mp)
 		CScalarAggFunc(mp, pmdidAggFunc, pmdidResolvedReturnType, pstrAggFunc,
-					   is_distinct, eaggfuncstage, fSplit);
+					   is_distinct, eaggfuncstage, fSplit, is_ordered);
 }
 
 // generate an aggregate function

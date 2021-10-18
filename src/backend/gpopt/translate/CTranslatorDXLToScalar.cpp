@@ -558,6 +558,25 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 			aggref->aggdistinct = gpdb::LAppend(aggref->aggdistinct, gc);
 			sortgrpindex++;
 		}
+		if (dxlop->IsOrdered())
+		{
+			new_target_entry->ressortgroupref = sortgrpindex;
+			SortGroupClause *gc = makeNode(SortGroupClause);
+			gc->tleSortGroupRef = sortgrpindex;
+			gc->eqop = gpdb::GetEqualityOp(
+				gpdb::ExprType((Node *) new_target_entry->expr));
+			gc->sortop = gpdb::GetOrderingOpForEqualityOp(gc->eqop, NULL);
+			/*
+			 * Since ORCA doesn't yet support ordered aggregates, we are
+			 * setting nulls_first to false. This is also the default behavior
+			 * when no order by clause is provided so it is OK to set it to
+			 * false.
+			 */
+			gc->nulls_first = false;
+			aggref->aggorder = gpdb::LAppend(aggref->aggorder, gc);
+			aggref->aggkind = 'o';
+			sortgrpindex++;
+		}
 		aggref->args = gpdb::LAppend(aggref->args, new_target_entry);
 	}
 
