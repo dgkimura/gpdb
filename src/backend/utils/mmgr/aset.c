@@ -1129,7 +1129,7 @@ AllocSetAlloc(MemoryContext context, Size size)
 	Assert(block->freeptr <= block->endptr);
 
 	chunk->aset = (void *) set;
-	chunk->size = chunk_size;
+	chunk->size = chunk_size + ALLOC_CHUNKHDRSZ;
 #ifdef MEMORY_CONTEXT_CHECKING
 	chunk->requested_size = size;
 	/* set mark to catch clobber of "unused" space */
@@ -1265,8 +1265,8 @@ AllocSetContains(MemoryContext context, void *pointer) {
 	AllocSet set = (AllocSet) context;
 
 	for (AllocBlock block = set->blocks; block != NULL; block = (AllocBlock) block->next) {
-		void *block_start = (void *)block;
-		void *block_end = (void *)((char *)block + UserPtr_GetUserPtrSize(block));
+		void *block_start = (void *)block + ALLOC_BLOCKHDRSZ;
+		void *block_end = (void *)((char *)block_start + UserPtr_GetUserPtrSize(block));
 		if (pointer >= block_start && pointer < block_end)
 			return true;
 	}
