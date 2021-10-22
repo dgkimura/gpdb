@@ -1721,6 +1721,9 @@ vac_update_datfrozenxid(void)
 	systable_endscan(scan);
 	table_close(relation, AccessShareLock);
 
+	if (bogus)
+		elog(WARNING, "bogus data in %u", MyDatabaseId);
+
 	/* chicken out if bogus data found */
 	if (bogus)
 		return;
@@ -1753,6 +1756,8 @@ vac_update_datfrozenxid(void)
 		dirty = true;
 	else
 		newMinMulti = cached_dbform->datminmxid;
+
+	elog(LOG, "database is %s", dirty ? "dirty" : "not dirty");
 
 	if (dirty)
 	{

@@ -37,6 +37,10 @@ SELECT gp_inject_fault('auto_vac_worker_before_do_autovacuum', 'reset', dbid) fr
 SELECT gp_wait_until_triggered_fault('vacuum_update_dat_frozen_xid', 1, dbid) from gp_segment_configuration where content = 0 and role = 'p';
 SELECT gp_inject_fault('vacuum_update_dat_frozen_xid', 'reset', dbid) from gp_segment_configuration where content = 0 and role = 'p';
 
+-- start_ignore
+SELECT gp_segment_id, age(datfrozenxid) < 200 * 1000000, datname FROM gp_dist_random('pg_database') where gp_segment_id=0;
+-- end_ignore
+
 -- catalog table should be young
 -- We only wait for 1 worker above to update the datfrozenxid. Based
 -- on age of database multiple workers can be invoked to perform the

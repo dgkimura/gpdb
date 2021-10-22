@@ -86,6 +86,11 @@ SELECT gp_inject_fault('vacuum_update_dat_frozen_xid', 'reset', dbid) from gp_se
  Success:
 (1 row)
 
+-- start_ignore
+SELECT gp_segment_id, age(relfrozenxid) < 200 * 1000000 FROM gp_dist_random('pg_class') WHERE relname='pg_class';
+ gp_segment_id | ?column? |  datname
+ ---------------+----------+------------
+-- end_ignore
 -- catalog table should be young
 -- We only wait for 1 worker above to update the datfrozenxid. Based
 -- on age of database multiple workers can be invoked to perform the
