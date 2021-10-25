@@ -1737,6 +1737,17 @@ vac_update_datfrozenxid(void)
 	cached_tuple = SearchSysCache1(DATABASEOID, ObjectIdGetDatum(MyDatabaseId));
 	cached_dbform = (Form_pg_database) GETSTRUCT(cached_tuple);
 
+	elog(LOG, "cached_dbform->datfrozenxid: %ul\n"
+			  "newFrozenXid: %ul\n"
+			  "TransactionIdPrecedes(cached_dbform->datfrozenxid, newFrozenXid): %d\n"
+			  "lastSaneFrozenXid: %ul\n"
+			  "TransactionIdPrecedes(lastSaneFrozenXid, cached_dbform->datfrozenxid): %d",
+			  cached_dbform->datfrozenxid,
+			  newFrozenXid,
+			  TransactionIdPrecedes(cached_dbform->datfrozenxid, newFrozenXid),
+			  lastSaneFrozenXid,
+			  TransactionIdPrecedes(lastSaneFrozenXid, cached_dbform->datfrozenxid));
+
 	/*
 	 * As in vac_update_relstats(), we ordinarily don't want to let
 	 * datfrozenxid go backward; but if it's "in the future" then it must be
