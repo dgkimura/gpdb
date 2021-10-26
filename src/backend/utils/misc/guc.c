@@ -3065,7 +3065,7 @@ static struct config_int ConfigureNamesInt[] =
 			NULL
 		},
 		&autovacuum_max_workers,
-		1, 1, MAX_BACKENDS,
+		3, 1, MAX_BACKENDS,
 		check_autovacuum_max_workers, NULL, NULL
 	},
 
