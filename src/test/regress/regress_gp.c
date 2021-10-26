@@ -1971,7 +1971,8 @@ test_consume_xids(PG_FUNCTION_ARGS)
 
 	while (TransactionIdPrecedes(xid, targetxid))
 	{
-		elog(DEBUG1, "xid: %u", xid);
+		if (xid%1000==0)
+			elog(LOG, "xid: %u", xid);
 		fullxid = GetNewTransactionId(true);
 		xid = XidFromFullTransactionId(fullxid);
 	}
