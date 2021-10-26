@@ -576,6 +576,21 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 			aggref->aggorder = gpdb::LAppend(aggref->aggorder, gc);
 			aggref->aggkind = 'o';
 			sortgrpindex++;
+
+			gc->hashable=true;
+			aggref->aggkind = 'h';
+			aggref->args = gpdb::LAppend(aggref->args, new_target_entry);
+
+			Const *c = makeNode(Const);
+			c->consttype = 23;
+			c->consttypmod = -1;
+			c->constcollid = 0;
+			c->constlen = 4;
+			c->constvalue = gpdb::DatumFromUint32(3);
+			c->constbyval = true;
+			aggref->aggdirectargs = gpdb::LAppend(aggref->aggdirectargs, c);
+
+			break;
 		}
 		aggref->args = gpdb::LAppend(aggref->args, new_target_entry);
 	}
