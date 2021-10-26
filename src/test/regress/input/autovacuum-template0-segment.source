@@ -10,6 +10,7 @@ language C;
 -- start_ignore
 \! gpconfig -c debug_burn_xids -v on --skipvalidation
 \! gpconfig -c autovacuum_naptime -v 5
+\i gpconfig -c autovacuum_max_workers -v 1
 \! gpstop -au
 -- end_ignore
 
@@ -71,6 +72,7 @@ select gp_segment_id, datfrozenxid from gp_dist_random('pg_database') where datn
 -- start_ignore
 \! gpconfig -r debug_burn_xids --skipvalidation
 \! gpconfig -r autovacuum_naptime
+\! gpconfig -r autovacuum_max_workers
 \! gpstop -au
 -- end_ignore
 
