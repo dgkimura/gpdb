@@ -2633,6 +2633,11 @@ deleted:
 	 * going away soon, it's not a problem.
 	 */
 
+	if (table_oids)
+		elog(LOG, "DID_VACUUM: %d len(table_oids): %d", did_vacuum, table_oids->length);
+	else
+		elog(LOG, "DID_VACUUM: %d len(table_oids): 0", did_vacuum);
+
 	/*
 	 * Update pg_database.datfrozenxid, and truncate pg_xact if possible. We
 	 * only need to do this once, not after each table.
@@ -3113,6 +3118,11 @@ relation_needs_vacanalyze(Oid relid,
 		return;
 	}
 
+	elog(LOG, "classForm->relfrozenxid: %d, xidForceLimit: %d, force_vacuum: %d",
+					classForm->relfrozenxid, xidForceLimit,
+					TransactionIdPrecedes(classForm->relfrozenxid,
+										  xidForceLimit));
+
 	/*
 	 * If we found the table in the stats hash, and autovacuum is currently
 	 * enabled, make a threshold-based decision whether to vacuum and/or
@@ -3134,7 +3144,7 @@ relation_needs_vacanalyze(Oid relid,
 		 * reset, because if that happens, the last vacuum and analyze counts
 		 * will be reset too.
 		 */
-		elog(DEBUG3, "%s: vac: %.0f (threshold %.0f), anl: %.0f (threshold %.0f)",
+		elog(LOG, "%s: vac: %.0f (threshold %.0f), anl: %.0f (threshold %.0f)",
 			 NameStr(classForm->relname),
 			 vactuples, vacthresh, anltuples, anlthresh);
 
