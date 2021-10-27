@@ -804,7 +804,7 @@ FaultInjector_SetFaultInjection(
 		case FaultInjectorTypeWaitUntilTriggered:
 		{
 			FaultInjectorEntry_s	*entryLocal;
-			int retry_count = 3000; /* 10 minutes */
+			int retry_count = 6000; /* 20 minutes */
 
 			while ((entryLocal = FaultInjector_LookupHashEntry(entry->faultName)) != NULL &&
 				   entryLocal->faultInjectorState != FaultInjectorStateCompleted &&
