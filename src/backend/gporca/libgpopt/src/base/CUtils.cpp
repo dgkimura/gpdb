@@ -1694,7 +1694,7 @@ CUtils::PopAggFunc(
 	BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
 	IMDId *
 		pmdidResolvedReturnType,  // return type to be used if original return type is ambiguous
-	BOOL is_ordered)
+	BOOL is_ordered, CExpressionArray *direct_args)
 {
 	GPOS_ASSERT(NULL != pmdidAggFunc);
 	GPOS_ASSERT(NULL != pstrAggFunc);
@@ -1703,7 +1703,7 @@ CUtils::PopAggFunc(
 
 	return GPOS_NEW(mp)
 		CScalarAggFunc(mp, pmdidAggFunc, pmdidResolvedReturnType, pstrAggFunc,
-					   is_distinct, eaggfuncstage, fSplit, is_ordered);
+					   is_distinct, eaggfuncstage, fSplit, is_ordered, direct_args);
 }
 
 // generate an aggregate function
@@ -1717,7 +1717,7 @@ CUtils::PexprAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 
 	// generate aggregate function
 	CScalarAggFunc *popScAggFunc = PopAggFunc(
-		mp, pmdidAggFunc, pstrAggFunc, is_distinct, eaggfuncstage, fSplit);
+		mp, pmdidAggFunc, pstrAggFunc, is_distinct, eaggfuncstage, fSplit, NULL, false, NULL);
 
 	// generate function arguments
 	CExpression *pexprScalarIdent = PexprScalarIdent(mp, colref);
@@ -1741,7 +1741,7 @@ CUtils::PexprCountStar(CMemoryPool *mp)
 
 	CScalarAggFunc *popScAggFunc =
 		PopAggFunc(mp, mdid, str, false /*is_distinct*/,
-				   EaggfuncstageGlobal /*eaggfuncstage*/, false /*fSplit*/);
+				   EaggfuncstageGlobal /*eaggfuncstage*/, false /*fSplit*/, NULL, false, NULL);
 
 	CExpression *pexprCountStar =
 		GPOS_NEW(mp) CExpression(mp, popScAggFunc, pdrgpexpr);

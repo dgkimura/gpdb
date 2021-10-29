@@ -1258,7 +1258,6 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 	GPOS_ASSERT(EdxlaggstageSentinel != agg_stage && "Invalid agg stage");
 
 	CMDIdGPDB *agg_mdid = GPOS_NEW(m_mp) CMDIdGPDB(aggref->aggfnoid);
-	GPOS_ASSERT(!m_md_accessor->RetrieveAgg(agg_mdid)->IsOrdered());
 
 	if (0 != aggref->agglevelsup)
 	{
@@ -1307,6 +1306,19 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 		GPOS_ASSERT(NULL != child_node);
 		dxlnode->AddChild(child_node);
 	}
+	//
+	// translate direct args
+	CDXLScalarValuesList *values = GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
+	CDXLNode *value_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, values);
+	ForEach(lc, aggref->aggdirectargs)
+	{
+		Expr *expr = (Expr *) lfirst(lc);
+		CDXLNode *child_node =
+			TranslateScalarToDXL(expr, var_colid_mapping);
+		GPOS_ASSERT(NULL != child_node);
+		value_list_dxlnode->AddChild(child_node);
+	}
+	dxlnode->AddChild(value_list_dxlnode);
 
 	return dxlnode;
 }

@@ -6596,6 +6596,21 @@ CTranslatorExprToDXL::PdxlnScAggref(CExpression *pexprAggFunc)
 	CDXLNode *pdxlnAggref = GPOS_NEW(m_mp) CDXLNode(m_mp, pdxlopAggRef);
 	TranslateScalarChildren(pexprAggFunc, pdxlnAggref);
 
+	// Add direct args
+	CDXLScalarValuesList *values = GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
+	CDXLNode *value_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, values);
+
+	CExpressionArray *direct_args = popScAggFunc->GetDirectArgs();
+	for (ULONG idx=0; idx<direct_args->Size(); idx++)
+	{
+		CExpression *pexprChild = (*direct_args)[idx];
+		CDXLNode *child_dxlnode = PdxlnScalar(pexprChild);
+		GPOS_ASSERT(NULL != child_dxlnode);
+		value_list_dxlnode->AddChild(child_dxlnode);
+	}
+
+	pdxlnAggref->AddChild(value_list_dxlnode);
+
 	return pdxlnAggref;
 }
 

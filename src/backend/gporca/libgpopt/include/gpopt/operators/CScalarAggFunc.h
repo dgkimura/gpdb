@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
+#include "gpopt/operators/CExpression.h"
 #include "naucrates/md/IMDId.h"
 
 namespace gpopt
@@ -68,6 +69,8 @@ private:
 	// is result of splitting aggregates
 	BOOL m_fSplit;
 
+	CExpressionArray *m_pdrgpexprDirectArgs;
+
 	// private copy ctor
 	CScalarAggFunc(const CScalarAggFunc &);
 
@@ -76,7 +79,7 @@ public:
 	CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 				   IMDId *resolved_rettype, const CWStringConst *pstrAggFunc,
 				   BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
-				   BOOL is_ordered);
+				   BOOL is_ordered, CExpressionArray *pdrgpexprDirectArgs);
 
 	// dtor
 	virtual ~CScalarAggFunc()
@@ -181,6 +184,12 @@ public:
 	FSplit() const
 	{
 		return m_fSplit;
+	}
+
+	CExpressionArray *
+	GetDirectArgs() const
+	{
+		return m_pdrgpexprDirectArgs;
 	}
 
 	// type of expression's result

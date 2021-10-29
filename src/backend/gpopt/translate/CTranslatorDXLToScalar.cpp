@@ -526,7 +526,17 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 	}
 
 	// translate each DXL argument
-	List *exprs = TranslateScalarChildren(aggref->args, aggref_node, colid_var);
+	//List *exprs = TranslateScalarChildren(aggref->args, aggref_node, colid_var);
+	List *exprs = aggref->args;
+
+	// Skip last child (scalar values list for direct args)
+	const ULONG arity = aggref_node->Arity()-1;
+	for (ULONG ul = 0; ul < arity; ul++)
+	{
+		CDXLNode *child_dxl = (*aggref_node)[ul];
+		Expr *child_expr = TranslateDXLToScalar(child_dxl, colid_var);
+		exprs = gpdb::LAppend(exprs, child_expr);
+	}
 
 	int attno;
 	aggref->args = NIL;

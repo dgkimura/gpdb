@@ -206,6 +206,7 @@ CDXLScalarAggref::SerializeToDXL(CXMLSerializer *xml_serializer,
 		m_resolved_rettype_mdid->Serialize(
 			xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
 	}
+	// Serializes all children - including scalar values list (direct args)
 	dxlnode->SerializeChildrenToDXL(xml_serializer);
 
 	xml_serializer->CloseElement(

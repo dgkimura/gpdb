@@ -3063,19 +3063,24 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 		resolved_return_type_mdid->AddRef();
 	}
 
-	CScalarAggFunc *popScAggFunc = CUtils::PopAggFunc(
-		m_mp, agg_func_mdid,
-		GPOS_NEW(m_mp)
-			CWStringConst(m_mp, (pmdagg->Mdname().GetMDName())->GetBuffer()),
-		dxl_op->IsDistinct(), agg_func_stage, fSplit, resolved_return_type_mdid,
-		dxl_op->IsOrdered());
-
 	CExpression *pexprAggFunc = NULL;
 
-	if (0 < pdxlnAggref->Arity())
+	// direct args always exists
+	if (1 < pdxlnAggref->Arity())
 	{
 		// translate function arguments
-		CExpressionArray *pdrgpexprArgs = PdrgpexprChildren(pdxlnAggref);
+		CExpressionArray *pdrgpexprArgs = GPOS_NEW(m_mp) CExpressionArray(m_mp);
+
+		// FIXME: Last element is a scalar values list containing direct args...
+		const ULONG arity = pdxlnAggref->Arity();
+		for (ULONG ul = 0; ul < arity-1; ul++)
+		{
+			// get next child arg and translate it.
+			// skip last child (direct arg list)
+			CDXLNode *child_dxlnode = (*pdxlnAggref)[ul];
+			CExpression *pexprChild = Pexpr(child_dxlnode);
+			pdrgpexprArgs->Append(pexprChild);
+		}
 
 		// check if the arguments have set returning functions, if so raise an exception
 		for (ULONG ul = 0; ul < pdrgpexprArgs->Size(); ul++)
@@ -3091,11 +3096,30 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 			}
 		}
 
+		// TODO: get last child (direct arg list) and link to CScalarAggRef
+		CExpressionArray *directArgs = PdrgpexprChildren((*pdxlnAggref)[pdxlnAggref->Arity()-1]);
+
+		CScalarAggFunc *popScAggFunc = CUtils::PopAggFunc(
+			m_mp, agg_func_mdid,
+			GPOS_NEW(m_mp)
+				CWStringConst(m_mp, (pmdagg->Mdname().GetMDName())->GetBuffer()),
+			dxl_op->IsDistinct(), agg_func_stage, fSplit, resolved_return_type_mdid,
+			dxl_op->IsOrdered(), directArgs);
+
 		pexprAggFunc =
 			GPOS_NEW(m_mp) CExpression(m_mp, popScAggFunc, pdrgpexprArgs);
 	}
 	else
 	{
+		CExpressionArray *directArgs = PdrgpexprChildren((*pdxlnAggref)[pdxlnAggref->Arity()-1]);
+
+		CScalarAggFunc *popScAggFunc = CUtils::PopAggFunc(
+			m_mp, agg_func_mdid,
+			GPOS_NEW(m_mp)
+				CWStringConst(m_mp, (pmdagg->Mdname().GetMDName())->GetBuffer()),
+			dxl_op->IsDistinct(), agg_func_stage, fSplit, resolved_return_type_mdid,
+			dxl_op->IsOrdered(), directArgs);
+
 		// aggregate function has no arguments
 		pexprAggFunc = GPOS_NEW(m_mp) CExpression(m_mp, popScAggFunc);
 	}
