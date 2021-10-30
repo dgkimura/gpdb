@@ -204,7 +204,7 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 				CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 			popScAggFunc->IsDistinct(), EaggfuncstageLocal, /* fGlobal */
 			true,											/* fSplit */
-			NULL, false, NULL
+			NULL, false, NULL, NULL
 		);
 
 		popScAggFunc->MDId()->AddRef();
@@ -214,7 +214,7 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 				CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 			false /* is_distinct */, EaggfuncstageGlobal, /* fGlobal */
 			true,										  /* fSplit */
-			NULL, false, NULL
+			NULL, false, NULL, NULL
 		);
 
 		// determine column reference for the new project element

@@ -530,7 +530,8 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 	List *exprs = aggref->args;
 
 	// Skip last child (scalar values list for direct args)
-	const ULONG arity = aggref_node->Arity()-1;
+	// Skip next to last child (scalar values list for sort group clause)
+	const ULONG arity = aggref_node->Arity()-2;
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CDXLNode *child_dxl = (*aggref_node)[ul];

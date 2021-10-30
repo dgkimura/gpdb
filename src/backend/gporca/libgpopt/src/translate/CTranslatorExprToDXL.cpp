@@ -6611,6 +6611,22 @@ CTranslatorExprToDXL::PdxlnScAggref(CExpression *pexprAggFunc)
 
 	pdxlnAggref->AddChild(value_list_dxlnode);
 
+	// Add sort group clauses
+
+	CDXLScalarValuesList *sgc_values = GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
+	CDXLNode *sgc_value_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, sgc_values);
+
+	CExpressionArray *sortgroupclauses = popScAggFunc->GetSortGroupClauses();
+	for (ULONG idx=0; idx<sortgroupclauses->Size(); idx++)
+	{
+		CExpression *pexprChild = (*sortgroupclauses)[idx];
+		CDXLNode *child_dxlnode = PdxlnScalar(pexprChild);
+		GPOS_ASSERT(NULL != child_dxlnode);
+		sgc_value_list_dxlnode->AddChild(child_dxlnode);
+	}
+
+	pdxlnAggref->AddChild(sgc_value_list_dxlnode);
+
 	return pdxlnAggref;
 }
 

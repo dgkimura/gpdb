@@ -1326,7 +1326,7 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 		GPOS_ASSERT(NULL != child_node);
 		dxlnode->AddChild(child_node);
 	}
-	//
+
 	// translate direct args
 	CDXLScalarValuesList *values = GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
 	CDXLNode *value_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, values);
@@ -1339,6 +1339,19 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 		value_list_dxlnode->AddChild(child_node);
 	}
 	dxlnode->AddChild(value_list_dxlnode);
+
+	// translate sort group clause
+	CDXLScalarValuesList *sgc_values = GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
+	CDXLNode *sgc_value_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, sgc_values);
+	ForEach(lc, aggref->aggorder)
+	{
+		Expr *expr = (Expr *) lfirst(lc);
+		CDXLNode *child_node =
+			TranslateScalarToDXL(expr, var_colid_mapping);
+		GPOS_ASSERT(NULL != child_node);
+		sgc_value_list_dxlnode->AddChild(child_node);
+	}
+	dxlnode->AddChild(sgc_value_list_dxlnode);
 
 	return dxlnode;
 }
