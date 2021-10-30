@@ -39,6 +39,7 @@ extern "C" {
 #include "naucrates/dxl/operators/CDXLDatumInt4.h"
 #include "naucrates/dxl/operators/CDXLDatumInt8.h"
 #include "naucrates/dxl/operators/CDXLDatumOid.h"
+#include "naucrates/dxl/operators/CDXLSortGroupClause.h"
 #include "naucrates/dxl/xml/dxltokens.h"
 #include "naucrates/md/CMDTypeGenericGPDB.h"
 #include "naucrates/md/IMDAggregate.h"
@@ -162,6 +163,24 @@ CTranslatorScalarToDXL::EdxlbooltypeFromGPDBBoolType(
 	return type;
 }
 
+CDXLNode *
+CTranslatorScalarToDXL::TranslateSortGroupClauseToDXL(
+	const Expr *expr, const CMappingVarColId *var_colid_mapping)
+{
+	GPOS_ASSERT(IsA(expr, SortGroupClause));
+	const SortGroupClause *sgc = (SortGroupClause *) expr;
+
+	CDXLSortGroupClause *sort_group_clause =
+		GPOS_NEW(m_mp) CDXLSortGroupClause(m_mp,
+			sgc->tleSortGroupRef,sgc->eqop, sgc->sortop,
+			sgc->nulls_first, sgc->hashable);
+
+	// create the DXL node holding the scalar ident operator
+	CDXLNode *dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, sort_group_clause);
+
+	return dxlnode;
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CTranslatorScalarToDXL::TranslateVarToDXL
@@ -266,6 +285,7 @@ CTranslatorScalarToDXL::TranslateScalarToDXL(
 		{T_SubLink, &CTranslatorScalarToDXL::TranslateSubLinkToDXL},
 		{T_ArrayExpr, &CTranslatorScalarToDXL::TranslateArrayExprToDXL},
 		{T_ArrayRef, &CTranslatorScalarToDXL::TranslateArrayRefToDXL},
+		{T_SortGroupClause, &CTranslatorScalarToDXL::TranslateSortGroupClauseToDXL},
 	};
 
 	const ULONG num_translators = GPOS_ARRAY_SIZE(translators);

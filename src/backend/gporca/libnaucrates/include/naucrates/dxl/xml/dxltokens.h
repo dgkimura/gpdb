@@ -176,6 +176,7 @@ enum Edxltoken
 	EdxltokenScalarSortCol,
 	EdxltokenScalarSortColList,
 	EdxltokenScalarGroupingColList,
+	EdxltokenScalarSortGroupClause,
 
 	EdxltokenScalarBitmapAnd,
 	EdxltokenScalarBitmapOr,
