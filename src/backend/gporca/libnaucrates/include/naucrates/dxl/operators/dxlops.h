@@ -133,6 +133,7 @@
 #include "naucrates/dxl/operators/CDXLScalarValuesList.h"
 #include "naucrates/dxl/operators/CDXLScalarWindowFrameEdge.h"
 #include "naucrates/dxl/operators/CDXLScalarWindowRef.h"
+#include "naucrates/dxl/operators/CDXLSortGroupClause.h"
 #include "naucrates/dxl/operators/CDXLSpoolInfo.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
 #include "naucrates/dxl/operators/CDXLWindowFrame.h"

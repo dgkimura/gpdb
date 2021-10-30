@@ -39,6 +39,7 @@
 #include "naucrates/md/IMDRelation.h"
 #include "naucrates/md/IMDScalarOp.h"
 #include "naucrates/traceflags/traceflags.h"
+#include "gpopt/operators/CScalarSortGroupClause.h"
 
 #define GPDB_DENSE_RANK_OID 7002
 #define GPDB_PERCENT_RANK_OID 7003
@@ -196,7 +197,7 @@ CTranslatorDXLToExpr::InitTranslators()
 		{EdxlopScalarArrayRef, &gpopt::CTranslatorDXLToExpr::PexprArrayRef},
 		{EdxlopScalarArrayRefIndexList,
 		 &gpopt::CTranslatorDXLToExpr::PexprArrayRefIndexList},
-		//{EdxlopScalarSortGroupClause, &gpopt::CTranslatorDXLToExpr::PexprScalarSortGroupClause},
+		{EdxlopScalarSortGroupClause, &gpopt::CTranslatorDXLToExpr::PexprSortGroupClause},
 	};
 
 	const ULONG translators_mapping_len = GPOS_ARRAY_SIZE(translators_mapping);
@@ -3711,19 +3712,23 @@ CTranslatorDXLToExpr::PexprScalarConst(const CDXLNode *pdxlnConstVal)
 	return GPOS_NEW(m_mp) CExpression(m_mp, popConst);
 }
 
-//CExpression *
-//CTranslatorDXLToExpr::PexprScalarSortGroupClause(const CDXLNode *pdxlnSortGroupClause)
-//{
-//	GPOS_ASSERT(NULL != pdxlnConstVal);
-//
-//	// translate the dxl scalar const value
-//	CDXLScalarConstValue *dxl_op =
-//		CDXLScalarConstValue::Cast(pdxlnConstVal->GetOperator());
-//	CScalarConst *popConst =
-//		CTranslatorDXLToExprUtils::PopConst(m_mp, m_pmda, dxl_op);
-//
-//	return GPOS_NEW(m_mp) CExpression(m_mp, popConst);
-//}
+CExpression *
+CTranslatorDXLToExpr::PexprSortGroupClause(const CDXLNode *pdxlnSortGroupClause)
+{
+	GPOS_ASSERT(NULL != pdxlnSortGroupClause);
+
+	// translate the dxl scalar const value
+	CDXLSortGroupClause *dxl_op =
+		CDXLSortGroupClause::Cast(pdxlnSortGroupClause->GetOperator());
+	CScalarSortGroupClause *sgc = GPOS_NEW(m_mp) CScalarSortGroupClause(m_mp,
+		dxl_op->Index(),
+		dxl_op->EqOp(),
+		dxl_op->SortOp(),
+		dxl_op->NullsFirst(),
+		dxl_op->IsHashable());
+
+	return GPOS_NEW(m_mp) CExpression(m_mp, sgc);
+}
 
 //---------------------------------------------------------------------------
 //	@function:

@@ -147,6 +147,7 @@ public:
 		EopScalarProjectList,
 		EopScalarNAryJoinPredList,
 		EopScalarConst,
+		EopScalarSortGroupClause,
 		EopScalarBoolOp,
 		EopScalarFunc,
 		EopScalarMinMax,

@@ -1,0 +1,114 @@
+//---------------------------------------------------------------------------
+//	Greenplum Database
+//	Copyright (C) 2011 EMC Corp.
+//
+//	@filename:
+//		CScalarSortGroupClause.h
+//
+//	@doc:
+//		An operator class that wraps a scalar constant
+//---------------------------------------------------------------------------
+#ifndef GPOPT_CScalarSortGroupClause_H
+#define GPOPT_CScalarSortGroupClause_H
+
+#include "gpos/base.h"
+
+#include "gpopt/base/CColRefSet.h"
+#include "gpopt/base/CDrvdProp.h"
+#include "gpopt/operators/CScalar.h"
+#include "naucrates/base/IDatum.h"
+
+namespace gpopt
+{
+using namespace gpos;
+using namespace gpnaucrates;
+
+//---------------------------------------------------------------------------
+//	@class:
+//		CScalarSortGroupClause
+//
+//	@doc:
+//		A wrapper operator for scalar constants
+//
+//---------------------------------------------------------------------------
+class CScalarSortGroupClause : public CScalar
+{
+private:
+	INT m_tle_sort_group_ref;
+	INT m_eqop;
+	INT m_sortop;
+	BOOL m_nulls_first;
+	BOOL m_hashable;
+
+	// private copy ctor
+	CScalarSortGroupClause(const CScalarSortGroupClause &);
+
+public:
+	// ctor
+	CScalarSortGroupClause(CMemoryPool *mp, INT tle_sort_group_ref, INT eqop, INT sortop, BOOL nulls_first, BOOL hashable)
+		: CScalar(mp),  m_tle_sort_group_ref(tle_sort_group_ref), m_eqop(eqop), m_sortop(sortop), m_nulls_first(nulls_first),  m_hashable(hashable){}
+
+	// dtor
+	virtual ~CScalarSortGroupClause();
+
+	// identity accessor
+	virtual EOperatorId
+	Eopid() const
+	{
+		return EopScalarConst;
+	}
+
+	// return a string for operator name
+	virtual const CHAR *
+	SzId() const
+	{
+		return "CScalarSortGroupClause";
+	}
+
+	// operator specific hash function
+	virtual ULONG HashValue() const { return 0; }
+
+	// match function
+	virtual BOOL Matches(COperator *) const { return false; }
+
+	// return a copy of the operator with remapped columns
+	// conversion function
+	static CScalarSortGroupClause *
+	PopConvert(COperator *pop)
+	{
+		GPOS_ASSERT(NULL != pop);
+		GPOS_ASSERT(EopScalarSortGroupClause == pop->Eopid());
+
+		return reinterpret_cast<CScalarSortGroupClause *>(pop);
+	}
+
+	// the type of the scalar expression
+	virtual IMDId *MdidType() const { return NULL; }
+
+	virtual INT TypeModifier() const { return 0; }
+
+	// boolean expression evaluation
+	virtual EBoolEvalResult Eber(ULongPtrArray *) const { return EberAny; }
+
+	virtual COperator *
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+	)
+	{
+		return PopCopyDefault();
+	}
+
+	virtual BOOL FInputOrderSensitive() const { return false; }
+
+	// print
+	virtual IOstream &OsPrint(IOstream &io) const { return io; }
+
+};	// class CScalarSortGroupClause
+
+}  // namespace gpopt
+
+
+#endif	// !GPOPT_CScalarSortGroupClause_H
+
+// EOF

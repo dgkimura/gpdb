@@ -69,15 +69,23 @@ public:
 	BOOL NullsFirst() const { return m_nulls_first; }
 	BOOL IsHashable() const { return m_hashable; }
 
+	static CDXLSortGroupClause *
+	Cast(CDXLOperator *dxl_op)
+	{
+		GPOS_ASSERT(NULL != dxl_op);
+		GPOS_ASSERT(EdxlopScalarSortGroupClause == dxl_op->GetDXLOperator());
+
+		return dynamic_cast<CDXLSortGroupClause *>(dxl_op);
+	}
+
 	// does the operator return a boolean result
-	virtual BOOL HasBoolResult(CMDAccessor *md_accessor) const { return false; }
+	virtual BOOL HasBoolResult(CMDAccessor *) const { return false; }
 
 #ifdef GPOS_DEBUG
-	virtual void AssertValid(const CDXLNode *dxlnode,
-							 BOOL validate_children) const {}
+	virtual void AssertValid(const CDXLNode *, BOOL) const {}
 #endif	// GPOS_DEBUG
 
-	virtual Edxlopid GetDXLOperator() const { return Edxlopid::EdxlopScalarSortGroupClause; }
+	virtual Edxlopid GetDXLOperator() const { return EdxlopScalarSortGroupClause; }
 
 	virtual const CWStringConst *GetOpNameStr() const 
 	{
