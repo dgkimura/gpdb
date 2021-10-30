@@ -45,17 +45,23 @@ private:
 
 public:
 	// ctor
-	CScalarSortGroupClause(CMemoryPool *mp, INT tle_sort_group_ref, INT eqop, INT sortop, BOOL nulls_first, BOOL hashable)
-		: CScalar(mp),  m_tle_sort_group_ref(tle_sort_group_ref), m_eqop(eqop), m_sortop(sortop), m_nulls_first(nulls_first),  m_hashable(hashable){}
+	CScalarSortGroupClause(CMemoryPool *mp, INT tle_sort_group_ref, INT eqop,
+						   INT sortop, BOOL nulls_first, BOOL hashable);
 
 	// dtor
 	virtual ~CScalarSortGroupClause();
+
+	INT Index() const { return m_tle_sort_group_ref; }
+	INT EqOp() const { return m_eqop; }
+	INT SortOp() const { return m_sortop; }
+	BOOL NullsFirst() const { return m_nulls_first; }
+	BOOL IsHashable() const { return m_hashable; }
 
 	// identity accessor
 	virtual EOperatorId
 	Eopid() const
 	{
-		return EopScalarConst;
+		return EopScalarSortGroupClause;
 	}
 
 	// return a string for operator name
@@ -66,10 +72,10 @@ public:
 	}
 
 	// operator specific hash function
-	virtual ULONG HashValue() const { return 0; }
+	virtual ULONG HashValue() const;
 
 	// match function
-	virtual BOOL Matches(COperator *) const { return false; }
+	virtual BOOL Matches(COperator *op) const;
 
 	// return a copy of the operator with remapped columns
 	// conversion function
@@ -85,10 +91,10 @@ public:
 	// the type of the scalar expression
 	virtual IMDId *MdidType() const { return NULL; }
 
-	virtual INT TypeModifier() const { return 0; }
+	virtual INT TypeModifier() const;
 
 	// boolean expression evaluation
-	virtual EBoolEvalResult Eber(ULongPtrArray *) const { return EberAny; }
+	virtual EBoolEvalResult Eber(ULongPtrArray *) const;
 
 	virtual COperator *
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
@@ -102,7 +108,7 @@ public:
 	virtual BOOL FInputOrderSensitive() const { return false; }
 
 	// print
-	virtual IOstream &OsPrint(IOstream &io) const { return io; }
+	virtual IOstream &OsPrint(IOstream &io) const;
 
 };	// class CScalarSortGroupClause
 

@@ -137,6 +137,7 @@ CTranslatorExprToDXL::InitScalarTranslators()
 		{COperator::EopScalarBoolOp,
 		 &gpopt::CTranslatorExprToDXL::PdxlnScBoolExpr},
 		{COperator::EopScalarConst, &gpopt::CTranslatorExprToDXL::PdxlnScConst},
+		{COperator::EopScalarSortGroupClause, &gpopt::CTranslatorExprToDXL::PdxlnScSortGroupClause},
 		{COperator::EopScalarFunc,
 		 &gpopt::CTranslatorExprToDXL::PdxlnScFuncExpr},
 		{COperator::EopScalarWindowFunc,
@@ -7484,6 +7485,21 @@ CTranslatorExprToDXL::PdxlnScConst(CExpression *pexprScConst)
 
 	CDXLNode *dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, pmdtype->GetDXLOpScConst(m_mp, datum));
+
+	return dxlnode;
+}
+CDXLNode *
+CTranslatorExprToDXL::PdxlnScSortGroupClause(CExpression *pexprScSortGroupClause)
+{
+	GPOS_ASSERT(NULL != pexprScSortGroupClause);
+
+	CScalarSortGroupClause *pop = CScalarSortGroupClause::PopConvert(pexprScSortGroupClause->Pop());
+
+	CDXLNode *dxlnode =
+		GPOS_NEW(m_mp) CDXLNode(m_mp,
+			GPOS_NEW(m_mp) CDXLSortGroupClause(m_mp, pop->Index(), pop->EqOp(),
+											 pop->SortOp(), pop->NullsFirst(),
+											 pop->IsHashable()));
 
 	return dxlnode;
 }

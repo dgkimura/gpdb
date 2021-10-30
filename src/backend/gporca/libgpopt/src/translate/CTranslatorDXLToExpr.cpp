@@ -39,7 +39,6 @@
 #include "naucrates/md/IMDRelation.h"
 #include "naucrates/md/IMDScalarOp.h"
 #include "naucrates/traceflags/traceflags.h"
-#include "gpopt/operators/CScalarSortGroupClause.h"
 
 #define GPDB_DENSE_RANK_OID 7002
 #define GPDB_PERCENT_RANK_OID 7003

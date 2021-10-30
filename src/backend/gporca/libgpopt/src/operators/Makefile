@@ -164,6 +164,7 @@ OBJS        = CExpression.o \
               CScalarCoerceToDomain.o \
               CScalarCoerceViaIO.o \
               CScalarConst.o \
+              CScalarSortGroupClause.o \
               CScalarDMLAction.o \
               CScalarFunc.o \
               CScalarIdent.o \
