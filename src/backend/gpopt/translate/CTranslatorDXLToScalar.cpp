@@ -143,6 +143,8 @@ CTranslatorDXLToScalar::TranslateDXLToScalar(const CDXLNode *dxlnode,
 		 &CTranslatorDXLToScalar::TranslateDXLScalarPartListValuesToScalar},
 		{EdxlopScalarPartListNullTest,
 		 &CTranslatorDXLToScalar::TranslateDXLScalarPartListNullTestToScalar},
+		{EdxlopScalarSortGroupClause,
+		 &CTranslatorDXLToScalar::TranslateDXLSortGroupClauseToScalar},
 	};
 
 	const ULONG num_translators = GPOS_ARRAY_SIZE(translators);
@@ -529,8 +531,11 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 	//List *exprs = TranslateScalarChildren(aggref->args, aggref_node, colid_var);
 	List *exprs = aggref->args;
 
-	// Skip last child (scalar values list for direct args)
-	// Skip next to last child (scalar values list for sort group clause)
+	// Skip next to last child (scalar values list for direct args)
+	const ULONG directidx = aggref_node->Arity()-2;
+	// Skip last child (scalar values list for sort group clause)
+	const ULONG sortidx = aggref_node->Arity()-1;
+
 	const ULONG arity = aggref_node->Arity()-2;
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
@@ -569,41 +574,32 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 			aggref->aggdistinct = gpdb::LAppend(aggref->aggdistinct, gc);
 			sortgrpindex++;
 		}
+		aggref->args = gpdb::LAppend(aggref->args, new_target_entry);
 		if (dxlop->IsOrdered())
 		{
 			new_target_entry->ressortgroupref = sortgrpindex;
-			SortGroupClause *gc = makeNode(SortGroupClause);
-			gc->tleSortGroupRef = sortgrpindex;
-			gc->eqop = gpdb::GetEqualityOp(
-				gpdb::ExprType((Node *) new_target_entry->expr));
-			gc->sortop = gpdb::GetOrderingOpForEqualityOp(gc->eqop, NULL);
-			/*
-			 * Since ORCA doesn't yet support ordered aggregates, we are
-			 * setting nulls_first to false. This is also the default behavior
-			 * when no order by clause is provided so it is OK to set it to
-			 * false.
-			 */
-			gc->nulls_first = false;
-			aggref->aggorder = gpdb::LAppend(aggref->aggorder, gc);
+
 			aggref->aggkind = 'o';
 			sortgrpindex++;
 
-			gc->hashable=true;
 			aggref->aggkind = 'h';
-			aggref->args = gpdb::LAppend(aggref->args, new_target_entry);
-
-			Const *c = makeNode(Const);
-			c->consttype = 23;
-			c->consttypmod = -1;
-			c->constcollid = 0;
-			c->constlen = 4;
-			c->constvalue = gpdb::DatumFromUint32(3);
-			c->constbyval = true;
-			aggref->aggdirectargs = gpdb::LAppend(aggref->aggdirectargs, c);
-
-			break;
 		}
-		aggref->args = gpdb::LAppend(aggref->args, new_target_entry);
+
+	}
+	CDXLNode *directargs = (*aggref_node)[directidx];
+	for (ULONG i=0; i<directargs->Arity(); i++)
+	{
+		Const *c = (Const*)TranslateDXLToScalar((*directargs)[i], colid_var);
+		aggref->aggdirectargs = gpdb::LAppend(aggref->aggdirectargs, c);
+	}
+	if (dxlop->IsOrdered())
+	{
+		CDXLNode *sortgroupclauess = (*aggref_node)[sortidx];
+		for (ULONG i=0; i<sortgroupclauess->Arity(); i++)
+		{
+			SortGroupClause *gc = (SortGroupClause*)TranslateDXLToScalar((*sortgroupclauess)[i], colid_var);
+			aggref->aggorder = gpdb::LAppend(aggref->aggorder, gc);
+		}
 	}
 
 	// GPDB_91_MERGE_FIXME: collation
@@ -1931,6 +1927,24 @@ CTranslatorDXLToScalar::TranslateDXLScalarPartListNullTestToScalar(
 	PartListNullTestExpr *expr = MakeNode(PartListNullTestExpr);
 	expr->level = dxlop->GetPartitioningLevel();
 	expr->nulltesttype = dxlop->IsNull() ? IS_NULL : IS_NOT_NULL;
+
+	return (Expr *) expr;
+}
+Expr *
+CTranslatorDXLToScalar::TranslateDXLSortGroupClauseToScalar(
+	const CDXLNode *node,
+	CMappingColIdVar *	//colid_var
+)
+{
+	CDXLSortGroupClause *dxlop = CDXLSortGroupClause::Cast(
+		node->GetOperator());
+
+	SortGroupClause *expr = MakeNode(SortGroupClause);
+	expr->tleSortGroupRef = dxlop->Index();
+	expr->eqop = dxlop->EqOp();
+	expr->sortop = dxlop->SortOp();
+	expr->nulls_first = dxlop->NullsFirst();
+	expr->hashable = dxlop->IsHashable();
 
 	return (Expr *) expr;
 }
