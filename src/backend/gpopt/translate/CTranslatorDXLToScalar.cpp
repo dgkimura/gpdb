@@ -579,10 +579,9 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 		{
 			new_target_entry->ressortgroupref = sortgrpindex;
 
-			aggref->aggkind = 'o';
 			sortgrpindex++;
 
-			aggref->aggkind = 'h';
+			aggref->aggkind = dxlop->GetAggKind();
 		}
 
 	}

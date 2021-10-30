@@ -4359,7 +4359,7 @@ CXformUtils::PexprWinFuncAgg2ScalarAgg(CMemoryPool *mp,
 							   mp, popScWinFunc->PstrFunc()->GetBuffer()),
 						   popScWinFunc->IsDistinct(), EaggfuncstageGlobal,
 						   false, // fSplit
-						   NULL, false, NULL, NULL
+						   NULL, false, 'n', NULL, NULL
 						   ),
 		pdrgpexprWinFuncArgs);
 }

@@ -241,7 +241,7 @@ public:
 		CMemoryPool *mp, IMDId *pmdidAggFunc, const CWStringConst *pstrAggFunc,
 		BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
 		IMDId *pmdidResolvedReturnType, // return type to be used if original return type is ambiguous
-		BOOL is_ordered, CExpressionArray *direct_args, CExpressionArray *sort_group_clauses);
+		BOOL is_ordered, CHAR aggkind, CExpressionArray *direct_args, CExpressionArray *sort_group_clauses);
 
 	// generate an aggregate function
 	static CExpression *PexprAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,

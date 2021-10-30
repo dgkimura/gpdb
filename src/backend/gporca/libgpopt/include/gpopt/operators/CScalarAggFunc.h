@@ -63,6 +63,8 @@ private:
 
 	BOOL m_is_ordered;
 
+	CHAR m_aggkind;
+
 	// stage of the aggregate function
 	EAggfuncStage m_eaggfuncstage;
 
@@ -81,7 +83,7 @@ public:
 	CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 				   IMDId *resolved_rettype, const CWStringConst *pstrAggFunc,
 				   BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
-				   BOOL is_ordered, CExpressionArray *pdrgpexprDirectArgs,
+				   BOOL is_ordered, CHAR aggkind, CExpressionArray *pdrgpexprDirectArgs,
 				   CExpressionArray *m_sortGroupClauses);
 
 	// dtor
@@ -166,6 +168,12 @@ public:
 	IsOrdered() const
 	{
 		return m_is_ordered;
+	}
+
+	CHAR
+	AggKind() const
+	{
+		return m_aggkind;
 	}
 
 	// stage of the aggregate function

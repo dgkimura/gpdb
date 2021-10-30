@@ -59,6 +59,8 @@ private:
 
 	BOOL m_is_ordered;
 
+	CHAR m_aggkind;
+
 	// private copy ctor
 	CDXLScalarAggref(const CDXLScalarAggref &);
 
@@ -66,7 +68,7 @@ public:
 	// ctor/dtor
 	CDXLScalarAggref(CMemoryPool *mp, IMDId *agg_mdid, IMDId *resolved_rettype,
 					 BOOL is_distinct, EdxlAggrefStage agg_stage,
-					 BOOL is_ordered);
+					 BOOL is_ordered, CHAR aggkind);
 
 	virtual ~CDXLScalarAggref();
 
@@ -86,6 +88,8 @@ public:
 	BOOL IsDistinct() const;
 
 	BOOL IsOrdered() const;
+
+	CHAR GetAggKind() const { return m_aggkind; }
 
 	// serialize operator in DXL format
 	virtual void SerializeToDXL(CXMLSerializer *xml_serializer,
