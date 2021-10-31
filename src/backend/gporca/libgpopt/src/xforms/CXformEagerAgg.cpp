@@ -318,7 +318,8 @@ CXformEagerAgg::PopulateLowerProjectElement(
 	agg_mdid->AddRef();
 	CScalarAggFunc *lower_agg_func = CUtils::PopAggFunc(
 		mp, agg_mdid, agg_name, is_distinct, EaggfuncstageLocal, true, NULL,
-		false, 'n', NULL, NULL);
+		false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
+		GPOS_NEW(mp) CExpressionArray(mp));
 	// add the arguments for the lower aggregate function, which is
 	// going to be the same as the original aggregate function
 	agg_arg_array->AddRef();
@@ -355,7 +356,8 @@ CXformEagerAgg::PopulateUpperProjectElement(
 	agg_mdid->AddRef();
 	CScalarAggFunc *upper_agg_func = CUtils::PopAggFunc(
 		mp, agg_mdid, agg_name, is_distinct, EaggfuncstageGlobal, true, NULL,
-		false, 'n', NULL, NULL);
+		false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
+		GPOS_NEW(mp) CExpressionArray(mp));
 
 	// populate the argument list for the upper aggregate function
 	CExpressionArray *upper_agg_arg_array = GPOS_NEW(mp) CExpressionArray(mp);

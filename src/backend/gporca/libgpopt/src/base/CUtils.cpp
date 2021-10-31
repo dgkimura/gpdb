@@ -1720,7 +1720,8 @@ CUtils::PexprAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 	// generate aggregate function
 	CScalarAggFunc *popScAggFunc =
 		PopAggFunc(mp, pmdidAggFunc, pstrAggFunc, is_distinct, eaggfuncstage,
-				   fSplit, NULL, false, 'n', NULL, NULL);
+				   fSplit, NULL, false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
+				   GPOS_NEW(mp) CExpressionArray(mp));
 
 	// generate function arguments
 	CExpression *pexprScalarIdent = PexprScalarIdent(mp, colref);
@@ -1745,7 +1746,8 @@ CUtils::PexprCountStar(CMemoryPool *mp)
 	CScalarAggFunc *popScAggFunc =
 		PopAggFunc(mp, mdid, str, false /*is_distinct*/,
 				   EaggfuncstageGlobal /*eaggfuncstage*/, false /*fSplit*/,
-				   NULL, false, 'n', NULL, NULL);
+				   NULL, false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
+				   GPOS_NEW(mp) CExpressionArray(mp));
 
 	CExpression *pexprCountStar =
 		GPOS_NEW(mp) CExpression(mp, popScAggFunc, pdrgpexpr);
