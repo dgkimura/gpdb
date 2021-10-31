@@ -51,11 +51,31 @@ public:
 	// dtor
 	virtual ~CScalarSortGroupClause();
 
-	INT Index() const { return m_tle_sort_group_ref; }
-	INT EqOp() const { return m_eqop; }
-	INT SortOp() const { return m_sortop; }
-	BOOL NullsFirst() const { return m_nulls_first; }
-	BOOL IsHashable() const { return m_hashable; }
+	INT
+	Index() const
+	{
+		return m_tle_sort_group_ref;
+	}
+	INT
+	EqOp() const
+	{
+		return m_eqop;
+	}
+	INT
+	SortOp() const
+	{
+		return m_sortop;
+	}
+	BOOL
+	NullsFirst() const
+	{
+		return m_nulls_first;
+	}
+	BOOL
+	IsHashable() const
+	{
+		return m_hashable;
+	}
 
 	// identity accessor
 	virtual EOperatorId
@@ -89,7 +109,11 @@ public:
 	}
 
 	// the type of the scalar expression
-	virtual IMDId *MdidType() const { return NULL; }
+	virtual IMDId *
+	MdidType() const
+	{
+		return NULL;
+	}
 
 	virtual INT TypeModifier() const;
 
@@ -105,7 +129,11 @@ public:
 		return PopCopyDefault();
 	}
 
-	virtual BOOL FInputOrderSensitive() const { return false; }
+	virtual BOOL
+	FInputOrderSensitive() const
+	{
+		return false;
+	}
 
 	// print
 	virtual IOstream &OsPrint(IOstream &io) const;

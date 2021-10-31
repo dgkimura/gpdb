@@ -170,10 +170,9 @@ CTranslatorScalarToDXL::TranslateSortGroupClauseToDXL(
 	GPOS_ASSERT(IsA(expr, SortGroupClause));
 	const SortGroupClause *sgc = (SortGroupClause *) expr;
 
-	CDXLSortGroupClause *sort_group_clause =
-		GPOS_NEW(m_mp) CDXLSortGroupClause(m_mp,
-			sgc->tleSortGroupRef,sgc->eqop, sgc->sortop,
-			sgc->nulls_first, sgc->hashable);
+	CDXLSortGroupClause *sort_group_clause = GPOS_NEW(m_mp)
+		CDXLSortGroupClause(m_mp, sgc->tleSortGroupRef, sgc->eqop, sgc->sortop,
+							sgc->nulls_first, sgc->hashable);
 
 	// create the DXL node holding the scalar ident operator
 	CDXLNode *dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, sort_group_clause);
@@ -285,7 +284,8 @@ CTranslatorScalarToDXL::TranslateScalarToDXL(
 		{T_SubLink, &CTranslatorScalarToDXL::TranslateSubLinkToDXL},
 		{T_ArrayExpr, &CTranslatorScalarToDXL::TranslateArrayExprToDXL},
 		{T_ArrayRef, &CTranslatorScalarToDXL::TranslateArrayRefToDXL},
-		{T_SortGroupClause, &CTranslatorScalarToDXL::TranslateSortGroupClauseToDXL},
+		{T_SortGroupClause,
+		 &CTranslatorScalarToDXL::TranslateSortGroupClauseToDXL},
 	};
 
 	const ULONG num_translators = GPOS_ARRAY_SIZE(translators);
@@ -1310,8 +1310,9 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 		resolved_ret_type = GPOS_NEW(m_mp) CMDIdGPDB(aggref->aggtype);
 	}
 
-	CDXLScalarAggref *aggref_scalar = GPOS_NEW(m_mp) CDXLScalarAggref(
-		m_mp, agg_mdid, resolved_ret_type, is_distinct, agg_stage, is_ordered, aggref->aggkind);
+	CDXLScalarAggref *aggref_scalar = GPOS_NEW(m_mp)
+		CDXLScalarAggref(m_mp, agg_mdid, resolved_ret_type, is_distinct,
+						 agg_stage, is_ordered, aggref->aggkind);
 
 	// create the DXL node holding the scalar aggref
 	CDXLNode *dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, aggref_scalar);
@@ -1333,21 +1334,21 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 	ForEach(lc, aggref->aggdirectargs)
 	{
 		Expr *expr = (Expr *) lfirst(lc);
-		CDXLNode *child_node =
-			TranslateScalarToDXL(expr, var_colid_mapping);
+		CDXLNode *child_node = TranslateScalarToDXL(expr, var_colid_mapping);
 		GPOS_ASSERT(NULL != child_node);
 		value_list_dxlnode->AddChild(child_node);
 	}
 	dxlnode->AddChild(value_list_dxlnode);
 
 	// translate sort group clause
-	CDXLScalarValuesList *sgc_values = GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
-	CDXLNode *sgc_value_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, sgc_values);
+	CDXLScalarValuesList *sgc_values =
+		GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
+	CDXLNode *sgc_value_list_dxlnode =
+		GPOS_NEW(m_mp) CDXLNode(m_mp, sgc_values);
 	ForEach(lc, aggref->aggorder)
 	{
 		Expr *expr = (Expr *) lfirst(lc);
-		CDXLNode *child_node =
-			TranslateScalarToDXL(expr, var_colid_mapping);
+		CDXLNode *child_node = TranslateScalarToDXL(expr, var_colid_mapping);
 		GPOS_ASSERT(NULL != child_node);
 		sgc_value_list_dxlnode->AddChild(child_node);
 	}

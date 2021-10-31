@@ -532,11 +532,11 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 	List *exprs = aggref->args;
 
 	// Skip next to last child (scalar values list for direct args)
-	const ULONG directidx = aggref_node->Arity()-2;
+	const ULONG directidx = aggref_node->Arity() - 2;
 	// Skip last child (scalar values list for sort group clause)
-	const ULONG sortidx = aggref_node->Arity()-1;
+	const ULONG sortidx = aggref_node->Arity() - 1;
 
-	const ULONG arity = aggref_node->Arity()-2;
+	const ULONG arity = aggref_node->Arity() - 2;
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CDXLNode *child_dxl = (*aggref_node)[ul];
@@ -583,20 +583,20 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 
 			aggref->aggkind = dxlop->GetAggKind();
 		}
-
 	}
 	CDXLNode *directargs = (*aggref_node)[directidx];
-	for (ULONG i=0; i<directargs->Arity(); i++)
+	for (ULONG i = 0; i < directargs->Arity(); i++)
 	{
-		Const *c = (Const*)TranslateDXLToScalar((*directargs)[i], colid_var);
+		Const *c = (Const *) TranslateDXLToScalar((*directargs)[i], colid_var);
 		aggref->aggdirectargs = gpdb::LAppend(aggref->aggdirectargs, c);
 	}
 	if (dxlop->IsOrdered())
 	{
 		CDXLNode *sortgroupclauess = (*aggref_node)[sortidx];
-		for (ULONG i=0; i<sortgroupclauess->Arity(); i++)
+		for (ULONG i = 0; i < sortgroupclauess->Arity(); i++)
 		{
-			SortGroupClause *gc = (SortGroupClause*)TranslateDXLToScalar((*sortgroupclauess)[i], colid_var);
+			SortGroupClause *gc = (SortGroupClause *) TranslateDXLToScalar(
+				(*sortgroupclauess)[i], colid_var);
 			aggref->aggorder = gpdb::LAppend(aggref->aggorder, gc);
 		}
 	}
@@ -1935,8 +1935,7 @@ CTranslatorDXLToScalar::TranslateDXLSortGroupClauseToScalar(
 	CMappingColIdVar *	//colid_var
 )
 {
-	CDXLSortGroupClause *dxlop = CDXLSortGroupClause::Cast(
-		node->GetOperator());
+	CDXLSortGroupClause *dxlop = CDXLSortGroupClause::Cast(node->GetOperator());
 
 	SortGroupClause *expr = MakeNode(SortGroupClause);
 	expr->tleSortGroupRef = dxlop->Index();

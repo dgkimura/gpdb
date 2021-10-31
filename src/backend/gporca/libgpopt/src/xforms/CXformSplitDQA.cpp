@@ -259,8 +259,7 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 					CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 				true /* is_distinct */, EaggfuncstageLocal /*eaggfuncstage*/,
 				true, /* fSplit */
-				NULL, false, 'n', NULL, NULL
-			);
+				NULL, false, 'n', NULL, NULL);
 
 			GPOS_ASSERT(1 == pexprAggFunc->Arity());
 			CExpression *pexprArg = (*pexprAggFunc)[0];
@@ -293,8 +292,7 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 					CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 				false /* is_distinct */, EaggfuncstageGlobal /*eaggfuncstage*/,
 				true, /* fSplit */
-				NULL, false, 'n', NULL, NULL
-			);
+				NULL, false, 'n', NULL, NULL);
 
 			CExpressionArray *pdrgpexprArgsGlobal =
 				GPOS_NEW(mp) CExpressionArray(mp);
@@ -392,8 +390,7 @@ CXformSplitDQA::PexprSplitHelper(CMemoryPool *mp, CColumnFactory *col_factory,
 					CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 				false /* is_distinct */, EaggfuncstageGlobal /*eaggfuncstage*/,
 				false, /* fSplit */
-				NULL, false, 'n', NULL, NULL
-			);
+				NULL, false, 'n', NULL, NULL);
 
 			GPOS_ASSERT(1 == pexprAggFunc->Arity());
 			CExpression *pexprArg = (*pexprAggFunc)[0];
@@ -475,10 +472,9 @@ CXformSplitDQA::PexprPrElAgg(CMemoryPool *mp, CExpression *pexprAggFunc,
 		mp, popScAggFunc->MDId(),
 		GPOS_NEW(mp)
 			CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
-		false,				/*fdistinct */
+		false,				 /*fdistinct */
 		eaggfuncstage, true, /* fSplit */
-		NULL, false, 'n', NULL, NULL
-	);
+		NULL, false, 'n', NULL, NULL);
 
 	return CUtils::PexprScalarProjectElement(
 		mp, pcrCurrStage,

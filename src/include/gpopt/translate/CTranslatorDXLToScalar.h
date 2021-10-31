@@ -279,8 +279,8 @@ public:
 	Expr *TranslateDXLScalarPartListNullTestToScalar(
 		const CDXLNode *part_list_null_test_node, CMappingColIdVar *colid_var);
 
-	Expr *TranslateDXLSortGroupClauseToScalar(
-		const CDXLNode *node, CMappingColIdVar *colid_var);
+	Expr *TranslateDXLSortGroupClauseToScalar(const CDXLNode *node,
+											  CMappingColIdVar *colid_var);
 
 	// translate a scalar ident into an Expr
 	Expr *TranslateDXLScalarIdentToScalar(const CDXLNode *scalar_id_node,

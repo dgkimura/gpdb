@@ -89,7 +89,11 @@ public:
 
 	BOOL IsOrdered() const;
 
-	CHAR GetAggKind() const { return m_aggkind; }
+	CHAR
+	GetAggKind() const
+	{
+		return m_aggkind;
+	}
 
 	// serialize operator in DXL format
 	virtual void SerializeToDXL(CXMLSerializer *xml_serializer,

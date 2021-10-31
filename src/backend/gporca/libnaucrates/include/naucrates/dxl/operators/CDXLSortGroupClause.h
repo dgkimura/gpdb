@@ -30,7 +30,8 @@ class CXMLSerializer;
 class CDXLSortGroupClause;
 
 // arrays of column references
-typedef CDynamicPtrArray<CDXLSortGroupClause, CleanupRelease> CDXLSortGroupClauseArray;
+typedef CDynamicPtrArray<CDXLSortGroupClause, CleanupRelease>
+	CDXLSortGroupClauseArray;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -54,20 +55,47 @@ private:
 
 public:
 	// ctor/dtor
-	CDXLSortGroupClause(CMemoryPool *mp, INT tle_sort_group_ref, INT eqop, INT sortop,
-						BOOL nulls_first, BOOL hashable) :
-		CDXLScalar(mp), m_tle_sort_group_ref(tle_sort_group_ref), m_eqop(eqop), m_sortop(sortop),
-		m_nulls_first(nulls_first), m_hashable(hashable)
-	{}
+	CDXLSortGroupClause(CMemoryPool *mp, INT tle_sort_group_ref, INT eqop,
+						INT sortop, BOOL nulls_first, BOOL hashable)
+		: CDXLScalar(mp),
+		  m_tle_sort_group_ref(tle_sort_group_ref),
+		  m_eqop(eqop),
+		  m_sortop(sortop),
+		  m_nulls_first(nulls_first),
+		  m_hashable(hashable)
+	{
+	}
 
-	~CDXLSortGroupClause() {}
+	~CDXLSortGroupClause()
+	{
+	}
 
 	// accessors
-	INT Index() const { return m_tle_sort_group_ref; }
-	INT EqOp() const { return m_eqop; }
-	INT SortOp() const { return m_sortop; }
-	BOOL NullsFirst() const { return m_nulls_first; }
-	BOOL IsHashable() const { return m_hashable; }
+	INT
+	Index() const
+	{
+		return m_tle_sort_group_ref;
+	}
+	INT
+	EqOp() const
+	{
+		return m_eqop;
+	}
+	INT
+	SortOp() const
+	{
+		return m_sortop;
+	}
+	BOOL
+	NullsFirst() const
+	{
+		return m_nulls_first;
+	}
+	BOOL
+	IsHashable() const
+	{
+		return m_hashable;
+	}
 
 	static CDXLSortGroupClause *
 	Cast(CDXLOperator *dxl_op)
@@ -79,19 +107,32 @@ public:
 	}
 
 	// does the operator return a boolean result
-	virtual BOOL HasBoolResult(CMDAccessor *) const { return false; }
+	virtual BOOL
+	HasBoolResult(CMDAccessor *) const
+	{
+		return false;
+	}
 
 #ifdef GPOS_DEBUG
-	virtual void AssertValid(const CDXLNode *, BOOL) const {}
+	virtual void
+	AssertValid(const CDXLNode *, BOOL) const
+	{
+	}
 #endif	// GPOS_DEBUG
 
-	virtual Edxlopid GetDXLOperator() const { return EdxlopScalarSortGroupClause; }
+	virtual Edxlopid
+	GetDXLOperator() const
+	{
+		return EdxlopScalarSortGroupClause;
+	}
 
-	virtual const CWStringConst *GetOpNameStr() const 
+	virtual const CWStringConst *
+	GetOpNameStr() const
 	{
 		return CDXLTokens::GetDXLTokenStr(EdxltokenScalarSortGroupClause);
 	}
-	virtual void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *)  const
+	virtual void
+	SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *) const
 	{
 		const CWStringConst *element_name = GetOpNameStr();
 
@@ -100,14 +141,14 @@ public:
 
 		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenIndex),
 									 Index());
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenMDTypeEqOp),
-									 EqOp());
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenSortOpId),
-									 SortOp());
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenSortNullsFirst),
-									 NullsFirst());
-		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenMDTypeHashable),
-									 IsHashable());
+		xml_serializer->AddAttribute(
+			CDXLTokens::GetDXLTokenStr(EdxltokenMDTypeEqOp), EqOp());
+		xml_serializer->AddAttribute(
+			CDXLTokens::GetDXLTokenStr(EdxltokenSortOpId), SortOp());
+		xml_serializer->AddAttribute(
+			CDXLTokens::GetDXLTokenStr(EdxltokenSortNullsFirst), NullsFirst());
+		xml_serializer->AddAttribute(
+			CDXLTokens::GetDXLTokenStr(EdxltokenMDTypeHashable), IsHashable());
 
 		xml_serializer->CloseElement(
 			CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);

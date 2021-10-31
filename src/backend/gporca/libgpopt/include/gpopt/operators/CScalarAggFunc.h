@@ -14,8 +14,8 @@
 #include "gpos/base.h"
 
 #include "gpopt/base/CDrvdProp.h"
-#include "gpopt/operators/CScalar.h"
 #include "gpopt/operators/CExpression.h"
+#include "gpopt/operators/CScalar.h"
 #include "naucrates/md/IMDId.h"
 
 namespace gpopt
@@ -83,7 +83,8 @@ public:
 	CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 				   IMDId *resolved_rettype, const CWStringConst *pstrAggFunc,
 				   BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
-				   BOOL is_ordered, CHAR aggkind, CExpressionArray *pdrgpexprDirectArgs,
+				   BOOL is_ordered, CHAR aggkind,
+				   CExpressionArray *pdrgpexprDirectArgs,
 				   CExpressionArray *m_sortGroupClauses);
 
 	// dtor

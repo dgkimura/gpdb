@@ -30,10 +30,16 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarSortGroupClause::CScalarSortGroupClause(CMemoryPool *mp, INT tle_sort_group_ref,
-	INT eqop, INT sortop, BOOL nulls_first, BOOL hashable)
-		: CScalar(mp),  m_tle_sort_group_ref(tle_sort_group_ref), m_eqop(eqop),
-		  m_sortop(sortop), m_nulls_first(nulls_first),  m_hashable(hashable)
+CScalarSortGroupClause::CScalarSortGroupClause(CMemoryPool *mp,
+											   INT tle_sort_group_ref, INT eqop,
+											   INT sortop, BOOL nulls_first,
+											   BOOL hashable)
+	: CScalar(mp),
+	  m_tle_sort_group_ref(tle_sort_group_ref),
+	  m_eqop(eqop),
+	  m_sortop(sortop),
+	  m_nulls_first(nulls_first),
+	  m_hashable(hashable)
 {
 }
 
@@ -105,7 +111,7 @@ CScalarSortGroupClause::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarSortGroupClause::Eber(ULongPtrArray *	//pdrgpulChildren
+CScalarSortGroupClause::Eber(ULongPtrArray *  //pdrgpulChildren
 ) const
 {
 	return EberAny;

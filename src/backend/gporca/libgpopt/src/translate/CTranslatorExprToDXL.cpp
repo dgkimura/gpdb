@@ -137,7 +137,8 @@ CTranslatorExprToDXL::InitScalarTranslators()
 		{COperator::EopScalarBoolOp,
 		 &gpopt::CTranslatorExprToDXL::PdxlnScBoolExpr},
 		{COperator::EopScalarConst, &gpopt::CTranslatorExprToDXL::PdxlnScConst},
-		{COperator::EopScalarSortGroupClause, &gpopt::CTranslatorExprToDXL::PdxlnScSortGroupClause},
+		{COperator::EopScalarSortGroupClause,
+		 &gpopt::CTranslatorExprToDXL::PdxlnScSortGroupClause},
 		{COperator::EopScalarFunc,
 		 &gpopt::CTranslatorExprToDXL::PdxlnScFuncExpr},
 		{COperator::EopScalarWindowFunc,
@@ -6602,7 +6603,7 @@ CTranslatorExprToDXL::PdxlnScAggref(CExpression *pexprAggFunc)
 	CDXLNode *value_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, values);
 
 	CExpressionArray *direct_args = popScAggFunc->GetDirectArgs();
-	for (ULONG idx=0; idx<direct_args->Size(); idx++)
+	for (ULONG idx = 0; idx < direct_args->Size(); idx++)
 	{
 		CExpression *pexprChild = (*direct_args)[idx];
 		CDXLNode *child_dxlnode = PdxlnScalar(pexprChild);
@@ -6614,11 +6615,13 @@ CTranslatorExprToDXL::PdxlnScAggref(CExpression *pexprAggFunc)
 
 	// Add sort group clauses
 
-	CDXLScalarValuesList *sgc_values = GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
-	CDXLNode *sgc_value_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, sgc_values);
+	CDXLScalarValuesList *sgc_values =
+		GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
+	CDXLNode *sgc_value_list_dxlnode =
+		GPOS_NEW(m_mp) CDXLNode(m_mp, sgc_values);
 
 	CExpressionArray *sortgroupclauses = popScAggFunc->GetSortGroupClauses();
-	for (ULONG idx=0; idx<sortgroupclauses->Size(); idx++)
+	for (ULONG idx = 0; idx < sortgroupclauses->Size(); idx++)
 	{
 		CExpression *pexprChild = (*sortgroupclauses)[idx];
 		CDXLNode *child_dxlnode = PdxlnScalar(pexprChild);
@@ -7489,17 +7492,18 @@ CTranslatorExprToDXL::PdxlnScConst(CExpression *pexprScConst)
 	return dxlnode;
 }
 CDXLNode *
-CTranslatorExprToDXL::PdxlnScSortGroupClause(CExpression *pexprScSortGroupClause)
+CTranslatorExprToDXL::PdxlnScSortGroupClause(
+	CExpression *pexprScSortGroupClause)
 {
 	GPOS_ASSERT(NULL != pexprScSortGroupClause);
 
-	CScalarSortGroupClause *pop = CScalarSortGroupClause::PopConvert(pexprScSortGroupClause->Pop());
+	CScalarSortGroupClause *pop =
+		CScalarSortGroupClause::PopConvert(pexprScSortGroupClause->Pop());
 
-	CDXLNode *dxlnode =
-		GPOS_NEW(m_mp) CDXLNode(m_mp,
-			GPOS_NEW(m_mp) CDXLSortGroupClause(m_mp, pop->Index(), pop->EqOp(),
-											 pop->SortOp(), pop->NullsFirst(),
-											 pop->IsHashable()));
+	CDXLNode *dxlnode = GPOS_NEW(m_mp)
+		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLSortGroupClause(
+						   m_mp, pop->Index(), pop->EqOp(), pop->SortOp(),
+						   pop->NullsFirst(), pop->IsHashable()));
 
 	return dxlnode;
 }

@@ -206,8 +206,8 @@ private:
 	CDXLNode *TranslateAggrefToDXL(const Expr *expr,
 								   const CMappingVarColId *var_colid_mapping);
 
-	CDXLNode *TranslateSortGroupClauseToDXL(const Expr *expr,
-								const CMappingVarColId *var_colid_mapping);
+	CDXLNode *TranslateSortGroupClauseToDXL(
+		const Expr *expr, const CMappingVarColId *var_colid_mapping);
 
 	CDXLNode *TranslateVarToDXL(const Expr *expr,
 								const CMappingVarColId *var_colid_mapping);

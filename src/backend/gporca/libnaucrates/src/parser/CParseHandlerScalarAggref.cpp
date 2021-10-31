@@ -63,9 +63,9 @@ CParseHandlerScalarAggref::StartElement(const XMLCh *const element_uri,
 		// construct node from the created scalar AggRef
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}
-	else if (0 ==
-		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenScalarValuesList),
-								 element_local_name))
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenScalarValuesList),
+					  element_local_name))
 	{
 		// we must have seen an aggref already and initialized the aggref node
 		GPOS_ASSERT(NULL != m_dxl_node);
@@ -126,16 +126,16 @@ CParseHandlerScalarAggref::EndElement(const XMLCh *const,  // element_uri,
 	}
 
 	const ULONG size = this->Length();
-	for (ULONG idx = 0; idx < size-1; idx++)
+	for (ULONG idx = 0; idx < size - 1; idx++)
 	{
 		CParseHandlerScalarOp *scalar_op_parse_handler =
 			dynamic_cast<CParseHandlerScalarOp *>((*this)[idx]);
 		AddChildFromParseHandler(scalar_op_parse_handler);
 	}
 
-	const ULONG direct_args_idx = this->Length()-1;
+	const ULONG direct_args_idx = this->Length() - 1;
 	CParseHandlerScalarValuesList *scalar_values_parse_handler =
-		dynamic_cast<CParseHandlerScalarValuesList*>((*this)[direct_args_idx]);
+		dynamic_cast<CParseHandlerScalarValuesList *>((*this)[direct_args_idx]);
 	AddChildFromParseHandler(scalar_values_parse_handler);
 
 	// deactivate handler
