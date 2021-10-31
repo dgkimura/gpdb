@@ -22,6 +22,9 @@ extern "C" {
 #include "utils/datum.h"
 #include "utils/uuid.h"
 }
+
+#include <vector>
+
 #include "gpos/base.h"
 #include "gpos/common/CAutoP.h"
 #include "gpos/string/CWStringDynamic.h"
@@ -1317,15 +1320,22 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 	// create the DXL node holding the scalar aggref
 	CDXLNode *dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, aggref_scalar);
 
+	std::vector<int> indexes(gpdb::ListLength(aggref->args), -1);
 	// translate args
 	ListCell *lc;
-	ForEach(lc, aggref->args)
+	int i = 0;
+	ForEachWithCount(lc, aggref->args, i)
 	{
 		TargetEntry *tle = (TargetEntry *) lfirst(lc);
 		CDXLNode *child_node =
 			TranslateScalarToDXL(tle->expr, var_colid_mapping);
 		GPOS_ASSERT(NULL != child_node);
 		dxlnode->AddChild(child_node);
+
+		if (tle->ressortgroupref != 0)
+		{
+			indexes[tle->ressortgroupref] = i;
+		}
 	}
 
 	// translate direct args
@@ -1348,6 +1358,10 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 	ForEach(lc, aggref->aggorder)
 	{
 		Expr *expr = (Expr *) lfirst(lc);
+		// Hack? Here we set SortGroupClause->tleSortGroupRef to corresponding arg Index
+		((SortGroupClause *) expr)->tleSortGroupRef =
+			indexes[((SortGroupClause *) expr)->tleSortGroupRef];
+
 		CDXLNode *child_node = TranslateScalarToDXL(expr, var_colid_mapping);
 		GPOS_ASSERT(NULL != child_node);
 		sgc_value_list_dxlnode->AddChild(child_node);

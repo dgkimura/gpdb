@@ -22,6 +22,9 @@ extern "C" {
 #include "nodes/primnodes.h"
 #include "utils/datum.h"
 }
+
+#include <vector>
+
 #include "gpos/base.h"
 
 #include "gpopt/base/COptCtxt.h"
@@ -544,6 +547,20 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 		exprs = gpdb::LAppend(exprs, child_expr);
 	}
 
+	// Find ressortgroupref from tleSortGroupRef
+	std::vector<int> indexes(gpdb::ListLength(exprs), -1);
+	if (dxlop->IsOrdered())
+	{
+		CDXLNode *sortgroupclauess = (*aggref_node)[sortidx];
+		for (ULONG i = 0; i < sortgroupclauess->Arity(); i++)
+		{
+			SortGroupClause *gc = (SortGroupClause *) TranslateDXLToScalar(
+				(*sortgroupclauess)[i], colid_var);
+			aggref->aggorder = gpdb::LAppend(aggref->aggorder, gc);
+			indexes[gc->tleSortGroupRef] = gc->tleSortGroupRef;
+		}
+	}
+
 	int attno;
 	aggref->args = NIL;
 	ListCell *lc;
@@ -577,7 +594,8 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 		aggref->args = gpdb::LAppend(aggref->args, new_target_entry);
 		if (dxlop->IsOrdered())
 		{
-			new_target_entry->ressortgroupref = sortgrpindex;
+			new_target_entry->ressortgroupref =
+				indexes[attno] == 0 ? 0 : indexes[attno];
 
 			sortgrpindex++;
 
@@ -589,16 +607,6 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 	{
 		Const *c = (Const *) TranslateDXLToScalar((*directargs)[i], colid_var);
 		aggref->aggdirectargs = gpdb::LAppend(aggref->aggdirectargs, c);
-	}
-	if (dxlop->IsOrdered())
-	{
-		CDXLNode *sortgroupclauess = (*aggref_node)[sortidx];
-		for (ULONG i = 0; i < sortgroupclauess->Arity(); i++)
-		{
-			SortGroupClause *gc = (SortGroupClause *) TranslateDXLToScalar(
-				(*sortgroupclauess)[i], colid_var);
-			aggref->aggorder = gpdb::LAppend(aggref->aggorder, gc);
-		}
 	}
 
 	// GPDB_91_MERGE_FIXME: collation
