@@ -1359,8 +1359,11 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 	{
 		Expr *expr = (Expr *) lfirst(lc);
 		// Hack? Here we set SortGroupClause->tleSortGroupRef to corresponding arg Index
-		((SortGroupClause *) expr)->tleSortGroupRef =
-			indexes[((SortGroupClause *) expr)->tleSortGroupRef];
+		if (((SortGroupClause *) expr)->tleSortGroupRef != -1)
+		{
+			((SortGroupClause *) expr)->tleSortGroupRef =
+				indexes[((SortGroupClause *) expr)->tleSortGroupRef];
+		}
 
 		CDXLNode *child_node = TranslateScalarToDXL(expr, var_colid_mapping);
 		GPOS_ASSERT(NULL != child_node);
