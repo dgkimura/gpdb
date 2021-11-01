@@ -148,11 +148,19 @@ ULONG
 CScalarAggFunc::HashValue() const
 {
 	ULONG ulAggfuncstage = (ULONG) m_eaggfuncstage;
+	ULONG part = 0;
+	for (ULONG i = 0; i < m_pdrgpexprDirectArgs->Size(); i++)
+	{
+		part = CombineHashes((*m_pdrgpexprDirectArgs)[i]->Pop()->HashValue(),
+							 part);
+	}
 	return gpos::CombineHashes(
-		CombineHashes(COperator::HashValue(), m_pmdidAggFunc->HashValue()),
-		CombineHashes(gpos::HashValue<ULONG>(&ulAggfuncstage),
-					  CombineHashes(gpos::HashValue<BOOL>(&m_is_distinct),
-									gpos::HashValue<BOOL>(&m_fSplit))));
+		part,
+		gpos::CombineHashes(
+			CombineHashes(COperator::HashValue(), m_pmdidAggFunc->HashValue()),
+			CombineHashes(gpos::HashValue<ULONG>(&ulAggfuncstage),
+						  CombineHashes(gpos::HashValue<BOOL>(&m_is_distinct),
+										gpos::HashValue<BOOL>(&m_fSplit)))));
 }
 
 
