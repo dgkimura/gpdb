@@ -551,13 +551,17 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 	std::vector<int> indexes(gpdb::ListLength(exprs), -1);
 	if (dxlop->IsOrdered())
 	{
-		CDXLNode *sortgroupclauess = (*aggref_node)[sortidx];
-		for (ULONG i = 0; i < sortgroupclauess->Arity(); i++)
+		CDXLNode *sortgroupclauses = (*aggref_node)[sortidx];
+		for (ULONG i = 0; i < sortgroupclauses->Arity(); i++)
 		{
 			SortGroupClause *gc = (SortGroupClause *) TranslateDXLToScalar(
-				(*sortgroupclauess)[i], colid_var);
+				(*sortgroupclauses)[i], colid_var);
 			aggref->aggorder = gpdb::LAppend(aggref->aggorder, gc);
-			indexes[gc->tleSortGroupRef] = gc->tleSortGroupRef;
+			// hack special number to signal no associated ressortgroupref in tle
+			if (gc->tleSortGroupRef != -1)
+			{
+				indexes[gc->tleSortGroupRef] = gc->tleSortGroupRef;
+			}
 		}
 	}
 
