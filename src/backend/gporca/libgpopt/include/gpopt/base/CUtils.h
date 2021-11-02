@@ -243,7 +243,7 @@ public:
 		IMDId *
 			pmdidResolvedReturnType,  // return type to be used if original return type is ambiguous
 		BOOL is_ordered, CHAR aggkind, CExpressionArray *direct_args,
-		CExpressionArray *sort_group_clauses);
+		CExpressionArray *aggorders, CExpressionArray *aggdistincts);
 
 	// generate an aggregate function
 	static CExpression *PexprAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,

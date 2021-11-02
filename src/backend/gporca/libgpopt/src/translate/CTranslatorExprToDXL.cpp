@@ -6613,23 +6613,41 @@ CTranslatorExprToDXL::PdxlnScAggref(CExpression *pexprAggFunc)
 
 	pdxlnAggref->AddChild(value_list_dxlnode);
 
-	// Add sort group clauses
+	// Add aggorder sort group clauses
 
-	CDXLScalarValuesList *sgc_values =
+	CDXLScalarValuesList *order_values =
 		GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
-	CDXLNode *sgc_value_list_dxlnode =
-		GPOS_NEW(m_mp) CDXLNode(m_mp, sgc_values);
+	CDXLNode *aggorder_value_list_dxlnode =
+		GPOS_NEW(m_mp) CDXLNode(m_mp, order_values);
 
-	CExpressionArray *sortgroupclauses = popScAggFunc->GetSortGroupClauses();
-	for (ULONG idx = 0; idx < sortgroupclauses->Size(); idx++)
+	CExpressionArray *aggorder = popScAggFunc->GetAggOrder();
+	for (ULONG idx = 0; idx < aggorder->Size(); idx++)
 	{
-		CExpression *pexprChild = (*sortgroupclauses)[idx];
+		CExpression *pexprChild = (*aggorder)[idx];
 		CDXLNode *child_dxlnode = PdxlnScalar(pexprChild);
 		GPOS_ASSERT(NULL != child_dxlnode);
-		sgc_value_list_dxlnode->AddChild(child_dxlnode);
+		aggorder_value_list_dxlnode->AddChild(child_dxlnode);
 	}
 
-	pdxlnAggref->AddChild(sgc_value_list_dxlnode);
+	pdxlnAggref->AddChild(aggorder_value_list_dxlnode);
+
+	// Add aggdistinct sort group clauses
+
+	CDXLScalarValuesList *distinct_values =
+		GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
+	CDXLNode *aggdistinct_value_list_dxlnode =
+		GPOS_NEW(m_mp) CDXLNode(m_mp, distinct_values);
+
+	CExpressionArray *aggdistinct = popScAggFunc->GetAggDistinct();
+	for (ULONG idx = 0; idx < aggdistinct->Size(); idx++)
+	{
+		CExpression *pexprChild = (*aggdistinct)[idx];
+		CDXLNode *child_dxlnode = PdxlnScalar(pexprChild);
+		GPOS_ASSERT(NULL != child_dxlnode);
+		aggdistinct_value_list_dxlnode->AddChild(child_dxlnode);
+	}
+
+	pdxlnAggref->AddChild(aggdistinct_value_list_dxlnode);
 
 	return pdxlnAggref;
 }

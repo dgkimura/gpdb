@@ -38,7 +38,8 @@ CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 							   BOOL is_distinct, EAggfuncStage eaggfuncstage,
 							   BOOL fSplit, BOOL is_ordered, CHAR aggkind,
 							   CExpressionArray *pdrgpexprDirectArgs,
-							   CExpressionArray *sortGroupClauses)
+							   CExpressionArray *aggorder,
+							   CExpressionArray *aggdistinct)
 	: CScalar(mp),
 	  m_pmdidAggFunc(pmdidAggFunc),
 	  m_pmdidResolvedRetType(resolved_rettype),
@@ -50,7 +51,8 @@ CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 	  m_eaggfuncstage(eaggfuncstage),
 	  m_fSplit(fSplit),
 	  m_pdrgpexprDirectArgs(pdrgpexprDirectArgs),
-	  m_sortGroupClauses(sortGroupClauses)
+	  m_aggorder(aggorder),
+	  m_aggdistinct(aggdistinct)
 {
 	GPOS_ASSERT(NULL != pmdidAggFunc);
 	GPOS_ASSERT(NULL != pstrAggFunc);

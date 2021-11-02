@@ -3073,10 +3073,11 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 		// translate function arguments
 		CExpressionArray *pdrgpexprArgs = GPOS_NEW(m_mp) CExpressionArray(m_mp);
 
-		// FIXME: Last element is a scalar values list containing direct args...
-		// FIXME: Next to last element is a scalar values list containing sort group clauses...
+		// FIXME: -3 element is a scalar values list containing direct args...
+		// FIXME: -2 element is a scalar values list containing aggorder sort group clauses...
+		// FIXME: -1 element is a scalar values list containing aggdistinct sort group clauses...
 		const ULONG arity = pdxlnAggref->Arity();
-		for (ULONG ul = 0; ul < arity - 2; ul++)
+		for (ULONG ul = 0; ul < arity - 3; ul++)
 		{
 			// get next child arg and translate it.
 			// skip last child (direct arg list)
@@ -3101,10 +3102,14 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 
 		// TODO: get last child (direct arg list) and link to CScalarAggRef
 		CExpressionArray *directArgs =
+			PdrgpexprChildren((*pdxlnAggref)[pdxlnAggref->Arity() - 3]);
+
+		// TODO: get next to last child (sort group clause list) and link to CScalarAggRef
+		CExpressionArray *aggorder =
 			PdrgpexprChildren((*pdxlnAggref)[pdxlnAggref->Arity() - 2]);
 
 		// TODO: get next to last child (sort group clause list) and link to CScalarAggRef
-		CExpressionArray *sortGroupClauses =
+		CExpressionArray *aggdistinct =
 			PdrgpexprChildren((*pdxlnAggref)[pdxlnAggref->Arity() - 1]);
 
 		CScalarAggFunc *popScAggFunc = CUtils::PopAggFunc(
@@ -3113,7 +3118,7 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 				m_mp, (pmdagg->Mdname().GetMDName())->GetBuffer()),
 			dxl_op->IsDistinct(), agg_func_stage, fSplit,
 			resolved_return_type_mdid, dxl_op->IsOrdered(),
-			dxl_op->GetAggKind(), directArgs, sortGroupClauses);
+			dxl_op->GetAggKind(), directArgs, aggorder, aggdistinct);
 
 		pexprAggFunc =
 			GPOS_NEW(m_mp) CExpression(m_mp, popScAggFunc, pdrgpexprArgs);
@@ -3121,9 +3126,12 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 	else
 	{
 		CExpressionArray *directArgs =
+			PdrgpexprChildren((*pdxlnAggref)[pdxlnAggref->Arity() - 3]);
+
+		CExpressionArray *aggorder =
 			PdrgpexprChildren((*pdxlnAggref)[pdxlnAggref->Arity() - 2]);
 
-		CExpressionArray *sortGroupClauses =
+		CExpressionArray *aggdistinct =
 			PdrgpexprChildren((*pdxlnAggref)[pdxlnAggref->Arity() - 1]);
 
 		CScalarAggFunc *popScAggFunc = CUtils::PopAggFunc(
@@ -3132,7 +3140,7 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 				m_mp, (pmdagg->Mdname().GetMDName())->GetBuffer()),
 			dxl_op->IsDistinct(), agg_func_stage, fSplit,
 			resolved_return_type_mdid, dxl_op->IsOrdered(),
-			dxl_op->GetAggKind(), directArgs, sortGroupClauses);
+			dxl_op->GetAggKind(), directArgs, aggorder, aggdistinct);
 
 		// aggregate function has no arguments
 		pexprAggFunc = GPOS_NEW(m_mp) CExpression(m_mp, popScAggFunc);

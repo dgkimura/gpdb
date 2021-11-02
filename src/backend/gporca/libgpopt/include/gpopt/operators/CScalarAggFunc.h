@@ -73,7 +73,9 @@ private:
 
 	CExpressionArray *m_pdrgpexprDirectArgs;
 
-	CExpressionArray *m_sortGroupClauses;
+	CExpressionArray *m_aggorder;
+
+	CExpressionArray *m_aggdistinct;
 
 	// private copy ctor
 	CScalarAggFunc(const CScalarAggFunc &);
@@ -85,7 +87,7 @@ public:
 				   BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
 				   BOOL is_ordered, CHAR aggkind,
 				   CExpressionArray *pdrgpexprDirectArgs,
-				   CExpressionArray *m_sortGroupClauses);
+				   CExpressionArray *aggorder, CExpressionArray *aggdistinct);
 
 	// dtor
 	virtual ~CScalarAggFunc()
@@ -205,9 +207,15 @@ public:
 	}
 
 	CExpressionArray *
-	GetSortGroupClauses() const
+	GetAggOrder() const
 	{
-		return m_sortGroupClauses;
+		return m_aggorder;
+	}
+
+	CExpressionArray *
+	GetAggDistinct() const
+	{
+		return m_aggdistinct;
 	}
 
 	// type of expression's result

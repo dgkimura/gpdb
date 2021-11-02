@@ -1371,6 +1371,27 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 	}
 	dxlnode->AddChild(sgc_value_list_dxlnode);
 
+	// translate distinct
+	CDXLScalarValuesList *aggdistinct_values =
+		GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
+	CDXLNode *aggdistinct_value_list_dxlnode =
+		GPOS_NEW(m_mp) CDXLNode(m_mp, aggdistinct_values);
+	ForEach(lc, aggref->aggdistinct)
+	{
+		Expr *expr = (Expr *) lfirst(lc);
+		// Hack? Here we set SortGroupClause->tleSortGroupRef to corresponding arg Index
+		if (((SortGroupClause *) expr)->tleSortGroupRef != -1)
+		{
+			((SortGroupClause *) expr)->tleSortGroupRef =
+				indexes[((SortGroupClause *) expr)->tleSortGroupRef];
+		}
+
+		CDXLNode *child_node = TranslateScalarToDXL(expr, var_colid_mapping);
+		GPOS_ASSERT(NULL != child_node);
+		aggdistinct_value_list_dxlnode->AddChild(child_node);
+	}
+	dxlnode->AddChild(aggdistinct_value_list_dxlnode);
+
 	return dxlnode;
 }
 

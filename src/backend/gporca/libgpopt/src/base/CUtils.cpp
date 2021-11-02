@@ -1695,7 +1695,7 @@ CUtils::PopAggFunc(
 	IMDId *
 		pmdidResolvedReturnType,  // return type to be used if original return type is ambiguous
 	BOOL is_ordered, CHAR aggkind, CExpressionArray *direct_args,
-	CExpressionArray *sort_group_clauses)
+	CExpressionArray *aggorders, CExpressionArray *aggdistincts)
 {
 	GPOS_ASSERT(NULL != pmdidAggFunc);
 	GPOS_ASSERT(NULL != pstrAggFunc);
@@ -1705,7 +1705,7 @@ CUtils::PopAggFunc(
 	return GPOS_NEW(mp)
 		CScalarAggFunc(mp, pmdidAggFunc, pmdidResolvedReturnType, pstrAggFunc,
 					   is_distinct, eaggfuncstage, fSplit, is_ordered, aggkind,
-					   direct_args, sort_group_clauses);
+					   direct_args, aggorders, aggdistincts);
 }
 
 // generate an aggregate function
@@ -1718,10 +1718,10 @@ CUtils::PexprAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 	GPOS_ASSERT(NULL != colref);
 
 	// generate aggregate function
-	CScalarAggFunc *popScAggFunc =
-		PopAggFunc(mp, pmdidAggFunc, pstrAggFunc, is_distinct, eaggfuncstage,
-				   fSplit, NULL, false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
-				   GPOS_NEW(mp) CExpressionArray(mp));
+	CScalarAggFunc *popScAggFunc = PopAggFunc(
+		mp, pmdidAggFunc, pstrAggFunc, is_distinct, eaggfuncstage, fSplit, NULL,
+		false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
+		GPOS_NEW(mp) CExpressionArray(mp), GPOS_NEW(mp) CExpressionArray(mp));
 
 	// generate function arguments
 	CExpression *pexprScalarIdent = PexprScalarIdent(mp, colref);
@@ -1743,11 +1743,11 @@ CUtils::PexprCountStar(CMemoryPool *mp)
 	CMDIdGPDB *mdid = GPOS_NEW(mp) CMDIdGPDB(GPDB_COUNT_STAR);
 	CWStringConst *str = GPOS_NEW(mp) CWStringConst(GPOS_WSZ_LIT("count"));
 
-	CScalarAggFunc *popScAggFunc =
-		PopAggFunc(mp, mdid, str, false /*is_distinct*/,
-				   EaggfuncstageGlobal /*eaggfuncstage*/, false /*fSplit*/,
-				   NULL, false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
-				   GPOS_NEW(mp) CExpressionArray(mp));
+	CScalarAggFunc *popScAggFunc = PopAggFunc(
+		mp, mdid, str, false /*is_distinct*/,
+		EaggfuncstageGlobal /*eaggfuncstage*/, false /*fSplit*/, NULL, false,
+		'n', GPOS_NEW(mp) CExpressionArray(mp),
+		GPOS_NEW(mp) CExpressionArray(mp), GPOS_NEW(mp) CExpressionArray(mp));
 
 	CExpression *pexprCountStar =
 		GPOS_NEW(mp) CExpression(mp, popScAggFunc, pdrgpexpr);

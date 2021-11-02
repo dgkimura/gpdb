@@ -4360,6 +4360,7 @@ CXformUtils::PexprWinFuncAgg2ScalarAgg(CMemoryPool *mp,
 						   popScWinFunc->IsDistinct(), EaggfuncstageGlobal,
 						   false,  // fSplit
 						   NULL, false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
+						   GPOS_NEW(mp) CExpressionArray(mp),
 						   GPOS_NEW(mp) CExpressionArray(mp)),
 		pdrgpexprWinFuncArgs);
 }
