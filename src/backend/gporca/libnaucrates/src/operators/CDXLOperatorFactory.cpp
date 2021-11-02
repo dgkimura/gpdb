@@ -1020,6 +1020,7 @@ CDXLOperatorFactory::MakeDXLAggFunc(CDXLMemoryManager *dxl_memory_manager,
 		attrs, EdxltokenAggrefKind, EdxltokenScalarAggref, true);
 	if (attr_val_xml != NULL)
 	{
+		GPOS_DELETE(aggkind);
 		aggkind = CDXLUtils::CreateDynamicStringFromXMLChArray(
 			dxl_memory_manager, attr_val_xml);
 	}

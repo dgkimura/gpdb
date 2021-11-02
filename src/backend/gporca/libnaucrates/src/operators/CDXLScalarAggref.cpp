@@ -58,6 +58,7 @@ CDXLScalarAggref::CDXLScalarAggref(CMemoryPool *mp, IMDId *agg_func_mdid,
 CDXLScalarAggref::~CDXLScalarAggref()
 {
 	m_agg_func_mdid->Release();
+	GPOS_DELETE(m_aggkind);
 	CRefCount::SafeRelease(m_resolved_rettype_mdid);
 }
 
