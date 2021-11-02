@@ -95,6 +95,9 @@ public:
 		m_pmdidAggFunc->Release();
 		CRefCount::SafeRelease(m_pmdidResolvedRetType);
 		CRefCount::SafeRelease(m_return_type_mdid);
+		CRefCount::SafeRelease(m_pdrgpexprDirectArgs);
+		CRefCount::SafeRelease(m_aggorder);
+		CRefCount::SafeRelease(m_aggdistinct);
 		GPOS_DELETE(m_aggkind);
 		GPOS_DELETE(m_pstrAggFunc);
 	}

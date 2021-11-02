@@ -253,6 +253,9 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 		{
 			// create a new local DQA version of the original global DQA
 			popScAggFunc->MDId()->AddRef();
+			popScAggFunc->GetDirectArgs()->AddRef();
+			popScAggFunc->GetAggOrder()->AddRef();
+			popScAggFunc->GetAggDistinct()->AddRef();
 			CScalarAggFunc *popScAggFuncLocal = CUtils::PopAggFunc(
 				mp, popScAggFunc->MDId(),
 				GPOS_NEW(mp)
@@ -289,6 +292,9 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 
 			// create a new "non-distinct" global aggregate version of the original DQA
 			popScAggFunc->MDId()->AddRef();
+			popScAggFunc->GetDirectArgs()->AddRef();
+			popScAggFunc->GetAggOrder()->AddRef();
+			popScAggFunc->GetAggDistinct()->AddRef();
 			CScalarAggFunc *popScAggFuncGlobal = CUtils::PopAggFunc(
 				mp, popScAggFunc->MDId(),
 				GPOS_NEW(mp)
@@ -390,6 +396,9 @@ CXformSplitDQA::PexprSplitHelper(CMemoryPool *mp, CColumnFactory *col_factory,
 		{
 			// create a new "non-distinct" version of the original aggregate function
 			popScAggFunc->MDId()->AddRef();
+			popScAggFunc->GetDirectArgs()->AddRef();
+			popScAggFunc->GetAggOrder()->AddRef();
+			popScAggFunc->GetAggDistinct()->AddRef();
 			CScalarAggFunc *popScAggFuncNew = CUtils::PopAggFunc(
 				mp, popScAggFunc->MDId(),
 				GPOS_NEW(mp)
@@ -477,6 +486,9 @@ CXformSplitDQA::PexprPrElAgg(CMemoryPool *mp, CExpression *pexprAggFunc,
 	}
 
 	popScAggFunc->MDId()->AddRef();
+	popScAggFunc->GetDirectArgs()->AddRef();
+	popScAggFunc->GetAggOrder()->AddRef();
+	popScAggFunc->GetAggDistinct()->AddRef();
 	CScalarAggFunc *popScAggFuncNew = CUtils::PopAggFunc(
 		mp, popScAggFunc->MDId(),
 		GPOS_NEW(mp)

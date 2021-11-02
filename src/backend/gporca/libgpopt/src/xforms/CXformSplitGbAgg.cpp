@@ -198,6 +198,9 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 			CScalarAggFunc::PopConvert(pexprAggFunc->Pop());
 
 		popScAggFunc->MDId()->AddRef();
+		popScAggFunc->GetDirectArgs()->AddRef();
+		popScAggFunc->GetAggOrder()->AddRef();
+		popScAggFunc->GetAggDistinct()->AddRef();
 		CScalarAggFunc *popScAggFuncLocal = CUtils::PopAggFunc(
 			mp, popScAggFunc->MDId(),
 			GPOS_NEW(mp)
@@ -209,6 +212,9 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 			popScAggFunc->GetAggDistinct());
 
 		popScAggFunc->MDId()->AddRef();
+		popScAggFunc->GetDirectArgs()->AddRef();
+		popScAggFunc->GetAggOrder()->AddRef();
+		popScAggFunc->GetAggDistinct()->AddRef();
 		CScalarAggFunc *popScAggFuncGlobal = CUtils::PopAggFunc(
 			mp, popScAggFunc->MDId(),
 			GPOS_NEW(mp)
