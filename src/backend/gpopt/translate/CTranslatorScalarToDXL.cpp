@@ -1305,9 +1305,9 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 		resolved_ret_type = GPOS_NEW(m_mp) CMDIdGPDB(aggref->aggtype);
 	}
 
-	CDXLScalarAggref *aggref_scalar = GPOS_NEW(m_mp)
-		CDXLScalarAggref(m_mp, agg_mdid, resolved_ret_type, is_distinct,
-						 agg_stage, is_ordered, aggref->aggkind);
+	CDXLScalarAggref *aggref_scalar = GPOS_NEW(m_mp) CDXLScalarAggref(
+		m_mp, agg_mdid, resolved_ret_type, is_distinct, agg_stage, is_ordered,
+		CDXLUtils::CreateDynamicStringFromCharArray(m_mp, &aggref->aggkind));
 
 	// create the DXL node holding the scalar aggref
 	CDXLNode *dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, aggref_scalar);

@@ -1013,8 +1013,16 @@ CDXLOperatorFactory::MakeDXLAggFunc(CDXLMemoryManager *dxl_memory_manager,
 	BOOL is_distinct = ExtractConvertAttrValueToBool(dxl_memory_manager, attrs,
 													 EdxltokenAggrefDistinct,
 													 EdxltokenScalarAggref);
-	CHAR aggkind = *ExtractConvertAttrValueToSz(
-		dxl_memory_manager, attrs, EdxltokenAggrefKind, EdxltokenScalarAggref);
+
+	CWStringDynamic *aggkind =
+		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n"));
+	const XMLCh *attr_val_xml = CDXLOperatorFactory::ExtractAttrValue(
+		attrs, EdxltokenAggrefKind, EdxltokenScalarAggref, true);
+	if (attr_val_xml != NULL)
+	{
+		aggkind = CDXLUtils::CreateDynamicStringFromXMLChArray(
+			dxl_memory_manager, attr_val_xml);
+	}
 
 	EdxlAggrefStage agg_stage = EdxlaggstageFinal;
 

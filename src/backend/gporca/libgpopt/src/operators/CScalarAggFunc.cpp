@@ -32,14 +32,12 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
-							   IMDId *resolved_rettype,
-							   const CWStringConst *pstrAggFunc,
-							   BOOL is_distinct, EAggfuncStage eaggfuncstage,
-							   BOOL fSplit, BOOL is_ordered, CHAR aggkind,
-							   CExpressionArray *pdrgpexprDirectArgs,
-							   CExpressionArray *aggorder,
-							   CExpressionArray *aggdistinct)
+CScalarAggFunc::CScalarAggFunc(
+	CMemoryPool *mp, IMDId *pmdidAggFunc, IMDId *resolved_rettype,
+	const CWStringConst *pstrAggFunc, BOOL is_distinct,
+	EAggfuncStage eaggfuncstage, BOOL fSplit, BOOL is_ordered,
+	CWStringDynamic *aggkind, CExpressionArray *pdrgpexprDirectArgs,
+	CExpressionArray *aggorder, CExpressionArray *aggdistinct)
 	: CScalar(mp),
 	  m_pmdidAggFunc(pmdidAggFunc),
 	  m_pmdidResolvedRetType(resolved_rettype),

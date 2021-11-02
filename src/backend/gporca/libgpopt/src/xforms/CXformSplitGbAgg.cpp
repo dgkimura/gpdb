@@ -204,8 +204,9 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 				CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 			popScAggFunc->IsDistinct(), EaggfuncstageLocal, /* fGlobal */
 			true,											/* fSplit */
-			NULL, false, 'n', popScAggFunc->GetDirectArgs(),
-			popScAggFunc->GetAggOrder(), popScAggFunc->GetAggDistinct());
+			NULL, false, GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
+			popScAggFunc->GetDirectArgs(), popScAggFunc->GetAggOrder(),
+			popScAggFunc->GetAggDistinct());
 
 		popScAggFunc->MDId()->AddRef();
 		CScalarAggFunc *popScAggFuncGlobal = CUtils::PopAggFunc(
@@ -214,8 +215,9 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 				CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 			false /* is_distinct */, EaggfuncstageGlobal, /* fGlobal */
 			true,										  /* fSplit */
-			NULL, false, 'n', popScAggFunc->GetDirectArgs(),
-			popScAggFunc->GetAggOrder(), popScAggFunc->GetAggDistinct());
+			NULL, false, GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
+			popScAggFunc->GetDirectArgs(), popScAggFunc->GetAggOrder(),
+			popScAggFunc->GetAggDistinct());
 
 		// determine column reference for the new project element
 		const IMDAggregate *pmdagg =

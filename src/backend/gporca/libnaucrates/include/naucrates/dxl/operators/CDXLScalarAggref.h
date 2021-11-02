@@ -59,7 +59,7 @@ private:
 
 	BOOL m_is_ordered;
 
-	CHAR m_aggkind;
+	CWStringDynamic *m_aggkind;
 
 	// private copy ctor
 	CDXLScalarAggref(const CDXLScalarAggref &);
@@ -68,7 +68,7 @@ public:
 	// ctor/dtor
 	CDXLScalarAggref(CMemoryPool *mp, IMDId *agg_mdid, IMDId *resolved_rettype,
 					 BOOL is_distinct, EdxlAggrefStage agg_stage,
-					 BOOL is_ordered, CHAR aggkind);
+					 BOOL is_ordered, CWStringDynamic *aggkind);
 
 	virtual ~CDXLScalarAggref();
 
@@ -89,7 +89,7 @@ public:
 
 	BOOL IsOrdered() const;
 
-	CHAR
+	CWStringDynamic *
 	GetAggKind() const
 	{
 		return m_aggkind;

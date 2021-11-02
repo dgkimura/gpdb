@@ -242,8 +242,9 @@ public:
 		BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
 		IMDId *
 			pmdidResolvedReturnType,  // return type to be used if original return type is ambiguous
-		BOOL is_ordered, CHAR aggkind, CExpressionArray *direct_args,
-		CExpressionArray *aggorders, CExpressionArray *aggdistincts);
+		BOOL is_ordered, CWStringDynamic *aggkind,
+		CExpressionArray *direct_args, CExpressionArray *aggorders,
+		CExpressionArray *aggdistincts);
 
 	// generate an aggregate function
 	static CExpression *PexprAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,

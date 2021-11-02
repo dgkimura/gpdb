@@ -32,7 +32,7 @@ using namespace gpdxl;
 CDXLScalarAggref::CDXLScalarAggref(CMemoryPool *mp, IMDId *agg_func_mdid,
 								   IMDId *resolved_rettype_mdid,
 								   BOOL is_distinct, EdxlAggrefStage agg_stage,
-								   BOOL is_ordered, CHAR aggkind)
+								   BOOL is_ordered, CWStringDynamic *aggkind)
 	: CDXLScalar(mp),
 	  m_agg_func_mdid(agg_func_mdid),
 	  m_resolved_rettype_mdid(resolved_rettype_mdid),
@@ -200,11 +200,8 @@ CDXLScalarAggref::SerializeToDXL(CXMLSerializer *xml_serializer,
 							   CDXLTokens::GetDXLTokenStr(EdxltokenAggrefOid));
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenAggrefDistinct), m_is_distinct);
-	CHAR aggkind[2];
-	aggkind[0] = m_aggkind;
-	aggkind[1] = '\0';
 	xml_serializer->AddAttribute(
-		CDXLTokens::GetDXLTokenStr(EdxltokenAggrefKind), aggkind);
+		CDXLTokens::GetDXLTokenStr(EdxltokenAggrefKind), m_aggkind);
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenAggrefStage), GetDXLStrAggStage());
 	if (NULL != m_resolved_rettype_mdid)

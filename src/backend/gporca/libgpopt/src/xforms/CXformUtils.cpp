@@ -4354,14 +4354,16 @@ CXformUtils::PexprWinFuncAgg2ScalarAgg(CMemoryPool *mp,
 	mdid_func->AddRef();
 	return GPOS_NEW(mp) CExpression(
 		mp,
-		CUtils::PopAggFunc(mp, mdid_func,
-						   GPOS_NEW(mp) CWStringConst(
-							   mp, popScWinFunc->PstrFunc()->GetBuffer()),
-						   popScWinFunc->IsDistinct(), EaggfuncstageGlobal,
-						   false,  // fSplit
-						   NULL, false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
-						   GPOS_NEW(mp) CExpressionArray(mp),
-						   GPOS_NEW(mp) CExpressionArray(mp)),
+		CUtils::PopAggFunc(
+			mp, mdid_func,
+			GPOS_NEW(mp)
+				CWStringConst(mp, popScWinFunc->PstrFunc()->GetBuffer()),
+			popScWinFunc->IsDistinct(), EaggfuncstageGlobal,
+			false,	// fSplit
+			NULL, false, GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
+			GPOS_NEW(mp) CExpressionArray(mp),
+			GPOS_NEW(mp) CExpressionArray(mp),
+			GPOS_NEW(mp) CExpressionArray(mp)),
 		pdrgpexprWinFuncArgs);
 }
 

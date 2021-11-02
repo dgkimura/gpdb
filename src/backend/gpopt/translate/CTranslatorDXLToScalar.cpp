@@ -615,7 +615,11 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 			new_target_entry->ressortgroupref =
 				indexes[attno] == 0 ? 0 : indexes[attno];
 
-			aggref->aggkind = dxlop->GetAggKind();
+			CHAR *paggkind =
+				CTranslatorUtils::CreateMultiByteCharStringFromWCString(
+					dxlop->GetAggKind()->GetBuffer());
+			aggref->aggkind = *paggkind;
+			gpdb::GPDBFree(paggkind);
 		}
 		aggref->args = gpdb::LAppend(aggref->args, new_target_entry);
 		if (dxlop->IsOrdered())
@@ -625,7 +629,11 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 
 			sortgrpindex++;
 
-			aggref->aggkind = dxlop->GetAggKind();
+			CHAR *paggkind =
+				CTranslatorUtils::CreateMultiByteCharStringFromWCString(
+					dxlop->GetAggKind()->GetBuffer());
+			aggref->aggkind = *paggkind;
+			gpdb::GPDBFree(paggkind);
 		}
 	}
 	CDXLNode *directargs = (*aggref_node)[directidx];

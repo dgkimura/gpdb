@@ -63,7 +63,7 @@ private:
 
 	BOOL m_is_ordered;
 
-	CHAR m_aggkind;
+	CWStringDynamic *m_aggkind;
 
 	// stage of the aggregate function
 	EAggfuncStage m_eaggfuncstage;
@@ -85,7 +85,7 @@ public:
 	CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 				   IMDId *resolved_rettype, const CWStringConst *pstrAggFunc,
 				   BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
-				   BOOL is_ordered, CHAR aggkind,
+				   BOOL is_ordered, CWStringDynamic *aggkind,
 				   CExpressionArray *pdrgpexprDirectArgs,
 				   CExpressionArray *aggorder, CExpressionArray *aggdistinct);
 
@@ -95,6 +95,7 @@ public:
 		m_pmdidAggFunc->Release();
 		CRefCount::SafeRelease(m_pmdidResolvedRetType);
 		CRefCount::SafeRelease(m_return_type_mdid);
+		GPOS_DELETE(m_aggkind);
 		GPOS_DELETE(m_pstrAggFunc);
 	}
 
@@ -173,7 +174,7 @@ public:
 		return m_is_ordered;
 	}
 
-	CHAR
+	CWStringDynamic *
 	AggKind() const
 	{
 		return m_aggkind;
