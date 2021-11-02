@@ -259,9 +259,8 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 					CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 				true /* is_distinct */, EaggfuncstageLocal /*eaggfuncstage*/,
 				true, /* fSplit */
-				NULL, false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
-				GPOS_NEW(mp) CExpressionArray(mp),
-				GPOS_NEW(mp) CExpressionArray(mp));
+				NULL, false, 'n', popScAggFunc->GetDirectArgs(),
+				popScAggFunc->GetAggOrder(), popScAggFunc->GetAggDistinct());
 
 			GPOS_ASSERT(1 == pexprAggFunc->Arity());
 			CExpression *pexprArg = (*pexprAggFunc)[0];
@@ -294,9 +293,8 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 					CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 				false /* is_distinct */, EaggfuncstageGlobal /*eaggfuncstage*/,
 				true, /* fSplit */
-				NULL, false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
-				GPOS_NEW(mp) CExpressionArray(mp),
-				GPOS_NEW(mp) CExpressionArray(mp));
+				NULL, false, 'n', popScAggFunc->GetDirectArgs(),
+				popScAggFunc->GetAggOrder(), popScAggFunc->GetAggDistinct());
 
 			CExpressionArray *pdrgpexprArgsGlobal =
 				GPOS_NEW(mp) CExpressionArray(mp);
@@ -394,9 +392,8 @@ CXformSplitDQA::PexprSplitHelper(CMemoryPool *mp, CColumnFactory *col_factory,
 					CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 				false /* is_distinct */, EaggfuncstageGlobal /*eaggfuncstage*/,
 				false, /* fSplit */
-				NULL, false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
-				GPOS_NEW(mp) CExpressionArray(mp),
-				GPOS_NEW(mp) CExpressionArray(mp));
+				NULL, false, 'n', popScAggFunc->GetDirectArgs(),
+				popScAggFunc->GetAggOrder(), popScAggFunc->GetAggDistinct());
 
 			GPOS_ASSERT(1 == pexprAggFunc->Arity());
 			CExpression *pexprArg = (*pexprAggFunc)[0];
@@ -480,8 +477,8 @@ CXformSplitDQA::PexprPrElAgg(CMemoryPool *mp, CExpression *pexprAggFunc,
 			CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 		false,				 /*fdistinct */
 		eaggfuncstage, true, /* fSplit */
-		NULL, false, 'n', GPOS_NEW(mp) CExpressionArray(mp),
-		GPOS_NEW(mp) CExpressionArray(mp), GPOS_NEW(mp) CExpressionArray(mp));
+		NULL, false, 'n', popScAggFunc->GetDirectArgs(),
+		popScAggFunc->GetAggOrder(), popScAggFunc->GetAggDistinct());
 
 	return CUtils::PexprScalarProjectElement(
 		mp, pcrCurrStage,
