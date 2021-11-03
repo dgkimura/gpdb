@@ -6593,7 +6593,7 @@ CTranslatorExprToDXL::PdxlnScAggref(CExpression *pexprAggFunc)
 
 	CDXLScalarAggref *pdxlopAggRef = GPOS_NEW(m_mp) CDXLScalarAggref(
 		m_mp, pmdidAggFunc, resolved_rettype, popScAggFunc->IsDistinct(),
-		edxlaggrefstage, popScAggFunc->IsOrdered(),
+		edxlaggrefstage,
 		GPOS_NEW(m_mp)
 			CWStringDynamic(m_mp, popScAggFunc->AggKind()->GetBuffer()));
 

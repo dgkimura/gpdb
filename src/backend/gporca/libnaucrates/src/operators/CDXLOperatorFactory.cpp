@@ -1062,8 +1062,8 @@ CDXLOperatorFactory::MakeDXLAggFunc(CDXLMemoryManager *dxl_memory_manager,
 			dxl_memory_manager, attrs, EdxltokenTypeId, EdxltokenScalarAggref);
 	}
 
-	return GPOS_NEW(mp) CDXLScalarAggref(
-		mp, agg_mdid, resolved_rettype, is_distinct, agg_stage, false, aggkind);
+	return GPOS_NEW(mp) CDXLScalarAggref(mp, agg_mdid, resolved_rettype,
+										 is_distinct, agg_stage, aggkind);
 }
 
 //---------------------------------------------------------------------------

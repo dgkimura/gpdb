@@ -32,19 +32,20 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarAggFunc::CScalarAggFunc(
-	CMemoryPool *mp, IMDId *pmdidAggFunc, IMDId *resolved_rettype,
-	const CWStringConst *pstrAggFunc, BOOL is_distinct,
-	EAggfuncStage eaggfuncstage, BOOL fSplit, BOOL is_ordered,
-	CWStringDynamic *aggkind, CExpressionArray *pdrgpexprDirectArgs,
-	CExpressionArray *aggorder, CExpressionArray *aggdistinct)
+CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
+							   IMDId *resolved_rettype,
+							   const CWStringConst *pstrAggFunc,
+							   BOOL is_distinct, EAggfuncStage eaggfuncstage,
+							   BOOL fSplit, CWStringDynamic *aggkind,
+							   CExpressionArray *pdrgpexprDirectArgs,
+							   CExpressionArray *aggorder,
+							   CExpressionArray *aggdistinct)
 	: CScalar(mp),
 	  m_pmdidAggFunc(pmdidAggFunc),
 	  m_pmdidResolvedRetType(resolved_rettype),
 	  m_return_type_mdid(NULL),
 	  m_pstrAggFunc(pstrAggFunc),
 	  m_is_distinct(is_distinct),
-	  m_is_ordered(is_ordered),
 	  m_aggkind(aggkind),
 	  m_eaggfuncstage(eaggfuncstage),
 	  m_fSplit(fSplit),
@@ -179,11 +180,18 @@ CScalarAggFunc::Matches(COperator *pop) const
 	{
 		CScalarAggFunc *popScAggFunc = CScalarAggFunc::PopConvert(pop);
 
+		for (ULONG i = 0; i < m_aggorder->Size(); i++)
+		{
+			if (!(*m_aggorder)[i]->Matches((*popScAggFunc->GetAggOrder())[i]))
+			{
+				return false;
+			}
+		}
+
 		// match if func ids are identical
 		return ((popScAggFunc->IsDistinct() == m_is_distinct) &&
 				(popScAggFunc->Eaggfuncstage() == Eaggfuncstage()) &&
 				(popScAggFunc->FSplit() == m_fSplit) &&
-				(popScAggFunc->IsOrdered() == m_is_ordered) &&
 				m_pmdidAggFunc->Equals(popScAggFunc->MDId()));
 	}
 
@@ -257,8 +265,6 @@ CScalarAggFunc::OsPrint(IOstream &os) const
 		default:
 			GPOS_ASSERT(!"Unsupported aggregate type");
 	}
-	os << " , Ordered: ";
-	os << (m_is_ordered ? "true" : "false");
 
 	os << ")";
 

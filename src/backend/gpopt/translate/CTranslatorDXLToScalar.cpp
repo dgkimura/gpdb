@@ -551,24 +551,21 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 
 	// Find ressortgroupref from tleSortGroupRef
 	std::vector<int> indexes(gpdb::ListLength(exprs), -1);
-	if (dxlop->IsOrdered())
+	CDXLNode *aggorders = (*aggref_node)[sortidx];
+	for (ULONG i = 0; i < aggorders->Arity(); i++)
 	{
-		CDXLNode *aggorders = (*aggref_node)[sortidx];
-		for (ULONG i = 0; i < aggorders->Arity(); i++)
+		SortGroupClause *gc = (SortGroupClause *) TranslateDXLToScalar(
+			(*aggorders)[i], colid_var);
+		aggref->aggorder = gpdb::LAppend(aggref->aggorder, gc);
+		// hack special number to signal no associated ressortgroupref in tle
+		if (gc->tleSortGroupRef != -1)
 		{
-			SortGroupClause *gc = (SortGroupClause *) TranslateDXLToScalar(
-				(*aggorders)[i], colid_var);
-			aggref->aggorder = gpdb::LAppend(aggref->aggorder, gc);
-			// hack special number to signal no associated ressortgroupref in tle
-			if (gc->tleSortGroupRef != -1)
-			{
-				indexes[gc->tleSortGroupRef] = gc->tleSortGroupRef;
-			}
+			indexes[gc->tleSortGroupRef] = gc->tleSortGroupRef;
 		}
 	}
+	CDXLNode *aggdistincts = (*aggref_node)[distinctidx];
 	if (dxlop->IsDistinct())
 	{
-		CDXLNode *aggdistincts = (*aggref_node)[distinctidx];
 		for (ULONG i = 0; i < aggdistincts->Arity(); i++)
 		{
 			SortGroupClause *gc = (SortGroupClause *) TranslateDXLToScalar(
@@ -585,49 +582,16 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 	int attno;
 	aggref->args = NIL;
 	ListCell *lc;
-	int sortgrpindex = 1;
 	ForEachWithCount(lc, exprs, attno)
 	{
 		TargetEntry *new_target_entry =
 			gpdb::MakeTargetEntry((Expr *) lfirst(lc), attno + 1, NULL, false);
-		/*
-		 * Translate the aggdistinct bool set to true (in ORCA),
-		 * to a List of SortGroupClause in the PLNSTMT
-		 */
-		if (dxlop->IsDistinct())
-		{
-			//new_target_entry->ressortgroupref = sortgrpindex;
-			//SortGroupClause *gc = makeNode(SortGroupClause);
-			//gc->tleSortGroupRef = sortgrpindex;
-			//gc->eqop = gpdb::GetEqualityOp(
-			//	gpdb::ExprType((Node *) new_target_entry->expr));
-			//gc->sortop = gpdb::GetOrderingOpForEqualityOp(gc->eqop, NULL);
-			///*
-			// * Since ORCA doesn't yet support ordered aggregates, we are
-			// * setting nulls_first to false. This is also the default behavior
-			// * when no order by clause is provided so it is OK to set it to
-			// * false.
-			// */
-			//gc->nulls_first = false;
-			//aggref->aggdistinct = gpdb::LAppend(aggref->aggdistinct, gc);
-			//sortgrpindex++;
 
-			new_target_entry->ressortgroupref =
-				indexes[attno] == 0 ? 0 : indexes[attno];
-
-			CHAR *paggkind =
-				CTranslatorUtils::CreateMultiByteCharStringFromWCString(
-					dxlop->GetAggKind()->GetBuffer());
-			aggref->aggkind = *paggkind;
-			gpdb::GPDBFree(paggkind);
-		}
 		aggref->args = gpdb::LAppend(aggref->args, new_target_entry);
-		if (dxlop->IsOrdered())
+		if (aggorders->Arity() > 0 || aggdistincts->Arity() > 0)
 		{
 			new_target_entry->ressortgroupref =
 				indexes[attno] == 0 ? 0 : indexes[attno];
-
-			sortgrpindex++;
 
 			CHAR *paggkind =
 				CTranslatorUtils::CreateMultiByteCharStringFromWCString(

@@ -262,8 +262,7 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 					CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 				true /* is_distinct */, EaggfuncstageLocal /*eaggfuncstage*/,
 				true, /* fSplit */
-				NULL, false,
-				GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
+				NULL, GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
 				popScAggFunc->GetDirectArgs(), popScAggFunc->GetAggOrder(),
 				popScAggFunc->GetAggDistinct());
 
@@ -301,8 +300,7 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 					CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 				false /* is_distinct */, EaggfuncstageGlobal /*eaggfuncstage*/,
 				true, /* fSplit */
-				NULL, false,
-				GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
+				NULL, GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
 				popScAggFunc->GetDirectArgs(), popScAggFunc->GetAggOrder(),
 				popScAggFunc->GetAggDistinct());
 
@@ -405,8 +403,7 @@ CXformSplitDQA::PexprSplitHelper(CMemoryPool *mp, CColumnFactory *col_factory,
 					CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 				false /* is_distinct */, EaggfuncstageGlobal /*eaggfuncstage*/,
 				false, /* fSplit */
-				NULL, false,
-				GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
+				NULL, GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
 				popScAggFunc->GetDirectArgs(), popScAggFunc->GetAggOrder(),
 				popScAggFunc->GetAggDistinct());
 
@@ -495,7 +492,7 @@ CXformSplitDQA::PexprPrElAgg(CMemoryPool *mp, CExpression *pexprAggFunc,
 			CWStringConst(mp, popScAggFunc->PstrAggFunc()->GetBuffer()),
 		false,				 /*fdistinct */
 		eaggfuncstage, true, /* fSplit */
-		NULL, false, GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
+		NULL, GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
 		popScAggFunc->GetDirectArgs(), popScAggFunc->GetAggOrder(),
 		popScAggFunc->GetAggDistinct());
 

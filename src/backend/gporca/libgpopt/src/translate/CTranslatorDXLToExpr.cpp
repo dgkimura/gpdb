@@ -3117,7 +3117,7 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 			GPOS_NEW(m_mp) CWStringConst(
 				m_mp, (pmdagg->Mdname().GetMDName())->GetBuffer()),
 			dxl_op->IsDistinct(), agg_func_stage, fSplit,
-			resolved_return_type_mdid, dxl_op->IsOrdered(),
+			resolved_return_type_mdid,
 			GPOS_NEW(m_mp)
 				CWStringDynamic(m_mp, dxl_op->GetAggKind()->GetBuffer()),
 			directArgs, aggorder, aggdistinct);
@@ -3141,7 +3141,7 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 			GPOS_NEW(m_mp) CWStringConst(
 				m_mp, (pmdagg->Mdname().GetMDName())->GetBuffer()),
 			dxl_op->IsDistinct(), agg_func_stage, fSplit,
-			resolved_return_type_mdid, dxl_op->IsOrdered(),
+			resolved_return_type_mdid,
 			GPOS_NEW(m_mp)
 				CWStringDynamic(m_mp, dxl_op->GetAggKind()->GetBuffer()),
 			directArgs, aggorder, aggdistinct);

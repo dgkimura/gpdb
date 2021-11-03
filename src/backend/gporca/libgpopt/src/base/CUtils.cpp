@@ -1694,7 +1694,7 @@ CUtils::PopAggFunc(
 	BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
 	IMDId *
 		pmdidResolvedReturnType,  // return type to be used if original return type is ambiguous
-	BOOL is_ordered, CWStringDynamic *aggkind, CExpressionArray *direct_args,
+	CWStringDynamic *aggkind, CExpressionArray *direct_args,
 	CExpressionArray *aggorders, CExpressionArray *aggdistincts)
 {
 	GPOS_ASSERT(NULL != pmdidAggFunc);
@@ -1702,10 +1702,9 @@ CUtils::PopAggFunc(
 	GPOS_ASSERT_IMP(NULL != pmdidResolvedReturnType,
 					pmdidResolvedReturnType->IsValid());
 
-	return GPOS_NEW(mp)
-		CScalarAggFunc(mp, pmdidAggFunc, pmdidResolvedReturnType, pstrAggFunc,
-					   is_distinct, eaggfuncstage, fSplit, is_ordered, aggkind,
-					   direct_args, aggorders, aggdistincts);
+	return GPOS_NEW(mp) CScalarAggFunc(
+		mp, pmdidAggFunc, pmdidResolvedReturnType, pstrAggFunc, is_distinct,
+		eaggfuncstage, fSplit, aggkind, direct_args, aggorders, aggdistincts);
 }
 
 // generate an aggregate function
@@ -1720,7 +1719,7 @@ CUtils::PexprAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 	// generate aggregate function
 	CScalarAggFunc *popScAggFunc = PopAggFunc(
 		mp, pmdidAggFunc, pstrAggFunc, is_distinct, eaggfuncstage, fSplit, NULL,
-		false, GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
+		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
 		GPOS_NEW(mp) CExpressionArray(mp), GPOS_NEW(mp) CExpressionArray(mp),
 		GPOS_NEW(mp) CExpressionArray(mp));
 
@@ -1746,7 +1745,7 @@ CUtils::PexprCountStar(CMemoryPool *mp)
 
 	CScalarAggFunc *popScAggFunc = PopAggFunc(
 		mp, mdid, str, false /*is_distinct*/,
-		EaggfuncstageGlobal /*eaggfuncstage*/, false /*fSplit*/, NULL, false,
+		EaggfuncstageGlobal /*eaggfuncstage*/, false /*fSplit*/, NULL,
 		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("n")),
 		GPOS_NEW(mp) CExpressionArray(mp), GPOS_NEW(mp) CExpressionArray(mp),
 		GPOS_NEW(mp) CExpressionArray(mp));

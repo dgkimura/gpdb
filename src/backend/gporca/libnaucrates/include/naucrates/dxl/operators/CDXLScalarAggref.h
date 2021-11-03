@@ -57,8 +57,6 @@ private:
 	// Denotes the MPP Stage
 	EdxlAggrefStage m_agg_stage;
 
-	BOOL m_is_ordered;
-
 	CWStringDynamic *m_aggkind;
 
 	// private copy ctor
@@ -68,7 +66,7 @@ public:
 	// ctor/dtor
 	CDXLScalarAggref(CMemoryPool *mp, IMDId *agg_mdid, IMDId *resolved_rettype,
 					 BOOL is_distinct, EdxlAggrefStage agg_stage,
-					 BOOL is_ordered, CWStringDynamic *aggkind);
+					 CWStringDynamic *aggkind);
 
 	virtual ~CDXLScalarAggref();
 
@@ -86,8 +84,6 @@ public:
 	EdxlAggrefStage GetDXLAggStage() const;
 
 	BOOL IsDistinct() const;
-
-	BOOL IsOrdered() const;
 
 	CWStringDynamic *
 	GetAggKind() const
