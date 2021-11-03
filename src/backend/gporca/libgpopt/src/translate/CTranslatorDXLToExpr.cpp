@@ -3118,7 +3118,9 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 				m_mp, (pmdagg->Mdname().GetMDName())->GetBuffer()),
 			dxl_op->IsDistinct(), agg_func_stage, fSplit,
 			resolved_return_type_mdid, dxl_op->IsOrdered(),
-			dxl_op->GetAggKind(), directArgs, aggorder, aggdistinct);
+			GPOS_NEW(m_mp)
+				CWStringDynamic(m_mp, dxl_op->GetAggKind()->GetBuffer()),
+			directArgs, aggorder, aggdistinct);
 
 		pexprAggFunc =
 			GPOS_NEW(m_mp) CExpression(m_mp, popScAggFunc, pdrgpexprArgs);
@@ -3140,7 +3142,9 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 				m_mp, (pmdagg->Mdname().GetMDName())->GetBuffer()),
 			dxl_op->IsDistinct(), agg_func_stage, fSplit,
 			resolved_return_type_mdid, dxl_op->IsOrdered(),
-			dxl_op->GetAggKind(), directArgs, aggorder, aggdistinct);
+			GPOS_NEW(m_mp)
+				CWStringDynamic(m_mp, dxl_op->GetAggKind()->GetBuffer()),
+			directArgs, aggorder, aggdistinct);
 
 		// aggregate function has no arguments
 		pexprAggFunc = GPOS_NEW(m_mp) CExpression(m_mp, popScAggFunc);
