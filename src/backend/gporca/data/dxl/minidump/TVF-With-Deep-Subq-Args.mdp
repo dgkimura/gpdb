@@ -223,7 +223,11 @@ SELECT generate_series((
             <dxl:GroupingColumns/>
             <dxl:ProjList>
               <dxl:ProjElem ColId="12" Alias="count">
-                <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal"/>
+                <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal" AggKind="n">
+                  <dxl:ValuesList ParamType="aggdirectargs"/>
+                  <dxl:ValuesList ParamType="aggorder"/>
+                  <dxl:ValuesList ParamType="aggdistinct"/>
+                </dxl:AggFunc>
               </dxl:ProjElem>
             </dxl:ProjList>
             <dxl:LogicalGet>
@@ -251,7 +255,11 @@ SELECT generate_series((
               <dxl:GroupingColumns/>
               <dxl:ProjList>
                 <dxl:ProjElem ColId="23" Alias="count">
-                  <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal"/>
+                  <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal" AggKind="n">
+                    <dxl:ValuesList ParamType="aggdirectargs"/>
+                    <dxl:ValuesList ParamType="aggorder"/>
+                    <dxl:ValuesList ParamType="aggdistinct"/>
+                  </dxl:AggFunc>
                 </dxl:ProjElem>
               </dxl:ProjList>
               <dxl:LogicalGet>
@@ -385,7 +393,11 @@ SELECT generate_series((
                       <dxl:GroupingColumns/>
                       <dxl:ProjList>
                         <dxl:ProjElem ColId="64" Alias="count">
-                          <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal"/>
+                          <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal" AggKind="n">
+                            <dxl:ValuesList ParamType="aggdirectargs"/>
+                            <dxl:ValuesList ParamType="aggorder"/>
+                            <dxl:ValuesList ParamType="aggdistinct"/>
+                          </dxl:AggFunc>
                         </dxl:ProjElem>
                       </dxl:ProjList>
                       <dxl:Filter/>
@@ -434,7 +446,11 @@ SELECT generate_series((
                     <dxl:GroupingColumns/>
                     <dxl:ProjList>
                       <dxl:ProjElem ColId="75" Alias="count">
-                        <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal"/>
+                        <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal" AggKind="n">
+                          <dxl:ValuesList ParamType="aggdirectargs"/>
+                          <dxl:ValuesList ParamType="aggorder"/>
+                          <dxl:ValuesList ParamType="aggdistinct"/>
+                        </dxl:AggFunc>
                       </dxl:ProjElem>
                     </dxl:ProjList>
                     <dxl:Filter/>
@@ -580,7 +596,11 @@ SELECT generate_series((
                       <dxl:GroupingColumns/>
                       <dxl:ProjList>
                         <dxl:ProjElem ColId="64" Alias="count">
-                          <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal"/>
+                          <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal" AggKind="n">
+                            <dxl:ValuesList ParamType="aggdirectargs"/>
+                            <dxl:ValuesList ParamType="aggorder"/>
+                            <dxl:ValuesList ParamType="aggdistinct"/>
+                          </dxl:AggFunc>
                         </dxl:ProjElem>
                       </dxl:ProjList>
                       <dxl:Filter/>
@@ -629,7 +649,11 @@ SELECT generate_series((
                     <dxl:GroupingColumns/>
                     <dxl:ProjList>
                       <dxl:ProjElem ColId="75" Alias="count">
-                        <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal"/>
+                        <dxl:AggFunc AggMdid="0.2803.1.0" AggDistinct="false" AggStage="Normal" AggKind="n">
+                          <dxl:ValuesList ParamType="aggdirectargs"/>
+                          <dxl:ValuesList ParamType="aggorder"/>
+                          <dxl:ValuesList ParamType="aggdistinct"/>
+                        </dxl:AggFunc>
                       </dxl:ProjElem>
                     </dxl:ProjList>
                     <dxl:Filter/>
