@@ -54,6 +54,8 @@ private:
 		const XMLCh *const element_qname		// element's qname
 	);
 
+	ULONG m_numTrailingValuesLists;
+
 public:
 	// ctor
 	CParseHandlerScalarAggref(CMemoryPool *mp,

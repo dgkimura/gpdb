@@ -33,7 +33,8 @@ XERCES_CPP_NAMESPACE_USE
 CParseHandlerScalarAggref::CParseHandlerScalarAggref(
 	CMemoryPool *mp, CParseHandlerManager *parse_handler_mgr,
 	CParseHandlerBase *parse_handler_root)
-	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root)
+	: CParseHandlerScalarOp(mp, parse_handler_mgr, parse_handler_root),
+	  m_numTrailingValuesLists(0)
 {
 }
 
@@ -81,6 +82,8 @@ CParseHandlerScalarAggref::StartElement(const XMLCh *const element_uri,
 
 		parse_handler_base->startElement(element_uri, element_local_name,
 										 element_qname, attrs);
+
+		m_numTrailingValuesLists += 1;
 	}
 	else
 	{
@@ -126,17 +129,19 @@ CParseHandlerScalarAggref::EndElement(const XMLCh *const,  // element_uri,
 	}
 
 	const ULONG size = this->Length();
-	for (ULONG idx = 0; idx < size - 1; idx++)
+	for (ULONG idx = 0; idx < size - m_numTrailingValuesLists; idx++)
 	{
 		CParseHandlerScalarOp *scalar_op_parse_handler =
 			dynamic_cast<CParseHandlerScalarOp *>((*this)[idx]);
 		AddChildFromParseHandler(scalar_op_parse_handler);
 	}
 
-	const ULONG direct_args_idx = this->Length() - 1;
-	CParseHandlerScalarValuesList *scalar_values_parse_handler =
-		dynamic_cast<CParseHandlerScalarValuesList *>((*this)[direct_args_idx]);
-	AddChildFromParseHandler(scalar_values_parse_handler);
+	for (ULONG idx = size - m_numTrailingValuesLists; idx < size; idx++)
+	{
+		CParseHandlerScalarValuesList *scalar_values_parse_handler =
+			dynamic_cast<CParseHandlerScalarValuesList *>((*this)[idx]);
+		AddChildFromParseHandler(scalar_values_parse_handler);
+	}
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();
