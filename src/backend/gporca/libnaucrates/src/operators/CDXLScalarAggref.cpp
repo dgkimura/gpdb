@@ -13,6 +13,7 @@
 
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
+#include "naucrates/dxl/operators/CDXLScalarValuesList.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 #include "naucrates/md/IMDAggregate.h"
 
@@ -183,6 +184,28 @@ CDXLScalarAggref::IsOrdered() const
 
 //---------------------------------------------------------------------------
 //	@function:
+//		CDXLScalarAggref::SerializeValuesListChildToDXL
+//
+//	@doc:
+//		Serialize child CDXLScalarValuesList node in DXL format. Param index is
+//		one based.
+//
+//---------------------------------------------------------------------------
+void
+CDXLScalarAggref::SerializeValuesListChildToDXL(CXMLSerializer *xml_serializer,
+												const CDXLNode *dxlnode,
+												ULONG index,
+												const CHAR *attr_name) const
+{
+	const ULONG raw_index = dxlnode->Arity() - 3 - 1 + index;
+
+	CDXLScalarValuesList *child =
+		CDXLScalarValuesList::Cast(((*dxlnode)[raw_index])->GetOperator());
+	child->SerializeToDXL(xml_serializer, (*dxlnode)[raw_index], attr_name);
+}
+
+//---------------------------------------------------------------------------
+//	@function:
 //		CDXLScalarAggref::SerializeToDXL
 //
 //	@doc:
@@ -210,8 +233,23 @@ CDXLScalarAggref::SerializeToDXL(CXMLSerializer *xml_serializer,
 		m_resolved_rettype_mdid->Serialize(
 			xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
 	}
-	// Serializes all children - including scalar values list (direct args)
-	dxlnode->SerializeChildrenToDXL(xml_serializer);
+
+	// First serialize all the children representing Aggref args.
+	const ULONG arity = dxlnode->Arity();
+	for (ULONG idx = 0; idx < arity - 3; idx++)
+	{
+		GPOS_CHECK_ABORT;
+
+		CDXLNode *child_dxlnode = (*dxlnode)[idx];
+		child_dxlnode->SerializeToDXL(xml_serializer);
+
+		GPOS_CHECK_ABORT;
+	}
+
+	// Then serialize remaining children which represent Aggref aggorder, aggdistinct, and aggdirectargs
+	SerializeValuesListChildToDXL(xml_serializer, dxlnode, 1, "aggdirectargs");
+	SerializeValuesListChildToDXL(xml_serializer, dxlnode, 2, "aggorder");
+	SerializeValuesListChildToDXL(xml_serializer, dxlnode, 3, "aggdistinct");
 
 	xml_serializer->CloseElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
