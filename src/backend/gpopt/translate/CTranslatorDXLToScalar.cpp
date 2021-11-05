@@ -558,10 +558,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 			(*aggorders)[i], colid_var);
 		aggref->aggorder = gpdb::LAppend(aggref->aggorder, gc);
 		// hack special number to signal no associated ressortgroupref in tle
-		if (gc->tleSortGroupRef != -1)
-		{
-			indexes[gc->tleSortGroupRef] = gc->tleSortGroupRef;
-		}
+		indexes[gc->tleSortGroupRef] = gc->tleSortGroupRef;
 	}
 	CDXLNode *aggdistincts = (*aggref_node)[distinctidx];
 	if (dxlop->IsDistinct())
@@ -572,10 +569,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 				(*aggdistincts)[i], colid_var);
 			aggref->aggdistinct = gpdb::LAppend(aggref->aggdistinct, gc);
 			// hack special number to signal no associated ressortgroupref in tle
-			if (gc->tleSortGroupRef != -1)
-			{
-				indexes[gc->tleSortGroupRef] = gc->tleSortGroupRef;
-			}
+			indexes[gc->tleSortGroupRef] = gc->tleSortGroupRef;
 		}
 	}
 

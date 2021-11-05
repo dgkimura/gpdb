@@ -1015,8 +1015,9 @@ CDXLOperatorFactory::MakeDXLAggFunc(CDXLMemoryManager *dxl_memory_manager,
 													 EdxltokenScalarAggref);
 
 	CWStringDynamic *aggkind =
-		CDXLOperatorFactory::ExtractConvertAttrValueToStr( dxl_memory_manager,
-				attrs, EdxltokenAggrefKind, EdxltokenScalarAggref);
+		CDXLOperatorFactory::ExtractConvertAttrValueToStr(
+			dxl_memory_manager, attrs, EdxltokenAggrefKind,
+			EdxltokenScalarAggref);
 
 	EdxlAggrefStage agg_stage = EdxlaggstageFinal;
 
