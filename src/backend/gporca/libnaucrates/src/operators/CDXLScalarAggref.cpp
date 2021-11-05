@@ -225,14 +225,14 @@ CDXLScalarAggref::SerializeToDXL(CXMLSerializer *xml_serializer,
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenAggrefDistinct), m_is_distinct);
 	xml_serializer->AddAttribute(
-		CDXLTokens::GetDXLTokenStr(EdxltokenAggrefKind), m_aggkind);
-	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenAggrefStage), GetDXLStrAggStage());
 	if (NULL != m_resolved_rettype_mdid)
 	{
 		m_resolved_rettype_mdid->Serialize(
 			xml_serializer, CDXLTokens::GetDXLTokenStr(EdxltokenTypeId));
 	}
+	xml_serializer->AddAttribute(
+		CDXLTokens::GetDXLTokenStr(EdxltokenAggrefKind), m_aggkind);
 
 	// First serialize all the children representing Aggref args.
 	const ULONG arity = dxlnode->Arity();

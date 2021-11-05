@@ -1349,13 +1349,10 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 		GPOS_NEW(m_mp) CDXLNode(m_mp, sgc_values);
 	ForEach(lc, aggref->aggorder)
 	{
-		Expr *expr = (Expr *) lfirst(lc);
+		Expr *expr = (Expr*)gpdb::CopyObject(lfirst(lc));
 		// Hack? Here we set SortGroupClause->tleSortGroupRef to corresponding arg Index
-		if (((SortGroupClause *) expr)->tleSortGroupRef != -1)
-		{
-			((SortGroupClause *) expr)->tleSortGroupRef =
-				indexes[((SortGroupClause *) expr)->tleSortGroupRef];
-		}
+		((SortGroupClause *) expr)->tleSortGroupRef =
+			indexes[((SortGroupClause *) expr)->tleSortGroupRef];
 
 		CDXLNode *child_node = TranslateScalarToDXL(expr, var_colid_mapping);
 		GPOS_ASSERT(NULL != child_node);
@@ -1370,13 +1367,10 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 		GPOS_NEW(m_mp) CDXLNode(m_mp, aggdistinct_values);
 	ForEach(lc, aggref->aggdistinct)
 	{
-		Expr *expr = (Expr *) lfirst(lc);
+		Expr *expr = (Expr*)gpdb::CopyObject(lfirst(lc));
 		// Hack? Here we set SortGroupClause->tleSortGroupRef to corresponding arg Index
-		if (((SortGroupClause *) expr)->tleSortGroupRef != -1)
-		{
-			((SortGroupClause *) expr)->tleSortGroupRef =
-				indexes[((SortGroupClause *) expr)->tleSortGroupRef];
-		}
+		((SortGroupClause *) expr)->tleSortGroupRef =
+			indexes[((SortGroupClause *) expr)->tleSortGroupRef];
 
 		CDXLNode *child_node = TranslateScalarToDXL(expr, var_colid_mapping);
 		GPOS_ASSERT(NULL != child_node);
