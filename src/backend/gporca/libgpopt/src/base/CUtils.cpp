@@ -1720,9 +1720,16 @@ CUtils::PexprAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
 		mp, pmdidAggFunc, pstrAggFunc, is_distinct, eaggfuncstage, fSplit);
 
 	// generate function arguments
-	CExpression *pexprScalarIdent = PexprScalarIdent(mp, colref);
 	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
-	pdrgpexpr->Append(pexprScalarIdent);
+
+	CExpression *pexprScalarIdent = PexprScalarIdent(mp, colref);
+	CExpressionArray *pdrgpexprArgs = GPOS_NEW(mp) CExpressionArray(mp);
+	pdrgpexprArgs->Append(pexprScalarIdent);
+
+	CScalarValuesList *lv = GPOS_NEW(mp) CScalarValuesList(mp);
+	CExpression *args = GPOS_NEW(mp) CExpression(mp, lv, pdrgpexprArgs);
+
+	pdrgpexpr->Append(args);
 
 	return GPOS_NEW(mp) CExpression(mp, popScAggFunc, pdrgpexpr);
 }
@@ -1741,7 +1748,8 @@ CUtils::PexprCountStar(CMemoryPool *mp)
 
 	CScalarValuesList *popScalarValuesList = GPOS_NEW(mp) CScalarValuesList(mp);
 	CExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) CExpressionArray(mp);
-	pdrgpexpr->Append(GPOS_NEW(mp) CExpression(mp, popScalarValuesList, pdrgpexprChildren));
+	pdrgpexpr->Append(
+		GPOS_NEW(mp) CExpression(mp, popScalarValuesList, pdrgpexprChildren));
 
 	CScalarAggFunc *popScAggFunc =
 		PopAggFunc(mp, mdid, str, false /*is_distinct*/,
