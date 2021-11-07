@@ -262,7 +262,8 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 			);
 
 			GPOS_ASSERT(1 == pexprAggFunc->Arity());
-			CExpression *pexprArg = (*pexprAggFunc)[0];
+			// CScalarValuesList
+			CExpression *pexprArg = (*(*pexprAggFunc)[0])[0];
 			CColRef *pcrDistinctCol = phmexprcr->Find(pexprArg);
 			GPOS_ASSERT(NULL != pcrDistinctCol);
 			CExpressionArray *pdrgpexprArgsLocal =
@@ -393,7 +394,7 @@ CXformSplitDQA::PexprSplitHelper(CMemoryPool *mp, CColumnFactory *col_factory,
 			);
 
 			GPOS_ASSERT(1 == pexprAggFunc->Arity());
-			CExpression *pexprArg = (*pexprAggFunc)[0];
+			CExpression *pexprArg = (*(*pexprAggFunc)[0])[0];
 
 			CColRef *pcrDistinctCol = phmexprcr->Find(pexprArg);
 			GPOS_ASSERT(NULL != pcrDistinctCol);
@@ -750,7 +751,8 @@ CXformSplitDQA::ExtractDistinctCols(
 		{
 			GPOS_ASSERT(1 == pexprAggFunc->Arity());
 
-			CExpression *pexprArg = (*pexprAggFunc)[0];
+			// CScalarValuesList
+			CExpression *pexprArg = (*(*pexprAggFunc)[0])[0];
 			GPOS_ASSERT(NULL != pexprArg);
 			CColRef *pcrDistinctCol = phmexprcr->Find(pexprArg);
 			if (NULL == pcrDistinctCol)
