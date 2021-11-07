@@ -46,6 +46,9 @@ CParseHandlerScalarValuesList::StartElement(
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenScalarConstValue),
+					  element_local_name) ||
+			 0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenScalarIdent),
 					  element_local_name))
 	{
 		CParseHandlerBase *parse_handler_const_value =

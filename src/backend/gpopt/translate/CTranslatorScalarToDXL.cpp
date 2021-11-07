@@ -1298,6 +1298,8 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 	CDXLNode *dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, aggref_scalar);
 
 	// translate args
+	CDXLScalarValuesList *values = GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
+	CDXLNode *value_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, values);
 	ListCell *lc;
 	ForEach(lc, aggref->args)
 	{
@@ -1305,8 +1307,9 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 		CDXLNode *child_node =
 			TranslateScalarToDXL(tle->expr, var_colid_mapping);
 		GPOS_ASSERT(NULL != child_node);
-		dxlnode->AddChild(child_node);
+		value_list_dxlnode->AddChild(child_node);
 	}
+	dxlnode->AddChild(value_list_dxlnode);
 
 	return dxlnode;
 }

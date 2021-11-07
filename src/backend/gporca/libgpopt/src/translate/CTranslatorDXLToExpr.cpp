@@ -196,6 +196,7 @@ CTranslatorDXLToExpr::InitTranslators()
 		{EdxlopScalarArrayRef, &gpopt::CTranslatorDXLToExpr::PexprArrayRef},
 		{EdxlopScalarArrayRefIndexList,
 		 &gpopt::CTranslatorDXLToExpr::PexprArrayRefIndexList},
+		{EdxlopScalarValuesList, &gpopt::CTranslatorDXLToExpr::PexprValuesList},
 	};
 
 	const ULONG translators_mapping_len = GPOS_ARRAY_SIZE(translators_mapping);
@@ -3077,6 +3078,7 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 		// translate function arguments
 		CExpressionArray *pdrgpexprArgs = PdrgpexprChildren(pdxlnAggref);
 
+		//FIXME: This is a list
 		// check if the arguments have set returning functions, if so raise an exception
 		for (ULONG ul = 0; ul < pdrgpexprArgs->Size(); ul++)
 		{
@@ -3168,6 +3170,20 @@ CTranslatorDXLToExpr::PexprArrayRef(const CDXLNode *dxlnode)
 	CExpressionArray *pdrgpexprChildren = PdrgpexprChildren(dxlnode);
 
 	return GPOS_NEW(m_mp) CExpression(m_mp, popArrayref, pdrgpexprChildren);
+}
+
+CExpression *
+CTranslatorDXLToExpr::PexprValuesList(const CDXLNode *dxlnode)
+{
+	//CDXLScalarValuesList *dxl_op =
+	//	CDXLScalarValuesList::Cast(dxlnode->GetOperator());
+	CScalarValuesList *popScalarValuesList =
+		GPOS_NEW(m_mp) CScalarValuesList(m_mp);
+
+	CExpressionArray *pdrgpexprChildren = PdrgpexprChildren(dxlnode);
+
+	return GPOS_NEW(m_mp)
+		CExpression(m_mp, popScalarValuesList, pdrgpexprChildren);
 }
 
 //---------------------------------------------------------------------------

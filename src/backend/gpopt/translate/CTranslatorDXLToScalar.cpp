@@ -143,6 +143,8 @@ CTranslatorDXLToScalar::TranslateDXLToScalar(const CDXLNode *dxlnode,
 		 &CTranslatorDXLToScalar::TranslateDXLScalarPartListValuesToScalar},
 		{EdxlopScalarPartListNullTest,
 		 &CTranslatorDXLToScalar::TranslateDXLScalarPartListNullTestToScalar},
+		{EdxlopScalarValuesList,
+		 &CTranslatorDXLToScalar::TranslateDXLScalarValuesListToScalar},
 	};
 
 	const ULONG num_translators = GPOS_ARRAY_SIZE(translators);
@@ -526,7 +528,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 	}
 
 	// translate each DXL argument
-	List *exprs = TranslateScalarChildren(aggref->args, aggref_node, colid_var);
+	List *exprs = TranslateScalarListChildren((*aggref_node)[0], colid_var);
 
 	int attno;
 	aggref->args = NIL;
@@ -1450,6 +1452,23 @@ CTranslatorDXLToScalar::TranslateScalarChildren(List *list,
 	return new_list;
 }
 
+List *
+CTranslatorDXLToScalar::TranslateScalarListChildren(const CDXLNode *dxlnode,
+													CMappingColIdVar *colid_var)
+{
+	List *new_list = NULL;
+
+	const ULONG arity = dxlnode->Arity();
+	for (ULONG ul = 0; ul < arity; ul++)
+	{
+		CDXLNode *child_dxl = (*dxlnode)[ul];
+		Expr *child_expr = TranslateDXLToScalar(child_dxl, colid_var);
+		new_list = gpdb::LAppend(new_list, child_expr);
+	}
+
+	return new_list;
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CTranslatorDXLToScalar::TranslateDXLScalarConstToScalar
@@ -2013,6 +2032,20 @@ CTranslatorDXLToScalar::TranslateDXLScalarArrayToScalar(
 	 * were passed to ORCA. But there's little harm in trying).
 	 */
 	return (Expr *) gpdb::EvalConstExpressions((Node *) expr);
+}
+
+Expr *
+CTranslatorDXLToScalar::TranslateDXLScalarValuesListToScalar(
+	const CDXLNode *scalar_array_node, CMappingColIdVar *colid_var)
+{
+	GPOS_ASSERT(NULL != scalar_array_node);
+	CDXLScalarValuesList *dxlop =
+		CDXLScalarValuesList::Cast(scalar_array_node->GetOperator());
+
+	List *values = NULL;
+	values = TranslateScalarChildren(values, scalar_array_node, colid_var);
+
+	return (Expr *) values;
 }
 
 //---------------------------------------------------------------------------

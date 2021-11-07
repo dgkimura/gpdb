@@ -168,6 +168,8 @@ CTranslatorExprToDXL::InitScalarTranslators()
 		{COperator::EopScalarArrayCoerceExpr,
 		 &gpopt::CTranslatorExprToDXL::PdxlnScArrayCoerceExpr},
 		{COperator::EopScalarArray, &gpopt::CTranslatorExprToDXL::PdxlnArray},
+		{COperator::EopScalarValuesList,
+		 &gpopt::CTranslatorExprToDXL::PdxlnValuesList},
 		{COperator::EopScalarArrayCmp,
 		 &gpopt::CTranslatorExprToDXL::PdxlnArrayCmp},
 		{COperator::EopScalarArrayRef,
@@ -6594,7 +6596,9 @@ CTranslatorExprToDXL::PdxlnScAggref(CExpression *pexprAggFunc)
 						 popScAggFunc->IsDistinct(), edxlaggrefstage);
 
 	CDXLNode *pdxlnAggref = GPOS_NEW(m_mp) CDXLNode(m_mp, pdxlopAggRef);
-	TranslateScalarChildren(pexprAggFunc, pdxlnAggref);
+
+	CDXLNode *vl = PdxlnValuesList((*pexprAggFunc)[0]);
+	pdxlnAggref->AddChild(vl);
 
 	return pdxlnAggref;
 }
@@ -7245,6 +7249,24 @@ CTranslatorExprToDXL::PdxlnArray(CExpression *pexpr)
 	}
 
 	return pdxlnArray;
+}
+CDXLNode *
+CTranslatorExprToDXL::PdxlnValuesList(CExpression *pexpr)
+{
+	GPOS_ASSERT(NULL != pexpr);
+	//CScalarValuesList *pop = CScalarValuesList::PopConvert(pexpr->Pop());
+
+	CDXLNode *pdxlnValuesList = GPOS_NEW(m_mp)
+		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp));
+
+	for (ULONG ul = 0; ul < pexpr->Arity(); ul++)
+	{
+		CExpression *pexprChild = (*pexpr)[ul];
+		CDXLNode *child_dxlnode = PdxlnScalar(pexprChild);
+		pdxlnValuesList->AddChild(child_dxlnode);
+	}
+
+	return pdxlnValuesList;
 }
 
 //---------------------------------------------------------------------------
