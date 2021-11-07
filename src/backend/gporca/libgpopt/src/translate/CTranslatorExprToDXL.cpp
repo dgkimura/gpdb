@@ -7264,7 +7264,6 @@ CTranslatorExprToDXL::PdxlnValuesList(CExpression *pexpr)
 		CExpression *pexprChild = (*pexpr)[ul];
 		CDXLNode *child_dxlnode = PdxlnScalar(pexprChild);
 		pdxlnValuesList->AddChild(child_dxlnode);
-		pexprChild->Release();
 	}
 
 	return pdxlnValuesList;
