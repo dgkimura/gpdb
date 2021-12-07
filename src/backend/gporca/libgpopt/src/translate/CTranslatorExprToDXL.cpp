@@ -3160,6 +3160,7 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan(
 	// find required column from inner child
 	CColRef *pcrInner = (*pdrgpcrInner)[0];
 
+	BOOL outerParam = false;
 	if (fCorrelatedLOJ)
 	{
 		// overwrite required inner column based on scalar expression
@@ -3170,7 +3171,7 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan(
 		pcrsUsed->Intersection(pcrsInner);
 		if (0 < pcrsUsed->Size())
 		{
-			GPOS_ASSERT(1 == pcrsUsed->Size());
+			outerParam = pcrsUsed->Size() > 1;
 
 			pcrInner = pcrsUsed->PcrFirst();
 		}
@@ -3194,10 +3195,10 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan(
 	mdid->AddRef();
 
 	// construct a subplan node, with the inner child under it
-	CDXLNode *pdxlnSubPlan = GPOS_NEW(m_mp) CDXLNode(
-		m_mp,
-		GPOS_NEW(m_mp) CDXLScalarSubPlan(m_mp, mdid, dxl_colref_array,
-										 dxl_subplan_type, dxlnode_test_expr));
+	CDXLNode *pdxlnSubPlan = GPOS_NEW(m_mp)
+		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSubPlan(
+						   m_mp, mdid, dxl_colref_array, dxl_subplan_type,
+						   dxlnode_test_expr, outerParam));
 	pdxlnSubPlan->AddChild(inner_dxlnode);
 
 	// add to hashmap

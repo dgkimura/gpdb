@@ -668,7 +668,8 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 	SubLinkType slink = CTranslatorUtils::MapDXLSubplanToSublinkType(
 		dxlop->GetDxlSubplanType());
 	Expr *test_expr = TranslateDXLSubplanTestExprToScalar(
-		dxlop->GetDxlTestExpr(), slink, colid_var, false, &param_ids);
+		dxlop->GetDxlTestExpr(), slink, colid_var, dxlop->FOuterParam(),
+		&param_ids);
 
 	const CDXLColRefArray *outer_refs = dxlop->GetDxlOuterColRefsArray();
 
@@ -800,7 +801,7 @@ CTranslatorDXLToScalar::TranslateDXLSubplanTestExprToScalar(
 
 		// Ident
 		CDXLScalarIdent *outer_ident =
-			CDXLScalarIdent::Cast(inner_child_node->GetOperator());
+			CDXLScalarIdent::Cast(outer_child_node->GetOperator());
 		Expr *outer_expr = (Expr *) param1;
 
 		// finalize inner expression
