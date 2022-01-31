@@ -90,6 +90,30 @@ CColRefSet::FMember(const CColRef *colref) const
 	return CBitSet::Get(colref->Id());
 }
 
+//---------------------------------------------------------------------------
+//	@function:
+//		CColRefSet::GetMember
+//
+//	@doc:
+//		Return colref member that matches given colid
+//
+//---------------------------------------------------------------------------
+CColRef *
+CColRefSet::GetMember(const ULONG colid) const
+{
+	CColRefSetIter crsi(*this);
+	while (crsi.Advance())
+	{
+		CColRef *colref = crsi.Pcr();
+		if (colref->Id() == colid)
+		{
+			return colref;
+		}
+	}
+
+	return NULL;
+}
+
 
 //---------------------------------------------------------------------------
 //	@function:

@@ -3066,10 +3066,35 @@ CTranslatorExprToDXL::BuildSubplans(
 //
 //---------------------------------------------------------------------------
 CDXLNode *
-CTranslatorExprToDXL::PdxlnRestrictResult(CDXLNode *dxlnode, CColRef *colref)
+CTranslatorExprToDXL::PdxlnRestrictResult(CDXLNode *dxlnode,
+										  const CColRef *colref)
+{
+	CDXLNode *dxlresult = NULL;
+	CColRefSet *pcrInner = GPOS_NEW(m_mp) CColRefSet(m_mp);
+
+	pcrInner->Include(colref);
+	dxlresult = PdxlnRestrictResult(dxlnode, pcrInner);
+	pcrInner->Release();
+
+	return dxlresult;
+}
+
+
+//---------------------------------------------------------------------------
+//	@function:
+//		CTranslatorExprToDXL::PdxlnRestrictResult
+//
+//	@doc:
+//		Helper to build a Result expression with project list
+//		restricted to required columns
+//
+//---------------------------------------------------------------------------
+CDXLNode *
+CTranslatorExprToDXL::PdxlnRestrictResult(CDXLNode *dxlnode,
+										  const CColRefSet *colrefs)
 {
 	GPOS_ASSERT(NULL != dxlnode);
-	GPOS_ASSERT(NULL != colref);
+	GPOS_ASSERT(NULL != colrefs);
 
 	CDXLNode *pdxlnProjListOld = (*dxlnode)[0];
 	const ULONG ulPrjElems = pdxlnProjListOld->Arity();
@@ -3093,7 +3118,9 @@ CTranslatorExprToDXL::PdxlnRestrictResult(CDXLNode *dxlnode, CColRef *colref)
 			CDXLNode *child_dxlnode = (*pdxlnProjListOld)[ul];
 			CDXLScalarProjElem *pdxlPrjElem =
 				CDXLScalarProjElem::Cast(child_dxlnode->GetOperator());
-			if (pdxlPrjElem->Id() == colref->Id())
+
+			CColRef *colref = colrefs->GetMember(pdxlPrjElem->Id());
+			if (colref)
 			{
 				// create a new project element that simply points to required column,
 				// we cannot re-use child_dxlnode here since it may have a deep expression with columns inaccessible
@@ -3103,7 +3130,7 @@ CTranslatorExprToDXL::PdxlnRestrictResult(CDXLNode *dxlnode, CColRef *colref)
 				pdxlnProjListNew->AddChild(pdxlnPrEl);
 			}
 		}
-		GPOS_ASSERT(1 == pdxlnProjListNew->Arity());
+		GPOS_ASSERT(colrefs->Size() == pdxlnProjListNew->Arity());
 
 		pdxlnResult = GPOS_NEW(m_mp)
 			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLPhysicalResult(m_mp));
@@ -3158,7 +3185,8 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan(
 		pulNonGatherMotions, pfDML, false /*fRemap*/, false /*fRoot*/);
 
 	// find required column from inner child
-	CColRef *pcrInner = (*pdrgpcrInner)[0];
+	CColRefSet *pcrInner = GPOS_NEW(m_mp) CColRefSet(m_mp);
+	pcrInner->Include((*pdrgpcrInner)[0]);
 
 	BOOL outerParam = false;
 	if (fCorrelatedLOJ)
@@ -3171,14 +3199,22 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan(
 		pcrsUsed->Intersection(pcrsInner);
 		if (0 < pcrsUsed->Size())
 		{
+			// Both sides of the SubPlan test expression can come from the
+			// inner side. So we need to pass pcrsUsed instead of pcrInner into
+			// PdxlnRestrictResult()
 			outerParam = pcrsUsed->Size() > 1;
 
-			pcrInner = pcrsUsed->PcrFirst();
+			pcrInner->Release();
+			pcrInner = pcrsUsed;
 		}
-		pcrsUsed->Release();
+		else
+		{
+			pcrsUsed->Release();
+		}
 	}
 
 	CDXLNode *inner_dxlnode = PdxlnRestrictResult(pdxlnInnerChild, pcrInner);
+	pcrInner->Release();
 	if (NULL == inner_dxlnode)
 	{
 		GPOS_RAISE(

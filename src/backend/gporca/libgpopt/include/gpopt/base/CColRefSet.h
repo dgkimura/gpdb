@@ -80,6 +80,9 @@ public:
 	// determine if bit is set
 	BOOL FMember(const CColRef *colref) const;
 
+	// get colref based on colid (or NULL if not in set)
+	CColRef *GetMember(const ULONG colid) const;
+
 	// return random member
 	CColRef *PcrAny() const;
 
