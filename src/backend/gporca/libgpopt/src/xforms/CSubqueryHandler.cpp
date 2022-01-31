@@ -1269,6 +1269,12 @@ CSubqueryHandler::FCreateCorrelatedApplyForQuantifiedSubquery(
 			mp, pexprOuter, pexprProjectConstTrue, pdrgpcrInner, eopidSubq,
 			pexprPredicate);
 
+	if (COperator::EopScalarSubqueryAll == eopidSubq)
+	{
+		CLogicalLeftOuterCorrelatedApply::PopConvert((*ppexprNewOuter)->Pop())
+			->SetAllowPredicatePushdown(false);
+	}
+
 	// we replace existential subquery with the boolean column we created,
 	// Expr2DXL translator replaces this column with a subplan node
 	*ppexprResidualScalar = CUtils::PexprScalarIdent(mp, pcrBool);

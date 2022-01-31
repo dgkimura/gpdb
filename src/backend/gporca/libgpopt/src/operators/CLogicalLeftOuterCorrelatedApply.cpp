@@ -25,7 +25,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CLogicalLeftOuterCorrelatedApply::CLogicalLeftOuterCorrelatedApply(
 	CMemoryPool *mp)
-	: CLogicalLeftOuterApply(mp)
+	: CLogicalLeftOuterApply(mp), m_allow_prediate_pushdown(true)
 {
 }
 
@@ -40,7 +40,8 @@ CLogicalLeftOuterCorrelatedApply::CLogicalLeftOuterCorrelatedApply(
 //---------------------------------------------------------------------------
 CLogicalLeftOuterCorrelatedApply::CLogicalLeftOuterCorrelatedApply(
 	CMemoryPool *mp, CColRefArray *pdrgpcrInner, EOperatorId eopidOriginSubq)
-	: CLogicalLeftOuterApply(mp, pdrgpcrInner, eopidOriginSubq)
+	: CLogicalLeftOuterApply(mp, pdrgpcrInner, eopidOriginSubq),
+	  m_allow_prediate_pushdown(true)
 {
 }
 
