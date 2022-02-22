@@ -3257,11 +3257,8 @@ simplify_function(Oid funcid, Oid result_type, int32 result_typmod,
 		elog(ERROR, "cache lookup failed for function %u", funcid);
 
 	/* While we have the tuple, check if we need to add defaults */
-	Form_pg_proc funcform = (Form_pg_proc) GETSTRUCT(func_tuple);
-
-	if (funcform->pronargs > list_length(*args))
+	if (((Form_pg_proc) GETSTRUCT(func_tuple))->pronargs > list_length(*args))
 		*args = add_function_defaults(*args, result_type, func_tuple);
-	*args = (List *) expression_tree_mutator((Node *) *args, eval_const_expressions_mutator, (void *) context);
 
 	newexpr = evaluate_function(funcid, result_type, result_typmod, *args,
 								func_tuple, context);
