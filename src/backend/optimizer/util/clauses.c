@@ -2120,12 +2120,12 @@ eval_const_expressions_mutator(Node *node,
 		 * CDB: don't optimize divide, because we might hit a divide by zero in
 		 * an expression that won't necessarily get executed later.  2006-01-09
 		 */
-		if ((expr->opfuncid >=153 && expr->opfuncid <=157) ||
-			(expr->opfuncid >=172 && expr->opfuncid <=176))
-		{
-			simple = NULL;
-		}
-		else
+		//if ((expr->opfuncid >=153 && expr->opfuncid <=157) ||
+		//	(expr->opfuncid >=172 && expr->opfuncid <=176))
+		//{
+		//	simple = NULL;
+		//}
+		//else
 
 		/*
 		 * Code for op/func reduction is pretty bulky, so split it out as a
@@ -3257,8 +3257,11 @@ simplify_function(Oid funcid, Oid result_type, int32 result_typmod,
 		elog(ERROR, "cache lookup failed for function %u", funcid);
 
 	/* While we have the tuple, check if we need to add defaults */
-	if (((Form_pg_proc) GETSTRUCT(func_tuple))->pronargs > list_length(*args))
+	Form_pg_proc funcform = (Form_pg_proc) GETSTRUCT(func_tuple);
+
+	if (funcform->pronargs > list_length(*args))
 		*args = add_function_defaults(*args, result_type, func_tuple);
+	*args = (List *) expression_tree_mutator((Node *) *args, eval_const_expressions_mutator, (void *) context);
 
 	newexpr = evaluate_function(funcid, result_type, result_typmod, *args,
 								func_tuple, context);
