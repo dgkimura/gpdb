@@ -184,3 +184,37 @@ select array(select b from t_limit_all order by b asc limit all) t;
 (1 row)
 
 drop table t_limit_all;
+-- Check that LIMIT respects the ORDER BY in a SUBQUERY.
+drop table if exists subquery_limit_table;
+NOTICE:  table "subquery_limit_table" does not exist, skipping
+create table subquery_limit_table(date_string character varying(8), id character varying(8)) DISTRIBUTED BY (date_string);
+INSERT INTO subquery_limit_table VALUES ('20211104', 'bbb'), ('20211104', 'aaa');
+explain (costs off)
+select * from (
+    select a.date_string,a.id
+    FROM subquery_limit_table a
+    order by a.date_string,a.id
+) "SUB_QRY"
+LIMIT 1000000;
+                     QUERY PLAN                     
+----------------------------------------------------
+ Limit
+   ->  Gather Motion 3:1  (slice1; segments: 3)
+         ->  Sort
+               Sort Key: date_string, id
+               ->  Seq Scan on subquery_limit_table
+ Optimizer: Pivotal Optimizer (GPORCA)
+(6 rows)
+
+select * from (
+    select a.date_string,a.id
+    FROM subquery_limit_table a
+    order by a.date_string,a.id
+) "SUB_QRY"
+LIMIT 1000000;
+ date_string | id  
+-------------+-----
+ 20211104    | aaa
+ 20211104    | bbb
+(2 rows)
+

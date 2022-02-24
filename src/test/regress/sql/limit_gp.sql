@@ -65,3 +65,25 @@ select array(select b from t_limit_all order by b asc limit all) t;
 select array(select b from t_limit_all order by b asc limit all) t;
 
 drop table t_limit_all;
+
+
+-- Check that LIMIT respects the ORDER BY in a SUBQUERY.
+drop table if exists subquery_limit_table;
+
+create table subquery_limit_table(date_string character varying(8), id character varying(8)) DISTRIBUTED BY (date_string);
+INSERT INTO subquery_limit_table VALUES ('20211104', 'bbb'), ('20211104', 'aaa');
+
+explain (costs off)
+select * from (
+    select a.date_string,a.id
+    FROM subquery_limit_table a
+    order by a.date_string,a.id
+) "SUB_QRY"
+LIMIT 1000000;
+
+select * from (
+    select a.date_string,a.id
+    FROM subquery_limit_table a
+    order by a.date_string,a.id
+) "SUB_QRY"
+LIMIT 1000000;
