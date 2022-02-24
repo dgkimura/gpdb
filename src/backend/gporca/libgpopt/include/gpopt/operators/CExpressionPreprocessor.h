@@ -94,7 +94,8 @@ private:
 
 	// remove superfluous limit nodes
 	static CExpression *PexprRemoveSuperfluousLimit(CMemoryPool *mp,
-													CExpression *pexpr);
+													CExpression *pexpr,
+													CExpression *pexprParent);
 
 	// remove superfluous distinct nodes
 	static CExpression *PexprRemoveSuperfluousDistinctInDQA(CMemoryPool *mp,

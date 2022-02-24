@@ -377,7 +377,8 @@ CExpressionPreprocessor::PexprUnnestScalarSubqueries(CMemoryPool *mp,
 // an intermediate limit is removed if it has neither row count nor offset
 CExpression *
 CExpressionPreprocessor::PexprRemoveSuperfluousLimit(CMemoryPool *mp,
-													 CExpression *pexpr)
+													 CExpression *pexpr,
+													 CExpression *pexprParent)
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
@@ -389,14 +390,18 @@ CExpressionPreprocessor::PexprRemoveSuperfluousLimit(CMemoryPool *mp,
 	// row count, skip to limit's logical child
 	if (COperator::EopLogicalLimit == pop->Eopid() &&
 		CUtils::FHasZeroOffset(pexpr) &&
-		!CLogicalLimit::PopConvert(pop)->FHasCount())
+		!CLogicalLimit::PopConvert(pop)->FHasCount() &&
+		!(pexprParent &&
+		  pexprParent->Pop()->Eopid() == COperator::EopLogicalLimit &&
+		  CLogicalLimit::PopConvert(pexprParent->Pop())->Pos()->IsEmpty()) &&
+		!CLogicalLimit::PopConvert(pop)->Pos()->IsEmpty())
 	{
 		CLogicalLimit *popLgLimit = CLogicalLimit::PopConvert(pop);
 		if (!popLgLimit->IsTopLimitUnderDMLorCTAS() ||
 			(popLgLimit->IsTopLimitUnderDMLorCTAS() &&
 			 GPOS_FTRACE(EopttraceRemoveOrderBelowDML)))
 		{
-			return PexprRemoveSuperfluousLimit(mp, (*pexpr)[0]);
+			return PexprRemoveSuperfluousLimit(mp, (*pexpr)[0], pexpr);
 		}
 	}
 
@@ -406,7 +411,8 @@ CExpressionPreprocessor::PexprRemoveSuperfluousLimit(CMemoryPool *mp,
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprChild = PexprRemoveSuperfluousLimit(mp, (*pexpr)[ul]);
+		CExpression *pexprChild =
+			PexprRemoveSuperfluousLimit(mp, (*pexpr)[ul], pexpr);
 
 		pdrgpexprChildren->Append(pexprChild);
 	}
@@ -2724,7 +2730,7 @@ CExpressionPreprocessor::PexprPreprocess(
 
 	// (2.a) remove intermediate superfluous limit
 	CExpression *pexprSimplifiedLimit =
-		PexprRemoveSuperfluousLimit(mp, pexprNoUnusedCTEs);
+		PexprRemoveSuperfluousLimit(mp, pexprNoUnusedCTEs, nullptr);
 	GPOS_CHECK_ABORT;
 	pexprNoUnusedCTEs->Release();
 
