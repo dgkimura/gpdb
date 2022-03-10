@@ -272,9 +272,9 @@ public:
 					  ULONG minor, ...) __attribute__((__noreturn__));
 
 	// wrapper around throw with severity level
-	static void Raise(const CHAR *filename, ULONG line, ULONG major,
-					  ULONG minor, ULONG severity_level, ...)
-		__attribute__((__noreturn__));
+	//	static void Raise(const CHAR *filename, ULONG line, ULONG major,
+	//					  ULONG minor, ULONG severity_level, ...)
+	//		__attribute__((__noreturn__));
 
 	// rethrow wrapper
 	static void Reraise(CException exc, BOOL propagate = false)
