@@ -1223,6 +1223,30 @@ CSubqueryHandler::FCreateCorrelatedApplyForQuantifiedSubquery(
 		CScalarSubqueryQuantified::PopConvert(pexprSubquery->Pop());
 	CColRef *colref = const_cast<CColRef *>(popSubquery->Pcr());
 
+	// If subq is SubqueryAll and scalar child is a subquery then it must be
+	// treated in "Value" context. For example:
+	//
+	//   SELECT * FROM foo WHERE (SELECT a FROM foo limit 1) = ALL(SELECT b FROM bar);
+	//
+	//   +--CScalarSubqueryAll(=)["b" (8)]
+	//      |--CLogicalGet "bar" ("bar"),
+	//      +--CScalarSubquery["a" (16)]
+	//         +--CLogicalLimit <empty> global
+	//            |--CLogicalGet "foo" ("foo"),
+	//            |--CScalarConst (0)
+	//            +--CScalarCast
+	//               +--CScalarConst (1)
+	//
+	// This is needed to prevent incorrectly producing an inner join during
+	// FGenerateCorrelatedApplyForScalarSubquery() that will be turned into a
+	// filter over the table scan of bar during ExprToDXL translation. Such a
+	// plan can lead to wrong results.
+	if ((*pexprSubquery)[1]->Pop()->Eopid() == COperator::EopScalarSubquery &&
+		eopidSubq == COperator::EopScalarSubqueryAll)
+	{
+		esqctxt = EsqctxtValue;
+	}
+
 	// build subquery quantified comparison
 	CExpression *pexprResult = nullptr;
 	CSubqueryHandler sh(mp, true /* fEnforceCorrelatedApply */);

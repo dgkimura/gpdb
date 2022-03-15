@@ -3423,7 +3423,8 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan(
 	COperator *popCorrelatedJoin = pexprCorrelatedNLJoin->Pop();
 	COperator::EOperatorId op_id = popCorrelatedJoin->Eopid();
 	BOOL fCorrelatedLOJ =
-		(COperator::EopPhysicalCorrelatedLeftOuterNLJoin == op_id);
+		(COperator::EopPhysicalCorrelatedLeftOuterNLJoin == op_id ||
+		 COperator::EopPhysicalCorrelatedNotInLeftAntiSemiNLJoin == op_id);
 	GPOS_ASSERT(COperator::EopPhysicalCorrelatedInLeftSemiNLJoin == op_id ||
 				COperator::EopPhysicalCorrelatedNotInLeftAntiSemiNLJoin ==
 					op_id ||
