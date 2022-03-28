@@ -560,6 +560,7 @@ SELECT id, property AS "ProperTee" FROM GistTable13
 
 EXPLAIN SELECT id, property AS "ProperTee" FROM GistTable13 
  WHERE property ~= '( (999,999), (998,998) )';
+<<<<<<< HEAD
                                        QUERY PLAN                                       
 ----------------------------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)  (cost=0.00..200.27 rows=1 width=36)
@@ -568,6 +569,17 @@ EXPLAIN SELECT id, property AS "ProperTee" FROM GistTable13
  Settings:  enable_seqscan=off; optimizer=off
  Optimizer status: legacy query optimizer
 (5 rows)
+=======
+                          QUERY PLAN                          
+--------------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Bitmap Heap Scan on gisttable13
+         Recheck Cond: (property ~= '(999,999),(998,998)'::box)
+         ->  Bitmap Index Scan on gistindex13
+               Index Cond: (property ~= '(999,999),(998,998)'::box)
+ Optimizer: Postgres query optimizer
+(6 rows)
+>>>>>>> 3dd0128a47f (Make stadistinct unknown for a column without equality operator)
 
 VACUUM GistTable13;
 ANALYZE GistTable13;
@@ -580,6 +592,7 @@ SELECT id, property AS "ProperTee" FROM GistTable13
 
 EXPLAIN SELECT id, property AS "ProperTee" FROM GistTable13 
  WHERE property ~= '( (999,999), (998,998) )';
+<<<<<<< HEAD
                                        QUERY PLAN                                       
 ----------------------------------------------------------------------------------------
  Gather Motion 3:1  (slice1; segments: 3)  (cost=0.00..200.27 rows=1 width=36)
@@ -588,6 +601,17 @@ EXPLAIN SELECT id, property AS "ProperTee" FROM GistTable13
  Settings:  enable_seqscan=off; optimizer=off
  Optimizer status: legacy query optimizer
 (5 rows)
+=======
+                          QUERY PLAN                          
+--------------------------------------------------------------------
+ Gather Motion 3:1  (slice1; segments: 3)
+   ->  Bitmap Heap Scan on gisttable13
+         Recheck Cond: (property ~= '(999,999),(998,998)'::box)
+         ->  Bitmap Index Scan on gistindex13
+               Index Cond: (property ~= '(999,999),(998,998)'::box)
+ Optimizer: Postgres query optimizer
+(6 rows)
+>>>>>>> 3dd0128a47f (Make stadistinct unknown for a column without equality operator)
 
 TRUNCATE TABLE GistTable13;
 -- Add some rows.

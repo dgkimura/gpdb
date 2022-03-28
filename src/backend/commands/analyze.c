@@ -2240,14 +2240,6 @@ std_typanalyze(VacAttrStats *stats)
 		eqfunc = oprfuncid(func_operator);
 		ReleaseSysCache(func_operator);
 	}
-	if (!OidIsValid(eqfunc))
-	{
-		/* Can't do much but the minimal stuff */
-		stats->compute_stats = compute_very_minimal_stats;
-		/* Might as well use the same minrows as below */
-		stats->minrows = 300 * attr->attstattarget;
-		return true;
-	}
 
 	/* Is there a "<" operator with suitable semantics? */
 	func_operator = ordering_oper(attr->atttypid, true);
@@ -2302,10 +2294,17 @@ std_typanalyze(VacAttrStats *stats)
 		 */
 		stats->minrows = 300 * attr->attstattarget;
 	}
-	else
+	else if (OidIsValid(eqopr))
 	{
 		/* Can't do much but the minimal stuff */
 		stats->compute_stats = compute_minimal_stats;
+		/* Might as well use the same minrows as above */
+		stats->minrows = 300 * attr->attstattarget;
+	}
+	else
+	{
+		/* Can't do much but the very minimal stuff */
+		stats->compute_stats = compute_very_minimal_stats;
 		/* Might as well use the same minrows as above */
 		stats->minrows = 300 * attr->attstattarget;
 	}
@@ -2716,9 +2715,7 @@ compute_very_minimal_stats(VacAttrStatsP stats,
 			stats->stawidth = total_width / (double) nonnull_cnt;
 		else
 			stats->stawidth = stats->attrtype->typlen;
-
-		/* Assume it's a unique column */
-		stats->stadistinct = -1.0;
+		stats->stadistinct = 0.0;	/* "unknown" */
 	}
 	else if (null_cnt > 0)
 	{

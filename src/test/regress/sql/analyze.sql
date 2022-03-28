@@ -1,7 +1,7 @@
 
 -- start_matchsubs
--- m/Executing SQL: select pg_catalog.gp_acquire_sample_rows\(\d+, \d+, \'t\'\);/
--- s/Executing SQL: select pg_catalog.gp_acquire_sample_rows\(\d+, \d+, \'t\'\);/Executing SQL: select pg_catalog.gp_acquire_sample_rows\(XXX, XXX, \'t\'\)/;
+-- m/Executing SQL: select pg_catalog.sum.* c where c.oid=\d+/
+-- s/Executing SQL: select pg_catalog.sum.* c where c.oid=\d+/Executing SQL: select pg_catalog.sum XXX c where c.oid=YYY/
 -- end_matchsubs
 DROP DATABASE IF EXISTS testanalyze;
 CREATE DATABASE testanalyze;

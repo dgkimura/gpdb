@@ -1,6 +1,6 @@
 -- start_matchsubs
--- m/Executing SQL: select pg_catalog.gp_acquire_sample_rows\(\d+, \d+, \'t\'\);/
--- s/Executing SQL: select pg_catalog.gp_acquire_sample_rows\(\d+, \d+, \'t\'\);/Executing SQL: select pg_catalog.gp_acquire_sample_rows\(XXX, XXX, \'t\'\)/;
+-- m/Executing SQL: select pg_catalog.sum.* c where c.oid=\d+/
+-- s/Executing SQL: select pg_catalog.sum.* c where c.oid=\d+/Executing SQL: select pg_catalog.sum XXX c where c.oid=YYY/
 -- end_matchsubs
 DROP DATABASE IF EXISTS testanalyze;
 CREATE DATABASE testanalyze;
@@ -871,21 +871,23 @@ insert into no_eqop select i, i % 5 + 1, '<foo>bar</foo>'::xml from generate_ser
 insert into no_eqop select i, i % 5 + 1, NULL from generate_series(1, 1000)i;
 insert into no_eqop select NULL, i % 5 + 1, '<foo>bar</foo>'::xml from generate_series(1, 1000)i;
 analyze verbose rootpartition no_eqop(c);
-INFO:  analyzing "public.no_eqop" inheritance tree
-INFO:  partition no_eqop_1_prt_1 is not analyzed, so ANALYZE will collect sample for stats calculation
-INFO:  Executing SQL: select pg_catalog.gp_acquire_sample_rows(75185, 10000, 't');
+INFO:  analyzing "public.no_eqop"
+INFO:  Executing SQL: select pg_catalog.sum(pg_catalog.gp_statistics_estimate_reltuples_relpages_oid(c.oid))::pg_catalog.float4[] from pg_catalog.gp_dist_random('pg_catalog.pg_class') c where c.oid=68049
+INFO:  Executing SQL: select pg_catalog.sum(pg_catalog.gp_statistics_estimate_reltuples_relpages_oid(c.oid))::pg_catalog.float4[] from pg_catalog.gp_dist_random('pg_catalog.pg_class') c where c.oid=68057
+INFO:  Executing SQL: select (case when pg_column_size(Ta.c) > 1024 then NULL else Ta.c  end) as c, (case when Ta.c is NULL then false else true end) from public.no_eqop as Ta  limit 30000
 select * from pg_stats where tablename = 'no_eqop';
- schemaname | tablename | attname | inherited | null_frac | avg_width | n_distinct | most_common_vals | most_common_freqs | histogram_bounds | correlation | most_common_elems | most_common_elem_freqs | elem_count_histogram 
-------------+-----------+---------+-----------+-----------+-----------+------------+------------------+-------------------+------------------+-------------+-------------------+------------------------+----------------------
- public     | no_eqop   | c       | t         |  0.333333 |        15 |          0 |                  |                   |                  |             |                   |                        | 
+ schemaname | tablename | attname | null_frac | avg_width | n_distinct | most_common_vals | most_common_freqs | histogram_bounds | correlation 
+------------+-----------+---------+-----------+-----------+------------+------------------+-------------------+------------------+-------------
+ public     | no_eqop   | c       |  0.333333 |        15 |          0 |                  |                   |                  |            
 (1 row)
 
 analyze no_eqop(c);
 -- Simply merges leaf stats. gp_acquire_sample_rows() is not executed
 analyze verbose rootpartition no_eqop(c);
-INFO:  analyzing "public.no_eqop" inheritance tree
+INFO:  analyzing "public.no_eqop"
 select * from pg_stats where tablename = 'no_eqop';
- schemaname | tablename | attname | inherited | null_frac | avg_width | n_distinct | most_common_vals | most_common_freqs | histogram_bounds | correlation | most_common_elems | most_common_elem_freqs | elem_count_histogram 
-------------+-----------+---------+-----------+-----------+-----------+------------+------------------+-------------------+------------------+-------------+-------------------+------------------------+----------------------
- public     | no_eqop   | c       | t         |  0.333333 |        15 |          0 |                  |                   |                  |             |                   |                        | 
+ schemaname | tablename | attname | null_frac | avg_width | n_distinct | most_common_vals | most_common_freqs | histogram_bounds | correlation 
+------------+-----------+---------+-----------+-----------+------------+------------------+-------------------+------------------+-------------
+ public     | no_eqop   | c       |  0.333333 |        15 |          0 |                  |                   |                  |            
 (1 row)
+
