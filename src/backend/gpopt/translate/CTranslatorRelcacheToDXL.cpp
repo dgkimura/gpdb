@@ -1674,6 +1674,9 @@ CTranslatorRelcacheToDXL::LookupFuncProps(
 	CHAR cFuncDataAccess = gpdb::FuncDataAccess(func_oid);
 	*access = GetEFuncDataAccess(cFuncDataAccess);
 
+	if (*access != IMDFunction::EFuncDataAcc::EfdaNoSQL)
+		elog(ERROR, "caught you.... LookupFuncProps");
+
 	*returns_set = gpdb::GetFuncRetset(func_oid);
 	*is_strict = gpdb::FuncStrict(func_oid);
 	*is_ndv_preserving = gpdb::IsFuncNDVPreserving(func_oid);
