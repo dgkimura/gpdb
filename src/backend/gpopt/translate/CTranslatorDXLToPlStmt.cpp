@@ -1005,11 +1005,6 @@ CTranslatorDXLToPlStmt::PlExternalScanUriList(OID oidRel)
 		fUsingLocation = true;
 	}
 
-	if (0 == gpdb::ListLength(extentry->urilocations))
-	{
-		GPOS_RAISE(gpos::CException::ExmaSystem, gpos::CException::ExmiAssert,
-				   GPOS_WSZ_LIT("unspecified urilocations"));
-	}
 	//GPOS_ASSERT(0 < gpdb::ListLength(extentry->urilocations));
 
 	CHAR *szFirstUri = NULL;

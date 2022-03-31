@@ -628,6 +628,15 @@ CTranslatorRelcacheToDXL::RetrieveRel(CMemoryPool *mp, CMDAccessor *md_accessor,
 	{
 		ExtTableEntry *extentry = gpdb::GetExternalTableEntry(oid);
 
+		List *execlocations = extentry->execlocations;
+		if (1 == gpdb::ListLength(execlocations) &&
+			strcmp(((Value *) LInitial(execlocations))->val.str,
+				   "ALL_SEGMENTS") == 0)
+		{
+			GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryNotFound,
+					   GPOS_WSZ_LIT("myexception"));
+		}
+
 		// get format error table id
 		IMDId *pmdidFmtErrTbl = NULL;
 		if (InvalidOid != extentry->fmterrtbl)
