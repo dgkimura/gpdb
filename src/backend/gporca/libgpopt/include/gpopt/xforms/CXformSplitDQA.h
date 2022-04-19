@@ -48,7 +48,8 @@ private:
 		CExpressionArray *pdrgpexprPrElSecondStage,
 		CExpressionArray *pdrgpexprPrElThirdStage, CColRefArray *pdrgpcrArgDQA,
 		CColRefArray *pdrgpcrLastStage, BOOL fSplit2LevelsOnly,
-		BOOL fAddDistinctColToLocalGb, CLogicalGbAgg::EAggStage aggStage);
+		BOOL fAddDistinctColToLocalGb, CLogicalGbAgg::EAggStage aggStage,
+		BOOL wtf = false);
 
 	// split DQA into a local DQA and global non-DQA aggregate function
 	static CExpression *PexprSplitIntoLocalDQAGlobalAgg(
@@ -62,7 +63,7 @@ private:
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
 		CExpression *pexpr, CExpression *pexprRelational,
 		ExprToColRefMap *phmexprcr, CColRefArray *pdrgpcrArgDQA,
-		CLogicalGbAgg::EAggStage aggStage);
+		CLogicalGbAgg::EAggStage aggStage, BOOL wtf = false);
 
 	// given a scalar aggregate generate the local, intermediate and global
 	// aggregate functions. Then add them to the project list of the

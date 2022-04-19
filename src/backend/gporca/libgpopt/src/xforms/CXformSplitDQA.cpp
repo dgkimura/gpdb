@@ -194,6 +194,11 @@ CXformSplitDQA::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	pxfres->Add(pexprTwoStageDQA);
 
+	CExpression *pexprTwoStageDQA2 = PexprSplitHelper(
+		mp, col_factory, md_accessor, pexpr, pexprRelational, phmexprcr,
+		pdrgpcrArgDQA, CLogicalGbAgg::EasTwoStageScalarDQA, true);
+
+	pxfres->Add(pexprTwoStageDQA2);
 
 	pdrgpcrArgDQA->Release();
 
@@ -375,7 +380,7 @@ CXformSplitDQA::PexprSplitHelper(CMemoryPool *mp, CColumnFactory *col_factory,
 								 CExpression *pexprRelational,
 								 ExprToColRefMap *phmexprcr,
 								 CColRefArray *pdrgpcrArgDQA,
-								 CLogicalGbAgg::EAggStage aggStage)
+								 CLogicalGbAgg::EAggStage aggStage, BOOL wtf)
 {
 	CExpression *pexprPrL = (*pexpr)[1];
 
@@ -479,8 +484,8 @@ CXformSplitDQA::PexprSplitHelper(CMemoryPool *mp, CColumnFactory *col_factory,
 	CExpression *pexprGlobal = PexprMultiLevelAggregation(
 		mp, pexprRelational, pdrgpexprPrElFirstStage, pdrgpexprPrElSecondStage,
 		pdrgpexprPrElLastStage, pdrgpcrArgDQA, pdrgpcrGlobal, fSpillTo2Level,
-		true /* fAddDistinctColToLocalGb */, aggStage /* fTwoStageScalarDQA */
-	);
+		true /* fAddDistinctColToLocalGb */, aggStage /* fTwoStageScalarDQA */,
+		wtf);
 
 	// clean-up the secondStage if spill to 2 level
 	if (fSpillTo2Level)
@@ -691,7 +696,7 @@ CXformSplitDQA::PexprMultiLevelAggregation(
 	CExpressionArray *pdrgpexprPrElSecondStage,
 	CExpressionArray *pdrgpexprPrElThirdStage, CColRefArray *pdrgpcrArgDQA,
 	CColRefArray *pdrgpcrLastStage, BOOL fSplit2LevelsOnly,
-	BOOL fAddDistinctColToLocalGb, CLogicalGbAgg::EAggStage aggStage)
+	BOOL fAddDistinctColToLocalGb, CLogicalGbAgg::EAggStage aggStage, BOOL wtf)
 {
 	GPOS_ASSERT(NULL != pexprRelational);
 	GPOS_ASSERT(NULL != pdrgpexprPrElFirstStage);
@@ -728,11 +733,17 @@ CXformSplitDQA::PexprMultiLevelAggregation(
 	{
 		// for scalar DQA the local aggregate is responsible for removing duplicates
 		BOOL fLocalAggGeneratesDuplicates = (0 < pdrgpcrLastStage->Size());
+		COperator::EGbAggType aggtype = COperator::EgbaggtypeLocal;
+		if (wtf)
+		{
+			fLocalAggGeneratesDuplicates = false;
+			aggtype = COperator::EgbaggtypeIntermediate;
+		}
 
 		pdrgpcrArgDQA->AddRef();
-		popFirstStage = GPOS_NEW(mp) CLogicalGbAgg(
-			mp, pdrgpcrLocal, COperator::EgbaggtypeLocal,
-			fLocalAggGeneratesDuplicates, pdrgpcrArgDQA, aggStage);
+		popFirstStage = GPOS_NEW(mp) CLogicalGbAgg(mp, pdrgpcrLocal, aggtype,
+												   fLocalAggGeneratesDuplicates,
+												   pdrgpcrArgDQA, aggStage);
 		pdrgpcrLastStage->AddRef();
 		popSecondStage = GPOS_NEW(mp) CLogicalGbAgg(
 			mp, pdrgpcrLastStage, COperator::EgbaggtypeGlobal, /* egbaggtype */
