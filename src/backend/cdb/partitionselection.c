@@ -137,6 +137,33 @@ partition_selection(PartitionNode *pn, PartitionAccessMethods *accessMethods, Da
 	return result;
 }
 
+static bool
+is_equality_qual_with_default_partition(ExprState *expr)
+{
+	if (expr->type != T_BoolExprState) return false;
+
+	BoolExprState *boolExprState = (BoolExprState*)expr;
+
+	if (list_length(boolExprState->args) == 2)
+	{
+		ExprState* arg1 = (ExprState*)linitial(boolExprState->args);
+		ExprState* arg2 = (ExprState*)lsecond(boolExprState->args);
+
+		if (arg2->type == T_PartDefaultExprState)
+		{
+			if (arg1->type == T_ScalarArrayOpExprState && arg1->expr->type == T_ScalarArrayOpExpr)
+			{
+				ScalarArrayOpExpr *opExpr = (ScalarArrayOpExpr *)arg1->expr;
+				if (opExpr->opfuncid == 67)
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 /* ----------------------------------------------------------------
  *		partition_rules_for_general_predicate
  *
@@ -155,6 +182,8 @@ partition_rules_for_general_predicate(PartitionSelectorState *node, int level,
 	List	   *result = NIL;
 	ListCell   *lc = NULL;
 
+	bool parts_cover_default = false;
+
 	foreach(lc, parentNode->rules)
 	{
 		PartitionRule *rule = (PartitionRule *) lfirst(lc);
@@ -168,13 +197,18 @@ partition_rules_for_general_predicate(PartitionSelectorState *node, int level,
 		/* evaluate generalPredicate */
 		List  *qualList = (List *) lfirst(list_nth_cell(node->levelExprStateLists, level));
 
+		bool is_equality = is_equality_qual_with_default_partition((ExprState*)linitial(qualList));
+
 		if (eval_part_qual(node->ps.ps_ExprContext, inputTuple, qualList))
 		{
 			result = lappend(result, rule);
+
+			if (is_equality)
+				parts_cover_default = true;
 		}
 	}
 
-	if (parentNode->default_part)
+	if (parentNode->default_part && !parts_cover_default)
 	{
 		/*
 		 * We need to register it to allLevelParts to evaluate the current
