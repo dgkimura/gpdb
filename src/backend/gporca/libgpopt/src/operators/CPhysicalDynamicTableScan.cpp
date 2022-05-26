@@ -19,6 +19,7 @@
 #include "gpopt/base/CDistributionSpecSingleton.h"
 #include "gpopt/base/CPartIndexMap.h"
 #include "gpopt/base/CUtils.h"
+#include "gpopt/exception.h"
 #include "gpopt/metadata/CName.h"
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
@@ -69,16 +70,23 @@ CPhysicalDynamicTableScan::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 IStatistics *
-CPhysicalDynamicTableScan::PstatsDerive(CMemoryPool *mp,
+CPhysicalDynamicTableScan::PstatsDerive(CMemoryPool *,
 										CExpressionHandle &exprhdl,
-										CReqdPropPlan *prpplan,
+										CReqdPropPlan *,
 										IStatisticsArray *	// stats_ctxt
 ) const
 {
-	GPOS_ASSERT(NULL != prpplan);
+	// extract part table base stats from passed handle
+	IStatistics *base_table_stats = exprhdl.Pstats();
+	GPOS_ASSERT(NULL != base_table_stats);
+	if (NULL == base_table_stats)
+	{
+		GPOS_RAISE(gpopt::ExmaGPOPT, gpopt::ExmiNoStats,
+				   GPOS_WSZ_LIT("CPhysicalDynamicScan"));
+	}
 
-	return CStatisticsUtils::DeriveStatsForDynamicScan(
-		mp, exprhdl, ScanId(), prpplan->Pepp()->PpfmDerived());
+	base_table_stats->AddRef();
+	return base_table_stats;
 }
 
 // EOF
