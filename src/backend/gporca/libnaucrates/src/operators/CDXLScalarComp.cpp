@@ -151,7 +151,8 @@ CDXLScalarComp::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarComp::AssertValid(const CDXLNode *node, BOOL validate_children) const
+CDXLScalarComp::AssertValid(gpos::pointer<const CDXLNode *> node,
+							BOOL validate_children) const
 {
 	const ULONG arity = node->Arity();
 	GPOS_ASSERT(2 == arity);

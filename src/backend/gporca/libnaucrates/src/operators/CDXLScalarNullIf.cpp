@@ -160,7 +160,7 @@ CDXLScalarNullIf::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarNullIf::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarNullIf::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();

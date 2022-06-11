@@ -1328,7 +1328,7 @@ CNormalizer::PexprPullUpAndCombineProjects(
 			mp, GPOS_NEW(mp) CScalarProjectList(mp), pdrgpexprPrElPullUp);
 
 #ifdef GPOS_DEBUG
-		CColRefSet *availableCRs = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::owner<CColRefSet *> availableCRs = GPOS_NEW(mp) CColRefSet(mp);
 
 		availableCRs->Include(pexprRelational->DeriveOutputColumns());
 		availableCRs->Include(pexpr->DeriveOuterReferences());
@@ -1487,7 +1487,8 @@ CNormalizer::PexprPullUpProjections(CMemoryPool *mp, CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CNormalizer::FLocalColsSubsetOfInputCols(CMemoryPool *mp, CExpression *pexpr)
+CNormalizer::FLocalColsSubsetOfInputCols(CMemoryPool *mp,
+										 gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_CHECK_STACK_SIZE;
@@ -1511,7 +1512,7 @@ CNormalizer::FLocalColsSubsetOfInputCols(CMemoryPool *mp, CExpression *pexpr)
 			return true;
 		}
 
-		CColRefSet *pcrsInput = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::owner<CColRefSet *> pcrsInput = GPOS_NEW(mp) CColRefSet(mp);
 
 		const ULONG arity = exprhdl.Arity();
 		for (ULONG ul = 0; ul < arity; ul++)
@@ -1523,7 +1524,7 @@ CNormalizer::FLocalColsSubsetOfInputCols(CMemoryPool *mp, CExpression *pexpr)
 		}
 
 		// check if the operator's locally used columns are a subset of the input columns
-		CColRefSet *pcrsUsedOp = exprhdl.PcrsUsedColumns(mp);
+		gpos::owner<CColRefSet *> pcrsUsedOp = exprhdl.PcrsUsedColumns(mp);
 		pcrsUsedOp->Exclude(exprhdl.DeriveOuterReferences());
 
 		fValid = pcrsInput->ContainsAll(pcrsUsedOp);

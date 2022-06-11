@@ -209,7 +209,7 @@ CDXLColStats::DebugPrint(IOstream &os) const
 
 	for (ULONG ul = 0; ul < Buckets(); ul++)
 	{
-		const CDXLBucket *dxl_bucket = GetDXLBucketAt(ul);
+		gpos::pointer<const CDXLBucket *> dxl_bucket = GetDXLBucketAt(ul);
 		dxl_bucket->DebugPrint(os);
 	}
 }

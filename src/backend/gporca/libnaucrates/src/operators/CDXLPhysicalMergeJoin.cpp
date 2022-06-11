@@ -108,7 +108,7 @@ CDXLPhysicalMergeJoin::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalMergeJoin::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalMergeJoin::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								   BOOL validate_children) const
 {
 	// assert proj list and filter are valid

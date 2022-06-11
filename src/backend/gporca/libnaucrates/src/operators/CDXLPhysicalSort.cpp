@@ -118,7 +118,7 @@ CDXLPhysicalSort::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSort::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalSort::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							  BOOL validate_children) const
 {
 	// assert proj list and filter are valid

@@ -157,7 +157,7 @@ CDXLPhysicalSplit::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSplit::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalSplit::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());

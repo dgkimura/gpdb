@@ -161,7 +161,7 @@ CDXLScalarCast::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCast::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarCast::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());

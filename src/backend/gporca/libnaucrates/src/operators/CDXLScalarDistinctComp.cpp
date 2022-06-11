@@ -105,7 +105,7 @@ CDXLScalarDistinctComp::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarDistinctComp::AssertValid(const CDXLNode *node,
+CDXLScalarDistinctComp::AssertValid(gpos::pointer<const CDXLNode *> node,
 									BOOL validate_children) const
 {
 	GPOS_ASSERT(EdxlscdistcmpSentinel == node->Arity());

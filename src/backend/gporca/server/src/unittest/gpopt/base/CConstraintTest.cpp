@@ -1308,7 +1308,7 @@ CConstraintTest::EresUnittest_NegativeTests()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 
 	// we need to use an auto pointer for the cache here to ensure
@@ -1324,14 +1324,15 @@ CConstraintTest::EresUnittest_NegativeTests()
 
 	CMDAccessor mda(mp, pcache, CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, pceeval, CTestUtils::GetCostModel(mp));
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_text);
+	gpos::pointer<const IMDType *> pmdtype =
+		mda.RetrieveType(&CMDIdGPDB::m_mdid_text);
 	CWStringConst str(GPOS_WSZ_LIT("text_col"));
 	CName name(mp, &str);
 	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
@@ -1346,10 +1347,11 @@ CConstraintTest::EresUnittest_NegativeTests()
 	const LINT lUpper1 = 322061118;
 
 	// 'text' is not a constrainable type, so the interval construction should assert-fail
-	CConstraintInterval *pciFirst = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_text, colref.Value(), pstrLower1.Value(),
-		lLower1, CRange::EriIncluded, pstrUpper1.Value(), lUpper1,
-		CRange::EriExcluded);
+	gpos::owner<CConstraintInterval *> pciFirst =
+		CTestUtils::PciGenericInterval(
+			mp, &mda, CMDIdGPDB::m_mdid_text, colref.Value(),
+			pstrLower1.Value(), lLower1, CRange::EriIncluded,
+			pstrUpper1.Value(), lUpper1, CRange::EriExcluded);
 	PrintConstraint(mp, pciFirst);
 	pciFirst->Release();
 

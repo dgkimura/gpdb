@@ -126,7 +126,7 @@ CDXLScalarCoerceBase::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCoerceBase::AssertValid(const CDXLNode *node,
+CDXLScalarCoerceBase::AssertValid(gpos::pointer<const CDXLNode *> node,
 								  BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == node->Arity());

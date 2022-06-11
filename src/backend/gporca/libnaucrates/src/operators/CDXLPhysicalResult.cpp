@@ -101,7 +101,7 @@ CDXLPhysicalResult::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalResult::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalResult::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(EdxlresultIndexSentinel >= dxlnode->Arity());

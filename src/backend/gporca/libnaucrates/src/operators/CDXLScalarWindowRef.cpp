@@ -193,7 +193,7 @@ CDXLScalarWindowRef::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowRef::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarWindowRef::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								 BOOL validate_children) const
 {
 	EdxlWinStage edxlwinrefstage =

@@ -111,7 +111,7 @@ CDXLLogicalLimit::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalLimit::AssertValid(const CDXLNode *node,
+CDXLLogicalLimit::AssertValid(gpos::pointer<const CDXLNode *> node,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(4 == node->Arity());

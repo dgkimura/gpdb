@@ -194,7 +194,7 @@ public:
 	CDistributionSpec *
 	PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				CDistributionSpec *pdsRequired, ULONG child_index,
-				CDrvdPropArray *,  //pdrgpdpCtxt,
+				gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
 				ULONG ulOptReq) const override
 	{
 		return PdsRequiredAgg(mp, exprhdl, pdsRequired, child_index, ulOptReq,

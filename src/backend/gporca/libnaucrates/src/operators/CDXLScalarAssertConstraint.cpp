@@ -126,7 +126,7 @@ CDXLScalarAssertConstraint::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAssertConstraint::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarAssertConstraint::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 										BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());

@@ -192,7 +192,8 @@ CDXLPhysicalDML::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDML::AssertValid(const CDXLNode *node, BOOL validate_children) const
+CDXLPhysicalDML::AssertValid(gpos::pointer<const CDXLNode *> node,
+							 BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == node->Arity());
 	CDXLNode *child_dxlnode = (*node)[1];

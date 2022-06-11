@@ -96,7 +96,7 @@ CDXLScalarPartOid::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarPartOid::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarPartOid::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							   BOOL	 // validate_children
 ) const
 {

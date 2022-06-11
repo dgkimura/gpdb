@@ -127,7 +127,7 @@ CDXLScalarHashExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarHashExpr::AssertValid(const CDXLNode *node,
+CDXLScalarHashExpr::AssertValid(gpos::pointer<const CDXLNode *> node,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == node->Arity());

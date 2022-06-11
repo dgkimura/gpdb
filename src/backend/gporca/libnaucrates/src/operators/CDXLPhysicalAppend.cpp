@@ -174,7 +174,7 @@ CDXLPhysicalAppend::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAppend::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalAppend::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								BOOL validate_children) const
 {
 	// assert proj list and filter are valid

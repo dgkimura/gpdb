@@ -229,7 +229,7 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalCTAS::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalCTAS::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());

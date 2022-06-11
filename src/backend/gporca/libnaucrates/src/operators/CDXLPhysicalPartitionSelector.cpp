@@ -144,8 +144,8 @@ CDXLPhysicalPartitionSelector::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalPartitionSelector::AssertValid(const CDXLNode *dxlnode,
-										   BOOL validate_children) const
+CDXLPhysicalPartitionSelector::AssertValid(
+	gpos::pointer<const CDXLNode *> dxlnode, BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	GPOS_ASSERT(6 == arity || 7 == arity);

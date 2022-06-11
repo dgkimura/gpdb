@@ -132,7 +132,7 @@ CDXLPhysicalSubqueryScan::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSubqueryScan::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalSubqueryScan::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 									  BOOL validate_children) const
 {
 	// assert proj list and filter are valid

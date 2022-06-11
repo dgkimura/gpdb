@@ -230,7 +230,7 @@ CDXLScalarSubPlan::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubPlan::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarSubPlan::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(EdxlSubPlanIndexSentinel == dxlnode->Arity());

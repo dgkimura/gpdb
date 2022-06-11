@@ -165,7 +165,7 @@ CDXLScalarSortCol::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSortCol::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarSortCol::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							   BOOL	 // validate_children
 ) const
 {

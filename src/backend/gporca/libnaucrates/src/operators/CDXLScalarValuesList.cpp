@@ -107,7 +107,7 @@ CDXLScalarValuesList::HasBoolResult(CMDAccessor *  //md_accessor
 
 // checks whether operator node is well-structured
 void
-CDXLScalarValuesList::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarValuesList::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();

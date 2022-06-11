@@ -165,7 +165,7 @@ CDXLPhysicalTableScan::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalTableScan::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalTableScan::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								   BOOL validate_children) const
 {
 	// assert proj list and filter are valid

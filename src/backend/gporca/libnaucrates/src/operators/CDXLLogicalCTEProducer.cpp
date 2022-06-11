@@ -120,7 +120,7 @@ CDXLLogicalCTEProducer::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalCTEProducer::AssertValid(const CDXLNode *dxlnode,
+CDXLLogicalCTEProducer::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 									BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());

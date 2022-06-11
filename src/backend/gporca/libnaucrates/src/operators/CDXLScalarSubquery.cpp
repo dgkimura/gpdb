@@ -108,7 +108,7 @@ CDXLScalarSubquery::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubquery::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarSubquery::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());

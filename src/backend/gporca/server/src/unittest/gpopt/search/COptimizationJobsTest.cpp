@@ -252,7 +252,7 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 
 		{
 			CAutoTrace at(mp);
-			CXformSet *xform_set =
+			gpos::owner<CXformSet *> xform_set =
 				CLogical::PopConvert(pgexprLogical->Pop())->PxfsCandidates(mp);
 
 			CXformSetIter xsi(*(xform_set));

@@ -244,13 +244,15 @@ CExpressionTest::EresUnittest_SimpleOps()
 		CColRef *pcrOld = pexpr->DeriveOutputColumns()->PcrAny();
 		CColRef *new_colref =
 			COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(pcrOld);
-		UlongToColRefMap *colref_mapping = GPOS_NEW(mp) UlongToColRefMap(mp);
+		gpos::owner<UlongToColRefMap *> colref_mapping =
+			GPOS_NEW(mp) UlongToColRefMap(mp);
 
 		BOOL result = colref_mapping->Insert(GPOS_NEW(mp) ULONG(pcrOld->Id()),
 											 new_colref);
 		GPOS_ASSERT(result);
-		CExpression *pexprCopy = pexpr->PexprCopyWithRemappedColumns(
-			mp, colref_mapping, true /*must_exist*/);
+		gpos::owner<CExpression *> pexprCopy =
+			pexpr->PexprCopyWithRemappedColumns(mp, colref_mapping,
+												true /*must_exist*/);
 		colref_mapping->Release();
 		oss << std::endl
 			<< "COPIED EXPRESSION (AFTER MAPPING " << *pcrOld << " TO "
@@ -261,9 +263,10 @@ CExpressionTest::EresUnittest_SimpleOps()
 		pexprCopy->Release();
 
 		// derive stats on expression
-		CReqdPropRelational *prprel =
+		gpos::owner<CReqdPropRelational *> prprel =
 			GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp));
-		IStatisticsArray *stats_ctxt = GPOS_NEW(mp) IStatisticsArray(mp);
+		gpos::owner<IStatisticsArray *> stats_ctxt =
+			GPOS_NEW(mp) IStatisticsArray(mp);
 		IStatistics *stats = pexpr->PstatsDerive(prprel, stats_ctxt);
 		GPOS_ASSERT(nullptr != stats);
 
@@ -320,9 +323,10 @@ CExpressionTest::EresUnittest_Union()
 	(void) pexpr->PdpDerive();
 
 #ifdef GPOS_DEBUG
-	CReqdPropRelational *prprel =
+	gpos::owner<CReqdPropRelational *> prprel =
 		GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp));
-	IStatisticsArray *stats_ctxt = GPOS_NEW(mp) IStatisticsArray(mp);
+	gpos::owner<IStatisticsArray *> stats_ctxt =
+		GPOS_NEW(mp) IStatisticsArray(mp);
 	IStatistics *stats = pexpr->PstatsDerive(prprel, stats_ctxt);
 	GPOS_ASSERT(nullptr != stats);
 
@@ -585,7 +589,7 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -594,7 +598,7 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	const IMDType *pmdtype = mda.PtMDType<IMDTypeInt4>();
+	gpos::pointer<const IMDType *> pmdtype = mda.PtMDType<IMDTypeInt4>();
 
 	GPOS_ASSERT(
 		IMDType::EcmptEq ==
@@ -606,11 +610,11 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 		IMDType::EcmptG ==
 		CUtils::ParseCmpType(pmdtype->GetMdidForCmpType(IMDType::EcmptG)));
 
-	const IMDScalarOp *pmdscopEq =
+	gpos::pointer<const IMDScalarOp *> pmdscopEq =
 		mda.RetrieveScOp(pmdtype->GetMdidForCmpType(IMDType::EcmptEq));
-	const IMDScalarOp *pmdscopLT =
+	gpos::pointer<const IMDScalarOp *> pmdscopLT =
 		mda.RetrieveScOp(pmdtype->GetMdidForCmpType(IMDType::EcmptL));
-	const IMDScalarOp *pmdscopGT =
+	gpos::pointer<const IMDScalarOp *> pmdscopGT =
 		mda.RetrieveScOp(pmdtype->GetMdidForCmpType(IMDType::EcmptG));
 
 	GPOS_ASSERT(IMDType::EcmptNEq ==
@@ -1048,31 +1052,33 @@ CExpressionTest::EresUnittest_FValidPlanError()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
-	const IMDType *pmdtype = mda.PtMDType<IMDTypeInt4>();
+	gpos::pointer<const IMDType *> pmdtype = mda.PtMDType<IMDTypeInt4>();
 
 	GPOS_RESULT eres = GPOS_OK;
 	// Test that in debug mode GPOS_ASSERT fails for non-physical expressions.
 	{
-		CColRefSet *pcrsInvalid = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::owner<CColRefSet *> pcrsInvalid = GPOS_NEW(mp) CColRefSet(mp);
 		CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 		CColRef *pcrComputed =
 			col_factory->PcrCreate(pmdtype, default_type_modifier);
 		pcrsInvalid->Include(pcrComputed);
 
-		CReqdPropPlan *prpp = PrppCreateRequiredProperties(mp, pcrsInvalid);
-		IDatum *datum = GPOS_NEW(mp) gpnaucrates::CDatumInt8GPDB(
+		gpos::owner<CReqdPropPlan *> prpp =
+			PrppCreateRequiredProperties(mp, pcrsInvalid);
+		gpos::owner<IDatum *> datum = GPOS_NEW(mp) gpnaucrates::CDatumInt8GPDB(
 			CTestUtils::m_sysidDefault, 1 /*val*/, false /*is_null*/);
-		CExpression *pexpr =
+		gpos::owner<CExpression *> pexpr =
 			GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, datum));
 
-		CDrvdPropCtxtPlan *pdpctxtplan = GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
+		gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+			GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 		GPOS_TRY
 		{
 			// FValidPlan should fail for expressions which are not physical.

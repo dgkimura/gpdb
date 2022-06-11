@@ -90,7 +90,7 @@ CDXLScalarHashExprList::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarHashExprList::AssertValid(const CDXLNode *node,
+CDXLScalarHashExprList::AssertValid(gpos::pointer<const CDXLNode *> node,
 									BOOL validate_children) const
 {
 	const ULONG arity = node->Arity();

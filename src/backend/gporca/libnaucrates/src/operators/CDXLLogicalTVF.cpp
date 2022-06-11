@@ -191,7 +191,7 @@ CDXLLogicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalTVF::AssertValid(const CDXLNode *dxlnode,
+CDXLLogicalTVF::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							BOOL validate_children) const
 {
 	// assert validity of function id and return type

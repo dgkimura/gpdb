@@ -147,7 +147,7 @@ CDXLPhysicalRowTrigger::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalRowTrigger::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalRowTrigger::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 									BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());

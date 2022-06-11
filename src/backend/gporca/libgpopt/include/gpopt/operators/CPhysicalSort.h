@@ -120,9 +120,9 @@ public:
 	// distribution matching type
 	CEnfdDistribution::EDistributionMatching
 	Edm(CReqdPropPlan *prppInput,
-		ULONG,			   // child_index
-		CDrvdPropArray *,  //pdrgpdpCtxt
-		ULONG			   // ulOptReq
+		ULONG,							  // child_index
+		gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt
+		ULONG							  // ulOptReq
 		) override
 	{
 		// Sort does not require Motions to be enforced on top,

@@ -95,7 +95,7 @@ CDXLLogicalSelect::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalSelect::AssertValid(const CDXLNode *node,
+CDXLLogicalSelect::AssertValid(gpos::pointer<const CDXLNode *> node,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == node->Arity());

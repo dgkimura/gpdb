@@ -198,7 +198,7 @@ CDXLLogicalGroupBy::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalGroupBy::AssertValid(const CDXLNode *node,
+CDXLLogicalGroupBy::AssertValid(gpos::pointer<const CDXLNode *> node,
 								BOOL validate_children) const
 {
 	// 1 Child node

@@ -404,7 +404,7 @@ CMDRelationCtasGPDB::DebugPrint(IOstream &os) const
 	const ULONG total_columns = ColumnCount();
 	for (ULONG ul = 0; ul < total_columns; ul++)
 	{
-		const IMDColumn *mdcol = GetMdCol(ul);
+		gpos::pointer<const IMDColumn *> mdcol = GetMdCol(ul);
 		mdcol->DebugPrint(os);
 	}
 	os << std::endl;
@@ -418,7 +418,7 @@ CMDRelationCtasGPDB::DebugPrint(IOstream &os) const
 			os << ", ";
 		}
 
-		const IMDColumn *mdcol_distr_key = GetDistrColAt(ul);
+		gpos::pointer<const IMDColumn *> mdcol_distr_key = GetDistrColAt(ul);
 		os << (mdcol_distr_key->Mdname()).GetMDName()->GetBuffer();
 	}
 

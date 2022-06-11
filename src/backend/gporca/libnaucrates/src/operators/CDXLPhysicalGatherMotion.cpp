@@ -117,7 +117,7 @@ CDXLPhysicalGatherMotion::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalGatherMotion::AssertValid(const CDXLNode *node,
+CDXLPhysicalGatherMotion::AssertValid(gpos::pointer<const CDXLNode *> node,
 									  BOOL validate_children) const
 {
 	// assert proj list and filter are valid

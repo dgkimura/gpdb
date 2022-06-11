@@ -170,7 +170,7 @@ CDXLScalarBitmapBoolOp::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBitmapBoolOp::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarBitmapBoolOp::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 									BOOL validate_children) const
 {
 	EdxlBitmapBoolOp bitmap_bool_dxlop =

@@ -1795,7 +1795,7 @@ CDXLUtils::DebugPrintMDIdArray(IOstream &os, IMdIdArray *mdid_array)
 	ULONG len = mdid_array->Size();
 	for (ULONG ul = 0; ul < len; ul++)
 	{
-		const IMDId *mdid = (*mdid_array)[ul];
+		gpos::pointer<const IMDId *> mdid = (*mdid_array)[ul];
 		mdid->OsPrint(os);
 		os << " ";
 	}

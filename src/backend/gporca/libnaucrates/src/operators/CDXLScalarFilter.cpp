@@ -98,7 +98,7 @@ CDXLScalarFilter::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarFilter::AssertValid(const CDXLNode *node,
+CDXLScalarFilter::AssertValid(gpos::pointer<const CDXLNode *> node,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(1 >= node->Arity());

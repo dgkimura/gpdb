@@ -109,7 +109,7 @@ CDXLPhysicalSequence::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSequence::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalSequence::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();

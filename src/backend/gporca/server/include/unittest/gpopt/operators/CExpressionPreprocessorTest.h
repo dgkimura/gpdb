@@ -85,16 +85,16 @@ private:
 
 #ifdef GPOS_DEBUG
 	// check if a given expression has no Outer Join nodes
-	static BOOL FHasNoOuterJoin(CExpression *pexpr);
+	static BOOL FHasNoOuterJoin(gpos::pointer<CExpression *> pexpr);
 
 	// check if a given expression has outer references in any node
-	static BOOL HasOuterRefs(CExpression *pexpr);
+	static BOOL HasOuterRefs(gpos::pointer<CExpression *> pexpr);
 
 	// check if a given expression has Sequence Project nodes
-	static BOOL FHasSeqPrj(CExpression *pexpr);
+	static BOOL FHasSeqPrj(gpos::pointer<CExpression *> pexpr);
 
 	// check if a given expression has IS DISTINCT FROM nodes
-	static BOOL FHasIDF(CExpression *pexpr);
+	static BOOL FHasIDF(gpos::pointer<CExpression *> pexpr);
 
 #endif	// GPOS_DEBUG
 

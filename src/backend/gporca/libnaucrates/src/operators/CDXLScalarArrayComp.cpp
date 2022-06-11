@@ -139,7 +139,7 @@ CDXLScalarArrayComp::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArrayComp::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarArrayComp::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								 BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();

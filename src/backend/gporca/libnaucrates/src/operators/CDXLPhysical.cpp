@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -63,7 +65,8 @@ CDXLPhysical::GetDXLOperatorType() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysical::AssertValid(const CDXLNode *node, BOOL validate_children) const
+CDXLPhysical::AssertValid(gpos::pointer<const CDXLNode *> node,
+						  BOOL validate_children) const
 {
 	GPOS_ASSERT(nullptr != node);
 

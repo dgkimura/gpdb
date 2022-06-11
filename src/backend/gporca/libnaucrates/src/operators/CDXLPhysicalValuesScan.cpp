@@ -73,7 +73,7 @@ CDXLPhysicalValuesScan::SerializeToDXL(
 
 // checks whether operator node is well-structured
 void
-CDXLPhysicalValuesScan::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalValuesScan::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 									BOOL validate_children) const
 {
 	GPOS_ASSERT(EdxloptypePhysical ==

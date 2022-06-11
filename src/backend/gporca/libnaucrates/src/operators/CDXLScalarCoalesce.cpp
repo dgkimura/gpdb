@@ -124,7 +124,7 @@ CDXLScalarCoalesce::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCoalesce::AssertValid(const CDXLNode *node,
+CDXLScalarCoalesce::AssertValid(gpos::pointer<const CDXLNode *> node,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(0 < node->Arity());

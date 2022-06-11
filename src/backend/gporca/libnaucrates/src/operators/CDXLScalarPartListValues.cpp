@@ -108,7 +108,7 @@ CDXLScalarPartListValues::SerializeToDXL(
 #ifdef GPOS_DEBUG
 // Checks whether operator node is well-structured
 void
-CDXLScalarPartListValues::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarPartListValues::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 									  BOOL	// validate_children
 ) const
 {

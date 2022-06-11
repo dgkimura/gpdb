@@ -94,8 +94,8 @@ CDXLScalarAssertConstraintList::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAssertConstraintList::AssertValid(const CDXLNode *dxlnode,
-											BOOL validate_children) const
+CDXLScalarAssertConstraintList::AssertValid(
+	gpos::pointer<const CDXLNode *> dxlnode, BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	GPOS_ASSERT(0 < arity);

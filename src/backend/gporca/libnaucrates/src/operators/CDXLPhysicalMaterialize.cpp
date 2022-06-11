@@ -172,7 +172,7 @@ CDXLPhysicalMaterialize::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalMaterialize::AssertValid(const CDXLNode *node,
+CDXLPhysicalMaterialize::AssertValid(gpos::pointer<const CDXLNode *> node,
 									 BOOL validate_children) const
 {
 	GPOS_ASSERT(EdxlspoolNone == m_spool_type ||

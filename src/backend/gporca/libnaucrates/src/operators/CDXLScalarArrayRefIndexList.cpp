@@ -128,8 +128,8 @@ CDXLScalarArrayRefIndexList::GetDXLIndexListBoundStr(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArrayRefIndexList::AssertValid(const CDXLNode *dxlnode,
-										 BOOL validate_children) const
+CDXLScalarArrayRefIndexList::AssertValid(
+	gpos::pointer<const CDXLNode *> dxlnode, BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
