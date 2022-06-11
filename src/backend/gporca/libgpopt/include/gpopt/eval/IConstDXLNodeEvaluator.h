@@ -19,6 +19,7 @@
 #define GPOPT_IConstDXLNodeEvaluator_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 
@@ -40,7 +41,8 @@ public:
 
 	// evaluate the given DXL node representing an expression and return the result
 	// as DXL. caller takes ownership of returned DXL node
-	virtual gpdxl::CDXLNode *EvaluateExpr(const gpdxl::CDXLNode *pdxlnExpr) = 0;
+	virtual gpdxl::CDXLNode *EvaluateExpr(
+		gpos::pointer<const gpdxl::CDXLNode *> pdxlnExpr) = 0;
 
 	// returns true iff the evaluator can evaluate constant expressions without
 	// subqueries

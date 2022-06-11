@@ -12,6 +12,7 @@
 #define GPOPT_CScalar_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdProp.h"
@@ -94,7 +95,7 @@ public:
 	CReqdProp *PrpCreate(CMemoryPool *mp) const override;
 
 	// return locally defined columns
-	virtual CColRefSet *
+	virtual gpos::owner<CColRefSet *>
 	PcrsDefined(CMemoryPool *mp,
 				CExpressionHandle &	 // exprhdl
 	)
@@ -104,7 +105,7 @@ public:
 	}
 
 	// return columns containing set-returning function
-	virtual CColRefSet *
+	virtual gpos::owner<CColRefSet *>
 	PcrsSetReturningFunction(CMemoryPool *mp,
 							 CExpressionHandle &  // exprhdl
 	)
@@ -114,7 +115,7 @@ public:
 	}
 
 	// return locally used columns
-	virtual CColRefSet *
+	virtual gpos::owner<CColRefSet *>
 	PcrsUsed(CMemoryPool *mp,
 			 CExpressionHandle &  // exprhdl
 	)
@@ -151,7 +152,7 @@ public:
 
 	// boolean expression evaluation
 	virtual EBoolEvalResult
-	Eber(ULongPtrArray *  // pdrgpulChildren
+	Eber(gpos::pointer<ULongPtrArray *>	 // pdrgpulChildren
 	) const
 	{
 		// by default, evaluation result can be false, true or NULL
@@ -163,7 +164,7 @@ public:
 										CExpression *pexprScalar);
 
 	// conversion function
-	static CScalar *
+	static gpos::cast_func<CScalar *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

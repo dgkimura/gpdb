@@ -13,6 +13,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include "gpos/common/owner.h"
 extern "C" {
 #include "postgres.h"
 
@@ -307,7 +308,8 @@ CConfigParamMapping::PackConfigParamInBitset(
 	ULONG xform_id	// number of available xforms
 )
 {
-	CBitSet *traceflag_bitset = GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
+	gpos::owner<CBitSet *> traceflag_bitset =
+		GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
 
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(m_elements); ul++)
 	{
@@ -346,14 +348,15 @@ CConfigParamMapping::PackConfigParamInBitset(
 
 	if (!optimizer_enable_nljoin)
 	{
-		CBitSet *nl_join_bitset = CXform::PbsNLJoinXforms(mp);
+		gpos::owner<CBitSet *> nl_join_bitset = CXform::PbsNLJoinXforms(mp);
 		traceflag_bitset->Union(nl_join_bitset);
 		nl_join_bitset->Release();
 	}
 
 	if (!optimizer_enable_indexjoin)
 	{
-		CBitSet *index_join_bitset = CXform::PbsIndexJoinXforms(mp);
+		gpos::owner<CBitSet *> index_join_bitset =
+			CXform::PbsIndexJoinXforms(mp);
 		traceflag_bitset->Union(index_join_bitset);
 		index_join_bitset->Release();
 	}
@@ -361,7 +364,8 @@ CConfigParamMapping::PackConfigParamInBitset(
 	// disable bitmap scan if the corresponding GUC is turned off
 	if (!optimizer_enable_bitmapscan)
 	{
-		CBitSet *bitmap_index_bitset = CXform::PbsBitmapIndexXforms(mp);
+		gpos::owner<CBitSet *> bitmap_index_bitset =
+			CXform::PbsBitmapIndexXforms(mp);
 		traceflag_bitset->Union(bitmap_index_bitset);
 		bitmap_index_bitset->Release();
 	}
@@ -388,7 +392,7 @@ CConfigParamMapping::PackConfigParamInBitset(
 	if (!optimizer_enable_hashjoin)
 	{
 		// disable hash-join if the corresponding GUC is turned off
-		CBitSet *hash_join_bitste = CXform::PbsHashJoinXforms(mp);
+		gpos::owner<CBitSet *> hash_join_bitste = CXform::PbsHashJoinXforms(mp);
 		traceflag_bitset->Union(hash_join_bitste);
 		hash_join_bitste->Release();
 	}
@@ -443,7 +447,7 @@ CConfigParamMapping::PackConfigParamInBitset(
 			GPOPT_DISABLE_XFORM_TF(CXform::ExfImplementFullOuterMergeJoin));
 	}
 
-	CBitSet *join_heuristic_bitset = nullptr;
+	gpos::owner<CBitSet *> join_heuristic_bitset = nullptr;
 	switch (optimizer_join_order)
 	{
 		case JOIN_ORDER_IN_QUERY:

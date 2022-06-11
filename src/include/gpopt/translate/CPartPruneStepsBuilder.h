@@ -14,6 +14,7 @@
 #define GPDXL_CPartPruneStepsBuilder_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/translate/CMappingColIdVarPlStmt.h"
 #include "gpopt/translate/CTranslatorDXLToScalar.h"
@@ -33,7 +34,7 @@ private:
 	Index m_rtindex;
 
 	// list of pruned scan nodes denoted as an index of the relation's partition_mdids
-	ULongPtrArray *m_part_indexes;
+	gpos::pointer<ULongPtrArray *> m_part_indexes;
 
 	// colid -> var mapping from the subtree
 	CMappingColIdVarPlStmt *m_colid_var_mapping;

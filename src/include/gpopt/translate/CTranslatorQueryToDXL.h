@@ -119,16 +119,16 @@ private:
 	BOOL m_is_ctas_query;
 
 	// hash map that maintains the list of CTEs defined at a particular query level
-	HMUlCTEListEntry *m_query_level_to_cte_map;
+	gpos::owner<HMUlCTEListEntry *> m_query_level_to_cte_map;
 
 	// query output columns
-	CDXLNodeArray *m_dxl_query_output_cols;
+	gpos::owner<CDXLNodeArray *> m_dxl_query_output_cols;
 
 	// list of CTE producers
-	CDXLNodeArray *m_dxl_cte_producers;
+	gpos::owner<CDXLNodeArray *> m_dxl_cte_producers;
 
 	// CTE producer IDs defined at the current query level
-	UlongBoolHashMap *m_cteid_at_current_query_level_map;
+	gpos::owner<UlongBoolHashMap *> m_cteid_at_current_query_level_map;
 
 	//ctor
 	// private constructor, called from the public factory function QueryToDXLInstance
@@ -168,7 +168,8 @@ private:
 										BOOL keep_res_junked) const;
 
 	// check if the set operation need to cast any of its input columns
-	static BOOL SetOpNeedsCast(List *target_list, IMdIdArray *input_col_mdids);
+	static BOOL SetOpNeedsCast(List *target_list,
+							   gpos::pointer<IMdIdArray *> input_col_mdids);
 	// translate a window operator
 	CDXLNode *TranslateWindowToDXL(
 		CDXLNode *child_dxlnode, List *target_list, List *window_clause,
@@ -186,8 +187,8 @@ private:
 		CDXLWindowSpecArray *window_specs_dxlnode) const;
 
 	// manufacture window frame for lead/lag functions
-	CDXLWindowFrame *CreateWindowFramForLeadLag(BOOL is_lead_func,
-												CDXLNode *dxl_offset) const;
+	gpos::owner<CDXLWindowFrame *> CreateWindowFramForLeadLag(
+		BOOL is_lead_func, CDXLNode *dxl_offset) const;
 
 	// translate the child of a set operation
 	CDXLNode *TranslateSetOpChild(Node *child_node, ULongPtrArray *pdrgpul,
@@ -195,7 +196,7 @@ private:
 								  List *target_list);
 
 	// return a dummy const table get
-	CDXLNode *DXLDummyConstTableGet() const;
+	gpos::owner<CDXLNode *> DXLDummyConstTableGet() const;
 
 	// translate an Expr into CDXLNode
 	CDXLNode *TranslateExprToDXL(Expr *expr);
@@ -204,7 +205,7 @@ private:
 	CDXLNode *TranslateJoinExprInFromToDXL(JoinExpr *join_expr);
 
 	// construct a group by node for a set of grouping columns
-	CDXLNode *CreateSimpleGroupBy(
+	gpos::owner<CDXLNode *> CreateSimpleGroupBy(
 		List *target_list, List *group_clause, CBitSet *bitset, BOOL has_aggs,
 		BOOL has_grouping_sets,	 // is this GB part of a GS query
 		CDXLNode *child_dxlnode,
@@ -226,9 +227,9 @@ private:
 		IntToUlongMap *output_attno_to_colid_mapping);
 
 	// expand the grouping sets into a union all operator
-	CDXLNode *CreateDXLUnionAllForGroupingSets(
+	gpos::owner<CDXLNode *> CreateDXLUnionAllForGroupingSets(
 		FromExpr *from_expr, List *target_list, List *group_clause,
-		BOOL has_aggs, CBitSetArray *pdrgpbsGroupingSets,
+		BOOL has_aggs, gpos::owner<CBitSetArray *> pdrgpbsGroupingSets,
 		IntToUlongMap *phmiulSortGrpColsColId,
 		IntToUlongMap *output_attno_to_colid_mapping,
 		UlongToUlongMap *
@@ -236,14 +237,14 @@ private:
 	);
 
 	// construct a project node with NULL values for columns not included in the grouping set
-	CDXLNode *CreateDXLProjectNullsForGroupingSets(
+	gpos::owner<CDXLNode *> CreateDXLProjectNullsForGroupingSets(
 		List *target_list, CDXLNode *child_dxlnode, CBitSet *bitset,
 		IntToUlongMap *sort_grouping_col_mapping,
 		IntToUlongMap *output_attno_to_colid_mapping,
 		UlongToUlongMap *grpcol_index_to_colid_mapping) const;
 
 	// construct a project node with appropriate values for the grouping funcs in the given target list
-	CDXLNode *CreateDXLProjectGroupingFuncs(
+	gpos::owner<CDXLNode *> CreateDXLProjectGroupingFuncs(
 		List *target_list, CDXLNode *child_dxlnode, CBitSet *bitset,
 		IntToUlongMap *output_attno_to_colid_mapping,
 		UlongToUlongMap *grpcol_index_to_colid_mapping,
@@ -354,22 +355,22 @@ private:
 	static BOOL OIDFound(OID oid, const OID oids[], ULONG size);
 
 	// check if given operator is lead() window function
-	static BOOL IsLeadWindowFunc(CDXLOperator *dxlop);
+	static BOOL IsLeadWindowFunc(gpos::pointer<CDXLOperator *> dxlop);
 
 	// check if given operator is lag() window function
-	static BOOL IsLagWindowFunc(CDXLOperator *dxlop);
+	static BOOL IsLagWindowFunc(gpos::pointer<CDXLOperator *> dxlop);
 
 	// translate an insert query
-	CDXLNode *TranslateInsertQueryToDXL();
+	gpos::owner<CDXLNode *> TranslateInsertQueryToDXL();
 
 	// translate a delete query
-	CDXLNode *TranslateDeleteQueryToDXL();
+	gpos::owner<CDXLNode *> TranslateDeleteQueryToDXL();
 
 	// translate an update query
-	CDXLNode *TranslateUpdateQueryToDXL();
+	gpos::owner<CDXLNode *> TranslateUpdateQueryToDXL();
 
 	// translate a CTAS query
-	CDXLNode *TranslateCTASToDXL();
+	gpos::owner<CDXLNode *> TranslateCTASToDXL();
 	// translate CTAS storage options
 	CDXLCtasStorageOptions::CDXLCtasOptionArray *GetDXLCtasOptionArray(
 		List *options, IMDRelation::Erelstoragetype *storage_type);
@@ -385,7 +386,7 @@ private:
 	void GetCtidAndSegmentId(ULONG *ctid, ULONG *segment_id);
 
 	// translate a grouping func expression
-	CDXLNode *TranslateGroupingFuncToDXL(
+	gpos::owner<CDXLNode *> TranslateGroupingFuncToDXL(
 		const Expr *expr, CBitSet *bitset,
 		UlongToUlongMap *grpcol_index_to_colid_mapping) const;
 
@@ -448,10 +449,10 @@ public:
 	CDXLNode *TranslateQueryToDXL();
 
 	// return the list of output columns
-	CDXLNodeArray *GetQueryOutputCols() const;
+	gpos::pointer<CDXLNodeArray *> GetQueryOutputCols() const;
 
 	// return the list of CTEs
-	CDXLNodeArray *GetCTEs() const;
+	gpos::pointer<CDXLNodeArray *> GetCTEs() const;
 
 	// factory function
 	static CTranslatorQueryToDXL *QueryToDXLInstance(CMemoryPool *mp,

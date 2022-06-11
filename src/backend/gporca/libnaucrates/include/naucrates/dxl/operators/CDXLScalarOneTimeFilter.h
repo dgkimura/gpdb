@@ -13,6 +13,7 @@
 #define GPDXL_CDXLScalarOneTimeFilter_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarFilter.h"
 
@@ -41,7 +42,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLScalarOneTimeFilter *
+	static gpos::cast_func<CDXLScalarOneTimeFilter *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -51,7 +52,8 @@ public:
 	}
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
+	void SerializeToDXL(CXMLSerializer *,
+						gpos::pointer<const CDXLNode *>) const override;
 
 	// does the operator return a boolean result
 	BOOL

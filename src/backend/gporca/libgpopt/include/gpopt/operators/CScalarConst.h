@@ -12,6 +12,7 @@
 #define GPOPT_CScalarConst_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdProp.h"
@@ -61,7 +62,7 @@ public:
 	}
 
 	// accessor of contained constant
-	IDatum *
+	gpos::pointer<IDatum *>
 	GetDatum() const
 	{
 		return m_pdatum;
@@ -91,7 +92,7 @@ public:
 	}
 
 	// conversion function
-	static CScalarConst *
+	static gpos::cast_func<CScalarConst *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -112,7 +113,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// is the given expression a scalar cast of a constant
-	static BOOL FCastedConst(CExpression *pexpr);
+	static BOOL FCastedConst(gpos::pointer<CExpression *> pexpr);
 
 	// extract the constant from the given constant expression or a casted constant expression.
 	// Else return NULL.

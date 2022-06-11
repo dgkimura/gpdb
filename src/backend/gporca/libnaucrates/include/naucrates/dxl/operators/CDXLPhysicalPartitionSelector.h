@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 
@@ -72,7 +73,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// table id
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetRelMdId() const
 	{
 		return m_rel_mdid;
@@ -92,7 +93,7 @@ public:
 		return m_scan_id;
 	}
 
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	Partitions() const
 	{
 		return m_parts;
@@ -100,16 +101,17 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(gpos::pointer<const CDXLNode *>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLPhysicalPartitionSelector *
+	static gpos::cast_func<CDXLPhysicalPartitionSelector *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

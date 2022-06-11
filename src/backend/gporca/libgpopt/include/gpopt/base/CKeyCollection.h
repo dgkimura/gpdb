@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 
@@ -51,14 +52,17 @@ public:
 	void Add(CColRefSet *pcrs);
 
 	// check if set forms a key
-	BOOL FKey(const CColRefSet *pcrs, BOOL fExactMatch = true) const;
+	BOOL FKey(gpos::pointer<const CColRefSet *> pcrs,
+			  BOOL fExactMatch = true) const;
 
 	// check if an array of columns constitutes a key
-	BOOL FKey(CMemoryPool *mp, const CColRefArray *colref_array) const;
+	BOOL FKey(CMemoryPool *mp,
+			  gpos::pointer<const CColRefArray *> colref_array) const;
 
 	// trim off non-key columns
-	CColRefArray *PdrgpcrTrim(CMemoryPool *mp,
-							  const CColRefArray *colref_array) const;
+	CColRefArray *PdrgpcrTrim(
+		CMemoryPool *mp,
+		gpos::pointer<const CColRefArray *> colref_array) const;
 
 	// extract a key
 	CColRefArray *PdrgpcrKey(CMemoryPool *mp) const;

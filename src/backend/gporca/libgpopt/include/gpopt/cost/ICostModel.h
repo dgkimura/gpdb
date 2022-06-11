@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDRelation.h"
 #include "naucrates/statistics/IStatistics.h"
@@ -70,7 +71,7 @@ public:
 	{
 	private:
 		// stats of the root
-		IStatistics *m_pstats;
+		gpos::owner<IStatistics *> m_pstats;
 
 	public:
 		// ctor
@@ -115,7 +116,7 @@ public:
 		ULONG m_ulChildren;
 
 		// stats of the root
-		CCostingStats *m_pcstats;
+		gpos::owner<CCostingStats *> m_pcstats;
 
 		// row estimate of root
 		DOUBLE m_rows;
@@ -320,7 +321,7 @@ public:
 		}
 
 		// return additional cost statistics
-		CCostingStats *
+		gpos::pointer<CCostingStats *>
 		Pcstats() const
 		{
 			return m_pcstats;

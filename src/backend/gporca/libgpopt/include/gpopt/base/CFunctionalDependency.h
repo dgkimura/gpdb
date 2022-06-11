@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 
@@ -57,14 +58,14 @@ public:
 	~CFunctionalDependency() override;
 
 	// key set accessor
-	CColRefSet *
+	gpos::pointer<CColRefSet *>
 	PcrsKey() const
 	{
 		return m_pcrsKey;
 	}
 
 	// determined set accessor
-	CColRefSet *
+	gpos::pointer<CColRefSet *>
 	PcrsDetermined() const
 	{
 		return m_pcrsDetermined;
@@ -77,7 +78,7 @@ public:
 	virtual ULONG HashValue() const;
 
 	// equality function
-	BOOL Equals(const CFunctionalDependency *pfd) const;
+	BOOL Equals(gpos::pointer<const CFunctionalDependency *> pfd) const;
 
 	// do the given arguments form a functional dependency
 	BOOL

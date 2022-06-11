@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CReqdPropPlan.h"
 #include "gpopt/base/CReqdPropRelational.h"
@@ -93,28 +94,28 @@ public:
 	}
 
 	// expression accessor
-	CExpression *
+	gpos::pointer<CExpression *>
 	Pexpr() const
 	{
 		return m_pexpr;
 	}
 
 	// required plan properties accessor
-	CReqdPropPlan *
+	gpos::pointer<CReqdPropPlan *>
 	Prpp() const
 	{
 		return m_prpp;
 	}
 
 	// return the array of output column references
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgPcr() const
 	{
 		return m_pdrgpcr;
 	}
 
 	// system columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrSystemCols() const
 	{
 		return m_pdrgpcrSystemCols;

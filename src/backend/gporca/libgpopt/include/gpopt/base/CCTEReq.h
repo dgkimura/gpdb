@@ -19,6 +19,7 @@
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CHashMapIter.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCTEMap.h"
 #include "gpopt/base/CDrvdPropPlan.h"
@@ -93,7 +94,7 @@ private:
 		}
 
 		// plan properties
-		CDrvdPropPlan *
+		gpos::pointer<CDrvdPropPlan *>
 		PdpplanProducer() const
 		{
 			return m_pdpplan;
@@ -144,7 +145,7 @@ public:
 	~CCTEReq() override;
 
 	// required cte ids
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	PdrgpulRequired() const
 	{
 		return m_pdrgpulRequired;
@@ -163,7 +164,7 @@ public:
 
 	// check if two cte requirements are equal
 	BOOL
-	Equals(const CCTEReq *pcter) const
+	Equals(gpos::pointer<const CCTEReq *> pcter) const
 	{
 		GPOS_ASSERT(nullptr != pcter);
 		return (m_phmcter->Size() == pcter->m_phmcter->Size()) &&
@@ -171,7 +172,7 @@ public:
 	}
 
 	// check if current requirement is a subset of the given one
-	BOOL FSubset(const CCTEReq *pcter) const;
+	BOOL FSubset(gpos::pointer<const CCTEReq *> pcter) const;
 
 	// check if the given CTE is in the requirements
 	BOOL FContainsRequirement(const ULONG id,

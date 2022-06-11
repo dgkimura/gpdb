@@ -123,14 +123,14 @@ public:
 	~CPhysicalHashJoin() override;
 
 	// inner keys
-	const CExpressionArray *
+	gpos::pointer<const CExpressionArray *>
 	PdrgpexprInnerKeys() const
 	{
 		return m_pdrgpexprInnerKeys;
 	}
 
 	// outer keys
-	const CExpressionArray *
+	gpos::pointer<const CExpressionArray *>
 	PdrgpexprOuterKeys() const
 	{
 		return m_pdrgpexprOuterKeys;
@@ -170,7 +170,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *
+	gpos::owner<COrderSpec *>
 	PosDerive(CMemoryPool *mp,
 			  CExpressionHandle &  // exprhdl
 	) const override
@@ -185,7 +185,8 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 
 	//-------------------------------------------------------------------------------------
@@ -205,7 +206,7 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalHashJoin *
+	static gpos::cast_func<CPhysicalHashJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(CUtils::FHashJoin(pop));

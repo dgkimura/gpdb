@@ -15,6 +15,7 @@
 #define GPDXL_CDXLPhysicalAgg_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
@@ -78,7 +79,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 	const CWStringConst *GetAggStrategyNameStr() const;
 	const CWStringConst *PstrAggLevel() const;
-	const ULongPtrArray *GetGroupingColidArray() const;
+	gpos::pointer<const ULongPtrArray *> GetGroupingColidArray() const;
 
 	// set grouping column indices
 	void SetGroupingCols(ULongPtrArray *);
@@ -92,10 +93,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						gpos::pointer<const CDXLNode *> node) const override;
 
 	// conversion function
-	static CDXLPhysicalAgg *
+	static gpos::cast_func<CDXLPhysicalAgg *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -107,7 +108,8 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(gpos::pointer<const CDXLNode *>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

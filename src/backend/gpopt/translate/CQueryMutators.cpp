@@ -13,6 +13,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include "gpos/common/owner.h"
 extern "C" {
 #include "postgres.h"
 
@@ -575,8 +576,10 @@ CQueryMutators::GetTargetEntryForAggExpr(CMemoryPool *mp,
 	{
 		Aggref *aggref = (Aggref *) node;
 
-		CMDIdGPDB *agg_mdid = GPOS_NEW(mp) CMDIdGPDB(aggref->aggfnoid);
-		const IMDAggregate *md_agg = md_accessor->RetrieveAgg(agg_mdid);
+		gpos::owner<CMDIdGPDB *> agg_mdid =
+			GPOS_NEW(mp) CMDIdGPDB(aggref->aggfnoid);
+		gpos::pointer<const IMDAggregate *> md_agg =
+			md_accessor->RetrieveAgg(agg_mdid);
 		agg_mdid->Release();
 
 		const CWStringConst *str = md_agg->Mdname().GetMDName();
@@ -1558,7 +1561,7 @@ CQueryMutators::RunWindowProjListMutator(Node *node,
 		GPOS_ASSERT(IsA(window_func, WindowFunc));
 
 		// get the function name and create a new target entry for window_func
-		CMDIdGPDB *mdid_func =
+		gpos::owner<CMDIdGPDB *> mdid_func =
 			GPOS_NEW(context->m_mp) CMDIdGPDB(window_func->winfnoid);
 		const CWStringConst *str =
 			CMDAccessorUtils::PstrWindowFuncName(context->m_mda, mdid_func);

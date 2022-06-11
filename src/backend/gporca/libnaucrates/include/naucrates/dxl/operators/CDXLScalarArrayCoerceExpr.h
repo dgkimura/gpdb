@@ -19,6 +19,7 @@
 #define GPDXL_CDXLScalarArrayCoerceExpr_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarCoerceBase.h"
 #include "naucrates/md/IMDId.h"
@@ -39,7 +40,7 @@ class CDXLScalarArrayCoerceExpr : public CDXLScalarCoerceBase
 {
 private:
 	// catalog MDId of element coerce function
-	IMDId *m_coerce_func_mdid;
+	gpos::owner<IMDId *> m_coerce_func_mdid;
 
 	// conversion semantics flag to pass to func
 	BOOL m_explicit;
@@ -65,7 +66,7 @@ public:
 	}
 
 	// return metadata id of element coerce function
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetCoerceFuncMDid() const
 	{
 		return m_coerce_func_mdid;
@@ -82,10 +83,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// conversion function
-	static CDXLScalarArrayCoerceExpr *
+	static gpos::cast_func<CDXLScalarArrayCoerceExpr *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

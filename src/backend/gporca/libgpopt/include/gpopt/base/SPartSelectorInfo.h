@@ -9,6 +9,8 @@
 #include <gpopt/operators/CExpression.h>
 #include <naucrates/statistics/IStatistics.h>
 
+#include "gpos/common/owner.h"
+
 namespace gpopt
 {
 struct SPartSelectorInfoEntry
@@ -17,10 +19,10 @@ struct SPartSelectorInfoEntry
 	ULONG m_selector_id;
 
 	// filter stored in the partition selector
-	CExpression *m_filter_expr;
+	gpos::owner<CExpression *> m_filter_expr;
 
 	// statistics of the subtree of the partition selector
-	IStatistics *m_stats;
+	gpos::owner<IStatistics *> m_stats;
 
 	SPartSelectorInfoEntry(ULONG mSelectorId, CExpression *mFilterExpr,
 						   IStatistics *mStats)

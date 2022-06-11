@@ -177,8 +177,8 @@ private:
 	static CMDFunctionGPDB::EFuncDataAcc GetEFuncDataAccess(CHAR c);
 
 	// get type of aggregate's intermediate result from the relcache
-	static IMDId *RetrieveAggIntermediateResultType(CMemoryPool *mp,
-													IMDId *mdid);
+	static gpos::owner<IMDId *> RetrieveAggIntermediateResultType(
+		CMemoryPool *mp, IMDId *mdid);
 
 	// retrieve a GPDB metadata object from the relcache
 	static IMDCacheObject *RetrieveObjectGPDB(CMemoryPool *mp,
@@ -194,24 +194,29 @@ private:
 											IMDId *mdid);
 
 	// retrieve cast object from the relcache
-	static IMDCacheObject *RetrieveCast(CMemoryPool *mp, IMDId *mdid);
+	static gpos::owner<IMDCacheObject *> RetrieveCast(CMemoryPool *mp,
+													  IMDId *mdid);
 
 	// retrieve scalar comparison object from the relcache
-	static IMDCacheObject *RetrieveScCmp(CMemoryPool *mp, IMDId *mdid);
+	static gpos::owner<IMDCacheObject *> RetrieveScCmp(CMemoryPool *mp,
+													   IMDId *mdid);
 
 	// transform GPDB's MCV information to optimizer's histogram structure
 	static CHistogram *TransformMcvToOrcaHistogram(
-		CMemoryPool *mp, const IMDType *md_type, const Datum *mcv_values,
-		const float4 *mcv_frequencies, ULONG num_mcv_values);
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type,
+		const Datum *mcv_values, const float4 *mcv_frequencies,
+		ULONG num_mcv_values);
 
 	// transform GPDB's hist information to optimizer's histogram structure
 	static CHistogram *TransformHistToOrcaHistogram(
-		CMemoryPool *mp, const IMDType *md_type, const Datum *hist_values,
-		ULONG num_hist_values, CDouble num_distinct, CDouble hist_freq);
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type,
+		const Datum *hist_values, ULONG num_hist_values, CDouble num_distinct,
+		CDouble hist_freq);
 
 	// histogram to array of dxl buckets
 	static CDXLBucketArray *TransformHistogramToDXLBucketArray(
-		CMemoryPool *mp, const IMDType *md_type, const CHistogram *hist);
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type,
+		const CHistogram *hist);
 
 	// transform stats from pg_stats form to optimizer's preferred form
 	static CDXLBucketArray *TransformStatsToDXLBucketArray(
@@ -262,17 +267,17 @@ private:
 	static BOOL IsIndexSupported(Relation index_rel);
 
 	// compute the array of included columns
-	static ULongPtrArray *ComputeIncludedCols(CMemoryPool *mp,
-											  const IMDRelation *md_rel);
+	static ULongPtrArray *ComputeIncludedCols(
+		CMemoryPool *mp, gpos::pointer<const IMDRelation *> md_rel);
 
 	// is given level included in the default partitions
 	static BOOL LevelHasDefaultPartition(List *default_levels, ULONG level);
 
 	// retrieve part constraint for index
 	static CMDPartConstraintGPDB *RetrievePartConstraintForIndex(
-		CMemoryPool *mp, CMDAccessor *md_accessor, const IMDRelation *md_rel,
-		Node *part_constraint, ULongPtrArray *level_with_default_part_array,
-		BOOL is_unbounded);
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		gpos::pointer<const IMDRelation *> md_rel, Node *part_constraint,
+		ULongPtrArray *level_with_default_part_array, BOOL is_unbounded);
 
 	// retrieve part constraint for relation
 	static CDXLNode *RetrievePartConstraintForRel(CMemoryPool *mp,
@@ -281,7 +286,7 @@ private:
 												  CMDColumnArray *mdcol_array);
 
 	// retrieve part constraint from a GPDB node
-	static CMDPartConstraintGPDB *RetrievePartConstraintFromNode(
+	static gpos::owner<CMDPartConstraintGPDB *> RetrievePartConstraintFromNode(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		CDXLColDescrArray *dxl_col_descr_array, Node *part_constraint,
 		ULongPtrArray *level_with_default_part_array, BOOL is_unbounded);
@@ -318,7 +323,7 @@ private:
 	static ULONG RetrieveNumChildPartitions(OID rel_oid);
 
 	// generate statistics for the system level columns
-	static CDXLColStats *GenerateStatsForSystemCols(
+	static gpos::owner<CDXLColStats *> GenerateStatsForSystemCols(
 		CMemoryPool *mp, OID rel_oid, CMDIdColStats *mdid_col_stats,
 		CMDName *md_colname, OID att_type, AttrNumber attrnum,
 		CDXLBucketArray *dxl_stats_bucket_array, CDouble rows);
@@ -347,19 +352,19 @@ public:
 								   IMDId *mdid_index);
 
 	// retrieve a check constraint from the relcache
-	static CMDCheckConstraintGPDB *RetrieveCheckConstraints(
+	static gpos::owner<CMDCheckConstraintGPDB *> RetrieveCheckConstraints(
 		CMemoryPool *mp, CMDAccessor *md_accessor, IMDId *mdid);
 
 	// populate the attribute number to position mapping
-	static ULONG *PopulateAttnoPositionMap(CMemoryPool *mp,
-										   const IMDRelation *md_rel,
-										   ULONG size);
+	static ULONG *PopulateAttnoPositionMap(
+		CMemoryPool *mp, gpos::pointer<const IMDRelation *> md_rel, ULONG size);
 
 	// return the position of a given attribute number
 	static ULONG GetAttributePosition(INT attno, const ULONG *attno_mapping);
 
 	// retrieve a type from the relcache
-	static IMDType *RetrieveType(CMemoryPool *mp, gpos::pointer<IMDId *> mdid);
+	static gpos::owner<IMDType *> RetrieveType(CMemoryPool *mp,
+											   gpos::pointer<IMDId *> mdid);
 
 	// retrieve a scalar operator from the relcache
 	static CMDScalarOpGPDB *RetrieveScOp(CMemoryPool *mp, IMDId *mdid);

@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CDistributionSpec.h"
@@ -88,34 +89,34 @@ public:
 	static CDrvdPropPlan *Pdpplan(CDrvdProp *pdp);
 
 	// sort order accessor
-	COrderSpec *
+	gpos::pointer<COrderSpec *>
 	Pos() const
 	{
 		return m_pos;
 	}
 
 	// distribution accessor
-	CDistributionSpec *
+	gpos::pointer<CDistributionSpec *>
 	Pds() const
 	{
 		return m_pds;
 	}
 
 	// rewindability accessor
-	CRewindabilitySpec *
+	gpos::pointer<CRewindabilitySpec *>
 	Prs() const
 	{
 		return m_prs;
 	}
 
-	CPartitionPropagationSpec *
+	gpos::pointer<CPartitionPropagationSpec *>
 	Ppps() const
 	{
 		return m_ppps;
 	}
 
 	// cte map
-	CCTEMap *
+	gpos::pointer<CCTEMap *>
 	GetCostModel() const
 	{
 		return m_pcm;
@@ -125,10 +126,10 @@ public:
 	virtual ULONG HashValue() const;
 
 	// equality function
-	virtual ULONG Equals(const CDrvdPropPlan *pdpplan) const;
+	virtual ULONG Equals(gpos::pointer<const CDrvdPropPlan *> pdpplan) const;
 
 	// check for satisfying required plan properties
-	BOOL FSatisfies(const CReqdPropPlan *prpp) const override;
+	BOOL FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

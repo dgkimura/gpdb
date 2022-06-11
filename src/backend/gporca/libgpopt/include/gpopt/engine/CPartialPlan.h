@@ -19,6 +19,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CReqdProp.h"
 #include "gpopt/cost/ICostModel.h"
@@ -71,21 +72,21 @@ public:
 	~CPartialPlan() override;
 
 	// group expression accessor
-	CGroupExpression *
+	gpos::pointer<CGroupExpression *>
 	Pgexpr() const
 	{
 		return m_pgexpr;
 	}
 
 	// plan properties accessor
-	CReqdPropPlan *
+	gpos::pointer<CReqdPropPlan *>
 	Prpp() const
 	{
 		return m_prpp;
 	}
 
 	// child cost context accessor
-	CCostContext *
+	gpos::pointer<CCostContext *>
 	PccChild() const
 	{
 		return m_pccChild;
@@ -102,10 +103,11 @@ public:
 	CCost CostCompute(CMemoryPool *mp);
 
 	// hash function used for cost bounding
-	static ULONG HashValue(const CPartialPlan *ppp);
+	static ULONG HashValue(gpos::pointer<const CPartialPlan *> ppp);
 
 	// equality function used for for cost bounding
-	static BOOL Equals(const CPartialPlan *pppFst, const CPartialPlan *pppSnd);
+	static BOOL Equals(gpos::pointer<const CPartialPlan *> pppFst,
+					   gpos::pointer<const CPartialPlan *> pppSnd);
 
 };	// class CPartialPlan
 }  // namespace gpopt

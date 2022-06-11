@@ -15,6 +15,7 @@
 #define GPOPT_CAutoMDAccessor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/mdcache/CMDCache.h"
@@ -39,7 +40,7 @@ class CAutoMDAccessor : public CStackObject
 {
 private:
 	// metadata provider
-	IMDProvider *m_pimdp;
+	gpos::pointer<IMDProvider *> m_pimdp;
 
 	// do we own cache object?
 	BOOL m_fOwnCache;
@@ -107,7 +108,7 @@ public:
 	}
 
 	// accessor of metadata provider
-	IMDProvider *
+	gpos::pointer<IMDProvider *>
 	Pimdp() const
 	{
 		return m_pimdp;

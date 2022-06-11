@@ -12,6 +12,7 @@
 #define GPOPT_traceflags_H
 
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 
 namespace gpos
 {
@@ -267,7 +268,8 @@ extern "C" {
 #endif	// __cplusplus
 
 // set trace flags based on given bit set, and return two output bit sets of old trace flags values
-void SetTraceflags(gpos::CMemoryPool *mp, const gpos::CBitSet *input_bitset,
+void SetTraceflags(gpos::CMemoryPool *mp,
+				   gpos::pointer<const gpos::CBitSet *> input_bitset,
 				   gpos::CBitSet **enable_bitset,
 				   gpos::CBitSet **disabled_bitset);
 

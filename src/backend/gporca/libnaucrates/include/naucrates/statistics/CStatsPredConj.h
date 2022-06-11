@@ -12,6 +12,7 @@
 #define GPNAUCRATES_CStatsPredConj_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/statistics/CPoint.h"
 #include "naucrates/statistics/CStatsPred.h"
@@ -31,7 +32,7 @@ class CStatsPredConj : public CStatsPred
 {
 private:
 	// array of filters
-	CStatsPredPtrArry *m_conj_pred_stats_array;
+	gpos::owner<CStatsPredPtrArry *> m_conj_pred_stats_array;
 
 public:
 	CStatsPredConj &operator=(CStatsPredConj &) = delete;
@@ -57,7 +58,7 @@ public:
 		return m_conj_pred_stats_array->Size();
 	}
 
-	CStatsPredPtrArry *
+	gpos::pointer<CStatsPredPtrArry *>
 	GetConjPredStatsArray() const
 	{
 		return m_conj_pred_stats_array;
@@ -77,7 +78,7 @@ public:
 	}
 
 	// conversion function
-	static CStatsPredConj *
+	static gpos::cast_func<CStatsPredConj *>
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

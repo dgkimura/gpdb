@@ -12,6 +12,7 @@
 #define GPDXL_CDXLProperties_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CDXLStatsDerivedRelation.h"
 
@@ -58,7 +59,8 @@ public:
 	virtual void SetStats(CDXLStatsDerivedRelation *dxl_stats_derived_relation);
 
 	// statistical information
-	virtual const CDXLStatsDerivedRelation *GetDxlStatsDrvdRelation() const;
+	virtual gpos::pointer<const CDXLStatsDerivedRelation *>
+	GetDxlStatsDrvdRelation() const;
 
 	virtual Edxlproperty
 	GetDXLPropertyType() const

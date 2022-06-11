@@ -18,6 +18,7 @@
 #define GPDXL_CDXLScalarCoerceBase_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 #include "naucrates/md/IMDId.h"
@@ -60,7 +61,7 @@ public:
 	~CDXLScalarCoerceBase() override;
 
 	// return result type
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetResultTypeMdId() const
 	{
 		return m_result_type_mdid;
@@ -93,13 +94,13 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(gpos::pointer<const CDXLNode *> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						gpos::pointer<const CDXLNode *> node) const override;
 };
 }  // namespace gpdxl
 

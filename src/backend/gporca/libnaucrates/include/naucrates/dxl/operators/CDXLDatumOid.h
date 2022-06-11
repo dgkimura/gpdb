@@ -19,6 +19,7 @@
 #define GPDXL_CDXLDatumOid_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
 
@@ -66,7 +67,7 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumOid *
+	static gpos::cast_func<CDXLDatumOid *>
 	Cast(CDXLDatum *dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);

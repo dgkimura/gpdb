@@ -13,6 +13,7 @@
 #define GPMD_CMDTypeGenericGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/md/CGPDBTypeHelper.h"
@@ -205,7 +206,7 @@ public:
 	// id of specified specified aggregate type
 	IMDId *GetMdidForAggType(EAggType agg_type) const override;
 
-	const IMDId *
+	gpos::pointer<const IMDId *>
 	CmpOpMdid() const override
 	{
 		return m_mdid_op_cmp;
@@ -232,13 +233,13 @@ public:
 	}
 
 	// id of the relation corresponding to a composite type
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetBaseRelMdid() const override
 	{
 		return m_mdid_base_relation;
 	}
 
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetArrayTypeMdid() const override
 	{
 		return m_mdid_type_array;
@@ -251,11 +252,12 @@ public:
 
 	// factory method for generating generic datum from CDXLScalarConstValue
 	IDatum *GetDatumForDXLConstVal(
-		const CDXLScalarConstValue *dxl_op) const override;
+		gpos::pointer<const CDXLScalarConstValue *> dxl_op) const override;
 
 	// create typed datum from DXL datum
-	IDatum *GetDatumForDXLDatum(CMemoryPool *mp,
-								const CDXLDatum *dxl_datum) const override;
+	IDatum *GetDatumForDXLDatum(
+		CMemoryPool *mp,
+		gpos::pointer<const CDXLDatum *> dxl_datum) const override;
 
 	// return the GPDB length
 	virtual INT
@@ -265,7 +267,7 @@ public:
 	}
 
 	// return the null constant for this type
-	IDatum *
+	gpos::pointer<IDatum *>
 	DatumNull() const override
 	{
 		return m_datum_null;
@@ -291,7 +293,7 @@ public:
 
 	// create a dxl datum
 	static CDXLDatum *CreateDXLDatumVal(CMemoryPool *mp, IMDId *mdid,
-										const IMDType *md_type,
+										gpos::pointer<const IMDType *> md_type,
 										INT type_modifier, BOOL is_null,
 										BYTE *byte_array, ULONG length,
 										LINT lint_Value, CDouble double_Value);
@@ -311,17 +313,17 @@ public:
 								   INT type_modifier) const override;
 
 	// does a datum of this type need bytea to Lint mapping for statistics computation
-	static BOOL HasByte2IntMapping(const IMDType *mdtype);
+	static BOOL HasByte2IntMapping(gpos::pointer<const IMDType *> mdtype);
 
 	// does a datum of this type need bytea to double mapping for statistics computation
-	static BOOL HasByte2DoubleMapping(const IMDId *mdid);
+	static BOOL HasByte2DoubleMapping(gpos::pointer<const IMDId *> mdid);
 
 	// is this a time-related type
-	static BOOL IsTimeRelatedType(const IMDId *mdid);
+	static BOOL IsTimeRelatedType(gpos::pointer<const IMDId *> mdid);
 
 	// is this a time-related type mappable to DOUBLE
 	static BOOL
-	IsTimeRelatedTypeMappableToDouble(const IMDId *mdid)
+	IsTimeRelatedTypeMappableToDouble(gpos::pointer<const IMDId *> mdid)
 	{
 		return IsTimeRelatedType(mdid) &&
 			   !IsTimeRelatedTypeMappableToLint(mdid);
@@ -329,13 +331,13 @@ public:
 
 	// is this a time-related type mappable to LINT
 	static inline BOOL
-	IsTimeRelatedTypeMappableToLint(const IMDId *mdid)
+	IsTimeRelatedTypeMappableToLint(gpos::pointer<const IMDId *> mdid)
 	{
 		return mdid->Equals(&CMDIdGPDB::m_mdid_date);
 	}
 
 	// is this a network-related type
-	static BOOL IsNetworkRelatedType(const IMDId *mdid);
+	static BOOL IsNetworkRelatedType(gpos::pointer<const IMDId *> mdid);
 };
 }  // namespace gpmd
 

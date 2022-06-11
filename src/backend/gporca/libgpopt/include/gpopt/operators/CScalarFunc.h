@@ -12,6 +12,7 @@
 #define GPOPT_CScalarFunc_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
@@ -120,7 +121,7 @@ public:
 	BOOL FHasNonScalarFunction(CExpressionHandle &exprhdl) override;
 
 	// conversion function
-	static CScalarFunc *
+	static gpos::cast_func<CScalarFunc *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

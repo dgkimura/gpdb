@@ -13,6 +13,7 @@
 #define GPDXL_CDXLPhysicalWindow_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
@@ -64,7 +65,7 @@ public:
 	ULONG PartByColsCount() const;
 
 	// return partition columns
-	const ULongPtrArray *
+	gpos::pointer<const ULongPtrArray *>
 	GetPartByColsArray() const
 	{
 		return m_part_by_colid_array;
@@ -78,10 +79,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalWindow *
+	static gpos::cast_func<CDXLPhysicalWindow *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -93,7 +94,8 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(gpos::pointer<const CDXLNode *>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

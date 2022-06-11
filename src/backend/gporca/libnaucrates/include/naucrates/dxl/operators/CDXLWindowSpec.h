@@ -14,6 +14,7 @@
 #define GPDXL_CDXLWindowSpec_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLWindowFrame.h"
@@ -70,21 +71,21 @@ public:
 	void SetWindowFrame(CDXLWindowFrame *window_frame);
 
 	// return window frame
-	CDXLWindowFrame *
+	gpos::pointer<CDXLWindowFrame *>
 	GetWindowFrame() const
 	{
 		return m_window_frame;
 	}
 
 	// partition-by column identifiers
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	GetPartitionByColIdArray() const
 	{
 		return m_partition_by_colid_array;
 	}
 
 	// sort columns
-	CDXLNode *
+	gpos::pointer<CDXLNode *>
 	GetSortColListDXL() const
 	{
 		return m_sort_col_list_dxlnode;

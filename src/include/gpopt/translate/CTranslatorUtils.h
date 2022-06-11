@@ -91,7 +91,8 @@ private:
 
 	// check if the given mdid array contains any of the polymorphic
 	// types (ANYELEMENT, ANYARRAY)
-	static BOOL ContainsPolymorphicTypes(IMdIdArray *mdid_array);
+	static BOOL ContainsPolymorphicTypes(
+		gpos::pointer<IMdIdArray *> mdid_array);
 
 	// resolve polymorphic types in the given array of type ids, replacing
 	// them with the actual types obtained from the query
@@ -133,11 +134,12 @@ public:
 	static OID GetOpFamilyForIndexQual(INT attno, OID oid_index);
 
 	// return the type for the system column with the given number
-	static CMDIdGPDB *GetSystemColType(CMemoryPool *mp, AttrNumber attno);
+	static gpos::owner<CMDIdGPDB *> GetSystemColType(CMemoryPool *mp,
+													 AttrNumber attno);
 
 	// find the n-th column descriptor in the table descriptor
-	static const CDXLColDescr *GetColumnDescrAt(
-		const CDXLTableDescr *table_descr, ULONG pos);
+	static gpos::pointer<const CDXLColDescr *> GetColumnDescrAt(
+		gpos::pointer<const CDXLTableDescr *> table_descr, ULONG pos);
 
 	// return the name for the system column with given number
 	static const CWStringConst *GetSystemColName(AttrNumber attno);
@@ -153,8 +155,9 @@ public:
 		ScanDirection sd);
 
 	// create a DXL index descriptor from an index MD id
-	static CDXLIndexDescr *GetIndexDescr(CMemoryPool *mp,
-										 CMDAccessor *md_accessor, IMDId *mdid);
+	static gpos::owner<CDXLIndexDescr *> GetIndexDescr(CMemoryPool *mp,
+													   CMDAccessor *md_accessor,
+													   IMDId *mdid);
 
 	// translate a RangeTableEntry into a CDXLTableDescr
 	static CDXLTableDescr *GetTableDescr(CMemoryPool *mp,
@@ -188,12 +191,12 @@ public:
 	// get column descriptors from a composite type
 	static CDXLColDescrArray *GetColumnDescriptorsFromComposite(
 		CMemoryPool *mp, CMDAccessor *md_accessor, CIdGenerator *id_generator,
-		const IMDType *md_type);
+		gpos::pointer<const IMDType *> md_type);
 
 	// expand a composite type into an array of IMDColumns
-	static CMDColumnArray *ExpandCompositeType(CMemoryPool *mp,
-											   CMDAccessor *md_accessor,
-											   const IMDType *md_type);
+	static CMDColumnArray *ExpandCompositeType(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		gpos::pointer<const IMDType *> md_type);
 
 	// return the dxl representation of the set operation
 	static EdxlSetOpType GetSetOpType(SetOperation setop, BOOL is_all);
@@ -264,7 +267,8 @@ public:
 										 List *window_clause_list);
 
 	// check if the project list contains AggRef with ORDER BY
-	static BOOL HasOrderedAggRefInProjList(CDXLNode *proj_list_dxlnode);
+	static BOOL HasOrderedAggRefInProjList(
+		gpos::pointer<CDXLNode *> proj_list_dxlnode);
 
 	// extract a matching target entry that is a window spec
 	static TargetEntry *GetWindowSpecTargetEntry(Node *node,
@@ -272,9 +276,8 @@ public:
 												 List *target_list);
 
 	// create a scalar const value expression for the given int8 value
-	static CDXLNode *CreateDXLProjElemFromInt8Const(CMemoryPool *mp,
-													CMDAccessor *md_accessor,
-													INT val);
+	static gpos::owner<CDXLNode *> CreateDXLProjElemFromInt8Const(
+		CMemoryPool *mp, CMDAccessor *md_accessor, INT val);
 
 	// check to see if the target list entry is a grouping column
 	static BOOL IsGroupingColumn(const TargetEntry *target_entry,
@@ -306,7 +309,8 @@ public:
 
 	// check whether the given project list has a project element of the given
 	// operator type
-	static BOOL HasProjElem(CDXLNode *project_list_dxlnode, Edxlopid dxl_op_id);
+	static BOOL HasProjElem(gpos::pointer<CDXLNode *> project_list_dxlnode,
+							Edxlopid dxl_op_id);
 
 	// create a multi-byte character string from a wide character string
 	static CHAR *CreateMultiByteCharStringFromWCString(const WCHAR *wcstr);
@@ -325,7 +329,7 @@ public:
 
 	// is this a motion sensitive to duplicates
 	static BOOL IsDuplicateSensitiveMotion(
-		gpdxl::CDXLPhysicalMotion *dxl_motion);
+		gpos::pointer<gpdxl::CDXLPhysicalMotion *> dxl_motion);
 
 	// construct a project element with a const NULL expression
 	static CDXLNode *CreateDXLProjElemConstNULL(CMemoryPool *mp,
@@ -334,17 +338,15 @@ public:
 												const WCHAR *col_name);
 
 	// construct a project element with a const NULL expression
-	static CDXLNode *CreateDXLProjElemConstNULL(CMemoryPool *mp,
-												CMDAccessor *md_accessor,
-												gpos::pointer<IMDId *> mdid,
-												ULONG colid, CHAR *alias_name);
+	static gpos::owner<CDXLNode *> CreateDXLProjElemConstNULL(
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::pointer<IMDId *> mdid,
+		ULONG colid, CHAR *alias_name);
 
 	// create a DXL project element node with a Const NULL of type provided
 	// by the column descriptor
-	static CDXLNode *CreateDXLProjElemConstNULL(CMemoryPool *mp,
-												CMDAccessor *md_accessor,
-												CIdGenerator *colid_generator,
-												const IMDColumn *col);
+	static CDXLNode *CreateDXLProjElemConstNULL(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		CIdGenerator *colid_generator, gpos::pointer<const IMDColumn *> col);
 
 	// check required permissions for the range table
 	static void CheckRTEPermissions(List *range_table_list);
@@ -363,22 +365,23 @@ public:
 	// check whether there are triggers for the given operation on
 	// the given relation
 	static BOOL RelHasTriggers(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   const IMDRelation *mdrel,
+							   gpos::pointer<const IMDRelation *> mdrel,
 							   const gpdxl::EdxlDmlType dml_type_dxl);
 
 	// check whether the given trigger is applicable to the given DML operation
 	static BOOL IsApplicableTrigger(CMDAccessor *md_accessor,
-									IMDId *trigger_mdid,
+									gpos::pointer<IMDId *> trigger_mdid,
 									const gpdxl::EdxlDmlType dml_type_dxl);
 
 	// check whether there are NOT NULL or CHECK constraints for the given relation
-	static BOOL RelHasConstraints(const IMDRelation *rel);
+	static BOOL RelHasConstraints(gpos::pointer<const IMDRelation *> rel);
 
 	// translate the list of error messages from an assert constraint list
 	static List *GetAssertErrorMsgs(CDXLNode *assert_constraint_list);
 
 	// return the count of non-system columns in the relation
-	static ULONG GetNumNonSystemColumns(const IMDRelation *mdrel);
+	static ULONG GetNumNonSystemColumns(
+		gpos::pointer<const IMDRelation *> mdrel);
 
 	// return agg kind as an EdxlAggrefKind
 	static EdxlAggrefKind GetAggKind(CHAR aggkind);

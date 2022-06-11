@@ -6,6 +6,7 @@
 #define GPOS_UnorderedSet_H
 
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/unordered_set.h"
 
 namespace gpos
@@ -61,7 +62,7 @@ public:
 		const_iterator end_;
 
 	public:
-		LegacyIterator(const UnorderedSet *set)
+		LegacyIterator(gpos::pointer<const UnorderedSet *> set)
 			: iterator_(set->begin()), end_(set->end())
 		{
 		}

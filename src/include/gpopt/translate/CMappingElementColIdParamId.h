@@ -17,6 +17,7 @@
 #define GPDXL_CMappingElementColIdParamId_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDId.h"
 
@@ -43,7 +44,7 @@ private:
 	ULONG m_paramid;
 
 	// param type
-	IMDId *m_mdid;
+	gpos::pointer<IMDId *> m_mdid;
 
 	INT m_type_modifier;
 
@@ -69,7 +70,7 @@ public:
 	}
 
 	// return the type
-	IMDId *
+	gpos::pointer<IMDId *>
 	MdidType() const
 	{
 		return m_mdid;

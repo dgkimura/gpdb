@@ -15,6 +15,7 @@
 #define GPMD_CMDTypeBoolGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatumBool.h"
 #include "naucrates/md/CGPDBTypeHelper.h"
@@ -175,7 +176,7 @@ public:
 	// id of specified comparison operator type
 	IMDId *GetMdidForCmpType(ECmpType cmp_type) const override;
 
-	const IMDId *
+	gpos::pointer<const IMDId *>
 	CmpOpMdid() const override
 	{
 		return m_mdid_op_cmp;
@@ -199,7 +200,7 @@ public:
 	}
 
 	// array type id
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetArrayTypeMdid() const override
 	{
 		return m_mdid_type_array;
@@ -213,7 +214,7 @@ public:
 	}
 
 	// return the null constant for this type
-	IDatum *
+	gpos::pointer<IDatum *>
 	DatumNull() const override
 	{
 		return m_datum_null;
@@ -224,15 +225,16 @@ public:
 								BOOL is_null) const override;
 
 	// create typed datum from DXL datum
-	IDatum *GetDatumForDXLDatum(CMemoryPool *mp,
-								const CDXLDatum *dxl_datum) const override;
+	IDatum *GetDatumForDXLDatum(
+		CMemoryPool *mp,
+		gpos::pointer<const CDXLDatum *> dxl_datum) const override;
 
 	// serialize object in DXL format
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;
 
 	// transformation function to generate datum from CDXLScalarConstValue
 	IDatum *GetDatumForDXLConstVal(
-		const CDXLScalarConstValue *dxl_op) const override;
+		gpos::pointer<const CDXLScalarConstValue *> dxl_op) const override;
 
 	// generate the DXL datum from IDatum
 	CDXLDatum *GetDatumVal(CMemoryPool *mp, IDatum *datum) const override;

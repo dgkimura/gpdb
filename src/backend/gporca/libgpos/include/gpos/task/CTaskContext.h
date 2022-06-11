@@ -15,6 +15,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 
 namespace gpos
 {
@@ -97,7 +98,7 @@ public:
 		m_locale = locale;
 	}
 
-	CBitSet *
+	gpos::owner<CBitSet *>
 	copy_trace_flags(CMemoryPool *mp) const
 	{
 		return GPOS_NEW(mp) CBitSet(mp, *m_bitset);

@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -79,26 +80,26 @@ public:
 	~CDXLMinidump();
 
 	// traceflags
-	const CBitSet *Pbs() const;
+	gpos::pointer<const CBitSet *> Pbs() const;
 
 	// optimizer configuration
-	COptimizerConfig *
+	gpos::pointer<COptimizerConfig *>
 	GetOptimizerConfig() const
 	{
 		return m_optimizer_config;
 	}
 
 	// query object
-	const CDXLNode *GetQueryDXLRoot() const;
+	gpos::pointer<const CDXLNode *> GetQueryDXLRoot() const;
 
 	// query output columns
-	const CDXLNodeArray *PdrgpdxlnQueryOutput() const;
+	gpos::pointer<const CDXLNodeArray *> PdrgpdxlnQueryOutput() const;
 
 	// CTE list
-	const CDXLNodeArray *GetCTEProducerDXLArray() const;
+	gpos::pointer<const CDXLNodeArray *> GetCTEProducerDXLArray() const;
 
 	// plan
-	const CDXLNode *PdxlnPlan() const;
+	gpos::pointer<const CDXLNode *> PdxlnPlan() const;
 
 	// metadata objects
 	const IMDCacheObjectArray *GetMdIdCachedObjArray() const;

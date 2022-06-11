@@ -22,6 +22,7 @@
 
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CHashMapIter.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/translate/CGPDBAttInfo.h"
 #include "gpopt/translate/CGPDBAttOptCol.h"
@@ -90,13 +91,13 @@ private:
 		GPDBAttOptColHashMapIter;
 
 	// map from gpdb att to optimizer col
-	GPDBAttOptColHashMap *m_gpdb_att_opt_col_mapping;
+	gpos::owner<GPDBAttOptColHashMap *> m_gpdb_att_opt_col_mapping;
 
 	// insert mapping entry
 	void Insert(ULONG, ULONG, INT, ULONG, CWStringBase *str);
 
 	// helper function to access mapping
-	const CGPDBAttOptCol *GetGPDBAttOptColMapping(
+	gpos::pointer<const CGPDBAttOptCol *> GetGPDBAttOptColMapping(
 		ULONG current_query_level, const Var *var,
 		EPlStmtPhysicalOpType plstmt_physical_op_type) const;
 
@@ -122,30 +123,35 @@ public:
 						   EPlStmtPhysicalOpType plstmt_physical_op_type) const;
 
 	// load up mapping information from an index
-	void LoadIndexColumns(ULONG query_level, ULONG RTE_index,
-						  const gpmd::IMDIndex *index,
-						  const gpdxl::CDXLTableDescr *table_descr);
+	void LoadIndexColumns(
+		ULONG query_level, ULONG RTE_index,
+		gpos::pointer<const gpmd::IMDIndex *> index,
+		gpos::pointer<const gpdxl::CDXLTableDescr *> table_descr);
 
 	// load up mapping information from table descriptor
-	void LoadTblColumns(ULONG query_level, ULONG RTE_index,
-						const gpdxl::CDXLTableDescr *table_descr);
+	void LoadTblColumns(
+		ULONG query_level, ULONG RTE_index,
+		gpos::pointer<const gpdxl::CDXLTableDescr *> table_descr);
 
 	// load up column id mapping information from the array of column descriptors
 	void LoadColumns(ULONG query_level, ULONG RTE_index,
-					 const CDXLColDescrArray *column_descrs);
+					 gpos::pointer<const CDXLColDescrArray *> column_descrs);
 
 	// load up mapping information from derived table columns
-	void LoadDerivedTblColumns(ULONG query_level, ULONG RTE_index,
-							   const gpdxl::CDXLNodeArray *derived_columns_dxl,
-							   List *target_list);
+	void LoadDerivedTblColumns(
+		ULONG query_level, ULONG RTE_index,
+		gpos::pointer<const gpdxl::CDXLNodeArray *> derived_columns_dxl,
+		List *target_list);
 
 	// load information from CTE columns
 	void LoadCTEColumns(ULONG query_level, ULONG RTE_index,
-						const ULongPtrArray *pdrgpulCTE, List *target_list);
+						gpos::pointer<const ULongPtrArray *> pdrgpulCTE,
+						List *target_list);
 
 	// load up mapping information from scalar projection list
-	void LoadProjectElements(ULONG query_level, ULONG RTE_index,
-							 const CDXLNode *project_list_dxlnode);
+	void LoadProjectElements(
+		ULONG query_level, ULONG RTE_index,
+		gpos::pointer<const CDXLNode *> project_list_dxlnode);
 
 	// load up mapping information from list of column names
 	void Load(ULONG query_level, ULONG RTE_index, CIdGenerator *id_generator,

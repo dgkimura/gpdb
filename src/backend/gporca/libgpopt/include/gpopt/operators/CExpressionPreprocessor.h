@@ -14,6 +14,7 @@
 #define GPOPT_CExpressionPreprocessor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColumnFactory.h"
 #include "gpopt/mdcache/CMDAccessor.h"
@@ -59,7 +60,8 @@ private:
 
 	// check if all columns in the given equivalence class come from one of the
 	// children of the given expression
-	static BOOL FEquivClassFromChild(CColRefSet *pcrs, CExpression *pexpr);
+	static BOOL FEquivClassFromChild(gpos::pointer<CColRefSet *> pcrs,
+									 gpos::pointer<CExpression *> pexpr);
 
 	// generate predicates for the given set of columns based on the given
 	// constraint property
@@ -184,7 +186,7 @@ private:
 	// prune unused project elements from the project list of Project or GbAgg
 	static CExpression *PexprPruneProjListProjectOrGbAgg(
 		CMemoryPool *mp, CExpression *pexpr, CColRefSet *pcrsUnused,
-		CColRefSet *pcrsDefined, const CColRefSet *pcrsReqd);
+		CColRefSet *pcrsDefined, gpos::pointer<const CColRefSet *> pcrsReqd);
 
 	// generate a scalar bool op expression or return the only child expression in array
 	static CExpression *PexprScalarBoolOpConvert2In(
@@ -192,7 +194,7 @@ private:
 		CExpressionArray *pdrgpexpr);
 
 	// determines if the expression is likely convertible to an array expression
-	static BOOL FConvert2InIsConvertable(CExpression *pexpr,
+	static BOOL FConvert2InIsConvertable(gpos::pointer<CExpression *> pexpr,
 										 CScalarBoolOp::EBoolOperator eboolop);
 
 	// reorder the scalar cmp children to ensure that left child is Scalar Ident and right Child is Scalar Const
@@ -201,9 +203,9 @@ private:
 
 	static CExpression *PrunePartitions(CMemoryPool *mp, CExpression *expr);
 
-	static CConstraint *PcnstrFromChildPartition(const IMDRelation *partrel,
-												 CColRefArray *pdrgpcrOutput,
-												 ColRefToUlongMap *col_mapping);
+	static CConstraint *PcnstrFromChildPartition(
+		gpos::pointer<const IMDRelation *> partrel, CColRefArray *pdrgpcrOutput,
+		ColRefToUlongMap *col_mapping);
 
 	// private ctor
 	CExpressionPreprocessor();

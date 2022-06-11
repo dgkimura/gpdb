@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CName.h"
 #include "naucrates/md/IMDType.h"
@@ -58,7 +59,7 @@ private:
 
 public:
 	// ctor
-	CColumnDescriptor(CMemoryPool *mp, const IMDType *pmdtype,
+	CColumnDescriptor(CMemoryPool *mp, gpos::pointer<const IMDType *> pmdtype,
 					  INT type_modifier, const CName &name, INT attno,
 					  BOOL is_nullable, ULONG ulWidth = gpos::ulong_max);
 
@@ -73,7 +74,7 @@ public:
 	}
 
 	// return metadata type
-	const IMDType *
+	gpos::pointer<const IMDType *>
 	RetrieveType() const
 	{
 		return m_pmdtype;

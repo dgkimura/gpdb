@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPool.h"
 
 #include "naucrates/md/CMDIdColStats.h"
@@ -100,7 +101,7 @@ public:
 	void CollectMissingStatsColumns(IMdIdArray *pdrgmdid);
 
 	// generate default optimizer configurations
-	static CStatisticsConfig *
+	static gpos::owner<CStatisticsConfig *>
 	PstatsconfDefault(CMemoryPool *mp)
 	{
 		return GPOS_NEW(mp) CStatisticsConfig(

@@ -20,6 +20,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
 
@@ -69,7 +70,7 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumGeneric *
+	static gpos::cast_func<CDXLDatumGeneric *>
 	Cast(CDXLDatum *dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);

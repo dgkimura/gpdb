@@ -15,6 +15,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/metadata/CColumnDescriptor.h"
@@ -115,10 +116,10 @@ public:
 
 	// accessors
 	ULONG ColumnCount() const;
-	const CColumnDescriptor *Pcoldesc(ULONG) const;
+	gpos::pointer<const CColumnDescriptor *> Pcoldesc(ULONG) const;
 
 	// mdid accessor
-	IMDId *
+	gpos::pointer<IMDId *>
 	MDId() const
 	{
 		return m_mdid;
@@ -162,21 +163,21 @@ public:
 	}
 
 	// distribution column descriptors accessor
-	const IMdIdArray *
+	gpos::pointer<const IMdIdArray *>
 	DistrOpfamilies() const
 	{
 		return m_distr_opfamilies;
 	}
 
 	// partition column indexes accessor
-	const ULongPtrArray *
+	gpos::pointer<const ULongPtrArray *>
 	PdrgpulPart() const
 	{
 		return m_pdrgpulPart;
 	}
 
 	// array of key sets
-	const CBitSetArray *
+	gpos::pointer<const CBitSetArray *>
 	PdrgpbsKeys() const
 	{
 		return m_pdrgpbsKeys;
@@ -216,7 +217,7 @@ public:
 
 	// helper function for finding the index of a column descriptor in
 	// an array of column descriptors
-	static ULONG UlPos(const CColumnDescriptor *,
+	static ULONG UlPos(gpos::pointer<const CColumnDescriptor *>,
 					   const CColumnDescriptorArray *);
 
 	IOstream &OsPrint(IOstream &os) const;

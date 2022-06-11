@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCostContext.h"
 #include "gpopt/engine/CPartialPlan.h"
@@ -183,7 +184,7 @@ public:
 	~CGroupExpression() override;
 
 	// duplicate group expression accessor
-	CGroupExpression *
+	gpos::pointer<CGroupExpression *>
 	PgexprDuplicate() const
 	{
 		return m_pgexprDuplicate;
@@ -260,7 +261,7 @@ public:
 	}
 
 	// accessor for operator
-	COperator *
+	gpos::pointer<COperator *>
 	Pop() const
 	{
 		return m_pop;
@@ -274,7 +275,7 @@ public:
 	}
 
 	// accessor for containing group
-	CGroup *
+	gpos::pointer<CGroup *>
 	Pgroup() const
 	{
 		return m_pgroup;
@@ -288,7 +289,7 @@ public:
 	}
 
 	// origin group expression
-	CGroupExpression *
+	gpos::pointer<CGroupExpression *>
 	PgexprOrigin() const
 	{
 		return m_pgexprOrigin;
@@ -317,10 +318,11 @@ public:
 	}
 
 	// match group expression against given operator and its children
-	BOOL Matches(const CGroupExpression *) const;
+	BOOL Matches(gpos::pointer<const CGroupExpression *>) const;
 
 	// match non-scalar children of group expression against given children of passed expression
-	BOOL FMatchNonScalarChildren(const CGroupExpression *pgexpr) const;
+	BOOL FMatchNonScalarChildren(
+		gpos::pointer<const CGroupExpression *> pgexpr) const;
 
 	// hash function
 	ULONG
@@ -363,7 +365,7 @@ public:
 	// check if transition to the given state is completed
 	BOOL FTransitioned(EState estate) const;
 
-	CGroupArray *
+	gpos::pointer<CGroupArray *>
 	Pdrgpgroup() const
 	{
 		return m_pdrgpgroup;

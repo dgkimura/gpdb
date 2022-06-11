@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CColRefSet.h"
@@ -234,7 +235,7 @@ public:
 	static CDrvdPropRelational *GetRelationalProperties(CDrvdProp *pdp);
 
 	// check for satisfying required plan properties
-	BOOL FSatisfies(const CReqdPropPlan *prpp) const override;
+	BOOL FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

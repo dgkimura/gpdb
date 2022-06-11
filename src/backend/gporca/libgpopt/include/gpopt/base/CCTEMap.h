@@ -20,6 +20,7 @@
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CHashMapIter.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdPropPlan.h"
 
@@ -81,7 +82,7 @@ private:
 		CCTEMap::ECteType m_ect;
 
 		// derived plan properties if entry corresponds to CTE producer
-		CDrvdPropPlan *m_pdpplan;
+		gpos::owner<CDrvdPropPlan *> m_pdpplan;
 
 	public:
 		CCTEMapEntry(const CCTEMapEntry &) = delete;
@@ -115,7 +116,7 @@ private:
 		}
 
 		// plan properties
-		CDrvdPropPlan *
+		gpos::pointer<CDrvdPropPlan *>
 		Pdpplan() const
 		{
 			return m_pdpplan;
@@ -190,7 +191,7 @@ public:
 
 	// check if two cte maps are equal
 	BOOL
-	Equals(const CCTEMap *pcm) const
+	Equals(gpos::pointer<const CCTEMap *> pcm) const
 	{
 		return (m_phmcm->Size() == pcm->m_phmcm->Size()) && this->FSubset(pcm);
 	}
@@ -199,14 +200,14 @@ public:
 	CDrvdPropPlan *PdpplanProducer(ULONG *ulpId) const;
 
 	// check if current  map is a subset of the given one
-	BOOL FSubset(const CCTEMap *pcm) const;
+	BOOL FSubset(gpos::pointer<const CCTEMap *> pcm) const;
 
 	// check whether the current CTE map satisfies the given CTE requirements
-	BOOL FSatisfies(const CCTEReq *pcter) const;
+	BOOL FSatisfies(gpos::pointer<const CCTEReq *> pcter) const;
 
 	// return producer ids that are in this map but not in the given requirement
-	ULongPtrArray *PdrgpulAdditionalProducers(CMemoryPool *mp,
-											  const CCTEReq *pcter) const;
+	ULongPtrArray *PdrgpulAdditionalProducers(
+		CMemoryPool *mp, gpos::pointer<const CCTEReq *> pcter) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;

@@ -13,6 +13,7 @@
 #define GPMD_CMDIdScCmpFunc_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CMDIdGPDB.h"
 #include "naucrates/md/IMDType.h"
@@ -90,7 +91,7 @@ public:
 	}
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(gpos::pointer<const IMDId *> mdid) const override;
 
 	// computes the hash value for the metadata id
 	ULONG HashValue() const override;
@@ -111,8 +112,8 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// const converter
-	static const CMDIdScCmp *
-	CastMdid(const IMDId *mdid)
+	static gpos::pointer<const CMDIdScCmp *>
+	CastMdid(gpos::pointer<const IMDId *> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidScCmp == mdid->MdidType());
 
@@ -120,7 +121,7 @@ public:
 	}
 
 	// non-const converter
-	static CMDIdScCmp *
+	static gpos::cast_func<CMDIdScCmp *>
 	CastMdid(IMDId *mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidScCmp == mdid->MdidType());
@@ -129,7 +130,7 @@ public:
 	}
 
 	// make a copy in the given memory pool
-	IMDId *
+	gpos::owner<IMDId *>
 	Copy(CMemoryPool *mp) const override
 	{
 		CMDIdGPDB *mdid_left = CMDIdGPDB::CastMdid(m_mdid_left->Copy(mp));

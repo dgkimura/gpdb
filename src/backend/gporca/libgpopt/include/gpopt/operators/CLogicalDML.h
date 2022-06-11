@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalDML_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogical.h"
 
@@ -107,14 +108,14 @@ public:
 	}
 
 	// source columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrSource() const
 	{
 		return m_pdrgpcrSource;
 	}
 
 	// modified columns set
-	CBitSet *
+	gpos::pointer<CBitSet *>
 	PbsModified() const
 	{
 		return m_pbsModified;
@@ -149,7 +150,7 @@ public:
 	}
 
 	// return table's descriptor
-	CTableDescriptor *
+	gpos::pointer<CTableDescriptor *>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
@@ -242,7 +243,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalDML *
+	static gpos::cast_func<CLogicalDML *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

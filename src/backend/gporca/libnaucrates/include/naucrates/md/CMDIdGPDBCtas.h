@@ -15,6 +15,7 @@
 #define GPMD_CMDIdGPDBCTAS_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CMDIdGPDB.h"
 
@@ -55,7 +56,7 @@ public:
 	}
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(gpos::pointer<const IMDId *> mdid) const override;
 
 	// is the mdid valid
 	BOOL IsValid() const override;
@@ -67,8 +68,8 @@ public:
 	static CMDIdGPDBCtas m_mdid_invalid_key;
 
 	// const converter
-	static const CMDIdGPDBCtas *
-	CastMdid(const IMDId *mdid)
+	static gpos::pointer<const CMDIdGPDBCtas *>
+	CastMdid(gpos::pointer<const IMDId *> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidGPDBCtas == mdid->MdidType());
 
@@ -76,7 +77,7 @@ public:
 	}
 
 	// non-const converter
-	static CMDIdGPDBCtas *
+	static gpos::cast_func<CMDIdGPDBCtas *>
 	CastMdid(IMDId *mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidGPDBCtas == mdid->MdidType());

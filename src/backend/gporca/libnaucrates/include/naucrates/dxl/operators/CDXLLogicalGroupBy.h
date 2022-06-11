@@ -13,6 +13,7 @@
 #define GPDXL_CDXLLogicalGroupBy_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -49,17 +50,17 @@ public:
 	// accessors
 	Edxlopid GetDXLOperator() const override;
 	const CWStringConst *GetOpNameStr() const override;
-	const ULongPtrArray *GetGroupingColidArray() const;
+	gpos::pointer<const ULongPtrArray *> GetGroupingColidArray() const;
 
 	// set grouping column indices
 	void SetGroupingColumns(ULongPtrArray *);
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// conversion function
-	static CDXLLogicalGroupBy *
+	static gpos::cast_func<CDXLLogicalGroupBy *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -71,7 +72,8 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(gpos::pointer<const CDXLNode *>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

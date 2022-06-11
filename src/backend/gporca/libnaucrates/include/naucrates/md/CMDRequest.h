@@ -17,6 +17,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CSystemId.h"
 #include "naucrates/md/IMDFunction.h"
@@ -97,7 +98,7 @@ public:
 	// accessors
 
 	// array of mdids
-	IMdIdArray *
+	gpos::pointer<IMdIdArray *>
 	GetMdIdArray() const
 	{
 		return m_mdid_array;

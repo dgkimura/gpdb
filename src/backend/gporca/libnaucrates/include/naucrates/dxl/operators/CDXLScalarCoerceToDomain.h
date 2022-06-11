@@ -25,6 +25,7 @@
 #define GPDXL_CDXLScalarCoerceToDomain_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarCoerceBase.h"
 #include "naucrates/md/IMDId.h"
@@ -66,7 +67,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLScalarCoerceToDomain *
+	static gpos::cast_func<CDXLScalarCoerceToDomain *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

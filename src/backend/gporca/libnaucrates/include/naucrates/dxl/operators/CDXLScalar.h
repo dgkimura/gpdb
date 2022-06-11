@@ -13,6 +13,7 @@
 #define GPDXL_CDXLScalar_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/dxl/operators/CDXLOperator.h"
@@ -52,7 +53,7 @@ public:
 	virtual BOOL HasBoolResult(CMDAccessor *md_accessor) const = 0;
 
 #ifdef GPOS_DEBUG
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 					 BOOL validate_children) const override = 0;
 #endif	// GPOS_DEBUG
 };

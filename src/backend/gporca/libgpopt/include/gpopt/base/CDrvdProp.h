@@ -15,6 +15,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/owner.h"
 
 
 namespace gpopt
@@ -95,7 +96,8 @@ public:
 						CDrvdPropCtxt *pdppropctxt) = 0;
 
 	// check for satisfying required plan properties
-	virtual BOOL FSatisfies(const CReqdPropPlan *prpp) const = 0;
+	virtual BOOL FSatisfies(
+		gpos::pointer<const CReqdPropPlan *> prpp) const = 0;
 
 	virtual BOOL
 	IsComplete() const

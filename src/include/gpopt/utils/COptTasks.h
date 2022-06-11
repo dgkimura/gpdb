@@ -15,6 +15,7 @@
 #ifndef COptTasks_H
 #define COptTasks_H
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CException.h"
 
 #include "gpopt/base/CColRef.h"
@@ -123,8 +124,8 @@ private:
 	static void LogExceptionMessageAndDelete(CHAR *err_buf);
 
 	// create optimizer configuration object
-	static COptimizerConfig *CreateOptimizerConfig(CMemoryPool *mp,
-												   ICostModel *cost_model);
+	static gpos::owner<COptimizerConfig *> CreateOptimizerConfig(
+		CMemoryPool *mp, ICostModel *cost_model);
 
 	// optimize a query to a physical DXL
 	static void *OptimizeTask(void *ptr);
@@ -132,7 +133,7 @@ private:
 	// translate a DXL tree into a planned statement
 	static PlannedStmt *ConvertToPlanStmtFromDXL(
 		CMemoryPool *mp, CMDAccessor *md_accessor, const Query *orig_query,
-		const CDXLNode *dxlnode, bool can_set_tag,
+		gpos::pointer<const CDXLNode *> dxlnode, bool can_set_tag,
 		DistributionHashOpsKind distribution_hashops);
 
 	// load search strategy from given path

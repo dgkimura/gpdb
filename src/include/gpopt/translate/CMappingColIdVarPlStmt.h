@@ -19,6 +19,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CHashMap.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/translate/CDXLTranslateContext.h"
 #include "gpopt/translate/CMappingColIdVar.h"
@@ -48,7 +49,7 @@ private:
 	const CDXLTranslateContextBaseTable *m_base_table_context;
 
 	// the array of translator context (one for each child of the DXL operator)
-	CDXLTranslationContextArray *m_child_contexts;
+	gpos::pointer<CDXLTranslationContextArray *> m_child_contexts;
 
 	CDXLTranslateContext *m_output_context;
 
@@ -65,10 +66,11 @@ public:
 		CContextDXLToPlStmt *dxl_to_plstmt_context);
 
 	// translate DXL ScalarIdent node into GPDB Var node
-	Var *VarFromDXLNodeScId(const CDXLScalarIdent *dxlop) override;
+	Var *VarFromDXLNodeScId(
+		gpos::pointer<const CDXLScalarIdent *> dxlop) override;
 
 	// translate DXL ScalarIdent node into GPDB Param node
-	Param *ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop);
+	Param *ParamFromDXLNodeScId(gpos::pointer<const CDXLScalarIdent *> dxlop);
 
 	// get the output translator context
 	CDXLTranslateContext *GetOutputContext();

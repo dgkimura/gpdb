@@ -12,6 +12,7 @@
 #define GPOPT_CPartInfo_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CPartKeys.h"
@@ -86,7 +87,7 @@ private:
 			UlongToColRefMap *colref_mapping);
 
 		// mdid of partition table
-		virtual IMDId *
+		virtual gpos::pointer<IMDId *>
 		MDId() const
 		{
 			return m_mdid;

@@ -18,6 +18,7 @@
 #define GPDXL_CDXLLogicalSetOp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLColDescr.h"
 #include "naucrates/dxl/operators/CDXLLogical.h"
@@ -83,7 +84,7 @@ public:
 	}
 
 	// array of output columns
-	const CDXLColDescrArray *
+	gpos::pointer<const CDXLColDescrArray *>
 	GetDXLColumnDescrArray() const
 	{
 		return m_col_descr_array;
@@ -97,7 +98,7 @@ public:
 	}
 
 	// output column descriptor at a given position
-	const CDXLColDescr *
+	gpos::pointer<const CDXLColDescr *>
 	GetColumnDescrAt(ULONG idx) const
 	{
 		return (*m_col_descr_array)[idx];
@@ -111,7 +112,7 @@ public:
 	}
 
 	// column array of the input at a given position
-	const ULongPtrArray *
+	gpos::pointer<const ULongPtrArray *>
 	GetInputColIdArrayAt(ULONG idx) const
 	{
 		GPOS_ASSERT(idx < ChildCount());
@@ -128,13 +129,13 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// check if given column is defined by operator
 	BOOL IsColDefined(ULONG colid) const override;
 
 	// conversion function
-	static CDXLLogicalSetOp *
+	static gpos::cast_func<CDXLLogicalSetOp *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -146,7 +147,8 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(gpos::pointer<const CDXLNode *>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

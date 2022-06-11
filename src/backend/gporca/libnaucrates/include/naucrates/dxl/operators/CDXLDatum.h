@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringConst.h"
 
 #include "naucrates/md/IMDId.h"
@@ -42,7 +43,7 @@ protected:
 	CMemoryPool *m_mp;
 
 	// mdid of the datum's type
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 	const INT m_type_modifier;
 
@@ -79,7 +80,7 @@ public:
 	}
 
 	// mdid type of the datum
-	virtual IMDId *
+	virtual gpos::pointer<IMDId *>
 	MDId() const
 	{
 		return m_mdid_type;

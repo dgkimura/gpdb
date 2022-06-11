@@ -9,6 +9,7 @@
 #include <type_traits>
 
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/vector.h"
 
 namespace gpos
@@ -74,7 +75,7 @@ public:
 
 	// equality check
 	BOOL
-	Equals(const Vector *arr) const noexcept
+	Equals(gpos::pointer<const Vector *> arr) const noexcept
 	{
 		return std::equal(v_.begin(), v_.end(), arr->v_.begin(), arr->v_.end());
 	}

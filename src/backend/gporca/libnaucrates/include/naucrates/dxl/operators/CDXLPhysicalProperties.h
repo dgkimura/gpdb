@@ -12,6 +12,7 @@
 #define GPDXL_CDXLPhysicalProperties_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLOperatorCost.h"
 #include "naucrates/dxl/operators/CDXLProperties.h"
@@ -59,7 +60,7 @@ public:
 	}
 
 	// conversion function
-	static CDXLPhysicalProperties *
+	static gpos::cast_func<CDXLPhysicalProperties *>
 	PdxlpropConvert(CDXLProperties *dxl_properties)
 	{
 		GPOS_ASSERT(nullptr != dxl_properties);

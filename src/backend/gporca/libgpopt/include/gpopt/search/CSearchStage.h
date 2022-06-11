@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CTimerUser.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXform.h"
 
@@ -125,7 +126,7 @@ public:
 	void SetBestExpr(CExpression *pexpr);
 
 	// best plan found accessor
-	CExpression *
+	gpos::pointer<CExpression *>
 	PexprBest() const
 	{
 		return m_pexprBest;

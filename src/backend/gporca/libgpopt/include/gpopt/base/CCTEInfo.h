@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CStack.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCTEReq.h"
 #include "gpopt/base/CColRef.h"
@@ -138,7 +139,7 @@ private:
 		~CCTEInfoEntry() override;
 
 		// CTE expression
-		CExpression *
+		gpos::pointer<CExpression *>
 		Pexpr() const
 		{
 			return m_pexprCTEProducer;
@@ -201,7 +202,7 @@ private:
 
 	// preprocess CTE producer expression
 	CExpression *PexprPreprocessCTEProducer(
-		const CExpression *pexprCTEProducer);
+		gpos::pointer<const CExpression *> pexprCTEProducer);
 
 	// number of consumers of given CTE inside a given parent
 	ULONG UlConsumersInParent(ULONG ulConsumerId, ULONG ulParentId) const;

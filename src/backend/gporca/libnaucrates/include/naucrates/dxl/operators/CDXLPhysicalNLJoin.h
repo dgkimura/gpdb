@@ -15,6 +15,7 @@
 #define GPDXL_CDXLPhysicalNLJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLColRef.h"
 #include "naucrates/dxl/operators/CDXLPhysicalJoin.h"
@@ -81,14 +82,14 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	void SetNestLoopParamsColRefs(CDXLColRefArray *nest_params_col_refs);
 
 	CDXLColRefArray *GetNestLoopParamsColRefs() const;
 
 	// conversion function
-	static CDXLPhysicalNLJoin *
+	static gpos::cast_func<CDXLPhysicalNLJoin *>
 	PdxlConvert(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -100,7 +101,8 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(gpos::pointer<const CDXLNode *>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

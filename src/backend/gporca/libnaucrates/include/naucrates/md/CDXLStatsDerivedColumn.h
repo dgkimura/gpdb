@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CDXLBucket.h"
 
@@ -102,7 +103,8 @@ public:
 		return m_freq_remaining;
 	}
 
-	const CDXLBucketArray *TransformHistogramToDXLBucketArray() const;
+	gpos::pointer<const CDXLBucketArray *> TransformHistogramToDXLBucketArray()
+		const;
 
 	// serialize bucket in DXL format
 	void Serialize(gpdxl::CXMLSerializer *) const;

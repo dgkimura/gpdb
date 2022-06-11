@@ -17,6 +17,7 @@
 #define GPDXL_CGPDBAttOptCol_H
 
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/translate/CGPDBAttInfo.h"
 #include "gpopt/translate/COptColInfo.h"
@@ -37,10 +38,10 @@ class CGPDBAttOptCol : public CRefCount
 {
 private:
 	// gpdb att info
-	CGPDBAttInfo *m_gpdb_att_info;
+	gpos::owner<CGPDBAttInfo *> m_gpdb_att_info;
 
 	// optimizer col info
-	COptColInfo *m_opt_col_info;
+	gpos::owner<COptColInfo *> m_opt_col_info;
 
 public:
 	CGPDBAttOptCol(const CGPDBAttOptCol &) = delete;
@@ -61,14 +62,14 @@ public:
 	}
 
 	// accessor
-	const CGPDBAttInfo *
+	gpos::pointer<const CGPDBAttInfo *>
 	GetGPDBAttInfo() const
 	{
 		return m_gpdb_att_info;
 	}
 
 	// accessor
-	const COptColInfo *
+	gpos::pointer<const COptColInfo *>
 	GetOptColInfo() const
 	{
 		return m_opt_col_info;

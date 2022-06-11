@@ -20,6 +20,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CHashMapIter.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/translate/CMappingElementColIdParamId.h"
 
@@ -63,10 +64,10 @@ private:
 	CMemoryPool *m_mp;
 
 	// mappings ColId->TargetEntry used for intermediate DXL nodes
-	ULongToTargetEntryMap *m_colid_to_target_entry_map;
+	gpos::owner<ULongToTargetEntryMap *> m_colid_to_target_entry_map;
 
 	// mappings ColId->ParamId used for outer refs in subplans
-	ULongToColParamMap *m_colid_to_paramid_map;
+	gpos::owner<ULongToColParamMap *> m_colid_to_paramid_map;
 
 	// is the node for which this context is built a child of an aggregate node
 	// This is used to assign 0 instead of OUTER for the varno value of columns
@@ -93,7 +94,7 @@ public:
 	BOOL IsParentAggNode() const;
 
 	// return the params hashmap
-	ULongToColParamMap *
+	gpos::pointer<ULongToColParamMap *>
 	GetColIdToParamIdMap()
 	{
 		return m_colid_to_paramid_map;
@@ -103,7 +104,7 @@ public:
 	const TargetEntry *GetTargetEntry(ULONG colid) const;
 
 	// return the param id corresponding to the given ColId
-	const CMappingElementColIdParamId *GetParamIdMappingElement(
+	gpos::pointer<const CMappingElementColIdParamId *> GetParamIdMappingElement(
 		ULONG colid) const;
 
 	// store the mapping of the given column id and target entry

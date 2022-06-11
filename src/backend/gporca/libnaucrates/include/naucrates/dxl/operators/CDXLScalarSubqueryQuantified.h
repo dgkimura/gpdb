@@ -13,6 +13,7 @@
 #define GPDXL_CDXLScalarSubqueryQuantified_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLScalar.h"
@@ -63,7 +64,7 @@ public:
 	~CDXLScalarSubqueryQuantified() override;
 
 	// scalar operator id
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetScalarOpMdId() const
 	{
 		return m_scalar_op_mdid;
@@ -84,10 +85,11 @@ public:
 	}
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
+	void SerializeToDXL(CXMLSerializer *,
+						gpos::pointer<const CDXLNode *>) const override;
 
 	// conversion function
-	static CDXLScalarSubqueryQuantified *
+	static gpos::cast_func<CDXLScalarSubqueryQuantified *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -108,7 +110,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

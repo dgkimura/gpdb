@@ -15,6 +15,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CDXLStatsDerivedRelation.h"
 
@@ -239,10 +240,12 @@ public:
 
 	// serialize operator in DXL format given a serializer object and the
 	// host DXL node, providing access to the operator's children
-	virtual void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const = 0;
+	virtual void SerializeToDXL(CXMLSerializer *,
+								gpos::pointer<const CDXLNode *>) const = 0;
 
 	// check if given column is defined by operator
-	virtual BOOL IsColDefined(ULONG	 // colid
+	virtual BOOL
+	IsColDefined(ULONG	// colid
 	) const
 	{
 		// by default, operator does not define columns
@@ -257,7 +260,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	virtual void AssertValid(const CDXLNode *,
+	virtual void AssertValid(gpos::pointer<const CDXLNode *>,
 							 BOOL validate_children) const = 0;
 #endif	// GPOS_DEBUG
 };

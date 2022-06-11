@@ -54,7 +54,8 @@ private:
 	//	* HD1 colocates NULLs or
 	//  * HD2 doesn't care about NULLs
 	BOOL
-	FNullsColocatedCompatible(const CDistributionSpecHashed *pds) const
+	FNullsColocatedCompatible(
+		gpos::pointer<const CDistributionSpecHashed *> pds) const
 	{
 		return (m_fNullsColocated || !pds->m_fNullsColocated);
 	}
@@ -64,14 +65,15 @@ private:
 	//	* HD1 is duplicate sensitive, or
 	//  * HD2 doesn't care about duplicates
 	BOOL
-	FDuplicateSensitiveCompatible(const CDistributionSpecHashed *pds) const
+	FDuplicateSensitiveCompatible(
+		gpos::pointer<const CDistributionSpecHashed *> pds) const
 	{
 		return (m_is_duplicate_sensitive || !pds->m_is_duplicate_sensitive);
 	}
 
 	// exact match against given hashed distribution
 	BOOL FMatchHashedDistribution(
-		const CDistributionSpecHashed *pdshashed) const;
+		gpos::pointer<const CDistributionSpecHashed *> pdshashed) const;
 
 	BOOL FDistributionSpecHashedOnlyOnGpSegmentId() const;
 
@@ -110,7 +112,7 @@ public:
 	}
 
 	// expression array accessor
-	CExpressionArray *
+	gpos::pointer<CExpressionArray *>
 	Pdrgpexpr() const
 	{
 		return m_pdrgpexpr;
@@ -124,13 +126,13 @@ public:
 	}
 
 	// equivalent hashed distribution
-	CDistributionSpecHashed *
+	gpos::pointer<CDistributionSpecHashed *>
 	PdshashedEquiv() const
 	{
 		return m_pdshashedEquiv;
 	}
 
-	IMdIdArray *
+	gpos::pointer<IMdIdArray *>
 	Opfamilies() const
 	{
 		return m_opfamilies;
@@ -144,17 +146,18 @@ public:
 															 CColRefSet *pcrs);
 
 	// does this distribution match the given one
-	BOOL Matches(const CDistributionSpec *pds) const override;
+	BOOL Matches(gpos::pointer<const CDistributionSpec *> pds) const override;
 
 	// does this distribution satisfy the given one
-	BOOL FSatisfies(const CDistributionSpec *pds) const override;
+	BOOL FSatisfies(
+		gpos::pointer<const CDistributionSpec *> pds) const override;
 
 	// check if the columns of passed spec match a subset of the
 	// object's columns
-	BOOL FMatchSubset(const CDistributionSpecHashed *pds) const;
+	BOOL FMatchSubset(gpos::pointer<const CDistributionSpecHashed *> pds) const;
 
 	// equality function
-	BOOL Equals(const CDistributionSpec *pds) const override;
+	BOOL Equals(gpos::pointer<const CDistributionSpec *> pds) const override;
 
 	// return a copy of the distribution spec with remapped columns
 	CDistributionSpec *PdsCopyWithRemappedColumns(
@@ -189,7 +192,7 @@ public:
 													 BOOL fNullsColocated);
 
 	// conversion function
-	static CDistributionSpecHashed *
+	static gpos::cast_func<CDistributionSpecHashed *>
 	PdsConvert(CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
@@ -201,11 +204,11 @@ public:
 	}
 
 	// conversion function: const argument
-	static const CDistributionSpecHashed *
-	PdsConvert(const CDistributionSpec *pds)
+	static gpos::pointer<const CDistributionSpecHashed *>
+	PdsConvert(gpos::pointer<const CDistributionSpec *> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
-		const CDistributionSpecHashed *pdsHashed =
+		gpos::pointer<const CDistributionSpecHashed *> pdsHashed =
 			dynamic_cast<const CDistributionSpecHashed *>(pds);
 		GPOS_ASSERT(nullptr != pdsHashed);
 
@@ -222,7 +225,8 @@ public:
 							   CExpressionHandle &expression_handle);
 
 	// does the current spec or equivalent spec cover the input expression array
-	BOOL IsCoveredBy(const CExpressionArray *dist_cols_expr_array) const;
+	BOOL IsCoveredBy(
+		gpos::pointer<const CExpressionArray *> dist_cols_expr_array) const;
 
 	// create a copy of the distribution spec
 	CDistributionSpecHashed *Copy(CMemoryPool *mp);

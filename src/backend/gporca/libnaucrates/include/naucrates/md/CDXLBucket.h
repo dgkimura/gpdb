@@ -17,6 +17,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
 
@@ -91,10 +92,10 @@ public:
 	}
 
 	// min value for the bucket
-	const CDXLDatum *GetDXLDatumLower() const;
+	gpos::pointer<const CDXLDatum *> GetDXLDatumLower() const;
 
 	// max value for the bucket
-	const CDXLDatum *GetDXLDatumUpper() const;
+	gpos::pointer<const CDXLDatum *> GetDXLDatumUpper() const;
 
 	// frequency
 	CDouble GetFrequency() const;

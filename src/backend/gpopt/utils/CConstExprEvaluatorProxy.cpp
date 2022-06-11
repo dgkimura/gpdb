@@ -14,6 +14,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include "gpos/common/owner.h"
 extern "C" {
 #include "postgres.h"
 
@@ -41,7 +42,7 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 Var *
 CConstExprEvaluatorProxy::CEmptyMappingColIdVar::VarFromDXLNodeScId(
-	const CDXLScalarIdent * /*scalar_ident*/
+	gpos::pointer<const CDXLScalarIdent *> /*scalar_ident*/
 )
 {
 	elog(LOG,
@@ -61,7 +62,7 @@ CConstExprEvaluatorProxy::CEmptyMappingColIdVar::VarFromDXLNodeScId(
 //
 //---------------------------------------------------------------------------
 CDXLNode *
-CConstExprEvaluatorProxy::EvaluateExpr(const CDXLNode *dxl_expr)
+CConstExprEvaluatorProxy::EvaluateExpr(gpos::pointer<const CDXLNode *> dxl_expr)
 {
 	// Translate DXL -> GPDB Expr
 	Expr *expr = m_dxl2scalar_translator.TranslateDXLToScalar(
@@ -86,7 +87,7 @@ CConstExprEvaluatorProxy::EvaluateExpr(const CDXLNode *dxl_expr)
 	Const *const_result = (Const *) result;
 	CDXLDatum *datum_dxl = CTranslatorScalarToDXL::TranslateConstToDXL(
 		m_mp, m_md_accessor, const_result);
-	CDXLNode *dxl_result = GPOS_NEW(m_mp)
+	gpos::owner<CDXLNode *> dxl_result = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarConstValue(m_mp, datum_dxl));
 	gpdb::GPDBFree(result);
 	gpdb::GPDBFree(expr);

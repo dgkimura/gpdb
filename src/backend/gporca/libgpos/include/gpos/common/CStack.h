@@ -21,6 +21,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 namespace gpos
 {
@@ -29,7 +30,7 @@ class CStack
 {
 private:
 	// backing dynamic array store
-	CDynamicPtrArray<T, CleanupNULL> *m_dynamic_ptr_array;
+	gpos::owner<CDynamicPtrArray<T, CleanupNULL> *> m_dynamic_ptr_array;
 
 	// top of stack index
 	ULONG m_size;

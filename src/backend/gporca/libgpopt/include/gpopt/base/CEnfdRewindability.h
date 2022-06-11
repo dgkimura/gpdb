@@ -12,6 +12,7 @@
 #define GPOPT_CEnfdRewindability_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CEnfdProp.h"
 #include "gpopt/base/CRewindabilitySpec.h"
@@ -71,7 +72,7 @@ public:
 	BOOL FCompatible(CRewindabilitySpec *pos) const;
 
 	// required rewindability accessor
-	CRewindabilitySpec *
+	gpos::pointer<CRewindabilitySpec *>
 	PrsRequired() const
 	{
 		return m_prs;
@@ -82,7 +83,7 @@ public:
 							BOOL fRewindabilityReqd) const;
 
 	// property spec accessor
-	CPropSpec *
+	gpos::pointer<CPropSpec *>
 	Pps() const override
 	{
 		return m_prs;

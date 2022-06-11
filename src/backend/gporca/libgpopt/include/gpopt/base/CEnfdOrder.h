@@ -12,6 +12,7 @@
 #define GPOPT_CEnfdOrder_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CEnfdProp.h"
 #include "gpopt/base/COrderSpec.h"
@@ -71,7 +72,7 @@ public:
 	BOOL FCompatible(COrderSpec *pos) const;
 
 	// required order accessor
-	COrderSpec *
+	gpos::pointer<COrderSpec *>
 	PosRequired() const
 	{
 		return m_pos;
@@ -82,7 +83,7 @@ public:
 							BOOL fOrderReqd) const;
 
 	// property spec accessor
-	CPropSpec *
+	gpos::pointer<CPropSpec *>
 	Pps() const override
 	{
 		return m_pos;

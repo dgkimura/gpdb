@@ -15,6 +15,7 @@
 #define GPMD_IMDCacheObject_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CMDName.h"
 #include "naucrates/md/IMDId.h"
@@ -54,7 +55,7 @@ public:
 	//		<strTokenListItem .../>...
 	// </strTokenList>
 	static void SerializeMDIdList(CXMLSerializer *xml_serializer,
-								  const IMdIdArray *mdid_array,
+								  gpos::pointer<const IMdIdArray *> mdid_array,
 								  const CWStringConst *strTokenList,
 								  const CWStringConst *strTokenListItem);
 
@@ -95,7 +96,7 @@ public:
 	// element with the given name
 	virtual void SerializeMDIdAsElem(gpdxl::CXMLSerializer *xml_serializer,
 									 const CWStringConst *element_name,
-									 const IMDId *mdid) const;
+									 gpos::pointer<const IMDId *> mdid) const;
 
 #ifdef GPOS_DEBUG
 	virtual void DebugPrint(IOstream &os) const = 0;

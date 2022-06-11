@@ -15,6 +15,8 @@
 
 #include "gpopt/utils/COptTasks.h"
 
+#include "gpos/common/owner.h"
+
 extern "C" {
 #include "cdb/cdbvars.h"
 #include "utils/fmgroids.h"
@@ -266,7 +268,7 @@ COptTasks::LogExceptionMessageAndDelete(CHAR *err_buf)
 PlannedStmt *
 COptTasks::ConvertToPlanStmtFromDXL(
 	CMemoryPool *mp, CMDAccessor *md_accessor, const Query *orig_query,
-	const CDXLNode *dxlnode, bool can_set_tag,
+	gpos::pointer<const CDXLNode *> dxlnode, bool can_set_tag,
 	DistributionHashOpsKind distribution_hashops)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
@@ -345,7 +347,7 @@ COptTasks::LoadSearchStrategy(CMemoryPool *mp, char *path)
 //		Create the optimizer configuration
 //
 //---------------------------------------------------------------------------
-COptimizerConfig *
+gpos::owner<COptimizerConfig *>
 COptTasks::CreateOptimizerConfig(CMemoryPool *mp, ICostModel *cost_model)
 {
 	// get chosen plan number, cost threshold
@@ -437,7 +439,8 @@ COptTasks::SetCostModelParams(ICostModel *cost_model)
 ICostModel *
 COptTasks::GetCostModel(CMemoryPool *mp, ULONG num_segments)
 {
-	ICostModel *cost_model = GPOS_NEW(mp) CCostModelGPDB(mp, num_segments);
+	gpos::owner<ICostModel *> cost_model =
+		GPOS_NEW(mp) CCostModelGPDB(mp, num_segments);
 
 	SetCostModelParams(cost_model);
 
@@ -495,13 +498,13 @@ COptTasks::OptimizeTask(void *ptr)
 	CSearchStageArray *search_strategy_arr =
 		LoadSearchStrategy(mp, optimizer_search_strategy_path);
 
-	CBitSet *trace_flags = nullptr;
-	CBitSet *enabled_trace_flags = nullptr;
-	CBitSet *disabled_trace_flags = nullptr;
-	CDXLNode *plan_dxl = nullptr;
+	gpos::owner<CBitSet *> trace_flags = nullptr;
+	gpos::owner<CBitSet *> enabled_trace_flags = nullptr;
+	gpos::owner<CBitSet *> disabled_trace_flags = nullptr;
+	gpos::owner<CDXLNode *> plan_dxl = nullptr;
 
-	IMdIdArray *col_stats = nullptr;
-	MdidHashSet *rel_stats = nullptr;
+	gpos::owner<IMdIdArray *> col_stats = nullptr;
+	gpos::owner<MdidHashSet *> rel_stats = nullptr;
 
 	GPOS_TRY
 	{
@@ -512,7 +515,7 @@ COptTasks::OptimizeTask(void *ptr)
 					  &disabled_trace_flags);
 
 		// set up relcache MD provider
-		CMDProviderRelcache *relcache_provider =
+		gpos::owner<CMDProviderRelcache *> relcache_provider =
 			GPOS_NEW(mp) CMDProviderRelcache(mp);
 
 		{
@@ -532,13 +535,13 @@ COptTasks::OptimizeTask(void *ptr)
 				mp, &mda, (Query *) opt_ctxt->m_query);
 
 			ICostModel *cost_model = GetCostModel(mp, num_segments_for_costing);
-			COptimizerConfig *optimizer_config =
+			gpos::owner<COptimizerConfig *> optimizer_config =
 				CreateOptimizerConfig(mp, cost_model);
 			CConstExprEvaluatorProxy expr_eval_proxy(mp, &mda);
-			IConstExprEvaluator *expr_evaluator =
+			gpos::owner<IConstExprEvaluator *> expr_evaluator =
 				GPOS_NEW(mp) CConstExprEvaluatorDXL(mp, &mda, &expr_eval_proxy);
 
-			CDXLNode *query_dxl =
+			gpos::owner<CDXLNode *> query_dxl =
 				query_to_dxl_translator->TranslateQueryToDXL();
 			CDXLNodeArray *query_output_dxlnode_array =
 				query_to_dxl_translator->GetQueryOutputCols();
@@ -669,7 +672,8 @@ COptTasks::PrintMissingStatsWarning(CMemoryPool *mp, CMDAccessor *md_accessor,
 
 		IMDId *rel_mdid = mdid_col_stats->GetRelMdId();
 		const ULONG pos = mdid_col_stats->Position();
-		const IMDRelation *rel = md_accessor->RetrieveRel(rel_mdid);
+		gpos::pointer<const IMDRelation *> rel =
+			md_accessor->RetrieveRel(rel_mdid);
 
 		if (IMDRelation::ErelstorageExternal != rel->RetrieveRelStorageType())
 		{

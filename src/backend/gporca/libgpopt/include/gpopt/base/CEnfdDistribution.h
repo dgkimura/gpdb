@@ -12,6 +12,7 @@
 #define GPOPT_CEnfdDistribution_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
@@ -63,7 +64,7 @@ public:
 	~CEnfdDistribution() override;
 
 	// distribution spec accessor
-	CPropSpec *
+	gpos::pointer<CPropSpec *>
 	Pps() const override
 	{
 		return m_pds;
@@ -93,7 +94,7 @@ public:
 	BOOL FCompatible(CDistributionSpec *pds) const;
 
 	// required distribution accessor
-	CDistributionSpec *
+	gpos::pointer<CDistributionSpec *>
 	PdsRequired() const
 	{
 		return m_pds;

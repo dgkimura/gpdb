@@ -17,6 +17,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
@@ -79,7 +80,7 @@ public:
 	BOOL IsUsedInUpdDel() const;
 	BOOL IsZapped() const;
 
-	CDXLTableDescr *
+	gpos::pointer<CDXLTableDescr *>
 	GetDXLTableDesc() const
 	{
 		return m_dxl_table_descr;
@@ -97,7 +98,7 @@ public:
 		return m_scan_id;
 	}
 
-	const ULongPtrArray *
+	gpos::pointer<const ULongPtrArray *>
 	GetSelectorIds() const
 	{
 		return m_selector_ids;
@@ -105,10 +106,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalAppend *
+	static gpos::cast_func<CDXLPhysicalAppend *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -120,7 +121,8 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(gpos::pointer<const CDXLNode *>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

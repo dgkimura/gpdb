@@ -18,6 +18,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/utils.h"
 
 namespace gpdxl
@@ -87,7 +88,7 @@ public:
 
 // hash function
 inline ULONG
-UlHashOptColInfo(const COptColInfo *opt_col_info)
+UlHashOptColInfo(gpos::pointer<const COptColInfo *> opt_col_info)
 {
 	GPOS_ASSERT(nullptr != opt_col_info);
 	return opt_col_info->HashValue();
@@ -95,8 +96,8 @@ UlHashOptColInfo(const COptColInfo *opt_col_info)
 
 // equality function
 inline BOOL
-FEqualOptColInfo(const COptColInfo *opt_col_infoA,
-				 const COptColInfo *opt_col_infoB)
+FEqualOptColInfo(gpos::pointer<const COptColInfo *> opt_col_infoA,
+				 gpos::pointer<const COptColInfo *> opt_col_infoB)
 {
 	GPOS_ASSERT(nullptr != opt_col_infoA && nullptr != opt_col_infoB);
 	return opt_col_infoA->Equals(*opt_col_infoB);

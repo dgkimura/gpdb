@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CAutoP.h"
+#include "gpos/common/owner.h"
 #include "gpos/io/IOstream.h"
 #include "gpos/string/CWStringDynamic.h"
 
@@ -146,20 +147,20 @@ public:
 		CDXLStatsDerivedColumn *dxl_derived_col_stats);
 
 	// serialize a DXL query tree into DXL Document
-	static void SerializeQuery(CMemoryPool *mp, IOstream &os,
-							   const CDXLNode *dxl_query_node,
-							   const CDXLNodeArray *query_output_dxlnode_array,
-							   const CDXLNodeArray *cte_producers,
-							   BOOL serialize_document_header_footer,
-							   BOOL indentation);
+	static void SerializeQuery(
+		CMemoryPool *mp, IOstream &os,
+		gpos::pointer<const CDXLNode *> dxl_query_node,
+		gpos::pointer<const CDXLNodeArray *> query_output_dxlnode_array,
+		gpos::pointer<const CDXLNodeArray *> cte_producers,
+		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// serialize a ULLONG value
 	static CWStringDynamic *SerializeULLONG(CMemoryPool *mp, ULLONG value);
 
 	// serialize a plan into DXL
 	static void SerializePlan(CMemoryPool *mp, IOstream &os,
-							  const CDXLNode *node, ULLONG plan_id,
-							  ULLONG plan_space_size,
+							  gpos::pointer<const CDXLNode *> node,
+							  ULLONG plan_id, ULLONG plan_space_size,
 							  BOOL serialize_document_header_footer,
 							  BOOL indentation);
 
@@ -195,7 +196,7 @@ public:
 
 	// serialize a metadata id into DXL
 	static CWStringDynamic *SerializeMetadata(
-		CMemoryPool *mp, const IMDId *mdid,
+		CMemoryPool *mp, gpos::pointer<const IMDId *> mdid,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// serialize sample plans
@@ -208,12 +209,12 @@ public:
 
 	// serialize a metadata object into DXL
 	static CWStringDynamic *SerializeMDObj(
-		CMemoryPool *, const IMDCacheObject *,
+		CMemoryPool *, gpos::pointer<const IMDCacheObject *>,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// serialize a scalar expression into DXL
 	static CWStringDynamic *SerializeScalarExpr(
-		CMemoryPool *mp, const CDXLNode *node,
+		CMemoryPool *mp, gpos::pointer<const CDXLNode *> node,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// create a GPOS dynamic string from a Xerces XMLCh array
@@ -247,12 +248,12 @@ public:
 		CMemoryPool *mp, const CDynamicPtrArray<T, CleanupFn> *arr);
 
 	// serialize a list of lists of integers into a comma-separate string
-	static CWStringDynamic *Serialize(CMemoryPool *mp,
-									  const ULongPtr2dArray *pdrgpul);
+	static CWStringDynamic *Serialize(
+		CMemoryPool *mp, gpos::pointer<const ULongPtr2dArray *> pdrgpul);
 
 	// serialize a list of chars into a comma-separate string
 	static CWStringDynamic *SerializeToCommaSeparatedString(
-		CMemoryPool *mp, const CharPtrArray *pdrgpsz);
+		CMemoryPool *mp, gpos::pointer<const CharPtrArray *> pdrgpsz);
 
 	// decode a byte array from a string
 	static BYTE *DecodeByteArrayFromString(CMemoryPool *mp,
@@ -271,7 +272,7 @@ public:
 
 	// translate the optimizer datum from dxl datum object
 	static IDatum *GetDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
-							const CDXLDatum *dxl_datum);
+							gpos::pointer<const CDXLDatum *> dxl_datum);
 
 #ifdef GPOS_DEBUG
 	// debug print of the metadata relation

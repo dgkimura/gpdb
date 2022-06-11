@@ -19,6 +19,7 @@
 #define GPDXL_CDXLDatumInt4_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
 
@@ -66,7 +67,7 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumInt4 *
+	static gpos::cast_func<CDXLDatumInt4 *>
 	Cast(CDXLDatum *dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);

@@ -13,6 +13,7 @@
 #define GPMD_CMDRelationExternalGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/md/CMDColumn.h"
@@ -176,19 +177,19 @@ public:
 	IMDId *GetFormatErrTableMdid() const override;
 
 	// retrieve the column at the given position
-	const IMDColumn *GetMdCol(ULONG pos) const override;
+	gpos::pointer<const IMDColumn *> GetMdCol(ULONG pos) const override;
 
 	// number of key sets
 	ULONG KeySetCount() const override;
 
 	// key set at given position
-	const ULongPtrArray *KeySetAt(ULONG pos) const override;
+	gpos::pointer<const ULongPtrArray *> KeySetAt(ULONG pos) const override;
 
 	// number of distribution columns
 	ULONG DistrColumnCount() const override;
 
 	// retrieve the column at the given position in the distribution columns list for the relation
-	const IMDColumn *GetDistrColAt(ULONG pos) const override;
+	gpos::pointer<const IMDColumn *> GetDistrColAt(ULONG pos) const override;
 
 	IMDId *GetDistrOpfamilyAt(ULONG pos) const override;
 

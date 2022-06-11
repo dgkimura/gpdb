@@ -14,6 +14,7 @@
 #define GPDXL_CDXLPhysicalAbstractBitmapScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
@@ -65,7 +66,7 @@ public:
 	~CDXLPhysicalAbstractBitmapScan() override;
 
 	// table descriptor
-	const CDXLTableDescr *
+	gpos::pointer<const CDXLTableDescr *>
 	GetDXLTableDescr()
 	{
 		return m_dxl_table_descr;
@@ -74,7 +75,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(gpos::pointer<const CDXLNode *> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };		// class CDXLPhysicalAbstractBitmapScan

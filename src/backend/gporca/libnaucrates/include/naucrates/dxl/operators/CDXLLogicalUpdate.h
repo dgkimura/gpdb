@@ -13,6 +13,7 @@
 #define GPDXL_CDXLLogicalUpdate_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
@@ -73,7 +74,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// target table descriptor
-	CDXLTableDescr *
+	gpos::pointer<CDXLTableDescr *>
 	GetDXLTableDescr() const
 	{
 		return m_dxl_table_descr;
@@ -94,14 +95,14 @@ public:
 	}
 
 	// deletion column ids
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	GetDeletionColIdArray() const
 	{
 		return m_deletion_colid_array;
 	}
 
 	// insertion column ids
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	GetInsertionColIdArray() const
 	{
 		return m_insert_colid_array;
@@ -124,16 +125,16 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(gpos::pointer<const CDXLNode *> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// conversion function
-	static CDXLLogicalUpdate *
+	static gpos::cast_func<CDXLLogicalUpdate *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

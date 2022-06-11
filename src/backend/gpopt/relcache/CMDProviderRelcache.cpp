@@ -14,6 +14,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include "gpos/common/owner.h"
 extern "C" {
 #include "postgres.h"
 }
@@ -52,7 +53,7 @@ CWStringBase *
 CMDProviderRelcache::GetMDObjDXLStr(CMemoryPool *mp, CMDAccessor *md_accessor,
 									IMDId *md_id) const
 {
-	IMDCacheObject *md_obj =
+	gpos::owner<IMDCacheObject *> md_obj =
 		CTranslatorRelcacheToDXL::RetrieveObject(mp, md_accessor, md_id);
 
 	GPOS_ASSERT(nullptr != md_obj);

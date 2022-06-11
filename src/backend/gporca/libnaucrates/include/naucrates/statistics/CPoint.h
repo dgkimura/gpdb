@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatum.h"
 
@@ -38,7 +39,7 @@ class CPoint : public CRefCount, public DbgPrintMixin<CPoint>
 {
 private:
 	// datum corresponding to the point
-	IDatum *m_datum;
+	gpos::owner<IDatum *> m_datum;
 
 public:
 	CPoint &operator=(CPoint &) = delete;
@@ -49,35 +50,36 @@ public:
 	explicit CPoint(IDatum *);
 
 	// get underlying datum
-	IDatum *
+	gpos::pointer<IDatum *>
 	GetDatum() const
 	{
 		return m_datum;
 	}
 
 	// is this point equal to another
-	BOOL Equals(const CPoint *) const;
+	BOOL Equals(gpos::pointer<const CPoint *>) const;
 
 	// is this point not equal to another
-	BOOL IsNotEqual(const CPoint *) const;
+	BOOL IsNotEqual(gpos::pointer<const CPoint *>) const;
 
 	// less than
-	BOOL IsLessThan(const CPoint *) const;
+	BOOL IsLessThan(gpos::pointer<const CPoint *>) const;
 
 	// less than or equals
-	BOOL IsLessThanOrEqual(const CPoint *) const;
+	BOOL IsLessThanOrEqual(gpos::pointer<const CPoint *>) const;
 
 	// greater than
-	BOOL IsGreaterThan(const CPoint *) const;
+	BOOL IsGreaterThan(gpos::pointer<const CPoint *>) const;
 
 	// greater than or equals
-	BOOL IsGreaterThanOrEqual(const CPoint *) const;
+	BOOL IsGreaterThanOrEqual(gpos::pointer<const CPoint *>) const;
 
 	// distance between two points
-	CDouble Distance(const CPoint *) const;
+	CDouble Distance(gpos::pointer<const CPoint *>) const;
 
 	// distance between two points, taking bounds into account
-	CDouble Width(const CPoint *, BOOL include_lower, BOOL include_upper) const;
+	CDouble Width(gpos::pointer<const CPoint *>, BOOL include_lower,
+				  BOOL include_upper) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;

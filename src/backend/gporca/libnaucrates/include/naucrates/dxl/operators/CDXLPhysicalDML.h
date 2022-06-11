@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
@@ -102,14 +103,14 @@ public:
 	}
 
 	// target table descriptor
-	CDXLTableDescr *
+	gpos::pointer<CDXLTableDescr *>
 	GetDXLTableDescr() const
 	{
 		return m_dxl_table_descr;
 	}
 
 	// source column ids
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	GetSrcColIdsArray() const
 	{
 		return m_src_colids_array;
@@ -158,7 +159,7 @@ public:
 	}
 
 	// direct dispatch info
-	CDXLDirectDispatchInfo *
+	gpos::pointer<CDXLDirectDispatchInfo *>
 	GetDXLDirectDispatchInfo() const
 	{
 		return m_direct_dispatch_info;
@@ -174,16 +175,16 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(gpos::pointer<const CDXLNode *> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						gpos::pointer<const CDXLNode *> node) const override;
 
 	// conversion function
-	static CDXLPhysicalDML *
+	static gpos::cast_func<CDXLPhysicalDML *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

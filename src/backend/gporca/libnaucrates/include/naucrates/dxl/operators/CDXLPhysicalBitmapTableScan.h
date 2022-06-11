@@ -13,6 +13,7 @@
 #define GPDXL_CDXLPhysicalBitmapTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalAbstractBitmapScan.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
@@ -59,10 +60,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalBitmapTableScan *
+	static gpos::cast_func<CDXLPhysicalBitmapTableScan *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

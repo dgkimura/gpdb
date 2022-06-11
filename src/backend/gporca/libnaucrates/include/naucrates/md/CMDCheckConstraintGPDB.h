@@ -13,6 +13,7 @@
 #define GPMD_CMDCheckConstraintGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/md/CMDName.h"
@@ -67,7 +68,7 @@ public:
 	~CMDCheckConstraintGPDB() override;
 
 	// check constraint mdid
-	IMDId *
+	gpos::pointer<IMDId *>
 	MDId() const override
 	{
 		return m_mdid;
@@ -81,7 +82,7 @@ public:
 	}
 
 	// mdid of the relation
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetRelMdId() const override
 	{
 		return m_rel_mdid;

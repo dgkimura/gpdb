@@ -15,6 +15,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/md/CDXLBucket.h"
@@ -133,7 +134,7 @@ public:
 	}
 
 	// get the bucket at the given position
-	const CDXLBucket *GetDXLBucketAt(ULONG ul) const override;
+	gpos::pointer<const CDXLBucket *> GetDXLBucketAt(ULONG ul) const override;
 
 	// serialize column stats in DXL format
 	void Serialize(gpdxl::CXMLSerializer *) const override;

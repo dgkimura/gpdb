@@ -14,6 +14,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include "gpos/common/owner.h"
 extern "C" {
 #include "postgres.h"
 
@@ -91,7 +92,7 @@ CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level, List *cte_list,
 //		Return the query of the CTE referenced in the range table entry
 //
 //---------------------------------------------------------------------------
-const CDXLNode *
+gpos::pointer<const CDXLNode *>
 CCTEListEntry::GetCTEProducer(const CHAR *cte_str) const
 {
 	SCTEProducerInfo *cte_info = m_cte_info->Find(cte_str);
@@ -133,7 +134,7 @@ CCTEListEntry::GetCTEProducerTargetList(const CHAR *cte_str) const
 //---------------------------------------------------------------------------
 void
 CCTEListEntry::AddCTEProducer(CMemoryPool *mp, CommonTableExpr *cte,
-							  const CDXLNode *cte_producer)
+							  gpos::pointer<const CDXLNode *> cte_producer)
 {
 	GPOS_ASSERT(nullptr == m_cte_info->Find(cte->ctename) &&
 				"CTE entry already exists");

@@ -14,6 +14,7 @@
 #define GPDXL_CDXLLogicalExternalGet_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLLogicalGet.h"
 
@@ -43,7 +44,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLLogicalExternalGet *
+	static gpos::cast_func<CDXLLogicalExternalGet *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

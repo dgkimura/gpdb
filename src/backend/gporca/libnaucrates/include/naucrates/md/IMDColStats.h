@@ -15,6 +15,7 @@
 #define GPMD_IMDColStats_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CDXLBucket.h"
 #include "naucrates/md/IMDCacheObject.h"
@@ -61,7 +62,8 @@ public:
 	virtual BOOL IsColStatsMissing() const = 0;
 
 	// get the bucket at the given position
-	virtual const CDXLBucket *GetDXLBucketAt(ULONG ul) const = 0;
+	virtual gpos::pointer<const CDXLBucket *> GetDXLBucketAt(
+		ULONG ul) const = 0;
 };
 }  // namespace gpmd
 

@@ -20,6 +20,7 @@
 #define GPDXL_CMappingColIdVar_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 //fwd decl
 struct Var;
@@ -56,7 +57,7 @@ public:
 	virtual ~CMappingColIdVar() = default;
 
 	// translate DXL ScalarIdent node into GPDB Var node
-	virtual Var *VarFromDXLNodeScId(const CDXLScalarIdent *) = 0;
+	virtual Var *VarFromDXLNodeScId(gpos::pointer<const CDXLScalarIdent *>) = 0;
 };
 }  // namespace gpdxl
 

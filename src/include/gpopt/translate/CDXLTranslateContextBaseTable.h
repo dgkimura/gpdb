@@ -21,6 +21,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CHashMap.h"
+#include "gpos/common/owner.h"
 
 extern "C" {
 #include "postgres.h"  // Index
@@ -60,7 +61,7 @@ private:
 	Index m_rel_index;
 
 	// maps a colid of a column to the attribute number of that column in the schema of the underlying relation
-	UlongToIntMap *m_colid_to_attno_map;
+	gpos::owner<UlongToIntMap *> m_colid_to_attno_map;
 
 public:
 	CDXLTranslateContextBaseTable(const CDXLTranslateContextBaseTable &) =
