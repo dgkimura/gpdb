@@ -613,7 +613,7 @@ CExpression::PstatsDerive(CReqdPropRelational *prprel,
 	}
 	else
 	{
-		IStatistics *stats_copy = stats->CopyStats(m_mp);
+		gpos::owner<IStatistics *> stats_copy = stats->CopyStats(m_mp);
 		stats_copy->AppendStats(m_mp, m_pstats);
 
 		m_pstats->Release();

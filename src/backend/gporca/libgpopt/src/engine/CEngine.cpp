@@ -1162,8 +1162,9 @@ CEngine::OptimizeGroupExpression(CGroupExpression *pgexpr,
 				FCheckEnfdProps(m_mp, pgexpr, poc, ul, pdrgpoc))
 			{
 				// compute group expression cost under the current optimization context
-				CCostContext *pccComputed = pgexpr->PccComputeCost(
-					m_mp, poc, ul, pdrgpoc, false /*fPruned*/, CCost(0.0));
+				gpos::pointer<CCostContext *> pccComputed =
+					pgexpr->PccComputeCost(m_mp, poc, ul, pdrgpoc,
+										   false /*fPruned*/, CCost(0.0));
 
 				if (nullptr != pccComputed)
 				{
@@ -1363,7 +1364,7 @@ CEngine::DbgPrintExpr(int group_no, int context_no)
 
 	GPOS_TRY
 	{
-		CGroup *top_group = m_pmemo->Pgroup(group_no);
+		gpos::pointer<CGroup *> top_group = m_pmemo->Pgroup(group_no);
 		if (nullptr != top_group)
 		{
 			gpos::pointer<COptimizationContext *> poc =

@@ -93,8 +93,8 @@ void
 CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::pointer<CReqdProp *> prpInput,
 							 ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+							 ULONG							   // ulOptReq
 )
 {
 	GPOS_CHECK_ABORT;

@@ -18,7 +18,7 @@
 using namespace gpopt;
 
 // return statistics object after performing LSJ operation
-CStatistics *
+gpos::owner<CStatistics *>
 CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
 	CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats_input,
 	gpos::pointer<const IStatistics *> inner_stats_input,
@@ -52,11 +52,12 @@ CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
 
 	gpos::pointer<const CStatistics *> outer_stats =
 		dynamic_cast<const CStatistics *>(outer_stats_input);
-	CStatistics *semi_join_stats = CJoinStatsProcessor::SetResultingJoinStats(
-		mp, outer_stats->GetStatsConfig(), outer_stats, inner_stats,
-		join_preds_stats, IStatistics::EsjtLeftSemiJoin /* esjt */,
-		true /* DoIgnoreLASJHistComputation */
-	);
+	gpos::owner<CStatistics *> semi_join_stats =
+		CJoinStatsProcessor::SetResultingJoinStats(
+			mp, outer_stats->GetStatsConfig(), outer_stats, inner_stats,
+			join_preds_stats, IStatistics::EsjtLeftSemiJoin /* esjt */,
+			true /* DoIgnoreLASJHistComputation */
+		);
 
 	// clean up
 	inner_colids->Release();

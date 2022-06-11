@@ -84,7 +84,7 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 		gpos::owner<CExpression *> pexprUl =
 			CUtils::PexprScalarConstInt4(mp, ulVal);
 		gpos::owner<CExpression *> pexprIsNull =
-			CUtils::PexprIsNull(mp, pexprUl);
+			CUtils::PexprIsNull(mp, std::move(pexprUl));
 #ifdef GPOS_DEBUG
 		gpos::owner<CExpression *> pexprResult =
 			pceevaldefault->PexprEval(pexprIsNull);

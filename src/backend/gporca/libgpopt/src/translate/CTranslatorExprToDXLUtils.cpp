@@ -1103,7 +1103,8 @@ gpos::owner<CDXLNode *>
 CTranslatorExprToDXLUtils::PdxlnResult(
 	CMemoryPool *mp, gpos::owner<CDXLPhysicalProperties *> dxl_properties,
 	gpos::owner<CDXLNode *> pdxlnPrL, gpos::owner<CDXLNode *> filter_dxlnode,
-	gpos::owner<CDXLNode *> one_time_filter, CDXLNode *child_dxlnode)
+	gpos::owner<CDXLNode *> one_time_filter,
+	gpos::owner<CDXLNode *> child_dxlnode)
 {
 	gpos::owner<CDXLPhysicalResult *> dxl_op =
 		GPOS_NEW(mp) CDXLPhysicalResult(mp);

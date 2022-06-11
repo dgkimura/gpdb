@@ -25,8 +25,8 @@ private:
 		CMemoryPool *mp, gpos::pointer<const CStatistics *> outer_stats,
 		gpos::pointer<const CStatistics *> inner_side_stats,
 		gpos::pointer<CStatistics *> inner_join_stats,
-		CStatsPredJoinArray *join_preds_stats, CDouble num_rows_inner_join,
-		CDouble *result_rows_LASJ);
+		gpos::pointer<CStatsPredJoinArray *> join_preds_stats,
+		CDouble num_rows_inner_join, CDouble *result_rows_LASJ);
 	// helper method to add histograms of the inner side of a LOJ
 	static void AddHistogramsLOJInner(
 		CMemoryPool *mp, gpos::pointer<const CStatistics *> inner_join_stats,
@@ -38,7 +38,7 @@ public:
 	static gpos::owner<CStatistics *> CalcLOJoinStatsStatic(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats,
 		gpos::pointer<const IStatistics *> inner_side_stats,
-		CStatsPredJoinArray *join_preds_stats);
+		gpos::pointer<CStatsPredJoinArray *> join_preds_stats);
 };
 }  // namespace gpnaucrates
 

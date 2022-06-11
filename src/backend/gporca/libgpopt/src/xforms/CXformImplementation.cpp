@@ -26,7 +26,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CXformImplementation::CXformImplementation(gpos::owner<CExpression *> pexpr)
-	: CXform(pexpr)
+	: CXform(std::move(pexpr))
 {
 	GPOS_ASSERT(nullptr != pexpr);
 }

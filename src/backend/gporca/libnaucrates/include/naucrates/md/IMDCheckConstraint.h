@@ -51,7 +51,7 @@ public:
 	virtual gpos::pointer<IMDId *> GetRelMdId() const = 0;
 
 	// the scalar expression of the check constraint
-	virtual CExpression *GetCheckConstraintExpr(
+	virtual gpos::owner<CExpression *> GetCheckConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::pointer<CColRefArray *> colref_array) const = 0;
 };

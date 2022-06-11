@@ -3382,7 +3382,7 @@ CTranslatorExprToDXL::BuildSubplansForCorrelatedLOJ(
 void
 CTranslatorExprToDXL::BuildSubplans(
 	gpos::pointer<CExpression *> pexprCorrelatedNLJoin,
-	CDXLColRefArray *dxl_colref_array,
+	gpos::owner<CDXLColRefArray *> dxl_colref_array,
 	gpos::owner<CDXLNode *> *
 		ppdxlnScalar,  // output: scalar condition after replacing inner child reference with subplan
 	CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
@@ -3421,8 +3421,9 @@ CTranslatorExprToDXL::BuildSubplans(
 		case COperator::EopPhysicalCorrelatedInLeftSemiNLJoin:
 		case COperator::EopPhysicalCorrelatedNotInLeftAntiSemiNLJoin:
 			pdxlnSubPlan = PdxlnQuantifiedSubplan(
-				pdrgpcrInner, pexprCorrelatedNLJoin, dxl_colref_array,
-				pdrgpdsBaseTables, pulNonGatherMotions, pfDML);
+				pdrgpcrInner, pexprCorrelatedNLJoin,
+				std::move(dxl_colref_array), pdrgpdsBaseTables,
+				pulNonGatherMotions, pfDML);
 			pdxlnSubPlan->AddRef();
 			*ppdxlnScalar = pdxlnSubPlan;
 			return;
@@ -3430,8 +3431,9 @@ CTranslatorExprToDXL::BuildSubplans(
 		case COperator::EopPhysicalCorrelatedLeftSemiNLJoin:
 		case COperator::EopPhysicalCorrelatedLeftAntiSemiNLJoin:
 			pdxlnSubPlan = PdxlnExistentialSubplan(
-				pdrgpcrInner, pexprCorrelatedNLJoin, dxl_colref_array,
-				pdrgpdsBaseTables, pulNonGatherMotions, pfDML);
+				pdrgpcrInner, pexprCorrelatedNLJoin,
+				std::move(dxl_colref_array), pdrgpdsBaseTables,
+				pulNonGatherMotions, pfDML);
 			pdxlnSubPlan->AddRef();
 			*ppdxlnScalar = pdxlnSubPlan;
 			return;
@@ -3556,7 +3558,7 @@ gpos::pointer<CDXLNode *>
 CTranslatorExprToDXL::PdxlnQuantifiedSubplan(
 	gpos::pointer<CColRefArray *> pdrgpcrInner,
 	gpos::pointer<CExpression *> pexprCorrelatedNLJoin,
-	CDXLColRefArray *dxl_colref_array,
+	gpos::owner<CDXLColRefArray *> dxl_colref_array,
 	CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
 	BOOL *pfDML)
 {
@@ -3635,8 +3637,8 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan(
 	// construct a subplan node, with the inner child under it
 	gpos::owner<CDXLNode *> pdxlnSubPlan = GPOS_NEW(m_mp) CDXLNode(
 		m_mp, GPOS_NEW(m_mp) CDXLScalarSubPlan(
-				  m_mp, std::move(mdid), dxl_colref_array, dxl_subplan_type,
-				  std::move(dxlnode_test_expr), outerParam));
+				  m_mp, std::move(mdid), std::move(dxl_colref_array),
+				  dxl_subplan_type, std::move(dxlnode_test_expr), outerParam));
 	pdxlnSubPlan->AddChild(std::move(inner_dxlnode));
 
 	// add to hashmap
@@ -3798,7 +3800,7 @@ gpos::pointer<CDXLNode *>
 CTranslatorExprToDXL::PdxlnExistentialSubplan(
 	gpos::pointer<CColRefArray *> pdrgpcrInner,
 	gpos::pointer<CExpression *> pexprCorrelatedNLJoin,
-	CDXLColRefArray *dxl_colref_array,
+	gpos::owner<CDXLColRefArray *> dxl_colref_array,
 	CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
 	BOOL *pfDML)
 {
@@ -3852,7 +3854,7 @@ CTranslatorExprToDXL::PdxlnExistentialSubplan(
 	// construct a subplan node, with the inner child under it
 	gpos::owner<CDXLNode *> pdxlnSubPlan = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSubPlan(
-						   m_mp, std::move(mdid), dxl_colref_array,
+						   m_mp, std::move(mdid), std::move(dxl_colref_array),
 						   dxl_subplan_type, nullptr /*dxlnode_test_expr*/));
 	pdxlnSubPlan->AddChild(std::move(inner_dxlnode));
 
@@ -4062,9 +4064,9 @@ CTranslatorExprToDXL::PdxlnCorrelatedNLJoin(
 //
 //---------------------------------------------------------------------------
 void
-CTranslatorExprToDXL::BuildDxlnSubPlan(gpos::owner<CDXLNode *> pdxlnRelChild,
-									   const CColRef *colref,
-									   CDXLColRefArray *dxl_colref_array)
+CTranslatorExprToDXL::BuildDxlnSubPlan(
+	gpos::owner<CDXLNode *> pdxlnRelChild, const CColRef *colref,
+	gpos::owner<CDXLColRefArray *> dxl_colref_array)
 {
 	GPOS_ASSERT(nullptr != colref);
 	gpos::owner<IMDId *> mdid = colref->RetrieveType()->MDId();
@@ -4073,7 +4075,7 @@ CTranslatorExprToDXL::BuildDxlnSubPlan(gpos::owner<CDXLNode *> pdxlnRelChild,
 	// construct a subplan node, with the inner child under it
 	gpos::owner<CDXLNode *> pdxlnSubPlan = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSubPlan(
-						   m_mp, std::move(mdid), dxl_colref_array,
+						   m_mp, std::move(mdid), std::move(dxl_colref_array),
 						   EdxlSubPlanTypeScalar, nullptr));
 	pdxlnSubPlan->AddChild(std::move(pdxlnRelChild));
 

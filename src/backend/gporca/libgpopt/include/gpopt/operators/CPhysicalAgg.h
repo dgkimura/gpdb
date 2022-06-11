@@ -52,12 +52,12 @@ private:
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
 		gpos::pointer<CColRefArray *> pdrgpcrGrp,
-		CColRefArray *pdrgpcrGrpMinimal, ULONG ulOptReq) const;
+		gpos::pointer<CColRefArray *> pdrgpcrGrpMinimal, ULONG ulOptReq) const;
 
 	// compute a maximal hashed distribution using the given columns,
 	// if no such distribution can be created, return a Singleton distribution
 	static gpos::owner<CDistributionSpec *> PdsMaximalHashed(
-		CMemoryPool *mp, CColRefArray *colref_array);
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array);
 
 protected:
 	// array of minimal grouping columns based on FDs
@@ -97,7 +97,7 @@ protected:
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
 		ULONG ulOptReq, gpos::pointer<CColRefArray *> pdrgpcgGrp,
-		CColRefArray *pdrgpcrGrpMinimal) const;
+		gpos::pointer<CColRefArray *> pdrgpcrGrpMinimal) const;
 
 public:
 	CPhysicalAgg(const CPhysicalAgg &) = delete;
@@ -188,12 +188,11 @@ public:
 		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
-	gpos::owner<CCTEReq *> PcteRequired(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										gpos::pointer<CCTEReq *> pcter,
-										ULONG child_index,
-										CDrvdPropArray *pdrgpdpCtxt,
-										ULONG ulOptReq) const override;
+	gpos::owner<CCTEReq *> PcteRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CCTEReq *> pcter, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
 	gpos::owner<CDistributionSpec *>

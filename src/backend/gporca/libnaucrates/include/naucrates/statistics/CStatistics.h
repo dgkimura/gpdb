@@ -230,28 +230,28 @@ public:
 	}
 
 	// inner join with another stats structure
-	IStatistics *CalcInnerJoinStats(
+	gpos::owner<IStatistics *> CalcInnerJoinStats(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
-		CStatsPredJoinArray *join_preds_stats) const override;
+		gpos::pointer<CStatsPredJoinArray *> join_preds_stats) const override;
 
 	// LOJ with another stats structure
-	IStatistics *CalcLOJoinStats(
+	gpos::owner<IStatistics *> CalcLOJoinStats(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const override;
 
 	// left anti semi join with another stats structure
-	IStatistics *CalcLASJoinStats(
+	gpos::owner<IStatistics *> CalcLASJoinStats(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
-		CStatsPredJoinArray *join_preds_stats,
+		gpos::pointer<CStatsPredJoinArray *> join_preds_stats,
 		BOOL
 			DoIgnoreLASJHistComputation	 // except for the case of LOJ cardinality estimation this flag is always
 		// "true" since LASJ stats computation is very aggressive
 	) const override;
 
 	// semi join stats computation
-	IStatistics *CalcLSJoinStats(
+	gpos::owner<IStatistics *> CalcLSJoinStats(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> inner_side_stats,
-		CStatsPredJoinArray *join_preds_stats) const override;
+		gpos::pointer<CStatsPredJoinArray *> join_preds_stats) const override;
 
 	// return required props associated with stats object
 	gpos::owner<CReqdPropRelational *> GetReqdRelationalProps(

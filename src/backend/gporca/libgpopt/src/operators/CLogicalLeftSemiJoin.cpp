@@ -124,7 +124,7 @@ CLogicalLeftSemiJoin::DeriveMaxCard(CMemoryPool *,	// mp
 //---------------------------------------------------------------------------
 IStatistics *
 CLogicalLeftSemiJoin::PstatsDerive(
-	CMemoryPool *mp, CStatsPredJoinArray *join_preds_stats,
+	CMemoryPool *mp, gpos::pointer<CStatsPredJoinArray *> join_preds_stats,
 	gpos::pointer<IStatistics *> outer_stats,
 	gpos::pointer<IStatistics *> inner_side_stats)
 {

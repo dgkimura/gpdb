@@ -77,7 +77,7 @@ public:
 		gpos::pointer<IStatisticsArray *> stats_ctxt);
 
 	// derive statistics when scalar expression has outer references
-	static IStatistics *DeriveStatsWithOuterRefs(
+	static gpos::owner<IStatistics *> DeriveStatsWithOuterRefs(
 		CMemoryPool *mp,
 		CExpressionHandle &
 			exprhdl,  // handle attached to the logical expression we want to derive stats for

@@ -102,7 +102,8 @@ CConstraintDisjunction::FConstraint(const CColRef *colref) const
 //---------------------------------------------------------------------------
 gpos::owner<CConstraint *>
 CConstraintDisjunction::PcnstrCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::owner<CConstraintArray *> pdrgpcnstr =
 		GPOS_NEW(mp) CConstraintArray(mp);

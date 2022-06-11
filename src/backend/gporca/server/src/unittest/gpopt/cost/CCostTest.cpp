@@ -313,8 +313,9 @@ CCostTest::EresUnittest_SetParams()
 	gpos::owner<CExpression *> pexprPred =
 		CUtils::PexprScalarCmp(mp, pcrOuter, pcrInner, IMDType::EcmptNEq);
 	gpos::owner<CExpression *> pexpr =
-		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprOuter, pexprInner,
-													pexprPred);
+		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, std::move(pexprOuter),
+													std::move(pexprInner),
+													std::move(pexprPred));
 
 	// optimize in-equality join based on default cost model params
 	gpos::owner<CExpression *> pexprPlan1 = nullptr;

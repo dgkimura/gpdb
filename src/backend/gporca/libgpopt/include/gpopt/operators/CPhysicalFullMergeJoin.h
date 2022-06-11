@@ -54,7 +54,7 @@ public:
 		return dynamic_cast<CPhysicalFullMergeJoin *>(pop);
 	}
 
-	CDistributionSpec *PdsRequired(
+	gpos::owner<CDistributionSpec *> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
 		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,

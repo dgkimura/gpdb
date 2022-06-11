@@ -339,7 +339,7 @@ CLogicalNAryJoin::GetTrueInnerJoinPreds(CMemoryPool *mp,
 gpos::owner<CExpression *>
 CLogicalNAryJoin::ReplaceInnerJoinPredicates(
 	CMemoryPool *mp, gpos::pointer<CExpression *> old_nary_join_scalar_expr,
-	CExpression *new_inner_join_preds)
+	gpos::owner<CExpression *> new_inner_join_preds)
 {
 	COperator *pop = old_nary_join_scalar_expr->Pop();
 

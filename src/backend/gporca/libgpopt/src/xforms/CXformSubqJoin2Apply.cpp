@@ -270,7 +270,7 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown(CMemoryPool *mp,
 			}
 
 			// unnest subqueries in newly created child
-			CExpression *pexprUnnested =
+			gpos::owner<CExpression *> pexprUnnested =
 				PexprSubqueryUnnest(mp, pexprNewChild, fEnforceCorrelatedApply);
 			if (nullptr != pexprUnnested)
 			{

@@ -509,7 +509,7 @@ CMDAccessor::GetImdObj(gpos::pointer<IMDId *> mdid)
 		CAutoP<CacheAccessorMD> a_pmdcacc;
 		a_pmdcacc = GPOS_NEW(m_mp) CacheAccessorMD(m_pcache);
 		a_pmdcacc->Lookup(&mdkey);
-		IMDCacheObject *pmdobjNew = a_pmdcacc->Val();
+		gpos::owner<IMDCacheObject *> pmdobjNew = a_pmdcacc->Val();
 		if (nullptr == pmdobjNew)
 		{
 			// object not found in MD cache: retrieve it from MD provider

@@ -112,17 +112,17 @@ public:
 	// parse a dxl datum of type generic
 	static gpos::owner<CDXLDatum *> GetDatumGeneric(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
+		Edxltoken target_elem, gpos::owner<IMDId *> mdid, BOOL is_const_null);
 
 	// parse a dxl datum of types that need double mapping
 	static gpos::owner<CDXLDatum *> GetDatumStatsDoubleMappable(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
+		Edxltoken target_elem, gpos::owner<IMDId *> mdid, BOOL is_const_null);
 
 	// parse a dxl datum of types that need lint mapping
 	static gpos::owner<CDXLDatum *> GetDatumStatsLintMappable(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
+		Edxltoken target_elem, gpos::owner<IMDId *> mdid, BOOL is_const_null);
 
 	// create a table scan operator
 	static gpos::owner<CDXLPhysical *> MakeDXLTblScan(

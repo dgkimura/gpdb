@@ -36,7 +36,7 @@ public:
 	CPhysicalDynamicTableScan(
 		CMemoryPool *mp, const CName *pnameAlias,
 		gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId,
-		ULONG scan_id, CColRefArray *pdrgpcrOutput,
+		ULONG scan_id, gpos::owner<CColRefArray *> pdrgpcrOutput,
 		gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
 		gpos::owner<IMdIdArray *> partition_mdids,
 		gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part);

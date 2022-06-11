@@ -49,7 +49,7 @@ public:
 	CPhysicalDynamicBitmapTableScan(
 		CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
 		ULONG ulOriginOpId, const CName *pnameAlias, ULONG scan_id,
-		CColRefArray *pdrgpcrOutput,
+		gpos::owner<CColRefArray *> pdrgpcrOutput,
 		gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
 		gpos::owner<IMdIdArray *> partition_mdids,
 		gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part);
@@ -72,7 +72,7 @@ public:
 	BOOL Matches(gpos::pointer<COperator *>) const override;
 
 	// statistics derivation during costing
-	IStatistics *PstatsDerive(
+	gpos::owner<IStatistics *> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CReqdPropPlan *> prpplan,
 		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;

@@ -40,8 +40,8 @@ CPhysicalStreamAgg::CPhysicalStreamAgg(
 	gpos::owner<CColRefArray *> pdrgpcrArgDQA, BOOL fMultiStage,
 	BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
 	BOOL should_enforce_distribution)
-	: CPhysicalAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype,
-				   fGeneratesDuplicates, pdrgpcrArgDQA, fMultiStage,
+	: CPhysicalAgg(mp, std::move(colref_array), pdrgpcrMinimal, egbaggtype,
+				   fGeneratesDuplicates, std::move(pdrgpcrArgDQA), fMultiStage,
 				   isAggFromSplitDQA, aggStage, should_enforce_distribution),
 	  m_pos(nullptr)
 {

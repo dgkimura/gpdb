@@ -865,7 +865,7 @@ CXformUtils::SubqueryAnyToAgg(
 	CExpression *pexprInner = (*pexprSubquery)[0];
 
 	// build subquery quantified comparison
-	CExpression *pexprResult = nullptr;
+	gpos::owner<CExpression *> pexprResult = nullptr;
 	CSubqueryHandler sh(mp, false /* fEnforceCorrelatedApply */);
 	gpos::owner<CExpression *> pexprSubqPred =
 		sh.PexprSubqueryPred(pexprInner, pexprSubquery, &pexprResult,
@@ -1739,7 +1739,7 @@ gpos::owner<CExpression *>
 CXformUtils::PexprAssertConstraints(CMemoryPool *mp,
 									gpos::owner<CExpression *> pexprChild,
 									gpos::pointer<CTableDescriptor *> ptabdesc,
-									CColRefArray *colref_array)
+									gpos::pointer<CColRefArray *> colref_array)
 {
 	gpos::owner<CExpression *> pexprAssertNotNull =
 		PexprAssertNotNull(mp, std::move(pexprChild), ptabdesc, colref_array);
@@ -1759,7 +1759,8 @@ CXformUtils::PexprAssertConstraints(CMemoryPool *mp,
 gpos::owner<CExpression *>
 CXformUtils::PexprAssertCheckConstraints(
 	CMemoryPool *mp, gpos::owner<CExpression *> pexprChild,
-	gpos::pointer<CTableDescriptor *> ptabdesc, CColRefArray *colref_array)
+	gpos::pointer<CTableDescriptor *> ptabdesc,
+	gpos::pointer<CColRefArray *> colref_array)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	gpos::pointer<const IMDRelation *> pmdrel =
@@ -1779,7 +1780,7 @@ CXformUtils::PexprAssertCheckConstraints(
 				md_accessor->RetrieveCheckConstraints(pmdidCheckConstraint);
 
 			// extract the check constraint expression
-			CExpression *pexprCheckConstraint =
+			gpos::owner<CExpression *> pexprCheckConstraint =
 				pmdCheckConstraint->GetCheckConstraintExpr(mp, md_accessor,
 														   colref_array);
 
@@ -3361,8 +3362,8 @@ CXformUtils::CreateBitmapIndexProbeOps(
 	for (ULONG ul = 0; ul < ulPredicates; ul++)
 	{
 		CExpression *pexprPred = (*pdrgpexprPreds)[ul];
-		CExpression *pexprBitmap = nullptr;
-		CExpression *pexprRecheck = nullptr;
+		gpos::owner<CExpression *> pexprBitmap = nullptr;
+		gpos::owner<CExpression *> pexprRecheck = nullptr;
 
 		CreateBitmapIndexProbesWithOrWithoutPredBreakdown(
 			mp, md_accessor, pexprOriginalPred, pexprPred, ptabdesc, pmdrel,
@@ -3400,7 +3401,7 @@ CXformUtils::CreateBitmapIndexProbesWithOrWithoutPredBreakdown(
 	gpos::pointer<const IMDRelation *> pmdrel, CColRefArray *pdrgpcrOutput,
 	CColRefSet *pcrsOuterRefs, CColRefSet *pcrsReqd,
 	gpos::owner<CExpression *> *pexprBitmapResult,
-	CExpression **pexprRecheckResult,
+	gpos::owner<CExpression *> *pexprRecheckResult,
 	gpos::pointer<CExpressionArray *> pdrgpexprResidualResult,
 	BOOL isAPartialPredicate)
 {

@@ -201,7 +201,7 @@ CJoinStatsProcessor::CalcAllJoinStats(
 				is_a_left_join,	 // left joins use an anti-semijoin internally
 				&unsupported_pred_stats);
 
-		IStatistics *new_stats = nullptr;
+		gpos::owner<IStatistics *> new_stats = nullptr;
 
 		if (is_a_left_join)
 		{
@@ -588,7 +588,7 @@ CJoinStatsProcessor::DeriveJoinStats(
 	if (exprhdl.HasOuterRefs() && 0 < stats_ctxt->Size())
 	{
 		// derive stats based on outer references
-		IStatistics *stats = DeriveStatsWithOuterRefs(
+		gpos::owner<IStatistics *> stats = DeriveStatsWithOuterRefs(
 			mp, exprhdl, expr_with_outer_refs, join_stats, stats_ctxt);
 		join_stats->Release();
 		join_stats = stats;
@@ -655,7 +655,7 @@ CJoinStatsProcessor::DeriveJoinStats(
 //
 // when deriving statistics on 'Select(T.t=R.r)', we join T with the cross
 // product (R x S) based on the condition (T.t=R.r)
-IStatistics *
+gpos::owner<IStatistics *>
 CJoinStatsProcessor::DeriveStatsWithOuterRefs(
 	CMemoryPool *mp,
 	CExpressionHandle &
@@ -692,7 +692,7 @@ CJoinStatsProcessor::DeriveStatsWithOuterRefs(
 	statistics_array->Release();
 
 	// scale result using cardinality of outer stats and set number of rebinds of returned stats
-	IStatistics *result_stats =
+	gpos::owner<IStatistics *> result_stats =
 		result_join_stats->ScaleStats(mp, CDouble(1.0 / num_rows_outer));
 	result_stats->SetRebinds(num_rows_outer);
 	result_join_stats->Release();

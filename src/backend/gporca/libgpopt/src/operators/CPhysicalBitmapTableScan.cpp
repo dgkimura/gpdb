@@ -38,7 +38,8 @@ CPhysicalBitmapTableScan::CPhysicalBitmapTableScan(
 	CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
 	ULONG ulOriginOpId, const CName *pnameTableAlias,
 	gpos::owner<CColRefArray *> pdrgpcrOutput)
-	: CPhysicalScan(mp, pnameTableAlias, ptabdesc, pdrgpcrOutput),
+	: CPhysicalScan(mp, pnameTableAlias, std::move(ptabdesc),
+					std::move(pdrgpcrOutput)),
 	  m_ulOriginOpId(ulOriginOpId)
 {
 	GPOS_ASSERT(nullptr != mp);

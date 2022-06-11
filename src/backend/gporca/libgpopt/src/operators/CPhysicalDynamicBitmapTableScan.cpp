@@ -42,13 +42,14 @@ using namespace gpos;
 CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan(
 	CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
 	ULONG ulOriginOpId, const CName *pnameAlias, ULONG scan_id,
-	CColRefArray *pdrgpcrOutput, gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
+	gpos::owner<CColRefArray *> pdrgpcrOutput,
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
 	gpos::owner<IMdIdArray *> partition_mdids,
 	gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part)
-	: CPhysicalDynamicScan(mp, std::move(ptabdesc), ulOriginOpId, pnameAlias,
-						   scan_id, pdrgpcrOutput, std::move(pdrgpdrgpcrParts),
-						   std::move(partition_mdids),
-						   std::move(root_col_mapping_per_part))
+	: CPhysicalDynamicScan(
+		  mp, std::move(ptabdesc), ulOriginOpId, pnameAlias, scan_id,
+		  std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrParts),
+		  std::move(partition_mdids), std::move(root_col_mapping_per_part))
 {
 }
 
@@ -74,7 +75,7 @@ CPhysicalDynamicBitmapTableScan::Matches(gpos::pointer<COperator *> pop) const
 //		Statistics derivation during costing
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CPhysicalDynamicBitmapTableScan::PstatsDerive(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::pointer<CReqdPropPlan *> prpplan,

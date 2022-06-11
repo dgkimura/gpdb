@@ -515,7 +515,7 @@ COrderedAggPreprocessor::PexprFinalAgg(
 						  CExpression(mp, GPOS_NEW(mp) CScalarValuesList(mp),
 									  GPOS_NEW(mp) CExpressionArray(mp)));
 
-	IMDId *ret_type = nullptr;
+	gpos::owner<IMDId *> ret_type = nullptr;
 	if (popScAggFunc->FHasAmbiguousReturnType())
 	{
 		popScAggFunc->MdidType()->AddRef();
@@ -523,8 +523,8 @@ COrderedAggPreprocessor::PexprFinalAgg(
 	}
 	gpos::owner<CScalarAggFunc *> popNewAggFunc = CUtils::PopAggFunc(
 		mp, std::move(mdid), arg_col_ref->Name().Pstr(), false /*is_distinct*/,
-		EaggfuncstageGlobal /*eaggfuncstage*/, false /*fSplit*/, ret_type,
-		EaggfunckindNormal, std::move(argtypes));
+		EaggfuncstageGlobal /*eaggfuncstage*/, false /*fSplit*/,
+		std::move(ret_type), EaggfunckindNormal, std::move(argtypes));
 
 	return GPOS_NEW(mp)
 		CExpression(mp, std::move(popNewAggFunc), std::move(pdrgpexpr));

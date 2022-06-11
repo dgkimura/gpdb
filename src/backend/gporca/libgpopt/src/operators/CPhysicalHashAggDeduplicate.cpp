@@ -32,11 +32,11 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalHashAggDeduplicate::CPhysicalHashAggDeduplicate(
 	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-	CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
-	gpos::owner<CColRefArray *> pdrgpcrKeys, BOOL fGeneratesDuplicates,
-	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
-	BOOL should_enforce_distribution)
-	: CPhysicalHashAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype,
+	gpos::pointer<CColRefArray *> pdrgpcrMinimal,
+	COperator::EGbAggType egbaggtype, gpos::owner<CColRefArray *> pdrgpcrKeys,
+	BOOL fGeneratesDuplicates, BOOL fMultiStage, BOOL isAggFromSplitDQA,
+	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
+	: CPhysicalHashAgg(mp, std::move(colref_array), pdrgpcrMinimal, egbaggtype,
 					   fGeneratesDuplicates, nullptr /*pdrgpcrGbMinusDistinct*/,
 					   fMultiStage, isAggFromSplitDQA, aggStage,
 					   should_enforce_distribution),

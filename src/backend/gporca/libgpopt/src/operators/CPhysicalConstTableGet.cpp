@@ -93,7 +93,7 @@ CPhysicalConstTableGet::Matches(gpos::pointer<COperator *> pop) const
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CPhysicalConstTableGet::PcrsRequired(
 	CMemoryPool *,					  // mp,
 	CExpressionHandle &,			  // exprhdl,
@@ -183,13 +183,14 @@ CPhysicalConstTableGet::PrsRequired(
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
-CPhysicalConstTableGet::PcteRequired(CMemoryPool *,				//mp,
-									 CExpressionHandle &,		//exprhdl,
-									 gpos::pointer<CCTEReq *>,	//pcter,
-									 ULONG,						//child_index,
-									 CDrvdPropArray *,			//pdrgpdpCtxt,
-									 ULONG						//ulOptReq
+gpos::owner<CCTEReq *>
+CPhysicalConstTableGet::PcteRequired(
+	CMemoryPool *,					  //mp,
+	CExpressionHandle &,			  //exprhdl,
+	gpos::pointer<CCTEReq *>,		  //pcter,
+	ULONG,							  //child_index,
+	gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
+	ULONG							  //ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalConstTableGet has no children");

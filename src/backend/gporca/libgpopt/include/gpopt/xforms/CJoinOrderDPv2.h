@@ -483,7 +483,7 @@ private:
 
 	void GreedySearchJoinOrders(ULONG left_level, JoinOrderPropType algo);
 
-	void DeriveStats(CExpression *pexpr) override;
+	void DeriveStats(gpos::pointer<CExpression *> pexpr) override;
 
 	// create a CLogicalJoin and a CExpression to join two groups, for a required property
 	gpos::owner<SExpressionInfo *> GetJoinExprForProperties(

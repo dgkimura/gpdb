@@ -16,7 +16,7 @@
 using namespace gpmd;
 
 // return statistics object after performing inner join
-CStatistics *
+gpos::owner<CStatistics *>
 CInnerJoinStatsProcessor::CalcInnerJoinStatsStatic(
 	CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats_input,
 	gpos::pointer<const IStatistics *> inner_stats_input,

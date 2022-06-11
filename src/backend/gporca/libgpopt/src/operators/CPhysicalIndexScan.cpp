@@ -34,7 +34,8 @@ CPhysicalIndexScan::CPhysicalIndexScan(
 	gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId,
 	const CName *pnameAlias, gpos::owner<CColRefArray *> pdrgpcrOutput,
 	gpos::owner<COrderSpec *> pos)
-	: CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput),
+	: CPhysicalScan(mp, pnameAlias, std::move(ptabdesc),
+					std::move(pdrgpcrOutput)),
 	  m_pindexdesc(std::move(pindexdesc)),
 	  m_ulOriginOpId(ulOriginOpId),
 	  m_pos(std::move(pos))

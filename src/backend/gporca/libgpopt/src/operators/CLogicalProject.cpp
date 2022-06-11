@@ -380,7 +380,8 @@ CLogicalProject::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		}
 	}
 
-	IStatistics *stats = PstatsDeriveProject(mp, exprhdl, phmuldatum);
+	gpos::owner<IStatistics *> stats =
+		PstatsDeriveProject(mp, exprhdl, phmuldatum);
 
 	// clean up
 	phmuldatum->Release();

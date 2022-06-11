@@ -307,7 +307,7 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 	gpos::owner<CExpression *> pexprScalarConstInt4 =
 		CUtils::PexprScalarConstInt4(mp, 10 /*fValue*/);
 	gpos::owner<CExpression *> pexprScIdentConstEquality =
-		CUtils::PexprScalarEqCmp(mp, pexprScalarConstInt4, pcrRight);
+		CUtils::PexprScalarEqCmp(mp, std::move(pexprScalarConstInt4), pcrRight);
 
 	pdrgpexprOriginal->Append(std::move(pexprScIdentConstEquality));
 
@@ -361,7 +361,7 @@ CPredicateUtilsTest::EresUnittest_Implication()
 		CTestUtils::PtabdescCreate(mp, 3, std::move(pmdid1), CName(&strName1));
 	CWStringConst strAlias1(GPOS_WSZ_LIT("Rel1"));
 	gpos::owner<CExpression *> pexprRel1 =
-		CTestUtils::PexprLogicalGet(mp, ptabdesc1, &strAlias1);
+		CTestUtils::PexprLogicalGet(mp, std::move(ptabdesc1), &strAlias1);
 
 	CWStringConst strName2(GPOS_WSZ_LIT("Rel2"));
 	gpos::owner<CMDIdGPDB *> pmdid2 =
@@ -370,7 +370,7 @@ CPredicateUtilsTest::EresUnittest_Implication()
 		CTestUtils::PtabdescCreate(mp, 3, std::move(pmdid2), CName(&strName2));
 	CWStringConst strAlias2(GPOS_WSZ_LIT("Rel2"));
 	gpos::owner<CExpression *> pexprRel2 =
-		CTestUtils::PexprLogicalGet(mp, ptabdesc2, &strAlias2);
+		CTestUtils::PexprLogicalGet(mp, std::move(ptabdesc2), &strAlias2);
 
 	CWStringConst strName3(GPOS_WSZ_LIT("Rel3"));
 	gpos::owner<CMDIdGPDB *> pmdid3 =
@@ -379,14 +379,14 @@ CPredicateUtilsTest::EresUnittest_Implication()
 		CTestUtils::PtabdescCreate(mp, 3, std::move(pmdid3), CName(&strName3));
 	CWStringConst strAlias3(GPOS_WSZ_LIT("Rel3"));
 	gpos::owner<CExpression *> pexprRel3 =
-		CTestUtils::PexprLogicalGet(mp, ptabdesc3, &strAlias3);
+		CTestUtils::PexprLogicalGet(mp, std::move(ptabdesc3), &strAlias3);
 
 	gpos::owner<CExpression *> pexprJoin1 =
-		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprRel1,
-														pexprRel2);
+		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(
+			mp, std::move(pexprRel1), std::move(pexprRel2));
 	gpos::owner<CExpression *> pexprJoin2 =
 		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(
-			mp, std::move(pexprJoin1), pexprRel3);
+			mp, std::move(pexprJoin1), std::move(pexprRel3));
 
 	{
 		CAutoTrace at(mp);

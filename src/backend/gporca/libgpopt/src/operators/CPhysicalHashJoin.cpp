@@ -693,7 +693,7 @@ CPhysicalHashJoin::PdsRequiredRedistribute(
 //
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalHashJoin::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
 	gpos::pointer<CDistributionSpec *> pdsInput GPOS_UNUSED,

@@ -155,9 +155,8 @@ public:
 		ScanDirection sd);
 
 	// create a DXL index descriptor from an index MD id
-	static gpos::owner<CDXLIndexDescr *> GetIndexDescr(CMemoryPool *mp,
-													   CMDAccessor *md_accessor,
-													   IMDId *mdid);
+	static gpos::owner<CDXLIndexDescr *> GetIndexDescr(
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::owner<IMDId *> mdid);
 
 	// translate a RangeTableEntry into a CDXLTableDescr
 	static gpos::owner<CDXLTableDescr *> GetTableDescr(

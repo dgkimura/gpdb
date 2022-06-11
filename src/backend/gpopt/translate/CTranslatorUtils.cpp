@@ -94,13 +94,13 @@ extern bool optimizer_multilevel_partitioning;
 //---------------------------------------------------------------------------
 gpos::owner<CDXLIndexDescr *>
 CTranslatorUtils::GetIndexDescr(CMemoryPool *mp, CMDAccessor *md_accessor,
-								IMDId *mdid)
+								gpos::owner<IMDId *> mdid)
 {
 	gpos::pointer<const IMDIndex *> index = md_accessor->RetrieveIndex(mdid);
 	const CWStringConst *index_name = index->Mdname().GetMDName();
 	CMDName *index_mdname = GPOS_NEW(mp) CMDName(mp, index_name);
 
-	return GPOS_NEW(mp) CDXLIndexDescr(mdid, index_mdname);
+	return GPOS_NEW(mp) CDXLIndexDescr(std::move(mdid), index_mdname);
 }
 
 //---------------------------------------------------------------------------
@@ -292,9 +292,9 @@ CTranslatorUtils::ConvertToCDXLLogicalTVF(CMemoryPool *mp,
 		mdid_return_type->AddRef();
 
 		// if TVF evaluates to const, pass invalid key as funcid
-		gpos::owner<CDXLLogicalTVF *> tvf_dxl = GPOS_NEW(mp)
-			CDXLLogicalTVF(mp, GPOS_NEW(mp) CMDIdGPDB(0), mdid_return_type,
-						   func_name, std::move(column_descrs));
+		gpos::owner<CDXLLogicalTVF *> tvf_dxl = GPOS_NEW(mp) CDXLLogicalTVF(
+			mp, GPOS_NEW(mp) CMDIdGPDB(0), std::move(mdid_return_type),
+			func_name, std::move(column_descrs));
 
 		return tvf_dxl;
 	}
@@ -367,9 +367,9 @@ CTranslatorUtils::ConvertToCDXLLogicalTVF(CMemoryPool *mp,
 
 	CMDName *pmdfuncname = GPOS_NEW(mp) CMDName(mp, func->Mdname().GetMDName());
 
-	gpos::owner<CDXLLogicalTVF *> tvf_dxl =
-		GPOS_NEW(mp) CDXLLogicalTVF(mp, std::move(mdid_func), mdid_return_type,
-									pmdfuncname, std::move(column_descrs));
+	gpos::owner<CDXLLogicalTVF *> tvf_dxl = GPOS_NEW(mp)
+		CDXLLogicalTVF(mp, std::move(mdid_func), std::move(mdid_return_type),
+					   pmdfuncname, std::move(column_descrs));
 
 	return tvf_dxl;
 }
@@ -653,7 +653,7 @@ CTranslatorUtils::ExpandCompositeType(CMemoryPool *mp, CMDAccessor *md_accessor,
 	GPOS_ASSERT(nullptr != type);
 	GPOS_ASSERT(type->IsComposite());
 
-	IMDId *rel_mdid = type->GetBaseRelMdid();
+	gpos::pointer<IMDId *> rel_mdid = type->GetBaseRelMdid();
 	gpos::pointer<const IMDRelation *> rel = md_accessor->RetrieveRel(rel_mdid);
 	GPOS_ASSERT(nullptr != rel);
 

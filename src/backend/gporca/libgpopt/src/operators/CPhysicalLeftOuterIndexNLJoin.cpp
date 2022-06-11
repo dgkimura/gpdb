@@ -80,7 +80,7 @@ CPhysicalLeftOuterIndexNLJoin::EpetDistribution(
 	return CEnfdProp::EpetRequired;
 }
 
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalLeftOuterIndexNLJoin::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
 	gpos::pointer<CDistributionSpec *>,	 //pdsRequired,

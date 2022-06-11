@@ -144,7 +144,7 @@ CStatisticsTest::EresUnittest_UnionAll()
 		gpos::owner<ULongPtrArray *> pdrgpulColIdInput1 = Pdrgpul(mp, 1);
 		gpos::owner<ULongPtrArray *> pdrgpulColIdInput2 = Pdrgpul(mp, 2);
 
-		CStatistics *pstatsOutput =
+		gpos::owner<CStatistics *> pstatsOutput =
 			CUnionAllStatsProcessor::CreateStatsForUnionAll(
 				mp, pstats1, pstats2, pdrgpulColIdOutput, pdrgpulColIdInput1,
 				pdrgpulColIdInput2);

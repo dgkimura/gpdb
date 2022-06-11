@@ -17,6 +17,8 @@
 
 #include "naucrates/dxl/operators/CDXLDatumStatsDoubleMappable.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -32,9 +34,10 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLDatumStatsDoubleMappable::CDXLDatumStatsDoubleMappable(
-	CMemoryPool *mp, IMDId *mdid_type, INT type_modifier, BOOL is_null,
-	BYTE *data, ULONG length, CDouble val)
-	: CDXLDatumGeneric(mp, mdid_type, type_modifier, is_null, data, length),
+	CMemoryPool *mp, gpos::owner<IMDId *> mdid_type, INT type_modifier,
+	BOOL is_null, BYTE *data, ULONG length, CDouble val)
+	: CDXLDatumGeneric(mp, std::move(mdid_type), type_modifier, is_null, data,
+					   length),
 	  m_val(val)
 {
 }

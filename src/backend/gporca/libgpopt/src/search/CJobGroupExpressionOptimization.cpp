@@ -462,7 +462,7 @@ CJobGroupExpressionOptimization::ScheduleChildGroupsJobs(CSchedulerContext *psc)
 {
 	GPOS_ASSERT(!FChildrenScheduled());
 
-	CGroup *pgroupChild = (*m_pgexpr)[m_ulChildIndex];
+	gpos::pointer<CGroup *> pgroupChild = (*m_pgexpr)[m_ulChildIndex];
 	if (pgroupChild->FScalar())
 	{
 		if (!m_pexprhdlPlan->FNextChildIndex(&m_ulChildIndex))
@@ -633,7 +633,7 @@ CJobGroupExpressionOptimization::EevtOptimizeSelf(CSchedulerContext *psc,
 	COptimizationContextArray *pdrgpoc = pjgeo->m_pdrgpoc;
 	ULONG ulOptReq = pjgeo->m_ulOptReq;
 
-	CCostContext *pcc =
+	gpos::pointer<CCostContext *> pcc =
 		pgexpr->PccComputeCost(psc->GetGlobalMemoryPool(), poc, ulOptReq,
 							   pdrgpoc, false /*fPruned*/, CCost(0.0));
 

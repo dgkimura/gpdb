@@ -1628,7 +1628,7 @@ CPredicateUtils::IsDisjunctionOfRangeComparison(
 // constant filters.
 gpos::owner<CExpression *>
 CPredicateUtils::PexprExtractPredicatesOnPartKeys(
-	CMemoryPool *mp, CExpression *pexprScalar,
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexprScalar,
 	gpos::pointer<CColRef2dArray *> pdrgpdrgpcrPartKeys,
 	gpos::pointer<CColRefSet *> pcrsAllowedRefs, BOOL fUseConstraints,
 	gpos::pointer<const IMDRelation *> pmdrel)

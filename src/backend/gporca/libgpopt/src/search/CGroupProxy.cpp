@@ -114,9 +114,9 @@ CGroupProxy::InitProperties(CDrvdProp *pdp)
 //
 //---------------------------------------------------------------------------
 void
-CGroupProxy::InitStats(IStatistics *stats)
+CGroupProxy::InitStats(gpos::owner<IStatistics *> stats)
 {
-	m_pgroup->InitStats(stats);
+	m_pgroup->InitStats(std::move(stats));
 }
 
 

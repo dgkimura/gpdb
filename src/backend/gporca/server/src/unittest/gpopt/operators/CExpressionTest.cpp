@@ -86,7 +86,7 @@ CExpressionTest::PrppCreateRequiredProperties(CMemoryPool *mp,
 //		Caller takes ownership of returned pointer.
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CExpressionTest::PexprCreateGbyWithColumnFormat(CMemoryPool *mp,
 												const WCHAR *wszColNameFormat)
 {
@@ -435,7 +435,7 @@ CExpressionTest::EresUnittest_BitmapGet()
 								   gpos::ulong_max,	 // pgexprOrigin
 								   GPOS_NEW(mp) CName(mp, CName(&strRelAlias)),
 								   std::move(pdrgpcrTable)),
-		pexprTableCond, pexprBitmapIndex);
+		std::move(pexprTableCond), pexprBitmapIndex);
 
 	// debug print
 	CWStringDynamic str(mp);
@@ -464,11 +464,11 @@ CExpressionTest::EresUnittest_BitmapGet()
 		CIndexDescriptor::Pindexdesc(mp, ptabdesc, pmdindex);
 	gpos::owner<CExpression *> pexprIndexCond2 = CUtils::PexprScalarEqCmp(
 		mp, pcrFirst, CUtils::PexprScalarConstInt4(mp, 20 /*val*/));
-	gpos::owner<CExpression *> pexprBitmapIndex2 = GPOS_NEW(mp) CExpression(
-		mp,
-		GPOS_NEW(mp)
-			CScalarBitmapIndexProbe(mp, pindexdesc2, std::move(pmdid2)),
-		pexprIndexCond2);
+	gpos::owner<CExpression *> pexprBitmapIndex2 = GPOS_NEW(mp)
+		CExpression(mp,
+					GPOS_NEW(mp) CScalarBitmapIndexProbe(
+						mp, std::move(pindexdesc2), std::move(pmdid2)),
+					std::move(pexprIndexCond2));
 	CWStringDynamic strIndex2(mp);
 	COstreamString ossIndex2(&strIndex2);
 	pexprBitmapIndex2->OsPrint(ossIndex2);
@@ -655,7 +655,7 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 //---------------------------------------------------------------------------
 void
 CExpressionTest::SetupPlanForFValidPlanTest(
-	CMemoryPool *mp, CExpression **ppexprGby, CColRefSet **ppcrs,
+	CMemoryPool *mp, gpos::owner<CExpression *> *ppexprGby, CColRefSet **ppcrs,
 	gpos::owner<CExpression *> *ppexprPlan, gpos::owner<CReqdPropPlan *> *pprpp)
 {
 	*ppexprGby =

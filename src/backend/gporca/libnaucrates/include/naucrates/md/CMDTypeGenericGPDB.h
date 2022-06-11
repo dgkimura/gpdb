@@ -304,13 +304,15 @@ public:
 
 	// create a dxl datum of types having double mapping
 	static gpos::owner<CDXLDatum *> CreateDXLDatumStatsDoubleMappable(
-		CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
-		BYTE *byte_array, ULONG length, LINT lint_Value, CDouble double_Value);
+		CMemoryPool *mp, gpos::owner<IMDId *> mdid, INT type_modifier,
+		BOOL is_null, BYTE *byte_array, ULONG length, LINT lint_Value,
+		CDouble double_Value);
 
 	// create a dxl datum of types having lint mapping
 	static gpos::owner<CDXLDatum *> CreateDXLDatumStatsIntMappable(
-		CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
-		BYTE *byte_array, ULONG length, LINT lint_Value, CDouble double_Value);
+		CMemoryPool *mp, gpos::owner<IMDId *> mdid, INT type_modifier,
+		BOOL is_null, BYTE *byte_array, ULONG length, LINT lint_Value,
+		CDouble double_Value);
 
 	// create a NULL constant for this type
 	gpos::owner<IDatum *> CreateGenericNullDatum(

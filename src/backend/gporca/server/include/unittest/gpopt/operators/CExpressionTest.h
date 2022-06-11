@@ -40,7 +40,7 @@ private:
 	static gpos::owner<CReqdPropPlan *> PrppCreateRequiredProperties(
 		CMemoryPool *mp, gpos::owner<CColRefSet *> pcrs);
 
-	static CExpression *PexprCreateGbyWithColumnFormat(
+	static gpos::owner<CExpression *> PexprCreateGbyWithColumnFormat(
 		CMemoryPool *mp, const WCHAR *wszColNameFormat);
 
 	// helper for testing required column computation
@@ -53,8 +53,8 @@ private:
 
 	// helper function for the FValidPlan tests
 	static void SetupPlanForFValidPlanTest(
-		CMemoryPool *mp, CExpression **ppexprGby, CColRefSet **ppcrs,
-		gpos::owner<CExpression *> *ppexprPlan,
+		CMemoryPool *mp, gpos::owner<CExpression *> *ppexprGby,
+		CColRefSet **ppcrs, gpos::owner<CExpression *> *ppexprPlan,
 		gpos::owner<CReqdPropPlan *> *pprpp);
 
 	// return an expression with several joins

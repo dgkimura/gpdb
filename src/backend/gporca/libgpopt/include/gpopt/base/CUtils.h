@@ -437,7 +437,7 @@ public:
 	template <class T>
 	static gpos::owner<CExpression *> PexprLogicalApply(
 		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
-		CExpression *pexprRight, const CColRef *pcrInner,
+		gpos::owner<CExpression *> pexprRight, const CColRef *pcrInner,
 		COperator::EOperatorId eopidOriginSubq,
 		CExpression *pexprPred = nullptr);
 
@@ -454,7 +454,8 @@ public:
 	template <class T>
 	static gpos::owner<CExpression *> PexprLogicalCorrelatedQuantifiedApply(
 		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
-		gpos::owner<CExpression *> pexprRight, CColRefArray *pdrgpcrInner,
+		gpos::owner<CExpression *> pexprRight,
+		gpos::owner<CColRefArray *> pdrgpcrInner,
 		COperator::EOperatorId eopidOriginSubq,
 		CExpression *pexprPred = nullptr);
 

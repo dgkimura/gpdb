@@ -127,12 +127,11 @@ public:
 		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
-	gpos::owner<CCTEReq *> PcteRequired(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										gpos::pointer<CCTEReq *> pcter,
-										ULONG child_index,
-										CDrvdPropArray *pdrgpdpCtxt,
-										ULONG ulOptReq) const override;
+	gpos::owner<CCTEReq *> PcteRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CCTEReq *> pcter, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// compute required sort order of the n-th child
 	gpos::owner<COrderSpec *> PosRequired(

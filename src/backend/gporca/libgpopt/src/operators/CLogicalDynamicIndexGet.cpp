@@ -60,8 +60,9 @@ CLogicalDynamicIndexGet::CLogicalDynamicIndexGet(
 	gpos::owner<CColRefArray *> pdrgpcrOutput,
 	gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
 	gpos::owner<IMdIdArray *> partition_mdids)
-	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, part_idx_id,
-							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
+	: CLogicalDynamicGetBase(
+		  mp, pnameAlias, ptabdesc, part_idx_id, std::move(pdrgpcrOutput),
+		  std::move(pdrgpdrgpcrPart), std::move(partition_mdids)),
 	  m_pindexdesc(nullptr),
 	  m_ulOriginOpId(ulOriginOpId)
 {

@@ -69,10 +69,10 @@ CDefaultComparator::FEvalComparison(CMemoryPool *mp,
 
 	gpos::owner<IDatum *> pdatum1Copy = datum1->MakeCopy(mp);
 	gpos::owner<CExpression *> pexpr1 = GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, pdatum1Copy));
+		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, std::move(pdatum1Copy)));
 	gpos::owner<IDatum *> pdatum2Copy = datum2->MakeCopy(mp);
 	gpos::owner<CExpression *> pexpr2 = GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, pdatum2Copy));
+		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, std::move(pdatum2Copy)));
 	gpos::owner<CExpression *> pexprComp = CUtils::PexprScalarCmp(
 		mp, std::move(pexpr1), std::move(pexpr2), cmp_type);
 

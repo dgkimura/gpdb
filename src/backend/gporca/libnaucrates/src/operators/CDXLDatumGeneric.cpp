@@ -37,7 +37,7 @@ CDXLDatumGeneric::CDXLDatumGeneric(CMemoryPool *mp,
 								   gpos::owner<IMDId *> mdid_type,
 								   INT type_modifier, BOOL is_null,
 								   BYTE *byte_array, ULONG length)
-	: CDXLDatum(mp, mdid_type, type_modifier, is_null, length),
+	: CDXLDatum(mp, std::move(mdid_type), type_modifier, is_null, length),
 	  m_byte_array(byte_array)
 {
 	GPOS_ASSERT_IMP(m_is_null, (m_byte_array == nullptr) && (m_length == 0));

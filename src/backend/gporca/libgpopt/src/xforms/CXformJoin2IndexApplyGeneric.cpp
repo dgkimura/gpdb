@@ -128,12 +128,12 @@ CXformJoin2IndexApplyGeneric::Transform(
 	CExpression *selectThatIsParentOfGet = nullptr;
 
 	// the logical get node (dynamic or regular get) at the bottom of the inner tree
-	CExpression *pexprGet = nullptr;
+	gpos::pointer<CExpression *> pexprGet = nullptr;
 
 	// the highest node of the right child that gets inserted above the index get
 	// into the alternative, or NULL if there is no such node
 	// (this is a project, GbAgg or a select node above a project or GbAgg)
-	CExpression *nodesToInsertAboveIndexGet = nullptr;
+	gpos::pointer<CExpression *> nodesToInsertAboveIndexGet = nullptr;
 
 	// the cut-off point for "nodesAboveIndexGet", this node is below nodesAboveIndexGet
 	// but it doesn't get inserted into the alternative anymore

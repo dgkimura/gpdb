@@ -136,7 +136,7 @@ CXformLeftSemiApplyWithExternalCorrs2InnerJoin::FDecorrelate(
 
 	// extract children
 	gpos::pointer<CExpression *> pexprOuter = (*pexpr)[0];
-	CExpression *pexprInner = (*pexpr)[1];
+	gpos::pointer<CExpression *> pexprInner = (*pexpr)[1];
 	gpos::pointer<CExpression *> pexprScalar = (*pexpr)[2];
 
 	// collect all correlations from inner child

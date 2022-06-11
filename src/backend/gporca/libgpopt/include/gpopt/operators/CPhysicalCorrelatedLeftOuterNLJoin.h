@@ -97,7 +97,7 @@ public:
 	}
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *
+	gpos::owner<CDistributionSpec *>
 	PdsRequired(CMemoryPool *,						 // mp
 				CExpressionHandle &,				 // exprhdl,
 				gpos::pointer<CDistributionSpec *>,	 // pdsRequired,

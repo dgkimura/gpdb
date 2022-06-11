@@ -619,7 +619,8 @@ CLogical::PpcDeriveConstraintFromPredicates(CMemoryPool *mp,
 	{
 		if (exprhdl.FScalarChild(ul))
 		{
-			CExpression *pexprScalar = exprhdl.PexprScalarExactChild(ul);
+			gpos::pointer<CExpression *> pexprScalar =
+				exprhdl.PexprScalarExactChild(ul);
 
 			// make sure it is a predicate... boolop, cmp, nulltest,
 			// or a list of join predicates for an NAry join

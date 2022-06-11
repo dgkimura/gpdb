@@ -737,7 +737,7 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexScan(
 	index_scan = MakeNode(IndexScan);
 	index_scan->scan.scanrelid = index;
 
-	CMDIdGPDB *mdid_index = gpos::dyn_cast<CMDIdGPDB>(
+	gpos::pointer<CMDIdGPDB *> mdid_index = gpos::dyn_cast<CMDIdGPDB>(
 		physical_idx_scan_dxlop->GetDXLIndexDescr()->MDId());
 	gpos::pointer<const IMDIndex *> md_index =
 		m_md_accessor->RetrieveIndex(mdid_index);
@@ -883,7 +883,7 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexOnlyScan(
 	IndexOnlyScan *index_scan = MakeNode(IndexOnlyScan);
 	index_scan->scan.scanrelid = index;
 
-	CMDIdGPDB *mdid_index = gpos::dyn_cast<CMDIdGPDB>(
+	gpos::pointer<CMDIdGPDB *> mdid_index = gpos::dyn_cast<CMDIdGPDB>(
 		physical_idx_scan_dxlop->GetDXLIndexDescr()->MDId());
 	gpos::pointer<const IMDIndex *> md_index =
 		m_md_accessor->RetrieveIndex(mdid_index);
@@ -4040,7 +4040,8 @@ CTranslatorDXLToPlStmt::TranslateDXLDml(
 		}
 	}
 
-	IMDId *mdid_target_table = phy_dml_dxlop->GetDXLTableDescr()->MDId();
+	gpos::pointer<IMDId *> mdid_target_table =
+		phy_dml_dxlop->GetDXLTableDescr()->MDId();
 	gpos::pointer<const IMDRelation *> md_rel =
 		m_md_accessor->RetrieveRel(mdid_target_table);
 
@@ -5095,7 +5096,7 @@ CTranslatorDXLToPlStmt::IsTgtTblDistributed(gpos::pointer<CDXLOperator *> dxlop)
 
 	gpos::pointer<CDXLPhysicalDML *> phy_dml_dxlop =
 		gpos::dyn_cast<CDXLPhysicalDML>(dxlop);
-	IMDId *mdid = phy_dml_dxlop->GetDXLTableDescr()->MDId();
+	gpos::pointer<IMDId *> mdid = phy_dml_dxlop->GetDXLTableDescr()->MDId();
 
 	return IMDRelation::EreldistrMasterOnly !=
 		   m_md_accessor->RetrieveRel(mdid)->GetRelDistribution();
@@ -5696,7 +5697,7 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapIndexProbe(
 	bitmap_idx_scan = MakeNode(BitmapIndexScan);
 	bitmap_idx_scan->scan.scanrelid = bitmap_tbl_scan->scan.scanrelid;
 
-	CMDIdGPDB *mdid_index = gpos::dyn_cast<CMDIdGPDB>(
+	gpos::pointer<CMDIdGPDB *> mdid_index = gpos::dyn_cast<CMDIdGPDB>(
 		sc_bitmap_idx_probe_dxlop->GetDXLIndexDescr()->MDId());
 	gpos::pointer<const IMDIndex *> index =
 		m_md_accessor->RetrieveIndex(mdid_index);

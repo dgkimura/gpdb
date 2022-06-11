@@ -60,8 +60,10 @@ CLogicalDynamicGet::CLogicalDynamicGet(
 	gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
 	gpos::owner<IMdIdArray *> partition_mdids,
 	gpos::owner<CConstraint *> partition_cnstrs_disj, BOOL static_pruned)
-	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, ulPartIndex,
-							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
+	: CLogicalDynamicGetBase(mp, pnameAlias, std::move(ptabdesc), ulPartIndex,
+							 std::move(pdrgpcrOutput),
+							 std::move(pdrgpdrgpcrPart),
+							 std::move(partition_mdids)),
 	  m_partition_cnstrs_disj(std::move(partition_cnstrs_disj)),
 	  m_static_pruned(static_pruned)
 {
@@ -353,8 +355,9 @@ CLogicalDynamicGet::PstatsDeriveFilter(
 	);
 	pexprFilterNew->Release();
 
-	IStatistics *result_stats = CFilterStatsProcessor::MakeStatsFilter(
-		mp, pstatsFullTable, pred_stats, true /* do_cap_NDVs */);
+	gpos::owner<IStatistics *> result_stats =
+		CFilterStatsProcessor::MakeStatsFilter(mp, pstatsFullTable, pred_stats,
+											   true /* do_cap_NDVs */);
 	pred_stats->Release();
 	pstatsFullTable->Release();
 

@@ -44,7 +44,8 @@ using namespace gpopt;
 CPhysicalSerialUnionAll::CPhysicalSerialUnionAll(
 	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrOutput,
 	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput)
-	: CPhysicalUnionAll(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
+	: CPhysicalUnionAll(mp, std::move(pdrgpcrOutput),
+						std::move(pdrgpdrgpcrInput))
 {
 	// UnionAll creates two distribution requests to enforce distribution of its children:
 	// (1) (Hashed, Hashed): used to pass hashed distribution (requested from above)

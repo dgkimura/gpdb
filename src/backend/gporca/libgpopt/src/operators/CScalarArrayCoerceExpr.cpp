@@ -36,7 +36,8 @@ CScalarArrayCoerceExpr::CScalarArrayCoerceExpr(
 	CMemoryPool *mp, gpos::owner<IMDId *> element_func,
 	gpos::owner<IMDId *> result_type_mdid, INT type_modifier, BOOL is_explicit,
 	ECoercionForm ecf, INT location)
-	: CScalarCoerceBase(mp, result_type_mdid, type_modifier, ecf, location),
+	: CScalarCoerceBase(mp, std::move(result_type_mdid), type_modifier, ecf,
+						location),
 	  m_pmdidElementFunc(std::move(element_func)),
 	  m_is_explicit(is_explicit)
 {

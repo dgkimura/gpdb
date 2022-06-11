@@ -219,7 +219,7 @@ CLogicalSetOp::DerivePartitionInfo(CMemoryPool *mp,
 			exprhdl.DerivePartitionInfo(ul);
 		GPOS_ASSERT(nullptr != ppartinfoChild);
 
-		CColRefArray *pdrgpcrInput = (*m_pdrgpdrgpcrInput)[ul];
+		gpos::pointer<CColRefArray *> pdrgpcrInput = (*m_pdrgpdrgpcrInput)[ul];
 		GPOS_ASSERT(pdrgpcrInput->Size() == m_pdrgpcrOutput->Size());
 
 		gpos::owner<CPartInfo *> ppartinfoRemapped =

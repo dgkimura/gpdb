@@ -36,7 +36,7 @@ class CLogicalUnary : public CLogical
 private:
 protected:
 	// derive statistics for projection operators
-	IStatistics *PstatsDeriveProject(
+	gpos::owner<IStatistics *> PstatsDeriveProject(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<UlongToIDatumMap *> phmuldatum = nullptr) const;
 

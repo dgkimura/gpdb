@@ -348,7 +348,8 @@ COptTasks::LoadSearchStrategy(CMemoryPool *mp, char *path)
 //
 //---------------------------------------------------------------------------
 gpos::owner<COptimizerConfig *>
-COptTasks::CreateOptimizerConfig(CMemoryPool *mp, ICostModel *cost_model)
+COptTasks::CreateOptimizerConfig(CMemoryPool *mp,
+								 gpos::owner<ICostModel *> cost_model)
 {
 	// get chosen plan number, cost threshold
 	ULLONG plan_id = (ULLONG) optimizer_plan_id;
@@ -376,7 +377,7 @@ COptTasks::CreateOptimizerConfig(CMemoryPool *mp, ICostModel *cost_model)
 		GPOS_NEW(mp)
 			CStatisticsConfig(mp, damping_factor_filter, damping_factor_join,
 							  damping_factor_groupby, MAX_STATS_BUCKETS),
-		GPOS_NEW(mp) CCTEConfig(cte_inlining_cutoff), cost_model,
+		GPOS_NEW(mp) CCTEConfig(cte_inlining_cutoff), std::move(cost_model),
 		GPOS_NEW(mp)
 			CHint(gpos::int_max /* optimizer_parts_to_force_sort_on_insert */,
 				  join_arity_for_associativity_commutativity,
@@ -614,7 +615,7 @@ COptTasks::OptimizeTask(void *ptr)
 	{
 		ResetTraceflags(enabled_trace_flags, disabled_trace_flags);
 		CRefCount::SafeRelease(std::move(rel_stats));
-		CRefCount::SafeRelease(col_stats);
+		CRefCount::SafeRelease(std::move(col_stats));
 		CRefCount::SafeRelease(enabled_trace_flags);
 		CRefCount::SafeRelease(disabled_trace_flags);
 		CRefCount::SafeRelease(trace_flags);

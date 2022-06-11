@@ -46,7 +46,7 @@ CLogicalUnion::CLogicalUnion(CMemoryPool *mp) : CLogicalSetOp(mp)
 CLogicalUnion::CLogicalUnion(CMemoryPool *mp,
 							 gpos::owner<CColRefArray *> pdrgpcrOutput,
 							 gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput)
-	: CLogicalSetOp(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
+	: CLogicalSetOp(mp, std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrInput))
 {
 #ifdef GPOS_DEBUG
 	gpos::pointer<CColRefArray *> pdrgpcrInput = (*pdrgpdrgpcrInput)[0];
@@ -158,7 +158,7 @@ CLogicalUnion::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::owner<ULongPtrArray *> pdrgpulComputedCols =
 		GPOS_NEW(mp) ULongPtrArray(mp);
 
-	IStatistics *stats = CLogicalGbAgg::PstatsDerive(
+	gpos::owner<IStatistics *> stats = CLogicalGbAgg::PstatsDerive(
 		mp, pstatsUnionAll,
 		m_pdrgpcrOutput,	  // we group by the output columns
 		pdrgpulComputedCols,  // no computed columns for set ops

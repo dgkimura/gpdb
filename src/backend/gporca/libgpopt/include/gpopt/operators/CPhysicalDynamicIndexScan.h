@@ -49,8 +49,8 @@ public:
 	CPhysicalDynamicIndexScan(
 		CMemoryPool *mp, gpos::owner<CIndexDescriptor *> pindexdesc,
 		gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId,
-		const CName *pnameAlias, CColRefArray *pdrgpcrOutput, ULONG scan_id,
-		gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
+		const CName *pnameAlias, gpos::owner<CColRefArray *> pdrgpcrOutput,
+		ULONG scan_id, gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
 		gpos::owner<COrderSpec *> pos,
 		gpos::owner<IMdIdArray *> partition_mdids,
 		gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part);
@@ -123,7 +123,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// statistics derivation during costing
-	IStatistics *PstatsDerive(
+	gpos::owner<IStatistics *> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CReqdPropPlan *> prpplan,
 		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;

@@ -323,9 +323,10 @@ private:
 
 	// generate statistics for the system level columns
 	static gpos::owner<CDXLColStats *> GenerateStatsForSystemCols(
-		CMemoryPool *mp, OID rel_oid, CMDIdColStats *mdid_col_stats,
-		CMDName *md_colname, OID att_type, AttrNumber attrnum,
-		CDXLBucketArray *dxl_stats_bucket_array, CDouble rows);
+		CMemoryPool *mp, OID rel_oid,
+		gpos::owner<CMDIdColStats *> mdid_col_stats, CMDName *md_colname,
+		OID att_type, AttrNumber attrnum,
+		gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array, CDouble rows);
 
 	static gpos::owner<IMdIdArray *> RetrieveIndexPartitions(CMemoryPool *mp,
 															 OID rel_oid);

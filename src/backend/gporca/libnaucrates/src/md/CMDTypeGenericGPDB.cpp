@@ -385,17 +385,19 @@ CMDTypeGenericGPDB::CreateDXLDatumVal(CMemoryPool *mp,
 	if (HasByte2DoubleMapping(mdid))
 	{
 		return CMDTypeGenericGPDB::CreateDXLDatumStatsDoubleMappable(
-			mp, mdid, type_modifier, is_null, pba, length, lValue, dValue);
+			mp, std::move(mdid), type_modifier, is_null, pba, length, lValue,
+			dValue);
 	}
 
 	if (HasByte2IntMapping(md_type))
 	{
 		return CMDTypeGenericGPDB::CreateDXLDatumStatsIntMappable(
-			mp, mdid, type_modifier, is_null, pba, length, lValue, dValue);
+			mp, std::move(mdid), type_modifier, is_null, pba, length, lValue,
+			dValue);
 	}
 
-	return GPOS_NEW(mp)
-		CDXLDatumGeneric(mp, mdid, type_modifier, is_null, pba, length);
+	return GPOS_NEW(mp) CDXLDatumGeneric(mp, std::move(mdid), type_modifier,
+										 is_null, pba, length);
 }
 
 
@@ -409,12 +411,13 @@ CMDTypeGenericGPDB::CreateDXLDatumVal(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::owner<CDXLDatum *>
 CMDTypeGenericGPDB::CreateDXLDatumStatsDoubleMappable(
-	CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
+	CMemoryPool *mp, gpos::owner<IMDId *> mdid, INT type_modifier, BOOL is_null,
 	BYTE *byte_array, ULONG length, LINT, CDouble double_value)
 {
 	GPOS_ASSERT(CMDTypeGenericGPDB::HasByte2DoubleMapping(mdid));
-	return GPOS_NEW(mp) CDXLDatumStatsDoubleMappable(
-		mp, mdid, type_modifier, is_null, byte_array, length, double_value);
+	return GPOS_NEW(mp)
+		CDXLDatumStatsDoubleMappable(mp, std::move(mdid), type_modifier,
+									 is_null, byte_array, length, double_value);
 }
 
 
@@ -428,13 +431,14 @@ CMDTypeGenericGPDB::CreateDXLDatumStatsDoubleMappable(
 //---------------------------------------------------------------------------
 gpos::owner<CDXLDatum *>
 CMDTypeGenericGPDB::CreateDXLDatumStatsIntMappable(
-	CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
+	CMemoryPool *mp, gpos::owner<IMDId *> mdid, INT type_modifier, BOOL is_null,
 	BYTE *byte_array, ULONG length, LINT lint_value,
 	CDouble	 // double_value
 )
 {
-	return GPOS_NEW(mp) CDXLDatumStatsLintMappable(
-		mp, mdid, type_modifier, is_null, byte_array, length, lint_value);
+	return GPOS_NEW(mp)
+		CDXLDatumStatsLintMappable(mp, std::move(mdid), type_modifier, is_null,
+								   byte_array, length, lint_value);
 }
 
 //---------------------------------------------------------------------------

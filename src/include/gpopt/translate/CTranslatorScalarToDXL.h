@@ -236,7 +236,7 @@ private:
 		const CMappingVarColId *var_colid_mapping);
 
 	// get the operator name
-	const CWStringConst *GetDXLArrayCmpType(IMDId *mdid) const;
+	const CWStringConst *GetDXLArrayCmpType(gpos::pointer<IMDId *> mdid) const;
 
 	// translate the window frame edge, if the column used in the edge is a
 	// computed column then add it to the project list

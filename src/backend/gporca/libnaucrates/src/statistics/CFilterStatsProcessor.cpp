@@ -32,7 +32,8 @@ gpos::pointer<IStatistics *>
 CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::pointer<IStatistics *> child_stats,
-	CExpression *local_scalar_expr,	 // filter expression on local columns only
+	gpos::pointer<CExpression *>
+		local_scalar_expr,	// filter expression on local columns only
 	CExpression *
 		outer_refs_scalar_expr,	 // filter expression involving outer references
 	gpos::pointer<IStatisticsArray *> all_outer_stats)
@@ -62,8 +63,10 @@ CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
 	if (exprhdl.HasOuterRefs() && 0 < all_outer_stats->Size())
 	{
 		// derive stats based on outer references
-		IStatistics *stats = CJoinStatsProcessor::DeriveStatsWithOuterRefs(
-			mp, exprhdl, outer_refs_scalar_expr, result_stats, all_outer_stats);
+		gpos::owner<IStatistics *> stats =
+			CJoinStatsProcessor::DeriveStatsWithOuterRefs(
+				mp, exprhdl, outer_refs_scalar_expr, result_stats,
+				all_outer_stats);
 		result_stats->Release();
 		result_stats = stats;
 	}
@@ -887,8 +890,8 @@ CFilterStatsProcessor::MakeHistArrayCmpAnyFilter(
 		freq_remain = CDouble(ndv_remain) / dummy_rows;
 	}
 	CHistogram *dummy_histogram = GPOS_NEW(mp)
-		CHistogram(mp, dummy_histogram_buckets, true /* is_well_defined */,
-				   CDouble(0.0) /* null_freq */,
+		CHistogram(mp, std::move(dummy_histogram_buckets),
+				   true /* is_well_defined */, CDouble(0.0) /* null_freq */,
 				   CDouble(ndv_remain) /* distinct_remain */, freq_remain);
 	// dummy histogram should already be normalized since each bucket's frequency
 	// is already adjusted by a scale factor of 1/dummy_rows to avoid unnecessarily

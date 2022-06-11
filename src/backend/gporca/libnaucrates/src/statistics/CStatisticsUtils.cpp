@@ -1131,7 +1131,7 @@ CStatisticsUtils::DeriveStatsForDynamicScan(
 		// apply the unsupported join filters as a filter on top of the join results.
 		// TODO,  June 13 2014 we currently only cap NDVs for filters
 		// (also look at CJoinStatsProcessor::CalcAllJoinStats since most of this code was taken from there)
-		IStatistics *stats_after_join_filter =
+		gpos::owner<IStatistics *> stats_after_join_filter =
 			CFilterStatsProcessor::MakeStatsFilter(
 				mp, gpos::dyn_cast<CStatistics>(left_semi_join_stats),
 				unsupported_pred_stats, false /* do_cap_NDVs */);
@@ -1139,7 +1139,7 @@ CStatisticsUtils::DeriveStatsForDynamicScan(
 		left_semi_join_stats = stats_after_join_filter;
 	}
 
-	CRefCount::SafeRelease(unsupported_pred_stats);
+	CRefCount::SafeRelease(std::move(unsupported_pred_stats));
 	output_colrefs->Release();
 	outer_refs->Release();
 	join_preds_stats->Release();

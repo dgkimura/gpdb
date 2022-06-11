@@ -85,7 +85,8 @@ private:
 	// create a logical assert for the check constraints on the given table
 	static gpos::owner<CExpression *> PexprAssertCheckConstraints(
 		CMemoryPool *mp, gpos::owner<CExpression *> pexprChild,
-		gpos::pointer<CTableDescriptor *> ptabdesc, CColRefArray *colref_array);
+		gpos::pointer<CTableDescriptor *> ptabdesc,
+		gpos::pointer<CColRefArray *> colref_array);
 
 	// helper for extracting foreign key
 	static gpos::owner<CColRefSet *> PcrsFKey(
@@ -143,7 +144,8 @@ private:
 	template <class T>
 	static void AddHashOrMergeJoinAlternative(
 		CMemoryPool *mp, gpos::pointer<CExpression *> pexprJoin,
-		CExpressionArray *pdrgpexprOuter, CExpressionArray *pdrgpexprInner,
+		gpos::owner<CExpressionArray *> pdrgpexprOuter,
+		gpos::owner<CExpressionArray *> pdrgpexprInner,
 		gpos::owner<IMdIdArray *> join_opfamilies,
 		gpos::pointer<CXformResult *> pxfres);
 
@@ -196,13 +198,16 @@ private:
 	static gpos::owner<CLogical *>
 	PopDynamicBtreeIndexOpConstructor(
 		CMemoryPool *mp, gpos::pointer<const IMDIndex *> pmdindex,
-		CTableDescriptor *ptabdesc, ULONG ulOriginOpId, CName *pname,
-		ULONG ulPartIndex, CColRefArray *pdrgpcrOutput,
-		CColRef2dArray *pdrgpdrgpcrPart, IMdIdArray *partition_mdids)
+		gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId,
+		CName *pname, ULONG ulPartIndex,
+		gpos::owner<CColRefArray *> pdrgpcrOutput,
+		gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
+		gpos::owner<IMdIdArray *> partition_mdids)
 	{
 		return GPOS_NEW(mp) CLogicalDynamicIndexGet(
-			mp, pmdindex, ptabdesc, ulOriginOpId, pname, ulPartIndex,
-			pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids);
+			mp, pmdindex, std::move(ptabdesc), ulOriginOpId, pname, ulPartIndex,
+			std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrPart),
+			std::move(partition_mdids));
 	}
 
 	//	create a static operator for a btree index plan
@@ -403,7 +408,8 @@ public:
 	// create a logical assert for the check constraints on the given table
 	static gpos::owner<CExpression *> PexprAssertConstraints(
 		CMemoryPool *mp, gpos::owner<CExpression *> pexprChild,
-		gpos::pointer<CTableDescriptor *> ptabdesc, CColRefArray *colref_array);
+		gpos::pointer<CTableDescriptor *> ptabdesc,
+		gpos::pointer<CColRefArray *> colref_array);
 
 	// return true if stats derivation is needed for this xform
 	static BOOL FDeriveStatsBeforeXform(gpos::pointer<CXform *> pxform);
@@ -546,7 +552,7 @@ public:
 		CTableDescriptor *ptabdesc, gpos::pointer<const IMDRelation *> pmdrel,
 		CColRefArray *pdrgpcrOutput, CColRefSet *outer_refs,
 		CColRefSet *pcrsReqd, gpos::owner<CExpression *> *pexprBitmapResult,
-		CExpression **pexprRecheckResult,
+		gpos::owner<CExpression *> *pexprRecheckResult,
 		gpos::pointer<CExpressionArray *> pdrgpexprResidualResult,
 		BOOL isAPartialPredicate);
 
@@ -768,7 +774,7 @@ CXformUtils::ImplementHashJoin(gpos::pointer<CXformContext *> pxfctxt,
 
 	CExpression *pexprOuter = (*pexpr)[0];
 	CExpression *pexprInner = (*pexpr)[1];
-	CExpression *pexprScalar = (*pexpr)[2];
+	gpos::pointer<CExpression *> pexprScalar = (*pexpr)[2];
 
 	// split the predicate into arrays of conjuncts based on if they are
 	// output from inner or outer child

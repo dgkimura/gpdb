@@ -243,18 +243,18 @@ private:
 		gpos::owner<CExpression *> *ppexprResidualScalar);
 
 	// remove a subquery EXISTS from scalar tree
-	BOOL FRemoveExistsSubquery(gpos::owner<CExpression *> pexprOuter,
-							   gpos::pointer<CExpression *> pexprSubquery,
-							   ESubqueryCtxt esqctxt,
-							   gpos::owner<CExpression *> *ppexprNewOuter,
-							   CExpression **ppexprResidualScalar);
+	BOOL FRemoveExistsSubquery(
+		gpos::owner<CExpression *> pexprOuter,
+		gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
+		gpos::owner<CExpression *> *ppexprNewOuter,
+		gpos::owner<CExpression *> *ppexprResidualScalar);
 
 	// remove a subquery NOT EXISTS from scalar tree
-	BOOL FRemoveNotExistsSubquery(gpos::owner<CExpression *> pexprOuter,
-								  gpos::pointer<CExpression *> pexprSubquery,
-								  ESubqueryCtxt esqctxt,
-								  gpos::owner<CExpression *> *ppexprNewOuter,
-								  CExpression **ppexprResidualScalar);
+	BOOL FRemoveNotExistsSubquery(
+		gpos::owner<CExpression *> pexprOuter,
+		gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
+		gpos::owner<CExpression *> *ppexprNewOuter,
+		gpos::owner<CExpression *> *ppexprResidualScalar);
 
 	// handle subqueries in scalar tree recursively
 	BOOL FRecursiveHandler(CExpression *pexprOuter,
@@ -291,7 +291,8 @@ public:
 	// build an expression for the quantified comparison of the subquery
 	gpos::owner<CExpression *> PexprSubqueryPred(
 		CExpression *pexprOuter, gpos::pointer<CExpression *> pexprSubquery,
-		CExpression **ppexprResult, CSubqueryHandler::ESubqueryCtxt esqctxt);
+		gpos::owner<CExpression *> *ppexprResult,
+		CSubqueryHandler::ESubqueryCtxt esqctxt);
 
 	// main driver
 	BOOL FProcess(

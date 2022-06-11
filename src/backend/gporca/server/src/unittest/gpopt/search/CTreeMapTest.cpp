@@ -100,7 +100,7 @@ CTreeMapTest::CNode::OsPrintWithIndent(IOstream &os, ULONG ulIndent) const
 //
 //---------------------------------------------------------------------------
 CTreeMapTest::CNode::CNode(CMemoryPool *,  // mp
-						   const ULONG *pulData,
+						   gpos::pointer<const ULONG *> pulData,
 						   gpos::owner<CNodeArray *> pdrgpnd)
 	: m_ulData(gpos::ulong_max), m_pdrgpnd(pdrgpnd)
 {
@@ -134,7 +134,7 @@ CTreeMapTest::CNode::~CNode()
 //
 //---------------------------------------------------------------------------
 gpos::owner<CTreeMapTest::CNode *>
-CTreeMapTest::Pnd(CMemoryPool *mp, ULONG *pul,
+CTreeMapTest::Pnd(CMemoryPool *mp, gpos::pointer<ULONG *> pul,
 				  gpos::owner<CNodeArray *> pdrgpnd, BOOL *fTestTrue)
 {
 	// The test passes 'true' to PrUnrank and the rehydrate function expects to find it here.
@@ -420,7 +420,7 @@ CTreeMapTest::EresUnittest_Memo()
 	// clean up
 	CRefCount::SafeRelease(std::move(pexprPlan));
 	GPOS_DELETE(pqc);
-	CRefCount::SafeRelease(pexpr);
+	CRefCount::SafeRelease(std::move(pexpr));
 	GPOS_DELETE(peng);
 
 	return GPOS_OK;

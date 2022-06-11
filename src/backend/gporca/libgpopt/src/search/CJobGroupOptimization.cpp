@@ -241,7 +241,7 @@ CJobGroupOptimization::EevtStartOptimization(CSchedulerContext *psc,
 {
 	// get a job pointer
 	CJobGroupOptimization *pjgo = PjConvert(pjOwner);
-	CGroup *pgroup = pjgo->m_pgroup;
+	gpos::pointer<CGroup *> pgroup = pjgo->m_pgroup;
 	GPOS_ASSERT(COptimizationContext::estUnoptimized == pjgo->m_poc->Est() &&
 				"Group is already optimized under this context");
 

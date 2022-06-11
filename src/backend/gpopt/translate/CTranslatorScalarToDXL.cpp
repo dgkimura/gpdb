@@ -504,7 +504,7 @@ CTranslatorScalarToDXL::CreateScalarCmpFromOpExpr(
 	const CWStringConst *str = GetDXLArrayCmpType(mdid);
 
 	gpos::owner<CDXLScalarComp *> dxlop = GPOS_NEW(m_mp) CDXLScalarComp(
-		m_mp, mdid, GPOS_NEW(m_mp) CWStringConst(str->GetBuffer()));
+		m_mp, std::move(mdid), GPOS_NEW(m_mp) CWStringConst(str->GetBuffer()));
 
 	// create the DXL node holding the scalar comparison operator
 	gpos::owner<CDXLNode *> dxlnode =
@@ -555,7 +555,7 @@ CTranslatorScalarToDXL::TranslateOpExprToDXL(
 	const CWStringConst *str = GetDXLArrayCmpType(mdid);
 
 	gpos::owner<CDXLScalarOpExpr *> dxlop = GPOS_NEW(m_mp)
-		CDXLScalarOpExpr(m_mp, mdid, return_type_mdid,
+		CDXLScalarOpExpr(m_mp, std::move(mdid), std::move(return_type_mdid),
 						 GPOS_NEW(m_mp) CWStringConst(str->GetBuffer()));
 
 	// create the DXL node holding the scalar opexpr
@@ -1407,8 +1407,9 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 				   GPOS_WSZ_LIT("Aggregate functions with FILTER"));
 	}
 
-	IMDId *mdid_return_type = CScalarAggFunc::PmdidLookupReturnType(
-		agg_mdid, (EdxlaggstageNormal == agg_stage), m_md_accessor);
+	gpos::pointer<IMDId *> mdid_return_type =
+		CScalarAggFunc::PmdidLookupReturnType(
+			agg_mdid, (EdxlaggstageNormal == agg_stage), m_md_accessor);
 	gpos::owner<IMDId *> resolved_ret_type = nullptr;
 	if (m_md_accessor->RetrieveType(mdid_return_type)->IsAmbiguous())
 	{
@@ -2152,7 +2153,7 @@ CTranslatorScalarToDXL::AddArrayIndexList(
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CTranslatorScalarToDXL::GetDXLArrayCmpType(IMDId *mdid) const
+CTranslatorScalarToDXL::GetDXLArrayCmpType(gpos::pointer<IMDId *> mdid) const
 {
 	// get operator name
 	gpos::pointer<const IMDScalarOp *> md_scalar_op =

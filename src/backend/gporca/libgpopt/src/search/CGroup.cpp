@@ -837,14 +837,14 @@ CGroup::FDuplicateGroups(gpos::pointer<CGroup *> pgroupFst,
 //
 //---------------------------------------------------------------------------
 BOOL
-CGroup::FInitStats(IStatistics *stats)
+CGroup::FInitStats(gpos::owner<IStatistics *> stats)
 {
 	GPOS_ASSERT(nullptr != stats);
 
 	CGroupProxy gp(this);
 	if (nullptr == Pstats())
 	{
-		gp.InitStats(stats);
+		gp.InitStats(std::move(stats));
 		return true;
 	}
 
@@ -869,7 +869,7 @@ CGroup::AppendStats(CMemoryPool *mp, gpos::pointer<IStatistics *> stats)
 	GPOS_ASSERT(nullptr != stats);
 	GPOS_ASSERT(nullptr != Pstats());
 
-	IStatistics *stats_copy = Pstats()->CopyStats(mp);
+	gpos::owner<IStatistics *> stats_copy = Pstats()->CopyStats(mp);
 	stats_copy->AppendStats(mp, stats);
 
 	gpos::owner<IStatistics *> current_stats = nullptr;
@@ -877,7 +877,7 @@ CGroup::AppendStats(CMemoryPool *mp, gpos::pointer<IStatistics *> stats)
 		CGroupProxy gp(this);
 		current_stats = m_pstats;
 		m_pstats = nullptr;
-		gp.InitStats(stats_copy);
+		gp.InitStats(std::move(stats_copy));
 	}
 
 	current_stats->Release();
@@ -1403,8 +1403,8 @@ CGroup::FBetterPromise(CMemoryPool *mp, CLogical::EStatPromise espFst,
 CLogical::EStatPromise
 CGroup::EspDerive(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 				  gpos::pointer<CGroupExpression *> pgexpr,
-				  CReqdPropRelational *prprel, IStatisticsArray *stats_ctxt,
-				  BOOL fDeriveChildStats)
+				  gpos::pointer<CReqdPropRelational *> prprel,
+				  IStatisticsArray *stats_ctxt, BOOL fDeriveChildStats)
 {
 	GPOS_ASSERT(pgexpr->Pop()->FLogical());
 
@@ -1602,7 +1602,7 @@ CGroup::PgexprBestPromise(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CGroupExpression *
 CGroup::PgexprBestPromise(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-						  CReqdPropRelational *prprelInput,
+						  gpos::pointer<CReqdPropRelational *> prprelInput,
 						  IStatisticsArray *stats_ctxt)
 {
 	CGroupExpression *pgexprBest = nullptr;

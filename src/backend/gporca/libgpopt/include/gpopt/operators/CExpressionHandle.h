@@ -282,7 +282,8 @@ public:
 	// return an exact scalar expression attached to handle or null if not possible
 	CExpression *PexprScalarExact() const;
 
-	void DeriveProducerStats(ULONG child_index, CColRefSet *pcrsStat) const;
+	void DeriveProducerStats(ULONG child_index,
+							 gpos::pointer<CColRefSet *> pcrsStat) const;
 
 	// return the columns used by a logical operator internally as well
 	// as columns used by all its scalar children

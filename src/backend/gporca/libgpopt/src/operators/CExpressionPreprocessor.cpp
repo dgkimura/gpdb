@@ -2642,7 +2642,7 @@ CExpressionPreprocessor::PrunePartitions(CMemoryPool *mp,
 	if (pop->Eopid() == COperator::EopLogicalSelect &&
 		(*expr)[0]->Pop()->Eopid() == COperator::EopLogicalDynamicGet)
 	{
-		CExpression *filter_pred = (*expr)[1];
+		gpos::pointer<CExpression *> filter_pred = (*expr)[1];
 		gpos::pointer<CLogicalDynamicGet *> dyn_get =
 			gpos::dyn_cast<CLogicalDynamicGet>((*expr)[0]->Pop());
 

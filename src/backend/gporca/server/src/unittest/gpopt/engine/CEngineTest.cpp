@@ -382,8 +382,9 @@ CEngineTest::EresUnittest_BuildMemoLargeJoins()
 //
 //---------------------------------------------------------------------------
 void
-CEngineTest::BuildMemoRecursive(CMemoryPool *mp, CExpression *pexprInput,
-								CSearchStageArray *search_stage_array)
+CEngineTest::BuildMemoRecursive(
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexprInput,
+	gpos::owner<CSearchStageArray *> search_stage_array)
 {
 	CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexprInput);
 

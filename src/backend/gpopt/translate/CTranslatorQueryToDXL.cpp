@@ -3311,7 +3311,7 @@ CTranslatorQueryToDXL::TranslateRTEToDXLLogicalGet(const RangeTblEntry *rte,
 	gpos::pointer<IMdIdArray *> partition_mdids = md_rel->ChildPartitionMdids();
 	for (ULONG ul = 0; partition_mdids && ul < partition_mdids->Size(); ++ul)
 	{
-		IMDId *part_mdid = (*partition_mdids)[ul];
+		gpos::pointer<IMDId *> part_mdid = (*partition_mdids)[ul];
 		gpos::pointer<const IMDRelation *> partrel =
 			m_md_accessor->RetrieveRel(part_mdid);
 

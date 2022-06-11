@@ -38,13 +38,14 @@ using namespace gpopt;
 CPhysicalDynamicIndexScan::CPhysicalDynamicIndexScan(
 	CMemoryPool *mp, gpos::owner<CIndexDescriptor *> pindexdesc,
 	gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId,
-	const CName *pnameAlias, CColRefArray *pdrgpcrOutput, ULONG scan_id,
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
+	const CName *pnameAlias, gpos::owner<CColRefArray *> pdrgpcrOutput,
+	ULONG scan_id, gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
 	gpos::owner<COrderSpec *> pos, gpos::owner<IMdIdArray *> partition_mdids,
 	gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part)
-	: CPhysicalDynamicScan(mp, ptabdesc, ulOriginOpId, pnameAlias, scan_id,
-						   pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids,
-						   root_col_mapping_per_part),
+	: CPhysicalDynamicScan(
+		  mp, std::move(ptabdesc), ulOriginOpId, pnameAlias, scan_id,
+		  std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrPart),
+		  std::move(partition_mdids), std::move(root_col_mapping_per_part)),
 	  m_pindexdesc(std::move(pindexdesc)),
 	  m_pos(std::move(pos))
 {
@@ -165,7 +166,7 @@ CPhysicalDynamicIndexScan::OsPrint(IOstream &os) const
 //		Statistics derivation during costing
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CPhysicalDynamicIndexScan::PstatsDerive(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::pointer<CReqdPropPlan *> prpplan,

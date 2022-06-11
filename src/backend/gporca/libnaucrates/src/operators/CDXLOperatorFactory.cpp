@@ -2541,12 +2541,12 @@ CDXLOperatorFactory::GetDatumVal(CDXLMemoryManager *dxl_memory_manager,
 			if (attr_val_xml)
 			{
 				return GetDatumStatsLintMappable(dxl_memory_manager, attrs,
-												 target_elem, mdid,
+												 target_elem, std::move(mdid),
 												 is_const_null);
 			}
 			// generate a datum of generic type
-			return GetDatumGeneric(dxl_memory_manager, attrs, target_elem, mdid,
-								   is_const_null);
+			return GetDatumGeneric(dxl_memory_manager, attrs, target_elem,
+								   std::move(mdid), is_const_null);
 		}
 		// native support
 		case GPDB_INT2:
@@ -2583,7 +2583,8 @@ CDXLOperatorFactory::GetDatumVal(CDXLMemoryManager *dxl_memory_manager,
 		case GPDB_DATE:
 		{
 			return GetDatumStatsLintMappable(dxl_memory_manager, attrs,
-											 target_elem, mdid, is_const_null);
+											 target_elem, std::move(mdid),
+											 is_const_null);
 		}
 		// non-integer numeric types
 		case GPDB_NUMERIC:
@@ -2603,8 +2604,9 @@ CDXLOperatorFactory::GetDatumVal(CDXLMemoryManager *dxl_memory_manager,
 		case GPDB_INTERVAL:
 		case GPDB_TIMEINTERVAL:
 		{
-			return GetDatumStatsDoubleMappable(
-				dxl_memory_manager, attrs, target_elem, mdid, is_const_null);
+			return GetDatumStatsDoubleMappable(dxl_memory_manager, attrs,
+											   target_elem, std::move(mdid),
+											   is_const_null);
 		}
 	}
 }
@@ -2756,7 +2758,8 @@ CDXLOperatorFactory::GetDatumBool(CDXLMemoryManager *dxl_memory_manager,
 gpos::owner<CDXLDatum *>
 CDXLOperatorFactory::GetDatumGeneric(CDXLMemoryManager *dxl_memory_manager,
 									 const Attributes &attrs,
-									 Edxltoken target_elem, IMDId *mdid,
+									 Edxltoken target_elem,
+									 gpos::owner<IMDId *> mdid,
 									 BOOL is_const_null)
 {
 	// get the memory pool from the memory manager
@@ -2781,8 +2784,8 @@ CDXLOperatorFactory::GetDatumGeneric(CDXLMemoryManager *dxl_memory_manager,
 		dxl_memory_manager, attrs, EdxltokenTypeMod, EdxltokenScalarCast, true,
 		default_type_modifier);
 
-	return GPOS_NEW(mp)
-		CDXLDatumGeneric(mp, mdid, type_modifier, is_const_null, data, len);
+	return GPOS_NEW(mp) CDXLDatumGeneric(mp, std::move(mdid), type_modifier,
+										 is_const_null, data, len);
 }
 
 
@@ -2797,7 +2800,7 @@ CDXLOperatorFactory::GetDatumGeneric(CDXLMemoryManager *dxl_memory_manager,
 gpos::owner<CDXLDatum *>
 CDXLOperatorFactory::GetDatumStatsLintMappable(
 	CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-	Edxltoken target_elem, IMDId *mdid, BOOL is_const_null)
+	Edxltoken target_elem, gpos::owner<IMDId *> mdid, BOOL is_const_null)
 {
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
@@ -2818,7 +2821,7 @@ CDXLOperatorFactory::GetDatumStatsLintMappable(
 	);
 
 	return GPOS_NEW(mp) CDXLDatumStatsLintMappable(
-		mp, mdid, type_modifier, is_const_null, data, len, value);
+		mp, std::move(mdid), type_modifier, is_const_null, data, len, value);
 }
 
 //---------------------------------------------------------------------------
@@ -2878,7 +2881,7 @@ CDXLOperatorFactory::GetByteArray(CDXLMemoryManager *dxl_memory_manager,
 gpos::owner<CDXLDatum *>
 CDXLOperatorFactory::GetDatumStatsDoubleMappable(
 	CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-	Edxltoken target_elem, IMDId *mdid, BOOL is_const_null)
+	Edxltoken target_elem, gpos::owner<IMDId *> mdid, BOOL is_const_null)
 {
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
@@ -2907,7 +2910,7 @@ CDXLOperatorFactory::GetDatumStatsDoubleMappable(
 		-1 /* default_val value */
 	);
 	return GPOS_NEW(mp) CDXLDatumStatsDoubleMappable(
-		mp, mdid, type_modifier, is_const_null, data, len, value);
+		mp, std::move(mdid), type_modifier, is_const_null, data, len, value);
 }
 
 //---------------------------------------------------------------------------

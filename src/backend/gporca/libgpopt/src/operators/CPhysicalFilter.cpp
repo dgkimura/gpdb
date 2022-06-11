@@ -171,8 +171,8 @@ CPhysicalFilter::PcteRequired(CMemoryPool *,		//mp,
 								  child_index
 #endif
 							  ,
-							  CDrvdPropArray *,	 //pdrgpdpCtxt,
-							  ULONG				 //ulOptReq
+							  gpos::pointer<CDrvdPropArray *>,	//pdrgpdpCtxt,
+							  ULONG								//ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -220,7 +220,7 @@ CPhysicalFilter::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	if (CDistributionSpec::EdtHashed == pdsChild->Edt() &&
 		exprhdl.HasOuterRefs())
 	{
-		CExpression *pexprFilterPred =
+		gpos::pointer<CExpression *> pexprFilterPred =
 			exprhdl.PexprScalarExactChild(1, true /*error_on_null_return*/);
 
 		CDistributionSpecHashed *pdshashedOriginal =

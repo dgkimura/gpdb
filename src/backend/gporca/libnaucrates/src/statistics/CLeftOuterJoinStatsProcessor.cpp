@@ -22,7 +22,7 @@ gpos::owner<CStatistics *>
 CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
 	CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_side_stats,
 	gpos::pointer<const IStatistics *> inner_side_stats,
-	CStatsPredJoinArray *join_preds_stats)
+	gpos::pointer<CStatsPredJoinArray *> join_preds_stats)
 {
 	GPOS_ASSERT(nullptr != outer_side_stats);
 	GPOS_ASSERT(nullptr != inner_side_stats);
@@ -83,8 +83,8 @@ CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
 	CMemoryPool *mp, gpos::pointer<const CStatistics *> outer_side_stats,
 	gpos::pointer<const CStatistics *> inner_side_stats,
 	gpos::pointer<CStatistics *> inner_join_stats,
-	CStatsPredJoinArray *join_preds_stats, CDouble num_rows_inner_join,
-	CDouble *result_rows_LASJ)
+	gpos::pointer<CStatsPredJoinArray *> join_preds_stats,
+	CDouble num_rows_inner_join, CDouble *result_rows_LASJ)
 {
 	GPOS_ASSERT(nullptr != outer_side_stats);
 	GPOS_ASSERT(nullptr != inner_side_stats);

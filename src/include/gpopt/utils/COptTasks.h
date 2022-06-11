@@ -125,7 +125,7 @@ private:
 
 	// create optimizer configuration object
 	static gpos::owner<COptimizerConfig *> CreateOptimizerConfig(
-		CMemoryPool *mp, ICostModel *cost_model);
+		CMemoryPool *mp, gpos::owner<ICostModel *> cost_model);
 
 	// optimize a query to a physical DXL
 	static void *OptimizeTask(void *ptr);
