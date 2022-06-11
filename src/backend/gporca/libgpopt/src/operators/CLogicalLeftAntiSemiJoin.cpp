@@ -132,7 +132,7 @@ CLogicalLeftAntiSemiJoin::PstatsDerive(
 	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExprHandle(mp, exprhdl,
 														true /*LASJ*/);
-	IStatistics *pstatsLASJoin =
+	gpos::owner<IStatistics *> pstatsLASJoin =
 		outer_stats->CalcLASJoinStats(mp, inner_side_stats, join_preds_stats,
 									  true /* DoIgnoreLASJHistComputation */
 		);

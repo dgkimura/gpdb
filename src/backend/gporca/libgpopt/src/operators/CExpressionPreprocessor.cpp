@@ -2810,7 +2810,7 @@ CExpressionPreprocessor::PcnstrFromChildPartition(
 	gpos::owner<CConstraint *> cnstr = CConstraint::PcnstrFromScalarExpr(
 		mp, part_constraint_expr, &pdrgpcrsChild, true /* infer_nulls_as */);
 
-	CRefCount::SafeRelease(part_constraint_expr);
+	CRefCount::SafeRelease(std::move(part_constraint_expr));
 	CRefCount::SafeRelease(std::move(pdrgpcrsChild));
 	GPOS_ASSERT(cnstr);
 	return cnstr;

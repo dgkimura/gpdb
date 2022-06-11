@@ -513,7 +513,7 @@ CGroup::InitProperties(CDrvdProp *pdp)
 //
 //---------------------------------------------------------------------------
 void
-CGroup::InitStats(IStatistics *stats)
+CGroup::InitStats(gpos::owner<IStatistics *> stats)
 {
 	GPOS_ASSERT(nullptr == m_pstats);
 	GPOS_ASSERT(nullptr != stats);

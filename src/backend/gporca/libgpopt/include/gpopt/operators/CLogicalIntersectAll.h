@@ -127,7 +127,7 @@ public:
 	}
 
 	// derive statistics
-	static IStatistics *PstatsDerive(
+	static gpos::owner<IStatistics *> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput,
 		gpos::pointer<CColRefSetArray *> output_colrefsets);

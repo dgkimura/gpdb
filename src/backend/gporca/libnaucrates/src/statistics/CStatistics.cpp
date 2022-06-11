@@ -404,9 +404,9 @@ CStatistics::IsEmptyJoin(gpos::pointer<const CStatistics *> outer_stats,
 
 //	return statistics object after performing LOJ operation with another statistics structure
 gpos::owner<IStatistics *>
-CStatistics::CalcLOJoinStats(CMemoryPool *mp,
-							 gpos::pointer<const IStatistics *> other_stats,
-							 CStatsPredJoinArray *join_preds_stats) const
+CStatistics::CalcLOJoinStats(
+	CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
+	gpos::pointer<CStatsPredJoinArray *> join_preds_stats) const
 {
 	return CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
 		mp, this, other_stats, join_preds_stats);

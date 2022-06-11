@@ -140,22 +140,22 @@ public:
 	virtual ULONG GetNumberOfPredicates() const = 0;
 
 	// inner join with another stats structure
-	virtual IStatistics *CalcInnerJoinStats(
+	virtual gpos::owner<IStatistics *> CalcInnerJoinStats(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
 		gpos::pointer<CStatsPredJoinArray *> join_preds_stats) const = 0;
 
 	// LOJ with another stats structure
 	virtual gpos::owner<IStatistics *> CalcLOJoinStats(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
-		CStatsPredJoinArray *join_preds_stats) const = 0;
+		gpos::pointer<CStatsPredJoinArray *> join_preds_stats) const = 0;
 
 	// semi join stats computation
-	virtual IStatistics *CalcLSJoinStats(
+	virtual gpos::owner<IStatistics *> CalcLSJoinStats(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> inner_side_stats,
 		gpos::pointer<CStatsPredJoinArray *> join_preds_stats) const = 0;
 
 	// anti semi join
-	virtual IStatistics *CalcLASJoinStats(
+	virtual gpos::owner<IStatistics *> CalcLASJoinStats(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
 		gpos::pointer<CStatsPredJoinArray *> join_preds_stats,
 		BOOL DoIgnoreLASJHistComputation) const = 0;
