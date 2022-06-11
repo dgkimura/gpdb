@@ -44,7 +44,7 @@ CLogicalLeftSemiApply::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalLeftSemiApply::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -67,7 +67,7 @@ CLogicalLeftSemiApply::PxfsCandidates(CMemoryPool *mp) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalLeftSemiApply::DeriveOutputColumns(CMemoryPool *,  // mp
 										   CExpressionHandle &exprhdl)
 {
@@ -87,13 +87,14 @@ CLogicalLeftSemiApply::DeriveOutputColumns(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
 CLogicalLeftSemiApply::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrInner =
+	gpos::owner<CColRefArray *> pdrgpcrInner =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
 
 	return GPOS_NEW(mp)
-		CLogicalLeftSemiApply(mp, pdrgpcrInner, m_eopidOriginSubq);
+		CLogicalLeftSemiApply(mp, std::move(pdrgpcrInner), m_eopidOriginSubq);
 }
 
 // EOF

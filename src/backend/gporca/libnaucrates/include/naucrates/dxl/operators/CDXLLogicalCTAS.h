@@ -85,16 +85,18 @@ public:
 	CDXLLogicalCTAS(const CDXLLogicalCTAS &) = delete;
 
 	// ctor
-	CDXLLogicalCTAS(CMemoryPool *mp, IMDId *mdid, CMDName *mdname_schema,
-					CMDName *mdname_rel, CDXLColDescrArray *dxl_col_descr_array,
-					CDXLCtasStorageOptions *dxl_ctas_storage_option,
-					IMDRelation::Ereldistrpolicy rel_distr_policy,
-					ULongPtrArray *distr_column_pos_array,
-					IMdIdArray *distr_opfamilies, IMdIdArray *distr_opclasses,
-					BOOL fTemporary, BOOL fHasOids,
-					IMDRelation::Erelstoragetype rel_storage_type,
-					ULongPtrArray *src_colids_array,
-					IntPtrArray *vartypemod_array);
+	CDXLLogicalCTAS(
+		CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname_schema,
+		CMDName *mdname_rel,
+		gpos::owner<CDXLColDescrArray *> dxl_col_descr_array,
+		gpos::owner<CDXLCtasStorageOptions *> dxl_ctas_storage_option,
+		IMDRelation::Ereldistrpolicy rel_distr_policy,
+		gpos::owner<ULongPtrArray *> distr_column_pos_array,
+		gpos::owner<IMdIdArray *> distr_opfamilies,
+		gpos::owner<IMdIdArray *> distr_opclasses, BOOL fTemporary,
+		BOOL fHasOids, IMDRelation::Erelstoragetype rel_storage_type,
+		gpos::owner<ULongPtrArray *> src_colids_array,
+		gpos::owner<IntPtrArray *> vartypemod_array);
 
 	// dtor
 	~CDXLLogicalCTAS() override;

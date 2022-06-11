@@ -58,11 +58,12 @@ public:
 
 	// ctor
 	CStatsPredPoint(ULONG colid, CStatsPred::EStatsCmpType stats_cmp_type,
-					CPoint *point);
+					gpos::owner<CPoint *> point);
 
 	// ctor
 	CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
-					CStatsPred::EStatsCmpType stats_cmp_type, IDatum *datum);
+					CStatsPred::EStatsCmpType stats_cmp_type,
+					gpos::pointer<IDatum *> datum);
 
 	// dtor
 	~CStatsPredPoint() override

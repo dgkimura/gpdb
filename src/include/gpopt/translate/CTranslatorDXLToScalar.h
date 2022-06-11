@@ -166,11 +166,10 @@ private:
 		CContextDXLToPlStmt *dxl_to_plstmt_ctxt);
 
 	// translate subplan test expression
-	Expr *TranslateDXLSubplanTestExprToScalar(CDXLNode *test_expr_node,
-											  SubLinkType slink,
-											  CMappingColIdVar *colid_var,
-											  BOOL has_outer_refs,
-											  List **param_ids_list);
+	Expr *TranslateDXLSubplanTestExprToScalar(
+		gpos::pointer<CDXLNode *> test_expr_node, SubLinkType slink,
+		CMappingColIdVar *colid_var, BOOL has_outer_refs,
+		List **param_ids_list);
 
 	// translate subplan parameters
 	void TranslateSubplanParams(
@@ -179,10 +178,9 @@ private:
 		CMappingColIdVar *colid_var);
 
 	// translate subplan test expression parameters
-	void TranslateDXLTestExprScalarIdentToExpr(CDXLNode *child_node,
-											   Param *param,
-											   CDXLScalarIdent **ident,
-											   Expr **expr);
+	void TranslateDXLTestExprScalarIdentToExpr(
+		gpos::pointer<CDXLNode *> child_node, Param *param,
+		CDXLScalarIdent **ident, Expr **expr);
 
 	CHAR *GetSubplanAlias(ULONG plan_id);
 
@@ -242,12 +240,18 @@ private:
 	OID GetFunctionReturnTypeOid(IMDId *mdid) const;
 
 	// translate dxldatum to GPDB Const
-	static Const *ConvertDXLDatumToConstOid(CDXLDatum *datum_dxl);
-	static Const *ConvertDXLDatumToConstInt2(CDXLDatum *datum_dxl);
-	static Const *ConvertDXLDatumToConstInt4(CDXLDatum *datum_dxl);
-	static Const *ConvertDXLDatumToConstInt8(CDXLDatum *datum_dxl);
-	static Const *ConvertDXLDatumToConstBool(CDXLDatum *datum_dxl);
-	Const *TranslateDXLDatumGenericToScalar(CDXLDatum *datum_dxl);
+	static Const *ConvertDXLDatumToConstOid(
+		gpos::pointer<CDXLDatum *> datum_dxl);
+	static Const *ConvertDXLDatumToConstInt2(
+		gpos::pointer<CDXLDatum *> datum_dxl);
+	static Const *ConvertDXLDatumToConstInt4(
+		gpos::pointer<CDXLDatum *> datum_dxl);
+	static Const *ConvertDXLDatumToConstInt8(
+		gpos::pointer<CDXLDatum *> datum_dxl);
+	static Const *ConvertDXLDatumToConstBool(
+		gpos::pointer<CDXLDatum *> datum_dxl);
+	Const *TranslateDXLDatumGenericToScalar(
+		gpos::pointer<CDXLDatum *> datum_dxl);
 	Expr *TranslateDXLScalarCastWithChildExpr(
 		gpos::pointer<const CDXLScalarCast *> scalar_cast, Expr *child_expr);
 	Expr *TranslateDXLScalarCoerceViaIOWithChildExpr(
@@ -306,7 +310,7 @@ public:
 	}
 
 	// translate a DXL datum into GPDB const expression
-	Expr *TranslateDXLDatumToScalar(CDXLDatum *datum_dxl);
+	Expr *TranslateDXLDatumToScalar(gpos::pointer<CDXLDatum *> datum_dxl);
 };
 }  // namespace gpdxl
 #endif	// !GPDXL_CTranslatorDXLToScalar_H

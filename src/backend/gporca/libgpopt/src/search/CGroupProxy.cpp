@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CSyncHashtableAccessByKey.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdPropRelational.h"
 #include "gpopt/base/COptimizationContext.h"
@@ -30,7 +31,7 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CGroupProxy::CGroupProxy(CGroup *pgroup) : m_pgroup(pgroup)
+CGroupProxy::CGroupProxy(gpos::pointer<CGroup *> pgroup) : m_pgroup(pgroup)
 {
 	GPOS_ASSERT(nullptr != pgroup);
 }
@@ -128,7 +129,7 @@ CGroupProxy::InitStats(IStatistics *stats)
 //
 //---------------------------------------------------------------------------
 CGroupExpression *
-CGroupProxy::PgexprNext(CGroupExpression *pgexpr)
+CGroupProxy::PgexprNext(gpos::pointer<CGroupExpression *> pgexpr)
 {
 	GPOS_ASSERT(nullptr != pgexpr);
 	return m_pgroup->PgexprNext(pgexpr);
@@ -183,7 +184,7 @@ CGroupProxy::PgexprSkip(CGroupExpression *pgexprStart, BOOL fSkipLogical)
 //
 //---------------------------------------------------------------------------
 CGroupExpression *
-CGroupProxy::PgexprSkipLogical(CGroupExpression *pgexpr)
+CGroupProxy::PgexprSkipLogical(gpos::pointer<CGroupExpression *> pgexpr)
 {
 	if (nullptr == pgexpr)
 	{
@@ -204,7 +205,7 @@ CGroupProxy::PgexprSkipLogical(CGroupExpression *pgexpr)
 //
 //---------------------------------------------------------------------------
 CGroupExpression *
-CGroupProxy::PgexprNextLogical(CGroupExpression *pgexpr)
+CGroupProxy::PgexprNextLogical(gpos::pointer<CGroupExpression *> pgexpr)
 {
 	GPOS_ASSERT(!m_pgroup->FScalar());
 

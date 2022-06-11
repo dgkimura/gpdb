@@ -70,10 +70,11 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 void
-CSubqueryHandler::AssertValidArguments(CMemoryPool *mp, CExpression *pexprOuter,
-									   CExpression *pexprScalar,
-									   CExpression **ppexprNewOuter,
-									   CExpression **ppexprResidualScalar)
+CSubqueryHandler::AssertValidArguments(
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexprOuter,
+	gpos::pointer<CExpression *> pexprScalar,
+	gpos::pointer<CExpression *> *ppexprNewOuter,
+	gpos::pointer<CExpression *> *ppexprResidualScalar)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexprOuter);
@@ -96,7 +97,8 @@ CSubqueryHandler::AssertValidArguments(CMemoryPool *mp, CExpression *pexprOuter,
 //
 //---------------------------------------------------------------------------
 gpos::owner<CExpression *>
-CSubqueryHandler::PexprReplace(CMemoryPool *mp, CExpression *pexprInput,
+CSubqueryHandler::PexprReplace(CMemoryPool *mp,
+							   gpos::pointer<CExpression *> pexprInput,
 							   CColRef *colref,
 							   gpos::pointer<CExpression *> pexprScalar)
 {
@@ -105,7 +107,7 @@ CSubqueryHandler::PexprReplace(CMemoryPool *mp, CExpression *pexprInput,
 
 	COperator *pop = pexprInput->Pop();
 	if (pop->Eopid() == CScalar::EopScalarIdent &&
-		CScalarIdent::PopConvert(pop)->Pcr() == colref)
+		gpos::dyn_cast<CScalarIdent>(pop)->Pcr() == colref)
 	{
 		GPOS_ASSERT(nullptr != pexprScalar);
 		GPOS_ASSERT(pexprScalar->Pop()->FScalar());
@@ -121,13 +123,13 @@ CSubqueryHandler::PexprReplace(CMemoryPool *mp, CExpression *pexprInput,
 	const ULONG arity = pexprInput->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprChild =
+		gpos::owner<CExpression *> pexprChild =
 			PexprReplace(mp, (*pexprInput)[ul], colref, pexprScalar);
 		pdrgpexpr->Append(pexprChild);
 	}
 
 	pop->AddRef();
-	return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
+	return GPOS_NEW(mp) CExpression(mp, pop, std::move(pdrgpexpr));
 }
 
 //---------------------------------------------------------------------------
@@ -179,15 +181,15 @@ CSubqueryHandler::PexprReplace(CMemoryPool *mp, CExpression *pexprInput,
 //		pexprOuter.
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CSubqueryHandler::PexprSubqueryPred(CExpression *pexprOuter,
-									CExpression *pexprSubquery,
+									gpos::pointer<CExpression *> pexprSubquery,
 									CExpression **ppexprResult,
 									CSubqueryHandler::ESubqueryCtxt esqctxt)
 {
 	GPOS_ASSERT(CUtils::FQuantifiedSubquery(pexprSubquery->Pop()));
 
-	CExpression *pexprNewScalar = nullptr;
+	gpos::owner<CExpression *> pexprNewScalar = nullptr;
 	CExpression *pexprNewLogical = nullptr;
 
 	CExpression *pexprScalarChild = (*pexprSubquery)[1];
@@ -230,16 +232,16 @@ CSubqueryHandler::PexprSubqueryPred(CExpression *pexprOuter,
 
 	GPOS_ASSERT(nullptr != pexprNewScalar);
 
-	CScalarSubqueryQuantified *popSqQuantified =
-		CScalarSubqueryQuantified::PopConvert(pexprSubquery->Pop());
+	gpos::pointer<CScalarSubqueryQuantified *> popSqQuantified =
+		gpos::dyn_cast<CScalarSubqueryQuantified>(pexprSubquery->Pop());
 
 	const CColRef *colref = popSqQuantified->Pcr();
 	IMDId *mdid_op = popSqQuantified->MdIdOp();
 	const CWStringConst *str = popSqQuantified->PstrOp();
 
 	mdid_op->AddRef();
-	CExpression *pexprPredicate =
-		CUtils::PexprScalarCmp(m_mp, pexprNewScalar, colref, *str, mdid_op);
+	gpos::owner<CExpression *> pexprPredicate = CUtils::PexprScalarCmp(
+		m_mp, std::move(pexprNewScalar), colref, *str, mdid_op);
 
 	return pexprPredicate;
 }
@@ -268,8 +270,8 @@ CSubqueryHandler::FProjectCountSubquery(
 	GPOS_ASSERT(colref == pcrCount);
 #endif	// GPOS_DEBUG
 
-	CScalarSubquery *popScalarSubquery =
-		CScalarSubquery::PopConvert(pexprSubquery->Pop());
+	gpos::pointer<CScalarSubquery *> popScalarSubquery =
+		gpos::dyn_cast<CScalarSubquery>(pexprSubquery->Pop());
 	const CColRef *pcrSubquery = popScalarSubquery->Pcr();
 
 	if (pcrCount == pcrSubquery)
@@ -278,9 +280,9 @@ CSubqueryHandler::FProjectCountSubquery(
 		return false;
 	}
 
-	CExpression *pexprPrj = (*pexprSubquery)[0];
-	CExpression *pexprPrjChild = (*pexprPrj)[0];
-	CExpression *pexprPrjList = (*pexprPrj)[1];
+	gpos::pointer<CExpression *> pexprPrj = (*pexprSubquery)[0];
+	gpos::pointer<CExpression *> pexprPrjChild = (*pexprPrj)[0];
+	gpos::pointer<CExpression *> pexprPrjList = (*pexprPrj)[1];
 
 	if (COperator::EopLogicalGbAgg != pexprPrjChild->Pop()->Eopid() ||
 		pexprPrjList->DeriveHasNonScalarFunction() ||
@@ -291,14 +293,15 @@ CSubqueryHandler::FProjectCountSubquery(
 		return false;
 	}
 
-	CColRefSet *pcrsOutput = pexprPrjChild->DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrsOutput =
+		pexprPrjChild->DeriveOutputColumns();
 	if (1 < pcrsOutput->Size())
 	{
 		// fail if GbAgg has more than one output column
 		return false;
 	}
 
-	CColRefSet *pcrsUsed = pexprPrjList->DeriveUsedColumns();
+	gpos::pointer<CColRefSet *> pcrsUsed = pexprPrjList->DeriveUsedColumns();
 	BOOL fPrjUsesCount = (0 == pcrsUsed->Size()) ||
 						 (1 == pcrsUsed->Size() && pcrsUsed->FMember(pcrCount));
 	if (!fPrjUsesCount)
@@ -340,18 +343,22 @@ CSubqueryHandler::SSubqueryDesc::SetCorrelatedExecution()
 //
 //---------------------------------------------------------------------------
 CSubqueryHandler::SSubqueryDesc *
-CSubqueryHandler::Psd(CMemoryPool *mp, CExpression *pexprSubquery,
-					  CExpression *pexprOuter, const CColRef *pcrSubquery,
-					  ESubqueryCtxt esqctxt)
+CSubqueryHandler::Psd(CMemoryPool *mp,
+					  gpos::pointer<CExpression *> pexprSubquery,
+					  gpos::pointer<CExpression *> pexprOuter,
+					  const CColRef *pcrSubquery, ESubqueryCtxt esqctxt)
 {
 	GPOS_ASSERT(nullptr != pexprSubquery);
 	GPOS_ASSERT(CUtils::FSubquery(pexprSubquery->Pop()));
 	GPOS_ASSERT(nullptr != pexprOuter);
 
-	CExpression *pexprInner = (*pexprSubquery)[0];
-	CColRefSet *subqueryOutputCols = (*pexprSubquery)[0]->DeriveOutputColumns();
-	CColRefSet *outer_refs = (*pexprSubquery)[0]->DeriveOuterReferences();
-	CColRefSet *pcrsOuterOutput = pexprOuter->DeriveOutputColumns();
+	gpos::pointer<CExpression *> pexprInner = (*pexprSubquery)[0];
+	gpos::pointer<CColRefSet *> subqueryOutputCols =
+		(*pexprSubquery)[0]->DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> outer_refs =
+		(*pexprSubquery)[0]->DeriveOuterReferences();
+	gpos::pointer<CColRefSet *> pcrsOuterOutput =
+		pexprOuter->DeriveOutputColumns();
 
 	SSubqueryDesc *psd = GPOS_NEW(mp) SSubqueryDesc();
 	psd->m_returns_set = (1 < pexprInner->DeriveMaxCard().Ull());
@@ -403,11 +410,10 @@ CSubqueryHandler::Psd(CMemoryPool *mp, CExpression *pexprSubquery,
 //
 //---------------------------------------------------------------------------
 BOOL
-CSubqueryHandler::FRemoveScalarSubquery(CExpression *pexprOuter,
-										CExpression *pexprSubquery,
-										ESubqueryCtxt esqctxt,
-										CExpression **ppexprNewOuter,
-										CExpression **ppexprResidualScalar)
+CSubqueryHandler::FRemoveScalarSubquery(
+	CExpression *pexprOuter, gpos::pointer<CExpression *> pexprSubquery,
+	ESubqueryCtxt esqctxt, gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 	CMemoryPool *pmp = m_mp;
 
@@ -416,8 +422,8 @@ CSubqueryHandler::FRemoveScalarSubquery(CExpression *pexprOuter,
 						 ppexprResidualScalar);
 #endif	// GPOS_DEBUG
 
-	CScalarSubquery *popScalarSubquery =
-		CScalarSubquery::PopConvert(pexprSubquery->Pop());
+	gpos::pointer<CScalarSubquery *> popScalarSubquery =
+		gpos::dyn_cast<CScalarSubquery>(pexprSubquery->Pop());
 	const CColRef *pcrSubquery = popScalarSubquery->Pcr();
 
 	SSubqueryDesc *psd =
@@ -447,8 +453,8 @@ CSubqueryHandler::FRemoveScalarSubquery(CExpression *pexprOuter,
 		// we then pull the Project node below subquery to be above the LOA expression
 
 		// create a new subquery to compute count(*) agg
-		CExpression *pexprPrj = (*pexprSubquery)[0];
-		CExpression *pexprPrjList = (*pexprPrj)[1];
+		gpos::pointer<CExpression *> pexprPrj = (*pexprSubquery)[0];
+		gpos::pointer<CExpression *> pexprPrjList = (*pexprPrj)[1];
 		CExpression *pexprGbAgg = (*pexprPrj)[0];
 		GPOS_ASSERT(COperator::EopLogicalGbAgg == pexprGbAgg->Pop()->Eopid());
 
@@ -462,7 +468,7 @@ CSubqueryHandler::FRemoveScalarSubquery(CExpression *pexprOuter,
 
 		// unnest new subquery
 		GPOS_DELETE(psd);
-		CExpression *pexprNewOuter = nullptr;
+		gpos::owner<CExpression *> pexprNewOuter = nullptr;
 		gpos::owner<CExpression *> pexprResidualScalar = nullptr;
 		psd = Psd(m_mp, pexprNewSubq, pexprOuter, popInnerSubq->Pcr(), esqctxt);
 		fSuccess = FRemoveScalarSubqueryInternal(
@@ -473,7 +479,7 @@ CSubqueryHandler::FRemoveScalarSubquery(CExpression *pexprOuter,
 		{
 			// unnesting succeeded -- replace all occurrences of count(*) column in project list with residual expression
 			pexprPrj->Pop()->AddRef();
-			CExpression *pexprPrjListNew = PexprReplace(
+			gpos::owner<CExpression *> pexprPrjListNew = PexprReplace(
 				m_mp, pexprPrjList, psd->m_pcrCountAgg, pexprResidualScalar);
 			*ppexprNewOuter = GPOS_NEW(m_mp) CExpression(
 				m_mp, pexprPrj->Pop(), pexprNewOuter, pexprPrjListNew);
@@ -504,14 +510,16 @@ CSubqueryHandler::FRemoveScalarSubquery(CExpression *pexprOuter,
 //---------------------------------------------------------------------------
 BOOL
 CSubqueryHandler::FGenerateCorrelatedApplyForScalarSubquery(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprSubquery,
+	CMemoryPool *mp, CExpression *pexprOuter,
+	gpos::pointer<CExpression *> pexprSubquery,
 	ESubqueryCtxt
 #ifdef GPOS_DEBUG
 		esqctxt
 #endif	// GPOS_DEBUG
 	,
 	CSubqueryHandler::SSubqueryDesc *psd, BOOL fEnforceCorrelatedApply,
-	CExpression **ppexprNewOuter, CExpression **ppexprResidualScalar)
+	gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 #ifdef GPOS_DEBUG
 	AssertValidArguments(mp, pexprOuter, pexprSubquery, ppexprNewOuter,
@@ -520,8 +528,8 @@ CSubqueryHandler::FGenerateCorrelatedApplyForScalarSubquery(
 	GPOS_ASSERT(nullptr != psd);
 	GPOS_ASSERT(psd->m_fCorrelatedExecution || fEnforceCorrelatedApply);
 
-	CScalarSubquery *popScalarSubquery =
-		CScalarSubquery::PopConvert(pexprSubquery->Pop());
+	gpos::pointer<CScalarSubquery *> popScalarSubquery =
+		gpos::dyn_cast<CScalarSubquery>(pexprSubquery->Pop());
 	const CColRef *colref = popScalarSubquery->Pcr();
 	COperator::EOperatorId eopidSubq = popScalarSubquery->Eopid();
 
@@ -606,10 +614,11 @@ CSubqueryHandler::FGenerateCorrelatedApplyForScalarSubquery(
 //---------------------------------------------------------------------------
 BOOL
 CSubqueryHandler::FRemoveScalarSubqueryInternal(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprSubquery,
-	ESubqueryCtxt esqctxt, CSubqueryHandler::SSubqueryDesc *psd,
-	BOOL fEnforceCorrelatedApply, CExpression **ppexprNewOuter,
-	CExpression **ppexprResidualScalar)
+	CMemoryPool *mp, gpos::owner<CExpression *> pexprOuter,
+	gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
+	CSubqueryHandler::SSubqueryDesc *psd, BOOL fEnforceCorrelatedApply,
+	gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 #ifdef GPOS_DEBUG
 	AssertValidArguments(mp, pexprOuter, pexprSubquery, ppexprNewOuter,
@@ -624,8 +633,8 @@ CSubqueryHandler::FRemoveScalarSubqueryInternal(
 			fEnforceCorrelatedApply, ppexprNewOuter, ppexprResidualScalar);
 	}
 
-	CScalarSubquery *popScalarSubquery =
-		CScalarSubquery::PopConvert(pexprSubquery->Pop());
+	gpos::pointer<CScalarSubquery *> popScalarSubquery =
+		gpos::dyn_cast<CScalarSubquery>(pexprSubquery->Pop());
 	const CColRef *colref = popScalarSubquery->Pcr();
 
 	gpos::owner<CExpression *> pexprInner = (*pexprSubquery)[0];
@@ -649,7 +658,8 @@ CSubqueryHandler::FRemoveScalarSubqueryInternal(
 	GPOS_ASSERT(EsqctxtFilter == esqctxt);
 
 	*ppexprNewOuter = CUtils::PexprLogicalApply<CLogicalInnerApply>(
-		mp, pexprOuter, pexprInner, colref, pexprSubquery->Pop()->Eopid());
+		mp, std::move(pexprOuter), pexprInner, colref,
+		pexprSubquery->Pop()->Eopid());
 	*ppexprResidualScalar = CUtils::PexprScalarIdent(mp, colref);
 
 	return fSuccess;
@@ -675,14 +685,15 @@ CSubqueryHandler::FRemoveScalarSubqueryInternal(
 //		that handles the outer column in CSubqueryHandler::PexprScalarIf.
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CSubqueryHandler::PexprInnerSelect(CMemoryPool *mp, const CColRef *pcrInner,
 								   CExpression *pexprInner,
 								   CExpression *pexprPredicate,
 								   BOOL *useNotNullableInnerOpt)
 {
 	gpos::owner<CExpression *> predToUse = nullptr;
-	CScalarCmp *pscalarCmp = CScalarCmp::PopConvert(pexprPredicate->Pop());
+	gpos::pointer<CScalarCmp *> pscalarCmp =
+		gpos::dyn_cast<CScalarCmp>(pexprPredicate->Pop());
 	BOOL innerIsNullable =
 		!pexprInner->DeriveNotNullColumns()->FMember(pcrInner);
 
@@ -708,7 +719,7 @@ CSubqueryHandler::PexprInnerSelect(CMemoryPool *mp, const CColRef *pcrInner,
 
 	pexprInner->AddRef();
 
-	return CUtils::PexprLogicalSelect(mp, pexprInner, predToUse);
+	return CUtils::PexprLogicalSelect(mp, pexprInner, std::move(predToUse));
 }
 
 
@@ -723,17 +734,18 @@ CSubqueryHandler::PexprInnerSelect(CMemoryPool *mp, const CColRef *pcrInner,
 BOOL
 CSubqueryHandler::FCreateOuterApplyForScalarSubquery(
 	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-	CExpression *pexprSubquery,
+	gpos::pointer<CExpression *> pexprSubquery,
 	BOOL,  // fOuterRefsUnderInner
-	CExpression **ppexprNewOuter, CExpression **ppexprResidualScalar)
+	gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
-	CScalarSubquery *popSubquery =
-		CScalarSubquery::PopConvert(pexprSubquery->Pop());
+	gpos::pointer<CScalarSubquery *> popSubquery =
+		gpos::dyn_cast<CScalarSubquery>(pexprSubquery->Pop());
 	const CColRef *colref = popSubquery->Pcr();
 	BOOL fSuccess = true;
 
 	// generate an outer apply between outer expression and the relational child of scalar subquery
-	CExpression *pexprLeftOuterApply =
+	gpos::owner<CExpression *> pexprLeftOuterApply =
 		CUtils::PexprLogicalApply<CLogicalLeftOuterApply>(
 			mp, pexprOuter, pexprInner, colref, popSubquery->Eopid());
 
@@ -750,10 +762,11 @@ CSubqueryHandler::FCreateOuterApplyForScalarSubquery(
 	}
 
 	// add projection for subquery column
-	CExpression *pexprPrj = CUtils::PexprAddProjection(
+	gpos::owner<CExpression *> pexprPrj = CUtils::PexprAddProjection(
 		mp, pexprLeftOuterApply, CUtils::PexprScalarIdent(mp, colref));
 	const CColRef *pcrComputed =
-		CScalarProjectElement::PopConvert((*(*pexprPrj)[1])[0]->Pop())->Pcr();
+		gpos::dyn_cast<CScalarProjectElement>((*(*pexprPrj)[1])[0]->Pop())
+			->Pcr();
 	*ppexprNewOuter = pexprPrj;
 
 	BOOL fGeneratedByQuantified = popSubquery->FGeneratedByQuantified();
@@ -812,10 +825,12 @@ CSubqueryHandler::FCreateOuterApplyForScalarSubquery(
 //---------------------------------------------------------------------------
 BOOL
 CSubqueryHandler::FCreateGrpCols(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-	BOOL fExistential, BOOL fOuterRefsUnderInner,
-	CColRefArray **ppdrgpcr,  // output: constructed grouping columns
-	BOOL *pfGbOnInner		  // output: is Gb created on inner expression
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexprOuter,
+	gpos::pointer<CExpression *> pexprInner, BOOL fExistential,
+	BOOL fOuterRefsUnderInner,
+	gpos::owner<CColRefArray *>
+		*ppdrgpcr,	   // output: constructed grouping columns
+	BOOL *pfGbOnInner  // output: is Gb created on inner expression
 )
 {
 	GPOS_ASSERT(nullptr != pexprOuter);
@@ -823,12 +838,14 @@ CSubqueryHandler::FCreateGrpCols(
 	GPOS_ASSERT(nullptr != ppdrgpcr);
 	GPOS_ASSERT(nullptr != pfGbOnInner);
 
-	CColRefSet *pcrsOuterOutput = pexprOuter->DeriveOutputColumns();
-	CColRefSet *pcrsInnerOutput = pexprInner->DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrsOuterOutput =
+		pexprOuter->DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrsInnerOutput =
+		pexprInner->DeriveOutputColumns();
 	gpos::owner<CColRefSet *> pcrsUsedOuter = GPOS_NEW(mp) CColRefSet(mp);
 
 	BOOL fGbOnInner = false;
-	CExpression *pexprScalar = nullptr;
+	gpos::pointer<CExpression *> pexprScalar = nullptr;
 
 	// remove any columns that are not referenced in the query from pcrsOuterOutput
 	CColRefSetIter it(*pcrsOuterOutput);
@@ -852,10 +869,10 @@ CSubqueryHandler::FCreateGrpCols(
 															   pcrsInnerOutput);
 	}
 
-	CColRefArray *colref_array = nullptr;
+	gpos::owner<CColRefArray *> colref_array = nullptr;
 	if (fGbOnInner)
 	{
-		CColRefSet *pcrsUsed = pexprScalar->DeriveUsedColumns();
+		gpos::pointer<CColRefSet *> pcrsUsed = pexprScalar->DeriveUsedColumns();
 		gpos::owner<CColRefSet *> pcrsGb = GPOS_NEW(mp) CColRefSet(mp);
 		pcrsGb->Include(pcrsUsed);
 		pcrsGb->Difference(pcrsUsedOuter);
@@ -873,7 +890,7 @@ CSubqueryHandler::FCreateGrpCols(
 			return false;
 		}
 
-		CColRefArray *pdrgpcrSystemCols =
+		gpos::pointer<CColRefArray *> pdrgpcrSystemCols =
 			COptCtxt::PoctxtFromTLS()->PdrgpcrSystemCols();
 		if (nullptr != pdrgpcrSystemCols && 0 < pdrgpcrSystemCols->Size())
 		{
@@ -928,9 +945,9 @@ CSubqueryHandler::FCreateGrpCols(
 //		For quantified subqueries, return the newly generated colrefs for
 //		the count and sum aggregates.
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CSubqueryHandler::CreateGroupByNode(CMemoryPool *mp, CExpression *pexprChild,
-									CColRefArray *colref_array,
+									gpos::owner<CColRefArray *> colref_array,
 									BOOL fExistential, CColRef *colref,
 									CExpression *pexprPredicate,
 									CColRef **pcrCount, CColRef **pcrSum)
@@ -940,7 +957,7 @@ CSubqueryHandler::CreateGroupByNode(CMemoryPool *mp, CExpression *pexprChild,
 	GPOS_ASSERT(nullptr != colref);
 	// create project list of group by expression
 	gpos::owner<CExpression *> pexprPrjList = nullptr;
-	CExpression *pexprNewChild = pexprChild;
+	gpos::owner<CExpression *> pexprNewChild = pexprChild;
 	if (fExistential)
 	{
 		// add the new column introduced by project node as a groupby column,
@@ -956,32 +973,34 @@ CSubqueryHandler::CreateGroupByNode(CMemoryPool *mp, CExpression *pexprChild,
 		CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-		CExpression *pexprCount =
+		gpos::owner<CExpression *> pexprCount =
 			CUtils::PexprCount(mp, colref, false /* is_distinct */);
-		CScalarAggFunc *popCount =
-			CScalarAggFunc::PopConvert(pexprCount->Pop());
+		gpos::pointer<CScalarAggFunc *> popCount =
+			gpos::dyn_cast<CScalarAggFunc>(pexprCount->Pop());
 		gpos::pointer<const IMDType *> pmdtypeCount =
 			md_accessor->RetrieveType(popCount->MdidType());
 		*pcrCount =
 			col_factory->PcrCreate(pmdtypeCount, popCount->TypeModifier());
-		CExpression *pexprPrjElemCount =
+		gpos::owner<CExpression *> pexprPrjElemCount =
 			CUtils::PexprScalarProjectElement(mp, *pcrCount, pexprCount);
 
 		pexprPredicate->AddRef();
-		CExpression *sumExpr =
+		gpos::owner<CExpression *> sumExpr =
 			CXformUtils::PexprNullIndicator(mp, pexprPredicate);
 		// now make a project for sumExpr so we get a colref
 		pexprNewChild = CUtils::PexprAddProjection(mp, pexprChild, sumExpr);
-		CExpression *pexprPrjListForSum = (*pexprNewChild)[1];
-		CColRef *colrefForSum =
-			CScalarProjectElement::PopConvert((*pexprPrjListForSum)[0]->Pop())
-				->Pcr();
-		CExpression *pexprSum = CUtils::PexprSum(mp, colrefForSum);
-		CScalarAggFunc *popSum = CScalarAggFunc::PopConvert(pexprSum->Pop());
+		gpos::pointer<CExpression *> pexprPrjListForSum = (*pexprNewChild)[1];
+		CColRef *colrefForSum = gpos::dyn_cast<CScalarProjectElement>(
+									(*pexprPrjListForSum)[0]->Pop())
+									->Pcr();
+		gpos::owner<CExpression *> pexprSum =
+			CUtils::PexprSum(mp, colrefForSum);
+		gpos::pointer<CScalarAggFunc *> popSum =
+			gpos::dyn_cast<CScalarAggFunc>(pexprSum->Pop());
 		gpos::pointer<const IMDType *> pmdtypeSum =
 			md_accessor->RetrieveType(popSum->MdidType());
 		*pcrSum = col_factory->PcrCreate(pmdtypeSum, popSum->TypeModifier());
-		CExpression *pexprPrjElemSum =
+		gpos::owner<CExpression *> pexprPrjElemSum =
 			CUtils::PexprScalarProjectElement(mp, *pcrSum, pexprSum);
 
 		pexprPrjList =
@@ -991,9 +1010,9 @@ CSubqueryHandler::CreateGroupByNode(CMemoryPool *mp, CExpression *pexprChild,
 
 	gpos::owner<CExpression *> pexprGb = GPOS_NEW(mp) CExpression(
 		mp,
-		GPOS_NEW(mp) CLogicalGbAgg(mp, colref_array,
+		GPOS_NEW(mp) CLogicalGbAgg(mp, std::move(colref_array),
 								   COperator::EgbaggtypeGlobal /*egbaggtype*/),
-		pexprNewChild, pexprPrjList);
+		std::move(pexprNewChild), std::move(pexprPrjList));
 	return pexprGb;
 }
 
@@ -1096,9 +1115,10 @@ CSubqueryHandler::CreateGroupByNode(CMemoryPool *mp, CExpression *pexprChild,
 BOOL
 CSubqueryHandler::FCreateOuterApplyForExistOrQuant(
 	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-	CExpression *pexprSubquery, CExpression *pexprPredicate,
-	BOOL fOuterRefsUnderInner, CExpression **ppexprNewOuter,
-	CExpression **ppexprResidualScalar, BOOL useNotNullableInnerOpt)
+	gpos::pointer<CExpression *> pexprSubquery, CExpression *pexprPredicate,
+	BOOL fOuterRefsUnderInner, gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar,
+	BOOL useNotNullableInnerOpt)
 {
 	BOOL fExistential = CUtils::FExistentialSubquery(pexprSubquery->Pop());
 
@@ -1117,9 +1137,9 @@ CSubqueryHandler::FCreateOuterApplyForExistOrQuant(
 	CExpression *pexprPrjInner = nullptr;
 
 	AddProjectNode(mp, pexprInner, &pexprPrjInner);
-	CExpression *pexprPrjList = (*pexprPrjInner)[1];
+	gpos::pointer<CExpression *> pexprPrjList = (*pexprPrjInner)[1];
 	CColRef *colref =
-		CScalarProjectElement::PopConvert((*pexprPrjList)[0]->Pop())->Pcr();
+		gpos::dyn_cast<CScalarProjectElement>((*pexprPrjList)[0]->Pop())->Pcr();
 	const CColRef *pcrSubquery = colref;
 
 
@@ -1129,7 +1149,8 @@ CSubqueryHandler::FCreateOuterApplyForExistOrQuant(
 		// the actual comparison, but we'll pass just <inner col> to the apply as the inner
 		// colref
 		pcrSubquery =
-			CScalarSubqueryQuantified::PopConvert(pexprSubquery->Pop())->Pcr();
+			gpos::dyn_cast<CScalarSubqueryQuantified>(pexprSubquery->Pop())
+				->Pcr();
 	}
 
 	CColRef *pcrCount = nullptr;
@@ -1137,7 +1158,7 @@ CSubqueryHandler::FCreateOuterApplyForExistOrQuant(
 
 	if (fGbOnInner)
 	{
-		CExpression *pexprGb = CreateGroupByNode(
+		gpos::owner<CExpression *> pexprGb = CreateGroupByNode(
 			mp,
 			pexprPrjInner,	// child on which to create the project
 			colref_array,	// group by cols
@@ -1154,9 +1175,10 @@ CSubqueryHandler::FCreateOuterApplyForExistOrQuant(
 	else
 	{
 		// generate an outer apply between outer expression and the new project expression
-		CExpression *result = CUtils::PexprLogicalApply<CLogicalLeftOuterApply>(
-			mp, pexprOuter, pexprPrjInner, pcrSubquery,
-			COperator::EopScalarSubquery);
+		gpos::owner<CExpression *> result =
+			CUtils::PexprLogicalApply<CLogicalLeftOuterApply>(
+				mp, pexprOuter, pexprPrjInner, pcrSubquery,
+				COperator::EopScalarSubquery);
 
 		*ppexprNewOuter =
 			CreateGroupByNode(mp, result, colref_array, fExistential, colref,
@@ -1182,11 +1204,12 @@ CSubqueryHandler::FCreateOuterApplyForExistOrQuant(
 BOOL
 CSubqueryHandler::FCreateOuterApply(
 	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-	CExpression *pexprSubquery, CExpression *pexprPredicate,
-	BOOL fOuterRefsUnderInner, CExpression **ppexprNewOuter,
-	CExpression **ppexprResidualScalar, BOOL useNotNullableInnerOpt)
+	gpos::pointer<CExpression *> pexprSubquery, CExpression *pexprPredicate,
+	BOOL fOuterRefsUnderInner, gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar,
+	BOOL useNotNullableInnerOpt)
 {
-	COperator *popSubquery = pexprSubquery->Pop();
+	gpos::pointer<COperator *> popSubquery = pexprSubquery->Pop();
 	BOOL fExistential = CUtils::FExistentialSubquery(popSubquery);
 	BOOL fQuantified = CUtils::FQuantifiedSubquery(popSubquery);
 
@@ -1214,9 +1237,10 @@ CSubqueryHandler::FCreateOuterApply(
 //---------------------------------------------------------------------------
 BOOL
 CSubqueryHandler::FCreateCorrelatedApplyForQuantifiedSubquery(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprSubquery,
-	ESubqueryCtxt esqctxt, CExpression **ppexprNewOuter,
-	CExpression **ppexprResidualScalar)
+	CMemoryPool *mp, gpos::owner<CExpression *> pexprOuter,
+	gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
+	gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 	COperator::EOperatorId eopidSubq = pexprSubquery->Pop()->Eopid();
 	GPOS_ASSERT(COperator::EopScalarSubqueryAny == eopidSubq ||
@@ -1224,8 +1248,8 @@ CSubqueryHandler::FCreateCorrelatedApplyForQuantifiedSubquery(
 
 	// get the logical child of subquery
 	CExpression *pexprInner = (*pexprSubquery)[0];
-	CScalarSubqueryQuantified *popSubquery =
-		CScalarSubqueryQuantified::PopConvert(pexprSubquery->Pop());
+	gpos::pointer<CScalarSubqueryQuantified *> popSubquery =
+		gpos::dyn_cast<CScalarSubqueryQuantified>(pexprSubquery->Pop());
 	CColRef *colref = const_cast<CColRef *>(popSubquery->Pcr());
 
 	// If subq is SubqueryAll and scalar child is a subquery then it must be
@@ -1253,9 +1277,9 @@ CSubqueryHandler::FCreateCorrelatedApplyForQuantifiedSubquery(
 	}
 
 	// build subquery quantified comparison
-	CExpression *pexprResult = nullptr;
+	gpos::owner<CExpression *> pexprResult = nullptr;
 	CSubqueryHandler sh(mp, true /* fEnforceCorrelatedApply */);
-	CExpression *pexprPredicate =
+	gpos::owner<CExpression *> pexprPredicate =
 		sh.PexprSubqueryPred(pexprInner, pexprSubquery, &pexprResult, esqctxt);
 
 	pexprInner->AddRef();
@@ -1283,9 +1307,11 @@ CSubqueryHandler::FCreateCorrelatedApplyForQuantifiedSubquery(
 
 	// subquery occurs in a value context or disjunction, we need to create an outer apply expression
 	// add a project node with constant true to be used as subplan place holder
-	CExpression *pexprProjectConstTrue = CUtils::PexprAddProjection(
-		mp, pexprResult, CUtils::PexprScalarConstBool(mp, true /*value*/));
-	CColRef *pcrBool = CScalarProjectElement::PopConvert(
+	gpos::owner<CExpression *> pexprProjectConstTrue =
+		CUtils::PexprAddProjection(
+			mp, std::move(pexprResult),
+			CUtils::PexprScalarConstBool(mp, true /*value*/));
+	CColRef *pcrBool = gpos::dyn_cast<CScalarProjectElement>(
 						   (*(*pexprProjectConstTrue)[1])[0]->Pop())
 						   ->Pcr();
 
@@ -1296,8 +1322,8 @@ CSubqueryHandler::FCreateCorrelatedApplyForQuantifiedSubquery(
 
 	*ppexprNewOuter =
 		CUtils::PexprLogicalApply<CLogicalLeftOuterCorrelatedApply>(
-			mp, pexprOuter, pexprProjectConstTrue, pdrgpcrInner, eopidSubq,
-			pexprPredicate);
+			mp, std::move(pexprOuter), std::move(pexprProjectConstTrue),
+			std::move(pdrgpcrInner), eopidSubq, pexprPredicate);
 
 	// we replace existential subquery with the boolean column we created,
 	// Expr2DXL translator replaces this column with a subplan node
@@ -1318,16 +1344,17 @@ CSubqueryHandler::FCreateCorrelatedApplyForQuantifiedSubquery(
 //---------------------------------------------------------------------------
 BOOL
 CSubqueryHandler::FCreateCorrelatedApplyForExistentialSubquery(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprSubquery,
-	ESubqueryCtxt esqctxt, CExpression **ppexprNewOuter,
-	CExpression **ppexprResidualScalar)
+	CMemoryPool *mp, gpos::owner<CExpression *> pexprOuter,
+	gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
+	gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 	COperator::EOperatorId eopidSubq = pexprSubquery->Pop()->Eopid();
 	GPOS_ASSERT(COperator::EopScalarSubqueryExists == eopidSubq ||
 				COperator::EopScalarSubqueryNotExists == eopidSubq);
 
 	// get the logical child of subquery
-	CExpression *pexprInner = (*pexprSubquery)[0];
+	gpos::owner<CExpression *> pexprInner = (*pexprSubquery)[0];
 
 	// for existential subqueries, any column produced by inner expression
 	// can be used to check for empty answers; we use first column for that
@@ -1339,7 +1366,8 @@ CSubqueryHandler::FCreateCorrelatedApplyForExistentialSubquery(
 		// we can use correlated semi/anti-semi apply here since the subquery is used in filtering context
 		if (COperator::EopScalarSubqueryExists == eopidSubq)
 		{
-			CColRefSet *outer_refs = pexprInner->DeriveOuterReferences();
+			gpos::pointer<CColRefSet *> outer_refs =
+				pexprInner->DeriveOuterReferences();
 			if (0 == outer_refs->Size())
 			{
 				// add a limit operator on top of the inner child if the subquery does not have
@@ -1366,9 +1394,10 @@ CSubqueryHandler::FCreateCorrelatedApplyForExistentialSubquery(
 
 	// subquery occurs in a value context or disjunction, we need to create an outer apply expression
 	// add a project node with constant true to be used as subplan place holder
-	CExpression *pexprProjectConstTrue = CUtils::PexprAddProjection(
-		mp, pexprInner, CUtils::PexprScalarConstBool(mp, true /*value*/));
-	CColRef *pcrBool = CScalarProjectElement::PopConvert(
+	gpos::owner<CExpression *> pexprProjectConstTrue =
+		CUtils::PexprAddProjection(
+			mp, pexprInner, CUtils::PexprScalarConstBool(mp, true /*value*/));
+	CColRef *pcrBool = gpos::dyn_cast<CScalarProjectElement>(
 						   (*(*pexprProjectConstTrue)[1])[0]->Pop())
 						   ->Pcr();
 
@@ -1379,7 +1408,8 @@ CSubqueryHandler::FCreateCorrelatedApplyForExistentialSubquery(
 
 	*ppexprNewOuter =
 		CUtils::PexprLogicalApply<CLogicalLeftOuterCorrelatedApply>(
-			mp, pexprOuter, pexprProjectConstTrue, pdrgpcrInner, eopidSubq);
+			mp, std::move(pexprOuter), std::move(pexprProjectConstTrue),
+			std::move(pdrgpcrInner), eopidSubq);
 
 	// we replace existential subquery with the boolean column we created,
 	// Expr2DXL translator replaces this column with a subplan node
@@ -1400,9 +1430,10 @@ CSubqueryHandler::FCreateCorrelatedApplyForExistentialSubquery(
 //---------------------------------------------------------------------------
 BOOL
 CSubqueryHandler::FCreateCorrelatedApplyForExistOrQuant(
-	CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprSubquery,
-	ESubqueryCtxt esqctxt, CExpression **ppexprNewOuter,
-	CExpression **ppexprResidualScalar)
+	CMemoryPool *mp, gpos::owner<CExpression *> pexprOuter,
+	gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
+	gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 	BOOL fExistential = CUtils::FExistentialSubquery(pexprSubquery->Pop());
 #ifdef GPOS_DEBUG
@@ -1413,12 +1444,12 @@ CSubqueryHandler::FCreateCorrelatedApplyForExistOrQuant(
 	if (fExistential)
 	{
 		return FCreateCorrelatedApplyForExistentialSubquery(
-			mp, pexprOuter, pexprSubquery, esqctxt, ppexprNewOuter,
+			mp, std::move(pexprOuter), pexprSubquery, esqctxt, ppexprNewOuter,
 			ppexprResidualScalar);
 	}
 
 	return FCreateCorrelatedApplyForQuantifiedSubquery(
-		mp, pexprOuter, pexprSubquery, esqctxt, ppexprNewOuter,
+		mp, std::move(pexprOuter), pexprSubquery, esqctxt, ppexprNewOuter,
 		ppexprResidualScalar);
 }
 
@@ -1448,11 +1479,11 @@ CSubqueryHandler::FCreateCorrelatedApplyForExistOrQuant(
 //
 //---------------------------------------------------------------------------
 BOOL
-CSubqueryHandler::FRemoveAnySubquery(CExpression *pexprOuter,
-									 CExpression *pexprSubquery,
-									 ESubqueryCtxt esqctxt,
-									 CExpression **ppexprNewOuter,
-									 CExpression **ppexprResidualScalar)
+CSubqueryHandler::FRemoveAnySubquery(
+	gpos::owner<CExpression *> pexprOuter,
+	gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
+	gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 	CMemoryPool *mp = m_mp;
 
@@ -1461,13 +1492,13 @@ CSubqueryHandler::FRemoveAnySubquery(CExpression *pexprOuter,
 						 ppexprResidualScalar);
 #endif	// GPOS_DEBUG
 
-	CScalarSubqueryAny *pScalarSubqAny =
-		CScalarSubqueryAny::PopConvert(pexprSubquery->Pop());
+	gpos::pointer<CScalarSubqueryAny *> pScalarSubqAny =
+		gpos::dyn_cast<CScalarSubqueryAny>(pexprSubquery->Pop());
 
 	if (m_fEnforceCorrelatedApply)
 	{
 		return FCreateCorrelatedApplyForExistOrQuant(
-			mp, pexprOuter, pexprSubquery, esqctxt, ppexprNewOuter,
+			mp, std::move(pexprOuter), pexprSubquery, esqctxt, ppexprNewOuter,
 			ppexprResidualScalar);
 	}
 
@@ -1475,12 +1506,12 @@ CSubqueryHandler::FRemoveAnySubquery(CExpression *pexprOuter,
 	CExpression *pexprInner = (*pexprSubquery)[0];
 	BOOL fOuterRefsUnderInner = pexprInner->HasOuterRefs();
 	const CColRef *colref =
-		CScalarSubqueryAny::PopConvert(pexprSubquery->Pop())->Pcr();
+		gpos::dyn_cast<CScalarSubqueryAny>(pexprSubquery->Pop())->Pcr();
 	COperator::EOperatorId eopidSubq = pexprSubquery->Pop()->Eopid();
 
 	// build subquery quantified comparison
 	CExpression *pexprResult = nullptr;
-	CExpression *pexprPredicate =
+	gpos::owner<CExpression *> pexprPredicate =
 		PexprSubqueryPred(pexprInner, pexprSubquery, &pexprResult, esqctxt);
 
 	// generate a select for the quantified predicate
@@ -1493,7 +1524,7 @@ CSubqueryHandler::FRemoveAnySubquery(CExpression *pexprOuter,
 
 	if (EsqctxtValue == esqctxt)
 	{
-		CExpression *pexprNewSelect = PexprInnerSelect(
+		gpos::owner<CExpression *> pexprNewSelect = PexprInnerSelect(
 			mp, colref, pexprResult, pexprPredicate, &fUseNotNullableInnerOpt);
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 		gpos::pointer<const IMDScalarOp *> pmdOp =
@@ -1556,10 +1587,11 @@ CSubqueryHandler::FRemoveAnySubquery(CExpression *pexprOuter,
 //		scalar expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CSubqueryHandler::PexprIsNotNull(
-	CMemoryPool *mp, CExpression *pexprOuter,
-	CExpression *pexprLogical,	// the logical parent of scalar expression
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexprOuter,
+	gpos::pointer<CExpression *>
+		pexprLogical,  // the logical parent of scalar expression
 	CExpression *pexprScalar)
 {
 	pexprScalar->AddRef();
@@ -1613,11 +1645,11 @@ CSubqueryHandler::PexprIsNotNull(
 //
 //---------------------------------------------------------------------------
 BOOL
-CSubqueryHandler::FRemoveAllSubquery(CExpression *pexprOuter,
-									 CExpression *pexprSubquery,
-									 ESubqueryCtxt esqctxt,
-									 CExpression **ppexprNewOuter,
-									 CExpression **ppexprResidualScalar)
+CSubqueryHandler::FRemoveAllSubquery(
+	gpos::owner<CExpression *> pexprOuter,
+	gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
+	gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 	CMemoryPool *mp = m_mp;
 #ifdef GPOS_DEBUG
@@ -1628,7 +1660,7 @@ CSubqueryHandler::FRemoveAllSubquery(CExpression *pexprOuter,
 	if (m_fEnforceCorrelatedApply)
 	{
 		return FCreateCorrelatedApplyForExistOrQuant(
-			mp, pexprOuter, pexprSubquery, esqctxt, ppexprNewOuter,
+			mp, std::move(pexprOuter), pexprSubquery, esqctxt, ppexprNewOuter,
 			ppexprResidualScalar);
 	}
 
@@ -1638,7 +1670,7 @@ CSubqueryHandler::FRemoveAllSubquery(CExpression *pexprOuter,
 	gpos::owner<CExpression *> pexprInner = (*pexprSubquery)[0];
 	COperator::EOperatorId eopidSubq = pexprSubquery->Pop()->Eopid();
 	const CColRef *colref =
-		CScalarSubqueryAll::PopConvert(pexprSubquery->Pop())->Pcr();
+		gpos::dyn_cast<CScalarSubqueryAll>(pexprSubquery->Pop())->Pcr();
 
 	BOOL fOuterRefsUnderInner = pexprInner->HasOuterRefs();
 	BOOL fUseNotNullOptimization = false;
@@ -1651,15 +1683,16 @@ CSubqueryHandler::FRemoveAllSubquery(CExpression *pexprOuter,
 		if (EsqctxtFilter == esqctxt)
 		{
 			// build subquery quantified comparison
-			CExpression *pexprResult = nullptr;
-			CExpression *pexprPredicate = PexprSubqueryPred(
+			gpos::owner<CExpression *> pexprResult = nullptr;
+			gpos::owner<CExpression *> pexprPredicate = PexprSubqueryPred(
 				pexprInner, pexprSubquery, &pexprResult, esqctxt);
 
 			*ppexprResidualScalar =
 				CUtils::PexprScalarConstBool(mp, true /*value*/);
 			*ppexprNewOuter = CUtils::PexprLogicalApply<
 				CLogicalLeftAntiSemiCorrelatedApplyNotIn>(
-				mp, pexprOuter, pexprResult, colref, eopidSubq, pexprPredicate);
+				mp, std::move(pexprOuter), std::move(pexprResult), colref,
+				eopidSubq, std::move(pexprPredicate));
 
 			return fSuccess;
 		}
@@ -1671,14 +1704,15 @@ CSubqueryHandler::FRemoveAllSubquery(CExpression *pexprOuter,
 
 	// generate a select with the inverse predicate as the selection predicate
 	// TODO: Handle the case where pexprInversePred == NULL
-	CExpression *pexprInversePred =
+	gpos::owner<CExpression *> pexprInversePred =
 		CXformUtils::PexprInversePred(mp, pexprSubquery);
 	pexprPredicate = pexprInversePred;
 
 	if (EsqctxtValue == esqctxt)
 	{
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		CScalarCmp *scalarComp = CScalarCmp::PopConvert(pexprPredicate->Pop());
+		gpos::pointer<CScalarCmp *> scalarComp =
+			gpos::dyn_cast<CScalarCmp>(pexprPredicate->Pop());
 
 		if (nullptr != scalarComp)
 		{
@@ -1741,15 +1775,17 @@ CSubqueryHandler::FRemoveAllSubquery(CExpression *pexprOuter,
 //
 //---------------------------------------------------------------------------
 void
-CSubqueryHandler::AddProjectNode(CMemoryPool *mp, CExpression *pexpr,
-								 CExpression **ppexprResult)
+CSubqueryHandler::AddProjectNode(CMemoryPool *mp,
+								 gpos::owner<CExpression *> pexpr,
+								 gpos::owner<CExpression *> *ppexprResult)
 {
 	GPOS_ASSERT(nullptr != ppexprResult);
 
-	CExpression *pexprProjected =
+	gpos::owner<CExpression *> pexprProjected =
 		CUtils::PexprScalarConstBool(mp, true /*value*/);
 
-	*ppexprResult = CUtils::PexprAddProjection(mp, pexpr, pexprProjected);
+	*ppexprResult = CUtils::PexprAddProjection(mp, std::move(pexpr),
+											   std::move(pexprProjected));
 }
 
 
@@ -1765,10 +1801,10 @@ CSubqueryHandler::AddProjectNode(CMemoryPool *mp, CExpression *pexpr,
 gpos::owner<CExpression *>
 CSubqueryHandler::PexprScalarIf(CMemoryPool *mp, CColRef *pcrBool,
 								CColRef *pcrSum, CColRef *pcrCount,
-								CExpression *pexprSubquery,
+								gpos::pointer<CExpression *> pexprSubquery,
 								BOOL useNotNullableInnerOpt)
 {
-	COperator *popSubquery = pexprSubquery->Pop();
+	gpos::pointer<COperator *> popSubquery = pexprSubquery->Pop();
 	BOOL fExistential = CUtils::FExistentialSubquery(popSubquery);
 #ifdef GPOS_DEBUG
 	BOOL fQuantified = CUtils::FQuantifiedSubquery(popSubquery);
@@ -1794,22 +1830,24 @@ CSubqueryHandler::PexprScalarIf(CMemoryPool *mp, CColRef *pcrBool,
 
 	if (fExistential)
 	{
-		CExpression *pexprIsNotNull =
+		gpos::owner<CExpression *> pexprIsNotNull =
 			CUtils::PexprIsNotNull(mp, CUtils::PexprScalarIdent(mp, pcrBool));
 		mdid->AddRef();
-		return GPOS_NEW(mp)
-			CExpression(mp, GPOS_NEW(mp) CScalarIf(mp, mdid), pexprIsNotNull,
-						CUtils::PexprScalarConstBool(mp, value),
-						CUtils::PexprScalarConstBool(mp, !value));
+		return GPOS_NEW(mp) CExpression(
+			mp, GPOS_NEW(mp) CScalarIf(mp, mdid), std::move(pexprIsNotNull),
+			CUtils::PexprScalarConstBool(mp, value),
+			CUtils::PexprScalarConstBool(mp, !value));
 	}
 
 	// quantified subquery
 
 	// sum = count
-	CExpression *pexprEquality = CUtils::PexprScalarEqCmp(mp, pcrSum, pcrCount);
+	gpos::owner<CExpression *> pexprEquality =
+		CUtils::PexprScalarEqCmp(mp, pcrSum, pcrCount);
 
-	CExpression *pexprRowCountGreaterZero = CUtils::PexprScalarCmp(
-		mp, pcrCount, CUtils::PexprScalarConstInt8(mp, 0), IMDType::EcmptG);
+	gpos::owner<CExpression *> pexprRowCountGreaterZero =
+		CUtils::PexprScalarCmp(
+			mp, pcrCount, CUtils::PexprScalarConstInt8(mp, 0), IMDType::EcmptG);
 
 	mdid->AddRef();
 
@@ -1856,7 +1894,7 @@ CSubqueryHandler::PexprScalarIf(CMemoryPool *mp, CColRef *pcrBool,
 
 // add a limit 1 expression over given expression,
 // removing any existing limits
-CExpression *
+gpos::owner<CExpression *>
 CSubqueryHandler::AddOrReplaceLimitOne(CMemoryPool *mp, CExpression *pexpr)
 {
 	if (COperator::EopLogicalLimit == pexpr->Pop()->Eopid() &&
@@ -1902,8 +1940,9 @@ CSubqueryHandler::AddOrReplaceLimitOne(CMemoryPool *mp, CExpression *pexpr)
 BOOL
 CSubqueryHandler::FRemoveExistentialSubquery(
 	CMemoryPool *mp, COperator::EOperatorId op_id, CExpression *pexprOuter,
-	CExpression *pexprSubquery, ESubqueryCtxt esqctxt,
-	CExpression **ppexprNewOuter, CExpression **ppexprResidualScalar)
+	gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
+	gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 #ifdef GPOS_DEBUG
 	AssertValidArguments(mp, pexprOuter, pexprSubquery, ppexprNewOuter,
@@ -1946,7 +1985,8 @@ CSubqueryHandler::FRemoveExistentialSubquery(
 
 		if (COperator::EopScalarSubqueryExists == op_id)
 		{
-			CColRefSet *outer_refs = pexprInner->DeriveOuterReferences();
+			gpos::pointer<CColRefSet *> outer_refs =
+				pexprInner->DeriveOuterReferences();
 
 			if (0 == outer_refs->Size())
 			{
@@ -1981,16 +2021,16 @@ CSubqueryHandler::FRemoveExistentialSubquery(
 
 //---------------------------------------------------------------------------
 BOOL
-CSubqueryHandler::FRemoveExistsSubquery(CExpression *pexprOuter,
-										CExpression *pexprSubquery,
-										ESubqueryCtxt esqctxt,
-										CExpression **ppexprNewOuter,
-										CExpression **ppexprResidualScalar)
+CSubqueryHandler::FRemoveExistsSubquery(
+	gpos::owner<CExpression *> pexprOuter,
+	gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
+	gpos::owner<CExpression *> *ppexprNewOuter,
+	CExpression **ppexprResidualScalar)
 {
 	if (m_fEnforceCorrelatedApply)
 	{
 		return FCreateCorrelatedApplyForExistOrQuant(
-			m_mp, pexprOuter, pexprSubquery, esqctxt, ppexprNewOuter,
+			m_mp, std::move(pexprOuter), pexprSubquery, esqctxt, ppexprNewOuter,
 			ppexprResidualScalar);
 	}
 
@@ -2010,16 +2050,16 @@ CSubqueryHandler::FRemoveExistsSubquery(CExpression *pexprOuter,
 //
 //---------------------------------------------------------------------------
 BOOL
-CSubqueryHandler::FRemoveNotExistsSubquery(CExpression *pexprOuter,
-										   CExpression *pexprSubquery,
-										   ESubqueryCtxt esqctxt,
-										   CExpression **ppexprNewOuter,
-										   CExpression **ppexprResidualScalar)
+CSubqueryHandler::FRemoveNotExistsSubquery(
+	gpos::owner<CExpression *> pexprOuter,
+	gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
+	gpos::owner<CExpression *> *ppexprNewOuter,
+	CExpression **ppexprResidualScalar)
 {
 	if (m_fEnforceCorrelatedApply)
 	{
 		return FCreateCorrelatedApplyForExistOrQuant(
-			m_mp, pexprOuter, pexprSubquery, esqctxt, ppexprNewOuter,
+			m_mp, std::move(pexprOuter), pexprSubquery, esqctxt, ppexprNewOuter,
 			ppexprResidualScalar);
 	}
 
@@ -2038,11 +2078,10 @@ CSubqueryHandler::FRemoveNotExistsSubquery(CExpression *pexprOuter,
 //
 //---------------------------------------------------------------------------
 BOOL
-CSubqueryHandler::FRecursiveHandler(CExpression *pexprOuter,
-									CExpression *pexprScalar,
-									ESubqueryCtxt esqctxt,
-									gpos::owner<CExpression *> *ppexprNewOuter,
-									CExpression **ppexprResidualScalar)
+CSubqueryHandler::FRecursiveHandler(
+	CExpression *pexprOuter, gpos::pointer<CExpression *> pexprScalar,
+	ESubqueryCtxt esqctxt, gpos::owner<CExpression *> *ppexprNewOuter,
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
@@ -2054,7 +2093,7 @@ CSubqueryHandler::FRecursiveHandler(CExpression *pexprOuter,
 						 ppexprResidualScalar);
 #endif	// GPOS_DEBUG
 
-	COperator *popScalar = pexprScalar->Pop();
+	gpos::pointer<COperator *> popScalar = pexprScalar->Pop();
 
 	if (CPredicateUtils::FOr(pexprScalar) ||
 		CPredicateUtils::FNot(pexprScalar) ||
@@ -2071,10 +2110,10 @@ CSubqueryHandler::FRecursiveHandler(CExpression *pexprOuter,
 	const ULONG arity = pexprScalar->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprScalarChild = (*pexprScalar)[ul];
-		COperator *popScalarChild = pexprScalarChild->Pop();
+		gpos::pointer<CExpression *> pexprScalarChild = (*pexprScalar)[ul];
+		gpos::pointer<COperator *> popScalarChild = pexprScalarChild->Pop();
 		CExpression *pexprNewLogical = nullptr;
-		CExpression *pexprNewScalar = nullptr;
+		gpos::owner<CExpression *> pexprNewScalar = nullptr;
 
 		// Set the subquery context to Value for a non-scalar subquery nested in a
 		// scalar expression such that the corresponding subquery unnesting routines
@@ -2130,7 +2169,8 @@ CSubqueryHandler::FRecursiveHandler(CExpression *pexprOuter,
 	*ppexprNewOuter = pexprCurrentOuter;
 	gpos::owner<COperator *> pop = pexprScalar->Pop();
 	pop->AddRef();
-	*ppexprResidualScalar = GPOS_NEW(mp) CExpression(mp, pop, pdrgpexpr);
+	*ppexprResidualScalar =
+		GPOS_NEW(mp) CExpression(mp, std::move(pop), std::move(pdrgpexpr));
 
 	return true;
 }
@@ -2146,8 +2186,8 @@ CSubqueryHandler::FRecursiveHandler(CExpression *pexprOuter,
 //---------------------------------------------------------------------------
 BOOL
 CSubqueryHandler::FProcessScalarOperator(
-	CExpression *pexprOuter, CExpression *pexprScalar, ESubqueryCtxt esqctxt,
-	CExpression **ppexprNewOuter,
+	CExpression *pexprOuter, gpos::pointer<CExpression *> pexprScalar,
+	ESubqueryCtxt esqctxt, gpos::owner<CExpression *> *ppexprNewOuter,
 	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 	CMemoryPool *mp = m_mp;
@@ -2219,14 +2259,14 @@ CSubqueryHandler::FProcessScalarOperator(
 	if (fSuccess)
 	{
 		// clean-up unnecessary equality operations
-		CExpression *pexprPruned =
+		gpos::owner<CExpression *> pexprPruned =
 			CPredicateUtils::PexprPruneSuperfluosEquality(
 				mp, *ppexprResidualScalar);
 		(*ppexprResidualScalar)->Release();
 		*ppexprResidualScalar = pexprPruned;
 
 		// cleanup unncessary conjuncts
-		CExpressionArray *pdrgpexpr =
+		gpos::owner<CExpressionArray *> pdrgpexpr =
 			CPredicateUtils::PdrgpexprConjuncts(mp, *ppexprResidualScalar);
 		(*ppexprResidualScalar)->Release();
 		*ppexprResidualScalar =
@@ -2248,10 +2288,10 @@ CSubqueryHandler::FProcessScalarOperator(
 //---------------------------------------------------------------------------
 BOOL
 CSubqueryHandler::FProcess(
-	CExpression *pexprOuter,   // logical child of a SELECT node
-	CExpression *pexprScalar,  // scalar child of a SELECT node
-	ESubqueryCtxt esqctxt,	   // context in which subquery occurs
-	CExpression *
+	CExpression *pexprOuter,				   // logical child of a SELECT node
+	gpos::pointer<CExpression *> pexprScalar,  // scalar child of a SELECT node
+	ESubqueryCtxt esqctxt,	// context in which subquery occurs
+	gpos::owner<CExpression *>
 		*ppexprNewOuter,  // an Apply logical expression produced as output
 	gpos::owner<CExpression *>
 		*ppexprResidualScalar  // residual scalar expression produced as output

@@ -36,8 +36,9 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalDML::CPhysicalDML(CMemoryPool *mp, CLogicalDML::EDMLOperator edmlop,
-						   CTableDescriptor *ptabdesc,
-						   CColRefArray *pdrgpcrSource, CBitSet *pbsModified,
+						   gpos::owner<CTableDescriptor *> ptabdesc,
+						   gpos::owner<CColRefArray *> pdrgpcrSource,
+						   gpos::owner<CBitSet *> pbsModified,
 						   CColRef *pcrAction, CColRef *pcrTableOid,
 						   CColRef *pcrCtid, CColRef *pcrSegmentId,
 						   CColRef *pcrTupleOid)
@@ -88,8 +89,8 @@ CPhysicalDML::CPhysicalDML(CMemoryPool *mp, CLogicalDML::EDMLOperator edmlop,
 
 		if (CLogicalDML::EdmlUpdate == edmlop)
 		{
-			CDistributionSpecHashed *hashDistSpec =
-				CDistributionSpecHashed::PdsConvert(m_pds);
+			gpos::pointer<CDistributionSpecHashed *> hashDistSpec =
+				gpos::dyn_cast<CDistributionSpecHashed>(m_pds);
 			gpos::owner<CColRefSet *> updatedCols = GPOS_NEW(mp) CColRefSet(mp);
 			gpos::owner<CColRefSet *> distributionCols =
 				hashDistSpec->PcrsUsed(mp);
@@ -156,8 +157,8 @@ CPhysicalDML::PosRequired(CMemoryPool *,				// mp
 							  child_index
 #endif	// GPOS_DEBUG
 						  ,
-						  CDrvdPropArray *,	 // pdrgpdpCtxt
-						  ULONG				 // ulOptReq
+						  gpos::pointer<CDrvdPropArray *>,	// pdrgpdpCtxt
+						  ULONG								// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -198,7 +199,8 @@ CPhysicalDML::EpetOrder(CExpressionHandle &exprhdl,
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
 
 	// get the order delivered by the DML node
-	COrderSpec *pos = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pos();
+	gpos::pointer<COrderSpec *> pos =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pos();
 	if (peo->FCompatible(pos))
 	{
 		return CEnfdProp::EpetUnnecessary;
@@ -217,17 +219,17 @@ CPhysicalDML::EpetOrder(CExpressionHandle &exprhdl,
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CPhysicalDML::PcrsRequired(CMemoryPool *mp,
 						   CExpressionHandle &,	 // exprhdl,
-						   CColRefSet *pcrsRequired,
+						   gpos::pointer<CColRefSet *> pcrsRequired,
 						   ULONG
 #ifdef GPOS_DEBUG
 							   child_index
 #endif	// GPOS_DEBUG
 						   ,
-						   CDrvdPropArray *,  // pdrgpdpCtxt
-						   ULONG			  // ulOptReq
+						   gpos::pointer<CDrvdPropArray *>,	 // pdrgpdpCtxt
+						   ULONG							 // ulOptReq
 )
 {
 	GPOS_ASSERT(
@@ -258,8 +260,8 @@ CPhysicalDML::PdsRequired(CMemoryPool *mp,
 							  child_index
 #endif	// GPOS_DEBUG
 						  ,
-						  CDrvdPropArray *,	 // pdrgpdpCtxt
-						  ULONG				 // ulOptReq
+						  gpos::pointer<CDrvdPropArray *>,	// pdrgpdpCtxt
+						  ULONG								// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -290,11 +292,12 @@ CPhysicalDML::PdsRequired(CMemoryPool *mp,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalDML::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  CRewindabilitySpec *prsRequired, ULONG child_index,
-						  CDrvdPropArray *,	 // pdrgpdpCtxt
-						  ULONG				 // ulOptReq
+						  gpos::pointer<CRewindabilitySpec *> prsRequired,
+						  ULONG child_index,
+						  gpos::pointer<CDrvdPropArray *>,	// pdrgpdpCtxt
+						  ULONG								// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -310,10 +313,10 @@ CPhysicalDML::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::owner<CCTEReq *>
 CPhysicalDML::PcteRequired(CMemoryPool *,		 //mp,
 						   CExpressionHandle &,	 //exprhdl,
-						   CCTEReq *pcter,
+						   gpos::pointer<CCTEReq *> pcter,
 						   ULONG
 #ifdef GPOS_DEBUG
 							   child_index
@@ -337,7 +340,7 @@ CPhysicalDML::PcteRequired(CMemoryPool *,		 //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalDML::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								CColRefSet *pcrsRequired,
+								gpos::pointer<CColRefSet *> pcrsRequired,
 								ULONG  // ulOptReq
 ) const
 {
@@ -352,7 +355,7 @@ CPhysicalDML::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalDML::PdsDerive(CMemoryPool *,	//mp,
 						CExpressionHandle &exprhdl) const
 {
@@ -367,7 +370,7 @@ CPhysicalDML::PdsDerive(CMemoryPool *,	//mp,
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalDML::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	return PrsDerivePassThruOuter(mp, exprhdl);
@@ -411,11 +414,12 @@ CPhysicalDML::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDML::Matches(COperator *pop) const
+CPhysicalDML::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CPhysicalDML *popDML = CPhysicalDML::PopConvert(pop);
+		gpos::pointer<CPhysicalDML *> popDML =
+			gpos::dyn_cast<CPhysicalDML>(pop);
 
 		return m_pcrAction == popDML->PcrAction() &&
 			   m_pcrTableOid == popDML->PcrTableOid() &&
@@ -474,8 +478,9 @@ CPhysicalDML::EpetRewindability(
 //		tuples deleted before the new ones are inserted.
 //
 //---------------------------------------------------------------------------
-COrderSpec *
-CPhysicalDML::PosComputeRequired(CMemoryPool *mp, CTableDescriptor *ptabdesc)
+gpos::owner<COrderSpec *>
+CPhysicalDML::PosComputeRequired(CMemoryPool *mp,
+								 gpos::pointer<CTableDescriptor *> ptabdesc)
 {
 	gpos::owner<COrderSpec *> pos = GPOS_NEW(mp) COrderSpec(mp);
 
@@ -488,7 +493,7 @@ CPhysicalDML::PosComputeRequired(CMemoryPool *mp, CTableDescriptor *ptabdesc)
 		BOOL fNeedsSort = false;
 		for (ULONG ul = 0; ul < ulKeySets && !fNeedsSort; ul++)
 		{
-			CBitSet *pbs = (*pdrgpbsKeys)[ul];
+			gpos::pointer<CBitSet *> pbs = (*pdrgpbsKeys)[ul];
 			if (!pbs->IsDisjoint(m_pbsModified))
 			{
 				fNeedsSort = true;
@@ -506,7 +511,7 @@ CPhysicalDML::PosComputeRequired(CMemoryPool *mp, CTableDescriptor *ptabdesc)
 	}
 	else if (m_ptabdesc->IsPartitioned())
 	{
-		COptimizerConfig *optimizer_config =
+		gpos::pointer<COptimizerConfig *> optimizer_config =
 			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 
 		BOOL fInsertSortOnRows = FInsertSortOnRows(optimizer_config);
@@ -537,7 +542,8 @@ CPhysicalDML::PosComputeRequired(CMemoryPool *mp, CTableDescriptor *ptabdesc)
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDML::FInsertSortOnRows(COptimizerConfig *optimizer_config)
+CPhysicalDML::FInsertSortOnRows(
+	gpos::pointer<COptimizerConfig *> optimizer_config)
 {
 	GPOS_ASSERT(nullptr != optimizer_config);
 

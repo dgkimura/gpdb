@@ -12,6 +12,7 @@
 #include "gpopt/base/CEnfdDistribution.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
@@ -40,9 +41,9 @@ const CHAR *CEnfdDistribution::m_szDistributionMatching[EdmSentinel] = {
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CEnfdDistribution::CEnfdDistribution(CDistributionSpec *pds,
+CEnfdDistribution::CEnfdDistribution(gpos::owner<CDistributionSpec *> pds,
 									 EDistributionMatching edm)
-	: m_pds(pds), m_edm(edm)
+	: m_pds(std::move(pds)), m_edm(edm)
 {
 	GPOS_ASSERT(nullptr != m_pds);
 	GPOS_ASSERT(EdmSentinel > edm);
@@ -73,7 +74,7 @@ CEnfdDistribution::~CEnfdDistribution()
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnfdDistribution::FCompatible(CDistributionSpec *pds) const
+CEnfdDistribution::FCompatible(gpos::pointer<CDistributionSpec *> pds) const
 {
 	GPOS_ASSERT(nullptr != pds);
 
@@ -89,8 +90,9 @@ CEnfdDistribution::FCompatible(CDistributionSpec *pds) const
 			if (CDistributionSpec::EdtHashed == m_pds->Edt() &&
 				CDistributionSpec::EdtHashed == pds->Edt())
 			{
-				return CDistributionSpecHashed::PdsConvert(pds)->FMatchSubset(
-					CDistributionSpecHashed::PdsConvert(m_pds));
+				return gpos::dyn_cast<CDistributionSpecHashed>(pds)
+					->FMatchSubset(
+						gpos::dyn_cast<CDistributionSpecHashed>(m_pds));
 			}
 
 		case (EdmSentinel):
@@ -124,12 +126,14 @@ CEnfdDistribution::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdDistribution::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+CEnfdDistribution::Epet(CExpressionHandle &exprhdl,
+						gpos::pointer<CPhysical *> popPhysical,
 						BOOL fDistribReqd) const
 {
 	if (fDistribReqd)
 	{
-		CDistributionSpec *pds = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
+		gpos::pointer<CDistributionSpec *> pds =
+			gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pds();
 
 		if (CDistributionSpec::EdtStrictReplicated == pds->Edt() &&
 			CDistributionSpec::EdtHashed == PdsRequired()->Edt() &&

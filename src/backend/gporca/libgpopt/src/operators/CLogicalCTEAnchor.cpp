@@ -54,7 +54,7 @@ CLogicalCTEAnchor::CLogicalCTEAnchor(CMemoryPool *mp, ULONG id)
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalCTEAnchor::DeriveOutputColumns(CMemoryPool *,  // mp
 									   CExpressionHandle &exprhdl)
 {
@@ -69,7 +69,7 @@ CLogicalCTEAnchor::DeriveOutputColumns(CMemoryPool *,  // mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalCTEAnchor::DeriveKeyCollection(CMemoryPool *,  // mp
 									   CExpressionHandle &exprhdl) const
 {
@@ -84,17 +84,18 @@ CLogicalCTEAnchor::DeriveKeyCollection(CMemoryPool *,  // mp
 //		Derive part consumer
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::owner<CPartInfo *>
 CLogicalCTEAnchor::DerivePartitionInfo(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl) const
 {
-	CPartInfo *ppartinfoChild = exprhdl.DerivePartitionInfo(0);
+	gpos::pointer<CPartInfo *> ppartinfoChild = exprhdl.DerivePartitionInfo(0);
 	GPOS_ASSERT(nullptr != ppartinfoChild);
 
-	CExpression *pexprProducer =
+	gpos::pointer<CExpression *> pexprProducer =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexprProducer);
-	CPartInfo *ppartinfoCTEProducer = pexprProducer->DerivePartitionInfo();
+	gpos::pointer<CPartInfo *> ppartinfoCTEProducer =
+		pexprProducer->DerivePartitionInfo();
 
 	return CPartInfo::PpartinfoCombine(mp, ppartinfoChild,
 									   ppartinfoCTEProducer);
@@ -125,14 +126,15 @@ CLogicalCTEAnchor::DeriveMaxCard(CMemoryPool *,	 // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalCTEAnchor::Matches(COperator *pop) const
+CLogicalCTEAnchor::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalCTEAnchor *popCTEAnchor = CLogicalCTEAnchor::PopConvert(pop);
+	gpos::pointer<CLogicalCTEAnchor *> popCTEAnchor =
+		gpos::dyn_cast<CLogicalCTEAnchor>(pop);
 
 	return m_id == popCTEAnchor->Id();
 }
@@ -159,7 +161,7 @@ CLogicalCTEAnchor::HashValue() const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalCTEAnchor::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);

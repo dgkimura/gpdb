@@ -55,8 +55,9 @@ public:
 	CDXLScalarCoerceBase(const CDXLScalarCoerceBase &) = delete;
 
 	// ctor/dtor
-	CDXLScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
-						 EdxlCoercionForm dxl_coerce_format, INT location);
+	CDXLScalarCoerceBase(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+						 INT type_modifier, EdxlCoercionForm dxl_coerce_format,
+						 INT location);
 
 	~CDXLScalarCoerceBase() override;
 

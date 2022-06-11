@@ -115,7 +115,8 @@ CDistributionSpecTest::EresUnittest_Random()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr /*pceeval*/,
@@ -182,7 +183,8 @@ CDistributionSpecTest::EresUnittest_Replicated()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr /*pceeval*/,
@@ -237,7 +239,8 @@ CDistributionSpecTest::EresUnittest_Singleton()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr /*pceeval*/,
@@ -314,7 +317,8 @@ CDistributionSpecTest::EresUnittest_Universal()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr /*pceeval*/,
@@ -380,7 +384,8 @@ CDistributionSpecTest::EresUnittest_Hashed()
 
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -404,13 +409,15 @@ CDistributionSpecTest::EresUnittest_Hashed()
 	CColRef *pcrB =
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier, nameB);
 
-	CExpression *pexprScalarA = CUtils::PexprScalarIdent(mp, pcrA);
-	CExpression *pexprScalarB = CUtils::PexprScalarIdent(mp, pcrB);
+	gpos::owner<CExpression *> pexprScalarA =
+		CUtils::PexprScalarIdent(mp, pcrA);
+	gpos::owner<CExpression *> pexprScalarB =
+		CUtils::PexprScalarIdent(mp, pcrB);
 
 	gpos::owner<CExpressionArray *> prgpexpr1 =
 		GPOS_NEW(mp) CExpressionArray(mp);
 	prgpexpr1->Append(pexprScalarA);
-	prgpexpr1->Append(pexprScalarB);
+	prgpexpr1->Append(std::move(pexprScalarB));
 
 	gpos::owner<CExpressionArray *> prgpexpr2 =
 		GPOS_NEW(mp) CExpressionArray(mp);
@@ -421,8 +428,9 @@ CDistributionSpecTest::EresUnittest_Hashed()
 
 	// HD{A,B}, nulls colocated, duplicate insensitive
 	poptctxt->MarkDMLQuery(false /*fDMLQuery*/);
-	gpos::owner<CDistributionSpecHashed *> pdshashed1 = GPOS_NEW(mp)
-		CDistributionSpecHashed(prgpexpr1, true /* fNullsCollocated */);
+	gpos::owner<CDistributionSpecHashed *> pdshashed1 =
+		GPOS_NEW(mp) CDistributionSpecHashed(std::move(prgpexpr1),
+											 true /* fNullsCollocated */);
 	GPOS_ASSERT(pdshashed1->FSatisfies(pdshashed1));
 	GPOS_ASSERT(pdshashed1->Matches(pdshashed1));
 
@@ -581,7 +589,8 @@ CDistributionSpecTest::EresUnittest_NegativeRandom()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr /*pceeval*/,

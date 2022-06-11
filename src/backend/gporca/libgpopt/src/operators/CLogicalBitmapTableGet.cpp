@@ -36,16 +36,15 @@ using namespace gpos;
 //		Takes ownership of ptabdesc, pnameTableAlias and pdrgpcrOutput.
 //
 //---------------------------------------------------------------------------
-CLogicalBitmapTableGet::CLogicalBitmapTableGet(CMemoryPool *mp,
-											   CTableDescriptor *ptabdesc,
-											   ULONG ulOriginOpId,
-											   const CName *pnameTableAlias,
-											   CColRefArray *pdrgpcrOutput)
+CLogicalBitmapTableGet::CLogicalBitmapTableGet(
+	CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
+	ULONG ulOriginOpId, const CName *pnameTableAlias,
+	gpos::owner<CColRefArray *> pdrgpcrOutput)
 	: CLogical(mp),
-	  m_ptabdesc(ptabdesc),
+	  m_ptabdesc(std::move(ptabdesc)),
 	  m_ulOriginOpId(ulOriginOpId),
 	  m_pnameTableAlias(pnameTableAlias),
-	  m_pdrgpcrOutput(pdrgpcrOutput)
+	  m_pdrgpcrOutput(std::move(pdrgpcrOutput))
 {
 	GPOS_ASSERT(nullptr != m_ptabdesc);
 	GPOS_ASSERT(nullptr != pnameTableAlias);
@@ -114,7 +113,7 @@ CLogicalBitmapTableGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalBitmapTableGet::Matches(COperator *pop) const
+CLogicalBitmapTableGet::Matches(gpos::pointer<COperator *> pop) const
 {
 	return CUtils::FMatchBitmapScan(this, pop);
 }
@@ -148,7 +147,7 @@ CLogicalBitmapTableGet::DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &
 //		Derive outer references
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalBitmapTableGet::DeriveOuterReferences(CMemoryPool *mp,
 											  CExpressionHandle &exprhdl)
 {
@@ -164,7 +163,7 @@ CLogicalBitmapTableGet::DeriveOuterReferences(CMemoryPool *mp,
 //		Derive the constraint property.
 //
 //---------------------------------------------------------------------------
-CPropConstraint *
+gpos::owner<CPropConstraint *>
 CLogicalBitmapTableGet::DerivePropertyConstraint(
 	CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
@@ -180,10 +179,10 @@ CLogicalBitmapTableGet::DerivePropertyConstraint(
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
-CLogicalBitmapTableGet::PstatsDerive(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl,
-									 IStatisticsArray *stats_ctxt) const
+gpos::owner<IStatistics *>
+CLogicalBitmapTableGet::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<IStatisticsArray *> stats_ctxt) const
 {
 	return CStatisticsUtils::DeriveStatsForBitmapTableGet(mp, exprhdl,
 														  stats_ctxt);
@@ -221,9 +220,10 @@ CLogicalBitmapTableGet::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
 CLogicalBitmapTableGet::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput = nullptr;
+	gpos::owner<CColRefArray *> pdrgpcrOutput = nullptr;
 	if (must_exist)
 	{
 		pdrgpcrOutput =
@@ -238,8 +238,8 @@ CLogicalBitmapTableGet::PopCopyWithRemappedColumns(
 
 	m_ptabdesc->AddRef();
 
-	return GPOS_NEW(mp) CLogicalBitmapTableGet(mp, m_ptabdesc, m_ulOriginOpId,
-											   pnameAlias, pdrgpcrOutput);
+	return GPOS_NEW(mp) CLogicalBitmapTableGet(
+		mp, m_ptabdesc, m_ulOriginOpId, pnameAlias, std::move(pdrgpcrOutput));
 }
 
 //---------------------------------------------------------------------------
@@ -250,7 +250,7 @@ CLogicalBitmapTableGet::PopCopyWithRemappedColumns(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalBitmapTableGet::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);

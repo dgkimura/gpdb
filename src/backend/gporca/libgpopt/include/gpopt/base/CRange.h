@@ -75,14 +75,14 @@ private:
 	ERangeInclusion m_eriRight;
 
 	// construct an equality predicate if possible
-	CExpression *PexprEquality(CMemoryPool *mp, const CColRef *colref);
+	gpos::owner<CExpression *> PexprEquality(CMemoryPool *mp,
+											 const CColRef *colref);
 
 	// construct a scalar comparison expression from one of the ends
-	static CExpression *PexprScalarCompEnd(CMemoryPool *mp, IDatum *datum,
-										   ERangeInclusion eri,
-										   IMDType::ECmpType ecmptIncl,
-										   IMDType::ECmpType ecmptExcl,
-										   const CColRef *colref);
+	static gpos::owner<CExpression *> PexprScalarCompEnd(
+		CMemoryPool *mp, IDatum *datum, ERangeInclusion eri,
+		IMDType::ECmpType ecmptIncl, IMDType::ECmpType ecmptExcl,
+		const CColRef *colref);
 
 	// inverse of the inclusion option
 	static ERangeInclusion
@@ -96,16 +96,16 @@ private:
 	}
 
 	// print a bound
-	static IOstream &OsPrintBound(IOstream &os, IDatum *datum,
+	static IOstream &OsPrintBound(IOstream &os, gpos::pointer<IDatum *> datum,
 								  const CHAR *szInfinity);
 
 public:
 	CRange(const CRange &) = delete;
 
 	// ctor
-	CRange(IMDId *mdid, const IComparator *pcomp, IDatum *pdatumLeft,
-		   ERangeInclusion eriLeft, IDatum *pdatumRight,
-		   ERangeInclusion eriRight);
+	CRange(gpos::owner<IMDId *> mdid, const IComparator *pcomp,
+		   gpos::owner<IDatum *> pdatumLeft, ERangeInclusion eriLeft,
+		   gpos::owner<IDatum *> pdatumRight, ERangeInclusion eriRight);
 
 	// ctor
 	CRange(const IComparator *pcomp, IMDType::ECmpType cmp_type, IDatum *datum);
@@ -149,31 +149,31 @@ public:
 	}
 
 	// is this range disjoint from the given range and to its left
-	BOOL FDisjointLeft(CRange *prange);
+	BOOL FDisjointLeft(gpos::pointer<CRange *> prange);
 
 	// does this range contain the given range
-	BOOL Contains(CRange *prange);
+	BOOL Contains(gpos::pointer<CRange *> prange);
 
 	// does this range overlap only the left end of the given range
-	BOOL FOverlapsLeft(CRange *prange);
+	BOOL FOverlapsLeft(gpos::pointer<CRange *> prange);
 
 	// does this range overlap only the right end of the given range
-	BOOL FOverlapsRight(CRange *prange);
+	BOOL FOverlapsRight(gpos::pointer<CRange *> prange);
 
 	// does this range's upper bound equal the given range's lower bound
-	BOOL FUpperBoundEqualsLowerBound(CRange *prange);
+	BOOL FUpperBoundEqualsLowerBound(gpos::pointer<CRange *> prange);
 
 	// does this range start before the given range starts
-	BOOL FStartsBefore(CRange *prange);
+	BOOL FStartsBefore(gpos::pointer<CRange *> prange);
 
 	// does this range start with or before the given range
-	BOOL FStartsWithOrBefore(CRange *prange);
+	BOOL FStartsWithOrBefore(gpos::pointer<CRange *> prange);
 
 	// does this range end after the given range ends
-	BOOL FEndsAfter(CRange *prange);
+	BOOL FEndsAfter(gpos::pointer<CRange *> prange);
 
 	// does this range end with or after the given range
-	BOOL FEndsWithOrAfter(CRange *prange);
+	BOOL FEndsWithOrAfter(gpos::pointer<CRange *> prange);
 
 	// check if range represents a point
 	BOOL FPoint() const;
@@ -183,17 +183,21 @@ public:
 										gpos::pointer<CRange *> prange);
 
 	// difference between this range and a given range on the left side only
-	gpos::owner<CRange *> PrngDifferenceLeft(CMemoryPool *mp, CRange *prange);
+	gpos::owner<CRange *> PrngDifferenceLeft(CMemoryPool *mp,
+											 gpos::pointer<CRange *> prange);
 
 	// difference between this range and a given range on the right side only
-	gpos::owner<CRange *> PrngDifferenceRight(CMemoryPool *mp, CRange *prange);
+	gpos::owner<CRange *> PrngDifferenceRight(CMemoryPool *mp,
+											  gpos::pointer<CRange *> prange);
 
 	// return the extension of this range with the given range. The given
 	// range must start right after this range, otherwise NULL is returned
-	gpos::owner<CRange *> PrngExtend(CMemoryPool *mp, CRange *prange);
+	gpos::owner<CRange *> PrngExtend(CMemoryPool *mp,
+									 gpos::pointer<CRange *> prange);
 
 	// construct scalar expression
-	CExpression *PexprScalar(CMemoryPool *mp, const CColRef *colref);
+	gpos::owner<CExpression *> PexprScalar(CMemoryPool *mp,
+										   const CColRef *colref);
 
 	// is this interval unbounded
 	BOOL

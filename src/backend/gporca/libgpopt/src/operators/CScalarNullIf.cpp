@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarNullIf.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -31,10 +32,11 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarNullIf::CScalarNullIf(CMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type)
+CScalarNullIf::CScalarNullIf(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
+							 gpos::owner<IMDId *> mdid_type)
 	: CScalar(mp),
-	  m_mdid_op(mdid_op),
-	  m_mdid_type(mdid_type),
+	  m_mdid_op(std::move(mdid_op)),
+	  m_mdid_type(std::move(mdid_type)),
 	  m_returns_null_on_null_input(false),
 	  m_fBoolReturnType(false)
 {
@@ -89,14 +91,15 @@ CScalarNullIf::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarNullIf::Matches(COperator *pop) const
+CScalarNullIf::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CScalarNullIf *popScNullIf = CScalarNullIf::PopConvert(pop);
+	gpos::pointer<CScalarNullIf *> popScNullIf =
+		gpos::dyn_cast<CScalarNullIf>(pop);
 
 	// match if operators and return types are identical
 	return m_mdid_op->Equals(popScNullIf->MdIdOp()) &&
@@ -113,7 +116,7 @@ CScalarNullIf::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarNullIf::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarNullIf::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

@@ -33,26 +33,27 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-						   BOOL is_clustered, BOOL is_partitioned,
-						   EmdindexType index_type, IMDId *mdid_item_type,
-						   ULongPtrArray *index_key_cols_array,
-						   ULongPtrArray *included_cols_array,
-						   IMdIdArray *mdid_opfamilies_array,
-						   IMDPartConstraint *mdpart_constraint,
-						   IMdIdArray *child_index_oids)
+CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+						   CMDName *mdname, BOOL is_clustered,
+						   BOOL is_partitioned, EmdindexType index_type,
+						   gpos::owner<IMDId *> mdid_item_type,
+						   gpos::owner<ULongPtrArray *> index_key_cols_array,
+						   gpos::owner<ULongPtrArray *> included_cols_array,
+						   gpos::owner<IMdIdArray *> mdid_opfamilies_array,
+						   gpos::owner<IMDPartConstraint *> mdpart_constraint,
+						   gpos::owner<IMdIdArray *> child_index_oids)
 	: m_mp(mp),
-	  m_mdid(mdid),
+	  m_mdid(std::move(mdid)),
 	  m_mdname(mdname),
 	  m_clustered(is_clustered),
 	  m_partitioned(is_partitioned),
 	  m_index_type(index_type),
-	  m_mdid_item_type(mdid_item_type),
-	  m_index_key_cols_array(index_key_cols_array),
-	  m_included_cols_array(included_cols_array),
-	  m_mdid_opfamilies_array(mdid_opfamilies_array),
-	  m_mdpart_constraint(mdpart_constraint),
-	  m_child_index_oids(child_index_oids)
+	  m_mdid_item_type(std::move(mdid_item_type)),
+	  m_index_key_cols_array(std::move(index_key_cols_array)),
+	  m_included_cols_array(std::move(included_cols_array)),
+	  m_mdid_opfamilies_array(std::move(mdid_opfamilies_array)),
+	  m_mdpart_constraint(std::move(mdpart_constraint)),
+	  m_child_index_oids(std::move(child_index_oids))
 {
 	GPOS_ASSERT(m_mdid->IsValid());
 	GPOS_ASSERT(IMDIndex::EmdindSentinel > index_type);

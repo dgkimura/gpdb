@@ -47,10 +47,12 @@ public:
 	CPhysicalIndexOnlyScan(const CPhysicalIndexOnlyScan &) = delete;
 
 	// ctors
-	CPhysicalIndexOnlyScan(CMemoryPool *mp, CIndexDescriptor *pindexdesc,
-						   CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
-						   const CName *pnameAlias, CColRefArray *colref_array,
-						   COrderSpec *pos);
+	CPhysicalIndexOnlyScan(CMemoryPool *mp,
+						   gpos::owner<CIndexDescriptor *> pindexdesc,
+						   gpos::owner<CTableDescriptor *> ptabdesc,
+						   ULONG ulOriginOpId, const CName *pnameAlias,
+						   gpos::owner<CColRefArray *> colref_array,
+						   gpos::owner<COrderSpec *> pos);
 
 	// dtor
 	~CPhysicalIndexOnlyScan() override;
@@ -88,7 +90,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// index descriptor
 	gpos::pointer<CIndexDescriptor *>
@@ -150,10 +152,10 @@ public:
 
 	// statistics derivation during costing
 	IStatistics *
-	PstatsDerive(CMemoryPool *,					  // mp
-				 CExpressionHandle &,			  // exprhdl
-				 gpos::pointer<CReqdPropPlan *>,  // prpplan
-				 IStatisticsArray *				  //stats_ctxt
+	PstatsDerive(CMemoryPool *,						// mp
+				 CExpressionHandle &,				// exprhdl
+				 gpos::pointer<CReqdPropPlan *>,	// prpplan
+				 gpos::pointer<IStatisticsArray *>	//stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(

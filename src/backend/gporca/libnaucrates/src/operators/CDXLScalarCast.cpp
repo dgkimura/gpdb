@@ -30,9 +30,11 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCast::CDXLScalarCast(CMemoryPool *mp, IMDId *mdid_type,
-							   IMDId *func_mdid)
-	: CDXLScalar(mp), m_mdid_type(mdid_type), m_func_mdid(func_mdid)
+CDXLScalarCast::CDXLScalarCast(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+							   gpos::owner<IMDId *> func_mdid)
+	: CDXLScalar(mp),
+	  m_mdid_type(std::move(mdid_type)),
+	  m_func_mdid(std::move(func_mdid))
 {
 	GPOS_ASSERT(nullptr != m_func_mdid);
 	GPOS_ASSERT(m_mdid_type->IsValid());
@@ -166,7 +168,7 @@ CDXLScalarCast::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[0];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeScalar ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

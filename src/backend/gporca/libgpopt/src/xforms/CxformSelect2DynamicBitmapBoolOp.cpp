@@ -71,9 +71,10 @@ CXformSelect2DynamicBitmapBoolOp::Exfp(CExpressionHandle &	// exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformSelect2DynamicBitmapBoolOp::Transform(CXformContext *pxfctxt,
-											CXformResult *pxfres,
-											CExpression *pexpr) const
+CXformSelect2DynamicBitmapBoolOp::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -86,11 +87,11 @@ CXformSelect2DynamicBitmapBoolOp::Transform(CXformContext *pxfctxt,
 	if (nullptr != pexprResult)
 	{
 		// create a redundant SELECT on top of DynamicIndexGet to be able to use predicate in partition elimination
-		CExpression *pexprRedundantSelect =
+		gpos::owner<CExpression *> pexprRedundantSelect =
 			CXformUtils::PexprRedundantSelectForDynamicIndex(mp, pexprResult);
 		pexprResult->Release();
 
-		pxfres->Add(pexprRedundantSelect);
+		pxfres->Add(std::move(pexprRedundantSelect));
 	}
 }
 

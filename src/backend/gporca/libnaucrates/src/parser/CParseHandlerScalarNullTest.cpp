@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarNullTest.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -79,12 +81,12 @@ CParseHandlerScalarNullTest::StartElement(const XMLCh *const,  // element_uri,
 		}
 
 		// parse and create scalar NullTest
-		CDXLScalarNullTest *dxl_op =
-			(CDXLScalarNullTest *) CDXLOperatorFactory::MakeDXLNullTest(
-				m_parse_handler_mgr->GetDXLMemoryManager(), is_null);
+		gpos::owner<CDXLScalarNullTest *> dxl_op =
+			gpos::cast<CDXLScalarNullTest>(CDXLOperatorFactory::MakeDXLNullTest(
+				m_parse_handler_mgr->GetDXLMemoryManager(), is_null));
 
 		// construct node from the created child node
-		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 
 		// parse handler for child scalar node
 		CParseHandlerBase *child_parse_handler =

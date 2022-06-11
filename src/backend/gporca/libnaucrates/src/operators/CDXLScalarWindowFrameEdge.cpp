@@ -172,7 +172,7 @@ CDXLScalarWindowFrameEdge::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[idx];
+		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

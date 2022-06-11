@@ -79,7 +79,7 @@ private:
 		COrderExpression(const COrderExpression &) = delete;
 
 		// ctor
-		COrderExpression(gpmd::IMDId *mdid, const CColRef *colref,
+		COrderExpression(gpos::owner<gpmd::IMDId *> mdid, const CColRef *colref,
 						 ENullTreatment ent);
 
 		// dtor
@@ -126,7 +126,7 @@ private:
 	gpos::owner<COrderExpressionArray *> m_pdrgpoe;
 
 	// extract columns from order spec into the given column set
-	void ExtractCols(CColRefSet *pcrs) const;
+	void ExtractCols(gpos::pointer<CColRefSet *> pcrs) const;
 
 public:
 	COrderSpec(const COrderSpec &) = delete;
@@ -176,10 +176,11 @@ public:
 	}
 
 	// append new component
-	void Append(gpmd::IMDId *mdid, const CColRef *colref, ENullTreatment ent);
+	void Append(gpos::owner<gpmd::IMDId *> mdid, const CColRef *colref,
+				ENullTreatment ent);
 
 	// extract colref set of order columns
-	CColRefSet *PcrsUsed(CMemoryPool *mp) const override;
+	gpos::owner<CColRefSet *> PcrsUsed(CMemoryPool *mp) const override;
 
 	// property type
 	EPropSpecType
@@ -197,18 +198,20 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::pointer<CReqdPropPlan *> prpp,
-						 CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::pointer<CExpressionArray *> pdrgpexpr,
+						 gpos::pointer<CExpression *> pexpr) override;
 
 	// hash function
 	ULONG HashValue() const override;
 
 	// return a copy of the order spec with remapped columns
-	virtual COrderSpec *PosCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
+	virtual gpos::owner<COrderSpec *> PosCopyWithRemappedColumns(
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+		BOOL must_exist);
 
 	// return a copy of the order spec after excluding the given columns
-	virtual COrderSpec *PosExcludeColumns(CMemoryPool *mp, CColRefSet *pcrs);
+	virtual gpos::owner<COrderSpec *> PosExcludeColumns(
+		CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs);
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
@@ -226,12 +229,13 @@ public:
 							 gpos::pointer<const COrderSpecArray *> pdrgpos);
 
 	// extract colref set of order columns used by elements of order spec array
-	static CColRefSet *GetColRefSet(CMemoryPool *mp, COrderSpecArray *pdrgpos);
+	static gpos::owner<CColRefSet *> GetColRefSet(
+		CMemoryPool *mp, gpos::pointer<COrderSpecArray *> pdrgpos);
 
 	// filter out array of order specs from order expressions using the passed columns
 	static gpos::owner<COrderSpecArray *> PdrgposExclude(
 		CMemoryPool *mp, gpos::pointer<COrderSpecArray *> pdrgpos,
-		CColRefSet *pcrsToExclude);
+		gpos::pointer<CColRefSet *> pcrsToExclude);
 
 
 };	// class COrderSpec

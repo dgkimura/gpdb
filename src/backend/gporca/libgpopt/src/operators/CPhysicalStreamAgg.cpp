@@ -34,10 +34,12 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalStreamAgg::CPhysicalStreamAgg(
-	CMemoryPool *mp, CColRefArray *colref_array, CColRefArray *pdrgpcrMinimal,
+	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+	gpos::pointer<CColRefArray *> pdrgpcrMinimal,
 	COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-	CColRefArray *pdrgpcrArgDQA, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
+	gpos::owner<CColRefArray *> pdrgpcrArgDQA, BOOL fMultiStage,
+	BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+	BOOL should_enforce_distribution)
 	: CPhysicalAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype,
 				   fGeneratesDuplicates, pdrgpcrArgDQA, fMultiStage,
 				   isAggFromSplitDQA, aggStage, should_enforce_distribution),
@@ -57,7 +59,8 @@ CPhysicalStreamAgg::CPhysicalStreamAgg(
 //
 //---------------------------------------------------------------------------
 void
-CPhysicalStreamAgg::InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder)
+CPhysicalStreamAgg::InitOrderSpec(CMemoryPool *mp,
+								  gpos::pointer<CColRefArray *> pdrgpcrOrder)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrOrder);
 
@@ -104,9 +107,10 @@ CPhysicalStreamAgg::~CPhysicalStreamAgg()
 //		can be created
 //
 //---------------------------------------------------------------------------
-COrderSpec *
-CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
-								CColRefArray *pdrgpcrGrp)
+gpos::owner<COrderSpec *>
+CPhysicalStreamAgg::PosCovering(CMemoryPool *mp,
+								gpos::pointer<COrderSpec *> posRequired,
+								gpos::pointer<CColRefArray *> pdrgpcrGrp)
 {
 	GPOS_ASSERT(nullptr != posRequired);
 
@@ -168,16 +172,16 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
 //		Compute required sort columns of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
-CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
-										 CExpressionHandle &exprhdl,
-										 COrderSpec *posRequired,
-										 ULONG
+gpos::owner<COrderSpec *>
+CPhysicalStreamAgg::PosRequiredStreamAgg(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<COrderSpec *> posRequired,
+	ULONG
 #ifdef GPOS_DEBUG
-											 child_index
+		child_index
 #endif	// GPOS_DEBUG
-										 ,
-										 CColRefArray *pdrgpcrGrp) const
+	,
+	gpos::pointer<CColRefArray *> pdrgpcrGrp) const
 {
 	GPOS_ASSERT(0 == child_index);
 
@@ -193,7 +197,7 @@ CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
 	gpos::owner<CColRefSet *> pcrs = pos->PcrsUsed(mp);
 
 	// get key collection of the relational child
-	CKeyCollection *pkc = exprhdl.DeriveKeyCollection(0);
+	gpos::pointer<CKeyCollection *> pkc = exprhdl.DeriveKeyCollection(0);
 
 	if (nullptr != pkc && pkc->FKey(pcrs, false /*fExactMatch*/))
 	{
@@ -224,7 +228,7 @@ CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalStreamAgg::PosDerive(CMemoryPool *,  // mp
 							  CExpressionHandle &exprhdl) const
 {
@@ -248,7 +252,8 @@ CPhysicalStreamAgg::EpetOrder(CExpressionHandle &exprhdl,
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
 
 	// get the order delivered by the stream agg node
-	COrderSpec *pos = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pos();
+	gpos::pointer<COrderSpec *> pos =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pos();
 	if (peo->FCompatible(pos))
 	{
 		// required order will be established by the stream agg operator

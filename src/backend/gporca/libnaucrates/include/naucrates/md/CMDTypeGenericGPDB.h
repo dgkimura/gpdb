@@ -149,15 +149,19 @@ public:
 
 	// ctor
 	CMDTypeGenericGPDB(
-		CMemoryPool *mp, IMDId *mdid, CMDName *mdname, BOOL is_redistributable,
-		BOOL is_fixed_length, ULONG length, BOOL is_passed_by_value,
-		IMDId *mdid_distr_opfamily, IMDId *mdid_legacy_distr_opfamily,
-		IMDId *mdid_op_eq, IMDId *mdid_op_neq, IMDId *mdid_op_lt,
-		IMDId *mdid_op_leq, IMDId *mdid_op_gt, IMDId *mdid_op_geq,
-		IMDId *mdid_op_cmp, IMDId *pmdidMin, IMDId *pmdidMax, IMDId *pmdidAvg,
-		IMDId *pmdidSum, IMDId *pmdidCount, BOOL is_hashable,
-		BOOL is_merge_joinable, BOOL is_composite_type, BOOL is_text_related,
-		IMDId *mdid_base_relation, IMDId *mdid_type_array, INT gpdb_length);
+		CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+		BOOL is_redistributable, BOOL is_fixed_length, ULONG length,
+		BOOL is_passed_by_value, gpos::owner<IMDId *> mdid_distr_opfamily,
+		gpos::owner<IMDId *> mdid_legacy_distr_opfamily,
+		gpos::owner<IMDId *> mdid_op_eq, gpos::owner<IMDId *> mdid_op_neq,
+		gpos::owner<IMDId *> mdid_op_lt, gpos::owner<IMDId *> mdid_op_leq,
+		gpos::owner<IMDId *> mdid_op_gt, gpos::owner<IMDId *> mdid_op_geq,
+		gpos::owner<IMDId *> mdid_op_cmp, gpos::owner<IMDId *> pmdidMin,
+		gpos::owner<IMDId *> pmdidMax, gpos::owner<IMDId *> pmdidAvg,
+		gpos::owner<IMDId *> pmdidSum, gpos::owner<IMDId *> pmdidCount,
+		BOOL is_hashable, BOOL is_merge_joinable, BOOL is_composite_type,
+		BOOL is_text_related, gpos::owner<IMDId *> mdid_base_relation,
+		gpos::owner<IMDId *> mdid_type_array, INT gpdb_length);
 
 	// dtor
 	~CMDTypeGenericGPDB() override;
@@ -274,14 +278,15 @@ public:
 	}
 
 	// generate the DXL datum from IDatum
-	CDXLDatum *GetDatumVal(CMemoryPool *mp, IDatum *datum) const override;
+	gpos::owner<CDXLDatum *> GetDatumVal(
+		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const override;
 
 	// generate the DXL datum representing null value
-	CDXLDatum *GetDXLDatumNull(CMemoryPool *mp) const override;
+	gpos::owner<CDXLDatum *> GetDXLDatumNull(CMemoryPool *mp) const override;
 
 	// generate the DXL scalar constant from IDatum
 	gpos::owner<CDXLScalarConstValue *> GetDXLOpScConst(
-		CMemoryPool *mp, IDatum *datum) const override;
+		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the type in the provided stream
@@ -293,9 +298,9 @@ public:
 
 	// create a dxl datum
 	static gpos::owner<CDXLDatum *> CreateDXLDatumVal(
-		CMemoryPool *mp, IMDId *mdid, gpos::pointer<const IMDType *> md_type,
-		INT type_modifier, BOOL is_null, BYTE *byte_array, ULONG length,
-		LINT lint_Value, CDouble double_Value);
+		CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+		gpos::pointer<const IMDType *> md_type, INT type_modifier, BOOL is_null,
+		BYTE *byte_array, ULONG length, LINT lint_Value, CDouble double_Value);
 
 	// create a dxl datum of types having double mapping
 	static gpos::owner<CDXLDatum *> CreateDXLDatumStatsDoubleMappable(

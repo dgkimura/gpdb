@@ -50,10 +50,11 @@ public:
 	CReqdPropRelational();
 
 	// ctor
-	explicit CReqdPropRelational(CColRefSet *pcrs);
+	explicit CReqdPropRelational(gpos::owner<CColRefSet *> pcrs);
 
 	// ctor
-	CReqdPropRelational(CColRefSet *pcrs, CExpression *pexprPartPred);
+	CReqdPropRelational(gpos::owner<CColRefSet *> pcrs,
+						gpos::owner<CExpression *> pexprPartPred);
 
 	// dtor
 	~CReqdPropRelational() override;
@@ -82,12 +83,12 @@ public:
 
 	// required properties computation function
 	void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 CReqdProp *prpInput, ULONG child_index,
+				 gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
 				 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// return difference from given properties
 	gpos::owner<CReqdPropRelational *> PrprelDifference(
-		CMemoryPool *mp, CReqdPropRelational *prprel);
+		CMemoryPool *mp, gpos::pointer<CReqdPropRelational *> prprel);
 
 	// return true if property container is empty
 	BOOL IsEmpty() const;

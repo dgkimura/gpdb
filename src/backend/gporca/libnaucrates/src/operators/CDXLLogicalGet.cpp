@@ -29,8 +29,9 @@ using namespace gpdxl;
 //		Construct a logical get operator node given its table descriptor rtable entry
 //
 //---------------------------------------------------------------------------
-CDXLLogicalGet::CDXLLogicalGet(CMemoryPool *mp, CDXLTableDescr *table_descr)
-	: CDXLLogical(mp), m_dxl_table_descr(table_descr)
+CDXLLogicalGet::CDXLLogicalGet(CMemoryPool *mp,
+							   gpos::owner<CDXLTableDescr *> table_descr)
+	: CDXLLogical(mp), m_dxl_table_descr(std::move(table_descr))
 {
 }
 

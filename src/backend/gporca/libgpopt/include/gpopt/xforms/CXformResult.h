@@ -54,7 +54,7 @@ public:
 	}
 
 	// add alternative
-	void Add(CExpression *pexpr);
+	void Add(gpos::owner<CExpression *> pexpr);
 
 	// retrieve next alternative
 	CExpression *PexprNext();

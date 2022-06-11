@@ -81,17 +81,20 @@ public:
 	CDistributionSpecHashed(const CDistributionSpecHashed &) = delete;
 
 	// ctor
-	CDistributionSpecHashed(CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
-							IMdIdArray *opfamilies = nullptr);
+	CDistributionSpecHashed(gpos::owner<CExpressionArray *> pdrgpexpr,
+							BOOL fNullsColocated,
+							gpos::owner<IMdIdArray *> opfamilies = nullptr);
 
 	// ctor
-	CDistributionSpecHashed(CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
-							CDistributionSpecHashed *pdshashedEquiv,
-							IMdIdArray *opfamilies = nullptr);
+	CDistributionSpecHashed(
+		gpos::owner<CExpressionArray *> pdrgpexpr, BOOL fNullsColocated,
+		gpos::owner<CDistributionSpecHashed *> pdshashedEquiv,
+		gpos::owner<IMdIdArray *> opfamilies = nullptr);
 
 	static gpos::owner<CDistributionSpecHashed *> MakeHashedDistrSpec(
-		CMemoryPool *mp, CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
-		CDistributionSpecHashed *pdshashedEquiv,
+		CMemoryPool *mp, gpos::owner<CExpressionArray *> pdrgpexpr,
+		BOOL fNullsColocated,
+		gpos::owner<CDistributionSpecHashed *> pdshashedEquiv,
 		gpos::owner<IMdIdArray *> opfamilies);
 
 	// dtor
@@ -140,11 +143,11 @@ public:
 	}
 
 	// columns used by distribution expressions
-	CColRefSet *PcrsUsed(CMemoryPool *mp) const override;
+	gpos::owner<CColRefSet *> PcrsUsed(CMemoryPool *mp) const override;
 
 	// return a copy of the distribution spec after excluding the given columns
 	virtual gpos::owner<CDistributionSpecHashed *> PdshashedExcludeColumns(
-		CMemoryPool *mp, CColRefSet *pcrs);
+		CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs);
 
 	// does this distribution match the given one
 	BOOL Matches(gpos::pointer<const CDistributionSpec *> pds) const override;
@@ -162,7 +165,7 @@ public:
 
 	// return a copy of the distribution spec with remapped columns
 	gpos::owner<CDistributionSpec *> PdsCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	// strip off any equivalent columns embedded in the distribution spec
@@ -171,8 +174,8 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::pointer<CReqdPropPlan *> prpp,
-						 CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::pointer<CExpressionArray *> pdrgpexpr,
+						 gpos::pointer<CExpression *> pexpr) override;
 
 	// hash function for hashed distribution spec
 	ULONG HashValue() const override;
@@ -189,9 +192,9 @@ public:
 	IOstream &OsPrintWithPrefix(IOstream &os, const char *prefix) const;
 
 	// return a hashed distribution on the maximal hashable subset of given columns
-	static CDistributionSpecHashed *PdshashedMaximal(CMemoryPool *mp,
-													 CColRefArray *colref_array,
-													 BOOL fNullsColocated);
+	static gpos::owner<CDistributionSpecHashed *> PdshashedMaximal(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array,
+		BOOL fNullsColocated);
 
 	// conversion function
 	static gpos::cast_func<CDistributionSpecHashed *>
@@ -231,22 +234,23 @@ public:
 		gpos::pointer<const CExpressionArray *> dist_cols_expr_array) const;
 
 	// create a copy of the distribution spec
-	CDistributionSpecHashed *Copy(CMemoryPool *mp);
+	gpos::owner<CDistributionSpecHashed *> Copy(CMemoryPool *mp);
 
 	// get distribution expr array from the current and its equivalent spec
-	CExpressionArrays *GetAllDistributionExprs(CMemoryPool *mp);
+	gpos::owner<CExpressionArrays *> GetAllDistributionExprs(CMemoryPool *mp);
 
 	// return a new spec created after merging the current spec with the input spec as equivalents
 	gpos::owner<CDistributionSpecHashed *> Combine(
-		CMemoryPool *mp, CDistributionSpecHashed *other_spec);
+		CMemoryPool *mp, gpos::pointer<CDistributionSpecHashed *> other_spec);
 
 	// check if the equivalent spec (if any) has no matching columns with the main spec
 	BOOL HasCompleteEquivSpec(CMemoryPool *mp) const;
 
 	// use given predicates to complete an incomplete spec, if possible
-	static CDistributionSpecHashed *TryToCompleteEquivSpec(
-		CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
-		CExpression *pexprPred, CColRefSet *outerRefs);
+	static gpos::owner<CDistributionSpecHashed *> TryToCompleteEquivSpec(
+		CMemoryPool *mp, gpos::pointer<CDistributionSpecHashed *> pdshashed,
+		gpos::pointer<CExpression *> pexprPred,
+		gpos::pointer<CColRefSet *> outerRefs);
 };	// class CDistributionSpecHashed
 
 }  // namespace gpopt

@@ -71,9 +71,9 @@ CXformExpandNAryJoinMinCard::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformExpandNAryJoinMinCard::Transform(CXformContext *pxfctxt,
-									   CXformResult *pxfres,
-									   CExpression *pexpr) const
+CXformExpandNAryJoinMinCard::Transform(gpos::pointer<CXformContext *> pxfctxt,
+									   gpos::pointer<CXformResult *> pxfres,
+									   gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -94,18 +94,19 @@ CXformExpandNAryJoinMinCard::Transform(CXformContext *pxfctxt,
 		pdrgpexpr->Append(pexprChild);
 	}
 
-	CExpression *pexprScalar = (*pexpr)[arity - 1];
-	CExpressionArray *pdrgpexprPreds =
+	gpos::pointer<CExpression *> pexprScalar = (*pexpr)[arity - 1];
+	gpos::owner<CExpressionArray *> pdrgpexprPreds =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 
 	// create a join order based on cardinality of intermediate results
-	CJoinOrderMinCard jomc(mp, pdrgpexpr, pdrgpexprPreds);
+	CJoinOrderMinCard jomc(mp, std::move(pdrgpexpr), std::move(pdrgpexprPreds));
 	gpos::owner<CExpression *> pexprResult = jomc.PexprExpand();
 
 	// normalize resulting expression
-	CExpression *pexprNormalized = CNormalizer::PexprNormalize(mp, pexprResult);
+	gpos::owner<CExpression *> pexprNormalized =
+		CNormalizer::PexprNormalize(mp, pexprResult);
 	pexprResult->Release();
-	pxfres->Add(pexprNormalized);
+	pxfres->Add(std::move(pexprNormalized));
 }
 
 // EOF

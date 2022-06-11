@@ -80,11 +80,13 @@ public:
 	~CJobTransformation() override;
 
 	// initialize job
-	void Init(CGroupExpression *pgexpr, CXform *pxform);
+	void Init(gpos::pointer<CGroupExpression *> pgexpr,
+			  gpos::pointer<CXform *> pxform);
 
 	// schedule a new transformation job
-	static void ScheduleJob(CSchedulerContext *psc, CGroupExpression *pgexpr,
-							CXform *pxform, CJob *pjParent);
+	static void ScheduleJob(CSchedulerContext *psc,
+							gpos::pointer<CGroupExpression *> pgexpr,
+							gpos::pointer<CXform *> pxform, CJob *pjParent);
 
 	// job's main function
 	BOOL FExecute(CSchedulerContext *psc) override;

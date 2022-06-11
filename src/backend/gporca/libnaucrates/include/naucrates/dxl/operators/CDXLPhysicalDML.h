@@ -78,13 +78,14 @@ public:
 	CDXLPhysicalDML(const CDXLPhysicalDML &) = delete;
 
 	// ctor
-	CDXLPhysicalDML(CMemoryPool *mp, const EdxlDmlType dxl_dml_type,
-					CDXLTableDescr *table_descr,
-					ULongPtrArray *src_colids_array, ULONG action_colid,
-					ULONG oid_colid, ULONG ctid_colid, ULONG segid_colid,
-					BOOL preserve_oids, ULONG tuple_oid,
-					CDXLDirectDispatchInfo *dxl_direct_dispatch_info,
-					BOOL input_sort_req);
+	CDXLPhysicalDML(
+		CMemoryPool *mp, const EdxlDmlType dxl_dml_type,
+		gpos::owner<CDXLTableDescr *> table_descr,
+		gpos::owner<ULongPtrArray *> src_colids_array, ULONG action_colid,
+		ULONG oid_colid, ULONG ctid_colid, ULONG segid_colid,
+		BOOL preserve_oids, ULONG tuple_oid,
+		gpos::owner<CDXLDirectDispatchInfo *> dxl_direct_dispatch_info,
+		BOOL input_sort_req);
 
 	// dtor
 	~CDXLPhysicalDML() override;

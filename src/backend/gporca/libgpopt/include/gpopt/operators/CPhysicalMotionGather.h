@@ -49,7 +49,7 @@ public:
 
 	CPhysicalMotionGather(CMemoryPool *mp,
 						  CDistributionSpecSingleton::ESegmentType est,
-						  COrderSpec *pos);
+						  gpos::owner<COrderSpec *> pos);
 
 	// dtor
 	~CPhysicalMotionGather() override;
@@ -100,28 +100,28 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::pointer<COperator *>) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	CColRefSet *PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsInput, ULONG child_index,
-							 CDrvdPropArray *pdrgpdpCtxt,
-							 ULONG ulOptReq) override;
+	gpos::owner<CColRefSet *> PcrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CColRefSet *> pcrsInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// compute required sort order of the n-th child
-	gpos::owner<COrderSpec *> PosRequired(CMemoryPool *mp,
-										  CExpressionHandle &exprhdl,
-										  gpos::pointer<COrderSpec *> posInput,
-										  ULONG child_index,
-										  CDrvdPropArray *pdrgpdpCtxt,
-										  ULONG ulOptReq) const override;
+	gpos::owner<COrderSpec *> PosRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<COrderSpec *> posInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::pointer<CColRefSet *> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------

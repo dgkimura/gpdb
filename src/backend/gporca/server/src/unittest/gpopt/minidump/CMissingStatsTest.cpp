@@ -82,7 +82,7 @@ CMissingStatsTest::EresUnittest_RunTests()
 	for (ULONG ul = m_ulMissingStatsTestCounter;
 		 ((ul < ulTests) && (GPOS_OK == eres)); ul++)
 	{
-		ICostModel *pcm = CTestUtils::GetCostModel(mp);
+		gpos::owner<ICostModel *> pcm = CTestUtils::GetCostModel(mp);
 		CAutoTraceFlag atf1(EopttracePrintColsWithMissingStats, true /*value*/);
 
 		gpos::owner<COptimizerConfig *> optimizer_config =
@@ -100,7 +100,8 @@ CMissingStatsTest::EresUnittest_RunTests()
 				optimizer_config, nullptr /*pceeval*/
 			);
 
-		CStatisticsConfig *stats_config = optimizer_config->GetStatsConf();
+		gpos::pointer<CStatisticsConfig *> stats_config =
+			optimizer_config->GetStatsConf();
 
 		leaked<IMdIdArray *> pdrgmdidCol = GPOS_NEW(mp) IMdIdArray(mp);
 		stats_config->CollectMissingStatsColumns(pdrgmdidCol);

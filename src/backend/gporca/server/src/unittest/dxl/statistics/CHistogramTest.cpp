@@ -51,7 +51,8 @@ CHistogramTest::EresUnittest()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr /* pceeval */,
@@ -270,7 +271,7 @@ CHistogramTest::PhistExampleInt4Remain(CMemoryPool *mp)
 	}
 
 	return GPOS_NEW(mp)
-		CHistogram(mp, histogram_buckets, true, 0.1 /*null_freq*/,
+		CHistogram(mp, std::move(histogram_buckets), true, 0.1 /*null_freq*/,
 				   2.0 /*distinct_remaining*/, 0.4 /*freq_remaining*/);
 }
 
@@ -303,7 +304,8 @@ CHistogramTest::EresUnittest_Skew()
 	pdrgppbucket1->Append(bucket1);
 	pdrgppbucket1->Append(bucket2);
 	pdrgppbucket1->Append(pbucket3);
-	CHistogram *histogram1 = GPOS_NEW(mp) CHistogram(mp, pdrgppbucket1);
+	CHistogram *histogram1 =
+		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket1));
 
 	gpos::owner<CBucketArray *> pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket2->Append(pbucket4);
@@ -311,7 +313,8 @@ CHistogramTest::EresUnittest_Skew()
 	pdrgppbucket2->Append(pbucket6);
 	pdrgppbucket2->Append(pbucket7);
 	pdrgppbucket2->Append(pbucket8);
-	CHistogram *histogram2 = GPOS_NEW(mp) CHistogram(mp, pdrgppbucket2);
+	CHistogram *histogram2 =
+		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket2));
 	GPOS_ASSERT(histogram1->GetSkew() > histogram2->GetSkew());
 
 	{
@@ -349,12 +352,14 @@ CHistogramTest::EresUnittest_MergeUnion()
 	gpos::owner<CBucketArray *> pdrgppbucket1 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket1->Append(bucket1);
 	pdrgppbucket1->Append(bucket2);
-	CHistogram *histogram1 = GPOS_NEW(mp) CHistogram(mp, pdrgppbucket1);
+	CHistogram *histogram1 =
+		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket1));
 
 	gpos::owner<CBucketArray *> pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket2->Append(pbucket3);
 	pdrgppbucket2->Append(pbucket4);
-	CHistogram *histogram2 = GPOS_NEW(mp) CHistogram(mp, pdrgppbucket2);
+	CHistogram *histogram2 =
+		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket2));
 
 	CDouble output_rows1(0.0);
 	CHistogram *result1 = histogram1->MakeUnionHistogramNormalize(
@@ -391,31 +396,33 @@ CHistogramTest::EresUnittest_MergeUnionDoubleLessThanEpsilon()
 	CMemoryPool *mp = amp.Pmp();
 
 	// [631.82140700000002, 631.82140700000002]
-	CPoint *ppLower1 = CCardinalityTestUtils::PpointDouble(
+	gpos::owner<CPoint *> ppLower1 = CCardinalityTestUtils::PpointDouble(
 		mp, GPDB_FLOAT8, CDouble(631.82140700000002));
-	CPoint *ppUpper1 = CCardinalityTestUtils::PpointDouble(
+	gpos::owner<CPoint *> ppUpper1 = CCardinalityTestUtils::PpointDouble(
 		mp, GPDB_FLOAT8, CDouble(631.82140700000002));
 
-	CBucket *bucket1 = GPOS_NEW(mp)
-		CBucket(ppLower1, ppUpper1, true /* is_lower_closed */,
-				true /*is_upper_closed*/, CDouble(0.2), CDouble(50));
+	CBucket *bucket1 = GPOS_NEW(mp) CBucket(
+		std::move(ppLower1), std::move(ppUpper1), true /* is_lower_closed */,
+		true /*is_upper_closed*/, CDouble(0.2), CDouble(50));
 
 	// (631.82140500000003, 645.05197699999997)
-	CPoint *ppLower2 = CCardinalityTestUtils::PpointDouble(
+	gpos::owner<CPoint *> ppLower2 = CCardinalityTestUtils::PpointDouble(
 		mp, GPDB_FLOAT8, CDouble(631.82140500000003));
-	CPoint *ppUpper2 = CCardinalityTestUtils::PpointDouble(
+	gpos::owner<CPoint *> ppUpper2 = CCardinalityTestUtils::PpointDouble(
 		mp, GPDB_FLOAT8, CDouble(645.05197699999997));
-	CBucket *bucket2 = GPOS_NEW(mp)
-		CBucket(ppLower2, ppUpper2, false /* is_lower_closed */,
-				false /*is_upper_closed*/, CDouble(0.2), CDouble(50));
+	CBucket *bucket2 = GPOS_NEW(mp) CBucket(
+		std::move(ppLower2), std::move(ppUpper2), false /* is_lower_closed */,
+		false /*is_upper_closed*/, CDouble(0.2), CDouble(50));
 
 	gpos::owner<CBucketArray *> pdrgppbucket1 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket1->Append(bucket1);
-	CHistogram *histogram1 = GPOS_NEW(mp) CHistogram(mp, pdrgppbucket1);
+	CHistogram *histogram1 =
+		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket1));
 
 	gpos::owner<CBucketArray *> pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket2->Append(bucket2);
-	CHistogram *histogram2 = GPOS_NEW(mp) CHistogram(mp, pdrgppbucket2);
+	CHistogram *histogram2 =
+		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket2));
 
 	CDouble output_rows1(0.0);
 	CHistogram *result1 = histogram1->MakeUnionHistogramNormalize(

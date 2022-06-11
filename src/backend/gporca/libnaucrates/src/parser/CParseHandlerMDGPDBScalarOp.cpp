@@ -269,13 +269,13 @@ CParseHandlerMDGPDBScalarOp::EndElement(const XMLCh *const,	 // element_uri,
 		{
 			mdid_opfamilies_array = GPOS_NEW(m_mp) IMdIdArray(m_mp);
 		}
-		m_imd_obj = GPOS_NEW(m_mp)
-			CMDScalarOpGPDB(m_mp, m_mdid, m_mdname, m_mdid_type_left,
-							m_mdid_type_right, m_mdid_type_result, m_func_mdid,
-							m_mdid_commute_opr, m_mdid_inverse_opr,
-							m_comparision_type, m_returns_null_on_null_input,
-							mdid_opfamilies_array, m_mdid_hash_opfamily,
-							m_mdid_legacy_hash_opfamily, m_is_ndv_preserving);
+		m_imd_obj = GPOS_NEW(m_mp) CMDScalarOpGPDB(
+			m_mp, m_mdid, m_mdname, m_mdid_type_left, m_mdid_type_right,
+			m_mdid_type_result, m_func_mdid, m_mdid_commute_opr,
+			m_mdid_inverse_opr, m_comparision_type,
+			m_returns_null_on_null_input, std::move(mdid_opfamilies_array),
+			m_mdid_hash_opfamily, m_mdid_legacy_hash_opfamily,
+			m_is_ndv_preserving);
 
 		// deactivate handler
 		m_parse_handler_mgr->DeactivateHandler();

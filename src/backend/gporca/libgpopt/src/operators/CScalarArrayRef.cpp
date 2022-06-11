@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarArrayRef.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 using namespace gpmd;
@@ -24,14 +25,16 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
-								 INT type_modifier, IMDId *array_type_mdid,
-								 IMDId *return_type_mdid)
+CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp,
+								 gpos::owner<IMDId *> elem_type_mdid,
+								 INT type_modifier,
+								 gpos::owner<IMDId *> array_type_mdid,
+								 gpos::owner<IMDId *> return_type_mdid)
 	: CScalar(mp),
-	  m_pmdidElem(elem_type_mdid),
+	  m_pmdidElem(std::move(elem_type_mdid)),
 	  m_type_modifier(type_modifier),
-	  m_pmdidArray(array_type_mdid),
-	  m_mdid_type(return_type_mdid)
+	  m_pmdidArray(std::move(array_type_mdid)),
+	  m_mdid_type(std::move(return_type_mdid))
 {
 	GPOS_ASSERT(m_pmdidElem->IsValid());
 	GPOS_ASSERT(m_pmdidArray->IsValid());
@@ -87,14 +90,15 @@ CScalarArrayRef::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayRef::Matches(COperator *pop) const
+CScalarArrayRef::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CScalarArrayRef *popArrayRef = CScalarArrayRef::PopConvert(pop);
+	gpos::pointer<CScalarArrayRef *> popArrayRef =
+		gpos::dyn_cast<CScalarArrayRef>(pop);
 
 	return m_mdid_type->Equals(popArrayRef->MdidType()) &&
 		   m_pmdidElem->Equals(popArrayRef->PmdidElem()) &&

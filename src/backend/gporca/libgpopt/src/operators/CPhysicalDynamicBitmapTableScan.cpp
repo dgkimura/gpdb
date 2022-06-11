@@ -40,13 +40,15 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan(
-	CMemoryPool *mp, CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
-	const CName *pnameAlias, ULONG scan_id, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
-	ColRefToUlongMapArray *root_col_mapping_per_part)
-	: CPhysicalDynamicScan(mp, ptabdesc, ulOriginOpId, pnameAlias, scan_id,
-						   pdrgpcrOutput, pdrgpdrgpcrParts, partition_mdids,
-						   root_col_mapping_per_part)
+	CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
+	ULONG ulOriginOpId, const CName *pnameAlias, ULONG scan_id,
+	CColRefArray *pdrgpcrOutput, gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
+	gpos::owner<IMdIdArray *> partition_mdids,
+	gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part)
+	: CPhysicalDynamicScan(mp, std::move(ptabdesc), ulOriginOpId, pnameAlias,
+						   scan_id, pdrgpcrOutput, std::move(pdrgpdrgpcrParts),
+						   std::move(partition_mdids),
+						   std::move(root_col_mapping_per_part))
 {
 }
 
@@ -59,7 +61,7 @@ CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDynamicBitmapTableScan::Matches(COperator *pop) const
+CPhysicalDynamicBitmapTableScan::Matches(gpos::pointer<COperator *> pop) const
 {
 	return CUtils::FMatchDynamicBitmapScan(this, pop);
 }
@@ -74,8 +76,9 @@ CPhysicalDynamicBitmapTableScan::Matches(COperator *pop) const
 //---------------------------------------------------------------------------
 IStatistics *
 CPhysicalDynamicBitmapTableScan::PstatsDerive(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan,
-	IStatisticsArray *stats_ctxt) const
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CReqdPropPlan *> prpplan,
+	gpos::pointer<IStatisticsArray *> stats_ctxt) const
 {
 	GPOS_ASSERT(nullptr != prpplan);
 

@@ -77,10 +77,10 @@ public:
 	CDXLColStats(const CDXLColStats &) = delete;
 
 	// ctor
-	CDXLColStats(CMemoryPool *mp, CMDIdColStats *mdid_col_stats,
+	CDXLColStats(CMemoryPool *mp, gpos::owner<CMDIdColStats *> mdid_col_stats,
 				 CMDName *mdname, CDouble width, CDouble null_freq,
 				 CDouble distinct_remaining, CDouble freq_remaining,
-				 CDXLBucketArray *dxl_stats_bucket_array,
+				 gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array,
 				 BOOL is_col_stats_missing);
 
 	// dtor
@@ -145,8 +145,10 @@ public:
 #endif
 
 	// dummy colstats
-	static CDXLColStats *CreateDXLDummyColStats(CMemoryPool *mp, IMDId *mdid,
-												CMDName *mdname, CDouble width);
+	static gpos::owner<CDXLColStats *> CreateDXLDummyColStats(CMemoryPool *mp,
+															  IMDId *mdid,
+															  CMDName *mdname,
+															  CDouble width);
 };
 
 // array of dxl column stats

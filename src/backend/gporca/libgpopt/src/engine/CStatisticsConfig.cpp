@@ -96,7 +96,8 @@ CStatisticsConfig::AddMissingStatsColumn(CMDIdColStats *pmdidCol)
 //
 //---------------------------------------------------------------------------
 void
-CStatisticsConfig::CollectMissingStatsColumns(IMdIdArray *pdrgmdid)
+CStatisticsConfig::CollectMissingStatsColumns(
+	gpos::pointer<IMdIdArray *> pdrgmdid)
 {
 	GPOS_ASSERT(nullptr != pdrgmdid);
 
@@ -104,7 +105,7 @@ CStatisticsConfig::CollectMissingStatsColumns(IMdIdArray *pdrgmdid)
 	while (hsiter.Advance())
 	{
 		gpos::owner<CMDIdColStats *> mdid_col_stats =
-			CMDIdColStats::CastMdid(const_cast<IMDId *>(hsiter.Get()));
+			gpos::dyn_cast<CMDIdColStats>(const_cast<IMDId *>(hsiter.Get()));
 		mdid_col_stats->AddRef();
 		pdrgmdid->Append(mdid_col_stats);
 	}

@@ -61,7 +61,7 @@ public:
 	CMappingColIdVarPlStmt(
 		CMemoryPool *mp,
 		const CDXLTranslateContextBaseTable *base_table_context,
-		CDXLTranslationContextArray *child_contexts,
+		gpos::pointer<CDXLTranslationContextArray *> child_contexts,
 		CDXLTranslateContext *output_context,
 		CContextDXLToPlStmt *dxl_to_plstmt_context);
 

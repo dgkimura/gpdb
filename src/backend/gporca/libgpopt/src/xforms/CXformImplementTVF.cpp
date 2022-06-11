@@ -47,8 +47,8 @@ CXformImplementTVF::CXformImplementTVF(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CXformImplementTVF::CXformImplementTVF(CExpression *pexpr)
-	: CXformImplementation(pexpr)
+CXformImplementTVF::CXformImplementTVF(gpos::owner<CExpression *> pexpr)
+	: CXformImplementation(std::move(pexpr))
 {
 }
 
@@ -87,14 +87,16 @@ CXformImplementTVF::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							  CExpression *pexpr) const
+CXformImplementTVF::Transform(gpos::pointer<CXformContext *> pxfctxt,
+							  gpos::pointer<CXformResult *> pxfres,
+							  gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalTVF *popTVF = CLogicalTVF::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalTVF *> popTVF =
+		gpos::dyn_cast<CLogicalTVF>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
@@ -110,7 +112,7 @@ CXformImplementTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	gpos::owner<CColumnDescriptorArray *> pdrgpcoldesc = popTVF->Pdrgpcoldesc();
 	pdrgpcoldesc->AddRef();
 
-	CColRefArray *pdrgpcrOutput = popTVF->PdrgpcrOutput();
+	gpos::pointer<CColRefArray *> pdrgpcrOutput = popTVF->PdrgpcrOutput();
 	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pdrgpcrOutput);
 
@@ -132,7 +134,7 @@ CXformImplementTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 

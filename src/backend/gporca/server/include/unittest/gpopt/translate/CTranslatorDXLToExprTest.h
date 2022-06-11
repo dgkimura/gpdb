@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/string/CWStringDynamic.h"
 
@@ -51,17 +52,18 @@ private:
 	);
 
 	// translate a dxl document into Expr Tree
-	static CExpression *Pexpr(
+	static gpos::owner<CExpression *> Pexpr(
 		CMemoryPool *mp,  // memory pool
 		const CHAR
 			*dxl_filename  // DXL document representing the DXL logical tree
 	);
 
 	// generate a string representation of a given Expr tree
-	static CWStringDynamic *Pstr(CMemoryPool *mp, CExpression *pexpr);
+	static CWStringDynamic *Pstr(CMemoryPool *mp,
+								 gpos::pointer<CExpression *> pexpr);
 
 	// create a get expression for a table (r) with two integer columns
-	static CExpression *PexprGet(CMemoryPool *mp);
+	static gpos::owner<CExpression *> PexprGet(CMemoryPool *mp);
 
 public:
 	// unittests

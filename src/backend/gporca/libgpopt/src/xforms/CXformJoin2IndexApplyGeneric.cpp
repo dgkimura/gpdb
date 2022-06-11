@@ -41,8 +41,10 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 		return true;
 
 	// now consider hash distributed table
-	CColRefSet *pcrsInnerOutput = pexprInner->DeriveOutputColumns();
-	CColRefSet *pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
+	gpos::pointer<CColRefSet *> pcrsInnerOutput =
+		pexprInner->DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrsScalarExpr =
+		pexprScalar->DeriveUsedColumns();
 	gpos::owner<CColRefSet *> pcrsInnerRefs =
 		GPOS_NEW(mp) CColRefSet(mp, *pcrsScalarExpr);
 	pcrsInnerRefs->Intersection(pcrsInnerOutput);
@@ -60,8 +62,9 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 			CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 		for (ULONG ul = 0; ul < pdrgpexpr->Size(); ul++)
 		{
-			CExpression *pexprPred = (*pdrgpexpr)[ul];
-			CColRefSet *pcrsPred = pexprPred->DeriveUsedColumns();
+			gpos::pointer<CExpression *> pexprPred = (*pdrgpexpr)[ul];
+			gpos::pointer<CColRefSet *> pcrsPred =
+				pexprPred->DeriveUsedColumns();
 
 			// if it doesn't have equi-join predicate on the distribution key,
 			// we can't transform to left outer index apply, because only
@@ -101,9 +104,10 @@ CXformJoin2IndexApplyGeneric::Exfp(CExpressionHandle &exprhdl) const
 
 // actual transform
 void
-CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
-										CXformResult *pxfres,
-										CExpression *pexpr) const
+CXformJoin2IndexApplyGeneric::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -166,7 +170,7 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 	// info on the get node (a get node or a dynamic get)
 	CTableDescriptor *ptabdescInner = nullptr;
 	gpos::pointer<const CColRefSet *> distributionCols = nullptr;
-	CLogicalDynamicGet *popDynamicGet = nullptr;
+	gpos::pointer<CLogicalDynamicGet *> popDynamicGet = nullptr;
 	CAutoRef<CColRefSet> groupingColsToCheck;
 
 	// walk down the right child tree, accepting some unary operators
@@ -222,8 +226,9 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 					if (COperator::EopLogicalGbAgg ==
 						pexprCurrInnerChild->Pop()->Eopid())
 					{
-						CLogicalGbAgg *grbyAggOp = CLogicalGbAgg::PopConvert(
-							pexprCurrInnerChild->Pop());
+						gpos::pointer<CLogicalGbAgg *> grbyAggOp =
+							gpos::dyn_cast<CLogicalGbAgg>(
+								pexprCurrInnerChild->Pop());
 
 						GPOS_ASSERT(nullptr != grbyAggOp);
 						if (nullptr != grbyAggOp->Pdrgpcr() &&
@@ -263,8 +268,8 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 
 			case COperator::EopLogicalGet:
 			{
-				CLogicalGet *popGet =
-					CLogicalGet::PopConvert(pexprCurrInnerChild->Pop());
+				gpos::pointer<CLogicalGet *> popGet =
+					gpos::dyn_cast<CLogicalGet>(pexprCurrInnerChild->Pop());
 
 				ptabdescInner = popGet->Ptabdesc();
 				distributionCols = popGet->PcrsDist();
@@ -281,8 +286,8 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 
 			case COperator::EopLogicalDynamicGet:
 			{
-				popDynamicGet =
-					CLogicalDynamicGet::PopConvert(pexprCurrInnerChild->Pop());
+				popDynamicGet = gpos::dyn_cast<CLogicalDynamicGet>(
+					pexprCurrInnerChild->Pop());
 				ptabdescInner = popDynamicGet->Ptabdesc();
 				distributionCols = popDynamicGet->PcrsDist();
 				pexprGet = pexprCurrInnerChild;

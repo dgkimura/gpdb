@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CPropSpec.h"
 #include "gpopt/operators/COperator.h"
@@ -86,12 +87,14 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	void
-	AppendEnforcers(
-		CMemoryPool *mp, CReqdPropPlan *prpp,
-		CExpressionArray *pdrgpexpr,  // array of enforcer expressions
-		CExpression *pexprChild,	  // leaf in the target group where
-									  // enforcers will be added
-		CEnfdProp::EPropEnforcingType epet, CExpressionHandle &exprhdl) const
+	AppendEnforcers(CMemoryPool *mp, gpos::pointer<CReqdPropPlan *> prpp,
+					gpos::pointer<CExpressionArray *>
+						pdrgpexpr,	// array of enforcer expressions
+					gpos::pointer<CExpression *>
+						pexprChild,	 // leaf in the target group where
+									 // enforcers will be added
+					CEnfdProp::EPropEnforcingType epet,
+					CExpressionHandle &exprhdl) const
 	{
 		if (FEnforce(epet))
 		{
@@ -100,7 +103,7 @@ public:
 	}
 
 	// property spec accessor
-	virtual CPropSpec *Pps() const = 0;
+	virtual gpos::pointer<CPropSpec *> Pps() const = 0;
 
 	// hash function
 	virtual ULONG HashValue() const = 0;

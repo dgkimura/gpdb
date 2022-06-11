@@ -132,8 +132,8 @@ private:
 
 	public:
 		// ctor
-		SContextLink(CCostContext *pccParent, ULONG child_index,
-					 COptimizationContext *poc);
+		SContextLink(gpos::owner<CCostContext *> pccParent, ULONG child_index,
+					 gpos::owner<COptimizationContext *> poc);
 
 		// dtor
 		virtual ~SContextLink();
@@ -259,8 +259,8 @@ private:
 	void SetState(EState estNewState);
 
 	// set hash join keys
-	void SetJoinKeys(CExpressionArray *pdrgpexprOuter,
-					 CExpressionArray *pdrgpexprInner,
+	void SetJoinKeys(gpos::pointer<CExpressionArray *> pdrgpexprOuter,
+					 gpos::pointer<CExpressionArray *> pdrgpexprInner,
 					 gpos::pointer<IMdIdArray *> join_opfamilies);
 
 	// insert new group expression
@@ -279,7 +279,7 @@ private:
 	CGroupExpression *PgexprFirst();
 
 	// retrieve next group expression
-	CGroupExpression *PgexprNext(CGroupExpression *pgexpr);
+	CGroupExpression *PgexprNext(gpos::pointer<CGroupExpression *> pgexpr);
 
 	// return true if first promise is better than second promise
 	static BOOL FBetterPromise(CMemoryPool *mp, CLogical::EStatPromise espFst,
@@ -288,20 +288,19 @@ private:
 							   gpos::pointer<CGroupExpression *> pgexprSnd);
 
 	// derive stats recursively on child groups
-	static CLogical::EStatPromise EspDerive(CMemoryPool *pmpLocal,
-											CMemoryPool *pmpGlobal,
-											CGroupExpression *pgexpr,
-											CReqdPropRelational *prprel,
-											IStatisticsArray *stats_ctxt,
-											BOOL fDeriveChildStats);
+	static CLogical::EStatPromise EspDerive(
+		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
+		gpos::pointer<CGroupExpression *> pgexpr, CReqdPropRelational *prprel,
+		IStatisticsArray *stats_ctxt, BOOL fDeriveChildStats);
 
 	// reset computed stats
 	void ResetStats();
 
 	// helper function to add links in child groups
 	static void RecursiveBuildTreeMap(
-		CMemoryPool *mp, COptimizationContext *poc, CCostContext *pccParent,
-		CGroupExpression *pgexprCurrent, ULONG child_index,
+		CMemoryPool *mp, COptimizationContext *poc,
+		gpos::pointer<CCostContext *> pccParent,
+		gpos::pointer<CGroupExpression *> pgexprCurrent, ULONG child_index,
 		CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan,
 				 CCostContext::HashValue, CCostContext::Equals> *ptmap);
 
@@ -353,7 +352,7 @@ public:
 	BOOL FInitStats(IStatistics *stats);
 
 	// append given stats object to group stats
-	void AppendStats(CMemoryPool *mp, IStatistics *stats);
+	void AppendStats(CMemoryPool *mp, gpos::pointer<IStatistics *> stats);
 
 	// accessor of maximum optimization level of member group expressions
 	EOptimizationLevel
@@ -530,10 +529,11 @@ public:
 	COptimizationContext *PocInsert(COptimizationContext *poc);
 
 	// update the best group cost under the given optimization context
-	void UpdateBestCost(COptimizationContext *poc, CCostContext *pcc);
+	void UpdateBestCost(gpos::pointer<COptimizationContext *> poc,
+						gpos::pointer<CCostContext *> pcc);
 
 	// lookup best expression under given optimization context
-	CGroupExpression *PgexprBest(COptimizationContext *poc);
+	CGroupExpression *PgexprBest(gpos::pointer<COptimizationContext *> poc);
 
 	// materialize a scalar expression for stat derivation if this is a scalar group
 	void CreateScalarExpression();
@@ -568,8 +568,8 @@ public:
 		CReqdPropRelational *prprel, IStatisticsArray *stats_ctxt);
 
 	// find group expression with best stats promise and the same given children
-	CGroupExpression *PgexprBestPromise(CMemoryPool *mp,
-										CGroupExpression *pgexprToMatch);
+	CGroupExpression *PgexprBestPromise(
+		CMemoryPool *mp, gpos::pointer<CGroupExpression *> pgexprToMatch);
 
 	// link parent group expression to group members
 	void BuildTreeMap(
@@ -585,9 +585,9 @@ public:
 	CGroupExpression *PgexprAnyCTEConsumer();
 
 	// compute stats during costing
-	gpos::pointer<IStatistics *> PstatsCompute(COptimizationContext *poc,
-											   CExpressionHandle &exprhdl,
-											   CGroupExpression *pgexpr);
+	gpos::pointer<IStatistics *> PstatsCompute(
+		COptimizationContext *poc, CExpressionHandle &exprhdl,
+		gpos::pointer<CGroupExpression *> pgexpr);
 
 	// compute cost lower bound for the plan satisfying given required properties
 	CCost CostLowerBound(CMemoryPool *mp, CReqdPropPlan *prppInput);

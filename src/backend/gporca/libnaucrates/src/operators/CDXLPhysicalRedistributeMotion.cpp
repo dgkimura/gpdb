@@ -124,8 +124,9 @@ CDXLPhysicalRedistributeMotion::AssertValid(
 
 	GPOS_ASSERT(EdxlrmIndexSentinel == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlrmIndexChild];
-	CDXLNode *hash_expr_list = (*dxlnode)[EdxlrmIndexHashExprList];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[EdxlrmIndexChild];
+	gpos::pointer<CDXLNode *> hash_expr_list =
+		(*dxlnode)[EdxlrmIndexHashExprList];
 
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());

@@ -70,7 +70,7 @@ private:
 public:
 	CDXLRelStats(const CDXLRelStats &) = delete;
 
-	CDXLRelStats(CMemoryPool *mp, CMDIdRelStats *rel_stats_mdid,
+	CDXLRelStats(CMemoryPool *mp, gpos::owner<CMDIdRelStats *> rel_stats_mdid,
 				 CMDName *mdname, CDouble rows, BOOL is_empty, ULONG relpages,
 				 ULONG relallvisible);
 
@@ -118,7 +118,8 @@ public:
 #endif
 
 	// dummy relstats
-	static CDXLRelStats *CreateDXLDummyRelStats(CMemoryPool *mp, IMDId *mdid);
+	static gpos::owner<CDXLRelStats *> CreateDXLDummyRelStats(CMemoryPool *mp,
+															  IMDId *mdid);
 };
 
 }  // namespace gpmd

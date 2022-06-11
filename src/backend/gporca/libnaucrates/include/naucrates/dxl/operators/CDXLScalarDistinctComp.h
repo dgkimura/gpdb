@@ -43,7 +43,7 @@ public:
 	CDXLScalarDistinctComp(CDXLScalarDistinctComp &) = delete;
 
 	// ctor/dtor
-	CDXLScalarDistinctComp(CMemoryPool *mp, IMDId *operator_mdid);
+	CDXLScalarDistinctComp(CMemoryPool *mp, gpos::owner<IMDId *> operator_mdid);
 
 	// ident accessors
 	Edxlopid GetDXLOperator() const override;

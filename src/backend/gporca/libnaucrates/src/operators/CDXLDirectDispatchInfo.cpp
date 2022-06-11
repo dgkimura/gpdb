@@ -17,6 +17,8 @@
 
 #include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -32,8 +34,10 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLDirectDispatchInfo::CDXLDirectDispatchInfo(
-	CDXLDatum2dArray *dispatch_identifer_datum_array, BOOL contains_raw_values)
-	: m_dispatch_identifer_datum_array(dispatch_identifer_datum_array),
+	gpos::owner<CDXLDatum2dArray *> dispatch_identifer_datum_array,
+	BOOL contains_raw_values)
+	: m_dispatch_identifer_datum_array(
+		  std::move(dispatch_identifer_datum_array)),
 	  m_contains_raw_values(contains_raw_values)
 {
 	GPOS_ASSERT(nullptr != m_dispatch_identifer_datum_array);
@@ -99,13 +103,14 @@ CDXLDirectDispatchInfo::Serialize(CXMLSerializer *xml_serializer)
 			CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 			CDXLTokens::GetDXLTokenStr(EdxltokenDirectDispatchKeyValue));
 
-		CDXLDatumArray *dispatch_identifier_array =
+		gpos::pointer<CDXLDatumArray *> dispatch_identifier_array =
 			(*m_dispatch_identifer_datum_array)[idx1];
 
 		const ULONG num_of_datums = dispatch_identifier_array->Size();
 		for (ULONG idx2 = 0; idx2 < num_of_datums; idx2++)
 		{
-			CDXLDatum *dxl_datum = (*dispatch_identifier_array)[idx2];
+			gpos::pointer<CDXLDatum *> dxl_datum =
+				(*dispatch_identifier_array)[idx2];
 			dxl_datum->Serialize(xml_serializer,
 								 CDXLTokens::GetDXLTokenStr(EdxltokenDatum));
 		}

@@ -40,9 +40,9 @@ CDXLLogicalGroupBy::CDXLLogicalGroupBy(CMemoryPool *mp)
 //		Construct a DXL Logical group by node
 //
 //---------------------------------------------------------------------------
-CDXLLogicalGroupBy::CDXLLogicalGroupBy(CMemoryPool *mp,
-									   ULongPtrArray *pdrgpulGrpColIds)
-	: CDXLLogical(mp), m_grouping_colid_array(pdrgpulGrpColIds)
+CDXLLogicalGroupBy::CDXLLogicalGroupBy(
+	CMemoryPool *mp, gpos::owner<ULongPtrArray *> pdrgpulGrpColIds)
+	: CDXLLogical(mp), m_grouping_colid_array(std::move(pdrgpulGrpColIds))
 {
 	GPOS_ASSERT(nullptr != m_grouping_colid_array);
 }
@@ -97,7 +97,8 @@ CDXLLogicalGroupBy::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalGroupBy::SetGroupingColumns(ULongPtrArray *grouping_colid_array)
+CDXLLogicalGroupBy::SetGroupingColumns(
+	gpos::owner<ULongPtrArray *> grouping_colid_array)
 {
 	GPOS_ASSERT(nullptr != grouping_colid_array);
 	m_grouping_colid_array = grouping_colid_array;
@@ -207,11 +208,11 @@ CDXLLogicalGroupBy::AssertValid(gpos::pointer<const CDXLNode *> node,
 	const ULONG num_of_child = node->Arity();
 	GPOS_ASSERT(2 == num_of_child);
 
-	CDXLNode *proj_list = (*node)[0];
+	gpos::pointer<CDXLNode *> proj_list = (*node)[0];
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list->GetOperator()->GetDXLOperator());
 
-	CDXLNode *dxl_op_type = (*node)[1];
+	gpos::pointer<CDXLNode *> dxl_op_type = (*node)[1];
 	GPOS_ASSERT(EdxloptypeLogical ==
 				dxl_op_type->GetOperator()->GetDXLOperatorType());
 
@@ -219,7 +220,7 @@ CDXLLogicalGroupBy::AssertValid(gpos::pointer<const CDXLNode *> node,
 	{
 		for (ULONG idx = 0; idx < num_of_child; idx++)
 		{
-			CDXLNode *child_dxlnode = (*node)[idx];
+			gpos::pointer<CDXLNode *> child_dxlnode = (*node)[idx];
 			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
 													  validate_children);
 		}
@@ -228,7 +229,7 @@ CDXLLogicalGroupBy::AssertValid(gpos::pointer<const CDXLNode *> node,
 	const ULONG num_of_proj_elem = proj_list->Arity();
 	for (ULONG idx = 0; idx < num_of_proj_elem; ++idx)
 	{
-		CDXLNode *proj_elem = (*proj_list)[idx];
+		gpos::pointer<CDXLNode *> proj_elem = (*proj_list)[idx];
 		GPOS_ASSERT(EdxlopScalarIdent !=
 					proj_elem->GetOperator()->GetDXLOperator());
 	}

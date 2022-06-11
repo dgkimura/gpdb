@@ -15,7 +15,7 @@
 namespace gpopt
 {
 CPhysicalUnionAllFactory::CPhysicalUnionAllFactory(
-	CLogicalUnionAll *popLogicalUnionAll)
+	gpos::pointer<CLogicalUnionAll *> popLogicalUnionAll)
 	: m_popLogicalUnionAll(popLogicalUnionAll)
 {
 }

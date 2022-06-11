@@ -30,7 +30,7 @@ FORCE_GENERATE_DBGSTR(CPoint);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPoint::CPoint(IDatum *datum) : m_datum(datum)
+CPoint::CPoint(gpos::owner<IDatum *> datum) : m_datum(std::move(datum))
 {
 	GPOS_ASSERT(nullptr != m_datum);
 }
@@ -231,10 +231,10 @@ CPoint::MaxPoint(CPoint *point1, CPoint *point2)
 //	@doc:
 //		Translate the point into its DXL representation
 //---------------------------------------------------------------------------
-CDXLDatum *
+gpos::owner<CDXLDatum *>
 CPoint::GetDatumVal(CMemoryPool *mp, CMDAccessor *md_accessor) const
 {
-	IMDId *mdid = m_datum->MDId();
+	gpos::pointer<IMDId *> mdid = m_datum->MDId();
 	return md_accessor->RetrieveType(mdid)->GetDatumVal(mp, m_datum);
 }
 

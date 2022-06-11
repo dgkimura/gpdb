@@ -49,10 +49,10 @@ public:
 	CScalarArrayCoerceExpr(const CScalarArrayCoerceExpr &) = delete;
 
 	// ctor
-	CScalarArrayCoerceExpr(CMemoryPool *mp, IMDId *element_func,
-						   IMDId *result_type_mdid, INT type_modifier,
-						   BOOL is_explicit, ECoercionForm dxl_coerce_format,
-						   INT location);
+	CScalarArrayCoerceExpr(CMemoryPool *mp, gpos::owner<IMDId *> element_func,
+						   gpos::owner<IMDId *> result_type_mdid,
+						   INT type_modifier, BOOL is_explicit,
+						   ECoercionForm dxl_coerce_format, INT location);
 
 	// dtor
 	~CScalarArrayCoerceExpr() override;
@@ -68,7 +68,7 @@ public:
 	const CHAR *SzId() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;

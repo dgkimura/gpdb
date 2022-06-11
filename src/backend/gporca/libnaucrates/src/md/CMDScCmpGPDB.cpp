@@ -30,16 +30,18 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDScCmpGPDB::CMDScCmpGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-						   IMDId *left_mdid, IMDId *right_mdid,
-						   IMDType::ECmpType cmp_type, IMDId *mdid_op)
+CMDScCmpGPDB::CMDScCmpGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+						   CMDName *mdname, gpos::owner<IMDId *> left_mdid,
+						   gpos::owner<IMDId *> right_mdid,
+						   IMDType::ECmpType cmp_type,
+						   gpos::owner<IMDId *> mdid_op)
 	: m_mp(mp),
-	  m_mdid(mdid),
+	  m_mdid(std::move(mdid)),
 	  m_mdname(mdname),
-	  m_mdid_left(left_mdid),
-	  m_mdid_right(right_mdid),
+	  m_mdid_left(std::move(left_mdid)),
+	  m_mdid_right(std::move(right_mdid)),
 	  m_comparision_type(cmp_type),
-	  m_mdid_op(mdid_op)
+	  m_mdid_op(std::move(mdid_op))
 {
 	GPOS_ASSERT(m_mdid->IsValid());
 	GPOS_ASSERT(m_mdid_left->IsValid());

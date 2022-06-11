@@ -57,9 +57,11 @@ private:
 
 public:
 	// ctor
-	CDXLWindowSpec(CMemoryPool *mp, ULongPtrArray *partition_by_colid_array,
-				   CMDName *mdname, CDXLNode *sort_col_list_dxlnode,
-				   CDXLWindowFrame *window_frame);
+	CDXLWindowSpec(CMemoryPool *mp,
+				   gpos::owner<ULongPtrArray *> partition_by_colid_array,
+				   CMDName *mdname,
+				   gpos::owner<CDXLNode *> sort_col_list_dxlnode,
+				   gpos::owner<CDXLWindowFrame *> window_frame);
 
 	// dtor
 	~CDXLWindowSpec() override;

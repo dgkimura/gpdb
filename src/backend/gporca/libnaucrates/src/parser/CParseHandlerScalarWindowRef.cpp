@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarWindowRef.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -54,12 +56,12 @@ CParseHandlerScalarWindowRef::StartElement(
 				 element_local_name))
 	{
 		// parse and create scalar WindowRef (window function)
-		CDXLScalarWindowRef *dxl_op =
-			(CDXLScalarWindowRef *) CDXLOperatorFactory::MakeWindowRef(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+		gpos::owner<CDXLScalarWindowRef *> dxl_op =
+			gpos::cast<CDXLScalarWindowRef>(CDXLOperatorFactory::MakeWindowRef(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 		// construct node from the created scalar window ref
-		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 	}
 	else
 	{

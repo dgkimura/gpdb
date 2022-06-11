@@ -63,7 +63,8 @@ CXformSplitLimit::Exfp(CExpressionHandle &exprhdl) const
 		return CXform::ExfpNone;
 	}
 
-	CLogicalLimit *popLimit = CLogicalLimit::PopConvert(exprhdl.Pop());
+	gpos::pointer<CLogicalLimit *> popLimit =
+		gpos::dyn_cast<CLogicalLimit>(exprhdl.Pop());
 	if (!popLimit->FGlobal() || !popLimit->FHasCount())
 	{
 		return CXform::ExfpNone;
@@ -82,8 +83,9 @@ CXformSplitLimit::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformSplitLimit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							CExpression *pexpr) const
+CXformSplitLimit::Transform(gpos::pointer<CXformContext *> pxfctxt,
+							gpos::pointer<CXformResult *> pxfres,
+							gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -92,7 +94,8 @@ CXformSplitLimit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 	// extract components
-	CLogicalLimit *popLimit = CLogicalLimit::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalLimit *> popLimit =
+		gpos::dyn_cast<CLogicalLimit>(pexpr->Pop());
 	CExpression *pexprRelational = (*pexpr)[0];
 	CExpression *pexprScalarStart = (*pexpr)[1];
 	CExpression *pexprScalarRows = (*pexpr)[2];
@@ -109,18 +112,18 @@ CXformSplitLimit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pexprRelational->AddRef();
 
 	// assemble local limit operator
-	CExpression *pexprLimitLocal =
+	gpos::owner<CExpression *> pexprLimitLocal =
 		PexprLimit(mp, pexprRelational, pexprScalarStart, pexprScalarRows, pos,
 				   false,  // fGlobal
 				   popLimit->FHasCount(), popLimit->IsTopLimitUnderDMLorCTAS());
 
 	// assemble global limit operator
-	CExpression *pexprLimitGlobal =
-		PexprLimit(mp, pexprLimitLocal, pexprScalarStart, pexprScalarRows, pos,
-				   true,  // fGlobal
-				   popLimit->FHasCount(), popLimit->IsTopLimitUnderDMLorCTAS());
+	gpos::owner<CExpression *> pexprLimitGlobal = PexprLimit(
+		mp, std::move(pexprLimitLocal), pexprScalarStart, pexprScalarRows, pos,
+		true,  // fGlobal
+		popLimit->FHasCount(), popLimit->IsTopLimitUnderDMLorCTAS());
 
-	pxfres->Add(pexprLimitGlobal);
+	pxfres->Add(std::move(pexprLimitGlobal));
 }
 
 
@@ -132,8 +135,9 @@ CXformSplitLimit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 //		Generate a limit operator
 //
 //---------------------------------------------------------------------------
-CExpression *
-CXformSplitLimit::PexprLimit(CMemoryPool *mp, CExpression *pexprRelational,
+gpos::owner<CExpression *>
+CXformSplitLimit::PexprLimit(CMemoryPool *mp,
+							 gpos::owner<CExpression *> pexprRelational,
 							 CExpression *pexprScalarStart,
 							 CExpression *pexprScalarRows, COrderSpec *pos,
 							 BOOL fGlobal, BOOL fHasCount,
@@ -148,7 +152,7 @@ CXformSplitLimit::PexprLimit(CMemoryPool *mp, CExpression *pexprRelational,
 		mp,
 		GPOS_NEW(mp)
 			CLogicalLimit(mp, pos, fGlobal, fHasCount, fTopLimitUnderDML),
-		pexprRelational, pexprScalarStart, pexprScalarRows);
+		std::move(pexprRelational), pexprScalarStart, pexprScalarRows);
 
 	return pexprLimit;
 }

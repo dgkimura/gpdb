@@ -77,7 +77,7 @@ private:
 	BOOL m_is_child_agg_node;
 
 	// copy the params hashmap
-	void CopyParamHashmap(ULongToColParamMap *original);
+	void CopyParamHashmap(gpos::pointer<ULongToColParamMap *> original);
 
 public:
 	CDXLTranslateContext(const CDXLTranslateContext &) = delete;
@@ -86,7 +86,7 @@ public:
 	CDXLTranslateContext(CMemoryPool *mp, BOOL is_child_agg_node);
 
 	CDXLTranslateContext(CMemoryPool *mp, BOOL is_child_agg_node,
-						 ULongToColParamMap *original);
+						 gpos::pointer<ULongToColParamMap *> original);
 
 	~CDXLTranslateContext();
 
@@ -111,8 +111,9 @@ public:
 	void InsertMapping(ULONG colid, TargetEntry *target_entry);
 
 	// store the mapping of the given column id and param id
-	BOOL FInsertParamMapping(ULONG colid,
-							 CMappingElementColIdParamId *pmecolidparamid);
+	BOOL FInsertParamMapping(
+		ULONG colid,
+		gpos::owner<CMappingElementColIdParamId *> pmecolidparamid);
 };
 
 

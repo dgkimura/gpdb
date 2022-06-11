@@ -39,11 +39,11 @@ protected:
 	// from the original aggregate
 	static void PopulateLocalGlobalProjectList(
 		CMemoryPool *mp,  // memory pool
-		CExpression *
+		gpos::pointer<CExpression *>
 			pexprProjListOrig,	// project list of the original global aggregate
-		CExpression *
+		gpos::owner<CExpression *>
 			*ppexprProjListLocal,  // project list of the new local aggregate
-		CExpression *
+		gpos::owner<CExpression *>
 			*ppexprProjListGlobal  // project list of the new global aggregate
 	);
 
@@ -54,7 +54,7 @@ public:
 	explicit CXformSplitGbAgg(CMemoryPool *mp);
 
 	// ctor
-	explicit CXformSplitGbAgg(CExpression *pexprPattern);
+	explicit CXformSplitGbAgg(gpos::owner<CExpression *> pexprPattern);
 
 	// dtor
 	~CXformSplitGbAgg() override = default;
@@ -86,8 +86,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::pointer<CXformContext *> pxfctxt,
+				   gpos::pointer<CXformResult *> pxfres,
+				   gpos::pointer<CExpression *> pexpr) const override;
 
 };	// class CXformSplitGbAgg
 

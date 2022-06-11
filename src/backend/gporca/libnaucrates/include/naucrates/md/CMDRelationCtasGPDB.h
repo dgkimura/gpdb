@@ -112,13 +112,16 @@ public:
 
 	// ctor
 	CMDRelationCtasGPDB(
-		CMemoryPool *mp, IMDId *mdid, CMDName *mdname_schema, CMDName *mdname,
-		BOOL fTemporary, BOOL fHasOids, Erelstoragetype rel_storage_type,
-		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-		ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
-		IMdIdArray *distr_opclasses, ULongPtr2dArray *keyset_array,
-		CDXLCtasStorageOptions *dxl_ctas_storage_options,
-		IntPtrArray *vartypemod_array);
+		CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname_schema,
+		CMDName *mdname, BOOL fTemporary, BOOL fHasOids,
+		Erelstoragetype rel_storage_type, Ereldistrpolicy rel_distr_policy,
+		gpos::owner<CMDColumnArray *> mdcol_array,
+		gpos::owner<ULongPtrArray *> distr_col_array,
+		gpos::owner<IMdIdArray *> distr_opfamilies,
+		gpos::owner<IMdIdArray *> distr_opclasses,
+		gpos::owner<ULongPtr2dArray *> keyset_array,
+		gpos::owner<CDXLCtasStorageOptions *> dxl_ctas_storage_options,
+		gpos::owner<IntPtrArray *> vartypemod_array);
 
 	// dtor
 	~CMDRelationCtasGPDB() override;
@@ -251,7 +254,7 @@ public:
 	}
 
 	// retrieve the id of the metadata cache trigger at the given position
-	IMDId *
+	gpos::pointer<IMDId *>
 	TriggerMDidAt(ULONG	 // pos
 	) const override
 	{
@@ -270,7 +273,7 @@ public:
 	}
 
 	// retrieve the id of the check constraint cache at the given position
-	IMDId *
+	gpos::pointer<IMDId *>
 	CheckConstraintMDidAt(ULONG	 // pos
 	) const override
 	{

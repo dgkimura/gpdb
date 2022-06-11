@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarCaseTest.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 using namespace gpmd;
@@ -24,8 +25,9 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCaseTest::CScalarCaseTest(CMemoryPool *mp, IMDId *mdid_type)
-	: CScalar(mp), m_mdid_type(mdid_type)
+CScalarCaseTest::CScalarCaseTest(CMemoryPool *mp,
+								 gpos::owner<IMDId *> mdid_type)
+	: CScalar(mp), m_mdid_type(std::move(mdid_type))
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
 }
@@ -83,11 +85,12 @@ CScalarCaseTest::FInputOrderSensitive() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCaseTest::Matches(COperator *pop) const
+CScalarCaseTest::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCaseTest *popScCaseTest = CScalarCaseTest::PopConvert(pop);
+		gpos::pointer<CScalarCaseTest *> popScCaseTest =
+			gpos::dyn_cast<CScalarCaseTest>(pop);
 
 		// match if return types are identical
 		return popScCaseTest->MdidType()->Equals(m_mdid_type);

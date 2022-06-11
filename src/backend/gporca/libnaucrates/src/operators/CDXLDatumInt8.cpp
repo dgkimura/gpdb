@@ -17,6 +17,7 @@
 
 #include "naucrates/dxl/operators/CDXLDatumInt8.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -32,8 +33,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumInt8::CDXLDatumInt8(CMemoryPool *mp, IMDId *mdid_type, BOOL is_null,
-							 LINT val)
+CDXLDatumInt8::CDXLDatumInt8(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+							 BOOL is_null, LINT val)
 	: CDXLDatum(mp, mdid_type, default_type_modifier, is_null, 8 /*length*/),
 	  m_val(val)
 {

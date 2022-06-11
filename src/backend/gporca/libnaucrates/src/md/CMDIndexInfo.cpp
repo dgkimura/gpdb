@@ -19,8 +19,8 @@ using namespace gpdxl;
 using namespace gpmd;
 
 // ctor
-CMDIndexInfo::CMDIndexInfo(IMDId *mdid, BOOL is_partial)
-	: m_mdid(mdid), m_is_partial(is_partial)
+CMDIndexInfo::CMDIndexInfo(gpos::owner<IMDId *> mdid, BOOL is_partial)
+	: m_mdid(std::move(mdid)), m_is_partial(is_partial)
 {
 	GPOS_ASSERT(m_mdid->IsValid());
 }

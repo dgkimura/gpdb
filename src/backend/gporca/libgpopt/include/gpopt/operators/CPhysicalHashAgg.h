@@ -33,10 +33,11 @@ public:
 	CPhysicalHashAgg(const CPhysicalHashAgg &) = delete;
 
 	// ctor
-	CPhysicalHashAgg(CMemoryPool *mp, CColRefArray *colref_array,
-					 CColRefArray *pdrgpcrMinimal,
+	CPhysicalHashAgg(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+					 gpos::pointer<CColRefArray *> pdrgpcrMinimal,
 					 COperator::EGbAggType egbaggtype,
-					 BOOL fGeneratesDuplicates, CColRefArray *pdrgpcrArgDQA,
+					 BOOL fGeneratesDuplicates,
+					 gpos::owner<CColRefArray *> pdrgpcrArgDQA,
 					 BOOL fMultiStage, BOOL isAggFromSplitDQA,
 					 CLogicalGbAgg::EAggStage aggStage,
 					 BOOL should_enforce_distribution = true
@@ -72,7 +73,8 @@ public:
 	gpos::owner<COrderSpec *> PosRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties

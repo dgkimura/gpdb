@@ -65,7 +65,7 @@ CDistributionSpecUniversal::Matches(
 
 void
 CDistributionSpecUniversal::AppendEnforcers(CMemoryPool *, CExpressionHandle &,
-											CReqdPropPlan *,
+											gpos::pointer<CReqdPropPlan *>,
 											gpos::pointer<CExpressionArray *>,
 											gpos::pointer<CExpression *>)
 {

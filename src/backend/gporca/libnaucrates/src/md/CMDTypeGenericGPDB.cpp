@@ -45,18 +45,22 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDTypeGenericGPDB::CMDTypeGenericGPDB(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname, BOOL is_redistributable,
-	BOOL is_fixed_length, ULONG length GPOS_ASSERTS_ONLY,
-	BOOL is_passed_by_value, IMDId *mdid_distr_opfamily,
-	IMDId *mdid_legacy_distr_opfamily, IMDId *mdid_op_eq, IMDId *mdid_op_neq,
-	IMDId *mdid_op_lt, IMDId *mdid_op_leq, IMDId *mdid_op_gt,
-	IMDId *mdid_op_geq, IMDId *mdid_op_cmp, IMDId *mdid_op_min,
-	IMDId *mdid_op_max, IMDId *mdid_op_avg, IMDId *mdid_op_sum,
-	IMDId *mdid_op_count, BOOL is_hashable, BOOL is_merge_joinable,
-	BOOL is_composite_type, BOOL is_text_related, IMDId *mdid_base_relation,
-	IMDId *mdid_type_array, INT gpdb_length)
+	CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+	BOOL is_redistributable, BOOL is_fixed_length,
+	ULONG length GPOS_ASSERTS_ONLY, BOOL is_passed_by_value,
+	gpos::owner<IMDId *> mdid_distr_opfamily,
+	gpos::owner<IMDId *> mdid_legacy_distr_opfamily,
+	gpos::owner<IMDId *> mdid_op_eq, gpos::owner<IMDId *> mdid_op_neq,
+	gpos::owner<IMDId *> mdid_op_lt, gpos::owner<IMDId *> mdid_op_leq,
+	gpos::owner<IMDId *> mdid_op_gt, gpos::owner<IMDId *> mdid_op_geq,
+	gpos::owner<IMDId *> mdid_op_cmp, gpos::owner<IMDId *> mdid_op_min,
+	gpos::owner<IMDId *> mdid_op_max, gpos::owner<IMDId *> mdid_op_avg,
+	gpos::owner<IMDId *> mdid_op_sum, gpos::owner<IMDId *> mdid_op_count,
+	BOOL is_hashable, BOOL is_merge_joinable, BOOL is_composite_type,
+	BOOL is_text_related, gpos::owner<IMDId *> mdid_base_relation,
+	gpos::owner<IMDId *> mdid_type_array, INT gpdb_length)
 	: m_mp(mp),
-	  m_mdid(mdid),
+	  m_mdid(std::move(mdid)),
 	  m_mdname(mdname),
 	  m_is_redistributable(is_redistributable),
 	  m_is_fixed_length(is_fixed_length),
@@ -64,26 +68,26 @@ CMDTypeGenericGPDB::CMDTypeGenericGPDB(
 	  m_length(length),
 #endif
 	  m_is_passed_by_value(is_passed_by_value),
-	  m_distr_opfamily(mdid_distr_opfamily),
-	  m_legacy_distr_opfamily(mdid_legacy_distr_opfamily),
-	  m_mdid_op_eq(mdid_op_eq),
-	  m_mdid_op_neq(mdid_op_neq),
-	  m_mdid_op_lt(mdid_op_lt),
-	  m_mdid_op_leq(mdid_op_leq),
-	  m_mdid_op_gt(mdid_op_gt),
-	  m_mdid_op_geq(mdid_op_geq),
-	  m_mdid_op_cmp(mdid_op_cmp),
-	  m_mdid_min(mdid_op_min),
-	  m_mdid_max(mdid_op_max),
-	  m_mdid_avg(mdid_op_avg),
-	  m_mdid_sum(mdid_op_sum),
-	  m_mdid_count(mdid_op_count),
+	  m_distr_opfamily(std::move(mdid_distr_opfamily)),
+	  m_legacy_distr_opfamily(std::move(mdid_legacy_distr_opfamily)),
+	  m_mdid_op_eq(std::move(mdid_op_eq)),
+	  m_mdid_op_neq(std::move(mdid_op_neq)),
+	  m_mdid_op_lt(std::move(mdid_op_lt)),
+	  m_mdid_op_leq(std::move(mdid_op_leq)),
+	  m_mdid_op_gt(std::move(mdid_op_gt)),
+	  m_mdid_op_geq(std::move(mdid_op_geq)),
+	  m_mdid_op_cmp(std::move(mdid_op_cmp)),
+	  m_mdid_min(std::move(mdid_op_min)),
+	  m_mdid_max(std::move(mdid_op_max)),
+	  m_mdid_avg(std::move(mdid_op_avg)),
+	  m_mdid_sum(std::move(mdid_op_sum)),
+	  m_mdid_count(std::move(mdid_op_count)),
 	  m_is_hashable(is_hashable),
 	  m_is_merge_joinable(is_merge_joinable),
 	  m_is_composite_type(is_composite_type),
 	  m_is_text_related(is_text_related),
-	  m_mdid_base_relation(mdid_base_relation),
-	  m_mdid_type_array(mdid_type_array),
+	  m_mdid_base_relation(std::move(mdid_base_relation)),
+	  m_mdid_type_array(std::move(mdid_type_array)),
 	  m_gpdb_length(gpdb_length),
 	  m_datum_null(nullptr)
 {
@@ -245,8 +249,9 @@ gpos::owner<IDatum *>
 CMDTypeGenericGPDB::GetDatumForDXLConstVal(
 	gpos::pointer<const CDXLScalarConstValue *> dxl_op) const
 {
-	CDXLDatumGeneric *dxl_datum =
-		CDXLDatumGeneric::Cast(const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
+	gpos::pointer<CDXLDatumGeneric *> dxl_datum =
+		gpos::dyn_cast<CDXLDatumGeneric>(
+			const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
 	GPOS_ASSERT(nullptr != dxl_op);
 
 	LINT lint_value = 0;
@@ -280,8 +285,8 @@ CMDTypeGenericGPDB::GetDatumForDXLDatum(
 	CMemoryPool *mp, gpos::pointer<const CDXLDatum *> dxl_datum) const
 {
 	m_mdid->AddRef();
-	CDXLDatumGeneric *dxl_datum_generic =
-		CDXLDatumGeneric::Cast(const_cast<CDXLDatum *>(dxl_datum));
+	gpos::pointer<CDXLDatumGeneric *> dxl_datum_generic =
+		gpos::dyn_cast<CDXLDatumGeneric>(const_cast<CDXLDatum *>(dxl_datum));
 
 	LINT lint_value = 0;
 	if (dxl_datum_generic->IsDatumMappableToLINT())
@@ -309,11 +314,13 @@ CMDTypeGenericGPDB::GetDatumForDXLDatum(
 // 		Generate dxl datum
 //
 //---------------------------------------------------------------------------
-CDXLDatum *
-CMDTypeGenericGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
+gpos::owner<CDXLDatum *>
+CMDTypeGenericGPDB::GetDatumVal(CMemoryPool *mp,
+								gpos::pointer<IDatum *> datum) const
 {
 	m_mdid->AddRef();
-	CDatumGenericGPDB *datum_generic = dynamic_cast<CDatumGenericGPDB *>(datum);
+	gpos::pointer<CDatumGenericGPDB *> datum_generic =
+		dynamic_cast<CDatumGenericGPDB *>(datum);
 	ULONG length = 0;
 	BYTE *pba = nullptr;
 	if (!datum_generic->IsNull())
@@ -351,7 +358,7 @@ CMDTypeGenericGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 BOOL
 CMDTypeGenericGPDB::IsAmbiguous() const
 {
-	OID oid = CMDIdGPDB::CastMdid(m_mdid)->Oid();
+	OID oid = gpos::dyn_cast<CMDIdGPDB>(m_mdid)->Oid();
 	// This should match the IsPolymorphicType() macro in GPDB's pg_type.h
 	return (GPDB_ANYELEMENT_OID == oid || GPDB_ANYARRAY_OID == oid ||
 			GPDB_ANYNONARRAY_OID == oid || GPDB_ANYENUM_OID == oid);
@@ -366,7 +373,8 @@ CMDTypeGenericGPDB::IsAmbiguous() const
 //
 //---------------------------------------------------------------------------
 gpos::owner<CDXLDatum *>
-CMDTypeGenericGPDB::CreateDXLDatumVal(CMemoryPool *mp, IMDId *mdid,
+CMDTypeGenericGPDB::CreateDXLDatumVal(CMemoryPool *mp,
+									  gpos::owner<IMDId *> mdid,
 									  gpos::pointer<const IMDType *> md_type,
 									  INT type_modifier, BOOL is_null,
 									  BYTE *pba, ULONG length, LINT lValue,
@@ -438,11 +446,12 @@ CMDTypeGenericGPDB::CreateDXLDatumStatsIntMappable(
 //
 //---------------------------------------------------------------------------
 gpos::owner<CDXLScalarConstValue *>
-CMDTypeGenericGPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
+CMDTypeGenericGPDB::GetDXLOpScConst(CMemoryPool *mp,
+									gpos::pointer<IDatum *> datum) const
 {
-	CDXLDatum *dxl_datum = GetDatumVal(mp, datum);
+	gpos::owner<CDXLDatum *> dxl_datum = GetDatumVal(mp, datum);
 
-	return GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum);
+	return GPOS_NEW(mp) CDXLScalarConstValue(mp, std::move(dxl_datum));
 }
 
 //---------------------------------------------------------------------------
@@ -453,7 +462,7 @@ CMDTypeGenericGPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
 // 		Generate dxl datum
 //
 //---------------------------------------------------------------------------
-CDXLDatum *
+gpos::owner<CDXLDatum *>
 CMDTypeGenericGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
 	m_mdid->AddRef();
@@ -476,7 +485,7 @@ CMDTypeGenericGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 BOOL
 CMDTypeGenericGPDB::HasByte2IntMapping(gpos::pointer<const IMDType *> mdtype)
 {
-	IMDId *mdid = mdtype->MDId();
+	gpos::pointer<IMDId *> mdid = mdtype->MDId();
 	return mdtype->IsTextRelated() || mdid->Equals(&CMDIdGPDB::m_mdid_uuid) ||
 		   mdid->Equals(&CMDIdGPDB::m_mdid_cash) ||
 		   IsTimeRelatedTypeMappableToLint(mdid);

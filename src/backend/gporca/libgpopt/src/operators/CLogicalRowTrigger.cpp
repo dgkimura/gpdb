@@ -47,14 +47,15 @@ CLogicalRowTrigger::CLogicalRowTrigger(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalRowTrigger::CLogicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
-									   INT type, CColRefArray *pdrgpcrOld,
-									   CColRefArray *pdrgpcrNew)
+CLogicalRowTrigger::CLogicalRowTrigger(CMemoryPool *mp,
+									   gpos::owner<IMDId *> rel_mdid, INT type,
+									   gpos::owner<CColRefArray *> pdrgpcrOld,
+									   gpos::owner<CColRefArray *> pdrgpcrNew)
 	: CLogical(mp),
-	  m_rel_mdid(rel_mdid),
+	  m_rel_mdid(std::move(rel_mdid)),
 	  m_type(type),
-	  m_pdrgpcrOld(pdrgpcrOld),
-	  m_pdrgpcrNew(pdrgpcrNew)
+	  m_pdrgpcrOld(std::move(pdrgpcrOld)),
+	  m_pdrgpcrNew(std::move(pdrgpcrNew))
 {
 	GPOS_ASSERT(m_rel_mdid->IsValid());
 	GPOS_ASSERT(0 != type);
@@ -160,14 +161,15 @@ CLogicalRowTrigger::ITriggerType(gpos::pointer<const IMDTrigger *> pmdtrigger)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalRowTrigger::Matches(COperator *pop) const
+CLogicalRowTrigger::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalRowTrigger *popRowTrigger = CLogicalRowTrigger::PopConvert(pop);
+	gpos::pointer<CLogicalRowTrigger *> popRowTrigger =
+		gpos::dyn_cast<CLogicalRowTrigger>(pop);
 
 	return m_rel_mdid->Equals(popRowTrigger->GetRelMdId()) &&
 		   m_type == popRowTrigger->GetType() &&
@@ -214,18 +216,18 @@ CLogicalRowTrigger::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
-CLogicalRowTrigger::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+CLogicalRowTrigger::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOld = nullptr;
+	gpos::owner<CColRefArray *> pdrgpcrOld = nullptr;
 	if (nullptr != m_pdrgpcrOld)
 	{
 		pdrgpcrOld =
 			CUtils::PdrgpcrRemap(mp, m_pdrgpcrOld, colref_mapping, must_exist);
 	}
 
-	CColRefArray *pdrgpcrNew = nullptr;
+	gpos::owner<CColRefArray *> pdrgpcrNew = nullptr;
 	if (nullptr != m_pdrgpcrNew)
 	{
 		pdrgpcrNew =
@@ -234,8 +236,8 @@ CLogicalRowTrigger::PopCopyWithRemappedColumns(CMemoryPool *mp,
 
 	m_rel_mdid->AddRef();
 
-	return GPOS_NEW(mp)
-		CLogicalRowTrigger(mp, m_rel_mdid, m_type, pdrgpcrOld, pdrgpcrNew);
+	return GPOS_NEW(mp) CLogicalRowTrigger(
+		mp, m_rel_mdid, m_type, std::move(pdrgpcrOld), std::move(pdrgpcrNew));
 }
 
 //---------------------------------------------------------------------------
@@ -246,7 +248,7 @@ CLogicalRowTrigger::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalRowTrigger::DeriveOutputColumns(CMemoryPool *,	//mp,
 										CExpressionHandle &exprhdl)
 {
@@ -261,7 +263,7 @@ CLogicalRowTrigger::DeriveOutputColumns(CMemoryPool *,	//mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalRowTrigger::DeriveKeyCollection(CMemoryPool *,	// mp
 										CExpressionHandle &exprhdl) const
 {
@@ -292,7 +294,7 @@ CLogicalRowTrigger::DeriveMaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalRowTrigger::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -308,10 +310,10 @@ CLogicalRowTrigger::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalRowTrigger::PstatsDerive(CMemoryPool *,	 // mp,
 								 CExpressionHandle &exprhdl,
-								 IStatisticsArray *	 // not used
+								 gpos::pointer<IStatisticsArray *>	// not used
 ) const
 {
 	return PstatsPassThruOuter(exprhdl);
@@ -325,7 +327,7 @@ CLogicalRowTrigger::PstatsDerive(CMemoryPool *,	 // mp,
 //		Derive function properties
 //
 //---------------------------------------------------------------------------
-CFunctionProp *
+gpos::owner<CFunctionProp *>
 CLogicalRowTrigger::DeriveFunctionProperties(CMemoryPool *mp,
 											 CExpressionHandle &exprhdl) const
 {

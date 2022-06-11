@@ -68,17 +68,18 @@ CXformImplementBitmapTableGet::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementBitmapTableGet::Transform(CXformContext *pxfctxt,
-										 CXformResult *pxfres,
-										 CExpression *pexpr) const
+CXformImplementBitmapTableGet::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalBitmapTableGet *popLogical =
-		CLogicalBitmapTableGet::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalBitmapTableGet *> popLogical =
+		gpos::dyn_cast<CLogicalBitmapTableGet>(pexpr->Pop());
 
 	gpos::owner<CTableDescriptor *> ptabdesc = popLogical->Ptabdesc();
 	ptabdesc->AddRef();
@@ -86,11 +87,11 @@ CXformImplementBitmapTableGet::Transform(CXformContext *pxfctxt,
 	gpos::owner<CColRefArray *> pdrgpcrOutput = popLogical->PdrgpcrOutput();
 	pdrgpcrOutput->AddRef();
 
-	gpos::owner<CPhysicalBitmapTableScan *> popPhysical = GPOS_NEW(mp)
-		CPhysicalBitmapTableScan(mp, ptabdesc, pexpr->Pop()->UlOpId(),
-								 GPOS_NEW(mp)
-									 CName(mp, *popLogical->PnameTableAlias()),
-								 pdrgpcrOutput);
+	gpos::owner<CPhysicalBitmapTableScan *> popPhysical =
+		GPOS_NEW(mp) CPhysicalBitmapTableScan(
+			mp, std::move(ptabdesc), pexpr->Pop()->UlOpId(),
+			GPOS_NEW(mp) CName(mp, *popLogical->PnameTableAlias()),
+			std::move(pdrgpcrOutput));
 
 	CExpression *pexprCondition = (*pexpr)[0];
 	CExpression *pexprIndexPath = (*pexpr)[1];
@@ -98,8 +99,8 @@ CXformImplementBitmapTableGet::Transform(CXformContext *pxfctxt,
 	pexprIndexPath->AddRef();
 
 	gpos::owner<CExpression *> pexprPhysical = GPOS_NEW(mp)
-		CExpression(mp, popPhysical, pexprCondition, pexprIndexPath);
-	pxfres->Add(pexprPhysical);
+		CExpression(mp, std::move(popPhysical), pexprCondition, pexprIndexPath);
+	pxfres->Add(std::move(pexprPhysical));
 }
 
 // EOF

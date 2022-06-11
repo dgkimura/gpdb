@@ -17,6 +17,8 @@
 
 #include "naucrates/dxl/operators/CDXLDatumInt4.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpos;
@@ -30,9 +32,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumInt4::CDXLDatumInt4(CMemoryPool *mp, IMDId *mdid_type, BOOL is_null,
-							 INT val)
-	: CDXLDatum(mp, mdid_type, default_type_modifier, is_null, 4 /*length*/),
+CDXLDatumInt4::CDXLDatumInt4(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+							 BOOL is_null, INT val)
+	: CDXLDatum(mp, std::move(mdid_type), default_type_modifier, is_null,
+				4 /*length*/),
 	  m_val(val)
 {
 }

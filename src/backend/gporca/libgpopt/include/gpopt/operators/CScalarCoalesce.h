@@ -42,7 +42,7 @@ public:
 	CScalarCoalesce(const CScalarCoalesce &) = delete;
 
 	// ctor
-	CScalarCoalesce(CMemoryPool *mp, IMDId *mdid_type);
+	CScalarCoalesce(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type);
 
 	// dtor
 	~CScalarCoalesce() override;
@@ -72,7 +72,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -82,7 +82,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
@@ -94,7 +94,7 @@ public:
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(ULongPtrArray *pdrgpulChildren) const override
+	Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override
 	{
 		// Coalesce returns the first not-null child,
 		// if all children are Null, then Coalesce must return Null

@@ -62,7 +62,8 @@ private:
 					   INT type_modifier, ULONG id, const CName &name);
 	CColRef *PcrCreate(gpos::pointer<const CColumnDescriptor *> pcoldesc,
 					   ULONG id, const CName &name, ULONG ulOpSource,
-					   BOOL mark_as_used = true, IMDId *mdid_table = nullptr);
+					   BOOL mark_as_used = true,
+					   gpos::pointer<IMDId *> mdid_table = nullptr);
 
 public:
 	CColumnFactory(const CColumnFactory &) = delete;
@@ -87,12 +88,12 @@ public:
 	// create a column reference given its descriptor and name
 	CColRef *PcrCreate(gpos::pointer<const CColumnDescriptor *> pcoldescr,
 					   const CName &name, ULONG ulOpSource, BOOL mark_as_used,
-					   IMDId *mdid_table);
+					   gpos::pointer<IMDId *> mdid_table);
 
 	// create a column reference given its type, attno, nullability and name
 	CColRef *PcrCreate(gpos::pointer<const IMDType *> pmdtype,
-					   INT type_modifier, IMDId *mdid_table, INT attno,
-					   BOOL is_nullable, ULONG id, const CName &name,
+					   INT type_modifier, gpos::pointer<IMDId *> mdid_table,
+					   INT attno, BOOL is_nullable, ULONG id, const CName &name,
 					   ULONG ulOpSource, BOOL isDistCol,
 					   ULONG ulWidth = gpos::ulong_max);
 
@@ -104,7 +105,7 @@ public:
 	}
 
 	// add mapping between computed column to its used columns
-	void AddComputedToUsedColsMap(CExpression *pexpr);
+	void AddComputedToUsedColsMap(gpos::pointer<CExpression *> pexpr);
 
 	// lookup the set of used column references (if any) based on id of computed column
 	gpos::pointer<const CColRefSet *> PcrsUsedInComputedCol(

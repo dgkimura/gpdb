@@ -73,7 +73,7 @@ public:
 		BOOL m_fUsed;
 
 		// ctor
-		SEdge(CMemoryPool *mp, CExpression *pexpr, ULONG loj_num);
+		SEdge(CMemoryPool *mp, gpos::owner<CExpression *> pexpr, ULONG loj_num);
 
 		// dtor
 		~SEdge() override;
@@ -156,12 +156,13 @@ public:
 		EPosition m_position;
 
 		// ctor
-		SComponent(CMemoryPool *mp, CExpression *expr,
+		SComponent(CMemoryPool *mp, gpos::owner<CExpression *> expr,
 				   INT parent_loj_id = NON_LOJ_DEFAULT_ID,
 				   EPosition position = EpSentinel);
 
 		// ctor
-		SComponent(CExpression *expr, CBitSet *pbs, CBitSet *edge_set,
+		SComponent(gpos::owner<CExpression *> expr, gpos::owner<CBitSet *> pbs,
+				   gpos::owner<CBitSet *> edge_set,
 				   INT parent_loj_id = NON_LOJ_DEFAULT_ID,
 				   EPosition position = EpSentinel);
 
@@ -211,13 +212,14 @@ protected:
 	void ComputeEdgeCover();
 
 	// combine the two given components using applicable edges
-	SComponent *PcompCombine(SComponent *comp1, SComponent *comp2);
+	gpos::owner<SComponent *> PcompCombine(gpos::pointer<SComponent *> comp1,
+										   gpos::pointer<SComponent *> comp2);
 
 	// derive stats on a given component
-	virtual void DeriveStats(CExpression *pexpr);
+	virtual void DeriveStats(gpos::pointer<CExpression *> pexpr);
 
 	// mark edges used by expression
-	void MarkUsedEdges(SComponent *comp);
+	void MarkUsedEdges(gpos::pointer<SComponent *> comp);
 
 	// add component to to component array
 	void AddComponent(CMemoryPool *mp, CExpression *expr, INT loj_id,
@@ -237,7 +239,8 @@ public:
 	CJoinOrder(CMemoryPool *mp,
 			   gpos::owner<CExpressionArray *> pdrgpexprComponents,
 			   gpos::owner<CExpressionArray *> innerJoinPredConjuncts,
-			   CExpressionArray *onPreds, ULongPtrArray *childPredIndexes);
+			   gpos::pointer<CExpressionArray *> onPreds,
+			   gpos::pointer<ULongPtrArray *> childPredIndexes);
 
 	// dtor
 	virtual ~CJoinOrder();

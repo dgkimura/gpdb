@@ -12,6 +12,7 @@
 #define GPOPT_CXformImplementation_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXform.h"
 
@@ -34,7 +35,7 @@ public:
 	CXformImplementation(const CXformImplementation &) = delete;
 
 	// ctor
-	explicit CXformImplementation(CExpression *);
+	explicit CXformImplementation(gpos::owner<CExpression *>);
 
 	// dtor
 	~CXformImplementation() override;

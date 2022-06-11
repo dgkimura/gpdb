@@ -57,15 +57,16 @@ public:
 	CDXLTableDescr(const CDXLTableDescr &) = delete;
 
 	// ctor/dtor
-	CDXLTableDescr(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
+	CDXLTableDescr(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
 				   ULONG ulExecuteAsUser, int lockmode);
 
 	~CDXLTableDescr() override;
 
 	// setters
-	void SetColumnDescriptors(CDXLColDescrArray *dxl_column_descr_array);
+	void SetColumnDescriptors(
+		gpos::owner<CDXLColDescrArray *> dxl_column_descr_array);
 
-	void AddColumnDescr(CDXLColDescr *pdxlcd);
+	void AddColumnDescr(gpos::owner<CDXLColDescr *> pdxlcd);
 
 	// table name
 	const CMDName *MdName() const;

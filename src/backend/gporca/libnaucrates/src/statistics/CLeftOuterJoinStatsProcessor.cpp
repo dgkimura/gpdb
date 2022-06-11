@@ -18,7 +18,7 @@
 using namespace gpmd;
 
 // return statistics object after performing LOJ operation with another statistics structure
-CStatistics *
+gpos::owner<CStatistics *>
 CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
 	CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_side_stats,
 	gpos::pointer<const IStatistics *> inner_side_stats,
@@ -34,14 +34,14 @@ CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
 		dynamic_cast<const CStatistics *>(inner_side_stats);
 
 	gpos::owner<CStatistics *> inner_join_stats =
-		CStatistics::CastStats(result_stats_outer_side->CalcInnerJoinStats(
+		gpos::dyn_cast<CStatistics>(result_stats_outer_side->CalcInnerJoinStats(
 			mp, inner_side_stats, join_preds_stats));
 	CDouble num_rows_inner_join = inner_join_stats->Rows();
 	CDouble num_rows_LASJ(1.0);
 
 	// create a new hash map of histograms, for each column from the outer child
 	// add the buckets that do not contribute to the inner join
-	UlongToHistogramMap *LOJ_histograms =
+	gpos::owner<UlongToHistogramMap *> LOJ_histograms =
 		CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
 			mp, result_stats_outer_side, result_stats_inner_side,
 			inner_join_stats, join_preds_stats, num_rows_inner_join,
@@ -53,8 +53,9 @@ CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
 
 	// create an output stats object
 	gpos::owner<CStatistics *> result_stats_LOJ = GPOS_NEW(mp) CStatistics(
-		mp, LOJ_histograms, inner_join_stats->CopyWidths(mp), num_rows_LOJ,
-		outer_side_stats->IsEmpty(), outer_side_stats->GetNumberOfPredicates());
+		mp, std::move(LOJ_histograms), inner_join_stats->CopyWidths(mp),
+		num_rows_LOJ, outer_side_stats->IsEmpty(),
+		outer_side_stats->GetNumberOfPredicates());
 
 	inner_join_stats->Release();
 
@@ -77,12 +78,13 @@ CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
 
 // create a new hash map of histograms for LOJ from the histograms
 // of the outer child and the histograms of the inner join
-UlongToHistogramMap *
+gpos::owner<UlongToHistogramMap *>
 CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
 	CMemoryPool *mp, gpos::pointer<const CStatistics *> outer_side_stats,
 	gpos::pointer<const CStatistics *> inner_side_stats,
-	CStatistics *inner_join_stats, CStatsPredJoinArray *join_preds_stats,
-	CDouble num_rows_inner_join, CDouble *result_rows_LASJ)
+	gpos::pointer<CStatistics *> inner_join_stats,
+	CStatsPredJoinArray *join_preds_stats, CDouble num_rows_inner_join,
+	CDouble *result_rows_LASJ)
 {
 	GPOS_ASSERT(nullptr != outer_side_stats);
 	GPOS_ASSERT(nullptr != inner_side_stats);
@@ -93,7 +95,7 @@ CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
 	gpos::owner<CBitSet *> outer_side_join_cols = GPOS_NEW(mp) CBitSet(mp);
 	for (ULONG j = 0; j < join_preds_stats->Size(); j++)
 	{
-		CStatsPredJoin *join_stats = (*join_preds_stats)[j];
+		gpos::pointer<CStatsPredJoin *> join_stats = (*join_preds_stats)[j];
 		if (join_stats->HasValidColIdOuter())
 		{
 			(void) outer_side_join_cols->ExchangeSet(join_stats->ColIdOuter());
@@ -102,7 +104,7 @@ CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
 
 	// for the columns in the outer child, compute the buckets that do not contribute to the inner join
 	gpos::owner<CStatistics *> LASJ_stats =
-		CStatistics::CastStats(outer_side_stats->CalcLASJoinStats(
+		gpos::dyn_cast<CStatistics>(outer_side_stats->CalcLASJoinStats(
 			mp, inner_side_stats, join_preds_stats,
 			false /* DoIgnoreLASJHistComputation */
 			));
@@ -182,8 +184,9 @@ CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
 void
 CLeftOuterJoinStatsProcessor::AddHistogramsLOJInner(
 	CMemoryPool *mp, gpos::pointer<const CStatistics *> inner_join_stats,
-	ULongPtrArray *inner_colids_with_stats, CDouble num_rows_LASJ,
-	CDouble num_rows_inner_join, UlongToHistogramMap *LOJ_histograms)
+	gpos::pointer<ULongPtrArray *> inner_colids_with_stats,
+	CDouble num_rows_LASJ, CDouble num_rows_inner_join,
+	gpos::pointer<UlongToHistogramMap *> LOJ_histograms)
 {
 	GPOS_ASSERT(nullptr != inner_join_stats);
 	GPOS_ASSERT(nullptr != inner_colids_with_stats);

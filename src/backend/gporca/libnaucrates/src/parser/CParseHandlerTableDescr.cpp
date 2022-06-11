@@ -143,7 +143,7 @@ CParseHandlerTableDescr::EndElement(const XMLCh *const,	 // element_uri,
 	gpos::owner<CDXLColDescrArray *> dxl_column_descr_array =
 		col_descr_parse_handler->GetDXLColumnDescrArray();
 	dxl_column_descr_array->AddRef();
-	m_dxl_table_descr->SetColumnDescriptors(dxl_column_descr_array);
+	m_dxl_table_descr->SetColumnDescriptors(std::move(dxl_column_descr_array));
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

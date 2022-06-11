@@ -31,7 +31,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
 						   gpos::owner<IConstExprEvaluator *> pceeval,
-						   COptimizerConfig *optimizer_config)
+						   gpos::owner<COptimizerConfig *> optimizer_config)
 {
 	if (nullptr == optimizer_config)
 	{
@@ -44,8 +44,8 @@ CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
 		pceeval = GPOS_NEW(mp) CConstExprEvaluatorDefault();
 	}
 
-	COptCtxt *poctxt =
-		COptCtxt::PoctxtCreate(mp, md_accessor, pceeval, optimizer_config);
+	COptCtxt *poctxt = COptCtxt::PoctxtCreate(
+		mp, md_accessor, std::move(pceeval), std::move(optimizer_config));
 	ITask::Self()->GetTls().Store(poctxt);
 }
 
@@ -60,12 +60,12 @@ CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
 //---------------------------------------------------------------------------
 CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
 						   gpos::owner<IConstExprEvaluator *> pceeval,
-						   ICostModel *pcm)
+						   gpos::owner<ICostModel *> pcm)
 {
 	GPOS_ASSERT(nullptr != pcm);
 
 	// create default statistics configuration
-	COptimizerConfig *optimizer_config =
+	gpos::owner<COptimizerConfig *> optimizer_config =
 		COptimizerConfig::PoconfDefault(mp, pcm);
 
 	if (nullptr == pceeval)
@@ -74,8 +74,8 @@ CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
 		pceeval = GPOS_NEW(mp) CConstExprEvaluatorDefault();
 	}
 
-	COptCtxt *poctxt =
-		COptCtxt::PoctxtCreate(mp, md_accessor, pceeval, optimizer_config);
+	COptCtxt *poctxt = COptCtxt::PoctxtCreate(
+		mp, md_accessor, std::move(pceeval), std::move(optimizer_config));
 	ITask::Self()->GetTls().Store(poctxt);
 }
 

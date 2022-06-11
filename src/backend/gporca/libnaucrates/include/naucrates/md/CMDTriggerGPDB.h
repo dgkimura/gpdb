@@ -66,9 +66,9 @@ public:
 	CMDTriggerGPDB(const CMDTriggerGPDB &) = delete;
 
 	// ctor
-	CMDTriggerGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-				   IMDId *rel_mdid, IMDId *mdid_func, INT type,
-				   BOOL is_enabled);
+	CMDTriggerGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+				   gpos::owner<IMDId *> rel_mdid,
+				   gpos::owner<IMDId *> mdid_func, INT type, BOOL is_enabled);
 
 	// dtor
 	~CMDTriggerGPDB() override;

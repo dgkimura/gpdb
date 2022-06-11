@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarCoerceToDomain.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 using namespace gpmd;
@@ -25,10 +26,11 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCoerceToDomain::CScalarCoerceToDomain(CMemoryPool *mp, IMDId *mdid_type,
+CScalarCoerceToDomain::CScalarCoerceToDomain(CMemoryPool *mp,
+											 gpos::owner<IMDId *> mdid_type,
 											 INT type_modifier,
 											 ECoercionForm ecf, INT location)
-	: CScalarCoerceBase(mp, mdid_type, type_modifier, ecf, location),
+	: CScalarCoerceBase(mp, std::move(mdid_type), type_modifier, ecf, location),
 	  m_returns_null_on_null_input(false)
 {
 }
@@ -43,12 +45,12 @@ CScalarCoerceToDomain::CScalarCoerceToDomain(CMemoryPool *mp, IMDId *mdid_type,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCoerceToDomain::Matches(COperator *pop) const
+CScalarCoerceToDomain::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCoerceToDomain *popCoerce =
-			CScalarCoerceToDomain::PopConvert(pop);
+		gpos::pointer<CScalarCoerceToDomain *> popCoerce =
+			gpos::dyn_cast<CScalarCoerceToDomain>(pop);
 
 		return popCoerce->MdidType()->Equals(MdidType()) &&
 			   popCoerce->TypeModifier() == TypeModifier() &&
@@ -68,7 +70,8 @@ CScalarCoerceToDomain::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarCoerceToDomain::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarCoerceToDomain::Eber(
+	gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

@@ -53,7 +53,8 @@ public:
 	}
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::pointer<CColRefSet *> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	// conversion function

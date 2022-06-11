@@ -15,6 +15,7 @@
 #define GPMD_IMDAggregate_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDCacheObject.h"
 
@@ -43,10 +44,10 @@ public:
 
 	// type of intermediate results computed by the aggregate's
 	// transformation function
-	virtual IMDId *GetIntermediateResultTypeMdid() const = 0;
+	virtual gpos::pointer<IMDId *> GetIntermediateResultTypeMdid() const = 0;
 
 	// result type
-	virtual IMDId *GetResultTypeMdid() const = 0;
+	virtual gpos::pointer<IMDId *> GetResultTypeMdid() const = 0;
 
 	// is aggregate ordered
 	virtual BOOL IsOrdered() const = 0;

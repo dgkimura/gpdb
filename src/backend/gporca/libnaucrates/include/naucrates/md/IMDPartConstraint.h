@@ -15,6 +15,7 @@
 #define GPMD_IMDPartConstraint_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/operators/CExpression.h"
@@ -45,10 +46,10 @@ public:
 	// column mappings
 	virtual CExpression *GetPartConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CColRefArray *colref_array) const = 0;
+		gpos::pointer<CColRefArray *> colref_array) const = 0;
 
 	// included default partitions
-	virtual ULongPtrArray *GetDefaultPartsArray() const = 0;
+	virtual gpos::pointer<ULongPtrArray *> GetDefaultPartsArray() const = 0;
 
 	// is constraint unbounded
 	virtual BOOL IsConstraintUnbounded() const = 0;

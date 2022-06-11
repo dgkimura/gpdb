@@ -30,13 +30,13 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalPartitionSelector::CDXLPhysicalPartitionSelector(
-	CMemoryPool *mp, IMDId *mdid_rel, ULONG selector_id, ULONG scan_id,
-	ULongPtrArray *parts)
+	CMemoryPool *mp, gpos::owner<IMDId *> mdid_rel, ULONG selector_id,
+	ULONG scan_id, gpos::owner<ULongPtrArray *> parts)
 	: CDXLPhysical(mp),
-	  m_rel_mdid(mdid_rel),
+	  m_rel_mdid(std::move(mdid_rel)),
 	  m_selector_id(selector_id),
 	  m_scan_id(scan_id),
-	  m_parts(parts)
+	  m_parts(std::move(parts))
 {
 }
 
@@ -151,7 +151,7 @@ CDXLPhysicalPartitionSelector::AssertValid(
 	GPOS_ASSERT(6 == arity || 7 == arity);
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[idx];
+		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[idx];
 		if (validate_children)
 		{
 			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,

@@ -22,7 +22,7 @@ CStatistics *
 CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
 	CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats_input,
 	gpos::pointer<const IStatistics *> inner_stats_input,
-	CStatsPredJoinArray *join_preds_stats)
+	gpos::pointer<CStatsPredJoinArray *> join_preds_stats)
 {
 	GPOS_ASSERT(nullptr != outer_stats_input);
 	GPOS_ASSERT(nullptr != inner_stats_input);

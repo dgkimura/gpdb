@@ -60,11 +60,11 @@ CDatumInt4GPDB::CDatumInt4GPDB(CSystemId sysid, INT val, BOOL is_null)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDatumInt4GPDB::CDatumInt4GPDB(IMDId *mdid, INT val, BOOL is_null)
+CDatumInt4GPDB::CDatumInt4GPDB(gpos::owner<IMDId *> mdid, INT val, BOOL is_null)
 	: m_mdid(mdid), m_val(val), m_is_null(is_null)
 {
 	GPOS_ASSERT(nullptr != m_mdid);
-	GPOS_ASSERT(GPDB_INT4_OID == CMDIdGPDB::CastMdid(m_mdid)->Oid());
+	GPOS_ASSERT(GPDB_INT4_OID == gpos::dyn_cast<CMDIdGPDB>(m_mdid)->Oid());
 
 	if (IsNull())
 	{

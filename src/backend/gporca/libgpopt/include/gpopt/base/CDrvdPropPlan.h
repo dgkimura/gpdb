@@ -62,8 +62,9 @@ private:
 	gpos::owner<CCTEMap *> m_pcm{nullptr};
 
 	// copy CTE producer plan properties from given context to current object
-	void CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
-								  COperator *pop);
+	void CopyCTEProducerPlanProps(CMemoryPool *mp,
+								  gpos::pointer<CDrvdPropCtxt *> pdpctxt,
+								  gpos::pointer<COperator *> pop);
 
 public:
 	CDrvdPropPlan(const CDrvdPropPlan &) = delete;
@@ -83,7 +84,7 @@ public:
 
 	// derivation function
 	void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDrvdPropCtxt *pdpctxt) override;
+				gpos::pointer<CDrvdPropCtxt *> pdpctxt) override;
 
 	// short hand for conversion
 	static gpos::cast_func<CDrvdPropPlan *> Pdpplan(CDrvdProp *pdp);

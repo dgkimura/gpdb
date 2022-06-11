@@ -88,9 +88,10 @@ CXformInnerApplyWithOuterKey2InnerJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformInnerApplyWithOuterKey2InnerJoin::Transform(CXformContext *pxfctxt,
-												  CXformResult *pxfres,
-												  CExpression *pexpr) const
+CXformInnerApplyWithOuterKey2InnerJoin::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -100,10 +101,10 @@ CXformInnerApplyWithOuterKey2InnerJoin::Transform(CXformContext *pxfctxt,
 
 	// extract components
 	CExpression *pexprOuter = (*pexpr)[0];
-	CExpression *pexprGb = (*pexpr)[1];
+	gpos::pointer<CExpression *> pexprGb = (*pexpr)[1];
 	CExpression *pexprScalar = (*pexpr)[2];
 
-	if (0 < CLogicalGbAgg::PopConvert(pexprGb->Pop())->Pdrgpcr()->Size())
+	if (0 < gpos::dyn_cast<CLogicalGbAgg>(pexprGb->Pop())->Pdrgpcr()->Size())
 	{
 		// xform is not applicable if inner Gb has grouping columns
 		return;
@@ -117,7 +118,7 @@ CXformInnerApplyWithOuterKey2InnerJoin::Transform(CXformContext *pxfctxt,
 
 	// decorrelate Gb's relational child
 	(*pexprGb)[0]->ResetDerivedProperties();
-	CExpression *pexprInner = nullptr;
+	gpos::owner<CExpression *> pexprInner = nullptr;
 	gpos::owner<CExpressionArray *> pdrgpexpr =
 		GPOS_NEW(mp) CExpressionArray(mp);
 	if (!CDecorrelator::FProcess(mp, (*pexprGb)[0], false /*fEqualityOnly*/,
@@ -129,34 +130,36 @@ CXformInnerApplyWithOuterKey2InnerJoin::Transform(CXformContext *pxfctxt,
 	}
 
 	GPOS_ASSERT(nullptr != pexprInner);
-	CExpression *pexprPredicate =
-		CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
+	gpos::owner<CExpression *> pexprPredicate =
+		CPredicateUtils::PexprConjunction(mp, std::move(pdrgpexpr));
 
 	// join outer child with Gb's decorrelated child
 	pexprOuter->AddRef();
-	gpos::owner<CExpression *> pexprInnerJoin =
-		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp),
-								 pexprOuter, pexprInner, pexprPredicate);
+	gpos::owner<CExpression *> pexprInnerJoin = GPOS_NEW(mp)
+		CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp), pexprOuter,
+					std::move(pexprInner), std::move(pexprPredicate));
 
 	// create grouping columns from the output of outer child
 	gpos::owner<CColRefArray *> pdrgpcrKey = nullptr;
-	CColRefArray *colref_array =
+	gpos::owner<CColRefArray *> colref_array =
 		CUtils::PdrgpcrGroupingKey(mp, pexprOuter, &pdrgpcrKey);
 	pdrgpcrKey->Release();	// key is not used here
 
-	gpos::owner<CLogicalGbAgg *> popGbAgg = GPOS_NEW(mp) CLogicalGbAgg(
-		mp, colref_array, COperator::EgbaggtypeGlobal /*egbaggtype*/);
+	gpos::owner<CLogicalGbAgg *> popGbAgg =
+		GPOS_NEW(mp) CLogicalGbAgg(mp, std::move(colref_array),
+								   COperator::EgbaggtypeGlobal /*egbaggtype*/);
 	gpos::owner<CExpression *> pexprPrjList = (*pexprGb)[1];
 	pexprPrjList->AddRef();
-	gpos::owner<CExpression *> pexprNewGb =
-		GPOS_NEW(mp) CExpression(mp, popGbAgg, pexprInnerJoin, pexprPrjList);
+	gpos::owner<CExpression *> pexprNewGb = GPOS_NEW(mp)
+		CExpression(mp, std::move(popGbAgg), std::move(pexprInnerJoin),
+					std::move(pexprPrjList));
 
 	// add Apply predicate in a top Select node
 	pexprScalar->AddRef();
-	CExpression *pexprSelect =
-		CUtils::PexprLogicalSelect(mp, pexprNewGb, pexprScalar);
+	gpos::owner<CExpression *> pexprSelect =
+		CUtils::PexprLogicalSelect(mp, std::move(pexprNewGb), pexprScalar);
 
-	pxfres->Add(pexprSelect);
+	pxfres->Add(std::move(pexprSelect));
 }
 
 

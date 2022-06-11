@@ -52,9 +52,10 @@ public:
 	CPhysicalTVF(const CPhysicalTVF &) = delete;
 
 	// ctor
-	CPhysicalTVF(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				 CWStringConst *str, CColumnDescriptorArray *pdrgpcoldesc,
-				 CColRefSet *pcrsOutput);
+	CPhysicalTVF(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+				 gpos::owner<IMDId *> mdid_return_type, CWStringConst *str,
+				 gpos::owner<CColumnDescriptorArray *> pdrgpcoldesc,
+				 gpos::owner<CColRefSet *> pcrsOutput);
 
 	// dtor
 	~CPhysicalTVF() override;
@@ -112,7 +113,7 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
@@ -121,7 +122,8 @@ public:
 	// compute required output columns of the n-th child
 	CColRefSet *PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::pointer<CColRefSet *> pcrsRequired,
-							 ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+							 ULONG child_index,
+							 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
 							 ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
@@ -131,25 +133,29 @@ public:
 						  ULONG ulOptReq) const override;
 
 	// compute required sort order of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							gpos::pointer<COrderSpec *> posRequired,
-							ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
+	gpos::owner<COrderSpec *> PosRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(
+	gpos::owner<CDistributionSpec *> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
-	CRewindabilitySpec *PrsRequired(
+	gpos::owner<CRewindabilitySpec *> PrsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::pointer<CColRefSet *> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------

@@ -29,9 +29,12 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarMinMax::CDXLScalarMinMax(CMemoryPool *mp, IMDId *mdid_type,
+CDXLScalarMinMax::CDXLScalarMinMax(CMemoryPool *mp,
+								   gpos::owner<IMDId *> mdid_type,
 								   EdxlMinMaxType min_max_type)
-	: CDXLScalar(mp), m_mdid_type(mdid_type), m_min_max_type(min_max_type)
+	: CDXLScalar(mp),
+	  m_mdid_type(std::move(mdid_type)),
+	  m_min_max_type(min_max_type)
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
 	GPOS_ASSERT(EmmtSentinel > min_max_type);
@@ -142,7 +145,7 @@ CDXLScalarMinMax::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[idx];
+		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

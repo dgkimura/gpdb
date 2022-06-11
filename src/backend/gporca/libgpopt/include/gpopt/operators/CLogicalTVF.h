@@ -57,12 +57,14 @@ public:
 	// ctors
 	explicit CLogicalTVF(CMemoryPool *mp);
 
-	CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				CWStringConst *str, CColumnDescriptorArray *pdrgpcoldesc);
+	CLogicalTVF(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+				gpos::owner<IMDId *> mdid_return_type, CWStringConst *str,
+				gpos::owner<CColumnDescriptorArray *> pdrgpcoldesc);
 
-	CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				CWStringConst *str, CColumnDescriptorArray *pdrgpcoldesc,
-				CColRefArray *pdrgpcrOutput);
+	CLogicalTVF(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+				gpos::owner<IMDId *> mdid_return_type, CWStringConst *str,
+				gpos::owner<CColumnDescriptorArray *> pdrgpcoldesc,
+				gpos::owner<CColRefArray *> pdrgpcrOutput);
 
 	// dtor
 	~CLogicalTVF() override;
@@ -123,11 +125,11 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -135,8 +137,8 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *,
-									CExpressionHandle &) override;
+	gpos::owner<CColRefSet *> DeriveOutputColumns(CMemoryPool *,
+												  CExpressionHandle &) override;
 
 	// derive partition consumer info
 	gpos::owner<CPartInfo *>
@@ -158,7 +160,7 @@ public:
 	}
 
 	// derive function properties
-	CFunctionProp *DeriveFunctionProperties(
+	gpos::owner<CFunctionProp *> DeriveFunctionProperties(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -170,7 +172,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	PcrsStat(CMemoryPool *,				   // mp
 			 CExpressionHandle &,		   // exprhdl
 			 gpos::pointer<CColRefSet *>,  // pcrsInput
@@ -185,7 +187,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// stat promise
 	EStatPromise
@@ -195,8 +197,9 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::owner<IStatistics *> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------

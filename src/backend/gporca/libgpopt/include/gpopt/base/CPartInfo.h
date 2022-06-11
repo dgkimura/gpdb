@@ -67,8 +67,8 @@ private:
 		CPartInfoEntry(const CPartInfoEntry &) = delete;
 
 		// ctor
-		CPartInfoEntry(ULONG scan_id, IMDId *mdid,
-					   CPartKeysArray *pdrgppartkeys);
+		CPartInfoEntry(ULONG scan_id, gpos::owner<IMDId *> mdid,
+					   gpos::owner<CPartKeysArray *> pdrgppartkeys);
 
 		// dtor
 		~CPartInfoEntry() override;
@@ -83,7 +83,7 @@ private:
 		// create a copy of the current object, and add a set of remapped
 		// part keys to this entry, using the existing keys and the given hashmap
 		gpos::owner<CPartInfoEntry *> PpartinfoentryAddRemappedKeys(
-			CMemoryPool *mp, CColRefSet *pcrs,
+			CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs,
 			UlongToColRefMap *colref_mapping);
 
 		// mdid of partition table
@@ -115,7 +115,7 @@ private:
 	gpos::owner<CPartInfoEntryArray *> m_pdrgppartentries;
 
 	// private ctor
-	explicit CPartInfo(CPartInfoEntryArray *pdrgppartentries);
+	explicit CPartInfo(gpos::owner<CPartInfoEntryArray *> pdrgppartentries);
 
 public:
 	CPartInfo(const CPartInfo &) = delete;
@@ -134,8 +134,9 @@ public:
 	}
 
 	// add part table consumer
-	void AddPartConsumer(CMemoryPool *mp, ULONG scan_id, IMDId *mdid,
-						 CColRef2dArray *pdrgpdrgpcrPart);
+	void AddPartConsumer(CMemoryPool *mp, ULONG scan_id,
+						 gpos::owner<IMDId *> mdid,
+						 gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart);
 
 	// scan id of the entry at the given position
 	ULONG ScanId(ULONG ulPos) const;
@@ -154,16 +155,16 @@ public:
 
 	// return a new part info object with an additional set of remapped keys
 	gpos::owner<CPartInfo *> PpartinfoWithRemappedKeys(
-		CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
-		CColRefArray *pdrgpcrDest) const;
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrSrc,
+		gpos::pointer<CColRefArray *> pdrgpcrDest) const;
 
 	// print
 	IOstream &OsPrint(IOstream &) const;
 
 	// combine two part info objects
-	static gpos::owner<CPartInfo *> PpartinfoCombine(CMemoryPool *mp,
-													 CPartInfo *ppartinfoFst,
-													 CPartInfo *ppartinfoSnd);
+	static gpos::owner<CPartInfo *> PpartinfoCombine(
+		CMemoryPool *mp, gpos::pointer<CPartInfo *> ppartinfoFst,
+		gpos::pointer<CPartInfo *> ppartinfoSnd);
 
 };	// CPartInfo
 

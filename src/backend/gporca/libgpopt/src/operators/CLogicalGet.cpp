@@ -58,7 +58,7 @@ CLogicalGet::CLogicalGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
-						 CTableDescriptor *ptabdesc)
+						 gpos::owner<CTableDescriptor *> ptabdesc)
 	: CLogical(mp),
 	  m_pnameAlias(pnameAlias),
 	  m_ptabdesc(ptabdesc),
@@ -91,8 +91,8 @@ CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
 //
 //---------------------------------------------------------------------------
 CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
-						 CTableDescriptor *ptabdesc,
-						 CColRefArray *pdrgpcrOutput)
+						 gpos::owner<CTableDescriptor *> ptabdesc,
+						 gpos::owner<CColRefArray *> pdrgpcrOutput)
 	: CLogical(mp),
 	  m_pnameAlias(pnameAlias),
 	  m_ptabdesc(ptabdesc),
@@ -159,13 +159,13 @@ CLogicalGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalGet::Matches(COperator *pop) const
+CLogicalGet::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	CLogicalGet *popGet = CLogicalGet::PopConvert(pop);
+	gpos::pointer<CLogicalGet *> popGet = gpos::dyn_cast<CLogicalGet>(pop);
 
 	return m_ptabdesc->MDId()->Equals(popGet->m_ptabdesc->MDId()) &&
 		   m_pdrgpcrOutput->Equals(popGet->PdrgpcrOutput());
@@ -180,11 +180,11 @@ CLogicalGet::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
-CLogicalGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										UlongToColRefMap *colref_mapping,
-										BOOL must_exist)
+CLogicalGet::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput = nullptr;
+	gpos::owner<CColRefArray *> pdrgpcrOutput = nullptr;
 	if (must_exist)
 	{
 		pdrgpcrOutput =
@@ -198,7 +198,8 @@ CLogicalGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameAlias);
 	m_ptabdesc->AddRef();
 
-	return GPOS_NEW(mp) CLogicalGet(mp, pnameAlias, m_ptabdesc, pdrgpcrOutput);
+	return GPOS_NEW(mp)
+		CLogicalGet(mp, pnameAlias, m_ptabdesc, std::move(pdrgpcrOutput));
 }
 
 //---------------------------------------------------------------------------
@@ -209,7 +210,7 @@ CLogicalGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalGet::DeriveOutputColumns(CMemoryPool *mp,
 								 CExpressionHandle &  // exprhdl
 )
@@ -240,7 +241,7 @@ CLogicalGet::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive not null output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalGet::DeriveNotNullColumns(CMemoryPool *mp,
 								  CExpressionHandle &exprhdl) const
 {
@@ -287,7 +288,7 @@ CLogicalGet::FInputOrderSensitive() const
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalGet::DeriveKeyCollection(CMemoryPool *mp,
 								 CExpressionHandle &  // exprhdl
 ) const
@@ -306,7 +307,7 @@ CLogicalGet::DeriveKeyCollection(CMemoryPool *mp,
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalGet::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -324,20 +325,21 @@ CLogicalGet::PxfsCandidates(CMemoryPool *mp) const
 //		Load up statistics from metadata
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  IStatisticsArray *  // not used
+						  gpos::pointer<IStatisticsArray *>	 // not used
 ) const
 {
 	// requesting stats on distribution columns to estimate data skew
-	IStatistics *pstatsTable =
+	gpos::owner<IStatistics *> pstatsTable =
 		PstatsBaseTable(mp, exprhdl, m_ptabdesc, m_pcrsDist);
 
 	gpos::owner<CColRefSet *> pcrs =
 		GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
 	CUpperBoundNDVs *upper_bound_NDVs =
-		GPOS_NEW(mp) CUpperBoundNDVs(pcrs, pstatsTable->Rows());
-	CStatistics::CastStats(pstatsTable)->AddCardUpperBound(upper_bound_NDVs);
+		GPOS_NEW(mp) CUpperBoundNDVs(std::move(pcrs), pstatsTable->Rows());
+	gpos::dyn_cast<CStatistics>(pstatsTable)
+		->AddCardUpperBound(upper_bound_NDVs);
 
 	return pstatsTable;
 }
@@ -376,7 +378,7 @@ CLogicalGet::OsPrint(IOstream &os) const
 			m_ptabdesc->PdrgpbsKeys();
 		for (ULONG ul = 0; ul < pdrgpbsKeys->Size(); ul++)
 		{
-			CBitSet *pbs = (*pdrgpbsKeys)[ul];
+			gpos::pointer<CBitSet *> pbs = (*pdrgpbsKeys)[ul];
 			if (0 < ul)
 			{
 				os << ", ";

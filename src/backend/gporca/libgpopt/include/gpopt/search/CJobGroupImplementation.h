@@ -12,6 +12,7 @@
 #define GPOPT_CJobGroupImplementation_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/search/CJobGroup.h"
 #include "gpopt/search/CJobStateMachine.h"
@@ -82,7 +83,7 @@ public:
 	~CJobGroupImplementation() override;
 
 	// initialize job
-	void Init(CGroup *pgroup);
+	void Init(gpos::pointer<CGroup *> pgroup);
 
 	// get first unscheduled expression
 	CGroupExpression *
@@ -95,8 +96,8 @@ public:
 	BOOL FScheduleGroupExpressions(CSchedulerContext *psc) override;
 
 	// schedule a new group implementation job
-	static void ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
-							CJob *pjParent);
+	static void ScheduleJob(CSchedulerContext *psc,
+							gpos::pointer<CGroup *> pgroup, CJob *pjParent);
 
 	// job's function
 	BOOL FExecute(CSchedulerContext *psc) override;

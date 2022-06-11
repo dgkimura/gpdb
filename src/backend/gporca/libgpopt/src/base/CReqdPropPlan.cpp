@@ -43,15 +43,18 @@ using namespace gpopt;
 //             Ctor
 //
 //---------------------------------------------------------------------------
-CReqdPropPlan::CReqdPropPlan(CColRefSet *pcrs, CEnfdOrder *peo,
-							 CEnfdDistribution *ped, CEnfdRewindability *per,
-							 CEnfdPartitionPropagation *pepp, CCTEReq *pcter)
-	: m_pcrs(pcrs),
-	  m_peo(peo),
-	  m_ped(ped),
-	  m_per(per),
-	  m_pepp(pepp),
-	  m_pcter(pcter)
+CReqdPropPlan::CReqdPropPlan(gpos::owner<CColRefSet *> pcrs,
+							 gpos::owner<CEnfdOrder *> peo,
+							 gpos::owner<CEnfdDistribution *> ped,
+							 gpos::owner<CEnfdRewindability *> per,
+							 gpos::owner<CEnfdPartitionPropagation *> pepp,
+							 gpos::owner<CCTEReq *> pcter)
+	: m_pcrs(std::move(pcrs)),
+	  m_peo(std::move(peo)),
+	  m_ped(std::move(ped)),
+	  m_per(std::move(per)),
+	  m_pepp(std::move(pepp)),
+	  m_pcter(std::move(pcter))
 {
 	GPOS_ASSERT(nullptr != m_pcrs);
 	GPOS_ASSERT(nullptr != m_peo);
@@ -91,13 +94,16 @@ CReqdPropPlan::~CReqdPropPlan()
 //---------------------------------------------------------------------------
 void
 CReqdPropPlan::ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   CReqdProp *prpInput, ULONG child_index,
-							   CDrvdPropArray *pdrgpdpCtxt)
+							   gpos::pointer<CReqdProp *> prpInput,
+							   ULONG child_index,
+							   gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr == m_pcrs);
 
-	CReqdPropPlan *prppInput = CReqdPropPlan::Prpp(prpInput);
-	CPhysical *popPhysical = CPhysical::PopConvert(exprhdl.Pop());
+	gpos::pointer<CReqdPropPlan *> prppInput =
+		gpos::dyn_cast<CReqdPropPlan>(prpInput);
+	gpos::pointer<CPhysical *> popPhysical =
+		gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 	m_pcrs =
 		popPhysical->PcrsRequired(mp, exprhdl, prppInput->PcrsRequired(),
 								  child_index, pdrgpdpCtxt, 0 /*ulOptReq*/);
@@ -113,13 +119,15 @@ CReqdPropPlan::ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 void
 CReqdPropPlan::ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   CReqdProp *prpInput, ULONG child_index,
-							   CDrvdPropArray *pdrgpdpCtxt)
+							   gpos::pointer<CReqdProp *> prpInput,
+							   ULONG child_index, CDrvdPropArray *pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr == m_pcter);
 
-	CReqdPropPlan *prppInput = CReqdPropPlan::Prpp(prpInput);
-	CPhysical *popPhysical = CPhysical::PopConvert(exprhdl.Pop());
+	gpos::pointer<CReqdPropPlan *> prppInput =
+		gpos::dyn_cast<CReqdPropPlan>(prpInput);
+	gpos::pointer<CPhysical *> popPhysical =
+		gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 	m_pcter =
 		popPhysical->PcteRequired(mp, exprhdl, prppInput->Pcter(), child_index,
 								  pdrgpdpCtxt, 0 /*ulOptReq*/);
@@ -135,13 +143,15 @@ CReqdPropPlan::ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 void
 CReqdPropPlan::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					   CReqdProp *prpInput, ULONG child_index,
+					   gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
 					   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_CHECK_ABORT;
 
-	CReqdPropPlan *prppInput = CReqdPropPlan::Prpp(prpInput);
-	CPhysical *popPhysical = CPhysical::PopConvert(exprhdl.Pop());
+	gpos::pointer<CReqdPropPlan *> prppInput =
+		gpos::dyn_cast<CReqdPropPlan>(prpInput);
+	gpos::pointer<CPhysical *> popPhysical =
+		gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 	ComputeReqdCols(mp, exprhdl, prpInput, child_index, pdrgpdpCtxt);
 	ComputeReqdCTEs(mp, exprhdl, prpInput, child_index, pdrgpdpCtxt);
 
@@ -224,7 +234,8 @@ BOOL
 CReqdPropPlan::FProvidesReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 ULONG ulOptReq) const
 {
-	CPhysical *popPhysical = CPhysical::PopConvert(exprhdl.Pop());
+	gpos::pointer<CPhysical *> popPhysical =
+		gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 
 	// check if operator provides required columns
 	if (!popPhysical->FProvidesReqdCols(exprhdl, m_pcrs, ulOptReq))
@@ -232,13 +243,13 @@ CReqdPropPlan::FProvidesReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		return false;
 	}
 
-	CColRefSet *pcrsOutput = exprhdl.DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrsOutput = exprhdl.DeriveOutputColumns();
 
 	// check if property spec members use columns from operator output
 	BOOL fProvidesReqdCols = true;
 	for (ULONG ul = 0; fProvidesReqdCols && ul < CPropSpec::EpstSentinel; ul++)
 	{
-		CPropSpec *pps = Pps(ul);
+		gpos::pointer<CPropSpec *> pps = Pps(ul);
 		if (nullptr == pps)
 		{
 			continue;
@@ -362,7 +373,8 @@ CReqdPropPlan::FSatisfied(gpos::pointer<const CDrvdPropRelational *> pdprel,
 //
 //---------------------------------------------------------------------------
 BOOL
-CReqdPropPlan::FCompatible(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+CReqdPropPlan::FCompatible(CExpressionHandle &exprhdl,
+						   gpos::pointer<CPhysical *> popPhysical,
 						   gpos::pointer<const CDrvdPropRelational *> pdprel,
 						   gpos::pointer<const CDrvdPropPlan *> pdpplan) const
 {
@@ -402,16 +414,19 @@ CReqdPropPlan::PrppEmpty(CMemoryPool *mp)
 	gpos::owner<CPartitionPropagationSpec *> pps =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	gpos::owner<CEnfdOrder *> peo =
-		GPOS_NEW(mp) CEnfdOrder(pos, CEnfdOrder::EomSatisfy);
-	gpos::owner<CEnfdDistribution *> ped =
-		GPOS_NEW(mp) CEnfdDistribution(pds, CEnfdDistribution::EdmExact);
-	gpos::owner<CEnfdRewindability *> per =
-		GPOS_NEW(mp) CEnfdRewindability(prs, CEnfdRewindability::ErmSatisfy);
-	gpos::owner<CEnfdPartitionPropagation *> pepp = GPOS_NEW(mp)
-		CEnfdPartitionPropagation(pps, CEnfdPartitionPropagation::EppmSatisfy);
+		GPOS_NEW(mp) CEnfdOrder(std::move(pos), CEnfdOrder::EomSatisfy);
+	gpos::owner<CEnfdDistribution *> ped = GPOS_NEW(mp)
+		CEnfdDistribution(std::move(pds), CEnfdDistribution::EdmExact);
+	gpos::owner<CEnfdRewindability *> per = GPOS_NEW(mp)
+		CEnfdRewindability(std::move(prs), CEnfdRewindability::ErmSatisfy);
+	gpos::owner<CEnfdPartitionPropagation *> pepp =
+		GPOS_NEW(mp) CEnfdPartitionPropagation(
+			std::move(pps), CEnfdPartitionPropagation::EppmSatisfy);
 	gpos::owner<CCTEReq *> pcter = GPOS_NEW(mp) CCTEReq(mp);
 
-	return GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pcter);
+	return GPOS_NEW(mp)
+		CReqdPropPlan(std::move(pcrs), std::move(peo), std::move(ped),
+					  std::move(per), std::move(pepp), std::move(pcter));
 }
 
 //---------------------------------------------------------------------------
@@ -530,8 +545,9 @@ CReqdPropPlan::FEqualForCostBounding(
 //
 //---------------------------------------------------------------------------
 gpos::owner<CReqdPropPlan *>
-CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp, CReqdPropPlan *prppInput,
-							   CDrvdPropPlan *pdpplanInput,
+CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp,
+							   gpos::pointer<CReqdPropPlan *> prppInput,
+							   gpos::pointer<CDrvdPropPlan *> pdpplanInput,
 							   UlongToColRefMap *colref_mapping)
 {
 	GPOS_ASSERT(nullptr != colref_mapping);
@@ -539,8 +555,9 @@ CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp, CReqdPropPlan *prppInput,
 	GPOS_ASSERT(nullptr != pdpplanInput);
 
 	// Remap derived sort order to a required sort order.
-	COrderSpec *pos = pdpplanInput->Pos()->PosCopyWithRemappedColumns(
-		mp, colref_mapping, false /*must_exist*/);
+	gpos::owner<COrderSpec *> pos =
+		pdpplanInput->Pos()->PosCopyWithRemappedColumns(mp, colref_mapping,
+														false /*must_exist*/);
 	gpos::owner<CEnfdOrder *> peo =
 		GPOS_NEW(mp) CEnfdOrder(pos, prppInput->Peo()->Eom());
 
@@ -553,14 +570,15 @@ CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp, CReqdPropPlan *prppInput,
 	// On the query side, columns x1.a and x2.b are equivalent, but we should NOT
 	// treat columns a and b of the producer as equivalent.
 
-	CDistributionSpec *pdsDerived = pdpplanInput->Pds();
+	gpos::pointer<CDistributionSpec *> pdsDerived = pdpplanInput->Pds();
 	gpos::owner<CEnfdDistribution *> ped = nullptr;
 	if (pdsDerived->FRequirable())
 	{
 		gpos::owner<CDistributionSpec *> pdsNoEquiv =
 			pdsDerived->StripEquivColumns(mp);
-		CDistributionSpec *pds = pdsNoEquiv->PdsCopyWithRemappedColumns(
-			mp, colref_mapping, false /*must_exist*/);
+		gpos::owner<CDistributionSpec *> pds =
+			pdsNoEquiv->PdsCopyWithRemappedColumns(mp, colref_mapping,
+												   false /*must_exist*/);
 		ped = GPOS_NEW(mp) CEnfdDistribution(pds, prppInput->Ped()->Edm());
 		pdsNoEquiv->Release();
 	}
@@ -573,18 +591,20 @@ CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp, CReqdPropPlan *prppInput,
 	// other properties are copied from input
 
 	prppInput->PcrsRequired()->AddRef();
-	CColRefSet *pcrsRequired = prppInput->PcrsRequired();
+	gpos::owner<CColRefSet *> pcrsRequired = prppInput->PcrsRequired();
 
 	prppInput->Per()->AddRef();
-	CEnfdRewindability *per = prppInput->Per();
+	gpos::owner<CEnfdRewindability *> per = prppInput->Per();
 
 	prppInput->Pepp()->AddRef();
-	CEnfdPartitionPropagation *pepp = prppInput->Pepp();
+	gpos::owner<CEnfdPartitionPropagation *> pepp = prppInput->Pepp();
 
 	prppInput->Pcter()->AddRef();
-	CCTEReq *pcter = prppInput->Pcter();
+	gpos::owner<CCTEReq *> pcter = prppInput->Pcter();
 
-	return GPOS_NEW(mp) CReqdPropPlan(pcrsRequired, peo, ped, per, pepp, pcter);
+	return GPOS_NEW(mp)
+		CReqdPropPlan(std::move(pcrsRequired), std::move(peo), std::move(ped),
+					  std::move(per), std::move(pepp), std::move(pcter));
 }
 
 

@@ -43,10 +43,10 @@ CLogicalIntersectAll::CLogicalIntersectAll(CMemoryPool *mp) : CLogicalSetOp(mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalIntersectAll::CLogicalIntersectAll(CMemoryPool *mp,
-										   CColRefArray *pdrgpcrOutput,
-										   CColRef2dArray *pdrgpdrgpcrInput)
-	: CLogicalSetOp(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
+CLogicalIntersectAll::CLogicalIntersectAll(
+	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrOutput,
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput)
+	: CLogicalSetOp(mp, std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrInput))
 {
 }
 
@@ -99,15 +99,16 @@ CLogicalIntersectAll::DeriveMaxCard(CMemoryPool *,	// mp
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
 CLogicalIntersectAll::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput =
+	gpos::owner<CColRefArray *> pdrgpcrOutput =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
-	CColRef2dArray *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
 		mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
-	return GPOS_NEW(mp)
-		CLogicalIntersectAll(mp, pdrgpcrOutput, pdrgpdrgpcrInput);
+	return GPOS_NEW(mp) CLogicalIntersectAll(mp, std::move(pdrgpcrOutput),
+											 std::move(pdrgpdrgpcrInput));
 }
 
 //---------------------------------------------------------------------------
@@ -118,7 +119,7 @@ CLogicalIntersectAll::PopCopyWithRemappedColumns(
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalIntersectAll::DeriveKeyCollection(CMemoryPool *,	   //mp,
 										  CExpressionHandle &  //exprhdl
 ) const
@@ -135,7 +136,7 @@ CLogicalIntersectAll::DeriveKeyCollection(CMemoryPool *,	   //mp,
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalIntersectAll::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -155,14 +156,15 @@ CLogicalIntersectAll::PxfsCandidates(CMemoryPool *mp) const
 IStatistics *
 CLogicalIntersectAll::PstatsDerive(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	CColRef2dArray *pdrgpdrgpcrInput,
-	CColRefSetArray *output_colrefsets	// output of relational children
+	gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput,
+	gpos::pointer<CColRefSetArray *>
+		output_colrefsets  // output of relational children
 )
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	IStatistics *outer_stats = exprhdl.Pstats(0);
-	IStatistics *inner_side_stats = exprhdl.Pstats(1);
+	gpos::pointer<IStatistics *> outer_stats = exprhdl.Pstats(0);
+	gpos::pointer<IStatistics *> inner_side_stats = exprhdl.Pstats(1);
 
 	// construct the scalar condition similar to transform that turns an "intersect all" into a "left semi join"
 	// over a window operation on the individual input (for row_number)
@@ -194,9 +196,10 @@ CLogicalIntersectAll::PstatsDerive(
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
-CLogicalIntersectAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   IStatisticsArray *  // not used
+gpos::owner<IStatistics *>
+CLogicalIntersectAll::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<IStatisticsArray *>  // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);

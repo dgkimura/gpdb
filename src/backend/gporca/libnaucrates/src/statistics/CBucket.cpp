@@ -30,11 +30,11 @@ using namespace gpnaucrates;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CBucket::CBucket(CPoint *bucket_lower_bound, CPoint *bucket_upper_bound,
-				 BOOL is_lower_closed, BOOL is_upper_closed, CDouble frequency,
-				 CDouble distinct)
-	: m_bucket_lower_bound(bucket_lower_bound),
-	  m_bucket_upper_bound(bucket_upper_bound),
+CBucket::CBucket(gpos::owner<CPoint *> bucket_lower_bound,
+				 gpos::owner<CPoint *> bucket_upper_bound, BOOL is_lower_closed,
+				 BOOL is_upper_closed, CDouble frequency, CDouble distinct)
+	: m_bucket_lower_bound(std::move(bucket_lower_bound)),
+	  m_bucket_upper_bound(std::move(bucket_upper_bound)),
 	  m_is_lower_closed(is_lower_closed),
 	  m_is_upper_closed(is_upper_closed),
 	  m_frequency(frequency),
@@ -509,8 +509,8 @@ CBucket::CompareLowerBounds(const CBucket *bucket1, const CBucket *bucket2)
 	GPOS_ASSERT(nullptr != bucket1);
 	GPOS_ASSERT(nullptr != bucket2);
 
-	CPoint *point1 = bucket1->GetLowerBound();
-	CPoint *point2 = bucket2->GetLowerBound();
+	gpos::pointer<CPoint *> point1 = bucket1->GetLowerBound();
+	gpos::pointer<CPoint *> point2 = bucket2->GetLowerBound();
 
 	BOOL is_closed_point1 = bucket1->IsLowerClosed();
 	BOOL is_closed_point2 = bucket2->IsLowerClosed();
@@ -553,8 +553,8 @@ INT
 CBucket::CompareLowerBoundToUpperBound(const CBucket *bucket1,
 									   const CBucket *bucket2)
 {
-	CPoint *lower_bound_first = bucket1->GetLowerBound();
-	CPoint *upper_bound_second = bucket2->GetUpperBound();
+	gpos::pointer<CPoint *> lower_bound_first = bucket1->GetLowerBound();
+	gpos::pointer<CPoint *> upper_bound_second = bucket2->GetUpperBound();
 
 	if (lower_bound_first->IsGreaterThan(upper_bound_second))
 	{
@@ -590,8 +590,8 @@ CBucket::CompareUpperBounds(const CBucket *bucket1, const CBucket *bucket2)
 	GPOS_ASSERT(nullptr != bucket1);
 	GPOS_ASSERT(nullptr != bucket2);
 
-	CPoint *point1 = bucket1->GetUpperBound();
-	CPoint *point2 = bucket2->GetUpperBound();
+	gpos::pointer<CPoint *> point1 = bucket1->GetUpperBound();
+	gpos::pointer<CPoint *> point2 = bucket2->GetUpperBound();
 
 	BOOL is_closed_point1 = bucket1->IsUpperClosed();
 	BOOL is_closed_point2 = bucket2->IsUpperClosed();

@@ -62,7 +62,8 @@ private:
 
 public:
 	// ctor
-	CSearchStage(CXformSet *xform_set, ULONG ulTimeThreshold = gpos::ulong_max,
+	CSearchStage(gpos::owner<CXformSet *> xform_set,
+				 ULONG ulTimeThreshold = gpos::ulong_max,
 				 CCost costThreshold = CCost(0.0));
 
 	// dtor
@@ -143,7 +144,7 @@ public:
 	IOstream &OsPrint(IOstream &) const;
 
 	// generate default search strategy
-	static CSearchStageArray *PdrgpssDefault(CMemoryPool *mp);
+	static gpos::owner<CSearchStageArray *> PdrgpssDefault(CMemoryPool *mp);
 };
 
 // shorthand for printing

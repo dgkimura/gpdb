@@ -78,8 +78,8 @@ public:
 
 protected:
 	// serialize an array of column ids into a comma-separated string
-	static CWStringDynamic *ColumnsToStr(CMemoryPool *mp,
-										 ULongPtrArray *colid_array);
+	static CWStringDynamic *ColumnsToStr(
+		CMemoryPool *mp, gpos::pointer<ULongPtrArray *> colid_array);
 
 public:
 	// object type
@@ -117,7 +117,7 @@ public:
 	virtual ULONG GetPosFromAttno(INT attno) const = 0;
 
 	// return the original positions of all the non-dropped columns
-	virtual ULongPtrArray *NonDroppedColsArray() const = 0;
+	virtual gpos::pointer<ULongPtrArray *> NonDroppedColsArray() const = 0;
 
 	// number of system columns
 	virtual ULONG SystemColumnsCount() const = 0;
@@ -137,7 +137,7 @@ public:
 	// retrieve the column at the given position in the distribution key for the relation
 	virtual gpos::pointer<const IMDColumn *> GetDistrColAt(ULONG pos) const = 0;
 
-	virtual IMDId *GetDistrOpfamilyAt(ULONG pos) const = 0;
+	virtual gpos::pointer<IMDId *> GetDistrOpfamilyAt(ULONG pos) const = 0;
 
 	// return true if a hash distributed table needs to be considered as random
 	virtual BOOL ConvertHashToRandom() const = 0;
@@ -158,7 +158,7 @@ public:
 	virtual gpos::pointer<const IMDColumn *> PartColAt(ULONG pos) const = 0;
 
 	// retrieve list of partition types
-	virtual CharPtrArray *GetPartitionTypes() const = 0;
+	virtual gpos::pointer<CharPtrArray *> GetPartitionTypes() const = 0;
 
 	// retrieve the partition type of the given partition level
 	virtual CHAR PartTypeAtLevel(ULONG pos) const = 0;
@@ -173,19 +173,19 @@ public:
 	virtual IMDId *IndexMDidAt(ULONG pos) const = 0;
 
 	// retrieve the id of the metadata cache trigger at the given position
-	virtual IMDId *TriggerMDidAt(ULONG pos) const = 0;
+	virtual gpos::pointer<IMDId *> TriggerMDidAt(ULONG pos) const = 0;
 
 	// number of check constraints
 	virtual ULONG CheckConstraintCount() const = 0;
 
 	// retrieve the id of the check constraint cache at the given position
-	virtual IMDId *CheckConstraintMDidAt(ULONG pos) const = 0;
+	virtual gpos::pointer<IMDId *> CheckConstraintMDidAt(ULONG pos) const = 0;
 
 	// part constraint
-	virtual CDXLNode *MDPartConstraint() const = 0;
+	virtual gpos::pointer<CDXLNode *> MDPartConstraint() const = 0;
 
 	// child partition oids
-	virtual IMdIdArray *
+	virtual gpos::pointer<IMdIdArray *>
 	ChildPartitionMdids() const
 	{
 		return nullptr;

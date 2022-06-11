@@ -135,7 +135,7 @@ CDXLLogicalJoin::AssertValid(gpos::pointer<const CDXLNode *> node,
 
 	for (ULONG idx = 0; idx < num_of_child - 1; ++idx)
 	{
-		CDXLNode *child_dxlnode = (*node)[idx];
+		gpos::pointer<CDXLNode *> child_dxlnode = (*node)[idx];
 		GPOS_ASSERT(EdxloptypeLogical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 
@@ -146,7 +146,7 @@ CDXLLogicalJoin::AssertValid(gpos::pointer<const CDXLNode *> node,
 		}
 	}
 
-	CDXLNode *node_last_child = (*node)[num_of_child - 1];
+	gpos::pointer<CDXLNode *> node_last_child = (*node)[num_of_child - 1];
 	GPOS_ASSERT(nullptr != node_last_child);
 
 	//The last child is a CDXLScalar operator representing the join qual

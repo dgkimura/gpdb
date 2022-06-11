@@ -67,7 +67,8 @@ CColumnDescriptorTest::EresUnittest_Basic()
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);

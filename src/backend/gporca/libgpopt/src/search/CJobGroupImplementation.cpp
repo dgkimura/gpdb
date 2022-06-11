@@ -11,6 +11,8 @@
 
 #include "gpopt/search/CJobGroupImplementation.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CQueryContext.h"
 #include "gpopt/engine/CEngine.h"
 #include "gpopt/search/CGroup.h"
@@ -114,7 +116,7 @@ CJobGroupImplementation::~CJobGroupImplementation() = default;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupImplementation::Init(CGroup *pgroup)
+CJobGroupImplementation::Init(gpos::pointer<CGroup *> pgroup)
 {
 	CJobGroup::Init(pgroup);
 
@@ -282,7 +284,8 @@ CJobGroupImplementation::FExecute(CSchedulerContext *psc)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupImplementation::ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
+CJobGroupImplementation::ScheduleJob(CSchedulerContext *psc,
+									 gpos::pointer<CGroup *> pgroup,
 									 CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtGroupImplementation);

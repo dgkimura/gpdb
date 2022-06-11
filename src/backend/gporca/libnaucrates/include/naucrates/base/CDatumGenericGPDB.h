@@ -62,9 +62,10 @@ public:
 	CDatumGenericGPDB(const CDatumGenericGPDB &) = delete;
 
 	// ctor
-	CDatumGenericGPDB(CMemoryPool *mp, IMDId *mdid, INT type_modifier,
-					  const void *src, ULONG size, BOOL is_null,
-					  LINT stats_comp_val_int, CDouble stats_comp_val_double);
+	CDatumGenericGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+					  INT type_modifier, const void *src, ULONG size,
+					  BOOL is_null, LINT stats_comp_val_int,
+					  CDouble stats_comp_val_double);
 
 	// dtor
 	~CDatumGenericGPDB() override;
@@ -134,7 +135,8 @@ public:
 	BOOL NeedsPadding() const override;
 
 	// return the padded datum
-	IDatum *MakePaddedDatum(CMemoryPool *mp, ULONG col_len) const override;
+	gpos::owner<IDatum *> MakePaddedDatum(CMemoryPool *mp,
+										  ULONG col_len) const override;
 
 	// does datum support like predicate
 	BOOL

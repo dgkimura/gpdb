@@ -15,7 +15,8 @@ namespace gpopt
 class CColConstraintsHashMapper : public IColConstraintsMapper
 {
 public:
-	CColConstraintsHashMapper(CMemoryPool *mp, CConstraintArray *pdrgPcnstr);
+	CColConstraintsHashMapper(CMemoryPool *mp,
+							  gpos::pointer<CConstraintArray *> pdrgPcnstr);
 
 	gpos::owner<CConstraintArray *> PdrgPcnstrLookup(CColRef *colref) override;
 	~CColConstraintsHashMapper() override;

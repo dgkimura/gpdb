@@ -162,11 +162,11 @@ CParseHandlerLogicalUpdate::EndElement(const XMLCh *const,	// element_uri,
 		table_descr_parse_handler->GetDXLTableDescr();
 	table_descr->AddRef();
 
-	m_dxl_node = GPOS_NEW(m_mp)
-		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalUpdate(
-						   m_mp, table_descr, m_ctid_colid, m_segid_colid,
-						   m_deletion_colid_array, m_insert_colid_array,
-						   m_preserve_oids, m_tuple_oid_col_oid));
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(
+		m_mp, GPOS_NEW(m_mp) CDXLLogicalUpdate(
+				  m_mp, std::move(table_descr), m_ctid_colid, m_segid_colid,
+				  m_deletion_colid_array, m_insert_colid_array, m_preserve_oids,
+				  m_tuple_oid_col_oid));
 
 	AddChildFromParseHandler(child_parse_handler);
 

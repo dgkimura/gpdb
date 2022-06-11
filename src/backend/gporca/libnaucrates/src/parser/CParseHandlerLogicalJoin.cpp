@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalJoin.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -66,12 +68,13 @@ CParseHandlerLogicalJoin::StartElement(const XMLCh *const element_uri,
 		if (nullptr == m_dxl_node)
 		{
 			// parse and create logical join operator
-			CDXLLogicalJoin *pdxlopJoin =
-				(CDXLLogicalJoin *) CDXLOperatorFactory::MakeLogicalJoin(
-					m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+			gpos::owner<CDXLLogicalJoin *> pdxlopJoin =
+				gpos::cast<CDXLLogicalJoin>(
+					CDXLOperatorFactory::MakeLogicalJoin(
+						m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 			// construct node from the created child nodes
-			m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, pdxlopJoin);
+			m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(pdxlopJoin));
 		}
 		else
 		{

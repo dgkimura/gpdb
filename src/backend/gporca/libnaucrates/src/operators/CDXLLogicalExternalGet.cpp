@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalExternalGet.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/dxltokens.h"
 
 using namespace gpos;
@@ -24,9 +26,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalExternalGet::CDXLLogicalExternalGet(CMemoryPool *mp,
-											   CDXLTableDescr *table_descr)
-	: CDXLLogicalGet(mp, table_descr)
+CDXLLogicalExternalGet::CDXLLogicalExternalGet(
+	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr)
+	: CDXLLogicalGet(mp, std::move(table_descr))
 {
 }
 

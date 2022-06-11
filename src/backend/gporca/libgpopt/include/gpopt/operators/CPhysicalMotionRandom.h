@@ -38,7 +38,8 @@ public:
 	CPhysicalMotionRandom(const CPhysicalMotionRandom &) = delete;
 
 	// ctor
-	CPhysicalMotionRandom(CMemoryPool *mp, CDistributionSpecRandom *pdsRandom);
+	CPhysicalMotionRandom(CMemoryPool *mp,
+						  gpos::owner<CDistributionSpecRandom *> pdsRandom);
 
 	// dtor
 	~CPhysicalMotionRandom() override;
@@ -71,28 +72,28 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	CColRefSet *PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsInput, ULONG child_index,
-							 CDrvdPropArray *pdrgpdpCtxt,
-							 ULONG ulOptReq) override;
+	gpos::owner<CColRefSet *> PcrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CColRefSet *> pcrsInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// compute required sort order of the n-th child
-	gpos::owner<COrderSpec *> PosRequired(CMemoryPool *mp,
-										  CExpressionHandle &exprhdl,
-										  gpos::pointer<COrderSpec *> posInput,
-										  ULONG child_index,
-										  CDrvdPropArray *pdrgpdpCtxt,
-										  ULONG ulOptReq) const override;
+	gpos::owner<COrderSpec *> PosRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<COrderSpec *> posInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::pointer<CColRefSet *> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------

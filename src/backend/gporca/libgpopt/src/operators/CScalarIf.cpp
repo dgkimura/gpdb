@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarIf.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -32,8 +33,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarIf::CScalarIf(CMemoryPool *mp, IMDId *mdid)
-	: CScalar(mp), m_mdid_type(mdid), m_fBoolReturnType(false)
+CScalarIf::CScalarIf(CMemoryPool *mp, gpos::owner<IMDId *> mdid)
+	: CScalar(mp), m_mdid_type(std::move(mdid)), m_fBoolReturnType(false)
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
 
@@ -67,11 +68,11 @@ CScalarIf::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIf::Matches(COperator *pop) const
+CScalarIf::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarIf *popScIf = CScalarIf::PopConvert(pop);
+		gpos::pointer<CScalarIf *> popScIf = gpos::dyn_cast<CScalarIf>(pop);
 
 		// match if return types are identical
 		return popScIf->MdidType()->Equals(m_mdid_type);

@@ -70,8 +70,8 @@ public:
 		EdxldatumSentinel
 	};
 	// ctor
-	CDXLDatum(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
-			  BOOL is_null, ULONG length);
+	CDXLDatum(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+			  INT type_modifier, BOOL is_null, ULONG length);
 
 	// dtor
 	~CDXLDatum() override

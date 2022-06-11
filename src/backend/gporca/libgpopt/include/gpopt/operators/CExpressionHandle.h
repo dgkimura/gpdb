@@ -86,7 +86,7 @@ private:
 
 	// return an array of stats objects starting from the first stats object referenced by child
 	gpos::owner<IStatisticsArray *> PdrgpstatOuterRefs(
-		IStatisticsArray *statistics_array, ULONG child_index);
+		gpos::pointer<IStatisticsArray *> statistics_array, ULONG child_index);
 
 	// check if stats are derived for attached expression and its children
 	BOOL FStatsDerived() const;
@@ -110,13 +110,13 @@ public:
 	~CExpressionHandle();
 
 	// attach handle to a given expression
-	void Attach(CExpression *pexpr);
+	void Attach(gpos::pointer<CExpression *> pexpr);
 
 	// attach handle to a given group expression
-	void Attach(CGroupExpression *pgexpr);
+	void Attach(gpos::pointer<CGroupExpression *> pgexpr);
 
 	// attach handle to a given cost context
-	void Attach(CCostContext *pcc);
+	void Attach(gpos::pointer<CCostContext *> pcc);
 
 	// recursive property derivation,
 	void DeriveProps(CDrvdPropCtxt *pdpctxt);
@@ -138,20 +138,20 @@ public:
 	void DerivePlanPropsForCostContext();
 
 	// initialize required properties container
-	void InitReqdProps(CReqdProp *prpInput);
+	void InitReqdProps(gpos::pointer<CReqdProp *> prpInput);
 
 	// compute required properties of the n-th child
 	void ComputeChildReqdProps(ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
 							   ULONG ulOptReq);
 
 	// copy required properties of the n-th child
-	void CopyChildReqdProps(ULONG child_index, CReqdProp *prp);
+	void CopyChildReqdProps(ULONG child_index, gpos::owner<CReqdProp *> prp);
 
 	// compute required columns of the n-th child
 	void ComputeChildReqdCols(ULONG child_index, CDrvdPropArray *pdrgpdpCtxt);
 
 	// required properties computation of all children
-	void ComputeReqdProps(CReqdProp *prpInput, ULONG ulOptReq);
+	void ComputeReqdProps(gpos::pointer<CReqdProp *> prpInput, ULONG ulOptReq);
 
 	// derived relational props of n-th child
 	CDrvdPropRelational *GetRelationalProperties(ULONG child_index) const;
@@ -286,7 +286,7 @@ public:
 
 	// return the columns used by a logical operator internally as well
 	// as columns used by all its scalar children
-	CColRefSet *PcrsUsedColumns(CMemoryPool *mp) const;
+	gpos::owner<CColRefSet *> PcrsUsedColumns(CMemoryPool *mp) const;
 
 	CColRefSet *DeriveOuterReferences() const;
 	CColRefSet *DeriveOuterReferences(ULONG child_index) const;

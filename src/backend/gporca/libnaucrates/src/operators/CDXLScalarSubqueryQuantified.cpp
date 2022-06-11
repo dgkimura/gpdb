@@ -30,10 +30,10 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CDXLScalarSubqueryQuantified::CDXLScalarSubqueryQuantified(
-	CMemoryPool *mp, IMDId *scalar_op_mdid, CMDName *scalar_op_mdname,
-	ULONG colid)
+	CMemoryPool *mp, gpos::owner<IMDId *> scalar_op_mdid,
+	CMDName *scalar_op_mdname, ULONG colid)
 	: CDXLScalar(mp),
-	  m_scalar_op_mdid(scalar_op_mdid),
+	  m_scalar_op_mdid(std::move(scalar_op_mdid)),
 	  m_scalar_op_mdname(scalar_op_mdname),
 	  m_colid(colid)
 {
@@ -102,8 +102,9 @@ CDXLScalarSubqueryQuantified::AssertValid(
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
 
-	CDXLNode *pdxlnScalarChild = (*dxlnode)[EdxlsqquantifiedIndexScalar];
-	CDXLNode *pdxlnRelationalChild =
+	gpos::pointer<CDXLNode *> pdxlnScalarChild =
+		(*dxlnode)[EdxlsqquantifiedIndexScalar];
+	gpos::pointer<CDXLNode *> pdxlnRelationalChild =
 		(*dxlnode)[EdxlsqquantifiedIndexRelational];
 
 	GPOS_ASSERT(EdxloptypeScalar ==

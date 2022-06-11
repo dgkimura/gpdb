@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/operators/CDXLScalarSubqueryAll.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -28,11 +29,11 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSubqueryAll::CDXLScalarSubqueryAll(CMemoryPool *mp,
-											 IMDId *scalar_op_mdid,
-											 CMDName *scalar_op_mdname,
-											 ULONG colid)
-	: CDXLScalarSubqueryQuantified(mp, scalar_op_mdid, scalar_op_mdname, colid)
+CDXLScalarSubqueryAll::CDXLScalarSubqueryAll(
+	CMemoryPool *mp, gpos::owner<IMDId *> scalar_op_mdid,
+	CMDName *scalar_op_mdname, ULONG colid)
+	: CDXLScalarSubqueryQuantified(mp, std::move(scalar_op_mdid),
+								   scalar_op_mdname, colid)
 {
 }
 

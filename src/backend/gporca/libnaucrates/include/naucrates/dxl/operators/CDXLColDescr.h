@@ -67,8 +67,8 @@ public:
 
 	// ctor
 	CDXLColDescr(CMDName *, ULONG column_id, INT attr_no,
-				 IMDId *column_mdid_type, INT type_modifier, BOOL is_dropped,
-				 ULONG width = gpos::ulong_max);
+				 gpos::owner<IMDId *> column_mdid_type, INT type_modifier,
+				 BOOL is_dropped, ULONG width = gpos::ulong_max);
 
 	//dtor
 	~CDXLColDescr() override;

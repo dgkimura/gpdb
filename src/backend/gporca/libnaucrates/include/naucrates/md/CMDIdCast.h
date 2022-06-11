@@ -57,7 +57,8 @@ public:
 	CMDIdCast(const CMDIdCast &) = delete;
 
 	// ctor
-	CMDIdCast(CMDIdGPDB *mdid_src, CMDIdGPDB *mdid_dest);
+	CMDIdCast(gpos::owner<CMDIdGPDB *> mdid_src,
+			  gpos::owner<CMDIdGPDB *> mdid_dest);
 
 	// dtor
 	~CMDIdCast() override;
@@ -132,9 +133,12 @@ public:
 	gpos::owner<IMDId *>
 	Copy(CMemoryPool *mp) const override
 	{
-		CMDIdGPDB *mdid_src = CMDIdGPDB::CastMdid(m_mdid_src->Copy(mp));
-		CMDIdGPDB *mdid_dest = CMDIdGPDB::CastMdid(m_mdid_dest->Copy(mp));
-		return GPOS_NEW(mp) CMDIdCast(mdid_src, mdid_dest);
+		gpos::owner<CMDIdGPDB *> mdid_src =
+			gpos::dyn_cast<CMDIdGPDB>(m_mdid_src->Copy(mp));
+		gpos::owner<CMDIdGPDB *> mdid_dest =
+			gpos::dyn_cast<CMDIdGPDB>(m_mdid_dest->Copy(mp));
+		return GPOS_NEW(mp)
+			CMDIdCast(std::move(mdid_src), std::move(mdid_dest));
 	}
 };
 }  // namespace gpmd

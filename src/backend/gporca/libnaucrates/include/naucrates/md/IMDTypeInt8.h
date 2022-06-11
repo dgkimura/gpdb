@@ -13,6 +13,7 @@
 #define GPMD_IMDTypeInt8_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatumInt8.h"
 #include "naucrates/md/IMDType.h"
@@ -48,8 +49,9 @@ public:
 	}
 
 	// factory function for INT8 datums
-	virtual IDatumInt8 *CreateInt8Datum(CMemoryPool *mp, LINT value,
-										BOOL is_null) const = 0;
+	virtual gpos::owner<IDatumInt8 *> CreateInt8Datum(CMemoryPool *mp,
+													  LINT value,
+													  BOOL is_null) const = 0;
 };
 
 }  // namespace gpmd

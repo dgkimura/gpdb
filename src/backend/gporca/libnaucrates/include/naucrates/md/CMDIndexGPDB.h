@@ -81,14 +81,14 @@ public:
 	CMDIndexGPDB(const CMDIndexGPDB &) = delete;
 
 	// ctor
-	CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
+	CMDIndexGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
 				 BOOL is_clustered, BOOL is_partitioned,
-				 EmdindexType index_type, IMDId *mdid_item_type,
-				 ULongPtrArray *index_key_cols_array,
-				 ULongPtrArray *included_cols_array,
-				 IMdIdArray *mdid_opfamilies_array,
-				 IMDPartConstraint *mdpart_constraint,
-				 IMdIdArray *child_index_oids);
+				 EmdindexType index_type, gpos::owner<IMDId *> mdid_item_type,
+				 gpos::owner<ULongPtrArray *> index_key_cols_array,
+				 gpos::owner<ULongPtrArray *> included_cols_array,
+				 gpos::owner<IMdIdArray *> mdid_opfamilies_array,
+				 gpos::owner<IMDPartConstraint *> mdpart_constraint,
+				 gpos::owner<IMdIdArray *> child_index_oids);
 
 	// dtor
 	~CMDIndexGPDB() override;

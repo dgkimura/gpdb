@@ -47,12 +47,13 @@ CLogicalDelete::CLogicalDelete(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalDelete::CLogicalDelete(CMemoryPool *mp, CTableDescriptor *ptabdesc,
-							   CColRefArray *colref_array, CColRef *pcrCtid,
-							   CColRef *pcrSegmentId)
+CLogicalDelete::CLogicalDelete(CMemoryPool *mp,
+							   gpos::owner<CTableDescriptor *> ptabdesc,
+							   gpos::owner<CColRefArray *> colref_array,
+							   CColRef *pcrCtid, CColRef *pcrSegmentId)
 	: CLogical(mp),
-	  m_ptabdesc(ptabdesc),
-	  m_pdrgpcr(colref_array),
+	  m_ptabdesc(std::move(ptabdesc)),
+	  m_pdrgpcr(std::move(colref_array)),
 	  m_pcrCtid(pcrCtid),
 	  m_pcrSegmentId(pcrSegmentId)
 
@@ -90,14 +91,15 @@ CLogicalDelete::~CLogicalDelete()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalDelete::Matches(COperator *pop) const
+CLogicalDelete::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalDelete *popDelete = CLogicalDelete::PopConvert(pop);
+	gpos::pointer<CLogicalDelete *> popDelete =
+		gpos::dyn_cast<CLogicalDelete>(pop);
 
 	return m_pcrCtid == popDelete->PcrCtid() &&
 		   m_pcrSegmentId == popDelete->PcrSegmentId() &&
@@ -135,19 +137,19 @@ CLogicalDelete::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
-CLogicalDelete::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										   UlongToColRefMap *colref_mapping,
-										   BOOL must_exist)
+CLogicalDelete::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *colref_array =
+	gpos::owner<CColRefArray *> colref_array =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcr, colref_mapping, must_exist);
 	CColRef *pcrCtid = CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
 	CColRef *pcrSegmentId =
 		CUtils::PcrRemap(m_pcrSegmentId, colref_mapping, must_exist);
 	m_ptabdesc->AddRef();
 
-	return GPOS_NEW(mp)
-		CLogicalDelete(mp, m_ptabdesc, colref_array, pcrCtid, pcrSegmentId);
+	return GPOS_NEW(mp) CLogicalDelete(mp, m_ptabdesc, std::move(colref_array),
+									   pcrCtid, pcrSegmentId);
 }
 
 //---------------------------------------------------------------------------
@@ -158,7 +160,7 @@ CLogicalDelete::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalDelete::DeriveOutputColumns(CMemoryPool *mp,
 									CExpressionHandle &	 //exprhdl
 )
@@ -176,7 +178,7 @@ CLogicalDelete::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalDelete::DeriveKeyCollection(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl) const
 {
@@ -207,7 +209,7 @@ CLogicalDelete::DeriveMaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalDelete::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -223,10 +225,10 @@ CLogicalDelete::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalDelete::PstatsDerive(CMemoryPool *,	 // mp,
 							 CExpressionHandle &exprhdl,
-							 IStatisticsArray *	 // not used
+							 gpos::pointer<IStatisticsArray *>	// not used
 ) const
 {
 	return PstatsPassThruOuter(exprhdl);

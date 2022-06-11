@@ -51,7 +51,8 @@ public:
 	CDXLScalarSortCol(CDXLScalarSortCol &) = delete;
 
 	// ctor/dtor
-	CDXLScalarSortCol(CMemoryPool *mp, ULONG colid, IMDId *sort_op_id,
+	CDXLScalarSortCol(CMemoryPool *mp, ULONG colid,
+					  gpos::owner<IMDId *> sort_op_id,
 					  CWStringConst *pstrTypeName, BOOL fSortNullsFirst);
 
 	~CDXLScalarSortCol() override;

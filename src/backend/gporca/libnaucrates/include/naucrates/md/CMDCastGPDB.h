@@ -65,9 +65,10 @@ public:
 	CMDCastGPDB(const CMDCastGPDB &) = delete;
 
 	// ctor
-	CMDCastGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname, IMDId *mdid_src,
-				IMDId *mdid_dest, BOOL is_binary_coercible,
-				IMDId *mdid_cast_func, EmdCoercepathType path_type = EmdtNone);
+	CMDCastGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+				gpos::owner<IMDId *> mdid_src, gpos::owner<IMDId *> mdid_dest,
+				BOOL is_binary_coercible, gpos::owner<IMDId *> mdid_cast_func,
+				EmdCoercepathType path_type = EmdtNone);
 
 	// dtor
 	~CMDCastGPDB() override;

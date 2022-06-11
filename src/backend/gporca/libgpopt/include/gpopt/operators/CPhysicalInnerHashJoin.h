@@ -30,14 +30,14 @@ class CPhysicalInnerHashJoin : public CPhysicalHashJoin
 {
 private:
 	// helper for computing a hashed distribution matching the given distribution
-	CDistributionSpecHashed *PdshashedCreateMatching(
+	gpos::owner<CDistributionSpecHashed *> PdshashedCreateMatching(
 		CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
 		ULONG ulSourceChild) const;
 
 	// helper for deriving hash join distribution from hashed children
-	CDistributionSpec *PdsDeriveFromHashedChildren(
-		CMemoryPool *mp, CDistributionSpec *pdsOuter,
-		CDistributionSpec *pdsInner) const;
+	gpos::owner<CDistributionSpec *> PdsDeriveFromHashedChildren(
+		CMemoryPool *mp, gpos::pointer<CDistributionSpec *> pdsOuter,
+		gpos::pointer<CDistributionSpec *> pdsInner) const;
 
 	// helper for deriving hash join distribution from replicated outer child
 	gpos::owner<CDistributionSpec *> PdsDeriveFromReplicatedOuter(
@@ -45,7 +45,7 @@ private:
 		gpos::pointer<CDistributionSpec *> pdsInner) const;
 
 	// helper for deriving hash join distribution from hashed outer child
-	CDistributionSpec *PdsDeriveFromHashedOuter(
+	gpos::owner<CDistributionSpec *> PdsDeriveFromHashedOuter(
 		CMemoryPool *mp, CDistributionSpec *pdsOuter,
 		gpos::pointer<CDistributionSpec *> pdsInner) const;
 
@@ -54,8 +54,8 @@ public:
 
 	// ctor
 	CPhysicalInnerHashJoin(CMemoryPool *mp,
-						   CExpressionArray *pdrgpexprOuterKeys,
-						   CExpressionArray *pdrgpexprInnerKeys,
+						   gpos::owner<CExpressionArray *> pdrgpexprOuterKeys,
+						   gpos::owner<CExpressionArray *> pdrgpexprInnerKeys,
 						   gpos::owner<IMdIdArray *> hash_opfamilies,
 						   CXform::EXformId origin_xform = CXform::ExfSentinel);
 
@@ -90,12 +90,13 @@ public:
 	gpos::owner<CDistributionSpec *> PdsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
-	CPartitionPropagationSpec *PppsRequired(
+	gpos::owner<CPartitionPropagationSpec *> PppsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CPartitionPropagationSpec *pppsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::pointer<CPartitionPropagationSpec *> pppsRequired,
+		ULONG child_index, gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
-	CPartitionPropagationSpec *PppsDerive(
+	gpos::owner<CPartitionPropagationSpec *> PppsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 };	// class CPhysicalInnerHashJoin
 

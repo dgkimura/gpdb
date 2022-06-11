@@ -107,7 +107,8 @@ CDXLPhysicalResult::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	GPOS_ASSERT(EdxlresultIndexSentinel >= dxlnode->Arity());
 
 	// check that one time filter is valid
-	CDXLNode *one_time_filter = (*dxlnode)[EdxlresultIndexOneTimeFilter];
+	gpos::pointer<CDXLNode *> one_time_filter =
+		(*dxlnode)[EdxlresultIndexOneTimeFilter];
 	GPOS_ASSERT(EdxlopScalarOneTimeFilter ==
 				one_time_filter->GetOperator()->GetDXLOperator());
 
@@ -119,7 +120,8 @@ CDXLPhysicalResult::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	if (EdxlresultIndexSentinel == dxlnode->Arity())
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[EdxlresultIndexChild];
+		gpos::pointer<CDXLNode *> child_dxlnode =
+			(*dxlnode)[EdxlresultIndexChild];
 		GPOS_ASSERT(EdxloptypePhysical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

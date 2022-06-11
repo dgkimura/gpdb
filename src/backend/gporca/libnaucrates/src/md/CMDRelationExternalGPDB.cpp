@@ -28,13 +28,15 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDRelationExternalGPDB::CMDRelationExternalGPDB(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-	Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-	ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
-	BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
-	CMDIndexInfoArray *md_index_info_array, IMdIdArray *mdid_triggers_array,
-	IMdIdArray *mdid_check_constraint_array, INT reject_limit,
-	BOOL is_reject_limit_in_rows, IMDId *mdid_fmt_err_table)
+	CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+	Ereldistrpolicy rel_distr_policy, gpos::owner<CMDColumnArray *> mdcol_array,
+	gpos::owner<ULongPtrArray *> distr_col_array,
+	gpos::owner<IMdIdArray *> distr_opfamilies, BOOL convert_hash_to_random,
+	gpos::owner<ULongPtr2dArray *> keyset_array,
+	gpos::owner<CMDIndexInfoArray *> md_index_info_array,
+	gpos::owner<IMdIdArray *> mdid_triggers_array,
+	gpos::owner<IMdIdArray *> mdid_check_constraint_array, INT reject_limit,
+	BOOL is_reject_limit_in_rows, gpos::owner<IMDId *> mdid_fmt_err_table)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -77,7 +79,7 @@ CMDRelationExternalGPDB::CMDRelationExternalGPDB(
 	const ULONG arity = m_md_col_array->Size();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		IMDColumn *pmdcol = (*m_md_col_array)[ul];
+		gpos::pointer<IMDColumn *> pmdcol = (*m_md_col_array)[ul];
 
 		BOOL isSystemCol = pmdcol->IsSystemColumn();
 		if (isSystemCol)
@@ -606,7 +608,7 @@ CMDRelationExternalGPDB::Serialize(CXMLSerializer *xml_serializer) const
 		CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
 	for (ULONG ul = 0; ul < m_md_col_array->Size(); ul++)
 	{
-		CMDColumn *pmdcol = (*m_md_col_array)[ul];
+		gpos::pointer<CMDColumn *> pmdcol = (*m_md_col_array)[ul];
 		pmdcol->Serialize(xml_serializer);
 	}
 
@@ -621,7 +623,8 @@ CMDRelationExternalGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	const ULONG ulIndexes = m_mdindex_info_array->Size();
 	for (ULONG ul = 0; ul < ulIndexes; ul++)
 	{
-		CMDIndexInfo *pmdIndexInfo = (*m_mdindex_info_array)[ul];
+		gpos::pointer<CMDIndexInfo *> pmdIndexInfo =
+			(*m_mdindex_info_array)[ul];
 		pmdIndexInfo->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -704,7 +707,8 @@ CMDRelationExternalGPDB::DebugPrint(IOstream &os) const
 	const ULONG ulIndexes = m_mdindex_info_array->Size();
 	for (ULONG ul = 0; ul < ulIndexes; ul++)
 	{
-		CMDIndexInfo *pmdIndexInfo = (*m_mdindex_info_array)[ul];
+		gpos::pointer<CMDIndexInfo *> pmdIndexInfo =
+			(*m_mdindex_info_array)[ul];
 		pmdIndexInfo->DebugPrint(os);
 	}
 

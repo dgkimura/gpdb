@@ -38,7 +38,7 @@ protected:
 	// derive statistics for projection operators
 	IStatistics *PstatsDeriveProject(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		UlongToIDatumMap *phmuldatum = nullptr) const;
+		gpos::pointer<UlongToIDatumMap *> phmuldatum = nullptr) const;
 
 public:
 	CLogicalUnary(const CLogicalUnary &) = delete;
@@ -52,7 +52,7 @@ public:
 	~CLogicalUnary() override = default;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -62,7 +62,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
@@ -77,7 +77,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive not nullable output columns
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	DeriveNotNullColumns(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -86,7 +86,7 @@ public:
 	}
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::owner<CPartInfo *>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -94,7 +94,7 @@ public:
 	}
 
 	// derive function properties
-	CFunctionProp *
+	gpos::owner<CFunctionProp *>
 	DeriveFunctionProperties(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -113,8 +113,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
-	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput,
+	gpos::owner<CColRefSet *>
+	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+			 gpos::pointer<CColRefSet *> pcrsInput,
 			 ULONG child_index) const override
 	{
 		return PcrsReqdChildStats(mp, exprhdl, pcrsInput,

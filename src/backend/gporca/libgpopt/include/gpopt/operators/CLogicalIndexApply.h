@@ -35,8 +35,10 @@ public:
 	CLogicalIndexApply(const CLogicalIndexApply &) = delete;
 
 	// ctor
-	CLogicalIndexApply(CMemoryPool *mp, CColRefArray *pdrgpcrOuterRefs,
-					   BOOL fOuterJoin, CExpression *origJoinPred);
+	CLogicalIndexApply(CMemoryPool *mp,
+					   gpos::owner<CColRefArray *> pdrgpcrOuterRefs,
+					   BOOL fOuterJoin,
+					   gpos::owner<CExpression *> origJoinPred);
 
 	// ctor for patterns
 	explicit CLogicalIndexApply(CMemoryPool *mp);
@@ -83,7 +85,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &exprhdl) override
 	{
 		GPOS_ASSERT(3 == exprhdl.Arity());
@@ -92,7 +94,7 @@ public:
 	}
 
 	// derive not nullable columns
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	DeriveNotNullColumns(CMemoryPool *mp,
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -104,7 +106,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -112,17 +114,17 @@ public:
 	}
 
 	// applicable transformations
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Stats
 	//-------------------------------------------------------------------------------------
 
 	// derive statistics
-	IStatistics *PstatsDerive(
+	gpos::owner<IStatistics *> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
 
@@ -135,9 +137,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+		BOOL must_exist) override;
 
 	// conversion function
 	static gpos::cast_func<CLogicalIndexApply *>

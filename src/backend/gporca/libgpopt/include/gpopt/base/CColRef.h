@@ -152,7 +152,8 @@ public:
 	}
 
 	// extract array of colids from array of colrefs
-	static ULongPtrArray *Pdrgpul(CMemoryPool *mp, CColRefArray *colref_array);
+	static gpos::owner<ULongPtrArray *> Pdrgpul(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array);
 
 	// check if the the array of column references are equal
 	static BOOL Equals(gpos::pointer<const CColRefArray *> pdrgpcr1,
@@ -223,7 +224,7 @@ public:
 	};
 
 	void
-	SetMdidTable(IMDId *mdid_table)
+	SetMdidTable(gpos::pointer<IMDId *> mdid_table)
 	{
 		m_mdid_table = mdid_table;
 	}

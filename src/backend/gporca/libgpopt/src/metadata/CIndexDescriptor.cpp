@@ -31,14 +31,14 @@ FORCE_GENERATE_DBGSTR(CIndexDescriptor);
 //
 //---------------------------------------------------------------------------
 CIndexDescriptor::CIndexDescriptor(
-	CMemoryPool *mp, IMDId *pmdidIndex, const CName &name,
-	CColumnDescriptorArray *pdrgcoldescKeyCols,
-	CColumnDescriptorArray *pdrgcoldescIncludedCols, BOOL is_clustered,
-	IMDIndex::EmdindexType index_type)
-	: m_pmdidIndex(pmdidIndex),
+	CMemoryPool *mp, gpos::owner<IMDId *> pmdidIndex, const CName &name,
+	gpos::owner<CColumnDescriptorArray *> pdrgcoldescKeyCols,
+	gpos::owner<CColumnDescriptorArray *> pdrgcoldescIncludedCols,
+	BOOL is_clustered, IMDIndex::EmdindexType index_type)
+	: m_pmdidIndex(std::move(pmdidIndex)),
 	  m_name(mp, name),
-	  m_pdrgpcoldescKeyCols(pdrgcoldescKeyCols),
-	  m_pdrgpcoldescIncludedCols(pdrgcoldescIncludedCols),
+	  m_pdrgpcoldescKeyCols(std::move(pdrgcoldescKeyCols)),
+	  m_pdrgpcoldescIncludedCols(std::move(pdrgcoldescIncludedCols)),
 	  m_clustered(is_clustered),
 	  m_index_type(index_type)
 {
@@ -104,14 +104,15 @@ CIndexDescriptor::UlIncludedColumns() const
 //		information from the catalog
 //
 //---------------------------------------------------------------------------
-CIndexDescriptor *
+gpos::owner<CIndexDescriptor *>
 CIndexDescriptor::Pindexdesc(CMemoryPool *mp,
 							 gpos::pointer<const CTableDescriptor *> ptabdesc,
 							 gpos::pointer<const IMDIndex *> pmdindex)
 {
 	CWStringConst strIndexName(mp, pmdindex->Mdname().GetMDName()->GetBuffer());
 
-	CColumnDescriptorArray *pdrgpcoldesc = ptabdesc->Pdrgpcoldesc();
+	gpos::pointer<CColumnDescriptorArray *> pdrgpcoldesc =
+		ptabdesc->Pdrgpcoldesc();
 
 	pmdindex->MDId()->AddRef();
 
@@ -139,8 +140,9 @@ CIndexDescriptor::Pindexdesc(CMemoryPool *mp,
 
 	// create the index descriptors
 	gpos::owner<CIndexDescriptor *> pindexdesc = GPOS_NEW(mp) CIndexDescriptor(
-		mp, pmdindex->MDId(), CName(&strIndexName), pdrgcoldescKey,
-		pdrgcoldescIncluded, pmdindex->IsClustered(), pmdindex->IndexType());
+		mp, pmdindex->MDId(), CName(&strIndexName), std::move(pdrgcoldescKey),
+		std::move(pdrgcoldescIncluded), pmdindex->IsClustered(),
+		pmdindex->IndexType());
 	return pindexdesc;
 }
 

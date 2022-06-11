@@ -55,7 +55,7 @@ public:
 	// ctor
 	CDXLStatsDerivedRelation(
 		CDouble rows, BOOL is_empty,
-		CDXLStatsDerivedColumnArray *dxl_stats_derived_col_array);
+		gpos::owner<CDXLStatsDerivedColumnArray *> dxl_stats_derived_col_array);
 
 	// dtor
 	~CDXLStatsDerivedRelation() override;

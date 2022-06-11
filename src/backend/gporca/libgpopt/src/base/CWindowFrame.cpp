@@ -56,8 +56,8 @@ const CWindowFrame CWindowFrame::m_wfEmpty;
 CWindowFrame::CWindowFrame(CMemoryPool *mp, EFrameSpec efs,
 						   EFrameBoundary efbLeading,
 						   EFrameBoundary efbTrailing,
-						   CExpression *pexprLeading,
-						   CExpression *pexprTrailing,
+						   gpos::owner<CExpression *> pexprLeading,
+						   gpos::owner<CExpression *> pexprTrailing,
 						   EFrameExclusionStrategy efes)
 	: m_efs(efs),
 	  m_efbLeading(efbLeading),
@@ -187,22 +187,23 @@ CWindowFrame::PwfCopyWithRemappedColumns(CMemoryPool *mp,
 		return this;
 	}
 
-	CExpression *pexprLeading = nullptr;
+	gpos::owner<CExpression *> pexprLeading = nullptr;
 	if (nullptr != m_pexprLeading)
 	{
 		pexprLeading = m_pexprLeading->PexprCopyWithRemappedColumns(
 			mp, colref_mapping, must_exist);
 	}
 
-	CExpression *pexprTrailing = nullptr;
+	gpos::owner<CExpression *> pexprTrailing = nullptr;
 	if (nullptr != m_pexprTrailing)
 	{
 		pexprTrailing = m_pexprTrailing->PexprCopyWithRemappedColumns(
 			mp, colref_mapping, must_exist);
 	}
 
-	return GPOS_NEW(mp) CWindowFrame(mp, m_efs, m_efbLeading, m_efbTrailing,
-									 pexprLeading, pexprTrailing, m_efes);
+	return GPOS_NEW(mp)
+		CWindowFrame(mp, m_efs, m_efbLeading, m_efbTrailing,
+					 std::move(pexprLeading), std::move(pexprTrailing), m_efes);
 }
 
 //---------------------------------------------------------------------------

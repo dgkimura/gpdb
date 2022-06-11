@@ -12,6 +12,7 @@
 #define GPOPT_CXformUnnestTVF_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformExploration.h"
 
@@ -31,13 +32,13 @@ class CXformUnnestTVF : public CXformExploration
 {
 private:
 	// helper for mapping subquery function arguments into columns
-	static CColRefArray *PdrgpcrSubqueries(CMemoryPool *mp,
-										   CExpression *pexprCTEProducer,
-										   CExpression *pexprCTEConsumer);
+	static gpos::owner<CColRefArray *> PdrgpcrSubqueries(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprCTEProducer,
+		gpos::pointer<CExpression *> pexprCTEConsumer);
 
 	//	collect subquery arguments and return a Project expression
-	static CExpression *PexprProjectSubqueries(CMemoryPool *mp,
-											   CExpression *pexprTVF);
+	static gpos::owner<CExpression *> PexprProjectSubqueries(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprTVF);
 
 public:
 	CXformUnnestTVF(const CXformUnnestTVF &) = delete;
@@ -66,8 +67,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::pointer<CXformContext *> pxfctxt,
+				   gpos::pointer<CXformResult *> pxfres,
+				   gpos::pointer<CExpression *> pexpr) const override;
 
 };	// class CXformUnnestTVF
 

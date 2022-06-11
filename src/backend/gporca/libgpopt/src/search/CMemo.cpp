@@ -94,7 +94,7 @@ CMemo::~CMemo()
 //
 //---------------------------------------------------------------------------
 void
-CMemo::SetRoot(CGroup *pgroup)
+CMemo::SetRoot(gpos::pointer<CGroup *> pgroup)
 {
 	GPOS_ASSERT(nullptr == m_pgroupRoot);
 	GPOS_ASSERT(nullptr != pgroup);
@@ -112,9 +112,9 @@ CMemo::SetRoot(CGroup *pgroup)
 //
 //---------------------------------------------------------------------------
 void
-CMemo::Add(
-	CGroup *pgroup,
-	CExpression *pexprOrigin  // origin expression that produced the group
+CMemo::Add(CGroup *pgroup,
+		   gpos::pointer<CExpression *>
+			   pexprOrigin	// origin expression that produced the group
 )
 {
 	GPOS_ASSERT(nullptr != pgroup);
@@ -165,7 +165,7 @@ CMemo::Add(
 //---------------------------------------------------------------------------
 CGroup *
 CMemo::PgroupInsert(CGroup *pgroupTarget, CGroupExpression *pgexpr,
-					CExpression *pexprOrigin, BOOL fNewGroup)
+					gpos::pointer<CExpression *> pexprOrigin, BOOL fNewGroup)
 {
 	GPOS_ASSERT(nullptr != pgroupTarget);
 	GPOS_ASSERT(nullptr != pgexpr);
@@ -173,7 +173,7 @@ CMemo::PgroupInsert(CGroup *pgroupTarget, CGroupExpression *pgexpr,
 	ShtAcc shta(m_sht, *pgexpr);
 
 	// we do a lookup since group expression may have been already inserted
-	CGroupExpression *pgexprFound = shta.Find();
+	gpos::pointer<CGroupExpression *> pgexprFound = shta.Find();
 	if (nullptr == pgexprFound)
 	{
 		shta.Insert(pgexpr);
@@ -205,7 +205,8 @@ CMemo::PgroupInsert(CGroup *pgroupTarget, CGroupExpression *pgexpr,
 //
 //---------------------------------------------------------------------------
 BOOL
-CMemo::FNewGroup(CGroup **ppgroupTarget, CGroupExpression *pgexpr, BOOL fScalar)
+CMemo::FNewGroup(gpos::owner<CGroup *> *ppgroupTarget,
+				 gpos::pointer<CGroupExpression *> pgexpr, BOOL fScalar)
 {
 	GPOS_ASSERT(nullptr != ppgroupTarget);
 
@@ -234,7 +235,8 @@ CMemo::FNewGroup(CGroup **ppgroupTarget, CGroupExpression *pgexpr, BOOL fScalar)
 //---------------------------------------------------------------------------
 CGroup *
 CMemo::PgroupInsert(gpos::owner<CGroup *> pgroupTarget,
-					CExpression *pexprOrigin, CGroupExpression *pgexpr)
+					gpos::pointer<CExpression *> pexprOrigin,
+					CGroupExpression *pgexpr)
 {
 	GPOS_ASSERT(nullptr != pgexpr);
 	GPOS_CHECK_ABORT;
@@ -296,8 +298,8 @@ CMemo::PgroupInsert(gpos::owner<CGroup *> pgroupTarget,
 //		Extract a plan that delivers the given required properties
 //
 //---------------------------------------------------------------------------
-CExpression *
-CMemo::PexprExtractPlan(CMemoryPool *mp, CGroup *pgroupRoot,
+gpos::owner<CExpression *>
+CMemo::PexprExtractPlan(CMemoryPool *mp, gpos::pointer<CGroup *> pgroupRoot,
 						CReqdPropPlan *prppInput, ULONG ulSearchStages)
 {
 	// check stack size
@@ -351,7 +353,7 @@ CMemo::PexprExtractPlan(CMemoryPool *mp, CGroup *pgroupRoot,
 	ULONG arity = pgexprBest->Arity();
 	for (ULONG i = 0; i < arity; i++)
 	{
-		CGroup *pgroupChild = (*pgexprBest)[i];
+		gpos::pointer<CGroup *> pgroupChild = (*pgexprBest)[i];
 		CReqdPropPlan *prppChild = nullptr;
 
 		// If the child group doesn't have scalar expression, we get the optimization
@@ -381,13 +383,14 @@ CMemo::PexprExtractPlan(CMemoryPool *mp, CGroup *pgroupRoot,
 						   gpopt::ExmiUnsatisfiedRequiredProperties);
 			}
 
-			COptimizationContext *pocChild = (*poc->PccBest()->Pdrgpoc())[i];
+			gpos::pointer<COptimizationContext *> pocChild =
+				(*poc->PccBest()->Pdrgpoc())[i];
 			GPOS_ASSERT(nullptr != pocChild);
 
 			prppChild = pocChild->Prpp();
 		}
 
-		CExpression *pexprChild =
+		gpos::owner<CExpression *> pexprChild =
 			PexprExtractPlan(mp, pgroupChild, prppChild, ulSearchStages);
 		pdrgpexpr->Append(pexprChild);
 	}
@@ -450,7 +453,7 @@ CMemo::Pgroup(ULONG id)
 //
 //---------------------------------------------------------------------------
 void
-CMemo::MarkDuplicates(CGroup *pgroupFst, CGroup *pgroupSnd)
+CMemo::MarkDuplicates(gpos::pointer<CGroup *> pgroupFst, CGroup *pgroupSnd)
 {
 	GPOS_ASSERT(nullptr != pgroupFst);
 	GPOS_ASSERT(nullptr != pgroupSnd);
@@ -533,7 +536,7 @@ CMemo::FRehash()
 
 		// mark duplicate group expression
 		pgexpr->SetDuplicate(pgexprFound);
-		CGroup *pgroup = pgexpr->Pgroup();
+		gpos::pointer<CGroup *> pgroup = pgexpr->Pgroup();
 
 		// move group expression to duplicates list in owner group
 		{
@@ -546,8 +549,9 @@ CMemo::FRehash()
 		CGroup *pgroupFound = pgexprFound->Pgroup();
 		if (pgroupFound != pgroup)
 		{
-			CGroup *pgroupDup = pgroup->PgroupDuplicate();
-			CGroup *pgroupFoundDup = pgroupFound->PgroupDuplicate();
+			gpos::pointer<CGroup *> pgroupDup = pgroup->PgroupDuplicate();
+			gpos::pointer<CGroup *> pgroupFoundDup =
+				pgroupFound->PgroupDuplicate();
 			if ((nullptr == pgroupDup && nullptr == pgroupFoundDup) ||
 				(pgroupDup != pgroupFoundDup))
 			{
@@ -673,7 +677,8 @@ CMemo::DeriveStatsIfAbsent(CMemoryPool *pmpLocal)
 		GPOS_ASSERT(!pgroup->FImplemented());
 		if (nullptr == pgroup->Pstats())
 		{
-			CGroupExpression *pgexprFirst = CEngine::PgexprFirst(pgroup);
+			gpos::pointer<CGroupExpression *> pgexprFirst =
+				CEngine::PgexprFirst(pgroup);
 
 			CExpressionHandle exprhdl(m_mp);
 			exprhdl.Attach(pgexprFirst);

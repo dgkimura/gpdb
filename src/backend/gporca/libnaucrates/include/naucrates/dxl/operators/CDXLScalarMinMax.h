@@ -53,7 +53,7 @@ public:
 	CDXLScalarMinMax(const CDXLScalarMinMax &) = delete;
 
 	// ctor
-	CDXLScalarMinMax(CMemoryPool *mp, IMDId *mdid_type,
+	CDXLScalarMinMax(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
 					 EdxlMinMaxType min_max_type);
 
 	//dtor

@@ -132,19 +132,22 @@ public:
 	CMDRelationGPDB(const CMDRelationGPDB &) = delete;
 
 	// ctor
-	CMDRelationGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
+	CMDRelationGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
 					BOOL is_temp_table, Erelstoragetype rel_storage_type,
 					Ereldistrpolicy rel_distr_policy,
-					CMDColumnArray *mdcol_array, ULongPtrArray *distr_col_array,
-					IMdIdArray *distr_opfamilies,
-					ULongPtrArray *partition_cols_array,
-					CharPtrArray *str_part_types_array, ULONG num_of_partitions,
-					IMdIdArray *partition_oids, BOOL convert_hash_to_random,
-					ULongPtr2dArray *keyset_array,
-					CMDIndexInfoArray *md_index_info_array,
-					IMdIdArray *mdid_triggers_array,
-					IMdIdArray *mdid_check_constraint_array,
-					CDXLNode *mdpart_constraint, BOOL has_oids);
+					gpos::owner<CMDColumnArray *> mdcol_array,
+					gpos::owner<ULongPtrArray *> distr_col_array,
+					gpos::owner<IMdIdArray *> distr_opfamilies,
+					gpos::owner<ULongPtrArray *> partition_cols_array,
+					gpos::owner<CharPtrArray *> str_part_types_array,
+					ULONG num_of_partitions,
+					gpos::owner<IMdIdArray *> partition_oids,
+					BOOL convert_hash_to_random,
+					gpos::owner<ULongPtr2dArray *> keyset_array,
+					gpos::owner<CMDIndexInfoArray *> md_index_info_array,
+					gpos::owner<IMdIdArray *> mdid_triggers_array,
+					gpos::owner<IMdIdArray *> mdid_check_constraint_array,
+					gpos::owner<CDXLNode *> mdpart_constraint, BOOL has_oids);
 
 	// dtor
 	~CMDRelationGPDB() override;

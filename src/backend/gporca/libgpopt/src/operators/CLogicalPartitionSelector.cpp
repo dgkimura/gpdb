@@ -47,11 +47,11 @@ CLogicalPartitionSelector::CLogicalPartitionSelector(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalPartitionSelector::CLogicalPartitionSelector(
-	CMemoryPool *mp, IMDId *mdid, CExpressionArray *pdrgpexprFilters,
-	CColRef *pcrOid)
+	CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+	gpos::owner<CExpressionArray *> pdrgpexprFilters, CColRef *pcrOid)
 	: CLogical(mp),
-	  m_mdid(mdid),
-	  m_pdrgpexprFilters(pdrgpexprFilters),
+	  m_mdid(std::move(mdid)),
+	  m_pdrgpexprFilters(std::move(pdrgpexprFilters)),
 	  m_pcrOid(pcrOid)
 {
 	GPOS_ASSERT(m_mdid->IsValid());
@@ -83,15 +83,15 @@ CLogicalPartitionSelector::~CLogicalPartitionSelector()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalPartitionSelector::Matches(COperator *pop) const
+CLogicalPartitionSelector::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	CLogicalPartitionSelector *popPartSelector =
-		CLogicalPartitionSelector::PopConvert(pop);
+	gpos::pointer<CLogicalPartitionSelector *> popPartSelector =
+		gpos::dyn_cast<CLogicalPartitionSelector>(pop);
 
 	return popPartSelector->PcrOid() == m_pcrOid &&
 		   popPartSelector->MDId()->Equals(m_mdid) &&
@@ -122,16 +122,17 @@ CLogicalPartitionSelector::HashValue() const
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
 CLogicalPartitionSelector::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
 	CColRef *pcrOid = CUtils::PcrRemap(m_pcrOid, colref_mapping, must_exist);
-	CExpressionArray *pdrgpexpr =
+	gpos::owner<CExpressionArray *> pdrgpexpr =
 		CUtils::PdrgpexprRemap(mp, m_pdrgpexprFilters, colref_mapping);
 
 	m_mdid->AddRef();
 
 	return GPOS_NEW(mp)
-		CLogicalPartitionSelector(mp, m_mdid, pdrgpexpr, pcrOid);
+		CLogicalPartitionSelector(mp, m_mdid, std::move(pdrgpexpr), pcrOid);
 }
 
 //---------------------------------------------------------------------------
@@ -142,7 +143,7 @@ CLogicalPartitionSelector::PopCopyWithRemappedColumns(
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalPartitionSelector::DeriveOutputColumns(CMemoryPool *mp,
 											   CExpressionHandle &exprhdl)
 {
@@ -178,7 +179,7 @@ CLogicalPartitionSelector::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalPartitionSelector::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);

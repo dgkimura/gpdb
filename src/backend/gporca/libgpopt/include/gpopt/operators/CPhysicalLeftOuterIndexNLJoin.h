@@ -28,8 +28,9 @@ public:
 		delete;
 
 	// ctor
-	CPhysicalLeftOuterIndexNLJoin(CMemoryPool *mp, CColRefArray *colref_array,
-								  CExpression *origJoinPred);
+	CPhysicalLeftOuterIndexNLJoin(CMemoryPool *mp,
+								  gpos::owner<CColRefArray *> colref_array,
+								  gpos::owner<CExpression *> origJoinPred);
 
 	// dtor
 	~CPhysicalLeftOuterIndexNLJoin() override;
@@ -53,7 +54,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// outer column references accessor
 	gpos::pointer<CColRefArray *>
@@ -69,12 +70,10 @@ public:
 		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
 		ULONG ulOptReq) const override;
 
-	gpos::owner<CEnfdDistribution *> Ped(CMemoryPool *mp,
-										 CExpressionHandle &exprhdl,
-										 CReqdPropPlan *prppInput,
-										 ULONG child_index,
-										 CDrvdPropArray *pdrgpdpCtxt,
-										 ULONG ulDistrReq) override;
+	gpos::owner<CEnfdDistribution *> Ped(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulDistrReq) override;
 
 	// execution order of children
 	EChildExecOrder

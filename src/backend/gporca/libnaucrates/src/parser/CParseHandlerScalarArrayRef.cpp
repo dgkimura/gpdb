@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarArrayRef.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarArrayRef.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -62,15 +64,15 @@ CParseHandlerScalarArrayRef::StartElement(const XMLCh *const element_uri,
 		GPOS_ASSERT(nullptr == m_dxl_node);
 
 		// parse types
-		IMDId *elem_type_mdid =
+		gpos::owner<IMDId *> elem_type_mdid =
 			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 				EdxltokenArrayElementType, EdxltokenScalarArrayRef);
-		IMDId *array_type_mdid =
+		gpos::owner<IMDId *> array_type_mdid =
 			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 				EdxltokenArrayType, EdxltokenScalarArrayRef);
-		IMDId *return_type_mdid =
+		gpos::owner<IMDId *> return_type_mdid =
 			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 				EdxltokenTypeId, EdxltokenScalarArrayRef);
@@ -78,10 +80,10 @@ CParseHandlerScalarArrayRef::StartElement(const XMLCh *const element_uri,
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeMod,
 			EdxltokenScalarArrayRef, true, default_type_modifier);
 
-		m_dxl_node = GPOS_NEW(m_mp)
-			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarArrayRef(
-							   m_mp, elem_type_mdid, type_modifier,
-							   array_type_mdid, return_type_mdid));
+		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(
+			m_mp, GPOS_NEW(m_mp) CDXLScalarArrayRef(
+					  m_mp, std::move(elem_type_mdid), type_modifier,
+					  std::move(array_type_mdid), std::move(return_type_mdid)));
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenScalarArrayRefIndexList),

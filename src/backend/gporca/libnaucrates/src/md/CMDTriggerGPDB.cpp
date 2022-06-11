@@ -13,6 +13,7 @@
 
 #include "naucrates/md/CMDTriggerGPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -29,14 +30,15 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDTriggerGPDB::CMDTriggerGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-							   IMDId *rel_mdid, IMDId *mdid_func, INT type,
+CMDTriggerGPDB::CMDTriggerGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+							   CMDName *mdname, gpos::owner<IMDId *> rel_mdid,
+							   gpos::owner<IMDId *> mdid_func, INT type,
 							   BOOL is_enabled)
 	: m_mp(mp),
-	  m_mdid(mdid),
+	  m_mdid(std::move(mdid)),
 	  m_mdname(mdname),
-	  m_rel_mdid(rel_mdid),
-	  m_func_mdid(mdid_func),
+	  m_rel_mdid(std::move(rel_mdid)),
+	  m_func_mdid(std::move(mdid_func)),
 	  m_type(type),
 	  m_is_enabled(is_enabled)
 {

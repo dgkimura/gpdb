@@ -54,9 +54,10 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
-						 IMDId *mdid_return_type, CWStringConst *str,
-						 CColumnDescriptorArray *pdrgpcoldesc)
+CLogicalTVF::CLogicalTVF(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+						 gpos::owner<IMDId *> mdid_return_type,
+						 CWStringConst *str,
+						 gpos::owner<CColumnDescriptorArray *> pdrgpcoldesc)
 	: CLogical(mp),
 	  m_func_mdid(mdid_func),
 	  m_return_type_mdid(mdid_return_type),
@@ -95,16 +96,17 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
-						 IMDId *mdid_return_type, CWStringConst *str,
-						 CColumnDescriptorArray *pdrgpcoldesc,
-						 CColRefArray *pdrgpcrOutput)
+CLogicalTVF::CLogicalTVF(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+						 gpos::owner<IMDId *> mdid_return_type,
+						 CWStringConst *str,
+						 gpos::owner<CColumnDescriptorArray *> pdrgpcoldesc,
+						 gpos::owner<CColRefArray *> pdrgpcrOutput)
 	: CLogical(mp),
-	  m_func_mdid(mdid_func),
-	  m_return_type_mdid(mdid_return_type),
+	  m_func_mdid(std::move(mdid_func)),
+	  m_return_type_mdid(std::move(mdid_return_type)),
 	  m_pstr(str),
-	  m_pdrgpcoldesc(pdrgpcoldesc),
-	  m_pdrgpcrOutput(pdrgpcrOutput)
+	  m_pdrgpcoldesc(std::move(pdrgpcoldesc)),
+	  m_pdrgpcrOutput(std::move(pdrgpcrOutput))
 {
 	GPOS_ASSERT(m_func_mdid->IsValid());
 	GPOS_ASSERT(m_return_type_mdid->IsValid());
@@ -170,14 +172,14 @@ CLogicalTVF::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalTVF::Matches(COperator *pop) const
+CLogicalTVF::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalTVF *popTVF = CLogicalTVF::PopConvert(pop);
+	gpos::pointer<CLogicalTVF *> popTVF = gpos::dyn_cast<CLogicalTVF>(pop);
 
 	return m_func_mdid->Equals(popTVF->FuncMdId()) &&
 		   m_return_type_mdid->Equals(popTVF->ReturnTypeMdId()) &&
@@ -194,11 +196,11 @@ CLogicalTVF::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
-CLogicalTVF::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										UlongToColRefMap *colref_mapping,
-										BOOL must_exist)
+CLogicalTVF::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput = nullptr;
+	gpos::owner<CColRefArray *> pdrgpcrOutput = nullptr;
 	if (must_exist)
 	{
 		pdrgpcrOutput =
@@ -216,7 +218,7 @@ CLogicalTVF::PopCopyWithRemappedColumns(CMemoryPool *mp,
 	m_pdrgpcoldesc->AddRef();
 
 	return GPOS_NEW(mp) CLogicalTVF(mp, m_func_mdid, m_return_type_mdid, str,
-									m_pdrgpcoldesc, pdrgpcrOutput);
+									m_pdrgpcoldesc, std::move(pdrgpcrOutput));
 }
 
 //---------------------------------------------------------------------------
@@ -227,7 +229,7 @@ CLogicalTVF::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalTVF::DeriveOutputColumns(CMemoryPool *mp,
 								 CExpressionHandle &  // exprhdl
 )
@@ -246,7 +248,7 @@ CLogicalTVF::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive function properties
 //
 //---------------------------------------------------------------------------
-CFunctionProp *
+gpos::owner<CFunctionProp *>
 CLogicalTVF::DeriveFunctionProperties(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl) const
 {
@@ -277,7 +279,7 @@ CLogicalTVF::FInputOrderSensitive() const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalTVF::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -319,9 +321,9 @@ CLogicalTVF::DeriveMaxCard(CMemoryPool *,		// mp
 //
 //---------------------------------------------------------------------------
 
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalTVF::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  IStatisticsArray *  // stats_ctxt
+						  gpos::pointer<IStatisticsArray *>	 // stats_ctxt
 ) const
 {
 	CDouble rows(1.0);

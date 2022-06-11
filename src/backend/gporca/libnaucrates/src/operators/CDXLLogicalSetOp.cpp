@@ -36,14 +36,14 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalSetOp::CDXLLogicalSetOp(CMemoryPool *mp, EdxlSetOpType edxlsetoptype,
-								   CDXLColDescrArray *col_descr_array,
-								   ULongPtr2dArray *input_colids_arrays,
-								   BOOL fCastAcrossInputs)
+CDXLLogicalSetOp::CDXLLogicalSetOp(
+	CMemoryPool *mp, EdxlSetOpType edxlsetoptype,
+	gpos::owner<CDXLColDescrArray *> col_descr_array,
+	gpos::owner<ULongPtr2dArray *> input_colids_arrays, BOOL fCastAcrossInputs)
 	: CDXLLogical(mp),
 	  m_set_operation_dxl_type(edxlsetoptype),
-	  m_col_descr_array(col_descr_array),
-	  m_input_colids_arrays(input_colids_arrays),
+	  m_col_descr_array(std::move(col_descr_array)),
+	  m_input_colids_arrays(std::move(input_colids_arrays)),
 	  m_cast_across_input_req(fCastAcrossInputs)
 {
 	GPOS_ASSERT(nullptr != m_col_descr_array);
@@ -55,7 +55,8 @@ CDXLLogicalSetOp::CDXLLogicalSetOp(CMemoryPool *mp, EdxlSetOpType edxlsetoptype,
 	const ULONG length = m_input_colids_arrays->Size();
 	for (ULONG idx = 0; idx < length; idx++)
 	{
-		ULongPtrArray *input_colids_array = (*m_input_colids_arrays)[idx];
+		gpos::pointer<ULongPtrArray *> input_colids_array =
+			(*m_input_colids_arrays)[idx];
 		GPOS_ASSERT(num_of_cols == input_colids_array->Size());
 	}
 
@@ -163,7 +164,7 @@ CDXLLogicalSetOp::SerializeToDXL(CXMLSerializer *xml_serializer,
 	const ULONG length = m_col_descr_array->Size();
 	for (ULONG idx = 0; idx < length; idx++)
 	{
-		CDXLColDescr *col_descr_dxl = (*m_col_descr_array)[idx];
+		gpos::pointer<CDXLColDescr *> col_descr_dxl = (*m_col_descr_array)[idx];
 		col_descr_dxl->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -225,7 +226,7 @@ CDXLLogicalSetOp::AssertValid(gpos::pointer<const CDXLNode *> node,
 	const ULONG num_of_child = node->Arity();
 	for (ULONG idx = 0; idx < num_of_child; ++idx)
 	{
-		CDXLNode *child_dxlnode = (*node)[idx];
+		gpos::pointer<CDXLNode *> child_dxlnode = (*node)[idx];
 		GPOS_ASSERT(EdxloptypeLogical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

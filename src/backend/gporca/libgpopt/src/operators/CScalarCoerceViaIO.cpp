@@ -18,6 +18,7 @@
 #include "gpopt/operators/CScalarCoerceViaIO.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 using namespace gpmd;
@@ -31,10 +32,11 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCoerceViaIO::CScalarCoerceViaIO(CMemoryPool *mp, IMDId *mdid_type,
+CScalarCoerceViaIO::CScalarCoerceViaIO(CMemoryPool *mp,
+									   gpos::owner<IMDId *> mdid_type,
 									   INT type_modifier, ECoercionForm ecf,
 									   INT location)
-	: CScalarCoerceBase(mp, mdid_type, type_modifier, ecf, location)
+	: CScalarCoerceBase(mp, std::move(mdid_type), type_modifier, ecf, location)
 {
 }
 
@@ -48,11 +50,12 @@ CScalarCoerceViaIO::CScalarCoerceViaIO(CMemoryPool *mp, IMDId *mdid_type,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCoerceViaIO::Matches(COperator *pop) const
+CScalarCoerceViaIO::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCoerceViaIO *popCoerce = CScalarCoerceViaIO::PopConvert(pop);
+		gpos::pointer<CScalarCoerceViaIO *> popCoerce =
+			gpos::dyn_cast<CScalarCoerceViaIO>(pop);
 
 		return popCoerce->MdidType()->Equals(MdidType()) &&
 			   popCoerce->TypeModifier() == TypeModifier() &&

@@ -31,8 +31,10 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalCTEConsumer::CDXLPhysicalCTEConsumer(
-	CMemoryPool *mp, ULONG id, ULongPtrArray *output_colids_array)
-	: CDXLPhysical(mp), m_id(id), m_output_colids_array(output_colids_array)
+	CMemoryPool *mp, ULONG id, gpos::owner<ULongPtrArray *> output_colids_array)
+	: CDXLPhysical(mp),
+	  m_id(id),
+	  m_output_colids_array(std::move(output_colids_array))
 {
 	GPOS_ASSERT(nullptr != m_output_colids_array);
 }
@@ -127,7 +129,7 @@ CDXLPhysicalCTEConsumer::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	CDXLNode *dxlnode_proj_list = (*dxlnode)[0];
+	gpos::pointer<CDXLNode *> dxlnode_proj_list = (*dxlnode)[0];
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				dxlnode_proj_list->GetOperator()->GetDXLOperator());
 

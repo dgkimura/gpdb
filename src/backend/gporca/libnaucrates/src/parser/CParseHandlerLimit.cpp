@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerLimit.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerProjList.h"
@@ -59,8 +61,9 @@ CParseHandlerLimit::StartElement(const XMLCh *const,  // element_uri,
 				 element_local_name))
 	{
 		// parse and create Limit operator
-		m_dxl_op = (CDXLPhysicalLimit *) CDXLOperatorFactory::MakeDXLLimit(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+		m_dxl_op =
+			gpos::cast<CDXLPhysicalLimit>(CDXLOperatorFactory::MakeDXLLimit(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 
 		// create and activate the parse handler for the children nodes in reverse

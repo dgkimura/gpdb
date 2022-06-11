@@ -42,7 +42,7 @@ public:
 	CDXLScalarCaseTest(const CDXLScalarCaseTest &) = delete;
 
 	// ctor
-	CDXLScalarCaseTest(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarCaseTest(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type);
 
 	// dtor
 	~CDXLScalarCaseTest() override;

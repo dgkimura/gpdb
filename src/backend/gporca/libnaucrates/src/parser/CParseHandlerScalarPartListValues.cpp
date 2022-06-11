@@ -8,6 +8,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarPartListValues.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarPartListValues.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -46,15 +48,18 @@ CParseHandlerScalarPartListValues::StartElement(
 	ULONG partition_level = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenPartLevel,
 		EdxltokenScalarPartListValues);
-	IMDId *mdid_result = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBScalarOpResultTypeId, EdxltokenScalarPartListValues);
-	IMDId *mdid_element = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenArrayElementType, EdxltokenScalarPartListValues);
+	gpos::owner<IMDId *> mdid_result =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBScalarOpResultTypeId, EdxltokenScalarPartListValues);
+	gpos::owner<IMDId *> mdid_element =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenArrayElementType, EdxltokenScalarPartListValues);
 	m_dxl_node = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarPartListValues(
-						   m_mp, partition_level, mdid_result, mdid_element));
+						   m_mp, partition_level, std::move(mdid_result),
+						   std::move(mdid_element)));
 }
 
 // Invoked by Xerces to process a closing tag

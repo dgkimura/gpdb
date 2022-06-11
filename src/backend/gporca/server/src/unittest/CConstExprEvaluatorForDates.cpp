@@ -17,6 +17,8 @@
 
 #include "unittest/gpopt/CConstExprEvaluatorForDates.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CScalarCmp.h"
 #include "naucrates/base/IDatum.h"
@@ -38,25 +40,26 @@ using namespace gpopt;
 //		debug mode.
 //
 //---------------------------------------------------------------------------
-CExpression *
-CConstExprEvaluatorForDates::PexprEval(CExpression *pexpr)
+gpos::owner<CExpression *>
+CConstExprEvaluatorForDates::PexprEval(gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(COperator::EopScalarCmp == pexpr->Pop()->Eopid());
 	GPOS_ASSERT(COperator::EopScalarConst == (*pexpr)[0]->Pop()->Eopid());
 	GPOS_ASSERT(COperator::EopScalarConst == (*pexpr)[1]->Pop()->Eopid());
 
-	CScalarConst *popScalarLeft =
+	gpos::pointer<CScalarConst *> popScalarLeft =
 		dynamic_cast<CScalarConst *>((*pexpr)[0]->Pop());
 
 	GPOS_ASSERT(
 		CMDIdGPDB::m_mdid_date.Equals(popScalarLeft->GetDatum()->MDId()));
-	CScalarConst *popScalarRight =
+	gpos::pointer<CScalarConst *> popScalarRight =
 		dynamic_cast<CScalarConst *>((*pexpr)[1]->Pop());
 
 	GPOS_ASSERT(
 		CMDIdGPDB::m_mdid_date.Equals(popScalarRight->GetDatum()->MDId()));
 
-	CScalarCmp *popScCmp = dynamic_cast<CScalarCmp *>(pexpr->Pop());
+	gpos::pointer<CScalarCmp *> popScCmp =
+		dynamic_cast<CScalarCmp *>(pexpr->Pop());
 	LINT dLeft = popScalarLeft->GetDatum()->GetLINTMapping();
 	LINT dRight = popScalarRight->GetDatum()->GetLINTMapping();
 	BOOL result = false;
@@ -84,7 +87,8 @@ CConstExprEvaluatorForDates::PexprEval(CExpression *pexpr)
 			GPOS_ASSERT(false && "Unsupported comparison");
 			return nullptr;
 	}
-	CExpression *pexprResult = CUtils::PexprScalarConstBool(m_mp, result);
+	gpos::owner<CExpression *> pexprResult =
+		CUtils::PexprScalarConstBool(m_mp, result);
 
 	return pexprResult;
 }

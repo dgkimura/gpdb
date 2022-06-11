@@ -75,7 +75,8 @@ public:
 
 	public:
 		// ctor
-		CCostingStats(IStatistics *stats) : m_pstats(stats)
+		CCostingStats(gpos::owner<IStatistics *> stats)
+			: m_pstats(std::move(stats))
 		{
 			GPOS_ASSERT(nullptr != m_pstats);
 		}
@@ -144,7 +145,8 @@ public:
 
 	public:
 		// ctor
-		SCostingInfo(CMemoryPool *mp, ULONG ulChildren, CCostingStats *pcstats)
+		SCostingInfo(CMemoryPool *mp, ULONG ulChildren,
+					 gpos::owner<CCostingStats *> pcstats)
 			: m_ulChildren(ulChildren),
 			  m_pcstats(pcstats),
 			  m_rows(0),
@@ -315,7 +317,7 @@ public:
 
 		// child stats setter
 		void
-		SetChildStats(ULONG ulPos, CCostingStats *child_stats)
+		SetChildStats(ULONG ulPos, gpos::owner<CCostingStats *> child_stats)
 		{
 			m_pdrgstatsChildren[ulPos] = child_stats;
 		}
@@ -343,7 +345,7 @@ public:
 	virtual CDouble DRowsPerHost(CDouble dRowsTotal) const = 0;
 
 	// return cost model parameters
-	virtual ICostModelParams *GetCostModelParams() const = 0;
+	virtual gpos::pointer<ICostModelParams *> GetCostModelParams() const = 0;
 
 	// main driver for cost computation
 	virtual CCost Cost(CExpressionHandle &exprhdl,
@@ -353,7 +355,7 @@ public:
 	virtual ECostModelType Ecmt() const = 0;
 
 	// set cost model params
-	void SetParams(ICostModelParamsArray *pdrgpcp) const;
+	void SetParams(gpos::pointer<ICostModelParamsArray *> pdrgpcp) const;
 
 	// create a default cost model instance
 	static gpos::owner<ICostModel *> PcmDefault(CMemoryPool *mp);

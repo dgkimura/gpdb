@@ -36,12 +36,13 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCoerceBase::CDXLScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type,
+CDXLScalarCoerceBase::CDXLScalarCoerceBase(CMemoryPool *mp,
+										   gpos::owner<IMDId *> mdid_type,
 										   INT type_modifier,
 										   EdxlCoercionForm dxl_coerce_format,
 										   INT location)
 	: CDXLScalar(mp),
-	  m_result_type_mdid(mdid_type),
+	  m_result_type_mdid(std::move(mdid_type)),
 	  m_type_modifier(type_modifier),
 	  m_dxl_coerce_format(dxl_coerce_format),
 	  m_location(location)
@@ -131,7 +132,7 @@ CDXLScalarCoerceBase::AssertValid(gpos::pointer<const CDXLNode *> node,
 {
 	GPOS_ASSERT(1 == node->Arity());
 
-	CDXLNode *child_dxlnode = (*node)[0];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[0];
 	GPOS_ASSERT(EdxloptypeScalar ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

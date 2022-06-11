@@ -50,9 +50,9 @@ public:
 	CDXLPhysicalRowTrigger(const CDXLPhysicalRowTrigger &) = delete;
 
 	// ctor
-	CDXLPhysicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid, INT type,
-						   ULongPtrArray *colids_old,
-						   ULongPtrArray *colids_new);
+	CDXLPhysicalRowTrigger(CMemoryPool *mp, gpos::owner<IMDId *> rel_mdid,
+						   INT type, gpos::owner<ULongPtrArray *> colids_old,
+						   gpos::owner<ULongPtrArray *> colids_new);
 
 	// dtor
 	~CDXLPhysicalRowTrigger() override;

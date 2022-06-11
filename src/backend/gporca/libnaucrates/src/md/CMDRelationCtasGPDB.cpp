@@ -29,13 +29,16 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDRelationCtasGPDB::CMDRelationCtasGPDB(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname_schema, CMDName *mdname,
-	BOOL fTemporary, BOOL fHasOids, Erelstoragetype rel_storage_type,
-	Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-	ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamiles,
-	IMdIdArray *distr_opclasses, ULongPtr2dArray *keyset_array,
-	CDXLCtasStorageOptions *dxl_ctas_storage_options,
-	IntPtrArray *vartypemod_array)
+	CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname_schema,
+	CMDName *mdname, BOOL fTemporary, BOOL fHasOids,
+	Erelstoragetype rel_storage_type, Ereldistrpolicy rel_distr_policy,
+	gpos::owner<CMDColumnArray *> mdcol_array,
+	gpos::owner<ULongPtrArray *> distr_col_array,
+	gpos::owner<IMdIdArray *> distr_opfamiles,
+	gpos::owner<IMdIdArray *> distr_opclasses,
+	gpos::owner<ULongPtr2dArray *> keyset_array,
+	gpos::owner<CDXLCtasStorageOptions *> dxl_ctas_storage_options,
+	gpos::owner<IntPtrArray *> vartypemod_array)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname_schema(mdname_schema),
@@ -68,7 +71,7 @@ CMDRelationCtasGPDB::CMDRelationCtasGPDB(
 	const ULONG arity = m_md_col_array->Size();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		IMDColumn *mdcol = (*m_md_col_array)[ul];
+		gpos::pointer<IMDColumn *> mdcol = (*m_md_col_array)[ul];
 		GPOS_ASSERT(!mdcol->IsDropped() &&
 					"Cannot create a table with dropped columns");
 
@@ -353,7 +356,7 @@ CMDRelationCtasGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	const ULONG columns = m_md_col_array->Size();
 	for (ULONG ul = 0; ul < columns; ul++)
 	{
-		CMDColumn *mdcol = (*m_md_col_array)[ul];
+		gpos::pointer<CMDColumn *> mdcol = (*m_md_col_array)[ul];
 		mdcol->Serialize(xml_serializer);
 	}
 

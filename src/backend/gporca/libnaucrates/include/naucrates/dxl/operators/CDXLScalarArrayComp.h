@@ -48,7 +48,7 @@ private:
 
 public:
 	// ctor/dtor
-	CDXLScalarArrayComp(CMemoryPool *mp, IMDId *mdid_op,
+	CDXLScalarArrayComp(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
 						const CWStringConst *str_opname,
 						EdxlArrayCompType comparison_type);
 

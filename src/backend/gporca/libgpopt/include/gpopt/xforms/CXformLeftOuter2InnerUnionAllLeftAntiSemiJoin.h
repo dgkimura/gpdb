@@ -62,19 +62,21 @@ private:
 
 	// construct a left anti semi join with the CTE consumer (ulCTEJoinId) as outer
 	// and a group by as inner
-	static CExpression *PexprLeftAntiSemiJoinWithInnerGroupBy(
-		CMemoryPool *mp, CColRefArray *pdrgpcrOuter,
-		CColRefArray *pdrgpcrOuterCopy, CColRefSet *pcrsScalar,
-		CColRefSet *pcrsInner, CColRefArray *pdrgpcrJoinOutput,
-		ULONG ulCTEJoinId, ULONG ulCTEOuterId);
+	static gpos::owner<CExpression *> PexprLeftAntiSemiJoinWithInnerGroupBy(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrOuter,
+		CColRefArray *pdrgpcrOuterCopy, gpos::pointer<CColRefSet *> pcrsScalar,
+		gpos::pointer<CColRefSet *> pcrsInner,
+		gpos::pointer<CColRefArray *> pdrgpcrJoinOutput, ULONG ulCTEJoinId,
+		ULONG ulCTEOuterId);
 
 	// return a project over a left anti semi join that appends nulls for all
 	// columns in the original inner child
-	static CExpression *PexprProjectOverLeftAntiSemiJoin(
-		CMemoryPool *mp, CColRefArray *pdrgpcrOuter, CColRefSet *pcrsScalar,
-		CColRefSet *pcrsInner, CColRefArray *pdrgpcrJoinOutput,
-		ULONG ulCTEJoinId, ULONG ulCTEOuterId,
-		CColRefArray **ppdrgpcrProjectOutput);
+	static gpos::owner<CExpression *> PexprProjectOverLeftAntiSemiJoin(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrOuter,
+		gpos::pointer<CColRefSet *> pcrsScalar,
+		gpos::pointer<CColRefSet *> pcrsInner,
+		gpos::pointer<CColRefArray *> pdrgpcrJoinOutput, ULONG ulCTEJoinId,
+		ULONG ulCTEOuterId, gpos::owner<CColRefArray *> *ppdrgpcrProjectOutput);
 
 public:
 	CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin(
@@ -111,8 +113,9 @@ public:
 	}
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::pointer<CXformContext *> pxfctxt,
+				   gpos::pointer<CXformResult *> pxfres,
+				   gpos::pointer<CExpression *> pexpr) const override;
 
 	// return true if xform should be applied only once
 	BOOL IsApplyOnce() override;

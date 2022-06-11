@@ -35,7 +35,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level,
-							 CommonTableExpr *cte, CDXLNode *cte_producer)
+							 CommonTableExpr *cte,
+							 gpos::pointer<CDXLNode *> cte_producer)
 	: m_query_level(query_level), m_cte_info(nullptr)
 {
 	GPOS_ASSERT(nullptr != cte && nullptr != cte_producer);
@@ -59,7 +60,7 @@ CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level,
 //
 //---------------------------------------------------------------------------
 CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level, List *cte_list,
-							 CDXLNodeArray *cte_dxl_arr)
+							 gpos::pointer<CDXLNodeArray *> cte_dxl_arr)
 	: m_query_level(query_level), m_cte_info(nullptr)
 {
 	GPOS_ASSERT(nullptr != cte_dxl_arr);
@@ -70,7 +71,7 @@ CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level, List *cte_list,
 
 	for (ULONG ul = 0; ul < num_cte; ul++)
 	{
-		CDXLNode *cte_producer = (*cte_dxl_arr)[ul];
+		gpos::pointer<CDXLNode *> cte_producer = (*cte_dxl_arr)[ul];
 		CommonTableExpr *cte = (CommonTableExpr *) gpdb::ListNth(cte_list, ul);
 
 		Query *cte_query = (Query *) cte->ctequery;

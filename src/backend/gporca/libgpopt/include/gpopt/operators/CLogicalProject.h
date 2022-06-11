@@ -32,14 +32,15 @@ class CLogicalProject : public CLogicalUnary
 {
 private:
 	// return equivalence class from scalar ident project element
-	static CColRefSetArray *PdrgpcrsEquivClassFromScIdent(
-		CMemoryPool *mp, CExpression *pexprPrEl, CColRefSet *not_null_columns);
+	static gpos::owner<CColRefSetArray *> PdrgpcrsEquivClassFromScIdent(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprPrEl,
+		gpos::pointer<CColRefSet *> not_null_columns);
 
 	// extract constraint from scalar constant project element
-	static void ExtractConstraintFromScConst(CMemoryPool *mp,
-											 CExpression *pexprPrEl,
-											 CConstraintArray *pdrgpcnstr,
-											 CColRefSetArray *pdrgpcrs);
+	static void ExtractConstraintFromScConst(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprPrEl,
+		gpos::pointer<CConstraintArray *> pdrgpcnstr,
+		gpos::pointer<CColRefSetArray *> pdrgpcrs);
 
 public:
 	CLogicalProject(const CLogicalProject &) = delete;
@@ -68,11 +69,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::owner<CColRefSet *> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::owner<CKeyCollection *> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -88,11 +89,12 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::owner<IStatistics *> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------

@@ -49,17 +49,18 @@ CXformGbAggDedup2HashAggDedup::CXformGbAggDedup2HashAggDedup(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformGbAggDedup2HashAggDedup::Transform(CXformContext *pxfctxt,
-										 CXformResult *pxfres,
-										 CExpression *pexpr) const
+CXformGbAggDedup2HashAggDedup::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalGbAggDeduplicate *popAggDedup =
-		CLogicalGbAggDeduplicate::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalGbAggDeduplicate *> popAggDedup =
+		gpos::dyn_cast<CLogicalGbAggDeduplicate>(pexpr->Pop());
 	gpos::owner<CColRefArray *> colref_array = popAggDedup->Pdrgpcr();
 	colref_array->AddRef();
 
@@ -79,8 +80,8 @@ CXformGbAggDedup2HashAggDedup::Transform(CXformContext *pxfctxt,
 	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalHashAggDeduplicate(
-			mp, colref_array, popAggDedup->PdrgpcrMinimal(),
-			popAggDedup->Egbaggtype(), pdrgpcrKeys,
+			mp, std::move(colref_array), popAggDedup->PdrgpcrMinimal(),
+			popAggDedup->Egbaggtype(), std::move(pdrgpcrKeys),
 			popAggDedup->FGeneratesDuplicates(),
 			CXformUtils::FMultiStageAgg(pexpr),
 			CXformUtils::FAggGenBySplitDQAXform(pexpr), popAggDedup->AggStage(),
@@ -88,7 +89,7 @@ CXformGbAggDedup2HashAggDedup::Transform(CXformContext *pxfctxt,
 		pexprRel, pexprScalar);
 
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 // EOF

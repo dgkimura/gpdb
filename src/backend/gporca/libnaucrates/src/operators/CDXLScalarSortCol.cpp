@@ -28,12 +28,12 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarSortCol::CDXLScalarSortCol(CMemoryPool *mp, ULONG colid,
-									 IMDId *mdid_sort_op,
+									 gpos::owner<IMDId *> mdid_sort_op,
 									 CWStringConst *sort_op_name_str,
 									 BOOL sort_nulls_first)
 	: CDXLScalar(mp),
 	  m_colid(colid),
-	  m_mdid_sort_op(mdid_sort_op),
+	  m_mdid_sort_op(std::move(mdid_sort_op)),
 	  m_sort_op_name_str(sort_op_name_str),
 	  m_must_sort_nulls_first(sort_nulls_first)
 {

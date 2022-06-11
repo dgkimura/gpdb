@@ -53,8 +53,9 @@ public:
 	CScalarCoerceBase(const CScalarCoerceBase &) = delete;
 
 	// ctor
-	CScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
-					  ECoercionForm dxl_coerce_format, INT location);
+	CScalarCoerceBase(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+					  INT type_modifier, ECoercionForm dxl_coerce_format,
+					  INT location);
 
 	// dtor
 	~CScalarCoerceBase() override;
@@ -72,9 +73,9 @@ public:
 	INT Location() const;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+		BOOL must_exist) override;
 
 };	// class CScalarCoerceBase
 

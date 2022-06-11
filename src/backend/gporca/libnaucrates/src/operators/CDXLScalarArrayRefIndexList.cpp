@@ -134,7 +134,7 @@ CDXLScalarArrayRefIndexList::AssertValid(
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

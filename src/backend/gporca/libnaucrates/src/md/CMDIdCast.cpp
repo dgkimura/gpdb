@@ -27,9 +27,10 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdCast::CMDIdCast(CMDIdGPDB *mdid_src, CMDIdGPDB *mdid_dest)
-	: m_mdid_src(mdid_src),
-	  m_mdid_dest(mdid_dest),
+CMDIdCast::CMDIdCast(gpos::owner<CMDIdGPDB *> mdid_src,
+					 gpos::owner<CMDIdGPDB *> mdid_dest)
+	: m_mdid_src(std::move(mdid_src)),
+	  m_mdid_dest(std::move(mdid_dest)),
 	  m_str(m_mdid_buffer, GPOS_ARRAY_SIZE(m_mdid_buffer))
 {
 	GPOS_ASSERT(m_mdid_src->IsValid());

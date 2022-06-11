@@ -47,8 +47,9 @@ CXformInlineCTEConsumer::CXformInlineCTEConsumer(CMemoryPool *mp)
 CXform::EXformPromise
 CXformInlineCTEConsumer::Exfp(CExpressionHandle &exprhdl) const
 {
-	const ULONG id = CLogicalCTEConsumer::PopConvert(exprhdl.Pop())->UlCTEId();
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	const ULONG id =
+		gpos::dyn_cast<CLogicalCTEConsumer>(exprhdl.Pop())->UlCTEId();
+	gpos::pointer<CCTEInfo *> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 
 	if ((pcteinfo->FEnableInlining() || 1 == pcteinfo->UlConsumers(id)) &&
 		CXformUtils::FInlinableCTE(id))
@@ -73,20 +74,20 @@ CXformInlineCTEConsumer::Transform(gpos::pointer<CXformContext *>
 									   pxfctxt
 #endif
 								   ,
-								   CXformResult *pxfres,
-								   CExpression *pexpr) const
+								   gpos::pointer<CXformResult *> pxfres,
+								   gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	// inline the consumer
-	CLogicalCTEConsumer *popConsumer =
-		CLogicalCTEConsumer::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalCTEConsumer *> popConsumer =
+		gpos::dyn_cast<CLogicalCTEConsumer>(pexpr->Pop());
 	gpos::owner<CExpression *> pexprAlt = popConsumer->PexprInlined();
 	pexprAlt->AddRef();
 	// add alternative to xform result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 // EOF

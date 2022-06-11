@@ -25,8 +25,9 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalProperties::CDXLPhysicalProperties(CDXLOperatorCost *cost)
-	: CDXLProperties(), m_operator_cost_dxl(cost)
+CDXLPhysicalProperties::CDXLPhysicalProperties(
+	gpos::owner<CDXLOperatorCost *> cost)
+	: CDXLProperties(), m_operator_cost_dxl(std::move(cost))
 {
 }
 

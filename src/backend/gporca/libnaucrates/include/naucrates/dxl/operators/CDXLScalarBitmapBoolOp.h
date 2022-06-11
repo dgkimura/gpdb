@@ -52,7 +52,7 @@ public:
 	CDXLScalarBitmapBoolOp(const CDXLScalarBitmapBoolOp &) = delete;
 
 	// ctor
-	CDXLScalarBitmapBoolOp(CMemoryPool *mp, IMDId *mdid_type,
+	CDXLScalarBitmapBoolOp(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
 						   EdxlBitmapBoolOp bitmap_op_type);
 
 	// dtor

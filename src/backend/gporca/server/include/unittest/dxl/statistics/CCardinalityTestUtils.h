@@ -59,16 +59,17 @@ public:
 	static CHistogram *PhistExampleBool(CMemoryPool *mp);
 
 	// helper function to generate a point from an encoded value of specific datatype
-	static CPoint *PpointGeneric(CMemoryPool *mp, OID oid,
-								 CWStringDynamic *pstrValueEncoded, LINT value);
+	static gpos::owner<CPoint *> PpointGeneric(
+		CMemoryPool *mp, OID oid, CWStringDynamic *pstrValueEncoded,
+		LINT value);
 
 	// helper function to generate a point of numeric datatype
-	static CPoint *PpointNumeric(CMemoryPool *mp,
-								 CWStringDynamic *pstrEncodedValue,
-								 CDouble value);
+	static gpos::owner<CPoint *> PpointNumeric(
+		CMemoryPool *mp, CWStringDynamic *pstrEncodedValue, CDouble value);
 
 	// helper function to generate a point of double datatype
-	static CPoint *PpointDouble(CMemoryPool *mp, OID oid, CDouble value);
+	static gpos::owner<CPoint *> PpointDouble(CMemoryPool *mp, OID oid,
+											  CDouble value);
 
 	// helper method to print statistics object
 	static void PrintStats(CMemoryPool *mp,

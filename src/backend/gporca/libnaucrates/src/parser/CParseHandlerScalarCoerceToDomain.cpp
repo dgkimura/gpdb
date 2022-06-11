@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarCoerceToDomain.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -66,11 +68,12 @@ CParseHandlerScalarCoerceToDomain::StartElement(
 		}
 
 		// parse and create scalar coerce
-		CDXLScalarCoerceToDomain *dxl_op = (CDXLScalarCoerceToDomain *)
-			CDXLOperatorFactory::MakeDXLCoerceToDomain(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+		gpos::owner<CDXLScalarCoerceToDomain *> dxl_op =
+			gpos::cast<CDXLScalarCoerceToDomain>(
+				CDXLOperatorFactory::MakeDXLCoerceToDomain(
+					m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
-		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 
 		// parse handler for child scalar node
 		CParseHandlerBase *child_parse_handler =

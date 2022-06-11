@@ -3,11 +3,13 @@
 
 #include "gpopt/base/CDistributionSpecStrictHashed.h"
 
+#include "gpos/common/owner.h"
+
 namespace gpopt
 {
 CDistributionSpecStrictHashed::CDistributionSpecStrictHashed(
-	CExpressionArray *pdrgpexpr, BOOL fNullsColocated)
-	: CDistributionSpecHashed(pdrgpexpr, fNullsColocated)
+	gpos::owner<CExpressionArray *> pdrgpexpr, BOOL fNullsColocated)
+	: CDistributionSpecHashed(std::move(pdrgpexpr), fNullsColocated)
 {
 }
 

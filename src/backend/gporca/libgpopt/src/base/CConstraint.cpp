@@ -53,10 +53,10 @@ BOOL CConstraint::m_fFalse(false);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CConstraint::CConstraint(CMemoryPool *mp, CColRefSet *pcrsUsed)
+CConstraint::CConstraint(CMemoryPool *mp, gpos::owner<CColRefSet *> pcrsUsed)
 	: m_phmcontain(nullptr),
 	  m_mp(mp),
-	  m_pcrsUsed(pcrsUsed),
+	  m_pcrsUsed(std::move(pcrsUsed)),
 	  m_pexprScalar(nullptr)
 {
 	m_phmcontain = GPOS_NEW(m_mp) ConstraintContainmentMap(m_mp);
@@ -88,13 +88,15 @@ CConstraint::~CConstraint()
 //
 //---------------------------------------------------------------------------
 gpos::owner<CConstraint *>
-CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp, CExpression *pexpr,
+CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp,
+									  gpos::pointer<CExpression *> pexpr,
 									  CColRef *colref, BOOL infer_nulls_as)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(CUtils::FScalarArrayCmp(pexpr));
 
-	CScalarArrayCmp *popScArrayCmp = CScalarArrayCmp::PopConvert(pexpr->Pop());
+	gpos::pointer<CScalarArrayCmp *> popScArrayCmp =
+		gpos::dyn_cast<CScalarArrayCmp>(pexpr->Pop());
 	CScalarArrayCmp::EArrCmpType earrccmpt = popScArrayCmp->Earrcmpt();
 
 	if ((CScalarArrayCmp::EarrcmpAny == earrccmpt ||
@@ -104,15 +106,15 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp, CExpression *pexpr,
 	{
 #ifdef GPOS_DEBUG
 		// verify column in expr is the same as column which was passed in
-		CScalarIdent *popScId = nullptr;
+		gpos::pointer<CScalarIdent *> popScId = nullptr;
 		if (CUtils::FScalarIdent((*pexpr)[0]))
 		{
-			popScId = CScalarIdent::PopConvert((*pexpr)[0]->Pop());
+			popScId = gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
 		}
 		else
 		{
 			GPOS_ASSERT(CScalarIdent::FCastedScId((*pexpr)[0]));
-			popScId = CScalarIdent::PopConvert((*(*pexpr)[0])[0]->Pop());
+			popScId = gpos::dyn_cast<CScalarIdent>((*(*pexpr)[0])[0]->Pop());
 		}
 		GPOS_ASSERT(colref == (CColRef *) popScId->Pcr());
 #endif	// GPOS_DEBUG
@@ -127,13 +129,14 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp, CExpression *pexpr,
 
 			return nullptr;
 		}
-		CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexpr);
+		gpos::pointer<CExpression *> pexprArray =
+			CUtils::PexprScalarArrayChild(pexpr);
 
 		const ULONG arity = CUtils::UlScalarArrayArity(pexprArray);
 
 		// When array size exceeds the constraint derivation threshold,
 		// don't expand it into a DNF and don't derive constraints
-		COptimizerConfig *optimizer_config =
+		gpos::pointer<COptimizerConfig *> optimizer_config =
 			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 		ULONG array_expansion_threshold =
 			optimizer_config->GetHint()->UlArrayExpansionThreshold();
@@ -151,8 +154,9 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp, CExpression *pexpr,
 					GPOS_NEW(mp) CRangeArray(mp);
 				// comparing with an empty array for any ANY comparison produces a "false" constraint
 				// which is represented by an empty CConstraintInterval
-				return GPOS_NEW(mp) CConstraintInterval(
-					mp, colref, emptyRangeArray, false /*includes NULL*/);
+				return GPOS_NEW(mp)
+					CConstraintInterval(mp, colref, std::move(emptyRangeArray),
+										false /*includes NULL*/);
 			}
 			else
 			{
@@ -167,9 +171,9 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp, CExpression *pexpr,
 
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			CScalarConst *popScConst =
+			gpos::pointer<CScalarConst *> popScConst =
 				CUtils::PScalarArrayConstChildAt(pexprArray, ul);
-			CConstraintInterval *pci =
+			gpos::owner<CConstraintInterval *> pci =
 				CConstraintInterval::PciIntervalFromColConstCmp(
 					mp, colref, cmp_type, popScConst, infer_nulls_as);
 			pdrgpcnstr->Append(pci);
@@ -179,12 +183,13 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp, CExpression *pexpr,
 		{
 			// predicate is of the form 'A IN (1,2,3)'
 			// return a disjunction of ranges {[1,1], [2,2], [3,3]}
-			return GPOS_NEW(mp) CConstraintDisjunction(mp, pdrgpcnstr);
+			return GPOS_NEW(mp)
+				CConstraintDisjunction(mp, std::move(pdrgpcnstr));
 		}
 
 		// predicate is of the form 'A NOT IN (1,2,3)'
 		// return a conjunctive negation on {[1,1], [2,2], [3,3]}
-		return GPOS_NEW(mp) CConstraintConjunction(mp, pdrgpcnstr);
+		return GPOS_NEW(mp) CConstraintConjunction(mp, std::move(pdrgpcnstr));
 	}
 
 	return nullptr;
@@ -199,10 +204,10 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp, CExpression *pexpr,
 //		equivalence classes
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CConstraint::PcnstrFromScalarExpr(
 	CMemoryPool *mp, CExpression *pexpr,
-	CColRefSetArray **ppdrgpcrs,  // output equivalence classes
+	gpos::owner<CColRefSetArray *> *ppdrgpcrs,	// output equivalence classes
 	BOOL infer_nulls_as)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -210,7 +215,7 @@ CConstraint::PcnstrFromScalarExpr(
 	GPOS_ASSERT(nullptr != ppdrgpcrs);
 	GPOS_ASSERT(nullptr == *ppdrgpcrs);
 
-	CColRefSet *pcrs = pexpr->DeriveUsedColumns();
+	gpos::pointer<CColRefSet *> pcrs = pexpr->DeriveUsedColumns();
 	ULONG num_cols = pcrs->Size();
 
 	if (0 == num_cols)
@@ -228,7 +233,7 @@ CConstraint::PcnstrFromScalarExpr(
 			return nullptr;
 		}
 
-		CConstraint *pcnstr = nullptr;
+		gpos::owner<CConstraint *> pcnstr = nullptr;
 		*ppdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
 
 		// first, try creating a single interval constraint from the expression
@@ -275,10 +280,11 @@ CConstraint::PcnstrFromScalarExpr(
 //		Create conjunction from array of constraints
 //
 //---------------------------------------------------------------------------
-CConstraint *
-CConstraint::PcnstrConjunction(CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
+gpos::owner<CConstraint *>
+CConstraint::PcnstrConjunction(CMemoryPool *mp,
+							   gpos::owner<CConstraintArray *> pdrgpcnstr)
 {
-	return PcnstrConjDisj(mp, pdrgpcnstr, true /*fConj*/);
+	return PcnstrConjDisj(mp, std::move(pdrgpcnstr), true /*fConj*/);
 }
 
 //---------------------------------------------------------------------------
@@ -289,10 +295,11 @@ CConstraint::PcnstrConjunction(CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
 //		Create disjunction from array of constraints
 //
 //---------------------------------------------------------------------------
-CConstraint *
-CConstraint::PcnstrDisjunction(CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
+gpos::owner<CConstraint *>
+CConstraint::PcnstrDisjunction(CMemoryPool *mp,
+							   gpos::owner<CConstraintArray *> pdrgpcnstr)
 {
-	return PcnstrConjDisj(mp, pdrgpcnstr, false /*fConj*/);
+	return PcnstrConjDisj(mp, std::move(pdrgpcnstr), false /*fConj*/);
 }
 
 //---------------------------------------------------------------------------
@@ -303,7 +310,7 @@ CConstraint::PcnstrDisjunction(CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
 //		Create conjunction/disjunction from array of constraints
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CConstraint::PcnstrConjDisj(CMemoryPool *mp,
 							gpos::owner<CConstraintArray *> pdrgpcnstr,
 							BOOL fConj)
@@ -357,12 +364,12 @@ CConstraint::PcnstrConjDisj(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 void
 CConstraint::AddColumnToEquivClasses(CMemoryPool *mp, const CColRef *colref,
-									 CColRefSetArray *pdrgpcrs)
+									 gpos::pointer<CColRefSetArray *> pdrgpcrs)
 {
 	const ULONG length = pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRefSet *pcrs = (*pdrgpcrs)[ul];
+		gpos::pointer<CColRefSet *> pcrs = (*pdrgpcrs)[ul];
 		if (pcrs->FMember(colref))
 		{
 			return;
@@ -372,7 +379,7 @@ CConstraint::AddColumnToEquivClasses(CMemoryPool *mp, const CColRef *colref,
 	gpos::owner<CColRefSet *> pcrsNew = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsNew->Include(colref);
 
-	pdrgpcrs->Append(pcrsNew);
+	pdrgpcrs->Append(std::move(pcrsNew));
 }
 
 //---------------------------------------------------------------------------
@@ -383,10 +390,10 @@ CConstraint::AddColumnToEquivClasses(CMemoryPool *mp, const CColRef *colref,
 //		Create constraint from scalar comparison
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CConstraint::PcnstrFromScalarCmp(
-	CMemoryPool *mp, CExpression *pexpr,
-	CColRefSetArray **ppdrgpcrs,  // output equivalence classes
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+	gpos::owner<CColRefSetArray *> *ppdrgpcrs,	// output equivalence classes
 	BOOL infer_nulls_as)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -394,8 +401,8 @@ CConstraint::PcnstrFromScalarCmp(
 	GPOS_ASSERT(nullptr != ppdrgpcrs);
 	GPOS_ASSERT(nullptr == *ppdrgpcrs);
 
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::pointer<CExpression *> pexprLeft = (*pexpr)[0];
+	gpos::pointer<CExpression *> pexprRight = (*pexpr)[1];
 
 	// check if the scalar comparison is over scalar idents or binary coercible casted scalar idents
 	if ((CUtils::FScalarIdent(pexprLeft) ||
@@ -403,29 +410,30 @@ CConstraint::PcnstrFromScalarCmp(
 		(CUtils::FScalarIdent(pexprRight) ||
 		 CCastUtils::FBinaryCoercibleCastedScId(pexprRight)))
 	{
-		CScalarIdent *popScIdLeft, *popScIdRight;
+		gpos::pointer<CScalarIdent *> popScIdLeft, popScIdRight;
 		if (CUtils::FScalarIdent(pexprLeft))
 		{
 			// col1 = ...
-			popScIdLeft = CScalarIdent::PopConvert(pexprLeft->Pop());
+			popScIdLeft = gpos::dyn_cast<CScalarIdent>(pexprLeft->Pop());
 		}
 		else
 		{
 			// cast(col1) = ...
 			GPOS_ASSERT(CCastUtils::FBinaryCoercibleCastedScId(pexprLeft));
-			popScIdLeft = CScalarIdent::PopConvert((*pexprLeft)[0]->Pop());
+			popScIdLeft = gpos::dyn_cast<CScalarIdent>((*pexprLeft)[0]->Pop());
 		}
 
 		if (CUtils::FScalarIdent(pexprRight))
 		{
 			// ... = col2
-			popScIdRight = CScalarIdent::PopConvert(pexprRight->Pop());
+			popScIdRight = gpos::dyn_cast<CScalarIdent>(pexprRight->Pop());
 		}
 		else
 		{
 			// ... = cost(col2)
 			GPOS_ASSERT(CCastUtils::FBinaryCoercibleCastedScId(pexprRight));
-			popScIdRight = CScalarIdent::PopConvert((*pexprRight)[0]->Pop());
+			popScIdRight =
+				gpos::dyn_cast<CScalarIdent>((*pexprRight)[0]->Pop());
 		}
 
 		const CColRef *pcrLeft = popScIdLeft->Pcr();
@@ -440,17 +448,18 @@ CConstraint::PcnstrFromScalarCmp(
 		if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 		{
 			CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
-			CScalarCmp *sc_cmp = CScalarCmp::PopConvert(pexpr->Pop());
+			gpos::pointer<CScalarCmp *> sc_cmp =
+				gpos::dyn_cast<CScalarCmp>(pexpr->Pop());
 			gpos::pointer<const IMDScalarOp *> op =
 				mda->RetrieveScOp(sc_cmp->MdIdOp());
 
-			IMDId *left_mdid =
-				CScalar::PopConvert(pexprLeft->Pop())->MdidType();
+			gpos::pointer<IMDId *> left_mdid =
+				gpos::dyn_cast<CScalar>(pexprLeft->Pop())->MdidType();
 			gpos::pointer<const IMDType *> left_type =
 				mda->RetrieveType(left_mdid);
 
-			IMDId *right_mdid =
-				CScalar::PopConvert(pexprRight->Pop())->MdidType();
+			gpos::pointer<IMDId *> right_mdid =
+				gpos::dyn_cast<CScalar>(pexprRight->Pop())->MdidType();
 			gpos::pointer<const IMDType *> right_type =
 				mda->RetrieveType(right_mdid);
 
@@ -495,7 +504,7 @@ CConstraint::PcnstrFromScalarCmp(
 			mp, pcrLeft, pcrLeftIncludesNull /*fIncludesNull*/));
 		pdrgpcnstr->Append(CConstraintInterval::PciUnbounded(
 			mp, pcrRight, pcrRightIncludesNull /*fIncludesNull*/));
-		return CConstraint::PcnstrConjunction(mp, pdrgpcnstr);
+		return CConstraint::PcnstrConjunction(mp, std::move(pdrgpcnstr));
 	}
 
 	// TODO: , May 28, 2012; add support for other cases besides (col cmp col)
@@ -513,7 +522,7 @@ CConstraint::PcnstrFromScalarCmp(
 //---------------------------------------------------------------------------
 gpos::owner<CConstraint *>
 CConstraint::PcnstrFromScalarBoolOp(
-	CMemoryPool *mp, CExpression *pexpr,
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
 	gpos::owner<CColRefSetArray *> *ppdrgpcrs,	// output equivalence classes
 	BOOL infer_nulls_as)
 {
@@ -531,7 +540,7 @@ CConstraint::PcnstrFromScalarBoolOp(
 	// "(expression1, expression2) scalar op ANY/ALL ((const-x1,const-y1), ... (const-xn,const-yn))"
 	// Deriving constraints from this is quite expensive; hence don't
 	// bother when the arity of OR exceeds the threshold
-	COptimizerConfig *optimizer_config =
+	gpos::pointer<COptimizerConfig *> optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 	ULONG array_expansion_threshold =
 		optimizer_config->GetHint()->UlArrayExpansionThreshold();
@@ -564,7 +573,7 @@ CConstraint::PcnstrFromScalarBoolOp(
 		GPOS_ASSERT(nullptr != pdrgpcrsChild);
 
 		pdrgpcnstr->Append(pcnstrChild);
-		CColRefSetArray *pdrgpcrsMerged =
+		gpos::owner<CColRefSetArray *> pdrgpcrsMerged =
 			PdrgpcrsMergeFromBoolOp(mp, pexpr, *ppdrgpcrs, pdrgpcrsChild);
 
 		(*ppdrgpcrs)->Release();
@@ -587,7 +596,7 @@ CConstraint::PcnstrFromScalarBoolOp(
 
 		if (CPredicateUtils::FNot(pexpr))
 		{
-			return GPOS_NEW(mp) CConstraintNegation(mp, pcnstrChild);
+			return GPOS_NEW(mp) CConstraintNegation(mp, std::move(pcnstrChild));
 		}
 
 		return pcnstrChild;
@@ -596,12 +605,12 @@ CConstraint::PcnstrFromScalarBoolOp(
 	// we know we have more than one child
 	if (CPredicateUtils::FAnd(pexpr))
 	{
-		return GPOS_NEW(mp) CConstraintConjunction(mp, pdrgpcnstr);
+		return GPOS_NEW(mp) CConstraintConjunction(mp, std::move(pdrgpcnstr));
 	}
 
 	if (CPredicateUtils::FOr(pexpr))
 	{
-		return GPOS_NEW(mp) CConstraintDisjunction(mp, pdrgpcnstr);
+		return GPOS_NEW(mp) CConstraintDisjunction(mp, std::move(pdrgpcnstr));
 	}
 
 	return nullptr;
@@ -616,9 +625,9 @@ CConstraint::PcnstrFromScalarBoolOp(
 //
 //---------------------------------------------------------------------------
 gpos::owner<CColRefSetArray *>
-CConstraint::PdrgpcrsMergeFromBoolOp(CMemoryPool *mp, CExpression *pexpr,
-									 CColRefSetArray *pdrgpcrsFst,
-									 CColRefSetArray *pdrgpcrsSnd)
+CConstraint::PdrgpcrsMergeFromBoolOp(
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+	CColRefSetArray *pdrgpcrsFst, gpos::pointer<CColRefSetArray *> pdrgpcrsSnd)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(CUtils::FScalarBoolOp(pexpr));
@@ -652,9 +661,10 @@ CConstraint::PdrgpcrsMergeFromBoolOp(CMemoryPool *mp, CExpression *pexpr,
 //		given column
 //
 //---------------------------------------------------------------------------
-CConstraintArray *
+gpos::owner<CConstraintArray *>
 CConstraint::PdrgpcnstrOnColumn(
-	CMemoryPool *mp, CConstraintArray *pdrgpcnstr, CColRef *colref,
+	CMemoryPool *mp, gpos::pointer<CConstraintArray *> pdrgpcnstr,
+	CColRef *colref,
 	BOOL fExclusive	 // returned constraints must reference ONLY the given col
 )
 {
@@ -666,7 +676,7 @@ CConstraint::PdrgpcnstrOnColumn(
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		CConstraint *pcnstr = (*pdrgpcnstr)[ul];
-		CColRefSet *pcrs = pcnstr->PcrsUsed();
+		gpos::pointer<CColRefSet *> pcrs = pcnstr->PcrsUsed();
 
 		// if the fExclusive flag is true, then colref must be the only column
 		if (pcrs->FMember(colref) && (!fExclusive || 1 == pcrs->Size()))
@@ -688,8 +698,9 @@ CConstraint::PdrgpcnstrOnColumn(
 //		array of constraints
 //
 //---------------------------------------------------------------------------
-CExpression *
-CConstraint::PexprScalarConjDisj(CMemoryPool *mp, CConstraintArray *pdrgpcnstr,
+gpos::owner<CExpression *>
+CConstraint::PexprScalarConjDisj(CMemoryPool *mp,
+								 gpos::pointer<CConstraintArray *> pdrgpcnstr,
 								 BOOL fConj)
 {
 	gpos::owner<CExpressionArray *> pdrgpexpr =
@@ -705,10 +716,10 @@ CConstraint::PexprScalarConjDisj(CMemoryPool *mp, CConstraintArray *pdrgpcnstr,
 
 	if (fConj)
 	{
-		return CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
+		return CPredicateUtils::PexprConjunction(mp, std::move(pdrgpexpr));
 	}
 
-	return CPredicateUtils::PexprDisjunction(mp, pdrgpexpr);
+	return CPredicateUtils::PexprDisjunction(mp, std::move(pdrgpexpr));
 }
 
 //---------------------------------------------------------------------------
@@ -721,7 +732,7 @@ CConstraint::PexprScalarConjDisj(CMemoryPool *mp, CConstraintArray *pdrgpcnstr,
 //		its children directly instead of having multiple levels of the same type
 //
 //---------------------------------------------------------------------------
-CConstraintArray *
+gpos::owner<CConstraintArray *>
 CConstraint::PdrgpcnstrFlatten(CMemoryPool *mp,
 							   gpos::owner<CConstraintArray *> pdrgpcnstr,
 							   EConstraintType ect)
@@ -737,14 +748,14 @@ CConstraint::PdrgpcnstrFlatten(CMemoryPool *mp,
 
 		if (EctConjunction == ectChild && EctConjunction == ect)
 		{
-			CConstraintConjunction *pcconj =
-				(CConstraintConjunction *) pcnstrChild;
+			gpos::pointer<CConstraintConjunction *> pcconj =
+				gpos::cast<CConstraintConjunction>(pcnstrChild);
 			CUtils::AddRefAppend(pdrgpcnstrNew, pcconj->Pdrgpcnstr());
 		}
 		else if (EctDisjunction == ectChild && EctDisjunction == ect)
 		{
-			CConstraintDisjunction *pcdisj =
-				(CConstraintDisjunction *) pcnstrChild;
+			gpos::pointer<CConstraintDisjunction *> pcdisj =
+				gpos::cast<CConstraintDisjunction>(pcnstrChild);
 			CUtils::AddRefAppend(pdrgpcnstrNew, pcdisj->Pdrgpcnstr());
 		}
 		else
@@ -755,7 +766,7 @@ CConstraint::PdrgpcnstrFlatten(CMemoryPool *mp,
 	}
 
 	pdrgpcnstr->Release();
-	return PdrgpcnstrDeduplicate(mp, pdrgpcnstrNew, ect);
+	return PdrgpcnstrDeduplicate(mp, std::move(pdrgpcnstrNew), ect);
 }
 
 //---------------------------------------------------------------------------
@@ -768,7 +779,7 @@ CConstraint::PdrgpcnstrFlatten(CMemoryPool *mp,
 //		particular column, these constraints are combined into one
 //
 //---------------------------------------------------------------------------
-CConstraintArray *
+gpos::owner<CConstraintArray *>
 CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
 								   gpos::owner<CConstraintArray *> pdrgpcnstr,
 								   EConstraintType ect)
@@ -794,7 +805,7 @@ CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		CConstraint *pcnstrChild = (*pdrgpcnstr)[ul];
-		CColRefSet *pcrs = pcnstrChild->PcrsUsed();
+		gpos::pointer<CColRefSet *> pcrs = pcnstrChild->PcrsUsed();
 
 		GPOS_ASSERT(0 != pcrs->Size());
 		// we only simplify constraints that reference a single column, otherwise
@@ -840,7 +851,7 @@ CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
 		pdrgpcnstrCol->Release();
 		GPOS_ASSERT(nullptr != pexpr);
 
-		CConstraint *pcnstrNew =
+		gpos::owner<CConstraint *> pcnstrNew =
 			CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
 		if (nullptr == pcnstrNew)
 		{
@@ -873,9 +884,9 @@ CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
 //		Construct mapping between columns and arrays of constraints
 //
 //---------------------------------------------------------------------------
-ColRefToConstraintArrayMap *
-CConstraint::Phmcolconstr(CMemoryPool *mp, CColRefSet *pcrs,
-						  CConstraintArray *pdrgpcnstr)
+gpos::owner<ColRefToConstraintArrayMap *>
+CConstraint::Phmcolconstr(CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs,
+						  gpos::pointer<CConstraintArray *> pdrgpcnstr)
 {
 	gpos::owner<ColRefToConstraintArrayMap *> phmcolconstr =
 		GPOS_NEW(mp) ColRefToConstraintArrayMap(mp);
@@ -884,7 +895,7 @@ CConstraint::Phmcolconstr(CMemoryPool *mp, CColRefSet *pcrs,
 	while (crsi.Advance())
 	{
 		CColRef *colref = crsi.Pcr();
-		CConstraintArray *pdrgpcnstrCol =
+		gpos::owner<CConstraintArray *> pdrgpcnstrCol =
 			PdrgpcnstrOnColumn(mp, pdrgpcnstr, colref, false /*fExclusive*/);
 
 		BOOL fres GPOS_ASSERTS_ONLY =
@@ -903,10 +914,10 @@ CConstraint::Phmcolconstr(CMemoryPool *mp, CColRefSet *pcrs,
 //		Return a copy of the conjunction/disjunction constraint for a different column
 //
 //---------------------------------------------------------------------------
-CConstraint *
-CConstraint::PcnstrConjDisjRemapForColumn(CMemoryPool *mp, CColRef *colref,
-										  CConstraintArray *pdrgpcnstr,
-										  BOOL fConj)
+gpos::owner<CConstraint *>
+CConstraint::PcnstrConjDisjRemapForColumn(
+	CMemoryPool *mp, CColRef *colref,
+	gpos::pointer<CConstraintArray *> pdrgpcnstr, BOOL fConj)
 {
 	GPOS_ASSERT(nullptr != colref);
 
@@ -917,7 +928,7 @@ CConstraint::PcnstrConjDisjRemapForColumn(CMemoryPool *mp, CColRef *colref,
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		// clone child
-		CConstraint *pcnstrChild =
+		gpos::owner<CConstraint *> pcnstrChild =
 			(*pdrgpcnstr)[ul]->PcnstrRemapForColumn(mp, colref);
 		GPOS_ASSERT(nullptr != pcnstrChild);
 
@@ -926,9 +937,9 @@ CConstraint::PcnstrConjDisjRemapForColumn(CMemoryPool *mp, CColRef *colref,
 
 	if (fConj)
 	{
-		return PcnstrConjunction(mp, pdrgpcnstrNew);
+		return PcnstrConjunction(mp, std::move(pdrgpcnstrNew));
 	}
-	return PcnstrDisjunction(mp, pdrgpcnstrNew);
+	return PcnstrDisjunction(mp, std::move(pdrgpcnstrNew));
 }
 
 //---------------------------------------------------------------------------
@@ -940,7 +951,7 @@ CConstraint::PcnstrConjDisjRemapForColumn(CMemoryPool *mp, CColRef *colref,
 //
 //---------------------------------------------------------------------------
 BOOL
-CConstraint::Contains(CConstraint *pcnstr)
+CConstraint::Contains(gpos::pointer<CConstraint *> pcnstr)
 {
 	if (IsConstraintUnbounded())
 	{
@@ -1010,7 +1021,7 @@ CConstraint::Contains(CConstraint *pcnstr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CConstraint::Equals(CConstraint *pcnstr)
+CConstraint::Equals(gpos::pointer<CConstraint *> pcnstr)
 {
 	if (nullptr == pcnstr || pcnstr->IsConstraintUnbounded())
 	{
@@ -1035,8 +1046,8 @@ CConstraint::Equals(CConstraint *pcnstr)
 //
 //---------------------------------------------------------------------------
 IOstream &
-CConstraint::PrintConjunctionDisjunction(IOstream &os,
-										 CConstraintArray *pdrgpcnstr) const
+CConstraint::PrintConjunctionDisjunction(
+	IOstream &os, gpos::pointer<CConstraintArray *> pdrgpcnstr) const
 {
 	EConstraintType ect = Ect();
 	GPOS_ASSERT(EctConjunction == ect || EctDisjunction == ect);
@@ -1062,8 +1073,9 @@ CConstraint::PrintConjunctionDisjunction(IOstream &os,
 	return os;
 }
 
-CColRefSet *
-CConstraint::PcrsFromConstraints(CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
+gpos::owner<CColRefSet *>
+CConstraint::PcrsFromConstraints(CMemoryPool *mp,
+								 gpos::pointer<CConstraintArray *> pdrgpcnstr)
 {
 	gpos::owner<CColRefSet *> crs = GPOS_NEW(mp) CColRefSet(mp);
 
@@ -1072,7 +1084,7 @@ CConstraint::PcrsFromConstraints(CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
 
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CConstraint *pcnstr = (*pdrgpcnstr)[ul];
+		gpos::pointer<CConstraint *> pcnstr = (*pdrgpcnstr)[ul];
 		crs->Include(pcnstr->PcrsUsed());
 	}
 

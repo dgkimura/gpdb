@@ -91,15 +91,18 @@ CPhysicalInnerNLJoin::PdsRequired(
 
 gpos::owner<CEnfdDistribution *>
 CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  CReqdPropPlan *prppInput, ULONG child_index,
-						  CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+						  gpos::pointer<CReqdPropPlan *> prppInput,
+						  ULONG child_index,
+						  gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+						  ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());
 
 	CEnfdDistribution::EDistributionMatching dmatch =
 		Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
-	CDistributionSpec *const pdsRequired = prppInput->Ped()->PdsRequired();
+	gpos::pointer<CDistributionSpec *> const pdsRequired =
+		prppInput->Ped()->PdsRequired();
 
 	// if expression has to execute on a single host then we need a gather
 	if (exprhdl.NeedsSingletonExecution())
@@ -127,7 +130,7 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	{
 		if (1 == child_index)
 		{
-			CEnfdDistribution *pEnfdHashedDistribution =
+			gpos::owner<CEnfdDistribution *> pEnfdHashedDistribution =
 				CPhysicalJoin::PedInnerHashedFromOuterHashed(
 					mp, exprhdl, dmatch, (*pdrgpdpCtxt)[0]);
 			if (pEnfdHashedDistribution)
@@ -147,8 +150,8 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// compute a matching distribution based on derived distribution of outer child
-	CDistributionSpec *pdsOuter =
-		CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds();
+	gpos::pointer<CDistributionSpec *> pdsOuter =
+		gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Pds();
 	if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 	{
 		// first child is universal, request second child to execute on a single host to avoid duplicates

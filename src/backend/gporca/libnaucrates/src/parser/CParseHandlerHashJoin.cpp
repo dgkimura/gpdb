@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerHashJoin.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerCondList.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -66,8 +68,9 @@ CParseHandlerHashJoin::StartElement(const XMLCh *const,	 // element_uri,
 	}
 
 	// parse and create Hash join operator
-	m_dxl_op = (CDXLPhysicalHashJoin *) CDXLOperatorFactory::MakeDXLHashJoin(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	m_dxl_op =
+		gpos::cast<CDXLPhysicalHashJoin>(CDXLOperatorFactory::MakeDXLHashJoin(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance

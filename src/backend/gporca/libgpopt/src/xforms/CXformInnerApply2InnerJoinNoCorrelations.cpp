@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformInnerApply2InnerJoinNoCorrelations.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 
 using namespace gpopt;
@@ -50,9 +51,10 @@ CXformInnerApply2InnerJoinNoCorrelations::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformInnerApply2InnerJoinNoCorrelations::Transform(CXformContext *pxfctxt,
-													CXformResult *pxfres,
-													CExpression *pexpr) const
+CXformInnerApply2InnerJoinNoCorrelations::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

@@ -28,15 +28,15 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalRowTrigger::CDXLPhysicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
-											   INT type,
-											   ULongPtrArray *colids_old,
-											   ULongPtrArray *colids_new)
+CDXLPhysicalRowTrigger::CDXLPhysicalRowTrigger(
+	CMemoryPool *mp, gpos::owner<IMDId *> rel_mdid, INT type,
+	gpos::owner<ULongPtrArray *> colids_old,
+	gpos::owner<ULongPtrArray *> colids_new)
 	: CDXLPhysical(mp),
-	  m_rel_mdid(rel_mdid),
+	  m_rel_mdid(std::move(rel_mdid)),
 	  m_type(type),
-	  m_colids_old(colids_old),
-	  m_colids_new(colids_new)
+	  m_colids_old(std::move(colids_old)),
+	  m_colids_new(std::move(colids_new))
 {
 	GPOS_ASSERT(m_rel_mdid->IsValid());
 	GPOS_ASSERT(0 != type);
@@ -151,7 +151,7 @@ CDXLPhysicalRowTrigger::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 									BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
-	CDXLNode *child_dxlnode = (*dxlnode)[1];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[1];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

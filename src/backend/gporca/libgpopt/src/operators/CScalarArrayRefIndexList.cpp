@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarArrayRefIndexList.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 using namespace gpmd;
@@ -40,15 +41,15 @@ CScalarArrayRefIndexList::CScalarArrayRefIndexList(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayRefIndexList::Matches(COperator *pop) const
+CScalarArrayRefIndexList::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CScalarArrayRefIndexList *popIndexList =
-		CScalarArrayRefIndexList::PopConvert(pop);
+	gpos::pointer<CScalarArrayRefIndexList *> popIndexList =
+		gpos::dyn_cast<CScalarArrayRefIndexList>(pop);
 
 	return m_eilt == popIndexList->Eilt();
 }

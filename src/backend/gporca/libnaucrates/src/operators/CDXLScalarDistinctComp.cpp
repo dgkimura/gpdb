@@ -29,9 +29,10 @@ using namespace gpdxl;
 //		Constructs a scalar distinct comparison node
 //
 //---------------------------------------------------------------------------
-CDXLScalarDistinctComp::CDXLScalarDistinctComp(CMemoryPool *mp, IMDId *mdid_op)
+CDXLScalarDistinctComp::CDXLScalarDistinctComp(CMemoryPool *mp,
+											   gpos::owner<IMDId *> mdid_op)
 	: CDXLScalarComp(
-		  mp, mdid_op,
+		  mp, std::move(mdid_op),
 		  GPOS_NEW(mp) CWStringConst(
 			  mp, CDXLTokens::GetDXLTokenStr(EdxltokenEq)->GetBuffer()))
 {
@@ -110,8 +111,8 @@ CDXLScalarDistinctComp::AssertValid(gpos::pointer<const CDXLNode *> node,
 {
 	GPOS_ASSERT(EdxlscdistcmpSentinel == node->Arity());
 
-	CDXLNode *dxlnode_left = (*node)[EdxlscdistcmpIndexLeft];
-	CDXLNode *dxlnode_right = (*node)[EdxlscdistcmpIndexRight];
+	gpos::pointer<CDXLNode *> dxlnode_left = (*node)[EdxlscdistcmpIndexLeft];
+	gpos::pointer<CDXLNode *> dxlnode_right = (*node)[EdxlscdistcmpIndexRight];
 
 	// assert children are of right type (scalar)
 	GPOS_ASSERT(EdxloptypeScalar ==

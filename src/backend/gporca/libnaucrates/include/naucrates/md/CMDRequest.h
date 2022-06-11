@@ -86,8 +86,8 @@ public:
 	CMDRequest(const CMDRequest &) = delete;
 
 	// ctor
-	CMDRequest(CMemoryPool *mp, IMdIdArray *mdid_array,
-			   SMDTypeRequestArray *mdtype_request_array);
+	CMDRequest(CMemoryPool *mp, gpos::owner<IMdIdArray *> mdid_array,
+			   gpos::owner<SMDTypeRequestArray *> mdtype_request_array);
 
 	// ctor: type request only
 	CMDRequest(CMemoryPool *mp, SMDTypeRequest *md_type_request);

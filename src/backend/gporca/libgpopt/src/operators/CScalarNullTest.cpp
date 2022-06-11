@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarNullTest.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -32,7 +33,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarNullTest::Matches(COperator *pop) const
+CScalarNullTest::Matches(gpos::pointer<COperator *> pop) const
 {
 	return pop->Eopid() == Eopid();
 }
@@ -46,7 +47,7 @@ CScalarNullTest::Matches(COperator *pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarNullTest::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -64,7 +65,7 @@ CScalarNullTest::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarNullTest::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarNullTest::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 	GPOS_ASSERT(1 == pdrgpulChildren->Size());

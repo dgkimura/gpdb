@@ -49,7 +49,7 @@ protected:
 	~CJobGroup() override = default;
 
 	// initialize job
-	void Init(CGroup *pgroup);
+	void Init(gpos::pointer<CGroup *> pgroup);
 
 	// get first unscheduled logical expression
 	virtual CGroupExpression *PgexprFirstUnschedLogical();

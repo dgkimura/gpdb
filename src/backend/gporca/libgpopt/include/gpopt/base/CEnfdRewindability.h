@@ -59,7 +59,8 @@ public:
 	CEnfdRewindability(const CEnfdRewindability &) = delete;
 
 	// ctor
-	CEnfdRewindability(CRewindabilitySpec *prs, ERewindabilityMatching erm);
+	CEnfdRewindability(gpos::owner<CRewindabilitySpec *> prs,
+					   ERewindabilityMatching erm);
 
 	// dtor
 	~CEnfdRewindability() override;
@@ -69,7 +70,7 @@ public:
 
 	// check if the given rewindability specification is compatible with the
 	// rewindability specification of this object for the specified matching type
-	BOOL FCompatible(CRewindabilitySpec *pos) const;
+	BOOL FCompatible(gpos::pointer<CRewindabilitySpec *> pos) const;
 
 	// required rewindability accessor
 	gpos::pointer<CRewindabilitySpec *>
@@ -79,7 +80,8 @@ public:
 	}
 
 	// get rewindability enforcing type for the given operator
-	EPropEnforcingType Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+	EPropEnforcingType Epet(CExpressionHandle &exprhdl,
+							gpos::pointer<CPhysical *> popPhysical,
 							BOOL fRewindabilityReqd) const;
 
 	// property spec accessor
@@ -98,7 +100,7 @@ public:
 
 	// matching function
 	BOOL
-	Matches(CEnfdRewindability *per)
+	Matches(gpos::pointer<CEnfdRewindability *> per)
 	{
 		GPOS_ASSERT(nullptr != per);
 

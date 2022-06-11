@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarPartBound.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarPartBound.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -63,16 +65,18 @@ CParseHandlerScalarPartBound::StartElement(
 	ULONG partition_level = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenPartLevel,
 		EdxltokenScalarPartBound);
-	IMDId *m_mdid_type = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMDType,
-		EdxltokenScalarPartBound);
+	gpos::owner<IMDId *> m_mdid_type =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMDType,
+			EdxltokenScalarPartBound);
 	BOOL is_lower_bound = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 		EdxltokenScalarPartBoundLower, EdxltokenScalarPartBound);
 
-	m_dxl_node = GPOS_NEW(m_mp)
-		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarPartBound(
-						   m_mp, partition_level, m_mdid_type, is_lower_bound));
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(
+		m_mp,
+		GPOS_NEW(m_mp) CDXLScalarPartBound(
+			m_mp, partition_level, std::move(m_mdid_type), is_lower_bound));
 }
 
 //---------------------------------------------------------------------------

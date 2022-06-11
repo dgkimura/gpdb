@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLWindowFrame.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -31,12 +33,12 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLWindowFrame::CDXLWindowFrame(EdxlFrameSpec edxlfs,
 								 EdxlFrameExclusionStrategy frame_exc_strategy,
-								 CDXLNode *dxlnode_leading,
-								 CDXLNode *dxlnode_trailing)
+								 gpos::owner<CDXLNode *> dxlnode_leading,
+								 gpos::owner<CDXLNode *> dxlnode_trailing)
 	: m_dxl_win_frame_spec(edxlfs),
 	  m_dxl_frame_exclusion_strategy(frame_exc_strategy),
-	  m_dxlnode_leading(dxlnode_leading),
-	  m_dxlnode_trailing(dxlnode_trailing)
+	  m_dxlnode_leading(std::move(dxlnode_leading)),
+	  m_dxlnode_trailing(std::move(dxlnode_trailing))
 {
 	GPOS_ASSERT(EdxlfsSentinel > m_dxl_win_frame_spec);
 	GPOS_ASSERT(EdxlfesSentinel > m_dxl_frame_exclusion_strategy);

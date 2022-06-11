@@ -71,8 +71,8 @@ CXformDynamicIndexGet2DynamicIndexScan::Transform(
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDynamicIndexGet *popIndexGet =
-		CLogicalDynamicIndexGet::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalDynamicIndexGet *> popIndexGet =
+		gpos::dyn_cast<CLogicalDynamicIndexGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
@@ -107,13 +107,14 @@ CXformDynamicIndexGet2DynamicIndexScan::Transform(
 	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CPhysicalDynamicIndexScan(
-						mp, pindexdesc, ptabdesc, pexpr->Pop()->UlOpId(), pname,
-						pdrgpcrOutput, popIndexGet->ScanId(), pdrgpdrgpcrPart,
-						pos, popIndexGet->GetPartitionMdids(),
+						mp, std::move(pindexdesc), std::move(ptabdesc),
+						pexpr->Pop()->UlOpId(), pname, pdrgpcrOutput,
+						popIndexGet->ScanId(), std::move(pdrgpdrgpcrPart),
+						std::move(pos), popIndexGet->GetPartitionMdids(),
 						popIndexGet->GetRootColMappingPerPart()),
-					pexprIndexCond);
+					std::move(pexprIndexCond));
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 

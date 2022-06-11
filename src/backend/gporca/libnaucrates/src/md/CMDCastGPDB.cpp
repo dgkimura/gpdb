@@ -30,17 +30,19 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDCastGPDB::CMDCastGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-						 IMDId *mdid_src, IMDId *mdid_dest,
-						 BOOL is_binary_coercible, IMDId *mdid_cast_func,
+CMDCastGPDB::CMDCastGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+						 CMDName *mdname, gpos::owner<IMDId *> mdid_src,
+						 gpos::owner<IMDId *> mdid_dest,
+						 BOOL is_binary_coercible,
+						 gpos::owner<IMDId *> mdid_cast_func,
 						 EmdCoercepathType path_type)
 	: m_mp(mp),
-	  m_mdid(mdid),
+	  m_mdid(std::move(mdid)),
 	  m_mdname(mdname),
-	  m_mdid_src(mdid_src),
-	  m_mdid_dest(mdid_dest),
+	  m_mdid_src(std::move(mdid_src)),
+	  m_mdid_dest(std::move(mdid_dest)),
 	  m_is_binary_coercible(is_binary_coercible),
-	  m_mdid_cast_func(mdid_cast_func),
+	  m_mdid_cast_func(std::move(mdid_cast_func)),
 	  m_path_type(path_type)
 {
 	GPOS_ASSERT(m_mdid->IsValid());

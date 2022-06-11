@@ -29,8 +29,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSwitch::CDXLScalarSwitch(CMemoryPool *mp, IMDId *mdid_type)
-	: CDXLScalar(mp), m_mdid_type(mdid_type)
+CDXLScalarSwitch::CDXLScalarSwitch(CMemoryPool *mp,
+								   gpos::owner<IMDId *> mdid_type)
+	: CDXLScalar(mp), m_mdid_type(std::move(mdid_type))
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
 }
@@ -146,7 +147,7 @@ CDXLScalarSwitch::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

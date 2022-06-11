@@ -50,8 +50,9 @@ public:
 	CDXLLogicalTVF(const CDXLLogicalTVF &) = delete;
 
 	// ctor/dtor
-	CDXLLogicalTVF(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				   CMDName *mdname, CDXLColDescrArray *pdrgdxlcd);
+	CDXLLogicalTVF(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+				   gpos::owner<IMDId *> mdid_return_type, CMDName *mdname,
+				   gpos::owner<CDXLColDescrArray *> pdrgdxlcd);
 
 	~CDXLLogicalTVF() override;
 

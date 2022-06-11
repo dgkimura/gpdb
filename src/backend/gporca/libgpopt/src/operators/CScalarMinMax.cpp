@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarMinMax.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -31,10 +32,10 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarMinMax::CScalarMinMax(CMemoryPool *mp, IMDId *mdid_type,
+CScalarMinMax::CScalarMinMax(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
 							 EScalarMinMaxType esmmt)
 	: CScalar(mp),
-	  m_mdid_type(mdid_type),
+	  m_mdid_type(std::move(mdid_type)),
 	  m_esmmt(esmmt),
 	  m_fBoolReturnType(false)
 {
@@ -87,14 +88,15 @@ CScalarMinMax::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarMinMax::Matches(COperator *pop) const
+CScalarMinMax::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CScalarMinMax *popScMinMax = CScalarMinMax::PopConvert(pop);
+	gpos::pointer<CScalarMinMax *> popScMinMax =
+		gpos::dyn_cast<CScalarMinMax>(pop);
 
 	// match if return types are identical
 	return popScMinMax->Esmmt() == m_esmmt &&

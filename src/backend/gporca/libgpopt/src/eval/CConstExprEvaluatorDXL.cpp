@@ -69,8 +69,8 @@ CConstExprEvaluatorDXL::~CConstExprEvaluatorDXL() = default;
 //		Caller takes ownership of returned expression
 //
 //---------------------------------------------------------------------------
-CExpression *
-CConstExprEvaluatorDXL::PexprEval(CExpression *pexpr)
+gpos::owner<CExpression *>
+CConstExprEvaluatorDXL::PexprEval(gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -85,7 +85,7 @@ CConstExprEvaluatorDXL::PexprEval(CExpression *pexpr)
 	GPOS_ASSERT(EdxloptypeScalar ==
 				pdxlnResult->GetOperator()->GetDXLOperatorType());
 
-	CExpression *pexprResult = m_trdxl2expr.PexprTranslateScalar(
+	gpos::owner<CExpression *> pexprResult = m_trdxl2expr.PexprTranslateScalar(
 		pdxlnResult, nullptr /*colref_array*/);
 	pdxlnResult->Release();
 	pdxlnExpr->Release();

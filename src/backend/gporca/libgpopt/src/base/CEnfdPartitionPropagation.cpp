@@ -12,6 +12,7 @@
 #include "gpopt/base/CEnfdPartitionPropagation.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CReqdPropPlan.h"
 #include "gpopt/base/CUtils.h"
@@ -29,8 +30,9 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CEnfdPartitionPropagation::CEnfdPartitionPropagation(
-	CPartitionPropagationSpec *ppps, EPartitionPropagationMatching eppm)
-	: m_ppps(ppps), m_eppm(eppm)
+	gpos::owner<CPartitionPropagationSpec *> ppps,
+	EPartitionPropagationMatching eppm)
+	: m_ppps(std::move(ppps)), m_eppm(eppm)
 
 {
 	GPOS_ASSERT(nullptr != m_ppps);
@@ -77,7 +79,7 @@ CEnfdPartitionPropagation::HashValue() const
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CEnfdPartitionPropagation::Epet(CExpressionHandle &exprhdl,
-								CPhysical *popPhysical,
+								gpos::pointer<CPhysical *> popPhysical,
 								BOOL fPropagationReqd) const
 {
 	if (fPropagationReqd)
@@ -124,7 +126,8 @@ CEnfdPartitionPropagation::SzPropagationMatching(
 }
 
 BOOL
-CEnfdPartitionPropagation::Matches(CEnfdPartitionPropagation *pepp)
+CEnfdPartitionPropagation::Matches(
+	gpos::pointer<CEnfdPartitionPropagation *> pepp)
 {
 	GPOS_ASSERT(nullptr != pepp);
 
@@ -133,7 +136,7 @@ CEnfdPartitionPropagation::Matches(CEnfdPartitionPropagation *pepp)
 
 BOOL
 CEnfdPartitionPropagation::FCompatible(
-	CPartitionPropagationSpec *pps_drvd) const
+	gpos::pointer<CPartitionPropagationSpec *> pps_drvd) const
 {
 	GPOS_ASSERT(nullptr != pps_drvd);
 

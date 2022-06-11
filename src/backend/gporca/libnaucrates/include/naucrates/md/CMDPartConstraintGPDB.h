@@ -61,9 +61,10 @@ private:
 
 public:
 	// ctor
-	CMDPartConstraintGPDB(CMemoryPool *mp,
-						  ULongPtrArray *level_with_default_part_array,
-						  BOOL is_unbounded, CDXLNode *dxlnode);
+	CMDPartConstraintGPDB(
+		CMemoryPool *mp,
+		gpos::owner<ULongPtrArray *> level_with_default_part_array,
+		BOOL is_unbounded, gpos::owner<CDXLNode *> dxlnode);
 
 	// dtor
 	~CMDPartConstraintGPDB() override;
@@ -72,9 +73,9 @@ public:
 	void Serialize(CXMLSerializer *xml_serializer) const override;
 
 	// the scalar expression of the part constraint
-	CExpression *GetPartConstraintExpr(
+	gpos::owner<CExpression *> GetPartConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CColRefArray *colref_array) const override;
+		gpos::pointer<CColRefArray *> colref_array) const override;
 
 	// included default partitions
 	gpos::pointer<ULongPtrArray *> GetDefaultPartsArray() const override;

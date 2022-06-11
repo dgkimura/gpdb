@@ -46,7 +46,7 @@ protected:
 	CMemoryPool *m_mp;
 
 	// copy function
-	virtual CDrvdPropCtxt *PdpctxtCopy(CMemoryPool *mp) const = 0;
+	virtual gpos::owner<CDrvdPropCtxt *> PdpctxtCopy(CMemoryPool *mp) const = 0;
 
 	// add props to context
 	virtual void AddProps(gpos::pointer<CDrvdProp *> pdp) = 0;
@@ -88,8 +88,8 @@ public:
 #endif	// GPOS_DEBUG
 
 	// copy function
-	static CDrvdPropCtxt *
-	PdpctxtCopy(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt)
+	static gpos::owner<CDrvdPropCtxt *>
+	PdpctxtCopy(CMemoryPool *mp, gpos::pointer<CDrvdPropCtxt *> pdpctxt)
 	{
 		if (nullptr == pdpctxt)
 		{
@@ -101,7 +101,8 @@ public:
 
 	// add derived props to context
 	static void
-	AddDerivedProps(CDrvdProp *pdp, CDrvdPropCtxt *pdpctxt)
+	AddDerivedProps(gpos::pointer<CDrvdProp *> pdp,
+					gpos::pointer<CDrvdPropCtxt *> pdpctxt)
 	{
 		if (nullptr != pdpctxt)
 		{

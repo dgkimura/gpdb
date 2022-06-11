@@ -48,10 +48,11 @@ private:
 public:
 	CDXLScalarArrayCoerceExpr(const CDXLScalarArrayCoerceExpr &) = delete;
 
-	CDXLScalarArrayCoerceExpr(CMemoryPool *mp, IMDId *coerce_func_mdid,
-							  IMDId *result_type_mdid, INT type_modifier,
-							  BOOL is_explicit, EdxlCoercionForm coerce_format,
-							  INT location);
+	CDXLScalarArrayCoerceExpr(CMemoryPool *mp,
+							  gpos::owner<IMDId *> coerce_func_mdid,
+							  gpos::owner<IMDId *> result_type_mdid,
+							  INT type_modifier, BOOL is_explicit,
+							  EdxlCoercionForm coerce_format, INT location);
 
 	~CDXLScalarArrayCoerceExpr() override
 	{

@@ -139,15 +139,15 @@ CDistributionSpecRandom::FSatisfies(
 //
 //---------------------------------------------------------------------------
 void
-CDistributionSpecRandom::AppendEnforcers(CMemoryPool *mp,
-										 CExpressionHandle &exprhdl,
-										 gpos::pointer<CReqdPropPlan *>
+CDistributionSpecRandom::AppendEnforcers(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CReqdPropPlan *>
 #ifdef GPOS_DEBUG
-											 prpp
+		prpp
 #endif	// GPOS_DEBUG
-										 ,
-										 CExpressionArray *pdrgpexpr,
-										 CExpression *pexpr)
+	,
+	gpos::pointer<CExpressionArray *> pdrgpexpr,
+	gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);
@@ -191,8 +191,8 @@ CDistributionSpecRandom::AppendEnforcers(CMemoryPool *mp,
 	//         ->  Result  (cost=0.00..0.00 rows=1 width=1)  (#2)  ==> Motion converted to Result Node
 	//            ->  Values Scan on "Values"  (cost=0.00..0.00 rows=2 width=4) ==> Derives universal spec
 
-	CDistributionSpec *expr_dist_spec =
-		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
+	gpos::pointer<CDistributionSpec *> expr_dist_spec =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pds();
 	gpos::owner<CDistributionSpecRandom *> random_dist_spec = nullptr;
 
 	if (CUtils::FDuplicateHazardDistributionSpec(expr_dist_spec))
@@ -213,8 +213,9 @@ CDistributionSpecRandom::AppendEnforcers(CMemoryPool *mp,
 	// add a distribution enforcer
 	pexpr->AddRef();
 	gpos::owner<CExpression *> pexprMotion = GPOS_NEW(mp) CExpression(
-		mp, GPOS_NEW(mp) CPhysicalMotionRandom(mp, random_dist_spec), pexpr);
-	pdrgpexpr->Append(pexprMotion);
+		mp, GPOS_NEW(mp) CPhysicalMotionRandom(mp, std::move(random_dist_spec)),
+		pexpr);
+	pdrgpexpr->Append(std::move(pexprMotion));
 }
 
 

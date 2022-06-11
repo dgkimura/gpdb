@@ -12,6 +12,7 @@
 #define GPOPT_CXformImplementTVF_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformImplementation.h"
 
@@ -37,7 +38,7 @@ public:
 	explicit CXformImplementTVF(CMemoryPool *mp);
 
 	// ctor
-	explicit CXformImplementTVF(CExpression *pexprPattern);
+	explicit CXformImplementTVF(gpos::owner<CExpression *> pexprPattern);
 
 	// dtor
 	~CXformImplementTVF() override = default;
@@ -60,8 +61,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::pointer<CXformContext *> pxfctxt,
+				   gpos::pointer<CXformResult *> pxfres,
+				   gpos::pointer<CExpression *> pexpr) const override;
 
 };	// class CXformImplementTVF
 

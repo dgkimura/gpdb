@@ -88,11 +88,11 @@ private:
 public:
 	// ctor: single CTE
 	CCTEListEntry(CMemoryPool *mp, ULONG query_level, CommonTableExpr *cte,
-				  CDXLNode *cte_producer);
+				  gpos::pointer<CDXLNode *> cte_producer);
 
 	// ctor: multiple CTEs
 	CCTEListEntry(CMemoryPool *mp, ULONG query_level, List *cte_list,
-				  CDXLNodeArray *dxlnodes);
+				  gpos::pointer<CDXLNodeArray *> dxlnodes);
 
 	// dtor
 	~CCTEListEntry() override

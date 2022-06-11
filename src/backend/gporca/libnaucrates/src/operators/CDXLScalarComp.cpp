@@ -29,10 +29,10 @@ using namespace gpdxl;
 //		Constructs a scalar comparison node
 //
 //---------------------------------------------------------------------------
-CDXLScalarComp::CDXLScalarComp(CMemoryPool *mp, IMDId *mdid_op,
+CDXLScalarComp::CDXLScalarComp(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
 							   const CWStringConst *comparison_operator_name)
 	: CDXLScalar(mp),
-	  m_mdid(mdid_op),
+	  m_mdid(std::move(mdid_op)),
 	  m_comparison_operator_name(comparison_operator_name)
 {
 	GPOS_ASSERT(m_mdid->IsValid());
@@ -159,7 +159,7 @@ CDXLScalarComp::AssertValid(gpos::pointer<const CDXLNode *> node,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *child_dxlnode = (*node)[ul];
+		gpos::pointer<CDXLNode *> child_dxlnode = (*node)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 						child_dxlnode->GetOperator()->GetDXLOperatorType() ||
 					EdxloptypeLogical ==

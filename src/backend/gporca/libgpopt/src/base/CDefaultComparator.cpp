@@ -43,7 +43,8 @@ using gpnaucrates::IDatum;
 //		Does not take ownership of the constant expression evaluator
 //
 //---------------------------------------------------------------------------
-CDefaultComparator::CDefaultComparator(IConstExprEvaluator *pceeval)
+CDefaultComparator::CDefaultComparator(
+	gpos::pointer<IConstExprEvaluator *> pceeval)
 	: m_pceeval(pceeval)
 {
 	GPOS_ASSERT(nullptr != pceeval);
@@ -66,22 +67,23 @@ CDefaultComparator::FEvalComparison(CMemoryPool *mp,
 {
 	GPOS_ASSERT(m_pceeval->FCanEvalExpressions());
 
-	IDatum *pdatum1Copy = datum1->MakeCopy(mp);
+	gpos::owner<IDatum *> pdatum1Copy = datum1->MakeCopy(mp);
 	gpos::owner<CExpression *> pexpr1 = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, pdatum1Copy));
-	IDatum *pdatum2Copy = datum2->MakeCopy(mp);
+	gpos::owner<IDatum *> pdatum2Copy = datum2->MakeCopy(mp);
 	gpos::owner<CExpression *> pexpr2 = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, pdatum2Copy));
-	gpos::owner<CExpression *> pexprComp =
-		CUtils::PexprScalarCmp(mp, pexpr1, pexpr2, cmp_type);
+	gpos::owner<CExpression *> pexprComp = CUtils::PexprScalarCmp(
+		mp, std::move(pexpr1), std::move(pexpr2), cmp_type);
 
 	gpos::owner<CExpression *> pexprResult = m_pceeval->PexprEval(pexprComp);
 	pexprComp->Release();
-	CScalarConst *popScalarConst = CScalarConst::PopConvert(pexprResult->Pop());
-	IDatum *datum = popScalarConst->GetDatum();
+	gpos::pointer<CScalarConst *> popScalarConst =
+		gpos::dyn_cast<CScalarConst>(pexprResult->Pop());
+	gpos::pointer<IDatum *> datum = popScalarConst->GetDatum();
 
 	GPOS_ASSERT(IMDType::EtiBool == datum->GetDatumType());
-	IDatumBool *pdatumBool = dynamic_cast<IDatumBool *>(datum);
+	gpos::pointer<IDatumBool *> pdatumBool = dynamic_cast<IDatumBool *>(datum);
 	BOOL result = pdatumBool->GetValue();
 	pexprResult->Release();
 
@@ -93,8 +95,8 @@ CDefaultComparator::FUseInternalEvaluator(gpos::pointer<const IDatum *> datum1,
 										  gpos::pointer<const IDatum *> datum2,
 										  BOOL *can_use_external_evaluator)
 {
-	IMDId *mdid1 = datum1->MDId();
-	IMDId *mdid2 = datum2->MDId();
+	gpos::pointer<IMDId *> mdid1 = datum1->MDId();
+	gpos::pointer<IMDId *> mdid2 = datum2->MDId();
 
 	// be conservative for now and require this extra condition that
 	// has been in place for a while (might be relaxed in the future)

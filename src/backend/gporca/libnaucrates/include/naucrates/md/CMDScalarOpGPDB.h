@@ -88,14 +88,18 @@ public:
 	CMDScalarOpGPDB(const CMDScalarOpGPDB &) = delete;
 
 	// ctor/dtor
-	CMDScalarOpGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-					IMDId *mdid_type_left, IMDId *mdid_type_right,
-					IMDId *result_type_mdid, IMDId *mdid_func,
-					IMDId *mdid_commute_opr, IMDId *m_mdid_inverse_opr,
+	CMDScalarOpGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+					gpos::owner<IMDId *> mdid_type_left,
+					gpos::owner<IMDId *> mdid_type_right,
+					gpos::owner<IMDId *> result_type_mdid,
+					gpos::owner<IMDId *> mdid_func,
+					gpos::owner<IMDId *> mdid_commute_opr,
+					gpos::owner<IMDId *> m_mdid_inverse_opr,
 					IMDType::ECmpType cmp_type, BOOL returns_null_on_null_input,
-					IMdIdArray *mdid_opfamilies_array,
-					IMDId *m_mdid_hash_opfamily,
-					IMDId *mdid_legacy_hash_opfamily, BOOL is_ndv_preserving);
+					gpos::owner<IMdIdArray *> mdid_opfamilies_array,
+					gpos::owner<IMDId *> m_mdid_hash_opfamily,
+					gpos::owner<IMDId *> mdid_legacy_hash_opfamily,
+					BOOL is_ndv_preserving);
 
 	~CMDScalarOpGPDB() override;
 

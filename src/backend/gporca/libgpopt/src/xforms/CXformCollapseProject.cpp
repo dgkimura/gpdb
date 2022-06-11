@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformCollapseProject.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalProject.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -73,8 +74,9 @@ CXformCollapseProject::Exfp(CExpressionHandle &	 //exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformCollapseProject::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformCollapseProject::Transform(gpos::pointer<CXformContext *> pxfctxt,
+								 gpos::pointer<CXformResult *> pxfres,
+								 gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -82,11 +84,12 @@ CXformCollapseProject::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	CExpression *pexprCollapsed = CUtils::PexprCollapseProjects(mp, pexpr);
+	gpos::owner<CExpression *> pexprCollapsed =
+		CUtils::PexprCollapseProjects(mp, pexpr);
 
 	if (nullptr != pexprCollapsed)
 	{
-		pxfres->Add(pexprCollapsed);
+		pxfres->Add(std::move(pexprCollapsed));
 	}
 }
 

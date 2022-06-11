@@ -98,7 +98,7 @@ public:
 	void AddMissingStatsColumn(CMDIdColStats *pmdidCol);
 
 	// collect the missing statistics columns
-	void CollectMissingStatsColumns(IMdIdArray *pdrgmdid);
+	void CollectMissingStatsColumns(gpos::pointer<IMdIdArray *> pdrgmdid);
 
 	// generate default optimizer configurations
 	static gpos::owner<CStatisticsConfig *>

@@ -15,6 +15,7 @@
 #define GPMD_IMDColumn_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/md/IMDId.h"
@@ -41,7 +42,7 @@ public:
 	virtual CMDName Mdname() const = 0;
 
 	// id of attribute type
-	virtual IMDId *MdidType() const = 0;
+	virtual gpos::pointer<IMDId *> MdidType() const = 0;
 
 	virtual INT TypeModifier() const = 0;
 

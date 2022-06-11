@@ -67,7 +67,7 @@ public:
 	virtual ULONG HashValue() const = 0;
 
 	// extract columns used by the property
-	virtual CColRefSet *PcrsUsed(CMemoryPool *mp) const = 0;
+	virtual gpos::owner<CColRefSet *> PcrsUsed(CMemoryPool *mp) const = 0;
 
 	// property type
 	virtual EPropSpecType Epst() const = 0;

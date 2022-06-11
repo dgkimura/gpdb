@@ -36,16 +36,17 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalDynamicIndexScan::CPhysicalDynamicIndexScan(
-	CMemoryPool *mp, CIndexDescriptor *pindexdesc, CTableDescriptor *ptabdesc,
-	ULONG ulOriginOpId, const CName *pnameAlias, CColRefArray *pdrgpcrOutput,
-	ULONG scan_id, CColRef2dArray *pdrgpdrgpcrPart, COrderSpec *pos,
-	IMdIdArray *partition_mdids,
-	ColRefToUlongMapArray *root_col_mapping_per_part)
+	CMemoryPool *mp, gpos::owner<CIndexDescriptor *> pindexdesc,
+	gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId,
+	const CName *pnameAlias, CColRefArray *pdrgpcrOutput, ULONG scan_id,
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
+	gpos::owner<COrderSpec *> pos, gpos::owner<IMdIdArray *> partition_mdids,
+	gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part)
 	: CPhysicalDynamicScan(mp, ptabdesc, ulOriginOpId, pnameAlias, scan_id,
 						   pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids,
 						   root_col_mapping_per_part),
-	  m_pindexdesc(pindexdesc),
-	  m_pos(pos)
+	  m_pindexdesc(std::move(pindexdesc)),
+	  m_pos(std::move(pos))
 {
 	GPOS_ASSERT(nullptr != m_pindexdesc);
 	GPOS_ASSERT(nullptr != m_pos);
@@ -118,7 +119,7 @@ CPhysicalDynamicIndexScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDynamicIndexScan::Matches(COperator *pop) const
+CPhysicalDynamicIndexScan::Matches(gpos::pointer<COperator *> pop) const
 {
 	return CUtils::FMatchDynamicIndex(this, pop);
 }
@@ -165,10 +166,10 @@ CPhysicalDynamicIndexScan::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 IStatistics *
-CPhysicalDynamicIndexScan::PstatsDerive(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										CReqdPropPlan *prpplan,
-										IStatisticsArray *stats_ctxt) const
+CPhysicalDynamicIndexScan::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CReqdPropPlan *> prpplan,
+	gpos::pointer<IStatisticsArray *> stats_ctxt) const
 {
 	GPOS_ASSERT(nullptr != prpplan);
 

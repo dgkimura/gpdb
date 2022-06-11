@@ -60,10 +60,11 @@ public:
 	CIndexDescriptor(const CIndexDescriptor &) = delete;
 
 	// ctor
-	CIndexDescriptor(CMemoryPool *mp, IMDId *pmdidIndex, const CName &name,
-					 CColumnDescriptorArray *pdrgcoldescKeyCols,
-					 CColumnDescriptorArray *pdrgcoldescIncludedCols,
-					 BOOL is_clustered, IMDIndex::EmdindexType emdindt);
+	CIndexDescriptor(
+		CMemoryPool *mp, gpos::owner<IMDId *> pmdidIndex, const CName &name,
+		gpos::owner<CColumnDescriptorArray *> pdrgcoldescKeyCols,
+		gpos::owner<CColumnDescriptorArray *> pdrgcoldescIncludedCols,
+		BOOL is_clustered, IMDIndex::EmdindexType emdindt);
 
 	// dtor
 	~CIndexDescriptor() override;
@@ -118,7 +119,7 @@ public:
 	BOOL SupportsIndexOnlyScan() const;
 
 	// create an index descriptor
-	static CIndexDescriptor *Pindexdesc(
+	static gpos::owner<CIndexDescriptor *> Pindexdesc(
 		CMemoryPool *mp, gpos::pointer<const CTableDescriptor *> ptabdesc,
 		gpos::pointer<const IMDIndex *> pmdindex);
 

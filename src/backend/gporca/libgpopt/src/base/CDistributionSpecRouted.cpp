@@ -87,7 +87,8 @@ CDistributionSpecRouted::FSatisfies(
 //---------------------------------------------------------------------------
 gpos::owner<CDistributionSpec *>
 CDistributionSpecRouted::PdsCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
 	ULONG id = m_pcrSegmentId->Id();
 	CColRef *pcrSegmentId = colref_mapping->Find(&id);
@@ -121,15 +122,16 @@ CDistributionSpecRouted::PdsCopyWithRemappedColumns(
 //
 //---------------------------------------------------------------------------
 void
-CDistributionSpecRouted::AppendEnforcers(CMemoryPool *mp,
-										 CExpressionHandle &,  // exprhdl
-										 gpos::pointer<CReqdPropPlan *>
+CDistributionSpecRouted::AppendEnforcers(
+	CMemoryPool *mp,
+	CExpressionHandle &,  // exprhdl
+	gpos::pointer<CReqdPropPlan *>
 #ifdef GPOS_DEBUG
-											 prpp
+		prpp
 #endif	// GPOS_DEBUG
-										 ,
-										 CExpressionArray *pdrgpexpr,
-										 CExpression *pexpr)
+	,
+	gpos::pointer<CExpressionArray *> pdrgpexpr,
+	gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);
@@ -151,7 +153,7 @@ CDistributionSpecRouted::AppendEnforcers(CMemoryPool *mp,
 	pexpr->AddRef();
 	gpos::owner<CExpression *> pexprMotion = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalMotionRoutedDistribute(mp, this), pexpr);
-	pdrgpexpr->Append(pexprMotion);
+	pdrgpexpr->Append(std::move(pexprMotion));
 }
 
 
@@ -179,7 +181,7 @@ CDistributionSpecRouted::HashValue() const
 //		Extract columns used by the distribution spec
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CDistributionSpecRouted::PcrsUsed(CMemoryPool *mp) const
 {
 	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);

@@ -108,7 +108,7 @@ CDXLScalarSubqueryNotExists::AssertValid(
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[0];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeLogical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

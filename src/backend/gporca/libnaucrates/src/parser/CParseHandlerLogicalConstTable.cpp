@@ -98,10 +98,10 @@ CParseHandlerLogicalConstTable::StartElement(
 		GPOS_ASSERT(nullptr != m_dxl_datum_array);
 
 		// translate the datum and add it to the datum array
-		CDXLDatum *dxl_datum = CDXLOperatorFactory::GetDatumVal(
+		gpos::owner<CDXLDatum *> dxl_datum = CDXLOperatorFactory::GetDatumVal(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenScalarConstValue);
-		m_dxl_datum_array->Append(dxl_datum);
+		m_dxl_datum_array->Append(std::move(dxl_datum));
 	}
 	else
 	{
@@ -143,9 +143,11 @@ CParseHandlerLogicalConstTable::EndElement(
 		dxl_col_descr_array->AddRef();
 
 		gpos::owner<CDXLLogicalConstTable *> lg_const_table_get_dxl_op =
-			GPOS_NEW(m_mp) CDXLLogicalConstTable(m_mp, dxl_col_descr_array,
-												 m_const_tuples_datum_array);
-		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, lg_const_table_get_dxl_op);
+			GPOS_NEW(m_mp)
+				CDXLLogicalConstTable(m_mp, std::move(dxl_col_descr_array),
+									  m_const_tuples_datum_array);
+		m_dxl_node =
+			GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(lg_const_table_get_dxl_op));
 
 #ifdef REFCOUNT_FIXME_ASSERT_AFTER_MOVE
 #ifdef GPOS_DEBUG

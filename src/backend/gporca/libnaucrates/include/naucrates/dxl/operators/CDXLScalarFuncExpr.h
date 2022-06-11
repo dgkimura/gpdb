@@ -49,9 +49,9 @@ public:
 	CDXLScalarFuncExpr(const CDXLScalarFuncExpr &) = delete;
 
 	// ctor
-	CDXLScalarFuncExpr(CMemoryPool *mp, IMDId *mdid_func,
-					   IMDId *mdid_return_type, INT return_type_modifier,
-					   BOOL returns_set);
+	CDXLScalarFuncExpr(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+					   gpos::owner<IMDId *> mdid_return_type,
+					   INT return_type_modifier, BOOL returns_set);
 
 	//dtor
 	~CDXLScalarFuncExpr() override;

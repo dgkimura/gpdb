@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarBooleanTest.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -87,13 +89,14 @@ CParseHandlerScalarBooleanTest::StartElement(
 
 	m_dxl_boolean_test_type = dxl_boolean_test_type;
 	// parse and create scalar BooleanTest
-	CDXLScalarBooleanTest *dxl_op =
-		(CDXLScalarBooleanTest *) CDXLOperatorFactory::MakeDXLBooleanTest(
-			m_parse_handler_mgr->GetDXLMemoryManager(),
-			m_dxl_boolean_test_type);
+	gpos::owner<CDXLScalarBooleanTest *> dxl_op =
+		gpos::cast<CDXLScalarBooleanTest>(
+			CDXLOperatorFactory::MakeDXLBooleanTest(
+				m_parse_handler_mgr->GetDXLMemoryManager(),
+				m_dxl_boolean_test_type));
 
 	// construct node from the created child nodes
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 }
 
 //---------------------------------------------------------------------------

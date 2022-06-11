@@ -64,7 +64,7 @@ CLogicalInnerJoin::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalInnerJoin::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -111,8 +111,8 @@ CLogicalInnerJoin::FFewerConj(CMemoryPool *mp,
 	}
 
 	// third child must be the group for join conditions
-	CGroup *pgroupScalarFst = (*pgexprFst)[2];
-	CGroup *pgroupScalarSnd = (*pgexprSnd)[2];
+	gpos::pointer<CGroup *> pgroupScalarFst = (*pgexprFst)[2];
+	gpos::pointer<CGroup *> pgroupScalarSnd = (*pgexprSnd)[2];
 	GPOS_ASSERT(pgroupScalarFst->FScalar());
 	GPOS_ASSERT(pgroupScalarSnd->FScalar());
 

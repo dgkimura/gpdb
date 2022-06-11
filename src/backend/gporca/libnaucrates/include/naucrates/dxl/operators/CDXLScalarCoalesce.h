@@ -41,7 +41,7 @@ public:
 	CDXLScalarCoalesce(const CDXLScalarCoalesce &) = delete;
 
 	// ctor
-	CDXLScalarCoalesce(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarCoalesce(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type);
 
 	//dtor
 	~CDXLScalarCoalesce() override;

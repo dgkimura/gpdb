@@ -19,6 +19,7 @@
 #define GPMD_CMDProviderRelcache_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringBase.h"
 
 #include "naucrates/md/CSystemId.h"
@@ -59,14 +60,15 @@ public:
 
 	// returns the DXL string of the requested metadata object
 	CWStringBase *GetMDObjDXLStr(CMemoryPool *mp, CMDAccessor *md_accessor,
-								 IMDId *md_id) const override;
+								 gpos::pointer<IMDId *> md_id) const override;
 
 	// return the requested metadata object
-	IMDCacheObject *GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
-							 IMDId *mdid) const override;
+	gpos::owner<IMDCacheObject *> GetMDObj(CMemoryPool *mp,
+										   CMDAccessor *md_accessor,
+										   IMDId *mdid) const override;
 
 	// return the mdid for the requested type
-	IMDId *
+	gpos::owner<IMDId *>
 	MDId(CMemoryPool *mp, CSystemId sysid,
 		 IMDType::ETypeInfo type_info) const override
 	{

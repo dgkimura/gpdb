@@ -46,10 +46,10 @@ CLogicalExternalGet::CLogicalExternalGet(CMemoryPool *mp) : CLogicalGet(mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalExternalGet::CLogicalExternalGet(CMemoryPool *mp,
-										 const CName *pnameAlias,
-										 CTableDescriptor *ptabdesc)
-	: CLogicalGet(mp, pnameAlias, ptabdesc)
+CLogicalExternalGet::CLogicalExternalGet(
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::owner<CTableDescriptor *> ptabdesc)
+	: CLogicalGet(mp, pnameAlias, std::move(ptabdesc))
 {
 }
 
@@ -61,11 +61,11 @@ CLogicalExternalGet::CLogicalExternalGet(CMemoryPool *mp,
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalExternalGet::CLogicalExternalGet(CMemoryPool *mp,
-										 const CName *pnameAlias,
-										 CTableDescriptor *ptabdesc,
-										 CColRefArray *pdrgpcrOutput)
-	: CLogicalGet(mp, pnameAlias, ptabdesc, pdrgpcrOutput)
+CLogicalExternalGet::CLogicalExternalGet(
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::owner<CTableDescriptor *> ptabdesc,
+	gpos::owner<CColRefArray *> pdrgpcrOutput)
+	: CLogicalGet(mp, pnameAlias, std::move(ptabdesc), std::move(pdrgpcrOutput))
 {
 }
 
@@ -78,13 +78,14 @@ CLogicalExternalGet::CLogicalExternalGet(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalExternalGet::Matches(COperator *pop) const
+CLogicalExternalGet::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	CLogicalExternalGet *popGet = CLogicalExternalGet::PopConvert(pop);
+	gpos::pointer<CLogicalExternalGet *> popGet =
+		gpos::dyn_cast<CLogicalExternalGet>(pop);
 
 	return Ptabdesc() == popGet->Ptabdesc() &&
 		   PdrgpcrOutput()->Equals(popGet->PdrgpcrOutput());
@@ -100,9 +101,10 @@ CLogicalExternalGet::Matches(COperator *pop) const
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
 CLogicalExternalGet::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput = nullptr;
+	gpos::owner<CColRefArray *> pdrgpcrOutput = nullptr;
 	if (must_exist)
 	{
 		pdrgpcrOutput =
@@ -118,8 +120,8 @@ CLogicalExternalGet::PopCopyWithRemappedColumns(
 	gpos::owner<CTableDescriptor *> ptabdesc = Ptabdesc();
 	ptabdesc->AddRef();
 
-	return GPOS_NEW(mp)
-		CLogicalExternalGet(mp, pnameAlias, ptabdesc, pdrgpcrOutput);
+	return GPOS_NEW(mp) CLogicalExternalGet(mp, pnameAlias, std::move(ptabdesc),
+											std::move(pdrgpcrOutput));
 }
 
 //---------------------------------------------------------------------------
@@ -130,7 +132,7 @@ CLogicalExternalGet::PopCopyWithRemappedColumns(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalExternalGet::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);

@@ -65,7 +65,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive not nullable output columns
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	DeriveNotNullColumns(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -78,7 +78,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -90,7 +90,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------

@@ -31,8 +31,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarConstValue::CDXLScalarConstValue(CMemoryPool *mp,
-										   CDXLDatum *dxl_datum)
-	: CDXLScalar(mp), m_dxl_datum(dxl_datum)
+										   gpos::owner<CDXLDatum *> dxl_datum)
+	: CDXLScalar(mp), m_dxl_datum(std::move(dxl_datum))
 {
 }
 

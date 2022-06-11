@@ -90,7 +90,7 @@ public:
 	}
 
 	// job factory accessor
-	CJobFactory *
+	gpos::pointer<CJobFactory *>
 	Pjf() const
 	{
 		GPOS_ASSERT(FInit() && "Scheduling context is not initialized");

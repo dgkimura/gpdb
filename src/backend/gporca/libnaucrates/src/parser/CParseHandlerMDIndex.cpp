@@ -210,7 +210,7 @@ CParseHandlerMDIndex::EndElement(const XMLCh *const,  // element_uri,
 		pdxlnPartConstraint->AddRef();
 		m_part_constraint = GPOS_NEW(m_mp) CMDPartConstraintGPDB(
 			m_mp, m_level_with_default_part_array, m_part_constraint_unbounded,
-			pdxlnPartConstraint);
+			std::move(pdxlnPartConstraint));
 		return;
 	}
 
@@ -243,7 +243,7 @@ CParseHandlerMDIndex::EndElement(const XMLCh *const,  // element_uri,
 	m_imd_obj = GPOS_NEW(m_mp) CMDIndexGPDB(
 		m_mp, m_mdid, m_mdname, m_clustered, is_partitioned, m_index_type,
 		m_mdid_item_type, m_index_key_cols_array, m_included_cols_array,
-		mdid_opfamilies_array, m_part_constraint, child_indexes);
+		std::move(mdid_opfamilies_array), m_part_constraint, child_indexes);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

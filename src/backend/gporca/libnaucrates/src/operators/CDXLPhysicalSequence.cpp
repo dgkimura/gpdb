@@ -117,7 +117,7 @@ CDXLPhysicalSequence::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG ul = 1; ul < arity; ul++)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypePhysical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

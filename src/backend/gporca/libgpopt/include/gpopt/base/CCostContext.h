@@ -110,7 +110,7 @@ private:
 	static void BreakCostTiesForJoinPlans(
 		gpos::pointer<const CCostContext *> pccFst,
 		gpos::pointer<const CCostContext *> pccSnd,
-		CONST_COSTCTXT_PTR *ppccPrefered, BOOL *pfTiesResolved);
+		gpos::pointer<CONST_COSTCTXT_PTR> *ppccPrefered, BOOL *pfTiesResolved);
 
 public:
 	CCostContext(const CCostContext &) = delete;
@@ -122,8 +122,8 @@ public:
 	SLink m_link;
 
 	// ctor
-	CCostContext(CMemoryPool *mp, COptimizationContext *poc, ULONG ulOptReq,
-				 CGroupExpression *pgexpr);
+	CCostContext(CMemoryPool *mp, gpos::owner<COptimizationContext *> poc,
+				 ULONG ulOptReq, gpos::owner<CGroupExpression *> pgexpr);
 
 	// dtor
 	~CCostContext() override;
@@ -251,7 +251,8 @@ public:
 	BOOL operator==(const CCostContext &cc) const;
 
 	// compute cost
-	CCost CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren);
+	CCost CostCompute(CMemoryPool *mp,
+					  gpos::pointer<CCostArray *> pdrgpcostChildren);
 
 	// is current context better than the given equivalent context based on cost?
 	BOOL FBetterThan(gpos::pointer<const CCostContext *> pcc) const;

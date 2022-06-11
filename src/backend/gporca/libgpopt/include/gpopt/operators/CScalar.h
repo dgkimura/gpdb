@@ -51,23 +51,25 @@ public:
 
 private:
 	// helper for combining partition consumer arrays of scalar children
-	static CPartInfo *PpartinfoDeriveCombineScalar(CMemoryPool *mp,
-												   CExpressionHandle &exprhdl);
+	static gpos::owner<CPartInfo *> PpartinfoDeriveCombineScalar(
+		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 protected:
 	// perform conjunction of child boolean evaluation results
-	static EBoolEvalResult EberConjunction(ULongPtrArray *pdrgpulChildren);
+	static EBoolEvalResult EberConjunction(
+		gpos::pointer<ULongPtrArray *> pdrgpulChildren);
 
 	// perform disjunction of child boolean evaluation results
-	static EBoolEvalResult EberDisjunction(ULongPtrArray *pdrgpulChildren);
+	static EBoolEvalResult EberDisjunction(
+		gpos::pointer<ULongPtrArray *> pdrgpulChildren);
 
 	// return Null if any child is Null
 	static EBoolEvalResult EberNullOnAnyNullChild(
-		ULongPtrArray *pdrgpulChildren);
+		gpos::pointer<ULongPtrArray *> pdrgpulChildren);
 
 	// return Null if all children are Null
 	static EBoolEvalResult EberNullOnAllNullChildren(
-		ULongPtrArray *pdrgpulChildren);
+		gpos::pointer<ULongPtrArray *> pdrgpulChildren);
 
 public:
 	CScalar(const CScalar &) = delete;
@@ -92,7 +94,7 @@ public:
 	gpos::owner<CDrvdProp *> PdpCreate(CMemoryPool *mp) const override;
 
 	// create required properties container
-	CReqdProp *PrpCreate(CMemoryPool *mp) const override;
+	gpos::owner<CReqdProp *> PrpCreate(CMemoryPool *mp) const override;
 
 	// return locally defined columns
 	virtual gpos::owner<CColRefSet *>
@@ -125,14 +127,14 @@ public:
 	}
 
 	// derive partition consumer info
-	virtual CPartInfo *
+	virtual gpos::owner<CPartInfo *>
 	PpartinfoDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	{
 		return PpartinfoDeriveCombineScalar(mp, exprhdl);
 	}
 
 	// derive function properties
-	virtual CFunctionProp *
+	virtual gpos::owner<CFunctionProp *>
 	DeriveFunctionProperties(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	{
 		return PfpDeriveFromChildren(mp, exprhdl,
@@ -160,8 +162,8 @@ public:
 	}
 
 	// perform boolean evaluation of the given expression tree
-	static EBoolEvalResult EberEvaluate(CMemoryPool *mp,
-										CExpression *pexprScalar);
+	static EBoolEvalResult EberEvaluate(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprScalar);
 
 	// conversion function
 	static gpos::cast_func<CScalar *>
@@ -174,7 +176,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	virtual IMDId *MdidType() const = 0;
+	virtual gpos::pointer<IMDId *> MdidType() const = 0;
 
 	// the type modifier of the scalar expression
 	virtual INT

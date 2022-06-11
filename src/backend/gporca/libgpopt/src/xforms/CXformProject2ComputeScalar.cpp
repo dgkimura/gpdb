@@ -52,9 +52,9 @@ CXformProject2ComputeScalar::CXformProject2ComputeScalar(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformProject2ComputeScalar::Transform(CXformContext *pxfctxt,
-									   CXformResult *pxfres,
-									   CExpression *pexpr) const
+CXformProject2ComputeScalar::Transform(gpos::pointer<CXformContext *> pxfctxt,
+									   gpos::pointer<CXformResult *> pxfres,
+									   gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -76,7 +76,7 @@ CXformProject2ComputeScalar::Transform(CXformContext *pxfctxt,
 								 pexprRelational, pexprScalar);
 
 	// add alternative to results
-	pxfres->Add(pexprComputeScalar);
+	pxfres->Add(std::move(pexprComputeScalar));
 }
 
 

@@ -67,7 +67,7 @@ CXformPushDownLeftOuterJoin::CXformPushDownLeftOuterJoin(CMemoryPool *mp)
 CXform::EXformPromise
 CXformPushDownLeftOuterJoin::Exfp(CExpressionHandle &exprhdl) const
 {
-	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(2);
+	gpos::pointer<CExpression *> pexprScalar = exprhdl.PexprScalarRepChild(2);
 	if (COperator::EopScalarConst == pexprScalar->Pop()->Eopid())
 	{
 		return CXform::ExfpNone;
@@ -101,9 +101,9 @@ CXformPushDownLeftOuterJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformPushDownLeftOuterJoin::Transform(CXformContext *pxfctxt,
-									   CXformResult *pxfres,
-									   CExpression *pexpr) const
+CXformPushDownLeftOuterJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
+									   gpos::pointer<CXformResult *> pxfres,
+									   gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -112,11 +112,12 @@ CXformPushDownLeftOuterJoin::Transform(CXformContext *pxfctxt,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	CExpression *pexprNAryJoin = (*pexpr)[0];
+	gpos::pointer<CExpression *> pexprNAryJoin = (*pexpr)[0];
 	CExpression *pexprLOJInnerChild = (*pexpr)[1];
 	CExpression *pexprLOJScalarChild = (*pexpr)[2];
 
-	CColRefSet *pcrsLOJUsed = pexprLOJScalarChild->DeriveUsedColumns();
+	gpos::pointer<CColRefSet *> pcrsLOJUsed =
+		pexprLOJScalarChild->DeriveUsedColumns();
 	gpos::owner<CExpressionArray *> pdrgpexprLOJChildren =
 		GPOS_NEW(mp) CExpressionArray(mp);
 	gpos::owner<CExpressionArray *> pdrgpexprNAryJoinChildren =
@@ -127,7 +128,8 @@ CXformPushDownLeftOuterJoin::Transform(CXformContext *pxfctxt,
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
 		CExpression *pexprChild = (*pexprNAryJoin)[ul];
-		CColRefSet *pcrsOutput = pexprChild->DeriveOutputColumns();
+		gpos::pointer<CColRefSet *> pcrsOutput =
+			pexprChild->DeriveOutputColumns();
 		pexprChild->AddRef();
 		if (!pcrsOutput->IsDisjoint(pcrsLOJUsed))
 		{
@@ -206,15 +208,16 @@ CXformPushDownLeftOuterJoin::Transform(CXformContext *pxfctxt,
 	}
 
 	// create new NAry join
-	gpos::owner<CExpression *> pexprNAryJoinNew = GPOS_NEW(mp) CExpression(
-		mp, GPOS_NEW(mp) CLogicalNAryJoin(mp), pdrgpexprNAryJoinChildren);
+	gpos::owner<CExpression *> pexprNAryJoinNew =
+		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalNAryJoin(mp),
+								 std::move(pdrgpexprNAryJoinChildren));
 
 	// normalize resulting expression and add it to xform results
-	CExpression *pexprResult =
+	gpos::owner<CExpression *> pexprResult =
 		CNormalizer::PexprNormalize(mp, pexprNAryJoinNew);
 	pexprNAryJoinNew->Release();
 
-	pxfres->Add(pexprResult);
+	pxfres->Add(std::move(pexprResult));
 }
 
 // EOF

@@ -35,12 +35,12 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarArrayCoerceExpr::CDXLScalarArrayCoerceExpr(
-	CMemoryPool *mp, IMDId *coerce_func_mdid, IMDId *result_type_mdid,
-	INT type_modifier, BOOL is_explicit, EdxlCoercionForm coerce_format,
-	INT location)
-	: CDXLScalarCoerceBase(mp, result_type_mdid, type_modifier, coerce_format,
-						   location),
-	  m_coerce_func_mdid(coerce_func_mdid),
+	CMemoryPool *mp, gpos::owner<IMDId *> coerce_func_mdid,
+	gpos::owner<IMDId *> result_type_mdid, INT type_modifier, BOOL is_explicit,
+	EdxlCoercionForm coerce_format, INT location)
+	: CDXLScalarCoerceBase(mp, std::move(result_type_mdid), type_modifier,
+						   coerce_format, location),
+	  m_coerce_func_mdid(std::move(coerce_func_mdid)),
 	  m_explicit(is_explicit)
 {
 	GPOS_ASSERT(nullptr != m_coerce_func_mdid);

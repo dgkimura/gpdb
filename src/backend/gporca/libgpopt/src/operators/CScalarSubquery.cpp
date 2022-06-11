@@ -59,7 +59,7 @@ CScalarSubquery::~CScalarSubquery() = default;
 //		Type of scalar's value
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarSubquery::MdidType() const
 {
 	return m_pcr->RetrieveType()->MDId();
@@ -90,11 +90,12 @@ CScalarSubquery::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSubquery::Matches(COperator *pop) const
+CScalarSubquery::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarSubquery *popScalarSubquery = CScalarSubquery::PopConvert(pop);
+		gpos::pointer<CScalarSubquery *> popScalarSubquery =
+			gpos::dyn_cast<CScalarSubquery>(pop);
 
 		// match if computed columns are identical
 		return popScalarSubquery->Pcr() == m_pcr &&
@@ -116,9 +117,9 @@ CScalarSubquery::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
-CScalarSubquery::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											UlongToColRefMap *colref_mapping,
-											BOOL must_exist)
+CScalarSubquery::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
 	CColRef *colref = CUtils::PcrRemap(m_pcr, colref_mapping, must_exist);
 
@@ -135,7 +136,7 @@ CScalarSubquery::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Locally used columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CScalarSubquery::PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(1 == exprhdl.Arity());
@@ -143,7 +144,7 @@ CScalarSubquery::PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl)
 	// used columns is an empty set unless subquery column is an outer reference
 	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
-	CColRefSet *pcrsChildOutput =
+	gpos::pointer<CColRefSet *> pcrsChildOutput =
 		exprhdl.DeriveOutputColumns(0 /* child_index */);
 	if (!pcrsChildOutput->FMember(m_pcr))
 	{

@@ -143,9 +143,9 @@ CParseHandlerPhysicalAbstractBitmapScan::EndElementHelper(
 
 
 	GPOS_ASSERT(EdxltokenPhysicalBitmapTableScan == token_type);
-	gpos::owner<CDXLPhysical *> dxl_op =
-		GPOS_NEW(m_mp) CDXLPhysicalBitmapTableScan(m_mp, table_descr);
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+	gpos::owner<CDXLPhysical *> dxl_op = GPOS_NEW(m_mp)
+		CDXLPhysicalBitmapTableScan(m_mp, std::move(table_descr));
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 
 	// set statictics and physical properties
 	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);

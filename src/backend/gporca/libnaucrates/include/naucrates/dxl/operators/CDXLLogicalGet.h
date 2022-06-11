@@ -40,7 +40,7 @@ public:
 	CDXLLogicalGet(CDXLLogicalGet &) = delete;
 
 	// ctor
-	CDXLLogicalGet(CMemoryPool *mp, CDXLTableDescr *table_descr);
+	CDXLLogicalGet(CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr);
 
 	// dtor
 	~CDXLLogicalGet() override;

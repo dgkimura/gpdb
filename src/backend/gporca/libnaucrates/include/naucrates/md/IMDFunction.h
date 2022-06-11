@@ -15,6 +15,7 @@
 #define GPMD_IMDFunction_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDCacheObject.h"
 
@@ -79,10 +80,10 @@ public:
 	virtual EFuncDataAcc GetFuncDataAccess() const = 0;
 
 	// result type
-	virtual IMDId *GetResultTypeMdid() const = 0;
+	virtual gpos::pointer<IMDId *> GetResultTypeMdid() const = 0;
 
 	// output argument types
-	virtual IMdIdArray *OutputArgTypesMdidArray() const = 0;
+	virtual gpos::pointer<IMdIdArray *> OutputArgTypesMdidArray() const = 0;
 };
 
 }  // namespace gpmd

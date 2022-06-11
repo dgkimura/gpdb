@@ -30,17 +30,16 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSubPlan::CDXLScalarSubPlan(CMemoryPool *mp,
-									 IMDId *first_col_type_mdid,
-									 CDXLColRefArray *dxl_colref_array,
-									 EdxlSubPlanType dxl_subplan_type,
-									 CDXLNode *dxlnode_test_expr,
-									 BOOL outer_param)
+CDXLScalarSubPlan::CDXLScalarSubPlan(
+	CMemoryPool *mp, gpos::owner<IMDId *> first_col_type_mdid,
+	gpos::owner<CDXLColRefArray *> dxl_colref_array,
+	EdxlSubPlanType dxl_subplan_type, gpos::owner<CDXLNode *> dxlnode_test_expr,
+	BOOL outer_param)
 	: CDXLScalar(mp),
-	  m_first_col_type_mdid(first_col_type_mdid),
-	  m_dxl_colref_array(dxl_colref_array),
+	  m_first_col_type_mdid(std::move(first_col_type_mdid)),
+	  m_dxl_colref_array(std::move(dxl_colref_array)),
 	  m_dxl_subplan_type(dxl_subplan_type),
-	  m_dxlnode_test_expr(dxlnode_test_expr),
+	  m_dxlnode_test_expr(std::move(dxlnode_test_expr)),
 	  m_outer_param(outer_param)
 {
 	GPOS_ASSERT(EdxlSubPlanTypeSentinel > dxl_subplan_type);
@@ -237,7 +236,8 @@ CDXLScalarSubPlan::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	// assert child plan is a physical plan and is valid
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlSubPlanIndexChildPlan];
+	gpos::pointer<CDXLNode *> child_dxlnode =
+		(*dxlnode)[EdxlSubPlanIndexChildPlan];
 	GPOS_ASSERT(nullptr != child_dxlnode);
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());

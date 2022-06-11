@@ -12,6 +12,7 @@
 #define GPOPT_CMiniDumperUtils_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CMiniDumper.h"
 
 #include "gpopt/minidump/CDXLMinidump.h"
@@ -50,22 +51,23 @@ public:
 	// load and execute the minidump in the specified file
 	static CDXLNode *PdxlnExecuteMinidump(
 		CMemoryPool *mp, const CHAR *file_name, ULONG ulSegments,
-		ULONG ulSessionId, ULONG ulCmdId, COptimizerConfig *optimizer_config,
-		IConstExprEvaluator *pceeval = nullptr);
+		ULONG ulSessionId, ULONG ulCmdId,
+		gpos::pointer<COptimizerConfig *> optimizer_config,
+		gpos::pointer<IConstExprEvaluator *> pceeval = nullptr);
 
 	// execute the given minidump
 	static CDXLNode *PdxlnExecuteMinidump(
 		CMemoryPool *mp, CDXLMinidump *pdxlmdp, const CHAR *file_name,
 		ULONG ulSegments, ULONG ulSessionId, ULONG ulCmdId,
-		COptimizerConfig *optimizer_config,
-		IConstExprEvaluator *pceeval = nullptr);
+		gpos::pointer<COptimizerConfig *> optimizer_config,
+		gpos::pointer<IConstExprEvaluator *> pceeval = nullptr);
 
 	// execute the given minidump using the given MD accessor
 	static CDXLNode *PdxlnExecuteMinidump(
 		CMemoryPool *mp, CMDAccessor *md_accessor, CDXLMinidump *pdxlmd,
 		const CHAR *file_name, ULONG ulSegments, ULONG ulSessionId,
-		ULONG ulCmdId, COptimizerConfig *optimizer_config,
-		IConstExprEvaluator *pceeval);
+		ULONG ulCmdId, gpos::pointer<COptimizerConfig *> optimizer_config,
+		gpos::pointer<IConstExprEvaluator *> pceeval);
 
 };	// class CMinidumperUtils
 

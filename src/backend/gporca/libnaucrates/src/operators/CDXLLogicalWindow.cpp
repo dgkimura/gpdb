@@ -36,9 +36,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalWindow::CDXLLogicalWindow(CMemoryPool *mp,
-									 CDXLWindowSpecArray *window_spec_array)
-	: CDXLLogical(mp), m_window_spec_array(window_spec_array)
+CDXLLogicalWindow::CDXLLogicalWindow(
+	CMemoryPool *mp, gpos::owner<CDXLWindowSpecArray *> window_spec_array)
+	: CDXLLogical(mp), m_window_spec_array(std::move(window_spec_array))
 {
 	GPOS_ASSERT(nullptr != m_window_spec_array);
 	GPOS_ASSERT(0 < m_window_spec_array->Size());
@@ -126,7 +126,8 @@ CDXLLogicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer,
 	const ULONG size = m_window_spec_array->Size();
 	for (ULONG idx = 0; idx < size; idx++)
 	{
-		CDXLWindowSpec *window_spec = (*m_window_spec_array)[idx];
+		gpos::pointer<CDXLWindowSpec *> window_spec =
+			(*m_window_spec_array)[idx];
 		window_spec->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -155,8 +156,8 @@ CDXLLogicalWindow::AssertValid(gpos::pointer<const CDXLNode *> node,
 {
 	GPOS_ASSERT(2 == node->Arity());
 
-	CDXLNode *proj_list_dxlnode = (*node)[0];
-	CDXLNode *child_dxlnode = (*node)[1];
+	gpos::pointer<CDXLNode *> proj_list_dxlnode = (*node)[0];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[1];
 
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list_dxlnode->GetOperator()->GetDXLOperator());
@@ -174,7 +175,7 @@ CDXLLogicalWindow::AssertValid(gpos::pointer<const CDXLNode *> node,
 	const ULONG arity = proj_list_dxlnode->Arity();
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *proj_elem = (*proj_list_dxlnode)[idx];
+		gpos::pointer<CDXLNode *> proj_elem = (*proj_list_dxlnode)[idx];
 		GPOS_ASSERT(EdxlopScalarIdent !=
 					proj_elem->GetOperator()->GetDXLOperator());
 	}

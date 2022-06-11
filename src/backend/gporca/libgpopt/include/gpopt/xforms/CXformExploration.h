@@ -35,7 +35,7 @@ public:
 	CXformExploration(const CXformExploration &) = delete;
 
 	// ctor
-	explicit CXformExploration(CExpression *pexpr);
+	explicit CXformExploration(gpos::owner<CExpression *> pexpr);
 
 	// dtor
 	~CXformExploration() override;

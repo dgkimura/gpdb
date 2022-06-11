@@ -15,6 +15,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 
@@ -103,7 +104,7 @@ public:
 
 	// required properties computation function
 	virtual void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdProp *prpInput, ULONG child_index,
+						 gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
 						 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) = 0;
 
 	virtual gpos::IOstream &OsPrint(gpos::IOstream &os) const = 0;

@@ -17,6 +17,8 @@
 
 #include "gpopt/operators/CPhysicalBitmapTableScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CTableDescriptor.h"
@@ -32,11 +34,10 @@ using namespace gpos;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalBitmapTableScan::CPhysicalBitmapTableScan(CMemoryPool *mp,
-												   CTableDescriptor *ptabdesc,
-												   ULONG ulOriginOpId,
-												   const CName *pnameTableAlias,
-												   CColRefArray *pdrgpcrOutput)
+CPhysicalBitmapTableScan::CPhysicalBitmapTableScan(
+	CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
+	ULONG ulOriginOpId, const CName *pnameTableAlias,
+	gpos::owner<CColRefArray *> pdrgpcrOutput)
 	: CPhysicalScan(mp, pnameTableAlias, ptabdesc, pdrgpcrOutput),
 	  m_ulOriginOpId(ulOriginOpId)
 {
@@ -73,7 +74,7 @@ CPhysicalBitmapTableScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalBitmapTableScan::Matches(COperator *pop) const
+CPhysicalBitmapTableScan::Matches(gpos::pointer<COperator *> pop) const
 {
 	return CUtils::FMatchBitmapScan(this, pop);
 }

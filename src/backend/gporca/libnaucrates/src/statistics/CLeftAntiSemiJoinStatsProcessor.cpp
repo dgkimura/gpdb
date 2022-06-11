@@ -22,7 +22,7 @@ using namespace gpmd;
 void
 CLeftAntiSemiJoinStatsProcessor::JoinHistogramsLASJ(
 	const CHistogram *histogram1, const CHistogram *histogram2,
-	CStatsPredJoin *join_stats, CDouble num_rows1,
+	gpos::pointer<CStatsPredJoin *> join_stats, CDouble num_rows1,
 	CDouble,					//num_rows2,
 	CHistogram **result_hist1,	// output: histogram 1 after join
 	CHistogram **result_hist2,	// output: histogram 2 after join
@@ -82,7 +82,8 @@ CStatistics *
 CLeftAntiSemiJoinStatsProcessor::CalcLASJoinStatsStatic(
 	CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats_input,
 	gpos::pointer<const IStatistics *> inner_stats_input,
-	CStatsPredJoinArray *join_preds_stats, BOOL DoIgnoreLASJHistComputation)
+	gpos::pointer<CStatsPredJoinArray *> join_preds_stats,
+	BOOL DoIgnoreLASJHistComputation)
 {
 	GPOS_ASSERT(nullptr != inner_stats_input);
 	GPOS_ASSERT(nullptr != outer_stats_input);

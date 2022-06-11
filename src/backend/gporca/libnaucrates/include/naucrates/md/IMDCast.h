@@ -15,6 +15,7 @@
 #define GPMD_IMDCast_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDCacheObject.h"
 
@@ -52,16 +53,16 @@ public:
 	}
 
 	// source type
-	virtual IMDId *MdidSrc() const = 0;
+	virtual gpos::pointer<IMDId *> MdidSrc() const = 0;
 
 	// destination type
-	virtual IMDId *MdidDest() const = 0;
+	virtual gpos::pointer<IMDId *> MdidDest() const = 0;
 
 	// is the cast between binary coercible types, i.e. the types are binary compatible
 	virtual BOOL IsBinaryCoercible() const = 0;
 
 	// cast function id
-	virtual IMDId *GetCastFuncMdId() const = 0;
+	virtual gpos::pointer<IMDId *> GetCastFuncMdId() const = 0;
 
 	// return the coercion path type
 	virtual EmdCoercepathType GetMDPathType() const = 0;

@@ -57,7 +57,8 @@ public:
 	CDXLScalarSubqueryQuantified(CDXLScalarSubqueryQuantified &) = delete;
 
 	// ctor
-	CDXLScalarSubqueryQuantified(CMemoryPool *mp, IMDId *scalar_op_mdid,
+	CDXLScalarSubqueryQuantified(CMemoryPool *mp,
+								 gpos::owner<IMDId *> scalar_op_mdid,
 								 CMDName *mdname, ULONG colid);
 
 	// dtor

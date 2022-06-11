@@ -45,7 +45,7 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CMappingColIdVarPlStmt::CMappingColIdVarPlStmt(
 	CMemoryPool *mp, const CDXLTranslateContextBaseTable *base_table_context,
-	CDXLTranslationContextArray *child_contexts,
+	gpos::pointer<CDXLTranslationContextArray *> child_contexts,
 	CDXLTranslateContext *output_context,
 	CContextDXLToPlStmt *dxl_to_plstmt_context)
 	: CMappingColIdVar(mp),
@@ -109,7 +109,7 @@ CMappingColIdVarPlStmt::ParamFromDXLNodeScId(
 		param = MakeNode(Param);
 		param->paramkind = PARAM_EXEC;
 		param->paramid = elem->ParamId();
-		param->paramtype = CMDIdGPDB::CastMdid(elem->MdidType())->Oid();
+		param->paramtype = gpos::dyn_cast<CMDIdGPDB>(elem->MdidType())->Oid();
 		param->paramtypmod = elem->TypeModifier();
 		param->paramcollid = gpdb::TypeCollation(param->paramtype);
 	}
@@ -223,10 +223,10 @@ CMappingColIdVarPlStmt::VarFromDXLNodeScId(
 		}
 	}
 
-	Var *var = gpdb::MakeVar(varno, attno,
-							 CMDIdGPDB::CastMdid(dxlop->MdidType())->Oid(),
-							 dxlop->TypeModifier(),
-							 0	// varlevelsup
+	Var *var = gpdb::MakeVar(
+		varno, attno, gpos::dyn_cast<CMDIdGPDB>(dxlop->MdidType())->Oid(),
+		dxlop->TypeModifier(),
+		0  // varlevelsup
 	);
 
 	// set varnoold and varoattno since makeVar does not set them properly

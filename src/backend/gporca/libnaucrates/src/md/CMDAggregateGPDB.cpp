@@ -30,16 +30,16 @@ using namespace gpdxl;
 //		Constructs a metadata aggregate
 //
 //---------------------------------------------------------------------------
-CMDAggregateGPDB::CMDAggregateGPDB(CMemoryPool *mp, IMDId *mdid,
-								   CMDName *mdname, IMDId *result_type_mdid,
-								   IMDId *intermediate_result_type_mdid,
-								   BOOL fOrdered, BOOL is_splittable,
-								   BOOL is_hash_agg_capable)
+CMDAggregateGPDB::CMDAggregateGPDB(
+	CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+	gpos::owner<IMDId *> result_type_mdid,
+	gpos::owner<IMDId *> intermediate_result_type_mdid, BOOL fOrdered,
+	BOOL is_splittable, BOOL is_hash_agg_capable)
 	: m_mp(mp),
-	  m_mdid(mdid),
+	  m_mdid(std::move(mdid)),
 	  m_mdname(mdname),
-	  m_mdid_type_result(result_type_mdid),
-	  m_mdid_type_intermediate(intermediate_result_type_mdid),
+	  m_mdid_type_result(std::move(result_type_mdid)),
+	  m_mdid_type_intermediate(std::move(intermediate_result_type_mdid)),
 	  m_is_ordered(fOrdered),
 	  m_is_splittable(is_splittable),
 	  m_hash_agg_capable(is_hash_agg_capable)

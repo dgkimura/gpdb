@@ -44,10 +44,11 @@ CLogicalApply::CLogicalApply(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalApply::CLogicalApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
+CLogicalApply::CLogicalApply(CMemoryPool *mp,
+							 gpos::owner<CColRefArray *> pdrgpcrInner,
 							 EOperatorId eopidOriginSubq)
 	: CLogical(mp),
-	  m_pdrgpcrInner(pdrgpcrInner),
+	  m_pdrgpcrInner(std::move(pdrgpcrInner)),
 	  m_eopidOriginSubq(eopidOriginSubq)
 {
 	GPOS_ASSERT(nullptr != m_pdrgpcrInner);
@@ -75,9 +76,10 @@ CLogicalApply::~CLogicalApply()
 //		Compute required stat columns of the n-th child
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						CColRefSet *pcrsInput, ULONG child_index) const
+						gpos::pointer<CColRefSet *> pcrsInput,
+						ULONG child_index) const
 {
 	GPOS_ASSERT(3 == exprhdl.Arity());
 
@@ -91,7 +93,7 @@ CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		pcrsUsed->Union(exprhdl.DeriveOuterReferences(1));
 	}
 
-	CColRefSet *pcrsStat =
+	gpos::owner<CColRefSet *> pcrsStat =
 		PcrsReqdChildStats(mp, exprhdl, pcrsInput, pcrsUsed, child_index);
 	pcrsUsed->Release();
 
@@ -107,12 +109,12 @@ CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalApply::Matches(COperator *pop) const
+CLogicalApply::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CColRefArray *pdrgpcrInner =
-			CLogicalApply::PopConvert(pop)->PdrgPcrInner();
+		gpos::pointer<CColRefArray *> pdrgpcrInner =
+			gpos::dyn_cast<CLogicalApply>(pop)->PdrgPcrInner();
 		if (nullptr == m_pdrgpcrInner || nullptr == pdrgpcrInner)
 		{
 			return (nullptr == m_pdrgpcrInner && nullptr == pdrgpcrInner);

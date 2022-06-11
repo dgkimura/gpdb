@@ -46,7 +46,8 @@ class CTreeMapTest
 		CNode(const CNode &) = delete;
 
 		// ctor
-		CNode(CMemoryPool *mp, const ULONG *pulData, CNodeArray *pdrgpnd);
+		CNode(CMemoryPool *mp, const ULONG *pulData,
+			  gpos::owner<CNodeArray *> pdrgpnd);
 
 		// dtor
 		~CNode() override;
@@ -62,7 +63,8 @@ private:
 
 	// factory function for result object
 	static gpos::owner<CNode *> Pnd(CMemoryPool *mp, ULONG *pul,
-									CNodeArray *pdrgpnd, BOOL *fTestTrue);
+									gpos::owner<CNodeArray *> pdrgpnd,
+									BOOL *fTestTrue);
 
 	// shorthand for tests
 	using TestMap =

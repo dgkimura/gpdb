@@ -100,8 +100,8 @@ CDXLLogicalSelect::AssertValid(gpos::pointer<const CDXLNode *> node,
 {
 	GPOS_ASSERT(2 == node->Arity());
 
-	CDXLNode *condition_dxl = (*node)[0];
-	CDXLNode *child_dxlnode = (*node)[1];
+	gpos::pointer<CDXLNode *> condition_dxl = (*node)[0];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[1];
 
 	GPOS_ASSERT(EdxloptypeScalar ==
 				condition_dxl->GetOperator()->GetDXLOperatorType());

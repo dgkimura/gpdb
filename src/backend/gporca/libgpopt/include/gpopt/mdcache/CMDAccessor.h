@@ -141,7 +141,8 @@ private:
 		static const MdidPtr m_pmdidInvalid;
 
 		// ctor
-		SMDAccessorElem(IMDCacheObject *pimdobj, IMDId *mdid);
+		SMDAccessorElem(gpos::owner<IMDCacheObject *> pimdobj,
+						gpos::owner<IMDId *> mdid);
 
 		// dtor
 		~SMDAccessorElem();
@@ -157,7 +158,8 @@ private:
 		gpos::pointer<IMDId *> MDId() const;
 
 		// equality function for hash tables
-		static BOOL Equals(const MdidPtr &left_mdid, const MdidPtr &right_mdid);
+		static BOOL Equals(const MdidPtr &left_mdid,
+						   gpos::pointer<const MdidPtr &> right_mdid);
 
 		// hash function for cost contexts hash table
 		static ULONG HashValue(const MdidPtr &mdid);
@@ -181,7 +183,7 @@ private:
 		static const SMDProviderElem m_mdpelemInvalid;
 
 		// ctor
-		SMDProviderElem(CSystemId sysid, IMDProvider *pmdp);
+		SMDProviderElem(CSystemId sysid, gpos::owner<IMDProvider *> pmdp);
 
 		// dtor
 		~SMDProviderElem();
@@ -252,23 +254,25 @@ private:
 												   ULONG ulPos);
 
 	// record histogram and width information for a given column of a table
-	void RecordColumnStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
-						   ULONG ulPos, BOOL isSystemCol, BOOL isEmptyTable,
-						   UlongToHistogramMap *col_histogram_mapping,
-						   UlongToDoubleMap *colid_width_mapping,
-						   CStatisticsConfig *stats_config);
+	void RecordColumnStats(
+		CMemoryPool *mp, IMDId *rel_mdid, ULONG colid, ULONG ulPos,
+		BOOL isSystemCol, BOOL isEmptyTable,
+		gpos::pointer<UlongToHistogramMap *> col_histogram_mapping,
+		gpos::pointer<UlongToDoubleMap *> colid_width_mapping,
+		gpos::pointer<CStatisticsConfig *> stats_config);
 
 	// construct a stats histogram from an MD column stats object
-	CHistogram *GetHistogram(CMemoryPool *mp, IMDId *mdid_type,
+	CHistogram *GetHistogram(CMemoryPool *mp, gpos::pointer<IMDId *> mdid_type,
 							 gpos::pointer<const IMDColStats *> pmdcolstats);
 
 	// construct a typed bucket from a DXL bucket
-	CBucket *Pbucket(CMemoryPool *mp, IMDId *mdid_type,
+	CBucket *Pbucket(CMemoryPool *mp, gpos::pointer<IMDId *> mdid_type,
 					 gpos::pointer<const CDXLBucket *> dxl_bucket);
 
 	// construct a typed datum from a DXL bucket
-	IDatum *GetDatum(CMemoryPool *mp, IMDId *mdid_type,
-					 gpos::pointer<const CDXLDatum *> dxl_datum);
+	gpos::owner<IDatum *> GetDatum(CMemoryPool *mp,
+								   gpos::pointer<IMDId *> mdid_type,
+								   gpos::pointer<const CDXLDatum *> dxl_datum);
 
 public:
 	CMDAccessor(const CMDAccessor &) = delete;
@@ -276,7 +280,7 @@ public:
 	// ctors
 	CMDAccessor(CMemoryPool *mp, MDCache *pcache);
 	CMDAccessor(CMemoryPool *mp, MDCache *pcache, CSystemId sysid,
-				IMDProvider *pmdp);
+				gpos::owner<IMDProvider *> pmdp);
 	CMDAccessor(CMemoryPool *mp, MDCache *pcache,
 				gpos::pointer<const CSystemIdArray *> pdrgpsysid,
 				gpos::pointer<const CMDProviderArray *> pdrgpmdp);
@@ -292,17 +296,17 @@ public:
 	}
 
 	// register a new MD provider
-	void RegisterProvider(CSystemId sysid, IMDProvider *pmdp);
+	void RegisterProvider(CSystemId sysid, gpos::owner<IMDProvider *> pmdp);
 
 	// register given MD providers
 	void RegisterProviders(gpos::pointer<const CSystemIdArray *> pdrgpsysid,
 						   gpos::pointer<const CMDProviderArray *> pdrgpmdp);
 
 	// interface to a relation object from the MD cache
-	gpos::pointer<const IMDRelation *> RetrieveRel(IMDId *mdid);
+	gpos::pointer<const IMDRelation *> RetrieveRel(gpos::pointer<IMDId *> mdid);
 
 	// interface to type's from the MD cache given the type's mdid
-	gpos::pointer<const IMDType *> RetrieveType(IMDId *mdid);
+	gpos::pointer<const IMDType *> RetrieveType(gpos::pointer<IMDId *> mdid);
 
 	// obtain the specified base type given by the template parameter
 	template <class T>
@@ -325,49 +329,54 @@ public:
 	}
 
 	// interface to a scalar operator from the MD cache
-	gpos::pointer<const IMDScalarOp *> RetrieveScOp(IMDId *mdid);
+	gpos::pointer<const IMDScalarOp *> RetrieveScOp(
+		gpos::pointer<IMDId *> mdid);
 
 	// interface to a function from the MD cache
-	gpos::pointer<const IMDFunction *> RetrieveFunc(IMDId *mdid);
+	gpos::pointer<const IMDFunction *> RetrieveFunc(
+		gpos::pointer<IMDId *> mdid);
 
 	// interface to check if the window function from the MD cache is an aggregate window function
-	BOOL FAggWindowFunc(IMDId *mdid);
+	BOOL FAggWindowFunc(gpos::pointer<IMDId *> mdid);
 
 	// interface to an aggregate from the MD cache
-	gpos::pointer<const IMDAggregate *> RetrieveAgg(IMDId *mdid);
+	gpos::pointer<const IMDAggregate *> RetrieveAgg(
+		gpos::pointer<IMDId *> mdid);
 
 	// interface to a trigger from the MD cache
-	gpos::pointer<const IMDTrigger *> RetrieveTrigger(IMDId *mdid);
+	gpos::pointer<const IMDTrigger *> RetrieveTrigger(
+		gpos::pointer<IMDId *> mdid);
 
 	// interface to an index from the MD cache
-	gpos::pointer<const IMDIndex *> RetrieveIndex(IMDId *mdid);
+	gpos::pointer<const IMDIndex *> RetrieveIndex(gpos::pointer<IMDId *> mdid);
 
 	// interface to a check constraint from the MD cache
 	gpos::pointer<const IMDCheckConstraint *> RetrieveCheckConstraints(
-		IMDId *mdid);
+		gpos::pointer<IMDId *> mdid);
 
 	// retrieve a column stats object from the cache
-	gpos::pointer<const IMDColStats *> Pmdcolstats(IMDId *mdid);
+	gpos::pointer<const IMDColStats *> Pmdcolstats(gpos::pointer<IMDId *> mdid);
 
 	// retrieve a relation stats object from the cache
-	gpos::pointer<const IMDRelStats *> Pmdrelstats(IMDId *mdid);
+	gpos::pointer<const IMDRelStats *> Pmdrelstats(gpos::pointer<IMDId *> mdid);
 
 	// retrieve a cast object from the cache
-	gpos::pointer<const IMDCast *> Pmdcast(IMDId *mdid_src, IMDId *mdid_dest);
+	gpos::pointer<const IMDCast *> Pmdcast(gpos::pointer<IMDId *> mdid_src,
+										   gpos::pointer<IMDId *> mdid_dest);
 
 	// retrieve a scalar comparison object from the cache
-	gpos::pointer<const IMDScCmp *> Pmdsccmp(IMDId *left_mdid,
-											 IMDId *right_mdid,
+	gpos::pointer<const IMDScCmp *> Pmdsccmp(gpos::pointer<IMDId *> left_mdid,
+											 gpos::pointer<IMDId *> right_mdid,
 											 IMDType::ECmpType cmp_type);
 
 	// construct a statistics object for the columns of the given relation
 	gpos::owner<IStatistics *> Pstats(
 		CMemoryPool *mp, IMDId *rel_mdid,
-		CColRefSet
-			*pcrsHist,	// set of column references for which stats are needed
-		CColRefSet *
+		gpos::pointer<CColRefSet *>
+			pcrsHist,  // set of column references for which stats are needed
+		gpos::pointer<CColRefSet *>
 			pcrsWidth,	// set of column references for which the widths are needed
-		CStatisticsConfig *stats_config = nullptr);
+		gpos::pointer<CStatisticsConfig *> stats_config = nullptr);
 
 	// serialize object to passed stream
 	void Serialize(COstream &oos);

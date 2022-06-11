@@ -34,8 +34,8 @@ public:
 
 	// ctor
 	CPhysicalLeftOuterHashJoin(
-		CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-		CExpressionArray *pdrgpexprInnerKeys,
+		CMemoryPool *mp, gpos::owner<CExpressionArray *> pdrgpexprOuterKeys,
+		gpos::owner<CExpressionArray *> pdrgpexprInnerKeys,
 		gpos::owner<IMdIdArray *> hash_opfamilies,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 

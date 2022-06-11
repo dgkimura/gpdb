@@ -29,7 +29,7 @@ using namespace gpopt;
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalLeftAntiSemiApply::DeriveKeyCollection(CMemoryPool *,  // mp
 											   CExpressionHandle &exprhdl) const
 {
@@ -62,7 +62,7 @@ CLogicalLeftAntiSemiApply::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalLeftAntiSemiApply::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -85,13 +85,14 @@ CLogicalLeftAntiSemiApply::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
 CLogicalLeftAntiSemiApply::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrInner =
+	gpos::owner<CColRefArray *> pdrgpcrInner =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
 
-	return GPOS_NEW(mp)
-		CLogicalLeftAntiSemiApply(mp, pdrgpcrInner, m_eopidOriginSubq);
+	return GPOS_NEW(mp) CLogicalLeftAntiSemiApply(mp, std::move(pdrgpcrInner),
+												  m_eopidOriginSubq);
 }
 
 // EOF

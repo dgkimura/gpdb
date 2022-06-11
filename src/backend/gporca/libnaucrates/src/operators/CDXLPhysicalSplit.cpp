@@ -29,15 +29,13 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalSplit::CDXLPhysicalSplit(CMemoryPool *mp,
-									 ULongPtrArray *delete_colid_array,
-									 ULongPtrArray *insert_colid_array,
-									 ULONG action_colid, ULONG ctid_colid,
-									 ULONG segid_colid, BOOL preserve_oids,
-									 ULONG tuple_oid)
+CDXLPhysicalSplit::CDXLPhysicalSplit(
+	CMemoryPool *mp, gpos::owner<ULongPtrArray *> delete_colid_array,
+	gpos::owner<ULongPtrArray *> insert_colid_array, ULONG action_colid,
+	ULONG ctid_colid, ULONG segid_colid, BOOL preserve_oids, ULONG tuple_oid)
 	: CDXLPhysical(mp),
-	  m_deletion_colid_array(delete_colid_array),
-	  m_insert_colid_array(insert_colid_array),
+	  m_deletion_colid_array(std::move(delete_colid_array)),
+	  m_insert_colid_array(std::move(insert_colid_array)),
 	  m_action_colid(action_colid),
 	  m_ctid_colid(ctid_colid),
 	  m_segid_colid(segid_colid),
@@ -161,7 +159,7 @@ CDXLPhysicalSplit::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
-	CDXLNode *child_dxlnode = (*dxlnode)[1];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[1];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

@@ -53,14 +53,15 @@ CScalarSortGroupClause::CScalarSortGroupClause(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSortGroupClause::Matches(COperator *other) const
+CScalarSortGroupClause::Matches(gpos::pointer<COperator *> other) const
 {
 	if (Eopid() != other->Eopid())
 	{
 		return false;
 	}
 
-	CScalarSortGroupClause *op = CScalarSortGroupClause::PopConvert(other);
+	gpos::pointer<CScalarSortGroupClause *> op =
+		gpos::dyn_cast<CScalarSortGroupClause>(other);
 
 	return Index() == op->Index() && EqOp() == op->EqOp() &&
 		   SortOp() == op->SortOp() && NullsFirst() == op->NullsFirst() &&

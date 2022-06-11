@@ -591,7 +591,7 @@ CParseHandlerDXL::ExtractStats(CParseHandlerBase *parse_handler_base)
 		dynamic_cast<CParseHandlerStatistics *>(parse_handler_base);
 	GPOS_ASSERT(nullptr != parse_handler_stats);
 
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+	gpos::pointer<CDXLStatsDerivedRelationArray *> dxl_derived_rel_stats_array =
 		parse_handler_stats->GetStatsDerivedRelDXLArray();
 	GPOS_ASSERT(nullptr != dxl_derived_rel_stats_array);
 

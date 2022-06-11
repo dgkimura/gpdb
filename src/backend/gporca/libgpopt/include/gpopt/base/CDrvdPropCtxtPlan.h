@@ -44,10 +44,10 @@ private:
 
 protected:
 	// copy function
-	CDrvdPropCtxt *PdpctxtCopy(CMemoryPool *mp) const override;
+	gpos::owner<CDrvdPropCtxt *> PdpctxtCopy(CMemoryPool *mp) const override;
 
 	// add props to context
-	void AddProps(CDrvdProp *pdp) override;
+	void AddProps(gpos::pointer<CDrvdProp *> pdp) override;
 
 public:
 	CDrvdPropCtxtPlan(const CDrvdPropCtxtPlan &) = delete;

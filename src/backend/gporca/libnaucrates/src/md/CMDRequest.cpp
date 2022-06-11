@@ -12,6 +12,7 @@
 
 #include "naucrates/md/CMDRequest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -28,11 +29,11 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDRequest::CMDRequest(CMemoryPool *mp, IMdIdArray *mdid_array,
-					   SMDTypeRequestArray *mdtype_request_array)
+CMDRequest::CMDRequest(CMemoryPool *mp, gpos::owner<IMdIdArray *> mdid_array,
+					   gpos::owner<SMDTypeRequestArray *> mdtype_request_array)
 	: m_mp(mp),
-	  m_mdid_array(mdid_array),
-	  m_mdtype_request_array(mdtype_request_array)
+	  m_mdid_array(std::move(mdid_array)),
+	  m_mdtype_request_array(std::move(mdtype_request_array))
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != m_mdid_array);
@@ -108,7 +109,7 @@ CMDRequest::Serialize(CXMLSerializer *xml_serializer)
 	const ULONG ulMdids = m_mdid_array->Size();
 	for (ULONG ul = 0; ul < ulMdids; ul++)
 	{
-		IMDId *mdid = (*m_mdid_array)[ul];
+		gpos::pointer<IMDId *> mdid = (*m_mdid_array)[ul];
 		xml_serializer->OpenElement(
 			CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 			CDXLTokens::GetDXLTokenStr(EdxltokenMdid));

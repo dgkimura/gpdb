@@ -72,7 +72,7 @@ public:
 	}
 
 	// retrieve list of partition types
-	CharPtrArray *
+	gpos::pointer<CharPtrArray *>
 	GetPartitionTypes() const override
 	{
 		GPOS_ASSERT(!"CTAS tables have no partition types");
@@ -111,14 +111,15 @@ public:
 	}
 
 	// part constraint
-	CDXLNode *
+	gpos::pointer<CDXLNode *>
 	MDPartConstraint() const override
 	{
 		return nullptr;
 	}
 
 	// CTAS storage options
-	virtual CDXLCtasStorageOptions *GetDxlCtasStorageOption() const = 0;
+	virtual gpos::pointer<CDXLCtasStorageOptions *> GetDxlCtasStorageOption()
+		const = 0;
 };
 }  // namespace gpmd
 

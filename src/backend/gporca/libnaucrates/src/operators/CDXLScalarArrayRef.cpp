@@ -28,15 +28,16 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarArrayRef::CDXLScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
+CDXLScalarArrayRef::CDXLScalarArrayRef(CMemoryPool *mp,
+									   gpos::owner<IMDId *> elem_type_mdid,
 									   INT type_modifier,
-									   IMDId *array_type_mdid,
-									   IMDId *return_type_mdid)
+									   gpos::owner<IMDId *> array_type_mdid,
+									   gpos::owner<IMDId *> return_type_mdid)
 	: CDXLScalar(mp),
-	  m_elem_type_mdid(elem_type_mdid),
+	  m_elem_type_mdid(std::move(elem_type_mdid)),
 	  m_type_modifier(type_modifier),
-	  m_array_type_mdid(array_type_mdid),
-	  m_return_type_mdid(return_type_mdid)
+	  m_array_type_mdid(std::move(array_type_mdid)),
+	  m_return_type_mdid(std::move(return_type_mdid))
 {
 	GPOS_ASSERT(m_elem_type_mdid->IsValid());
 	GPOS_ASSERT(m_array_type_mdid->IsValid());
@@ -187,7 +188,7 @@ CDXLScalarArrayRef::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

@@ -52,8 +52,9 @@ public:
 	CScalarArrayRef(const CScalarArrayRef &) = delete;
 
 	// ctor
-	CScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid, INT type_modifier,
-					IMDId *array_type_mdid, IMDId *return_type_mdid);
+	CScalarArrayRef(CMemoryPool *mp, gpos::owner<IMDId *> elem_type_mdid,
+					INT type_modifier, gpos::owner<IMDId *> array_type_mdid,
+					gpos::owner<IMDId *> return_type_mdid);
 
 	// dtor
 	~CScalarArrayRef() override;
@@ -93,7 +94,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -103,7 +104,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,

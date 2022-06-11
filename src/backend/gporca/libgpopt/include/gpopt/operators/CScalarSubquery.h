@@ -72,13 +72,13 @@ public:
 	}
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::pointer<IMDId *> MdidType() const override;
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -89,11 +89,12 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	// return locally used columns
-	CColRefSet *PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl) override;
+	gpos::owner<CColRefSet *> PcrsUsed(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl) override;
 
 	// is subquery generated from existential subquery?
 	BOOL

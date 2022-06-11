@@ -45,8 +45,8 @@ public:
 	CDXLPhysicalTVF(const CDXLPhysicalTVF &) = delete;
 
 	// ctor
-	CDXLPhysicalTVF(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-					CWStringConst *str);
+	CDXLPhysicalTVF(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+					gpos::owner<IMDId *> mdid_return_type, CWStringConst *str);
 
 	// dtor
 	~CDXLPhysicalTVF() override;

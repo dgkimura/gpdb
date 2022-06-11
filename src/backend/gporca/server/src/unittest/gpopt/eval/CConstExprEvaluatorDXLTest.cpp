@@ -60,9 +60,9 @@ CConstExprEvaluatorDXLTest::CDummyConstDXLNodeEvaluator::EvaluateExpr(
 	gpos::owner<CDXLDatumInt4 *> dxl_datum = GPOS_NEW(m_mp) CDXLDatumInt4(
 		m_mp, pmdtypeint4->MDId(), false /*is_const_null*/, m_val);
 	gpos::owner<CDXLScalarConstValue *> pdxlnConst =
-		GPOS_NEW(m_mp) CDXLScalarConstValue(m_mp, dxl_datum);
+		GPOS_NEW(m_mp) CDXLScalarConstValue(m_mp, std::move(dxl_datum));
 
-	return GPOS_NEW(m_mp) CDXLNode(m_mp, pdxlnConst);
+	return GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(pdxlnConst));
 }
 
 //---------------------------------------------------------------------------
@@ -117,7 +117,7 @@ CConstExprEvaluatorDXLTest::EresUnittest_NonScalar()
 
 	// this call should raise an exception
 	gpos::owner<CExpression *> pexprResult = pceeval->PexprEval(pexprGet);
-	CRefCount::SafeRelease(pexprResult);
+	CRefCount::SafeRelease(std::move(pexprResult));
 	pexprGet->Release();
 	pceeval->Release();
 
@@ -144,13 +144,13 @@ CConstExprEvaluatorDXLTest::EresUnittest_NestedSubquery()
 
 	gpos::owner<CExpression *> pexprSelect =
 		CTestUtils::PexprLogicalSelectWithConstAnySubquery(testsetup.Pmp());
-	CExpression *pexprPredicate = (*pexprSelect)[1];
+	gpos::pointer<CExpression *> pexprPredicate = (*pexprSelect)[1];
 	GPOS_ASSERT(COperator::EopScalarSubqueryAny ==
 				pexprPredicate->Pop()->Eopid());
 
 	// this call should raise an exception
 	gpos::owner<CExpression *> pexprResult = pceeval->PexprEval(pexprPredicate);
-	CRefCount::SafeRelease(pexprResult);
+	CRefCount::SafeRelease(std::move(pexprResult));
 	pexprSelect->Release();
 	pceeval->Release();
 
@@ -189,7 +189,7 @@ CConstExprEvaluatorDXLTest::EresUnittest_ScalarContainingVariables()
 
 	// this call should raise an exception
 	gpos::owner<CExpression *> pexprResult = pceeval->PexprEval(pexprFunCall);
-	CRefCount::SafeRelease(pexprResult);
+	CRefCount::SafeRelease(std::move(pexprResult));
 	pexprFunCall->Release();
 	pceeval->Release();
 

@@ -15,6 +15,7 @@
 #define GPMD_IMDTypeBool_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatumBool.h"
 #include "naucrates/dxl/gpdb_types.h"
@@ -49,8 +50,9 @@ public:
 	}
 
 	// factory function for BOOL datums
-	virtual IDatumBool *CreateBoolDatum(CMemoryPool *mp, BOOL value,
-										BOOL is_null) const = 0;
+	virtual gpos::owner<IDatumBool *> CreateBoolDatum(CMemoryPool *mp,
+													  BOOL value,
+													  BOOL is_null) const = 0;
 };
 
 }  // namespace gpmd

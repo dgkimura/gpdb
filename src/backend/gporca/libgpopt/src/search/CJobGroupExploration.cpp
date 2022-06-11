@@ -11,6 +11,8 @@
 
 #include "gpopt/search/CJobGroupExploration.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/engine/CEngine.h"
 #include "gpopt/search/CGroup.h"
 #include "gpopt/search/CGroupExpression.h"
@@ -109,7 +111,7 @@ CJobGroupExploration::~CJobGroupExploration() = default;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExploration::Init(CGroup *pgroup)
+CJobGroupExploration::Init(gpos::pointer<CGroup *> pgroup)
 {
 	CJobGroup::Init(pgroup);
 
@@ -185,7 +187,7 @@ CJobGroupExploration::EevtStartExploration(CSchedulerContext *,	 //psc
 {
 	// get a job pointer
 	CJobGroupExploration *pjge = PjConvert(pjOwner);
-	CGroup *pgroup = pjge->m_pgroup;
+	gpos::pointer<CGroup *> pgroup = pjge->m_pgroup;
 
 	// move group to exploration state
 	{
@@ -260,7 +262,8 @@ CJobGroupExploration::FExecute(CSchedulerContext *psc)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExploration::ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
+CJobGroupExploration::ScheduleJob(CSchedulerContext *psc,
+								  gpos::pointer<CGroup *> pgroup,
 								  CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtGroupExploration);

@@ -27,8 +27,9 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarHashExpr::CDXLScalarHashExpr(CMemoryPool *mp, IMDId *opfamily)
-	: CDXLScalar(mp), m_mdid_opfamily(opfamily)
+CDXLScalarHashExpr::CDXLScalarHashExpr(CMemoryPool *mp,
+									   gpos::owner<IMDId *> opfamily)
+	: CDXLScalar(mp), m_mdid_opfamily(std::move(opfamily))
 {
 	GPOS_ASSERT_IMP(GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution),
 					m_mdid_opfamily->IsValid());
@@ -131,7 +132,7 @@ CDXLScalarHashExpr::AssertValid(gpos::pointer<const CDXLNode *> node,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == node->Arity());
-	CDXLNode *child_dxlnode = (*node)[0];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[0];
 
 	GPOS_ASSERT(EdxloptypeScalar ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());

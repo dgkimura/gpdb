@@ -32,10 +32,11 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLScalarPartBound::CDXLScalarPartBound(CMemoryPool *mp,
 										 ULONG partitioning_level,
-										 IMDId *mdid_type, BOOL is_lower_bound)
+										 gpos::owner<IMDId *> mdid_type,
+										 BOOL is_lower_bound)
 	: CDXLScalar(mp),
 	  m_partitioning_level(partitioning_level),
-	  m_mdid_type(mdid_type),
+	  m_mdid_type(std::move(mdid_type)),
 	  m_is_lower_bound(is_lower_bound)
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());

@@ -54,7 +54,7 @@ CXformGbAgg2ScalarAgg::CXformGbAgg2ScalarAgg(CMemoryPool *mp)
 CXform::EXformPromise
 CXformGbAgg2ScalarAgg::Exfp(CExpressionHandle &exprhdl) const
 {
-	if (0 < CLogicalGbAgg::PopConvert(exprhdl.Pop())->Pdrgpcr()->Size() ||
+	if (0 < gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop())->Pdrgpcr()->Size() ||
 		exprhdl.DeriveHasSubquery(1))
 	{
 		// GbAgg has grouping columns, or agg functions use subquery arguments
@@ -74,14 +74,16 @@ CXformGbAgg2ScalarAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformGbAgg2ScalarAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformGbAgg2ScalarAgg::Transform(gpos::pointer<CXformContext *> pxfctxt,
+								 gpos::pointer<CXformResult *> pxfres,
+								 gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalGbAgg *> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 	gpos::owner<CColRefArray *> colref_array = popAgg->Pdrgpcr();
 	colref_array->AddRef();
@@ -104,15 +106,15 @@ CXformGbAgg2ScalarAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalScalarAgg(
-			mp, colref_array, popAgg->PdrgpcrMinimal(), popAgg->Egbaggtype(),
-			popAgg->FGeneratesDuplicates(), pdrgpcrArgDQA,
+			mp, std::move(colref_array), popAgg->PdrgpcrMinimal(),
+			popAgg->Egbaggtype(), popAgg->FGeneratesDuplicates(), pdrgpcrArgDQA,
 			CXformUtils::FMultiStageAgg(pexpr),
 			CXformUtils::FAggGenBySplitDQAXform(pexpr), popAgg->AggStage(),
 			!CXformUtils::FLocalAggCreatedByEagerAggXform(pexpr)),
 		pexprRel, pexprScalar);
 
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 

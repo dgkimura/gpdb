@@ -27,9 +27,10 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CStatsPredConj::CStatsPredConj(CStatsPredPtrArry *conj_pred_stats_array)
+CStatsPredConj::CStatsPredConj(
+	gpos::owner<CStatsPredPtrArry *> conj_pred_stats_array)
 	: CStatsPred(gpos::ulong_max),
-	  m_conj_pred_stats_array(conj_pred_stats_array)
+	  m_conj_pred_stats_array(std::move(conj_pred_stats_array))
 {
 	GPOS_ASSERT(nullptr != m_conj_pred_stats_array);
 	m_colid = CStatisticsUtils::GetColId(m_conj_pred_stats_array);

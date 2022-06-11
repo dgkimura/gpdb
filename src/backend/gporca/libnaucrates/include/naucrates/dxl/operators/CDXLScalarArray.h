@@ -46,8 +46,9 @@ public:
 	CDXLScalarArray(const CDXLScalarArray &) = delete;
 
 	// ctor
-	CDXLScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
-					IMDId *array_type_mdid, BOOL multi_dimensional_array);
+	CDXLScalarArray(CMemoryPool *mp, gpos::owner<IMDId *> elem_type_mdid,
+					gpos::owner<IMDId *> array_type_mdid,
+					BOOL multi_dimensional_array);
 
 	// dtor
 	~CDXLScalarArray() override;

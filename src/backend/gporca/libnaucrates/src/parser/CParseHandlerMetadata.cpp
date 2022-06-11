@@ -149,10 +149,11 @@ CParseHandlerMetadata::StartElement(const XMLCh *const element_uri,
 	{
 		// start of the metadata section in the DXL document
 		GPOS_ASSERT(nullptr != m_mdid_array);
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenValue,
-			EdxltokenMdid);
-		m_mdid_array->Append(mdid);
+		gpos::owner<IMDId *> mdid =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenValue, EdxltokenMdid);
+		m_mdid_array->Append(std::move(mdid));
 	}
 	else
 	{
@@ -227,7 +228,7 @@ CParseHandlerMetadata::EndElement(const XMLCh *const,  // element_uri,
 //		Parse a list of source system ids
 //
 //---------------------------------------------------------------------------
-CSystemIdArray *
+gpos::owner<CSystemIdArray *>
 CParseHandlerMetadata::GetSrcSysIdArray(const Attributes &attrs,
 										Edxltoken dxl_token_attr,
 										Edxltoken dxl_token_element)

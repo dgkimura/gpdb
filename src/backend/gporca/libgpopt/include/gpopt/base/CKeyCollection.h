@@ -42,14 +42,14 @@ public:
 
 	// ctors
 	explicit CKeyCollection(CMemoryPool *mp);
-	CKeyCollection(CMemoryPool *mp, CColRefSet *pcrs);
+	CKeyCollection(CMemoryPool *mp, gpos::owner<CColRefSet *> pcrs);
 	CKeyCollection(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array);
 
 	// dtor
 	~CKeyCollection() override;
 
 	// add individual set -- takes ownership
-	void Add(CColRefSet *pcrs);
+	void Add(gpos::owner<CColRefSet *> pcrs);
 
 	// check if set forms a key
 	BOOL FKey(gpos::pointer<const CColRefSet *> pcrs,
@@ -60,18 +60,18 @@ public:
 			  gpos::pointer<const CColRefArray *> colref_array) const;
 
 	// trim off non-key columns
-	CColRefArray *PdrgpcrTrim(
+	gpos::owner<CColRefArray *> PdrgpcrTrim(
 		CMemoryPool *mp,
 		gpos::pointer<const CColRefArray *> colref_array) const;
 
 	// extract a key
-	CColRefArray *PdrgpcrKey(CMemoryPool *mp) const;
+	gpos::owner<CColRefArray *> PdrgpcrKey(CMemoryPool *mp) const;
 
 	// extract a hashable key
-	CColRefArray *PdrgpcrHashableKey(CMemoryPool *mp) const;
+	gpos::owner<CColRefArray *> PdrgpcrHashableKey(CMemoryPool *mp) const;
 
 	// extract key at given position
-	CColRefArray *PdrgpcrKey(CMemoryPool *mp, ULONG ul) const;
+	gpos::owner<CColRefArray *> PdrgpcrKey(CMemoryPool *mp, ULONG ul) const;
 
 	// extract key at given position
 	gpos::owner<CColRefSet *> PcrsKey(CMemoryPool *mp, ULONG ul) const;

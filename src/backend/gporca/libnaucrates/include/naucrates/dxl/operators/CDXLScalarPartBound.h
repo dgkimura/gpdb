@@ -45,7 +45,7 @@ public:
 
 	// ctor
 	CDXLScalarPartBound(CMemoryPool *mp, ULONG partitioning_level,
-						IMDId *mdid_type, BOOL is_lower_bound);
+						gpos::owner<IMDId *> mdid_type, BOOL is_lower_bound);
 
 	// dtor
 	~CDXLScalarPartBound() override;

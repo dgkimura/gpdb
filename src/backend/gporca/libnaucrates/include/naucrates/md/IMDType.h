@@ -91,16 +91,18 @@ public:
 		return EmdtType;
 	}
 
-	virtual IMDId *GetDistrOpfamilyMdid() const = 0;
+	virtual gpos::pointer<IMDId *> GetDistrOpfamilyMdid() const = 0;
 
 	// md id of cache object
-	IMDId *MDId() const override = 0;
+	gpos::pointer<IMDId *> MDId() const override = 0;
 
 	// id of specified specified comparison operator type
-	virtual IMDId *GetMdidForCmpType(ECmpType cmp_type) const = 0;
+	virtual gpos::pointer<IMDId *> GetMdidForCmpType(
+		ECmpType cmp_type) const = 0;
 
 	// id of specified specified aggregate type
-	virtual IMDId *GetMdidForAggType(EAggType agg_type) const = 0;
+	virtual gpos::pointer<IMDId *> GetMdidForAggType(
+		EAggType agg_type) const = 0;
 
 	// id of comparison operator for type used in btree lookups
 	virtual gpos::pointer<const IMDId *> CmpOpMdid() const = 0;
@@ -115,17 +117,17 @@ public:
 	virtual BOOL IsRedistributable() const = 0;
 
 	// id of the array type for the type
-	virtual IMDId *GetArrayTypeMdid() const = 0;
+	virtual gpos::pointer<IMDId *> GetArrayTypeMdid() const = 0;
 
 	// type id
 	virtual ETypeInfo GetDatumType() const = 0;
 
 	// transformation function for datums
-	virtual IDatum *GetDatumForDXLConstVal(
+	virtual gpos::owner<IDatum *> GetDatumForDXLConstVal(
 		gpos::pointer<const CDXLScalarConstValue *> dxl_op) const = 0;
 
 	// construct a datum from a DXL datum
-	virtual IDatum *GetDatumForDXLDatum(
+	virtual gpos::owner<IDatum *> GetDatumForDXLDatum(
 		CMemoryPool *mp, gpos::pointer<const CDXLDatum *> dxl_datum) const = 0;
 
 	// is type fixed length
@@ -141,7 +143,7 @@ public:
 	}
 
 	// id of the relation corresponding to a composite type
-	virtual IMDId *GetBaseRelMdid() const = 0;
+	virtual gpos::pointer<IMDId *> GetBaseRelMdid() const = 0;
 
 	// type length
 	virtual ULONG Length() const = 0;
@@ -150,17 +152,18 @@ public:
 	virtual BOOL IsPassedByValue() const = 0;
 
 	// return the null constant for this type
-	virtual IDatum *DatumNull() const = 0;
+	virtual gpos::pointer<IDatum *> DatumNull() const = 0;
 
 	// generate the DXL scalar constant from IDatum
-	virtual CDXLScalarConstValue *GetDXLOpScConst(CMemoryPool *mp,
-												  IDatum *datum) const = 0;
+	virtual gpos::owner<CDXLScalarConstValue *> GetDXLOpScConst(
+		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const = 0;
 
 	// generate the DXL datum from IDatum
-	virtual CDXLDatum *GetDatumVal(CMemoryPool *mp, IDatum *datum) const = 0;
+	virtual gpos::owner<CDXLDatum *> GetDatumVal(
+		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const = 0;
 
 	// generate the DXL datum representing null value
-	virtual CDXLDatum *GetDXLDatumNull(CMemoryPool *mp) const = 0;
+	virtual gpos::owner<CDXLDatum *> GetDXLDatumNull(CMemoryPool *mp) const = 0;
 
 	// is type an ambiguous one? e.g., AnyElement in GPDB
 	virtual BOOL

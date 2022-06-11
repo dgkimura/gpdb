@@ -34,9 +34,9 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalInnerIndexNLJoin::CPhysicalInnerIndexNLJoin(CMemoryPool *mp,
-													 CColRefArray *colref_array,
-													 CExpression *origJoinPred)
+CPhysicalInnerIndexNLJoin::CPhysicalInnerIndexNLJoin(
+	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+	gpos::owner<CExpression *> origJoinPred)
 	: CPhysicalInnerNLJoin(mp),
 	  m_pdrgpcrOuterRefs(colref_array),
 	  m_origJoinPred(origJoinPred)
@@ -73,12 +73,12 @@ CPhysicalInnerIndexNLJoin::~CPhysicalInnerIndexNLJoin()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalInnerIndexNLJoin::Matches(COperator *pop) const
+CPhysicalInnerIndexNLJoin::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
 		return m_pdrgpcrOuterRefs->Equals(
-			CPhysicalInnerIndexNLJoin::PopConvert(pop)->PdrgPcrOuterRefs());
+			gpos::dyn_cast<CPhysicalInnerIndexNLJoin>(pop)->PdrgPcrOuterRefs());
 	}
 
 	return false;
@@ -111,8 +111,10 @@ CPhysicalInnerIndexNLJoin::PdsRequired(
 
 gpos::owner<CEnfdDistribution *>
 CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   CReqdPropPlan *prppInput, ULONG child_index,
-							   CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq)
+							   gpos::pointer<CReqdPropPlan *> prppInput,
+							   ULONG child_index,
+							   gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+							   ULONG ulDistrReq)
 {
 	GPOS_ASSERT(2 > child_index);
 
@@ -131,8 +133,8 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// we need to match distribution of inner
-	CDistributionSpec *pdsInner =
-		CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds();
+	gpos::pointer<CDistributionSpec *> pdsInner =
+		gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Pds();
 	CDistributionSpec::EDistributionType edtInner = pdsInner->Edt();
 	if (CDistributionSpec::EdtSingleton == edtInner ||
 		CDistributionSpec::EdtStrictSingleton == edtInner ||
@@ -146,9 +148,10 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (CDistributionSpec::EdtHashed == edtInner)
 	{
 		// check if we could create an equivalent hashed distribution request to the inner child
-		CDistributionSpecHashed *pdshashed =
-			CDistributionSpecHashed::PdsConvert(pdsInner);
-		CDistributionSpecHashed *pdshashedEquiv = pdshashed->PdshashedEquiv();
+		gpos::pointer<CDistributionSpecHashed *> pdshashed =
+			gpos::dyn_cast<CDistributionSpecHashed>(pdsInner);
+		gpos::pointer<CDistributionSpecHashed *> pdshashedEquiv =
+			pdshashed->PdshashedEquiv();
 
 		// If the inner child is a IndexScan on a multi-key distributed index, it
 		// may derive an incomplete equiv spec (see CPhysicalScan::PdsDerive()).
@@ -164,7 +167,8 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 											pdshashedEquiv->FNullsColocated());
 			pdsHashedRequired->ComputeEquivHashExprs(mp, exprhdl);
 
-			return GPOS_NEW(mp) CEnfdDistribution(pdsHashedRequired, dmatch);
+			return GPOS_NEW(mp)
+				CEnfdDistribution(std::move(pdsHashedRequired), dmatch);
 		}
 	}
 

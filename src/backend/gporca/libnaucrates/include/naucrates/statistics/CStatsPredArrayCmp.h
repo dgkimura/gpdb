@@ -45,7 +45,7 @@ public:
 
 	// ctor
 	CStatsPredArrayCmp(ULONG colid, CStatsPred::EStatsCmpType stats_cmp_type,
-					   CPointArray *points);
+					   gpos::owner<CPointArray *> points);
 
 	// dtor
 	~CStatsPredArrayCmp() override

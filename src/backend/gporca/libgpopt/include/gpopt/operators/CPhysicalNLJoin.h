@@ -45,22 +45,25 @@ public:
 
 	// compute required sort order of the n-th child
 	gpos::owner<COrderSpec *> PosRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl, COrderSpec *posInput,
-		ULONG child_index, gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<COrderSpec *> posInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
 		ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	gpos::owner<CRewindabilitySpec *> PrsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CRewindabilitySpec *prsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// compute required output columns of the n-th child
-	CColRefSet *PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsRequired, ULONG child_index,
-							 gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
-							 ULONG							   // ulOptReq
-							 ) override;
+	gpos::owner<CColRefSet *> PcrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+		ULONG							  // ulOptReq
+		) override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -83,7 +86,7 @@ public:
 	}
 
 	// return required inner columns -- overloaded by correlated join children
-	virtual CColRefArray *
+	virtual gpos::pointer<CColRefArray *>
 	PdrgPcrInner() const
 	{
 		return nullptr;

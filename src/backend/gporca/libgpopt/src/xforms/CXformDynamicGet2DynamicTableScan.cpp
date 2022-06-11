@@ -48,15 +48,17 @@ CXformDynamicGet2DynamicTableScan::CXformDynamicGet2DynamicTableScan(
 //
 //---------------------------------------------------------------------------
 void
-CXformDynamicGet2DynamicTableScan::Transform(CXformContext *pxfctxt,
-											 CXformResult *pxfres,
-											 CExpression *pexpr) const
+CXformDynamicGet2DynamicTableScan::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDynamicGet *popGet = CLogicalDynamicGet::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalDynamicGet *> popGet =
+		gpos::dyn_cast<CLogicalDynamicGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
@@ -78,12 +80,13 @@ CXformDynamicGet2DynamicTableScan::Transform(CXformContext *pxfctxt,
 
 	// create alternative expression
 	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
-		mp, GPOS_NEW(mp) CPhysicalDynamicTableScan(
-				mp, pname, ptabdesc, popGet->UlOpId(), popGet->ScanId(),
-				pdrgpcrOutput, pdrgpdrgpcrPart, popGet->GetPartitionMdids(),
-				popGet->GetRootColMappingPerPart()));
+		mp,
+		GPOS_NEW(mp) CPhysicalDynamicTableScan(
+			mp, pname, std::move(ptabdesc), popGet->UlOpId(), popGet->ScanId(),
+			pdrgpcrOutput, std::move(pdrgpdrgpcrPart),
+			popGet->GetPartitionMdids(), popGet->GetRootColMappingPerPart()));
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 

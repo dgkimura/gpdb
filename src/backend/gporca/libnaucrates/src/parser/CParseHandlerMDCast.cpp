@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMDCast.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -71,21 +73,25 @@ CParseHandlerMDCast::StartElement(const XMLCh *const,  // element_uri,
 
 
 	// parse cast properties
-	IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-		EdxltokenGPDBCast);
+	gpos::owner<IMDId *> mdid =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenGPDBCast);
 
-	IMDId *mdid_src = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBCastSrcType, EdxltokenGPDBCast);
+	gpos::owner<IMDId *> mdid_src =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBCastSrcType, EdxltokenGPDBCast);
 
-	IMDId *mdid_dest = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBCastDestType, EdxltokenGPDBCast);
+	gpos::owner<IMDId *> mdid_dest =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBCastDestType, EdxltokenGPDBCast);
 
-	IMDId *mdid_cast_func = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBCastFuncId, EdxltokenGPDBCast);
+	gpos::owner<IMDId *> mdid_cast_func =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBCastFuncId, EdxltokenGPDBCast);
 
 	// parse whether func returns a set
 	BOOL is_binary_coercible =
@@ -101,8 +107,9 @@ CParseHandlerMDCast::StartElement(const XMLCh *const,  // element_uri,
 		);
 
 	m_imd_obj = GPOS_NEW(m_mp)
-		CMDCastGPDB(m_mp, mdid, mdname, mdid_src, mdid_dest,
-					is_binary_coercible, mdid_cast_func, coerce_path_type);
+		CMDCastGPDB(m_mp, std::move(mdid), mdname, std::move(mdid_src),
+					std::move(mdid_dest), is_binary_coercible,
+					std::move(mdid_cast_func), coerce_path_type);
 }
 
 //---------------------------------------------------------------------------

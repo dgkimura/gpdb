@@ -49,7 +49,8 @@ public:
 	// ctor
 	explicit CLogicalNAryJoin(CMemoryPool *mp);
 
-	CLogicalNAryJoin(CMemoryPool *mp, ULongPtrArray *lojChildIndexes);
+	CLogicalNAryJoin(CMemoryPool *mp,
+					 gpos::owner<ULongPtrArray *> lojChildIndexes);
 
 	// dtor
 	~CLogicalNAryJoin() override
@@ -76,8 +77,8 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive not nullable columns
-	CColRefSet *DeriveNotNullColumns(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl) const override;
+	gpos::owner<CColRefSet *> DeriveNotNullColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
 	CMaxCard DeriveMaxCard(CMemoryPool *mp,
@@ -105,7 +106,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -143,7 +144,7 @@ public:
 	}
 
 	CExpression *
-	GetInnerJoinPreds(CExpression *nary_join_expr) const
+	GetInnerJoinPreds(gpos::pointer<CExpression *> nary_join_expr) const
 	{
 		GPOS_ASSERT(nary_join_expr->Pop() == this);
 		if (HasOuterJoinChildren())
@@ -155,7 +156,7 @@ public:
 	}
 
 	CExpression *
-	GetOnPredicateForLOJChild(CExpression *nary_join_expr,
+	GetOnPredicateForLOJChild(gpos::pointer<CExpression *> nary_join_expr,
 							  ULONG child_num) const
 	{
 		GPOS_ASSERT(nary_join_expr->Pop() == this);
@@ -176,8 +177,8 @@ public:
 	// given an existing scalar child of an NAry join, make a new copy, replacing
 	// only the inner join predicates and leaving the LOJ ON predicates the same
 	gpos::owner<CExpression *> ReplaceInnerJoinPredicates(
-		CMemoryPool *mp, CExpression *old_nary_join_scalar_expr,
-		CExpression *new_inner_join_preds);
+		CMemoryPool *mp, gpos::pointer<CExpression *> old_nary_join_scalar_expr,
+		gpos::owner<CExpression *> new_inner_join_preds);
 
 	IOstream &OsPrint(IOstream &os) const override;
 

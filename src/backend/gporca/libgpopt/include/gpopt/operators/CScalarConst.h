@@ -42,7 +42,7 @@ public:
 	CScalarConst(const CScalarConst &) = delete;
 
 	// ctor
-	CScalarConst(CMemoryPool *mp, IDatum *datum);
+	CScalarConst(CMemoryPool *mp, gpos::owner<IDatum *> datum);
 
 	// dtor
 	~CScalarConst() override;
@@ -72,7 +72,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -82,7 +82,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
@@ -103,7 +103,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::pointer<IMDId *> MdidType() const override;
 
 	INT TypeModifier() const override;
 
@@ -119,7 +119,8 @@ public:
 
 	// extract the constant from the given constant expression or a casted constant expression.
 	// Else return NULL.
-	static CScalarConst *PopExtractFromConstOrCastConst(CExpression *pexpr);
+	static CScalarConst *PopExtractFromConstOrCastConst(
+		gpos::pointer<CExpression *> pexpr);
 
 };	// class CScalarConst
 

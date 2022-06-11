@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarSubqueryQuantified.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarSubqueryAll.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -75,9 +77,10 @@ CParseHandlerScalarSubqueryQuantified::StartElement(
 	}
 
 	// parse operator id
-	IMDId *mdid_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
-		dxl_token);
+	gpos::owner<IMDId *> mdid_op =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
+			dxl_token);
 
 	// parse operator name
 	const XMLCh *xmlszScalarOpName = CDXLOperatorFactory::ExtractAttrValue(

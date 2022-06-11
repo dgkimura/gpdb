@@ -33,20 +33,21 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
-							   IMDId *resolved_rettype,
+CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp,
+							   gpos::owner<IMDId *> pmdidAggFunc,
+							   gpos::owner<IMDId *> resolved_rettype,
 							   const CWStringConst *pstrAggFunc,
 							   BOOL is_distinct, EAggfuncStage eaggfuncstage,
 							   BOOL fSplit, EAggfuncKind aggkind,
-							   ULongPtrArray *argtypes)
+							   gpos::owner<ULongPtrArray *> argtypes)
 	: CScalar(mp),
-	  m_pmdidAggFunc(pmdidAggFunc),
-	  m_pmdidResolvedRetType(resolved_rettype),
+	  m_pmdidAggFunc(std::move(pmdidAggFunc)),
+	  m_pmdidResolvedRetType(std::move(resolved_rettype)),
 	  m_return_type_mdid(nullptr),
 	  m_pstrAggFunc(pstrAggFunc),
 	  m_is_distinct(is_distinct),
 	  m_aggkind(aggkind),
-	  m_argtypes(argtypes),
+	  m_argtypes(std::move(argtypes)),
 	  m_eaggfuncstage(eaggfuncstage),
 	  m_fSplit(fSplit)
 {
@@ -164,11 +165,12 @@ CScalarAggFunc::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarAggFunc::Matches(COperator *pop) const
+CScalarAggFunc::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarAggFunc *popScAggFunc = CScalarAggFunc::PopConvert(pop);
+		gpos::pointer<CScalarAggFunc *> popScAggFunc =
+			gpos::dyn_cast<CScalarAggFunc>(pop);
 
 		// match if func ids are identical
 		return ((popScAggFunc->IsDistinct() == m_is_distinct) &&
@@ -190,8 +192,8 @@ CScalarAggFunc::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 IMDId *
-CScalarAggFunc::PmdidLookupReturnType(IMDId *pmdidAggFunc, BOOL fGlobal,
-									  CMDAccessor *pmdaInput)
+CScalarAggFunc::PmdidLookupReturnType(gpos::pointer<IMDId *> pmdidAggFunc,
+									  BOOL fGlobal, CMDAccessor *pmdaInput)
 {
 	GPOS_ASSERT(nullptr != pmdidAggFunc);
 	CMDAccessor *md_accessor = pmdaInput;

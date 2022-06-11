@@ -4,6 +4,7 @@
 #ifndef GPOPT_CHashedDistributions_H
 #define GPOPT_CHashedDistributions_H
 
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPool.h"
 
 #include "gpopt/base/CColRef.h"
@@ -20,8 +21,9 @@ namespace gpopt
 class CHashedDistributions : public CDistributionSpecArray
 {
 public:
-	CHashedDistributions(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-						 CColRef2dArray *pdrgpdrgpcrInput);
+	CHashedDistributions(CMemoryPool *mp,
+						 gpos::pointer<CColRefArray *> pdrgpcrOutput,
+						 gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput);
 };
 }  // namespace gpopt
 

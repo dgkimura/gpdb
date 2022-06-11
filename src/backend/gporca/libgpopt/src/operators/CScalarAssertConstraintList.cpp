@@ -13,6 +13,7 @@
 #include "gpopt/operators/CScalarAssertConstraintList.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "naucrates/md/IMDTypeBool.h"
@@ -42,7 +43,7 @@ CScalarAssertConstraintList::CScalarAssertConstraintList(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarAssertConstraintList::Matches(COperator *pop) const
+CScalarAssertConstraintList::Matches(gpos::pointer<COperator *> pop) const
 {
 	return pop->Eopid() == Eopid();
 }
@@ -56,7 +57,7 @@ CScalarAssertConstraintList::Matches(COperator *pop) const
 //		Type of expression's result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarAssertConstraintList::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

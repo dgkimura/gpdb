@@ -40,7 +40,7 @@ public:
 	CStatsPredConj(const CStatsPredConj &) = delete;
 
 	// ctor
-	explicit CStatsPredConj(CStatsPredPtrArry *pdrgpstatspred);
+	explicit CStatsPredConj(gpos::owner<CStatsPredPtrArry *> pdrgpstatspred);
 
 	// dtor
 	~CStatsPredConj() override

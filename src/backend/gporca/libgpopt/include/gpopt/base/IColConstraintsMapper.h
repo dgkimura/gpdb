@@ -5,6 +5,7 @@
 #define GPOPT_IColConstraintsMapper_H
 
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CConstraint.h"
 
@@ -13,7 +14,8 @@ namespace gpopt
 class IColConstraintsMapper : public CRefCount
 {
 public:
-	virtual CConstraintArray *PdrgPcnstrLookup(CColRef *colref) = 0;
+	virtual gpos::owner<CConstraintArray *> PdrgPcnstrLookup(
+		CColRef *colref) = 0;
 
 	~IColConstraintsMapper() override = 0;
 };

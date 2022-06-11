@@ -32,17 +32,18 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotion::FValidContext(CMemoryPool *, COptimizationContext *poc,
-							   COptimizationContextArray *pdrgpocChild) const
+CPhysicalMotion::FValidContext(
+	CMemoryPool *, gpos::pointer<COptimizationContext *> poc,
+	gpos::pointer<COptimizationContextArray *> pdrgpocChild) const
 {
 	GPOS_ASSERT(nullptr != pdrgpocChild);
 	GPOS_ASSERT(1 == pdrgpocChild->Size());
 
-	COptimizationContext *pocChild = (*pdrgpocChild)[0];
-	CCostContext *pccBest = pocChild->PccBest();
+	gpos::pointer<COptimizationContext *> pocChild = (*pdrgpocChild)[0];
+	gpos::pointer<CCostContext *> pccBest = pocChild->PccBest();
 	GPOS_ASSERT(nullptr != pccBest);
 
-	CDrvdPropPlan *pdpplanChild = pccBest->Pdpplan();
+	gpos::pointer<CDrvdPropPlan *> pdpplanChild = pccBest->Pdpplan();
 	// GPDB_12_MERGE_FIXME: Check partition propagation spec
 #if 0
 	if (pdpplanChild->Ppim()->FContainsUnresolved())
@@ -51,7 +52,7 @@ CPhysicalMotion::FValidContext(CMemoryPool *, COptimizationContext *poc,
 	}
 #endif
 
-	CEnfdDistribution *ped = poc->Prpp()->Ped();
+	gpos::pointer<CEnfdDistribution *> ped = poc->Prpp()->Ped();
 	if (ped->FCompatible(this->Pds()) && ped->FCompatible(pdpplanChild->Pds()))
 	{
 		// required distribution is compatible with the distribution delivered by Motion and its child plan,
@@ -74,14 +75,14 @@ CPhysicalMotion::FValidContext(CMemoryPool *, COptimizationContext *poc,
 gpos::owner<CDistributionSpec *>
 CPhysicalMotion::PdsRequired(CMemoryPool *mp,
 							 CExpressionHandle &,  // exprhdl
-							 CDistributionSpec *pdsRequired,
+							 gpos::pointer<CDistributionSpec *> pdsRequired,
 							 ULONG
 #ifdef GPOS_DEBUG
 								 child_index
 #endif	// GPOS_DEBUG
 							 ,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+							 ULONG							   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -165,8 +166,8 @@ CPhysicalMotion::PrsRequired(
 		child_index
 #endif	// GPOS_DEBUG
 	,
-	CDrvdPropArray *,  // pdrgpdpCtxt
-	ULONG			   // ulOptReq
+	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+	ULONG							  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -181,7 +182,7 @@ CPhysicalMotion::PrsRequired(
 gpos::owner<CPartitionPropagationSpec *>
 CPhysicalMotion::PppsRequired(CMemoryPool *mp, CExpressionHandle &,
 							  gpos::pointer<CPartitionPropagationSpec *>, ULONG,
-							  CDrvdPropArray *, ULONG) const
+							  gpos::pointer<CDrvdPropArray *>, ULONG) const
 {
 	// A motion is a hard barrier for partition propagation since it executes in a
 	// different slice; and thus it cannot require this property from its child
@@ -196,10 +197,10 @@ CPhysicalMotion::PppsRequired(CMemoryPool *mp, CExpressionHandle &,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::owner<CCTEReq *>
 CPhysicalMotion::PcteRequired(CMemoryPool *,		//mp,
 							  CExpressionHandle &,	//exprhdl,
-							  CCTEReq *pcter,
+							  gpos::pointer<CCTEReq *> pcter,
 							  ULONG
 #ifdef GPOS_DEBUG
 								  child_index

@@ -30,12 +30,12 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CDXLColDescr::CDXLColDescr(CMDName *md_name, ULONG column_id, INT attr_no,
-						   IMDId *column_mdid_type, INT type_modifier,
-						   BOOL is_dropped, ULONG width)
+						   gpos::owner<IMDId *> column_mdid_type,
+						   INT type_modifier, BOOL is_dropped, ULONG width)
 	: m_md_name(md_name),
 	  m_column_id(column_id),
 	  m_attr_no(attr_no),
-	  m_column_mdid_type(column_mdid_type),
+	  m_column_mdid_type(std::move(column_mdid_type)),
 	  m_type_modifier(type_modifier),
 	  m_is_dropped(is_dropped),
 	  m_column_width(width)

@@ -42,7 +42,7 @@ public:
 	CXformGbAgg2HashAgg(CMemoryPool *mp);
 
 	// ctor
-	explicit CXformGbAgg2HashAgg(CExpression *pexprPattern);
+	explicit CXformGbAgg2HashAgg(gpos::owner<CExpression *> pexprPattern);
 
 	// dtor
 	~CXformGbAgg2HashAgg() override = default;
@@ -65,8 +65,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::pointer<CXformContext *> pxfctxt,
+				   gpos::pointer<CXformResult *> pxfres,
+				   gpos::pointer<CExpression *> pexpr) const override;
 
 };	// class CXformGbAgg2HashAgg
 

@@ -30,12 +30,13 @@ using namespace gpdxl;
 //		Constructs a scalar FuncExpr node
 //
 //---------------------------------------------------------------------------
-CDXLScalarFuncExpr::CDXLScalarFuncExpr(CMemoryPool *mp, IMDId *mdid_func,
-									   IMDId *mdid_return_type,
+CDXLScalarFuncExpr::CDXLScalarFuncExpr(CMemoryPool *mp,
+									   gpos::owner<IMDId *> mdid_func,
+									   gpos::owner<IMDId *> mdid_return_type,
 									   INT return_type_modifier, BOOL fRetSet)
 	: CDXLScalar(mp),
-	  m_func_mdid(mdid_func),
-	  m_return_type_mdid(mdid_return_type),
+	  m_func_mdid(std::move(mdid_func)),
+	  m_return_type_mdid(std::move(mdid_return_type)),
 	  m_return_type_modifier(return_type_modifier),
 	  m_returns_set(fRetSet)
 {
@@ -181,7 +182,8 @@ CDXLScalarFuncExpr::SerializeToDXL(
 BOOL
 CDXLScalarFuncExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	IMDId *mdid = md_accessor->RetrieveFunc(m_func_mdid)->GetResultTypeMdid();
+	gpos::pointer<IMDId *> mdid =
+		md_accessor->RetrieveFunc(m_func_mdid)->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());
 }
@@ -201,7 +203,7 @@ CDXLScalarFuncExpr::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 {
 	for (ULONG ul = 0; ul < dxlnode->Arity(); ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

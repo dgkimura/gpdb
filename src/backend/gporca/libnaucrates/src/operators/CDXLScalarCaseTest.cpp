@@ -29,8 +29,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCaseTest::CDXLScalarCaseTest(CMemoryPool *mp, IMDId *mdid_type)
-	: CDXLScalar(mp), m_mdid_type(mdid_type)
+CDXLScalarCaseTest::CDXLScalarCaseTest(CMemoryPool *mp,
+									   gpos::owner<IMDId *> mdid_type)
+	: CDXLScalar(mp), m_mdid_type(std::move(mdid_type))
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
 }

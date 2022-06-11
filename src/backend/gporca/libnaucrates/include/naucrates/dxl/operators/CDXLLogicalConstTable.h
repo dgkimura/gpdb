@@ -44,8 +44,8 @@ public:
 
 	// ctor
 	CDXLLogicalConstTable(CMemoryPool *mp,
-						  CDXLColDescrArray *dxl_col_descr_array,
-						  CDXLDatum2dArray *pdrgpdrgpdxldatum);
+						  gpos::owner<CDXLColDescrArray *> dxl_col_descr_array,
+						  gpos::owner<CDXLDatum2dArray *> pdrgpdrgpdxldatum);
 
 	//dtor
 	~CDXLLogicalConstTable() override;

@@ -55,7 +55,8 @@ private:
 		gpos::owner<CBitSet *> m_pbsSnd;
 
 		// ctor
-		SComponentPair(CBitSet *pbsFst, CBitSet *pbsSnd);
+		SComponentPair(gpos::owner<CBitSet *> pbsFst,
+					   gpos::owner<CBitSet *> pbsSnd);
 
 		// dtor
 		~SComponentPair() override;
@@ -120,17 +121,19 @@ private:
 	gpos::owner<CExpression *> m_pexprDummy;
 
 	// build expression linking given components
-	CExpression *PexprBuildPred(CBitSet *pbsFst, CBitSet *pbsSnd);
+	gpos::owner<CExpression *> PexprBuildPred(gpos::pointer<CBitSet *> pbsFst,
+											  gpos::pointer<CBitSet *> pbsSnd);
 
 	// lookup best join order for given set
-	gpos::pointer<CExpression *> PexprLookup(CBitSet *pbs);
+	gpos::pointer<CExpression *> PexprLookup(gpos::pointer<CBitSet *> pbs);
 
 	// extract predicate joining the two given sets
 	gpos::pointer<CExpression *> PexprPred(gpos::pointer<CBitSet *> pbsFst,
 										   gpos::pointer<CBitSet *> pbsSnd);
 
 	// join expressions in the given two sets
-	CExpression *PexprJoin(CBitSet *pbsFst, CBitSet *pbsSnd);
+	gpos::owner<CExpression *> PexprJoin(gpos::pointer<CBitSet *> pbsFst,
+										 gpos::pointer<CBitSet *> pbsSnd);
 
 	// join expressions in the given set
 	gpos::pointer<CExpression *> PexprJoin(gpos::pointer<CBitSet *> pbs);
@@ -140,7 +143,7 @@ private:
 		gpos::pointer<CBitSet *> pbs);
 
 	// find best join order for given component
-	CExpression *PexprBestJoinOrder(CBitSet *pbs);
+	CExpression *PexprBestJoinOrder(gpos::pointer<CBitSet *> pbs);
 
 	// generate cross product for the given components
 	gpos::pointer<CExpression *> PexprCross(gpos::pointer<CBitSet *> pbs);
@@ -151,34 +154,36 @@ private:
 		gpos::pointer<CBitSet *> pbsUncovered);
 
 	// return a subset of the given set covered by one or more edges
-	CBitSet *PbsCovered(CBitSet *pbsInput);
+	gpos::owner<CBitSet *> PbsCovered(gpos::pointer<CBitSet *> pbsInput);
 
 	// add given join order to best results
 	void AddJoinOrder(CExpression *pexprJoin, CDouble dCost);
 
 	// compute cost of given join expression
-	CDouble DCost(CExpression *pexpr);
+	CDouble DCost(gpos::pointer<CExpression *> pexpr);
 
 	// derive stats on given expression
-	void DeriveStats(CExpression *pexpr) override;
+	void DeriveStats(gpos::pointer<CExpression *> pexpr) override;
 
 	// add expression to cost map
 	void InsertExpressionCost(CExpression *pexpr, CDouble dCost,
 							  BOOL fValidateInsert);
 
 	// generate all subsets of the given array of elements
-	static void GenerateSubsets(CMemoryPool *mp, CBitSet *pbsCurrent,
+	static void GenerateSubsets(CMemoryPool *mp,
+								gpos::owner<CBitSet *> pbsCurrent,
 								ULONG *pulElems, ULONG size, ULONG ulIndex,
 								gpos::pointer<CBitSetArray *> pdrgpbsSubsets);
 
 	// driver of subset generation
-	static gpos::owner<CBitSetArray *> PdrgpbsSubsets(CMemoryPool *mp,
-													  CBitSet *pbs);
+	static gpos::owner<CBitSetArray *> PdrgpbsSubsets(
+		CMemoryPool *mp, gpos::pointer<CBitSet *> pbs);
 
 public:
 	// ctor
-	CJoinOrderDP(CMemoryPool *mp, CExpressionArray *pdrgpexprComponents,
-				 CExpressionArray *pdrgpexprConjuncts);
+	CJoinOrderDP(CMemoryPool *mp,
+				 gpos::owner<CExpressionArray *> pdrgpexprComponents,
+				 gpos::owner<CExpressionArray *> pdrgpexprConjuncts);
 
 	// dtor
 	~CJoinOrderDP() override;

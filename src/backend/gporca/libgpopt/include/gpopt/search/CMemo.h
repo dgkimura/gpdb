@@ -80,18 +80,19 @@ private:
 		m_sht;
 
 	// add new group
-	void Add(CGroup *pgroup, CExpression *pexprOrigin);
+	void Add(CGroup *pgroup, gpos::pointer<CExpression *> pexprOrigin);
 
 	// rehash all group expressions after group merge - not thread-safe
 	BOOL FRehash();
 
 	// helper for inserting group expression in target group
 	CGroup *PgroupInsert(CGroup *pgroupTarget, CGroupExpression *pgexpr,
-						 CExpression *pexprOrigin, BOOL fNewGroup);
+						 gpos::pointer<CExpression *> pexprOrigin,
+						 BOOL fNewGroup);
 
 	// helper to check if a new group needs to be created
-	BOOL FNewGroup(CGroup **ppgroupTarget, CGroupExpression *pgexpr,
-				   BOOL fScalar);
+	BOOL FNewGroup(gpos::owner<CGroup *> *ppgroupTarget,
+				   gpos::pointer<CGroupExpression *> pgexpr, BOOL fScalar);
 
 public:
 	CMemo(const CMemo &) = delete;
@@ -123,7 +124,8 @@ public:
 	ULONG UlDuplicateGroups();
 
 	// mark groups as duplicates
-	static void MarkDuplicates(CGroup *pgroupFst, CGroup *pgroupSnd);
+	static void MarkDuplicates(gpos::pointer<CGroup *> pgroupFst,
+							   CGroup *pgroupSnd);
 
 	// return tree map
 	MemoTreeMap *
@@ -133,16 +135,17 @@ public:
 	}
 
 	// set root group
-	void SetRoot(CGroup *pgroup);
+	void SetRoot(gpos::pointer<CGroup *> pgroup);
 
 	// insert group expression into hash table
 	CGroup *PgroupInsert(gpos::owner<CGroup *> pgroupTarget,
-						 CExpression *pexprOrigin, CGroupExpression *pgexpr);
+						 gpos::pointer<CExpression *> pexprOrigin,
+						 CGroupExpression *pgexpr);
 
 	// extract a plan that delivers the given required properties
-	CExpression *PexprExtractPlan(CMemoryPool *mp, CGroup *pgroupRoot,
-								  CReqdPropPlan *prppInput,
-								  ULONG ulSearchStages);
+	gpos::owner<CExpression *> PexprExtractPlan(
+		CMemoryPool *mp, gpos::pointer<CGroup *> pgroupRoot,
+		CReqdPropPlan *prppInput, ULONG ulSearchStages);
 
 	// merge duplicate groups
 	void GroupMerge();

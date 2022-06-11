@@ -63,14 +63,16 @@ CXformDelete2DML::Exfp(CExpressionHandle &	// exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformDelete2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							CExpression *pexpr) const
+CXformDelete2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
+							gpos::pointer<CXformResult *> pxfres,
+							gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDelete *popDelete = CLogicalDelete::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalDelete *> popDelete =
+		gpos::dyn_cast<CLogicalDelete>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
@@ -90,12 +92,14 @@ CXformDelete2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pexprChild->AddRef();
 
 	// create logical DML
-	CExpression *pexprAlt = CXformUtils::PexprLogicalDMLOverProject(
-		mp, pexprChild, CLogicalDML::EdmlDelete, ptabdesc, colref_array,
-		pcrCtid, pcrSegmentId);
+	gpos::owner<CExpression *> pexprAlt =
+		CXformUtils::PexprLogicalDMLOverProject(
+			mp, std::move(pexprChild), CLogicalDML::EdmlDelete,
+			std::move(ptabdesc), std::move(colref_array), pcrCtid,
+			pcrSegmentId);
 
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 // EOF

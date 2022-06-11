@@ -239,7 +239,7 @@ public:
 	};
 
 	// ctor
-	explicit CXform(CExpression *pexpr);
+	explicit CXform(gpos::owner<CExpression *> pexpr);
 
 	// dtor
 	~CXform() override;
@@ -301,7 +301,7 @@ public:
 #ifdef GPOS_DEBUG
 
 	// verify pattern against given expression
-	BOOL FCheckPattern(CExpression *pexpr) const;
+	BOOL FCheckPattern(gpos::pointer<CExpression *> pexpr) const;
 
 	// verify xform promise on the given expression
 	static BOOL FPromising(CMemoryPool *mp,
@@ -315,33 +315,35 @@ public:
 
 	// returns a set containing all xforms related to nl join
 	// caller takes ownership of the returned set
-	static CBitSet *PbsNLJoinXforms(CMemoryPool *mp);
+	static gpos::owner<CBitSet *> PbsNLJoinXforms(CMemoryPool *mp);
 
 	// returns a set containing all xforms related to index join
 	// caller takes ownership of the returned set
-	static CBitSet *PbsIndexJoinXforms(CMemoryPool *mp);
+	static gpos::owner<CBitSet *> PbsIndexJoinXforms(CMemoryPool *mp);
 
 	// returns a set containing all xforms related to bitmap indexes
 	// caller takes ownership of the returned set
-	static CBitSet *PbsBitmapIndexXforms(CMemoryPool *mp);
+	static gpos::owner<CBitSet *> PbsBitmapIndexXforms(CMemoryPool *mp);
 
 	// returns a set containing all xforms that generate a plan with a hash join
 	// caller takes ownership of the returned set
-	static CBitSet *PbsHashJoinXforms(CMemoryPool *mp);
+	static gpos::owner<CBitSet *> PbsHashJoinXforms(CMemoryPool *mp);
 
 	// returns a set containing xforms to use only the join order as available
 	// in the query
-	static CBitSet *PbsJoinOrderInQueryXforms(CMemoryPool *mp);
+	static gpos::owner<CBitSet *> PbsJoinOrderInQueryXforms(CMemoryPool *mp);
 
 	// returns a set containing xforms to use combination of greedy xforms
 	// for join order
-	static CBitSet *PbsJoinOrderOnGreedyXforms(CMemoryPool *mp);
+	static gpos::owner<CBitSet *> PbsJoinOrderOnGreedyXforms(CMemoryPool *mp);
 
 	// returns a set containing xforms to use for exhaustive join order
-	static CBitSet *PbsJoinOrderOnExhaustiveXforms(CMemoryPool *mp);
+	static gpos::owner<CBitSet *> PbsJoinOrderOnExhaustiveXforms(
+		CMemoryPool *mp);
 
 	// returns a set containing xforms to use for exhaustive2 join order
-	static CBitSet *PbsJoinOrderOnExhaustive2Xforms(CMemoryPool *mp);
+	static gpos::owner<CBitSet *> PbsJoinOrderOnExhaustive2Xforms(
+		CMemoryPool *mp);
 
 	// return true if xform should be applied only once.
 	// for expression of type CPatternTree, in deep trees, the number

@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMDScCmp.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -71,21 +73,25 @@ CParseHandlerMDScCmp::StartElement(const XMLCh *const,	// element_uri,
 
 
 	// parse scalar comparison properties
-	IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-		EdxltokenGPDBMDScCmp);
+	gpos::owner<IMDId *> mdid =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenGPDBMDScCmp);
 
-	IMDId *mdid_left = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBScalarOpLeftTypeId, EdxltokenGPDBMDScCmp);
+	gpos::owner<IMDId *> mdid_left =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBScalarOpLeftTypeId, EdxltokenGPDBMDScCmp);
 
-	IMDId *mdid_right = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBScalarOpRightTypeId, EdxltokenGPDBMDScCmp);
+	gpos::owner<IMDId *> mdid_right =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBScalarOpRightTypeId, EdxltokenGPDBMDScCmp);
 
-	IMDId *mdid_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
-		EdxltokenGPDBMDScCmp);
+	gpos::owner<IMDId *> mdid_op =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
+			EdxltokenGPDBMDScCmp);
 
 	// parse comparison type
 	const XMLCh *xml_str_comp_type = CDXLOperatorFactory::ExtractAttrValue(
@@ -95,7 +101,8 @@ CParseHandlerMDScCmp::StartElement(const XMLCh *const,	// element_uri,
 		CDXLOperatorFactory::ParseCmpType(xml_str_comp_type);
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDScCmpGPDB(
-		m_mp, mdid, mdname, mdid_left, mdid_right, comparision_type, mdid_op);
+		m_mp, std::move(mdid), mdname, std::move(mdid_left),
+		std::move(mdid_right), comparision_type, std::move(mdid_op));
 }
 
 //---------------------------------------------------------------------------

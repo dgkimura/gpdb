@@ -63,14 +63,16 @@ CXformInsert2DML::Exfp(CExpressionHandle &	// exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformInsert2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							CExpression *pexpr) const
+CXformInsert2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
+							gpos::pointer<CXformResult *> pxfres,
+							gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalInsert *popInsert = CLogicalInsert::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalInsert *> popInsert =
+		gpos::dyn_cast<CLogicalInsert>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
@@ -86,14 +88,16 @@ CXformInsert2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pexprChild->AddRef();
 
 	// create logical DML
-	CExpression *pexprAlt = CXformUtils::PexprLogicalDMLOverProject(
-		mp, pexprChild, CLogicalDML::EdmlInsert, ptabdesc, pdrgpcrSource,
-		nullptr,  //pcrCtid
-		nullptr	  //pcrSegmentId
-	);
+	gpos::owner<CExpression *> pexprAlt =
+		CXformUtils::PexprLogicalDMLOverProject(
+			mp, std::move(pexprChild), CLogicalDML::EdmlInsert,
+			std::move(ptabdesc), std::move(pdrgpcrSource),
+			nullptr,  //pcrCtid
+			nullptr	  //pcrSegmentId
+		);
 
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 // EOF

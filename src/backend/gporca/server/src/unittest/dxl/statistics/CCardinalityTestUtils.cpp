@@ -37,8 +37,8 @@ CCardinalityTestUtils::PbucketIntegerClosedLowerBound(CMemoryPool *mp,
 													  CDouble frequency,
 													  CDouble distinct)
 {
-	CPoint *ppLower = CTestUtils::PpointInt4(mp, iLower);
-	CPoint *ppUpper = CTestUtils::PpointInt4(mp, iUpper);
+	gpos::owner<CPoint *> ppLower = CTestUtils::PpointInt4(mp, iLower);
+	gpos::owner<CPoint *> ppUpper = CTestUtils::PpointInt4(mp, iUpper);
 
 	BOOL is_upper_closed = false;
 	if (ppLower->Equals(ppUpper))
@@ -46,8 +46,9 @@ CCardinalityTestUtils::PbucketIntegerClosedLowerBound(CMemoryPool *mp,
 		is_upper_closed = true;
 	}
 
-	return GPOS_NEW(mp) CBucket(ppLower, ppUpper, true /* is_lower_closed */,
-								is_upper_closed, frequency, distinct);
+	return GPOS_NEW(mp) CBucket(std::move(ppLower), std::move(ppUpper),
+								true /* is_lower_closed */, is_upper_closed,
+								frequency, distinct);
 }
 
 // create an integer bucket with the provider upper/lower bound, frequency and NDV information
@@ -57,11 +58,12 @@ CCardinalityTestUtils::PbucketInteger(CMemoryPool *mp, INT iLower, INT iUpper,
 									  BOOL is_upper_closed, CDouble frequency,
 									  CDouble distinct)
 {
-	CPoint *ppLower = CTestUtils::PpointInt4(mp, iLower);
-	CPoint *ppUpper = CTestUtils::PpointInt4(mp, iUpper);
+	gpos::owner<CPoint *> ppLower = CTestUtils::PpointInt4(mp, iLower);
+	gpos::owner<CPoint *> ppUpper = CTestUtils::PpointInt4(mp, iUpper);
 
-	return GPOS_NEW(mp) CBucket(ppLower, ppUpper, is_lower_closed,
-								is_upper_closed, frequency, distinct);
+	return GPOS_NEW(mp)
+		CBucket(std::move(ppLower), std::move(ppUpper), is_lower_closed,
+				is_upper_closed, frequency, distinct);
 }
 
 // create a singleton bucket containing a boolean value
@@ -112,8 +114,8 @@ CCardinalityTestUtils::PhistInt4Remain(CMemoryPool *mp, ULONG num_of_buckets,
 		freq_remaining = CDouble(0.0);
 	}
 
-	return GPOS_NEW(mp) CHistogram(mp, histogram_buckets, true, null_freq,
-								   num_NDV_remain, freq_remaining);
+	return GPOS_NEW(mp) CHistogram(mp, std::move(histogram_buckets), true,
+								   null_freq, num_NDV_remain, freq_remaining);
 }
 
 // helper function to generate an example int histogram
@@ -139,7 +141,7 @@ CCardinalityTestUtils::PhistExampleInt4(CMemoryPool *mp)
 		CCardinalityTestUtils::PbucketIntegerClosedLowerBound(mp, 100, 100, 0.1,
 															  1.0));
 
-	return GPOS_NEW(mp) CHistogram(mp, histogram_buckets);
+	return GPOS_NEW(mp) CHistogram(mp, std::move(histogram_buckets));
 }
 
 // helper function to generates example bool histogram
@@ -154,11 +156,11 @@ CCardinalityTestUtils::PhistExampleBool(CMemoryPool *mp)
 		CCardinalityTestUtils::PbucketSingletonBoolVal(mp, true, 0.2);
 	histogram_buckets->Append(pbucketFalse);
 	histogram_buckets->Append(pbucketTrue);
-	return GPOS_NEW(mp) CHistogram(mp, histogram_buckets);
+	return GPOS_NEW(mp) CHistogram(mp, std::move(histogram_buckets));
 }
 
 // helper function to generate a point from an encoded value of specific datatype
-CPoint *
+gpos::owner<CPoint *>
 CCardinalityTestUtils::PpointGeneric(CMemoryPool *mp, OID oid,
 									 CWStringDynamic *pstrEncodedValue,
 									 LINT value)
@@ -166,15 +168,15 @@ CCardinalityTestUtils::PpointGeneric(CMemoryPool *mp, OID oid,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	gpos::owner<IMDId *> mdid = GPOS_NEW(mp) CMDIdGPDB(oid);
-	IDatum *datum = CTestUtils::CreateGenericDatum(mp, md_accessor, mdid,
-												   pstrEncodedValue, value);
-	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(datum);
+	gpos::owner<IDatum *> datum = CTestUtils::CreateGenericDatum(
+		mp, md_accessor, std::move(mdid), pstrEncodedValue, value);
+	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(std::move(datum));
 
 	return point;
 }
 
 // helper function to generate a point of numeric datatype
-CPoint *
+gpos::owner<CPoint *>
 CCardinalityTestUtils::PpointNumeric(CMemoryPool *mp,
 									 CWStringDynamic *pstrEncodedValue,
 									 CDouble value)
@@ -189,26 +191,27 @@ CCardinalityTestUtils::PpointNumeric(CMemoryPool *mp,
 		CDXLUtils::DecodeByteArrayFromString(mp, pstrEncodedValue, &ulbaSize);
 
 	gpos::owner<CDXLDatumStatsDoubleMappable *> dxl_datum = GPOS_NEW(mp)
-		CDXLDatumStatsDoubleMappable(mp, mdid, default_type_modifier,
+		CDXLDatumStatsDoubleMappable(mp, std::move(mdid), default_type_modifier,
 									 false /*is_const_null*/, data, ulbaSize,
 									 value);
 
-	IDatum *datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
-	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(datum);
+	gpos::owner<IDatum *> datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
+	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(std::move(datum));
 	dxl_datum->Release();
 
 	return point;
 }
 
 // helper function to generate a point from an encoded value of specific datatype
-CPoint *
+gpos::owner<CPoint *>
 CCardinalityTestUtils::PpointDouble(CMemoryPool *mp, OID oid, CDouble value)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	gpos::owner<IMDId *> mdid = GPOS_NEW(mp) CMDIdGPDB(oid);
-	IDatum *datum = CTestUtils::CreateDoubleDatum(mp, md_accessor, mdid, value);
-	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(datum);
+	gpos::owner<IDatum *> datum =
+		CTestUtils::CreateDoubleDatum(mp, md_accessor, std::move(mdid), value);
+	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(std::move(datum));
 
 	return point;
 }

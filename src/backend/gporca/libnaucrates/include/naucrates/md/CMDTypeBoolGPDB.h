@@ -207,7 +207,7 @@ public:
 	}
 
 	// id of the relation corresponding to a composite type
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetBaseRelMdid() const override
 	{
 		return nullptr;
@@ -237,12 +237,12 @@ public:
 		gpos::pointer<const CDXLScalarConstValue *> dxl_op) const override;
 
 	// generate the DXL datum from IDatum
-	gpos::owner<CDXLDatum *> GetDatumVal(CMemoryPool *mp,
-										 IDatum *datum) const override;
+	gpos::owner<CDXLDatum *> GetDatumVal(
+		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const override;
 
 	// generate the DXL scalar constant from IDatum
 	gpos::owner<CDXLScalarConstValue *> GetDXLOpScConst(
-		CMemoryPool *mp, IDatum *datum) const override;
+		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const override;
 
 	// generate the DXL datum representing null value
 	gpos::owner<CDXLDatum *> GetDXLDatumNull(CMemoryPool *mp) const override;

@@ -51,13 +51,13 @@ public:
 	}
 
 	// create derived properties container
-	CDrvdProp *PdpCreate(CMemoryPool *mp) const override;
+	gpos::owner<CDrvdProp *> PdpCreate(CMemoryPool *mp) const override;
 
 	// create required properties container
-	CReqdProp *PrpCreate(CMemoryPool *mp) const override;
+	gpos::owner<CReqdProp *> PrpCreate(CMemoryPool *mp) const override;
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::pointer<COperator *>) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
@@ -66,9 +66,9 @@ public:
 	virtual BOOL FLeaf() const = 0;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+		BOOL must_exist) override;
 
 	// conversion function
 	static gpos::cast_func<CPattern *>

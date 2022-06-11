@@ -42,7 +42,7 @@ public:
 	CDXLScalarIfStmt(const CDXLScalarIfStmt &) = delete;
 
 	// ctor
-	CDXLScalarIfStmt(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarIfStmt(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type);
 
 	//dtor
 	~CDXLScalarIfStmt() override;

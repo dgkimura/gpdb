@@ -43,7 +43,8 @@ public:
 	CDXLScalarNullIf(CDXLScalarNullIf &) = delete;
 
 	// ctor
-	CDXLScalarNullIf(CMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type);
+	CDXLScalarNullIf(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
+					 gpos::owner<IMDId *> mdid_type);
 
 	// dtor
 	~CDXLScalarNullIf() override;

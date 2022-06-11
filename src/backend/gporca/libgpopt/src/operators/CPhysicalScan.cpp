@@ -35,8 +35,8 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalScan::CPhysicalScan(CMemoryPool *mp, const CName *pnameAlias,
-							 CTableDescriptor *ptabdesc,
-							 CColRefArray *pdrgpcrOutput)
+							 gpos::owner<CTableDescriptor *> ptabdesc,
+							 gpos::owner<CColRefArray *> pdrgpcrOutput)
 	: CPhysical(mp),
 	  m_pnameAlias(pnameAlias),
 	  m_ptabdesc(ptabdesc),
@@ -106,7 +106,7 @@ CPhysicalScan::FInputOrderSensitive() const
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalScan::FProvidesReqdCols(CExpressionHandle &,  // exprhdl
-								 CColRefSet *pcrsRequired,
+								 gpos::pointer<CColRefSet *> pcrsRequired,
 								 ULONG	// ulOptReq
 ) const
 {
@@ -186,9 +186,9 @@ CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		CExpression *pexprIndexPred = exprhdl.PexprScalarExactChild(
 			0 /*child_index*/, true /*error_on_null_return*/);
 
-		CDistributionSpecHashed *pdshashed =
-			CDistributionSpecHashed::PdsConvert(m_pds);
-		CDistributionSpecHashed *pdshashedEquiv =
+		gpos::pointer<CDistributionSpecHashed *> pdshashed =
+			gpos::dyn_cast<CDistributionSpecHashed>(m_pds);
+		gpos::owner<CDistributionSpecHashed *> pdshashedEquiv =
 			CDistributionSpecHashed::TryToCompleteEquivSpec(
 				mp, pdshashed, pexprIndexPred, exprhdl.DeriveOuterReferences());
 
@@ -203,8 +203,8 @@ CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 			}
 			gpos::owner<CDistributionSpecHashed *> pdshashedResult =
 				GPOS_NEW(mp) CDistributionSpecHashed(
-					pdrgpexprHashed, pdshashed->FNullsColocated(),
-					pdshashedEquiv, pdshashed->Opfamilies());
+					std::move(pdrgpexprHashed), pdshashed->FNullsColocated(),
+					std::move(pdshashedEquiv), pdshashed->Opfamilies());
 
 			return pdshashedResult;
 		}

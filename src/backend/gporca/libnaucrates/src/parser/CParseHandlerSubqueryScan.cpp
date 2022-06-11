@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerSubqueryScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFilter.h"
@@ -65,9 +67,9 @@ CParseHandlerSubqueryScan::StartElement(const XMLCh *const,	 // element_uri,
 				   str->GetBuffer());
 	}
 
-	m_dxl_op =
-		(CDXLPhysicalSubqueryScan *) CDXLOperatorFactory::MakeDXLSubqScan(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	m_dxl_op = gpos::cast<CDXLPhysicalSubqueryScan>(
+		CDXLOperatorFactory::MakeDXLSubqScan(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// create child node parsers in reverse order of their expected occurrence
 

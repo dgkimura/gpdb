@@ -43,7 +43,7 @@ public:
 	CDXLIndexDescr(const CDXLIndexDescr &) = delete;
 
 	// ctor
-	CDXLIndexDescr(IMDId *mdid, CMDName *mdname);
+	CDXLIndexDescr(gpos::owner<IMDId *> mdid, CMDName *mdname);
 
 	// dtor
 	~CDXLIndexDescr() override;

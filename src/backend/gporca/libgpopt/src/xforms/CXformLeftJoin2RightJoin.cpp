@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformLeftJoin2RightJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/operators/CLogicalLeftOuterJoin.h"
@@ -82,9 +83,9 @@ CXformLeftJoin2RightJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftJoin2RightJoin::Transform(CXformContext *pxfctxt,
-									CXformResult *pxfres,
-									CExpression *pexpr) const
+CXformLeftJoin2RightJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
+									gpos::pointer<CXformResult *> pxfres,
+									gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -100,10 +101,10 @@ CXformLeftJoin2RightJoin::Transform(CXformContext *pxfctxt,
 	pexprInner->AddRef();
 	pexprScalar->AddRef();
 
-	CExpression *pexprRightJoin =
+	gpos::owner<CExpression *> pexprRightJoin =
 		CUtils::PexprLogicalJoin<CLogicalRightOuterJoin>(
 			mp, pexprInner, pexprOuter, pexprScalar);
-	pxfres->Add(pexprRightJoin);
+	pxfres->Add(std::move(pexprRightJoin));
 }
 
 

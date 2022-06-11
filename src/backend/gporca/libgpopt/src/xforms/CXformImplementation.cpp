@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementation.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 
@@ -24,7 +25,8 @@ using namespace gpopt;
 //		Dtor
 //
 //---------------------------------------------------------------------------
-CXformImplementation::CXformImplementation(CExpression *pexpr) : CXform(pexpr)
+CXformImplementation::CXformImplementation(gpos::owner<CExpression *> pexpr)
+	: CXform(pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 }

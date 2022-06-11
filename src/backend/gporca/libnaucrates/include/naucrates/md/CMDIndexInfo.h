@@ -35,7 +35,7 @@ private:
 
 public:
 	// ctor
-	CMDIndexInfo(IMDId *mdid, BOOL is_partial);
+	CMDIndexInfo(gpos::owner<IMDId *> mdid, BOOL is_partial);
 
 	// dtor
 	~CMDIndexInfo() override;

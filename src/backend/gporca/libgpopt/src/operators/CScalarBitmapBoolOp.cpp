@@ -17,6 +17,8 @@
 
 #include "gpopt/operators/CScalarBitmapBoolOp.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/metadata/CIndexDescriptor.h"
@@ -41,10 +43,10 @@ const WCHAR CScalarBitmapBoolOp::m_rgwszBitmapOpType[EbitmapboolSentinel][30] =
 //---------------------------------------------------------------------------
 CScalarBitmapBoolOp::CScalarBitmapBoolOp(CMemoryPool *mp,
 										 EBitmapBoolOp ebitmapboolop,
-										 IMDId *pmdidBitmapType)
+										 gpos::owner<IMDId *> pmdidBitmapType)
 	: CScalar(mp),
 	  m_ebitmapboolop(ebitmapboolop),
-	  m_pmdidBitmapType(pmdidBitmapType)
+	  m_pmdidBitmapType(std::move(pmdidBitmapType))
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(EbitmapboolSentinel > ebitmapboolop);
@@ -90,13 +92,14 @@ CScalarBitmapBoolOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBitmapBoolOp::Matches(COperator *pop) const
+CScalarBitmapBoolOp::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	CScalarBitmapBoolOp *popBitmapBoolOp = PopConvert(pop);
+	gpos::pointer<CScalarBitmapBoolOp *> popBitmapBoolOp =
+		gpos::dyn_cast<CScalarBitmapBoolOp>(pop);
 
 	return popBitmapBoolOp->Ebitmapboolop() == Ebitmapboolop() &&
 		   popBitmapBoolOp->MdidType()->Equals(m_pmdidBitmapType);

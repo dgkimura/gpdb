@@ -18,7 +18,7 @@ CColConstraintsHashMapper::PdrgPcnstrLookup(CColRef *colref)
 }
 
 // mapping between columns and single column constraints in array of constraints
-static ColRefToConstraintArrayMap *
+static gpos::owner<ColRefToConstraintArrayMap *>
 PhmcolconstrSingleColConstr(CMemoryPool *mp,
 							gpos::pointer<const CConstraintArray *> drgPcnstr)
 {
@@ -30,7 +30,7 @@ PhmcolconstrSingleColConstr(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		CConstraint *pcnstrChild = (*drgPcnstr)[ul];
-		CColRefSet *pcrs = pcnstrChild->PcrsUsed();
+		gpos::pointer<CColRefSet *> pcrs = pcnstrChild->PcrsUsed();
 
 		if (1 == pcrs->Size())
 		{
@@ -51,7 +51,7 @@ PhmcolconstrSingleColConstr(CMemoryPool *mp,
 }
 
 CColConstraintsHashMapper::CColConstraintsHashMapper(
-	CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
+	CMemoryPool *mp, gpos::pointer<CConstraintArray *> pdrgpcnstr)
 	: m_phmColConstr(PhmcolconstrSingleColConstr(mp, pdrgpcnstr))
 {
 }

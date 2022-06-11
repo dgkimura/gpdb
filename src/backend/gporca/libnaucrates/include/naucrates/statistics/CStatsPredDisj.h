@@ -42,7 +42,8 @@ private:
 
 public:
 	// ctor
-	explicit CStatsPredDisj(CStatsPredPtrArry *disj_pred_stats_array);
+	explicit CStatsPredDisj(
+		gpos::owner<CStatsPredPtrArry *> disj_pred_stats_array);
 
 	// dtor
 	~CStatsPredDisj() override

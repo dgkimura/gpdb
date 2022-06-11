@@ -223,11 +223,10 @@ CMinidumperUtils::Finalize(CMiniDumperDXL *pmdmp, BOOL fSerializeErrCtx)
 //
 //---------------------------------------------------------------------------
 CDXLNode *
-CMinidumperUtils::PdxlnExecuteMinidump(CMemoryPool *mp, const CHAR *file_name,
-									   ULONG ulSegments, ULONG ulSessionId,
-									   ULONG ulCmdId,
-									   COptimizerConfig *optimizer_config,
-									   IConstExprEvaluator *pceeval)
+CMinidumperUtils::PdxlnExecuteMinidump(
+	CMemoryPool *mp, const CHAR *file_name, ULONG ulSegments, ULONG ulSessionId,
+	ULONG ulCmdId, gpos::pointer<COptimizerConfig *> optimizer_config,
+	gpos::pointer<IConstExprEvaluator *> pceeval)
 {
 	GPOS_ASSERT(nullptr != file_name);
 	GPOS_ASSERT(nullptr != optimizer_config);
@@ -258,11 +257,11 @@ CMinidumperUtils::PdxlnExecuteMinidump(CMemoryPool *mp, const CHAR *file_name,
 //
 //---------------------------------------------------------------------------
 CDXLNode *
-CMinidumperUtils::PdxlnExecuteMinidump(CMemoryPool *mp, CDXLMinidump *pdxlmd,
-									   const CHAR *file_name, ULONG ulSegments,
-									   ULONG ulSessionId, ULONG ulCmdId,
-									   COptimizerConfig *optimizer_config,
-									   IConstExprEvaluator *pceeval)
+CMinidumperUtils::PdxlnExecuteMinidump(
+	CMemoryPool *mp, CDXLMinidump *pdxlmd, const CHAR *file_name,
+	ULONG ulSegments, ULONG ulSessionId, ULONG ulCmdId,
+	gpos::pointer<COptimizerConfig *> optimizer_config,
+	gpos::pointer<IConstExprEvaluator *> pceeval)
 {
 	GPOS_ASSERT(nullptr != file_name);
 
@@ -291,7 +290,8 @@ CDXLNode *
 CMinidumperUtils::PdxlnExecuteMinidump(
 	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLMinidump *pdxlmd,
 	const CHAR *file_name, ULONG ulSegments, ULONG ulSessionId, ULONG ulCmdId,
-	COptimizerConfig *optimizer_config, IConstExprEvaluator *pceeval)
+	gpos::pointer<COptimizerConfig *> optimizer_config,
+	gpos::pointer<IConstExprEvaluator *> pceeval)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 	GPOS_ASSERT(nullptr != pdxlmd->GetQueryDXLRoot() &&

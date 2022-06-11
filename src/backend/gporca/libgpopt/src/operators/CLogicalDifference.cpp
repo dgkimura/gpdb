@@ -44,10 +44,10 @@ CLogicalDifference::CLogicalDifference(CMemoryPool *mp) : CLogicalSetOp(mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalDifference::CLogicalDifference(CMemoryPool *mp,
-									   CColRefArray *pdrgpcrOutput,
-									   CColRef2dArray *pdrgpdrgpcrInput)
-	: CLogicalSetOp(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
+CLogicalDifference::CLogicalDifference(
+	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrOutput,
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput)
+	: CLogicalSetOp(mp, std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrInput))
 {
 }
 
@@ -91,16 +91,17 @@ CLogicalDifference::DeriveMaxCard(CMemoryPool *,  // mp
 //
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
-CLogicalDifference::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+CLogicalDifference::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput =
+	gpos::owner<CColRefArray *> pdrgpcrOutput =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
-	CColRef2dArray *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
 		mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
-	return GPOS_NEW(mp) CLogicalDifference(mp, pdrgpcrOutput, pdrgpdrgpcrInput);
+	return GPOS_NEW(mp) CLogicalDifference(mp, std::move(pdrgpcrOutput),
+										   std::move(pdrgpdrgpcrInput));
 }
 
 
@@ -112,7 +113,7 @@ CLogicalDifference::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalDifference::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -128,9 +129,9 @@ CLogicalDifference::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 IStatisticsArray *	 // not used
+								 gpos::pointer<IStatisticsArray *>	// not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
@@ -147,8 +148,8 @@ CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		output_colrefsets->Append(pcrs);
 	}
 
-	IStatistics *outer_stats = exprhdl.Pstats(0);
-	IStatistics *inner_side_stats = exprhdl.Pstats(1);
+	gpos::pointer<IStatistics *> outer_stats = exprhdl.Pstats(0);
+	gpos::pointer<IStatistics *> inner_side_stats = exprhdl.Pstats(1);
 
 	// construct the scalar condition for the LASJ
 	gpos::owner<CExpression *> pexprScCond =

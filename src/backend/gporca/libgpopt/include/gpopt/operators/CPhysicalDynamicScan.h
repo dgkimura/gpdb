@@ -61,12 +61,13 @@ public:
 	CPhysicalDynamicScan(const CPhysicalDynamicScan &) = delete;
 
 	// ctor
-	CPhysicalDynamicScan(CMemoryPool *mp, CTableDescriptor *ptabdesc,
-						 ULONG ulOriginOpId, const CName *pnameAlias,
-						 ULONG scan_id, CColRefArray *pdrgpcrOutput,
-						 CColRef2dArray *pdrgpdrgpcrParts,
-						 IMdIdArray *partition_mdids,
-						 ColRefToUlongMapArray *root_col_mapping_per_part);
+	CPhysicalDynamicScan(
+		CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
+		ULONG ulOriginOpId, const CName *pnameAlias, ULONG scan_id,
+		gpos::owner<CColRefArray *> pdrgpcrOutput,
+		gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
+		gpos::owner<IMdIdArray *> partition_mdids,
+		gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part);
 
 	// dtor
 	~CPhysicalDynamicScan() override;

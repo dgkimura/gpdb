@@ -33,7 +33,8 @@ public:
 
 	// ctor
 	CDXLScalarPartListValues(CMemoryPool *mp, ULONG partitioning_level,
-							 IMDId *result_type_mdid, IMDId *elem_type_mdid);
+							 gpos::owner<IMDId *> result_type_mdid,
+							 gpos::owner<IMDId *> elem_type_mdid);
 
 	// dtor
 	~CDXLScalarPartListValues() override;

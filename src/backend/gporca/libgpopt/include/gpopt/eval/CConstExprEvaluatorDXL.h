@@ -19,6 +19,7 @@
 #define GPOPT_CConstExprEvaluatorDXL_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/eval/IConstExprEvaluator.h"
@@ -71,7 +72,8 @@ public:
 
 	// evaluate the given expression and return the result as a new expression
 	// caller takes ownership of returned expression
-	CExpression *PexprEval(CExpression *pexpr) override;
+	gpos::owner<CExpression *> PexprEval(
+		gpos::pointer<CExpression *> pexpr) override;
 
 	// Returns true iff the evaluator can evaluate expressions
 	BOOL FCanEvalExpressions() override;

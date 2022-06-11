@@ -115,7 +115,7 @@ CDXLPhysicalBroadcastMotion::AssertValid(
 
 	GPOS_ASSERT(EdxlbmIndexSentinel == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlbmIndexChild];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[EdxlbmIndexChild];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

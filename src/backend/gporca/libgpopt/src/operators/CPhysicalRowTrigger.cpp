@@ -29,9 +29,11 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalRowTrigger::CPhysicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
-										 INT type, CColRefArray *pdrgpcrOld,
-										 CColRefArray *pdrgpcrNew)
+CPhysicalRowTrigger::CPhysicalRowTrigger(CMemoryPool *mp,
+										 gpos::owner<IMDId *> rel_mdid,
+										 INT type,
+										 gpos::owner<CColRefArray *> pdrgpcrOld,
+										 gpos::owner<CColRefArray *> pdrgpcrNew)
 	: CPhysical(mp),
 	  m_rel_mdid(rel_mdid),
 	  m_type(type),
@@ -82,16 +84,17 @@ CPhysicalRowTrigger::~CPhysicalRowTrigger()
 //
 //---------------------------------------------------------------------------
 gpos::owner<COrderSpec *>
-CPhysicalRowTrigger::PosRequired(CMemoryPool *mp,
-								 CExpressionHandle &,		   //exprhdl,
-								 gpos::pointer<COrderSpec *>,  //posRequired,
-								 ULONG
+CPhysicalRowTrigger::PosRequired(
+	CMemoryPool *mp,
+	CExpressionHandle &,		  //exprhdl,
+	gpos::pointer<COrderSpec *>,  //posRequired,
+	ULONG
 #ifdef GPOS_DEBUG
-									 child_index
+		child_index
 #endif
-								 ,
-								 CDrvdPropArray *,	// pdrgpdpCtxt
-								 ULONG				// ulOptReq
+	,
+	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+	ULONG							  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -146,17 +149,18 @@ CPhysicalRowTrigger::EpetOrder(CExpressionHandle &,	 // exprhdl
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
-CPhysicalRowTrigger::PcrsRequired(CMemoryPool *mp,
-								  CExpressionHandle &,	// exprhdl,
-								  CColRefSet *pcrsRequired,
-								  ULONG
+gpos::owner<CColRefSet *>
+CPhysicalRowTrigger::PcrsRequired(
+	CMemoryPool *mp,
+	CExpressionHandle &,  // exprhdl,
+	gpos::pointer<CColRefSet *> pcrsRequired,
+	ULONG
 #ifdef GPOS_DEBUG
-									  child_index
+		child_index
 #endif	// GPOS_DEBUG
-								  ,
-								  CDrvdPropArray *,	 // pdrgpdpCtxt
-								  ULONG				 // ulOptReq
+	,
+	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+	ULONG							  // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -177,10 +181,11 @@ CPhysicalRowTrigger::PcrsRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::owner<CDistributionSpec *>
-CPhysicalRowTrigger::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 CDistributionSpec *pdsInput, ULONG child_index,
-								 CDrvdPropArray *,	// pdrgpdpCtxt
-								 ULONG				// ulOptReq
+CPhysicalRowTrigger::PdsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
+	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+	ULONG							  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -202,12 +207,12 @@ CPhysicalRowTrigger::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
-CPhysicalRowTrigger::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 CRewindabilitySpec *prsRequired,
-								 ULONG child_index,
-								 CDrvdPropArray *,	// pdrgpdpCtxt
-								 ULONG				// ulOptReq
+gpos::owner<CRewindabilitySpec *>
+CPhysicalRowTrigger::PrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index,
+	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+	ULONG							  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -223,10 +228,10 @@ CPhysicalRowTrigger::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::owner<CCTEReq *>
 CPhysicalRowTrigger::PcteRequired(CMemoryPool *,		//mp,
 								  CExpressionHandle &,	//exprhdl,
-								  CCTEReq *pcter,
+								  gpos::pointer<CCTEReq *> pcter,
 								  ULONG
 #ifdef GPOS_DEBUG
 									  child_index
@@ -250,7 +255,7 @@ CPhysicalRowTrigger::PcteRequired(CMemoryPool *,		//mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalRowTrigger::FProvidesReqdCols(CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired,
+									   gpos::pointer<CColRefSet *> pcrsRequired,
 									   ULONG  // ulOptReq
 ) const
 {
@@ -265,7 +270,7 @@ CPhysicalRowTrigger::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalRowTrigger::PdsDerive(CMemoryPool *,  // mp
 							   CExpressionHandle &exprhdl) const
 {
@@ -280,7 +285,7 @@ CPhysicalRowTrigger::PdsDerive(CMemoryPool *,  // mp
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalRowTrigger::PrsDerive(CMemoryPool *mp,
 							   CExpressionHandle &exprhdl) const
 {
@@ -326,17 +331,18 @@ CPhysicalRowTrigger::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalRowTrigger::Matches(COperator *pop) const
+CPhysicalRowTrigger::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CPhysicalRowTrigger *popRowTrigger = CPhysicalRowTrigger::PopConvert(pop);
+	gpos::pointer<CPhysicalRowTrigger *> popRowTrigger =
+		gpos::dyn_cast<CPhysicalRowTrigger>(pop);
 
-	CColRefArray *pdrgpcrOld = popRowTrigger->PdrgpcrOld();
-	CColRefArray *pdrgpcrNew = popRowTrigger->PdrgpcrNew();
+	gpos::pointer<CColRefArray *> pdrgpcrOld = popRowTrigger->PdrgpcrOld();
+	gpos::pointer<CColRefArray *> pdrgpcrNew = popRowTrigger->PdrgpcrNew();
 
 	return m_rel_mdid->Equals(popRowTrigger->GetRelMdId()) &&
 		   m_type == popRowTrigger->GetType() &&
@@ -358,7 +364,8 @@ CPhysicalRowTrigger::EpetRewindability(
 	CExpressionHandle &exprhdl,
 	gpos::pointer<const CEnfdRewindability *> per) const
 {
-	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
+	gpos::pointer<CRewindabilitySpec *> prs =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{
 		// required rewindability is already provided

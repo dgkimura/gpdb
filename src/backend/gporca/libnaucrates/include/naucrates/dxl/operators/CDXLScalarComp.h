@@ -53,7 +53,7 @@ public:
 	CDXLScalarComp(CDXLScalarComp &) = delete;
 
 	// ctor/dtor
-	CDXLScalarComp(CMemoryPool *mp, IMDId *operator_mdid,
+	CDXLScalarComp(CMemoryPool *mp, gpos::owner<IMDId *> operator_mdid,
 				   const CWStringConst *comparison_operator_name);
 
 	~CDXLScalarComp() override;

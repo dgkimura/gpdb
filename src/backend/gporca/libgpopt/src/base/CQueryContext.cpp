@@ -33,13 +33,16 @@ FORCE_GENERATE_DBGSTR(CQueryContext);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CQueryContext::CQueryContext(CMemoryPool *mp, CExpression *pexpr,
-							 CReqdPropPlan *prpp, CColRefArray *colref_array,
-							 CMDNameArray *pdrgpmdname, BOOL fDeriveStats)
-	: m_prpp(prpp),
-	  m_pdrgpcr(colref_array),
+CQueryContext::CQueryContext(CMemoryPool *mp,
+							 gpos::pointer<CExpression *> pexpr,
+							 gpos::owner<CReqdPropPlan *> prpp,
+							 gpos::owner<CColRefArray *> colref_array,
+							 gpos::owner<CMDNameArray *> pdrgpmdname,
+							 BOOL fDeriveStats)
+	: m_prpp(std::move(prpp)),
+	  m_pdrgpcr(std::move(colref_array)),
 	  m_pdrgpcrSystemCols(nullptr),
-	  m_pdrgpmdname(pdrgpmdname),
+	  m_pdrgpmdname(std::move(pdrgpmdname)),
 	  m_fDeriveStats(fDeriveStats)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -53,7 +56,7 @@ CQueryContext::CQueryContext(CMemoryPool *mp, CExpression *pexpr,
 #endif	//GPOS_DEBUG
 
 	// mark unused CTEs
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::pointer<CCTEInfo *> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	pcteinfo->MarkUnusedCTEs();
 
 	gpos::owner<CColRefSet *> pcrsOutputAndOrderingCols =
@@ -113,12 +116,12 @@ CQueryContext::~CQueryContext()
 //
 //---------------------------------------------------------------------------
 COperator *
-CQueryContext::PopTop(CExpression *pexpr)
+CQueryContext::PopTop(gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
 	// skip CTE anchors if any
-	CExpression *pexprCurr = pexpr;
+	gpos::pointer<CExpression *> pexprCurr = pexpr;
 	while (COperator::EopLogicalCTEAnchor == pexprCurr->Pop()->Eopid())
 	{
 		pexprCurr = (*pexprCurr)[0];
@@ -165,9 +168,10 @@ CQueryContext::SetSystemCols(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CQueryContext *
-CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
-						   ULongPtrArray *pdrgpulQueryOutputColRefId,
-						   CMDNameArray *pdrgpmdname, BOOL fDeriveStats)
+CQueryContext::PqcGenerate(
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+	gpos::pointer<ULongPtrArray *> pdrgpulQueryOutputColRefId,
+	CMDNameArray *pdrgpmdname, BOOL fDeriveStats)
 {
 	GPOS_ASSERT(nullptr != pexpr && nullptr != pdrgpulQueryOutputColRefId);
 
@@ -198,12 +202,12 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	// the input logical expression is a LIMIT. This is because Orca always
 	// attaches top level Sort to a LIMIT node.
 	gpos::owner<COrderSpec *> pos = nullptr;
-	CExpression *pexprResult = pexpr;
-	COperator *popTop = PopTop(pexpr);
+	gpos::pointer<CExpression *> pexprResult = pexpr;
+	gpos::pointer<COperator *> popTop = PopTop(pexpr);
 	if (COperator::EopLogicalLimit == popTop->Eopid())
 	{
 		// top level operator is a limit, copy order spec to query context
-		pos = CLogicalLimit::PopConvert(popTop)->Pos();
+		pos = gpos::dyn_cast<CLogicalLimit>(popTop)->Pos();
 		pos->AddRef();
 	}
 	else
@@ -239,28 +243,31 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 
 	// Ensure order, distribution and rewindability meet 'satisfy' matching at the top level
 	gpos::owner<CEnfdOrder *> peo =
-		GPOS_NEW(mp) CEnfdOrder(pos, CEnfdOrder::EomSatisfy);
-	gpos::owner<CEnfdDistribution *> ped =
-		GPOS_NEW(mp) CEnfdDistribution(pds, CEnfdDistribution::EdmSatisfy);
-	gpos::owner<CEnfdRewindability *> per =
-		GPOS_NEW(mp) CEnfdRewindability(prs, CEnfdRewindability::ErmSatisfy);
-	gpos::owner<CEnfdPartitionPropagation *> pepp = GPOS_NEW(mp)
-		CEnfdPartitionPropagation(ppps, CEnfdPartitionPropagation::EppmSatisfy);
+		GPOS_NEW(mp) CEnfdOrder(std::move(pos), CEnfdOrder::EomSatisfy);
+	gpos::owner<CEnfdDistribution *> ped = GPOS_NEW(mp)
+		CEnfdDistribution(std::move(pds), CEnfdDistribution::EdmSatisfy);
+	gpos::owner<CEnfdRewindability *> per = GPOS_NEW(mp)
+		CEnfdRewindability(std::move(prs), CEnfdRewindability::ErmSatisfy);
+	gpos::owner<CEnfdPartitionPropagation *> pepp =
+		GPOS_NEW(mp) CEnfdPartitionPropagation(
+			std::move(ppps), CEnfdPartitionPropagation::EppmSatisfy);
 
 	// Required CTEs are obtained from the CTEInfo global information in the optimizer context
-	CCTEReq *pcter = poptctxt->Pcteinfo()->PcterProducers(mp);
+	gpos::owner<CCTEReq *> pcter = poptctxt->Pcteinfo()->PcterProducers(mp);
 
 	// NB: Partition propagation requirements are not initialized here.  They are
 	// constructed later based on derived relation properties (CPartInfo) by
 	// CReqdPropPlan::InitReqdPartitionPropagation().
 
-	gpos::owner<CReqdPropPlan *> prpp =
-		GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pcter);
+	gpos::owner<CReqdPropPlan *> prpp = GPOS_NEW(mp)
+		CReqdPropPlan(std::move(pcrs), std::move(peo), std::move(ped),
+					  std::move(per), std::move(pepp), std::move(pcter));
 
 	// Finally, create the CQueryContext
 	pdrgpmdname->AddRef();
-	return GPOS_NEW(mp) CQueryContext(mp, pexprResult, prpp, colref_array,
-									  pdrgpmdname, fDeriveStats);
+	return GPOS_NEW(mp)
+		CQueryContext(mp, pexprResult, std::move(prpp), std::move(colref_array),
+					  pdrgpmdname, fDeriveStats);
 }
 
 #ifdef GPOS_DEBUG
@@ -292,18 +299,18 @@ CQueryContext::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 void
 CQueryContext::MapComputedToUsedCols(CColumnFactory *col_factory,
-									 CExpression *pexpr)
+									 gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
 	if (COperator::EopLogicalProject == pexpr->Pop()->Eopid())
 	{
-		CExpression *pexprPrL = (*pexpr)[1];
+		gpos::pointer<CExpression *> pexprPrL = (*pexpr)[1];
 
 		const ULONG arity = pexprPrL->Arity();
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			CExpression *pexprPrEl = (*pexprPrL)[ul];
+			gpos::pointer<CExpression *> pexprPrEl = (*pexprPrL)[ul];
 			col_factory->AddComputedToUsedColsMap(pexprPrEl);
 		}
 	}

@@ -50,10 +50,11 @@ CXformIndexGet2IndexOnlyScan::CXformIndexGet2IndexOnlyScan(CMemoryPool *mp)
 CXform::EXformPromise
 CXformIndexGet2IndexOnlyScan::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalIndexGet *popGet = CLogicalIndexGet::PopConvert(exprhdl.Pop());
+	gpos::pointer<CLogicalIndexGet *> popGet =
+		gpos::dyn_cast<CLogicalIndexGet>(exprhdl.Pop());
 
-	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
-	CIndexDescriptor *pindexdesc = popGet->Pindexdesc();
+	gpos::pointer<CTableDescriptor *> ptabdesc = popGet->Ptabdesc();
+	gpos::pointer<CIndexDescriptor *> pindexdesc = popGet->Pindexdesc();
 	BOOL possible_ao_table = ptabdesc->IsAORowOrColTable() ||
 							 ptabdesc->RetrieveRelStorageType() ==
 								 IMDRelation::ErelstorageMixedPartitioned;
@@ -84,15 +85,17 @@ CXformIndexGet2IndexOnlyScan::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformIndexGet2IndexOnlyScan::Transform(CXformContext *pxfctxt,
-										CXformResult *pxfres,
-										CExpression *pexpr) const
+CXformIndexGet2IndexOnlyScan::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalIndexGet *pop = CLogicalIndexGet::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalIndexGet *> pop =
+		gpos::dyn_cast<CLogicalIndexGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 	CIndexDescriptor *pindexdesc = pop->Pindexdesc();
 	CTableDescriptor *ptabdesc = pop->Ptabdesc();
@@ -161,13 +164,14 @@ CXformIndexGet2IndexOnlyScan::Transform(CXformContext *pxfctxt,
 	// addref all children
 	pexprIndexCond->AddRef();
 
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
-		mp,
-		GPOS_NEW(mp) CPhysicalIndexOnlyScan(
-			mp, pindexdesc, ptabdesc, pexpr->Pop()->UlOpId(),
-			GPOS_NEW(mp) CName(mp, pop->NameAlias()), pdrgpcrOutput, pos),
-		pexprIndexCond);
-	pxfres->Add(pexprAlt);
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
+		CExpression(mp,
+					GPOS_NEW(mp) CPhysicalIndexOnlyScan(
+						mp, pindexdesc, ptabdesc, pexpr->Pop()->UlOpId(),
+						GPOS_NEW(mp) CName(mp, pop->NameAlias()),
+						std::move(pdrgpcrOutput), pos),
+					pexprIndexCond);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 

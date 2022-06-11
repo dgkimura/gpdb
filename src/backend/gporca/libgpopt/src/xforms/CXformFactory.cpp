@@ -90,7 +90,7 @@ CXformFactory::~CXformFactory()
 //
 //---------------------------------------------------------------------------
 void
-CXformFactory::Add(CXform *pxform)
+CXformFactory::Add(gpos::owner<CXform *> pxform)
 {
 	GPOS_ASSERT(nullptr != pxform);
 	CXform::EXformId exfid = pxform->Exfid();

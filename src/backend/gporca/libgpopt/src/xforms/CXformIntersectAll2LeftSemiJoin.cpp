@@ -59,9 +59,10 @@ CXformIntersectAll2LeftSemiJoin::CXformIntersectAll2LeftSemiJoin(
 //
 //---------------------------------------------------------------------------
 void
-CXformIntersectAll2LeftSemiJoin::Transform(CXformContext *pxfctxt,
-										   CXformResult *pxfres,
-										   CExpression *pexpr) const
+CXformIntersectAll2LeftSemiJoin::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -78,42 +79,45 @@ CXformIntersectAll2LeftSemiJoin::Transform(CXformContext *pxfctxt,
 	CExpression *pexprLeftChild = (*pexpr)[0];
 	CExpression *pexprRightChild = (*pexpr)[1];
 
-	CLogicalIntersectAll *popIntersectAll =
-		CLogicalIntersectAll::PopConvert(pexpr->Pop());
-	CColRef2dArray *pdrgpdrgpcrInput = popIntersectAll->PdrgpdrgpcrInput();
+	gpos::pointer<CLogicalIntersectAll *> popIntersectAll =
+		gpos::dyn_cast<CLogicalIntersectAll>(pexpr->Pop());
+	gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput =
+		popIntersectAll->PdrgpdrgpcrInput();
 
-	CExpression *pexprLeftWindow = CXformUtils::PexprWindowWithRowNumber(
-		mp, pexprLeftChild, (*pdrgpdrgpcrInput)[0]);
-	CExpression *pexprRightWindow = CXformUtils::PexprWindowWithRowNumber(
-		mp, pexprRightChild, (*pdrgpdrgpcrInput)[1]);
+	gpos::owner<CExpression *> pexprLeftWindow =
+		CXformUtils::PexprWindowWithRowNumber(mp, pexprLeftChild,
+											  (*pdrgpdrgpcrInput)[0]);
+	gpos::owner<CExpression *> pexprRightWindow =
+		CXformUtils::PexprWindowWithRowNumber(mp, pexprRightChild,
+											  (*pdrgpdrgpcrInput)[1]);
 
 	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInputNew =
 		GPOS_NEW(mp) CColRef2dArray(mp);
-	CColRefArray *pdrgpcrLeftNew =
+	gpos::owner<CColRefArray *> pdrgpcrLeftNew =
 		CUtils::PdrgpcrExactCopy(mp, (*pdrgpdrgpcrInput)[0]);
 	pdrgpcrLeftNew->Append(CXformUtils::PcrProjectElement(
 		pexprLeftWindow, 0 /* row_number window function*/));
 
-	CColRefArray *pdrgpcrRightNew =
+	gpos::owner<CColRefArray *> pdrgpcrRightNew =
 		CUtils::PdrgpcrExactCopy(mp, (*pdrgpdrgpcrInput)[1]);
 	pdrgpcrRightNew->Append(CXformUtils::PcrProjectElement(
 		pexprRightWindow, 0 /* row_number window function*/));
 
-	pdrgpdrgpcrInputNew->Append(pdrgpcrLeftNew);
-	pdrgpdrgpcrInputNew->Append(pdrgpcrRightNew);
+	pdrgpdrgpcrInputNew->Append(std::move(pdrgpcrLeftNew));
+	pdrgpdrgpcrInputNew->Append(std::move(pdrgpcrRightNew));
 
-	CExpression *pexprScCond =
+	gpos::owner<CExpression *> pexprScCond =
 		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInputNew);
 
 	// assemble the new logical operator
-	gpos::owner<CExpression *> pexprLSJ = GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) CLogicalLeftSemiJoin(mp), pexprLeftWindow,
-					pexprRightWindow, pexprScCond);
+	gpos::owner<CExpression *> pexprLSJ = GPOS_NEW(mp) CExpression(
+		mp, GPOS_NEW(mp) CLogicalLeftSemiJoin(mp), std::move(pexprLeftWindow),
+		std::move(pexprRightWindow), std::move(pexprScCond));
 
 	// clean up
 	pdrgpdrgpcrInputNew->Release();
 
-	pxfres->Add(pexprLSJ);
+	pxfres->Add(std::move(pexprLSJ));
 }
 
 // EOF

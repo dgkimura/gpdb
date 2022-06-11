@@ -50,8 +50,8 @@ public:
 	CDXLDatumGeneric(const CDXLDatumGeneric &) = delete;
 
 	// ctor
-	CDXLDatumGeneric(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
-					 BOOL is_null, BYTE *data, ULONG length);
+	CDXLDatumGeneric(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+					 INT type_modifier, BOOL is_null, BYTE *data, ULONG length);
 
 	// dtor
 	~CDXLDatumGeneric() override;

@@ -206,8 +206,8 @@ CParseHandlerMDRelationCtas::EndElement(const XMLCh *const,	 // element_uri,
 	m_imd_obj = GPOS_NEW(m_mp) CMDRelationCtasGPDB(
 		m_mp, m_mdid, m_mdname_schema, m_mdname, m_is_temp_table, m_has_oids,
 		m_rel_storage_type, m_rel_distr_policy, md_col_array, m_distr_col_array,
-		distr_opfamilies, distr_opclasses, m_key_sets_arrays,
-		dxl_ctas_storage_options, m_vartypemod_array);
+		std::move(distr_opfamilies), std::move(distr_opclasses),
+		m_key_sets_arrays, dxl_ctas_storage_options, m_vartypemod_array);
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

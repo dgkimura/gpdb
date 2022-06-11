@@ -12,6 +12,7 @@
 #include "gpopt/base/CEnfdOrder.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CReqdPropPlan.h"
 #include "gpopt/operators/CPhysicalSort.h"
@@ -32,8 +33,8 @@ const CHAR *CEnfdOrder::m_szOrderMatching[EomSentinel] = {"satisfy"};
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CEnfdOrder::CEnfdOrder(COrderSpec *pos, EOrderMatching eom)
-	: m_pos(pos), m_eom(eom)
+CEnfdOrder::CEnfdOrder(gpos::owner<COrderSpec *> pos, EOrderMatching eom)
+	: m_pos(std::move(pos)), m_eom(eom)
 {
 	GPOS_ASSERT(nullptr != m_pos);
 	GPOS_ASSERT(EomSentinel > eom);
@@ -64,7 +65,7 @@ CEnfdOrder::~CEnfdOrder()
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnfdOrder::FCompatible(COrderSpec *pos) const
+CEnfdOrder::FCompatible(gpos::pointer<COrderSpec *> pos) const
 {
 	GPOS_ASSERT(nullptr != pos);
 
@@ -105,8 +106,8 @@ CEnfdOrder::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdOrder::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
-				 BOOL fOrderReqd) const
+CEnfdOrder::Epet(CExpressionHandle &exprhdl,
+				 gpos::pointer<CPhysical *> popPhysical, BOOL fOrderReqd) const
 {
 	if (fOrderReqd)
 	{

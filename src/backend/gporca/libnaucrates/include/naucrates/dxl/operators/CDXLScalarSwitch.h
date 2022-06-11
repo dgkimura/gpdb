@@ -42,7 +42,7 @@ public:
 	CDXLScalarSwitch(const CDXLScalarSwitch &) = delete;
 
 	// ctor
-	CDXLScalarSwitch(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarSwitch(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type);
 
 	//dtor
 	~CDXLScalarSwitch() override;

@@ -51,8 +51,8 @@ public:
 	CScalarCast(const CScalarCast &) = delete;
 
 	// ctor
-	CScalarCast(CMemoryPool *mp, IMDId *return_type_mdid, IMDId *mdid_func,
-				BOOL is_binary_coercible);
+	CScalarCast(CMemoryPool *mp, gpos::owner<IMDId *> return_type_mdid,
+				gpos::owner<IMDId *> mdid_func, BOOL is_binary_coercible);
 
 	// dtor
 	~CScalarCast() override
@@ -92,7 +92,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::pointer<COperator *>) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -102,7 +102,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
@@ -121,7 +121,7 @@ public:
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(ULongPtrArray *pdrgpulChildren) const override
+	Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override
 	{
 		return EberNullOnAllNullChildren(pdrgpulChildren);
 	}

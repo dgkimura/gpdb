@@ -16,7 +16,7 @@
 using namespace gpopt;
 
 //	compute the statistics of a limit operation
-CStatistics *
+gpos::owner<CStatistics *>
 CLimitStatsProcessor::CalcLimitStats(
 	CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
 	CDouble input_limit_rows)
@@ -24,7 +24,8 @@ CLimitStatsProcessor::CalcLimitStats(
 	GPOS_ASSERT(nullptr != input_stats);
 
 	// copy the hash map from colid -> histogram for resultant structure
-	UlongToHistogramMap *colid_histogram = input_stats->CopyHistograms(mp);
+	gpos::owner<UlongToHistogramMap *> colid_histogram =
+		input_stats->CopyHistograms(mp);
 
 	CDouble limit_rows = CStatistics::MinRows;
 	if (!input_stats->IsEmpty())
@@ -33,7 +34,7 @@ CLimitStatsProcessor::CalcLimitStats(
 	}
 	// create an output stats object
 	gpos::owner<CStatistics *> pstatsLimit = GPOS_NEW(mp) CStatistics(
-		mp, colid_histogram, input_stats->CopyWidths(mp), limit_rows,
+		mp, std::move(colid_histogram), input_stats->CopyWidths(mp), limit_rows,
 		input_stats->IsEmpty(), input_stats->GetNumberOfPredicates());
 
 	// In the output statistics object, the upper bound source cardinality of the join column

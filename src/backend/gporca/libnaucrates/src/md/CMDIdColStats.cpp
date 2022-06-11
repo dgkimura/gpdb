@@ -27,8 +27,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdColStats::CMDIdColStats(CMDIdGPDB *rel_mdid, ULONG pos)
-	: m_rel_mdid(rel_mdid),
+CMDIdColStats::CMDIdColStats(gpos::owner<CMDIdGPDB *> rel_mdid, ULONG pos)
+	: m_rel_mdid(std::move(rel_mdid)),
 	  m_attr_pos(pos),
 	  m_str(m_mdid_buffer, GPOS_ARRAY_SIZE(m_mdid_buffer))
 {

@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerBroadcastMotion.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFilter.h"
@@ -68,9 +70,9 @@ CParseHandlerBroadcastMotion::StartElement(
 	}
 
 	// parse and create Broadcast motion operator
-	m_dxl_op = (CDXLPhysicalBroadcastMotion *)
+	m_dxl_op = gpos::cast<CDXLPhysicalBroadcastMotion>(
 		CDXLOperatorFactory::MakeDXLBroadcastMotion(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance

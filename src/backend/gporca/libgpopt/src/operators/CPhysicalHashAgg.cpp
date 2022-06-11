@@ -30,13 +30,17 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalHashAgg::CPhysicalHashAgg(
-	CMemoryPool *mp, CColRefArray *colref_array, CColRefArray *pdrgpcrMinimal,
-	COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-	CColRefArray *pdrgpcrArgDQA, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
-	: CPhysicalAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype,
-				   fGeneratesDuplicates, pdrgpcrArgDQA, fMultiStage,
+CPhysicalHashAgg::CPhysicalHashAgg(CMemoryPool *mp,
+								   gpos::owner<CColRefArray *> colref_array,
+								   gpos::pointer<CColRefArray *> pdrgpcrMinimal,
+								   COperator::EGbAggType egbaggtype,
+								   BOOL fGeneratesDuplicates,
+								   gpos::owner<CColRefArray *> pdrgpcrArgDQA,
+								   BOOL fMultiStage, BOOL isAggFromSplitDQA,
+								   CLogicalGbAgg::EAggStage aggStage,
+								   BOOL should_enforce_distribution)
+	: CPhysicalAgg(mp, std::move(colref_array), pdrgpcrMinimal, egbaggtype,
+				   fGeneratesDuplicates, std::move(pdrgpcrArgDQA), fMultiStage,
 				   isAggFromSplitDQA, aggStage, should_enforce_distribution)
 {
 }
@@ -70,8 +74,8 @@ CPhysicalHashAgg::PosRequired(CMemoryPool *mp,
 								  child_index
 #endif	// GPOS_DEBUG
 							  ,
-							  CDrvdPropArray *,	 // pdrgpdpCtxt
-							  ULONG				 // ulOptReq
+							  gpos::pointer<CDrvdPropArray *>,	// pdrgpdpCtxt
+							  ULONG								// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

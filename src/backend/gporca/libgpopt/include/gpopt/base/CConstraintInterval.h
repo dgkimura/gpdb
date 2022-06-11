@@ -58,71 +58,75 @@ private:
 
 	// adds ranges from a source array to a destination array, starting
 	// at the range with the given index
-	static void AddRemainingRanges(CMemoryPool *mp, CRangeArray *pdrgprngSrc,
-								   ULONG ulStart, CRangeArray *pdrgprngDest);
+	static void AddRemainingRanges(CMemoryPool *mp,
+								   gpos::pointer<CRangeArray *> pdrgprngSrc,
+								   ULONG ulStart,
+								   gpos::pointer<CRangeArray *> pdrgprngDest);
 
 	// append the given range to the array or extend the last element
-	static void AppendOrExtend(CMemoryPool *mp, CRangeArray *pdrgprng,
+	static void AppendOrExtend(CMemoryPool *mp,
+							   gpos::pointer<CRangeArray *> pdrgprng,
 							   gpos::owner<CRange *> prange);
 
 	// difference between two ranges on the left side only -
 	// any difference on the right side is reported as residual range
-	static CRange *PrangeDiffWithRightResidual(CMemoryPool *mp,
-											   CRange *prangeFirst,
-											   CRange *prangeSecond,
-											   CRange **pprangeResidual,
-											   CRangeArray *pdrgprngResidual);
+	static gpos::owner<CRange *> PrangeDiffWithRightResidual(
+		CMemoryPool *mp, gpos::pointer<CRange *> prangeFirst,
+		gpos::pointer<CRange *> prangeSecond, CRange **pprangeResidual,
+		gpos::pointer<CRangeArray *> pdrgprngResidual);
 
 	// type of this interval
 	IMDId *MdidType();
 
 	// construct scalar expression
-	virtual CExpression *PexprConstructScalar(CMemoryPool *mp) const;
+	virtual gpos::owner<CExpression *> PexprConstructScalar(
+		CMemoryPool *mp) const;
 
-	virtual CExpression *PexprConstructArrayScalar(CMemoryPool *mp) const;
+	virtual gpos::owner<CExpression *> PexprConstructArrayScalar(
+		CMemoryPool *mp) const;
 
 	// create interval from scalar comparison expression
-	static CConstraintInterval *PciIntervalFromScalarCmp(
-		CMemoryPool *mp, CExpression *pexpr, CColRef *colref,
+	static gpos::owner<CConstraintInterval *> PciIntervalFromScalarCmp(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr, CColRef *colref,
 		BOOL infer_nulls_as = false);
 
-	static CConstraintInterval *PciIntervalFromScalarIDF(CMemoryPool *mp,
-														 CExpression *pexpr,
-														 CColRef *colref);
+	static gpos::owner<CConstraintInterval *> PciIntervalFromScalarIDF(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr, CColRef *colref);
 
 	// create interval from scalar bool operator
-	static CConstraintInterval *PciIntervalFromScalarBoolOp(
-		CMemoryPool *mp, CExpression *pexpr, CColRef *colref,
+	static gpos::owner<CConstraintInterval *> PciIntervalFromScalarBoolOp(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr, CColRef *colref,
 		BOOL infer_nulls_as = false);
 
 	// create interval from scalar bool AND
-	static CConstraintInterval *PciIntervalFromScalarBoolAnd(
-		CMemoryPool *mp, CExpression *pexpr, CColRef *colref,
+	static gpos::owner<CConstraintInterval *> PciIntervalFromScalarBoolAnd(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr, CColRef *colref,
 		BOOL infer_nulls_as = false);
 
 	// create interval from scalar bool OR
-	static CConstraintInterval *PciIntervalFromScalarBoolOr(
-		CMemoryPool *mp, CExpression *pexpr, CColRef *colref,
+	static gpos::owner<CConstraintInterval *> PciIntervalFromScalarBoolOr(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr, CColRef *colref,
 		BOOL infer_nulls_as = false);
 
 	// create interval from scalar null test
 	static gpos::owner<CConstraintInterval *> PciIntervalFromScalarNullTest(
-		CMemoryPool *mp, CExpression *pexpr, CColRef *colref);
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr, CColRef *colref);
 
 	// creates a range like [x,x] where x is a constant
-	static CRangeArray *PciRangeFromColConstCmp(
+	static gpos::owner<CRangeArray *> PciRangeFromColConstCmp(
 		CMemoryPool *mp, IMDType::ECmpType cmp_type,
 		gpos::pointer<const CScalarConst *> popScConst);
 
 	// create an array IN or NOT IN expression
-	CExpression *PexprConstructArrayScalar(CMemoryPool *mp, bool isIn) const;
+	gpos::owner<CExpression *> PexprConstructArrayScalar(CMemoryPool *mp,
+														 bool isIn) const;
 
 public:
 	CConstraintInterval(const CConstraintInterval &) = delete;
 
 	// ctor
 	CConstraintInterval(CMemoryPool *mp, const CColRef *colref,
-						CRangeArray *pdrgprng, BOOL is_null);
+						gpos::owner<CRangeArray *> pdrgprng, BOOL is_null);
 
 	// dtor
 	~CConstraintInterval() override;
@@ -178,39 +182,43 @@ public:
 	}
 
 	// return a copy of the constraint with remapped columns
-	CConstraint *PcnstrCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist) override;
+	gpos::owner<CConstraint *> PcnstrCopyWithRemappedColumns(
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+		BOOL must_exist) override;
 
 	// interval intersection
-	gpos::owner<CConstraintInterval *> PciIntersect(CMemoryPool *mp,
-													CConstraintInterval *pci);
+	gpos::owner<CConstraintInterval *> PciIntersect(
+		CMemoryPool *mp, gpos::pointer<CConstraintInterval *> pci);
 
 	// interval union
-	gpos::owner<CConstraintInterval *> PciUnion(CMemoryPool *mp,
-												CConstraintInterval *pci);
+	gpos::owner<CConstraintInterval *> PciUnion(
+		CMemoryPool *mp, gpos::pointer<CConstraintInterval *> pci);
 
 	// interval difference
-	gpos::owner<CConstraintInterval *> PciDifference(CMemoryPool *mp,
-													 CConstraintInterval *pci);
+	gpos::owner<CConstraintInterval *> PciDifference(
+		CMemoryPool *mp, gpos::pointer<CConstraintInterval *> pci);
 
 	// interval complement
-	CConstraintInterval *PciComplement(CMemoryPool *mp);
+	gpos::owner<CConstraintInterval *> PciComplement(CMemoryPool *mp);
 
 	// does the current interval contain the given interval?
-	BOOL FContainsInterval(CMemoryPool *mp, CConstraintInterval *pci);
+	BOOL FContainsInterval(CMemoryPool *mp,
+						   gpos::pointer<CConstraintInterval *> pci);
 
 	// scalar expression
-	CExpression *PexprScalar(CMemoryPool *mp) override;
+	gpos::pointer<CExpression *> PexprScalar(CMemoryPool *mp) override;
 
 	// scalar expression  which will be a disjunction
-	CExpression *PexprConstructDisjunctionScalar(CMemoryPool *mp) const;
+	gpos::owner<CExpression *> PexprConstructDisjunctionScalar(
+		CMemoryPool *mp) const;
 
 	// return constraint on a given column
-	CConstraint *Pcnstr(CMemoryPool *mp, const CColRef *colref) override;
+	gpos::owner<CConstraint *> Pcnstr(CMemoryPool *mp,
+									  const CColRef *colref) override;
 
 	// return constraint on a given column set
-	CConstraint *Pcnstr(CMemoryPool *mp, CColRefSet *pcrs) override;
+	gpos::owner<CConstraint *> Pcnstr(
+		CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs) override;
 
 	// return a clone of the constraint for a different column
 	gpos::owner<CConstraint *> PcnstrRemapForColumn(
@@ -230,18 +238,18 @@ public:
 		CMemoryPool *mp, const CColRef *colref, BOOL fIncludesNull);
 
 	// create an unbounded interval on any column from the given set
-	static CConstraintInterval *PciUnbounded(
+	static gpos::owner<CConstraintInterval *> PciUnbounded(
 		CMemoryPool *mp, gpos::pointer<const CColRefSet *> pcrs,
 		BOOL fIncludesNull);
 
 	// helper for create interval from comparison between a column and a constant
-	static CConstraintInterval *PciIntervalFromColConstCmp(
+	static gpos::owner<CConstraintInterval *> PciIntervalFromColConstCmp(
 		CMemoryPool *mp, CColRef *colref, IMDType::ECmpType cmp_type,
-		CScalarConst *popScConst, BOOL infer_nulls_as = false);
+		gpos::pointer<CScalarConst *> popScConst, BOOL infer_nulls_as = false);
 
 	// create interval from scalar expression
-	static CConstraintInterval *PciIntervalFromScalarExpr(
-		CMemoryPool *mp, CExpression *pexpr, CColRef *colref,
+	static gpos::owner<CConstraintInterval *> PciIntervalFromScalarExpr(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr, CColRef *colref,
 		BOOL infer_nulls_as = false);
 
 	// create interval from any general constraint that references
@@ -252,7 +260,7 @@ public:
 
 	// generate a ConstraintInterval from the given expression
 	static gpos::owner<CConstraintInterval *> PcnstrIntervalFromScalarArrayCmp(
-		CMemoryPool *mp, CExpression *pexpr, CColRef *colref,
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr, CColRef *colref,
 		BOOL infer_nulls_as = false);
 
 };	// class CConstraintInterval

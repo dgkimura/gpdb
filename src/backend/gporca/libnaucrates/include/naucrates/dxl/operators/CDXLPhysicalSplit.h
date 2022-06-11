@@ -56,10 +56,11 @@ public:
 	CDXLPhysicalSplit(const CDXLPhysicalSplit &) = delete;
 
 	// ctor
-	CDXLPhysicalSplit(CMemoryPool *mp, ULongPtrArray *delete_colid_array,
-					  ULongPtrArray *insert_colid_array, ULONG action_colid,
-					  ULONG ctid_colid, ULONG segid_colid, BOOL preserve_oids,
-					  ULONG tuple_oid);
+	CDXLPhysicalSplit(CMemoryPool *mp,
+					  gpos::owner<ULongPtrArray *> delete_colid_array,
+					  gpos::owner<ULongPtrArray *> insert_colid_array,
+					  ULONG action_colid, ULONG ctid_colid, ULONG segid_colid,
+					  BOOL preserve_oids, ULONG tuple_oid);
 
 	// dtor
 	~CDXLPhysicalSplit() override;

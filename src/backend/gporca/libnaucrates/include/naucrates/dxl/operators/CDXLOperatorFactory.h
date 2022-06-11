@@ -91,23 +91,23 @@ private:
 public:
 	static gpos::owner<CDXLDatum *> GetDatumOid(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
+		Edxltoken target_elem, gpos::owner<IMDId *> mdid, BOOL is_const_null);
 
 	static gpos::owner<CDXLDatum *> GetDatumInt2(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
+		Edxltoken target_elem, gpos::owner<IMDId *> mdid, BOOL is_const_null);
 
 	static gpos::owner<CDXLDatum *> GetDatumInt4(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
+		Edxltoken target_elem, gpos::owner<IMDId *> mdid, BOOL is_const_null);
 
 	static gpos::owner<CDXLDatum *> GetDatumInt8(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
+		Edxltoken target_elem, gpos::owner<IMDId *> mdid, BOOL is_const_null);
 
 	static gpos::owner<CDXLDatum *> GetDatumBool(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
+		Edxltoken target_elem, gpos::owner<IMDId *> mdid, BOOL is_const_null);
 
 	// parse a dxl datum of type generic
 	static gpos::owner<CDXLDatum *> GetDatumGeneric(
@@ -149,23 +149,23 @@ public:
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a gather motion operator
-	static CDXLPhysical *MakeDXLGatherMotion(
+	static gpos::owner<CDXLPhysical *> MakeDXLGatherMotion(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a broadcast motion operator
-	static CDXLPhysical *MakeDXLBroadcastMotion(
+	static gpos::owner<CDXLPhysical *> MakeDXLBroadcastMotion(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a redistribute motion operator
-	static CDXLPhysical *MakeDXLRedistributeMotion(
+	static gpos::owner<CDXLPhysical *> MakeDXLRedistributeMotion(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a routed motion operator
-	static CDXLPhysical *MakeDXLRoutedMotion(
+	static gpos::owner<CDXLPhysical *> MakeDXLRoutedMotion(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a random motion operator
-	static CDXLPhysical *MakeDXLRandomMotion(
+	static gpos::owner<CDXLPhysical *> MakeDXLRandomMotion(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create an append operator
@@ -185,7 +185,7 @@ public:
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a materialize operator
-	static CDXLPhysical *MakeDXLMaterialize(
+	static gpos::owner<CDXLPhysical *> MakeDXLMaterialize(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a limit count operator
@@ -222,9 +222,10 @@ public:
 
 	// create a subplan operator
 	static gpos::owner<CDXLScalar *> MakeDXLSubPlan(
-		CDXLMemoryManager *dxl_memory_manager, IMDId *mdid,
-		CDXLColRefArray *dxl_colref_array, EdxlSubPlanType dxl_subplan_type,
-		CDXLNode *dxlnode_test_expr);
+		CDXLMemoryManager *dxl_memory_manager, gpos::owner<IMDId *> mdid,
+		gpos::owner<CDXLColRefArray *> dxl_colref_array,
+		EdxlSubPlanType dxl_subplan_type,
+		gpos::owner<CDXLNode *> dxlnode_test_expr);
 
 	// create a NullTest
 	static gpos::owner<CDXLScalar *> MakeDXLNullTest(
@@ -455,60 +456,66 @@ public:
 		ULLONG default_value = 0);
 
 	// parse an mdid object from the given attributes
-	static IMDId *ExtractConvertAttrValueToMdId(
+	static gpos::owner<IMDId *> ExtractConvertAttrValueToMdId(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attr,
 		Edxltoken target_attr, Edxltoken target_elem, BOOL is_optional = false,
 		IMDId *default_val = nullptr);
 
 	// parse an mdid object from an XMLCh
-	static IMDId *MakeMdIdFromStr(CDXLMemoryManager *dxl_memory_manager,
-								  const XMLCh *mdid_xml, Edxltoken target_attr,
-								  Edxltoken target_elem);
+	static gpos::owner<IMDId *> MakeMdIdFromStr(
+		CDXLMemoryManager *dxl_memory_manager, const XMLCh *mdid_xml,
+		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a GPDB mdid object from an array of its components
 	static gpos::owner<CMDIdGPDB *> GetGPDBMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::pointer<XMLChArray *> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem);
 
 	// parse a GPDB CTAS mdid object from an array of its components
 	static gpos::owner<CMDIdGPDB *> GetGPDBCTASMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::pointer<XMLChArray *> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem);
 
 	// parse a column stats mdid object from an array of its components
 	static gpos::owner<CMDIdColStats *> GetColStatsMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::pointer<XMLChArray *> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem);
 
 	// parse a relation stats mdid object from an array of its components
 	static gpos::owner<CMDIdRelStats *> GetRelStatsMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::pointer<XMLChArray *> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem);
 
 	// parse a cast func mdid from the array of its components
 	static gpos::owner<CMDIdCast *> GetCastFuncMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::pointer<XMLChArray *> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem);
 
 	// parse a comparison operator mdid from the array of its components
 	static gpos::owner<CMDIdScCmp *> GetScCmpMdId(
-		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
-		Edxltoken target_attr, Edxltoken target_elem);
+		CDXLMemoryManager *dxl_memory_manager,
+		gpos::pointer<XMLChArray *> remaining_tokens, Edxltoken target_attr,
+		Edxltoken target_elem);
 
 	// parse a dxl datum object
-	static CDXLDatum *GetDatumVal(CDXLMemoryManager *dxl_memory_manager,
-								  const Attributes &attrs,
-								  Edxltoken target_elem);
+	static gpos::owner<CDXLDatum *> GetDatumVal(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
+		Edxltoken target_elem);
 
 	// parse a comma-separated list of MDids into a dynamic array
 	// will raise an exception if list is not well-formed
-	static IMdIdArray *ExtractConvertMdIdsToArray(
+	static gpos::owner<IMdIdArray *> ExtractConvertMdIdsToArray(
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *mdid_list_xml,
 		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a comma-separated list of unsigned long numbers into a dynamic array
 	// will raise an exception if list is not well-formed
-	static ULongPtrArray *ExtractConvertValuesToArray(
+	static gpos::owner<ULongPtrArray *> ExtractConvertValuesToArray(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attr,
 		Edxltoken target_attr, Edxltoken target_elem);
 
@@ -517,11 +524,11 @@ public:
 	template <typename T, void (*CleanupFn)(T *),
 			  T ValueFromXmlstr(CDXLMemoryManager *, const XMLCh *, Edxltoken,
 								Edxltoken)>
-	static CDynamicPtrArray<T, CleanupFn> *ExtractIntsToArray(
+	static gpos::owner<CDynamicPtrArray<T, CleanupFn> *> ExtractIntsToArray(
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *xmlszUl,
 		Edxltoken target_attr, Edxltoken target_elem);
 
-	static ULongPtrArray *
+	static gpos::owner<ULongPtrArray *>
 	ExtractIntsToUlongArray(CDXLMemoryManager *dxl_memory_manager,
 							const XMLCh *xmlszUl, Edxltoken target_attr,
 							Edxltoken target_elem)
@@ -531,7 +538,7 @@ public:
 			dxl_memory_manager, xmlszUl, target_attr, target_elem);
 	}
 
-	static IntPtrArray *
+	static gpos::owner<IntPtrArray *>
 	ExtractIntsToIntArray(CDXLMemoryManager *dxl_memory_manager,
 						  const XMLCh *xmlszUl, Edxltoken target_attr,
 						  Edxltoken target_elem)
@@ -542,33 +549,33 @@ public:
 
 	// parse a comma-separated list of CHAR partition types into a dynamic array.
 	// will raise an exception if list is not well-formed
-	static CharPtrArray *ExtractConvertPartitionTypeToArray(
+	static gpos::owner<CharPtrArray *> ExtractConvertPartitionTypeToArray(
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *xml_val,
 		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a semicolon-separated list of comma-separated unsigned
 	// long numbers into a dynamc array of unsigned integer arrays
 	// will raise an exception if list is not well-formed
-	static ULongPtr2dArray *ExtractConvertUlongTo2DArray(
+	static gpos::owner<ULongPtr2dArray *> ExtractConvertUlongTo2DArray(
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *xml_val,
 		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a comma-separated list of segment ids into a dynamic array
 	// will raise an exception if list is not well-formed
-	static IntPtrArray *ExtractConvertSegmentIdsToArray(
+	static gpos::owner<IntPtrArray *> ExtractConvertSegmentIdsToArray(
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *seg_id_list_xml,
 		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a comma-separated list of strings into a dynamic array
 	// will raise an exception if list is not well-formed
-	static StringPtrArray *ExtractConvertStrsToArray(
+	static gpos::owner<StringPtrArray *> ExtractConvertStrsToArray(
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *xml_val);
 
 	// parses the input and output segment ids from Xerces attributes and
 	// stores them in the provided DXL Motion operator
 	// will raise an exception if lists are not well-formed
 	static void SetSegmentInfo(CDXLMemoryManager *mp,
-							   CDXLPhysicalMotion *motion,
+							   gpos::pointer<CDXLPhysicalMotion *> motion,
 							   const Attributes &attrs, Edxltoken target_elem);
 
 	static EdxlJoinType ParseJoinType(const XMLCh *xmlszJoinType,
@@ -618,7 +625,7 @@ public:
 template <typename T, void (*CleanupFn)(T *),
 		  T ValueFromXmlstr(CDXLMemoryManager *, const XMLCh *, Edxltoken,
 							Edxltoken)>
-CDynamicPtrArray<T, CleanupFn> *
+gpos::owner<CDynamicPtrArray<T, CleanupFn> *>
 CDXLOperatorFactory::ExtractIntsToArray(CDXLMemoryManager *dxl_memory_manager,
 										const XMLCh *mdid_list_xml,
 										Edxltoken target_attr,

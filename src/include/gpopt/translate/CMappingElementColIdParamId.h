@@ -50,8 +50,8 @@ private:
 
 public:
 	// ctors and dtor
-	CMappingElementColIdParamId(ULONG colid, ULONG paramid, IMDId *mdid,
-								INT type_modifier);
+	CMappingElementColIdParamId(ULONG colid, ULONG paramid,
+								gpos::pointer<IMDId *> mdid, INT type_modifier);
 
 	~CMappingElementColIdParamId() override = default;
 

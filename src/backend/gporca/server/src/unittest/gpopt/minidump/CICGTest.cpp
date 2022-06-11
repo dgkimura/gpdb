@@ -208,7 +208,8 @@ CICGTest::EresUnittest_RunUnsupportedMinidumpTests()
 		{
 			gpos::owner<ICostModel *> pcm = CTestUtils::GetCostModel(mp);
 
-			COptimizerConfig *optimizer_config = pdxlmd->GetOptimizerConfig();
+			gpos::pointer<COptimizerConfig *> optimizer_config =
+				pdxlmd->GetOptimizerConfig();
 			gpos::owner<CDXLNode *> pdxlnPlan =
 				CMinidumperUtils::PdxlnExecuteMinidump(
 					mp, filename,
@@ -395,7 +396,7 @@ CICGTest::FIsNotIndexJoin(gpos::pointer<CDXLOperator *> dxl_op)
 {
 	if (EdxlopPhysicalNLJoin == dxl_op->GetDXLOperator())
 	{
-		if (CDXLPhysicalNLJoin::PdxlConvert(dxl_op)->IsIndexNLJ())
+		if (gpos::dyn_cast<CDXLPhysicalNLJoin>(dxl_op)->IsIndexNLJ())
 		{
 			return false;
 		}

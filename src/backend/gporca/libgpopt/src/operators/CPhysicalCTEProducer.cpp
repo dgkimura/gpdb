@@ -30,9 +30,12 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalCTEProducer::CPhysicalCTEProducer(CMemoryPool *mp, ULONG id,
-										   CColRefArray *colref_array)
-	: CPhysical(mp), m_id(id), m_pdrgpcr(colref_array), m_pcrs(nullptr)
+CPhysicalCTEProducer::CPhysicalCTEProducer(
+	CMemoryPool *mp, ULONG id, gpos::owner<CColRefArray *> colref_array)
+	: CPhysical(mp),
+	  m_id(id),
+	  m_pdrgpcr(std::move(colref_array)),
+	  m_pcrs(nullptr)
 {
 	GPOS_ASSERT(nullptr != m_pdrgpcr);
 	m_pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcr);
@@ -60,11 +63,12 @@ CPhysicalCTEProducer::~CPhysicalCTEProducer()
 //		Compute required output columns of the n-th child
 //
 //---------------------------------------------------------------------------
-CColRefSet *
-CPhysicalCTEProducer::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CColRefSet *pcrsRequired, ULONG child_index,
-								   CDrvdPropArray *,  // pdrgpdpCtxt
-								   ULONG			  // ulOptReq
+gpos::owner<CColRefSet *>
+CPhysicalCTEProducer::PcrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
+	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+	ULONG							  // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -72,7 +76,7 @@ CPhysicalCTEProducer::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrs);
 	pcrs->Union(pcrsRequired);
-	CColRefSet *pcrsChildReqd =
+	gpos::owner<CColRefSet *> pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
 
 	GPOS_ASSERT(pcrsChildReqd->Size() == m_pdrgpcr->Size());
@@ -89,11 +93,12 @@ CPhysicalCTEProducer::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
-CPhysicalCTEProducer::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								  COrderSpec *posRequired, ULONG child_index,
-								  CDrvdPropArray *,	 // pdrgpdpCtxt
-								  ULONG				 // ulOptReq
+gpos::owner<COrderSpec *>
+CPhysicalCTEProducer::PosRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
+	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+	ULONG							  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -109,12 +114,12 @@ CPhysicalCTEProducer::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
-CPhysicalCTEProducer::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								  CDistributionSpec *pdsRequired,
-								  ULONG child_index,
-								  CDrvdPropArray *,	 // pdrgpdpCtxt
-								  ULONG				 // ulOptReq
+gpos::owner<CDistributionSpec *>
+CPhysicalCTEProducer::PdsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
+	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+	ULONG							  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -130,12 +135,12 @@ CPhysicalCTEProducer::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
-CPhysicalCTEProducer::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								  CRewindabilitySpec *prsRequired,
-								  ULONG child_index,
-								  CDrvdPropArray *,	 // pdrgpdpCtxt
-								  ULONG				 // ulOptReq
+gpos::owner<CRewindabilitySpec *>
+CPhysicalCTEProducer::PrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index,
+	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+	ULONG							  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -151,10 +156,10 @@ CPhysicalCTEProducer::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::owner<CCTEReq *>
 CPhysicalCTEProducer::PcteRequired(CMemoryPool *,		 //mp,
 								   CExpressionHandle &,	 //exprhdl,
-								   CCTEReq *pcter,
+								   gpos::pointer<CCTEReq *> pcter,
 								   ULONG
 #ifdef GPOS_DEBUG
 									   child_index
@@ -176,7 +181,7 @@ CPhysicalCTEProducer::PcteRequired(CMemoryPool *,		 //mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalCTEProducer::PosDerive(CMemoryPool *,	// mp
 								CExpressionHandle &exprhdl) const
 {
@@ -191,7 +196,7 @@ CPhysicalCTEProducer::PosDerive(CMemoryPool *,	// mp
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalCTEProducer::PdsDerive(CMemoryPool *,	// mp
 								CExpressionHandle &exprhdl) const
 {
@@ -207,7 +212,7 @@ CPhysicalCTEProducer::PdsDerive(CMemoryPool *,	// mp
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalCTEProducer::PrsDerive(CMemoryPool *mp,
 								CExpressionHandle &exprhdl) const
 {
@@ -222,19 +227,20 @@ CPhysicalCTEProducer::PrsDerive(CMemoryPool *mp,
 //		Derive cte map
 //
 //---------------------------------------------------------------------------
-CCTEMap *
+gpos::owner<CCTEMap *>
 CPhysicalCTEProducer::PcmDerive(CMemoryPool *mp,
 								CExpressionHandle &exprhdl) const
 {
 	GPOS_ASSERT(1 == exprhdl.Arity());
 
-	CCTEMap *pcmChild = exprhdl.Pdpplan(0)->GetCostModel();
+	gpos::pointer<CCTEMap *> pcmChild = exprhdl.Pdpplan(0)->GetCostModel();
 
 	gpos::owner<CCTEMap *> pcmProducer = GPOS_NEW(mp) CCTEMap(mp);
 	// store plan properties of the child in producer's CTE map
 	pcmProducer->Insert(m_id, CCTEMap::EctProducer, exprhdl.Pdpplan(0));
 
-	CCTEMap *pcmCombined = CCTEMap::PcmCombine(mp, *pcmProducer, *pcmChild);
+	gpos::owner<CCTEMap *> pcmCombined =
+		CCTEMap::PcmCombine(mp, *pcmProducer, *pcmChild);
 	pcmProducer->Release();
 
 	return pcmCombined;
@@ -249,9 +255,9 @@ CPhysicalCTEProducer::PcmDerive(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalCTEProducer::FProvidesReqdCols(CExpressionHandle &exprhdl,
-										CColRefSet *pcrsRequired,
-										ULONG  // ulOptReq
+CPhysicalCTEProducer::FProvidesReqdCols(
+	CExpressionHandle &exprhdl, gpos::pointer<CColRefSet *> pcrsRequired,
+	ULONG  // ulOptReq
 ) const
 {
 	return FUnaryProvidesReqdCols(exprhdl, pcrsRequired);
@@ -272,7 +278,8 @@ CPhysicalCTEProducer::EpetOrder(CExpressionHandle &exprhdl,
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
 
-	COrderSpec *pos = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pos();
+	gpos::pointer<COrderSpec *> pos =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pos();
 	if (peo->FCompatible(pos))
 	{
 		return CEnfdProp::EpetUnnecessary;
@@ -297,7 +304,8 @@ CPhysicalCTEProducer::EpetRewindability(
 {
 	GPOS_ASSERT(nullptr != per);
 
-	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
+	gpos::pointer<CRewindabilitySpec *> prs =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{
 		return CEnfdProp::EpetUnnecessary;
@@ -316,15 +324,15 @@ CPhysicalCTEProducer::EpetRewindability(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalCTEProducer::Matches(COperator *pop) const
+CPhysicalCTEProducer::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CPhysicalCTEProducer *popCTEProducer =
-		CPhysicalCTEProducer::PopConvert(pop);
+	gpos::pointer<CPhysicalCTEProducer *> popCTEProducer =
+		gpos::dyn_cast<CPhysicalCTEProducer>(pop);
 
 	return m_id == popCTEProducer->UlCTEId() &&
 		   m_pdrgpcr->Equals(popCTEProducer->Pdrgpcr());

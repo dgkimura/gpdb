@@ -30,15 +30,15 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalDelete::CDXLLogicalDelete(CMemoryPool *mp,
-									 CDXLTableDescr *table_descr,
-									 ULONG ctid_colid, ULONG segid_colid,
-									 ULongPtrArray *delete_colid_array)
+CDXLLogicalDelete::CDXLLogicalDelete(
+	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr,
+	ULONG ctid_colid, ULONG segid_colid,
+	gpos::owner<ULongPtrArray *> delete_colid_array)
 	: CDXLLogical(mp),
-	  m_dxl_table_descr(table_descr),
+	  m_dxl_table_descr(std::move(table_descr)),
 	  m_ctid_colid(ctid_colid),
 	  m_segid_colid(segid_colid),
-	  m_deletion_colid_array(delete_colid_array)
+	  m_deletion_colid_array(std::move(delete_colid_array))
 {
 	GPOS_ASSERT(nullptr != m_dxl_table_descr);
 	GPOS_ASSERT(nullptr != m_deletion_colid_array);
@@ -135,7 +135,7 @@ CDXLLogicalDelete::AssertValid(gpos::pointer<const CDXLNode *> node,
 {
 	GPOS_ASSERT(1 == node->Arity());
 
-	CDXLNode *child_dxlnode = (*node)[0];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[0];
 	GPOS_ASSERT(EdxloptypeLogical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

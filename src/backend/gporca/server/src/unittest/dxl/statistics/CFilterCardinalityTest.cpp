@@ -103,7 +103,8 @@ CFilterCardinalityTest::EresUnittest()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr /* pceeval */,
@@ -209,7 +210,7 @@ CFilterCardinalityTest::PstatspredNullableCols(CMemoryPool *mp)
 	pdrgpstatspred->Append(GPOS_NEW(mp) CStatsPredPoint(
 		1, CStatsPred::EstatscmptLEq, CTestUtils::PpointInt4(mp, 1)));
 
-	return GPOS_NEW(mp) CStatsPredConj(pdrgpstatspred);
+	return GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspred));
 }
 
 // create a point filter where the constant is null
@@ -222,7 +223,7 @@ CFilterCardinalityTest::PstatspredWithNullConstant(CMemoryPool *mp)
 	pdrgpstatspred->Append(GPOS_NEW(mp) CStatsPredPoint(
 		1, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4NullVal(mp)));
 
-	return GPOS_NEW(mp) CStatsPredConj(pdrgpstatspred);
+	return GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspred));
 }
 
 // create an 'is not null' point filter
@@ -235,7 +236,7 @@ CFilterCardinalityTest::PstatspredNotNull(CMemoryPool *mp)
 	pdrgpstatspred->Append(GPOS_NEW(mp) CStatsPredPoint(
 		1, CStatsPred::EstatscmptNEq, CTestUtils::PpointInt4NullVal(mp)));
 
-	return GPOS_NEW(mp) CStatsPredConj(pdrgpstatspred);
+	return GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspred));
 }
 
 // testing ArryCmpAny predicates
@@ -267,10 +268,10 @@ CFilterCardinalityTest::PstatspredArrayCmpAnySimple(CMemoryPool *mp)
 	arr->Append(CTestUtils::PpointInt4(mp, 2));
 	arr->Append(CTestUtils::PpointInt4(mp, 15));
 
-	pdrgpstatspred->Append(
-		GPOS_NEW(mp) CStatsPredArrayCmp(1, CStatsPred::EstatscmptEq, arr));
+	pdrgpstatspred->Append(GPOS_NEW(mp) CStatsPredArrayCmp(
+		1, CStatsPred::EstatscmptEq, std::move(arr)));
 
-	return GPOS_NEW(mp) CStatsPredConj(pdrgpstatspred);
+	return GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspred));
 }
 
 // create a 'col IN (...)' filter with duplicates (unsorted)
@@ -292,10 +293,10 @@ CFilterCardinalityTest::PstatspredArrayCmpAnyDuplicate(CMemoryPool *mp)
 	arr->Append(CTestUtils::PpointInt4(mp, 15));
 	arr->Append(CTestUtils::PpointInt4(mp, 15));
 
-	pdrgpstatspred->Append(
-		GPOS_NEW(mp) CStatsPredArrayCmp(1, CStatsPred::EstatscmptEq, arr));
+	pdrgpstatspred->Append(GPOS_NEW(mp) CStatsPredArrayCmp(
+		1, CStatsPred::EstatscmptEq, std::move(arr)));
 
-	return GPOS_NEW(mp) CStatsPredConj(pdrgpstatspred);
+	return GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspred));
 }
 
 // reads a DXL document, generates the statistics object, performs a
@@ -337,10 +338,10 @@ CFilterCardinalityTest::PstatspredDisj1(CMemoryPool *mp)
 	// predicate col_1 in (13, 25, 47, 49);
 	INT rgiVal[] = {13, 25, 47, 49};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 1, CStatsPred::EstatscmptEq, rgiVal, ulVals);
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 // create an or filter (one duplicate constant)
@@ -350,10 +351,10 @@ CFilterCardinalityTest::PstatspredDisj2(CMemoryPool *mp)
 	// predicate col_1 in (13, 13, 25, 47, 49);
 	INT rgiVal[] = {13, 13, 25, 47, 49};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 1, CStatsPred::EstatscmptEq, rgiVal, ulVals);
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 //	create an or filter (multiple duplicate constants)
@@ -363,10 +364,10 @@ CFilterCardinalityTest::PstatspredDisj3(CMemoryPool *mp)
 	// predicate col_1 in (13, 25, 47, 47, 47, 49, 13);
 	INT rgiVal[] = {13, 25, 47, 47, 47, 49, 13};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 1, CStatsPred::EstatscmptEq, rgiVal, ulVals);
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 // create an or filter
@@ -376,10 +377,10 @@ CFilterCardinalityTest::PstatspredDisj4(CMemoryPool *mp)
 	// the predicate is (x <= 5 or x <= 10 or x <= 13) (domain [0 -- 20])
 	INT rgiVal[] = {5, 10, 13};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 1, CStatsPred::EstatscmptLEq, rgiVal, ulVals);
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 //	create an or filter (multiple LEQ)
@@ -389,10 +390,10 @@ CFilterCardinalityTest::PstatspredDisj5(CMemoryPool *mp)
 	// the predicate is (x >= 5 or x >= 13) (domain [0 -- 20])
 	INT rgiVal[] = {5, 13};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 1, CStatsPred::EstatscmptGEq, rgiVal, ulVals);
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 //	create an or filter
@@ -408,7 +409,7 @@ CFilterCardinalityTest::PstatspredDisj6(CMemoryPool *mp)
 	pdrgpstatspredDisj->Append(GPOS_NEW(mp) CStatsPredPoint(
 		1, CStatsPred::EstatscmptL, CTestUtils::PpointInt4(mp, 5)));
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 // create an or filter
@@ -418,12 +419,12 @@ CFilterCardinalityTest::PstatspredDisj7(CMemoryPool *mp)
 	// the predicate is (x <= 15 or x >= 5 or x > = 10) (domain [0 -- 20])
 	INT rgiVal[] = {5, 10};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 1, CStatsPred::EstatscmptGEq, rgiVal, ulVals);
 	pdrgpstatspredDisj->Append(GPOS_NEW(mp) CStatsPredPoint(
 		1, CStatsPred::EstatscmptLEq, CTestUtils::PpointInt4(mp, 15)));
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 // create disjunctive predicate on same columns
@@ -433,10 +434,10 @@ CFilterCardinalityTest::PstatspredDisj8(CMemoryPool *mp)
 	// predicate is b = 2001 OR b == 2002
 	INT rgiVal[] = {2001, 2002};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 61, CStatsPred::EstatscmptEq, rgiVal, ulVals);
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 //	create an or filter (multiple LEQ)
@@ -446,10 +447,10 @@ CFilterCardinalityTest::PstatspredDisj9(CMemoryPool *mp)
 	// the predicate is (x <= 3 or x <= 10) (domain [0 -- 20])
 	INT rgiVal[] = {3, 10};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 1, CStatsPred::EstatscmptLEq, rgiVal, ulVals);
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 // reads a DXL document, generates the statistics object, performs a
@@ -488,7 +489,7 @@ CFilterCardinalityTest::PstatspredConj(CMemoryPool *mp)
 
 	GPOS_DELETE(pstrW);
 
-	return GPOS_NEW(mp) CStatsPredConj(pdrgpstatspredConj3);
+	return GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj3));
 }
 
 // reads a DXL document, generates the statistics object, performs a
@@ -553,14 +554,14 @@ CFilterCardinalityTest::PstatspredNestedPredDiffCol1(CMemoryPool *mp)
 	// predicate col_2 in (15, 20, 22, 24, 31, 39, 42, 46);
 	INT rgiVal[] = {15, 20, 22, 24, 31, 39, 42, 46};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 2, CStatsPred::EstatscmptEq, rgiVal, ulVals);
 
 	gpos::owner<CStatsPredDisj *> disjunctive_pred_stats =
-		GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
-	pdrgpstatspredConj->Append(disjunctive_pred_stats);
+		GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
+	pdrgpstatspredConj->Append(std::move(disjunctive_pred_stats));
 
-	return GPOS_NEW(mp) CStatsPredConj(pdrgpstatspredConj);
+	return GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj));
 }
 
 // create nested AND and OR predicates where the AND and OR predicates
@@ -575,18 +576,18 @@ CFilterCardinalityTest::PstatspredNestedPredDiffCol2(CMemoryPool *mp)
 	// predicate col_2 in (15, 20, 22, 24, 31, 39, 42, 46);
 	INT rgiVal[] = {15, 20, 22, 24, 31, 39, 42, 46};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 2, CStatsPred::EstatscmptEq, rgiVal, ulVals);
 
 	gpos::owner<CStatsPredDisj *> disjunctive_pred_stats =
-		GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
-	pdrgpstatspredConj->Append(disjunctive_pred_stats);
+		GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
+	pdrgpstatspredConj->Append(std::move(disjunctive_pred_stats));
 
 	// predicate col_1 <> 3
 	pdrgpstatspredConj->Append(GPOS_NEW(mp) CStatsPredPoint(
 		1, CStatsPred::EstatscmptNEq, CTestUtils::PpointInt4(mp, 3)));
 
-	return GPOS_NEW(mp) CStatsPredConj(pdrgpstatspredConj);
+	return GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj));
 }
 
 // create nested AND and OR predicates where the AND and OR predicates
@@ -601,18 +602,18 @@ CFilterCardinalityTest::PstatspredNestedPredCommonCol1(CMemoryPool *mp)
 	// predicate col_2 in (15, 20, 22, 24, 31, 39, 42, 46);
 	INT rgiVal[] = {15, 20, 22, 24, 31, 39, 42, 46};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 2, CStatsPred::EstatscmptEq, rgiVal, ulVals);
 
 	gpos::owner<CStatsPredDisj *> disjunctive_pred_stats =
-		GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
-	pdrgpstatspredConj->Append(disjunctive_pred_stats);
+		GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
+	pdrgpstatspredConj->Append(std::move(disjunctive_pred_stats));
 
 	// predicate col_2 == 2
 	pdrgpstatspredConj->Append(GPOS_NEW(mp) CStatsPredPoint(
 		2, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 2)));
 
-	return GPOS_NEW(mp) CStatsPredConj(pdrgpstatspredConj);
+	return GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj));
 }
 
 // create nested AND and OR predicates where the AND and OR predicates
@@ -627,18 +628,18 @@ CFilterCardinalityTest::PstatspredNestedPredCommonCol2(CMemoryPool *mp)
 	// IN predicate: col_2 in (2, 39, 31, 24, 22, 46, 20, 42, 15);
 	INT rgiVal[] = {2, 15, 20, 22, 24, 31, 39, 42, 46};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 2, CStatsPred::EstatscmptEq, rgiVal, ulVals);
 
 	gpos::owner<CStatsPredDisj *> disjunctive_pred_stats =
-		GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
-	pdrgpstatspredConj->Append(disjunctive_pred_stats);
+		GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
+	pdrgpstatspredConj->Append(std::move(disjunctive_pred_stats));
 
 	// predicate col_2 == 2
 	pdrgpstatspredConj->Append(GPOS_NEW(mp) CStatsPredPoint(
 		2, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 2)));
 
-	return GPOS_NEW(mp) CStatsPredConj(pdrgpstatspredConj);
+	return GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj));
 }
 
 // create nested AND and OR predicates where the AND and OR predicates
@@ -657,17 +658,17 @@ CFilterCardinalityTest::PstatspredNestedSharedCol(CMemoryPool *mp)
 
 	INT rgiVal[] = {15, 20, 22, 24, 31, 39, 42, 46};
 	const ULONG ulVals = GPOS_ARRAY_SIZE(rgiVal);
-	CStatsPredPtrArry *pdrgpstatspredDisj =
+	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		PdrgpstatspredInteger(mp, 2, CStatsPred::EstatscmptEq, rgiVal, ulVals);
 
 	pdrgpstatspredDisj->Append(GPOS_NEW(mp) CStatsPredPoint(
 		1, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 4)));
 
 	gpos::owner<CStatsPredDisj *> disjunctive_pred_stats =
-		GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
-	pdrgpstatspredConj->Append(disjunctive_pred_stats);
+		GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
+	pdrgpstatspredConj->Append(std::move(disjunctive_pred_stats));
 
-	return GPOS_NEW(mp) CStatsPredConj(pdrgpstatspredConj);
+	return GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj));
 }
 
 // create nested AND and OR predicates where the AND and OR predicates share common columns
@@ -684,16 +685,16 @@ CFilterCardinalityTest::PstatspredDisjOverConjSameCol1(CMemoryPool *mp)
 		1, CStatsPred::EstatscmptGEq, CTestUtils::PpointInt4(mp, 3)));
 
 	gpos::owner<CStatsPredConj *> conjunctive_pred_stats =
-		GPOS_NEW(mp) CStatsPredConj(pdrgpstatspredConj);
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj));
 
 	// predicate (col_1 = 1);
 	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		GPOS_NEW(mp) CStatsPredPtrArry(mp);
 	pdrgpstatspredDisj->Append(GPOS_NEW(mp) CStatsPredPoint(
 		1, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 1)));
-	pdrgpstatspredDisj->Append(conjunctive_pred_stats);
+	pdrgpstatspredDisj->Append(std::move(conjunctive_pred_stats));
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 // create nested AND and OR predicates where the AND and OR predicates share common columns
@@ -710,16 +711,16 @@ CFilterCardinalityTest::PstatspredDisjOverConjSameCol2(CMemoryPool *mp)
 		1, CStatsPred::EstatscmptGEq, CTestUtils::PpointInt4(mp, 1)));
 
 	gpos::owner<CStatsPredConj *> conjunctive_pred_stats =
-		GPOS_NEW(mp) CStatsPredConj(pdrgpstatspredConj);
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj));
 
 	// predicate (col_1 = 1);
 	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		GPOS_NEW(mp) CStatsPredPtrArry(mp);
 	pdrgpstatspredDisj->Append(GPOS_NEW(mp) CStatsPredPoint(
 		1, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 1)));
-	pdrgpstatspredDisj->Append(conjunctive_pred_stats);
+	pdrgpstatspredDisj->Append(std::move(conjunctive_pred_stats));
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 // create disjunctive predicate over conjunctions on same columns
@@ -742,8 +743,8 @@ CFilterCardinalityTest::PstatspredDisjOverConjSameCol3(CMemoryPool *mp)
 		CCardinalityTestUtils::PpointGeneric(mp, GPDB_TEXT, pstrS, 160588332)));
 	pdrgpstatspredConj1->Append(GPOS_NEW(mp) CStatsPredPoint(
 		113, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 2001)));
-	pdrgpstatspredDisj->Append(GPOS_NEW(mp)
-								   CStatsPredConj(pdrgpstatspredConj1));
+	pdrgpstatspredDisj->Append(
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj1)));
 
 	// predicate is a == 's' AND b == 2002
 	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredConj2 =
@@ -753,8 +754,8 @@ CFilterCardinalityTest::PstatspredDisjOverConjSameCol3(CMemoryPool *mp)
 		CCardinalityTestUtils::PpointGeneric(mp, GPDB_TEXT, pstrS, 160588332)));
 	pdrgpstatspredConj2->Append(GPOS_NEW(mp) CStatsPredPoint(
 		113, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 2002)));
-	pdrgpstatspredDisj->Append(GPOS_NEW(mp)
-								   CStatsPredConj(pdrgpstatspredConj2));
+	pdrgpstatspredDisj->Append(
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj2)));
 
 	// predicate is a == 'w' AND b == 2001
 	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredConj3 =
@@ -764,8 +765,8 @@ CFilterCardinalityTest::PstatspredDisjOverConjSameCol3(CMemoryPool *mp)
 		CCardinalityTestUtils::PpointGeneric(mp, GPDB_TEXT, pstrW, 160621100)));
 	pdrgpstatspredConj3->Append(GPOS_NEW(mp) CStatsPredPoint(
 		113, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 2001)));
-	pdrgpstatspredDisj->Append(GPOS_NEW(mp)
-								   CStatsPredConj(pdrgpstatspredConj3));
+	pdrgpstatspredDisj->Append(
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj3)));
 
 	// predicate is a == 'w' AND b == 2002
 	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredConj4 =
@@ -775,13 +776,13 @@ CFilterCardinalityTest::PstatspredDisjOverConjSameCol3(CMemoryPool *mp)
 		CCardinalityTestUtils::PpointGeneric(mp, GPDB_TEXT, pstrW, 160621100)));
 	pdrgpstatspredConj4->Append(GPOS_NEW(mp) CStatsPredPoint(
 		113, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 2002)));
-	pdrgpstatspredDisj->Append(GPOS_NEW(mp)
-								   CStatsPredConj(pdrgpstatspredConj4));
+	pdrgpstatspredDisj->Append(
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj4)));
 
 	GPOS_DELETE(pstrS);
 	GPOS_DELETE(pstrW);
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 // create disjunctive predicate over conjunctions on same columns
@@ -817,8 +818,8 @@ CFilterCardinalityTest::PstatspredDisjOverConjSameCol4(CMemoryPool *mp)
 		CCardinalityTestUtils::PpointGeneric(mp, GPDB_TEXT, pstrS, 160588332)));
 	pdrgpstatspredConj2->Append(GPOS_NEW(mp) CStatsPredPoint(
 		61, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 2002)));
-	pdrgpstatspredDisj->Append(GPOS_NEW(mp)
-								   CStatsPredConj(pdrgpstatspredConj2));
+	pdrgpstatspredDisj->Append(
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj2)));
 
 	// predicate is a == 'w' AND b == 2001 AND c > 0
 	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredConj3 =
@@ -830,8 +831,8 @@ CFilterCardinalityTest::PstatspredDisjOverConjSameCol4(CMemoryPool *mp)
 		61, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 2001)));
 	pdrgpstatspredConj1->Append(GPOS_NEW(mp) CStatsPredPoint(
 		90, CStatsPred::EstatscmptG, CTestUtils::PpointInt4(mp, 0)));
-	pdrgpstatspredDisj->Append(GPOS_NEW(mp)
-								   CStatsPredConj(pdrgpstatspredConj3));
+	pdrgpstatspredDisj->Append(
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj3)));
 
 	// predicate is a == 'w' AND b == 2002
 	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredConj4 =
@@ -841,13 +842,13 @@ CFilterCardinalityTest::PstatspredDisjOverConjSameCol4(CMemoryPool *mp)
 		CCardinalityTestUtils::PpointGeneric(mp, GPDB_TEXT, pstrW, 160621100)));
 	pdrgpstatspredConj4->Append(GPOS_NEW(mp) CStatsPredPoint(
 		61, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 2002)));
-	pdrgpstatspredDisj->Append(GPOS_NEW(mp)
-								   CStatsPredConj(pdrgpstatspredConj4));
+	pdrgpstatspredDisj->Append(
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj4)));
 
 	GPOS_DELETE(pstrS);
 	GPOS_DELETE(pstrW);
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 // create nested AND and OR predicates where the AND and OR predicates share common columns
@@ -864,16 +865,16 @@ CFilterCardinalityTest::PstatspredDisjOverConjDifferentCol1(CMemoryPool *mp)
 		2, CStatsPred::EstatscmptGEq, CTestUtils::PpointInt4(mp, 3)));
 
 	gpos::owner<CStatsPredConj *> conjunctive_pred_stats =
-		GPOS_NEW(mp) CStatsPredConj(pdrgpstatspredConj);
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj));
 
 	// predicate (col_1 = 1);
 	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		GPOS_NEW(mp) CStatsPredPtrArry(mp);
 	pdrgpstatspredDisj->Append(GPOS_NEW(mp) CStatsPredPoint(
 		1, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 1)));
-	pdrgpstatspredDisj->Append(conjunctive_pred_stats);
+	pdrgpstatspredDisj->Append(std::move(conjunctive_pred_stats));
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 // create nested AND and OR predicates where the AND and OR predicates
@@ -891,7 +892,7 @@ CFilterCardinalityTest::PstatspredDisjOverConjMultipleIdenticalCols(
 		2, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 1)));
 
 	gpos::owner<CStatsPredConj *> pstatspredConj1 =
-		GPOS_NEW(mp) CStatsPredConj(pdrgpstatspredConj1);
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj1));
 
 	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredConj2 =
 		GPOS_NEW(mp) CStatsPredPtrArry(mp);
@@ -903,14 +904,14 @@ CFilterCardinalityTest::PstatspredDisjOverConjMultipleIdenticalCols(
 		2, CStatsPred::EstatscmptEq, CTestUtils::PpointInt4(mp, 2)));
 
 	gpos::owner<CStatsPredConj *> pstatspredConj2 =
-		GPOS_NEW(mp) CStatsPredConj(pdrgpstatspredConj2);
+		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspredConj2));
 	gpos::owner<CStatsPredPtrArry *> pdrgpstatspredDisj =
 		GPOS_NEW(mp) CStatsPredPtrArry(mp);
 
-	pdrgpstatspredDisj->Append(pstatspredConj1);
-	pdrgpstatspredDisj->Append(pstatspredConj2);
+	pdrgpstatspredDisj->Append(std::move(pstatspredConj1));
+	pdrgpstatspredDisj->Append(std::move(pstatspredConj2));
 
-	return GPOS_NEW(mp) CStatsPredDisj(pdrgpstatspredDisj);
+	return GPOS_NEW(mp) CStatsPredDisj(std::move(pdrgpstatspredDisj));
 }
 
 // reads a DXL document, generates the statistics object, performs a
@@ -990,7 +991,7 @@ CFilterCardinalityTest::EresUnittest_CStatisticsBasicsFromDXLNumeric()
 
 		SStatsCmpValElem statsCmpValElem = rgStatsCmpValElem[ul];
 
-		CStatsPredPtrArry *pdrgpstatspred =
+		gpos::owner<CStatsPredPtrArry *> pdrgpstatspred =
 			PdrgppredfilterNumeric(mp, 1 /*colid*/, statsCmpValElem);
 		gpos::owner<CStatsPredConj *> pred_stats =
 			GPOS_NEW(mp) CStatsPredConj(pdrgpstatspred);
@@ -1016,7 +1017,7 @@ CFilterCardinalityTest::EresUnittest_CStatisticsBasicsFromDXLNumeric()
 
 // generate an array of filter given a column identifier, comparison type,
 // and array of integer point
-CStatsPredPtrArry *
+gpos::owner<CStatsPredPtrArry *>
 CFilterCardinalityTest::PdrgpstatspredInteger(
 	CMemoryPool *mp, ULONG colid, CStatsPred::EStatsCmpType stats_cmp_type,
 	INT *piVals, ULONG ulVals)
@@ -1035,7 +1036,7 @@ CFilterCardinalityTest::PdrgpstatspredInteger(
 }
 
 // generate a numeric filter on the column specified and the literal value
-CStatsPredPtrArry *
+gpos::owner<CStatsPredPtrArry *>
 CFilterCardinalityTest::PdrgppredfilterNumeric(CMemoryPool *mp, ULONG colid,
 											   SStatsCmpValElem statsCmpValElem)
 {
@@ -1048,7 +1049,7 @@ CFilterCardinalityTest::PdrgppredfilterNumeric(CMemoryPool *mp, ULONG colid,
 		CStatsPredPoint(colid, statsCmpValElem.m_stats_cmp_type,
 						CCardinalityTestUtils::PpointNumeric(
 							mp, pstrNumeric, statsCmpValElem.m_value));
-	pdrgpstatspred->Append(pred_stats);
+	pdrgpstatspred->Append(std::move(pred_stats));
 	GPOS_DELETE(pstrNumeric);
 
 	return pdrgpstatspred;
@@ -1107,13 +1108,13 @@ CFilterCardinalityTest::EresUnittest_CStatisticsBasicsFromDXL()
 GPOS_RESULT
 CFilterCardinalityTest::EresUnittest_CStatisticsCompare(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	CStatisticsArray *pdrgpstatBefore, CStatsPred *pred_stats,
+	gpos::pointer<CStatisticsArray *> pdrgpstatBefore, CStatsPred *pred_stats,
 	const CHAR *szDXLOutput, BOOL fApplyTwice)
 {
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
-	CStatistics *input_stats = (*pdrgpstatBefore)[0];
+	gpos::pointer<CStatistics *> input_stats = (*pdrgpstatBefore)[0];
 
 	GPOS_TRACE(GPOS_WSZ_LIT("Statistics before"));
 	CCardinalityTestUtils::PrintStats(mp, input_stats);

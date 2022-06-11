@@ -32,11 +32,12 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalInnerHashJoin::CPhysicalInnerHashJoin(
-	CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-	CExpressionArray *pdrgpexprInnerKeys,
+	CMemoryPool *mp, gpos::owner<CExpressionArray *> pdrgpexprOuterKeys,
+	gpos::owner<CExpressionArray *> pdrgpexprInnerKeys,
 	gpos::owner<IMdIdArray *> hash_opfamilies, CXform::EXformId origin_xform)
-	: CPhysicalHashJoin(mp, pdrgpexprOuterKeys, pdrgpexprInnerKeys,
-						hash_opfamilies, origin_xform)
+	: CPhysicalHashJoin(mp, std::move(pdrgpexprOuterKeys),
+						std::move(pdrgpexprInnerKeys),
+						std::move(hash_opfamilies), origin_xform)
 {
 }
 
@@ -60,7 +61,7 @@ CPhysicalInnerHashJoin::~CPhysicalInnerHashJoin() = default;
 //		Helper function for creating a matching hashed distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpecHashed *
+gpos::owner<CDistributionSpecHashed *>
 CPhysicalInnerHashJoin::PdshashedCreateMatching(
 	CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
 	ULONG
@@ -101,18 +102,18 @@ CPhysicalInnerHashJoin::PdshashedCreateMatching(
 //		return nullptr if derivation failed
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalInnerHashJoin::PdsDeriveFromHashedChildren(
-	CMemoryPool *mp, CDistributionSpec *pdsOuter,
-	CDistributionSpec *pdsInner) const
+	CMemoryPool *mp, gpos::pointer<CDistributionSpec *> pdsOuter,
+	gpos::pointer<CDistributionSpec *> pdsInner) const
 {
 	GPOS_ASSERT(nullptr != pdsOuter);
 	GPOS_ASSERT(nullptr != pdsInner);
 
-	CDistributionSpecHashed *pdshashedOuter =
-		CDistributionSpecHashed::PdsConvert(pdsOuter);
-	CDistributionSpecHashed *pdshashedInner =
-		CDistributionSpecHashed::PdsConvert(pdsInner);
+	gpos::pointer<CDistributionSpecHashed *> pdshashedOuter =
+		gpos::dyn_cast<CDistributionSpecHashed>(pdsOuter);
+	gpos::pointer<CDistributionSpecHashed *> pdshashedInner =
+		gpos::dyn_cast<CDistributionSpecHashed>(pdsInner);
 
 	if (pdshashedOuter->IsCoveredBy(PdrgpexprOuterKeys()) &&
 		pdshashedInner->IsCoveredBy(PdrgpexprInnerKeys()))
@@ -120,7 +121,7 @@ CPhysicalInnerHashJoin::PdsDeriveFromHashedChildren(
 		// if both sides are hashed on subsets of hash join keys, join's output can be
 		// seen as distributed on outer spec or (equivalently) on inner spec,
 		// so create a new spec and mark outer and inner as equivalent
-		CDistributionSpecHashed *combined_hashed_spec =
+		gpos::owner<CDistributionSpecHashed *> combined_hashed_spec =
 			pdshashedOuter->Combine(mp, pdshashedInner);
 		return combined_hashed_spec;
 	}
@@ -155,7 +156,7 @@ CPhysicalInnerHashJoin::PdsDeriveFromReplicatedOuter(
 	if (CDistributionSpec::EdtHashed == pdsInner->Edt())
 	{
 		CDistributionSpecHashed *pdshashedInner =
-			CDistributionSpecHashed::PdsConvert(pdsInner);
+			gpos::dyn_cast<CDistributionSpecHashed>(pdsInner);
 		if (pdshashedInner->IsCoveredBy(PdrgpexprInnerKeys()))
 		{
 			// inner child is hashed on a subset of inner hashkeys,
@@ -180,7 +181,7 @@ CPhysicalInnerHashJoin::PdsDeriveFromReplicatedOuter(
 //		return nullptr if derivation failed
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalInnerHashJoin::PdsDeriveFromHashedOuter(
 	CMemoryPool *mp, CDistributionSpec *pdsOuter,
 	gpos::pointer<CDistributionSpec *>
@@ -195,7 +196,7 @@ CPhysicalInnerHashJoin::PdsDeriveFromHashedOuter(
 	GPOS_ASSERT(CDistributionSpec::EdtHashed == pdsOuter->Edt());
 
 	CDistributionSpecHashed *pdshashedOuter =
-		CDistributionSpecHashed::PdsConvert(pdsOuter);
+		gpos::dyn_cast<CDistributionSpecHashed>(pdsOuter);
 	if (pdshashedOuter->IsCoveredBy(PdrgpexprOuterKeys()))
 	{
 		// outer child is hashed on a subset of outer hashkeys,
@@ -234,7 +235,7 @@ CPhysicalInnerHashJoin::PdsDerive(CMemoryPool *mp,
 	if (CDistributionSpec::EdtHashed == pdsOuter->Edt() &&
 		CDistributionSpec::EdtHashed == pdsInner->Edt())
 	{
-		CDistributionSpec *pdsDerived =
+		gpos::owner<CDistributionSpec *> pdsDerived =
 			PdsDeriveFromHashedChildren(mp, pdsOuter, pdsInner);
 		if (nullptr != pdsDerived)
 		{
@@ -249,7 +250,7 @@ CPhysicalInnerHashJoin::PdsDerive(CMemoryPool *mp,
 
 	if (CDistributionSpec::EdtHashed == pdsOuter->Edt())
 	{
-		CDistributionSpec *pdsDerived =
+		gpos::owner<CDistributionSpec *> pdsDerived =
 			PdsDeriveFromHashedOuter(mp, pdsOuter, pdsInner);
 		if (nullptr != pdsDerived)
 		{
@@ -262,14 +263,14 @@ CPhysicalInnerHashJoin::PdsDerive(CMemoryPool *mp,
 	return pdsOuter;
 }
 
-CExpression *
+gpos::owner<CExpression *>
 PexprJoinPredOnPartKeys(CMemoryPool *mp, CExpression *pexprScalar,
-						CPartKeysArray *pdrgppartkeys,
-						CColRefSet *pcrsAllowedRefs)
+						gpos::pointer<CPartKeysArray *> pdrgppartkeys,
+						gpos::pointer<CColRefSet *> pcrsAllowedRefs)
 {
 	GPOS_ASSERT(nullptr != pcrsAllowedRefs);
 
-	CExpression *pexprPred = nullptr;
+	gpos::owner<CExpression *> pexprPred = nullptr;
 	for (ULONG ulKey = 0; nullptr == pexprPred && ulKey < pdrgppartkeys->Size();
 		 ulKey++)
 	{
@@ -287,13 +288,11 @@ PexprJoinPredOnPartKeys(CMemoryPool *mp, CExpression *pexprScalar,
 	return pexprPred;
 }
 
-CPartitionPropagationSpec *
-CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl,
-									 CPartitionPropagationSpec *pppsRequired,
-									 ULONG child_index,
-									 CDrvdPropArray *pdrgpdpCtxt,
-									 ULONG ulOptReq) const
+gpos::owner<CPartitionPropagationSpec *>
+CPhysicalInnerHashJoin::PppsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CPartitionPropagationSpec *> pppsRequired, ULONG child_index,
+	gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) const
 {
 	GPOS_ASSERT(nullptr != pppsRequired);
 	GPOS_ASSERT(nullptr != pdrgpdpCtxt);
@@ -301,7 +300,8 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(2 /*child_index*/);
 
 	// CColRefSet *pcrsOutputOuter = exprhdl.DeriveOutputColumns(0);
-	CColRefSet *pcrsOutputInner = exprhdl.DeriveOutputColumns(1);
+	gpos::pointer<CColRefSet *> pcrsOutputInner =
+		exprhdl.DeriveOutputColumns(1);
 
 	// CPartInfo *part_info_outer = exprhdl.DerivePartitionInfo(0);
 	// CPartInfo *part_info_inner = exprhdl.DerivePartitionInfo(1);
@@ -311,12 +311,13 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 	{
 		// DPE: create a new request
 		pps_result = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
-		CPartInfo *part_info_outer = exprhdl.DerivePartitionInfo(0);
+		gpos::pointer<CPartInfo *> part_info_outer =
+			exprhdl.DerivePartitionInfo(0);
 		for (ULONG ul = 0; ul < part_info_outer->UlConsumers(); ++ul)
 		{
 			ULONG scan_id = part_info_outer->ScanId(ul);
 			IMDId *rel_mdid = part_info_outer->GetRelMdId(ul);
-			CPartKeysArray *part_keys_array =
+			gpos::pointer<CPartKeysArray *> part_keys_array =
 				part_info_outer->Pdrgppartkeys(ul);
 
 			gpos::owner<CExpression *> pexprCmp =
@@ -329,8 +330,8 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 
 			if (child_index == 0)
 			{
-				CPartitionPropagationSpec *pps_inner =
-					CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Ppps();
+				gpos::pointer<CPartitionPropagationSpec *> pps_inner =
+					gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Ppps();
 
 				gpos::owner<CBitSet *> selector_ids =
 					GPOS_NEW(mp) CBitSet(mp, *pps_inner->SelectorIds(scan_id));
@@ -350,7 +351,8 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 		}
 
 		gpos::owner<CBitSet *> allowed_scan_ids = GPOS_NEW(mp) CBitSet(mp);
-		CPartInfo *part_info = exprhdl.DerivePartitionInfo(child_index);
+		gpos::pointer<CPartInfo *> part_info =
+			exprhdl.DerivePartitionInfo(child_index);
 		for (ULONG ul = 0; ul < part_info->UlConsumers(); ++ul)
 		{
 			ULONG scan_id = part_info->ScanId(ul);
@@ -369,12 +371,14 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 	return pps_result;
 }
 
-CPartitionPropagationSpec *
+gpos::owner<CPartitionPropagationSpec *>
 CPhysicalInnerHashJoin::PppsDerive(CMemoryPool *mp,
 								   CExpressionHandle &exprhdl) const
 {
-	CPartitionPropagationSpec *pps_outer = exprhdl.Pdpplan(0)->Ppps();
-	CPartitionPropagationSpec *pps_inner = exprhdl.Pdpplan(1)->Ppps();
+	gpos::pointer<CPartitionPropagationSpec *> pps_outer =
+		exprhdl.Pdpplan(0)->Ppps();
+	gpos::pointer<CPartitionPropagationSpec *> pps_inner =
+		exprhdl.Pdpplan(1)->Ppps();
 
 	gpos::owner<CPartitionPropagationSpec *> pps_result =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);

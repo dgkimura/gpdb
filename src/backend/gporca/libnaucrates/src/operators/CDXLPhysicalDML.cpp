@@ -32,21 +32,23 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLPhysicalDML::CDXLPhysicalDML(
 	CMemoryPool *mp, const EdxlDmlType dxl_dml_type,
-	CDXLTableDescr *table_descr, ULongPtrArray *src_colids_array,
-	ULONG action_colid, ULONG oid_colid, ULONG ctid_colid, ULONG segid_colid,
-	BOOL preserve_oids, ULONG tuple_oid,
-	CDXLDirectDispatchInfo *dxl_direct_dispatch_info, BOOL input_sort_req)
+	gpos::owner<CDXLTableDescr *> table_descr,
+	gpos::owner<ULongPtrArray *> src_colids_array, ULONG action_colid,
+	ULONG oid_colid, ULONG ctid_colid, ULONG segid_colid, BOOL preserve_oids,
+	ULONG tuple_oid,
+	gpos::owner<CDXLDirectDispatchInfo *> dxl_direct_dispatch_info,
+	BOOL input_sort_req)
 	: CDXLPhysical(mp),
 	  m_dxl_dml_type(dxl_dml_type),
-	  m_dxl_table_descr(table_descr),
-	  m_src_colids_array(src_colids_array),
+	  m_dxl_table_descr(std::move(table_descr)),
+	  m_src_colids_array(std::move(src_colids_array)),
 	  m_action_colid(action_colid),
 	  m_oid_colid(oid_colid),
 	  m_ctid_colid(ctid_colid),
 	  m_segid_colid(segid_colid),
 	  m_preserve_oids(preserve_oids),
 	  m_tuple_oid(tuple_oid),
-	  m_direct_dispatch_info(dxl_direct_dispatch_info),
+	  m_direct_dispatch_info(std::move(dxl_direct_dispatch_info)),
 	  m_input_sort_req(input_sort_req)
 {
 	GPOS_ASSERT(EdxldmlSentinel > dxl_dml_type);
@@ -196,7 +198,7 @@ CDXLPhysicalDML::AssertValid(gpos::pointer<const CDXLNode *> node,
 							 BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == node->Arity());
-	CDXLNode *child_dxlnode = (*node)[1];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[1];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

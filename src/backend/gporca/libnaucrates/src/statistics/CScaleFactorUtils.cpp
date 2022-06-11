@@ -45,10 +45,11 @@ const CDouble CScaleFactorUtils::InvalidScaleFactor(0.0);
 //		join preds
 //
 //---------------------------------------------------------------------------
-CScaleFactorUtils::OIDPairToScaleFactorArrayMap *
+gpos::owner<CScaleFactorUtils::OIDPairToScaleFactorArrayMap *>
 CScaleFactorUtils::GenerateScaleFactorMap(
-	CMemoryPool *mp, SJoinConditionArray *join_conds_scale_factors,
-	CDoubleArray *independent_join_preds)
+	CMemoryPool *mp,
+	gpos::pointer<SJoinConditionArray *> join_conds_scale_factors,
+	gpos::pointer<CDoubleArray *> independent_join_preds)
 {
 	GPOS_ASSERT(join_conds_scale_factors != nullptr);
 
@@ -154,8 +155,8 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CalcCumulativeScaleFactorSqrtAlg(
-	OIDPairToScaleFactorArrayMap *scale_factor_hashmap,
-	CDoubleArray *independent_join_preds)
+	gpos::pointer<OIDPairToScaleFactorArrayMap *> scale_factor_hashmap,
+	gpos::pointer<CDoubleArray *> independent_join_preds)
 {
 	CDouble cumulative_scale_factor(1.0);
 
@@ -201,7 +202,7 @@ CScaleFactorUtils::CalcCumulativeScaleFactorSqrtAlg(
 CDouble
 CScaleFactorUtils::CumulativeJoinScaleFactor(
 	CMemoryPool *mp, gpos::pointer<const CStatisticsConfig *> stats_config,
-	SJoinConditionArray *join_conds_scale_factors,
+	gpos::pointer<SJoinConditionArray *> join_conds_scale_factors,
 	CDouble limit_for_result_scale_factor)
 {
 	GPOS_ASSERT(nullptr != stats_config);
@@ -373,8 +374,8 @@ CScaleFactorUtils::DampedGroupByScaleFactor(
 //
 //---------------------------------------------------------------------------
 void
-CScaleFactorUtils::SortScalingFactor(CDoubleArray *scale_factors,
-									 BOOL is_descending)
+CScaleFactorUtils::SortScalingFactor(
+	gpos::pointer<CDoubleArray *> scale_factors, BOOL is_descending)
 {
 	GPOS_ASSERT(nullptr != scale_factors);
 	const ULONG num_cols = scale_factors->Size();
@@ -498,7 +499,7 @@ CScaleFactorUtils::DoubleCmpFunc(const CDouble *double_val1,
 CDouble
 CScaleFactorUtils::CalcScaleFactorCumulativeConj(
 	gpos::pointer<const CStatisticsConfig *> stats_config,
-	CDoubleArray *scale_factors)
+	gpos::pointer<CDoubleArray *> scale_factors)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 	GPOS_ASSERT(nullptr != scale_factors);
@@ -539,7 +540,7 @@ CScaleFactorUtils::CalcScaleFactorCumulativeConj(
 CDouble
 CScaleFactorUtils::CalcScaleFactorCumulativeDisj(
 	gpos::pointer<const CStatisticsConfig *> stats_config,
-	CDoubleArray *scale_factors, CDouble total_rows)
+	gpos::pointer<CDoubleArray *> scale_factors, CDouble total_rows)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 	GPOS_ASSERT(nullptr != scale_factors);

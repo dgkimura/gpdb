@@ -30,7 +30,8 @@ FORCE_GENERATE_DBGSTR(CPartKeys);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPartKeys::CPartKeys(CColRef2dArray *pdrgpdrgpcr) : m_pdrgpdrgpcr(pdrgpdrgpcr)
+CPartKeys::CPartKeys(gpos::owner<CColRef2dArray *> pdrgpdrgpcr)
+	: m_pdrgpdrgpcr(std::move(pdrgpdrgpcr))
 {
 	GPOS_ASSERT(nullptr != m_pdrgpdrgpcr);
 	m_num_of_part_levels = m_pdrgpdrgpcr->Size();
@@ -61,7 +62,7 @@ CColRef *
 CPartKeys::PcrKey(ULONG ulLevel) const
 {
 	GPOS_ASSERT(ulLevel < m_num_of_part_levels);
-	CColRefArray *colref_array = (*m_pdrgpdrgpcr)[ulLevel];
+	gpos::pointer<CColRefArray *> colref_array = (*m_pdrgpdrgpcr)[ulLevel];
 	return (*colref_array)[0];
 }
 
@@ -74,7 +75,7 @@ CPartKeys::PcrKey(ULONG ulLevel) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPartKeys::FOverlap(CColRefSet *pcrs) const
+CPartKeys::FOverlap(gpos::pointer<CColRefSet *> pcrs) const
 {
 	for (ULONG ul = 0; ul < m_num_of_part_levels; ul++)
 	{
@@ -105,7 +106,7 @@ CPartKeys::PpartkeysCopy(CMemoryPool *mp)
 	const ULONG length = m_pdrgpdrgpcr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRefArray *colref_array = (*m_pdrgpdrgpcr)[ul];
+		gpos::pointer<CColRefArray *> colref_array = (*m_pdrgpdrgpcr)[ul];
 		gpos::owner<CColRefArray *> pdrgpcrCopy = GPOS_NEW(mp) CColRefArray(mp);
 		const ULONG num_cols = colref_array->Size();
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
@@ -115,7 +116,7 @@ CPartKeys::PpartkeysCopy(CMemoryPool *mp)
 		pdrgpdrgpcrCopy->Append(pdrgpcrCopy);
 	}
 
-	return GPOS_NEW(mp) CPartKeys(pdrgpdrgpcrCopy);
+	return GPOS_NEW(mp) CPartKeys(std::move(pdrgpdrgpcrCopy));
 }
 
 //---------------------------------------------------------------------------
@@ -126,7 +127,7 @@ CPartKeys::PpartkeysCopy(CMemoryPool *mp)
 //		Copy array of part keys into given memory pool
 //
 //---------------------------------------------------------------------------
-CPartKeysArray *
+gpos::owner<CPartKeysArray *>
 CPartKeys::PdrgppartkeysCopy(
 	CMemoryPool *mp, gpos::pointer<const CPartKeysArray *> pdrgppartkeys)
 {
@@ -171,7 +172,7 @@ CPartKeys::PpartkeysRemap(CMemoryPool *mp,
 		pdrgpdrgpcr->Append(colref_array);
 	}
 
-	return GPOS_NEW(mp) CPartKeys(pdrgpdrgpcr);
+	return GPOS_NEW(mp) CPartKeys(std::move(pdrgpdrgpcr));
 }
 
 //---------------------------------------------------------------------------

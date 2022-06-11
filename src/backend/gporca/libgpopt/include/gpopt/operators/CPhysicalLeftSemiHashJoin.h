@@ -34,8 +34,8 @@ public:
 
 	// ctor
 	CPhysicalLeftSemiHashJoin(
-		CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-		CExpressionArray *pdrgpexprInnerKeys,
+		CMemoryPool *mp, gpos::owner<CExpressionArray *> pdrgpexprOuterKeys,
+		gpos::owner<CExpressionArray *> pdrgpexprInnerKeys,
 		gpos::owner<IMdIdArray *> hash_opfamilies,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 
@@ -57,7 +57,8 @@ public:
 	}
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::pointer<CColRefSet *> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	// conversion function

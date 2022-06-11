@@ -90,7 +90,8 @@ CRangeTest::EresUnittest()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -117,9 +118,10 @@ CRangeTest::EresUnittest_CRangeInt2()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
-	IMDTypeInt2 *pmdtypeint2 =
+	gpos::pointer<IMDTypeInt2 *> pmdtypeint2 =
 		(IMDTypeInt2 *) mda.PtMDType<IMDTypeInt2>(CTestUtils::m_sysidDefault);
 	IMDId *mdid = pmdtypeint2->MDId();
 
@@ -144,9 +146,10 @@ CRangeTest::EresUnittest_CRangeInt4()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
-	IMDTypeInt4 *pmdtypeint4 =
+	gpos::pointer<IMDTypeInt4 *> pmdtypeint4 =
 		(IMDTypeInt4 *) mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 	IMDId *mdid = pmdtypeint4->MDId();
 
@@ -171,9 +174,10 @@ CRangeTest::EresUnittest_CRangeInt8()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
-	IMDTypeInt8 *pmdtypeint8 =
+	gpos::pointer<IMDTypeInt8 *> pmdtypeint8 =
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 	IMDId *mdid = pmdtypeint8->MDId();
 
@@ -196,7 +200,7 @@ CRangeTest::EresUnittest_CRangeFromScalar()
 	CMemoryPool *mp = amp.Pmp();
 
 	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	gpos::owner<CDatumInt4GPDB *> pdatumint4 =
@@ -289,9 +293,12 @@ CRangeTest::EresInitAndCheckRanges(CMemoryPool *mp, IMDId *mdid, PfPdatum pf)
 //
 //---------------------------------------------------------------------------
 void
-CRangeTest::TestRangeRelationship(CMemoryPool *mp, CRange *prange1,
-								  CRange *prange2, CRange *prange3,
-								  CRange *prange4, CRange *prange5)
+CRangeTest::TestRangeRelationship(CMemoryPool *mp,
+								  gpos::pointer<CRange *> prange1,
+								  gpos::pointer<CRange *> prange2,
+								  gpos::pointer<CRange *> prange3,
+								  gpos::pointer<CRange *> prange4,
+								  gpos::pointer<CRange *> prange5)
 {
 	GPOS_ASSERT_MSG(!prange4->FDisjointLeft(prange5),
 					"[-10, 10) does not end before [0, 0]");
@@ -319,7 +326,7 @@ CRangeTest::TestRangeRelationship(CMemoryPool *mp, CRange *prange1,
 					"[-10, 10) overlaps end (-20, 0]");
 
 	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	PrintRange(mp, colref, prange1);
@@ -340,7 +347,8 @@ CRangeTest::TestRangeRelationship(CMemoryPool *mp, CRange *prange1,
 //
 //---------------------------------------------------------------------------
 void
-CRangeTest::PrintRange(CMemoryPool *mp, CColRef *colref, CRange *prange)
+CRangeTest::PrintRange(CMemoryPool *mp, CColRef *colref,
+					   gpos::pointer<CRange *> prange)
 {
 	gpos::owner<CExpression *> pexpr = prange->PexprScalar(mp, colref);
 

@@ -43,9 +43,12 @@ CLogicalInsert::CLogicalInsert(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalInsert::CLogicalInsert(CMemoryPool *mp, CTableDescriptor *ptabdesc,
-							   CColRefArray *pdrgpcrSource)
-	: CLogical(mp), m_ptabdesc(ptabdesc), m_pdrgpcrSource(pdrgpcrSource)
+CLogicalInsert::CLogicalInsert(CMemoryPool *mp,
+							   gpos::owner<CTableDescriptor *> ptabdesc,
+							   gpos::owner<CColRefArray *> pdrgpcrSource)
+	: CLogical(mp),
+	  m_ptabdesc(std::move(ptabdesc)),
+	  m_pdrgpcrSource(std::move(pdrgpcrSource))
 
 {
 	GPOS_ASSERT(nullptr != m_ptabdesc);
@@ -77,14 +80,15 @@ CLogicalInsert::~CLogicalInsert()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalInsert::Matches(COperator *pop) const
+CLogicalInsert::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalInsert *popInsert = CLogicalInsert::PopConvert(pop);
+	gpos::pointer<CLogicalInsert *> popInsert =
+		gpos::dyn_cast<CLogicalInsert>(pop);
 
 	return m_ptabdesc->MDId()->Equals(popInsert->Ptabdesc()->MDId()) &&
 		   m_pdrgpcrSource->Equals(popInsert->PdrgpcrSource());
@@ -118,15 +122,15 @@ CLogicalInsert::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
-CLogicalInsert::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										   UlongToColRefMap *colref_mapping,
-										   BOOL must_exist)
+CLogicalInsert::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *colref_array =
+	gpos::owner<CColRefArray *> colref_array =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrSource, colref_mapping, must_exist);
 	m_ptabdesc->AddRef();
 
-	return GPOS_NEW(mp) CLogicalInsert(mp, m_ptabdesc, colref_array);
+	return GPOS_NEW(mp) CLogicalInsert(mp, m_ptabdesc, std::move(colref_array));
 }
 
 //---------------------------------------------------------------------------
@@ -137,7 +141,7 @@ CLogicalInsert::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalInsert::DeriveOutputColumns(CMemoryPool *mp,
 									CExpressionHandle &	 //exprhdl
 )
@@ -155,7 +159,7 @@ CLogicalInsert::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalInsert::DeriveKeyCollection(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl) const
 {
@@ -186,7 +190,7 @@ CLogicalInsert::DeriveMaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalInsert::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -202,10 +206,10 @@ CLogicalInsert::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalInsert::PstatsDerive(CMemoryPool *,	 // mp,
 							 CExpressionHandle &exprhdl,
-							 IStatisticsArray *	 // not used
+							 gpos::pointer<IStatisticsArray *>	// not used
 ) const
 {
 	return PstatsPassThruOuter(exprhdl);

@@ -29,7 +29,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CGroupExpression *
-CBinding::PgexprNext(CGroup *pgroup, CGroupExpression *pgexpr)
+CBinding::PgexprNext(gpos::pointer<CGroup *> pgroup, CGroupExpression *pgexpr)
 {
 	CGroupProxy gp(pgroup);
 
@@ -64,7 +64,7 @@ CBinding::PexprExpandPattern(CExpression *pexprPattern, ULONG ulPos,
 							 ULONG arity)
 {
 	GPOS_ASSERT_IMP(pexprPattern->Pop()->FPattern(),
-					!CPattern::PopConvert(pexprPattern->Pop())->FLeaf());
+					!gpos::dyn_cast<CPattern>(pexprPattern->Pop())->FLeaf());
 
 	// re-use tree pattern
 	if (COperator::EopPatternTree == pexprPattern->Pop()->Eopid() ||
@@ -102,16 +102,17 @@ CBinding::PexprExpandPattern(CExpression *pexprPattern, ULONG ulPos,
 //		Assemble expression; substitute operator with pattern as necessary
 //
 //---------------------------------------------------------------------------
-CExpression *
-CBinding::PexprFinalize(CMemoryPool *mp, CGroupExpression *pgexpr,
-						CExpressionArray *pdrgpexpr)
+gpos::owner<CExpression *>
+CBinding::PexprFinalize(CMemoryPool *mp,
+						gpos::pointer<CGroupExpression *> pgexpr,
+						gpos::owner<CExpressionArray *> pdrgpexpr)
 {
 	gpos::owner<COperator *> pop = pgexpr->Pop();
 
 	pop->AddRef();
-	gpos::owner<CExpression *> pexpr =
-		GPOS_NEW(mp) CExpression(mp, pop, pgexpr, pdrgpexpr, nullptr /* prpp */,
-								 nullptr /*input_stats*/, GPOPT_INVALID_COST);
+	gpos::owner<CExpression *> pexpr = GPOS_NEW(mp) CExpression(
+		mp, std::move(pop), pgexpr, std::move(pdrgpexpr), nullptr /* prpp */,
+		nullptr /*input_stats*/, GPOPT_INVALID_COST);
 
 	return pexpr;
 }
@@ -127,8 +128,10 @@ CBinding::PexprFinalize(CMemoryPool *mp, CGroupExpression *pgexpr,
 //
 //---------------------------------------------------------------------------
 gpos::owner<CExpression *>
-CBinding::PexprExtract(CMemoryPool *mp, CGroupExpression *pgexpr,
-					   CExpression *pexprPattern, CExpression *pexprLast)
+CBinding::PexprExtract(CMemoryPool *mp,
+					   gpos::pointer<CGroupExpression *> pgexpr,
+					   CExpression *pexprPattern,
+					   gpos::pointer<CExpression *> pexprLast)
 {
 	GPOS_CHECK_ABORT;
 
@@ -141,8 +144,8 @@ CBinding::PexprExtract(CMemoryPool *mp, CGroupExpression *pgexpr,
 	// the previously extracted pattern must have the same root
 	GPOS_ASSERT_IMP(nullptr != pexprLast, pexprLast->Pgexpr() == pgexpr);
 
-	COperator *popPattern = pexprPattern->Pop();
-	if (popPattern->FPattern() && CPattern::PopConvert(popPattern)->FLeaf())
+	gpos::pointer<COperator *> popPattern = pexprPattern->Pop();
+	if (popPattern->FPattern() && gpos::dyn_cast<CPattern>(popPattern)->FLeaf())
 	{
 		// return immediately; no deep extraction for leaf patterns
 		pgexpr->Pop()->AddRef();
@@ -185,7 +188,8 @@ CBinding::PexprExtract(CMemoryPool *mp, CGroupExpression *pgexpr,
 		}
 	}
 
-	CExpression *pexpr = PexprFinalize(mp, pgexpr, pdrgpexpr);
+	gpos::owner<CExpression *> pexpr =
+		PexprFinalize(mp, pgexpr, std::move(pdrgpexpr));
 	GPOS_ASSERT(nullptr != pexpr);
 
 	return pexpr;
@@ -201,9 +205,10 @@ CBinding::PexprExtract(CMemoryPool *mp, CGroupExpression *pgexpr,
 //
 //---------------------------------------------------------------------------
 BOOL
-CBinding::FInitChildCursors(CMemoryPool *mp, CGroupExpression *pgexpr,
+CBinding::FInitChildCursors(CMemoryPool *mp,
+							gpos::pointer<CGroupExpression *> pgexpr,
 							CExpression *pexprPattern,
-							CExpressionArray *pdrgpexpr)
+							gpos::pointer<CExpressionArray *> pdrgpexpr)
 {
 	GPOS_ASSERT(nullptr != pexprPattern);
 	GPOS_ASSERT(nullptr != pdrgpexpr);
@@ -213,11 +218,11 @@ CBinding::FInitChildCursors(CMemoryPool *mp, CGroupExpression *pgexpr,
 	// grab first expression from each cursor
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CGroup *pgroup = (*pgexpr)[ul];
+		gpos::pointer<CGroup *> pgroup = (*pgexpr)[ul];
 		CExpression *pexprPatternChild =
 			PexprExpandPattern(pexprPattern, ul, arity);
-		CExpression *pexprNewChild = PexprExtract(mp, pgroup, pexprPatternChild,
-												  nullptr /*pexprLastChild*/);
+		gpos::owner<CExpression *> pexprNewChild = PexprExtract(
+			mp, pgroup, pexprPatternChild, nullptr /*pexprLastChild*/);
 
 		if (nullptr == pexprNewChild)
 		{
@@ -242,10 +247,11 @@ CBinding::FInitChildCursors(CMemoryPool *mp, CGroupExpression *pgexpr,
 //
 //---------------------------------------------------------------------------
 BOOL
-CBinding::FAdvanceChildCursors(CMemoryPool *mp, CGroupExpression *pgexpr,
+CBinding::FAdvanceChildCursors(CMemoryPool *mp,
+							   gpos::pointer<CGroupExpression *> pgexpr,
 							   CExpression *pexprPattern,
-							   CExpression *pexprLast,
-							   CExpressionArray *pdrgpexpr)
+							   gpos::pointer<CExpression *> pexprLast,
+							   gpos::pointer<CExpressionArray *> pdrgpexpr)
 {
 	GPOS_ASSERT(nullptr != pexprPattern);
 	GPOS_ASSERT(nullptr != pdrgpexpr);
@@ -265,10 +271,10 @@ CBinding::FAdvanceChildCursors(CMemoryPool *mp, CGroupExpression *pgexpr,
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CGroup *pgroup = (*pgexpr)[ul];
+		gpos::pointer<CGroup *> pgroup = (*pgexpr)[ul];
 		CExpression *pexprPatternChild =
 			PexprExpandPattern(pexprPattern, ul, arity);
-		CExpression *pexprNewChild = nullptr;
+		gpos::owner<CExpression *> pexprNewChild = nullptr;
 
 		if (fCursorAdvanced)
 		{
@@ -278,7 +284,7 @@ CBinding::FAdvanceChildCursors(CMemoryPool *mp, CGroupExpression *pgexpr,
 		}
 		else
 		{
-			CExpression *pexprLastChild = (*pexprLast)[ul];
+			gpos::pointer<CExpression *> pexprLastChild = (*pexprLast)[ul];
 			GPOS_ASSERT(pgroup == pexprLastChild->Pgexpr()->Pgroup());
 
 			// advance current cursor
@@ -320,9 +326,11 @@ CBinding::FAdvanceChildCursors(CMemoryPool *mp, CGroupExpression *pgexpr,
 //
 //---------------------------------------------------------------------------
 BOOL
-CBinding::FExtractChildren(CMemoryPool *mp, CGroupExpression *pgexpr,
-						   CExpression *pexprPattern, CExpression *pexprLast,
-						   CExpressionArray *pdrgpexpr)
+CBinding::FExtractChildren(CMemoryPool *mp,
+						   gpos::pointer<CGroupExpression *> pgexpr,
+						   CExpression *pexprPattern,
+						   gpos::pointer<CExpression *> pexprLast,
+						   gpos::pointer<CExpressionArray *> pdrgpexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_CHECK_ABORT;
@@ -330,7 +338,7 @@ CBinding::FExtractChildren(CMemoryPool *mp, CGroupExpression *pgexpr,
 	GPOS_ASSERT(nullptr != pexprPattern);
 	GPOS_ASSERT(nullptr != pdrgpexpr);
 	GPOS_ASSERT_IMP(pexprPattern->Pop()->FPattern(),
-					!CPattern::PopConvert(pexprPattern->Pop())->FLeaf());
+					!gpos::dyn_cast<CPattern>(pexprPattern->Pop())->FLeaf());
 	GPOS_ASSERT(pexprPattern->FMatchPattern(pgexpr));
 
 	ULONG arity = pgexpr->Arity();
@@ -361,9 +369,10 @@ CBinding::FExtractChildren(CMemoryPool *mp, CGroupExpression *pgexpr,
 //		until group is exhausted;
 //
 //---------------------------------------------------------------------------
-CExpression *
-CBinding::PexprExtract(CMemoryPool *mp, CGroup *pgroup,
-					   CExpression *pexprPattern, CExpression *pexprLast)
+gpos::owner<CExpression *>
+CBinding::PexprExtract(CMemoryPool *mp, gpos::pointer<CGroup *> pgroup,
+					   CExpression *pexprPattern,
+					   gpos::pointer<CExpression *> pexprLast)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_CHECK_ABORT;
@@ -383,8 +392,8 @@ CBinding::PexprExtract(CMemoryPool *mp, CGroup *pgroup,
 	}
 	GPOS_ASSERT(nullptr != pgexpr);
 
-	COperator *popPattern = pexprPattern->Pop();
-	if (popPattern->FPattern() && CPattern::PopConvert(popPattern)->FLeaf())
+	gpos::pointer<COperator *> popPattern = pexprPattern->Pop();
+	if (popPattern->FPattern() && gpos::dyn_cast<CPattern>(popPattern)->FLeaf())
 	{
 		// for leaf patterns, we do not iterate on group expressions
 		if (nullptr != pexprLast)
@@ -402,7 +411,7 @@ CBinding::PexprExtract(CMemoryPool *mp, CGroup *pgroup,
 	{
 		if (pexprPattern->FMatchPattern(pgexpr))
 		{
-			CExpression *pexprResult =
+			gpos::owner<CExpression *> pexprResult =
 				PexprExtract(mp, pgexpr, pexprPattern, pexprStart);
 			if (nullptr != pexprResult)
 			{

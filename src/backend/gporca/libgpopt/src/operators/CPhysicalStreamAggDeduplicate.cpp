@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalStreamAggDeduplicate.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalGbAgg.h"
@@ -28,15 +29,16 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalStreamAggDeduplicate::CPhysicalStreamAggDeduplicate(
-	CMemoryPool *mp, CColRefArray *colref_array, CColRefArray *pdrgpcrMinimal,
-	COperator::EGbAggType egbaggtype, CColRefArray *pdrgpcrKeys,
-	BOOL fGeneratesDuplicates, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
+	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+	CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	gpos::owner<CColRefArray *> pdrgpcrKeys, BOOL fGeneratesDuplicates,
+	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+	BOOL should_enforce_distribution)
 	: CPhysicalStreamAgg(
 		  mp, colref_array, pdrgpcrMinimal, egbaggtype, fGeneratesDuplicates,
 		  nullptr /*pdrgpcrGbMinusDistinct*/, fMultiStage, isAggFromSplitDQA,
 		  aggStage, should_enforce_distribution),
-	  m_pdrgpcrKeys(pdrgpcrKeys)
+	  m_pdrgpcrKeys(std::move(pdrgpcrKeys))
 {
 	GPOS_ASSERT(nullptr != m_pdrgpcrKeys);
 	InitOrderSpec(mp, m_pdrgpcrKeys);

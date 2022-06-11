@@ -47,7 +47,8 @@ public:
 	CDXLScalarOpExpr(const CDXLScalarOpExpr &) = delete;
 
 	// ctor/dtor
-	CDXLScalarOpExpr(CMemoryPool *mp, IMDId *mdid_op, IMDId *return_type_mdid,
+	CDXLScalarOpExpr(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
+					 gpos::owner<IMDId *> return_type_mdid,
 					 const CWStringConst *str_opname);
 
 	~CDXLScalarOpExpr() override;

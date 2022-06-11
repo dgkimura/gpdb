@@ -34,10 +34,10 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CScalarSubqueryQuantified::CScalarSubqueryQuantified(
-	CMemoryPool *mp, IMDId *scalar_op_mdid, const CWStringConst *pstrScalarOp,
-	const CColRef *colref)
+	CMemoryPool *mp, gpos::owner<IMDId *> scalar_op_mdid,
+	const CWStringConst *pstrScalarOp, const CColRef *colref)
 	: CScalar(mp),
-	  m_scalar_op_mdid(scalar_op_mdid),
+	  m_scalar_op_mdid(std::move(scalar_op_mdid)),
 	  m_pstrScalarOp(pstrScalarOp),
 	  m_pcr(colref)
 {
@@ -96,7 +96,7 @@ CScalarSubqueryQuantified::MdIdOp() const
 //		Type of scalar's value
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarSubqueryQuantified::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -136,7 +136,7 @@ CScalarSubqueryQuantified::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSubqueryQuantified::Matches(COperator *pop) const
+CScalarSubqueryQuantified::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
@@ -144,8 +144,8 @@ CScalarSubqueryQuantified::Matches(COperator *pop) const
 	}
 
 	// match if contents are identical
-	CScalarSubqueryQuantified *popSsq =
-		CScalarSubqueryQuantified::PopConvert(pop);
+	gpos::pointer<CScalarSubqueryQuantified *> popSsq =
+		gpos::dyn_cast<CScalarSubqueryQuantified>(pop);
 	return popSsq->Pcr() == m_pcr && popSsq->MdIdOp()->Equals(m_scalar_op_mdid);
 }
 
@@ -158,13 +158,13 @@ CScalarSubqueryQuantified::Matches(COperator *pop) const
 //		Locally used columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CScalarSubqueryQuantified::PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
 	// used columns is an empty set unless subquery column is an outer reference
 	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
-	CColRefSet *pcrsChildOutput =
+	gpos::pointer<CColRefSet *> pcrsChildOutput =
 		exprhdl.DeriveOutputColumns(0 /* child_index */);
 	if (!pcrsChildOutput->FMember(m_pcr))
 	{

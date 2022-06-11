@@ -45,7 +45,7 @@ private:
 
 public:
 	// ctor
-	explicit CGroupProxy(CGroup *pgroup);
+	explicit CGroupProxy(gpos::pointer<CGroup *> pgroup);
 
 	// dtor
 	~CGroupProxy();
@@ -66,8 +66,9 @@ public:
 
 	// set hash join keys
 	void
-	SetJoinKeys(CExpressionArray *pdrgpexprOuter,
-				CExpressionArray *pdrgpexprInner, IMdIdArray *join_opfamilies)
+	SetJoinKeys(gpos::pointer<CExpressionArray *> pdrgpexprOuter,
+				gpos::pointer<CExpressionArray *> pdrgpexprInner,
+				gpos::pointer<IMdIdArray *> join_opfamilies)
 	{
 		m_pgroup->SetJoinKeys(pdrgpexprOuter, pdrgpexprInner, join_opfamilies);
 	}
@@ -88,13 +89,15 @@ public:
 	CGroupExpression *PgexprFirst();
 
 	// retrieve next group expression
-	CGroupExpression *PgexprNext(CGroupExpression *pgexpr);
+	CGroupExpression *PgexprNext(gpos::pointer<CGroupExpression *> pgexpr);
 
 	// get the first non-logical group expression following the given expression
-	CGroupExpression *PgexprSkipLogical(CGroupExpression *pgexpr);
+	CGroupExpression *PgexprSkipLogical(
+		gpos::pointer<CGroupExpression *> pgexpr);
 
 	// get the next logical group expression following the given expression
-	CGroupExpression *PgexprNextLogical(CGroupExpression *pgexpr);
+	CGroupExpression *PgexprNextLogical(
+		gpos::pointer<CGroupExpression *> pgexpr);
 
 	// lookup best expression under optimization context
 	CGroupExpression *PgexprLookup(COptimizationContext *poc) const;

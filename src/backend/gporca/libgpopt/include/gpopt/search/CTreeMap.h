@@ -54,8 +54,8 @@ class CTreeMap
 	using DrgPr = CDynamicPtrArray<R, CleanupRelease<R>>;
 
 	// generic rehydrate function
-	using PrFn = gpos::owner<R *> (*)(CMemoryPool *, T *, gpos::owner<DrgPr *>,
-									  U *);
+	using PrFn = gpos::owner<R *> (*)(CMemoryPool *, gpos::pointer<T *>,
+									  gpos::owner<DrgPr *>, U *);
 
 private:
 	// fwd declaration
@@ -262,7 +262,7 @@ private:
 		}
 
 		// accessor
-		const T *
+		gpos::pointer<const T *>
 		Value() const
 		{
 			return m_value;

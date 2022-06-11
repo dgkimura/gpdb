@@ -55,8 +55,8 @@ private:
 
 public:
 	// ctor
-	CScalarCmp(CMemoryPool *mp, IMDId *mdid_op, const CWStringConst *pstrOp,
-			   IMDType::ECmpType cmp_type);
+	CScalarCmp(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
+			   const CWStringConst *pstrOp, IMDType::ECmpType cmp_type);
 
 	// dtor
 	~CScalarCmp() override
@@ -92,13 +92,13 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
@@ -112,7 +112,8 @@ public:
 	BOOL FCommutative() const;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override;
 
 	// name of the comparison operator
 	const CWStringConst *Pstr() const;
@@ -121,7 +122,7 @@ public:
 	gpos::pointer<IMDId *> MdIdOp() const;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::pointer<IMDId *> MdidType() const override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
@@ -141,10 +142,11 @@ public:
 
 	// get the string representation of a metadata object
 	static CWStringConst *Pstr(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   IMDId *mdid);
+							   gpos::pointer<IMDId *> mdid);
 
 	// get metadata id of the commuted operator
-	static IMDId *PmdidCommuteOp(CMDAccessor *md_accessor, COperator *pop);
+	static IMDId *PmdidCommuteOp(CMDAccessor *md_accessor,
+								 gpos::pointer<COperator *> pop);
 
 
 

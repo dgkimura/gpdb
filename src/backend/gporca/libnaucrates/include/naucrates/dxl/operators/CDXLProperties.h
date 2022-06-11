@@ -57,7 +57,8 @@ public:
 	~CDXLProperties() override;
 
 	// setter
-	virtual void SetStats(CDXLStatsDerivedRelation *dxl_stats_derived_relation);
+	virtual void SetStats(
+		gpos::owner<CDXLStatsDerivedRelation *> dxl_stats_derived_relation);
 
 	// statistical information
 	virtual gpos::pointer<const CDXLStatsDerivedRelation *>

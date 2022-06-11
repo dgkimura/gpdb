@@ -45,7 +45,7 @@ public:
 
 	// ctors
 	CDatumInt8GPDB(CSystemId sysid, LINT val, BOOL is_null = false);
-	CDatumInt8GPDB(IMDId *mdid, LINT val, BOOL is_null = false);
+	CDatumInt8GPDB(gpos::owner<IMDId *> mdid, LINT val, BOOL is_null = false);
 
 	// dtor
 	~CDatumInt8GPDB() override;

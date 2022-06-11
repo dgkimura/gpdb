@@ -29,7 +29,7 @@ using namespace gpnaucrates;
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerUtils::SetProperties(CDXLNode *dxlnode,
+CParseHandlerUtils::SetProperties(gpos::pointer<CDXLNode *> dxlnode,
 								  CParseHandlerProperties *prop_parse_handler)
 {
 	GPOS_ASSERT(nullptr != prop_parse_handler->GetProperties());

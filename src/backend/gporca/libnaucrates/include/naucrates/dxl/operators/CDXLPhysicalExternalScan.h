@@ -37,7 +37,8 @@ public:
 	// ctors
 	explicit CDXLPhysicalExternalScan(CMemoryPool *mp);
 
-	CDXLPhysicalExternalScan(CMemoryPool *mp, CDXLTableDescr *table_descr);
+	CDXLPhysicalExternalScan(CMemoryPool *mp,
+							 gpos::owner<CDXLTableDescr *> table_descr);
 
 	// operator type
 	Edxlopid GetDXLOperator() const override;

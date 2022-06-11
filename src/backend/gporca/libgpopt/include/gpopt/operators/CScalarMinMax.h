@@ -58,7 +58,8 @@ public:
 	CScalarMinMax(const CScalarMinMax &) = delete;
 
 	// ctor
-	CScalarMinMax(CMemoryPool *mp, IMDId *mdid_type, EScalarMinMaxType esmmt);
+	CScalarMinMax(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+				  EScalarMinMaxType esmmt);
 
 	// dtor
 	~CScalarMinMax() override;
@@ -95,7 +96,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -105,7 +106,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
@@ -117,7 +118,7 @@ public:
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(ULongPtrArray *pdrgpulChildren) const override
+	Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override
 	{
 		// MinMax returns Null only if all children are Null
 		return EberNullOnAllNullChildren(pdrgpulChildren);

@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformJoinCommutativity.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogicalInnerJoin.h"
@@ -79,8 +80,9 @@ CXformJoinCommutativity::FCompatible(CXform::EXformId exfid)
 //
 //---------------------------------------------------------------------------
 void
-CXformJoinCommutativity::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								   CExpression *pexpr) const
+CXformJoinCommutativity::Transform(gpos::pointer<CXformContext *> pxfctxt,
+								   gpos::pointer<CXformResult *> pxfres,
+								   gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -99,11 +101,12 @@ CXformJoinCommutativity::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pexprScalar->AddRef();
 
 	// assemble transformed expression
-	CExpression *pexprAlt = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
-		mp, pexprRight, pexprLeft, pexprScalar);
+	gpos::owner<CExpression *> pexprAlt =
+		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprRight, pexprLeft,
+													pexprScalar);
 
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 // EOF

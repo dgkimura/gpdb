@@ -40,8 +40,9 @@ private:
 
 public:
 	// ctor
-	CJoinOrderGreedy(CMemoryPool *pmp, CExpressionArray *pdrgpexprComponents,
-					 CExpressionArray *pdrgpexprConjuncts);
+	CJoinOrderGreedy(CMemoryPool *pmp,
+					 gpos::owner<CExpressionArray *> pdrgpexprComponents,
+					 gpos::owner<CExpressionArray *> pdrgpexprConjuncts);
 
 	// dtor
 	~CJoinOrderGreedy() override;
@@ -50,9 +51,9 @@ public:
 	virtual gpos::owner<CExpression *> PexprExpand();
 
 	ULONG
-	PickBestJoin(CBitSet *candidate_nodes);
+	PickBestJoin(gpos::pointer<CBitSet *> candidate_nodes);
 
-	CBitSet *GetAdjacentComponentsToJoinCandidate();
+	gpos::owner<CBitSet *> GetAdjacentComponentsToJoinCandidate();
 
 	CXform::EXformId
 	EOriginXForm() const override

@@ -62,9 +62,10 @@ public:
 	CMDScCmpGPDB(const CMDScCmpGPDB &) = delete;
 
 	// ctor
-	CMDScCmpGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-				 IMDId *left_mdid, IMDId *right_mdid,
-				 IMDType::ECmpType cmp_type, IMDId *mdid_op);
+	CMDScCmpGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+				 gpos::owner<IMDId *> left_mdid,
+				 gpos::owner<IMDId *> right_mdid, IMDType::ECmpType cmp_type,
+				 gpos::owner<IMDId *> mdid_op);
 
 	// dtor
 	~CMDScCmpGPDB() override;

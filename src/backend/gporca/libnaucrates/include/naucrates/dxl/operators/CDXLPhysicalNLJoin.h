@@ -84,7 +84,8 @@ public:
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
 						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
-	void SetNestLoopParamsColRefs(CDXLColRefArray *nest_params_col_refs);
+	void SetNestLoopParamsColRefs(
+		gpos::owner<CDXLColRefArray *> nest_params_col_refs);
 
 	gpos::pointer<CDXLColRefArray *> GetNestLoopParamsColRefs() const;
 

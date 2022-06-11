@@ -113,12 +113,14 @@ private:
 	gpos::pointer<CTableDescriptor *> m_table_descriptor;
 
 	// helper for getting applicable FDs from child
-	static CFunctionalDependencyArray *DeriveChildFunctionalDependencies(
-		CMemoryPool *mp, ULONG child_index, CExpressionHandle &exprhdl);
+	static gpos::owner<CFunctionalDependencyArray *>
+	DeriveChildFunctionalDependencies(CMemoryPool *mp, ULONG child_index,
+									  CExpressionHandle &exprhdl);
 
 	// helper for creating local FDs
-	static CFunctionalDependencyArray *DeriveLocalFunctionalDependencies(
-		CMemoryPool *mp, CExpressionHandle &exprhdl);
+	static gpos::owner<CFunctionalDependencyArray *>
+	DeriveLocalFunctionalDependencies(CMemoryPool *mp,
+									  CExpressionHandle &exprhdl);
 
 	// Have all the properties been derived?
 	//
@@ -135,22 +137,23 @@ private:
 
 protected:
 	// output columns
-	CColRefSet *DeriveOutputColumns(CExpressionHandle &);
+	gpos::pointer<CColRefSet *> DeriveOutputColumns(CExpressionHandle &);
 
 	// outer references
-	CColRefSet *DeriveOuterReferences(CExpressionHandle &);
+	gpos::pointer<CColRefSet *> DeriveOuterReferences(CExpressionHandle &);
 
 	// nullable columns
-	CColRefSet *DeriveNotNullColumns(CExpressionHandle &);
+	gpos::pointer<CColRefSet *> DeriveNotNullColumns(CExpressionHandle &);
 
 	// columns from the inner child of a correlated-apply expression that can be used above the apply expression
-	CColRefSet *DeriveCorrelatedApplyColumns(CExpressionHandle &);
+	gpos::pointer<CColRefSet *> DeriveCorrelatedApplyColumns(
+		CExpressionHandle &);
 
 	// key collection
-	CKeyCollection *DeriveKeyCollection(CExpressionHandle &);
+	gpos::pointer<CKeyCollection *> DeriveKeyCollection(CExpressionHandle &);
 
 	// functional dependencies
-	CFunctionalDependencyArray *DeriveFunctionalDependencies(
+	gpos::pointer<CFunctionalDependencyArray *> DeriveFunctionalDependencies(
 		CExpressionHandle &);
 
 	// max cardinality
@@ -160,13 +163,15 @@ protected:
 	ULONG DeriveJoinDepth(CExpressionHandle &);
 
 	// partition consumers
-	CPartInfo *DerivePartitionInfo(CExpressionHandle &);
+	gpos::pointer<CPartInfo *> DerivePartitionInfo(CExpressionHandle &);
 
 	// constraint property
-	CPropConstraint *DerivePropertyConstraint(CExpressionHandle &);
+	gpos::pointer<CPropConstraint *> DerivePropertyConstraint(
+		CExpressionHandle &);
 
 	// function properties
-	CFunctionProp *DeriveFunctionProperties(CExpressionHandle &);
+	gpos::pointer<CFunctionProp *> DeriveFunctionProperties(
+		CExpressionHandle &);
 
 	CTableDescriptor *DeriveTableDescriptor(CExpressionHandle &);
 
@@ -194,7 +199,7 @@ public:
 
 	// derivation function
 	void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDrvdPropCtxt *pdpctxt) override;
+				gpos::pointer<CDrvdPropCtxt *> pdpctxt) override;
 
 	// output columns
 	gpos::pointer<CColRefSet *> GetOutputColumns() const;

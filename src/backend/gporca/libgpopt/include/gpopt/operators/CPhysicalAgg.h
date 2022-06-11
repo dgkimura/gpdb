@@ -44,15 +44,15 @@ private:
 	CLogicalGbAgg::EAggStage m_aggStage;
 
 	// compute required distribution of the n-th child of an intermediate aggregate
-	CDistributionSpec *PdsRequiredIntermediateAgg(CMemoryPool *mp,
-												  ULONG ulOptReq) const;
+	gpos::owner<CDistributionSpec *> PdsRequiredIntermediateAgg(
+		CMemoryPool *mp, ULONG ulOptReq) const;
 
 	// compute required distribution of the n-th child of a global aggregate
 	gpos::owner<CDistributionSpec *> PdsRequiredGlobalAgg(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
-		CColRefArray *pdrgpcrGrp, CColRefArray *pdrgpcrGrpMinimal,
-		ULONG ulOptReq) const;
+		gpos::pointer<CColRefArray *> pdrgpcrGrp,
+		CColRefArray *pdrgpcrGrpMinimal, ULONG ulOptReq) const;
 
 	// compute a maximal hashed distribution using the given columns,
 	// if no such distribution can be created, return a Singleton distribution
@@ -87,24 +87,27 @@ protected:
 	BOOL m_should_enforce_distribution;
 
 	// compute required columns of the n-th child
-	CColRefSet *PcrsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								CColRefSet *pcrsRequired, ULONG child_index,
-								CColRefArray *pdrgpcrGrp);
+	gpos::owner<CColRefSet *> PcrsRequiredAgg(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
+		gpos::pointer<CColRefArray *> pdrgpcrGrp);
 
 	// compute required distribution of the n-th child
 	gpos::owner<CDistributionSpec *> PdsRequiredAgg(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CDistributionSpec *pdsInput, ULONG child_index, ULONG ulOptReq,
-		CColRefArray *pdrgpcgGrp, CColRefArray *pdrgpcrGrpMinimal) const;
+		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
+		ULONG ulOptReq, gpos::pointer<CColRefArray *> pdrgpcgGrp,
+		CColRefArray *pdrgpcrGrpMinimal) const;
 
 public:
 	CPhysicalAgg(const CPhysicalAgg &) = delete;
 
 	// ctor
-	CPhysicalAgg(CMemoryPool *mp, CColRefArray *colref_array,
-				 CColRefArray *pdrgpcrMinimal,	// FD's on grouping columns
+	CPhysicalAgg(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+				 gpos::pointer<CColRefArray *>
+					 pdrgpcrMinimal,  // FD's on grouping columns
 				 COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-				 CColRefArray *pdrgpcrArgDQA, BOOL fMultiStage,
+				 gpos::owner<CColRefArray *> pdrgpcrArgDQA, BOOL fMultiStage,
 				 BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
 				 BOOL should_enforce_distribution);
 
@@ -162,7 +165,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
@@ -179,21 +182,24 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	CColRefSet *PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsRequired, ULONG child_index,
-							 CDrvdPropArray *pdrgpdpCtxt,
-							 ULONG ulOptReq) override;
+	gpos::owner<CColRefSet *> PcrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
-	CCTEReq *PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  CCTEReq *pcter, ULONG child_index,
-						  CDrvdPropArray *pdrgpdpCtxt,
-						  ULONG ulOptReq) const override;
+	gpos::owner<CCTEReq *> PcteRequired(CMemoryPool *mp,
+										CExpressionHandle &exprhdl,
+										gpos::pointer<CCTEReq *> pcter,
+										ULONG child_index,
+										CDrvdPropArray *pdrgpdpCtxt,
+										ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *
+	gpos::owner<CDistributionSpec *>
 	PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDistributionSpec *pdsRequired, ULONG child_index,
+				gpos::pointer<CDistributionSpec *> pdsRequired,
+				ULONG child_index,
 				gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
 				ULONG ulOptReq) const override
 	{
@@ -202,14 +208,15 @@ public:
 	}
 
 	// compute required rewindability of the n-th child
-	CRewindabilitySpec *PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CRewindabilitySpec *prsRequired,
-									ULONG child_index,
-									CDrvdPropArray *pdrgpdpCtxt,
-									ULONG ulOptReq) const override;
+	gpos::owner<CRewindabilitySpec *> PrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::pointer<CColRefSet *> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 
@@ -222,8 +229,8 @@ public:
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive rewindability
-	CRewindabilitySpec *PrsDerive(CMemoryPool *mp,
-								  CExpressionHandle &exprhdl) const override;
+	gpos::owner<CRewindabilitySpec *> PrsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties

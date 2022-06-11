@@ -60,8 +60,10 @@ private:
 		gpos::owner<CExpression *> m_filter_expr = nullptr;
 
 		SPartPropSpecInfo(ULONG scan_id, EPartPropSpecInfoType type,
-						  IMDId *rool_rel_mdid)
-			: m_scan_id(scan_id), m_type(type), m_root_rel_mdid(rool_rel_mdid)
+						  gpos::owner<IMDId *> rool_rel_mdid)
+			: m_scan_id(scan_id),
+			  m_type(type),
+			  m_root_rel_mdid(std::move(rool_rel_mdid))
 		{
 			GPOS_ASSERT(m_root_rel_mdid != nullptr);
 
@@ -108,8 +110,8 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::pointer<CReqdPropPlan *> prpp,
-						 CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::pointer<CExpressionArray *> pdrgpexpr,
+						 gpos::pointer<CExpression *> pexpr) override;
 
 	// hash function
 	ULONG
@@ -153,16 +155,18 @@ public:
 	SPartPropSpecInfo *FindPartPropSpecInfo(ULONG scan_id) const;
 
 	void Insert(ULONG scan_id, EPartPropSpecInfoType type, IMDId *rool_rel_mdid,
-				CBitSet *selector_ids, CExpression *expr);
+				gpos::pointer<CBitSet *> selector_ids,
+				gpos::pointer<CExpression *> expr);
 
-	void Insert(SPartPropSpecInfo *other);
+	void Insert(gpos::pointer<SPartPropSpecInfo *> other);
 
-	void InsertAll(CPartitionPropagationSpec *pps);
+	void InsertAll(gpos::pointer<CPartitionPropagationSpec *> pps);
 
-	void InsertAllowedConsumers(CPartitionPropagationSpec *pps,
-								CBitSet *allowed_scan_ids);
+	void InsertAllowedConsumers(gpos::pointer<CPartitionPropagationSpec *> pps,
+								gpos::pointer<CBitSet *> allowed_scan_ids);
 
-	void InsertAllExcept(CPartitionPropagationSpec *pps, ULONG scan_id);
+	void InsertAllExcept(gpos::pointer<CPartitionPropagationSpec *> pps,
+						 ULONG scan_id);
 
 	gpos::pointer<const CBitSet *> SelectorIds(ULONG scan_id) const;
 
@@ -176,7 +180,7 @@ public:
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
 
-	void InsertAllResolve(CPartitionPropagationSpec *pSpec);
+	void InsertAllResolve(gpos::pointer<CPartitionPropagationSpec *> pSpec);
 };	// class CPartitionPropagationSpec
 
 }  // namespace gpopt

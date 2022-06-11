@@ -241,7 +241,7 @@ CDXLOperatorFactory::MakeDXLMergeJoin(CDXLMemoryManager *dxl_memory_manager,
 }
 
 //		Construct a gather motion operator
-CDXLPhysical *
+gpos::owner<CDXLPhysical *>
 CDXLOperatorFactory::MakeDXLGatherMotion(CDXLMemoryManager *dxl_memory_manager,
 										 const Attributes &attrs)
 {
@@ -264,7 +264,7 @@ CDXLOperatorFactory::MakeDXLGatherMotion(CDXLMemoryManager *dxl_memory_manager,
 //		Construct a broadcast motion operator
 //
 //---------------------------------------------------------------------------
-CDXLPhysical *
+gpos::owner<CDXLPhysical *>
 CDXLOperatorFactory::MakeDXLBroadcastMotion(
 	CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs)
 {
@@ -287,7 +287,7 @@ CDXLOperatorFactory::MakeDXLBroadcastMotion(
 //		Construct a redistribute motion operator
 //
 //---------------------------------------------------------------------------
-CDXLPhysical *
+gpos::owner<CDXLPhysical *>
 CDXLOperatorFactory::MakeDXLRedistributeMotion(
 	CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs)
 {
@@ -322,7 +322,7 @@ CDXLOperatorFactory::MakeDXLRedistributeMotion(
 //		Construct a routed motion operator
 //
 //---------------------------------------------------------------------------
-CDXLPhysical *
+gpos::owner<CDXLPhysical *>
 CDXLOperatorFactory::MakeDXLRoutedMotion(CDXLMemoryManager *dxl_memory_manager,
 										 const Attributes &attrs)
 {
@@ -349,7 +349,7 @@ CDXLOperatorFactory::MakeDXLRoutedMotion(CDXLMemoryManager *dxl_memory_manager,
 //		Construct a random motion operator
 //
 //---------------------------------------------------------------------------
-CDXLPhysical *
+gpos::owner<CDXLPhysical *>
 CDXLOperatorFactory::MakeDXLRandomMotion(CDXLMemoryManager *dxl_memory_manager,
 										 const Attributes &attrs)
 {
@@ -402,7 +402,7 @@ CDXLOperatorFactory::MakeDXLAppend(CDXLMemoryManager *dxl_memory_manager,
 		EdxltokenPhysicalAppend, true /* is_optional */,
 		gpos::ulong_max /* default_value */);
 
-	ULongPtrArray *selector_ids = nullptr;
+	gpos::owner<ULongPtrArray *> selector_ids = nullptr;
 	if (scan_id != gpos::ulong_max)
 	{
 		selector_ids = ExtractConvertValuesToArray(dxl_memory_manager, attrs,
@@ -411,7 +411,7 @@ CDXLOperatorFactory::MakeDXLAppend(CDXLMemoryManager *dxl_memory_manager,
 	}
 
 	return GPOS_NEW(mp) CDXLPhysicalAppend(mp, is_target, is_zapped, scan_id,
-										   nullptr, selector_ids);
+										   nullptr, std::move(selector_ids));
 }
 
 //---------------------------------------------------------------------------
@@ -563,7 +563,7 @@ CDXLOperatorFactory::MakeDXLSort(CDXLMemoryManager *dxl_memory_manager,
 //		Construct a materialize operator
 //
 //---------------------------------------------------------------------------
-CDXLPhysical *
+gpos::owner<CDXLPhysical *>
 CDXLOperatorFactory::MakeDXLMaterialize(CDXLMemoryManager *dxl_memory_manager,
 										const Attributes &attrs)
 {
@@ -629,7 +629,7 @@ CDXLOperatorFactory::MakeDXLScalarCmp(CDXLMemoryManager *dxl_memory_manager,
 		ExtractAttrValue(attrs, EdxltokenComparisonOp, EdxltokenScalarComp);
 
 	// parse op no and function id
-	IMDId *op_id = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> op_id = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenOpNo, EdxltokenScalarComp);
 
 	// parse comparison operator from string
@@ -644,7 +644,7 @@ CDXLOperatorFactory::MakeDXLScalarCmp(CDXLMemoryManager *dxl_memory_manager,
 	// cleanup
 	GPOS_DELETE(comp_op_name);
 
-	return GPOS_NEW(mp) CDXLScalarComp(mp, op_id, comp_op_name_copy);
+	return GPOS_NEW(mp) CDXLScalarComp(mp, std::move(op_id), comp_op_name_copy);
 }
 
 //---------------------------------------------------------------------------
@@ -663,10 +663,10 @@ CDXLOperatorFactory::MakeDXLDistinctCmp(CDXLMemoryManager *dxl_memory_manager,
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
 	// parse operator and function id
-	IMDId *op_id = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> op_id = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenOpNo, EdxltokenScalarDistinctComp);
 
-	return GPOS_NEW(mp) CDXLScalarDistinctComp(mp, op_id);
+	return GPOS_NEW(mp) CDXLScalarDistinctComp(mp, std::move(op_id));
 }
 
 //---------------------------------------------------------------------------
@@ -688,10 +688,10 @@ CDXLOperatorFactory::MakeDXLOpExpr(CDXLMemoryManager *dxl_memory_manager,
 	const XMLCh *op_expr_xml =
 		ExtractAttrValue(attrs, EdxltokenOpName, EdxltokenScalarOpExpr);
 
-	IMDId *op_id = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> op_id = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenOpNo, EdxltokenScalarOpExpr);
 
-	IMDId *return_type_mdid = nullptr;
+	gpos::owner<IMDId *> return_type_mdid = nullptr;
 	const XMLCh *return_type_xml =
 		attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenOpType));
 
@@ -707,8 +707,8 @@ CDXLOperatorFactory::MakeDXLOpExpr(CDXLMemoryManager *dxl_memory_manager,
 		GPOS_NEW(mp) CWStringConst(mp, value->GetBuffer());
 	GPOS_DELETE(value);
 
-	return GPOS_NEW(mp)
-		CDXLScalarOpExpr(mp, op_id, return_type_mdid, value_copy);
+	return GPOS_NEW(mp) CDXLScalarOpExpr(
+		mp, std::move(op_id), std::move(return_type_mdid), value_copy);
 }
 
 
@@ -735,7 +735,7 @@ CDXLOperatorFactory::MakeDXLArrayComp(CDXLMemoryManager *dxl_memory_manager,
 		ExtractAttrValue(attrs, EdxltokenOpType, EdxltokenScalarArrayComp);
 
 	// parse operator no and function id
-	IMDId *op_id = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> op_id = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenOpNo, EdxltokenScalarArrayComp);
 
 	EdxlArrayCompType array_comp_type = Edxlarraycomptypeany;
@@ -761,7 +761,7 @@ CDXLOperatorFactory::MakeDXLArrayComp(CDXLMemoryManager *dxl_memory_manager,
 	GPOS_DELETE(opname);
 
 	return GPOS_NEW(mp)
-		CDXLScalarArrayComp(mp, op_id, opname_copy, array_comp_type);
+		CDXLScalarArrayComp(mp, std::move(op_id), opname_copy, array_comp_type);
 }
 
 //---------------------------------------------------------------------------
@@ -810,17 +810,17 @@ CDXLOperatorFactory::MakeDXLBooleanTest(
 //
 //---------------------------------------------------------------------------
 gpos::owner<CDXLScalar *>
-CDXLOperatorFactory::MakeDXLSubPlan(CDXLMemoryManager *dxl_memory_manager,
-									IMDId *mdid,
-									CDXLColRefArray *dxl_colref_array,
-									EdxlSubPlanType dxl_subplan_type,
-									CDXLNode *dxlnode_test_expr)
+CDXLOperatorFactory::MakeDXLSubPlan(
+	CDXLMemoryManager *dxl_memory_manager, gpos::owner<IMDId *> mdid,
+	gpos::owner<CDXLColRefArray *> dxl_colref_array,
+	EdxlSubPlanType dxl_subplan_type, gpos::owner<CDXLNode *> dxlnode_test_expr)
 {
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
-	return GPOS_NEW(mp) CDXLScalarSubPlan(mp, mdid, dxl_colref_array,
-										  dxl_subplan_type, dxlnode_test_expr);
+	return GPOS_NEW(mp)
+		CDXLScalarSubPlan(mp, std::move(mdid), std::move(dxl_colref_array),
+						  dxl_subplan_type, std::move(dxlnode_test_expr));
 }
 
 //---------------------------------------------------------------------------
@@ -857,13 +857,14 @@ CDXLOperatorFactory::MakeDXLCast(CDXLMemoryManager *dxl_memory_manager,
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
 	// parse type id and function id
-	IMDId *mdid_type = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_type = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenTypeId, EdxltokenScalarCast);
 
-	IMDId *mdid_func = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_func = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenFuncId, EdxltokenScalarCast);
 
-	return GPOS_NEW(mp) CDXLScalarCast(mp, mdid_type, mdid_func);
+	return GPOS_NEW(mp)
+		CDXLScalarCast(mp, std::move(mdid_type), std::move(mdid_func));
 }
 
 
@@ -883,7 +884,7 @@ CDXLOperatorFactory::MakeDXLCoerceToDomain(
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
 	// parse type id and function id
-	IMDId *mdid_type = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_type = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenTypeId,
 		EdxltokenScalarCoerceToDomain);
 	INT type_modifier = ExtractConvertAttrValueToInt(
@@ -897,7 +898,7 @@ CDXLOperatorFactory::MakeDXLCoerceToDomain(
 												EdxltokenScalarCoerceToDomain);
 
 	return GPOS_NEW(mp)
-		CDXLScalarCoerceToDomain(mp, mdid_type, type_modifier,
+		CDXLScalarCoerceToDomain(mp, std::move(mdid_type), type_modifier,
 								 (EdxlCoercionForm) coercion_form, location);
 }
 
@@ -917,7 +918,7 @@ CDXLOperatorFactory::MakeDXLCoerceViaIO(CDXLMemoryManager *dxl_memory_manager,
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
 	// parse type id and function id
-	IMDId *mdid_type = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_type = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenTypeId, EdxltokenScalarCoerceViaIO);
 	INT type_modifier = ExtractConvertAttrValueToInt(
 		dxl_memory_manager, attrs, EdxltokenTypeMod, EdxltokenScalarCoerceViaIO,
@@ -930,7 +931,7 @@ CDXLOperatorFactory::MakeDXLCoerceViaIO(CDXLMemoryManager *dxl_memory_manager,
 												EdxltokenScalarCoerceViaIO);
 
 	return GPOS_NEW(mp)
-		CDXLScalarCoerceViaIO(mp, mdid_type, type_modifier,
+		CDXLScalarCoerceViaIO(mp, std::move(mdid_type), type_modifier,
 							  (EdxlCoercionForm) coercion_form, location);
 }
 
@@ -948,10 +949,10 @@ CDXLOperatorFactory::MakeDXLArrayCoerceExpr(
 {
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
-	IMDId *element_func = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> element_func = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenElementFunc,
 		EdxltokenScalarArrayCoerceExpr);
-	IMDId *mdid_type = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_type = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenTypeId,
 		EdxltokenScalarArrayCoerceExpr);
 	INT type_modifier = ExtractConvertAttrValueToInt(
@@ -968,8 +969,8 @@ CDXLOperatorFactory::MakeDXLArrayCoerceExpr(
 												EdxltokenScalarArrayCoerceExpr);
 
 	return GPOS_NEW(mp) CDXLScalarArrayCoerceExpr(
-		mp, element_func, mdid_type, type_modifier, is_explicit,
-		(EdxlCoercionForm) coercion_form, location);
+		mp, std::move(element_func), std::move(mdid_type), type_modifier,
+		is_explicit, (EdxlCoercionForm) coercion_form, location);
 }
 
 //---------------------------------------------------------------------------
@@ -986,10 +987,10 @@ CDXLOperatorFactory::MakeDXLConstValue(CDXLMemoryManager *dxl_memory_manager,
 {
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
-	CDXLDatum *dxl_datum =
+	gpos::owner<CDXLDatum *> dxl_datum =
 		GetDatumVal(dxl_memory_manager, attrs, EdxltokenScalarConstValue);
 
-	return GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum);
+	return GPOS_NEW(mp) CDXLScalarConstValue(mp, std::move(dxl_datum));
 }
 
 //---------------------------------------------------------------------------
@@ -1008,10 +1009,10 @@ CDXLOperatorFactory::MakeDXLIfStmt(CDXLMemoryManager *dxl_memory_manager,
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
 	// get the type id
-	IMDId *mdid_type = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_type = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenTypeId, EdxltokenScalarIfStmt);
 
-	return GPOS_NEW(mp) CDXLScalarIfStmt(mp, mdid_type);
+	return GPOS_NEW(mp) CDXLScalarIfStmt(mp, std::move(mdid_type));
 }
 
 
@@ -1023,21 +1024,22 @@ CDXLOperatorFactory::MakeDXLFuncExpr(CDXLMemoryManager *dxl_memory_manager,
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
-	IMDId *mdid_func = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_func = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenFuncId, EdxltokenScalarFuncExpr);
 
 	BOOL is_retset = ExtractConvertAttrValueToBool(dxl_memory_manager, attrs,
 												   EdxltokenFuncRetSet,
 												   EdxltokenScalarFuncExpr);
 
-	IMDId *mdid_return_type = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_return_type = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenTypeId, EdxltokenScalarFuncExpr);
 
 	INT type_modifier = ExtractConvertAttrValueToInt(
 		dxl_memory_manager, attrs, EdxltokenTypeMod, EdxltokenScalarCast, true,
 		default_type_modifier);
 
-	return GPOS_NEW(mp) CDXLScalarFuncExpr(mp, mdid_func, mdid_return_type,
+	return GPOS_NEW(mp) CDXLScalarFuncExpr(mp, std::move(mdid_func),
+										   std::move(mdid_return_type),
 										   type_modifier, is_retset);
 }
 
@@ -1056,7 +1058,7 @@ CDXLOperatorFactory::MakeDXLAggFunc(CDXLMemoryManager *dxl_memory_manager,
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
-	IMDId *agg_mdid = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> agg_mdid = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenAggrefOid, EdxltokenScalarAggref);
 
 	const XMLCh *agg_stage_xml =
@@ -1069,7 +1071,7 @@ CDXLOperatorFactory::MakeDXLAggFunc(CDXLMemoryManager *dxl_memory_manager,
 	const XMLCh *agg_kind_xml =
 		ExtractAttrValue(attrs, EdxltokenAggrefKind, EdxltokenScalarAggref);
 
-	ULongPtrArray *argtypelist = ExtractConvertValuesToArray(
+	gpos::owner<ULongPtrArray *> argtypelist = ExtractConvertValuesToArray(
 		dxl_memory_manager, attrs, EdxltokenAggrefArgTypes,
 		EdxltokenScalarAggref);
 
@@ -1136,7 +1138,7 @@ CDXLOperatorFactory::MakeDXLAggFunc(CDXLMemoryManager *dxl_memory_manager,
 			CDXLTokens::GetDXLTokenStr(EdxltokenScalarAggref)->GetBuffer());
 	}
 
-	IMDId *resolved_rettype = nullptr;
+	gpos::owner<IMDId *> resolved_rettype = nullptr;
 	const XMLCh *return_type_xml =
 		attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenTypeId));
 	if (nullptr != return_type_xml)
@@ -1145,9 +1147,9 @@ CDXLOperatorFactory::MakeDXLAggFunc(CDXLMemoryManager *dxl_memory_manager,
 			dxl_memory_manager, attrs, EdxltokenTypeId, EdxltokenScalarAggref);
 	}
 
-	return GPOS_NEW(mp)
-		CDXLScalarAggref(mp, agg_mdid, resolved_rettype, is_distinct, agg_stage,
-						 agg_kind, argtypelist);
+	return GPOS_NEW(mp) CDXLScalarAggref(
+		mp, std::move(agg_mdid), std::move(resolved_rettype), is_distinct,
+		agg_stage, agg_kind, std::move(argtypelist));
 }
 
 //---------------------------------------------------------------------------
@@ -1307,17 +1309,18 @@ CDXLOperatorFactory::MakeDXLArray(CDXLMemoryManager *dxl_memory_manager,
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
-	IMDId *elem_type_mdid = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> elem_type_mdid = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenArrayElementType,
 		EdxltokenScalarArray);
-	IMDId *array_type_mdid = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> array_type_mdid = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenArrayType, EdxltokenScalarArray);
 	BOOL is_multidimenstional = ExtractConvertAttrValueToBool(
 		dxl_memory_manager, attrs, EdxltokenArrayMultiDim,
 		EdxltokenScalarArray);
 
-	return GPOS_NEW(mp) CDXLScalarArray(mp, elem_type_mdid, array_type_mdid,
-										is_multidimenstional);
+	return GPOS_NEW(mp)
+		CDXLScalarArray(mp, std::move(elem_type_mdid),
+						std::move(array_type_mdid), is_multidimenstional);
 }
 
 //---------------------------------------------------------------------------
@@ -1335,10 +1338,10 @@ CDXLOperatorFactory::MakeDXLScalarIdent(CDXLMemoryManager *dxl_memory_manager,
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
-	CDXLColRef *dxl_colref =
+	gpos::owner<CDXLColRef *> dxl_colref =
 		MakeDXLColRef(dxl_memory_manager, attrs, EdxltokenScalarIdent);
 
-	return GPOS_NEW(mp) CDXLScalarIdent(mp, dxl_colref);
+	return GPOS_NEW(mp) CDXLScalarIdent(mp, std::move(dxl_colref));
 }
 
 //---------------------------------------------------------------------------
@@ -1392,12 +1395,12 @@ CDXLOperatorFactory::MakeDXLHashExpr(CDXLMemoryManager *dxl_memory_manager,
 
 	// get column type id and type name from attributes
 
-	IMDId *mdid_type = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_type = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenOpfamily, EdxltokenScalarHashExpr,
 		true /* is_optional */, nullptr /* default_val */
 	);
 
-	return GPOS_NEW(mp) CDXLScalarHashExpr(mp, mdid_type);
+	return GPOS_NEW(mp) CDXLScalarHashExpr(mp, std::move(mdid_type));
 }
 
 //---------------------------------------------------------------------------
@@ -1432,7 +1435,7 @@ CDXLOperatorFactory::MakeDXLSortCol(CDXLMemoryManager *dxl_memory_manager,
 													 EdxltokenPhysicalSort);
 
 	// parse sorting operator id
-	IMDId *sort_op_id = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> sort_op_id = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenSortOpId, EdxltokenPhysicalSort);
 
 	// copy dynamic string into const string
@@ -1441,7 +1444,7 @@ CDXLOperatorFactory::MakeDXLSortCol(CDXLMemoryManager *dxl_memory_manager,
 
 	GPOS_DELETE(sort_op_name);
 
-	return GPOS_NEW(mp) CDXLScalarSortCol(mp, colid, sort_op_id,
+	return GPOS_NEW(mp) CDXLScalarSortCol(mp, colid, std::move(sort_op_id),
 										  sort_op_name_copy, nulls_first);
 }
 
@@ -1511,7 +1514,7 @@ CDXLOperatorFactory::MakeDXLTableDescr(CDXLMemoryManager *dxl_memory_manager,
 														 xml_str_table_name);
 
 	// parse metadata id
-	IMDId *mdid = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenMdid, EdxltokenTableDescr);
 
 	// parse execute as user value if the attribute is specified
@@ -1530,7 +1533,8 @@ CDXLOperatorFactory::MakeDXLTableDescr(CDXLMemoryManager *dxl_memory_manager,
 			EdxltokenTableDescr);
 	}
 
-	return GPOS_NEW(mp) CDXLTableDescr(mp, mdid, mdname, user_id, lockmode);
+	return GPOS_NEW(mp)
+		CDXLTableDescr(mp, std::move(mdid), mdname, user_id, lockmode);
 }
 
 //---------------------------------------------------------------------------
@@ -1556,14 +1560,14 @@ CDXLOperatorFactory::MakeDXLIndexDescr(CDXLMemoryManager *dxl_memory_manager,
 		dxl_memory_manager, index_name_xml);
 
 	// parse metadata id
-	IMDId *mdid = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenMdid, EdxltokenIndexDescr);
 
 	// create a copy of the string in the CMDName constructor
 	CMDName *mdname = GPOS_NEW(mp) CMDName(mp, index_name);
 	GPOS_DELETE(index_name);
 
-	return GPOS_NEW(mp) CDXLIndexDescr(mdid, mdname);
+	return GPOS_NEW(mp) CDXLIndexDescr(std::move(mdid), mdname);
 }
 
 //---------------------------------------------------------------------------
@@ -1601,7 +1605,7 @@ CDXLOperatorFactory::MakeColumnDescr(CDXLMemoryManager *dxl_memory_manager,
 	}
 
 	// parse column type id
-	IMDId *mdid_type = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_type = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenTypeId, EdxltokenColDescr);
 
 	// parse optional type modifier from attributes
@@ -1642,7 +1646,7 @@ CDXLOperatorFactory::MakeColumnDescr(CDXLMemoryManager *dxl_memory_manager,
 
 	GPOS_DELETE(col_name);
 
-	return GPOS_NEW(mp) CDXLColDescr(mdname, id, attno, mdid_type,
+	return GPOS_NEW(mp) CDXLColDescr(mdname, id, attno, std::move(mdid_type),
 									 type_modifier, col_dropped, col_len);
 }
 
@@ -1687,7 +1691,7 @@ CDXLOperatorFactory::MakeDXLColRef(CDXLMemoryManager *dxl_memory_manager,
 
 	GPOS_DELETE(col_name);
 
-	IMDId *mdid_type = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_type = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenTypeId, target_elem);
 
 	// parse optional type modifier
@@ -1695,7 +1699,8 @@ CDXLOperatorFactory::MakeDXLColRef(CDXLMemoryManager *dxl_memory_manager,
 		dxl_memory_manager, attrs, EdxltokenTypeMod, target_elem, true,
 		default_type_modifier);
 
-	return GPOS_NEW(mp) CDXLColRef(mdname, id, mdid_type, type_modifier);
+	return GPOS_NEW(mp)
+		CDXLColRef(mdname, id, std::move(mdid_type), type_modifier);
 }
 
 //---------------------------------------------------------------------------
@@ -2216,7 +2221,7 @@ CDXLOperatorFactory::ParseGroupingColId(CDXLMemoryManager *dxl_memory_manager,
 //		Parse a metadata id object from the XML attributes of the specified element.
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::owner<IMDId *>
 CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 	CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
 	Edxltoken target_attr, Edxltoken target_elem, BOOL is_optional,
@@ -2248,7 +2253,7 @@ CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 //		Parse a metadata id object from the XML attributes of the specified element.
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::owner<IMDId *>
 CDXLOperatorFactory::MakeMdIdFromStr(CDXLMemoryManager *dxl_memory_manager,
 									 const XMLCh *mdid_xml,
 									 Edxltoken target_attr,
@@ -2277,7 +2282,7 @@ CDXLOperatorFactory::MakeMdIdFromStr(CDXLMemoryManager *dxl_memory_manager,
 	IMDId::EMDIdType typ = (IMDId::EMDIdType) ConvertAttrValueToUlong(
 		dxl_memory_manager, mdid_type, target_attr, target_elem);
 
-	IMDId *mdid = nullptr;
+	gpos::owner<IMDId *> mdid = nullptr;
 	switch (typ)
 	{
 		case IMDId::EmdidGPDB:
@@ -2329,7 +2334,7 @@ CDXLOperatorFactory::MakeMdIdFromStr(CDXLMemoryManager *dxl_memory_manager,
 //---------------------------------------------------------------------------
 gpos::owner<CMDIdGPDB *>
 CDXLOperatorFactory::GetGPDBMdId(CDXLMemoryManager *dxl_memory_manager,
-								 XMLChArray *remaining_tokens,
+								 gpos::pointer<XMLChArray *> remaining_tokens,
 								 Edxltoken target_attr, Edxltoken target_elem)
 {
 	GPOS_ASSERT(GPDXL_GPDB_MDID_COMPONENTS <= remaining_tokens->Size());
@@ -2361,10 +2366,10 @@ CDXLOperatorFactory::GetGPDBMdId(CDXLMemoryManager *dxl_memory_manager,
 //
 //---------------------------------------------------------------------------
 gpos::owner<CMDIdGPDB *>
-CDXLOperatorFactory::GetGPDBCTASMdId(CDXLMemoryManager *dxl_memory_manager,
-									 XMLChArray *remaining_tokens,
-									 Edxltoken target_attr,
-									 Edxltoken target_elem)
+CDXLOperatorFactory::GetGPDBCTASMdId(
+	CDXLMemoryManager *dxl_memory_manager,
+	gpos::pointer<XMLChArray *> remaining_tokens, Edxltoken target_attr,
+	Edxltoken target_elem)
 {
 	GPOS_ASSERT(GPDXL_GPDB_MDID_COMPONENTS <= remaining_tokens->Size());
 
@@ -2385,22 +2390,23 @@ CDXLOperatorFactory::GetGPDBCTASMdId(CDXLMemoryManager *dxl_memory_manager,
 //
 //---------------------------------------------------------------------------
 gpos::owner<CMDIdColStats *>
-CDXLOperatorFactory::GetColStatsMdId(CDXLMemoryManager *dxl_memory_manager,
-									 XMLChArray *remaining_tokens,
-									 Edxltoken target_attr,
-									 Edxltoken target_elem)
+CDXLOperatorFactory::GetColStatsMdId(
+	CDXLMemoryManager *dxl_memory_manager,
+	gpos::pointer<XMLChArray *> remaining_tokens, Edxltoken target_attr,
+	Edxltoken target_elem)
 {
 	GPOS_ASSERT(GPDXL_GPDB_MDID_COMPONENTS + 1 == remaining_tokens->Size());
 
-	CMDIdGPDB *rel_mdid = GetGPDBMdId(dxl_memory_manager, remaining_tokens,
-									  target_attr, target_elem);
+	gpos::owner<CMDIdGPDB *> rel_mdid = GetGPDBMdId(
+		dxl_memory_manager, remaining_tokens, target_attr, target_elem);
 
 	XMLCh *attno_xml = (*remaining_tokens)[3];
 	ULONG attno = ConvertAttrValueToUlong(dxl_memory_manager, attno_xml,
 										  target_attr, target_elem);
 
 	// construct metadata id object
-	return GPOS_NEW(dxl_memory_manager->Pmp()) CMDIdColStats(rel_mdid, attno);
+	return GPOS_NEW(dxl_memory_manager->Pmp())
+		CMDIdColStats(std::move(rel_mdid), attno);
 }
 
 //---------------------------------------------------------------------------
@@ -2412,18 +2418,19 @@ CDXLOperatorFactory::GetColStatsMdId(CDXLMemoryManager *dxl_memory_manager,
 //
 //---------------------------------------------------------------------------
 gpos::owner<CMDIdRelStats *>
-CDXLOperatorFactory::GetRelStatsMdId(CDXLMemoryManager *dxl_memory_manager,
-									 XMLChArray *remaining_tokens,
-									 Edxltoken target_attr,
-									 Edxltoken target_elem)
+CDXLOperatorFactory::GetRelStatsMdId(
+	CDXLMemoryManager *dxl_memory_manager,
+	gpos::pointer<XMLChArray *> remaining_tokens, Edxltoken target_attr,
+	Edxltoken target_elem)
 {
 	GPOS_ASSERT(GPDXL_GPDB_MDID_COMPONENTS == remaining_tokens->Size());
 
-	CMDIdGPDB *rel_mdid = GetGPDBMdId(dxl_memory_manager, remaining_tokens,
-									  target_attr, target_elem);
+	gpos::owner<CMDIdGPDB *> rel_mdid = GetGPDBMdId(
+		dxl_memory_manager, remaining_tokens, target_attr, target_elem);
 
 	// construct metadata id object
-	return GPOS_NEW(dxl_memory_manager->Pmp()) CMDIdRelStats(rel_mdid);
+	return GPOS_NEW(dxl_memory_manager->Pmp())
+		CMDIdRelStats(std::move(rel_mdid));
 }
 
 //---------------------------------------------------------------------------
@@ -2435,15 +2442,15 @@ CDXLOperatorFactory::GetRelStatsMdId(CDXLMemoryManager *dxl_memory_manager,
 //
 //---------------------------------------------------------------------------
 gpos::owner<CMDIdCast *>
-CDXLOperatorFactory::GetCastFuncMdId(CDXLMemoryManager *dxl_memory_manager,
-									 XMLChArray *remaining_tokens,
-									 Edxltoken target_attr,
-									 Edxltoken target_elem)
+CDXLOperatorFactory::GetCastFuncMdId(
+	CDXLMemoryManager *dxl_memory_manager,
+	gpos::pointer<XMLChArray *> remaining_tokens, Edxltoken target_attr,
+	Edxltoken target_elem)
 {
 	GPOS_ASSERT(2 * GPDXL_GPDB_MDID_COMPONENTS == remaining_tokens->Size());
 
-	CMDIdGPDB *mdid_src = GetGPDBMdId(dxl_memory_manager, remaining_tokens,
-									  target_attr, target_elem);
+	gpos::owner<CMDIdGPDB *> mdid_src = GetGPDBMdId(
+		dxl_memory_manager, remaining_tokens, target_attr, target_elem);
 	gpos::owner<XMLChArray *> dest_xml = GPOS_NEW(dxl_memory_manager->Pmp())
 		XMLChArray(dxl_memory_manager->Pmp());
 
@@ -2453,11 +2460,12 @@ CDXLOperatorFactory::GetCastFuncMdId(CDXLMemoryManager *dxl_memory_manager,
 		dest_xml->Append((*remaining_tokens)[ul]);
 	}
 
-	CMDIdGPDB *mdid_dest =
+	gpos::owner<CMDIdGPDB *> mdid_dest =
 		GetGPDBMdId(dxl_memory_manager, dest_xml, target_attr, target_elem);
 	dest_xml->Release();
 
-	return GPOS_NEW(dxl_memory_manager->Pmp()) CMDIdCast(mdid_src, mdid_dest);
+	return GPOS_NEW(dxl_memory_manager->Pmp())
+		CMDIdCast(std::move(mdid_src), std::move(mdid_dest));
 }
 
 //---------------------------------------------------------------------------
@@ -2470,13 +2478,13 @@ CDXLOperatorFactory::GetCastFuncMdId(CDXLMemoryManager *dxl_memory_manager,
 //---------------------------------------------------------------------------
 gpos::owner<CMDIdScCmp *>
 CDXLOperatorFactory::GetScCmpMdId(CDXLMemoryManager *dxl_memory_manager,
-								  XMLChArray *remaining_tokens,
+								  gpos::pointer<XMLChArray *> remaining_tokens,
 								  Edxltoken target_attr, Edxltoken target_elem)
 {
 	GPOS_ASSERT(2 * GPDXL_GPDB_MDID_COMPONENTS + 1 == remaining_tokens->Size());
 
-	CMDIdGPDB *left_mdid = GetGPDBMdId(dxl_memory_manager, remaining_tokens,
-									   target_attr, target_elem);
+	gpos::owner<CMDIdGPDB *> left_mdid = GetGPDBMdId(
+		dxl_memory_manager, remaining_tokens, target_attr, target_elem);
 	gpos::owner<XMLChArray *> right_xml = GPOS_NEW(dxl_memory_manager->Pmp())
 		XMLChArray(dxl_memory_manager->Pmp());
 
@@ -2486,7 +2494,7 @@ CDXLOperatorFactory::GetScCmpMdId(CDXLMemoryManager *dxl_memory_manager,
 		right_xml->Append((*remaining_tokens)[ul]);
 	}
 
-	CMDIdGPDB *right_mdid =
+	gpos::owner<CMDIdGPDB *> right_mdid =
 		GetGPDBMdId(dxl_memory_manager, right_xml, target_attr, target_elem);
 
 	// parse the comparison type from the last component of the mdid
@@ -2498,7 +2506,7 @@ CDXLOperatorFactory::GetScCmpMdId(CDXLMemoryManager *dxl_memory_manager,
 	right_xml->Release();
 
 	return GPOS_NEW(dxl_memory_manager->Pmp())
-		CMDIdScCmp(left_mdid, right_mdid, cmp_type);
+		CMDIdScCmp(std::move(left_mdid), std::move(right_mdid), cmp_type);
 }
 
 
@@ -2510,15 +2518,15 @@ CDXLOperatorFactory::GetScCmpMdId(CDXLMemoryManager *dxl_memory_manager,
 //		Parses a DXL datum from the given attributes
 //
 //---------------------------------------------------------------------------
-CDXLDatum *
+gpos::owner<CDXLDatum *>
 CDXLOperatorFactory::GetDatumVal(CDXLMemoryManager *dxl_memory_manager,
 								 const Attributes &attrs, Edxltoken target_elem)
 {
 	// get the type id and value of the datum from attributes
-	IMDId *mdid = ExtractConvertAttrValueToMdId(dxl_memory_manager, attrs,
-												EdxltokenTypeId, target_elem);
+	gpos::owner<IMDId *> mdid = ExtractConvertAttrValueToMdId(
+		dxl_memory_manager, attrs, EdxltokenTypeId, target_elem);
 	GPOS_ASSERT(IMDId::EmdidGPDB == mdid->MdidType());
-	CMDIdGPDB *gpdb_mdid = CMDIdGPDB::CastMdid(mdid);
+	gpos::pointer<CMDIdGPDB *> gpdb_mdid = gpos::dyn_cast<CMDIdGPDB>(mdid);
 
 	// get the type id from string
 	BOOL is_const_null = ExtractConvertAttrValueToBool(
@@ -2543,28 +2551,28 @@ CDXLOperatorFactory::GetDatumVal(CDXLMemoryManager *dxl_memory_manager,
 		// native support
 		case GPDB_INT2:
 		{
-			return GetDatumInt2(dxl_memory_manager, attrs, target_elem, mdid,
-								is_const_null);
+			return GetDatumInt2(dxl_memory_manager, attrs, target_elem,
+								std::move(mdid), is_const_null);
 		}
 		case GPDB_INT4:
 		{
-			return GetDatumInt4(dxl_memory_manager, attrs, target_elem, mdid,
-								is_const_null);
+			return GetDatumInt4(dxl_memory_manager, attrs, target_elem,
+								std::move(mdid), is_const_null);
 		}
 		case GPDB_INT8:
 		{
-			return GetDatumInt8(dxl_memory_manager, attrs, target_elem, mdid,
-								is_const_null);
+			return GetDatumInt8(dxl_memory_manager, attrs, target_elem,
+								std::move(mdid), is_const_null);
 		}
 		case GPDB_BOOL:
 		{
-			return GetDatumBool(dxl_memory_manager, attrs, target_elem, mdid,
-								is_const_null);
+			return GetDatumBool(dxl_memory_manager, attrs, target_elem,
+								std::move(mdid), is_const_null);
 		}
 		case GPDB_OID:
 		{
-			return GetDatumOid(dxl_memory_manager, attrs, target_elem, mdid,
-							   is_const_null);
+			return GetDatumOid(dxl_memory_manager, attrs, target_elem,
+							   std::move(mdid), is_const_null);
 		}
 		// types with long int mapping
 		case GPDB_CHAR:
@@ -2612,7 +2620,7 @@ CDXLOperatorFactory::GetDatumVal(CDXLMemoryManager *dxl_memory_manager,
 gpos::owner<CDXLDatum *>
 CDXLOperatorFactory::GetDatumOid(CDXLMemoryManager *dxl_memory_manager,
 								 const Attributes &attrs, Edxltoken target_elem,
-								 IMDId *mdid, BOOL is_const_null)
+								 gpos::owner<IMDId *> mdid, BOOL is_const_null)
 {
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
@@ -2624,7 +2632,7 @@ CDXLOperatorFactory::GetDatumOid(CDXLMemoryManager *dxl_memory_manager,
 										   EdxltokenValue, target_elem);
 	}
 
-	return GPOS_NEW(mp) CDXLDatumOid(mp, mdid, is_const_null, val);
+	return GPOS_NEW(mp) CDXLDatumOid(mp, std::move(mdid), is_const_null, val);
 }
 
 //---------------------------------------------------------------------------
@@ -2638,8 +2646,8 @@ CDXLOperatorFactory::GetDatumOid(CDXLMemoryManager *dxl_memory_manager,
 gpos::owner<CDXLDatum *>
 CDXLOperatorFactory::GetDatumInt2(CDXLMemoryManager *dxl_memory_manager,
 								  const Attributes &attrs,
-								  Edxltoken target_elem, IMDId *mdid,
-								  BOOL is_const_null)
+								  Edxltoken target_elem,
+								  gpos::owner<IMDId *> mdid, BOOL is_const_null)
 {
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
@@ -2651,7 +2659,7 @@ CDXLOperatorFactory::GetDatumInt2(CDXLMemoryManager *dxl_memory_manager,
 												EdxltokenValue, target_elem);
 	}
 
-	return GPOS_NEW(mp) CDXLDatumInt2(mp, mdid, is_const_null, val);
+	return GPOS_NEW(mp) CDXLDatumInt2(mp, std::move(mdid), is_const_null, val);
 }
 
 //---------------------------------------------------------------------------
@@ -2665,8 +2673,8 @@ CDXLOperatorFactory::GetDatumInt2(CDXLMemoryManager *dxl_memory_manager,
 gpos::owner<CDXLDatum *>
 CDXLOperatorFactory::GetDatumInt4(CDXLMemoryManager *dxl_memory_manager,
 								  const Attributes &attrs,
-								  Edxltoken target_elem, IMDId *mdid,
-								  BOOL is_const_null)
+								  Edxltoken target_elem,
+								  gpos::owner<IMDId *> mdid, BOOL is_const_null)
 {
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
@@ -2678,7 +2686,7 @@ CDXLOperatorFactory::GetDatumInt4(CDXLMemoryManager *dxl_memory_manager,
 										   EdxltokenValue, target_elem);
 	}
 
-	return GPOS_NEW(mp) CDXLDatumInt4(mp, mdid, is_const_null, val);
+	return GPOS_NEW(mp) CDXLDatumInt4(mp, std::move(mdid), is_const_null, val);
 }
 
 //---------------------------------------------------------------------------
@@ -2692,8 +2700,8 @@ CDXLOperatorFactory::GetDatumInt4(CDXLMemoryManager *dxl_memory_manager,
 gpos::owner<CDXLDatum *>
 CDXLOperatorFactory::GetDatumInt8(CDXLMemoryManager *dxl_memory_manager,
 								  const Attributes &attrs,
-								  Edxltoken target_elem, IMDId *mdid,
-								  BOOL is_const_null)
+								  Edxltoken target_elem,
+								  gpos::owner<IMDId *> mdid, BOOL is_const_null)
 {
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
@@ -2705,7 +2713,7 @@ CDXLOperatorFactory::GetDatumInt8(CDXLMemoryManager *dxl_memory_manager,
 											EdxltokenValue, target_elem);
 	}
 
-	return GPOS_NEW(mp) CDXLDatumInt8(mp, mdid, is_const_null, val);
+	return GPOS_NEW(mp) CDXLDatumInt8(mp, std::move(mdid), is_const_null, val);
 }
 
 //---------------------------------------------------------------------------
@@ -2719,8 +2727,8 @@ CDXLOperatorFactory::GetDatumInt8(CDXLMemoryManager *dxl_memory_manager,
 gpos::owner<CDXLDatum *>
 CDXLOperatorFactory::GetDatumBool(CDXLMemoryManager *dxl_memory_manager,
 								  const Attributes &attrs,
-								  Edxltoken target_elem, IMDId *mdid,
-								  BOOL is_const_null)
+								  Edxltoken target_elem,
+								  gpos::owner<IMDId *> mdid, BOOL is_const_null)
 {
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
@@ -2732,7 +2740,8 @@ CDXLOperatorFactory::GetDatumBool(CDXLMemoryManager *dxl_memory_manager,
 											  EdxltokenValue, target_elem);
 	}
 
-	return GPOS_NEW(mp) CDXLDatumBool(mp, mdid, is_const_null, value);
+	return GPOS_NEW(mp)
+		CDXLDatumBool(mp, std::move(mdid), is_const_null, value);
 }
 
 
@@ -2910,7 +2919,7 @@ CDXLOperatorFactory::GetDatumStatsDoubleMappable(
 //		Will raise an exception if list is not well-formed
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::owner<ULongPtrArray *>
 CDXLOperatorFactory::ExtractConvertValuesToArray(
 	CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
 	Edxltoken target_attr, Edxltoken target_elem)
@@ -2931,7 +2940,7 @@ CDXLOperatorFactory::ExtractConvertValuesToArray(
 //		Will raise an exception if list is not well-formed
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::owner<IMdIdArray *>
 CDXLOperatorFactory::ExtractConvertMdIdsToArray(
 	CDXLMemoryManager *dxl_memory_manager, const XMLCh *mdid_list_xml,
 	Edxltoken target_attr, Edxltoken target_elem)
@@ -2950,8 +2959,8 @@ CDXLOperatorFactory::ExtractConvertMdIdsToArray(
 		XMLCh *mdid_xml = mdid_components.nextToken();
 		GPOS_ASSERT(nullptr != mdid_xml);
 
-		IMDId *mdid = MakeMdIdFromStr(dxl_memory_manager, mdid_xml, target_attr,
-									  target_elem);
+		gpos::owner<IMDId *> mdid = MakeMdIdFromStr(
+			dxl_memory_manager, mdid_xml, target_attr, target_elem);
 		mdid_array->Append(mdid);
 	}
 
@@ -2960,7 +2969,7 @@ CDXLOperatorFactory::ExtractConvertMdIdsToArray(
 
 // Parse a comma-separated list of CHAR partition types into a dynamic array.
 // Will raise an exception if list is not well-formed
-CharPtrArray *
+gpos::owner<CharPtrArray *>
 CDXLOperatorFactory::ExtractConvertPartitionTypeToArray(
 	CDXLMemoryManager *dxl_memory_manager, const XMLCh *xml_val,
 	Edxltoken target_attr, Edxltoken target_elem)
@@ -2979,7 +2988,7 @@ CDXLOperatorFactory::ExtractConvertPartitionTypeToArray(
 //		Will raise an exception if list is not well-formed
 //
 //---------------------------------------------------------------------------
-ULongPtr2dArray *
+gpos::owner<ULongPtr2dArray *>
 CDXLOperatorFactory::ExtractConvertUlongTo2DArray(
 	CDXLMemoryManager *dxl_memory_manager, const XMLCh *xml_val,
 	Edxltoken target_attr, Edxltoken target_elem)
@@ -2999,7 +3008,7 @@ CDXLOperatorFactory::ExtractConvertUlongTo2DArray(
 
 		GPOS_ASSERT(nullptr != comp_xml);
 
-		ULongPtrArray *array_1D = ExtractIntsToUlongArray(
+		gpos::owner<ULongPtrArray *> array_1D = ExtractIntsToUlongArray(
 			dxl_memory_manager, comp_xml, target_attr, target_elem);
 		array_2D->Append(array_1D);
 	}
@@ -3016,7 +3025,7 @@ CDXLOperatorFactory::ExtractConvertUlongTo2DArray(
 //		Will raise an exception if list is not well-formed
 //
 //---------------------------------------------------------------------------
-IntPtrArray *
+gpos::owner<IntPtrArray *>
 CDXLOperatorFactory::ExtractConvertSegmentIdsToArray(
 	CDXLMemoryManager *dxl_memory_manager, const XMLCh *seg_id_list_xml,
 	Edxltoken target_attr, Edxltoken target_elem)
@@ -3056,7 +3065,7 @@ CDXLOperatorFactory::ExtractConvertSegmentIdsToArray(
 //		Parse a semicolon-separated list of strings into a dynamic array.
 //
 //---------------------------------------------------------------------------
-StringPtrArray *
+gpos::owner<StringPtrArray *>
 CDXLOperatorFactory::ExtractConvertStrsToArray(
 	CDXLMemoryManager *dxl_memory_manager, const XMLCh *xml_val)
 {
@@ -3093,23 +3102,23 @@ CDXLOperatorFactory::ExtractConvertStrsToArray(
 //---------------------------------------------------------------------------
 void
 CDXLOperatorFactory::SetSegmentInfo(CDXLMemoryManager *dxl_memory_manager,
-									CDXLPhysicalMotion *motion,
+									gpos::pointer<CDXLPhysicalMotion *> motion,
 									const Attributes &attrs,
 									Edxltoken target_elem)
 {
 	const XMLCh *input_seglist_xml =
 		ExtractAttrValue(attrs, EdxltokenInputSegments, target_elem);
-	IntPtrArray *input_segments =
+	gpos::owner<IntPtrArray *> input_segments =
 		ExtractConvertSegmentIdsToArray(dxl_memory_manager, input_seglist_xml,
 										EdxltokenInputSegments, target_elem);
-	motion->SetInputSegIds(input_segments);
+	motion->SetInputSegIds(std::move(input_segments));
 
 	const XMLCh *output_seglist_xml =
 		ExtractAttrValue(attrs, EdxltokenOutputSegments, target_elem);
-	IntPtrArray *output_segments =
+	gpos::owner<IntPtrArray *> output_segments =
 		ExtractConvertSegmentIdsToArray(dxl_memory_manager, output_seglist_xml,
 										EdxltokenOutputSegments, target_elem);
-	motion->SetOutputSegIds(output_segments);
+	motion->SetOutputSegIds(std::move(output_segments));
 }
 
 //---------------------------------------------------------------------------
@@ -3382,10 +3391,10 @@ CDXLOperatorFactory::MakeWindowRef(CDXLMemoryManager *dxl_memory_manager,
 {
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
-	IMDId *mdid_func = ExtractConvertAttrValueToMdId(dxl_memory_manager, attrs,
-													 EdxltokenWindowrefOid,
-													 EdxltokenScalarWindowref);
-	IMDId *mdid_return_type = ExtractConvertAttrValueToMdId(
+	gpos::owner<IMDId *> mdid_func = ExtractConvertAttrValueToMdId(
+		dxl_memory_manager, attrs, EdxltokenWindowrefOid,
+		EdxltokenScalarWindowref);
+	gpos::owner<IMDId *> mdid_return_type = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenTypeId, EdxltokenScalarWindowref);
 	BOOL is_distinct = ExtractConvertAttrValueToBool(dxl_memory_manager, attrs,
 													 EdxltokenWindowrefDistinct,
@@ -3425,8 +3434,8 @@ CDXLOperatorFactory::MakeWindowRef(CDXLMemoryManager *dxl_memory_manager,
 	GPOS_ASSERT(EdxlwinstageSentinel != dxl_win_stage);
 
 	return GPOS_NEW(mp) CDXLScalarWindowRef(
-		mp, mdid_func, mdid_return_type, is_distinct, is_star_arg,
-		is_simple_agg, dxl_win_stage, win_spec_pos);
+		mp, std::move(mdid_func), std::move(mdid_return_type), is_distinct,
+		is_star_arg, is_simple_agg, dxl_win_stage, win_spec_pos);
 }
 
 //---------------------------------------------------------------------------

@@ -32,17 +32,21 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 class CRangeTest
 {
-	using PfPdatum = IDatum *(*) (CMemoryPool *, INT);
+	using PfPdatum = gpos::owner<IDatum *> (*)(CMemoryPool *, INT);
 
 private:
 	static GPOS_RESULT EresInitAndCheckRanges(CMemoryPool *mp, IMDId *mdid,
 											  PfPdatum pf);
 
-	static void TestRangeRelationship(CMemoryPool *mp, CRange *prange1,
-									  CRange *prange2, CRange *prange3,
-									  CRange *prange4, CRange *prange5);
+	static void TestRangeRelationship(CMemoryPool *mp,
+									  gpos::pointer<CRange *> prange1,
+									  gpos::pointer<CRange *> prange2,
+									  gpos::pointer<CRange *> prange3,
+									  gpos::pointer<CRange *> prange4,
+									  gpos::pointer<CRange *> prange5);
 
-	static void PrintRange(CMemoryPool *mp, CColRef *colref, CRange *prange);
+	static void PrintRange(CMemoryPool *mp, CColRef *colref,
+						   gpos::pointer<CRange *> prange);
 
 	// int2 datum
 	static gpos::owner<IDatum *> CreateInt2Datum(CMemoryPool *mp, INT i);

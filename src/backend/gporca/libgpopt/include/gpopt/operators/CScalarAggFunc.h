@@ -91,10 +91,11 @@ public:
 	CScalarAggFunc(const CScalarAggFunc &) = delete;
 
 	// ctor
-	CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
-				   IMDId *resolved_rettype, const CWStringConst *pstrAggFunc,
-				   BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
-				   EAggfuncKind aggkind, ULongPtrArray *argtypes);
+	CScalarAggFunc(CMemoryPool *mp, gpos::owner<IMDId *> pmdidAggFunc,
+				   gpos::owner<IMDId *> resolved_rettype,
+				   const CWStringConst *pstrAggFunc, BOOL is_distinct,
+				   EAggfuncStage eaggfuncstage, BOOL fSplit,
+				   EAggfuncKind aggkind, gpos::owner<ULongPtrArray *> argtypes);
 
 	// dtor
 	~CScalarAggFunc() override
@@ -126,7 +127,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -136,7 +137,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
@@ -241,7 +242,8 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// lookup mdid of return type for given Agg function
-	static IMDId *PmdidLookupReturnType(IMDId *pmdidAggFunc, BOOL fGlobal,
+	static IMDId *PmdidLookupReturnType(gpos::pointer<IMDId *> pmdidAggFunc,
+										BOOL fGlobal,
 										CMDAccessor *pmdaInput = nullptr);
 
 };	// class CScalarAggFunc

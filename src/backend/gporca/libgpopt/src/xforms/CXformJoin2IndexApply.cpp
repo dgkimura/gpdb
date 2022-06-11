@@ -64,14 +64,14 @@ CXformJoin2IndexApply::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformJoin2IndexApply::ComputeColumnSets(CMemoryPool *mp,
-										 CExpression *pexprInner,
-										 CExpression *pexprScalar,
-										 CColRefSet **ppcrsScalarExpr,
-										 CColRefSet **ppcrsOuterRefs,
-										 CColRefSet **ppcrsReqd)
+CXformJoin2IndexApply::ComputeColumnSets(
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexprInner,
+	gpos::pointer<CExpression *> pexprScalar, CColRefSet **ppcrsScalarExpr,
+	gpos::owner<CColRefSet *> *ppcrsOuterRefs,
+	gpos::owner<CColRefSet *> *ppcrsReqd)
 {
-	CColRefSet *pcrsInnerOutput = pexprInner->DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrsInnerOutput =
+		pexprInner->DeriveOutputColumns();
 	*ppcrsScalarExpr = pexprScalar->DeriveUsedColumns();
 	*ppcrsOuterRefs = GPOS_NEW(mp) CColRefSet(mp, **ppcrsScalarExpr);
 	(*ppcrsOuterRefs)->Difference(pcrsInnerOutput);
@@ -92,11 +92,12 @@ CXformJoin2IndexApply::ComputeColumnSets(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 void
 CXformJoin2IndexApply::CreateHomogeneousIndexApplyAlternatives(
-	CMemoryPool *mp, COperator *joinOp, CExpression *pexprOuter,
-	CExpression *pexprInner, CExpression *pexprScalar,
-	CExpression *origJoinPred, CExpression *nodesToInsertAboveIndexGet,
+	CMemoryPool *mp, gpos::pointer<COperator *> joinOp, CExpression *pexprOuter,
+	gpos::pointer<CExpression *> pexprInner, CExpression *pexprScalar,
+	CExpression *origJoinPred,
+	gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
 	CExpression *endOfNodesToInsertAboveIndexGet,
-	CTableDescriptor *ptabdescInner, CXformResult *pxfres,
+	CTableDescriptor *ptabdescInner, gpos::pointer<CXformResult *> pxfres,
 	IMDIndex::EmdindexType emdtype) const
 {
 	GPOS_ASSERT(nullptr != pexprOuter);
@@ -152,13 +153,15 @@ CXformJoin2IndexApply::CreateHomogeneousIndexApplyAlternatives(
 //---------------------------------------------------------------------------
 void
 CXformJoin2IndexApply::CreateHomogeneousBtreeIndexApplyAlternatives(
-	CMemoryPool *mp, COperator *joinOp, CExpression *pexprOuter,
-	CExpression *pexprInner, CExpression *pexprScalar,
-	CExpression *origJoinPred, CExpression *nodesToInsertAboveIndexGet,
+	CMemoryPool *mp, gpos::pointer<COperator *> joinOp, CExpression *pexprOuter,
+	gpos::pointer<CExpression *> pexprInner,
+	gpos::pointer<CExpression *> pexprScalar, CExpression *origJoinPred,
+	gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
 	CExpression *endOfNodesToInsertAboveIndexGet,
-	CTableDescriptor *ptabdescInner, CColRefSet *pcrsScalarExpr,
-	CColRefSet *outer_refs, CColRefSet *pcrsReqd, ULONG ulIndices,
-	CXformResult *pxfres)
+	gpos::pointer<CTableDescriptor *> ptabdescInner,
+	gpos::pointer<CColRefSet *> pcrsScalarExpr, CColRefSet *outer_refs,
+	gpos::pointer<CColRefSet *> pcrsReqd, ULONG ulIndices,
+	gpos::pointer<CXformResult *> pxfres)
 {
 	// array of expressions in the scalar expression
 	gpos::owner<CExpressionArray *> pdrgpexpr =
@@ -172,7 +175,7 @@ CXformJoin2IndexApply::CreateHomogeneousBtreeIndexApplyAlternatives(
 
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
-		IMDId *pmdidIndex = pmdrel->IndexMDidAt(ul);
+		gpos::pointer<IMDId *> pmdidIndex = pmdrel->IndexMDidAt(ul);
 		gpos::pointer<const IMDIndex *> pmdindex =
 			md_accessor->RetrieveIndex(pmdidIndex);
 
@@ -198,14 +201,17 @@ CXformJoin2IndexApply::CreateHomogeneousBtreeIndexApplyAlternatives(
 //---------------------------------------------------------------------------
 void
 CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
-	CMemoryPool *mp, COperator *joinOp, CExpression *pexprOuter,
-	CExpression *pexprInner, CExpression *origJoinPred,
-	CExpression *nodesToInsertAboveIndexGet,
+	CMemoryPool *mp, gpos::pointer<COperator *> joinOp, CExpression *pexprOuter,
+	gpos::pointer<CExpression *> pexprInner,
+	gpos::owner<CExpression *> origJoinPred,
+	gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
 	CExpression *endOfNodesToInsertAboveIndexGet, CMDAccessor *md_accessor,
-	CExpressionArray *pdrgpexprConjuncts, CColRefSet *pcrsScalarExpr,
-	CColRefSet *outer_refs, CColRefSet *pcrsReqd,
+	CExpressionArray *pdrgpexprConjuncts,
+	gpos::pointer<CColRefSet *> pcrsScalarExpr, CColRefSet *outer_refs,
+	gpos::pointer<CColRefSet *> pcrsReqd,
 	gpos::pointer<const IMDRelation *> pmdrel,
-	gpos::pointer<const IMDIndex *> pmdindex, CXformResult *pxfres)
+	gpos::pointer<const IMDIndex *> pmdindex,
+	gpos::pointer<CXformResult *> pxfres)
 {
 	gpos::owner<CExpression *> pexprLogicalIndexGet =
 		CXformUtils::PexprLogicalIndexGet(
@@ -215,8 +221,9 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 	{
 		// second child has residual predicates, create an apply of outer and inner
 		// and add it to xform results
-		CColRefArray *colref_array = outer_refs->Pdrgpcr(mp);
-		CExpression *indexGetWithOptionalSelect = pexprLogicalIndexGet;
+		gpos::owner<CColRefArray *> colref_array = outer_refs->Pdrgpcr(mp);
+		gpos::owner<CExpression *> indexGetWithOptionalSelect =
+			pexprLogicalIndexGet;
 
 		if (COperator::EopLogicalDynamicGet == pexprInner->Pop()->Eopid())
 		{
@@ -226,7 +233,7 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 			pexprLogicalIndexGet->Release();
 		}
 
-		CExpression *rightChildOfApply =
+		gpos::owner<CExpression *> rightChildOfApply =
 			CXformUtils::AddALinearStackOfUnaryExpressions(
 				mp, indexGetWithOptionalSelect, nodesToInsertAboveIndexGet,
 				endOfNodesToInsertAboveIndexGet);
@@ -251,10 +258,11 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 		gpos::owner<CExpression *> pexprIndexApply = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp)
-				CLogicalIndexApply(mp, colref_array, isOuterJoin, origJoinPred),
-			pexprOuter, rightChildOfApply,
+				CLogicalIndexApply(mp, std::move(colref_array), isOuterJoin,
+								   std::move(origJoinPred)),
+			pexprOuter, std::move(rightChildOfApply),
 			CPredicateUtils::PexprConjunction(mp, nullptr /*pdrgpexpr*/));
-		pxfres->Add(pexprIndexApply);
+		pxfres->Add(std::move(pexprIndexApply));
 	}
 }
 
@@ -269,14 +277,15 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 //---------------------------------------------------------------------------
 void
 CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives(
-	CMemoryPool *mp, COperator *joinOp, CExpression *pexprOuter,
-	CExpression *pexprInner, CExpression *pexprScalar,
-	CExpression *origJoinPred, CExpression *nodesToInsertAboveIndexGet,
+	CMemoryPool *mp, gpos::pointer<COperator *> joinOp, CExpression *pexprOuter,
+	gpos::pointer<CExpression *> pexprInner, CExpression *pexprScalar,
+	gpos::owner<CExpression *> origJoinPred,
+	gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
 	CExpression *endOfNodesToInsertAboveIndexGet,
 	CTableDescriptor *ptabdescInner, CColRefSet *outer_refs,
-	CColRefSet *pcrsReqd, CXformResult *pxfres)
+	CColRefSet *pcrsReqd, gpos::pointer<CXformResult *> pxfres)
 {
-	CLogical *popGet = CLogical::PopConvert(pexprInner->Pop());
+	CLogical *popGet = gpos::dyn_cast<CLogical>(pexprInner->Pop());
 	gpos::owner<CExpression *> pexprLogicalIndexGet =
 		CXformUtils::PexprBitmapTableGet(mp, popGet, joinOp->UlOpId(),
 										 ptabdescInner, pexprScalar, outer_refs,
@@ -285,8 +294,9 @@ CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives(
 	{
 		// second child has residual predicates, create an apply of outer and inner
 		// and add it to xform results
-		CColRefArray *colref_array = outer_refs->Pdrgpcr(mp);
-		CExpression *indexGetWithOptionalSelect = pexprLogicalIndexGet;
+		gpos::owner<CColRefArray *> colref_array = outer_refs->Pdrgpcr(mp);
+		gpos::owner<CExpression *> indexGetWithOptionalSelect =
+			pexprLogicalIndexGet;
 
 		if (COperator::EopLogicalDynamicGet == popGet->Eopid())
 		{
@@ -296,7 +306,7 @@ CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives(
 			pexprLogicalIndexGet->Release();
 		}
 
-		CExpression *rightChildOfApply =
+		gpos::owner<CExpression *> rightChildOfApply =
 			CXformUtils::AddALinearStackOfUnaryExpressions(
 				mp, indexGetWithOptionalSelect, nodesToInsertAboveIndexGet,
 				endOfNodesToInsertAboveIndexGet);
@@ -321,10 +331,11 @@ CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives(
 		gpos::owner<CExpression *> pexprIndexApply = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp)
-				CLogicalIndexApply(mp, colref_array, isOuterJoin, origJoinPred),
-			pexprOuter, rightChildOfApply,
+				CLogicalIndexApply(mp, std::move(colref_array), isOuterJoin,
+								   std::move(origJoinPred)),
+			pexprOuter, std::move(rightChildOfApply),
 			CPredicateUtils::PexprConjunction(mp, nullptr /*pdrgpexpr*/));
-		pxfres->Add(pexprIndexApply);
+		pxfres->Add(std::move(pexprIndexApply));
 	}
 }
 

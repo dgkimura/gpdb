@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalRowTrigger.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerProjList.h"
@@ -64,9 +66,10 @@ CParseHandlerPhysicalRowTrigger::StartElement(
 				   str->GetBuffer());
 	}
 
-	IMDId *rel_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenRelationMdid, EdxltokenPhysicalRowTrigger);
+	gpos::owner<IMDId *> rel_mdid =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenRelationMdid, EdxltokenPhysicalRowTrigger);
 
 	INT type = CDXLOperatorFactory::ExtractConvertAttrValueToInt(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMDType,
@@ -74,7 +77,7 @@ CParseHandlerPhysicalRowTrigger::StartElement(
 
 	const XMLCh *xmlszOldColIds =
 		attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenOldCols));
-	ULongPtrArray *colids_old = nullptr;
+	gpos::owner<ULongPtrArray *> colids_old = nullptr;
 	if (nullptr != xmlszOldColIds)
 	{
 		colids_old = CDXLOperatorFactory::ExtractIntsToUlongArray(
@@ -84,7 +87,7 @@ CParseHandlerPhysicalRowTrigger::StartElement(
 
 	const XMLCh *xmlszNewColIds =
 		attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenNewCols));
-	ULongPtrArray *colids_new = nullptr;
+	gpos::owner<ULongPtrArray *> colids_new = nullptr;
 	if (nullptr != xmlszNewColIds)
 	{
 		colids_new = CDXLOperatorFactory::ExtractIntsToUlongArray(
@@ -93,7 +96,8 @@ CParseHandlerPhysicalRowTrigger::StartElement(
 	}
 
 	m_dxl_op = GPOS_NEW(m_mp)
-		CDXLPhysicalRowTrigger(m_mp, rel_mdid, type, colids_old, colids_new);
+		CDXLPhysicalRowTrigger(m_mp, std::move(rel_mdid), type,
+							   std::move(colids_old), std::move(colids_new));
 
 	// parse handler for physical operator
 	CParseHandlerBase *child_parse_handler =

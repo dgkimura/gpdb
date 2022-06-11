@@ -57,7 +57,7 @@ public:
 	virtual IMDType::ETypeInfo GetDatumType() = 0;
 
 	// accessor of metadata id
-	virtual IMDId *MDId() const = 0;
+	virtual gpos::pointer<IMDId *> MDId() const = 0;
 
 	virtual INT
 	TypeModifier() const
@@ -81,7 +81,7 @@ public:
 	virtual BOOL Matches(gpos::pointer<const IDatum *>) const = 0;
 
 	// create a copy of the datum
-	virtual IDatum *MakeCopy(CMemoryPool *mp) const = 0;
+	virtual gpos::owner<IDatum *> MakeCopy(CMemoryPool *mp) const = 0;
 
 	// stats greater than
 	virtual BOOL
@@ -97,7 +97,8 @@ public:
 	virtual BOOL NeedsPadding() const = 0;
 
 	// return the padded datum
-	virtual IDatum *MakePaddedDatum(CMemoryPool *mp, ULONG col_len) const = 0;
+	virtual gpos::owner<IDatum *> MakePaddedDatum(CMemoryPool *mp,
+												  ULONG col_len) const = 0;
 
 	// does datum support like predicate
 	virtual BOOL SupportsLikePredicate() const = 0;

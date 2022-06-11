@@ -23,10 +23,9 @@ CLogicalIndexApply::CLogicalIndexApply(CMemoryPool *mp)
 	m_fPattern = true;
 }
 
-CLogicalIndexApply::CLogicalIndexApply(CMemoryPool *mp,
-									   CColRefArray *pdrgpcrOuterRefs,
-									   BOOL fOuterJoin,
-									   CExpression *origJoinPred)
+CLogicalIndexApply::CLogicalIndexApply(
+	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrOuterRefs,
+	BOOL fOuterJoin, gpos::owner<CExpression *> origJoinPred)
 	: CLogicalApply(mp),
 	  m_pdrgpcrOuterRefs(pdrgpcrOuterRefs),
 	  m_fOuterJoin(fOuterJoin),
@@ -59,7 +58,7 @@ CLogicalIndexApply::DeriveMaxCard(CMemoryPool *,  // mp
 }
 
 
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalIndexApply::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -68,21 +67,21 @@ CLogicalIndexApply::PxfsCandidates(CMemoryPool *mp) const
 }
 
 BOOL
-CLogicalIndexApply::Matches(COperator *pop) const
+CLogicalIndexApply::Matches(gpos::pointer<COperator *> pop) const
 {
 	GPOS_ASSERT(nullptr != pop);
 
 	if (pop->Eopid() == Eopid())
 	{
 		return m_pdrgpcrOuterRefs->Equals(
-			CLogicalIndexApply::PopConvert(pop)->PdrgPcrOuterRefs());
+			gpos::dyn_cast<CLogicalIndexApply>(pop)->PdrgPcrOuterRefs());
 	}
 
 	return false;
 }
 
 
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalIndexApply::PstatsDerive(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::pointer<IStatisticsArray *>  // stats_ctxt
@@ -101,7 +100,7 @@ CLogicalIndexApply::PstatsDerive(
 	statistics_array->Append(outer_stats);
 	inner_side_stats->AddRef();
 	statistics_array->Append(inner_side_stats);
-	IStatistics *stats = CJoinStatsProcessor::CalcAllJoinStats(
+	gpos::owner<IStatistics *> stats = CJoinStatsProcessor::CalcAllJoinStats(
 		mp, statistics_array, pexprScalar,
 		const_cast<CLogicalIndexApply *>(this));
 	statistics_array->Release();
@@ -110,13 +109,13 @@ CLogicalIndexApply::PstatsDerive(
 }
 
 // return a copy of the operator with remapped columns
-COperator *
-CLogicalIndexApply::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+gpos::owner<COperator *>
+CLogicalIndexApply::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::owner<COperator *> result = nullptr;
-	CColRefArray *colref_array = CUtils::PdrgpcrRemap(
+	gpos::owner<CColRefArray *> colref_array = CUtils::PdrgpcrRemap(
 		mp, m_pdrgpcrOuterRefs, colref_mapping, must_exist);
 	gpos::owner<CExpression *> remapped_orig_join_pred = nullptr;
 
@@ -126,8 +125,8 @@ CLogicalIndexApply::PopCopyWithRemappedColumns(CMemoryPool *mp,
 			mp, colref_mapping, must_exist);
 	}
 
-	result = GPOS_NEW(mp) CLogicalIndexApply(mp, colref_array, m_fOuterJoin,
-											 remapped_orig_join_pred);
+	result = GPOS_NEW(mp) CLogicalIndexApply(
+		mp, std::move(colref_array), m_fOuterJoin, remapped_orig_join_pred);
 	CRefCount::SafeRelease(remapped_orig_join_pred);
 
 	return result;

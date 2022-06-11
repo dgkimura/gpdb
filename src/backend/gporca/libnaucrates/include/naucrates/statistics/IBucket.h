@@ -13,6 +13,7 @@
 #define GPNAUCRATES_IBucket_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/statistics/CPoint.h"
 
@@ -42,10 +43,10 @@ public:
 	IBucket() = default;
 
 	// lower point
-	virtual CPoint *GetLowerBound() const = 0;
+	virtual gpos::pointer<CPoint *> GetLowerBound() const = 0;
 
 	// upper point
-	virtual CPoint *GetUpperBound() const = 0;
+	virtual gpos::pointer<CPoint *> GetUpperBound() const = 0;
 
 	// is bucket singleton?
 	BOOL

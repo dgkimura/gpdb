@@ -28,7 +28,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalUnary::Matches(COperator *pop) const
+CLogicalUnary::Matches(gpos::pointer<COperator *> pop) const
 {
 	return (pop->Eopid() == Eopid());
 }
@@ -65,14 +65,15 @@ CLogicalUnary::Esp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 IStatistics *
-CLogicalUnary::PstatsDeriveProject(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   UlongToIDatumMap *phmuldatum) const
+CLogicalUnary::PstatsDeriveProject(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<UlongToIDatumMap *> phmuldatum) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *child_stats = exprhdl.Pstats(0);
-	CReqdPropRelational *prprel =
-		CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
-	CColRefSet *pcrs = prprel->PcrsStat();
+	gpos::pointer<IStatistics *> child_stats = exprhdl.Pstats(0);
+	gpos::pointer<CReqdPropRelational *> prprel =
+		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
+	gpos::pointer<CColRefSet *> pcrs = prprel->PcrsStat();
 	gpos::owner<ULongPtrArray *> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	pcrs->ExtractColIds(mp, colids);
 

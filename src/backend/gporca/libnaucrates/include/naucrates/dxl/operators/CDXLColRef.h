@@ -61,7 +61,8 @@ public:
 	CDXLColRef(const CDXLColRef &) = delete;
 
 	// ctor/dtor
-	CDXLColRef(CMDName *mdname, ULONG id, IMDId *mdid_type, INT type_modifier);
+	CDXLColRef(CMDName *mdname, ULONG id, gpos::owner<IMDId *> mdid_type,
+			   INT type_modifier);
 
 	~CDXLColRef() override;
 

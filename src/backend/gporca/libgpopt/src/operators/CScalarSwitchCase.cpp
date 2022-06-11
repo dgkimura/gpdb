@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarSwitchCase.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 
@@ -39,7 +40,7 @@ CScalarSwitchCase::CScalarSwitchCase(CMemoryPool *mp) : CScalar(mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSwitchCase::Matches(COperator *pop) const
+CScalarSwitchCase::Matches(gpos::pointer<COperator *> pop) const
 {
 	return (pop->Eopid() == Eopid());
 }

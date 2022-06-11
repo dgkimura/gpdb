@@ -43,7 +43,7 @@ public:
 
 	// ctors
 	CDatumOidGPDB(CSystemId sysid, OID oid_val, BOOL is_null = false);
-	CDatumOidGPDB(IMDId *mdid, OID oid_val, BOOL is_null = false);
+	CDatumOidGPDB(gpos::owner<IMDId *> mdid, OID oid_val, BOOL is_null = false);
 
 	// dtor
 	~CDatumOidGPDB() override;

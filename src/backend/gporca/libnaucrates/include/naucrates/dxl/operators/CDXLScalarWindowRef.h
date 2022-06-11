@@ -68,8 +68,8 @@ public:
 	CDXLScalarWindowRef(const CDXLScalarWindowRef &) = delete;
 
 	// ctor
-	CDXLScalarWindowRef(CMemoryPool *mp, IMDId *pmdidWinfunc,
-						IMDId *mdid_return_type, BOOL is_distinct,
+	CDXLScalarWindowRef(CMemoryPool *mp, gpos::owner<IMDId *> pmdidWinfunc,
+						gpos::owner<IMDId *> mdid_return_type, BOOL is_distinct,
 						BOOL is_star_arg, BOOL is_simple_agg,
 						EdxlWinStage dxl_win_stage, ULONG ulWinspecPosition);
 

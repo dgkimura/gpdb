@@ -13,6 +13,7 @@
 #define GPMD_IMDTypeInt2_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatumInt2.h"
 #include "naucrates/md/IMDType.h"
@@ -48,8 +49,9 @@ public:
 	}
 
 	// factory function for INT2 datums
-	virtual IDatumInt2 *CreateInt2Datum(CMemoryPool *mp, SINT value,
-										BOOL is_null) const = 0;
+	virtual gpos::owner<IDatumInt2 *> CreateInt2Datum(CMemoryPool *mp,
+													  SINT value,
+													  BOOL is_null) const = 0;
 };
 
 }  // namespace gpmd

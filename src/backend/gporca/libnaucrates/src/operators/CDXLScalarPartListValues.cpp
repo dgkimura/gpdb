@@ -19,14 +19,13 @@ using namespace gpos;
 using namespace gpdxl;
 
 // Ctor
-CDXLScalarPartListValues::CDXLScalarPartListValues(CMemoryPool *mp,
-												   ULONG partitioning_level,
-												   IMDId *result_type_mdid,
-												   IMDId *elem_type_mdid)
+CDXLScalarPartListValues::CDXLScalarPartListValues(
+	CMemoryPool *mp, ULONG partitioning_level,
+	gpos::owner<IMDId *> result_type_mdid, gpos::owner<IMDId *> elem_type_mdid)
 	: CDXLScalar(mp),
 	  m_partitioning_level(partitioning_level),
-	  m_result_type_mdid(result_type_mdid),
-	  m_elem_type_mdid(elem_type_mdid)
+	  m_result_type_mdid(std::move(result_type_mdid)),
+	  m_elem_type_mdid(std::move(elem_type_mdid))
 {
 	GPOS_ASSERT(m_result_type_mdid->IsValid());
 	GPOS_ASSERT(m_elem_type_mdid->IsValid());

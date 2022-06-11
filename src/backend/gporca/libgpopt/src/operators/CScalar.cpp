@@ -45,7 +45,7 @@ CScalar::PdpCreate(CMemoryPool *mp) const
 //		Create base container of required properties
 //
 //---------------------------------------------------------------------------
-CReqdProp *
+gpos::owner<CReqdProp *>
 CScalar::PrpCreate(CMemoryPool *  // mp
 ) const
 {
@@ -97,7 +97,7 @@ CScalar::FHasSubquery(CExpressionHandle &exprhdl)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberConjunction(ULongPtrArray *pdrgpulChildren)
+CScalar::EberConjunction(gpos::pointer<ULongPtrArray *> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 	GPOS_ASSERT(1 < pdrgpulChildren->Size());
@@ -158,7 +158,7 @@ CScalar::EberConjunction(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberDisjunction(ULongPtrArray *pdrgpulChildren)
+CScalar::EberDisjunction(gpos::pointer<ULongPtrArray *> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 	GPOS_ASSERT(1 < pdrgpulChildren->Size());
@@ -243,7 +243,7 @@ CScalar::EberDisjunction(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberNullOnAnyNullChild(ULongPtrArray *pdrgpulChildren)
+CScalar::EberNullOnAnyNullChild(gpos::pointer<ULongPtrArray *> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 
@@ -270,7 +270,8 @@ CScalar::EberNullOnAnyNullChild(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberNullOnAllNullChildren(ULongPtrArray *pdrgpulChildren)
+CScalar::EberNullOnAllNullChildren(
+	gpos::pointer<ULongPtrArray *> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 
@@ -297,12 +298,12 @@ CScalar::EberNullOnAllNullChildren(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberEvaluate(CMemoryPool *mp, CExpression *pexprScalar)
+CScalar::EberEvaluate(CMemoryPool *mp, gpos::pointer<CExpression *> pexprScalar)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexprScalar);
 
-	COperator *pop = pexprScalar->Pop();
+	gpos::pointer<COperator *> pop = pexprScalar->Pop();
 	GPOS_ASSERT(pop->FScalar());
 
 	const ULONG arity = pexprScalar->Arity();
@@ -314,14 +315,14 @@ CScalar::EberEvaluate(CMemoryPool *mp, CExpression *pexprScalar)
 		// do not recurse into subqueries
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			CExpression *pexprChild = (*pexprScalar)[ul];
+			gpos::pointer<CExpression *> pexprChild = (*pexprScalar)[ul];
 			EBoolEvalResult eberChild = EberEvaluate(mp, pexprChild);
 			pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(eberChild));
 		}
 	}
 
-	EBoolEvalResult eber = PopConvert(pop)->Eber(pdrgpulChildren);
-	CRefCount::SafeRelease(pdrgpulChildren);
+	EBoolEvalResult eber = gpos::dyn_cast<CScalar>(pop)->Eber(pdrgpulChildren);
+	CRefCount::SafeRelease(std::move(pdrgpulChildren));
 
 	return eber;
 }
@@ -369,7 +370,7 @@ CScalar::FHasNonScalarFunction(CExpressionHandle &exprhdl)
 //		Combine partition consumer arrays of all scalar children
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::owner<CPartInfo *>
 CScalar::PpartinfoDeriveCombineScalar(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl)
 {
@@ -382,9 +383,10 @@ CScalar::PpartinfoDeriveCombineScalar(CMemoryPool *mp,
 	{
 		if (exprhdl.FScalarChild(ul))
 		{
-			CPartInfo *ppartinfoChild = exprhdl.DeriveScalarPartitionInfo(ul);
+			gpos::pointer<CPartInfo *> ppartinfoChild =
+				exprhdl.DeriveScalarPartitionInfo(ul);
 			GPOS_ASSERT(nullptr != ppartinfoChild);
-			CPartInfo *ppartinfoCombined =
+			gpos::owner<CPartInfo *> ppartinfoCombined =
 				CPartInfo::PpartinfoCombine(mp, ppartinfo, ppartinfoChild);
 			ppartinfo->Release();
 			ppartinfo = ppartinfoCombined;

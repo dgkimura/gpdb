@@ -31,26 +31,29 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDScalarOpGPDB::CMDScalarOpGPDB(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname, IMDId *mdid_type_left,
-	IMDId *mdid_type_right, IMDId *result_type_mdid, IMDId *mdid_func,
-	IMDId *mdid_commute_opr, IMDId *m_mdid_inverse_opr,
-	IMDType::ECmpType cmp_type, BOOL returns_null_on_null_input,
-	IMdIdArray *mdid_opfamilies_array, IMDId *mdid_hash_opfamily,
-	IMDId *mdid_legacy_hash_opfamily, BOOL is_ndv_preserving)
+	CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+	gpos::owner<IMDId *> mdid_type_left, gpos::owner<IMDId *> mdid_type_right,
+	gpos::owner<IMDId *> result_type_mdid, gpos::owner<IMDId *> mdid_func,
+	gpos::owner<IMDId *> mdid_commute_opr,
+	gpos::owner<IMDId *> m_mdid_inverse_opr, IMDType::ECmpType cmp_type,
+	BOOL returns_null_on_null_input,
+	gpos::owner<IMdIdArray *> mdid_opfamilies_array,
+	gpos::owner<IMDId *> mdid_hash_opfamily,
+	gpos::owner<IMDId *> mdid_legacy_hash_opfamily, BOOL is_ndv_preserving)
 	: m_mp(mp),
-	  m_mdid(mdid),
+	  m_mdid(std::move(mdid)),
 	  m_mdname(mdname),
-	  m_mdid_type_left(mdid_type_left),
-	  m_mdid_type_right(mdid_type_right),
-	  m_mdid_type_result(result_type_mdid),
-	  m_func_mdid(mdid_func),
-	  m_mdid_commute_opr(mdid_commute_opr),
-	  m_mdid_inverse_opr(m_mdid_inverse_opr),
+	  m_mdid_type_left(std::move(mdid_type_left)),
+	  m_mdid_type_right(std::move(mdid_type_right)),
+	  m_mdid_type_result(std::move(result_type_mdid)),
+	  m_func_mdid(std::move(mdid_func)),
+	  m_mdid_commute_opr(std::move(mdid_commute_opr)),
+	  m_mdid_inverse_opr(std::move(m_mdid_inverse_opr)),
 	  m_comparision_type(cmp_type),
 	  m_returns_null_on_null_input(returns_null_on_null_input),
-	  m_mdid_opfamilies_array(mdid_opfamilies_array),
-	  m_mdid_hash_opfamily(mdid_hash_opfamily),
-	  m_mdid_legacy_hash_opfamily(mdid_legacy_hash_opfamily),
+	  m_mdid_opfamilies_array(std::move(mdid_opfamilies_array)),
+	  m_mdid_hash_opfamily(std::move(mdid_hash_opfamily)),
+	  m_mdid_legacy_hash_opfamily(std::move(mdid_legacy_hash_opfamily)),
 	  m_is_ndv_preserving(is_ndv_preserving)
 {
 	GPOS_ASSERT(nullptr != m_mdid_opfamilies_array);

@@ -26,12 +26,12 @@ using namespace gpos;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CQueryToDXLResult::CQueryToDXLResult(CDXLNode *query,
-									 CDXLNodeArray *query_output,
-									 CDXLNodeArray *cte_producers)
-	: m_query_dxl(query),
-	  m_query_output(query_output),
-	  m_cte_producers(cte_producers)
+CQueryToDXLResult::CQueryToDXLResult(gpos::owner<CDXLNode *> query,
+									 gpos::owner<CDXLNodeArray *> query_output,
+									 gpos::owner<CDXLNodeArray *> cte_producers)
+	: m_query_dxl(std::move(query)),
+	  m_query_output(std::move(query_output)),
+	  m_cte_producers(std::move(cte_producers))
 {
 	GPOS_ASSERT(nullptr != m_query_dxl);
 }

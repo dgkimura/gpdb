@@ -24,11 +24,12 @@ struct SPartSelectorInfoEntry
 	// statistics of the subtree of the partition selector
 	gpos::owner<IStatistics *> m_stats;
 
-	SPartSelectorInfoEntry(ULONG mSelectorId, CExpression *mFilterExpr,
-						   IStatistics *mStats)
+	SPartSelectorInfoEntry(ULONG mSelectorId,
+						   gpos::owner<CExpression *> mFilterExpr,
+						   gpos::owner<IStatistics *> mStats)
 		: m_selector_id(mSelectorId),
-		  m_filter_expr(mFilterExpr),
-		  m_stats(mStats)
+		  m_filter_expr(std::move(mFilterExpr)),
+		  m_stats(std::move(mStats))
 	{
 	}
 

@@ -165,9 +165,9 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 		}
 	}
 
-	pkc->Add(pcrs0);
-	pkc->Add(pcrs1);
-	pkc->Add(pcrs2);
+	pkc->Add(std::move(pcrs0));
+	pkc->Add(std::move(pcrs1));
+	pkc->Add(std::move(pcrs2));
 
 	GPOS_ASSERT(pkc->FKey(pcrs2));
 

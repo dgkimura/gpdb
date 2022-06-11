@@ -86,7 +86,7 @@ public:
 	}
 
 	// retrieve list of partition types
-	CharPtrArray *
+	gpos::pointer<CharPtrArray *>
 	GetPartitionTypes() const override
 	{
 		GPOS_ASSERT(!"External tables have no partition types");
@@ -102,7 +102,7 @@ public:
 	}
 
 	// part constraint
-	CDXLNode *
+	gpos::pointer<CDXLNode *>
 	MDPartConstraint() const override
 	{
 		return nullptr;
@@ -115,7 +115,7 @@ public:
 	virtual BOOL IsRejectLimitInRows() const = 0;
 
 	// format error table mdid
-	virtual IMDId *GetFormatErrTableMdid() const = 0;
+	virtual gpos::pointer<IMDId *> GetFormatErrTableMdid() const = 0;
 };
 }  // namespace gpmd
 

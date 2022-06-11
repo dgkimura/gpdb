@@ -89,7 +89,7 @@ private:
 		}
 
 		// object accessor
-		T *
+		gpos::pointer<T *>
 		Value() const
 		{
 			return m_value;

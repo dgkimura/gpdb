@@ -76,9 +76,10 @@ CXformSelect2DynamicIndexGet::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformSelect2DynamicIndexGet::Transform(CXformContext *pxfctxt,
-										CXformResult *pxfres,
-										CExpression *pexpr) const
+CXformSelect2DynamicIndexGet::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -87,12 +88,12 @@ CXformSelect2DynamicIndexGet::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::pointer<CExpression *> pexprRelational = (*pexpr)[0];
+	gpos::pointer<CExpression *> pexprScalar = (*pexpr)[1];
 
 	// get the indexes on this relation
-	CLogicalDynamicGet *popDynamicGet =
-		CLogicalDynamicGet::PopConvert(pexprRelational->Pop());
+	gpos::pointer<CLogicalDynamicGet *> popDynamicGet =
+		gpos::dyn_cast<CLogicalDynamicGet>(pexprRelational->Pop());
 	const ULONG ulIndices = popDynamicGet->Ptabdesc()->IndexCount();
 	if (0 == ulIndices)
 	{
@@ -105,8 +106,9 @@ CXformSelect2DynamicIndexGet::Transform(CXformContext *pxfctxt,
 	GPOS_ASSERT(0 < pdrgpexpr->Size());
 
 	// derive the scalar and relational properties to build set of required columns
-	CColRefSet *pcrsOutput = pexpr->DeriveOutputColumns();
-	CColRefSet *pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
+	gpos::pointer<CColRefSet *> pcrsOutput = pexpr->DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrsScalarExpr =
+		pexprScalar->DeriveUsedColumns();
 
 	gpos::owner<CColRefSet *> pcrsReqd = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsReqd->Include(pcrsOutput);
@@ -119,7 +121,7 @@ CXformSelect2DynamicIndexGet::Transform(CXformContext *pxfctxt,
 
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
-		IMDId *pmdidIndex = pmdrel->IndexMDidAt(ul);
+		gpos::pointer<IMDId *> pmdidIndex = pmdrel->IndexMDidAt(ul);
 		gpos::pointer<const IMDIndex *> pmdindex =
 			md_accessor->RetrieveIndex(pmdidIndex);
 		gpos::owner<CExpression *> pexprDynamicIndexGet =
@@ -131,7 +133,7 @@ CXformSelect2DynamicIndexGet::Transform(CXformContext *pxfctxt,
 		{
 			// create a redundant SELECT on top of DynamicIndexGet to be able to use predicate in partition elimination
 
-			CExpression *pexprRedundantSelect =
+			gpos::owner<CExpression *> pexprRedundantSelect =
 				CXformUtils::PexprRedundantSelectForDynamicIndex(
 					mp, pexprDynamicIndexGet);
 			pexprDynamicIndexGet->Release();

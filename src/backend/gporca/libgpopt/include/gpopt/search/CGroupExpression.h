@@ -132,32 +132,36 @@ private:
 	ShtCC m_sht;
 
 	// set group back pointer
-	void SetGroup(CGroup *pgroup);
+	void SetGroup(gpos::pointer<CGroup *> pgroup);
 
 	// set group expression id
 	void SetId(ULONG id);
 
 	// print transformation
-	static void PrintXform(CMemoryPool *mp, CXform *pxform, CExpression *pexpr,
-						   CXformResult *pxfres, ULONG ulNumResults);
+	static void PrintXform(CMemoryPool *mp, gpos::pointer<CXform *> pxform,
+						   gpos::pointer<CExpression *> pexpr,
+						   gpos::pointer<CXformResult *> pxfres,
+						   ULONG ulNumResults);
 
 	// preprocessing before applying transformation
 	void PreprocessTransform(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-							 CXform *pxform);
+							 gpos::pointer<CXform *> pxform);
 
 	// postprocessing after applying transformation
 	void PostprocessTransform(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-							  CXform *pxform) const;
+							  gpos::pointer<CXform *> pxform) const;
 
 	// costing scheme
-	static CCost CostCompute(CMemoryPool *mp, CCostContext *pcc);
+	static CCost CostCompute(CMemoryPool *mp,
+							 gpos::pointer<CCostContext *> pcc);
 
 	// set optimization level of group expression
 	void SetOptimizationLevel();
 
 	// check validity of group expression
-	BOOL FValidContext(CMemoryPool *mp, COptimizationContext *poc,
-					   COptimizationContextArray *pdrgpocChild);
+	BOOL FValidContext(CMemoryPool *mp,
+					   gpos::pointer<COptimizationContext *> poc,
+					   gpos::pointer<COptimizationContextArray *> pdrgpocChild);
 
 	// remove cost context in hash table
 	CCostContext *PccRemove(COptimizationContext *poc, ULONG ulOptReq);
@@ -176,8 +180,10 @@ public:
 	CGroupExpression(const CGroupExpression &) = delete;
 
 	// ctor
-	CGroupExpression(CMemoryPool *mp, COperator *pop, CGroupArray *pdrgpgroup,
-					 CXform::EXformId exfid, CGroupExpression *pgexprOrigin,
+	CGroupExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
+					 gpos::owner<CGroupArray *> pdrgpgroup,
+					 CXform::EXformId exfid,
+					 gpos::pointer<CGroupExpression *> pgexprOrigin,
 					 BOOL fIntermediate);
 
 	// dtor
@@ -192,7 +198,7 @@ public:
 
 	// set duplicate group expression
 	void
-	SetDuplicate(CGroupExpression *pgexpr)
+	SetDuplicate(gpos::pointer<CGroupExpression *> pgexpr)
 	{
 		GPOS_ASSERT(nullptr != pgexpr);
 
@@ -204,7 +210,7 @@ public:
 
 	// check if cost context already exists in group expression hash table
 	BOOL FCostContextExists(COptimizationContext *poc,
-							COptimizationContextArray *pdrgpoc);
+							gpos::pointer<COptimizationContextArray *> pdrgpoc);
 
 	// compute and store expression's cost under a given context
 	CCostContext *PccComputeCost(CMemoryPool *mp, COptimizationContext *poc,
@@ -217,11 +223,11 @@ public:
 						 CCostContext *pccChild, ULONG child_index);
 
 	// initialize group expression
-	void Init(CGroup *pgroup, ULONG id);
+	void Init(gpos::pointer<CGroup *> pgroup, ULONG id);
 
 	// reset group expression
 	void
-	Reset(CGroup *pgroup, ULONG id)
+	Reset(gpos::pointer<CGroup *> pgroup, ULONG id)
 	{
 		m_pgroup = pgroup;
 		m_id = id;
@@ -332,14 +338,16 @@ public:
 	}
 
 	// static hash function for operator and group references
-	static ULONG HashValue(COperator *pop, CGroupArray *drgpgroup);
+	static ULONG HashValue(gpos::pointer<COperator *> pop,
+						   gpos::pointer<CGroupArray *> drgpgroup);
 
 	// static hash function for group expression
 	static ULONG HashValue(const CGroupExpression &);
 
 	// transform group expression
-	void Transform(CMemoryPool *mp, CMemoryPool *pmpLocal, CXform *pxform,
-				   CXformResult *pxfres, ULONG *pulElapsedTime,
+	void Transform(CMemoryPool *mp, CMemoryPool *pmpLocal,
+				   gpos::pointer<CXform *> pxform,
+				   gpos::pointer<CXformResult *> pxfres, ULONG *pulElapsedTime,
 				   ULONG *pulNumberOfBindings);
 
 	// set group expression state
@@ -375,18 +383,17 @@ public:
 	CCostContext *PccLookup(COptimizationContext *poc, ULONG ulOptReq);
 
 	// lookup all cost contexts matching given optimization context
-	CCostContextArray *PdrgpccLookupAll(CMemoryPool *mp,
-										COptimizationContext *poc);
+	gpos::owner<CCostContextArray *> PdrgpccLookupAll(
+		CMemoryPool *mp, COptimizationContext *poc);
 
 	// insert a cost context in hash table
 	CCostContext *PccInsert(CCostContext *pcc);
 
 	// derive statistics recursively on a given group expression
-	IStatistics *PstatsRecursiveDerive(CMemoryPool *pmpLocal,
-									   CMemoryPool *pmpGlobal,
-									   CReqdPropRelational *prprel,
-									   IStatisticsArray *stats_ctxt,
-									   BOOL fComputeRootStats = true);
+	IStatistics *PstatsRecursiveDerive(
+		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
+		gpos::pointer<CReqdPropRelational *> prprel,
+		IStatisticsArray *stats_ctxt, BOOL fComputeRootStats = true);
 
 	// print driver
 	IOstream &OsPrint(IOstream &os) const;

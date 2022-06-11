@@ -40,7 +40,7 @@ const CDouble CDatumGenericGPDB::DefaultCdbRolloffSelectivity(0.14);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDatumGenericGPDB::CDatumGenericGPDB(CMemoryPool *mp, IMDId *mdid,
+CDatumGenericGPDB::CDatumGenericGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
 									 INT type_modifier, const void *src,
 									 ULONG size, BOOL is_null,
 									 LINT stats_comp_val_int,
@@ -412,7 +412,7 @@ CDatumGenericGPDB::NeedsPadding() const
 //		Return the padded datum
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::owner<IDatum *>
 CDatumGenericGPDB::MakePaddedDatum(CMemoryPool *mp, ULONG col_len) const
 {
 	// in GPDB the first four bytes of the datum are used for the header

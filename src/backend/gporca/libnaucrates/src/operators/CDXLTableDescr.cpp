@@ -31,9 +31,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLTableDescr::CDXLTableDescr(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-							   ULONG ulExecuteAsUser, int lockmode)
-	: m_mdid(mdid),
+CDXLTableDescr::CDXLTableDescr(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+							   CMDName *mdname, ULONG ulExecuteAsUser,
+							   int lockmode)
+	: m_mdid(std::move(mdid)),
 	  m_mdname(mdname),
 	  m_dxl_column_descr_array(nullptr),
 	  m_execute_as_user_id(ulExecuteAsUser),
@@ -133,7 +134,8 @@ CDXLTableDescr::LockMode() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLTableDescr::SetColumnDescriptors(CDXLColDescrArray *dxl_column_descr_array)
+CDXLTableDescr::SetColumnDescriptors(
+	gpos::owner<CDXLColDescrArray *> dxl_column_descr_array)
 {
 	CRefCount::SafeRelease(m_dxl_column_descr_array);
 	m_dxl_column_descr_array = dxl_column_descr_array;
@@ -148,11 +150,11 @@ CDXLTableDescr::SetColumnDescriptors(CDXLColDescrArray *dxl_column_descr_array)
 //
 //---------------------------------------------------------------------------
 void
-CDXLTableDescr::AddColumnDescr(CDXLColDescr *column_descr_dxl)
+CDXLTableDescr::AddColumnDescr(gpos::owner<CDXLColDescr *> column_descr_dxl)
 {
 	GPOS_ASSERT(nullptr != m_dxl_column_descr_array);
 	GPOS_ASSERT(nullptr != column_descr_dxl);
-	m_dxl_column_descr_array->Append(column_descr_dxl);
+	m_dxl_column_descr_array->Append(std::move(column_descr_dxl));
 }
 
 //---------------------------------------------------------------------------
@@ -228,7 +230,7 @@ CDXLTableDescr::SerializeToDXL(CXMLSerializer *xml_serializer) const
 	const ULONG arity = Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDXLColDescr *pdxlcd = (*m_dxl_column_descr_array)[ul];
+		gpos::pointer<CDXLColDescr *> pdxlcd = (*m_dxl_column_descr_array)[ul];
 		pdxlcd->SerializeToDXL(xml_serializer);
 	}
 

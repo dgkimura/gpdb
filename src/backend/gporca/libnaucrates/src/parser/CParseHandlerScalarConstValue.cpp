@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarConstValue.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -64,14 +66,14 @@ CParseHandlerScalarConstValue::StartElement(
 	}
 
 	// parse and create scalar const operator
-	CDXLScalarConstValue *dxl_op =
-		(CDXLScalarConstValue *) CDXLOperatorFactory::MakeDXLConstValue(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	gpos::owner<CDXLScalarConstValue *> dxl_op =
+		gpos::cast<CDXLScalarConstValue>(CDXLOperatorFactory::MakeDXLConstValue(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// construct scalar Const node
 	GPOS_ASSERT(nullptr != dxl_op);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp);
-	m_dxl_node->SetOperator(dxl_op);
+	m_dxl_node->SetOperator(std::move(dxl_op));
 }
 
 //---------------------------------------------------------------------------

@@ -182,16 +182,16 @@ private:
 	Plan *TranslateDXLIndexScan(
 		gpos::pointer<const CDXLNode *> index_scan_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translates a DXL index scan node into a IndexScan node
 	Plan *TranslateDXLIndexScan(
 		gpos::pointer<const CDXLNode *> index_scan_dxlnode,
-		gpdxl::CDXLPhysicalIndexScan *dxl_physical_idx_scan_op,
+		gpos::pointer<gpdxl::CDXLPhysicalIndexScan *> dxl_physical_idx_scan_op,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -199,7 +199,7 @@ private:
 	Plan *TranslateDXLIndexOnlyScan(
 		gpos::pointer<const CDXLNode *> index_scan_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -207,7 +207,7 @@ private:
 	Plan *TranslateDXLHashJoin(
 		gpos::pointer<const CDXLNode *> TranslateDXLHashJoin,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -215,7 +215,7 @@ private:
 	Plan *TranslateDXLNLJoin(
 		gpos::pointer<const CDXLNode *> nl_join_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -223,7 +223,7 @@ private:
 	Plan *TranslateDXLMergeJoin(
 		gpos::pointer<const CDXLNode *> merge_join_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -231,7 +231,7 @@ private:
 	Plan *TranslateDXLMotion(
 		gpos::pointer<const CDXLNode *> motion_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -239,7 +239,7 @@ private:
 	Plan *TranslateDXLDuplicateSensitiveMotion(
 		gpos::pointer<const CDXLNode *> motion_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -248,7 +248,7 @@ private:
 	Plan *TranslateDXLRedistributeMotionToResultHashFilters(
 		gpos::pointer<const CDXLNode *> motion_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -256,7 +256,7 @@ private:
 	Plan *TranslateDXLAgg(
 		gpos::pointer<const CDXLNode *> motion_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -264,7 +264,7 @@ private:
 	Plan *TranslateDXLWindow(
 		gpos::pointer<const CDXLNode *> motion_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -272,7 +272,7 @@ private:
 	Plan *TranslateDXLSort(
 		gpos::pointer<const CDXLNode *> sort_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -280,7 +280,7 @@ private:
 	Plan *TranslateDXLHash(
 		gpos::pointer<const CDXLNode *> dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -288,7 +288,7 @@ private:
 	Plan *TranslateDXLLimit(
 		gpos::pointer<const CDXLNode *> limit_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -303,35 +303,35 @@ private:
 	Plan *TranslateDXLSubQueryScan(
 		gpos::pointer<const CDXLNode *> subquery_scan_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	Plan *TranslateDXLProjectSet(
 		gpos::pointer<const CDXLNode *> result_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	Plan *TranslateDXLResult(
 		gpos::pointer<const CDXLNode *> result_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	Plan *TranslateDXLAppend(
 		gpos::pointer<const CDXLNode *> append_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	Plan *TranslateDXLMaterialize(
 		gpos::pointer<const CDXLNode *> materialize_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -346,7 +346,7 @@ private:
 	Plan *TranslateDXLSequence(
 		gpos::pointer<const CDXLNode *> sequence_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -354,7 +354,7 @@ private:
 	Plan *TranslateDXLDml(
 		gpos::pointer<const CDXLNode *> dml_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -362,7 +362,7 @@ private:
 	Plan *TranslateDXLSplit(
 		gpos::pointer<const CDXLNode *> split_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -370,7 +370,7 @@ private:
 	Plan *TranslateDXLAssert(
 		gpos::pointer<const CDXLNode *> assert_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -378,7 +378,7 @@ private:
 	Plan *TranslateDXLCTEProducerToSharedScan(
 		gpos::pointer<const CDXLNode *> cte_producer_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -402,7 +402,7 @@ private:
 	Plan *TranslateDXLPartSelector(
 		gpos::pointer<const CDXLNode *> partition_selector_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
+		gpos::pointer<CDXLTranslationContextArray *>
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
@@ -417,7 +417,7 @@ private:
 	List *TranslateDXLFilterList(
 		gpos::pointer<const CDXLNode *> filter_list_dxlnode,
 		const CDXLTranslateContextBaseTable *base_table_context,
-		CDXLTranslationContextArray *child_contexts,
+		gpos::pointer<CDXLTranslationContextArray *> child_contexts,
 		CDXLTranslateContext *output_context);
 
 	// create range table entry from a CDXLPhysicalTVF node
@@ -441,7 +441,7 @@ private:
 	List *TranslateDXLProjList(
 		gpos::pointer<const CDXLNode *> project_list_dxlnode,
 		const CDXLTranslateContextBaseTable *base_table_context,
-		CDXLTranslationContextArray *child_contexts,
+		gpos::pointer<CDXLTranslationContextArray *> child_contexts,
 		CDXLTranslateContext *output_context);
 
 	// insert NULL values for dropped attributes to construct the target list for a DML statement
@@ -458,7 +458,7 @@ private:
 	List *TranslateDXLFilterToQual(
 		gpos::pointer<const CDXLNode *> filter_dxlnode,
 		const CDXLTranslateContextBaseTable *base_table_context,
-		CDXLTranslationContextArray *child_contexts,
+		gpos::pointer<CDXLTranslationContextArray *> child_contexts,
 		CDXLTranslateContext *output_context);
 
 
@@ -472,8 +472,9 @@ private:
 		gpos::pointer<const CDXLNode *> project_list_dxlnode,
 		gpos::pointer<const CDXLNode *> filter_dxlnode,
 		const CDXLTranslateContextBaseTable *base_table_context,
-		CDXLTranslationContextArray *child_contexts, List **targetlist_out,
-		List **qual_out, CDXLTranslateContext *output_context);
+		gpos::pointer<CDXLTranslationContextArray *> child_contexts,
+		List **targetlist_out, List **qual_out,
+		CDXLTranslateContext *output_context);
 
 	// translate the hash expr list of a redistribute motion node
 	void TranslateHashExprList(
@@ -508,7 +509,8 @@ private:
 		gpos::pointer<const IMDRelation *> md_rel,
 		gpos::pointer<const CDXLTableDescr *> table_descr,
 		CDXLTranslateContextBaseTable *base_table_context,
-		CDXLTranslationContextArray *ctxt_translation_prev_siblings,
+		gpos::pointer<CDXLTranslationContextArray *>
+			ctxt_translation_prev_siblings,
 		BitmapHeapScan *bitmap_tbl_scan);
 
 	static void TranslateSortCols(
@@ -520,14 +522,14 @@ private:
 	List *TranslateDXLScCondToQual(
 		gpos::pointer<const CDXLNode *> filter_dxlnode,
 		const CDXLTranslateContextBaseTable *base_table_context,
-		CDXLTranslationContextArray *child_contexts,
+		gpos::pointer<CDXLTranslationContextArray *> child_contexts,
 		CDXLTranslateContext *output_context);
 
 	// parse string value into a Const
 	static Cost CostFromStr(const CWStringBase *str);
 
 	// check if the given operator is a DML operator on a distributed table
-	BOOL IsTgtTblDistributed(CDXLOperator *dxlop);
+	BOOL IsTgtTblDistributed(gpos::pointer<CDXLOperator *> dxlop);
 
 	// add a target entry for a junk column with given colid to the target list
 	static void AddJunkTargetEntryForColId(
@@ -536,33 +538,38 @@ private:
 
 	// translate the index condition list in an Index scan
 	void TranslateIndexConditions(
-		CDXLNode *index_cond_list_dxlnode,
+		gpos::pointer<CDXLNode *> index_cond_list_dxlnode,
 		gpos::pointer<const CDXLTableDescr *> dxl_tbl_descr,
 		BOOL is_bitmap_index_probe, gpos::pointer<const IMDIndex *> index,
 		gpos::pointer<const IMDRelation *> md_rel,
 		CDXLTranslateContext *output_context,
 		CDXLTranslateContextBaseTable *base_table_context,
-		CDXLTranslationContextArray *ctxt_translation_prev_siblings,
+		gpos::pointer<CDXLTranslationContextArray *>
+			ctxt_translation_prev_siblings,
 		List **index_cond, List **index_orig_cond, List **index_strategy_list,
 		List **index_subtype_list);
 
 	// translate the index filters
 	List *TranslateDXLIndexFilter(
-		CDXLNode *filter_dxlnode, CDXLTranslateContext *output_context,
+		gpos::pointer<CDXLNode *> filter_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslateContextBaseTable *base_table_context,
-		CDXLTranslationContextArray *ctxt_translation_prev_siblings);
+		gpos::pointer<CDXLTranslationContextArray *>
+			ctxt_translation_prev_siblings);
 
 	// translate the assert constraints
 	List *TranslateDXLAssertConstraints(
-		CDXLNode *filter_dxlnode, CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *child_contexts);
+		gpos::pointer<CDXLNode *> filter_dxlnode,
+		CDXLTranslateContext *output_context,
+		gpos::pointer<CDXLTranslationContextArray *> child_contexts);
 
 	// translate a CTAS operator
 	Plan *TranslateDXLCtas(
 		gpos::pointer<const CDXLNode *> dml_dxlnode,
 		CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *ctxt_translation_prev_siblings =
-			nullptr	 // translation contexts of previous siblings
+		gpos::pointer<CDXLTranslationContextArray *>
+			ctxt_translation_prev_siblings =
+				nullptr	 // translation contexts of previous siblings
 	);
 
 	// sets the vartypmod fields in the target entries of the given target list
@@ -579,19 +586,20 @@ private:
 
 	// translate CTAS storage options
 	static List *TranslateDXLCtasStorageOptions(
-		gpdxl::CDXLCtasStorageOptions::CDXLCtasOptionArray
-			*ctas_storage_options);
+		gpos::pointer<gpdxl::CDXLCtasStorageOptions::CDXLCtasOptionArray *>
+			ctas_storage_options);
 
 	// compute directed dispatch segment ids
 	List *TranslateDXLDirectDispatchInfo(
-		CDXLDirectDispatchInfo *dxl_direct_dispatch_info);
+		gpos::pointer<CDXLDirectDispatchInfo *> dxl_direct_dispatch_info);
 
 	// hash a DXL datum with GPDB's hash function
-	ULONG GetDXLDatumGPDBHash(CDXLDatumArray *dxl_datum_array);
+	ULONG GetDXLDatumGPDBHash(gpos::pointer<CDXLDatumArray *> dxl_datum_array);
 
 	// translate nest loop colrefs to GPDB nestparams
 	static List *TranslateNestLoopParamList(
-		CDXLColRefArray *pdrgdxlcrOuterRefs, CDXLTranslateContext *dxltrctxLeft,
+		gpos::pointer<CDXLColRefArray *> pdrgdxlcrOuterRefs,
+		CDXLTranslateContext *dxltrctxLeft,
 		CDXLTranslateContext *dxltrctxRight);
 };
 }  // namespace gpdxl

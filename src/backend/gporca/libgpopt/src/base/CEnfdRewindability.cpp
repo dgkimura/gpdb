@@ -12,6 +12,7 @@
 #include "gpopt/base/CEnfdRewindability.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CReqdPropPlan.h"
 #include "gpopt/operators/CPhysicalSpool.h"
@@ -33,9 +34,9 @@ const CHAR *CEnfdRewindability::m_szRewindabilityMatching[ErmSentinel] = {
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CEnfdRewindability::CEnfdRewindability(CRewindabilitySpec *prs,
+CEnfdRewindability::CEnfdRewindability(gpos::owner<CRewindabilitySpec *> prs,
 									   ERewindabilityMatching erm)
-	: m_prs(prs), m_erm(erm)
+	: m_prs(std::move(prs)), m_erm(erm)
 {
 	GPOS_ASSERT(nullptr != m_prs);
 	GPOS_ASSERT(ErmSentinel > erm);
@@ -67,7 +68,7 @@ CEnfdRewindability::~CEnfdRewindability()
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnfdRewindability::FCompatible(CRewindabilitySpec *prs) const
+CEnfdRewindability::FCompatible(gpos::pointer<CRewindabilitySpec *> prs) const
 {
 	GPOS_ASSERT(nullptr != prs);
 
@@ -108,7 +109,8 @@ CEnfdRewindability::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdRewindability::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+CEnfdRewindability::Epet(CExpressionHandle &exprhdl,
+						 gpos::pointer<CPhysical *> popPhysical,
 						 BOOL fRewindabilityReqd) const
 {
 	if (fRewindabilityReqd)

@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerRelStats.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -77,9 +79,10 @@ CParseHandlerRelStats::StartElement(const XMLCh *const,	 // element_uri,
 
 
 	// parse metadata id info
-	IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-		EdxltokenRelationStats);
+	gpos::owner<IMDId *> mdid =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenRelationStats);
 
 	// parse rows
 
@@ -117,9 +120,9 @@ CParseHandlerRelStats::StartElement(const XMLCh *const,	 // element_uri,
 			EdxltokenRelAllVisible, EdxltokenRelationStats);
 	}
 
-	m_imd_obj =
-		GPOS_NEW(m_mp) CDXLRelStats(m_mp, CMDIdRelStats::CastMdid(mdid), mdname,
-									rows, is_empty, relpages, relallvisible);
+	m_imd_obj = GPOS_NEW(m_mp)
+		CDXLRelStats(m_mp, gpos::dyn_cast<CMDIdRelStats>(std::move(mdid)),
+					 mdname, rows, is_empty, relpages, relallvisible);
 }
 
 //---------------------------------------------------------------------------

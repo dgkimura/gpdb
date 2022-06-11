@@ -50,7 +50,8 @@ public:
 	CDXLScalarCast(const CDXLScalarCast &) = delete;
 
 	// ctor/dtor
-	CDXLScalarCast(CMemoryPool *mp, IMDId *mdid_type, IMDId *func_mdid);
+	CDXLScalarCast(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+				   gpos::owner<IMDId *> func_mdid);
 
 	~CDXLScalarCast() override;
 

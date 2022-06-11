@@ -122,10 +122,11 @@ public:
 	virtual CDouble Width() const = 0;
 
 	// what is the width in bytes of set of column id's
-	virtual CDouble Width(ULongPtrArray *colids) const = 0;
+	virtual CDouble Width(gpos::pointer<ULongPtrArray *> colids) const = 0;
 
 	// what is the width in bytes of set of column references
-	virtual CDouble Width(CMemoryPool *mp, CColRefSet *colrefs) const = 0;
+	virtual CDouble Width(CMemoryPool *mp,
+						  gpos::pointer<CColRefSet *> colrefs) const = 0;
 
 	// the risk of errors in cardinality estimation
 	virtual ULONG StatsEstimationRisk() const = 0;
@@ -160,11 +161,12 @@ public:
 		BOOL DoIgnoreLASJHistComputation) const = 0;
 
 	// return required props associated with stats object
-	virtual CReqdPropRelational *GetReqdRelationalProps(
+	virtual gpos::owner<CReqdPropRelational *> GetReqdRelationalProps(
 		CMemoryPool *mp) const = 0;
 
 	// append given stats to current object
-	virtual void AppendStats(CMemoryPool *mp, IStatistics *stats) = 0;
+	virtual void AppendStats(CMemoryPool *mp,
+							 gpos::pointer<IStatistics *> stats) = 0;
 
 	// set number of rebinds
 	virtual void SetRebinds(CDouble num_rebinds) = 0;
@@ -176,18 +178,18 @@ public:
 	virtual IStatistics *ScaleStats(CMemoryPool *mp, CDouble factor) const = 0;
 
 	// copy stats with remapped column ids
-	virtual IStatistics *CopyStatsWithRemap(CMemoryPool *mp,
-											UlongToColRefMap *colref_mapping,
-											BOOL must_exist = true) const = 0;
+	virtual gpos::owner<IStatistics *> CopyStatsWithRemap(
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+		BOOL must_exist = true) const = 0;
 
 	// return a set of column references we have stats for
-	virtual CColRefSet *GetColRefSet(CMemoryPool *mp) const = 0;
+	virtual gpos::owner<CColRefSet *> GetColRefSet(CMemoryPool *mp) const = 0;
 
 	// print function
 	virtual IOstream &OsPrint(IOstream &os) const = 0;
 
 	// generate the DXL representation of the statistics object
-	virtual CDXLStatsDerivedRelation *GetDxlStatsDrvdRelation(
+	virtual gpos::owner<CDXLStatsDerivedRelation *> GetDxlStatsDrvdRelation(
 		CMemoryPool *mp, CMDAccessor *md_accessor) const = 0;
 
 	// is the join type either a left semi join or left anti-semi join

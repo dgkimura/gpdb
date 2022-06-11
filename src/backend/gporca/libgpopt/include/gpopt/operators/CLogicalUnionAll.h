@@ -35,8 +35,8 @@ public:
 	// ctor
 	explicit CLogicalUnionAll(CMemoryPool *mp);
 
-	CLogicalUnionAll(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-					 CColRef2dArray *pdrgpdrgpcrInput);
+	CLogicalUnionAll(CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrOutput,
+					 gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput);
 
 	// dtor
 	~CLogicalUnionAll() override;
@@ -64,7 +64,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive key collections
-	CKeyCollection *DeriveKeyCollection(
+	gpos::owner<CKeyCollection *> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// stat promise
 	EStatPromise
@@ -94,8 +94,9 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::owner<IStatistics *> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
 
 
 	// conversion function
@@ -109,8 +110,8 @@ public:
 	}
 
 	// derive statistics based on union all semantics
-	static IStatistics *PstatsDeriveUnionAll(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl);
+	static gpos::owner<IStatistics *> PstatsDeriveUnionAll(
+		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 };	// class CLogicalUnionAll
 

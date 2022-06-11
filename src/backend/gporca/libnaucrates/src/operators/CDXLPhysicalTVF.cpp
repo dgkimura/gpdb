@@ -28,11 +28,13 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalTVF::CDXLPhysicalTVF(CMemoryPool *mp, IMDId *mdid_func,
-								 IMDId *mdid_return_type, CWStringConst *str)
+CDXLPhysicalTVF::CDXLPhysicalTVF(CMemoryPool *mp,
+								 gpos::owner<IMDId *> mdid_func,
+								 gpos::owner<IMDId *> mdid_return_type,
+								 CWStringConst *str)
 	: CDXLPhysical(mp),
-	  m_func_mdid(mdid_func),
-	  m_return_type_mdid(mdid_return_type),
+	  m_func_mdid(std::move(mdid_func)),
+	  m_return_type_mdid(std::move(mdid_return_type)),
 	  func_name(str)
 {
 	GPOS_ASSERT(nullptr != m_func_mdid);
@@ -136,7 +138,7 @@ CDXLPhysicalTVF::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[idx];
+		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

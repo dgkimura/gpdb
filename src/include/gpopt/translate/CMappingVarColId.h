@@ -164,8 +164,9 @@ public:
 	CMappingVarColId *CopyMapColId(ULONG query_level) const;
 
 	// create a copy of the mapping replacing old col ids with new ones
-	CMappingVarColId *CopyRemapColId(CMemoryPool *mp, ULongPtrArray *old_colids,
-									 ULongPtrArray *new_colids) const;
+	CMappingVarColId *CopyRemapColId(
+		CMemoryPool *mp, gpos::pointer<ULongPtrArray *> old_colids,
+		gpos::pointer<ULongPtrArray *> new_colids) const;
 };
 }  // namespace gpdxl
 

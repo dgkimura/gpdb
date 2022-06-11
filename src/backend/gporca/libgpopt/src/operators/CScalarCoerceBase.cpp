@@ -32,11 +32,12 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCoerceBase::CScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type,
+CScalarCoerceBase::CScalarCoerceBase(CMemoryPool *mp,
+									 gpos::owner<IMDId *> mdid_type,
 									 INT type_modifier, ECoercionForm ecf,
 									 INT location)
 	: CScalar(mp),
-	  m_result_type_mdid(mdid_type),
+	  m_result_type_mdid(std::move(mdid_type)),
 	  m_type_modifier(type_modifier),
 	  m_ecf(ecf),
 	  m_location(location)
@@ -128,11 +129,11 @@ CScalarCoerceBase::Location() const
 //		return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CScalarCoerceBase::PopCopyWithRemappedColumns(
-	CMemoryPool *,		 //mp,
-	UlongToColRefMap *,	 //colref_mapping,
-	BOOL				 //must_exist
+	CMemoryPool *,						//mp,
+	gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+	BOOL								//must_exist
 )
 {
 	return PopCopyDefault();

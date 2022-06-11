@@ -70,9 +70,11 @@ public:
 	CReqdPropPlan() = default;
 
 	// ctor
-	CReqdPropPlan(CColRefSet *pcrs, CEnfdOrder *peo, CEnfdDistribution *ped,
-				  CEnfdRewindability *per, CEnfdPartitionPropagation *pepp,
-				  CCTEReq *pcter);
+	CReqdPropPlan(gpos::owner<CColRefSet *> pcrs, gpos::owner<CEnfdOrder *> peo,
+				  gpos::owner<CEnfdDistribution *> ped,
+				  gpos::owner<CEnfdRewindability *> per,
+				  gpos::owner<CEnfdPartitionPropagation *> pepp,
+				  gpos::owner<CCTEReq *> pcter);
 
 	// dtor
 	~CReqdPropPlan() override;
@@ -87,17 +89,17 @@ public:
 
 	// required properties computation function
 	void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 CReqdProp *prpInput, ULONG child_index,
+				 gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
 				 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// required columns computation function
 	void ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdProp *prpInput, ULONG child_index,
-						 CDrvdPropArray *pdrgpdpCtxt);
+						 gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
+						 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt);
 
 	// required ctes computation function
 	void ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdProp *prpInput, ULONG child_index,
+						 gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
 						 CDrvdPropArray *pdrgpdpCtxt);
 
 	// required columns accessor
@@ -156,7 +158,8 @@ public:
 					gpos::pointer<const CDrvdPropPlan *> pdpplan) const;
 
 	// check if plan properties are compatible with the given derived properties
-	BOOL FCompatible(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+	BOOL FCompatible(CExpressionHandle &exprhdl,
+					 gpos::pointer<CPhysical *> popPhysical,
 					 gpos::pointer<const CDrvdPropRelational *> pdprel,
 					 gpos::pointer<const CDrvdPropPlan *> pdpplan) const;
 
@@ -187,7 +190,8 @@ public:
 
 	// map input required and derived plan properties into new required plan properties
 	static gpos::owner<CReqdPropPlan *> PrppRemapForCTE(
-		CMemoryPool *mp, CReqdPropPlan *prppInput, CDrvdPropPlan *pdpplanInput,
+		CMemoryPool *mp, gpos::pointer<CReqdPropPlan *> prppInput,
+		gpos::pointer<CDrvdPropPlan *> pdpplanInput,
 		UlongToColRefMap *colref_mapping);
 
 	// print function

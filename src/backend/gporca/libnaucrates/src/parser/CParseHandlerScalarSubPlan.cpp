@@ -201,12 +201,13 @@ CParseHandlerScalarSubPlan::EndElement(const XMLCh *const,	// element_uri,
 	{
 		dxl_subplan_test_expr->AddRef();
 	}
-	CDXLScalarSubPlan *dxl_op =
-		(CDXLScalarSubPlan *) CDXLOperatorFactory::MakeDXLSubPlan(
+	gpos::owner<CDXLScalarSubPlan *> dxl_op =
+		gpos::cast<CDXLScalarSubPlan>(CDXLOperatorFactory::MakeDXLSubPlan(
 			m_parse_handler_mgr->GetDXLMemoryManager(), m_mdid_first_col,
-			dxl_colref_array, m_dxl_subplan_type, dxl_subplan_test_expr);
+			std::move(dxl_colref_array), m_dxl_subplan_type,
+			dxl_subplan_test_expr));
 
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 
 	// add constructed children
 	AddChildFromParseHandler(child_parse_handler);

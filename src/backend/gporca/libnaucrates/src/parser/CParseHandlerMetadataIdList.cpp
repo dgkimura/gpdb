@@ -82,10 +82,11 @@ CParseHandlerMetadataIdList::StartElement(const XMLCh *const,  // element_uri,
 		// index metadata id: array must be initialized already
 		GPOS_ASSERT(nullptr != m_mdid_array);
 
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenIndex);
-		m_mdid_array->Append(mdid);
+		gpos::owner<IMDId *> mdid =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenIndex);
+		m_mdid_array->Append(std::move(mdid));
 	}
 	else if (0 ==
 			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenTrigger),
@@ -94,10 +95,11 @@ CParseHandlerMetadataIdList::StartElement(const XMLCh *const,  // element_uri,
 		// trigger metadata id: array must be initialized already
 		GPOS_ASSERT(nullptr != m_mdid_array);
 
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenTrigger);
-		m_mdid_array->Append(mdid);
+		gpos::owner<IMDId *> mdid =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenTrigger);
+		m_mdid_array->Append(std::move(mdid));
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenPartition),
@@ -106,10 +108,11 @@ CParseHandlerMetadataIdList::StartElement(const XMLCh *const,  // element_uri,
 		// partition metadata id: array must be initialized already
 		GPOS_ASSERT(nullptr != m_mdid_array);
 
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenPartition);
-		m_mdid_array->Append(mdid);
+		gpos::owner<IMDId *> mdid =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenPartition);
+		m_mdid_array->Append(std::move(mdid));
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenCheckConstraint),
@@ -118,10 +121,11 @@ CParseHandlerMetadataIdList::StartElement(const XMLCh *const,  // element_uri,
 		// check constraint metadata id: array must be initialized already
 		GPOS_ASSERT(nullptr != m_mdid_array);
 
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenCheckConstraint);
-		m_mdid_array->Append(mdid);
+		gpos::owner<IMDId *> mdid =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenCheckConstraint);
+		m_mdid_array->Append(std::move(mdid));
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenOpfamily),
@@ -130,10 +134,11 @@ CParseHandlerMetadataIdList::StartElement(const XMLCh *const,  // element_uri,
 		// opfamily metadata id: array must be initialized already
 		GPOS_ASSERT(nullptr != m_mdid_array);
 
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenOpfamily);
-		m_mdid_array->Append(mdid);
+		gpos::owner<IMDId *> mdid =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenOpfamily);
+		m_mdid_array->Append(std::move(mdid));
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenRelDistrOpfamily),
@@ -142,10 +147,11 @@ CParseHandlerMetadataIdList::StartElement(const XMLCh *const,  // element_uri,
 		// distr opfamily metadata id: array must be initialized already
 		GPOS_ASSERT(nullptr != m_mdid_array);
 
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenRelDistrOpfamily);
-		m_mdid_array->Append(mdid);
+		gpos::owner<IMDId *> mdid =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenRelDistrOpfamily);
+		m_mdid_array->Append(std::move(mdid));
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenRelDistrOpclass),
@@ -154,10 +160,11 @@ CParseHandlerMetadataIdList::StartElement(const XMLCh *const,  // element_uri,
 		// distr opclass metadata id: array must be initialized already
 		GPOS_ASSERT(nullptr != m_mdid_array);
 
-		IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenRelDistrOpclass);
-		m_mdid_array->Append(mdid);
+		gpos::owner<IMDId *> mdid =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenRelDistrOpclass);
+		m_mdid_array->Append(std::move(mdid));
 	}
 	else
 	{

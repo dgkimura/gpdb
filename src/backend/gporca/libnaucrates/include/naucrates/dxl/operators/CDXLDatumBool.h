@@ -48,7 +48,8 @@ public:
 	CDXLDatumBool(const CDXLDatumBool &) = delete;
 
 	// ctor
-	CDXLDatumBool(CMemoryPool *mp, IMDId *mdid_type, BOOL is_null, BOOL value);
+	CDXLDatumBool(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type, BOOL is_null,
+				  BOOL value);
 
 	// dtor
 	~CDXLDatumBool() override = default;

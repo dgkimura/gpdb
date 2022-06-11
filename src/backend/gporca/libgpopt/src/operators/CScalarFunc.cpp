@@ -54,12 +54,13 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarFunc::CScalarFunc(CMemoryPool *mp, IMDId *mdid_func,
-						 IMDId *mdid_return_type, INT return_type_modifier,
+CScalarFunc::CScalarFunc(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+						 gpos::owner<IMDId *> mdid_return_type,
+						 INT return_type_modifier,
 						 const CWStringConst *pstrFunc)
 	: CScalar(mp),
-	  m_func_mdid(mdid_func),
-	  m_return_type_mdid(mdid_return_type),
+	  m_func_mdid(std::move(mdid_func)),
+	  m_return_type_mdid(std::move(mdid_return_type)),
 	  m_return_type_modifier(return_type_modifier),
 	  m_pstrFunc(pstrFunc),
 	  m_returns_set(false),
@@ -167,13 +168,13 @@ CScalarFunc::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarFunc::Matches(COperator *pop) const
+CScalarFunc::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	CScalarFunc *popScFunc = CScalarFunc::PopConvert(pop);
+	gpos::pointer<CScalarFunc *> popScFunc = gpos::dyn_cast<CScalarFunc>(pop);
 
 	// match if func ids are identical
 	return popScFunc->FuncMdId()->Equals(m_func_mdid) &&
@@ -242,7 +243,7 @@ CScalarFunc::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarFunc::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarFunc::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

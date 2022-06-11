@@ -53,10 +53,11 @@ CLogicalLimit::CLogicalLimit(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalLimit::CLogicalLimit(CMemoryPool *mp, COrderSpec *pos, BOOL fGlobal,
-							 BOOL fHasCount, BOOL fTopLimitUnderDML)
+CLogicalLimit::CLogicalLimit(CMemoryPool *mp, gpos::owner<COrderSpec *> pos,
+							 BOOL fGlobal, BOOL fHasCount,
+							 BOOL fTopLimitUnderDML)
 	: CLogical(mp),
-	  m_pos(pos),
+	  m_pos(std::move(pos)),
 	  m_fGlobal(fGlobal),
 	  m_fHasCount(fHasCount),
 	  m_top_limit_under_dml(fTopLimitUnderDML)
@@ -109,11 +110,12 @@ CLogicalLimit::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalLimit::Matches(COperator *pop) const
+CLogicalLimit::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CLogicalLimit *popLimit = CLogicalLimit::PopConvert(pop);
+		gpos::pointer<CLogicalLimit *> popLimit =
+			gpos::dyn_cast<CLogicalLimit>(pop);
 
 		if (popLimit->FGlobal() == m_fGlobal &&
 			popLimit->FHasCount() == m_fHasCount)
@@ -136,15 +138,15 @@ CLogicalLimit::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
-CLogicalLimit::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist)
+CLogicalLimit::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	COrderSpec *pos =
+	gpos::owner<COrderSpec *> pos =
 		m_pos->PosCopyWithRemappedColumns(mp, colref_mapping, must_exist);
 
-	return GPOS_NEW(mp)
-		CLogicalLimit(mp, pos, m_fGlobal, m_fHasCount, m_top_limit_under_dml);
+	return GPOS_NEW(mp) CLogicalLimit(mp, std::move(pos), m_fGlobal,
+									  m_fHasCount, m_top_limit_under_dml);
 }
 
 //---------------------------------------------------------------------------
@@ -155,7 +157,7 @@ CLogicalLimit::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalLimit::DeriveOutputColumns(CMemoryPool *,  // mp
 								   CExpressionHandle &exprhdl)
 {
@@ -171,12 +173,12 @@ CLogicalLimit::DeriveOutputColumns(CMemoryPool *,  // mp
 //		Derive outer references
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalLimit::DeriveOuterReferences(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl)
 {
 	gpos::owner<CColRefSet *> pcrsSort = m_pos->PcrsUsed(mp);
-	CColRefSet *outer_refs =
+	gpos::owner<CColRefSet *> outer_refs =
 		CLogical::DeriveOuterReferences(mp, exprhdl, pcrsSort);
 	pcrsSort->Release();
 
@@ -196,15 +198,16 @@ CLogicalLimit::DeriveMaxCard(CMemoryPool *,	 // mp
 							 CExpressionHandle &exprhdl) const
 {
 	// max card is a precise property, so we need an exact scalar expr to derive it
-	CExpression *pexprCount = exprhdl.PexprScalarExactChild(2 /*child_index*/);
+	gpos::pointer<CExpression *> pexprCount =
+		exprhdl.PexprScalarExactChild(2 /*child_index*/);
 
 	if (nullptr != pexprCount &&
 		CUtils::FScalarConstInt<IMDTypeInt8>(pexprCount) &&
 		!pexprCount->DeriveHasSubquery())
 	{
-		CScalarConst *popScalarConst =
-			CScalarConst::PopConvert(pexprCount->Pop());
-		IDatumInt8 *pdatumInt8 =
+		gpos::pointer<CScalarConst *> popScalarConst =
+			gpos::dyn_cast<CScalarConst>(pexprCount->Pop());
+		gpos::pointer<IDatumInt8 *> pdatumInt8 =
 			dynamic_cast<IDatumInt8 *>(popScalarConst->GetDatum());
 
 		return CMaxCard(pdatumInt8->Value());
@@ -223,7 +226,7 @@ CLogicalLimit::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalLimit::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -243,9 +246,10 @@ CLogicalLimit::PxfsCandidates(CMemoryPool *mp) const
 //		Compute required stat columns of the n-th child
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalLimit::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						CColRefSet *pcrsInput, ULONG child_index) const
+						gpos::pointer<CColRefSet *> pcrsInput,
+						ULONG child_index) const
 {
 	GPOS_ASSERT(0 == child_index);
 
@@ -254,7 +258,7 @@ CLogicalLimit::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	pcrsUsed->Union(exprhdl.DeriveUsedColumns(1));
 	pcrsUsed->Union(exprhdl.DeriveUsedColumns(2));
 
-	CColRefSet *pcrsStat =
+	gpos::owner<CColRefSet *> pcrsStat =
 		PcrsReqdChildStats(mp, exprhdl, pcrsInput, pcrsUsed, child_index);
 	pcrsUsed->Release();
 
@@ -270,7 +274,7 @@ CLogicalLimit::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalLimit::DeriveKeyCollection(CMemoryPool *,  // mp
 								   CExpressionHandle &exprhdl) const
 {
@@ -304,7 +308,7 @@ CLogicalLimit::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 gpos::owner<IStatistics *>
 CLogicalLimit::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							IStatisticsArray *	// not used
+							gpos::pointer<IStatisticsArray *>  // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);

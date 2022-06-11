@@ -83,9 +83,10 @@ CDrvdPropPlan::Pdpplan(CDrvdProp *pdp)
 //---------------------------------------------------------------------------
 void
 CDrvdPropPlan::Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					  CDrvdPropCtxt *pdpctxt)
+					  gpos::pointer<CDrvdPropCtxt *> pdpctxt)
 {
-	CPhysical *popPhysical = CPhysical::PopConvert(exprhdl.Pop());
+	gpos::pointer<CPhysical *> popPhysical =
+		gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 	if (nullptr != pdpctxt &&
 		COperator::EopPhysicalCTEConsumer == popPhysical->Eopid())
 	{
@@ -116,16 +117,18 @@ CDrvdPropPlan::Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 void
-CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
-										COperator *pop)
+CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp,
+										gpos::pointer<CDrvdPropCtxt *> pdpctxt,
+										gpos::pointer<COperator *> pop)
 {
-	CDrvdPropCtxtPlan *pdpctxtplan =
-		CDrvdPropCtxtPlan::PdpctxtplanConvert(pdpctxt);
-	CPhysicalCTEConsumer *popCTEConsumer =
-		CPhysicalCTEConsumer::PopConvert(pop);
+	gpos::pointer<CDrvdPropCtxtPlan *> pdpctxtplan =
+		gpos::dyn_cast<CDrvdPropCtxtPlan>(pdpctxt);
+	gpos::pointer<CPhysicalCTEConsumer *> popCTEConsumer =
+		gpos::dyn_cast<CPhysicalCTEConsumer>(pop);
 	ULONG ulCTEId = popCTEConsumer->UlCTEId();
 	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
-	CDrvdPropPlan *pdpplan = pdpctxtplan->PdpplanCTEProducer(ulCTEId);
+	gpos::pointer<CDrvdPropPlan *> pdpplan =
+		pdpctxtplan->PdpplanCTEProducer(ulCTEId);
 	if (nullptr != pdpplan)
 	{
 		// copy producer plan properties after remapping columns

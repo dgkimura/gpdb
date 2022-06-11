@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalTableScan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
@@ -32,10 +33,12 @@ using namespace gpopt;
 //		ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalTableScan::CPhysicalTableScan(CMemoryPool *mp, const CName *pnameAlias,
-									   CTableDescriptor *ptabdesc,
-									   CColRefArray *pdrgpcrOutput)
-	: CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput)
+CPhysicalTableScan::CPhysicalTableScan(
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::owner<CTableDescriptor *> ptabdesc,
+	gpos::owner<CColRefArray *> pdrgpcrOutput)
+	: CPhysicalScan(mp, pnameAlias, std::move(ptabdesc),
+					std::move(pdrgpcrOutput))
 {
 }
 
@@ -68,14 +71,15 @@ CPhysicalTableScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalTableScan::Matches(COperator *pop) const
+CPhysicalTableScan::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	CPhysicalTableScan *popTableScan = CPhysicalTableScan::PopConvert(pop);
+	gpos::pointer<CPhysicalTableScan *> popTableScan =
+		gpos::dyn_cast<CPhysicalTableScan>(pop);
 	return m_ptabdesc->MDId()->Equals(popTableScan->Ptabdesc()->MDId()) &&
 		   m_pdrgpcrOutput->Equals(popTableScan->PdrgpcrOutput());
 }

@@ -42,9 +42,9 @@ CLogicalLeftOuterApply::CLogicalLeftOuterApply(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalLeftOuterApply::CLogicalLeftOuterApply(CMemoryPool *mp,
-											   CColRefArray *pdrgpcrInner,
-											   EOperatorId eopidOriginSubq)
+CLogicalLeftOuterApply::CLogicalLeftOuterApply(
+	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrInner,
+	EOperatorId eopidOriginSubq)
 	: CLogicalApply(mp, pdrgpcrInner, eopidOriginSubq)
 {
 	GPOS_ASSERT(0 < pdrgpcrInner->Size());
@@ -85,7 +85,7 @@ CLogicalLeftOuterApply::DeriveMaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalLeftOuterApply::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -108,13 +108,14 @@ CLogicalLeftOuterApply::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
 CLogicalLeftOuterApply::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrInner =
+	gpos::owner<CColRefArray *> pdrgpcrInner =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
 
 	return GPOS_NEW(mp)
-		CLogicalLeftOuterApply(mp, pdrgpcrInner, m_eopidOriginSubq);
+		CLogicalLeftOuterApply(mp, std::move(pdrgpcrInner), m_eopidOriginSubq);
 }
 
 // EOF

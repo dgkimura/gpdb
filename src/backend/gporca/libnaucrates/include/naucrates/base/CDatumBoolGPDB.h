@@ -44,7 +44,7 @@ public:
 
 	// ctors
 	CDatumBoolGPDB(CSystemId sysid, BOOL value, BOOL is_null = false);
-	CDatumBoolGPDB(IMDId *mdid, BOOL value, BOOL is_null = false);
+	CDatumBoolGPDB(gpos::owner<IMDId *> mdid, BOOL value, BOOL is_null = false);
 
 	// dtor
 	~CDatumBoolGPDB() override;

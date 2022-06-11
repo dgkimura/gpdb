@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalExternalScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -38,9 +40,9 @@ CDXLPhysicalExternalScan::CDXLPhysicalExternalScan(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalExternalScan::CDXLPhysicalExternalScan(CMemoryPool *mp,
-												   CDXLTableDescr *table_descr)
-	: CDXLPhysicalTableScan(mp, table_descr)
+CDXLPhysicalExternalScan::CDXLPhysicalExternalScan(
+	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr)
+	: CDXLPhysicalTableScan(mp, std::move(table_descr))
 {
 }
 

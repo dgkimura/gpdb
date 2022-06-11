@@ -52,7 +52,7 @@ public:
 	// ident accessors
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::pointer<IMDId *> MdidType() const override;
 
 	EOperatorId
 	Eopid() const override
@@ -68,7 +68,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -78,7 +78,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,

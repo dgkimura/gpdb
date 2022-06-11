@@ -13,6 +13,7 @@
 #define GPMD_IMDTrigger_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDCacheObject.h"
 
@@ -55,10 +56,10 @@ public:
 	virtual BOOL IsUpdate() const = 0;
 
 	// relation mdid
-	virtual IMDId *GetRelMdId() const = 0;
+	virtual gpos::pointer<IMDId *> GetRelMdId() const = 0;
 
 	// function mdid
-	virtual IMDId *FuncMdId() const = 0;
+	virtual gpos::pointer<IMDId *> FuncMdId() const = 0;
 
 	// is trigger enabled
 	virtual BOOL IsEnabled() const = 0;

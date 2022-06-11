@@ -57,9 +57,10 @@ public:
 	CLogicalSequenceProject(const CLogicalSequenceProject &) = delete;
 
 	// ctor
-	CLogicalSequenceProject(CMemoryPool *mp, CDistributionSpec *pds,
-							COrderSpecArray *pdrgpos,
-							CWindowFrameArray *pdrgpwf);
+	CLogicalSequenceProject(CMemoryPool *mp,
+							gpos::owner<CDistributionSpec *> pds,
+							gpos::owner<COrderSpecArray *> pdrgpos,
+							gpos::owner<CWindowFrameArray *> pdrgpwf);
 
 	// ctor for pattern
 	explicit CLogicalSequenceProject(CMemoryPool *mp);
@@ -118,7 +119,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	// return true if we can pull projections up past this operator from its given child
@@ -134,15 +135,15 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::owner<CColRefSet *> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive outer references
-	CColRefSet *DeriveOuterReferences(CMemoryPool *mp,
-									  CExpressionHandle &exprhdl) override;
+	gpos::owner<CColRefSet *> DeriveOuterReferences(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::owner<CKeyCollection *> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -150,7 +151,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -162,18 +163,19 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::owner<IStatistics *> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	ULONG HashValue() const override;
 

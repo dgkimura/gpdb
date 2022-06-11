@@ -119,13 +119,16 @@ private:
 public:
 	// ctor
 	CMDRelationExternalGPDB(
-		CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-		ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
-		BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
-		CMDIndexInfoArray *md_index_info_array, IMdIdArray *mdid_triggers_array,
-		IMdIdArray *mdid_check_constraint_array, INT reject_limit,
-		BOOL is_reject_limit_in_rows, IMDId *mdid_fmt_err_table);
+		CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+		Ereldistrpolicy rel_distr_policy,
+		gpos::owner<CMDColumnArray *> mdcol_array,
+		gpos::owner<ULongPtrArray *> distr_col_array,
+		gpos::owner<IMdIdArray *> distr_opfamilies, BOOL convert_hash_to_random,
+		gpos::owner<ULongPtr2dArray *> keyset_array,
+		gpos::owner<CMDIndexInfoArray *> md_index_info_array,
+		gpos::owner<IMdIdArray *> mdid_triggers_array,
+		gpos::owner<IMdIdArray *> mdid_check_constraint_array, INT reject_limit,
+		BOOL is_reject_limit_in_rows, gpos::owner<IMDId *> mdid_fmt_err_table);
 
 	// dtor
 	~CMDRelationExternalGPDB() override;

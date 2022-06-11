@@ -73,8 +73,8 @@ public:
 
 	// helper method to copy stats on columns that are not excluded by bitset
 	void AddNotExcludedHistograms(
-		CMemoryPool *mp, CBitSet *excluded_cols,
-		UlongToHistogramMap *col_histogram_mapping) const;
+		CMemoryPool *mp, gpos::pointer<CBitSet *> excluded_cols,
+		gpos::pointer<UlongToHistogramMap *> col_histogram_mapping) const;
 
 private:
 	// hashmap from column ids to histograms
@@ -118,19 +118,17 @@ private:
 	static const ULONG no_card_est_risk_default_val;
 
 	// helper method to add histograms where the column ids have been remapped
-	static void AddHistogramsWithRemap(CMemoryPool *mp,
-									   UlongToHistogramMap *src_histograms,
-									   UlongToHistogramMap *dest_histograms,
-									   UlongToColRefMap *colref_mapping,
-									   BOOL must_exist);
+	static void AddHistogramsWithRemap(
+		CMemoryPool *mp, gpos::pointer<UlongToHistogramMap *> src_histograms,
+		gpos::pointer<UlongToHistogramMap *> dest_histograms,
+		gpos::pointer<UlongToColRefMap *> colref_mapping, BOOL must_exist);
 
 	// helper method to add width information where the column ids have been
 	// remapped
-	static void AddWidthInfoWithRemap(CMemoryPool *mp,
-									  UlongToDoubleMap *src_width,
-									  UlongToDoubleMap *dest_width,
-									  UlongToColRefMap *colref_mapping,
-									  BOOL must_exist);
+	static void AddWidthInfoWithRemap(
+		CMemoryPool *mp, gpos::pointer<UlongToDoubleMap *> src_width,
+		gpos::pointer<UlongToDoubleMap *> dest_width,
+		gpos::pointer<UlongToColRefMap *> colref_mapping, BOOL must_exist);
 
 public:
 	CStatistics &operator=(CStatistics &) = delete;
@@ -138,24 +136,29 @@ public:
 	CStatistics(const CStatistics &) = delete;
 
 	// ctor
-	CStatistics(CMemoryPool *mp, UlongToHistogramMap *col_histogram_mapping,
-				UlongToDoubleMap *colid_width_mapping, CDouble rows,
-				BOOL is_empty, ULONG num_predicates = 0);
+	CStatistics(CMemoryPool *mp,
+				gpos::owner<UlongToHistogramMap *> col_histogram_mapping,
+				gpos::owner<UlongToDoubleMap *> colid_width_mapping,
+				CDouble rows, BOOL is_empty, ULONG num_predicates = 0);
 
-	CStatistics(CMemoryPool *mp, UlongToHistogramMap *col_histogram_mapping,
-				UlongToDoubleMap *colid_width_mapping, CDouble rows,
-				BOOL is_empty, ULONG relpages, ULONG relallvisible);
+	CStatistics(CMemoryPool *mp,
+				gpos::owner<UlongToHistogramMap *> col_histogram_mapping,
+				gpos::owner<UlongToDoubleMap *> colid_width_mapping,
+				CDouble rows, BOOL is_empty, ULONG relpages,
+				ULONG relallvisible);
 
 
 	// dtor
 	~CStatistics() override;
 
-	virtual UlongToDoubleMap *CopyWidths(CMemoryPool *mp) const;
+	virtual gpos::owner<UlongToDoubleMap *> CopyWidths(CMemoryPool *mp) const;
 
-	virtual void CopyWidthsInto(CMemoryPool *mp,
-								UlongToDoubleMap *colid_width_mapping) const;
+	virtual void CopyWidthsInto(
+		CMemoryPool *mp,
+		gpos::pointer<UlongToDoubleMap *> colid_width_mapping) const;
 
-	virtual UlongToHistogramMap *CopyHistograms(CMemoryPool *mp) const;
+	virtual gpos::owner<UlongToHistogramMap *> CopyHistograms(
+		CMemoryPool *mp) const;
 
 	// actual number of rows
 	CDouble Rows() const override;
@@ -183,10 +186,11 @@ public:
 	CDouble GetSkew(ULONG colid) const override;
 
 	// what is the width in bytes of set of column id's
-	CDouble Width(ULongPtrArray *colids) const override;
+	CDouble Width(gpos::pointer<ULongPtrArray *> colids) const override;
 
 	// what is the width in bytes of set of column references
-	CDouble Width(CMemoryPool *mp, CColRefSet *colrefs) const override;
+	CDouble Width(CMemoryPool *mp,
+				  gpos::pointer<CColRefSet *> colrefs) const override;
 
 	// what is the width in bytes
 	CDouble Width() const override;
@@ -254,7 +258,8 @@ public:
 		CMemoryPool *mp) const override;
 
 	// append given stats to current object
-	void AppendStats(CMemoryPool *mp, IStatistics *stats) override;
+	void AppendStats(CMemoryPool *mp,
+					 gpos::pointer<IStatistics *> stats) override;
 
 	// set number of rebinds
 	void
@@ -266,18 +271,19 @@ public:
 	}
 
 	// copy stats
-	IStatistics *CopyStats(CMemoryPool *mp) const override;
+	gpos::owner<IStatistics *> CopyStats(CMemoryPool *mp) const override;
 
 	// return a copy of this stats object scaled by a given factor
-	IStatistics *ScaleStats(CMemoryPool *mp, CDouble factor) const override;
+	gpos::owner<IStatistics *> ScaleStats(CMemoryPool *mp,
+										  CDouble factor) const override;
 
 	// copy stats with remapped column id
-	IStatistics *CopyStatsWithRemap(CMemoryPool *mp,
-									UlongToColRefMap *colref_mapping,
-									BOOL must_exist) const override;
+	gpos::owner<IStatistics *> CopyStatsWithRemap(
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+		BOOL must_exist) const override;
 
 	// return the set of column references we have stats for
-	CColRefSet *GetColRefSet(CMemoryPool *mp) const override;
+	gpos::owner<CColRefSet *> GetColRefSet(CMemoryPool *mp) const override;
 
 	// generate the DXL representation of the statistics object
 	gpos::owner<CDXLStatsDerivedRelation *> GetDxlStatsDrvdRelation(
@@ -296,7 +302,8 @@ public:
 	virtual ULONG GetIndexUpperBoundNDVs(const CColRef *colref);
 
 	// return the column identifiers of all columns statistics maintained
-	virtual ULongPtrArray *GetColIdsWithStats(CMemoryPool *mp) const;
+	virtual gpos::owner<ULongPtrArray *> GetColIdsWithStats(
+		CMemoryPool *mp) const;
 
 	ULONG
 	GetNumberOfPredicates() const override
@@ -316,11 +323,12 @@ public:
 		return m_src_upper_bound_NDVs;
 	}
 	// create an empty statistics object
-	static CStatistics *
+	static gpos::owner<CStatistics *>
 	MakeEmptyStats(CMemoryPool *mp)
 	{
 		gpos::owner<ULongPtrArray *> colids = GPOS_NEW(mp) ULongPtrArray(mp);
-		CStatistics *stats = MakeDummyStats(mp, colids, DefaultRelationRows);
+		gpos::owner<CStatistics *> stats =
+			MakeDummyStats(mp, colids, DefaultRelationRows);
 
 		// clean up
 		colids->Release();
@@ -337,14 +345,13 @@ public:
 	}
 
 	// create a dummy statistics object
-	static CStatistics *MakeDummyStats(CMemoryPool *mp, ULongPtrArray *colids,
-									   CDouble rows);
+	static gpos::owner<CStatistics *> MakeDummyStats(
+		CMemoryPool *mp, gpos::pointer<ULongPtrArray *> colids, CDouble rows);
 
 	// create a dummy statistics object
-	static CStatistics *MakeDummyStats(CMemoryPool *mp,
-									   ULongPtrArray *col_histogram_mapping,
-									   ULongPtrArray *colid_width_mapping,
-									   CDouble rows);
+	static gpos::owner<CStatistics *> MakeDummyStats(
+		CMemoryPool *mp, gpos::pointer<ULongPtrArray *> col_histogram_mapping,
+		gpos::pointer<ULongPtrArray *> colid_width_mapping, CDouble rows);
 
 	// default column width
 	static const CDouble DefaultColumnWidth;
@@ -367,14 +374,14 @@ public:
 							BOOL IsLASJ);
 
 	// add upper bound ndvs information for a given set of columns
-	static void CreateAndInsertUpperBoundNDVs(CMemoryPool *mp,
-											  CStatistics *stats,
-											  ULongPtrArray *colids,
-											  CDouble rows);
+	static void CreateAndInsertUpperBoundNDVs(
+		CMemoryPool *mp, gpos::pointer<CStatistics *> stats,
+		gpos::pointer<ULongPtrArray *> colids, CDouble rows);
 
 	// cap the total number of distinct values (NDV) in buckets to the number of rows
-	static void CapNDVs(CDouble rows,
-						UlongToHistogramMap *col_histogram_mapping);
+	static void CapNDVs(
+		CDouble rows,
+		gpos::pointer<UlongToHistogramMap *> col_histogram_mapping);
 };	// class CStatistics
 
 }  // namespace gpnaucrates

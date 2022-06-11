@@ -40,7 +40,8 @@ CLogicalSelect::CLogicalSelect(CMemoryPool *mp)
 	m_phmPexprPartPred = GPOS_NEW(mp) ExprPredToExprPredPartMap(mp);
 }
 
-CLogicalSelect::CLogicalSelect(CMemoryPool *mp, CTableDescriptor *ptabdesc)
+CLogicalSelect::CLogicalSelect(CMemoryPool *mp,
+							   gpos::pointer<CTableDescriptor *> ptabdesc)
 	: CLogicalUnary(mp), m_ptabdesc(ptabdesc)
 {
 	m_phmPexprPartPred = GPOS_NEW(mp) ExprPredToExprPredPartMap(mp);
@@ -58,7 +59,7 @@ CLogicalSelect::~CLogicalSelect()
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalSelect::DeriveOutputColumns(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl)
 {
@@ -74,7 +75,7 @@ CLogicalSelect::DeriveOutputColumns(CMemoryPool *,	// mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalSelect::DeriveKeyCollection(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl) const
 {
@@ -90,7 +91,7 @@ CLogicalSelect::DeriveKeyCollection(CMemoryPool *,	// mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalSelect::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -122,7 +123,7 @@ CLogicalSelect::DeriveMaxCard(CMemoryPool *,  // mp
 							  CExpressionHandle &exprhdl) const
 {
 	// in case of a false condition or a contradiction, maxcard should be zero
-	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(1);
+	gpos::pointer<CExpression *> pexprScalar = exprhdl.PexprScalarRepChild(1);
 	if ((nullptr != pexprScalar &&
 		 (CUtils::FScalarConstFalse(pexprScalar) ||
 		  CUtils::FScalarConstBoolNull(pexprScalar))) ||
@@ -146,7 +147,7 @@ CLogicalSelect::DeriveMaxCard(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 gpos::owner<IStatistics *>
 CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 IStatisticsArray *stats_ctxt) const
+							 gpos::pointer<IStatisticsArray *> stats_ctxt) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	gpos::pointer<IStatistics *> child_stats = exprhdl.Pstats(0);
@@ -159,7 +160,8 @@ CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// remove implied predicates from selection condition to avoid cardinality under-estimation
-	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(1 /*child_index*/);
+	gpos::pointer<CExpression *> pexprScalar =
+		exprhdl.PexprScalarRepChild(1 /*child_index*/);
 	gpos::owner<CExpression *> pexprPredicate =
 		CPredicateUtils::PexprRemoveImpliedConjuncts(mp, pexprScalar, exprhdl);
 
@@ -224,7 +226,7 @@ CLogicalSelect::PexprPartPred(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// get partition keys
-	CPartInfo *ppartinfo = exprhdl.DerivePartitionInfo();
+	gpos::pointer<CPartInfo *> ppartinfo = exprhdl.DerivePartitionInfo();
 	GPOS_ASSERT(nullptr != ppartinfo);
 
 	// we assume that the select is right on top of the dynamic get, so there
@@ -236,7 +238,8 @@ CLogicalSelect::PexprPartPred(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// check if a corresponding predicate has already been cached
-	CExpression *pexprPredOnPartKey = m_phmPexprPartPred->Find(pexprScalar);
+	gpos::owner<CExpression *> pexprPredOnPartKey =
+		m_phmPexprPartPred->Find(pexprScalar);
 	if (pexprPredOnPartKey != nullptr)
 	{
 		// predicate on partition key found in cache
@@ -244,7 +247,8 @@ CLogicalSelect::PexprPartPred(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		return pexprPredOnPartKey;
 	}
 
-	CPartKeysArray *pdrgppartkeys = ppartinfo->Pdrgppartkeys(0 /*ulPos*/);
+	gpos::pointer<CPartKeysArray *> pdrgppartkeys =
+		ppartinfo->Pdrgppartkeys(0 /*ulPos*/);
 	const ULONG ulKeySets = pdrgppartkeys->Size();
 	for (ULONG ul = 0; nullptr == pexprPredOnPartKey && ul < ulKeySets; ul++)
 	{

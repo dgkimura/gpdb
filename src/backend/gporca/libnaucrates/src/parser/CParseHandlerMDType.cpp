@@ -330,7 +330,7 @@ CParseHandlerMDType::EndElement(const XMLCh *const,	 // element_uri,
 		// TODO:  - Jan 30, 2012; add support for other types of mdids
 
 		gpos::pointer<const CMDIdGPDB *> pmdidGPDB =
-			CMDIdGPDB::CastMdid(m_mdid);
+			gpos::dyn_cast<CMDIdGPDB>(m_mdid);
 
 		switch (pmdidGPDB->Oid())
 		{

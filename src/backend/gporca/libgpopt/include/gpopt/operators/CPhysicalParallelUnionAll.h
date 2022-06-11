@@ -20,8 +20,9 @@ private:
 	gpos::owner<CDistributionSpecArray *> const m_pdrgpds;
 
 public:
-	CPhysicalParallelUnionAll(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-							  CColRef2dArray *pdrgpdrgpcrInput);
+	CPhysicalParallelUnionAll(CMemoryPool *mp,
+							  gpos::owner<CColRefArray *> pdrgpcrOutput,
+							  gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput);
 
 	EOperatorId Eopid() const override;
 
@@ -30,13 +31,14 @@ public:
 	gpos::owner<CDistributionSpec *> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	CEnfdDistribution::EDistributionMatching Edm(
-		gpos::pointer<CReqdPropPlan *>,	 // prppInput
-		ULONG,							 // child_index
-		CDrvdPropArray *,				 //pdrgpdpCtxt
-		ULONG							 // ulOptReq
+		gpos::pointer<CReqdPropPlan *>,	  // prppInput
+		ULONG,							  // child_index
+		gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt
+		ULONG							  // ulOptReq
 		) override;
 
 	~CPhysicalParallelUnionAll() override;

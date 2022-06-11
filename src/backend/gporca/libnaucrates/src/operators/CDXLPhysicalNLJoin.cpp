@@ -174,9 +174,11 @@ CDXLPhysicalNLJoin::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	GPOS_ASSERT(EdxlnljIndexSentinel == dxlnode->Arity());
 	GPOS_ASSERT(EdxljtSentinel > GetJoinType());
 
-	CDXLNode *dxlnode_join_filter = (*dxlnode)[EdxlnljIndexJoinFilter];
-	CDXLNode *dxlnode_left = (*dxlnode)[EdxlnljIndexLeftChild];
-	CDXLNode *dxlnode_right = (*dxlnode)[EdxlnljIndexRightChild];
+	gpos::pointer<CDXLNode *> dxlnode_join_filter =
+		(*dxlnode)[EdxlnljIndexJoinFilter];
+	gpos::pointer<CDXLNode *> dxlnode_left = (*dxlnode)[EdxlnljIndexLeftChild];
+	gpos::pointer<CDXLNode *> dxlnode_right =
+		(*dxlnode)[EdxlnljIndexRightChild];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarJoinFilter ==
@@ -200,7 +202,7 @@ CDXLPhysicalNLJoin::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 void
 CDXLPhysicalNLJoin::SetNestLoopParamsColRefs(
-	CDXLColRefArray *nest_params_col_refs)
+	gpos::owner<CDXLColRefArray *> nest_params_col_refs)
 {
 	m_nest_params_col_refs = nest_params_col_refs;
 }

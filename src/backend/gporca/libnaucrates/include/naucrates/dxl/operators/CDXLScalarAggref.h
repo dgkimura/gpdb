@@ -81,9 +81,10 @@ public:
 	CDXLScalarAggref(const CDXLScalarAggref &) = delete;
 
 	// ctor/dtor
-	CDXLScalarAggref(CMemoryPool *mp, IMDId *agg_mdid, IMDId *resolved_rettype,
-					 BOOL is_distinct, EdxlAggrefStage agg_stage,
-					 EdxlAggrefKind aggkind, ULongPtrArray *argtypes);
+	CDXLScalarAggref(CMemoryPool *mp, gpos::owner<IMDId *> agg_mdid,
+					 gpos::owner<IMDId *> resolved_rettype, BOOL is_distinct,
+					 EdxlAggrefStage agg_stage, EdxlAggrefKind aggkind,
+					 gpos::owner<ULongPtrArray *> argtypes);
 
 	~CDXLScalarAggref() override;
 

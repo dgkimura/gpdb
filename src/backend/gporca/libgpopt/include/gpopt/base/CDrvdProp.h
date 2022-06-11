@@ -93,7 +93,7 @@ public:
 
 	// derivation function
 	virtual void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						CDrvdPropCtxt *pdppropctxt) = 0;
+						gpos::pointer<CDrvdPropCtxt *> pdppropctxt) = 0;
 
 	// check for satisfying required plan properties
 	virtual BOOL FSatisfies(

@@ -41,7 +41,7 @@ public:
 	CDXLScalarConstValue(const CDXLScalarConstValue &) = delete;
 
 	// ctor/dtor
-	CDXLScalarConstValue(CMemoryPool *mp, CDXLDatum *dxl_datum);
+	CDXLScalarConstValue(CMemoryPool *mp, gpos::owner<CDXLDatum *> dxl_datum);
 
 	~CDXLScalarConstValue() override;
 

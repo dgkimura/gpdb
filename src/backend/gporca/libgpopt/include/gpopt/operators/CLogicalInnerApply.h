@@ -37,7 +37,8 @@ public:
 	explicit CLogicalInnerApply(CMemoryPool *mp);
 
 	// ctor
-	CLogicalInnerApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
+	CLogicalInnerApply(CMemoryPool *mp,
+					   gpos::owner<CColRefArray *> pdrgpcrInner,
 					   EOperatorId eopidOriginSubq);
 
 	// dtor
@@ -59,7 +60,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -67,7 +68,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &exprhdl) override
 	{
 		GPOS_ASSERT(3 == exprhdl.Arity());
@@ -76,7 +77,7 @@ public:
 	}
 
 	// derive not nullable columns
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	DeriveNotNullColumns(CMemoryPool *mp,
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -88,7 +89,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -100,7 +101,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------

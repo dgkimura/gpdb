@@ -77,7 +77,7 @@ public:
 	};
 
 	// md id of cache object
-	virtual IMDId *MDId() const = 0;
+	virtual gpos::pointer<IMDId *> MDId() const = 0;
 
 	// cache object name
 	virtual CMDName Mdname() const = 0;

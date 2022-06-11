@@ -35,8 +35,9 @@ private:
 public:
 	// ctors
 	explicit CPhysicalTableScan(CMemoryPool *mp);
-	CPhysicalTableScan(CMemoryPool *, const CName *, CTableDescriptor *,
-					   CColRefArray *);
+	CPhysicalTableScan(CMemoryPool *, const CName *,
+					   gpos::owner<CTableDescriptor *>,
+					   gpos::owner<CColRefArray *>);
 
 	// ident accessors
 	EOperatorId
@@ -56,7 +57,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::pointer<COperator *>) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -79,10 +80,10 @@ public:
 
 	// statistics derivation during costing
 	IStatistics *
-	PstatsDerive(CMemoryPool *,					  // mp
-				 CExpressionHandle &,			  // exprhdl
-				 gpos::pointer<CReqdPropPlan *>,  // prpplan
-				 IStatisticsArray *				  //stats_ctxt
+	PstatsDerive(CMemoryPool *,						// mp
+				 CExpressionHandle &,				// exprhdl
+				 gpos::pointer<CReqdPropPlan *>,	// prpplan
+				 gpos::pointer<IStatisticsArray *>	//stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(

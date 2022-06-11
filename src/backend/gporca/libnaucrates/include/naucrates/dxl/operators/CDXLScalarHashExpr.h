@@ -41,7 +41,7 @@ public:
 	CDXLScalarHashExpr(CDXLScalarHashExpr &) = delete;
 
 	// ctor/dtor
-	CDXLScalarHashExpr(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarHashExpr(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type);
 
 	~CDXLScalarHashExpr() override;
 

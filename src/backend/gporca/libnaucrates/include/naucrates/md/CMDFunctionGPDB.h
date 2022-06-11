@@ -93,11 +93,12 @@ public:
 	CMDFunctionGPDB(const CMDFunctionGPDB &) = delete;
 
 	// ctor/dtor
-	CMDFunctionGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-					IMDId *result_type_mdid, IMdIdArray *mdid_array,
-					BOOL ReturnsSet, EFuncStbl func_stability,
-					EFuncDataAcc func_data_access, BOOL is_strict,
-					BOOL is_ndv_preserving, BOOL is_allowed_for_PS);
+	CMDFunctionGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+					gpos::owner<IMDId *> result_type_mdid,
+					gpos::owner<IMdIdArray *> mdid_array, BOOL ReturnsSet,
+					EFuncStbl func_stability, EFuncDataAcc func_data_access,
+					BOOL is_strict, BOOL is_ndv_preserving,
+					BOOL is_allowed_for_PS);
 
 	~CMDFunctionGPDB() override;
 

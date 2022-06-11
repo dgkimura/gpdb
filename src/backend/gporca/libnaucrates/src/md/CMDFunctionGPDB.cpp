@@ -30,17 +30,18 @@ using namespace gpdxl;
 //		Constructs a metadata func
 //
 //---------------------------------------------------------------------------
-CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-								 IMDId *result_type_mdid,
-								 IMdIdArray *mdid_array, BOOL ReturnsSet,
-								 EFuncStbl func_stability,
+CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+								 CMDName *mdname,
+								 gpos::owner<IMDId *> result_type_mdid,
+								 gpos::owner<IMdIdArray *> mdid_array,
+								 BOOL ReturnsSet, EFuncStbl func_stability,
 								 EFuncDataAcc func_data_access, BOOL is_strict,
 								 BOOL is_ndv_preserving, BOOL is_allowed_for_PS)
 	: m_mp(mp),
-	  m_mdid(mdid),
+	  m_mdid(std::move(mdid)),
 	  m_mdname(mdname),
-	  m_mdid_type_result(result_type_mdid),
-	  m_mdid_types_array(mdid_array),
+	  m_mdid_type_result(std::move(result_type_mdid)),
+	  m_mdid_types_array(std::move(mdid_array)),
 	  m_returns_set(ReturnsSet),
 	  m_func_stability(func_stability),
 	  m_func_data_access(func_data_access),
@@ -186,7 +187,7 @@ CMDFunctionGPDB::GetOutputArgTypeArrayStr() const
 	const ULONG len = m_mdid_types_array->Size();
 	for (ULONG ul = 0; ul < len; ul++)
 	{
-		IMDId *mdid = (*m_mdid_types_array)[ul];
+		gpos::pointer<IMDId *> mdid = (*m_mdid_types_array)[ul];
 		if (ul == len - 1)
 		{
 			// last element: do not print a comma

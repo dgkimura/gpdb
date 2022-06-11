@@ -44,7 +44,7 @@ public:
 
 	// ctors
 	CDatumInt4GPDB(CSystemId sysid, INT val, BOOL is_null = false);
-	CDatumInt4GPDB(IMDId *mdid, INT val, BOOL is_null = false);
+	CDatumInt4GPDB(gpos::owner<IMDId *> mdid, INT val, BOOL is_null = false);
 
 	// dtor
 	~CDatumInt4GPDB() override;

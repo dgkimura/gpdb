@@ -63,7 +63,7 @@ CLogicalLeftAntiSemiJoin::MaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalLeftAntiSemiJoin::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -87,7 +87,7 @@ CLogicalLeftAntiSemiJoin::PxfsCandidates(CMemoryPool *mp) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalLeftAntiSemiJoin::DeriveOutputColumns(CMemoryPool *,  // mp
 											  CExpressionHandle &exprhdl)
 {
@@ -105,7 +105,7 @@ CLogicalLeftAntiSemiJoin::DeriveOutputColumns(CMemoryPool *,  // mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalLeftAntiSemiJoin::DeriveKeyCollection(CMemoryPool *,  // mp
 											  CExpressionHandle &exprhdl) const
 {
@@ -120,15 +120,15 @@ CLogicalLeftAntiSemiJoin::DeriveKeyCollection(CMemoryPool *,  // mp
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
-CLogicalLeftAntiSemiJoin::PstatsDerive(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   IStatisticsArray *  // not used
+gpos::owner<IStatistics *>
+CLogicalLeftAntiSemiJoin::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<IStatisticsArray *>  // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *outer_stats = exprhdl.Pstats(0);
-	IStatistics *inner_side_stats = exprhdl.Pstats(1);
+	gpos::pointer<IStatistics *> outer_stats = exprhdl.Pstats(0);
+	gpos::pointer<IStatistics *> inner_side_stats = exprhdl.Pstats(1);
 	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExprHandle(mp, exprhdl,
 														true /*LASJ*/);

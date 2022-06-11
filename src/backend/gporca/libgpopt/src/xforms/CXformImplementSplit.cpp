@@ -68,14 +68,16 @@ CXformImplementSplit::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementSplit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformImplementSplit::Transform(gpos::pointer<CXformContext *> pxfctxt,
+								gpos::pointer<CXformResult *> pxfres,
+								gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalSplit *popSplit = CLogicalSplit::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalSplit *> popSplit =
+		gpos::dyn_cast<CLogicalSplit>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
@@ -97,13 +99,14 @@ CXformImplementSplit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pexprProjList->AddRef();
 
 	// create physical Split
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
-		mp,
-		GPOS_NEW(mp) CPhysicalSplit(mp, pdrgpcrDelete, pdrgpcrInsert, pcrCtid,
-									pcrSegmentId, pcrAction, pcrTupleOid),
-		pexprChild, pexprProjList);
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
+		CExpression(mp,
+					GPOS_NEW(mp) CPhysicalSplit(
+						mp, std::move(pdrgpcrDelete), std::move(pdrgpcrInsert),
+						pcrCtid, pcrSegmentId, pcrAction, pcrTupleOid),
+					pexprChild, pexprProjList);
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 // EOF

@@ -11,8 +11,8 @@
 using namespace gpopt;
 
 CDistributionSpecHashedNoOp::CDistributionSpecHashedNoOp(
-	CExpressionArray *pdrgpexpr)
-	: CDistributionSpecHashed(pdrgpexpr, true)
+	gpos::owner<CExpressionArray *> pdrgpexpr)
+	: CDistributionSpecHashed(std::move(pdrgpexpr), true)
 {
 }
 
@@ -30,15 +30,15 @@ CDistributionSpecHashedNoOp::Matches(
 }
 
 void
-CDistributionSpecHashedNoOp::AppendEnforcers(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl,
-											 gpos::pointer<CReqdPropPlan *>,
-											 CExpressionArray *pdrgpexpr,
-											 CExpression *pexpr)
+CDistributionSpecHashedNoOp::AppendEnforcers(
+	CMemoryPool *mp, CExpressionHandle &exprhdl, gpos::pointer<CReqdPropPlan *>,
+	gpos::pointer<CExpressionArray *> pdrgpexpr,
+	gpos::pointer<CExpression *> pexpr)
 {
-	CDrvdProp *pdp = exprhdl.Pdp();
-	CDistributionSpec *pdsChild = CDrvdPropPlan::Pdpplan(pdp)->Pds();
-	CDistributionSpecHashed *pdsChildHashed =
+	gpos::pointer<CDrvdProp *> pdp = exprhdl.Pdp();
+	gpos::pointer<CDistributionSpec *> pdsChild =
+		gpos::dyn_cast<CDrvdPropPlan>(pdp)->Pds();
+	gpos::pointer<CDistributionSpecHashed *> pdsChildHashed =
 		dynamic_cast<CDistributionSpecHashed *>(pdsChild);
 
 	if (nullptr == pdsChildHashed)
@@ -49,10 +49,12 @@ CDistributionSpecHashedNoOp::AppendEnforcers(CMemoryPool *mp,
 	gpos::owner<CExpressionArray *> pdrgpexprNoOpRedistributionColumns =
 		pdsChildHashed->Pdrgpexpr();
 	pdrgpexprNoOpRedistributionColumns->AddRef();
-	gpos::owner<CDistributionSpecHashedNoOp *> pdsNoOp = GPOS_NEW(mp)
-		CDistributionSpecHashedNoOp(pdrgpexprNoOpRedistributionColumns);
+	gpos::owner<CDistributionSpecHashedNoOp *> pdsNoOp =
+		GPOS_NEW(mp) CDistributionSpecHashedNoOp(
+			std::move(pdrgpexprNoOpRedistributionColumns));
 	pexpr->AddRef();
 	gpos::owner<CExpression *> pexprMotion = GPOS_NEW(mp) CExpression(
-		mp, GPOS_NEW(mp) CPhysicalMotionHashDistribute(mp, pdsNoOp), pexpr);
-	pdrgpexpr->Append(pexprMotion);
+		mp, GPOS_NEW(mp) CPhysicalMotionHashDistribute(mp, std::move(pdsNoOp)),
+		pexpr);
+	pdrgpexpr->Append(std::move(pexprMotion));
 }

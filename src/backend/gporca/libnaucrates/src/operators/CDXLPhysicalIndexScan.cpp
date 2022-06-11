@@ -29,11 +29,12 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexScan::CDXLPhysicalIndexScan(
-	CMemoryPool *mp, CDXLTableDescr *table_descr,
-	CDXLIndexDescr *dxl_index_descr, EdxlIndexScanDirection idx_scan_direction)
+	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr,
+	gpos::owner<CDXLIndexDescr *> dxl_index_descr,
+	EdxlIndexScanDirection idx_scan_direction)
 	: CDXLPhysical(mp),
-	  m_dxl_table_descr(table_descr),
-	  m_dxl_index_descr(dxl_index_descr),
+	  m_dxl_table_descr(std::move(table_descr)),
+	  m_dxl_index_descr(std::move(dxl_index_descr)),
 	  m_index_scan_dir(idx_scan_direction)
 {
 	GPOS_ASSERT(nullptr != m_dxl_table_descr);
@@ -189,7 +190,8 @@ CDXLPhysicalIndexScan::AssertValid(gpos::pointer<const CDXLNode *> node,
 	GPOS_ASSERT(nullptr != m_dxl_table_descr->MdName());
 	GPOS_ASSERT(m_dxl_table_descr->MdName()->GetMDName()->IsValid());
 
-	CDXLNode *index_cond_dxlnode = (*node)[EdxlisIndexCondition];
+	gpos::pointer<CDXLNode *> index_cond_dxlnode =
+		(*node)[EdxlisIndexCondition];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarIndexCondList ==

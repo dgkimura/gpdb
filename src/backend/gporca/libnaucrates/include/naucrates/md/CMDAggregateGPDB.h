@@ -68,10 +68,11 @@ public:
 	CMDAggregateGPDB(const CMDAggregateGPDB &) = delete;
 
 	// ctor
-	CMDAggregateGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-					 IMDId *result_type_mdid,
-					 IMDId *intermediate_result_type_mdid, BOOL is_ordered_agg,
-					 BOOL is_splittable, BOOL is_hash_agg_capable);
+	CMDAggregateGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+					 CMDName *mdname, gpos::owner<IMDId *> result_type_mdid,
+					 gpos::owner<IMDId *> intermediate_result_type_mdid,
+					 BOOL is_ordered_agg, BOOL is_splittable,
+					 BOOL is_hash_agg_capable);
 
 	//dtor
 	~CMDAggregateGPDB() override;

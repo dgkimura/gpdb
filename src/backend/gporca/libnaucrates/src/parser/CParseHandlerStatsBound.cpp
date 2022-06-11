@@ -13,6 +13,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerStatsBound.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -76,7 +78,7 @@ CParseHandlerStatsBound::StartElement(const XMLCh *const,  // element_uri,
 		GPOS_ASSERT(nullptr == m_dxl_datum);
 
 		// translate the datum and add it to the datum array
-		CDXLDatum *dxl_datum = CDXLOperatorFactory::GetDatumVal(
+		gpos::owner<CDXLDatum *> dxl_datum = CDXLOperatorFactory::GetDatumVal(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenDatum);
 		m_dxl_datum = dxl_datum;
 

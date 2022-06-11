@@ -35,16 +35,16 @@ CDXLPhysicalAppend::CDXLPhysicalAppend(CMemoryPool *mp, BOOL fIsTarget,
 {
 }
 
-CDXLPhysicalAppend::CDXLPhysicalAppend(CMemoryPool *mp, BOOL fIsTarget,
-									   BOOL fIsZapped, ULONG scan_id,
-									   CDXLTableDescr *dxl_table_desc,
-									   ULongPtrArray *selector_ids)
+CDXLPhysicalAppend::CDXLPhysicalAppend(
+	CMemoryPool *mp, BOOL fIsTarget, BOOL fIsZapped, ULONG scan_id,
+	gpos::owner<CDXLTableDescr *> dxl_table_desc,
+	gpos::owner<ULongPtrArray *> selector_ids)
 	: CDXLPhysical(mp),
 	  m_used_in_upd_del(fIsTarget),
 	  m_is_zapped(fIsZapped),
 	  m_scan_id(scan_id),
-	  m_dxl_table_descr(dxl_table_desc),
-	  m_selector_ids(selector_ids)
+	  m_dxl_table_descr(std::move(dxl_table_desc)),
+	  m_selector_ids(std::move(selector_ids))
 {
 }
 
@@ -183,7 +183,7 @@ CDXLPhysicalAppend::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG ulChildren = dxlnode->Arity();
 	for (ULONG ul = EdxlappendIndexFirstChild; ul < ulChildren; ul++)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypePhysical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

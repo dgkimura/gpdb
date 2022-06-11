@@ -93,7 +93,7 @@ public:
 	CTableDescriptor(const CTableDescriptor &) = delete;
 
 	// ctor
-	CTableDescriptor(CMemoryPool *, IMDId *mdid, const CName &,
+	CTableDescriptor(CMemoryPool *, gpos::owner<IMDId *> mdid, const CName &,
 					 BOOL convert_hash_to_random,
 					 IMDRelation::Ereldistrpolicy rel_distr_policy,
 					 IMDRelation::Erelstoragetype erelstoragetype,
@@ -103,7 +103,7 @@ public:
 	~CTableDescriptor() override;
 
 	// add a column to the table descriptor
-	void AddColumn(CColumnDescriptor *);
+	void AddColumn(gpos::owner<CColumnDescriptor *>);
 
 	// add the column at the specified position to the list of distribution columns
 	void AddDistributionColumn(ULONG ulPos, IMDId *opfamily);
@@ -112,7 +112,7 @@ public:
 	void AddPartitionColumn(ULONG ulPos);
 
 	// add a keyset
-	BOOL FAddKeySet(CBitSet *pbs);
+	BOOL FAddKeySet(gpos::owner<CBitSet *> pbs);
 
 	// accessors
 	ULONG ColumnCount() const;

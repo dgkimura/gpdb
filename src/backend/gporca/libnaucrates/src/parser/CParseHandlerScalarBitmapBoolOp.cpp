@@ -13,6 +13,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarBitmapBoolOp.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarBitmapBoolOp.h"
@@ -77,12 +79,13 @@ CParseHandlerScalarBitmapBoolOp::StartElement(
 				->GetBuffer());
 	}
 
-	IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId,
-		token_type);
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(
-		m_mp,
-		GPOS_NEW(m_mp) CDXLScalarBitmapBoolOp(m_mp, mdid, bitmap_bool_dxlop));
+	gpos::owner<IMDId *> mdid =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId,
+			token_type);
+	m_dxl_node = GPOS_NEW(m_mp)
+		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarBitmapBoolOp(
+						   m_mp, std::move(mdid), bitmap_bool_dxlop));
 
 	// install parse handlers for children
 	CParseHandlerBase *right_child_parse_handler =

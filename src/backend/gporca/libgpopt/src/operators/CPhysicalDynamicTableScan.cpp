@@ -35,13 +35,15 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalDynamicTableScan::CPhysicalDynamicTableScan(
-	CMemoryPool *mp, const CName *pnameAlias, CTableDescriptor *ptabdesc,
-	ULONG ulOriginOpId, ULONG scan_id, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
-	ColRefToUlongMapArray *root_col_mapping_per_part)
-	: CPhysicalDynamicScan(mp, ptabdesc, ulOriginOpId, pnameAlias, scan_id,
-						   pdrgpcrOutput, pdrgpdrgpcrParts, partition_mdids,
-						   root_col_mapping_per_part)
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId, ULONG scan_id,
+	CColRefArray *pdrgpcrOutput, gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
+	gpos::owner<IMdIdArray *> partition_mdids,
+	gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part)
+	: CPhysicalDynamicScan(mp, std::move(ptabdesc), ulOriginOpId, pnameAlias,
+						   scan_id, pdrgpcrOutput, std::move(pdrgpdrgpcrParts),
+						   std::move(partition_mdids),
+						   std::move(root_col_mapping_per_part))
 {
 }
 
@@ -54,7 +56,7 @@ CPhysicalDynamicTableScan::CPhysicalDynamicTableScan(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDynamicTableScan::Matches(COperator *pop) const
+CPhysicalDynamicTableScan::Matches(gpos::pointer<COperator *> pop) const
 {
 	return CUtils::FMatchDynamicScan(this, pop);
 }
@@ -67,11 +69,11 @@ CPhysicalDynamicTableScan::Matches(COperator *pop) const
 //		Statistics derivation during costing
 //
 //---------------------------------------------------------------------------
-IStatistics *
-CPhysicalDynamicTableScan::PstatsDerive(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										CReqdPropPlan *prpplan,
-										IStatisticsArray *	// stats_ctxt
+gpos::owner<IStatistics *>
+CPhysicalDynamicTableScan::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CReqdPropPlan *> prpplan,
+	gpos::pointer<IStatisticsArray *>  // stats_ctxt
 ) const
 {
 	GPOS_ASSERT(nullptr != prpplan);
@@ -81,7 +83,7 @@ CPhysicalDynamicTableScan::PstatsDerive(CMemoryPool *mp,
 }
 
 
-CPartitionPropagationSpec *
+gpos::owner<CPartitionPropagationSpec *>
 CPhysicalDynamicTableScan::PppsDerive(CMemoryPool *mp,
 									  CExpressionHandle &) const
 {

@@ -48,11 +48,12 @@ CScalarIdent::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIdent::Matches(COperator *pop) const
+CScalarIdent::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarIdent *popIdent = CScalarIdent::PopConvert(pop);
+		gpos::pointer<CScalarIdent *> popIdent =
+			gpos::dyn_cast<CScalarIdent>(pop);
 
 		// match if column reference is same
 		return Pcr() == popIdent->Pcr();
@@ -86,9 +87,9 @@ CScalarIdent::FInputOrderSensitive() const
 //
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
-CScalarIdent::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										 UlongToColRefMap *colref_mapping,
-										 BOOL must_exist)
+CScalarIdent::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
 	ULONG id = m_pcr->Id();
 	CColRef *colref = colref_mapping->Find(&id);
@@ -122,7 +123,7 @@ CScalarIdent::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarIdent::MdidType() const
 {
 	return m_pcr->RetrieveType()->MDId();
@@ -170,7 +171,8 @@ CScalarIdent::FCastedScId(gpos::pointer<CExpression *> pexpr, CColRef *colref)
 		return false;
 	}
 
-	CScalarIdent *pScIdent = CScalarIdent::PopConvert((*pexpr)[0]->Pop());
+	gpos::pointer<CScalarIdent *> pScIdent =
+		gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
 
 	return colref == pScIdent->Pcr();
 }
@@ -193,8 +195,10 @@ CScalarIdent::FAllowedFuncScId(gpos::pointer<CExpression *> pexpr)
 		pexpr->Arity() > 0 &&
 		COperator::EopScalarIdent == (*pexpr)[0]->Pop()->Eopid())
 	{
-		CScalarFunc *func = CScalarFunc::PopConvert(pexpr->Pop());
-		CMDIdGPDB *funcmdid = CMDIdGPDB::CastMdid(func->FuncMdId());
+		gpos::pointer<CScalarFunc *> func =
+			gpos::dyn_cast<CScalarFunc>(pexpr->Pop());
+		gpos::pointer<CMDIdGPDB *> funcmdid =
+			gpos::dyn_cast<CMDIdGPDB>(func->FuncMdId());
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 		return md_accessor->RetrieveFunc(funcmdid)->IsAllowedForPS();
 	}
@@ -213,7 +217,8 @@ CScalarIdent::FAllowedFuncScId(gpos::pointer<CExpression *> pexpr,
 		return false;
 	}
 
-	CScalarIdent *pScIdent = CScalarIdent::PopConvert((*pexpr)[0]->Pop());
+	gpos::pointer<CScalarIdent *> pScIdent =
+		gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
 
 	return colref == pScIdent->Pcr();
 }

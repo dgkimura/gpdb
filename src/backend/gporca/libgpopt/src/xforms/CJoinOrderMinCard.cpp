@@ -35,10 +35,11 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CJoinOrderMinCard::CJoinOrderMinCard(CMemoryPool *mp,
-									 CExpressionArray *pdrgpexprComponents,
-									 CExpressionArray *pdrgpexprConjuncts)
-	: CJoinOrder(mp, pdrgpexprComponents, pdrgpexprConjuncts,
+CJoinOrderMinCard::CJoinOrderMinCard(
+	CMemoryPool *mp, gpos::owner<CExpressionArray *> pdrgpexprComponents,
+	gpos::owner<CExpressionArray *> pdrgpexprConjuncts)
+	: CJoinOrder(mp, std::move(pdrgpexprComponents),
+				 std::move(pdrgpexprConjuncts),
 				 true /* m_include_loj_childs */),
 	  m_pcompResult(nullptr)
 {

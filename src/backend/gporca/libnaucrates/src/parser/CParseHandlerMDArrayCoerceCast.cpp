@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMDArrayCoerceCast.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -56,21 +58,25 @@ CParseHandlerMDArrayCoerceCast::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_fun_name);
 
 	// parse cast properties
-	IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-		EdxltokenGPDBArrayCoerceCast);
+	gpos::owner<IMDId *> mdid =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenGPDBArrayCoerceCast);
 
-	IMDId *mdid_src = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBCastSrcType, EdxltokenGPDBArrayCoerceCast);
+	gpos::owner<IMDId *> mdid_src =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBCastSrcType, EdxltokenGPDBArrayCoerceCast);
 
-	IMDId *mdid_dest = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBCastDestType, EdxltokenGPDBArrayCoerceCast);
+	gpos::owner<IMDId *> mdid_dest =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBCastDestType, EdxltokenGPDBArrayCoerceCast);
 
-	IMDId *mdid_cast_func = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBCastFuncId, EdxltokenGPDBArrayCoerceCast);
+	gpos::owner<IMDId *> mdid_cast_func =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBCastFuncId, EdxltokenGPDBArrayCoerceCast);
 
 	// parse whether func returns a set
 	BOOL is_binary_coercible =
@@ -102,9 +108,10 @@ CParseHandlerMDArrayCoerceCast::StartElement(
 		EdxltokenGPDBArrayCoerceCast);
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDArrayCoerceCastGPDB(
-		m_mp, mdid, mdname, mdid_src, mdid_dest, is_binary_coercible,
-		mdid_cast_func, coerce_path_type, type_modifier, is_explicit,
-		dxl_coercion_form, location);
+		m_mp, std::move(mdid), mdname, std::move(mdid_src),
+		std::move(mdid_dest), is_binary_coercible, std::move(mdid_cast_func),
+		coerce_path_type, type_modifier, is_explicit, dxl_coercion_form,
+		location);
 }
 
 // invoked by Xerces to process a closing tag

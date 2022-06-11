@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarNullIf.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -58,16 +60,18 @@ CParseHandlerScalarNullIf::StartElement(const XMLCh *const,	 // element_uri,
 				   str->GetBuffer());
 	}
 
-	IMDId *mdid_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
-		EdxltokenScalarNullIf);
-	IMDId *mdid_return_type =
+	gpos::owner<IMDId *> mdid_op =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
+			EdxltokenScalarNullIf);
+	gpos::owner<IMDId *> mdid_return_type =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId,
 			EdxltokenScalarNullIf);
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(
-		m_mp, GPOS_NEW(m_mp) CDXLScalarNullIf(m_mp, mdid_op, mdid_return_type));
+		m_mp, GPOS_NEW(m_mp) CDXLScalarNullIf(m_mp, std::move(mdid_op),
+											  std::move(mdid_return_type)));
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance

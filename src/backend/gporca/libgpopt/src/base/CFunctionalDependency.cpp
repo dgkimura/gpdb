@@ -29,9 +29,9 @@ FORCE_GENERATE_DBGSTR(CFunctionalDependency);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CFunctionalDependency::CFunctionalDependency(CColRefSet *pcrsKey,
-											 CColRefSet *pcrsDetermined)
-	: m_pcrsKey(pcrsKey), m_pcrsDetermined(pcrsDetermined)
+CFunctionalDependency::CFunctionalDependency(
+	gpos::owner<CColRefSet *> pcrsKey, gpos::owner<CColRefSet *> pcrsDetermined)
+	: m_pcrsKey(std::move(pcrsKey)), m_pcrsDetermined(std::move(pcrsDetermined))
 {
 	GPOS_ASSERT(0 < m_pcrsKey->Size());
 	GPOS_ASSERT(0 < m_pcrsDetermined->Size());
@@ -62,7 +62,7 @@ CFunctionalDependency::~CFunctionalDependency()
 //
 //---------------------------------------------------------------------------
 BOOL
-CFunctionalDependency::FIncluded(CColRefSet *pcrs) const
+CFunctionalDependency::FIncluded(gpos::pointer<CColRefSet *> pcrs) const
 {
 	return pcrs->ContainsAll(m_pcrsKey) && pcrs->ContainsAll(m_pcrsDetermined);
 }
@@ -201,7 +201,7 @@ CFunctionalDependency::Equals(
 //		Create a set of all keys
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CFunctionalDependency::PcrsKeys(
 	CMemoryPool *mp, gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd)
 {
@@ -228,12 +228,12 @@ CFunctionalDependency::PcrsKeys(
 //		Create an array of all keys
 //
 //---------------------------------------------------------------------------
-CColRefArray *
+gpos::owner<CColRefArray *>
 CFunctionalDependency::PdrgpcrKeys(
 	CMemoryPool *mp, gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd)
 {
 	gpos::owner<CColRefSet *> pcrs = PcrsKeys(mp, pdrgpfd);
-	CColRefArray *colref_array = pcrs->Pdrgpcr(mp);
+	gpos::owner<CColRefArray *> colref_array = pcrs->Pdrgpcr(mp);
 	pcrs->Release();
 
 	return colref_array;

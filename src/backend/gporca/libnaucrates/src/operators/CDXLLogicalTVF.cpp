@@ -28,14 +28,15 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalTVF::CDXLLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
-							   IMDId *mdid_return_type, CMDName *mdname,
-							   CDXLColDescrArray *pdrgdxlcd)
+CDXLLogicalTVF::CDXLLogicalTVF(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+							   gpos::owner<IMDId *> mdid_return_type,
+							   CMDName *mdname,
+							   gpos::owner<CDXLColDescrArray *> pdrgdxlcd)
 	: CDXLLogical(mp),
-	  m_func_mdid(mdid_func),
-	  m_return_type_mdid(mdid_return_type),
+	  m_func_mdid(std::move(mdid_func)),
+	  m_return_type_mdid(std::move(mdid_return_type)),
 	  m_mdname(mdname),
-	  m_dxl_col_descr_array(pdrgdxlcd)
+	  m_dxl_col_descr_array(std::move(pdrgdxlcd))
 {
 	GPOS_ASSERT(m_return_type_mdid->IsValid());
 }
@@ -166,7 +167,7 @@ CDXLLogicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	for (ULONG ul = 0; ul < Arity(); ul++)
 	{
-		CDXLColDescr *pdxlcd = (*m_dxl_col_descr_array)[ul];
+		gpos::pointer<CDXLColDescr *> pdxlcd = (*m_dxl_col_descr_array)[ul];
 		pdxlcd->SerializeToDXL(xml_serializer);
 	}
 
@@ -201,7 +202,7 @@ CDXLLogicalTVF::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

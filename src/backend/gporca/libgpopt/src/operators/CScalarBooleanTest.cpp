@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarBooleanTest.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -84,11 +85,11 @@ const BYTE CScalarBooleanTest::m_rgBoolEvalMap[][3] = {
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBooleanTest::Matches(COperator *pop) const
+CScalarBooleanTest::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		return m_ebt == CScalarBooleanTest::PopConvert(pop)->Ebt();
+		return m_ebt == gpos::dyn_cast<CScalarBooleanTest>(pop)->Ebt();
 	}
 
 	return false;
@@ -103,7 +104,7 @@ CScalarBooleanTest::Matches(COperator *pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarBooleanTest::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -120,7 +121,7 @@ CScalarBooleanTest::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarBooleanTest::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarBooleanTest::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 	GPOS_ASSERT(1 == pdrgpulChildren->Size());

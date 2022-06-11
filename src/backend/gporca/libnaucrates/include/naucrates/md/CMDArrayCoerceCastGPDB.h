@@ -15,6 +15,7 @@
 #define GPMD_CMDArrayCoerceCastGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 #include "naucrates/md/CMDCastGPDB.h"
@@ -45,9 +46,11 @@ public:
 	CMDArrayCoerceCastGPDB(const CMDArrayCoerceCastGPDB &) = delete;
 
 	// ctor
-	CMDArrayCoerceCastGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-						   IMDId *mdid_src, IMDId *mdid_dest,
-						   BOOL is_binary_coercible, IMDId *mdid_cast_func,
+	CMDArrayCoerceCastGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+						   CMDName *mdname, gpos::owner<IMDId *> mdid_src,
+						   gpos::owner<IMDId *> mdid_dest,
+						   BOOL is_binary_coercible,
+						   gpos::owner<IMDId *> mdid_cast_func,
 						   EmdCoercepathType path_type, INT type_modifier,
 						   BOOL is_explicit, EdxlCoercionForm dxl_coerce_format,
 						   INT location);

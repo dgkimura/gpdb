@@ -32,11 +32,12 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarOp::CScalarOp(CMemoryPool *mp, IMDId *mdid_op, IMDId *return_type_mdid,
+CScalarOp::CScalarOp(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
+					 gpos::owner<IMDId *> return_type_mdid,
 					 const CWStringConst *pstrOp)
 	: CScalar(mp),
-	  m_mdid_op(mdid_op),
-	  m_return_type_mdid(return_type_mdid),
+	  m_mdid_op(std::move(mdid_op)),
+	  m_return_type_mdid(std::move(return_type_mdid)),
 	  m_pstrOp(pstrOp),
 	  m_returns_null_on_null_input(false),
 	  m_fBoolReturnType(false),
@@ -109,11 +110,11 @@ CScalarOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarOp::Matches(COperator *pop) const
+CScalarOp::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarOp *pscop = CScalarOp::PopConvert(pop);
+		gpos::pointer<CScalarOp *> pscop = gpos::dyn_cast<CScalarOp>(pop);
 
 		// match if operator oid are identical
 		return m_mdid_op->Equals(pscop->MdIdOp());
@@ -198,7 +199,7 @@ CScalarOp::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarOp::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarOp::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

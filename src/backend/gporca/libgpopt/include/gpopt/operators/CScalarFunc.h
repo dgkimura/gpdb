@@ -64,8 +64,9 @@ public:
 	explicit CScalarFunc(CMemoryPool *mp);
 
 	// ctor
-	CScalarFunc(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				INT return_type_modifier, const CWStringConst *pstrFunc);
+	CScalarFunc(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+				gpos::owner<IMDId *> mdid_return_type, INT return_type_modifier,
+				const CWStringConst *pstrFunc);
 
 	// dtor
 	~CScalarFunc() override;
@@ -88,7 +89,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -98,7 +99,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
@@ -109,7 +110,7 @@ public:
 	}
 
 	// derive function properties
-	CFunctionProp *
+	gpos::owner<CFunctionProp *>
 	DeriveFunctionProperties(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -147,7 +148,8 @@ public:
 	IMDFunction::EFuncStbl EfsGetFunctionStability() const;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

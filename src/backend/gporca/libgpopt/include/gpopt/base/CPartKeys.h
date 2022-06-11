@@ -48,7 +48,7 @@ public:
 	CPartKeys(const CPartKeys &) = delete;
 
 	// ctor
-	explicit CPartKeys(CColRef2dArray *pdrgpdrgpcr);
+	explicit CPartKeys(gpos::owner<CColRef2dArray *> pdrgpdrgpcr);
 
 	// dtor
 	~CPartKeys() override;
@@ -74,7 +74,7 @@ public:
 	gpos::owner<CPartKeys *> PpartkeysCopy(CMemoryPool *mp);
 
 	// check whether the key columns overlap the given column
-	BOOL FOverlap(CColRefSet *pcrs) const;
+	BOOL FOverlap(gpos::pointer<CColRefSet *> pcrs) const;
 
 	// create a new PartKeys object from the current one by remapping the
 	// keys using the given hashmap
@@ -85,7 +85,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const;
 
 	// copy array of part keys into given memory pool
-	static CPartKeysArray *PdrgppartkeysCopy(
+	static gpos::owner<CPartKeysArray *> PdrgppartkeysCopy(
 		CMemoryPool *mp, gpos::pointer<const CPartKeysArray *> pdrgppartkeys);
 
 };	// CPartKeys

@@ -27,8 +27,9 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CConstraintNegation::CConstraintNegation(CMemoryPool *mp, CConstraint *pcnstr)
-	: CConstraint(mp, pcnstr->PcrsUsed()), m_pcnstr(pcnstr)
+CConstraintNegation::CConstraintNegation(CMemoryPool *mp,
+										 gpos::owner<CConstraint *> pcnstr)
+	: CConstraint(mp, pcnstr->PcrsUsed()), m_pcnstr(std::move(pcnstr))
 {
 	GPOS_ASSERT(nullptr != m_pcnstr);
 
@@ -60,9 +61,9 @@ gpos::owner<CConstraint *>
 CConstraintNegation::PcnstrCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
-	CConstraint *pcnstr =
+	gpos::owner<CConstraint *> pcnstr =
 		m_pcnstr->PcnstrCopyWithRemappedColumns(mp, colref_mapping, must_exist);
-	return GPOS_NEW(mp) CConstraintNegation(mp, pcnstr);
+	return GPOS_NEW(mp) CConstraintNegation(mp, std::move(pcnstr));
 }
 
 //---------------------------------------------------------------------------
@@ -101,7 +102,7 @@ CConstraintNegation::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 //
 //---------------------------------------------------------------------------
 gpos::owner<CConstraint *>
-CConstraintNegation::Pcnstr(CMemoryPool *mp, CColRefSet *pcrs)
+CConstraintNegation::Pcnstr(CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs)
 {
 	if (!m_pcrsUsed->Equals(pcrs))
 	{
@@ -137,7 +138,7 @@ CConstraintNegation::PcnstrRemapForColumn(CMemoryPool *mp,
 //		Scalar expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::pointer<CExpression *>
 CConstraintNegation::PexprScalar(CMemoryPool *mp)
 {
 	if (nullptr == m_pexprScalar)
@@ -145,13 +146,15 @@ CConstraintNegation::PexprScalar(CMemoryPool *mp)
 		EConstraintType ect = m_pcnstr->Ect();
 		if (EctNegation == ect)
 		{
-			CConstraintNegation *pcn = (CConstraintNegation *) m_pcnstr;
+			gpos::pointer<CConstraintNegation *> pcn =
+				gpos::cast<CConstraintNegation>(m_pcnstr);
 			m_pexprScalar = pcn->PcnstrChild()->PexprScalar(mp);
 			m_pexprScalar->AddRef();
 		}
 		else if (EctInterval == ect)
 		{
-			CConstraintInterval *pci = (CConstraintInterval *) m_pcnstr;
+			gpos::pointer<CConstraintInterval *> pci =
+				gpos::cast<CConstraintInterval>(m_pcnstr);
 			gpos::owner<CConstraintInterval *> pciComp = pci->PciComplement(mp);
 			m_pexprScalar = pciComp->PexprScalar(mp);
 			m_pexprScalar->AddRef();

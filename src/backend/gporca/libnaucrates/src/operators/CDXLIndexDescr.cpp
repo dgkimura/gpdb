@@ -27,8 +27,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLIndexDescr::CDXLIndexDescr(IMDId *mdid, CMDName *mdname)
-	: m_mdid(mdid), m_mdname(mdname)
+CDXLIndexDescr::CDXLIndexDescr(gpos::owner<IMDId *> mdid, CMDName *mdname)
+	: m_mdid(std::move(mdid)), m_mdname(mdname)
 {
 	GPOS_ASSERT(m_mdid->IsValid());
 	GPOS_ASSERT(nullptr != m_mdname);

@@ -60,7 +60,7 @@ CPhysicalMotionBroadcast::~CPhysicalMotionBroadcast()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionBroadcast::Matches(COperator *pop) const
+CPhysicalMotionBroadcast::Matches(gpos::pointer<COperator *> pop) const
 {
 	return Eopid() == pop->Eopid();
 }
@@ -73,20 +73,19 @@ CPhysicalMotionBroadcast::Matches(COperator *pop) const
 //		Compute required columns of the n-th child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
-CPhysicalMotionBroadcast::PcrsRequired(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired,
-									   ULONG child_index,
-									   CDrvdPropArray *,  // pdrgpdpCtxt
-									   ULONG			  // ulOptReq
+gpos::owner<CColRefSet *>
+CPhysicalMotionBroadcast::PcrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
+	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+	ULONG							  // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
 
 	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp, *pcrsRequired);
 
-	CColRefSet *pcrsChildReqd =
+	gpos::owner<CColRefSet *> pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
 	pcrs->Release();
 
@@ -102,9 +101,9 @@ CPhysicalMotionBroadcast::PcrsRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionBroadcast::FProvidesReqdCols(CExpressionHandle &exprhdl,
-											CColRefSet *pcrsRequired,
-											ULONG  // ulOptReq
+CPhysicalMotionBroadcast::FProvidesReqdCols(
+	CExpressionHandle &exprhdl, gpos::pointer<CColRefSet *> pcrsRequired,
+	ULONG  // ulOptReq
 ) const
 {
 	return FUnaryProvidesReqdCols(exprhdl, pcrsRequired);
@@ -137,16 +136,17 @@ CPhysicalMotionBroadcast::EpetOrder(CExpressionHandle &,  // exprhdl
 //
 //---------------------------------------------------------------------------
 gpos::owner<COrderSpec *>
-CPhysicalMotionBroadcast::PosRequired(CMemoryPool *mp,
-									  CExpressionHandle &,			// exprhdl
-									  gpos::pointer<COrderSpec *>,	//posInput
-									  ULONG
+CPhysicalMotionBroadcast::PosRequired(
+	CMemoryPool *mp,
+	CExpressionHandle &,		  // exprhdl
+	gpos::pointer<COrderSpec *>,  //posInput
+	ULONG
 #ifdef GPOS_DEBUG
-										  child_index
+		child_index
 #endif	// GPOS_DEBUG
-									  ,
-									  CDrvdPropArray *,	 // pdrgpdpCtxt
-									  ULONG				 // ulOptReq
+	,
+	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+	ULONG							  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

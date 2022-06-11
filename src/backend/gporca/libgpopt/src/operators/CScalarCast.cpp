@@ -33,8 +33,9 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCast::CScalarCast(CMemoryPool *mp, IMDId *return_type_mdid,
-						 IMDId *mdid_func, BOOL is_binary_coercible)
+CScalarCast::CScalarCast(CMemoryPool *mp, gpos::owner<IMDId *> return_type_mdid,
+						 gpos::owner<IMDId *> mdid_func,
+						 BOOL is_binary_coercible)
 	: CScalar(mp),
 	  m_return_type_mdid(return_type_mdid),
 	  m_func_mdid(mdid_func),
@@ -64,11 +65,11 @@ CScalarCast::CScalarCast(CMemoryPool *mp, IMDId *return_type_mdid,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCast::Matches(COperator *pop) const
+CScalarCast::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCast *pscop = CScalarCast::PopConvert(pop);
+		gpos::pointer<CScalarCast *> pscop = gpos::dyn_cast<CScalarCast>(pop);
 
 		// match if the return type oids are identical
 		return pscop->MdidType()->Equals(m_return_type_mdid) &&

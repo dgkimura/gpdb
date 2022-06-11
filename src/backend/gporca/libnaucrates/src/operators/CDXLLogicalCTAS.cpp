@@ -31,29 +31,31 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalCTAS::CDXLLogicalCTAS(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname_schema, CMDName *mdname_rel,
-	CDXLColDescrArray *dxl_col_descr_array,
-	CDXLCtasStorageOptions *dxl_ctas_storage_options,
+	CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname_schema,
+	CMDName *mdname_rel, gpos::owner<CDXLColDescrArray *> dxl_col_descr_array,
+	gpos::owner<CDXLCtasStorageOptions *> dxl_ctas_storage_options,
 	IMDRelation::Ereldistrpolicy rel_distr_policy,
-	ULongPtrArray *distr_column_pos_array, IMdIdArray *distr_opfamilies,
-	IMdIdArray *distr_opclasses, BOOL is_temporary, BOOL has_oids,
+	gpos::owner<ULongPtrArray *> distr_column_pos_array,
+	gpos::owner<IMdIdArray *> distr_opfamilies,
+	gpos::owner<IMdIdArray *> distr_opclasses, BOOL is_temporary, BOOL has_oids,
 	IMDRelation::Erelstoragetype rel_storage_type,
-	ULongPtrArray *src_colids_array, IntPtrArray *vartypemod_array)
+	gpos::owner<ULongPtrArray *> src_colids_array,
+	gpos::owner<IntPtrArray *> vartypemod_array)
 	: CDXLLogical(mp),
-	  m_mdid(mdid),
+	  m_mdid(std::move(mdid)),
 	  m_mdname_schema(mdname_schema),
 	  m_mdname_rel(mdname_rel),
-	  m_col_descr_array(dxl_col_descr_array),
-	  m_dxl_ctas_storage_option(dxl_ctas_storage_options),
+	  m_col_descr_array(std::move(dxl_col_descr_array)),
+	  m_dxl_ctas_storage_option(std::move(dxl_ctas_storage_options)),
 	  m_rel_distr_policy(rel_distr_policy),
-	  m_distr_column_pos_array(distr_column_pos_array),
-	  m_distr_opfamilies(distr_opfamilies),
-	  m_distr_opclasses(distr_opclasses),
+	  m_distr_column_pos_array(std::move(distr_column_pos_array)),
+	  m_distr_opfamilies(std::move(distr_opfamilies)),
+	  m_distr_opclasses(std::move(distr_opclasses)),
 	  m_is_temp_table(is_temporary),
 	  m_has_oids(has_oids),
 	  m_rel_storage_type(rel_storage_type),
-	  m_src_colids_array(src_colids_array),
-	  m_vartypemod_array(vartypemod_array)
+	  m_src_colids_array(std::move(src_colids_array)),
+	  m_vartypemod_array(std::move(vartypemod_array))
 {
 	GPOS_ASSERT(nullptr != m_mdid && m_mdid->IsValid());
 	GPOS_ASSERT(nullptr != mdname_rel);
@@ -230,7 +232,7 @@ CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 	const ULONG arity = m_col_descr_array->Size();
 	for (ULONG idx = 0; idx < arity; idx++)
 	{
-		CDXLColDescr *dxl_col_descr = (*m_col_descr_array)[idx];
+		gpos::pointer<CDXLColDescr *> dxl_col_descr = (*m_col_descr_array)[idx];
 		dxl_col_descr->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -273,7 +275,7 @@ CDXLLogicalCTAS::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[0];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeLogical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

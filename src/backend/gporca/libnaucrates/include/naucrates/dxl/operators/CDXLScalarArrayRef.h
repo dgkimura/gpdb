@@ -49,9 +49,9 @@ public:
 	CDXLScalarArrayRef(const CDXLScalarArrayRef &) = delete;
 
 	// ctor
-	CDXLScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
-					   INT type_modifier, IMDId *array_type_mdid,
-					   IMDId *return_type_mdid);
+	CDXLScalarArrayRef(CMemoryPool *mp, gpos::owner<IMDId *> elem_type_mdid,
+					   INT type_modifier, gpos::owner<IMDId *> array_type_mdid,
+					   gpos::owner<IMDId *> return_type_mdid);
 
 	// dtor
 	~CDXLScalarArrayRef() override;

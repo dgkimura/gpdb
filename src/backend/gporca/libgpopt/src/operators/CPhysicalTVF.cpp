@@ -32,10 +32,11 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalTVF::CPhysicalTVF(CMemoryPool *mp, IMDId *mdid_func,
-						   IMDId *mdid_return_type, CWStringConst *str,
-						   CColumnDescriptorArray *pdrgpcoldesc,
-						   CColRefSet *pcrsOutput)
+CPhysicalTVF::CPhysicalTVF(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
+						   gpos::owner<IMDId *> mdid_return_type,
+						   CWStringConst *str,
+						   gpos::owner<CColumnDescriptorArray *> pdrgpcoldesc,
+						   gpos::owner<CColRefSet *> pcrsOutput)
 	: CPhysical(mp),
 	  m_func_mdid(mdid_func),
 	  m_return_type_mdid(mdid_return_type),
@@ -82,11 +83,12 @@ CPhysicalTVF::~CPhysicalTVF()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalTVF::Matches(COperator *pop) const
+CPhysicalTVF::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CPhysicalTVF *popTVF = CPhysicalTVF::PopConvert(pop);
+		gpos::pointer<CPhysicalTVF *> popTVF =
+			gpos::dyn_cast<CPhysicalTVF>(pop);
 
 		return m_func_mdid->Equals(popTVF->FuncMdId()) &&
 			   m_return_type_mdid->Equals(popTVF->ReturnTypeMdId()) &&
@@ -121,12 +123,12 @@ CPhysicalTVF::FInputOrderSensitive() const
 //
 //---------------------------------------------------------------------------
 CColRefSet *
-CPhysicalTVF::PcrsRequired(CMemoryPool *,				 // mp,
-						   CExpressionHandle &,			 // exprhdl,
-						   gpos::pointer<CColRefSet *>,	 // pcrsRequired,
-						   ULONG,						 // child_index,
-						   CDrvdPropArray *,			 // pdrgpdpCtxt
-						   ULONG						 // ulOptReq
+CPhysicalTVF::PcrsRequired(CMemoryPool *,					 // mp,
+						   CExpressionHandle &,				 // exprhdl,
+						   gpos::pointer<CColRefSet *>,		 // pcrsRequired,
+						   ULONG,							 // child_index,
+						   gpos::pointer<CDrvdPropArray *>,	 // pdrgpdpCtxt
+						   ULONG							 // ulOptReq
 )
 {
 	GPOS_ASSERT(!"CPhysicalTVF has no relational children");
@@ -141,13 +143,13 @@ CPhysicalTVF::PcrsRequired(CMemoryPool *,				 // mp,
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
-CPhysicalTVF::PosRequired(CMemoryPool *,				// mp,
-						  CExpressionHandle &,			// exprhdl,
-						  gpos::pointer<COrderSpec *>,	// posRequired,
-						  ULONG,						// child_index,
-						  CDrvdPropArray *,				// pdrgpdpCtxt
-						  ULONG							// ulOptReq
+gpos::owner<COrderSpec *>
+CPhysicalTVF::PosRequired(CMemoryPool *,					// mp,
+						  CExpressionHandle &,				// exprhdl,
+						  gpos::pointer<COrderSpec *>,		// posRequired,
+						  ULONG,							// child_index,
+						  gpos::pointer<CDrvdPropArray *>,	// pdrgpdpCtxt
+						  ULONG								// ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalTVF has no relational children");
@@ -162,12 +164,12 @@ CPhysicalTVF::PosRequired(CMemoryPool *,				// mp,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalTVF::PdsRequired(CMemoryPool *,					   // mp,
 						  CExpressionHandle &,				   // exprhdl,
 						  gpos::pointer<CDistributionSpec *>,  // pdsRequired,
 						  ULONG,							   //child_index
-						  CDrvdPropArray *,					   // pdrgpdpCtxt
+						  gpos::pointer<CDrvdPropArray *>,	   // pdrgpdpCtxt
 						  ULONG								   // ulOptReq
 ) const
 {
@@ -183,12 +185,12 @@ CPhysicalTVF::PdsRequired(CMemoryPool *,					   // mp,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalTVF::PrsRequired(CMemoryPool *,						// mp,
 						  CExpressionHandle &,					// exprhdl,
 						  gpos::pointer<CRewindabilitySpec *>,	// prsRequired,
 						  ULONG,								// child_index,
-						  CDrvdPropArray *,						// pdrgpdpCtxt
+						  gpos::pointer<CDrvdPropArray *>,		// pdrgpdpCtxt
 						  ULONG									// ulOptReq
 ) const
 {
@@ -227,7 +229,7 @@ CPhysicalTVF::PcteRequired(CMemoryPool *,			  //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalTVF::FProvidesReqdCols(CExpressionHandle &,  // exprhdl,
-								CColRefSet *pcrsRequired,
+								gpos::pointer<CColRefSet *> pcrsRequired,
 								ULONG  // ulOptReq
 ) const
 {
@@ -357,7 +359,8 @@ CPhysicalTVF::EpetRewindability(
 	gpos::pointer<const CEnfdRewindability *> per) const
 {
 	// get rewindability delivered by the TVF node
-	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
+	gpos::pointer<CRewindabilitySpec *> prs =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{
 		// required distribution is already provided

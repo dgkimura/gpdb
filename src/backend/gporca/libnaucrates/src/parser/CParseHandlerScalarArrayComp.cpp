@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarArrayComp.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -63,12 +65,12 @@ CParseHandlerScalarArrayComp::StartElement(
 	}
 
 	// parse and create scalar ArrayComp
-	CDXLScalarArrayComp *dxl_op =
-		(CDXLScalarArrayComp *) CDXLOperatorFactory::MakeDXLArrayComp(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	gpos::owner<CDXLScalarArrayComp *> dxl_op =
+		gpos::cast<CDXLScalarArrayComp>(CDXLOperatorFactory::MakeDXLArrayComp(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// construct node from the created child nodes
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance

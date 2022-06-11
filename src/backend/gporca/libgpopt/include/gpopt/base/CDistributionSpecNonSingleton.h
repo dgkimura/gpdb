@@ -68,8 +68,8 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::pointer<CReqdPropPlan *> prpp,
-						 CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::pointer<CExpressionArray *> pdrgpexpr,
+						 gpos::pointer<CExpression *> pexpr) override;
 
 	// return distribution partitioning type
 	EDistributionPartitioningType

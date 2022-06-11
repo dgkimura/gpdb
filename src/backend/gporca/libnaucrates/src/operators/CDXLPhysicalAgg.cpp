@@ -148,7 +148,8 @@ CDXLPhysicalAgg::GetGroupingColidArray() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAgg::SetGroupingCols(ULongPtrArray *grouping_colids_array)
+CDXLPhysicalAgg::SetGroupingCols(
+	gpos::owner<ULongPtrArray *> grouping_colids_array)
 {
 	GPOS_ASSERT(nullptr != grouping_colids_array);
 	m_grouping_colids_array = grouping_colids_array;
@@ -254,7 +255,7 @@ CDXLPhysicalAgg::AssertValid(gpos::pointer<const CDXLNode *> node,
 	GPOS_ASSERT(EdxlaggIndexSentinel == node->Arity());
 	GPOS_ASSERT(nullptr != m_grouping_colids_array);
 
-	CDXLNode *child_dxlnode = (*node)[EdxlaggIndexChild];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[EdxlaggIndexChild];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

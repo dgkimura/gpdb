@@ -127,8 +127,9 @@ CParseHandlerLogicalInsert::EndElement(const XMLCh *const,	// element_uri,
 	gpos::owner<CDXLTableDescr *> table_descr = pphTabDesc->GetDXLTableDescr();
 	table_descr->AddRef();
 
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(
-		m_mp, GPOS_NEW(m_mp) CDXLLogicalInsert(m_mp, table_descr, m_pdrgpul));
+	m_dxl_node = GPOS_NEW(m_mp)
+		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalInsert(
+						   m_mp, std::move(table_descr), m_pdrgpul));
 
 	AddChildFromParseHandler(child_parse_handler);
 

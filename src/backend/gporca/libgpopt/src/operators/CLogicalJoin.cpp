@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/COptCtxt.h"
@@ -47,7 +48,7 @@ CLogicalJoin::CLogicalJoin(CMemoryPool *mp, CXform::EXformId origin_xform)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalJoin::Matches(COperator *pop) const
+CLogicalJoin::Matches(gpos::pointer<COperator *> pop) const
 {
 	return (pop->Eopid() == Eopid());
 }
@@ -60,9 +61,9 @@ CLogicalJoin::Matches(COperator *pop) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalJoin::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   IStatisticsArray *stats_ctxt) const
+						   gpos::pointer<IStatisticsArray *> stats_ctxt) const
 {
 	return CJoinStatsProcessor::DeriveJoinStats(mp, exprhdl, stats_ctxt);
 }

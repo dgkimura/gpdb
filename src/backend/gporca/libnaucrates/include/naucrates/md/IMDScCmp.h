@@ -15,6 +15,7 @@
 #define GPMD_IMDScCmp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDCacheObject.h"
 #include "naucrates/md/IMDType.h"
@@ -43,16 +44,16 @@ public:
 	}
 
 	// left type
-	virtual IMDId *GetLeftMdid() const = 0;
+	virtual gpos::pointer<IMDId *> GetLeftMdid() const = 0;
 
 	// right type
-	virtual IMDId *GetRightMdid() const = 0;
+	virtual gpos::pointer<IMDId *> GetRightMdid() const = 0;
 
 	// comparison type
 	virtual IMDType::ECmpType ParseCmpType() const = 0;
 
 	// comparison operator id
-	virtual IMDId *MdIdOp() const = 0;
+	virtual gpos::pointer<IMDId *> MdIdOp() const = 0;
 };
 
 }  // namespace gpmd

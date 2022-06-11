@@ -60,15 +60,17 @@ CXformExternalGet2ExternalScan::Exfp(CExpressionHandle &  //exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformExternalGet2ExternalScan::Transform(CXformContext *pxfctxt,
-										  CXformResult *pxfres,
-										  CExpression *pexpr) const
+CXformExternalGet2ExternalScan::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalExternalGet *popGet = CLogicalExternalGet::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalExternalGet *> popGet =
+		gpos::dyn_cast<CLogicalExternalGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
@@ -83,12 +85,12 @@ CXformExternalGet2ExternalScan::Transform(CXformContext *pxfctxt,
 	pdrgpcrOutput->AddRef();
 
 	// create alternative expression
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
-		mp,
-		GPOS_NEW(mp) CPhysicalExternalScan(mp, pname, ptabdesc, pdrgpcrOutput));
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
+		CExpression(mp, GPOS_NEW(mp) CPhysicalExternalScan(
+							mp, pname, std::move(ptabdesc), pdrgpcrOutput));
 
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 // EOF

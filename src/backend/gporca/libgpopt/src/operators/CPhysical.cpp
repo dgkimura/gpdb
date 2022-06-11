@@ -177,10 +177,11 @@ CPhysical::PdpCreate(CMemoryPool *mp) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
-CPhysical::PopCopyWithRemappedColumns(CMemoryPool *,	   //mp,
-									  UlongToColRefMap *,  //colref_mapping,
-									  BOOL				   //must_exist
+gpos::owner<COperator *>
+CPhysical::PopCopyWithRemappedColumns(
+	CMemoryPool *,						//mp,
+	gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+	BOOL								//must_exist
 )
 {
 	GPOS_ASSERT(!"Invalid call of CPhysical::PopCopyWithRemappedColumns");
@@ -255,7 +256,8 @@ CPhysical::CReqdColsRequest::Equals(
 gpos::owner<CDistributionSpec *>
 CPhysical::PdsCompute(CMemoryPool *mp,
 					  gpos::pointer<const CTableDescriptor *> ptabdesc,
-					  CColRefArray *pdrgpcrOutput, CColRef *pcr_segment_id)
+					  gpos::pointer<CColRefArray *> pdrgpcrOutput,
+					  CColRef *pcr_segment_id)
 {
 	gpos::owner<CDistributionSpec *> pds = nullptr;
 
@@ -296,7 +298,8 @@ CPhysical::PdsCompute(CMemoryPool *mp,
 			const ULONG size = pdrgpcoldesc->Size();
 			for (ULONG ul = 0; ul < size; ul++)
 			{
-				CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
+				gpos::pointer<CColumnDescriptor *> pcoldesc =
+					(*pdrgpcoldesc)[ul];
 				ULONG ulPos = gpopt::CTableDescriptor::UlPos(
 					pcoldesc, ptabdesc->Pdrgpcoldesc());
 
@@ -307,7 +310,7 @@ CPhysical::PdsCompute(CMemoryPool *mp,
 				colref_array->Append(colref);
 			}
 
-			CExpressionArray *pdrgpexpr =
+			gpos::owner<CExpressionArray *> pdrgpexpr =
 				CUtils::PdrgpexprScalarIdents(mp, colref_array);
 			colref_array->Release();
 
@@ -396,10 +399,10 @@ CPhysical::PdsPassThru(CMemoryPool *,		 // mp
 //
 //---------------------------------------------------------------------------
 gpos::owner<CDistributionSpec *>
-CPhysical::PdsRequireSingletonOrReplicated(CMemoryPool *mp,
-										   CExpressionHandle &exprhdl,
-										   CDistributionSpec *pdsRequired,
-										   ULONG child_index, ULONG ulOptReq)
+CPhysical::PdsRequireSingletonOrReplicated(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
+	ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > ulOptReq);
 
@@ -436,14 +439,14 @@ CPhysical::PdsRequireSingletonOrReplicated(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::owner<CDistributionSpec *>
 CPhysical::PdsUnary(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					CDistributionSpec *pdsRequired, ULONG child_index,
-					ULONG ulOptReq)
+					gpos::pointer<CDistributionSpec *> pdsRequired,
+					ULONG child_index, ULONG ulOptReq)
 {
 	GPOS_ASSERT(0 == child_index);
 	GPOS_ASSERT(2 > ulOptReq);
 
 	// check if singleton/replicated distribution needs to be requested
-	CDistributionSpec *pds = PdsRequireSingletonOrReplicated(
+	gpos::owner<CDistributionSpec *> pds = PdsRequireSingletonOrReplicated(
 		mp, exprhdl, pdsRequired, child_index, ulOptReq);
 	if (nullptr != pds)
 	{
@@ -522,7 +525,7 @@ CPhysical::PdsDerivePassThruOuter(CExpressionHandle &exprhdl)
 //		Helper for common case of rewindability derivation
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysical::PrsDerivePassThruOuter(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
 	gpos::owner<CRewindabilitySpec *> prs =
@@ -556,8 +559,8 @@ CPhysical::PrsDerivePassThruOuter(CMemoryPool *mp, CExpressionHandle &exprhdl)
 //---------------------------------------------------------------------------
 gpos::owner<CColRefSet *>
 CPhysical::PcrsChildReqd(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CColRefSet *pcrsRequired, ULONG child_index,
-						 ULONG ulScalarIndex)
+						 gpos::pointer<CColRefSet *> pcrsRequired,
+						 ULONG child_index, ULONG ulScalarIndex)
 {
 	pcrsRequired->AddRef();
 	gpos::owner<CReqdColsRequest *> prcr =
@@ -587,7 +590,7 @@ CPhysical::PcrsChildReqd(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// insert request in map
 	pcrs->AddRef();
-	BOOL fSuccess GPOS_ASSERTS_ONLY = m_phmrcr->Insert(prcr, pcrs);
+	BOOL fSuccess GPOS_ASSERTS_ONLY = m_phmrcr->Insert(std::move(prcr), pcrs);
 	GPOS_ASSERT(fSuccess);
 
 	return pcrs;
@@ -609,7 +612,8 @@ CPhysical::FUnaryProvidesReqdCols(CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(nullptr != pcrsRequired);
 
-	CColRefSet *pcrsOutput = exprhdl.DeriveOutputColumns(0 /*child_index*/);
+	gpos::pointer<CColRefSet *> pcrsOutput =
+		exprhdl.DeriveOutputColumns(0 /*child_index*/);
 
 	return pcrsOutput->ContainsAll(pcrsRequired);
 }
@@ -623,7 +627,8 @@ CPhysical::FUnaryProvidesReqdCols(CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 gpos::owner<CDistributionSpecSingleton *>
-CPhysical::PdssMatching(CMemoryPool *mp, CDistributionSpecSingleton *pdss)
+CPhysical::PdssMatching(CMemoryPool *mp,
+						gpos::pointer<CDistributionSpecSingleton *> pdss)
 {
 	CDistributionSpecSingleton::ESegmentType est =
 		CDistributionSpecSingleton::EstSegment;
@@ -660,8 +665,9 @@ CPhysical::PcterPushThru(gpos::pointer<CCTEReq *> pcter)
 //		of the given expression handle
 //
 //---------------------------------------------------------------------------
-CCTEMap *
-CPhysical::PcmCombine(CMemoryPool *mp, CDrvdPropArray *pdrgpdpCtxt)
+gpos::owner<CCTEMap *>
+CPhysical::PcmCombine(CMemoryPool *mp,
+					  gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr != pdrgpdpCtxt);
 
@@ -669,11 +675,12 @@ CPhysical::PcmCombine(CMemoryPool *mp, CDrvdPropArray *pdrgpdpCtxt)
 	gpos::owner<CCTEMap *> pcmCombined = GPOS_NEW(mp) CCTEMap(mp);
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CCTEMap *pcmChild =
-			CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[ul])->GetCostModel();
+		gpos::pointer<CCTEMap *> pcmChild =
+			gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[ul])->GetCostModel();
 
 		// get the remaining requirements that have not been met by child
-		CCTEMap *pcm = CCTEMap::PcmCombine(mp, *pcmCombined, *pcmChild);
+		gpos::owner<CCTEMap *> pcm =
+			CCTEMap::PcmCombine(mp, *pcmCombined, *pcmChild);
 		pcmCombined->Release();
 		pcmCombined = pcm;
 	}
@@ -690,10 +697,10 @@ CPhysical::PcmCombine(CMemoryPool *mp, CDrvdPropArray *pdrgpdpCtxt)
 //		Helper for computing cte requirement for the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::owner<CCTEReq *>
 CPhysical::PcterNAry(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					 CCTEReq *pcter, ULONG child_index,
-					 CDrvdPropArray *pdrgpdpCtxt) const
+					 gpos::pointer<CCTEReq *> pcter, ULONG child_index,
+					 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt) const
 {
 	GPOS_ASSERT(nullptr != pcter);
 
@@ -721,7 +728,8 @@ CPhysical::PcterNAry(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::owner<CCTEMap *> pcmCombined = PcmCombine(mp, pdrgpdpCtxt);
 
 	// pass the remaining requirements that have not been resolved
-	CCTEReq *pcterUnresolved = pcter->PcterUnresolved(mp, pcmCombined);
+	gpos::owner<CCTEReq *> pcterUnresolved =
+		pcter->PcterUnresolved(mp, pcmCombined);
 	pcmCombined->Release();
 
 	return pcterUnresolved;
@@ -762,7 +770,7 @@ CPhysical::FCanPushPartReqToChild(gpos::pointer<CBitSet *> pbsPartConsumer,
 //		Common case of combining cte maps of all logical children
 //
 //---------------------------------------------------------------------------
-CCTEMap *
+gpos::owner<CCTEMap *>
 CPhysical::PcmDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	GPOS_ASSERT(0 < exprhdl.Arity());
@@ -773,10 +781,12 @@ CPhysical::PcmDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	{
 		if (!exprhdl.FScalarChild(ul))
 		{
-			CCTEMap *pcmChild = exprhdl.Pdpplan(ul)->GetCostModel();
+			gpos::pointer<CCTEMap *> pcmChild =
+				exprhdl.Pdpplan(ul)->GetCostModel();
 			GPOS_ASSERT(nullptr != pcmChild);
 
-			CCTEMap *pcmCombined = CCTEMap::PcmCombine(mp, *pcm, *pcmChild);
+			gpos::owner<CCTEMap *> pcmCombined =
+				CCTEMap::PcmCombine(mp, *pcm, *pcmChild);
 			pcm->Release();
 			pcm = pcmCombined;
 		}
@@ -797,7 +807,8 @@ BOOL
 CPhysical::FProvidesReqdCTEs(CExpressionHandle &exprhdl,
 							 gpos::pointer<const CCTEReq *> pcter) const
 {
-	CCTEMap *pcmDrvd = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->GetCostModel();
+	gpos::pointer<CCTEMap *> pcmDrvd =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->GetCostModel();
 	GPOS_ASSERT(nullptr != pcmDrvd);
 	return pcmDrvd->FSatisfies(pcter);
 }
@@ -810,7 +821,8 @@ CPhysical::EpetDistribution(CExpressionHandle &exprhdl,
 	GPOS_ASSERT(nullptr != ped);
 
 	// get distribution delivered by the physical node
-	CDistributionSpec *pds = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
+	gpos::pointer<CDistributionSpec *> pds =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pds();
 	if (ped->FCompatible(pds))
 	{
 		// required distribution is already provided
@@ -825,7 +837,8 @@ CPhysical::EpetDistribution(CExpressionHandle &exprhdl,
 // Generate a singleton distribution spec request
 gpos::owner<CDistributionSpec *>
 CPhysical::PdsRequireSingleton(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   CDistributionSpec *pds, ULONG child_index)
+							   gpos::pointer<CDistributionSpec *> pds,
+							   ULONG child_index)
 {
 	if (CDistributionSpec::EdtSingleton == pds->Edt())
 	{
@@ -845,23 +858,25 @@ CPhysical::PdsRequireSingleton(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 CDouble
-CPhysical::GetSkew(IStatistics *stats, CDistributionSpec *pds)
+CPhysical::GetSkew(gpos::pointer<IStatistics *> stats,
+				   gpos::pointer<CDistributionSpec *> pds)
 {
 	CDouble dSkew = 1.0;
 	if (CDistributionSpec::EdtHashed == pds->Edt())
 	{
-		CDistributionSpecHashed *pdshashed =
-			CDistributionSpecHashed::PdsConvert(pds);
+		gpos::pointer<CDistributionSpecHashed *> pdshashed =
+			gpos::dyn_cast<CDistributionSpecHashed>(pds);
 		gpos::pointer<const CExpressionArray *> pdrgpexpr =
 			pdshashed->Pdrgpexpr();
 		const ULONG size = pdrgpexpr->Size();
 		for (ULONG ul = 0; ul < size; ul++)
 		{
-			CExpression *pexpr = (*pdrgpexpr)[ul];
+			gpos::pointer<CExpression *> pexpr = (*pdrgpexpr)[ul];
 			if (COperator::EopScalarIdent == pexpr->Pop()->Eopid())
 			{
 				// consider only hashed distribution direct columns for now
-				CScalarIdent *popScId = CScalarIdent::PopConvert(pexpr->Pop());
+				gpos::pointer<CScalarIdent *> popScId =
+					gpos::dyn_cast<CScalarIdent>(pexpr->Pop());
 				ULONG colid = popScId->Pcr()->Id();
 				CDouble dSkewCol = stats->GetSkew(colid);
 				if (dSkewCol > dSkew)
@@ -896,7 +911,7 @@ CPhysical::FCompatibleChildrenDistributions(
 	{
 		if (!exprhdl.FScalarChild(ul))
 		{
-			CDrvdPropPlan *pdpplanChild = exprhdl.Pdpplan(ul);
+			gpos::pointer<CDrvdPropPlan *> pdpplanChild = exprhdl.Pdpplan(ul);
 
 			// an operator cannot have a singleton or universal distributed child
 			// and one distributed on multiple nodes
@@ -977,8 +992,8 @@ CPhysical::Erm(gpos::pointer<CReqdPropPlan *>, ULONG,
 
 gpos::owner<CEnfdDistribution *>
 CPhysical::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-			   CReqdPropPlan *prppInput, ULONG child_index,
-			   CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq)
+			   gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
+			   gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulDistrReq)
 {
 	return GPOS_NEW(mp) CEnfdDistribution(
 		PdsRequired(mp, exprhdl, prppInput->Ped()->PdsRequired(), child_index,
@@ -987,9 +1002,9 @@ CPhysical::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	;
 }
 
-CPartitionPropagationSpec *
+gpos::owner<CPartitionPropagationSpec *>
 CPhysical::PppsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						CPartitionPropagationSpec *pppsRequired,
+						gpos::pointer<CPartitionPropagationSpec *> pppsRequired,
 						ULONG child_index, gpos::pointer<CDrvdPropArray *>,
 						ULONG) const
 {
@@ -999,7 +1014,8 @@ CPhysical::PppsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 
 	gpos::owner<CBitSet *> allowed_scan_ids = GPOS_NEW(mp) CBitSet(mp);
-	CPartInfo *part_info = exprhdl.DerivePartitionInfo(child_index);
+	gpos::pointer<CPartInfo *> part_info =
+		exprhdl.DerivePartitionInfo(child_index);
 	for (ULONG ul = 0; ul < part_info->UlConsumers(); ++ul)
 	{
 		ULONG scan_id = part_info->ScanId(ul);
@@ -1019,8 +1035,8 @@ CPhysical::EpetPartitionPropagation(
 {
 	GPOS_ASSERT(nullptr != pps_reqd);
 
-	CPartitionPropagationSpec *pps_drvd =
-		CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Ppps();
+	gpos::pointer<CPartitionPropagationSpec *> pps_drvd =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Ppps();
 	if (pps_reqd->FCompatible(pps_drvd))
 	{
 		// all requests are resolved
@@ -1030,7 +1046,7 @@ CPhysical::EpetPartitionPropagation(
 	return CEnfdProp::EpetRequired;
 }
 
-CPartitionPropagationSpec *
+gpos::owner<CPartitionPropagationSpec *>
 CPhysical::PppsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	gpos::owner<CPartitionPropagationSpec *> pps_result =
@@ -1042,7 +1058,8 @@ CPhysical::PppsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		{
 			continue;
 		}
-		CPartitionPropagationSpec *pps = exprhdl.Pdpplan(ul)->Ppps();
+		gpos::pointer<CPartitionPropagationSpec *> pps =
+			exprhdl.Pdpplan(ul)->Ppps();
 		pps_result->InsertAll(pps);
 	}
 
