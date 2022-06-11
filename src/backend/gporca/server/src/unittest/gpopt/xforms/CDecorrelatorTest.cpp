@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/xforms/CDecorrelatorTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/string/CWStringDynamic.h"
 
@@ -57,7 +58,7 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -75,7 +76,7 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 						 CTestUtils::GetCostModel(mp));
 
 		// generate expression
-		CExpression *pexpr = rgpf[ulCase](mp);
+		gpos::owner<CExpression *> pexpr = rgpf[ulCase](mp);
 
 		CWStringDynamic str(mp);
 		COstreamString oss(&str);
@@ -83,8 +84,9 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 		GPOS_TRACE(str.GetBuffer());
 		str.Reset();
 
-		CExpression *pexprResult = nullptr;
-		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+		gpos::owner<CExpression *> pexprResult = nullptr;
+		gpos::owner<CExpressionArray *> pdrgpexpr =
+			GPOS_NEW(mp) CExpressionArray(mp);
 		CColRefSet *outerRefs = pexpr->DeriveOuterReferences();
 #ifdef GPOS_DEBUG
 		BOOL fSuccess =
@@ -94,7 +96,7 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 		GPOS_ASSERT(fSuccess);
 
 		// convert residuals into one single conjunct
-		CExpression *pexprResidual =
+		gpos::owner<CExpression *> pexprResidual =
 			CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
 
 		oss << std::endl

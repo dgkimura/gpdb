@@ -85,18 +85,20 @@ CMissingStatsTest::EresUnittest_RunTests()
 		ICostModel *pcm = CTestUtils::GetCostModel(mp);
 		CAutoTraceFlag atf1(EopttracePrintColsWithMissingStats, true /*value*/);
 
-		COptimizerConfig *optimizer_config = GPOS_NEW(mp) COptimizerConfig(
-			CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
-			CStatisticsConfig::PstatsconfDefault(mp),
-			CCTEConfig::PcteconfDefault(mp), pcm, CHint::PhintDefault(mp),
-			CWindowOids::GetWindowOids(mp));
+		gpos::owner<COptimizerConfig *> optimizer_config =
+			GPOS_NEW(mp) COptimizerConfig(
+				CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
+				CStatisticsConfig::PstatsconfDefault(mp),
+				CCTEConfig::PcteconfDefault(mp), pcm, CHint::PhintDefault(mp),
+				CWindowOids::GetWindowOids(mp));
 		SMissingStatsTestCase testCase = rgtc[ul];
 
-		CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
-			mp, testCase.m_szInputFile, GPOPT_TEST_SEGMENTS /*ulSegments*/,
-			1 /*ulSessionId*/, 1,	  /*ulCmdId*/
-			optimizer_config, nullptr /*pceeval*/
-		);
+		gpos::owner<CDXLNode *> pdxlnPlan =
+			CMinidumperUtils::PdxlnExecuteMinidump(
+				mp, testCase.m_szInputFile, GPOPT_TEST_SEGMENTS /*ulSegments*/,
+				1 /*ulSessionId*/, 1,	  /*ulCmdId*/
+				optimizer_config, nullptr /*pceeval*/
+			);
 
 		CStatisticsConfig *stats_config = optimizer_config->GetStatsConf();
 

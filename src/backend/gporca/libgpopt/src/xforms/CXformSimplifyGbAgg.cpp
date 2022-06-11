@@ -13,6 +13,7 @@
 #include "gpopt/xforms/CXformSimplifyGbAgg.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/CUtils.h"
@@ -82,8 +83,9 @@ CXformSimplifyGbAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
-								CXformResult *pxfres)
+CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp,
+								gpos::pointer<CExpression *> pexpr,
+								gpos::pointer<CXformResult *> pxfres)
 {
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
 	CExpression *pexprRelational = (*pexpr)[0];
@@ -106,11 +108,12 @@ CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
 	BOOL fDrop = false;
 	for (ULONG ul = 0; !fDrop && ul < ulKeys; ul++)
 	{
-		CColRefArray *pdrgpcrKey = pkc->PdrgpcrKey(mp, ul);
-		CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrKey);
+		gpos::owner<CColRefArray *> pdrgpcrKey = pkc->PdrgpcrKey(mp, ul);
+		gpos::owner<CColRefSet *> pcrs =
+			GPOS_NEW(mp) CColRefSet(mp, pdrgpcrKey);
 		pdrgpcrKey->Release();
 
-		CColRefSet *pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::owner<CColRefSet *> pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
 		pcrsGrpCols->Include(popAgg->Pdrgpcr());
 		BOOL fGrpColsHasKey = pcrsGrpCols->ContainsAll(pcrs);
 
@@ -163,12 +166,12 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CExpression *pexprProjectList = (*pexpr)[1];
 
 	CColRefArray *colref_array = popAgg->Pdrgpcr();
-	CColRefSet *pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGrpCols->Include(colref_array);
 
-	CColRefSet *pcrsCovered =
+	gpos::owner<CColRefSet *> pcrsCovered =
 		GPOS_NEW(mp) CColRefSet(mp);  // set of grouping columns covered by FD's
-	CColRefSet *pcrsMinimal = GPOS_NEW(mp)
+	gpos::owner<CColRefSet *> pcrsMinimal = GPOS_NEW(mp)
 		CColRefSet(mp);	 // a set of minimal grouping columns based on FD's
 	CFunctionalDependencyArray *pdrgpfd = pexpr->DeriveFunctionalDependencies();
 
@@ -198,7 +201,7 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	// create a new Agg with minimal grouping columns
 	colref_array->AddRef();
 
-	CLogicalGbAgg *popAggNew = GPOS_NEW(mp) CLogicalGbAgg(
+	gpos::owner<CLogicalGbAgg *> popAggNew = GPOS_NEW(mp) CLogicalGbAgg(
 		mp, colref_array, pcrsMinimal->Pdrgpcr(mp), popAgg->Egbaggtype());
 	pcrsMinimal->Release();
 	GPOS_ASSERT(!popAgg->Matches(popAggNew) &&
@@ -206,7 +209,7 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	pexprRelational->AddRef();
 	pexprProjectList->AddRef();
-	CExpression *pexprResult = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprResult = GPOS_NEW(mp)
 		CExpression(mp, popAggNew, pexprRelational, pexprProjectList);
 	pxfres->Add(pexprResult);
 }

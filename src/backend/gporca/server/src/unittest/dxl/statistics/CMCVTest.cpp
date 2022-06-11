@@ -11,9 +11,8 @@
 
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
+#include "gpos/common/owner.h"
 #endif
-
-#include "unittest/dxl/statistics/CMCVTest.h"
 
 #include <stdint.h>
 
@@ -28,6 +27,7 @@
 
 #include "unittest/base.h"
 #include "unittest/dxl/statistics/CCardinalityTestUtils.h"
+#include "unittest/dxl/statistics/CMCVTest.h"
 #include "unittest/gpopt/CTestUtils.h"
 
 using namespace gpopt;
@@ -51,7 +51,7 @@ CMCVTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -72,14 +72,15 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 	CMemoryPool *mp = amp.Pmp();
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	CMDIdGPDB *mdid = GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_int4);
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid);
+	gpos::owner<CMDIdGPDB *> mdid =
+		GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_int4);
+	gpos::pointer<const IMDType *> pmdtype = md_accessor->RetrieveType(mdid);
 
 	// create three integer MCVs
-	CPoint *point1 = CTestUtils::PpointInt4(mp, 5);
-	CPoint *point2 = CTestUtils::PpointInt4(mp, 1);
-	CPoint *point3 = CTestUtils::PpointInt4(mp, 10);
-	IDatumArray *pdrgpdatumMCV = GPOS_NEW(mp) IDatumArray(mp);
+	gpos::owner<CPoint *> point1 = CTestUtils::PpointInt4(mp, 5);
+	gpos::owner<CPoint *> point2 = CTestUtils::PpointInt4(mp, 1);
+	gpos::owner<CPoint *> point3 = CTestUtils::PpointInt4(mp, 10);
+	gpos::owner<IDatumArray *> pdrgpdatumMCV = GPOS_NEW(mp) IDatumArray(mp);
 	IDatum *datum1 = point1->GetDatum();
 	IDatum *datum2 = point2->GetDatum();
 	IDatum *datum3 = point3->GetDatum();
@@ -91,7 +92,7 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 	pdrgpdatumMCV->Append(datum3);
 
 	// create corresponding frequencies
-	CDoubleArray *pdrgpdFreq = GPOS_NEW(mp) CDoubleArray(mp);
+	gpos::owner<CDoubleArray *> pdrgpdFreq = GPOS_NEW(mp) CDoubleArray(mp);
 	// in GPDB, MCVs are stored in descending frequencies
 	pdrgpdFreq->Append(GPOS_NEW(mp) CDouble(0.4));
 	pdrgpdFreq->Append(GPOS_NEW(mp) CDouble(0.2));
@@ -102,24 +103,26 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 		mp, pmdtype, pdrgpdatumMCV, pdrgpdFreq, pdrgpdatumMCV->Size());
 
 	// create hash map from colid -> histogram
-	UlongToHistogramMap *col_histogram_mapping =
+	gpos::owner<UlongToHistogramMap *> col_histogram_mapping =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// generate int histogram for column 1
 	col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(1), phistMCV);
 
 	// column width for int4
-	UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::owner<UlongToDoubleMap *> colid_width_mapping =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 	colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(1),
 								GPOS_NEW(mp) CDouble(4.0));
 
-	CStatistics *stats =
+	gpos::owner<CStatistics *> stats =
 		GPOS_NEW(mp) CStatistics(mp, col_histogram_mapping, colid_width_mapping,
 								 1000.0 /* rows */, false /* is_empty */
 		);
 
 	// put stats object in an array in order to serialize
-	CStatisticsArray *pdrgpstats = GPOS_NEW(mp) CStatisticsArray(mp);
+	gpos::owner<CStatisticsArray *> pdrgpstats =
+		GPOS_NEW(mp) CStatisticsArray(mp);
 	pdrgpstats->Append(stats);
 
 	// serialize stats object
@@ -186,10 +189,10 @@ CMCVTest::EresUnittest_MergeHistMCV()
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 		// parse the stats objects
-		CDXLStatsDerivedRelationArray *pdrgpdxlstatsderrelMCV =
+		gpos::owner<CDXLStatsDerivedRelationArray *> pdrgpdxlstatsderrelMCV =
 			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInputMCV,
 													  nullptr);
-		CDXLStatsDerivedRelationArray *pdrgpdxlstatsderrelHist =
+		gpos::owner<CDXLStatsDerivedRelationArray *> pdrgpdxlstatsderrelHist =
 			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInputHist,
 													  nullptr);
 
@@ -197,8 +200,9 @@ CMCVTest::EresUnittest_MergeHistMCV()
 
 		CDXLStatsDerivedRelation *pdxlstatsderrelMCV =
 			(*pdrgpdxlstatsderrelMCV)[0];
-		const CDXLStatsDerivedColumnArray *pdrgpdxlstatsdercolMCV =
-			pdxlstatsderrelMCV->GetDXLStatsDerivedColArray();
+		gpos::pointer<const CDXLStatsDerivedColumnArray *>
+			pdrgpdxlstatsdercolMCV =
+				pdxlstatsderrelMCV->GetDXLStatsDerivedColArray();
 		CDXLStatsDerivedColumn *pdxlstatsdercolMCV =
 			(*pdrgpdxlstatsdercolMCV)[0];
 		CBucketArray *pdrgppbucketMCV = CDXLUtils::ParseDXLToBucketsArray(
@@ -207,8 +211,9 @@ CMCVTest::EresUnittest_MergeHistMCV()
 
 		CDXLStatsDerivedRelation *pdxlstatsderrelHist =
 			(*pdrgpdxlstatsderrelHist)[0];
-		const CDXLStatsDerivedColumnArray *pdrgpdxlstatsdercolHist =
-			pdxlstatsderrelHist->GetDXLStatsDerivedColArray();
+		gpos::pointer<const CDXLStatsDerivedColumnArray *>
+			pdrgpdxlstatsdercolHist =
+				pdxlstatsderrelHist->GetDXLStatsDerivedColArray();
 		CDXLStatsDerivedColumn *pdxlstatsdercolHist =
 			(*pdrgpdxlstatsdercolHist)[0];
 		CBucketArray *pdrgppbucketHist = CDXLUtils::ParseDXLToBucketsArray(
@@ -222,7 +227,7 @@ CMCVTest::EresUnittest_MergeHistMCV()
 			CStatisticsUtils::MergeMCVHist(mp, phistMCV, phistHist);
 
 		// create hash map from colid -> histogram
-		UlongToHistogramMap *col_histogram_mapping =
+		gpos::owner<UlongToHistogramMap *> col_histogram_mapping =
 			GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 		// generate int histogram for column 1
@@ -230,18 +235,19 @@ CMCVTest::EresUnittest_MergeHistMCV()
 		col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(colid), phistMerged);
 
 		// column width for int4
-		UlongToDoubleMap *colid_width_mapping =
+		gpos::owner<UlongToDoubleMap *> colid_width_mapping =
 			GPOS_NEW(mp) UlongToDoubleMap(mp);
 		CDouble width = pdxlstatsdercolMCV->Width();
 		colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(colid),
 									GPOS_NEW(mp) CDouble(width));
 
-		CStatistics *stats = GPOS_NEW(mp) CStatistics(
+		gpos::owner<CStatistics *> stats = GPOS_NEW(mp) CStatistics(
 			mp, col_histogram_mapping, colid_width_mapping,
 			pdxlstatsderrelMCV->Rows(), pdxlstatsderrelMCV->IsEmpty());
 
 		// put stats object in an array in order to serialize
-		CStatisticsArray *pdrgpstats = GPOS_NEW(mp) CStatisticsArray(mp);
+		gpos::owner<CStatisticsArray *> pdrgpstats =
+			GPOS_NEW(mp) CStatisticsArray(mp);
 		pdrgpstats->Append(stats);
 
 		// serialize stats object

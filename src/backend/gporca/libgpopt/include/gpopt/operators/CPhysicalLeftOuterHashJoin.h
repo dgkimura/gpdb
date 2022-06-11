@@ -57,7 +57,7 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalLeftOuterHashJoin *
+	static gpos::cast_func<CPhysicalLeftOuterHashJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -10,6 +10,7 @@
 #define GPDXL_CDXLScalarPartListValues_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 
@@ -22,10 +23,10 @@ private:
 	ULONG m_partitioning_level;
 
 	// result type
-	IMDId *m_result_type_mdid;
+	gpos::owner<IMDId *> m_result_type_mdid;
 
 	// element type
-	IMDId *m_elem_type_mdid;
+	gpos::owner<IMDId *> m_elem_type_mdid;
 
 public:
 	CDXLScalarPartListValues(const CDXLScalarPartListValues &) = delete;
@@ -47,14 +48,14 @@ public:
 	ULONG GetPartitioningLevel() const;
 
 	// result type
-	IMDId *GetResultTypeMdId() const;
+	gpos::pointer<IMDId *> GetResultTypeMdId() const;
 
 	// element type
-	IMDId *GetElemTypeMdId() const;
+	gpos::pointer<IMDId *> GetElemTypeMdId() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// does the operator return a boolean result
 	BOOL HasBoolResult(CMDAccessor *md_accessor) const override;
@@ -67,7 +68,8 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarPartListValues *Cast(CDXLOperator *dxl_op);
+	static gpos::cast_func<CDXLScalarPartListValues *> Cast(
+		CDXLOperator *dxl_op);
 };
 }  // namespace gpdxl
 

@@ -34,10 +34,10 @@ class CDXLLogicalConstTable : public CDXLLogical
 {
 private:
 	// list of column descriptors
-	CDXLColDescrArray *m_col_descr_array;
+	gpos::owner<CDXLColDescrArray *> m_col_descr_array;
 
 	// array of datum arrays (const tuples)
-	CDXLDatum2dArray *m_const_tuples_datum_array;
+	gpos::owner<CDXLDatum2dArray *> m_const_tuples_datum_array;
 
 public:
 	CDXLLogicalConstTable(CDXLLogicalConstTable &) = delete;
@@ -66,7 +66,7 @@ public:
 	}
 
 	// return the column descriptor at a given position
-	CDXLColDescr *GetColumnDescrAt(ULONG ul) const;
+	gpos::pointer<CDXLColDescr *> GetColumnDescrAt(ULONG ul) const;
 
 	// number of columns
 	ULONG Arity() const;

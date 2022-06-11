@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/operators/CDXLScalarSubquery.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -80,8 +81,9 @@ CDXLScalarSubquery::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubquery::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+CDXLScalarSubquery::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

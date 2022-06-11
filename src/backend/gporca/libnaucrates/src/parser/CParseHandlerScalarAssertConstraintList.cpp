@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarAssertConstraintList.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerUtils.h"
@@ -145,7 +147,7 @@ CParseHandlerScalarAssertConstraintList::EndElement(
 		GPOS_ASSERT(nullptr != child_dxlnode);
 		child_dxlnode->AddRef();
 
-		CDXLNode *pdxlnAssertConstraint = GPOS_NEW(m_mp)
+		gpos::owner<CDXLNode *> pdxlnAssertConstraint = GPOS_NEW(m_mp)
 			CDXLNode(m_mp, m_dxl_op_assert_constraint, child_dxlnode);
 		m_dxlnode_assert_constraints_parsed_array->Append(
 			pdxlnAssertConstraint);

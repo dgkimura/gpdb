@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerDistinctComp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarDistinctComp.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerDistinctComp : public CParseHandlerScalarOp
 {
 private:
 	// the distinct comparison operator
-	CDXLScalarDistinctComp *m_dxl_op;
+	gpos::pointer<CDXLScalarDistinctComp *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

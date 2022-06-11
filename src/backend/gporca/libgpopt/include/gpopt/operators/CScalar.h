@@ -89,7 +89,7 @@ public:
 	}
 
 	// create derived properties container
-	CDrvdProp *PdpCreate(CMemoryPool *mp) const override;
+	gpos::owner<CDrvdProp *> PdpCreate(CMemoryPool *mp) const override;
 
 	// create required properties container
 	CReqdProp *PrpCreate(CMemoryPool *mp) const override;

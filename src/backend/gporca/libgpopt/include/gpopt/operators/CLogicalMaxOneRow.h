@@ -13,6 +13,7 @@
 #define GPOPT_CLogicalMaxOneRow_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 
@@ -80,7 +81,8 @@ public:
 	}
 
 	// return true if we can pull projections up past this operator from its given child
-	BOOL FCanPullProjectionsUp(ULONG  //child_index
+	BOOL
+	FCanPullProjectionsUp(ULONG	 //child_index
 	) const override
 	{
 		return false;
@@ -155,7 +157,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalMaxOneRow *
+	static gpos::cast_func<CLogicalMaxOneRow *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

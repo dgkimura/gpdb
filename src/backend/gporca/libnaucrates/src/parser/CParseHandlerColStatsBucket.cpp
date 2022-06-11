@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerColStatsBucket.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -66,7 +68,7 @@ CParseHandlerColStatsBucket::~CParseHandlerColStatsBucket()
 //		The bucket constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CDXLBucket *
+gpos::pointer<CDXLBucket *>
 CParseHandlerColStatsBucket::GetDXLBucketAt() const
 {
 	return m_dxl_bucket;

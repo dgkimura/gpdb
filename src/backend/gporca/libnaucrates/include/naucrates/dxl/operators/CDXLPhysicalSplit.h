@@ -32,10 +32,10 @@ class CDXLPhysicalSplit : public CDXLPhysical
 {
 private:
 	// list of deletion column ids
-	ULongPtrArray *m_deletion_colid_array;
+	gpos::owner<ULongPtrArray *> m_deletion_colid_array;
 
 	// list of insertion column ids
-	ULongPtrArray *m_insert_colid_array;
+	gpos::owner<ULongPtrArray *> m_insert_colid_array;
 
 	// action column id
 	ULONG m_action_colid;

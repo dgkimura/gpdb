@@ -11,6 +11,8 @@
 
 #include "gpopt/base/CRewindabilitySpec.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPhysicalSpool.h"
 
@@ -54,7 +56,7 @@ CRewindabilitySpec::~CRewindabilitySpec() = default;
 //
 //---------------------------------------------------------------------------
 BOOL
-CRewindabilitySpec::Matches(const CRewindabilitySpec *prs) const
+CRewindabilitySpec::Matches(gpos::pointer<const CRewindabilitySpec *> prs) const
 {
 	GPOS_ASSERT(nullptr != prs);
 
@@ -93,7 +95,8 @@ CRewindabilitySpec::Matches(const CRewindabilitySpec *prs) const
 //	+-----------+----------+--------+
 
 BOOL
-CRewindabilitySpec::FSatisfies(const CRewindabilitySpec *prs) const
+CRewindabilitySpec::FSatisfies(
+	gpos::pointer<const CRewindabilitySpec *> prs) const
 {
 	// ErtNone requests always satisfied (row 1 in table 1)
 	if (prs->Ert() == ErtNone)
@@ -188,7 +191,7 @@ CRewindabilitySpec::AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	pexpr->AddRef();
-	CExpression *pexprSpool = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprSpool = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalSpool(mp, eager), pexpr);
 	pdrgpexpr->Append(pexprSpool);
 }

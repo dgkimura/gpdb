@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementDML.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogicalDML.h"
@@ -77,12 +78,12 @@ CXformImplementDML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	CLogicalDML::EDMLOperator edmlop = popDML->Edmlop();
 
-	CTableDescriptor *ptabdesc = popDML->Ptabdesc();
+	gpos::owner<CTableDescriptor *> ptabdesc = popDML->Ptabdesc();
 	ptabdesc->AddRef();
 
-	CColRefArray *pdrgpcrSource = popDML->PdrgpcrSource();
+	gpos::owner<CColRefArray *> pdrgpcrSource = popDML->PdrgpcrSource();
 	pdrgpcrSource->AddRef();
-	CBitSet *pbsModified = popDML->PbsModified();
+	gpos::owner<CBitSet *> pbsModified = popDML->PbsModified();
 	pbsModified->AddRef();
 
 	CColRef *pcrAction = popDML->PcrAction();
@@ -92,11 +93,11 @@ CXformImplementDML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CColRef *pcrTupleOid = popDML->PcrTupleOid();
 
 	// child of DML operator
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
 	pexprChild->AddRef();
 
 	// create physical DML
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalDML(mp, edmlop, ptabdesc, pdrgpcrSource,
 								  pbsModified, pcrAction, pcrTableOid, pcrCtid,

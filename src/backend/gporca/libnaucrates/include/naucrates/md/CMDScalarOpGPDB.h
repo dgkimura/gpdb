@@ -15,6 +15,7 @@
 #define GPMD_CMDScalarOpGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDScalarOp.h"
 
@@ -41,28 +42,28 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// operator id
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// operator name
 	CMDName *m_mdname;
 
 	// type of left operand
-	IMDId *m_mdid_type_left;
+	gpos::owner<IMDId *> m_mdid_type_left;
 
 	// type of right operand
-	IMDId *m_mdid_type_right;
+	gpos::owner<IMDId *> m_mdid_type_right;
 
 	// type of result operand
-	IMDId *m_mdid_type_result;
+	gpos::owner<IMDId *> m_mdid_type_result;
 
 	// id of function which implements the operator
-	IMDId *m_func_mdid;
+	gpos::owner<IMDId *> m_func_mdid;
 
 	// id of commute operator
-	IMDId *m_mdid_commute_opr;
+	gpos::owner<IMDId *> m_mdid_commute_opr;
 
 	// id of inverse operator
-	IMDId *m_mdid_inverse_opr;
+	gpos::owner<IMDId *> m_mdid_inverse_opr;
 
 	// comparison type for comparison operators
 	IMDType::ECmpType m_comparision_type;
@@ -71,13 +72,13 @@ private:
 	BOOL m_returns_null_on_null_input;
 
 	// operator classes this operator belongs to
-	IMdIdArray *m_mdid_opfamilies_array;
+	gpos::owner<IMdIdArray *> m_mdid_opfamilies_array;
 
 	// compatible hash op family
-	IMDId *m_mdid_hash_opfamily;
+	gpos::owner<IMDId *> m_mdid_hash_opfamily;
 
 	// compatible legacy hash op family using legacy (cdbhash) opclass
-	IMDId *m_mdid_legacy_hash_opfamily;
+	gpos::owner<IMDId *> m_mdid_legacy_hash_opfamily;
 
 	// does operator preserve the NDV of its input(s)
 	// (used for cardinality estimation)
@@ -106,28 +107,28 @@ public:
 	}
 
 	// operator id
-	IMDId *MDId() const override;
+	gpos::pointer<IMDId *> MDId() const override;
 
 	// operator name
 	CMDName Mdname() const override;
 
 	// left operand type id
-	IMDId *GetLeftMdid() const override;
+	gpos::pointer<IMDId *> GetLeftMdid() const override;
 
 	// right operand type id
-	IMDId *GetRightMdid() const override;
+	gpos::pointer<IMDId *> GetRightMdid() const override;
 
 	// resulttype id
-	IMDId *GetResultTypeMdid() const override;
+	gpos::pointer<IMDId *> GetResultTypeMdid() const override;
 
 	// implementer function id
-	IMDId *FuncMdId() const override;
+	gpos::pointer<IMDId *> FuncMdId() const override;
 
 	// commutor id
-	IMDId *GetCommuteOpMdid() const override;
+	gpos::pointer<IMDId *> GetCommuteOpMdid() const override;
 
 	// inverse operator id
-	IMDId *GetInverseOpMdid() const override;
+	gpos::pointer<IMDId *> GetInverseOpMdid() const override;
 
 	// is this an equality operator
 	BOOL IsEqualityOp() const override;
@@ -150,10 +151,10 @@ public:
 	ULONG OpfamiliesCount() const override;
 
 	// operator class at given position
-	IMDId *OpfamilyMdidAt(ULONG pos) const override;
+	gpos::pointer<IMDId *> OpfamilyMdidAt(ULONG pos) const override;
 
 	// compatible hash opfamily
-	IMDId *HashOpfamilyMdid() const override;
+	gpos::pointer<IMDId *> HashOpfamilyMdid() const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the type in the provided stream

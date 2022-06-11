@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMetadataColumn_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 #include "naucrates/md/CMDColumn.h"
@@ -36,7 +37,7 @@ class CParseHandlerMetadataColumn : public CParseHandlerBase
 {
 private:
 	// the metadata column
-	CMDColumn *m_mdcol;
+	gpos::owner<CMDColumn *> m_mdcol;
 
 	// column name
 	CMDName *m_mdname;
@@ -45,7 +46,7 @@ private:
 	INT m_attno;
 
 	// attribute type oid
-	IMDId *m_mdid_type;
+	gpos::pointer<IMDId *> m_mdid_type;
 
 	INT m_type_modifier;
 
@@ -56,7 +57,7 @@ private:
 	BOOL m_is_dropped;
 
 	// default value expression if one exists
-	CDXLNode *m_dxl_default_val;
+	gpos::pointer<CDXLNode *> m_dxl_default_val;
 
 	// width of the column
 	ULONG m_width;
@@ -86,7 +87,7 @@ public:
 
 	~CParseHandlerMetadataColumn() override;
 
-	CMDColumn *GetMdCol();
+	gpos::pointer<CMDColumn *> GetMdCol();
 };
 }  // namespace gpdxl
 

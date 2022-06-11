@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerPhysicalWindow_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLWindowKey.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerPhysicalWindow : public CParseHandlerPhysicalOp
 {
 private:
 	// array of partition columns used by the window functions
-	ULongPtrArray *m_part_by_colid_array;
+	gpos::pointer<ULongPtrArray *> m_part_by_colid_array;
 
 	// process the start of an element
 	void StartElement(

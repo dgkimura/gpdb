@@ -11,6 +11,7 @@
 
 #include "gpopt/mdcache/CMDKey.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/io/COstreamString.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -28,7 +29,7 @@ using namespace gpopt;
 //		Constructs a md cache key
 //
 //---------------------------------------------------------------------------
-CMDKey::CMDKey(const IMDId *mdid) : m_mdid(mdid)
+CMDKey::CMDKey(gpos::pointer<const IMDId *> mdid) : m_mdid(mdid)
 {
 	GPOS_ASSERT(mdid->IsValid());
 }

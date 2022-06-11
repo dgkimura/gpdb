@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerGroupingColList.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -136,7 +138,7 @@ CParseHandlerGroupingColList::EndElement(const XMLCh *const,  // element_uri,
 //		Returns the array of parsed grouping column ids
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::pointer<ULongPtrArray *>
 CParseHandlerGroupingColList::GetGroupingColidArray()
 {
 	return m_grouping_colids_array;

@@ -45,7 +45,7 @@ class CDXLPhysicalPartitionSelector : public CDXLPhysical
 {
 private:
 	// table id
-	IMDId *m_rel_mdid;
+	gpos::owner<IMDId *> m_rel_mdid;
 
 	// selector id
 	ULONG m_selector_id;
@@ -53,7 +53,7 @@ private:
 	// scan id
 	ULONG m_scan_id;
 
-	ULongPtrArray *m_parts;
+	gpos::owner<ULongPtrArray *> m_parts;
 
 public:
 	CDXLPhysicalPartitionSelector(CDXLPhysicalPartitionSelector &) = delete;

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarFunc.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -69,7 +70,8 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp, IMDId *mdid_func,
 	GPOS_ASSERT(m_return_type_mdid->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+	gpos::pointer<const IMDFunction *> pmdfunc =
+		md_accessor->RetrieveFunc(m_func_mdid);
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_returns_set = pmdfunc->ReturnsSet();
@@ -117,7 +119,7 @@ CScalarFunc::PstrFunc() const
 //		Func id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarFunc::FuncMdId() const
 {
 	return m_func_mdid;
@@ -186,7 +188,7 @@ CScalarFunc::Matches(COperator *pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarFunc::MdidType() const
 {
 	return m_return_type_mdid;

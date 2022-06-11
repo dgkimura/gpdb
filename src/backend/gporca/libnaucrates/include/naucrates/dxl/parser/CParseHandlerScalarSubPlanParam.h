@@ -14,6 +14,7 @@
 #define GPDXL_CParseHandlerScalarSubPlanParam_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLColRef.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerScalarSubPlanParam : public CParseHandlerScalarOp
 {
 private:
 	// column reference
-	CDXLColRef *m_dxl_colref;
+	gpos::owner<CDXLColRef *> m_dxl_colref;
 
 	// process the start of an element
 	void StartElement(
@@ -65,7 +66,7 @@ public:
 	~CParseHandlerScalarSubPlanParam() override;
 
 	// return column reference
-	CDXLColRef *
+	gpos::pointer<CDXLColRef *>
 	MakeDXLColRef(void) const
 	{
 		return m_dxl_colref;

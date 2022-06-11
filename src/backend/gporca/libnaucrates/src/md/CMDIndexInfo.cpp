@@ -11,6 +11,8 @@
 
 #include "naucrates/md/CMDIndexInfo.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpdxl;
@@ -30,7 +32,7 @@ CMDIndexInfo::~CMDIndexInfo()
 }
 
 // returns the metadata id of this index
-IMDId *
+gpos::pointer<IMDId *>
 CMDIndexInfo::MDId() const
 {
 	return m_mdid;

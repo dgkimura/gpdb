@@ -18,6 +18,7 @@
 #include "gpopt/operators/CScalarArrayCoerceExpr.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 using namespace gpmd;
@@ -63,7 +64,7 @@ CScalarArrayCoerceExpr::~CScalarArrayCoerceExpr()
 //		Return metadata id of element coerce function
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarArrayCoerceExpr::PmdidElementFunc() const
 {
 	return m_pmdidElementFunc;
@@ -164,7 +165,7 @@ CScalarArrayCoerceExpr::FInputOrderSensitive() const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CScalarArrayCoerceExpr *
+gpos::cast_func<CScalarArrayCoerceExpr *>
 CScalarArrayCoerceExpr::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);

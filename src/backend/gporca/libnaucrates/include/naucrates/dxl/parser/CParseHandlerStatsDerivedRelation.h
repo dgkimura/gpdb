@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerStatsDerivedRelation_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 #include "naucrates/md/CDXLStatsDerivedRelation.h"
@@ -49,7 +50,7 @@ private:
 	ULONG m_relallvisible;
 
 	// relation stats
-	CDXLStatsDerivedRelation *m_dxl_stats_derived_relation;
+	gpos::owner<CDXLStatsDerivedRelation *> m_dxl_stats_derived_relation;
 
 	// process the start of an element
 	void StartElement(
@@ -79,7 +80,7 @@ public:
 	~CParseHandlerStatsDerivedRelation() override;
 
 	// the derived relation stats
-	CDXLStatsDerivedRelation *
+	gpos::pointer<CDXLStatsDerivedRelation *>
 	GetDxlStatsDrvdRelation() const
 	{
 		return m_dxl_stats_derived_relation;

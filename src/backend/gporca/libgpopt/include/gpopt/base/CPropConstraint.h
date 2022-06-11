@@ -38,13 +38,13 @@ class CPropConstraint : public CRefCount, public DbgPrintMixin<CPropConstraint>
 {
 private:
 	// array of equivalence classes
-	CColRefSetArray *m_pdrgpcrs;
+	gpos::owner<CColRefSetArray *> m_pdrgpcrs;
 
 	// mapping from column to equivalence class
-	ColRefToColRefSetMap *m_phmcrcrs;
+	gpos::owner<ColRefToColRefSetMap *> m_phmcrcrs;
 
 	// constraint
-	CConstraint *m_pcnstr;
+	gpos::owner<CConstraint *> m_pcnstr;
 
 	// initialize mapping from columns to equivalence classes
 	void InitHashMap(CMemoryPool *mp);

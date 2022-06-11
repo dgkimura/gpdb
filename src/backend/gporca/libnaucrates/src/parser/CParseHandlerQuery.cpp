@@ -19,6 +19,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerQuery.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/parser/CParseHandlerCTEList.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerLogicalOp.h"
@@ -71,7 +73,7 @@ CParseHandlerQuery::~CParseHandlerQuery()
 //		Root of constructed DXL plan
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::pointer<CDXLNode *>
 CParseHandlerQuery::CreateDXLNode() const
 {
 	return m_dxl_node;
@@ -85,7 +87,7 @@ CParseHandlerQuery::CreateDXLNode() const
 //		Returns the list of query output columns
 //
 //---------------------------------------------------------------------------
-CDXLNodeArray *
+gpos::pointer<CDXLNodeArray *>
 CParseHandlerQuery::GetOutputColumnsDXLArray() const
 {
 	return m_output_colums_dxl_array;
@@ -99,7 +101,7 @@ CParseHandlerQuery::GetOutputColumnsDXLArray() const
 //		Returns the list of CTEs
 //
 //---------------------------------------------------------------------------
-CDXLNodeArray *
+gpos::pointer<CDXLNodeArray *>
 CParseHandlerQuery::GetCTEProducerDXLArray() const
 {
 	return m_cte_producers;

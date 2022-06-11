@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CAutoRef.h"
 #include "gpos/common/CHashMapIter.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/test/CUnittest.h"
 
@@ -67,7 +68,7 @@ CHashMapIterTest::EresUnittest_Basic()
 
 
 	// using N - 2 slots guarantees collisions
-	Map *pm = GPOS_NEW(mp) Map(mp, ulCnt - 2);
+	gpos::owner<Map *> pm = GPOS_NEW(mp) Map(mp, ulCnt - 2);
 
 #ifdef GPOS_DEBUG
 

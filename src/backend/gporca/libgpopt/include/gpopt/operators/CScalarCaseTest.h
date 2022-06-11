@@ -12,6 +12,7 @@
 #define GPOPT_CScalarCaseTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
@@ -32,7 +33,7 @@ class CScalarCaseTest : public CScalar
 {
 private:
 	// type id
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 public:
 	CScalarCaseTest(const CScalarCaseTest &) = delete;
@@ -58,7 +59,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	IMDId *
+	gpos::pointer<IMDId *>
 	MdidType() const override
 	{
 		return m_mdid_type;
@@ -75,16 +76,17 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
 
 	// conversion function
-	static CScalarCaseTest *
+	static gpos::cast_func<CScalarCaseTest *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

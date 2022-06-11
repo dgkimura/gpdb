@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformDelete2DML.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogicalDelete.h"
@@ -74,10 +75,10 @@ CXformDelete2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	// extract components for alternative
 
-	CTableDescriptor *ptabdesc = popDelete->Ptabdesc();
+	gpos::owner<CTableDescriptor *> ptabdesc = popDelete->Ptabdesc();
 	ptabdesc->AddRef();
 
-	CColRefArray *colref_array = popDelete->Pdrgpcr();
+	gpos::owner<CColRefArray *> colref_array = popDelete->Pdrgpcr();
 	colref_array->AddRef();
 
 	CColRef *pcrCtid = popDelete->PcrCtid();
@@ -85,7 +86,7 @@ CXformDelete2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CColRef *pcrSegmentId = popDelete->PcrSegmentId();
 
 	// child of delete operator
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
 	pexprChild->AddRef();
 
 	// create logical DML

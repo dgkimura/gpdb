@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformJoinAssociativity.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogicalInnerJoin.h"
@@ -77,7 +78,8 @@ CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp, CExpression *pexpr,
 	CExpression *pexprLeftLeft = (*pexprLeft)[0];
 	CExpression *pexprRight = (*pexpr)[1];
 
-	CExpressionArray *pdrgpexprJoins = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprJoins =
+		GPOS_NEW(mp) CExpressionArray(mp);
 
 	pexprLeft->AddRef();
 	pdrgpexprJoins->Append(pexprLeft);
@@ -86,21 +88,23 @@ CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp, CExpression *pexpr,
 	pdrgpexprJoins->Append(pexpr);
 
 	// columns for new lower join
-	CColRefSet *pcrsLower = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsLower = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsLower->Union(pexprLeftLeft->DeriveOutputColumns());
 	pcrsLower->Union(pexprRight->DeriveOutputColumns());
 
 	// convert current predicates into arrays of conjuncts
-	CExpressionArray *pdrgpexprOrig = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprOrig =
+		GPOS_NEW(mp) CExpressionArray(mp);
 
 	for (ULONG ul = 0; ul < 2; ul++)
 	{
-		CExpressionArray *pdrgpexprPreds = CPredicateUtils::PdrgpexprConjuncts(
-			mp, (*(*pdrgpexprJoins)[ul])[2]);
+		gpos::owner<CExpressionArray *> pdrgpexprPreds =
+			CPredicateUtils::PdrgpexprConjuncts(mp,
+												(*(*pdrgpexprJoins)[ul])[2]);
 		ULONG length = pdrgpexprPreds->Size();
 		for (ULONG ulConj = 0; ulConj < length; ulConj++)
 		{
-			CExpression *pexprConj = (*pdrgpexprPreds)[ulConj];
+			gpos::owner<CExpression *> pexprConj = (*pdrgpexprPreds)[ulConj];
 			pexprConj->AddRef();
 
 			pdrgpexprOrig->Append(pexprConj);
@@ -218,8 +222,10 @@ CXformJoinAssociativity::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create new predicates
-	CExpressionArray *pdrgpexprLower = GPOS_NEW(mp) CExpressionArray(mp);
-	CExpressionArray *pdrgpexprUpper = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprLower =
+		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprUpper =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	CreatePredicates(mp, pexpr, pdrgpexprLower, pdrgpexprUpper);
 
 	GPOS_ASSERT(pdrgpexprLower->Size() > 0);

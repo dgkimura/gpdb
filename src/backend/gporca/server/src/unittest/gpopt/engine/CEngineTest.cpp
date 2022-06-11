@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/engine/CEngineTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/task/CAutoTraceFlag.h"
 
@@ -82,7 +83,7 @@ CEngineTest::EresUnittest_Basic()
 	CAutoTraceFlag atf9(EopttracePrintXformPattern, true);
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -93,7 +94,8 @@ CEngineTest::EresUnittest_Basic()
 	CEngine eng(mp);
 
 	// generate  join expression
-	CExpression *pexpr = CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
+	gpos::owner<CExpression *> pexpr =
+		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
 
 	// generate query context
 	CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexpr);
@@ -105,7 +107,7 @@ CEngineTest::EresUnittest_Basic()
 	eng.Optimize();
 
 	// extract plan
-	CExpression *pexprPlan = eng.PexprExtractPlan();
+	gpos::owner<CExpression *> pexprPlan = eng.PexprExtractPlan();
 	GPOS_ASSERT(nullptr != pexprPlan);
 
 	// clean up
@@ -147,7 +149,7 @@ CEngineTest::EresOptimize(
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -157,13 +159,14 @@ CEngineTest::EresOptimize(
 						 CTestUtils::GetCostModel(mp));
 
 		// generate cross product expressions
-		CExpressionJoinsArray *pdrgpexprCrossProducts =
+		gpos::owner<CExpressionJoinsArray *> pdrgpexprCrossProducts =
 			CTestUtils::PdrgpexprJoins(mp, str, pul, ulRels,
 									   true /*fCrossProduct*/);
 
 		// generate join expressions
-		CExpressionJoinsArray *pdrgpexpr = CTestUtils::PdrgpexprJoins(
-			mp, str, pul, ulRels, false /*fCrossProduct*/);
+		gpos::owner<CExpressionJoinsArray *> pdrgpexpr =
+			CTestUtils::PdrgpexprJoins(mp, str, pul, ulRels,
+									   false /*fCrossProduct*/);
 
 		// build memo for each expression
 		for (ULONG ul = m_ulTestCounter; ul < ulRels; ul++)

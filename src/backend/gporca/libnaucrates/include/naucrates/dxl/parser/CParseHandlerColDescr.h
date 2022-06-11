@@ -14,6 +14,7 @@
 #define GPDXL_CParseHandlerColumnDescriptor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLColDescr.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -37,10 +38,10 @@ class CParseHandlerColDescr : public CParseHandlerBase
 {
 private:
 	// array of column descriptors to build
-	CDXLColDescrArray *m_dxl_column_descr_array;
+	gpos::owner<CDXLColDescrArray *> m_dxl_column_descr_array;
 
 	// current column descriptor being parsed
-	CDXLColDescr *m_current_column_descr;
+	gpos::pointer<CDXLColDescr *> m_current_column_descr;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +68,7 @@ public:
 
 	~CParseHandlerColDescr() override;
 
-	CDXLColDescrArray *GetDXLColumnDescrArray();
+	gpos::pointer<CDXLColDescrArray *> GetDXLColumnDescrArray();
 };
 }  // namespace gpdxl
 

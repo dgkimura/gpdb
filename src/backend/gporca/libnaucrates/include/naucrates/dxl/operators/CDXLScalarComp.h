@@ -43,7 +43,7 @@ class CDXLScalarComp : public CDXLScalar
 {
 protected:
 	// operator number in the catalog
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// comparison operator name
 	const CWStringConst *m_comparison_operator_name;
@@ -70,7 +70,7 @@ public:
 	const CWStringConst *GetComparisonOpName() const;
 
 	// operator id
-	IMDId *MDId() const;
+	gpos::pointer<IMDId *> MDId() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

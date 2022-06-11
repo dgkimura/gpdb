@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CHashMap.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalCTEAnchor.h"
@@ -88,13 +89,13 @@ CXformUnnestTVF::PdrgpcrSubqueries(CMemoryPool *mp, CExpression *pexprCTEProd,
 	CExpression *pexprProject = (*pexprCTEProd)[0];
 	GPOS_ASSERT(COperator::EopLogicalProject == pexprProject->Pop()->Eopid());
 
-	CColRefArray *pdrgpcrProdOutput =
+	gpos::owner<CColRefArray *> pdrgpcrProdOutput =
 		pexprCTEProd->DeriveOutputColumns()->Pdrgpcr(mp);
-	CColRefArray *pdrgpcrConsOutput =
+	gpos::owner<CColRefArray *> pdrgpcrConsOutput =
 		pexprCTECons->DeriveOutputColumns()->Pdrgpcr(mp);
 	GPOS_ASSERT(pdrgpcrProdOutput->Size() == pdrgpcrConsOutput->Size());
 
-	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::owner<CColRefArray *> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 	const ULONG ulPrjElems = (*pexprProject)[1]->Arity();
 	for (ULONG ulOuter = 0; ulOuter < ulPrjElems; ulOuter++)
 	{
@@ -133,7 +134,8 @@ CXformUnnestTVF::PexprProjectSubqueries(CMemoryPool *mp, CExpression *pexprTVF)
 	GPOS_ASSERT(COperator::EopLogicalTVF == pexprTVF->Pop()->Eopid());
 
 	// collect subquery arguments
-	CExpressionArray *pdrgpexprSubqueries = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprSubqueries =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG arity = pexprTVF->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
@@ -188,14 +190,14 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create a project expression on subquery arguments
-	CExpression *pexprProject = PexprProjectSubqueries(mp, pexpr);
+	gpos::owner<CExpression *> pexprProject = PexprProjectSubqueries(mp, pexpr);
 
 	// create a CTE producer on top of the project
 	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	const ULONG ulCTEId = pcteinfo->next_id();
 
 	// construct CTE producer output from subquery columns
-	CColRefArray *pdrgpcrOutput = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::owner<CColRefArray *> pdrgpcrOutput = GPOS_NEW(mp) CColRefArray(mp);
 	const ULONG ulPrjElems = (*pexprProject)[1]->Arity();
 	for (ULONG ulOuter = 0; ulOuter < ulPrjElems; ulOuter++)
 	{
@@ -214,13 +216,14 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pexprProject->Release();
 
 	// create CTE consumer
-	CColRefArray *pdrgpcrProducerOutput =
+	gpos::owner<CColRefArray *> pdrgpcrProducerOutput =
 		pexprCTEProd->DeriveOutputColumns()->Pdrgpcr(mp);
 	CColRefArray *pdrgpcrConsumerOutput =
 		CUtils::PdrgpcrCopy(mp, pdrgpcrProducerOutput);
-	CLogicalCTEConsumer *popConsumer =
+	gpos::owner<CLogicalCTEConsumer *> popConsumer =
 		GPOS_NEW(mp) CLogicalCTEConsumer(mp, ulCTEId, pdrgpcrConsumerOutput);
-	CExpression *pexprCTECons = GPOS_NEW(mp) CExpression(mp, popConsumer);
+	gpos::owner<CExpression *> pexprCTECons =
+		GPOS_NEW(mp) CExpression(mp, popConsumer);
 	pcteinfo->IncrementConsumers(ulCTEId);
 	pdrgpcrProducerOutput->Release();
 
@@ -229,7 +232,8 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		PdrgpcrSubqueries(mp, pexprCTEProd, pexprCTECons);
 
 	// create new function arguments by replacing subqueries with columns in CTE consumer output
-	CExpressionArray *pdrgpexprNewArgs = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprNewArgs =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	ULONG ulIndex = 0;
 	const ULONG arity = pexpr->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
@@ -249,7 +253,7 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// finally, create correlated apply expression
-	CLogicalTVF *popTVF = CLogicalTVF::PopConvert(pexpr->Pop());
+	gpos::owner<CLogicalTVF *> popTVF = CLogicalTVF::PopConvert(pexpr->Pop());
 	popTVF->AddRef();
 	CExpression *pexprCorrApply =
 		CUtils::PexprLogicalApply<CLogicalLeftOuterCorrelatedApply>(
@@ -259,7 +263,7 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 				mp, nullptr /*pdrgpexpr*/)	// scalar expression is const True
 		);
 
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEId), pexprCorrApply);
 
 	// add alternative to transformation result

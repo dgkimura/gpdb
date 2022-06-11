@@ -12,6 +12,7 @@
 #include "naucrates/dxl/parser/CParseHandlerTraceFlags.h"
 
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -81,7 +82,7 @@ CParseHandlerTraceFlags::StartElement(const XMLCh *const,  //element_uri,
 	const XMLCh *xml_str_trace_flags = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenValue, EdxltokenTraceFlags);
 
-	ULongPtrArray *trace_flag_array =
+	gpos::owner<ULongPtrArray *> trace_flag_array =
 		CDXLOperatorFactory::ExtractIntsToUlongArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_trace_flags,
 			EdxltokenDistrColumns, EdxltokenRelation);
@@ -145,7 +146,7 @@ CParseHandlerTraceFlags::GetParseHandlerType() const
 //		Returns the bitset for the trace flags
 //
 //---------------------------------------------------------------------------
-CBitSet *
+gpos::pointer<CBitSet *>
 CParseHandlerTraceFlags::GetTraceFlagBitSet()
 {
 	return m_trace_flags_bitset;

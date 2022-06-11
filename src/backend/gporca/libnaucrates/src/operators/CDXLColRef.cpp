@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLColRef.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpos;
@@ -71,7 +73,7 @@ CDXLColRef::MdName() const
 //		Returns column's type md id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLColRef::MdidType() const
 {
 	return m_mdid_type;

@@ -14,6 +14,7 @@
 
 #include "gpos/common/CAutoP.h"
 #include "gpos/common/CAutoRef.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -69,7 +70,7 @@ CDXLRelStats::~CDXLRelStats()
 //		Returns the metadata id of this relation stats object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLRelStats::MDId() const
 {
 	return m_rel_stats_mdid;
@@ -199,7 +200,7 @@ CDXLRelStats::CreateDXLDummyRelStats(CMemoryPool *mp, IMDId *mdid)
 	str = GPOS_NEW(mp) CWStringDynamic(mp, rel_stats_mdid->GetBuffer());
 	CAutoP<CMDName> mdname;
 	mdname = GPOS_NEW(mp) CMDName(mp, str.Value());
-	CDXLRelStats *rel_stats_dxl;
+	gpos::owner<CDXLRelStats *> rel_stats_dxl;
 	rel_stats_dxl = GPOS_NEW(mp) CDXLRelStats(
 		mp, rel_stats_mdid, mdname.Value(), CStatistics::DefaultColumnWidth,
 		false /* is_empty */, 0 /* relpages */, 0 /* relallvisible */);

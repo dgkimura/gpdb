@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerCTEList.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerLogicalCTEProducer.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -128,7 +130,8 @@ CParseHandlerCTEList::EndElement(const XMLCh *const,  // element_uri,
 	{
 		CParseHandlerLogicalCTEProducer *cte_producer_parse_handler =
 			dynamic_cast<CParseHandlerLogicalCTEProducer *>((*this)[ul]);
-		CDXLNode *dxlnode_cte = cte_producer_parse_handler->CreateDXLNode();
+		gpos::owner<CDXLNode *> dxlnode_cte =
+			cte_producer_parse_handler->CreateDXLNode();
 		dxlnode_cte->AddRef();
 		m_dxl_array->Append(dxlnode_cte);
 	}

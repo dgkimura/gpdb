@@ -11,6 +11,8 @@
 
 #include "naucrates/md/IMDProvider.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/md/CMDIdGPDB.h"
 
 using namespace gpmd;
@@ -23,7 +25,7 @@ using namespace gpmd;
 //		Return the mdid for the requested type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::owner<IMDId *>
 IMDProvider::GetGPDBTypeMdid(CMemoryPool *mp,
 							 CSystemId
 #ifdef GPOS_DEBUG

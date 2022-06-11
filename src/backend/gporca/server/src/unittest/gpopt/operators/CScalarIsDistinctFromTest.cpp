@@ -1,6 +1,7 @@
 #include "unittest/gpopt/operators/CScalarIsDistinctFromTest.h"
 
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringConst.h"
 
 #include "gpopt/operators/CScalarIsDistinctFrom.h"
@@ -17,9 +18,9 @@ private:
 	const CAutoMemoryPool m_amp;
 	CMDAccessor m_mda;
 	const CAutoOptCtxt m_aoc;
-	CScalarIsDistinctFrom *const m_pScalarIDF;
+	gpos::owner<CScalarIsDistinctFrom *> const m_pScalarIDF;
 
-	static IMDProvider *
+	static gpos::owner<IMDProvider *>
 	Pmdp()
 	{
 		CTestUtils::m_pmdpf->AddRef();
@@ -50,7 +51,7 @@ public:
 		return m_amp.Pmp();
 	}
 
-	CScalarIsDistinctFrom *
+	gpos::pointer<CScalarIsDistinctFrom *>
 	PScalarIDF() const
 	{
 		return m_pScalarIDF;
@@ -63,7 +64,8 @@ EresUnittest_Eber_WhenBothInputsAreNull()
 	SEberFixture fixture;
 	CMemoryPool *mp = fixture.Pmp();
 
-	ULongPtrArray *pdrgpulChildren = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpulChildren =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberNull));
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberNull));
 
@@ -83,7 +85,8 @@ EresUnittest_Eber_WhenFirstInputIsUnknown()
 	SEberFixture fixture;
 	CMemoryPool *mp = fixture.Pmp();
 
-	ULongPtrArray *pdrgpulChildren = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpulChildren =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberAny));
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberNull));
 
@@ -103,7 +106,8 @@ EresUnittest_Eber_WhenSecondInputIsUnknown()
 	SEberFixture fixture;
 	CMemoryPool *mp = fixture.Pmp();
 
-	ULongPtrArray *pdrgpulChildren = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpulChildren =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberNull));
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberAny));
 
@@ -123,7 +127,8 @@ EresUnittest_Eber_WhenFirstInputDiffersFromSecondInput()
 	SEberFixture fixture;
 	CMemoryPool *mp = fixture.Pmp();
 
-	ULongPtrArray *pdrgpulChildren = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpulChildren =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberNull));
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberTrue));
 
@@ -143,7 +148,8 @@ EresUnittest_Eber_WhenBothInputsAreSameAndNotNull()
 	SEberFixture fixture;
 	CMemoryPool *mp = fixture.Pmp();
 
-	ULongPtrArray *pdrgpulChildren = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpulChildren =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberTrue));
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberTrue));
 

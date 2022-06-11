@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarCast.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -44,7 +45,8 @@ CScalarCast::CScalarCast(CMemoryPool *mp, IMDId *return_type_mdid,
 	if (nullptr != m_func_mdid && m_func_mdid->IsValid())
 	{
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+		gpos::pointer<const IMDFunction *> pmdfunc =
+			md_accessor->RetrieveFunc(m_func_mdid);
 
 		m_returns_null_on_null_input = pmdfunc->IsStrict();
 		m_fBoolReturnType =

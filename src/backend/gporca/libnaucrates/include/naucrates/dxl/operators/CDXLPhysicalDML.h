@@ -45,10 +45,10 @@ private:
 	const EdxlDmlType m_dxl_dml_type;
 
 	// target table descriptor
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
 
 	// list of source column ids
-	ULongPtrArray *m_src_colids_array;
+	gpos::owner<ULongPtrArray *> m_src_colids_array;
 
 	// action column id
 	ULONG m_action_colid;
@@ -69,7 +69,7 @@ private:
 	ULONG m_tuple_oid;
 
 	// direct dispatch info for insert statements
-	CDXLDirectDispatchInfo *m_direct_dispatch_info;
+	gpos::owner<CDXLDirectDispatchInfo *> m_direct_dispatch_info;
 
 	// needs the data to be sorted or not
 	BOOL m_input_sort_req;

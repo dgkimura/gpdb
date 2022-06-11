@@ -49,7 +49,7 @@ class CXform : public CRefCount, public DbgPrintMixin<CXform>
 {
 private:
 	// pattern
-	CExpression *m_pexpr;
+	gpos::owner<CExpression *> m_pexpr;
 
 public:
 	CXform(CXform &) = delete;
@@ -274,8 +274,9 @@ public:
 	}
 
 	// actual transformation
-	virtual void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-						   CExpression *pexpr) const = 0;
+	virtual void Transform(gpos::pointer<CXformContext *> pxfctxt,
+						   gpos::pointer<CXformResult *> pxfres,
+						   gpos::pointer<CExpression *> pexpr) const = 0;
 
 	// accessor
 	gpos::pointer<CExpression *>

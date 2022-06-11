@@ -13,6 +13,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalTVF.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLPhysicalTVF.h"
@@ -142,7 +144,7 @@ CParseHandlerPhysicalTVF::EndElement(const XMLCh *const,  // element_uri,
 				   str->GetBuffer());
 	}
 
-	CDXLPhysicalTVF *dxl_op = GPOS_NEW(m_mp)
+	gpos::owner<CDXLPhysicalTVF *> dxl_op = GPOS_NEW(m_mp)
 		CDXLPhysicalTVF(m_mp, m_func_mdid, m_return_type_mdid, m_pstr);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 

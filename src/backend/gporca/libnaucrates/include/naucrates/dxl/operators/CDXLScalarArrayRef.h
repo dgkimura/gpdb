@@ -34,16 +34,16 @@ class CDXLScalarArrayRef : public CDXLScalar
 {
 private:
 	// base element type id
-	IMDId *m_elem_type_mdid;
+	gpos::owner<IMDId *> m_elem_type_mdid;
 
 	// element type modifier
 	INT m_type_modifier;
 
 	// array type id
-	IMDId *m_array_type_mdid;
+	gpos::owner<IMDId *> m_array_type_mdid;
 
 	// return type id
-	IMDId *m_return_type_mdid;
+	gpos::owner<IMDId *> m_return_type_mdid;
 
 public:
 	CDXLScalarArrayRef(const CDXLScalarArrayRef &) = delete;

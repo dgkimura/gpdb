@@ -13,6 +13,7 @@
 #define GPOPT_CXformEagerAgg_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformExploration.h"
 
@@ -80,10 +81,11 @@ public:
 
 private:
 	// check if transform can be applied
-	static BOOL CanApplyTransform(CExpression *agg_expr);
+	static BOOL CanApplyTransform(gpos::pointer<CExpression *> agg_expr);
 
 	// is this aggregate supported for push down?
-	static BOOL CanPushAggBelowJoin(CExpression *scalar_agg_func_expr);
+	static BOOL CanPushAggBelowJoin(
+		gpos::pointer<CExpression *> scalar_agg_func_expr);
 
 	// generate project lists for the lower and upper aggregates
 	// from all the original aggregates

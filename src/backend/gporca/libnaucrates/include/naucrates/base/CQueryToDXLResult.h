@@ -34,13 +34,13 @@ class CQueryToDXLResult
 {
 private:
 	// DXL representing the Query
-	CDXLNode *m_query_dxl;
+	gpos::owner<CDXLNode *> m_query_dxl;
 
 	// array of DXL nodes that represent the query output
-	CDXLNodeArray *m_query_output;
+	gpos::owner<CDXLNodeArray *> m_query_output;
 
 	// CTE list
-	CDXLNodeArray *m_cte_producers;
+	gpos::owner<CDXLNodeArray *> m_cte_producers;
 
 public:
 	// ctor

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerScalarCaseTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarCaseTest.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerScalarCaseTest : public CParseHandlerScalarOp
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::pointer<IMDId *> m_mdid_type;
 
 	// process the start of an element
 	void StartElement(const XMLCh *const element_uri,

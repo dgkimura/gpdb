@@ -10,6 +10,8 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/base/COrderSpecTest.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CColumnFactory.h"
 #include "gpopt/base/COrderSpec.h"
 #include "gpopt/base/CQueryContext.h"
@@ -54,7 +56,7 @@ COrderSpecTest::EresUnittest_Basics()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -68,7 +70,7 @@ COrderSpecTest::EresUnittest_Basics()
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
 	CColRef *pcr1 =
@@ -79,9 +81,10 @@ COrderSpecTest::EresUnittest_Basics()
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
 
 
-	COrderSpec *pos1 = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::owner<COrderSpec *> pos1 = GPOS_NEW(mp) COrderSpec(mp);
 
-	IMDId *pmdidInt4LT = pmdtypeint4->GetMdidForCmpType(IMDType::EcmptL);
+	gpos::owner<IMDId *> pmdidInt4LT =
+		pmdtypeint4->GetMdidForCmpType(IMDType::EcmptL);
 	pmdidInt4LT->AddRef();
 	pmdidInt4LT->AddRef();
 
@@ -91,7 +94,7 @@ COrderSpecTest::EresUnittest_Basics()
 	GPOS_ASSERT(pos1->Matches(pos1));
 	GPOS_ASSERT(pos1->FSatisfies(pos1));
 
-	COrderSpec *pos2 = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::owner<COrderSpec *> pos2 = GPOS_NEW(mp) COrderSpec(mp);
 	pmdidInt4LT->AddRef();
 	pmdidInt4LT->AddRef();
 	pmdidInt4LT->AddRef();
@@ -120,7 +123,8 @@ COrderSpecTest::EresUnittest_Basics()
 
 		GPOS_ASSERT(nullptr != colref);
 
-		const IMDId *mdid GPOS_ASSERTS_ONLY = pos1->GetMdIdSortOp(ul);
+		gpos::pointer<const IMDId *> mdid GPOS_ASSERTS_ONLY =
+			pos1->GetMdIdSortOp(ul);
 
 		GPOS_ASSERT(mdid->IsValid());
 

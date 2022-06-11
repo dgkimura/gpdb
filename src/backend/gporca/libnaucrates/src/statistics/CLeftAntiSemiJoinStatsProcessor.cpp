@@ -11,6 +11,8 @@
 
 #include "naucrates/statistics/CLeftAntiSemiJoinStatsProcessor.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/statistics/CScaleFactorUtils.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
@@ -78,14 +80,14 @@ CLeftAntiSemiJoinStatsProcessor::JoinHistogramsLASJ(
 //	Return statistics object after performing LASJ
 CStatistics *
 CLeftAntiSemiJoinStatsProcessor::CalcLASJoinStatsStatic(
-	CMemoryPool *mp, const IStatistics *outer_stats_input,
-	const IStatistics *inner_stats_input, CStatsPredJoinArray *join_preds_stats,
-	BOOL DoIgnoreLASJHistComputation)
+	CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats_input,
+	gpos::pointer<const IStatistics *> inner_stats_input,
+	CStatsPredJoinArray *join_preds_stats, BOOL DoIgnoreLASJHistComputation)
 {
 	GPOS_ASSERT(nullptr != inner_stats_input);
 	GPOS_ASSERT(nullptr != outer_stats_input);
 	GPOS_ASSERT(nullptr != join_preds_stats);
-	const CStatistics *outer_stats =
+	gpos::pointer<const CStatistics *> outer_stats =
 		dynamic_cast<const CStatistics *>(outer_stats_input);
 
 	return CJoinStatsProcessor::SetResultingJoinStats(

@@ -19,6 +19,7 @@
 #define GPOPT_CScalarBitmapBoolOp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalar.h"
 
@@ -48,7 +49,7 @@ private:
 	EBitmapBoolOp m_ebitmapboolop;
 
 	// bitmap type id
-	IMDId *m_pmdidBitmapType;
+	gpos::owner<IMDId *> m_pmdidBitmapType;
 
 	static const WCHAR m_rgwszBitmapOpType[EbitmapboolSentinel][30];
 
@@ -71,7 +72,7 @@ public:
 	}
 
 	// bitmap type id
-	IMDId *
+	gpos::pointer<IMDId *>
 	MdidType() const override
 	{
 		return m_pmdidBitmapType;
@@ -106,10 +107,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -118,7 +120,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion
-	static CScalarBitmapBoolOp *
+	static gpos::cast_func<CScalarBitmapBoolOp *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

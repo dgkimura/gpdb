@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerLogicalUpdate_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalOp.h"
 
@@ -41,10 +42,10 @@ private:
 	ULONG m_segid_colid;
 
 	// delete col ids
-	ULongPtrArray *m_deletion_colid_array;
+	gpos::pointer<ULongPtrArray *> m_deletion_colid_array;
 
 	// insert col ids
-	ULongPtrArray *m_insert_colid_array;
+	gpos::pointer<ULongPtrArray *> m_insert_colid_array;
 
 	// does update preserve oids
 	BOOL m_preserve_oids;

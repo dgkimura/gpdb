@@ -8,6 +8,7 @@
 #define GPOPT_CXformImplementIndexApply_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalIndexApply.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -84,7 +85,8 @@ public:
 		CExpression *pexprOuter = (*pexpr)[0];
 		CExpression *pexprInner = (*pexpr)[1];
 		CExpression *pexprScalar = (*pexpr)[2];
-		CColRefArray *colref_array = indexApply->PdrgPcrOuterRefs();
+		gpos::owner<CColRefArray *> colref_array =
+			indexApply->PdrgPcrOuterRefs();
 		colref_array->AddRef();
 
 		// addref all components
@@ -93,7 +95,7 @@ public:
 		pexprScalar->AddRef();
 
 		// assemble physical operator
-		CPhysicalNLJoin *pop = nullptr;
+		gpos::owner<CPhysicalNLJoin *> pop = nullptr;
 
 		if (CLogicalIndexApply::PopConvert(pexpr->Pop())->FouterJoin())
 			pop = GPOS_NEW(mp) CPhysicalLeftOuterIndexNLJoin(
@@ -102,7 +104,7 @@ public:
 			pop = GPOS_NEW(mp) CPhysicalInnerIndexNLJoin(
 				mp, colref_array, indexApply->OrigJoinPred());
 
-		CExpression *pexprResult = GPOS_NEW(mp)
+		gpos::owner<CExpression *> pexprResult = GPOS_NEW(mp)
 			CExpression(mp, pop, pexprOuter, pexprInner, pexprScalar);
 
 		// add alternative to results

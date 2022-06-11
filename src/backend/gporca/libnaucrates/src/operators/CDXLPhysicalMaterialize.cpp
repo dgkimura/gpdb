@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalMaterialize.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -125,8 +127,8 @@ CDXLPhysicalMaterialize::IsEager() const
 
 //		Serialize operator in DXL format
 void
-CDXLPhysicalMaterialize::SerializeToDXL(CXMLSerializer *xml_serializer,
-										const CDXLNode *node) const
+CDXLPhysicalMaterialize::SerializeToDXL(
+	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

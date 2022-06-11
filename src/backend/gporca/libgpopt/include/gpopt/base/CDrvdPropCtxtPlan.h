@@ -14,6 +14,7 @@
 #define GPOPT_CDrvdPropCtxtPlan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCTEMap.h"
 #include "gpopt/base/CDrvdPropCtxt.h"
@@ -36,7 +37,7 @@ class CDrvdPropCtxtPlan : public CDrvdPropCtxt
 {
 private:
 	// map of CTE id to producer plan properties
-	UlongToDrvdPropPlanMap *m_phmulpdpCTEs;
+	gpos::owner<UlongToDrvdPropPlanMap *> m_phmulpdpCTEs;
 
 	// if true, a call to AddProps updates the CTE.
 	BOOL m_fUpdateCTEMap;
@@ -61,7 +62,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const;
 
 	// return the plan properties of CTE producer with given id
-	CDrvdPropPlan *PdpplanCTEProducer(ULONG ulCTEId) const;
+	gpos::pointer<CDrvdPropPlan *> PdpplanCTEProducer(ULONG ulCTEId) const;
 
 	// copy plan properties of given CTE prdoucer
 	void CopyCTEProducerProps(CDrvdPropPlan *pdpplan, ULONG ulCTEId);
@@ -78,7 +79,7 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDrvdPropCtxtPlan *
+	static gpos::cast_func<CDrvdPropCtxtPlan *>
 	PdpctxtplanConvert(CDrvdPropCtxt *pdpctxt)
 	{
 		GPOS_ASSERT(nullptr != pdpctxt);

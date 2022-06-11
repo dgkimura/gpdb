@@ -12,6 +12,7 @@
 #define GPNAUCRATES_CFilterCardinalityTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/statistics/CBucket.h"
@@ -35,7 +36,7 @@ using namespace gpos;
 class CFilterCardinalityTest
 {
 	// shorthand for functions for generating the disjunctive filter predicates
-	typedef CStatsPred *(FnPstatspredDisj)(CMemoryPool *mp);
+	typedef CStatsPred *(FnPstatspredDisj) (CMemoryPool *mp);
 
 private:
 	// triplet consisting of comparison type, double value and its byte array representation
@@ -64,72 +65,83 @@ private:
 		SStatsFilterSTestCase rgstatsdisjtc[], ULONG ulTestCases);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj1(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredDisj1(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj2(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredDisj2(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj3(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredDisj3(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj4(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredDisj4(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj5(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredDisj5(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj6(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredDisj6(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj7(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredDisj7(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj8(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredDisj8(CMemoryPool *mp);
 
 	// disjunction filters
-	static CStatsPred *PstatspredDisj9(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredDisj9(CMemoryPool *mp);
 
 	// nested AND and OR predicates
-	static CStatsPred *PstatspredNestedPredDiffCol1(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredNestedPredDiffCol2(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredNestedPredCommonCol1(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredNestedPredCommonCol2(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredNestedSharedCol(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredDisjOverConjSameCol1(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredDisjOverConjSameCol2(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredDisjOverConjSameCol3(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredDisjOverConjSameCol4(CMemoryPool *mp);
-
-	// nested AND and OR predicates
-	static CStatsPred *PstatspredDisjOverConjDifferentCol1(CMemoryPool *mp);
-
-	static CStatsPred *PstatspredDisjOverConjMultipleIdenticalCols(
+	static gpos::owner<CStatsPred *> PstatspredNestedPredDiffCol1(
 		CMemoryPool *mp);
 
-	static CStatsPred *PstatspredArrayCmpAnySimple(CMemoryPool *mp);
+	// nested AND and OR predicates
+	static gpos::owner<CStatsPred *> PstatspredNestedPredDiffCol2(
+		CMemoryPool *mp);
 
-	static CStatsPred *PstatspredArrayCmpAnyDuplicate(CMemoryPool *mp);
+	// nested AND and OR predicates
+	static gpos::owner<CStatsPred *> PstatspredNestedPredCommonCol1(
+		CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::owner<CStatsPred *> PstatspredNestedPredCommonCol2(
+		CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::owner<CStatsPred *> PstatspredNestedSharedCol(CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::owner<CStatsPred *> PstatspredDisjOverConjSameCol1(
+		CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::owner<CStatsPred *> PstatspredDisjOverConjSameCol2(
+		CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::owner<CStatsPred *> PstatspredDisjOverConjSameCol3(
+		CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::owner<CStatsPred *> PstatspredDisjOverConjSameCol4(
+		CMemoryPool *mp);
+
+	// nested AND and OR predicates
+	static gpos::owner<CStatsPred *> PstatspredDisjOverConjDifferentCol1(
+		CMemoryPool *mp);
+
+	static gpos::owner<CStatsPred *>
+	PstatspredDisjOverConjMultipleIdenticalCols(CMemoryPool *mp);
+
+	static gpos::owner<CStatsPred *> PstatspredArrayCmpAnySimple(
+		CMemoryPool *mp);
+
+	static gpos::owner<CStatsPred *> PstatspredArrayCmpAnyDuplicate(
+		CMemoryPool *mp);
 
 
 	// conjunctive predicates
-	static CStatsPred *PstatspredConj(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredConj(CMemoryPool *mp);
 
 	// generate an array of filter given a column identifier, comparison type, and array of integer point
 	static CStatsPredPtrArry *PdrgpstatspredInteger(
@@ -141,13 +153,14 @@ private:
 		CMemoryPool *mp, ULONG colid, SStatsCmpValElem statsCmpValElem);
 
 	// create a filter on a column with null values
-	static CStatsPred *PstatspredNullableCols(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredNullableCols(CMemoryPool *mp);
 
 	// create a point filter where the constant is null
-	static CStatsPred *PstatspredWithNullConstant(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredWithNullConstant(
+		CMemoryPool *mp);
 
 	// create a 'is not null' point filter
-	static CStatsPred *PstatspredNotNull(CMemoryPool *mp);
+	static gpos::owner<CStatsPred *> PstatspredNotNull(CMemoryPool *mp);
 
 	// compare the derived statistics with the statistics in the outputfile
 	static GPOS_RESULT EresUnittest_CStatisticsCompare(

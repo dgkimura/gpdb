@@ -41,10 +41,10 @@ class CDXLScalarCast : public CDXLScalar
 {
 private:
 	// catalog MDId of the column's type
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 	// catalog MDId of the function implementing the casting
-	IMDId *m_func_mdid;
+	gpos::owner<IMDId *> m_func_mdid;
 
 public:
 	CDXLScalarCast(const CDXLScalarCast &) = delete;
@@ -57,8 +57,8 @@ public:
 	// ident accessors
 	Edxlopid GetDXLOperator() const override;
 
-	IMDId *MdidType() const;
-	IMDId *FuncMdId() const;
+	gpos::pointer<IMDId *> MdidType() const;
+	gpos::pointer<IMDId *> FuncMdId() const;
 
 	// name of the DXL operator name
 	const CWStringConst *GetOpNameStr() const override;

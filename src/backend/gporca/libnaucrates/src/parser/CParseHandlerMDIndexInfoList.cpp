@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMDIndexInfoList.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -38,7 +40,7 @@ CParseHandlerMDIndexInfoList::~CParseHandlerMDIndexInfoList()
 }
 
 // returns array of indexinfo
-CMDIndexInfoArray *
+gpos::pointer<CMDIndexInfoArray *>
 CParseHandlerMDIndexInfoList::GetMdIndexInfoArray()
 {
 	return m_mdindex_info_array;
@@ -72,7 +74,7 @@ CParseHandlerMDIndexInfoList::StartElement(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenIndexPartial, EdxltokenIndexInfo);
 
-		CMDIndexInfo *md_index_info =
+		gpos::owner<CMDIndexInfo *> md_index_info =
 			GPOS_NEW(m_mp) CMDIndexInfo(mdid, is_partial);
 		m_mdindex_info_array->Append(md_index_info);
 	}

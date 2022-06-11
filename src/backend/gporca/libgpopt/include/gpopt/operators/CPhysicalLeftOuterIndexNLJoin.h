@@ -8,6 +8,7 @@
 #define GPOPT_CPhysicalLeftOuterIndexNLJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalLeftOuterNLJoin.h"
 
@@ -17,10 +18,10 @@ class CPhysicalLeftOuterIndexNLJoin : public CPhysicalLeftOuterNLJoin
 {
 private:
 	// columns from outer child used for index lookup in inner child
-	CColRefArray *m_pdrgpcrOuterRefs;
+	gpos::owner<CColRefArray *> m_pdrgpcrOuterRefs;
 
 	// a copy of the original join predicate that has been pushed down to the inner side
-	CExpression *m_origJoinPred;
+	gpos::owner<CExpression *> m_origJoinPred;
 
 public:
 	CPhysicalLeftOuterIndexNLJoin(const CPhysicalLeftOuterIndexNLJoin &) =
@@ -35,7 +36,7 @@ public:
 
 	CEnfdProp::EPropEnforcingType EpetDistribution(
 		CExpressionHandle &exprhdl,
-		const CEnfdDistribution *ped) const override;
+		gpos::pointer<const CEnfdDistribution *> ped) const override;
 
 	// ident accessors
 	EOperatorId
@@ -55,23 +56,25 @@ public:
 	BOOL Matches(COperator *pop) const override;
 
 	// outer column references accessor
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgPcrOuterRefs() const
 	{
 		return m_pdrgpcrOuterRefs;
 	}
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	CDistributionSpec *PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
-	CEnfdDistribution *Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   CReqdPropPlan *prppInput, ULONG child_index,
-						   CDrvdPropArray *pdrgpdpCtxt,
-						   ULONG ulDistrReq) override;
+	gpos::owner<CEnfdDistribution *> Ped(CMemoryPool *mp,
+										 CExpressionHandle &exprhdl,
+										 CReqdPropPlan *prppInput,
+										 ULONG child_index,
+										 CDrvdPropArray *pdrgpdpCtxt,
+										 ULONG ulDistrReq) override;
 
 	// execution order of children
 	EChildExecOrder
@@ -82,7 +85,7 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalLeftOuterIndexNLJoin *
+	static gpos::cast_func<CPhysicalLeftOuterIndexNLJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftOuterIndexNLJoin == pop->Eopid());
@@ -90,7 +93,7 @@ public:
 		return dynamic_cast<CPhysicalLeftOuterIndexNLJoin *>(pop);
 	}
 
-	CExpression *
+	gpos::pointer<CExpression *>
 	OrigJoinPred()
 	{
 		return m_origJoinPred;

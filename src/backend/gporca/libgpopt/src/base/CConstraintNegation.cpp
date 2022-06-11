@@ -12,6 +12,7 @@
 #include "gpopt/base/CConstraintNegation.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CConstraintInterval.h"
 #include "gpopt/operators/CPredicateUtils.h"
@@ -55,7 +56,7 @@ CConstraintNegation::~CConstraintNegation()
 //		Return a copy of the constraint with remapped columns
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CConstraintNegation::PcnstrCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -72,7 +73,7 @@ CConstraintNegation::PcnstrCopyWithRemappedColumns(
 //		Return constraint on a given column
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CConstraintNegation::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 {
 	if (!m_pcrsUsed->FMember(colref) || (1 != m_pcrsUsed->Size()))
@@ -99,7 +100,7 @@ CConstraintNegation::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 //		Return constraint on a given column set
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CConstraintNegation::Pcnstr(CMemoryPool *mp, CColRefSet *pcrs)
 {
 	if (!m_pcrsUsed->Equals(pcrs))
@@ -118,7 +119,7 @@ CConstraintNegation::Pcnstr(CMemoryPool *mp, CColRefSet *pcrs)
 //		Return a copy of the constraint for a different column
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CConstraintNegation::PcnstrRemapForColumn(CMemoryPool *mp,
 										  CColRef *colref) const
 {
@@ -151,14 +152,14 @@ CConstraintNegation::PexprScalar(CMemoryPool *mp)
 		else if (EctInterval == ect)
 		{
 			CConstraintInterval *pci = (CConstraintInterval *) m_pcnstr;
-			CConstraintInterval *pciComp = pci->PciComplement(mp);
+			gpos::owner<CConstraintInterval *> pciComp = pci->PciComplement(mp);
 			m_pexprScalar = pciComp->PexprScalar(mp);
 			m_pexprScalar->AddRef();
 			pciComp->Release();
 		}
 		else
 		{
-			CExpression *pexpr = m_pcnstr->PexprScalar(mp);
+			gpos::owner<CExpression *> pexpr = m_pcnstr->PexprScalar(mp);
 			pexpr->AddRef();
 			m_pexprScalar = CUtils::PexprNegate(mp, pexpr);
 		}

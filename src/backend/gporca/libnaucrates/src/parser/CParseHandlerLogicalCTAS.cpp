@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalCTAS.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLLogicalCTAS.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerColDescr.h"
@@ -221,21 +223,21 @@ CParseHandlerLogicalCTAS::EndElement(const XMLCh *const,  // element_uri,
 	GPOS_ASSERT(nullptr != opclasses_parse_handler->GetMdIdArray());
 	GPOS_ASSERT(nullptr != child_parse_handler->CreateDXLNode());
 
-	CDXLColDescrArray *dxl_column_descr_array =
+	gpos::owner<CDXLColDescrArray *> dxl_column_descr_array =
 		col_descr_parse_handler->GetDXLColumnDescrArray();
 	dxl_column_descr_array->AddRef();
 
-	CDXLCtasStorageOptions *dxl_ctas_storage_opt =
+	gpos::owner<CDXLCtasStorageOptions *> dxl_ctas_storage_opt =
 		ctas_options_parse_handler->GetDxlCtasStorageOption();
 	dxl_ctas_storage_opt->AddRef();
 
 
-	IMdIdArray *distr_opfamilies =
+	gpos::owner<IMdIdArray *> distr_opfamilies =
 		dynamic_cast<CParseHandlerMetadataIdList *>(opfamilies_parse_handler)
 			->GetMdIdArray();
 	distr_opfamilies->AddRef();
 
-	IMdIdArray *distr_opclasses =
+	gpos::owner<IMdIdArray *> distr_opclasses =
 		dynamic_cast<CParseHandlerMetadataIdList *>(opclasses_parse_handler)
 			->GetMdIdArray();
 	distr_opclasses->AddRef();

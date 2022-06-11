@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementPartitionSelector.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalPartitionSelector.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -48,8 +49,9 @@ CXformImplementPartitionSelector::CXformImplementPartitionSelector(
 //---------------------------------------------------------------------------
 void
 CXformImplementPartitionSelector::Transform(
-	CXformContext *pxfctxt GPOS_UNUSED, CXformResult *pxfres GPOS_UNUSED,
-	CExpression *pexpr GPOS_UNUSED) const
+	gpos::pointer<CXformContext *> pxfctxt GPOS_UNUSED,
+	gpos::pointer<CXformResult *> pxfres GPOS_UNUSED,
+	gpos::pointer<CExpression *> pexpr GPOS_UNUSED) const
 {
 }
 

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerTraceFlags_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 
@@ -41,7 +42,7 @@ class CParseHandlerTraceFlags : public CParseHandlerBase
 {
 private:
 	// trace flag bitset
-	CBitSet *m_trace_flags_bitset;
+	gpos::owner<CBitSet *> m_trace_flags_bitset;
 
 	// process the start of an element
 	void StartElement(
@@ -72,7 +73,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// accessor
-	CBitSet *GetTraceFlagBitSet();
+	gpos::pointer<CBitSet *> GetTraceFlagBitSet();
 };
 }  // namespace gpdxl
 

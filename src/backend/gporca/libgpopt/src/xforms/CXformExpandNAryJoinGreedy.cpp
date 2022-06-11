@@ -14,6 +14,7 @@
 #include "gpopt/xforms/CXformExpandNAryJoinGreedy.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CExpressionUtils.h"
@@ -86,10 +87,11 @@ CXformExpandNAryJoinGreedy::Transform(CXformContext *pxfctxt,
 	const ULONG ulArity = pexpr->Arity();
 	GPOS_ASSERT(ulArity >= 3);
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(pmp) CExpressionArray(pmp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(pmp) CExpressionArray(pmp);
 	for (ULONG ul = 0; ul < ulArity - 1; ul++)
 	{
-		CExpression *pexprChild = (*pexpr)[ul];
+		gpos::owner<CExpression *> pexprChild = (*pexpr)[ul];
 		pexprChild->AddRef();
 		pdrgpexpr->Append(pexprChild);
 	}
@@ -100,7 +102,7 @@ CXformExpandNAryJoinGreedy::Transform(CXformContext *pxfctxt,
 
 	// create a join order based on cardinality of intermediate results
 	CJoinOrderGreedy jomc(pmp, pdrgpexpr, pdrgpexprPreds);
-	CExpression *pexprResult = jomc.PexprExpand();
+	gpos::owner<CExpression *> pexprResult = jomc.PexprExpand();
 
 	if (nullptr != pexprResult)
 	{

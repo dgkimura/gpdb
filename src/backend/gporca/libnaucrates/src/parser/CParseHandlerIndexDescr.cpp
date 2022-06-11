@@ -18,6 +18,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerIndexDescr.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -64,7 +66,7 @@ CParseHandlerIndexDescr::~CParseHandlerIndexDescr()
 //		Returns the index descriptor constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CDXLIndexDescr *
+gpos::pointer<CDXLIndexDescr *>
 CParseHandlerIndexDescr::GetDXLIndexDescr()
 {
 	return m_dxl_index_descr;

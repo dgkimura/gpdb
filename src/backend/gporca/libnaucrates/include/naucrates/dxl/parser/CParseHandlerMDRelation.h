@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDRelation_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 #include "naucrates/dxl/xml/dxltokens.h"
@@ -38,7 +39,7 @@ class CParseHandlerMDRelation : public CParseHandlerMetadataObject
 {
 protected:
 	// id and version of the relation
-	IMDId *m_mdid;
+	gpos::pointer<IMDId *> m_mdid;
 
 	// schema name
 	CMDName *m_mdname_schema;
@@ -59,13 +60,13 @@ protected:
 	IMDRelation::Ereldistrpolicy m_rel_distr_policy;
 
 	// distribution columns
-	ULongPtrArray *m_distr_col_array;
+	gpos::pointer<ULongPtrArray *> m_distr_col_array;
 
 	// do we need to consider a hash distributed table as random distributed
 	BOOL m_convert_hash_to_random;
 
 	// partition keys
-	ULongPtrArray *m_partition_cols_array;
+	gpos::pointer<ULongPtrArray *> m_partition_cols_array;
 
 	// partition types
 	CharPtrArray *m_str_part_types_array;
@@ -74,10 +75,10 @@ protected:
 	ULONG m_num_of_partitions;
 
 	// key sets
-	ULongPtr2dArray *m_key_sets_arrays;
+	gpos::pointer<ULongPtr2dArray *> m_key_sets_arrays;
 
 	// part constraint
-	CDXLNode *m_part_constraint;
+	gpos::pointer<CDXLNode *> m_part_constraint;
 
 	// distribution opfamilies parse handler
 	CParseHandlerBase *m_opfamilies_parse_handler;

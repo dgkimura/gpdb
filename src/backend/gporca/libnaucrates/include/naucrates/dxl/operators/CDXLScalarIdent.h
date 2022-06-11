@@ -35,7 +35,7 @@ class CDXLScalarIdent : public CDXLScalar
 {
 private:
 	// column reference
-	CDXLColRef *m_dxl_colref;
+	gpos::owner<CDXLColRef *> m_dxl_colref;
 
 public:
 	CDXLScalarIdent(CDXLScalarIdent &) = delete;

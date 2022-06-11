@@ -3,6 +3,8 @@
 
 #include "gpopt/operators/CHashedDistributions.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CUtils.h"
 
 using namespace gpopt;
@@ -16,7 +18,8 @@ CHashedDistributions::CHashedDistributions(CMemoryPool *mp,
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
 		CColRefArray *colref_array = (*pdrgpdrgpcrInput)[ulChild];
-		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+		gpos::owner<CExpressionArray *> pdrgpexpr =
+			GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 		{
 			CColRef *colref = (*colref_array)[ulCol];
@@ -26,7 +29,7 @@ CHashedDistributions::CHashedDistributions(CMemoryPool *mp,
 
 		// create a hashed distribution on input columns of the current child
 		BOOL fNullsColocated = true;
-		CDistributionSpec *pdshashed =
+		gpos::owner<CDistributionSpec *> pdshashed =
 			GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, fNullsColocated);
 		Append(pdshashed);
 	}

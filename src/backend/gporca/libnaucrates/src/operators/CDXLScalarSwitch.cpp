@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarSwitch.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -82,7 +84,7 @@ CDXLScalarSwitch::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarSwitch::MdidType() const
 {
 	return m_mdid_type;
@@ -98,7 +100,7 @@ CDXLScalarSwitch::MdidType() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarSwitch::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *dxlnode) const
+								 gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

@@ -48,13 +48,13 @@ private:
 	EDMLOperator m_edmlop;
 
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::owner<CTableDescriptor *> m_ptabdesc;
 
 	// source columns
-	CColRefArray *m_pdrgpcrSource;
+	gpos::owner<CColRefArray *> m_pdrgpcrSource;
 
 	// set of modified columns from the target table
-	CBitSet *m_pbsModified;
+	gpos::owner<CBitSet *> m_pbsModified;
 
 	// action column
 	CColRef *m_pcrAction;
@@ -177,9 +177,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties

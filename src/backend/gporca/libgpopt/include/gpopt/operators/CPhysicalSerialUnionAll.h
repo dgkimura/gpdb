@@ -5,6 +5,7 @@
 #define GPOPT_CPhysicalSerialUnionAll_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalUnionAll.h"
 
@@ -50,8 +51,8 @@ public:
 	// distribution matching type
 	CEnfdDistribution::EDistributionMatching
 	Edm(CReqdPropPlan *prppInput,
-		ULONG,			   // child_index
-		CDrvdPropArray *,  //pdrgpdpCtxt
+		ULONG,							  // child_index
+		gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt
 		ULONG ulOptReq) override
 	{
 		if (0 == ulOptReq && CDistributionSpec::EdtHashed ==
@@ -67,11 +68,12 @@ public:
 
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	gpos::owner<CDistributionSpec *> PdsRequired(CMemoryPool *mp,
+												 CExpressionHandle &exprhdl,
+												 CDistributionSpec *pdsRequired,
+												 ULONG child_index,
+												 CDrvdPropArray *pdrgpdpCtxt,
+												 ULONG ulOptReq) const override;
 
 };	// class CPhysicalSerialUnionAll
 

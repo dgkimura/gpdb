@@ -101,7 +101,7 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 									ptroutput->GetCTEProducerDXLArray());
 
 		// setup a file-based provider
-		CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+		gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 		pmdp->AddRef();
 
 		// we need to use an auto pointer for the cache here to ensure
@@ -160,7 +160,8 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 		leaked<CExpression *> pexprPlan = eng.PexprExtractPlan();
 
 		// translate plan into DXL
-		IntPtrArray *pdrgpiSegments = GPOS_NEW(mp) IntPtrArray(mp);
+		gpos::owner<IntPtrArray *> pdrgpiSegments =
+			GPOS_NEW(mp) IntPtrArray(mp);
 
 
 		GPOS_ASSERT(0 < ulSegments);

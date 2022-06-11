@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDGPDBTrigger_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 #include "naucrates/md/CMDTriggerGPDB.h"
@@ -37,16 +38,16 @@ class CParseHandlerMDGPDBTrigger : public CParseHandlerMetadataObject
 {
 private:
 	// trigger id
-	IMDId *m_mdid;
+	gpos::pointer<IMDId *> m_mdid;
 
 	// trigger name
 	CMDName *m_mdname;
 
 	// relation id
-	IMDId *m_rel_mdid;
+	gpos::pointer<IMDId *> m_rel_mdid;
 
 	// function id
-	IMDId *m_func_mdid;
+	gpos::pointer<IMDId *> m_func_mdid;
 
 	// trigger type
 	INT m_type;

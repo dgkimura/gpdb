@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalIndexScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CIndexDescriptor.h"
 #include "gpopt/operators/CPhysicalScan.h"
@@ -36,13 +37,13 @@ class CPhysicalIndexScan : public CPhysicalScan
 {
 private:
 	// index descriptor
-	CIndexDescriptor *m_pindexdesc;
+	gpos::owner<CIndexDescriptor *> m_pindexdesc;
 
 	// origin operator id -- gpos::ulong_max if operator was not generated via a transformation
 	ULONG m_ulOriginOpId;
 
 	// order
-	COrderSpec *m_pos;
+	gpos::owner<COrderSpec *> m_pos;
 
 public:
 	CPhysicalIndexScan(const CPhysicalIndexScan &) = delete;
@@ -92,7 +93,7 @@ public:
 	BOOL Matches(COperator *pop) const override;
 
 	// index descriptor
-	CIndexDescriptor *
+	gpos::pointer<CIndexDescriptor *>
 	Pindexdesc() const
 	{
 		return m_pindexdesc;
@@ -110,7 +111,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *
+	gpos::owner<COrderSpec *>
 	PosDerive(CMemoryPool *,	   //mp
 			  CExpressionHandle &  //exprhdl
 	) const override
@@ -119,7 +120,7 @@ public:
 		return m_pos;
 	}
 
-	CRewindabilitySpec *
+	gpos::owner<CRewindabilitySpec *>
 	PrsDerive(CMemoryPool *mp,
 			  CExpressionHandle &  // exprhdl
 	) const override
@@ -136,10 +137,11 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	// conversion function
-	static CPhysicalIndexScan *
+	static gpos::cast_func<CPhysicalIndexScan *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -150,10 +152,10 @@ public:
 
 	// statistics derivation during costing
 	IStatistics *
-	PstatsDerive(CMemoryPool *,		   // mp
-				 CExpressionHandle &,  // exprhdl
-				 CReqdPropPlan *,	   // prpplan
-				 IStatisticsArray *	   //stats_ctxt
+	PstatsDerive(CMemoryPool *,					  // mp
+				 CExpressionHandle &,			  // exprhdl
+				 gpos::pointer<CReqdPropPlan *>,  // prpplan
+				 IStatisticsArray *				  //stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(

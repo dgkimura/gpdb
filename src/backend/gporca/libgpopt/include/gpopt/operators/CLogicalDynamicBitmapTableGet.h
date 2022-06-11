@@ -19,6 +19,7 @@
 #define GPOPT_CLogicalDynamicBitmapTableGet_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/metadata/CTableDescriptor.h"
@@ -86,9 +87,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// derive outer references
 	CColRefSet *DeriveOuterReferences(CMemoryPool *mp,
@@ -99,11 +100,11 @@ public:
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	PcrsStat(CMemoryPool *mp,
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   //pcrsInput
-			 ULONG				   // child_index
+			 CExpressionHandle &,		   // exprhdl
+			 gpos::pointer<CColRefSet *>,  //pcrsInput
+			 ULONG						   // child_index
 	) const override
 	{
 		return GPOS_NEW(mp) CColRefSet(mp);
@@ -134,7 +135,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion
-	static CLogicalDynamicBitmapTableGet *
+	static gpos::cast_func<CLogicalDynamicBitmapTableGet *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -19,6 +19,7 @@
 #define GPOPT_CScalarBitmapIndexProbe_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalar.h"
 
@@ -39,10 +40,10 @@ class CScalarBitmapIndexProbe : public CScalar
 {
 private:
 	// index descriptor
-	CIndexDescriptor *m_pindexdesc;
+	gpos::owner<CIndexDescriptor *> m_pindexdesc;
 
 	// bitmap type id
-	IMDId *m_pmdidBitmapType;
+	gpos::owner<IMDId *> m_pmdidBitmapType;
 
 	// private copy ctor
 	CScalarBitmapIndexProbe(const CScalarBitmapIndexProbe &);
@@ -60,14 +61,14 @@ public:
 	~CScalarBitmapIndexProbe() override;
 
 	// index descriptor
-	CIndexDescriptor *
+	gpos::pointer<CIndexDescriptor *>
 	Pindexdesc() const
 	{
 		return m_pindexdesc;
 	}
 
 	// bitmap type id
-	IMDId *
+	gpos::pointer<IMDId *>
 	MdidType() const override
 	{
 		return m_pmdidBitmapType;
@@ -102,10 +103,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -114,7 +116,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion
-	static CScalarBitmapIndexProbe *
+	static gpos::cast_func<CScalarBitmapIndexProbe *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

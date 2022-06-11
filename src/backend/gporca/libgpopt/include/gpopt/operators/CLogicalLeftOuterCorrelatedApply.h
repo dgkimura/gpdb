@@ -14,6 +14,7 @@
 #define GPOPT_CLogicalLeftOuterCorrelatedApply_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalLeftOuterApply.h"
 
@@ -65,9 +66,9 @@ public:
 	BOOL Matches(COperator *pop) const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// applicable transformations
 	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
@@ -86,7 +87,7 @@ public:
 	}
 
 	// conversion function
-	static CLogicalLeftOuterCorrelatedApply *
+	static gpos::cast_func<CLogicalLeftOuterCorrelatedApply *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

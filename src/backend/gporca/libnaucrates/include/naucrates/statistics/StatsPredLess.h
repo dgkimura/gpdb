@@ -6,6 +6,7 @@
 #define GPNAUCRATES_StatsPredLess_H
 
 #include "gpos/common/Ref.h"
+#include "gpos/common/owner.h"
 
 namespace gpnaucrates
 {
@@ -13,8 +14,8 @@ class CStatsPred;
 
 struct StatsPredColIdLess
 {
-	bool operator()(const gpnaucrates::CStatsPred *a,
-					const gpnaucrates::CStatsPred *b) const;
+	bool operator()(gpos::pointer<const gpnaucrates::CStatsPred *> a,
+					gpos::pointer<const gpnaucrates::CStatsPred *> b) const;
 
 	bool operator()(const gpos::Ref<gpnaucrates::CStatsPred> &a,
 					const gpos::Ref<gpnaucrates::CStatsPred> &b) const;

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerCost_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLOperatorCost.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -35,7 +36,7 @@ class CParseHandlerCost : public CParseHandlerBase
 {
 private:
 	// physical operator cost constructed by the parse handler
-	CDXLOperatorCost *m_operator_cost_dxl;
+	gpos::owner<CDXLOperatorCost *> m_operator_cost_dxl;
 
 	// process the start of an element
 	void StartElement(
@@ -62,7 +63,7 @@ public:
 	~CParseHandlerCost() override;
 
 	// returns operator cost constructed by the handler
-	CDXLOperatorCost *GetDXLOperatorCost();
+	gpos::pointer<CDXLOperatorCost *> GetDXLOperatorCost();
 };
 }  // namespace gpdxl
 

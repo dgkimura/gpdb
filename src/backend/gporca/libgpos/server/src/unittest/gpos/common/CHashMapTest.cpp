@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CHashMap.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/test/CUnittest.h"
 
@@ -66,7 +67,8 @@ CHashMapTest::EresUnittest_Basic()
 					 CleanupNULL<CHAR> >
 		UlongPtrToCharMap;
 
-	UlongPtrToCharMap *phm = GPOS_NEW(mp) UlongPtrToCharMap(mp, 128);
+	gpos::owner<UlongPtrToCharMap *> phm =
+		GPOS_NEW(mp) UlongPtrToCharMap(mp, 128);
 	for (ULONG i = 0; i < ulCnt; ++i)
 	{
 		BOOL fSuccess GPOS_ASSERTS_ONLY =
@@ -107,7 +109,7 @@ CHashMapTest::EresUnittest_Basic()
 	typedef CHashMap<ULONG, ULONG, HashValue<ULONG>, gpos::Equals<ULONG>,
 					 CleanupDelete<ULONG>, CleanupDelete<ULONG> >
 		UlongToUlongMap;
-	UlongToUlongMap *phm2 = GPOS_NEW(mp) UlongToUlongMap(mp, 128);
+	gpos::owner<UlongToUlongMap *> phm2 = GPOS_NEW(mp) UlongToUlongMap(mp, 128);
 
 	ULONG *pulKey = GPOS_NEW(mp) ULONG(1);
 	ULONG *pulVal1 = GPOS_NEW(mp) ULONG(2);
@@ -161,7 +163,8 @@ CHashMapTest::EresUnittest_Ownership()
 					 CleanupDeleteArray<CHAR> >
 		UlongPtrToCharMap;
 
-	UlongPtrToCharMap *phm = GPOS_NEW(mp) UlongPtrToCharMap(mp, 32);
+	gpos::owner<UlongPtrToCharMap *> phm =
+		GPOS_NEW(mp) UlongPtrToCharMap(mp, 32);
 	for (ULONG i = 0; i < ulCnt; ++i)
 	{
 		ULONG_PTR *pulp = GPOS_NEW(mp) ULONG_PTR(i);

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerStatsBound_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -38,7 +39,7 @@ class CParseHandlerStatsBound : public CParseHandlerBase
 {
 private:
 	// dxl datum representing the bound
-	CDXLDatum *m_dxl_datum;
+	gpos::owner<CDXLDatum *> m_dxl_datum;
 
 	// is stats bound closed
 	BOOL m_is_stats_bound_closed;
@@ -69,7 +70,7 @@ public:
 	~CParseHandlerStatsBound() override;
 
 	// return the dxl datum representing the bound point
-	CDXLDatum *
+	gpos::pointer<CDXLDatum *>
 	GetDatumVal() const
 	{
 		return m_dxl_datum;

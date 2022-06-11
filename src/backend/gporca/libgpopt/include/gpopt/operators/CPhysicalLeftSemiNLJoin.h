@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalLeftSemiNLJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalNLJoin.h"
 
@@ -56,7 +57,7 @@ public:
 						   ULONG ulOptReq) const override;
 
 	// conversion function
-	static CPhysicalLeftSemiNLJoin *
+	static gpos::cast_func<CPhysicalLeftSemiNLJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftSemiNLJoin == pop->Eopid());

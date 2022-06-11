@@ -3,6 +3,8 @@
 
 #include "gpopt/base/CDistributionSpecReplicated.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CDistributionSpecNonSingleton.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
 #include "gpopt/operators/CPhysicalMotionBroadcast.h"
@@ -37,7 +39,8 @@ using namespace gpopt;
 //	| others not Singleton    | T                |(default) F        |
 //	+-------------------------+------------------+-------------------+
 BOOL
-CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
+CDistributionSpecReplicated::FSatisfies(
+	gpos::pointer<const CDistributionSpec *> pdss) const
 {
 	GPOS_ASSERT(Edt() != CDistributionSpec::EdtReplicated);
 
@@ -111,7 +114,7 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
 void
 CDistributionSpecReplicated::AppendEnforcers(CMemoryPool *mp,
 											 CExpressionHandle &,  // exprhdl
-											 CReqdPropPlan *
+											 gpos::pointer<CReqdPropPlan *>
 #ifdef GPOS_DEBUG
 												 prpp
 #endif	// GPOS_DEBUG
@@ -136,7 +139,7 @@ CDistributionSpecReplicated::AppendEnforcers(CMemoryPool *mp,
 	}
 
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprMotion = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalMotionBroadcast(mp), pexpr);
 	pdrgpexpr->Append(pexprMotion);
 }

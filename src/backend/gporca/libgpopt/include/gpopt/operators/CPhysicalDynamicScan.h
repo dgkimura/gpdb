@@ -19,6 +19,7 @@
 #define GPOPT_CPhysicalDynamicScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalScan.h"
 
@@ -47,14 +48,14 @@ private:
 	ULONG m_scan_id;
 
 	// partition keys
-	CColRef2dArray *m_pdrgpdrgpcrPart;
+	gpos::owner<CColRef2dArray *> m_pdrgpdrgpcrPart;
 
 	// child partitions
-	IMdIdArray *m_partition_mdids;
+	gpos::owner<IMdIdArray *> m_partition_mdids;
 
 	// Map of Root colref -> col index in child tabledesc
 	// per child partition in m_partition_mdid
-	ColRefToUlongMapArray *m_root_col_mapping_per_part = nullptr;
+	gpos::owner<ColRefToUlongMapArray *> m_root_col_mapping_per_part = nullptr;
 
 public:
 	CPhysicalDynamicScan(const CPhysicalDynamicScan &) = delete;
@@ -85,7 +86,7 @@ public:
 	}
 
 	// partition keys
-	CColRef2dArray *
+	gpos::pointer<CColRef2dArray *>
 	PdrgpdrgpcrPart() const
 	{
 		return m_pdrgpdrgpcrPart;
@@ -108,13 +109,13 @@ public:
 		return true;
 	}
 
-	IMdIdArray *
+	gpos::pointer<IMdIdArray *>
 	GetPartitionMdids() const
 	{
 		return m_partition_mdids;
 	}
 
-	ColRefToUlongMapArray *
+	gpos::pointer<ColRefToUlongMapArray *>
 	GetRootColMappingPerPart() const
 	{
 		return m_root_col_mapping_per_part;
@@ -124,7 +125,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalDynamicScan *PopConvert(COperator *pop);
+	static gpos::cast_func<CPhysicalDynamicScan *> PopConvert(COperator *pop);
 };
 }  // namespace gpopt
 

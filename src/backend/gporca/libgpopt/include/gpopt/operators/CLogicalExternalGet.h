@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalExternalGet_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CLogicalGet.h"
@@ -64,9 +65,9 @@ public:
 	BOOL Matches(COperator *pop) const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Relational Properties
@@ -74,10 +75,10 @@ public:
 
 	// compute required stat columns of the n-th child
 	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp,
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   // pcrsInput
-			 ULONG				   // child_index
+	PcrsStat(CMemoryPool *,				   // mp,
+			 CExpressionHandle &,		   // exprhdl
+			 gpos::pointer<CColRefSet *>,  // pcrsInput
+			 ULONG						   // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalExternalGet has no children");
@@ -96,7 +97,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalExternalGet *
+	static gpos::cast_func<CLogicalExternalGet *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

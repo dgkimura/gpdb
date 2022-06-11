@@ -36,7 +36,7 @@ class CDXLScalarIfStmt : public CDXLScalar
 {
 private:
 	// catalog MDId of the return type
-	IMDId *m_result_type_mdid;
+	gpos::owner<IMDId *> m_result_type_mdid;
 
 public:
 	CDXLScalarIfStmt(const CDXLScalarIfStmt &) = delete;
@@ -50,7 +50,7 @@ public:
 	// name of the operator
 	const CWStringConst *GetOpNameStr() const override;
 
-	IMDId *GetResultTypeMdId() const;
+	gpos::pointer<IMDId *> GetResultTypeMdId() const;
 
 	// DXL Operator ID
 	Edxlopid GetDXLOperator() const override;

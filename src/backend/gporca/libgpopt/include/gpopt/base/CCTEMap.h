@@ -162,10 +162,10 @@ private:
 	CMemoryPool *m_mp;
 
 	// cte map
-	UlongToCTEMapEntryMap *m_phmcm;
+	gpos::owner<UlongToCTEMapEntryMap *> m_phmcm;
 
 	// lookup info for given cte id
-	CCTEMapEntry *PcmeLookup(ULONG ulCteId) const;
+	gpos::pointer<CCTEMapEntry *> PcmeLookup(ULONG ulCteId) const;
 
 	// helper to add entries found in first map and are unresolved based on second map
 	static void AddUnresolved(const CCTEMap &cmFirst, const CCTEMap &cmSecond,

@@ -11,6 +11,8 @@
 #ifndef GPNAUCRATES_CCardinalityTestUtils_H
 #define GPNAUCRATES_CCardinalityTestUtils_H
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/statistics/CBucket.h"
 #include "naucrates/statistics/CHistogram.h"
 #include "naucrates/statistics/CPoint.h"
@@ -69,7 +71,8 @@ public:
 	static CPoint *PpointDouble(CMemoryPool *mp, OID oid, CDouble value);
 
 	// helper method to print statistics object
-	static void PrintStats(CMemoryPool *mp, const IStatistics *stats);
+	static void PrintStats(CMemoryPool *mp,
+						   gpos::pointer<const IStatistics *> stats);
 
 	// helper method to print histogram object
 	static void PrintHist(CMemoryPool *mp, const char *pcPrefix,

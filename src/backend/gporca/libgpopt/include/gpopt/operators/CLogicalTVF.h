@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalTVF_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CLogical.h"
@@ -30,19 +31,19 @@ class CLogicalTVF : public CLogical
 {
 private:
 	// function mdid
-	IMDId *m_func_mdid;
+	gpos::owner<IMDId *> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::owner<IMDId *> m_return_type_mdid;
 
 	// function name
 	CWStringConst *m_pstr;
 
 	// array of column descriptors: the schema of the function result
-	CColumnDescriptorArray *m_pdrgpcoldesc;
+	gpos::owner<CColumnDescriptorArray *> m_pdrgpcoldesc;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::owner<CColRefArray *> m_pdrgpcrOutput;
 
 	// function stability
 	IMDFunction::EFuncStbl m_efs;
@@ -81,14 +82,14 @@ public:
 	}
 
 	// function mdid
-	IMDId *
+	gpos::pointer<IMDId *>
 	FuncMdId() const
 	{
 		return m_func_mdid;
 	}
 
 	// return type
-	IMDId *
+	gpos::pointer<IMDId *>
 	ReturnTypeMdId() const
 	{
 		return m_return_type_mdid;
@@ -102,14 +103,14 @@ public:
 	}
 
 	// col descr accessor
-	CColumnDescriptorArray *
+	gpos::pointer<CColumnDescriptorArray *>
 	Pdrgpcoldesc() const
 	{
 		return m_pdrgpcoldesc;
 	}
 
 	// accessors
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -125,9 +126,9 @@ public:
 	BOOL Matches(COperator *pop) const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -138,7 +139,7 @@ public:
 									CExpressionHandle &) override;
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::owner<CPartInfo *>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &	 //exprhdl
 	) const override
@@ -147,7 +148,7 @@ public:
 	}
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &  //exprhdl
 	) const override
@@ -170,10 +171,10 @@ public:
 
 	// compute required stat columns of the n-th child
 	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   // pcrsInput
-			 ULONG				   // child_index
+	PcrsStat(CMemoryPool *,				   // mp
+			 CExpressionHandle &,		   // exprhdl
+			 gpos::pointer<CColRefSet *>,  // pcrsInput
+			 ULONG						   // child_index
 	) const override
 	{
 		return nullptr;
@@ -202,7 +203,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalTVF *
+	static gpos::cast_func<CLogicalTVF *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

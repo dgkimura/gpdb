@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarPartBoundOpen.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -74,8 +76,9 @@ CDXLScalarPartBoundOpen::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarPartBoundOpen::SerializeToDXL(CXMLSerializer *xml_serializer,
-										const CDXLNode *  // dxlnode
+CDXLScalarPartBoundOpen::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *>	 // dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();

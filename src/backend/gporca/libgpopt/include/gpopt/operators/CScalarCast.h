@@ -12,6 +12,7 @@
 #define GPOPT_CScalarCast_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
@@ -32,10 +33,10 @@ class CScalarCast : public CScalar
 {
 private:
 	// return type metadata id in the catalog
-	IMDId *m_return_type_mdid;
+	gpos::owner<IMDId *> m_return_type_mdid;
 
 	// function to be used for casting
-	IMDId *m_func_mdid;
+	gpos::owner<IMDId *> m_func_mdid;
 
 	// whether or not this cast is binary coercible
 	BOOL m_is_binary_coercible;
@@ -64,14 +65,14 @@ public:
 	// ident accessors
 
 	// the type of the scalar expression
-	IMDId *
+	gpos::pointer<IMDId *>
 	MdidType() const override
 	{
 		return m_return_type_mdid;
 	}
 
 	// func that casts
-	IMDId *
+	gpos::pointer<IMDId *>
 	FuncMdId() const
 	{
 		return m_func_mdid;
@@ -102,10 +103,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -125,7 +127,7 @@ public:
 	}
 
 	// conversion function
-	static CScalarCast *
+	static gpos::cast_func<CScalarCast *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

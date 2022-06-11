@@ -17,6 +17,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerDirectDispatchInfo.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -166,7 +168,7 @@ CParseHandlerDirectDispatchInfo::EndElement(
 //		Return parsed DXL datum array
 //
 //---------------------------------------------------------------------------
-CDXLDirectDispatchInfo *
+gpos::pointer<CDXLDirectDispatchInfo *>
 CParseHandlerDirectDispatchInfo::GetDXLDirectDispatchInfo() const
 {
 	return m_direct_dispatch_info;

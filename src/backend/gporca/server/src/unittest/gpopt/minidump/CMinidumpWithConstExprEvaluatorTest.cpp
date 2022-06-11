@@ -17,6 +17,7 @@
 
 #include "unittest/gpopt/minidump/CMinidumpWithConstExprEvaluatorTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/task/CAutoTraceFlag.h"
 
 #include "gpopt/base/CAutoOptCtxt.h"
@@ -86,7 +87,8 @@ CMinidumpWithConstExprEvaluatorTest::
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	IConstExprEvaluator *pceeval = GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
+	gpos::owner<IConstExprEvaluator *> pceeval =
+		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	BOOL fMatchPlans = true;
 

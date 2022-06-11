@@ -10,6 +10,8 @@
 //---------------------------------------------------------------------------
 #include "naucrates/dxl/operators/CDXLScalarHashExpr.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 #include "naucrates/traceflags/traceflags.h"
@@ -82,7 +84,7 @@ CDXLScalarHashExpr::GetOpNameStr() const
 //		Hash expression type from the catalog
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarHashExpr::MdidOpfamily() const
 {
 	return m_mdid_opfamily;
@@ -98,7 +100,7 @@ CDXLScalarHashExpr::MdidOpfamily() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarHashExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *node) const
+								   gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

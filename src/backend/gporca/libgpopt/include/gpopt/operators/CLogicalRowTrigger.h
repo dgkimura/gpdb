@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalRowTrigger_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogical.h"
 
@@ -29,16 +30,16 @@ class CLogicalRowTrigger : public CLogical
 {
 private:
 	// relation id on which triggers are to be executed
-	IMDId *m_rel_mdid;
+	gpos::owner<IMDId *> m_rel_mdid;
 
 	// trigger type
 	INT m_type;
 
 	// old columns
-	CColRefArray *m_pdrgpcrOld;
+	gpos::owner<CColRefArray *> m_pdrgpcrOld;
 
 	// new columns
-	CColRefArray *m_pdrgpcrNew;
+	gpos::owner<CColRefArray *> m_pdrgpcrNew;
 
 	// stability
 	IMDFunction::EFuncStbl m_efs{IMDFunction::EfsImmutable};
@@ -47,7 +48,7 @@ private:
 	void InitFunctionProperties();
 
 	// return the type of a given trigger as an integer
-	static INT ITriggerType(const IMDTrigger *pmdtrigger);
+	static INT ITriggerType(gpos::pointer<const IMDTrigger *> pmdtrigger);
 
 public:
 	CLogicalRowTrigger(const CLogicalRowTrigger &) = delete;
@@ -77,7 +78,7 @@ public:
 	}
 
 	// relation id
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetRelMdId() const
 	{
 		return m_rel_mdid;
@@ -91,14 +92,14 @@ public:
 	}
 
 	// old columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrOld() const
 	{
 		return m_pdrgpcrOld;
 	}
 
 	// new columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrNew() const
 	{
 		return m_pdrgpcrNew;
@@ -118,9 +119,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -193,7 +194,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalRowTrigger *
+	static gpos::cast_func<CLogicalRowTrigger *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

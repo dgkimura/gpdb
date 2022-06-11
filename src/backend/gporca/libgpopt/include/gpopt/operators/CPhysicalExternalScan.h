@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalExternalScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalTableScan.h"
 
@@ -57,7 +58,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive rewindability
-	CRewindabilitySpec *
+	gpos::owner<CRewindabilitySpec *>
 	PrsDerive(CMemoryPool *mp,
 			  CExpressionHandle &  // exprhdl
 	) const override
@@ -74,14 +75,14 @@ public:
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
 		CExpressionHandle &exprhdl,
-		const CEnfdRewindability *per) const override;
+		gpos::pointer<const CEnfdRewindability *> per) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalExternalScan *
+	static gpos::cast_func<CPhysicalExternalScan *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

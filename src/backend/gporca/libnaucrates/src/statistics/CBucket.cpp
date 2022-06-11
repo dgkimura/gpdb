@@ -13,6 +13,7 @@
 #include <stdlib.h>
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "naucrates/base/IDatum.h"
@@ -77,7 +78,7 @@ CBucket::~CBucket()
 //
 //---------------------------------------------------------------------------
 BOOL
-CBucket::Contains(const CPoint *point) const
+CBucket::Contains(gpos::pointer<const CPoint *> point) const
 {
 	// special case for singleton bucket
 	if (IsSingleton())
@@ -110,7 +111,7 @@ CBucket::Contains(const CPoint *point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CBucket::IsBefore(const CPoint *point) const
+CBucket::IsBefore(gpos::pointer<const CPoint *> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -128,7 +129,7 @@ CBucket::IsBefore(const CPoint *point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CBucket::IsAfter(const CPoint *point) const
+CBucket::IsAfter(gpos::pointer<const CPoint *> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -147,7 +148,8 @@ CBucket::IsAfter(const CPoint *point) const
 //
 //---------------------------------------------------------------------------
 CDouble
-CBucket::GetOverlapPercentage(const CPoint *point, BOOL include_point) const
+CBucket::GetOverlapPercentage(gpos::pointer<const CPoint *> point,
+							  BOOL include_point) const
 {
 	// special case of upper bound equal to point
 	if ((this->GetUpperBound()->Equals(point) && include_point) ||
@@ -269,7 +271,8 @@ CBucket::MakeBucketGreaterThan(CMemoryPool *mp, CPoint *point) const
 
 	CBucket *result_bucket = nullptr;
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	CPoint *point_new = CStatisticsUtils::NextPoint(mp, md_accessor, point);
+	gpos::owner<CPoint *> point_new =
+		CStatisticsUtils::NextPoint(mp, md_accessor, point);
 
 	if (nullptr != point_new)
 	{

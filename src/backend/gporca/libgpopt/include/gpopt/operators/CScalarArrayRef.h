@@ -12,6 +12,7 @@
 #define GPOPT_CScalarArrayRef_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalar.h"
 #include "naucrates/md/IMDId.h"
@@ -36,16 +37,16 @@ class CScalarArrayRef : public CScalar
 {
 private:
 	// element type id
-	IMDId *m_pmdidElem;
+	gpos::owner<IMDId *> m_pmdidElem;
 
 	// element type modifier
 	INT m_type_modifier;
 
 	// array type id
-	IMDId *m_pmdidArray;
+	gpos::owner<IMDId *> m_pmdidArray;
 
 	// return type id
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 public:
 	CScalarArrayRef(const CScalarArrayRef &) = delete;
@@ -72,7 +73,7 @@ public:
 	}
 
 	// element type id
-	IMDId *
+	gpos::pointer<IMDId *>
 	PmdidElem() const
 	{
 		return m_pmdidElem;
@@ -82,7 +83,7 @@ public:
 	INT TypeModifier() const override;
 
 	// array type id
-	IMDId *
+	gpos::pointer<IMDId *>
 	PmdidArray() const
 	{
 		return m_pmdidArray;
@@ -103,23 +104,24 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
 
 	// type of expression's result
-	IMDId *
+	gpos::pointer<IMDId *>
 	MdidType() const override
 	{
 		return m_mdid_type;
 	}
 
 	// conversion function
-	static CScalarArrayRef *
+	static gpos::cast_func<CScalarArrayRef *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalInnerIndexNLJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalInnerNLJoin.h"
 
@@ -29,10 +30,10 @@ class CPhysicalInnerIndexNLJoin : public CPhysicalInnerNLJoin
 {
 private:
 	// columns from outer child used for index lookup in inner child
-	CColRefArray *m_pdrgpcrOuterRefs;
+	gpos::owner<CColRefArray *> m_pdrgpcrOuterRefs;
 
 	// a copy of the original join predicate that has been pushed down to the inner side
-	CExpression *m_origJoinPred;
+	gpos::owner<CExpression *> m_origJoinPred;
 
 public:
 	CPhysicalInnerIndexNLJoin(const CPhysicalInnerIndexNLJoin &) = delete;
@@ -62,23 +63,25 @@ public:
 	BOOL Matches(COperator *pop) const override;
 
 	// outer column references accessor
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgPcrOuterRefs() const
 	{
 		return m_pdrgpcrOuterRefs;
 	}
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	CDistributionSpec *PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
-	CEnfdDistribution *Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   CReqdPropPlan *prppInput, ULONG child_index,
-						   CDrvdPropArray *pdrgpdpCtxt,
-						   ULONG ulDistrReq) override;
+	gpos::owner<CEnfdDistribution *> Ped(CMemoryPool *mp,
+										 CExpressionHandle &exprhdl,
+										 CReqdPropPlan *prppInput,
+										 ULONG child_index,
+										 CDrvdPropArray *pdrgpdpCtxt,
+										 ULONG ulDistrReq) override;
 
 	// execution order of children
 	EChildExecOrder
@@ -89,7 +92,7 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalInnerIndexNLJoin *
+	static gpos::cast_func<CPhysicalInnerIndexNLJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(EopPhysicalInnerIndexNLJoin == pop->Eopid());
@@ -97,7 +100,7 @@ public:
 		return dynamic_cast<CPhysicalInnerIndexNLJoin *>(pop);
 	}
 
-	CExpression *
+	gpos::pointer<CExpression *>
 	OrigJoinPred()
 	{
 		return m_origJoinPred;

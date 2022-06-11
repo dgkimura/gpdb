@@ -13,6 +13,7 @@
 
 #include "naucrates/md/CMDFunctionGPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -105,7 +106,7 @@ CMDFunctionGPDB::InitDXLTokenArrays()
 //		Func id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDFunctionGPDB::MDId() const
 {
 	return m_mdid;
@@ -134,7 +135,7 @@ CMDFunctionGPDB::Mdname() const
 //		Type id of result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDFunctionGPDB::GetResultTypeMdid() const
 {
 	return m_mdid_type_result;
@@ -148,7 +149,7 @@ CMDFunctionGPDB::GetResultTypeMdid() const
 //		Output argument types
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::pointer<IMdIdArray *>
 CMDFunctionGPDB::OutputArgTypesMdidArray() const
 {
 	return m_mdid_types_array;

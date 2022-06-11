@@ -13,6 +13,7 @@
 #include "naucrates/dxl/parser/CParseHandlerOptimizerConfig.h"
 
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CWindowOids.h"
 #include "gpopt/cost/ICostModel.h"
@@ -193,17 +194,19 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 
 	CParseHandlerEnumeratorConfig *pphEnumeratorConfig =
 		dynamic_cast<CParseHandlerEnumeratorConfig *>((*this)[0]);
-	CEnumeratorConfig *pec = pphEnumeratorConfig->GetEnumeratorCfg();
+	gpos::owner<CEnumeratorConfig *> pec =
+		pphEnumeratorConfig->GetEnumeratorCfg();
 	pec->AddRef();
 
 	CParseHandlerStatisticsConfig *pphStatisticsConfig =
 		dynamic_cast<CParseHandlerStatisticsConfig *>((*this)[1]);
-	CStatisticsConfig *stats_config = pphStatisticsConfig->GetStatsConf();
+	gpos::owner<CStatisticsConfig *> stats_config =
+		pphStatisticsConfig->GetStatsConf();
 	stats_config->AddRef();
 
 	CParseHandlerCTEConfig *pphCTEConfig =
 		dynamic_cast<CParseHandlerCTEConfig *>((*this)[2]);
-	CCTEConfig *pcteconfig = pphCTEConfig->GetCteConf();
+	gpos::owner<CCTEConfig *> pcteconfig = pphCTEConfig->GetCteConf();
 	pcteconfig->AddRef();
 
 	CParseHandlerWindowOids *pphDefoidsGPDB =
@@ -276,7 +279,7 @@ CParseHandlerOptimizerConfig::GetParseHandlerType() const
 //		Returns the bitset for the trace flags
 //
 //---------------------------------------------------------------------------
-CBitSet *
+gpos::pointer<CBitSet *>
 CParseHandlerOptimizerConfig::Pbs() const
 {
 	return m_pbs;
@@ -290,7 +293,7 @@ CParseHandlerOptimizerConfig::Pbs() const
 //		Returns the optimizer config
 //
 //---------------------------------------------------------------------------
-COptimizerConfig *
+gpos::pointer<COptimizerConfig *>
 CParseHandlerOptimizerConfig::GetOptimizerConfig() const
 {
 	return m_optimizer_config;

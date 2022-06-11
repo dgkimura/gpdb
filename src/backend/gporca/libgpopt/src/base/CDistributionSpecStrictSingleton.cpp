@@ -11,6 +11,8 @@
 
 #include "gpopt/base/CDistributionSpecStrictSingleton.h"
 
+#include "gpos/common/owner.h"
+
 using namespace gpopt;
 
 
@@ -39,7 +41,7 @@ CDistributionSpecStrictSingleton::CDistributionSpecStrictSingleton(
 //---------------------------------------------------------------------------
 BOOL
 CDistributionSpecStrictSingleton::FSatisfies(
-	const CDistributionSpec *pdss) const
+	gpos::pointer<const CDistributionSpec *> pdss) const
 {
 	if (Matches(pdss))
 	{

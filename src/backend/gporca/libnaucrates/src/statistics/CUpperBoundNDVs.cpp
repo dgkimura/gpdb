@@ -12,6 +12,8 @@
 
 #include "naucrates/statistics/CUpperBoundNDVs.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
 
@@ -33,7 +35,7 @@ CUpperBoundNDVs::CopyUpperBoundNDVWithRemap(
 {
 	BOOL mapping_not_found = false;
 
-	CColRefSet *column_refset_copy = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> column_refset_copy = GPOS_NEW(mp) CColRefSet(mp);
 	CColRefSetIter column_refset_iter(*m_column_refset);
 	while (column_refset_iter.Advance() && !mapping_not_found)
 	{

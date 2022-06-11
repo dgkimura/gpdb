@@ -14,6 +14,7 @@
 #define GPDXL_CParseHandlerNLJIndexParam_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLColRef.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerNLJIndexParam : public CParseHandlerBase
 {
 private:
 	// column reference
-	CDXLColRef *m_nest_param_colref_dxl;
+	gpos::owner<CDXLColRef *> m_nest_param_colref_dxl;
 
 	// process the start of an element
 	void StartElement(
@@ -64,7 +65,7 @@ public:
 	~CParseHandlerNLJIndexParam() override;
 
 	// return column reference
-	CDXLColRef *
+	gpos::pointer<CDXLColRef *>
 	GetNestParamColRefDxl(void) const
 	{
 		return m_nest_param_colref_dxl;

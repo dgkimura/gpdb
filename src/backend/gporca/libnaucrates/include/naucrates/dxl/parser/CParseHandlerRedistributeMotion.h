@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerRedistributeMotion_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalRedistributeMotion.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -35,7 +36,7 @@ class CParseHandlerRedistributeMotion : public CParseHandlerPhysicalOp
 {
 private:
 	// the redistribute motion operator
-	CDXLPhysicalRedistributeMotion *m_dxl_op;
+	gpos::pointer<CDXLPhysicalRedistributeMotion *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

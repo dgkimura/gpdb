@@ -47,7 +47,7 @@ private:
 	ULONG m_num_of_segments;
 
 	// cost model parameters
-	CCostModelParamsGPDB *m_cost_model_params;
+	gpos::owner<CCostModelParamsGPDB *> m_cost_model_params;
 
 	// return cost of processing the given number of rows
 	static CCost CostTupleProcessing(DOUBLE rows, DOUBLE width,
@@ -71,7 +71,8 @@ private:
 
 	// returns cost of highest costed child
 	static CCost CostMaxChild(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const SCostingInfo *pci, ICostModelParams *pcp);
+							  const SCostingInfo *pci,
+							  gpos::pointer<ICostModelParams *> pcp);
 
 	// check if given operator is unary
 	static BOOL FUnary(COperator::EOperatorId op_id);

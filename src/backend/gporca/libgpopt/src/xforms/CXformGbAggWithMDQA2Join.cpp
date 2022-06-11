@@ -13,6 +13,7 @@
 #include "gpopt/xforms/CXformGbAggWithMDQA2Join.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/base/CKeyCollection.h"
@@ -90,7 +91,7 @@ CXformGbAggWithMDQA2Join::Exfp(CExpressionHandle &exprhdl) const
 //		generated join expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CXformGbAggWithMDQA2Join::PexprMDQAs2Join(CMemoryPool *mp, CExpression *pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -110,14 +111,14 @@ CXformGbAggWithMDQA2Join::PexprMDQAs2Join(CMemoryPool *mp, CExpression *pexpr)
 											pexprChild);
 
 	// create a CTE consumer with child output columns
-	CExpression *pexprConsumer = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprConsumer = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEConsumer(mp, ulCTEId, pdrgpcrChildOutput));
 	pcteinfo->IncrementConsumers(ulCTEId);
 
 	// finalize GbAgg expression by replacing its child with CTE consumer
 	pexpr->Pop()->AddRef();
 	(*pexpr)[1]->AddRef();
-	CExpression *pexprGbAggWithConsumer =
+	gpos::owner<CExpression *> pexprGbAggWithConsumer =
 		GPOS_NEW(mp) CExpression(mp, pexpr->Pop(), pexprConsumer, (*pexpr)[1]);
 
 	CExpression *pexprJoinDQAs =
@@ -154,7 +155,8 @@ CXformGbAggWithMDQA2Join::PexprExpandMDQAs(CMemoryPool *mp, CExpression *pexpr)
 			(*pexpr)[1]->DeriveHasMultipleDistinctAggs();
 		if (fHasMultipleDistinctAggs)
 		{
-			CExpression *pexprExpanded = PexprMDQAs2Join(mp, pexpr);
+			gpos::owner<CExpression *> pexprExpanded =
+				PexprMDQAs2Join(mp, pexpr);
 
 			// recursively process the resulting expression
 			CExpression *pexprResult = PexprTransform(mp, pexprExpanded);
@@ -176,7 +178,7 @@ CXformGbAggWithMDQA2Join::PexprExpandMDQAs(CMemoryPool *mp, CExpression *pexpr)
 //		Main transformation driver
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CXformGbAggWithMDQA2Join::PexprTransform(CMemoryPool *mp, CExpression *pexpr)
 {
 	// protect against stack overflow during recursion
@@ -196,7 +198,8 @@ CXformGbAggWithMDQA2Join::PexprTransform(CMemoryPool *mp, CExpression *pexpr)
 
 	// recursively process child expressions
 	const ULONG arity = pexpr->Arity();
-	CExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprChildren =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CExpression *pexprChild = PexprTransform(mp, (*pexpr)[ul]);

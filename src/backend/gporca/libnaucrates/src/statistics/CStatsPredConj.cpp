@@ -11,6 +11,8 @@
 
 #include "naucrates/statistics/CStatsPredConj.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/statistics/CStatisticsUtils.h"
 #include "naucrates/statistics/StatsPredLess.h"
 
@@ -42,7 +44,7 @@ CStatsPredConj::CStatsPredConj(CStatsPredPtrArry *conj_pred_stats_array)
 //		Return the filter at a particular position
 //
 //---------------------------------------------------------------------------
-CStatsPred *
+gpos::pointer<CStatsPred *>
 CStatsPredConj::GetPredStats(ULONG pos) const
 {
 	return (*m_conj_pred_stats_array)[pos];

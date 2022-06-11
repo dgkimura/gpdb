@@ -44,10 +44,10 @@ class CDXLScalarWindowRef : public CDXLScalar
 {
 private:
 	// catalog id of the function
-	IMDId *m_func_mdid;
+	gpos::owner<IMDId *> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::owner<IMDId *> m_return_type_mdid;
 
 	// denotes whether it's agg(DISTINCT ...)
 	BOOL m_is_distinct;

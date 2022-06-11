@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/cost/ICostModelParams.h"
 #include "gpopt/search/CSearchStage.h"
@@ -40,43 +41,43 @@ class CParseHandlerDXL : public CParseHandlerBase
 {
 private:
 	// traceflags
-	CBitSet *m_trace_flags_bitset;
+	gpos::owner<CBitSet *> m_trace_flags_bitset;
 
 	// optimizer config
-	COptimizerConfig *m_optimizer_config;
+	gpos::owner<COptimizerConfig *> m_optimizer_config;
 
 	// MD request
-	CMDRequest *m_mdrequest;
+	gpos::owner<CMDRequest *> m_mdrequest;
 
 	// the root of the parsed DXL query
-	CDXLNode *m_query_dxl_root;
+	gpos::owner<CDXLNode *> m_query_dxl_root;
 
 	// list of query output columns
-	CDXLNodeArray *m_output_colums_dxl_array;
+	gpos::owner<CDXLNodeArray *> m_output_colums_dxl_array;
 
 	// list of CTE producers
-	CDXLNodeArray *m_cte_producers;
+	gpos::owner<CDXLNodeArray *> m_cte_producers;
 
 	// the root of the parsed DXL plan
-	CDXLNode *m_plan_dxl_root;
+	gpos::owner<CDXLNode *> m_plan_dxl_root;
 
 	// list of parsed metadata objects
-	IMDCacheObjectArray *m_mdid_cached_obj_array;
+	gpos::owner<IMDCacheObjectArray *> m_mdid_cached_obj_array;
 
 	// list of parsed metadata ids
-	IMdIdArray *m_mdid_array;
+	gpos::owner<IMdIdArray *> m_mdid_array;
 
 	// the root of the parsed scalar expression
-	CDXLNode *m_scalar_expr_dxl;
+	gpos::owner<CDXLNode *> m_scalar_expr_dxl;
 
 	// list of source system ids
-	CSystemIdArray *m_system_id_array;
+	gpos::owner<CSystemIdArray *> m_system_id_array;
 
 	// list of parsed statistics objects
-	CDXLStatsDerivedRelationArray *m_dxl_stats_derived_rel_array;
+	gpos::owner<CDXLStatsDerivedRelationArray *> m_dxl_stats_derived_rel_array;
 
 	// search strategy
-	CSearchStageArray *m_search_stage_array;
+	gpos::owner<CSearchStageArray *> m_search_stage_array;
 
 	// plan Id
 	ULLONG m_plan_id;
@@ -85,7 +86,7 @@ private:
 	ULLONG m_plan_space_size;
 
 	// cost model params
-	ICostModelParams *m_cost_model_params;
+	gpos::owner<ICostModelParams *> m_cost_model_params;
 
 	// process the start of an element
 	void StartElement(
@@ -145,43 +146,44 @@ public:
 	~CParseHandlerDXL() override;
 
 	// traceflag bitset
-	CBitSet *Pbs() const;
+	gpos::pointer<CBitSet *> Pbs() const;
 
 	// optimizer config
-	COptimizerConfig *GetOptimizerConfig() const;
+	gpos::pointer<COptimizerConfig *> GetOptimizerConfig() const;
 
 	// returns the root of the parsed DXL query
-	CDXLNode *GetQueryDXLRoot() const;
+	gpos::pointer<CDXLNode *> GetQueryDXLRoot() const;
 
 	// returns the list of query output columns
-	CDXLNodeArray *GetOutputColumnsDXLArray() const;
+	gpos::pointer<CDXLNodeArray *> GetOutputColumnsDXLArray() const;
 
 	// returns the list of CTE producers
-	CDXLNodeArray *GetCTEProducerDXLArray() const;
+	gpos::pointer<CDXLNodeArray *> GetCTEProducerDXLArray() const;
 
 	// returns the root of the parsed DXL plan
-	CDXLNode *PdxlnPlan() const;
+	gpos::pointer<CDXLNode *> PdxlnPlan() const;
 
 	// return the list of parsed metadata objects
-	IMDCacheObjectArray *GetMdIdCachedObjArray() const;
+	gpos::pointer<IMDCacheObjectArray *> GetMdIdCachedObjArray() const;
 
 	// return the list of parsed metadata ids
-	IMdIdArray *GetMdIdArray() const;
+	gpos::pointer<IMdIdArray *> GetMdIdArray() const;
 
 	// return the MD request object
-	CMDRequest *GetMiniDumper() const;
+	gpos::pointer<CMDRequest *> GetMiniDumper() const;
 
 	// return the root of the parsed scalar expression
-	CDXLNode *GetScalarExprDXLRoot() const;
+	gpos::pointer<CDXLNode *> GetScalarExprDXLRoot() const;
 
 	// return the list of parsed source system id objects
-	CSystemIdArray *GetSysidPtrArray() const;
+	gpos::pointer<CSystemIdArray *> GetSysidPtrArray() const;
 
 	// return the list of statistics objects
-	CDXLStatsDerivedRelationArray *GetStatsDerivedRelDXLArray() const;
+	gpos::pointer<CDXLStatsDerivedRelationArray *> GetStatsDerivedRelDXLArray()
+		const;
 
 	// return search strategy
-	CSearchStageArray *GetSearchStageArray() const;
+	gpos::pointer<CSearchStageArray *> GetSearchStageArray() const;
 
 	// return plan id
 	ULLONG GetPlanId() const;
@@ -190,7 +192,7 @@ public:
 	ULLONG GetPlanSpaceSize() const;
 
 	// return cost params
-	ICostModelParams *GetCostModelParams() const;
+	gpos::pointer<ICostModelParams *> GetCostModelParams() const;
 
 	// process the end of the document
 	void endDocument() override;

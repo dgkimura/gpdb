@@ -53,16 +53,16 @@ class CDXLScalarSubPlan : public CDXLScalar
 {
 private:
 	// catalog MDId of the first column type
-	IMDId *m_first_col_type_mdid;
+	gpos::owner<IMDId *> m_first_col_type_mdid;
 
 	// array of outer column references
-	CDXLColRefArray *m_dxl_colref_array;
+	gpos::owner<CDXLColRefArray *> m_dxl_colref_array;
 
 	// subplan type
 	EdxlSubPlanType m_dxl_subplan_type;
 
 	// test expression -- not null if quantified/existential subplan
-	CDXLNode *m_dxlnode_test_expr;
+	gpos::owner<CDXLNode *> m_dxlnode_test_expr;
 
 	// does test expression contain outer param
 	BOOL m_outer_param;
@@ -89,7 +89,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// type of first output column
-	IMDId *GetFirstColTypeMdId() const;
+	gpos::pointer<IMDId *> GetFirstColTypeMdId() const;
 
 	// outer references
 	gpos::pointer<const CDXLColRefArray *>

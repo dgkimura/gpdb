@@ -12,6 +12,7 @@
 #define GPOPT_CScalarSubqueryQuantified_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalar.h"
 #include "gpopt/xforms/CSubqueryHandler.h"
@@ -43,7 +44,7 @@ class CScalarSubqueryQuantified : public CScalar
 {
 private:
 	// id of comparison operator
-	IMDId *m_scalar_op_mdid;
+	gpos::owner<IMDId *> m_scalar_op_mdid;
 
 	// name of comparison operator
 	const CWStringConst *m_pstrScalarOp;
@@ -64,7 +65,7 @@ public:
 	CScalarSubqueryQuantified(const CScalarSubqueryQuantified &) = delete;
 
 	// operator mdid accessor
-	IMDId *MdIdOp() const;
+	gpos::pointer<IMDId *> MdIdOp() const;
 
 	// operator name accessor
 	const CWStringConst *PstrOp() const;
@@ -96,11 +97,11 @@ public:
 	CColRefSet *PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive partition consumer info
-	CPartInfo *PpartinfoDerive(CMemoryPool *mp,
-							   CExpressionHandle &exprhdl) const override;
+	gpos::owner<CPartInfo *> PpartinfoDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// conversion function
-	static CScalarSubqueryQuantified *
+	static gpos::cast_func<CScalarSubqueryQuantified *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

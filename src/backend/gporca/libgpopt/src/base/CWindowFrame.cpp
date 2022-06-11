@@ -11,6 +11,8 @@
 
 #include "gpopt/base/CWindowFrame.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CScalarIdent.h"
 
@@ -125,7 +127,7 @@ CWindowFrame::~CWindowFrame()
 //
 //---------------------------------------------------------------------------
 BOOL
-CWindowFrame::Matches(const CWindowFrame *pwf) const
+CWindowFrame::Matches(gpos::pointer<const CWindowFrame *> pwf) const
 {
 	return m_efs == pwf->Efs() && m_efbLeading == pwf->EfbLeading() &&
 		   m_efbTrailing == pwf->EfbTrailing() && m_efes == pwf->Efes() &&
@@ -174,7 +176,7 @@ CWindowFrame::HashValue() const
 //		Return a copy of the window frame with remapped columns
 //
 //---------------------------------------------------------------------------
-CWindowFrame *
+gpos::owner<CWindowFrame *>
 CWindowFrame::PwfCopyWithRemappedColumns(CMemoryPool *mp,
 										 UlongToColRefMap *colref_mapping,
 										 BOOL must_exist)
@@ -251,8 +253,8 @@ CWindowFrame::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CWindowFrame::Equals(const CWindowFrameArray *pdrgpwfFirst,
-					 const CWindowFrameArray *pdrgpwfSecond)
+CWindowFrame::Equals(gpos::pointer<const CWindowFrameArray *> pdrgpwfFirst,
+					 gpos::pointer<const CWindowFrameArray *> pdrgpwfSecond)
 {
 	if (nullptr == pdrgpwfFirst || nullptr == pdrgpwfSecond)
 	{
@@ -284,7 +286,8 @@ CWindowFrame::Equals(const CWindowFrameArray *pdrgpwfFirst,
 //
 //---------------------------------------------------------------------------
 ULONG
-CWindowFrame::HashValue(const CWindowFrameArray *pdrgpwf, ULONG ulMaxSize)
+CWindowFrame::HashValue(gpos::pointer<const CWindowFrameArray *> pdrgpwf,
+						ULONG ulMaxSize)
 {
 	GPOS_ASSERT(nullptr != pdrgpwf);
 	const ULONG size = std::min(ulMaxSize, pdrgpwf->Size());
@@ -307,7 +310,8 @@ CWindowFrame::HashValue(const CWindowFrameArray *pdrgpwf, ULONG ulMaxSize)
 //
 //---------------------------------------------------------------------------
 IOstream &
-CWindowFrame::OsPrint(IOstream &os, const CWindowFrameArray *pdrgpwf)
+CWindowFrame::OsPrint(IOstream &os,
+					  gpos::pointer<const CWindowFrameArray *> pdrgpwf)
 {
 	os << "[";
 	const ULONG size = pdrgpwf->Size();

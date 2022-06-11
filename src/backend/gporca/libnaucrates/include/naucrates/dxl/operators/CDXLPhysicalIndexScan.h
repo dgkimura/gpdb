@@ -43,10 +43,10 @@ class CDXLPhysicalIndexScan : public CDXLPhysical
 {
 private:
 	// table descriptor for the scanned table
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
 
 	// index descriptor associated with the scanned table
-	CDXLIndexDescr *m_dxl_index_descr;
+	gpos::owner<CDXLIndexDescr *> m_dxl_index_descr;
 
 	// scan direction of the index
 	EdxlIndexScanDirection m_index_scan_dir;

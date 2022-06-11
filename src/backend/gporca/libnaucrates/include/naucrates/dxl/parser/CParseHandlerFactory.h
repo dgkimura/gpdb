@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CHashMap.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysical.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -77,7 +78,8 @@ class CParseHandlerFactory
 
 private:
 	// mappings DXL token -> ParseHandler creator
-	static TokenParseHandlerFuncMap *m_token_parse_handler_func_map;
+	static gpos::owner<TokenParseHandlerFuncMap *>
+		m_token_parse_handler_func_map;
 
 	static void AddMapping(Edxltoken token_type,
 						   ParseHandlerOpCreatorFunc *parse_handler_op_func);

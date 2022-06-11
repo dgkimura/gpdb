@@ -31,16 +31,16 @@ class CLogicalSetOp : public CLogical
 {
 protected:
 	// output column array
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::owner<CColRefArray *> m_pdrgpcrOutput;
 
 	// input column array
-	CColRef2dArray *m_pdrgpdrgpcrInput;
+	gpos::owner<CColRef2dArray *> m_pdrgpdrgpcrInput;
 
 	// set representation of output columns
-	CColRefSet *m_pcrsOutput;
+	gpos::owner<CColRefSet *> m_pcrsOutput;
 
 	// set representation of input columns
-	CColRefSetArray *m_pdrgpcrsInput;
+	gpos::owner<CColRefSetArray *> m_pdrgpcrsInput;
 
 	// private copy ctor
 	CLogicalSetOp(const CLogicalSetOp &);
@@ -68,9 +68,8 @@ protected:
 
 	// derive constraint property for difference, intersect, and union
 	// operators
-	CPropConstraint *PpcDeriveConstraintSetop(CMemoryPool *mp,
-											  CExpressionHandle &exprhdl,
-											  BOOL fIntersect) const;
+	gpos::owner<CPropConstraint *> PpcDeriveConstraintSetop(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, BOOL fIntersect) const;
 
 public:
 	// ctor
@@ -92,7 +91,7 @@ public:
 	const CHAR *SzId() const override = 0;
 
 	// accessor of output column array
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrOutput() const
 	{
 		GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
@@ -100,7 +99,7 @@ public:
 	}
 
 	// accessor of input column array
-	CColRef2dArray *
+	gpos::pointer<CColRef2dArray *>
 	PdrgpdrgpcrInput() const
 	{
 		GPOS_ASSERT(nullptr != m_pdrgpdrgpcrInput);
@@ -108,7 +107,8 @@ public:
 	}
 
 	// return true if we can pull projections up past this operator from its given child
-	BOOL FCanPullProjectionsUp(ULONG  //child_index
+	BOOL
+	FCanPullProjectionsUp(ULONG	 //child_index
 	) const override
 	{
 		return false;
@@ -124,11 +124,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *,
-									CExpressionHandle &) override;
+	gpos::owner<CColRefSet *> DeriveOutputColumns(CMemoryPool *,
+												  CExpressionHandle &) override;
 
 	// derive key collections
-	CKeyCollection *DeriveKeyCollection(
+	gpos::owner<CKeyCollection *> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
@@ -140,14 +140,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *PcrsStat(CMemoryPool *,		   // mp
-						 CExpressionHandle &,  // exprhdl
-						 CColRefSet *pcrsInput,
-						 ULONG	// child_index
+	gpos::owner<CColRefSet *> PcrsStat(CMemoryPool *,		 // mp
+									   CExpressionHandle &,	 // exprhdl
+									   gpos::pointer<CColRefSet *> pcrsInput,
+									   ULONG  // child_index
 	) const override;
 
 	// conversion function
-	static CLogicalSetOp *
+	static gpos::cast_func<CLogicalSetOp *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

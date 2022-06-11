@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalPartitionSelector_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CPartConstraint.h"
@@ -38,10 +39,10 @@ private:
 	ULONG m_selector_id;
 
 	// mdid of partitioned table
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// partition selection predicate
-	CExpression *m_filter_expr;
+	gpos::owner<CExpression *> m_filter_expr;
 
 public:
 	CPhysicalPartitionSelector(const CPhysicalPartitionSelector &) = delete;
@@ -82,14 +83,14 @@ public:
 	}
 
 	// partitioned table mdid
-	IMDId *
+	gpos::pointer<IMDId *>
 	MDId() const
 	{
 		return m_mdid;
 	}
 
 	// return the partition selection predicate
-	CExpression *
+	gpos::pointer<CExpression *>
 	FilterExpr() const
 	{
 		return m_filter_expr;
@@ -132,11 +133,12 @@ public:
 							ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	gpos::owner<CDistributionSpec *> PdsRequired(CMemoryPool *mp,
+												 CExpressionHandle &exprhdl,
+												 CDistributionSpec *pdsRequired,
+												 ULONG child_index,
+												 CDrvdPropArray *pdrgpdpCtxt,
+												 ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	CRewindabilitySpec *PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -180,16 +182,17 @@ public:
 	// return distribution property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetDistribution(
 		CExpressionHandle &exprhdl,
-		const CEnfdDistribution *ped) const override;
+		gpos::pointer<const CEnfdDistribution *> ped) const override;
 
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
 		CExpressionHandle &exprhdl,
-		const CEnfdRewindability *per) const override;
+		gpos::pointer<const CEnfdRewindability *> per) const override;
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	// return true if operator passes through stats obtained from children,
 	// this is used when computing stats during costing
@@ -204,7 +207,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalPartitionSelector *
+	static gpos::cast_func<CPhysicalPartitionSelector *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

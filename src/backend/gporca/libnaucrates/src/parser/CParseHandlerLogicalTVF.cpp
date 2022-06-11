@@ -13,6 +13,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalTVF.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLLogicalTVF.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
@@ -150,7 +152,7 @@ CParseHandlerLogicalTVF::EndElement(const XMLCh *const,	 // element_uri,
 	GPOS_ASSERT(nullptr != cold_descr_dxl_array);
 
 	cold_descr_dxl_array->AddRef();
-	CDXLLogicalTVF *lg_tvf_op = GPOS_NEW(m_mp) CDXLLogicalTVF(
+	gpos::owner<CDXLLogicalTVF *> lg_tvf_op = GPOS_NEW(m_mp) CDXLLogicalTVF(
 		m_mp, m_func_mdid, m_return_type_mdid, m_mdname, cold_descr_dxl_array);
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, lg_tvf_op);

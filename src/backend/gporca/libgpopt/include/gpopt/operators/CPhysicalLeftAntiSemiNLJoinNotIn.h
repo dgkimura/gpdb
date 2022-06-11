@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalLeftAntiSemiNLJoinNotIn_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalLeftAntiSemiNLJoin.h"
 
@@ -53,7 +54,7 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalLeftAntiSemiNLJoinNotIn *
+	static gpos::cast_func<CPhysicalLeftAntiSemiNLJoinNotIn *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftAntiSemiNLJoinNotIn == pop->Eopid());

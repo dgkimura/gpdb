@@ -12,6 +12,7 @@
 
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -67,7 +68,7 @@ CDXLTableDescr::~CDXLTableDescr()
 //		Return the metadata id for the table
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLTableDescr::MDId() const
 {
 	return m_mdid;
@@ -162,7 +163,7 @@ CDXLTableDescr::AddColumnDescr(CDXLColDescr *column_descr_dxl)
 //		Get the column descriptor at the specified position from the col descr list
 //
 //---------------------------------------------------------------------------
-const CDXLColDescr *
+gpos::pointer<const CDXLColDescr *>
 CDXLTableDescr::GetColumnDescrAt(ULONG idx) const
 {
 	GPOS_ASSERT(idx < Arity());

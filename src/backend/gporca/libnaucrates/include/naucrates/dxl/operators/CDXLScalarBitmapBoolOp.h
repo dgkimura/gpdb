@@ -43,7 +43,7 @@ public:
 
 private:
 	// type id
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 	// operator type
 	const EdxlBitmapBoolOp m_bitmap_op_type;
@@ -65,7 +65,7 @@ public:
 	EdxlBitmapBoolOp GetDXLBitmapOpType() const;
 
 	// return type
-	IMDId *MdidType() const;
+	gpos::pointer<IMDId *> MdidType() const;
 
 	// name of the DXL operator name
 	const CWStringConst *GetOpNameStr() const override;

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDGPDBCheckConstraint_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 
@@ -36,13 +37,13 @@ class CParseHandlerMDGPDBCheckConstraint : public CParseHandlerMetadataObject
 {
 private:
 	// mdid of the check constraint
-	IMDId *m_mdid;
+	gpos::pointer<IMDId *> m_mdid;
 
 	// name of the check constraint
 	CMDName *m_mdname;
 
 	// mdid of the relation
-	IMDId *m_rel_mdid;
+	gpos::pointer<IMDId *> m_rel_mdid;
 
 	// process the start of an element
 	void StartElement(

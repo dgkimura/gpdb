@@ -17,6 +17,8 @@
 
 #include "unittest/gpopt/eval/CConstExprEvaluatorDefaultTest.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CAutoOptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/eval/CConstExprEvaluatorDefault.h"
@@ -44,12 +46,12 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	CConstExprEvaluatorDefault *pceevaldefault =
+	gpos::owner<CConstExprEvaluatorDefault *> pceevaldefault =
 		GPOS_NEW(mp) CConstExprEvaluatorDefault();
 	GPOS_ASSERT(!pceevaldefault->FCanEvalExpressions());
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -60,7 +62,8 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 	// Test evaluation of an integer constant
 	{
 		ULONG ulVal = 123456;
-		CExpression *pexprUl = CUtils::PexprScalarConstInt4(mp, ulVal);
+		gpos::owner<CExpression *> pexprUl =
+			CUtils::PexprScalarConstInt4(mp, ulVal);
 #ifdef GPOS_DEBUG
 		CExpression *pexprUlResult = pceevaldefault->PexprEval(pexprUl);
 		CScalarConst *pscalarconstUl = CScalarConst::PopConvert(pexprUl->Pop());
@@ -76,7 +79,8 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 	{
 		ULONG ulVal = 123456;
 		CExpression *pexprUl = CUtils::PexprScalarConstInt4(mp, ulVal);
-		CExpression *pexprIsNull = CUtils::PexprIsNull(mp, pexprUl);
+		gpos::owner<CExpression *> pexprIsNull =
+			CUtils::PexprIsNull(mp, pexprUl);
 #ifdef GPOS_DEBUG
 		CExpression *pexprResult = pceevaldefault->PexprEval(pexprIsNull);
 		gpopt::CScalarNullTest *pscalarnulltest =

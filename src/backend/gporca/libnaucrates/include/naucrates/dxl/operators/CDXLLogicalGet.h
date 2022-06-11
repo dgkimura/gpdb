@@ -34,7 +34,7 @@ class CDXLLogicalGet : public CDXLLogical
 {
 private:
 	// table descriptor for the scanned table
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
 
 public:
 	CDXLLogicalGet(CDXLLogicalGet &) = delete;
@@ -48,7 +48,7 @@ public:
 	// accessors
 	Edxlopid GetDXLOperator() const override;
 	const CWStringConst *GetOpNameStr() const override;
-	CDXLTableDescr *GetDXLTableDescr() const;
+	gpos::pointer<CDXLTableDescr *> GetDXLTableDescr() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarMinMax.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -94,7 +96,7 @@ CDXLScalarMinMax::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarMinMax::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *dxlnode) const
+								 gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

@@ -39,7 +39,7 @@ private:
 	ULONG m_colid;
 
 	// catalog Oid of the sorting operator
-	IMDId *m_mdid_sort_op;
+	gpos::owner<IMDId *> m_mdid_sort_op;
 
 	// name of sorting operator
 	CWStringConst *m_sort_op_name_str;
@@ -66,7 +66,7 @@ public:
 	ULONG GetColId() const;
 
 	// mdid of the sorting operator
-	IMDId *GetMdIdSortOp() const;
+	gpos::pointer<IMDId *> GetMdIdSortOp() const;
 
 	// whether nulls are sorted before other values
 	BOOL IsSortedNullsFirst() const;

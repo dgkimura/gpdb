@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalLimit.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -69,7 +71,7 @@ CDXLPhysicalLimit::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalLimit::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  const CDXLNode *node) const
+								  gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -81,7 +83,8 @@ CDXLPhysicalLimit::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	// serialize children nodes
 
-	const CDXLNodeArray *dxl_array = node->GetChildDXLNodeArray();
+	gpos::pointer<const CDXLNodeArray *> dxl_array =
+		node->GetChildDXLNodeArray();
 
 	GPOS_ASSERT(4 == node->Arity());
 	// serialize the first two children: target-list and plan

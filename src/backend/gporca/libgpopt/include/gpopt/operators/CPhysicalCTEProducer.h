@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalCTEProducer_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysical.h"
 
@@ -32,10 +33,10 @@ private:
 	ULONG m_id;
 
 	// cte columns
-	CColRefArray *m_pdrgpcr;
+	gpos::owner<CColRefArray *> m_pdrgpcr;
 
 	// set representation of cte columns
-	CColRefSet *m_pcrs;
+	gpos::owner<CColRefSet *> m_pcrs;
 
 public:
 	CPhysicalCTEProducer(const CPhysicalCTEProducer &) = delete;
@@ -67,7 +68,7 @@ public:
 	}
 
 	// cte columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	Pdrgpcr() const
 	{
 		return m_pdrgpcr;
@@ -152,12 +153,13 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
 		CExpressionHandle &exprhdl,
-		const CEnfdRewindability *per) const override;
+		gpos::pointer<const CEnfdRewindability *> per) const override;
 
 	// return true if operator passes through stats obtained from children,
 	// this is used when computing stats during costing
@@ -172,7 +174,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalCTEProducer *
+	static gpos::cast_func<CPhysicalCTEProducer *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

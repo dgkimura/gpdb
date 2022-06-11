@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerResult_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalResult.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerResult : public CParseHandlerPhysicalOp
 {
 private:
 	// the result operator
-	CDXLPhysicalResult *m_dxl_op;
+	gpos::pointer<CDXLPhysicalResult *> m_dxl_op;
 
 	// set up initial handlers
 	void SetupInitialHandlers();

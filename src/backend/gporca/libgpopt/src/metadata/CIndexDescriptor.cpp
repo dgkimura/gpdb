@@ -12,6 +12,7 @@
 #include "gpopt/metadata/CIndexDescriptor.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColumnFactory.h"
 #include "gpopt/base/COptCtxt.h"
@@ -104,8 +105,9 @@ CIndexDescriptor::UlIncludedColumns() const
 //
 //---------------------------------------------------------------------------
 CIndexDescriptor *
-CIndexDescriptor::Pindexdesc(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
-							 const IMDIndex *pmdindex)
+CIndexDescriptor::Pindexdesc(CMemoryPool *mp,
+							 gpos::pointer<const CTableDescriptor *> ptabdesc,
+							 gpos::pointer<const IMDIndex *> pmdindex)
 {
 	CWStringConst strIndexName(mp, pmdindex->Mdname().GetMDName()->GetBuffer());
 
@@ -114,29 +116,29 @@ CIndexDescriptor::Pindexdesc(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
 	pmdindex->MDId()->AddRef();
 
 	// array of index column descriptors
-	CColumnDescriptorArray *pdrgcoldescKey =
+	gpos::owner<CColumnDescriptorArray *> pdrgcoldescKey =
 		GPOS_NEW(mp) CColumnDescriptorArray(mp);
 
 	for (ULONG ul = 0; ul < pmdindex->Keys(); ul++)
 	{
-		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
+		gpos::owner<CColumnDescriptor *> pcoldesc = (*pdrgpcoldesc)[ul];
 		pcoldesc->AddRef();
 		pdrgcoldescKey->Append(pcoldesc);
 	}
 
 	// array of included column descriptors
-	CColumnDescriptorArray *pdrgcoldescIncluded =
+	gpos::owner<CColumnDescriptorArray *> pdrgcoldescIncluded =
 		GPOS_NEW(mp) CColumnDescriptorArray(mp);
 	for (ULONG ul = 0; ul < pmdindex->IncludedCols(); ul++)
 	{
-		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
+		gpos::owner<CColumnDescriptor *> pcoldesc = (*pdrgpcoldesc)[ul];
 		pcoldesc->AddRef();
 		pdrgcoldescIncluded->Append(pcoldesc);
 	}
 
 
 	// create the index descriptors
-	CIndexDescriptor *pindexdesc = GPOS_NEW(mp) CIndexDescriptor(
+	gpos::owner<CIndexDescriptor *> pindexdesc = GPOS_NEW(mp) CIndexDescriptor(
 		mp, pmdindex->MDId(), CName(&strIndexName), pdrgcoldescKey,
 		pdrgcoldescIncluded, pmdindex->IsClustered(), pmdindex->IndexType());
 	return pindexdesc;

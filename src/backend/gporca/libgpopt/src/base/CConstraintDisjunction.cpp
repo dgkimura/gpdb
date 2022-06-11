@@ -12,6 +12,7 @@
 #include "gpopt/base/CConstraintDisjunction.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CConstraintInterval.h"
 #include "gpopt/base/CUtils.h"
@@ -98,11 +99,12 @@ CConstraintDisjunction::FConstraint(const CColRef *colref) const
 //		Return a copy of the constraint with remapped columns
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CConstraintDisjunction::PcnstrCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
-	CConstraintArray *pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstr =
+		GPOS_NEW(mp) CConstraintArray(mp);
 	const ULONG length = m_pdrgpcnstr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -140,7 +142,8 @@ CConstraintDisjunction::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 												 true /*fIncludesNull*/);
 	}
 
-	CConstraintArray *pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstr =
+		GPOS_NEW(mp) CConstraintArray(mp);
 
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -175,7 +178,8 @@ CConstraintDisjunction::Pcnstr(CMemoryPool *mp, CColRefSet *pcrs)
 {
 	const ULONG length = m_pdrgpcnstr->Size();
 
-	CConstraintArray *pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstr =
+		GPOS_NEW(mp) CConstraintArray(mp);
 
 	for (ULONG ul = 0; ul < length; ul++)
 	{

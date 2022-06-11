@@ -8,6 +8,7 @@
 #include "gpopt/xforms/CXformJoin2IndexApplyGeneric.h"
 
 #include "gpos/common/CAutoRef.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalApply.h"
 #include "gpopt/operators/CLogicalDynamicGet.h"
@@ -27,8 +28,10 @@ using namespace gpopt;
 // to redistribute outer child to match inner on the join keys.
 BOOL
 CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
-	CMemoryPool *mp, CExpression *pexprInner, CExpression *pexprScalar,
-	CTableDescriptor *ptabDesc, const CColRefSet *pcrsDist)
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexprInner,
+	gpos::pointer<CExpression *> pexprScalar,
+	gpos::pointer<CTableDescriptor *> ptabDesc,
+	gpos::pointer<const CColRefSet *> pcrsDist)
 {
 	IMDRelation::Ereldistrpolicy ereldist = ptabDesc->GetRelDistribution();
 
@@ -40,7 +43,8 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 	// now consider hash distributed table
 	CColRefSet *pcrsInnerOutput = pexprInner->DeriveOutputColumns();
 	CColRefSet *pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
-	CColRefSet *pcrsInnerRefs = GPOS_NEW(mp) CColRefSet(mp, *pcrsScalarExpr);
+	gpos::owner<CColRefSet *> pcrsInnerRefs =
+		GPOS_NEW(mp) CColRefSet(mp, *pcrsScalarExpr);
 	pcrsInnerRefs->Intersection(pcrsInnerOutput);
 
 	// Distribution key set of inner GET must be subset of inner columns used in
@@ -49,9 +53,10 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 	pcrsInnerRefs->Release();
 	if (fCanOuterIndexApply)
 	{
-		CColRefSet *pcrsEquivPredInner = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::owner<CColRefSet *> pcrsEquivPredInner =
+			GPOS_NEW(mp) CColRefSet(mp);
 		// extract array of join predicates from join condition expression
-		CExpressionArray *pdrgpexpr =
+		gpos::owner<CExpressionArray *> pdrgpexpr =
 			CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 		for (ULONG ul = 0; ul < pdrgpexpr->Size(); ul++)
 		{
@@ -113,7 +118,7 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 
 	// all predicates that could be used as index predicates, this includes the
 	// join predicates and selection predicates of selects right above the get
-	CExpression *pexprAllPredicates = pexprScalar;
+	gpos::owner<CExpression *> pexprAllPredicates = pexprScalar;
 
 	// a select node that sits right on top of the get node (if it exists, NULL otherwise)
 	CExpression *selectThatIsParentOfGet = nullptr;
@@ -160,7 +165,7 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 
 	// info on the get node (a get node or a dynamic get)
 	CTableDescriptor *ptabdescInner = nullptr;
-	const CColRefSet *distributionCols = nullptr;
+	gpos::pointer<const CColRefSet *> distributionCols = nullptr;
 	CLogicalDynamicGet *popDynamicGet = nullptr;
 	CAutoRef<CColRefSet> groupingColsToCheck;
 
@@ -193,7 +198,7 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 						return;
 					}
 
-					CColRefSet *joinPredUsedCols = GPOS_NEW(mp)
+					gpos::owner<CColRefSet *> joinPredUsedCols = GPOS_NEW(mp)
 						CColRefSet(mp, *(pexprScalar->DeriveUsedColumns()));
 
 					joinPredUsedCols->Exclude(
@@ -228,8 +233,9 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 							// on the inner side if the grouping columns are a superset of the
 							// distribution columns. This way, we can put a groupby locally on top
 							// of each of the gets on every segment.
-							CColRefSet *groupingCols = GPOS_NEW(mp)
-								CColRefSet(mp, grbyAggOp->Pdrgpcr());
+							gpos::owner<CColRefSet *> groupingCols =
+								GPOS_NEW(mp)
+									CColRefSet(mp, grbyAggOp->Pdrgpcr());
 
 							// if there are multiple groupbys, then check the intersection of their grouping cols
 							groupingCols->Intersection(

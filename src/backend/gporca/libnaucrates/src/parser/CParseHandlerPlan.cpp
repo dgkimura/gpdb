@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPlan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerDirectDispatchInfo.h"
@@ -62,7 +64,7 @@ CParseHandlerPlan::~CParseHandlerPlan()
 //		Root of constructed DXL plan
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::pointer<CDXLNode *>
 CParseHandlerPlan::CreateDXLNode()
 {
 	return m_dxl_node;

@@ -11,6 +11,8 @@
 
 #include "gpopt/search/CJobTransformation.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/engine/CEngine.h"
 #include "gpopt/operators/CLogical.h"
 #include "gpopt/search/CGroup.h"
@@ -130,7 +132,8 @@ CJobTransformation::EevtTransform(CSchedulerContext *psc, CJob *pjOwner)
 	CXform *pxform = pjt->m_xform;
 
 	// insert transformation results to memo
-	CXformResult *pxfres = GPOS_NEW(pmpGlobal) CXformResult(pmpGlobal);
+	gpos::owner<CXformResult *> pxfres =
+		GPOS_NEW(pmpGlobal) CXformResult(pmpGlobal);
 	ULONG ulElapsedTime = 0;
 	ULONG ulNumberOfBindings = 0;
 	pgexpr->Transform(pmpGlobal, pmpLocal, pxform, pxfres, &ulElapsedTime,

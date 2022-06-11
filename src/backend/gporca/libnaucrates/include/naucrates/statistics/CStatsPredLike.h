@@ -34,10 +34,10 @@ class CStatsPredLike : public CStatsPred
 {
 private:
 	// left hand side of the LIKE expression
-	CExpression *m_expr_left;
+	gpos::owner<CExpression *> m_expr_left;
 
 	// right hand side of the LIKE expression
-	CExpression *m_expr_right;
+	gpos::owner<CExpression *> m_expr_right;
 
 	// default scale factor
 	CDouble m_default_scale_factor;

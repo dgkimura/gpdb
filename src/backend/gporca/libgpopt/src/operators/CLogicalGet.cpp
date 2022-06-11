@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CAutoP.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -178,7 +179,7 @@ CLogicalGet::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										UlongToColRefMap *colref_mapping,
 										BOOL must_exist)
@@ -213,7 +214,7 @@ CLogicalGet::DeriveOutputColumns(CMemoryPool *mp,
 								 CExpressionHandle &  // exprhdl
 )
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	for (ULONG i = 0; i < m_pdrgpcrOutput->Size(); i++)
 	{
 		// We want to limit the output columns to only those which are referenced in the query
@@ -244,7 +245,7 @@ CLogicalGet::DeriveNotNullColumns(CMemoryPool *mp,
 								  CExpressionHandle &exprhdl) const
 {
 	// get all output columns
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(exprhdl.DeriveOutputColumns());
 
 	// filters out nullable columns
@@ -291,7 +292,7 @@ CLogicalGet::DeriveKeyCollection(CMemoryPool *mp,
 								 CExpressionHandle &  // exprhdl
 ) const
 {
-	const CBitSetArray *pdrgpbs = m_ptabdesc->PdrgpbsKeys();
+	gpos::pointer<const CBitSetArray *> pdrgpbs = m_ptabdesc->PdrgpbsKeys();
 
 	return CLogical::PkcKeysBaseTable(mp, pdrgpbs, m_pdrgpcrOutput);
 }
@@ -308,7 +309,7 @@ CLogicalGet::DeriveKeyCollection(CMemoryPool *mp,
 CXformSet *
 CLogicalGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfGet2TableScan);
 
@@ -332,7 +333,8 @@ CLogicalGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	IStatistics *pstatsTable =
 		PstatsBaseTable(mp, exprhdl, m_ptabdesc, m_pcrsDist);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
+	gpos::owner<CColRefSet *> pcrs =
+		GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
 	CUpperBoundNDVs *upper_bound_NDVs =
 		GPOS_NEW(mp) CUpperBoundNDVs(pcrs, pstatsTable->Rows());
 	CStatistics::CastStats(pstatsTable)->AddCardUpperBound(upper_bound_NDVs);
@@ -370,7 +372,8 @@ CLogicalGet::OsPrint(IOstream &os) const
 		os << "] Key sets: {";
 
 		const ULONG ulColumns = m_pdrgpcrOutput->Size();
-		const CBitSetArray *pdrgpbsKeys = m_ptabdesc->PdrgpbsKeys();
+		gpos::pointer<const CBitSetArray *> pdrgpbsKeys =
+			m_ptabdesc->PdrgpbsKeys();
 		for (ULONG ul = 0; ul < pdrgpbsKeys->Size(); ul++)
 		{
 			CBitSet *pbs = (*pdrgpbsKeys)[ul];

@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/base/CRangeTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/CDefaultComparator.h"
@@ -28,7 +29,7 @@
 //		Creates an int2 datum.
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::owner<IDatum *>
 CRangeTest::CreateInt2Datum(gpos::CMemoryPool *mp, INT i)
 {
 	return GPOS_NEW(mp)
@@ -43,7 +44,7 @@ CRangeTest::CreateInt2Datum(gpos::CMemoryPool *mp, INT i)
 //		Creates an int4 datum.
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::owner<IDatum *>
 CRangeTest::CreateInt4Datum(gpos::CMemoryPool *mp, INT i)
 {
 	return GPOS_NEW(mp)
@@ -58,7 +59,7 @@ CRangeTest::CreateInt4Datum(gpos::CMemoryPool *mp, INT i)
 //		Creates an int8 datum.
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::owner<IDatum *>
 CRangeTest::CreateInt8Datum(gpos::CMemoryPool *mp, INT li)
 {
 	return GPOS_NEW(mp)
@@ -87,7 +88,7 @@ CRangeTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -114,7 +115,7 @@ CRangeTest::EresUnittest_CRangeInt2()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -141,7 +142,7 @@ CRangeTest::EresUnittest_CRangeInt4()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -168,7 +169,7 @@ CRangeTest::EresUnittest_CRangeInt8()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -194,11 +195,11 @@ CRangeTest::EresUnittest_CRangeFromScalar()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
-	CDatumInt4GPDB *pdatumint4 =
+	gpos::owner<CDatumInt4GPDB *> pdatumint4 =
 		GPOS_NEW(mp) CDatumInt4GPDB(CTestUtils::m_sysidDefault, 10 /*val*/);
 
 	IMDType::ECmpType rgecmpt[] = {
@@ -206,13 +207,14 @@ CRangeTest::EresUnittest_CRangeFromScalar()
 		IMDType::EcmptG,  IMDType::EcmptGEq,
 	};
 
-	CConstExprEvaluatorDefault *pceeval =
+	gpos::owner<CConstExprEvaluatorDefault *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorDefault();
 	CDefaultComparator comp(pceeval);
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(rgecmpt); ul++)
 	{
 		pdatumint4->AddRef();
-		CRange *prange = GPOS_NEW(mp) CRange(&comp, rgecmpt[ul], pdatumint4);
+		gpos::owner<CRange *> prange =
+			GPOS_NEW(mp) CRange(&comp, rgecmpt[ul], pdatumint4);
 
 		PrintRange(mp, colref, prange);
 		prange->Release();
@@ -236,33 +238,33 @@ CRangeTest::EresUnittest_CRangeFromScalar()
 GPOS_RESULT
 CRangeTest::EresInitAndCheckRanges(CMemoryPool *mp, IMDId *mdid, PfPdatum pf)
 {
-	CConstExprEvaluatorDefault *pceeval =
+	gpos::owner<CConstExprEvaluatorDefault *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorDefault();
 	CDefaultComparator comp(pceeval);
 
 	// generate ranges
 	mdid->AddRef();
-	CRange *prange1 = GPOS_NEW(mp)
+	gpos::owner<CRange *> prange1 = GPOS_NEW(mp)
 		CRange(mdid, &comp, (*pf)(mp, 10), CRange::EriIncluded, nullptr,
 			   CRange::EriExcluded);  // [10, inf)
 
 	mdid->AddRef();
-	CRange *prange2 = GPOS_NEW(mp)
+	gpos::owner<CRange *> prange2 = GPOS_NEW(mp)
 		CRange(mdid, &comp, nullptr, CRange::EriExcluded, (*pf)(mp, 20),
 			   CRange::EriIncluded);  // (-inf, 20]
 
 	mdid->AddRef();
-	CRange *prange3 = GPOS_NEW(mp)
+	gpos::owner<CRange *> prange3 = GPOS_NEW(mp)
 		CRange(mdid, &comp, (*pf)(mp, -20), CRange::EriExcluded, (*pf)(mp, 0),
 			   CRange::EriIncluded);  // (-20, 0]
 
 	mdid->AddRef();
-	CRange *prange4 = GPOS_NEW(mp)
+	gpos::owner<CRange *> prange4 = GPOS_NEW(mp)
 		CRange(mdid, &comp, (*pf)(mp, -10), CRange::EriIncluded, (*pf)(mp, 10),
 			   CRange::EriExcluded);  // [-10, 10)
 
 	mdid->AddRef();
-	CRange *prange5 = GPOS_NEW(mp)
+	gpos::owner<CRange *> prange5 = GPOS_NEW(mp)
 		CRange(mdid, &comp, (*pf)(mp, 0), CRange::EriIncluded, (*pf)(mp, 0),
 			   CRange::EriIncluded);  // [0, 0]
 
@@ -316,7 +318,7 @@ CRangeTest::TestRangeRelationship(CMemoryPool *mp, CRange *prange1,
 	GPOS_ASSERT_MSG(prange4->FOverlapsRight(prange3),
 					"[-10, 10) overlaps end (-20, 0]");
 
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
@@ -340,7 +342,7 @@ CRangeTest::TestRangeRelationship(CMemoryPool *mp, CRange *prange1,
 void
 CRangeTest::PrintRange(CMemoryPool *mp, CColRef *colref, CRange *prange)
 {
-	CExpression *pexpr = prange->PexprScalar(mp, colref);
+	gpos::owner<CExpression *> pexpr = prange->PexprScalar(mp, colref);
 
 	// debug print
 	CAutoTrace at(mp);

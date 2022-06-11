@@ -55,9 +55,9 @@ private:
 	ULONG m_scan_id = gpos::ulong_max;
 
 	// table descr of the root partitioned table (when translated from a CPhysicalDynamicTableScan)
-	CDXLTableDescr *m_dxl_table_descr = nullptr;
+	gpos::owner<CDXLTableDescr *> m_dxl_table_descr = nullptr;
 
-	ULongPtrArray *m_selector_ids = nullptr;
+	gpos::owner<ULongPtrArray *> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalAppend(const CDXLPhysicalAppend &) = delete;

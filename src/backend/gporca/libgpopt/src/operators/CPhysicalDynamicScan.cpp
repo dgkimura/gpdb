@@ -17,6 +17,8 @@
 
 #include "gpopt/operators/CPhysicalDynamicScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CName.h"
@@ -52,7 +54,8 @@ CPhysicalDynamicScan::CPhysicalDynamicScan(
 	GPOS_ASSERT(0 < m_pdrgpdrgpcrPart->Size());
 
 	CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *root_rel = mda->RetrieveRel(ptabdesc->MDId());
+	gpos::pointer<const IMDRelation *> root_rel =
+		mda->RetrieveRel(ptabdesc->MDId());
 	IMdIdArray *all_partition_mdids = root_rel->ChildPartitionMdids();
 	ULONG part_ptr = 0;
 	for (ULONG ul = 0; ul < m_partition_mdids->Size(); ul++)
@@ -138,7 +141,7 @@ CPhysicalDynamicScan::OsPrint(IOstream &os) const
 //		conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalDynamicScan *
+gpos::cast_func<CPhysicalDynamicScan *>
 CPhysicalDynamicScan::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);

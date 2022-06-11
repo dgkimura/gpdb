@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerWindowKeyList_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLWindowKey.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -35,7 +36,7 @@ class CParseHandlerWindowKeyList : public CParseHandlerBase
 {
 private:
 	// list of window keys
-	CDXLWindowKeyArray *m_dxl_window_key_array;
+	gpos::pointer<CDXLWindowKeyArray *> m_dxl_window_key_array;
 
 	// process the start of an element
 	void StartElement(
@@ -61,7 +62,7 @@ public:
 							   CParseHandlerBase *parse_handler_root);
 
 	// list of window keys
-	CDXLWindowKeyArray *
+	gpos::pointer<CDXLWindowKeyArray *>
 	GetDxlWindowKeyArray() const
 	{
 		return m_dxl_window_key_array;

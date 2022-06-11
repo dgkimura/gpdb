@@ -11,6 +11,8 @@
 #ifndef GPNAUCRATES_CLeftAntiSemiJoinStatsProcessor_H
 #define GPNAUCRATES_CLeftAntiSemiJoinStatsProcessor_H
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/statistics/CJoinStatsProcessor.h"
 
 
@@ -32,8 +34,8 @@ public:
 		BOOL DoIgnoreLASJHistComputation);
 	// left anti semi join with another stats structure
 	static CStatistics *CalcLASJoinStatsStatic(
-		CMemoryPool *mp, const IStatistics *outer_stats_input,
-		const IStatistics *inner_stats_input,
+		CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats_input,
+		gpos::pointer<const IStatistics *> inner_stats_input,
 		CStatsPredJoinArray *join_preds_stats,
 		BOOL
 			DoIgnoreLASJHistComputation	 // except for the case of LOJ cardinality estimation this flag is always

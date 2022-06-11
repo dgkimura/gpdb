@@ -13,6 +13,7 @@
 #define GPOPT_CXformGbAggWithMDQA2Join_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformExploration.h"
 
@@ -32,14 +33,16 @@ using namespace gpos;
 class CXformGbAggWithMDQA2Join : public CXformExploration
 {
 private:
-	static CExpression *PexprMDQAs2Join(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprMDQAs2Join(CMemoryPool *mp,
+													  CExpression *pexpr);
 
 	// expand GbAgg with multiple distinct aggregates into a join of single distinct
 	// aggregates
 	static CExpression *PexprExpandMDQAs(CMemoryPool *mp, CExpression *pexpr);
 
 	// main transformation function driver
-	static CExpression *PexprTransform(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprTransform(CMemoryPool *mp,
+													 CExpression *pexpr);
 
 public:
 	CXformGbAggWithMDQA2Join(const CXformGbAggWithMDQA2Join &) = delete;

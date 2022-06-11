@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalDelete_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogical.h"
 
@@ -32,10 +33,10 @@ class CLogicalDelete : public CLogical
 {
 private:
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::owner<CTableDescriptor *> m_ptabdesc;
 
 	// columns to delete
-	CColRefArray *m_pdrgpcr;
+	gpos::owner<CColRefArray *> m_pdrgpcr;
 
 	// ctid column
 	CColRef *m_pcrCtid;
@@ -72,7 +73,7 @@ public:
 	}
 
 	// columns to delete
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	Pdrgpcr() const
 	{
 		return m_pdrgpcr;
@@ -93,7 +94,7 @@ public:
 	}
 
 	// return table's descriptor
-	CTableDescriptor *
+	gpos::pointer<CTableDescriptor *>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
@@ -113,9 +114,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -184,7 +185,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalDelete *
+	static gpos::cast_func<CLogicalDelete *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

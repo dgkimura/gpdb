@@ -13,6 +13,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarSubPlanParamList.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -138,7 +140,8 @@ CParseHandlerScalarSubPlanParamList::EndElement(
 		CParseHandlerScalarSubPlanParam *parse_handler_subplan_param =
 			dynamic_cast<CParseHandlerScalarSubPlanParam *>((*this)[ul]);
 
-		CDXLColRef *dxl_colref = parse_handler_subplan_param->MakeDXLColRef();
+		gpos::owner<CDXLColRef *> dxl_colref =
+			parse_handler_subplan_param->MakeDXLColRef();
 		dxl_colref->AddRef();
 		m_dxl_colref_array->Append(dxl_colref);
 	}

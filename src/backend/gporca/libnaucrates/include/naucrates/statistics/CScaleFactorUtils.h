@@ -12,6 +12,7 @@
 #define GPOPT_CScaleFactorUtils_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/engine/CStatisticsConfig.h"
 #include "naucrates/statistics/CHistogram.h"
@@ -38,7 +39,7 @@ public:
 		CDouble m_scale_factor;
 
 		// mdid pair for the predicate
-		IMdIdArray *m_oid_pair;
+		gpos::owner<IMdIdArray *> m_oid_pair;
 
 		// true if both sides of the predicate are distribution keys
 		BOOL m_dist_keys;
@@ -61,14 +62,15 @@ public:
 		// For example, when performing a self join, the underlying tables will have different IMdId pointers, but the same contents.
 		// We treat them as different instances and assume independence to calculate the correct join cardinality.
 		static ULONG
-		HashValue(const IMdIdArray *oid_pair)
+		HashValue(gpos::pointer<const IMdIdArray *> oid_pair)
 		{
 			return CombineHashes(gpos::HashPtr<IMDId>((*oid_pair)[0]),
 								 gpos::HashPtr<IMDId>((*oid_pair)[1]));
 		}
 
 		static BOOL
-		Equals(const IMdIdArray *first, const IMdIdArray *second)
+		Equals(gpos::pointer<const IMdIdArray *> first,
+			   gpos::pointer<const IMdIdArray *> second)
 		{
 			return ((*first)[0] == (*second)[0]) &&
 				   ((*first)[1] == (*second)[1]);
@@ -99,21 +101,24 @@ public:
 
 	// calculate the cumulative join scaling factor
 	static CDouble CumulativeJoinScaleFactor(
-		CMemoryPool *mp, const CStatisticsConfig *stats_config,
+		CMemoryPool *mp, gpos::pointer<const CStatisticsConfig *> stats_config,
 		SJoinConditionArray *join_conds_scale_factors,
 		CDouble limit_for_result_scale_factor);
 
 	// return scaling factor of the join predicate after apply damping
-	static CDouble DampedJoinScaleFactor(const CStatisticsConfig *stats_config,
-										 ULONG num_columns);
+	static CDouble DampedJoinScaleFactor(
+		gpos::pointer<const CStatisticsConfig *> stats_config,
+		ULONG num_columns);
 
 	// return scaling factor of the filter after apply damping
 	static CDouble DampedFilterScaleFactor(
-		const CStatisticsConfig *stats_config, ULONG num_columns);
+		gpos::pointer<const CStatisticsConfig *> stats_config,
+		ULONG num_columns);
 
 	// return scaling factor of the group by predicate after apply damping
 	static CDouble DampedGroupByScaleFactor(
-		const CStatisticsConfig *stats_config, ULONG num_columns);
+		gpos::pointer<const CStatisticsConfig *> stats_config,
+		ULONG num_columns);
 
 	// sort the array of scaling factor
 	static void SortScalingFactor(CDoubleArray *scale_factors,
@@ -121,12 +126,13 @@ public:
 
 	// calculate the cumulative scaling factor for conjunction after applying damping multiplier
 	static CDouble CalcScaleFactorCumulativeConj(
-		const CStatisticsConfig *stats_config, CDoubleArray *scale_factors);
+		gpos::pointer<const CStatisticsConfig *> stats_config,
+		CDoubleArray *scale_factors);
 
 	// calculate the cumulative scaling factor for disjunction after applying damping multiplier
 	static CDouble CalcScaleFactorCumulativeDisj(
-		const CStatisticsConfig *stats_config, CDoubleArray *scale_factors,
-		CDouble tota_rows);
+		gpos::pointer<const CStatisticsConfig *> stats_config,
+		CDoubleArray *scale_factors, CDouble tota_rows);
 
 	// comparison function in descending order
 	static INT DescendingOrderCmpFunc(const void *val1, const void *val2);

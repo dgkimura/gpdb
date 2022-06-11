@@ -10,6 +10,8 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/xforms/CXformRightOuterJoin2HashJoinTest.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CQueryContext.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CPredicateUtils.h"
@@ -53,19 +55,20 @@ CXformRightOuterJoin2HashJoinTest::EresUnittest_Transform()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	CXformContext *context = GPOS_NEW(mp) CXformContext(mp);
-	CXformResult *result = GPOS_NEW(mp) CXformResult(mp);
+	gpos::owner<CXformContext *> context = GPOS_NEW(mp) CXformContext(mp);
+	gpos::owner<CXformResult *> result = GPOS_NEW(mp) CXformResult(mp);
 
-	CXformRightOuterJoin2HashJoin *xform =
+	gpos::owner<CXformRightOuterJoin2HashJoin *> xform =
 		GPOS_NEW(mp) CXformRightOuterJoin2HashJoin(mp);
 
-	CExpression *pLogicalRightOuterJoin = CTestUtils::PexprRightOuterJoin(mp);
+	gpos::owner<CExpression *> pLogicalRightOuterJoin =
+		CTestUtils::PexprRightOuterJoin(mp);
 
 	// xform should work even if child stats aren't derived yet.
 	GPOS_ASSERT(nullptr == (*pLogicalRightOuterJoin)[0]->Pstats());

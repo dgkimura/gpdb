@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalMotionRandom.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 
@@ -109,7 +110,7 @@ CPhysicalMotionRandom::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalMotionRandom::EpetOrder(CExpressionHandle &,  // exprhdl
-								 const CEnfdOrder *
+								 gpos::pointer<const CEnfdOrder *>
 #ifdef GPOS_DEBUG
 									 peo
 #endif	// GPOS_DEBUG
@@ -130,10 +131,10 @@ CPhysicalMotionRandom::EpetOrder(CExpressionHandle &,  // exprhdl
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalMotionRandom::PosRequired(CMemoryPool *mp,
-								   CExpressionHandle &,	 //exprhdl,
-								   COrderSpec *,		 //posInput,
+								   CExpressionHandle &,			 //exprhdl,
+								   gpos::pointer<COrderSpec *>,	 //posInput,
 								   ULONG
 #ifdef GPOS_DEBUG
 									   child_index
@@ -156,7 +157,7 @@ CPhysicalMotionRandom::PosRequired(CMemoryPool *mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalMotionRandom::PosDerive(CMemoryPool *mp,
 								 CExpressionHandle &  // exprhdl
 ) const
@@ -190,7 +191,7 @@ CPhysicalMotionRandom::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalMotionRandom *
+gpos::cast_func<CPhysicalMotionRandom *>
 CPhysicalMotionRandom::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);

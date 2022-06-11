@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalGet_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CLogical.h"
@@ -37,18 +38,19 @@ private:
 	const CName *m_pnameAlias;
 
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::owner<CTableDescriptor *> m_ptabdesc;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::owner<CColRefArray *> m_pdrgpcrOutput;
 
 	// partition keys
-	CColRef2dArray *m_pdrgpdrgpcrPart;
+	gpos::owner<CColRef2dArray *> m_pdrgpdrgpcrPart;
 
 	// distribution columns (empty for master only tables)
-	CColRefSet *m_pcrsDist;
+	gpos::owner<CColRefSet *> m_pcrsDist;
 
-	void CreatePartCols(CMemoryPool *mp, const ULongPtrArray *pdrgpulPart);
+	void CreatePartCols(CMemoryPool *mp,
+						gpos::pointer<const ULongPtrArray *> pdrgpulPart);
 
 	// private copy ctor
 	CLogicalGet(const CLogicalGet &);
@@ -74,7 +76,7 @@ public:
 	}
 
 	// distribution columns
-	virtual const CColRefSet *
+	virtual gpos::pointer<const CColRefSet *>
 	PcrsDist() const
 	{
 		return m_pcrsDist;
@@ -88,7 +90,7 @@ public:
 	}
 
 	// accessors
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -102,14 +104,14 @@ public:
 	}
 
 	// return table's descriptor
-	CTableDescriptor *
+	gpos::pointer<CTableDescriptor *>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
 	}
 
 	// partition columns
-	CColRef2dArray *
+	gpos::pointer<CColRef2dArray *>
 	PdrgpdrgpcrPartColumns() const
 	{
 		return m_pdrgpdrgpcrPart;
@@ -125,9 +127,9 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -142,7 +144,7 @@ public:
 									 CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::owner<CPartInfo *>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &	 // exprhdl
 	) const override
@@ -169,7 +171,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	gpos::pointer<CTableDescriptor *>
 	DeriveTableDescriptor(CMemoryPool *,	   // mp
 						  CExpressionHandle &  // exprhdl
 	) const override
@@ -183,10 +185,10 @@ public:
 
 	// compute required stat columns of the n-th child
 	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp,
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   // pcrsInput
-			 ULONG				   // child_index
+	PcrsStat(CMemoryPool *,				   // mp,
+			 CExpressionHandle &,		   // exprhdl
+			 gpos::pointer<CColRefSet *>,  // pcrsInput
+			 ULONG						   // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalGet has no children");
@@ -220,7 +222,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalGet *
+	static gpos::cast_func<CLogicalGet *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

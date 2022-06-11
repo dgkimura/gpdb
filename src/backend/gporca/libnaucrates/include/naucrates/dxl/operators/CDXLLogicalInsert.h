@@ -34,10 +34,10 @@ class CDXLLogicalInsert : public CDXLLogical
 {
 private:
 	// target table descriptor
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
 
 	// list of source column ids
-	ULongPtrArray *m_src_colids_array;
+	gpos::owner<ULongPtrArray *> m_src_colids_array;
 
 public:
 	CDXLLogicalInsert(const CDXLLogicalInsert &) = delete;

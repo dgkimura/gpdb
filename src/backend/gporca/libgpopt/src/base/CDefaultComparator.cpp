@@ -17,6 +17,7 @@
 
 #include "gpopt/base/CDefaultComparator.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/base/COptCtxt.h"
@@ -58,22 +59,23 @@ CDefaultComparator::CDefaultComparator(IConstExprEvaluator *pceeval)
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::FEvalComparison(CMemoryPool *mp, const IDatum *datum1,
-									const IDatum *datum2,
+CDefaultComparator::FEvalComparison(CMemoryPool *mp,
+									gpos::pointer<const IDatum *> datum1,
+									gpos::pointer<const IDatum *> datum2,
 									IMDType::ECmpType cmp_type) const
 {
 	GPOS_ASSERT(m_pceeval->FCanEvalExpressions());
 
 	IDatum *pdatum1Copy = datum1->MakeCopy(mp);
-	CExpression *pexpr1 = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexpr1 = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, pdatum1Copy));
 	IDatum *pdatum2Copy = datum2->MakeCopy(mp);
-	CExpression *pexpr2 = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexpr2 = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, pdatum2Copy));
-	CExpression *pexprComp =
+	gpos::owner<CExpression *> pexprComp =
 		CUtils::PexprScalarCmp(mp, pexpr1, pexpr2, cmp_type);
 
-	CExpression *pexprResult = m_pceeval->PexprEval(pexprComp);
+	gpos::owner<CExpression *> pexprResult = m_pceeval->PexprEval(pexprComp);
 	pexprComp->Release();
 	CScalarConst *popScalarConst = CScalarConst::PopConvert(pexprResult->Pop());
 	IDatum *datum = popScalarConst->GetDatum();
@@ -87,8 +89,8 @@ CDefaultComparator::FEvalComparison(CMemoryPool *mp, const IDatum *datum1,
 }
 
 BOOL
-CDefaultComparator::FUseInternalEvaluator(const IDatum *datum1,
-										  const IDatum *datum2,
+CDefaultComparator::FUseInternalEvaluator(gpos::pointer<const IDatum *> datum1,
+										  gpos::pointer<const IDatum *> datum2,
 										  BOOL *can_use_external_evaluator)
 {
 	IMDId *mdid1 = datum1->MDId();
@@ -139,7 +141,8 @@ CDefaultComparator::FUseInternalEvaluator(const IDatum *datum1,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::Equals(const IDatum *datum1, const IDatum *datum2) const
+CDefaultComparator::Equals(gpos::pointer<const IDatum *> datum1,
+						   gpos::pointer<const IDatum *> datum2) const
 {
 	BOOL can_use_external_evaluator = false;
 
@@ -176,7 +179,8 @@ CDefaultComparator::Equals(const IDatum *datum1, const IDatum *datum2) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::IsLessThan(const IDatum *datum1, const IDatum *datum2) const
+CDefaultComparator::IsLessThan(gpos::pointer<const IDatum *> datum1,
+							   gpos::pointer<const IDatum *> datum2) const
 {
 	BOOL can_use_external_evaluator = false;
 
@@ -213,8 +217,9 @@ CDefaultComparator::IsLessThan(const IDatum *datum1, const IDatum *datum2) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::IsLessThanOrEqual(const IDatum *datum1,
-									  const IDatum *datum2) const
+CDefaultComparator::IsLessThanOrEqual(
+	gpos::pointer<const IDatum *> datum1,
+	gpos::pointer<const IDatum *> datum2) const
 {
 	BOOL can_use_external_evaluator = false;
 
@@ -259,8 +264,8 @@ CDefaultComparator::IsLessThanOrEqual(const IDatum *datum1,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::IsGreaterThan(const IDatum *datum1,
-								  const IDatum *datum2) const
+CDefaultComparator::IsGreaterThan(gpos::pointer<const IDatum *> datum1,
+								  gpos::pointer<const IDatum *> datum2) const
 {
 	BOOL can_use_external_evaluator = false;
 
@@ -297,8 +302,9 @@ CDefaultComparator::IsGreaterThan(const IDatum *datum1,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::IsGreaterThanOrEqual(const IDatum *datum1,
-										 const IDatum *datum2) const
+CDefaultComparator::IsGreaterThanOrEqual(
+	gpos::pointer<const IDatum *> datum1,
+	gpos::pointer<const IDatum *> datum2) const
 {
 	BOOL can_use_external_evaluator = false;
 

@@ -12,6 +12,7 @@
 #define GPOPT_CXformSubqJoin2Apply_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformSubqueryUnnest.h"
 
@@ -47,14 +48,12 @@ private:
 								  CExpressionArrays *pdrgpdrgpexprSubqs);
 
 	// replace subqueries with scalar identifier based on given map
-	static CExpression *PexprReplaceSubqueries(CMemoryPool *mp,
-											   CExpression *pexprScalar,
-											   ExprToColRefMap *phmexprcr);
+	static gpos::owner<CExpression *> PexprReplaceSubqueries(
+		CMemoryPool *mp, CExpression *pexprScalar, ExprToColRefMap *phmexprcr);
 
 	// push down subquery below join
-	static CExpression *PexprSubqueryPushDown(CMemoryPool *mp,
-											  CExpression *pexpr,
-											  BOOL fEnforceCorrelatedApply);
+	static gpos::owner<CExpression *> PexprSubqueryPushDown(
+		CMemoryPool *mp, CExpression *pexpr, BOOL fEnforceCorrelatedApply);
 
 public:
 	CXformSubqJoin2Apply(const CXformSubqJoin2Apply &) = delete;

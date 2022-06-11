@@ -99,10 +99,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -117,7 +118,7 @@ public:
 	const CWStringConst *Pstr() const;
 
 	// metadata id
-	IMDId *MdIdOp() const;
+	gpos::pointer<IMDId *> MdIdOp() const;
 
 	// the type of the scalar expression
 	IMDId *MdidType() const override;
@@ -136,7 +137,7 @@ public:
 	}
 
 	// get commuted scalar comparision operator
-	virtual CScalarCmp *PopCommutedOp(CMemoryPool *mp);
+	virtual gpos::owner<CScalarCmp *> PopCommutedOp(CMemoryPool *mp);
 
 	// get the string representation of a metadata object
 	static CWStringConst *Pstr(CMemoryPool *mp, CMDAccessor *md_accessor,

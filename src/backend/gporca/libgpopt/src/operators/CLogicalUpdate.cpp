@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalUpdate.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CKeyCollection.h"
@@ -152,7 +153,7 @@ CLogicalUpdate::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalUpdate::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										   UlongToColRefMap *colref_mapping,
 										   BOOL must_exist)
@@ -190,7 +191,7 @@ CLogicalUpdate::DeriveOutputColumns(CMemoryPool *mp,
 									CExpressionHandle &	 //exprhdl
 )
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsOutput->Include(m_pdrgpcrInsert);
 	pcrsOutput->Include(m_pcrCtid);
 	pcrsOutput->Include(m_pcrSegmentId);
@@ -244,7 +245,7 @@ CLogicalUpdate::DeriveMaxCard(CMemoryPool *,  // mp
 CXformSet *
 CLogicalUpdate::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfUpdate2DML);
 	return xform_set;
 }

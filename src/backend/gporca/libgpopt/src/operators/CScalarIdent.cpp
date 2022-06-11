@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarIdent.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefTable.h"
@@ -84,7 +85,7 @@ CScalarIdent::FInputOrderSensitive() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CScalarIdent::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										 UlongToColRefMap *colref_mapping,
 										 BOOL must_exist)
@@ -142,7 +143,7 @@ CScalarIdent::TypeModifier() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIdent::FCastedScId(CExpression *pexpr)
+CScalarIdent::FCastedScId(gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -159,7 +160,7 @@ CScalarIdent::FCastedScId(CExpression *pexpr)
 }
 
 BOOL
-CScalarIdent::FCastedScId(CExpression *pexpr, CColRef *colref)
+CScalarIdent::FCastedScId(gpos::pointer<CExpression *> pexpr, CColRef *colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != colref);
@@ -184,7 +185,7 @@ CScalarIdent::FCastedScId(CExpression *pexpr, CColRef *colref)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIdent::FAllowedFuncScId(CExpression *pexpr)
+CScalarIdent::FAllowedFuncScId(gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -201,7 +202,8 @@ CScalarIdent::FAllowedFuncScId(CExpression *pexpr)
 }
 
 BOOL
-CScalarIdent::FAllowedFuncScId(CExpression *pexpr, CColRef *colref)
+CScalarIdent::FAllowedFuncScId(gpos::pointer<CExpression *> pexpr,
+							   CColRef *colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != colref);

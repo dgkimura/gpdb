@@ -11,6 +11,8 @@
 #ifndef GPNAUCRATES_CStatisticsTest_H
 #define GPNAUCRATES_CStatisticsTest_H
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/statistics/CBucket.h"
 #include "naucrates/statistics/CHistogram.h"
 #include "naucrates/statistics/CPoint.h"
@@ -79,7 +81,7 @@ private:
 	static ULongPtrArray *
 	Pdrgpul(CMemoryPool *mp, ULONG ul1, ULONG ul2 = gpos::ulong_max)
 	{
-		ULongPtrArray *pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
+		gpos::owner<ULongPtrArray *> pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 		pdrgpul->Append(GPOS_NEW(mp) ULONG(ul1));
 
 		if (gpos::ulong_max != ul2)
@@ -92,7 +94,8 @@ private:
 
 	// create a table descriptor with two columns having the given names
 	static CTableDescriptor *PtabdescTwoColumnSource(
-		CMemoryPool *mp, const CName &nameTable, const IMDTypeInt4 *pmdtype,
+		CMemoryPool *mp, const CName &nameTable,
+		gpos::pointer<const IMDTypeInt4 *> pmdtype,
 		const CWStringConst &strColA, const CWStringConst &strColB);
 
 public:

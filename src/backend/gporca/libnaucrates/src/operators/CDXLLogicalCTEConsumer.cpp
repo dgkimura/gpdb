@@ -12,6 +12,7 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalCTEConsumer.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -111,8 +112,9 @@ CDXLLogicalCTEConsumer::IsColDefined(ULONG colid) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalCTEConsumer::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const CDXLNode *	 //dxlnode
+CDXLLogicalCTEConsumer::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *>	 //dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();

@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerColDescr.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -60,7 +62,7 @@ CParseHandlerColDescr::~CParseHandlerColDescr()
 //		Returns the array of column descriptors.
 //
 //---------------------------------------------------------------------------
-CDXLColDescrArray *
+gpos::pointer<CDXLColDescrArray *>
 CParseHandlerColDescr::GetDXLColumnDescrArray()
 {
 	return m_dxl_column_descr_array;

@@ -13,6 +13,7 @@
 #define GPOPT_CSubqueryTestUtils_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "unittest/gpopt/CTestUtils.h"
 
@@ -175,28 +176,24 @@ public:
 									  BOOL fCorrelated);
 
 	// generate a quantified subquery expression
-	static CExpression *PexprSubqueryQuantified(CMemoryPool *mp,
-												COperator::EOperatorId op_id,
-												CExpression *pexprOuter,
-												CExpression *pexprInner,
-												BOOL fCorrelated);
+	static gpos::owner<CExpression *> PexprSubqueryQuantified(
+		CMemoryPool *mp, COperator::EOperatorId op_id, CExpression *pexprOuter,
+		CExpression *pexprInner, BOOL fCorrelated);
 
 	// generate quantified subquery expression over window operations
 	static CExpression *PexprSelectWithSubqueryQuantifiedOverWindow(
 		CMemoryPool *mp, COperator::EOperatorId op_id, BOOL fCorrelated);
 
 	// generate existential subquery expression
-	static CExpression *PexprSubqueryExistential(CMemoryPool *mp,
-												 COperator::EOperatorId op_id,
-												 CExpression *pexprOuter,
-												 CExpression *pexprInner,
-												 BOOL fCorrelated);
+	static gpos::owner<CExpression *> PexprSubqueryExistential(
+		CMemoryPool *mp, COperator::EOperatorId op_id, CExpression *pexprOuter,
+		CExpression *pexprInner, BOOL fCorrelated);
 
 	// generate a ScalarSubquery aggregate expression
-	static CExpression *PexprSubqueryAgg(CMemoryPool *mp,
-										 CExpression *pexprOuter,
-										 CExpression *pexprInner,
-										 BOOL fCorrelated);
+	static gpos::owner<CExpression *> PexprSubqueryAgg(CMemoryPool *mp,
+													   CExpression *pexprOuter,
+													   CExpression *pexprInner,
+													   BOOL fCorrelated);
 
 	// generate a random select expression with nested quantified subqueries
 	static CExpression *PexprSelectWithNestedQuantifiedSubqueries(

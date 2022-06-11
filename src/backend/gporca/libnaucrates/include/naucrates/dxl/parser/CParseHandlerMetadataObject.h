@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMetadataObject_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 #include "naucrates/md/IMDCacheObject.h"
@@ -38,7 +39,7 @@ class CParseHandlerMetadataObject : public CParseHandlerBase
 private:
 protected:
 	// the metadata object constructed by the parse handler
-	IMDCacheObject *m_imd_obj;
+	gpos::owner<IMDCacheObject *> m_imd_obj;
 
 public:
 	CParseHandlerMetadataObject(const CParseHandlerMetadataObject &) = delete;
@@ -51,7 +52,7 @@ public:
 	~CParseHandlerMetadataObject() override;
 
 	// returns constructed metadata object
-	IMDCacheObject *GetImdObj() const;
+	gpos::pointer<IMDCacheObject *> GetImdObj() const;
 };
 }  // namespace gpdxl
 

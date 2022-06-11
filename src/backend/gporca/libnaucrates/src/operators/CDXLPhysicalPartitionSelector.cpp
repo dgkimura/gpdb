@@ -12,6 +12,7 @@
 #include "naucrates/dxl/operators/CDXLPhysicalPartitionSelector.h"
 
 #include "gpos/common/CBitSetIter.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -90,8 +91,9 @@ CDXLPhysicalPartitionSelector::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalPartitionSelector::SerializeToDXL(CXMLSerializer *xml_serializer,
-											  const CDXLNode *dxlnode) const
+CDXLPhysicalPartitionSelector::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

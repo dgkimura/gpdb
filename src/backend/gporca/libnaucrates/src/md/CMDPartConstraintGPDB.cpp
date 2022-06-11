@@ -11,6 +11,8 @@
 
 #include "naucrates/md/CMDPartConstraintGPDB.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/translate/CTranslatorDXLToExpr.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -80,7 +82,7 @@ CMDPartConstraintGPDB::GetPartConstraintExpr(CMemoryPool *mp,
 //		Included default partitions
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::pointer<ULongPtrArray *>
 CMDPartConstraintGPDB::GetDefaultPartsArray() const
 {
 	return m_level_with_default_part_array;

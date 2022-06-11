@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalAbstractBitmapScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLPhysicalAbstractBitmapScan.h"
 #include "naucrates/dxl/operators/CDXLPhysicalBitmapTableScan.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -135,12 +137,13 @@ CParseHandlerPhysicalAbstractBitmapScan::EndElementHelper(
 	GPOS_ASSERT(nullptr != table_descr_parse_handler->GetDXLTableDescr());
 
 	// set table descriptor
-	CDXLTableDescr *table_descr = table_descr_parse_handler->GetDXLTableDescr();
+	gpos::owner<CDXLTableDescr *> table_descr =
+		table_descr_parse_handler->GetDXLTableDescr();
 	table_descr->AddRef();
 
 
 	GPOS_ASSERT(EdxltokenPhysicalBitmapTableScan == token_type);
-	CDXLPhysical *dxl_op =
+	gpos::owner<CDXLPhysical *> dxl_op =
 		GPOS_NEW(m_mp) CDXLPhysicalBitmapTableScan(m_mp, table_descr);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 

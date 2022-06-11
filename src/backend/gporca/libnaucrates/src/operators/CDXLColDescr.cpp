@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/operators/CDXLColDescr.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -106,7 +107,7 @@ CDXLColDescr::AttrNum() const
 //		Returns the type id for this column
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLColDescr::MdidType() const
 {
 	return m_column_mdid_type;

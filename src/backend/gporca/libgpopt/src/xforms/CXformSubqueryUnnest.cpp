@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformSubqueryUnnest.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalGbAgg.h"
@@ -75,8 +76,8 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
 	// we add-ref the logical child since the resulting expression must re-use it
 	pexprOuter->AddRef();
 
-	CExpression *pexprNewOuter = nullptr;
-	CExpression *pexprResidualScalar = nullptr;
+	gpos::owner<CExpression *> pexprNewOuter = nullptr;
+	gpos::owner<CExpression *> pexprResidualScalar = nullptr;
 
 	CSubqueryHandler::ESubqueryCtxt esqctxt = CSubqueryHandler::EsqctxtFilter;
 
@@ -92,7 +93,7 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
 	}
 
 	// create a new alternative using the new logical and scalar expressions
-	CExpression *pexprResult = nullptr;
+	gpos::owner<CExpression *> pexprResult = nullptr;
 	if (COperator::EopScalarProjectList == pexprScalar->Pop()->Eopid())
 	{
 		CLogicalSequenceProject *popSeqPrj = nullptr;
@@ -137,7 +138,8 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
 	}
 
 	// normalize resulting expression
-	CExpression *pexprNormalized = CNormalizer::PexprNormalize(mp, pexprResult);
+	gpos::owner<CExpression *> pexprNormalized =
+		CNormalizer::PexprNormalize(mp, pexprResult);
 	pexprResult->Release();
 
 	// pull up projections

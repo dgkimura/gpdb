@@ -13,6 +13,7 @@
 #include "gpopt/xforms/CXformDifference2LeftAntiSemiJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/exception.h"
 #include "gpopt/operators/CLogicalDifference.h"
@@ -79,14 +80,14 @@ CXformDifference2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
 	pexprRightChild->AddRef();
 
 	// assemble the new left anti-semi join logical operator
-	CExpression *pexprLASJ =
+	gpos::owner<CExpression *> pexprLASJ =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalLeftAntiSemiJoin(mp),
 								 pexprLeftChild, pexprRightChild, pexprScCond);
 
 	// assemble the aggregate operator
 	pdrgpcrOutput->AddRef();
 
-	CExpression *pexprProjList =
+	gpos::owner<CExpression *> pexprProjList =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp),
 								 GPOS_NEW(mp) CExpressionArray(mp));
 

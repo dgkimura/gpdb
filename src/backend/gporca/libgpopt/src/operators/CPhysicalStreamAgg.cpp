@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalStreamAgg.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
@@ -69,7 +70,7 @@ CPhysicalStreamAgg::InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder)
 
 		// TODO: 12/21/2011 - ; this seems broken: a colref must not embed
 		// a pointer to a cached object
-		gpmd::IMDId *mdid =
+		gpos::owner<gpmd::IMDId *> mdid =
 			colref->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
 		mdid->AddRef();
 
@@ -116,11 +117,12 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
 	}
 
 	// create a set of required sort columns
-	CColRefSet *pcrsReqd = posRequired->PcrsUsed(mp);
+	gpos::owner<CColRefSet *> pcrsReqd = posRequired->PcrsUsed(mp);
 
-	COrderSpec *pos = nullptr;
+	gpos::owner<COrderSpec *> pos = nullptr;
 
-	CColRefSet *pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrGrp);
+	gpos::owner<CColRefSet *> pcrsGrpCols =
+		GPOS_NEW(mp) CColRefSet(mp, pdrgpcrGrp);
 	if (pcrsGrpCols->ContainsAll(pcrsReqd))
 	{
 		// required order columns are included in grouping columns, we can
@@ -145,7 +147,7 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
 			CColRef *colref = (*pdrgpcrGrp)[ul];
 			if (!pcrsReqd->FMember(colref))
 			{
-				IMDId *mdid =
+				gpos::owner<IMDId *> mdid =
 					colref->RetrieveType()->GetMdidForCmpType(IMDType::EcmptL);
 				mdid->AddRef();
 				pos->Append(mdid, colref, COrderSpec::EntLast);
@@ -179,7 +181,7 @@ CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	COrderSpec *pos = PosCovering(mp, posRequired, pdrgpcrGrp);
+	gpos::owner<COrderSpec *> pos = PosCovering(mp, posRequired, pdrgpcrGrp);
 	if (nullptr == pos)
 	{
 		// failed to find a covering order spec, use local order spec
@@ -188,14 +190,14 @@ CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
 	}
 
 	// extract sort columns from order spec
-	CColRefSet *pcrs = pos->PcrsUsed(mp);
+	gpos::owner<CColRefSet *> pcrs = pos->PcrsUsed(mp);
 
 	// get key collection of the relational child
 	CKeyCollection *pkc = exprhdl.DeriveKeyCollection(0);
 
 	if (nullptr != pkc && pkc->FKey(pcrs, false /*fExactMatch*/))
 	{
-		CColRefSet *pcrsReqd = posRequired->PcrsUsed(m_mp);
+		gpos::owner<CColRefSet *> pcrsReqd = posRequired->PcrsUsed(m_mp);
 		BOOL fUsesDefinedCols = FUnaryUsesDefinedColumns(pcrsReqd, exprhdl);
 		pcrsReqd->Release();
 
@@ -240,7 +242,7 @@ CPhysicalStreamAgg::PosDerive(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalStreamAgg::EpetOrder(CExpressionHandle &exprhdl,
-							  const CEnfdOrder *peo) const
+							  gpos::pointer<const CEnfdOrder *> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());

@@ -40,7 +40,7 @@ class CMDIdRelStats : public IMDId
 {
 private:
 	// mdid of base relation
-	CMDIdGPDB *m_rel_mdid;
+	gpos::owner<CMDIdGPDB *> m_rel_mdid;
 
 	// buffer for the serialzied mdid
 	WCHAR m_mdid_array[GPDXL_MDID_LENGTH];
@@ -77,7 +77,7 @@ public:
 	}
 
 	// accessors
-	IMDId *GetRelMdId() const;
+	gpos::pointer<IMDId *> GetRelMdId() const;
 
 	// equality check
 	BOOL Equals(gpos::pointer<const IMDId *> mdid) const override;

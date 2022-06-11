@@ -12,6 +12,7 @@
 #define GPOS_CLogicalFullOuterJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalJoin.h"
 
@@ -53,7 +54,8 @@ public:
 	}
 
 	// return true if we can pull projections up past this operator from its given child
-	BOOL FCanPullProjectionsUp(ULONG  //child_index
+	BOOL
+	FCanPullProjectionsUp(ULONG	 //child_index
 	) const override
 	{
 		return false;
@@ -64,7 +66,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive not nullable output columns
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	DeriveNotNullColumns(CMemoryPool *mp,
 						 CExpressionHandle &  //exprhdl
 	) const override
@@ -78,7 +80,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &  //exprhdl
 	) const override
@@ -112,7 +114,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalFullOuterJoin *
+	static gpos::cast_func<CLogicalFullOuterJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

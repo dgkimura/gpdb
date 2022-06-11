@@ -35,10 +35,10 @@ class CDXLScalarFuncExpr : public CDXLScalar
 {
 private:
 	// catalog id of the function
-	IMDId *m_func_mdid;
+	gpos::owner<IMDId *> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::owner<IMDId *> m_return_type_mdid;
 
 	const INT m_return_type_modifier;
 
@@ -63,10 +63,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// function id
-	IMDId *FuncMdId() const;
+	gpos::pointer<IMDId *> FuncMdId() const;
 
 	// return type
-	IMDId *ReturnTypeMdId() const;
+	gpos::pointer<IMDId *> ReturnTypeMdId() const;
 
 	INT TypeModifier() const;
 

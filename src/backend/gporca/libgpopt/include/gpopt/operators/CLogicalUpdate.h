@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalUpdate_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogical.h"
 
@@ -32,13 +33,13 @@ class CLogicalUpdate : public CLogical
 {
 private:
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::owner<CTableDescriptor *> m_ptabdesc;
 
 	// columns to delete
-	CColRefArray *m_pdrgpcrDelete;
+	gpos::owner<CColRefArray *> m_pdrgpcrDelete;
 
 	// columns to insert
-	CColRefArray *m_pdrgpcrInsert;
+	gpos::owner<CColRefArray *> m_pdrgpcrInsert;
 
 	// ctid column
 	CColRef *m_pcrCtid;
@@ -79,14 +80,14 @@ public:
 	}
 
 	// columns to delete
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrDelete() const
 	{
 		return m_pdrgpcrDelete;
 	}
 
 	// columns to insert
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrInsert() const
 	{
 		return m_pdrgpcrInsert;
@@ -114,7 +115,7 @@ public:
 	}
 
 	// return table's descriptor
-	CTableDescriptor *
+	gpos::pointer<CTableDescriptor *>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
@@ -134,9 +135,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -205,7 +206,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalUpdate *
+	static gpos::cast_func<CLogicalUpdate *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

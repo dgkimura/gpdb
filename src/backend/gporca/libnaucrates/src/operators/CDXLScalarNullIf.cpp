@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarNullIf.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -71,7 +73,7 @@ CDXLScalarNullIf::GetDXLOperator() const
 //		Operator id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarNullIf::MdIdOp() const
 {
 	return m_mdid_op;
@@ -85,7 +87,7 @@ CDXLScalarNullIf::MdIdOp() const
 //		Return type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarNullIf::MdidType() const
 {
 	return m_mdid_type;
@@ -131,7 +133,7 @@ CDXLScalarNullIf::HasBoolResult(CMDAccessor *md_accessor) const
 //---------------------------------------------------------------------------
 void
 CDXLScalarNullIf::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *dxlnode) const
+								 gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

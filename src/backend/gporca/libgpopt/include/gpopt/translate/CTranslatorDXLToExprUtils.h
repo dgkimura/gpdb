@@ -51,7 +51,7 @@ public:
 									   CSystemId sysid, LINT liValue);
 
 	// create a scalar const operator from a DXL scalar const operator
-	static CScalarConst *PopConst(
+	static gpos::owner<CScalarConst *> PopConst(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::pointer<const CDXLScalarConstValue *> dxl_op);
 

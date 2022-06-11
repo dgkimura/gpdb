@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDRequest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 #include "naucrates/md/CMDRequest.h"
@@ -36,10 +37,10 @@ class CParseHandlerMDRequest : public CParseHandlerBase
 {
 private:
 	// array of metadata ids
-	IMdIdArray *m_mdid_array;
+	gpos::owner<IMdIdArray *> m_mdid_array;
 
 	// array of type requests
-	CMDRequest::SMDTypeRequestArray *m_mdtype_request_array;
+	gpos::owner<CMDRequest::SMDTypeRequestArray *> m_mdtype_request_array;
 
 	// process the start of an element
 	void StartElement(
@@ -71,10 +72,11 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// parsed mdids
-	IMdIdArray *GetMdIdArray() const;
+	gpos::pointer<IMdIdArray *> GetMdIdArray() const;
 
 	// parsed type requests
-	CMDRequest::SMDTypeRequestArray *GetMDTypeRequestArray() const;
+	gpos::pointer<CMDRequest::SMDTypeRequestArray *> GetMDTypeRequestArray()
+		const;
 };
 }  // namespace gpdxl
 

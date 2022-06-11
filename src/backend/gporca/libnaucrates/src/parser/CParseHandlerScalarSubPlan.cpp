@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarSubPlan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarSubPlan.h"
@@ -189,7 +191,7 @@ CParseHandlerScalarSubPlan::EndElement(const XMLCh *const,	// element_uri,
 	CParseHandlerPhysicalOp *child_parse_handler =
 		dynamic_cast<CParseHandlerPhysicalOp *>((*this)[2]);
 
-	CDXLColRefArray *dxl_colref_array =
+	gpos::owner<CDXLColRefArray *> dxl_colref_array =
 		parse_handler_subplan_param_list->GetDXLColRefArray();
 	dxl_colref_array->AddRef();
 

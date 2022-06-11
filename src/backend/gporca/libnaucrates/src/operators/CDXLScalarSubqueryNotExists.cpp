@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/operators/CDXLScalarSubqueryNotExists.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -80,8 +81,9 @@ CDXLScalarSubqueryNotExists::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubqueryNotExists::SerializeToDXL(CXMLSerializer *xml_serializer,
-											const CDXLNode *dxlnode) const
+CDXLScalarSubqueryNotExists::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

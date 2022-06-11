@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerOptimizerConfig_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 
@@ -40,10 +41,10 @@ class CParseHandlerOptimizerConfig : public CParseHandlerBase
 {
 private:
 	// trace flag bitset
-	CBitSet *m_pbs;
+	gpos::owner<CBitSet *> m_pbs;
 
 	// optimizer configuration
-	COptimizerConfig *m_optimizer_config;
+	gpos::owner<COptimizerConfig *> m_optimizer_config;
 
 	// process the start of an element
 	void StartElement(
@@ -74,10 +75,10 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// trace flags
-	CBitSet *Pbs() const;
+	gpos::pointer<CBitSet *> Pbs() const;
 
 	// optimizer config
-	COptimizerConfig *GetOptimizerConfig() const;
+	gpos::pointer<COptimizerConfig *> GetOptimizerConfig() const;
 };
 }  // namespace gpdxl
 

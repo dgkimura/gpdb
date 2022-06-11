@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerScalarPartitionSelector_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
 
@@ -34,7 +35,7 @@ class CParseHandlerPartitionSelector : public CParseHandlerPhysicalOp
 {
 private:
 	// table id
-	IMDId *m_rel_mdid;
+	gpos::owner<IMDId *> m_rel_mdid;
 
 	// number of partitioning levels
 	ULONG m_selector_id;
@@ -43,7 +44,7 @@ private:
 	ULONG m_scan_id;
 
 	// partitions
-	ULongPtrArray *m_partitions;
+	gpos::pointer<ULongPtrArray *> m_partitions;
 
 	// process the start of an element
 	void StartElement(

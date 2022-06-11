@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalLimit_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COrderSpec.h"
 #include "gpopt/operators/CLogical.h"
@@ -32,7 +33,7 @@ class CLogicalLimit : public CLogical
 {
 private:
 	// required sort order
-	COrderSpec *m_pos;
+	gpos::owner<COrderSpec *> m_pos;
 
 	// global limit
 	BOOL m_fGlobal;
@@ -68,7 +69,7 @@ public:
 	}
 
 	// order spec
-	COrderSpec *
+	gpos::pointer<COrderSpec *>
 	Pos() const
 	{
 		return m_pos;
@@ -109,9 +110,9 @@ public:
 	ULONG HashValue() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
@@ -176,15 +177,16 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::owner<IStatistics *> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalLimit *
+	static gpos::cast_func<CLogicalLimit *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CAutoP.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -58,7 +59,8 @@ CLogicalIndexGet::CLogicalIndexGet(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalIndexGet::CLogicalIndexGet(CMemoryPool *mp, const IMDIndex *pmdindex,
+CLogicalIndexGet::CLogicalIndexGet(CMemoryPool *mp,
+								   gpos::pointer<const IMDIndex *> pmdindex,
 								   CTableDescriptor *ptabdesc,
 								   ULONG ulOriginOpId, const CName *pnameAlias,
 								   CColRefArray *pdrgpcrOutput)
@@ -149,13 +151,14 @@ CLogicalIndexGet::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalIndexGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											 UlongToColRefMap *colref_mapping,
 											 BOOL must_exist)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(m_pindexdesc->MDId());
+	gpos::pointer<const IMDIndex *> pmdindex =
+		md_accessor->RetrieveIndex(m_pindexdesc->MDId());
 
 	CColRefArray *pdrgpcrOutput = nullptr;
 	if (must_exist)
@@ -189,7 +192,7 @@ CLogicalIndexGet::DeriveOutputColumns(CMemoryPool *mp,
 									  CExpressionHandle &  // exprhdl
 )
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	return pcrs;
@@ -245,7 +248,7 @@ CLogicalIndexGet::FInputOrderSensitive() const
 CXformSet *
 CLogicalIndexGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfIndexGet2IndexScan);
 	(void) xform_set->ExchangeSet(CXform::ExfIndexGet2IndexOnlyScan);

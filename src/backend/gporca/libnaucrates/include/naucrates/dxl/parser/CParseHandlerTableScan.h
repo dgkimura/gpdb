@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalTableScan.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -37,7 +38,7 @@ class CParseHandlerTableScan : public CParseHandlerPhysicalOp
 {
 private:
 	// the table scan operator
-	CDXLPhysicalTableScan *m_dxl_op;
+	gpos::pointer<CDXLPhysicalTableScan *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

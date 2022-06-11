@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalSelect.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -92,7 +93,7 @@ CLogicalSelect::DeriveKeyCollection(CMemoryPool *,	// mp
 CXformSet *
 CLogicalSelect::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfSelect2Apply);
 	(void) xform_set->ExchangeSet(CXform::ExfRemoveSubqDistinct);
@@ -143,12 +144,12 @@ CLogicalSelect::DeriveMaxCard(CMemoryPool *,  // mp
 //		Derive statistics based on filter predicates
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 IStatisticsArray *stats_ctxt) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *child_stats = exprhdl.Pstats(0);
+	gpos::pointer<IStatistics *> child_stats = exprhdl.Pstats(0);
 
 	if (exprhdl.DeriveHasSubquery(1))
 	{
@@ -159,13 +160,13 @@ CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// remove implied predicates from selection condition to avoid cardinality under-estimation
 	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(1 /*child_index*/);
-	CExpression *pexprPredicate =
+	gpos::owner<CExpression *> pexprPredicate =
 		CPredicateUtils::PexprRemoveImpliedConjuncts(mp, pexprScalar, exprhdl);
 
 
 	// split selection predicate into local predicate and predicate involving outer references
-	CExpression *local_expr = nullptr;
-	CExpression *expr_with_outer_refs = nullptr;
+	gpos::owner<CExpression *> local_expr = nullptr;
+	gpos::owner<CExpression *> expr_with_outer_refs = nullptr;
 
 	// get outer references from expression handle
 	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
@@ -203,9 +204,9 @@ CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //	|--CScalarIdent "value_date" (0)
 //	+--CScalarConst (559094400000000.000)
 // clang-format on
-CExpression *
+gpos::owner<CExpression *>
 CLogicalSelect::PexprPartPred(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CExpression *,  //pexprInput
+							  gpos::pointer<CExpression *>,	 //pexprInput
 							  ULONG
 #ifdef GPOS_DEBUG
 								  child_index

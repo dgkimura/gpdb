@@ -12,6 +12,7 @@
 #define GPOPT_CPartKeys_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 
@@ -38,7 +39,7 @@ class CPartKeys : public CRefCount, public DbgPrintMixin<CPartKeys>
 {
 private:
 	// partitioning keys
-	CColRef2dArray *m_pdrgpdrgpcr;
+	gpos::owner<CColRef2dArray *> m_pdrgpdrgpcr;
 
 	// number of levels
 	ULONG m_num_of_part_levels;
@@ -56,7 +57,7 @@ public:
 	CColRef *PcrKey(ULONG ulLevel) const;
 
 	// return array of keys
-	CColRef2dArray *
+	gpos::pointer<CColRef2dArray *>
 	Pdrgpdrgpcr() const
 	{
 		return m_pdrgpdrgpcr;
@@ -70,22 +71,22 @@ public:
 	}
 
 	// copy part key into the given memory pool
-	CPartKeys *PpartkeysCopy(CMemoryPool *mp);
+	gpos::owner<CPartKeys *> PpartkeysCopy(CMemoryPool *mp);
 
 	// check whether the key columns overlap the given column
 	BOOL FOverlap(CColRefSet *pcrs) const;
 
 	// create a new PartKeys object from the current one by remapping the
 	// keys using the given hashmap
-	CPartKeys *PpartkeysRemap(CMemoryPool *mp,
-							  UlongToColRefMap *colref_mapping) const;
+	gpos::owner<CPartKeys *> PpartkeysRemap(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;
 
 	// copy array of part keys into given memory pool
 	static CPartKeysArray *PdrgppartkeysCopy(
-		CMemoryPool *mp, const CPartKeysArray *pdrgppartkeys);
+		CMemoryPool *mp, gpos::pointer<const CPartKeysArray *> pdrgppartkeys);
 
 };	// CPartKeys
 

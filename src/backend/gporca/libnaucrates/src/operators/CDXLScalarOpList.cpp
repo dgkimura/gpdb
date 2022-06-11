@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarOpList.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -91,7 +93,7 @@ CDXLScalarOpList::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarOpList::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *dxlnode) const
+								 gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

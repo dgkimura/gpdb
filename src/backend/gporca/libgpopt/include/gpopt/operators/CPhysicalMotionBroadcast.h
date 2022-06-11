@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalMotionBroadcast_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/base/COrderSpec.h"
@@ -31,7 +32,7 @@ class CPhysicalMotionBroadcast : public CPhysicalMotion
 {
 private:
 	// output distribution
-	CDistributionSpecReplicated *m_pdsReplicated;
+	gpos::owner<CDistributionSpecReplicated *> m_pdsReplicated;
 
 public:
 	CPhysicalMotionBroadcast(const CPhysicalMotionBroadcast &) = delete;
@@ -56,7 +57,7 @@ public:
 	}
 
 	// output distribution accessor
-	CDistributionSpec *
+	gpos::pointer<CDistributionSpec *>
 	Pds() const override
 	{
 		return m_pdsReplicated;
@@ -76,10 +77,12 @@ public:
 							 ULONG ulOptReq) override;
 
 	// compute required sort order of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posInput, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
+	gpos::owner<COrderSpec *> PosRequired(CMemoryPool *mp,
+										  CExpressionHandle &exprhdl,
+										  gpos::pointer<COrderSpec *> posInput,
+										  ULONG child_index,
+										  CDrvdPropArray *pdrgpdpCtxt,
+										  ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
 	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
@@ -91,8 +94,8 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *PosDerive(CMemoryPool *mp,
-						  CExpressionHandle &exprhdl) const override;
+	gpos::owner<COrderSpec *> PosDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -100,7 +103,8 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -110,7 +114,8 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalMotionBroadcast *PopConvert(COperator *pop);
+	static gpos::cast_func<CPhysicalMotionBroadcast *> PopConvert(
+		COperator *pop);
 
 };	// class CPhysicalMotionBroadcast
 

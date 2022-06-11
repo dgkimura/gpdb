@@ -64,28 +64,28 @@ private:
 	CMemoryPool *m_mp;
 
 	// operator class
-	COperator *m_pop;
+	gpos::owner<COperator *> m_pop;
 
 	// array of children
-	CExpressionArray *m_pdrgpexpr;
+	gpos::owner<CExpressionArray *> m_pdrgpexpr;
 
 	// derived relational properties
-	CDrvdPropRelational *m_pdprel;
+	gpos::owner<CDrvdPropRelational *> m_pdprel;
 
 	// derived stats
-	IStatistics *m_pstats;
+	gpos::owner<IStatistics *> m_pstats;
 
 	// required plan properties
-	CReqdPropPlan *m_prpp;
+	gpos::owner<CReqdPropPlan *> m_prpp;
 
 	// derived physical properties
-	CDrvdPropPlan *m_pdpplan;
+	gpos::owner<CDrvdPropPlan *> m_pdpplan;
 
 	// derived scalar properties
-	CDrvdPropScalar *m_pdpscalar;
+	gpos::owner<CDrvdPropScalar *> m_pdpscalar;
 
 	// group reference to Memo
-	CGroupExpression *m_pgexpr;
+	gpos::pointer<CGroupExpression *> m_pgexpr;
 
 	// cost of physical expression node when copied out of the memo
 	CCost m_cost;
@@ -97,7 +97,7 @@ private:
 	ULONG m_ulOriginGrpExprId;
 
 	// get expression's derived property given its type
-	CDrvdProp *Pdp(const CDrvdProp::EPropType ept) const;
+	gpos::pointer<CDrvdProp *> Pdp(const CDrvdProp::EPropType ept) const;
 
 #ifdef GPOS_DEBUG
 
@@ -195,11 +195,11 @@ public:
 		return m_prpp;
 	}
 
-	CDrvdPropRelational *GetDrvdPropRelational() const;
+	gpos::pointer<CDrvdPropRelational *> GetDrvdPropRelational() const;
 
-	CDrvdPropPlan *GetDrvdPropPlan() const;
+	gpos::pointer<CDrvdPropPlan *> GetDrvdPropPlan() const;
 
-	CDrvdPropScalar *GetDrvdPropScalar() const;
+	gpos::pointer<CDrvdPropScalar *> GetDrvdPropScalar() const;
 
 	// get derived statistics object
 	gpos::pointer<const IStatistics *>
@@ -250,9 +250,9 @@ public:
 	BOOL FMatchPattern(CGroupExpression *pgexpr) const;
 
 	// return a copy of the expression with remapped columns
-	CExpression *PexprCopyWithRemappedColumns(CMemoryPool *mp,
-											  UlongToColRefMap *colref_mapping,
-											  BOOL must_exist) const;
+	gpos::owner<CExpression *> PexprCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) const;
 
 	// compare entire expression rooted here
 	BOOL Matches(CExpression *pexpr) const;

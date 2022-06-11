@@ -35,16 +35,16 @@ class CDXLLogicalTVF : public CDXLLogical
 {
 private:
 	// catalog id of the function
-	IMDId *m_func_mdid;
+	gpos::owner<IMDId *> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::owner<IMDId *> m_return_type_mdid;
 
 	// function name
 	CMDName *m_mdname;
 
 	// list of column descriptors
-	CDXLColDescrArray *m_dxl_col_descr_array;
+	gpos::owner<CDXLColDescrArray *> m_dxl_col_descr_array;
 
 public:
 	CDXLLogicalTVF(const CDXLLogicalTVF &) = delete;

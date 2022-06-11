@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformGbAggDedup2StreamAggDedup.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalGbAggDeduplicate.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -69,14 +70,14 @@ CXformGbAggDedup2StreamAggDedup::Transform(CXformContext *pxfctxt,
 
 	CLogicalGbAggDeduplicate *popAggDedup =
 		CLogicalGbAggDeduplicate::PopConvert(pexpr->Pop());
-	CColRefArray *colref_array = popAggDedup->Pdrgpcr();
+	gpos::owner<CColRefArray *> colref_array = popAggDedup->Pdrgpcr();
 	colref_array->AddRef();
 
-	CColRefArray *pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
+	gpos::owner<CColRefArray *> pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
 	pdrgpcrKeys->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalStreamAggDeduplicate(
 			mp, colref_array, popAggDedup->PdrgpcrMinimal(),

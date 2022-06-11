@@ -35,7 +35,7 @@ using namespace gpmd;
 class CDXLScalarConstValue : public CDXLScalar
 {
 private:
-	CDXLDatum *m_dxl_datum;
+	gpos::owner<CDXLDatum *> m_dxl_datum;
 
 public:
 	CDXLScalarConstValue(const CDXLScalarConstValue &) = delete;

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalScalarAgg.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
@@ -60,10 +61,10 @@ CPhysicalScalarAgg::~CPhysicalScalarAgg() = default;
 //		Compute required sort columns of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalScalarAgg::PosRequired(CMemoryPool *mp,
-								CExpressionHandle &,  // exprhdl
-								COrderSpec *,		  // posRequired
+								CExpressionHandle &,		  // exprhdl
+								gpos::pointer<COrderSpec *>,  // posRequired
 								ULONG
 #ifdef GPOS_DEBUG
 									child_index
@@ -88,7 +89,7 @@ CPhysicalScalarAgg::PosRequired(CMemoryPool *mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalScalarAgg::PosDerive(CMemoryPool *mp,
 							  CExpressionHandle &  // exprhdl
 ) const
@@ -108,7 +109,7 @@ CPhysicalScalarAgg::PosDerive(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalScalarAgg::EpetOrder(CExpressionHandle &,	// exprhdl
-							  const CEnfdOrder *
+							  gpos::pointer<const CEnfdOrder *>
 #ifdef GPOS_DEBUG
 								  peo
 #endif	// GPOS_DEBUG

@@ -12,6 +12,7 @@
 #define GPOPT_CExpressionPreprocessorTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CScalarBoolOp.h"
@@ -57,16 +58,16 @@ private:
 	static ULONG UlScalarSubqs(CExpression *pexpr);
 
 	// check if a given expression has a subquery exists node
-	static BOOL FHasSubqueryExists(CExpression *pexpr);
+	static BOOL FHasSubqueryExists(gpos::pointer<CExpression *> pexpr);
 
 	// check if a given expression has a subquery not exitst node
-	static BOOL FHasSubqueryNotExists(CExpression *pexpr);
+	static BOOL FHasSubqueryNotExists(gpos::pointer<CExpression *> pexpr);
 
 	// check if a given expression has an ALL subquery
-	static BOOL FHasSubqueryAll(CExpression *pexpr);
+	static BOOL FHasSubqueryAll(gpos::pointer<CExpression *> pexpr);
 
 	// check if a given expression has an ANY subquery
-	static BOOL FHasSubqueryAny(CExpression *pexpr);
+	static BOOL FHasSubqueryAny(gpos::pointer<CExpression *> pexpr);
 
 	// check the type of the subquery
 	static GPOS_RESULT EresCheckSubqueryType(
@@ -127,9 +128,9 @@ private:
 
 	// helper function for testing window functions with outer join
 	static CExpression *PexprWindowFuncWithLOJHelper(
-		CMemoryPool *mp, CExpression *pexprLOJ, CColRef *pcrPartitionBy,
-		BOOL fAddWindowFunction, BOOL fOuterChildPred, BOOL fCascadedLOJ,
-		BOOL fPredBelowWindow);
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLOJ,
+		CColRef *pcrPartitionBy, BOOL fAddWindowFunction, BOOL fOuterChildPred,
+		BOOL fCascadedLOJ, BOOL fPredBelowWindow);
 
 	// helper function for testing Select with outer join
 	static CExpression *PexprSelectWithLOJHelper(CMemoryPool *mp,

@@ -19,6 +19,7 @@
 #define GPOPT_CPhysicalBitmapTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/operators/CPhysicalScan.h"
@@ -89,10 +90,10 @@ public:
 
 	// statistics derivation during costing
 	IStatistics *
-	PstatsDerive(CMemoryPool *,		   // mp
-				 CExpressionHandle &,  // exprhdl
-				 CReqdPropPlan *,	   // prpplan
-				 IStatisticsArray *	   //stats_ctxt
+	PstatsDerive(CMemoryPool *,					  // mp
+				 CExpressionHandle &,			  // exprhdl
+				 gpos::pointer<CReqdPropPlan *>,  // prpplan
+				 IStatisticsArray *				  //stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(
@@ -105,7 +106,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalBitmapTableScan *
+	static gpos::cast_func<CPhysicalBitmapTableScan *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

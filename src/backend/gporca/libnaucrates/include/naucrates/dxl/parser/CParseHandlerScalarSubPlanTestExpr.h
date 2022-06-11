@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerScalarSubPlanTestExpr_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
 
@@ -35,7 +36,7 @@ class CParseHandlerScalarSubPlanTestExpr : public CParseHandlerScalarOp
 {
 private:
 	// child test expression
-	CDXLNode *m_dxl_test_expr;
+	gpos::owner<CDXLNode *> m_dxl_test_expr;
 
 	// process the start of an element
 	void StartElement(
@@ -64,7 +65,7 @@ public:
 	~CParseHandlerScalarSubPlanTestExpr() override;
 
 	// return test expression
-	CDXLNode *
+	gpos::pointer<CDXLNode *>
 	GetDXLTestExpr() const
 	{
 		return m_dxl_test_expr;

@@ -11,6 +11,8 @@
 
 #include "naucrates/md/CMDIdGPDBCtas.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpos;
@@ -62,14 +64,14 @@ CMDIdGPDBCtas::CMDIdGPDBCtas(const CMDIdGPDBCtas &mdid_source)
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdGPDBCtas::Equals(const IMDId *mdid) const
+CMDIdGPDBCtas::Equals(gpos::pointer<const IMDId *> mdid) const
 {
 	if (nullptr == mdid || EmdidGPDBCtas != mdid->MdidType())
 	{
 		return false;
 	}
 
-	const CMDIdGPDBCtas *mdidGPDBCTAS =
+	gpos::pointer<const CMDIdGPDBCtas *> mdidGPDBCTAS =
 		CMDIdGPDBCtas::CastMdid(const_cast<IMDId *>(mdid));
 
 	return m_oid == mdidGPDBCTAS->Oid();

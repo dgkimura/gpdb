@@ -10,6 +10,8 @@
 //---------------------------------------------------------------------------
 #include "naucrates/dxl/operators/CDXLScalarSortCol.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -103,7 +105,7 @@ CDXLScalarSortCol::GetColId() const
 //		Oid of the sorting operator for the column from the catalog
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarSortCol::GetMdIdSortOp() const
 {
 	return m_mdid_sort_op;
@@ -133,7 +135,7 @@ CDXLScalarSortCol::IsSortedNullsFirst() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarSortCol::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  const CDXLNode *	// dxlnode
+								  gpos::pointer<const CDXLNode *>  // dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();

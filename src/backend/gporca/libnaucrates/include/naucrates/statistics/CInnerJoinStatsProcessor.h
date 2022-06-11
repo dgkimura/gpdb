@@ -11,6 +11,8 @@
 #ifndef GPNAUCRATES_CInnerJoinStatsProcessor_H
 #define GPNAUCRATES_CInnerJoinStatsProcessor_H
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/statistics/CJoinStatsProcessor.h"
 
 
@@ -21,8 +23,8 @@ class CInnerJoinStatsProcessor : public CJoinStatsProcessor
 public:
 	// inner join with another stats structure
 	static CStatistics *CalcInnerJoinStatsStatic(
-		CMemoryPool *mp, const IStatistics *outer_stats_input,
-		const IStatistics *inner_stats_input,
+		CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats_input,
+		gpos::pointer<const IStatistics *> inner_stats_input,
 		CStatsPredJoinArray *join_preds_stats);
 };
 }  // namespace gpnaucrates

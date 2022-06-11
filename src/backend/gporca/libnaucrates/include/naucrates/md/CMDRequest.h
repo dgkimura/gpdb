@@ -74,10 +74,10 @@ private:
 	CMemoryPool *m_mp;
 
 	// array of mdids
-	IMdIdArray *m_mdid_array;
+	gpos::owner<IMdIdArray *> m_mdid_array;
 
 	// type info requests
-	SMDTypeRequestArray *m_mdtype_request_array;
+	gpos::owner<SMDTypeRequestArray *> m_mdtype_request_array;
 
 	// serialize system id
 	CWStringDynamic *GetStrRepr(CSystemId sysid);
@@ -105,7 +105,7 @@ public:
 	}
 
 	// array of type info requests
-	SMDTypeRequestArray *
+	gpos::pointer<SMDTypeRequestArray *>
 	GetMDTypeRequestArray() const
 	{
 		return m_mdtype_request_array;

@@ -36,7 +36,7 @@ class CScalarConst : public CScalar
 {
 private:
 	// constant
-	IDatum *m_pdatum;
+	gpos::owner<IDatum *> m_pdatum;
 
 public:
 	CScalarConst(const CScalarConst &) = delete;
@@ -83,10 +83,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -107,7 +108,8 @@ public:
 	INT TypeModifier() const override;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override;
 
 	// print
 	IOstream &OsPrint(IOstream &) const override;

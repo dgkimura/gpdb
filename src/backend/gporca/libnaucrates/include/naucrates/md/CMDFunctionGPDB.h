@@ -14,6 +14,7 @@
 #define GPMD_CMDFunctionGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 #include "naucrates/md/IMDFunction.h"
@@ -40,16 +41,16 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// func id
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// func name
 	CMDName *m_mdname;
 
 	// result type
-	IMDId *m_mdid_type_result;
+	gpos::owner<IMDId *> m_mdid_type_result;
 
 	// output argument types
-	IMdIdArray *m_mdid_types_array;
+	gpos::owner<IMdIdArray *> m_mdid_types_array;
 
 	// whether function returns a set of values
 	BOOL m_returns_set;
@@ -108,16 +109,16 @@ public:
 	}
 
 	// function id
-	IMDId *MDId() const override;
+	gpos::pointer<IMDId *> MDId() const override;
 
 	// function name
 	CMDName Mdname() const override;
 
 	// result type
-	IMDId *GetResultTypeMdid() const override;
+	gpos::pointer<IMDId *> GetResultTypeMdid() const override;
 
 	// output argument types
-	IMdIdArray *OutputArgTypesMdidArray() const override;
+	gpos::pointer<IMdIdArray *> OutputArgTypesMdidArray() const override;
 
 	// does function return NULL on NULL input
 	BOOL

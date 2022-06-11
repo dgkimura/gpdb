@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementUnionAll.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/exception.h"
 #include "gpopt/operators/CLogicalUnionAll.h"
@@ -61,12 +62,13 @@ CXformImplementUnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CLogicalUnionAll *popUnionAll = CLogicalUnionAll::PopConvert(pexpr->Pop());
 	CPhysicalUnionAllFactory factory(popUnionAll);
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG arity = pexpr->Arity();
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprChild = (*pexpr)[ul];
+		gpos::owner<CExpression *> pexprChild = (*pexpr)[ul];
 		pexprChild->AddRef();
 		pdrgpexpr->Append(pexprChild);
 	}
@@ -75,7 +77,7 @@ CXformImplementUnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		factory.PopPhysicalUnionAll(mp, false);
 
 	// assemble serial union physical operator
-	CExpression *pexprSerialUnionAll =
+	gpos::owner<CExpression *> pexprSerialUnionAll =
 		GPOS_NEW(mp) CExpression(mp, popPhysicalSerialUnionAll, pdrgpexpr);
 
 	// add serial union alternative to results
@@ -92,7 +94,7 @@ CXformImplementUnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		pdrgpexpr->AddRef();
 
 		// assemble physical parallel operator
-		CExpression *pexprParallelUnionAll = GPOS_NEW(mp)
+		gpos::owner<CExpression *> pexprParallelUnionAll = GPOS_NEW(mp)
 			CExpression(mp, popPhysicalParallelUnionAll, pdrgpexpr);
 
 		// add parallel union alternative to results

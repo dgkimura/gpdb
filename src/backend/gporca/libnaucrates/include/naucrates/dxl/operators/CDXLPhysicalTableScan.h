@@ -42,7 +42,7 @@ class CDXLPhysicalTableScan : public CDXLPhysical
 {
 private:
 	// table descriptor for the scanned table
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
 
 public:
 	CDXLPhysicalTableScan(CDXLPhysicalTableScan &) = delete;

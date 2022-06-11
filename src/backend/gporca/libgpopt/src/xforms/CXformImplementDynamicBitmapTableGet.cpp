@@ -17,6 +17,8 @@
 
 #include "gpopt/xforms/CXformImplementDynamicBitmapTableGet.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/metadata/CPartConstraint.h"
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogicalDynamicBitmapTableGet.h"
@@ -68,8 +70,9 @@ CXformImplementDynamicBitmapTableGet::Exfp(CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 void
 CXformImplementDynamicBitmapTableGet::Transform(
-	CXformContext *pxfctxt GPOS_ASSERTS_ONLY, CXformResult *pxfres GPOS_UNUSED,
-	CExpression *pexpr GPOS_ASSERTS_ONLY) const
+	gpos::pointer<CXformContext *> pxfctxt GPOS_ASSERTS_ONLY,
+	gpos::pointer<CXformResult *> pxfres GPOS_UNUSED,
+	gpos::pointer<CExpression *> pexpr GPOS_ASSERTS_ONLY) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -79,7 +82,7 @@ CXformImplementDynamicBitmapTableGet::Transform(
 	CLogicalDynamicBitmapTableGet *popLogical =
 		CLogicalDynamicBitmapTableGet::PopConvert(pexpr->Pop());
 
-	CTableDescriptor *ptabdesc = popLogical->Ptabdesc();
+	gpos::owner<CTableDescriptor *> ptabdesc = popLogical->Ptabdesc();
 	ptabdesc->AddRef();
 
 	CName *pname = GPOS_NEW(mp) CName(mp, popLogical->Name());
@@ -89,13 +92,14 @@ CXformImplementDynamicBitmapTableGet::Transform(
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 	pdrgpcrOutput->AddRef();
 
-	CColRef2dArray *pdrgpdrgpcrPart = popLogical->PdrgpdrgpcrPart();
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart =
+		popLogical->PdrgpdrgpcrPart();
 	pdrgpdrgpcrPart->AddRef();
 
 	popLogical->GetPartitionMdids()->AddRef();
 	popLogical->GetRootColMappingPerPart()->AddRef();
 
-	CPhysicalDynamicBitmapTableScan *popPhysical =
+	gpos::owner<CPhysicalDynamicBitmapTableScan *> popPhysical =
 		GPOS_NEW(mp) CPhysicalDynamicBitmapTableScan(
 			mp, ptabdesc, pexpr->Pop()->UlOpId(), pname, popLogical->ScanId(),
 			pdrgpcrOutput, pdrgpdrgpcrPart, popLogical->GetPartitionMdids(),
@@ -106,7 +110,7 @@ CXformImplementDynamicBitmapTableGet::Transform(
 	pexprCondition->AddRef();
 	pexprIndexPath->AddRef();
 
-	CExpression *pexprPhysical = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprPhysical = GPOS_NEW(mp)
 		CExpression(mp, popPhysical, pexprCondition, pexprIndexPath);
 	pxfres->Add(pexprPhysical);
 }

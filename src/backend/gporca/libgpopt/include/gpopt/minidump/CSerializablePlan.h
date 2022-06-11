@@ -12,6 +12,7 @@
 #define GPOPT_CSerializablePlan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CSerializable.h"
 #include "gpos/string/CWStringDynamic.h"
 
@@ -36,7 +37,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// plan DXL node
-	const CDXLNode *m_plan_dxl_root;
+	gpos::pointer<const CDXLNode *> m_plan_dxl_root;
 
 	// serialized plan
 	CWStringDynamic *m_pstrPlan;
@@ -52,8 +53,9 @@ public:
 	CSerializablePlan(const CSerializablePlan &) = delete;
 
 	// ctor
-	CSerializablePlan(CMemoryPool *mp, const CDXLNode *pdxlnPlan,
-					  ULLONG plan_id, ULLONG plan_space_size);
+	CSerializablePlan(CMemoryPool *mp,
+					  gpos::pointer<const CDXLNode *> pdxlnPlan, ULLONG plan_id,
+					  ULLONG plan_space_size);
 
 	// dtor
 	~CSerializablePlan() override;

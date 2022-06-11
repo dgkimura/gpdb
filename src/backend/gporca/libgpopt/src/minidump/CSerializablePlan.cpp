@@ -12,6 +12,7 @@
 #include "gpopt/minidump/CSerializablePlan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CErrorContext.h"
 #include "gpos/task/CTask.h"
 
@@ -29,7 +30,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CSerializablePlan::CSerializablePlan(CMemoryPool *mp, const CDXLNode *pdxlnPlan,
+CSerializablePlan::CSerializablePlan(CMemoryPool *mp,
+									 gpos::pointer<const CDXLNode *> pdxlnPlan,
 									 ULLONG plan_id, ULLONG plan_space_size)
 	: CSerializable(),
 	  m_mp(mp),

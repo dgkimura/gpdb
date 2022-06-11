@@ -12,6 +12,7 @@
 #define GPOPT_CConstraintNegation_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CConstraint.h"
 
@@ -32,7 +33,7 @@ class CConstraintNegation : public CConstraint
 {
 private:
 	// child constraint
-	CConstraint *m_pcnstr;
+	gpos::owner<CConstraint *> m_pcnstr;
 
 public:
 	CConstraintNegation(const CConstraintNegation &) = delete;
@@ -51,7 +52,7 @@ public:
 	}
 
 	// child constraint
-	CConstraint *
+	gpos::pointer<CConstraint *>
 	PcnstrChild() const
 	{
 		return m_pcnstr;
@@ -82,19 +83,21 @@ public:
 	}
 
 	// return a copy of the constraint with remapped columns
-	CConstraint *PcnstrCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist) override;
+	gpos::owner<CConstraint *> PcnstrCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// return constraint on a given column
-	CConstraint *Pcnstr(CMemoryPool *mp, const CColRef *colref) override;
+	gpos::owner<CConstraint *> Pcnstr(CMemoryPool *mp,
+									  const CColRef *colref) override;
 
 	// return constraint on a given column set
-	CConstraint *Pcnstr(CMemoryPool *mp, CColRefSet *pcrs) override;
+	gpos::owner<CConstraint *> Pcnstr(CMemoryPool *mp,
+									  CColRefSet *pcrs) override;
 
 	// return a clone of the constraint for a different column
-	CConstraint *PcnstrRemapForColumn(CMemoryPool *mp,
-									  CColRef *colref) const override;
+	gpos::owner<CConstraint *> PcnstrRemapForColumn(
+		CMemoryPool *mp, CColRef *colref) const override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

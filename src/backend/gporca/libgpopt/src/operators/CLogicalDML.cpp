@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalDML.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CKeyCollection.h"
@@ -180,7 +181,7 @@ CLogicalDML::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalDML::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										UlongToColRefMap *colref_mapping,
 										BOOL must_exist)
@@ -236,7 +237,7 @@ CLogicalDML::DeriveOutputColumns(CMemoryPool *mp,
 								 CExpressionHandle &  //exprhdl
 )
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsOutput->Include(m_pdrgpcrSource);
 	if (nullptr != m_pcrCtid)
 	{
@@ -267,7 +268,7 @@ CPropConstraint *
 CLogicalDML::DerivePropertyConstraint(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl) const
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsOutput->Include(m_pdrgpcrSource);
 	CPropConstraint *ppc = PpcDeriveConstraintRestrict(mp, exprhdl, pcrsOutput);
 	pcrsOutput->Release();
@@ -317,7 +318,7 @@ CLogicalDML::DeriveMaxCard(CMemoryPool *,  // mp
 CXformSet *
 CLogicalDML::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementDML);
 	return xform_set;
 }

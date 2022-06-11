@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarArray.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -88,7 +90,7 @@ CDXLScalarArray::GetOpNameStr() const
 //		Id of base element type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarArray::ElementTypeMDid() const
 {
 	return m_elem_type_mdid;
@@ -102,7 +104,7 @@ CDXLScalarArray::ElementTypeMDid() const
 //		Id of array type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarArray::ArrayTypeMDid() const
 {
 	return m_array_type_mdid;
@@ -132,7 +134,7 @@ CDXLScalarArray::IsMultiDimensional() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarArray::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *dxlnode) const
+								gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

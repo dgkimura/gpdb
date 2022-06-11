@@ -36,7 +36,7 @@ class CDXLScalarCaseTest : public CDXLScalar
 {
 private:
 	// expression type
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 public:
 	CDXLScalarCaseTest(const CDXLScalarCaseTest &) = delete;
@@ -51,7 +51,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// expression type
-	virtual IMDId *MdidType() const;
+	virtual gpos::pointer<IMDId *> MdidType() const;
 
 	// DXL Operator ID
 	Edxlopid GetDXLOperator() const override;

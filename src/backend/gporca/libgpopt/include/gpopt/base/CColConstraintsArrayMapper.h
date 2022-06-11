@@ -4,6 +4,7 @@
 #ifndef GPOPT_CColConstraintsArrayMapper_H
 #define GPOPT_CColConstraintsArrayMapper_H
 
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPool.h"
 
 #include "gpopt/base/CConstraint.h"
@@ -22,7 +23,7 @@ public:
 
 private:
 	gpos::CMemoryPool *m_mp;
-	CConstraintArray *m_pdrgpcnstr;
+	gpos::owner<CConstraintArray *> m_pdrgpcnstr;
 };
 }  // namespace gpopt
 

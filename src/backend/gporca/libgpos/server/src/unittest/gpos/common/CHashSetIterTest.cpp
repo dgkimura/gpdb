@@ -7,6 +7,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CAutoRef.h"
 #include "gpos/common/CHashSetIter.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/test/CUnittest.h"
 
@@ -44,7 +45,7 @@ CHashSetIterTest::EresUnittest_Basic()
 		UlongHashSetIter;
 
 	// using N - 2 slots guarantees collisions
-	UlongHashSet *ps = GPOS_NEW(mp) UlongHashSet(mp, ulCnt - 2);
+	gpos::owner<UlongHashSet *> ps = GPOS_NEW(mp) UlongHashSet(mp, ulCnt - 2);
 
 #ifdef GPOS_DEBUG
 

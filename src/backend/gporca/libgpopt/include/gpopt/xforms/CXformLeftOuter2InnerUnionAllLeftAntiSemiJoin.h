@@ -38,6 +38,7 @@
 #define GPOPT_CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformExploration.h"
 
@@ -52,11 +53,12 @@ private:
 	static const DOUBLE m_dOuterInnerRatioThreshold;
 
 	// check the stats ratio to decide whether to apply the xform or not
-	static BOOL FApplyXformUsingStatsInfo(const IStatistics *outer_stats,
-										  const IStatistics *inner_side_stats);
+	static BOOL FApplyXformUsingStatsInfo(
+		gpos::pointer<const IStatistics *> outer_stats,
+		gpos::pointer<const IStatistics *> inner_side_stats);
 
 	// check if the inner expression is of a type which should be considered by this xform
-	static BOOL FValidInnerExpr(CExpression *pexprInner);
+	static BOOL FValidInnerExpr(gpos::pointer<CExpression *> pexprInner);
 
 	// construct a left anti semi join with the CTE consumer (ulCTEJoinId) as outer
 	// and a group by as inner

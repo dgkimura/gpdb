@@ -33,10 +33,10 @@ class CDXLPhysicalTVF : public CDXLPhysical
 {
 private:
 	// function mdid
-	IMDId *m_func_mdid;
+	gpos::owner<IMDId *> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::owner<IMDId *> m_return_type_mdid;
 
 	// function name
 	CWStringConst *func_name;

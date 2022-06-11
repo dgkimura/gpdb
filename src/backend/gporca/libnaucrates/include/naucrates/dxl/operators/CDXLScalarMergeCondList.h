@@ -13,6 +13,7 @@
 #define GPDXL_CDXLScalarMergeCondList_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 
@@ -42,10 +43,11 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
+	void SerializeToDXL(CXMLSerializer *,
+						gpos::pointer<const CDXLNode *>) const override;
 
 	// conversion function
-	static CDXLScalarMergeCondList *
+	static gpos::cast_func<CDXLScalarMergeCondList *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

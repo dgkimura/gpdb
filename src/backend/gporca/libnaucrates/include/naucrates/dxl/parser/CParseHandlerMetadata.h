@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMetadata_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 #include "naucrates/dxl/xml/dxltokens.h"
@@ -39,13 +40,13 @@ class CParseHandlerMetadata : public CParseHandlerBase
 {
 private:
 	// list of parsed metadata objects
-	IMDCacheObjectArray *m_mdid_cached_obj_array;
+	gpos::owner<IMDCacheObjectArray *> m_mdid_cached_obj_array;
 
 	// list of parsed mdids
-	IMdIdArray *m_mdid_array;
+	gpos::owner<IMdIdArray *> m_mdid_array;
 
 	// list of parsed metatadata source system ids
-	CSystemIdArray *m_system_id_array;
+	gpos::owner<CSystemIdArray *> m_system_id_array;
 
 	// process the start of an element
 	void StartElement(
@@ -83,13 +84,13 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// return the list of parsed metadata objects
-	IMDCacheObjectArray *GetMdIdCachedObjArray();
+	gpos::pointer<IMDCacheObjectArray *> GetMdIdCachedObjArray();
 
 	// return the list of parsed mdids
-	IMdIdArray *GetMdIdArray();
+	gpos::pointer<IMdIdArray *> GetMdIdArray();
 
 	// return the list of parsed system ids
-	CSystemIdArray *GetSysidPtrArray();
+	gpos::pointer<CSystemIdArray *> GetSysidPtrArray();
 };
 }  // namespace gpdxl
 

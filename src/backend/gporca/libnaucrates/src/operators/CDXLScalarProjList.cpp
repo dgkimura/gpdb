@@ -10,6 +10,8 @@
 //---------------------------------------------------------------------------
 #include "naucrates/dxl/operators/CDXLScalarProjList.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -67,8 +69,9 @@ CDXLScalarProjList::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarProjList::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+CDXLScalarProjList::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

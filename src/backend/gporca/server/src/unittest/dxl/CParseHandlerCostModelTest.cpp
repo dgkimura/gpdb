@@ -15,6 +15,7 @@
 #include "gpos/common/CAutoP.h"
 #include "gpos/common/CAutoRef.h"
 #include "gpos/common/CAutoRg.h"
+#include "gpos/common/owner.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/test/CUnittest.h"
@@ -145,7 +146,8 @@ Eres_SerializeCalibratedCostModel()
 		GPOS_NEW(mp) CWStringDynamic(mp, wszExpectedString));
 
 	const ULONG ulSegments = 3;
-	CCostModelParamsGPDB *pcp = GPOS_NEW(mp) CCostModelParamsGPDB(mp);
+	gpos::owner<CCostModelParamsGPDB *> pcp =
+		GPOS_NEW(mp) CCostModelParamsGPDB(mp);
 	pcp->SetParam(CCostModelParamsGPDB::EcpNLJFactor, 1024.0, 1023.0, 1025.0);
 	gpos::CAutoRef<CCostModelGPDB> apcm(
 		GPOS_NEW(mp) CCostModelGPDB(mp, ulSegments, pcp));

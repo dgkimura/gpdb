@@ -40,7 +40,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// index mdid
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -55,27 +55,27 @@ private:
 	EmdindexType m_index_type;
 
 	// type of items returned by index
-	IMDId *m_mdid_item_type;
+	gpos::owner<IMDId *> m_mdid_item_type;
 
 	// index key columns
-	ULongPtrArray *m_index_key_cols_array;
+	gpos::owner<ULongPtrArray *> m_index_key_cols_array;
 
 	// included columns
-	ULongPtrArray *m_included_cols_array;
+	gpos::owner<ULongPtrArray *> m_included_cols_array;
 
 	// operator families for each index key
-	IMdIdArray *m_mdid_opfamilies_array;
+	gpos::owner<IMdIdArray *> m_mdid_opfamilies_array;
 
 	// partition constraint
 	// GPDB_12_MERGE_FIXME: This field is no longer needed,
 	// we should get rid of it.
-	IMDPartConstraint *m_mdpart_constraint;
+	gpos::owner<IMDPartConstraint *> m_mdpart_constraint;
 
 	// DXL for object
 	const CWStringDynamic *m_dxl_str;
 
 	// Child index oids
-	IMdIdArray *m_child_index_oids;
+	gpos::owner<IMdIdArray *> m_child_index_oids;
 
 public:
 	CMDIndexGPDB(const CMDIndexGPDB &) = delete;
@@ -94,7 +94,7 @@ public:
 	~CMDIndexGPDB() override;
 
 	// index mdid
-	IMDId *MDId() const override;
+	gpos::pointer<IMDId *> MDId() const override;
 
 	// index name
 	CMDName Mdname() const override;
@@ -127,7 +127,7 @@ public:
 	ULONG GetIncludedColPos(ULONG column) const override;
 
 	// part constraint
-	IMDPartConstraint *MDPartConstraint() const override;
+	gpos::pointer<IMDPartConstraint *> MDPartConstraint() const override;
 
 	// DXL string for index
 	const CWStringDynamic *
@@ -140,7 +140,7 @@ public:
 	void Serialize(gpdxl::CXMLSerializer *) const override;
 
 	// type id of items returned by the index
-	IMDId *GetIndexRetItemTypeMdid() const override;
+	gpos::pointer<IMDId *> GetIndexRetItemTypeMdid() const override;
 
 	// check if given scalar comparison can be used with the index key
 	// at the specified position
@@ -148,7 +148,7 @@ public:
 					  ULONG key_pos) const override;
 
 	// child index oids
-	IMdIdArray *ChildIndexMdids() const override;
+	gpos::pointer<IMdIdArray *> ChildIndexMdids() const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the MD index

@@ -90,11 +90,14 @@ CBindingTest::EresUnittest_Basic()
 	GPOS_CHECK_ABORT;
 
 	// set up MD providers
-	CMDProviderMemory *pmdp = GPOS_NEW(mp) CMDProviderMemory(mp, szQueryFile);
+	gpos::owner<CMDProviderMemory *> pmdp =
+		GPOS_NEW(mp) CMDProviderMemory(mp, szQueryFile);
 	pmdp->AddRef();
 
-	const CSystemIdArray *pdrgpsysid = pdxlmd->GetSysidPtrArray();
-	CMDProviderArray *pdrgpmdp = GPOS_NEW(mp) CMDProviderArray(mp);
+	gpos::pointer<const CSystemIdArray *> pdrgpsysid =
+		pdxlmd->GetSysidPtrArray();
+	gpos::owner<CMDProviderArray *> pdrgpmdp =
+		GPOS_NEW(mp) CMDProviderArray(mp);
 	pdrgpmdp->Append(pmdp);
 
 	for (ULONG ul = 1; ul < pdrgpsysid->Size(); ul++)
@@ -115,7 +118,7 @@ CBindingTest::EresUnittest_Basic()
 
 	// translate DXL Tree -> Expr Tree
 	CTranslatorDXLToExpr *pdxltr = GPOS_NEW(mp) CTranslatorDXLToExpr(mp, &mda);
-	CExpression *pexprTranslated = pdxltr->PexprTranslateQuery(
+	gpos::owner<CExpression *> pexprTranslated = pdxltr->PexprTranslateQuery(
 		pdxlmd->GetQueryDXLRoot(), pdxlmd->PdrgpdxlnQueryOutput(),
 		pdxlmd->GetCTEProducerDXLArray());
 
@@ -131,13 +134,14 @@ CBindingTest::EresUnittest_Basic()
 	eng.Optimize();
 
 	// extract plan
-	CExpression *pexprPlan = eng.PexprExtractPlan();
+	gpos::owner<CExpression *> pexprPlan = eng.PexprExtractPlan();
 	GPOS_ASSERT(nullptr != pexprPlan);
 
 	UlongPtrArray *number_of_bindings = eng.GetNumberOfBindings();
 	ULONG search_stage = 0;
-	ULONG bindings_for_xform = (ULONG)(
-		*number_of_bindings)[search_stage][CXform::ExfJoin2IndexGetApply];
+	ULONG bindings_for_xform =
+		(ULONG) (*number_of_bindings)[search_stage]
+									 [CXform::ExfJoin2IndexGetApply];
 
 	GPOS_RESULT eres = GPOS_FAILED;
 

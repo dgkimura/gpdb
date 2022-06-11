@@ -35,10 +35,10 @@ class CScalarFunc : public CScalar
 {
 protected:
 	// func id
-	IMDId *m_func_mdid;
+	gpos::owner<IMDId *> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::owner<IMDId *> m_return_type_mdid;
 
 	const INT m_return_type_modifier;
 
@@ -99,10 +99,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -135,12 +136,12 @@ public:
 	const CWStringConst *PstrFunc() const;
 
 	// func id
-	IMDId *FuncMdId() const;
+	gpos::pointer<IMDId *> FuncMdId() const;
 
 	INT TypeModifier() const override;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::pointer<IMDId *> MdidType() const override;
 
 	// function stability
 	IMDFunction::EFuncStbl EfsGetFunctionStability() const;

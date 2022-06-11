@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerScalarSwitch_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarSwitch.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerScalarSwitch : public CParseHandlerScalarOp
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::pointer<IMDId *> m_mdid_type;
 
 	// was the arg child seen
 	BOOL m_arg_processed;

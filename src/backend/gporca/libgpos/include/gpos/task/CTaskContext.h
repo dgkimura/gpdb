@@ -26,7 +26,7 @@ class CTaskContext
 
 private:
 	// trace vector
-	CBitSet *m_bitset;
+	gpos::owner<CBitSet *> m_bitset;
 
 	// output log abstraction
 	ILogger *m_log_out;

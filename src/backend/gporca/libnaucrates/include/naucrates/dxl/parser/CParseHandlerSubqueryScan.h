@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerSubqueryScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalSubqueryScan.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerSubqueryScan : public CParseHandlerPhysicalOp
 {
 private:
 	// the subquery scan operator
-	CDXLPhysicalSubqueryScan *m_dxl_op;
+	gpos::pointer<CDXLPhysicalSubqueryScan *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

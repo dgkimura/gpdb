@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalSequenceProject_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CWindowFrame.h"
@@ -31,19 +32,19 @@ class CPhysicalSequenceProject : public CPhysical
 {
 private:
 	// partition by keys
-	CDistributionSpec *m_pds;
+	gpos::owner<CDistributionSpec *> m_pds;
 
 	// order specs of child window functions
-	COrderSpecArray *m_pdrgpos;
+	gpos::owner<COrderSpecArray *> m_pdrgpos;
 
 	// frames of child window functions
-	CWindowFrameArray *m_pdrgpwf;
+	gpos::owner<CWindowFrameArray *> m_pdrgpwf;
 
 	// order spec to request from child
-	COrderSpec *m_pos;
+	gpos::owner<COrderSpec *> m_pos;
 
 	// required columns in order/frame specs
-	CColRefSet *m_pcrsRequiredLocal;
+	gpos::owner<CColRefSet *> m_pcrsRequiredLocal;
 
 	// create local order spec
 	void CreateOrderSpec(CMemoryPool *mp);
@@ -77,21 +78,21 @@ public:
 	}
 
 	// partition by keys
-	CDistributionSpec *
+	gpos::pointer<CDistributionSpec *>
 	Pds() const
 	{
 		return m_pds;
 	}
 
 	// order by keys
-	COrderSpecArray *
+	gpos::pointer<COrderSpecArray *>
 	Pdrgpos() const
 	{
 		return m_pdrgpos;
 	}
 
 	// frame specifications
-	CWindowFrameArray *
+	gpos::pointer<CWindowFrameArray *>
 	Pdrgpwf() const
 	{
 		return m_pdrgpwf;
@@ -127,17 +128,18 @@ public:
 						  ULONG ulOptReq) const override;
 
 	// compute required sort order of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posRequired, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
+	gpos::owner<COrderSpec *> PosRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	gpos::owner<CDistributionSpec *> PdsRequired(CMemoryPool *mp,
+												 CExpressionHandle &exprhdl,
+												 CDistributionSpec *pdsRequired,
+												 ULONG child_index,
+												 CDrvdPropArray *pdrgpdpCtxt,
+												 ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	CRewindabilitySpec *PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -159,8 +161,8 @@ public:
 						  CExpressionHandle &exprhdl) const override;
 
 	// derive distribution
-	CDistributionSpec *PdsDerive(CMemoryPool *mp,
-								 CExpressionHandle &exprhdl) const override;
+	gpos::owner<CDistributionSpec *> PdsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive rewindability
 	CRewindabilitySpec *PrsDerive(CMemoryPool *mp,
@@ -172,12 +174,13 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
-		CExpressionHandle &,		// exprhdl
-		const CEnfdRewindability *	// per
+		CExpressionHandle &,					   // exprhdl
+		gpos::pointer<const CEnfdRewindability *>  // per
 	) const override;
 
 	// return true if operator passes through stats obtained from children,
@@ -196,7 +199,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CPhysicalSequenceProject *
+	static gpos::cast_func<CPhysicalSequenceProject *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

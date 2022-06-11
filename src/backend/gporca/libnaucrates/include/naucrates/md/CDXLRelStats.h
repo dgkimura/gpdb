@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/md/CMDIdRelStats.h"
@@ -46,7 +47,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// metadata id of the object
-	CMDIdRelStats *m_rel_stats_mdid;
+	gpos::owner<CMDIdRelStats *> m_rel_stats_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -76,7 +77,7 @@ public:
 	~CDXLRelStats() override;
 
 	// the metadata id
-	IMDId *MDId() const override;
+	gpos::pointer<IMDId *> MDId() const override;
 
 	// relation name
 	CMDName Mdname() const override;

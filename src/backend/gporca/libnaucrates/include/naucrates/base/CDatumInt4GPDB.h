@@ -12,6 +12,7 @@
 #define GPNAUCRATES_CDatumInt4GPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatumInt4.h"
 #include "naucrates/md/CMDTypeInt4GPDB.h"
@@ -30,7 +31,7 @@ class CDatumInt4GPDB : public IDatumInt4
 {
 private:
 	// type information
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// integer value
 	INT m_val;
@@ -49,7 +50,7 @@ public:
 	~CDatumInt4GPDB() override;
 
 	// accessor of metadata type id
-	IMDId *MDId() const override;
+	gpos::pointer<IMDId *> MDId() const override;
 
 	// accessor of size
 	ULONG Size() const override;
@@ -67,10 +68,10 @@ public:
 	ULONG HashValue() const override;
 
 	// match function for datums
-	BOOL Matches(const IDatum *) const override;
+	BOOL Matches(gpos::pointer<const IDatum *>) const override;
 
 	// copy datum
-	IDatum *MakeCopy(CMemoryPool *mp) const override;
+	gpos::owner<IDatum *> MakeCopy(CMemoryPool *mp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

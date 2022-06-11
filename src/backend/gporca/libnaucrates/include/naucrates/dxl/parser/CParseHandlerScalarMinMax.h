@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerScalarMinMax_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarMinMax.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerScalarMinMax : public CParseHandlerScalarOp
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::pointer<IMDId *> m_mdid_type;
 
 	// min/max type
 	CDXLScalarMinMax::EdxlMinMaxType m_min_max_type;

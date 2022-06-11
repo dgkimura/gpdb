@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformProject2ComputeScalar.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalProject.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -70,7 +71,7 @@ CXformProject2ComputeScalar::Transform(CXformContext *pxfctxt,
 	pexprScalar->AddRef();
 
 	// assemble physical operator
-	CExpression *pexprComputeScalar =
+	gpos::owner<CExpression *> pexprComputeScalar =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPhysicalComputeScalar(mp),
 								 pexprRelational, pexprScalar);
 

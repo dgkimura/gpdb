@@ -12,6 +12,7 @@
 #define GPOS_CLogicalLeftAntiSemiJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalJoin.h"
 
@@ -106,7 +107,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalLeftAntiSemiJoin *
+	static gpos::cast_func<CLogicalLeftAntiSemiJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

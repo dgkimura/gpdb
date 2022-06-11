@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CMDIdGPDB.h"
 #include "naucrates/md/CMDName.h"
@@ -51,7 +52,7 @@ private:
 	INT m_attr_no;
 
 	// mdid of column's type
-	IMDId *m_column_mdid_type;
+	gpos::owner<IMDId *> m_column_mdid_type;
 
 	INT m_type_modifier;
 
@@ -85,7 +86,7 @@ public:
 	BOOL IsDropped() const;
 
 	// column type
-	IMDId *MdidType() const;
+	gpos::pointer<IMDId *> MdidType() const;
 
 	INT TypeModifier() const;
 

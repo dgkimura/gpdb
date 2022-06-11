@@ -15,6 +15,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 
 namespace gpopt
@@ -48,7 +49,7 @@ protected:
 	virtual CDrvdPropCtxt *PdpctxtCopy(CMemoryPool *mp) const = 0;
 
 	// add props to context
-	virtual void AddProps(CDrvdProp *pdp) = 0;
+	virtual void AddProps(gpos::pointer<CDrvdProp *> pdp) = 0;
 
 public:
 	CDrvdPropCtxt(const CDrvdPropCtxt &) = delete;

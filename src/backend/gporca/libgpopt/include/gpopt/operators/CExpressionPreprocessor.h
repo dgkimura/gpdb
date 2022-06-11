@@ -71,57 +71,58 @@ private:
 		CColRefSet *pcrs, CColRefSet *pcrsProcessed);
 
 	// eliminate self comparisons
-	static CExpression *PexprEliminateSelfComparison(CMemoryPool *mp,
-													 CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprEliminateSelfComparison(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// remove CTE Anchor nodes
 	static CExpression *PexprRemoveCTEAnchors(CMemoryPool *mp,
 											  CExpression *pexpr);
 
 	// trim superfluos equality
-	static CExpression *PexprPruneSuperfluousEquality(CMemoryPool *mp,
-													  CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprPruneSuperfluousEquality(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// trim existential subqueries
-	static CExpression *PexprTrimExistentialSubqueries(CMemoryPool *mp,
-													   CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprTrimExistentialSubqueries(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// simplify quantified subqueries
-	static CExpression *PexprSimplifyQuantifiedSubqueries(CMemoryPool *mp,
-														  CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprSimplifyQuantifiedSubqueries(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// preliminary unnesting of scalar  subqueries
-	static CExpression *PexprUnnestScalarSubqueries(CMemoryPool *mp,
-													CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprUnnestScalarSubqueries(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// remove superfluous limit nodes
-	static CExpression *PexprRemoveSuperfluousLimit(CMemoryPool *mp,
-													CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprRemoveSuperfluousLimit(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// remove superfluous distinct nodes
-	static CExpression *PexprRemoveSuperfluousDistinctInDQA(CMemoryPool *mp,
-															CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprRemoveSuperfluousDistinctInDQA(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// remove superfluous outer references from limit, group by and window operators
-	static CExpression *PexprRemoveSuperfluousOuterRefs(CMemoryPool *mp,
-														CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprRemoveSuperfluousOuterRefs(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// generate predicates based on derived constraint properties
-	static CExpression *PexprFromConstraints(
+	static gpos::owner<CExpression *> PexprFromConstraints(
 		CMemoryPool *mp, CExpression *pexpr, CColRefSet *pcrsProcessed,
 		CPropConstraint *constraintsForOuterRefs);
 
 	// generate predicates based on derived constraint properties under scalar expressions
-	static CExpression *PexprFromConstraintsScalar(
-		CMemoryPool *mp, CExpression *pexpr,
+	static gpos::owner<CExpression *> PexprFromConstraintsScalar(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
 		CPropConstraint *constraintsForOuterRefs);
 
 	// eliminate subtrees that have zero output cardinality
-	static CExpression *PexprPruneEmptySubtrees(CMemoryPool *mp,
-												CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprPruneEmptySubtrees(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// collapse cascaded inner joins into NAry-joins
-	static CExpression *PexprCollapseJoins(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprCollapseJoins(CMemoryPool *mp,
+														 CExpression *pexpr);
 
 	// helper method for PexprCollapseJoins, collect children and make recursive calls
 	static void CollectJoinChildrenRecursively(
@@ -134,9 +135,9 @@ private:
 											  CExpression *pexpr);
 
 	// add dummy project element below scalar subquery when the output column is an outer reference
-	static CExpression *PexprProjBelowSubquery(CMemoryPool *mp,
-											   CExpression *pexpr,
-											   BOOL fUnderPrList);
+	static gpos::owner<CExpression *> PexprProjBelowSubquery(CMemoryPool *mp,
+															 CExpression *pexpr,
+															 BOOL fUnderPrList);
 
 	// helper function to rewrite IN query to simple EXISTS with a predicate
 	static CExpression *ConvertInToSimpleExists(CMemoryPool *mp,
@@ -147,41 +148,44 @@ private:
 													 CExpression *pexpr);
 
 	// collapse cascaded union/union all into an NAry union/union all operator
-	static CExpression *PexprCollapseUnionUnionAll(CMemoryPool *mp,
-												   CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprCollapseUnionUnionAll(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// transform outer joins into inner joins whenever possible
-	static CExpression *PexprOuterJoinToInnerJoin(CMemoryPool *mp,
-												  CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprOuterJoinToInnerJoin(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr);
 
 	// eliminate CTE Anchors for CTEs that have zero consumers
-	static CExpression *PexprRemoveUnusedCTEs(CMemoryPool *mp,
-											  CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprRemoveUnusedCTEs(CMemoryPool *mp,
+															CExpression *pexpr);
 
 	// collect CTE predicates from consumers
 	static void CollectCTEPredicates(CMemoryPool *mp, CExpression *pexpr,
 									 CTEPredsMap *phm);
 
 	// imply new predicates on LOJ's inner child based on constraints derived from LOJ's outer child and join predicate
-	static CExpression *PexprWithImpliedPredsOnLOJInnerChild(
+	static gpos::owner<CExpression *> PexprWithImpliedPredsOnLOJInnerChild(
 		CMemoryPool *mp, CExpression *pexprLOJ, BOOL *pfAddedPredicates);
 
 	// infer predicate from outer child to inner child of the outer join
-	static CExpression *PexprOuterJoinInferPredsFromOuterChildToInnerChild(
-		CMemoryPool *mp, CExpression *pexpr, BOOL *pfAddedPredicates);
+	static gpos::owner<CExpression *>
+	PexprOuterJoinInferPredsFromOuterChildToInnerChild(CMemoryPool *mp,
+													   CExpression *pexpr,
+													   BOOL *pfAddedPredicates);
 
 	// driver for inferring predicates from constraints
 	static CExpression *PexprInferPredicates(CMemoryPool *mp,
 											 CExpression *pexpr);
 
 	// entry for pruning unused computed columns
-	static CExpression *PexprPruneUnusedComputedCols(CMemoryPool *mp,
-													 CExpression *pexpr,
-													 CColRefSet *pcrsReqd);
+	static gpos::owner<CExpression *> PexprPruneUnusedComputedCols(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+		CColRefSet *pcrsReqd);
 
 	// driver for pruning unused computed columns
-	static CExpression *PexprPruneUnusedComputedColsRecursive(
-		CMemoryPool *mp, CExpression *pexpr, CColRefSet *pcrsReqd);
+	static gpos::owner<CExpression *> PexprPruneUnusedComputedColsRecursive(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+		CColRefSet *pcrsReqd);
 
 	// prune unused project elements from the project list of Project or GbAgg
 	static CExpression *PexprPruneProjListProjectOrGbAgg(
@@ -189,19 +193,20 @@ private:
 		CColRefSet *pcrsDefined, gpos::pointer<const CColRefSet *> pcrsReqd);
 
 	// generate a scalar bool op expression or return the only child expression in array
-	static CExpression *PexprScalarBoolOpConvert2In(
+	static gpos::owner<CExpression *> PexprScalarBoolOpConvert2In(
 		CMemoryPool *mp, CScalarBoolOp::EBoolOperator eboolop,
-		CExpressionArray *pdrgpexpr);
+		gpos::owner<CExpressionArray *> pdrgpexpr);
 
 	// determines if the expression is likely convertible to an array expression
 	static BOOL FConvert2InIsConvertable(gpos::pointer<CExpression *> pexpr,
 										 CScalarBoolOp::EBoolOperator eboolop);
 
 	// reorder the scalar cmp children to ensure that left child is Scalar Ident and right Child is Scalar Const
-	static CExpression *PexprReorderScalarCmpChildren(CMemoryPool *mp,
-													  CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprReorderScalarCmpChildren(
+		CMemoryPool *mp, CExpression *pexpr);
 
-	static CExpression *PrunePartitions(CMemoryPool *mp, CExpression *expr);
+	static gpos::owner<CExpression *> PrunePartitions(CMemoryPool *mp,
+													  CExpression *expr);
 
 	static CConstraint *PcnstrFromChildPartition(
 		gpos::pointer<const IMDRelation *> partrel, CColRefArray *pdrgpcrOutput,
@@ -230,7 +235,8 @@ public:
 														  CExpression *pexpr);
 
 	// convert series of AND or OR comparisons into array IN expressions
-	static CExpression *PexprConvert2In(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprConvert2In(CMemoryPool *mp,
+													  CExpression *pexpr);
 
 };	// class CExpressionPreprocessor
 }  // namespace gpopt

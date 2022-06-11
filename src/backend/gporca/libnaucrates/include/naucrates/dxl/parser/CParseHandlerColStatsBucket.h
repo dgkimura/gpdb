@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerColStatsBucket_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 
@@ -52,10 +53,10 @@ private:
 	CDouble m_distinct;
 
 	// lower bound value for the bucket
-	CDXLDatum *m_lower_bound_dxl_datum;
+	gpos::pointer<CDXLDatum *> m_lower_bound_dxl_datum;
 
 	// upper bound value for the bucket
-	CDXLDatum *m_upper_bound_dxl_datum;
+	gpos::pointer<CDXLDatum *> m_upper_bound_dxl_datum;
 
 	// is lower bound closed
 	BOOL m_is_lower_closed;
@@ -64,7 +65,7 @@ private:
 	BOOL m_is_upper_closed;
 
 	// dxl bucket object
-	CDXLBucket *m_dxl_bucket;
+	gpos::owner<CDXLBucket *> m_dxl_bucket;
 
 	// process the start of an element
 	void StartElement(
@@ -93,7 +94,7 @@ public:
 	~CParseHandlerColStatsBucket() override;
 
 	// returns the constructed bucket
-	CDXLBucket *GetDXLBucketAt() const;
+	gpos::pointer<CDXLBucket *> GetDXLBucketAt() const;
 };
 }  // namespace gpdxl
 

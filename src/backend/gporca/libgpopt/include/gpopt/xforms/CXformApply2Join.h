@@ -12,6 +12,7 @@
 #define GPOPT_CXformApply2Join_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalInnerCorrelatedApply.h"
 #include "gpopt/operators/CLogicalLeftAntiSemiCorrelatedApply.h"
@@ -43,7 +44,8 @@ class CXformApply2Join : public CXformExploration
 private:
 	// check if we can create a correlated apply expression from the given expression
 	static BOOL
-	FCanCreateCorrelatedApply(CMemoryPool *, CExpression *pexprApply)
+	FCanCreateCorrelatedApply(CMemoryPool *,
+							  gpos::pointer<CExpression *> pexprApply)
 	{
 		GPOS_ASSERT(nullptr != pexprApply);
 
@@ -134,7 +136,8 @@ protected:
 	// helper function to attempt decorrelating Apply's inner child
 	static BOOL
 	FDecorrelate(CMemoryPool *mp, CExpression *pexprApply,
-				 CExpression **ppexprInner, CExpressionArray **ppdrgpexpr)
+				 CExpression **ppexprInner,
+				 gpos::owner<CExpressionArray *> *ppdrgpexpr)
 	{
 		GPOS_ASSERT(nullptr != pexprApply);
 		GPOS_ASSERT(nullptr != ppexprInner);
@@ -142,7 +145,7 @@ protected:
 
 		*ppdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 
-		CExpression *pexprPredicateOrig = (*pexprApply)[2];
+		gpos::owner<CExpression *> pexprPredicateOrig = (*pexprApply)[2];
 
 		// add original predicate to array
 		pexprPredicateOrig->AddRef();
@@ -210,7 +213,7 @@ protected:
 		CExpression *pexprPredicate =
 			CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
 
-		CExpression *pexprResult =
+		gpos::owner<CExpression *> pexprResult =
 			GPOS_NEW(mp) CExpression(mp,
 									 GPOS_NEW(mp) TJoin(mp),  // join operator
 									 pexprOuter, pexprInner, pexprPredicate);
@@ -244,7 +247,7 @@ protected:
 		pexprOuter->AddRef();
 		pexprInner->AddRef();
 		pexprPred->AddRef();
-		CExpression *pexprResult =
+		gpos::owner<CExpression *> pexprResult =
 			GPOS_NEW(mp) CExpression(mp,
 									 GPOS_NEW(mp) TJoin(mp),  // join operator
 									 pexprOuter, pexprInner, pexprPred);

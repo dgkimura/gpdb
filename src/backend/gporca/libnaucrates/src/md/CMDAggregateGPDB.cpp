@@ -13,6 +13,7 @@
 
 #include "naucrates/md/CMDAggregateGPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -74,7 +75,7 @@ CMDAggregateGPDB::~CMDAggregateGPDB()
 //		Agg id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDAggregateGPDB::MDId() const
 {
 	return m_mdid;
@@ -103,7 +104,7 @@ CMDAggregateGPDB::Mdname() const
 //		Type id of result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDAggregateGPDB::GetResultTypeMdid() const
 {
 	return m_mdid_type_result;
@@ -117,7 +118,7 @@ CMDAggregateGPDB::GetResultTypeMdid() const
 //		Type id of intermediate result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDAggregateGPDB::GetIntermediateResultTypeMdid() const
 {
 	return m_mdid_type_intermediate;

@@ -13,6 +13,7 @@
 #define GPOPT_CAutoOptCtxt_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColumnFactory.h"
 #include "gpopt/base/COptCtxt.h"
@@ -45,12 +46,12 @@ public:
 
 	// ctor
 	CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
-				 IConstExprEvaluator *pceeval,
+				 gpos::owner<IConstExprEvaluator *> pceeval,
 				 COptimizerConfig *optimizer_config);
 
 	// ctor
 	CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
-				 IConstExprEvaluator *pceeval, ICostModel *pcm);
+				 gpos::owner<IConstExprEvaluator *> pceeval, ICostModel *pcm);
 
 	// dtor
 	~CAutoOptCtxt();

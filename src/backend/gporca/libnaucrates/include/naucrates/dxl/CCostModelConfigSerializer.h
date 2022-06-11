@@ -7,6 +7,7 @@
 #include <gpopt/cost/ICostModel.h>
 
 #include "gpos/common/CAutoP.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPool.h"
 
 
@@ -16,10 +17,11 @@ class CXMLSerializer;
 class CCostModelConfigSerializer
 {
 private:
-	const gpopt::ICostModel *m_cost_model;
+	gpos::pointer<const gpopt::ICostModel *> m_cost_model;
 
 public:
-	CCostModelConfigSerializer(const gpopt::ICostModel *cost_model);
+	CCostModelConfigSerializer(
+		gpos::pointer<const gpopt::ICostModel *> cost_model);
 
 	void Serialize(CXMLSerializer &xml_serializer) const;
 };

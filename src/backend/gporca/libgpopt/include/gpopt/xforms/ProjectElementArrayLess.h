@@ -6,6 +6,7 @@
 #define GPOPT_ProjectElementArrayLess_H
 
 #include "gpos/common/Ref.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 
@@ -13,7 +14,8 @@ namespace gpopt
 {
 struct ProjectElementArrayLess
 {
-	bool operator()(const CExpressionArray *a, const CExpressionArray *b) const;
+	bool operator()(gpos::pointer<const CExpressionArray *> a,
+					gpos::pointer<const CExpressionArray *> b) const;
 	bool operator()(const gpos::Ref<CExpressionArray> &a,
 					const gpos::Ref<CExpressionArray> &b) const;
 };

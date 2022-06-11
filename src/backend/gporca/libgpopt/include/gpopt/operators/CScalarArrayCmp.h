@@ -111,10 +111,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -133,7 +134,7 @@ public:
 	const CWStringConst *Pstr() const;
 
 	// operator mdid
-	IMDId *MdIdOp() const;
+	gpos::pointer<IMDId *> MdIdOp() const;
 
 	// the type of the scalar expression
 	IMDId *MdidType() const override;
@@ -145,8 +146,8 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// expand array comparison expression into a conjunctive/disjunctive expression
-	static CExpression *PexprExpand(CMemoryPool *mp,
-									CExpression *pexprArrayCmp);
+	static gpos::owner<CExpression *> PexprExpand(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprArrayCmp);
 
 };	// class CScalarArrayCmp
 

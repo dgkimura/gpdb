@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerSearchStrategy.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
 #include "naucrates/dxl/parser/CParseHandlerSearchStage.h"
@@ -129,7 +131,8 @@ CParseHandlerSearchStrategy::EndElement(const XMLCh *const,	 // element_uri,
 	{
 		CParseHandlerSearchStage *search_stage_parse_handler =
 			dynamic_cast<CParseHandlerSearchStage *>((*this)[idx]);
-		CXformSet *xform_set = search_stage_parse_handler->GetXformSet();
+		gpos::owner<CXformSet *> xform_set =
+			search_stage_parse_handler->GetXformSet();
 		xform_set->AddRef();
 		CSearchStage *search_stage = GPOS_NEW(m_mp)
 			CSearchStage(xform_set, search_stage_parse_handler->TimeThreshold(),

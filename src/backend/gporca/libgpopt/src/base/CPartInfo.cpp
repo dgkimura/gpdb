@@ -12,6 +12,7 @@
 #include "gpopt/base/CPartInfo.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/CUtils.h"
@@ -62,7 +63,7 @@ CPartInfo::CPartInfoEntry::~CPartInfoEntry()
 //		part keys to this entry, using the existing keys and the given hashmap
 //
 //---------------------------------------------------------------------------
-CPartInfo::CPartInfoEntry *
+gpos::owner<CPartInfo::CPartInfoEntry *>
 CPartInfo::CPartInfoEntry::PpartinfoentryAddRemappedKeys(
 	CMemoryPool *mp, CColRefSet *pcrs, UlongToColRefMap *colref_mapping)
 {
@@ -115,10 +116,10 @@ CPartInfo::CPartInfoEntry::OsPrint(IOstream &os) const
 //		Copy part info entry into given memory pool
 //
 //---------------------------------------------------------------------------
-CPartInfo::CPartInfoEntry *
+gpos::owner<CPartInfo::CPartInfoEntry *>
 CPartInfo::CPartInfoEntry::PpartinfoentryCopy(CMemoryPool *mp) const
 {
-	IMDId *mdid = MDId();
+	gpos::owner<IMDId *> mdid = MDId();
 	mdid->AddRef();
 
 	// copy part keys
@@ -126,7 +127,8 @@ CPartInfo::CPartInfoEntry::PpartinfoentryCopy(CMemoryPool *mp) const
 		CPartKeys::PdrgppartkeysCopy(mp, Pdrgppartkeys());
 
 	// copy part constraint using empty remapping to get exact copy
-	UlongToColRefMap *colref_mapping = GPOS_NEW(mp) UlongToColRefMap(mp);
+	gpos::owner<UlongToColRefMap *> colref_mapping =
+		GPOS_NEW(mp) UlongToColRefMap(mp);
 	colref_mapping->Release();
 
 	return GPOS_NEW(mp) CPartInfoEntry(ScanId(), mdid, pdrgppartkeysCopy);
@@ -185,7 +187,8 @@ void
 CPartInfo::AddPartConsumer(CMemoryPool *mp, ULONG scan_id, IMDId *mdid,
 						   CColRef2dArray *pdrgpdrgpcrPart)
 {
-	CPartKeysArray *pdrgppartkeys = GPOS_NEW(mp) CPartKeysArray(mp);
+	gpos::owner<CPartKeysArray *> pdrgppartkeys =
+		GPOS_NEW(mp) CPartKeysArray(mp);
 	pdrgppartkeys->Append(GPOS_NEW(mp) CPartKeys(pdrgpdrgpcrPart));
 
 	m_pdrgppartentries->Append(
@@ -292,18 +295,18 @@ CPartInfo::PdrgppartkeysByScanId(ULONG scan_id) const
 //		Return a new part info object with an additional set of remapped keys
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::owner<CPartInfo *>
 CPartInfo::PpartinfoWithRemappedKeys(CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
 									 CColRefArray *pdrgpcrDest) const
 {
 	GPOS_ASSERT(nullptr != pdrgpcrSrc);
 	GPOS_ASSERT(nullptr != pdrgpcrDest);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrSrc);
-	UlongToColRefMap *colref_mapping =
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrSrc);
+	gpos::owner<UlongToColRefMap *> colref_mapping =
 		CUtils::PhmulcrMapping(mp, pdrgpcrSrc, pdrgpcrDest);
 
-	CPartInfoEntryArray *pdrgppartentries =
+	gpos::owner<CPartInfoEntryArray *> pdrgppartentries =
 		GPOS_NEW(mp) CPartInfoEntryArray(mp);
 
 	const ULONG size = m_pdrgppartentries->Size();
@@ -333,14 +336,14 @@ CPartInfo::PpartinfoWithRemappedKeys(CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
 //		Combine two part info objects
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::owner<CPartInfo *>
 CPartInfo::PpartinfoCombine(CMemoryPool *mp, CPartInfo *ppartinfoFst,
 							CPartInfo *ppartinfoSnd)
 {
 	GPOS_ASSERT(nullptr != ppartinfoFst);
 	GPOS_ASSERT(nullptr != ppartinfoSnd);
 
-	CPartInfoEntryArray *pdrgppartentries =
+	gpos::owner<CPartInfoEntryArray *> pdrgppartentries =
 		GPOS_NEW(mp) CPartInfoEntryArray(mp);
 
 	// copy part entries from first part info object
@@ -359,8 +362,9 @@ CPartInfo::PpartinfoCombine(CMemoryPool *mp, CPartInfo *ppartinfoFst,
 		{
 			// there is already an entry with the same scan id; need to add to it
 			// the keys from the current entry
-			CPartKeysArray *pdrgppartkeysCopy = CPartKeys::PdrgppartkeysCopy(
-				mp, ppartinfoentry->Pdrgppartkeys());
+			gpos::owner<CPartKeysArray *> pdrgppartkeysCopy =
+				CPartKeys::PdrgppartkeysCopy(mp,
+											 ppartinfoentry->Pdrgppartkeys());
 			CUtils::AddRefAppend(pdrgppartkeys, pdrgppartkeysCopy);
 			pdrgppartkeysCopy->Release();
 		}

@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarIdent.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -86,7 +88,7 @@ CDXLScalarIdent::GetOpNameStr() const
 //		Return column reference of the identifier operator
 //
 //---------------------------------------------------------------------------
-const CDXLColRef *
+gpos::pointer<const CDXLColRef *>
 CDXLScalarIdent::GetDXLColRef() const
 {
 	return m_dxl_colref;
@@ -122,7 +124,7 @@ CDXLScalarIdent::TypeModifier() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarIdent::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *node) const
+								gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

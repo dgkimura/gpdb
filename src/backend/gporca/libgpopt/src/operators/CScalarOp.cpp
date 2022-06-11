@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarOp.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -77,7 +78,7 @@ CScalarOp::Pstr() const
 //		Scalar operator metadata id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarOp::MdIdOp() const
 {
 	return m_mdid_op;
@@ -129,7 +130,7 @@ CScalarOp::Matches(COperator *pop) const
 //		Accessor to the return type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarOp::GetReturnTypeMdId() const
 {
 	return m_return_type_mdid;
@@ -143,7 +144,7 @@ CScalarOp::GetReturnTypeMdId() const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarOp::MdidType() const
 {
 	if (nullptr != m_return_type_mdid)

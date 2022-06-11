@@ -13,6 +13,7 @@
 #define GPDXL_CDXLIndexDescriptor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CMDName.h"
 #include "naucrates/md/IMDId.h"
@@ -33,7 +34,7 @@ class CDXLIndexDescr : public CRefCount
 {
 private:
 	// id and version information for the table
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// index name
 	CMDName *m_mdname;
@@ -49,7 +50,7 @@ public:
 
 	// accessors
 	const CMDName *MdName() const;
-	IMDId *MDId() const;
+	gpos::pointer<IMDId *> MDId() const;
 
 	// serialize the operator to a DXL document
 	void SerializeToDXL(CXMLSerializer *) const;

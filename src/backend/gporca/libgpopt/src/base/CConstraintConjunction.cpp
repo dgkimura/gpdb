@@ -12,6 +12,7 @@
 #include "gpopt/base/CConstraintConjunction.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CConstraintInterval.h"
 #include "gpopt/base/CUtils.h"
@@ -100,11 +101,12 @@ CConstraintConjunction::FConstraint(const CColRef *colref) const
 //		in the mapping, and hence will not be replaced
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CConstraintConjunction::PcnstrCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
-	CConstraintArray *pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstr =
+		GPOS_NEW(mp) CConstraintArray(mp);
 	const ULONG length = m_pdrgpcnstr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -134,13 +136,15 @@ CConstraintConjunction::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 		return nullptr;
 	}
 
-	CConstraintArray *pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstr =
+		GPOS_NEW(mp) CConstraintArray(mp);
 
 	const ULONG length = pdrgpcnstrCol->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		// the part of the child that references this column
-		CConstraint *pcnstrCol = (*pdrgpcnstrCol)[ul]->Pcnstr(mp, colref);
+		gpos::owner<CConstraint *> pcnstrCol =
+			(*pdrgpcnstrCol)[ul]->Pcnstr(mp, colref);
 		if (nullptr == pcnstrCol || pcnstrCol->IsConstraintUnbounded())
 		{
 			CRefCount::SafeRelease(pcnstrCol);
@@ -165,7 +169,8 @@ CConstraintConjunction::Pcnstr(CMemoryPool *mp, CColRefSet *pcrs)
 {
 	const ULONG length = m_pdrgpcnstr->Size();
 
-	CConstraintArray *pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstr =
+		GPOS_NEW(mp) CConstraintArray(mp);
 
 	for (ULONG ul = 0; ul < length; ul++)
 	{

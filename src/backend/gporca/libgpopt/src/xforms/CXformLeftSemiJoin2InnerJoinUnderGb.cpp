@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformLeftSemiJoin2InnerJoinUnderGb.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/base/CColRefSetIter.h"
@@ -110,7 +111,7 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform(CXformContext *pxfctxt,
 	CExpression *pexprInnerJoin = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 		mp, pexprOuter, pexprInner, pexprScalar);
 
-	CExpression *pexprGb = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprGb = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 			mp, pdrgpcrGrouping, COperator::EgbaggtypeGlobal /*egbaggtype*/,

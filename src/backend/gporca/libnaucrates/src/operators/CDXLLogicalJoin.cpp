@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalJoin.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 #include "naucrates/dxl/xml/dxltokens.h"
@@ -84,7 +86,7 @@ CDXLLogicalJoin::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalJoin::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *node) const
+								gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

@@ -12,6 +12,7 @@
 #include "gpopt/search/CGroupExpression.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/string/CWStringDynamic.h"
@@ -125,7 +126,7 @@ CGroupExpression::CleanupContexts()
 		CAutoSuspendAbort asa;
 
 		ShtIter shtit(m_sht);
-		CCostContext *pcc = nullptr;
+		gpos::owner<CCostContext *> pcc = nullptr;
 		while (nullptr != pcc || shtit.Advance())
 		{
 			if (nullptr != pcc)
@@ -363,7 +364,7 @@ CGroupExpression::PccRemove(COptimizationContext *poc, ULONG ulOptReq)
 //
 //---------------------------------------------------------------------------
 CCostContext *
-CGroupExpression::PccInsertBest(CCostContext *pcc)
+CGroupExpression::PccInsertBest(gpos::owner<CCostContext *> pcc)
 {
 	GPOS_ASSERT(nullptr != pcc);
 
@@ -371,7 +372,7 @@ CGroupExpression::PccInsertBest(CCostContext *pcc)
 	const ULONG ulOptReq = pcc->UlOptReq();
 
 	// remove existing cost context, if any
-	CCostContext *pccExisting = PccRemove(poc, ulOptReq);
+	gpos::owner<CCostContext *> pccExisting = PccRemove(poc, ulOptReq);
 	CCostContext *pccKept = nullptr;
 
 	// compare existing context with given context
@@ -437,7 +438,8 @@ CGroupExpression::PccComputeCost(
 
 	poc->AddRef();
 	this->AddRef();
-	CCostContext *pcc = GPOS_NEW(mp) CCostContext(mp, poc, ulOptReq, this);
+	gpos::owner<CCostContext *> pcc =
+		GPOS_NEW(mp) CCostContext(mp, poc, ulOptReq, this);
 	BOOL fValid = true;
 
 	// computing cost
@@ -500,7 +502,7 @@ CGroupExpression::CostLowerBound(CMemoryPool *mp, CReqdPropPlan *prppInput,
 	{
 		pccChild->AddRef();
 	}
-	CPartialPlan *ppp =
+	gpos::owner<CPartialPlan *> ppp =
 		GPOS_NEW(mp) CPartialPlan(this, prppInput, pccChild, child_index);
 	CCost *pcostLowerBound = m_ppartialplancostmap->Find(ppp);
 	if (nullptr != pcostLowerBound)
@@ -531,7 +533,7 @@ CGroupExpression::CostLowerBound(CMemoryPool *mp, CReqdPropPlan *prppInput,
 void
 CGroupExpression::SetState(EState estNewState)
 {
-	GPOS_ASSERT(estNewState == (EState)(m_estate + 1));
+	GPOS_ASSERT(estNewState == (EState) (m_estate + 1));
 
 	m_estate = estNewState;
 }
@@ -567,7 +569,7 @@ CGroupExpression::CostCompute(CMemoryPool *mp, CCostContext *pcc)
 
 	// prepare cost array
 	COptimizationContextArray *pdrgpoc = pcc->Pdrgpoc();
-	CCostArray *pdrgpcostChildren = GPOS_NEW(mp) CCostArray(mp);
+	gpos::owner<CCostArray *> pdrgpcostChildren = GPOS_NEW(mp) CCostArray(mp);
 	const ULONG length = pdrgpoc->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -642,7 +644,8 @@ CCostContextArray *
 CGroupExpression::PdrgpccLookupAll(CMemoryPool *mp, COptimizationContext *poc)
 {
 	GPOS_ASSERT(nullptr != poc);
-	CCostContextArray *pdrgpcc = GPOS_NEW(mp) CCostContextArray(mp);
+	gpos::owner<CCostContextArray *> pdrgpcc =
+		GPOS_NEW(mp) CCostContextArray(mp);
 
 	CCostContext *pccFound = nullptr;
 	BOOL fValid = false;
@@ -808,13 +811,14 @@ CGroupExpression::Transform(
 
 	// extract memo bindings to apply xform
 	CBinding binding;
-	CXformContext *pxfctxt = GPOS_NEW(mp) CXformContext(mp);
+	gpos::owner<CXformContext *> pxfctxt = GPOS_NEW(mp) CXformContext(mp);
 
 	COptimizerConfig *optconfig =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 	ULONG bindThreshold = optconfig->GetHint()->UlXformBindThreshold();
 	CExpression *pexprPattern = pxform->PexprPattern();
-	CExpression *pexpr = binding.PexprExtract(mp, this, pexprPattern, nullptr);
+	gpos::owner<CExpression *> pexpr =
+		binding.PexprExtract(mp, this, pexprPattern, nullptr);
 	while (nullptr != pexpr)
 	{
 		++(*pulNumberOfBindings);
@@ -833,7 +837,7 @@ CGroupExpression::Transform(
 			break;
 		}
 
-		CExpression *pexprLast = pexpr;
+		gpos::owner<CExpression *> pexprLast = pexpr;
 		pexpr = binding.PexprExtract(mp, this, pexprPattern, pexprLast);
 
 		// release last extracted expression
@@ -863,7 +867,8 @@ CGroupExpression::Transform(
 //
 //---------------------------------------------------------------------------
 BOOL
-CGroupExpression::FMatchNonScalarChildren(const CGroupExpression *pgexpr) const
+CGroupExpression::FMatchNonScalarChildren(
+	gpos::pointer<const CGroupExpression *> pgexpr) const
 {
 	GPOS_ASSERT(nullptr != pgexpr);
 
@@ -885,7 +890,7 @@ CGroupExpression::FMatchNonScalarChildren(const CGroupExpression *pgexpr) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CGroupExpression::Matches(const CGroupExpression *pgexpr) const
+CGroupExpression::Matches(gpos::pointer<const CGroupExpression *> pgexpr) const
 {
 	GPOS_ASSERT(nullptr != pgexpr);
 

@@ -15,6 +15,7 @@
 #define GPMD_CMDAggregateGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 #include "naucrates/md/IMDAggregate.h"
@@ -43,16 +44,16 @@ class CMDAggregateGPDB : public IMDAggregate
 	const CWStringDynamic *m_dxl_str;
 
 	// aggregate id
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// aggregate name
 	CMDName *m_mdname;
 
 	// result type
-	IMDId *m_mdid_type_result;
+	gpos::owner<IMDId *> m_mdid_type_result;
 
 	// type of intermediate results
-	IMDId *m_mdid_type_intermediate;
+	gpos::owner<IMDId *> m_mdid_type_intermediate;
 
 	// is aggregate ordered
 	BOOL m_is_ordered;
@@ -83,16 +84,16 @@ public:
 	}
 
 	// aggregate id
-	IMDId *MDId() const override;
+	gpos::pointer<IMDId *> MDId() const override;
 
 	// aggregate name
 	CMDName Mdname() const override;
 
 	// result id
-	IMDId *GetResultTypeMdid() const override;
+	gpos::pointer<IMDId *> GetResultTypeMdid() const override;
 
 	// intermediate result id
-	IMDId *GetIntermediateResultTypeMdid() const override;
+	gpos::pointer<IMDId *> GetIntermediateResultTypeMdid() const override;
 
 	// serialize object in DXL format
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;

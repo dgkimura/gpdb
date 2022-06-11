@@ -11,6 +11,8 @@
 
 #include "gpopt/operators/CScalarIsDistinctFrom.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/mdcache/CMDAccessorUtils.h"
 
@@ -19,7 +21,7 @@ using namespace gpmd;
 
 
 // conversion function
-CScalarIsDistinctFrom *
+gpos::cast_func<CScalarIsDistinctFrom *>
 CScalarIsDistinctFrom::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);
@@ -66,7 +68,7 @@ CScalarIsDistinctFrom::Matches(COperator *pop) const
 }
 
 // get commuted scalar IDF operator
-CScalarCmp *
+gpos::owner<CScalarCmp *>
 CScalarIsDistinctFrom::PopCommutedOp(CMemoryPool *mp)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

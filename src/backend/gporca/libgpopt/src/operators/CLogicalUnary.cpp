@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalUnary.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformUtils.h"
 #include "naucrates/statistics/CProjectStatsProcessor.h"
@@ -72,7 +73,7 @@ CLogicalUnary::PstatsDeriveProject(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	CReqdPropRelational *prprel =
 		CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
 	CColRefSet *pcrs = prprel->PcrsStat();
-	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	pcrs->ExtractColIds(mp, colids);
 
 	IStatistics *stats = CProjectStatsProcessor::CalcProjStats(

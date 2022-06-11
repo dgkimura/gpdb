@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalRowTrigger_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysical.h"
 
@@ -29,19 +30,19 @@ class CPhysicalRowTrigger : public CPhysical
 {
 private:
 	// relation id on which triggers are to be executed
-	IMDId *m_rel_mdid;
+	gpos::owner<IMDId *> m_rel_mdid;
 
 	// trigger type
 	INT m_type;
 
 	// old columns
-	CColRefArray *m_pdrgpcrOld;
+	gpos::owner<CColRefArray *> m_pdrgpcrOld;
 
 	// new columns
-	CColRefArray *m_pdrgpcrNew;
+	gpos::owner<CColRefArray *> m_pdrgpcrNew;
 
 	// required columns by local members
-	CColRefSet *m_pcrsRequiredLocal;
+	gpos::owner<CColRefSet *> m_pcrsRequiredLocal;
 
 public:
 	CPhysicalRowTrigger(const CPhysicalRowTrigger &) = delete;
@@ -68,7 +69,7 @@ public:
 	}
 
 	// relation id
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetRelMdId() const
 	{
 		return m_rel_mdid;
@@ -82,14 +83,14 @@ public:
 	}
 
 	// old columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrOld() const
 	{
 		return m_pdrgpcrOld;
 	}
 
 	// new columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrNew() const
 	{
 		return m_pdrgpcrNew;
@@ -113,18 +114,18 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required sort columns of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posRequired, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
+	gpos::owner<COrderSpec *> PosRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *PosDerive(CMemoryPool *mp,
-						  CExpressionHandle &exprhdl) const override;
+	gpos::owner<COrderSpec *> PosDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -132,7 +133,8 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	// compute required output columns of the n-th child
 	CColRefSet *PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -147,11 +149,12 @@ public:
 						  ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	gpos::owner<CDistributionSpec *> PdsRequired(CMemoryPool *mp,
+												 CExpressionHandle &exprhdl,
+												 CDistributionSpec *pdsRequired,
+												 ULONG child_index,
+												 CDrvdPropArray *pdrgpdpCtxt,
+												 ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	CRewindabilitySpec *PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -183,8 +186,8 @@ public:
 
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
-		CExpressionHandle &,		// exprhdl
-		const CEnfdRewindability *	// per
+		CExpressionHandle &,					   // exprhdl
+		gpos::pointer<const CEnfdRewindability *>  // per
 	) const override;
 
 	// return true if operator passes through stats obtained from children,
@@ -200,7 +203,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalRowTrigger *
+	static gpos::cast_func<CPhysicalRowTrigger *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

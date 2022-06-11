@@ -38,10 +38,10 @@ class CReqdPropRelational : public CReqdProp
 {
 private:
 	// required stat columns
-	CColRefSet *m_pcrsStat{nullptr};
+	gpos::owner<CColRefSet *> m_pcrsStat{nullptr};
 
 	// predicate on partition key
-	CExpression *m_pexprPartPred{nullptr};
+	gpos::owner<CExpression *> m_pexprPartPred{nullptr};
 
 public:
 	CReqdPropRelational(const CReqdPropRelational &) = delete;
@@ -86,14 +86,15 @@ public:
 				 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// return difference from given properties
-	CReqdPropRelational *PrprelDifference(CMemoryPool *mp,
-										  CReqdPropRelational *prprel);
+	gpos::owner<CReqdPropRelational *> PrprelDifference(
+		CMemoryPool *mp, CReqdPropRelational *prprel);
 
 	// return true if property container is empty
 	BOOL IsEmpty() const;
 
 	// shorthand for conversion
-	static CReqdPropRelational *GetReqdRelationalProps(CReqdProp *prp);
+	static gpos::cast_func<CReqdPropRelational *> GetReqdRelationalProps(
+		CReqdProp *prp);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

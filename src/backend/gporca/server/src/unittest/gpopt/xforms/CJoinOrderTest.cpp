@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/xforms/CJoinOrderTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/test/CUnittest.h"
@@ -86,7 +87,7 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 	GPOS_ASSERT(GPOS_ARRAY_SIZE(rgulRel) == ulRels);
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -96,27 +97,29 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 						 CTestUtils::GetCostModel(mp));
 
-		CExpression *pexprNAryJoin = CTestUtils::PexprLogicalNAryJoin(
-			mp, rgscRel, rgulRel, ulRels, false /*fCrossProduct*/);
+		gpos::owner<CExpression *> pexprNAryJoin =
+			CTestUtils::PexprLogicalNAryJoin(mp, rgscRel, rgulRel, ulRels,
+											 false /*fCrossProduct*/);
 
 		// derive stats on input expression
 		CExpressionHandle exprhdl(mp);
 		exprhdl.Attach(pexprNAryJoin);
 		exprhdl.DeriveStats(mp, mp, nullptr /*prprel*/, nullptr /*stats_ctxt*/);
 
-		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+		gpos::owner<CExpressionArray *> pdrgpexpr =
+			GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ul = 0; ul < ulRels; ul++)
 		{
-			CExpression *pexprChild = (*pexprNAryJoin)[ul];
+			gpos::owner<CExpression *> pexprChild = (*pexprNAryJoin)[ul];
 			pexprChild->AddRef();
 			pdrgpexpr->Append(pexprChild);
 		}
-		CExpressionArray *pdrgpexprPred =
+		gpos::owner<CExpressionArray *> pdrgpexprPred =
 			CPredicateUtils::PdrgpexprConjuncts(mp, (*pexprNAryJoin)[ulRels]);
 		pdrgpexpr->AddRef();
 		pdrgpexprPred->AddRef();
 		CJoinOrderMinCard jomc(mp, pdrgpexpr, pdrgpexprPred);
-		CExpression *pexprResult = jomc.PexprExpand();
+		gpos::owner<CExpression *> pexprResult = jomc.PexprExpand();
 		{
 			CAutoTrace at(mp);
 			at.Os() << std::endl

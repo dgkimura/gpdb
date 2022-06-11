@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalPartitionSelector.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/COptCtxt.h"
@@ -119,7 +120,7 @@ CLogicalPartitionSelector::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalPartitionSelector::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -145,7 +146,7 @@ CColRefSet *
 CLogicalPartitionSelector::DeriveOutputColumns(CMemoryPool *mp,
 											   CExpressionHandle &exprhdl)
 {
-	CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 
 	pcrsOutput->Union(exprhdl.DeriveOutputColumns(0));
 	pcrsOutput->Include(m_pcrOid);
@@ -180,7 +181,7 @@ CLogicalPartitionSelector::DeriveMaxCard(CMemoryPool *,	 // mp
 CXformSet *
 CLogicalPartitionSelector::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementPartitionSelector);
 	return xform_set;
 }

@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerTableDescr.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerColDescr.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -59,7 +61,7 @@ CParseHandlerTableDescr::~CParseHandlerTableDescr()
 //		Returns the table descriptor constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CDXLTableDescr *
+gpos::pointer<CDXLTableDescr *>
 CParseHandlerTableDescr::GetDXLTableDescr()
 {
 	return m_dxl_table_descr;
@@ -138,7 +140,7 @@ CParseHandlerTableDescr::EndElement(const XMLCh *const,	 // element_uri,
 
 	GPOS_ASSERT(nullptr != col_descr_parse_handler->GetDXLColumnDescrArray());
 
-	CDXLColDescrArray *dxl_column_descr_array =
+	gpos::owner<CDXLColDescrArray *> dxl_column_descr_array =
 		col_descr_parse_handler->GetDXLColumnDescrArray();
 	dxl_column_descr_array->AddRef();
 	m_dxl_table_descr->SetColumnDescriptors(dxl_column_descr_array);

@@ -12,6 +12,7 @@
 #define GPOPT_CXformSelect2IndexGet_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalGet.h"
 #include "gpopt/xforms/CXformExploration.h"
@@ -36,7 +37,7 @@ private:
 
 	// return the column reference set of included / key columns
 	CColRefSet *GetColRefSet(CMemoryPool *mp, CLogicalGet *popGet,
-							 const IMDIndex *pmdindex,
+							 gpos::pointer<const IMDIndex *> pmdindex,
 							 BOOL fIncludedColumns) const;
 
 public:

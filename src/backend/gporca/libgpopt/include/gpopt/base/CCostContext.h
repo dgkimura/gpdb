@@ -77,16 +77,16 @@ private:
 	EState m_estate;
 
 	// back pointer to owner group expression
-	CGroupExpression *m_pgexpr;
+	gpos::owner<CGroupExpression *> m_pgexpr;
 
 	// group expression to be used stats derivation during costing
-	CGroupExpression *m_pgexprForStats;
+	gpos::owner<CGroupExpression *> m_pgexprForStats;
 
 	// array of optimization contexts of child groups
-	COptimizationContextArray *m_pdrgpoc;
+	gpos::owner<COptimizationContextArray *> m_pdrgpoc;
 
 	// derived properties of the carried plan
-	CDrvdPropPlan *m_pdpplan;
+	gpos::owner<CDrvdPropPlan *> m_pdpplan;
 
 	// optimization request number
 	ULONG m_ulOptReq;
@@ -97,7 +97,7 @@ private:
 	BOOL m_fPruned;
 
 	// stats of owner group expression
-	IStatistics *m_pstats;
+	gpos::owner<IStatistics *> m_pstats;
 
 	// derive stats of owner group expression
 	void DeriveStats();
@@ -116,7 +116,7 @@ public:
 	CCostContext(const CCostContext &) = delete;
 
 	// main optimization context
-	COptimizationContext *m_poc;
+	gpos::owner<COptimizationContext *> m_poc;
 
 	// link for cost context hash table in CGroupExpression
 	SLink m_link;
@@ -159,7 +159,7 @@ public:
 	}
 
 	// accessor of child optimization contexts array
-	COptimizationContextArray *
+	gpos::pointer<COptimizationContextArray *>
 	Pdrgpoc() const
 	{
 		return m_pdrgpoc;

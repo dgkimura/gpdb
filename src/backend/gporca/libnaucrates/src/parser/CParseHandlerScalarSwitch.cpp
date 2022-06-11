@@ -13,6 +13,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarSwitch.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -66,7 +68,7 @@ CParseHandlerScalarSwitch::StartElement(const XMLCh *const element_uri,
 			EdxltokenScalarSwitch);
 
 		// construct node
-		CDXLScalarSwitch *dxl_op =
+		gpos::owner<CDXLScalarSwitch *> dxl_op =
 			GPOS_NEW(m_mp) CDXLScalarSwitch(m_mp, m_mdid_type);
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}

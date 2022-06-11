@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalLeftAntiSemiApply.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CExpression.h"
@@ -64,7 +65,7 @@ CLogicalLeftAntiSemiApply::DeriveMaxCard(CMemoryPool *,	 // mp
 CXformSet *
 CLogicalLeftAntiSemiApply::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(
 		CXform::ExfLeftAntiSemiApply2LeftAntiSemiJoin);
@@ -82,7 +83,7 @@ CLogicalLeftAntiSemiApply::PxfsCandidates(CMemoryPool *mp) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalLeftAntiSemiApply::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

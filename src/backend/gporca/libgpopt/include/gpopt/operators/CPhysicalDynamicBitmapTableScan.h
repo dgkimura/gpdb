@@ -19,6 +19,7 @@
 #define GPOPT_CPhysicalDynamicBitmapTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalDynamicScan.h"
 
@@ -74,7 +75,7 @@ public:
 							  IStatisticsArray *stats_ctxt) const override;
 
 	// conversion function
-	static CPhysicalDynamicBitmapTableScan *
+	static gpos::cast_func<CPhysicalDynamicBitmapTableScan *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

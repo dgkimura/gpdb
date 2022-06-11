@@ -17,6 +17,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerIndexScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLPhysicalIndexOnlyScan.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -201,15 +203,15 @@ CParseHandlerIndexScan::EndElementHelper(const XMLCh *const element_local_name,
 	CParseHandlerTableDescr *table_descr_parse_handler =
 		dynamic_cast<CParseHandlerTableDescr *>((*this)[5]);
 
-	CDXLTableDescr *dxl_table_descr =
+	gpos::owner<CDXLTableDescr *> dxl_table_descr =
 		table_descr_parse_handler->GetDXLTableDescr();
 	dxl_table_descr->AddRef();
 
-	CDXLIndexDescr *dxl_index_descr =
+	gpos::owner<CDXLIndexDescr *> dxl_index_descr =
 		index_descr_parse_handler->GetDXLIndexDescr();
 	dxl_index_descr->AddRef();
 
-	CDXLPhysical *dxl_op = nullptr;
+	gpos::owner<CDXLPhysical *> dxl_op = nullptr;
 	if (EdxltokenPhysicalIndexOnlyScan == token_type)
 	{
 		dxl_op = GPOS_NEW(m_mp) CDXLPhysicalIndexOnlyScan(

@@ -12,6 +12,7 @@
 #define GPOPT_CJobGroupOptimization_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/search/CJobGroup.h"
 #include "gpopt/search/CJobStateMachine.h"
@@ -71,10 +72,10 @@ private:
 	JSM m_jsm;
 
 	// group expression that triggered group optimization
-	CGroupExpression *m_pgexprOrigin;
+	gpos::pointer<CGroupExpression *> m_pgexprOrigin;
 
 	// optimization context of the job
-	COptimizationContext *m_poc;
+	gpos::pointer<COptimizationContext *> m_poc;
 
 	// current optimization level of group expressions
 	EOptimizationLevel m_eolCurrent;

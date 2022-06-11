@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarArray.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -66,7 +67,7 @@ CScalarArray::~CScalarArray()
 //		Element type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarArray::PmdidElem() const
 {
 	return m_pmdidElem;
@@ -80,7 +81,7 @@ CScalarArray::PmdidElem() const
 //		Array type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarArray::PmdidArray() const
 {
 	return m_pmdidArray;
@@ -162,13 +163,13 @@ CScalarArray::Matches(COperator *pop) const
 //		Type of expression's result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarArray::MdidType() const
 {
 	return m_pmdidArray;
 }
 
-CScalarConstArray *
+gpos::pointer<CScalarConstArray *>
 CScalarArray::PdrgPconst() const
 {
 	return m_pdrgPconst;

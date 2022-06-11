@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdProp.h"
@@ -65,7 +66,7 @@ protected:
 		CExpressionHandle &exprhdl, IMDFunction::EFuncStbl efsDefault);
 
 	// derive function properties from children
-	static CFunctionProp *PfpDeriveFromChildren(
+	static gpos::owner<CFunctionProp *> PfpDeriveFromChildren(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		IMDFunction::EFuncStbl efsDefault, BOOL fHasVolatileFunctionScan,
 		BOOL fScan);
@@ -343,7 +344,8 @@ public:
 
 	// return a copy of the operator with remapped columns
 	virtual COperator *PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist) = 0;
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+		BOOL must_exist) = 0;
 
 	// print
 	virtual IOstream &OsPrint(IOstream &os) const;

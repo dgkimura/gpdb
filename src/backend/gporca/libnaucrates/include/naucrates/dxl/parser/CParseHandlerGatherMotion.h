@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerGatherMotion_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalGatherMotion.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -35,7 +36,7 @@ class CParseHandlerGatherMotion : public CParseHandlerPhysicalOp
 {
 private:
 	// the gather motion operator
-	CDXLPhysicalGatherMotion *m_dxl_op;
+	gpos::pointer<CDXLPhysicalGatherMotion *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

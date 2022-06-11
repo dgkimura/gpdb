@@ -37,7 +37,7 @@ class CDXLScalarBitmapIndexProbe : public CDXLScalar
 {
 private:
 	// index descriptor associated with the scanned table
-	CDXLIndexDescr *m_dxl_index_descr;
+	gpos::owner<CDXLIndexDescr *> m_dxl_index_descr;
 
 public:
 	CDXLScalarBitmapIndexProbe(CDXLScalarBitmapIndexProbe &) = delete;

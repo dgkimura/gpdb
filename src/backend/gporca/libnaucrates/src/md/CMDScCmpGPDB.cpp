@@ -13,6 +13,7 @@
 
 #include "naucrates/md/CMDScCmpGPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -77,7 +78,7 @@ CMDScCmpGPDB::~CMDScCmpGPDB()
 //		Mdid of comparison object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScCmpGPDB::MDId() const
 {
 	return m_mdid;
@@ -105,7 +106,7 @@ CMDScCmpGPDB::Mdname() const
 //		Left type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScCmpGPDB::GetLeftMdid() const
 {
 	return m_mdid_left;
@@ -119,7 +120,7 @@ CMDScCmpGPDB::GetLeftMdid() const
 //		Destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScCmpGPDB::GetRightMdid() const
 {
 	return m_mdid_right;
@@ -133,7 +134,7 @@ CMDScCmpGPDB::GetRightMdid() const
 //		Cast function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScCmpGPDB::MdIdOp() const
 {
 	return m_mdid_op;

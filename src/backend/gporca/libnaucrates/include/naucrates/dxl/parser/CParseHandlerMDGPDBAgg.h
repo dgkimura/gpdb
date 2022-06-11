@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDGPDBAgg_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 #include "naucrates/md/CMDAggregateGPDB.h"
@@ -37,16 +38,16 @@ class CParseHandlerMDGPDBAgg : public CParseHandlerMetadataObject
 {
 private:
 	// metadata id comprising of id and version info.
-	IMDId *m_mdid;
+	gpos::pointer<IMDId *> m_mdid;
 
 	// name
 	CMDName *m_mdname;
 
 	// result type
-	IMDId *m_mdid_type_result;
+	gpos::pointer<IMDId *> m_mdid_type_result;
 
 	// intermediate result type
-	IMDId *m_mdid_type_intermediate;
+	gpos::pointer<IMDId *> m_mdid_type_intermediate;
 
 	// is aggregate ordered
 	BOOL m_is_ordered;

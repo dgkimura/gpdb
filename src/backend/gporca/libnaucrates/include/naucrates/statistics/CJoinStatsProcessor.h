@@ -59,8 +59,8 @@ public:
 	// main driver to generate join stats
 	static CStatistics *SetResultingJoinStats(
 		CMemoryPool *mp, CStatisticsConfig *stats_config,
-		const IStatistics *outer_stats_input,
-		const IStatistics *inner_stats_input,
+		gpos::pointer<const IStatistics *> outer_stats_input,
+		gpos::pointer<const IStatistics *> inner_stats_input,
 		CStatsPredJoinArray *join_preds_stats,
 		IStatistics::EStatsJoinType join_type,
 		BOOL DoIgnoreLASJHistComputation);

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerPhysicalCTAS_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
 #include "naucrates/md/IMDRelation.h"
@@ -42,13 +43,13 @@ private:
 	CMDName *m_mdname;
 
 	// list of distribution column positions
-	ULongPtrArray *m_distr_column_pos_array;
+	gpos::pointer<ULongPtrArray *> m_distr_column_pos_array;
 
 	// list of source column ids
-	ULongPtrArray *m_src_colids_array;
+	gpos::pointer<ULongPtrArray *> m_src_colids_array;
 
 	// list of vartypmod
-	IntPtrArray *m_vartypemod_array;
+	gpos::pointer<IntPtrArray *> m_vartypemod_array;
 
 	// is this a temporary table
 	BOOL m_is_temp_table;

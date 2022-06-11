@@ -35,7 +35,7 @@ class CDXLScalarHashExpr : public CDXLScalar
 {
 private:
 	// catalog Oid of the distribution opfamily
-	IMDId *m_mdid_opfamily;
+	gpos::owner<IMDId *> m_mdid_opfamily;
 
 public:
 	CDXLScalarHashExpr(CDXLScalarHashExpr &) = delete;
@@ -51,7 +51,7 @@ public:
 	// name of the operator
 	const CWStringConst *GetOpNameStr() const override;
 
-	IMDId *MdidOpfamily() const;
+	gpos::pointer<IMDId *> MdidOpfamily() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

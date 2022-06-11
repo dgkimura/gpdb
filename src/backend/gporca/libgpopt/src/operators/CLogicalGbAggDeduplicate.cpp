@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalGbAggDeduplicate.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/operators/CExpression.h"
@@ -89,7 +90,7 @@ CLogicalGbAggDeduplicate::~CLogicalGbAggDeduplicate()
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -162,7 +163,7 @@ CLogicalGbAggDeduplicate::DeriveKeyCollection(CMemoryPool *mp,
 											  CExpressionHandle &  //exprhdl
 ) const
 {
-	CKeyCollection *pkc = nullptr;
+	gpos::owner<CKeyCollection *> pkc = nullptr;
 
 	// Gb produces a key only if it's global
 	if (FGlobal())
@@ -216,7 +217,7 @@ CLogicalGbAggDeduplicate::Matches(COperator *pop) const
 CXformSet *
 CLogicalGbAggDeduplicate::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfPushGbDedupBelowJoin);
 	(void) xform_set->ExchangeSet(CXform::ExfSplitGbAggDedup);
 	(void) xform_set->ExchangeSet(CXform::ExfGbAggDedup2HashAggDedup);
@@ -242,11 +243,12 @@ CLogicalGbAggDeduplicate::PstatsDerive(CMemoryPool *mp,
 	IStatistics *child_stats = exprhdl.Pstats(0);
 
 	// extract computed columns
-	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpulComputedCols =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	exprhdl.DeriveDefinedColumns(1)->ExtractColIds(mp, pdrgpulComputedCols);
 
 	// construct bitset with keys of join child
-	CBitSet *keys = GPOS_NEW(mp) CBitSet(mp);
+	gpos::owner<CBitSet *> keys = GPOS_NEW(mp) CBitSet(mp);
 	const ULONG ulKeys = m_pdrgpcrKeys->Size();
 	for (ULONG ul = 0; ul < ulKeys; ul++)
 	{

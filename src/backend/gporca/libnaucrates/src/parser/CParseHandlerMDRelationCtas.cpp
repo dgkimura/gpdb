@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMDRelationCtas.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLCtasStorageOptions.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerCtasStorageOptions.h"
@@ -190,12 +192,12 @@ CParseHandlerMDRelationCtas::EndElement(const XMLCh *const,	 // element_uri,
 	md_col_array->AddRef();
 	dxl_ctas_storage_options->AddRef();
 
-	IMdIdArray *distr_opfamilies =
+	gpos::owner<IMdIdArray *> distr_opfamilies =
 		dynamic_cast<CParseHandlerMetadataIdList *>(opfamilies_parse_handler)
 			->GetMdIdArray();
 	distr_opfamilies->AddRef();
 
-	IMdIdArray *distr_opclasses =
+	gpos::owner<IMdIdArray *> distr_opclasses =
 		dynamic_cast<CParseHandlerMetadataIdList *>(opclasses_parse_handler)
 			->GetMdIdArray();
 	distr_opclasses->AddRef();

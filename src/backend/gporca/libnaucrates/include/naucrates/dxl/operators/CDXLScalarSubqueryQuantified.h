@@ -45,7 +45,7 @@ public:
 
 private:
 	// id of the scalar comparison operator
-	IMDId *m_scalar_op_mdid;
+	gpos::owner<IMDId *> m_scalar_op_mdid;
 
 	// name of scalar comparison operator
 	CMDName *m_scalar_op_mdname;

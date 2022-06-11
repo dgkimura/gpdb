@@ -17,6 +17,7 @@
 #include "gpos/common/CAutoRef.h"
 #include "gpos/common/CAutoTimer.h"
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 #include "gpos/common/syslibwrapper.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/error/CErrorContext.h"
@@ -308,8 +309,8 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 	GPOS_CHECK_ABORT;
 
 	// set trace flags
-	CBitSet *pbsEnabled = nullptr;
-	CBitSet *pbsDisabled = nullptr;
+	gpos::owner<CBitSet *> pbsEnabled = nullptr;
+	gpos::owner<CBitSet *> pbsDisabled = nullptr;
 	SetTraceflags(mp, pdxlmd->Pbs(), &pbsEnabled, &pbsDisabled);
 
 	if (nullptr == pceeval)

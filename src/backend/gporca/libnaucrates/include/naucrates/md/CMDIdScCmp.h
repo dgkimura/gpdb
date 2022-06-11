@@ -35,10 +35,10 @@ class CMDIdScCmp : public IMDId
 {
 private:
 	// mdid of source type
-	CMDIdGPDB *m_mdid_left;
+	gpos::owner<CMDIdGPDB *> m_mdid_left;
 
 	// mdid of destinatin type
-	CMDIdGPDB *m_mdid_right;
+	gpos::owner<CMDIdGPDB *> m_mdid_right;
 
 	// comparison type
 	IMDType::ECmpType m_comparision_type;
@@ -79,10 +79,10 @@ public:
 	}
 
 	// left type id
-	IMDId *GetLeftMdid() const;
+	gpos::pointer<IMDId *> GetLeftMdid() const;
 
 	// right type id
-	IMDId *GetRightMdid() const;
+	gpos::pointer<IMDId *> GetRightMdid() const;
 
 	IMDType::ECmpType
 	ParseCmpType() const

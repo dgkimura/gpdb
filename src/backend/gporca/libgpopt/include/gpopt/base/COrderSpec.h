@@ -67,7 +67,7 @@ private:
 	{
 	private:
 		// MD id of sort operator
-		gpmd::IMDId *m_mdid;
+		gpos::owner<gpmd::IMDId *> m_mdid;
 
 		// sort column
 		const CColRef *m_pcr;
@@ -123,7 +123,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// components of order spec
-	COrderExpressionArray *m_pdrgpoe;
+	gpos::owner<COrderExpressionArray *> m_pdrgpoe;
 
 	// extract columns from order spec into the given column set
 	void ExtractCols(CColRefSet *pcrs) const;
@@ -196,7 +196,8 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 gpos::pointer<CReqdPropPlan *> prpp,
+						 CExpressionArray *pdrgpexpr,
 						 CExpression *pexpr) override;
 
 	// hash function
@@ -213,22 +214,24 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// matching function over order spec arrays
-	static BOOL Equals(const COrderSpecArray *pdrgposFirst,
-					   const COrderSpecArray *pdrgposSecond);
+	static BOOL Equals(gpos::pointer<const COrderSpecArray *> pdrgposFirst,
+					   gpos::pointer<const COrderSpecArray *> pdrgposSecond);
 
 	// combine hash values of a maximum number of entries
-	static ULONG HashValue(const COrderSpecArray *pdrgpos, ULONG ulMaxSize);
+	static ULONG HashValue(gpos::pointer<const COrderSpecArray *> pdrgpos,
+						   ULONG ulMaxSize);
 
 	// print array of order spec objects
-	static IOstream &OsPrint(IOstream &os, const COrderSpecArray *pdrgpos);
+	static IOstream &OsPrint(IOstream &os,
+							 gpos::pointer<const COrderSpecArray *> pdrgpos);
 
 	// extract colref set of order columns used by elements of order spec array
 	static CColRefSet *GetColRefSet(CMemoryPool *mp, COrderSpecArray *pdrgpos);
 
 	// filter out array of order specs from order expressions using the passed columns
-	static COrderSpecArray *PdrgposExclude(CMemoryPool *mp,
-										   COrderSpecArray *pdrgpos,
-										   CColRefSet *pcrsToExclude);
+	static gpos::owner<COrderSpecArray *> PdrgposExclude(
+		CMemoryPool *mp, gpos::pointer<COrderSpecArray *> pdrgpos,
+		CColRefSet *pcrsToExclude);
 
 
 };	// class COrderSpec

@@ -50,7 +50,7 @@ public:
 						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalValuesScan *Cast(CDXLOperator *dxl_op);
+	static gpos::cast_func<CDXLPhysicalValuesScan *> Cast(CDXLOperator *dxl_op);
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and

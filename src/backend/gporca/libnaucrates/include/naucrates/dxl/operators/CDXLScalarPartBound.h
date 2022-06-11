@@ -13,6 +13,7 @@
 #define GPDXL_CDXLScalarPartBound_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 
@@ -34,7 +35,7 @@ private:
 	ULONG m_partitioning_level;
 
 	// boundary type
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 	// whether this represents a lower or upper bound
 	BOOL m_is_lower_bound;
@@ -63,7 +64,7 @@ public:
 	}
 
 	// boundary type
-	IMDId *
+	gpos::pointer<IMDId *>
 	MdidType() const
 	{
 		return m_mdid_type;
@@ -78,7 +79,7 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// does the operator return a boolean result
 	BOOL HasBoolResult(CMDAccessor *md_accessor) const override;
@@ -91,7 +92,7 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarPartBound *
+	static gpos::cast_func<CDXLScalarPartBound *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

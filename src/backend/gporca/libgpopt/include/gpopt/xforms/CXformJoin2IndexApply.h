@@ -8,6 +8,7 @@
 #define GPOPT_CXformJoin2IndexApply_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformExploration.h"
 #include "gpopt/xforms/CXformUtils.h"
@@ -41,8 +42,9 @@ private:
 		CExpression *nodesToInsertAboveIndexGet,
 		CExpression *endOfNodesToInsertAboveIndexGet, CMDAccessor *md_accessor,
 		CExpressionArray *pdrgpexprConjuncts, CColRefSet *pcrsScalarExpr,
-		CColRefSet *outer_refs, CColRefSet *pcrsReqd, const IMDRelation *pmdrel,
-		const IMDIndex *pmdindex, CXformResult *pxfres);
+		CColRefSet *outer_refs, CColRefSet *pcrsReqd,
+		gpos::pointer<const IMDRelation *> pmdrel,
+		gpos::pointer<const IMDIndex *> pmdindex, CXformResult *pxfres);
 
 	// helper to add IndexApply expression to given xform results container
 	// for homogeneous bitmap indexes

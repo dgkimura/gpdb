@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarCmp.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -73,7 +74,7 @@ CScalarCmp::Pstr() const
 //		Comparison operator metadata id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarCmp::MdIdOp() const
 {
 	return m_mdid_op;
@@ -172,7 +173,7 @@ IMDId *
 CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor, COperator *pop)
 {
 	CScalarCmp *popScalarCmp = dynamic_cast<CScalarCmp *>(pop);
-	const IMDScalarOp *pmdScalarCmpOp =
+	gpos::pointer<const IMDScalarOp *> pmdScalarCmpOp =
 		md_accessor->RetrieveScOp(popScalarCmp->MdIdOp());
 
 	IMDId *pmdidScalarCmpCommute = pmdScalarCmpOp->GetCommuteOpMdid();
@@ -190,7 +191,7 @@ CScalarCmp::Pstr(CMemoryPool *mp, CMDAccessor *md_accessor, IMDId *mdid)
 }
 
 // get commuted scalar comparision operator
-CScalarCmp *
+gpos::owner<CScalarCmp *>
 CScalarCmp::PopCommutedOp(CMemoryPool *mp)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

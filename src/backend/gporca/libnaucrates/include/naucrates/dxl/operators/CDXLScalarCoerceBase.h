@@ -40,7 +40,7 @@ class CDXLScalarCoerceBase : public CDXLScalar
 {
 private:
 	// catalog MDId of the result type
-	IMDId *m_result_type_mdid;
+	gpos::owner<IMDId *> m_result_type_mdid;
 
 	// output type modifier
 	INT m_type_modifier;

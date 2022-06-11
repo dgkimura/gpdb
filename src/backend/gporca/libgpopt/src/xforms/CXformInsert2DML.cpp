@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformInsert2DML.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogicalInsert.h"
@@ -74,14 +75,14 @@ CXformInsert2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	// extract components for alternative
 
-	CTableDescriptor *ptabdesc = popInsert->Ptabdesc();
+	gpos::owner<CTableDescriptor *> ptabdesc = popInsert->Ptabdesc();
 	ptabdesc->AddRef();
 
-	CColRefArray *pdrgpcrSource = popInsert->PdrgpcrSource();
+	gpos::owner<CColRefArray *> pdrgpcrSource = popInsert->PdrgpcrSource();
 	pdrgpcrSource->AddRef();
 
 	// child of insert operator
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
 	pexprChild->AddRef();
 
 	// create logical DML

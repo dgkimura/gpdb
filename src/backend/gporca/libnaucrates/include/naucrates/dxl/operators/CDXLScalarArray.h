@@ -34,10 +34,10 @@ class CDXLScalarArray : public CDXLScalar
 {
 private:
 	// base element type id
-	IMDId *m_elem_type_mdid;
+	gpos::owner<IMDId *> m_elem_type_mdid;
 
 	// array type id
-	IMDId *m_array_type_mdid;
+	gpos::owner<IMDId *> m_array_type_mdid;
 
 	// is it a multidimensional array
 	BOOL m_multi_dimensional_array;
@@ -59,10 +59,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// element type id
-	IMDId *ElementTypeMDid() const;
+	gpos::pointer<IMDId *> ElementTypeMDid() const;
 
 	// array type id
-	IMDId *ArrayTypeMDid() const;
+	gpos::pointer<IMDId *> ArrayTypeMDid() const;
 
 	// is array multi-dimensional
 	BOOL IsMultiDimensional() const;

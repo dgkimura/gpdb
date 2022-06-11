@@ -19,6 +19,7 @@
 #define GPOPT_CConstExprEvaluatorDefault_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/eval/IConstExprEvaluator.h"
 
@@ -48,7 +49,8 @@ public:
 	~CConstExprEvaluatorDefault() override;
 
 	// Evaluate the given expression and return the result as a new expression
-	CExpression *PexprEval(CExpression *pexpr) override;
+	gpos::owner<CExpression *> PexprEval(
+		gpos::pointer<CExpression *> pexpr) override;
 
 	// Returns true iff the evaluator can evaluate constant expressions
 	BOOL FCanEvalExpressions() override;

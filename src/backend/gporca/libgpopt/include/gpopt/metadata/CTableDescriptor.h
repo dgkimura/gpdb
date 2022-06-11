@@ -50,13 +50,13 @@ private:
 	CMemoryPool *m_mp;
 
 	// mdid of the table
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// name of table
 	CName m_name;
 
 	// array of columns
-	CColumnDescriptorArray *m_pdrgpcoldesc;
+	gpos::owner<CColumnDescriptorArray *> m_pdrgpcoldesc;
 
 	// distribution policy
 	IMDRelation::Ereldistrpolicy m_rel_distr_policy;
@@ -65,10 +65,10 @@ private:
 	IMDRelation::Erelstoragetype m_erelstoragetype;
 
 	// distribution columns for hash distribution
-	CColumnDescriptorArray *m_pdrgpcoldescDist;
+	gpos::owner<CColumnDescriptorArray *> m_pdrgpcoldescDist;
 
 	// Opfamily used for hash distribution
-	IMdIdArray *m_distr_opfamilies;
+	gpos::owner<IMdIdArray *> m_distr_opfamilies;
 
 	// if true, we need to consider a hash distributed table as random
 	// there are two possible scenarios:
@@ -78,10 +78,10 @@ private:
 	BOOL m_convert_hash_to_random;
 
 	// indexes of partition columns for partitioned tables
-	ULongPtrArray *m_pdrgpulPart;
+	gpos::owner<ULongPtrArray *> m_pdrgpulPart;
 
 	// key sets
-	CBitSetArray *m_pdrgpbsKeys;
+	gpos::owner<CBitSetArray *> m_pdrgpbsKeys;
 
 	// id of user the table needs to be accessed with
 	ULONG m_execute_as_user_id;
@@ -149,14 +149,14 @@ public:
 	ULONG GetAttributePosition(INT attno) const;
 
 	// column descriptor accessor
-	CColumnDescriptorArray *
+	gpos::pointer<CColumnDescriptorArray *>
 	Pdrgpcoldesc() const
 	{
 		return m_pdrgpcoldesc;
 	}
 
 	// distribution column descriptors accessor
-	const CColumnDescriptorArray *
+	gpos::pointer<const CColumnDescriptorArray *>
 	PdrgpcoldescDist() const
 	{
 		return m_pdrgpcoldescDist;
@@ -218,7 +218,7 @@ public:
 	// helper function for finding the index of a column descriptor in
 	// an array of column descriptors
 	static ULONG UlPos(gpos::pointer<const CColumnDescriptor *>,
-					   const CColumnDescriptorArray *);
+					   gpos::pointer<const CColumnDescriptorArray *>);
 
 	IOstream &OsPrint(IOstream &os) const;
 

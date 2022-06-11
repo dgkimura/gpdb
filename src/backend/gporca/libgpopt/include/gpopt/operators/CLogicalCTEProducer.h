@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalCTEProducer_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogical.h"
@@ -33,10 +34,10 @@ private:
 	ULONG m_id;
 
 	// cte columns
-	CColRefArray *m_pdrgpcr;
+	gpos::owner<CColRefArray *> m_pdrgpcr;
 
 	// output columns, same as cte columns but in CColRefSet
-	CColRefSet *m_pcrsOutput;
+	gpos::owner<CColRefSet *> m_pcrsOutput;
 
 public:
 	CLogicalCTEProducer(const CLogicalCTEProducer &) = delete;
@@ -71,14 +72,14 @@ public:
 	}
 
 	// cte columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	Pdrgpcr() const
 	{
 		return m_pdrgpcr;
 	}
 
 	// cte columns in CColRefSet
-	CColRefSet *
+	gpos::pointer<CColRefSet *>
 	DeriveOutputColumns() const
 	{
 		return m_pcrsOutput;
@@ -98,17 +99,17 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::owner<CColRefSet *> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
 	CKeyCollection *DeriveKeyCollection(
@@ -155,7 +156,7 @@ public:
 	IStatistics *
 	PstatsDerive(CMemoryPool *,	 //mp,
 				 CExpressionHandle &exprhdl,
-				 IStatisticsArray *	 //stats_ctxt
+				 gpos::pointer<IStatisticsArray *>	//stats_ctxt
 	) const override
 	{
 		return PstatsPassThruOuter(exprhdl);
@@ -178,7 +179,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalCTEProducer *
+	static gpos::cast_func<CLogicalCTEProducer *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

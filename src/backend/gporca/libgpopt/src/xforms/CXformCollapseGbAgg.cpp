@@ -13,6 +13,7 @@
 #include "gpopt/xforms/CXformCollapseGbAgg.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CLogicalGbAgg.h"
@@ -141,7 +142,7 @@ CXformCollapseGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	popTopGbAgg->AddRef();
 	pexprTopProjectList->AddRef();
-	CExpression *pexprGbAggNew = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprGbAggNew = GPOS_NEW(mp)
 		CExpression(mp, popTopGbAgg, pexprSelect, pexprTopProjectList);
 
 	pxfres->Add(pexprGbAggNew);

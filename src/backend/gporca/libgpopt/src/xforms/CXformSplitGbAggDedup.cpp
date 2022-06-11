@@ -13,6 +13,7 @@
 #include "gpopt/xforms/CXformSplitGbAggDedup.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefComputed.h"
 #include "gpopt/base/CUtils.h"
@@ -88,7 +89,7 @@ CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	GPOS_ASSERT(nullptr != pexprProjectListLocal &&
 				nullptr != pexprProjectListLocal);
 
-	CColRefArray *colref_array = popAggDedup->Pdrgpcr();
+	gpos::owner<CColRefArray *> colref_array = popAggDedup->Pdrgpcr();
 	colref_array->AddRef();
 	colref_array->AddRef();
 
@@ -99,18 +100,18 @@ CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		pdrgpcrMinimal->AddRef();
 	}
 
-	CColRefArray *pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
+	gpos::owner<CColRefArray *> pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
 	pdrgpcrKeys->AddRef();
 	pdrgpcrKeys->AddRef();
 
-	CExpression *local_expr = GPOS_NEW(mp)
+	gpos::owner<CExpression *> local_expr = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 						mp, colref_array, pdrgpcrMinimal,
 						COperator::EgbaggtypeLocal /*egbaggtype*/, pdrgpcrKeys),
 					pexprRelational, pexprProjectListLocal);
 
-	CExpression *pexprGlobal = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprGlobal = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 			mp, colref_array, pdrgpcrMinimal,

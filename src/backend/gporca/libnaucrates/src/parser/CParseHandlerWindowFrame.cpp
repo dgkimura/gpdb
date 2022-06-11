@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerWindowFrame.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -119,14 +121,15 @@ CParseHandlerWindowFrame::EndElement(const XMLCh *const,  // element_uri,
 	CParseHandlerScalarOp *trailing_val_parse_handler_base =
 		dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);
 	GPOS_ASSERT(nullptr != trailing_val_parse_handler_base);
-	CDXLNode *dxlnode_trailing =
+	gpos::owner<CDXLNode *> dxlnode_trailing =
 		trailing_val_parse_handler_base->CreateDXLNode();
 	dxlnode_trailing->AddRef();
 
 	CParseHandlerScalarOp *leading_val_parse_handler_base =
 		dynamic_cast<CParseHandlerScalarOp *>((*this)[1]);
 	GPOS_ASSERT(nullptr != leading_val_parse_handler_base);
-	CDXLNode *dxlnode_leading = leading_val_parse_handler_base->CreateDXLNode();
+	gpos::owner<CDXLNode *> dxlnode_leading =
+		leading_val_parse_handler_base->CreateDXLNode();
 	dxlnode_leading->AddRef();
 
 	m_window_frame = GPOS_NEW(m_mp)

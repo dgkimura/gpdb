@@ -13,6 +13,7 @@
 
 #include "naucrates/md/CMDScalarOpGPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -92,7 +93,7 @@ CMDScalarOpGPDB::~CMDScalarOpGPDB()
 //		Operator id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScalarOpGPDB::MDId() const
 {
 	return m_mdid;
@@ -120,7 +121,7 @@ CMDScalarOpGPDB::Mdname() const
 //		Type id of left operand
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScalarOpGPDB::GetLeftMdid() const
 {
 	return m_mdid_type_left;
@@ -134,7 +135,7 @@ CMDScalarOpGPDB::GetLeftMdid() const
 //		Type id of right operand
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScalarOpGPDB::GetRightMdid() const
 {
 	return m_mdid_type_right;
@@ -148,7 +149,7 @@ CMDScalarOpGPDB::GetRightMdid() const
 //		Type id of result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScalarOpGPDB::GetResultTypeMdid() const
 {
 	return m_mdid_type_result;
@@ -162,7 +163,7 @@ CMDScalarOpGPDB::GetResultTypeMdid() const
 //		Id of function which implements the operator
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScalarOpGPDB::FuncMdId() const
 {
 	return m_func_mdid;
@@ -176,7 +177,7 @@ CMDScalarOpGPDB::FuncMdId() const
 //		Id of commute operator
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScalarOpGPDB::GetCommuteOpMdid() const
 {
 	return m_mdid_commute_opr;
@@ -190,7 +191,7 @@ CMDScalarOpGPDB::GetCommuteOpMdid() const
 //		Id of inverse operator
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScalarOpGPDB::GetInverseOpMdid() const
 {
 	return m_mdid_inverse_opr;
@@ -335,7 +336,7 @@ CMDScalarOpGPDB::OpfamiliesCount() const
 //		Operator family at given position
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDScalarOpGPDB::OpfamilyMdidAt(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_mdid_opfamilies_array->Size());
@@ -344,7 +345,7 @@ CMDScalarOpGPDB::OpfamilyMdidAt(ULONG pos) const
 }
 
 // compatible hash opfamily
-IMDId *
+gpos::pointer<IMDId *>
 CMDScalarOpGPDB::HashOpfamilyMdid() const
 {
 	if (GPOS_FTRACE(EopttraceUseLegacyOpfamilies))

@@ -16,6 +16,7 @@
 #define GPOPT_CScalarMinMax_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
@@ -45,7 +46,7 @@ public:
 
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 	// min/max type
 	EScalarMinMaxType m_esmmt;
@@ -77,7 +78,7 @@ public:
 	}
 
 	// return type
-	IMDId *
+	gpos::pointer<IMDId *>
 	MdidType() const override
 	{
 		return m_mdid_type;
@@ -105,10 +106,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -125,7 +127,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CScalarMinMax *
+	static gpos::cast_func<CScalarMinMax *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

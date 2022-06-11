@@ -11,6 +11,8 @@
 #ifndef GPNAUCRATES_CProjectStatsProcessor_H
 #define GPNAUCRATES_CProjectStatsProcessor_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/optimizer/COptimizerConfig.h"
 #include "naucrates/statistics/CStatistics.h"
 
@@ -20,10 +22,9 @@ class CProjectStatsProcessor
 {
 public:
 	// project
-	static CStatistics *CalcProjStats(CMemoryPool *mp,
-									  const CStatistics *input_stats,
-									  ULongPtrArray *projection_colids,
-									  UlongToIDatumMap *datum_map);
+	static CStatistics *CalcProjStats(
+		CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
+		ULongPtrArray *projection_colids, UlongToIDatumMap *datum_map);
 };
 }  // namespace gpnaucrates
 

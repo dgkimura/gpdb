@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalAssert.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CRewindabilitySpec.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -109,9 +110,10 @@ CPhysicalAssert::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalAssert::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CDistributionSpec *pdsRequired, ULONG child_index,
+							 gpos::pointer<CDistributionSpec *> pdsRequired,
+							 ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG ulOptReq) const
 {
@@ -273,7 +275,7 @@ CPhysicalAssert::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalAssert::EpetOrder(CExpressionHandle &,	 // exprhdl
-						   const CEnfdOrder *
+						   gpos::pointer<const CEnfdOrder *>
 #ifdef GPOS_DEBUG
 							   peo
 #endif	// GPOS_DEBUG
@@ -296,8 +298,9 @@ CPhysicalAssert::EpetOrder(CExpressionHandle &,	 // exprhdl
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalAssert::EpetRewindability(CExpressionHandle &exprhdl,
-								   const CEnfdRewindability *per) const
+CPhysicalAssert::EpetRewindability(
+	CExpressionHandle &exprhdl,
+	gpos::pointer<const CEnfdRewindability *> per) const
 {
 	// get rewindability delivered by the assert node
 	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();

@@ -12,6 +12,7 @@
 
 #include "naucrates/md/CMDTypeOidGPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/base/CDatumOidGPDB.h"
@@ -114,7 +115,7 @@ CMDTypeOidGPDB::~CMDTypeOidGPDB()
 //		Factory function for creating OID datums
 //
 //---------------------------------------------------------------------------
-IDatumOid *
+gpos::owner<IDatumOid *>
 CMDTypeOidGPDB::CreateOidDatum(CMemoryPool *mp, OID oValue, BOOL is_null) const
 {
 	return GPOS_NEW(mp) CDatumOidGPDB(m_mdid->Sysid(), oValue, is_null);
@@ -128,13 +129,13 @@ CMDTypeOidGPDB::CreateOidDatum(CMemoryPool *mp, OID oValue, BOOL is_null) const
 //		Returns the metadata id of this type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDTypeOidGPDB::MDId() const
 {
 	return m_mdid;
 }
 
-IMDId *
+gpos::pointer<IMDId *>
 CMDTypeOidGPDB::GetDistrOpfamilyMdid() const
 {
 	if (GPOS_FTRACE(EopttraceUseLegacyOpfamilies))
@@ -169,7 +170,7 @@ CMDTypeOidGPDB::Mdname() const
 //		Return mdid of specified comparison operator type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDTypeOidGPDB::GetMdidForCmpType(ECmpType cmp_type) const
 {
 	switch (cmp_type)
@@ -200,7 +201,7 @@ CMDTypeOidGPDB::GetMdidForCmpType(ECmpType cmp_type) const
 //		Return mdid of specified aggregate type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDTypeOidGPDB::GetMdidForAggType(EAggType agg_type) const
 {
 	switch (agg_type)
@@ -243,8 +244,9 @@ CMDTypeOidGPDB::Serialize(CXMLSerializer *xml_serializer) const
 //		Transformation method for generating oid datum from CDXLScalarConstValue
 //
 //---------------------------------------------------------------------------
-IDatum *
-CMDTypeOidGPDB::GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) const
+gpos::owner<IDatum *>
+CMDTypeOidGPDB::GetDatumForDXLConstVal(
+	gpos::pointer<const CDXLScalarConstValue *> dxl_op) const
 {
 	CDXLDatumOid *dxl_datum =
 		CDXLDatumOid::Cast(const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
@@ -261,9 +263,9 @@ CMDTypeOidGPDB::GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) const
 //		Construct an oid datum from a DXL datum
 //
 //---------------------------------------------------------------------------
-IDatum *
-CMDTypeOidGPDB::GetDatumForDXLDatum(CMemoryPool *mp,
-									const CDXLDatum *dxl_datum) const
+gpos::owner<IDatum *>
+CMDTypeOidGPDB::GetDatumForDXLDatum(
+	CMemoryPool *mp, gpos::pointer<const CDXLDatum *> dxl_datum) const
 {
 	CDXLDatumOid *dxl_datumOid =
 		CDXLDatumOid::Cast(const_cast<CDXLDatum *>(dxl_datum));
@@ -281,7 +283,7 @@ CMDTypeOidGPDB::GetDatumForDXLDatum(CMemoryPool *mp,
 // 		Generate dxl datum
 //
 //---------------------------------------------------------------------------
-CDXLDatum *
+gpos::owner<CDXLDatum *>
 CMDTypeOidGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 {
 	m_mdid->AddRef();
@@ -299,13 +301,13 @@ CMDTypeOidGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 // 		Generate a dxl scalar constant from a datum
 //
 //---------------------------------------------------------------------------
-CDXLScalarConstValue *
+gpos::owner<CDXLScalarConstValue *>
 CMDTypeOidGPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
 {
 	CDatumOidGPDB *datum_oidGPDB = dynamic_cast<CDatumOidGPDB *>(datum);
 
 	m_mdid->AddRef();
-	CDXLDatumOid *dxl_datum = GPOS_NEW(mp) CDXLDatumOid(
+	gpos::owner<CDXLDatumOid *> dxl_datum = GPOS_NEW(mp) CDXLDatumOid(
 		mp, m_mdid, datum_oidGPDB->IsNull(), datum_oidGPDB->OidValue());
 
 	return GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum);
@@ -319,7 +321,7 @@ CMDTypeOidGPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
 // 		Generate dxl datum
 //
 //---------------------------------------------------------------------------
-CDXLDatum *
+gpos::owner<CDXLDatum *>
 CMDTypeOidGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
 	m_mdid->AddRef();

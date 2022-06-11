@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformIntersectAll2LeftSemiJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefComputed.h"
 #include "gpopt/base/CUtils.h"
@@ -86,7 +87,8 @@ CXformIntersectAll2LeftSemiJoin::Transform(CXformContext *pxfctxt,
 	CExpression *pexprRightWindow = CXformUtils::PexprWindowWithRowNumber(
 		mp, pexprRightChild, (*pdrgpdrgpcrInput)[1]);
 
-	CColRef2dArray *pdrgpdrgpcrInputNew = GPOS_NEW(mp) CColRef2dArray(mp);
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInputNew =
+		GPOS_NEW(mp) CColRef2dArray(mp);
 	CColRefArray *pdrgpcrLeftNew =
 		CUtils::PdrgpcrExactCopy(mp, (*pdrgpdrgpcrInput)[0]);
 	pdrgpcrLeftNew->Append(CXformUtils::PcrProjectElement(
@@ -104,7 +106,7 @@ CXformIntersectAll2LeftSemiJoin::Transform(CXformContext *pxfctxt,
 		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInputNew);
 
 	// assemble the new logical operator
-	CExpression *pexprLSJ = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprLSJ = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalLeftSemiJoin(mp), pexprLeftWindow,
 					pexprRightWindow, pexprScCond);
 

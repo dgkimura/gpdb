@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarWindowFunc.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -55,7 +56,8 @@ CScalarWindowFunc::CScalarWindowFunc(CMemoryPool *mp, IMDId *mdid_func,
 	m_fAgg = md_accessor->FAggWindowFunc(m_func_mdid);
 	if (!m_fAgg)
 	{
-		const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+		gpos::pointer<const IMDFunction *> pmdfunc =
+			md_accessor->RetrieveFunc(m_func_mdid);
 		m_efs = pmdfunc->GetFuncStability();
 	}
 	else

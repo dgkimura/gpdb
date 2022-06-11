@@ -47,22 +47,22 @@ class COptimizerConfig : public CRefCount
 {
 private:
 	// plan enumeration configuration
-	CEnumeratorConfig *m_enumerator_cfg;
+	gpos::owner<CEnumeratorConfig *> m_enumerator_cfg;
 
 	// statistics configuration
-	CStatisticsConfig *m_stats_conf;
+	gpos::owner<CStatisticsConfig *> m_stats_conf;
 
 	// CTE configuration
-	CCTEConfig *m_cte_conf;
+	gpos::owner<CCTEConfig *> m_cte_conf;
 
 	// cost model configuration
-	ICostModel *m_cost_model;
+	gpos::owner<ICostModel *> m_cost_model;
 
 	// hint configuration
-	CHint *m_hint;
+	gpos::owner<CHint *> m_hint;
 
 	// default window oids
-	CWindowOids *m_window_oids;
+	gpos::owner<CWindowOids *> m_window_oids;
 
 public:
 	// ctor
@@ -117,10 +117,11 @@ public:
 	}
 
 	// generate default optimizer configurations
-	static COptimizerConfig *PoconfDefault(CMemoryPool *mp);
+	static gpos::owner<COptimizerConfig *> PoconfDefault(CMemoryPool *mp);
 
 	// generate default optimizer configurations with the given cost model
-	static COptimizerConfig *PoconfDefault(CMemoryPool *mp, ICostModel *pcm);
+	static gpos::owner<COptimizerConfig *> PoconfDefault(CMemoryPool *mp,
+														 ICostModel *pcm);
 
 	void Serialize(CMemoryPool *mp, CXMLSerializer *xml_serializer,
 				   CBitSet *pbsTrace) const;

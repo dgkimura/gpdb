@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CEnumSet.h"
 #include "gpos/common/CEnumSetIter.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/test/CUnittest.h"
 #include "gpos/types.h"
@@ -55,7 +56,7 @@ CEnumSetTest::EresUnittest_Basics()
 	typedef CEnumSet<eTest, eTestSentinel> CETestSet;
 	typedef CEnumSetIter<eTest, eTestSentinel> CETestIter;
 
-	CETestSet *enum_set = GPOS_NEW(mp) CETestSet(mp);
+	gpos::owner<CETestSet *> enum_set = GPOS_NEW(mp) CETestSet(mp);
 
 	(void) enum_set->ExchangeSet(eTestOne);
 	(void) enum_set->ExchangeSet(eTestTwo);

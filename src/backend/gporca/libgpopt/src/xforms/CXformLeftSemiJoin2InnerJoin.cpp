@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformLeftSemiJoin2InnerJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/base/CColRefSetIter.h"
@@ -116,7 +117,7 @@ CXformLeftSemiJoin2InnerJoin::Transform(CXformContext *pxfctxt,
 	// that come from join's inner child
 	CColRefSet *pcrsOuterOutput = pexprOuter->DeriveOutputColumns();
 	CColRefSet *pcrsUsed = pexprScalar->DeriveUsedColumns();
-	CColRefSet *pcrsGb = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsGb = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGb->Include(pcrsUsed);
 	pcrsGb->Difference(pcrsOuterOutput);
 	GPOS_ASSERT(0 < pcrsGb->Size());
@@ -128,7 +129,7 @@ CXformLeftSemiJoin2InnerJoin::Transform(CXformContext *pxfctxt,
 		// grouping columns do not cover a key on the inner side,
 		// we need to create a group by on inner side
 		CColRefArray *colref_array = pcrsGb->Pdrgpcr(mp);
-		CExpression *pexprGb = GPOS_NEW(mp) CExpression(
+		gpos::owner<CExpression *> pexprGb = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CLogicalGbAgg(
 				mp, colref_array, COperator::EgbaggtypeGlobal /*egbaggtype*/),

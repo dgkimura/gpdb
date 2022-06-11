@@ -12,6 +12,7 @@
 #define GPOPT_CScalarIsDistinctFrom_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalarCmp.h"
 
@@ -65,10 +66,10 @@ public:
 	BOOL Matches(COperator *pop) const override;
 
 	// conversion function
-	static CScalarIsDistinctFrom *PopConvert(COperator *pop);
+	static gpos::cast_func<CScalarIsDistinctFrom *> PopConvert(COperator *pop);
 
 	// get commuted scalar IDF operator
-	CScalarCmp *PopCommutedOp(CMemoryPool *mp) override;
+	gpos::owner<CScalarCmp *> PopCommutedOp(CMemoryPool *mp) override;
 
 };	// class CScalarIsDistinctFrom
 

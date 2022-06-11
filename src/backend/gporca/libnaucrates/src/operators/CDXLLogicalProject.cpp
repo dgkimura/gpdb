@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalProject.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -99,8 +101,9 @@ CDXLLogicalProject::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalProject::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+CDXLLogicalProject::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

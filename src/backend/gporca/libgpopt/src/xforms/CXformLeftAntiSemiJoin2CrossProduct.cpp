@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformLeftAntiSemiJoin2CrossProduct.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalInnerJoin.h"
 #include "gpopt/operators/CLogicalLeftAntiSemiJoin.h"
@@ -118,16 +119,17 @@ CXformLeftAntiSemiJoin2CrossProduct::Transform(CXformContext *pxfctxt,
 	// create a (limit 1) on top of inner child
 	CExpression *pexprLimitOffset = CUtils::PexprScalarConstInt8(mp, 0 /*val*/);
 	CExpression *pexprLimitCount = CUtils::PexprScalarConstInt8(mp, 1 /*val*/);
-	COrderSpec *pos = GPOS_NEW(mp) COrderSpec(mp);
-	CLogicalLimit *popLimit = GPOS_NEW(mp)
+	gpos::owner<COrderSpec *> pos = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::owner<CLogicalLimit *> popLimit = GPOS_NEW(mp)
 		CLogicalLimit(mp, pos, true /*fGlobal*/, true /*fHasCount*/,
 					  false /*fNonRemovableLimit*/);
-	CExpression *pexprLimit = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprLimit = GPOS_NEW(mp) CExpression(
 		mp, popLimit, pexprInner, pexprLimitOffset, pexprLimitCount);
 
 	// create cross product
-	CExpression *pexprJoin = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
-		mp, pexprOuter, pexprLimit, pexprNegatedScalar);
+	gpos::owner<CExpression *> pexprJoin =
+		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprOuter, pexprLimit,
+													pexprNegatedScalar);
 	CExpression *pexprNormalized = CNormalizer::PexprNormalize(mp, pexprJoin);
 	pexprJoin->Release();
 

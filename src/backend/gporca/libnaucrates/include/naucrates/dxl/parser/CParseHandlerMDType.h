@@ -47,13 +47,13 @@ private:
 	};
 
 	// id and version of the type
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// default distribution (hash) opfamily
-	IMDId *m_distr_opfamily;
+	gpos::owner<IMDId *> m_distr_opfamily;
 
 	// default legacy distribution (hash) opfamily
-	IMDId *m_legacy_distr_opfamily;
+	gpos::owner<IMDId *> m_legacy_distr_opfamily;
 
 	// type name
 	CMDName *m_mdname;
@@ -71,40 +71,40 @@ private:
 	BOOL m_type_passed_by_value;
 
 	// id of equality operator for type
-	IMDId *m_mdid_eq_op;
+	gpos::owner<IMDId *> m_mdid_eq_op;
 
 	// id of inequality operator for type
-	IMDId *m_mdid_neq_op;
+	gpos::owner<IMDId *> m_mdid_neq_op;
 
 	// id of less than operator for type
-	IMDId *m_mdid_lt_op;
+	gpos::owner<IMDId *> m_mdid_lt_op;
 
 	// id of less than equals operator for type
-	IMDId *m_mdid_lteq_op;
+	gpos::owner<IMDId *> m_mdid_lteq_op;
 
 	// id of greater than operator for type
-	IMDId *m_mdid_gt_op;
+	gpos::owner<IMDId *> m_mdid_gt_op;
 
 	// id of greater than equals operator for type
-	IMDId *m_mdid_gteq_op;
+	gpos::owner<IMDId *> m_mdid_gteq_op;
 
 	// id of comparison operator for type used in btree lookups
-	IMDId *m_mdid_cmp_op;
+	gpos::owner<IMDId *> m_mdid_cmp_op;
 
 	// id of min aggregate
-	IMDId *m_mdid_min_op;
+	gpos::owner<IMDId *> m_mdid_min_op;
 
 	// id of max aggregate
-	IMDId *m_mdid_max_op;
+	gpos::owner<IMDId *> m_mdid_max_op;
 
 	// id of avg aggregate
-	IMDId *m_mdid_avg_op;
+	gpos::owner<IMDId *> m_mdid_avg_op;
 
 	// id of sum aggregate
-	IMDId *m_mdid_sum_op;
+	gpos::owner<IMDId *> m_mdid_sum_op;
 
 	// id of count aggregate
-	IMDId *m_mdid_count_op;
+	gpos::owner<IMDId *> m_mdid_count_op;
 
 	// is type hashable
 	BOOL m_is_hashable;
@@ -119,10 +119,10 @@ private:
 	BOOL m_is_text_related;
 
 	// id of the relation corresponding to a composite type
-	IMDId *m_mdid_base_rel;
+	gpos::owner<IMDId *> m_mdid_base_rel;
 
 	// id of array type
-	IMDId *m_mdid_array_type;
+	gpos::owner<IMDId *> m_mdid_array_type;
 
 	// handles a SAX start element event
 	void StartElement(
@@ -142,7 +142,7 @@ private:
 	// parse the value for the given mdid variable name from the attributes
 	void ParseMdid(const XMLCh *element_local_name, const Attributes &attrs);
 
-	static BOOL IsBuiltInType(const IMDId *mdid);
+	static BOOL IsBuiltInType(gpos::pointer<const IMDId *> mdid);
 
 public:
 	CParseHandlerMDType(const CParseHandlerMDType &) = delete;

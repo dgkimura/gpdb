@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarBitmapIndexProbe.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLScalarBitmapIndexProbe.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFilter.h"
@@ -119,11 +121,11 @@ CParseHandlerScalarBitmapIndexProbe::EndElement(
 	CParseHandlerIndexDescr *index_descr_parse_handler =
 		dynamic_cast<CParseHandlerIndexDescr *>((*this)[1]);
 
-	CDXLIndexDescr *dxl_index_descr =
+	gpos::owner<CDXLIndexDescr *> dxl_index_descr =
 		index_descr_parse_handler->GetDXLIndexDescr();
 	dxl_index_descr->AddRef();
 
-	CDXLScalar *dxl_op =
+	gpos::owner<CDXLScalar *> dxl_op =
 		GPOS_NEW(m_mp) CDXLScalarBitmapIndexProbe(m_mp, dxl_index_descr);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 

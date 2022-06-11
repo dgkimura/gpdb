@@ -35,10 +35,10 @@ class CDXLScalarOpExpr : public CDXLScalar
 {
 private:
 	// operator number in the catalog
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// return type (or invalid if type can be infered from the metadata)
-	IMDId *m_return_type_mdid;
+	gpos::owner<IMDId *> m_return_type_mdid;
 
 	// operator name
 	const CWStringConst *m_str_opname;
@@ -62,10 +62,10 @@ public:
 	const CWStringConst *GetScalarOpNameStr() const;
 
 	// operator id
-	IMDId *MDId() const;
+	gpos::pointer<IMDId *> MDId() const;
 
 	// operator return type
-	IMDId *GetReturnTypeMdId() const;
+	gpos::pointer<IMDId *> GetReturnTypeMdId() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *,

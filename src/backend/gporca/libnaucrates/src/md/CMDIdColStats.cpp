@@ -12,6 +12,8 @@
 
 #include "naucrates/md/CMDIdColStats.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpos;
@@ -88,7 +90,7 @@ CMDIdColStats::GetBuffer() const
 //		Returns the base relation id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDIdColStats::GetRelMdId() const
 {
 	return m_rel_mdid;
@@ -117,14 +119,15 @@ CMDIdColStats::Position() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdColStats::Equals(const IMDId *mdid) const
+CMDIdColStats::Equals(gpos::pointer<const IMDId *> mdid) const
 {
 	if (nullptr == mdid || EmdidColStats != mdid->MdidType())
 	{
 		return false;
 	}
 
-	const CMDIdColStats *mdid_col_stats = CMDIdColStats::CastMdid(mdid);
+	gpos::pointer<const CMDIdColStats *> mdid_col_stats =
+		CMDIdColStats::CastMdid(mdid);
 
 	return m_rel_mdid->Equals(mdid_col_stats->GetRelMdId()) &&
 		   m_attr_pos == mdid_col_stats->Position();

@@ -51,10 +51,10 @@ private:
 	EdxlSetOpType m_set_operation_dxl_type;
 
 	// list of output column descriptors
-	CDXLColDescrArray *m_col_descr_array;
+	gpos::owner<CDXLColDescrArray *> m_col_descr_array;
 
 	// array of input colid arrays
-	ULongPtr2dArray *m_input_colids_arrays;
+	gpos::owner<ULongPtr2dArray *> m_input_colids_arrays;
 
 	// do the columns need to be casted accross inputs
 	BOOL m_cast_across_input_req;

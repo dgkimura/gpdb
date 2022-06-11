@@ -18,6 +18,7 @@
 #include "gpopt/operators/CScalarCoerceBase.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 using namespace gpmd;
@@ -67,7 +68,7 @@ CScalarCoerceBase::~CScalarCoerceBase()
 //		Return type of the scalar expression
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarCoerceBase::MdidType() const
 {
 	return m_result_type_mdid;

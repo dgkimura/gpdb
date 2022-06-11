@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerAppend.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFilter.h"
@@ -179,7 +181,7 @@ CParseHandlerAppend::EndElement(const XMLCh *const,	 // element_uri,
 	{
 		CParseHandlerTableDescr *table_descr_parse_handler =
 			dynamic_cast<CParseHandlerTableDescr *>((*this)[child_index++]);
-		CDXLTableDescr *table_descr =
+		gpos::owner<CDXLTableDescr *> table_descr =
 			table_descr_parse_handler->GetDXLTableDescr();
 		table_descr->AddRef();
 		m_dxl_op->SetDXLTableDesc(table_descr);

@@ -45,16 +45,16 @@ private:
 	CMemoryPool *m_mp;
 
 	// check constraint mdid
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// check constraint name
 	CMDName *m_mdname;
 
 	// relation mdid
-	IMDId *m_rel_mdid;
+	gpos::owner<IMDId *> m_rel_mdid;
 
 	// the DXL representation of the check constraint
-	CDXLNode *m_dxl_node;
+	gpos::owner<CDXLNode *> m_dxl_node;
 
 	// DXL for object
 	const CWStringDynamic *m_dxl_str;

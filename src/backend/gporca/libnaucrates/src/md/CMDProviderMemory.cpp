@@ -14,6 +14,7 @@
 
 #include "gpos/common/CAutoP.h"
 #include "gpos/common/CAutoRef.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/memory/CMemoryPool.h"
@@ -95,7 +96,7 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 		GPOS_CHECK_ABORT;
 
 		IMDCacheObject *mdcache_obj = (*mdcache_obj_array)[ul];
-		IMDId *mdid_key = mdcache_obj->MDId();
+		gpos::owner<IMDId *> mdid_key = mdcache_obj->MDId();
 		mdid_key->AddRef();
 
 		CAutoP<CWStringDynamic> str;

@@ -15,6 +15,7 @@
 #include "gpos/common/CAutoP.h"
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CHashMapIter.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "naucrates/traceflags/traceflags.h"
@@ -102,7 +103,7 @@ CStatisticsConfig::CollectMissingStatsColumns(IMdIdArray *pdrgmdid)
 	MdidHashSetIter hsiter(m_phsmdidcolinfo);
 	while (hsiter.Advance())
 	{
-		CMDIdColStats *mdid_col_stats =
+		gpos::owner<CMDIdColStats *> mdid_col_stats =
 			CMDIdColStats::CastMdid(const_cast<IMDId *>(hsiter.Get()));
 		mdid_col_stats->AddRef();
 		pdrgmdid->Append(mdid_col_stats);

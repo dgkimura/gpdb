@@ -13,6 +13,7 @@
 #include "gpopt/xforms/CXformUnion2UnionAll.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CLogicalUnion.h"
@@ -61,12 +62,13 @@ CXformUnion2UnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CColRefArray *pdrgpcrOutput = popUnion->PdrgpcrOutput();
 	CColRef2dArray *pdrgpdrgpcrInput = popUnion->PdrgpdrgpcrInput();
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG arity = pexpr->Arity();
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprChild = (*pexpr)[ul];
+		gpos::owner<CExpression *> pexprChild = (*pexpr)[ul];
 		pexprChild->AddRef();
 		pdrgpexpr->Append(pexprChild);
 	}
@@ -75,17 +77,17 @@ CXformUnion2UnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pdrgpdrgpcrInput->AddRef();
 
 	// assemble new logical operator
-	CExpression *pexprUnionAll = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprUnionAll = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalUnionAll(mp, pdrgpcrOutput, pdrgpdrgpcrInput),
 		pdrgpexpr);
 
 	pdrgpcrOutput->AddRef();
 
-	CExpression *pexprProjList =
+	gpos::owner<CExpression *> pexprProjList =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp),
 								 GPOS_NEW(mp) CExpressionArray(mp));
 
-	CExpression *pexprAgg = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAgg = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAgg(mp, pdrgpcrOutput,
 								   COperator::EgbaggtypeGlobal /*egbaggtype*/),

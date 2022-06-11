@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalIntersect.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/CUtils.h"
@@ -96,7 +97,7 @@ CLogicalIntersect::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalIntersect::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											  UlongToColRefMap *colref_mapping,
 											  BOOL must_exist)
@@ -121,7 +122,7 @@ CLogicalIntersect::PopCopyWithRemappedColumns(CMemoryPool *mp,
 CXformSet *
 CLogicalIntersect::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfIntersect2Join);
 	return xform_set;
 }
@@ -144,20 +145,23 @@ CLogicalIntersect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// intersect is transformed into a group by over an intersect all
 	// we follow the same route to compute statistics
 
-	CColRefSetArray *output_colrefsets = GPOS_NEW(mp) CColRefSetArray(mp);
+	gpos::owner<CColRefSetArray *> output_colrefsets =
+		GPOS_NEW(mp) CColRefSetArray(mp);
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs =
+		gpos::owner<CColRefSet *> pcrs =
 			GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul]);
 		output_colrefsets->Append(pcrs);
 	}
 
-	IStatistics *pstatsIntersectAll = CLogicalIntersectAll::PstatsDerive(
-		mp, exprhdl, m_pdrgpdrgpcrInput, output_colrefsets);
+	gpos::owner<IStatistics *> pstatsIntersectAll =
+		CLogicalIntersectAll::PstatsDerive(mp, exprhdl, m_pdrgpdrgpcrInput,
+										   output_colrefsets);
 
 	// computed columns
-	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpulComputedCols =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 
 	IStatistics *stats = CLogicalGbAgg::PstatsDerive(
 		mp, pstatsIntersectAll,

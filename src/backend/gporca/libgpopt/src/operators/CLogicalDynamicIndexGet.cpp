@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CAutoP.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -53,10 +54,10 @@ CLogicalDynamicIndexGet::CLogicalDynamicIndexGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalDynamicIndexGet::CLogicalDynamicIndexGet(
-	CMemoryPool *mp, const IMDIndex *pmdindex, CTableDescriptor *ptabdesc,
-	ULONG ulOriginOpId, const CName *pnameAlias, ULONG part_idx_id,
-	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
-	IMdIdArray *partition_mdids)
+	CMemoryPool *mp, gpos::pointer<const IMDIndex *> pmdindex,
+	CTableDescriptor *ptabdesc, ULONG ulOriginOpId, const CName *pnameAlias,
+	ULONG part_idx_id, CColRefArray *pdrgpcrOutput,
+	CColRef2dArray *pdrgpdrgpcrPart, IMdIdArray *partition_mdids)
 	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, part_idx_id,
 							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
 	  m_pindexdesc(nullptr),
@@ -140,12 +141,13 @@ CLogicalDynamicIndexGet::DeriveOuterReferences(CMemoryPool *mp,
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalDynamicIndexGet::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(m_pindexdesc->MDId());
+	gpos::pointer<const IMDIndex *> pmdindex =
+		md_accessor->RetrieveIndex(m_pindexdesc->MDId());
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameAlias);
 
 	CColRefArray *pdrgpcrOutput = nullptr;
@@ -196,7 +198,7 @@ CLogicalDynamicIndexGet::FInputOrderSensitive() const
 CXformSet *
 CLogicalDynamicIndexGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfDynamicIndexGet2DynamicIndexScan);
 	return xform_set;
 }

@@ -13,6 +13,7 @@
 #define GPOPT_CScalarOp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
@@ -35,10 +36,10 @@ class CScalarOp : public CScalar
 {
 private:
 	// metadata id in the catalog
-	IMDId *m_mdid_op;
+	gpos::owner<IMDId *> m_mdid_op;
 
 	// return type id or NULL if it can be inferred from the metadata
-	IMDId *m_return_type_mdid;
+	gpos::owner<IMDId *> m_return_type_mdid;
 
 	// scalar operator name
 	const CWStringConst *m_pstrOp;
@@ -84,10 +85,10 @@ public:
 	}
 
 	// accessor to the return type field
-	IMDId *GetReturnTypeMdId() const;
+	gpos::pointer<IMDId *> GetReturnTypeMdId() const;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::pointer<IMDId *> MdidType() const override;
 
 	// operator specific hash function
 	ULONG HashValue() const override;
@@ -100,16 +101,17 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
 
 	// conversion function
-	static CScalarOp *
+	static gpos::cast_func<CScalarOp *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -119,7 +121,7 @@ public:
 	}
 
 	// helper function
-	static BOOL FCommutative(const IMDId *pcmdidOtherOp);
+	static BOOL FCommutative(gpos::pointer<const IMDId *> pcmdidOtherOp);
 
 	// boolean expression evaluation
 	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
@@ -128,7 +130,7 @@ public:
 	const CWStringConst *Pstr() const;
 
 	// metadata id
-	IMDId *MdIdOp() const;
+	gpos::pointer<IMDId *> MdIdOp() const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

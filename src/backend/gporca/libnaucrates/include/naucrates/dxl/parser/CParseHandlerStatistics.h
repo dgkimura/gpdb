@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerStatistics_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 #include "naucrates/md/CDXLStatsDerivedRelation.h"
@@ -37,7 +38,7 @@ class CParseHandlerStatistics : public CParseHandlerBase
 {
 private:
 	// list of derived table statistics
-	CDXLStatsDerivedRelationArray *m_dxl_stats_derived_rel_array;
+	gpos::owner<CDXLStatsDerivedRelationArray *> m_dxl_stats_derived_rel_array;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +68,8 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// return the list of statistics objects
-	CDXLStatsDerivedRelationArray *GetStatsDerivedRelDXLArray() const;
+	gpos::pointer<CDXLStatsDerivedRelationArray *> GetStatsDerivedRelDXLArray()
+		const;
 };
 }  // namespace gpdxl
 

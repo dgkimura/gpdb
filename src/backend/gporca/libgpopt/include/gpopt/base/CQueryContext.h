@@ -53,19 +53,19 @@ class CQueryContext : public DbgPrintMixin<CQueryContext>
 {
 private:
 	// required plan properties in optimizer's produced plan
-	CReqdPropPlan *m_prpp;
+	gpos::owner<CReqdPropPlan *> m_prpp;
 
 	// required array of output columns
-	CColRefArray *m_pdrgpcr;
+	gpos::owner<CColRefArray *> m_pdrgpcr;
 
 	// required system columns, collected from of output columns
-	CColRefArray *m_pdrgpcrSystemCols;
+	gpos::owner<CColRefArray *> m_pdrgpcrSystemCols;
 
 	// array of output column names
-	CMDNameArray *m_pdrgpmdname;
+	gpos::owner<CMDNameArray *> m_pdrgpmdname;
 
 	// logical expression tree to be optimized
-	CExpression *m_pexpr;
+	gpos::owner<CExpression *> m_pexpr;
 
 	// should statistics derivation take place
 	BOOL m_fDeriveStats;
@@ -122,7 +122,7 @@ public:
 	}
 
 	// return the array of output column names
-	CMDNameArray *
+	gpos::pointer<CMDNameArray *>
 	Pdrgpmdname() const
 	{
 		return m_pdrgpmdname;

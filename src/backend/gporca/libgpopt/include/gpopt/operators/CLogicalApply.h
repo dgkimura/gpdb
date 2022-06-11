@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalApply_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogical.h"
 #include "naucrates/statistics/CStatistics.h"
@@ -32,7 +33,7 @@ class CLogicalApply : public CLogical
 private:
 protected:
 	// columns used from Apply's inner child
-	CColRefArray *m_pdrgpcrInner;
+	gpos::owner<CColRefArray *> m_pdrgpcrInner;
 
 	// origin subquery id
 	EOperatorId m_eopidOriginSubq;
@@ -61,7 +62,7 @@ public:
 	}
 
 	// inner column references accessor
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgPcrInner() const
 	{
 		return m_pdrgpcrInner;
@@ -69,10 +70,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -108,7 +110,7 @@ public:
 	// derive statistics
 	IStatistics *
 	PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 IStatisticsArray *	 // stats_ctxt
+				 gpos::pointer<IStatisticsArray *>	// stats_ctxt
 	) const override
 	{
 		// we should use stats from the corresponding Join tree if decorrelation succeeds
@@ -172,7 +174,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CLogicalApply *
+	static gpos::cast_func<CLogicalApply *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

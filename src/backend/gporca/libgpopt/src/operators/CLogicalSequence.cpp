@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalSequence.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CExpression.h"
@@ -58,7 +59,7 @@ CLogicalSequence::Matches(COperator *pop) const
 CXformSet *
 CLogicalSequence::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementSequence);
 	return xform_set;
 }
@@ -72,14 +73,15 @@ CLogicalSequence::PxfsCandidates(CMemoryPool *mp) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalSequence::DeriveOutputColumns(CMemoryPool *,  // mp
 									  CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(1 <= exprhdl.Arity());
 
 	// get output columns of last child
-	CColRefSet *pcrs = exprhdl.DeriveOutputColumns(exprhdl.Arity() - 1);
+	gpos::owner<CColRefSet *> pcrs =
+		exprhdl.DeriveOutputColumns(exprhdl.Arity() - 1);
 	pcrs->AddRef();
 
 	return pcrs;

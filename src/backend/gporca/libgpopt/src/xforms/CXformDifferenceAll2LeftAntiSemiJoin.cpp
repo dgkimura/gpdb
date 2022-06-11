@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformDifferenceAll2LeftAntiSemiJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/exception.h"
 #include "gpopt/operators/CLogicalDifferenceAll.h"
@@ -75,7 +76,8 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
 	CExpression *pexprRightWindow = CXformUtils::PexprWindowWithRowNumber(
 		mp, pexprRightChild, (*pdrgpdrgpcrInput)[1]);
 
-	CColRef2dArray *pdrgpdrgpcrInputNew = GPOS_NEW(mp) CColRef2dArray(mp);
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInputNew =
+		GPOS_NEW(mp) CColRef2dArray(mp);
 	CColRefArray *pdrgpcrLeftNew =
 		CUtils::PdrgpcrExactCopy(mp, (*pdrgpdrgpcrInput)[0]);
 	pdrgpcrLeftNew->Append(CXformUtils::PcrProjectElement(
@@ -94,7 +96,7 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
 		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInputNew);
 
 	// assemble the new left anti-semi join logical operator
-	CExpression *pexprLASJ = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprLASJ = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalLeftAntiSemiJoin(mp),
 					pexprLeftWindow, pexprRightWindow, pexprScCond);
 

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalConstTableGet.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefTable.h"
@@ -172,7 +173,7 @@ CLogicalConstTableGet::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalConstTableGet::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -206,7 +207,7 @@ CLogicalConstTableGet::DeriveOutputColumns(CMemoryPool *mp,
 										   CExpressionHandle &	// exprhdl
 )
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	return pcrs;
@@ -256,7 +257,7 @@ CLogicalConstTableGet::FInputOrderSensitive() const
 CXformSet *
 CLogicalConstTableGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementConstTableGet);
 	return xform_set;
 }
@@ -275,7 +276,7 @@ CLogicalConstTableGet::PdrgpcoldescMapping(CMemoryPool *mp,
 										   CColRefArray *colref_array)
 {
 	GPOS_ASSERT(nullptr != colref_array);
-	CColumnDescriptorArray *pdrgpcoldesc =
+	gpos::owner<CColumnDescriptorArray *> pdrgpcoldesc =
 		GPOS_NEW(mp) CColumnDescriptorArray(mp);
 
 	const ULONG length = colref_array->Size();
@@ -290,11 +291,12 @@ CLogicalConstTableGet::PdrgpcoldescMapping(CMemoryPool *mp,
 			length = pcrTable->Width();
 		}
 
-		CColumnDescriptor *pcoldesc = GPOS_NEW(mp) CColumnDescriptor(
-			mp, colref->RetrieveType(), colref->TypeModifier(), colref->Name(),
-			ul + 1,	 //attno
-			true,	 // IsNullable
-			length);
+		gpos::owner<CColumnDescriptor *> pcoldesc = GPOS_NEW(mp)
+			CColumnDescriptor(mp, colref->RetrieveType(),
+							  colref->TypeModifier(), colref->Name(),
+							  ul + 1,  //attno
+							  true,	   // IsNullable
+							  length);
 		pdrgpcoldesc->Append(pcoldesc);
 	}
 
@@ -318,9 +320,10 @@ CLogicalConstTableGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	CReqdPropRelational *prprel =
 		CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
 	CColRefSet *pcrs = prprel->PcrsStat();
-	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	pcrs->ExtractColIds(mp, colids);
-	ULongPtrArray *pdrgpulColWidth = CUtils::Pdrgpul(mp, m_pdrgpcrOutput);
+	gpos::owner<ULongPtrArray *> pdrgpulColWidth =
+		CUtils::Pdrgpul(mp, m_pdrgpcrOutput);
 
 	IStatistics *stats = CStatistics::MakeDummyStats(
 		mp, colids, pdrgpulColWidth, m_pdrgpdrgpdatum->Size());

@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementSequenceProject.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalSequenceProject.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -80,7 +81,7 @@ CXformImplementSequenceProject::Transform(CXformContext *pxfctxt,
 	pdrgpwf->AddRef();
 
 	// assemble physical operator
-	CExpression *pexprSequenceProject = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprSequenceProject = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalSequenceProject(mp, pds, pdrgpos, pdrgpwf),
 		pexprRelational, pexprScalar);
 

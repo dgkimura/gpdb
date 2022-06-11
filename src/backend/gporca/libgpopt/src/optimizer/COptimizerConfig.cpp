@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CBitSetIter.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "gpopt/cost/ICostModel.h"
@@ -74,7 +75,7 @@ COptimizerConfig::~COptimizerConfig()
 //		Default optimizer configuration
 //
 //---------------------------------------------------------------------------
-COptimizerConfig *
+gpos::owner<COptimizerConfig *>
 COptimizerConfig::PoconfDefault(CMemoryPool *mp)
 {
 	return GPOS_NEW(mp) COptimizerConfig(
@@ -92,7 +93,7 @@ COptimizerConfig::PoconfDefault(CMemoryPool *mp)
 //		Default optimizer configuration with the given cost model
 //
 //---------------------------------------------------------------------------
-COptimizerConfig *
+gpos::owner<COptimizerConfig *>
 COptimizerConfig::PoconfDefault(CMemoryPool *mp, ICostModel *pcm)
 {
 	GPOS_ASSERT(nullptr != pcm);

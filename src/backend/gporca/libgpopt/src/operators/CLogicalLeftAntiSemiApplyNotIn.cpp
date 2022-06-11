@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalLeftAntiSemiApplyNotIn.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 
@@ -26,7 +27,7 @@ using namespace gpopt;
 CXformSet *
 CLogicalLeftAntiSemiApplyNotIn::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(
 		CXform::ExfLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotIn);
 	(void) xform_set->ExchangeSet(
@@ -44,7 +45,7 @@ CLogicalLeftAntiSemiApplyNotIn::PxfsCandidates(CMemoryPool *mp) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalLeftAntiSemiApplyNotIn::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

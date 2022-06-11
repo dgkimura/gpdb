@@ -13,6 +13,7 @@
 #include "gpopt/xforms/CXformSimplifySubquery.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CNormalizer.h"
@@ -79,11 +80,12 @@ CXformSimplifySubquery::FSimplifyQuantified(CMemoryPool *mp,
 	GPOS_ASSERT(CUtils::FQuantifiedSubquery(pexprScalar->Pop()));
 
 	CExpression *pexprNewSubquery = nullptr;
-	CExpression *pexprCmp = nullptr;
+	gpos::owner<CExpression *> pexprCmp = nullptr;
 	CXformUtils::QuantifiedToAgg(mp, pexprScalar, &pexprNewSubquery, &pexprCmp);
 
 	// create a comparison predicate involving subquery expression
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	(*pexprCmp)[1]->AddRef();
 	pdrgpexpr->Append(pexprNewSubquery);
 	pdrgpexpr->Append((*pexprCmp)[1]);
@@ -113,12 +115,13 @@ CXformSimplifySubquery::FSimplifyExistential(CMemoryPool *mp,
 	GPOS_ASSERT(CUtils::FExistentialSubquery(pexprScalar->Pop()));
 
 	CExpression *pexprNewSubquery = nullptr;
-	CExpression *pexprCmp = nullptr;
+	gpos::owner<CExpression *> pexprCmp = nullptr;
 	CXformUtils::ExistentialToAgg(mp, pexprScalar, &pexprNewSubquery,
 								  &pexprCmp);
 
 	// create a comparison predicate involving subquery expression
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	(*pexprCmp)[1]->AddRef();
 	pdrgpexpr->Append(pexprNewSubquery);
 	pdrgpexpr->Append((*pexprCmp)[1]);
@@ -142,8 +145,9 @@ CXformSimplifySubquery::FSimplifyExistential(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 BOOL
 CXformSimplifySubquery::FSimplifySubqueryRecursive(
-	CMemoryPool *mp, CExpression *pexprScalar, CExpression **ppexprNewScalar,
-	FnSimplify *pfnsimplify, FnMatch *pfnmatch)
+	CMemoryPool *mp, CExpression *pexprScalar,
+	gpos::owner<CExpression *> *ppexprNewScalar, FnSimplify *pfnsimplify,
+	FnMatch *pfnmatch)
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
@@ -168,11 +172,12 @@ CXformSimplifySubquery::FSimplifySubqueryRecursive(
 
 	// otherwise, recursively process children
 	const ULONG arity = pexprScalar->Arity();
-	CExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprChildren =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	BOOL fSuccess = true;
 	for (ULONG ul = 0; fSuccess && ul < arity; ul++)
 	{
-		CExpression *pexprChild = nullptr;
+		gpos::owner<CExpression *> pexprChild = nullptr;
 		fSuccess = FSimplifySubqueryRecursive(
 			mp, (*pexprScalar)[ul], &pexprChild, pfnsimplify, pfnmatch);
 		if (fSuccess)
@@ -187,7 +192,7 @@ CXformSimplifySubquery::FSimplifySubqueryRecursive(
 
 	if (fSuccess)
 	{
-		COperator *pop = pexprScalar->Pop();
+		gpos::owner<COperator *> pop = pexprScalar->Pop();
 		pop->AddRef();
 		*ppexprNewScalar = GPOS_NEW(mp) CExpression(mp, pop, pdrgpexprChildren);
 	}
@@ -252,7 +257,7 @@ CXformSimplifySubquery::FSimplifySubquery(CMemoryPool *mp,
 {
 	CExpression *pexprOuter = (*pexprInput)[0];
 	CExpression *pexprScalar = (*pexprInput)[1];
-	CExpression *pexprNewScalar = nullptr;
+	gpos::owner<CExpression *> pexprNewScalar = nullptr;
 
 	if (!FSimplifySubqueryRecursive(mp, pexprScalar, &pexprNewScalar,
 									pfnsimplify, pfnmatch))
@@ -262,7 +267,7 @@ CXformSimplifySubquery::FSimplifySubquery(CMemoryPool *mp,
 	}
 
 	pexprOuter->AddRef();
-	CExpression *pexprResult = nullptr;
+	gpos::owner<CExpression *> pexprResult = nullptr;
 	if (COperator::EopLogicalSelect == pexprInput->Pop()->Eopid())
 	{
 		pexprResult =

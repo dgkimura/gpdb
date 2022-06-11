@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerSequence.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLPhysicalSequence.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -123,7 +125,8 @@ CParseHandlerSequence::EndElement(const XMLCh *const,  // element_uri,
 	CParseHandlerProperties *prop_parse_handler =
 		dynamic_cast<CParseHandlerProperties *>((*this)[0]);
 
-	CDXLPhysicalSequence *dxl_op = GPOS_NEW(m_mp) CDXLPhysicalSequence(m_mp);
+	gpos::owner<CDXLPhysicalSequence *> dxl_op =
+		GPOS_NEW(m_mp) CDXLPhysicalSequence(m_mp);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
 	// set statistics and physical properties

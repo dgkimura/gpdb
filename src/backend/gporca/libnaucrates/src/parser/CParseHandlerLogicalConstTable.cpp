@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalConstTable.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLLogicalConstTable.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerColDescr.h"
@@ -136,11 +138,11 @@ CParseHandlerLogicalConstTable::EndElement(
 		GPOS_ASSERT(nullptr !=
 					col_descr_parse_handler->GetDXLColumnDescrArray());
 
-		CDXLColDescrArray *dxl_col_descr_array =
+		gpos::owner<CDXLColDescrArray *> dxl_col_descr_array =
 			col_descr_parse_handler->GetDXLColumnDescrArray();
 		dxl_col_descr_array->AddRef();
 
-		CDXLLogicalConstTable *lg_const_table_get_dxl_op =
+		gpos::owner<CDXLLogicalConstTable *> lg_const_table_get_dxl_op =
 			GPOS_NEW(m_mp) CDXLLogicalConstTable(m_mp, dxl_col_descr_array,
 												 m_const_tuples_datum_array);
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, lg_const_table_get_dxl_op);

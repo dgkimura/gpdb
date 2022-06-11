@@ -13,6 +13,7 @@
 #include "naucrates/md/CDXLColStats.h"
 
 #include "gpos/common/CAutoRef.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -75,7 +76,7 @@ CDXLColStats::~CDXLColStats()
 //		Returns the metadata id of this column stats object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLColStats::MDId() const
 {
 	return m_mdid_col_stats;
@@ -131,7 +132,7 @@ CDXLColStats::Buckets() const
 //		Returns the bucket at the given position
 //
 //---------------------------------------------------------------------------
-const CDXLBucket *
+gpos::pointer<const CDXLBucket *>
 CDXLColStats::GetDXLBucketAt(ULONG pos) const
 {
 	return (*m_dxl_stats_bucket_array)[pos];
@@ -175,7 +176,7 @@ CDXLColStats::Serialize(CXMLSerializer *xml_serializer) const
 	ULONG num_of_buckets = Buckets();
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
 	{
-		const CDXLBucket *dxl_bucket = GetDXLBucketAt(ul);
+		gpos::pointer<const CDXLBucket *> dxl_bucket = GetDXLBucketAt(ul);
 		dxl_bucket->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -229,9 +230,9 @@ CDXLColStats::CreateDXLDummyColStats(CMemoryPool *mp, IMDId *mdid,
 {
 	CMDIdColStats *mdid_col_stats = CMDIdColStats::CastMdid(mdid);
 
-	CDXLBucketArray *dxl_bucket_array;
+	gpos::owner<CDXLBucketArray *> dxl_bucket_array;
 	dxl_bucket_array = GPOS_NEW(mp) CDXLBucketArray(mp);
-	CDXLColStats *dxl_col_stats;
+	gpos::owner<CDXLColStats *> dxl_col_stats;
 	dxl_col_stats = GPOS_NEW(mp) CDXLColStats(
 		mp, mdid_col_stats, mdname, width, CHistogram::DefaultNullFreq,
 		CHistogram::DefaultNDVRemain, CHistogram::DefaultNDVFreqRemain,

@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerStatsDerivedColumn.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerColStatsBucket.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -167,7 +169,7 @@ CParseHandlerStatsDerivedColumn::EndElement(
 				   str->GetBuffer());
 	}
 
-	CDXLBucketArray *dxl_stats_bucket_array =
+	gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array =
 		GPOS_NEW(m_mp) CDXLBucketArray(m_mp);
 
 	const ULONG num_of_buckets = this->Length();
@@ -176,7 +178,7 @@ CParseHandlerStatsDerivedColumn::EndElement(
 	{
 		CParseHandlerColStatsBucket *col_stats_bucket_parse_handler =
 			dynamic_cast<CParseHandlerColStatsBucket *>((*this)[idx]);
-		CDXLBucket *dxl_bucket =
+		gpos::owner<CDXLBucket *> dxl_bucket =
 			col_stats_bucket_parse_handler->GetDXLBucketAt();
 		dxl_bucket->AddRef();
 		dxl_stats_bucket_array->Append(dxl_bucket);

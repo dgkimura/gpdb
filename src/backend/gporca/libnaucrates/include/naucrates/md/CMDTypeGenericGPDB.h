@@ -60,7 +60,7 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// metadata id
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// type name
 	CMDName *m_mdname;
@@ -80,45 +80,45 @@ private:
 	// is type passed by value or by reference
 	BOOL m_is_passed_by_value;
 
-	IMDId *m_distr_opfamily;
+	gpos::owner<IMDId *> m_distr_opfamily;
 
-	IMDId *m_legacy_distr_opfamily;
+	gpos::owner<IMDId *> m_legacy_distr_opfamily;
 
 	// id of equality operator for type
-	IMDId *m_mdid_op_eq;
+	gpos::owner<IMDId *> m_mdid_op_eq;
 
 	// id of inequality operator for type
-	IMDId *m_mdid_op_neq;
+	gpos::owner<IMDId *> m_mdid_op_neq;
 
 	// id of less than operator for type
-	IMDId *m_mdid_op_lt;
+	gpos::owner<IMDId *> m_mdid_op_lt;
 
 	// id of less than equals operator for type
-	IMDId *m_mdid_op_leq;
+	gpos::owner<IMDId *> m_mdid_op_leq;
 
 	// id of greater than operator for type
-	IMDId *m_mdid_op_gt;
+	gpos::owner<IMDId *> m_mdid_op_gt;
 
 	// id of greater than equals operator for type
-	IMDId *m_mdid_op_geq;
+	gpos::owner<IMDId *> m_mdid_op_geq;
 
 	// id of comparison operator for type used in btree lookups
-	IMDId *m_mdid_op_cmp;
+	gpos::owner<IMDId *> m_mdid_op_cmp;
 
 	// min aggregate
-	IMDId *m_mdid_min;
+	gpos::owner<IMDId *> m_mdid_min;
 
 	// max aggregate
-	IMDId *m_mdid_max;
+	gpos::owner<IMDId *> m_mdid_max;
 
 	// avg aggregate
-	IMDId *m_mdid_avg;
+	gpos::owner<IMDId *> m_mdid_avg;
 
 	// sum aggregate
-	IMDId *m_mdid_sum;
+	gpos::owner<IMDId *> m_mdid_sum;
 
 	// count aggregate
-	IMDId *m_mdid_count;
+	gpos::owner<IMDId *> m_mdid_count;
 
 	// is type hashable
 	BOOL m_is_hashable;
@@ -133,16 +133,16 @@ private:
 	BOOL m_is_text_related;
 
 	// id of the relation corresponding to a composite type
-	IMDId *m_mdid_base_relation;
+	gpos::owner<IMDId *> m_mdid_base_relation;
 
 	// id of array type for type
-	IMDId *m_mdid_type_array;
+	gpos::owner<IMDId *> m_mdid_type_array;
 
 	// GPDB specific length
 	INT m_gpdb_length;
 
 	// a null datum of this type (used for statistics comparison)
-	IDatum *m_datum_null;
+	gpos::owner<IDatum *> m_datum_null;
 
 public:
 	CMDTypeGenericGPDB(const CMDTypeGenericGPDB &) = delete;
@@ -169,7 +169,7 @@ public:
 		return m_dxl_str;
 	}
 
-	IMDId *MDId() const override;
+	gpos::pointer<IMDId *> MDId() const override;
 
 	CMDName Mdname() const override;
 
@@ -201,10 +201,10 @@ public:
 	}
 
 	// id of specified comparison operator type
-	IMDId *GetMdidForCmpType(ECmpType ecmpt) const override;
+	gpos::pointer<IMDId *> GetMdidForCmpType(ECmpType ecmpt) const override;
 
 	// id of specified specified aggregate type
-	IMDId *GetMdidForAggType(EAggType agg_type) const override;
+	gpos::pointer<IMDId *> GetMdidForAggType(EAggType agg_type) const override;
 
 	gpos::pointer<const IMDId *>
 	CmpOpMdid() const override
@@ -245,17 +245,17 @@ public:
 		return m_mdid_type_array;
 	}
 
-	IMDId *GetDistrOpfamilyMdid() const override;
+	gpos::pointer<IMDId *> GetDistrOpfamilyMdid() const override;
 
 	// serialize object in DXL format
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;
 
 	// factory method for generating generic datum from CDXLScalarConstValue
-	IDatum *GetDatumForDXLConstVal(
+	gpos::owner<IDatum *> GetDatumForDXLConstVal(
 		gpos::pointer<const CDXLScalarConstValue *> dxl_op) const override;
 
 	// create typed datum from DXL datum
-	IDatum *GetDatumForDXLDatum(
+	gpos::owner<IDatum *> GetDatumForDXLDatum(
 		CMemoryPool *mp,
 		gpos::pointer<const CDXLDatum *> dxl_datum) const override;
 
@@ -280,8 +280,8 @@ public:
 	CDXLDatum *GetDXLDatumNull(CMemoryPool *mp) const override;
 
 	// generate the DXL scalar constant from IDatum
-	CDXLScalarConstValue *GetDXLOpScConst(CMemoryPool *mp,
-										  IDatum *datum) const override;
+	gpos::owner<CDXLScalarConstValue *> GetDXLOpScConst(
+		CMemoryPool *mp, IDatum *datum) const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the type in the provided stream
@@ -292,25 +292,24 @@ public:
 	BOOL IsAmbiguous() const override;
 
 	// create a dxl datum
-	static CDXLDatum *CreateDXLDatumVal(CMemoryPool *mp, IMDId *mdid,
-										gpos::pointer<const IMDType *> md_type,
-										INT type_modifier, BOOL is_null,
-										BYTE *byte_array, ULONG length,
-										LINT lint_Value, CDouble double_Value);
+	static gpos::owner<CDXLDatum *> CreateDXLDatumVal(
+		CMemoryPool *mp, IMDId *mdid, gpos::pointer<const IMDType *> md_type,
+		INT type_modifier, BOOL is_null, BYTE *byte_array, ULONG length,
+		LINT lint_Value, CDouble double_Value);
 
 	// create a dxl datum of types having double mapping
-	static CDXLDatum *CreateDXLDatumStatsDoubleMappable(
+	static gpos::owner<CDXLDatum *> CreateDXLDatumStatsDoubleMappable(
 		CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
 		BYTE *byte_array, ULONG length, LINT lint_Value, CDouble double_Value);
 
 	// create a dxl datum of types having lint mapping
-	static CDXLDatum *CreateDXLDatumStatsIntMappable(
+	static gpos::owner<CDXLDatum *> CreateDXLDatumStatsIntMappable(
 		CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
 		BYTE *byte_array, ULONG length, LINT lint_Value, CDouble double_Value);
 
 	// create a NULL constant for this type
-	IDatum *CreateGenericNullDatum(CMemoryPool *mp,
-								   INT type_modifier) const override;
+	gpos::owner<IDatum *> CreateGenericNullDatum(
+		CMemoryPool *mp, INT type_modifier) const override;
 
 	// does a datum of this type need bytea to Lint mapping for statistics computation
 	static BOOL HasByte2IntMapping(gpos::pointer<const IMDType *> mdtype);

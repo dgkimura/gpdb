@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/types.h"
 
 #include "gpopt/base/CColRef.h"
@@ -56,19 +57,19 @@ public:
 
 private:
 	// range type
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// datum comparator
 	const IComparator *m_pcomp;
 
 	// left end point, NULL if infinite
-	IDatum *m_pdatumLeft;
+	gpos::owner<IDatum *> m_pdatumLeft;
 
 	// inclusion option for left end
 	ERangeInclusion m_eriLeft;
 
 	// right end point, NULL if infinite
-	IDatum *m_pdatumRight;
+	gpos::owner<IDatum *> m_pdatumRight;
 
 	// inclusion option for right end
 	ERangeInclusion m_eriRight;
@@ -113,21 +114,21 @@ public:
 	~CRange() override;
 
 	// range type
-	IMDId *
+	gpos::pointer<IMDId *>
 	MDId() const
 	{
 		return m_mdid;
 	}
 
 	// range beginning
-	IDatum *
+	gpos::pointer<IDatum *>
 	PdatumLeft() const
 	{
 		return m_pdatumLeft;
 	}
 
 	// range end
-	IDatum *
+	gpos::pointer<IDatum *>
 	PdatumRight() const
 	{
 		return m_pdatumRight;
@@ -178,17 +179,18 @@ public:
 	BOOL FPoint() const;
 
 	// intersection with another range
-	CRange *PrngIntersect(CMemoryPool *mp, CRange *prange);
+	gpos::owner<CRange *> PrngIntersect(CMemoryPool *mp,
+										gpos::pointer<CRange *> prange);
 
 	// difference between this range and a given range on the left side only
-	CRange *PrngDifferenceLeft(CMemoryPool *mp, CRange *prange);
+	gpos::owner<CRange *> PrngDifferenceLeft(CMemoryPool *mp, CRange *prange);
 
 	// difference between this range and a given range on the right side only
-	CRange *PrngDifferenceRight(CMemoryPool *mp, CRange *prange);
+	gpos::owner<CRange *> PrngDifferenceRight(CMemoryPool *mp, CRange *prange);
 
 	// return the extension of this range with the given range. The given
 	// range must start right after this range, otherwise NULL is returned
-	CRange *PrngExtend(CMemoryPool *mp, CRange *prange);
+	gpos::owner<CRange *> PrngExtend(CMemoryPool *mp, CRange *prange);
 
 	// construct scalar expression
 	CExpression *PexprScalar(CMemoryPool *mp, const CColRef *colref);

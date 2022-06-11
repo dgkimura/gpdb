@@ -12,6 +12,7 @@
 #define GPOPT_CWindowOids_H
 
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/gpdb_types.h"
 
@@ -48,7 +49,7 @@ public:
 	OID OidRank() const;
 
 	// generate default window oids
-	static CWindowOids *GetWindowOids(CMemoryPool *mp);
+	static gpos::owner<CWindowOids *> GetWindowOids(CMemoryPool *mp);
 
 };	// class CWindowOids
 }  // namespace gpopt

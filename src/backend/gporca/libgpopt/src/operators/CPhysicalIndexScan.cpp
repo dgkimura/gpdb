@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalIndexScan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -66,7 +67,7 @@ CPhysicalIndexScan::~CPhysicalIndexScan()
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalIndexScan::EpetOrder(CExpressionHandle &,	// exprhdl
-							  const CEnfdOrder *peo) const
+							  gpos::pointer<const CEnfdOrder *> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());

@@ -18,6 +18,7 @@
 #define GPOPT_CScalarCoerceBase_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalar.h"
 
@@ -37,7 +38,7 @@ class CScalarCoerceBase : public CScalar
 {
 private:
 	// catalog MDId of the result type
-	IMDId *m_result_type_mdid;
+	gpos::owner<IMDId *> m_result_type_mdid;
 
 	// output type modifier
 	INT m_type_modifier;
@@ -59,7 +60,7 @@ public:
 	~CScalarCoerceBase() override;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::pointer<IMDId *> MdidType() const override;
 
 	// return type modifier
 	INT TypeModifier() const override;

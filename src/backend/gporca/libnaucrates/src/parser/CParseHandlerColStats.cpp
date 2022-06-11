@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerColStats.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerColStatsBucket.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -181,7 +183,7 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 
 	// get histogram buckets from child parse handlers
 
-	CDXLBucketArray *dxl_stats_bucket_array =
+	gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array =
 		GPOS_NEW(m_mp) CDXLBucketArray(m_mp);
 
 	for (ULONG ul = 0; ul < this->Length(); ul++)
@@ -189,7 +191,7 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 		CParseHandlerColStatsBucket *parse_handler_col_stats_bucket =
 			dynamic_cast<CParseHandlerColStatsBucket *>((*this)[ul]);
 
-		CDXLBucket *dxl_bucket =
+		gpos::owner<CDXLBucket *> dxl_bucket =
 			parse_handler_col_stats_bucket->GetDXLBucketAt();
 		dxl_bucket->AddRef();
 

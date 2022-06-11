@@ -10,6 +10,8 @@
 //---------------------------------------------------------------------------
 #include "naucrates/dxl/operators/CDXLScalarHashCondList.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -67,8 +69,8 @@ CDXLScalarHashCondList::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarHashCondList::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const CDXLNode *node) const
+CDXLScalarHashCondList::SerializeToDXL(
+	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

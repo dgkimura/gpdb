@@ -7,6 +7,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarPartListValues.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -60,14 +62,14 @@ CDXLScalarPartListValues::GetPartitioningLevel() const
 }
 
 // result type
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarPartListValues::GetResultTypeMdId() const
 {
 	return m_result_type_mdid;
 }
 
 // element type
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarPartListValues::GetElemTypeMdId() const
 {
 	return m_elem_type_mdid;
@@ -83,8 +85,9 @@ CDXLScalarPartListValues::HasBoolResult(CMDAccessor *  //md_accessor
 
 // Serialize operator in DXL format
 void
-CDXLScalarPartListValues::SerializeToDXL(CXMLSerializer *xml_serializer,
-										 const CDXLNode *  // dxlnode
+CDXLScalarPartListValues::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *>	 // dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -114,7 +117,7 @@ CDXLScalarPartListValues::AssertValid(const CDXLNode *dxlnode,
 #endif	// GPOS_DEBUG
 
 // conversion function
-CDXLScalarPartListValues *
+gpos::cast_func<CDXLScalarPartListValues *>
 CDXLScalarPartListValues::Cast(CDXLOperator *dxl_op)
 {
 	GPOS_ASSERT(nullptr != dxl_op);

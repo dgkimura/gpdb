@@ -4,6 +4,8 @@
 #ifndef GPOPT_CPhysicalParallelUnionAll_H
 #define GPOPT_CPhysicalParallelUnionAll_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/operators/CPhysicalUnionAll.h"
 
 namespace gpopt
@@ -15,7 +17,7 @@ class CPhysicalParallelUnionAll : public CPhysicalUnionAll
 {
 private:
 	// array of child hashed distributions -- used locally for distribution derivation
-	CDistributionSpecArray *const m_pdrgpds;
+	gpos::owner<CDistributionSpecArray *> const m_pdrgpds;
 
 public:
 	CPhysicalParallelUnionAll(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
@@ -25,17 +27,16 @@ public:
 
 	const CHAR *SzId() const override;
 
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	gpos::owner<CDistributionSpec *> PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	CEnfdDistribution::EDistributionMatching Edm(
-		CReqdPropPlan *,   // prppInput
-		ULONG,			   // child_index
-		CDrvdPropArray *,  //pdrgpdpCtxt
-		ULONG			   // ulOptReq
+		gpos::pointer<CReqdPropPlan *>,	 // prppInput
+		ULONG,							 // child_index
+		CDrvdPropArray *,				 //pdrgpdpCtxt
+		ULONG							 // ulOptReq
 		) override;
 
 	~CPhysicalParallelUnionAll() override;

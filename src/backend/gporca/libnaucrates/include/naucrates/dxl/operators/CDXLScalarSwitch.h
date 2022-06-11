@@ -36,7 +36,7 @@ class CDXLScalarSwitch : public CDXLScalar
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 public:
 	CDXLScalarSwitch(const CDXLScalarSwitch &) = delete;
@@ -51,7 +51,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// return type
-	virtual IMDId *MdidType() const;
+	virtual gpos::pointer<IMDId *> MdidType() const;
 
 	// DXL Operator ID
 	Edxlopid GetDXLOperator() const override;

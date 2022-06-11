@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataIdList.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -277,7 +279,7 @@ CParseHandlerMetadataIdList::FSupportedListType(const XMLCh *const xml_str)
 //		Return the constructed list of metadata ids
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::pointer<IMdIdArray *>
 CParseHandlerMetadataIdList::GetMdIdArray()
 {
 	return m_mdid_array;

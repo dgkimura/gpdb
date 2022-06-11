@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDGPDBFunc_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 #include "naucrates/md/CMDFunctionGPDB.h"
@@ -37,13 +38,13 @@ class CParseHandlerMDGPDBFunc : public CParseHandlerMetadataObject
 {
 private:
 	// id and version
-	IMDId *m_mdid;
+	gpos::pointer<IMDId *> m_mdid;
 
 	// name
 	CMDName *m_mdname;
 
 	// result type
-	IMDId *m_mdid_type_result;
+	gpos::pointer<IMDId *> m_mdid_type_result;
 
 	// output argument types
 	IMdIdArray *m_mdid_types_array;

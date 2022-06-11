@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerEnumeratorConfig.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/engine/CEnumeratorConfig.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -146,7 +148,7 @@ CParseHandlerEnumeratorConfig::GetParseHandlerType() const
 //		Returns the enumerator configuration
 //
 //---------------------------------------------------------------------------
-CEnumeratorConfig *
+gpos::pointer<CEnumeratorConfig *>
 CParseHandlerEnumeratorConfig::GetEnumeratorCfg() const
 {
 	return m_enumerator_cfg;

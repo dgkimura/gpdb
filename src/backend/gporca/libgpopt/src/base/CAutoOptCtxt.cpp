@@ -12,6 +12,7 @@
 #include "gpopt/base/CAutoOptCtxt.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/cost/ICostModel.h"
 #include "gpopt/eval/CConstExprEvaluatorDefault.h"
@@ -29,7 +30,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
-						   IConstExprEvaluator *pceeval,
+						   gpos::owner<IConstExprEvaluator *> pceeval,
 						   COptimizerConfig *optimizer_config)
 {
 	if (nullptr == optimizer_config)
@@ -58,7 +59,8 @@ CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
 //
 //---------------------------------------------------------------------------
 CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
-						   IConstExprEvaluator *pceeval, ICostModel *pcm)
+						   gpos::owner<IConstExprEvaluator *> pceeval,
+						   ICostModel *pcm)
 {
 	GPOS_ASSERT(nullptr != pcm);
 

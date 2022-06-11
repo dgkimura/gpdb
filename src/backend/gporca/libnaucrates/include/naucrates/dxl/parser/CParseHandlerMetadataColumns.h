@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMetadataColumns_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 #include "naucrates/md/CMDColumn.h"
@@ -38,7 +39,7 @@ class CParseHandlerMetadataColumns : public CParseHandlerBase
 {
 private:
 	// list of columns
-	CMDColumnArray *m_md_col_array;
+	gpos::owner<CMDColumnArray *> m_md_col_array;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +68,7 @@ public:
 
 
 	// returns the constructed columns list
-	CMDColumnArray *GetMdColArray();
+	gpos::pointer<CMDColumnArray *> GetMdColArray();
 };
 }  // namespace gpdxl
 

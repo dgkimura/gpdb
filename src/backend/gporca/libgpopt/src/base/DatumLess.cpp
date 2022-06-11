@@ -5,13 +5,15 @@
 
 #include "gpopt/base/DatumLess.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/COptCtxt.h"
 
 namespace gpopt
 {
 bool
-DatumLess::operator()(const gpnaucrates::IDatum *a,
-					  const gpnaucrates::IDatum *b) const
+DatumLess::operator()(gpos::pointer<const gpnaucrates::IDatum *> a,
+					  gpos::pointer<const gpnaucrates::IDatum *> b) const
 {
 	const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
 	return pcomp->IsLessThan(a, b);

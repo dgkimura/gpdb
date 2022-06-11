@@ -18,6 +18,7 @@
 #include "gpopt/operators/CPhysicalSerialUnionAll.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
@@ -66,7 +67,7 @@ CPhysicalSerialUnionAll::~CPhysicalSerialUnionAll() = default;
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalSerialUnionAll::PdsRequired(
 	CMemoryPool *mp, CExpressionHandle &exprhdl, CDistributionSpec *pdsRequired,
 	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const

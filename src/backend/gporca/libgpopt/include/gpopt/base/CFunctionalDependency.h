@@ -43,10 +43,10 @@ class CFunctionalDependency : public CRefCount,
 {
 private:
 	// the left hand side of the FD
-	CColRefSet *m_pcrsKey;
+	gpos::owner<CColRefSet *> m_pcrsKey;
 
 	// the right hand side of the FD
-	CColRefSet *m_pcrsDetermined;
+	gpos::owner<CColRefSet *> m_pcrsDetermined;
 
 public:
 	CFunctionalDependency(const CFunctionalDependency &) = delete;
@@ -94,19 +94,23 @@ public:
 	IOstream &OsPrint(IOstream &os) const;
 
 	// hash function
-	static ULONG HashValue(const CFunctionalDependencyArray *pdrgpfd);
+	static ULONG HashValue(
+		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd);
 
 	// equality function
-	static BOOL Equals(const CFunctionalDependencyArray *pdrgpfdFst,
-					   const CFunctionalDependencyArray *pdrgpfdSnd);
+	static BOOL Equals(
+		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfdFst,
+		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfdSnd);
 
 	// create a set of all keys in the passed FD's array
-	static CColRefSet *PcrsKeys(CMemoryPool *mp,
-								const CFunctionalDependencyArray *pdrgpfd);
+	static CColRefSet *PcrsKeys(
+		CMemoryPool *mp,
+		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd);
 
 	// create an array of all keys in the passed FD's array
-	static CColRefArray *PdrgpcrKeys(CMemoryPool *mp,
-									 const CFunctionalDependencyArray *pdrgpfd);
+	static CColRefArray *PdrgpcrKeys(
+		CMemoryPool *mp,
+		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd);
 
 
 };	// class CFunctionalDependency

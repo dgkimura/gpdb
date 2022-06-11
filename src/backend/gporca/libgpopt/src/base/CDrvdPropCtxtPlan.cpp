@@ -12,6 +12,7 @@
 #include "gpopt/base/CDrvdPropCtxtPlan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCTEMap.h"
 #include "gpopt/base/CDrvdPropPlan.h"
@@ -59,13 +60,14 @@ CDrvdPropCtxtPlan::~CDrvdPropCtxtPlan()
 CDrvdPropCtxt *
 CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 {
-	CDrvdPropCtxtPlan *pdpctxtplan = GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
+	gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+		GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 
 	UlongToDrvdPropPlanMapIter hmulpdpiter(m_phmulpdpCTEs);
 	while (hmulpdpiter.Advance())
 	{
 		ULONG id = *(hmulpdpiter.Key());
-		CDrvdPropPlan *pdpplan =
+		gpos::owner<CDrvdPropPlan *> pdpplan =
 			const_cast<CDrvdPropPlan *>(hmulpdpiter.Value());
 		pdpplan->AddRef();
 #ifdef GPOS_DEBUG
@@ -151,7 +153,7 @@ CDrvdPropCtxtPlan::OsPrint(IOstream &os) const
 //		Return the plan properties of cte producer with given id
 //
 //---------------------------------------------------------------------------
-CDrvdPropPlan *
+gpos::pointer<CDrvdPropPlan *>
 CDrvdPropCtxtPlan::PdpplanCTEProducer(ULONG ulCTEId) const
 {
 	GPOS_ASSERT(nullptr != m_phmulpdpCTEs);

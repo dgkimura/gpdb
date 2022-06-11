@@ -35,7 +35,7 @@ class CDXLScalarCoalesce : public CDXLScalar
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 public:
 	CDXLScalarCoalesce(const CDXLScalarCoalesce &) = delete;

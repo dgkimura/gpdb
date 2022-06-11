@@ -12,6 +12,7 @@
 
 #include "naucrates/md/CMDRelationGPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -156,7 +157,7 @@ CMDRelationGPDB::~CMDRelationGPDB()
 //		Returns the metadata id of this relation
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDRelationGPDB::MDId() const
 {
 	return m_mdid;
@@ -319,7 +320,7 @@ CMDRelationGPDB::GetPosFromAttno(INT attno) const
 //		Returns the original positions of all the non-dropped columns
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::pointer<ULongPtrArray *>
 CMDRelationGPDB::NonDroppedColsArray() const
 {
 	return m_nondrop_col_pos_array;
@@ -361,7 +362,7 @@ CMDRelationGPDB::KeySetCount() const
 //		Returns the key set at the specified position
 //
 //---------------------------------------------------------------------------
-const ULongPtrArray *
+gpos::pointer<const ULongPtrArray *>
 CMDRelationGPDB::KeySetAt(ULONG pos) const
 {
 	GPOS_ASSERT(nullptr != m_keyset_array);
@@ -441,7 +442,7 @@ CMDRelationGPDB::PartColumnCount() const
 }
 
 // Retrieve list of partition types
-CharPtrArray *
+gpos::pointer<CharPtrArray *>
 CMDRelationGPDB::GetPartitionTypes() const
 {
 	return m_str_part_types_array;
@@ -464,7 +465,7 @@ CMDRelationGPDB::PartTypeAtLevel(ULONG ulLevel) const
 //		partition key list
 //
 //---------------------------------------------------------------------------
-const IMDColumn *
+gpos::pointer<const IMDColumn *>
 CMDRelationGPDB::PartColAt(ULONG pos) const
 {
 	ULONG partition_key_pos = (*(*m_partition_cols_array)[pos]);
@@ -507,7 +508,7 @@ CMDRelationGPDB::TriggerCount() const
 //		Returns the column at the specified position
 //
 //---------------------------------------------------------------------------
-const IMDColumn *
+gpos::pointer<const IMDColumn *>
 CMDRelationGPDB::GetMdCol(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_md_col_array->Size());
@@ -523,7 +524,7 @@ CMDRelationGPDB::GetMdCol(ULONG pos) const
 //		Returns the distribution column at the specified position in the distribution column list
 //
 //---------------------------------------------------------------------------
-const IMDColumn *
+gpos::pointer<const IMDColumn *>
 CMDRelationGPDB::GetDistrColAt(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_distr_col_array->Size());
@@ -532,7 +533,7 @@ CMDRelationGPDB::GetDistrColAt(ULONG pos) const
 	return GetMdCol(distr_key_pos);
 }
 
-IMDId *
+gpos::pointer<IMDId *>
 CMDRelationGPDB::GetDistrOpfamilyAt(ULONG pos) const
 {
 	if (m_distr_opfamilies == nullptr)
@@ -580,7 +581,7 @@ CMDRelationGPDB::IndexMDidAt(ULONG pos) const
 //		Returns the id of the trigger at the specified position of the trigger array
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDRelationGPDB::TriggerMDidAt(ULONG pos) const
 {
 	return (*m_mdid_trigger_array)[pos];
@@ -609,7 +610,7 @@ CMDRelationGPDB::CheckConstraintCount() const
 //		the check constraint array
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDRelationGPDB::CheckConstraintMDidAt(ULONG pos) const
 {
 	return (*m_mdid_check_constraint_array)[pos];
@@ -623,7 +624,7 @@ CMDRelationGPDB::CheckConstraintMDidAt(ULONG pos) const
 //		Return the part constraint
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::pointer<CDXLNode *>
 CMDRelationGPDB::MDPartConstraint() const
 {
 	return m_mdpart_constraint;
@@ -807,7 +808,7 @@ CMDRelationGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	GPOS_CHECK_ABORT;
 }
 
-IMdIdArray *
+gpos::pointer<IMdIdArray *>
 CMDRelationGPDB::ChildPartitionMdids() const
 {
 	return m_partition_oids;

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalFilter.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecReplicated.h"
@@ -106,9 +107,10 @@ CPhysicalFilter::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalFilter::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CDistributionSpec *pdsRequired, ULONG child_index,
+							 gpos::pointer<CDistributionSpec *> pdsRequired,
+							 ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG ulOptReq) const
 {
@@ -198,10 +200,10 @@ CPhysicalFilter::PosDerive(CMemoryPool *,  // mp
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalFilter::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pdsChild = PdsDerivePassThruOuter(exprhdl);
+	gpos::owner<CDistributionSpec *> pdsChild = PdsDerivePassThruOuter(exprhdl);
 
 	if (CDistributionSpec::EdtStrictReplicated == pdsChild->Edt() &&
 		IMDFunction::EfsVolatile ==
@@ -252,7 +254,7 @@ CPhysicalFilter::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 					mp, pdshashed, pexprFilterPred,
 					exprhdl.DeriveOuterReferences());
 
-			CExpressionArray *pdrgpexprOriginal =
+			gpos::owner<CExpressionArray *> pdrgpexprOriginal =
 				pdshashedOriginal->Pdrgpexpr();
 			pdrgpexprOriginal->AddRef();
 			IMdIdArray *opfamiliesOriginal = pdshashedOriginal->Opfamilies();
@@ -261,7 +263,7 @@ CPhysicalFilter::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 				opfamiliesOriginal->AddRef();
 			}
 
-			CDistributionSpecHashed *pdsResult;
+			gpos::owner<CDistributionSpecHashed *> pdsResult;
 			if (nullptr == pdshashedComplete)
 			{
 				// could not complete the spec, return the original without any equiv spec
@@ -347,7 +349,7 @@ CPhysicalFilter::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalFilter::EpetOrder(CExpressionHandle &,	 // exprhdl
-						   const CEnfdOrder *
+						   gpos::pointer<const CEnfdOrder *>
 #ifdef GPOS_DEBUG
 							   peo
 #endif	// GPOS_DEBUG
@@ -370,8 +372,9 @@ CPhysicalFilter::EpetOrder(CExpressionHandle &,	 // exprhdl
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalFilter::EpetRewindability(CExpressionHandle &exprhdl,
-								   const CEnfdRewindability *per) const
+CPhysicalFilter::EpetRewindability(
+	CExpressionHandle &exprhdl,
+	gpos::pointer<const CEnfdRewindability *> per) const
 {
 	// get rewindability delivered by the Filter node
 	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();

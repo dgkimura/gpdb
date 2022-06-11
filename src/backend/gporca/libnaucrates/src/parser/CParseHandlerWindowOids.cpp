@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerWindowOids.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -92,7 +94,7 @@ CParseHandlerWindowOids::GetParseHandlerType() const
 	return EdxlphWindowOids;
 }
 
-CWindowOids *
+gpos::pointer<CWindowOids *>
 CParseHandlerWindowOids::GetWindowOids() const
 {
 	return m_window_oids;

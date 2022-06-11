@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerNLJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalNLJoin.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -48,7 +49,7 @@ class CParseHandlerNLJoin : public CParseHandlerPhysicalOp
 {
 private:
 	// the nested loop join operator
-	CDXLPhysicalNLJoin *m_dxl_op;
+	gpos::pointer<CDXLPhysicalNLJoin *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

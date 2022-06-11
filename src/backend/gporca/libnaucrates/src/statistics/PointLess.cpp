@@ -5,13 +5,15 @@
 
 #include "naucrates/statistics/PointLess.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/statistics/CPoint.h"
 
 namespace gpnaucrates
 {
 bool
-PointLess::operator()(const gpnaucrates::CPoint *a,
-					  const gpnaucrates::CPoint *b) const
+PointLess::operator()(gpos::pointer<const gpnaucrates::CPoint *> a,
+					  gpos::pointer<const gpnaucrates::CPoint *> b) const
 {
 	return a->IsLessThan(b);
 }

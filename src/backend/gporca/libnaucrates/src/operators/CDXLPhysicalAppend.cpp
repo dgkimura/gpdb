@@ -12,6 +12,7 @@
 #include "naucrates/dxl/operators/CDXLPhysicalAppend.h"
 
 #include "gpos/common/CBitSetIter.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -119,8 +120,9 @@ CDXLPhysicalAppend::IsZapped() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAppend::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+CDXLPhysicalAppend::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

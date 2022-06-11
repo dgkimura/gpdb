@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformLeftAntiSemiJoinNotIn2HashJoinNotIn.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalLeftAntiSemiJoinNotIn.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -81,7 +82,7 @@ CXformLeftAntiSemiJoinNotIn2HashJoinNotIn::Transform(CXformContext *pxfctxt,
 
 	if (pxfres->Pdrgpexpr()->Size() == 0)
 	{
-		CExpression *pexprProcessed = nullptr;
+		gpos::owner<CExpression *> pexprProcessed = nullptr;
 		if (CXformUtils::FProcessGPDBAntiSemiHashJoin(pxfctxt->Pmp(), pexpr,
 													  &pexprProcessed))
 		{

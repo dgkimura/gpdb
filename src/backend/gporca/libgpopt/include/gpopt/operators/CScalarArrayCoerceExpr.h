@@ -20,6 +20,7 @@
 #define GPOPT_CScalarArrayCoerceExpr_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalarCoerceBase.h"
 
@@ -39,7 +40,7 @@ class CScalarArrayCoerceExpr : public CScalarCoerceBase
 {
 private:
 	// catalog MDId of the element function
-	IMDId *m_pmdidElementFunc;
+	gpos::owner<IMDId *> m_pmdidElementFunc;
 
 	// conversion semantics flag to pass to func
 	BOOL m_is_explicit;
@@ -57,7 +58,7 @@ public:
 	~CScalarArrayCoerceExpr() override;
 
 	// return metadata id of element coerce function
-	IMDId *PmdidElementFunc() const;
+	gpos::pointer<IMDId *> PmdidElementFunc() const;
 
 	BOOL IsExplicit() const;
 
@@ -73,7 +74,7 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// conversion function
-	static CScalarArrayCoerceExpr *PopConvert(COperator *pop);
+	static gpos::cast_func<CScalarArrayCoerceExpr *> PopConvert(COperator *pop);
 
 };	// class CScalarArrayCoerceExpr
 

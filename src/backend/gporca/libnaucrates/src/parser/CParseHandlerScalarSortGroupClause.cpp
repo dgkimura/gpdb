@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarSortGroupClause.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarSortGroupClause.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -64,7 +66,7 @@ CParseHandlerScalarSortGroupClause::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 		EdxltokenMDTypeHashable, EdxltokenScalarSortGroupClause);
 
-	CDXLScalarSortGroupClause *dxl_op =
+	gpos::owner<CDXLScalarSortGroupClause *> dxl_op =
 		GPOS_NEW(m_mp) CDXLScalarSortGroupClause(m_mp, index, eqop, sortop,
 												 nullsfirst, hashable);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);

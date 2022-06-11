@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementCTEProducer.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalCTEProducer.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -77,15 +78,15 @@ CXformImplementCTEProducer::Transform(CXformContext *pxfctxt,
 	// extract components for alternative
 	ULONG id = popCTEProducer->UlCTEId();
 
-	CColRefArray *colref_array = popCTEProducer->Pdrgpcr();
+	gpos::owner<CColRefArray *> colref_array = popCTEProducer->Pdrgpcr();
 	colref_array->AddRef();
 
 	// child of CTEProducer operator
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
 	pexprChild->AddRef();
 
 	// create physical CTE Producer
-	CExpression *pexprAlt = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalCTEProducer(mp, id, colref_array),
 					pexprChild);
 

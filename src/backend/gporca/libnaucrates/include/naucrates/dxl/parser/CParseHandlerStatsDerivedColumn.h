@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerStatsDerivedColumn_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 #include "naucrates/md/CDXLStatsDerivedColumn.h"
@@ -51,7 +52,7 @@ private:
 	CDouble m_freq_remaining;
 
 	// derived column stats
-	CDXLStatsDerivedColumn *m_dxl_stats_derived_col;
+	gpos::owner<CDXLStatsDerivedColumn *> m_dxl_stats_derived_col;
 
 	// process the start of an element
 	void StartElement(
@@ -81,7 +82,7 @@ public:
 	~CParseHandlerStatsDerivedColumn() override;
 
 	// derived column stats
-	CDXLStatsDerivedColumn *
+	gpos::pointer<CDXLStatsDerivedColumn *>
 	GetDxlStatsDerivedCol() const
 	{
 		return m_dxl_stats_derived_col;

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalSplit.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CDistributionSpecAny.h"
@@ -83,10 +84,10 @@ CPhysicalSplit::~CPhysicalSplit()
 //		Compute required sort columns of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalSplit::PosRequired(CMemoryPool *mp,
-							CExpressionHandle &,  // exprhdl
-							COrderSpec *,		  // posRequired
+							CExpressionHandle &,		  // exprhdl
+							gpos::pointer<COrderSpec *>,  // posRequired
 							ULONG
 #ifdef GPOS_DEBUG
 								child_index
@@ -127,7 +128,7 @@ CPhysicalSplit::PosDerive(CMemoryPool *,  //mp,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalSplit::EpetOrder(CExpressionHandle &,	// exprhdl
-						  const CEnfdOrder *
+						  gpos::pointer<const CEnfdOrder *>
 #ifdef GPOS_DEBUG
 							  peo
 #endif	// GPOS_DEBUG
@@ -164,7 +165,8 @@ CPhysicalSplit::PcrsRequired(CMemoryPool *mp,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
+	gpos::owner<CColRefSet *> pcrs =
+		GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
 	pcrs->Union(pcrsRequired);
 	pcrs->Exclude(m_pcrAction);
 
@@ -179,10 +181,10 @@ CPhysicalSplit::PcrsRequired(CMemoryPool *mp,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalSplit::PdsRequired(CMemoryPool *mp,
-							CExpressionHandle &,  // exprhdl,
-							CDistributionSpec *,  // pdsInput,
+							CExpressionHandle &,				 // exprhdl,
+							gpos::pointer<CDistributionSpec *>,	 // pdsInput,
 							ULONG
 #ifdef GPOS_DEBUG
 								child_index
@@ -259,7 +261,7 @@ CPhysicalSplit::FProvidesReqdCols(CExpressionHandle &exprhdl,
 	GPOS_ASSERT(nullptr != pcrsRequired);
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	CColRefSet *pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
 	// include defined column
 	pcrs->Include(m_pcrAction);
 
@@ -280,10 +282,11 @@ CPhysicalSplit::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalSplit::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	gpos::pointer<CDistributionSpec *> pdsOuter =
+		exprhdl.Pdpplan(0 /*child_index*/)->Pds();
 
 	if (CDistributionSpec::EdtHashed != pdsOuter->Edt())
 	{
@@ -293,8 +296,8 @@ CPhysicalSplit::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 
 	// find out which columns of the target table get modified by the DML and check
 	// whether those participate in the derived hash distribution
-	CColRefSet *pcrsModified = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefSet *pcrsDelete = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsModified = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsDelete = GPOS_NEW(mp) CColRefSet(mp);
 	const ULONG num_cols = m_pdrgpcrDelete->Size();
 
 	for (ULONG ul = 0; ul < num_cols; ul++)
@@ -353,7 +356,7 @@ CPhysicalSplit::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 
 	do
 	{
-		CColRefSet *pcrsHashed =
+		gpos::owner<CColRefSet *> pcrsHashed =
 			CUtils::PcrsExtractColumns(mp, pdsHashed->Pdrgpexpr());
 		if (!pcrsModified->IsDisjoint(pcrsHashed))
 		{
@@ -442,8 +445,9 @@ CPhysicalSplit::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalSplit::EpetRewindability(CExpressionHandle &exprhdl,
-								  const CEnfdRewindability *per) const
+CPhysicalSplit::EpetRewindability(
+	CExpressionHandle &exprhdl,
+	gpos::pointer<const CEnfdRewindability *> per) const
 {
 	// get rewindability delivered by the split node
 	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalMotionGather.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -115,7 +116,7 @@ CPhysicalMotionGather::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsSort);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsSort);
 	pcrs->Union(pcrsRequired);
 
 	CColRefSet *pcrsChildReqd =
@@ -152,7 +153,7 @@ CPhysicalMotionGather::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalMotionGather::EpetOrder(CExpressionHandle &,  // exprhdl
-								 const CEnfdOrder *peo) const
+								 gpos::pointer<const CEnfdOrder *> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
@@ -182,9 +183,9 @@ CPhysicalMotionGather::EpetOrder(CExpressionHandle &,  // exprhdl
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalMotionGather::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   COrderSpec *,  //posInput,
+								   gpos::pointer<COrderSpec *>,	 //posInput,
 								   ULONG child_index,
 								   CDrvdPropArray *,  // pdrgpdpCtxt
 								   ULONG			  // ulOptReq
@@ -208,7 +209,7 @@ CPhysicalMotionGather::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalMotionGather::PosDerive(CMemoryPool *,		  // mp
 								 CExpressionHandle &  // exprhdl
 ) const
@@ -248,7 +249,7 @@ CPhysicalMotionGather::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalMotionGather *
+gpos::cast_func<CPhysicalMotionGather *>
 CPhysicalMotionGather::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);

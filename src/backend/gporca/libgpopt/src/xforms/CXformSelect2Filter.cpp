@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformSelect2Filter.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalSelect.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -91,7 +92,7 @@ CXformSelect2Filter::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pexprScalar->AddRef();
 
 	// assemble physical operator
-	CExpression *pexprFilter = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprFilter = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalFilter(mp), pexprRelational, pexprScalar);
 
 	// add alternative to results

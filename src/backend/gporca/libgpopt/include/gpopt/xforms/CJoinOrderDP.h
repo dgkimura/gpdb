@@ -49,10 +49,10 @@ private:
 	struct SComponentPair : public CRefCount
 	{
 		// first component
-		CBitSet *m_pbsFst;
+		gpos::owner<CBitSet *> m_pbsFst;
 
 		// second component
-		CBitSet *m_pbsSnd;
+		gpos::owner<CBitSet *> m_pbsSnd;
 
 		// ctor
 		SComponentPair(CBitSet *pbsFst, CBitSet *pbsSnd);
@@ -61,16 +61,16 @@ private:
 		~SComponentPair() override;
 
 		// hashing function
-		static ULONG HashValue(const SComponentPair *pcomppair);
+		static ULONG HashValue(gpos::pointer<const SComponentPair *> pcomppair);
 
 		// equality function
-		static BOOL Equals(const SComponentPair *pcomppairFst,
-						   const SComponentPair *pcomppairSnd);
+		static BOOL Equals(gpos::pointer<const SComponentPair *> pcomppairFst,
+						   gpos::pointer<const SComponentPair *> pcomppairSnd);
 	};
 
 	// hashing function
 	static ULONG
-	UlHashBitSet(const CBitSet *pbs)
+	UlHashBitSet(gpos::pointer<const CBitSet *> pbs)
 	{
 		GPOS_ASSERT(nullptr != pbs);
 
@@ -79,7 +79,8 @@ private:
 
 	// equality function
 	static BOOL
-	FEqualBitSet(const CBitSet *pbsFst, const CBitSet *pbsSnd)
+	FEqualBitSet(gpos::pointer<const CBitSet *> pbsFst,
+				 gpos::pointer<const CBitSet *> pbsSnd)
 	{
 		GPOS_ASSERT(nullptr != pbsFst);
 		GPOS_ASSERT(nullptr != pbsSnd);
@@ -104,25 +105,25 @@ private:
 				 CleanupRelease<CExpression>, CleanupDelete<CDouble>>;
 
 	// lookup table for links
-	ComponentPairToExpressionMap *m_phmcomplink;
+	gpos::owner<ComponentPairToExpressionMap *> m_phmcomplink;
 
 	// dynamic programming table
-	BitSetToExpressionMap *m_phmbsexpr;
+	gpos::owner<BitSetToExpressionMap *> m_phmbsexpr;
 
 	// map of expressions to its cost
-	ExpressionToCostMap *m_phmexprcost;
+	gpos::owner<ExpressionToCostMap *> m_phmexprcost;
 
 	// array of top-k join expression
-	CExpressionArray *m_pdrgpexprTopKOrders;
+	gpos::owner<CExpressionArray *> m_pdrgpexprTopKOrders;
 
 	// dummy expression to used for non-joinable components
-	CExpression *m_pexprDummy;
+	gpos::owner<CExpression *> m_pexprDummy;
 
 	// build expression linking given components
 	CExpression *PexprBuildPred(CBitSet *pbsFst, CBitSet *pbsSnd);
 
 	// lookup best join order for given set
-	CExpression *PexprLookup(CBitSet *pbs);
+	gpos::pointer<CExpression *> PexprLookup(CBitSet *pbs);
 
 	// extract predicate joining the two given sets
 	gpos::pointer<CExpression *> PexprPred(gpos::pointer<CBitSet *> pbsFst,
@@ -186,7 +187,7 @@ public:
 	virtual CExpression *PexprExpand();
 
 	// best join orders
-	CExpressionArray *
+	gpos::pointer<CExpressionArray *>
 	PdrgpexprTopK() const
 	{
 		return m_pdrgpexprTopKOrders;

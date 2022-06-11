@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformCTEAnchor2TrivialSelect.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalCTEAnchor.h"
@@ -98,10 +99,10 @@ CXformCTEAnchor2TrivialSelect::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// child of CTE anchor
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
 	pexprChild->AddRef();
 
-	CExpression *pexprSelect = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprSelect = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalSelect(mp), pexprChild,
 					CUtils::PexprScalarConstBool(mp, true /*fValue*/));
 

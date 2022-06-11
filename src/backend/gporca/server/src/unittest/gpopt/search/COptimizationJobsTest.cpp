@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/search/COptimizationJobsTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/engine/CEngine.h"
@@ -66,7 +67,7 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -77,7 +78,7 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 		CEngine eng(mp);
 
 		// generate  join expression
-		CExpression *pexpr =
+		gpos::owner<CExpression *> pexpr =
 			CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
 
 		// generate query context
@@ -88,12 +89,13 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 
 		CGroup *pgroup = eng.PgroupRoot();
 		pqc->Prpp()->AddRef();
-		COptimizationContext *poc = GPOS_NEW(mp) COptimizationContext(
-			mp, pgroup, pqc->Prpp(),
-			GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp)),
-			GPOS_NEW(mp) IStatisticsArray(mp),
-			0  // ulSearchStageIndex
-		);
+		gpos::owner<COptimizationContext *> poc =
+			GPOS_NEW(mp) COptimizationContext(
+				mp, pgroup, pqc->Prpp(),
+				GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp)),
+				GPOS_NEW(mp) IStatisticsArray(mp),
+				0  // ulSearchStageIndex
+			);
 
 		// optimize query
 		CJobFactory jf(mp, 1000 /*ulJobs*/);

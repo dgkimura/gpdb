@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalCTEConsumer.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/CMaxCard.h"
@@ -115,7 +116,7 @@ CLogicalCTEConsumer::CreateInlinedExpr(CMemoryPool *mp)
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalCTEConsumer::DeriveOutputColumns(CMemoryPool *,		  //mp,
 										 CExpressionHandle &  //exprhdl
 )
@@ -187,12 +188,12 @@ CLogicalCTEConsumer::DeriveKeyCollection(CMemoryPool *,		  //mp,
 //		Derive partition consumers
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::owner<CPartInfo *>
 CLogicalCTEConsumer::DerivePartitionInfo(CMemoryPool *,		  //mp,
 										 CExpressionHandle &  //exprhdl
 ) const
 {
-	CPartInfo *ppartInfo = m_pexprInlined->DerivePartitionInfo();
+	gpos::owner<CPartInfo *> ppartInfo = m_pexprInlined->DerivePartitionInfo();
 	ppartInfo->AddRef();
 
 	return ppartInfo;
@@ -311,7 +312,7 @@ CLogicalCTEConsumer::FInputOrderSensitive() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalCTEConsumer::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -340,7 +341,7 @@ CLogicalCTEConsumer::PopCopyWithRemappedColumns(
 CXformSet *
 CLogicalCTEConsumer::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfInlineCTEConsumer);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementCTEConsumer);
 	return xform_set;
@@ -354,7 +355,7 @@ CLogicalCTEConsumer::PxfsCandidates(CMemoryPool *mp) const
 //		Derive constraint property
 //
 //---------------------------------------------------------------------------
-CPropConstraint *
+gpos::owner<CPropConstraint *>
 CLogicalCTEConsumer::DerivePropertyConstraint(CMemoryPool *mp,
 											  CExpressionHandle &  //exprhdl
 ) const
@@ -367,7 +368,8 @@ CLogicalCTEConsumer::DerivePropertyConstraint(CMemoryPool *mp,
 	CConstraint *pcnstr = ppc->Pcnstr();
 
 	// remap producer columns to consumer columns
-	CColRefSetArray *pdrgpcrsMapped = GPOS_NEW(mp) CColRefSetArray(mp);
+	gpos::owner<CColRefSetArray *> pdrgpcrsMapped =
+		GPOS_NEW(mp) CColRefSetArray(mp);
 	const ULONG length = pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -404,7 +406,7 @@ CLogicalCTEConsumer::PstatsDerive(CMemoryPool *mp,
 	CExpression *pexprProducer =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexprProducer);
-	const IStatistics *stats = pexprProducer->Pstats();
+	gpos::pointer<const IStatistics *> stats = pexprProducer->Pstats();
 	GPOS_ASSERT(nullptr != stats);
 
 	// copy the stats with the remaped colids

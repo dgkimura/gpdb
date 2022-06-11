@@ -4,6 +4,7 @@
 #ifndef GPOPT_CColConstraintsHashMapper_H
 #define GPOPT_CColConstraintsHashMapper_H
 
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPool.h"
 
 #include "gpopt/base/CConstraint.h"
@@ -16,11 +17,11 @@ class CColConstraintsHashMapper : public IColConstraintsMapper
 public:
 	CColConstraintsHashMapper(CMemoryPool *mp, CConstraintArray *pdrgPcnstr);
 
-	CConstraintArray *PdrgPcnstrLookup(CColRef *colref) override;
+	gpos::owner<CConstraintArray *> PdrgPcnstrLookup(CColRef *colref) override;
 	~CColConstraintsHashMapper() override;
 
 private:
-	ColRefToConstraintArrayMap *m_phmColConstr;
+	gpos::owner<ColRefToConstraintArrayMap *> m_phmColConstr;
 };
 }  // namespace gpopt
 

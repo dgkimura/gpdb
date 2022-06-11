@@ -11,6 +11,7 @@
 #define GPOPT_CLogicalIndexApply_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalApply.h"
@@ -22,13 +23,13 @@ class CLogicalIndexApply : public CLogicalApply
 private:
 protected:
 	// columns used from Apply's outer child used by index in Apply's inner child
-	CColRefArray *m_pdrgpcrOuterRefs;
+	gpos::owner<CColRefArray *> m_pdrgpcrOuterRefs;
 
 	// is this an outer join?
 	BOOL m_fOuterJoin;
 
 	// a copy of the original join predicate that has been pushed down to the inner side
-	CExpression *m_origJoinPred;
+	gpos::owner<CExpression *> m_origJoinPred;
 
 public:
 	CLogicalIndexApply(const CLogicalIndexApply &) = delete;
@@ -58,7 +59,7 @@ public:
 	}
 
 	// outer column references accessor
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgPcrOuterRefs() const
 	{
 		return m_pdrgpcrOuterRefs;
@@ -71,7 +72,7 @@ public:
 		return m_fOuterJoin;
 	}
 
-	CExpression *
+	gpos::pointer<CExpression *>
 	OrigJoinPred()
 	{
 		return m_origJoinPred;
@@ -121,8 +122,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	IStatistics *PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -138,7 +140,7 @@ public:
 										  BOOL must_exist) override;
 
 	// conversion function
-	static CLogicalIndexApply *
+	static gpos::cast_func<CLogicalIndexApply *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerLogicalConstTable_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLLogicalGet.h"
 #include "naucrates/dxl/parser/CParseHandlerLogicalOp.h"
@@ -37,10 +38,10 @@ class CParseHandlerLogicalConstTable : public CParseHandlerLogicalOp
 {
 private:
 	// array of datum arrays
-	CDXLDatum2dArray *m_const_tuples_datum_array;
+	gpos::pointer<CDXLDatum2dArray *> m_const_tuples_datum_array;
 
 	// array of datums
-	CDXLDatumArray *m_dxl_datum_array;
+	gpos::pointer<CDXLDatumArray *> m_dxl_datum_array;
 
 	// process the start of an element
 	void StartElement(

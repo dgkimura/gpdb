@@ -15,6 +15,8 @@
 //
 //---------------------------------------------------------------------------
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/parser/parsehandlers.h"
 #include "naucrates/dxl/xml/CDXLMemoryManager.h"
 #include "naucrates/dxl/xml/dxltokens.h"
@@ -23,8 +25,8 @@ using namespace gpdxl;
 
 XERCES_CPP_NAMESPACE_USE
 
-CParseHandlerFactory::TokenParseHandlerFuncMap
-	*CParseHandlerFactory::m_token_parse_handler_func_map = nullptr;
+gpos::owner<CParseHandlerFactory::TokenParseHandlerFuncMap *>
+	CParseHandlerFactory::m_token_parse_handler_func_map = nullptr;
 
 // adds a new mapping of token to corresponding parse handler
 void

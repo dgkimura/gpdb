@@ -13,6 +13,7 @@
 
 #include "naucrates/md/CMDCastGPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -79,7 +80,7 @@ CMDCastGPDB::~CMDCastGPDB()
 //		Mdid of cast object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDCastGPDB::MDId() const
 {
 	return m_mdid;
@@ -107,7 +108,7 @@ CMDCastGPDB::Mdname() const
 //		Source type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDCastGPDB::MdidSrc() const
 {
 	return m_mdid_src;
@@ -121,7 +122,7 @@ CMDCastGPDB::MdidSrc() const
 //		Destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDCastGPDB::MdidDest() const
 {
 	return m_mdid_dest;
@@ -135,7 +136,7 @@ CMDCastGPDB::MdidDest() const
 //		Cast function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDCastGPDB::GetCastFuncMdId() const
 {
 	return m_mdid_cast_func;

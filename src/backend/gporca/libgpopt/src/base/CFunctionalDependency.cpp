@@ -12,6 +12,7 @@
 #include "gpopt/base/CFunctionalDependency.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 
@@ -92,7 +93,8 @@ CFunctionalDependency::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CFunctionalDependency::Equals(const CFunctionalDependency *pfd) const
+CFunctionalDependency::Equals(
+	gpos::pointer<const CFunctionalDependency *> pfd) const
 {
 	if (nullptr == pfd)
 	{
@@ -130,7 +132,8 @@ CFunctionalDependency::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 ULONG
-CFunctionalDependency::HashValue(const CFunctionalDependencyArray *pdrgpfd)
+CFunctionalDependency::HashValue(
+	gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd)
 {
 	ULONG ulHash = 0;
 	if (nullptr != pdrgpfd)
@@ -155,8 +158,9 @@ CFunctionalDependency::HashValue(const CFunctionalDependencyArray *pdrgpfd)
 //
 //---------------------------------------------------------------------------
 BOOL
-CFunctionalDependency::Equals(const CFunctionalDependencyArray *pdrgpfdFst,
-							  const CFunctionalDependencyArray *pdrgpfdSnd)
+CFunctionalDependency::Equals(
+	gpos::pointer<const CFunctionalDependencyArray *> pdrgpfdFst,
+	gpos::pointer<const CFunctionalDependencyArray *> pdrgpfdSnd)
 {
 	if (nullptr == pdrgpfdFst && nullptr == pdrgpfdSnd)
 		return true; /* both empty */
@@ -173,11 +177,13 @@ CFunctionalDependency::Equals(const CFunctionalDependencyArray *pdrgpfdFst,
 	BOOL fEqual = true;
 	for (ULONG ulFst = 0; fEqual && ulFst < ulLenFst; ulFst++)
 	{
-		const CFunctionalDependency *pfdFst = (*pdrgpfdFst)[ulFst];
+		gpos::pointer<const CFunctionalDependency *> pfdFst =
+			(*pdrgpfdFst)[ulFst];
 		BOOL fMatch = false;
 		for (ULONG ulSnd = 0; !fMatch && ulSnd < ulLenSnd; ulSnd++)
 		{
-			const CFunctionalDependency *pfdSnd = (*pdrgpfdSnd)[ulSnd];
+			gpos::pointer<const CFunctionalDependency *> pfdSnd =
+				(*pdrgpfdSnd)[ulSnd];
 			fMatch = pfdFst->Equals(pfdSnd);
 		}
 		fEqual = fMatch;
@@ -196,10 +202,10 @@ CFunctionalDependency::Equals(const CFunctionalDependencyArray *pdrgpfdFst,
 //
 //---------------------------------------------------------------------------
 CColRefSet *
-CFunctionalDependency::PcrsKeys(CMemoryPool *mp,
-								const CFunctionalDependencyArray *pdrgpfd)
+CFunctionalDependency::PcrsKeys(
+	CMemoryPool *mp, gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd)
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	if (pdrgpfd != nullptr)
 	{
@@ -223,10 +229,10 @@ CFunctionalDependency::PcrsKeys(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 CColRefArray *
-CFunctionalDependency::PdrgpcrKeys(CMemoryPool *mp,
-								   const CFunctionalDependencyArray *pdrgpfd)
+CFunctionalDependency::PdrgpcrKeys(
+	CMemoryPool *mp, gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd)
 {
-	CColRefSet *pcrs = PcrsKeys(mp, pdrgpfd);
+	gpos::owner<CColRefSet *> pcrs = PcrsKeys(mp, pdrgpfd);
 	CColRefArray *colref_array = pcrs->Pdrgpcr(mp);
 	pcrs->Release();
 

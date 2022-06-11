@@ -54,7 +54,7 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// relation mdid
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -69,45 +69,45 @@ private:
 	Ereldistrpolicy m_rel_distr_policy;
 
 	// columns
-	CMDColumnArray *m_md_col_array;
+	gpos::owner<CMDColumnArray *> m_md_col_array;
 
 	// number of dropped columns
 	ULONG m_dropped_cols;
 
 	// indices of distribution columns
-	ULongPtrArray *m_distr_col_array;
+	gpos::owner<ULongPtrArray *> m_distr_col_array;
 
-	IMdIdArray *m_distr_opfamilies;
+	gpos::owner<IMdIdArray *> m_distr_opfamilies;
 
 	// do we need to consider a hash distributed table as random distributed
 	BOOL m_convert_hash_to_random;
 
 	// indices of partition columns
-	ULongPtrArray *m_partition_cols_array;
+	gpos::owner<ULongPtrArray *> m_partition_cols_array;
 
 	// partition types
-	CharPtrArray *m_str_part_types_array;
+	gpos::owner<CharPtrArray *> m_str_part_types_array;
 
 	// number of partition
 	ULONG m_num_of_partitions;
 
 	// Child partition oids
-	IMdIdArray *m_partition_oids;
+	gpos::owner<IMdIdArray *> m_partition_oids;
 
 	// array of key sets
-	ULongPtr2dArray *m_keyset_array;
+	gpos::owner<ULongPtr2dArray *> m_keyset_array;
 
 	// array of index info
-	CMDIndexInfoArray *m_mdindex_info_array;
+	gpos::owner<CMDIndexInfoArray *> m_mdindex_info_array;
 
 	// array of trigger ids
-	IMdIdArray *m_mdid_trigger_array;
+	gpos::owner<IMdIdArray *> m_mdid_trigger_array;
 
 	// array of check constraint mdids
-	IMdIdArray *m_mdid_check_constraint_array;
+	gpos::owner<IMdIdArray *> m_mdid_check_constraint_array;
 
 	// partition constraint
-	CDXLNode *m_mdpart_constraint;
+	gpos::owner<CDXLNode *> m_mdpart_constraint;
 
 	// does this table have oids
 	BOOL m_has_oids;
@@ -116,17 +116,17 @@ private:
 	ULONG m_system_columns;
 
 	// mapping of column position to positions excluding dropped columns
-	UlongToUlongMap *m_colpos_nondrop_colpos_map;
+	gpos::owner<UlongToUlongMap *> m_colpos_nondrop_colpos_map;
 
 	// mapping of attribute number in the system catalog to the positions of
 	// the non dropped column in the metadata object
-	IntToUlongMap *m_attrno_nondrop_col_pos_map;
+	gpos::owner<IntToUlongMap *> m_attrno_nondrop_col_pos_map;
 
 	// the original positions of all the non-dropped columns
-	ULongPtrArray *m_nondrop_col_pos_array;
+	gpos::owner<ULongPtrArray *> m_nondrop_col_pos_array;
 
 	// array of column widths including dropped columns
-	CDoubleArray *m_col_width_array;
+	gpos::owner<CDoubleArray *> m_col_width_array;
 
 public:
 	CMDRelationGPDB(const CMDRelationGPDB &) = delete;
@@ -157,7 +157,7 @@ public:
 	}
 
 	// the metadata id
-	IMDId *MDId() const override;
+	gpos::pointer<IMDId *> MDId() const override;
 
 	// relation name
 	CMDName Mdname() const override;
@@ -190,7 +190,7 @@ public:
 	ULONG GetPosFromAttno(INT attno) const override;
 
 	// return the original positions of all the non-dropped columns
-	ULongPtrArray *NonDroppedColsArray() const override;
+	gpos::pointer<ULongPtrArray *> NonDroppedColsArray() const override;
 
 	// number of system columns
 	ULONG SystemColumnsCount() const override;
@@ -210,7 +210,7 @@ public:
 	// retrieve the column at the given position in the distribution columns list for the relation
 	gpos::pointer<const IMDColumn *> GetDistrColAt(ULONG pos) const override;
 
-	IMDId *GetDistrOpfamilyAt(ULONG pos) const override;
+	gpos::pointer<IMDId *> GetDistrOpfamilyAt(ULONG pos) const override;
 
 	// return true if a hash distributed table needs to be considered as random
 	BOOL ConvertHashToRandom() const override;
@@ -231,7 +231,7 @@ public:
 	gpos::pointer<const IMDColumn *> PartColAt(ULONG pos) const override;
 
 	// retrieve list of partition types
-	CharPtrArray *GetPartitionTypes() const override;
+	gpos::pointer<CharPtrArray *> GetPartitionTypes() const override;
 
 	// retrieve the partition type of the given level
 	CHAR PartTypeAtLevel(ULONG ulLevel) const override;
@@ -246,7 +246,7 @@ public:
 	IMDId *IndexMDidAt(ULONG pos) const override;
 
 	// retrieve the id of the metadata cache trigger at the given position
-	IMDId *TriggerMDidAt(ULONG pos) const override;
+	gpos::pointer<IMDId *> TriggerMDidAt(ULONG pos) const override;
 
 	// serialize metadata relation in DXL format given a serializer object
 	void Serialize(gpdxl::CXMLSerializer *) const override;
@@ -255,13 +255,13 @@ public:
 	ULONG CheckConstraintCount() const override;
 
 	// retrieve the id of the check constraint cache at the given position
-	IMDId *CheckConstraintMDidAt(ULONG pos) const override;
+	gpos::pointer<IMDId *> CheckConstraintMDidAt(ULONG pos) const override;
 
 	// part constraint
-	CDXLNode *MDPartConstraint() const override;
+	gpos::pointer<CDXLNode *> MDPartConstraint() const override;
 
 	// child partition oids
-	IMdIdArray *ChildPartitionMdids() const override;
+	gpos::pointer<IMdIdArray *> ChildPartitionMdids() const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the metadata relation

@@ -35,7 +35,7 @@ class CKeyCollection : public CRefCount, public DbgPrintMixin<CKeyCollection>
 {
 private:
 	// array of key sets
-	CColRefSetArray *m_pdrgpcrs;
+	gpos::owner<CColRefSetArray *> m_pdrgpcrs;
 
 public:
 	CKeyCollection(const CKeyCollection &) = delete;
@@ -43,7 +43,7 @@ public:
 	// ctors
 	explicit CKeyCollection(CMemoryPool *mp);
 	CKeyCollection(CMemoryPool *mp, CColRefSet *pcrs);
-	CKeyCollection(CMemoryPool *mp, CColRefArray *colref_array);
+	CKeyCollection(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array);
 
 	// dtor
 	~CKeyCollection() override;
@@ -74,7 +74,7 @@ public:
 	CColRefArray *PdrgpcrKey(CMemoryPool *mp, ULONG ul) const;
 
 	// extract key at given position
-	CColRefSet *PcrsKey(CMemoryPool *mp, ULONG ul) const;
+	gpos::owner<CColRefSet *> PcrsKey(CMemoryPool *mp, ULONG ul) const;
 
 	// number of keys
 	ULONG

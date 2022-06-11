@@ -43,7 +43,7 @@ class CSearchStage : public DbgPrintMixin<CSearchStage>
 {
 private:
 	// set of xforms to be applied during stage
-	CXformSet *m_xforms;
+	gpos::owner<CXformSet *> m_xforms;
 
 	// time threshold in milliseconds
 	ULONG m_time_threshold;
@@ -52,7 +52,7 @@ private:
 	CCost m_cost_threshold;
 
 	// best plan found at the end of search stage
-	CExpression *m_pexprBest;
+	gpos::owner<CExpression *> m_pexprBest;
 
 	// cost of best plan found
 	CCost m_costBest;
@@ -102,7 +102,7 @@ public:
 	}
 
 	// xforms set accessor
-	CXformSet *
+	gpos::pointer<CXformSet *>
 	GetXformSet() const
 	{
 		return m_xforms;

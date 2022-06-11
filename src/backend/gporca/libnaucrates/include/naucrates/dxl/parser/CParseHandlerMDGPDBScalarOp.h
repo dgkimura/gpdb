@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDGPDBScalarOp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 
@@ -34,28 +35,28 @@ class CParseHandlerMDGPDBScalarOp : public CParseHandlerMetadataObject
 {
 private:
 	// id and version
-	IMDId *m_mdid;
+	gpos::pointer<IMDId *> m_mdid;
 
 	// name
 	CMDName *m_mdname;
 
 	// type of left operand
-	IMDId *m_mdid_type_left;
+	gpos::pointer<IMDId *> m_mdid_type_left;
 
 	// type of right operand
-	IMDId *m_mdid_type_right;
+	gpos::pointer<IMDId *> m_mdid_type_right;
 
 	// type of result operand
-	IMDId *m_mdid_type_result;
+	gpos::pointer<IMDId *> m_mdid_type_result;
 
 	// id of function which implements the operator
-	IMDId *m_func_mdid;
+	gpos::pointer<IMDId *> m_func_mdid;
 
 	// id of commute operator
-	IMDId *m_mdid_commute_opr;
+	gpos::pointer<IMDId *> m_mdid_commute_opr;
 
 	// id of inverse operator
-	IMDId *m_mdid_inverse_opr;
+	gpos::pointer<IMDId *> m_mdid_inverse_opr;
 
 	// comparison type
 	IMDType::ECmpType m_comparision_type;
@@ -63,8 +64,8 @@ private:
 	// does operator return NULL on NULL input?
 	BOOL m_returns_null_on_null_input;
 
-	IMDId *m_mdid_hash_opfamily;
-	IMDId *m_mdid_legacy_hash_opfamily;
+	gpos::pointer<IMDId *> m_mdid_hash_opfamily;
+	gpos::pointer<IMDId *> m_mdid_legacy_hash_opfamily;
 
 	// preserves NDVs of inputs
 	BOOL m_is_ndv_preserving;

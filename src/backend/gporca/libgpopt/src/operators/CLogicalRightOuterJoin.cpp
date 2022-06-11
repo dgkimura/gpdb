@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalRightOuterJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CExpression.h"
@@ -72,7 +73,7 @@ CLogicalRightOuterJoin::DeriveMaxCard(CMemoryPool *,  // mp
 CXformSet *
 CLogicalRightOuterJoin::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfRightOuterJoin2HashJoin);
 

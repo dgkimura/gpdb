@@ -12,6 +12,7 @@
 #include "naucrates/statistics/CStatistics.h"
 
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
@@ -250,7 +251,7 @@ CStatistics::Width(CMemoryPool *mp, CColRefSet *colrefs) const
 {
 	GPOS_ASSERT(nullptr != colrefs);
 
-	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	colrefs->ExtractColIds(mp, colids);
 
 	CDouble width = Width(colids);
@@ -267,11 +268,12 @@ CStatistics::MakeDummyStats(CMemoryPool *mp, ULongPtrArray *colids,
 	GPOS_ASSERT(nullptr != colids);
 
 	// hash map from colid -> histogram for resultant structure
-	UlongToHistogramMap *col_histogram_mapping =
+	gpos::owner<UlongToHistogramMap *> col_histogram_mapping =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// hashmap from colid -> width (double)
-	UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::owner<UlongToDoubleMap *> colid_width_mapping =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
@@ -280,7 +282,7 @@ CStatistics::MakeDummyStats(CMemoryPool *mp, ULongPtrArray *colids,
 		mp, col_factory, col_histogram_mapping, colid_width_mapping, colids,
 		is_empty);
 
-	CStatistics *stats = GPOS_NEW(mp) CStatistics(
+	gpos::owner<CStatistics *> stats = GPOS_NEW(mp) CStatistics(
 		mp, col_histogram_mapping, colid_width_mapping, rows, is_empty);
 	CreateAndInsertUpperBoundNDVs(mp, stats, colids, rows);
 
@@ -296,7 +298,7 @@ CStatistics::CreateAndInsertUpperBoundNDVs(CMemoryPool *mp, CStatistics *stats,
 	GPOS_ASSERT(nullptr != colids);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
-	CColRefSet *colrefs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> colrefs = GPOS_NEW(mp) CColRefSet(mp);
 	const ULONG num_cols = colids->Size();
 	for (ULONG i = 0; i < num_cols; i++)
 	{
@@ -331,7 +333,7 @@ CStatistics::MakeDummyStats(CMemoryPool *mp,
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 	// hash map from colid -> histogram for resultant structure
-	UlongToHistogramMap *result_col_histogram_mapping =
+	gpos::owner<UlongToHistogramMap *> result_col_histogram_mapping =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	const ULONG num_col_hist = col_histogram_mapping->Size();
@@ -350,7 +352,8 @@ CStatistics::MakeDummyStats(CMemoryPool *mp,
 	}
 
 	// hashmap from colid -> width (double)
-	UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::owner<UlongToDoubleMap *> colid_width_mapping =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	const ULONG num_col_width = col_width_mapping->Size();
 	for (ULONG ul = 0; ul < num_col_width; ul++)
@@ -366,7 +369,7 @@ CStatistics::MakeDummyStats(CMemoryPool *mp,
 									GPOS_NEW(mp) CDouble(width));
 	}
 
-	CStatistics *stats = GPOS_NEW(mp)
+	gpos::owner<CStatistics *> stats = GPOS_NEW(mp)
 		CStatistics(mp, result_col_histogram_mapping, colid_width_mapping, rows,
 					false /* is_empty */);
 	CreateAndInsertUpperBoundNDVs(mp, stats, col_histogram_mapping, rows);
@@ -377,8 +380,9 @@ CStatistics::MakeDummyStats(CMemoryPool *mp,
 
 //	check if the input statistics from join statistics computation empty
 BOOL
-CStatistics::IsEmptyJoin(const CStatistics *outer_stats,
-						 const CStatistics *inner_side_stats, BOOL IsLASJ)
+CStatistics::IsEmptyJoin(gpos::pointer<const CStatistics *> outer_stats,
+						 gpos::pointer<const CStatistics *> inner_side_stats,
+						 BOOL IsLASJ)
 {
 	GPOS_ASSERT(nullptr != outer_stats);
 	GPOS_ASSERT(nullptr != inner_side_stats);
@@ -396,7 +400,8 @@ CStatistics::IsEmptyJoin(const CStatistics *outer_stats,
 
 //	return statistics object after performing LOJ operation with another statistics structure
 IStatistics *
-CStatistics::CalcLOJoinStats(CMemoryPool *mp, const IStatistics *other_stats,
+CStatistics::CalcLOJoinStats(CMemoryPool *mp,
+							 gpos::pointer<const IStatistics *> other_stats,
 							 CStatsPredJoinArray *join_preds_stats) const
 {
 	return CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
@@ -407,9 +412,9 @@ CStatistics::CalcLOJoinStats(CMemoryPool *mp, const IStatistics *other_stats,
 
 //	return statistics object after performing semi-join with another statistics structure
 IStatistics *
-CStatistics::CalcLSJoinStats(CMemoryPool *mp,
-							 const IStatistics *inner_side_stats,
-							 CStatsPredJoinArray *join_preds_stats) const
+CStatistics::CalcLSJoinStats(
+	CMemoryPool *mp, gpos::pointer<const IStatistics *> inner_side_stats,
+	CStatsPredJoinArray *join_preds_stats) const
 {
 	return CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
 		mp, this, inner_side_stats, join_preds_stats);
@@ -419,7 +424,8 @@ CStatistics::CalcLSJoinStats(CMemoryPool *mp,
 
 // return statistics object after performing inner join
 IStatistics *
-CStatistics::CalcInnerJoinStats(CMemoryPool *mp, const IStatistics *other_stats,
+CStatistics::CalcInnerJoinStats(CMemoryPool *mp,
+								gpos::pointer<const IStatistics *> other_stats,
 								CStatsPredJoinArray *join_preds_stats) const
 {
 	return CInnerJoinStatsProcessor::CalcInnerJoinStatsStatic(
@@ -428,7 +434,8 @@ CStatistics::CalcInnerJoinStats(CMemoryPool *mp, const IStatistics *other_stats,
 
 // return statistics object after performing LASJ
 IStatistics *
-CStatistics::CalcLASJoinStats(CMemoryPool *mp, const IStatistics *other_stats,
+CStatistics::CalcLASJoinStats(CMemoryPool *mp,
+							  gpos::pointer<const IStatistics *> other_stats,
 							  CStatsPredJoinArray *join_preds_stats,
 							  BOOL DoIgnoreLASJHistComputation) const
 {
@@ -463,7 +470,8 @@ CStatistics::AddNotExcludedHistograms(
 UlongToDoubleMap *
 CStatistics::CopyWidths(CMemoryPool *mp) const
 {
-	UlongToDoubleMap *widths_copy = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::owner<UlongToDoubleMap *> widths_copy =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 	CStatisticsUtils::AddWidthInfo(mp, m_colid_width_mapping, widths_copy);
 
 	return widths_copy;
@@ -481,7 +489,8 @@ UlongToHistogramMap *
 CStatistics::CopyHistograms(CMemoryPool *mp) const
 {
 	// create hash map from colid -> histogram for resultant structure
-	UlongToHistogramMap *histograms_copy = GPOS_NEW(mp) UlongToHistogramMap(mp);
+	gpos::owner<UlongToHistogramMap *> histograms_copy =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	BOOL is_empty = IsEmpty();
 
@@ -510,13 +519,13 @@ CStatistics::CopyHistograms(CMemoryPool *mp) const
 
 
 //	return required props associated with statistics object
-CReqdPropRelational *
+gpos::owner<CReqdPropRelational *>
 CStatistics::GetReqdRelationalProps(CMemoryPool *mp) const
 {
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 	GPOS_ASSERT(nullptr != col_factory);
 
-	CColRefSet *colrefs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> colrefs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// add columns from histogram map
 	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping);
@@ -558,8 +567,10 @@ CStatistics::CopyStats(CMemoryPool *mp) const
 IStatistics *
 CStatistics::ScaleStats(CMemoryPool *mp, CDouble factor) const
 {
-	UlongToHistogramMap *histograms_new = GPOS_NEW(mp) UlongToHistogramMap(mp);
-	UlongToDoubleMap *widths_new = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::owner<UlongToHistogramMap *> histograms_new =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
+	gpos::owner<UlongToDoubleMap *> widths_new =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	CHistogram::AddHistograms(mp, m_colid_histogram_mapping, histograms_new);
 	GPOS_CHECK_ABORT;
@@ -570,7 +581,7 @@ CStatistics::ScaleStats(CMemoryPool *mp, CDouble factor) const
 	CDouble scaled_num_rows = m_rows * factor;
 
 	// create a scaled stats object
-	CStatistics *scaled_stats =
+	gpos::owner<CStatistics *> scaled_stats =
 		GPOS_NEW(mp) CStatistics(mp, histograms_new, widths_new,
 								 scaled_num_rows, IsEmpty(), m_num_predicates);
 
@@ -595,8 +606,10 @@ CStatistics::CopyStatsWithRemap(CMemoryPool *mp,
 								BOOL must_exist) const
 {
 	GPOS_ASSERT(nullptr != colref_mapping);
-	UlongToHistogramMap *histograms_new = GPOS_NEW(mp) UlongToHistogramMap(mp);
-	UlongToDoubleMap *widths_new = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::owner<UlongToHistogramMap *> histograms_new =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
+	gpos::owner<UlongToDoubleMap *> widths_new =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	AddHistogramsWithRemap(mp, m_colid_histogram_mapping, histograms_new,
 						   colref_mapping, must_exist);
@@ -604,7 +617,7 @@ CStatistics::CopyStatsWithRemap(CMemoryPool *mp,
 						  must_exist);
 
 	// create a copy of the stats object
-	CStatistics *stats_copy = GPOS_NEW(mp) CStatistics(
+	gpos::owner<CStatistics *> stats_copy = GPOS_NEW(mp) CStatistics(
 		mp, histograms_new, widths_new, m_rows, IsEmpty(), m_num_predicates);
 
 	// In the output statistics object, the upper bound source cardinality of the join column
@@ -633,7 +646,7 @@ CStatistics::CopyStatsWithRemap(CMemoryPool *mp,
 ULongPtrArray *
 CStatistics::GetColIdsWithStats(CMemoryPool *mp) const
 {
-	ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 
 	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping);
 	while (col_hist_mapping.Advance())
@@ -649,7 +662,7 @@ CStatistics::GetColIdsWithStats(CMemoryPool *mp) const
 CColRefSet *
 CStatistics::GetColRefSet(CMemoryPool *mp) const
 {
-	CColRefSet *colrefs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> colrefs = GPOS_NEW(mp) CColRefSet(mp);
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping);
@@ -757,11 +770,11 @@ CStatistics::AddCardUpperBound(CUpperBoundNDVs *upper_bound_NDVs)
 }
 
 // return the dxl representation of the statistics object
-CDXLStatsDerivedRelation *
+gpos::owner<CDXLStatsDerivedRelation *>
 CStatistics::GetDxlStatsDrvdRelation(CMemoryPool *mp,
 									 CMDAccessor *md_accessor) const
 {
-	CDXLStatsDerivedColumnArray *dxl_stats_derived_col_array =
+	gpos::owner<CDXLStatsDerivedColumnArray *> dxl_stats_derived_col_array =
 		GPOS_NEW(mp) CDXLStatsDerivedColumnArray(mp);
 
 	UlongToHistogramMapIter col_hist_mapping(m_colid_histogram_mapping);

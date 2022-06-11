@@ -12,6 +12,7 @@
 #define GPOPT_CDecorrelator_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 
@@ -53,15 +54,17 @@ private:
 	};	// struct SOperatorHandler
 
 	// helper to check if correlations below join are valid to be pulled-up
-	static BOOL FPullableCorrelations(CMemoryPool *mp, CExpression *pexpr,
-									  CExpressionArray *pdrgpexpr,
-									  CExpressionArray *pdrgpexprCorrelations);
+	static BOOL FPullableCorrelations(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+		gpos::pointer<CExpressionArray *> pdrgpexpr,
+		gpos::pointer<CExpressionArray *> pdrgpexprCorrelations);
 
 	// check if scalar operator can be delayed
-	static BOOL FDelayableScalarOp(CExpression *pexprScalar);
+	static BOOL FDelayableScalarOp(gpos::pointer<CExpression *> pexprScalar);
 
 	// check if scalar expression can be lifted
-	static BOOL FDelayable(CExpression *pexprLogical, CExpression *pexprScalar,
+	static BOOL FDelayable(gpos::pointer<CExpression *> pexprLogical,
+						   gpos::pointer<CExpression *> pexprScalar,
 						   BOOL fEqualityOnly);
 
 	// switch function for all operators
@@ -140,7 +143,8 @@ public:
 
 	// main handler
 	static BOOL FProcess(CMemoryPool *mp, CExpression *pexprOrig,
-						 BOOL fEqualityOnly, CExpression **ppexprDecorrelated,
+						 BOOL fEqualityOnly,
+						 gpos::owner<CExpression *> *ppexprDecorrelated,
 						 CExpressionArray *pdrgpexprCorrelations,
 						 CColRefSet *outerRefsToRemove);
 

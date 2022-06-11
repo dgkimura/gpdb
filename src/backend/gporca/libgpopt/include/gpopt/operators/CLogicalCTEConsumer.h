@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalCTEConsumer_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogical.h"
@@ -33,16 +34,16 @@ private:
 	ULONG m_id;
 
 	// mapped cte columns
-	CColRefArray *m_pdrgpcr;
+	gpos::owner<CColRefArray *> m_pdrgpcr;
 
 	// inlined expression
-	CExpression *m_pexprInlined;
+	gpos::owner<CExpression *> m_pexprInlined;
 
 	// map of CTE producer's output column ids to consumer's output columns
-	UlongToColRefMap *m_phmulcr;
+	gpos::owner<UlongToColRefMap *> m_phmulcr;
 
 	// output columns
-	CColRefSet *m_pcrsOutput;
+	gpos::owner<CColRefSet *> m_pcrsOutput;
 
 	// create the inlined version of this consumer as well as the column mapping
 	void CreateInlinedExpr(CMemoryPool *mp);
@@ -80,20 +81,20 @@ public:
 	}
 
 	// cte columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	Pdrgpcr() const
 	{
 		return m_pdrgpcr;
 	}
 
 	// column mapping
-	UlongToColRefMap *
+	gpos::pointer<UlongToColRefMap *>
 	Phmulcr() const
 	{
 		return m_phmulcr;
 	}
 
-	CExpression *
+	gpos::pointer<CExpression *>
 	PexprInlined() const
 	{
 		return m_pexprInlined;
@@ -109,17 +110,17 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::owner<CColRefSet *> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
 	CKeyCollection *DeriveKeyCollection(
@@ -138,12 +139,12 @@ public:
 									 CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *DerivePropertyConstraint(
+	gpos::owner<CPropConstraint *> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *DerivePartitionInfo(CMemoryPool *mp,
-								   CExpressionHandle &exprhdl) const override;
+	gpos::owner<CPartInfo *> DerivePartitionInfo(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive table descriptor
 	CTableDescriptor *DeriveTableDescriptor(
@@ -151,10 +152,10 @@ public:
 
 	// compute required stats columns of the n-th child
 	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   //pcrsInput,
-			 ULONG				   // child_index
+	PcrsStat(CMemoryPool *,				   // mp
+			 CExpressionHandle &,		   // exprhdl
+			 gpos::pointer<CColRefSet *>,  //pcrsInput,
+			 ULONG						   // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalCTEConsumer has no children");
@@ -182,7 +183,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalCTEConsumer *
+	static gpos::cast_func<CLogicalCTEConsumer *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

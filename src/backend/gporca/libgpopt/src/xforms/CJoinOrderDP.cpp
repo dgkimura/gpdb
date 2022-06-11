@@ -56,7 +56,8 @@ CJoinOrderDP::SComponentPair::SComponentPair(CBitSet *pbsFst, CBitSet *pbsSnd)
 //
 //---------------------------------------------------------------------------
 ULONG
-CJoinOrderDP::SComponentPair::HashValue(const SComponentPair *pcomppair)
+CJoinOrderDP::SComponentPair::HashValue(
+	gpos::pointer<const SComponentPair *> pcomppair)
 {
 	GPOS_ASSERT(nullptr != pcomppair);
 
@@ -74,8 +75,9 @@ CJoinOrderDP::SComponentPair::HashValue(const SComponentPair *pcomppair)
 //
 //---------------------------------------------------------------------------
 BOOL
-CJoinOrderDP::SComponentPair::Equals(const SComponentPair *pcomppairFst,
-									 const SComponentPair *pcomppairSnd)
+CJoinOrderDP::SComponentPair::Equals(
+	gpos::pointer<const SComponentPair *> pcomppairFst,
+	gpos::pointer<const SComponentPair *> pcomppairSnd)
 {
 	GPOS_ASSERT(nullptr != pcomppairFst);
 	GPOS_ASSERT(nullptr != pcomppairSnd);
@@ -219,7 +221,7 @@ CJoinOrderDP::AddJoinOrder(CExpression *pexprJoin, CDouble dCost)
 //		Lookup best join order for given set
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::pointer<CExpression *>
 CJoinOrderDP::PexprLookup(CBitSet *pbs)
 {
 	// if set has size 1, return expression directly
@@ -259,7 +261,7 @@ CJoinOrderDP::PexprPred(gpos::pointer<CBitSet *> pbsFst,
 	}
 
 	CExpression *pexprPred = nullptr;
-	SComponentPair *pcomppair = nullptr;
+	gpos::owner<SComponentPair *> pcomppair = nullptr;
 
 	// lookup link map
 	for (ULONG ul = 0; ul < 2; ul++)
@@ -417,9 +419,9 @@ CJoinOrderDP::PexprJoin(gpos::pointer<CBitSet *> pbs)
 	ULONG ulCompSnd = bsi.Bit();
 	GPOS_ASSERT(!bsi.Advance());
 
-	CBitSet *pbsFst = GPOS_NEW(m_mp) CBitSet(m_mp);
+	gpos::owner<CBitSet *> pbsFst = GPOS_NEW(m_mp) CBitSet(m_mp);
 	(void) pbsFst->ExchangeSet(ulCompFst);
-	CBitSet *pbsSnd = GPOS_NEW(m_mp) CBitSet(m_mp);
+	gpos::owner<CBitSet *> pbsSnd = GPOS_NEW(m_mp) CBitSet(m_mp);
 	(void) pbsSnd->ExchangeSet(ulCompSnd);
 	CExpression *pexprScalar = PexprPred(pbsFst, pbsSnd);
 	pbsFst->Release();
@@ -471,14 +473,15 @@ CJoinOrderDP::PexprBestJoinOrderDP(
 )
 {
 	CDouble dMinCost(0.0);
-	CExpression *pexprResult = nullptr;
+	gpos::owner<CExpression *> pexprResult = nullptr;
 
-	CBitSetArray *pdrgpbsSubsets = PdrgpbsSubsets(m_mp, pbs);
+	gpos::owner<CBitSetArray *> pdrgpbsSubsets = PdrgpbsSubsets(m_mp, pbs);
 	const ULONG ulSubsets = pdrgpbsSubsets->Size();
 	for (ULONG ul = 0; ul < ulSubsets; ul++)
 	{
 		CBitSet *pbsCurrent = (*pdrgpbsSubsets)[ul];
-		CBitSet *pbsRemaining = GPOS_NEW(m_mp) CBitSet(m_mp, *pbs);
+		gpos::owner<CBitSet *> pbsRemaining =
+			GPOS_NEW(m_mp) CBitSet(m_mp, *pbs);
 		pbsRemaining->Difference(pbsCurrent);
 
 		// check if subsets are connected with one or more edges
@@ -493,7 +496,8 @@ CJoinOrderDP::PexprBestJoinOrderDP(
 			{
 				// we found solutions of left and right subsets, we check if
 				// this gives a better solution for the input set
-				CExpression *pexprJoin = PexprJoin(pbsCurrent, pbsRemaining);
+				gpos::owner<CExpression *> pexprJoin =
+					PexprJoin(pbsCurrent, pbsRemaining);
 				CDouble dCost = DCost(pexprJoin);
 
 				if (nullptr == pexprResult || dCost < dMinCost)
@@ -563,7 +567,7 @@ CJoinOrderDP::GenerateSubsets(CMemoryPool *mp, CBitSet *pbsCurrent,
 		return;
 	}
 
-	CBitSet *pbsCopy = GPOS_NEW(mp) CBitSet(mp, *pbsCurrent);
+	gpos::owner<CBitSet *> pbsCopy = GPOS_NEW(mp) CBitSet(mp, *pbsCurrent);
 	BOOL fSet GPOS_ASSERTS_ONLY = pbsCopy->ExchangeSet(pulElems[ulIndex]);
 	GPOS_ASSERT(!fSet);
 
@@ -592,8 +596,8 @@ CJoinOrderDP::PdrgpbsSubsets(CMemoryPool *mp, CBitSet *pbs)
 		pulElems[ul++] = bsi.Bit();
 	}
 
-	CBitSet *pbsCurrent = GPOS_NEW(mp) CBitSet(mp);
-	CBitSetArray *pdrgpbsSubsets = GPOS_NEW(mp) CBitSetArray(mp);
+	gpos::owner<CBitSet *> pbsCurrent = GPOS_NEW(mp) CBitSet(mp);
+	gpos::owner<CBitSetArray *> pdrgpbsSubsets = GPOS_NEW(mp) CBitSetArray(mp);
 	GenerateSubsets(mp, pbsCurrent, pulElems, size, 0, pdrgpbsSubsets);
 	GPOS_DELETE_ARRAY(pulElems);
 
@@ -665,7 +669,7 @@ CBitSet *
 CJoinOrderDP::PbsCovered(CBitSet *pbsInput)
 {
 	GPOS_ASSERT(nullptr != pbsInput);
-	CBitSet *pbs = GPOS_NEW(m_mp) CBitSet(m_mp);
+	gpos::owner<CBitSet *> pbs = GPOS_NEW(m_mp) CBitSet(m_mp);
 
 	for (ULONG ul = 0; ul < m_ulEdges; ul++)
 	{
@@ -702,7 +706,7 @@ CJoinOrderDP::PexprCross(gpos::pointer<CBitSet *> pbs)
 
 	CBitSetIter bsi(*pbs);
 	(void) bsi.Advance();
-	CExpression *pexprComp = m_rgpcomp[bsi.Bit()]->m_pexpr;
+	gpos::owner<CExpression *> pexprComp = m_rgpcomp[bsi.Bit()]->m_pexpr;
 	pexprComp->AddRef();
 	CExpression *pexprCross = pexprComp;
 	while (bsi.Advance())
@@ -798,7 +802,7 @@ CJoinOrderDP::PexprBestJoinOrder(CBitSet *pbs)
 	}
 
 	// find maximal covered subset
-	CBitSet *pbsCovered = PbsCovered(pbs);
+	gpos::owner<CBitSet *> pbsCovered = PbsCovered(pbs);
 	if (0 == pbsCovered->Size())
 	{
 		// set is not covered, return a cross product
@@ -810,7 +814,8 @@ CJoinOrderDP::PexprBestJoinOrder(CBitSet *pbs)
 	if (!pbsCovered->Equals(pbs))
 	{
 		// create a cross product for uncovered subset
-		CBitSet *pbsUncovered = GPOS_NEW(m_mp) CBitSet(m_mp, *pbs);
+		gpos::owner<CBitSet *> pbsUncovered =
+			GPOS_NEW(m_mp) CBitSet(m_mp, *pbs);
 		pbsUncovered->Difference(pbsCovered);
 		CExpression *pexprResult = PexprJoinCoveredSubsetWithUncoveredSubset(
 			pbs, pbsCovered, pbsUncovered);
@@ -851,8 +856,8 @@ CExpression *
 CJoinOrderDP::PexprBuildPred(CBitSet *pbsFst, CBitSet *pbsSnd)
 {
 	// collect edges connecting the given sets
-	CBitSet *pbsEdges = GPOS_NEW(m_mp) CBitSet(m_mp);
-	CBitSet *pbs = GPOS_NEW(m_mp) CBitSet(m_mp, *pbsFst);
+	gpos::owner<CBitSet *> pbsEdges = GPOS_NEW(m_mp) CBitSet(m_mp);
+	gpos::owner<CBitSet *> pbs = GPOS_NEW(m_mp) CBitSet(m_mp, *pbsFst);
 	pbs->Union(pbsSnd);
 
 	for (ULONG ul = 0; ul < m_ulEdges; ul++)
@@ -871,7 +876,8 @@ CJoinOrderDP::PexprBuildPred(CBitSet *pbsFst, CBitSet *pbsSnd)
 	CExpression *pexprPred = nullptr;
 	if (0 < pbsEdges->Size())
 	{
-		CExpressionArray *pdrgpexpr = GPOS_NEW(m_mp) CExpressionArray(m_mp);
+		gpos::owner<CExpressionArray *> pdrgpexpr =
+			GPOS_NEW(m_mp) CExpressionArray(m_mp);
 		CBitSetIter bsi(*pbsEdges);
 		while (bsi.Advance())
 		{
@@ -900,7 +906,7 @@ CJoinOrderDP::PexprBuildPred(CBitSet *pbsFst, CBitSet *pbsSnd)
 CExpression *
 CJoinOrderDP::PexprExpand()
 {
-	CBitSet *pbs = GPOS_NEW(m_mp) CBitSet(m_mp);
+	gpos::owner<CBitSet *> pbs = GPOS_NEW(m_mp) CBitSet(m_mp);
 	for (ULONG ul = 0; ul < m_ulComps; ul++)
 	{
 		(void) pbs->ExchangeSet(ul);

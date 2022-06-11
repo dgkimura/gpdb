@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/test/CUnittest.h"
 
@@ -64,7 +65,7 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 					  "wert", "dfg", "xcv", "zxc"};
 	const CHAR *szMissingElem = "missing";
 
-	CDynamicPtrArray<CHAR, CleanupNULL<CHAR> > *pdrg =
+	gpos::owner<CDynamicPtrArray<CHAR, CleanupNULL<CHAR> > *> pdrg =
 		GPOS_NEW(mp) CDynamicPtrArray<CHAR, CleanupNULL<CHAR> >(mp, 2);
 
 	// add elements incl trigger resize of array
@@ -102,7 +103,7 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 	// test with ULONG array
 
 	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > UlongArray;
-	UlongArray *pdrgULONG = GPOS_NEW(mp) UlongArray(mp, 1);
+	gpos::owner<UlongArray *> pdrgULONG = GPOS_NEW(mp) UlongArray(mp, 1);
 	ULONG c = 256;
 
 	// add elements incl trigger resize of array
@@ -150,7 +151,7 @@ CDynamicPtrArrayTest::EresUnittest_Ownership()
 	// test with ULONGs
 
 	typedef CDynamicPtrArray<ULONG, CleanupDelete<ULONG> > UlongArray;
-	UlongArray *pdrgULONG = GPOS_NEW(mp) UlongArray(mp, 1);
+	gpos::owner<UlongArray *> pdrgULONG = GPOS_NEW(mp) UlongArray(mp, 1);
 
 	// add elements incl trigger resize of array
 	for (ULONG k = 0; k < 256; k++)
@@ -165,7 +166,7 @@ CDynamicPtrArrayTest::EresUnittest_Ownership()
 	// test with CHAR array
 
 	typedef CDynamicPtrArray<CHAR, CleanupDeleteArray<CHAR> > CharArray;
-	CharArray *pdrgCHAR = GPOS_NEW(mp) CharArray(mp, 2);
+	gpos::owner<CharArray *> pdrgCHAR = GPOS_NEW(mp) CharArray(mp, 2);
 
 	// add elements incl trigger resize of array
 	for (ULONG i = 0; i < 3; i++)
@@ -205,13 +206,13 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppend()
 	ULONG cVal = 0;
 
 	// array with 1 element
-	UlongArray *pdrgULONG1 = GPOS_NEW(mp) UlongArray(mp, 1);
+	gpos::owner<UlongArray *> pdrgULONG1 = GPOS_NEW(mp) UlongArray(mp, 1);
 	pdrgULONG1->Append(&cVal);
 	GPOS_ASSERT(1 == pdrgULONG1->Size());
 
 	// array with x elements
 	ULONG cX = 1000;
-	UlongArray *pdrgULONG2 = GPOS_NEW(mp) UlongArray(mp, 1);
+	gpos::owner<UlongArray *> pdrgULONG2 = GPOS_NEW(mp) UlongArray(mp, 1);
 	for (ULONG i = 0; i < cX; i++)
 	{
 		pdrgULONG2->Append(&cX);
@@ -254,13 +255,13 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit()
 	ULONG cVal = 0;
 
 	// array with 1 element
-	UlongArray *pdrgULONG1 = GPOS_NEW(mp) UlongArray(mp, 10);
+	gpos::owner<UlongArray *> pdrgULONG1 = GPOS_NEW(mp) UlongArray(mp, 10);
 	pdrgULONG1->Append(&cVal);
 	GPOS_ASSERT(1 == pdrgULONG1->Size());
 
 	// array with x elements
 	ULONG cX = 9;
-	UlongArray *pdrgULONG2 = GPOS_NEW(mp) UlongArray(mp, 15);
+	gpos::owner<UlongArray *> pdrgULONG2 = GPOS_NEW(mp) UlongArray(mp, 15);
 	for (ULONG i = 0; i < cX; i++)
 	{
 		pdrgULONG2->Append(&cX);
@@ -275,7 +276,7 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit()
 		GPOS_ASSERT((*pdrgULONG1)[j + 1] == (*pdrgULONG2)[j]);
 	}
 
-	UlongArray *pdrgULONG3 = GPOS_NEW(mp) UlongArray(mp, 15);
+	gpos::owner<UlongArray *> pdrgULONG3 = GPOS_NEW(mp) UlongArray(mp, 15);
 	pdrgULONG1->AppendArray(pdrgULONG3);
 	GPOS_ASSERT(cX + 1 == pdrgULONG1->Size());
 
@@ -304,10 +305,10 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	CMemoryPool *mp = amp.Pmp();
 
 	// the array containing elements to look up
-	UlongArray *pdrgULONGLookup = GPOS_NEW(mp) UlongArray(mp);
+	gpos::owner<UlongArray *> pdrgULONGLookup = GPOS_NEW(mp) UlongArray(mp);
 
 	// the array containing the target elements that will give the positions
-	UlongArray *pdrgULONGTarget = GPOS_NEW(mp) UlongArray(mp);
+	gpos::owner<UlongArray *> pdrgULONGTarget = GPOS_NEW(mp) UlongArray(mp);
 
 	ULONG *pul1 = GPOS_NEW(mp) ULONG(10);
 	ULONG *pul2 = GPOS_NEW(mp) ULONG(20);
@@ -329,7 +330,7 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	pdrgULONGTarget->Append(pul3);
 	pdrgULONGTarget->Append(pul2);
 
-	ULongPtrArray *pdrgpulIndexes =
+	gpos::owner<ULongPtrArray *> pdrgpulIndexes =
 		pdrgULONGTarget->IndexesOfSubsequence(pdrgULONGLookup);
 
 	GPOS_ASSERT(nullptr != pdrgpulIndexes);

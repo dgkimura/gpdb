@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformCTEAnchor2Sequence.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalCTEAnchor.h"
@@ -107,11 +108,11 @@ CXformCTEAnchor2Sequence::Transform(CXformContext *pxfctxt,
 	pexprProducer->AddRef();
 
 	// child of CTE anchor
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
 	pexprChild->AddRef();
 
 	// create logical sequence
-	CExpression *pexprSequence = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprSequence = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalSequence(mp), pexprProducer, pexprChild);
 
 	pxfres->Add(pexprSequence);

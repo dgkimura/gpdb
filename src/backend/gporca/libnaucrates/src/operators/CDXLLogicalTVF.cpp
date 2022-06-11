@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalTVF.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -105,7 +106,7 @@ CDXLLogicalTVF::Arity() const
 //		Get the column descriptor at the given position
 //
 //---------------------------------------------------------------------------
-const CDXLColDescr *
+gpos::pointer<const CDXLColDescr *>
 CDXLLogicalTVF::GetColumnDescrAt(ULONG ul) const
 {
 	return (*m_dxl_col_descr_array)[ul];
@@ -145,7 +146,7 @@ CDXLLogicalTVF::IsColDefined(ULONG colid) const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   const CDXLNode *dxlnode) const
+							   gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

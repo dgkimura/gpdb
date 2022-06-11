@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarOpExpr.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -105,7 +107,7 @@ CDXLScalarOpExpr::GetOpNameStr() const
 //		Operator id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarOpExpr::MDId() const
 {
 	return m_mdid;
@@ -119,7 +121,7 @@ CDXLScalarOpExpr::MDId() const
 //		Operator return type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarOpExpr::GetReturnTypeMdId() const
 {
 	return m_return_type_mdid;
@@ -136,7 +138,8 @@ CDXLScalarOpExpr::GetReturnTypeMdId() const
 BOOL
 CDXLScalarOpExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(m_mdid);
+	gpos::pointer<const IMDScalarOp *> md_scalar_op =
+		md_accessor->RetrieveScOp(m_mdid);
 	IMDId *mdid = md_accessor->RetrieveFunc(md_scalar_op->FuncMdId())
 					  ->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
@@ -153,7 +156,7 @@ CDXLScalarOpExpr::HasBoolResult(CMDAccessor *md_accessor) const
 //---------------------------------------------------------------------------
 void
 CDXLScalarOpExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *dxlnode) const
+								 gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 

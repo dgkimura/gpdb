@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerLogicalInsert_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalOp.h"
 
@@ -35,7 +36,7 @@ class CParseHandlerLogicalInsert : public CParseHandlerLogicalOp
 {
 private:
 	// source col ids
-	ULongPtrArray *m_pdrgpul;
+	gpos::pointer<ULongPtrArray *> m_pdrgpul;
 
 	// process the start of an element
 	void StartElement(

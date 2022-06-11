@@ -13,6 +13,7 @@
 #define GPMD_CMDIndexInfo_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDId.h"
 #include "naucrates/md/IMDInterface.h"
@@ -27,7 +28,7 @@ class CMDIndexInfo : public IMDInterface
 {
 private:
 	// index mdid
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// is the index partial
 	BOOL m_is_partial;
@@ -40,7 +41,7 @@ public:
 	~CMDIndexInfo() override;
 
 	// index mdid
-	IMDId *MDId() const;
+	gpos::pointer<IMDId *> MDId() const;
 
 	// is the index partial
 	BOOL IsPartial() const;

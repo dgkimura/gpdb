@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalNAryJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColumnFactory.h"
 #include "gpopt/base/COptCtxt.h"
@@ -80,7 +81,8 @@ CLogicalNAryJoin::DeriveMaxCard(CMemoryPool *mp,
 	{
 		if (COperator::EopScalarNAryJoinPredList == pexprScalar->Pop()->Eopid())
 		{
-			CExpression *pexprScalarChild = GetTrueInnerJoinPreds(mp, exprhdl);
+			gpos::owner<CExpression *> pexprScalarChild =
+				GetTrueInnerJoinPreds(mp, exprhdl);
 
 			// in case of a false condition (when the operator is non Inner Join)
 			// maxcard should be zero
@@ -105,7 +107,7 @@ CColRefSet *
 CLogicalNAryJoin::DeriveNotNullColumns(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl) const
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// union not nullable columns from the first N-1 children that are not right children of LOJs
 	ULONG arity = exprhdl.Arity();
@@ -124,7 +126,7 @@ CLogicalNAryJoin::DeriveNotNullColumns(CMemoryPool *mp,
 	return pcrs;
 }
 
-CPropConstraint *
+gpos::owner<CPropConstraint *>
 CLogicalNAryJoin::DerivePropertyConstraint(CMemoryPool *mp,
 										   CExpressionHandle &exprhdl) const
 {
@@ -136,8 +138,10 @@ CLogicalNAryJoin::DerivePropertyConstraint(CMemoryPool *mp,
 
 	// the following logic is similar to PpcDeriveConstraintFromPredicates, except that
 	// it excludes right children of LOJs and their ON predicates
-	CColRefSetArray *equivalenceClasses = GPOS_NEW(mp) CColRefSetArray(mp);
-	CConstraintArray *constraints = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CColRefSetArray *> equivalenceClasses =
+		GPOS_NEW(mp) CColRefSetArray(mp);
+	gpos::owner<CConstraintArray *> constraints =
+		GPOS_NEW(mp) CConstraintArray(mp);
 
 	// collect constraint properties from inner join children
 	const ULONG arity = exprhdl.Arity();
@@ -167,10 +171,11 @@ CLogicalNAryJoin::DerivePropertyConstraint(CMemoryPool *mp,
 	}
 
 	// process inner join predicates
-	CExpression *trueInnerJoinPreds = GetTrueInnerJoinPreds(mp, exprhdl);
+	gpos::owner<CExpression *> trueInnerJoinPreds =
+		GetTrueInnerJoinPreds(mp, exprhdl);
 	if (nullptr != trueInnerJoinPreds)
 	{
-		CColRefSetArray *equivClassesFromInnerJoinPreds = nullptr;
+		gpos::owner<CColRefSetArray *> equivClassesFromInnerJoinPreds = nullptr;
 		CConstraint *pcnstr = CConstraint::PcnstrFromScalarExpr(
 			mp, trueInnerJoinPreds, &equivClassesFromInnerJoinPreds);
 
@@ -205,7 +210,7 @@ CLogicalNAryJoin::DerivePropertyConstraint(CMemoryPool *mp,
 CXformSet *
 CLogicalNAryJoin::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfSubqNAryJoin2Apply);
 	(void) xform_set->ExchangeSet(CXform::ExfExpandNAryJoin);
@@ -230,7 +235,7 @@ CLogicalNAryJoin::PopConvertNAryLOJ(COperator *pop)
 	return nullptr;
 }
 
-CExpression *
+gpos::owner<CExpression *>
 CLogicalNAryJoin::GetTrueInnerJoinPreds(CMemoryPool *mp,
 										CExpressionHandle &exprhdl) const
 {
@@ -244,7 +249,8 @@ CLogicalNAryJoin::GetTrueInnerJoinPreds(CMemoryPool *mp,
 	// bar.c might have been created with a NOT NULL constraint. We don't want to use
 	// such predicates in constraint derivation.
 	ULONG arity = exprhdl.Arity();
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(arity - 1);
+	gpos::pointer<CExpression *> pexprScalar =
+		exprhdl.PexprScalarExactChild(arity - 1);
 
 	if (nullptr == pexprScalar)
 	{
@@ -260,8 +266,8 @@ CLogicalNAryJoin::GetTrueInnerJoinPreds(CMemoryPool *mp,
 		return pexprScalar;
 	}
 
-	CExpressionArray *predArray = nullptr;
-	CExpressionArray *trueInnerJoinPredArray =
+	gpos::owner<CExpressionArray *> predArray = nullptr;
+	gpos::owner<CExpressionArray *> trueInnerJoinPredArray =
 		GPOS_NEW(mp) CExpressionArray(mp);
 	CExpression *innerJoinPreds = (*pexprScalar)[0];
 	BOOL isAConjunction = CPredicateUtils::FAnd(innerJoinPreds);
@@ -321,7 +327,7 @@ CLogicalNAryJoin::GetTrueInnerJoinPreds(CMemoryPool *mp,
 // given an existing scalar child of an NAry join, make a new copy, replacing
 // only the inner join predicates and leaving the LOJ ON predicates the same
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CLogicalNAryJoin::ReplaceInnerJoinPredicates(
 	CMemoryPool *mp, CExpression *old_nary_join_scalar_expr,
 	CExpression *new_inner_join_preds)
@@ -333,13 +339,15 @@ CLogicalNAryJoin::ReplaceInnerJoinPredicates(
 		GPOS_ASSERT(nullptr != m_lojChildPredIndexes);
 		// this requires a bit of surgery, make a new copy of the
 		// CScalarNAryJoinPredList with the first child replaced
-		CExpressionArray *new_children = GPOS_NEW(mp) CExpressionArray(mp);
+		gpos::owner<CExpressionArray *> new_children =
+			GPOS_NEW(mp) CExpressionArray(mp);
 
 		new_children->Append(new_inner_join_preds);
 
 		for (ULONG ul = 1; ul < old_nary_join_scalar_expr->Arity(); ul++)
 		{
-			CExpression *existing_child = (*old_nary_join_scalar_expr)[ul];
+			gpos::owner<CExpression *> existing_child =
+				(*old_nary_join_scalar_expr)[ul];
 
 			existing_child->AddRef();
 			new_children->Append(existing_child);

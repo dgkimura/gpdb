@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalUnion.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/CUtils.h"
@@ -79,7 +80,7 @@ CLogicalUnion::~CLogicalUnion() = default;
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalUnion::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										  UlongToColRefMap *colref_mapping,
 										  BOOL must_exist)
@@ -126,7 +127,7 @@ CLogicalUnion::DeriveMaxCard(CMemoryPool *,	 // mp
 CXformSet *
 CLogicalUnion::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfUnion2UnionAll);
 	return xform_set;
 }
@@ -148,11 +149,12 @@ CLogicalUnion::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// union is transformed into a group by over an union all
 	// we follow the same route to compute statistics
-	IStatistics *pstatsUnionAll =
+	gpos::owner<IStatistics *> pstatsUnionAll =
 		CLogicalUnionAll::PstatsDeriveUnionAll(mp, exprhdl);
 
 	// computed columns
-	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpulComputedCols =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 
 	IStatistics *stats = CLogicalGbAgg::PstatsDerive(
 		mp, pstatsUnionAll,

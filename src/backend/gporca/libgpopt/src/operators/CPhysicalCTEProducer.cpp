@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalCTEProducer.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCTEMap.h"
 #include "gpopt/base/COptCtxt.h"
@@ -69,7 +70,7 @@ CPhysicalCTEProducer::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	GPOS_ASSERT(0 == child_index);
 	GPOS_ASSERT(0 == pcrsRequired->Size());
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrs);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrs);
 	pcrs->Union(pcrsRequired);
 	CColRefSet *pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
@@ -229,7 +230,7 @@ CPhysicalCTEProducer::PcmDerive(CMemoryPool *mp,
 
 	CCTEMap *pcmChild = exprhdl.Pdpplan(0)->GetCostModel();
 
-	CCTEMap *pcmProducer = GPOS_NEW(mp) CCTEMap(mp);
+	gpos::owner<CCTEMap *> pcmProducer = GPOS_NEW(mp) CCTEMap(mp);
 	// store plan properties of the child in producer's CTE map
 	pcmProducer->Insert(m_id, CCTEMap::EctProducer, exprhdl.Pdpplan(0));
 
@@ -266,7 +267,7 @@ CPhysicalCTEProducer::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalCTEProducer::EpetOrder(CExpressionHandle &exprhdl,
-								const CEnfdOrder *peo) const
+								gpos::pointer<const CEnfdOrder *> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
@@ -290,8 +291,9 @@ CPhysicalCTEProducer::EpetOrder(CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalCTEProducer::EpetRewindability(CExpressionHandle &exprhdl,
-										const CEnfdRewindability *per) const
+CPhysicalCTEProducer::EpetRewindability(
+	CExpressionHandle &exprhdl,
+	gpos::pointer<const CEnfdRewindability *> per) const
 {
 	GPOS_ASSERT(nullptr != per);
 

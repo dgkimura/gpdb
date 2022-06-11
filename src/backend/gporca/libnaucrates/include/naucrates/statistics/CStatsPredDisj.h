@@ -71,7 +71,7 @@ public:
 	void Sort() const;
 
 	// return the point filter at a particular position
-	CStatsPred *GetPredStats(ULONG pos) const;
+	gpos::pointer<CStatsPred *> GetPredStats(ULONG pos) const;
 
 	// filter type id
 	EStatsPredType

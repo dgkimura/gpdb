@@ -11,6 +11,7 @@
 
 #include "naucrates/md/CMDProviderGeneric.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/memory/CMemoryPool.h"
@@ -70,7 +71,7 @@ CMDProviderGeneric::~CMDProviderGeneric()
 //		return the mdid of a requested type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDProviderGeneric::MDId(IMDType::ETypeInfo type_info) const
 {
 	GPOS_ASSERT(IMDType::EtiGeneric > type_info);

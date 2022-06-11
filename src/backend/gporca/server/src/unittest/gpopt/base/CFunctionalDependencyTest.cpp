@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/base/CFunctionalDependencyTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/CFunctionalDependency.h"
@@ -51,7 +52,7 @@ CFunctionalDependencyTest::EresUnittest_Basics()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -66,11 +67,12 @@ CFunctionalDependencyTest::EresUnittest_Basics()
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
+		mda.PtMDType<IMDTypeInt4>();
 
 	const ULONG num_cols = 3;
-	CColRefSet *pcrsLeft = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefSet *pcrsRight = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsLeft = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsRight = GPOS_NEW(mp) CColRefSet(mp);
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
 		CColRef *colref =
@@ -84,18 +86,18 @@ CFunctionalDependencyTest::EresUnittest_Basics()
 
 	pcrsLeft->AddRef();
 	pcrsRight->AddRef();
-	CFunctionalDependency *pfdFst =
+	gpos::owner<CFunctionalDependency *> pfdFst =
 		GPOS_NEW(mp) CFunctionalDependency(pcrsLeft, pcrsRight);
 
 	pcrsLeft->AddRef();
 	pcrsRight->AddRef();
-	CFunctionalDependency *pfdSnd =
+	gpos::owner<CFunctionalDependency *> pfdSnd =
 		GPOS_NEW(mp) CFunctionalDependency(pcrsLeft, pcrsRight);
 
 	GPOS_ASSERT(pfdFst->Equals(pfdSnd));
 	GPOS_ASSERT(pfdFst->HashValue() == pfdSnd->HashValue());
 
-	CFunctionalDependencyArray *pdrgpfd =
+	gpos::owner<CFunctionalDependencyArray *> pdrgpfd =
 		GPOS_NEW(mp) CFunctionalDependencyArray(mp);
 	pfdFst->AddRef();
 	pdrgpfd->Append(pfdFst);
@@ -103,11 +105,12 @@ CFunctionalDependencyTest::EresUnittest_Basics()
 	pdrgpfd->Append(pfdSnd);
 	GPOS_ASSERT(CFunctionalDependency::Equals(pdrgpfd, pdrgpfd));
 
-	CColRefArray *colref_array =
+	gpos::owner<CColRefArray *> colref_array =
 		CFunctionalDependency::PdrgpcrKeys(mp, pdrgpfd);
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(colref_array);
-	CColRefSet *pcrsKeys = CFunctionalDependency::PcrsKeys(mp, pdrgpfd);
+	gpos::owner<CColRefSet *> pcrsKeys =
+		CFunctionalDependency::PcrsKeys(mp, pdrgpfd);
 
 	GPOS_ASSERT(pcrsLeft->Equals(pcrs));
 	GPOS_ASSERT(pcrsKeys->Equals(pcrs));

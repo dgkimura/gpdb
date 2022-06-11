@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDRelationExternal_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMDRelation.h"
 #include "naucrates/md/CMDRelationExternalGPDB.h"
@@ -42,7 +43,7 @@ private:
 	BOOL m_is_rej_limit_in_rows;
 
 	// format error table mdid
-	IMDId *m_mdid_fmt_err_table;
+	gpos::pointer<IMDId *> m_mdid_fmt_err_table;
 
 	// distribution opfamilies parse handler
 	CParseHandlerBase *m_opfamilies_parse_handler;

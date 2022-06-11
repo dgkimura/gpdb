@@ -3,6 +3,8 @@
 
 #include "gpopt/base/CWindowOids.h"
 
+#include "gpos/common/owner.h"
+
 using namespace gpopt;
 
 CWindowOids::CWindowOids(OID row_number_oid, OID rank_oid)
@@ -23,7 +25,7 @@ CWindowOids::OidRank() const
 	return m_oidRank;
 }
 
-CWindowOids *
+gpos::owner<CWindowOids *>
 CWindowOids::GetWindowOids(CMemoryPool *mp)
 {
 	return GPOS_NEW(mp) CWindowOids(DUMMY_ROW_NUMBER_OID, DUMMY_WIN_RANK);

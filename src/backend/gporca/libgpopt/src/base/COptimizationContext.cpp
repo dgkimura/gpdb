@@ -12,6 +12,7 @@
 #include "gpopt/base/COptimizationContext.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/CEnfdOrder.h"
@@ -107,7 +108,8 @@ COptimizationContext::SetBest(CCostContext *pcc)
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::Matches(const COptimizationContext *poc) const
+COptimizationContext::Matches(
+	gpos::pointer<const COptimizationContext *> poc) const
 {
 	GPOS_ASSERT(nullptr != poc);
 
@@ -139,8 +141,9 @@ COptimizationContext::Matches(const COptimizationContext *poc) const
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FEqualForStats(const COptimizationContext *pocLeft,
-									 const COptimizationContext *pocRight)
+COptimizationContext::FEqualForStats(
+	gpos::pointer<const COptimizationContext *> pocLeft,
+	gpos::pointer<const COptimizationContext *> pocRight)
 {
 	GPOS_ASSERT(nullptr != pocLeft);
 	GPOS_ASSERT(nullptr != pocRight);
@@ -161,9 +164,10 @@ COptimizationContext::FEqualForStats(const COptimizationContext *pocLeft,
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FOptimize(CMemoryPool *mp, CGroupExpression *pgexprParent,
-								CGroupExpression *pgexprChild,
-								COptimizationContext *pocChild,
+COptimizationContext::FOptimize(CMemoryPool *mp,
+								gpos::pointer<CGroupExpression *> pgexprParent,
+								gpos::pointer<CGroupExpression *> pgexprChild,
+								gpos::pointer<COptimizationContext *> pocChild,
 								ULONG ulSearchStages)
 {
 	COperator *pop = pgexprChild->Pop();
@@ -205,8 +209,9 @@ COptimizationContext::FOptimize(CMemoryPool *mp, CGroupExpression *pgexprParent,
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FEqualContextIds(COptimizationContextArray *pdrgpocFst,
-									   COptimizationContextArray *pdrgpocSnd)
+COptimizationContext::FEqualContextIds(
+	gpos::pointer<COptimizationContextArray *> pdrgpocFst,
+	gpos::pointer<COptimizationContextArray *> pdrgpocSnd)
 {
 	if (nullptr == pdrgpocFst || nullptr == pdrgpocSnd)
 	{
@@ -238,11 +243,12 @@ COptimizationContext::FEqualContextIds(COptimizationContextArray *pdrgpocFst,
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FOptimizeMotion(CMemoryPool *,	   // mp
-									  CGroupExpression *,  // pgexprParent
-									  CGroupExpression *pgexprMotion,
-									  COptimizationContext *poc,
-									  ULONG	 // ulSearchStages
+COptimizationContext::FOptimizeMotion(
+	CMemoryPool *,						// mp
+	gpos::pointer<CGroupExpression *>,	// pgexprParent
+	gpos::pointer<CGroupExpression *> pgexprMotion,
+	gpos::pointer<COptimizationContext *> poc,
+	ULONG  // ulSearchStages
 )
 {
 	GPOS_ASSERT(nullptr != pgexprMotion);
@@ -264,11 +270,12 @@ COptimizationContext::FOptimizeMotion(CMemoryPool *,	   // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FOptimizeSort(CMemoryPool *,		 // mp
-									CGroupExpression *,	 // pgexprParent
-									CGroupExpression *pgexprSort,
-									COptimizationContext *poc,
-									ULONG  // ulSearchStages
+COptimizationContext::FOptimizeSort(
+	CMemoryPool *,						// mp
+	gpos::pointer<CGroupExpression *>,	// pgexprParent
+	gpos::pointer<CGroupExpression *> pgexprSort,
+	gpos::pointer<COptimizationContext *> poc,
+	ULONG  // ulSearchStages
 )
 {
 	GPOS_ASSERT(nullptr != pgexprSort);
@@ -291,11 +298,11 @@ COptimizationContext::FOptimizeSort(CMemoryPool *,		 // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FOptimizeAgg(CMemoryPool *mp,
-								   CGroupExpression *,	// pgexprParent
-								   CGroupExpression *pgexprAgg,
-								   COptimizationContext *poc,
-								   ULONG ulSearchStages)
+COptimizationContext::FOptimizeAgg(
+	CMemoryPool *mp,
+	gpos::pointer<CGroupExpression *>,	// pgexprParent
+	gpos::pointer<CGroupExpression *> pgexprAgg,
+	gpos::pointer<COptimizationContext *> poc, ULONG ulSearchStages)
 {
 	GPOS_ASSERT(nullptr != pgexprAgg);
 	GPOS_ASSERT(nullptr != poc);
@@ -343,11 +350,12 @@ COptimizationContext::FOptimizeAgg(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FOptimizeNLJoin(CMemoryPool *mp,
-									  CGroupExpression *,  // pgexprParent
-									  CGroupExpression *pgexprJoin,
-									  COptimizationContext *poc,
-									  ULONG	 // ulSearchStages
+COptimizationContext::FOptimizeNLJoin(
+	CMemoryPool *mp,
+	gpos::pointer<CGroupExpression *>,	// pgexprParent
+	gpos::pointer<CGroupExpression *> pgexprJoin,
+	gpos::pointer<COptimizationContext *> poc,
+	ULONG  // ulSearchStages
 )
 {
 	GPOS_ASSERT(nullptr != pgexprJoin);
@@ -363,7 +371,8 @@ COptimizationContext::FOptimizeNLJoin(CMemoryPool *mp,
 	// for correlated join, the requested columns must be covered by outer child
 	// columns and columns to be generated from inner child
 	CPhysicalNLJoin *popNLJoin = CPhysicalNLJoin::PopConvert(pop);
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, popNLJoin->PdrgPcrInner());
+	gpos::owner<CColRefSet *> pcrs =
+		GPOS_NEW(mp) CColRefSet(mp, popNLJoin->PdrgPcrInner());
 	CColRefSet *pcrsOuterChild =
 		CDrvdPropRelational::GetRelationalProperties((*pgexprJoin)[0]->Pdp())
 			->GetOutputColumns();
@@ -434,11 +443,11 @@ COptimizationContext::PrppCTEProducer(CMemoryPool *mp,
 			->GetOutputColumns();
 	CPhysicalCTEProducer *popProducer =
 		CPhysicalCTEProducer::PopConvert(pccProducer->Pgexpr()->Pop());
-	UlongToColRefMap *colref_mapping =
+	gpos::owner<UlongToColRefMap *> colref_mapping =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PhmulcrConsumerToProducer(
 			mp, popProducer->UlCTEId(), pcrsInnerOutput,
 			popProducer->Pdrgpcr());
-	CReqdPropPlan *prppProducer = CReqdPropPlan::PrppRemapForCTE(
+	gpos::owner<CReqdPropPlan *> prppProducer = CReqdPropPlan::PrppRemapForCTE(
 		mp, pocProducer->Prpp(), pccConsumer->Pdpplan(), colref_mapping);
 	colref_mapping->Release();
 

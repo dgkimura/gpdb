@@ -4,6 +4,7 @@
 #include "naucrates/dxl/CCostModelConfigSerializer.h"
 
 #include "gpos/common/CAutoRef.h"
+#include "gpos/common/owner.h"
 
 #include "gpdbcost/CCostModelParamsGPDB.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -66,7 +67,7 @@ CCostModelConfigSerializer::Serialize(CXMLSerializer &xml_serializer) const
 }
 
 CCostModelConfigSerializer::CCostModelConfigSerializer(
-	const gpopt::ICostModel *cost_model)
+	gpos::pointer<const gpopt::ICostModel *> cost_model)
 	: m_cost_model(cost_model)
 {
 }

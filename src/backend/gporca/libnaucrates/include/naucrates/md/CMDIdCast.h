@@ -38,10 +38,10 @@ class CMDIdCast : public IMDId
 {
 private:
 	// mdid of source type
-	CMDIdGPDB *m_mdid_src;
+	gpos::owner<CMDIdGPDB *> m_mdid_src;
 
 	// mdid of destinatin type
-	CMDIdGPDB *m_mdid_dest;
+	gpos::owner<CMDIdGPDB *> m_mdid_dest;
 
 
 	// buffer for the serialized mdid
@@ -79,10 +79,10 @@ public:
 	}
 
 	// source type id
-	IMDId *MdidSrc() const;
+	gpos::pointer<IMDId *> MdidSrc() const;
 
 	// destination type id
-	IMDId *MdidDest() const;
+	gpos::pointer<IMDId *> MdidDest() const;
 
 	// equality check
 	BOOL Equals(gpos::pointer<const IMDId *> mdid) const override;

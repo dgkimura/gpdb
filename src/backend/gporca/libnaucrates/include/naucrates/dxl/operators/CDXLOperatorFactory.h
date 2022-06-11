@@ -19,6 +19,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatum.h"
 #include "naucrates/dxl/operators/CDXLColRef.h"
@@ -88,69 +89,64 @@ private:
 							  ULONG *length);
 
 public:
-	static CDXLDatum *GetDatumOid(CDXLMemoryManager *dxl_memory_manager,
-								  const Attributes &attrs,
-								  Edxltoken target_elem, IMDId *mdid,
-								  BOOL is_const_null);
+	static gpos::owner<CDXLDatum *> GetDatumOid(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
+		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
 
-	static CDXLDatum *GetDatumInt2(CDXLMemoryManager *dxl_memory_manager,
-								   const Attributes &attrs,
-								   Edxltoken target_elem, IMDId *mdid,
-								   BOOL is_const_null);
+	static gpos::owner<CDXLDatum *> GetDatumInt2(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
+		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
 
-	static CDXLDatum *GetDatumInt4(CDXLMemoryManager *dxl_memory_manager,
-								   const Attributes &attrs,
-								   Edxltoken target_elem, IMDId *mdid,
-								   BOOL is_const_null);
+	static gpos::owner<CDXLDatum *> GetDatumInt4(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
+		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
 
-	static CDXLDatum *GetDatumInt8(CDXLMemoryManager *dxl_memory_manager,
-								   const Attributes &attrs,
-								   Edxltoken target_elem, IMDId *mdid,
-								   BOOL is_const_null);
+	static gpos::owner<CDXLDatum *> GetDatumInt8(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
+		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
 
-	static CDXLDatum *GetDatumBool(CDXLMemoryManager *dxl_memory_manager,
-								   const Attributes &attrs,
-								   Edxltoken target_elem, IMDId *mdid,
-								   BOOL is_const_null);
+	static gpos::owner<CDXLDatum *> GetDatumBool(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
+		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
 
 	// parse a dxl datum of type generic
-	static CDXLDatum *GetDatumGeneric(CDXLMemoryManager *dxl_memory_manager,
-									  const Attributes &attrs,
-									  Edxltoken target_elem, IMDId *mdid,
-									  BOOL is_const_null);
+	static gpos::owner<CDXLDatum *> GetDatumGeneric(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
+		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
 
 	// parse a dxl datum of types that need double mapping
-	static CDXLDatum *GetDatumStatsDoubleMappable(
+	static gpos::owner<CDXLDatum *> GetDatumStatsDoubleMappable(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
 		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
 
 	// parse a dxl datum of types that need lint mapping
-	static CDXLDatum *GetDatumStatsLintMappable(
+	static gpos::owner<CDXLDatum *> GetDatumStatsLintMappable(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
 		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
 
 	// create a table scan operator
-	static CDXLPhysical *MakeDXLTblScan(CDXLMemoryManager *dxl_memory_manager,
-										const Attributes &attrs);
+	static gpos::owner<CDXLPhysical *> MakeDXLTblScan(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a subquery scan operator
-	static CDXLPhysical *MakeDXLSubqScan(CDXLMemoryManager *dxl_memory_manager,
-										 const Attributes &attrs);
+	static gpos::owner<CDXLPhysical *> MakeDXLSubqScan(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a result operator
-	static CDXLPhysical *MakeDXLResult(CDXLMemoryManager *dxl_memory_manager);
+	static gpos::owner<CDXLPhysical *> MakeDXLResult(
+		CDXLMemoryManager *dxl_memory_manager);
 
 	// create a hashjoin operator
-	static CDXLPhysical *MakeDXLHashJoin(CDXLMemoryManager *dxl_memory_manager,
-										 const Attributes &attrs);
+	static gpos::owner<CDXLPhysical *> MakeDXLHashJoin(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a nested loop join operator
-	static CDXLPhysical *MakeDXLNLJoin(CDXLMemoryManager *dxl_memory_manager,
-									   const Attributes &attrs);
+	static gpos::owner<CDXLPhysical *> MakeDXLNLJoin(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a merge join operator
-	static CDXLPhysical *MakeDXLMergeJoin(CDXLMemoryManager *dxl_memory_manager,
-										  const Attributes &attrs);
+	static gpos::owner<CDXLPhysical *> MakeDXLMergeJoin(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a gather motion operator
 	static CDXLPhysical *MakeDXLGatherMotion(
@@ -173,148 +169,147 @@ public:
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create an append operator
-	static CDXLPhysical *MakeDXLAppend(CDXLMemoryManager *dxl_memory_manager,
-									   const Attributes &attrs);
+	static gpos::owner<CDXLPhysical *> MakeDXLAppend(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a limit operator
-	static CDXLPhysical *MakeDXLLimit(CDXLMemoryManager *dxl_memory_manager,
-									  const Attributes &attrs);
+	static gpos::owner<CDXLPhysical *> MakeDXLLimit(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create an aggregation operator
-	static CDXLPhysical *MakeDXLAgg(CDXLMemoryManager *dxl_memory_manager,
-									const Attributes &attrs);
+	static gpos::owner<CDXLPhysical *> MakeDXLAgg(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a sort operator
-	static CDXLPhysical *MakeDXLSort(CDXLMemoryManager *dxl_memory_manager,
-									 const Attributes &attrs);
+	static gpos::owner<CDXLPhysical *> MakeDXLSort(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a materialize operator
 	static CDXLPhysical *MakeDXLMaterialize(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a limit count operator
-	static CDXLScalar *MakeDXLLimitCount(CDXLMemoryManager *dxl_memory_manager,
-										 const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLLimitCount(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a limit offset operator
-	static CDXLScalar *MakeDXLLimitOffset(CDXLMemoryManager *dxl_memory_manager,
-										  const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLLimitOffset(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a scalar comparison operator
-	static CDXLScalar *MakeDXLScalarCmp(CDXLMemoryManager *dxl_memory_manager,
-										const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLScalarCmp(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a distinct comparison operator
-	static CDXLScalar *MakeDXLDistinctCmp(CDXLMemoryManager *dxl_memory_manager,
-										  const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLDistinctCmp(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a scalar OpExpr
-	static CDXLScalar *MakeDXLOpExpr(CDXLMemoryManager *dxl_memory_manager,
-									 const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLOpExpr(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a scalar ArrayComp
-	static CDXLScalar *MakeDXLArrayComp(CDXLMemoryManager *dxl_memory_manager,
-										const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLArrayComp(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a BoolExpr
-	static CDXLScalar *MakeDXLBoolExpr(CDXLMemoryManager *dxl_memory_manager,
-									   const EdxlBoolExprType);
+	static gpos::owner<CDXLScalar *> MakeDXLBoolExpr(
+		CDXLMemoryManager *dxl_memory_manager, const EdxlBoolExprType);
 
 	// create a boolean test
-	static CDXLScalar *MakeDXLBooleanTest(CDXLMemoryManager *dxl_memory_manager,
-										  const EdxlBooleanTestType);
+	static gpos::owner<CDXLScalar *> MakeDXLBooleanTest(
+		CDXLMemoryManager *dxl_memory_manager, const EdxlBooleanTestType);
 
 	// create a subplan operator
-	static CDXLScalar *MakeDXLSubPlan(CDXLMemoryManager *dxl_memory_manager,
-									  IMDId *mdid,
-									  CDXLColRefArray *dxl_colref_array,
-									  EdxlSubPlanType dxl_subplan_type,
-									  CDXLNode *dxlnode_test_expr);
+	static gpos::owner<CDXLScalar *> MakeDXLSubPlan(
+		CDXLMemoryManager *dxl_memory_manager, IMDId *mdid,
+		CDXLColRefArray *dxl_colref_array, EdxlSubPlanType dxl_subplan_type,
+		CDXLNode *dxlnode_test_expr);
 
 	// create a NullTest
-	static CDXLScalar *MakeDXLNullTest(CDXLMemoryManager *dxl_memory_manager,
-									   const BOOL);
+	static gpos::owner<CDXLScalar *> MakeDXLNullTest(
+		CDXLMemoryManager *dxl_memory_manager, const BOOL);
 
 	// create a cast
-	static CDXLScalar *MakeDXLCast(CDXLMemoryManager *dxl_memory_manager,
-								   const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLCast(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a coerce
-	static CDXLScalar *MakeDXLCoerceToDomain(
+	static gpos::owner<CDXLScalar *> MakeDXLCoerceToDomain(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a CoerceViaIo
-	static CDXLScalar *MakeDXLCoerceViaIO(CDXLMemoryManager *dxl_memory_manager,
-										  const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLCoerceViaIO(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a ArrayCoerceExpr
-	static CDXLScalar *MakeDXLArrayCoerceExpr(
+	static gpos::owner<CDXLScalar *> MakeDXLArrayCoerceExpr(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a scalar identifier operator
-	static CDXLScalar *MakeDXLScalarIdent(CDXLMemoryManager *dxl_memory_manager,
-										  const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLScalarIdent(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a scalar Const
-	static CDXLScalar *MakeDXLConstValue(CDXLMemoryManager *dxl_memory_manager,
-										 const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLConstValue(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a CaseStmt
-	static CDXLScalar *MakeDXLIfStmt(CDXLMemoryManager *dxl_memory_manager,
-									 const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLIfStmt(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a FuncExpr
-	static CDXLScalar *MakeDXLFuncExpr(CDXLMemoryManager *dxl_memory_manager,
-									   const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLFuncExpr(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a AggRef
-	static CDXLScalar *MakeDXLAggFunc(CDXLMemoryManager *dxl_memory_manager,
-									  const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLAggFunc(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a scalar window function (WindowRef)
-	static CDXLScalar *MakeWindowRef(CDXLMemoryManager *dxl_memory_manager,
-									 const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeWindowRef(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create an array
-	static CDXLScalar *MakeDXLArray(CDXLMemoryManager *dxl_memory_manager,
-									const Attributes &attr);
+	static gpos::owner<CDXLScalar *> MakeDXLArray(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attr);
 
 	// create a proj elem
-	static CDXLScalar *MakeDXLProjElem(CDXLMemoryManager *dxl_memory_manager,
-									   const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLProjElem(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a hash expr
-	static CDXLScalar *MakeDXLHashExpr(CDXLMemoryManager *dxl_memory_manager,
-									   const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLHashExpr(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a sort col
-	static CDXLScalar *MakeDXLSortCol(CDXLMemoryManager *dxl_memory_manager,
-									  const Attributes &attrs);
+	static gpos::owner<CDXLScalar *> MakeDXLSortCol(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create an object representing cost estimates of a physical operator
 	// from the parsed XML attributes
-	static CDXLOperatorCost *MakeDXLOperatorCost(
+	static gpos::owner<CDXLOperatorCost *> MakeDXLOperatorCost(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a table descriptor element
-	static CDXLTableDescr *MakeDXLTableDescr(
+	static gpos::owner<CDXLTableDescr *> MakeDXLTableDescr(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create an index descriptor
-	static CDXLIndexDescr *MakeDXLIndexDescr(
+	static gpos::owner<CDXLIndexDescr *> MakeDXLIndexDescr(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a column descriptor object
-	static CDXLColDescr *MakeColumnDescr(CDXLMemoryManager *dxl_memory_manager,
-										 const Attributes &attrs);
+	static gpos::owner<CDXLColDescr *> MakeColumnDescr(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// create a column reference object
-	static CDXLColRef *MakeDXLColRef(CDXLMemoryManager *dxl_memory_manager,
-									 const Attributes &, Edxltoken);
+	static gpos::owner<CDXLColRef *> MakeDXLColRef(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &, Edxltoken);
 
 	// create a logical join
-	static CDXLLogical *MakeLogicalJoin(CDXLMemoryManager *dxl_memory_manager,
-										const Attributes &attrs);
+	static gpos::owner<CDXLLogical *> MakeLogicalJoin(
+		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs);
 
 	// parse an output segment index
 	static INT ParseOutputSegId(CDXLMemoryManager *dxl_memory_manager,
@@ -471,39 +466,34 @@ public:
 								  Edxltoken target_elem);
 
 	// parse a GPDB mdid object from an array of its components
-	static CMDIdGPDB *GetGPDBMdId(CDXLMemoryManager *dxl_memory_manager,
-								  XMLChArray *remaining_tokens,
-								  Edxltoken target_attr, Edxltoken target_elem);
+	static gpos::owner<CMDIdGPDB *> GetGPDBMdId(
+		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
+		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a GPDB CTAS mdid object from an array of its components
-	static CMDIdGPDB *GetGPDBCTASMdId(CDXLMemoryManager *dxl_memory_manager,
-									  XMLChArray *remaining_tokens,
-									  Edxltoken target_attr,
-									  Edxltoken target_elem);
+	static gpos::owner<CMDIdGPDB *> GetGPDBCTASMdId(
+		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
+		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a column stats mdid object from an array of its components
-	static CMDIdColStats *GetColStatsMdId(CDXLMemoryManager *dxl_memory_manager,
-										  XMLChArray *remaining_tokens,
-										  Edxltoken target_attr,
-										  Edxltoken target_elem);
+	static gpos::owner<CMDIdColStats *> GetColStatsMdId(
+		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
+		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a relation stats mdid object from an array of its components
-	static CMDIdRelStats *GetRelStatsMdId(CDXLMemoryManager *dxl_memory_manager,
-										  XMLChArray *remaining_tokens,
-										  Edxltoken target_attr,
-										  Edxltoken target_elem);
+	static gpos::owner<CMDIdRelStats *> GetRelStatsMdId(
+		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
+		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a cast func mdid from the array of its components
-	static CMDIdCast *GetCastFuncMdId(CDXLMemoryManager *dxl_memory_manager,
-									  XMLChArray *remaining_tokens,
-									  Edxltoken target_attr,
-									  Edxltoken target_elem);
+	static gpos::owner<CMDIdCast *> GetCastFuncMdId(
+		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
+		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a comparison operator mdid from the array of its components
-	static CMDIdScCmp *GetScCmpMdId(CDXLMemoryManager *dxl_memory_manager,
-									XMLChArray *remaining_tokens,
-									Edxltoken target_attr,
-									Edxltoken target_elem);
+	static gpos::owner<CMDIdScCmp *> GetScCmpMdId(
+		CDXLMemoryManager *dxl_memory_manager, XMLChArray *remaining_tokens,
+		Edxltoken target_attr, Edxltoken target_elem);
 
 	// parse a dxl datum object
 	static CDXLDatum *GetDatumVal(CDXLMemoryManager *dxl_memory_manager,
@@ -637,7 +627,7 @@ CDXLOperatorFactory::ExtractIntsToArray(CDXLMemoryManager *dxl_memory_manager,
 	// get the memory pool from the memory manager
 	CMemoryPool *mp = dxl_memory_manager->Pmp();
 
-	CDynamicPtrArray<T, CleanupFn> *pdrgpt =
+	gpos::owner<CDynamicPtrArray<T, CleanupFn> *> pdrgpt =
 		GPOS_NEW(mp) CDynamicPtrArray<T, CleanupFn>(mp);
 
 	XMLStringTokenizer mdid_components(mdid_list_xml,

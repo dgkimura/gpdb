@@ -12,6 +12,8 @@
 #ifndef GPDXL_CParseHandlerScalarExpr_H
 #define GPDXL_CParseHandlerScalarExpr_H
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
 
 namespace gpdxl
@@ -32,7 +34,7 @@ class CParseHandlerScalarExpr : public CParseHandlerBase
 {
 private:
 	// the root of the parsed DXL tree constructed by the parse handler
-	CDXLNode *m_dxl_node;
+	gpos::owner<CDXLNode *> m_dxl_node;
 
 protected:
 	// returns the parse handler type
@@ -65,7 +67,7 @@ public:
 	~CParseHandlerScalarExpr() override;
 
 	// root of constructed DXL expression
-	CDXLNode *CreateDXLNode() const;
+	gpos::pointer<CDXLNode *> CreateDXLNode() const;
 };
 }  // namespace gpdxl
 

@@ -12,6 +12,7 @@
 
 #include "naucrates/md/CMDIndexGPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -101,7 +102,7 @@ CMDIndexGPDB::~CMDIndexGPDB()
 //		Returns the metadata id of this index
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDIndexGPDB::MDId() const
 {
 	return m_mdid;
@@ -277,7 +278,7 @@ CMDIndexGPDB::GetIncludedColPos(ULONG column) const
 //		Return the part constraint
 //
 //---------------------------------------------------------------------------
-IMDPartConstraint *
+gpos::pointer<IMDPartConstraint *>
 CMDIndexGPDB::MDPartConstraint() const
 {
 	return m_mdpart_constraint;
@@ -403,7 +404,7 @@ CMDIndexGPDB::DebugPrint(IOstream &os) const
 //		Type of items returned by the index
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDIndexGPDB::GetIndexRetItemTypeMdid() const
 {
 	return m_mdid_item_type;
@@ -419,14 +420,16 @@ CMDIndexGPDB::GetIndexRetItemTypeMdid() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIndexGPDB::IsCompatible(const IMDScalarOp *md_scalar_op, ULONG key_pos) const
+CMDIndexGPDB::IsCompatible(gpos::pointer<const IMDScalarOp *> md_scalar_op,
+						   ULONG key_pos) const
 {
 	GPOS_ASSERT(nullptr != md_scalar_op);
 	GPOS_ASSERT(key_pos < m_mdid_opfamilies_array->Size());
 
 	// check if the index opfamily for the key at the given position is one of
 	// the families the scalar comparison belongs to
-	const IMDId *mdid_opfamily = (*m_mdid_opfamilies_array)[key_pos];
+	gpos::pointer<const IMDId *> mdid_opfamily =
+		(*m_mdid_opfamilies_array)[key_pos];
 
 	const ULONG opfamilies_count = md_scalar_op->OpfamiliesCount();
 
@@ -441,7 +444,7 @@ CMDIndexGPDB::IsCompatible(const IMDScalarOp *md_scalar_op, ULONG key_pos) const
 	return false;
 }
 
-IMdIdArray *
+gpos::pointer<IMdIdArray *>
 CMDIndexGPDB::ChildIndexMdids() const
 {
 	return m_child_index_oids;

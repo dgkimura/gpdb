@@ -14,6 +14,7 @@
 #define GPDXL_CParseHandlerScalarSubPlan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarSubPlan.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerScalarSubPlan : public CParseHandlerScalarOp
 {
 private:
 	// first col type
-	IMDId *m_mdid_first_col;
+	gpos::pointer<IMDId *> m_mdid_first_col;
 
 	// subplan type
 	EdxlSubPlanType m_dxl_subplan_type;

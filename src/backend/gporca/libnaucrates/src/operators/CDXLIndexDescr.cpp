@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/operators/CDXLIndexDescr.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -58,7 +59,7 @@ CDXLIndexDescr::~CDXLIndexDescr()
 //		Return the metadata id for the index
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLIndexDescr::MDId() const
 {
 	return m_mdid;

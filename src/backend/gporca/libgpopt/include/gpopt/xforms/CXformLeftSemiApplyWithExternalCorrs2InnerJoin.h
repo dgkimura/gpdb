@@ -14,6 +14,7 @@
 #define GPOPT_CXformLeftSemiApplyWithExternalCorrs2InnerJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalInnerJoin.h"
 #include "gpopt/operators/CLogicalLeftSemiApply.h"
@@ -47,7 +48,7 @@ private:
 
 	// helper for collecting correlations
 	static BOOL FDecorrelate(CMemoryPool *mp, CExpression *pexpr,
-							 CExpression **ppexprInnerNew,
+							 gpos::owner<CExpression *> *ppexprInnerNew,
 							 CExpressionArray **ppdrgpexprCorr);
 
 	// decorrelate semi apply with external correlations

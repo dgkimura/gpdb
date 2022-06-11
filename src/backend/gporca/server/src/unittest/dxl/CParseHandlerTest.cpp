@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/dxl/CParseHandlerTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/error/CException.h"
 #include "gpos/error/CMessage.h"
@@ -420,7 +421,7 @@ CParseHandlerTest::EresParseAndSerializePlan(CMemoryPool *mp,
 	// the root of the parsed DXL tree
 	ULLONG plan_id = gpos::ullong_max;
 	ULLONG plan_space_size = gpos::ullong_max;
-	CDXLNode *root_dxl_node = CDXLUtils::GetPlanDXLNode(
+	gpos::owner<CDXLNode *> root_dxl_node = CDXLUtils::GetPlanDXLNode(
 		mp, dxl_string, szValidationPath, &plan_id, &plan_space_size);
 
 	GPOS_CHECK_ABORT;
@@ -548,7 +549,7 @@ CParseHandlerTest::EresParseAndSerializeMetadata(CMemoryPool *mp,
 		szValidationPath = CTestUtils::m_szXSDPath;
 	}
 
-	IMDCacheObjectArray *mdcache_obj_array =
+	gpos::owner<IMDCacheObjectArray *> mdcache_obj_array =
 		CDXLUtils::ParseDXLToIMDObjectArray(mp, dxl_string, szValidationPath);
 
 	GPOS_ASSERT(nullptr != mdcache_obj_array);
@@ -607,7 +608,7 @@ CParseHandlerTest::EresParseAndSerializeMDRequest(CMemoryPool *mp,
 		szValidationPath = CTestUtils::m_szXSDPath;
 	}
 
-	CMDRequest *pmdr =
+	gpos::owner<CMDRequest *> pmdr =
 		CDXLUtils::ParseDXLToMDRequest(mp, dxl_string, szValidationPath);
 
 	GPOS_ASSERT(nullptr != pmdr);
@@ -646,7 +647,7 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 												   BOOL fValidate)
 {
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -670,10 +671,10 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 	}
 
 	// parse the statistics objects
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+	gpos::owner<CDXLStatsDerivedRelationArray *> dxl_derived_rel_stats_array =
 		CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, dxl_string,
 												  szValidationPath);
-	CStatisticsArray *statistics_array =
+	gpos::owner<CStatisticsArray *> statistics_array =
 		CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 			mp, &mda, dxl_derived_rel_stats_array);
 
@@ -735,8 +736,9 @@ CParseHandlerTest::EresParseAndSerializeScalarExpr(CMemoryPool *mp,
 	}
 
 	// the root of the parsed DXL tree
-	CDXLNode *root_dxl_node = CDXLUtils::ParseDXLToScalarExprDXLNode(
-		mp, dxl_string, szValidationPath);
+	gpos::owner<CDXLNode *> root_dxl_node =
+		CDXLUtils::ParseDXLToScalarExprDXLNode(mp, dxl_string,
+											   szValidationPath);
 	GPOS_CHECK_ABORT;
 
 	CWStringDynamic str(mp);

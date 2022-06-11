@@ -37,7 +37,7 @@ class CColumnDescriptor : public CRefCount,
 {
 private:
 	// type information
-	const IMDType *m_pmdtype;
+	gpos::pointer<const IMDType *> m_pmdtype;
 
 	// type modifier
 	const INT m_type_modifier;

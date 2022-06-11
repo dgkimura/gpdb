@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalIndexGet_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/COrderSpec.h"
@@ -36,10 +37,10 @@ class CLogicalIndexGet : public CLogical
 {
 private:
 	// index descriptor
-	CIndexDescriptor *m_pindexdesc;
+	gpos::owner<CIndexDescriptor *> m_pindexdesc;
 
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::owner<CTableDescriptor *> m_ptabdesc;
 
 	// origin operator id -- gpos::ulong_max if operator was not generated via a transformation
 	ULONG m_ulOriginOpId;
@@ -48,16 +49,16 @@ private:
 	const CName *m_pnameAlias;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::owner<CColRefArray *> m_pdrgpcrOutput;
 
 	// set representation of output columns
-	CColRefSet *m_pcrsOutput;
+	gpos::owner<CColRefSet *> m_pcrsOutput;
 
 	// order spec
-	COrderSpec *m_pos;
+	gpos::owner<COrderSpec *> m_pos;
 
 	// distribution columns (empty for master only tables)
-	CColRefSet *m_pcrsDist;
+	gpos::owner<CColRefSet *> m_pcrsDist;
 
 public:
 	CLogicalIndexGet(const CLogicalIndexGet &) = delete;
@@ -65,7 +66,7 @@ public:
 	// ctors
 	explicit CLogicalIndexGet(CMemoryPool *mp);
 
-	CLogicalIndexGet(CMemoryPool *mp, const IMDIndex *pmdindex,
+	CLogicalIndexGet(CMemoryPool *mp, gpos::pointer<const IMDIndex *> pmdindex,
 					 CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
 					 const CName *pnameAlias, CColRefArray *pdrgpcrOutput);
 
@@ -87,14 +88,14 @@ public:
 	}
 
 	// distribution columns
-	virtual const CColRefSet *
+	virtual gpos::pointer<const CColRefSet *>
 	PcrsDist() const
 	{
 		return m_pcrsDist;
 	}
 
 	// array of output columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -122,21 +123,21 @@ public:
 	}
 
 	// index descriptor
-	CIndexDescriptor *
+	gpos::pointer<CIndexDescriptor *>
 	Pindexdesc() const
 	{
 		return m_pindexdesc;
 	}
 
 	// table descriptor
-	CTableDescriptor *
+	gpos::pointer<CTableDescriptor *>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
 	}
 
 	// order spec
-	COrderSpec *
+	gpos::pointer<COrderSpec *>
 	Pos() const
 	{
 		return m_pos;
@@ -152,9 +153,9 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -169,7 +170,7 @@ public:
 									  CExpressionHandle &exprhdl) override;
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::owner<CPartInfo *>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &	 //exprhdl
 	) const override
@@ -204,11 +205,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	PcrsStat(CMemoryPool *mp,
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   //pcrsInput
-			 ULONG				   // child_index
+			 CExpressionHandle &,		   // exprhdl
+			 gpos::pointer<CColRefSet *>,  //pcrsInput
+			 ULONG						   // child_index
 	) const override
 	{
 		// TODO:  March 26 2012; statistics derivation for indexes
@@ -237,7 +238,7 @@ public:
 	// conversion function
 	//-------------------------------------------------------------------------------------
 
-	static CLogicalIndexGet *
+	static gpos::cast_func<CLogicalIndexGet *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

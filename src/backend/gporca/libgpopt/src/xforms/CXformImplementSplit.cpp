@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementSplit.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogicalSplit.h"
@@ -78,10 +79,10 @@ CXformImplementSplit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
-	CColRefArray *pdrgpcrDelete = popSplit->PdrgpcrDelete();
+	gpos::owner<CColRefArray *> pdrgpcrDelete = popSplit->PdrgpcrDelete();
 	pdrgpcrDelete->AddRef();
 
-	CColRefArray *pdrgpcrInsert = popSplit->PdrgpcrInsert();
+	gpos::owner<CColRefArray *> pdrgpcrInsert = popSplit->PdrgpcrInsert();
 	pdrgpcrInsert->AddRef();
 
 	CColRef *pcrAction = popSplit->PcrAction();
@@ -96,7 +97,7 @@ CXformImplementSplit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pexprProjList->AddRef();
 
 	// create physical Split
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalSplit(mp, pdrgpcrDelete, pdrgpcrInsert, pcrCtid,
 									pcrSegmentId, pcrAction, pcrTupleOid),

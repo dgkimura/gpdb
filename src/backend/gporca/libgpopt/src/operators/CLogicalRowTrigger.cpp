@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalRowTrigger.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CExpression.h"
@@ -90,12 +91,13 @@ void
 CLogicalRowTrigger::InitFunctionProperties()
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_rel_mdid);
+	gpos::pointer<const IMDRelation *> pmdrel =
+		md_accessor->RetrieveRel(m_rel_mdid);
 	const ULONG ulTriggers = pmdrel->TriggerCount();
 
 	for (ULONG ul = 0; ul < ulTriggers; ul++)
 	{
-		const IMDTrigger *pmdtrigger =
+		gpos::pointer<const IMDTrigger *> pmdtrigger =
 			md_accessor->RetrieveTrigger(pmdrel->TriggerMDidAt(ul));
 		if (!pmdtrigger->IsEnabled() || !pmdtrigger->ExecutesOnRowLevel() ||
 			(ITriggerType(pmdtrigger) & m_type) != m_type)
@@ -103,7 +105,7 @@ CLogicalRowTrigger::InitFunctionProperties()
 			continue;
 		}
 
-		const IMDFunction *pmdfunc =
+		gpos::pointer<const IMDFunction *> pmdfunc =
 			md_accessor->RetrieveFunc(pmdtrigger->FuncMdId());
 		IMDFunction::EFuncStbl efs = pmdfunc->GetFuncStability();
 
@@ -123,7 +125,7 @@ CLogicalRowTrigger::InitFunctionProperties()
 //
 //---------------------------------------------------------------------------
 INT
-CLogicalRowTrigger::ITriggerType(const IMDTrigger *pmdtrigger)
+CLogicalRowTrigger::ITriggerType(gpos::pointer<const IMDTrigger *> pmdtrigger)
 {
 	INT type = GPMD_TRIGGER_ROW;
 	if (pmdtrigger->IsBefore())
@@ -211,7 +213,7 @@ CLogicalRowTrigger::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalRowTrigger::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											   UlongToColRefMap *colref_mapping,
 											   BOOL must_exist)
@@ -293,7 +295,7 @@ CLogicalRowTrigger::DeriveMaxCard(CMemoryPool *,  // mp
 CXformSet *
 CLogicalRowTrigger::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementRowTrigger);
 	return xform_set;
 }

@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMDRequest.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -158,7 +160,7 @@ CParseHandlerMDRequest::GetParseHandlerType() const
 //		Parsed array of mdids
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::pointer<IMdIdArray *>
 CParseHandlerMDRequest::GetMdIdArray() const
 {
 	return m_mdid_array;
@@ -172,7 +174,7 @@ CParseHandlerMDRequest::GetMdIdArray() const
 //		Parsed array of type requests
 //
 //---------------------------------------------------------------------------
-CMDRequest::SMDTypeRequestArray *
+gpos::pointer<CMDRequest::SMDTypeRequestArray *>
 CParseHandlerMDRequest::GetMDTypeRequestArray() const
 {
 	return m_mdtype_request_array;

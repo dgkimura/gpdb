@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerCost.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
 #include "naucrates/dxl/xml/dxltokens.h"
@@ -57,7 +59,7 @@ CParseHandlerCost::~CParseHandlerCost()
 //		Destructor
 //
 //---------------------------------------------------------------------------
-CDXLOperatorCost *
+gpos::pointer<CDXLOperatorCost *>
 CParseHandlerCost::GetDXLOperatorCost()
 {
 	return m_operator_cost_dxl;

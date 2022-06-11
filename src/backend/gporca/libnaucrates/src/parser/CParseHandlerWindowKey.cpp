@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerWindowKey.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -124,7 +126,7 @@ CParseHandlerWindowKey::EndElement(const XMLCh *const,	// element_uri,
 
 	CParseHandlerSortColList *sort_col_list_parse_handler =
 		dynamic_cast<CParseHandlerSortColList *>((*this)[0]);
-	CDXLNode *sort_col_list_dxlnode =
+	gpos::owner<CDXLNode *> sort_col_list_dxlnode =
 		sort_col_list_parse_handler->CreateDXLNode();
 	sort_col_list_dxlnode->AddRef();
 	m_dxl_window_key_gen->SetSortColList(sort_col_list_dxlnode);

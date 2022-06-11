@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarAggref.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -159,7 +161,7 @@ CDXLScalarAggref::GetOpNameStr() const
 //		Returns function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarAggref::GetDXLAggFuncMDid() const
 {
 	return m_agg_func_mdid;
@@ -174,7 +176,7 @@ CDXLScalarAggref::GetDXLAggFuncMDid() const
 //		Returns resolved type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarAggref::GetDXLResolvedRetTypeMDid() const
 {
 	return m_resolved_rettype_mdid;
@@ -205,10 +207,9 @@ CDXLScalarAggref::IsDistinct() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAggref::SerializeValuesListChildToDXL(CXMLSerializer *xml_serializer,
-												const CDXLNode *dxlnode,
-												ULONG index,
-												const CHAR *attr_name) const
+CDXLScalarAggref::SerializeValuesListChildToDXL(
+	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> dxlnode,
+	ULONG index, const CHAR *attr_name) const
 {
 	CDXLScalarValuesList *child =
 		CDXLScalarValuesList::Cast(((*dxlnode)[index])->GetOperator());
@@ -225,7 +226,7 @@ CDXLScalarAggref::SerializeValuesListChildToDXL(CXMLSerializer *xml_serializer,
 //---------------------------------------------------------------------------
 void
 CDXLScalarAggref::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *dxlnode) const
+								 gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -270,7 +271,8 @@ CDXLScalarAggref::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarAggref::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(m_agg_func_mdid);
+	gpos::pointer<const IMDAggregate *> pmdagg =
+		md_accessor->RetrieveAgg(m_agg_func_mdid);
 	return (
 		IMDType::EtiBool ==
 		md_accessor->RetrieveType(pmdagg->GetResultTypeMdid())->GetDatumType());

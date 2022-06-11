@@ -50,7 +50,7 @@ private:
 
 	// array holding nest params col references used for creating nestparam
 	// node during translation
-	CDXLColRefArray *m_nest_params_col_refs;
+	gpos::owner<CDXLColRefArray *> m_nest_params_col_refs;
 
 	// if nest params are required to be parsed
 	BOOL m_nest_params_exists;
@@ -86,7 +86,7 @@ public:
 
 	void SetNestLoopParamsColRefs(CDXLColRefArray *nest_params_col_refs);
 
-	CDXLColRefArray *GetNestLoopParamsColRefs() const;
+	gpos::pointer<CDXLColRefArray *> GetNestLoopParamsColRefs() const;
 
 	// conversion function
 	static gpos::cast_func<CDXLPhysicalNLJoin *>

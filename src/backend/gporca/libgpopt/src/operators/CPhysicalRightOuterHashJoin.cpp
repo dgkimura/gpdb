@@ -61,7 +61,7 @@ CPhysicalRightOuterHashJoin::~CPhysicalRightOuterHashJoin() = default;
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CEnfdDistribution *
+gpos::owner<CEnfdDistribution *>
 CPhysicalRightOuterHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 CReqdPropPlan *prppInput, ULONG child_index,
 								 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)

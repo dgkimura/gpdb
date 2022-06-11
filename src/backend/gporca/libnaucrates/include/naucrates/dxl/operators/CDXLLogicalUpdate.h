@@ -34,7 +34,7 @@ class CDXLLogicalUpdate : public CDXLLogical
 {
 private:
 	// target table descriptor
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
 
 	// ctid column id
 	ULONG m_ctid_colid;
@@ -43,10 +43,10 @@ private:
 	ULONG m_segid_colid;
 
 	// list of deletion column ids
-	ULongPtrArray *m_deletion_colid_array;
+	gpos::owner<ULongPtrArray *> m_deletion_colid_array;
 
 	// list of insertion column ids
-	ULongPtrArray *m_insert_colid_array;
+	gpos::owner<ULongPtrArray *> m_insert_colid_array;
 
 	// should update preserve tuple oids
 	BOOL m_preserve_oids;

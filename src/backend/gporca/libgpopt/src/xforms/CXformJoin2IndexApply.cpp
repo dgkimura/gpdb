@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformJoin2IndexApply.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
@@ -114,8 +115,8 @@ CXformJoin2IndexApply::CreateHomogeneousIndexApplyAlternatives(
 
 	// derive the scalar and relational properties to build set of required columns
 	CColRefSet *pcrsScalarExpr = nullptr;
-	CColRefSet *outer_refs = nullptr;
-	CColRefSet *pcrsReqd = nullptr;
+	gpos::owner<CColRefSet *> outer_refs = nullptr;
+	gpos::owner<CColRefSet *> pcrsReqd = nullptr;
 	ComputeColumnSets(mp, pexprInner, pexprScalar, &pcrsScalarExpr, &outer_refs,
 					  &pcrsReqd);
 
@@ -160,18 +161,20 @@ CXformJoin2IndexApply::CreateHomogeneousBtreeIndexApplyAlternatives(
 	CXformResult *pxfres)
 {
 	// array of expressions in the scalar expression
-	CExpressionArray *pdrgpexpr =
+	gpos::owner<CExpressionArray *> pdrgpexpr =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 	GPOS_ASSERT(pdrgpexpr->Size() > 0);
 
 	// find the indexes whose included columns meet the required columns
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdescInner->MDId());
+	gpos::pointer<const IMDRelation *> pmdrel =
+		md_accessor->RetrieveRel(ptabdescInner->MDId());
 
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
 		IMDId *pmdidIndex = pmdrel->IndexMDidAt(ul);
-		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdidIndex);
+		gpos::pointer<const IMDIndex *> pmdindex =
+			md_accessor->RetrieveIndex(pmdidIndex);
 
 		CreateAlternativesForBtreeIndex(
 			mp, joinOp, pexprOuter, pexprInner, origJoinPred,
@@ -200,12 +203,14 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 	CExpression *nodesToInsertAboveIndexGet,
 	CExpression *endOfNodesToInsertAboveIndexGet, CMDAccessor *md_accessor,
 	CExpressionArray *pdrgpexprConjuncts, CColRefSet *pcrsScalarExpr,
-	CColRefSet *outer_refs, CColRefSet *pcrsReqd, const IMDRelation *pmdrel,
-	const IMDIndex *pmdindex, CXformResult *pxfres)
+	CColRefSet *outer_refs, CColRefSet *pcrsReqd,
+	gpos::pointer<const IMDRelation *> pmdrel,
+	gpos::pointer<const IMDIndex *> pmdindex, CXformResult *pxfres)
 {
-	CExpression *pexprLogicalIndexGet = CXformUtils::PexprLogicalIndexGet(
-		mp, md_accessor, pexprInner, joinOp->UlOpId(), pdrgpexprConjuncts,
-		pcrsReqd, pcrsScalarExpr, outer_refs, pmdindex, pmdrel);
+	gpos::owner<CExpression *> pexprLogicalIndexGet =
+		CXformUtils::PexprLogicalIndexGet(
+			mp, md_accessor, pexprInner, joinOp->UlOpId(), pdrgpexprConjuncts,
+			pcrsReqd, pcrsScalarExpr, outer_refs, pmdindex, pmdrel);
 	if (nullptr != pexprLogicalIndexGet)
 	{
 		// second child has residual predicates, create an apply of outer and inner
@@ -243,7 +248,7 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 		}
 
 		pexprOuter->AddRef();
-		CExpression *pexprIndexApply = GPOS_NEW(mp) CExpression(
+		gpos::owner<CExpression *> pexprIndexApply = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp)
 				CLogicalIndexApply(mp, colref_array, isOuterJoin, origJoinPred),
@@ -272,9 +277,10 @@ CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives(
 	CColRefSet *pcrsReqd, CXformResult *pxfres)
 {
 	CLogical *popGet = CLogical::PopConvert(pexprInner->Pop());
-	CExpression *pexprLogicalIndexGet = CXformUtils::PexprBitmapTableGet(
-		mp, popGet, joinOp->UlOpId(), ptabdescInner, pexprScalar, outer_refs,
-		pcrsReqd);
+	gpos::owner<CExpression *> pexprLogicalIndexGet =
+		CXformUtils::PexprBitmapTableGet(mp, popGet, joinOp->UlOpId(),
+										 ptabdescInner, pexprScalar, outer_refs,
+										 pcrsReqd);
 	if (nullptr != pexprLogicalIndexGet)
 	{
 		// second child has residual predicates, create an apply of outer and inner
@@ -312,7 +318,7 @@ CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives(
 		}
 
 		pexprOuter->AddRef();
-		CExpression *pexprIndexApply = GPOS_NEW(mp) CExpression(
+		gpos::owner<CExpression *> pexprIndexApply = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp)
 				CLogicalIndexApply(mp, colref_array, isOuterJoin, origJoinPred),

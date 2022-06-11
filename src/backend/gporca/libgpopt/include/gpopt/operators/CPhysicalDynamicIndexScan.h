@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalDynamicIndexScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CIndexDescriptor.h"
 #include "gpopt/operators/CPhysicalDynamicScan.h"
@@ -36,10 +37,10 @@ class CPhysicalDynamicIndexScan : public CPhysicalDynamicScan
 {
 private:
 	// index descriptor
-	CIndexDescriptor *m_pindexdesc;
+	gpos::owner<CIndexDescriptor *> m_pindexdesc;
 
 	// order
-	COrderSpec *m_pos;
+	gpos::owner<COrderSpec *> m_pos;
 
 public:
 	CPhysicalDynamicIndexScan(const CPhysicalDynamicIndexScan &) = delete;
@@ -72,7 +73,7 @@ public:
 	}
 
 	// index descriptor
-	CIndexDescriptor *
+	gpos::pointer<CIndexDescriptor *>
 	Pindexdesc() const
 	{
 		return m_pindexdesc;
@@ -89,7 +90,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *
+	gpos::owner<COrderSpec *>
 	PosDerive(CMemoryPool *,	   //mp
 			  CExpressionHandle &  //exprhdl
 	) const override
@@ -104,10 +105,11 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	// conversion function
-	static CPhysicalDynamicIndexScan *
+	static gpos::cast_func<CPhysicalDynamicIndexScan *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -78,10 +78,10 @@ public:
 
 private:
 	// hashmap from column ids to histograms
-	UlongToHistogramMap *m_colid_histogram_mapping;
+	gpos::owner<UlongToHistogramMap *> m_colid_histogram_mapping;
 
 	// hashmap from column id to width
-	UlongToDoubleMap *m_colid_width_mapping;
+	gpos::owner<UlongToDoubleMap *> m_colid_width_mapping;
 
 	// number of rows
 	CDouble m_rows;
@@ -108,11 +108,11 @@ private:
 	ULONG m_num_predicates;
 
 	// statistics configuration
-	CStatisticsConfig *m_stats_conf;
+	gpos::pointer<CStatisticsConfig *> m_stats_conf;
 
 	// array of upper bound of ndv per source;
 	// source can be one of the following operators: like Get, Group By, and Project
-	CUpperBoundNDVPtrArray *m_src_upper_bound_NDVs;
+	gpos::owner<CUpperBoundNDVPtrArray *> m_src_upper_bound_NDVs;
 
 	// the default value for operators that have no cardinality estimation risk
 	static const ULONG no_card_est_risk_default_val;
@@ -250,7 +250,8 @@ public:
 		CStatsPredJoinArray *join_preds_stats) const override;
 
 	// return required props associated with stats object
-	CReqdPropRelational *GetReqdRelationalProps(CMemoryPool *mp) const override;
+	gpos::owner<CReqdPropRelational *> GetReqdRelationalProps(
+		CMemoryPool *mp) const override;
 
 	// append given stats to current object
 	void AppendStats(CMemoryPool *mp, IStatistics *stats) override;
@@ -279,7 +280,7 @@ public:
 	CColRefSet *GetColRefSet(CMemoryPool *mp) const override;
 
 	// generate the DXL representation of the statistics object
-	CDXLStatsDerivedRelation *GetDxlStatsDrvdRelation(
+	gpos::owner<CDXLStatsDerivedRelation *> GetDxlStatsDrvdRelation(
 		CMemoryPool *mp, CMDAccessor *md_accessor) const override;
 
 	// print function
@@ -309,7 +310,7 @@ public:
 		return m_stats_conf;
 	}
 
-	CUpperBoundNDVPtrArray *
+	gpos::pointer<CUpperBoundNDVPtrArray *>
 	GetUpperBoundNDVs() const
 	{
 		return m_src_upper_bound_NDVs;

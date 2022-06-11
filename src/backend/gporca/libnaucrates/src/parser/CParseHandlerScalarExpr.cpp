@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarExpr.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerOp.h"
 
@@ -56,7 +58,7 @@ CParseHandlerScalarExpr::~CParseHandlerScalarExpr()
 //		Root of constructed DXL expression
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::pointer<CDXLNode *>
 CParseHandlerScalarExpr::CreateDXLNode() const
 {
 	return m_dxl_node;

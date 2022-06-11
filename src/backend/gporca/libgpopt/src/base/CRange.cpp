@@ -12,6 +12,7 @@
 #include "gpopt/base/CRange.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/CUtils.h"
@@ -420,7 +421,8 @@ CRange::PexprScalar(CMemoryPool *mp, const CColRef *colref)
 		PexprScalarCompEnd(mp, m_pdatumRight, m_eriRight, IMDType::EcmptLEq,
 						   IMDType::EcmptL, colref);
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 
 	if (nullptr != pexprLeft)
 	{
@@ -455,7 +457,7 @@ CRange::PexprEquality(CMemoryPool *mp, const CColRef *colref)
 	}
 
 	m_pdatumLeft->AddRef();
-	CExpression *pexprVal = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprVal = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, m_pdatumLeft));
 
 	return CUtils::PexprScalarCmp(mp, colref, pexprVal, IMDType::EcmptEq);
@@ -481,7 +483,7 @@ CRange::PexprScalarCompEnd(CMemoryPool *mp, IDatum *datum, ERangeInclusion eri,
 	}
 
 	datum->AddRef();
-	CExpression *pexprVal =
+	gpos::owner<CExpression *> pexprVal =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, datum));
 
 	IMDType::ECmpType cmp_type;
@@ -505,8 +507,8 @@ CRange::PexprScalarCompEnd(CMemoryPool *mp, IDatum *datum, ERangeInclusion eri,
 //		Intersection with another range
 //
 //---------------------------------------------------------------------------
-CRange *
-CRange::PrngIntersect(CMemoryPool *mp, CRange *prange)
+gpos::owner<CRange *>
+CRange::PrngIntersect(CMemoryPool *mp, gpos::pointer<CRange *> prange)
 {
 	if (Contains(prange))
 	{
@@ -524,7 +526,7 @@ CRange::PrngIntersect(CMemoryPool *mp, CRange *prange)
 	{
 		m_mdid->AddRef();
 
-		IDatum *pdatumLeft = prange->PdatumLeft();
+		gpos::owner<IDatum *> pdatumLeft = prange->PdatumLeft();
 		pdatumLeft->AddRef();
 		m_pdatumRight->AddRef();
 
@@ -537,7 +539,7 @@ CRange::PrngIntersect(CMemoryPool *mp, CRange *prange)
 	{
 		m_mdid->AddRef();
 
-		IDatum *pdatumRight = prange->PdatumRight();
+		gpos::owner<IDatum *> pdatumRight = prange->PdatumRight();
 		pdatumRight->AddRef();
 		m_pdatumLeft->AddRef();
 
@@ -559,7 +561,7 @@ CRange::PrngIntersect(CMemoryPool *mp, CRange *prange)
 //		prange         |-----------|
 //		result  |------|
 //---------------------------------------------------------------------------
-CRange *
+gpos::owner<CRange *>
 CRange::PrngDifferenceLeft(CMemoryPool *mp, CRange *prange)
 {
 	if (FDisjointLeft(prange))
@@ -577,7 +579,7 @@ CRange::PrngDifferenceLeft(CMemoryPool *mp, CRange *prange)
 			m_pdatumLeft->AddRef();
 		}
 
-		IDatum *pdatumRight = prange->PdatumLeft();
+		gpos::owner<IDatum *> pdatumRight = prange->PdatumLeft();
 		pdatumRight->AddRef();
 
 		return GPOS_NEW(mp)
@@ -599,7 +601,7 @@ CRange::PrngDifferenceLeft(CMemoryPool *mp, CRange *prange)
 //		prange      |-----------|
 //		result                  |------|
 //---------------------------------------------------------------------------
-CRange *
+gpos::owner<CRange *>
 CRange::PrngDifferenceRight(CMemoryPool *mp, CRange *prange)
 {
 	if (prange->FDisjointLeft(this))
@@ -617,7 +619,7 @@ CRange::PrngDifferenceRight(CMemoryPool *mp, CRange *prange)
 			m_pdatumRight->AddRef();
 		}
 
-		IDatum *pdatumRight = prange->PdatumRight();
+		gpos::owner<IDatum *> pdatumRight = prange->PdatumRight();
 		pdatumRight->AddRef();
 
 		return GPOS_NEW(mp) CRange(m_mdid, m_pcomp, pdatumRight,
@@ -637,7 +639,7 @@ CRange::PrngDifferenceRight(CMemoryPool *mp, CRange *prange)
 //		must start right after this range, otherwise NULL is returned
 //
 //---------------------------------------------------------------------------
-CRange *
+gpos::owner<CRange *>
 CRange::PrngExtend(CMemoryPool *mp, CRange *prange)
 {
 	if ((EriIncluded == prange->EriLeft() || EriIncluded == m_eriRight) &&

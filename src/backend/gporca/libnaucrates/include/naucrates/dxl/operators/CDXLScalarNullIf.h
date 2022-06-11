@@ -34,10 +34,10 @@ class CDXLScalarNullIf : public CDXLScalar
 {
 private:
 	// operator number
-	IMDId *m_mdid_op;
+	gpos::owner<IMDId *> m_mdid_op;
 
 	// return type
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 public:
 	CDXLScalarNullIf(CDXLScalarNullIf &) = delete;
@@ -55,10 +55,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// operator id
-	virtual IMDId *MdIdOp() const;
+	virtual gpos::pointer<IMDId *> MdIdOp() const;
 
 	// return type
-	virtual IMDId *MdidType() const;
+	virtual gpos::pointer<IMDId *> MdidType() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

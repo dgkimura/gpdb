@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMDGPDBScalarOp.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -255,7 +257,7 @@ CParseHandlerMDGPDBScalarOp::EndElement(const XMLCh *const,	 // element_uri,
 
 		GPOS_ASSERT(0 == this->Length() || 1 == this->Length());
 
-		IMdIdArray *mdid_opfamilies_array = nullptr;
+		gpos::owner<IMdIdArray *> mdid_opfamilies_array = nullptr;
 		if (0 < this->Length())
 		{
 			CParseHandlerMetadataIdList *mdid_list_parse_handler =

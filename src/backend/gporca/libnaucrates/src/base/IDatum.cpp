@@ -11,6 +11,8 @@
 
 #include "naucrates/base/IDatum.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/md/CMDTypeGenericGPDB.h"
 #include "naucrates/statistics/CStatistics.h"
 
@@ -28,7 +30,7 @@ FORCE_GENERATE_DBGSTR(gpmd::IDatum);
 //
 //---------------------------------------------------------------------------
 BOOL
-IDatum::StatsAreEqual(const IDatum *datum) const
+IDatum::StatsAreEqual(gpos::pointer<const IDatum *> datum) const
 {
 	GPOS_ASSERT(nullptr != datum);
 
@@ -77,7 +79,7 @@ IDatum::StatsAreEqual(const IDatum *datum) const
 //
 //---------------------------------------------------------------------------
 BOOL
-IDatum::StatsAreLessThan(const IDatum *datum) const
+IDatum::StatsAreLessThan(gpos::pointer<const IDatum *> datum) const
 {
 	GPOS_ASSERT(nullptr != datum);
 
@@ -126,7 +128,7 @@ IDatum::StatsAreLessThan(const IDatum *datum) const
 //
 //---------------------------------------------------------------------------
 CDouble
-IDatum::GetStatsDistanceFrom(const IDatum *datum) const
+IDatum::GetStatsDistanceFrom(gpos::pointer<const IDatum *> datum) const
 {
 	GPOS_ASSERT(nullptr != datum);
 
@@ -199,7 +201,7 @@ IDatum::GetValAsDouble() const
 //
 //---------------------------------------------------------------------------
 BOOL
-IDatum::StatsAreComparable(const IDatum *datum) const
+IDatum::StatsAreComparable(gpos::pointer<const IDatum *> datum) const
 {
 	GPOS_ASSERT(nullptr != datum);
 

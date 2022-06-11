@@ -15,6 +15,7 @@
 #define GPMD_CDXLColumn_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/md/CMDName.h"
@@ -47,7 +48,7 @@ private:
 	INT m_attno;
 
 	// column type
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 	INT m_type_modifier;
 
@@ -61,7 +62,7 @@ private:
 	ULONG m_length;
 
 	// default value expression
-	gpdxl::CDXLNode *m_dxl_default_val;
+	gpos::owner<gpdxl::CDXLNode *> m_dxl_default_val;
 
 public:
 	CMDColumn(const CMDColumn &) = delete;
@@ -79,7 +80,7 @@ public:
 	CMDName Mdname() const override;
 
 	// column type
-	IMDId *MdidType() const override;
+	gpos::pointer<IMDId *> MdidType() const override;
 
 	INT TypeModifier() const override;
 

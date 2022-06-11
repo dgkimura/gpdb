@@ -12,6 +12,7 @@
 #define GPOPT_CJobGroupExpression_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/search/CJob.h"
 #include "gpopt/xforms/CXform.h"
@@ -44,7 +45,7 @@ private:
 
 protected:
 	// target group expression
-	CGroupExpression *m_pgexpr{nullptr};
+	gpos::pointer<CGroupExpression *> m_pgexpr{nullptr};
 
 	// ctor
 	CJobGroupExpression() = default;

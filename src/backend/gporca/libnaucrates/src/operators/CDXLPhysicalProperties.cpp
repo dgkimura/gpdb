@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalProperties.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpdxl;
@@ -73,7 +75,7 @@ CDXLPhysicalProperties::SerializePropertiesToDXL(
 //		Return cost of operator
 //
 //---------------------------------------------------------------------------
-CDXLOperatorCost *
+gpos::pointer<CDXLOperatorCost *>
 CDXLPhysicalProperties::GetDXLOperatorCost() const
 {
 	return m_operator_cost_dxl;

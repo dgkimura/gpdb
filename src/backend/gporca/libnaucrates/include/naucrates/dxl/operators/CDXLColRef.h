@@ -17,6 +17,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CMDName.h"
 #include "naucrates/md/IMDId.h"
@@ -51,7 +52,7 @@ private:
 	const ULONG m_id;
 
 	// column type
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 	// column type modifier
 	INT m_iTypeModifer;
@@ -67,7 +68,7 @@ public:
 	// accessors
 	const CMDName *MdName() const;
 
-	IMDId *MdidType() const;
+	gpos::pointer<IMDId *> MdidType() const;
 
 	INT TypeModifier() const;
 

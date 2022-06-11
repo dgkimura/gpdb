@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarDistinctComp.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -75,8 +77,8 @@ CDXLScalarDistinctComp::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarDistinctComp::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const CDXLNode *node) const
+CDXLScalarDistinctComp::SerializeToDXL(
+	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

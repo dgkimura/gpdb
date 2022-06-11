@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLProperties.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpdxl;
@@ -63,7 +65,7 @@ CDXLProperties::SetStats(CDXLStatsDerivedRelation *dxl_stats_derived_relation)
 //		Return operator's statistical information
 //
 //---------------------------------------------------------------------------
-const CDXLStatsDerivedRelation *
+gpos::pointer<const CDXLStatsDerivedRelation *>
 CDXLProperties::GetDxlStatsDrvdRelation() const
 {
 	return m_dxl_stats_derived_relation;

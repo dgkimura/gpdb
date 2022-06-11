@@ -6,6 +6,7 @@
 #define GPNAUCRATES_PointLess_H
 
 #include "gpos/common/Ref.h"
+#include "gpos/common/owner.h"
 
 namespace gpnaucrates
 {
@@ -13,8 +14,8 @@ class CPoint;
 
 struct PointLess
 {
-	bool operator()(const gpnaucrates::CPoint *a,
-					const gpnaucrates::CPoint *b) const;
+	bool operator()(gpos::pointer<const gpnaucrates::CPoint *> a,
+					gpos::pointer<const gpnaucrates::CPoint *> b) const;
 
 	bool operator()(const gpos::Ref<gpnaucrates::CPoint> &a,
 					const gpos::Ref<gpnaucrates::CPoint> &b) const;

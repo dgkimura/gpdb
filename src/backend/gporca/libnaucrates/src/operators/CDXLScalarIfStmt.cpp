@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarIfStmt.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -82,7 +84,7 @@ CDXLScalarIfStmt::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarIfStmt::GetResultTypeMdId() const
 {
 	return m_result_type_mdid;
@@ -98,7 +100,7 @@ CDXLScalarIfStmt::GetResultTypeMdId() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarIfStmt::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *node) const
+								 gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

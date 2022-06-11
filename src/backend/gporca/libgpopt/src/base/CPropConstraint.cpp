@@ -12,6 +12,7 @@
 #include "gpopt/base/CPropConstraint.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/CColRefSetIter.h"
@@ -119,7 +120,7 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 		return nullptr;
 	}
 	CColRefSet *pcrs = m_phmcrcrs->Find(colref);
-	CColRefSet *equivOuterRefs = nullptr;
+	gpos::owner<CColRefSet *> equivOuterRefs = nullptr;
 
 	if (nullptr != constraintsForOuterRefs &&
 		nullptr != constraintsForOuterRefs->m_phmcrcrs)
@@ -136,7 +137,7 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 
 	// get constraints for all other columns in this equivalence class
 	// except the current column
-	CColRefSet *pcrsEquiv = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsEquiv = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsEquiv->Include(pcrs);
 	if (nullptr != equivOuterRefs)
 	{
@@ -145,7 +146,7 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 	pcrsEquiv->Exclude(colref);
 
 	// local constraints on the equivalent column(s)
-	CConstraint *pcnstr = m_pcnstr->Pcnstr(mp, pcrsEquiv);
+	gpos::owner<CConstraint *> pcnstr = m_pcnstr->Pcnstr(mp, pcrsEquiv);
 	CConstraint *pcnstrFromOuterRefs = nullptr;
 
 	if (nullptr != constraintsForOuterRefs &&
@@ -174,7 +175,8 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 	{
 		// constraints from both local and outer refs, make a conjunction
 		// and store it in pcnstr
-		CConstraintArray *conjArray = GPOS_NEW(mp) CConstraintArray(mp);
+		gpos::owner<CConstraintArray *> conjArray =
+			GPOS_NEW(mp) CConstraintArray(mp);
 
 		conjArray->Append(pcnstr);
 		conjArray->Append(pcnstrFromOuterRefs);
@@ -185,8 +187,9 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 	// Now, pcnstr contains constraints on columns that are equivalent
 	// to 'colref'. These constraints may be local or in an outer scope.
 	// Generate a copy of all these constraints for the current column.
-	CConstraint *pcnstrCol = pcnstr->PcnstrRemapForColumn(mp, colref);
-	CExpression *pexprScalar = pcnstrCol->PexprScalar(mp);
+	gpos::owner<CConstraint *> pcnstrCol =
+		pcnstr->PcnstrRemapForColumn(mp, colref);
+	gpos::owner<CExpression *> pexprScalar = pcnstrCol->PexprScalar(mp);
 	pexprScalar->AddRef();
 
 	pcnstr->Release();

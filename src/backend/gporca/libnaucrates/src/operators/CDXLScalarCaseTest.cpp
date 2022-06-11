@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarCaseTest.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -82,7 +84,7 @@ CDXLScalarCaseTest::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarCaseTest::MdidType() const
 {
 	return m_mdid_type;
@@ -98,7 +100,7 @@ CDXLScalarCaseTest::MdidType() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarCaseTest::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *	 //dxlnode
+								   gpos::pointer<const CDXLNode *>	//dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();

@@ -39,7 +39,7 @@ class CDXLLogicalCTAS : public CDXLLogical
 {
 private:
 	// mdid of table to create
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// schema name
 	CMDName *m_mdname_schema;
@@ -48,22 +48,22 @@ private:
 	CMDName *m_mdname_rel;
 
 	// list of columns
-	CDXLColDescrArray *m_col_descr_array;
+	gpos::owner<CDXLColDescrArray *> m_col_descr_array;
 
 	// storage options
-	CDXLCtasStorageOptions *m_dxl_ctas_storage_option;
+	gpos::owner<CDXLCtasStorageOptions *> m_dxl_ctas_storage_option;
 
 	// distribution policy
 	IMDRelation::Ereldistrpolicy m_rel_distr_policy;
 
 	// list of distribution column positions
-	ULongPtrArray *m_distr_column_pos_array;
+	gpos::owner<ULongPtrArray *> m_distr_column_pos_array;
 
 	// list of distribution column opfamilies
-	IMdIdArray *m_distr_opfamilies;
+	gpos::owner<IMdIdArray *> m_distr_opfamilies;
 
 	// list of distribution column opclasses for populating dist policy of created table
-	IMdIdArray *m_distr_opclasses;
+	gpos::owner<IMdIdArray *> m_distr_opclasses;
 
 	// is this a temporary table
 	BOOL m_is_temp_table;
@@ -75,11 +75,11 @@ private:
 	IMDRelation::Erelstoragetype m_rel_storage_type;
 
 	// list of source column ids
-	ULongPtrArray *m_src_colids_array;
+	gpos::owner<ULongPtrArray *> m_src_colids_array;
 
 	// list of vartypmod for target expressions
 	// typemod records type-specific, e.g. the maximum length of a character column
-	IntPtrArray *m_vartypemod_array;
+	gpos::owner<IntPtrArray *> m_vartypemod_array;
 
 public:
 	CDXLLogicalCTAS(const CDXLLogicalCTAS &) = delete;

@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarComp.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -72,7 +74,7 @@ CDXLScalarComp::GetComparisonOpName() const
 //		Comparison operator id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CDXLScalarComp::MDId() const
 {
 	return m_mdid;
@@ -117,7 +119,7 @@ CDXLScalarComp::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarComp::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   const CDXLNode *node) const
+							   gpos::pointer<const CDXLNode *> node) const
 {
 	GPOS_CHECK_ABORT;
 

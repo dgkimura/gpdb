@@ -34,20 +34,20 @@ class CDistributionSpecHashed : public CDistributionSpecRandom
 {
 private:
 	// array of distribution expressions
-	CExpressionArray *m_pdrgpexpr;
+	gpos::owner<CExpressionArray *> m_pdrgpexpr;
 
-	IMdIdArray *m_opfamilies;
+	gpos::owner<IMdIdArray *> m_opfamilies;
 
 	// are NULLS consistently distributed
 	BOOL m_fNullsColocated;
 
 	// equivalent hashed distribution introduced by a hash join
-	CDistributionSpecHashed *m_pdshashedEquiv;
+	gpos::owner<CDistributionSpecHashed *> m_pdshashedEquiv;
 
 	// array of expression arrays, an array at position n
 	// is the list of expression which are equivalent to the distribution expr
 	// at position n in m_pdrgpexpr array.
-	CExpressionArrays *m_equiv_hash_exprs;
+	gpos::owner<CExpressionArrays *> m_equiv_hash_exprs;
 
 	// check if specs are compatible wrt to co-location of nulls;
 	// HD1 satisfies HD2 if:
@@ -89,9 +89,10 @@ public:
 							CDistributionSpecHashed *pdshashedEquiv,
 							IMdIdArray *opfamilies = nullptr);
 
-	static CDistributionSpecHashed *MakeHashedDistrSpec(
+	static gpos::owner<CDistributionSpecHashed *> MakeHashedDistrSpec(
 		CMemoryPool *mp, CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
-		CDistributionSpecHashed *pdshashedEquiv, IMdIdArray *opfamilies);
+		CDistributionSpecHashed *pdshashedEquiv,
+		gpos::owner<IMdIdArray *> opfamilies);
 
 	// dtor
 	~CDistributionSpecHashed() override;
@@ -142,8 +143,8 @@ public:
 	CColRefSet *PcrsUsed(CMemoryPool *mp) const override;
 
 	// return a copy of the distribution spec after excluding the given columns
-	virtual CDistributionSpecHashed *PdshashedExcludeColumns(CMemoryPool *mp,
-															 CColRefSet *pcrs);
+	virtual gpos::owner<CDistributionSpecHashed *> PdshashedExcludeColumns(
+		CMemoryPool *mp, CColRefSet *pcrs);
 
 	// does this distribution match the given one
 	BOOL Matches(gpos::pointer<const CDistributionSpec *> pds) const override;
@@ -160,16 +161,17 @@ public:
 	BOOL Equals(gpos::pointer<const CDistributionSpec *> pds) const override;
 
 	// return a copy of the distribution spec with remapped columns
-	CDistributionSpec *PdsCopyWithRemappedColumns(
+	gpos::owner<CDistributionSpec *> PdsCopyWithRemappedColumns(
 		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// strip off any equivalent columns embedded in the distribution spec
-	CDistributionSpec *StripEquivColumns(CMemoryPool *) override;
+	gpos::owner<CDistributionSpec *> StripEquivColumns(CMemoryPool *) override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 gpos::pointer<CReqdPropPlan *> prpp,
+						 CExpressionArray *pdrgpexpr,
 						 CExpression *pexpr) override;
 
 	// hash function for hashed distribution spec
@@ -215,7 +217,7 @@ public:
 		return pdsHashed;
 	}
 
-	CExpressionArrays *
+	gpos::pointer<CExpressionArrays *>
 	HashSpecEquivExprs() const
 	{
 		return m_equiv_hash_exprs;

@@ -40,7 +40,7 @@ class CMDIdColStats : public IMDId
 {
 private:
 	// mdid of base relation
-	CMDIdGPDB *m_rel_mdid;
+	gpos::owner<CMDIdGPDB *> m_rel_mdid;
 
 	// position of the attribute in the base relation
 	ULONG m_attr_pos;
@@ -80,7 +80,7 @@ public:
 	}
 
 	// accessors
-	IMDId *GetRelMdId() const;
+	gpos::pointer<IMDId *> GetRelMdId() const;
 	ULONG Position() const;
 
 	// equality check

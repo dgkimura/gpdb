@@ -11,9 +11,8 @@
 
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
+#include "gpos/common/owner.h"
 #endif
-
-#include "unittest/gpopt/base/CConstraintTest.h"
 
 #include <stdint.h>
 
@@ -29,6 +28,7 @@
 
 #include "unittest/base.h"
 #include "unittest/gpopt/CConstExprEvaluatorForDates.h"
+#include "unittest/gpopt/base/CConstraintTest.h"
 
 // number of microseconds in one day
 const LINT CConstraintTest::lMicrosecondsPerDay =
@@ -123,11 +123,11 @@ CConstraintTest::EresUnittest_CInterval()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
@@ -138,36 +138,42 @@ CConstraintTest::EresUnittest_CInterval()
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 	IMDId *mdid = pmdtypeint8->MDId();
 
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	// first interval
-	CConstraintInterval *pciFirst = PciFirstInterval(mp, mdid, colref);
+	gpos::owner<CConstraintInterval *> pciFirst =
+		PciFirstInterval(mp, mdid, colref);
 	PrintConstraint(mp, pciFirst);
 
 	// second interval
-	CConstraintInterval *pciSecond = PciSecondInterval(mp, mdid, colref);
+	gpos::owner<CConstraintInterval *> pciSecond =
+		PciSecondInterval(mp, mdid, colref);
 	PrintConstraint(mp, pciSecond);
 
 	// intersection
-	CConstraintInterval *pciIntersect = pciFirst->PciIntersect(mp, pciSecond);
+	gpos::owner<CConstraintInterval *> pciIntersect =
+		pciFirst->PciIntersect(mp, pciSecond);
 	PrintConstraint(mp, pciIntersect);
 
 	// union
-	CConstraintInterval *pciUnion = pciFirst->PciUnion(mp, pciSecond);
+	gpos::owner<CConstraintInterval *> pciUnion =
+		pciFirst->PciUnion(mp, pciSecond);
 	PrintConstraint(mp, pciUnion);
 
 	// diff 1
-	CConstraintInterval *pciDiff1 = pciFirst->PciDifference(mp, pciSecond);
+	gpos::owner<CConstraintInterval *> pciDiff1 =
+		pciFirst->PciDifference(mp, pciSecond);
 	PrintConstraint(mp, pciDiff1);
 
 	// diff 2
-	CConstraintInterval *pciDiff2 = pciSecond->PciDifference(mp, pciFirst);
+	gpos::owner<CConstraintInterval *> pciDiff2 =
+		pciSecond->PciDifference(mp, pciFirst);
 	PrintConstraint(mp, pciDiff2);
 
 	// complement
-	CConstraintInterval *pciComp = pciFirst->PciComplement(mp);
+	gpos::owner<CConstraintInterval *> pciComp = pciFirst->PciComplement(mp);
 	PrintConstraint(mp, pciComp);
 
 	// containment
@@ -177,9 +183,10 @@ CConstraintTest::EresUnittest_CInterval()
 	GPOS_ASSERT(pciSecond->Contains(pciDiff2));
 
 	// equality
-	CConstraintInterval *pciThird = PciFirstInterval(mp, mdid, colref);
+	gpos::owner<CConstraintInterval *> pciThird =
+		PciFirstInterval(mp, mdid, colref);
 	pciThird->AddRef();
-	CConstraintInterval *pciFourth = pciThird;
+	gpos::owner<CConstraintInterval *> pciFourth = pciThird;
 	GPOS_ASSERT(!pciFirst->Equals(pciSecond));
 	GPOS_ASSERT(!pciFirst->Equals(pciDiff1));
 	GPOS_ASSERT(!pciSecond->Equals(pciDiff2));
@@ -217,11 +224,11 @@ CConstraintTest::EresUnittest_CConjunction()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
@@ -232,28 +239,31 @@ CConstraintTest::EresUnittest_CConjunction()
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 	IMDId *mdid = pmdtypeint8->MDId();
 
-	CExpression *pexprGet1 = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet1 = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs1 = pexprGet1->DeriveOutputColumns();
 	CColRef *pcr1 = pcrs1->PcrAny();
 
-	CExpression *pexprGet2 = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet2 = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs2 = pexprGet2->DeriveOutputColumns();
 	CColRef *pcr2 = pcrs2->PcrAny();
 
-	CConstraintConjunction *pcconj1 = Pcstconjunction(mp, mdid, pcr1);
+	gpos::owner<CConstraintConjunction *> pcconj1 =
+		Pcstconjunction(mp, mdid, pcr1);
 	PrintConstraint(mp, pcconj1);
 	GPOS_ASSERT(!pcconj1->FContradiction());
 
-	CConstraintConjunction *pcconj2 = Pcstconjunction(mp, mdid, pcr2);
+	gpos::owner<CConstraintConjunction *> pcconj2 =
+		Pcstconjunction(mp, mdid, pcr2);
 	PrintConstraint(mp, pcconj2);
 
-	CConstraintArray *pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcst =
+		GPOS_NEW(mp) CConstraintArray(mp);
 	pcconj1->AddRef();
 	pcconj2->AddRef();
 	pdrgpcst->Append(pcconj1);
 	pdrgpcst->Append(pcconj2);
 
-	CConstraintConjunction *pcconjTop =
+	gpos::owner<CConstraintConjunction *> pcconjTop =
 		GPOS_NEW(mp) CConstraintConjunction(mp, pdrgpcst);
 	PrintConstraint(mp, pcconjTop);
 
@@ -288,7 +298,7 @@ CConstraintTest::EresUnittest_CConjunction()
 //		Build a conjunction
 //
 //---------------------------------------------------------------------------
-CConstraintConjunction *
+gpos::owner<CConstraintConjunction *>
 CConstraintTest::Pcstconjunction(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
 {
 	// first interval
@@ -297,7 +307,8 @@ CConstraintTest::Pcstconjunction(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
 	// second interval
 	CConstraintInterval *pciSecond = PciSecondInterval(mp, mdid, colref);
 
-	CConstraintArray *pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcst =
+		GPOS_NEW(mp) CConstraintArray(mp);
 	pdrgpcst->Append(pciFirst);
 	pdrgpcst->Append(pciSecond);
 
@@ -312,7 +323,7 @@ CConstraintTest::Pcstconjunction(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
 //		Build a disjunction
 //
 //---------------------------------------------------------------------------
-CConstraintDisjunction *
+gpos::owner<CConstraintDisjunction *>
 CConstraintTest::Pcstdisjunction(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
 {
 	// first interval
@@ -321,7 +332,8 @@ CConstraintTest::Pcstdisjunction(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
 	// second interval
 	CConstraintInterval *pciSecond = PciSecondInterval(mp, mdid, colref);
 
-	CConstraintArray *pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcst =
+		GPOS_NEW(mp) CConstraintArray(mp);
 	pdrgpcst->Append(pciFirst);
 	pdrgpcst->Append(pciSecond);
 
@@ -344,11 +356,11 @@ CConstraintTest::EresUnittest_CDisjunction()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
@@ -359,28 +371,31 @@ CConstraintTest::EresUnittest_CDisjunction()
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 	IMDId *mdid = pmdtypeint8->MDId();
 
-	CExpression *pexprGet1 = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet1 = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs1 = pexprGet1->DeriveOutputColumns();
 	CColRef *pcr1 = pcrs1->PcrAny();
 
-	CExpression *pexprGet2 = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet2 = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs2 = pexprGet2->DeriveOutputColumns();
 	CColRef *pcr2 = pcrs2->PcrAny();
 
-	CConstraintDisjunction *pcdisj1 = Pcstdisjunction(mp, mdid, pcr1);
+	gpos::owner<CConstraintDisjunction *> pcdisj1 =
+		Pcstdisjunction(mp, mdid, pcr1);
 	PrintConstraint(mp, pcdisj1);
 	GPOS_ASSERT(!pcdisj1->FContradiction());
 
-	CConstraintDisjunction *pcdisj2 = Pcstdisjunction(mp, mdid, pcr2);
+	gpos::owner<CConstraintDisjunction *> pcdisj2 =
+		Pcstdisjunction(mp, mdid, pcr2);
 	PrintConstraint(mp, pcdisj2);
 
-	CConstraintArray *pdrgpcst = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcst =
+		GPOS_NEW(mp) CConstraintArray(mp);
 	pcdisj1->AddRef();
 	pcdisj2->AddRef();
 	pdrgpcst->Append(pcdisj1);
 	pdrgpcst->Append(pcdisj2);
 
-	CConstraintDisjunction *pcdisjTop =
+	gpos::owner<CConstraintDisjunction *> pcdisjTop =
 		GPOS_NEW(mp) CConstraintDisjunction(mp, pdrgpcst);
 	PrintConstraint(mp, pcdisjTop);
 
@@ -422,11 +437,11 @@ CConstraintTest::EresUnittest_CNegation()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
@@ -437,19 +452,21 @@ CConstraintTest::EresUnittest_CNegation()
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 	IMDId *mdid = pmdtypeint8->MDId();
 
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
-	CConstraintInterval *pci = PciFirstInterval(mp, mdid, colref);
+	gpos::owner<CConstraintInterval *> pci = PciFirstInterval(mp, mdid, colref);
 	PrintConstraint(mp, pci);
 
 	pci->AddRef();
-	CConstraintNegation *pcn1 = GPOS_NEW(mp) CConstraintNegation(mp, pci);
+	gpos::owner<CConstraintNegation *> pcn1 =
+		GPOS_NEW(mp) CConstraintNegation(mp, pci);
 	PrintConstraint(mp, pcn1);
 
 	pcn1->AddRef();
-	CConstraintNegation *pcn2 = GPOS_NEW(mp) CConstraintNegation(mp, pcn1);
+	gpos::owner<CConstraintNegation *> pcn2 =
+		GPOS_NEW(mp) CConstraintNegation(mp, pcn1);
 	PrintConstraint(mp, pcn2);
 
 	// containment
@@ -490,18 +507,18 @@ CConstraintTest::EresUnittest_CIntervalFromScalarExpr()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, pceeval, CTestUtils::GetCostModel(mp));
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
@@ -537,30 +554,31 @@ CConstraintTest::EresUnittest_CConstraintFromScalarExpr()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, pceeval, CTestUtils::GetCostModel(mp));
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	CExpression *pexprGet1 = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet1 = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs1 = pexprGet1->DeriveOutputColumns();
 	CColRef *pcr1 = pcrs1->PcrAny();
 
-	CExpression *pexprGet2 = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet2 = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs2 = pexprGet2->DeriveOutputColumns();
 	CColRef *pcr2 = pcrs2->PcrAny();
 
-	CColRefSetArray *pdrgpcrs = nullptr;
+	gpos::owner<CColRefSetArray *> pdrgpcrs = nullptr;
 
 	// expression with 1 column
-	CExpression *pexpr = PexprScalarCmp(mp, &mda, pcr1, IMDType::EcmptG, 15);
-	CConstraint *pcnstr =
+	gpos::owner<CExpression *> pexpr =
+		PexprScalarCmp(mp, &mda, pcr1, IMDType::EcmptG, 15);
+	gpos::owner<CConstraint *> pcnstr =
 		CConstraint::PcnstrFromScalarExpr(mp, pexpr, &pdrgpcrs);
 	PrintConstraint(mp, pcnstr);
 	PrintEquivClasses(mp, pdrgpcrs);
@@ -570,15 +588,16 @@ CConstraintTest::EresUnittest_CConstraintFromScalarExpr()
 	pexpr->Release();
 
 	// expression with 2 columns
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	pdrgpexpr->Append(PexprScalarCmp(mp, &mda, pcr1, IMDType::EcmptG, 15));
 	pdrgpexpr->Append(PexprScalarCmp(mp, &mda, pcr2, IMDType::EcmptL, 20));
 
-	CExpression *pexprAnd =
+	gpos::owner<CExpression *> pexprAnd =
 		CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopAnd, pdrgpexpr);
 	(void) pexprAnd->PdpDerive();
 
-	CConstraint *pcnstrAnd =
+	gpos::owner<CConstraint *> pcnstrAnd =
 		CConstraint::PcnstrFromScalarExpr(mp, pexprAnd, &pdrgpcrs);
 	PrintConstraint(mp, pcnstrAnd);
 	PrintEquivClasses(mp, pdrgpcrs);
@@ -589,9 +608,10 @@ CConstraintTest::EresUnittest_CConstraintFromScalarExpr()
 	pexprAnd->Release();
 
 	// equality predicate with 2 columns
-	CExpression *pexprEq = CUtils::PexprScalarEqCmp(mp, pcr1, pcr2);
+	gpos::owner<CExpression *> pexprEq =
+		CUtils::PexprScalarEqCmp(mp, pcr1, pcr2);
 	(void) pexprEq->PdpDerive();
-	CConstraint *pcnstrEq =
+	gpos::owner<CConstraint *> pcnstrEq =
 		CConstraint::PcnstrFromScalarExpr(mp, pexprEq, &pdrgpcrs);
 	PrintConstraint(mp, pcnstrEq);
 	PrintEquivClasses(mp, pdrgpcrs);
@@ -624,11 +644,11 @@ CConstraintTest::EresUnittest_CConstraintIntervalConvertsTo()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
@@ -647,14 +667,14 @@ CConstraintTest::EresUnittest_CConstraintIntervalConvertsTo()
 	IMDId *mdid = pmdtypeint8->MDId();
 
 	// get a column ref
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	// create constraint
 	CRangeArray *pdrgprng =
 		Pdrgprng(mp, mdid, rgRangeInfoIn, GPOS_ARRAY_SIZE(rgRangeInfoIn));
-	CConstraintInterval *pcnstin =
+	gpos::owner<CConstraintInterval *> pcnstin =
 		GPOS_NEW(mp) CConstraintInterval(mp, colref, pdrgprng, true);
 
 	PrintConstraint(mp, pcnstin);
@@ -663,7 +683,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalConvertsTo()
 	GPOS_ASSERT(pcnstin->FConvertsToIn());
 	GPOS_ASSERT(!pcnstin->FConvertsToNotIn());
 
-	CConstraintInterval *pcnstNotIn = pcnstin->PciComplement(mp);
+	gpos::owner<CConstraintInterval *> pcnstNotIn = pcnstin->PciComplement(mp);
 
 	// should convert to a not in statement after taking the complement
 	GPOS_ASSERT(pcnstNotIn->FConvertsToNotIn());
@@ -693,11 +713,11 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
@@ -718,14 +738,14 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 	IMDId *mdid = pmdtypeint8->MDId();
 
 	// get a column ref
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	CRangeArray *pdrgprng = nullptr;
-	CConstraintInterval *pcnstin = nullptr;
+	gpos::owner<CConstraintInterval *> pcnstin = nullptr;
 	CExpression *pexpr = nullptr;
-	CConstraintInterval *pcnstNotIn = nullptr;
+	gpos::owner<CConstraintInterval *> pcnstNotIn = nullptr;
 
 	// IN CONSTRAINT FOR SIMPLE INTERVAL (WITHOUT NULL)
 
@@ -834,11 +854,11 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
@@ -848,7 +868,8 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 	CAutoTraceFlag atf(EopttraceArrayConstraints, true);
 
 	// Create an IN array expression
-	CExpression *pexpr = CTestUtils::PexprLogicalSelectArrayCmp(mp);
+	gpos::owner<CExpression *> pexpr =
+		CTestUtils::PexprLogicalSelectArrayCmp(mp);
 	// get a ref to the comparison column
 	CColRef *colref = pexpr->DeriveOutputColumns()->PcrAny();
 
@@ -856,7 +877,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 	CExpression *pexprArrayComp = (*pexpr->PdrgPexpr())[1];
 	GPOS_ASSERT(CUtils::FScalarArrayCmp(pexprArrayComp));
 
-	CConstraintInterval *pcnstIn =
+	gpos::owner<CConstraintInterval *> pcnstIn =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexprArrayComp,
 													   colref);
 	GPOS_ASSERT(CConstraint::EctInterval == pcnstIn->Ect());
@@ -869,11 +890,12 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 
 	// test a NOT IN expression
 
-	CExpression *pexprNotIn = CTestUtils::PexprLogicalSelectArrayCmp(
-		mp, CScalarArrayCmp::EarrcmpAll, IMDType::EcmptNEq);
+	gpos::owner<CExpression *> pexprNotIn =
+		CTestUtils::PexprLogicalSelectArrayCmp(mp, CScalarArrayCmp::EarrcmpAll,
+											   IMDType::EcmptNEq);
 	CExpression *pexprArrayNotInComp = (*pexprNotIn->PdrgPexpr())[1];
 	CColRef *pcrNot = pexprNotIn->DeriveOutputColumns()->PcrAny();
-	CConstraintInterval *pcnstNotIn =
+	gpos::owner<CConstraintInterval *> pcnstNotIn =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexprArrayNotInComp,
 													   pcrNot);
 	GPOS_ASSERT(CConstraint::EctInterval == pcnstNotIn->Ect());
@@ -886,20 +908,21 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 	pcnstNotIn->Release();
 
 	// create an IN expression with repeated values
-	IntPtrArray *pdrgpi = GPOS_NEW(mp) IntPtrArray(mp);
+	gpos::owner<IntPtrArray *> pdrgpi = GPOS_NEW(mp) IntPtrArray(mp);
 	INT aiValsRepeat[] = {5, 1, 2, 5, 3, 4, 5};
 	ULONG aiValsLength = sizeof(aiValsRepeat) / sizeof(INT);
 	for (ULONG ul = 0; ul < aiValsLength; ul++)
 	{
 		pdrgpi->Append(GPOS_NEW(mp) INT(aiValsRepeat[ul]));
 	}
-	CExpression *pexprInRepeatsSelect = CTestUtils::PexprLogicalSelectArrayCmp(
-		mp, CScalarArrayCmp::EarrcmpAny, IMDType::EcmptEq, pdrgpi);
+	gpos::owner<CExpression *> pexprInRepeatsSelect =
+		CTestUtils::PexprLogicalSelectArrayCmp(mp, CScalarArrayCmp::EarrcmpAny,
+											   IMDType::EcmptEq, pdrgpi);
 	CColRef *pcrInRepeats =
 		pexprInRepeatsSelect->DeriveOutputColumns()->PcrAny();
 	CExpression *pexprArrayCmpRepeats = (*pexprInRepeatsSelect->PdrgPexpr())[1];
 	// add 2 repeated values and one unique
-	CConstraintInterval *pcnstInRepeats =
+	gpos::owner<CConstraintInterval *> pcnstInRepeats =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexprArrayCmpRepeats,
 													   pcrInRepeats);
 	GPOS_ASSERT(5 == pcnstInRepeats->Pdrgprng()->Size());
@@ -907,14 +930,14 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 	pcnstInRepeats->Release();
 
 	// create a NOT IN expression with repeated values
-	CExpression *pexprNotInRepeatsSelect =
+	gpos::owner<CExpression *> pexprNotInRepeatsSelect =
 		CTestUtils::PexprLogicalSelectArrayCmp(mp, CScalarArrayCmp::EarrcmpAll,
 											   IMDType::EcmptNEq, pdrgpi);
 	CColRef *pcrNotInRepeats =
 		pexprNotInRepeatsSelect->DeriveOutputColumns()->PcrAny();
 	CExpression *pexprNotInArrayCmpRepeats =
 		(*pexprNotInRepeatsSelect->PdrgPexpr())[1];
-	CConstraintInterval *pcnstNotInRepeats =
+	gpos::owner<CConstraintInterval *> pcnstNotInRepeats =
 		CConstraintInterval::PciIntervalFromScalarExpr(
 			mp, pexprNotInArrayCmpRepeats, pcrNotInRepeats);
 	// a total of 5 unique ScalarConsts in the expression will result in 6 ranges
@@ -944,11 +967,11 @@ EresUnittest_CConstraintIntervalFromArrayExprIncludesNull()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
@@ -959,28 +982,30 @@ EresUnittest_CConstraintIntervalFromArrayExprIncludesNull()
 
 	// test for includes NULL
 	// create an IN expression with repeated values
-	IntPtrArray *pdrgpi = GPOS_NEW(mp) IntPtrArray(mp);
+	gpos::owner<IntPtrArray *> pdrgpi = GPOS_NEW(mp) IntPtrArray(mp);
 	INT rngiValues[] = {1, 2};
 	ULONG ulValsLength = GPOS_ARRAY_SIZE(rngiValues);
 	for (ULONG ul = 0; ul < ulValsLength; ul++)
 	{
 		pdrgpi->Append(GPOS_NEW(mp) INT(rngiValues[ul]));
 	}
-	CExpression *pexprIn = CTestUtils::PexprLogicalSelectArrayCmp(
+	gpos::owner<CExpression *> pexprIn = CTestUtils::PexprLogicalSelectArrayCmp(
 		mp, CScalarArrayCmp::EarrcmpAny, IMDType::EcmptEq, pdrgpi);
 
 	CExpression *pexprArrayChild = (*(*pexprIn)[1])[1];
 	// create a int4 datum
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
+		mda.PtMDType<IMDTypeInt4>();
 	IDatumInt4 *pdatumNull = pmdtypeint4->CreateInt4Datum(mp, 0, true);
 
-	CExpression *pexprConstNull = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprConstNull = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, (IDatum *) pdatumNull));
 	pexprArrayChild->PdrgPexpr()->Append(pexprConstNull);
 
 	CColRef *colref = pexprIn->DeriveOutputColumns()->PcrAny();
-	CConstraintInterval *pci = CConstraintInterval::PciIntervalFromScalarExpr(
-		mp, (*pexprIn)[1], colref);
+	gpos::owner<CConstraintInterval *> pci =
+		CConstraintInterval::PciIntervalFromScalarExpr(mp, (*pexprIn)[1],
+													   colref);
 	GPOS_RTL_ASSERT(!pci->FIncludesNull());
 	GPOS_RTL_ASSERT(2 == pci->Pdrgprng()->Size());
 	pexprIn->Release();
@@ -1010,9 +1035,9 @@ CConstraintTest::EresUnittest_CIntervalFromScalarCmp(CMemoryPool *mp,
 
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(rgecmpt); ul++)
 	{
-		CExpression *pexprScCmp =
+		gpos::owner<CExpression *> pexprScCmp =
 			PexprScalarCmp(mp, md_accessor, colref, rgecmpt[ul], 4);
-		CConstraintInterval *pci =
+		gpos::owner<CConstraintInterval *> pci =
 			CConstraintInterval::PciIntervalFromScalarExpr(mp, pexprScCmp,
 														   colref);
 		PrintConstraint(mp, pci);
@@ -1037,17 +1062,18 @@ CConstraintTest::EresUnittest_CIntervalFromScalarBoolOp(
 	CMemoryPool *mp, CMDAccessor *md_accessor, CColRef *colref)
 {
 	// AND
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	pdrgpexpr->Append(
 		PexprScalarCmp(mp, md_accessor, colref, IMDType::EcmptL, 5));
 	pdrgpexpr->Append(
 		PexprScalarCmp(mp, md_accessor, colref, IMDType::EcmptGEq, 0));
 
-	CExpression *pexpr =
+	gpos::owner<CExpression *> pexpr =
 		CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopAnd, pdrgpexpr);
 	(void) pexpr->PdpDerive();
 
-	CConstraintInterval *pciAnd =
+	gpos::owner<CConstraintInterval *> pciAnd =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
 	PrintConstraint(mp, pciAnd);
 
@@ -1064,7 +1090,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarBoolOp(
 	pexpr = CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopOr, pdrgpexpr);
 	(void) pexpr->PdpDerive();
 
-	CConstraintInterval *pciOr =
+	gpos::owner<CConstraintInterval *> pciOr =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
 	PrintConstraint(mp, pciOr);
 
@@ -1079,7 +1105,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarBoolOp(
 	pexpr = CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopNot, pdrgpexpr);
 	(void) pexpr->PdpDerive();
 
-	CConstraintInterval *pciNot =
+	gpos::owner<CConstraintInterval *> pciNot =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
 	PrintConstraint(mp, pciNot);
 
@@ -1104,8 +1130,9 @@ CConstraintTest::PexprScalarCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 {
 	CExpression *pexprConst = CUtils::PexprScalarConstInt8(mp, val);
 
-	const IMDTypeInt8 *pmdtypeint8 = md_accessor->PtMDType<IMDTypeInt8>();
-	IMDId *mdid_op = pmdtypeint8->GetMdidForCmpType(cmp_type);
+	gpos::pointer<const IMDTypeInt8 *> pmdtypeint8 =
+		md_accessor->PtMDType<IMDTypeInt8>();
+	gpos::owner<IMDId *> mdid_op = pmdtypeint8->GetMdidForCmpType(cmp_type);
 	mdid_op->AddRef();
 
 	const CMDName mdname = md_accessor->RetrieveScOp(mdid_op)->Mdname();
@@ -1126,7 +1153,7 @@ CConstraintTest::PexprScalarCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 //		Create an interval
 //
 //---------------------------------------------------------------------------
-CConstraintInterval *
+gpos::owner<CConstraintInterval *>
 CConstraintTest::PciFirstInterval(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
 {
 	const SRangeInfo rgRangeInfo[] = {
@@ -1152,7 +1179,7 @@ CConstraintTest::PciFirstInterval(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
 //		Create an interval
 //
 //---------------------------------------------------------------------------
-CConstraintInterval *
+gpos::owner<CConstraintInterval *>
 CConstraintTest::PciSecondInterval(CMemoryPool *mp, IMDId *mdid,
 								   CColRef *colref)
 {
@@ -1181,13 +1208,13 @@ CRangeArray *
 CConstraintTest::Pdrgprng(CMemoryPool *mp, IMDId *mdid,
 						  const SRangeInfo rgRangeInfo[], ULONG ulRanges)
 {
-	CRangeArray *pdrgprng = GPOS_NEW(mp) CRangeArray(mp);
+	gpos::owner<CRangeArray *> pdrgprng = GPOS_NEW(mp) CRangeArray(mp);
 
 	for (ULONG ul = 0; ul < ulRanges; ul++)
 	{
 		SRangeInfo rnginfo = rgRangeInfo[ul];
 		mdid->AddRef();
-		CRange *prange = GPOS_NEW(mp)
+		gpos::owner<CRange *> prange = GPOS_NEW(mp)
 			CRange(mdid, COptCtxt::PoctxtFromTLS()->Pcomp(),
 				   GPOS_NEW(mp) CDatumInt8GPDB(CTestUtils::m_sysidDefault,
 											   (LINT) rnginfo.iLeft),
@@ -1348,18 +1375,19 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	CConstExprEvaluatorForDates *pceeval =
+	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, pceeval, CTestUtils::GetCostModel(mp));
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
+	gpos::pointer<const IMDType *> pmdtype =
+		mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
 	CWStringConst str(GPOS_WSZ_LIT("date_col"));
 	CName name(mp, &str);
 	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
@@ -1368,61 +1396,71 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	// create a date interval: ['01-01-2012', '01-21-2012')
 	CWStringDynamic pstrLowerDate1(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate1(mp, wszInternalRepresentationFor2012_01_21);
-	CConstraintInterval *pciFirst = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
-		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
-		&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
-		CRange::EriExcluded);
+	gpos::owner<CConstraintInterval *> pciFirst =
+		CTestUtils::PciGenericInterval(
+			mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
+			lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
+			&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
+			CRange::EriExcluded);
 	PrintConstraint(mp, pciFirst);
 
 	// create a date interval: ['01-02-2012', '01-22-2012')
 	CWStringDynamic pstrLowerDate2(mp, wszInternalRepresentationFor2012_01_02);
 	CWStringDynamic pstrUpperDate2(mp, wszInternalRepresentationFor2012_01_22);
-	CConstraintInterval *pciSecond = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate2,
-		lInternalRepresentationFor2012_01_02, CRange::EriIncluded,
-		&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
-		CRange::EriExcluded);
+	gpos::owner<CConstraintInterval *> pciSecond =
+		CTestUtils::PciGenericInterval(
+			mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate2,
+			lInternalRepresentationFor2012_01_02, CRange::EriIncluded,
+			&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
+			CRange::EriExcluded);
 	PrintConstraint(mp, pciSecond);
 
 	// intersection
-	CConstraintInterval *pciIntersect = pciFirst->PciIntersect(mp, pciSecond);
+	gpos::owner<CConstraintInterval *> pciIntersect =
+		pciFirst->PciIntersect(mp, pciSecond);
 	PrintConstraint(mp, pciIntersect);
-	CConstraintInterval *pciIntersectExpected = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate2,
-		lInternalRepresentationFor2012_01_02, CRange::EriIncluded,
-		&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
-		CRange::EriExcluded);
+	gpos::owner<CConstraintInterval *> pciIntersectExpected =
+		CTestUtils::PciGenericInterval(
+			mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate2,
+			lInternalRepresentationFor2012_01_02, CRange::EriIncluded,
+			&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
+			CRange::EriExcluded);
 	GPOS_ASSERT(pciIntersectExpected->Equals(pciIntersect));
 
 	// union
-	CConstraintInterval *pciUnion = pciFirst->PciUnion(mp, pciSecond);
+	gpos::owner<CConstraintInterval *> pciUnion =
+		pciFirst->PciUnion(mp, pciSecond);
 	PrintConstraint(mp, pciUnion);
-	CConstraintInterval *pciUnionExpected = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
-		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
-		&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
-		CRange::EriExcluded);
+	gpos::owner<CConstraintInterval *> pciUnionExpected =
+		CTestUtils::PciGenericInterval(
+			mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
+			lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
+			&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
+			CRange::EriExcluded);
 	GPOS_ASSERT(pciUnionExpected->Equals(pciUnion));
 
 	// difference between pciFirst and pciSecond
-	CConstraintInterval *pciDiff1 = pciFirst->PciDifference(mp, pciSecond);
+	gpos::owner<CConstraintInterval *> pciDiff1 =
+		pciFirst->PciDifference(mp, pciSecond);
 	PrintConstraint(mp, pciDiff1);
-	CConstraintInterval *pciDiff1Expected = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
-		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
-		&pstrLowerDate2, lInternalRepresentationFor2012_01_02,
-		CRange::EriExcluded);
+	gpos::owner<CConstraintInterval *> pciDiff1Expected =
+		CTestUtils::PciGenericInterval(
+			mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
+			lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
+			&pstrLowerDate2, lInternalRepresentationFor2012_01_02,
+			CRange::EriExcluded);
 	GPOS_ASSERT(pciDiff1Expected->Equals(pciDiff1));
 
 	// difference between pciSecond and pciFirst
-	CConstraintInterval *pciDiff2 = pciSecond->PciDifference(mp, pciFirst);
+	gpos::owner<CConstraintInterval *> pciDiff2 =
+		pciSecond->PciDifference(mp, pciFirst);
 	PrintConstraint(mp, pciDiff2);
-	CConstraintInterval *pciDiff2Expected = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrUpperDate1,
-		lInternalRepresentationFor2012_01_21, CRange::EriIncluded,
-		&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
-		CRange::EriExcluded);
+	gpos::owner<CConstraintInterval *> pciDiff2Expected =
+		CTestUtils::PciGenericInterval(
+			mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrUpperDate1,
+			lInternalRepresentationFor2012_01_21, CRange::EriIncluded,
+			&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
+			CRange::EriExcluded);
 	GPOS_ASSERT(pciDiff2Expected->Equals(pciDiff2));
 
 	// containment
@@ -1435,11 +1473,12 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 
 	// equality
 	// create a third interval identical to the first
-	CConstraintInterval *pciThird = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
-		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
-		&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
-		CRange::EriExcluded);
+	gpos::owner<CConstraintInterval *> pciThird =
+		CTestUtils::PciGenericInterval(
+			mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
+			lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
+			&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
+			CRange::EriExcluded);
 	GPOS_ASSERT(!pciFirst->Equals(pciSecond));
 	GPOS_ASSERT(!pciFirst->Equals(pciDiff1));
 	GPOS_ASSERT(!pciSecond->Equals(pciDiff2));

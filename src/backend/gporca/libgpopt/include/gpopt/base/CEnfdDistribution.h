@@ -46,7 +46,7 @@ public:
 
 private:
 	// required distribution
-	CDistributionSpec *m_pds;
+	gpos::owner<CDistributionSpec *> m_pds;
 
 	// distribution matching type
 	EDistributionMatching m_edm;

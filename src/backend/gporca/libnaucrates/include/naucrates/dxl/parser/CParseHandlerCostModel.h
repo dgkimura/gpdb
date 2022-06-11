@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerCostModel_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/cost/ICostModel.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -38,7 +39,7 @@ private:
 	ICostModel::ECostModelType m_cost_model_type;
 	ULONG m_num_of_segments;
 	// cost model
-	ICostModel *m_cost_model;
+	gpos::owner<ICostModel *> m_cost_model;
 
 	CParseHandlerCostParams *m_parse_handler_cost_params;
 
@@ -68,7 +69,7 @@ public:
 	~CParseHandlerCostModel() override;
 
 	// cost model
-	ICostModel *GetCostModel() const;
+	gpos::pointer<ICostModel *> GetCostModel() const;
 };
 }  // namespace gpdxl
 

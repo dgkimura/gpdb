@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarFilter.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -72,7 +74,7 @@ CDXLScalarFilter::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarFilter::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *node) const
+								 gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

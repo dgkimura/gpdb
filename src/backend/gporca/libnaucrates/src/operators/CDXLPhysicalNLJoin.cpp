@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalNLJoin.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -79,8 +81,9 @@ CDXLPhysicalNLJoin::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalNLJoin::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+CDXLPhysicalNLJoin::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -135,7 +138,8 @@ CDXLPhysicalNLJoin::SerializeNestLoopParamsToDXL(
 									 id);
 
 		const CMDName *md_name = (*m_nest_params_col_refs)[ul]->MdName();
-		const IMDId *mdid_type = (*m_nest_params_col_refs)[ul]->MdidType();
+		gpos::pointer<const IMDId *> mdid_type =
+			(*m_nest_params_col_refs)[ul]->MdidType();
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenColName), md_name->GetMDName());
 		mdid_type->Serialize(xml_serializer,
@@ -207,7 +211,7 @@ CDXLPhysicalNLJoin::NestParamsExists() const
 	return m_nest_params_exists;
 }
 
-CDXLColRefArray *
+gpos::pointer<CDXLColRefArray *>
 CDXLPhysicalNLJoin::GetNestLoopParamsColRefs() const
 {
 	return m_nest_params_col_refs;

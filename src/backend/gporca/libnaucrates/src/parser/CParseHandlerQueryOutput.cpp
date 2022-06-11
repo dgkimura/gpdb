@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerQueryOutput.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarIdent.h"
@@ -61,7 +63,7 @@ CParseHandlerQueryOutput::~CParseHandlerQueryOutput()
 //		Return the list of query output columns
 //
 //---------------------------------------------------------------------------
-CDXLNodeArray *
+gpos::pointer<CDXLNodeArray *>
 CParseHandlerQueryOutput::GetOutputColumnsDXLArray()
 {
 	GPOS_ASSERT(nullptr != m_dxl_array);
@@ -153,7 +155,8 @@ CParseHandlerQueryOutput::EndElement(const XMLCh *const,  // element_uri,
 
 		GPOS_ASSERT(nullptr != child_parse_handler);
 
-		CDXLNode *pdxlnIdent = child_parse_handler->CreateDXLNode();
+		gpos::owner<CDXLNode *> pdxlnIdent =
+			child_parse_handler->CreateDXLNode();
 		pdxlnIdent->AddRef();
 		m_dxl_array->Append(pdxlnIdent);
 	}

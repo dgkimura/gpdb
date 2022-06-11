@@ -41,16 +41,16 @@ private:
 	CMemoryPool *m_mp;
 
 	// partition-by column identifiers
-	ULongPtrArray *m_partition_by_colid_array;
+	gpos::owner<ULongPtrArray *> m_partition_by_colid_array;
 
 	// name of window specification
 	CMDName *m_mdname;
 
 	// sorting columns
-	CDXLNode *m_sort_col_list_dxlnode;
+	gpos::owner<CDXLNode *> m_sort_col_list_dxlnode;
 
 	// window frame associated with the window key
-	CDXLWindowFrame *m_window_frame;
+	gpos::owner<CDXLWindowFrame *> m_window_frame;
 
 	// private copy ctor
 	CDXLWindowSpec(const CDXLWindowSpec &);

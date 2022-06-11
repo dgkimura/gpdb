@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarArrayCmp.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -77,7 +78,7 @@ CScalarArrayCmp::Pstr() const
 //		Comparison operator mdid
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CScalarArrayCmp::MdIdOp() const
 {
 	return m_mdid_op;
@@ -187,8 +188,9 @@ CScalarArrayCmp::OsPrint(IOstream &os) const
 //		expression
 //
 //---------------------------------------------------------------------------
-CExpression *
-CScalarArrayCmp::PexprExpand(CMemoryPool *mp, CExpression *pexprArrayCmp)
+gpos::owner<CExpression *>
+CScalarArrayCmp::PexprExpand(CMemoryPool *mp,
+							 gpos::pointer<CExpression *> pexprArrayCmp)
 {
 	GPOS_ASSERT(nullptr != pexprArrayCmp);
 	GPOS_ASSERT(EopScalarArrayCmp == pexprArrayCmp->Pop()->Eopid());
@@ -217,7 +219,8 @@ CScalarArrayCmp::PexprExpand(CMemoryPool *mp, CExpression *pexprArrayCmp)
 		return pexprArrayCmp;
 	}
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < ulArrayElems; ul++)
 	{
 		CExpression *pexprArrayElem =

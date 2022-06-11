@@ -14,6 +14,7 @@
 #define GPDXL_CParseHandlerHashExpr_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarHashExpr.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -37,7 +38,7 @@ class CParseHandlerHashExpr : public CParseHandlerScalarOp
 {
 private:
 	// hash expr operator
-	CDXLScalarHashExpr *m_dxl_op;
+	gpos::pointer<CDXLScalarHashExpr *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

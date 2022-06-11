@@ -16,6 +16,7 @@
 #include "gpopt/operators/CExpressionHandle.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCTEReq.h"
 #include "gpopt/base/CColRefSet.h"
@@ -312,7 +313,7 @@ CExpressionHandle::DeriveProps(CDrvdPropCtxt *pdpctxt)
 //		child
 //
 //---------------------------------------------------------------------------
-IStatisticsArray *
+gpos::owner<IStatisticsArray *>
 CExpressionHandle::PdrgpstatOuterRefs(IStatisticsArray *statistics_array,
 									  ULONG child_index)
 {
@@ -325,7 +326,8 @@ CExpressionHandle::PdrgpstatOuterRefs(IStatisticsArray *statistics_array,
 		return GPOS_NEW(m_mp) IStatisticsArray(m_mp);
 	}
 
-	IStatisticsArray *pdrgpstatResult = GPOS_NEW(m_mp) IStatisticsArray(m_mp);
+	gpos::owner<IStatisticsArray *> pdrgpstatResult =
+		GPOS_NEW(m_mp) IStatisticsArray(m_mp);
 	CColRefSet *outer_refs = DeriveOuterReferences(child_index);
 	GPOS_ASSERT(0 < outer_refs->Size());
 
@@ -334,7 +336,7 @@ CExpressionHandle::PdrgpstatOuterRefs(IStatisticsArray *statistics_array,
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		IStatistics *stats = (*statistics_array)[ul];
-		CColRefSet *pcrsStats = stats->GetColRefSet(m_mp);
+		gpos::owner<CColRefSet *> pcrsStats = stats->GetColRefSet(m_mp);
 		BOOL fStatsColsUsed = !outer_refs->IsDisjoint(pcrsStats);
 		pcrsStats->Release();
 		if (fStatsColsUsed)
@@ -423,7 +425,7 @@ CExpressionHandle::DeriveStats(IStatisticsArray *stats_ctxt,
 	GPOS_ASSERT(nullptr != m_pdrgprp);
 
 	// copy input context
-	IStatisticsArray *pdrgpstatCurrentCtxt =
+	gpos::owner<IStatisticsArray *> pdrgpstatCurrentCtxt =
 		GPOS_NEW(m_mp) IStatisticsArray(m_mp);
 	CUtils::AddRefAppend(pdrgpstatCurrentCtxt, stats_ctxt);
 
@@ -434,7 +436,7 @@ CExpressionHandle::DeriveStats(IStatisticsArray *stats_ctxt,
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		// create a new context for outer references used by current child
-		IStatisticsArray *pdrgpstatChildCtxt =
+		gpos::owner<IStatisticsArray *> pdrgpstatChildCtxt =
 			PdrgpstatOuterRefs(pdrgpstatCurrentCtxt, ul);
 
 		IStatistics *stats = nullptr;
@@ -524,7 +526,7 @@ CExpressionHandle::DeriveCostContextStats()
 	{
 		// derive stats on dynamic table scan using stats of part selector
 		CPhysicalScan *popScan = CPhysicalScan::PopConvert(m_pgexpr->Pop());
-		IStatistics *pstatsDS = popScan->PstatsDerive(
+		gpos::owner<IStatistics *> pstatsDS = popScan->PstatsDerive(
 			m_mp, *this, m_pcc->Poc()->Prpp(), m_pcc->Poc()->Pdrgpstat());
 
 		if (nullptr == m_pstats || m_pstats->Rows() > pstatsDS->Rows())
@@ -616,11 +618,12 @@ CExpressionHandle::DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 							   CReqdPropRelational *prprel,
 							   IStatisticsArray *stats_ctxt) const
 {
-	CReqdPropRelational *prprelNew = prprel;
+	gpos::owner<CReqdPropRelational *> prprelNew = prprel;
 	if (nullptr == prprelNew)
 	{
 		// create empty property container
-		CColRefSet *pcrs = GPOS_NEW(pmpGlobal) CColRefSet(pmpGlobal);
+		gpos::owner<CColRefSet *> pcrs =
+			GPOS_NEW(pmpGlobal) CColRefSet(pmpGlobal);
 		prprelNew = GPOS_NEW(pmpGlobal) CReqdPropRelational(pcrs);
 	}
 	else
@@ -628,7 +631,7 @@ CExpressionHandle::DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 		prprelNew->AddRef();
 	}
 
-	IStatisticsArray *pdrgpstatCtxtNew = stats_ctxt;
+	gpos::owner<IStatisticsArray *> pdrgpstatCtxtNew = stats_ctxt;
 	if (nullptr == stats_ctxt)
 	{
 		// create empty context
@@ -669,7 +672,8 @@ CExpressionHandle::DerivePlanPropsForCostContext()
 	GPOS_ASSERT(nullptr != m_pgexpr);
 	GPOS_CHECK_ABORT;
 
-	CDrvdPropCtxtPlan *pdpctxtplan = GPOS_NEW(m_mp) CDrvdPropCtxtPlan(m_mp);
+	gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+		GPOS_NEW(m_mp) CDrvdPropCtxtPlan(m_mp);
 	CopyStats();
 
 
@@ -1067,7 +1071,7 @@ CExpressionHandle::GetRelationalProperties() const
 //		Return derived stats of n-th child
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::pointer<IStatistics *>
 CExpressionHandle::Pstats(ULONG child_index) const
 {
 	GPOS_ASSERT(child_index < m_pdrgpstat->Size());
@@ -1389,7 +1393,7 @@ CExpressionHandle::PexprScalarRepChild(ULONG child_index) const
 // for statistics derivation, costing, or for heuristics.
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::pointer<CExpression *>
 CExpressionHandle::PexprScalarRep() const
 {
 	if (!Pop()->FScalar())
@@ -1672,7 +1676,7 @@ CExpressionHandle::PcrsUsedColumns(CMemoryPool *mp) const
 	COperator *pop = Pop();
 	GPOS_ASSERT(pop->FLogical());
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// get columns used by the operator itself
 	pcrs->Include(CLogical::PopConvert(pop)->PcrsLocalUsed());
@@ -1690,7 +1694,7 @@ CExpressionHandle::PcrsUsedColumns(CMemoryPool *mp) const
 	return pcrs;
 }
 
-CDrvdProp *
+gpos::pointer<CDrvdProp *>
 CExpressionHandle::Pdp() const
 {
 	if (nullptr != m_pcc)
@@ -1708,7 +1712,7 @@ CExpressionHandle::Pdp() const
 	return Pgexpr()->Pgroup()->Pdp();
 }
 
-IStatistics *
+gpos::pointer<IStatistics *>
 CExpressionHandle::Pstats()
 {
 	return m_pstats;

@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalMotionGather_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecSingleton.h"
 #include "gpopt/base/COrderSpec.h"
@@ -31,13 +32,13 @@ class CPhysicalMotionGather : public CPhysicalMotion
 {
 private:
 	// type of segment on which this gather runs (master/segment)
-	CDistributionSpecSingleton *m_pdssSingeton;
+	gpos::owner<CDistributionSpecSingleton *> m_pdssSingeton;
 
 	// merge spec if the operator is order-preserving
-	COrderSpec *m_pos;
+	gpos::owner<COrderSpec *> m_pos;
 
 	// columns used by order spec
-	CColRefSet *m_pcrsSort;
+	gpos::owner<CColRefSet *> m_pcrsSort;
 
 public:
 	CPhysicalMotionGather(const CPhysicalMotionGather &) = delete;
@@ -73,7 +74,7 @@ public:
 	}
 
 	// output distribution accessor
-	CDistributionSpec *
+	gpos::pointer<CDistributionSpec *>
 	Pds() const override
 	{
 		return m_pdssSingeton;
@@ -92,7 +93,7 @@ public:
 	}
 
 	// order spec
-	COrderSpec *
+	gpos::pointer<COrderSpec *>
 	Pos() const
 	{
 		return m_pos;
@@ -112,10 +113,12 @@ public:
 							 ULONG ulOptReq) override;
 
 	// compute required sort order of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posInput, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
+	gpos::owner<COrderSpec *> PosRequired(CMemoryPool *mp,
+										  CExpressionHandle &exprhdl,
+										  gpos::pointer<COrderSpec *> posInput,
+										  ULONG child_index,
+										  CDrvdPropArray *pdrgpdpCtxt,
+										  ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
 	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
@@ -126,8 +129,8 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *PosDerive(CMemoryPool *mp,
-						  CExpressionHandle &exprhdl) const override;
+	gpos::owner<COrderSpec *> PosDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -135,7 +138,8 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -145,7 +149,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalMotionGather *PopConvert(COperator *pop);
+	static gpos::cast_func<CPhysicalMotionGather *> PopConvert(COperator *pop);
 
 };	// class CPhysicalMotionGather
 

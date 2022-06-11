@@ -63,19 +63,19 @@ private:
 
 	// create a new hash map of histograms after applying a conjunctive or disjunctive filter
 	static UlongToHistogramMap *MakeHistHashMapConjOrDisjFilter(
-		CMemoryPool *mp, const CStatisticsConfig *stats_config,
+		CMemoryPool *mp, gpos::pointer<const CStatisticsConfig *> stats_config,
 		UlongToHistogramMap *input_histograms, CDouble input_rows,
 		CStatsPred *pred_stats, CDouble *scale_factor);
 
 	// create new hash map of histograms after applying the conjunction predicate
 	static gpos::owner<UlongToHistogramMap *> MakeHistHashMapConjFilter(
-		CMemoryPool *mp, const CStatisticsConfig *stats_config,
+		CMemoryPool *mp, gpos::pointer<const CStatisticsConfig *> stats_config,
 		UlongToHistogramMap *intermediate_histograms, CDouble input_rows,
 		CStatsPredConj *conjunctive_pred_stats, CDouble *scale_factor);
 
 	// create new hash map of histograms after applying the disjunctive predicate
 	static gpos::owner<UlongToHistogramMap *> MakeHistHashMapDisjFilter(
-		CMemoryPool *mp, const CStatisticsConfig *stats_config,
+		CMemoryPool *mp, gpos::pointer<const CStatisticsConfig *> stats_config,
 		UlongToHistogramMap *input_histograms, CDouble input_rows,
 		CStatsPredDisj *pred_stats, CDouble *scale_factor);
 
@@ -84,10 +84,9 @@ private:
 
 public:
 	// filter
-	static CStatistics *MakeStatsFilter(CMemoryPool *mp,
-										const CStatistics *input_stats,
-										CStatsPred *base_pred_stats,
-										BOOL do_cap_NDVs);
+	static CStatistics *MakeStatsFilter(
+		CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
+		CStatsPred *base_pred_stats, BOOL do_cap_NDVs);
 
 	// derive statistics for filter operation based on given scalar expression
 	static gpos::pointer<IStatistics *> MakeStatsFilterForScalarExpr(

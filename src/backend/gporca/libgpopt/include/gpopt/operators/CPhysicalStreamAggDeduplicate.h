@@ -12,6 +12,7 @@
 #define GPOS_CPhysicalStreamAggDeduplicate_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalStreamAgg.h"
 
@@ -29,7 +30,7 @@ class CPhysicalStreamAggDeduplicate : public CPhysicalStreamAgg
 {
 private:
 	// array of keys from the join's child
-	CColRefArray *m_pdrgpcrKeys;
+	gpos::owner<CColRefArray *> m_pdrgpcrKeys;
 
 public:
 	CPhysicalStreamAggDeduplicate(const CPhysicalStreamAggDeduplicate &) =
@@ -63,7 +64,7 @@ public:
 	}
 
 	// array of keys from the join's child
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrKeys() const
 	{
 		return m_pdrgpcrKeys;
@@ -116,7 +117,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CPhysicalStreamAggDeduplicate *
+	static gpos::cast_func<CPhysicalStreamAggDeduplicate *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

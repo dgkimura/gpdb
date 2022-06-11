@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalar.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdPropScalar.h"
 #include "gpopt/operators/CExpression.h"
@@ -29,7 +30,7 @@ using namespace gpopt;
 //		Create base container of derived properties
 //
 //---------------------------------------------------------------------------
-CDrvdProp *
+gpos::owner<CDrvdProp *>
 CScalar::PdpCreate(CMemoryPool *mp) const
 {
 	return GPOS_NEW(mp) CDrvdPropScalar(mp);
@@ -305,7 +306,8 @@ CScalar::EberEvaluate(CMemoryPool *mp, CExpression *pexprScalar)
 	GPOS_ASSERT(pop->FScalar());
 
 	const ULONG arity = pexprScalar->Arity();
-	ULongPtrArray *pdrgpulChildren = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpulChildren =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 
 	if (!CUtils::FSubquery(pop))
 	{
@@ -374,7 +376,7 @@ CScalar::PpartinfoDeriveCombineScalar(CMemoryPool *mp,
 	const ULONG arity = exprhdl.Arity();
 	GPOS_ASSERT(0 < arity);
 
-	CPartInfo *ppartinfo = GPOS_NEW(mp) CPartInfo(mp);
+	gpos::owner<CPartInfo *> ppartinfo = GPOS_NEW(mp) CPartInfo(mp);
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{

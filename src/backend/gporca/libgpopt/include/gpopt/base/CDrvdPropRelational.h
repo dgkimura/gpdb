@@ -75,25 +75,25 @@ private:
 	CMemoryPool *m_mp;
 
 	// bitset representing whether property has been derived
-	CBitSet *m_is_prop_derived;
+	gpos::owner<CBitSet *> m_is_prop_derived;
 
 	// output columns
-	CColRefSet *m_pcrsOutput;
+	gpos::owner<CColRefSet *> m_pcrsOutput;
 
 	// columns not defined in the underlying operator tree
-	CColRefSet *m_pcrsOuter;
+	gpos::owner<CColRefSet *> m_pcrsOuter;
 
 	// output columns that do not allow null values
-	CColRefSet *m_pcrsNotNull;
+	gpos::owner<CColRefSet *> m_pcrsNotNull;
 
 	// columns from the inner child of a correlated-apply expression that can be used above the apply expression
-	CColRefSet *m_pcrsCorrelatedApply;
+	gpos::owner<CColRefSet *> m_pcrsCorrelatedApply;
 
 	// key collection
-	CKeyCollection *m_pkc;
+	gpos::owner<CKeyCollection *> m_pkc;
 
 	// functional dependencies
-	CFunctionalDependencyArray *m_pdrgpfd;
+	gpos::owner<CFunctionalDependencyArray *> m_pdrgpfd;
 
 	// max card
 	CMaxCard m_maxcard;
@@ -102,15 +102,15 @@ private:
 	ULONG m_ulJoinDepth;
 
 	// partition table consumers
-	CPartInfo *m_ppartinfo;
+	gpos::owner<CPartInfo *> m_ppartinfo;
 
 	// constraint property
-	CPropConstraint *m_ppc;
+	gpos::owner<CPropConstraint *> m_ppc;
 
 	// function properties
-	CFunctionProp *m_pfp;
+	gpos::owner<CFunctionProp *> m_pfp;
 
-	CTableDescriptor *m_table_descriptor;
+	gpos::pointer<CTableDescriptor *> m_table_descriptor;
 
 	// helper for getting applicable FDs from child
 	static CFunctionalDependencyArray *DeriveChildFunctionalDependencies(
@@ -197,22 +197,23 @@ public:
 				CDrvdPropCtxt *pdpctxt) override;
 
 	// output columns
-	CColRefSet *GetOutputColumns() const;
+	gpos::pointer<CColRefSet *> GetOutputColumns() const;
 
 	// outer references
-	CColRefSet *GetOuterReferences() const;
+	gpos::pointer<CColRefSet *> GetOuterReferences() const;
 
 	// nullable columns
-	CColRefSet *GetNotNullColumns() const;
+	gpos::pointer<CColRefSet *> GetNotNullColumns() const;
 
 	// columns from the inner child of a correlated-apply expression that can be used above the apply expression
-	CColRefSet *GetCorrelatedApplyColumns() const;
+	gpos::pointer<CColRefSet *> GetCorrelatedApplyColumns() const;
 
 	// key collection
-	CKeyCollection *GetKeyCollection() const;
+	gpos::pointer<CKeyCollection *> GetKeyCollection() const;
 
 	// functional dependencies
-	CFunctionalDependencyArray *GetFunctionalDependencies() const;
+	gpos::pointer<CFunctionalDependencyArray *> GetFunctionalDependencies()
+		const;
 
 	// max cardinality
 	CMaxCard GetMaxCard() const;
@@ -221,18 +222,19 @@ public:
 	ULONG GetJoinDepth() const;
 
 	// partition consumers
-	CPartInfo *GetPartitionInfo() const;
+	gpos::pointer<CPartInfo *> GetPartitionInfo() const;
 
 	// constraint property
-	CPropConstraint *GetPropertyConstraint() const;
+	gpos::pointer<CPropConstraint *> GetPropertyConstraint() const;
 
 	// function properties
-	CFunctionProp *GetFunctionProperties() const;
+	gpos::pointer<CFunctionProp *> GetFunctionProperties() const;
 
-	CTableDescriptor *GetTableDescriptor() const;
+	gpos::pointer<CTableDescriptor *> GetTableDescriptor() const;
 
 	// shorthand for conversion
-	static CDrvdPropRelational *GetRelationalProperties(CDrvdProp *pdp);
+	static gpos::cast_func<CDrvdPropRelational *> GetRelationalProperties(
+		CDrvdProp *pdp);
 
 	// check for satisfying required plan properties
 	BOOL FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const override;

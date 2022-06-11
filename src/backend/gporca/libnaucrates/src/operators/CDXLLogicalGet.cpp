@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalGet.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 #include "naucrates/dxl/xml/dxltokens.h"
@@ -81,7 +83,7 @@ CDXLLogicalGet::GetOpNameStr() const
 //		Table descriptor for the table scan
 //
 //---------------------------------------------------------------------------
-CDXLTableDescr *
+gpos::pointer<CDXLTableDescr *>
 CDXLLogicalGet::GetDXLTableDescr() const
 {
 	return m_dxl_table_descr;
@@ -98,7 +100,7 @@ CDXLLogicalGet::GetDXLTableDescr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalGet::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   const CDXLNode *	 //dxlnode
+							   gpos::pointer<const CDXLNode *>	//dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();

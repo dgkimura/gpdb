@@ -47,19 +47,19 @@ class CDrvdPropPlan : public CDrvdProp
 {
 private:
 	// derived sort order
-	COrderSpec *m_pos{nullptr};
+	gpos::owner<COrderSpec *> m_pos{nullptr};
 
 	// derived distribution
-	CDistributionSpec *m_pds{nullptr};
+	gpos::owner<CDistributionSpec *> m_pds{nullptr};
 
 	// derived rewindability
-	CRewindabilitySpec *m_prs{nullptr};
+	gpos::owner<CRewindabilitySpec *> m_prs{nullptr};
 
 	// derived partition propagation spec
-	CPartitionPropagationSpec *m_ppps{nullptr};
+	gpos::owner<CPartitionPropagationSpec *> m_ppps{nullptr};
 
 	// derived cte map
-	CCTEMap *m_pcm{nullptr};
+	gpos::owner<CCTEMap *> m_pcm{nullptr};
 
 	// copy CTE producer plan properties from given context to current object
 	void CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
@@ -86,7 +86,7 @@ public:
 				CDrvdPropCtxt *pdpctxt) override;
 
 	// short hand for conversion
-	static CDrvdPropPlan *Pdpplan(CDrvdProp *pdp);
+	static gpos::cast_func<CDrvdPropPlan *> Pdpplan(CDrvdProp *pdp);
 
 	// sort order accessor
 	gpos::pointer<COrderSpec *>

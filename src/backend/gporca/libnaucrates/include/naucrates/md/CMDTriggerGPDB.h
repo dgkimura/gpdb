@@ -13,6 +13,7 @@
 #define GPMD_CMDTriggerGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDTrigger.h"
 
@@ -44,16 +45,16 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// trigger id
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// trigger name
 	CMDName *m_mdname;
 
 	// relation id
-	IMDId *m_rel_mdid;
+	gpos::owner<IMDId *> m_rel_mdid;
 
 	// function id
-	IMDId *m_func_mdid;
+	gpos::owner<IMDId *> m_func_mdid;
 
 	// trigger type
 	INT m_type;
@@ -80,7 +81,7 @@ public:
 	}
 
 	// trigger id
-	IMDId *
+	gpos::pointer<IMDId *>
 	MDId() const override
 	{
 		return m_mdid;
@@ -94,14 +95,14 @@ public:
 	}
 
 	// relation mdid
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetRelMdId() const override
 	{
 		return m_rel_mdid;
 	}
 
 	// function mdid
-	IMDId *
+	gpos::pointer<IMDId *>
 	FuncMdId() const override
 	{
 		return m_func_mdid;

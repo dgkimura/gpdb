@@ -12,6 +12,7 @@
 #define GPOPT_CScalarIdent_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
@@ -78,9 +79,9 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 
 	// return locally used columns
@@ -90,14 +91,14 @@ public:
 
 			 ) override
 	{
-		CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 		pcrs->Include(m_pcr);
 
 		return pcrs;
 	}
 
 	// conversion function
-	static CScalarIdent *
+	static gpos::cast_func<CScalarIdent *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -116,16 +117,18 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// is the given expression a scalar cast of a scalar identifier
-	static BOOL FCastedScId(CExpression *pexpr);
+	static BOOL FCastedScId(gpos::pointer<CExpression *> pexpr);
 
 	// is the given expression a scalar cast of given scalar identifier
-	static BOOL FCastedScId(CExpression *pexpr, CColRef *colref);
+	static BOOL FCastedScId(gpos::pointer<CExpression *> pexpr,
+							CColRef *colref);
 
 	// is the given expression a scalar func allowed for Partition selection of given scalar identifier
-	static BOOL FAllowedFuncScId(CExpression *pexpr);
+	static BOOL FAllowedFuncScId(gpos::pointer<CExpression *> pexpr);
 
 	// is the given expression a scalar func allowed for Partition selection of given scalar identifier
-	static BOOL FAllowedFuncScId(CExpression *pexpr, CColRef *colref);
+	static BOOL FAllowedFuncScId(gpos::pointer<CExpression *> pexpr,
+								 CColRef *colref);
 
 };	// class CScalarIdent
 

@@ -51,7 +51,7 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// relation mdid
-	IMDId *m_mdid;
+	gpos::owner<IMDId *> m_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -60,30 +60,30 @@ private:
 	Ereldistrpolicy m_rel_distr_policy;
 
 	// columns
-	CMDColumnArray *m_md_col_array;
+	gpos::owner<CMDColumnArray *> m_md_col_array;
 
 	// number of dropped columns
 	ULONG m_dropped_cols;
 
 	// indices of distribution columns
-	ULongPtrArray *m_distr_col_array;
+	gpos::owner<ULongPtrArray *> m_distr_col_array;
 
-	IMdIdArray *m_distr_opfamilies;
+	gpos::owner<IMdIdArray *> m_distr_opfamilies;
 
 	// do we need to consider a hash distributed table as random distributed
 	BOOL m_convert_hash_to_random;
 
 	// array of key sets
-	ULongPtr2dArray *m_keyset_array;
+	gpos::owner<ULongPtr2dArray *> m_keyset_array;
 
 	// array of index infos
-	CMDIndexInfoArray *m_mdindex_info_array;
+	gpos::owner<CMDIndexInfoArray *> m_mdindex_info_array;
 
 	// array of trigger ids
-	IMdIdArray *m_mdid_trigger_array;
+	gpos::owner<IMdIdArray *> m_mdid_trigger_array;
 
 	// array of check constraint mdids
-	IMdIdArray *m_mdid_check_constraint_array;
+	gpos::owner<IMdIdArray *> m_mdid_check_constraint_array;
 
 	// reject limit
 	INT m_reject_limit;
@@ -92,23 +92,23 @@ private:
 	BOOL m_is_rej_limit_in_rows;
 
 	// format error table mdid
-	IMDId *m_mdid_fmt_err_table;
+	gpos::owner<IMDId *> m_mdid_fmt_err_table;
 
 	// number of system columns
 	ULONG m_system_columns;
 
 	// mapping of column position to positions excluding dropped columns
-	UlongToUlongMap *m_colpos_nondrop_colpos_map;
+	gpos::owner<UlongToUlongMap *> m_colpos_nondrop_colpos_map;
 
 	// mapping of attribute number in the system catalog to the positions of
 	// the non dropped column in the metadata object
-	IntToUlongMap *m_attrno_nondrop_col_pos_map;
+	gpos::owner<IntToUlongMap *> m_attrno_nondrop_col_pos_map;
 
 	// the original positions of all the non-dropped columns
-	ULongPtrArray *m_nondrop_col_pos_array;
+	gpos::owner<ULongPtrArray *> m_nondrop_col_pos_array;
 
 	// array of column widths including dropped columns
-	CDoubleArray *m_col_width_array;
+	gpos::owner<CDoubleArray *> m_col_width_array;
 
 	// format type for the relation
 	const CWStringConst *GetRelFormatType() const;
@@ -138,7 +138,7 @@ public:
 	}
 
 	// the metadata id
-	IMDId *MDId() const override;
+	gpos::pointer<IMDId *> MDId() const override;
 
 	// relation name
 	CMDName Mdname() const override;
@@ -159,7 +159,7 @@ public:
 	ULONG NonDroppedColsCount() const override;
 
 	// return the original positions of all the non-dropped columns
-	ULongPtrArray *NonDroppedColsArray() const override;
+	gpos::pointer<ULongPtrArray *> NonDroppedColsArray() const override;
 
 	// number of system columns
 	ULONG SystemColumnsCount() const override;
@@ -174,7 +174,7 @@ public:
 	BOOL IsRejectLimitInRows() const override;
 
 	// format error table mdid
-	IMDId *GetFormatErrTableMdid() const override;
+	gpos::pointer<IMDId *> GetFormatErrTableMdid() const override;
 
 	// retrieve the column at the given position
 	gpos::pointer<const IMDColumn *> GetMdCol(ULONG pos) const override;
@@ -191,7 +191,7 @@ public:
 	// retrieve the column at the given position in the distribution columns list for the relation
 	gpos::pointer<const IMDColumn *> GetDistrColAt(ULONG pos) const override;
 
-	IMDId *GetDistrOpfamilyAt(ULONG pos) const override;
+	gpos::pointer<IMDId *> GetDistrOpfamilyAt(ULONG pos) const override;
 
 	// number of indices
 	ULONG IndexCount() const override;
@@ -209,7 +209,7 @@ public:
 	IMDId *IndexMDidAt(ULONG pos) const override;
 
 	// retrieve the id of the metadata cache trigger at the given position
-	IMDId *TriggerMDidAt(ULONG pos) const override;
+	gpos::pointer<IMDId *> TriggerMDidAt(ULONG pos) const override;
 
 	// serialize metadata relation in DXL format given a serializer object
 	void Serialize(gpdxl::CXMLSerializer *) const override;
@@ -218,7 +218,7 @@ public:
 	ULONG CheckConstraintCount() const override;
 
 	// retrieve the id of the check constraint cache at the given position
-	IMDId *CheckConstraintMDidAt(ULONG pos) const override;
+	gpos::pointer<IMDId *> CheckConstraintMDidAt(ULONG pos) const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the metadata relation

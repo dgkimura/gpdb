@@ -12,6 +12,7 @@
 #include "gpopt/base/CColRefSet.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CAutoOptCtxt.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -56,7 +57,8 @@ CColRefSet::CColRefSet(CMemoryPool *mp, const CColRefSet &bs) : CBitSet(mp, bs)
 //		ctor, copy from col refs array
 //
 //---------------------------------------------------------------------------
-CColRefSet::CColRefSet(CMemoryPool *mp, const CColRefArray *colref_array,
+CColRefSet::CColRefSet(CMemoryPool *mp,
+					   gpos::pointer<const CColRefArray *> colref_array,
 					   ULONG size)
 	: CBitSet(mp, size)
 {
@@ -148,7 +150,7 @@ CColRefSet::Include(const CColRef *colref)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Include(const CColRefArray *colref_array)
+CColRefSet::Include(gpos::pointer<const CColRefArray *> colref_array)
 {
 	ULONG length = colref_array->Size();
 	for (ULONG i = 0; i < length; i++)
@@ -167,7 +169,7 @@ CColRefSet::Include(const CColRefArray *colref_array)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Include(const CColRefSet *pcrs)
+CColRefSet::Include(gpos::pointer<const CColRefSet *> pcrs)
 {
 	CColRefSetIter crsi(*pcrs);
 	while (crsi.Advance())
@@ -201,7 +203,7 @@ CColRefSet::Exclude(const CColRef *colref)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Exclude(const CColRefSet *pcrs)
+CColRefSet::Exclude(gpos::pointer<const CColRefSet *> pcrs)
 {
 	CColRefSetIter crsi(*pcrs);
 	while (crsi.Advance())
@@ -220,7 +222,7 @@ CColRefSet::Exclude(const CColRefSet *pcrs)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Exclude(const CColRefArray *colref_array)
+CColRefSet::Exclude(gpos::pointer<const CColRefArray *> colref_array)
 {
 	for (ULONG i = 0; i < colref_array->Size(); i++)
 	{
@@ -257,8 +259,8 @@ CColRefSet::Replace(const CColRef *pcrOut, const CColRef *pcrIn)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Replace(const CColRefArray *pdrgpcrOut,
-					const CColRefArray *pdrgpcrIn)
+CColRefSet::Replace(gpos::pointer<const CColRefArray *> pdrgpcrOut,
+					gpos::pointer<const CColRefArray *> pdrgpcrIn)
 {
 	const ULONG length = pdrgpcrOut->Size();
 	GPOS_ASSERT(length == pdrgpcrIn->Size());
@@ -281,7 +283,7 @@ CColRefSet::Replace(const CColRefArray *pdrgpcrOut,
 CColRefArray *
 CColRefSet::Pdrgpcr(CMemoryPool *mp) const
 {
-	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::owner<CColRefArray *> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 
 	CColRefSetIter crsi(*this);
 	while (crsi.Advance())
@@ -304,7 +306,7 @@ CColRefSet::Pdrgpcr(CMemoryPool *mp) const
 IntToColRefMap *
 CColRefSet::Phmicr(CMemoryPool *mp) const
 {
-	IntToColRefMap *phmicr = GPOS_NEW(mp) IntToColRefMap(mp);
+	gpos::owner<IntToColRefMap *> phmicr = GPOS_NEW(mp) IntToColRefMap(mp);
 
 	CColRefSetIter crsi(*this);
 	while (crsi.Advance())
@@ -415,7 +417,7 @@ CColRefSet::ExtractColIds(CMemoryPool *mp, ULongPtrArray *colids) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CColRefSet::FContained(const CColRefSetArray *pdrgpcrs)
+CColRefSet::FContained(gpos::pointer<const CColRefSetArray *> pdrgpcrs)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrs);
 
@@ -432,10 +434,11 @@ CColRefSet::FContained(const CColRefSetArray *pdrgpcrs)
 }
 
 BOOL
-CColRefSet::FIntersects(const CColRefSet *pcrs)
+CColRefSet::FIntersects(gpos::pointer<const CColRefSet *> pcrs)
 {
 	GPOS_ASSERT(nullptr != pcrs);
-	CColRefSet *intersecting_colrefset = GPOS_NEW(m_mp) CColRefSet(m_mp, *this);
+	gpos::owner<CColRefSet *> intersecting_colrefset =
+		GPOS_NEW(m_mp) CColRefSet(m_mp, *this);
 	intersecting_colrefset->Intersection(pcrs);
 
 	BOOL intersects = intersecting_colrefset->Size() > 0;
@@ -453,7 +456,8 @@ CColRefSet::FIntersects(const CColRefSet *pcrs)
 //		column ref sets
 //---------------------------------------------------------------------------
 BOOL
-CColRefSet::FCovered(CColRefSetArray *pdrgpcrs, CColRefSet *pcrs)
+CColRefSet::FCovered(gpos::pointer<CColRefSetArray *> pdrgpcrs,
+					 gpos::pointer<CColRefSet *> pcrs)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrs);
 	GPOS_ASSERT(nullptr != pcrs);

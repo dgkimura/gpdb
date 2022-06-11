@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarBitmapIndexProbe.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLIndexDescr.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
@@ -71,8 +73,9 @@ CDXLScalarBitmapIndexProbe::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBitmapIndexProbe::SerializeToDXL(CXMLSerializer *xml_serializer,
-										   const CDXLNode *dxlnode) const
+CDXLScalarBitmapIndexProbe::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

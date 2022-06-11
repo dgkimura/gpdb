@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerGroupBy_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalAgg.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -35,7 +36,7 @@ class CParseHandlerAgg : public CParseHandlerPhysicalOp
 {
 private:
 	// the aggregate operator
-	CDXLPhysicalAgg *m_dxl_op;
+	gpos::pointer<CDXLPhysicalAgg *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

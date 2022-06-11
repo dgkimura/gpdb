@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalCTEProducer.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -74,7 +75,7 @@ CLogicalCTEProducer::~CLogicalCTEProducer()
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalCTEProducer::DeriveOutputColumns(CMemoryPool *,		  //mp,
 										 CExpressionHandle &  //exprhdl
 )
@@ -95,7 +96,7 @@ CColRefSet *
 CLogicalCTEProducer::DeriveNotNullColumns(CMemoryPool *mp,
 										  CExpressionHandle &exprhdl) const
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcr);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcr);
 	pcrs->Intersection(exprhdl.DeriveNotNullColumns(0));
 
 	return pcrs;
@@ -187,7 +188,7 @@ CLogicalCTEProducer::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalCTEProducer::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -208,7 +209,7 @@ CLogicalCTEProducer::PopCopyWithRemappedColumns(
 CXformSet *
 CLogicalCTEProducer::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementCTEProducer);
 	return xform_set;
 }

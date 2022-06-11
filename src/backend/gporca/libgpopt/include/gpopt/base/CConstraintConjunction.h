@@ -13,6 +13,7 @@
 #define GPOPT_CConstraintConjunction_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CConstraint.h"
 #include "gpopt/base/CRange.h"
@@ -34,10 +35,10 @@ class CConstraintConjunction : public CConstraint
 {
 private:
 	// array of constraints
-	CConstraintArray *m_pdrgpcnstr;
+	gpos::owner<CConstraintArray *> m_pdrgpcnstr;
 
 	// mapping colref -> array of child constraints
-	ColRefToConstraintArrayMap *m_phmcolconstr;
+	gpos::owner<ColRefToConstraintArrayMap *> m_phmcolconstr;
 
 public:
 	CConstraintConjunction(const CConstraintConjunction &) = delete;
@@ -56,7 +57,7 @@ public:
 	}
 
 	// all constraints in conjunction
-	CConstraintArray *
+	gpos::pointer<CConstraintArray *>
 	Pdrgpcnstr() const
 	{
 		return m_pdrgpcnstr;
@@ -72,9 +73,9 @@ public:
 	BOOL FConstraint(const CColRef *colref) const override;
 
 	// return a copy of the constraint with remapped columns
-	CConstraint *PcnstrCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist) override;
+	gpos::owner<CConstraint *> PcnstrCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// return constraint on a given column
 	CConstraint *Pcnstr(CMemoryPool *mp, const CColRef *colref) override;

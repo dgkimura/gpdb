@@ -13,6 +13,8 @@
 
 #include "naucrates/md/CMDColumn.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -93,7 +95,7 @@ CMDColumn::AttrNum() const
 //		Attribute type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDColumn::MdidType() const
 {
 	return m_mdid_type;

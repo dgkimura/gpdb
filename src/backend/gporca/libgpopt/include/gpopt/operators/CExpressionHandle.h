@@ -57,36 +57,36 @@ private:
 	CMemoryPool *m_mp;
 
 	// attached expression
-	CExpression *m_pexpr;
+	gpos::owner<CExpression *> m_pexpr;
 
 	// attached group expression
-	CGroupExpression *m_pgexpr;
+	gpos::owner<CGroupExpression *> m_pgexpr;
 
 	// attached cost context
-	CCostContext *m_pcc;
+	gpos::pointer<CCostContext *> m_pcc;
 
 	// derived plan properties of the gexpr attached by a CostContext under
 	// the default CDrvdPropCtxtPlan. See DerivePlanPropsForCostContext()
 	// NB: does NOT support on-demand property derivation
-	CDrvdProp *m_pdpplan;
+	gpos::owner<CDrvdProp *> m_pdpplan;
 
 	// statistics of attached expr/gexpr;
 	// set during derived stats computation
-	IStatistics *m_pstats;
+	gpos::owner<IStatistics *> m_pstats;
 
 	// required properties of attached expr/gexpr;
 	// set during required property computation
-	CReqdProp *m_prp;
+	gpos::owner<CReqdProp *> m_prp;
 
 	// array of children's derived stats
-	IStatisticsArray *m_pdrgpstat;
+	gpos::owner<IStatisticsArray *> m_pdrgpstat;
 
 	// array of children's required properties
-	CReqdPropArray *m_pdrgprp;
+	gpos::owner<CReqdPropArray *> m_pdrgprp;
 
 	// return an array of stats objects starting from the first stats object referenced by child
-	IStatisticsArray *PdrgpstatOuterRefs(IStatisticsArray *statistics_array,
-										 ULONG child_index);
+	gpos::owner<IStatisticsArray *> PdrgpstatOuterRefs(
+		IStatisticsArray *statistics_array, ULONG child_index);
 
 	// check if stats are derived for attached expression and its children
 	BOOL FStatsDerived() const;
@@ -157,7 +157,7 @@ public:
 	CDrvdPropRelational *GetRelationalProperties(ULONG child_index) const;
 
 	// derived stats of n-th child
-	IStatistics *Pstats(ULONG child_index) const;
+	gpos::pointer<IStatistics *> Pstats(ULONG child_index) const;
 
 	// derived plan props of n-th child
 	CDrvdPropPlan *Pdpplan(ULONG child_index) const;
@@ -166,13 +166,13 @@ public:
 	CDrvdPropScalar *GetDrvdScalarProps(ULONG child_index) const;
 
 	// derived properties of attached expr/gexpr
-	CDrvdProp *Pdp() const;
+	gpos::pointer<CDrvdProp *> Pdp() const;
 
 	// derived relational properties of attached expr/gexpr
 	CDrvdPropRelational *GetRelationalProperties() const;
 
 	// stats of attached expr/gexpr
-	IStatistics *Pstats();
+	gpos::pointer<IStatistics *> Pstats();
 
 	// required properties of attached expr/gexpr
 	gpos::pointer<CReqdProp *>
@@ -273,7 +273,7 @@ public:
 	CExpression *PexprScalarRepChild(ULONG child_index) const;
 
 	// return a representative (inexact) scalar expression attached to handle
-	CExpression *PexprScalarRep() const;
+	gpos::pointer<CExpression *> PexprScalarRep() const;
 
 	// return an exact scalar child at given index or return null if not possible
 	CExpression *PexprScalarExactChild(ULONG child_index,

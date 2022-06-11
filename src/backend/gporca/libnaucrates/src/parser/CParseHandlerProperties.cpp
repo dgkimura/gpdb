@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerProperties.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/parser/CParseHandlerCost.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -59,7 +61,7 @@ CParseHandlerProperties::~CParseHandlerProperties()
 //		Destructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalProperties *
+gpos::pointer<CDXLPhysicalProperties *>
 CParseHandlerProperties::GetProperties() const
 {
 	GPOS_ASSERT(nullptr != m_dxl_properties);
@@ -152,7 +154,8 @@ CParseHandlerProperties::EndElement(const XMLCh *const,	 // element_uri,
 	CParseHandlerCost *parse_handler_cost =
 		dynamic_cast<CParseHandlerCost *>((*this)[0]);
 
-	CDXLOperatorCost *cost = parse_handler_cost->GetDXLOperatorCost();
+	gpos::owner<CDXLOperatorCost *> cost =
+		parse_handler_cost->GetDXLOperatorCost();
 	cost->AddRef();
 
 	if (2 == this->Length())
@@ -160,7 +163,7 @@ CParseHandlerProperties::EndElement(const XMLCh *const,	 // element_uri,
 		CParseHandlerStatsDerivedRelation *parse_handler_stats =
 			dynamic_cast<CParseHandlerStatsDerivedRelation *>((*this)[1]);
 
-		CDXLStatsDerivedRelation *dxl_stats_derived_relation =
+		gpos::owner<CDXLStatsDerivedRelation *> dxl_stats_derived_relation =
 			parse_handler_stats->GetDxlStatsDrvdRelation();
 		dxl_stats_derived_relation->AddRef();
 		m_dxl_stats_derived_relation = dxl_stats_derived_relation;

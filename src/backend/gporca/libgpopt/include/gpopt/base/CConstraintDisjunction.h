@@ -13,6 +13,7 @@
 #define GPOPT_CConstraintDisjunction_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CConstraint.h"
 
@@ -33,10 +34,10 @@ class CConstraintDisjunction : public CConstraint
 {
 private:
 	// array of constraints
-	CConstraintArray *m_pdrgpcnstr;
+	gpos::owner<CConstraintArray *> m_pdrgpcnstr;
 
 	// mapping colref -> array of child constraints
-	ColRefToConstraintArrayMap *m_phmcolconstr;
+	gpos::owner<ColRefToConstraintArrayMap *> m_phmcolconstr;
 
 public:
 	CConstraintDisjunction(const CConstraintDisjunction &) = delete;
@@ -55,7 +56,7 @@ public:
 	}
 
 	// all constraints in disjunction
-	CConstraintArray *
+	gpos::pointer<CConstraintArray *>
 	Pdrgpcnstr() const
 	{
 		return m_pdrgpcnstr;
@@ -65,9 +66,9 @@ public:
 	BOOL FContradiction() const override;
 
 	// return a copy of the constraint with remapped columns
-	CConstraint *PcnstrCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist) override;
+	gpos::owner<CConstraint *> PcnstrCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// scalar expression
 	CExpression *PexprScalar(CMemoryPool *mp) override;

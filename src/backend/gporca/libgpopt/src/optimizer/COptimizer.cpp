@@ -15,6 +15,7 @@
 
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/CDebugCounter.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/error/CErrorHandlerStandard.h"
 #include "gpos/io/CFileDescriptor.h"
@@ -66,7 +67,7 @@ COptimizer::PrintQuery(CMemoryPool *mp, CExpression *pexprTranslated,
 			<< "Algebrized query: " << std::endl
 			<< *pexprTranslated;
 
-	CExpressionArray *pdrgpexpr =
+	gpos::owner<CExpressionArray *> pdrgpexpr =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PdrgPexpr(mp);
 	const ULONG ulCTEs = pdrgpexpr->Size();
 	if (0 < ulCTEs)
@@ -228,9 +229,10 @@ COptimizer::PrintQueryOrPlan(CMemoryPool *mp, CExpression *pexpr,
 //---------------------------------------------------------------------------
 CDXLNode *
 COptimizer::PdxlnOptimize(
-	CMemoryPool *mp, CMDAccessor *md_accessor, const CDXLNode *query,
-	const CDXLNodeArray *query_output_dxlnode_array,
-	const CDXLNodeArray *cte_producers,
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	gpos::pointer<const CDXLNode *> query,
+	gpos::pointer<const CDXLNodeArray *> query_output_dxlnode_array,
+	gpos::pointer<const CDXLNodeArray *> cte_producers,
 	gpos::pointer<IConstExprEvaluator *> pceeval,
 	ULONG ulHosts,	// actual number of data nodes in the system
 	ULONG ulSessionId, ULONG ulCmdId, CSearchStageArray *search_stage_array,
@@ -289,8 +291,9 @@ COptimizer::PdxlnOptimize(
 
 			// translate DXL Tree -> Expr Tree
 			CTranslatorDXLToExpr dxltr(mp, md_accessor);
-			CExpression *pexprTranslated = dxltr.PexprTranslateQuery(
-				query, query_output_dxlnode_array, cte_producers);
+			gpos::owner<CExpression *> pexprTranslated =
+				dxltr.PexprTranslateQuery(query, query_output_dxlnode_array,
+										  cte_producers);
 			GPOS_CHECK_ABORT;
 			gpdxl::ULongPtrArray *pdrgpul = dxltr.PdrgpulOutputColRefs();
 			gpmd::CMDNameArray *pdrgpmdname = dxltr.Pdrgpmdname();
@@ -316,7 +319,8 @@ COptimizer::PdxlnOptimize(
 
 			GPOS_CHECK_ABORT;
 			// optimize logical expression tree into physical expression tree.
-			CExpression *pexprPlan = PexprOptimize(mp, pqc, search_stage_array);
+			gpos::owner<CExpression *> pexprPlan =
+				PexprOptimize(mp, pqc, search_stage_array);
 			GPOS_CHECK_ABORT;
 
 			// translate plan into DXL
@@ -397,7 +401,7 @@ COptimizer::HandleExceptionAfterFinalizingMinidump(CException &ex)
 void
 COptimizer::CheckCTEConsistency(CMemoryPool *mp, CExpression *pexpr)
 {
-	UlongToUlongMap *phmulul = GPOS_NEW(mp) UlongToUlongMap(mp);
+	gpos::owner<UlongToUlongMap *> phmulul = GPOS_NEW(mp) UlongToUlongMap(mp);
 	CDrvdPropPlan *pdpplanChild = CDrvdPropPlan::Pdpplan(pexpr->PdpDerive());
 	CDistributionSpec *pdsChild = pdpplanChild->Pds();
 
@@ -454,7 +458,7 @@ COptimizer::CreateDXLNode(CMemoryPool *mp, CMDAccessor *md_accessor,
 						  CMDNameArray *pdrgpmdname, ULONG ulHosts)
 {
 	GPOS_ASSERT(0 < ulHosts);
-	IntPtrArray *pdrgpiHosts = GPOS_NEW(mp) IntPtrArray(mp);
+	gpos::owner<IntPtrArray *> pdrgpiHosts = GPOS_NEW(mp) IntPtrArray(mp);
 
 	for (ULONG ul = 0; ul < ulHosts; ul++)
 	{

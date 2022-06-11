@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMetadataIdList_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 #include "naucrates/md/IMDId.h"
@@ -36,7 +37,7 @@ class CParseHandlerMetadataIdList : public CParseHandlerBase
 {
 private:
 	// list of metadata identifiers
-	IMdIdArray *m_mdid_array;
+	gpos::owner<IMdIdArray *> m_mdid_array;
 
 
 	// process the start of an element
@@ -71,7 +72,7 @@ public:
 	~CParseHandlerMetadataIdList() override;
 
 	// return the constructed list of metadata identifiers
-	IMdIdArray *GetMdIdArray();
+	gpos::pointer<IMdIdArray *> GetMdIdArray();
 };
 }  // namespace gpdxl
 

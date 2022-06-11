@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementCTEConsumer.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalCTEConsumer.h"
 #include "gpopt/operators/CPhysicalCTEConsumer.h"
@@ -74,7 +75,7 @@ CXformImplementCTEConsumer::Transform(CXformContext *pxfctxt,
 	// extract components for alternative
 	ULONG id = popCTEConsumer->UlCTEId();
 
-	CColRefArray *colref_array = popCTEConsumer->Pdrgpcr();
+	gpos::owner<CColRefArray *> colref_array = popCTEConsumer->Pdrgpcr();
 	colref_array->AddRef();
 
 	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
@@ -82,7 +83,7 @@ CXformImplementCTEConsumer::Transform(CXformContext *pxfctxt,
 	colref_mapping->AddRef();
 
 	// create physical CTE Consumer
-	CExpression *pexprAlt =
+	gpos::owner<CExpression *> pexprAlt =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CPhysicalCTEConsumer(
 										 mp, id, colref_array, colref_mapping));
 

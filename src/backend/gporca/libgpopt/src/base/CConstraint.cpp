@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CAutoRef.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCastUtils.h"
 #include "gpopt/base/CColConstraintsArrayMapper.h"
@@ -86,7 +87,7 @@ CConstraint::~CConstraint()
 //		originally generated for "scalar op ANY/ALL (array)" construct
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp, CExpression *pexpr,
 									  CColRef *colref, BOOL infer_nulls_as)
 {
@@ -146,7 +147,8 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp, CExpression *pexpr,
 		{
 			if (earrccmpt == CScalarArrayCmp::EarrcmpAny)
 			{
-				CRangeArray *emptyRangeArray = GPOS_NEW(mp) CRangeArray(mp);
+				gpos::owner<CRangeArray *> emptyRangeArray =
+					GPOS_NEW(mp) CRangeArray(mp);
 				// comparing with an empty array for any ANY comparison produces a "false" constraint
 				// which is represented by an empty CConstraintInterval
 				return GPOS_NEW(mp) CConstraintInterval(
@@ -160,7 +162,8 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp, CExpression *pexpr,
 			}
 		}
 
-		CConstraintArray *pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
+		gpos::owner<CConstraintArray *> pdrgpcnstr =
+			GPOS_NEW(mp) CConstraintArray(mp);
 
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
@@ -301,12 +304,13 @@ CConstraint::PcnstrDisjunction(CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
 //
 //---------------------------------------------------------------------------
 CConstraint *
-CConstraint::PcnstrConjDisj(CMemoryPool *mp, CConstraintArray *pdrgpcnstr,
+CConstraint::PcnstrConjDisj(CMemoryPool *mp,
+							gpos::owner<CConstraintArray *> pdrgpcnstr,
 							BOOL fConj)
 {
 	GPOS_ASSERT(nullptr != pdrgpcnstr);
 
-	CConstraint *pcnstr = nullptr;
+	gpos::owner<CConstraint *> pcnstr = nullptr;
 
 	const ULONG length = pdrgpcnstr->Size();
 
@@ -365,7 +369,7 @@ CConstraint::AddColumnToEquivClasses(CMemoryPool *mp, const CColRef *colref,
 		}
 	}
 
-	CColRefSet *pcrsNew = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsNew = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsNew->Include(colref);
 
 	pdrgpcrs->Append(pcrsNew);
@@ -437,15 +441,18 @@ CConstraint::PcnstrFromScalarCmp(
 		{
 			CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
 			CScalarCmp *sc_cmp = CScalarCmp::PopConvert(pexpr->Pop());
-			const IMDScalarOp *op = mda->RetrieveScOp(sc_cmp->MdIdOp());
+			gpos::pointer<const IMDScalarOp *> op =
+				mda->RetrieveScOp(sc_cmp->MdIdOp());
 
 			IMDId *left_mdid =
 				CScalar::PopConvert(pexprLeft->Pop())->MdidType();
-			const IMDType *left_type = mda->RetrieveType(left_mdid);
+			gpos::pointer<const IMDType *> left_type =
+				mda->RetrieveType(left_mdid);
 
 			IMDId *right_mdid =
 				CScalar::PopConvert(pexprRight->Pop())->MdidType();
-			const IMDType *right_type = mda->RetrieveType(right_mdid);
+			gpos::pointer<const IMDType *> right_type =
+				mda->RetrieveType(right_mdid);
 
 			// Build constraint (e.g for equivalent classes) only when the hash families
 			// of the operator and operands match.
@@ -475,14 +482,15 @@ CConstraint::PcnstrFromScalarCmp(
 		if (checkEquality)
 		{
 			// col1 = col2 or bcast(col1) = col2 or col1 = bcast(col2) or bcast(col1) = bcast(col2)
-			CColRefSet *pcrsNew = GPOS_NEW(mp) CColRefSet(mp);
+			gpos::owner<CColRefSet *> pcrsNew = GPOS_NEW(mp) CColRefSet(mp);
 			pcrsNew->Include(pcrLeft);
 			pcrsNew->Include(pcrRight);
 
 			(*ppdrgpcrs)->Append(pcrsNew);
 		}
 
-		CConstraintArray *pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
+		gpos::owner<CConstraintArray *> pdrgpcnstr =
+			GPOS_NEW(mp) CConstraintArray(mp);
 		pdrgpcnstr->Append(CConstraintInterval::PciUnbounded(
 			mp, pcrLeft, pcrLeftIncludesNull /*fIncludesNull*/));
 		pdrgpcnstr->Append(CConstraintInterval::PciUnbounded(
@@ -503,10 +511,10 @@ CConstraint::PcnstrFromScalarCmp(
 //		Create constraint from scalar boolean expression
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CConstraint::PcnstrFromScalarBoolOp(
 	CMemoryPool *mp, CExpression *pexpr,
-	CColRefSetArray **ppdrgpcrs,  // output equivalence classes
+	gpos::owner<CColRefSetArray *> *ppdrgpcrs,	// output equivalence classes
 	BOOL infer_nulls_as)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -534,12 +542,13 @@ CConstraint::PcnstrFromScalarBoolOp(
 	}
 
 	*ppdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
-	CConstraintArray *pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstr =
+		GPOS_NEW(mp) CConstraintArray(mp);
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CColRefSetArray *pdrgpcrsChild = nullptr;
-		CConstraint *pcnstrChild = PcnstrFromScalarExpr(
+		gpos::owner<CColRefSetArray *> pdrgpcrsChild = nullptr;
+		gpos::owner<CConstraint *> pcnstrChild = PcnstrFromScalarExpr(
 			mp, (*pexpr)[ul], &pdrgpcrsChild, infer_nulls_as);
 		if (nullptr == pcnstrChild || pcnstrChild->IsConstraintUnbounded())
 		{
@@ -572,7 +581,7 @@ CConstraint::PcnstrFromScalarBoolOp(
 
 	if (1 == length)
 	{
-		CConstraint *pcnstrChild = (*pdrgpcnstr)[0];
+		gpos::owner<CConstraint *> pcnstrChild = (*pdrgpcnstr)[0];
 		pcnstrChild->AddRef();
 		pdrgpcnstr->Release();
 
@@ -606,7 +615,7 @@ CConstraint::PcnstrFromScalarBoolOp(
 //		Merge equivalence classes coming from children of a bool op
 //
 //---------------------------------------------------------------------------
-CColRefSetArray *
+gpos::owner<CColRefSetArray *>
 CConstraint::PdrgpcrsMergeFromBoolOp(CMemoryPool *mp, CExpression *pexpr,
 									 CColRefSetArray *pdrgpcrsFst,
 									 CColRefSetArray *pdrgpcrsSnd)
@@ -649,7 +658,8 @@ CConstraint::PdrgpcnstrOnColumn(
 	BOOL fExclusive	 // returned constraints must reference ONLY the given col
 )
 {
-	CConstraintArray *pdrgpcnstrSubset = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstrSubset =
+		GPOS_NEW(mp) CConstraintArray(mp);
 
 	const ULONG length = pdrgpcnstr->Size();
 
@@ -682,12 +692,13 @@ CExpression *
 CConstraint::PexprScalarConjDisj(CMemoryPool *mp, CConstraintArray *pdrgpcnstr,
 								 BOOL fConj)
 {
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 
 	const ULONG length = pdrgpcnstr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CExpression *pexpr = (*pdrgpcnstr)[ul]->PexprScalar(mp);
+		gpos::owner<CExpression *> pexpr = (*pdrgpcnstr)[ul]->PexprScalar(mp);
 		pexpr->AddRef();
 		pdrgpexpr->Append(pexpr);
 	}
@@ -711,10 +722,12 @@ CConstraint::PexprScalarConjDisj(CMemoryPool *mp, CConstraintArray *pdrgpcnstr,
 //
 //---------------------------------------------------------------------------
 CConstraintArray *
-CConstraint::PdrgpcnstrFlatten(CMemoryPool *mp, CConstraintArray *pdrgpcnstr,
+CConstraint::PdrgpcnstrFlatten(CMemoryPool *mp,
+							   gpos::owner<CConstraintArray *> pdrgpcnstr,
 							   EConstraintType ect)
 {
-	CConstraintArray *pdrgpcnstrNew = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstrNew =
+		GPOS_NEW(mp) CConstraintArray(mp);
 
 	const ULONG length = pdrgpcnstr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
@@ -757,10 +770,11 @@ CConstraint::PdrgpcnstrFlatten(CMemoryPool *mp, CConstraintArray *pdrgpcnstr,
 //---------------------------------------------------------------------------
 CConstraintArray *
 CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
-								   CConstraintArray *pdrgpcnstr,
+								   gpos::owner<CConstraintArray *> pdrgpcnstr,
 								   EConstraintType ect)
 {
-	CConstraintArray *pdrgpcnstrNew = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstrNew =
+		GPOS_NEW(mp) CConstraintArray(mp);
 
 	CAutoRef<CColRefSet> pcrsDeduped(GPOS_NEW(mp) CColRefSet(mp));
 	CAutoRef<IColConstraintsMapper> arccm;
@@ -799,7 +813,8 @@ CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
 			continue;
 		}
 
-		CConstraintArray *pdrgpcnstrCol = arccm->PdrgPcnstrLookup(colref);
+		gpos::owner<CConstraintArray *> pdrgpcnstrCol =
+			arccm->PdrgPcnstrLookup(colref);
 
 		if (1 == pdrgpcnstrCol->Size())
 		{
@@ -811,7 +826,7 @@ CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
 			continue;
 		}
 
-		CExpression *pexpr = nullptr;
+		gpos::owner<CExpression *> pexpr = nullptr;
 
 		if (EctConjunction == ect)
 		{
@@ -862,7 +877,7 @@ ColRefToConstraintArrayMap *
 CConstraint::Phmcolconstr(CMemoryPool *mp, CColRefSet *pcrs,
 						  CConstraintArray *pdrgpcnstr)
 {
-	ColRefToConstraintArrayMap *phmcolconstr =
+	gpos::owner<ColRefToConstraintArrayMap *> phmcolconstr =
 		GPOS_NEW(mp) ColRefToConstraintArrayMap(mp);
 
 	CColRefSetIter crsi(*pcrs);
@@ -895,7 +910,8 @@ CConstraint::PcnstrConjDisjRemapForColumn(CMemoryPool *mp, CColRef *colref,
 {
 	GPOS_ASSERT(nullptr != colref);
 
-	CConstraintArray *pdrgpcnstrNew = GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstrNew =
+		GPOS_NEW(mp) CConstraintArray(mp);
 
 	const ULONG length = pdrgpcnstr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
@@ -957,15 +973,16 @@ CConstraint::Contains(CConstraint *pcnstr)
 	while (fContains && crsi.Advance())
 	{
 		CColRef *colref = crsi.Pcr();
-		CConstraint *pcnstrColThis = Pcnstr(m_mp, colref);
+		gpos::owner<CConstraint *> pcnstrColThis = Pcnstr(m_mp, colref);
 		GPOS_ASSERT(nullptr != pcnstrColThis);
-		CConstraint *pcnstrColOther = pcnstr->Pcnstr(m_mp, colref);
+		gpos::owner<CConstraint *> pcnstrColOther =
+			pcnstr->Pcnstr(m_mp, colref);
 
 		// convert each of them to interval (if they are not already)
-		CConstraintInterval *pciThis =
+		gpos::owner<CConstraintInterval *> pciThis =
 			CConstraintInterval::PciIntervalFromConstraint(m_mp, pcnstrColThis,
 														   colref);
-		CConstraintInterval *pciOther =
+		gpos::owner<CConstraintInterval *> pciOther =
 			CConstraintInterval::PciIntervalFromConstraint(m_mp, pcnstrColOther,
 														   colref);
 
@@ -1048,7 +1065,7 @@ CConstraint::PrintConjunctionDisjunction(IOstream &os,
 CColRefSet *
 CConstraint::PcrsFromConstraints(CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
 {
-	CColRefSet *crs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> crs = GPOS_NEW(mp) CColRefSet(mp);
 
 	ULONG const length = pdrgpcnstr->Size();
 	GPOS_ASSERT(0 < length);

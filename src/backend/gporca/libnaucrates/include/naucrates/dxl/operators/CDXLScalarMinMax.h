@@ -44,7 +44,7 @@ public:
 
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::owner<IMDId *> m_mdid_type;
 
 	// min/max type
 	EdxlMinMaxType m_min_max_type;

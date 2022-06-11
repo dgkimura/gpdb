@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementConstTableGet.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalConstTableGet.h"
 #include "gpopt/operators/CPhysicalConstTableGet.h"
@@ -57,17 +58,20 @@ CXformImplementConstTableGet::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
-	CColumnDescriptorArray *pdrgpcoldesc = popConstTableGet->Pdrgpcoldesc();
+	gpos::owner<CColumnDescriptorArray *> pdrgpcoldesc =
+		popConstTableGet->Pdrgpcoldesc();
 	pdrgpcoldesc->AddRef();
 
-	IDatum2dArray *pdrgpdrgpdatum = popConstTableGet->Pdrgpdrgpdatum();
+	gpos::owner<IDatum2dArray *> pdrgpdrgpdatum =
+		popConstTableGet->Pdrgpdrgpdatum();
 	pdrgpdrgpdatum->AddRef();
 
-	CColRefArray *pdrgpcrOutput = popConstTableGet->PdrgpcrOutput();
+	gpos::owner<CColRefArray *> pdrgpcrOutput =
+		popConstTableGet->PdrgpcrOutput();
 	pdrgpcrOutput->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalConstTableGet(
 							mp, pdrgpcoldesc, pdrgpdrgpdatum, pdrgpcrOutput));
 

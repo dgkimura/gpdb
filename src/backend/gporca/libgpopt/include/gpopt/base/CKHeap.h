@@ -11,6 +11,8 @@
 #ifndef GPOPT_CKHeap_H
 #define GPOPT_CKHeap_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CColRef.h"
 
 namespace gpopt
@@ -26,7 +28,7 @@ template <class A, class E>
 class CKHeap : public CRefCount
 {
 private:
-	A *m_topk;
+	gpos::owner<A *> m_topk;
 	CMemoryPool *m_mp;
 	ULONG m_k;
 	BOOL m_is_heapified;

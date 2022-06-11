@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerOp.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 
 using namespace gpdxl;
@@ -55,7 +57,7 @@ CParseHandlerOp::~CParseHandlerOp()
 //		Returns the constructed DXL node and passes ownership over it.
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::pointer<CDXLNode *>
 CParseHandlerOp::CreateDXLNode() const
 {
 	return m_dxl_node;

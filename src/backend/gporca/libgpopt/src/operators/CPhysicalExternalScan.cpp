@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalExternalScan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecRandom.h"
 #include "gpopt/metadata/CName.h"
@@ -81,8 +82,9 @@ CPhysicalExternalScan::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalExternalScan::EpetRewindability(CExpressionHandle &exprhdl,
-										 const CEnfdRewindability *per) const
+CPhysicalExternalScan::EpetRewindability(
+	CExpressionHandle &exprhdl,
+	gpos::pointer<const CEnfdRewindability *> per) const
 {
 	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))

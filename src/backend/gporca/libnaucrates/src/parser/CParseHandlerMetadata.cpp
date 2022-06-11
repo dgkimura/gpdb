@@ -13,6 +13,8 @@
 
 #include <xercesc/util/XMLStringTokenizer.hpp>
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -80,7 +82,7 @@ CParseHandlerMetadata::GetParseHandlerType() const
 //		Returns the list of metadata objects constructed by the parser
 //
 //---------------------------------------------------------------------------
-IMDCacheObjectArray *
+gpos::pointer<IMDCacheObjectArray *>
 CParseHandlerMetadata::GetMdIdCachedObjArray()
 {
 	return m_mdid_cached_obj_array;
@@ -94,7 +96,7 @@ CParseHandlerMetadata::GetMdIdCachedObjArray()
 //		Returns the list of metadata ids constructed by the parser
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::pointer<IMdIdArray *>
 CParseHandlerMetadata::GetMdIdArray()
 {
 	return m_mdid_array;
@@ -108,7 +110,7 @@ CParseHandlerMetadata::GetMdIdArray()
 //		Returns the list of metadata source system ids constructed by the parser
 //
 //---------------------------------------------------------------------------
-CSystemIdArray *
+gpos::pointer<CSystemIdArray *>
 CParseHandlerMetadata::GetSysidPtrArray()
 {
 	return m_system_id_array;
@@ -208,7 +210,8 @@ CParseHandlerMetadata::EndElement(const XMLCh *const,  // element_uri,
 
 		GPOS_ASSERT(nullptr != metadata_obj_parse_handler->GetImdObj());
 
-		IMDCacheObject *imdobj = metadata_obj_parse_handler->GetImdObj();
+		gpos::owner<IMDCacheObject *> imdobj =
+			metadata_obj_parse_handler->GetImdObj();
 		imdobj->AddRef();
 		m_mdid_cached_obj_array->Append(imdobj);
 	}
@@ -239,7 +242,8 @@ CParseHandlerMetadata::GetSrcSysIdArray(const Attributes &attrs,
 		return nullptr;
 	}
 
-	CSystemIdArray *src_sys_id_array = GPOS_NEW(m_mp) CSystemIdArray(m_mp);
+	gpos::owner<CSystemIdArray *> src_sys_id_array =
+		GPOS_NEW(m_mp) CSystemIdArray(m_mp);
 
 	// extract separate system ids
 	XMLStringTokenizer xml_str_tokenizer(

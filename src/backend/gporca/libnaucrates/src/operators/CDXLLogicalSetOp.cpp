@@ -17,6 +17,7 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalSetOp.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -136,7 +137,7 @@ CDXLLogicalSetOp::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalSetOp::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *node) const
+								 gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalDynamicGetBase_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/metadata/CName.h"
@@ -35,19 +36,19 @@ protected:
 	const CName *m_pnameAlias;
 
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::owner<CTableDescriptor *> m_ptabdesc;
 
 	// dynamic scan id
 	ULONG m_scan_id;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::owner<CColRefArray *> m_pdrgpcrOutput;
 
 	// partition keys
-	CColRef2dArray *m_pdrgpdrgpcrPart;
+	gpos::owner<CColRef2dArray *> m_pdrgpdrgpcrPart;
 
 	// distribution columns (empty for master only tables)
-	CColRefSet *m_pcrsDist;
+	gpos::owner<CColRefSet *> m_pcrsDist;
 
 	// private copy ctor
 	CLogicalDynamicGetBase(const CLogicalDynamicGetBase &);
@@ -58,10 +59,10 @@ protected:
 							ULongPtrArray *pdrgpulPos) const;
 
 	// Child partitions
-	IMdIdArray *m_partition_mdids = nullptr;
+	gpos::owner<IMdIdArray *> m_partition_mdids = nullptr;
 	// Map of Root colref -> col index in child tabledesc
 	// per child partition in m_partition_mdid
-	ColRefToUlongMapArray *m_root_col_mapping_per_part = nullptr;
+	gpos::owner<ColRefToUlongMapArray *> m_root_col_mapping_per_part = nullptr;
 
 	// Construct a mapping from each column in root table to an index in each
 	// child partition's table descr by matching column names$
@@ -86,7 +87,7 @@ public:
 	~CLogicalDynamicGetBase() override;
 
 	// accessors
-	virtual CColRefArray *
+	virtual gpos::pointer<CColRefArray *>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -100,14 +101,14 @@ public:
 	}
 
 	// distribution columns
-	virtual const CColRefSet *
+	virtual gpos::pointer<const CColRefSet *>
 	PcrsDist() const
 	{
 		return m_pcrsDist;
 	}
 
 	// return table's descriptor
-	virtual CTableDescriptor *
+	virtual gpos::pointer<CTableDescriptor *>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
@@ -121,7 +122,7 @@ public:
 	}
 
 	// return the partition columns
-	virtual CColRef2dArray *
+	virtual gpos::pointer<CColRef2dArray *>
 	PdrgpdrgpcrPart() const
 	{
 		return m_pdrgpdrgpcrPart;
@@ -157,7 +158,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	gpos::pointer<CTableDescriptor *>
 	DeriveTableDescriptor(CMemoryPool *,	   // mp
 						  CExpressionHandle &  // exprhdl
 	) const override
@@ -165,13 +166,13 @@ public:
 		return m_ptabdesc;
 	}
 
-	IMdIdArray *
+	gpos::pointer<IMdIdArray *>
 	GetPartitionMdids() const
 	{
 		return m_partition_mdids;
 	}
 
-	ColRefToUlongMapArray *
+	gpos::pointer<ColRefToUlongMapArray *>
 	GetRootColMappingPerPart() const
 	{
 		return m_root_col_mapping_per_part;
