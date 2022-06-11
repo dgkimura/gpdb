@@ -2508,6 +2508,7 @@ CTranslatorUtils::IsCompositeConst(CMemoryPool *mp, CMDAccessor *md_accessor,
 	CMDIdGPDB *mdid_return_type = GPOS_NEW(mp) CMDIdGPDB(constExpr->consttype);
 
 	const IMDType *type = md_accessor->RetrieveType(mdid_return_type);
+	mdid_return_type->Release();
 
 	mdid_return_type->Release();
 
