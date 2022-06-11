@@ -41,7 +41,7 @@ CDXLPhysicalExternalScan::CDXLPhysicalExternalScan(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalExternalScan::CDXLPhysicalExternalScan(
-	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr)
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr)
 	: CDXLPhysicalTableScan(mp, std::move(table_descr))
 {
 }

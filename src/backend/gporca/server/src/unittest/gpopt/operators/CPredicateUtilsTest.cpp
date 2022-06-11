@@ -62,8 +62,8 @@ CPredicateUtilsTest::EresUnittest_Conjunctions()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -71,57 +71,56 @@ CPredicateUtilsTest::EresUnittest_Conjunctions()
 					 CTestUtils::GetCostModel(mp));
 
 	// build conjunction
-	gpos::owner<CExpressionArray *> pdrgpexpr =
-		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG ulConjs = 3;
 	for (ULONG ul = 0; ul < ulConjs; ul++)
 	{
 		pdrgpexpr->Append(CUtils::PexprScalarConstBool(mp, true /*fValue*/));
 	}
-	gpos::owner<CExpression *> pexprConjunction = CUtils::PexprScalarBoolOp(
+	gpos::Ref<CExpression> pexprConjunction = CUtils::PexprScalarBoolOp(
 		mp, CScalarBoolOp::EboolopAnd, std::move(pdrgpexpr));
 
 	// break into conjuncts
-	gpos::owner<CExpressionArray *> pdrgpexprExtract =
-		CPredicateUtils::PdrgpexprConjuncts(mp, pexprConjunction);
+	gpos::Ref<CExpressionArray> pdrgpexprExtract =
+		CPredicateUtils::PdrgpexprConjuncts(mp, pexprConjunction.get());
 	GPOS_ASSERT(pdrgpexprExtract->Size() == ulConjs);
 
 	// collapse into single conjunct
-	gpos::owner<CExpression *> pexpr =
+	gpos::Ref<CExpression> pexpr =
 		CPredicateUtils::PexprConjunction(mp, pdrgpexprExtract);
 	GPOS_ASSERT(nullptr != pexpr);
-	GPOS_ASSERT(CUtils::FScalarConstTrue(pexpr));
-	pexpr->Release();
+	GPOS_ASSERT(CUtils::FScalarConstTrue(pexpr.get()));
+	;
 
 	// collapse empty input array to conjunct
-	gpos::owner<CExpression *> pexprSingleton =
+	gpos::Ref<CExpression> pexprSingleton =
 		CPredicateUtils::PexprConjunction(mp, nullptr /*pdrgpexpr*/);
 	GPOS_ASSERT(nullptr != pexprSingleton);
-	pexprSingleton->Release();
+	;
 
-	pexprConjunction->Release();
+	;
 
 	// conjunction on scalar comparisons
-	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	gpos::pointer<CColRefSet *> pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
+	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *pcr1 = pcrs->PcrAny();
 	CColRef *pcr2 = pcrs->PcrFirst();
-	gpos::owner<CExpression *> pexprCmp1 =
+	gpos::Ref<CExpression> pexprCmp1 =
 		CUtils::PexprScalarCmp(mp, pcr1, pcr2, IMDType::EcmptEq);
-	gpos::owner<CExpression *> pexprCmp2 = CUtils::PexprScalarCmp(
+	gpos::Ref<CExpression> pexprCmp2 = CUtils::PexprScalarCmp(
 		mp, pcr1, CUtils::PexprScalarConstInt4(mp, 1 /*val*/),
 		IMDType::EcmptEq);
 
-	gpos::owner<CExpression *> pexprConj =
-		CPredicateUtils::PexprConjunction(mp, pexprCmp1, pexprCmp2);
-	pdrgpexprExtract = CPredicateUtils::PdrgpexprConjuncts(mp, pexprConj);
+	gpos::Ref<CExpression> pexprConj =
+		CPredicateUtils::PexprConjunction(mp, pexprCmp1.get(), pexprCmp2.get());
+	pdrgpexprExtract = CPredicateUtils::PdrgpexprConjuncts(mp, pexprConj.get());
 	GPOS_ASSERT(2 == pdrgpexprExtract->Size());
-	pdrgpexprExtract->Release();
+	;
 
-	pexprCmp1->Release();
-	pexprCmp2->Release();
-	pexprConj->Release();
-	pexprGet->Release();
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -142,8 +141,8 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -151,39 +150,38 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 					 CTestUtils::GetCostModel(mp));
 
 	// build disjunction
-	gpos::owner<CExpressionArray *> pdrgpexpr =
-		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG ulDisjs = 3;
 	for (ULONG ul = 0; ul < ulDisjs; ul++)
 	{
 		pdrgpexpr->Append(CUtils::PexprScalarConstBool(mp, false /*fValue*/));
 	}
-	gpos::owner<CExpression *> pexprDisjunction = CUtils::PexprScalarBoolOp(
+	gpos::Ref<CExpression> pexprDisjunction = CUtils::PexprScalarBoolOp(
 		mp, CScalarBoolOp::EboolopOr, std::move(pdrgpexpr));
 
 	// break into disjuncts
-	gpos::owner<CExpressionArray *> pdrgpexprExtract =
-		CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisjunction);
+	gpos::Ref<CExpressionArray> pdrgpexprExtract =
+		CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisjunction.get());
 	GPOS_ASSERT(pdrgpexprExtract->Size() == ulDisjs);
 
 	// collapse into single disjunct
-	gpos::owner<CExpression *> pexpr =
+	gpos::Ref<CExpression> pexpr =
 		CPredicateUtils::PexprDisjunction(mp, pdrgpexprExtract);
 	GPOS_ASSERT(nullptr != pexpr);
-	GPOS_ASSERT(CUtils::FScalarConstFalse(pexpr));
-	pexpr->Release();
+	GPOS_ASSERT(CUtils::FScalarConstFalse(pexpr.get()));
+	;
 
 	// collapse empty input array to disjunct
-	gpos::owner<CExpression *> pexprSingleton =
+	gpos::Ref<CExpression> pexprSingleton =
 		CPredicateUtils::PexprDisjunction(mp, nullptr /*pdrgpexpr*/);
 	GPOS_ASSERT(nullptr != pexprSingleton);
-	pexprSingleton->Release();
+	;
 
-	pexprDisjunction->Release();
+	;
 
 	// disjunction on scalar comparisons
-	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	gpos::pointer<CColRefSet *> pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
+	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
 	CColRefSetIter crsi(*pcrs);
 
 	BOOL fAdvance GPOS_ASSERTS_ONLY = crsi.Advance();
@@ -204,49 +202,51 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 	GPOS_ASSERT(fAdvance);
 	CColRef *pcr3 = crsi.Pcr();
 
-	gpos::owner<CExpression *> pexprCmp1 =
+	gpos::Ref<CExpression> pexprCmp1 =
 		CUtils::PexprScalarCmp(mp, pcr1, pcr2, IMDType::EcmptEq);
-	gpos::owner<CExpression *> pexprCmp2 = CUtils::PexprScalarCmp(
+	gpos::Ref<CExpression> pexprCmp2 = CUtils::PexprScalarCmp(
 		mp, pcr1, CUtils::PexprScalarConstInt4(mp, 1 /*val*/),
 		IMDType::EcmptEq);
 
 	{
-		gpos::owner<CExpression *> pexprDisj =
-			CPredicateUtils::PexprDisjunction(mp, pexprCmp1, pexprCmp2);
-		pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisj);
+		gpos::Ref<CExpression> pexprDisj = CPredicateUtils::PexprDisjunction(
+			mp, pexprCmp1.get(), pexprCmp2.get());
+		pdrgpexprExtract =
+			CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisj.get());
 		GPOS_ASSERT(2 == pdrgpexprExtract->Size());
-		pdrgpexprExtract->Release();
-		pexprDisj->Release();
+		;
+		;
 	}
 
 
 	{
-		gpos::owner<CExpressionArray *> pdrgpexpr =
+		gpos::Ref<CExpressionArray> pdrgpexpr =
 			GPOS_NEW(mp) CExpressionArray(mp);
-		gpos::owner<CExpression *> pexprCmp3 =
+		gpos::Ref<CExpression> pexprCmp3 =
 			CUtils::PexprScalarCmp(mp, pcr2, pcr1, IMDType::EcmptG);
-		gpos::owner<CExpression *> pexprCmp4 = CUtils::PexprScalarCmp(
+		gpos::Ref<CExpression> pexprCmp4 = CUtils::PexprScalarCmp(
 			mp, CUtils::PexprScalarConstInt4(mp, 200 /*val*/), pcr3,
 			IMDType::EcmptL);
-		pexprCmp1->AddRef();
-		pexprCmp2->AddRef();
+		;
+		;
 
 		pdrgpexpr->Append(std::move(pexprCmp3));
 		pdrgpexpr->Append(std::move(pexprCmp4));
 		pdrgpexpr->Append(pexprCmp1);
 		pdrgpexpr->Append(pexprCmp2);
 
-		gpos::owner<CExpression *> pexprDisj =
+		gpos::Ref<CExpression> pexprDisj =
 			CPredicateUtils::PexprDisjunction(mp, std::move(pdrgpexpr));
-		pdrgpexprExtract = CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisj);
+		pdrgpexprExtract =
+			CPredicateUtils::PdrgpexprDisjuncts(mp, pexprDisj.get());
 		GPOS_ASSERT(4 == pdrgpexprExtract->Size());
-		pdrgpexprExtract->Release();
-		pexprDisj->Release();
+		;
+		;
 	}
 
-	pexprCmp1->Release();
-	pexprCmp2->Release();
-	pexprGet->Release();
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -267,8 +267,8 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -276,55 +276,55 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	gpos::owner<CExpression *> pexprLeft = CTestUtils::PexprLogicalGet(mp);
-	gpos::owner<CExpression *> pexprRight = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprLeft = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprRight = CTestUtils::PexprLogicalGet(mp);
 
-	gpos::owner<CExpressionArray *> pdrgpexprOriginal =
+	gpos::Ref<CExpressionArray> pdrgpexprOriginal =
 		GPOS_NEW(mp) CExpressionArray(mp);
 
-	gpos::pointer<CColRefSet *> pcrsLeft = pexprLeft->DeriveOutputColumns();
-	gpos::pointer<CColRefSet *> pcrsRight = pexprRight->DeriveOutputColumns();
+	CColRefSet *pcrsLeft = pexprLeft->DeriveOutputColumns();
+	CColRefSet *pcrsRight = pexprRight->DeriveOutputColumns();
 
 	CColRef *pcrLeft = pcrsLeft->PcrAny();
 	CColRef *pcrRight = pcrsRight->PcrAny();
 
 	// generate an equality predicate between two column reference
-	gpos::owner<CExpression *> pexprScIdentEquality =
+	gpos::Ref<CExpression> pexprScIdentEquality =
 		CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
 
-	pexprScIdentEquality->AddRef();
+	;
 	pdrgpexprOriginal->Append(pexprScIdentEquality);
 
 	// generate a non-equality predicate between two column reference
-	gpos::owner<CExpression *> pexprScIdentInequality = CUtils::PexprScalarCmp(
+	gpos::Ref<CExpression> pexprScIdentInequality = CUtils::PexprScalarCmp(
 		mp, pcrLeft, pcrRight, CWStringConst(GPOS_WSZ_LIT("<")),
 		GPOS_NEW(mp) CMDIdGPDB(GPDB_INT4_LT_OP));
 
-	pexprScIdentInequality->AddRef();
+	;
 	pdrgpexprOriginal->Append(pexprScIdentInequality);
 
 	// generate an equality predicate between a column reference and a constant value
-	gpos::owner<CExpression *> pexprScalarConstInt4 =
+	gpos::Ref<CExpression> pexprScalarConstInt4 =
 		CUtils::PexprScalarConstInt4(mp, 10 /*fValue*/);
-	gpos::owner<CExpression *> pexprScIdentConstEquality =
+	gpos::Ref<CExpression> pexprScIdentConstEquality =
 		CUtils::PexprScalarEqCmp(mp, std::move(pexprScalarConstInt4), pcrRight);
 
 	pdrgpexprOriginal->Append(std::move(pexprScIdentConstEquality));
 
 	GPOS_ASSERT(3 == pdrgpexprOriginal->Size());
 
-	gpos::owner<CExpressionArray *> pdrgpexprResult =
-		CPredicateUtils::PdrgpexprPlainEqualities(mp, pdrgpexprOriginal);
+	gpos::Ref<CExpressionArray> pdrgpexprResult =
+		CPredicateUtils::PdrgpexprPlainEqualities(mp, pdrgpexprOriginal.get());
 
 	GPOS_ASSERT(1 == pdrgpexprResult->Size());
 
 	// clean up
-	pdrgpexprOriginal->Release();
-	pdrgpexprResult->Release();
-	pexprLeft->Release();
-	pexprRight->Release();
-	pexprScIdentEquality->Release();
-	pexprScIdentInequality->Release();
+	;
+	;
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -344,8 +344,8 @@ CPredicateUtilsTest::EresUnittest_Implication()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -355,36 +355,36 @@ CPredicateUtilsTest::EresUnittest_Implication()
 
 	// generate a two cascaded joins
 	CWStringConst strName1(GPOS_WSZ_LIT("Rel1"));
-	gpos::owner<CMDIdGPDB *> pmdid1 =
+	gpos::Ref<CMDIdGPDB> pmdid1 =
 		GPOS_NEW(mp) CMDIdGPDB(GPOPT_TEST_REL_OID1, 1, 1);
-	gpos::owner<CTableDescriptor *> ptabdesc1 =
+	gpos::Ref<CTableDescriptor> ptabdesc1 =
 		CTestUtils::PtabdescCreate(mp, 3, std::move(pmdid1), CName(&strName1));
 	CWStringConst strAlias1(GPOS_WSZ_LIT("Rel1"));
-	gpos::owner<CExpression *> pexprRel1 =
+	gpos::Ref<CExpression> pexprRel1 =
 		CTestUtils::PexprLogicalGet(mp, std::move(ptabdesc1), &strAlias1);
 
 	CWStringConst strName2(GPOS_WSZ_LIT("Rel2"));
-	gpos::owner<CMDIdGPDB *> pmdid2 =
+	gpos::Ref<CMDIdGPDB> pmdid2 =
 		GPOS_NEW(mp) CMDIdGPDB(GPOPT_TEST_REL_OID2, 1, 1);
-	gpos::owner<CTableDescriptor *> ptabdesc2 =
+	gpos::Ref<CTableDescriptor> ptabdesc2 =
 		CTestUtils::PtabdescCreate(mp, 3, std::move(pmdid2), CName(&strName2));
 	CWStringConst strAlias2(GPOS_WSZ_LIT("Rel2"));
-	gpos::owner<CExpression *> pexprRel2 =
+	gpos::Ref<CExpression> pexprRel2 =
 		CTestUtils::PexprLogicalGet(mp, std::move(ptabdesc2), &strAlias2);
 
 	CWStringConst strName3(GPOS_WSZ_LIT("Rel3"));
-	gpos::owner<CMDIdGPDB *> pmdid3 =
+	gpos::Ref<CMDIdGPDB> pmdid3 =
 		GPOS_NEW(mp) CMDIdGPDB(GPOPT_TEST_REL_OID3, 1, 1);
-	gpos::owner<CTableDescriptor *> ptabdesc3 =
+	gpos::Ref<CTableDescriptor> ptabdesc3 =
 		CTestUtils::PtabdescCreate(mp, 3, std::move(pmdid3), CName(&strName3));
 	CWStringConst strAlias3(GPOS_WSZ_LIT("Rel3"));
-	gpos::owner<CExpression *> pexprRel3 =
+	gpos::Ref<CExpression> pexprRel3 =
 		CTestUtils::PexprLogicalGet(mp, std::move(ptabdesc3), &strAlias3);
 
-	gpos::owner<CExpression *> pexprJoin1 =
+	gpos::Ref<CExpression> pexprJoin1 =
 		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 			mp, std::move(pexprRel1), std::move(pexprRel2));
-	gpos::owner<CExpression *> pexprJoin2 =
+	gpos::Ref<CExpression> pexprJoin2 =
 		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 			mp, std::move(pexprJoin1), std::move(pexprRel3));
 
@@ -395,9 +395,9 @@ CPredicateUtilsTest::EresUnittest_Implication()
 	}
 
 	// imply new predicates by deriving constraints
-	gpos::owner<CExpression *> pexprConstraints =
-		CExpressionPreprocessor::PexprAddPredicatesFromConstraints(mp,
-																   pexprJoin2);
+	gpos::Ref<CExpression> pexprConstraints =
+		CExpressionPreprocessor::PexprAddPredicatesFromConstraints(
+			mp, pexprJoin2.get());
 
 	{
 		CAutoTrace at(mp);
@@ -408,8 +408,8 @@ CPredicateUtilsTest::EresUnittest_Implication()
 
 	// minimize join predicates by removing implied conjuncts
 	CExpressionHandle exprhdl(mp);
-	exprhdl.Attach(pexprConstraints);
-	gpos::owner<CExpression *> pexprMinimizedPred =
+	exprhdl.Attach(pexprConstraints.get());
+	gpos::Ref<CExpression> pexprMinimizedPred =
 		CPredicateUtils::PexprRemoveImpliedConjuncts(mp, (*pexprConstraints)[2],
 													 exprhdl);
 
@@ -419,20 +419,20 @@ CPredicateUtilsTest::EresUnittest_Implication()
 				<< *pexprMinimizedPred << std::endl;
 	}
 
-	gpos::owner<CExpressionArray *> pdrgpexprOriginalConjuncts =
+	gpos::Ref<CExpressionArray> pdrgpexprOriginalConjuncts =
 		CPredicateUtils::PdrgpexprConjuncts(mp, (*pexprConstraints)[2]);
-	gpos::owner<CExpressionArray *> pdrgpexprNewConjuncts =
-		CPredicateUtils::PdrgpexprConjuncts(mp, pexprMinimizedPred);
+	gpos::Ref<CExpressionArray> pdrgpexprNewConjuncts =
+		CPredicateUtils::PdrgpexprConjuncts(mp, pexprMinimizedPred.get());
 
 	GPOS_ASSERT(pdrgpexprNewConjuncts->Size() <
 				pdrgpexprOriginalConjuncts->Size());
 
 	// clean up
-	pdrgpexprOriginalConjuncts->Release();
-	pdrgpexprNewConjuncts->Release();
-	pexprJoin2->Release();
-	pexprConstraints->Release();
-	pexprMinimizedPred->Release();
+	;
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }

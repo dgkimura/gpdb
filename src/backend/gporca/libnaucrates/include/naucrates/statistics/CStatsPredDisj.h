@@ -38,17 +38,16 @@ private:
 	CStatsPredDisj &operator=(CStatsPredDisj &);
 
 	// array of filters
-	gpos::owner<CStatsPredPtrArry *> m_disj_pred_stats_array;
+	gpos::Ref<CStatsPredPtrArry> m_disj_pred_stats_array;
 
 public:
 	// ctor
-	explicit CStatsPredDisj(
-		gpos::owner<CStatsPredPtrArry *> disj_pred_stats_array);
+	explicit CStatsPredDisj(gpos::Ref<CStatsPredPtrArry> disj_pred_stats_array);
 
 	// dtor
 	~CStatsPredDisj() override
 	{
-		m_disj_pred_stats_array->Release();
+		;
 	}
 
 	// the column identifier on which the predicates are on
@@ -62,17 +61,17 @@ public:
 	}
 
 	// return the array of predicate filters
-	gpos::pointer<CStatsPredPtrArry *>
+	CStatsPredPtrArry *
 	GetDisjPredStatsArray() const
 	{
-		return m_disj_pred_stats_array;
+		return m_disj_pred_stats_array.get();
 	}
 
 	// sort the components of the disjunction
 	void Sort() const;
 
 	// return the point filter at a particular position
-	gpos::pointer<CStatsPred *> GetPredStats(ULONG pos) const;
+	CStatsPred *GetPredStats(ULONG pos) const;
 
 	// filter type id
 	EStatsPredType
@@ -82,11 +81,10 @@ public:
 	}
 
 	// return the column id of the filter based on the column ids of its child filters
-	static ULONG GetColId(
-		gpos::pointer<const CStatsPredPtrArry *> pdrgpstatspred);
+	static ULONG GetColId(const CStatsPredPtrArry *pdrgpstatspred);
 
 	// conversion function
-	static gpos::cast_func<CStatsPredDisj *>
+	static CStatsPredDisj *
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

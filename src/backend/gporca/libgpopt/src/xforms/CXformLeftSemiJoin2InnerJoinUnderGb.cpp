@@ -61,9 +61,8 @@ CXformLeftSemiJoin2InnerJoinUnderGb::CXformLeftSemiJoin2InnerJoinUnderGb(
 CXform::EXformPromise
 CXformLeftSemiJoin2InnerJoinUnderGb::Exfp(CExpressionHandle &exprhdl) const
 {
-	gpos::pointer<CColRefSet *> pcrsInnerOutput =
-		exprhdl.DeriveOutputColumns(1);
-	gpos::pointer<CExpression *> pexprScalar = exprhdl.PexprScalarExactChild(2);
+	CColRefSet *pcrsInnerOutput = exprhdl.DeriveOutputColumns(1);
+	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(2);
 	CAutoMemoryPool amp;
 	if (exprhdl.HasOuterRefs() || nullptr == exprhdl.DeriveKeyCollection(0) ||
 		nullptr == pexprScalar ||
@@ -85,10 +84,9 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftSemiJoin2InnerJoinUnderGb::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+CXformLeftSemiJoin2InnerJoinUnderGb::Transform(CXformContext *pxfctxt,
+											   CXformResult *pxfres,
+											   CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -101,20 +99,20 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform(
 	CExpression *pexprInner = (*pexpr)[1];
 	CExpression *pexprScalar = (*pexpr)[2];
 
-	pexprOuter->AddRef();
-	pexprInner->AddRef();
-	pexprScalar->AddRef();
+	;
+	;
+	;
 
-	gpos::owner<CColRefArray *> pdrgpcrKeys = nullptr;
-	gpos::owner<CColRefArray *> pdrgpcrGrouping =
+	gpos::Ref<CColRefArray> pdrgpcrKeys = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrGrouping =
 		CUtils::PdrgpcrGroupingKey(mp, pexprOuter, &pdrgpcrKeys);
 	GPOS_ASSERT(nullptr != pdrgpcrKeys);
 
-	gpos::owner<CExpression *> pexprInnerJoin =
+	gpos::Ref<CExpression> pexprInnerJoin =
 		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprOuter, pexprInner,
 													pexprScalar);
 
-	gpos::owner<CExpression *> pexprGb = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprGb = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 			mp, std::move(pdrgpcrGrouping),

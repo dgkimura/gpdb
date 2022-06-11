@@ -97,7 +97,7 @@ public:
 		const const_iterator end_;
 
 	public:
-		LegacyIterator(gpos::pointer<const UnorderedMap *> map)
+		LegacyIterator(const UnorderedMap *map)
 			: iterator_(map->begin()), end_(map->end())
 		{
 		}

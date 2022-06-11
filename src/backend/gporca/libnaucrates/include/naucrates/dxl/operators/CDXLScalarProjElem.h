@@ -63,8 +63,7 @@ public:
 	const CMDName *GetMdNameAlias() const;
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *,
-						gpos::pointer<const CDXLNode *>) const override;
+	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// check if given column is defined by operator
 	BOOL
@@ -74,7 +73,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarProjElem *>
+	static CDXLScalarProjElem *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -94,7 +93,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

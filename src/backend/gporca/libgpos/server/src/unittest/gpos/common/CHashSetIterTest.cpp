@@ -45,29 +45,29 @@ CHashSetIterTest::EresUnittest_Basic()
 		UlongHashSetIter;
 
 	// using N - 2 slots guarantees collisions
-	gpos::owner<UlongHashSet *> ps = GPOS_NEW(mp) UlongHashSet(mp, ulCnt - 2);
+	gpos::Ref<UlongHashSet> ps = GPOS_NEW(mp) UlongHashSet(mp, ulCnt - 2);
 
 #ifdef GPOS_DEBUG
 
 	// iteration over empty map
-	UlongHashSetIter siEmpty(ps);
+	UlongHashSetIter siEmpty(ps.get());
 	GPOS_ASSERT(!siEmpty.Advance());
 
 #endif	// GPOS_DEBUG
 
 	typedef CDynamicPtrArray<const ULONG, CleanupNULL> ULongPtrArray;
-	CAutoRef<ULongPtrArray> pdrgpulValues(GPOS_NEW(mp) ULongPtrArray(mp));
+	gpos::Ref<ULongPtrArray> pdrgpulValues(GPOS_NEW(mp) ULongPtrArray(mp));
 	// load map and iterate over it after each step
 	for (ULONG ul = 0; ul < ulCnt; ++ul)
 	{
 		(void) ps->Insert(&rgul[ul]);
 		pdrgpulValues->Append(&rgul[ul]);
 
-		CAutoRef<ULongPtrArray> pdrgpulIterValues(GPOS_NEW(mp)
-													  ULongPtrArray(mp));
+		gpos::Ref<ULongPtrArray> pdrgpulIterValues(GPOS_NEW(mp)
+													   ULongPtrArray(mp));
 
 		// iterate over full set
-		UlongHashSetIter si(ps);
+		UlongHashSetIter si(ps.get());
 		while (si.Advance())
 		{
 			pdrgpulIterValues->Append(si.Get());
@@ -75,10 +75,10 @@ CHashSetIterTest::EresUnittest_Basic()
 
 		pdrgpulIterValues->Sort();
 
-		GPOS_ASSERT(pdrgpulValues->Equals(pdrgpulIterValues.Value()));
+		GPOS_ASSERT(pdrgpulValues->Equals(pdrgpulIterValues.get()));
 	}
 
-	ps->Release();
+	;
 
 	return GPOS_OK;
 }

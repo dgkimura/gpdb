@@ -69,10 +69,9 @@ CXformLeftSemiJoin2InnerJoin::Exfp(CExpressionHandle &exprhdl) const
 		return ExfpNone;
 	}
 
-	gpos::pointer<CColRefSet *> pcrsInnerOutput =
+	CColRefSet *pcrsInnerOutput =
 		exprhdl.DeriveOutputColumns(1 /*child_index*/);
-	gpos::pointer<CExpression *> pexprScalar =
-		exprhdl.PexprScalarExactChild(2 /*child_index*/);
+	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(2 /*child_index*/);
 	CAutoMemoryPool amp;
 
 	// examine join predicate to determine xform applicability
@@ -95,10 +94,9 @@ CXformLeftSemiJoin2InnerJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftSemiJoin2InnerJoin::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+CXformLeftSemiJoin2InnerJoin::Transform(CXformContext *pxfctxt,
+										CXformResult *pxfres,
+										CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -111,28 +109,27 @@ CXformLeftSemiJoin2InnerJoin::Transform(
 	CExpression *pexprInner = (*pexpr)[1];
 	CExpression *pexprScalar = (*pexpr)[2];
 
-	pexprOuter->AddRef();
-	pexprInner->AddRef();
-	pexprScalar->AddRef();
+	;
+	;
+	;
 
 	// construct grouping columns by collecting used columns in the join predicate
 	// that come from join's inner child
-	gpos::pointer<CColRefSet *> pcrsOuterOutput =
-		pexprOuter->DeriveOutputColumns();
-	gpos::pointer<CColRefSet *> pcrsUsed = pexprScalar->DeriveUsedColumns();
-	gpos::owner<CColRefSet *> pcrsGb = GPOS_NEW(mp) CColRefSet(mp);
+	CColRefSet *pcrsOuterOutput = pexprOuter->DeriveOutputColumns();
+	CColRefSet *pcrsUsed = pexprScalar->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsGb = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGb->Include(pcrsUsed);
 	pcrsGb->Difference(pcrsOuterOutput);
 	GPOS_ASSERT(0 < pcrsGb->Size());
 
-	gpos::pointer<CKeyCollection *> pkc = pexprInner->DeriveKeyCollection();
+	CKeyCollection *pkc = pexprInner->DeriveKeyCollection();
 	if (nullptr == pkc ||
-		(nullptr != pkc && !pkc->FKey(pcrsGb, false /*fExactMatch*/)))
+		(nullptr != pkc && !pkc->FKey(pcrsGb.get(), false /*fExactMatch*/)))
 	{
 		// grouping columns do not cover a key on the inner side,
 		// we need to create a group by on inner side
-		gpos::owner<CColRefArray *> colref_array = pcrsGb->Pdrgpcr(mp);
-		gpos::owner<CExpression *> pexprGb = GPOS_NEW(mp) CExpression(
+		gpos::Ref<CColRefArray> colref_array = pcrsGb->Pdrgpcr(mp);
+		gpos::Ref<CExpression> pexprGb = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CLogicalGbAgg(
 				mp, colref_array, COperator::EgbaggtypeGlobal /*egbaggtype*/),
@@ -141,11 +138,11 @@ CXformLeftSemiJoin2InnerJoin::Transform(
 		pexprInner = pexprGb;
 	}
 
-	gpos::owner<CExpression *> pexprInnerJoin =
+	gpos::Ref<CExpression> pexprInnerJoin =
 		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprOuter, pexprInner,
 													pexprScalar);
 
-	pcrsGb->Release();
+	;
 	pxfres->Add(std::move(pexprInnerJoin));
 }
 

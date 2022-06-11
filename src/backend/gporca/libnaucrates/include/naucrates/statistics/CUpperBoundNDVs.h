@@ -41,7 +41,7 @@ class CUpperBoundNDVs
 {
 private:
 	// set of column references
-	gpos::owner<CColRefSet *> m_column_refset;
+	gpos::Ref<CColRefSet> m_column_refset;
 
 	// upper bound of ndvs
 	CDouble m_upper_bound_ndv;
@@ -50,7 +50,7 @@ public:
 	CUpperBoundNDVs(const CUpperBoundNDVs &) = delete;
 
 	// ctor
-	CUpperBoundNDVs(gpos::owner<CColRefSet *> column_refset,
+	CUpperBoundNDVs(gpos::Ref<CColRefSet> column_refset,
 					CDouble upper_bound_ndv)
 		: m_column_refset(std::move(column_refset)),
 		  m_upper_bound_ndv(upper_bound_ndv)
@@ -61,7 +61,7 @@ public:
 	// dtor
 	~CUpperBoundNDVs()
 	{
-		m_column_refset->Release();
+		;
 	}
 
 	// return the upper bound of ndvs
@@ -86,8 +86,7 @@ public:
 	// copy upper bound ndvs with remapped column id; function will
 	// return null if there is no mapping found for any of the columns
 	CUpperBoundNDVs *CopyUpperBoundNDVWithRemap(
-		CMemoryPool *mp,
-		gpos::pointer<UlongToColRefMap *> colid_to_colref_map) const;
+		CMemoryPool *mp, UlongToColRefMap *colid_to_colref_map) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;

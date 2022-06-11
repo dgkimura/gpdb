@@ -71,7 +71,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CStatsPredUnsupported *>
+	static CStatsPredUnsupported *
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

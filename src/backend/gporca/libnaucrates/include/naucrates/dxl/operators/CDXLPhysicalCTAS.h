@@ -43,19 +43,19 @@ private:
 	CMDName *m_mdname_rel;
 
 	// list of columns
-	gpos::owner<CDXLColDescrArray *> m_col_descr_array;
+	gpos::Ref<CDXLColDescrArray> m_col_descr_array;
 
 	// storage options
-	gpos::owner<CDXLCtasStorageOptions *> m_dxl_ctas_storage_option;
+	gpos::Ref<CDXLCtasStorageOptions> m_dxl_ctas_storage_option;
 
 	// distribution policy
 	IMDRelation::Ereldistrpolicy m_rel_distr_policy;
 
 	// list of distribution column positions
-	gpos::owner<ULongPtrArray *> m_distr_column_pos_array;
+	gpos::Ref<ULongPtrArray> m_distr_column_pos_array;
 
 	// list of distriution column opclasses
-	gpos::owner<IMdIdArray *> m_distr_opclasses;
+	gpos::Ref<IMdIdArray> m_distr_opclasses;
 
 	// is this a temporary table
 	BOOL m_is_temp_table;
@@ -67,25 +67,26 @@ private:
 	IMDRelation::Erelstoragetype m_rel_storage_type;
 
 	// list of source column ids
-	gpos::owner<ULongPtrArray *> m_src_colids_array;
+	gpos::Ref<ULongPtrArray> m_src_colids_array;
 
 	// list of vartypmod
-	gpos::owner<IntPtrArray *> m_vartypemod_array;
+	gpos::Ref<IntPtrArray> m_vartypemod_array;
 
 public:
 	CDXLPhysicalCTAS(CDXLPhysicalCTAS &) = delete;
 
 	// ctor
-	CDXLPhysicalCTAS(
-		CMemoryPool *mp, CMDName *mdname_schema, CMDName *mdname_rel,
-		gpos::owner<CDXLColDescrArray *> dxl_col_descr_array,
-		gpos::owner<CDXLCtasStorageOptions *> dxl_ctas_storage_options,
-		IMDRelation::Ereldistrpolicy rel_distr_policy,
-		gpos::owner<ULongPtrArray *> distr_column_pos_array,
-		gpos::owner<IMdIdArray *> distr_opclasses, BOOL is_temporary,
-		BOOL has_oids, IMDRelation::Erelstoragetype rel_storage_type,
-		gpos::owner<ULongPtrArray *> src_colids_array,
-		gpos::owner<IntPtrArray *> vartypemod_array);
+	CDXLPhysicalCTAS(CMemoryPool *mp, CMDName *mdname_schema,
+					 CMDName *mdname_rel,
+					 gpos::Ref<CDXLColDescrArray> dxl_col_descr_array,
+					 gpos::Ref<CDXLCtasStorageOptions> dxl_ctas_storage_options,
+					 IMDRelation::Ereldistrpolicy rel_distr_policy,
+					 gpos::Ref<ULongPtrArray> distr_column_pos_array,
+					 gpos::Ref<IMdIdArray> distr_opclasses, BOOL is_temporary,
+					 BOOL has_oids,
+					 IMDRelation::Erelstoragetype rel_storage_type,
+					 gpos::Ref<ULongPtrArray> src_colids_array,
+					 gpos::Ref<IntPtrArray> vartypemod_array);
 
 	// dtor
 	~CDXLPhysicalCTAS() override;
@@ -97,10 +98,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// column descriptors
-	gpos::pointer<CDXLColDescrArray *>
+	CDXLColDescrArray *
 	GetDXLColumnDescrArray() const
 	{
-		return m_col_descr_array;
+		return m_col_descr_array.get();
 	}
 
 	// distribution type
@@ -111,24 +112,24 @@ public:
 	}
 
 	// distribution column positions
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetDistrColPosArray() const
 	{
-		return m_distr_column_pos_array;
+		return m_distr_column_pos_array.get();
 	}
 
 	// source column ids
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetSrcColidsArray() const
 	{
-		return m_src_colids_array;
+		return m_src_colids_array.get();
 	}
 
 	// list of vartypmod for target expressions
-	gpos::pointer<IntPtrArray *>
+	IntPtrArray *
 	GetVarTypeModArray() const
 	{
-		return m_vartypemod_array;
+		return m_vartypemod_array.get();
 	}
 
 	// table name
@@ -153,30 +154,30 @@ public:
 	}
 
 	// CTAS storage options
-	gpos::pointer<CDXLCtasStorageOptions *>
+	CDXLCtasStorageOptions *
 	GetDxlCtasStorageOption() const
 	{
-		return m_dxl_ctas_storage_option;
+		return m_dxl_ctas_storage_option.get();
 	}
 
-	gpos::pointer<IMdIdArray *>
+	IMdIdArray *
 	GetDistrOpclasses() const
 	{
-		return m_distr_opclasses;
+		return m_distr_opclasses.get();
 	}
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalCTAS *>
+	static CDXLPhysicalCTAS *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

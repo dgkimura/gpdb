@@ -34,17 +34,17 @@ class CDXLScalarNullIf : public CDXLScalar
 {
 private:
 	// operator number
-	gpos::owner<IMDId *> m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// return type
-	gpos::owner<IMDId *> m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CDXLScalarNullIf(CDXLScalarNullIf &) = delete;
 
 	// ctor
-	CDXLScalarNullIf(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
-					 gpos::owner<IMDId *> mdid_type);
+	CDXLScalarNullIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+					 gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CDXLScalarNullIf() override;
@@ -56,20 +56,20 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// operator id
-	virtual gpos::pointer<IMDId *> MdIdOp() const;
+	virtual IMDId *MdIdOp() const;
 
 	// return type
-	virtual gpos::pointer<IMDId *> MdidType() const;
+	virtual IMDId *MdidType() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// does the operator return a boolean result
 	BOOL HasBoolResult(CMDAccessor *md_accessor) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarNullIf *>
+	static CDXLScalarNullIf *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -81,7 +81,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

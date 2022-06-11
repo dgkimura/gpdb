@@ -39,8 +39,7 @@ class CDrvdPropPlan;
 using OPTCTXT_PTR = COptimizationContext *;
 
 // array of optimization contexts
-using COptimizationContextArray =
-	CDynamicPtrArray<COptimizationContext, CleanupRelease>;
+using COptimizationContextArray = gpos::Vector<gpos::Ref<COptimizationContext>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -76,22 +75,22 @@ private:
 	ULONG m_id{GPOPT_INVALID_OPTCTXT_ID};
 
 	// back pointer to owner group, used for debugging
-	gpos::pointer<CGroup *> m_pgroup{nullptr};
+	CGroup *m_pgroup{nullptr};
 
 	// required plan properties
-	gpos::owner<CReqdPropPlan *> m_prpp{nullptr};
+	gpos::Ref<CReqdPropPlan> m_prpp{nullptr};
 
 	// required relational properties -- used for stats computation during costing
-	gpos::owner<CReqdPropRelational *> m_prprel{nullptr};
+	gpos::Ref<CReqdPropRelational> m_prprel{nullptr};
 
 	// stats of previously optimized expressions
-	gpos::owner<IStatisticsArray *> m_pdrgpstatCtxt{nullptr};
+	gpos::Ref<IStatisticsArray> m_pdrgpstatCtxt{nullptr};
 
 	// index of search stage where context is generated
 	ULONG m_ulSearchStageIndex{0};
 
 	// best cost context under the optimization context
-	gpos::pointer<CCostContext *> m_pccBest{nullptr};
+	CCostContext *m_pccBest{nullptr};
 
 	// optimization context state
 	EState m_estate{estUnoptimized};
@@ -103,48 +102,40 @@ private:
 	CJobQueue m_jqOptimization;
 
 	// internal matching function
-	BOOL FMatchSortColumns(
-		gpos::pointer<const COptimizationContext *> poc) const;
+	BOOL FMatchSortColumns(const COptimizationContext *poc) const;
 
 	// private dummy ctor; used for creating invalid context
 	COptimizationContext() = default;
 
 	// check if Agg node should be optimized for the given context
-	static BOOL FOptimizeAgg(CMemoryPool *mp,
-							 gpos::pointer<CGroupExpression *> pgexprParent,
-							 gpos::pointer<CGroupExpression *> pgexprAgg,
-							 gpos::pointer<COptimizationContext *> poc,
-							 ULONG ulSearchStages);
+	static BOOL FOptimizeAgg(CMemoryPool *mp, CGroupExpression *pgexprParent,
+							 CGroupExpression *pgexprAgg,
+							 COptimizationContext *poc, ULONG ulSearchStages);
 
 	// check if Sort node should be optimized for the given context
-	static BOOL FOptimizeSort(CMemoryPool *mp,
-							  gpos::pointer<CGroupExpression *> pgexprParent,
-							  gpos::pointer<CGroupExpression *> pgexprSort,
-							  gpos::pointer<COptimizationContext *> poc,
-							  ULONG ulSearchStages);
+	static BOOL FOptimizeSort(CMemoryPool *mp, CGroupExpression *pgexprParent,
+							  CGroupExpression *pgexprSort,
+							  COptimizationContext *poc, ULONG ulSearchStages);
 
 	// check if Motion node should be optimized for the given context
-	static BOOL FOptimizeMotion(CMemoryPool *mp,
-								gpos::pointer<CGroupExpression *> pgexprParent,
-								gpos::pointer<CGroupExpression *> pgexprMotion,
-								gpos::pointer<COptimizationContext *> poc,
+	static BOOL FOptimizeMotion(CMemoryPool *mp, CGroupExpression *pgexprParent,
+								CGroupExpression *pgexprMotion,
+								COptimizationContext *poc,
 								ULONG ulSearchStages);
 
 	// check if NL join node should be optimized for the given context
-	static BOOL FOptimizeNLJoin(CMemoryPool *mp,
-								gpos::pointer<CGroupExpression *> pgexprParent,
-								gpos::pointer<CGroupExpression *> pgexprMotion,
-								gpos::pointer<COptimizationContext *> poc,
+	static BOOL FOptimizeNLJoin(CMemoryPool *mp, CGroupExpression *pgexprParent,
+								CGroupExpression *pgexprMotion,
+								COptimizationContext *poc,
 								ULONG ulSearchStages);
 
 public:
 	// ctor
 	COptimizationContext(
-		CMemoryPool *mp, gpos::pointer<CGroup *> pgroup,
-		gpos::owner<CReqdPropPlan *> prpp,
-		gpos::owner<CReqdPropRelational *>
+		CMemoryPool *mp, CGroup *pgroup, gpos::Ref<CReqdPropPlan> prpp,
+		gpos::Ref<CReqdPropRelational>
 			prprel,	 // required relational props -- used during stats derivation
-		gpos::owner<IStatisticsArray *>
+		gpos::Ref<IStatisticsArray>
 			stats_ctxt,	 // stats of previously optimized expressions
 		ULONG ulSearchStageIndex)
 		: m_mp(mp),
@@ -167,7 +158,7 @@ public:
 	CGroupExpression *PgexprBest() const;
 
 	// match optimization contexts
-	BOOL Matches(gpos::pointer<const COptimizationContext *> poc) const;
+	BOOL Matches(const COptimizationContext *poc) const;
 
 	// get id
 	ULONG
@@ -177,31 +168,31 @@ public:
 	}
 
 	// group accessor
-	gpos::pointer<CGroup *>
+	CGroup *
 	Pgroup() const
 	{
 		return m_pgroup;
 	}
 
 	// required plan properties accessor
-	gpos::pointer<CReqdPropPlan *>
+	CReqdPropPlan *
 	Prpp() const
 	{
-		return m_prpp;
+		return m_prpp.get();
 	}
 
 	// required relatoinal properties accessor
-	gpos::pointer<CReqdPropRelational *>
+	CReqdPropRelational *
 	GetReqdRelationalProps() const
 	{
-		return m_prprel;
+		return m_prprel.get();
 	}
 
 	// stats of previously optimized expressions
-	gpos::pointer<IStatisticsArray *>
+	IStatisticsArray *
 	Pdrgpstat() const
 	{
-		return m_pdrgpstatCtxt;
+		return m_pdrgpstatCtxt.get();
 	}
 
 	// search stage index accessor
@@ -212,7 +203,7 @@ public:
 	}
 
 	// best cost context accessor
-	gpos::pointer<CCostContext *>
+	CCostContext *
 	PccBest() const
 	{
 		return m_pccBest;
@@ -258,7 +249,7 @@ public:
 	}
 
 	// set best cost context
-	void SetBest(gpos::pointer<CCostContext *> pcc);
+	void SetBest(CCostContext *pcc);
 
 	// comparison operator for hashtables
 	BOOL
@@ -311,7 +302,7 @@ public:
 
 	// hash function used for computing stats during costing
 	static ULONG
-	UlHashForStats(gpos::pointer<const COptimizationContext *> poc)
+	UlHashForStats(const COptimizationContext *poc)
 	{
 		GPOS_ASSERT(m_pocInvalid != poc);
 
@@ -319,26 +310,22 @@ public:
 	}
 
 	// equality function used for computing stats during costing
-	static BOOL FEqualForStats(
-		gpos::pointer<const COptimizationContext *> pocLeft,
-		gpos::pointer<const COptimizationContext *> pocRight);
+	static BOOL FEqualForStats(const COptimizationContext *pocLeft,
+							   const COptimizationContext *pocRight);
 
 	// return true if given group expression should be optimized under given context
-	static BOOL FOptimize(CMemoryPool *mp,
-						  gpos::pointer<CGroupExpression *> pgexprParent,
-						  gpos::pointer<CGroupExpression *> pgexprChild,
-						  gpos::pointer<COptimizationContext *> pocChild,
-						  ULONG ulSearchStages);
+	static BOOL FOptimize(CMemoryPool *mp, CGroupExpression *pgexprParent,
+						  CGroupExpression *pgexprChild,
+						  COptimizationContext *pocChild, ULONG ulSearchStages);
 
 	// compare array of contexts based on context ids
-	static BOOL FEqualContextIds(
-		gpos::pointer<COptimizationContextArray *> pdrgpocFst,
-		gpos::pointer<COptimizationContextArray *> pdrgpocSnd);
+	static BOOL FEqualContextIds(COptimizationContextArray *pdrgpocFst,
+								 COptimizationContextArray *pdrgpocSnd);
 
 	// compute required properties to CTE producer based on plan properties of CTE consumer
-	static gpos::owner<CReqdPropPlan *> PrppCTEProducer(
-		CMemoryPool *mp, gpos::pointer<COptimizationContext *> poc,
-		ULONG ulSearchStages);
+	static gpos::Ref<CReqdPropPlan> PrppCTEProducer(CMemoryPool *mp,
+													COptimizationContext *poc,
+													ULONG ulSearchStages);
 
 	// link for optimization context hash table in CGroup
 	SLink m_link;

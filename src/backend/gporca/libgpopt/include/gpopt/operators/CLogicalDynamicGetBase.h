@@ -36,19 +36,19 @@ protected:
 	const CName *m_pnameAlias;
 
 	// table descriptor
-	gpos::owner<CTableDescriptor *> m_ptabdesc;
+	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// dynamic scan id
 	ULONG m_scan_id;
 
 	// output columns
-	gpos::owner<CColRefArray *> m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> m_pdrgpcrOutput;
 
 	// partition keys
-	gpos::owner<CColRef2dArray *> m_pdrgpdrgpcrPart;
+	gpos::Ref<CColRef2dArray> m_pdrgpdrgpcrPart;
 
 	// distribution columns (empty for master only tables)
-	gpos::owner<CColRefSet *> m_pcrsDist;
+	gpos::Ref<CColRefSet> m_pcrsDist;
 
 	// private copy ctor
 	CLogicalDynamicGetBase(const CLogicalDynamicGetBase &);
@@ -59,41 +59,38 @@ protected:
 							ULongPtrArray *pdrgpulPos) const;
 
 	// Child partitions
-	gpos::owner<IMdIdArray *> m_partition_mdids = nullptr;
+	gpos::Ref<IMdIdArray> m_partition_mdids = nullptr;
 	// Map of Root colref -> col index in child tabledesc
 	// per child partition in m_partition_mdid
-	gpos::owner<ColRefToUlongMapArray *> m_root_col_mapping_per_part = nullptr;
+	gpos::Ref<ColRefToUlongMapArray> m_root_col_mapping_per_part = nullptr;
 
 	// Construct a mapping from each column in root table to an index in each
 	// child partition's table descr by matching column names$
-	static gpos::owner<ColRefToUlongMapArray *> ConstructRootColMappingPerPart(
-		CMemoryPool *mp, gpos::pointer<CColRefArray *> root_cols,
-		gpos::pointer<IMdIdArray *> partition_mdids);
+	static gpos::Ref<ColRefToUlongMapArray> ConstructRootColMappingPerPart(
+		CMemoryPool *mp, CColRefArray *root_cols, IMdIdArray *partition_mdids);
 
 public:
 	// ctors
 	explicit CLogicalDynamicGetBase(CMemoryPool *mp);
 
 	CLogicalDynamicGetBase(CMemoryPool *mp, const CName *pnameAlias,
-						   gpos::owner<CTableDescriptor *> ptabdesc,
-						   ULONG scan_id,
-						   gpos::owner<CColRefArray *> pdrgpcrOutput,
-						   gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
-						   gpos::owner<IMdIdArray *> partition_mdids);
+						   gpos::Ref<CTableDescriptor> ptabdesc, ULONG scan_id,
+						   gpos::Ref<CColRefArray> pdrgpcrOutput,
+						   gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+						   gpos::Ref<IMdIdArray> partition_mdids);
 
 	CLogicalDynamicGetBase(CMemoryPool *mp, const CName *pnameAlias,
-						   gpos::owner<CTableDescriptor *> ptabdesc,
-						   ULONG scan_id,
-						   gpos::owner<IMdIdArray *> partition_mdids);
+						   gpos::Ref<CTableDescriptor> ptabdesc, ULONG scan_id,
+						   gpos::Ref<IMdIdArray> partition_mdids);
 
 	// dtor
 	~CLogicalDynamicGetBase() override;
 
 	// accessors
-	virtual gpos::pointer<CColRefArray *>
+	virtual CColRefArray *
 	PdrgpcrOutput() const
 	{
-		return m_pdrgpcrOutput;
+		return m_pdrgpcrOutput.get();
 	}
 
 	// return table's name
@@ -104,17 +101,17 @@ public:
 	}
 
 	// distribution columns
-	virtual gpos::pointer<const CColRefSet *>
+	virtual const CColRefSet *
 	PcrsDist() const
 	{
-		return m_pcrsDist;
+		return m_pcrsDist.get();
 	}
 
 	// return table's descriptor
-	virtual gpos::pointer<CTableDescriptor *>
+	virtual CTableDescriptor *
 	Ptabdesc() const
 	{
-		return m_ptabdesc;
+		return m_ptabdesc.get();
 	}
 
 	// return scan id
@@ -125,10 +122,10 @@ public:
 	}
 
 	// return the partition columns
-	virtual gpos::pointer<CColRef2dArray *>
+	virtual CColRef2dArray *
 	PdrgpdrgpcrPart() const
 	{
-		return m_pdrgpdrgpcrPart;
+		return m_pdrgpdrgpcrPart.get();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -136,19 +133,19 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	gpos::owner<CColRefSet *> DeriveOutputColumns(CMemoryPool *,
-												  CExpressionHandle &) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(CMemoryPool *,
+											  CExpressionHandle &) override;
 
 	// derive keys
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	gpos::owner<CPartInfo *> DerivePartitionInfo(
+	gpos::Ref<CPartInfo> DerivePartitionInfo(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *> DerivePropertyConstraint(
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive join depth
@@ -161,24 +158,24 @@ public:
 	}
 
 	// derive table descriptor
-	gpos::pointer<CTableDescriptor *>
+	CTableDescriptor *
 	DeriveTableDescriptor(CMemoryPool *,	   // mp
 						  CExpressionHandle &  // exprhdl
 	) const override
 	{
-		return m_ptabdesc;
+		return m_ptabdesc.get();
 	}
 
-	gpos::pointer<IMdIdArray *>
+	IMdIdArray *
 	GetPartitionMdids() const
 	{
-		return m_partition_mdids;
+		return m_partition_mdids.get();
 	}
 
-	gpos::pointer<ColRefToUlongMapArray *>
+	ColRefToUlongMapArray *
 	GetRootColMappingPerPart() const
 	{
-		return m_root_col_mapping_per_part;
+		return m_root_col_mapping_per_part.get();
 	}
 };	// class CLogicalDynamicGetBase
 

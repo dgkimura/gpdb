@@ -47,7 +47,7 @@ CParseHandlerMetadataObject::CParseHandlerMetadataObject(
 //---------------------------------------------------------------------------
 CParseHandlerMetadataObject::~CParseHandlerMetadataObject()
 {
-	CRefCount::SafeRelease(m_imd_obj);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -58,10 +58,10 @@ CParseHandlerMetadataObject::~CParseHandlerMetadataObject()
 //		Returns the constructed metadata object.
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDCacheObject *>
+IMDCacheObject *
 CParseHandlerMetadataObject::GetImdObj() const
 {
-	return m_imd_obj;
+	return m_imd_obj.get();
 }
 
 

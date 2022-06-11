@@ -31,9 +31,9 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CSerializableQuery::CSerializableQuery(
-	CMemoryPool *mp, gpos::pointer<const CDXLNode *> query,
-	gpos::pointer<const CDXLNodeArray *> query_output_dxlnode_array,
-	gpos::pointer<const CDXLNodeArray *> cte_producers)
+	CMemoryPool *mp, const CDXLNode *query,
+	const CDXLNodeArray *query_output_dxlnode_array,
+	const CDXLNodeArray *cte_producers)
 	: CSerializable(),
 	  m_mp(mp),
 	  m_query_dxl_root(query),

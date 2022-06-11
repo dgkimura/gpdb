@@ -35,28 +35,28 @@ class CParseHandlerMDGPDBScalarOp : public CParseHandlerMetadataObject
 {
 private:
 	// id and version
-	gpos::pointer<IMDId *> m_mdid;
+	IMDId *m_mdid;
 
 	// name
 	CMDName *m_mdname;
 
 	// type of left operand
-	gpos::pointer<IMDId *> m_mdid_type_left;
+	IMDId *m_mdid_type_left;
 
 	// type of right operand
-	gpos::pointer<IMDId *> m_mdid_type_right;
+	IMDId *m_mdid_type_right;
 
 	// type of result operand
-	gpos::pointer<IMDId *> m_mdid_type_result;
+	IMDId *m_mdid_type_result;
 
 	// id of function which implements the operator
-	gpos::pointer<IMDId *> m_func_mdid;
+	IMDId *m_func_mdid;
 
 	// id of commute operator
-	gpos::pointer<IMDId *> m_mdid_commute_opr;
+	IMDId *m_mdid_commute_opr;
 
 	// id of inverse operator
-	gpos::pointer<IMDId *> m_mdid_inverse_opr;
+	IMDId *m_mdid_inverse_opr;
 
 	// comparison type
 	IMDType::ECmpType m_comparision_type;
@@ -64,8 +64,8 @@ private:
 	// does operator return NULL on NULL input?
 	BOOL m_returns_null_on_null_input;
 
-	gpos::pointer<IMDId *> m_mdid_hash_opfamily;
-	gpos::pointer<IMDId *> m_mdid_legacy_hash_opfamily;
+	IMDId *m_mdid_hash_opfamily;
+	IMDId *m_mdid_legacy_hash_opfamily;
 
 	// preserves NDVs of inputs
 	BOOL m_is_ndv_preserving;

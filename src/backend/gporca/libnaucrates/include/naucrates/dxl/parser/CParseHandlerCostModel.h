@@ -39,7 +39,7 @@ private:
 	ICostModel::ECostModelType m_cost_model_type;
 	ULONG m_num_of_segments;
 	// cost model
-	gpos::owner<ICostModel *> m_cost_model;
+	gpos::Ref<ICostModel> m_cost_model;
 
 	CParseHandlerCostParams *m_parse_handler_cost_params;
 
@@ -69,7 +69,7 @@ public:
 	~CParseHandlerCostModel() override;
 
 	// cost model
-	gpos::pointer<ICostModel *> GetCostModel() const;
+	ICostModel *GetCostModel() const;
 };
 }  // namespace gpdxl
 

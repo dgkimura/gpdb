@@ -71,15 +71,15 @@ CDatumTest::EresUnittest_Basics()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	using Pfpdatum = gpos::owner<IDatum *> (*)(CMemoryPool *, BOOL);
+	using Pfpdatum = gpos::Ref<IDatum> (*)(CMemoryPool *, BOOL);
 
 	Pfpdatum rgpf[] = {
 		CreateInt2Datum, CreateInt4Datum, CreateInt8Datum,
@@ -100,10 +100,10 @@ CDatumTest::EresUnittest_Basics()
 
 			// generate datum
 			BOOL is_null = rgf[ul2];
-			gpos::owner<IDatum *> datum = rgpf[ul1](mp, is_null);
-			gpos::owner<IDatum *> pdatumCopy = datum->MakeCopy(mp);
+			gpos::Ref<IDatum> datum = rgpf[ul1](mp, is_null);
+			gpos::Ref<IDatum> pdatumCopy = datum->MakeCopy(mp);
 
-			GPOS_ASSERT(datum->Matches(pdatumCopy));
+			GPOS_ASSERT(datum->Matches(pdatumCopy.get()));
 
 			const CWStringConst *pstrDatum = datum->GetStrRepr(mp);
 
@@ -131,8 +131,8 @@ CDatumTest::EresUnittest_Basics()
 			}
 
 			// cleanup
-			datum->Release();
-			pdatumCopy->Release();
+			;
+			;
 			GPOS_DELETE(pstrDatum);
 		}
 	}
@@ -149,7 +149,7 @@ CDatumTest::EresUnittest_Basics()
 //		Create an oid datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CDatumTest::CreateOidDatum(CMemoryPool *mp, BOOL is_null)
 {
 	return GPOS_NEW(mp)
@@ -164,7 +164,7 @@ CDatumTest::CreateOidDatum(CMemoryPool *mp, BOOL is_null)
 //		Create an int2 datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CDatumTest::CreateInt2Datum(CMemoryPool *mp, BOOL is_null)
 {
 	return GPOS_NEW(mp)
@@ -179,7 +179,7 @@ CDatumTest::CreateInt2Datum(CMemoryPool *mp, BOOL is_null)
 //		Create an int4 datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CDatumTest::CreateInt4Datum(CMemoryPool *mp, BOOL is_null)
 {
 	return GPOS_NEW(mp)
@@ -194,7 +194,7 @@ CDatumTest::CreateInt4Datum(CMemoryPool *mp, BOOL is_null)
 //		Create an int8 datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CDatumTest::CreateInt8Datum(CMemoryPool *mp, BOOL is_null)
 {
 	return GPOS_NEW(mp)
@@ -209,7 +209,7 @@ CDatumTest::CreateInt8Datum(CMemoryPool *mp, BOOL is_null)
 //		Create a bool datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CDatumTest::CreateBoolDatum(CMemoryPool *mp, BOOL is_null)
 {
 	return GPOS_NEW(mp)
@@ -224,10 +224,10 @@ CDatumTest::CreateBoolDatum(CMemoryPool *mp, BOOL is_null)
 //		Create a generic datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CDatumTest::CreateGenericDatum(CMemoryPool *mp, BOOL is_null)
 {
-	gpos::owner<CMDIdGPDB *> pmdidChar = GPOS_NEW(mp) CMDIdGPDB(GPDB_CHAR);
+	gpos::Ref<CMDIdGPDB> pmdidChar = GPOS_NEW(mp) CMDIdGPDB(GPDB_CHAR);
 
 	const CHAR *val = "test";
 	return GPOS_NEW(mp)
@@ -252,8 +252,8 @@ CDatumTest::StatsComparisonDoubleEqualWithinEpsilon()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -263,18 +263,18 @@ CDatumTest::StatsComparisonDoubleEqualWithinEpsilon()
 	// create accesssor
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	gpos::owner<IMDId *> mdid1 = GPOS_NEW(mp) CMDIdGPDB(GPDB_FLOAT8);
-	gpos::owner<IDatum *> datum1 = CTestUtils::CreateDoubleDatum(
+	gpos::Ref<IMDId> mdid1 = GPOS_NEW(mp) CMDIdGPDB(GPDB_FLOAT8);
+	gpos::Ref<IDatum> datum1 = CTestUtils::CreateDoubleDatum(
 		mp, md_accessor, mdid1, CDouble(631.82140500000003));
 
-	gpos::owner<IMDId *> mdid2 = GPOS_NEW(mp) CMDIdGPDB(GPDB_FLOAT8);
-	gpos::owner<IDatum *> datum2 = CTestUtils::CreateDoubleDatum(
+	gpos::Ref<IMDId> mdid2 = GPOS_NEW(mp) CMDIdGPDB(GPDB_FLOAT8);
+	gpos::Ref<IDatum> datum2 = CTestUtils::CreateDoubleDatum(
 		mp, md_accessor, mdid2, CDouble(631.82140700000002));
 
-	BOOL isEqual = datum1->StatsAreEqual(datum2);
-	BOOL isLessThan = datum1->StatsAreLessThan(datum2);
-	datum1->Release();
-	datum2->Release();
+	BOOL isEqual = datum1->StatsAreEqual(datum2.get());
+	BOOL isLessThan = datum1->StatsAreLessThan(datum2.get());
+	;
+	;
 
 	if (isEqual || !isLessThan)
 	{
@@ -299,8 +299,8 @@ CDatumTest::StatsComparisonDoubleLessThan()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -310,18 +310,18 @@ CDatumTest::StatsComparisonDoubleLessThan()
 	// create accesssor
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	gpos::owner<IMDId *> mdid1 = GPOS_NEW(mp) CMDIdGPDB(GPDB_FLOAT8);
-	gpos::owner<IDatum *> datum1 = CTestUtils::CreateDoubleDatum(
+	gpos::Ref<IMDId> mdid1 = GPOS_NEW(mp) CMDIdGPDB(GPDB_FLOAT8);
+	gpos::Ref<IDatum> datum1 = CTestUtils::CreateDoubleDatum(
 		mp, md_accessor, mdid1, CDouble(99.82140500000003));
 
-	gpos::owner<IMDId *> mdid2 = GPOS_NEW(mp) CMDIdGPDB(GPDB_FLOAT8);
-	gpos::owner<IDatum *> datum2 = CTestUtils::CreateDoubleDatum(
+	gpos::Ref<IMDId> mdid2 = GPOS_NEW(mp) CMDIdGPDB(GPDB_FLOAT8);
+	gpos::Ref<IDatum> datum2 = CTestUtils::CreateDoubleDatum(
 		mp, md_accessor, mdid2, CDouble(100.92140700000002));
 
-	BOOL isEqual = datum1->StatsAreEqual(datum2);
-	BOOL isLessThan = datum1->StatsAreLessThan(datum2);
-	datum1->Release();
-	datum2->Release();
+	BOOL isEqual = datum1->StatsAreEqual(datum2.get());
+	BOOL isLessThan = datum1->StatsAreLessThan(datum2.get());
+	;
+	;
 
 	if (!isEqual && isLessThan)
 	{
@@ -346,22 +346,22 @@ CDatumTest::StatsComparisonIntLessThan()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	gpos::owner<IDatum *> datum1 = GPOS_NEW(mp) CDatumInt4GPDB(
+	gpos::Ref<IDatum> datum1 = GPOS_NEW(mp) CDatumInt4GPDB(
 		CTestUtils::m_sysidDefault, 100 /*val*/, false /*isnull*/);
-	gpos::owner<IDatum *> datum2 = GPOS_NEW(mp) CDatumInt4GPDB(
+	gpos::Ref<IDatum> datum2 = GPOS_NEW(mp) CDatumInt4GPDB(
 		CTestUtils::m_sysidDefault, 101 /*val*/, false /*isnull*/);
-	BOOL isEqual = datum1->StatsAreEqual(datum2);
-	BOOL isLessThan = datum1->StatsAreLessThan(datum2);
-	datum1->Release();
-	datum2->Release();
+	BOOL isEqual = datum1->StatsAreEqual(datum2.get());
+	BOOL isLessThan = datum1->StatsAreLessThan(datum2.get());
+	;
+	;
 
 	if (!isEqual && isLessThan)
 	{
@@ -386,22 +386,22 @@ CDatumTest::StatsComparisonIntEqual()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	gpos::owner<IDatum *> datum1 = GPOS_NEW(mp) CDatumInt4GPDB(
+	gpos::Ref<IDatum> datum1 = GPOS_NEW(mp) CDatumInt4GPDB(
 		CTestUtils::m_sysidDefault, 101 /*val*/, false /*isnull*/);
-	gpos::owner<IDatum *> datum2 = GPOS_NEW(mp) CDatumInt4GPDB(
+	gpos::Ref<IDatum> datum2 = GPOS_NEW(mp) CDatumInt4GPDB(
 		CTestUtils::m_sysidDefault, 101 /*val*/, false /*isnull*/);
-	BOOL isEqual = datum1->StatsAreEqual(datum2);
-	BOOL isLessThan = datum1->StatsAreLessThan(datum2);
-	datum1->Release();
-	datum2->Release();
+	BOOL isEqual = datum1->StatsAreEqual(datum2.get());
+	BOOL isLessThan = datum1->StatsAreLessThan(datum2.get());
+	;
+	;
 
 	if (isEqual && !isLessThan)
 	{

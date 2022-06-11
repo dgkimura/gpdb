@@ -100,8 +100,7 @@ CTreeMapTest::CNode::OsPrintWithIndent(IOstream &os, ULONG ulIndent) const
 //
 //---------------------------------------------------------------------------
 CTreeMapTest::CNode::CNode(CMemoryPool *,  // mp
-						   gpos::pointer<const ULONG *> pulData,
-						   gpos::owner<CNodeArray *> pdrgpnd)
+						   const ULONG *pulData, gpos::Ref<CNodeArray> pdrgpnd)
 	: m_ulData(gpos::ulong_max), m_pdrgpnd(pdrgpnd)
 {
 	if (nullptr != pulData)
@@ -121,7 +120,7 @@ CTreeMapTest::CNode::CNode(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 CTreeMapTest::CNode::~CNode()
 {
-	CRefCount::SafeRelease(m_pdrgpnd);
+	;
 }
 
 
@@ -133,9 +132,9 @@ CTreeMapTest::CNode::~CNode()
 //		Constructor function for result tree
 //
 //---------------------------------------------------------------------------
-gpos::owner<CTreeMapTest::CNode *>
-CTreeMapTest::Pnd(CMemoryPool *mp, gpos::pointer<ULONG *> pul,
-				  gpos::owner<CNodeArray *> pdrgpnd, BOOL *fTestTrue)
+gpos::Ref<CTreeMapTest::CNode>
+CTreeMapTest::Pnd(CMemoryPool *mp, ULONG *pul, gpos::Ref<CNodeArray> pdrgpnd,
+				  BOOL *fTestTrue)
 {
 	// The test passes 'true' to PrUnrank and the rehydrate function expects to find it here.
 	GPOS_ASSERT(nullptr != fTestTrue);
@@ -312,9 +311,9 @@ CTreeMapTest::EresUnittest_Unrank()
 	{
 		oss << "=== tree rank: " << ulRank << " ===" << std::endl;
 		BOOL fFlag = true;
-		gpos::owner<CNode *> pnd = ptmap->PrUnrank(mp, &fFlag, ulRank);
+		gpos::Ref<CNode> pnd = ptmap->PrUnrank(mp, &fFlag, ulRank);
 
-		pnd->Release();
+		;
 	}
 
 	GPOS_TRACE(str.GetBuffer());
@@ -341,14 +340,14 @@ CTreeMapTest::EresUnittest_Memo()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	CEngine *peng = nullptr;
-	gpos::owner<CExpression *> pexpr = nullptr;
+	gpos::Ref<CExpression> pexpr = nullptr;
 	CQueryContext *pqc = nullptr;
-	gpos::owner<CExpression *> pexprPlan = nullptr;
+	gpos::Ref<CExpression> pexprPlan = nullptr;
 	{
 		// install opt context in TLS
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -362,7 +361,7 @@ CTreeMapTest::EresUnittest_Memo()
 		pexpr = CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
 
 		// generate query context
-		pqc = CTestUtils::PqcGenerate(mp, pexpr);
+		pqc = CTestUtils::PqcGenerate(mp, pexpr.get());
 
 		// Initialize engine
 		peng->Init(pqc, nullptr /*search_stage_array*/);
@@ -387,9 +386,9 @@ CTreeMapTest::EresUnittest_Memo()
 
 			for (ULONG ulRank = 0; ulRank < ullCount; ulRank++)
 			{
-				gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+				gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 					GPOS_NEW(mp) CDrvdPropCtxtPlan(mp, false /*fUpdateCTEMap*/);
-				gpos::owner<CExpression *> pexprAlt = nullptr;
+				gpos::Ref<CExpression> pexprAlt = nullptr;
 				GPOS_TRY
 				{
 					pexprAlt =
@@ -411,16 +410,16 @@ CTreeMapTest::EresUnittest_Memo()
 					GPOS_RESET_EX;
 				}
 				GPOS_CATCH_END;
-				CRefCount::SafeRelease(pexprAlt);
-				CRefCount::SafeRelease(pdpctxtplan);
+				;
+				;
 			}
 		}
 	}
 
 	// clean up
-	CRefCount::SafeRelease(std::move(pexprPlan));
+	;
 	GPOS_DELETE(pqc);
-	CRefCount::SafeRelease(std::move(pexpr));
+	;
 	GPOS_DELETE(peng);
 
 	return GPOS_OK;

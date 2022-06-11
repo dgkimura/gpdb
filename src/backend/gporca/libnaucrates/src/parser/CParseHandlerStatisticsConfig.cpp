@@ -51,7 +51,7 @@ CParseHandlerStatisticsConfig::CParseHandlerStatisticsConfig(
 //---------------------------------------------------------------------------
 CParseHandlerStatisticsConfig::~CParseHandlerStatisticsConfig()
 {
-	CRefCount::SafeRelease(m_stats_conf);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -155,10 +155,10 @@ CParseHandlerStatisticsConfig::GetParseHandlerType() const
 //		Returns the statistics configuration
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CStatisticsConfig *>
+CStatisticsConfig *
 CParseHandlerStatisticsConfig::GetStatsConf() const
 {
-	return m_stats_conf;
+	return m_stats_conf.get();
 }
 
 // EOF

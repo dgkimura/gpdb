@@ -45,16 +45,16 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// trigger id
-	gpos::owner<IMDId *> m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// trigger name
 	CMDName *m_mdname;
 
 	// relation id
-	gpos::owner<IMDId *> m_rel_mdid;
+	gpos::Ref<IMDId> m_rel_mdid;
 
 	// function id
-	gpos::owner<IMDId *> m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// trigger type
 	INT m_type;
@@ -66,9 +66,9 @@ public:
 	CMDTriggerGPDB(const CMDTriggerGPDB &) = delete;
 
 	// ctor
-	CMDTriggerGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
-				   gpos::owner<IMDId *> rel_mdid,
-				   gpos::owner<IMDId *> mdid_func, INT type, BOOL is_enabled);
+	CMDTriggerGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+				   gpos::Ref<IMDId> rel_mdid, gpos::Ref<IMDId> mdid_func,
+				   INT type, BOOL is_enabled);
 
 	// dtor
 	~CMDTriggerGPDB() override;
@@ -81,10 +81,10 @@ public:
 	}
 
 	// trigger id
-	gpos::pointer<IMDId *>
+	IMDId *
 	MDId() const override
 	{
-		return m_mdid;
+		return m_mdid.get();
 	}
 
 	// trigger name
@@ -95,17 +95,17 @@ public:
 	}
 
 	// relation mdid
-	gpos::pointer<IMDId *>
+	IMDId *
 	GetRelMdId() const override
 	{
-		return m_rel_mdid;
+		return m_rel_mdid.get();
 	}
 
 	// function mdid
-	gpos::pointer<IMDId *>
+	IMDId *
 	FuncMdId() const override
 	{
-		return m_func_mdid;
+		return m_func_mdid.get();
 	}
 
 	// does trigger execute on a row-level

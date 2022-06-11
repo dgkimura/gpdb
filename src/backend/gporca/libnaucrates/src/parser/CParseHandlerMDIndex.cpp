@@ -78,7 +78,8 @@ CParseHandlerMDIndex::StartElement(const XMLCh *const element_uri,
 			m_level_with_default_part_array =
 				CDXLOperatorFactory::ExtractIntsToUlongArray(
 					m_parse_handler_mgr->GetDXLMemoryManager(), xmlszDefParts,
-					EdxltokenDefaultPartition, EdxltokenIndex);
+					EdxltokenDefaultPartition, EdxltokenIndex)
+					.get();
 		}
 		else
 		{
@@ -133,8 +134,9 @@ CParseHandlerMDIndex::StartElement(const XMLCh *const element_uri,
 
 	// parse mdid
 	m_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-		EdxltokenIndex);
+				 m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				 EdxltokenMdid, EdxltokenIndex)
+				 .get();
 
 	// parse index name
 	const XMLCh *parsed_column_name = CDXLOperatorFactory::ExtractAttrValue(
@@ -156,22 +158,28 @@ CParseHandlerMDIndex::StartElement(const XMLCh *const element_uri,
 		attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenIndexItemType));
 	if (nullptr != xmlszItemType)
 	{
-		m_mdid_item_type = CDXLOperatorFactory::MakeMdIdFromStr(
-			m_parse_handler_mgr->GetDXLMemoryManager(), xmlszItemType,
-			EdxltokenIndexItemType, EdxltokenIndex);
+		m_mdid_item_type =
+			CDXLOperatorFactory::MakeMdIdFromStr(
+				m_parse_handler_mgr->GetDXLMemoryManager(), xmlszItemType,
+				EdxltokenIndexItemType, EdxltokenIndex)
+				.get();
 	}
 
 	const XMLCh *xmlszIndexKeys = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenIndexKeyCols, EdxltokenIndex);
-	m_index_key_cols_array = CDXLOperatorFactory::ExtractIntsToUlongArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), xmlszIndexKeys,
-		EdxltokenIndexKeyCols, EdxltokenIndex);
+	m_index_key_cols_array =
+		CDXLOperatorFactory::ExtractIntsToUlongArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), xmlszIndexKeys,
+			EdxltokenIndexKeyCols, EdxltokenIndex)
+			.get();
 
 	const XMLCh *xmlszIndexIncludedCols = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenIndexIncludedCols, EdxltokenIndex);
-	m_included_cols_array = CDXLOperatorFactory::ExtractIntsToUlongArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), xmlszIndexIncludedCols,
-		EdxltokenIndexIncludedCols, EdxltokenIndex);
+	m_included_cols_array =
+		CDXLOperatorFactory::ExtractIntsToUlongArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), xmlszIndexIncludedCols,
+			EdxltokenIndexIncludedCols, EdxltokenIndex)
+			.get();
 
 	// parse handler for operator class list
 	CParseHandlerBase *opfamilies_list_parse_handler =
@@ -205,9 +213,8 @@ CParseHandlerMDIndex::EndElement(const XMLCh *const,  // element_uri,
 
 		CParseHandlerScalarOp *pphPartCnstr =
 			dynamic_cast<CParseHandlerScalarOp *>((*this)[1]);
-		gpos::owner<CDXLNode *> pdxlnPartConstraint =
-			pphPartCnstr->CreateDXLNode();
-		pdxlnPartConstraint->AddRef();
+		gpos::Ref<CDXLNode> pdxlnPartConstraint = pphPartCnstr->CreateDXLNode();
+		;
 		m_part_constraint = GPOS_NEW(m_mp) CMDPartConstraintGPDB(
 			m_mp, m_level_with_default_part_array, m_part_constraint_unbounded,
 			std::move(pdxlnPartConstraint));
@@ -225,9 +232,9 @@ CParseHandlerMDIndex::EndElement(const XMLCh *const,  // element_uri,
 
 	CParseHandlerMetadataIdList *pphMdidOpfamilies =
 		dynamic_cast<CParseHandlerMetadataIdList *>((*this)[0]);
-	gpos::owner<IMdIdArray *> mdid_opfamilies_array =
+	gpos::Ref<IMdIdArray> mdid_opfamilies_array =
 		pphMdidOpfamilies->GetMdIdArray();
-	mdid_opfamilies_array->AddRef();
+	;
 
 	BOOL is_partitioned = false;
 	IMdIdArray *child_indexes = nullptr;
@@ -237,7 +244,7 @@ CParseHandlerMDIndex::EndElement(const XMLCh *const,  // element_uri,
 		child_indexes = dynamic_cast<CParseHandlerMetadataIdList *>(
 							m_child_indexes_parse_handler)
 							->GetMdIdArray();
-		child_indexes->AddRef();
+		;
 	}
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDIndexGPDB(

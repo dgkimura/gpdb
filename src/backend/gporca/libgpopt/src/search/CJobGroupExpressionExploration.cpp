@@ -134,7 +134,7 @@ CJobGroupExpressionExploration::~CJobGroupExpressionExploration() = default;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExpressionExploration::Init(gpos::pointer<CGroupExpression *> pgexpr)
+CJobGroupExpressionExploration::Init(CGroupExpression *pgexpr)
 {
 	CJobGroupExpression::Init(pgexpr);
 	GPOS_ASSERT(pgexpr->Pop()->FLogical());
@@ -171,16 +171,16 @@ CJobGroupExpressionExploration::ScheduleApplicableTransformations(
 	GPOS_ASSERT(!FXformsScheduled());
 
 	// get all applicable xforms
-	gpos::pointer<COperator *> pop = m_pgexpr->Pop();
-	gpos::owner<CXformSet *> xform_set =
+	COperator *pop = m_pgexpr->Pop();
+	gpos::Ref<CXformSet> xform_set =
 		gpos::dyn_cast<CLogical>(pop)->PxfsCandidates(
 			psc->GetGlobalMemoryPool());
 
 	// intersect them with required xforms and schedule jobs
 	xform_set->Intersection(CXformFactory::Pxff()->PxfsExploration());
 	xform_set->Intersection(psc->Peng()->PxfsCurrentStage());
-	ScheduleTransformations(psc, xform_set);
-	xform_set->Release();
+	ScheduleTransformations(psc, xform_set.get());
+	;
 
 	SetXformsScheduled();
 }
@@ -310,9 +310,9 @@ CJobGroupExpressionExploration::FExecute(CSchedulerContext *psc)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExpressionExploration::ScheduleJob(
-	CSchedulerContext *psc, gpos::pointer<CGroupExpression *> pgexpr,
-	CJob *pjParent)
+CJobGroupExpressionExploration::ScheduleJob(CSchedulerContext *psc,
+											CGroupExpression *pgexpr,
+											CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtGroupExpressionExploration);
 

@@ -30,8 +30,8 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CDXLScalarSubqueryQuantified::CDXLScalarSubqueryQuantified(
-	CMemoryPool *mp, gpos::owner<IMDId *> scalar_op_mdid,
-	CMDName *scalar_op_mdname, ULONG colid)
+	CMemoryPool *mp, gpos::Ref<IMDId> scalar_op_mdid, CMDName *scalar_op_mdname,
+	ULONG colid)
 	: CDXLScalar(mp),
 	  m_scalar_op_mdid(std::move(scalar_op_mdid)),
 	  m_scalar_op_mdname(scalar_op_mdname),
@@ -51,7 +51,7 @@ CDXLScalarSubqueryQuantified::CDXLScalarSubqueryQuantified(
 //---------------------------------------------------------------------------
 CDXLScalarSubqueryQuantified::~CDXLScalarSubqueryQuantified()
 {
-	m_scalar_op_mdid->Release();
+	;
 	GPOS_DELETE(m_scalar_op_mdname);
 }
 
@@ -64,9 +64,8 @@ CDXLScalarSubqueryQuantified::~CDXLScalarSubqueryQuantified()
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubqueryQuantified::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarSubqueryQuantified::SerializeToDXL(CXMLSerializer *xml_serializer,
+											 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -97,14 +96,13 @@ CDXLScalarSubqueryQuantified::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubqueryQuantified::AssertValid(
-	gpos::pointer<const CDXLNode *> dxlnode, BOOL validate_children) const
+CDXLScalarSubqueryQuantified::AssertValid(const CDXLNode *dxlnode,
+										  BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
 
-	gpos::pointer<CDXLNode *> pdxlnScalarChild =
-		(*dxlnode)[EdxlsqquantifiedIndexScalar];
-	gpos::pointer<CDXLNode *> pdxlnRelationalChild =
+	CDXLNode *pdxlnScalarChild = (*dxlnode)[EdxlsqquantifiedIndexScalar];
+	CDXLNode *pdxlnRelationalChild =
 		(*dxlnode)[EdxlsqquantifiedIndexRelational];
 
 	GPOS_ASSERT(EdxloptypeScalar ==

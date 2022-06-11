@@ -25,8 +25,7 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalProperties::CDXLPhysicalProperties(
-	gpos::owner<CDXLOperatorCost *> cost)
+CDXLPhysicalProperties::CDXLPhysicalProperties(gpos::Ref<CDXLOperatorCost> cost)
 	: CDXLProperties(), m_operator_cost_dxl(std::move(cost))
 {
 }
@@ -41,7 +40,7 @@ CDXLPhysicalProperties::CDXLPhysicalProperties(
 //---------------------------------------------------------------------------
 CDXLPhysicalProperties::~CDXLPhysicalProperties()
 {
-	CRefCount::SafeRelease(m_operator_cost_dxl);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -76,10 +75,10 @@ CDXLPhysicalProperties::SerializePropertiesToDXL(
 //		Return cost of operator
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLOperatorCost *>
+CDXLOperatorCost *
 CDXLPhysicalProperties::GetDXLOperatorCost() const
 {
-	return m_operator_cost_dxl;
+	return m_operator_cost_dxl.get();
 }
 
 // EOF

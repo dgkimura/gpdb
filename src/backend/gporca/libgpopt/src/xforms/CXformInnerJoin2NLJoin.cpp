@@ -71,9 +71,8 @@ CXformInnerJoin2NLJoin::Exfp(CExpressionHandle &) const
 //
 //---------------------------------------------------------------------------
 void
-CXformInnerJoin2NLJoin::Transform(gpos::pointer<CXformContext *>,
-								  gpos::pointer<CXformResult *>,
-								  gpos::pointer<CExpression *>) const
+CXformInnerJoin2NLJoin::Transform(CXformContext *, CXformResult *,
+								  CExpression *) const
 {
 }
 

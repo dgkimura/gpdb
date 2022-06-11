@@ -57,9 +57,8 @@ CXformSplitGbAggDedup::CXformSplitGbAggDedup(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformSplitGbAggDedup::Transform(gpos::pointer<CXformContext *> pxfctxt,
-								 gpos::pointer<CXformResult *> pxfres,
-								 gpos::pointer<CExpression *> pexpr) const
+CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+								 CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -67,12 +66,12 @@ CXformSplitGbAggDedup::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	gpos::pointer<CLogicalGbAggDeduplicate *> popAggDedup =
+	CLogicalGbAggDeduplicate *popAggDedup =
 		gpos::dyn_cast<CLogicalGbAggDeduplicate>(pexpr->Pop());
 
 	// extract components
 	CExpression *pexprRelational = (*pexpr)[0];
-	gpos::pointer<CExpression *> pexprProjectList = (*pexpr)[1];
+	CExpression *pexprProjectList = (*pexpr)[1];
 
 	// check if the transformation is applicable
 	if (!FApplicable(pexprProjectList))
@@ -80,39 +79,39 @@ CXformSplitGbAggDedup::Transform(gpos::pointer<CXformContext *> pxfctxt,
 		return;
 	}
 
-	pexprRelational->AddRef();
+	;
 
-	gpos::owner<CExpression *> pexprProjectListLocal = nullptr;
-	gpos::owner<CExpression *> pexprProjectListGlobal = nullptr;
+	gpos::Ref<CExpression> pexprProjectListLocal = nullptr;
+	gpos::Ref<CExpression> pexprProjectListGlobal = nullptr;
 
 	(void) PopulateLocalGlobalProjectList(
 		mp, pexprProjectList, &pexprProjectListLocal, &pexprProjectListGlobal);
 	GPOS_ASSERT(nullptr != pexprProjectListLocal &&
 				nullptr != pexprProjectListLocal);
 
-	gpos::owner<CColRefArray *> colref_array = popAggDedup->Pdrgpcr();
-	colref_array->AddRef();
-	colref_array->AddRef();
+	gpos::Ref<CColRefArray> colref_array = popAggDedup->Pdrgpcr();
+	;
+	;
 
 	CColRefArray *pdrgpcrMinimal = popAggDedup->PdrgpcrMinimal();
 	if (nullptr != pdrgpcrMinimal)
 	{
-		pdrgpcrMinimal->AddRef();
-		pdrgpcrMinimal->AddRef();
+		;
+		;
 	}
 
-	gpos::owner<CColRefArray *> pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
-	pdrgpcrKeys->AddRef();
-	pdrgpcrKeys->AddRef();
+	gpos::Ref<CColRefArray> pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
+	;
+	;
 
-	gpos::owner<CExpression *> local_expr = GPOS_NEW(mp)
+	gpos::Ref<CExpression> local_expr = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 						mp, colref_array, pdrgpcrMinimal,
 						COperator::EgbaggtypeLocal /*egbaggtype*/, pdrgpcrKeys),
 					pexprRelational, std::move(pexprProjectListLocal));
 
-	gpos::owner<CExpression *> pexprGlobal = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprGlobal = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 			mp, colref_array, pdrgpcrMinimal,

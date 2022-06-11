@@ -28,8 +28,8 @@ using namespace gpmd;
 //		takes ownership of string; verify string is properly formatted
 //
 //---------------------------------------------------------------------------
-CColRefTable::CColRefTable(gpos::pointer<const CColumnDescriptor *> pcoldesc,
-						   ULONG id, const CName *pname, ULONG ulOpSource)
+CColRefTable::CColRefTable(const CColumnDescriptor *pcoldesc, ULONG id,
+						   const CName *pname, ULONG ulOpSource)
 	: CColRef(pcoldesc->RetrieveType(), pcoldesc->TypeModifier(), id, pname),
 	  m_iAttno(0),
 	  m_ulSourceOpId(ulOpSource),
@@ -51,10 +51,9 @@ CColRefTable::CColRefTable(gpos::pointer<const CColumnDescriptor *> pcoldesc,
 //		takes ownership of string; verify string is properly formatted
 //
 //---------------------------------------------------------------------------
-CColRefTable::CColRefTable(gpos::pointer<const IMDType *> pmdtype,
-						   INT type_modifier, INT attno, BOOL is_nullable,
-						   ULONG id, const CName *pname, ULONG ulOpSource,
-						   BOOL is_dist_col, ULONG ulWidth)
+CColRefTable::CColRefTable(const IMDType *pmdtype, INT type_modifier, INT attno,
+						   BOOL is_nullable, ULONG id, const CName *pname,
+						   ULONG ulOpSource, BOOL is_dist_col, ULONG ulWidth)
 	: CColRef(pmdtype, type_modifier, id, pname),
 	  m_iAttno(attno),
 	  m_is_nullable(is_nullable),

@@ -42,7 +42,7 @@ CDXLPhysicalValuesScan::GetOpNameStr() const
 	return CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalValuesScan);
 }
 
-gpos::cast_func<CDXLPhysicalValuesScan *>
+CDXLPhysicalValuesScan *
 CDXLPhysicalValuesScan::Cast(CDXLOperator *dxl_op)
 {
 	GPOS_ASSERT(nullptr != dxl_op);
@@ -52,9 +52,8 @@ CDXLPhysicalValuesScan::Cast(CDXLOperator *dxl_op)
 }
 // serialize operator in DXL format
 void
-CDXLPhysicalValuesScan::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLPhysicalValuesScan::SerializeToDXL(CXMLSerializer *xml_serializer,
+									   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -73,7 +72,7 @@ CDXLPhysicalValuesScan::SerializeToDXL(
 
 // checks whether operator node is well-structured
 void
-CDXLPhysicalValuesScan::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalValuesScan::AssertValid(const CDXLNode *dxlnode,
 									BOOL validate_children) const
 {
 	GPOS_ASSERT(EdxloptypePhysical ==
@@ -84,7 +83,7 @@ CDXLPhysicalValuesScan::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[ul];
+		CDXLNode *child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 		if (validate_children)

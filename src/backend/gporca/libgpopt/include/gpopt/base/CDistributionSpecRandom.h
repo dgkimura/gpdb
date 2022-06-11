@@ -99,17 +99,15 @@ public:
 	}
 
 	// does this distribution match the given one
-	BOOL Matches(gpos::pointer<const CDistributionSpec *> pds) const override;
+	BOOL Matches(const CDistributionSpec *pds) const override;
 
 	// does current distribution satisfy the given one
-	BOOL FSatisfies(
-		gpos::pointer<const CDistributionSpec *> pds) const override;
+	BOOL FSatisfies(const CDistributionSpec *pds) const override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 gpos::pointer<CReqdPropPlan *> prpp,
-						 gpos::pointer<CExpressionArray *> pdrgpexpr,
-						 gpos::pointer<CExpression *> pexpr) override;
+						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 CExpression *pexpr) override;
 
 	// return distribution partitioning type
 	EDistributionPartitioningType
@@ -122,7 +120,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static gpos::cast_func<CDistributionSpecRandom *>
+	static CDistributionSpecRandom *
 	PdsConvert(CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
@@ -132,8 +130,8 @@ public:
 	}
 
 	// conversion function: const argument
-	static gpos::pointer<const CDistributionSpecRandom *>
-	PdsConvert(gpos::pointer<const CDistributionSpec *> pds)
+	static const CDistributionSpecRandom *
+	PdsConvert(const CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtRandom == pds->Edt());

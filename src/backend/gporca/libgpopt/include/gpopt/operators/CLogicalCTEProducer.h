@@ -34,10 +34,10 @@ private:
 	ULONG m_id;
 
 	// cte columns
-	gpos::owner<CColRefArray *> m_pdrgpcr;
+	gpos::Ref<CColRefArray> m_pdrgpcr;
 
 	// output columns, same as cte columns but in CColRefSet
-	gpos::owner<CColRefSet *> m_pcrsOutput;
+	gpos::Ref<CColRefSet> m_pcrsOutput;
 
 public:
 	CLogicalCTEProducer(const CLogicalCTEProducer &) = delete;
@@ -47,7 +47,7 @@ public:
 
 	// ctor
 	CLogicalCTEProducer(CMemoryPool *mp, ULONG id,
-						gpos::owner<CColRefArray *> colref_array);
+						gpos::Ref<CColRefArray> colref_array);
 
 	// dtor
 	~CLogicalCTEProducer() override;
@@ -73,24 +73,24 @@ public:
 	}
 
 	// cte columns
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	Pdrgpcr() const
 	{
-		return m_pdrgpcr;
+		return m_pdrgpcr.get();
 	}
 
 	// cte columns in CColRefSet
-	gpos::pointer<CColRefSet *>
+	CColRefSet *
 	DeriveOutputColumns() const
 	{
-		return m_pcrsOutput;
+		return m_pcrsOutput.get();
 	}
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -100,8 +100,8 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -109,11 +109,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	gpos::owner<CColRefSet *> DeriveOutputColumns(
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -121,32 +121,32 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive not nullable output columns
-	gpos::owner<CColRefSet *> DeriveNotNullColumns(
+	gpos::Ref<CColRefSet> DeriveNotNullColumns(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *>
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
-		return PpcDeriveConstraintRestrict(mp, exprhdl, m_pcrsOutput);
+		return PpcDeriveConstraintRestrict(mp, exprhdl, m_pcrsOutput.get());
 	}
 
 	// derive partition consumer info
-	gpos::owner<CPartInfo *>
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *,	// mp,
 						CExpressionHandle &exprhdl) const override
 	{
 		return PpartinfoPassThruOuter(exprhdl);
 	}
 
-	gpos::pointer<CTableDescriptor *> DeriveTableDescriptor(
+	CTableDescriptor *DeriveTableDescriptor(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 	// compute required stats columns of the n-th child
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	PcrsStat(CMemoryPool *,		   // mp
 			 CExpressionHandle &,  // exprhdl
-			 gpos::pointer<CColRefSet *> pcrsInput,
+			 CColRefSet *pcrsInput,
 			 ULONG	// child_index
 	) const override
 	{
@@ -154,10 +154,10 @@ public:
 	}
 
 	// derive statistics
-	gpos::owner<IStatistics *>
+	gpos::Ref<IStatistics>
 	PstatsDerive(CMemoryPool *,	 //mp,
 				 CExpressionHandle &exprhdl,
-				 gpos::pointer<IStatisticsArray *>	//stats_ctxt
+				 IStatisticsArray *	 //stats_ctxt
 	) const override
 	{
 		return PstatsPassThruOuter(exprhdl);
@@ -175,12 +175,12 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CLogicalCTEProducer *>
+	static CLogicalCTEProducer *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

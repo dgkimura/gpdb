@@ -87,9 +87,9 @@ CXformExpandFullOuterJoin::Exfp(CExpressionHandle &	 //exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformExpandFullOuterJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
-									 gpos::pointer<CXformResult *> pxfres,
-									 gpos::pointer<CExpression *> pexpr) const
+CXformExpandFullOuterJoin::Transform(CXformContext *pxfctxt,
+									 CXformResult *pxfres,
+									 CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -97,83 +97,83 @@ CXformExpandFullOuterJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	gpos::pointer<CExpression *> pexprA = (*pexpr)[0];
-	gpos::pointer<CExpression *> pexprB = (*pexpr)[1];
+	CExpression *pexprA = (*pexpr)[0];
+	CExpression *pexprB = (*pexpr)[1];
 	CExpression *pexprScalar = (*pexpr)[2];
 
 	// 1. create the CTE producers
 	const ULONG ulCTEIdA = COptCtxt::PoctxtFromTLS()->Pcteinfo()->next_id();
-	gpos::owner<CColRefArray *> pdrgpcrOutA =
+	gpos::Ref<CColRefArray> pdrgpcrOutA =
 		pexprA->DeriveOutputColumns()->Pdrgpcr(mp);
-	(void) CXformUtils::PexprAddCTEProducer(mp, ulCTEIdA, pdrgpcrOutA, pexprA);
+	(void) CXformUtils::PexprAddCTEProducer(mp, ulCTEIdA, pdrgpcrOutA.get(),
+											pexprA);
 
 	const ULONG ulCTEIdB = COptCtxt::PoctxtFromTLS()->Pcteinfo()->next_id();
-	gpos::owner<CColRefArray *> pdrgpcrOutB =
+	gpos::Ref<CColRefArray> pdrgpcrOutB =
 		pexprB->DeriveOutputColumns()->Pdrgpcr(mp);
-	(void) CXformUtils::PexprAddCTEProducer(mp, ulCTEIdB, pdrgpcrOutB, pexprB);
+	(void) CXformUtils::PexprAddCTEProducer(mp, ulCTEIdB, pdrgpcrOutB.get(),
+											pexprB);
 
 	// 2. create the right child (PROJECT over LASJ)
-	gpos::owner<CColRefArray *> pdrgpcrRightA =
-		CUtils::PdrgpcrCopy(mp, pdrgpcrOutA);
-	gpos::owner<CColRefArray *> pdrgpcrRightB =
-		CUtils::PdrgpcrCopy(mp, pdrgpcrOutB);
-	gpos::owner<CExpression *> pexprScalarRight =
-		CXformUtils::PexprRemapColumns(mp, pexprScalar, pdrgpcrOutA,
-									   pdrgpcrRightA, pdrgpcrOutB,
-									   pdrgpcrRightB);
-	gpos::owner<CExpression *> pexprLASJ = PexprLogicalJoinOverCTEs(
+	gpos::Ref<CColRefArray> pdrgpcrRightA =
+		CUtils::PdrgpcrCopy(mp, pdrgpcrOutA.get());
+	gpos::Ref<CColRefArray> pdrgpcrRightB =
+		CUtils::PdrgpcrCopy(mp, pdrgpcrOutB.get());
+	gpos::Ref<CExpression> pexprScalarRight = CXformUtils::PexprRemapColumns(
+		mp, pexprScalar, pdrgpcrOutA.get(), pdrgpcrRightA.get(),
+		pdrgpcrOutB.get(), pdrgpcrRightB.get());
+	gpos::Ref<CExpression> pexprLASJ = PexprLogicalJoinOverCTEs(
 		mp, EdxljtLeftAntiSemijoin, ulCTEIdB, pdrgpcrRightB, ulCTEIdA,
 		pdrgpcrRightA, std::move(pexprScalarRight));
-	gpos::owner<CExpression *> pexprProject = CUtils::PexprLogicalProjectNulls(
-		mp, pdrgpcrRightA, std::move(pexprLASJ));
+	gpos::Ref<CExpression> pexprProject = CUtils::PexprLogicalProjectNulls(
+		mp, pdrgpcrRightA.get(), std::move(pexprLASJ));
 
 	// 3. create the left child (LOJ) - this has to use the original output
 	//    columns and the original scalar expression
-	pexprScalar->AddRef();
-	gpos::owner<CExpression *> pexprLOJ =
+	;
+	gpos::Ref<CExpression> pexprLOJ =
 		PexprLogicalJoinOverCTEs(mp, EdxljtLeft, ulCTEIdA, pdrgpcrOutA,
 								 ulCTEIdB, pdrgpcrOutB, pexprScalar);
 
 	// 4. create the UNION ALL expression
 
 	// output columns of the union are the same as the outputs of the first child (LOJ)
-	gpos::owner<CColRefArray *> pdrgpcrOutput = GPOS_NEW(mp) CColRefArray(mp);
-	pdrgpcrOutput->AppendArray(pdrgpcrOutA);
-	pdrgpcrOutput->AppendArray(pdrgpcrOutB);
+	gpos::Ref<CColRefArray> pdrgpcrOutput = GPOS_NEW(mp) CColRefArray(mp);
+	pdrgpcrOutput->AppendArray(pdrgpcrOutA.get());
+	pdrgpcrOutput->AppendArray(pdrgpcrOutB.get());
 
 	// input columns of the union
-	gpos::owner<CColRef2dArray *> pdrgdrgpcrInput =
-		GPOS_NEW(mp) CColRef2dArray(mp);
+	gpos::Ref<CColRef2dArray> pdrgdrgpcrInput = GPOS_NEW(mp) CColRef2dArray(mp);
 
 	// inputs from the first child (LOJ)
-	pdrgpcrOutput->AddRef();
+	;
 	pdrgdrgpcrInput->Append(pdrgpcrOutput);
 
 	// inputs from the second child have to be in the correct order
 	// a. add new computed columns from the project only
-	gpos::owner<CColRefSet *> pcrsProjOnly = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsProjOnly = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsProjOnly->Include(pexprProject->DeriveOutputColumns());
-	pcrsProjOnly->Exclude(pdrgpcrRightB);
-	gpos::owner<CColRefArray *> pdrgpcrProj = pcrsProjOnly->Pdrgpcr(mp);
-	pcrsProjOnly->Release();
+	pcrsProjOnly->Exclude(pdrgpcrRightB.get());
+	gpos::Ref<CColRefArray> pdrgpcrProj = pcrsProjOnly->Pdrgpcr(mp);
+	;
 	// b. add columns from the LASJ expression
-	pdrgpcrProj->AppendArray(pdrgpcrRightB);
+	pdrgpcrProj->AppendArray(pdrgpcrRightB.get());
 
 	pdrgdrgpcrInput->Append(std::move(pdrgpcrProj));
 
-	gpos::owner<CExpression *> pexprUnionAll = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprUnionAll = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
 			CLogicalUnionAll(mp, pdrgpcrOutput, std::move(pdrgdrgpcrInput)),
 		std::move(pexprLOJ), std::move(pexprProject));
 
 	// 5. Add CTE anchor for the B subtree
-	gpos::owner<CExpression *> pexprAnchorB = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAnchorB = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEIdB),
 					std::move(pexprUnionAll));
 
 	// 6. Add CTE anchor for the A subtree
-	gpos::owner<CExpression *> pexprAnchorA = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAnchorA = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEIdA),
 					std::move(pexprAnchorB));
 
@@ -190,28 +190,27 @@ CXformExpandFullOuterJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
 // 		and output columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CExpression *>
+gpos::Ref<CExpression>
 CXformExpandFullOuterJoin::PexprLogicalJoinOverCTEs(
 	CMemoryPool *mp, EdxlJoinType edxljointype, ULONG ulLeftCTEId,
-	gpos::owner<CColRefArray *> pdrgpcrLeft, ULONG ulRightCTEId,
-	gpos::owner<CColRefArray *> pdrgpcrRight,
-	gpos::owner<CExpression *> pexprScalar)
+	gpos::Ref<CColRefArray> pdrgpcrLeft, ULONG ulRightCTEId,
+	gpos::Ref<CColRefArray> pdrgpcrRight, gpos::Ref<CExpression> pexprScalar)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 
-	gpos::owner<CExpressionArray *> pdrgpexprChildren =
+	gpos::Ref<CExpressionArray> pdrgpexprChildren =
 		GPOS_NEW(mp) CExpressionArray(mp);
-	gpos::pointer<CCTEInfo *> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 
-	gpos::owner<CLogicalCTEConsumer *> popConsumerLeft = GPOS_NEW(mp)
+	gpos::Ref<CLogicalCTEConsumer> popConsumerLeft = GPOS_NEW(mp)
 		CLogicalCTEConsumer(mp, ulLeftCTEId, std::move(pdrgpcrLeft));
-	gpos::owner<CExpression *> pexprLeft =
+	gpos::Ref<CExpression> pexprLeft =
 		GPOS_NEW(mp) CExpression(mp, std::move(popConsumerLeft));
 	pcteinfo->IncrementConsumers(ulLeftCTEId);
 
-	gpos::owner<CLogicalCTEConsumer *> popConsumerRight = GPOS_NEW(mp)
+	gpos::Ref<CLogicalCTEConsumer> popConsumerRight = GPOS_NEW(mp)
 		CLogicalCTEConsumer(mp, ulRightCTEId, std::move(pdrgpcrRight));
-	gpos::owner<CExpression *> pexprRight =
+	gpos::Ref<CExpression> pexprRight =
 		GPOS_NEW(mp) CExpression(mp, std::move(popConsumerRight));
 	pcteinfo->IncrementConsumers(ulRightCTEId);
 

@@ -33,7 +33,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CScalarCoerceBase::CScalarCoerceBase(CMemoryPool *mp,
-									 gpos::owner<IMDId *> mdid_type,
+									 gpos::Ref<IMDId> mdid_type,
 									 INT type_modifier, ECoercionForm ecf,
 									 INT location)
 	: CScalar(mp),
@@ -57,7 +57,7 @@ CScalarCoerceBase::CScalarCoerceBase(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CScalarCoerceBase::~CScalarCoerceBase()
 {
-	m_result_type_mdid->Release();
+	;
 }
 
 
@@ -69,10 +69,10 @@ CScalarCoerceBase::~CScalarCoerceBase()
 //		Return type of the scalar expression
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarCoerceBase::MdidType() const
 {
-	return m_result_type_mdid;
+	return m_result_type_mdid.get();
 }
 
 
@@ -129,11 +129,11 @@ CScalarCoerceBase::Location() const
 //		return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
+gpos::Ref<COperator>
 CScalarCoerceBase::PopCopyWithRemappedColumns(
-	CMemoryPool *,						//mp,
-	gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-	BOOL								//must_exist
+	CMemoryPool *,		 //mp,
+	UlongToColRefMap *,	 //colref_mapping,
+	BOOL				 //must_exist
 )
 {
 	return PopCopyDefault();

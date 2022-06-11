@@ -8,21 +8,19 @@
 
 using namespace gpopt;
 
-gpos::owner<CConstraintArray *>
+gpos::Ref<CConstraintArray>
 CColConstraintsHashMapper::PdrgPcnstrLookup(CColRef *colref)
 {
-	gpos::owner<CConstraintArray *> pdrgpcnstrCol =
-		m_phmColConstr->Find(colref);
-	pdrgpcnstrCol->AddRef();
+	gpos::Ref<CConstraintArray> pdrgpcnstrCol = m_phmColConstr->Find(colref);
+	;
 	return pdrgpcnstrCol;
 }
 
 // mapping between columns and single column constraints in array of constraints
-static gpos::owner<ColRefToConstraintArrayMap *>
-PhmcolconstrSingleColConstr(CMemoryPool *mp,
-							gpos::pointer<const CConstraintArray *> drgPcnstr)
+static gpos::Ref<ColRefToConstraintArrayMap>
+PhmcolconstrSingleColConstr(CMemoryPool *mp, const CConstraintArray *drgPcnstr)
 {
-	gpos::owner<ColRefToConstraintArrayMap *> phmcolconstr =
+	gpos::Ref<ColRefToConstraintArrayMap> phmcolconstr =
 		GPOS_NEW(mp) ColRefToConstraintArrayMap(mp);
 
 	const ULONG length = drgPcnstr->Size();
@@ -30,19 +28,18 @@ PhmcolconstrSingleColConstr(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		CConstraint *pcnstrChild = (*drgPcnstr)[ul];
-		gpos::pointer<CColRefSet *> pcrs = pcnstrChild->PcrsUsed();
+		CColRefSet *pcrs = pcnstrChild->PcrsUsed();
 
 		if (1 == pcrs->Size())
 		{
 			CColRef *colref = pcrs->PcrFirst();
-			gpos::owner<CConstraintArray *> pcnstrMapped =
+			gpos::Ref<CConstraintArray> pcnstrMapped =
 				phmcolconstr->Find(colref);
 			if (nullptr == pcnstrMapped)
 			{
 				pcnstrMapped = GPOS_NEW(mp) CConstraintArray(mp);
 				phmcolconstr->Insert(colref, pcnstrMapped);
-			}
-			pcnstrChild->AddRef();
+			};
 			pcnstrMapped->Append(pcnstrChild);
 		}
 	}
@@ -51,12 +48,12 @@ PhmcolconstrSingleColConstr(CMemoryPool *mp,
 }
 
 CColConstraintsHashMapper::CColConstraintsHashMapper(
-	CMemoryPool *mp, gpos::pointer<CConstraintArray *> pdrgpcnstr)
+	CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
 	: m_phmColConstr(PhmcolconstrSingleColConstr(mp, pdrgpcnstr))
 {
 }
 
 CColConstraintsHashMapper::~CColConstraintsHashMapper()
 {
-	m_phmColConstr->Release();
+	;
 }

@@ -61,24 +61,27 @@ private:
 	// helper functions
 
 	// insert elements with duplicate keys
-	static GPOS_RESULT EresInsertDuplicates(CCache<SSimpleObject *, ULONG *> *);
+	static GPOS_RESULT EresInsertDuplicates(
+		CCache<gpos::Ref<SSimpleObject>, ULONG *> *);
 
 	// remove
-	static GPOS_RESULT EresRemoveDuplicates(CCache<SSimpleObject *, ULONG *> *);
+	static GPOS_RESULT EresRemoveDuplicates(
+		CCache<gpos::Ref<SSimpleObject>, ULONG *> *);
 
 	// inserts one SSimpleObject with key and value set to ulKey
-	static ULLONG InsertOneElement(CCache<SSimpleObject *, ULONG *> *pCache,
-								   ULONG ulKey);
+	static ULLONG InsertOneElement(
+		CCache<gpos::Ref<SSimpleObject>, ULONG *> *pCache, ULONG ulKey);
 
 	// inserts as many SSimpleObjects as needed (starting with the key ulKeyStart and
 	// sequentially generating the successive keys) to consume cache quota.
 	static ULONG ULFillCacheWithoutEviction(
-		CCache<SSimpleObject *, ULONG *> *pCache, ULONG ulKeyStart);
+		CCache<gpos::Ref<SSimpleObject>, ULONG *> *pCache, ULONG ulKeyStart);
 
 	// checks if after eviction we have more entries from newer generation than the older generation
 	static void CheckGenerationSanityAfterEviction(
-		CCache<SSimpleObject *, ULONG *> *pCache, ULLONG ullOneElemSize,
-		ULONG ulOldGenBeginKey, ULONG ulOldGenEndKey, ULONG ulNewGenEndKey);
+		CCache<gpos::Ref<SSimpleObject>, ULONG *> *pCache,
+		ULLONG ullOneElemSize, ULONG ulOldGenBeginKey, ULONG ulOldGenEndKey,
+		ULONG ulNewGenEndKey);
 
 	// tests if cache eviction works for a single cache size
 	static void TestEvictionForOneCacheSize(ULLONG ullCacheQuota);
@@ -141,8 +144,10 @@ private:
 
 
 	// accessors type definitions
-	typedef CCacheAccessor<SSimpleObject *, ULONG *> CSimpleObjectCacheAccessor;
-	typedef CCacheAccessor<CDeepObject *, CDeepObject::CDeepObjectList *>
+	typedef CCacheAccessor<gpos::Ref<SSimpleObject>, ULONG *>
+		CSimpleObjectCacheAccessor;
+	typedef CCacheAccessor<gpos::Ref<CDeepObject>,
+						   CDeepObject::CDeepObjectList *>
 		CDeepObjectCacheAccessor;
 
 	// cache task function pointer

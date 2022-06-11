@@ -35,7 +35,7 @@ class CParseHandlerPartitionSelector : public CParseHandlerPhysicalOp
 {
 private:
 	// table id
-	gpos::owner<IMDId *> m_rel_mdid;
+	gpos::Ref<IMDId> m_rel_mdid;
 
 	// number of partitioning levels
 	ULONG m_selector_id;
@@ -44,7 +44,7 @@ private:
 	ULONG m_scan_id;
 
 	// partitions
-	gpos::pointer<ULongPtrArray *> m_partitions;
+	ULongPtrArray *m_partitions;
 
 	// process the start of an element
 	void StartElement(

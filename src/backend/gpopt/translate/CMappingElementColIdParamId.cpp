@@ -35,8 +35,10 @@ using namespace gpos;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMappingElementColIdParamId::CMappingElementColIdParamId(
-	ULONG colid, ULONG paramid, gpos::pointer<IMDId *> mdid, INT type_modifier)
+CMappingElementColIdParamId::CMappingElementColIdParamId(ULONG colid,
+														 ULONG paramid,
+														 IMDId *mdid,
+														 INT type_modifier)
 	: m_colid(colid),
 	  m_paramid(paramid),
 	  m_mdid(mdid),

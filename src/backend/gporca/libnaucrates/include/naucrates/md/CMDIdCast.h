@@ -38,10 +38,10 @@ class CMDIdCast : public IMDId
 {
 private:
 	// mdid of source type
-	gpos::owner<CMDIdGPDB *> m_mdid_src;
+	gpos::Ref<CMDIdGPDB> m_mdid_src;
 
 	// mdid of destinatin type
-	gpos::owner<CMDIdGPDB *> m_mdid_dest;
+	gpos::Ref<CMDIdGPDB> m_mdid_dest;
 
 
 	// buffer for the serialized mdid
@@ -57,8 +57,7 @@ public:
 	CMDIdCast(const CMDIdCast &) = delete;
 
 	// ctor
-	CMDIdCast(gpos::owner<CMDIdGPDB *> mdid_src,
-			  gpos::owner<CMDIdGPDB *> mdid_dest);
+	CMDIdCast(gpos::Ref<CMDIdGPDB> mdid_src, gpos::Ref<CMDIdGPDB> mdid_dest);
 
 	// dtor
 	~CMDIdCast() override;
@@ -80,13 +79,13 @@ public:
 	}
 
 	// source type id
-	gpos::pointer<IMDId *> MdidSrc() const;
+	IMDId *MdidSrc() const;
 
 	// destination type id
-	gpos::pointer<IMDId *> MdidDest() const;
+	IMDId *MdidDest() const;
 
 	// equality check
-	BOOL Equals(gpos::pointer<const IMDId *> mdid) const override;
+	BOOL Equals(const IMDId *mdid) const override;
 
 	// computes the hash value for the metadata id
 	ULONG
@@ -101,7 +100,8 @@ public:
 	BOOL
 	IsValid() const override
 	{
-		return IMDId::IsValid(m_mdid_src) && IMDId::IsValid(m_mdid_dest);
+		return IMDId::IsValid(m_mdid_src.get()) &&
+			   IMDId::IsValid(m_mdid_dest.get());
 	}
 
 	// serialize mdid in DXL as the value of the specified attribute
@@ -112,8 +112,8 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// const converter
-	static gpos::pointer<const CMDIdCast *>
-	CastMdid(gpos::pointer<const IMDId *> mdid)
+	static const CMDIdCast *
+	CastMdid(const IMDId *mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidCastFunc == mdid->MdidType());
 
@@ -121,7 +121,7 @@ public:
 	}
 
 	// non-const converter
-	static gpos::cast_func<CMDIdCast *>
+	static CMDIdCast *
 	CastMdid(IMDId *mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidCastFunc == mdid->MdidType());
@@ -130,12 +130,12 @@ public:
 	}
 
 	// make a copy in the given memory pool
-	gpos::owner<IMDId *>
+	gpos::Ref<IMDId>
 	Copy(CMemoryPool *mp) const override
 	{
-		gpos::owner<CMDIdGPDB *> mdid_src =
+		gpos::Ref<CMDIdGPDB> mdid_src =
 			gpos::dyn_cast<CMDIdGPDB>(m_mdid_src->Copy(mp));
-		gpos::owner<CMDIdGPDB *> mdid_dest =
+		gpos::Ref<CMDIdGPDB> mdid_dest =
 			gpos::dyn_cast<CMDIdGPDB>(m_mdid_dest->Copy(mp));
 		return GPOS_NEW(mp)
 			CMDIdCast(std::move(mdid_src), std::move(mdid_dest));

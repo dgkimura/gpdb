@@ -33,13 +33,13 @@ class CLogicalUpdate : public CLogical
 {
 private:
 	// table descriptor
-	gpos::owner<CTableDescriptor *> m_ptabdesc;
+	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// columns to delete
-	gpos::owner<CColRefArray *> m_pdrgpcrDelete;
+	gpos::Ref<CColRefArray> m_pdrgpcrDelete;
 
 	// columns to insert
-	gpos::owner<CColRefArray *> m_pdrgpcrInsert;
+	gpos::Ref<CColRefArray> m_pdrgpcrInsert;
 
 	// ctid column
 	CColRef *m_pcrCtid;
@@ -57,9 +57,9 @@ public:
 	explicit CLogicalUpdate(CMemoryPool *mp);
 
 	// ctor
-	CLogicalUpdate(CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
-				   gpos::owner<CColRefArray *> pdrgpcrDelete,
-				   gpos::owner<CColRefArray *> pdrgpcrInsert, CColRef *pcrCtid,
+	CLogicalUpdate(CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
+				   gpos::Ref<CColRefArray> pdrgpcrDelete,
+				   gpos::Ref<CColRefArray> pdrgpcrInsert, CColRef *pcrCtid,
 				   CColRef *pcrSegmentId, CColRef *pcrTupleOid);
 
 	// dtor
@@ -80,17 +80,17 @@ public:
 	}
 
 	// columns to delete
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrDelete() const
 	{
-		return m_pdrgpcrDelete;
+		return m_pdrgpcrDelete.get();
 	}
 
 	// columns to insert
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrInsert() const
 	{
-		return m_pdrgpcrInsert;
+		return m_pdrgpcrInsert.get();
 	}
 
 	// ctid column
@@ -115,17 +115,17 @@ public:
 	}
 
 	// return table's descriptor
-	gpos::pointer<CTableDescriptor *>
+	CTableDescriptor *
 	Ptabdesc() const
 	{
-		return m_ptabdesc;
+		return m_ptabdesc.get();
 	}
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -135,8 +135,8 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -144,12 +144,12 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	gpos::owner<CColRefSet *> DeriveOutputColumns(
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *>
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 // mp
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -161,7 +161,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	gpos::owner<CPartInfo *>
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *,	// mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -169,10 +169,10 @@ public:
 	}
 
 	// compute required stats columns of the n-th child
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	PcrsStat(CMemoryPool *,		   // mp
 			 CExpressionHandle &,  // exprhdl
-			 gpos::pointer<CColRefSet *> pcrsInput,
+			 CColRefSet *pcrsInput,
 			 ULONG	// child_index
 	) const override
 	{
@@ -184,16 +184,16 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -207,7 +207,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CLogicalUpdate *>
+	static CLogicalUpdate *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

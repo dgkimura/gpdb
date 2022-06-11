@@ -71,12 +71,11 @@ public:
 	{
 	private:
 		// stats of the root
-		gpos::owner<IStatistics *> m_pstats;
+		gpos::Ref<IStatistics> m_pstats;
 
 	public:
 		// ctor
-		CCostingStats(gpos::owner<IStatistics *> stats)
-			: m_pstats(std::move(stats))
+		CCostingStats(gpos::Ref<IStatistics> stats) : m_pstats(std::move(stats))
 		{
 			GPOS_ASSERT(nullptr != m_pstats);
 		}
@@ -84,7 +83,7 @@ public:
 		// dtor
 		~CCostingStats() override
 		{
-			m_pstats->Release();
+			;
 		}
 
 		// the risk of errors in cardinality estimation
@@ -117,7 +116,7 @@ public:
 		ULONG m_ulChildren;
 
 		// stats of the root
-		gpos::owner<CCostingStats *> m_pcstats;
+		gpos::Ref<CCostingStats> m_pcstats;
 
 		// row estimate of root
 		DOUBLE m_rows;
@@ -146,7 +145,7 @@ public:
 	public:
 		// ctor
 		SCostingInfo(CMemoryPool *mp, ULONG ulChildren,
-					 gpos::owner<CCostingStats *> pcstats)
+					 gpos::Ref<CCostingStats> pcstats)
 			: m_ulChildren(ulChildren),
 			  m_pcstats(pcstats),
 			  m_rows(0),
@@ -189,7 +188,7 @@ public:
 			}
 
 			GPOS_DELETE_ARRAY(m_pdrgstatsChildren);
-			m_pcstats->Release();
+			;
 		}
 
 		// children accessor
@@ -317,16 +316,16 @@ public:
 
 		// child stats setter
 		void
-		SetChildStats(ULONG ulPos, gpos::owner<CCostingStats *> child_stats)
+		SetChildStats(ULONG ulPos, gpos::Ref<CCostingStats> child_stats)
 		{
 			m_pdrgstatsChildren[ulPos] = child_stats;
 		}
 
 		// return additional cost statistics
-		gpos::pointer<CCostingStats *>
+		CCostingStats *
 		Pcstats() const
 		{
-			return m_pcstats;
+			return m_pcstats.get();
 		}
 
 		// return additional child statistics
@@ -345,7 +344,7 @@ public:
 	virtual CDouble DRowsPerHost(CDouble dRowsTotal) const = 0;
 
 	// return cost model parameters
-	virtual gpos::pointer<ICostModelParams *> GetCostModelParams() const = 0;
+	virtual ICostModelParams *GetCostModelParams() const = 0;
 
 	// main driver for cost computation
 	virtual CCost Cost(CExpressionHandle &exprhdl,
@@ -355,10 +354,10 @@ public:
 	virtual ECostModelType Ecmt() const = 0;
 
 	// set cost model params
-	void SetParams(gpos::pointer<ICostModelParamsArray *> pdrgpcp) const;
+	void SetParams(ICostModelParamsArray *pdrgpcp) const;
 
 	// create a default cost model instance
-	static gpos::owner<ICostModel *> PcmDefault(CMemoryPool *mp);
+	static gpos::Ref<ICostModel> PcmDefault(CMemoryPool *mp);
 };
 }  // namespace gpopt
 

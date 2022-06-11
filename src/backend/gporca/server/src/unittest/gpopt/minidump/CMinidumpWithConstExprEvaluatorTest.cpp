@@ -87,7 +87,7 @@ CMinidumpWithConstExprEvaluatorTest::
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	gpos::owner<IConstExprEvaluator *> pceeval =
+	gpos::Ref<IConstExprEvaluator> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	BOOL fMatchPlans = true;
@@ -107,8 +107,8 @@ CMinidumpWithConstExprEvaluatorTest::
 		fMatchPlans,
 		false,	  // fTestSpacePruning
 		nullptr,  // szMDFilePath
-		pceeval);
-	pceeval->Release();
+		pceeval.get());
+	;
 
 	return eres;
 }

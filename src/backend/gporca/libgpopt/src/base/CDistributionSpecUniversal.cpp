@@ -16,8 +16,7 @@ CDistributionSpecUniversal::Edt() const
 }
 
 BOOL
-CDistributionSpecUniversal::FSatisfies(
-	gpos::pointer<const CDistributionSpec *> pds) const
+CDistributionSpecUniversal::FSatisfies(const CDistributionSpec *pds) const
 {
 	// universal distribution does not satisfy duplicate-sensitive
 	// hash distributions
@@ -51,8 +50,7 @@ CDistributionSpecUniversal::FRequirable() const
 }
 
 BOOL
-CDistributionSpecUniversal::Matches(
-	gpos::pointer<const CDistributionSpec *> pds) const
+CDistributionSpecUniversal::Matches(const CDistributionSpec *pds) const
 {
 	// universal distribution needs to match replicated / singleton requests
 	// to avoid generating duplicates
@@ -65,9 +63,8 @@ CDistributionSpecUniversal::Matches(
 
 void
 CDistributionSpecUniversal::AppendEnforcers(CMemoryPool *, CExpressionHandle &,
-											gpos::pointer<CReqdPropPlan *>,
-											gpos::pointer<CExpressionArray *>,
-											gpos::pointer<CExpression *>)
+											CReqdPropPlan *, CExpressionArray *,
+											CExpression *)
 {
 	GPOS_ASSERT(!"attempt to enforce UNIVERSAL distribution");
 }
@@ -84,7 +81,7 @@ CDistributionSpecUniversal::Edpt() const
 	return EdptNonPartitioned;
 }
 
-gpos::cast_func<CDistributionSpecUniversal *>
+CDistributionSpecUniversal *
 CDistributionSpecUniversal::PdsConvert(CDistributionSpec *pds)
 {
 	GPOS_ASSERT(nullptr != pds);

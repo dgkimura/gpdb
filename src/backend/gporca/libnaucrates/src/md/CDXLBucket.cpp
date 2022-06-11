@@ -29,8 +29,8 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLBucket::CDXLBucket(gpos::owner<CDXLDatum *> dxl_datum_lower,
-					   gpos::owner<CDXLDatum *> dxl_datum_upper,
+CDXLBucket::CDXLBucket(gpos::Ref<CDXLDatum> dxl_datum_lower,
+					   gpos::Ref<CDXLDatum> dxl_datum_upper,
 					   BOOL is_lower_closed, BOOL is_upper_closed,
 					   CDouble frequency, CDouble distinct)
 	: m_lower_bound_dxl_datum(std::move(dxl_datum_lower)),
@@ -56,8 +56,8 @@ CDXLBucket::CDXLBucket(gpos::owner<CDXLDatum *> dxl_datum_lower,
 //---------------------------------------------------------------------------
 CDXLBucket::~CDXLBucket()
 {
-	m_lower_bound_dxl_datum->Release();
-	m_upper_bound_dxl_datum->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -68,10 +68,10 @@ CDXLBucket::~CDXLBucket()
 //		Returns the lower bound for the bucket
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLDatum *>
+const CDXLDatum *
 CDXLBucket::GetDXLDatumLower() const
 {
-	return m_lower_bound_dxl_datum;
+	return m_lower_bound_dxl_datum.get();
 }
 
 //---------------------------------------------------------------------------
@@ -82,10 +82,10 @@ CDXLBucket::GetDXLDatumLower() const
 //		Returns the upper bound for the bucket
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLDatum *>
+const CDXLDatum *
 CDXLBucket::GetDXLDatumUpper() const
 {
-	return m_upper_bound_dxl_datum;
+	return m_upper_bound_dxl_datum.get();
 }
 
 //---------------------------------------------------------------------------
@@ -141,11 +141,11 @@ CDXLBucket::Serialize(CXMLSerializer *xml_serializer) const
 	SerializeBoundaryValue(
 		xml_serializer,
 		CDXLTokens::GetDXLTokenStr(EdxltokenStatsBucketLowerBound),
-		m_lower_bound_dxl_datum, m_is_lower_closed);
+		m_lower_bound_dxl_datum.get(), m_is_lower_closed);
 	SerializeBoundaryValue(
 		xml_serializer,
 		CDXLTokens::GetDXLTokenStr(EdxltokenStatsBucketUpperBound),
-		m_upper_bound_dxl_datum, m_is_upper_closed);
+		m_upper_bound_dxl_datum.get(), m_is_upper_closed);
 	xml_serializer->SetFullPrecision(false);
 
 	xml_serializer->CloseElement(
@@ -166,8 +166,7 @@ CDXLBucket::Serialize(CXMLSerializer *xml_serializer) const
 void
 CDXLBucket::SerializeBoundaryValue(CXMLSerializer *xml_serializer,
 								   const CWStringConst *elem_str,
-								   gpos::pointer<CDXLDatum *> dxl_datum,
-								   BOOL is_bound_closed)
+								   CDXLDatum *dxl_datum, BOOL is_bound_closed)
 {
 	xml_serializer->OpenElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), elem_str);

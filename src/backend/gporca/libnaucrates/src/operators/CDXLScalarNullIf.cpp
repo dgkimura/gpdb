@@ -29,9 +29,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarNullIf::CDXLScalarNullIf(CMemoryPool *mp,
-								   gpos::owner<IMDId *> mdid_op,
-								   gpos::owner<IMDId *> mdid_type)
+CDXLScalarNullIf::CDXLScalarNullIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+								   gpos::Ref<IMDId> mdid_type)
 	: CDXLScalar(mp),
 	  m_mdid_op(std::move(mdid_op)),
 	  m_mdid_type(std::move(mdid_type))
@@ -50,8 +49,8 @@ CDXLScalarNullIf::CDXLScalarNullIf(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarNullIf::~CDXLScalarNullIf()
 {
-	m_mdid_op->Release();
-	m_mdid_type->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -76,10 +75,10 @@ CDXLScalarNullIf::GetDXLOperator() const
 //		Operator id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarNullIf::MdIdOp() const
 {
-	return m_mdid_op;
+	return m_mdid_op.get();
 }
 
 //---------------------------------------------------------------------------
@@ -90,10 +89,10 @@ CDXLScalarNullIf::MdIdOp() const
 //		Return type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarNullIf::MdidType() const
 {
-	return m_mdid_type;
+	return m_mdid_type.get();
 }
 
 //---------------------------------------------------------------------------
@@ -123,7 +122,7 @@ BOOL
 CDXLScalarNullIf::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
+			md_accessor->RetrieveType(m_mdid_type.get())->GetDatumType());
 }
 
 //---------------------------------------------------------------------------
@@ -136,7 +135,7 @@ CDXLScalarNullIf::HasBoolResult(CMDAccessor *md_accessor) const
 //---------------------------------------------------------------------------
 void
 CDXLScalarNullIf::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 gpos::pointer<const CDXLNode *> dxlnode) const
+								 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -163,7 +162,7 @@ CDXLScalarNullIf::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarNullIf::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarNullIf::AssertValid(const CDXLNode *dxlnode,
 							  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
@@ -171,7 +170,7 @@ CDXLScalarNullIf::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[idx];
+		CDXLNode *child_dxlnode = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

@@ -36,10 +36,10 @@ class CParseHandlerLogicalTVF : public CParseHandlerLogicalOp
 {
 private:
 	// catalog id of the function
-	gpos::pointer<IMDId *> m_func_mdid;
+	IMDId *m_func_mdid;
 
 	// return type
-	gpos::pointer<IMDId *> m_return_type_mdid;
+	IMDId *m_return_type_mdid;
 
 	// function name
 	CMDName *m_mdname;

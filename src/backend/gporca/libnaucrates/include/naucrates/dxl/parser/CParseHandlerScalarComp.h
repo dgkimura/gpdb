@@ -37,7 +37,7 @@ class CParseHandlerScalarComp : public CParseHandlerScalarOp
 {
 private:
 	// the scalar comparison operator
-	gpos::pointer<CDXLScalarComp *> m_dxl_op;
+	CDXLScalarComp *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

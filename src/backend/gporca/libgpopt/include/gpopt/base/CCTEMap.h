@@ -82,14 +82,14 @@ private:
 		CCTEMap::ECteType m_ect;
 
 		// derived plan properties if entry corresponds to CTE producer
-		gpos::owner<CDrvdPropPlan *> m_pdpplan;
+		gpos::Ref<CDrvdPropPlan> m_pdpplan;
 
 	public:
 		CCTEMapEntry(const CCTEMapEntry &) = delete;
 
 		// ctor
 		CCTEMapEntry(ULONG id, CCTEMap::ECteType ect,
-					 gpos::owner<CDrvdPropPlan *> pdpplan)
+					 gpos::Ref<CDrvdPropPlan> pdpplan)
 			: m_id(id), m_ect(ect), m_pdpplan(std::move(pdpplan))
 		{
 			GPOS_ASSERT(EctSentinel > ect);
@@ -99,7 +99,7 @@ private:
 		// dtor
 		~CCTEMapEntry() override
 		{
-			CRefCount::SafeRelease(m_pdpplan);
+			;
 		}
 
 		// cte id
@@ -117,10 +117,10 @@ private:
 		}
 
 		// plan properties
-		gpos::pointer<CDrvdPropPlan *>
+		CDrvdPropPlan *
 		Pdpplan() const
 		{
-			return m_pdpplan;
+			return m_pdpplan.get();
 		}
 
 		// hash function
@@ -163,14 +163,14 @@ private:
 	CMemoryPool *m_mp;
 
 	// cte map
-	gpos::owner<UlongToCTEMapEntryMap *> m_phmcm;
+	gpos::Ref<UlongToCTEMapEntryMap> m_phmcm;
 
 	// lookup info for given cte id
-	gpos::pointer<CCTEMapEntry *> PcmeLookup(ULONG ulCteId) const;
+	CCTEMapEntry *PcmeLookup(ULONG ulCteId) const;
 
 	// helper to add entries found in first map and are unresolved based on second map
 	static void AddUnresolved(const CCTEMap &cmFirst, const CCTEMap &cmSecond,
-							  gpos::pointer<CCTEMap *> pcmResult);
+							  CCTEMap *pcmResult);
 
 public:
 	CCTEMap(const CCTEMap &) = delete;
@@ -192,7 +192,7 @@ public:
 
 	// check if two cte maps are equal
 	BOOL
-	Equals(gpos::pointer<const CCTEMap *> pcm) const
+	Equals(const CCTEMap *pcm) const
 	{
 		return (m_phmcm->Size() == pcm->m_phmcm->Size()) && this->FSubset(pcm);
 	}
@@ -201,22 +201,22 @@ public:
 	CDrvdPropPlan *PdpplanProducer(ULONG *ulpId) const;
 
 	// check if current  map is a subset of the given one
-	BOOL FSubset(gpos::pointer<const CCTEMap *> pcm) const;
+	BOOL FSubset(const CCTEMap *pcm) const;
 
 	// check whether the current CTE map satisfies the given CTE requirements
-	BOOL FSatisfies(gpos::pointer<const CCTEReq *> pcter) const;
+	BOOL FSatisfies(const CCTEReq *pcter) const;
 
 	// return producer ids that are in this map but not in the given requirement
-	gpos::owner<ULongPtrArray *> PdrgpulAdditionalProducers(
-		CMemoryPool *mp, gpos::pointer<const CCTEReq *> pcter) const;
+	gpos::Ref<ULongPtrArray> PdrgpulAdditionalProducers(
+		CMemoryPool *mp, const CCTEReq *pcter) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;
 
 	// combine the two given maps and return the resulting map
-	static gpos::owner<CCTEMap *> PcmCombine(CMemoryPool *mp,
-											 const CCTEMap &cmFirst,
-											 const CCTEMap &cmSecond);
+	static gpos::Ref<CCTEMap> PcmCombine(CMemoryPool *mp,
+										 const CCTEMap &cmFirst,
+										 const CCTEMap &cmSecond);
 
 };	// class CCTEMap
 

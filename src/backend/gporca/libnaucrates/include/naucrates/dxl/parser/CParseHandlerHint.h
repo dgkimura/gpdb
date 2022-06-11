@@ -36,7 +36,7 @@ class CParseHandlerHint : public CParseHandlerBase
 {
 private:
 	// hint configuration
-	gpos::owner<CHint *> m_hint;
+	gpos::Ref<CHint> m_hint;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +67,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// hint configuration
-	gpos::pointer<CHint *> GetHint() const;
+	CHint *GetHint() const;
 };
 }  // namespace gpdxl
 

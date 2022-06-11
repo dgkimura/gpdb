@@ -28,7 +28,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarCoerceToDomain::CDXLScalarCoerceToDomain(
-	CMemoryPool *mp, gpos::owner<IMDId *> mdid_type, INT type_modifier,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid_type, INT type_modifier,
 	EdxlCoercionForm dxl_coerce_format, INT location)
 	: CDXLScalarCoerceBase(mp, std::move(mdid_type), type_modifier,
 						   dxl_coerce_format, location)

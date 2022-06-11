@@ -49,7 +49,7 @@ private:
 	EBitmapBoolOp m_ebitmapboolop;
 
 	// bitmap type id
-	gpos::owner<IMDId *> m_pmdidBitmapType;
+	gpos::Ref<IMDId> m_pmdidBitmapType;
 
 	static const WCHAR m_rgwszBitmapOpType[EbitmapboolSentinel][30];
 
@@ -58,7 +58,7 @@ public:
 
 	// ctor
 	CScalarBitmapBoolOp(CMemoryPool *mp, EBitmapBoolOp ebitmapboolop,
-						gpos::owner<IMDId *> pmdidBitmapType);
+						gpos::Ref<IMDId> pmdidBitmapType);
 
 
 	// dtor
@@ -72,10 +72,10 @@ public:
 	}
 
 	// bitmap type id
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const override
 	{
-		return m_pmdidBitmapType;
+		return m_pmdidBitmapType.get();
 	}
 
 	// identifier
@@ -96,7 +96,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -106,12 +106,11 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
@@ -120,7 +119,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion
-	static gpos::cast_func<CScalarBitmapBoolOp *>
+	static CScalarBitmapBoolOp *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

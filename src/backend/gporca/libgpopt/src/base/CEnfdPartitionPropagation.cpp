@@ -30,7 +30,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CEnfdPartitionPropagation::CEnfdPartitionPropagation(
-	gpos::owner<CPartitionPropagationSpec *> ppps,
+	gpos::Ref<CPartitionPropagationSpec> ppps,
 	EPartitionPropagationMatching eppm)
 	: m_ppps(std::move(ppps)), m_eppm(eppm)
 
@@ -50,7 +50,7 @@ CEnfdPartitionPropagation::CEnfdPartitionPropagation(
 //---------------------------------------------------------------------------
 CEnfdPartitionPropagation::~CEnfdPartitionPropagation()
 {
-	m_ppps->Release();
+	;
 }
 
 
@@ -79,7 +79,7 @@ CEnfdPartitionPropagation::HashValue() const
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CEnfdPartitionPropagation::Epet(CExpressionHandle &exprhdl,
-								gpos::pointer<CPhysical *> popPhysical,
+								CPhysical *popPhysical,
 								BOOL fPropagationReqd) const
 {
 	if (fPropagationReqd)
@@ -126,8 +126,7 @@ CEnfdPartitionPropagation::SzPropagationMatching(
 }
 
 BOOL
-CEnfdPartitionPropagation::Matches(
-	gpos::pointer<CEnfdPartitionPropagation *> pepp)
+CEnfdPartitionPropagation::Matches(CEnfdPartitionPropagation *pepp)
 {
 	GPOS_ASSERT(nullptr != pepp);
 
@@ -136,14 +135,14 @@ CEnfdPartitionPropagation::Matches(
 
 BOOL
 CEnfdPartitionPropagation::FCompatible(
-	gpos::pointer<CPartitionPropagationSpec *> pps_drvd) const
+	CPartitionPropagationSpec *pps_drvd) const
 {
 	GPOS_ASSERT(nullptr != pps_drvd);
 
 	switch (m_eppm)
 	{
 		case EppmSatisfy:
-			return pps_drvd->FSatisfies(m_ppps);
+			return pps_drvd->FSatisfies(m_ppps.get());
 
 		case EppmSentinel:
 			GPOS_ASSERT("invalid matching type");

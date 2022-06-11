@@ -45,7 +45,7 @@ public:
 
 private:
 	// id of the scalar comparison operator
-	gpos::owner<IMDId *> m_scalar_op_mdid;
+	gpos::Ref<IMDId> m_scalar_op_mdid;
 
 	// name of scalar comparison operator
 	CMDName *m_scalar_op_mdname;
@@ -58,17 +58,17 @@ public:
 
 	// ctor
 	CDXLScalarSubqueryQuantified(CMemoryPool *mp,
-								 gpos::owner<IMDId *> scalar_op_mdid,
+								 gpos::Ref<IMDId> scalar_op_mdid,
 								 CMDName *mdname, ULONG colid);
 
 	// dtor
 	~CDXLScalarSubqueryQuantified() override;
 
 	// scalar operator id
-	gpos::pointer<IMDId *>
+	IMDId *
 	GetScalarOpMdId() const
 	{
-		return m_scalar_op_mdid;
+		return m_scalar_op_mdid.get();
 	}
 
 	// scalar operator name
@@ -86,11 +86,10 @@ public:
 	}
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *,
-						gpos::pointer<const CDXLNode *>) const override;
+	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarSubqueryQuantified *>
+	static CDXLScalarSubqueryQuantified *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -111,7 +110,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

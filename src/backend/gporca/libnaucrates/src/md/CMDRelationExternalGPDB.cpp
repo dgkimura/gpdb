@@ -28,15 +28,15 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDRelationExternalGPDB::CMDRelationExternalGPDB(
-	CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
-	Ereldistrpolicy rel_distr_policy, gpos::owner<CMDColumnArray *> mdcol_array,
-	gpos::owner<ULongPtrArray *> distr_col_array,
-	gpos::owner<IMdIdArray *> distr_opfamilies, BOOL convert_hash_to_random,
-	gpos::owner<ULongPtr2dArray *> keyset_array,
-	gpos::owner<CMDIndexInfoArray *> md_index_info_array,
-	gpos::owner<IMdIdArray *> mdid_triggers_array,
-	gpos::owner<IMdIdArray *> mdid_check_constraint_array, INT reject_limit,
-	BOOL is_reject_limit_in_rows, gpos::owner<IMDId *> mdid_fmt_err_table)
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+	Ereldistrpolicy rel_distr_policy, gpos::Ref<CMDColumnArray> mdcol_array,
+	gpos::Ref<ULongPtrArray> distr_col_array,
+	gpos::Ref<IMdIdArray> distr_opfamilies, BOOL convert_hash_to_random,
+	gpos::Ref<ULongPtr2dArray> keyset_array,
+	gpos::Ref<CMDIndexInfoArray> md_index_info_array,
+	gpos::Ref<IMdIdArray> mdid_triggers_array,
+	gpos::Ref<IMdIdArray> mdid_check_constraint_array, INT reject_limit,
+	BOOL is_reject_limit_in_rows, gpos::Ref<IMDId> mdid_fmt_err_table)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -79,7 +79,7 @@ CMDRelationExternalGPDB::CMDRelationExternalGPDB(
 	const ULONG arity = m_md_col_array->Size();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		gpos::pointer<IMDColumn *> pmdcol = (*m_md_col_array)[ul];
+		IMDColumn *pmdcol = (*m_md_col_array)[ul].get();
 
 		BOOL isSystemCol = pmdcol->IsSystemColumn();
 		if (isSystemCol)
@@ -124,20 +124,20 @@ CMDRelationExternalGPDB::~CMDRelationExternalGPDB()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid->Release();
-	m_md_col_array->Release();
-	CRefCount::SafeRelease(m_distr_col_array);
-	CRefCount::SafeRelease(m_distr_opfamilies);
-	CRefCount::SafeRelease(m_keyset_array);
-	m_mdindex_info_array->Release();
-	m_mdid_trigger_array->Release();
-	m_col_width_array->Release();
-	m_mdid_check_constraint_array->Release();
-	CRefCount::SafeRelease(m_mdid_fmt_err_table);
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
 
-	CRefCount::SafeRelease(m_colpos_nondrop_colpos_map);
-	CRefCount::SafeRelease(m_attrno_nondrop_col_pos_map);
-	CRefCount::SafeRelease(m_nondrop_col_pos_array);
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -148,10 +148,10 @@ CMDRelationExternalGPDB::~CMDRelationExternalGPDB()
 //		Returns the metadata id of this relation
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDRelationExternalGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -255,10 +255,10 @@ CMDRelationExternalGPDB::SystemColumnsCount() const
 //		Returns the original positions of all the non-dropped columns
 //
 //---------------------------------------------------------------------------
-gpos::pointer<ULongPtrArray *>
+ULongPtrArray *
 CMDRelationExternalGPDB::NonDroppedColsArray() const
 {
-	return m_nondrop_col_pos_array;
+	return m_nondrop_col_pos_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -286,7 +286,7 @@ CMDRelationExternalGPDB::NonDroppedColAt(ULONG pos) const
 	return *pul;
 }
 
-gpos::pointer<IMDId *>
+IMDId *
 CMDRelationExternalGPDB::GetDistrOpfamilyAt(ULONG pos) const
 {
 	if (m_distr_opfamilies == nullptr)
@@ -296,7 +296,7 @@ CMDRelationExternalGPDB::GetDistrOpfamilyAt(ULONG pos) const
 	}
 
 	GPOS_ASSERT(pos < m_distr_opfamilies->Size());
-	return (*m_distr_opfamilies)[pos];
+	return (*m_distr_opfamilies)[pos].get();
 }
 //---------------------------------------------------------------------------
 //	@function:
@@ -364,10 +364,10 @@ CMDRelationExternalGPDB::IsRejectLimitInRows() const
 //		Format error table mdid
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDRelationExternalGPDB::GetFormatErrTableMdid() const
 {
-	return m_mdid_fmt_err_table;
+	return m_mdid_fmt_err_table.get();
 }
 
 //---------------------------------------------------------------------------
@@ -392,12 +392,12 @@ CMDRelationExternalGPDB::KeySetCount() const
 //		Returns the key set at the specified position
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const ULongPtrArray *>
+const ULongPtrArray *
 CMDRelationExternalGPDB::KeySetAt(ULONG pos) const
 {
 	GPOS_ASSERT(nullptr != m_keyset_array);
 
-	return (*m_keyset_array)[pos];
+	return (*m_keyset_array)[pos].get();
 }
 
 //---------------------------------------------------------------------------
@@ -450,12 +450,12 @@ CMDRelationExternalGPDB::TriggerCount() const
 //		Returns the column at the specified position
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const IMDColumn *>
+const IMDColumn *
 CMDRelationExternalGPDB::GetMdCol(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_md_col_array->Size());
 
-	return (*m_md_col_array)[pos];
+	return (*m_md_col_array)[pos].get();
 }
 
 //---------------------------------------------------------------------------
@@ -466,7 +466,7 @@ CMDRelationExternalGPDB::GetMdCol(ULONG pos) const
 //		Returns the distribution column at the specified position in the distribution column list
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const IMDColumn *>
+const IMDColumn *
 CMDRelationExternalGPDB::GetDistrColAt(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_distr_col_array->Size());
@@ -498,10 +498,10 @@ CMDRelationExternalGPDB::IndexMDidAt(ULONG pos) const
 //		Returns the id of the trigger at the specified position of the trigger array
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDRelationExternalGPDB::TriggerMDidAt(ULONG pos) const
 {
-	return (*m_mdid_trigger_array)[pos];
+	return (*m_mdid_trigger_array)[pos].get();
 }
 
 //---------------------------------------------------------------------------
@@ -527,10 +527,10 @@ CMDRelationExternalGPDB::CheckConstraintCount() const
 //		the check constraint array
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDRelationExternalGPDB::CheckConstraintMDidAt(ULONG pos) const
 {
-	return (*m_mdid_check_constraint_array)[pos];
+	return (*m_mdid_check_constraint_array)[pos].get();
 }
 
 //---------------------------------------------------------------------------
@@ -562,7 +562,7 @@ CMDRelationExternalGPDB::Serialize(CXMLSerializer *xml_serializer) const
 
 		// serialize distribution columns
 		CWStringDynamic *pstrDistrColumns =
-			ColumnsToStr(m_mp, m_distr_col_array);
+			ColumnsToStr(m_mp, m_distr_col_array.get());
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenDistrColumns),
 			pstrDistrColumns);
@@ -572,7 +572,8 @@ CMDRelationExternalGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	// serialize key sets
 	if (m_keyset_array != nullptr && 0 < m_keyset_array->Size())
 	{
-		CWStringDynamic *pstrKeys = CDXLUtils::Serialize(m_mp, m_keyset_array);
+		CWStringDynamic *pstrKeys =
+			CDXLUtils::Serialize(m_mp, m_keyset_array.get());
 		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenKeys),
 									 pstrKeys);
 		GPOS_DELETE(pstrKeys);
@@ -608,7 +609,7 @@ CMDRelationExternalGPDB::Serialize(CXMLSerializer *xml_serializer) const
 		CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
 	for (ULONG ul = 0; ul < m_md_col_array->Size(); ul++)
 	{
-		gpos::pointer<CMDColumn *> pmdcol = (*m_md_col_array)[ul];
+		CMDColumn *pmdcol = (*m_md_col_array)[ul].get();
 		pmdcol->Serialize(xml_serializer);
 	}
 
@@ -623,8 +624,7 @@ CMDRelationExternalGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	const ULONG ulIndexes = m_mdindex_info_array->Size();
 	for (ULONG ul = 0; ul < ulIndexes; ul++)
 	{
-		gpos::pointer<CMDIndexInfo *> pmdIndexInfo =
-			(*m_mdindex_info_array)[ul];
+		CMDIndexInfo *pmdIndexInfo = (*m_mdindex_info_array)[ul].get();
 		pmdIndexInfo->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -635,12 +635,12 @@ CMDRelationExternalGPDB::Serialize(CXMLSerializer *xml_serializer) const
 		CDXLTokens::GetDXLTokenStr(EdxltokenIndexInfoList));
 
 	// serialize trigger information
-	SerializeMDIdList(xml_serializer, m_mdid_trigger_array,
+	SerializeMDIdList(xml_serializer, m_mdid_trigger_array.get(),
 					  CDXLTokens::GetDXLTokenStr(EdxltokenTriggers),
 					  CDXLTokens::GetDXLTokenStr(EdxltokenTrigger));
 
 	// serialize check constraint information
-	SerializeMDIdList(xml_serializer, m_mdid_check_constraint_array,
+	SerializeMDIdList(xml_serializer, m_mdid_check_constraint_array.get(),
 					  CDXLTokens::GetDXLTokenStr(EdxltokenCheckConstraints),
 					  CDXLTokens::GetDXLTokenStr(EdxltokenCheckConstraint));
 
@@ -648,7 +648,7 @@ CMDRelationExternalGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	if (EreldistrHash == m_rel_distr_policy && nullptr != m_distr_opfamilies)
 	{
 		SerializeMDIdList(
-			xml_serializer, m_distr_opfamilies,
+			xml_serializer, m_distr_opfamilies.get(),
 			CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpfamilies),
 			CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpfamily));
 	}
@@ -683,7 +683,7 @@ CMDRelationExternalGPDB::DebugPrint(IOstream &os) const
 	const ULONG ulColumns = ColumnCount();
 	for (ULONG ul = 0; ul < ulColumns; ul++)
 	{
-		gpos::pointer<const IMDColumn *> pimdcol = GetMdCol(ul);
+		const IMDColumn *pimdcol = GetMdCol(ul);
 		pimdcol->DebugPrint(os);
 	}
 	os << std::endl;
@@ -697,7 +697,7 @@ CMDRelationExternalGPDB::DebugPrint(IOstream &os) const
 			os << ", ";
 		}
 
-		gpos::pointer<const IMDColumn *> pimdcolDistrKey = GetDistrColAt(ul);
+		const IMDColumn *pimdcolDistrKey = GetDistrColAt(ul);
 		os << (pimdcolDistrKey->Mdname()).GetMDName()->GetBuffer();
 	}
 
@@ -707,16 +707,15 @@ CMDRelationExternalGPDB::DebugPrint(IOstream &os) const
 	const ULONG ulIndexes = m_mdindex_info_array->Size();
 	for (ULONG ul = 0; ul < ulIndexes; ul++)
 	{
-		gpos::pointer<CMDIndexInfo *> pmdIndexInfo =
-			(*m_mdindex_info_array)[ul];
+		CMDIndexInfo *pmdIndexInfo = (*m_mdindex_info_array)[ul].get();
 		pmdIndexInfo->DebugPrint(os);
 	}
 
 	os << "Triggers: ";
-	CDXLUtils::DebugPrintMDIdArray(os, m_mdid_trigger_array);
+	CDXLUtils::DebugPrintMDIdArray(os, m_mdid_trigger_array.get());
 
 	os << "Check Constraint: ";
-	CDXLUtils::DebugPrintMDIdArray(os, m_mdid_check_constraint_array);
+	CDXLUtils::DebugPrintMDIdArray(os, m_mdid_check_constraint_array.get());
 
 	os << "Reject limit: " << m_reject_limit;
 	if (m_is_rej_limit_in_rows)

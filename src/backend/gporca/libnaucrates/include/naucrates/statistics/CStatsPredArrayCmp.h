@@ -36,7 +36,7 @@ private:
 	// comparison type
 	CStatsPred::EStatsCmpType m_stats_cmp_type;
 
-	gpos::owner<CPointArray *> m_points;
+	gpos::Ref<CPointArray> m_points;
 
 public:
 	CStatsPredArrayCmp &operator=(CStatsPredArrayCmp &) = delete;
@@ -45,12 +45,12 @@ public:
 
 	// ctor
 	CStatsPredArrayCmp(ULONG colid, CStatsPred::EStatsCmpType stats_cmp_type,
-					   gpos::owner<CPointArray *> points);
+					   gpos::Ref<CPointArray> points);
 
 	// dtor
 	~CStatsPredArrayCmp() override
 	{
-		m_points->Release();
+		;
 	}
 
 	// comparison types for stats computation
@@ -67,14 +67,14 @@ public:
 		return CStatsPred::EsptArrayCmp;
 	}
 
-	virtual gpos::pointer<CPointArray *>
+	virtual CPointArray *
 	GetPoints() const
 	{
-		return m_points;
+		return m_points.get();
 	}
 
 	// conversion function
-	static gpos::cast_func<CStatsPredArrayCmp *>
+	static CStatsPredArrayCmp *
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

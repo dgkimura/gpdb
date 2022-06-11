@@ -73,15 +73,19 @@ CParseHandlerPhysicalSplit::StartElement(const XMLCh *const,  // element_uri,
 
 	const XMLCh *delete_colids = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenDeleteCols, EdxltokenPhysicalSplit);
-	m_deletion_colid_array = CDXLOperatorFactory::ExtractIntsToUlongArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), delete_colids,
-		EdxltokenDeleteCols, EdxltokenPhysicalSplit);
+	m_deletion_colid_array =
+		CDXLOperatorFactory::ExtractIntsToUlongArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), delete_colids,
+			EdxltokenDeleteCols, EdxltokenPhysicalSplit)
+			.get();
 
 	const XMLCh *insert_colids = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenInsertCols, EdxltokenPhysicalSplit);
-	m_insert_colid_array = CDXLOperatorFactory::ExtractIntsToUlongArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), insert_colids,
-		EdxltokenInsertCols, EdxltokenPhysicalSplit);
+	m_insert_colid_array =
+		CDXLOperatorFactory::ExtractIntsToUlongArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), insert_colids,
+			EdxltokenInsertCols, EdxltokenPhysicalSplit)
+			.get();
 
 	m_action_colid = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenActionColId,
@@ -173,20 +177,20 @@ CParseHandlerPhysicalSplit::EndElement(const XMLCh *const,	// element_uri,
 		dynamic_cast<CParseHandlerPhysicalOp *>((*this)[2]);
 	GPOS_ASSERT(nullptr != child_parse_handler->CreateDXLNode());
 
-	gpos::owner<CDXLPhysicalSplit *> dxl_op = GPOS_NEW(m_mp) CDXLPhysicalSplit(
+	gpos::Ref<CDXLPhysicalSplit> dxl_op = GPOS_NEW(m_mp) CDXLPhysicalSplit(
 		m_mp, m_deletion_colid_array, m_insert_colid_array, m_action_colid,
 		m_ctid_colid, m_segid_colid, m_preserve_oids, m_tuple_oid_col_oid);
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 
 	// set statistics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	AddChildFromParseHandler(proj_list_parse_handler);
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node,
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node.get(),
 										   false /* validate_children */);
 #endif	// GPOS_DEBUG
 

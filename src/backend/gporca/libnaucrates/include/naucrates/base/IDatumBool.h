@@ -101,7 +101,7 @@ public:
 	}
 
 	// return the padded datum
-	gpos::owner<IDatum *>
+	gpos::Ref<IDatum>
 	MakePaddedDatum(CMemoryPool *,	// mp,
 					ULONG			// col_len
 	) const override

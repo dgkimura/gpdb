@@ -39,8 +39,7 @@ using namespace gpopt;
 //	| others not Singleton    | T                |(default) F        |
 //	+-------------------------+------------------+-------------------+
 BOOL
-CDistributionSpecReplicated::FSatisfies(
-	gpos::pointer<const CDistributionSpec *> pdss) const
+CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
 {
 	GPOS_ASSERT(Edt() != CDistributionSpec::EdtReplicated);
 
@@ -112,16 +111,15 @@ CDistributionSpecReplicated::FSatisfies(
 }
 
 void
-CDistributionSpecReplicated::AppendEnforcers(
-	CMemoryPool *mp,
-	CExpressionHandle &,  // exprhdl
-	gpos::pointer<CReqdPropPlan *>
+CDistributionSpecReplicated::AppendEnforcers(CMemoryPool *mp,
+											 CExpressionHandle &,  // exprhdl
+											 CReqdPropPlan *
 #ifdef GPOS_DEBUG
-		prpp
+												 prpp
 #endif	// GPOS_DEBUG
-	,
-	gpos::pointer<CExpressionArray *> pdrgpexpr,
-	gpos::pointer<CExpression *> pexpr)
+											 ,
+											 CExpressionArray *pdrgpexpr,
+											 CExpression *pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);
@@ -139,8 +137,8 @@ CDistributionSpecReplicated::AppendEnforcers(
 		return;
 	}
 
-	pexpr->AddRef();
-	gpos::owner<CExpression *> pexprMotion = GPOS_NEW(mp)
+	;
+	gpos::Ref<CExpression> pexprMotion = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalMotionBroadcast(mp), pexpr);
 	pdrgpexpr->Append(std::move(pexprMotion));
 }

@@ -52,9 +52,9 @@ CPhysicalLeftAntiSemiNLJoin::~CPhysicalLeftAntiSemiNLJoin() = default;
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalLeftAntiSemiNLJoin::FProvidesReqdCols(
-	CExpressionHandle &exprhdl, gpos::pointer<CColRefSet *> pcrsRequired,
-	ULONG  // ulOptReq
+CPhysicalLeftAntiSemiNLJoin::FProvidesReqdCols(CExpressionHandle &exprhdl,
+											   CColRefSet *pcrsRequired,
+											   ULONG  // ulOptReq
 ) const
 {
 	// left anti semi join only propagates columns from left child

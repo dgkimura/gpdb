@@ -62,8 +62,9 @@ CParseHandlerScalarCaseTest::StartElement(const XMLCh *const,  //element_uri,
 
 	// parse type id
 	m_mdid_type = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId,
-		EdxltokenScalarCaseTest);
+					  m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+					  EdxltokenTypeId, EdxltokenScalarCaseTest)
+					  .get();
 }
 
 //---------------------------------------------------------------------------

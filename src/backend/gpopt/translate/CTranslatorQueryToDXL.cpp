@@ -125,8 +125,7 @@ static const OID lag_func_oids[] = {
 CTranslatorQueryToDXL::CTranslatorQueryToDXL(
 	CContextQueryToDXL *context, CMDAccessor *md_accessor,
 	const CMappingVarColId *var_colid_mapping, Query *query, ULONG query_level,
-	BOOL is_top_query_dml,
-	gpos::pointer<HMUlCTEListEntry *> query_level_to_cte_map)
+	BOOL is_top_query_dml, HMUlCTEListEntry *query_level_to_cte_map)
 	: m_context(context),
 	  m_mp(context->m_mp),
 	  m_sysid(IMDId::EmdidGPDB, GPMD_GPDB_SYSID),
@@ -194,7 +193,7 @@ CTranslatorQueryToDXL::CTranslatorQueryToDXL(
 
 			if (cte_query_level < query_level && nullptr != cte_list_entry)
 			{
-				cte_list_entry->AddRef();
+				;
 				BOOL is_res GPOS_ASSERTS_ONLY =
 					m_query_level_to_cte_map->Insert(
 						GPOS_NEW(m_mp) ULONG(cte_query_level), cte_list_entry);
@@ -218,9 +217,9 @@ CTranslatorQueryToDXL::CTranslatorQueryToDXL(
 		ConstructCTEProducerList(m_query->cteList, query_level);
 	}
 
-	m_scalar_translator = GPOS_NEW(m_mp)
-		CTranslatorScalarToDXL(m_context, m_md_accessor, m_query_level,
-							   m_query_level_to_cte_map, m_dxl_cte_producers);
+	m_scalar_translator = GPOS_NEW(m_mp) CTranslatorScalarToDXL(
+		m_context, m_md_accessor, m_query_level, m_query_level_to_cte_map.get(),
+		m_dxl_cte_producers.get());
 }
 
 //---------------------------------------------------------------------------
@@ -262,10 +261,10 @@ CTranslatorQueryToDXL::~CTranslatorQueryToDXL()
 	GPOS_DELETE(m_scalar_translator);
 	GPOS_DELETE(m_var_to_colid_map);
 	gpdb::GPDBFree(m_query);
-	m_query_level_to_cte_map->Release();
-	m_dxl_cte_producers->Release();
-	m_cteid_at_current_query_level_map->Release();
-	CRefCount::SafeRelease(m_dxl_query_output_cols);
+	;
+	;
+	;
+	;
 
 	if (m_query_level == 0)
 		GPOS_DELETE(m_context);
@@ -482,10 +481,10 @@ CTranslatorQueryToDXL::CheckRangeTable(Query *query)
 //		Return the list of query output columns
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLNodeArray *>
+CDXLNodeArray *
 CTranslatorQueryToDXL::GetQueryOutputCols() const
 {
-	return m_dxl_query_output_cols;
+	return m_dxl_query_output_cols.get();
 }
 
 //---------------------------------------------------------------------------
@@ -496,10 +495,10 @@ CTranslatorQueryToDXL::GetQueryOutputCols() const
 //		Return the list of CTEs
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLNodeArray *>
+CDXLNodeArray *
 CTranslatorQueryToDXL::GetCTEs() const
 {
-	return m_dxl_cte_producers;
+	return m_dxl_cte_producers.get();
 }
 
 //---------------------------------------------------------------------------
@@ -531,16 +530,16 @@ CTranslatorQueryToDXL::TranslateSelectQueryToDXL()
 		GPOS_RAISE(gpdxl::ExmaDXL, gpdxl::ExmiQuery2DXLUnsupportedFeature,
 				   GPOS_WSZ_LIT("ON CONFLICT clause"));
 
-	gpos::owner<CDXLNode *> child_dxlnode = nullptr;
-	gpos::owner<IntToUlongMap *> sort_group_attno_to_colid_mapping =
+	gpos::Ref<CDXLNode> child_dxlnode = nullptr;
+	gpos::Ref<IntToUlongMap> sort_group_attno_to_colid_mapping =
 		GPOS_NEW(m_mp) IntToUlongMap(m_mp);
-	gpos::owner<IntToUlongMap *> output_attno_to_colid_mapping =
+	gpos::Ref<IntToUlongMap> output_attno_to_colid_mapping =
 		GPOS_NEW(m_mp) IntToUlongMap(m_mp);
 
 	// construct CTEAnchor operators for the CTEs defined at the top level
 	CDXLNode *dxl_cte_anchor_top = nullptr;
-	gpos::owner<CDXLNode *> dxl_cte_anchor_bottom = nullptr;
-	ConstructCTEAnchors(m_dxl_cte_producers, &dxl_cte_anchor_top,
+	gpos::Ref<CDXLNode> dxl_cte_anchor_bottom = nullptr;
+	ConstructCTEAnchors(m_dxl_cte_producers.get(), &dxl_cte_anchor_top,
 						&dxl_cte_anchor_bottom);
 	GPOS_ASSERT_IMP(
 		m_dxl_cte_producers == nullptr || 0 < m_dxl_cte_producers->Size(),
@@ -552,12 +551,13 @@ CTranslatorQueryToDXL::TranslateSelectQueryToDXL()
 	{
 		List *target_list = m_query->targetList;
 		// translate set operations
-		child_dxlnode = TranslateSetOpToDXL(m_query->setOperations, target_list,
-											output_attno_to_colid_mapping);
+		child_dxlnode =
+			TranslateSetOpToDXL(m_query->setOperations, target_list,
+								output_attno_to_colid_mapping.get());
 
-		gpos::pointer<CDXLLogicalSetOp *> dxlop =
+		CDXLLogicalSetOp *dxlop =
 			gpos::dyn_cast<CDXLLogicalSetOp>(child_dxlnode->GetOperator());
-		gpos::pointer<const CDXLColDescrArray *> dxl_col_descr_array =
+		const CDXLColDescrArray *dxl_col_descr_array =
 			dxlop->GetDXLColumnDescrArray();
 		ListCell *lc = nullptr;
 		ULONG resno = 1;
@@ -568,7 +568,8 @@ CTranslatorQueryToDXL::TranslateSelectQueryToDXL()
 			{
 				ULONG colid = ((*dxl_col_descr_array)[resno - 1])->Id();
 				AddSortingGroupingColumn(
-					target_entry, sort_group_attno_to_colid_mapping, colid);
+					target_entry, sort_group_attno_to_colid_mapping.get(),
+					colid);
 			}
 			resno++;
 		}
@@ -581,21 +582,22 @@ CTranslatorQueryToDXL::TranslateSelectQueryToDXL()
 		GPOS_ASSERT(nullptr == m_query->groupingSets);
 		child_dxlnode = TranslateWindowToDXL(
 			dxlnode, m_query->targetList, m_query->windowClause,
-			m_query->sortClause, sort_group_attno_to_colid_mapping,
-			output_attno_to_colid_mapping);
+			m_query->sortClause, sort_group_attno_to_colid_mapping.get(),
+			output_attno_to_colid_mapping.get());
 	}
 	else
 	{
 		child_dxlnode = TranslateGroupingSets(
 			m_query->jointree, m_query->targetList, m_query->groupClause,
 			m_query->groupingSets, m_query->hasAggs,
-			sort_group_attno_to_colid_mapping, output_attno_to_colid_mapping);
+			sort_group_attno_to_colid_mapping.get(),
+			output_attno_to_colid_mapping.get());
 	}
 
 	// translate limit clause
-	gpos::owner<CDXLNode *> limit_dxlnode = TranslateLimitToDXLGroupBy(
+	gpos::Ref<CDXLNode> limit_dxlnode = TranslateLimitToDXLGroupBy(
 		m_query->sortClause, m_query->limitCount, m_query->limitOffset,
-		child_dxlnode, sort_group_attno_to_colid_mapping);
+		child_dxlnode, sort_group_attno_to_colid_mapping.get());
 
 
 	if (nullptr == m_query->targetList)
@@ -605,13 +607,13 @@ CTranslatorQueryToDXL::TranslateSelectQueryToDXL()
 	else
 	{
 		m_dxl_query_output_cols = CreateDXLOutputCols(
-			m_query->targetList, output_attno_to_colid_mapping);
+			m_query->targetList, output_attno_to_colid_mapping.get());
 	}
 
 	// cleanup
-	CRefCount::SafeRelease(sort_group_attno_to_colid_mapping);
+	;
 
-	output_attno_to_colid_mapping->Release();
+	;
 
 	// add CTE anchors if needed
 	CDXLNode *result_dxlnode = limit_dxlnode;
@@ -634,12 +636,11 @@ CTranslatorQueryToDXL::TranslateSelectQueryToDXL()
 //		Construct a DXL SPJ tree from the given query parts
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateSelectProjectJoinToDXL(
 	List *target_list, FromExpr *from_expr,
-	gpos::pointer<IntToUlongMap *> sort_group_attno_to_colid_mapping,
-	gpos::pointer<IntToUlongMap *> output_attno_to_colid_mapping,
-	List *group_clause)
+	IntToUlongMap *sort_group_attno_to_colid_mapping,
+	IntToUlongMap *output_attno_to_colid_mapping, List *group_clause)
 {
 	CDXLNode *join_tree_dxlnode = TranslateFromExprToDXL(from_expr);
 
@@ -658,12 +659,11 @@ CTranslatorQueryToDXL::TranslateSelectProjectJoinToDXL(
 //		appearing in aggregates in the project list
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateSelectProjectJoinForGrpSetsToDXL(
 	List *target_list, FromExpr *from_expr,
-	gpos::pointer<IntToUlongMap *> sort_group_attno_to_colid_mapping,
-	gpos::pointer<IntToUlongMap *> output_attno_to_colid_mapping,
-	List *group_clause)
+	IntToUlongMap *sort_group_attno_to_colid_mapping,
+	IntToUlongMap *output_attno_to_colid_mapping, List *group_clause)
 {
 	CDXLNode *join_tree_dxlnode = TranslateFromExprToDXL(from_expr);
 
@@ -682,7 +682,7 @@ CTranslatorQueryToDXL::TranslateSelectProjectJoinForGrpSetsToDXL(
 //		Main driver
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateQueryToDXL()
 {
 	CAutoTimer at("\n[OPT]: Query To DXL Translation Time",
@@ -723,7 +723,7 @@ CTranslatorQueryToDXL::TranslateQueryToDXL()
 //		Translate an insert stmt
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateInsertQueryToDXL()
 {
 	GPOS_ASSERT(CMD_INSERT == m_query->commandType);
@@ -735,15 +735,14 @@ CTranslatorQueryToDXL::TranslateInsertQueryToDXL()
 				   GPOS_WSZ_LIT("DML not enabled"));
 	}
 
-	gpos::owner<CDXLNode *> query_dxlnode = TranslateSelectQueryToDXL();
+	gpos::Ref<CDXLNode> query_dxlnode = TranslateSelectQueryToDXL();
 	const RangeTblEntry *rte = (RangeTblEntry *) gpdb::ListNth(
 		m_query->rtable, m_query->resultRelation - 1);
 
-	gpos::owner<CDXLTableDescr *> table_descr = CTranslatorUtils::GetTableDescr(
+	gpos::Ref<CDXLTableDescr> table_descr = CTranslatorUtils::GetTableDescr(
 		m_mp, m_md_accessor, m_context->m_colid_counter, rte,
 		&m_context->m_has_distributed_tables);
-	gpos::pointer<const IMDRelation *> md_rel =
-		m_md_accessor->RetrieveRel(table_descr->MDId());
+	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(table_descr->MDId());
 
 	BOOL rel_has_constraints = CTranslatorUtils::RelHasConstraints(md_rel);
 	if (!optimizer_enable_dml_constraints && rel_has_constraints)
@@ -761,7 +760,7 @@ CTranslatorQueryToDXL::TranslateInsertQueryToDXL()
 	GPOS_ASSERT(num_table_columns >= target_list_length);
 	GPOS_ASSERT(target_list_length == m_dxl_query_output_cols->Size());
 
-	gpos::owner<CDXLNode *> project_list_dxlnode = nullptr;
+	gpos::Ref<CDXLNode> project_list_dxlnode = nullptr;
 
 	const ULONG num_system_cols = md_rel->ColumnCount() - num_table_columns;
 	const ULONG num_non_dropped_cols =
@@ -773,13 +772,12 @@ CTranslatorQueryToDXL::TranslateInsertQueryToDXL()
 			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 	}
 
-	gpos::owner<ULongPtrArray *> source_array =
-		GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+	gpos::Ref<ULongPtrArray> source_array = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 
 	ULONG target_list_pos = 0;
 	for (ULONG ul = 0; ul < num_table_columns; ul++)
 	{
-		gpos::pointer<const IMDColumn *> mdcol = md_rel->GetMdCol(ul);
+		const IMDColumn *mdcol = md_rel->GetMdCol(ul);
 		GPOS_ASSERT(!mdcol->IsSystemColumn());
 
 		if (mdcol->IsDropped())
@@ -797,9 +795,9 @@ CTranslatorQueryToDXL::TranslateInsertQueryToDXL()
 
 			if (attno == resno)
 			{
-				gpos::pointer<CDXLNode *> dxl_column =
-					(*m_dxl_query_output_cols)[target_list_pos];
-				gpos::pointer<CDXLScalarIdent *> dxl_ident =
+				CDXLNode *dxl_column =
+					(*m_dxl_query_output_cols)[target_list_pos].get();
+				CDXLScalarIdent *dxl_ident =
 					gpos::dyn_cast<CDXLScalarIdent>(dxl_column->GetOperator());
 				source_array->Append(
 					GPOS_NEW(m_mp) ULONG(dxl_ident->GetDXLColRef()->Id()));
@@ -810,7 +808,7 @@ CTranslatorQueryToDXL::TranslateInsertQueryToDXL()
 
 		// target entry corresponding to the tables column not found, therefore
 		// add a project element with null value scalar child
-		gpos::owner<CDXLNode *> project_elem_dxlnode =
+		gpos::Ref<CDXLNode> project_elem_dxlnode =
 			CTranslatorUtils::CreateDXLProjElemConstNULL(
 				m_mp, m_md_accessor, m_context->m_colid_counter, mdcol);
 		ULONG colid = gpos::dyn_cast<CDXLScalarProjElem>(
@@ -820,14 +818,14 @@ CTranslatorQueryToDXL::TranslateInsertQueryToDXL()
 		source_array->Append(GPOS_NEW(m_mp) ULONG(colid));
 	}
 
-	gpos::owner<CDXLLogicalInsert *> insert_dxlnode =
+	gpos::Ref<CDXLLogicalInsert> insert_dxlnode =
 		GPOS_NEW(m_mp) CDXLLogicalInsert(m_mp, table_descr, source_array);
 
 	if (nullptr != project_list_dxlnode)
 	{
 		GPOS_ASSERT(0 < project_list_dxlnode->Arity());
 
-		gpos::owner<CDXLNode *> project_dxlnode = GPOS_NEW(m_mp)
+		gpos::Ref<CDXLNode> project_dxlnode = GPOS_NEW(m_mp)
 			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalProject(m_mp));
 		project_dxlnode->AddChild(project_list_dxlnode);
 		project_dxlnode->AddChild(query_dxlnode);
@@ -846,14 +844,14 @@ CTranslatorQueryToDXL::TranslateInsertQueryToDXL()
 //		Translate a CTAS
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateCTASToDXL()
 {
 	GPOS_ASSERT(CMD_SELECT == m_query->commandType);
 	//GPOS_ASSERT(NULL != m_query->intoClause);
 
 	m_is_ctas_query = true;
-	gpos::owner<CDXLNode *> query_dxlnode = TranslateSelectQueryToDXL();
+	gpos::Ref<CDXLNode> query_dxlnode = TranslateSelectQueryToDXL();
 
 	// GPDB_92_MERGE_FIXME: we should plumb through the intoClause
 	//	IntoClause *pintocl = m_pquery->intoClause;
@@ -863,14 +861,13 @@ CTranslatorQueryToDXL::TranslateCTASToDXL()
 	const char *const relname = "fake ctas rel";
 	CMDName *md_relname = CDXLUtils::CreateMDNameFromCharArray(m_mp, relname);
 
-	gpos::owner<CDXLColDescrArray *> dxl_col_descr_array =
+	gpos::Ref<CDXLColDescrArray> dxl_col_descr_array =
 		GPOS_NEW(m_mp) CDXLColDescrArray(m_mp);
 
 	const ULONG num_columns = gpdb::ListLength(m_query->targetList);
 
-	gpos::owner<ULongPtrArray *> source_array =
-		GPOS_NEW(m_mp) ULongPtrArray(m_mp);
-	gpos::owner<IntPtrArray *> var_typmods = GPOS_NEW(m_mp) IntPtrArray(m_mp);
+	gpos::Ref<ULongPtrArray> source_array = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+	gpos::Ref<IntPtrArray> var_typmods = GPOS_NEW(m_mp) IntPtrArray(m_mp);
 
 	//	List *col_names = into_clause->colNames;
 	List *col_names = NIL;
@@ -886,8 +883,8 @@ CTranslatorQueryToDXL::TranslateCTASToDXL()
 		int var_typmod = gpdb::ExprTypeMod((Node *) target_entry->expr);
 		var_typmods->Append(GPOS_NEW(m_mp) INT(var_typmod));
 
-		gpos::pointer<CDXLNode *> dxl_column = (*m_dxl_query_output_cols)[ul];
-		gpos::pointer<CDXLScalarIdent *> dxl_ident =
+		CDXLNode *dxl_column = (*m_dxl_query_output_cols)[ul].get();
+		CDXLScalarIdent *dxl_ident =
 			gpos::dyn_cast<CDXLScalarIdent>(dxl_column->GetOperator());
 		source_array->Append(GPOS_NEW(m_mp)
 								 ULONG(dxl_ident->GetDXLColRef()->Id()));
@@ -906,9 +903,9 @@ CTranslatorQueryToDXL::TranslateCTASToDXL()
 		}
 
 		GPOS_ASSERT(nullptr != md_colname);
-		gpos::owner<IMDId *> mdid = dxl_ident->MdidType();
-		mdid->AddRef();
-		gpos::owner<CDXLColDescr *> dxl_col_descr = GPOS_NEW(m_mp)
+		gpos::Ref<IMDId> mdid = dxl_ident->MdidType();
+		;
+		gpos::Ref<CDXLColDescr> dxl_col_descr = GPOS_NEW(m_mp)
 			CDXLColDescr(md_colname, m_context->m_colid_counter->next_id(),
 						 resno /* attno */, mdid, dxl_ident->TypeModifier(),
 						 false /* is_dropped */
@@ -918,11 +915,10 @@ CTranslatorQueryToDXL::TranslateCTASToDXL()
 
 	IMDRelation::Ereldistrpolicy rel_distr_policy =
 		IMDRelation::EreldistrRandom;
-	gpos::owner<ULongPtrArray *> distribution_colids = nullptr;
+	gpos::Ref<ULongPtrArray> distribution_colids = nullptr;
 
-	gpos::owner<IMdIdArray *> distr_opfamilies =
-		GPOS_NEW(m_mp) IMdIdArray(m_mp);
-	gpos::owner<IMdIdArray *> distr_opclasses = GPOS_NEW(m_mp) IMdIdArray(m_mp);
+	gpos::Ref<IMdIdArray> distr_opfamilies = GPOS_NEW(m_mp) IMdIdArray(m_mp);
+	gpos::Ref<IMdIdArray> distr_opclasses = GPOS_NEW(m_mp) IMdIdArray(m_mp);
 
 	if (nullptr != m_query->intoPolicy)
 	{
@@ -965,7 +961,7 @@ CTranslatorQueryToDXL::TranslateCTASToDXL()
 
 	// TODO: Mar 5, 2014; reserve an OID
 	OID oid = 1;
-	gpos::owner<CMDIdGPDB *> mdid = GPOS_NEW(m_mp) CMDIdGPDBCtas(oid);
+	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(m_mp) CMDIdGPDBCtas(oid);
 
 	CMDName *md_tablespace_name = nullptr;
 	//	if (NULL != into_clause->tableSpaceName)
@@ -989,13 +985,13 @@ CTranslatorQueryToDXL::TranslateCTASToDXL()
 	IMDRelation::Erelstoragetype rel_storage_type =
 		IMDRelation::ErelstorageHeap;
 	//	CDXLCtasStorageOptions::CDXLCtasOptionArray *ctas_storage_options = GetDXLCtasOptionArray(into_clause->options, &rel_storage_type);
-	gpos::owner<CDXLCtasStorageOptions::CDXLCtasOptionArray *>
+	gpos::Ref<CDXLCtasStorageOptions::CDXLCtasOptionArray>
 		ctas_storage_options = GetDXLCtasOptionArray(NIL, &rel_storage_type);
 
 	//	BOOL has_oids = gpdb::InterpretOidsOption(into_clause->options);
 	BOOL has_oids = false;
 	BOOL fTempTable = true;
-	gpos::owner<CDXLLogicalCTAS *> ctas_dxlop = GPOS_NEW(m_mp) CDXLLogicalCTAS(
+	gpos::Ref<CDXLLogicalCTAS> ctas_dxlop = GPOS_NEW(m_mp) CDXLLogicalCTAS(
 		m_mp, std::move(mdid), md_schema_name, md_relname,
 		std::move(dxl_col_descr_array),
 		GPOS_NEW(m_mp)
@@ -1018,7 +1014,7 @@ CTranslatorQueryToDXL::TranslateCTASToDXL()
 //		Translate CTAS storage options
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLCtasStorageOptions::CDXLCtasOptionArray *>
+gpos::Ref<CDXLCtasStorageOptions::CDXLCtasOptionArray>
 CTranslatorQueryToDXL::GetDXLCtasOptionArray(
 	List *options,
 	IMDRelation::Erelstoragetype
@@ -1032,7 +1028,7 @@ CTranslatorQueryToDXL::GetDXLCtasOptionArray(
 
 	GPOS_ASSERT(nullptr != storage_type);
 
-	gpos::owner<CDXLCtasStorageOptions::CDXLCtasOptionArray *>
+	gpos::Ref<CDXLCtasStorageOptions::CDXLCtasOptionArray>
 		ctas_storage_options =
 			GPOS_NEW(m_mp) CDXLCtasStorageOptions::CDXLCtasOptionArray(m_mp);
 	ListCell *lc = nullptr;
@@ -1132,19 +1128,19 @@ void
 CTranslatorQueryToDXL::GetCtidAndSegmentId(ULONG *ctid, ULONG *segment_id)
 {
 	// ctid column id
-	gpos::owner<IMDId *> mdid = CTranslatorUtils::GetSystemColType(
+	gpos::Ref<IMDId> mdid = CTranslatorUtils::GetSystemColType(
 		m_mp, SelfItemPointerAttributeNumber);
 	*ctid = CTranslatorUtils::GetColId(m_query_level, m_query->resultRelation,
-									   SelfItemPointerAttributeNumber, mdid,
-									   m_var_to_colid_map);
-	mdid->Release();
+									   SelfItemPointerAttributeNumber,
+									   mdid.get(), m_var_to_colid_map);
+	;
 
 	// segmentid column id
 	mdid = CTranslatorUtils::GetSystemColType(m_mp, GpSegmentIdAttributeNumber);
 	*segment_id = CTranslatorUtils::GetColId(
 		m_query_level, m_query->resultRelation, GpSegmentIdAttributeNumber,
-		mdid, m_var_to_colid_map);
-	mdid->Release();
+		mdid.get(), m_var_to_colid_map);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -1155,7 +1151,7 @@ CTranslatorQueryToDXL::GetCtidAndSegmentId(ULONG *ctid, ULONG *segment_id)
 //		Translate a delete stmt
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateDeleteQueryToDXL()
 {
 	GPOS_ASSERT(CMD_DELETE == m_query->commandType);
@@ -1167,15 +1163,14 @@ CTranslatorQueryToDXL::TranslateDeleteQueryToDXL()
 				   GPOS_WSZ_LIT("DML not enabled"));
 	}
 
-	gpos::owner<CDXLNode *> query_dxlnode = TranslateSelectQueryToDXL();
+	gpos::Ref<CDXLNode> query_dxlnode = TranslateSelectQueryToDXL();
 	const RangeTblEntry *rte = (RangeTblEntry *) gpdb::ListNth(
 		m_query->rtable, m_query->resultRelation - 1);
 
-	gpos::owner<CDXLTableDescr *> table_descr = CTranslatorUtils::GetTableDescr(
+	gpos::Ref<CDXLTableDescr> table_descr = CTranslatorUtils::GetTableDescr(
 		m_mp, m_md_accessor, m_context->m_colid_counter, rte,
 		&m_context->m_has_distributed_tables);
-	gpos::pointer<const IMDRelation *> md_rel =
-		m_md_accessor->RetrieveRel(table_descr->MDId());
+	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(table_descr->MDId());
 
 	if (md_rel->IsPartitioned())
 	{
@@ -1191,13 +1186,13 @@ CTranslatorQueryToDXL::TranslateDeleteQueryToDXL()
 	ULONG segid_colid = 0;
 	GetCtidAndSegmentId(&ctid_colid, &segid_colid);
 
-	gpos::owner<ULongPtrArray *> delete_colid_array =
+	gpos::Ref<ULongPtrArray> delete_colid_array =
 		GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 
 	const ULONG num_of_non_sys_cols = md_rel->ColumnCount();
 	for (ULONG ul = 0; ul < num_of_non_sys_cols; ul++)
 	{
-		gpos::pointer<const IMDColumn *> mdcol = md_rel->GetMdCol(ul);
+		const IMDColumn *mdcol = md_rel->GetMdCol(ul);
 		if (mdcol->IsSystemColumn() || mdcol->IsDropped())
 		{
 			continue;
@@ -1209,7 +1204,7 @@ CTranslatorQueryToDXL::TranslateDeleteQueryToDXL()
 		delete_colid_array->Append(GPOS_NEW(m_mp) ULONG(colid));
 	}
 
-	gpos::owner<CDXLLogicalDelete *> delete_dxlop = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLLogicalDelete> delete_dxlop = GPOS_NEW(m_mp)
 		CDXLLogicalDelete(m_mp, std::move(table_descr), ctid_colid, segid_colid,
 						  std::move(delete_colid_array));
 
@@ -1226,7 +1221,7 @@ CTranslatorQueryToDXL::TranslateDeleteQueryToDXL()
 //
 //---------------------------------------------------------------------------
 
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateUpdateQueryToDXL()
 {
 	GPOS_ASSERT(CMD_UPDATE == m_query->commandType);
@@ -1238,15 +1233,14 @@ CTranslatorQueryToDXL::TranslateUpdateQueryToDXL()
 				   GPOS_WSZ_LIT("DML not enabled"));
 	}
 
-	gpos::owner<CDXLNode *> query_dxlnode = TranslateSelectQueryToDXL();
+	gpos::Ref<CDXLNode> query_dxlnode = TranslateSelectQueryToDXL();
 	const RangeTblEntry *rte = (RangeTblEntry *) gpdb::ListNth(
 		m_query->rtable, m_query->resultRelation - 1);
 
-	gpos::owner<CDXLTableDescr *> table_descr = CTranslatorUtils::GetTableDescr(
+	gpos::Ref<CDXLTableDescr> table_descr = CTranslatorUtils::GetTableDescr(
 		m_mp, m_md_accessor, m_context->m_colid_counter, rte,
 		&m_context->m_has_distributed_tables);
-	gpos::pointer<const IMDRelation *> md_rel =
-		m_md_accessor->RetrieveRel(table_descr->MDId());
+	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(table_descr->MDId());
 
 	if (md_rel->IsPartitioned())
 	{
@@ -1276,17 +1270,17 @@ CTranslatorQueryToDXL::TranslateUpdateQueryToDXL()
 	BOOL has_oids = false;
 
 	// get (resno -> colId) mapping of columns to be updated
-	gpos::owner<IntToUlongMap *> update_column_map = UpdatedColumnMapping();
+	gpos::Ref<IntToUlongMap> update_column_map = UpdatedColumnMapping();
 
 	const ULONG num_of_non_sys_cols = md_rel->ColumnCount();
-	gpos::owner<ULongPtrArray *> insert_colid_array =
+	gpos::Ref<ULongPtrArray> insert_colid_array =
 		GPOS_NEW(m_mp) ULongPtrArray(m_mp);
-	gpos::owner<ULongPtrArray *> delete_colid_array =
+	gpos::Ref<ULongPtrArray> delete_colid_array =
 		GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 
 	for (ULONG ul = 0; ul < num_of_non_sys_cols; ul++)
 	{
-		gpos::pointer<const IMDColumn *> mdcol = md_rel->GetMdCol(ul);
+		const IMDColumn *mdcol = md_rel->GetMdCol(ul);
 		if (mdcol->IsSystemColumn() || mdcol->IsDropped())
 		{
 			continue;
@@ -1313,8 +1307,8 @@ CTranslatorQueryToDXL::TranslateUpdateQueryToDXL()
 		delete_colid_array->Append(GPOS_NEW(m_mp) ULONG(colid));
 	}
 
-	update_column_map->Release();
-	gpos::owner<CDXLLogicalUpdate *> pdxlopupdate = GPOS_NEW(m_mp)
+	;
+	gpos::Ref<CDXLLogicalUpdate> pdxlopupdate = GPOS_NEW(m_mp)
 		CDXLLogicalUpdate(m_mp, std::move(table_descr), ctid_colid,
 						  segmentid_colid, std::move(delete_colid_array),
 						  std::move(insert_colid_array), has_oids,
@@ -1332,10 +1326,10 @@ CTranslatorQueryToDXL::TranslateUpdateQueryToDXL()
 // 		Return resno -> colId mapping of columns to be updated
 //
 //---------------------------------------------------------------------------
-gpos::owner<IntToUlongMap *>
+gpos::Ref<IntToUlongMap>
 CTranslatorQueryToDXL::UpdatedColumnMapping()
 {
-	gpos::owner<IntToUlongMap *> update_column_map =
+	gpos::Ref<IntToUlongMap> update_column_map =
 		GPOS_NEW(m_mp) IntToUlongMap(m_mp);
 
 	ListCell *lc = nullptr;
@@ -1356,13 +1350,12 @@ CTranslatorQueryToDXL::UpdatedColumnMapping()
 		// once we plan generating MODIFYTABLE node from ORCA, we may revisit it.
 		if (!target_entry->resjunk)
 		{
-			gpos::pointer<CDXLNode *> dxl_column =
-				(*m_dxl_query_output_cols)[ul];
-			gpos::pointer<CDXLScalarIdent *> dxl_ident =
+			CDXLNode *dxl_column = (*m_dxl_query_output_cols)[ul].get();
+			CDXLScalarIdent *dxl_ident =
 				gpos::dyn_cast<CDXLScalarIdent>(dxl_column->GetOperator());
 			ULONG colid = dxl_ident->GetDXLColRef()->Id();
 
-			StoreAttnoColIdMapping(update_column_map, resno, colid);
+			StoreAttnoColIdMapping(update_column_map.get(), resno, colid);
 			output_columns++;
 		}
 		ul++;
@@ -1402,14 +1395,14 @@ CTranslatorQueryToDXL::OIDFound(OID oid, const OID oids[], ULONG size)
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorQueryToDXL::IsLeadWindowFunc(gpos::pointer<CDXLOperator *> dxlop)
+CTranslatorQueryToDXL::IsLeadWindowFunc(CDXLOperator *dxlop)
 {
 	BOOL is_lead_func = false;
 	if (EdxlopScalarWindowRef == dxlop->GetDXLOperator())
 	{
-		gpos::pointer<CDXLScalarWindowRef *> winref_dxlop =
+		CDXLScalarWindowRef *winref_dxlop =
 			gpos::dyn_cast<CDXLScalarWindowRef>(dxlop);
-		gpos::pointer<const CMDIdGPDB *> mdid_gpdb =
+		const CMDIdGPDB *mdid_gpdb =
 			gpos::dyn_cast<CMDIdGPDB>(winref_dxlop->FuncMdId());
 		OID oid = mdid_gpdb->Oid();
 		is_lead_func =
@@ -1429,14 +1422,14 @@ CTranslatorQueryToDXL::IsLeadWindowFunc(gpos::pointer<CDXLOperator *> dxlop)
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorQueryToDXL::IsLagWindowFunc(gpos::pointer<CDXLOperator *> dxlop)
+CTranslatorQueryToDXL::IsLagWindowFunc(CDXLOperator *dxlop)
 {
 	BOOL is_lag = false;
 	if (EdxlopScalarWindowRef == dxlop->GetDXLOperator())
 	{
-		gpos::pointer<CDXLScalarWindowRef *> winref_dxlop =
+		CDXLScalarWindowRef *winref_dxlop =
 			gpos::dyn_cast<CDXLScalarWindowRef>(dxlop);
-		gpos::pointer<const CMDIdGPDB *> mdid_gpdb =
+		const CMDIdGPDB *mdid_gpdb =
 			gpos::dyn_cast<CMDIdGPDB>(winref_dxlop->FuncMdId());
 		OID oid = mdid_gpdb->Oid();
 		is_lag = OIDFound(oid, lag_func_oids, GPOS_ARRAY_SIZE(lag_func_oids));
@@ -1454,7 +1447,7 @@ CTranslatorQueryToDXL::IsLagWindowFunc(gpos::pointer<CDXLOperator *> dxlop)
 // 		Manufacture window frame for lead/lag functions
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLWindowFrame *>
+gpos::Ref<CDXLWindowFrame>
 CTranslatorQueryToDXL::CreateWindowFramForLeadLag(BOOL is_lead_func,
 												  CDXLNode *dxl_offset) const
 {
@@ -1466,8 +1459,8 @@ CTranslatorQueryToDXL::CreateWindowFramForLeadLag(BOOL is_lead_func,
 		dxl_frame_trail = EdxlfbBoundedPreceding;
 	}
 
-	gpos::owner<CDXLNode *> dxl_lead_edge = nullptr;
-	gpos::owner<CDXLNode *> dxl_trail_edge = nullptr;
+	gpos::Ref<CDXLNode> dxl_lead_edge = nullptr;
+	gpos::Ref<CDXLNode> dxl_trail_edge = nullptr;
 	if (nullptr == dxl_offset)
 	{
 		dxl_lead_edge = GPOS_NEW(m_mp)
@@ -1508,9 +1501,9 @@ CTranslatorQueryToDXL::CreateWindowFramForLeadLag(BOOL is_lead_func,
 			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarWindowFrameEdge(
 							   m_mp, false /* fLeading */, dxl_frame_trail));
 
-		dxl_offset->AddRef();
+		;
 		dxl_lead_edge->AddChild(dxl_offset);
-		dxl_offset->AddRef();
+		;
 		dxl_trail_edge->AddChild(dxl_offset);
 	}
 
@@ -1537,10 +1530,8 @@ CTranslatorQueryToDXL::CreateWindowFramForLeadLag(BOOL is_lead_func,
 //---------------------------------------------------------------------------
 void
 CTranslatorQueryToDXL::UpdateLeadLagWinSpecPos(
-	gpos::pointer<CDXLNode *>
-		project_list_dxlnode,  // project list holding WinRef nodes
-	gpos::pointer<CDXLWindowSpecArray *>
-		window_spec_array  // original list of window spec
+	CDXLNode *project_list_dxlnode,			// project list holding WinRef nodes
+	CDXLWindowSpecArray *window_spec_array	// original list of window spec
 ) const
 {
 	GPOS_ASSERT(nullptr != project_list_dxlnode);
@@ -1549,17 +1540,16 @@ CTranslatorQueryToDXL::UpdateLeadLagWinSpecPos(
 	const ULONG arity = project_list_dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		gpos::pointer<CDXLNode *> child_dxlnode =
-			(*(*project_list_dxlnode)[ul])[0];
-		gpos::pointer<CDXLOperator *> dxlop = child_dxlnode->GetOperator();
+		CDXLNode *child_dxlnode = (*(*project_list_dxlnode)[ul])[0];
+		CDXLOperator *dxlop = child_dxlnode->GetOperator();
 		BOOL is_lead_func = IsLeadWindowFunc(dxlop);
 		BOOL is_lag = IsLagWindowFunc(dxlop);
 		if (is_lead_func || is_lag)
 		{
-			gpos::pointer<CDXLScalarWindowRef *> winref_dxlop =
+			CDXLScalarWindowRef *winref_dxlop =
 				gpos::dyn_cast<CDXLScalarWindowRef>(dxlop);
-			gpos::pointer<CDXLWindowSpec *> window_spec_dxlnode =
-				(*window_spec_array)[winref_dxlop->GetWindSpecPos()];
+			CDXLWindowSpec *window_spec_dxlnode =
+				(*window_spec_array)[winref_dxlop->GetWindSpecPos()].get();
 			CMDName *mdname = nullptr;
 			if (nullptr != window_spec_dxlnode->MdName())
 			{
@@ -1575,17 +1565,15 @@ CTranslatorQueryToDXL::UpdateLeadLagWinSpecPos(
 			}
 
 			// create LEAD/LAG frame
-			gpos::owner<CDXLWindowFrame *> window_frame =
+			gpos::Ref<CDXLWindowFrame> window_frame =
 				CreateWindowFramForLeadLag(is_lead_func, dxl_offset);
 
 			// create new window spec object
-			window_spec_dxlnode->GetPartitionByColIdArray()->AddRef();
-			window_spec_dxlnode->GetSortColListDXL()->AddRef();
-			gpos::owner<CDXLWindowSpec *> pdxlwsNew = GPOS_NEW(m_mp)
-				CDXLWindowSpec(m_mp,
-							   window_spec_dxlnode->GetPartitionByColIdArray(),
-							   mdname, window_spec_dxlnode->GetSortColListDXL(),
-							   window_frame);
+			;
+			;
+			gpos::Ref<CDXLWindowSpec> pdxlwsNew = GPOS_NEW(m_mp) CDXLWindowSpec(
+				m_mp, window_spec_dxlnode->GetPartitionByColIdArray(), mdname,
+				window_spec_dxlnode->GetSortColListDXL(), window_frame);
 			window_spec_array->Append(pdxlwsNew);
 
 			// update win spec pos of LEAD/LAG function
@@ -1603,17 +1591,16 @@ CTranslatorQueryToDXL::UpdateLeadLagWinSpecPos(
 //		Translate window specs
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLWindowSpecArray *>
+gpos::Ref<CDXLWindowSpecArray>
 CTranslatorQueryToDXL::TranslateWindowSpecToDXL(
-	List *window_clause,
-	gpos::pointer<IntToUlongMap *> sort_col_attno_to_colid_mapping,
-	gpos::pointer<CDXLNode *> project_list_dxlnode_node)
+	List *window_clause, IntToUlongMap *sort_col_attno_to_colid_mapping,
+	CDXLNode *project_list_dxlnode_node)
 {
 	GPOS_ASSERT(nullptr != window_clause);
 	GPOS_ASSERT(nullptr != sort_col_attno_to_colid_mapping);
 	GPOS_ASSERT(nullptr != project_list_dxlnode_node);
 
-	gpos::owner<CDXLWindowSpecArray *> window_spec_array =
+	gpos::Ref<CDXLWindowSpecArray> window_spec_array =
 		GPOS_NEW(m_mp) CDXLWindowSpecArray(m_mp);
 
 	// translate window specification
@@ -1621,12 +1608,12 @@ CTranslatorQueryToDXL::TranslateWindowSpecToDXL(
 	ForEach(lc, window_clause)
 	{
 		WindowClause *wc = (WindowClause *) lfirst(lc);
-		gpos::owner<ULongPtrArray *> part_columns = TranslatePartColumns(
+		gpos::Ref<ULongPtrArray> part_columns = TranslatePartColumns(
 			wc->partitionClause, sort_col_attno_to_colid_mapping);
 
-		gpos::owner<CDXLNode *> sort_col_list_dxl = nullptr;
+		gpos::Ref<CDXLNode> sort_col_list_dxl = nullptr;
 		CMDName *mdname = nullptr;
-		gpos::owner<CDXLWindowFrame *> window_frame = nullptr;
+		gpos::Ref<CDXLWindowFrame> window_frame = nullptr;
 
 		if (nullptr != wc->name)
 		{
@@ -1642,24 +1629,22 @@ CTranslatorQueryToDXL::TranslateWindowSpecToDXL(
 			sort_col_list_dxl = GPOS_NEW(m_mp)
 				CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSortColList(m_mp));
 
-			gpos::owner<CDXLNodeArray *> dxl_sort_cols =
-				TranslateSortColumsToDXL(wc->orderClause,
-										 sort_col_attno_to_colid_mapping);
+			gpos::Ref<CDXLNodeArray> dxl_sort_cols = TranslateSortColumsToDXL(
+				wc->orderClause, sort_col_attno_to_colid_mapping);
 			const ULONG size = dxl_sort_cols->Size();
 			for (ULONG ul = 0; ul < size; ul++)
 			{
-				gpos::owner<CDXLNode *> dxl_sort_clause = (*dxl_sort_cols)[ul];
-				dxl_sort_clause->AddRef();
+				gpos::Ref<CDXLNode> dxl_sort_clause = (*dxl_sort_cols)[ul];
+				;
 				sort_col_list_dxl->AddChild(dxl_sort_clause);
-			}
-			dxl_sort_cols->Release();
+			};
 		}
 
 		window_frame = m_scalar_translator->TranslateWindowFrameToDXL(
 			wc->frameOptions, wc->startOffset, wc->endOffset,
 			m_var_to_colid_map, project_list_dxlnode_node);
 
-		gpos::owner<CDXLWindowSpec *> window_spec_dxlnode =
+		gpos::Ref<CDXLWindowSpec> window_spec_dxlnode =
 			GPOS_NEW(m_mp) CDXLWindowSpec(m_mp, part_columns, mdname,
 										  sort_col_list_dxl, window_frame);
 		window_spec_array->Append(window_spec_dxlnode);
@@ -1677,12 +1662,11 @@ CTranslatorQueryToDXL::TranslateWindowSpecToDXL(
 //		Translate a window operator
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateWindowToDXL(
-	gpos::owner<CDXLNode *> child_dxlnode, List *target_list,
-	List *window_clause, List *sort_clause,
-	gpos::pointer<IntToUlongMap *> sort_col_attno_to_colid_mapping,
-	gpos::pointer<IntToUlongMap *> output_attno_to_colid_mapping)
+	gpos::Ref<CDXLNode> child_dxlnode, List *target_list, List *window_clause,
+	List *sort_clause, IntToUlongMap *sort_col_attno_to_colid_mapping,
+	IntToUlongMap *output_attno_to_colid_mapping)
 {
 	if (0 == gpdb::ListLength(window_clause))
 	{
@@ -1690,10 +1674,10 @@ CTranslatorQueryToDXL::TranslateWindowToDXL(
 	}
 
 	// translate target list entries
-	gpos::owner<CDXLNode *> project_list_dxlnode =
+	gpos::Ref<CDXLNode> project_list_dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 
-	gpos::owner<CDXLNode *> new_child_project_list_dxlnode =
+	gpos::Ref<CDXLNode> new_child_project_list_dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 	ListCell *lc = nullptr;
 	ULONG resno = 1;
@@ -1710,9 +1694,8 @@ CTranslatorQueryToDXL::TranslateWindowToDXL(
 		GPOS_ASSERT(IsA(target_entry, TargetEntry));
 
 		// create the DXL node holding the target list entry
-		gpos::owner<CDXLNode *> project_elem_dxlnode =
-			TranslateExprToDXLProject(target_entry->expr,
-									  target_entry->resname);
+		gpos::Ref<CDXLNode> project_elem_dxlnode = TranslateExprToDXLProject(
+			target_entry->expr, target_entry->resname);
 		ULONG colid = gpos::dyn_cast<CDXLScalarProjElem>(
 						  project_elem_dxlnode->GetOperator())
 						  ->Id();
@@ -1742,11 +1725,10 @@ CTranslatorQueryToDXL::TranslateWindowToDXL(
 									  project_elem_dxlnode->GetOperator())
 									  ->GetMdNameAlias()
 									  ->GetMDName());
-				gpos::owner<CDXLNode *> new_project_elem_dxlnode =
-					GPOS_NEW(m_mp)
-						CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjElem(
-										   m_mp, colid, mdname_alias));
-				gpos::owner<CDXLNode *> project_elem_new_child_dxlnode =
+				gpos::Ref<CDXLNode> new_project_elem_dxlnode = GPOS_NEW(m_mp)
+					CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjElem(
+									   m_mp, colid, mdname_alias));
+				gpos::Ref<CDXLNode> project_elem_new_child_dxlnode =
 					GPOS_NEW(m_mp) CDXLNode(
 						m_mp,
 						GPOS_NEW(m_mp) CDXLScalarIdent(
@@ -1772,7 +1754,7 @@ CTranslatorQueryToDXL::TranslateWindowToDXL(
 					gpdb::LAppend(omitted_target_entries, target_entry);
 				resno_list = gpdb::LAppendInt(resno_list, resno);
 
-				project_elem_dxlnode->Release();
+				;
 			}
 		}
 		else if (IsA(target_entry->expr, WindowFunc))
@@ -1789,7 +1771,7 @@ CTranslatorQueryToDXL::TranslateWindowToDXL(
 		}
 		else
 		{
-			project_elem_dxlnode->Release();
+			;
 		}
 
 		if (insert_sort_info)
@@ -1829,11 +1811,11 @@ CTranslatorQueryToDXL::TranslateWindowToDXL(
 	}
 
 	// translate window spec
-	gpos::owner<CDXLWindowSpecArray *> window_spec_array =
+	gpos::Ref<CDXLWindowSpecArray> window_spec_array =
 		TranslateWindowSpecToDXL(window_clause, sort_col_attno_to_colid_mapping,
-								 new_child_project_list_dxlnode);
+								 new_child_project_list_dxlnode.get());
 
-	gpos::owner<CDXLNode *> new_child_dxlnode = nullptr;
+	gpos::Ref<CDXLNode> new_child_dxlnode = nullptr;
 
 	if (0 < new_child_project_list_dxlnode->Arity())
 	{
@@ -1847,24 +1829,25 @@ CTranslatorQueryToDXL::TranslateWindowToDXL(
 	else
 	{
 		// clean up
-		new_child_project_list_dxlnode->Release();
+		;
 	}
 
-	if (!CTranslatorUtils::HasProjElem(project_list_dxlnode,
+	if (!CTranslatorUtils::HasProjElem(project_list_dxlnode.get(),
 									   EdxlopScalarWindowRef))
 	{
-		project_list_dxlnode->Release();
-		window_spec_array->Release();
+		;
+		;
 
 		return child_dxlnode;
 	}
 
 	// update window spec positions of LEAD/LAG functions
-	UpdateLeadLagWinSpecPos(project_list_dxlnode, window_spec_array);
+	UpdateLeadLagWinSpecPos(project_list_dxlnode.get(),
+							window_spec_array.get());
 
-	gpos::owner<CDXLLogicalWindow *> window_dxlop =
+	gpos::Ref<CDXLLogicalWindow> window_dxlop =
 		GPOS_NEW(m_mp) CDXLLogicalWindow(m_mp, std::move(window_spec_array));
-	gpos::owner<CDXLNode *> dxlnode =
+	gpos::Ref<CDXLNode> dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(window_dxlop));
 
 	dxlnode->AddChild(std::move(project_list_dxlnode));
@@ -1881,12 +1864,11 @@ CTranslatorQueryToDXL::TranslateWindowToDXL(
 //		Translate the list of partition-by column identifiers
 //
 //---------------------------------------------------------------------------
-gpos::owner<ULongPtrArray *>
+gpos::Ref<ULongPtrArray>
 CTranslatorQueryToDXL::TranslatePartColumns(
-	List *partition_by_clause,
-	gpos::pointer<IntToUlongMap *> col_attno_colid_mapping) const
+	List *partition_by_clause, IntToUlongMap *col_attno_colid_mapping) const
 {
-	gpos::owner<ULongPtrArray *> part_cols = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+	gpos::Ref<ULongPtrArray> part_cols = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 
 	ListCell *lc = nullptr;
 	ForEach(lc, partition_by_clause)
@@ -1916,12 +1898,11 @@ CTranslatorQueryToDXL::TranslatePartColumns(
 //		Translate the list of sorting columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNodeArray *>
+gpos::Ref<CDXLNodeArray>
 CTranslatorQueryToDXL::TranslateSortColumsToDXL(
-	List *sort_clause,
-	gpos::pointer<IntToUlongMap *> col_attno_colid_mapping) const
+	List *sort_clause, IntToUlongMap *col_attno_colid_mapping) const
 {
-	gpos::owner<CDXLNodeArray *> dxlnodes = GPOS_NEW(m_mp) CDXLNodeArray(m_mp);
+	gpos::Ref<CDXLNodeArray> dxlnodes = GPOS_NEW(m_mp) CDXLNodeArray(m_mp);
 
 	ListCell *lc = nullptr;
 	ForEach(lc, sort_clause)
@@ -1941,20 +1922,20 @@ CTranslatorQueryToDXL::TranslateSortColumsToDXL(
 		OID oid = sort_group_clause->sortop;
 
 		// get operator name
-		gpos::owner<CMDIdGPDB *> op_mdid = GPOS_NEW(m_mp) CMDIdGPDB(oid);
-		gpos::pointer<const IMDScalarOp *> md_scalar_op =
-			m_md_accessor->RetrieveScOp(op_mdid);
+		gpos::Ref<CMDIdGPDB> op_mdid = GPOS_NEW(m_mp) CMDIdGPDB(oid);
+		const IMDScalarOp *md_scalar_op =
+			m_md_accessor->RetrieveScOp(op_mdid.get());
 
 		const CWStringConst *str = md_scalar_op->Mdname().GetMDName();
 		GPOS_ASSERT(nullptr != str);
 
-		gpos::owner<CDXLScalarSortCol *> sc_sort_col_dxlop = GPOS_NEW(m_mp)
+		gpos::Ref<CDXLScalarSortCol> sc_sort_col_dxlop = GPOS_NEW(m_mp)
 			CDXLScalarSortCol(m_mp, colid, op_mdid,
 							  GPOS_NEW(m_mp) CWStringConst(str->GetBuffer()),
 							  sort_group_clause->nulls_first);
 
 		// create the DXL node holding the sorting col
-		gpos::owner<CDXLNode *> sort_col_dxlnode =
+		gpos::Ref<CDXLNode> sort_col_dxlnode =
 			GPOS_NEW(m_mp) CDXLNode(m_mp, sc_sort_col_dxlop);
 
 		dxlnodes->Append(sort_col_dxlnode);
@@ -1972,11 +1953,10 @@ CTranslatorQueryToDXL::TranslateSortColumsToDXL(
 //		into a CDXLLogicalGroupBy node
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateLimitToDXLGroupBy(
 	List *sort_clause, Node *limit_count, Node *limit_offset_node,
-	gpos::owner<CDXLNode *> child_dxlnode,
-	gpos::pointer<IntToUlongMap *> grpcols_to_colid_mapping)
+	gpos::Ref<CDXLNode> child_dxlnode, IntToUlongMap *grpcols_to_colid_mapping)
 {
 	if (0 == gpdb::ListLength(sort_clause) && nullptr == limit_count &&
 		nullptr == limit_offset_node)
@@ -1988,26 +1968,25 @@ CTranslatorQueryToDXL::TranslateLimitToDXLGroupBy(
 	// otherwise we may increase the storage size because there are less opportunities for compression
 	BOOL is_limit_top_level = (m_is_top_query_dml && 1 == m_query_level) ||
 							  (m_is_ctas_query && 0 == m_query_level);
-	gpos::owner<CDXLNode *> limit_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+	gpos::Ref<CDXLNode> limit_dxlnode = GPOS_NEW(m_mp) CDXLNode(
 		m_mp, GPOS_NEW(m_mp) CDXLLogicalLimit(m_mp, is_limit_top_level));
 
 	// create a sorting col list
-	gpos::owner<CDXLNode *> sort_col_list_dxl = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLNode> sort_col_list_dxl = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarSortColList(m_mp));
 
-	gpos::owner<CDXLNodeArray *> dxl_sort_cols =
+	gpos::Ref<CDXLNodeArray> dxl_sort_cols =
 		TranslateSortColumsToDXL(sort_clause, grpcols_to_colid_mapping);
 	const ULONG size = dxl_sort_cols->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		gpos::owner<CDXLNode *> sort_col_dxlnode = (*dxl_sort_cols)[ul];
-		sort_col_dxlnode->AddRef();
+		gpos::Ref<CDXLNode> sort_col_dxlnode = (*dxl_sort_cols)[ul];
+		;
 		sort_col_list_dxl->AddChild(sort_col_dxlnode);
-	}
-	dxl_sort_cols->Release();
+	};
 
 	// create limit count
-	gpos::owner<CDXLNode *> limit_count_dxlnode = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLNode> limit_count_dxlnode = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarLimitCount(m_mp));
 
 	if (nullptr != limit_count)
@@ -2016,7 +1995,7 @@ CTranslatorQueryToDXL::TranslateLimitToDXLGroupBy(
 	}
 
 	// create limit offset
-	gpos::owner<CDXLNode *> limit_offset_dxlnode = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLNode> limit_offset_dxlnode = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarLimitOffset(m_mp));
 
 	if (nullptr != limit_offset_node)
@@ -2043,8 +2022,7 @@ CTranslatorQueryToDXL::TranslateLimitToDXLGroupBy(
 //---------------------------------------------------------------------------
 void
 CTranslatorQueryToDXL::AddSortingGroupingColumn(
-	TargetEntry *target_entry,
-	gpos::pointer<IntToUlongMap *> sort_grpref_to_colid_mapping,
+	TargetEntry *target_entry, IntToUlongMap *sort_grpref_to_colid_mapping,
 	ULONG colid) const
 {
 	if (0 < target_entry->ressortgroupref)
@@ -2103,14 +2081,13 @@ ExpressionContainsMissingVars(const Expr *expr, CBitSet *grpby_cols_bitset)
 //		Translate a query with grouping clause into a CDXLLogicalGroupBy node
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::CreateSimpleGroupBy(
 	List *target_list, List *group_clause, CBitSet *grpby_cols_bitset,
-	BOOL has_aggs, BOOL has_grouping_sets,
-	gpos::owner<CDXLNode *> child_dxlnode,
-	gpos::pointer<IntToUlongMap *> sort_grpref_to_colid_mapping,
-	gpos::pointer<IntToUlongMap *> child_attno_colid_mapping,
-	gpos::pointer<IntToUlongMap *> output_attno_to_colid_mapping)
+	BOOL has_aggs, BOOL has_grouping_sets, gpos::Ref<CDXLNode> child_dxlnode,
+	IntToUlongMap *sort_grpref_to_colid_mapping,
+	IntToUlongMap *child_attno_colid_mapping,
+	IntToUlongMap *output_attno_to_colid_mapping)
 {
 	if (nullptr == grpby_cols_bitset)
 	{
@@ -2141,7 +2118,7 @@ CTranslatorQueryToDXL::CreateSimpleGroupBy(
 
 	List *dqa_list = NIL;
 	// construct the project list of the group-by operator
-	gpos::owner<CDXLNode *> project_list_grpby_dxlnode =
+	gpos::Ref<CDXLNode> project_list_grpby_dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 
 	ListCell *lc = nullptr;
@@ -2212,7 +2189,7 @@ CTranslatorQueryToDXL::CreateSimpleGroupBy(
 			}
 
 			// create a project element for aggregate
-			gpos::owner<CDXLNode *> project_elem_dxlnode =
+			gpos::Ref<CDXLNode> project_elem_dxlnode =
 				TranslateExprToDXLProject(target_entry->expr,
 										  target_entry->resname);
 			project_list_grpby_dxlnode->AddChild(project_elem_dxlnode);
@@ -2244,7 +2221,7 @@ CTranslatorQueryToDXL::CreateSimpleGroupBy(
 	}
 
 	// initialize the array of grouping columns
-	gpos::owner<ULongPtrArray *> grouping_cols =
+	gpos::Ref<ULongPtrArray> grouping_cols =
 		CTranslatorUtils::GetGroupingColidArray(m_mp, grpby_cols_bitset,
 												sort_grpref_to_colid_mapping);
 
@@ -2300,99 +2277,99 @@ CTranslatorQueryToDXL::IsDuplicateDqaArg(List *dqa_list, Aggref *aggref)
 //		Translate a query with grouping sets
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateGroupingSets(
 	FromExpr *from_expr, List *target_list, List *group_clause,
 	List *grouping_set, BOOL has_aggs,
-	gpos::pointer<IntToUlongMap *> sort_grpref_to_colid_mapping,
-	gpos::pointer<IntToUlongMap *> output_attno_to_colid_mapping)
+	IntToUlongMap *sort_grpref_to_colid_mapping,
+	IntToUlongMap *output_attno_to_colid_mapping)
 {
 	const ULONG num_of_cols = gpdb::ListLength(target_list) + 1;
 
 	if (nullptr == group_clause && nullptr == grouping_set)
 	{
-		gpos::owner<IntToUlongMap *> child_attno_colid_mapping =
+		gpos::Ref<IntToUlongMap> child_attno_colid_mapping =
 			GPOS_NEW(m_mp) IntToUlongMap(m_mp);
 
-		gpos::owner<CDXLNode *> select_project_join_dxlnode =
+		gpos::Ref<CDXLNode> select_project_join_dxlnode =
 			TranslateSelectProjectJoinToDXL(
 				target_list, from_expr, sort_grpref_to_colid_mapping,
-				child_attno_colid_mapping, group_clause);
+				child_attno_colid_mapping.get(), group_clause);
 
-		gpos::owner<CBitSet *> bitset = nullptr;
+		gpos::Ref<CBitSet> bitset = nullptr;
 		if (has_aggs)
 		{
 			bitset = GPOS_NEW(m_mp) CBitSet(m_mp);
 		}
 
 		// in case of aggregates, construct a group by operator
-		gpos::owner<CDXLNode *> result_dxlnode = CreateSimpleGroupBy(
+		gpos::Ref<CDXLNode> result_dxlnode = CreateSimpleGroupBy(
 			target_list, group_clause, bitset, has_aggs,
 			false,	// has_grouping_sets
 			std::move(select_project_join_dxlnode),
-			sort_grpref_to_colid_mapping, child_attno_colid_mapping,
+			sort_grpref_to_colid_mapping, child_attno_colid_mapping.get(),
 			output_attno_to_colid_mapping);
 
 		// cleanup
-		child_attno_colid_mapping->Release();
-		CRefCount::SafeRelease(bitset);
+		;
+		;
 		return result_dxlnode;
 	}
 
 	// grouping functions refer to grouping col positions, so construct a map pos->grouping column
 	// while processing the grouping clause
-	gpos::owner<UlongToUlongMap *> grpcol_index_to_colid_mapping =
+	gpos::Ref<UlongToUlongMap> grpcol_index_to_colid_mapping =
 		GPOS_NEW(m_mp) UlongToUlongMap(m_mp);
-	gpos::owner<CBitSet *> unique_grp_cols_bitset =
+	gpos::Ref<CBitSet> unique_grp_cols_bitset =
 		GPOS_NEW(m_mp) CBitSet(m_mp, num_of_cols);
-	gpos::owner<CBitSetArray *> bitset_array =
+	gpos::Ref<CBitSetArray> bitset_array =
 		CTranslatorUtils::GetColumnAttnosForGroupBy(
 			m_mp, group_clause, grouping_set, num_of_cols,
-			grpcol_index_to_colid_mapping, unique_grp_cols_bitset);
+			grpcol_index_to_colid_mapping.get(), unique_grp_cols_bitset.get());
 
 	const ULONG num_of_grouping_sets = bitset_array->Size();
 
 	if (1 == num_of_grouping_sets)
 	{
 		// simple group by
-		gpos::owner<IntToUlongMap *> child_attno_colid_mapping =
+		gpos::Ref<IntToUlongMap> child_attno_colid_mapping =
 			GPOS_NEW(m_mp) IntToUlongMap(m_mp);
-		gpos::owner<CDXLNode *> select_project_join_dxlnode =
+		gpos::Ref<CDXLNode> select_project_join_dxlnode =
 			TranslateSelectProjectJoinToDXL(
 				target_list, from_expr, sort_grpref_to_colid_mapping,
-				child_attno_colid_mapping, group_clause);
+				child_attno_colid_mapping.get(), group_clause);
 
 		// translate the groupby clauses into a logical group by operator
 		CBitSet *bitset = (*bitset_array)[0];
 
 
-		gpos::owner<CDXLNode *> groupby_dxlnode = CreateSimpleGroupBy(
+		gpos::Ref<CDXLNode> groupby_dxlnode = CreateSimpleGroupBy(
 			target_list, group_clause, bitset, has_aggs,
 			false,	// has_grouping_sets
 			std::move(select_project_join_dxlnode),
-			sort_grpref_to_colid_mapping, child_attno_colid_mapping,
+			sort_grpref_to_colid_mapping, child_attno_colid_mapping.get(),
 			output_attno_to_colid_mapping);
 
-		gpos::owner<CDXLNode *> result_dxlnode = CreateDXLProjectGroupingFuncs(
+		gpos::Ref<CDXLNode> result_dxlnode = CreateDXLProjectGroupingFuncs(
 			target_list, std::move(groupby_dxlnode), bitset,
-			output_attno_to_colid_mapping, grpcol_index_to_colid_mapping,
+			output_attno_to_colid_mapping, grpcol_index_to_colid_mapping.get(),
 			sort_grpref_to_colid_mapping);
 
-		child_attno_colid_mapping->Release();
-		bitset_array->Release();
-		unique_grp_cols_bitset->Release();
-		grpcol_index_to_colid_mapping->Release();
+		;
+		;
+		;
+		;
 
 		return result_dxlnode;
 	}
 
-	gpos::owner<CDXLNode *> result_dxlnode = CreateDXLUnionAllForGroupingSets(
+	gpos::Ref<CDXLNode> result_dxlnode = CreateDXLUnionAllForGroupingSets(
 		from_expr, target_list, group_clause, has_aggs, std::move(bitset_array),
 		sort_grpref_to_colid_mapping, output_attno_to_colid_mapping,
-		grpcol_index_to_colid_mapping);
+		grpcol_index_to_colid_mapping.get());
 
-	unique_grp_cols_bitset->Release();
-	grpcol_index_to_colid_mapping->Release();
+	;
+	;
 
 	return result_dxlnode;
 }
@@ -2405,13 +2382,13 @@ CTranslatorQueryToDXL::TranslateGroupingSets(
 //		Construct a union all for the given grouping sets
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::CreateDXLUnionAllForGroupingSets(
 	FromExpr *from_expr, List *target_list, List *group_clause, BOOL has_aggs,
-	gpos::owner<CBitSetArray *> bitset_array,
-	gpos::pointer<IntToUlongMap *> sort_grpref_to_colid_mapping,
-	gpos::pointer<IntToUlongMap *> output_attno_to_colid_mapping,
-	gpos::pointer<UlongToUlongMap *>
+	gpos::Ref<CBitSetArray> bitset_array,
+	IntToUlongMap *sort_grpref_to_colid_mapping,
+	IntToUlongMap *output_attno_to_colid_mapping,
+	UlongToUlongMap *
 		grpcol_index_to_colid_mapping  // mapping pos->unique grouping columns for grouping func arguments
 )
 {
@@ -2419,30 +2396,31 @@ CTranslatorQueryToDXL::CreateDXLUnionAllForGroupingSets(
 	GPOS_ASSERT(1 < bitset_array->Size());
 
 	const ULONG num_of_grouping_sets = bitset_array->Size();
-	gpos::owner<CDXLNode *> unionall_dxlnode = nullptr;
-	gpos::owner<ULongPtrArray *> colid_array_inner = nullptr;
+	gpos::Ref<CDXLNode> unionall_dxlnode = nullptr;
+	gpos::Ref<ULongPtrArray> colid_array_inner = nullptr;
 
 	const ULONG cte_id = m_context->m_cte_id_counter->next_id();
 
 	// construct a CTE producer on top of the SPJ query
-	gpos::owner<IntToUlongMap *> spj_output_attno_to_colid_mapping =
+	gpos::Ref<IntToUlongMap> spj_output_attno_to_colid_mapping =
 		GPOS_NEW(m_mp) IntToUlongMap(m_mp);
-	gpos::owner<IntToUlongMap *> sort_groupref_to_colid_producer_mapping =
+	gpos::Ref<IntToUlongMap> sort_groupref_to_colid_producer_mapping =
 		GPOS_NEW(m_mp) IntToUlongMap(m_mp);
-	gpos::owner<CDXLNode *> select_project_join_dxlnode =
+	gpos::Ref<CDXLNode> select_project_join_dxlnode =
 		TranslateSelectProjectJoinForGrpSetsToDXL(
-			target_list, from_expr, sort_groupref_to_colid_producer_mapping,
-			spj_output_attno_to_colid_mapping, group_clause);
+			target_list, from_expr,
+			sort_groupref_to_colid_producer_mapping.get(),
+			spj_output_attno_to_colid_mapping.get(), group_clause);
 
 	// construct output colids
-	gpos::owner<ULongPtrArray *> op_colid_array_cte_producer =
-		ExtractColIds(m_mp, spj_output_attno_to_colid_mapping);
+	gpos::Ref<ULongPtrArray> op_colid_array_cte_producer =
+		ExtractColIds(m_mp, spj_output_attno_to_colid_mapping.get());
 
 	GPOS_ASSERT(nullptr != m_dxl_cte_producers);
 
-	gpos::owner<CDXLLogicalCTEProducer *> cte_prod_dxlop = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLLogicalCTEProducer> cte_prod_dxlop = GPOS_NEW(m_mp)
 		CDXLLogicalCTEProducer(m_mp, cte_id, op_colid_array_cte_producer);
-	gpos::owner<CDXLNode *> cte_producer_dxlnode = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLNode> cte_producer_dxlnode = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, cte_prod_dxlop, select_project_join_dxlnode);
 	m_dxl_cte_producers->Append(cte_producer_dxlnode);
 
@@ -2454,64 +2432,66 @@ CTranslatorQueryToDXL::CreateDXLUnionAllForGroupingSets(
 		CBitSet *grouping_set_bitset = (*bitset_array)[ul];
 
 		// remap columns
-		gpos::owner<ULongPtrArray *> colid_array_cte_consumer =
+		gpos::Ref<ULongPtrArray> colid_array_cte_consumer =
 			GenerateColIds(m_mp, op_colid_array_cte_producer->Size());
 
 		// reset col mapping with new consumer columns
 		GPOS_DELETE(m_var_to_colid_map);
 		m_var_to_colid_map = var_colid_orig_mapping->CopyRemapColId(
-			m_mp, op_colid_array_cte_producer, colid_array_cte_consumer);
+			m_mp, op_colid_array_cte_producer.get(),
+			colid_array_cte_consumer.get());
 
-		gpos::owner<IntToUlongMap *>
-			spj_consumer_output_attno_to_colid_mapping = RemapColIds(
-				m_mp, spj_output_attno_to_colid_mapping,
-				op_colid_array_cte_producer, colid_array_cte_consumer);
-		gpos::owner<IntToUlongMap *> phmiulSortgrouprefColIdConsumer =
-			RemapColIds(m_mp, sort_groupref_to_colid_producer_mapping,
-						op_colid_array_cte_producer, colid_array_cte_consumer);
+		gpos::Ref<IntToUlongMap> spj_consumer_output_attno_to_colid_mapping =
+			RemapColIds(m_mp, spj_output_attno_to_colid_mapping.get(),
+						op_colid_array_cte_producer.get(),
+						colid_array_cte_consumer.get());
+		gpos::Ref<IntToUlongMap> phmiulSortgrouprefColIdConsumer = RemapColIds(
+			m_mp, sort_groupref_to_colid_producer_mapping.get(),
+			op_colid_array_cte_producer.get(), colid_array_cte_consumer.get());
 
 		// construct a CTE consumer
-		gpos::owner<CDXLNode *> cte_consumer_dxlnode = GPOS_NEW(m_mp)
+		gpos::Ref<CDXLNode> cte_consumer_dxlnode = GPOS_NEW(m_mp)
 			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalCTEConsumer(
 							   m_mp, cte_id, colid_array_cte_consumer));
 
 		List *target_list_copy = (List *) gpdb::CopyObject(target_list);
 
-		gpos::owner<IntToUlongMap *> groupby_attno_to_colid_mapping =
+		gpos::Ref<IntToUlongMap> groupby_attno_to_colid_mapping =
 			GPOS_NEW(m_mp) IntToUlongMap(m_mp);
-		gpos::owner<CDXLNode *> groupby_dxlnode = CreateSimpleGroupBy(
+		gpos::Ref<CDXLNode> groupby_dxlnode = CreateSimpleGroupBy(
 			target_list_copy, group_clause, grouping_set_bitset, has_aggs,
 			true,  // has_grouping_sets
-			cte_consumer_dxlnode, phmiulSortgrouprefColIdConsumer,
-			spj_consumer_output_attno_to_colid_mapping,
-			groupby_attno_to_colid_mapping);
+			cte_consumer_dxlnode, phmiulSortgrouprefColIdConsumer.get(),
+			spj_consumer_output_attno_to_colid_mapping.get(),
+			groupby_attno_to_colid_mapping.get());
 
 		// add a project list for the NULL values
-		gpos::owner<CDXLNode *> project_dxlnode =
+		gpos::Ref<CDXLNode> project_dxlnode =
 			CreateDXLProjectNullsForGroupingSets(
 				target_list_copy, groupby_dxlnode, grouping_set_bitset,
-				phmiulSortgrouprefColIdConsumer, groupby_attno_to_colid_mapping,
+				phmiulSortgrouprefColIdConsumer.get(),
+				groupby_attno_to_colid_mapping.get(),
 				grpcol_index_to_colid_mapping);
 
-		gpos::owner<ULongPtrArray *> colids_outer_array =
+		gpos::Ref<ULongPtrArray> colids_outer_array =
 			CTranslatorUtils::GetOutputColIdsArray(
-				m_mp, target_list_copy, groupby_attno_to_colid_mapping);
+				m_mp, target_list_copy, groupby_attno_to_colid_mapping.get());
 		if (nullptr != unionall_dxlnode)
 		{
 			GPOS_ASSERT(nullptr != colid_array_inner);
-			gpos::owner<CDXLColDescrArray *> dxl_col_descr_array =
+			gpos::Ref<CDXLColDescrArray> dxl_col_descr_array =
 				CTranslatorUtils::GetDXLColumnDescrArray(
-					m_mp, target_list_copy, colids_outer_array,
+					m_mp, target_list_copy, colids_outer_array.get(),
 					true /* keep_res_junked */);
 
-			colids_outer_array->AddRef();
+			;
 
-			gpos::owner<ULongPtr2dArray *> input_colids =
+			gpos::Ref<ULongPtr2dArray> input_colids =
 				GPOS_NEW(m_mp) ULongPtr2dArray(m_mp);
 			input_colids->Append(colids_outer_array);
 			input_colids->Append(colid_array_inner);
 
-			gpos::owner<CDXLLogicalSetOp *> dxl_setop = GPOS_NEW(m_mp)
+			gpos::Ref<CDXLLogicalSetOp> dxl_setop = GPOS_NEW(m_mp)
 				CDXLLogicalSetOp(m_mp, EdxlsetopUnionAll, dxl_col_descr_array,
 								 input_colids, false);
 			unionall_dxlnode = GPOS_NEW(m_mp)
@@ -2549,19 +2529,19 @@ CTranslatorQueryToDXL::CreateDXLUnionAllForGroupingSets(
 		}
 
 		// cleanup
-		groupby_attno_to_colid_mapping->Release();
-		spj_consumer_output_attno_to_colid_mapping->Release();
-		phmiulSortgrouprefColIdConsumer->Release();
+		;
+		;
+		;
 	}
 
 	// cleanup
-	spj_output_attno_to_colid_mapping->Release();
-	sort_groupref_to_colid_producer_mapping->Release();
+	;
+	;
 	GPOS_DELETE(var_colid_orig_mapping);
-	colid_array_inner->Release();
+	;
 
 	// compute output columns
-	gpos::pointer<CDXLLogicalSetOp *> union_dxlop =
+	CDXLLogicalSetOp *union_dxlop =
 		gpos::dyn_cast<CDXLLogicalSetOp>(unionall_dxlnode->GetOperator());
 
 	ListCell *lc = nullptr;
@@ -2575,7 +2555,7 @@ CTranslatorQueryToDXL::CreateDXLUnionAllForGroupingSets(
 
 		// note that all target list entries are kept in union all's output column
 		// this is achieved by the keep_res_junked flag in CTranslatorUtils::GetDXLColumnDescrArray
-		gpos::pointer<const CDXLColDescr *> dxl_col_descr =
+		const CDXLColDescr *dxl_col_descr =
 			union_dxlop->GetColumnDescrAt(output_col_idx);
 		const ULONG colid = dxl_col_descr->Id();
 		output_col_idx++;
@@ -2588,7 +2568,7 @@ CTranslatorQueryToDXL::CreateDXLUnionAllForGroupingSets(
 	}
 
 	// cleanup
-	bitset_array->Release();
+	;
 
 	// construct a CTE anchor operator on top of the union all
 	return GPOS_NEW(m_mp)
@@ -2604,23 +2584,21 @@ CTranslatorQueryToDXL::CreateDXLUnionAllForGroupingSets(
 //		Create a dummy constant table get (CTG) with a boolean true value
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::DXLDummyConstTableGet() const
 {
 	// construct the schema of the const table
-	gpos::owner<CDXLColDescrArray *> dxl_col_descr_array =
+	gpos::Ref<CDXLColDescrArray> dxl_col_descr_array =
 		GPOS_NEW(m_mp) CDXLColDescrArray(m_mp);
 
-	gpos::pointer<const CMDTypeBoolGPDB *> md_type_bool =
-		dynamic_cast<const CMDTypeBoolGPDB *>(
-			m_md_accessor->PtMDType<IMDTypeBool>(m_sysid));
-	gpos::pointer<const CMDIdGPDB *> mdid =
-		gpos::dyn_cast<CMDIdGPDB>(md_type_bool->MDId());
+	const CMDTypeBoolGPDB *md_type_bool = dynamic_cast<const CMDTypeBoolGPDB *>(
+		m_md_accessor->PtMDType<IMDTypeBool>(m_sysid));
+	const CMDIdGPDB *mdid = gpos::dyn_cast<CMDIdGPDB>(md_type_bool->MDId());
 
 	// empty column name
 	CWStringConst str_unnamed_col(GPOS_WSZ_LIT(""));
 	CMDName *mdname = GPOS_NEW(m_mp) CMDName(m_mp, &str_unnamed_col);
-	gpos::owner<CDXLColDescr *> dxl_col_descr = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLColDescr> dxl_col_descr = GPOS_NEW(m_mp)
 		CDXLColDescr(mdname, m_context->m_colid_counter->next_id(),
 					 1 /* attno */, GPOS_NEW(m_mp) CMDIdGPDB(mdid->Oid()),
 					 default_type_modifier, false /* is_dropped */
@@ -2628,23 +2606,23 @@ CTranslatorQueryToDXL::DXLDummyConstTableGet() const
 	dxl_col_descr_array->Append(std::move(dxl_col_descr));
 
 	// create the array of datum arrays
-	gpos::owner<CDXLDatum2dArray *> dispatch_identifier_datum_arrays =
+	gpos::Ref<CDXLDatum2dArray> dispatch_identifier_datum_arrays =
 		GPOS_NEW(m_mp) CDXLDatum2dArray(m_mp);
 
 	// create a datum array
-	gpos::owner<CDXLDatumArray *> dxl_datum_array =
+	gpos::Ref<CDXLDatumArray> dxl_datum_array =
 		GPOS_NEW(m_mp) CDXLDatumArray(m_mp);
 
 	Const *const_expr =
 		(Const *) gpdb::MakeBoolConst(true /*value*/, false /*isnull*/);
-	gpos::owner<CDXLDatum *> datum_dxl =
+	gpos::Ref<CDXLDatum> datum_dxl =
 		m_scalar_translator->TranslateConstToDXL(const_expr);
 	gpdb::GPDBFree(const_expr);
 
 	dxl_datum_array->Append(std::move(datum_dxl));
 	dispatch_identifier_datum_arrays->Append(std::move(dxl_datum_array));
 
-	gpos::owner<CDXLLogicalConstTable *> dxlop = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLLogicalConstTable> dxlop = GPOS_NEW(m_mp)
 		CDXLLogicalConstTable(m_mp, std::move(dxl_col_descr_array),
 							  std::move(dispatch_identifier_datum_arrays));
 
@@ -2659,10 +2637,10 @@ CTranslatorQueryToDXL::DXLDummyConstTableGet() const
 //		Translate a set operation
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateSetOpToDXL(
 	Node *setop_node, List *target_list,
-	gpos::pointer<IntToUlongMap *> output_attno_to_colid_mapping)
+	IntToUlongMap *output_attno_to_colid_mapping)
 {
 	GPOS_ASSERT(IsA(setop_node, SetOperationStmt));
 	SetOperationStmt *psetopstmt = (SetOperationStmt *) setop_node;
@@ -2672,19 +2650,21 @@ CTranslatorQueryToDXL::TranslateSetOpToDXL(
 		CTranslatorUtils::GetSetOpType(psetopstmt->op, psetopstmt->all);
 
 	// translate the left and right child
-	gpos::owner<ULongPtrArray *> leftchild_array =
+	gpos::Ref<ULongPtrArray> leftchild_array =
 		GPOS_NEW(m_mp) ULongPtrArray(m_mp);
-	gpos::owner<ULongPtrArray *> rightchild_array =
+	gpos::Ref<ULongPtrArray> rightchild_array =
 		GPOS_NEW(m_mp) ULongPtrArray(m_mp);
-	gpos::owner<IMdIdArray *> mdid_array_leftchild =
+	gpos::Ref<IMdIdArray> mdid_array_leftchild =
 		GPOS_NEW(m_mp) IMdIdArray(m_mp);
-	gpos::owner<IMdIdArray *> mdid_array_rightchild =
+	gpos::Ref<IMdIdArray> mdid_array_rightchild =
 		GPOS_NEW(m_mp) IMdIdArray(m_mp);
 
-	gpos::owner<CDXLNode *> left_child_dxlnode = TranslateSetOpChild(
-		psetopstmt->larg, leftchild_array, mdid_array_leftchild, target_list);
-	gpos::owner<CDXLNode *> right_child_dxlnode = TranslateSetOpChild(
-		psetopstmt->rarg, rightchild_array, mdid_array_rightchild, target_list);
+	gpos::Ref<CDXLNode> left_child_dxlnode =
+		TranslateSetOpChild(psetopstmt->larg, leftchild_array.get(),
+							mdid_array_leftchild.get(), target_list);
+	gpos::Ref<CDXLNode> right_child_dxlnode =
+		TranslateSetOpChild(psetopstmt->rarg, rightchild_array.get(),
+							mdid_array_rightchild.get(), target_list);
 
 	// mark outer references in input columns from left child
 	ULONG *colid = GPOS_NEW_ARRAY(m_mp, ULONG, leftchild_array->Size());
@@ -2696,39 +2676,38 @@ CTranslatorQueryToDXL::TranslateSetOpToDXL(
 		outer_ref_array[ul] = true;
 	}
 	CTranslatorUtils::MarkOuterRefs(colid, outer_ref_array, size,
-									left_child_dxlnode);
+									left_child_dxlnode.get());
 
-	gpos::owner<ULongPtr2dArray *> input_colids =
+	gpos::Ref<ULongPtr2dArray> input_colids =
 		GPOS_NEW(m_mp) ULongPtr2dArray(m_mp);
 	input_colids->Append(leftchild_array);
 	input_colids->Append(rightchild_array);
 
-	gpos::owner<ULongPtrArray *> output_colids =
-		CTranslatorUtils::GenerateColIds(
-			m_mp, target_list, mdid_array_leftchild, leftchild_array,
-			outer_ref_array, m_context->m_colid_counter);
+	gpos::Ref<ULongPtrArray> output_colids = CTranslatorUtils::GenerateColIds(
+		m_mp, target_list, mdid_array_leftchild.get(), leftchild_array.get(),
+		outer_ref_array, m_context->m_colid_counter);
 	GPOS_ASSERT(output_colids->Size() == leftchild_array->Size());
 
 	GPOS_DELETE_ARRAY(colid);
 	GPOS_DELETE_ARRAY(outer_ref_array);
 
 	BOOL is_cast_across_input =
-		SetOpNeedsCast(target_list, mdid_array_leftchild) ||
-		SetOpNeedsCast(target_list, mdid_array_rightchild);
+		SetOpNeedsCast(target_list, mdid_array_leftchild.get()) ||
+		SetOpNeedsCast(target_list, mdid_array_rightchild.get());
 
-	gpos::owner<CDXLNodeArray *> children_dxlnodes =
+	gpos::Ref<CDXLNodeArray> children_dxlnodes =
 		GPOS_NEW(m_mp) CDXLNodeArray(m_mp);
 	children_dxlnodes->Append(left_child_dxlnode);
 	children_dxlnodes->Append(right_child_dxlnode);
 
-	gpos::owner<CDXLNode *> dxlnode = CreateDXLSetOpFromColumns(
-		setop_type, target_list, output_colids, input_colids, children_dxlnodes,
-		is_cast_across_input, false /* keep_res_junked */
+	gpos::Ref<CDXLNode> dxlnode = CreateDXLSetOpFromColumns(
+		setop_type, target_list, output_colids.get(), input_colids,
+		children_dxlnodes, is_cast_across_input, false /* keep_res_junked */
 	);
 
-	gpos::pointer<CDXLLogicalSetOp *> dxlop =
+	CDXLLogicalSetOp *dxlop =
 		gpos::dyn_cast<CDXLLogicalSetOp>(dxlnode->GetOperator());
-	gpos::pointer<const CDXLColDescrArray *> dxl_col_descr_array =
+	const CDXLColDescrArray *dxl_col_descr_array =
 		dxlop->GetDXLColumnDescrArray();
 
 	ULONG output_col_idx = 0;
@@ -2742,8 +2721,8 @@ CTranslatorQueryToDXL::TranslateSetOpToDXL(
 
 		if (!target_entry->resjunk)
 		{
-			gpos::pointer<const CDXLColDescr *> dxl_col_descr_new =
-				(*dxl_col_descr_array)[output_col_idx];
+			const CDXLColDescr *dxl_col_descr_new =
+				(*dxl_col_descr_array)[output_col_idx].get();
 			ULONG colid = dxl_col_descr_new->Id();
 			StoreAttnoColIdMapping(output_attno_to_colid_mapping, resno, colid);
 			output_col_idx++;
@@ -2751,9 +2730,9 @@ CTranslatorQueryToDXL::TranslateSetOpToDXL(
 	}
 
 	// clean up
-	output_colids->Release();
-	mdid_array_leftchild->Release();
-	mdid_array_rightchild->Release();
+	;
+	;
+	;
 
 	return dxlnode;
 }
@@ -2765,12 +2744,11 @@ CTranslatorQueryToDXL::TranslateSetOpToDXL(
 //	@doc:
 //		Create a set op after adding dummy cast on input columns where needed
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::CreateDXLSetOpFromColumns(
 	EdxlSetOpType setop_type, List *output_target_list,
-	gpos::pointer<ULongPtrArray *> output_colids,
-	gpos::owner<ULongPtr2dArray *> input_colids,
-	gpos::owner<CDXLNodeArray *> children_dxlnodes, BOOL is_cast_across_input,
+	ULongPtrArray *output_colids, gpos::Ref<ULongPtr2dArray> input_colids,
+	gpos::Ref<CDXLNodeArray> children_dxlnodes, BOOL is_cast_across_input,
 	BOOL keep_res_junked) const
 {
 	GPOS_ASSERT(nullptr != output_target_list);
@@ -2781,24 +2759,24 @@ CTranslatorQueryToDXL::CreateDXLSetOpFromColumns(
 	GPOS_ASSERT(1 < children_dxlnodes->Size());
 
 	// positions of output columns in the target list
-	gpos::owner<ULongPtrArray *> output_col_pos =
+	gpos::Ref<ULongPtrArray> output_col_pos =
 		CTranslatorUtils::GetPosInTargetList(m_mp, output_target_list,
 											 keep_res_junked);
 
 	const ULONG num_of_cols = output_colids->Size();
-	gpos::pointer<ULongPtrArray *> input_first_child_array = (*input_colids)[0];
+	ULongPtrArray *input_first_child_array = (*input_colids)[0].get();
 	GPOS_ASSERT(num_of_cols == input_first_child_array->Size());
 	GPOS_ASSERT(num_of_cols == output_colids->Size());
 
-	gpos::owner<CBitSet *> bitset = GPOS_NEW(m_mp) CBitSet(m_mp);
+	gpos::Ref<CBitSet> bitset = GPOS_NEW(m_mp) CBitSet(m_mp);
 
 	// project list to maintain the casting of the duplicate input columns
-	gpos::owner<CDXLNode *> new_child_project_list_dxlnode =
+	gpos::Ref<CDXLNode> new_child_project_list_dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 
-	gpos::owner<ULongPtrArray *> input_first_child_new_array =
+	gpos::Ref<ULongPtrArray> input_first_child_new_array =
 		GPOS_NEW(m_mp) ULongPtrArray(m_mp);
-	gpos::owner<CDXLColDescrArray *> output_col_descrs =
+	gpos::Ref<CDXLColDescrArray> output_col_descrs =
 		GPOS_NEW(m_mp) CDXLColDescrArray(m_mp);
 	for (ULONG ul = 0; ul < num_of_cols; ul++)
 	{
@@ -2813,7 +2791,7 @@ CTranslatorQueryToDXL::CreateDXLSetOpFromColumns(
 			(TargetEntry *) gpdb::ListNth(output_target_list, target_list_pos);
 		GPOS_ASSERT(nullptr != target_entry);
 
-		gpos::owner<CDXLColDescr *> output_col_descr = nullptr;
+		gpos::Ref<CDXLColDescr> output_col_descr = nullptr;
 		if (!is_col_exists)
 		{
 			bitset->ExchangeSet(colid_input);
@@ -2839,9 +2817,9 @@ CTranslatorQueryToDXL::CreateDXLSetOpFromColumns(
 
 			output_col_descr = CTranslatorUtils::GetColumnDescrAt(
 				m_mp, target_entry, colid_union_output, ul + 1);
-			gpos::owner<CDXLNode *> project_elem_dxlnode =
+			gpos::Ref<CDXLNode> project_elem_dxlnode =
 				CTranslatorUtils::CreateDummyProjectElem(
-					m_mp, colid_input, colid_new, output_col_descr);
+					m_mp, colid_input, colid_new, output_col_descr.get());
 
 			new_child_project_list_dxlnode->AddChild(project_elem_dxlnode);
 		}
@@ -2854,9 +2832,9 @@ CTranslatorQueryToDXL::CreateDXLSetOpFromColumns(
 	if (0 < new_child_project_list_dxlnode->Arity())
 	{
 		// create a project node for the dummy casted columns
-		gpos::owner<CDXLNode *> first_child_dxlnode = (*children_dxlnodes)[0];
-		first_child_dxlnode->AddRef();
-		gpos::owner<CDXLNode *> new_child_dxlnode = GPOS_NEW(m_mp)
+		gpos::Ref<CDXLNode> first_child_dxlnode = (*children_dxlnodes)[0];
+		;
+		gpos::Ref<CDXLNode> new_child_dxlnode = GPOS_NEW(m_mp)
 			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalProject(m_mp));
 		new_child_dxlnode->AddChild(new_child_project_list_dxlnode);
 		new_child_dxlnode->AddChild(first_child_dxlnode);
@@ -2865,17 +2843,17 @@ CTranslatorQueryToDXL::CreateDXLSetOpFromColumns(
 	}
 	else
 	{
-		new_child_project_list_dxlnode->Release();
+		;
 	}
 
-	gpos::owner<CDXLLogicalSetOp *> dxlop = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLLogicalSetOp> dxlop = GPOS_NEW(m_mp)
 		CDXLLogicalSetOp(m_mp, setop_type, std::move(output_col_descrs),
 						 std::move(input_colids), is_cast_across_input);
-	gpos::owner<CDXLNode *> dxlnode =
+	gpos::Ref<CDXLNode> dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(std::move(dxlop), std::move(children_dxlnodes));
 
-	bitset->Release();
-	output_col_pos->Release();
+	;
+	;
 
 	return dxlnode;
 }
@@ -2889,8 +2867,8 @@ CTranslatorQueryToDXL::CreateDXLSetOpFromColumns(
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorQueryToDXL::SetOpNeedsCast(
-	List *target_list, gpos::pointer<IMdIdArray *> input_col_mdids)
+CTranslatorQueryToDXL::SetOpNeedsCast(List *target_list,
+									  IMdIdArray *input_col_mdids)
 {
 	GPOS_ASSERT(nullptr != input_col_mdids);
 	GPOS_ASSERT(nullptr != target_list);
@@ -2906,7 +2884,7 @@ CTranslatorQueryToDXL::SetOpNeedsCast(
 		OID expr_type_oid = gpdb::ExprType((Node *) target_entry->expr);
 		if (!target_entry->resjunk)
 		{
-			gpos::pointer<IMDId *> mdid = (*input_col_mdids)[col_pos_idx];
+			IMDId *mdid = (*input_col_mdids)[col_pos_idx].get();
 			if (gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid() != expr_type_oid)
 			{
 				return true;
@@ -2926,10 +2904,11 @@ CTranslatorQueryToDXL::SetOpNeedsCast(
 //		Translate the child of a set operation
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
-CTranslatorQueryToDXL::TranslateSetOpChild(
-	Node *child_node, gpos::pointer<ULongPtrArray *> colids,
-	gpos::pointer<IMdIdArray *> input_col_mdids, List *target_list)
+gpos::Ref<CDXLNode>
+CTranslatorQueryToDXL::TranslateSetOpChild(Node *child_node,
+										   ULongPtrArray *colids,
+										   IMdIdArray *input_col_mdids,
+										   List *target_list)
 {
 	GPOS_ASSERT(nullptr != colids);
 	GPOS_ASSERT(nullptr != input_col_mdids);
@@ -2982,26 +2961,27 @@ CTranslatorQueryToDXL::TranslateSetOpChild(
 
 			CTranslatorQueryToDXL query_to_dxl_translator(
 				m_context, m_md_accessor, m_var_to_colid_map, query_derived_tbl,
-				m_query_level + 1, IsDMLQuery(), m_query_level_to_cte_map);
+				m_query_level + 1, IsDMLQuery(),
+				m_query_level_to_cte_map.get());
 
 			// translate query representing the derived table to its DXL representation
 			CDXLNode *query_dxlnode =
 				query_to_dxl_translator.TranslateSelectQueryToDXL();
 			GPOS_ASSERT(nullptr != query_dxlnode);
 
-			gpos::pointer<CDXLNodeArray *> cte_dxlnode_array =
+			CDXLNodeArray *cte_dxlnode_array =
 				query_to_dxl_translator.GetCTEs();
-			CUtils::AddRefAppend(m_dxl_cte_producers, cte_dxlnode_array);
+			CUtils::AddRefAppend(m_dxl_cte_producers.get(), cte_dxlnode_array);
 
 			// get the output columns of the derived table
-			gpos::pointer<CDXLNodeArray *> dxlnodes =
+			CDXLNodeArray *dxlnodes =
 				query_to_dxl_translator.GetQueryOutputCols();
 			GPOS_ASSERT(dxlnodes != nullptr);
 			const ULONG length = dxlnodes->Size();
 			for (ULONG ul = 0; ul < length; ul++)
 			{
-				gpos::pointer<CDXLNode *> current_dxlnode = (*dxlnodes)[ul];
-				gpos::pointer<CDXLScalarIdent *> dxl_scalar_ident =
+				CDXLNode *current_dxlnode = (*dxlnodes)[ul].get();
+				CDXLScalarIdent *dxl_scalar_ident =
 					gpos::dyn_cast<CDXLScalarIdent>(
 						current_dxlnode->GetOperator());
 				ULONG *colid = GPOS_NEW(m_mp)
@@ -3010,7 +2990,7 @@ CTranslatorQueryToDXL::TranslateSetOpChild(
 
 				IMDId *mdid_col = dxl_scalar_ident->MdidType();
 				GPOS_ASSERT(nullptr != mdid_col);
-				mdid_col->AddRef();
+				;
 				input_col_mdids->Append(mdid_col);
 			}
 
@@ -3019,29 +2999,29 @@ CTranslatorQueryToDXL::TranslateSetOpChild(
 	}
 	else if (IsA(child_node, SetOperationStmt))
 	{
-		gpos::owner<IntToUlongMap *> output_attno_to_colid_mapping =
+		gpos::Ref<IntToUlongMap> output_attno_to_colid_mapping =
 			GPOS_NEW(m_mp) IntToUlongMap(m_mp);
-		gpos::owner<CDXLNode *> dxlnode = TranslateSetOpToDXL(
-			child_node, target_list, output_attno_to_colid_mapping);
+		gpos::Ref<CDXLNode> dxlnode = TranslateSetOpToDXL(
+			child_node, target_list, output_attno_to_colid_mapping.get());
 
 		// cleanup
-		output_attno_to_colid_mapping->Release();
+		;
 
-		gpos::pointer<const CDXLColDescrArray *> dxl_col_descr_array =
+		const CDXLColDescrArray *dxl_col_descr_array =
 			gpos::dyn_cast<CDXLLogicalSetOp>(dxlnode->GetOperator())
 				->GetDXLColumnDescrArray();
 		GPOS_ASSERT(nullptr != dxl_col_descr_array);
 		const ULONG length = dxl_col_descr_array->Size();
 		for (ULONG ul = 0; ul < length; ul++)
 		{
-			gpos::pointer<const CDXLColDescr *> dxl_col_descr =
-				(*dxl_col_descr_array)[ul];
+			const CDXLColDescr *dxl_col_descr =
+				(*dxl_col_descr_array)[ul].get();
 			ULONG *colid = GPOS_NEW(m_mp) ULONG(dxl_col_descr->Id());
 			colids->Append(colid);
 
 			IMDId *mdid_col = dxl_col_descr->MdidType();
 			GPOS_ASSERT(nullptr != mdid_col);
-			mdid_col->AddRef();
+			;
 			input_col_mdids->Append(mdid_col);
 		}
 
@@ -3069,7 +3049,7 @@ CTranslatorQueryToDXL::TranslateSetOpChild(
 CDXLNode *
 CTranslatorQueryToDXL::TranslateFromExprToDXL(FromExpr *from_expr)
 {
-	gpos::owner<CDXLNode *> dxlnode = nullptr;
+	gpos::Ref<CDXLNode> dxlnode = nullptr;
 
 	if (0 == gpdb::ListLength(from_expr->fromlist))
 	{
@@ -3096,7 +3076,7 @@ CTranslatorQueryToDXL::TranslateFromExprToDXL(FromExpr *from_expr)
 			ForEach(lc, from_expr->fromlist)
 			{
 				Node *node = (Node *) lfirst(lc);
-				gpos::owner<CDXLNode *> child_dxlnode =
+				gpos::Ref<CDXLNode> child_dxlnode =
 					TranslateFromClauseToDXL(node);
 				dxlnode->AddChild(child_dxlnode);
 			}
@@ -3105,7 +3085,7 @@ CTranslatorQueryToDXL::TranslateFromExprToDXL(FromExpr *from_expr)
 
 	// translate the quals
 	Node *qual_node = from_expr->quals;
-	gpos::owner<CDXLNode *> condition_dxlnode = nullptr;
+	gpos::Ref<CDXLNode> condition_dxlnode = nullptr;
 	if (nullptr != qual_node)
 	{
 		condition_dxlnode = TranslateExprToDXL((Expr *) qual_node);
@@ -3115,7 +3095,7 @@ CTranslatorQueryToDXL::TranslateFromExprToDXL(FromExpr *from_expr)
 	{
 		if (nullptr != condition_dxlnode)
 		{
-			gpos::owner<CDXLNode *> select_dxlnode = GPOS_NEW(m_mp)
+			gpos::Ref<CDXLNode> select_dxlnode = GPOS_NEW(m_mp)
 				CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalSelect(m_mp));
 			select_dxlnode->AddChild(condition_dxlnode);
 			select_dxlnode->AddChild(dxlnode);
@@ -3146,7 +3126,7 @@ CTranslatorQueryToDXL::TranslateFromExprToDXL(FromExpr *from_expr)
 //		(1) a fromlist entry in the FromExpr or (2) left/right child of a JoinExpr
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateFromClauseToDXL(Node *node)
 {
 	GPOS_ASSERT(nullptr != node);
@@ -3266,7 +3246,7 @@ CTranslatorQueryToDXL::UnsupportedRTEKind(RTEKind rtekind)
 //		Returns a CDXLNode representing a from relation range table entry
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateRTEToDXLLogicalGet(const RangeTblEntry *rte,
 												   ULONG rt_index,
 												   ULONG  //current_query_level
@@ -3282,13 +3262,12 @@ CTranslatorQueryToDXL::TranslateRTEToDXLLogicalGet(const RangeTblEntry *rte,
 	}
 
 	// construct table descriptor for the scan node from the range table entry
-	gpos::owner<CDXLTableDescr *> dxl_table_descr =
-		CTranslatorUtils::GetTableDescr(m_mp, m_md_accessor,
-										m_context->m_colid_counter, rte,
-										&m_context->m_has_distributed_tables);
+	gpos::Ref<CDXLTableDescr> dxl_table_descr = CTranslatorUtils::GetTableDescr(
+		m_mp, m_md_accessor, m_context->m_colid_counter, rte,
+		&m_context->m_has_distributed_tables);
 
-	gpos::owner<CDXLLogicalGet *> dxl_op = nullptr;
-	gpos::pointer<const IMDRelation *> md_rel =
+	gpos::Ref<CDXLLogicalGet> dxl_op = nullptr;
+	const IMDRelation *md_rel =
 		m_md_accessor->RetrieveRel(dxl_table_descr->MDId());
 	if (IMDRelation::ErelstorageExternal == md_rel->RetrieveRelStorageType())
 	{
@@ -3299,21 +3278,20 @@ CTranslatorQueryToDXL::TranslateRTEToDXLLogicalGet(const RangeTblEntry *rte,
 		dxl_op = GPOS_NEW(m_mp) CDXLLogicalGet(m_mp, dxl_table_descr);
 	}
 
-	gpos::owner<CDXLNode *> dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+	gpos::Ref<CDXLNode> dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
 	// make note of new columns from base relation
 	m_var_to_colid_map->LoadTblColumns(m_query_level, rt_index,
-									   dxl_table_descr);
+									   dxl_table_descr.get());
 
 	// make note of the operator classes used in the distribution key
 	NoteDistributionPolicyOpclasses(rte);
 
-	gpos::pointer<IMdIdArray *> partition_mdids = md_rel->ChildPartitionMdids();
+	IMdIdArray *partition_mdids = md_rel->ChildPartitionMdids();
 	for (ULONG ul = 0; partition_mdids && ul < partition_mdids->Size(); ++ul)
 	{
-		gpos::pointer<IMDId *> part_mdid = (*partition_mdids)[ul];
-		gpos::pointer<const IMDRelation *> partrel =
-			m_md_accessor->RetrieveRel(part_mdid);
+		IMDId *part_mdid = (*partition_mdids)[ul].get();
+		const IMDRelation *partrel = m_md_accessor->RetrieveRel(part_mdid);
 
 		if (partrel->RetrieveRelStorageType() ==
 			IMDRelation::ErelstorageExternal)
@@ -3448,7 +3426,7 @@ CTranslatorQueryToDXL::NoteDistributionPolicyOpclasses(const RangeTblEntry *rte)
 //		Returns a CDXLNode representing a range table entry of values
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 												  ULONG rt_index,
 												  ULONG current_query_level)
@@ -3460,18 +3438,18 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 	GPOS_ASSERT(0 < num_of_tuples);
 
 	// children of the UNION ALL
-	gpos::owner<CDXLNodeArray *> dxlnodes = GPOS_NEW(m_mp) CDXLNodeArray(m_mp);
+	gpos::Ref<CDXLNodeArray> dxlnodes = GPOS_NEW(m_mp) CDXLNodeArray(m_mp);
 
 	// array of datum arrays for Values
-	gpos::owner<CDXLDatum2dArray *> dxl_values_datum_array =
+	gpos::Ref<CDXLDatum2dArray> dxl_values_datum_array =
 		GPOS_NEW(m_mp) CDXLDatum2dArray(m_mp);
 
 	// array of input colid arrays
-	gpos::owner<ULongPtr2dArray *> input_colids =
+	gpos::Ref<ULongPtr2dArray> input_colids =
 		GPOS_NEW(m_mp) ULongPtr2dArray(m_mp);
 
 	// array of column descriptor for the UNION ALL operator
-	gpos::owner<CDXLColDescrArray *> dxl_col_descr_array =
+	gpos::Ref<CDXLColDescrArray> dxl_col_descr_array =
 		GPOS_NEW(m_mp) CDXLColDescrArray(m_mp);
 
 	// translate the tuples in the value scan
@@ -3487,19 +3465,19 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 		GPOS_ASSERT(IsA(tuple_list, List));
 
 		// array of column colids
-		gpos::owner<ULongPtrArray *> colid_array =
+		gpos::Ref<ULongPtrArray> colid_array =
 			GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 
 		// array of project elements (for expression elements)
-		gpos::owner<CDXLNodeArray *> project_elem_dxlnode_array =
+		gpos::Ref<CDXLNodeArray> project_elem_dxlnode_array =
 			GPOS_NEW(m_mp) CDXLNodeArray(m_mp);
 
 		// array of datum (for datum constant values)
-		gpos::owner<CDXLDatumArray *> dxl_datum_array =
+		gpos::Ref<CDXLDatumArray> dxl_datum_array =
 			GPOS_NEW(m_mp) CDXLDatumArray(m_mp);
 
 		// array of column descriptors for the CTG containing the datum array
-		gpos::owner<CDXLColDescrArray *> dxl_column_descriptors =
+		gpos::Ref<CDXLColDescrArray> dxl_column_descriptors =
 			GPOS_NEW(m_mp) CDXLColDescrArray(m_mp);
 
 		List *col_names = rte->eref->colnames;
@@ -3521,7 +3499,7 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 			{
 				// extract the datum
 				Const *const_expr = (Const *) expr;
-				gpos::owner<CDXLDatum *> datum_dxl =
+				gpos::Ref<CDXLDatum> datum_dxl =
 					m_scalar_translator->TranslateConstToDXL(const_expr);
 				dxl_datum_array->Append(datum_dxl);
 
@@ -3533,7 +3511,7 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 				CMDName *mdname = GPOS_NEW(m_mp) CMDName(m_mp, alias_str);
 				GPOS_DELETE(alias_str);
 
-				gpos::owner<CDXLColDescr *> dxl_col_descr =
+				gpos::Ref<CDXLColDescr> dxl_col_descr =
 					GPOS_NEW(m_mp) CDXLColDescr(
 						mdname, colid, col_pos_idx + 1 /* attno */,
 						GPOS_NEW(m_mp) CMDIdGPDB(const_expr->consttype),
@@ -3542,7 +3520,7 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 
 				if (0 == tuple_pos)
 				{
-					dxl_col_descr->AddRef();
+					;
 					dxl_col_descr_array->Append(dxl_col_descr);
 				}
 				dxl_column_descriptors->Append(dxl_col_descr);
@@ -3551,7 +3529,7 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 			{
 				fAllConstant = false;
 				// translate the scalar expression into a project element
-				gpos::owner<CDXLNode *> project_elem_dxlnode =
+				gpos::Ref<CDXLNode> project_elem_dxlnode =
 					TranslateExprToDXLProject(expr, col_name_char_array,
 											  true /* insist_new_colids */);
 				project_elem_dxlnode_array->Append(project_elem_dxlnode);
@@ -3567,7 +3545,7 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 					CMDName *mdname = GPOS_NEW(m_mp) CMDName(m_mp, alias_str);
 					GPOS_DELETE(alias_str);
 
-					gpos::owner<CDXLColDescr *> dxl_col_descr =
+					gpos::Ref<CDXLColDescr> dxl_col_descr =
 						GPOS_NEW(m_mp) CDXLColDescr(
 							mdname, colid, col_pos_idx + 1 /* attno */,
 							GPOS_NEW(m_mp)
@@ -3585,12 +3563,12 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 			col_pos_idx++;
 		}
 
-		dxlnodes->Append(
-			TranslateColumnValuesToDXL(dxl_datum_array, dxl_column_descriptors,
-									   project_elem_dxlnode_array));
+		dxlnodes->Append(TranslateColumnValuesToDXL(
+			dxl_datum_array.get(), dxl_column_descriptors.get(),
+			project_elem_dxlnode_array.get()));
 		if (fAllConstant)
 		{
-			dxl_datum_array->AddRef();
+			;
 			dxl_values_datum_array->Append(dxl_datum_array);
 		}
 
@@ -3598,9 +3576,9 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 		tuple_pos++;
 
 		// cleanup
-		dxl_datum_array->Release();
-		project_elem_dxlnode_array->Release();
-		dxl_column_descriptors->Release();
+		;
+		;
+		;
 	}
 
 	GPOS_ASSERT(nullptr != dxl_col_descr_array);
@@ -3608,52 +3586,52 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 	if (fAllConstant)
 	{
 		// create Const Table DXL Node
-		gpos::owner<CDXLLogicalConstTable *> dxlop = GPOS_NEW(m_mp)
+		gpos::Ref<CDXLLogicalConstTable> dxlop = GPOS_NEW(m_mp)
 			CDXLLogicalConstTable(m_mp, std::move(dxl_col_descr_array),
 								  std::move(dxl_values_datum_array));
-		gpos::owner<CDXLNode *> dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxlop);
+		gpos::Ref<CDXLNode> dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxlop);
 
 		// make note of new columns from Value Scan
 		m_var_to_colid_map->LoadColumns(m_query_level, rt_index,
 										dxlop->GetDXLColumnDescrArray());
 
 		// cleanup
-		dxlnodes->Release();
-		input_colids->Release();
+		;
+		;
 
 		return dxlnode;
 	}
 	else if (1 < num_of_tuples)
 	{
 		// create a UNION ALL operator
-		gpos::owner<CDXLLogicalSetOp *> dxlop = GPOS_NEW(m_mp) CDXLLogicalSetOp(
+		gpos::Ref<CDXLLogicalSetOp> dxlop = GPOS_NEW(m_mp) CDXLLogicalSetOp(
 			m_mp, EdxlsetopUnionAll, std::move(dxl_col_descr_array),
 			std::move(input_colids), false);
-		gpos::owner<CDXLNode *> dxlnode =
+		gpos::Ref<CDXLNode> dxlnode =
 			GPOS_NEW(m_mp) CDXLNode(dxlop, std::move(dxlnodes));
 
 		// make note of new columns from UNION ALL
 		m_var_to_colid_map->LoadColumns(m_query_level, rt_index,
 										dxlop->GetDXLColumnDescrArray());
-		dxl_values_datum_array->Release();
+		;
 
 		return dxlnode;
 	}
 
 	GPOS_ASSERT(1 == dxlnodes->Size());
 
-	gpos::owner<CDXLNode *> dxlnode = (*dxlnodes)[0];
-	dxlnode->AddRef();
+	gpos::Ref<CDXLNode> dxlnode = (*dxlnodes)[0];
+	;
 
 	// make note of new columns
 	m_var_to_colid_map->LoadColumns(m_query_level, rt_index,
-									dxl_col_descr_array);
+									dxl_col_descr_array.get());
 
 	//cleanup
-	dxl_values_datum_array->Release();
-	dxlnodes->Release();
-	input_colids->Release();
-	dxl_col_descr_array->Release();
+	;
+	;
+	;
+	;
 
 	return dxlnode;
 }
@@ -3667,16 +3645,16 @@ CTranslatorQueryToDXL::TranslateValueScanRTEToDXL(const RangeTblEntry *rte,
 //		either a datum or scalar expression represented as project element.
 //		Each datum is associated with a column descriptors used by the CTG
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateColumnValuesToDXL(
-	gpos::pointer<CDXLDatumArray *> dxl_datum_array_const_tbl_get,
-	gpos::pointer<CDXLColDescrArray *> dxl_column_descriptors,
-	gpos::pointer<CDXLNodeArray *> project_elem_dxlnode_array) const
+	CDXLDatumArray *dxl_datum_array_const_tbl_get,
+	CDXLColDescrArray *dxl_column_descriptors,
+	CDXLNodeArray *project_elem_dxlnode_array) const
 {
 	GPOS_ASSERT(nullptr != dxl_datum_array_const_tbl_get);
 	GPOS_ASSERT(nullptr != project_elem_dxlnode_array);
 
-	gpos::owner<CDXLNode *> const_tbl_get_dxlnode = nullptr;
+	gpos::Ref<CDXLNode> const_tbl_get_dxlnode = nullptr;
 	if (0 == dxl_datum_array_const_tbl_get->Size())
 	{
 		// add a dummy CTG
@@ -3685,14 +3663,14 @@ CTranslatorQueryToDXL::TranslateColumnValuesToDXL(
 	else
 	{
 		// create the array of datum arrays
-		gpos::owner<CDXLDatum2dArray *> dxl_datum_arrays_const_tbl_get =
+		gpos::Ref<CDXLDatum2dArray> dxl_datum_arrays_const_tbl_get =
 			GPOS_NEW(m_mp) CDXLDatum2dArray(m_mp);
 
-		dxl_datum_array_const_tbl_get->AddRef();
+		;
 		dxl_datum_arrays_const_tbl_get->Append(dxl_datum_array_const_tbl_get);
 
-		dxl_column_descriptors->AddRef();
-		gpos::owner<CDXLLogicalConstTable *> dxlop =
+		;
+		gpos::Ref<CDXLLogicalConstTable> dxlop =
 			GPOS_NEW(m_mp) CDXLLogicalConstTable(
 				m_mp, dxl_column_descriptors, dxl_datum_arrays_const_tbl_get);
 
@@ -3705,11 +3683,11 @@ CTranslatorQueryToDXL::TranslateColumnValuesToDXL(
 	}
 
 	// create a project node for the list of project elements
-	project_elem_dxlnode_array->AddRef();
-	gpos::owner<CDXLNode *> project_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+	;
+	gpos::Ref<CDXLNode> project_list_dxlnode = GPOS_NEW(m_mp) CDXLNode(
 		GPOS_NEW(m_mp) CDXLScalarProjList(m_mp), project_elem_dxlnode_array);
 
-	gpos::owner<CDXLNode *> project_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+	gpos::Ref<CDXLNode> project_dxlnode = GPOS_NEW(m_mp) CDXLNode(
 		m_mp, GPOS_NEW(m_mp) CDXLLogicalProject(m_mp),
 		std::move(project_list_dxlnode), std::move(const_tbl_get_dxlnode));
 
@@ -3723,7 +3701,7 @@ CTranslatorQueryToDXL::TranslateColumnValuesToDXL(
 //	@doc:
 //		Returns a CDXLNode representing a from relation range table entry
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateTVFToDXL(const RangeTblEntry *rte,
 										 ULONG rt_index,
 										 ULONG	//current_query_level
@@ -3746,33 +3724,31 @@ CTranslatorQueryToDXL::TranslateTVFToDXL(const RangeTblEntry *rte,
 	// if this is a folded function expression, generate a project over a CTG
 	if (!IsA(rtfunc->funcexpr, FuncExpr) && !is_composite_const)
 	{
-		gpos::owner<CDXLNode *> const_tbl_get_dxlnode = DXLDummyConstTableGet();
+		gpos::Ref<CDXLNode> const_tbl_get_dxlnode = DXLDummyConstTableGet();
 
-		gpos::owner<CDXLNode *> project_list_dxlnode = GPOS_NEW(m_mp)
+		gpos::Ref<CDXLNode> project_list_dxlnode = GPOS_NEW(m_mp)
 			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 
-		gpos::owner<CDXLNode *> project_elem_dxlnode =
-			TranslateExprToDXLProject((Expr *) rtfunc->funcexpr,
-									  rte->eref->aliasname,
-									  true /* insist_new_colids */);
+		gpos::Ref<CDXLNode> project_elem_dxlnode = TranslateExprToDXLProject(
+			(Expr *) rtfunc->funcexpr, rte->eref->aliasname,
+			true /* insist_new_colids */);
 		project_list_dxlnode->AddChild(std::move(project_elem_dxlnode));
 
-		gpos::owner<CDXLNode *> project_dxlnode = GPOS_NEW(m_mp)
+		gpos::Ref<CDXLNode> project_dxlnode = GPOS_NEW(m_mp)
 			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalProject(m_mp));
 		project_dxlnode->AddChild(project_list_dxlnode);
 		project_dxlnode->AddChild(std::move(const_tbl_get_dxlnode));
 
 		m_var_to_colid_map->LoadProjectElements(m_query_level, rt_index,
-												project_list_dxlnode);
+												project_list_dxlnode.get());
 
 		return project_dxlnode;
 	}
 
-	gpos::owner<CDXLLogicalTVF *> tvf_dxlop =
+	gpos::Ref<CDXLLogicalTVF> tvf_dxlop =
 		CTranslatorUtils::ConvertToCDXLLogicalTVF(
 			m_mp, m_md_accessor, m_context->m_colid_counter, rte);
-	gpos::owner<CDXLNode *> tvf_dxlnode =
-		GPOS_NEW(m_mp) CDXLNode(m_mp, tvf_dxlop);
+	gpos::Ref<CDXLNode> tvf_dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, tvf_dxlop);
 
 	// make note of new columns from function
 	m_var_to_colid_map->LoadColumns(m_query_level, rt_index,
@@ -3783,7 +3759,7 @@ CTranslatorQueryToDXL::TranslateTVFToDXL(const RangeTblEntry *rte,
 	// funcexpr evaluates to const and returns composite type
 	if (IsA(rtfunc->funcexpr, Const))
 	{
-		gpos::owner<CDXLNode *> constValue =
+		gpos::Ref<CDXLNode> constValue =
 			m_scalar_translator->TranslateScalarToDXL(
 				(Expr *) (rtfunc->funcexpr), m_var_to_colid_map);
 		tvf_dxlnode->AddChild(std::move(constValue));
@@ -3807,25 +3783,22 @@ CTranslatorQueryToDXL::TranslateTVFToDXL(const RangeTblEntry *rte,
 		Node *arg_node = (Node *) lfirst(lc);
 		is_subquery_in_args =
 			is_subquery_in_args || CTranslatorUtils::HasSubquery(arg_node);
-		gpos::owner<CDXLNode *> func_expr_arg_dxlnode =
+		gpos::Ref<CDXLNode> func_expr_arg_dxlnode =
 			m_scalar_translator->TranslateScalarToDXL((Expr *) arg_node,
 													  m_var_to_colid_map);
 		GPOS_ASSERT(nullptr != func_expr_arg_dxlnode);
 		tvf_dxlnode->AddChild(func_expr_arg_dxlnode);
 	}
 
-	gpos::owner<CMDIdGPDB *> mdid_func =
-		GPOS_NEW(m_mp) CMDIdGPDB(funcexpr->funcid);
-	gpos::pointer<const IMDFunction *> pmdfunc =
-		m_md_accessor->RetrieveFunc(mdid_func);
+	gpos::Ref<CMDIdGPDB> mdid_func = GPOS_NEW(m_mp) CMDIdGPDB(funcexpr->funcid);
+	const IMDFunction *pmdfunc = m_md_accessor->RetrieveFunc(mdid_func.get());
 	if (is_subquery_in_args &&
 		IMDFunction::EfsVolatile == pmdfunc->GetFuncStability())
 	{
 		GPOS_RAISE(
 			gpdxl::ExmaDXL, gpdxl::ExmiQuery2DXLUnsupportedFeature,
 			GPOS_WSZ_LIT("Volatile functions with subqueries in arguments"));
-	}
-	mdid_func->Release();
+	};
 
 	return tvf_dxlnode;
 }
@@ -3838,13 +3811,13 @@ CTranslatorQueryToDXL::TranslateTVFToDXL(const RangeTblEntry *rte,
 //		Translate a common table expression into CDXLNode
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateCTEToDXL(const RangeTblEntry *rte,
 										 ULONG rt_index,
 										 ULONG current_query_level)
 {
 	const ULONG cte_query_level = current_query_level - rte->ctelevelsup;
-	gpos::pointer<const CCTEListEntry *> cte_list_entry =
+	const CCTEListEntry *cte_list_entry =
 		m_query_level_to_cte_map->Find(&cte_query_level);
 	if (nullptr == cte_list_entry)
 	{
@@ -3853,7 +3826,7 @@ CTranslatorQueryToDXL::TranslateCTEToDXL(const RangeTblEntry *rte,
 				   GPOS_WSZ_LIT("No CTE"));
 	}
 
-	gpos::pointer<const CDXLNode *> cte_producer_dxlnode =
+	const CDXLNode *cte_producer_dxlnode =
 		cte_list_entry->GetCTEProducer(rte->ctename);
 	const List *cte_producer_target_list =
 		cte_list_entry->GetCTEProducerTargetList(rte->ctename);
@@ -3861,26 +3834,26 @@ CTranslatorQueryToDXL::TranslateCTEToDXL(const RangeTblEntry *rte,
 	GPOS_ASSERT(nullptr != cte_producer_dxlnode &&
 				nullptr != cte_producer_target_list);
 
-	gpos::pointer<CDXLLogicalCTEProducer *> cte_producer_dxlop =
+	CDXLLogicalCTEProducer *cte_producer_dxlop =
 		gpos::dyn_cast<CDXLLogicalCTEProducer>(
 			cte_producer_dxlnode->GetOperator());
 	ULONG cte_id = cte_producer_dxlop->Id();
-	gpos::pointer<ULongPtrArray *> op_colid_array_cte_producer =
+	ULongPtrArray *op_colid_array_cte_producer =
 		cte_producer_dxlop->GetOutputColIdsArray();
 
 	// construct output column array
-	gpos::owner<ULongPtrArray *> colid_array_cte_consumer =
+	gpos::Ref<ULongPtrArray> colid_array_cte_consumer =
 		GenerateColIds(m_mp, op_colid_array_cte_producer->Size());
 
 	// load the new columns from the CTE
 	m_var_to_colid_map->LoadCTEColumns(
-		current_query_level, rt_index, colid_array_cte_consumer,
+		current_query_level, rt_index, colid_array_cte_consumer.get(),
 		const_cast<List *>(cte_producer_target_list));
 
-	gpos::owner<CDXLLogicalCTEConsumer *> cte_consumer_dxlop =
+	gpos::Ref<CDXLLogicalCTEConsumer> cte_consumer_dxlop =
 		GPOS_NEW(m_mp) CDXLLogicalCTEConsumer(
 			m_mp, cte_id, std::move(colid_array_cte_consumer));
-	gpos::owner<CDXLNode *> cte_dxlnode =
+	gpos::Ref<CDXLNode> cte_dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(cte_consumer_dxlop));
 
 	return cte_dxlnode;
@@ -3904,21 +3877,20 @@ CTranslatorQueryToDXL::TranslateDerivedTablesToDXL(const RangeTblEntry *rte,
 
 	CTranslatorQueryToDXL query_to_dxl_translator(
 		m_context, m_md_accessor, m_var_to_colid_map, query_derived_tbl,
-		m_query_level + 1, IsDMLQuery(), m_query_level_to_cte_map);
+		m_query_level + 1, IsDMLQuery(), m_query_level_to_cte_map.get());
 
 	// translate query representing the derived table to its DXL representation
 	CDXLNode *derived_tbl_dxlnode =
 		query_to_dxl_translator.TranslateSelectQueryToDXL();
 
 	// get the output columns of the derived table
-	gpos::pointer<CDXLNodeArray *> query_output_cols_dxlnode_array =
+	CDXLNodeArray *query_output_cols_dxlnode_array =
 		query_to_dxl_translator.GetQueryOutputCols();
-	gpos::pointer<CDXLNodeArray *> cte_dxlnode_array =
-		query_to_dxl_translator.GetCTEs();
+	CDXLNodeArray *cte_dxlnode_array = query_to_dxl_translator.GetCTEs();
 	GPOS_ASSERT(nullptr != derived_tbl_dxlnode &&
 				query_output_cols_dxlnode_array != nullptr);
 
-	CUtils::AddRefAppend(m_dxl_cte_producers, cte_dxlnode_array);
+	CUtils::AddRefAppend(m_dxl_cte_producers.get(), cte_dxlnode_array);
 
 	// make note of new columns from derived table
 	m_var_to_colid_map->LoadDerivedTblColumns(
@@ -3936,10 +3908,10 @@ CTranslatorQueryToDXL::TranslateDerivedTablesToDXL(const RangeTblEntry *rte,
 //		Translate the Expr into a CDXLScalar node
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateExprToDXL(Expr *expr)
 {
-	gpos::owner<CDXLNode *> scalar_dxlnode =
+	gpos::Ref<CDXLNode> scalar_dxlnode =
 		m_scalar_translator->TranslateScalarToDXL(expr, m_var_to_colid_map);
 	GPOS_ASSERT(nullptr != scalar_dxlnode);
 
@@ -3954,18 +3926,18 @@ CTranslatorQueryToDXL::TranslateExprToDXL(Expr *expr)
 //		Translate the JoinExpr on a GPDB query into a CDXLLogicalJoin node
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateJoinExprInFromToDXL(JoinExpr *join_expr)
 {
 	GPOS_ASSERT(nullptr != join_expr);
 
-	gpos::owner<CDXLNode *> left_child_dxlnode =
+	gpos::Ref<CDXLNode> left_child_dxlnode =
 		TranslateFromClauseToDXL(join_expr->larg);
-	gpos::owner<CDXLNode *> right_child_dxlnode =
+	gpos::Ref<CDXLNode> right_child_dxlnode =
 		TranslateFromClauseToDXL(join_expr->rarg);
 	EdxlJoinType join_type =
 		CTranslatorUtils::ConvertToDXLJoinType(join_expr->jointype);
-	gpos::owner<CDXLNode *> join_dxlnode = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLNode> join_dxlnode = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalJoin(m_mp, join_type));
 
 	GPOS_ASSERT(nullptr != left_child_dxlnode &&
@@ -4003,9 +3975,9 @@ CTranslatorQueryToDXL::TranslateJoinExprInFromToDXL(JoinExpr *join_expr)
 	GPOS_ASSERT(gpdb::ListLength(rte->joinaliasvars) ==
 				gpdb::ListLength(alias->colnames));
 
-	gpos::owner<CDXLNode *> project_list_computed_cols_dxlnode =
+	gpos::Ref<CDXLNode> project_list_computed_cols_dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
-	gpos::owner<CDXLNode *> project_list_dxlnode =
+	gpos::Ref<CDXLNode> project_list_dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 
 	// construct a proj element node for each entry in the joinaliasvars
@@ -4023,29 +3995,28 @@ CTranslatorQueryToDXL::TranslateJoinExprInFromToDXL(JoinExpr *join_expr)
 		CHAR *col_name_char_array = strVal(value);
 
 		// create the DXL node holding the target list entry and add it to proj list
-		gpos::owner<CDXLNode *> project_elem_dxlnode =
-			TranslateExprToDXLProject((Expr *) join_alias_node,
-									  col_name_char_array);
+		gpos::Ref<CDXLNode> project_elem_dxlnode = TranslateExprToDXLProject(
+			(Expr *) join_alias_node, col_name_char_array);
 		project_list_dxlnode->AddChild(project_elem_dxlnode);
 
 		if (IsA(join_alias_node, CoalesceExpr))
 		{
 			// add coalesce expression to the computed columns
-			project_elem_dxlnode->AddRef();
+			;
 			project_list_computed_cols_dxlnode->AddChild(project_elem_dxlnode);
 		}
 	}
 	m_var_to_colid_map->LoadProjectElements(m_query_level, rtindex,
-											project_list_dxlnode);
-	project_list_dxlnode->Release();
+											project_list_dxlnode.get());
+	;
 
 	if (0 == project_list_computed_cols_dxlnode->Arity())
 	{
-		project_list_computed_cols_dxlnode->Release();
+		;
 		return join_dxlnode;
 	}
 
-	gpos::owner<CDXLNode *> project_dxlnode =
+	gpos::Ref<CDXLNode> project_dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalProject(m_mp));
 	project_dxlnode->AddChild(std::move(project_list_computed_cols_dxlnode));
 	project_dxlnode->AddChild(std::move(join_dxlnode));
@@ -4062,18 +4033,18 @@ CTranslatorQueryToDXL::TranslateJoinExprInFromToDXL(JoinExpr *join_expr)
 //		memory in the translator memory pool and caller responsible for freeing it.
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateTargetListToDXLProject(
 	List *target_list, CDXLNode *child_dxlnode,
-	gpos::pointer<IntToUlongMap *> sort_grpref_to_colid_mapping,
-	gpos::pointer<IntToUlongMap *> output_attno_to_colid_mapping, List *plgrpcl,
+	IntToUlongMap *sort_grpref_to_colid_mapping,
+	IntToUlongMap *output_attno_to_colid_mapping, List *plgrpcl,
 	BOOL is_expand_aggref_expr)
 {
 	BOOL is_groupby =
 		(0 != gpdb::ListLength(m_query->groupClause) ||
 		 0 != gpdb::ListLength(m_query->groupingSets) || m_query->hasAggs);
 
-	gpos::owner<CDXLNode *> project_list_dxlnode =
+	gpos::Ref<CDXLNode> project_list_dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 
 	// construct a proj element node for each entry in the target list
@@ -4124,7 +4095,7 @@ CTranslatorQueryToDXL::TranslateTargetListToDXLProject(
 				(IsA(target_entry->expr, Var) &&
 				 ((Var *) (target_entry->expr))->varlevelsup > 0 &&
 				 !is_grouping_col);
-			gpos::owner<CDXLNode *> project_elem_dxlnode =
+			gpos::Ref<CDXLNode> project_elem_dxlnode =
 				TranslateExprToDXLProject(target_entry->expr,
 										  target_entry->resname,
 										  insist_proj /* insist_new_colids */);
@@ -4145,7 +4116,7 @@ CTranslatorQueryToDXL::TranslateTargetListToDXLProject(
 			}
 			else
 			{
-				project_elem_dxlnode->Release();
+				;
 			}
 		}
 		else if (is_expand_aggref_expr && IsA(target_entry->expr, Aggref))
@@ -4201,7 +4172,7 @@ CTranslatorQueryToDXL::TranslateTargetListToDXLProject(
 		Var *var = (Var *) lfirst(lc_var);
 
 		// TODO: Dec 28, 2012; figure out column's name
-		gpos::owner<CDXLNode *> project_elem_dxlnode =
+		gpos::Ref<CDXLNode> project_elem_dxlnode =
 			TranslateExprToDXLProject((Expr *) var, "?col?");
 
 		ULONG colid = gpos::dyn_cast<CDXLScalarProjElem>(
@@ -4211,14 +4182,14 @@ CTranslatorQueryToDXL::TranslateTargetListToDXLProject(
 		// add column to the list of output columns of the query
 		StoreAttnoColIdMapping(output_attno_to_colid_mapping, resno, colid);
 
-		project_elem_dxlnode->Release();
+		;
 	}
 
 	if (0 < project_list_dxlnode->Arity())
 	{
 		// create a node with the CDXLLogicalProject operator and add as its children:
 		// the CDXLProjectList node and the node representing the input to the project node
-		gpos::owner<CDXLNode *> project_dxlnode = GPOS_NEW(m_mp)
+		gpos::Ref<CDXLNode> project_dxlnode = GPOS_NEW(m_mp)
 			CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalProject(m_mp));
 		project_dxlnode->AddChild(project_list_dxlnode);
 		project_dxlnode->AddChild(child_dxlnode);
@@ -4226,7 +4197,7 @@ CTranslatorQueryToDXL::TranslateTargetListToDXLProject(
 		return project_dxlnode;
 	}
 
-	project_list_dxlnode->Release();
+	;
 	return child_dxlnode;
 }
 
@@ -4239,19 +4210,18 @@ CTranslatorQueryToDXL::TranslateTargetListToDXLProject(
 //		given bitset
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::CreateDXLProjectNullsForGroupingSets(
-	List *target_list, gpos::owner<CDXLNode *> child_dxlnode,
-	gpos::pointer<CBitSet *> bitset,  // group by columns
-	gpos::pointer<IntToUlongMap *>
-		sort_grouping_col_mapping,	// mapping of sorting and grouping columns
-	gpos::pointer<IntToUlongMap *>
-		output_attno_to_colid_mapping,	// mapping of output columns
-	gpos::pointer<UlongToUlongMap *>
+	List *target_list, gpos::Ref<CDXLNode> child_dxlnode,
+	CBitSet *bitset,  // group by columns
+	IntToUlongMap
+		*sort_grouping_col_mapping,	 // mapping of sorting and grouping columns
+	IntToUlongMap *output_attno_to_colid_mapping,  // mapping of output columns
+	UlongToUlongMap *
 		grpcol_index_to_colid_mapping  // mapping of unique grouping col positions
 ) const
 {
-	gpos::owner<CDXLNode *> project_list_dxlnode =
+	gpos::Ref<CDXLNode> project_list_dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 
 	// construct a proj element node for those non-aggregate entries in the target list which
@@ -4270,7 +4240,7 @@ CTranslatorQueryToDXL::CreateDXLProjectNullsForGroupingSets(
 		if (IsA(target_entry->expr, GroupingFunc))
 		{
 			colid = m_context->m_colid_counter->next_id();
-			gpos::owner<CDXLNode *> grouping_func_dxlnode =
+			gpos::Ref<CDXLNode> grouping_func_dxlnode =
 				TranslateGroupingFuncToDXL(target_entry->expr, bitset,
 										   grpcol_index_to_colid_mapping);
 
@@ -4280,11 +4250,10 @@ CTranslatorQueryToDXL::CreateDXLProjectNullsForGroupingSets(
 			CMDName *mdname_alias = GPOS_NEW(m_mp) CMDName(m_mp, alias_str);
 			GPOS_DELETE(alias_str);
 
-			gpos::owner<CDXLNode *> project_elem_dxlnode = GPOS_NEW(m_mp)
-				CDXLNode(m_mp,
-						 GPOS_NEW(m_mp)
-							 CDXLScalarProjElem(m_mp, colid, mdname_alias),
-						 grouping_func_dxlnode);
+			gpos::Ref<CDXLNode> project_elem_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+				m_mp,
+				GPOS_NEW(m_mp) CDXLScalarProjElem(m_mp, colid, mdname_alias),
+				grouping_func_dxlnode);
 			project_list_dxlnode->AddChild(project_elem_dxlnode);
 			StoreAttnoColIdMapping(output_attno_to_colid_mapping, resno, colid);
 		}
@@ -4294,11 +4263,12 @@ CTranslatorQueryToDXL::CreateDXLProjectNullsForGroupingSets(
 
 			colid = m_context->m_colid_counter->next_id();
 
-			gpos::owner<CMDIdGPDB *> mdid = GPOS_NEW(m_mp) CMDIdGPDB(oid_type);
-			gpos::owner<CDXLNode *> project_elem_dxlnode =
+			gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(m_mp) CMDIdGPDB(oid_type);
+			gpos::Ref<CDXLNode> project_elem_dxlnode =
 				CTranslatorUtils::CreateDXLProjElemConstNULL(
-					m_mp, m_md_accessor, mdid, colid, target_entry->resname);
-			mdid->Release();
+					m_mp, m_md_accessor, mdid.get(), colid,
+					target_entry->resname);
+			;
 
 			project_list_dxlnode->AddChild(project_elem_dxlnode);
 			StoreAttnoColIdMapping(output_attno_to_colid_mapping, resno, colid);
@@ -4322,7 +4292,7 @@ CTranslatorQueryToDXL::CreateDXLProjectNullsForGroupingSets(
 	if (0 == project_list_dxlnode->Arity())
 	{
 		// no project necessary
-		project_list_dxlnode->Release();
+		;
 		return child_dxlnode;
 	}
 
@@ -4340,15 +4310,14 @@ CTranslatorQueryToDXL::CreateDXLProjectNullsForGroupingSets(
 //		the target list
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::CreateDXLProjectGroupingFuncs(
-	List *target_list, gpos::owner<CDXLNode *> child_dxlnode,
-	gpos::pointer<CBitSet *> bitset,
-	gpos::pointer<IntToUlongMap *> output_attno_to_colid_mapping,
-	gpos::pointer<UlongToUlongMap *> grpcol_index_to_colid_mapping,
-	gpos::pointer<IntToUlongMap *> sort_grpref_to_colid_mapping) const
+	List *target_list, gpos::Ref<CDXLNode> child_dxlnode, CBitSet *bitset,
+	IntToUlongMap *output_attno_to_colid_mapping,
+	UlongToUlongMap *grpcol_index_to_colid_mapping,
+	IntToUlongMap *sort_grpref_to_colid_mapping) const
 {
-	gpos::owner<CDXLNode *> project_list_dxlnode =
+	gpos::Ref<CDXLNode> project_list_dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarProjList(m_mp));
 
 	// construct a proj element node for those non-aggregate entries in the target list which
@@ -4364,7 +4333,7 @@ CTranslatorQueryToDXL::CreateDXLProjectGroupingFuncs(
 		if (IsA(target_entry->expr, GroupingFunc))
 		{
 			ULONG colid = m_context->m_colid_counter->next_id();
-			gpos::owner<CDXLNode *> grouping_func_dxlnode =
+			gpos::Ref<CDXLNode> grouping_func_dxlnode =
 				TranslateGroupingFuncToDXL(target_entry->expr, bitset,
 										   grpcol_index_to_colid_mapping);
 
@@ -4374,11 +4343,10 @@ CTranslatorQueryToDXL::CreateDXLProjectGroupingFuncs(
 			CMDName *mdname_alias = GPOS_NEW(m_mp) CMDName(m_mp, alias_str);
 			GPOS_DELETE(alias_str);
 
-			gpos::owner<CDXLNode *> project_elem_dxlnode = GPOS_NEW(m_mp)
-				CDXLNode(m_mp,
-						 GPOS_NEW(m_mp)
-							 CDXLScalarProjElem(m_mp, colid, mdname_alias),
-						 grouping_func_dxlnode);
+			gpos::Ref<CDXLNode> project_elem_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+				m_mp,
+				GPOS_NEW(m_mp) CDXLScalarProjElem(m_mp, colid, mdname_alias),
+				grouping_func_dxlnode);
 			project_list_dxlnode->AddChild(project_elem_dxlnode);
 			StoreAttnoColIdMapping(output_attno_to_colid_mapping, resno, colid);
 			AddSortingGroupingColumn(target_entry, sort_grpref_to_colid_mapping,
@@ -4389,7 +4357,7 @@ CTranslatorQueryToDXL::CreateDXLProjectGroupingFuncs(
 	if (0 == project_list_dxlnode->Arity())
 	{
 		// no project necessary
-		project_list_dxlnode->Release();
+		;
 		return child_dxlnode;
 	}
 
@@ -4408,8 +4376,7 @@ CTranslatorQueryToDXL::CreateDXLProjectGroupingFuncs(
 //---------------------------------------------------------------------------
 void
 CTranslatorQueryToDXL::StoreAttnoColIdMapping(
-	gpos::pointer<IntToUlongMap *> attno_to_colid_mapping, INT attno,
-	ULONG colid) const
+	IntToUlongMap *attno_to_colid_mapping, INT attno, ULONG colid) const
 {
 	GPOS_ASSERT(nullptr != attno_to_colid_mapping);
 
@@ -4432,15 +4399,14 @@ CTranslatorQueryToDXL::StoreAttnoColIdMapping(
 //		Construct an array of DXL nodes representing the query output
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNodeArray *>
+gpos::Ref<CDXLNodeArray>
 CTranslatorQueryToDXL::CreateDXLOutputCols(
-	List *target_list,
-	gpos::pointer<IntToUlongMap *> attno_to_colid_mapping) const
+	List *target_list, IntToUlongMap *attno_to_colid_mapping) const
 {
 	GPOS_ASSERT(nullptr != target_list);
 	GPOS_ASSERT(nullptr != attno_to_colid_mapping);
 
-	gpos::owner<CDXLNodeArray *> dxlnodes = GPOS_NEW(m_mp) CDXLNodeArray(m_mp);
+	gpos::Ref<CDXLNodeArray> dxlnodes = GPOS_NEW(m_mp) CDXLNodeArray(m_mp);
 
 	ListCell *lc = nullptr;
 	ForEach(lc, target_list)
@@ -4475,17 +4441,16 @@ CTranslatorQueryToDXL::CreateDXLOutputCols(
 			CTranslatorUtils::GetColId(resno, attno_to_colid_mapping);
 
 		// create a column reference
-		gpos::owner<IMDId *> mdid_type = GPOS_NEW(m_mp)
+		gpos::Ref<IMDId> mdid_type = GPOS_NEW(m_mp)
 			CMDIdGPDB(gpdb::ExprType((Node *) target_entry->expr));
 		INT type_modifier = gpdb::ExprTypeMod((Node *) target_entry->expr);
-		gpos::owner<CDXLColRef *> dxl_colref =
+		gpos::Ref<CDXLColRef> dxl_colref =
 			GPOS_NEW(m_mp) CDXLColRef(mdname, colid, mdid_type, type_modifier);
-		gpos::owner<CDXLScalarIdent *> dxl_ident =
+		gpos::Ref<CDXLScalarIdent> dxl_ident =
 			GPOS_NEW(m_mp) CDXLScalarIdent(m_mp, dxl_colref);
 
 		// create the DXL node holding the scalar ident operator
-		gpos::owner<CDXLNode *> dxlnode =
-			GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_ident);
+		gpos::Ref<CDXLNode> dxlnode = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_ident);
 
 		dxlnodes->Append(dxlnode);
 	}
@@ -4502,7 +4467,7 @@ CTranslatorQueryToDXL::CreateDXLOutputCols(
 //		The function allocates memory in the translator memory pool, and the caller
 //		is responsible for freeing it.
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateExprToDXLProject(Expr *expr,
 												 const CHAR *alias_name,
 												 BOOL insist_new_colids)
@@ -4510,7 +4475,7 @@ CTranslatorQueryToDXL::TranslateExprToDXLProject(Expr *expr,
 	GPOS_ASSERT(nullptr != expr);
 
 	// construct a scalar operator
-	gpos::owner<CDXLNode *> child_dxlnode = TranslateExprToDXL(expr);
+	gpos::Ref<CDXLNode> child_dxlnode = TranslateExprToDXL(expr);
 
 	// get the id and alias for the proj elem
 	ULONG project_elem_id;
@@ -4534,7 +4499,7 @@ CTranslatorQueryToDXL::TranslateExprToDXLProject(Expr *expr,
 		// project elem is a reference to a column - use the colref id
 		GPOS_ASSERT(EdxlopScalarIdent ==
 					child_dxlnode->GetOperator()->GetDXLOperator());
-		gpos::pointer<CDXLScalarIdent *> dxl_ident =
+		CDXLScalarIdent *dxl_ident =
 			gpos::cast<CDXLScalarIdent>(child_dxlnode->GetOperator());
 		project_elem_id = dxl_ident->GetDXLColRef()->Id();
 	}
@@ -4544,7 +4509,7 @@ CTranslatorQueryToDXL::TranslateExprToDXLProject(Expr *expr,
 		project_elem_id = m_context->m_colid_counter->next_id();
 	}
 
-	gpos::owner<CDXLNode *> project_elem_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+	gpos::Ref<CDXLNode> project_elem_dxlnode = GPOS_NEW(m_mp) CDXLNode(
 		m_mp,
 		GPOS_NEW(m_mp) CDXLScalarProjElem(m_mp, project_elem_id, mdname_alias));
 	project_elem_dxlnode->AddChild(std::move(child_dxlnode));
@@ -4559,12 +4524,12 @@ CTranslatorQueryToDXL::TranslateExprToDXLProject(Expr *expr,
 //	@doc:
 //		Returns a CDXLNode representing scalar condition "true"
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::CreateDXLConstValueTrue()
 {
 	Const *const_expr =
 		(Const *) gpdb::MakeBoolConst(true /*value*/, false /*isnull*/);
-	gpos::owner<CDXLNode *> dxlnode = TranslateExprToDXL((Expr *) const_expr);
+	gpos::Ref<CDXLNode> dxlnode = TranslateExprToDXL((Expr *) const_expr);
 	gpdb::GPDBFree(const_expr);
 
 	return dxlnode;
@@ -4578,10 +4543,10 @@ CTranslatorQueryToDXL::CreateDXLConstValueTrue()
 //		Translate grouping func
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateGroupingFuncToDXL(
-	const Expr *expr, gpos::pointer<CBitSet *> bitset,
-	gpos::pointer<UlongToUlongMap *> grpcol_index_to_colid_mapping) const
+	const Expr *expr, CBitSet *bitset,
+	UlongToUlongMap *grpcol_index_to_colid_mapping) const
 {
 	GPOS_ASSERT(IsA(expr, GroupingFunc));
 	GPOS_ASSERT(nullptr != grpcol_index_to_colid_mapping);
@@ -4603,15 +4568,13 @@ CTranslatorQueryToDXL::TranslateGroupingFuncToDXL(
 		l_value = 1;
 	}
 
-	gpos::pointer<const IMDType *> md_type =
-		m_md_accessor->PtMDType<IMDTypeInt4>(m_sysid);
-	gpos::pointer<CMDIdGPDB *> mdid_cast =
-		gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
-	gpos::owner<CMDIdGPDB *> mdid = GPOS_NEW(m_mp) CMDIdGPDB(*mdid_cast);
+	const IMDType *md_type = m_md_accessor->PtMDType<IMDTypeInt4>(m_sysid);
+	CMDIdGPDB *mdid_cast = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
+	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(m_mp) CMDIdGPDB(*mdid_cast);
 
-	gpos::owner<CDXLDatum *> datum_dxl = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLDatum> datum_dxl = GPOS_NEW(m_mp)
 		CDXLDatumInt4(m_mp, std::move(mdid), false /* is_null */, l_value);
-	gpos::owner<CDXLScalarConstValue *> dxlop =
+	gpos::Ref<CDXLScalarConstValue> dxlop =
 		GPOS_NEW(m_mp) CDXLScalarConstValue(m_mp, std::move(datum_dxl));
 	return GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxlop));
 }
@@ -4657,45 +4620,43 @@ CTranslatorQueryToDXL::ConstructCTEProducerList(List *cte_list,
 
 		CTranslatorQueryToDXL query_to_dxl_translator(
 			m_context, m_md_accessor, m_var_to_colid_map, cte_query,
-			cte_query_level + 1, IsDMLQuery(), m_query_level_to_cte_map);
+			cte_query_level + 1, IsDMLQuery(), m_query_level_to_cte_map.get());
 
 		// translate query representing the cte table to its DXL representation
 		CDXLNode *cte_child_dxlnode =
 			query_to_dxl_translator.TranslateSelectQueryToDXL();
 
 		// get the output columns of the cte table
-		gpos::pointer<CDXLNodeArray *> cte_query_output_colds_dxlnode_array =
+		CDXLNodeArray *cte_query_output_colds_dxlnode_array =
 			query_to_dxl_translator.GetQueryOutputCols();
-		gpos::pointer<CDXLNodeArray *> cte_dxlnode_array =
-			query_to_dxl_translator.GetCTEs();
+		CDXLNodeArray *cte_dxlnode_array = query_to_dxl_translator.GetCTEs();
 
 		GPOS_ASSERT(nullptr != cte_child_dxlnode &&
 					nullptr != cte_query_output_colds_dxlnode_array &&
 					nullptr != cte_dxlnode_array);
 
 		// append any nested CTE
-		CUtils::AddRefAppend(m_dxl_cte_producers, cte_dxlnode_array);
+		CUtils::AddRefAppend(m_dxl_cte_producers.get(), cte_dxlnode_array);
 
-		gpos::owner<ULongPtrArray *> colid_array =
+		gpos::Ref<ULongPtrArray> colid_array =
 			GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 
 		const ULONG output_columns =
 			cte_query_output_colds_dxlnode_array->Size();
 		for (ULONG ul = 0; ul < output_columns; ul++)
 		{
-			gpos::pointer<CDXLNode *> output_col_dxlnode =
-				(*cte_query_output_colds_dxlnode_array)[ul];
-			gpos::pointer<CDXLScalarIdent *> dxl_scalar_ident =
-				gpos::dyn_cast<CDXLScalarIdent>(
-					output_col_dxlnode->GetOperator());
+			CDXLNode *output_col_dxlnode =
+				(*cte_query_output_colds_dxlnode_array)[ul].get();
+			CDXLScalarIdent *dxl_scalar_ident = gpos::dyn_cast<CDXLScalarIdent>(
+				output_col_dxlnode->GetOperator());
 			colid_array->Append(
 				GPOS_NEW(m_mp) ULONG(dxl_scalar_ident->GetDXLColRef()->Id()));
 		}
 
-		gpos::owner<CDXLLogicalCTEProducer *> lg_cte_prod_dxlop =
+		gpos::Ref<CDXLLogicalCTEProducer> lg_cte_prod_dxlop =
 			GPOS_NEW(m_mp) CDXLLogicalCTEProducer(
 				m_mp, m_context->m_cte_id_counter->next_id(), colid_array);
-		gpos::owner<CDXLNode *> cte_producer_dxlnode =
+		gpos::Ref<CDXLNode> cte_producer_dxlnode =
 			GPOS_NEW(m_mp) CDXLNode(m_mp, lg_cte_prod_dxlop, cte_child_dxlnode);
 
 		m_dxl_cte_producers->Append(cte_producer_dxlnode);
@@ -4706,19 +4667,20 @@ CTranslatorQueryToDXL::ConstructCTEProducerList(List *cte_list,
 		GPOS_ASSERT(result);
 
 		// update CTE producer mappings
-		gpos::owner<CCTEListEntry *> cte_list_entry =
+		gpos::Ref<CCTEListEntry> cte_list_entry =
 			m_query_level_to_cte_map->Find(&cte_query_level);
 		if (nullptr == cte_list_entry)
 		{
-			cte_list_entry = GPOS_NEW(m_mp)
-				CCTEListEntry(m_mp, cte_query_level, cte, cte_producer_dxlnode);
+			cte_list_entry = GPOS_NEW(m_mp) CCTEListEntry(
+				m_mp, cte_query_level, cte, cte_producer_dxlnode.get());
 			BOOL is_res GPOS_ASSERTS_ONLY = m_query_level_to_cte_map->Insert(
 				GPOS_NEW(m_mp) ULONG(cte_query_level), cte_list_entry);
 			GPOS_ASSERT(is_res);
 		}
 		else
 		{
-			cte_list_entry->AddCTEProducer(m_mp, cte, cte_producer_dxlnode);
+			cte_list_entry->AddCTEProducer(m_mp, cte,
+										   cte_producer_dxlnode.get());
 		}
 	}
 }
@@ -4733,8 +4695,8 @@ CTranslatorQueryToDXL::ConstructCTEProducerList(List *cte_list,
 //---------------------------------------------------------------------------
 void
 CTranslatorQueryToDXL::ConstructCTEAnchors(
-	gpos::pointer<CDXLNodeArray *> dxlnodes, CDXLNode **dxl_cte_anchor_top,
-	gpos::owner<CDXLNode *> *dxl_cte_anchor_bottom)
+	CDXLNodeArray *dxlnodes, CDXLNode **dxl_cte_anchor_top,
+	gpos::Ref<CDXLNode> *dxl_cte_anchor_bottom)
 {
 	GPOS_ASSERT(nullptr == *dxl_cte_anchor_top);
 	GPOS_ASSERT(nullptr == *dxl_cte_anchor_bottom);
@@ -4749,8 +4711,8 @@ CTranslatorQueryToDXL::ConstructCTEAnchors(
 	for (ULONG ul = num_of_ctes; ul > 0; ul--)
 	{
 		// construct a new CTE anchor on top of the previous one
-		gpos::pointer<CDXLNode *> cte_producer_dxlnode = (*dxlnodes)[ul - 1];
-		gpos::pointer<CDXLLogicalCTEProducer *> cte_prod_dxlop =
+		CDXLNode *cte_producer_dxlnode = (*dxlnodes)[ul - 1].get();
+		CDXLLogicalCTEProducer *cte_prod_dxlop =
 			gpos::dyn_cast<CDXLLogicalCTEProducer>(
 				cte_producer_dxlnode->GetOperator());
 		ULONG cte_producer_id = cte_prod_dxlop->Id();
@@ -4762,9 +4724,8 @@ CTranslatorQueryToDXL::ConstructCTEAnchors(
 			continue;
 		}
 
-		gpos::owner<CDXLNode *> cte_anchor_new_dxlnode = GPOS_NEW(m_mp)
-			CDXLNode(m_mp, GPOS_NEW(m_mp)
-							   CDXLLogicalCTEAnchor(m_mp, cte_producer_id));
+		gpos::Ref<CDXLNode> cte_anchor_new_dxlnode = GPOS_NEW(m_mp) CDXLNode(
+			m_mp, GPOS_NEW(m_mp) CDXLLogicalCTEAnchor(m_mp, cte_producer_id));
 
 		if (nullptr == *dxl_cte_anchor_bottom)
 		{
@@ -4787,10 +4748,10 @@ CTranslatorQueryToDXL::ConstructCTEAnchors(
 //		Generate an array of new column ids of the given size
 //
 //---------------------------------------------------------------------------
-gpos::owner<ULongPtrArray *>
+gpos::Ref<ULongPtrArray>
 CTranslatorQueryToDXL::GenerateColIds(CMemoryPool *mp, ULONG size) const
 {
-	gpos::owner<ULongPtrArray *> colid_array = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> colid_array = GPOS_NEW(mp) ULongPtrArray(mp);
 
 	for (ULONG ul = 0; ul < size; ul++)
 	{
@@ -4809,15 +4770,14 @@ CTranslatorQueryToDXL::GenerateColIds(CMemoryPool *mp, ULONG size) const
 //		Extract column ids from the given mapping
 //
 //---------------------------------------------------------------------------
-gpos::owner<ULongPtrArray *>
+gpos::Ref<ULongPtrArray>
 CTranslatorQueryToDXL::ExtractColIds(
-	CMemoryPool *mp,
-	gpos::pointer<IntToUlongMap *> attno_to_colid_mapping) const
+	CMemoryPool *mp, IntToUlongMap *attno_to_colid_mapping) const
 {
-	gpos::owner<UlongToUlongMap *> old_new_col_mapping =
+	gpos::Ref<UlongToUlongMap> old_new_col_mapping =
 		GPOS_NEW(mp) UlongToUlongMap(mp);
 
-	gpos::owner<ULongPtrArray *> colid_array = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> colid_array = GPOS_NEW(mp) ULongPtrArray(mp);
 
 	IntUlongHashmapIter att_iter(attno_to_colid_mapping);
 	while (att_iter.Advance())
@@ -4833,7 +4793,7 @@ CTranslatorQueryToDXL::ExtractColIds(
 		}
 	}
 
-	old_new_col_mapping->Release();
+	;
 	return colid_array;
 }
 
@@ -4846,18 +4806,18 @@ CTranslatorQueryToDXL::ExtractColIds(
 //		with the corresponding value in the To array
 //
 //---------------------------------------------------------------------------
-gpos::owner<IntToUlongMap *>
-CTranslatorQueryToDXL::RemapColIds(
-	CMemoryPool *mp, gpos::pointer<IntToUlongMap *> attno_to_colid_mapping,
-	gpos::pointer<ULongPtrArray *> from_list_colids,
-	gpos::pointer<ULongPtrArray *> to_list_colids)
+gpos::Ref<IntToUlongMap>
+CTranslatorQueryToDXL::RemapColIds(CMemoryPool *mp,
+								   IntToUlongMap *attno_to_colid_mapping,
+								   ULongPtrArray *from_list_colids,
+								   ULongPtrArray *to_list_colids)
 {
 	GPOS_ASSERT(nullptr != attno_to_colid_mapping);
 	GPOS_ASSERT(nullptr != from_list_colids && nullptr != to_list_colids);
 	GPOS_ASSERT(from_list_colids->Size() == to_list_colids->Size());
 
 	// compute a map of the positions in the from array
-	gpos::owner<UlongToUlongMap *> old_new_col_mapping =
+	gpos::Ref<UlongToUlongMap> old_new_col_mapping =
 		GPOS_NEW(mp) UlongToUlongMap(mp);
 	const ULONG size = from_list_colids->Size();
 	for (ULONG ul = 0; ul < size; ul++)
@@ -4868,7 +4828,7 @@ CTranslatorQueryToDXL::RemapColIds(
 		GPOS_ASSERT(result);
 	}
 
-	gpos::owner<IntToUlongMap *> result_attno_to_colid_mapping =
+	gpos::Ref<IntToUlongMap> result_attno_to_colid_mapping =
 		GPOS_NEW(mp) IntToUlongMap(mp);
 	IntUlongHashmapIter mi(attno_to_colid_mapping);
 	while (mi.Advance())
@@ -4882,7 +4842,7 @@ CTranslatorQueryToDXL::RemapColIds(
 		result_attno_to_colid_mapping->Insert(key, remapped_value);
 	}
 
-	old_new_col_mapping->Release();
+	;
 
 	return result_attno_to_colid_mapping;
 }

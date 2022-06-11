@@ -30,7 +30,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarIfStmt::CDXLScalarIfStmt(CMemoryPool *mp,
-								   gpos::owner<IMDId *> result_type_mdid)
+								   gpos::Ref<IMDId> result_type_mdid)
 	: CDXLScalar(mp), m_result_type_mdid(std::move(result_type_mdid))
 {
 	GPOS_ASSERT(m_result_type_mdid->IsValid());
@@ -46,7 +46,7 @@ CDXLScalarIfStmt::CDXLScalarIfStmt(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarIfStmt::~CDXLScalarIfStmt()
 {
-	m_result_type_mdid->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -85,10 +85,10 @@ CDXLScalarIfStmt::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarIfStmt::GetResultTypeMdId() const
 {
-	return m_result_type_mdid;
+	return m_result_type_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -101,7 +101,7 @@ CDXLScalarIfStmt::GetResultTypeMdId() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarIfStmt::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 gpos::pointer<const CDXLNode *> node) const
+								 const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -125,8 +125,9 @@ CDXLScalarIfStmt::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarIfStmt::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_result_type_mdid)->GetDatumType());
+	return (
+		IMDType::EtiBool ==
+		md_accessor->RetrieveType(m_result_type_mdid.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG
@@ -139,7 +140,7 @@ CDXLScalarIfStmt::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarIfStmt::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLScalarIfStmt::AssertValid(const CDXLNode *node,
 							  BOOL validate_children) const
 {
 	const ULONG arity = node->Arity();
@@ -147,7 +148,7 @@ CDXLScalarIfStmt::AssertValid(gpos::pointer<const CDXLNode *> node,
 
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_arg = (*node)[idx];
+		CDXLNode *dxlnode_arg = (*node)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

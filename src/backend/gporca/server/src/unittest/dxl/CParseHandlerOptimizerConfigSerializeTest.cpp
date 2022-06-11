@@ -57,8 +57,7 @@ public:
 }  // namespace
 
 static void
-SerializeOptimizerConfig(CMemoryPool *mp,
-						 gpos::pointer<COptimizerConfig *> optimizer_config,
+SerializeOptimizerConfig(CMemoryPool *mp, COptimizerConfig *optimizer_config,
 						 COstream &oos, BOOL indentation)
 {
 	GPOS_ASSERT(nullptr != mp);
@@ -70,14 +69,14 @@ SerializeOptimizerConfig(CMemoryPool *mp,
 	CDXLUtils::SerializeHeader(mp, &xml_serializer);
 
 	// Make a dummy bitset
-	gpos::owner<CBitSet *> pbs = GPOS_NEW(mp) CBitSet(mp, 256);
+	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, 256);
 
-	optimizer_config->Serialize(mp, &xml_serializer, pbs);
+	optimizer_config->Serialize(mp, &xml_serializer, pbs.get());
 
 	// Add DXL document footer
 	CDXLUtils::SerializeFooter(&xml_serializer);
 
-	pbs->Release();
+	;
 	return;
 }
 
@@ -104,7 +103,7 @@ CParseHandlerOptimizerConfigSerializeTest::EresUnittest()
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
-	gpos::owner<COptimizerConfig *> poc =
+	gpos::Ref<COptimizerConfig> poc =
 		CDXLUtils::ParseDXLToOptimizerConfig(mp, dxl_string, szValidationPath);
 
 	GPOS_ASSERT(nullptr != poc);
@@ -114,7 +113,7 @@ CParseHandlerOptimizerConfigSerializeTest::EresUnittest()
 	// Though the serialization of an optimizer config will include a traceflags element
 	// This test tests only the serializing of the traceflags element itself and not the traceflag values
 	// The production code calls a method to get the traceflags from a global task context
-	SerializeOptimizerConfig(mp, poc, oss, false);
+	SerializeOptimizerConfig(mp, poc.get(), oss, false);
 	GPOS_CHECK_ABORT;
 
 	CWStringDynamic strExpected(mp);
@@ -122,7 +121,7 @@ CParseHandlerOptimizerConfigSerializeTest::EresUnittest()
 
 	GPOS_ASSERT(strExpected.Equals(&str));
 
-	poc->Release();
+	;
 
 	return GPOS_OK;
 }

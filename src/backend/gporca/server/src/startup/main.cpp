@@ -329,7 +329,7 @@ PvExec(void *pv)
 		CDXLMinidump *pdxlmd = CMinidumperUtils::PdxlmdLoad(mp, file_name);
 		GPOS_CHECK_ABORT;
 
-		gpos::owner<COptimizerConfig *> optimizer_config =
+		gpos::Ref<COptimizerConfig> optimizer_config =
 			pdxlmd->GetOptimizerConfig();
 
 		if (nullptr == optimizer_config)
@@ -338,7 +338,7 @@ PvExec(void *pv)
 		}
 		else
 		{
-			optimizer_config->AddRef();
+			;
 		}
 
 		if (ullPlanId != 0)
@@ -346,28 +346,27 @@ PvExec(void *pv)
 			optimizer_config->GetEnumeratorCfg()->SetPlanId(ullPlanId);
 		}
 
-		ULONG ulSegments = CTestUtils::UlSegments(optimizer_config);
+		ULONG ulSegments = CTestUtils::UlSegments(optimizer_config.get());
 
-		gpos::owner<CDXLNode *> pdxlnPlan =
-			CMinidumperUtils::PdxlnExecuteMinidump(
-				mp, file_name, ulSegments, 1 /*ulSessionId*/, 1 /*ulCmdId*/,
-				optimizer_config, nullptr /*pceeval*/
-			);
+		gpos::Ref<CDXLNode> pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
+			mp, file_name, ulSegments, 1 /*ulSessionId*/, 1 /*ulCmdId*/,
+			optimizer_config.get(), nullptr /*pceeval*/
+		);
 
 		if (fPrintDXLPlan)
 		{
 			// Print DXL Plan
 			CAutoTrace at(mp);
 			CDXLUtils::SerializePlan(
-				mp, at.Os(), pdxlnPlan,
+				mp, at.Os(), pdxlnPlan.get(),
 				optimizer_config->GetEnumeratorCfg()->GetPlanId(),
 				optimizer_config->GetEnumeratorCfg()->GetPlanSpaceSize(),
 				true /*serialize_header_footer*/, true /*indentation*/);
 		}
 
 		GPOS_DELETE(pdxlmd);
-		optimizer_config->Release();
-		pdxlnPlan->Release();
+		;
+		;
 		CMDCache::Shutdown();
 	}
 	else

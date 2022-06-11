@@ -33,13 +33,12 @@ public:
 	CPhysicalHashAgg(const CPhysicalHashAgg &) = delete;
 
 	// ctor
-	CPhysicalHashAgg(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-					 gpos::pointer<CColRefArray *> pdrgpcrMinimal,
+	CPhysicalHashAgg(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+					 CColRefArray *pdrgpcrMinimal,
 					 COperator::EGbAggType egbaggtype,
 					 BOOL fGeneratesDuplicates,
-					 gpos::owner<CColRefArray *> pdrgpcrArgDQA,
-					 BOOL fMultiStage, BOOL isAggFromSplitDQA,
-					 CLogicalGbAgg::EAggStage aggStage,
+					 gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,
+					 BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
 					 BOOL should_enforce_distribution = true
 					 // should_enforce_distribution should be set to false if
 					 // 'local' and 'global' splits don't need to have different
@@ -70,19 +69,20 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required sort columns of the n-th child
-	gpos::owner<COrderSpec *> PosRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<COrderSpec> PosRequired(CMemoryPool *mp,
+									  CExpressionHandle &exprhdl,
+									  COrderSpec *posRequired,
+									  ULONG child_index,
+									  CDrvdPropArray *pdrgpdpCtxt,
+									  ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	gpos::owner<COrderSpec *> PosDerive(
-		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
+	gpos::Ref<COrderSpec> PosDerive(CMemoryPool *mp,
+									CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -90,15 +90,14 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl,
-		gpos::pointer<const CEnfdOrder *> peo) const override;
+		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CPhysicalHashAgg *>
+	static CPhysicalHashAgg *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

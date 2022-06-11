@@ -72,10 +72,10 @@ private:
 	JSM m_jsm;
 
 	// group expression that triggered group optimization
-	gpos::pointer<CGroupExpression *> m_pgexprOrigin;
+	CGroupExpression *m_pgexprOrigin;
 
 	// optimization context of the job
-	gpos::pointer<COptimizationContext *> m_poc;
+	COptimizationContext *m_poc;
 
 	// current optimization level of group expressions
 	EOptimizationLevel m_eolCurrent;
@@ -99,8 +99,7 @@ public:
 	~CJobGroupOptimization() override;
 
 	// initialize job
-	void Init(gpos::pointer<CGroup *> pgroup,
-			  gpos::pointer<CGroupExpression *> pgexprOrigin,
+	void Init(CGroup *pgroup, CGroupExpression *pgexprOrigin,
 			  COptimizationContext *poc);
 
 	// current optimization level accessor
@@ -128,9 +127,8 @@ public:
 	BOOL FScheduleGroupExpressions(CSchedulerContext *psc) override;
 
 	// schedule a new group optimization job
-	static void ScheduleJob(CSchedulerContext *psc,
-							gpos::pointer<CGroup *> pgroup,
-							gpos::pointer<CGroupExpression *> pgexprOrigin,
+	static void ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
+							CGroupExpression *pgexprOrigin,
 							COptimizationContext *poc, CJob *pjParent);
 
 	// job's function

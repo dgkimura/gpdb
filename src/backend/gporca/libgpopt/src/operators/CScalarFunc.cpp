@@ -54,8 +54,8 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarFunc::CScalarFunc(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
-						 gpos::owner<IMDId *> mdid_return_type,
+CScalarFunc::CScalarFunc(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+						 gpos::Ref<IMDId> mdid_return_type,
 						 INT return_type_modifier,
 						 const CWStringConst *pstrFunc)
 	: CScalar(mp),
@@ -71,15 +71,14 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
 	GPOS_ASSERT(m_return_type_mdid->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	gpos::pointer<const IMDFunction *> pmdfunc =
-		md_accessor->RetrieveFunc(m_func_mdid);
+	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid.get());
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_returns_set = pmdfunc->ReturnsSet();
 
 	m_returns_null_on_null_input = pmdfunc->IsStrict();
 	m_fBoolReturnType =
-		CMDAccessorUtils::FBoolType(md_accessor, m_return_type_mdid);
+		CMDAccessorUtils::FBoolType(md_accessor, m_return_type_mdid.get());
 }
 
 
@@ -93,8 +92,8 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
 //---------------------------------------------------------------------------
 CScalarFunc::~CScalarFunc()
 {
-	CRefCount::SafeRelease(m_func_mdid);
-	CRefCount::SafeRelease(m_return_type_mdid);
+	;
+	;
 	GPOS_DELETE(m_pstrFunc);
 }
 
@@ -120,10 +119,10 @@ CScalarFunc::PstrFunc() const
 //		Func id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarFunc::FuncMdId() const
 {
-	return m_func_mdid;
+	return m_func_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -168,17 +167,17 @@ CScalarFunc::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarFunc::Matches(gpos::pointer<COperator *> pop) const
+CScalarFunc::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	gpos::pointer<CScalarFunc *> popScFunc = gpos::dyn_cast<CScalarFunc>(pop);
+	CScalarFunc *popScFunc = gpos::dyn_cast<CScalarFunc>(pop);
 
 	// match if func ids are identical
-	return popScFunc->FuncMdId()->Equals(m_func_mdid) &&
-		   popScFunc->MdidType()->Equals(m_return_type_mdid);
+	return popScFunc->FuncMdId()->Equals(m_func_mdid.get()) &&
+		   popScFunc->MdidType()->Equals(m_return_type_mdid.get());
 }
 
 //---------------------------------------------------------------------------
@@ -189,10 +188,10 @@ CScalarFunc::Matches(gpos::pointer<COperator *> pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarFunc::MdidType() const
 {
-	return m_return_type_mdid;
+	return m_return_type_mdid.get();
 }
 
 INT
@@ -243,7 +242,7 @@ CScalarFunc::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarFunc::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
+CScalarFunc::Eber(ULongPtrArray *pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

@@ -43,7 +43,7 @@ class CDXLScalarComp : public CDXLScalar
 {
 protected:
 	// operator number in the catalog
-	gpos::owner<IMDId *> m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// comparison operator name
 	const CWStringConst *m_comparison_operator_name;
@@ -53,7 +53,7 @@ public:
 	CDXLScalarComp(CDXLScalarComp &) = delete;
 
 	// ctor/dtor
-	CDXLScalarComp(CMemoryPool *mp, gpos::owner<IMDId *> operator_mdid,
+	CDXLScalarComp(CMemoryPool *mp, gpos::Ref<IMDId> operator_mdid,
 				   const CWStringConst *comparison_operator_name);
 
 	~CDXLScalarComp() override;
@@ -70,14 +70,14 @@ public:
 	const CWStringConst *GetComparisonOpName() const;
 
 	// operator id
-	gpos::pointer<IMDId *> MDId() const;
+	IMDId *MDId() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarComp *>
+	static CDXLScalarComp *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -100,7 +100,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> node,
+	void AssertValid(const CDXLNode *node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

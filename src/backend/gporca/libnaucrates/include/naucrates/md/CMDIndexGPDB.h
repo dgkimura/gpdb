@@ -40,7 +40,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// index mdid
-	gpos::owner<IMDId *> m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -55,46 +55,46 @@ private:
 	EmdindexType m_index_type;
 
 	// type of items returned by index
-	gpos::owner<IMDId *> m_mdid_item_type;
+	gpos::Ref<IMDId> m_mdid_item_type;
 
 	// index key columns
-	gpos::owner<ULongPtrArray *> m_index_key_cols_array;
+	gpos::Ref<ULongPtrArray> m_index_key_cols_array;
 
 	// included columns
-	gpos::owner<ULongPtrArray *> m_included_cols_array;
+	gpos::Ref<ULongPtrArray> m_included_cols_array;
 
 	// operator families for each index key
-	gpos::owner<IMdIdArray *> m_mdid_opfamilies_array;
+	gpos::Ref<IMdIdArray> m_mdid_opfamilies_array;
 
 	// partition constraint
 	// GPDB_12_MERGE_FIXME: This field is no longer needed,
 	// we should get rid of it.
-	gpos::owner<IMDPartConstraint *> m_mdpart_constraint;
+	gpos::Ref<IMDPartConstraint> m_mdpart_constraint;
 
 	// DXL for object
 	const CWStringDynamic *m_dxl_str;
 
 	// Child index oids
-	gpos::owner<IMdIdArray *> m_child_index_oids;
+	gpos::Ref<IMdIdArray> m_child_index_oids;
 
 public:
 	CMDIndexGPDB(const CMDIndexGPDB &) = delete;
 
 	// ctor
-	CMDIndexGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+	CMDIndexGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 				 BOOL is_clustered, BOOL is_partitioned,
-				 EmdindexType index_type, gpos::owner<IMDId *> mdid_item_type,
-				 gpos::owner<ULongPtrArray *> index_key_cols_array,
-				 gpos::owner<ULongPtrArray *> included_cols_array,
-				 gpos::owner<IMdIdArray *> mdid_opfamilies_array,
-				 gpos::owner<IMDPartConstraint *> mdpart_constraint,
-				 gpos::owner<IMdIdArray *> child_index_oids);
+				 EmdindexType index_type, gpos::Ref<IMDId> mdid_item_type,
+				 gpos::Ref<ULongPtrArray> index_key_cols_array,
+				 gpos::Ref<ULongPtrArray> included_cols_array,
+				 gpos::Ref<IMdIdArray> mdid_opfamilies_array,
+				 gpos::Ref<IMDPartConstraint> mdpart_constraint,
+				 gpos::Ref<IMdIdArray> child_index_oids);
 
 	// dtor
 	~CMDIndexGPDB() override;
 
 	// index mdid
-	gpos::pointer<IMDId *> MDId() const override;
+	IMDId *MDId() const override;
 
 	// index name
 	CMDName Mdname() const override;
@@ -127,7 +127,7 @@ public:
 	ULONG GetIncludedColPos(ULONG column) const override;
 
 	// part constraint
-	gpos::pointer<IMDPartConstraint *> MDPartConstraint() const override;
+	IMDPartConstraint *MDPartConstraint() const override;
 
 	// DXL string for index
 	const CWStringDynamic *
@@ -140,15 +140,15 @@ public:
 	void Serialize(gpdxl::CXMLSerializer *) const override;
 
 	// type id of items returned by the index
-	gpos::pointer<IMDId *> GetIndexRetItemTypeMdid() const override;
+	IMDId *GetIndexRetItemTypeMdid() const override;
 
 	// check if given scalar comparison can be used with the index key
 	// at the specified position
-	BOOL IsCompatible(gpos::pointer<const IMDScalarOp *> md_scalar_op,
+	BOOL IsCompatible(const IMDScalarOp *md_scalar_op,
 					  ULONG key_pos) const override;
 
 	// child index oids
-	gpos::pointer<IMdIdArray *> ChildIndexMdids() const override;
+	IMdIdArray *ChildIndexMdids() const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the MD index

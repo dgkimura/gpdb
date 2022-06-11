@@ -74,7 +74,8 @@ CParseHandlerRedistributeMotion::StartElement(
 	// parse and create Redistribute motion operator
 	m_dxl_op = gpos::cast<CDXLPhysicalRedistributeMotion>(
 		CDXLOperatorFactory::MakeDXLRedistributeMotion(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs)
+			.get());
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance
@@ -172,7 +173,7 @@ CParseHandlerRedistributeMotion::EndElement(
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 	// set statictics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add children
 	AddChildFromParseHandler(proj_list_parse_handler);

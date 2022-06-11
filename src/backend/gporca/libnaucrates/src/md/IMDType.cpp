@@ -53,14 +53,14 @@ IMDType::GetCmpTypeStr(IMDType::ECmpType cmp_type)
 //
 //---------------------------------------------------------------------------
 BOOL
-IMDType::StatsAreComparable(gpos::pointer<const IMDType *> mdtype_first,
-							gpos::pointer<const IMDType *> mdtype_second)
+IMDType::StatsAreComparable(const IMDType *mdtype_first,
+							const IMDType *mdtype_second)
 {
 	GPOS_ASSERT(nullptr != mdtype_first);
 	GPOS_ASSERT(nullptr != mdtype_second);
 
-	gpos::pointer<const IDatum *> datum_first = mdtype_first->DatumNull();
-	gpos::pointer<const IDatum *> datum_second = mdtype_second->DatumNull();
+	const IDatum *datum_first = mdtype_first->DatumNull();
+	const IDatum *datum_second = mdtype_second->DatumNull();
 
 	return datum_first->StatsAreComparable(datum_second);
 }
@@ -76,13 +76,13 @@ IMDType::StatsAreComparable(gpos::pointer<const IMDType *> mdtype_first,
 //
 //---------------------------------------------------------------------------
 BOOL
-IMDType::StatsAreComparable(gpos::pointer<const IMDType *> mdtype_first,
-							gpos::pointer<const IDatum *> datum_second)
+IMDType::StatsAreComparable(const IMDType *mdtype_first,
+							const IDatum *datum_second)
 {
 	GPOS_ASSERT(nullptr != mdtype_first);
 	GPOS_ASSERT(nullptr != datum_second);
 
-	gpos::pointer<const IDatum *> datum_first = mdtype_first->DatumNull();
+	const IDatum *datum_first = mdtype_first->DatumNull();
 
 	return datum_first->StatsAreComparable(datum_second);
 }

@@ -35,7 +35,7 @@ XERCES_CPP_NAMESPACE_USE
 class CParseHandlerPhysicalRowTrigger : public CParseHandlerPhysicalOp
 {
 private:
-	gpos::pointer<CDXLPhysicalRowTrigger *> m_dxl_op;
+	CDXLPhysicalRowTrigger *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

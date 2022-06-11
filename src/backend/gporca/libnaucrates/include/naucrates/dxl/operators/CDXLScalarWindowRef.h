@@ -44,10 +44,10 @@ class CDXLScalarWindowRef : public CDXLScalar
 {
 private:
 	// catalog id of the function
-	gpos::owner<IMDId *> m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	gpos::owner<IMDId *> m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// denotes whether it's agg(DISTINCT ...)
 	BOOL m_is_distinct;
@@ -68,8 +68,8 @@ public:
 	CDXLScalarWindowRef(const CDXLScalarWindowRef &) = delete;
 
 	// ctor
-	CDXLScalarWindowRef(CMemoryPool *mp, gpos::owner<IMDId *> pmdidWinfunc,
-						gpos::owner<IMDId *> mdid_return_type, BOOL is_distinct,
+	CDXLScalarWindowRef(CMemoryPool *mp, gpos::Ref<IMDId> pmdidWinfunc,
+						gpos::Ref<IMDId> mdid_return_type, BOOL is_distinct,
 						BOOL is_star_arg, BOOL is_simple_agg,
 						EdxlWinStage dxl_win_stage, ULONG ulWinspecPosition);
 
@@ -83,17 +83,17 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// catalog id of the function
-	gpos::pointer<IMDId *>
+	IMDId *
 	FuncMdId() const
 	{
-		return m_func_mdid;
+		return m_func_mdid.get();
 	}
 
 	// return type of the function
-	gpos::pointer<IMDId *>
+	IMDId *
 	ReturnTypeMdId() const
 	{
-		return m_return_type_mdid;
+		return m_return_type_mdid.get();
 	}
 
 	// window stage
@@ -141,10 +141,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarWindowRef *>
+	static CDXLScalarWindowRef *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -159,7 +159,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

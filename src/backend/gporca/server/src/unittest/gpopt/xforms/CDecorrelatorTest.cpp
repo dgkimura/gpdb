@@ -58,12 +58,12 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// test cases
-	using Pfpexpr = gpos::owner<CExpression *> (*)(CMemoryPool *);
+	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *);
 	Pfpexpr rgpf[] = {CTestUtils::PexprLogicalGbAggCorrelated,
 					  CTestUtils::PexprLogicalSelectCorrelated,
 					  CTestUtils::PexprLogicalJoinCorrelated,
@@ -76,7 +76,7 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 						 CTestUtils::GetCostModel(mp));
 
 		// generate expression
-		gpos::owner<CExpression *> pexpr = rgpf[ulCase](mp);
+		gpos::Ref<CExpression> pexpr = rgpf[ulCase](mp);
 
 		CWStringDynamic str(mp);
 		COstreamString oss(&str);
@@ -84,19 +84,19 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 		GPOS_TRACE(str.GetBuffer());
 		str.Reset();
 
-		gpos::owner<CExpression *> pexprResult = nullptr;
-		gpos::owner<CExpressionArray *> pdrgpexpr =
+		gpos::Ref<CExpression> pexprResult = nullptr;
+		gpos::Ref<CExpressionArray> pdrgpexpr =
 			GPOS_NEW(mp) CExpressionArray(mp);
 		CColRefSet *outerRefs = pexpr->DeriveOuterReferences();
 #ifdef GPOS_DEBUG
 		BOOL fSuccess =
 #endif	// GPOS_DEBUG
-			CDecorrelator::FProcess(mp, pexpr, false /*fEqualityOnly*/,
+			CDecorrelator::FProcess(mp, pexpr.get(), false /*fEqualityOnly*/,
 									&pexprResult, pdrgpexpr, outerRefs);
 		GPOS_ASSERT(fSuccess);
 
 		// convert residuals into one single conjunct
-		gpos::owner<CExpression *> pexprResidual =
+		gpos::Ref<CExpression> pexprResidual =
 			CPredicateUtils::PexprConjunction(mp, pdrgpexpr);
 
 		oss << std::endl
@@ -109,9 +109,9 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 		GPOS_TRACE(str.GetBuffer());
 		str.Reset();
 
-		pexprResult->Release();
-		pexprResidual->Release();
-		pexpr->Release();
+		;
+		;
+		;
 	}
 
 	return GPOS_OK;

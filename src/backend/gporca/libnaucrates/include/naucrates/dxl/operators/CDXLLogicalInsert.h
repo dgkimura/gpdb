@@ -34,18 +34,17 @@ class CDXLLogicalInsert : public CDXLLogical
 {
 private:
 	// target table descriptor
-	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 	// list of source column ids
-	gpos::owner<ULongPtrArray *> m_src_colids_array;
+	gpos::Ref<ULongPtrArray> m_src_colids_array;
 
 public:
 	CDXLLogicalInsert(const CDXLLogicalInsert &) = delete;
 
 	// ctor/dtor
-	CDXLLogicalInsert(CMemoryPool *mp,
-					  gpos::owner<CDXLTableDescr *> table_descr,
-					  gpos::owner<ULongPtrArray *> src_colids_array);
+	CDXLLogicalInsert(CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
+					  gpos::Ref<ULongPtrArray> src_colids_array);
 
 	~CDXLLogicalInsert() override;
 
@@ -56,32 +55,32 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// target table descriptor
-	gpos::pointer<CDXLTableDescr *>
+	CDXLTableDescr *
 	GetDXLTableDescr() const
 	{
-		return m_dxl_table_descr;
+		return m_dxl_table_descr.get();
 	}
 
 	// source column ids
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetSrcColIdsArray() const
 	{
-		return m_src_colids_array;
+		return m_src_colids_array.get();
 	}
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> node,
+	void AssertValid(const CDXLNode *node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLLogicalInsert *>
+	static CDXLLogicalInsert *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

@@ -30,9 +30,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDTriggerGPDB::CMDTriggerGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
-							   CMDName *mdname, gpos::owner<IMDId *> rel_mdid,
-							   gpos::owner<IMDId *> mdid_func, INT type,
+CMDTriggerGPDB::CMDTriggerGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+							   CMDName *mdname, gpos::Ref<IMDId> rel_mdid,
+							   gpos::Ref<IMDId> mdid_func, INT type,
 							   BOOL is_enabled)
 	: m_mp(mp),
 	  m_mdid(std::move(mdid)),
@@ -61,9 +61,9 @@ CMDTriggerGPDB::CMDTriggerGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
 //---------------------------------------------------------------------------
 CMDTriggerGPDB::~CMDTriggerGPDB()
 {
-	m_mdid->Release();
-	m_rel_mdid->Release();
-	m_func_mdid->Release();
+	;
+	;
+	;
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }

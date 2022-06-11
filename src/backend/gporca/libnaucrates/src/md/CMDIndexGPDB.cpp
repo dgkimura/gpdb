@@ -33,15 +33,15 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 						   CMDName *mdname, BOOL is_clustered,
 						   BOOL is_partitioned, EmdindexType index_type,
-						   gpos::owner<IMDId *> mdid_item_type,
-						   gpos::owner<ULongPtrArray *> index_key_cols_array,
-						   gpos::owner<ULongPtrArray *> included_cols_array,
-						   gpos::owner<IMdIdArray *> mdid_opfamilies_array,
-						   gpos::owner<IMDPartConstraint *> mdpart_constraint,
-						   gpos::owner<IMdIdArray *> child_index_oids)
+						   gpos::Ref<IMDId> mdid_item_type,
+						   gpos::Ref<ULongPtrArray> index_key_cols_array,
+						   gpos::Ref<ULongPtrArray> included_cols_array,
+						   gpos::Ref<IMdIdArray> mdid_opfamilies_array,
+						   gpos::Ref<IMDPartConstraint> mdpart_constraint,
+						   gpos::Ref<IMdIdArray> child_index_oids)
 	: m_mp(mp),
 	  m_mdid(std::move(mdid)),
 	  m_mdname(mdname),
@@ -86,13 +86,13 @@ CMDIndexGPDB::~CMDIndexGPDB()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid->Release();
-	CRefCount::SafeRelease(m_mdid_item_type);
-	m_index_key_cols_array->Release();
-	m_included_cols_array->Release();
-	m_mdid_opfamilies_array->Release();
-	CRefCount::SafeRelease(m_mdpart_constraint);
-	CRefCount::SafeRelease(m_child_index_oids);
+	;
+	;
+	;
+	;
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -103,10 +103,10 @@ CMDIndexGPDB::~CMDIndexGPDB()
 //		Returns the metadata id of this index
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDIndexGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -279,10 +279,10 @@ CMDIndexGPDB::GetIncludedColPos(ULONG column) const
 //		Return the part constraint
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDPartConstraint *>
+IMDPartConstraint *
 CMDIndexGPDB::MDPartConstraint() const
 {
-	return m_mdpart_constraint;
+	return m_mdpart_constraint.get();
 }
 
 //---------------------------------------------------------------------------
@@ -317,20 +317,20 @@ CMDIndexGPDB::Serialize(CXMLSerializer *xml_serializer) const
 
 	// serialize index keys
 	CWStringDynamic *index_key_cols_str =
-		CDXLUtils::Serialize(m_mp, m_index_key_cols_array);
+		CDXLUtils::Serialize(m_mp, m_index_key_cols_array.get());
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenIndexKeyCols), index_key_cols_str);
 	GPOS_DELETE(index_key_cols_str);
 
 	CWStringDynamic *available_cols_str =
-		CDXLUtils::Serialize(m_mp, m_included_cols_array);
+		CDXLUtils::Serialize(m_mp, m_included_cols_array.get());
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenIndexIncludedCols),
 		available_cols_str);
 	GPOS_DELETE(available_cols_str);
 
 	// serialize operator class information
-	SerializeMDIdList(xml_serializer, m_mdid_opfamilies_array,
+	SerializeMDIdList(xml_serializer, m_mdid_opfamilies_array.get(),
 					  CDXLTokens::GetDXLTokenStr(EdxltokenOpfamilies),
 					  CDXLTokens::GetDXLTokenStr(EdxltokenOpfamily));
 
@@ -341,7 +341,7 @@ CMDIndexGPDB::Serialize(CXMLSerializer *xml_serializer) const
 
 	if (IsPartitioned())
 	{
-		SerializeMDIdList(xml_serializer, m_child_index_oids,
+		SerializeMDIdList(xml_serializer, m_child_index_oids.get(),
 						  CDXLTokens::GetDXLTokenStr(EdxltokenPartitions),
 						  CDXLTokens::GetDXLTokenStr(EdxltokenPartition));
 	}
@@ -405,10 +405,10 @@ CMDIndexGPDB::DebugPrint(IOstream &os) const
 //		Type of items returned by the index
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDIndexGPDB::GetIndexRetItemTypeMdid() const
 {
-	return m_mdid_item_type;
+	return m_mdid_item_type.get();
 }
 
 //---------------------------------------------------------------------------
@@ -421,16 +421,14 @@ CMDIndexGPDB::GetIndexRetItemTypeMdid() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIndexGPDB::IsCompatible(gpos::pointer<const IMDScalarOp *> md_scalar_op,
-						   ULONG key_pos) const
+CMDIndexGPDB::IsCompatible(const IMDScalarOp *md_scalar_op, ULONG key_pos) const
 {
 	GPOS_ASSERT(nullptr != md_scalar_op);
 	GPOS_ASSERT(key_pos < m_mdid_opfamilies_array->Size());
 
 	// check if the index opfamily for the key at the given position is one of
 	// the families the scalar comparison belongs to
-	gpos::pointer<const IMDId *> mdid_opfamily =
-		(*m_mdid_opfamilies_array)[key_pos];
+	const IMDId *mdid_opfamily = (*m_mdid_opfamilies_array)[key_pos].get();
 
 	const ULONG opfamilies_count = md_scalar_op->OpfamiliesCount();
 
@@ -445,10 +443,10 @@ CMDIndexGPDB::IsCompatible(gpos::pointer<const IMDScalarOp *> md_scalar_op,
 	return false;
 }
 
-gpos::pointer<IMdIdArray *>
+IMdIdArray *
 CMDIndexGPDB::ChildIndexMdids() const
 {
-	return m_child_index_oids;
+	return m_child_index_oids.get();
 }
 
 

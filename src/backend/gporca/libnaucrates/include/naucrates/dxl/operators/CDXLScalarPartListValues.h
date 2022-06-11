@@ -23,18 +23,18 @@ private:
 	ULONG m_partitioning_level;
 
 	// result type
-	gpos::owner<IMDId *> m_result_type_mdid;
+	gpos::Ref<IMDId> m_result_type_mdid;
 
 	// element type
-	gpos::owner<IMDId *> m_elem_type_mdid;
+	gpos::Ref<IMDId> m_elem_type_mdid;
 
 public:
 	CDXLScalarPartListValues(const CDXLScalarPartListValues &) = delete;
 
 	// ctor
 	CDXLScalarPartListValues(CMemoryPool *mp, ULONG partitioning_level,
-							 gpos::owner<IMDId *> result_type_mdid,
-							 gpos::owner<IMDId *> elem_type_mdid);
+							 gpos::Ref<IMDId> result_type_mdid,
+							 gpos::Ref<IMDId> elem_type_mdid);
 
 	// dtor
 	~CDXLScalarPartListValues() override;
@@ -49,14 +49,14 @@ public:
 	ULONG GetPartitioningLevel() const;
 
 	// result type
-	gpos::pointer<IMDId *> GetResultTypeMdId() const;
+	IMDId *GetResultTypeMdId() const;
 
 	// element type
-	gpos::pointer<IMDId *> GetElemTypeMdId() const;
+	IMDId *GetElemTypeMdId() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// does the operator return a boolean result
 	BOOL HasBoolResult(CMDAccessor *md_accessor) const override;
@@ -64,13 +64,12 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarPartListValues *> Cast(
-		CDXLOperator *dxl_op);
+	static CDXLScalarPartListValues *Cast(CDXLOperator *dxl_op);
 };
 }  // namespace gpdxl
 

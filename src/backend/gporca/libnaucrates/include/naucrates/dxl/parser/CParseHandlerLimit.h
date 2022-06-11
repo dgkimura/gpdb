@@ -35,7 +35,7 @@ XERCES_CPP_NAMESPACE_USE
 class CParseHandlerLimit : public CParseHandlerPhysicalOp
 {
 private:
-	gpos::pointer<CDXLPhysicalLimit *> m_dxl_op;
+	CDXLPhysicalLimit *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

@@ -36,7 +36,7 @@ public:
 
 	// ctor
 	CDXLLogicalExternalGet(CMemoryPool *mp,
-						   gpos::owner<CDXLTableDescr *> table_descr);
+						   gpos::Ref<CDXLTableDescr> table_descr);
 
 	// operator type
 	Edxlopid GetDXLOperator() const override;
@@ -45,7 +45,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLLogicalExternalGet *>
+	static CDXLLogicalExternalGet *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

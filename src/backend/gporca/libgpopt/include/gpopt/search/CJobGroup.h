@@ -37,10 +37,10 @@ class CJobGroup : public CJob
 private:
 protected:
 	// target group
-	gpos::pointer<CGroup *> m_pgroup{nullptr};
+	CGroup *m_pgroup{nullptr};
 
 	// last scheduled group expression
-	gpos::pointer<CGroupExpression *> m_pgexprLastScheduled;
+	CGroupExpression *m_pgexprLastScheduled;
 
 	// ctor
 	CJobGroup() = default;
@@ -49,7 +49,7 @@ protected:
 	~CJobGroup() override = default;
 
 	// initialize job
-	void Init(gpos::pointer<CGroup *> pgroup);
+	void Init(CGroup *pgroup);
 
 	// get first unscheduled logical expression
 	virtual CGroupExpression *PgexprFirstUnschedLogical();

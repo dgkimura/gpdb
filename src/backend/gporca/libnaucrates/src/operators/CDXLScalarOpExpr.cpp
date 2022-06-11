@@ -31,9 +31,8 @@ using namespace gpmd;
 //		Constructs a scalar OpExpr node
 //
 //---------------------------------------------------------------------------
-CDXLScalarOpExpr::CDXLScalarOpExpr(CMemoryPool *mp,
-								   gpos::owner<IMDId *> mdid_op,
-								   gpos::owner<IMDId *> return_type_mdid,
+CDXLScalarOpExpr::CDXLScalarOpExpr(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+								   gpos::Ref<IMDId> return_type_mdid,
 								   const CWStringConst *str_opname)
 	: CDXLScalar(mp),
 	  m_mdid(std::move(mdid_op)),
@@ -53,8 +52,8 @@ CDXLScalarOpExpr::CDXLScalarOpExpr(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarOpExpr::~CDXLScalarOpExpr()
 {
-	m_mdid->Release();
-	CRefCount::SafeRelease(m_return_type_mdid);
+	;
+	;
 	GPOS_DELETE(m_str_opname);
 }
 
@@ -108,10 +107,10 @@ CDXLScalarOpExpr::GetOpNameStr() const
 //		Operator id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarOpExpr::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -122,10 +121,10 @@ CDXLScalarOpExpr::MDId() const
 //		Operator return type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarOpExpr::GetReturnTypeMdId() const
 {
-	return m_return_type_mdid;
+	return m_return_type_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -139,11 +138,9 @@ CDXLScalarOpExpr::GetReturnTypeMdId() const
 BOOL
 CDXLScalarOpExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	gpos::pointer<const IMDScalarOp *> md_scalar_op =
-		md_accessor->RetrieveScOp(m_mdid);
-	gpos::pointer<IMDId *> mdid =
-		md_accessor->RetrieveFunc(md_scalar_op->FuncMdId())
-			->GetResultTypeMdid();
+	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(m_mdid.get());
+	IMDId *mdid = md_accessor->RetrieveFunc(md_scalar_op->FuncMdId())
+					  ->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());
 }
@@ -158,7 +155,7 @@ CDXLScalarOpExpr::HasBoolResult(CMDAccessor *md_accessor) const
 //---------------------------------------------------------------------------
 void
 CDXLScalarOpExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 gpos::pointer<const CDXLNode *> dxlnode) const
+								 const CDXLNode *dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 
@@ -195,7 +192,7 @@ CDXLScalarOpExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarOpExpr::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarOpExpr::AssertValid(const CDXLNode *dxlnode,
 							  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
@@ -203,7 +200,7 @@ CDXLScalarOpExpr::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[ul];
+		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

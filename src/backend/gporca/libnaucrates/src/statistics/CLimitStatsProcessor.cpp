@@ -16,15 +16,15 @@
 using namespace gpopt;
 
 //	compute the statistics of a limit operation
-gpos::owner<CStatistics *>
-CLimitStatsProcessor::CalcLimitStats(
-	CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
-	CDouble input_limit_rows)
+gpos::Ref<CStatistics>
+CLimitStatsProcessor::CalcLimitStats(CMemoryPool *mp,
+									 const CStatistics *input_stats,
+									 CDouble input_limit_rows)
 {
 	GPOS_ASSERT(nullptr != input_stats);
 
 	// copy the hash map from colid -> histogram for resultant structure
-	gpos::owner<UlongToHistogramMap *> colid_histogram =
+	gpos::Ref<UlongToHistogramMap> colid_histogram =
 		input_stats->CopyHistograms(mp);
 
 	CDouble limit_rows = CStatistics::MinRows;
@@ -33,7 +33,7 @@ CLimitStatsProcessor::CalcLimitStats(
 		limit_rows = std::max(CStatistics::MinRows, input_limit_rows);
 	}
 	// create an output stats object
-	gpos::owner<CStatistics *> pstatsLimit = GPOS_NEW(mp) CStatistics(
+	gpos::Ref<CStatistics> pstatsLimit = GPOS_NEW(mp) CStatistics(
 		mp, std::move(colid_histogram), input_stats->CopyWidths(mp), limit_rows,
 		input_stats->IsEmpty(), input_stats->GetNumberOfPredicates());
 
@@ -45,7 +45,7 @@ CLimitStatsProcessor::CalcLimitStats(
 
 	// modify source id to upper bound card information
 	CStatisticsUtils::ComputeCardUpperBounds(
-		mp, input_stats, pstatsLimit, limit_rows,
+		mp, input_stats, pstatsLimit.get(), limit_rows,
 		CStatistics::EcbmMin /* card_bounding_method */);
 
 	return pstatsLimit;

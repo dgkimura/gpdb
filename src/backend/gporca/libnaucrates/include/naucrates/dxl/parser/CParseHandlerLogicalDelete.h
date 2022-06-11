@@ -42,7 +42,7 @@ private:
 	ULONG m_segid_colid;
 
 	// delete col ids
-	gpos::pointer<ULongPtrArray *> m_deletion_colid_array;
+	ULongPtrArray *m_deletion_colid_array;
 
 	// process the start of an element
 	void StartElement(

@@ -36,7 +36,7 @@ class CScalarCmp : public CScalar
 {
 private:
 	// metadata id in the catalog
-	gpos::owner<IMDId *> m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// comparison operator name
 	const CWStringConst *m_pstrOp;
@@ -55,13 +55,13 @@ private:
 
 public:
 	// ctor
-	CScalarCmp(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
+	CScalarCmp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 			   const CWStringConst *pstrOp, IMDType::ECmpType cmp_type);
 
 	// dtor
 	~CScalarCmp() override
 	{
-		m_mdid_op->Release();
+		;
 		GPOS_DELETE(m_pstrOp);
 	}
 
@@ -92,18 +92,17 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
@@ -112,23 +111,22 @@ public:
 	BOOL FCommutative() const;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(
-		gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override;
+	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
 
 	// name of the comparison operator
 	const CWStringConst *Pstr() const;
 
 	// metadata id
-	gpos::pointer<IMDId *> MdIdOp() const;
+	IMDId *MdIdOp() const;
 
 	// the type of the scalar expression
-	gpos::pointer<IMDId *> MdidType() const override;
+	IMDId *MdidType() const override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static gpos::cast_func<CScalarCmp *>
+	static CScalarCmp *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -138,15 +136,14 @@ public:
 	}
 
 	// get commuted scalar comparision operator
-	virtual gpos::owner<CScalarCmp *> PopCommutedOp(CMemoryPool *mp);
+	virtual gpos::Ref<CScalarCmp> PopCommutedOp(CMemoryPool *mp);
 
 	// get the string representation of a metadata object
 	static CWStringConst *Pstr(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   gpos::pointer<IMDId *> mdid);
+							   IMDId *mdid);
 
 	// get metadata id of the commuted operator
-	static IMDId *PmdidCommuteOp(CMDAccessor *md_accessor,
-								 gpos::pointer<COperator *> pop);
+	static IMDId *PmdidCommuteOp(CMDAccessor *md_accessor, COperator *pop);
 
 
 

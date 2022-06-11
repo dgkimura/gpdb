@@ -30,10 +30,10 @@ using namespace gpdxl;
 //		Constructs a metadata func
 //
 //---------------------------------------------------------------------------
-CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 								 CMDName *mdname,
-								 gpos::owner<IMDId *> result_type_mdid,
-								 gpos::owner<IMdIdArray *> mdid_array,
+								 gpos::Ref<IMDId> result_type_mdid,
+								 gpos::Ref<IMdIdArray> mdid_array,
 								 BOOL ReturnsSet, EFuncStbl func_stability,
 								 EFuncDataAcc func_data_access, BOOL is_strict,
 								 BOOL is_ndv_preserving, BOOL is_allowed_for_PS)
@@ -68,9 +68,9 @@ CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
 //---------------------------------------------------------------------------
 CMDFunctionGPDB::~CMDFunctionGPDB()
 {
-	m_mdid->Release();
-	m_mdid_type_result->Release();
-	CRefCount::SafeRelease(m_mdid_types_array);
+	;
+	;
+	;
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }
@@ -107,10 +107,10 @@ CMDFunctionGPDB::InitDXLTokenArrays()
 //		Func id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDFunctionGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -136,10 +136,10 @@ CMDFunctionGPDB::Mdname() const
 //		Type id of result
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDFunctionGPDB::GetResultTypeMdid() const
 {
-	return m_mdid_type_result;
+	return m_mdid_type_result.get();
 }
 
 //---------------------------------------------------------------------------
@@ -150,10 +150,10 @@ CMDFunctionGPDB::GetResultTypeMdid() const
 //		Output argument types
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMdIdArray *>
+IMdIdArray *
 CMDFunctionGPDB::OutputArgTypesMdidArray() const
 {
-	return m_mdid_types_array;
+	return m_mdid_types_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -187,7 +187,7 @@ CMDFunctionGPDB::GetOutputArgTypeArrayStr() const
 	const ULONG len = m_mdid_types_array->Size();
 	for (ULONG ul = 0; ul < len; ul++)
 	{
-		gpos::pointer<IMDId *> mdid = (*m_mdid_types_array)[ul];
+		IMDId *mdid = (*m_mdid_types_array)[ul].get();
 		if (ul == len - 1)
 		{
 			// last element: do not print a comma
@@ -245,7 +245,7 @@ CMDFunctionGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	SerializeMDIdAsElem(
 		xml_serializer,
 		CDXLTokens::GetDXLTokenStr(EdxltokenGPDBFuncResultTypeId),
-		m_mdid_type_result);
+		m_mdid_type_result.get());
 
 	if (nullptr != m_mdid_types_array)
 	{

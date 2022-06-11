@@ -43,13 +43,13 @@ private:
 	CMDName *m_mdname;
 
 	// list of distribution column positions
-	gpos::pointer<ULongPtrArray *> m_distr_column_pos_array;
+	ULongPtrArray *m_distr_column_pos_array;
 
 	// list of source column ids
-	gpos::pointer<ULongPtrArray *> m_src_colids_array;
+	ULongPtrArray *m_src_colids_array;
 
 	// list of vartypmod
-	gpos::pointer<IntPtrArray *> m_vartypemod_array;
+	IntPtrArray *m_vartypemod_array;
 
 	// is this a temporary table
 	BOOL m_is_temp_table;

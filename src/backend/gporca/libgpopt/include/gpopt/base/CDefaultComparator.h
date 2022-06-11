@@ -59,47 +59,44 @@ class CDefaultComparator : public IComparator
 {
 private:
 	// constant expression evaluator
-	gpos::pointer<IConstExprEvaluator *> m_pceeval;
+	IConstExprEvaluator *m_pceeval;
 
 	// construct a comparison expression from the given components and evaluate it
-	BOOL FEvalComparison(CMemoryPool *mp, gpos::pointer<const IDatum *> datum1,
-						 gpos::pointer<const IDatum *> datum2,
+	BOOL FEvalComparison(CMemoryPool *mp, const IDatum *datum1,
+						 const IDatum *datum2,
 						 IMDType::ECmpType cmp_type) const;
 
 	// return true iff we should use the internal (stats-based) evaluation
-	static BOOL FUseInternalEvaluator(gpos::pointer<const IDatum *> datum1,
-									  gpos::pointer<const IDatum *> datum2,
+	static BOOL FUseInternalEvaluator(const IDatum *datum1,
+									  const IDatum *datum2,
 									  BOOL *can_use_external_evaluator);
 
 public:
 	CDefaultComparator(const CDefaultComparator &) = delete;
 
 	// ctor
-	CDefaultComparator(gpos::pointer<IConstExprEvaluator *> pceeval);
+	CDefaultComparator(IConstExprEvaluator *pceeval);
 
 	// dtor
 	~CDefaultComparator() override = default;
 
 	// tests if the two arguments are equal
-	BOOL Equals(gpos::pointer<const IDatum *> datum1,
-				gpos::pointer<const IDatum *> datum2) const override;
+	BOOL Equals(const IDatum *datum1, const IDatum *datum2) const override;
 
 	// tests if the first argument is less than the second
-	BOOL IsLessThan(gpos::pointer<const IDatum *> datum1,
-					gpos::pointer<const IDatum *> datum2) const override;
+	BOOL IsLessThan(const IDatum *datum1, const IDatum *datum2) const override;
 
 	// tests if the first argument is less or equal to the second
-	BOOL IsLessThanOrEqual(gpos::pointer<const IDatum *> datum1,
-						   gpos::pointer<const IDatum *> datum2) const override;
+	BOOL IsLessThanOrEqual(const IDatum *datum1,
+						   const IDatum *datum2) const override;
 
 	// tests if the first argument is greater than the second
-	BOOL IsGreaterThan(gpos::pointer<const IDatum *> datum1,
-					   gpos::pointer<const IDatum *> datum2) const override;
+	BOOL IsGreaterThan(const IDatum *datum1,
+					   const IDatum *datum2) const override;
 
 	// tests if the first argument is greater or equal to the second
-	BOOL IsGreaterThanOrEqual(
-		gpos::pointer<const IDatum *> datum1,
-		gpos::pointer<const IDatum *> datum2) const override;
+	BOOL IsGreaterThanOrEqual(const IDatum *datum1,
+							  const IDatum *datum2) const override;
 
 };	// CDefaultComparator
 }  // namespace gpopt

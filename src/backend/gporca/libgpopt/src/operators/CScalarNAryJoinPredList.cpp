@@ -40,7 +40,7 @@ CScalarNAryJoinPredList::CScalarNAryJoinPredList(CMemoryPool *mp) : CScalar(mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarNAryJoinPredList::Matches(gpos::pointer<COperator *> pop) const
+CScalarNAryJoinPredList::Matches(COperator *pop) const
 {
 	return (pop->Eopid() == Eopid());
 }

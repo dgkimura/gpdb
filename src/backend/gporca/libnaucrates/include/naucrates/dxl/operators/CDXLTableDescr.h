@@ -37,13 +37,13 @@ class CDXLTableDescr : public CRefCount
 {
 private:
 	// id and version information for the table
-	gpos::owner<IMDId *> m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// table name
 	CMDName *m_mdname;
 
 	// list of column descriptors
-	gpos::owner<CDXLColDescrArray *> m_dxl_column_descr_array;
+	gpos::Ref<CDXLColDescrArray> m_dxl_column_descr_array;
 
 	// id of user the table needs to be accessed with
 	ULONG m_execute_as_user_id;
@@ -57,22 +57,22 @@ public:
 	CDXLTableDescr(const CDXLTableDescr &) = delete;
 
 	// ctor/dtor
-	CDXLTableDescr(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
+	CDXLTableDescr(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 				   ULONG ulExecuteAsUser, int lockmode);
 
 	~CDXLTableDescr() override;
 
 	// setters
 	void SetColumnDescriptors(
-		gpos::owner<CDXLColDescrArray *> dxl_column_descr_array);
+		gpos::Ref<CDXLColDescrArray> dxl_column_descr_array);
 
-	void AddColumnDescr(gpos::owner<CDXLColDescr *> pdxlcd);
+	void AddColumnDescr(gpos::Ref<CDXLColDescr> pdxlcd);
 
 	// table name
 	const CMDName *MdName() const;
 
 	// table mdid
-	gpos::pointer<IMDId *> MDId() const;
+	IMDId *MDId() const;
 
 	// table arity
 	ULONG Arity() const;
@@ -84,7 +84,7 @@ public:
 	INT LockMode() const;
 
 	// get the column descriptor at the given position
-	gpos::pointer<const CDXLColDescr *> GetColumnDescrAt(ULONG idx) const;
+	const CDXLColDescr *GetColumnDescrAt(ULONG idx) const;
 
 	// serialize to dxl format
 	void SerializeToDXL(CXMLSerializer *xml_serializer) const;

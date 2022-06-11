@@ -79,10 +79,9 @@ CParseHandlerScalarBitmapBoolOp::StartElement(
 				->GetBuffer());
 	}
 
-	gpos::owner<IMDId *> mdid =
-		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId,
-			token_type);
+	gpos::Ref<IMDId> mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId,
+		token_type);
 	m_dxl_node = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarBitmapBoolOp(
 						   m_mp, std::move(mdid), bitmap_bool_dxlop));

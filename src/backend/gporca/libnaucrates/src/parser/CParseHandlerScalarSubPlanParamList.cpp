@@ -53,7 +53,7 @@ CParseHandlerScalarSubPlanParamList::CParseHandlerScalarSubPlanParamList(
 //---------------------------------------------------------------------------
 CParseHandlerScalarSubPlanParamList::~CParseHandlerScalarSubPlanParamList()
 {
-	m_dxl_colref_array->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -140,9 +140,9 @@ CParseHandlerScalarSubPlanParamList::EndElement(
 		CParseHandlerScalarSubPlanParam *parse_handler_subplan_param =
 			dynamic_cast<CParseHandlerScalarSubPlanParam *>((*this)[ul]);
 
-		gpos::owner<CDXLColRef *> dxl_colref =
+		gpos::Ref<CDXLColRef> dxl_colref =
 			parse_handler_subplan_param->MakeDXLColRef();
-		dxl_colref->AddRef();
+		;
 		m_dxl_colref_array->Append(dxl_colref);
 	}
 

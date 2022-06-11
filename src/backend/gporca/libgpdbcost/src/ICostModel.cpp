@@ -29,7 +29,7 @@ using namespace gpdbcost;
 //		Create default cost model
 //
 //---------------------------------------------------------------------------
-gpos::owner<ICostModel *>
+gpos::Ref<ICostModel>
 ICostModel::PcmDefault(CMemoryPool *mp)
 {
 	return GPOS_NEW(mp) CCostModelGPDB(mp, GPOPT_DEFAULT_SEGMENT_COUNT);
@@ -45,7 +45,7 @@ ICostModel::PcmDefault(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-ICostModel::SetParams(gpos::pointer<ICostModelParamsArray *> pdrgpcp) const
+ICostModel::SetParams(ICostModelParamsArray *pdrgpcp) const
 {
 	if (nullptr == pdrgpcp)
 	{

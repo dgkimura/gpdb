@@ -28,7 +28,7 @@ template <class A, class E>
 class CKHeap : public CRefCount
 {
 private:
-	gpos::owner<A *> m_topk;
+	gpos::Ref<A> m_topk;
 	CMemoryPool *m_mp;
 	ULONG m_k;
 	BOOL m_is_heapified;
@@ -132,7 +132,7 @@ public:
 
 	~CKHeap() override
 	{
-		m_topk->Release();
+		;
 	}
 
 	void

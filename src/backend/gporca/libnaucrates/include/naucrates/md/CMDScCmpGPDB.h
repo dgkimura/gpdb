@@ -41,31 +41,30 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// object id
-	gpos::owner<IMDId *> m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// operator name
 	CMDName *m_mdname;
 
 	// left type
-	gpos::owner<IMDId *> m_mdid_left;
+	gpos::Ref<IMDId> m_mdid_left;
 
 	// right type
-	gpos::owner<IMDId *> m_mdid_right;
+	gpos::Ref<IMDId> m_mdid_right;
 
 	// comparison type
 	IMDType::ECmpType m_comparision_type;
 
 	// comparison operator id
-	gpos::owner<IMDId *> m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 public:
 	CMDScCmpGPDB(const CMDScCmpGPDB &) = delete;
 
 	// ctor
-	CMDScCmpGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
-				 gpos::owner<IMDId *> left_mdid,
-				 gpos::owner<IMDId *> right_mdid, IMDType::ECmpType cmp_type,
-				 gpos::owner<IMDId *> mdid_op);
+	CMDScCmpGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+				 gpos::Ref<IMDId> left_mdid, gpos::Ref<IMDId> right_mdid,
+				 IMDType::ECmpType cmp_type, gpos::Ref<IMDId> mdid_op);
 
 	// dtor
 	~CMDScCmpGPDB() override;
@@ -78,22 +77,22 @@ public:
 	}
 
 	// copmarison object id
-	gpos::pointer<IMDId *> MDId() const override;
+	IMDId *MDId() const override;
 
 	// cast object name
 	CMDName Mdname() const override;
 
 	// left type
-	gpos::pointer<IMDId *> GetLeftMdid() const override;
+	IMDId *GetLeftMdid() const override;
 
 	// right type
-	gpos::pointer<IMDId *> GetRightMdid() const override;
+	IMDId *GetRightMdid() const override;
 
 	// comparison type
 	IMDType::ECmpType ParseCmpType() const override;
 
 	// comparison operator id
-	gpos::pointer<IMDId *> MdIdOp() const override;
+	IMDId *MdIdOp() const override;
 
 	// serialize object in DXL format
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;

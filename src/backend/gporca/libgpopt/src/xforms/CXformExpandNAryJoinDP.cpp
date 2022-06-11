@@ -61,9 +61,9 @@ CXformExpandNAryJoinDP::CXformExpandNAryJoinDP(CMemoryPool *mp)
 CXform::EXformPromise
 CXformExpandNAryJoinDP::Exfp(CExpressionHandle &exprhdl) const
 {
-	gpos::pointer<COptimizerConfig *> optimizer_config =
+	COptimizerConfig *optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
-	gpos::pointer<const CHint *> phint = optimizer_config->GetHint();
+	const CHint *phint = optimizer_config->GetHint();
 
 	const ULONG arity = exprhdl.Arity();
 
@@ -90,9 +90,8 @@ CXformExpandNAryJoinDP::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformExpandNAryJoinDP::Transform(gpos::pointer<CXformContext *> pxfctxt,
-								  gpos::pointer<CXformResult *> pxfres,
-								  gpos::pointer<CExpression *> pexpr) const
+CXformExpandNAryJoinDP::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+								  CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -104,29 +103,28 @@ CXformExpandNAryJoinDP::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	const ULONG arity = pexpr->Arity();
 	GPOS_ASSERT(arity >= 3);
 
-	gpos::owner<CExpressionArray *> pdrgpexpr =
-		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
-		gpos::owner<CExpression *> pexprChild = (*pexpr)[ul];
-		pexprChild->AddRef();
+		gpos::Ref<CExpression> pexprChild = (*pexpr)[ul];
+		;
 		pdrgpexpr->Append(pexprChild);
 	}
 
-	gpos::pointer<CExpression *> pexprScalar = (*pexpr)[arity - 1];
-	gpos::owner<CExpressionArray *> pdrgpexprPreds =
+	CExpression *pexprScalar = (*pexpr)[arity - 1];
+	gpos::Ref<CExpressionArray> pdrgpexprPreds =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 
 	// create join order using dynamic programming
 	CJoinOrderDP jodp(mp, pdrgpexpr, pdrgpexprPreds);
-	gpos::owner<CExpression *> pexprResult = jodp.PexprExpand();
+	gpos::Ref<CExpression> pexprResult = jodp.PexprExpand();
 
 	if (nullptr != pexprResult)
 	{
 		// normalize resulting expression
-		gpos::owner<CExpression *> pexprNormalized =
-			CNormalizer::PexprNormalize(mp, pexprResult);
-		pexprResult->Release();
+		gpos::Ref<CExpression> pexprNormalized =
+			CNormalizer::PexprNormalize(mp, pexprResult.get());
+		;
 		pxfres->Add(pexprNormalized);
 
 		const ULONG UlTopKJoinOrders = jodp.PdrgpexprTopK()->Size();
@@ -136,7 +134,7 @@ CXformExpandNAryJoinDP::Transform(gpos::pointer<CXformContext *> pxfctxt,
 			if (pexprJoinOrder != pexprResult)
 			{
 				// We should consider normalizing this expression before inserting it, as we do for pexprResult
-				pexprJoinOrder->AddRef();
+				;
 				pxfres->Add(pexprJoinOrder);
 			}
 		}

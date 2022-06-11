@@ -29,8 +29,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalWindow::CDXLPhysicalWindow(
-	CMemoryPool *mp, gpos::owner<ULongPtrArray *> part_by_colid_array,
-	gpos::owner<CDXLWindowKeyArray *> window_key_array)
+	CMemoryPool *mp, gpos::Ref<ULongPtrArray> part_by_colid_array,
+	gpos::Ref<CDXLWindowKeyArray> window_key_array)
 	: CDXLPhysical(mp),
 	  m_part_by_colid_array(std::move(part_by_colid_array)),
 	  m_dxl_window_key_array(std::move(window_key_array))
@@ -49,8 +49,8 @@ CDXLPhysicalWindow::CDXLPhysicalWindow(
 //---------------------------------------------------------------------------
 CDXLPhysicalWindow::~CDXLPhysicalWindow()
 {
-	m_part_by_colid_array->Release();
-	m_dxl_window_key_array->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -117,11 +117,11 @@ CDXLPhysicalWindow::WindowKeysCount() const
 //		Return the window key at a given position
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLWindowKey *>
+CDXLWindowKey *
 CDXLPhysicalWindow::GetDXLWindowKeyAt(ULONG position) const
 {
 	GPOS_ASSERT(position <= m_dxl_window_key_array->Size());
-	return (*m_dxl_window_key_array)[position];
+	return (*m_dxl_window_key_array)[position].get();
 }
 
 //---------------------------------------------------------------------------
@@ -133,9 +133,8 @@ CDXLPhysicalWindow::GetDXLWindowKeyAt(ULONG position) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalWindow::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLPhysicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer,
+								   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -144,7 +143,7 @@ CDXLPhysicalWindow::SerializeToDXL(
 
 	// serialize partition keys
 	CWStringDynamic *part_by_cols_str =
-		CDXLUtils::Serialize(m_mp, m_part_by_colid_array);
+		CDXLUtils::Serialize(m_mp, m_part_by_colid_array.get());
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartKeys),
 								 part_by_cols_str);
 	GPOS_DELETE(part_by_cols_str);
@@ -164,8 +163,7 @@ CDXLPhysicalWindow::SerializeToDXL(
 	const ULONG size = m_dxl_window_key_array->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		gpos::pointer<CDXLWindowKey *> window_key_dxlnode =
-			(*m_dxl_window_key_array)[ul];
+		CDXLWindowKey *window_key_dxlnode = (*m_dxl_window_key_array)[ul].get();
 		window_key_dxlnode->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -186,7 +184,7 @@ CDXLPhysicalWindow::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalWindow::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalWindow::AssertValid(const CDXLNode *dxlnode,
 								BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -194,7 +192,7 @@ CDXLPhysicalWindow::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	GPOS_ASSERT(nullptr != m_part_by_colid_array);
 	GPOS_ASSERT(nullptr != m_dxl_window_key_array);
 	GPOS_ASSERT(EdxlwindowIndexSentinel == dxlnode->Arity());
-	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[EdxlwindowIndexChild];
+	CDXLNode *child_dxlnode = (*dxlnode)[EdxlwindowIndexChild];
 	if (validate_children)
 	{
 		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,

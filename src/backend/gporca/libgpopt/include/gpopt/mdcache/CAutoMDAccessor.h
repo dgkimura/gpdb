@@ -40,7 +40,7 @@ class CAutoMDAccessor : public CStackObject
 {
 private:
 	// metadata provider
-	gpos::pointer<IMDProvider *> m_pimdp;
+	IMDProvider *m_pimdp;
 
 	// do we own cache object?
 	BOOL m_fOwnCache;
@@ -58,23 +58,26 @@ public:
 	CAutoMDAccessor(const CAutoMDAccessor &) = delete;
 
 	// ctor
-	CAutoMDAccessor(CMemoryPool *mp, gpos::owner<IMDProvider *> pmdp,
+	CAutoMDAccessor(CMemoryPool *mp, gpos::Ref<IMDProvider> pmdp,
 					CSystemId sysid)
-		: m_pimdp(pmdp), m_fOwnCache(true), m_sysid(sysid)
+		: m_pimdp(pmdp.get()), m_fOwnCache(true), m_sysid(sysid)
 	{
 		GPOS_ASSERT(nullptr != pmdp);
 
-		m_pcache =
-			CCacheFactory::CreateCache<gpmd::IMDCacheObject *, gpopt::CMDKey *>(
-				true /*fUnique*/, 0 /* unlimited cache quota */,
-				gpopt::CMDKey::UlHashMDKey, gpopt::CMDKey::FEqualMDKey);
+		m_pcache = CCacheFactory::CreateCache<gpos::Ref<gpmd::IMDCacheObject>,
+											  gpopt::CMDKey *>(
+			true /*fUnique*/, 0 /* unlimited cache quota */,
+			gpopt::CMDKey::UlHashMDKey, gpopt::CMDKey::FEqualMDKey);
 		m_pmda = GPOS_NEW(mp) CMDAccessor(mp, m_pcache, sysid, std::move(pmdp));
 	}
 
 	// ctor
-	CAutoMDAccessor(CMemoryPool *mp, gpos::owner<IMDProvider *> pmdp,
+	CAutoMDAccessor(CMemoryPool *mp, gpos::Ref<IMDProvider> pmdp,
 					CSystemId sysid, CMDAccessor::MDCache *pcache)
-		: m_pimdp(pmdp), m_fOwnCache(false), m_pcache(pcache), m_sysid(sysid)
+		: m_pimdp(pmdp.get()),
+		  m_fOwnCache(false),
+		  m_pcache(pcache),
+		  m_sysid(sysid)
 	{
 		GPOS_ASSERT(nullptr != pmdp);
 		GPOS_ASSERT(nullptr != pcache);
@@ -109,7 +112,7 @@ public:
 	}
 
 	// accessor of metadata provider
-	gpos::pointer<IMDProvider *>
+	IMDProvider *
 	Pimdp() const
 	{
 		return m_pimdp;

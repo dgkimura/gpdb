@@ -31,7 +31,7 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CGroupProxy::CGroupProxy(gpos::pointer<CGroup *> pgroup) : m_pgroup(pgroup)
+CGroupProxy::CGroupProxy(CGroup *pgroup) : m_pgroup(pgroup)
 {
 	GPOS_ASSERT(nullptr != pgroup);
 }
@@ -114,7 +114,7 @@ CGroupProxy::InitProperties(CDrvdProp *pdp)
 //
 //---------------------------------------------------------------------------
 void
-CGroupProxy::InitStats(gpos::owner<IStatistics *> stats)
+CGroupProxy::InitStats(gpos::Ref<IStatistics> stats)
 {
 	m_pgroup->InitStats(std::move(stats));
 }
@@ -129,7 +129,7 @@ CGroupProxy::InitStats(gpos::owner<IStatistics *> stats)
 //
 //---------------------------------------------------------------------------
 CGroupExpression *
-CGroupProxy::PgexprNext(gpos::pointer<CGroupExpression *> pgexpr)
+CGroupProxy::PgexprNext(CGroupExpression *pgexpr)
 {
 	GPOS_ASSERT(nullptr != pgexpr);
 	return m_pgroup->PgexprNext(pgexpr);
@@ -184,7 +184,7 @@ CGroupProxy::PgexprSkip(CGroupExpression *pgexprStart, BOOL fSkipLogical)
 //
 //---------------------------------------------------------------------------
 CGroupExpression *
-CGroupProxy::PgexprSkipLogical(gpos::pointer<CGroupExpression *> pgexpr)
+CGroupProxy::PgexprSkipLogical(CGroupExpression *pgexpr)
 {
 	if (nullptr == pgexpr)
 	{
@@ -205,7 +205,7 @@ CGroupProxy::PgexprSkipLogical(gpos::pointer<CGroupExpression *> pgexpr)
 //
 //---------------------------------------------------------------------------
 CGroupExpression *
-CGroupProxy::PgexprNextLogical(gpos::pointer<CGroupExpression *> pgexpr)
+CGroupProxy::PgexprNextLogical(CGroupExpression *pgexpr)
 {
 	GPOS_ASSERT(!m_pgroup->FScalar());
 

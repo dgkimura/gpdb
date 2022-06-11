@@ -78,9 +78,11 @@ CParseHandlerWindowSpec::StartElement(const XMLCh *const element_uri,
 
 		const XMLCh *xml_part_cols = CDXLOperatorFactory::ExtractAttrValue(
 			attrs, EdxltokenPartKeys, EdxltokenPhysicalWindow);
-		m_part_by_colid_array = CDXLOperatorFactory::ExtractIntsToUlongArray(
-			m_parse_handler_mgr->GetDXLMemoryManager(), xml_part_cols,
-			EdxltokenPartKeys, EdxltokenPhysicalWindow);
+		m_part_by_colid_array =
+			CDXLOperatorFactory::ExtractIntsToUlongArray(
+				m_parse_handler_mgr->GetDXLMemoryManager(), xml_part_cols,
+				EdxltokenPartKeys, EdxltokenPhysicalWindow)
+				.get();
 		GPOS_ASSERT(nullptr != m_part_by_colid_array);
 	}
 	else if (0 == XMLString::compareString(
@@ -153,7 +155,7 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,	 // element_uri,
 	CDXLNode *sort_col_list_dxlnode = nullptr;
 
 	// window frame associated with the window key
-	gpos::owner<CDXLWindowFrame *> window_frame = nullptr;
+	gpos::Ref<CDXLWindowFrame> window_frame = nullptr;
 
 	if (1 == this->Length())
 	{
@@ -173,7 +175,7 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,	 // element_uri,
 				dynamic_cast<CParseHandlerSortColList *>((*this)[0]);
 			sort_col_list_dxlnode =
 				sort_col_list_parse_handler->CreateDXLNode();
-			sort_col_list_dxlnode->AddRef();
+			;
 		}
 	}
 	else if (2 == this->Length())
@@ -181,7 +183,7 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,	 // element_uri,
 		CParseHandlerSortColList *sort_col_list_parse_handler =
 			dynamic_cast<CParseHandlerSortColList *>((*this)[0]);
 		sort_col_list_dxlnode = sort_col_list_parse_handler->CreateDXLNode();
-		sort_col_list_dxlnode->AddRef();
+		;
 
 		CParseHandlerWindowFrame *window_frame_parse_handler =
 			dynamic_cast<CParseHandlerWindowFrame *>((*this)[1]);

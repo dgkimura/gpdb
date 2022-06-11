@@ -23,7 +23,7 @@ namespace gpopt
 {
 // type definition of corresponding dynamic pointer array
 class CWindowFrame;
-using CWindowFrameArray = CDynamicPtrArray<CWindowFrame, CleanupRelease>;
+using CWindowFrameArray = gpos::Vector<gpos::Ref<CWindowFrame>>;
 
 using namespace gpos;
 
@@ -84,16 +84,16 @@ private:
 	const EFrameBoundary m_efbTrailing{EfbCurrentRow};
 
 	// scalar value of leading edge, memory owned by this class
-	gpos::owner<CExpression *> m_pexprLeading{nullptr};
+	gpos::Ref<CExpression> m_pexprLeading{nullptr};
 
 	// scalar value of trailing edge, memory owned by this class
-	gpos::owner<CExpression *> m_pexprTrailing{nullptr};
+	gpos::Ref<CExpression> m_pexprTrailing{nullptr};
 
 	// exclusion strategy
 	const EFrameExclusionStrategy m_efes{EfesNone};
 
 	// columns used by frame edges
-	gpos::owner<CColRefSet *> m_pcrsUsed{nullptr};
+	gpos::Ref<CColRefSet> m_pcrsUsed{nullptr};
 
 	// singelton empty frame -- used with any unspecified window function frame
 	static const CWindowFrame m_wfEmpty;
@@ -107,8 +107,8 @@ public:
 	// ctor
 	CWindowFrame(CMemoryPool *mp, EFrameSpec efs, EFrameBoundary efbLeading,
 				 EFrameBoundary efbTrailing,
-				 gpos::owner<CExpression *> pexprLeading,
-				 gpos::owner<CExpression *> pexprTrailing,
+				 gpos::Ref<CExpression> pexprLeading,
+				 gpos::Ref<CExpression> pexprTrailing,
 				 EFrameExclusionStrategy efes);
 
 	// dtor
@@ -136,17 +136,17 @@ public:
 	}
 
 	// scalar value of leading edge
-	gpos::pointer<CExpression *>
+	CExpression *
 	PexprLeading() const
 	{
-		return m_pexprLeading;
+		return m_pexprLeading.get();
 	}
 
 	// scalar value of trailing edge
-	gpos::pointer<CExpression *>
+	CExpression *
 	PexprTrailing() const
 	{
-		return m_pexprTrailing;
+		return m_pexprTrailing.get();
 	}
 
 	// exclusion strategy
@@ -157,46 +157,45 @@ public:
 	}
 
 	// matching function
-	BOOL Matches(gpos::pointer<const CWindowFrame *> pwf) const;
+	BOOL Matches(const CWindowFrame *pwf) const;
 
 	// hash function
 	virtual ULONG HashValue() const;
 
 	// return a copy of the window frame with remapped columns
-	virtual gpos::owner<CWindowFrame *> PwfCopyWithRemappedColumns(
+	virtual gpos::Ref<CWindowFrame> PwfCopyWithRemappedColumns(
 		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 	// return columns used by frame edges
-	gpos::pointer<CColRefSet *>
+	CColRefSet *
 	PcrsUsed() const
 	{
-		return m_pcrsUsed;
+		return m_pcrsUsed.get();
 	}
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;
 
 	// matching function over frame arrays
-	static BOOL Equals(gpos::pointer<const CWindowFrameArray *> pdrgpwfFirst,
-					   gpos::pointer<const CWindowFrameArray *> pdrgpwfSecond);
+	static BOOL Equals(const CWindowFrameArray *pdrgpwfFirst,
+					   const CWindowFrameArray *pdrgpwfSecond);
 
 	// combine hash values of a maximum number of entries
-	static ULONG HashValue(
-		gpos::pointer<const CWindowFrameArray *> pdrgpwfFirst, ULONG ulMaxSize);
+	static ULONG HashValue(const CWindowFrameArray *pdrgpwfFirst,
+						   ULONG ulMaxSize);
 
 	// print array of window frame objects
-	static IOstream &OsPrint(IOstream &os,
-							 gpos::pointer<const CWindowFrameArray *> pdrgpwf);
+	static IOstream &OsPrint(IOstream &os, const CWindowFrameArray *pdrgpwf);
 
 	// check if a given window frame is empty
 	static BOOL
-	IsEmpty(gpos::pointer<CWindowFrame *> pwf)
+	IsEmpty(CWindowFrame *pwf)
 	{
 		return pwf == &m_wfEmpty;
 	}
 
 	// return pointer to singleton empty window frame
-	static gpos::pointer<const CWindowFrame *>
+	static const CWindowFrame *
 	PwfEmpty()
 	{
 		return &m_wfEmpty;

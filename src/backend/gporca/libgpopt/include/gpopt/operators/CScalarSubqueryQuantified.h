@@ -44,7 +44,7 @@ class CScalarSubqueryQuantified : public CScalar
 {
 private:
 	// id of comparison operator
-	gpos::owner<IMDId *> m_scalar_op_mdid;
+	gpos::Ref<IMDId> m_scalar_op_mdid;
 
 	// name of comparison operator
 	const CWStringConst *m_pstrScalarOp;
@@ -54,8 +54,7 @@ private:
 
 protected:
 	// ctor
-	CScalarSubqueryQuantified(CMemoryPool *mp,
-							  gpos::owner<IMDId *> scalar_op_mdid,
+	CScalarSubqueryQuantified(CMemoryPool *mp, gpos::Ref<IMDId> scalar_op_mdid,
 							  const CWStringConst *pstrScalarOp,
 							  const CColRef *colref);
 
@@ -66,7 +65,7 @@ public:
 	CScalarSubqueryQuantified(const CScalarSubqueryQuantified &) = delete;
 
 	// operator mdid accessor
-	gpos::pointer<IMDId *> MdIdOp() const;
+	IMDId *MdIdOp() const;
 
 	// operator name accessor
 	const CWStringConst *PstrOp() const;
@@ -79,13 +78,13 @@ public:
 	}
 
 	// return the type of the scalar expression
-	gpos::pointer<IMDId *> MdidType() const override;
+	IMDId *MdidType() const override;
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -95,15 +94,15 @@ public:
 	}
 
 	// return locally used columns
-	gpos::owner<CColRefSet *> PcrsUsed(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> PcrsUsed(CMemoryPool *mp,
+								   CExpressionHandle &exprhdl) override;
 
 	// derive partition consumer info
-	gpos::owner<CPartInfo *> PpartinfoDerive(
+	gpos::Ref<CPartInfo> PpartinfoDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// conversion function
-	static gpos::cast_func<CScalarSubqueryQuantified *>
+	static CScalarSubqueryQuantified *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

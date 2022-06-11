@@ -203,15 +203,15 @@ CParseHandlerIndexScan::EndElementHelper(const XMLCh *const element_local_name,
 	CParseHandlerTableDescr *table_descr_parse_handler =
 		dynamic_cast<CParseHandlerTableDescr *>((*this)[5]);
 
-	gpos::owner<CDXLTableDescr *> dxl_table_descr =
+	gpos::Ref<CDXLTableDescr> dxl_table_descr =
 		table_descr_parse_handler->GetDXLTableDescr();
-	dxl_table_descr->AddRef();
+	;
 
-	gpos::owner<CDXLIndexDescr *> dxl_index_descr =
+	gpos::Ref<CDXLIndexDescr> dxl_index_descr =
 		index_descr_parse_handler->GetDXLIndexDescr();
-	dxl_index_descr->AddRef();
+	;
 
-	gpos::owner<CDXLPhysical *> dxl_op = nullptr;
+	gpos::Ref<CDXLPhysical> dxl_op = nullptr;
 	if (EdxltokenPhysicalIndexOnlyScan == token_type)
 	{
 		dxl_op = GPOS_NEW(m_mp) CDXLPhysicalIndexOnlyScan(
@@ -228,7 +228,7 @@ CParseHandlerIndexScan::EndElementHelper(const XMLCh *const element_local_name,
 
 
 	// set statistics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add children
 	AddChildFromParseHandler(proj_list_parse_handler);

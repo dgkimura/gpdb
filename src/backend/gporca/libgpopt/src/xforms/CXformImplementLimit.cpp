@@ -67,9 +67,8 @@ CXformImplementLimit::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementLimit::Transform(gpos::pointer<CXformContext *> pxfctxt,
-								gpos::pointer<CXformResult *> pxfres,
-								gpos::pointer<CExpression *> pexpr) const
+CXformImplementLimit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+								CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -78,21 +77,20 @@ CXformImplementLimit::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	gpos::pointer<CLogicalLimit *> popLimit =
-		gpos::dyn_cast<CLogicalLimit>(pexpr->Pop());
+	CLogicalLimit *popLimit = gpos::dyn_cast<CLogicalLimit>(pexpr->Pop());
 	CExpression *pexprRelational = (*pexpr)[0];
 	CExpression *pexprScalarStart = (*pexpr)[1];
 	CExpression *pexprScalarRows = (*pexpr)[2];
-	gpos::owner<COrderSpec *> pos = popLimit->Pos();
+	gpos::Ref<COrderSpec> pos = popLimit->Pos();
 
 	// addref all components
-	pexprRelational->AddRef();
-	pexprScalarStart->AddRef();
-	pexprScalarRows->AddRef();
-	popLimit->Pos()->AddRef();
+	;
+	;
+	;
+	;
 
 	// assemble physical operator
-	gpos::owner<CExpression *> pexprLimit = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprLimit = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalLimit(mp, std::move(pos), popLimit->FGlobal(),
 									popLimit->FHasCount(),

@@ -74,8 +74,9 @@ CParseHandlerMDGPDBTrigger::StartElement(const XMLCh *const,  // element_uri,
 	}
 
 	m_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-		EdxltokenGPDBTrigger);
+				 m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				 EdxltokenMdid, EdxltokenGPDBTrigger)
+				 .get();
 
 	const XMLCh *xml_str_name = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenName, EdxltokenGPDBTrigger);
@@ -86,11 +87,13 @@ CParseHandlerMDGPDBTrigger::StartElement(const XMLCh *const,  // element_uri,
 	GPOS_ASSERT(m_mdid->IsValid() && nullptr != m_mdname);
 
 	m_rel_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenRelationMdid, EdxltokenGPDBTrigger);
+					 m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+					 EdxltokenRelationMdid, EdxltokenGPDBTrigger)
+					 .get();
 	m_func_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenFuncId,
-		EdxltokenGPDBTrigger);
+					  m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+					  EdxltokenFuncId, EdxltokenGPDBTrigger)
+					  .get();
 
 	BOOL gpmd_trigger_properties[GPMD_TRIGGER_BITMAP_LEN];
 	gpmd_trigger_properties[GPMD_TRIGGER_ROW_BIT] =

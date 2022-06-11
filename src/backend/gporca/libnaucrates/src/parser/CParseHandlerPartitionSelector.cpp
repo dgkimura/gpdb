@@ -49,7 +49,7 @@ CParseHandlerPartitionSelector::CParseHandlerPartitionSelector(
 
 CParseHandlerPartitionSelector::~CParseHandlerPartitionSelector()
 {
-	CRefCount::SafeRelease(m_rel_mdid);
+	;
 }
 //---------------------------------------------------------------------------
 //	@function:
@@ -106,9 +106,11 @@ CParseHandlerPartitionSelector::StartElement(
 				EdxltokenPhysicalPartitionSelector);
 
 			// parse partitions
-			m_partitions = CDXLOperatorFactory::ExtractConvertValuesToArray(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-				EdxltokenPartitions, EdxltokenPhysicalPartitionSelector);
+			m_partitions =
+				CDXLOperatorFactory::ExtractConvertValuesToArray(
+					m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+					EdxltokenPartitions, EdxltokenPhysicalPartitionSelector)
+					.get();
 
 			// parse handlers for all the scalar children
 
@@ -195,8 +197,8 @@ CParseHandlerPartitionSelector::EndElement(
 				   str->GetBuffer());
 	}
 
-	m_rel_mdid->AddRef();
-	gpos::owner<CDXLPhysicalPartitionSelector *> dxl_op =
+	;
+	gpos::Ref<CDXLPhysicalPartitionSelector> dxl_op =
 		GPOS_NEW(m_mp) CDXLPhysicalPartitionSelector(
 			m_mp, m_rel_mdid, m_selector_id, m_scan_id, m_partitions);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
@@ -205,7 +207,7 @@ CParseHandlerPartitionSelector::EndElement(
 		dynamic_cast<CParseHandlerProperties *>((*this)[0]);
 
 	// set statistics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// scalar children
 	for (ULONG idx = 1; idx < 3; idx++)

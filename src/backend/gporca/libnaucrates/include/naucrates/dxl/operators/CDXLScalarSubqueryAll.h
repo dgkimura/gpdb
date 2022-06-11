@@ -41,7 +41,7 @@ public:
 	CDXLScalarSubqueryAll(CDXLScalarSubqueryAll &) = delete;
 
 	// ctor
-	CDXLScalarSubqueryAll(CMemoryPool *mp, gpos::owner<IMDId *> scalar_op_mdid,
+	CDXLScalarSubqueryAll(CMemoryPool *mp, gpos::Ref<IMDId> scalar_op_mdid,
 						  CMDName *mdname, ULONG colid);
 
 	// ident accessors
@@ -51,7 +51,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarSubqueryAll *>
+	static CDXLScalarSubqueryAll *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

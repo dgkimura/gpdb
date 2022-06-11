@@ -63,30 +63,30 @@ CXformImplementCTEProducer::Exfp(CExpressionHandle &  // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementCTEProducer::Transform(gpos::pointer<CXformContext *> pxfctxt,
-									  gpos::pointer<CXformResult *> pxfres,
-									  gpos::pointer<CExpression *> pexpr) const
+CXformImplementCTEProducer::Transform(CXformContext *pxfctxt,
+									  CXformResult *pxfres,
+									  CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CLogicalCTEProducer *> popCTEProducer =
+	CLogicalCTEProducer *popCTEProducer =
 		gpos::dyn_cast<CLogicalCTEProducer>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 	ULONG id = popCTEProducer->UlCTEId();
 
-	gpos::owner<CColRefArray *> colref_array = popCTEProducer->Pdrgpcr();
-	colref_array->AddRef();
+	gpos::Ref<CColRefArray> colref_array = popCTEProducer->Pdrgpcr();
+	;
 
 	// child of CTEProducer operator
-	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
+	;
 
 	// create physical CTE Producer
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalCTEProducer(mp, id, std::move(colref_array)),
 		std::move(pexprChild));
 

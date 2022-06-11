@@ -72,7 +72,8 @@ CParseHandlerBroadcastMotion::StartElement(
 	// parse and create Broadcast motion operator
 	m_dxl_op = gpos::cast<CDXLPhysicalBroadcastMotion>(
 		CDXLOperatorFactory::MakeDXLBroadcastMotion(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs)
+			.get());
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance
@@ -158,7 +159,7 @@ CParseHandlerBroadcastMotion::EndElement(const XMLCh *const,  // element_uri,
 	CParseHandlerPhysicalOp *child_parse_handler =
 		dynamic_cast<CParseHandlerPhysicalOp *>((*this)[4]);
 
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add children nodes
 	AddChildFromParseHandler(proj_list_parse_handler);
@@ -167,7 +168,7 @@ CParseHandlerBroadcastMotion::EndElement(const XMLCh *const,  // element_uri,
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxl_op->AssertValid(m_dxl_node.get(), false /* validate_children */);
 #endif	// GPOS_DEBUG
 
 	// deactivate handler

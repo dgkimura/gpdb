@@ -29,10 +29,9 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDColumn::CMDColumn(CMDName *mdname, INT attrnum,
-					 gpos::owner<IMDId *> mdid_type, INT type_modifier,
-					 BOOL is_nullable, BOOL is_dropped,
-					 gpos::owner<CDXLNode *> dxl_dafault_value, ULONG length)
+CMDColumn::CMDColumn(CMDName *mdname, INT attrnum, gpos::Ref<IMDId> mdid_type,
+					 INT type_modifier, BOOL is_nullable, BOOL is_dropped,
+					 gpos::Ref<CDXLNode> dxl_dafault_value, ULONG length)
 	: m_mdname(mdname),
 	  m_attno(attrnum),
 	  m_mdid_type(std::move(mdid_type)),
@@ -55,8 +54,8 @@ CMDColumn::CMDColumn(CMDName *mdname, INT attrnum,
 CMDColumn::~CMDColumn()
 {
 	GPOS_DELETE(m_mdname);
-	m_mdid_type->Release();
-	CRefCount::SafeRelease(m_dxl_default_val);
+	;
+	;
 }
 
 
@@ -96,10 +95,10 @@ CMDColumn::AttrNum() const
 //		Attribute type id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDColumn::MdidType() const
 {
-	return m_mdid_type;
+	return m_mdid_type.get();
 }
 
 INT

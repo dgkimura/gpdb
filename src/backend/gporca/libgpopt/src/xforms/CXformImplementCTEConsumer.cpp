@@ -60,30 +60,30 @@ CXformImplementCTEConsumer::Exfp(CExpressionHandle &  // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementCTEConsumer::Transform(gpos::pointer<CXformContext *> pxfctxt,
-									  gpos::pointer<CXformResult *> pxfres,
-									  gpos::pointer<CExpression *> pexpr) const
+CXformImplementCTEConsumer::Transform(CXformContext *pxfctxt,
+									  CXformResult *pxfres,
+									  CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CLogicalCTEConsumer *> popCTEConsumer =
+	CLogicalCTEConsumer *popCTEConsumer =
 		gpos::dyn_cast<CLogicalCTEConsumer>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 	ULONG id = popCTEConsumer->UlCTEId();
 
-	gpos::owner<CColRefArray *> colref_array = popCTEConsumer->Pdrgpcr();
-	colref_array->AddRef();
+	gpos::Ref<CColRefArray> colref_array = popCTEConsumer->Pdrgpcr();
+	;
 
 	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
 	GPOS_ASSERT(nullptr != colref_mapping);
-	colref_mapping->AddRef();
+	;
 
 	// create physical CTE Consumer
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalCTEConsumer(
 							mp, id, std::move(colref_array), colref_mapping));
 

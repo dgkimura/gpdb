@@ -25,7 +25,7 @@ using namespace gpmd;
 //		Return the mdid for the requested type
 //
 //---------------------------------------------------------------------------
-gpos::owner<IMDId *>
+gpos::Ref<IMDId>
 IMDProvider::GetGPDBTypeMdid(CMemoryPool *mp,
 							 CSystemId
 #ifdef GPOS_DEBUG

@@ -50,7 +50,7 @@ CParseHandlerTableDescr::CParseHandlerTableDescr(
 //---------------------------------------------------------------------------
 CParseHandlerTableDescr::~CParseHandlerTableDescr()
 {
-	CRefCount::SafeRelease(m_dxl_table_descr);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -61,10 +61,10 @@ CParseHandlerTableDescr::~CParseHandlerTableDescr()
 //		Returns the table descriptor constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLTableDescr *>
+CDXLTableDescr *
 CParseHandlerTableDescr::GetDXLTableDescr()
 {
-	return m_dxl_table_descr;
+	return m_dxl_table_descr.get();
 }
 
 //---------------------------------------------------------------------------
@@ -140,9 +140,9 @@ CParseHandlerTableDescr::EndElement(const XMLCh *const,	 // element_uri,
 
 	GPOS_ASSERT(nullptr != col_descr_parse_handler->GetDXLColumnDescrArray());
 
-	gpos::owner<CDXLColDescrArray *> dxl_column_descr_array =
+	gpos::Ref<CDXLColDescrArray> dxl_column_descr_array =
 		col_descr_parse_handler->GetDXLColumnDescrArray();
-	dxl_column_descr_array->AddRef();
+	;
 	m_dxl_table_descr->SetColumnDescriptors(std::move(dxl_column_descr_array));
 
 	// deactivate handler

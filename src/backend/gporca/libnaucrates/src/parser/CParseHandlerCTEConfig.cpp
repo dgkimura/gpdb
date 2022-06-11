@@ -51,7 +51,7 @@ CParseHandlerCTEConfig::CParseHandlerCTEConfig(
 //---------------------------------------------------------------------------
 CParseHandlerCTEConfig::~CParseHandlerCTEConfig()
 {
-	CRefCount::SafeRelease(m_cte_conf);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -140,10 +140,10 @@ CParseHandlerCTEConfig::GetParseHandlerType() const
 //		Returns the CTE configuration
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CCTEConfig *>
+CCTEConfig *
 CParseHandlerCTEConfig::GetCteConf() const
 {
-	return m_cte_conf;
+	return m_cte_conf.get();
 }
 
 // EOF

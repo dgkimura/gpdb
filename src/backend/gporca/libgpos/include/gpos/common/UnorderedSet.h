@@ -62,7 +62,7 @@ public:
 		const_iterator end_;
 
 	public:
-		LegacyIterator(gpos::pointer<const UnorderedSet *> set)
+		LegacyIterator(const UnorderedSet *set)
 			: iterator_(set->begin()), end_(set->end())
 		{
 		}

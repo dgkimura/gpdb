@@ -30,8 +30,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalPartitionSelector::CDXLPhysicalPartitionSelector(
-	CMemoryPool *mp, gpos::owner<IMDId *> mdid_rel, ULONG selector_id,
-	ULONG scan_id, gpos::owner<ULongPtrArray *> parts)
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid_rel, ULONG selector_id,
+	ULONG scan_id, gpos::Ref<ULongPtrArray> parts)
 	: CDXLPhysical(mp),
 	  m_rel_mdid(std::move(mdid_rel)),
 	  m_selector_id(selector_id),
@@ -50,8 +50,8 @@ CDXLPhysicalPartitionSelector::CDXLPhysicalPartitionSelector(
 //---------------------------------------------------------------------------
 CDXLPhysicalPartitionSelector::~CDXLPhysicalPartitionSelector()
 {
-	CRefCount::SafeRelease(m_parts);
-	CRefCount::SafeRelease(m_rel_mdid);
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -91,9 +91,8 @@ CDXLPhysicalPartitionSelector::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalPartitionSelector::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLPhysicalPartitionSelector::SerializeToDXL(CXMLSerializer *xml_serializer,
+											  const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -109,7 +108,7 @@ CDXLPhysicalPartitionSelector::SerializeToDXL(
 		m_scan_id);
 
 	CWStringDynamic *serialized_partitions =
-		CDXLUtils::Serialize(m_mp, m_parts);
+		CDXLUtils::Serialize(m_mp, m_parts.get());
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenPartitions), serialized_partitions);
 	GPOS_DELETE(serialized_partitions);
@@ -144,14 +143,14 @@ CDXLPhysicalPartitionSelector::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalPartitionSelector::AssertValid(
-	gpos::pointer<const CDXLNode *> dxlnode, BOOL validate_children) const
+CDXLPhysicalPartitionSelector::AssertValid(const CDXLNode *dxlnode,
+										   BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	GPOS_ASSERT(6 == arity || 7 == arity);
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[idx];
+		CDXLNode *child_dxlnode = (*dxlnode)[idx];
 		if (validate_children)
 		{
 			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,

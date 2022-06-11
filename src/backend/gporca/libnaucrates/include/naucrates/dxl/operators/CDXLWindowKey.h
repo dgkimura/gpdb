@@ -33,10 +33,10 @@ class CDXLWindowKey : public CRefCount
 {
 private:
 	// window frame associated with the window key
-	gpos::owner<CDXLWindowFrame *> m_window_frame_dxl{nullptr};
+	gpos::Ref<CDXLWindowFrame> m_window_frame_dxl{nullptr};
 
 	// sorting columns
-	gpos::owner<CDXLNode *> m_sort_col_list_dxlnode{nullptr};
+	gpos::Ref<CDXLNode> m_sort_col_list_dxlnode{nullptr};
 
 public:
 	CDXLWindowKey(const CDXLWindowKey &) = delete;
@@ -54,24 +54,24 @@ public:
 	void SetWindowFrame(CDXLWindowFrame *window_frame);
 
 	// return window frame
-	gpos::pointer<CDXLWindowFrame *>
+	CDXLWindowFrame *
 	GetWindowFrame() const
 	{
-		return m_window_frame_dxl;
+		return m_window_frame_dxl.get();
 	}
 
 	// set the list of sort columns
 	void SetSortColList(CDXLNode *sort_col_list_dxlnode);
 
 	// sort columns
-	gpos::pointer<CDXLNode *>
+	CDXLNode *
 	GetSortColListDXL() const
 	{
-		return m_sort_col_list_dxlnode;
+		return m_sort_col_list_dxlnode.get();
 	}
 };
 
-using CDXLWindowKeyArray = CDynamicPtrArray<CDXLWindowKey, CleanupRelease>;
+using CDXLWindowKeyArray = gpos::Vector<gpos::Ref<CDXLWindowKey>>;
 }  // namespace gpdxl
 #endif	// !GPDXL_CDXLWindowKey_H
 

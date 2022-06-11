@@ -35,7 +35,7 @@ class CParseHandlerCTEList : public CParseHandlerBase
 {
 private:
 	// CTE list
-	gpos::owner<CDXLNodeArray *> m_dxl_array;
+	gpos::Ref<CDXLNodeArray> m_dxl_array;
 
 	// process the start of an element
 	void StartElement(
@@ -64,10 +64,10 @@ public:
 	~CParseHandlerCTEList() override;
 
 	// CTE list
-	gpos::pointer<CDXLNodeArray *>
+	CDXLNodeArray *
 	GetDxlCteArray() const
 	{
-		return m_dxl_array;
+		return m_dxl_array.get();
 	}
 };
 }  // namespace gpdxl

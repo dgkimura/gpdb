@@ -29,8 +29,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarMinMax::CDXLScalarMinMax(CMemoryPool *mp,
-								   gpos::owner<IMDId *> mdid_type,
+CDXLScalarMinMax::CDXLScalarMinMax(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 								   EdxlMinMaxType min_max_type)
 	: CDXLScalar(mp),
 	  m_mdid_type(std::move(mdid_type)),
@@ -50,7 +49,7 @@ CDXLScalarMinMax::CDXLScalarMinMax(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarMinMax::~CDXLScalarMinMax()
 {
-	m_mdid_type->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -99,7 +98,7 @@ CDXLScalarMinMax::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarMinMax::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 gpos::pointer<const CDXLNode *> dxlnode) const
+								 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -124,7 +123,7 @@ BOOL
 CDXLScalarMinMax::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
+			md_accessor->RetrieveType(m_mdid_type.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG
@@ -137,7 +136,7 @@ CDXLScalarMinMax::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarMinMax::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarMinMax::AssertValid(const CDXLNode *dxlnode,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(0 < dxlnode->Arity());
@@ -145,7 +144,7 @@ CDXLScalarMinMax::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[idx];
+		CDXLNode *dxlnode_arg = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

@@ -61,7 +61,7 @@ CParseHandlerScalarOpExpr::StartElement(const XMLCh *const element_uri,
 		(nullptr == m_dxl_node))
 	{
 		// parse and create scalar OpExpr
-		gpos::owner<CDXLScalarOpExpr *> dxl_op =
+		gpos::Ref<CDXLScalarOpExpr> dxl_op =
 			gpos::cast<CDXLScalarOpExpr>(CDXLOperatorFactory::MakeDXLOpExpr(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 

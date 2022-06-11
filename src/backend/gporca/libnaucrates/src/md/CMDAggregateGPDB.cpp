@@ -31,9 +31,9 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CMDAggregateGPDB::CMDAggregateGPDB(
-	CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
-	gpos::owner<IMDId *> result_type_mdid,
-	gpos::owner<IMDId *> intermediate_result_type_mdid, BOOL fOrdered,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+	gpos::Ref<IMDId> result_type_mdid,
+	gpos::Ref<IMDId> intermediate_result_type_mdid, BOOL fOrdered,
 	BOOL is_splittable, BOOL is_hash_agg_capable)
 	: m_mp(mp),
 	  m_mdid(std::move(mdid)),
@@ -60,9 +60,9 @@ CMDAggregateGPDB::CMDAggregateGPDB(
 //---------------------------------------------------------------------------
 CMDAggregateGPDB::~CMDAggregateGPDB()
 {
-	m_mdid->Release();
-	m_mdid_type_intermediate->Release();
-	m_mdid_type_result->Release();
+	;
+	;
+	;
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }
@@ -75,10 +75,10 @@ CMDAggregateGPDB::~CMDAggregateGPDB()
 //		Agg id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDAggregateGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -104,10 +104,10 @@ CMDAggregateGPDB::Mdname() const
 //		Type id of result
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDAggregateGPDB::GetResultTypeMdid() const
 {
-	return m_mdid_type_result;
+	return m_mdid_type_result.get();
 }
 
 //---------------------------------------------------------------------------
@@ -118,10 +118,10 @@ CMDAggregateGPDB::GetResultTypeMdid() const
 //		Type id of intermediate result
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDAggregateGPDB::GetIntermediateResultTypeMdid() const
 {
-	return m_mdid_type_intermediate;
+	return m_mdid_type_intermediate.get();
 }
 
 //---------------------------------------------------------------------------
@@ -161,11 +161,11 @@ CMDAggregateGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	SerializeMDIdAsElem(
 		xml_serializer,
 		CDXLTokens::GetDXLTokenStr(EdxltokenGPDBAggResultTypeId),
-		m_mdid_type_result);
+		m_mdid_type_result.get());
 	SerializeMDIdAsElem(
 		xml_serializer,
 		CDXLTokens::GetDXLTokenStr(EdxltokenGPDBAggIntermediateResultTypeId),
-		m_mdid_type_intermediate);
+		m_mdid_type_intermediate.get());
 
 	xml_serializer->CloseElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),

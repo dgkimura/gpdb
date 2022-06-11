@@ -53,31 +53,27 @@ private:
 	static const DOUBLE m_dOuterInnerRatioThreshold;
 
 	// check the stats ratio to decide whether to apply the xform or not
-	static BOOL FApplyXformUsingStatsInfo(
-		gpos::pointer<const IStatistics *> outer_stats,
-		gpos::pointer<const IStatistics *> inner_side_stats);
+	static BOOL FApplyXformUsingStatsInfo(const IStatistics *outer_stats,
+										  const IStatistics *inner_side_stats);
 
 	// check if the inner expression is of a type which should be considered by this xform
-	static BOOL FValidInnerExpr(gpos::pointer<CExpression *> pexprInner);
+	static BOOL FValidInnerExpr(CExpression *pexprInner);
 
 	// construct a left anti semi join with the CTE consumer (ulCTEJoinId) as outer
 	// and a group by as inner
-	static gpos::owner<CExpression *> PexprLeftAntiSemiJoinWithInnerGroupBy(
-		CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrOuter,
-		gpos::owner<CColRefArray *> pdrgpcrOuterCopy,
-		gpos::pointer<CColRefSet *> pcrsScalar,
-		gpos::pointer<CColRefSet *> pcrsInner,
-		gpos::pointer<CColRefArray *> pdrgpcrJoinOutput, ULONG ulCTEJoinId,
-		ULONG ulCTEOuterId);
+	static gpos::Ref<CExpression> PexprLeftAntiSemiJoinWithInnerGroupBy(
+		CMemoryPool *mp, CColRefArray *pdrgpcrOuter,
+		gpos::Ref<CColRefArray> pdrgpcrOuterCopy, CColRefSet *pcrsScalar,
+		CColRefSet *pcrsInner, CColRefArray *pdrgpcrJoinOutput,
+		ULONG ulCTEJoinId, ULONG ulCTEOuterId);
 
 	// return a project over a left anti semi join that appends nulls for all
 	// columns in the original inner child
-	static gpos::owner<CExpression *> PexprProjectOverLeftAntiSemiJoin(
-		CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrOuter,
-		gpos::pointer<CColRefSet *> pcrsScalar,
-		gpos::pointer<CColRefSet *> pcrsInner,
-		gpos::pointer<CColRefArray *> pdrgpcrJoinOutput, ULONG ulCTEJoinId,
-		ULONG ulCTEOuterId, gpos::owner<CColRefArray *> *ppdrgpcrProjectOutput);
+	static gpos::Ref<CExpression> PexprProjectOverLeftAntiSemiJoin(
+		CMemoryPool *mp, CColRefArray *pdrgpcrOuter, CColRefSet *pcrsScalar,
+		CColRefSet *pcrsInner, CColRefArray *pdrgpcrJoinOutput,
+		ULONG ulCTEJoinId, ULONG ulCTEOuterId,
+		gpos::Ref<CColRefArray> *ppdrgpcrProjectOutput);
 
 public:
 	CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin(
@@ -114,9 +110,8 @@ public:
 	}
 
 	// actual transform
-	void Transform(gpos::pointer<CXformContext *> pxfctxt,
-				   gpos::pointer<CXformResult *> pxfres,
-				   gpos::pointer<CExpression *> pexpr) const override;
+	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+				   CExpression *pexpr) const override;
 
 	// return true if xform should be applied only once
 	BOOL IsApplyOnce() override;

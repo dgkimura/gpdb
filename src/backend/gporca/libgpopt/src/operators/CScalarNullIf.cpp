@@ -32,8 +32,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarNullIf::CScalarNullIf(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
-							 gpos::owner<IMDId *> mdid_type)
+CScalarNullIf::CScalarNullIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+							 gpos::Ref<IMDId> mdid_type)
 	: CScalar(mp),
 	  m_mdid_op(std::move(mdid_op)),
 	  m_mdid_type(std::move(mdid_type)),
@@ -46,8 +46,9 @@ CScalarNullIf::CScalarNullIf(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	m_returns_null_on_null_input =
 		CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(md_accessor,
-														  m_mdid_op);
-	m_fBoolReturnType = CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type);
+														  m_mdid_op.get());
+	m_fBoolReturnType =
+		CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type.get());
 }
 
 
@@ -61,8 +62,8 @@ CScalarNullIf::CScalarNullIf(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
 //---------------------------------------------------------------------------
 CScalarNullIf::~CScalarNullIf()
 {
-	m_mdid_op->Release();
-	m_mdid_type->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -91,15 +92,14 @@ CScalarNullIf::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarNullIf::Matches(gpos::pointer<COperator *> pop) const
+CScalarNullIf::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CScalarNullIf *> popScNullIf =
-		gpos::dyn_cast<CScalarNullIf>(pop);
+	CScalarNullIf *popScNullIf = gpos::dyn_cast<CScalarNullIf>(pop);
 
 	// match if operators and return types are identical
 	return m_mdid_op->Equals(popScNullIf->MdIdOp()) &&
@@ -116,7 +116,7 @@ CScalarNullIf::Matches(gpos::pointer<COperator *> pop) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarNullIf::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
+CScalarNullIf::Eber(ULongPtrArray *pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

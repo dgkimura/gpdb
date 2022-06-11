@@ -33,13 +33,13 @@ class CScalarCaseTest : public CScalar
 {
 private:
 	// type id
-	gpos::owner<IMDId *> m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CScalarCaseTest(const CScalarCaseTest &) = delete;
 
 	// ctor
-	CScalarCaseTest(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type);
+	CScalarCaseTest(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CScalarCaseTest() override;
@@ -59,34 +59,33 @@ public:
 	}
 
 	// the type of the scalar expression
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarCaseTest *>
+	static CScalarCaseTest *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -59,13 +59,13 @@ class CDXLScalarAggref : public CDXLScalar
 {
 private:
 	// catalog id of the function
-	gpos::owner<IMDId *> m_agg_func_mdid;
+	gpos::Ref<IMDId> m_agg_func_mdid;
 
 	// resolved return type refers to a non-ambiguous type that was resolved during query
 	// parsing if the actual return type of Agg is ambiguous (e.g., AnyElement in GPDB)
 	// if resolved return type is NULL, then we can get Agg return type by looking up MD cache
 	// using Agg MDId
-	gpos::owner<IMDId *> m_resolved_rettype_mdid;
+	gpos::Ref<IMDId> m_resolved_rettype_mdid;
 
 	// Denotes whether it's agg(DISTINCT ...)
 	BOOL m_is_distinct;
@@ -75,16 +75,16 @@ private:
 
 	EdxlAggrefKind m_aggkind;
 
-	gpos::owner<ULongPtrArray *> m_argtypes;
+	gpos::Ref<ULongPtrArray> m_argtypes;
 
 public:
 	CDXLScalarAggref(const CDXLScalarAggref &) = delete;
 
 	// ctor/dtor
-	CDXLScalarAggref(CMemoryPool *mp, gpos::owner<IMDId *> agg_mdid,
-					 gpos::owner<IMDId *> resolved_rettype, BOOL is_distinct,
+	CDXLScalarAggref(CMemoryPool *mp, gpos::Ref<IMDId> agg_mdid,
+					 gpos::Ref<IMDId> resolved_rettype, BOOL is_distinct,
 					 EdxlAggrefStage agg_stage, EdxlAggrefKind aggkind,
-					 gpos::owner<ULongPtrArray *> argtypes);
+					 gpos::Ref<ULongPtrArray> argtypes);
 
 	~CDXLScalarAggref() override;
 
@@ -93,9 +93,9 @@ public:
 
 	const CWStringConst *GetOpNameStr() const override;
 
-	gpos::pointer<IMDId *> GetDXLAggFuncMDid() const;
+	IMDId *GetDXLAggFuncMDid() const;
 
-	gpos::pointer<IMDId *> GetDXLResolvedRetTypeMDid() const;
+	IMDId *GetDXLResolvedRetTypeMDid() const;
 
 	const CWStringConst *GetDXLStrAggStage() const;
 
@@ -111,23 +111,22 @@ public:
 		return m_aggkind;
 	}
 
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetArgTypes() const
 	{
-		return m_argtypes;
+		return m_argtypes.get();
 	}
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	void SerializeValuesListChildToDXL(CXMLSerializer *xml_serializer,
-									   gpos::pointer<const CDXLNode *> dxlnode,
-									   ULONG index,
+									   const CDXLNode *dxlnode, ULONG index,
 									   const CHAR *attr_name) const;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarAggref *>
+	static CDXLScalarAggref *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -142,7 +141,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

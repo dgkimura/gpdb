@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumBool::CDXLDatumBool(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+CDXLDatumBool::CDXLDatumBool(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 							 BOOL is_null, BOOL value)
 	: CDXLDatum(mp, std::move(mdid_type), default_type_modifier, is_null,
 				1 /*length*/),

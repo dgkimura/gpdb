@@ -32,10 +32,10 @@ namespace gpopt
 {
 // cleanup function for arrays
 class CExpression;
-using CExpressionArray = CDynamicPtrArray<CExpression, CleanupRelease>;
+using CExpressionArray = gpos::Vector<gpos::Ref<CExpression>>;
 
 // array of arrays of expression pointers
-using CExpressionArrays = CDynamicPtrArray<CExpressionArray, CleanupRelease>;
+using CExpressionArrays = gpos::Vector<gpos::Ref<CExpressionArray>>;
 
 class CGroupExpression;
 class CDrvdPropPlan;
@@ -64,28 +64,28 @@ private:
 	CMemoryPool *m_mp;
 
 	// operator class
-	gpos::owner<COperator *> m_pop;
+	gpos::Ref<COperator> m_pop;
 
 	// array of children
-	gpos::owner<CExpressionArray *> m_pdrgpexpr;
+	gpos::Ref<CExpressionArray> m_pdrgpexpr;
 
 	// derived relational properties
-	gpos::owner<CDrvdPropRelational *> m_pdprel;
+	gpos::Ref<CDrvdPropRelational> m_pdprel;
 
 	// derived stats
-	gpos::owner<IStatistics *> m_pstats;
+	gpos::Ref<IStatistics> m_pstats;
 
 	// required plan properties
-	gpos::owner<CReqdPropPlan *> m_prpp;
+	gpos::Ref<CReqdPropPlan> m_prpp;
 
 	// derived physical properties
-	gpos::owner<CDrvdPropPlan *> m_pdpplan;
+	gpos::Ref<CDrvdPropPlan> m_pdpplan;
 
 	// derived scalar properties
-	gpos::owner<CDrvdPropScalar *> m_pdpscalar;
+	gpos::Ref<CDrvdPropScalar> m_pdpscalar;
 
 	// group reference to Memo
-	gpos::pointer<CGroupExpression *> m_pgexpr;
+	CGroupExpression *m_pgexpr;
 
 	// cost of physical expression node when copied out of the memo
 	CCost m_cost;
@@ -97,7 +97,7 @@ private:
 	ULONG m_ulOriginGrpExprId;
 
 	// get expression's derived property given its type
-	gpos::pointer<CDrvdProp *> Pdp(const CDrvdProp::EPropType ept) const;
+	CDrvdProp *Pdp(const CDrvdProp::EPropType ept) const;
 
 #ifdef GPOS_DEBUG
 
@@ -126,44 +126,43 @@ public:
 	// ctor's with different arity
 
 	// ctor for leaf nodes
-	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-				gpos::pointer<CGroupExpression *> pgexpr = nullptr);
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				CGroupExpression *pgexpr = nullptr);
 
 	// ctor for unary expressions
-	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-				gpos::owner<CExpression *> pexpr);
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				gpos::Ref<CExpression> pexpr);
 
 	// ctor for binary expressions
-	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-				gpos::owner<CExpression *> pexprChildFirst,
-				gpos::owner<CExpression *> pexprChildSecond);
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				gpos::Ref<CExpression> pexprChildFirst,
+				gpos::Ref<CExpression> pexprChildSecond);
 
 	// ctor for ternary expressions
-	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-				gpos::owner<CExpression *> pexprChildFirst,
-				gpos::owner<CExpression *> pexprChildSecond,
-				gpos::owner<CExpression *> pexprChildThird);
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				gpos::Ref<CExpression> pexprChildFirst,
+				gpos::Ref<CExpression> pexprChildSecond,
+				gpos::Ref<CExpression> pexprChildThird);
 
 	// ctor n-ary expressions
-	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-				gpos::owner<CExpressionArray *> pdrgpexpr);
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// ctor for n-ary expression with origin group expression
-	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-				gpos::pointer<CGroupExpression *> pgexpr,
-				gpos::owner<CExpressionArray *> pdrgpexpr,
-				gpos::owner<CReqdPropPlan *> prpp, IStatistics *input_stats,
+	CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+				CGroupExpression *pgexpr, gpos::Ref<CExpressionArray> pdrgpexpr,
+				gpos::Ref<CReqdPropPlan> prpp, IStatistics *input_stats,
 				CCost cost);
 
 	// dtor
 	~CExpression() override;
 
 	// shorthand to access children
-	gpos::pointer<CExpression *>
+	CExpression *
 	operator[](ULONG ulPos) const
 	{
 		GPOS_ASSERT(nullptr != m_pdrgpexpr);
-		return (*m_pdrgpexpr)[ulPos];
+		return (*m_pdrgpexpr)[ulPos].get();
 	};
 
 	// arity function
@@ -174,45 +173,45 @@ public:
 	}
 
 	// accessor for operator
-	gpos::pointer<COperator *>
+	COperator *
 	Pop() const
 	{
 		GPOS_ASSERT(nullptr != m_pop);
-		return m_pop;
+		return m_pop.get();
 	}
 
 	// accessor of children array
-	gpos::pointer<CExpressionArray *>
+	CExpressionArray *
 	PdrgPexpr() const
 	{
-		return m_pdrgpexpr;
+		return m_pdrgpexpr.get();
 	}
 
 	// accessor for origin group expression
-	gpos::pointer<CGroupExpression *>
+	CGroupExpression *
 	Pgexpr() const
 	{
 		return m_pgexpr;
 	}
 
 	// accessor for computed required plan props
-	gpos::pointer<CReqdPropPlan *>
+	CReqdPropPlan *
 	Prpp() const
 	{
-		return m_prpp;
+		return m_prpp.get();
 	}
 
-	gpos::pointer<CDrvdPropRelational *> GetDrvdPropRelational() const;
+	CDrvdPropRelational *GetDrvdPropRelational() const;
 
-	gpos::pointer<CDrvdPropPlan *> GetDrvdPropPlan() const;
+	CDrvdPropPlan *GetDrvdPropPlan() const;
 
-	gpos::pointer<CDrvdPropScalar *> GetDrvdPropScalar() const;
+	CDrvdPropScalar *GetDrvdPropScalar() const;
 
 	// get derived statistics object
-	gpos::pointer<const IStatistics *>
+	const IStatistics *
 	Pstats() const
 	{
-		return m_pstats;
+		return m_pstats.get();
 	}
 
 	// cost accessor
@@ -231,8 +230,8 @@ public:
 	CDrvdProp *PdpDerive(CDrvdPropCtxt *pdpctxt = nullptr);
 
 	// derive statistics
-	gpos::pointer<IStatistics *> PstatsDerive(CReqdPropRelational *prprel,
-											  IStatisticsArray *stats_ctxt);
+	IStatistics *PstatsDerive(CReqdPropRelational *prprel,
+							  IStatisticsArray *stats_ctxt);
 
 	// reset a derived property
 	void ResetDerivedProperty(CDrvdProp::EPropType ept);
@@ -254,25 +253,25 @@ public:
 								BOOL fLast = true) const;
 
 	// match with group expression
-	BOOL FMatchPattern(gpos::pointer<CGroupExpression *> pgexpr) const;
+	BOOL FMatchPattern(CGroupExpression *pgexpr) const;
 
 	// return a copy of the expression with remapped columns
-	gpos::owner<CExpression *> PexprCopyWithRemappedColumns(
+	gpos::Ref<CExpression> PexprCopyWithRemappedColumns(
 		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) const;
 
 	// compare entire expression rooted here
-	BOOL Matches(gpos::pointer<CExpression *> pexpr) const;
+	BOOL Matches(CExpression *pexpr) const;
 
 #ifdef GPOS_DEBUG
 	// match against given pattern
-	BOOL FMatchPattern(gpos::pointer<CExpression *> pexpr) const;
+	BOOL FMatchPattern(CExpression *pexpr) const;
 
 	// match children against given pattern
-	BOOL FMatchPatternChildren(gpos::pointer<CExpression *> pexpr) const;
+	BOOL FMatchPatternChildren(CExpression *pexpr) const;
 
 	// compare entire expression rooted here
-	BOOL FMatchDebug(gpos::pointer<CExpression *> pexpr) const;
+	BOOL FMatchDebug(CExpression *pexpr) const;
 
 	// debug print; for interactive debugging sessions only
 	// prints expression properties as well
@@ -280,20 +279,18 @@ public:
 #endif	// GPOS_DEBUG
 
 	// check if the expression satisfies given required properties
-	BOOL FValidPlan(gpos::pointer<const CReqdPropPlan *> prpp,
-					CDrvdPropCtxtPlan *pdpctxtplan);
+	BOOL FValidPlan(const CReqdPropPlan *prpp, CDrvdPropCtxtPlan *pdpctxtplan);
 
 	// static hash function
-	static ULONG HashValue(gpos::pointer<const CExpression *> pexpr);
+	static ULONG HashValue(const CExpression *pexpr);
 
 	// static hash function
-	static ULONG UlHashDedup(gpos::pointer<const CExpression *> pexpr);
+	static ULONG UlHashDedup(const CExpression *pexpr);
 
 	// rehydrate expression from a given cost context and child expressions
-	static gpos::owner<CExpression *> PexprRehydrate(
-		CMemoryPool *mp, gpos::pointer<CCostContext *> pcc,
-		gpos::owner<CExpressionArray *> pdrgpexpr,
-		CDrvdPropCtxtPlan *pdpctxtplan);
+	static gpos::Ref<CExpression> PexprRehydrate(
+		CMemoryPool *mp, CCostContext *pcc,
+		gpos::Ref<CExpressionArray> pdrgpexpr, CDrvdPropCtxtPlan *pdpctxtplan);
 
 	// Relational property accessors - derived as needed
 	CColRefSet *DeriveOuterReferences();

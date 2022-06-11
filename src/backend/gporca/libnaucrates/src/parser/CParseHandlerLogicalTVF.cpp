@@ -65,8 +65,9 @@ CParseHandlerLogicalTVF::StartElement(const XMLCh *const element_uri,
 	{
 		// parse function id
 		m_func_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenFuncId,
-			EdxltokenLogicalTVF);
+						  m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+						  EdxltokenFuncId, EdxltokenLogicalTVF)
+						  .get();
 
 		// parse function name
 		const XMLCh *func_name = CDXLOperatorFactory::ExtractAttrValue(
@@ -80,8 +81,9 @@ CParseHandlerLogicalTVF::StartElement(const XMLCh *const element_uri,
 
 		// parse function return type
 		m_return_type_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId,
-			EdxltokenLogicalTVF);
+								 m_parse_handler_mgr->GetDXLMemoryManager(),
+								 attrs, EdxltokenTypeId, EdxltokenLogicalTVF)
+								 .get();
 	}
 	else if (0 ==
 			 XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenColumns),
@@ -151,8 +153,8 @@ CParseHandlerLogicalTVF::EndElement(const XMLCh *const,	 // element_uri,
 		col_descr_parse_handler->GetDXLColumnDescrArray();
 	GPOS_ASSERT(nullptr != cold_descr_dxl_array);
 
-	cold_descr_dxl_array->AddRef();
-	gpos::owner<CDXLLogicalTVF *> lg_tvf_op = GPOS_NEW(m_mp) CDXLLogicalTVF(
+	;
+	gpos::Ref<CDXLLogicalTVF> lg_tvf_op = GPOS_NEW(m_mp) CDXLLogicalTVF(
 		m_mp, m_func_mdid, m_return_type_mdid, m_mdname, cold_descr_dxl_array);
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, lg_tvf_op);

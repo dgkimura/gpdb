@@ -33,14 +33,14 @@ private:
 	ULONG m_id;
 
 	// output column ids
-	gpos::owner<ULongPtrArray *> m_output_colids_array;
+	gpos::Ref<ULongPtrArray> m_output_colids_array;
 
 public:
 	CDXLLogicalCTEConsumer(CDXLLogicalCTEConsumer &) = delete;
 
 	// ctor
 	CDXLLogicalCTEConsumer(CMemoryPool *mp, ULONG id,
-						   gpos::owner<ULongPtrArray *> output_colids_array);
+						   gpos::Ref<ULongPtrArray> output_colids_array);
 
 	// dtor
 	~CDXLLogicalCTEConsumer() override;
@@ -58,15 +58,15 @@ public:
 		return m_id;
 	}
 
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetOutputColIdsArray() const
 	{
-		return m_output_colids_array;
+		return m_output_colids_array.get();
 	}
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// check if given column is defined by operator
 	BOOL IsColDefined(ULONG colid) const override;
@@ -74,12 +74,11 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static gpos::cast_func<CDXLLogicalCTEConsumer *>
+	static CDXLLogicalCTEConsumer *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

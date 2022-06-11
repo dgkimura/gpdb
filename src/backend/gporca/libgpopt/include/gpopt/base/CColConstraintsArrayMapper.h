@@ -16,14 +16,14 @@ class CColConstraintsArrayMapper : public IColConstraintsMapper
 {
 public:
 	CColConstraintsArrayMapper(gpos::CMemoryPool *mp,
-							   gpos::owner<CConstraintArray *> pdrgpcnstr);
-	gpos::owner<CConstraintArray *> PdrgPcnstrLookup(CColRef *colref) override;
+							   gpos::Ref<CConstraintArray> pdrgpcnstr);
+	gpos::Ref<CConstraintArray> PdrgPcnstrLookup(CColRef *colref) override;
 
 	~CColConstraintsArrayMapper() override;
 
 private:
 	gpos::CMemoryPool *m_mp;
-	gpos::owner<CConstraintArray *> m_pdrgpcnstr;
+	gpos::Ref<CConstraintArray> m_pdrgpcnstr;
 };
 }  // namespace gpopt
 

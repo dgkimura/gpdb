@@ -29,9 +29,10 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSubqueryAll::CDXLScalarSubqueryAll(
-	CMemoryPool *mp, gpos::owner<IMDId *> scalar_op_mdid,
-	CMDName *scalar_op_mdname, ULONG colid)
+CDXLScalarSubqueryAll::CDXLScalarSubqueryAll(CMemoryPool *mp,
+											 gpos::Ref<IMDId> scalar_op_mdid,
+											 CMDName *scalar_op_mdname,
+											 ULONG colid)
 	: CDXLScalarSubqueryQuantified(mp, std::move(scalar_op_mdid),
 								   scalar_op_mdname, colid)
 {

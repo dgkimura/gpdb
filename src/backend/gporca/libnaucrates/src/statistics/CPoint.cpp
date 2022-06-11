@@ -30,7 +30,7 @@ FORCE_GENERATE_DBGSTR(CPoint);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPoint::CPoint(gpos::owner<IDatum *> datum) : m_datum(std::move(datum))
+CPoint::CPoint(gpos::Ref<IDatum> datum) : m_datum(std::move(datum))
 {
 	GPOS_ASSERT(nullptr != m_datum);
 }
@@ -44,10 +44,10 @@ CPoint::CPoint(gpos::owner<IDatum *> datum) : m_datum(std::move(datum))
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::Equals(gpos::pointer<const CPoint *> point) const
+CPoint::Equals(const CPoint *point) const
 {
 	GPOS_ASSERT(nullptr != point);
-	return m_datum->StatsAreEqual(point->m_datum);
+	return m_datum->StatsAreEqual(point->m_datum.get());
 }
 
 //---------------------------------------------------------------------------
@@ -59,7 +59,7 @@ CPoint::Equals(gpos::pointer<const CPoint *> point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::IsNotEqual(gpos::pointer<const CPoint *> point) const
+CPoint::IsNotEqual(const CPoint *point) const
 {
 	return !(this->Equals(point));
 }
@@ -73,11 +73,11 @@ CPoint::IsNotEqual(gpos::pointer<const CPoint *> point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::IsLessThan(gpos::pointer<const CPoint *> point) const
+CPoint::IsLessThan(const CPoint *point) const
 {
 	GPOS_ASSERT(nullptr != point);
-	return m_datum->StatsAreComparable(point->m_datum) &&
-		   m_datum->StatsAreLessThan(point->m_datum);
+	return m_datum->StatsAreComparable(point->m_datum.get()) &&
+		   m_datum->StatsAreLessThan(point->m_datum.get());
 }
 
 //---------------------------------------------------------------------------
@@ -89,7 +89,7 @@ CPoint::IsLessThan(gpos::pointer<const CPoint *> point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::IsLessThanOrEqual(gpos::pointer<const CPoint *> point) const
+CPoint::IsLessThanOrEqual(const CPoint *point) const
 {
 	return (this->IsLessThan(point) || this->Equals(point));
 }
@@ -103,10 +103,10 @@ CPoint::IsLessThanOrEqual(gpos::pointer<const CPoint *> point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::IsGreaterThan(gpos::pointer<const CPoint *> point) const
+CPoint::IsGreaterThan(const CPoint *point) const
 {
-	return m_datum->StatsAreComparable(point->m_datum) &&
-		   m_datum->StatsAreGreaterThan(point->m_datum);
+	return m_datum->StatsAreComparable(point->m_datum.get()) &&
+		   m_datum->StatsAreGreaterThan(point->m_datum.get());
 }
 
 //---------------------------------------------------------------------------
@@ -118,14 +118,14 @@ CPoint::IsGreaterThan(gpos::pointer<const CPoint *> point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::IsGreaterThanOrEqual(gpos::pointer<const CPoint *> point) const
+CPoint::IsGreaterThanOrEqual(const CPoint *point) const
 {
 	return (this->IsGreaterThan(point) || this->Equals(point));
 }
 
 // Distance between two points, assuming closed lower bound and open upper bound
 CDouble
-CPoint::Distance(gpos::pointer<const CPoint *> point) const
+CPoint::Distance(const CPoint *point) const
 {
 	return Width(point, true /*include_lower*/, false /*include_upper*/);
 }
@@ -134,17 +134,16 @@ CPoint::Distance(gpos::pointer<const CPoint *> point) const
 // this" is usually the higher value and "point" is the lower value
 // [0,5) would return 5, [0,5] would return 6 and (0,5) would return 4
 CDouble
-CPoint::Width(gpos::pointer<const CPoint *> point, BOOL include_lower,
-			  BOOL include_upper) const
+CPoint::Width(const CPoint *point, BOOL include_lower, BOOL include_upper) const
 {
 	// default to a non zero constant for overlap computation
 	CDouble width = CDouble(1.0);
 	CDouble adjust = CDouble(0.0);
 	GPOS_ASSERT(nullptr != point);
-	if (m_datum->StatsAreComparable(point->m_datum))
+	if (m_datum->StatsAreComparable(point->m_datum.get()))
 	{
 		// default case [this, point) or (this, point]
-		width = CDouble(m_datum->GetStatsDistanceFrom(point->m_datum));
+		width = CDouble(m_datum->GetStatsDistanceFrom(point->m_datum.get()));
 		if (m_datum->IsDatumMappableToLINT())
 		{
 			adjust = CDouble(1.0);
@@ -231,11 +230,11 @@ CPoint::MaxPoint(CPoint *point1, CPoint *point2)
 //	@doc:
 //		Translate the point into its DXL representation
 //---------------------------------------------------------------------------
-gpos::owner<CDXLDatum *>
+gpos::Ref<CDXLDatum>
 CPoint::GetDatumVal(CMemoryPool *mp, CMDAccessor *md_accessor) const
 {
-	gpos::pointer<IMDId *> mdid = m_datum->MDId();
-	return md_accessor->RetrieveType(mdid)->GetDatumVal(mp, m_datum);
+	IMDId *mdid = m_datum->MDId();
+	return md_accessor->RetrieveType(mdid)->GetDatumVal(mp, m_datum.get());
 }
 
 // EOF

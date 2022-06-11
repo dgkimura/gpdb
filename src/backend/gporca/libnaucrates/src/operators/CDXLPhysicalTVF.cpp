@@ -28,9 +28,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalTVF::CDXLPhysicalTVF(CMemoryPool *mp,
-								 gpos::owner<IMDId *> mdid_func,
-								 gpos::owner<IMDId *> mdid_return_type,
+CDXLPhysicalTVF::CDXLPhysicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+								 gpos::Ref<IMDId> mdid_return_type,
 								 CWStringConst *str)
 	: CDXLPhysical(mp),
 	  m_func_mdid(std::move(mdid_func)),
@@ -53,8 +52,8 @@ CDXLPhysicalTVF::CDXLPhysicalTVF(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLPhysicalTVF::~CDXLPhysicalTVF()
 {
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
+	;
+	;
 	GPOS_DELETE(func_name);
 }
 
@@ -96,7 +95,7 @@ CDXLPhysicalTVF::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
-								gpos::pointer<const CDXLNode *> dxlnode) const
+								const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -128,7 +127,7 @@ CDXLPhysicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalTVF::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalTVF::AssertValid(const CDXLNode *dxlnode,
 							 BOOL validate_children) const
 {
 	// assert validity of function id and return type
@@ -138,7 +137,7 @@ CDXLPhysicalTVF::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[idx];
+		CDXLNode *dxlnode_arg = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

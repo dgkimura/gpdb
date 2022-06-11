@@ -37,7 +37,7 @@ class CParseHandlerValuesScan : public CParseHandlerPhysicalOp
 {
 private:
 	// the ValuesScan operator
-	gpos::pointer<CDXLPhysicalValuesScan *> m_dxl_op;
+	CDXLPhysicalValuesScan *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

@@ -64,7 +64,7 @@ CleanupRelease(T *elem)
 // arrays of unsigned integers
 using ULongPtrArray = CDynamicPtrArray<ULONG, CleanupDelete>;
 // array of unsigned integer arrays
-using ULongPtr2dArray = CDynamicPtrArray<ULongPtrArray, CleanupRelease>;
+using ULongPtr2dArray = gpos::Vector<gpos::Ref<ULongPtrArray>>;
 
 // arrays of integers
 using IntPtrArray = CDynamicPtrArray<INT, CleanupDelete>;
@@ -207,7 +207,7 @@ public:
 
 	// append array -- flatten it
 	void
-	AppendArray(gpos::pointer<const CDynamicPtrArray<T, CleanupFn> *> arr)
+	AppendArray(const CDynamicPtrArray<T, CleanupFn> *arr)
 	{
 		GPOS_ASSERT(nullptr != arr);
 		GPOS_ASSERT(this != arr && "Cannot append array to itself");
@@ -251,7 +251,7 @@ public:
 
 	// equality check
 	BOOL
-	Equals(gpos::pointer<const CDynamicPtrArray<T, CleanupFn> *> arr) const
+	Equals(const CDynamicPtrArray<T, CleanupFn> *arr) const
 	{
 		BOOL is_equal = (Size() == arr->Size());
 
@@ -359,15 +359,13 @@ public:
 	// in the second array if the first array is not included in the second,
 	// return null
 	// equality comparison between elements is via the "==" operator
-	gpos::owner<ULongPtrArray *>
-	IndexesOfSubsequence(
-		gpos::pointer<CDynamicPtrArray<T, CleanupFn> *> subsequence)
+	gpos::Ref<ULongPtrArray>
+	IndexesOfSubsequence(CDynamicPtrArray<T, CleanupFn> *subsequence)
 	{
 		GPOS_ASSERT(nullptr != subsequence);
 
 		ULONG subsequence_length = subsequence->Size();
-		gpos::owner<ULongPtrArray *> indexes =
-			GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+		gpos::Ref<ULongPtrArray> indexes = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 
 		for (ULONG ul1 = 0; ul1 < subsequence_length; ul1++)
 		{
@@ -376,7 +374,7 @@ public:
 			if (gpos::ulong_max == index)
 			{
 				// not found
-				indexes->Release();
+				;
 				return nullptr;
 			}
 
@@ -386,10 +384,10 @@ public:
 	}
 
 	// Eliminate members from an array that are not contained in a given list of indexes
-	gpos::owner<CDynamicPtrArray<T, CleanupFn> *>
-	CreateReducedArray(gpos::pointer<ULongPtrArray *> indexes_to_choose)
+	gpos::Ref<CDynamicPtrArray<T, CleanupFn>>
+	CreateReducedArray(ULongPtrArray *indexes_to_choose)
 	{
-		gpos::owner<CDynamicPtrArray<T, CleanupFn> *> result =
+		gpos::Ref<CDynamicPtrArray<T, CleanupFn>> result =
 			GPOS_NEW(m_mp) CDynamicPtrArray<T, CleanupFn>(m_mp, m_min_size,
 														  m_expansion_factor);
 		ULONG list_size = indexes_to_choose->Size();

@@ -27,8 +27,8 @@ using namespace gpdxl;
 //		Constructs a column reference
 //
 //---------------------------------------------------------------------------
-CDXLColRef::CDXLColRef(CMDName *mdname, ULONG id,
-					   gpos::owner<IMDId *> mdid_type, INT type_modifier)
+CDXLColRef::CDXLColRef(CMDName *mdname, ULONG id, gpos::Ref<IMDId> mdid_type,
+					   INT type_modifier)
 	: m_mdname(mdname),
 	  m_id(id),
 	  m_mdid_type(std::move(mdid_type)),
@@ -48,7 +48,7 @@ CDXLColRef::CDXLColRef(CMDName *mdname, ULONG id,
 CDXLColRef::~CDXLColRef()
 {
 	GPOS_DELETE(m_mdname);
-	m_mdid_type->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -73,10 +73,10 @@ CDXLColRef::MdName() const
 //		Returns column's type md id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLColRef::MdidType() const
 {
-	return m_mdid_type;
+	return m_mdid_type.get();
 }
 
 INT

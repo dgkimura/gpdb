@@ -30,15 +30,12 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalHashAgg::CPhysicalHashAgg(CMemoryPool *mp,
-								   gpos::owner<CColRefArray *> colref_array,
-								   gpos::pointer<CColRefArray *> pdrgpcrMinimal,
-								   COperator::EGbAggType egbaggtype,
-								   BOOL fGeneratesDuplicates,
-								   gpos::owner<CColRefArray *> pdrgpcrArgDQA,
-								   BOOL fMultiStage, BOOL isAggFromSplitDQA,
-								   CLogicalGbAgg::EAggStage aggStage,
-								   BOOL should_enforce_distribution)
+CPhysicalHashAgg::CPhysicalHashAgg(
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	BOOL fGeneratesDuplicates, gpos::Ref<CColRefArray> pdrgpcrArgDQA,
+	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+	BOOL should_enforce_distribution)
 	: CPhysicalAgg(mp, std::move(colref_array), pdrgpcrMinimal, egbaggtype,
 				   fGeneratesDuplicates, std::move(pdrgpcrArgDQA), fMultiStage,
 				   isAggFromSplitDQA, aggStage, should_enforce_distribution)
@@ -65,17 +62,17 @@ CPhysicalHashAgg::~CPhysicalHashAgg() = default;
 //		Compute required sort columns of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<COrderSpec *>
+gpos::Ref<COrderSpec>
 CPhysicalHashAgg::PosRequired(CMemoryPool *mp,
-							  CExpressionHandle &,			// exprhdl
-							  gpos::pointer<COrderSpec *>,	// posRequired
+							  CExpressionHandle &,	// exprhdl
+							  COrderSpec *,			// posRequired
 							  ULONG
 #ifdef GPOS_DEBUG
 								  child_index
 #endif	// GPOS_DEBUG
 							  ,
-							  gpos::pointer<CDrvdPropArray *>,	// pdrgpdpCtxt
-							  ULONG								// ulOptReq
+							  CDrvdPropArray *,	 // pdrgpdpCtxt
+							  ULONG				 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -93,7 +90,7 @@ CPhysicalHashAgg::PosRequired(CMemoryPool *mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-gpos::owner<COrderSpec *>
+gpos::Ref<COrderSpec>
 CPhysicalHashAgg::PosDerive(CMemoryPool *mp,
 							CExpressionHandle &	 // exprhdl
 ) const
@@ -113,7 +110,7 @@ CPhysicalHashAgg::PosDerive(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalHashAgg::EpetOrder(CExpressionHandle &,  // exprhdl
-							gpos::pointer<const CEnfdOrder *>
+							const CEnfdOrder *
 #ifdef GPOS_DEBUG
 								peo
 #endif	// GPOS_DEBUG

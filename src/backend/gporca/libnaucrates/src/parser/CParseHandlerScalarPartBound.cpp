@@ -65,7 +65,7 @@ CParseHandlerScalarPartBound::StartElement(
 	ULONG partition_level = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenPartLevel,
 		EdxltokenScalarPartBound);
-	gpos::owner<IMDId *> m_mdid_type =
+	gpos::Ref<IMDId> m_mdid_type =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMDType,
 			EdxltokenScalarPartBound);

@@ -30,8 +30,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCast::CDXLScalarCast(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
-							   gpos::owner<IMDId *> func_mdid)
+CDXLScalarCast::CDXLScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+							   gpos::Ref<IMDId> func_mdid)
 	: CDXLScalar(mp),
 	  m_mdid_type(std::move(mdid_type)),
 	  m_func_mdid(std::move(func_mdid))
@@ -51,8 +51,8 @@ CDXLScalarCast::CDXLScalarCast(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
 //---------------------------------------------------------------------------
 CDXLScalarCast::~CDXLScalarCast()
 {
-	m_mdid_type->Release();
-	m_func_mdid->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -91,10 +91,10 @@ CDXLScalarCast::GetOpNameStr() const
 //		Return the oid of the type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarCast::MdidType() const
 {
-	return m_mdid_type;
+	return m_mdid_type.get();
 }
 
 //---------------------------------------------------------------------------
@@ -105,10 +105,10 @@ CDXLScalarCast::MdidType() const
 //		Casting function id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarCast::FuncMdId() const
 {
-	return m_func_mdid;
+	return m_func_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -121,7 +121,7 @@ CDXLScalarCast::FuncMdId() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarCast::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   gpos::pointer<const CDXLNode *> dxlnode) const
+							   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -150,7 +150,7 @@ BOOL
 CDXLScalarCast::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
+			md_accessor->RetrieveType(m_mdid_type.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG
@@ -163,12 +163,12 @@ CDXLScalarCast::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCast::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarCast::AssertValid(const CDXLNode *dxlnode,
 							BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[0];
+	CDXLNode *child_dxlnode = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeScalar ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

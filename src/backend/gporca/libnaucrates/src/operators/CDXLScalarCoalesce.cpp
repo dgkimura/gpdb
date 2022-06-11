@@ -30,7 +30,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarCoalesce::CDXLScalarCoalesce(CMemoryPool *mp,
-									   gpos::owner<IMDId *> mdid_type)
+									   gpos::Ref<IMDId> mdid_type)
 	: CDXLScalar(mp), m_mdid_type(std::move(mdid_type))
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
@@ -46,7 +46,7 @@ CDXLScalarCoalesce::CDXLScalarCoalesce(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarCoalesce::~CDXLScalarCoalesce()
 {
-	m_mdid_type->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -87,7 +87,7 @@ CDXLScalarCoalesce::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarCoalesce::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   gpos::pointer<const CDXLNode *> node) const
+								   const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -112,7 +112,7 @@ BOOL
 CDXLScalarCoalesce::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
+			md_accessor->RetrieveType(m_mdid_type.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG
@@ -125,7 +125,7 @@ CDXLScalarCoalesce::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCoalesce::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLScalarCoalesce::AssertValid(const CDXLNode *node,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(0 < node->Arity());
@@ -133,7 +133,7 @@ CDXLScalarCoalesce::AssertValid(gpos::pointer<const CDXLNode *> node,
 	const ULONG arity = node->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		gpos::pointer<CDXLNode *> child_dxlnode = (*node)[ul];
+		CDXLNode *child_dxlnode = (*node)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

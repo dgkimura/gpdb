@@ -80,9 +80,8 @@ CXformJoinCommutativity::FCompatible(CXform::EXformId exfid)
 //
 //---------------------------------------------------------------------------
 void
-CXformJoinCommutativity::Transform(gpos::pointer<CXformContext *> pxfctxt,
-								   gpos::pointer<CXformResult *> pxfres,
-								   gpos::pointer<CExpression *> pexpr) const
+CXformJoinCommutativity::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+								   CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -96,12 +95,12 @@ CXformJoinCommutativity::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	CExpression *pexprScalar = (*pexpr)[2];
 
 	// addref children
-	pexprLeft->AddRef();
-	pexprRight->AddRef();
-	pexprScalar->AddRef();
+	;
+	;
+	;
 
 	// assemble transformed expression
-	gpos::owner<CExpression *> pexprAlt =
+	gpos::Ref<CExpression> pexprAlt =
 		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprRight, pexprLeft,
 													pexprScalar);
 

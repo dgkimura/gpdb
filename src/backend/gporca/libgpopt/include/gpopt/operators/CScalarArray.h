@@ -23,7 +23,7 @@ namespace gpopt
 using namespace gpos;
 using namespace gpmd;
 
-using CScalarConstArray = CDynamicPtrArray<CScalarConst, CleanupRelease>;
+using CScalarConstArray = gpos::Vector<gpos::Ref<CScalarConst>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -37,30 +37,28 @@ class CScalarArray : public CScalar
 {
 private:
 	// element type id
-	gpos::owner<IMDId *> m_pmdidElem;
+	gpos::Ref<IMDId> m_pmdidElem;
 
 	// array type id
-	gpos::owner<IMDId *> m_pmdidArray;
+	gpos::Ref<IMDId> m_pmdidArray;
 
 	// is array multidimensional
 	BOOL m_fMultiDimensional;
 
 	// const values
-	gpos::owner<CScalarConstArray *> m_pdrgPconst;
+	gpos::Ref<CScalarConstArray> m_pdrgPconst;
 
 public:
 	CScalarArray(const CScalarArray &) = delete;
 
 	// ctor
-	CScalarArray(CMemoryPool *mp, gpos::owner<IMDId *> elem_type_mdid,
-				 gpos::owner<IMDId *> array_type_mdid,
-				 BOOL is_multidimenstional);
+	CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+				 gpos::Ref<IMDId> array_type_mdid, BOOL is_multidimenstional);
 
 	// ctor
-	CScalarArray(CMemoryPool *mp, gpos::owner<IMDId *> elem_type_mdid,
-				 gpos::owner<IMDId *> array_type_mdid,
-				 BOOL is_multidimenstional,
-				 gpos::owner<CScalarConstArray *> pdrgPconst);
+	CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+				 gpos::Ref<IMDId> array_type_mdid, BOOL is_multidimenstional,
+				 gpos::Ref<CScalarConstArray> pdrgPconst);
 
 	// dtor
 	~CScalarArray() override;
@@ -84,7 +82,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -94,18 +92,17 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarArray *>
+	static CScalarArray *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -115,19 +112,19 @@ public:
 	}
 
 	// element type id
-	gpos::pointer<IMDId *> PmdidElem() const;
+	IMDId *PmdidElem() const;
 
 	// array type id
-	gpos::pointer<IMDId *> PmdidArray() const;
+	IMDId *PmdidArray() const;
 
 	// is array multi-dimensional
 	BOOL FMultiDimensional() const;
 
 	// type of expression's result
-	gpos::pointer<IMDId *> MdidType() const override;
+	IMDId *MdidType() const override;
 
 	// CScalarConst array
-	gpos::pointer<CScalarConstArray *> PdrgPconst() const;
+	CScalarConstArray *PdrgPconst() const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

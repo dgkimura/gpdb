@@ -12,9 +12,8 @@
 namespace gpnaucrates
 {
 bool
-StatsPredColIdLess::operator()(
-	gpos::pointer<const gpnaucrates::CStatsPred *> a,
-	gpos::pointer<const gpnaucrates::CStatsPred *> b) const
+StatsPredColIdLess::operator()(const gpnaucrates::CStatsPred *a,
+							   const gpnaucrates::CStatsPred *b) const
 {
 	return a->GetColId() < b->GetColId();
 }

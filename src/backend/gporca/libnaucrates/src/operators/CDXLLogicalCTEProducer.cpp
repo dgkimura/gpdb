@@ -32,7 +32,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalCTEProducer::CDXLLogicalCTEProducer(
-	CMemoryPool *mp, ULONG id, gpos::owner<ULongPtrArray *> output_colids_array)
+	CMemoryPool *mp, ULONG id, gpos::Ref<ULongPtrArray> output_colids_array)
 	: CDXLLogical(mp),
 	  m_id(id),
 	  m_output_colids_array(std::move(output_colids_array))
@@ -50,7 +50,7 @@ CDXLLogicalCTEProducer::CDXLLogicalCTEProducer(
 //---------------------------------------------------------------------------
 CDXLLogicalCTEProducer::~CDXLLogicalCTEProducer()
 {
-	m_output_colids_array->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -90,9 +90,8 @@ CDXLLogicalCTEProducer::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalCTEProducer::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLLogicalCTEProducer::SerializeToDXL(CXMLSerializer *xml_serializer,
+									   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -102,7 +101,7 @@ CDXLLogicalCTEProducer::SerializeToDXL(
 								 Id());
 
 	CWStringDynamic *str_colids =
-		CDXLUtils::Serialize(m_mp, m_output_colids_array);
+		CDXLUtils::Serialize(m_mp, m_output_colids_array.get());
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenColumns),
 								 str_colids);
 	GPOS_DELETE(str_colids);
@@ -122,12 +121,12 @@ CDXLLogicalCTEProducer::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalCTEProducer::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLLogicalCTEProducer::AssertValid(const CDXLNode *dxlnode,
 									BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[0];
+	CDXLNode *child_dxlnode = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeLogical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

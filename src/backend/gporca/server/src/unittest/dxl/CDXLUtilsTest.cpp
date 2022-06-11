@@ -131,7 +131,7 @@ CDXLUtilsTest::EresUnittest_SerializePlan()
 
 	ULLONG plan_id = gpos::ullong_max;
 	ULLONG plan_space_size = gpos::ullong_max;
-	gpos::owner<CDXLNode *> node = CDXLUtils::GetPlanDXLNode(
+	gpos::Ref<CDXLNode> node = CDXLUtils::GetPlanDXLNode(
 		mp, dxl_string, nullptr /*xsd_file_path*/, &plan_id, &plan_space_size);
 
 	// serialize with document header
@@ -149,8 +149,8 @@ CDXLUtilsTest::EresUnittest_SerializePlan()
 		{
 			oss << "Headers: " << rgfHeaders[ulHeaders]
 				<< ", indentation: " << rgfIndentation[ulIndent] << std::endl;
-			CDXLUtils::SerializePlan(mp, oss, node, plan_id, plan_space_size,
-									 rgfHeaders[ulHeaders],
+			CDXLUtils::SerializePlan(mp, oss, node.get(), plan_id,
+									 plan_space_size, rgfHeaders[ulHeaders],
 									 rgfIndentation[ulIndent]);
 			oss << std::endl;
 		}
@@ -160,7 +160,7 @@ CDXLUtilsTest::EresUnittest_SerializePlan()
 	GPOS_TRACE(str.GetBuffer());
 
 	// cleanup
-	node->Release();
+	;
 	GPOS_DELETE_ARRAY(dxl_string);
 
 	return GPOS_OK;

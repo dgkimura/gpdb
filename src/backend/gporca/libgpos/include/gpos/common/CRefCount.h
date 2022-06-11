@@ -103,7 +103,7 @@ public:
 			if (!Deletable())
 			{
 				// restore ref-count
-				AddRef();
+				;
 
 				// deletion is not allowed
 				GPOS_RAISE(CException::ExmaSystem,

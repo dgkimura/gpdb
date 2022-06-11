@@ -36,7 +36,7 @@ class CParseHandlerRandomMotion : public CParseHandlerPhysicalOp
 {
 private:
 	// motion operator
-	gpos::pointer<CDXLPhysicalRandomMotion *> m_dxl_op;
+	CDXLPhysicalRandomMotion *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

@@ -30,37 +30,36 @@ class CPhysicalStreamAgg : public CPhysicalAgg
 {
 private:
 	// local order spec
-	gpos::owner<COrderSpec *> m_pos;
+	gpos::Ref<COrderSpec> m_pos;
 
 	// set representation of minimal grouping columns
-	gpos::owner<CColRefSet *> m_pcrsMinimalGrpCols;
+	gpos::Ref<CColRefSet> m_pcrsMinimalGrpCols;
 
 	// construct order spec on grouping column so that it covers required order spec
-	static gpos::owner<COrderSpec *> PosCovering(
-		CMemoryPool *mp, gpos::pointer<COrderSpec *> posRequired,
-		gpos::pointer<CColRefArray *> pdrgpcrGrp);
+	static gpos::Ref<COrderSpec> PosCovering(CMemoryPool *mp,
+											 COrderSpec *posRequired,
+											 CColRefArray *pdrgpcrGrp);
 
 protected:
 	// compute required sort columns of the n-th child
-	gpos::owner<COrderSpec *> PosRequiredStreamAgg(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
-		gpos::pointer<CColRefArray *> pdrgpcrGrp) const;
+	gpos::Ref<COrderSpec> PosRequiredStreamAgg(CMemoryPool *mp,
+											   CExpressionHandle &exprhdl,
+											   COrderSpec *posRequired,
+											   ULONG child_index,
+											   CColRefArray *pdrgpcrGrp) const;
 
 	// initialize the order spec using the given array of columns
-	void InitOrderSpec(CMemoryPool *mp,
-					   gpos::pointer<CColRefArray *> pdrgpcrOrder);
+	void InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder);
 
 public:
 	CPhysicalStreamAgg(const CPhysicalStreamAgg &) = delete;
 
 	// ctor
 	CPhysicalStreamAgg(
-		CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-		gpos::pointer<CColRefArray *>
-			pdrgpcrMinimal,	 // minimal grouping columns based on FD's
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+		CColRefArray *pdrgpcrMinimal,  // minimal grouping columns based on FD's
 		COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-		gpos::owner<CColRefArray *> pdrgpcrArgDQA, BOOL fMultiStage,
+		gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,
 		BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
 		BOOL should_enforce_distribution = true
 		// should_enforce_distribution should be set to false if
@@ -92,15 +91,15 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required sort columns of the n-th child
-	gpos::owner<COrderSpec *>
+	gpos::Ref<COrderSpec>
 	PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
-				gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
-				ULONG							  //ulOptReq
+				COrderSpec *posRequired, ULONG child_index,
+				CDrvdPropArray *,  //pdrgpdpCtxt,
+				ULONG			   //ulOptReq
 	) const override
 	{
 		return PosRequiredStreamAgg(mp, exprhdl, posRequired, child_index,
-									m_pdrgpcrMinimal);
+									m_pdrgpcrMinimal.get());
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -108,8 +107,8 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	gpos::owner<COrderSpec *> PosDerive(
-		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
+	gpos::Ref<COrderSpec> PosDerive(CMemoryPool *mp,
+									CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -117,15 +116,14 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl,
-		gpos::pointer<const CEnfdOrder *> peo) const override;
+		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CPhysicalStreamAgg *>
+	static CPhysicalStreamAgg *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

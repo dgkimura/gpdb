@@ -21,7 +21,7 @@ using namespace gpdxl;
 // Ctor
 CDXLScalarPartListValues::CDXLScalarPartListValues(
 	CMemoryPool *mp, ULONG partitioning_level,
-	gpos::owner<IMDId *> result_type_mdid, gpos::owner<IMDId *> elem_type_mdid)
+	gpos::Ref<IMDId> result_type_mdid, gpos::Ref<IMDId> elem_type_mdid)
 	: CDXLScalar(mp),
 	  m_partitioning_level(partitioning_level),
 	  m_result_type_mdid(std::move(result_type_mdid)),
@@ -35,8 +35,8 @@ CDXLScalarPartListValues::CDXLScalarPartListValues(
 // Dtor
 CDXLScalarPartListValues::~CDXLScalarPartListValues()
 {
-	m_result_type_mdid->Release();
-	m_elem_type_mdid->Release();
+	;
+	;
 }
 
 // Operator type
@@ -61,17 +61,17 @@ CDXLScalarPartListValues::GetPartitioningLevel() const
 }
 
 // result type
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarPartListValues::GetResultTypeMdId() const
 {
-	return m_result_type_mdid;
+	return m_result_type_mdid.get();
 }
 
 // element type
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarPartListValues::GetElemTypeMdId() const
 {
-	return m_elem_type_mdid;
+	return m_elem_type_mdid.get();
 }
 
 // does the operator return a boolean result
@@ -84,9 +84,8 @@ CDXLScalarPartListValues::HasBoolResult(CMDAccessor *  //md_accessor
 
 // Serialize operator in DXL format
 void
-CDXLScalarPartListValues::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *>	 // dxlnode
+CDXLScalarPartListValues::SerializeToDXL(CXMLSerializer *xml_serializer,
+										 const CDXLNode *  // dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -107,7 +106,7 @@ CDXLScalarPartListValues::SerializeToDXL(
 #ifdef GPOS_DEBUG
 // Checks whether operator node is well-structured
 void
-CDXLScalarPartListValues::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarPartListValues::AssertValid(const CDXLNode *dxlnode,
 									  BOOL	// validate_children
 ) const
 {
@@ -116,7 +115,7 @@ CDXLScalarPartListValues::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 #endif	// GPOS_DEBUG
 
 // conversion function
-gpos::cast_func<CDXLScalarPartListValues *>
+CDXLScalarPartListValues *
 CDXLScalarPartListValues::Cast(CDXLOperator *dxl_op)
 {
 	GPOS_ASSERT(nullptr != dxl_op);

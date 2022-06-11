@@ -36,12 +36,12 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalDynamicIndexScan::CPhysicalDynamicIndexScan(
-	CMemoryPool *mp, gpos::owner<CIndexDescriptor *> pindexdesc,
-	gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId,
-	const CName *pnameAlias, gpos::owner<CColRefArray *> pdrgpcrOutput,
-	ULONG scan_id, gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
-	gpos::owner<COrderSpec *> pos, gpos::owner<IMdIdArray *> partition_mdids,
-	gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part)
+	CMemoryPool *mp, gpos::Ref<CIndexDescriptor> pindexdesc,
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+	const CName *pnameAlias, gpos::Ref<CColRefArray> pdrgpcrOutput,
+	ULONG scan_id, gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+	gpos::Ref<COrderSpec> pos, gpos::Ref<IMdIdArray> partition_mdids,
+	gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part)
 	: CPhysicalDynamicScan(
 		  mp, std::move(ptabdesc), ulOriginOpId, pnameAlias, scan_id,
 		  std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrPart),
@@ -64,8 +64,8 @@ CPhysicalDynamicIndexScan::CPhysicalDynamicIndexScan(
 //---------------------------------------------------------------------------
 CPhysicalDynamicIndexScan::~CPhysicalDynamicIndexScan()
 {
-	m_pindexdesc->Release();
-	m_pos->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -77,14 +77,13 @@ CPhysicalDynamicIndexScan::~CPhysicalDynamicIndexScan()
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalDynamicIndexScan::EpetOrder(
-	CExpressionHandle &,  // exprhdl
-	gpos::pointer<const CEnfdOrder *> peo) const
+CPhysicalDynamicIndexScan::EpetOrder(CExpressionHandle &,  // exprhdl
+									 const CEnfdOrder *peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
 
-	if (peo->FCompatible(m_pos))
+	if (peo->FCompatible(m_pos.get()))
 	{
 		// required order is already established by the index
 		return CEnfdProp::EpetUnnecessary;
@@ -120,7 +119,7 @@ CPhysicalDynamicIndexScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDynamicIndexScan::Matches(gpos::pointer<COperator *> pop) const
+CPhysicalDynamicIndexScan::Matches(COperator *pop) const
 {
 	return CUtils::FMatchDynamicIndex(this, pop);
 }
@@ -166,22 +165,22 @@ CPhysicalDynamicIndexScan::OsPrint(IOstream &os) const
 //		Statistics derivation during costing
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
-CPhysicalDynamicIndexScan::PstatsDerive(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<CReqdPropPlan *> prpplan,
-	gpos::pointer<IStatisticsArray *> stats_ctxt) const
+gpos::Ref<IStatistics>
+CPhysicalDynamicIndexScan::PstatsDerive(CMemoryPool *mp,
+										CExpressionHandle &exprhdl,
+										CReqdPropPlan *prpplan,
+										IStatisticsArray *stats_ctxt) const
 {
 	GPOS_ASSERT(nullptr != prpplan);
 
-	gpos::owner<IStatistics *> pstatsBaseTable =
+	gpos::Ref<IStatistics> pstatsBaseTable =
 		CStatisticsUtils::DeriveStatsForDynamicScan(
 			mp, exprhdl, ScanId(), prpplan->Pepp()->PppsRequired());
 
 	// create a conjunction of index condition and additional filters
 	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(0 /*ulChidIndex*/);
-	gpos::owner<CExpression *> local_expr = nullptr;
-	gpos::owner<CExpression *> expr_with_outer_refs = nullptr;
+	gpos::Ref<CExpression> local_expr = nullptr;
+	gpos::Ref<CExpression> expr_with_outer_refs = nullptr;
 
 	// get outer references from expression handle
 	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
@@ -190,12 +189,12 @@ CPhysicalDynamicIndexScan::PstatsDerive(
 									   &expr_with_outer_refs);
 
 	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
-		mp, exprhdl, pstatsBaseTable, local_expr, expr_with_outer_refs,
-		stats_ctxt);
+		mp, exprhdl, pstatsBaseTable.get(), local_expr.get(),
+		expr_with_outer_refs, stats_ctxt);
 
-	pstatsBaseTable->Release();
-	local_expr->Release();
-	expr_with_outer_refs->Release();
+	;
+	;
+	;
 
 	return stats;
 }

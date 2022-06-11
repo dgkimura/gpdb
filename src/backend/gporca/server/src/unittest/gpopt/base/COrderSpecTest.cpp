@@ -56,8 +56,8 @@ COrderSpecTest::EresUnittest_Basics()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -70,7 +70,7 @@ COrderSpecTest::EresUnittest_Basics()
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
-	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
+	const IMDTypeInt4 *pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
 	CColRef *pcr1 =
@@ -81,23 +81,23 @@ COrderSpecTest::EresUnittest_Basics()
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier, name);
 
 
-	gpos::owner<COrderSpec *> pos1 = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<COrderSpec> pos1 = GPOS_NEW(mp) COrderSpec(mp);
 
-	gpos::owner<IMDId *> pmdidInt4LT =
+	gpos::Ref<IMDId> pmdidInt4LT =
 		pmdtypeint4->GetMdidForCmpType(IMDType::EcmptL);
-	pmdidInt4LT->AddRef();
-	pmdidInt4LT->AddRef();
+	;
+	;
 
 	pos1->Append(pmdidInt4LT, pcr1, COrderSpec::EntFirst);
 	pos1->Append(pmdidInt4LT, pcr2, COrderSpec::EntLast);
 
-	GPOS_ASSERT(pos1->Matches(pos1));
-	GPOS_ASSERT(pos1->FSatisfies(pos1));
+	GPOS_ASSERT(pos1->Matches(pos1.get()));
+	GPOS_ASSERT(pos1->FSatisfies(pos1.get()));
 
-	gpos::owner<COrderSpec *> pos2 = GPOS_NEW(mp) COrderSpec(mp);
-	pmdidInt4LT->AddRef();
-	pmdidInt4LT->AddRef();
-	pmdidInt4LT->AddRef();
+	gpos::Ref<COrderSpec> pos2 = GPOS_NEW(mp) COrderSpec(mp);
+	;
+	;
+	;
 
 	pos2->Append(pmdidInt4LT, pcr1, COrderSpec::EntFirst);
 	pos2->Append(pmdidInt4LT, pcr2, COrderSpec::EntLast);
@@ -106,15 +106,15 @@ COrderSpecTest::EresUnittest_Basics()
 	(void) pos1->HashValue();
 	(void) pos2->HashValue();
 
-	GPOS_ASSERT(pos2->Matches(pos2));
-	GPOS_ASSERT(pos2->FSatisfies(pos2));
+	GPOS_ASSERT(pos2->Matches(pos2.get()));
+	GPOS_ASSERT(pos2->FSatisfies(pos2.get()));
 
 
-	GPOS_ASSERT(!pos1->Matches(pos2));
-	GPOS_ASSERT(!pos2->Matches(pos1));
+	GPOS_ASSERT(!pos1->Matches(pos2.get()));
+	GPOS_ASSERT(!pos2->Matches(pos1.get()));
 
-	GPOS_ASSERT(pos2->FSatisfies(pos1));
-	GPOS_ASSERT(!pos1->FSatisfies(pos2));
+	GPOS_ASSERT(pos2->FSatisfies(pos1.get()));
+	GPOS_ASSERT(!pos1->FSatisfies(pos2.get()));
 
 	// iterate over the components of the order spec
 	for (ULONG ul = 0; ul < pos1->UlSortColumns(); ul++)
@@ -123,16 +123,15 @@ COrderSpecTest::EresUnittest_Basics()
 
 		GPOS_ASSERT(nullptr != colref);
 
-		gpos::pointer<const IMDId *> mdid GPOS_ASSERTS_ONLY =
-			pos1->GetMdIdSortOp(ul);
+		const IMDId *mdid GPOS_ASSERTS_ONLY = pos1->GetMdIdSortOp(ul);
 
 		GPOS_ASSERT(mdid->IsValid());
 
 		(void) pos1->Ent(ul);
 	}
 
-	pos1->Release();
-	pos2->Release();
+	;
+	;
 
 	return GPOS_OK;
 }

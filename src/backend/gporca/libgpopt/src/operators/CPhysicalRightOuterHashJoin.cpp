@@ -31,9 +31,9 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalRightOuterHashJoin::CPhysicalRightOuterHashJoin(
-	CMemoryPool *mp, gpos::owner<CExpressionArray *> pdrgpexprOuterKeys,
-	gpos::owner<CExpressionArray *> pdrgpexprInnerKeys,
-	gpos::owner<IMdIdArray *> hash_opfamilies, CXform::EXformId origin_xform)
+	CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+	gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+	gpos::Ref<IMdIdArray> hash_opfamilies, CXform::EXformId origin_xform)
 	: CPhysicalHashJoin(mp, std::move(pdrgpexprOuterKeys),
 						std::move(pdrgpexprInnerKeys),
 						std::move(hash_opfamilies), origin_xform)
@@ -62,12 +62,10 @@ CPhysicalRightOuterHashJoin::~CPhysicalRightOuterHashJoin() = default;
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CEnfdDistribution *>
+gpos::Ref<CEnfdDistribution>
 CPhysicalRightOuterHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 gpos::pointer<CReqdPropPlan *> prppInput,
-								 ULONG child_index,
-								 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-								 ULONG ulOptReq)
+								 CReqdPropPlan *prppInput, ULONG child_index,
+								 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 {
 	// create the following requests:
 	// 1) hash-hash (provided by CPhysicalHashJoin::Ped)
@@ -76,8 +74,7 @@ CPhysicalRightOuterHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// We also could create a replicated-hashed and replicated-non-singleton request, but that isn't a promising
 	// alternative as we would be broadcasting the outer side. In that case, an LOJ would be better.
 
-	gpos::pointer<CDistributionSpec *> const pdsInput =
-		prppInput->Ped()->PdsRequired();
+	CDistributionSpec *const pdsInput = prppInput->Ped()->PdsRequired();
 	CEnfdDistribution::EDistributionMatching dmatch =
 		Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
 
@@ -92,12 +89,12 @@ CPhysicalRightOuterHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (ulOptReq < ulHashDistributeRequests)
 	{
 		// requests 1 .. N are (redistribute, redistribute)
-		gpos::owner<CDistributionSpec *> pds = PdsRequiredRedistribute(
+		gpos::Ref<CDistributionSpec> pds = PdsRequiredRedistribute(
 			mp, exprhdl, pdsInput, child_index, pdrgpdpCtxt, ulOptReq);
 		if (CDistributionSpec::EdtHashed == pds->Edt())
 		{
-			gpos::pointer<CDistributionSpecHashed *> pdsHashed =
-				gpos::dyn_cast<CDistributionSpecHashed>(pds);
+			CDistributionSpecHashed *pdsHashed =
+				gpos::dyn_cast<CDistributionSpecHashed>(pds.get());
 			pdsHashed->ComputeEquivHashExprs(mp, exprhdl);
 		}
 		return GPOS_NEW(mp) CEnfdDistribution(std::move(pds), dmatch);

@@ -19,14 +19,14 @@ struct SPartSelectorInfoEntry
 	ULONG m_selector_id;
 
 	// filter stored in the partition selector
-	gpos::owner<CExpression *> m_filter_expr;
+	gpos::Ref<CExpression> m_filter_expr;
 
 	// statistics of the subtree of the partition selector
-	gpos::owner<IStatistics *> m_stats;
+	gpos::Ref<IStatistics> m_stats;
 
 	SPartSelectorInfoEntry(ULONG mSelectorId,
-						   gpos::owner<CExpression *> mFilterExpr,
-						   gpos::owner<IStatistics *> mStats)
+						   gpos::Ref<CExpression> mFilterExpr,
+						   gpos::Ref<IStatistics> mStats)
 		: m_selector_id(mSelectorId),
 		  m_filter_expr(std::move(mFilterExpr)),
 		  m_stats(std::move(mStats))
@@ -35,8 +35,8 @@ struct SPartSelectorInfoEntry
 
 	~SPartSelectorInfoEntry()
 	{
-		m_filter_expr->Release();
-		m_stats->Release();
+		;
+		;
 	}
 };
 

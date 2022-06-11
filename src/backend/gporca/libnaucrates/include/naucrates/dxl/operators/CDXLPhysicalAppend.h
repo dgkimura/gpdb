@@ -55,9 +55,9 @@ private:
 	ULONG m_scan_id = gpos::ulong_max;
 
 	// table descr of the root partitioned table (when translated from a CPhysicalDynamicTableScan)
-	gpos::owner<CDXLTableDescr *> m_dxl_table_descr = nullptr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr = nullptr;
 
-	gpos::owner<ULongPtrArray *> m_selector_ids = nullptr;
+	gpos::Ref<ULongPtrArray> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalAppend(const CDXLPhysicalAppend &) = delete;
@@ -67,9 +67,8 @@ public:
 
 	// ctor for partitioned table scan
 	CDXLPhysicalAppend(CMemoryPool *mp, BOOL fIsTarget, BOOL fIsZapped,
-					   ULONG scan_id,
-					   gpos::owner<CDXLTableDescr *> dxl_table_desc,
-					   gpos::owner<ULongPtrArray *> selector_ids);
+					   ULONG scan_id, gpos::Ref<CDXLTableDescr> dxl_table_desc,
+					   gpos::Ref<ULongPtrArray> selector_ids);
 
 	// dtor
 	~CDXLPhysicalAppend() override;
@@ -81,10 +80,10 @@ public:
 	BOOL IsUsedInUpdDel() const;
 	BOOL IsZapped() const;
 
-	gpos::pointer<CDXLTableDescr *>
+	CDXLTableDescr *
 	GetDXLTableDesc() const
 	{
-		return m_dxl_table_descr;
+		return m_dxl_table_descr.get();
 	}
 
 	void
@@ -99,18 +98,18 @@ public:
 		return m_scan_id;
 	}
 
-	gpos::pointer<const ULongPtrArray *>
+	const ULongPtrArray *
 	GetSelectorIds() const
 	{
-		return m_selector_ids;
+		return m_selector_ids.get();
 	}
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalAppend *>
+	static CDXLPhysicalAppend *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -122,8 +121,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

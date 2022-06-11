@@ -42,10 +42,10 @@ private:
 	ULONG m_segid_colid;
 
 	// delete col ids
-	gpos::pointer<ULongPtrArray *> m_deletion_colid_array;
+	ULongPtrArray *m_deletion_colid_array;
 
 	// insert col ids
-	gpos::pointer<ULongPtrArray *> m_insert_colid_array;
+	ULongPtrArray *m_insert_colid_array;
 
 	// does update preserve oids
 	BOOL m_preserve_oids;

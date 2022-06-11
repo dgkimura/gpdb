@@ -37,12 +37,11 @@ using namespace gpopt;
 // 		Construct const operator from a DXL const value operator
 //
 //---------------------------------------------------------------------------
-gpos::owner<CScalarConst *>
-CTranslatorDXLToExprUtils::PopConst(
-	CMemoryPool *mp, CMDAccessor *md_accessor,
-	gpos::pointer<const CDXLScalarConstValue *> dxl_op)
+gpos::Ref<CScalarConst>
+CTranslatorDXLToExprUtils::PopConst(CMemoryPool *mp, CMDAccessor *md_accessor,
+									const CDXLScalarConstValue *dxl_op)
 {
-	gpos::owner<IDatum *> datum =
+	gpos::Ref<IDatum> datum =
 		CTranslatorDXLToExprUtils::GetDatum(md_accessor, dxl_op);
 	return GPOS_NEW(mp) CScalarConst(mp, std::move(datum));
 }
@@ -55,13 +54,12 @@ CTranslatorDXLToExprUtils::PopConst(
 // 		Construct a datum from a DXL const value operator
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
-CTranslatorDXLToExprUtils::GetDatum(
-	CMDAccessor *md_accessor,
-	gpos::pointer<const CDXLScalarConstValue *> dxl_op)
+gpos::Ref<IDatum>
+CTranslatorDXLToExprUtils::GetDatum(CMDAccessor *md_accessor,
+									const CDXLScalarConstValue *dxl_op)
 {
-	gpos::pointer<IMDId *> mdid = dxl_op->GetDatumVal()->MDId();
-	gpos::owner<IDatum *> datum =
+	IMDId *mdid = dxl_op->GetDatumVal()->MDId();
+	gpos::Ref<IDatum> datum =
 		md_accessor->RetrieveType(mdid)->GetDatumForDXLConstVal(dxl_op);
 
 	return datum;
@@ -75,20 +73,19 @@ CTranslatorDXLToExprUtils::GetDatum(
 // 		Construct a datum array from a DXL datum array
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatumArray *>
-CTranslatorDXLToExprUtils::Pdrgpdatum(
-	CMemoryPool *mp, CMDAccessor *md_accessor,
-	gpos::pointer<const CDXLDatumArray *> pdrgpdxldatum)
+gpos::Ref<IDatumArray>
+CTranslatorDXLToExprUtils::Pdrgpdatum(CMemoryPool *mp, CMDAccessor *md_accessor,
+									  const CDXLDatumArray *pdrgpdxldatum)
 {
 	GPOS_ASSERT(nullptr != pdrgpdxldatum);
 
-	gpos::owner<IDatumArray *> pdrgdatum = GPOS_NEW(mp) IDatumArray(mp);
+	gpos::Ref<IDatumArray> pdrgdatum = GPOS_NEW(mp) IDatumArray(mp);
 	const ULONG length = pdrgpdxldatum->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		gpos::pointer<CDXLDatum *> dxl_datum = (*pdrgpdxldatum)[ul];
-		gpos::pointer<IMDId *> mdid = dxl_datum->MDId();
-		gpos::owner<IDatum *> datum =
+		CDXLDatum *dxl_datum = (*pdrgpdxldatum)[ul].get();
+		IMDId *mdid = dxl_datum->MDId();
+		gpos::Ref<IDatum> datum =
 			md_accessor->RetrieveType(mdid)->GetDatumForDXLDatum(mp, dxl_datum);
 		pdrgdatum->Append(datum);
 	}
@@ -104,15 +101,15 @@ CTranslatorDXLToExprUtils::Pdrgpdatum(
 // 		Construct an expression representing the given value in INT8 format
 //
 //---------------------------------------------------------------------------
-gpos::owner<CExpression *>
+gpos::Ref<CExpression>
 CTranslatorDXLToExprUtils::PexprConstInt8(CMemoryPool *mp,
 										  CMDAccessor *md_accessor,
 										  CSystemId sysid, LINT val)
 {
-	gpos::owner<IDatumInt8 *> datum =
+	gpos::Ref<IDatumInt8> datum =
 		md_accessor->PtMDType<IMDTypeInt8>(sysid)->CreateInt8Datum(
 			mp, val, false /* is_null */);
-	gpos::owner<CExpression *> pexprConst = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprConst = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, std::move(datum)));
 
 	return pexprConst;
@@ -128,10 +125,10 @@ CTranslatorDXLToExprUtils::PexprConstInt8(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 void
-CTranslatorDXLToExprUtils::AddKeySets(
-	CMemoryPool *mp, gpos::pointer<CTableDescriptor *> ptabdesc,
-	gpos::pointer<const IMDRelation *> pmdrel,
-	gpos::pointer<UlongToUlongMap *> phmululColMapping)
+CTranslatorDXLToExprUtils::AddKeySets(CMemoryPool *mp,
+									  CTableDescriptor *ptabdesc,
+									  const IMDRelation *pmdrel,
+									  UlongToUlongMap *phmululColMapping)
 {
 	GPOS_ASSERT(nullptr != ptabdesc);
 	GPOS_ASSERT(nullptr != pmdrel);
@@ -139,9 +136,9 @@ CTranslatorDXLToExprUtils::AddKeySets(
 	const ULONG ulKeySets = pmdrel->KeySetCount();
 	for (ULONG ul = 0; ul < ulKeySets; ul++)
 	{
-		gpos::owner<CBitSet *> pbs =
+		gpos::Ref<CBitSet> pbs =
 			GPOS_NEW(mp) CBitSet(mp, ptabdesc->ColumnCount());
-		gpos::pointer<const ULongPtrArray *> pdrgpulKeys = pmdrel->KeySetAt(ul);
+		const ULongPtrArray *pdrgpulKeys = pmdrel->KeySetAt(ul);
 		const ULONG ulKeys = pdrgpulKeys->Size();
 
 		for (ULONG ulKey = 0; ulKey < ulKeys; ulKey++)
@@ -156,7 +153,7 @@ CTranslatorDXLToExprUtils::AddKeySets(
 
 		if (!ptabdesc->FAddKeySet(pbs))
 		{
-			pbs->Release();
+			;
 		}
 	}
 }
@@ -170,12 +167,12 @@ CTranslatorDXLToExprUtils::AddKeySets(
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorDXLToExprUtils::FScalarBool(gpos::pointer<const CDXLNode *> dxlnode,
+CTranslatorDXLToExprUtils::FScalarBool(const CDXLNode *dxlnode,
 									   EdxlBoolExprType edxlboolexprtype)
 {
 	GPOS_ASSERT(nullptr != dxlnode);
 
-	gpos::pointer<CDXLOperator *> dxl_op = dxlnode->GetOperator();
+	CDXLOperator *dxl_op = dxlnode->GetOperator();
 	if (EdxlopScalarBoolExpr == dxl_op->GetDXLOperator())
 	{
 		EdxlBoolExprType edxlboolexprtypeNode =
@@ -229,14 +226,14 @@ CTranslatorDXLToExprUtils::EBoolOperator(EdxlBoolExprType edxlbooltype)
 //		given col ids
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefArray *>
-CTranslatorDXLToExprUtils::Pdrgpcr(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	gpos::pointer<const ULongPtrArray *> colids)
+gpos::Ref<CColRefArray>
+CTranslatorDXLToExprUtils::Pdrgpcr(CMemoryPool *mp,
+								   UlongToColRefMap *colref_mapping,
+								   const ULongPtrArray *colids)
 {
 	GPOS_ASSERT(nullptr != colids);
 
-	gpos::owner<CColRefArray *> colref_array = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 
 	for (ULONG ul = 0; ul < colids->Size(); ul++)
 	{
@@ -262,8 +259,7 @@ CTranslatorDXLToExprUtils::Pdrgpcr(
 //---------------------------------------------------------------------------
 BOOL
 CTranslatorDXLToExprUtils::FCastFunc(CMDAccessor *md_accessor,
-									 gpos::pointer<const CDXLNode *> dxlnode,
-									 gpos::pointer<IMDId *> pmdidInput)
+									 const CDXLNode *dxlnode, IMDId *pmdidInput)
 {
 	GPOS_ASSERT(nullptr != dxlnode);
 
@@ -282,18 +278,17 @@ CTranslatorDXLToExprUtils::FCastFunc(CMDAccessor *md_accessor,
 		return false;
 	}
 
-	gpos::pointer<CDXLScalarFuncExpr *> pdxlopScFunc =
+	CDXLScalarFuncExpr *pdxlopScFunc =
 		gpos::dyn_cast<CDXLScalarFuncExpr>(dxlnode->GetOperator());
 
-	gpos::pointer<IMDId *> mdid_dest = pdxlopScFunc->ReturnTypeMdId();
+	IMDId *mdid_dest = pdxlopScFunc->ReturnTypeMdId();
 
 	if (!CMDAccessorUtils::FCastExists(md_accessor, pmdidInput, mdid_dest))
 	{
 		return false;
 	}
 
-	gpos::pointer<const IMDCast *> pmdcast =
-		md_accessor->Pmdcast(pmdidInput, mdid_dest);
+	const IMDCast *pmdcast = md_accessor->Pmdcast(pmdidInput, mdid_dest);
 
 	return (pmdcast->GetCastFuncMdId()->Equals(pdxlopScFunc->FuncMdId()));
 }

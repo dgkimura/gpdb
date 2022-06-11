@@ -30,8 +30,8 @@ public:
 
 	// ctor
 	CPhysicalSerialUnionAll(CMemoryPool *mp,
-							gpos::owner<CColRefArray *> pdrgpcrOutput,
-							gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput);
+							gpos::Ref<CColRefArray> pdrgpcrOutput,
+							gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput);
 
 	// dtor
 	~CPhysicalSerialUnionAll() override;
@@ -51,9 +51,9 @@ public:
 
 	// distribution matching type
 	CEnfdDistribution::EDistributionMatching
-	Edm(gpos::pointer<CReqdPropPlan *> prppInput,
-		ULONG,							  // child_index
-		gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt
+	Edm(CReqdPropPlan *prppInput,
+		ULONG,			   // child_index
+		CDrvdPropArray *,  //pdrgpdpCtxt
 		ULONG ulOptReq) override
 	{
 		if (0 == ulOptReq && CDistributionSpec::EdtHashed ==
@@ -69,11 +69,12 @@ public:
 
 
 	// compute required distribution of the n-th child
-	gpos::owner<CDistributionSpec *> PdsRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<CDistributionSpec> PdsRequired(CMemoryPool *mp,
+											 CExpressionHandle &exprhdl,
+											 CDistributionSpec *pdsRequired,
+											 ULONG child_index,
+											 CDrvdPropArray *pdrgpdpCtxt,
+											 ULONG ulOptReq) const override;
 
 };	// class CPhysicalSerialUnionAll
 

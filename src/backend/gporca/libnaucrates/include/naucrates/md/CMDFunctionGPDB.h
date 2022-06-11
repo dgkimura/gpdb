@@ -41,16 +41,16 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// func id
-	gpos::owner<IMDId *> m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// func name
 	CMDName *m_mdname;
 
 	// result type
-	gpos::owner<IMDId *> m_mdid_type_result;
+	gpos::Ref<IMDId> m_mdid_type_result;
 
 	// output argument types
-	gpos::owner<IMdIdArray *> m_mdid_types_array;
+	gpos::Ref<IMdIdArray> m_mdid_types_array;
 
 	// whether function returns a set of values
 	BOOL m_returns_set;
@@ -93,9 +93,9 @@ public:
 	CMDFunctionGPDB(const CMDFunctionGPDB &) = delete;
 
 	// ctor/dtor
-	CMDFunctionGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
-					gpos::owner<IMDId *> result_type_mdid,
-					gpos::owner<IMdIdArray *> mdid_array, BOOL ReturnsSet,
+	CMDFunctionGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+					gpos::Ref<IMDId> result_type_mdid,
+					gpos::Ref<IMdIdArray> mdid_array, BOOL ReturnsSet,
 					EFuncStbl func_stability, EFuncDataAcc func_data_access,
 					BOOL is_strict, BOOL is_ndv_preserving,
 					BOOL is_allowed_for_PS);
@@ -110,16 +110,16 @@ public:
 	}
 
 	// function id
-	gpos::pointer<IMDId *> MDId() const override;
+	IMDId *MDId() const override;
 
 	// function name
 	CMDName Mdname() const override;
 
 	// result type
-	gpos::pointer<IMDId *> GetResultTypeMdid() const override;
+	IMDId *GetResultTypeMdid() const override;
 
 	// output argument types
-	gpos::pointer<IMdIdArray *> OutputArgTypesMdidArray() const override;
+	IMdIdArray *OutputArgTypesMdidArray() const override;
 
 	// does function return NULL on NULL input
 	BOOL

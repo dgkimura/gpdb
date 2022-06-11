@@ -35,13 +35,13 @@ using namespace gpmd;
 class CDXLScalarConstValue : public CDXLScalar
 {
 private:
-	gpos::owner<CDXLDatum *> m_dxl_datum;
+	gpos::Ref<CDXLDatum> m_dxl_datum;
 
 public:
 	CDXLScalarConstValue(const CDXLScalarConstValue &) = delete;
 
 	// ctor/dtor
-	CDXLScalarConstValue(CMemoryPool *mp, gpos::owner<CDXLDatum *> dxl_datum);
+	CDXLScalarConstValue(CMemoryPool *mp, gpos::Ref<CDXLDatum> dxl_datum);
 
 	~CDXLScalarConstValue() override;
 
@@ -49,10 +49,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// return the datum value
-	gpos::pointer<const CDXLDatum *>
+	const CDXLDatum *
 	GetDatumVal() const
 	{
-		return m_dxl_datum;
+		return m_dxl_datum.get();
 	}
 
 	// DXL Operator ID
@@ -60,10 +60,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarConstValue *>
+	static CDXLScalarConstValue *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -77,7 +77,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

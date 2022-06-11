@@ -17,11 +17,10 @@ class CXMLSerializer;
 class CCostModelConfigSerializer
 {
 private:
-	gpos::pointer<const gpopt::ICostModel *> m_cost_model;
+	const gpopt::ICostModel *m_cost_model;
 
 public:
-	CCostModelConfigSerializer(
-		gpos::pointer<const gpopt::ICostModel *> cost_model);
+	CCostModelConfigSerializer(const gpopt::ICostModel *cost_model);
 
 	void Serialize(CXMLSerializer &xml_serializer) const;
 };

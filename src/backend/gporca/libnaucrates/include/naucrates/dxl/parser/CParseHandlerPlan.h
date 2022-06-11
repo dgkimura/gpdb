@@ -42,7 +42,7 @@ private:
 	ULLONG m_plan_space_size;
 
 	// the root of the parsed DXL tree constructed by the parse handler
-	gpos::owner<CDXLNode *> m_dxl_node;
+	gpos::Ref<CDXLNode> m_dxl_node;
 
 	// process the end of an element
 	void StartElement(
@@ -70,7 +70,7 @@ public:
 	~CParseHandlerPlan() override;
 
 	// returns the root of constructed DXL plan
-	gpos::pointer<CDXLNode *> CreateDXLNode();
+	CDXLNode *CreateDXLNode();
 
 	// return plan id
 	ULLONG

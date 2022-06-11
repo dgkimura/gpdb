@@ -34,7 +34,7 @@ class CParseHandlerCostParams : public CParseHandlerBase
 {
 private:
 	// cost params
-	gpos::owner<ICostModelParams *> m_cost_model_params;
+	gpos::Ref<ICostModelParams> m_cost_model_params;
 
 	// process the start of an element
 	void StartElement(
@@ -63,10 +63,10 @@ public:
 	~CParseHandlerCostParams() override;
 
 	// returns the dxl representation of cost parameters
-	gpos::pointer<ICostModelParams *>
+	ICostModelParams *
 	GetCostModelParams()
 	{
-		return m_cost_model_params;
+		return m_cost_model_params.get();
 	}
 
 	EDxlParseHandlerType

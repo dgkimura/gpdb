@@ -46,8 +46,8 @@ CParseHandlerMDRequest::CParseHandlerMDRequest(
 //---------------------------------------------------------------------------
 CParseHandlerMDRequest::~CParseHandlerMDRequest()
 {
-	CRefCount::SafeRelease(m_mdid_array);
-	CRefCount::SafeRelease(m_mdtype_request_array);
+	;
+	;
 }
 
 
@@ -84,7 +84,7 @@ CParseHandlerMDRequest::StartElement(const XMLCh *const,  // element_uri,
 		GPOS_ASSERT(nullptr != m_mdid_array);
 
 		// parse mdid
-		gpos::owner<IMDId *> mdid =
+		gpos::Ref<IMDId> mdid =
 			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 				EdxltokenValue, EdxltokenMdid);
@@ -161,10 +161,10 @@ CParseHandlerMDRequest::GetParseHandlerType() const
 //		Parsed array of mdids
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMdIdArray *>
+IMdIdArray *
 CParseHandlerMDRequest::GetMdIdArray() const
 {
-	return m_mdid_array;
+	return m_mdid_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -175,10 +175,10 @@ CParseHandlerMDRequest::GetMdIdArray() const
 //		Parsed array of type requests
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CMDRequest::SMDTypeRequestArray *>
+CMDRequest::SMDTypeRequestArray *
 CParseHandlerMDRequest::GetMDTypeRequestArray() const
 {
-	return m_mdtype_request_array;
+	return m_mdtype_request_array.get();
 }
 
 // EOF

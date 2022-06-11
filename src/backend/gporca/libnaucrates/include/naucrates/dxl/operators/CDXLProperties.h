@@ -40,8 +40,7 @@ class CDXLProperties : public CRefCount
 {
 private:
 	// derived statistics
-	gpos::owner<CDXLStatsDerivedRelation *> m_dxl_stats_derived_relation{
-		nullptr};
+	gpos::Ref<CDXLStatsDerivedRelation> m_dxl_stats_derived_relation{nullptr};
 
 protected:
 	// serialize statistics in DXL format
@@ -58,11 +57,10 @@ public:
 
 	// setter
 	virtual void SetStats(
-		gpos::owner<CDXLStatsDerivedRelation *> dxl_stats_derived_relation);
+		gpos::Ref<CDXLStatsDerivedRelation> dxl_stats_derived_relation);
 
 	// statistical information
-	virtual gpos::pointer<const CDXLStatsDerivedRelation *>
-	GetDxlStatsDrvdRelation() const;
+	virtual const CDXLStatsDerivedRelation *GetDxlStatsDrvdRelation() const;
 
 	virtual Edxlproperty
 	GetDXLPropertyType() const

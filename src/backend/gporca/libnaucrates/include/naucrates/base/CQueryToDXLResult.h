@@ -34,31 +34,31 @@ class CQueryToDXLResult
 {
 private:
 	// DXL representing the Query
-	gpos::owner<CDXLNode *> m_query_dxl;
+	gpos::Ref<CDXLNode> m_query_dxl;
 
 	// array of DXL nodes that represent the query output
-	gpos::owner<CDXLNodeArray *> m_query_output;
+	gpos::Ref<CDXLNodeArray> m_query_output;
 
 	// CTE list
-	gpos::owner<CDXLNodeArray *> m_cte_producers;
+	gpos::Ref<CDXLNodeArray> m_cte_producers;
 
 public:
 	// ctor
-	CQueryToDXLResult(gpos::owner<CDXLNode *> query,
-					  gpos::owner<CDXLNodeArray *> query_output,
-					  gpos::owner<CDXLNodeArray *> cte_producers);
+	CQueryToDXLResult(gpos::Ref<CDXLNode> query,
+					  gpos::Ref<CDXLNodeArray> query_output,
+					  gpos::Ref<CDXLNodeArray> cte_producers);
 
 	// dtor
 	~CQueryToDXLResult();
 
 	// return the DXL representation of the query
-	gpos::pointer<const CDXLNode *> CreateDXLNode() const;
+	const CDXLNode *CreateDXLNode() const;
 
 	// return the array of output columns
-	gpos::pointer<const CDXLNodeArray *> GetOutputColumnsDXLArray() const;
+	const CDXLNodeArray *GetOutputColumnsDXLArray() const;
 
 	// return the array of CTEs
-	gpos::pointer<const CDXLNodeArray *> GetCTEProducerDXLArray() const;
+	const CDXLNodeArray *GetCTEProducerDXLArray() const;
 };
 }  // namespace gpdxl
 

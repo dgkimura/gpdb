@@ -28,7 +28,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarSortCol::CDXLScalarSortCol(CMemoryPool *mp, ULONG colid,
-									 gpos::owner<IMDId *> mdid_sort_op,
+									 gpos::Ref<IMDId> mdid_sort_op,
 									 CWStringConst *sort_op_name_str,
 									 BOOL sort_nulls_first)
 	: CDXLScalar(mp),
@@ -50,7 +50,7 @@ CDXLScalarSortCol::CDXLScalarSortCol(CMemoryPool *mp, ULONG colid,
 //---------------------------------------------------------------------------
 CDXLScalarSortCol::~CDXLScalarSortCol()
 {
-	m_mdid_sort_op->Release();
+	;
 	GPOS_DELETE(m_sort_op_name_str);
 }
 
@@ -105,10 +105,10 @@ CDXLScalarSortCol::GetColId() const
 //		Oid of the sorting operator for the column from the catalog
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarSortCol::GetMdIdSortOp() const
 {
-	return m_mdid_sort_op;
+	return m_mdid_sort_op.get();
 }
 
 //---------------------------------------------------------------------------
@@ -135,7 +135,7 @@ CDXLScalarSortCol::IsSortedNullsFirst() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarSortCol::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  gpos::pointer<const CDXLNode *>  // dxlnode
+								  const CDXLNode *	// dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -165,7 +165,7 @@ CDXLScalarSortCol::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSortCol::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarSortCol::AssertValid(const CDXLNode *dxlnode,
 							   BOOL	 // validate_children
 ) const
 {

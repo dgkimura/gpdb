@@ -36,9 +36,8 @@ public:
 	// ctor
 	explicit CLogicalIntersect(CMemoryPool *mp);
 
-	CLogicalIntersect(CMemoryPool *mp,
-					  gpos::owner<CColRefArray *> pdrgpcrOutput,
-					  gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput);
+	CLogicalIntersect(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+					  gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput);
 
 	// dtor
 	~CLogicalIntersect() override;
@@ -65,8 +64,8 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -78,7 +77,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *>
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -90,7 +89,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Stats
@@ -104,16 +103,16 @@ public:
 	}
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CLogicalIntersect *>
+	static CLogicalIntersect *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

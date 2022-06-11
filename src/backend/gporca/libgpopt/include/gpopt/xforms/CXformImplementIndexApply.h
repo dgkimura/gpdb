@@ -70,33 +70,31 @@ public:
 
 	// actual transform
 	void
-	Transform(gpos::pointer<CXformContext *> pxfctxt,
-			  gpos::pointer<CXformResult *> pxfres,
-			  gpos::pointer<CExpression *> pexpr) const override
+	Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+			  CExpression *pexpr) const override
 	{
 		GPOS_ASSERT(nullptr != pxfctxt);
 		GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 		GPOS_ASSERT(FCheckPattern(pexpr));
 
 		CMemoryPool *mp = pxfctxt->Pmp();
-		gpos::pointer<CLogicalIndexApply *> indexApply =
+		CLogicalIndexApply *indexApply =
 			gpos::dyn_cast<CLogicalIndexApply>(pexpr->Pop());
 
 		// extract components
 		CExpression *pexprOuter = (*pexpr)[0];
 		CExpression *pexprInner = (*pexpr)[1];
 		CExpression *pexprScalar = (*pexpr)[2];
-		gpos::owner<CColRefArray *> colref_array =
-			indexApply->PdrgPcrOuterRefs();
-		colref_array->AddRef();
+		gpos::Ref<CColRefArray> colref_array = indexApply->PdrgPcrOuterRefs();
+		;
 
 		// addref all components
-		pexprOuter->AddRef();
-		pexprInner->AddRef();
-		pexprScalar->AddRef();
+		;
+		;
+		;
 
 		// assemble physical operator
-		gpos::owner<CPhysicalNLJoin *> pop = nullptr;
+		gpos::Ref<CPhysicalNLJoin> pop = nullptr;
 
 		if (gpos::dyn_cast<CLogicalIndexApply>(pexpr->Pop())->FouterJoin())
 			pop = GPOS_NEW(mp) CPhysicalLeftOuterIndexNLJoin(
@@ -105,7 +103,7 @@ public:
 			pop = GPOS_NEW(mp) CPhysicalInnerIndexNLJoin(
 				mp, colref_array, indexApply->OrigJoinPred());
 
-		gpos::owner<CExpression *> pexprResult = GPOS_NEW(mp) CExpression(
+		gpos::Ref<CExpression> pexprResult = GPOS_NEW(mp) CExpression(
 			mp, std::move(pop), pexprOuter, pexprInner, pexprScalar);
 
 		// add alternative to results

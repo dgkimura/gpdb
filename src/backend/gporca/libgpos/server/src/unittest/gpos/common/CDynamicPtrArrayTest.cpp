@@ -65,8 +65,8 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 					  "wert", "dfg", "xcv", "zxc"};
 	const CHAR *szMissingElem = "missing";
 
-	gpos::owner<CDynamicPtrArray<CHAR, CleanupNULL<CHAR> > *> pdrg =
-		GPOS_NEW(mp) CDynamicPtrArray<CHAR, CleanupNULL<CHAR> >(mp, 2);
+	gpos::Ref<CDynamicPtrArray<CHAR, CleanupNULL<CHAR>>> pdrg =
+		GPOS_NEW(mp) CDynamicPtrArray<CHAR, CleanupNULL<CHAR>>(mp, 2);
 
 	// add elements incl trigger resize of array
 	for (ULONG i = 0; i < 9; i++)
@@ -97,13 +97,13 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 	// all elements were inserted in ascending order
 	GPOS_ASSERT(pdrg->IsSorted());
 
-	pdrg->Release();
+	;
 
 
 	// test with ULONG array
 
-	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > UlongArray;
-	gpos::owner<UlongArray *> pdrgULONG = GPOS_NEW(mp) UlongArray(mp, 1);
+	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG>> UlongArray;
+	gpos::Ref<UlongArray> pdrgULONG = GPOS_NEW(mp) UlongArray(mp, 1);
 	ULONG c = 256;
 
 	// add elements incl trigger resize of array
@@ -125,8 +125,7 @@ CDynamicPtrArrayTest::EresUnittest_Basic()
 	for (ULONG_PTR ulpJ = 0; ulpJ < c; ulpJ++)
 	{
 		GPOS_ASSERT((ULONG *) ulpJ == (*pdrgULONG)[(ULONG) ulpJ]);
-	}
-	pdrgULONG->Release();
+	};
 
 
 	return GPOS_OK;
@@ -150,8 +149,8 @@ CDynamicPtrArrayTest::EresUnittest_Ownership()
 
 	// test with ULONGs
 
-	typedef CDynamicPtrArray<ULONG, CleanupDelete<ULONG> > UlongArray;
-	gpos::owner<UlongArray *> pdrgULONG = GPOS_NEW(mp) UlongArray(mp, 1);
+	typedef CDynamicPtrArray<ULONG, CleanupDelete<ULONG>> UlongArray;
+	gpos::Ref<UlongArray> pdrgULONG = GPOS_NEW(mp) UlongArray(mp, 1);
 
 	// add elements incl trigger resize of array
 	for (ULONG k = 0; k < 256; k++)
@@ -160,13 +159,12 @@ CDynamicPtrArrayTest::EresUnittest_Ownership()
 		pdrgULONG->Append(pul);
 		GPOS_ASSERT(k + 1 == pdrgULONG->Size());
 		GPOS_ASSERT(pul == (*pdrgULONG)[k]);
-	}
-	pdrgULONG->Release();
+	};
 
 	// test with CHAR array
 
-	typedef CDynamicPtrArray<CHAR, CleanupDeleteArray<CHAR> > CharArray;
-	gpos::owner<CharArray *> pdrgCHAR = GPOS_NEW(mp) CharArray(mp, 2);
+	typedef CDynamicPtrArray<CHAR, CleanupDeleteArray<CHAR>> CharArray;
+	gpos::Ref<CharArray> pdrgCHAR = GPOS_NEW(mp) CharArray(mp, 2);
 
 	// add elements incl trigger resize of array
 	for (ULONG i = 0; i < 3; i++)
@@ -180,7 +178,7 @@ CDynamicPtrArrayTest::EresUnittest_Ownership()
 	pdrgCHAR->Clear();
 	GPOS_ASSERT(0 == pdrgCHAR->Size());
 
-	pdrgCHAR->Release();
+	;
 
 	return GPOS_OK;
 }
@@ -201,18 +199,18 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppend()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > UlongArray;
+	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG>> UlongArray;
 
 	ULONG cVal = 0;
 
 	// array with 1 element
-	gpos::owner<UlongArray *> pdrgULONG1 = GPOS_NEW(mp) UlongArray(mp, 1);
+	gpos::Ref<UlongArray> pdrgULONG1 = GPOS_NEW(mp) UlongArray(mp, 1);
 	pdrgULONG1->Append(&cVal);
 	GPOS_ASSERT(1 == pdrgULONG1->Size());
 
 	// array with x elements
 	ULONG cX = 1000;
-	gpos::owner<UlongArray *> pdrgULONG2 = GPOS_NEW(mp) UlongArray(mp, 1);
+	gpos::Ref<UlongArray> pdrgULONG2 = GPOS_NEW(mp) UlongArray(mp, 1);
 	for (ULONG i = 0; i < cX; i++)
 	{
 		pdrgULONG2->Append(&cX);
@@ -220,15 +218,15 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppend()
 	GPOS_ASSERT(cX == pdrgULONG2->Size());
 
 	// add one to another
-	pdrgULONG1->AppendArray(pdrgULONG2);
+	pdrgULONG1->AppendArray(pdrgULONG2.get());
 	GPOS_ASSERT(cX + 1 == pdrgULONG1->Size());
 	for (ULONG j = 0; j < pdrgULONG2->Size(); j++)
 	{
 		GPOS_ASSERT((*pdrgULONG1)[j + 1] == (*pdrgULONG2)[j]);
 	}
 
-	pdrgULONG1->Release();
-	pdrgULONG2->Release();
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -250,18 +248,18 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > UlongArray;
+	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG>> UlongArray;
 
 	ULONG cVal = 0;
 
 	// array with 1 element
-	gpos::owner<UlongArray *> pdrgULONG1 = GPOS_NEW(mp) UlongArray(mp, 10);
+	gpos::Ref<UlongArray> pdrgULONG1 = GPOS_NEW(mp) UlongArray(mp, 10);
 	pdrgULONG1->Append(&cVal);
 	GPOS_ASSERT(1 == pdrgULONG1->Size());
 
 	// array with x elements
 	ULONG cX = 9;
-	gpos::owner<UlongArray *> pdrgULONG2 = GPOS_NEW(mp) UlongArray(mp, 15);
+	gpos::Ref<UlongArray> pdrgULONG2 = GPOS_NEW(mp) UlongArray(mp, 15);
 	for (ULONG i = 0; i < cX; i++)
 	{
 		pdrgULONG2->Append(&cX);
@@ -269,20 +267,20 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit()
 	GPOS_ASSERT(cX == pdrgULONG2->Size());
 
 	// add one to another
-	pdrgULONG1->AppendArray(pdrgULONG2);
+	pdrgULONG1->AppendArray(pdrgULONG2.get());
 	GPOS_ASSERT(cX + 1 == pdrgULONG1->Size());
 	for (ULONG j = 0; j < pdrgULONG2->Size(); j++)
 	{
 		GPOS_ASSERT((*pdrgULONG1)[j + 1] == (*pdrgULONG2)[j]);
 	}
 
-	gpos::owner<UlongArray *> pdrgULONG3 = GPOS_NEW(mp) UlongArray(mp, 15);
-	pdrgULONG1->AppendArray(pdrgULONG3);
+	gpos::Ref<UlongArray> pdrgULONG3 = GPOS_NEW(mp) UlongArray(mp, 15);
+	pdrgULONG1->AppendArray(pdrgULONG3.get());
 	GPOS_ASSERT(cX + 1 == pdrgULONG1->Size());
 
-	pdrgULONG1->Release();
-	pdrgULONG2->Release();
-	pdrgULONG3->Release();
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -299,16 +297,16 @@ CDynamicPtrArrayTest::EresUnittest_ArrayAppendExactFit()
 GPOS_RESULT
 CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 {
-	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG> > UlongArray;
+	typedef CDynamicPtrArray<ULONG, CleanupNULL<ULONG>> UlongArray;
 
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
 	// the array containing elements to look up
-	gpos::owner<UlongArray *> pdrgULONGLookup = GPOS_NEW(mp) UlongArray(mp);
+	gpos::Ref<UlongArray> pdrgULONGLookup = GPOS_NEW(mp) UlongArray(mp);
 
 	// the array containing the target elements that will give the positions
-	gpos::owner<UlongArray *> pdrgULONGTarget = GPOS_NEW(mp) UlongArray(mp);
+	gpos::Ref<UlongArray> pdrgULONGTarget = GPOS_NEW(mp) UlongArray(mp);
 
 	ULONG *pul1 = GPOS_NEW(mp) ULONG(10);
 	ULONG *pul2 = GPOS_NEW(mp) ULONG(20);
@@ -322,7 +320,7 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	// since target is empty, there are elements in lookup with no match, so the function
 	// should return NULL
 	GPOS_ASSERT(nullptr ==
-				pdrgULONGTarget->IndexesOfSubsequence(pdrgULONGLookup));
+				pdrgULONGTarget->IndexesOfSubsequence(pdrgULONGLookup.get()));
 
 	pdrgULONGTarget->Append(pul1);
 	pdrgULONGTarget->Append(pul3);
@@ -330,8 +328,8 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	pdrgULONGTarget->Append(pul3);
 	pdrgULONGTarget->Append(pul2);
 
-	gpos::owner<ULongPtrArray *> pdrgpulIndexes =
-		pdrgULONGTarget->IndexesOfSubsequence(pdrgULONGLookup);
+	gpos::Ref<ULongPtrArray> pdrgpulIndexes =
+		pdrgULONGTarget->IndexesOfSubsequence(pdrgULONGLookup.get());
 
 	GPOS_ASSERT(nullptr != pdrgpulIndexes);
 	GPOS_ASSERT(4 == pdrgpulIndexes->Size());
@@ -343,9 +341,9 @@ CDynamicPtrArrayTest::EresUnittest_PdrgpulSubsequenceIndexes()
 	GPOS_DELETE(pul1);
 	GPOS_DELETE(pul2);
 	GPOS_DELETE(pul3);
-	pdrgpulIndexes->Release();
-	pdrgULONGTarget->Release();
-	pdrgULONGLookup->Release();
+	;
+	;
+	;
 
 	return GPOS_OK;
 }

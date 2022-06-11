@@ -33,7 +33,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarNullTest::Matches(gpos::pointer<COperator *> pop) const
+CScalarNullTest::Matches(COperator *pop) const
 {
 	return pop->Eopid() == Eopid();
 }
@@ -47,7 +47,7 @@ CScalarNullTest::Matches(gpos::pointer<COperator *> pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarNullTest::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -65,7 +65,7 @@ CScalarNullTest::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarNullTest::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
+CScalarNullTest::Eber(ULongPtrArray *pdrgpulChildren) const
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 	GPOS_ASSERT(1 == pdrgpulChildren->Size());

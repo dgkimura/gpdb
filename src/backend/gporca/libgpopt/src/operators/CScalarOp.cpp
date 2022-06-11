@@ -32,8 +32,8 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarOp::CScalarOp(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
-					 gpos::owner<IMDId *> return_type_mdid,
+CScalarOp::CScalarOp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+					 gpos::Ref<IMDId> return_type_mdid,
 					 const CWStringConst *pstrOp)
 	: CScalar(mp),
 	  m_mdid_op(std::move(mdid_op)),
@@ -49,11 +49,11 @@ CScalarOp::CScalarOp(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
 
 	m_returns_null_on_null_input =
 		CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(md_accessor,
-														  m_mdid_op);
+														  m_mdid_op.get());
 	m_fCommutative =
-		CMDAccessorUtils::FCommutativeScalarOp(md_accessor, m_mdid_op);
+		CMDAccessorUtils::FCommutativeScalarOp(md_accessor, m_mdid_op.get());
 	m_fBoolReturnType =
-		CMDAccessorUtils::FBoolType(md_accessor, m_return_type_mdid);
+		CMDAccessorUtils::FBoolType(md_accessor, m_return_type_mdid.get());
 }
 
 
@@ -79,10 +79,10 @@ CScalarOp::Pstr() const
 //		Scalar operator metadata id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarOp::MdIdOp() const
 {
-	return m_mdid_op;
+	return m_mdid_op.get();
 }
 
 //---------------------------------------------------------------------------
@@ -110,11 +110,11 @@ CScalarOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarOp::Matches(gpos::pointer<COperator *> pop) const
+CScalarOp::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarOp *> pscop = gpos::dyn_cast<CScalarOp>(pop);
+		CScalarOp *pscop = gpos::dyn_cast<CScalarOp>(pop);
 
 		// match if operator oid are identical
 		return m_mdid_op->Equals(pscop->MdIdOp());
@@ -131,10 +131,10 @@ CScalarOp::Matches(gpos::pointer<COperator *> pop) const
 //		Accessor to the return type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarOp::GetReturnTypeMdId() const
 {
-	return m_return_type_mdid;
+	return m_return_type_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -145,16 +145,16 @@ CScalarOp::GetReturnTypeMdId() const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarOp::MdidType() const
 {
 	if (nullptr != m_return_type_mdid)
 	{
-		return m_return_type_mdid;
+		return m_return_type_mdid.get();
 	}
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	return md_accessor->RetrieveScOp(m_mdid_op)->GetResultTypeMdid();
+	return md_accessor->RetrieveScOp(m_mdid_op.get())->GetResultTypeMdid();
 }
 
 //---------------------------------------------------------------------------
@@ -199,7 +199,7 @@ CScalarOp::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarOp::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
+CScalarOp::Eber(ULongPtrArray *pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

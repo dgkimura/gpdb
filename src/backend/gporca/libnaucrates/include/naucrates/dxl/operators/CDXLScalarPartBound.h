@@ -35,7 +35,7 @@ private:
 	ULONG m_partitioning_level;
 
 	// boundary type
-	gpos::owner<IMDId *> m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// whether this represents a lower or upper bound
 	BOOL m_is_lower_bound;
@@ -45,7 +45,7 @@ public:
 
 	// ctor
 	CDXLScalarPartBound(CMemoryPool *mp, ULONG partitioning_level,
-						gpos::owner<IMDId *> mdid_type, BOOL is_lower_bound);
+						gpos::Ref<IMDId> mdid_type, BOOL is_lower_bound);
 
 	// dtor
 	~CDXLScalarPartBound() override;
@@ -64,10 +64,10 @@ public:
 	}
 
 	// boundary type
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// is this a lower (or upper) bound
@@ -79,7 +79,7 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// does the operator return a boolean result
 	BOOL HasBoolResult(CMDAccessor *md_accessor) const override;
@@ -87,12 +87,12 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarPartBound *>
+	static CDXLScalarPartBound *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

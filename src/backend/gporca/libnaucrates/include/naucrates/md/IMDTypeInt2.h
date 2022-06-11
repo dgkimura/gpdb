@@ -49,9 +49,8 @@ public:
 	}
 
 	// factory function for INT2 datums
-	virtual gpos::owner<IDatumInt2 *> CreateInt2Datum(CMemoryPool *mp,
-													  SINT value,
-													  BOOL is_null) const = 0;
+	virtual gpos::Ref<IDatumInt2> CreateInt2Datum(CMemoryPool *mp, SINT value,
+												  BOOL is_null) const = 0;
 };
 
 }  // namespace gpmd

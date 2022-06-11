@@ -73,9 +73,8 @@ CDXLScalarOneTimeFilter::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarOneTimeFilter::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarOneTimeFilter::SerializeToDXL(CXMLSerializer *xml_serializer,
+										const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

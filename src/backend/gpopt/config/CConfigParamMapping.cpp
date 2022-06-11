@@ -302,13 +302,13 @@ CConfigParamMapping::SConfigMappingElem CConfigParamMapping::m_elements[] = {
 //		Pack the GPDB config params into a bitset
 //
 //---------------------------------------------------------------------------
-gpos::owner<CBitSet *>
+gpos::Ref<CBitSet>
 CConfigParamMapping::PackConfigParamInBitset(
 	CMemoryPool *mp,
 	ULONG xform_id	// number of available xforms
 )
 {
-	gpos::owner<CBitSet *> traceflag_bitset =
+	gpos::Ref<CBitSet> traceflag_bitset =
 		GPOS_NEW(mp) CBitSet(mp, EopttraceSentinel);
 
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(m_elements); ul++)
@@ -348,26 +348,25 @@ CConfigParamMapping::PackConfigParamInBitset(
 
 	if (!optimizer_enable_nljoin)
 	{
-		gpos::owner<CBitSet *> nl_join_bitset = CXform::PbsNLJoinXforms(mp);
-		traceflag_bitset->Union(nl_join_bitset);
-		nl_join_bitset->Release();
+		gpos::Ref<CBitSet> nl_join_bitset = CXform::PbsNLJoinXforms(mp);
+		traceflag_bitset->Union(nl_join_bitset.get());
+		;
 	}
 
 	if (!optimizer_enable_indexjoin)
 	{
-		gpos::owner<CBitSet *> index_join_bitset =
-			CXform::PbsIndexJoinXforms(mp);
-		traceflag_bitset->Union(index_join_bitset);
-		index_join_bitset->Release();
+		gpos::Ref<CBitSet> index_join_bitset = CXform::PbsIndexJoinXforms(mp);
+		traceflag_bitset->Union(index_join_bitset.get());
+		;
 	}
 
 	// disable bitmap scan if the corresponding GUC is turned off
 	if (!optimizer_enable_bitmapscan)
 	{
-		gpos::owner<CBitSet *> bitmap_index_bitset =
+		gpos::Ref<CBitSet> bitmap_index_bitset =
 			CXform::PbsBitmapIndexXforms(mp);
-		traceflag_bitset->Union(bitmap_index_bitset);
-		bitmap_index_bitset->Release();
+		traceflag_bitset->Union(bitmap_index_bitset.get());
+		;
 	}
 
 	// disable outerjoin to unionall transformation if GUC is turned off
@@ -392,9 +391,9 @@ CConfigParamMapping::PackConfigParamInBitset(
 	if (!optimizer_enable_hashjoin)
 	{
 		// disable hash-join if the corresponding GUC is turned off
-		gpos::owner<CBitSet *> hash_join_bitste = CXform::PbsHashJoinXforms(mp);
-		traceflag_bitset->Union(hash_join_bitste);
-		hash_join_bitste->Release();
+		gpos::Ref<CBitSet> hash_join_bitste = CXform::PbsHashJoinXforms(mp);
+		traceflag_bitset->Union(hash_join_bitste.get());
+		;
 	}
 
 	if (!optimizer_enable_dynamictablescan)
@@ -447,7 +446,7 @@ CConfigParamMapping::PackConfigParamInBitset(
 			GPOPT_DISABLE_XFORM_TF(CXform::ExfImplementFullOuterMergeJoin));
 	}
 
-	gpos::owner<CBitSet *> join_heuristic_bitset = nullptr;
+	gpos::Ref<CBitSet> join_heuristic_bitset = nullptr;
 	switch (optimizer_join_order)
 	{
 		case JOIN_ORDER_IN_QUERY:
@@ -468,8 +467,8 @@ CConfigParamMapping::PackConfigParamInBitset(
 				 not come here");
 			break;
 	}
-	traceflag_bitset->Union(join_heuristic_bitset);
-	join_heuristic_bitset->Release();
+	traceflag_bitset->Union(join_heuristic_bitset.get());
+	;
 
 	// disable join associativity transform if the corresponding GUC
 	// is turned off independent of the join order algorithm chosen

@@ -67,16 +67,16 @@ CDrvdPropRelational::~CDrvdPropRelational()
 	{
 		CAutoSuspendAbort asa;
 
-		CRefCount::SafeRelease(m_is_prop_derived);
-		CRefCount::SafeRelease(m_pcrsOutput);
-		CRefCount::SafeRelease(m_pcrsOuter);
-		CRefCount::SafeRelease(m_pcrsNotNull);
-		CRefCount::SafeRelease(m_pcrsCorrelatedApply);
-		CRefCount::SafeRelease(m_pkc);
-		CRefCount::SafeRelease(m_pdrgpfd);
-		CRefCount::SafeRelease(m_ppartinfo);
-		CRefCount::SafeRelease(m_ppc);
-		CRefCount::SafeRelease(m_pfp);
+		;
+		;
+		;
+		;
+		;
+		;
+		;
+		;
+		;
+		;
 	}
 }
 
@@ -92,7 +92,7 @@ CDrvdPropRelational::~CDrvdPropRelational()
 void
 CDrvdPropRelational::Derive(CMemoryPool *,	//mp,
 							CExpressionHandle &exprhdl,
-							gpos::pointer<CDrvdPropCtxt *>	// pdpctxt
+							CDrvdPropCtxt *	 // pdpctxt
 )
 {
 	GPOS_CHECK_ABORT;
@@ -145,7 +145,7 @@ CDrvdPropRelational::Derive(CMemoryPool *,	//mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDrvdPropRelational::FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const
+CDrvdPropRelational::FSatisfies(const CReqdPropPlan *prpp) const
 {
 	GPOS_ASSERT(nullptr != prpp);
 	GPOS_ASSERT(nullptr != prpp->PcrsRequired());
@@ -164,7 +164,7 @@ CDrvdPropRelational::FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-gpos::cast_func<CDrvdPropRelational *>
+CDrvdPropRelational *
 CDrvdPropRelational::GetRelationalProperties(CDrvdProp *pdp)
 {
 	GPOS_ASSERT(nullptr != pdp);
@@ -182,7 +182,7 @@ CDrvdPropRelational::GetRelationalProperties(CDrvdProp *pdp)
 //		Helper for getting applicable FDs from child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CFunctionalDependencyArray *>
+gpos::Ref<CFunctionalDependencyArray>
 CDrvdPropRelational::DeriveChildFunctionalDependencies(
 	CMemoryPool *mp, ULONG child_index, CExpressionHandle &exprhdl)
 {
@@ -190,38 +190,35 @@ CDrvdPropRelational::DeriveChildFunctionalDependencies(
 	GPOS_ASSERT(!exprhdl.FScalarChild(child_index));
 
 	// get FD's of the child
-	gpos::pointer<CFunctionalDependencyArray *> pdrgpfdChild =
-		exprhdl.Pdrgpfd(child_index);
+	CFunctionalDependencyArray *pdrgpfdChild = exprhdl.Pdrgpfd(child_index);
 
 	// get output columns of the parent
-	gpos::pointer<CColRefSet *> pcrsOutput = exprhdl.DeriveOutputColumns();
+	CColRefSet *pcrsOutput = exprhdl.DeriveOutputColumns();
 
 	// collect child FD's that are applicable to the parent
-	gpos::owner<CFunctionalDependencyArray *> pdrgpfd =
+	gpos::Ref<CFunctionalDependencyArray> pdrgpfd =
 		GPOS_NEW(mp) CFunctionalDependencyArray(mp);
 	const ULONG size = pdrgpfdChild->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		gpos::pointer<CFunctionalDependency *> pfd = (*pdrgpfdChild)[ul];
+		CFunctionalDependency *pfd = (*pdrgpfdChild)[ul].get();
 
 		// check applicability of FD's LHS
 		if (pcrsOutput->ContainsAll(pfd->PcrsKey()))
 		{
 			// decompose FD's RHS to extract the applicable part
-			gpos::owner<CColRefSet *> pcrsDetermined =
-				GPOS_NEW(mp) CColRefSet(mp);
+			gpos::Ref<CColRefSet> pcrsDetermined = GPOS_NEW(mp) CColRefSet(mp);
 			pcrsDetermined->Include(pfd->PcrsDetermined());
 			pcrsDetermined->Intersection(pcrsOutput);
 			if (0 < pcrsDetermined->Size())
 			{
 				// create a new FD and add it to the output array
-				pfd->PcrsKey()->AddRef();
-				pcrsDetermined->AddRef();
-				gpos::owner<CFunctionalDependency *> pfdNew = GPOS_NEW(mp)
+				;
+				;
+				gpos::Ref<CFunctionalDependency> pfdNew = GPOS_NEW(mp)
 					CFunctionalDependency(pfd->PcrsKey(), pcrsDetermined);
 				pdrgpfd->Append(pfdNew);
-			}
-			pcrsDetermined->Release();
+			};
 		}
 	}
 
@@ -237,15 +234,15 @@ CDrvdPropRelational::DeriveChildFunctionalDependencies(
 //		Helper for deriving local FDs
 //
 //---------------------------------------------------------------------------
-gpos::owner<CFunctionalDependencyArray *>
+gpos::Ref<CFunctionalDependencyArray>
 CDrvdPropRelational::DeriveLocalFunctionalDependencies(
 	CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
-	gpos::owner<CFunctionalDependencyArray *> pdrgpfd =
+	gpos::Ref<CFunctionalDependencyArray> pdrgpfd =
 		GPOS_NEW(mp) CFunctionalDependencyArray(mp);
 
 	// get local key
-	gpos::pointer<CKeyCollection *> pkc = exprhdl.DeriveKeyCollection();
+	CKeyCollection *pkc = exprhdl.DeriveKeyCollection();
 
 	if (nullptr == pkc)
 	{
@@ -255,29 +252,29 @@ CDrvdPropRelational::DeriveLocalFunctionalDependencies(
 	ULONG ulKeys = pkc->Keys();
 	for (ULONG ul = 0; ul < ulKeys; ul++)
 	{
-		gpos::owner<CColRefArray *> pdrgpcrKey = pkc->PdrgpcrKey(mp, ul);
-		gpos::owner<CColRefSet *> pcrsKey = GPOS_NEW(mp) CColRefSet(mp);
-		pcrsKey->Include(pdrgpcrKey);
+		gpos::Ref<CColRefArray> pdrgpcrKey = pkc->PdrgpcrKey(mp, ul);
+		gpos::Ref<CColRefSet> pcrsKey = GPOS_NEW(mp) CColRefSet(mp);
+		pcrsKey->Include(pdrgpcrKey.get());
 
 		// get output columns
-		gpos::pointer<CColRefSet *> pcrsOutput = exprhdl.DeriveOutputColumns();
-		gpos::owner<CColRefSet *> pcrsDetermined = GPOS_NEW(mp) CColRefSet(mp);
+		CColRefSet *pcrsOutput = exprhdl.DeriveOutputColumns();
+		gpos::Ref<CColRefSet> pcrsDetermined = GPOS_NEW(mp) CColRefSet(mp);
 		pcrsDetermined->Include(pcrsOutput);
-		pcrsDetermined->Exclude(pcrsKey);
+		pcrsDetermined->Exclude(pcrsKey.get());
 
 		if (0 < pcrsDetermined->Size())
 		{
 			// add FD between key and the rest of output columns
-			pcrsKey->AddRef();
-			pcrsDetermined->AddRef();
-			gpos::owner<CFunctionalDependency *> pfdLocal =
+			;
+			;
+			gpos::Ref<CFunctionalDependency> pfdLocal =
 				GPOS_NEW(mp) CFunctionalDependency(pcrsKey, pcrsDetermined);
 			pdrgpfd->Append(pfdLocal);
 		}
 
-		pcrsKey->Release();
-		pcrsDetermined->Release();
-		CRefCount::SafeRelease(pdrgpcrKey);
+		;
+		;
+		;
 	}
 
 	return pdrgpfd;
@@ -320,8 +317,7 @@ CDrvdPropRelational::OsPrint(IOstream &os) const
 	os << ", FDs: [";
 	for (ULONG ul = 0; ul < ulFDs; ul++)
 	{
-		gpos::pointer<CFunctionalDependency *> pfd =
-			(*GetFunctionalDependencies())[ul];
+		CFunctionalDependency *pfd = (*GetFunctionalDependencies())[ul].get();
 		os << *pfd;
 	}
 	os << "]";
@@ -334,107 +330,102 @@ CDrvdPropRelational::OsPrint(IOstream &os) const
 }
 
 // output columns
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropRelational::GetOutputColumns() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_pcrsOutput;
+	return m_pcrsOutput.get();
 }
 
 // output columns
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropRelational::DeriveOutputColumns(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPcrsOutput))
 	{
-		gpos::pointer<CLogical *> popLogical =
-			gpos::dyn_cast<CLogical>(exprhdl.Pop());
+		CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 		m_pcrsOutput = popLogical->DeriveOutputColumns(m_mp, exprhdl);
 	}
 
-	return m_pcrsOutput;
+	return m_pcrsOutput.get();
 }
 
 // outer references
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropRelational::GetOuterReferences() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_pcrsOuter;
+	return m_pcrsOuter.get();
 }
 
 // outer references
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropRelational::DeriveOuterReferences(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPcrsOuter))
 	{
-		gpos::pointer<CLogical *> popLogical =
-			gpos::dyn_cast<CLogical>(exprhdl.Pop());
+		CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 		m_pcrsOuter = popLogical->DeriveOuterReferences(m_mp, exprhdl);
 	}
 
-	return m_pcrsOuter;
+	return m_pcrsOuter.get();
 }
 
 // nullable columns
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropRelational::GetNotNullColumns() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_pcrsNotNull;
+	return m_pcrsNotNull.get();
 }
 
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropRelational::DeriveNotNullColumns(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPcrsNotNull))
 	{
-		gpos::pointer<CLogical *> popLogical =
-			gpos::dyn_cast<CLogical>(exprhdl.Pop());
+		CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 		m_pcrsNotNull = popLogical->DeriveNotNullColumns(m_mp, exprhdl);
 	}
 
-	return m_pcrsNotNull;
+	return m_pcrsNotNull.get();
 }
 
 // columns from the inner child of a correlated-apply expression that can be used above the apply expression
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropRelational::GetCorrelatedApplyColumns() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_pcrsCorrelatedApply;
+	return m_pcrsCorrelatedApply.get();
 }
 
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropRelational::DeriveCorrelatedApplyColumns(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPcrsCorrelatedApply))
 	{
-		gpos::pointer<CLogical *> popLogical =
-			gpos::dyn_cast<CLogical>(exprhdl.Pop());
+		CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 		m_pcrsCorrelatedApply =
 			popLogical->DeriveCorrelatedApplyColumns(m_mp, exprhdl);
 	}
 
-	return m_pcrsCorrelatedApply;
+	return m_pcrsCorrelatedApply.get();
 }
 
 // key collection
-gpos::pointer<CKeyCollection *>
+CKeyCollection *
 CDrvdPropRelational::GetKeyCollection() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_pkc;
+	return m_pkc.get();
 }
 
-gpos::pointer<CKeyCollection *>
+CKeyCollection *
 CDrvdPropRelational::DeriveKeyCollection(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPkc))
 	{
-		gpos::pointer<CLogical *> popLogical =
-			gpos::dyn_cast<CLogical>(exprhdl.Pop());
+		CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 		m_pkc = popLogical->DeriveKeyCollection(m_mp, exprhdl);
 
 		if (nullptr == m_pkc && 1 == DeriveMaxCard(exprhdl))
@@ -443,29 +434,29 @@ CDrvdPropRelational::DeriveKeyCollection(CExpressionHandle &exprhdl)
 
 			if (0 < m_pcrsOutput->Size())
 			{
-				m_pcrsOutput->AddRef();
+				;
 				m_pkc = GPOS_NEW(m_mp) CKeyCollection(m_mp, m_pcrsOutput);
 			}
 		}
 	}
 
-	return m_pkc;
+	return m_pkc.get();
 }
 
 // functional dependencies
-gpos::pointer<CFunctionalDependencyArray *>
+CFunctionalDependencyArray *
 CDrvdPropRelational::GetFunctionalDependencies() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_pdrgpfd;
+	return m_pdrgpfd.get();
 }
 
-gpos::pointer<CFunctionalDependencyArray *>
+CFunctionalDependencyArray *
 CDrvdPropRelational::DeriveFunctionalDependencies(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPdrgpfd))
 	{
-		gpos::owner<CFunctionalDependencyArray *> pdrgpfd =
+		gpos::Ref<CFunctionalDependencyArray> pdrgpfd =
 			GPOS_NEW(m_mp) CFunctionalDependencyArray(m_mp);
 		const ULONG arity = exprhdl.Arity();
 
@@ -474,22 +465,22 @@ CDrvdPropRelational::DeriveFunctionalDependencies(CExpressionHandle &exprhdl)
 		{
 			if (!exprhdl.FScalarChild(ul))
 			{
-				gpos::owner<CFunctionalDependencyArray *> pdrgpfdChild =
+				gpos::Ref<CFunctionalDependencyArray> pdrgpfdChild =
 					DeriveChildFunctionalDependencies(m_mp, ul, exprhdl);
-				CUtils::AddRefAppend(pdrgpfd, pdrgpfdChild);
-				pdrgpfdChild->Release();
+				CUtils::AddRefAppend(pdrgpfd.get(), pdrgpfdChild.get());
+				;
 			}
 		}
 		// add local FD's
-		gpos::owner<CFunctionalDependencyArray *> pdrgpfdLocal =
+		gpos::Ref<CFunctionalDependencyArray> pdrgpfdLocal =
 			DeriveLocalFunctionalDependencies(m_mp, exprhdl);
-		CUtils::AddRefAppend(pdrgpfd, pdrgpfdLocal);
-		pdrgpfdLocal->Release();
+		CUtils::AddRefAppend(pdrgpfd.get(), pdrgpfdLocal.get());
+		;
 
 		m_pdrgpfd = pdrgpfd;
 	}
 
-	return m_pdrgpfd;
+	return m_pdrgpfd.get();
 }
 
 // max cardinality
@@ -505,8 +496,7 @@ CDrvdPropRelational::DeriveMaxCard(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptMaxCard))
 	{
-		gpos::pointer<CLogical *> popLogical =
-			gpos::dyn_cast<CLogical>(exprhdl.Pop());
+		CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 		m_maxcard = popLogical->DeriveMaxCard(m_mp, exprhdl);
 	}
 
@@ -526,8 +516,7 @@ CDrvdPropRelational::DeriveJoinDepth(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptJoinDepth))
 	{
-		gpos::pointer<CLogical *> popLogical =
-			gpos::dyn_cast<CLogical>(exprhdl.Pop());
+		CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 		m_ulJoinDepth = popLogical->DeriveJoinDepth(m_mp, exprhdl);
 	}
 
@@ -535,72 +524,69 @@ CDrvdPropRelational::DeriveJoinDepth(CExpressionHandle &exprhdl)
 }
 
 // partition consumers
-gpos::pointer<CPartInfo *>
+CPartInfo *
 CDrvdPropRelational::GetPartitionInfo() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_ppartinfo;
+	return m_ppartinfo.get();
 }
 
-gpos::pointer<CPartInfo *>
+CPartInfo *
 CDrvdPropRelational::DerivePartitionInfo(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPpartinfo))
 	{
-		gpos::pointer<CLogical *> popLogical =
-			gpos::dyn_cast<CLogical>(exprhdl.Pop());
+		CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 		m_ppartinfo = popLogical->DerivePartitionInfo(m_mp, exprhdl);
 
 		GPOS_ASSERT(nullptr != m_ppartinfo);
 	}
 
-	return m_ppartinfo;
+	return m_ppartinfo.get();
 }
 
 // constraint property
-gpos::pointer<CPropConstraint *>
+CPropConstraint *
 CDrvdPropRelational::GetPropertyConstraint() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_ppc;
+	return m_ppc.get();
 }
 
-gpos::pointer<CPropConstraint *>
+CPropConstraint *
 CDrvdPropRelational::DerivePropertyConstraint(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPpc))
 	{
-		gpos::pointer<CLogical *> popLogical =
-			gpos::dyn_cast<CLogical>(exprhdl.Pop());
+		CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 		m_ppc = popLogical->DerivePropertyConstraint(m_mp, exprhdl);
 	}
 
-	return m_ppc;
+	return m_ppc.get();
 }
 
 // function properties
-gpos::pointer<CFunctionProp *>
+CFunctionProp *
 CDrvdPropRelational::GetFunctionProperties() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_pfp;
+	return m_pfp.get();
 }
 
-gpos::pointer<CFunctionProp *>
+CFunctionProp *
 CDrvdPropRelational::DeriveFunctionProperties(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPfp))
 	{
-		gpos::pointer<CLogical *> popLogical =
-			gpos::dyn_cast<CLogical>(exprhdl.Pop());
+		CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 		m_pfp = popLogical->DeriveFunctionProperties(m_mp, exprhdl);
 	}
 
-	return m_pfp;
+	return m_pfp.get();
 }
 
 // table descriptor
-gpos::pointer<CTableDescriptor *>
+CTableDescriptor *
 CDrvdPropRelational::GetTableDescriptor() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
@@ -612,8 +598,7 @@ CDrvdPropRelational::DeriveTableDescriptor(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptTableDescriptor))
 	{
-		gpos::pointer<CLogical *> popLogical =
-			gpos::dyn_cast<CLogical>(exprhdl.Pop());
+		CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 		m_table_descriptor = popLogical->DeriveTableDescriptor(m_mp, exprhdl);
 	}
 

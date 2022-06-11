@@ -43,7 +43,7 @@ private:
 	BOOL m_is_rej_limit_in_rows;
 
 	// format error table mdid
-	gpos::pointer<IMDId *> m_mdid_fmt_err_table;
+	IMDId *m_mdid_fmt_err_table;
 
 	// distribution opfamilies parse handler
 	CParseHandlerBase *m_opfamilies_parse_handler;

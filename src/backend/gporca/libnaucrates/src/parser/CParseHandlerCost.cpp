@@ -48,7 +48,7 @@ CParseHandlerCost::CParseHandlerCost(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerCost::~CParseHandlerCost()
 {
-	CRefCount::SafeRelease(m_operator_cost_dxl);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -59,10 +59,10 @@ CParseHandlerCost::~CParseHandlerCost()
 //		Destructor
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLOperatorCost *>
+CDXLOperatorCost *
 CParseHandlerCost::GetDXLOperatorCost()
 {
-	return m_operator_cost_dxl;
+	return m_operator_cost_dxl.get();
 }
 
 //---------------------------------------------------------------------------

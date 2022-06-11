@@ -32,10 +32,10 @@ FORCE_GENERATE_DBGSTR(CPartConstraint);
 //
 //---------------------------------------------------------------------------
 CPartConstraint::CPartConstraint(CMemoryPool *mp,
-								 gpos::owner<UlongToConstraintMap *> phmulcnstr,
-								 gpos::owner<CBitSet *> pbsDefaultParts,
+								 gpos::Ref<UlongToConstraintMap> phmulcnstr,
+								 gpos::Ref<CBitSet> pbsDefaultParts,
 								 BOOL is_unbounded,
-								 gpos::owner<CColRef2dArray *> pdrgpdrgpcr)
+								 gpos::Ref<CColRef2dArray> pdrgpdrgpcr)
 	: m_phmulcnstr(std::move(phmulcnstr)),
 	  m_pbsDefaultParts(std::move(pbsDefaultParts)),
 	  m_is_unbounded(is_unbounded),
@@ -74,11 +74,11 @@ CPartConstraint::CPartConstraint(CMemoryPool *mp, CConstraint *pcnstr,
 		m_phmulcnstr->Insert(GPOS_NEW(mp) ULONG(0 /*ulLevel*/), pcnstr);
 	GPOS_ASSERT(result);
 
-	gpos::pointer<CColRefSet *> pcrsUsed = pcnstr->PcrsUsed();
+	CColRefSet *pcrsUsed = pcnstr->PcrsUsed();
 	GPOS_ASSERT(1 == pcrsUsed->Size());
 	CColRef *pcrPartKey = pcrsUsed->PcrFirst();
 
-	gpos::owner<CColRefArray *> colref_array = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 	colref_array->Append(pcrPartKey);
 
 	m_pdrgpdrgpcr = GPOS_NEW(mp) CColRef2dArray(mp);
@@ -91,7 +91,7 @@ CPartConstraint::CPartConstraint(CMemoryPool *mp, CConstraint *pcnstr,
 		m_pbsDefaultParts->ExchangeSet(0 /*ulBit*/);
 	}
 
-	pcnstr->AddRef();
+	;
 	m_pcnstrCombined = pcnstr;
 }
 
@@ -125,10 +125,10 @@ CPartConstraint::CPartConstraint(BOOL fUninterpreted)
 //---------------------------------------------------------------------------
 CPartConstraint::~CPartConstraint()
 {
-	CRefCount::SafeRelease(m_phmulcnstr);
-	CRefCount::SafeRelease(m_pbsDefaultParts);
-	CRefCount::SafeRelease(m_pdrgpdrgpcr);
-	CRefCount::SafeRelease(m_pcnstrCombined);
+	;
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -139,17 +139,16 @@ CPartConstraint::~CPartConstraint()
 //		Construct the combined constraint
 //
 //---------------------------------------------------------------------------
-gpos::owner<CConstraint *>
+gpos::Ref<CConstraint>
 CPartConstraint::PcnstrBuildCombined(CMemoryPool *mp)
 {
-	gpos::owner<CConstraintArray *> pdrgpcnstr =
-		GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::Ref<CConstraintArray> pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
 	for (ULONG ul = 0; ul < m_num_of_part_levels; ul++)
 	{
 		CConstraint *pcnstr = m_phmulcnstr->Find(&ul);
 		if (nullptr != pcnstr)
 		{
-			pcnstr->AddRef();
+			;
 			pdrgpcnstr->Append(pcnstr);
 		}
 	}
@@ -204,8 +203,7 @@ CPartConstraint::IsConstraintUnbounded() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPartConstraint::FEquivalent(
-	gpos::pointer<const CPartConstraint *> ppartcnstr) const
+CPartConstraint::FEquivalent(const CPartConstraint *ppartcnstr) const
 {
 	GPOS_ASSERT(nullptr != ppartcnstr);
 
@@ -220,8 +218,8 @@ CPartConstraint::FEquivalent(
 	}
 
 	return m_num_of_part_levels == ppartcnstr->m_num_of_part_levels &&
-		   m_pbsDefaultParts->Equals(ppartcnstr->m_pbsDefaultParts) &&
-		   FEqualConstrMaps(m_phmulcnstr, ppartcnstr->m_phmulcnstr,
+		   m_pbsDefaultParts->Equals(ppartcnstr->m_pbsDefaultParts.get()) &&
+		   FEqualConstrMaps(m_phmulcnstr.get(), ppartcnstr->m_phmulcnstr.get(),
 							m_num_of_part_levels);
 }
 
@@ -234,9 +232,9 @@ CPartConstraint::FEquivalent(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPartConstraint::FEqualConstrMaps(
-	gpos::pointer<UlongToConstraintMap *> phmulcnstrFst,
-	gpos::pointer<UlongToConstraintMap *> phmulcnstrSnd, ULONG ulLevels)
+CPartConstraint::FEqualConstrMaps(UlongToConstraintMap *phmulcnstrFst,
+								  UlongToConstraintMap *phmulcnstrSnd,
+								  ULONG ulLevels)
 {
 	if (phmulcnstrFst->Size() != phmulcnstrSnd->Size())
 	{
@@ -245,8 +243,8 @@ CPartConstraint::FEqualConstrMaps(
 
 	for (ULONG ul = 0; ul < ulLevels; ul++)
 	{
-		gpos::pointer<CConstraint *> pcnstrFst = phmulcnstrFst->Find(&ul);
-		gpos::pointer<CConstraint *> pcnstrSnd = phmulcnstrSnd->Find(&ul);
+		CConstraint *pcnstrFst = phmulcnstrFst->Find(&ul);
+		CConstraint *pcnstrSnd = phmulcnstrSnd->Find(&ul);
 
 		if ((nullptr == pcnstrFst || nullptr == pcnstrSnd) &&
 			pcnstrFst != pcnstrSnd)
@@ -271,7 +269,7 @@ CPartConstraint::FEqualConstrMaps(
 //		Constraint at given level
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CConstraint *>
+CConstraint *
 CPartConstraint::Pcnstr(ULONG ulLevel) const
 {
 	GPOS_ASSERT(!m_fUninterpreted &&
@@ -288,31 +286,30 @@ CPartConstraint::Pcnstr(ULONG ulLevel) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPartConstraint::FOverlapLevel(
-	CMemoryPool *mp, gpos::pointer<const CPartConstraint *> ppartcnstr,
-	ULONG ulLevel) const
+CPartConstraint::FOverlapLevel(CMemoryPool *mp,
+							   const CPartConstraint *ppartcnstr,
+							   ULONG ulLevel) const
 {
 	GPOS_ASSERT(nullptr != ppartcnstr);
 	GPOS_ASSERT(!IsConstraintUnbounded());
 	GPOS_ASSERT(!ppartcnstr->IsConstraintUnbounded());
 
-	gpos::owner<CConstraintArray *> pdrgpcnstr =
-		GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::Ref<CConstraintArray> pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
 	CConstraint *pcnstrCurrent = Pcnstr(ulLevel);
 	CConstraint *pcnstrOther = ppartcnstr->Pcnstr(ulLevel);
 	GPOS_ASSERT(nullptr != pcnstrCurrent);
 	GPOS_ASSERT(nullptr != pcnstrOther);
 
-	pcnstrCurrent->AddRef();
-	pcnstrOther->AddRef();
+	;
+	;
 	pdrgpcnstr->Append(pcnstrCurrent);
 	pdrgpcnstr->Append(pcnstrOther);
 
-	gpos::owner<CConstraint *> pcnstrIntersect =
+	gpos::Ref<CConstraint> pcnstrIntersect =
 		CConstraint::PcnstrConjunction(mp, pdrgpcnstr);
 
 	BOOL fOverlap = !pcnstrIntersect->FContradiction();
-	pcnstrIntersect->Release();
+	;
 
 	return fOverlap || (IsDefaultPartition(ulLevel) &&
 						ppartcnstr->IsDefaultPartition(ulLevel));
@@ -327,8 +324,8 @@ CPartConstraint::FOverlapLevel(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPartConstraint::FOverlap(
-	CMemoryPool *mp, gpos::pointer<const CPartConstraint *> ppartcnstr) const
+CPartConstraint::FOverlap(CMemoryPool *mp,
+						  const CPartConstraint *ppartcnstr) const
 {
 	GPOS_ASSERT(nullptr != ppartcnstr);
 	GPOS_ASSERT(!m_fUninterpreted &&
@@ -359,8 +356,7 @@ CPartConstraint::FOverlap(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPartConstraint::FSubsume(
-	gpos::pointer<const CPartConstraint *> ppartcnstr) const
+CPartConstraint::FSubsume(const CPartConstraint *ppartcnstr) const
 {
 	GPOS_ASSERT(nullptr != ppartcnstr);
 	GPOS_ASSERT(!m_fUninterpreted &&
@@ -379,8 +375,8 @@ CPartConstraint::FSubsume(
 	BOOL fSubsumeLevel = true;
 	for (ULONG ul = 0; ul < m_num_of_part_levels && fSubsumeLevel; ul++)
 	{
-		gpos::pointer<CConstraint *> pcnstrCurrent = Pcnstr(ul);
-		gpos::pointer<CConstraint *> pcnstrOther = ppartcnstr->Pcnstr(ul);
+		CConstraint *pcnstrCurrent = Pcnstr(ul);
+		CConstraint *pcnstrOther = ppartcnstr->Pcnstr(ul);
 		GPOS_ASSERT(nullptr != pcnstrCurrent);
 		GPOS_ASSERT(nullptr != pcnstrOther);
 
@@ -413,7 +409,7 @@ CPartConstraint::FCanNegate() const
 	// all levels after the first must be unconstrained
 	for (ULONG ul = 1; ul < m_num_of_part_levels; ul++)
 	{
-		gpos::pointer<CConstraint *> pcnstr = Pcnstr(ul);
+		CConstraint *pcnstr = Pcnstr(ul);
 		if (nullptr == pcnstr || !pcnstr->IsConstraintUnbounded())
 		{
 			return false;
@@ -433,9 +429,9 @@ CPartConstraint::FCanNegate() const
 //		performed
 //
 //---------------------------------------------------------------------------
-gpos::owner<CPartConstraint *>
-CPartConstraint::PpartcnstrRemaining(
-	CMemoryPool *mp, gpos::pointer<CPartConstraint *> ppartcnstr)
+gpos::Ref<CPartConstraint>
+CPartConstraint::PpartcnstrRemaining(CMemoryPool *mp,
+									 CPartConstraint *ppartcnstr)
 {
 	GPOS_ASSERT(
 		!m_fUninterpreted &&
@@ -448,15 +444,15 @@ CPartConstraint::PpartcnstrRemaining(
 		return nullptr;
 	}
 
-	gpos::owner<UlongToConstraintMap *> phmulcnstr =
+	gpos::Ref<UlongToConstraintMap> phmulcnstr =
 		GPOS_NEW(mp) UlongToConstraintMap(mp);
-	gpos::owner<CBitSet *> pbsDefaultParts = GPOS_NEW(mp) CBitSet(mp);
+	gpos::Ref<CBitSet> pbsDefaultParts = GPOS_NEW(mp) CBitSet(mp);
 
 	// constraint on first level
 	CConstraint *pcnstrCurrent = Pcnstr(0 /*ulLevel*/);
 	CConstraint *pcnstrOther = ppartcnstr->Pcnstr(0 /*ulLevel*/);
 
-	gpos::owner<CConstraint *> pcnstrRemaining =
+	gpos::Ref<CConstraint> pcnstrRemaining =
 		PcnstrRemaining(mp, pcnstrCurrent, pcnstrOther);
 
 	BOOL result GPOS_ASSERTS_ONLY =
@@ -475,7 +471,7 @@ CPartConstraint::PpartcnstrRemaining(
 		CConstraint *pcnstrLevel = Pcnstr(ul);
 		if (nullptr != pcnstrLevel)
 		{
-			pcnstrLevel->AddRef();
+			;
 			BOOL result GPOS_ASSERTS_ONLY =
 				phmulcnstr->Insert(GPOS_NEW(mp) ULONG(ul), pcnstrLevel);
 			GPOS_ASSERT(result);
@@ -487,7 +483,7 @@ CPartConstraint::PpartcnstrRemaining(
 		}
 	}
 
-	m_pdrgpdrgpcr->AddRef();
+	;
 	return GPOS_NEW(mp)
 		CPartConstraint(mp, std::move(phmulcnstr), std::move(pbsDefaultParts),
 						false /*is_unbounded*/, m_pdrgpdrgpcr);
@@ -502,14 +498,14 @@ CPartConstraint::PpartcnstrRemaining(
 //		the second constraint
 //
 //---------------------------------------------------------------------------
-gpos::owner<CConstraint *>
+gpos::Ref<CConstraint>
 CPartConstraint::PcnstrRemaining(CMemoryPool *mp, CConstraint *pcnstrFst,
 								 CConstraint *pcnstrSnd)
 {
 	GPOS_ASSERT(nullptr != pcnstrSnd);
 
-	pcnstrSnd->AddRef();
-	gpos::owner<CConstraint *> pcnstrNegation =
+	;
+	gpos::Ref<CConstraint> pcnstrNegation =
 		GPOS_NEW(mp) CConstraintNegation(mp, pcnstrSnd);
 
 	if (nullptr == pcnstrFst || pcnstrFst->IsConstraintUnbounded())
@@ -517,9 +513,8 @@ CPartConstraint::PcnstrRemaining(CMemoryPool *mp, CConstraint *pcnstrFst,
 		return pcnstrNegation;
 	}
 
-	gpos::owner<CConstraintArray *> pdrgpcnstr =
-		GPOS_NEW(mp) CConstraintArray(mp);
-	pcnstrFst->AddRef();
+	gpos::Ref<CConstraintArray> pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
+	;
 	pdrgpcnstr->Append(pcnstrFst);
 	pdrgpcnstr->Append(std::move(pcnstrNegation));
 
@@ -534,7 +529,7 @@ CPartConstraint::PcnstrRemaining(CMemoryPool *mp, CConstraint *pcnstrFst,
 //		Return a copy of the part constraint with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CPartConstraint *>
+gpos::Ref<CPartConstraint>
 CPartConstraint::PpartcnstrCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -543,21 +538,21 @@ CPartConstraint::PpartcnstrCopyWithRemappedColumns(
 		return GPOS_NEW(mp) CPartConstraint(true /*m_fUninterpreted*/);
 	}
 
-	gpos::owner<UlongToConstraintMap *> phmulcnstr =
+	gpos::Ref<UlongToConstraintMap> phmulcnstr =
 		GPOS_NEW(mp) UlongToConstraintMap(mp);
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcr = GPOS_NEW(mp) CColRef2dArray(mp);
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcr = GPOS_NEW(mp) CColRef2dArray(mp);
 
 	for (ULONG ul = 0; ul < m_num_of_part_levels; ul++)
 	{
-		gpos::pointer<CColRefArray *> colref_array = (*m_pdrgpdrgpcr)[ul];
-		gpos::owner<CColRefArray *> pdrgpcrMapped =
+		CColRefArray *colref_array = (*m_pdrgpdrgpcr)[ul].get();
+		gpos::Ref<CColRefArray> pdrgpcrMapped =
 			CUtils::PdrgpcrRemap(mp, colref_array, colref_mapping, must_exist);
 		pdrgpdrgpcr->Append(pdrgpcrMapped);
 
-		gpos::pointer<CConstraint *> pcnstr = Pcnstr(ul);
+		CConstraint *pcnstr = Pcnstr(ul);
 		if (nullptr != pcnstr)
 		{
-			gpos::owner<CConstraint *> pcnstrRemapped =
+			gpos::Ref<CConstraint> pcnstrRemapped =
 				pcnstr->PcnstrCopyWithRemappedColumns(mp, colref_mapping,
 													  must_exist);
 			BOOL result GPOS_ASSERTS_ONLY =
@@ -566,7 +561,7 @@ CPartConstraint::PpartcnstrCopyWithRemappedColumns(
 		}
 	}
 
-	m_pbsDefaultParts->AddRef();
+	;
 	return GPOS_NEW(mp)
 		CPartConstraint(mp, std::move(phmulcnstr), m_pbsDefaultParts,
 						m_is_unbounded, std::move(pdrgpdrgpcr));
@@ -596,7 +591,7 @@ CPartConstraint::OsPrint(IOstream &os) const
 		{
 			os << ", ";
 		}
-		gpos::pointer<CConstraint *> pcnstr = Pcnstr(ul);
+		CConstraint *pcnstr = Pcnstr(ul);
 		if (nullptr != pcnstr)
 		{
 			pcnstr->OsPrint(os);
@@ -624,9 +619,8 @@ CPartConstraint::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPartConstraint::FDisjunctionPossible(
-	gpos::pointer<CPartConstraint *> ppartcnstrFst,
-	gpos::pointer<CPartConstraint *> ppartcnstrSnd)
+CPartConstraint::FDisjunctionPossible(CPartConstraint *ppartcnstrFst,
+									  CPartConstraint *ppartcnstrSnd)
 {
 	GPOS_ASSERT(nullptr != ppartcnstrFst);
 	GPOS_ASSERT(nullptr != ppartcnstrSnd);
@@ -638,8 +632,8 @@ CPartConstraint::FDisjunctionPossible(
 
 	for (ULONG ul = 0; fSuccess && ul < ulLevels - 1; ul++)
 	{
-		gpos::pointer<CConstraint *> pcnstrFst = ppartcnstrFst->Pcnstr(ul);
-		gpos::pointer<CConstraint *> pcnstrSnd = ppartcnstrSnd->Pcnstr(ul);
+		CConstraint *pcnstrFst = ppartcnstrFst->Pcnstr(ul);
+		CConstraint *pcnstrSnd = ppartcnstrSnd->Pcnstr(ul);
 		fSuccess = (nullptr != pcnstrFst && nullptr != pcnstrSnd &&
 					pcnstrFst->Equals(pcnstrSnd) &&
 					ppartcnstrFst->IsDefaultPartition(ul) ==
@@ -662,23 +656,23 @@ CPartConstraint::FDisjunctionPossible(
 //		construct this disjunction if they differ only on the last level
 //
 //---------------------------------------------------------------------------
-gpos::owner<CPartConstraint *>
-CPartConstraint::PpartcnstrDisjunction(
-	CMemoryPool *mp, gpos::pointer<CPartConstraint *> ppartcnstrFst,
-	gpos::pointer<CPartConstraint *> ppartcnstrSnd)
+gpos::Ref<CPartConstraint>
+CPartConstraint::PpartcnstrDisjunction(CMemoryPool *mp,
+									   CPartConstraint *ppartcnstrFst,
+									   CPartConstraint *ppartcnstrSnd)
 {
 	GPOS_ASSERT(nullptr != ppartcnstrFst);
 	GPOS_ASSERT(nullptr != ppartcnstrSnd);
 
 	if (ppartcnstrFst->IsConstraintUnbounded())
 	{
-		ppartcnstrFst->AddRef();
+		;
 		return ppartcnstrFst;
 	}
 
 	if (ppartcnstrSnd->IsConstraintUnbounded())
 	{
-		ppartcnstrSnd->AddRef();
+		;
 		return ppartcnstrSnd;
 	}
 
@@ -687,16 +681,16 @@ CPartConstraint::PpartcnstrDisjunction(
 		return nullptr;
 	}
 
-	gpos::owner<UlongToConstraintMap *> phmulcnstr =
+	gpos::Ref<UlongToConstraintMap> phmulcnstr =
 		GPOS_NEW(mp) UlongToConstraintMap(mp);
-	gpos::owner<CBitSet *> pbsCombined = GPOS_NEW(mp) CBitSet(mp);
+	gpos::Ref<CBitSet> pbsCombined = GPOS_NEW(mp) CBitSet(mp);
 
 	const ULONG ulLevels = ppartcnstrFst->m_num_of_part_levels;
 	for (ULONG ul = 0; ul < ulLevels - 1; ul++)
 	{
-		gpos::owner<CConstraint *> pcnstrFst = ppartcnstrFst->Pcnstr(ul);
+		gpos::Ref<CConstraint> pcnstrFst = ppartcnstrFst->Pcnstr(ul);
 
-		pcnstrFst->AddRef();
+		;
 		BOOL result GPOS_ASSERTS_ONLY =
 			phmulcnstr->Insert(GPOS_NEW(mp) ULONG(ul), pcnstrFst);
 		GPOS_ASSERT(result);
@@ -711,15 +705,15 @@ CPartConstraint::PpartcnstrDisjunction(
 	CConstraint *pcnstrFst = ppartcnstrFst->Pcnstr(ulLevels - 1);
 	CConstraint *pcnstrSnd = ppartcnstrSnd->Pcnstr(ulLevels - 1);
 
-	pcnstrFst->AddRef();
-	pcnstrSnd->AddRef();
-	gpos::owner<CConstraintArray *> pdrgpcnstrCombined =
+	;
+	;
+	gpos::Ref<CConstraintArray> pdrgpcnstrCombined =
 		GPOS_NEW(mp) CConstraintArray(mp);
 
 	pdrgpcnstrCombined->Append(pcnstrFst);
 	pdrgpcnstrCombined->Append(pcnstrSnd);
 
-	gpos::owner<CConstraint *> pcnstrDisj =
+	gpos::Ref<CConstraint> pcnstrDisj =
 		CConstraint::PcnstrDisjunction(mp, pdrgpcnstrCombined);
 	GPOS_ASSERT(nullptr != pcnstrDisj);
 	BOOL result GPOS_ASSERTS_ONLY =
@@ -732,8 +726,8 @@ CPartConstraint::PpartcnstrDisjunction(
 		pbsCombined->ExchangeSet(ulLevels - 1);
 	}
 
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcr = ppartcnstrFst->Pdrgpdrgpcr();
-	pdrgpdrgpcr->AddRef();
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcr = ppartcnstrFst->Pdrgpdrgpcr();
+	;
 	return GPOS_NEW(mp)
 		CPartConstraint(mp, std::move(phmulcnstr), std::move(pbsCombined),
 						false /*is_unbounded*/, std::move(pdrgpdrgpcr));
@@ -749,9 +743,8 @@ CPartConstraint::PpartcnstrDisjunction(
 //---------------------------------------------------------------------------
 void
 CPartConstraint::CopyPartConstraints(
-	CMemoryPool *mp,
-	gpos::pointer<UlongToPartConstraintMap *> ppartcnstrmapDest,
-	gpos::pointer<UlongToPartConstraintMap *> ppartcnstrmapSource)
+	CMemoryPool *mp, UlongToPartConstraintMap *ppartcnstrmapDest,
+	UlongToPartConstraintMap *ppartcnstrmapSource)
 {
 	GPOS_ASSERT(nullptr != ppartcnstrmapDest);
 	GPOS_ASSERT(nullptr != ppartcnstrmapSource);
@@ -764,14 +757,13 @@ CPartConstraint::CopyPartConstraints(
 		CPartConstraint *ppartcnstrSource =
 			const_cast<CPartConstraint *>(pcmi.Value());
 
-		gpos::pointer<CPartConstraint *> ppartcnstrDest =
-			ppartcnstrmapDest->Find(&ulKey);
+		CPartConstraint *ppartcnstrDest = ppartcnstrmapDest->Find(&ulKey);
 		GPOS_ASSERT_IMP(nullptr != ppartcnstrDest,
 						ppartcnstrDest->FEquivalent(ppartcnstrSource));
 
 		if (nullptr == ppartcnstrDest)
 		{
-			ppartcnstrSource->AddRef();
+			;
 
 			BOOL result GPOS_ASSERTS_ONLY = ppartcnstrmapDest->Insert(
 				GPOS_NEW(mp) ULONG(ulKey), ppartcnstrSource);
@@ -789,10 +781,10 @@ CPartConstraint::CopyPartConstraints(
 //		Combine the two given part constraint maps and return the result
 //
 //---------------------------------------------------------------------------
-gpos::owner<UlongToPartConstraintMap *>
+gpos::Ref<UlongToPartConstraintMap>
 CPartConstraint::PpartcnstrmapCombine(
-	CMemoryPool *mp, gpos::pointer<UlongToPartConstraintMap *> ppartcnstrmapFst,
-	gpos::pointer<UlongToPartConstraintMap *> ppartcnstrmapSnd)
+	CMemoryPool *mp, UlongToPartConstraintMap *ppartcnstrmapFst,
+	UlongToPartConstraintMap *ppartcnstrmapSnd)
 {
 	if (nullptr == ppartcnstrmapFst && nullptr == ppartcnstrmapSnd)
 	{
@@ -801,24 +793,24 @@ CPartConstraint::PpartcnstrmapCombine(
 
 	if (nullptr == ppartcnstrmapFst)
 	{
-		ppartcnstrmapSnd->AddRef();
+		;
 		return ppartcnstrmapSnd;
 	}
 
 	if (nullptr == ppartcnstrmapSnd)
 	{
-		ppartcnstrmapFst->AddRef();
+		;
 		return ppartcnstrmapFst;
 	}
 
 	GPOS_ASSERT(nullptr != ppartcnstrmapFst);
 	GPOS_ASSERT(nullptr != ppartcnstrmapSnd);
 
-	gpos::owner<UlongToPartConstraintMap *> ppartcnstrmap =
+	gpos::Ref<UlongToPartConstraintMap> ppartcnstrmap =
 		GPOS_NEW(mp) UlongToPartConstraintMap(mp);
 
-	CopyPartConstraints(mp, ppartcnstrmap, ppartcnstrmapFst);
-	CopyPartConstraints(mp, ppartcnstrmap, ppartcnstrmapSnd);
+	CopyPartConstraints(mp, ppartcnstrmap.get(), ppartcnstrmapFst);
+	CopyPartConstraints(mp, ppartcnstrmap.get(), ppartcnstrmapSnd);
 
 	return ppartcnstrmap;
 }

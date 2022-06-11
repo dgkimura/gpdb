@@ -53,16 +53,16 @@ class CDXLScalarSubPlan : public CDXLScalar
 {
 private:
 	// catalog MDId of the first column type
-	gpos::owner<IMDId *> m_first_col_type_mdid;
+	gpos::Ref<IMDId> m_first_col_type_mdid;
 
 	// array of outer column references
-	gpos::owner<CDXLColRefArray *> m_dxl_colref_array;
+	gpos::Ref<CDXLColRefArray> m_dxl_colref_array;
 
 	// subplan type
 	EdxlSubPlanType m_dxl_subplan_type;
 
 	// test expression -- not null if quantified/existential subplan
-	gpos::owner<CDXLNode *> m_dxlnode_test_expr;
+	gpos::Ref<CDXLNode> m_dxlnode_test_expr;
 
 	// does test expression contain outer param
 	BOOL m_outer_param;
@@ -71,10 +71,10 @@ public:
 	CDXLScalarSubPlan(CDXLScalarSubPlan &) = delete;
 
 	// ctor/dtor
-	CDXLScalarSubPlan(CMemoryPool *mp, gpos::owner<IMDId *> first_col_type_mdid,
-					  gpos::owner<CDXLColRefArray *> dxl_colref_array,
+	CDXLScalarSubPlan(CMemoryPool *mp, gpos::Ref<IMDId> first_col_type_mdid,
+					  gpos::Ref<CDXLColRefArray> dxl_colref_array,
 					  EdxlSubPlanType dxl_subplan_type,
-					  gpos::owner<CDXLNode *> dxlnode_test_expr,
+					  gpos::Ref<CDXLNode> dxlnode_test_expr,
 					  BOOL outer_param = false);
 
 	~CDXLScalarSubPlan() override;
@@ -90,13 +90,13 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// type of first output column
-	gpos::pointer<IMDId *> GetFirstColTypeMdId() const;
+	IMDId *GetFirstColTypeMdId() const;
 
 	// outer references
-	gpos::pointer<const CDXLColRefArray *>
+	const CDXLColRefArray *
 	GetDxlOuterColRefsArray() const
 	{
-		return m_dxl_colref_array;
+		return m_dxl_colref_array.get();
 	}
 
 	// return subplan type
@@ -107,10 +107,10 @@ public:
 	}
 
 	// return test expression
-	gpos::pointer<CDXLNode *>
+	CDXLNode *
 	GetDxlTestExpr() const
 	{
-		return m_dxlnode_test_expr;
+		return m_dxlnode_test_expr.get();
 	}
 
 	BOOL
@@ -121,10 +121,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarSubPlan *>
+	static CDXLScalarSubPlan *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -142,7 +142,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

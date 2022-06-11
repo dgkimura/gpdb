@@ -33,27 +33,27 @@ class CJoinOrderGreedy : public CJoinOrder
 {
 private:
 	// result component
-	gpos::owner<SComponent *> m_pcompResult;
+	gpos::Ref<SComponent> m_pcompResult;
 
 	// returns starting joins with minimal cardinality
-	gpos::owner<SComponent *> GetStartingJoins();
+	gpos::Ref<SComponent> GetStartingJoins();
 
 public:
 	// ctor
 	CJoinOrderGreedy(CMemoryPool *pmp,
-					 gpos::owner<CExpressionArray *> pdrgpexprComponents,
-					 gpos::owner<CExpressionArray *> pdrgpexprConjuncts);
+					 gpos::Ref<CExpressionArray> pdrgpexprComponents,
+					 gpos::Ref<CExpressionArray> pdrgpexprConjuncts);
 
 	// dtor
 	~CJoinOrderGreedy() override;
 
 	// main handler
-	virtual gpos::owner<CExpression *> PexprExpand();
+	virtual gpos::Ref<CExpression> PexprExpand();
 
 	ULONG
-	PickBestJoin(gpos::pointer<CBitSet *> candidate_nodes);
+	PickBestJoin(CBitSet *candidate_nodes);
 
-	gpos::owner<CBitSet *> GetAdjacentComponentsToJoinCandidate();
+	gpos::Ref<CBitSet> GetAdjacentComponentsToJoinCandidate();
 
 	CXform::EXformId
 	EOriginXForm() const override

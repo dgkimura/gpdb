@@ -137,18 +137,18 @@ CParseHandlerPhysicalAbstractBitmapScan::EndElementHelper(
 	GPOS_ASSERT(nullptr != table_descr_parse_handler->GetDXLTableDescr());
 
 	// set table descriptor
-	gpos::owner<CDXLTableDescr *> table_descr =
+	gpos::Ref<CDXLTableDescr> table_descr =
 		table_descr_parse_handler->GetDXLTableDescr();
-	table_descr->AddRef();
+	;
 
 
 	GPOS_ASSERT(EdxltokenPhysicalBitmapTableScan == token_type);
-	gpos::owner<CDXLPhysical *> dxl_op = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLPhysical> dxl_op = GPOS_NEW(m_mp)
 		CDXLPhysicalBitmapTableScan(m_mp, std::move(table_descr));
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 
 	// set statictics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add constructed children
 	AddChildFromParseHandler(proj_list_parse_handler);

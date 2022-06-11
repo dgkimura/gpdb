@@ -30,7 +30,7 @@ FORCE_GENERATE_DBGSTR(CFunctionalDependency);
 //
 //---------------------------------------------------------------------------
 CFunctionalDependency::CFunctionalDependency(
-	gpos::owner<CColRefSet *> pcrsKey, gpos::owner<CColRefSet *> pcrsDetermined)
+	gpos::Ref<CColRefSet> pcrsKey, gpos::Ref<CColRefSet> pcrsDetermined)
 	: m_pcrsKey(std::move(pcrsKey)), m_pcrsDetermined(std::move(pcrsDetermined))
 {
 	GPOS_ASSERT(0 < m_pcrsKey->Size());
@@ -48,8 +48,8 @@ CFunctionalDependency::CFunctionalDependency(
 //---------------------------------------------------------------------------
 CFunctionalDependency::~CFunctionalDependency()
 {
-	m_pcrsKey->Release();
-	m_pcrsDetermined->Release();
+	;
+	;
 }
 
 
@@ -62,9 +62,10 @@ CFunctionalDependency::~CFunctionalDependency()
 //
 //---------------------------------------------------------------------------
 BOOL
-CFunctionalDependency::FIncluded(gpos::pointer<CColRefSet *> pcrs) const
+CFunctionalDependency::FIncluded(CColRefSet *pcrs) const
 {
-	return pcrs->ContainsAll(m_pcrsKey) && pcrs->ContainsAll(m_pcrsDetermined);
+	return pcrs->ContainsAll(m_pcrsKey.get()) &&
+		   pcrs->ContainsAll(m_pcrsDetermined.get());
 }
 
 
@@ -93,8 +94,7 @@ CFunctionalDependency::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CFunctionalDependency::Equals(
-	gpos::pointer<const CFunctionalDependency *> pfd) const
+CFunctionalDependency::Equals(const CFunctionalDependency *pfd) const
 {
 	if (nullptr == pfd)
 	{
@@ -132,8 +132,7 @@ CFunctionalDependency::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 ULONG
-CFunctionalDependency::HashValue(
-	gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd)
+CFunctionalDependency::HashValue(const CFunctionalDependencyArray *pdrgpfd)
 {
 	ULONG ulHash = 0;
 	if (nullptr != pdrgpfd)
@@ -158,9 +157,8 @@ CFunctionalDependency::HashValue(
 //
 //---------------------------------------------------------------------------
 BOOL
-CFunctionalDependency::Equals(
-	gpos::pointer<const CFunctionalDependencyArray *> pdrgpfdFst,
-	gpos::pointer<const CFunctionalDependencyArray *> pdrgpfdSnd)
+CFunctionalDependency::Equals(const CFunctionalDependencyArray *pdrgpfdFst,
+							  const CFunctionalDependencyArray *pdrgpfdSnd)
 {
 	if (nullptr == pdrgpfdFst && nullptr == pdrgpfdSnd)
 		return true; /* both empty */
@@ -177,13 +175,11 @@ CFunctionalDependency::Equals(
 	BOOL fEqual = true;
 	for (ULONG ulFst = 0; fEqual && ulFst < ulLenFst; ulFst++)
 	{
-		gpos::pointer<const CFunctionalDependency *> pfdFst =
-			(*pdrgpfdFst)[ulFst];
+		const CFunctionalDependency *pfdFst = (*pdrgpfdFst)[ulFst].get();
 		BOOL fMatch = false;
 		for (ULONG ulSnd = 0; !fMatch && ulSnd < ulLenSnd; ulSnd++)
 		{
-			gpos::pointer<const CFunctionalDependency *> pfdSnd =
-				(*pdrgpfdSnd)[ulSnd];
+			const CFunctionalDependency *pfdSnd = (*pdrgpfdSnd)[ulSnd].get();
 			fMatch = pfdFst->Equals(pfdSnd);
 		}
 		fEqual = fMatch;
@@ -201,11 +197,11 @@ CFunctionalDependency::Equals(
 //		Create a set of all keys
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
-CFunctionalDependency::PcrsKeys(
-	CMemoryPool *mp, gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd)
+gpos::Ref<CColRefSet>
+CFunctionalDependency::PcrsKeys(CMemoryPool *mp,
+								const CFunctionalDependencyArray *pdrgpfd)
 {
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	if (pdrgpfd != nullptr)
 	{
@@ -228,13 +224,13 @@ CFunctionalDependency::PcrsKeys(
 //		Create an array of all keys
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefArray *>
-CFunctionalDependency::PdrgpcrKeys(
-	CMemoryPool *mp, gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd)
+gpos::Ref<CColRefArray>
+CFunctionalDependency::PdrgpcrKeys(CMemoryPool *mp,
+								   const CFunctionalDependencyArray *pdrgpfd)
 {
-	gpos::owner<CColRefSet *> pcrs = PcrsKeys(mp, pdrgpfd);
-	gpos::owner<CColRefArray *> colref_array = pcrs->Pdrgpcr(mp);
-	pcrs->Release();
+	gpos::Ref<CColRefSet> pcrs = PcrsKeys(mp, pdrgpfd);
+	gpos::Ref<CColRefArray> colref_array = pcrs->Pdrgpcr(mp);
+	;
 
 	return colref_array;
 }

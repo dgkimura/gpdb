@@ -127,8 +127,9 @@ CParseHandlerScalarSubPlan::StartElement(const XMLCh *const,  // element_uri,
 	}
 
 	m_mdid_first_col = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId,
-		EdxltokenScalarSubPlanParam);
+						   m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+						   EdxltokenTypeId, EdxltokenScalarSubPlanParam)
+						   .get();
 
 	const XMLCh *xmlszSubplanType = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenScalarSubPlanType, EdxltokenScalarSubPlan);
@@ -191,17 +192,17 @@ CParseHandlerScalarSubPlan::EndElement(const XMLCh *const,	// element_uri,
 	CParseHandlerPhysicalOp *child_parse_handler =
 		dynamic_cast<CParseHandlerPhysicalOp *>((*this)[2]);
 
-	gpos::owner<CDXLColRefArray *> dxl_colref_array =
+	gpos::Ref<CDXLColRefArray> dxl_colref_array =
 		parse_handler_subplan_param_list->GetDXLColRefArray();
-	dxl_colref_array->AddRef();
+	;
 
 	CDXLNode *dxl_subplan_test_expr =
 		parse_handler_subplan_test_expr->GetDXLTestExpr();
 	if (nullptr != dxl_subplan_test_expr)
 	{
-		dxl_subplan_test_expr->AddRef();
+		;
 	}
-	gpos::owner<CDXLScalarSubPlan *> dxl_op =
+	gpos::Ref<CDXLScalarSubPlan> dxl_op =
 		gpos::cast<CDXLScalarSubPlan>(CDXLOperatorFactory::MakeDXLSubPlan(
 			m_parse_handler_mgr->GetDXLMemoryManager(), m_mdid_first_col,
 			std::move(dxl_colref_array), m_dxl_subplan_type,

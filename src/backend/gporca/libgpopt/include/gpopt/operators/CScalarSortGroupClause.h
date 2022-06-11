@@ -91,10 +91,10 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> op) const override;
+	BOOL Matches(COperator *op) const override;
 
 	// conversion function
-	static gpos::cast_func<CScalarSortGroupClause *>
+	static CScalarSortGroupClause *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -104,7 +104,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const override
 	{
 		return nullptr;
@@ -113,14 +113,13 @@ public:
 	INT TypeModifier() const override;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(gpos::pointer<ULongPtrArray *>) const override;
+	EBoolEvalResult Eber(ULongPtrArray *) const override;
 
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}

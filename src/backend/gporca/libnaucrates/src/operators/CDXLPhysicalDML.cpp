@@ -32,11 +32,10 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLPhysicalDML::CDXLPhysicalDML(
 	CMemoryPool *mp, const EdxlDmlType dxl_dml_type,
-	gpos::owner<CDXLTableDescr *> table_descr,
-	gpos::owner<ULongPtrArray *> src_colids_array, ULONG action_colid,
+	gpos::Ref<CDXLTableDescr> table_descr,
+	gpos::Ref<ULongPtrArray> src_colids_array, ULONG action_colid,
 	ULONG oid_colid, ULONG ctid_colid, ULONG segid_colid, BOOL preserve_oids,
-	ULONG tuple_oid,
-	gpos::owner<CDXLDirectDispatchInfo *> dxl_direct_dispatch_info,
+	ULONG tuple_oid, gpos::Ref<CDXLDirectDispatchInfo> dxl_direct_dispatch_info,
 	BOOL input_sort_req)
 	: CDXLPhysical(mp),
 	  m_dxl_dml_type(dxl_dml_type),
@@ -66,9 +65,9 @@ CDXLPhysicalDML::CDXLPhysicalDML(
 //---------------------------------------------------------------------------
 CDXLPhysicalDML::~CDXLPhysicalDML()
 {
-	m_dxl_table_descr->Release();
-	m_src_colids_array->Release();
-	CRefCount::SafeRelease(m_direct_dispatch_info);
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -119,13 +118,14 @@ CDXLPhysicalDML::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalDML::SerializeToDXL(CXMLSerializer *xml_serializer,
-								gpos::pointer<const CDXLNode *> node) const
+								const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
-	CWStringDynamic *pstrCols = CDXLUtils::Serialize(m_mp, m_src_colids_array);
+	CWStringDynamic *pstrCols =
+		CDXLUtils::Serialize(m_mp, m_src_colids_array.get());
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenColumns),
 								 pstrCols);
 	GPOS_DELETE(pstrCols);
@@ -194,11 +194,10 @@ CDXLPhysicalDML::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDML::AssertValid(gpos::pointer<const CDXLNode *> node,
-							 BOOL validate_children) const
+CDXLPhysicalDML::AssertValid(const CDXLNode *node, BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == node->Arity());
-	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[1];
+	CDXLNode *child_dxlnode = (*node)[1];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

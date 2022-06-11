@@ -70,9 +70,8 @@ CDXLScalarSwitchCase::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSwitchCase::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarSwitchCase::SerializeToDXL(CXMLSerializer *xml_serializer,
+									 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -93,7 +92,7 @@ CDXLScalarSwitchCase::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSwitchCase::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarSwitchCase::AssertValid(const CDXLNode *dxlnode,
 								  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
@@ -101,7 +100,7 @@ CDXLScalarSwitchCase::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[idx];
+		CDXLNode *dxlnode_arg = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

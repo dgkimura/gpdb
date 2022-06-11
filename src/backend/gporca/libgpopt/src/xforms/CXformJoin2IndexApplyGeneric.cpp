@@ -28,10 +28,8 @@ using namespace gpopt;
 // to redistribute outer child to match inner on the join keys.
 BOOL
 CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
-	CMemoryPool *mp, gpos::pointer<CExpression *> pexprInner,
-	gpos::pointer<CExpression *> pexprScalar,
-	gpos::pointer<CTableDescriptor *> ptabDesc,
-	gpos::pointer<const CColRefSet *> pcrsDist)
+	CMemoryPool *mp, CExpression *pexprInner, CExpression *pexprScalar,
+	CTableDescriptor *ptabDesc, const CColRefSet *pcrsDist)
 {
 	IMDRelation::Ereldistrpolicy ereldist = ptabDesc->GetRelDistribution();
 
@@ -41,30 +39,26 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 		return true;
 
 	// now consider hash distributed table
-	gpos::pointer<CColRefSet *> pcrsInnerOutput =
-		pexprInner->DeriveOutputColumns();
-	gpos::pointer<CColRefSet *> pcrsScalarExpr =
-		pexprScalar->DeriveUsedColumns();
-	gpos::owner<CColRefSet *> pcrsInnerRefs =
+	CColRefSet *pcrsInnerOutput = pexprInner->DeriveOutputColumns();
+	CColRefSet *pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsInnerRefs =
 		GPOS_NEW(mp) CColRefSet(mp, *pcrsScalarExpr);
 	pcrsInnerRefs->Intersection(pcrsInnerOutput);
 
 	// Distribution key set of inner GET must be subset of inner columns used in
 	// the left outer join condition, but doesn't need to be equal.
 	BOOL fCanOuterIndexApply = pcrsInnerRefs->ContainsAll(pcrsDist);
-	pcrsInnerRefs->Release();
+	;
 	if (fCanOuterIndexApply)
 	{
-		gpos::owner<CColRefSet *> pcrsEquivPredInner =
-			GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> pcrsEquivPredInner = GPOS_NEW(mp) CColRefSet(mp);
 		// extract array of join predicates from join condition expression
-		gpos::owner<CExpressionArray *> pdrgpexpr =
+		gpos::Ref<CExpressionArray> pdrgpexpr =
 			CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 		for (ULONG ul = 0; ul < pdrgpexpr->Size(); ul++)
 		{
-			gpos::pointer<CExpression *> pexprPred = (*pdrgpexpr)[ul];
-			gpos::pointer<CColRefSet *> pcrsPred =
-				pexprPred->DeriveUsedColumns();
+			CExpression *pexprPred = (*pdrgpexpr)[ul].get();
+			CColRefSet *pcrsPred = pexprPred->DeriveUsedColumns();
 
 			// if it doesn't have equi-join predicate on the distribution key,
 			// we can't transform to left outer index apply, because only
@@ -80,8 +74,8 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 			}
 		}
 		fCanOuterIndexApply = pcrsEquivPredInner->ContainsAll(pcrsDist);
-		pcrsEquivPredInner->Release();
-		pdrgpexpr->Release();
+		;
+		;
 	}
 
 	return fCanOuterIndexApply;
@@ -104,10 +98,9 @@ CXformJoin2IndexApplyGeneric::Exfp(CExpressionHandle &exprhdl) const
 
 // actual transform
 void
-CXformJoin2IndexApplyGeneric::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
+										CXformResult *pxfres,
+										CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -122,18 +115,18 @@ CXformJoin2IndexApplyGeneric::Transform(
 
 	// all predicates that could be used as index predicates, this includes the
 	// join predicates and selection predicates of selects right above the get
-	gpos::owner<CExpression *> pexprAllPredicates = pexprScalar;
+	gpos::Ref<CExpression> pexprAllPredicates = pexprScalar;
 
 	// a select node that sits right on top of the get node (if it exists, NULL otherwise)
 	CExpression *selectThatIsParentOfGet = nullptr;
 
 	// the logical get node (dynamic or regular get) at the bottom of the inner tree
-	gpos::pointer<CExpression *> pexprGet = nullptr;
+	CExpression *pexprGet = nullptr;
 
 	// the highest node of the right child that gets inserted above the index get
 	// into the alternative, or NULL if there is no such node
 	// (this is a project, GbAgg or a select node above a project or GbAgg)
-	gpos::pointer<CExpression *> nodesToInsertAboveIndexGet = nullptr;
+	CExpression *nodesToInsertAboveIndexGet = nullptr;
 
 	// the cut-off point for "nodesAboveIndexGet", this node is below nodesAboveIndexGet
 	// but it doesn't get inserted into the alternative anymore
@@ -169,8 +162,8 @@ CXformJoin2IndexApplyGeneric::Transform(
 
 	// info on the get node (a get node or a dynamic get)
 	CTableDescriptor *ptabdescInner = nullptr;
-	gpos::pointer<const CColRefSet *> distributionCols = nullptr;
-	gpos::pointer<CLogicalDynamicGet *> popDynamicGet = nullptr;
+	const CColRefSet *distributionCols = nullptr;
+	CLogicalDynamicGet *popDynamicGet = nullptr;
 	CAutoRef<CColRefSet> groupingColsToCheck;
 
 	// walk down the right child tree, accepting some unary operators
@@ -202,7 +195,7 @@ CXformJoin2IndexApplyGeneric::Transform(
 						return;
 					}
 
-					gpos::owner<CColRefSet *> joinPredUsedCols = GPOS_NEW(mp)
+					gpos::Ref<CColRefSet> joinPredUsedCols = GPOS_NEW(mp)
 						CColRefSet(mp, *(pexprScalar->DeriveUsedColumns()));
 
 					joinPredUsedCols->Exclude(
@@ -211,7 +204,7 @@ CXformJoin2IndexApplyGeneric::Transform(
 						(*pexprCurrInnerChild)[0]->DeriveOutputColumns());
 					BOOL joinPredUsesProjectedColumns =
 						(0 < joinPredUsedCols->Size());
-					joinPredUsedCols->Release();
+					;
 
 					if (joinPredUsesProjectedColumns)
 					{
@@ -226,7 +219,7 @@ CXformJoin2IndexApplyGeneric::Transform(
 					if (COperator::EopLogicalGbAgg ==
 						pexprCurrInnerChild->Pop()->Eopid())
 					{
-						gpos::pointer<CLogicalGbAgg *> grbyAggOp =
+						CLogicalGbAgg *grbyAggOp =
 							gpos::dyn_cast<CLogicalGbAgg>(
 								pexprCurrInnerChild->Pop());
 
@@ -238,14 +231,13 @@ CXformJoin2IndexApplyGeneric::Transform(
 							// on the inner side if the grouping columns are a superset of the
 							// distribution columns. This way, we can put a groupby locally on top
 							// of each of the gets on every segment.
-							gpos::owner<CColRefSet *> groupingCols =
-								GPOS_NEW(mp)
-									CColRefSet(mp, grbyAggOp->Pdrgpcr());
+							gpos::Ref<CColRefSet> groupingCols = GPOS_NEW(mp)
+								CColRefSet(mp, grbyAggOp->Pdrgpcr());
 
 							// if there are multiple groupbys, then check the intersection of their grouping cols
 							groupingCols->Intersection(
-								groupingColsToCheck.Value());
-							CRefCount::SafeRelease(groupingColsToCheck.Value());
+								groupingColsToCheck.get());
+							CRefCount::SafeRelease(groupingColsToCheck.get());
 							groupingColsToCheck = groupingCols;
 
 							if (0 == groupingCols->Size())
@@ -268,14 +260,14 @@ CXformJoin2IndexApplyGeneric::Transform(
 
 			case COperator::EopLogicalGet:
 			{
-				gpos::pointer<CLogicalGet *> popGet =
+				CLogicalGet *popGet =
 					gpos::dyn_cast<CLogicalGet>(pexprCurrInnerChild->Pop());
 
 				ptabdescInner = popGet->Ptabdesc();
 				distributionCols = popGet->PcrsDist();
 				pexprGet = pexprCurrInnerChild;
 
-				if (nullptr != groupingColsToCheck.Value() &&
+				if (nullptr != groupingColsToCheck.get() &&
 					!groupingColsToCheck->ContainsAll(distributionCols))
 				{
 					// the grouping columns are not a superset of the distribution columns
@@ -305,14 +297,14 @@ CXformJoin2IndexApplyGeneric::Transform(
 	if (nullptr != selectThatIsParentOfGet)
 	{
 		pexprAllPredicates = CPredicateUtils::PexprConjunction(
-			mp, pexprAllPredicates, (*selectThatIsParentOfGet)[1]);
+			mp, pexprAllPredicates.get(), (*selectThatIsParentOfGet)[1]);
 	}
 	else
 	{
 		// In the "if" case above, CPredicateUtils::PexprConjunction does an AddRef on
 		// pexprAllPredicates and returns a new expression. Here, we just do the AddRef,
 		// since CreateHomogeneousIndexApplyAlternatives consumes a ref on pexprAllPredicates.
-		pexprAllPredicates->AddRef();
+		;
 	}
 
 	// determine the set of nodes that need to be copied from pexprInner to the alternative
@@ -340,7 +332,7 @@ CXformJoin2IndexApplyGeneric::Transform(
 	{
 		// It is a left outer join, but we can't do outer index apply,
 		// stop transforming and return immediately.
-		pexprAllPredicates->Release();
+		;
 		return;
 	}
 
@@ -352,5 +344,5 @@ CXformJoin2IndexApplyGeneric::Transform(
 		(m_generateBitmapPlans ? IMDIndex::EmdindBitmap
 							   : IMDIndex::EmdindBtree));
 
-	CRefCount::SafeRelease(pexprAllPredicates);
+	;
 }

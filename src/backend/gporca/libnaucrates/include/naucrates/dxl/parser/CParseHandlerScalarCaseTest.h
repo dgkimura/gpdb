@@ -37,7 +37,7 @@ class CParseHandlerScalarCaseTest : public CParseHandlerScalarOp
 {
 private:
 	// return type
-	gpos::pointer<IMDId *> m_mdid_type;
+	IMDId *m_mdid_type;
 
 	// process the start of an element
 	void StartElement(const XMLCh *const element_uri,

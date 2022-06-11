@@ -47,7 +47,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// metadata id of the object
-	gpos::owner<CMDIdRelStats *> m_rel_stats_mdid;
+	gpos::Ref<CMDIdRelStats> m_rel_stats_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -70,14 +70,14 @@ private:
 public:
 	CDXLRelStats(const CDXLRelStats &) = delete;
 
-	CDXLRelStats(CMemoryPool *mp, gpos::owner<CMDIdRelStats *> rel_stats_mdid,
+	CDXLRelStats(CMemoryPool *mp, gpos::Ref<CMDIdRelStats> rel_stats_mdid,
 				 CMDName *mdname, CDouble rows, BOOL is_empty, ULONG relpages,
 				 ULONG relallvisible);
 
 	~CDXLRelStats() override;
 
 	// the metadata id
-	gpos::pointer<IMDId *> MDId() const override;
+	IMDId *MDId() const override;
 
 	// relation name
 	CMDName Mdname() const override;
@@ -118,8 +118,8 @@ public:
 #endif
 
 	// dummy relstats
-	static gpos::owner<CDXLRelStats *> CreateDXLDummyRelStats(CMemoryPool *mp,
-															  IMDId *mdid);
+	static gpos::Ref<CDXLRelStats> CreateDXLDummyRelStats(CMemoryPool *mp,
+														  IMDId *mdid);
 };
 
 }  // namespace gpmd

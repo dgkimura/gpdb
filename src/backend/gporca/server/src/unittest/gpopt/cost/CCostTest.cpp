@@ -139,7 +139,7 @@ CCostTest::TestParams(CMemoryPool *mp)
 	CAutoTrace at(mp);
 	IOstream &os(at.Os());
 
-	gpos::pointer<ICostModelParams *> pcp =
+	ICostModelParams *pcp =
 		(gpos::cast<CCostModelGPDB>(COptCtxt::PoctxtFromTLS()->GetCostModel()))
 			->GetCostModelParams();
 
@@ -215,8 +215,8 @@ CCostTest::EresUnittest_Params()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -245,7 +245,7 @@ CCostTest::EresUnittest_Parsing()
 	CMemoryPool *mp = amp.Pmp();
 	CParseHandlerDXL *pphDXL = CDXLUtils::GetParseHandlerForDXLFile(
 		mp, "../data/dxl/cost/cost0.xml", nullptr);
-	gpos::pointer<ICostModelParams *> pcp = pphDXL->GetCostModelParams();
+	ICostModelParams *pcp = pphDXL->GetCostModelParams();
 
 	{
 		CAutoTrace at(mp);
@@ -294,36 +294,34 @@ CCostTest::EresUnittest_SetParams()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
-	gpos::owner<ICostModel *> pcm =
+	gpos::Ref<ICostModel> pcm =
 		GPOS_NEW(mp) CCostModelGPDB(mp, GPOPT_TEST_SEGMENTS);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */ pcm);
 
 	// generate in-equality join expression
-	gpos::owner<CExpression *> pexprOuter = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprOuter = CTestUtils::PexprLogicalGet(mp);
 	const CColRef *pcrOuter = pexprOuter->DeriveOutputColumns()->PcrAny();
-	gpos::owner<CExpression *> pexprInner = CTestUtils::PexprLogicalGet(mp);
+	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprLogicalGet(mp);
 	const CColRef *pcrInner = pexprInner->DeriveOutputColumns()->PcrAny();
-	gpos::owner<CExpression *> pexprPred =
+	gpos::Ref<CExpression> pexprPred =
 		CUtils::PexprScalarCmp(mp, pcrOuter, pcrInner, IMDType::EcmptNEq);
-	gpos::owner<CExpression *> pexpr =
-		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, std::move(pexprOuter),
-													std::move(pexprInner),
-													std::move(pexprPred));
+	gpos::Ref<CExpression> pexpr = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
+		mp, std::move(pexprOuter), std::move(pexprInner), std::move(pexprPred));
 
 	// optimize in-equality join based on default cost model params
-	gpos::owner<CExpression *> pexprPlan1 = nullptr;
+	gpos::Ref<CExpression> pexprPlan1 = nullptr;
 	{
 		CEngine eng(mp);
 
 		// generate query context
-		CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexpr);
+		CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexpr.get());
 
 		// Initialize engine
 		eng.Init(pqc, nullptr /*search_stage_array*/);
@@ -347,12 +345,12 @@ CCostTest::EresUnittest_SetParams()
 										dVal + 0.5);
 
 	// optimize again after updating NLJ cost factor
-	gpos::owner<CExpression *> pexprPlan2 = nullptr;
+	gpos::Ref<CExpression> pexprPlan2 = nullptr;
 	{
 		CEngine eng(mp);
 
 		// generate query context
-		CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexpr);
+		CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexpr.get());
 
 		// Initialize engine
 		eng.Init(pqc, nullptr /*search_stage_array*/);
@@ -379,9 +377,9 @@ CCostTest::EresUnittest_SetParams()
 		"expected NLJ cost in PLAN2 to be larger than NLJ cost in PLAN1");
 
 	// clean up
-	pexpr->Release();
-	pexprPlan1->Release();
-	pexprPlan2->Release();
+	;
+	;
+	;
 
 	return GPOS_OK;
 }

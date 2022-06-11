@@ -67,8 +67,9 @@ CParseHandlerLogicalInsert::StartElement(const XMLCh *const,  // element_uri,
 	const XMLCh *src_colids_xml = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenInsertCols, EdxltokenLogicalInsert);
 	m_pdrgpul = CDXLOperatorFactory::ExtractIntsToUlongArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), src_colids_xml,
-		EdxltokenInsertCols, EdxltokenLogicalInsert);
+					m_parse_handler_mgr->GetDXLMemoryManager(), src_colids_xml,
+					EdxltokenInsertCols, EdxltokenLogicalInsert)
+					.get();
 
 	// create child node parsers
 
@@ -124,8 +125,8 @@ CParseHandlerLogicalInsert::EndElement(const XMLCh *const,	// element_uri,
 	GPOS_ASSERT(nullptr != pphTabDesc->GetDXLTableDescr());
 	GPOS_ASSERT(nullptr != child_parse_handler->CreateDXLNode());
 
-	gpos::owner<CDXLTableDescr *> table_descr = pphTabDesc->GetDXLTableDescr();
-	table_descr->AddRef();
+	gpos::Ref<CDXLTableDescr> table_descr = pphTabDesc->GetDXLTableDescr();
+	;
 
 	m_dxl_node = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalInsert(
@@ -134,7 +135,7 @@ CParseHandlerLogicalInsert::EndElement(const XMLCh *const,	// element_uri,
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node,
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node.get(),
 										   false /* validate_children */);
 #endif	// GPOS_DEBUG
 

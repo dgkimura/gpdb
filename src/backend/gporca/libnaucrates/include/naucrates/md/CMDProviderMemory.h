@@ -44,20 +44,18 @@ protected:
 				 CleanupRelease, CleanupDelete>;
 
 	// metadata objects indexed by their metadata id
-	gpos::owner<MDIdToSerializedMDIdMap *> m_mdmap;
+	gpos::Ref<MDIdToSerializedMDIdMap> m_mdmap;
 
 	// load MD objects in the hash map
-	void LoadMetadataObjectsFromArray(
-		CMemoryPool *mp,
-		gpos::pointer<IMDCacheObjectArray *> mdcache_obj_array);
+	void LoadMetadataObjectsFromArray(CMemoryPool *mp,
+									  IMDCacheObjectArray *mdcache_obj_array);
 
 	// private copy ctor
 	CMDProviderMemory(const CMDProviderMemory &);
 
 public:
 	// ctor
-	CMDProviderMemory(CMemoryPool *mp,
-					  gpos::pointer<IMDCacheObjectArray *> mdcache_obj_array);
+	CMDProviderMemory(CMemoryPool *mp, IMDCacheObjectArray *mdcache_obj_array);
 
 	// ctor
 	CMDProviderMemory(CMemoryPool *mp, const CHAR *file_name);
@@ -67,16 +65,16 @@ public:
 
 	// returns the DXL string of the requested metadata object
 	CWStringBase *GetMDObjDXLStr(CMemoryPool *mp, CMDAccessor *md_accessor,
-								 gpos::pointer<IMDId *> mdid) const override;
+								 IMDId *mdid) const override;
 
 	// returns the requested metadata object
-	gpos::owner<IMDCacheObject *> GetMDObj(
-		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::pointer<IMDId *> mdid) const override;
+	gpos::Ref<IMDCacheObject> GetMDObj(CMemoryPool *mp,
+									   CMDAccessor *md_accessor,
+									   IMDId *mdid) const override;
 
 	// return the mdid for the specified system id and type
-	gpos::owner<IMDId *> MDId(CMemoryPool *mp, CSystemId sysid,
-							  IMDType::ETypeInfo type_info) const override;
+	gpos::Ref<IMDId> MDId(CMemoryPool *mp, CSystemId sysid,
+						  IMDType::ETypeInfo type_info) const override;
 };
 }  // namespace gpmd
 

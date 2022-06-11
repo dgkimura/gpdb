@@ -39,7 +39,7 @@ class CLogicalBitmapTableGet : public CLogical
 {
 private:
 	// table descriptor
-	gpos::owner<CTableDescriptor *> m_ptabdesc;
+	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// origin operator id -- gpos::ulong_max if operator was not generated via a transformation
 	ULONG m_ulOriginOpId;
@@ -48,16 +48,16 @@ private:
 	const CName *m_pnameTableAlias;
 
 	// output columns
-	gpos::owner<CColRefArray *> m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> m_pdrgpcrOutput;
 
 public:
 	CLogicalBitmapTableGet(const CLogicalBitmapTableGet &) = delete;
 
 	// ctor
 	CLogicalBitmapTableGet(CMemoryPool *mp,
-						   gpos::owner<CTableDescriptor *> ptabdesc,
+						   gpos::Ref<CTableDescriptor> ptabdesc,
 						   ULONG ulOriginOpId, const CName *pnameTableAlias,
-						   gpos::owner<CColRefArray *> pdrgpcrOutput);
+						   gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// ctor
 	// only for transformations
@@ -67,10 +67,10 @@ public:
 	~CLogicalBitmapTableGet() override;
 
 	// table descriptor
-	gpos::pointer<CTableDescriptor *>
+	CTableDescriptor *
 	Ptabdesc() const
 	{
-		return m_ptabdesc;
+		return m_ptabdesc.get();
 	}
 
 	// table alias
@@ -81,10 +81,10 @@ public:
 	}
 
 	// array of output column references
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrOutput() const
 	{
-		return m_pdrgpcrOutput;
+		return m_pdrgpcrOutput.get();
 	}
 
 	// identifier
@@ -112,7 +112,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -122,20 +122,20 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// derive output columns
-	gpos::owner<CColRefSet *> DeriveOutputColumns(
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive outer references
-	gpos::owner<CColRefSet *> DeriveOuterReferences(
+	gpos::Ref<CColRefSet> DeriveOuterReferences(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive partition consumer info
-	gpos::owner<CPartInfo *>
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &	 //exprhdl
 	) const override
@@ -144,7 +144,7 @@ public:
 	}
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *> DerivePropertyConstraint(
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive join depth
@@ -157,32 +157,32 @@ public:
 	}
 
 	// derive table descriptor
-	gpos::pointer<CTableDescriptor *>
+	CTableDescriptor *
 	DeriveTableDescriptor(CMemoryPool *,	   // mp
 						  CExpressionHandle &  // exprhdl
 	) const override
 	{
-		return m_ptabdesc;
+		return m_ptabdesc.get();
 	}
 
 	// compute required stat columns of the n-th child
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	PcrsStat(CMemoryPool *mp,
-			 CExpressionHandle &,		   // exprhdl
-			 gpos::pointer<CColRefSet *>,  //pcrsInput
-			 ULONG						   // child_index
+			 CExpressionHandle &,  // exprhdl
+			 CColRefSet *,		   //pcrsInput
+			 ULONG				   // child_index
 	) const override
 	{
 		return GPOS_NEW(mp) CColRefSet(mp);
 	}
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -195,7 +195,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion
-	static gpos::cast_func<CLogicalBitmapTableGet *>
+	static CLogicalBitmapTableGet *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

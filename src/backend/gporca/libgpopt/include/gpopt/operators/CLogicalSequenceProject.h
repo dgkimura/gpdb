@@ -33,13 +33,13 @@ class CLogicalSequenceProject : public CLogicalUnary
 {
 private:
 	// partition by keys
-	gpos::owner<CDistributionSpec *> m_pds;
+	gpos::Ref<CDistributionSpec> m_pds;
 
 	// order specs of child window functions
-	gpos::owner<COrderSpecArray *> m_pdrgpos;
+	gpos::Ref<COrderSpecArray> m_pdrgpos;
 
 	// frames of child window functions
-	gpos::owner<CWindowFrameArray *> m_pdrgpwf;
+	gpos::Ref<CWindowFrameArray> m_pdrgpwf;
 
 	// flag indicating if current operator has any non-empty order specs
 	BOOL m_fHasOrderSpecs;
@@ -57,10 +57,9 @@ public:
 	CLogicalSequenceProject(const CLogicalSequenceProject &) = delete;
 
 	// ctor
-	CLogicalSequenceProject(CMemoryPool *mp,
-							gpos::owner<CDistributionSpec *> pds,
-							gpos::owner<COrderSpecArray *> pdrgpos,
-							gpos::owner<CWindowFrameArray *> pdrgpwf);
+	CLogicalSequenceProject(CMemoryPool *mp, gpos::Ref<CDistributionSpec> pds,
+							gpos::Ref<COrderSpecArray> pdrgpos,
+							gpos::Ref<CWindowFrameArray> pdrgpwf);
 
 	// ctor for pattern
 	explicit CLogicalSequenceProject(CMemoryPool *mp);
@@ -83,24 +82,24 @@ public:
 	}
 
 	// distribution spec
-	gpos::pointer<CDistributionSpec *>
+	CDistributionSpec *
 	Pds() const
 	{
-		return m_pds;
+		return m_pds.get();
 	}
 
 	// order by keys
-	gpos::pointer<COrderSpecArray *>
+	COrderSpecArray *
 	Pdrgpos() const
 	{
-		return m_pdrgpos;
+		return m_pdrgpos.get();
 	}
 
 	// frame specifications
-	gpos::pointer<CWindowFrameArray *>
+	CWindowFrameArray *
 	Pdrgpwf() const
 	{
-		return m_pdrgpwf;
+		return m_pdrgpwf.get();
 	}
 
 	// return true if non-empty order specs are used by current operator
@@ -118,8 +117,8 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// return true if we can pull projections up past this operator from its given child
@@ -135,15 +134,15 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	gpos::owner<CColRefSet *> DeriveOutputColumns(
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive outer references
-	gpos::owner<CColRefSet *> DeriveOuterReferences(
+	gpos::Ref<CColRefSet> DeriveOuterReferences(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -151,7 +150,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *>
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -163,19 +162,19 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	ULONG HashValue() const override;
 
@@ -183,15 +182,14 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// remove outer references from Order By/ Partition By clauses, and return a new operator
-	gpos::owner<CLogicalSequenceProject *> PopRemoveLocalOuterRefs(
+	gpos::Ref<CLogicalSequenceProject> PopRemoveLocalOuterRefs(
 		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// check for outer references in Partition/Order, or window frame edges
-	BOOL FHasLocalReferencesTo(
-		gpos::pointer<const CColRefSet *> outerRefsToCheck) const;
+	BOOL FHasLocalReferencesTo(const CColRefSet *outerRefsToCheck) const;
 
 	// conversion function
-	static gpos::cast_func<CLogicalSequenceProject *>
+	static CLogicalSequenceProject *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -43,7 +43,7 @@ protected:
 	CMemoryPool *m_mp;
 
 	// mdid of the datum's type
-	gpos::owner<IMDId *> m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	const INT m_type_modifier;
 
@@ -70,20 +70,20 @@ public:
 		EdxldatumSentinel
 	};
 	// ctor
-	CDXLDatum(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
-			  INT type_modifier, BOOL is_null, ULONG length);
+	CDXLDatum(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type, INT type_modifier,
+			  BOOL is_null, ULONG length);
 
 	// dtor
 	~CDXLDatum() override
 	{
-		m_mdid_type->Release();
+		;
 	}
 
 	// mdid type of the datum
-	virtual gpos::pointer<IMDId *>
+	virtual IMDId *
 	MDId() const
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	INT TypeModifier() const;
@@ -106,10 +106,10 @@ public:
 };
 
 // array of datums
-using CDXLDatumArray = CDynamicPtrArray<CDXLDatum, CleanupRelease>;
+using CDXLDatumArray = gpos::Vector<gpos::Ref<CDXLDatum>>;
 
 // dynamic array of datum arrays -- array owns elements
-using CDXLDatum2dArray = CDynamicPtrArray<CDXLDatumArray, CleanupRelease>;
+using CDXLDatum2dArray = gpos::Vector<gpos::Ref<CDXLDatumArray>>;
 }  // namespace gpdxl
 
 #endif	// !GPDXL_CDXLDatum_H

@@ -32,10 +32,10 @@ class CDXLPhysicalSplit : public CDXLPhysical
 {
 private:
 	// list of deletion column ids
-	gpos::owner<ULongPtrArray *> m_deletion_colid_array;
+	gpos::Ref<ULongPtrArray> m_deletion_colid_array;
 
 	// list of insertion column ids
-	gpos::owner<ULongPtrArray *> m_insert_colid_array;
+	gpos::Ref<ULongPtrArray> m_insert_colid_array;
 
 	// action column id
 	ULONG m_action_colid;
@@ -57,8 +57,8 @@ public:
 
 	// ctor
 	CDXLPhysicalSplit(CMemoryPool *mp,
-					  gpos::owner<ULongPtrArray *> delete_colid_array,
-					  gpos::owner<ULongPtrArray *> insert_colid_array,
+					  gpos::Ref<ULongPtrArray> delete_colid_array,
+					  gpos::Ref<ULongPtrArray> insert_colid_array,
 					  ULONG action_colid, ULONG ctid_colid, ULONG segid_colid,
 					  BOOL preserve_oids, ULONG tuple_oid);
 
@@ -72,17 +72,17 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// deletion column ids
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetDeletionColIdArray() const
 	{
-		return m_deletion_colid_array;
+		return m_deletion_colid_array.get();
 	}
 
 	// insertion column ids
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetInsertionColIdArray() const
 	{
-		return m_insert_colid_array;
+		return m_insert_colid_array.get();
 	}
 
 	// action column id
@@ -123,16 +123,16 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalSplit *>
+	static CDXLPhysicalSplit *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

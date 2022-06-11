@@ -49,9 +49,8 @@ public:
 	}
 
 	// factory function for INT8 datums
-	virtual gpos::owner<IDatumInt8 *> CreateInt8Datum(CMemoryPool *mp,
-													  LINT value,
-													  BOOL is_null) const = 0;
+	virtual gpos::Ref<IDatumInt8> CreateInt8Datum(CMemoryPool *mp, LINT value,
+												  BOOL is_null) const = 0;
 };
 
 }  // namespace gpmd

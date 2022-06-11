@@ -30,7 +30,7 @@ FORCE_GENERATE_DBGSTR(gpmd::IDatum);
 //
 //---------------------------------------------------------------------------
 BOOL
-IDatum::StatsAreEqual(gpos::pointer<const IDatum *> datum) const
+IDatum::StatsAreEqual(const IDatum *datum) const
 {
 	GPOS_ASSERT(nullptr != datum);
 
@@ -79,7 +79,7 @@ IDatum::StatsAreEqual(gpos::pointer<const IDatum *> datum) const
 //
 //---------------------------------------------------------------------------
 BOOL
-IDatum::StatsAreLessThan(gpos::pointer<const IDatum *> datum) const
+IDatum::StatsAreLessThan(const IDatum *datum) const
 {
 	GPOS_ASSERT(nullptr != datum);
 
@@ -128,7 +128,7 @@ IDatum::StatsAreLessThan(gpos::pointer<const IDatum *> datum) const
 //
 //---------------------------------------------------------------------------
 CDouble
-IDatum::GetStatsDistanceFrom(gpos::pointer<const IDatum *> datum) const
+IDatum::GetStatsDistanceFrom(const IDatum *datum) const
 {
 	GPOS_ASSERT(nullptr != datum);
 
@@ -201,7 +201,7 @@ IDatum::GetValAsDouble() const
 //
 //---------------------------------------------------------------------------
 BOOL
-IDatum::StatsAreComparable(gpos::pointer<const IDatum *> datum) const
+IDatum::StatsAreComparable(const IDatum *datum) const
 {
 	GPOS_ASSERT(nullptr != datum);
 

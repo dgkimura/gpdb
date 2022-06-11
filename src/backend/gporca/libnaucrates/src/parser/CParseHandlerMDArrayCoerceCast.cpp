@@ -58,22 +58,21 @@ CParseHandlerMDArrayCoerceCast::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_fun_name);
 
 	// parse cast properties
-	gpos::owner<IMDId *> mdid =
-		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBArrayCoerceCast);
+	gpos::Ref<IMDId> mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+		EdxltokenGPDBArrayCoerceCast);
 
-	gpos::owner<IMDId *> mdid_src =
+	gpos::Ref<IMDId> mdid_src =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenGPDBCastSrcType, EdxltokenGPDBArrayCoerceCast);
 
-	gpos::owner<IMDId *> mdid_dest =
+	gpos::Ref<IMDId> mdid_dest =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenGPDBCastDestType, EdxltokenGPDBArrayCoerceCast);
 
-	gpos::owner<IMDId *> mdid_cast_func =
+	gpos::Ref<IMDId> mdid_cast_func =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenGPDBCastFuncId, EdxltokenGPDBArrayCoerceCast);

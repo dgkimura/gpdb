@@ -77,7 +77,7 @@ CParseHandlerScalarSubqueryQuantified::StartElement(
 	}
 
 	// parse operator id
-	gpos::owner<IMDId *> mdid_op =
+	gpos::Ref<IMDId> mdid_op =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
 			dxl_token);
@@ -169,7 +169,7 @@ CParseHandlerScalarSubqueryQuantified::EndElement(
 	AddChildFromParseHandler(parse_handler_logical_child);
 
 #ifdef GPOS_DEBUG
-	m_dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxl_op->AssertValid(m_dxl_node.get(), false /* validate_children */);
 #endif	// GPOS_DEBUG
 
 	// deactivate handler

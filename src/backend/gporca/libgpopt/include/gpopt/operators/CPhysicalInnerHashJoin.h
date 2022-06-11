@@ -30,33 +30,33 @@ class CPhysicalInnerHashJoin : public CPhysicalHashJoin
 {
 private:
 	// helper for computing a hashed distribution matching the given distribution
-	gpos::owner<CDistributionSpecHashed *> PdshashedCreateMatching(
+	gpos::Ref<CDistributionSpecHashed> PdshashedCreateMatching(
 		CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
 		ULONG ulSourceChild) const;
 
 	// helper for deriving hash join distribution from hashed children
-	gpos::owner<CDistributionSpec *> PdsDeriveFromHashedChildren(
-		CMemoryPool *mp, gpos::pointer<CDistributionSpec *> pdsOuter,
-		gpos::pointer<CDistributionSpec *> pdsInner) const;
+	gpos::Ref<CDistributionSpec> PdsDeriveFromHashedChildren(
+		CMemoryPool *mp, CDistributionSpec *pdsOuter,
+		CDistributionSpec *pdsInner) const;
 
 	// helper for deriving hash join distribution from replicated outer child
-	gpos::owner<CDistributionSpec *> PdsDeriveFromReplicatedOuter(
-		CMemoryPool *mp, gpos::pointer<CDistributionSpec *> pdsOuter,
-		gpos::pointer<CDistributionSpec *> pdsInner) const;
+	gpos::Ref<CDistributionSpec> PdsDeriveFromReplicatedOuter(
+		CMemoryPool *mp, CDistributionSpec *pdsOuter,
+		CDistributionSpec *pdsInner) const;
 
 	// helper for deriving hash join distribution from hashed outer child
-	gpos::owner<CDistributionSpec *> PdsDeriveFromHashedOuter(
+	gpos::Ref<CDistributionSpec> PdsDeriveFromHashedOuter(
 		CMemoryPool *mp, CDistributionSpec *pdsOuter,
-		gpos::pointer<CDistributionSpec *> pdsInner) const;
+		CDistributionSpec *pdsInner) const;
 
 public:
 	CPhysicalInnerHashJoin(const CPhysicalInnerHashJoin &) = delete;
 
 	// ctor
 	CPhysicalInnerHashJoin(CMemoryPool *mp,
-						   gpos::owner<CExpressionArray *> pdrgpexprOuterKeys,
-						   gpos::owner<CExpressionArray *> pdrgpexprInnerKeys,
-						   gpos::owner<IMdIdArray *> hash_opfamilies,
+						   gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+						   gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+						   gpos::Ref<IMdIdArray> hash_opfamilies,
 						   CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// dtor
@@ -78,7 +78,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CPhysicalInnerHashJoin *>
+	static CPhysicalInnerHashJoin *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(EopPhysicalInnerHashJoin == pop->Eopid());
@@ -87,16 +87,15 @@ public:
 	}
 
 	// derive distribution
-	gpos::owner<CDistributionSpec *> PdsDerive(
+	gpos::Ref<CDistributionSpec> PdsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
-	gpos::owner<CPartitionPropagationSpec *> PppsRequired(
+	gpos::Ref<CPartitionPropagationSpec> PppsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CPartitionPropagationSpec *> pppsRequired,
-		ULONG child_index, gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+		CPartitionPropagationSpec *pppsRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
-	gpos::owner<CPartitionPropagationSpec *> PppsDerive(
+	gpos::Ref<CPartitionPropagationSpec> PppsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 };	// class CPhysicalInnerHashJoin
 

@@ -36,7 +36,7 @@ class CParseHandlerBroadcastMotion : public CParseHandlerPhysicalOp
 {
 private:
 	// the broadcast motion operator
-	gpos::pointer<CDXLPhysicalBroadcastMotion *> m_dxl_op;
+	CDXLPhysicalBroadcastMotion *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

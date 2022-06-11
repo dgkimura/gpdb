@@ -32,7 +32,7 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 CDXLPhysicalAbstractBitmapScan::~CDXLPhysicalAbstractBitmapScan()
 {
-	m_dxl_table_descr->Release();
+	;
 }
 
 #ifdef GPOS_DEBUG
@@ -45,8 +45,8 @@ CDXLPhysicalAbstractBitmapScan::~CDXLPhysicalAbstractBitmapScan()
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAbstractBitmapScan::AssertValid(
-	gpos::pointer<const CDXLNode *> node, BOOL validate_children) const
+CDXLPhysicalAbstractBitmapScan::AssertValid(const CDXLNode *node,
+											BOOL validate_children) const
 {
 	GPOS_ASSERT(4 == node->Arity());
 
@@ -57,7 +57,7 @@ CDXLPhysicalAbstractBitmapScan::AssertValid(
 				(*node)[2]->GetOperator()->GetDXLOperator());
 
 	// assert bitmap access path is valid
-	gpos::pointer<CDXLNode *> bitmap_dxlnode = (*node)[3];
+	CDXLNode *bitmap_dxlnode = (*node)[3];
 	GPOS_ASSERT(EdxlopScalarBitmapIndexProbe ==
 					bitmap_dxlnode->GetOperator()->GetDXLOperator() ||
 				EdxlopScalarBitmapBoolOp ==

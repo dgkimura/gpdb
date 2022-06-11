@@ -35,13 +35,13 @@ class CDXLScalarIdent : public CDXLScalar
 {
 private:
 	// column reference
-	gpos::owner<CDXLColRef *> m_dxl_colref;
+	gpos::Ref<CDXLColRef> m_dxl_colref;
 
 public:
 	CDXLScalarIdent(CDXLScalarIdent &) = delete;
 
 	// ctor/dtor
-	CDXLScalarIdent(CMemoryPool *, gpos::owner<CDXLColRef *>);
+	CDXLScalarIdent(CMemoryPool *, gpos::Ref<CDXLColRef>);
 
 	~CDXLScalarIdent() override;
 
@@ -52,7 +52,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// accessors
-	gpos::pointer<const CDXLColRef *> GetDXLColRef() const;
+	const CDXLColRef *GetDXLColRef() const;
 
 	IMDId *MdidType() const;
 
@@ -60,10 +60,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarIdent *>
+	static CDXLScalarIdent *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -77,7 +77,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure
-	void AssertValid(gpos::pointer<const CDXLNode *> node,
+	void AssertValid(const CDXLNode *node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

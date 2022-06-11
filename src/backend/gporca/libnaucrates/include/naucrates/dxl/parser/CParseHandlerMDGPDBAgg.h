@@ -38,16 +38,16 @@ class CParseHandlerMDGPDBAgg : public CParseHandlerMetadataObject
 {
 private:
 	// metadata id comprising of id and version info.
-	gpos::pointer<IMDId *> m_mdid;
+	IMDId *m_mdid;
 
 	// name
 	CMDName *m_mdname;
 
 	// result type
-	gpos::pointer<IMDId *> m_mdid_type_result;
+	IMDId *m_mdid_type_result;
 
 	// intermediate result type
-	gpos::pointer<IMDId *> m_mdid_type_intermediate;
+	IMDId *m_mdid_type_intermediate;
 
 	// is aggregate ordered
 	BOOL m_is_ordered;

@@ -51,7 +51,7 @@ CParseHandlerHint::CParseHandlerHint(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerHint::~CParseHandlerHint()
 {
-	CRefCount::SafeRelease(m_hint);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -176,10 +176,10 @@ CParseHandlerHint::GetParseHandlerType() const
 //		Returns the hint configuration
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CHint *>
+CHint *
 CParseHandlerHint::GetHint() const
 {
-	return m_hint;
+	return m_hint.get();
 }
 
 // EOF

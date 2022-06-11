@@ -40,12 +40,12 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan(
-	CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
-	ULONG ulOriginOpId, const CName *pnameAlias, ULONG scan_id,
-	gpos::owner<CColRefArray *> pdrgpcrOutput,
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
-	gpos::owner<IMdIdArray *> partition_mdids,
-	gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part)
+	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+	const CName *pnameAlias, ULONG scan_id,
+	gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
+	gpos::Ref<IMdIdArray> partition_mdids,
+	gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part)
 	: CPhysicalDynamicScan(
 		  mp, std::move(ptabdesc), ulOriginOpId, pnameAlias, scan_id,
 		  std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrParts),
@@ -62,7 +62,7 @@ CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDynamicBitmapTableScan::Matches(gpos::pointer<COperator *> pop) const
+CPhysicalDynamicBitmapTableScan::Matches(COperator *pop) const
 {
 	return CUtils::FMatchDynamicBitmapScan(this, pop);
 }
@@ -75,22 +75,21 @@ CPhysicalDynamicBitmapTableScan::Matches(gpos::pointer<COperator *> pop) const
 //		Statistics derivation during costing
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
+gpos::Ref<IStatistics>
 CPhysicalDynamicBitmapTableScan::PstatsDerive(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<CReqdPropPlan *> prpplan,
-	gpos::pointer<IStatisticsArray *> stats_ctxt) const
+	CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan,
+	IStatisticsArray *stats_ctxt) const
 {
 	GPOS_ASSERT(nullptr != prpplan);
 
-	gpos::owner<IStatistics *> pstatsBaseTable =
+	gpos::Ref<IStatistics> pstatsBaseTable =
 		CStatisticsUtils::DeriveStatsForDynamicScan(
 			mp, exprhdl, ScanId(), prpplan->Pepp()->PppsRequired());
 
 	CExpression *pexprCondChild =
 		exprhdl.PexprScalarRepChild(0 /*ulChidIndex*/);
-	gpos::owner<CExpression *> local_expr = nullptr;
-	gpos::owner<CExpression *> expr_with_outer_refs = nullptr;
+	gpos::Ref<CExpression> local_expr = nullptr;
+	gpos::Ref<CExpression> expr_with_outer_refs = nullptr;
 
 	// get outer references from expression handle
 	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
@@ -99,12 +98,12 @@ CPhysicalDynamicBitmapTableScan::PstatsDerive(
 									   &local_expr, &expr_with_outer_refs);
 
 	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
-		mp, exprhdl, pstatsBaseTable, local_expr, expr_with_outer_refs,
-		stats_ctxt);
+		mp, exprhdl, pstatsBaseTable.get(), local_expr.get(),
+		expr_with_outer_refs, stats_ctxt);
 
-	pstatsBaseTable->Release();
-	local_expr->Release();
-	expr_with_outer_refs->Release();
+	;
+	;
+	;
 
 	return stats;
 }

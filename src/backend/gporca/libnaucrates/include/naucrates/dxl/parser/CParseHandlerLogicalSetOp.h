@@ -44,7 +44,7 @@ private:
 	EdxlSetOpType m_setop_type;
 
 	// array of input column id arrays
-	gpos::pointer<ULongPtr2dArray *> m_input_colids_arrays;
+	ULongPtr2dArray *m_input_colids_arrays;
 
 	// do the columns across inputs need to be casted
 	BOOL m_cast_across_input_req;

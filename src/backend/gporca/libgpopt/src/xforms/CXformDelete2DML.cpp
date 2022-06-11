@@ -63,40 +63,36 @@ CXformDelete2DML::Exfp(CExpressionHandle &	// exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformDelete2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
-							gpos::pointer<CXformResult *> pxfres,
-							gpos::pointer<CExpression *> pexpr) const
+CXformDelete2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+							CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CLogicalDelete *> popDelete =
-		gpos::dyn_cast<CLogicalDelete>(pexpr->Pop());
+	CLogicalDelete *popDelete = gpos::dyn_cast<CLogicalDelete>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 
-	gpos::owner<CTableDescriptor *> ptabdesc = popDelete->Ptabdesc();
-	ptabdesc->AddRef();
+	gpos::Ref<CTableDescriptor> ptabdesc = popDelete->Ptabdesc();
+	;
 
-	gpos::owner<CColRefArray *> colref_array = popDelete->Pdrgpcr();
-	colref_array->AddRef();
+	gpos::Ref<CColRefArray> colref_array = popDelete->Pdrgpcr();
+	;
 
 	CColRef *pcrCtid = popDelete->PcrCtid();
 
 	CColRef *pcrSegmentId = popDelete->PcrSegmentId();
 
 	// child of delete operator
-	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
+	;
 
 	// create logical DML
-	gpos::owner<CExpression *> pexprAlt =
-		CXformUtils::PexprLogicalDMLOverProject(
-			mp, std::move(pexprChild), CLogicalDML::EdmlDelete,
-			std::move(ptabdesc), std::move(colref_array), pcrCtid,
-			pcrSegmentId);
+	gpos::Ref<CExpression> pexprAlt = CXformUtils::PexprLogicalDMLOverProject(
+		mp, std::move(pexprChild), CLogicalDML::EdmlDelete, std::move(ptabdesc),
+		std::move(colref_array), pcrCtid, pcrSegmentId);
 
 	// add alternative to transformation result
 	pxfres->Add(std::move(pexprAlt));

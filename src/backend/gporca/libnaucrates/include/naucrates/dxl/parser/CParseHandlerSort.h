@@ -36,7 +36,7 @@ class CParseHandlerSort : public CParseHandlerPhysicalOp
 {
 private:
 	// the sort operator
-	gpos::pointer<CDXLPhysicalSort *> m_dxl_op;
+	CDXLPhysicalSort *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

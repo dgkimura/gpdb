@@ -30,7 +30,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarCaseTest::CDXLScalarCaseTest(CMemoryPool *mp,
-									   gpos::owner<IMDId *> mdid_type)
+									   gpos::Ref<IMDId> mdid_type)
 	: CDXLScalar(mp), m_mdid_type(std::move(mdid_type))
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
@@ -46,7 +46,7 @@ CDXLScalarCaseTest::CDXLScalarCaseTest(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarCaseTest::~CDXLScalarCaseTest()
 {
-	m_mdid_type->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -85,10 +85,10 @@ CDXLScalarCaseTest::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarCaseTest::MdidType() const
 {
-	return m_mdid_type;
+	return m_mdid_type.get();
 }
 
 //---------------------------------------------------------------------------
@@ -101,7 +101,7 @@ CDXLScalarCaseTest::MdidType() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarCaseTest::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   gpos::pointer<const CDXLNode *>	//dxlnode
+								   const CDXLNode *	 //dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -126,7 +126,7 @@ BOOL
 CDXLScalarCaseTest::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
+			md_accessor->RetrieveType(m_mdid_type.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG
@@ -139,7 +139,7 @@ CDXLScalarCaseTest::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCaseTest::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarCaseTest::AssertValid(const CDXLNode *dxlnode,
 								BOOL  // validate_children
 ) const
 {

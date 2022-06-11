@@ -47,7 +47,7 @@ CParseHandlerScalarExpr::CParseHandlerScalarExpr(
 //---------------------------------------------------------------------------
 CParseHandlerScalarExpr::~CParseHandlerScalarExpr()
 {
-	CRefCount::SafeRelease(m_dxl_node);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -58,10 +58,10 @@ CParseHandlerScalarExpr::~CParseHandlerScalarExpr()
 //		Root of constructed DXL expression
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLNode *>
+CDXLNode *
 CParseHandlerScalarExpr::CreateDXLNode() const
 {
-	return m_dxl_node;
+	return m_dxl_node.get();
 }
 
 //---------------------------------------------------------------------------
@@ -141,7 +141,7 @@ CParseHandlerScalarExpr::EndElement(const XMLCh *const,	 //= element_uri,
 	GPOS_ASSERT(nullptr != child_parse_handler &&
 				nullptr != child_parse_handler->CreateDXLNode());
 	m_dxl_node = child_parse_handler->CreateDXLNode();
-	m_dxl_node->AddRef();
+	;
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

@@ -26,10 +26,10 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp,
-								 gpos::owner<IMDId *> elem_type_mdid,
+								 gpos::Ref<IMDId> elem_type_mdid,
 								 INT type_modifier,
-								 gpos::owner<IMDId *> array_type_mdid,
-								 gpos::owner<IMDId *> return_type_mdid)
+								 gpos::Ref<IMDId> array_type_mdid,
+								 gpos::Ref<IMDId> return_type_mdid)
 	: CScalar(mp),
 	  m_pmdidElem(std::move(elem_type_mdid)),
 	  m_type_modifier(type_modifier),
@@ -39,8 +39,8 @@ CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp,
 	GPOS_ASSERT(m_pmdidElem->IsValid());
 	GPOS_ASSERT(m_pmdidArray->IsValid());
 	GPOS_ASSERT(m_mdid_type->IsValid());
-	GPOS_ASSERT(m_mdid_type->Equals(m_pmdidElem) ||
-				m_mdid_type->Equals(m_pmdidArray));
+	GPOS_ASSERT(m_mdid_type->Equals(m_pmdidElem.get()) ||
+				m_mdid_type->Equals(m_pmdidArray.get()));
 }
 
 //---------------------------------------------------------------------------
@@ -53,9 +53,9 @@ CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CScalarArrayRef::~CScalarArrayRef()
 {
-	m_pmdidElem->Release();
-	m_pmdidArray->Release();
-	m_mdid_type->Release();
+	;
+	;
+	;
 }
 
 
@@ -90,15 +90,14 @@ CScalarArrayRef::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayRef::Matches(gpos::pointer<COperator *> pop) const
+CScalarArrayRef::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CScalarArrayRef *> popArrayRef =
-		gpos::dyn_cast<CScalarArrayRef>(pop);
+	CScalarArrayRef *popArrayRef = gpos::dyn_cast<CScalarArrayRef>(pop);
 
 	return m_mdid_type->Equals(popArrayRef->MdidType()) &&
 		   m_pmdidElem->Equals(popArrayRef->PmdidElem()) &&

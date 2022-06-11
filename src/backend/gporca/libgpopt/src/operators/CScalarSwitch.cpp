@@ -29,13 +29,14 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarSwitch::CScalarSwitch(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type)
+CScalarSwitch::CScalarSwitch(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type)
 	: CScalar(mp), m_mdid_type(std::move(mdid_type)), m_fBoolReturnType(false)
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	m_fBoolReturnType = CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type);
+	m_fBoolReturnType =
+		CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type.get());
 }
 
 //---------------------------------------------------------------------------
@@ -48,7 +49,7 @@ CScalarSwitch::CScalarSwitch(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type)
 //---------------------------------------------------------------------------
 CScalarSwitch::~CScalarSwitch()
 {
-	m_mdid_type->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -76,15 +77,14 @@ CScalarSwitch::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSwitch::Matches(gpos::pointer<COperator *> pop) const
+CScalarSwitch::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarSwitch *> popScSwitch =
-			gpos::dyn_cast<CScalarSwitch>(pop);
+		CScalarSwitch *popScSwitch = gpos::dyn_cast<CScalarSwitch>(pop);
 
 		// match if return types are identical
-		return popScSwitch->MdidType()->Equals(m_mdid_type);
+		return popScSwitch->MdidType()->Equals(m_mdid_type.get());
 	}
 
 	return false;

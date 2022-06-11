@@ -43,9 +43,9 @@ CLogicalIntersect::CLogicalIntersect(CMemoryPool *mp) : CLogicalSetOp(mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalIntersect::CLogicalIntersect(
-	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrOutput,
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput)
+CLogicalIntersect::CLogicalIntersect(CMemoryPool *mp,
+									 gpos::Ref<CColRefArray> pdrgpcrOutput,
+									 gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput)
 	: CLogicalSetOp(mp, std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrInput))
 {
 }
@@ -97,15 +97,15 @@ CLogicalIntersect::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
-CLogicalIntersect::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+gpos::Ref<COperator>
+CLogicalIntersect::PopCopyWithRemappedColumns(CMemoryPool *mp,
+											  UlongToColRefMap *colref_mapping,
+											  BOOL must_exist)
 {
-	gpos::owner<CColRefArray *> pdrgpcrOutput =
-		CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
-		mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
+	gpos::Ref<CColRefArray> pdrgpcrOutput = CUtils::PdrgpcrRemap(
+		mp, m_pdrgpcrOutput.get(), colref_mapping, must_exist);
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
+		mp, m_pdrgpdrgpcrInput.get(), colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalIntersect(mp, std::move(pdrgpcrOutput),
 										  std::move(pdrgpdrgpcrInput));
@@ -120,10 +120,10 @@ CLogicalIntersect::PopCopyWithRemappedColumns(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalIntersect::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfIntersect2Join);
 	return xform_set;
 }
@@ -136,9 +136,9 @@ CLogicalIntersect::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
+gpos::Ref<IStatistics>
 CLogicalIntersect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								gpos::pointer<IStatisticsArray *>  // not used
+								IStatisticsArray *	// not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
@@ -146,34 +146,35 @@ CLogicalIntersect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// intersect is transformed into a group by over an intersect all
 	// we follow the same route to compute statistics
 
-	gpos::owner<CColRefSetArray *> output_colrefsets =
+	gpos::Ref<CColRefSetArray> output_colrefsets =
 		GPOS_NEW(mp) CColRefSetArray(mp);
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		gpos::owner<CColRefSet *> pcrs =
-			GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul]);
+		gpos::Ref<CColRefSet> pcrs =
+			GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul].get());
 		output_colrefsets->Append(pcrs);
 	}
 
-	gpos::owner<IStatistics *> pstatsIntersectAll =
-		CLogicalIntersectAll::PstatsDerive(mp, exprhdl, m_pdrgpdrgpcrInput,
-										   output_colrefsets);
+	gpos::Ref<IStatistics> pstatsIntersectAll =
+		CLogicalIntersectAll::PstatsDerive(
+			mp, exprhdl, m_pdrgpdrgpcrInput.get(), output_colrefsets.get());
 
 	// computed columns
-	gpos::owner<ULongPtrArray *> pdrgpulComputedCols =
+	gpos::Ref<ULongPtrArray> pdrgpulComputedCols =
 		GPOS_NEW(mp) ULongPtrArray(mp);
 
-	gpos::owner<IStatistics *> stats = CLogicalGbAgg::PstatsDerive(
-		mp, pstatsIntersectAll,
-		(*m_pdrgpdrgpcrInput)[0],  // we group by the columns of the first child
-		pdrgpulComputedCols,	   // no computed columns for set ops
-		nullptr					   // no keys, use all grouping cols
+	gpos::Ref<IStatistics> stats = CLogicalGbAgg::PstatsDerive(
+		mp, pstatsIntersectAll.get(),
+		(*m_pdrgpdrgpcrInput)[0]
+			.get(),	 // we group by the columns of the first child
+		pdrgpulComputedCols.get(),	// no computed columns for set ops
+		nullptr						// no keys, use all grouping cols
 	);
 	// clean up
-	pdrgpulComputedCols->Release();
-	pstatsIntersectAll->Release();
-	output_colrefsets->Release();
+	;
+	;
+	;
 
 	return stats;
 }

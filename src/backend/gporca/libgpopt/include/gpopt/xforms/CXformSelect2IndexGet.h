@@ -37,7 +37,7 @@ private:
 
 	// return the column reference set of included / key columns
 	CColRefSet *GetColRefSet(CMemoryPool *mp, CLogicalGet *popGet,
-							 gpos::pointer<const IMDIndex *> pmdindex,
+							 const IMDIndex *pmdindex,
 							 BOOL fIncludedColumns) const;
 
 public:
@@ -65,9 +65,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(gpos::pointer<CXformContext *> pxfctxt,
-				   gpos::pointer<CXformResult *> pxfres,
-				   gpos::pointer<CExpression *> pexpr) const override;
+	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+				   CExpression *pexpr) const override;
 
 
 };	// class CXformSelect2IndexGet

@@ -13,8 +13,7 @@
 
 using namespace gpopt;
 
-static BOOL Equals(gpos::pointer<ULongPtrArray *> pdrgpulFst,
-				   gpos::pointer<ULongPtrArray *> pdrgpulSnd);
+static BOOL Equals(ULongPtrArray *pdrgpulFst, ULongPtrArray *pdrgpulSnd);
 
 #ifdef GPOS_DEBUG
 
@@ -35,8 +34,7 @@ static void CheckChildDistributions(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 // helper to do value equality check of arrays of ULONG pointers
 BOOL
-Equals(gpos::pointer<ULongPtrArray *> pdrgpulFst,
-	   gpos::pointer<ULongPtrArray *> pdrgpulSnd)
+Equals(ULongPtrArray *pdrgpulFst, ULongPtrArray *pdrgpulSnd)
 {
 	GPOS_ASSERT(nullptr != pdrgpulFst);
 	GPOS_ASSERT(nullptr != pdrgpulSnd);
@@ -67,9 +65,9 @@ CPhysicalUnionAll::FInputOrderSensitive() const
 	return false;
 }
 
-CPhysicalUnionAll::CPhysicalUnionAll(
-	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrOutput,
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput)
+CPhysicalUnionAll::CPhysicalUnionAll(CMemoryPool *mp,
+									 gpos::Ref<CColRefArray> pdrgpcrOutput,
+									 gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput)
 	: CPhysical(mp),
 	  m_pdrgpcrOutput(pdrgpcrOutput),
 	  m_pdrgpdrgpcrInput(pdrgpdrgpcrInput),
@@ -84,45 +82,42 @@ CPhysicalUnionAll::CPhysicalUnionAll(
 	const ULONG arity = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
-		gpos::pointer<CColRefArray *> colref_array =
-			(*m_pdrgpdrgpcrInput)[ulChild];
+		CColRefArray *colref_array = (*m_pdrgpdrgpcrInput)[ulChild].get();
 		m_pdrgpcrsInput->Append(GPOS_NEW(mp) CColRefSet(mp, colref_array));
 	}
-	PopulateDistrSpecs(mp, m_pdrgpcrOutput, m_pdrgpdrgpcrInput);
+	PopulateDistrSpecs(mp, m_pdrgpcrOutput.get(), m_pdrgpdrgpcrInput.get());
 }
 
 void
-CPhysicalUnionAll::PopulateDistrSpecs(
-	CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrOutput,
-	gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput)
+CPhysicalUnionAll::PopulateDistrSpecs(CMemoryPool *mp,
+									  CColRefArray *pdrgpcrOutput,
+									  CColRef2dArray *pdrgpdrgpcrInput)
 {
-	gpos::owner<CDistributionSpecArray *> pdrgpds =
+	gpos::Ref<CDistributionSpecArray> pdrgpds =
 		GPOS_NEW(mp) CDistributionSpecArray(mp);
 	const ULONG num_cols = pdrgpcrOutput->Size();
 	const ULONG arity = pdrgpdrgpcrInput->Size();
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
-		gpos::pointer<CColRefArray *> colref_array =
-			(*pdrgpdrgpcrInput)[ulChild];
-		gpos::owner<CExpressionArray *> pdrgpexpr =
+		CColRefArray *colref_array = (*pdrgpdrgpcrInput)[ulChild].get();
+		gpos::Ref<CExpressionArray> pdrgpexpr =
 			GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 		{
 			CColRef *colref = (*colref_array)[ulCol];
-			gpos::owner<CExpression *> pexpr =
-				CUtils::PexprScalarIdent(mp, colref);
+			gpos::Ref<CExpression> pexpr = CUtils::PexprScalarIdent(mp, colref);
 			pdrgpexpr->Append(pexpr);
 		}
 
 		// create a hashed distribution on input columns of the current child
 		BOOL fNullsColocated = true;
-		gpos::owner<CDistributionSpec *> pdshashed =
+		gpos::Ref<CDistributionSpec> pdshashed =
 			CDistributionSpecHashed::MakeHashedDistrSpec(
 				mp, pdrgpexpr, fNullsColocated, nullptr, nullptr);
 		if (nullptr == pdshashed)
 		{
-			pdrgpexpr->Release();
-			pdrgpds->Release();
+			;
+			;
 			return;
 		}
 		else
@@ -136,27 +131,27 @@ CPhysicalUnionAll::PopulateDistrSpecs(
 
 CPhysicalUnionAll::~CPhysicalUnionAll()
 {
-	m_pdrgpcrOutput->Release();
-	m_pdrgpdrgpcrInput->Release();
-	m_pdrgpcrsInput->Release();
-	CRefCount::SafeRelease(m_pdrgpds);
+	;
+	;
+	;
+	;
 }
 
 // accessor of output column array
-gpos::pointer<CColRefArray *>
+CColRefArray *
 CPhysicalUnionAll::PdrgpcrOutput() const
 {
-	return m_pdrgpcrOutput;
+	return m_pdrgpcrOutput.get();
 }
 
 // accessor of input column array
-gpos::pointer<CColRef2dArray *>
+CColRef2dArray *
 CPhysicalUnionAll::PdrgpdrgpcrInput() const
 {
-	return m_pdrgpdrgpcrInput;
+	return m_pdrgpdrgpcrInput.get();
 }
 
-gpos::cast_func<CPhysicalUnionAll *>
+CPhysicalUnionAll *
 CPhysicalUnionAll::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);
@@ -177,12 +172,11 @@ CPhysicalUnionAll::PopConvert(COperator *pop)
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalUnionAll::Matches(gpos::pointer<COperator *> pop) const
+CPhysicalUnionAll::Matches(COperator *pop) const
 {
 	if (Eopid() == pop->Eopid())
 	{
-		gpos::pointer<CPhysicalUnionAll *> popUnionAll =
-			gpos::dyn_cast<CPhysicalUnionAll>(pop);
+		CPhysicalUnionAll *popUnionAll = gpos::dyn_cast<CPhysicalUnionAll>(pop);
 
 		return PdrgpcrOutput()->Equals(popUnionAll->PdrgpcrOutput());
 	}
@@ -199,13 +193,12 @@ CPhysicalUnionAll::Matches(gpos::pointer<COperator *> pop) const
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CPhysicalUnionAll::PcrsRequired(CMemoryPool *mp,
 								CExpressionHandle &,  //exprhdl,
-								gpos::pointer<CColRefSet *> pcrsRequired,
-								ULONG child_index,
-								gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
-								ULONG							  // ulOptReq
+								CColRefSet *pcrsRequired, ULONG child_index,
+								CDrvdPropArray *,  // pdrgpdpCtxt
+								ULONG			   // ulOptReq
 )
 {
 	return MapOutputColRefsToInput(mp, pcrsRequired, child_index);
@@ -219,17 +212,17 @@ CPhysicalUnionAll::PcrsRequired(CMemoryPool *mp,
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<COrderSpec *>
+gpos::Ref<COrderSpec>
 CPhysicalUnionAll::PosRequired(CMemoryPool *mp,
-							   CExpressionHandle &,			 //exprhdl,
-							   gpos::pointer<COrderSpec *>,	 //posRequired,
+							   CExpressionHandle &,	 //exprhdl,
+							   COrderSpec *,		 //posRequired,
 							   ULONG
 #ifdef GPOS_DEBUG
 								   child_index
 #endif	// GPOS_DEBUG
 							   ,
-							   gpos::pointer<CDrvdPropArray *>,	 // pdrgpdpCtxt
-							   ULONG							 // ulOptReq
+							   CDrvdPropArray *,  // pdrgpdpCtxt
+							   ULONG			  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(PdrgpdrgpcrInput()->Size() > child_index);
@@ -247,12 +240,12 @@ CPhysicalUnionAll::PosRequired(CMemoryPool *mp,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CRewindabilitySpec *>
+gpos::Ref<CRewindabilitySpec>
 CPhysicalUnionAll::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   gpos::pointer<CRewindabilitySpec *> prsRequired,
+							   CRewindabilitySpec *prsRequired,
 							   ULONG child_index,
-							   gpos::pointer<CDrvdPropArray *>,	 // pdrgpdpCtxt
-							   ULONG							 // ulOptReq
+							   CDrvdPropArray *,  // pdrgpdpCtxt
+							   ULONG			  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(PdrgpdrgpcrInput()->Size() > child_index);
@@ -268,11 +261,10 @@ CPhysicalUnionAll::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CCTEReq *>
+gpos::Ref<CCTEReq>
 CPhysicalUnionAll::PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								gpos::pointer<CCTEReq *> pcter,
-								ULONG child_index,
-								gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+								CCTEReq *pcter, ULONG child_index,
+								CDrvdPropArray *pdrgpdpCtxt,
 								ULONG  //ulOptReq
 ) const
 {
@@ -294,19 +286,19 @@ CPhysicalUnionAll::FProvidesReqdCols(CExpressionHandle &
 										 exprhdl
 #endif	// GPOS_DEBUG
 									 ,
-									 gpos::pointer<CColRefSet *> pcrsRequired,
+									 CColRefSet *pcrsRequired,
 									 ULONG	// ulOptReq
 ) const
 {
 	GPOS_ASSERT(nullptr != pcrsRequired);
 	GPOS_ASSERT(PdrgpdrgpcrInput()->Size() == exprhdl.Arity());
 
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
 
 	// include output columns
 	pcrs->Include(PdrgpcrOutput());
 	BOOL fProvidesCols = pcrs->ContainsAll(pcrsRequired);
-	pcrs->Release();
+	;
 
 	return fProvidesCols;
 }
@@ -320,7 +312,7 @@ CPhysicalUnionAll::FProvidesReqdCols(CExpressionHandle &
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-gpos::owner<COrderSpec *>
+gpos::Ref<COrderSpec>
 CPhysicalUnionAll::PosDerive(CMemoryPool *mp,
 							 CExpressionHandle &  //exprhdl
 ) const
@@ -338,7 +330,7 @@ CPhysicalUnionAll::PosDerive(CMemoryPool *mp,
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-gpos::owner<CRewindabilitySpec *>
+gpos::Ref<CRewindabilitySpec>
 CPhysicalUnionAll::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	// TODO: shardikar; This should check all the children, not only the outer child.
@@ -355,7 +347,7 @@ CPhysicalUnionAll::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalUnionAll::EpetOrder(CExpressionHandle &,  // exprhdl
-							 gpos::pointer<const CEnfdOrder *>
+							 const CEnfdOrder *
 #ifdef GPOS_DEBUG
 								 peo
 #endif	// GPOS_DEBUG
@@ -377,14 +369,13 @@ CPhysicalUnionAll::EpetOrder(CExpressionHandle &,  // exprhdl
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalUnionAll::EpetRewindability(
-	CExpressionHandle &exprhdl,
-	gpos::pointer<const CEnfdRewindability *> per) const
+CPhysicalUnionAll::EpetRewindability(CExpressionHandle &exprhdl,
+									 const CEnfdRewindability *per) const
 {
 	GPOS_ASSERT(nullptr != per);
 
 	// get rewindability delivered by the node
-	gpos::pointer<CRewindabilitySpec *> prs =
+	CRewindabilitySpec *prs =
 		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{
@@ -409,26 +400,25 @@ CPhysicalUnionAll::FPassThruStats() const
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDistributionSpec *>
+gpos::Ref<CDistributionSpec>
 CPhysicalUnionAll::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
-	gpos::owner<CDistributionSpecHashed *> pdshashed =
-		PdshashedDerive(mp, exprhdl);
+	gpos::Ref<CDistributionSpecHashed> pdshashed = PdshashedDerive(mp, exprhdl);
 	if (nullptr != pdshashed)
 	{
 		return pdshashed;
 	}
 
-	gpos::pointer<CDistributionSpec *> pds = PdsDeriveFromChildren(mp, exprhdl);
+	CDistributionSpec *pds = PdsDeriveFromChildren(mp, exprhdl);
 	if (nullptr != pds)
 	{
 		// succeeded in deriving output distribution from child distributions
-		pds->AddRef();
+		;
 		return pds;
 	}
 
 	// derive strict random spec, if parallel union all enforces strict random
-	gpos::owner<CDistributionSpecRandom *> random_dist_spec =
+	gpos::Ref<CDistributionSpecRandom> random_dist_spec =
 		PdsStrictRandomParallelUnionAllChildren(mp, exprhdl);
 	if (nullptr != random_dist_spec)
 	{
@@ -460,7 +450,7 @@ CPhysicalUnionAll::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 // is already randomly distributed due to existence of motion,
 // there is no need to redistribute the data again before
 // inserting into t1_x. So, derive CDistributionSpecStrictRandom
-gpos::owner<CDistributionSpecRandom *>
+gpos::Ref<CDistributionSpecRandom>
 CPhysicalUnionAll::PdsStrictRandomParallelUnionAllChildren(
 	CMemoryPool *mp, CExpressionHandle &expr_handle)
 {
@@ -472,7 +462,7 @@ CPhysicalUnionAll::PdsStrictRandomParallelUnionAllChildren(
 							idx < expr_handle.Arity();
 			 idx++)
 		{
-			gpos::pointer<CDistributionSpec *> child_dist_spec =
+			CDistributionSpec *child_dist_spec =
 				expr_handle.Pdpplan(idx /*child_index*/)->Pds();
 			CDistributionSpec::EDistributionType dist_spec_type =
 				child_dist_spec->Edt();
@@ -497,7 +487,7 @@ CPhysicalUnionAll::PdsStrictRandomParallelUnionAllChildren(
 //		Derive hashed distribution from child hashed distributions
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDistributionSpecHashed *>
+gpos::Ref<CDistributionSpecHashed>
 CPhysicalUnionAll::PdshashedDerive(CMemoryPool *mp,
 								   CExpressionHandle &exprhdl) const
 {
@@ -512,13 +502,12 @@ CPhysicalUnionAll::PdshashedDerive(CMemoryPool *mp,
 	// (1) check that all children deliver a hashed distribution that satisfies their input columns
 	for (ULONG ulChild = 0; fSuccess && ulChild < arity; ulChild++)
 	{
-		gpos::pointer<CDistributionSpec *> pdsChild =
-			exprhdl.Pdpplan(ulChild)->Pds();
+		CDistributionSpec *pdsChild = exprhdl.Pdpplan(ulChild)->Pds();
 		CDistributionSpec::EDistributionType edtChild = pdsChild->Edt();
 		fSuccess = (CDistributionSpec::EdtHashed == edtChild ||
 					CDistributionSpec::EdtHashedNoOp == edtChild ||
 					CDistributionSpec::EdtStrictHashed == edtChild) &&
-				   pdsChild->FSatisfies((*m_pdrgpds)[ulChild]);
+				   pdsChild->FSatisfies((*m_pdrgpds)[ulChild].get());
 	}
 	if (!fSuccess)
 	{
@@ -530,11 +519,11 @@ CPhysicalUnionAll::PdshashedDerive(CMemoryPool *mp,
 
 	// map outer child hashed distribution to corresponding UnionAll column positions.
 	// make sure to look at the equivalent distribution specs
-	gpos::owner<ULongPtrArray *> pdrgpulOuter = nullptr;
-	gpos::pointer<CDistributionSpec *> pdsChild = exprhdl.Pdpplan(0)->Pds();
-	gpos::pointer<CDistributionSpecHashed *> pdsHashedFirstChild =
+	gpos::Ref<ULongPtrArray> pdrgpulOuter = nullptr;
+	CDistributionSpec *pdsChild = exprhdl.Pdpplan(0)->Pds();
+	CDistributionSpecHashed *pdsHashedFirstChild =
 		gpos::dyn_cast<CDistributionSpecHashed>(pdsChild);
-	gpos::pointer<CDistributionSpecHashed *> pdsHashed = pdsHashedFirstChild;
+	CDistributionSpecHashed *pdsHashed = pdsHashedFirstChild;
 	while (pdsHashed && nullptr == pdrgpulOuter)
 	{
 		pdrgpulOuter = PdrgpulMap(
@@ -547,14 +536,14 @@ CPhysicalUnionAll::PdshashedDerive(CMemoryPool *mp,
 		return nullptr;
 	}
 
-	gpos::owner<ULongPtrArray *> pdrgpulChild = nullptr;
+	gpos::Ref<ULongPtrArray> pdrgpulChild = nullptr;
 	for (ULONG ulChild = 1; fSuccess && ulChild < arity; ulChild++)
 	{
-		gpos::pointer<CDistributionSpecHashed *> pdsChildSpec =
+		CDistributionSpecHashed *pdsChildSpec =
 			gpos::dyn_cast<CDistributionSpecHashed>(
 				exprhdl.Pdpplan(ulChild)->Pds());
 		GPOS_ASSERT(nullptr != pdsChildSpec);
-		gpos::pointer<CDistributionSpecHashed *> pdsChildHashed = pdsChildSpec;
+		CDistributionSpecHashed *pdsChildHashed = pdsChildSpec;
 		BOOL equi_hash_spec_matches = false;
 		while (pdsChildHashed && !equi_hash_spec_matches)
 		{
@@ -565,20 +554,21 @@ CPhysicalUnionAll::PdshashedDerive(CMemoryPool *mp,
 				ulChild);
 			// match mapped column positions of current child with outer child
 			equi_hash_spec_matches =
-				(nullptr != pdrgpulChild) && Equals(pdrgpulOuter, pdrgpulChild);
-			CRefCount::SafeRelease(pdrgpulChild);
+				(nullptr != pdrgpulChild) &&
+				Equals(pdrgpulOuter.get(), pdrgpulChild.get());
+			;
 			pdsChildHashed = pdsChildHashed->PdshashedEquiv();
 		}
 		fSuccess = equi_hash_spec_matches;
 	}
 
-	gpos::owner<CDistributionSpecHashed *> pdsOutput = nullptr;
+	gpos::Ref<CDistributionSpecHashed> pdsOutput = nullptr;
 	if (fSuccess)
 	{
-		pdsOutput = PdsMatching(mp, pdrgpulOuter);
+		pdsOutput = PdsMatching(mp, pdrgpulOuter.get());
 	}
 
-	pdrgpulOuter->Release();
+	;
 
 	return pdsOutput;
 }
@@ -592,9 +582,9 @@ CPhysicalUnionAll::PdshashedDerive(CMemoryPool *mp,
 //		Compute output hashed distribution based on the outer child's
 //		hashed distribution
 //---------------------------------------------------------------------------
-gpos::owner<CDistributionSpecHashed *>
-CPhysicalUnionAll::PdsMatching(
-	CMemoryPool *mp, gpos::pointer<const ULongPtrArray *> pdrgpulOuter) const
+gpos::Ref<CDistributionSpecHashed>
+CPhysicalUnionAll::PdsMatching(CMemoryPool *mp,
+							   const ULongPtrArray *pdrgpulOuter) const
 {
 	GPOS_ASSERT(nullptr != pdrgpulOuter);
 
@@ -602,12 +592,11 @@ CPhysicalUnionAll::PdsMatching(
 
 	GPOS_ASSERT(num_cols <= PdrgpcrOutput()->Size());
 
-	gpos::owner<CExpressionArray *> pdrgpexpr =
-		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 	{
 		ULONG idx = *(*pdrgpulOuter)[ulCol];
-		gpos::owner<CExpression *> pexpr =
+		gpos::Ref<CExpression> pexpr =
 			CUtils::PexprScalarIdent(mp, (*PdrgpcrOutput())[idx]);
 		pdrgpexpr->Append(pexpr);
 	}
@@ -627,23 +616,21 @@ CPhysicalUnionAll::PdsMatching(
 //		Compute required hashed distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDistributionSpecHashed *>
-CPhysicalUnionAll::PdshashedPassThru(
-	CMemoryPool *mp, gpos::pointer<CDistributionSpecHashed *> pdshashedRequired,
-	ULONG child_index) const
+gpos::Ref<CDistributionSpecHashed>
+CPhysicalUnionAll::PdshashedPassThru(CMemoryPool *mp,
+									 CDistributionSpecHashed *pdshashedRequired,
+									 ULONG child_index) const
 {
-	gpos::pointer<CExpressionArray *> pdrgpexprRequired =
-		pdshashedRequired->Pdrgpexpr();
-	gpos::pointer<CColRefArray *> pdrgpcrChild =
-		(*PdrgpdrgpcrInput())[child_index];
+	CExpressionArray *pdrgpexprRequired = pdshashedRequired->Pdrgpexpr();
+	CColRefArray *pdrgpcrChild = (*PdrgpdrgpcrInput())[child_index].get();
 	const ULONG ulExprs = pdrgpexprRequired->Size();
 	const ULONG ulOutputCols = PdrgpcrOutput()->Size();
 
-	gpos::owner<CExpressionArray *> pdrgpexprChildRequired =
+	gpos::Ref<CExpressionArray> pdrgpexprChildRequired =
 		GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ulExpr = 0; ulExpr < ulExprs; ulExpr++)
 	{
-		gpos::pointer<CExpression *> pexpr = (*pdrgpexprRequired)[ulExpr];
+		CExpression *pexpr = (*pdrgpexprRequired)[ulExpr].get();
 		if (COperator::EopScalarIdent != pexpr->Pop()->Eopid())
 		{
 			// skip expressions that are not in form of scalar identifiers
@@ -651,7 +638,7 @@ CPhysicalUnionAll::PdshashedPassThru(
 		}
 		const CColRef *pcrHashed =
 			gpos::dyn_cast<CScalarIdent>(pexpr->Pop())->Pcr();
-		gpos::pointer<const IMDType *> pmdtype = pcrHashed->RetrieveType();
+		const IMDType *pmdtype = pcrHashed->RetrieveType();
 		if (!pmdtype->IsHashable())
 		{
 			// skip non-hashable columns
@@ -677,7 +664,7 @@ CPhysicalUnionAll::PdshashedPassThru(
 	}
 
 	// failed to create a matching hashed distribution
-	pdrgpexprChildRequired->Release();
+	;
 
 	if (nullptr != pdshashedRequired->PdshashedEquiv())
 	{
@@ -778,21 +765,19 @@ CPhysicalUnionAll::PdsDeriveFromChildren(CMemoryPool *
 //		the function returns NULL if no mapping could be constructed
 //
 //---------------------------------------------------------------------------
-gpos::owner<ULongPtrArray *>
-CPhysicalUnionAll::PdrgpulMap(CMemoryPool *mp,
-							  gpos::pointer<CExpressionArray *> pdrgpexpr,
+gpos::Ref<ULongPtrArray>
+CPhysicalUnionAll::PdrgpulMap(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
 							  ULONG child_index) const
 {
 	GPOS_ASSERT(nullptr != pdrgpexpr);
 
-	gpos::pointer<CColRefArray *> colref_array =
-		(*PdrgpdrgpcrInput())[child_index];
+	CColRefArray *colref_array = (*PdrgpdrgpcrInput())[child_index].get();
 	const ULONG ulExprs = pdrgpexpr->Size();
 	const ULONG num_cols = colref_array->Size();
-	gpos::owner<ULongPtrArray *> pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 	for (ULONG ulExpr = 0; ulExpr < ulExprs; ulExpr++)
 	{
-		gpos::pointer<CExpression *> pexpr = (*pdrgpexpr)[ulExpr];
+		CExpression *pexpr = (*pdrgpexpr)[ulExpr].get();
 		if (COperator::EopScalarIdent != pexpr->Pop()->Eopid())
 		{
 			continue;
@@ -811,23 +796,22 @@ CPhysicalUnionAll::PdrgpulMap(CMemoryPool *mp,
 	if (0 == pdrgpul->Size())
 	{
 		// mapping failed
-		pdrgpul->Release();
+		;
 		pdrgpul = nullptr;
 	}
 
 	return pdrgpul;
 }
 
-gpos::owner<CColRefSet *>
-CPhysicalUnionAll::MapOutputColRefsToInput(
-	CMemoryPool *mp, gpos::pointer<CColRefSet *> out_col_refs,
-	ULONG child_index)
+gpos::Ref<CColRefSet>
+CPhysicalUnionAll::MapOutputColRefsToInput(CMemoryPool *mp,
+										   CColRefSet *out_col_refs,
+										   ULONG child_index)
 {
-	gpos::owner<CColRefSet *> result = GPOS_NEW(mp) CColRefSet(mp);
-	gpos::pointer<CColRefArray *> all_outcols = m_pdrgpcrOutput;
+	gpos::Ref<CColRefSet> result = GPOS_NEW(mp) CColRefSet(mp);
+	CColRefArray *all_outcols = m_pdrgpcrOutput.get();
 	ULONG total_num_cols = all_outcols->Size();
-	gpos::pointer<CColRefArray *> in_colref_array =
-		(*PdrgpdrgpcrInput())[child_index];
+	CColRefArray *in_colref_array = (*PdrgpdrgpcrInput())[child_index].get();
 	CColRefSetIter iter(*out_col_refs);
 	while (iter.Advance())
 	{
@@ -861,8 +845,7 @@ AssertValidChildDistributions(
 	const ULONG arity = exprhdl.Arity();
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
-		gpos::pointer<CDistributionSpec *> pdsChild =
-			exprhdl.Pdpplan(ulChild)->Pds();
+		CDistributionSpec *pdsChild = exprhdl.Pdpplan(ulChild)->Pds();
 		CDistributionSpec::EDistributionType edtChild = pdsChild->Edt();
 		BOOL fMatch = false;
 		for (ULONG ulDistr = 0; !fMatch && ulDistr < ulDistrs; ulDistr++)

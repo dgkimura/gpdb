@@ -54,9 +54,9 @@ CParseHandlerMetadata::CParseHandlerMetadata(
 //---------------------------------------------------------------------------
 CParseHandlerMetadata::~CParseHandlerMetadata()
 {
-	CRefCount::SafeRelease(m_mdid_cached_obj_array);
-	CRefCount::SafeRelease(m_mdid_array);
-	CRefCount::SafeRelease(m_system_id_array);
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -82,10 +82,10 @@ CParseHandlerMetadata::GetParseHandlerType() const
 //		Returns the list of metadata objects constructed by the parser
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDCacheObjectArray *>
+IMDCacheObjectArray *
 CParseHandlerMetadata::GetMdIdCachedObjArray()
 {
-	return m_mdid_cached_obj_array;
+	return m_mdid_cached_obj_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -96,10 +96,10 @@ CParseHandlerMetadata::GetMdIdCachedObjArray()
 //		Returns the list of metadata ids constructed by the parser
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMdIdArray *>
+IMdIdArray *
 CParseHandlerMetadata::GetMdIdArray()
 {
-	return m_mdid_array;
+	return m_mdid_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -110,10 +110,10 @@ CParseHandlerMetadata::GetMdIdArray()
 //		Returns the list of metadata source system ids constructed by the parser
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CSystemIdArray *>
+CSystemIdArray *
 CParseHandlerMetadata::GetSysidPtrArray()
 {
-	return m_system_id_array;
+	return m_system_id_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -149,7 +149,7 @@ CParseHandlerMetadata::StartElement(const XMLCh *const element_uri,
 	{
 		// start of the metadata section in the DXL document
 		GPOS_ASSERT(nullptr != m_mdid_array);
-		gpos::owner<IMDId *> mdid =
+		gpos::Ref<IMDId> mdid =
 			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 				EdxltokenValue, EdxltokenMdid);
@@ -211,9 +211,9 @@ CParseHandlerMetadata::EndElement(const XMLCh *const,  // element_uri,
 
 		GPOS_ASSERT(nullptr != metadata_obj_parse_handler->GetImdObj());
 
-		gpos::owner<IMDCacheObject *> imdobj =
+		gpos::Ref<IMDCacheObject> imdobj =
 			metadata_obj_parse_handler->GetImdObj();
-		imdobj->AddRef();
+		;
 		m_mdid_cached_obj_array->Append(imdobj);
 	}
 
@@ -228,7 +228,7 @@ CParseHandlerMetadata::EndElement(const XMLCh *const,  // element_uri,
 //		Parse a list of source system ids
 //
 //---------------------------------------------------------------------------
-gpos::owner<CSystemIdArray *>
+gpos::Ref<CSystemIdArray>
 CParseHandlerMetadata::GetSrcSysIdArray(const Attributes &attrs,
 										Edxltoken dxl_token_attr,
 										Edxltoken dxl_token_element)
@@ -243,7 +243,7 @@ CParseHandlerMetadata::GetSrcSysIdArray(const Attributes &attrs,
 		return nullptr;
 	}
 
-	gpos::owner<CSystemIdArray *> src_sys_id_array =
+	gpos::Ref<CSystemIdArray> src_sys_id_array =
 		GPOS_NEW(m_mp) CSystemIdArray(m_mp);
 
 	// extract separate system ids

@@ -50,7 +50,7 @@ CParseHandlerEnumeratorConfig::CParseHandlerEnumeratorConfig(
 //---------------------------------------------------------------------------
 CParseHandlerEnumeratorConfig::~CParseHandlerEnumeratorConfig()
 {
-	CRefCount::SafeRelease(m_enumerator_cfg);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -148,10 +148,10 @@ CParseHandlerEnumeratorConfig::GetParseHandlerType() const
 //		Returns the enumerator configuration
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CEnumeratorConfig *>
+CEnumeratorConfig *
 CParseHandlerEnumeratorConfig::GetEnumeratorCfg() const
 {
-	return m_enumerator_cfg;
+	return m_enumerator_cfg.get();
 }
 
 // EOF

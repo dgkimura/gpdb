@@ -37,17 +37,17 @@ class CDrvdPropCtxtPlan : public CDrvdPropCtxt
 {
 private:
 	// map of CTE id to producer plan properties
-	gpos::owner<UlongToDrvdPropPlanMap *> m_phmulpdpCTEs;
+	gpos::Ref<UlongToDrvdPropPlanMap> m_phmulpdpCTEs;
 
 	// if true, a call to AddProps updates the CTE.
 	BOOL m_fUpdateCTEMap;
 
 protected:
 	// copy function
-	gpos::owner<CDrvdPropCtxt *> PdpctxtCopy(CMemoryPool *mp) const override;
+	gpos::Ref<CDrvdPropCtxt> PdpctxtCopy(CMemoryPool *mp) const override;
 
 	// add props to context
-	void AddProps(gpos::pointer<CDrvdProp *> pdp) override;
+	void AddProps(CDrvdProp *pdp) override;
 
 public:
 	CDrvdPropCtxtPlan(const CDrvdPropCtxtPlan &) = delete;
@@ -62,7 +62,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const;
 
 	// return the plan properties of CTE producer with given id
-	gpos::pointer<CDrvdPropPlan *> PdpplanCTEProducer(ULONG ulCTEId) const;
+	CDrvdPropPlan *PdpplanCTEProducer(ULONG ulCTEId) const;
 
 	// copy plan properties of given CTE prdoucer
 	void CopyCTEProducerProps(CDrvdPropPlan *pdpplan, ULONG ulCTEId);
@@ -79,7 +79,7 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static gpos::cast_func<CDrvdPropCtxtPlan *>
+	static CDrvdPropCtxtPlan *
 	PdpctxtplanConvert(CDrvdPropCtxt *pdpctxt)
 	{
 		GPOS_ASSERT(nullptr != pdpctxt);

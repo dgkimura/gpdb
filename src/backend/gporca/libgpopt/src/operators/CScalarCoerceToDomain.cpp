@@ -27,7 +27,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CScalarCoerceToDomain::CScalarCoerceToDomain(CMemoryPool *mp,
-											 gpos::owner<IMDId *> mdid_type,
+											 gpos::Ref<IMDId> mdid_type,
 											 INT type_modifier,
 											 ECoercionForm ecf, INT location)
 	: CScalarCoerceBase(mp, std::move(mdid_type), type_modifier, ecf, location),
@@ -45,11 +45,11 @@ CScalarCoerceToDomain::CScalarCoerceToDomain(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCoerceToDomain::Matches(gpos::pointer<COperator *> pop) const
+CScalarCoerceToDomain::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarCoerceToDomain *> popCoerce =
+		CScalarCoerceToDomain *popCoerce =
 			gpos::dyn_cast<CScalarCoerceToDomain>(pop);
 
 		return popCoerce->MdidType()->Equals(MdidType()) &&
@@ -70,8 +70,7 @@ CScalarCoerceToDomain::Matches(gpos::pointer<COperator *> pop) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarCoerceToDomain::Eber(
-	gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
+CScalarCoerceToDomain::Eber(ULongPtrArray *pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

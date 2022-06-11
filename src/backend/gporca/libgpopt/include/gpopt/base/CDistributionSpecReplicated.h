@@ -49,14 +49,12 @@ public:
 	}
 
 	// does this distribution satisfy the given one
-	BOOL FSatisfies(
-		gpos::pointer<const CDistributionSpec *> pds) const override;
+	BOOL FSatisfies(const CDistributionSpec *pds) const override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 gpos::pointer<CReqdPropPlan *> prpp,
-						 gpos::pointer<CExpressionArray *> pdrgpexpr,
-						 gpos::pointer<CExpression *> pexpr) override;
+						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 CExpression *pexpr) override;
 
 	// return distribution partitioning type
 	EDistributionPartitioningType
@@ -88,7 +86,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CDistributionSpecReplicated *>
+	static CDistributionSpecReplicated *
 	PdsConvert(CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(nullptr != pds);

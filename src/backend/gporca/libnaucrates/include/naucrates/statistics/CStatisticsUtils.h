@@ -51,13 +51,13 @@ private:
 	struct SMcvPair
 	{
 		// MCV datum
-		gpos::owner<IDatum *> m_datum_mcv;
+		gpos::Ref<IDatum> m_datum_mcv;
 
 		// the frequency of this MCV
 		CDouble m_mcv_freq;
 
 		// ctor
-		SMcvPair(gpos::owner<IDatum *> datum_mcv, CDouble mcv_freq)
+		SMcvPair(gpos::Ref<IDatum> datum_mcv, CDouble mcv_freq)
 			: m_datum_mcv(std::move(datum_mcv)), m_mcv_freq(mcv_freq)
 		{
 		}
@@ -65,7 +65,7 @@ private:
 		// dtor
 		~SMcvPair()
 		{
-			m_datum_mcv->Release();
+			;
 		}
 	};
 
@@ -73,14 +73,14 @@ private:
 	using SMcvPairPtrArray = CDynamicPtrArray<SMcvPair, CleanupDelete>;
 
 	// given MCVs and histogram buckets, merge them into buckets of a single histogram
-	static gpos::owner<CBucketArray *> MergeMcvHistBucket(
-		CMemoryPool *mp, gpos::pointer<const CBucketArray *> mcv_buckets,
-		gpos::pointer<const CBucketArray *> histogram_buckets);
+	static gpos::Ref<CBucketArray> MergeMcvHistBucket(
+		CMemoryPool *mp, const CBucketArray *mcv_buckets,
+		const CBucketArray *histogram_buckets);
 
 	// split a histogram bucket given an MCV bucket
-	static gpos::owner<CBucketArray *> SplitHistBucketGivenMcvBuckets(
+	static gpos::Ref<CBucketArray> SplitHistBucketGivenMcvBuckets(
 		CMemoryPool *mp, const CBucket *histogram_bucket,
-		gpos::pointer<const CBucketArray *> mcv_buckets);
+		const CBucketArray *mcv_buckets);
 
 	// given lower and upper bound information and their closedness, return a bucket if they can form a valid bucket
 	static CBucket *CreateValidBucket(CMemoryPool *mp,
@@ -90,44 +90,41 @@ private:
 									  BOOL is_upper_closed);
 
 	// given lower and upper bound information and their closedness, test if they can form a valid bucket
-	static BOOL IsValidBucket(gpos::pointer<CPoint *> bucket_lower_bound,
-							  gpos::pointer<CPoint *> bucket_upper_bound,
-							  BOOL is_lower_closed, BOOL is_upper_closed);
+	static BOOL IsValidBucket(CPoint *bucket_lower_bound,
+							  CPoint *bucket_upper_bound, BOOL is_lower_closed,
+							  BOOL is_upper_closed);
 
 	// find the MCVs that fall within the same histogram bucket and perform the split
 	static void SplitHistDriver(CMemoryPool *mp,
 								const CBucket *histogram_bucket,
-								gpos::pointer<const CBucketArray *> mcv_buckets,
-								gpos::pointer<CBucketArray *> merged_buckets,
-								ULONG *mcv_index, ULONG mcv);
+								const CBucketArray *mcv_buckets,
+								CBucketArray *merged_buckets, ULONG *mcv_index,
+								ULONG mcv);
 
 	// distribute total distinct and frequency of the histogram bucket into the new buckets
-	static gpos::owner<CBucketArray *> DistributeBucketProperties(
+	static gpos::Ref<CBucketArray> DistributeBucketProperties(
 		CMemoryPool *mp, CDouble total_frequency, CDouble total_distinct_values,
-		gpos::pointer<const CBucketArray *> buckets);
+		const CBucketArray *buckets);
 
 	// add the NDVs for all of the grouping columns
 	static void AddNdvForAllGrpCols(
-		CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
-		gpos::pointer<const ULongPtrArray *> grouping_columns,
-		gpos::pointer<CDoubleArray *> output_ndvs  // output array of NDV
+		CMemoryPool *mp, const CStatistics *input_stats,
+		const ULongPtrArray *grouping_columns,
+		CDoubleArray *output_ndvs  // output array of NDV
 	);
 
 	// compute max number of groups when grouping on columns from the given source
 	static CDouble MaxNumGroupsForGivenSrcGprCols(
-		CMemoryPool *mp, gpos::pointer<const CStatisticsConfig *> stats_config,
-		gpos::pointer<CStatistics *> input_stats,
-		gpos::pointer<const ULongPtrArray *> src_grouping_cols);
+		CMemoryPool *mp, const CStatisticsConfig *stats_config,
+		CStatistics *input_stats, const ULongPtrArray *src_grouping_cols);
 
 	// check to see if any one of the grouping columns has been capped
-	static BOOL CappedGrpColExists(
-		gpos::pointer<const CStatistics *> stats,
-		gpos::pointer<const ULongPtrArray *> grouping_columns);
+	static BOOL CappedGrpColExists(const CStatistics *stats,
+								   const ULongPtrArray *grouping_columns);
 
 	// return the maximum NDV given an array of grouping columns
-	static CDouble MaxNdv(
-		gpos::pointer<const CStatistics *> stats,
-		gpos::pointer<const ULongPtrArray *> grouping_columns);
+	static CDouble MaxNdv(const CStatistics *stats,
+						  const ULongPtrArray *grouping_columns);
 
 public:
 	// private dtor
@@ -139,15 +136,15 @@ public:
 	CStatisticsUtils(const CStatisticsUtils &) = delete;
 
 	// get the next data point for generating new bucket boundary
-	static gpos::owner<CPoint *> NextPoint(CMemoryPool *mp,
-										   CMDAccessor *md_accessor,
-										   gpos::pointer<CPoint *> point);
+	static gpos::Ref<CPoint> NextPoint(CMemoryPool *mp,
+									   CMDAccessor *md_accessor, CPoint *point);
 
 	// transform mcv information to optimizer's histogram structure
-	static CHistogram *TransformMCVToHist(
-		CMemoryPool *mp, gpos::pointer<const IMDType *> mdtype,
-		gpos::pointer<IDatumArray *> mcv_datums,
-		gpos::pointer<CDoubleArray *> freq_array, ULONG num_mcv_values);
+	static CHistogram *TransformMCVToHist(CMemoryPool *mp,
+										  const IMDType *mdtype,
+										  IDatumArray *mcv_datums,
+										  CDoubleArray *freq_array,
+										  ULONG num_mcv_values);
 
 	// merge MCVs and histogram
 	static CHistogram *MergeMCVHist(CMemoryPool *mp,
@@ -158,113 +155,104 @@ public:
 	static inline INT GetMcvPairCmpFunc(const void *val1, const void *val2);
 
 	// utility function to print column stats before/after applying filter
-	static void PrintColStats(CMemoryPool *mp,
-							  gpos::pointer<CStatsPred *> pred_stats,
+	static void PrintColStats(CMemoryPool *mp, CStatsPred *pred_stats,
 							  ULONG cond_colid, CHistogram *histogram,
 							  CDouble last_scale_factor,
 							  BOOL is_filter_applied_before);
 
 	// extract all the column identifiers used in the statistics filter
 	static void ExtractUsedColIds(CMemoryPool *mp, CBitSet *colids_bitset,
-								  gpos::pointer<CStatsPred *> pred_stats,
+								  CStatsPred *pred_stats,
 								  ULongPtrArray *colids);
 
 	// given the previously generated histogram, update the intermediate
 	// result of the disjunction
 	static void UpdateDisjStatistics(
-		CMemoryPool *mp, gpos::pointer<CBitSet *> non_updatable_cols,
+		CMemoryPool *mp, CBitSet *non_updatable_cols,
 		CDouble input_disjunct_rows, CDouble local_rows,
 		CHistogram *previous_histogram,
-		gpos::pointer<UlongToHistogramMap *> disjunctive_result_histograms,
-		ULONG last_colid);
+		UlongToHistogramMap *disjunctive_result_histograms, ULONG last_colid);
 
 	// given a disjunction filter, generate a bit set of columns whose
 	// histogram buckets cannot be changed by applying the predicates in the
 	// disjunction
-	static gpos::owner<CBitSet *> GetColsNonUpdatableHistForDisj(
-		CMemoryPool *mp, gpos::pointer<CStatsPredDisj *> pred_stats);
+	static gpos::Ref<CBitSet> GetColsNonUpdatableHistForDisj(
+		CMemoryPool *mp, CStatsPredDisj *pred_stats);
 
 	// helper method to add a histogram to a map
-	static void AddHistogram(
-		CMemoryPool *mp, ULONG colid, const CHistogram *histogram,
-		gpos::pointer<UlongToHistogramMap *> col_histogram_mapping,
-		BOOL replace_old = false);
+	static void AddHistogram(CMemoryPool *mp, ULONG colid,
+							 const CHistogram *histogram,
+							 UlongToHistogramMap *col_histogram_mapping,
+							 BOOL replace_old = false);
 
 	// create a new hash map of histograms after merging
 	// the histograms generated by the child of disjunctive predicate
-	static gpos::owner<UlongToHistogramMap *> MergeHistogramMapsForDisjPreds(
-		CMemoryPool *mp, gpos::pointer<CBitSet *> non_updatable_cols,
-		gpos::pointer<UlongToHistogramMap *> hmap1,
-		gpos::pointer<UlongToHistogramMap *> hmap2, CDouble rows1,
+	static gpos::Ref<UlongToHistogramMap> MergeHistogramMapsForDisjPreds(
+		CMemoryPool *mp, CBitSet *non_updatable_cols,
+		UlongToHistogramMap *hmap1, UlongToHistogramMap *hmap2, CDouble rows1,
 		CDouble rows2);
 
 	// helper method to copy the hash map of histograms
-	static gpos::owner<UlongToHistogramMap *> CopyHistHashMap(
-		CMemoryPool *mp,
-		gpos::pointer<UlongToHistogramMap *> col_histogram_mapping);
+	static gpos::Ref<UlongToHistogramMap> CopyHistHashMap(
+		CMemoryPool *mp, UlongToHistogramMap *col_histogram_mapping);
 
 	// return the column identifier of the filter if the predicate is
 	// on a single column else	return gpos::ulong_max
-	static ULONG GetColId(
-		gpos::pointer<const CStatsPredPtrArry *> stats_preds_array);
+	static ULONG GetColId(const CStatsPredPtrArry *stats_preds_array);
 
 	// add remaining buckets from one array of buckets to the other
-	static void AddRemainingBuckets(
-		CMemoryPool *mp, gpos::pointer<const CBucketArray *> src_buckets,
-		gpos::pointer<CBucketArray *> dest_buckets, ULONG *start_val);
+	static void AddRemainingBuckets(CMemoryPool *mp,
+									const CBucketArray *src_buckets,
+									CBucketArray *dest_buckets,
+									ULONG *start_val);
 
 	// generate a null datum with the type of passed colref
-	static gpos::owner<IDatum *> DatumNull(const CColRef *colref);
+	static gpos::Ref<IDatum> DatumNull(const CColRef *colref);
 
 #ifdef GPOS_DEBUG
 	// helper method to print the hash map of histograms
-	static void PrintHistogramMap(
-		IOstream &os,
-		gpos::pointer<UlongToHistogramMap *> col_histogram_mapping);
+	static void PrintHistogramMap(IOstream &os,
+								  UlongToHistogramMap *col_histogram_mapping);
 #endif	// GPOS_DEBUG
 
 	// derive statistics of dynamic scan based on part-selector stats in the given map
-	static gpos::owner<IStatistics *> DeriveStatsForDynamicScan(
+	static gpos::Ref<IStatistics> DeriveStatsForDynamicScan(
 		CMemoryPool *mp, CExpressionHandle &exprhdl, ULONG scan_id,
-		gpos::pointer<CPartitionPropagationSpec *> pps_reqd);
+		CPartitionPropagationSpec *pps_reqd);
 
 	// derive statistics of (dynamic) index-get
 	static IStatistics *DeriveStatsForIndexGet(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_contexts);
+		IStatisticsArray *stats_contexts);
 
 	// derive statistics of bitmap table-get
 	static IStatistics *DeriveStatsForBitmapTableGet(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_contexts);
+		IStatisticsArray *stats_contexts);
 
 	// compute the cumulative number of distinct values (NDV) of the group by operator
 	// from the array of NDV of the individual grouping columns
-	static CDouble GetCumulativeNDVs(
-		gpos::pointer<const CStatisticsConfig *> stats_config,
-		gpos::pointer<CDoubleArray *> ndv_array);
+	static CDouble GetCumulativeNDVs(const CStatisticsConfig *stats_config,
+									 CDoubleArray *ndv_array);
 
 	// return the mapping between the table column used for grouping to the logical operator id where it was defined.
 	// If the grouping column is not a table column then the logical op id is initialized to gpos::ulong_max
-	static gpos::owner<UlongToUlongPtrArrayMap *>
-	GetGrpColIdToUpperBoundNDVIdxMap(
-		CMemoryPool *mp, gpos::pointer<CStatistics *> stats,
-		gpos::pointer<const CColRefSet *> grouping_cols_refset,
-		gpos::pointer<CBitSet *> keys);
+	static gpos::Ref<UlongToUlongPtrArrayMap> GetGrpColIdToUpperBoundNDVIdxMap(
+		CMemoryPool *mp, CStatistics *stats,
+		const CColRefSet *grouping_cols_refset, CBitSet *keys);
 
 	// extract NDVs for the given array of grouping columns
-	static gpos::owner<CDoubleArray *> ExtractNDVForGrpCols(
-		CMemoryPool *mp, gpos::pointer<const CStatisticsConfig *> stats_config,
-		gpos::pointer<const IStatistics *> stats,
-		gpos::pointer<CColRefSet *> grp_cols_refset,  // grouping columns
-		gpos::pointer<CBitSet *> keys  // keys derived during optimization
+	static gpos::Ref<CDoubleArray> ExtractNDVForGrpCols(
+		CMemoryPool *mp, const CStatisticsConfig *stats_config,
+		const IStatistics *stats,
+		CColRefSet *grp_cols_refset,  // grouping columns
+		CBitSet *keys				  // keys derived during optimization
 	);
 
 	// compute the cumulative number of groups for the given set of grouping columns
-	static CDouble Groups(CMemoryPool *mp, gpos::pointer<IStatistics *> stats,
-						  gpos::pointer<const CStatisticsConfig *> stats_config,
-						  gpos::pointer<ULongPtrArray *> grouping_cols,
-						  gpos::pointer<CBitSet *> keys);
+	static CDouble Groups(CMemoryPool *mp, IStatistics *stats,
+						  const CStatisticsConfig *stats_config,
+						  ULongPtrArray *grouping_cols, CBitSet *keys);
 
 	// return the default number of distinct values
 	static CDouble
@@ -274,48 +262,44 @@ public:
 	}
 
 	// add the statistics (histogram and width) of the grouping columns
-	static void AddGrpColStats(
-		CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
-		gpos::pointer<CColRefSet *> grp_cols_refset,
-		gpos::pointer<UlongToHistogramMap *> output_histograms,
-		gpos::pointer<UlongToDoubleMap *> output_col_widths);
+	static void AddGrpColStats(CMemoryPool *mp, const CStatistics *input_stats,
+							   CColRefSet *grp_cols_refset,
+							   UlongToHistogramMap *output_histograms,
+							   UlongToDoubleMap *output_col_widths);
 
 	// return the set of grouping columns for statistics computation;
-	static gpos::owner<CColRefSet *> MakeGroupByColsForStats(
-		CMemoryPool *mp, gpos::pointer<const ULongPtrArray *> grouping_columns,
-		gpos::pointer<CColRefSet *>
+	static gpos::Ref<CColRefSet> MakeGroupByColsForStats(
+		CMemoryPool *mp, const ULongPtrArray *grouping_columns,
+		CColRefSet *
 			computed_groupby_cols  // output set of grouping columns that are computed attributes
 	);
 
 
 
 	// return the total number of distinct values in the given array of buckets
-	static CDouble GetNumDistinct(
-		gpos::pointer<const CBucketArray *> histogram_buckets);
+	static CDouble GetNumDistinct(const CBucketArray *histogram_buckets);
 
 	// return the cumulative frequency in the given array of buckets
-	static CDouble GetFrequency(
-		gpos::pointer<const CBucketArray *> histogram_buckets);
+	static CDouble GetFrequency(const CBucketArray *histogram_buckets);
 
 	// true if the given operator increases risk of cardinality misestimation
-	static BOOL IncreasesRisk(gpos::pointer<CLogical *> logical_op);
+	static BOOL IncreasesRisk(CLogical *logical_op);
 
 	// return the default column width
-	static CDouble DefaultColumnWidth(gpos::pointer<const IMDType *> mdtype);
+	static CDouble DefaultColumnWidth(const IMDType *mdtype);
 
 	// helper method to add width information
-	static void AddWidthInfo(CMemoryPool *mp,
-							 gpos::pointer<UlongToDoubleMap *> src_width,
-							 gpos::pointer<UlongToDoubleMap *> dest_width);
+	static void AddWidthInfo(CMemoryPool *mp, UlongToDoubleMap *src_width,
+							 UlongToDoubleMap *dest_width);
 
 
 	// for the output stats object, compute its upper bound cardinality mapping based on the bounding method
 	// estimated output cardinality and information maintained in the current stats object
 	static void ComputeCardUpperBounds(
 		CMemoryPool *mp,  // memory pool
-		gpos::pointer<const CStatistics *> input_stats,
-		gpos::pointer<CStatistics *>
-			output_stats,	  // output statistics object that is to be updated
+		const CStatistics *input_stats,
+		CStatistics
+			*output_stats,	  // output statistics object that is to be updated
 		CDouble rows_output,  // estimated output cardinality of the operator
 		CStatistics::ECardBoundingMethod
 			card_bounding_method  // technique used to estimate max source cardinality in the output stats object
@@ -334,8 +318,8 @@ CStatisticsUtils::GetMcvPairCmpFunc(const void *val1, const void *val2)
 	const SMcvPair *mcv_pair1 = *(const SMcvPair **) (val1);
 	const SMcvPair *mcv_pair2 = *(const SMcvPair **) (val2);
 
-	gpos::pointer<const IDatum *> datum1 = mcv_pair1->m_datum_mcv;
-	gpos::pointer<const IDatum *> datum2 = mcv_pair2->m_datum_mcv;
+	const IDatum *datum1 = mcv_pair1->m_datum_mcv.get();
+	const IDatum *datum2 = mcv_pair2->m_datum_mcv.get();
 
 	if (datum1->StatsAreEqual(datum2))
 	{

@@ -31,9 +31,9 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CDXLScalarSubPlan::CDXLScalarSubPlan(
-	CMemoryPool *mp, gpos::owner<IMDId *> first_col_type_mdid,
-	gpos::owner<CDXLColRefArray *> dxl_colref_array,
-	EdxlSubPlanType dxl_subplan_type, gpos::owner<CDXLNode *> dxlnode_test_expr,
+	CMemoryPool *mp, gpos::Ref<IMDId> first_col_type_mdid,
+	gpos::Ref<CDXLColRefArray> dxl_colref_array,
+	EdxlSubPlanType dxl_subplan_type, gpos::Ref<CDXLNode> dxlnode_test_expr,
 	BOOL outer_param)
 	: CDXLScalar(mp),
 	  m_first_col_type_mdid(std::move(first_col_type_mdid)),
@@ -58,9 +58,9 @@ CDXLScalarSubPlan::CDXLScalarSubPlan(
 //---------------------------------------------------------------------------
 CDXLScalarSubPlan::~CDXLScalarSubPlan()
 {
-	m_first_col_type_mdid->Release();
-	m_dxl_colref_array->Release();
-	CRefCount::SafeRelease(m_dxlnode_test_expr);
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -85,10 +85,10 @@ CDXLScalarSubPlan::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarSubPlan::GetFirstColTypeMdId() const
 {
-	return m_first_col_type_mdid;
+	return m_first_col_type_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -102,8 +102,9 @@ CDXLScalarSubPlan::GetFirstColTypeMdId() const
 BOOL
 CDXLScalarSubPlan::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_first_col_type_mdid)->GetDatumType());
+	return (
+		IMDType::EtiBool ==
+		md_accessor->RetrieveType(m_first_col_type_mdid.get())->GetDatumType());
 }
 
 
@@ -153,7 +154,7 @@ CDXLScalarSubPlan::GetSubplanTypeStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarSubPlan::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  gpos::pointer<const CDXLNode *> dxlnode) const
+								  const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -193,8 +194,7 @@ CDXLScalarSubPlan::SerializeToDXL(CXMLSerializer *xml_serializer,
 									 ulid);
 
 		const CMDName *mdname = (*m_dxl_colref_array)[ul]->MdName();
-		gpos::pointer<const IMDId *> mdid_type =
-			(*m_dxl_colref_array)[ul]->MdidType();
+		const IMDId *mdid_type = (*m_dxl_colref_array)[ul]->MdidType();
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenColName), mdname->GetMDName());
 		mdid_type->Serialize(xml_serializer,
@@ -229,15 +229,14 @@ CDXLScalarSubPlan::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubPlan::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarSubPlan::AssertValid(const CDXLNode *dxlnode,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(EdxlSubPlanIndexSentinel == dxlnode->Arity());
 
 	// assert child plan is a physical plan and is valid
 
-	gpos::pointer<CDXLNode *> child_dxlnode =
-		(*dxlnode)[EdxlSubPlanIndexChildPlan];
+	CDXLNode *child_dxlnode = (*dxlnode)[EdxlSubPlanIndexChildPlan];
 	GPOS_ASSERT(nullptr != child_dxlnode);
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());

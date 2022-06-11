@@ -50,7 +50,7 @@ CParseHandlerGroupingColList::CParseHandlerGroupingColList(
 //---------------------------------------------------------------------------
 CParseHandlerGroupingColList::~CParseHandlerGroupingColList()
 {
-	CRefCount::SafeRelease(m_grouping_colids_array);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -138,9 +138,9 @@ CParseHandlerGroupingColList::EndElement(const XMLCh *const,  // element_uri,
 //		Returns the array of parsed grouping column ids
 //
 //---------------------------------------------------------------------------
-gpos::pointer<ULongPtrArray *>
+ULongPtrArray *
 CParseHandlerGroupingColList::GetGroupingColidArray()
 {
-	return m_grouping_colids_array;
+	return m_grouping_colids_array.get();
 }
 // EOF

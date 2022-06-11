@@ -76,8 +76,9 @@ CParseHandlerMDGPDBCheckConstraint::StartElement(
 
 	// parse mdid
 	m_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-		EdxltokenCheckConstraint);
+				 m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				 EdxltokenMdid, EdxltokenCheckConstraint)
+				 .get();
 
 	// parse check constraint name
 	const XMLCh *parsed_column_name = CDXLOperatorFactory::ExtractAttrValue(
@@ -91,8 +92,9 @@ CParseHandlerMDGPDBCheckConstraint::StartElement(
 
 	// parse mdid of relation
 	m_rel_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenRelationMdid, EdxltokenCheckConstraint);
+					 m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+					 EdxltokenRelationMdid, EdxltokenCheckConstraint)
+					 .get();
 
 	// create and activate the parse handler for the child scalar expression node
 	CParseHandlerBase *scalar_expr_handler_base =
@@ -136,7 +138,7 @@ CParseHandlerMDGPDBCheckConstraint::EndElement(
 
 	CDXLNode *dxlnode_scalar_expr = op_parse_handler->CreateDXLNode();
 	GPOS_ASSERT(nullptr != dxlnode_scalar_expr);
-	dxlnode_scalar_expr->AddRef();
+	;
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDCheckConstraintGPDB(
 		m_mp, m_mdid, m_mdname, m_rel_mdid, dxlnode_scalar_expr);

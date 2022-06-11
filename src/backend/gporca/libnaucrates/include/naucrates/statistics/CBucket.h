@@ -48,10 +48,10 @@ class CBucket : public IBucket, public gpos::DbgPrintMixin<CBucket>
 {
 private:
 	// lower bound of bucket
-	gpos::owner<CPoint *> m_bucket_lower_bound;
+	gpos::Ref<CPoint> m_bucket_lower_bound;
 
 	// upper bound of bucket
-	gpos::owner<CPoint *> m_bucket_upper_bound;
+	gpos::Ref<CPoint> m_bucket_upper_bound;
 
 	// is lower bound closed (does bucket include boundary value)
 	BOOL m_is_lower_closed;
@@ -71,24 +71,24 @@ public:
 	CBucket(const CBucket &) = delete;
 
 	// ctor
-	CBucket(gpos::owner<CPoint *> bucket_lower_bound,
-			gpos::owner<CPoint *> bucket_upper_bound, BOOL is_lower_closed,
+	CBucket(gpos::Ref<CPoint> bucket_lower_bound,
+			gpos::Ref<CPoint> bucket_upper_bound, BOOL is_lower_closed,
 			BOOL is_upper_closed, CDouble frequency, CDouble distinct);
 
 	// dtor
 	~CBucket() override;
 
 	// does bucket contain point
-	BOOL Contains(gpos::pointer<const CPoint *> point) const;
+	BOOL Contains(const CPoint *point) const;
 
 	// is the point before the lower bound of the bucket
-	BOOL IsBefore(gpos::pointer<const CPoint *> point) const;
+	BOOL IsBefore(const CPoint *point) const;
 
 	// is the point after the upper bound of the bucket
-	BOOL IsAfter(gpos::pointer<const CPoint *> point) const;
+	BOOL IsAfter(const CPoint *point) const;
 
 	// what percentage of bucket is covered by [lb,pp]
-	CDouble GetOverlapPercentage(gpos::pointer<const CPoint *> point,
+	CDouble GetOverlapPercentage(const CPoint *point,
 								 BOOL include_point = true) const;
 
 	// frequency associated with bucket
@@ -126,17 +126,17 @@ public:
 	}
 
 	// lower point
-	gpos::pointer<CPoint *>
+	CPoint *
 	GetLowerBound() const override
 	{
-		return m_bucket_lower_bound;
+		return m_bucket_lower_bound.get();
 	}
 
 	// upper point
-	gpos::pointer<CPoint *>
+	CPoint *
 	GetUpperBound() const override
 	{
-		return m_bucket_upper_bound;
+		return m_bucket_upper_bound.get();
 	}
 
 	// is lower bound closed (does bucket includes boundary value)

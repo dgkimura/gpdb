@@ -36,10 +36,10 @@ class CScalarOp : public CScalar
 {
 private:
 	// metadata id in the catalog
-	gpos::owner<IMDId *> m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// return type id or NULL if it can be inferred from the metadata
-	gpos::owner<IMDId *> m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// scalar operator name
 	const CWStringConst *m_pstrOp;
@@ -58,15 +58,14 @@ private:
 
 public:
 	// ctor
-	CScalarOp(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
-			  gpos::owner<IMDId *> return_type_mdid,
-			  const CWStringConst *pstrOp);
+	CScalarOp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+			  gpos::Ref<IMDId> return_type_mdid, const CWStringConst *pstrOp);
 
 	// dtor
 	~CScalarOp() override
 	{
-		m_mdid_op->Release();
-		CRefCount::SafeRelease(m_return_type_mdid);
+		;
+		;
 		GPOS_DELETE(m_pstrOp);
 	}
 
@@ -86,33 +85,32 @@ public:
 	}
 
 	// accessor to the return type field
-	gpos::pointer<IMDId *> GetReturnTypeMdId() const;
+	IMDId *GetReturnTypeMdId() const;
 
 	// the type of the scalar expression
-	gpos::pointer<IMDId *> MdidType() const override;
+	IMDId *MdidType() const override;
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarOp *>
+	static CScalarOp *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -122,17 +120,16 @@ public:
 	}
 
 	// helper function
-	static BOOL FCommutative(gpos::pointer<const IMDId *> pcmdidOtherOp);
+	static BOOL FCommutative(const IMDId *pcmdidOtherOp);
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(
-		gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override;
+	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
 
 	// name of the scalar operator
 	const CWStringConst *Pstr() const;
 
 	// metadata id
-	gpos::pointer<IMDId *> MdIdOp() const;
+	IMDId *MdIdOp() const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

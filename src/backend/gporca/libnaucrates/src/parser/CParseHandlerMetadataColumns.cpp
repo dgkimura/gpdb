@@ -50,7 +50,7 @@ CParseHandlerMetadataColumns::CParseHandlerMetadataColumns(
 //---------------------------------------------------------------------------
 CParseHandlerMetadataColumns::~CParseHandlerMetadataColumns()
 {
-	CRefCount::SafeRelease(m_md_col_array);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -131,8 +131,8 @@ CParseHandlerMetadataColumns::EndElement(const XMLCh *const,  // element_uri,
 
 			GPOS_ASSERT(nullptr != md_col_parse_handler->GetMdCol());
 
-			gpos::owner<CMDColumn *> md_col = md_col_parse_handler->GetMdCol();
-			md_col->AddRef();
+			gpos::Ref<CMDColumn> md_col = md_col_parse_handler->GetMdCol();
+			;
 
 			m_md_col_array->Append(md_col);
 		}
@@ -156,10 +156,10 @@ CParseHandlerMetadataColumns::EndElement(const XMLCh *const,  // element_uri,
 //		Return the constructed list of metadata columns
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CMDColumnArray *>
+CMDColumnArray *
 CParseHandlerMetadataColumns::GetMdColArray()
 {
-	return m_md_col_array;
+	return m_md_col_array.get();
 }
 
 // EOF

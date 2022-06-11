@@ -78,15 +78,19 @@ CParseHandlerLogicalUpdate::StartElement(const XMLCh *const,  // element_uri,
 
 	const XMLCh *delete_colids_xml = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenDeleteCols, EdxltokenLogicalUpdate);
-	m_deletion_colid_array = CDXLOperatorFactory::ExtractIntsToUlongArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), delete_colids_xml,
-		EdxltokenDeleteCols, EdxltokenLogicalUpdate);
+	m_deletion_colid_array =
+		CDXLOperatorFactory::ExtractIntsToUlongArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), delete_colids_xml,
+			EdxltokenDeleteCols, EdxltokenLogicalUpdate)
+			.get();
 
 	const XMLCh *insert_colids_xml = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenInsertCols, EdxltokenLogicalUpdate);
-	m_insert_colid_array = CDXLOperatorFactory::ExtractIntsToUlongArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), insert_colids_xml,
-		EdxltokenInsertCols, EdxltokenLogicalUpdate);
+	m_insert_colid_array =
+		CDXLOperatorFactory::ExtractIntsToUlongArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), insert_colids_xml,
+			EdxltokenInsertCols, EdxltokenLogicalUpdate)
+			.get();
 
 	const XMLCh *preserve_oids_xml =
 		attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenUpdatePreservesOids));
@@ -158,9 +162,9 @@ CParseHandlerLogicalUpdate::EndElement(const XMLCh *const,	// element_uri,
 	GPOS_ASSERT(nullptr != table_descr_parse_handler->GetDXLTableDescr());
 	GPOS_ASSERT(nullptr != child_parse_handler->CreateDXLNode());
 
-	gpos::owner<CDXLTableDescr *> table_descr =
+	gpos::Ref<CDXLTableDescr> table_descr =
 		table_descr_parse_handler->GetDXLTableDescr();
-	table_descr->AddRef();
+	;
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(
 		m_mp, GPOS_NEW(m_mp) CDXLLogicalUpdate(
@@ -171,7 +175,7 @@ CParseHandlerLogicalUpdate::EndElement(const XMLCh *const,	// element_uri,
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node,
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node.get(),
 										   false /* validate_children */);
 #endif	// GPOS_DEBUG
 

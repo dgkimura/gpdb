@@ -32,23 +32,22 @@ class CDatumTest
 {
 private:
 	// create an oid datum
-	static gpos::owner<IDatum *> CreateOidDatum(CMemoryPool *mp, BOOL is_null);
+	static gpos::Ref<IDatum> CreateOidDatum(CMemoryPool *mp, BOOL is_null);
 
 	// create an int2 datum
-	static gpos::owner<IDatum *> CreateInt2Datum(CMemoryPool *mp, BOOL is_null);
+	static gpos::Ref<IDatum> CreateInt2Datum(CMemoryPool *mp, BOOL is_null);
 
 	// create an int4 datum
-	static gpos::owner<IDatum *> CreateInt4Datum(CMemoryPool *mp, BOOL is_null);
+	static gpos::Ref<IDatum> CreateInt4Datum(CMemoryPool *mp, BOOL is_null);
 
 	// create an int8 datum
-	static gpos::owner<IDatum *> CreateInt8Datum(CMemoryPool *mp, BOOL is_null);
+	static gpos::Ref<IDatum> CreateInt8Datum(CMemoryPool *mp, BOOL is_null);
 
 	// create a bool datum
-	static gpos::owner<IDatum *> CreateBoolDatum(CMemoryPool *mp, BOOL is_null);
+	static gpos::Ref<IDatum> CreateBoolDatum(CMemoryPool *mp, BOOL is_null);
 
 	// create a generic datum
-	static gpos::owner<IDatum *> CreateGenericDatum(CMemoryPool *mp,
-													BOOL is_null);
+	static gpos::Ref<IDatum> CreateGenericDatum(CMemoryPool *mp, BOOL is_null);
 
 public:
 	// unittests

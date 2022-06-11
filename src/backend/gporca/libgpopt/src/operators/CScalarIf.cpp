@@ -33,13 +33,14 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarIf::CScalarIf(CMemoryPool *mp, gpos::owner<IMDId *> mdid)
+CScalarIf::CScalarIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 	: CScalar(mp), m_mdid_type(std::move(mdid)), m_fBoolReturnType(false)
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	m_fBoolReturnType = CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type);
+	m_fBoolReturnType =
+		CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type.get());
 }
 
 
@@ -68,14 +69,14 @@ CScalarIf::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIf::Matches(gpos::pointer<COperator *> pop) const
+CScalarIf::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarIf *> popScIf = gpos::dyn_cast<CScalarIf>(pop);
+		CScalarIf *popScIf = gpos::dyn_cast<CScalarIf>(pop);
 
 		// match if return types are identical
-		return popScIf->MdidType()->Equals(m_mdid_type);
+		return popScIf->MdidType()->Equals(m_mdid_type.get());
 	}
 
 	return false;

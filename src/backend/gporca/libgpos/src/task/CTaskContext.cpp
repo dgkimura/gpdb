@@ -50,7 +50,7 @@ CTaskContext::CTaskContext(CMemoryPool *mp, const CTaskContext &task_ctxt)
 	  m_locale(task_ctxt.Locale())
 {
 	m_bitset = GPOS_NEW(mp) CBitSet(mp);
-	m_bitset->Union(task_ctxt.m_bitset);
+	m_bitset->Union(task_ctxt.m_bitset.get());
 }
 
 
@@ -64,7 +64,7 @@ CTaskContext::CTaskContext(CMemoryPool *mp, const CTaskContext &task_ctxt)
 //---------------------------------------------------------------------------
 CTaskContext::~CTaskContext()
 {
-	CRefCount::SafeRelease(m_bitset);
+	;
 }
 
 

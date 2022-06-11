@@ -115,13 +115,13 @@ Eres_ParseCalibratedCostModel()
 
 	fixture.Parse((const XMLByte *) a_szDXL.Rgt(), strlen(a_szDXL.Rgt()));
 
-	gpos::pointer<ICostModel *> pcm = pphcm->GetCostModel();
+	ICostModel *pcm = pphcm->GetCostModel();
 
 	GPOS_RTL_ASSERT(ICostModel::EcmtGPDBCalibrated == pcm->Ecmt());
 	GPOS_RTL_ASSERT(3 == pcm->UlHosts());
 
-	CAutoRef<CCostModelParamsGPDB> pcpExpected(GPOS_NEW(mp)
-												   CCostModelParamsGPDB(mp));
+	gpos::Ref<CCostModelParamsGPDB> pcpExpected(GPOS_NEW(mp)
+													CCostModelParamsGPDB(mp));
 	pcpExpected->SetParam(CCostModelParamsGPDB::EcpNLJFactor, 1024.0, 1023.0,
 						  1025.0);
 	GPOS_RTL_ASSERT(pcpExpected->Equals(pcm->GetCostModelParams()));
@@ -146,16 +146,15 @@ Eres_SerializeCalibratedCostModel()
 		GPOS_NEW(mp) CWStringDynamic(mp, wszExpectedString));
 
 	const ULONG ulSegments = 3;
-	gpos::owner<CCostModelParamsGPDB *> pcp =
-		GPOS_NEW(mp) CCostModelParamsGPDB(mp);
+	gpos::Ref<CCostModelParamsGPDB> pcp = GPOS_NEW(mp) CCostModelParamsGPDB(mp);
 	pcp->SetParam(CCostModelParamsGPDB::EcpNLJFactor, 1024.0, 1023.0, 1025.0);
-	gpos::CAutoRef<CCostModelGPDB> apcm(
-		GPOS_NEW(mp) CCostModelGPDB(mp, ulSegments, pcp));
+	gpos::Ref<CCostModelGPDB> apcm(GPOS_NEW(mp)
+									   CCostModelGPDB(mp, ulSegments, pcp));
 
 	CWStringDynamic wsActual(mp);
 	COstreamString os(&wsActual);
 	CXMLSerializer xml_serializer(mp, os, false);
-	CCostModelConfigSerializer cmcSerializer(apcm.Value());
+	CCostModelConfigSerializer cmcSerializer(apcm.get());
 	cmcSerializer.Serialize(xml_serializer);
 
 	GPOS_RTL_ASSERT(apwsExpected->Equals(&wsActual));

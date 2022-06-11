@@ -129,7 +129,7 @@ public:
 	virtual void SetParam(const CHAR *szName, CDouble dVal, CDouble dLowerBound,
 						  CDouble dUpperBound) = 0;
 
-	virtual BOOL Equals(gpos::pointer<ICostModelParams *> pcm) const = 0;
+	virtual BOOL Equals(ICostModelParams *pcm) const = 0;
 
 	virtual const CHAR *SzNameLookup(ULONG id) const = 0;
 

@@ -43,7 +43,7 @@ class CScalarIf : public CScalar
 {
 private:
 	// metadata id in the catalog
-	gpos::owner<IMDId *> m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// is operator return type BOOL?
 	BOOL m_fBoolReturnType;
@@ -52,12 +52,12 @@ public:
 	CScalarIf(const CScalarIf &) = delete;
 
 	// ctor
-	CScalarIf(CMemoryPool *mp, gpos::owner<IMDId *> mdid);
+	CScalarIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid);
 
 	// dtor
 	~CScalarIf() override
 	{
-		m_mdid_type->Release();
+		;
 	}
 
 
@@ -76,17 +76,17 @@ public:
 	}
 
 	// the type of the scalar expression
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *>) const override;
+	BOOL Matches(COperator *) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -96,12 +96,11 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
@@ -109,13 +108,13 @@ public:
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override
+	Eber(ULongPtrArray *pdrgpulChildren) const override
 	{
 		return EberNullOnAllNullChildren(pdrgpulChildren);
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarIf *>
+	static CScalarIf *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

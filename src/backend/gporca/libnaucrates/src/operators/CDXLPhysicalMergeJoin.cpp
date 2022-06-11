@@ -73,9 +73,8 @@ CDXLPhysicalMergeJoin::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalMergeJoin::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLPhysicalMergeJoin::SerializeToDXL(CXMLSerializer *xml_serializer,
+									  const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -108,7 +107,7 @@ CDXLPhysicalMergeJoin::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalMergeJoin::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalMergeJoin::AssertValid(const CDXLNode *dxlnode,
 								   BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -117,12 +116,10 @@ CDXLPhysicalMergeJoin::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	GPOS_ASSERT(EdxlmjIndexSentinel == dxlnode->Arity());
 	GPOS_ASSERT(EdxljtSentinel > GetJoinType());
 
-	gpos::pointer<CDXLNode *> dxlnode_join_filter =
-		(*dxlnode)[EdxlmjIndexJoinFilter];
-	gpos::pointer<CDXLNode *> dxlnode_merge_clauses =
-		(*dxlnode)[EdxlmjIndexMergeCondList];
-	gpos::pointer<CDXLNode *> dxlnode_left = (*dxlnode)[EdxlmjIndexLeftChild];
-	gpos::pointer<CDXLNode *> dxlnode_right = (*dxlnode)[EdxlmjIndexRightChild];
+	CDXLNode *dxlnode_join_filter = (*dxlnode)[EdxlmjIndexJoinFilter];
+	CDXLNode *dxlnode_merge_clauses = (*dxlnode)[EdxlmjIndexMergeCondList];
+	CDXLNode *dxlnode_left = (*dxlnode)[EdxlmjIndexLeftChild];
+	CDXLNode *dxlnode_right = (*dxlnode)[EdxlmjIndexRightChild];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarJoinFilter ==

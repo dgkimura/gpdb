@@ -76,9 +76,9 @@ CContextDXLToPlStmt::CContextDXLToPlStmt(
 //---------------------------------------------------------------------------
 CContextDXLToPlStmt::~CContextDXLToPlStmt()
 {
-	m_cte_consumer_info->Release();
-	m_num_partition_selectors_array->Release();
-	m_part_selector_to_param_map->Release();
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------

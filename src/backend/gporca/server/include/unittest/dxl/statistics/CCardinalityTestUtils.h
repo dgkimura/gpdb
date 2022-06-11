@@ -59,21 +59,21 @@ public:
 	static CHistogram *PhistExampleBool(CMemoryPool *mp);
 
 	// helper function to generate a point from an encoded value of specific datatype
-	static gpos::owner<CPoint *> PpointGeneric(
-		CMemoryPool *mp, OID oid, CWStringDynamic *pstrValueEncoded,
-		LINT value);
+	static gpos::Ref<CPoint> PpointGeneric(CMemoryPool *mp, OID oid,
+										   CWStringDynamic *pstrValueEncoded,
+										   LINT value);
 
 	// helper function to generate a point of numeric datatype
-	static gpos::owner<CPoint *> PpointNumeric(
-		CMemoryPool *mp, CWStringDynamic *pstrEncodedValue, CDouble value);
+	static gpos::Ref<CPoint> PpointNumeric(CMemoryPool *mp,
+										   CWStringDynamic *pstrEncodedValue,
+										   CDouble value);
 
 	// helper function to generate a point of double datatype
-	static gpos::owner<CPoint *> PpointDouble(CMemoryPool *mp, OID oid,
-											  CDouble value);
+	static gpos::Ref<CPoint> PpointDouble(CMemoryPool *mp, OID oid,
+										  CDouble value);
 
 	// helper method to print statistics object
-	static void PrintStats(CMemoryPool *mp,
-						   gpos::pointer<const IStatistics *> stats);
+	static void PrintStats(CMemoryPool *mp, const IStatistics *stats);
 
 	// helper method to print histogram object
 	static void PrintHist(CMemoryPool *mp, const char *pcPrefix,

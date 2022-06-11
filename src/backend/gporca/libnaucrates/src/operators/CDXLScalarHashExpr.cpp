@@ -28,7 +28,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarHashExpr::CDXLScalarHashExpr(CMemoryPool *mp,
-									   gpos::owner<IMDId *> opfamily)
+									   gpos::Ref<IMDId> opfamily)
 	: CDXLScalar(mp), m_mdid_opfamily(std::move(opfamily))
 {
 	GPOS_ASSERT_IMP(GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution),
@@ -45,7 +45,7 @@ CDXLScalarHashExpr::CDXLScalarHashExpr(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarHashExpr::~CDXLScalarHashExpr()
 {
-	CRefCount::SafeRelease(m_mdid_opfamily);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -85,10 +85,10 @@ CDXLScalarHashExpr::GetOpNameStr() const
 //		Hash expression type from the catalog
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarHashExpr::MdidOpfamily() const
 {
-	return m_mdid_opfamily;
+	return m_mdid_opfamily.get();
 }
 
 //---------------------------------------------------------------------------
@@ -101,7 +101,7 @@ CDXLScalarHashExpr::MdidOpfamily() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarHashExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   gpos::pointer<const CDXLNode *> node) const
+								   const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -128,11 +128,11 @@ CDXLScalarHashExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarHashExpr::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLScalarHashExpr::AssertValid(const CDXLNode *node,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == node->Arity());
-	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[0];
+	CDXLNode *child_dxlnode = (*node)[0];
 
 	GPOS_ASSERT(EdxloptypeScalar ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());

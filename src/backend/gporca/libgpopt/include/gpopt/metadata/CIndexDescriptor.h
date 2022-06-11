@@ -39,16 +39,16 @@ class CIndexDescriptor : public CRefCount,
 {
 private:
 	// mdid of the index
-	gpos::owner<IMDId *> m_pmdidIndex;
+	gpos::Ref<IMDId> m_pmdidIndex;
 
 	// name of index
 	CName m_name;
 
 	// array of index key columns
-	gpos::owner<CColumnDescriptorArray *> m_pdrgpcoldescKeyCols;
+	gpos::Ref<CColumnDescriptorArray> m_pdrgpcoldescKeyCols;
 
 	// array of index included columns
-	gpos::owner<CColumnDescriptorArray *> m_pdrgpcoldescIncludedCols;
+	gpos::Ref<CColumnDescriptorArray> m_pdrgpcoldescIncludedCols;
 
 	// clustered index
 	BOOL m_clustered;
@@ -60,11 +60,11 @@ public:
 	CIndexDescriptor(const CIndexDescriptor &) = delete;
 
 	// ctor
-	CIndexDescriptor(
-		CMemoryPool *mp, gpos::owner<IMDId *> pmdidIndex, const CName &name,
-		gpos::owner<CColumnDescriptorArray *> pdrgcoldescKeyCols,
-		gpos::owner<CColumnDescriptorArray *> pdrgcoldescIncludedCols,
-		BOOL is_clustered, IMDIndex::EmdindexType emdindt);
+	CIndexDescriptor(CMemoryPool *mp, gpos::Ref<IMDId> pmdidIndex,
+					 const CName &name,
+					 gpos::Ref<CColumnDescriptorArray> pdrgcoldescKeyCols,
+					 gpos::Ref<CColumnDescriptorArray> pdrgcoldescIncludedCols,
+					 BOOL is_clustered, IMDIndex::EmdindexType emdindt);
 
 	// dtor
 	~CIndexDescriptor() override;
@@ -76,10 +76,10 @@ public:
 	ULONG UlIncludedColumns() const;
 
 	// index mdid accessor
-	gpos::pointer<IMDId *>
+	IMDId *
 	MDId() const
 	{
-		return m_pmdidIndex;
+		return m_pmdidIndex.get();
 	}
 
 	// index name
@@ -90,17 +90,17 @@ public:
 	}
 
 	// key column descriptors
-	gpos::pointer<CColumnDescriptorArray *>
+	CColumnDescriptorArray *
 	PdrgpcoldescKey() const
 	{
-		return m_pdrgpcoldescKeyCols;
+		return m_pdrgpcoldescKeyCols.get();
 	}
 
 	// included column descriptors
-	gpos::pointer<CColumnDescriptorArray *>
+	CColumnDescriptorArray *
 	PdrgpcoldescIncluded() const
 	{
-		return m_pdrgpcoldescIncludedCols;
+		return m_pdrgpcoldescIncludedCols.get();
 	}
 
 	// is index clustered
@@ -119,9 +119,9 @@ public:
 	BOOL SupportsIndexOnlyScan() const;
 
 	// create an index descriptor
-	static gpos::owner<CIndexDescriptor *> Pindexdesc(
-		CMemoryPool *mp, gpos::pointer<const CTableDescriptor *> ptabdesc,
-		gpos::pointer<const IMDIndex *> pmdindex);
+	static gpos::Ref<CIndexDescriptor> Pindexdesc(
+		CMemoryPool *mp, const CTableDescriptor *ptabdesc,
+		const IMDIndex *pmdindex);
 
 	IOstream &OsPrint(IOstream &os) const;
 

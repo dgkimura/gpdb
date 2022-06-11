@@ -31,7 +31,7 @@ using namespace gpmd;
 void
 IMDCacheObject::SerializeMDIdAsElem(CXMLSerializer *xml_serializer,
 									const CWStringConst *element_name,
-									gpos::pointer<const IMDId *> mdid) const
+									const IMDId *mdid) const
 {
 	if (nullptr == mdid)
 	{
@@ -58,7 +58,7 @@ IMDCacheObject::SerializeMDIdAsElem(CXMLSerializer *xml_serializer,
 //---------------------------------------------------------------------------
 void
 IMDCacheObject::SerializeMDIdList(CXMLSerializer *xml_serializer,
-								  gpos::pointer<const IMdIdArray *> mdid_array,
+								  const IMdIdArray *mdid_array,
 								  const CWStringConst *strTokenList,
 								  const CWStringConst *strTokenListItem)
 {
@@ -72,7 +72,7 @@ IMDCacheObject::SerializeMDIdList(CXMLSerializer *xml_serializer,
 			CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 			strTokenListItem);
 
-		gpos::pointer<IMDId *> mdid = (*mdid_array)[ul];
+		IMDId *mdid = (*mdid_array)[ul].get();
 		mdid->Serialize(xml_serializer,
 						CDXLTokens::GetDXLTokenStr(EdxltokenMdid));
 		xml_serializer->CloseElement(

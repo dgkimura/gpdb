@@ -37,23 +37,22 @@ class CPhysicalDynamicIndexScan : public CPhysicalDynamicScan
 {
 private:
 	// index descriptor
-	gpos::owner<CIndexDescriptor *> m_pindexdesc;
+	gpos::Ref<CIndexDescriptor> m_pindexdesc;
 
 	// order
-	gpos::owner<COrderSpec *> m_pos;
+	gpos::Ref<COrderSpec> m_pos;
 
 public:
 	CPhysicalDynamicIndexScan(const CPhysicalDynamicIndexScan &) = delete;
 
 	// ctors
 	CPhysicalDynamicIndexScan(
-		CMemoryPool *mp, gpos::owner<CIndexDescriptor *> pindexdesc,
-		gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId,
-		const CName *pnameAlias, gpos::owner<CColRefArray *> pdrgpcrOutput,
-		ULONG scan_id, gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
-		gpos::owner<COrderSpec *> pos,
-		gpos::owner<IMdIdArray *> partition_mdids,
-		gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part);
+		CMemoryPool *mp, gpos::Ref<CIndexDescriptor> pindexdesc,
+		gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+		const CName *pnameAlias, gpos::Ref<CColRefArray> pdrgpcrOutput,
+		ULONG scan_id, gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+		gpos::Ref<COrderSpec> pos, gpos::Ref<IMdIdArray> partition_mdids,
+		gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part);
 
 	// dtor
 	~CPhysicalDynamicIndexScan() override;
@@ -74,29 +73,29 @@ public:
 	}
 
 	// index descriptor
-	gpos::pointer<CIndexDescriptor *>
+	CIndexDescriptor *
 	Pindexdesc() const
 	{
-		return m_pindexdesc;
+		return m_pindexdesc.get();
 	}
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	gpos::owner<COrderSpec *>
+	gpos::Ref<COrderSpec>
 	PosDerive(CMemoryPool *,	   //mp
 			  CExpressionHandle &  //exprhdl
 	) const override
 	{
-		m_pos->AddRef();
+		;
 		return m_pos;
 	}
 
@@ -106,11 +105,10 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl,
-		gpos::pointer<const CEnfdOrder *> peo) const override;
+		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
 
 	// conversion function
-	static gpos::cast_func<CPhysicalDynamicIndexScan *>
+	static CPhysicalDynamicIndexScan *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -123,10 +121,9 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// statistics derivation during costing
-	gpos::owner<IStatistics *> PstatsDerive(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CReqdPropPlan *> prpplan,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan,
+		IStatisticsArray *stats_ctxt) const override;
 
 };	// class CPhysicalDynamicIndexScan
 

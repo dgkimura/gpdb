@@ -116,7 +116,7 @@ CJobGroupImplementation::~CJobGroupImplementation() = default;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupImplementation::Init(gpos::pointer<CGroup *> pgroup)
+CJobGroupImplementation::Init(CGroup *pgroup)
 {
 	CJobGroup::Init(pgroup);
 
@@ -192,7 +192,7 @@ CJobGroupImplementation::EevtStartImplementation(CSchedulerContext *psc,
 {
 	// get a job pointer
 	CJobGroupImplementation *pjgi = PjConvert(pjOwner);
-	gpos::pointer<CGroup *> pgroup = pjgi->m_pgroup;
+	CGroup *pgroup = pjgi->m_pgroup;
 
 	if (!pgroup->FExplored())
 	{
@@ -284,8 +284,7 @@ CJobGroupImplementation::FExecute(CSchedulerContext *psc)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupImplementation::ScheduleJob(CSchedulerContext *psc,
-									 gpos::pointer<CGroup *> pgroup,
+CJobGroupImplementation::ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
 									 CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtGroupImplementation);

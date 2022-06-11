@@ -295,14 +295,14 @@ CMDIdGPDB::VersionMinor() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdGPDB::Equals(gpos::pointer<const IMDId *> mdid) const
+CMDIdGPDB::Equals(const IMDId *mdid) const
 {
 	if (nullptr == mdid || EmdidGPDB != mdid->MdidType())
 	{
 		return false;
 	}
 
-	gpos::pointer<const CMDIdGPDB *> mdidGPDB =
+	const CMDIdGPDB *mdidGPDB =
 		static_cast<CMDIdGPDB *>(const_cast<IMDId *>(mdid));
 
 	return (m_oid == mdidGPDB->Oid() &&

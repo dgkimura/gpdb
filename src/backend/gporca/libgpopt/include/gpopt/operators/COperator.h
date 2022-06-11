@@ -29,12 +29,13 @@ using namespace gpos;
 class CExpressionHandle;
 
 // dynamic array for operators
-using COperatorArray = CDynamicPtrArray<COperator, CleanupRelease>;
+using COperatorArray = gpos::Vector<gpos::Ref<COperator>>;
 
 // hash map mapping CColRef -> CColRef
 using ColRefToColRefMap =
-	CHashMap<CColRef, CColRef, CColRef::HashValue, CColRef::Equals,
-			 CleanupNULL<CColRef>, CleanupNULL<CColRef>>;
+	gpos::UnorderedMap<const CColRef *, CColRef *,
+					   gpos::PtrHash<CColRef, CColRef::HashValue>,
+					   gpos::PtrEqual<CColRef, CColRef::Equals>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -66,7 +67,7 @@ protected:
 		CExpressionHandle &exprhdl, IMDFunction::EFuncStbl efsDefault);
 
 	// derive function properties from children
-	static gpos::owner<CFunctionProp *> PfpDeriveFromChildren(
+	static gpos::Ref<CFunctionProp> PfpDeriveFromChildren(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		IMDFunction::EFuncStbl efsDefault, BOOL fHasVolatileFunctionScan,
 		BOOL fScan);
@@ -334,18 +335,17 @@ public:
 
 	// match function;
 	// abstract to enforce an implementation for each new operator
-	virtual BOOL Matches(gpos::pointer<COperator *> pop) const = 0;
+	virtual BOOL Matches(COperator *pop) const = 0;
 
 	// create container for derived properties
-	virtual gpos::owner<CDrvdProp *> PdpCreate(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<CDrvdProp> PdpCreate(CMemoryPool *mp) const = 0;
 
 	// create container for required properties
-	virtual gpos::owner<CReqdProp *> PrpCreate(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<CReqdProp> PrpCreate(CMemoryPool *mp) const = 0;
 
 	// return a copy of the operator with remapped columns
-	virtual gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-		BOOL must_exist) = 0;
+	virtual gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist) = 0;
 
 	// print
 	virtual IOstream &OsPrint(IOstream &os) const;

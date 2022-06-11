@@ -141,20 +141,21 @@ CParseHandlerLogicalGroupBy::EndElement(const XMLCh *const,	 // element_uri,
 	AddChildFromParseHandler(proj_list_parse_handler);
 	AddChildFromParseHandler(lg_op_parse_handler);
 
-	gpos::pointer<CDXLLogicalGroupBy *> lg_group_by_dxl =
+	CDXLLogicalGroupBy *lg_group_by_dxl =
 		static_cast<CDXLLogicalGroupBy *>(m_dxl_node->GetOperator());
 
 	// set grouping cols list
 	GPOS_ASSERT(nullptr != grouping_col_parse_handler->GetGroupingColidArray());
 
-	gpos::owner<ULongPtrArray *> grouping_col_array =
+	gpos::Ref<ULongPtrArray> grouping_col_array =
 		grouping_col_parse_handler->GetGroupingColidArray();
-	grouping_col_array->AddRef();
+	;
 	lg_group_by_dxl->SetGroupingColumns(std::move(grouping_col_array));
 
 
 #ifdef GPOS_DEBUG
-	lg_group_by_dxl->AssertValid(m_dxl_node, false /* validate_children */);
+	lg_group_by_dxl->AssertValid(m_dxl_node.get(),
+								 false /* validate_children */);
 #endif	// GPOS_DEBUG
 
 	// deactivate handler

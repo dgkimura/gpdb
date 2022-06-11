@@ -15,14 +15,13 @@ namespace gpopt
 class CColConstraintsHashMapper : public IColConstraintsMapper
 {
 public:
-	CColConstraintsHashMapper(CMemoryPool *mp,
-							  gpos::pointer<CConstraintArray *> pdrgPcnstr);
+	CColConstraintsHashMapper(CMemoryPool *mp, CConstraintArray *pdrgPcnstr);
 
-	gpos::owner<CConstraintArray *> PdrgPcnstrLookup(CColRef *colref) override;
+	gpos::Ref<CConstraintArray> PdrgPcnstrLookup(CColRef *colref) override;
 	~CColConstraintsHashMapper() override;
 
 private:
-	gpos::owner<ColRefToConstraintArrayMap *> m_phmColConstr;
+	gpos::Ref<ColRefToConstraintArrayMap> m_phmColConstr;
 };
 }  // namespace gpopt
 

@@ -42,32 +42,30 @@ class CExpressionUtils
 {
 private:
 	// unnest a given expression's child and append unnested nodes to given array
-	static void UnnestChild(CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+	static void UnnestChild(CMemoryPool *mp, CExpression *pexpr,
 							ULONG UlChildIndex, BOOL fAnd, BOOL fOr,
-							BOOL fNotChildren,
-							gpos::pointer<CExpressionArray *> pdrgpexpr);
+							BOOL fNotChildren, CExpressionArray *pdrgpexpr);
 
 	// append the unnested children of given expression to given array
-	static void AppendChildren(CMemoryPool *mp,
-							   gpos::pointer<CExpression *> pexpr,
-							   gpos::pointer<CExpressionArray *> pdrgpexpr);
+	static void AppendChildren(CMemoryPool *mp, CExpression *pexpr,
+							   CExpressionArray *pdrgpexpr);
 
 	// return an array of expression children after being unnested
-	static gpos::owner<CExpressionArray *> PdrgpexprUnnestChildren(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr);
+	static gpos::Ref<CExpressionArray> PdrgpexprUnnestChildren(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// push not expression one level down the given expression
-	static gpos::owner<CExpression *> PexprPushNotOneLevel(CMemoryPool *mp,
-														   CExpression *pexpr);
+	static gpos::Ref<CExpression> PexprPushNotOneLevel(CMemoryPool *mp,
+													   CExpression *pexpr);
 
 public:
 	// remove duplicate AND/OR children
-	static gpos::owner<CExpression *> PexprDedupChildren(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr);
+	static gpos::Ref<CExpression> PexprDedupChildren(CMemoryPool *mp,
+													 CExpression *pexpr);
 
 	// unnest AND/OR/NOT predicates
-	static gpos::owner<CExpression *> PexprUnnest(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr);
+	static gpos::Ref<CExpression> PexprUnnest(CMemoryPool *mp,
+											  CExpression *pexpr);
 };
 }  // namespace gpopt
 

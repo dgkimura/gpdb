@@ -74,8 +74,9 @@ CParseHandlerScalarMinMax::StartElement(const XMLCh *const element_uri,
 
 		// parse type id
 		m_mdid_type = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenTypeId,
-			token_type);
+						  m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+						  EdxltokenTypeId, token_type)
+						  .get();
 	}
 	else
 	{

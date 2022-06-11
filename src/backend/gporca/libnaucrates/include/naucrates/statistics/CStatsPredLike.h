@@ -34,10 +34,10 @@ class CStatsPredLike : public CStatsPred
 {
 private:
 	// left hand side of the LIKE expression
-	gpos::owner<CExpression *> m_expr_left;
+	gpos::Ref<CExpression> m_expr_left;
 
 	// right hand side of the LIKE expression
-	gpos::owner<CExpression *> m_expr_right;
+	gpos::Ref<CExpression> m_expr_right;
 
 	// default scale factor
 	CDouble m_default_scale_factor;
@@ -48,8 +48,8 @@ public:
 	CStatsPredLike(const CStatsPredLike &) = delete;
 
 	// ctor
-	CStatsPredLike(ULONG colid, gpos::owner<CExpression *> expr_left,
-				   gpos::owner<CExpression *> expr_right,
+	CStatsPredLike(ULONG colid, gpos::Ref<CExpression> expr_left,
+				   gpos::Ref<CExpression> expr_right,
 				   CDouble default_scale_factor);
 
 	// dtor
@@ -66,24 +66,24 @@ public:
 	}
 
 	// left hand side of the LIKE expression
-	virtual gpos::pointer<CExpression *>
+	virtual CExpression *
 	GetExprOnLeft() const
 	{
-		return m_expr_left;
+		return m_expr_left.get();
 	}
 
 	// right hand side of the LIKE expression
-	virtual gpos::pointer<CExpression *>
+	virtual CExpression *
 	GetExprOnRight() const
 	{
-		return m_expr_right;
+		return m_expr_right.get();
 	}
 
 	// default scale factor
 	virtual CDouble DefaultScaleFactor() const;
 
 	// conversion function
-	static gpos::cast_func<CStatsPredLike *>
+	static CStatsPredLike *
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

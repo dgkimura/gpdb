@@ -129,7 +129,7 @@ CParseHandlerScalarAssertConstraintList::EndElement(
 			CDXLNode(m_dxl_op, m_dxlnode_assert_constraints_parsed_array);
 
 #ifdef GPOS_DEBUG
-		m_dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+		m_dxl_op->AssertValid(m_dxl_node.get(), false /* validate_children */);
 #endif	// GPOS_DEBUG
 
 		// deactivate handler
@@ -145,9 +145,9 @@ CParseHandlerScalarAssertConstraintList::EndElement(
 			dynamic_cast<CParseHandlerScalarOp *>((*this)[this->Length() - 1]);
 		CDXLNode *child_dxlnode = child_parse_handler->CreateDXLNode();
 		GPOS_ASSERT(nullptr != child_dxlnode);
-		child_dxlnode->AddRef();
+		;
 
-		gpos::owner<CDXLNode *> pdxlnAssertConstraint = GPOS_NEW(m_mp)
+		gpos::Ref<CDXLNode> pdxlnAssertConstraint = GPOS_NEW(m_mp)
 			CDXLNode(m_mp, m_dxl_op_assert_constraint, child_dxlnode);
 		m_dxlnode_assert_constraints_parsed_array->Append(
 			std::move(pdxlnAssertConstraint));

@@ -32,7 +32,7 @@ class CStatsPredConj : public CStatsPred
 {
 private:
 	// array of filters
-	gpos::owner<CStatsPredPtrArry *> m_conj_pred_stats_array;
+	gpos::Ref<CStatsPredPtrArry> m_conj_pred_stats_array;
 
 public:
 	CStatsPredConj &operator=(CStatsPredConj &) = delete;
@@ -40,12 +40,12 @@ public:
 	CStatsPredConj(const CStatsPredConj &) = delete;
 
 	// ctor
-	explicit CStatsPredConj(gpos::owner<CStatsPredPtrArry *> pdrgpstatspred);
+	explicit CStatsPredConj(gpos::Ref<CStatsPredPtrArry> pdrgpstatspred);
 
 	// dtor
 	~CStatsPredConj() override
 	{
-		m_conj_pred_stats_array->Release();
+		;
 	}
 
 	// the column identifier on which the predicates are on
@@ -58,17 +58,17 @@ public:
 		return m_conj_pred_stats_array->Size();
 	}
 
-	gpos::pointer<CStatsPredPtrArry *>
+	CStatsPredPtrArry *
 	GetConjPredStatsArray() const
 	{
-		return m_conj_pred_stats_array;
+		return m_conj_pred_stats_array.get();
 	}
 
 	// sort the components of the conjunction
 	void Sort() const;
 
 	// return the filter at a particular position
-	gpos::pointer<CStatsPred *> GetPredStats(ULONG pos) const;
+	CStatsPred *GetPredStats(ULONG pos) const;
 
 	// filter type id
 	EStatsPredType
@@ -78,7 +78,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CStatsPredConj *>
+	static CStatsPredConj *
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

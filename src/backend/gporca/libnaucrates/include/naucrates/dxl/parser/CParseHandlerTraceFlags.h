@@ -42,7 +42,7 @@ class CParseHandlerTraceFlags : public CParseHandlerBase
 {
 private:
 	// trace flag bitset
-	gpos::owner<CBitSet *> m_trace_flags_bitset;
+	gpos::Ref<CBitSet> m_trace_flags_bitset;
 
 	// process the start of an element
 	void StartElement(
@@ -73,7 +73,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// accessor
-	gpos::pointer<CBitSet *> GetTraceFlagBitSet();
+	CBitSet *GetTraceFlagBitSet();
 };
 }  // namespace gpdxl
 

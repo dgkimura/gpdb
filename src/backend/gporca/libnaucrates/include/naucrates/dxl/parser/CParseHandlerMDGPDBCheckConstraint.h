@@ -37,13 +37,13 @@ class CParseHandlerMDGPDBCheckConstraint : public CParseHandlerMetadataObject
 {
 private:
 	// mdid of the check constraint
-	gpos::pointer<IMDId *> m_mdid;
+	IMDId *m_mdid;
 
 	// name of the check constraint
 	CMDName *m_mdname;
 
 	// mdid of the relation
-	gpos::pointer<IMDId *> m_rel_mdid;
+	IMDId *m_rel_mdid;
 
 	// process the start of an element
 	void StartElement(

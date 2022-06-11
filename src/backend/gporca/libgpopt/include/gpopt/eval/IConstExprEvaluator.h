@@ -46,8 +46,7 @@ public:
 
 	// evaluate the given expression and return the result as a new expression
 	// caller takes ownership of returned expression
-	virtual gpos::owner<CExpression *> PexprEval(
-		gpos::pointer<CExpression *> pexpr) = 0;
+	virtual gpos::Ref<CExpression> PexprEval(CExpression *pexpr) = 0;
 
 	// returns true iff the evaluator can evaluate constant expressions without
 	// subqueries

@@ -268,7 +268,7 @@ COptTasks::LogExceptionMessageAndDelete(CHAR *err_buf)
 PlannedStmt *
 COptTasks::ConvertToPlanStmtFromDXL(
 	CMemoryPool *mp, CMDAccessor *md_accessor, const Query *orig_query,
-	gpos::pointer<const CDXLNode *> dxlnode, bool can_set_tag,
+	const CDXLNode *dxlnode, bool can_set_tag,
 	DistributionHashOpsKind distribution_hashops)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
@@ -319,7 +319,7 @@ COptTasks::LoadSearchStrategy(CMemoryPool *mp, char *path)
 				elog(DEBUG2, "\n[OPT]: Using search strategy in (%s)", path);
 
 				search_strategy_arr = dxl_parse_handler->GetSearchStageArray();
-				search_strategy_arr->AddRef();
+				;
 			}
 		}
 	}
@@ -347,9 +347,9 @@ COptTasks::LoadSearchStrategy(CMemoryPool *mp, char *path)
 //		Create the optimizer configuration
 //
 //---------------------------------------------------------------------------
-gpos::owner<COptimizerConfig *>
+gpos::Ref<COptimizerConfig>
 COptTasks::CreateOptimizerConfig(CMemoryPool *mp,
-								 gpos::owner<ICostModel *> cost_model)
+								 gpos::Ref<ICostModel> cost_model)
 {
 	// get chosen plan number, cost threshold
 	ULLONG plan_id = (ULLONG) optimizer_plan_id;
@@ -398,7 +398,7 @@ COptTasks::CreateOptimizerConfig(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 void
-COptTasks::SetCostModelParams(gpos::pointer<ICostModel *> cost_model)
+COptTasks::SetCostModelParams(ICostModel *cost_model)
 {
 	GPOS_ASSERT(nullptr != cost_model);
 
@@ -437,13 +437,13 @@ COptTasks::SetCostModelParams(gpos::pointer<ICostModel *> cost_model)
 //			Generate an instance of optimizer cost model
 //
 //---------------------------------------------------------------------------
-gpos::owner<ICostModel *>
+gpos::Ref<ICostModel>
 COptTasks::GetCostModel(CMemoryPool *mp, ULONG num_segments)
 {
-	gpos::owner<ICostModel *> cost_model =
+	gpos::Ref<ICostModel> cost_model =
 		GPOS_NEW(mp) CCostModelGPDB(mp, num_segments);
 
-	SetCostModelParams(cost_model);
+	SetCostModelParams(cost_model.get());
 
 	return cost_model;
 }
@@ -499,24 +499,24 @@ COptTasks::OptimizeTask(void *ptr)
 	CSearchStageArray *search_strategy_arr =
 		LoadSearchStrategy(mp, optimizer_search_strategy_path);
 
-	gpos::owner<CBitSet *> trace_flags = nullptr;
-	gpos::owner<CBitSet *> enabled_trace_flags = nullptr;
-	gpos::owner<CBitSet *> disabled_trace_flags = nullptr;
-	gpos::owner<CDXLNode *> plan_dxl = nullptr;
+	gpos::Ref<CBitSet> trace_flags = nullptr;
+	gpos::Ref<CBitSet> enabled_trace_flags = nullptr;
+	gpos::Ref<CBitSet> disabled_trace_flags = nullptr;
+	gpos::Ref<CDXLNode> plan_dxl = nullptr;
 
-	gpos::owner<IMdIdArray *> col_stats = nullptr;
-	gpos::owner<MdidHashSet *> rel_stats = nullptr;
+	gpos::Ref<IMdIdArray> col_stats = nullptr;
+	gpos::Ref<MdidHashSet> rel_stats = nullptr;
 
 	GPOS_TRY
 	{
 		// set trace flags
 		trace_flags = CConfigParamMapping::PackConfigParamInBitset(
 			mp, CXform::ExfSentinel);
-		SetTraceflags(mp, trace_flags, &enabled_trace_flags,
+		SetTraceflags(mp, trace_flags.get(), &enabled_trace_flags,
 					  &disabled_trace_flags);
 
 		// set up relcache MD provider
-		gpos::owner<CMDProviderRelcache *> relcache_provider =
+		gpos::Ref<CMDProviderRelcache> relcache_provider =
 			GPOS_NEW(mp) CMDProviderRelcache(mp);
 
 		{
@@ -535,19 +535,19 @@ COptTasks::OptimizeTask(void *ptr)
 			query_to_dxl_translator = CTranslatorQueryToDXL::QueryToDXLInstance(
 				mp, &mda, (Query *) opt_ctxt->m_query);
 
-			gpos::owner<ICostModel *> cost_model =
+			gpos::Ref<ICostModel> cost_model =
 				GetCostModel(mp, num_segments_for_costing);
-			gpos::owner<COptimizerConfig *> optimizer_config =
+			gpos::Ref<COptimizerConfig> optimizer_config =
 				CreateOptimizerConfig(mp, cost_model);
 			CConstExprEvaluatorProxy expr_eval_proxy(mp, &mda);
-			gpos::owner<IConstExprEvaluator *> expr_evaluator =
+			gpos::Ref<IConstExprEvaluator> expr_evaluator =
 				GPOS_NEW(mp) CConstExprEvaluatorDXL(mp, &mda, &expr_eval_proxy);
 
-			gpos::owner<CDXLNode *> query_dxl =
+			gpos::Ref<CDXLNode> query_dxl =
 				query_to_dxl_translator->TranslateQueryToDXL();
-			gpos::pointer<CDXLNodeArray *> query_output_dxlnode_array =
+			CDXLNodeArray *query_output_dxlnode_array =
 				query_to_dxl_translator->GetQueryOutputCols();
-			gpos::pointer<CDXLNodeArray *> cte_dxlnode_array =
+			CDXLNodeArray *cte_dxlnode_array =
 				query_to_dxl_translator->GetCTEs();
 			GPOS_ASSERT(nullptr != query_output_dxlnode_array);
 
@@ -564,9 +564,10 @@ COptTasks::OptimizeTask(void *ptr)
 								use_legacy_opfamilies);
 
 			plan_dxl = COptimizer::PdxlnOptimize(
-				mp, &mda, query_dxl, query_output_dxlnode_array,
-				cte_dxlnode_array, expr_evaluator, num_segments, gp_session_id,
-				gp_command_count, search_strategy_arr, optimizer_config);
+				mp, &mda, query_dxl.get(), query_output_dxlnode_array,
+				cte_dxlnode_array, expr_evaluator.get(), num_segments,
+				gp_session_id, gp_command_count, search_strategy_arr,
+				optimizer_config.get());
 
 			if (opt_ctxt->m_should_serialize_plan_dxl)
 			{
@@ -574,7 +575,7 @@ COptTasks::OptimizeTask(void *ptr)
 				CWStringDynamic plan_str(mp);
 				COstreamString oss(&plan_str);
 				CDXLUtils::SerializePlan(
-					mp, oss, plan_dxl,
+					mp, oss, plan_dxl.get(),
 					optimizer_config->GetEnumeratorCfg()->GetPlanId(),
 					optimizer_config->GetEnumeratorCfg()->GetPlanSpaceSize(),
 					true /*serialize_header_footer*/, true /*indentation*/);
@@ -589,37 +590,37 @@ COptTasks::OptimizeTask(void *ptr)
 				// that may not have the correct can_set_tag
 				opt_ctxt->m_plan_stmt =
 					(PlannedStmt *) gpdb::CopyObject(ConvertToPlanStmtFromDXL(
-						mp, &mda, opt_ctxt->m_query, plan_dxl,
+						mp, &mda, opt_ctxt->m_query, plan_dxl.get(),
 						opt_ctxt->m_query->canSetTag,
 						query_to_dxl_translator->GetDistributionHashOpsKind()));
 			}
 
-			gpos::pointer<CStatisticsConfig *> stats_conf =
-				optimizer_config->GetStatsConf();
+			CStatisticsConfig *stats_conf = optimizer_config->GetStatsConf();
 			col_stats = GPOS_NEW(mp) IMdIdArray(mp);
-			stats_conf->CollectMissingStatsColumns(col_stats);
+			stats_conf->CollectMissingStatsColumns(col_stats.get());
 
 			rel_stats = GPOS_NEW(mp) MdidHashSet(mp);
-			PrintMissingStatsWarning(mp, &mda, col_stats, rel_stats);
+			PrintMissingStatsWarning(mp, &mda, col_stats.get(),
+									 rel_stats.get());
 
-			rel_stats->Release();
-			col_stats->Release();
+			;
+			;
 
-			expr_evaluator->Release();
-			query_dxl->Release();
-			optimizer_config->Release();
-			plan_dxl->Release();
+			;
+			;
+			;
+			;
 		}
 	}
 	GPOS_CATCH_EX(ex)
 	{
-		ResetTraceflags(enabled_trace_flags, disabled_trace_flags);
-		CRefCount::SafeRelease(std::move(rel_stats));
-		CRefCount::SafeRelease(std::move(col_stats));
-		CRefCount::SafeRelease(enabled_trace_flags);
-		CRefCount::SafeRelease(disabled_trace_flags);
-		CRefCount::SafeRelease(trace_flags);
-		CRefCount::SafeRelease(std::move(plan_dxl));
+		ResetTraceflags(enabled_trace_flags.get(), disabled_trace_flags.get());
+		;
+		;
+		;
+		;
+		;
+		;
 		CMDCache::Shutdown();
 
 		IErrorContext *errctxt = CTask::Self()->GetErrCtxt();
@@ -634,10 +635,10 @@ COptTasks::OptimizeTask(void *ptr)
 	GPOS_CATCH_END;
 
 	// cleanup
-	ResetTraceflags(enabled_trace_flags, disabled_trace_flags);
-	CRefCount::SafeRelease(enabled_trace_flags);
-	CRefCount::SafeRelease(disabled_trace_flags);
-	CRefCount::SafeRelease(trace_flags);
+	ResetTraceflags(enabled_trace_flags.get(), disabled_trace_flags.get());
+	;
+	;
+	;
 	if (!optimizer_metadata_caching)
 	{
 		CMDCache::Shutdown();
@@ -657,8 +658,8 @@ COptTasks::OptimizeTask(void *ptr)
 //---------------------------------------------------------------------------
 void
 COptTasks::PrintMissingStatsWarning(CMemoryPool *mp, CMDAccessor *md_accessor,
-									gpos::pointer<IMdIdArray *> col_stats,
-									gpos::pointer<MdidHashSet *> rel_stats)
+									IMdIdArray *col_stats,
+									MdidHashSet *rel_stats)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 	GPOS_ASSERT(nullptr != col_stats);
@@ -670,14 +671,12 @@ COptTasks::PrintMissingStatsWarning(CMemoryPool *mp, CMDAccessor *md_accessor,
 	const ULONG num_missing_col_stats = col_stats->Size();
 	for (ULONG ul = 0; ul < num_missing_col_stats; ul++)
 	{
-		gpos::pointer<IMDId *> mdid = (*col_stats)[ul];
-		gpos::pointer<CMDIdColStats *> mdid_col_stats =
-			gpos::dyn_cast<CMDIdColStats>(mdid);
+		IMDId *mdid = (*col_stats)[ul].get();
+		CMDIdColStats *mdid_col_stats = gpos::dyn_cast<CMDIdColStats>(mdid);
 
 		IMDId *rel_mdid = mdid_col_stats->GetRelMdId();
 		const ULONG pos = mdid_col_stats->Position();
-		gpos::pointer<const IMDRelation *> rel =
-			md_accessor->RetrieveRel(rel_mdid);
+		const IMDRelation *rel = md_accessor->RetrieveRel(rel_mdid);
 
 		if (IMDRelation::ErelstorageExternal != rel->RetrieveRelStorageType())
 		{
@@ -688,7 +687,7 @@ COptTasks::PrintMissingStatsWarning(CMemoryPool *mp, CMDAccessor *md_accessor,
 					oss << ", ";
 				}
 
-				rel_mdid->AddRef();
+				;
 				rel_stats->Insert(rel_mdid);
 				oss << rel->Mdname().GetMDName()->GetBuffer();
 			}
@@ -778,7 +777,7 @@ COptTasks::GPOPTOptimizedPlan(Query *query, SOptContext *gpopt_context)
 bool
 COptTasks::SetXform(char *xform_str, bool should_disable)
 {
-	gpos::pointer<CXform *> xform = CXformFactory::Pxff()->Pxf(xform_str);
+	CXform *xform = CXformFactory::Pxff()->Pxf(xform_str);
 	if (nullptr != xform)
 	{
 		optimizer_xforms[xform->Exfid()] = should_disable;

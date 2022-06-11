@@ -32,7 +32,7 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarMinMax::CScalarMinMax(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+CScalarMinMax::CScalarMinMax(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 							 EScalarMinMaxType esmmt)
 	: CScalar(mp),
 	  m_mdid_type(std::move(mdid_type)),
@@ -43,7 +43,8 @@ CScalarMinMax::CScalarMinMax(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
 	GPOS_ASSERT(EsmmtSentinel > esmmt);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	m_fBoolReturnType = CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type);
+	m_fBoolReturnType =
+		CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type.get());
 }
 
 //---------------------------------------------------------------------------
@@ -56,7 +57,7 @@ CScalarMinMax::CScalarMinMax(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
 //---------------------------------------------------------------------------
 CScalarMinMax::~CScalarMinMax()
 {
-	m_mdid_type->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -88,19 +89,18 @@ CScalarMinMax::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarMinMax::Matches(gpos::pointer<COperator *> pop) const
+CScalarMinMax::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CScalarMinMax *> popScMinMax =
-		gpos::dyn_cast<CScalarMinMax>(pop);
+	CScalarMinMax *popScMinMax = gpos::dyn_cast<CScalarMinMax>(pop);
 
 	// match if return types are identical
 	return popScMinMax->Esmmt() == m_esmmt &&
-		   popScMinMax->MdidType()->Equals(m_mdid_type);
+		   popScMinMax->MdidType()->Equals(m_mdid_type.get());
 }
 
 //---------------------------------------------------------------------------

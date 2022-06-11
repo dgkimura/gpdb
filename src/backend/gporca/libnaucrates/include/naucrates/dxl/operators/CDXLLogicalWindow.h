@@ -33,7 +33,7 @@ class CDXLLogicalWindow : public CDXLLogical
 {
 private:
 	// array of window specifications
-	gpos::owner<CDXLWindowSpecArray *> m_window_spec_array;
+	gpos::Ref<CDXLWindowSpecArray> m_window_spec_array;
 
 	// private copy ctor
 	CDXLLogicalWindow(CDXLLogicalWindow &);
@@ -41,7 +41,7 @@ private:
 public:
 	//ctor
 	CDXLLogicalWindow(CMemoryPool *mp,
-					  gpos::owner<CDXLWindowSpecArray *> pdrgpdxlwinspec);
+					  gpos::Ref<CDXLWindowSpecArray> pdrgpdxlwinspec);
 
 	//dtor
 	~CDXLLogicalWindow() override;
@@ -54,14 +54,14 @@ public:
 	ULONG NumOfWindowSpecs() const;
 
 	// return the window key at a given position
-	gpos::pointer<CDXLWindowSpec *> GetWindowKeyAt(ULONG idx) const;
+	CDXLWindowSpec *GetWindowKeyAt(ULONG idx) const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLLogicalWindow *>
+	static CDXLLogicalWindow *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -73,8 +73,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

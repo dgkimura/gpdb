@@ -73,32 +73,32 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 
 	// return locally used columns
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	PcrsUsed(CMemoryPool *mp,
 			 CExpressionHandle &  // exprhdl
 
 			 ) override
 	{
-		gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 		pcrs->Include(m_pcr);
 
 		return pcrs;
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarIdent *>
+	static CScalarIdent *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -108,7 +108,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	gpos::pointer<IMDId *> MdidType() const override;
+	IMDId *MdidType() const override;
 
 	// the type modifier of the scalar expression
 	INT TypeModifier() const override;
@@ -117,18 +117,16 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// is the given expression a scalar cast of a scalar identifier
-	static BOOL FCastedScId(gpos::pointer<CExpression *> pexpr);
+	static BOOL FCastedScId(CExpression *pexpr);
 
 	// is the given expression a scalar cast of given scalar identifier
-	static BOOL FCastedScId(gpos::pointer<CExpression *> pexpr,
-							CColRef *colref);
+	static BOOL FCastedScId(CExpression *pexpr, CColRef *colref);
 
 	// is the given expression a scalar func allowed for Partition selection of given scalar identifier
-	static BOOL FAllowedFuncScId(gpos::pointer<CExpression *> pexpr);
+	static BOOL FAllowedFuncScId(CExpression *pexpr);
 
 	// is the given expression a scalar func allowed for Partition selection of given scalar identifier
-	static BOOL FAllowedFuncScId(gpos::pointer<CExpression *> pexpr,
-								 CColRef *colref);
+	static BOOL FAllowedFuncScId(CExpression *pexpr, CColRef *colref);
 
 };	// class CScalarIdent
 

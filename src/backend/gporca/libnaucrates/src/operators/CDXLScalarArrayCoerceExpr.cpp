@@ -35,8 +35,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarArrayCoerceExpr::CDXLScalarArrayCoerceExpr(
-	CMemoryPool *mp, gpos::owner<IMDId *> coerce_func_mdid,
-	gpos::owner<IMDId *> result_type_mdid, INT type_modifier, BOOL is_explicit,
+	CMemoryPool *mp, gpos::Ref<IMDId> coerce_func_mdid,
+	gpos::Ref<IMDId> result_type_mdid, INT type_modifier, BOOL is_explicit,
 	EdxlCoercionForm coerce_format, INT location)
 	: CDXLScalarCoerceBase(mp, std::move(result_type_mdid), type_modifier,
 						   coerce_format, location),
@@ -69,8 +69,8 @@ CDXLScalarArrayCoerceExpr::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArrayCoerceExpr::SerializeToDXL(
-	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
+CDXLScalarArrayCoerceExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
+										  const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

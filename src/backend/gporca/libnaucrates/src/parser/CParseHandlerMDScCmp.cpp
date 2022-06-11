@@ -73,22 +73,21 @@ CParseHandlerMDScCmp::StartElement(const XMLCh *const,	// element_uri,
 
 
 	// parse scalar comparison properties
-	gpos::owner<IMDId *> mdid =
-		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBMDScCmp);
+	gpos::Ref<IMDId> mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+		EdxltokenGPDBMDScCmp);
 
-	gpos::owner<IMDId *> mdid_left =
+	gpos::Ref<IMDId> mdid_left =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenGPDBScalarOpLeftTypeId, EdxltokenGPDBMDScCmp);
 
-	gpos::owner<IMDId *> mdid_right =
+	gpos::Ref<IMDId> mdid_right =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenGPDBScalarOpRightTypeId, EdxltokenGPDBMDScCmp);
 
-	gpos::owner<IMDId *> mdid_op =
+	gpos::Ref<IMDId> mdid_op =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
 			EdxltokenGPDBMDScCmp);

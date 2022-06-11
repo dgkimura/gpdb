@@ -29,8 +29,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDRequest::CMDRequest(CMemoryPool *mp, gpos::owner<IMdIdArray *> mdid_array,
-					   gpos::owner<SMDTypeRequestArray *> mdtype_request_array)
+CMDRequest::CMDRequest(CMemoryPool *mp, gpos::Ref<IMdIdArray> mdid_array,
+					   gpos::Ref<SMDTypeRequestArray> mdtype_request_array)
 	: m_mp(mp),
 	  m_mdid_array(std::move(mdid_array)),
 	  m_mdtype_request_array(std::move(mdtype_request_array))
@@ -70,8 +70,8 @@ CMDRequest::CMDRequest(CMemoryPool *mp, SMDTypeRequest *md_type_request)
 //---------------------------------------------------------------------------
 CMDRequest::~CMDRequest()
 {
-	m_mdid_array->Release();
-	m_mdtype_request_array->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -109,7 +109,7 @@ CMDRequest::Serialize(CXMLSerializer *xml_serializer)
 	const ULONG ulMdids = m_mdid_array->Size();
 	for (ULONG ul = 0; ul < ulMdids; ul++)
 	{
-		gpos::pointer<IMDId *> mdid = (*m_mdid_array)[ul];
+		IMDId *mdid = (*m_mdid_array)[ul].get();
 		xml_serializer->OpenElement(
 			CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 			CDXLTokens::GetDXLTokenStr(EdxltokenMdid));

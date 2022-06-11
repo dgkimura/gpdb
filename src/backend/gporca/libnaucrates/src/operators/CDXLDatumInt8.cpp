@@ -33,7 +33,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumInt8::CDXLDatumInt8(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+CDXLDatumInt8::CDXLDatumInt8(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 							 BOOL is_null, LINT val)
 	: CDXLDatum(mp, mdid_type, default_type_modifier, is_null, 8 /*length*/),
 	  m_val(val)

@@ -46,7 +46,7 @@ CParseHandlerOp::CParseHandlerOp(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerOp::~CParseHandlerOp()
 {
-	CRefCount::SafeRelease(m_dxl_node);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -57,10 +57,10 @@ CParseHandlerOp::~CParseHandlerOp()
 //		Returns the constructed DXL node and passes ownership over it.
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLNode *>
+CDXLNode *
 CParseHandlerOp::CreateDXLNode() const
 {
-	return m_dxl_node;
+	return m_dxl_node.get();
 }
 
 
@@ -85,7 +85,7 @@ CParseHandlerOp::AddChildFromParseHandler(
 	CDXLNode *child_dxlnode = parse_handler_op->CreateDXLNode();
 	GPOS_ASSERT(nullptr != child_dxlnode);
 
-	child_dxlnode->AddRef();
+	;
 	m_dxl_node->AddChild(child_dxlnode);
 }
 

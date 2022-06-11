@@ -40,7 +40,7 @@ public:
 
 	// ctor
 	CLogicalLeftAntiSemiApply(CMemoryPool *mp,
-							  gpos::owner<CColRefArray *> pdrgpcrInner,
+							  gpos::Ref<CColRefArray> pdrgpcrInner,
 							  EOperatorId eopidOriginSubq)
 		: CLogicalApply(mp, std::move(pdrgpcrInner), eopidOriginSubq)
 	{
@@ -75,7 +75,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	DeriveOutputColumns(CMemoryPool *,	// mp
 						CExpressionHandle &exprhdl) override
 	{
@@ -85,7 +85,7 @@ public:
 	}
 
 	// derive not nullable output columns
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	DeriveNotNullColumns(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -93,7 +93,7 @@ public:
 	}
 
 	// dervive keys
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -101,7 +101,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *>
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -113,7 +113,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -127,12 +127,12 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function
-	static gpos::cast_func<CLogicalLeftAntiSemiApply *>
+	static CLogicalLeftAntiSemiApply *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

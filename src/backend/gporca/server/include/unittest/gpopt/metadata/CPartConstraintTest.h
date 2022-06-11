@@ -53,10 +53,9 @@ private:
 	static const WCHAR *wszInternalRepresentationFor2012_01_22;
 
 	// create an interval constraint for the given column and interval boundaries
-	static gpos::owner<CConstraint *> PcnstrInterval(CMemoryPool *mp,
-													 CColRef *colref,
-													 ULONG ulLeft,
-													 ULONG ulRight);
+	static gpos::Ref<CConstraint> PcnstrInterval(CMemoryPool *mp,
+												 CColRef *colref, ULONG ulLeft,
+												 ULONG ulRight);
 
 public:
 	// unittests

@@ -46,7 +46,7 @@ public:
 
 private:
 	// return type
-	gpos::owner<IMDId *> m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// min/max type
 	EScalarMinMaxType m_esmmt;
@@ -58,7 +58,7 @@ public:
 	CScalarMinMax(const CScalarMinMax &) = delete;
 
 	// ctor
-	CScalarMinMax(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+	CScalarMinMax(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 				  EScalarMinMaxType esmmt);
 
 	// dtor
@@ -79,10 +79,10 @@ public:
 	}
 
 	// return type
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// min/max type
@@ -96,7 +96,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -106,19 +106,18 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override
+	Eber(ULongPtrArray *pdrgpulChildren) const override
 	{
 		// MinMax returns Null only if all children are Null
 		return EberNullOnAllNullChildren(pdrgpulChildren);
@@ -128,7 +127,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static gpos::cast_func<CScalarMinMax *>
+	static CScalarMinMax *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

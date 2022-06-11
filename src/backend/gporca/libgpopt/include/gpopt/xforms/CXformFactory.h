@@ -33,8 +33,9 @@ class CXformFactory
 private:
 	// definition of hash map to maintain mappings
 	using XformNameToXformMap =
-		CHashMap<CHAR, CXform, gpos::HashValue<CHAR>, CXform::FEqualIds,
-				 CleanupDeleteArray<CHAR>, CleanupNULL<CXform>>;
+		gpos::UnorderedMap<const CHAR *, CXform *,
+						   gpos::PtrHash<CHAR, gpos::HashValue<CHAR>>,
+						   gpos::PtrEqual<CHAR, CXform::FEqualIds>>;
 
 	// memory pool
 	CMemoryPool *m_mp;
@@ -43,13 +44,13 @@ private:
 	CXform *m_rgpxf[CXform::ExfSentinel];
 
 	// name -> xform map
-	gpos::owner<XformNameToXformMap *> m_phmszxform;
+	gpos::Ref<XformNameToXformMap> m_phmszxform;
 
 	// bitset of exploration xforms
-	gpos::owner<CXformSet *> m_pxfsExploration;
+	gpos::Ref<CXformSet> m_pxfsExploration;
 
 	// bitset of implementation xforms
-	gpos::owner<CXformSet *> m_pxfsImplementation;
+	gpos::Ref<CXformSet> m_pxfsImplementation;
 
 	// ensure that xforms are inserted in order
 	ULONG m_lastAddedOrSkippedXformId;
@@ -61,7 +62,7 @@ private:
 	explicit CXformFactory(CMemoryPool *mp);
 
 	// actual adding of xform
-	void Add(gpos::owner<CXform *> pxform);
+	void Add(gpos::Ref<CXform> pxform);
 
 	// skip unused xforms that have been removed, preserving
 	// xform ids of the remaining ones
@@ -84,20 +85,20 @@ public:
 	CXform *Pxf(CXform::EXformId exfid) const;
 
 	// accessor by xform name
-	gpos::pointer<CXform *> Pxf(const CHAR *szXformName) const;
+	CXform *Pxf(const CHAR *szXformName) const;
 
 	// accessor of exploration xforms
-	gpos::pointer<CXformSet *>
+	CXformSet *
 	PxfsExploration() const
 	{
-		return m_pxfsExploration;
+		return m_pxfsExploration.get();
 	}
 
 	// accessor of implementation xforms
-	gpos::pointer<CXformSet *>
+	CXformSet *
 	PxfsImplementation() const
 	{
-		return m_pxfsImplementation;
+		return m_pxfsImplementation.get();
 	}
 
 	// is this xform id still used?

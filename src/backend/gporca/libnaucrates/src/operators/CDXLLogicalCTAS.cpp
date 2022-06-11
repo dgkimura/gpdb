@@ -31,16 +31,16 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalCTAS::CDXLLogicalCTAS(
-	CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname_schema,
-	CMDName *mdname_rel, gpos::owner<CDXLColDescrArray *> dxl_col_descr_array,
-	gpos::owner<CDXLCtasStorageOptions *> dxl_ctas_storage_options,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname_schema,
+	CMDName *mdname_rel, gpos::Ref<CDXLColDescrArray> dxl_col_descr_array,
+	gpos::Ref<CDXLCtasStorageOptions> dxl_ctas_storage_options,
 	IMDRelation::Ereldistrpolicy rel_distr_policy,
-	gpos::owner<ULongPtrArray *> distr_column_pos_array,
-	gpos::owner<IMdIdArray *> distr_opfamilies,
-	gpos::owner<IMdIdArray *> distr_opclasses, BOOL is_temporary, BOOL has_oids,
+	gpos::Ref<ULongPtrArray> distr_column_pos_array,
+	gpos::Ref<IMdIdArray> distr_opfamilies,
+	gpos::Ref<IMdIdArray> distr_opclasses, BOOL is_temporary, BOOL has_oids,
 	IMDRelation::Erelstoragetype rel_storage_type,
-	gpos::owner<ULongPtrArray *> src_colids_array,
-	gpos::owner<IntPtrArray *> vartypemod_array)
+	gpos::Ref<ULongPtrArray> src_colids_array,
+	gpos::Ref<IntPtrArray> vartypemod_array)
 	: CDXLLogical(mp),
 	  m_mdid(std::move(mdid)),
 	  m_mdname_schema(mdname_schema),
@@ -84,16 +84,16 @@ CDXLLogicalCTAS::CDXLLogicalCTAS(
 //---------------------------------------------------------------------------
 CDXLLogicalCTAS::~CDXLLogicalCTAS()
 {
-	m_mdid->Release();
+	;
 	GPOS_DELETE(m_mdname_schema);
 	GPOS_DELETE(m_mdname_rel);
-	m_col_descr_array->Release();
-	m_dxl_ctas_storage_option->Release();
-	CRefCount::SafeRelease(m_distr_column_pos_array);
-	m_src_colids_array->Release();
-	m_vartypemod_array->Release();
-	m_distr_opfamilies->Release();
-	m_distr_opclasses->Release();
+	;
+	;
+	;
+	;
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -159,7 +159,7 @@ CDXLLogicalCTAS::IsColDefined(ULONG colid) const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
-								gpos::pointer<const CDXLNode *> dxlnode) const
+								const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -196,7 +196,7 @@ CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 		// serialize distribution columns
 		CWStringDynamic *str_distribution_columns =
-			CDXLUtils::Serialize(m_mp, m_distr_column_pos_array);
+			CDXLUtils::Serialize(m_mp, m_distr_column_pos_array.get());
 		GPOS_ASSERT(nullptr != str_distribution_columns);
 
 		xml_serializer->AddAttribute(
@@ -207,7 +207,7 @@ CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	// serialize input columns
 	CWStringDynamic *str_input_columns =
-		CDXLUtils::Serialize(m_mp, m_src_colids_array);
+		CDXLUtils::Serialize(m_mp, m_src_colids_array.get());
 	GPOS_ASSERT(nullptr != str_input_columns);
 
 	xml_serializer->AddAttribute(
@@ -216,7 +216,7 @@ CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	// serialize vartypmod list
 	CWStringDynamic *str_vartypemod_list =
-		CDXLUtils::Serialize(m_mp, m_vartypemod_array);
+		CDXLUtils::Serialize(m_mp, m_vartypemod_array.get());
 	GPOS_ASSERT(nullptr != str_vartypemod_list);
 
 	xml_serializer->AddAttribute(
@@ -232,7 +232,7 @@ CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 	const ULONG arity = m_col_descr_array->Size();
 	for (ULONG idx = 0; idx < arity; idx++)
 	{
-		gpos::pointer<CDXLColDescr *> dxl_col_descr = (*m_col_descr_array)[idx];
+		CDXLColDescr *dxl_col_descr = (*m_col_descr_array)[idx].get();
 		dxl_col_descr->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -244,12 +244,12 @@ CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 
 	IMDCacheObject::SerializeMDIdList(
-		xml_serializer, m_distr_opfamilies,
+		xml_serializer, m_distr_opfamilies.get(),
 		CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpfamilies),
 		CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpfamily));
 
 	IMDCacheObject::SerializeMDIdList(
-		xml_serializer, m_distr_opclasses,
+		xml_serializer, m_distr_opclasses.get(),
 		CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpclasses),
 		CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpclass));
 
@@ -270,12 +270,12 @@ CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalCTAS::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLLogicalCTAS::AssertValid(const CDXLNode *dxlnode,
 							 BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[0];
+	CDXLNode *child_dxlnode = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeLogical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

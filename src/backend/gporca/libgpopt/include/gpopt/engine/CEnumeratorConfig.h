@@ -34,7 +34,7 @@ using namespace gpos;
 class CExpression;
 
 // type definition of plan checker
-using FnPlanChecker = BOOL(gpos::pointer<CExpression *>);
+using FnPlanChecker = BOOL(CExpression *);
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -115,7 +115,7 @@ private:
 	CDouble m_dCostThreshold;
 
 	// sampled plans
-	gpos::owner<SSamplePlanArray *> m_pdrgpsp;
+	gpos::Ref<SSamplePlanArray> m_pdrgpsp;
 
 	// step value used in fitting cost distribution
 	CDouble m_dStep;
@@ -327,7 +327,7 @@ public:
 									 DOUBLE *pdY, ULONG size);
 
 	// generate default enumerator configurations
-	static gpos::owner<CEnumeratorConfig *>
+	static gpos::Ref<CEnumeratorConfig>
 	PecDefault(CMemoryPool *mp)
 	{
 		return GPOS_NEW(mp)
@@ -335,7 +335,7 @@ public:
 	}
 
 	// generate enumerator configuration for a given plan id
-	static gpos::owner<CEnumeratorConfig *>
+	static gpos::Ref<CEnumeratorConfig>
 	GetEnumeratorCfg(CMemoryPool *mp, ULLONG plan_id)
 	{
 		return GPOS_NEW(mp) CEnumeratorConfig(mp, plan_id, 0 /*ullSamples*/);

@@ -32,7 +32,7 @@ class CXMLSerializer;
 class CDXLColRef;
 
 // arrays of column references
-using CDXLColRefArray = CDynamicPtrArray<CDXLColRef, CleanupRelease>;
+using CDXLColRefArray = gpos::Vector<gpos::Ref<CDXLColRef>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -52,7 +52,7 @@ private:
 	const ULONG m_id;
 
 	// column type
-	gpos::owner<IMDId *> m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// column type modifier
 	INT m_iTypeModifer;
@@ -61,7 +61,7 @@ public:
 	CDXLColRef(const CDXLColRef &) = delete;
 
 	// ctor/dtor
-	CDXLColRef(CMDName *mdname, ULONG id, gpos::owner<IMDId *> mdid_type,
+	CDXLColRef(CMDName *mdname, ULONG id, gpos::Ref<IMDId> mdid_type,
 			   INT type_modifier);
 
 	~CDXLColRef() override;
@@ -69,7 +69,7 @@ public:
 	// accessors
 	const CMDName *MdName() const;
 
-	gpos::pointer<IMDId *> MdidType() const;
+	IMDId *MdidType() const;
 
 	INT TypeModifier() const;
 

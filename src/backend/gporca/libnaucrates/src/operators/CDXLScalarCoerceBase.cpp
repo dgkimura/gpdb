@@ -37,7 +37,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarCoerceBase::CDXLScalarCoerceBase(CMemoryPool *mp,
-										   gpos::owner<IMDId *> mdid_type,
+										   gpos::Ref<IMDId> mdid_type,
 										   INT type_modifier,
 										   EdxlCoercionForm dxl_coerce_format,
 										   INT location)
@@ -62,7 +62,7 @@ CDXLScalarCoerceBase::CDXLScalarCoerceBase(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarCoerceBase::~CDXLScalarCoerceBase()
 {
-	m_result_type_mdid->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -75,7 +75,7 @@ CDXLScalarCoerceBase::~CDXLScalarCoerceBase()
 //---------------------------------------------------------------------------
 void
 CDXLScalarCoerceBase::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 gpos::pointer<const CDXLNode *> node) const
+									 const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -113,8 +113,9 @@ CDXLScalarCoerceBase::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarCoerceBase::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_result_type_mdid)->GetDatumType());
+	return (
+		IMDType::EtiBool ==
+		md_accessor->RetrieveType(m_result_type_mdid.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG
@@ -127,12 +128,12 @@ CDXLScalarCoerceBase::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCoerceBase::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLScalarCoerceBase::AssertValid(const CDXLNode *node,
 								  BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == node->Arity());
 
-	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[0];
+	CDXLNode *child_dxlnode = (*node)[0];
 	GPOS_ASSERT(EdxloptypeScalar ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

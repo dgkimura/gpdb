@@ -63,12 +63,11 @@ private:
 	// pair of DXL CTE producer and target list of the original CTE query
 	struct SCTEProducerInfo
 	{
-		gpos::pointer<const CDXLNode *> m_cte_producer;
+		const CDXLNode *m_cte_producer;
 		List *m_target_list;
 
 		// ctor
-		SCTEProducerInfo(gpos::pointer<const CDXLNode *> cte_producer,
-						 List *target_list)
+		SCTEProducerInfo(const CDXLNode *cte_producer, List *target_list)
 			: m_cte_producer(cte_producer), m_target_list(target_list)
 		{
 		}
@@ -83,21 +82,21 @@ private:
 	ULONG m_query_level;
 
 	// CTE producers at that level indexed by their name
-	gpos::owner<HMSzCTEInfo *> m_cte_info;
+	gpos::Ref<HMSzCTEInfo> m_cte_info;
 
 public:
 	// ctor: single CTE
 	CCTEListEntry(CMemoryPool *mp, ULONG query_level, CommonTableExpr *cte,
-				  gpos::pointer<CDXLNode *> cte_producer);
+				  CDXLNode *cte_producer);
 
 	// ctor: multiple CTEs
 	CCTEListEntry(CMemoryPool *mp, ULONG query_level, List *cte_list,
-				  gpos::pointer<CDXLNodeArray *> dxlnodes);
+				  CDXLNodeArray *dxlnodes);
 
 	// dtor
 	~CCTEListEntry() override
 	{
-		m_cte_info->Release();
+		;
 	};
 
 	// the query level
@@ -108,14 +107,14 @@ public:
 	}
 
 	// lookup CTE producer by its name
-	gpos::pointer<const CDXLNode *> GetCTEProducer(const CHAR *cte_str) const;
+	const CDXLNode *GetCTEProducer(const CHAR *cte_str) const;
 
 	// lookup CTE producer target list by its name
 	List *GetCTEProducerTargetList(const CHAR *cte_str) const;
 
 	// add a new CTE producer for this level
 	void AddCTEProducer(CMemoryPool *mp, CommonTableExpr *cte,
-						gpos::pointer<const CDXLNode *> cte_producer);
+						const CDXLNode *cte_producer);
 };
 
 // hash maps mapping ULONG -> CCTEListEntry

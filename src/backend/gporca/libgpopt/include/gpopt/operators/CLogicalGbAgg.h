@@ -39,13 +39,14 @@ protected:
 
 	// array of columns used in distinct qualified aggregates (DQA)
 	// used only in the case of intermediate aggregates
-	gpos::owner<CColRefArray *> m_pdrgpcrArgDQA;
+	gpos::Ref<CColRefArray> m_pdrgpcrArgDQA;
 
 	// compute required stats columns for a GbAgg
-	gpos::owner<CColRefSet *> PcrsStatGbAgg(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CColRefSet *> pcrsInput, ULONG child_index,
-		gpos::pointer<CColRefArray *> pdrgpcrGrp) const;
+	gpos::Ref<CColRefSet> PcrsStatGbAgg(CMemoryPool *mp,
+										CExpressionHandle &exprhdl,
+										CColRefSet *pcrsInput,
+										ULONG child_index,
+										CColRefArray *pdrgpcrGrp) const;
 
 public:
 	CLogicalGbAgg(const CLogicalGbAgg &) = delete;
@@ -67,34 +68,33 @@ public:
 	explicit CLogicalGbAgg(CMemoryPool *mp);
 
 	// ctor
-	CLogicalGbAgg(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+	CLogicalGbAgg(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 				  COperator::EGbAggType egbaggtype, EAggStage aggStage);
 
 	// ctor
-	CLogicalGbAgg(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+	CLogicalGbAgg(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 				  COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-				  gpos::owner<CColRefArray *> pdrgpcrArgDQA,
-				  EAggStage aggStage);
+				  gpos::Ref<CColRefArray> pdrgpcrArgDQA, EAggStage aggStage);
 
 	// ctor
-	CLogicalGbAgg(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+	CLogicalGbAgg(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 				  COperator::EGbAggType egbaggtype);
 
 	// ctor
-	CLogicalGbAgg(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+	CLogicalGbAgg(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 				  COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-				  gpos::owner<CColRefArray *> pdrgpcrArgDQA);
+				  gpos::Ref<CColRefArray> pdrgpcrArgDQA);
 
 	// ctor
-	CLogicalGbAgg(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-				  gpos::owner<CColRefArray *> pdrgpcrMinimal,
+	CLogicalGbAgg(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+				  gpos::Ref<CColRefArray> pdrgpcrMinimal,
 				  COperator::EGbAggType egbaggtype);
 
 	// ctor
-	CLogicalGbAgg(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-				  gpos::owner<CColRefArray *> pdrgpcrMinimal,
+	CLogicalGbAgg(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+				  gpos::Ref<CColRefArray> pdrgpcrMinimal,
 				  COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-				  gpos::owner<CColRefArray *> pdrgpcrArgDQA);
+				  gpos::Ref<CColRefArray> pdrgpcrArgDQA);
 
 	// is this part of Two Stage Scalar DQA
 	BOOL IsTwoStageScalarDQA() const;
@@ -134,23 +134,23 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
 
 	// grouping columns accessor
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	Pdrgpcr() const
 	{
-		return m_pdrgpcr;
+		return m_pdrgpcr.get();
 	}
 
 	// array of columns used in distinct qualified aggregates (DQA)
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrArgDQA() const
 	{
-		return m_pdrgpcrArgDQA;
+		return m_pdrgpcrArgDQA.get();
 	}
 
 	// aggregate type
@@ -168,15 +168,15 @@ public:
 	}
 
 	// minimal grouping columns accessor
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrMinimal() const
 	{
-		return m_pdrgpcrMinimal;
+		return m_pdrgpcrMinimal.get();
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -184,19 +184,19 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	gpos::owner<CColRefSet *> DeriveOutputColumns(CMemoryPool *,
-												  CExpressionHandle &) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(CMemoryPool *,
+											  CExpressionHandle &) override;
 
 	// derive outer references
-	gpos::owner<CColRefSet *> DeriveOuterReferences(
+	gpos::Ref<CColRefSet> DeriveOuterReferences(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive not null columns
-	gpos::owner<CColRefSet *> DeriveNotNullColumns(
+	gpos::Ref<CColRefSet> DeriveNotNullColumns(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive key collections
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -204,7 +204,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *> DerivePropertyConstraint(
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// compute required stats columns of the n-th child
@@ -213,22 +213,21 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	gpos::owner<CColRefSet *> PcrsStat(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   gpos::pointer<CColRefSet *> pcrsInput,
-									   ULONG child_index) const override;
+	gpos::Ref<CColRefSet> PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								   CColRefSet *pcrsInput,
+								   ULONG child_index) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -242,7 +241,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CLogicalGbAgg *>
+	static CLogicalGbAgg *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -256,11 +255,10 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// derive statistics
-	static gpos::owner<IStatistics *> PstatsDerive(
-		CMemoryPool *mp, gpos::pointer<IStatistics *> child_stats,
-		gpos::pointer<CColRefArray *> pdrgpcrGroupingCols,
-		gpos::pointer<ULongPtrArray *> pdrgpulComputedCols,
-		gpos::pointer<CBitSet *> keys);
+	static gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, IStatistics *child_stats,
+		CColRefArray *pdrgpcrGroupingCols, ULongPtrArray *pdrgpulComputedCols,
+		CBitSet *keys);
 
 	// print group by aggregate type
 	static IOstream &OsPrintGbAggType(IOstream &os,
@@ -268,10 +266,10 @@ public:
 
 private:
 	// array of grouping columns
-	gpos::owner<CColRefArray *> m_pdrgpcr;
+	gpos::Ref<CColRefArray> m_pdrgpcr;
 
 	// minimal grouping columns based on FD's
-	gpos::owner<CColRefArray *> m_pdrgpcrMinimal;
+	gpos::Ref<CColRefArray> m_pdrgpcrMinimal;
 
 	// local / intermediate / global aggregate
 	COperator::EGbAggType m_egbaggtype;

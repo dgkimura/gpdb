@@ -25,7 +25,7 @@ class CColRefSet;
 class CPartKeys;
 
 // array of part keys
-using CPartKeysArray = CDynamicPtrArray<CPartKeys, CleanupRelease>;
+using CPartKeysArray = gpos::Vector<gpos::Ref<CPartKeys>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -39,7 +39,7 @@ class CPartKeys : public CRefCount, public DbgPrintMixin<CPartKeys>
 {
 private:
 	// partitioning keys
-	gpos::owner<CColRef2dArray *> m_pdrgpdrgpcr;
+	gpos::Ref<CColRef2dArray> m_pdrgpdrgpcr;
 
 	// number of levels
 	ULONG m_num_of_part_levels;
@@ -48,7 +48,7 @@ public:
 	CPartKeys(const CPartKeys &) = delete;
 
 	// ctor
-	explicit CPartKeys(gpos::owner<CColRef2dArray *> pdrgpdrgpcr);
+	explicit CPartKeys(gpos::Ref<CColRef2dArray> pdrgpdrgpcr);
 
 	// dtor
 	~CPartKeys() override;
@@ -57,10 +57,10 @@ public:
 	CColRef *PcrKey(ULONG ulLevel) const;
 
 	// return array of keys
-	gpos::pointer<CColRef2dArray *>
+	CColRef2dArray *
 	Pdrgpdrgpcr() const
 	{
-		return m_pdrgpdrgpcr;
+		return m_pdrgpdrgpcr.get();
 	}
 
 	// number of levels
@@ -71,22 +71,22 @@ public:
 	}
 
 	// copy part key into the given memory pool
-	gpos::owner<CPartKeys *> PpartkeysCopy(CMemoryPool *mp);
+	gpos::Ref<CPartKeys> PpartkeysCopy(CMemoryPool *mp);
 
 	// check whether the key columns overlap the given column
-	BOOL FOverlap(gpos::pointer<CColRefSet *> pcrs) const;
+	BOOL FOverlap(CColRefSet *pcrs) const;
 
 	// create a new PartKeys object from the current one by remapping the
 	// keys using the given hashmap
-	gpos::owner<CPartKeys *> PpartkeysRemap(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping) const;
+	gpos::Ref<CPartKeys> PpartkeysRemap(CMemoryPool *mp,
+										UlongToColRefMap *colref_mapping) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;
 
 	// copy array of part keys into given memory pool
-	static gpos::owner<CPartKeysArray *> PdrgppartkeysCopy(
-		CMemoryPool *mp, gpos::pointer<const CPartKeysArray *> pdrgppartkeys);
+	static gpos::Ref<CPartKeysArray> PdrgppartkeysCopy(
+		CMemoryPool *mp, const CPartKeysArray *pdrgppartkeys);
 
 };	// CPartKeys
 

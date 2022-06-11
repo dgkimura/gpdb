@@ -75,8 +75,9 @@ CParseHandlerMDGPDBAgg::StartElement(const XMLCh *const,  // element_uri,
 
 		// parse metadata id info
 		m_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBAgg);
+					 m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+					 EdxltokenMdid, EdxltokenGPDBAgg)
+					 .get();
 
 		// parse ordered aggregate info
 		const XMLCh *xml_str_ordered_agg =
@@ -117,9 +118,11 @@ CParseHandlerMDGPDBAgg::StartElement(const XMLCh *const,  // element_uri,
 		// parse result type
 		GPOS_ASSERT(nullptr != m_mdname);
 
-		m_mdid_type_result = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBAggResultTypeId);
+		m_mdid_type_result =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenGPDBAggResultTypeId)
+				.get();
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(
@@ -132,7 +135,8 @@ CParseHandlerMDGPDBAgg::StartElement(const XMLCh *const,  // element_uri,
 		m_mdid_type_intermediate =
 			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-				EdxltokenMdid, EdxltokenGPDBAggIntermediateResultTypeId);
+				EdxltokenMdid, EdxltokenGPDBAggIntermediateResultTypeId)
+				.get();
 	}
 	else
 	{

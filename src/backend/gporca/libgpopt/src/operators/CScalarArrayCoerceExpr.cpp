@@ -33,8 +33,8 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CScalarArrayCoerceExpr::CScalarArrayCoerceExpr(
-	CMemoryPool *mp, gpos::owner<IMDId *> element_func,
-	gpos::owner<IMDId *> result_type_mdid, INT type_modifier, BOOL is_explicit,
+	CMemoryPool *mp, gpos::Ref<IMDId> element_func,
+	gpos::Ref<IMDId> result_type_mdid, INT type_modifier, BOOL is_explicit,
 	ECoercionForm ecf, INT location)
 	: CScalarCoerceBase(mp, std::move(result_type_mdid), type_modifier, ecf,
 						location),
@@ -54,7 +54,7 @@ CScalarArrayCoerceExpr::CScalarArrayCoerceExpr(
 //---------------------------------------------------------------------------
 CScalarArrayCoerceExpr::~CScalarArrayCoerceExpr()
 {
-	m_pmdidElementFunc->Release();
+	;
 }
 
 
@@ -66,10 +66,10 @@ CScalarArrayCoerceExpr::~CScalarArrayCoerceExpr()
 //		Return metadata id of element coerce function
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarArrayCoerceExpr::PmdidElementFunc() const
 {
-	return m_pmdidElementFunc;
+	return m_pmdidElementFunc.get();
 }
 
 
@@ -127,17 +127,17 @@ CScalarArrayCoerceExpr::SzId() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayCoerceExpr::Matches(gpos::pointer<COperator *> pop) const
+CScalarArrayCoerceExpr::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CScalarArrayCoerceExpr *> popCoerce =
+	CScalarArrayCoerceExpr *popCoerce =
 		gpos::dyn_cast<CScalarArrayCoerceExpr>(pop);
 
-	return popCoerce->PmdidElementFunc()->Equals(m_pmdidElementFunc) &&
+	return popCoerce->PmdidElementFunc()->Equals(m_pmdidElementFunc.get()) &&
 		   popCoerce->MdidType()->Equals(MdidType()) &&
 		   popCoerce->TypeModifier() == TypeModifier() &&
 		   popCoerce->IsExplicit() == m_is_explicit &&
@@ -168,7 +168,7 @@ CScalarArrayCoerceExpr::FInputOrderSensitive() const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-gpos::cast_func<CScalarArrayCoerceExpr *>
+CScalarArrayCoerceExpr *
 CScalarArrayCoerceExpr::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);

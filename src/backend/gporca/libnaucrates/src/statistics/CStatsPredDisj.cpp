@@ -28,12 +28,12 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CStatsPredDisj::CStatsPredDisj(
-	gpos::owner<CStatsPredPtrArry *> disj_pred_stats_array)
+	gpos::Ref<CStatsPredPtrArry> disj_pred_stats_array)
 	: CStatsPred(gpos::ulong_max),
 	  m_disj_pred_stats_array(std::move(disj_pred_stats_array))
 {
 	GPOS_ASSERT(nullptr != m_disj_pred_stats_array);
-	m_colid = CStatisticsUtils::GetColId(m_disj_pred_stats_array);
+	m_colid = CStatisticsUtils::GetColId(m_disj_pred_stats_array.get());
 }
 
 //---------------------------------------------------------------------------
@@ -44,10 +44,10 @@ CStatsPredDisj::CStatsPredDisj(
 //		Return the point filter at a particular position
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CStatsPred *>
+CStatsPred *
 CStatsPredDisj::GetPredStats(ULONG pos) const
 {
-	return (*m_disj_pred_stats_array)[pos];
+	return (*m_disj_pred_stats_array)[pos].get();
 }
 
 //---------------------------------------------------------------------------
@@ -64,7 +64,7 @@ CStatsPredDisj::Sort() const
 	if (1 < GetNumPreds())
 	{
 		// sort the filters on column ids
-		m_disj_pred_stats_array->Sort(CStatsPred::StatsPredSortCmpFunc);
+		m_disj_pred_stats_array->Sort(gpnaucrates::StatsPredColIdLess{});
 	}
 }
 

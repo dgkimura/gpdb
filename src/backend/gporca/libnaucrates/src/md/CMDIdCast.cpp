@@ -27,8 +27,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdCast::CMDIdCast(gpos::owner<CMDIdGPDB *> mdid_src,
-					 gpos::owner<CMDIdGPDB *> mdid_dest)
+CMDIdCast::CMDIdCast(gpos::Ref<CMDIdGPDB> mdid_src,
+					 gpos::Ref<CMDIdGPDB> mdid_dest)
 	: m_mdid_src(std::move(mdid_src)),
 	  m_mdid_dest(std::move(mdid_dest)),
 	  m_str(m_mdid_buffer, GPOS_ARRAY_SIZE(m_mdid_buffer))
@@ -50,8 +50,8 @@ CMDIdCast::CMDIdCast(gpos::owner<CMDIdGPDB *> mdid_src,
 //---------------------------------------------------------------------------
 CMDIdCast::~CMDIdCast()
 {
-	m_mdid_src->Release();
-	m_mdid_dest->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -95,10 +95,10 @@ CMDIdCast::GetBuffer() const
 //		Returns the source type id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDIdCast::MdidSrc() const
 {
-	return m_mdid_src;
+	return m_mdid_src.get();
 }
 
 //---------------------------------------------------------------------------
@@ -109,10 +109,10 @@ CMDIdCast::MdidSrc() const
 //		Returns the destination type id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDIdCast::MdidDest() const
 {
-	return m_mdid_dest;
+	return m_mdid_dest.get();
 }
 
 //---------------------------------------------------------------------------
@@ -124,14 +124,14 @@ CMDIdCast::MdidDest() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdCast::Equals(gpos::pointer<const IMDId *> mdid) const
+CMDIdCast::Equals(const IMDId *mdid) const
 {
 	if (nullptr == mdid || EmdidCastFunc != mdid->MdidType())
 	{
 		return false;
 	}
 
-	gpos::pointer<const CMDIdCast *> mdid_cast_func = CMDIdCast::CastMdid(mdid);
+	const CMDIdCast *mdid_cast_func = CMDIdCast::CastMdid(mdid);
 
 	return m_mdid_src->Equals(mdid_cast_func->MdidSrc()) &&
 		   m_mdid_dest->Equals(mdid_cast_func->MdidDest());

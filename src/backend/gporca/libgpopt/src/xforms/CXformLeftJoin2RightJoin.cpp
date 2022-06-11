@@ -83,9 +83,9 @@ CXformLeftJoin2RightJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftJoin2RightJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
-									gpos::pointer<CXformResult *> pxfres,
-									gpos::pointer<CExpression *> pexpr) const
+CXformLeftJoin2RightJoin::Transform(CXformContext *pxfctxt,
+									CXformResult *pxfres,
+									CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -97,11 +97,11 @@ CXformLeftJoin2RightJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	CExpression *pexprOuter = (*pexpr)[0];
 	CExpression *pexprInner = (*pexpr)[1];
 	CExpression *pexprScalar = (*pexpr)[2];
-	pexprOuter->AddRef();
-	pexprInner->AddRef();
-	pexprScalar->AddRef();
+	;
+	;
+	;
 
-	gpos::owner<CExpression *> pexprRightJoin =
+	gpos::Ref<CExpression> pexprRightJoin =
 		CUtils::PexprLogicalJoin<CLogicalRightOuterJoin>(
 			mp, pexprInner, pexprOuter, pexprScalar);
 	pxfres->Add(std::move(pexprRightJoin));

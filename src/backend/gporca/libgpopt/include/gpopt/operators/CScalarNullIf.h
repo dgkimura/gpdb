@@ -32,10 +32,10 @@ class CScalarNullIf : public CScalar
 {
 private:
 	// operator id
-	gpos::owner<IMDId *> m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// return type
-	gpos::owner<IMDId *> m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// does operator return NULL on NULL input?
 	BOOL m_returns_null_on_null_input;
@@ -47,8 +47,8 @@ public:
 	CScalarNullIf(const CScalarNullIf &) = delete;
 
 	// ctor
-	CScalarNullIf(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
-				  gpos::owner<IMDId *> mdid_type);
+	CScalarNullIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+				  gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CScalarNullIf() override;
@@ -61,17 +61,17 @@ public:
 	}
 
 	// operator id
-	virtual gpos::pointer<IMDId *>
+	virtual IMDId *
 	MdIdOp() const
 	{
-		return m_mdid_op;
+		return m_mdid_op.get();
 	}
 
 	// return type
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// return a string for operator name
@@ -85,7 +85,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -95,22 +95,20 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(
-		gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override;
+	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
 
 	// conversion function
-	static gpos::cast_func<CScalarNullIf *>
+	static CScalarNullIf *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

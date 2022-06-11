@@ -61,13 +61,12 @@ CColumnFactoryTest::EresUnittest_Basic()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, std::move(pmdp));
 
-	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
-		mda.PtMDType<IMDTypeInt4>();
+	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	CColumnFactory cf;
 

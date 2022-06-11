@@ -75,8 +75,9 @@ CParseHandlerMDGPDBFunc::StartElement(const XMLCh *const,  // element_uri,
 
 		// parse metadata id info
 		m_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBFunc);
+					 m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+					 EdxltokenMdid, EdxltokenGPDBFunc)
+					 .get();
 
 		// parse whether func returns a set
 		m_returns_set = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
@@ -124,9 +125,11 @@ CParseHandlerMDGPDBFunc::StartElement(const XMLCh *const,  // element_uri,
 		// parse result type
 		GPOS_ASSERT(nullptr != m_mdname);
 
-		m_mdid_type_result = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBFuncResultTypeId);
+		m_mdid_type_result =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenGPDBFuncResultTypeId)
+				.get();
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenOutputCols),

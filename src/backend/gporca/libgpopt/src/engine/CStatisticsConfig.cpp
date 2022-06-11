@@ -63,7 +63,7 @@ CStatisticsConfig::CStatisticsConfig(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CStatisticsConfig::~CStatisticsConfig()
 {
-	m_phsmdidcolinfo->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -82,7 +82,7 @@ CStatisticsConfig::AddMissingStatsColumn(CMDIdColStats *pmdidCol)
 	// add the new column information to the hash set
 	if (m_phsmdidcolinfo->Insert(pmdidCol))
 	{
-		pmdidCol->AddRef();
+		;
 	}
 }
 
@@ -96,17 +96,16 @@ CStatisticsConfig::AddMissingStatsColumn(CMDIdColStats *pmdidCol)
 //
 //---------------------------------------------------------------------------
 void
-CStatisticsConfig::CollectMissingStatsColumns(
-	gpos::pointer<IMdIdArray *> pdrgmdid)
+CStatisticsConfig::CollectMissingStatsColumns(IMdIdArray *pdrgmdid)
 {
 	GPOS_ASSERT(nullptr != pdrgmdid);
 
-	MdidHashSetIter hsiter(m_phsmdidcolinfo);
+	MdidHashSetIter hsiter(m_phsmdidcolinfo.get());
 	while (hsiter.Advance())
 	{
-		gpos::owner<CMDIdColStats *> mdid_col_stats =
+		gpos::Ref<CMDIdColStats> mdid_col_stats =
 			gpos::dyn_cast<CMDIdColStats>(const_cast<IMDId *>(hsiter.Get()));
-		mdid_col_stats->AddRef();
+		;
 		pdrgmdid->Append(mdid_col_stats);
 	}
 }

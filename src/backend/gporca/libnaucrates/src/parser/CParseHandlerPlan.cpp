@@ -53,7 +53,7 @@ CParseHandlerPlan::CParseHandlerPlan(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerPlan::~CParseHandlerPlan()
 {
-	CRefCount::SafeRelease(m_dxl_node);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -64,10 +64,10 @@ CParseHandlerPlan::~CParseHandlerPlan()
 //		Root of constructed DXL plan
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLNode *>
+CDXLNode *
 CParseHandlerPlan::CreateDXLNode()
 {
-	return m_dxl_node;
+	return m_dxl_node.get();
 }
 
 //---------------------------------------------------------------------------
@@ -182,7 +182,7 @@ CParseHandlerPlan::EndElement(const XMLCh *const,  // element_uri,
 
 	// store constructed child
 	m_dxl_node = operator_parse_handler->CreateDXLNode();
-	m_dxl_node->AddRef();
+	;
 
 	if (2 == this->Length())
 	{
@@ -192,7 +192,7 @@ CParseHandlerPlan::EndElement(const XMLCh *const,  // element_uri,
 			direct_dispatch_info_parse_handler->GetDXLDirectDispatchInfo();
 		GPOS_ASSERT(nullptr != dxl_direct_dispatch_info);
 
-		dxl_direct_dispatch_info->AddRef();
+		;
 		m_dxl_node->SetDirectDispatchInfo(dxl_direct_dispatch_info);
 	}
 	// deactivate handler

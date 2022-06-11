@@ -29,14 +29,14 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CConstraintConjunction::CConstraintConjunction(
-	CMemoryPool *mp, gpos::owner<CConstraintArray *> pdrgpcnstr)
-	: CConstraint(mp, PcrsFromConstraints(mp, pdrgpcnstr)),
+	CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr)
+	: CConstraint(mp, PcrsFromConstraints(mp, pdrgpcnstr.get())),
 	  m_pdrgpcnstr(nullptr)
 {
 	GPOS_ASSERT(nullptr != pdrgpcnstr);
 	m_pdrgpcnstr = PdrgpcnstrFlatten(mp, std::move(pdrgpcnstr), EctConjunction);
 
-	m_phmcolconstr = Phmcolconstr(mp, m_pcrsUsed, m_pdrgpcnstr);
+	m_phmcolconstr = Phmcolconstr(mp, m_pcrsUsed.get(), m_pdrgpcnstr.get());
 }
 
 //---------------------------------------------------------------------------
@@ -49,8 +49,8 @@ CConstraintConjunction::CConstraintConjunction(
 //---------------------------------------------------------------------------
 CConstraintConjunction::~CConstraintConjunction()
 {
-	m_pdrgpcnstr->Release();
-	m_phmcolconstr->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -86,8 +86,7 @@ CConstraintConjunction::FContradiction() const
 BOOL
 CConstraintConjunction::FConstraint(const CColRef *colref) const
 {
-	gpos::pointer<CConstraintArray *> pdrgpcnstrCol =
-		m_phmcolconstr->Find(colref);
+	CConstraintArray *pdrgpcnstrCol = m_phmcolconstr->Find(colref);
 	return (nullptr != pdrgpcnstrCol && 0 < pdrgpcnstrCol->Size());
 }
 
@@ -102,18 +101,16 @@ CConstraintConjunction::FConstraint(const CColRef *colref) const
 //		in the mapping, and hence will not be replaced
 //
 //---------------------------------------------------------------------------
-gpos::owner<CConstraint *>
+gpos::Ref<CConstraint>
 CConstraintConjunction::PcnstrCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
-	gpos::owner<CConstraintArray *> pdrgpcnstr =
-		GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::Ref<CConstraintArray> pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
 	const ULONG length = m_pdrgpcnstr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		gpos::pointer<CConstraint *> pcnstr = (*m_pdrgpcnstr)[ul];
-		gpos::owner<CConstraint *> pcnstrCopy =
+		CConstraint *pcnstr = (*m_pdrgpcnstr)[ul].get();
+		gpos::Ref<CConstraint> pcnstrCopy =
 			pcnstr->PcnstrCopyWithRemappedColumns(mp, colref_mapping,
 												  must_exist);
 		pdrgpcnstr->Append(pcnstrCopy);
@@ -129,29 +126,27 @@ CConstraintConjunction::PcnstrCopyWithRemappedColumns(
 //		Return constraint on a given column
 //
 //---------------------------------------------------------------------------
-gpos::owner<CConstraint *>
+gpos::Ref<CConstraint>
 CConstraintConjunction::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 {
 	// all children referencing given column
-	gpos::pointer<CConstraintArray *> pdrgpcnstrCol =
-		m_phmcolconstr->Find(colref);
+	CConstraintArray *pdrgpcnstrCol = m_phmcolconstr->Find(colref);
 	if (nullptr == pdrgpcnstrCol)
 	{
 		return nullptr;
 	}
 
-	gpos::owner<CConstraintArray *> pdrgpcnstr =
-		GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::Ref<CConstraintArray> pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
 
 	const ULONG length = pdrgpcnstrCol->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		// the part of the child that references this column
-		gpos::owner<CConstraint *> pcnstrCol =
+		gpos::Ref<CConstraint> pcnstrCol =
 			(*pdrgpcnstrCol)[ul]->Pcnstr(mp, colref);
 		if (nullptr == pcnstrCol || pcnstrCol->IsConstraintUnbounded())
 		{
-			CRefCount::SafeRelease(pcnstrCol);
+			;
 			continue;
 		}
 		pdrgpcnstr->Append(pcnstrCol);
@@ -168,25 +163,23 @@ CConstraintConjunction::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 //		Return constraint on a given column set
 //
 //---------------------------------------------------------------------------
-gpos::owner<CConstraint *>
-CConstraintConjunction::Pcnstr(CMemoryPool *mp,
-							   gpos::pointer<CColRefSet *> pcrs)
+gpos::Ref<CConstraint>
+CConstraintConjunction::Pcnstr(CMemoryPool *mp, CColRefSet *pcrs)
 {
 	const ULONG length = m_pdrgpcnstr->Size();
 
-	gpos::owner<CConstraintArray *> pdrgpcnstr =
-		GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::Ref<CConstraintArray> pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
 
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		gpos::pointer<CConstraint *> pcnstr = (*m_pdrgpcnstr)[ul];
+		CConstraint *pcnstr = (*m_pdrgpcnstr)[ul].get();
 		if (pcnstr->PcrsUsed()->IsDisjoint(pcrs))
 		{
 			continue;
 		}
 
 		// the part of the child that references these columns
-		gpos::owner<CConstraint *> pcnstrCol = pcnstr->Pcnstr(mp, pcrs);
+		gpos::Ref<CConstraint> pcnstrCol = pcnstr->Pcnstr(mp, pcrs);
 		if (nullptr != pcnstrCol)
 		{
 			pdrgpcnstr->Append(pcnstrCol);
@@ -204,11 +197,11 @@ CConstraintConjunction::Pcnstr(CMemoryPool *mp,
 //		Return a copy of the constraint for a different column
 //
 //---------------------------------------------------------------------------
-gpos::owner<CConstraint *>
+gpos::Ref<CConstraint>
 CConstraintConjunction::PcnstrRemapForColumn(CMemoryPool *mp,
 											 CColRef *colref) const
 {
-	return PcnstrConjDisjRemapForColumn(mp, colref, m_pdrgpcnstr,
+	return PcnstrConjDisjRemapForColumn(mp, colref, m_pdrgpcnstr.get(),
 										true /*fConj*/);
 }
 
@@ -220,7 +213,7 @@ CConstraintConjunction::PcnstrRemapForColumn(CMemoryPool *mp,
 //		Scalar expression
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CExpression *>
+CExpression *
 CConstraintConjunction::PexprScalar(CMemoryPool *mp)
 {
 	if (nullptr == m_pexprScalar)
@@ -233,11 +226,11 @@ CConstraintConjunction::PexprScalar(CMemoryPool *mp)
 		else
 		{
 			m_pexprScalar =
-				PexprScalarConjDisj(mp, m_pdrgpcnstr, true /*fConj*/);
+				PexprScalarConjDisj(mp, m_pdrgpcnstr.get(), true /*fConj*/);
 		}
 	}
 
-	return m_pexprScalar;
+	return m_pexprScalar.get();
 }
 
 // EOF

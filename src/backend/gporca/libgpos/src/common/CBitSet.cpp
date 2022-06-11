@@ -346,7 +346,7 @@ CBitSet::ExchangeClear(ULONG pos)
 //
 //---------------------------------------------------------------------------
 void
-CBitSet::Union(gpos::pointer<const CBitSet *> pbsOther)
+CBitSet::Union(const CBitSet *pbsOther)
 {
 	CBitSetLink *bsl = nullptr;
 	CBitSetLink *bsl_other = nullptr;
@@ -354,7 +354,7 @@ CBitSet::Union(gpos::pointer<const CBitSet *> pbsOther)
 	// dynamic array of CBitSetLink
 	typedef CDynamicPtrArray<CBitSetLink, CleanupNULL> CBitSetLinkArray;
 
-	CAutoRef<CBitSetLinkArray> a_drgpbsl;
+	gpos::Ref<CBitSetLinkArray> a_drgpbsl;
 	a_drgpbsl = GPOS_NEW(m_mp) CBitSetLinkArray(m_mp);
 
 	// iterate through other's links and copy missing links to array
@@ -419,7 +419,7 @@ CBitSet::Union(gpos::pointer<const CBitSet *> pbsOther)
 //
 //---------------------------------------------------------------------------
 void
-CBitSet::Intersection(gpos::pointer<const CBitSet *> pbsOther)
+CBitSet::Intersection(const CBitSet *pbsOther)
 {
 	if (nullptr == pbsOther)
 	{
@@ -463,7 +463,7 @@ CBitSet::Intersection(gpos::pointer<const CBitSet *> pbsOther)
 //
 //---------------------------------------------------------------------------
 void
-CBitSet::Difference(gpos::pointer<const CBitSet *> pbs)
+CBitSet::Difference(const CBitSet *pbs)
 {
 	if (IsDisjoint(pbs))
 	{
@@ -487,7 +487,7 @@ CBitSet::Difference(gpos::pointer<const CBitSet *> pbs)
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitSet::ContainsAll(gpos::pointer<const CBitSet *> bs) const
+CBitSet::ContainsAll(const CBitSet *bs) const
 {
 	// skip iterating if we can already tell by the sizes
 	if (Size() < bs->Size())
@@ -524,7 +524,7 @@ CBitSet::ContainsAll(gpos::pointer<const CBitSet *> bs) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitSet::Equals(gpos::pointer<const CBitSet *> bs) const
+CBitSet::Equals(const CBitSet *bs) const
 {
 	// check pointer equality first
 	if (this == bs)
@@ -569,7 +569,7 @@ CBitSet::Equals(gpos::pointer<const CBitSet *> bs) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitSet::IsDisjoint(gpos::pointer<const CBitSet *> bs) const
+CBitSet::IsDisjoint(const CBitSet *bs) const
 {
 	CBitSetLink *bsl = nullptr;
 	CBitSetLink *bsl_other = nullptr;

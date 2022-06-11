@@ -31,10 +31,10 @@ class CPhysicalSplit : public CPhysical
 {
 private:
 	// deletion columns
-	gpos::owner<CColRefArray *> m_pdrgpcrDelete;
+	gpos::Ref<CColRefArray> m_pdrgpcrDelete;
 
 	// insertion columns
-	gpos::owner<CColRefArray *> m_pdrgpcrInsert;
+	gpos::Ref<CColRefArray> m_pdrgpcrInsert;
 
 	// ctid column
 	CColRef *m_pcrCtid;
@@ -49,14 +49,14 @@ private:
 	CColRef *m_pcrTupleOid;
 
 	// required columns by local members
-	gpos::owner<CColRefSet *> m_pcrsRequiredLocal;
+	gpos::Ref<CColRefSet> m_pcrsRequiredLocal;
 
 public:
 	CPhysicalSplit(const CPhysicalSplit &) = delete;
 
 	// ctor
-	CPhysicalSplit(CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrDelete,
-				   gpos::owner<CColRefArray *> pdrgpcrInsert, CColRef *pcrCtid,
+	CPhysicalSplit(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrDelete,
+				   gpos::Ref<CColRefArray> pdrgpcrInsert, CColRef *pcrCtid,
 				   CColRef *pcrSegmentId, CColRef *pcrAction,
 				   CColRef *pcrTupleOid);
 
@@ -99,17 +99,17 @@ public:
 	}
 
 	// deletion columns
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrDelete() const
 	{
-		return m_pdrgpcrDelete;
+		return m_pdrgpcrDelete.get();
 	}
 
 	// insertion columns
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrInsert() const
 	{
-		return m_pdrgpcrInsert;
+		return m_pdrgpcrInsert.get();
 	}
 
 	// tuple oid column
@@ -120,7 +120,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
@@ -137,19 +137,20 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required sort columns of the n-th child
-	gpos::owner<COrderSpec *> PosRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<COrderSpec> PosRequired(CMemoryPool *mp,
+									  CExpressionHandle &exprhdl,
+									  COrderSpec *posRequired,
+									  ULONG child_index,
+									  CDrvdPropArray *pdrgpdpCtxt,
+									  ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	gpos::owner<COrderSpec *> PosDerive(
-		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
+	gpos::Ref<COrderSpec> PosDerive(CMemoryPool *mp,
+									CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -157,39 +158,40 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl,
-		gpos::pointer<const CEnfdOrder *> peo) const override;
+		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
 
 	// compute required output columns of the n-th child
-	gpos::owner<CColRefSet *> PcrsRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override;
+	gpos::Ref<CColRefSet> PcrsRequired(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl,
+									   CColRefSet *pcrsRequired,
+									   ULONG child_index,
+									   CDrvdPropArray *pdrgpdpCtxt,
+									   ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
-	gpos::owner<CCTEReq *> PcteRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CCTEReq *> pcter, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
+									CCTEReq *pcter, ULONG child_index,
+									CDrvdPropArray *pdrgpdpCtxt,
+									ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	gpos::owner<CDistributionSpec *> PdsRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<CDistributionSpec> PdsRequired(CMemoryPool *mp,
+											 CExpressionHandle &exprhdl,
+											 CDistributionSpec *pdsRequired,
+											 ULONG child_index,
+											 CDrvdPropArray *pdrgpdpCtxt,
+											 ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
-	gpos::owner<CRewindabilitySpec *> PrsRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<CRewindabilitySpec> PrsRequired(CMemoryPool *mp,
+											  CExpressionHandle &exprhdl,
+											  CRewindabilitySpec *prsRequired,
+											  ULONG child_index,
+											  CDrvdPropArray *pdrgpdpCtxt,
+											  ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
-						   gpos::pointer<CColRefSet *> pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 
@@ -198,11 +200,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive distribution
-	gpos::owner<CDistributionSpec *> PdsDerive(
+	gpos::Ref<CDistributionSpec> PdsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive rewindability
-	gpos::owner<CRewindabilitySpec *> PrsDerive(
+	gpos::Ref<CRewindabilitySpec> PrsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 
@@ -212,8 +214,8 @@ public:
 
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
-		CExpressionHandle &,					   // exprhdl
-		gpos::pointer<const CEnfdRewindability *>  // per
+		CExpressionHandle &,		// exprhdl
+		const CEnfdRewindability *	// per
 	) const override;
 
 	// return true if operator passes through stats obtained from children,
@@ -229,7 +231,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CPhysicalSplit *>
+	static CPhysicalSplit *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(COperator::EopPhysicalSplit == pop->Eopid());

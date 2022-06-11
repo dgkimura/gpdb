@@ -58,7 +58,7 @@ CLogicalGet::CLogicalGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
-						 gpos::owner<CTableDescriptor *> ptabdesc)
+						 gpos::Ref<CTableDescriptor> ptabdesc)
 	: CLogical(mp),
 	  m_pnameAlias(pnameAlias),
 	  m_ptabdesc(ptabdesc),
@@ -76,10 +76,11 @@ CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
 	if (m_ptabdesc->IsPartitioned())
 	{
 		m_pdrgpdrgpcrPart = PdrgpdrgpcrCreatePartCols(
-			mp, m_pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
+			mp, m_pdrgpcrOutput.get(), m_ptabdesc->PdrgpulPart());
 	}
 
-	m_pcrsDist = CLogical::PcrsDist(mp, m_ptabdesc, m_pdrgpcrOutput);
+	m_pcrsDist =
+		CLogical::PcrsDist(mp, m_ptabdesc.get(), m_pdrgpcrOutput.get());
 }
 
 //---------------------------------------------------------------------------
@@ -91,8 +92,8 @@ CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
 //
 //---------------------------------------------------------------------------
 CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
-						 gpos::owner<CTableDescriptor *> ptabdesc,
-						 gpos::owner<CColRefArray *> pdrgpcrOutput)
+						 gpos::Ref<CTableDescriptor> ptabdesc,
+						 gpos::Ref<CColRefArray> pdrgpcrOutput)
 	: CLogical(mp),
 	  m_pnameAlias(pnameAlias),
 	  m_ptabdesc(ptabdesc),
@@ -105,10 +106,11 @@ CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
 	if (m_ptabdesc->IsPartitioned())
 	{
 		m_pdrgpdrgpcrPart = PdrgpdrgpcrCreatePartCols(
-			mp, m_pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
+			mp, m_pdrgpcrOutput.get(), m_ptabdesc->PdrgpulPart());
 	}
 
-	m_pcrsDist = CLogical::PcrsDist(mp, m_ptabdesc, m_pdrgpcrOutput);
+	m_pcrsDist =
+		CLogical::PcrsDist(mp, m_ptabdesc.get(), m_pdrgpcrOutput.get());
 }
 
 //---------------------------------------------------------------------------
@@ -121,10 +123,10 @@ CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
 //---------------------------------------------------------------------------
 CLogicalGet::~CLogicalGet()
 {
-	CRefCount::SafeRelease(m_ptabdesc);
-	CRefCount::SafeRelease(m_pdrgpcrOutput);
-	CRefCount::SafeRelease(m_pdrgpdrgpcrPart);
-	CRefCount::SafeRelease(m_pcrsDist);
+	;
+	;
+	;
+	;
 
 	GPOS_DELETE(m_pnameAlias);
 }
@@ -143,8 +145,8 @@ CLogicalGet::HashValue() const
 {
 	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(),
 									   m_ptabdesc->MDId()->HashValue());
-	ulHash =
-		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrOutput));
+	ulHash = gpos::CombineHashes(ulHash,
+								 CUtils::UlHashColArray(m_pdrgpcrOutput.get()));
 
 	return ulHash;
 }
@@ -159,13 +161,13 @@ CLogicalGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalGet::Matches(gpos::pointer<COperator *> pop) const
+CLogicalGet::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	gpos::pointer<CLogicalGet *> popGet = gpos::dyn_cast<CLogicalGet>(pop);
+	CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(pop);
 
 	return m_ptabdesc->MDId()->Equals(popGet->m_ptabdesc->MDId()) &&
 		   m_pdrgpcrOutput->Equals(popGet->PdrgpcrOutput());
@@ -179,24 +181,24 @@ CLogicalGet::Matches(gpos::pointer<COperator *> pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
-CLogicalGet::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+gpos::Ref<COperator>
+CLogicalGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
+										UlongToColRefMap *colref_mapping,
+										BOOL must_exist)
 {
-	gpos::owner<CColRefArray *> pdrgpcrOutput = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrOutput = nullptr;
 	if (must_exist)
 	{
-		pdrgpcrOutput =
-			CUtils::PdrgpcrRemapAndCreate(mp, m_pdrgpcrOutput, colref_mapping);
+		pdrgpcrOutput = CUtils::PdrgpcrRemapAndCreate(mp, m_pdrgpcrOutput.get(),
+													  colref_mapping);
 	}
 	else
 	{
-		pdrgpcrOutput = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput,
+		pdrgpcrOutput = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput.get(),
 											 colref_mapping, must_exist);
 	}
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameAlias);
-	m_ptabdesc->AddRef();
+	;
 
 	return GPOS_NEW(mp)
 		CLogicalGet(mp, pnameAlias, m_ptabdesc, std::move(pdrgpcrOutput));
@@ -210,12 +212,12 @@ CLogicalGet::PopCopyWithRemappedColumns(
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CLogicalGet::DeriveOutputColumns(CMemoryPool *mp,
 								 CExpressionHandle &  // exprhdl
 )
 {
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	for (ULONG i = 0; i < m_pdrgpcrOutput->Size(); i++)
 	{
 		// We want to limit the output columns to only those which are referenced in the query
@@ -241,12 +243,12 @@ CLogicalGet::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive not null output columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CLogicalGet::DeriveNotNullColumns(CMemoryPool *mp,
 								  CExpressionHandle &exprhdl) const
 {
 	// get all output columns
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(exprhdl.DeriveOutputColumns());
 
 	// filters out nullable columns
@@ -288,14 +290,14 @@ CLogicalGet::FInputOrderSensitive() const
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-gpos::owner<CKeyCollection *>
+gpos::Ref<CKeyCollection>
 CLogicalGet::DeriveKeyCollection(CMemoryPool *mp,
 								 CExpressionHandle &  // exprhdl
 ) const
 {
-	gpos::pointer<const CBitSetArray *> pdrgpbs = m_ptabdesc->PdrgpbsKeys();
+	const CBitSetArray *pdrgpbs = m_ptabdesc->PdrgpbsKeys();
 
-	return CLogical::PkcKeysBaseTable(mp, pdrgpbs, m_pdrgpcrOutput);
+	return CLogical::PkcKeysBaseTable(mp, pdrgpbs, m_pdrgpcrOutput.get());
 }
 
 
@@ -307,10 +309,10 @@ CLogicalGet::DeriveKeyCollection(CMemoryPool *mp,
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfGet2TableScan);
 
@@ -325,17 +327,17 @@ CLogicalGet::PxfsCandidates(CMemoryPool *mp) const
 //		Load up statistics from metadata
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
+gpos::Ref<IStatistics>
 CLogicalGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  gpos::pointer<IStatisticsArray *>	 // not used
+						  IStatisticsArray *  // not used
 ) const
 {
 	// requesting stats on distribution columns to estimate data skew
-	gpos::owner<IStatistics *> pstatsTable =
-		PstatsBaseTable(mp, exprhdl, m_ptabdesc, m_pcrsDist);
+	gpos::Ref<IStatistics> pstatsTable =
+		PstatsBaseTable(mp, exprhdl, m_ptabdesc.get(), m_pcrsDist.get());
 
-	gpos::owner<CColRefSet *> pcrs =
-		GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
+	gpos::Ref<CColRefSet> pcrs =
+		GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput.get());
 	CUpperBoundNDVs *upper_bound_NDVs =
 		GPOS_NEW(mp) CUpperBoundNDVs(std::move(pcrs), pstatsTable->Rows());
 	gpos::dyn_cast<CStatistics>(pstatsTable)
@@ -370,15 +372,14 @@ CLogicalGet::OsPrint(IOstream &os) const
 		os << " (";
 		m_ptabdesc->Name().OsPrint(os);
 		os << "), Columns: [";
-		CUtils::OsPrintDrgPcr(os, m_pdrgpcrOutput);
+		CUtils::OsPrintDrgPcr(os, m_pdrgpcrOutput.get());
 		os << "] Key sets: {";
 
 		const ULONG ulColumns = m_pdrgpcrOutput->Size();
-		gpos::pointer<const CBitSetArray *> pdrgpbsKeys =
-			m_ptabdesc->PdrgpbsKeys();
+		const CBitSetArray *pdrgpbsKeys = m_ptabdesc->PdrgpbsKeys();
 		for (ULONG ul = 0; ul < pdrgpbsKeys->Size(); ul++)
 		{
-			gpos::pointer<CBitSet *> pbs = (*pdrgpbsKeys)[ul];
+			CBitSet *pbs = (*pdrgpbsKeys)[ul].get();
 			if (0 < ul)
 			{
 				os << ", ";

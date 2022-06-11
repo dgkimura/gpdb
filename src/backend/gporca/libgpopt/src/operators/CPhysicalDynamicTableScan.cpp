@@ -36,11 +36,11 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalDynamicTableScan::CPhysicalDynamicTableScan(
 	CMemoryPool *mp, const CName *pnameAlias,
-	gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId, ULONG scan_id,
-	gpos::owner<CColRefArray *> pdrgpcrOutput,
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
-	gpos::owner<IMdIdArray *> partition_mdids,
-	gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part)
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId, ULONG scan_id,
+	gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
+	gpos::Ref<IMdIdArray> partition_mdids,
+	gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part)
 	: CPhysicalDynamicScan(
 		  mp, std::move(ptabdesc), ulOriginOpId, pnameAlias, scan_id,
 		  std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrParts),
@@ -57,7 +57,7 @@ CPhysicalDynamicTableScan::CPhysicalDynamicTableScan(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDynamicTableScan::Matches(gpos::pointer<COperator *> pop) const
+CPhysicalDynamicTableScan::Matches(COperator *pop) const
 {
 	return CUtils::FMatchDynamicScan(this, pop);
 }
@@ -70,11 +70,11 @@ CPhysicalDynamicTableScan::Matches(gpos::pointer<COperator *> pop) const
 //		Statistics derivation during costing
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
-CPhysicalDynamicTableScan::PstatsDerive(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<CReqdPropPlan *> prpplan,
-	gpos::pointer<IStatisticsArray *>  // stats_ctxt
+gpos::Ref<IStatistics>
+CPhysicalDynamicTableScan::PstatsDerive(CMemoryPool *mp,
+										CExpressionHandle &exprhdl,
+										CReqdPropPlan *prpplan,
+										IStatisticsArray *	// stats_ctxt
 ) const
 {
 	GPOS_ASSERT(nullptr != prpplan);
@@ -84,11 +84,11 @@ CPhysicalDynamicTableScan::PstatsDerive(
 }
 
 
-gpos::owner<CPartitionPropagationSpec *>
+gpos::Ref<CPartitionPropagationSpec>
 CPhysicalDynamicTableScan::PppsDerive(CMemoryPool *mp,
 									  CExpressionHandle &) const
 {
-	gpos::owner<CPartitionPropagationSpec *> pps =
+	gpos::Ref<CPartitionPropagationSpec> pps =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	pps->Insert(ScanId(), CPartitionPropagationSpec::EpptConsumer,
 				Ptabdesc()->MDId(), nullptr, nullptr);

@@ -45,10 +45,10 @@ private:
 	const EdxlDmlType m_dxl_dml_type;
 
 	// target table descriptor
-	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 	// list of source column ids
-	gpos::owner<ULongPtrArray *> m_src_colids_array;
+	gpos::Ref<ULongPtrArray> m_src_colids_array;
 
 	// action column id
 	ULONG m_action_colid;
@@ -69,7 +69,7 @@ private:
 	ULONG m_tuple_oid;
 
 	// direct dispatch info for insert statements
-	gpos::owner<CDXLDirectDispatchInfo *> m_direct_dispatch_info;
+	gpos::Ref<CDXLDirectDispatchInfo> m_direct_dispatch_info;
 
 	// needs the data to be sorted or not
 	BOOL m_input_sort_req;
@@ -78,14 +78,13 @@ public:
 	CDXLPhysicalDML(const CDXLPhysicalDML &) = delete;
 
 	// ctor
-	CDXLPhysicalDML(
-		CMemoryPool *mp, const EdxlDmlType dxl_dml_type,
-		gpos::owner<CDXLTableDescr *> table_descr,
-		gpos::owner<ULongPtrArray *> src_colids_array, ULONG action_colid,
-		ULONG oid_colid, ULONG ctid_colid, ULONG segid_colid,
-		BOOL preserve_oids, ULONG tuple_oid,
-		gpos::owner<CDXLDirectDispatchInfo *> dxl_direct_dispatch_info,
-		BOOL input_sort_req);
+	CDXLPhysicalDML(CMemoryPool *mp, const EdxlDmlType dxl_dml_type,
+					gpos::Ref<CDXLTableDescr> table_descr,
+					gpos::Ref<ULongPtrArray> src_colids_array,
+					ULONG action_colid, ULONG oid_colid, ULONG ctid_colid,
+					ULONG segid_colid, BOOL preserve_oids, ULONG tuple_oid,
+					gpos::Ref<CDXLDirectDispatchInfo> dxl_direct_dispatch_info,
+					BOOL input_sort_req);
 
 	// dtor
 	~CDXLPhysicalDML() override;
@@ -104,17 +103,17 @@ public:
 	}
 
 	// target table descriptor
-	gpos::pointer<CDXLTableDescr *>
+	CDXLTableDescr *
 	GetDXLTableDescr() const
 	{
-		return m_dxl_table_descr;
+		return m_dxl_table_descr.get();
 	}
 
 	// source column ids
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetSrcColIdsArray() const
 	{
-		return m_src_colids_array;
+		return m_src_colids_array.get();
 	}
 
 	// action column id
@@ -160,10 +159,10 @@ public:
 	}
 
 	// direct dispatch info
-	gpos::pointer<CDXLDirectDispatchInfo *>
+	CDXLDirectDispatchInfo *
 	GetDXLDirectDispatchInfo() const
 	{
-		return m_direct_dispatch_info;
+		return m_direct_dispatch_info.get();
 	}
 
 	// needs the data to be sorted or not
@@ -176,16 +175,16 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> node,
+	void AssertValid(const CDXLNode *node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalDML *>
+	static CDXLPhysicalDML *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

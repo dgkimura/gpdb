@@ -59,8 +59,7 @@ CDistributionSpecRouted::~CDistributionSpecRouted() = default;
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecRouted::FSatisfies(
-	gpos::pointer<const CDistributionSpec *> pds) const
+CDistributionSpecRouted::FSatisfies(const CDistributionSpec *pds) const
 {
 	if (Matches(pds))
 	{
@@ -85,10 +84,9 @@ CDistributionSpecRouted::FSatisfies(
 //		Return a copy of the distribution spec with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDistributionSpec *>
+gpos::Ref<CDistributionSpec>
 CDistributionSpecRouted::PdsCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
 	ULONG id = m_pcrSegmentId->Id();
 	CColRef *pcrSegmentId = colref_mapping->Find(&id);
@@ -122,16 +120,15 @@ CDistributionSpecRouted::PdsCopyWithRemappedColumns(
 //
 //---------------------------------------------------------------------------
 void
-CDistributionSpecRouted::AppendEnforcers(
-	CMemoryPool *mp,
-	CExpressionHandle &,  // exprhdl
-	gpos::pointer<CReqdPropPlan *>
+CDistributionSpecRouted::AppendEnforcers(CMemoryPool *mp,
+										 CExpressionHandle &,  // exprhdl
+										 CReqdPropPlan *
 #ifdef GPOS_DEBUG
-		prpp
+											 prpp
 #endif	// GPOS_DEBUG
-	,
-	gpos::pointer<CExpressionArray *> pdrgpexpr,
-	gpos::pointer<CExpression *> pexpr)
+										 ,
+										 CExpressionArray *pdrgpexpr,
+										 CExpression *pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);
@@ -149,9 +146,9 @@ CDistributionSpecRouted::AppendEnforcers(
 	}
 
 	// add a routed distribution enforcer
-	AddRef();
-	pexpr->AddRef();
-	gpos::owner<CExpression *> pexprMotion = GPOS_NEW(mp) CExpression(
+	;
+	;
+	gpos::Ref<CExpression> pexprMotion = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalMotionRoutedDistribute(mp, this), pexpr);
 	pdrgpexpr->Append(std::move(pexprMotion));
 }
@@ -181,10 +178,10 @@ CDistributionSpecRouted::HashValue() const
 //		Extract columns used by the distribution spec
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CDistributionSpecRouted::PcrsUsed(CMemoryPool *mp) const
 {
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pcrSegmentId);
 
 	return pcrs;
@@ -200,15 +197,14 @@ CDistributionSpecRouted::PcrsUsed(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecRouted::Matches(
-	gpos::pointer<const CDistributionSpec *> pds) const
+CDistributionSpecRouted::Matches(const CDistributionSpec *pds) const
 {
 	if (Edt() != pds->Edt())
 	{
 		return false;
 	}
 
-	gpos::pointer<const CDistributionSpecRouted *> pdsRouted =
+	const CDistributionSpecRouted *pdsRouted =
 		CDistributionSpecRouted::PdsConvert(pds);
 	return m_pcrSegmentId == pdsRouted->Pcr();
 }

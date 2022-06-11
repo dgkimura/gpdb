@@ -49,7 +49,7 @@ public:
 	OID OidRank() const;
 
 	// generate default window oids
-	static gpos::owner<CWindowOids *> GetWindowOids(CMemoryPool *mp);
+	static gpos::Ref<CWindowOids> GetWindowOids(CMemoryPool *mp);
 
 };	// class CWindowOids
 }  // namespace gpopt

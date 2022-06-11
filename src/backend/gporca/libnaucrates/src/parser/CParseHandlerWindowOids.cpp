@@ -33,7 +33,7 @@ CParseHandlerWindowOids::CParseHandlerWindowOids(
 
 CParseHandlerWindowOids::~CParseHandlerWindowOids()
 {
-	CRefCount::SafeRelease(m_window_oids);
+	;
 }
 
 void
@@ -94,10 +94,10 @@ CParseHandlerWindowOids::GetParseHandlerType() const
 	return EdxlphWindowOids;
 }
 
-gpos::pointer<CWindowOids *>
+CWindowOids *
 CParseHandlerWindowOids::GetWindowOids() const
 {
-	return m_window_oids;
+	return m_window_oids.get();
 }
 
 // EOF

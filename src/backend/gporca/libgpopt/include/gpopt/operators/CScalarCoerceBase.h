@@ -38,7 +38,7 @@ class CScalarCoerceBase : public CScalar
 {
 private:
 	// catalog MDId of the result type
-	gpos::owner<IMDId *> m_result_type_mdid;
+	gpos::Ref<IMDId> m_result_type_mdid;
 
 	// output type modifier
 	INT m_type_modifier;
@@ -53,7 +53,7 @@ public:
 	CScalarCoerceBase(const CScalarCoerceBase &) = delete;
 
 	// ctor
-	CScalarCoerceBase(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+	CScalarCoerceBase(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 					  INT type_modifier, ECoercionForm dxl_coerce_format,
 					  INT location);
 
@@ -61,7 +61,7 @@ public:
 	~CScalarCoerceBase() override;
 
 	// the type of the scalar expression
-	gpos::pointer<IMDId *> MdidType() const override;
+	IMDId *MdidType() const override;
 
 	// return type modifier
 	INT TypeModifier() const override;
@@ -73,8 +73,8 @@ public:
 	INT Location() const;
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 };	// class CScalarCoerceBase

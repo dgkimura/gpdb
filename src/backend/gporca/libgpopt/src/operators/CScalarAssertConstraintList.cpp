@@ -43,7 +43,7 @@ CScalarAssertConstraintList::CScalarAssertConstraintList(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarAssertConstraintList::Matches(gpos::pointer<COperator *> pop) const
+CScalarAssertConstraintList::Matches(COperator *pop) const
 {
 	return pop->Eopid() == Eopid();
 }
@@ -57,7 +57,7 @@ CScalarAssertConstraintList::Matches(gpos::pointer<COperator *> pop) const
 //		Type of expression's result
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarAssertConstraintList::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

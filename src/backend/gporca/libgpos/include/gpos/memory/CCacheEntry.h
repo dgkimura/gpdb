@@ -125,7 +125,7 @@ public:
 	void
 	IncRefCount()
 	{
-		m_val->AddRef();
+		;
 	}
 
 	//decrements value's ref-count

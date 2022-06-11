@@ -34,7 +34,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarCoerceViaIO::CDXLScalarCoerceViaIO(CMemoryPool *mp,
-											 gpos::owner<IMDId *> mdid_type,
+											 gpos::Ref<IMDId> mdid_type,
 											 INT type_modifier,
 											 EdxlCoercionForm dxl_coerce_format,
 											 INT location)

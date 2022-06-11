@@ -43,7 +43,7 @@ class CSearchStage : public DbgPrintMixin<CSearchStage>
 {
 private:
 	// set of xforms to be applied during stage
-	gpos::owner<CXformSet *> m_xforms;
+	gpos::Ref<CXformSet> m_xforms;
 
 	// time threshold in milliseconds
 	ULONG m_time_threshold;
@@ -52,7 +52,7 @@ private:
 	CCost m_cost_threshold;
 
 	// best plan found at the end of search stage
-	gpos::owner<CExpression *> m_pexprBest;
+	gpos::Ref<CExpression> m_pexprBest;
 
 	// cost of best plan found
 	CCost m_costBest;
@@ -62,7 +62,7 @@ private:
 
 public:
 	// ctor
-	CSearchStage(gpos::owner<CXformSet *> xform_set,
+	CSearchStage(gpos::Ref<CXformSet> xform_set,
 				 ULONG ulTimeThreshold = gpos::ulong_max,
 				 CCost costThreshold = CCost(0.0));
 
@@ -103,10 +103,10 @@ public:
 	}
 
 	// xforms set accessor
-	gpos::pointer<CXformSet *>
+	CXformSet *
 	GetXformSet() const
 	{
-		return m_xforms;
+		return m_xforms.get();
 	}
 
 	// time threshold accessor
@@ -127,10 +127,10 @@ public:
 	void SetBestExpr(CExpression *pexpr);
 
 	// best plan found accessor
-	gpos::pointer<CExpression *>
+	CExpression *
 	PexprBest() const
 	{
-		return m_pexprBest;
+		return m_pexprBest.get();
 	}
 
 	// best plan cost accessor
@@ -144,7 +144,7 @@ public:
 	IOstream &OsPrint(IOstream &) const;
 
 	// generate default search strategy
-	static gpos::owner<CSearchStageArray *> PdrgpssDefault(CMemoryPool *mp);
+	static gpos::Ref<CSearchStageArray> PdrgpssDefault(CMemoryPool *mp);
 };
 
 // shorthand for printing

@@ -125,12 +125,12 @@ CParseHandlerSequence::EndElement(const XMLCh *const,  // element_uri,
 	CParseHandlerProperties *prop_parse_handler =
 		dynamic_cast<CParseHandlerProperties *>((*this)[0]);
 
-	gpos::owner<CDXLPhysicalSequence *> dxl_op =
+	gpos::Ref<CDXLPhysicalSequence> dxl_op =
 		GPOS_NEW(m_mp) CDXLPhysicalSequence(m_mp);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
 	// set statistics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add project list
 	CParseHandlerProjList *proj_list_parse_handler =
@@ -149,7 +149,7 @@ CParseHandlerSequence::EndElement(const XMLCh *const,  // element_uri,
 	}
 
 #ifdef GPOS_DEBUG
-	dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+	dxl_op->AssertValid(m_dxl_node.get(), false /* validate_children */);
 #endif	// GPOS_DEBUG
 
 	// deactivate handler

@@ -74,10 +74,10 @@ private:
 	CMemoryPool *m_mp;
 
 	// array of mdids
-	gpos::owner<IMdIdArray *> m_mdid_array;
+	gpos::Ref<IMdIdArray> m_mdid_array;
 
 	// type info requests
-	gpos::owner<SMDTypeRequestArray *> m_mdtype_request_array;
+	gpos::Ref<SMDTypeRequestArray> m_mdtype_request_array;
 
 	// serialize system id
 	CWStringDynamic *GetStrRepr(CSystemId sysid);
@@ -86,8 +86,8 @@ public:
 	CMDRequest(const CMDRequest &) = delete;
 
 	// ctor
-	CMDRequest(CMemoryPool *mp, gpos::owner<IMdIdArray *> mdid_array,
-			   gpos::owner<SMDTypeRequestArray *> mdtype_request_array);
+	CMDRequest(CMemoryPool *mp, gpos::Ref<IMdIdArray> mdid_array,
+			   gpos::Ref<SMDTypeRequestArray> mdtype_request_array);
 
 	// ctor: type request only
 	CMDRequest(CMemoryPool *mp, SMDTypeRequest *md_type_request);
@@ -98,17 +98,17 @@ public:
 	// accessors
 
 	// array of mdids
-	gpos::pointer<IMdIdArray *>
+	IMdIdArray *
 	GetMdIdArray() const
 	{
-		return m_mdid_array;
+		return m_mdid_array.get();
 	}
 
 	// array of type info requests
-	gpos::pointer<SMDTypeRequestArray *>
+	SMDTypeRequestArray *
 	GetMDTypeRequestArray() const
 	{
-		return m_mdtype_request_array;
+		return m_mdtype_request_array.get();
 	}
 
 	// serialize request in DXL format

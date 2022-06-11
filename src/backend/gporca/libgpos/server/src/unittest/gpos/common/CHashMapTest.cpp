@@ -62,13 +62,12 @@ CHashMapTest::EresUnittest_Basic()
 	GPOS_ASSERT(GPOS_ARRAY_SIZE(rgul) == GPOS_ARRAY_SIZE(rgsz));
 	const ULONG ulCnt = GPOS_ARRAY_SIZE(rgul);
 
-	typedef CHashMap<ULONG_PTR, CHAR, HashPtr<ULONG_PTR>,
-					 gpos::Equals<ULONG_PTR>, CleanupNULL<ULONG_PTR>,
-					 CleanupNULL<CHAR> >
+	typedef gpos::UnorderedMap<
+		const ULONG_PTR *, CHAR *, gpos::PtrHash<ULONG_PTR, HashPtr<ULONG_PTR>>,
+		gpos::PtrEqual<ULONG_PTR, gpos::Equals<ULONG_PTR>>>
 		UlongPtrToCharMap;
 
-	gpos::owner<UlongPtrToCharMap *> phm =
-		GPOS_NEW(mp) UlongPtrToCharMap(mp, 128);
+	gpos::Ref<UlongPtrToCharMap> phm = GPOS_NEW(mp) UlongPtrToCharMap(mp, 128);
 	for (ULONG i = 0; i < ulCnt; ++i)
 	{
 		BOOL fSuccess GPOS_ASSERTS_ONLY =
@@ -103,13 +102,13 @@ CHashMapTest::EresUnittest_Basic()
 	BOOL fSuccess GPOS_ASSERTS_ONLY = phm->Replace(&ulp, rgsz[0]);
 	GPOS_ASSERT(!fSuccess);
 
-	phm->Release();
+	;
 
 	// test replacing values and triggering their release
 	typedef CHashMap<ULONG, ULONG, HashValue<ULONG>, gpos::Equals<ULONG>,
-					 CleanupDelete<ULONG>, CleanupDelete<ULONG> >
+					 CleanupDelete<ULONG>, CleanupDelete<ULONG>>
 		UlongToUlongMap;
-	gpos::owner<UlongToUlongMap *> phm2 = GPOS_NEW(mp) UlongToUlongMap(mp, 128);
+	gpos::Ref<UlongToUlongMap> phm2 = GPOS_NEW(mp) UlongToUlongMap(mp, 128);
 
 	ULONG *pulKey = GPOS_NEW(mp) ULONG(1);
 	ULONG *pulVal1 = GPOS_NEW(mp) ULONG(2);
@@ -135,7 +134,7 @@ CHashMapTest::EresUnittest_Basic()
 	GPOS_ASSERT(*pulVal == 3);
 #endif	// GPOS_DEBUG
 
-	phm2->Release();
+	;
 
 	return GPOS_OK;
 }
@@ -160,11 +159,10 @@ CHashMapTest::EresUnittest_Ownership()
 
 	typedef CHashMap<ULONG_PTR, CHAR, HashPtr<ULONG_PTR>,
 					 gpos::Equals<ULONG_PTR>, CleanupDelete<ULONG_PTR>,
-					 CleanupDeleteArray<CHAR> >
+					 CleanupDeleteArray<CHAR>>
 		UlongPtrToCharMap;
 
-	gpos::owner<UlongPtrToCharMap *> phm =
-		GPOS_NEW(mp) UlongPtrToCharMap(mp, 32);
+	gpos::Ref<UlongPtrToCharMap> phm = GPOS_NEW(mp) UlongPtrToCharMap(mp, 32);
 	for (ULONG i = 0; i < ulCnt; ++i)
 	{
 		ULONG_PTR *pulp = GPOS_NEW(mp) ULONG_PTR(i);
@@ -179,7 +177,7 @@ CHashMapTest::EresUnittest_Ownership()
 		GPOS_ASSERT(!phm->Insert(pulp, sz));
 	}
 
-	phm->Release();
+	;
 
 	return GPOS_OK;
 }

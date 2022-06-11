@@ -65,7 +65,7 @@ CParseHandlerScalarArrayComp::StartElement(
 	}
 
 	// parse and create scalar ArrayComp
-	gpos::owner<CDXLScalarArrayComp *> dxl_op =
+	gpos::Ref<CDXLScalarArrayComp> dxl_op =
 		gpos::cast<CDXLScalarArrayComp>(CDXLOperatorFactory::MakeDXLArrayComp(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 

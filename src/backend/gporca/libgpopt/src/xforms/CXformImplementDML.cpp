@@ -64,29 +64,27 @@ CXformImplementDML::Exfp(CExpressionHandle &  // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementDML::Transform(gpos::pointer<CXformContext *> pxfctxt,
-							  gpos::pointer<CXformResult *> pxfres,
-							  gpos::pointer<CExpression *> pexpr) const
+CXformImplementDML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+							  CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CLogicalDML *> popDML =
-		gpos::dyn_cast<CLogicalDML>(pexpr->Pop());
+	CLogicalDML *popDML = gpos::dyn_cast<CLogicalDML>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 
 	CLogicalDML::EDMLOperator edmlop = popDML->Edmlop();
 
-	gpos::owner<CTableDescriptor *> ptabdesc = popDML->Ptabdesc();
-	ptabdesc->AddRef();
+	gpos::Ref<CTableDescriptor> ptabdesc = popDML->Ptabdesc();
+	;
 
-	gpos::owner<CColRefArray *> pdrgpcrSource = popDML->PdrgpcrSource();
-	pdrgpcrSource->AddRef();
-	gpos::owner<CBitSet *> pbsModified = popDML->PbsModified();
-	pbsModified->AddRef();
+	gpos::Ref<CColRefArray> pdrgpcrSource = popDML->PdrgpcrSource();
+	;
+	gpos::Ref<CBitSet> pbsModified = popDML->PbsModified();
+	;
 
 	CColRef *pcrAction = popDML->PcrAction();
 	CColRef *pcrTableOid = popDML->PcrTableOid();
@@ -95,11 +93,11 @@ CXformImplementDML::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	CColRef *pcrTupleOid = popDML->PcrTupleOid();
 
 	// child of DML operator
-	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
+	;
 
 	// create physical DML
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalDML(
 			mp, edmlop, std::move(ptabdesc), std::move(pdrgpcrSource),

@@ -75,30 +75,30 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// return locally defined columns
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	PcrsDefined(CMemoryPool *mp,
 				CExpressionHandle &	 // exprhdl
 				) override
 	{
-		gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 		pcrs->Include(m_pcr);
 
 		return pcrs;
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarProjectElement *>
+	static CScalarProjectElement *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -107,7 +107,7 @@ public:
 		return dynamic_cast<CScalarProjectElement *>(pop);
 	}
 
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const override
 	{
 		GPOS_ASSERT(!"Invalid function call: CScalarProjectElemet::MdidType()");

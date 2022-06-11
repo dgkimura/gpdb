@@ -50,11 +50,10 @@ CXformIndexGet2IndexOnlyScan::CXformIndexGet2IndexOnlyScan(CMemoryPool *mp)
 CXform::EXformPromise
 CXformIndexGet2IndexOnlyScan::Exfp(CExpressionHandle &exprhdl) const
 {
-	gpos::pointer<CLogicalIndexGet *> popGet =
-		gpos::dyn_cast<CLogicalIndexGet>(exprhdl.Pop());
+	CLogicalIndexGet *popGet = gpos::dyn_cast<CLogicalIndexGet>(exprhdl.Pop());
 
-	gpos::pointer<CTableDescriptor *> ptabdesc = popGet->Ptabdesc();
-	gpos::pointer<CIndexDescriptor *> pindexdesc = popGet->Pindexdesc();
+	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
+	CIndexDescriptor *pindexdesc = popGet->Pindexdesc();
 	BOOL possible_ao_table = ptabdesc->IsAORowOrColTable() ||
 							 ptabdesc->RetrieveRelStorageType() ==
 								 IMDRelation::ErelstorageMixedPartitioned;
@@ -85,17 +84,15 @@ CXformIndexGet2IndexOnlyScan::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformIndexGet2IndexOnlyScan::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+CXformIndexGet2IndexOnlyScan::Transform(CXformContext *pxfctxt,
+										CXformResult *pxfres,
+										CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CLogicalIndexGet *> pop =
-		gpos::dyn_cast<CLogicalIndexGet>(pexpr->Pop());
+	CLogicalIndexGet *pop = gpos::dyn_cast<CLogicalIndexGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 	CIndexDescriptor *pindexdesc = pop->Pindexdesc();
 	CTableDescriptor *ptabdesc = pop->Ptabdesc();
@@ -108,18 +105,16 @@ CXformIndexGet2IndexOnlyScan::Transform(
 	}
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	gpos::pointer<const IMDRelation *> pmdrel =
-		md_accessor->RetrieveRel(ptabdesc->MDId());
-	gpos::pointer<const IMDIndex *> pmdindex =
-		md_accessor->RetrieveIndex(pindexdesc->MDId());
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
+	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pindexdesc->MDId());
 
-	gpos::owner<CColRefArray *> pdrgpcrOutput = pop->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = pop->PdrgpcrOutput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
-	pdrgpcrOutput->AddRef();
+	;
 
-	gpos::owner<CColRefSet *> matched_cols =
-		CXformUtils::PcrsIndexKeys(mp, pdrgpcrOutput, pmdindex, pmdrel);
-	gpos::owner<CColRefSet *> output_cols = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> matched_cols =
+		CXformUtils::PcrsIndexKeys(mp, pdrgpcrOutput.get(), pmdindex, pmdrel);
+	gpos::Ref<CColRefSet> output_cols = GPOS_NEW(mp) CColRefSet(mp);
 
 	// An index only scan is allowed iff each used output column reference also
 	// exists as a column in the index.
@@ -141,30 +136,30 @@ CXformIndexGet2IndexOnlyScan::Transform(
 		}
 	}
 
-	if (!matched_cols->ContainsAll(output_cols))
+	if (!matched_cols->ContainsAll(output_cols.get()))
 	{
-		matched_cols->Release();
-		output_cols->Release();
-		pdrgpcrOutput->Release();
+		;
+		;
+		;
 		return;
 	}
 
-	matched_cols->Release();
-	output_cols->Release();
+	;
+	;
 
-	pindexdesc->AddRef();
-	ptabdesc->AddRef();
+	;
+	;
 
 	COrderSpec *pos = pop->Pos();
 	GPOS_ASSERT(nullptr != pos);
-	pos->AddRef();
+	;
 
 
 
 	// addref all children
-	pexprIndexCond->AddRef();
+	;
 
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CPhysicalIndexOnlyScan(
 						mp, pindexdesc, ptabdesc, pexpr->Pop()->UlOpId(),

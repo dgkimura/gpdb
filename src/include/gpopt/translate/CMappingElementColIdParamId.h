@@ -44,14 +44,14 @@ private:
 	ULONG m_paramid;
 
 	// param type
-	gpos::pointer<IMDId *> m_mdid;
+	IMDId *m_mdid;
 
 	INT m_type_modifier;
 
 public:
 	// ctors and dtor
-	CMappingElementColIdParamId(ULONG colid, ULONG paramid,
-								gpos::pointer<IMDId *> mdid, INT type_modifier);
+	CMappingElementColIdParamId(ULONG colid, ULONG paramid, IMDId *mdid,
+								INT type_modifier);
 
 	~CMappingElementColIdParamId() override = default;
 
@@ -70,7 +70,7 @@ public:
 	}
 
 	// return the type
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const
 	{
 		return m_mdid;

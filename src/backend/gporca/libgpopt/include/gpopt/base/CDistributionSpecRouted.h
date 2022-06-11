@@ -60,28 +60,26 @@ public:
 	}
 
 	// does this distribution satisfy the given one
-	BOOL Matches(gpos::pointer<const CDistributionSpec *> pds) const override;
+	BOOL Matches(const CDistributionSpec *pds) const override;
 
 	// does this distribution satisfy the given one
-	BOOL FSatisfies(
-		gpos::pointer<const CDistributionSpec *> pds) const override;
+	BOOL FSatisfies(const CDistributionSpec *pds) const override;
 
 	// return a copy of the distribution spec with remapped columns
-	gpos::owner<CDistributionSpec *> PdsCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<CDistributionSpec> PdsCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 gpos::pointer<CReqdPropPlan *> prpp,
-						 gpos::pointer<CExpressionArray *> pdrgpexpr,
-						 gpos::pointer<CExpression *> pexpr) override;
+						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 CExpression *pexpr) override;
 
 	// hash function for routed distribution spec
 	ULONG HashValue() const override;
 
 	// extract columns used by the distribution spec
-	gpos::owner<CColRefSet *> PcrsUsed(CMemoryPool *mp) const override;
+	gpos::Ref<CColRefSet> PcrsUsed(CMemoryPool *mp) const override;
 
 	// return distribution partitioning type
 	EDistributionPartitioningType
@@ -94,7 +92,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static gpos::cast_func<CDistributionSpecRouted *>
+	static CDistributionSpecRouted *
 	PdsConvert(CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
@@ -104,8 +102,8 @@ public:
 	}
 
 	// conversion function - const argument
-	static gpos::pointer<const CDistributionSpecRouted *>
-	PdsConvert(gpos::pointer<const CDistributionSpec *> pds)
+	static const CDistributionSpecRouted *
+	PdsConvert(const CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtRouted == pds->Edt());

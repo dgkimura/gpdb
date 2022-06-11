@@ -32,13 +32,13 @@ class CPhysicalMotionGather : public CPhysicalMotion
 {
 private:
 	// type of segment on which this gather runs (master/segment)
-	gpos::owner<CDistributionSpecSingleton *> m_pdssSingeton;
+	gpos::Ref<CDistributionSpecSingleton> m_pdssSingeton;
 
 	// merge spec if the operator is order-preserving
-	gpos::owner<COrderSpec *> m_pos;
+	gpos::Ref<COrderSpec> m_pos;
 
 	// columns used by order spec
-	gpos::owner<CColRefSet *> m_pcrsSort;
+	gpos::Ref<CColRefSet> m_pcrsSort;
 
 public:
 	CPhysicalMotionGather(const CPhysicalMotionGather &) = delete;
@@ -49,7 +49,7 @@ public:
 
 	CPhysicalMotionGather(CMemoryPool *mp,
 						  CDistributionSpecSingleton::ESegmentType est,
-						  gpos::owner<COrderSpec *> pos);
+						  gpos::Ref<COrderSpec> pos);
 
 	// dtor
 	~CPhysicalMotionGather() override;
@@ -74,10 +74,10 @@ public:
 	}
 
 	// output distribution accessor
-	gpos::pointer<CDistributionSpec *>
+	CDistributionSpec *
 	Pds() const override
 	{
-		return m_pdssSingeton;
+		return m_pdssSingeton.get();
 	}
 
 	BOOL
@@ -93,35 +93,35 @@ public:
 	}
 
 	// order spec
-	gpos::pointer<COrderSpec *>
+	COrderSpec *
 	Pos() const
 	{
-		return m_pos;
+		return m_pos.get();
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *>) const override;
+	BOOL Matches(COperator *) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	gpos::owner<CColRefSet *> PcrsRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CColRefSet *> pcrsInput, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override;
+	gpos::Ref<CColRefSet> PcrsRequired(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl,
+									   CColRefSet *pcrsInput, ULONG child_index,
+									   CDrvdPropArray *pdrgpdpCtxt,
+									   ULONG ulOptReq) override;
 
 	// compute required sort order of the n-th child
-	gpos::owner<COrderSpec *> PosRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<COrderSpec *> posInput, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<COrderSpec> PosRequired(CMemoryPool *mp,
+									  CExpressionHandle &exprhdl,
+									  COrderSpec *posInput, ULONG child_index,
+									  CDrvdPropArray *pdrgpdpCtxt,
+									  ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
-						   gpos::pointer<CColRefSet *> pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -129,8 +129,8 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	gpos::owner<COrderSpec *> PosDerive(
-		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
+	gpos::Ref<COrderSpec> PosDerive(CMemoryPool *mp,
+									CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -138,8 +138,7 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl,
-		gpos::pointer<const CEnfdOrder *> peo) const override;
+		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -149,7 +148,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static gpos::cast_func<CPhysicalMotionGather *> PopConvert(COperator *pop);
+	static CPhysicalMotionGather *PopConvert(COperator *pop);
 
 };	// class CPhysicalMotionGather
 

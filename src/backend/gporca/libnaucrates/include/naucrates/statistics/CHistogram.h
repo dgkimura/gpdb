@@ -70,7 +70,7 @@ private:
 	// all the buckets in the histogram. This is shared among histograms,
 	// so must not be modified unless we first make a new copy. We do not copy
 	// histograms unless required, as it is an expensive operation in memory and time.
-	gpos::owner<CBucketArray *> m_histogram_buckets;
+	gpos::Ref<CBucketArray> m_histogram_buckets;
 
 	// well-defined histogram. if false, then bounds are unknown
 	BOOL m_is_well_defined;
@@ -97,11 +97,10 @@ private:
 	BOOL m_is_col_stats_missing;
 
 	// return an array buckets after applying equality filter on the histogram buckets
-	gpos::owner<CBucketArray *> MakeBucketsWithEqualityFilter(
-		CPoint *point) const;
+	gpos::Ref<CBucketArray> MakeBucketsWithEqualityFilter(CPoint *point) const;
 
 	// return an array buckets after applying non equality filter on the histogram buckets
-	gpos::owner<CBucketArray *> MakeBucketsWithInequalityFilter(
+	gpos::Ref<CBucketArray> MakeBucketsWithInequalityFilter(
 		CPoint *point) const;
 
 	// less than or less than equal filter
@@ -142,23 +141,19 @@ private:
 	void ComputeSkew();
 
 	// helper to add buckets from one histogram to another
-	static void AddBuckets(CMemoryPool *mp,
-						   gpos::pointer<const CBucketArray *> src_buckets,
-						   gpos::pointer<CBucketArray *> dest_buckets,
-						   CDouble rows_old, CDouble rows_new, ULONG begin,
+	static void AddBuckets(CMemoryPool *mp, const CBucketArray *src_buckets,
+						   CBucketArray *dest_buckets, CDouble rows_old,
+						   CDouble rows_new, ULONG begin, ULONG end);
+
+	static void AddBuckets(CMemoryPool *mp, const CBucketArray *src_buckets,
+						   CBucketArray *dest_buckets, CDouble rows,
+						   CDoubleArray *dest_bucket_freqs, ULONG begin,
 						   ULONG end);
 
-	static void AddBuckets(CMemoryPool *mp,
-						   gpos::pointer<const CBucketArray *> src_buckets,
-						   gpos::pointer<CBucketArray *> dest_buckets,
-						   CDouble rows,
-						   gpos::pointer<CDoubleArray *> dest_bucket_freqs,
-						   ULONG begin, ULONG end);
-
 	// helper to combine histogram buckets to reduce total buckets
-	static gpos::owner<CBucketArray *> CombineBuckets(
-		CMemoryPool *mp, gpos::pointer<CBucketArray *> buckets,
-		ULONG desired_num_buckets);
+	static gpos::Ref<CBucketArray> CombineBuckets(CMemoryPool *mp,
+												  CBucketArray *buckets,
+												  ULONG desired_num_buckets);
 
 	// check if we can compute NDVRemain for JOIN histogram for the given input histograms
 	static BOOL CanComputeJoinNDVRemain(const CHistogram *histogram1,
@@ -168,7 +163,7 @@ private:
 	// by the histogram
 	static void ComputeJoinNDVRemainInfo(
 		const CHistogram *histogram1, const CHistogram *histogram2,
-		gpos::pointer<const CBucketArray *> join_buckets,  // join buckets
+		const CBucketArray *join_buckets,  // join buckets
 		CDouble
 			hist1_buckets_freq,	 // frequency of the buckets in input1 that contributed to the join
 		CDouble
@@ -182,16 +177,16 @@ private:
 	BOOL IsHistogramForTextRelatedTypes() const;
 
 	// add residual union all buckets after the merge
-	ULONG AddResidualUnionAllBucket(
-		gpos::pointer<CBucketArray *> histogram_buckets, CBucket *bucket,
-		CDouble rows_old, CDouble rows_new, BOOL bucket_is_residual,
-		ULONG index) const;
+	ULONG AddResidualUnionAllBucket(CBucketArray *histogram_buckets,
+									CBucket *bucket, CDouble rows_old,
+									CDouble rows_new, BOOL bucket_is_residual,
+									ULONG index) const;
 
 	// add residual union buckets after the merge
-	ULONG AddResidualUnionBucket(
-		gpos::pointer<CBucketArray *> histogram_buckets, CBucket *bucket,
-		CDouble rows, BOOL bucket_is_residual, ULONG index,
-		gpos::pointer<CDoubleArray *> dest_bucket_freqs) const;
+	ULONG AddResidualUnionBucket(CBucketArray *histogram_buckets,
+								 CBucket *bucket, CDouble rows,
+								 BOOL bucket_is_residual, ULONG index,
+								 CDoubleArray *dest_bucket_freqs) const;
 
 	// used to keep track of adjacent stats buckets and how similar
 	// they are in terms of distribution
@@ -229,12 +224,12 @@ public:
 
 	// ctors
 	explicit CHistogram(CMemoryPool *mp,
-						gpos::owner<CBucketArray *> histogram_buckets,
+						gpos::Ref<CBucketArray> histogram_buckets,
 						BOOL is_well_defined = true);
 
 	explicit CHistogram(CMemoryPool *mp, BOOL is_well_defined = true);
 
-	CHistogram(CMemoryPool *mp, gpos::owner<CBucketArray *> histogram_buckets,
+	CHistogram(CMemoryPool *mp, gpos::Ref<CBucketArray> histogram_buckets,
 			   BOOL is_well_defined, CDouble null_freq,
 			   CDouble distinct_remaining, CDouble freq_remaining,
 			   BOOL is_col_stats_missing = false);
@@ -327,10 +322,10 @@ public:
 	}
 
 	// buckets accessor
-	gpos::pointer<const CBucketArray *>
+	const CBucketArray *
 	GetBuckets() const
 	{
-		return m_histogram_buckets;
+		return m_histogram_buckets.get();
 	}
 
 	// well defined
@@ -367,7 +362,7 @@ public:
 	// destructor
 	virtual ~CHistogram()
 	{
-		m_histogram_buckets->Release();
+		;
 	}
 
 	// normalize histogram and return scaling factor
@@ -377,7 +372,7 @@ public:
 	BOOL IsNormalized() const;
 
 	// translate the histogram into a derived column stats
-	gpos::owner<CDXLStatsDerivedColumn *> TranslateToDXLDerivedColumnStats(
+	gpos::Ref<CDXLStatsDerivedColumn> TranslateToDXLDerivedColumnStats(
 		CMDAccessor *md_accessor, ULONG colid, CDouble width) const;
 
 	// randomly pick a bucket index
@@ -442,25 +437,25 @@ public:
 	static CHistogram *MakeDefaultBoolHistogram(CMemoryPool *mp);
 
 	// helper method to append histograms from one map to the other
-	static void AddHistograms(
-		CMemoryPool *mp, gpos::pointer<UlongToHistogramMap *> src_histograms,
-		gpos::pointer<UlongToHistogramMap *> dest_histograms);
+	static void AddHistograms(CMemoryPool *mp,
+							  UlongToHistogramMap *src_histograms,
+							  UlongToHistogramMap *dest_histograms);
 
 	// add dummy histogram buckets and column width for the array of columns
 	static void AddDummyHistogramAndWidthInfo(
 		CMemoryPool *mp, CColumnFactory *col_factory,
-		gpos::pointer<UlongToHistogramMap *> output_histograms,
-		gpos::pointer<UlongToDoubleMap *> output_col_widths,
-		gpos::pointer<const ULongPtrArray *> columns, BOOL is_empty);
+		UlongToHistogramMap *output_histograms,
+		UlongToDoubleMap *output_col_widths, const ULongPtrArray *columns,
+		BOOL is_empty);
 
 	// add dummy histogram buckets for the columns in the input histogram
-	static void AddEmptyHistogram(
-		CMemoryPool *mp, gpos::pointer<UlongToHistogramMap *> output_histograms,
-		gpos::pointer<UlongToHistogramMap *> input_histograms);
+	static void AddEmptyHistogram(CMemoryPool *mp,
+								  UlongToHistogramMap *output_histograms,
+								  UlongToHistogramMap *input_histograms);
 
 	// create a deep copy of m_histogram_buckets
-	static gpos::owner<CBucketArray *> DeepCopyHistogramBuckets(
-		CMemoryPool *mp, gpos::pointer<const CBucketArray *> buckets);
+	static gpos::Ref<CBucketArray> DeepCopyHistogramBuckets(
+		CMemoryPool *mp, const CBucketArray *buckets);
 
 	// default histogram selectivity
 	static const CDouble DefaultSelectivity;

@@ -35,9 +35,8 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 CPhysicalBitmapTableScan::CPhysicalBitmapTableScan(
-	CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
-	ULONG ulOriginOpId, const CName *pnameTableAlias,
-	gpos::owner<CColRefArray *> pdrgpcrOutput)
+	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+	const CName *pnameTableAlias, gpos::Ref<CColRefArray> pdrgpcrOutput)
 	: CPhysicalScan(mp, pnameTableAlias, std::move(ptabdesc),
 					std::move(pdrgpcrOutput)),
 	  m_ulOriginOpId(ulOriginOpId)
@@ -60,8 +59,8 @@ CPhysicalBitmapTableScan::HashValue() const
 {
 	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(),
 									   m_ptabdesc->MDId()->HashValue());
-	ulHash =
-		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrOutput));
+	ulHash = gpos::CombineHashes(ulHash,
+								 CUtils::UlHashColArray(m_pdrgpcrOutput.get()));
 
 	return ulHash;
 }
@@ -75,7 +74,7 @@ CPhysicalBitmapTableScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalBitmapTableScan::Matches(gpos::pointer<COperator *> pop) const
+CPhysicalBitmapTableScan::Matches(COperator *pop) const
 {
 	return CUtils::FMatchBitmapScan(this, pop);
 }
@@ -97,7 +96,7 @@ CPhysicalBitmapTableScan::OsPrint(IOstream &os) const
 	m_ptabdesc->Name().OsPrint(os);
 	os << ")";
 	os << ", Columns: [";
-	CUtils::OsPrintDrgPcr(os, m_pdrgpcrOutput);
+	CUtils::OsPrintDrgPcr(os, m_pdrgpcrOutput.get());
 	os << "]";
 
 	return os;

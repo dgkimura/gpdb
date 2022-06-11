@@ -57,10 +57,10 @@ public:
 	struct SEdge : public CRefCount, public DbgPrintMixin<SEdge>
 	{
 		// cover of edge
-		gpos::owner<CBitSet *> m_pbs;
+		gpos::Ref<CBitSet> m_pbs;
 
 		// associated conjunct
-		gpos::owner<CExpression *> m_pexpr;
+		gpos::Ref<CExpression> m_pexpr;
 
 		// tracks if the associated join is a LOJ:
 		// check the derived classes of CJoinOrder, but here is a high-level summary:
@@ -73,7 +73,7 @@ public:
 		BOOL m_fUsed;
 
 		// ctor
-		SEdge(CMemoryPool *mp, gpos::owner<CExpression *> pexpr, ULONG loj_num);
+		SEdge(CMemoryPool *mp, gpos::Ref<CExpression> pexpr, ULONG loj_num);
 
 		// dtor
 		~SEdge() override;
@@ -94,13 +94,13 @@ public:
 	struct SComponent : public CRefCount, public DbgPrintMixin<SComponent>
 	{
 		// cover
-		gpos::owner<CBitSet *> m_pbs;
+		gpos::Ref<CBitSet> m_pbs;
 
 		// set of edges associated with this component (stored as indexes into m_rgpedge array)
-		gpos::owner<CBitSet *> m_edge_set;
+		gpos::Ref<CBitSet> m_edge_set;
 
 		// associated expression
-		gpos::owner<CExpression *> m_pexpr;
+		gpos::Ref<CExpression> m_pexpr;
 
 		// a flag to component edge as used
 		BOOL m_fUsed;
@@ -156,13 +156,13 @@ public:
 		EPosition m_position;
 
 		// ctor
-		SComponent(CMemoryPool *mp, gpos::owner<CExpression *> expr,
+		SComponent(CMemoryPool *mp, gpos::Ref<CExpression> expr,
 				   INT parent_loj_id = NON_LOJ_DEFAULT_ID,
 				   EPosition position = EpSentinel);
 
 		// ctor
-		SComponent(gpos::owner<CExpression *> expr, gpos::owner<CBitSet *> pbs,
-				   gpos::owner<CBitSet *> edge_set,
+		SComponent(gpos::Ref<CExpression> expr, gpos::Ref<CBitSet> pbs,
+				   gpos::Ref<CBitSet> edge_set,
 				   INT parent_loj_id = NON_LOJ_DEFAULT_ID,
 				   EPosition position = EpSentinel);
 
@@ -212,14 +212,13 @@ protected:
 	void ComputeEdgeCover();
 
 	// combine the two given components using applicable edges
-	gpos::owner<SComponent *> PcompCombine(gpos::pointer<SComponent *> comp1,
-										   gpos::pointer<SComponent *> comp2);
+	gpos::Ref<SComponent> PcompCombine(SComponent *comp1, SComponent *comp2);
 
 	// derive stats on a given component
-	virtual void DeriveStats(gpos::pointer<CExpression *> pexpr);
+	virtual void DeriveStats(CExpression *pexpr);
 
 	// mark edges used by expression
-	void MarkUsedEdges(gpos::pointer<SComponent *> comp);
+	void MarkUsedEdges(SComponent *comp);
 
 	// add component to to component array
 	void AddComponent(CMemoryPool *mp, CExpression *expr, INT loj_id,
@@ -230,17 +229,14 @@ public:
 	CJoinOrder(const CJoinOrder &) = delete;
 
 	// ctor used in MinCard, Greedy and DP xforms
-	CJoinOrder(CMemoryPool *mp,
-			   gpos::owner<CExpressionArray *> pdrgpexprComponents,
-			   gpos::owner<CExpressionArray *> pdrgpexprConjuncts,
+	CJoinOrder(CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprComponents,
+			   gpos::Ref<CExpressionArray> pdrgpexprConjuncts,
 			   BOOL include_outer_join_childs);
 
 	// ctor used in CXformExpandNAryJoinDPv2
-	CJoinOrder(CMemoryPool *mp,
-			   gpos::owner<CExpressionArray *> pdrgpexprComponents,
-			   gpos::owner<CExpressionArray *> innerJoinPredConjuncts,
-			   gpos::pointer<CExpressionArray *> onPreds,
-			   gpos::pointer<ULongPtrArray *> childPredIndexes);
+	CJoinOrder(CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprComponents,
+			   gpos::Ref<CExpressionArray> innerJoinPredConjuncts,
+			   CExpressionArray *onPreds, ULongPtrArray *childPredIndexes);
 
 	// dtor
 	virtual ~CJoinOrder();
@@ -249,12 +245,10 @@ public:
 	IOstream &OsPrint(IOstream &) const;
 
 	// is this a valid join combination
-	static BOOL IsValidJoinCombination(gpos::pointer<SComponent *> comp1,
-									   gpos::pointer<SComponent *> comp2);
+	static BOOL IsValidJoinCombination(SComponent *comp1, SComponent *comp2);
 
 	// are these childs of the same LOJ
-	static BOOL IsChildOfSameLOJ(gpos::pointer<SComponent *> comp1,
-								 gpos::pointer<SComponent *> comp2);
+	static BOOL IsChildOfSameLOJ(SComponent *comp1, SComponent *comp2);
 
 	virtual CXform::EXformId
 	EOriginXForm() const

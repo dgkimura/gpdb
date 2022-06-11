@@ -43,7 +43,7 @@ class CParseHandlerColStats : public CParseHandlerMetadataObject
 {
 private:
 	// mdid of the col stats object
-	gpos::owner<CMDIdColStats *> m_mdid;
+	gpos::Ref<CMDIdColStats> m_mdid;
 
 	// name of the column
 	CMDName *m_md_name;

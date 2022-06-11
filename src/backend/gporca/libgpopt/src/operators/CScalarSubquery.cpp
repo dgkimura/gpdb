@@ -59,7 +59,7 @@ CScalarSubquery::~CScalarSubquery() = default;
 //		Type of scalar's value
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarSubquery::MdidType() const
 {
 	return m_pcr->RetrieveType()->MDId();
@@ -90,11 +90,11 @@ CScalarSubquery::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSubquery::Matches(gpos::pointer<COperator *> pop) const
+CScalarSubquery::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarSubquery *> popScalarSubquery =
+		CScalarSubquery *popScalarSubquery =
 			gpos::dyn_cast<CScalarSubquery>(pop);
 
 		// match if computed columns are identical
@@ -116,10 +116,10 @@ CScalarSubquery::Matches(gpos::pointer<COperator *> pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
-CScalarSubquery::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+gpos::Ref<COperator>
+CScalarSubquery::PopCopyWithRemappedColumns(CMemoryPool *mp,
+											UlongToColRefMap *colref_mapping,
+											BOOL must_exist)
 {
 	CColRef *colref = CUtils::PcrRemap(m_pcr, colref_mapping, must_exist);
 
@@ -136,15 +136,15 @@ CScalarSubquery::PopCopyWithRemappedColumns(
 //		Locally used columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CScalarSubquery::PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(1 == exprhdl.Arity());
 
 	// used columns is an empty set unless subquery column is an outer reference
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
-	gpos::pointer<CColRefSet *> pcrsChildOutput =
+	CColRefSet *pcrsChildOutput =
 		exprhdl.DeriveOutputColumns(0 /* child_index */);
 	if (!pcrsChildOutput->FMember(m_pcr))
 	{
@@ -163,13 +163,13 @@ CScalarSubquery::PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl)
 //		Derive partition consumers
 //
 //---------------------------------------------------------------------------
-gpos::owner<CPartInfo *>
+gpos::Ref<CPartInfo>
 CScalarSubquery::PpartinfoDerive(CMemoryPool *,	 // mp,
 								 CExpressionHandle &exprhdl) const
 {
-	gpos::pointer<CPartInfo *> ppartinfoChild = exprhdl.DerivePartitionInfo(0);
+	CPartInfo *ppartinfoChild = exprhdl.DerivePartitionInfo(0);
 	GPOS_ASSERT(nullptr != ppartinfoChild);
-	ppartinfoChild->AddRef();
+	;
 	return ppartinfoChild;
 }
 

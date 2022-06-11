@@ -44,16 +44,16 @@ public:
 	}
 
 	// left type
-	virtual gpos::pointer<IMDId *> GetLeftMdid() const = 0;
+	virtual IMDId *GetLeftMdid() const = 0;
 
 	// right type
-	virtual gpos::pointer<IMDId *> GetRightMdid() const = 0;
+	virtual IMDId *GetRightMdid() const = 0;
 
 	// comparison type
 	virtual IMDType::ECmpType ParseCmpType() const = 0;
 
 	// comparison operator id
-	virtual gpos::pointer<IMDId *> MdIdOp() const = 0;
+	virtual IMDId *MdIdOp() const = 0;
 };
 
 }  // namespace gpmd

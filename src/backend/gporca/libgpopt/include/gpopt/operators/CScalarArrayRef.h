@@ -37,24 +37,24 @@ class CScalarArrayRef : public CScalar
 {
 private:
 	// element type id
-	gpos::owner<IMDId *> m_pmdidElem;
+	gpos::Ref<IMDId> m_pmdidElem;
 
 	// element type modifier
 	INT m_type_modifier;
 
 	// array type id
-	gpos::owner<IMDId *> m_pmdidArray;
+	gpos::Ref<IMDId> m_pmdidArray;
 
 	// return type id
-	gpos::owner<IMDId *> m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CScalarArrayRef(const CScalarArrayRef &) = delete;
 
 	// ctor
-	CScalarArrayRef(CMemoryPool *mp, gpos::owner<IMDId *> elem_type_mdid,
-					INT type_modifier, gpos::owner<IMDId *> array_type_mdid,
-					gpos::owner<IMDId *> return_type_mdid);
+	CScalarArrayRef(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+					INT type_modifier, gpos::Ref<IMDId> array_type_mdid,
+					gpos::Ref<IMDId> return_type_mdid);
 
 	// dtor
 	~CScalarArrayRef() override;
@@ -74,27 +74,27 @@ public:
 	}
 
 	// element type id
-	gpos::pointer<IMDId *>
+	IMDId *
 	PmdidElem() const
 	{
-		return m_pmdidElem;
+		return m_pmdidElem.get();
 	}
 
 	// element type modifier
 	INT TypeModifier() const override;
 
 	// array type id
-	gpos::pointer<IMDId *>
+	IMDId *
 	PmdidArray() const
 	{
-		return m_pmdidArray;
+		return m_pmdidArray.get();
 	}
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -104,25 +104,24 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
 
 	// type of expression's result
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarArrayRef *>
+	static CScalarArrayRef *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

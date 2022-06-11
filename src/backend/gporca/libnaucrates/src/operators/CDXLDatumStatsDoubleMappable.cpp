@@ -34,7 +34,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLDatumStatsDoubleMappable::CDXLDatumStatsDoubleMappable(
-	CMemoryPool *mp, gpos::owner<IMDId *> mdid_type, INT type_modifier,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid_type, INT type_modifier,
 	BOOL is_null, BYTE *data, ULONG length, CDouble val)
 	: CDXLDatumGeneric(mp, std::move(mdid_type), type_modifier, is_null, data,
 					   length),

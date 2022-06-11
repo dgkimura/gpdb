@@ -28,20 +28,20 @@ class CMDIndexInfo : public IMDInterface
 {
 private:
 	// index mdid
-	gpos::owner<IMDId *> m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// is the index partial
 	BOOL m_is_partial;
 
 public:
 	// ctor
-	CMDIndexInfo(gpos::owner<IMDId *> mdid, BOOL is_partial);
+	CMDIndexInfo(gpos::Ref<IMDId> mdid, BOOL is_partial);
 
 	// dtor
 	~CMDIndexInfo() override;
 
 	// index mdid
-	gpos::pointer<IMDId *> MDId() const;
+	IMDId *MDId() const;
 
 	// is the index partial
 	BOOL IsPartial() const;

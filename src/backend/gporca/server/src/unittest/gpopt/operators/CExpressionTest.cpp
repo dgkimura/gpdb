@@ -50,27 +50,27 @@ using namespace gpos;
 // 		Caller takes ownership of returned pointer.
 //
 //---------------------------------------------------------------------------
-gpos::owner<CReqdPropPlan *>
+gpos::Ref<CReqdPropPlan>
 CExpressionTest::PrppCreateRequiredProperties(CMemoryPool *mp,
-											  gpos::owner<CColRefSet *> pcrs)
+											  gpos::Ref<CColRefSet> pcrs)
 {
-	gpos::owner<COrderSpec *> pos = GPOS_NEW(mp) COrderSpec(mp);
-	gpos::owner<CDistributionSpec *> pds = GPOS_NEW(mp)
+	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<CDistributionSpec> pds = GPOS_NEW(mp)
 		CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
-	gpos::owner<CRewindabilitySpec *> prs = GPOS_NEW(mp) CRewindabilitySpec(
+	gpos::Ref<CRewindabilitySpec> prs = GPOS_NEW(mp) CRewindabilitySpec(
 		CRewindabilitySpec::ErtNone, CRewindabilitySpec::EmhtNoMotion);
-	gpos::owner<CEnfdOrder *> peo =
+	gpos::Ref<CEnfdOrder> peo =
 		GPOS_NEW(mp) CEnfdOrder(std::move(pos), CEnfdOrder::EomSatisfy);
-	gpos::owner<CPartitionPropagationSpec *> pps =
+	gpos::Ref<CPartitionPropagationSpec> pps =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
-	gpos::owner<CEnfdDistribution *> ped = GPOS_NEW(mp)
+	gpos::Ref<CEnfdDistribution> ped = GPOS_NEW(mp)
 		CEnfdDistribution(std::move(pds), CEnfdDistribution::EdmSatisfy);
-	gpos::owner<CEnfdRewindability *> per = GPOS_NEW(mp)
+	gpos::Ref<CEnfdRewindability> per = GPOS_NEW(mp)
 		CEnfdRewindability(std::move(prs), CEnfdRewindability::ErmSatisfy);
-	gpos::owner<CEnfdPartitionPropagation *> pepp =
+	gpos::Ref<CEnfdPartitionPropagation> pepp =
 		GPOS_NEW(mp) CEnfdPartitionPropagation(
 			std::move(pps), CEnfdPartitionPropagation::EppmSatisfy);
-	gpos::owner<CCTEReq *> pcter = GPOS_NEW(mp) CCTEReq(mp);
+	gpos::Ref<CCTEReq> pcter = GPOS_NEW(mp) CCTEReq(mp);
 	return GPOS_NEW(mp)
 		CReqdPropPlan(std::move(pcrs), std::move(peo), std::move(ped),
 					  std::move(per), std::move(pepp), std::move(pcter));
@@ -86,19 +86,19 @@ CExpressionTest::PrppCreateRequiredProperties(CMemoryPool *mp,
 //		Caller takes ownership of returned pointer.
 //
 //---------------------------------------------------------------------------
-gpos::owner<CExpression *>
+gpos::Ref<CExpression>
 CExpressionTest::PexprCreateGbyWithColumnFormat(CMemoryPool *mp,
 												const WCHAR *wszColNameFormat)
 {
 	CWStringConst strRelName(GPOS_WSZ_LIT("Rel1"));
-	gpos::owner<CMDIdGPDB *> rel_mdid =
+	gpos::Ref<CMDIdGPDB> rel_mdid =
 		GPOS_NEW(mp) CMDIdGPDB(GPOPT_TEST_REL_OID1, 1, 1);
-	gpos::owner<CTableDescriptor *> ptabdesc =
+	gpos::Ref<CTableDescriptor> ptabdesc =
 		CTestUtils::PtabdescPlainWithColNameFormat(mp, 3, std::move(rel_mdid),
 												   wszColNameFormat,
 												   CName(&strRelName), false);
 	CWStringConst strRelAlias(GPOS_WSZ_LIT("Rel1"));
-	gpos::owner<CExpression *> pexprGet =
+	gpos::Ref<CExpression> pexprGet =
 		CTestUtils::PexprLogicalGet(mp, std::move(ptabdesc), &strRelAlias);
 	return CTestUtils::PexprLogicalGbAggWithInput(mp, std::move(pexprGet));
 }
@@ -159,11 +159,11 @@ CExpressionTest::EresUnittest_SimpleOps()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	using Pfpexpr = gpos::owner<CExpression *> (*)(CMemoryPool *);
+	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *);
 
 	Pfpexpr rgpf[] = {
 		CTestUtils::PexprLogicalGet,
@@ -204,13 +204,12 @@ CExpressionTest::EresUnittest_SimpleOps()
 						 CTestUtils::GetCostModel(mp));
 
 		// generate simple expression
-		gpos::owner<CExpression *> pexpr = rgpf[i](mp);
+		gpos::Ref<CExpression> pexpr = rgpf[i](mp);
 
-		gpos::pointer<CLogicalGet *> popGet =
-			dynamic_cast<CLogicalGet *>(pexpr->Pop());
-		gpos::pointer<CLogicalDynamicGetBase *> popDynGet =
+		CLogicalGet *popGet = dynamic_cast<CLogicalGet *>(pexpr->Pop());
+		CLogicalDynamicGetBase *popDynGet =
 			dynamic_cast<CLogicalDynamicGetBase *>(pexpr->Pop());
-		gpos::pointer<CColRefArray *> colrefs = nullptr;
+		CColRefArray *colrefs = nullptr;
 
 		if (nullptr != popGet)
 		{
@@ -230,7 +229,7 @@ CExpressionTest::EresUnittest_SimpleOps()
 		}
 
 		// self-match
-		GPOS_ASSERT(pexpr->FMatchDebug(pexpr));
+		GPOS_ASSERT(pexpr->FMatchDebug(pexpr.get()));
 
 		// debug print
 		CWStringDynamic str(mp, GPOS_WSZ_LIT("\n"));
@@ -251,31 +250,29 @@ CExpressionTest::EresUnittest_SimpleOps()
 		CColRef *pcrOld = pexpr->DeriveOutputColumns()->PcrAny();
 		CColRef *new_colref =
 			COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(pcrOld);
-		gpos::owner<UlongToColRefMap *> colref_mapping =
+		gpos::Ref<UlongToColRefMap> colref_mapping =
 			GPOS_NEW(mp) UlongToColRefMap(mp);
 
 		BOOL result = colref_mapping->Insert(GPOS_NEW(mp) ULONG(pcrOld->Id()),
 											 new_colref);
 		GPOS_ASSERT(result);
-		gpos::owner<CExpression *> pexprCopy =
-			pexpr->PexprCopyWithRemappedColumns(mp, colref_mapping,
-												true /*must_exist*/);
-		colref_mapping->Release();
+		gpos::Ref<CExpression> pexprCopy = pexpr->PexprCopyWithRemappedColumns(
+			mp, colref_mapping, true /*must_exist*/);
+		;
 		oss << std::endl
 			<< "COPIED EXPRESSION (AFTER MAPPING " << *pcrOld << " TO "
 			<< *new_colref << "):" << std::endl;
 		GPOS_TRACE(str.GetBuffer());
 		str.Reset();
 		pexprCopy->DbgPrint();
-		pexprCopy->Release();
+		;
 
 		// derive stats on expression
-		gpos::owner<CReqdPropRelational *> prprel =
+		gpos::Ref<CReqdPropRelational> prprel =
 			GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp));
-		gpos::owner<IStatisticsArray *> stats_ctxt =
+		gpos::Ref<IStatisticsArray> stats_ctxt =
 			GPOS_NEW(mp) IStatisticsArray(mp);
-		gpos::pointer<IStatistics *> stats =
-			pexpr->PstatsDerive(prprel, stats_ctxt);
+		IStatistics *stats = pexpr->PstatsDerive(prprel, stats_ctxt);
 		GPOS_ASSERT(nullptr != stats);
 
 		oss << "Expected risk: " << rgulRisk[i] << std::endl;
@@ -284,12 +281,12 @@ CExpressionTest::EresUnittest_SimpleOps()
 
 		GPOS_ASSERT(rgulRisk[i] == stats->StatsEstimationRisk());
 
-		prprel->Release();
-		stats_ctxt->Release();
+		;
+		;
 #endif	// GPOS_DEBUG
 
 		// cleanup
-		pexpr->Release();
+		;
 	}
 
 	return GPOS_OK;
@@ -309,8 +306,8 @@ CExpressionTest::EresUnittest_Union()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -319,7 +316,7 @@ CExpressionTest::EresUnittest_Union()
 					 CTestUtils::GetCostModel(mp));
 
 	// build union tree of depth 2
-	gpos::owner<CExpression *> pexpr = CTestUtils::PexprLogicalUnion(mp, 2);
+	gpos::Ref<CExpression> pexpr = CTestUtils::PexprLogicalUnion(mp, 2);
 
 	// debug print
 	CWStringDynamic str(mp);
@@ -332,22 +329,20 @@ CExpressionTest::EresUnittest_Union()
 	(void) pexpr->PdpDerive();
 
 #ifdef GPOS_DEBUG
-	gpos::owner<CReqdPropRelational *> prprel =
+	gpos::Ref<CReqdPropRelational> prprel =
 		GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp));
-	gpos::owner<IStatisticsArray *> stats_ctxt =
-		GPOS_NEW(mp) IStatisticsArray(mp);
-	gpos::pointer<IStatistics *> stats =
-		pexpr->PstatsDerive(prprel, stats_ctxt);
+	gpos::Ref<IStatisticsArray> stats_ctxt = GPOS_NEW(mp) IStatisticsArray(mp);
+	IStatistics *stats = pexpr->PstatsDerive(prprel, stats_ctxt);
 	GPOS_ASSERT(nullptr != stats);
 
 	// We expect a risk of 3 because every Union increments the risk.
 	GPOS_ASSERT(3 == stats->StatsEstimationRisk());
-	stats_ctxt->Release();
-	prprel->Release();
+	;
+	;
 #endif	// GPOS_DEBUG
 
 	// cleanup
-	pexpr->Release();
+	;
 
 	return GPOS_OK;
 }
@@ -366,8 +361,8 @@ CExpressionTest::EresUnittest_BitmapGet()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -376,21 +371,20 @@ CExpressionTest::EresUnittest_BitmapGet()
 
 	CWStringConst strRelName(GPOS_WSZ_LIT("MyTable"));
 	CWStringConst strRelAlias(GPOS_WSZ_LIT("T"));
-	gpos::owner<CMDIdGPDB *> rel_mdid =
+	gpos::Ref<CMDIdGPDB> rel_mdid =
 		GPOS_NEW(mp) CMDIdGPDB(GPOPT_MDCACHE_TEST_OID, 1, 1);
 	const WCHAR *wszColNameFormat = GPOS_WSZ_LIT("column_%04d");
-	gpos::owner<CTableDescriptor *> ptabdesc =
+	gpos::Ref<CTableDescriptor> ptabdesc =
 		CTestUtils::PtabdescPlainWithColNameFormat(
 			mp, 3, rel_mdid, wszColNameFormat, CName(&strRelName), false);
 
 	// get the index associated with the table
-	gpos::pointer<const IMDRelation *> pmdrel =
-		mda.RetrieveRel(ptabdesc->MDId());
+	const IMDRelation *pmdrel = mda.RetrieveRel(ptabdesc->MDId());
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 
 	// create an index descriptor
-	gpos::pointer<IMDId *> pmdidIndex = pmdrel->IndexMDidAt(0 /*pos*/);
-	gpos::pointer<const IMDIndex *> pmdindex = mda.RetrieveIndex(pmdidIndex);
+	IMDId *pmdidIndex = pmdrel->IndexMDidAt(0 /*pos*/);
+	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
@@ -398,37 +392,35 @@ CExpressionTest::EresUnittest_BitmapGet()
 	GPOS_ASSERT(2 < num_cols);
 
 	// create an index on the first column
-	gpos::pointer<const IMDColumn *> pmdcol = pmdrel->GetMdCol(0);
-	gpos::pointer<const IMDType *> pmdtype =
-		mda.RetrieveType(pmdcol->MdidType());
+	const IMDColumn *pmdcol = pmdrel->GetMdCol(0);
+	const IMDType *pmdtype = mda.RetrieveType(pmdcol->MdidType());
 	CColRef *pcrFirst = col_factory->PcrCreate(pmdtype, pmdcol->TypeModifier());
 
-	gpos::owner<CExpression *> pexprIndexCond = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CExpression> pexprIndexCond = CUtils::PexprScalarEqCmp(
 		mp, pcrFirst, CUtils::PexprScalarConstInt4(mp, 20 /*val*/));
 
-	gpos::owner<CMDIdGPDB *> mdid =
+	gpos::Ref<CMDIdGPDB> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_unknown);
-	gpos::owner<CIndexDescriptor *> pindexdesc =
-		CIndexDescriptor::Pindexdesc(mp, ptabdesc, pmdindex);
-	gpos::owner<CExpression *> pexprBitmapIndex = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CIndexDescriptor> pindexdesc =
+		CIndexDescriptor::Pindexdesc(mp, ptabdesc.get(), pmdindex);
+	gpos::Ref<CExpression> pexprBitmapIndex = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CScalarBitmapIndexProbe(mp, pindexdesc, mdid),
 		pexprIndexCond);
 
-	gpos::owner<CColRefArray *> pdrgpcrTable = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> pdrgpcrTable = GPOS_NEW(mp) CColRefArray(mp);
 	for (ULONG ul = 0; ul < num_cols; ++ul)
 	{
-		gpos::pointer<const IMDColumn *> pmdcol = pmdrel->GetMdCol(ul);
-		gpos::pointer<const IMDType *> pmdtype =
-			mda.RetrieveType(pmdcol->MdidType());
+		const IMDColumn *pmdcol = pmdrel->GetMdCol(ul);
+		const IMDType *pmdtype = mda.RetrieveType(pmdcol->MdidType());
 		CColRef *colref =
 			col_factory->PcrCreate(pmdtype, pmdcol->TypeModifier());
 		pdrgpcrTable->Append(colref);
 	}
 
-	gpos::owner<CExpression *> pexprTableCond = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CExpression> pexprTableCond = CUtils::PexprScalarEqCmp(
 		mp, pcrFirst, CUtils::PexprScalarConstInt4(mp, 20 /*val*/));
 
-	gpos::owner<CExpression *> pexprBitmapTableGet = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprBitmapTableGet = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
 			CLogicalBitmapTableGet(mp, ptabdesc,
@@ -458,13 +450,13 @@ CExpressionTest::EresUnittest_BitmapGet()
 	(void) pexprBitmapTableGet->PdpDerive();
 
 	// test matching of bitmap index probe expressions
-	gpos::owner<CMDIdGPDB *> pmdid2 =
+	gpos::Ref<CMDIdGPDB> pmdid2 =
 		GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_unknown);
-	gpos::owner<CIndexDescriptor *> pindexdesc2 =
-		CIndexDescriptor::Pindexdesc(mp, ptabdesc, pmdindex);
-	gpos::owner<CExpression *> pexprIndexCond2 = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CIndexDescriptor> pindexdesc2 =
+		CIndexDescriptor::Pindexdesc(mp, ptabdesc.get(), pmdindex);
+	gpos::Ref<CExpression> pexprIndexCond2 = CUtils::PexprScalarEqCmp(
 		mp, pcrFirst, CUtils::PexprScalarConstInt4(mp, 20 /*val*/));
-	gpos::owner<CExpression *> pexprBitmapIndex2 = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprBitmapIndex2 = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CScalarBitmapIndexProbe(
 						mp, std::move(pindexdesc2), std::move(pmdid2)),
@@ -482,30 +474,30 @@ CExpressionTest::EresUnittest_BitmapGet()
 		));
 
 	GPOS_ASSERT(strIndex2.Equals(&strExpectedDebugPrintIndex2));
-	GPOS_ASSERT(pexprBitmapIndex2->Matches(pexprBitmapIndex));
+	GPOS_ASSERT(pexprBitmapIndex2->Matches(pexprBitmapIndex.get()));
 
-	mdid->AddRef();
-	pexprBitmapIndex->AddRef();
-	pexprBitmapIndex2->AddRef();
-	gpos::owner<CExpression *> pexprBitmapBoolOp1 = GPOS_NEW(mp) CExpression(
+	;
+	;
+	;
+	gpos::Ref<CExpression> pexprBitmapBoolOp1 = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
 			CScalarBitmapBoolOp(mp, CScalarBitmapBoolOp::EbitmapboolAnd, mdid),
 		pexprBitmapIndex, pexprBitmapIndex2);
 
-	mdid->AddRef();
-	pexprBitmapIndex->AddRef();
-	gpos::owner<CExpression *> pexprBitmapBoolOp2 = GPOS_NEW(mp) CExpression(
+	;
+	;
+	gpos::Ref<CExpression> pexprBitmapBoolOp2 = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
 			CScalarBitmapBoolOp(mp, CScalarBitmapBoolOp::EbitmapboolAnd, mdid),
 		pexprBitmapIndex, pexprBitmapIndex2);
-	GPOS_ASSERT(pexprBitmapBoolOp2->Matches(pexprBitmapBoolOp1));
+	GPOS_ASSERT(pexprBitmapBoolOp2->Matches(pexprBitmapBoolOp1.get()));
 
 	// cleanup
-	pexprBitmapBoolOp2->Release();
-	pexprBitmapBoolOp1->Release();
-	pexprBitmapTableGet->Release();
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -525,8 +517,8 @@ CExpressionTest::EresUnittest_Const()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -535,22 +527,17 @@ CExpressionTest::EresUnittest_Const()
 					 CTestUtils::GetCostModel(mp));
 
 	BOOL value = true;
-	gpos::owner<CExpression *> pexprTrue =
-		CUtils::PexprScalarConstBool(mp, value);
+	gpos::Ref<CExpression> pexprTrue = CUtils::PexprScalarConstBool(mp, value);
 
 	value = false;
-	gpos::owner<CExpression *> pexprFalse =
-		CUtils::PexprScalarConstBool(mp, value);
+	gpos::Ref<CExpression> pexprFalse = CUtils::PexprScalarConstBool(mp, value);
 
 	ULONG ulVal = 123456;
-	gpos::owner<CExpression *> pexprUl =
-		CUtils::PexprScalarConstInt4(mp, ulVal);
-	gpos::owner<CExpression *> pexprUl2nd =
-		CUtils::PexprScalarConstInt4(mp, ulVal);
+	gpos::Ref<CExpression> pexprUl = CUtils::PexprScalarConstInt4(mp, ulVal);
+	gpos::Ref<CExpression> pexprUl2nd = CUtils::PexprScalarConstInt4(mp, ulVal);
 
 	ulVal = 1;
-	gpos::owner<CExpression *> pexprUlOne =
-		CUtils::PexprScalarConstInt4(mp, ulVal);
+	gpos::Ref<CExpression> pexprUlOne = CUtils::PexprScalarConstInt4(mp, ulVal);
 
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
@@ -562,15 +549,14 @@ CExpressionTest::EresUnittest_Const()
 	pexprUlOne->OsPrint(oss);
 
 #ifdef GPOS_DEBUG
-	gpos::pointer<CScalarConst *> pscalarconstTrue =
+	CScalarConst *pscalarconstTrue =
 		gpos::dyn_cast<CScalarConst>(pexprTrue->Pop());
-	gpos::pointer<CScalarConst *> pscalarconstFalse =
+	CScalarConst *pscalarconstFalse =
 		gpos::dyn_cast<CScalarConst>(pexprFalse->Pop());
-	gpos::pointer<CScalarConst *> pscalarconstUl =
-		gpos::dyn_cast<CScalarConst>(pexprUl->Pop());
-	gpos::pointer<CScalarConst *> pscalarconstUl2nd =
+	CScalarConst *pscalarconstUl = gpos::dyn_cast<CScalarConst>(pexprUl->Pop());
+	CScalarConst *pscalarconstUl2nd =
 		gpos::dyn_cast<CScalarConst>(pexprUl2nd->Pop());
-	gpos::pointer<CScalarConst *> pscalarconstUlOne =
+	CScalarConst *pscalarconstUlOne =
 		gpos::dyn_cast<CScalarConst>(pexprUlOne->Pop());
 #endif	// GPOS_DEBUG
 
@@ -578,11 +564,11 @@ CExpressionTest::EresUnittest_Const()
 	GPOS_ASSERT(!pscalarconstTrue->Matches(pscalarconstFalse));
 	GPOS_ASSERT(!pscalarconstTrue->Matches(pscalarconstUlOne));
 
-	pexprTrue->Release();
-	pexprFalse->Release();
-	pexprUl->Release();
-	pexprUl2nd->Release();
-	pexprUlOne->Release();
+	;
+	;
+	;
+	;
+	;
 
 	GPOS_TRACE(str.GetBuffer());
 
@@ -606,8 +592,8 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -615,7 +601,7 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	gpos::pointer<const IMDType *> pmdtype = mda.PtMDType<IMDTypeInt4>();
+	const IMDType *pmdtype = mda.PtMDType<IMDTypeInt4>();
 
 	GPOS_ASSERT(
 		IMDType::EcmptEq ==
@@ -627,11 +613,11 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 		IMDType::EcmptG ==
 		CUtils::ParseCmpType(pmdtype->GetMdidForCmpType(IMDType::EcmptG)));
 
-	gpos::pointer<const IMDScalarOp *> pmdscopEq =
+	const IMDScalarOp *pmdscopEq =
 		mda.RetrieveScOp(pmdtype->GetMdidForCmpType(IMDType::EcmptEq));
-	gpos::pointer<const IMDScalarOp *> pmdscopLT =
+	const IMDScalarOp *pmdscopLT =
 		mda.RetrieveScOp(pmdtype->GetMdidForCmpType(IMDType::EcmptL));
-	gpos::pointer<const IMDScalarOp *> pmdscopGT =
+	const IMDScalarOp *pmdscopGT =
 		mda.RetrieveScOp(pmdtype->GetMdidForCmpType(IMDType::EcmptG));
 
 	GPOS_ASSERT(IMDType::EcmptNEq ==
@@ -654,27 +640,29 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 //
 //---------------------------------------------------------------------------
 void
-CExpressionTest::SetupPlanForFValidPlanTest(
-	CMemoryPool *mp, gpos::owner<CExpression *> *ppexprGby, CColRefSet **ppcrs,
-	gpos::owner<CExpression *> *ppexprPlan, gpos::owner<CReqdPropPlan *> *pprpp)
+CExpressionTest::SetupPlanForFValidPlanTest(CMemoryPool *mp,
+											gpos::Ref<CExpression> *ppexprGby,
+											CColRefSet **ppcrs,
+											gpos::Ref<CExpression> *ppexprPlan,
+											gpos::Ref<CReqdPropPlan> *pprpp)
 {
 	*ppexprGby =
 		PexprCreateGbyWithColumnFormat(mp, GPOS_WSZ_LIT("Test Column%d"));
 
 	// Create a column requirement using the first output column of the group by.
-	gpos::pointer<CColRefSet *> pcrsGby = (*ppexprGby)->DeriveOutputColumns();
+	CColRefSet *pcrsGby = (*ppexprGby)->DeriveOutputColumns();
 	*ppcrs = GPOS_NEW(mp) CColRefSet(mp);
 	(*ppcrs)->Include(pcrsGby->PcrFirst());
 
 	*pprpp = PrppCreateRequiredProperties(mp, *ppcrs);
 	CExpressionHandle exprhdl(mp);
-	exprhdl.Attach(*ppexprGby);
-	exprhdl.InitReqdProps(*pprpp);
+	exprhdl.Attach(ppexprGby->get());
+	exprhdl.InitReqdProps(pprpp->get());
 
 	// Optimize the logical plan under default required properties, which are always satisfied.
 	CEngine eng(mp);
 	CAutoP<CQueryContext> pqc;
-	pqc = CTestUtils::PqcGenerate(mp, *ppexprGby);
+	pqc = CTestUtils::PqcGenerate(mp, ppexprGby->get());
 	eng.Init(pqc.Value(), nullptr /*search_stage_array*/);
 	eng.Optimize();
 	*ppexprPlan = eng.PexprExtractPlan();
@@ -697,43 +685,43 @@ CExpressionTest::EresUnittest_FValidPlan()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
-	gpos::pointer<const IMDType *> pmdtype = mda.PtMDType<IMDTypeInt4>();
+	const IMDType *pmdtype = mda.PtMDType<IMDTypeInt4>();
 
 	// Create a group-by with a get child. Properties required contain one of the columns in the group by.
 	// Test that the plan is valid.
 	{
-		gpos::owner<CExpression *> pexprGby = nullptr;
+		gpos::Ref<CExpression> pexprGby = nullptr;
 		CColRefSet *pcrs = nullptr;
-		gpos::owner<CExpression *> pexprPlan = nullptr;
-		gpos::owner<CReqdPropPlan *> prpp = nullptr;
+		gpos::Ref<CExpression> pexprPlan = nullptr;
+		gpos::Ref<CReqdPropPlan> prpp = nullptr;
 
 		SetupPlanForFValidPlanTest(mp, &pexprGby, &pcrs, &pexprPlan, &prpp);
-		gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+		gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 			GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 
 		// Test that prpp is actually satisfied.
-		GPOS_ASSERT(pexprPlan->FValidPlan(prpp, pdpctxtplan));
-		pdpctxtplan->Release();
-		pexprPlan->Release();
-		prpp->Release();
-		pexprGby->Release();
+		GPOS_ASSERT(pexprPlan->FValidPlan(prpp.get(), pdpctxtplan));
+		;
+		;
+		;
+		;
 	}
 	// Create a group-by with a get child. Properties required contain one column that doesn't exist.
 	// Test that the plan is NOT valid.
 	{
-		gpos::owner<CExpression *> pexprGby =
+		gpos::Ref<CExpression> pexprGby =
 			PexprCreateGbyWithColumnFormat(mp, GPOS_WSZ_LIT("Test Column%d"));
 
 		(void) pexprGby->PdpDerive();
-		gpos::owner<CColRefSet *> pcrsInvalid = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> pcrsInvalid = GPOS_NEW(mp) CColRefSet(mp);
 		CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 		// Creating the column reference with the column factory ensures that it's a brand new column.
@@ -741,29 +729,29 @@ CExpressionTest::EresUnittest_FValidPlan()
 			col_factory->PcrCreate(pmdtype, default_type_modifier);
 		pcrsInvalid->Include(pcrComputed);
 
-		gpos::owner<CReqdPropPlan *> prpp =
+		gpos::Ref<CReqdPropPlan> prpp =
 			PrppCreateRequiredProperties(mp, std::move(pcrsInvalid));
 		CExpressionHandle exprhdl(mp);
-		exprhdl.Attach(pexprGby);
-		exprhdl.InitReqdProps(prpp);
+		exprhdl.Attach(pexprGby.get());
+		exprhdl.InitReqdProps(prpp.get());
 
 		// Optimize the logical plan, but under default required properties, which are always satisfied.
 		CEngine eng(mp);
 		CAutoP<CQueryContext> pqc;
-		pqc = CTestUtils::PqcGenerate(mp, pexprGby);
+		pqc = CTestUtils::PqcGenerate(mp, pexprGby.get());
 		eng.Init(pqc.Value(), nullptr /*search_stage_array*/);
 		eng.Optimize();
-		gpos::owner<CExpression *> pexprPlan = eng.PexprExtractPlan();
+		gpos::Ref<CExpression> pexprPlan = eng.PexprExtractPlan();
 
-		gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+		gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 			GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 
 		// Test that prpp is actually unsatisfied.
-		GPOS_ASSERT(!pexprPlan->FValidPlan(prpp, pdpctxtplan));
-		pdpctxtplan->Release();
-		pexprPlan->Release();
-		prpp->Release();
-		pexprGby->Release();
+		GPOS_ASSERT(!pexprPlan->FValidPlan(prpp.get(), pdpctxtplan));
+		;
+		;
+		;
+		;
 	}
 
 	return GPOS_OK;
@@ -784,8 +772,8 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidOrder()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -793,62 +781,62 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidOrder()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	gpos::owner<CExpression *> pexprGby = nullptr;
+	gpos::Ref<CExpression> pexprGby = nullptr;
 	CColRefSet *pcrs = nullptr;
-	gpos::owner<CExpression *> pexprPlan = nullptr;
-	gpos::owner<CReqdPropPlan *> prpp = nullptr;
+	gpos::Ref<CExpression> pexprPlan = nullptr;
+	gpos::Ref<CReqdPropPlan> prpp = nullptr;
 
 	SetupPlanForFValidPlanTest(mp, &pexprGby, &pcrs, &pexprPlan, &prpp);
-	gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+	gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 		GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 
 	// Create similar requirements, but
 	// add an order requirement using a couple of output columns of a Get
-	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	gpos::pointer<CColRefSet *> pcrsGet = pexprGet->DeriveOutputColumns();
-	gpos::owner<CColRefSet *> pcrsGetCopy =
-		GPOS_NEW(mp) CColRefSet(mp, *pcrsGet);
+	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
+	CColRefSet *pcrsGet = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsGetCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrsGet);
 
-	gpos::owner<CColRefArray *> pdrgpcrGet = pcrsGetCopy->Pdrgpcr(mp);
+	gpos::Ref<CColRefArray> pdrgpcrGet = pcrsGetCopy->Pdrgpcr(mp);
 	GPOS_ASSERT(2 <= pdrgpcrGet->Size());
 
-	gpos::owner<COrderSpec *> pos = GPOS_NEW(mp) COrderSpec(mp);
-	gpos::pointer<const IMDType *> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
-	gpos::owner<IMDId *> pmdidInt4LT =
+	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
+	const IMDType *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	gpos::Ref<IMDId> pmdidInt4LT =
 		pmdtypeint4->GetMdidForCmpType(IMDType::EcmptL);
-	pmdidInt4LT->AddRef();
+	;
 	pos->Append(std::move(pmdidInt4LT), (*pdrgpcrGet)[1], COrderSpec::EntFirst);
-	gpos::owner<CEnfdOrder *> peo =
+	gpos::Ref<CEnfdOrder> peo =
 		GPOS_NEW(mp) CEnfdOrder(std::move(pos), CEnfdOrder::EomSatisfy);
 
-	gpos::owner<CDistributionSpec *> pds = GPOS_NEW(mp)
+	gpos::Ref<CDistributionSpec> pds = GPOS_NEW(mp)
 		CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
-	gpos::owner<CRewindabilitySpec *> prs = GPOS_NEW(mp) CRewindabilitySpec(
+	gpos::Ref<CRewindabilitySpec> prs = GPOS_NEW(mp) CRewindabilitySpec(
 		CRewindabilitySpec::ErtNone, CRewindabilitySpec::EmhtNoMotion);
-	gpos::owner<CEnfdDistribution *> ped = GPOS_NEW(mp)
+	gpos::Ref<CEnfdDistribution> ped = GPOS_NEW(mp)
 		CEnfdDistribution(std::move(pds), CEnfdDistribution::EdmExact);
-	gpos::owner<CEnfdRewindability *> per = GPOS_NEW(mp)
+	gpos::Ref<CEnfdRewindability> per = GPOS_NEW(mp)
 		CEnfdRewindability(std::move(prs), CEnfdRewindability::ErmSatisfy);
-	gpos::owner<CPartitionPropagationSpec *> pps =
+	gpos::Ref<CPartitionPropagationSpec> pps =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
-	gpos::owner<CEnfdPartitionPropagation *> pepp =
+	gpos::Ref<CEnfdPartitionPropagation> pepp =
 		GPOS_NEW(mp) CEnfdPartitionPropagation(
 			std::move(pps), CEnfdPartitionPropagation::EppmSatisfy);
 
-	gpos::owner<CCTEReq *> pcter = GPOS_NEW(mp) CCTEReq(mp);
-	gpos::owner<CReqdPropPlan *> prppIncompatibleOrder = GPOS_NEW(mp)
+	gpos::Ref<CCTEReq> pcter = GPOS_NEW(mp) CCTEReq(mp);
+	gpos::Ref<CReqdPropPlan> prppIncompatibleOrder = GPOS_NEW(mp)
 		CReqdPropPlan(std::move(pcrsGetCopy), std::move(peo), std::move(ped),
 					  std::move(per), std::move(pepp), std::move(pcter));
 
 	// Test that the plan is not valid.
-	GPOS_ASSERT(!pexprPlan->FValidPlan(prppIncompatibleOrder, pdpctxtplan));
-	pdpctxtplan->Release();
-	prppIncompatibleOrder->Release();
-	pdrgpcrGet->Release();
-	prpp->Release();
-	pexprGet->Release();
-	pexprPlan->Release();
-	pexprGby->Release();
+	GPOS_ASSERT(
+		!pexprPlan->FValidPlan(prppIncompatibleOrder.get(), pdpctxtplan));
+	;
+	;
+	;
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -868,8 +856,8 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidDistribution()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -877,44 +865,43 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidDistribution()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	gpos::owner<CExpression *> pexprGby = nullptr;
+	gpos::Ref<CExpression> pexprGby = nullptr;
 	CColRefSet *pcrs = nullptr;
-	gpos::owner<CExpression *> pexprPlan = nullptr;
-	gpos::owner<CReqdPropPlan *> prpp = nullptr;
+	gpos::Ref<CExpression> pexprPlan = nullptr;
+	gpos::Ref<CReqdPropPlan> prpp = nullptr;
 
 	SetupPlanForFValidPlanTest(mp, &pexprGby, &pcrs, &pexprPlan, &prpp);
-	gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+	gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 		GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
-	gpos::owner<COrderSpec *> pos = GPOS_NEW(mp) COrderSpec(mp);
-	gpos::owner<CDistributionSpec *> pds =
-		GPOS_NEW(mp) CDistributionSpecRandom();
-	gpos::owner<CRewindabilitySpec *> prs = GPOS_NEW(mp) CRewindabilitySpec(
+	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<CDistributionSpec> pds = GPOS_NEW(mp) CDistributionSpecRandom();
+	gpos::Ref<CRewindabilitySpec> prs = GPOS_NEW(mp) CRewindabilitySpec(
 		CRewindabilitySpec::ErtNone, CRewindabilitySpec::EmhtNoMotion);
-	gpos::owner<CEnfdOrder *> peo =
+	gpos::Ref<CEnfdOrder> peo =
 		GPOS_NEW(mp) CEnfdOrder(std::move(pos), CEnfdOrder::EomSatisfy);
-	gpos::owner<CEnfdDistribution *> ped = GPOS_NEW(mp)
+	gpos::Ref<CEnfdDistribution> ped = GPOS_NEW(mp)
 		CEnfdDistribution(std::move(pds), CEnfdDistribution::EdmExact);
-	gpos::owner<CEnfdRewindability *> per = GPOS_NEW(mp)
+	gpos::Ref<CEnfdRewindability> per = GPOS_NEW(mp)
 		CEnfdRewindability(std::move(prs), CEnfdRewindability::ErmSatisfy);
-	gpos::owner<CPartitionPropagationSpec *> pps =
+	gpos::Ref<CPartitionPropagationSpec> pps =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
-	gpos::owner<CEnfdPartitionPropagation *> pepp =
+	gpos::Ref<CEnfdPartitionPropagation> pepp =
 		GPOS_NEW(mp) CEnfdPartitionPropagation(
 			std::move(pps), CEnfdPartitionPropagation::EppmSatisfy);
-	gpos::owner<CCTEReq *> pcter = GPOS_NEW(mp) CCTEReq(mp);
-	gpos::owner<CColRefSet *> pcrsCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
-	gpos::owner<CReqdPropPlan *> prppIncompatibleDistribution = GPOS_NEW(mp)
+	gpos::Ref<CCTEReq> pcter = GPOS_NEW(mp) CCTEReq(mp);
+	gpos::Ref<CColRefSet> pcrsCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
+	gpos::Ref<CReqdPropPlan> prppIncompatibleDistribution = GPOS_NEW(mp)
 		CReqdPropPlan(std::move(pcrsCopy), std::move(peo), std::move(ped),
 					  std::move(per), std::move(pepp), std::move(pcter));
 
 	// Test that the plan is not valid.
-	GPOS_ASSERT(
-		!pexprPlan->FValidPlan(prppIncompatibleDistribution, pdpctxtplan));
-	pdpctxtplan->Release();
-	pexprPlan->Release();
-	prppIncompatibleDistribution->Release();
-	prpp->Release();
-	pexprGby->Release();
+	GPOS_ASSERT(!pexprPlan->FValidPlan(prppIncompatibleDistribution.get(),
+									   pdpctxtplan));
+	;
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -934,8 +921,8 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidRewindability()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -943,45 +930,45 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidRewindability()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	gpos::owner<CExpression *> pexprGby = nullptr;
+	gpos::Ref<CExpression> pexprGby = nullptr;
 	CColRefSet *pcrs = nullptr;
-	gpos::owner<CExpression *> pexprPlan = nullptr;
-	gpos::owner<CReqdPropPlan *> prpp = nullptr;
+	gpos::Ref<CExpression> pexprPlan = nullptr;
+	gpos::Ref<CReqdPropPlan> prpp = nullptr;
 
 	SetupPlanForFValidPlanTest(mp, &pexprGby, &pcrs, &pexprPlan, &prpp);
-	gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+	gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 		GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 
-	gpos::owner<COrderSpec *> pos = GPOS_NEW(mp) COrderSpec(mp);
-	gpos::owner<CDistributionSpec *> pds = GPOS_NEW(mp)
+	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<CDistributionSpec> pds = GPOS_NEW(mp)
 		CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
-	gpos::owner<CRewindabilitySpec *> prs = GPOS_NEW(mp) CRewindabilitySpec(
+	gpos::Ref<CRewindabilitySpec> prs = GPOS_NEW(mp) CRewindabilitySpec(
 		CRewindabilitySpec::ErtRewindable, CRewindabilitySpec::EmhtNoMotion);
-	gpos::owner<CEnfdOrder *> peo =
+	gpos::Ref<CEnfdOrder> peo =
 		GPOS_NEW(mp) CEnfdOrder(std::move(pos), CEnfdOrder::EomSatisfy);
-	gpos::owner<CEnfdDistribution *> ped = GPOS_NEW(mp)
+	gpos::Ref<CEnfdDistribution> ped = GPOS_NEW(mp)
 		CEnfdDistribution(std::move(pds), CEnfdDistribution::EdmExact);
-	gpos::owner<CEnfdRewindability *> per = GPOS_NEW(mp)
+	gpos::Ref<CEnfdRewindability> per = GPOS_NEW(mp)
 		CEnfdRewindability(std::move(prs), CEnfdRewindability::ErmSatisfy);
-	gpos::owner<CPartitionPropagationSpec *> pps =
+	gpos::Ref<CPartitionPropagationSpec> pps =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
-	gpos::owner<CEnfdPartitionPropagation *> pepp =
+	gpos::Ref<CEnfdPartitionPropagation> pepp =
 		GPOS_NEW(mp) CEnfdPartitionPropagation(
 			std::move(pps), CEnfdPartitionPropagation::EppmSatisfy);
-	gpos::owner<CCTEReq *> pcter = GPOS_NEW(mp) CCTEReq(mp);
-	gpos::owner<CColRefSet *> pcrsCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
+	gpos::Ref<CCTEReq> pcter = GPOS_NEW(mp) CCTEReq(mp);
+	gpos::Ref<CColRefSet> pcrsCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
 
-	gpos::owner<CReqdPropPlan *> prppIncompatibleRewindability = GPOS_NEW(mp)
+	gpos::Ref<CReqdPropPlan> prppIncompatibleRewindability = GPOS_NEW(mp)
 		CReqdPropPlan(std::move(pcrsCopy), std::move(peo), std::move(ped),
 					  std::move(per), std::move(pepp), std::move(pcter));
 	// Test that the plan is not valid.
-	GPOS_ASSERT(
-		!pexprPlan->FValidPlan(prppIncompatibleRewindability, pdpctxtplan));
-	pdpctxtplan->Release();
-	pexprPlan->Release();
-	prppIncompatibleRewindability->Release();
-	prpp->Release();
-	pexprGby->Release();
+	GPOS_ASSERT(!pexprPlan->FValidPlan(prppIncompatibleRewindability.get(),
+									   pdpctxtplan));
+	;
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -1001,8 +988,8 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidCTEs()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -1010,54 +997,54 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidCTEs()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	gpos::owner<CExpression *> pexprGby = nullptr;
+	gpos::Ref<CExpression> pexprGby = nullptr;
 	CColRefSet *pcrs = nullptr;
-	gpos::owner<CExpression *> pexprPlan = nullptr;
-	gpos::owner<CReqdPropPlan *> prpp = nullptr;
+	gpos::Ref<CExpression> pexprPlan = nullptr;
+	gpos::Ref<CReqdPropPlan> prpp = nullptr;
 
 	SetupPlanForFValidPlanTest(mp, &pexprGby, &pcrs, &pexprPlan, &prpp);
-	gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+	gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 		GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 
-	gpos::owner<COrderSpec *> pos = GPOS_NEW(mp) COrderSpec(mp);
-	gpos::owner<CDistributionSpec *> pds = GPOS_NEW(mp)
+	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<CDistributionSpec> pds = GPOS_NEW(mp)
 		CDistributionSpecSingleton(CDistributionSpecSingleton::EstMaster);
-	gpos::owner<CRewindabilitySpec *> prs = GPOS_NEW(mp) CRewindabilitySpec(
+	gpos::Ref<CRewindabilitySpec> prs = GPOS_NEW(mp) CRewindabilitySpec(
 		CRewindabilitySpec::ErtNone, CRewindabilitySpec::EmhtNoMotion);
-	gpos::owner<CEnfdOrder *> peo =
+	gpos::Ref<CEnfdOrder> peo =
 		GPOS_NEW(mp) CEnfdOrder(std::move(pos), CEnfdOrder::EomSatisfy);
-	gpos::owner<CEnfdDistribution *> ped = GPOS_NEW(mp)
+	gpos::Ref<CEnfdDistribution> ped = GPOS_NEW(mp)
 		CEnfdDistribution(std::move(pds), CEnfdDistribution::EdmExact);
-	gpos::owner<CEnfdRewindability *> per = GPOS_NEW(mp)
+	gpos::Ref<CEnfdRewindability> per = GPOS_NEW(mp)
 		CEnfdRewindability(std::move(prs), CEnfdRewindability::ErmSatisfy);
-	gpos::owner<CPartitionPropagationSpec *> pps =
+	gpos::Ref<CPartitionPropagationSpec> pps =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
-	gpos::owner<CEnfdPartitionPropagation *> pepp =
+	gpos::Ref<CEnfdPartitionPropagation> pepp =
 		GPOS_NEW(mp) CEnfdPartitionPropagation(
 			std::move(pps), CEnfdPartitionPropagation::EppmSatisfy);
-	gpos::owner<CCTEReq *> pcter = GPOS_NEW(mp) CCTEReq(mp);
+	gpos::Ref<CCTEReq> pcter = GPOS_NEW(mp) CCTEReq(mp);
 	ULONG ulCTEId = 0;
 
-	gpos::owner<CExpression *> pexprProducer =
+	gpos::Ref<CExpression> pexprProducer =
 		CTestUtils::PexprLogicalCTEProducerOverSelect(mp, ulCTEId);
-	gpos::owner<CDrvdPropPlan *> pdpplan =
+	gpos::Ref<CDrvdPropPlan> pdpplan =
 		gpos::dyn_cast<CDrvdPropPlan>(pexprPlan->PdpDerive());
-	pdpplan->AddRef();
+	;
 	pcter->Insert(ulCTEId, CCTEMap::EctProducer /*ect*/, true /*fRequired*/,
 				  std::move(pdpplan));
-	gpos::owner<CColRefSet *> pcrsCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
-	gpos::owner<CReqdPropPlan *> prppIncompatibleCTE = GPOS_NEW(mp)
+	gpos::Ref<CColRefSet> pcrsCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
+	gpos::Ref<CReqdPropPlan> prppIncompatibleCTE = GPOS_NEW(mp)
 		CReqdPropPlan(std::move(pcrsCopy), std::move(peo), std::move(ped),
 					  std::move(per), std::move(pepp), std::move(pcter));
 
 	// Test that the plan is not valid.
-	GPOS_ASSERT(!pexprPlan->FValidPlan(prppIncompatibleCTE, pdpctxtplan));
-	pdpctxtplan->Release();
-	pexprPlan->Release();
-	prppIncompatibleCTE->Release();
-	prpp->Release();
-	pexprGby->Release();
-	pexprProducer->Release();
+	GPOS_ASSERT(!pexprPlan->FValidPlan(prppIncompatibleCTE.get(), pdpctxtplan));
+	;
+	;
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -1080,45 +1067,44 @@ CExpressionTest::EresUnittest_FValidPlanError()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
-	gpos::pointer<const IMDType *> pmdtype = mda.PtMDType<IMDTypeInt4>();
+	const IMDType *pmdtype = mda.PtMDType<IMDTypeInt4>();
 
 	GPOS_RESULT eres = GPOS_OK;
 	// Test that in debug mode GPOS_ASSERT fails for non-physical expressions.
 	{
-		gpos::owner<CColRefSet *> pcrsInvalid = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::Ref<CColRefSet> pcrsInvalid = GPOS_NEW(mp) CColRefSet(mp);
 		CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 		CColRef *pcrComputed =
 			col_factory->PcrCreate(pmdtype, default_type_modifier);
 		pcrsInvalid->Include(pcrComputed);
 
-		gpos::owner<CReqdPropPlan *> prpp =
+		gpos::Ref<CReqdPropPlan> prpp =
 			PrppCreateRequiredProperties(mp, pcrsInvalid);
-		gpos::owner<IDatum *> datum = GPOS_NEW(mp) gpnaucrates::CDatumInt8GPDB(
+		gpos::Ref<IDatum> datum = GPOS_NEW(mp) gpnaucrates::CDatumInt8GPDB(
 			CTestUtils::m_sysidDefault, 1 /*val*/, false /*is_null*/);
-		gpos::owner<CExpression *> pexpr =
+		gpos::Ref<CExpression> pexpr =
 			GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, datum));
 
-		gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+		gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 			GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 		GPOS_TRY
 		{
 			// FValidPlan should fail for expressions which are not physical.
-			if (!pexpr->FValidPlan(prpp, pdpctxtplan))
+			if (!pexpr->FValidPlan(prpp.get(), pdpctxtplan))
 			{
 				eres = GPOS_FAILED;
-			}
-			pdpctxtplan->Release();
+			};
 		}
 		GPOS_CATCH_EX(ex)
 		{
-			pdpctxtplan->Release();
+			;
 			if (!GPOS_MATCH_EX(ex, CException::ExmaSystem,
 							   CException::ExmiAssert))
 			{
@@ -1131,8 +1117,8 @@ CExpressionTest::EresUnittest_FValidPlanError()
 		}
 		GPOS_CATCH_END;
 
-		pexpr->Release();
-		prpp->Release();
+		;
+		;
 	}
 
 	return eres;
@@ -1150,9 +1136,8 @@ CExpressionTest::EresUnittest_FValidPlanError()
 //
 //---------------------------------------------------------------------------
 GPOS_RESULT
-CExpressionTest::EresCheckCachedReqdCols(
-	CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
-	gpos::pointer<CReqdPropPlan *> prppInput)
+CExpressionTest::EresCheckCachedReqdCols(CMemoryPool *mp, CExpression *pexpr,
+										 CReqdPropPlan *prppInput)
 {
 	if (pexpr->Pop()->FScalar())
 	{
@@ -1171,13 +1156,13 @@ CExpressionTest::EresCheckCachedReqdCols(
 	exprhdl.InitReqdProps(prppInput);
 
 	// create array of child derived properties
-	gpos::owner<CDrvdPropArray *> pdrgpdp = GPOS_NEW(mp) CDrvdPropArray(mp);
+	gpos::Ref<CDrvdPropArray> pdrgpdp = GPOS_NEW(mp) CDrvdPropArray(mp);
 
 	GPOS_RESULT eres = GPOS_OK;
 	const ULONG arity = pexpr->Arity();
 	for (ULONG ul = 0; GPOS_OK == eres && ul < arity; ul++)
 	{
-		gpos::pointer<CExpression *> pexprChild = (*pexpr)[ul];
+		CExpression *pexprChild = (*pexpr)[ul];
 		if (pexprChild->Pop()->FScalar())
 		{
 			continue;
@@ -1215,12 +1200,12 @@ CExpressionTest::EresCheckCachedReqdCols(
 		}
 
 		// add plan props of current child to derived props array
-		gpos::owner<CDrvdProp *> pdp = pexprChild->PdpDerive();
-		pdp->AddRef();
+		gpos::Ref<CDrvdProp> pdp = pexprChild->PdpDerive();
+		;
 		pdrgpdp->Append(pdp);
 	}
 
-	pdrgpdp->Release();
+	;
 
 	return eres;
 }
@@ -1244,7 +1229,7 @@ CExpressionTest::EresComputeReqdCols(const CHAR *szFilePath)
 	CMDCache::Reset();
 
 	// set up MD providers
-	gpos::owner<CMDProviderMemory *> pmdp =
+	gpos::Ref<CMDProviderMemory> pmdp =
 		GPOS_NEW(mp) CMDProviderMemory(mp, szFilePath);
 	GPOS_CHECK_ABORT;
 
@@ -1255,24 +1240,24 @@ CExpressionTest::EresComputeReqdCols(const CHAR *szFilePath)
 						 /* pceeval */ CTestUtils::GetCostModel(mp));
 
 		// read query expression
-		gpos::owner<CExpression *> pexpr =
+		gpos::Ref<CExpression> pexpr =
 			CTestUtils::PexprReadQuery(mp, szFilePath);
 
 		// optimize query
 		CEngine eng(mp);
-		CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexpr);
+		CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexpr.get());
 		eng.Init(pqc, nullptr /*search_stage_array*/);
 		eng.Optimize();
 
 		// extract plan and decorate it with required columns
-		gpos::owner<CExpression *> pexprPlan = eng.PexprExtractPlan();
+		gpos::Ref<CExpression> pexprPlan = eng.PexprExtractPlan();
 
 		// attempt computing required columns again --
 		// we make sure that we reuse cached required columns at each operator
-		eres = EresCheckCachedReqdCols(mp, pexprPlan, pqc->Prpp());
+		eres = EresCheckCachedReqdCols(mp, pexprPlan.get(), pqc->Prpp());
 
-		pexpr->Release();
-		pexprPlan->Release();
+		;
+		;
 		GPOS_DELETE(pqc);
 	}
 
@@ -1345,8 +1330,8 @@ CExpressionTest::EresUnittest_InvalidSetOp()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -1356,48 +1341,46 @@ CExpressionTest::EresUnittest_InvalidSetOp()
 
 		// create two different Get expressions
 		CWStringConst strName1(GPOS_WSZ_LIT("T1"));
-		gpos::owner<CMDIdGPDB *> pmdid1 =
+		gpos::Ref<CMDIdGPDB> pmdid1 =
 			GPOS_NEW(mp) CMDIdGPDB(GPOPT_TEST_REL_OID1, 1, 1);
-		gpos::owner<CTableDescriptor *> ptabdesc1 = CTestUtils::PtabdescCreate(
+		gpos::Ref<CTableDescriptor> ptabdesc1 = CTestUtils::PtabdescCreate(
 			mp, 3, std::move(pmdid1), CName(&strName1));
 		CWStringConst strAlias1(GPOS_WSZ_LIT("T1Alias"));
-		gpos::owner<CExpression *> pexprGet1 =
+		gpos::Ref<CExpression> pexprGet1 =
 			CTestUtils::PexprLogicalGet(mp, std::move(ptabdesc1), &strAlias1);
-		gpos::pointer<CColRefSet *> pcrsOutput1 =
-			pexprGet1->DeriveOutputColumns();
+		CColRefSet *pcrsOutput1 = pexprGet1->DeriveOutputColumns();
 
 		CWStringConst strName2(GPOS_WSZ_LIT("T2"));
-		gpos::owner<CMDIdGPDB *> pmdid2 =
+		gpos::Ref<CMDIdGPDB> pmdid2 =
 			GPOS_NEW(mp) CMDIdGPDB(GPOPT_TEST_REL_OID2, 1, 1);
-		gpos::owner<CTableDescriptor *> ptabdesc2 = CTestUtils::PtabdescCreate(
+		gpos::Ref<CTableDescriptor> ptabdesc2 = CTestUtils::PtabdescCreate(
 			mp, 3, std::move(pmdid2), CName(&strName2));
 		CWStringConst strAlias2(GPOS_WSZ_LIT("T2Alias"));
-		gpos::owner<CExpression *> pexprGet2 =
+		gpos::Ref<CExpression> pexprGet2 =
 			CTestUtils::PexprLogicalGet(mp, std::move(ptabdesc2), &strAlias2);
 
 		// create output columns of SetOp from output columns of first Get expression
-		gpos::owner<CColRefArray *> pdrgpcrOutput =
-			GPOS_NEW(mp) CColRefArray(mp);
+		gpos::Ref<CColRefArray> pdrgpcrOutput = GPOS_NEW(mp) CColRefArray(mp);
 		pdrgpcrOutput->Append(pcrsOutput1->PcrFirst());
 
 		// create input columns of SetOp while including an outer reference in inner child
-		gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput =
+		gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput =
 			GPOS_NEW(mp) CColRef2dArray(mp);
 
-		gpos::owner<CColRefArray *> pdrgpcr1 = GPOS_NEW(mp) CColRefArray(mp);
+		gpos::Ref<CColRefArray> pdrgpcr1 = GPOS_NEW(mp) CColRefArray(mp);
 		pdrgpcr1->Append(pcrsOutput1->PcrFirst());
 		pdrgpdrgpcrInput->Append(std::move(pdrgpcr1));
 
-		gpos::owner<CColRefArray *> pdrgpcr2 = GPOS_NEW(mp) CColRefArray(mp);
+		gpos::Ref<CColRefArray> pdrgpcr2 = GPOS_NEW(mp) CColRefArray(mp);
 		CColRef *pcrOuterRef = COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
 			pcrsOutput1->PcrFirst());
 		pdrgpcr2->Append(pcrOuterRef);
 		pdrgpdrgpcrInput->Append(std::move(pdrgpcr2));
 
 		// create invalid SetOp expression
-		gpos::owner<CLogicalUnion *> pop = GPOS_NEW(mp) CLogicalUnion(
+		gpos::Ref<CLogicalUnion> pop = GPOS_NEW(mp) CLogicalUnion(
 			mp, std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrInput));
-		gpos::owner<CExpression *> pexprSetOp = GPOS_NEW(mp) CExpression(
+		gpos::Ref<CExpression> pexprSetOp = GPOS_NEW(mp) CExpression(
 			mp, std::move(pop), std::move(pexprGet1), std::move(pexprGet2));
 
 		{
@@ -1408,7 +1391,7 @@ CExpressionTest::EresUnittest_InvalidSetOp()
 		// deriving relational properties must fail
 		(void) pexprSetOp->PdpDerive();
 
-		pexprSetOp->Release();
+		;
 	}
 
 	return GPOS_FAILED;
@@ -1422,7 +1405,7 @@ CExpressionTest::EresUnittest_InvalidSetOp()
 // 		Return an expression with several joins
 //
 //---------------------------------------------------------------------------
-gpos::owner<CExpression *>
+gpos::Ref<CExpression>
 CExpressionTest::PexprComplexJoinTree(CMemoryPool *mp)
 {
 	// The plan will have this shape
@@ -1443,27 +1426,27 @@ CExpressionTest::PexprComplexJoinTree(CMemoryPool *mp)
 	//	      |--CLogicalGet
 	//	      +--CLogicalSelect
 
-	gpos::owner<CExpression *> pexprInnerJoin1 =
+	gpos::Ref<CExpression> pexprInnerJoin1 =
 		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 			mp, CTestUtils::PexprLogicalGet(mp),
 			CTestUtils::PexprLogicalSelect(mp));
-	gpos::owner<CExpression *> pexprJoinIndex =
+	gpos::Ref<CExpression> pexprJoinIndex =
 		CTestUtils::PexprLogicalJoinWithPartitionedAndIndexedInnerChild(mp);
-	gpos::owner<CExpression *> pexprLeftJoin =
+	gpos::Ref<CExpression> pexprLeftJoin =
 		CTestUtils::PexprLogicalJoin<CLogicalLeftOuterJoin>(
 			mp, std::move(pexprInnerJoin1), std::move(pexprJoinIndex));
 
-	gpos::owner<CExpression *> pexprOuterJoin =
+	gpos::Ref<CExpression> pexprOuterJoin =
 		CTestUtils::PexprLogicalJoin<CLogicalLeftOuterJoin>(mp);
-	gpos::owner<CExpression *> pexprInnerJoin4 =
+	gpos::Ref<CExpression> pexprInnerJoin4 =
 		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 			mp, std::move(pexprLeftJoin), std::move(pexprOuterJoin));
 
-	gpos::owner<CExpression *> pexprInnerJoin5 =
+	gpos::Ref<CExpression> pexprInnerJoin5 =
 		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 			mp, CTestUtils::PexprLogicalGet(mp),
 			CTestUtils::PexprLogicalSelect(mp));
-	gpos::owner<CExpression *> pexprTopJoin =
+	gpos::Ref<CExpression> pexprTopJoin =
 		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 			mp, std::move(pexprInnerJoin4), std::move(pexprInnerJoin5));
 

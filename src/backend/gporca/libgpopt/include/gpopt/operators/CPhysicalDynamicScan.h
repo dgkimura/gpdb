@@ -48,26 +48,26 @@ private:
 	ULONG m_scan_id;
 
 	// partition keys
-	gpos::owner<CColRef2dArray *> m_pdrgpdrgpcrPart;
+	gpos::Ref<CColRef2dArray> m_pdrgpdrgpcrPart;
 
 	// child partitions
-	gpos::owner<IMdIdArray *> m_partition_mdids;
+	gpos::Ref<IMdIdArray> m_partition_mdids;
 
 	// Map of Root colref -> col index in child tabledesc
 	// per child partition in m_partition_mdid
-	gpos::owner<ColRefToUlongMapArray *> m_root_col_mapping_per_part = nullptr;
+	gpos::Ref<ColRefToUlongMapArray> m_root_col_mapping_per_part = nullptr;
 
 public:
 	CPhysicalDynamicScan(const CPhysicalDynamicScan &) = delete;
 
 	// ctor
 	CPhysicalDynamicScan(
-		CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
+		CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
 		ULONG ulOriginOpId, const CName *pnameAlias, ULONG scan_id,
-		gpos::owner<CColRefArray *> pdrgpcrOutput,
-		gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
-		gpos::owner<IMdIdArray *> partition_mdids,
-		gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part);
+		gpos::Ref<CColRefArray> pdrgpcrOutput,
+		gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
+		gpos::Ref<IMdIdArray> partition_mdids,
+		gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part);
 
 	// dtor
 	~CPhysicalDynamicScan() override;
@@ -87,10 +87,10 @@ public:
 	}
 
 	// partition keys
-	gpos::pointer<CColRef2dArray *>
+	CColRef2dArray *
 	PdrgpdrgpcrPart() const
 	{
-		return m_pdrgpdrgpcrPart;
+		return m_pdrgpdrgpcrPart.get();
 	}
 
 	// sensitivity to order of inputs
@@ -110,23 +110,23 @@ public:
 		return true;
 	}
 
-	gpos::pointer<IMdIdArray *>
+	IMdIdArray *
 	GetPartitionMdids() const
 	{
-		return m_partition_mdids;
+		return m_partition_mdids.get();
 	}
 
-	gpos::pointer<ColRefToUlongMapArray *>
+	ColRefToUlongMapArray *
 	GetRootColMappingPerPart() const
 	{
-		return m_root_col_mapping_per_part;
+		return m_root_col_mapping_per_part.get();
 	}
 
 	// debug print
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static gpos::cast_func<CPhysicalDynamicScan *> PopConvert(COperator *pop);
+	static CPhysicalDynamicScan *PopConvert(COperator *pop);
 };
 }  // namespace gpopt
 

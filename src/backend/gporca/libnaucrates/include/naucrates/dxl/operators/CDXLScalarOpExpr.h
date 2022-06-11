@@ -35,10 +35,10 @@ class CDXLScalarOpExpr : public CDXLScalar
 {
 private:
 	// operator number in the catalog
-	gpos::owner<IMDId *> m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// return type (or invalid if type can be infered from the metadata)
-	gpos::owner<IMDId *> m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// operator name
 	const CWStringConst *m_str_opname;
@@ -47,8 +47,8 @@ public:
 	CDXLScalarOpExpr(const CDXLScalarOpExpr &) = delete;
 
 	// ctor/dtor
-	CDXLScalarOpExpr(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
-					 gpos::owner<IMDId *> return_type_mdid,
+	CDXLScalarOpExpr(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+					 gpos::Ref<IMDId> return_type_mdid,
 					 const CWStringConst *str_opname);
 
 	~CDXLScalarOpExpr() override;
@@ -63,17 +63,16 @@ public:
 	const CWStringConst *GetScalarOpNameStr() const;
 
 	// operator id
-	gpos::pointer<IMDId *> MDId() const;
+	IMDId *MDId() const;
 
 	// operator return type
-	gpos::pointer<IMDId *> GetReturnTypeMdId() const;
+	IMDId *GetReturnTypeMdId() const;
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *,
-						gpos::pointer<const CDXLNode *>) const override;
+	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarOpExpr *>
+	static CDXLScalarOpExpr *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -88,7 +87,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

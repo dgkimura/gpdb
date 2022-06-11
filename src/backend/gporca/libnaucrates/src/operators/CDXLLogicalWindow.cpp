@@ -37,7 +37,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalWindow::CDXLLogicalWindow(
-	CMemoryPool *mp, gpos::owner<CDXLWindowSpecArray *> window_spec_array)
+	CMemoryPool *mp, gpos::Ref<CDXLWindowSpecArray> window_spec_array)
 	: CDXLLogical(mp), m_window_spec_array(std::move(window_spec_array))
 {
 	GPOS_ASSERT(nullptr != m_window_spec_array);
@@ -54,7 +54,7 @@ CDXLLogicalWindow::CDXLLogicalWindow(
 //---------------------------------------------------------------------------
 CDXLLogicalWindow::~CDXLLogicalWindow()
 {
-	m_window_spec_array->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -93,11 +93,11 @@ CDXLLogicalWindow::GetOpNameStr() const
 //		Return the window specification at a given position
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLWindowSpec *>
+CDXLWindowSpec *
 CDXLLogicalWindow::GetWindowKeyAt(ULONG idx) const
 {
 	GPOS_ASSERT(idx <= m_window_spec_array->Size());
-	return (*m_window_spec_array)[idx];
+	return (*m_window_spec_array)[idx].get();
 }
 
 //---------------------------------------------------------------------------
@@ -110,7 +110,7 @@ CDXLLogicalWindow::GetWindowKeyAt(ULONG idx) const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  gpos::pointer<const CDXLNode *> node) const
+								  const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -126,8 +126,7 @@ CDXLLogicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer,
 	const ULONG size = m_window_spec_array->Size();
 	for (ULONG idx = 0; idx < size; idx++)
 	{
-		gpos::pointer<CDXLWindowSpec *> window_spec =
-			(*m_window_spec_array)[idx];
+		CDXLWindowSpec *window_spec = (*m_window_spec_array)[idx].get();
 		window_spec->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -151,13 +150,13 @@ CDXLLogicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalWindow::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLLogicalWindow::AssertValid(const CDXLNode *node,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == node->Arity());
 
-	gpos::pointer<CDXLNode *> proj_list_dxlnode = (*node)[0];
-	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[1];
+	CDXLNode *proj_list_dxlnode = (*node)[0];
+	CDXLNode *child_dxlnode = (*node)[1];
 
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list_dxlnode->GetOperator()->GetDXLOperator());
@@ -175,7 +174,7 @@ CDXLLogicalWindow::AssertValid(gpos::pointer<const CDXLNode *> node,
 	const ULONG arity = proj_list_dxlnode->Arity();
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		gpos::pointer<CDXLNode *> proj_elem = (*proj_list_dxlnode)[idx];
+		CDXLNode *proj_elem = (*proj_list_dxlnode)[idx];
 		GPOS_ASSERT(EdxlopScalarIdent !=
 					proj_elem->GetOperator()->GetDXLOperator());
 	}

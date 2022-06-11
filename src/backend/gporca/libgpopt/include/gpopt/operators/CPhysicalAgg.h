@@ -34,7 +34,7 @@ class CPhysicalAgg : public CPhysical
 {
 private:
 	// array of grouping columns
-	gpos::owner<CColRefArray *> m_pdrgpcr;
+	gpos::Ref<CColRefArray> m_pdrgpcr;
 
 	// aggregate type (local / intermediate / global)
 	COperator::EGbAggType m_egbaggtype;
@@ -44,24 +44,24 @@ private:
 	CLogicalGbAgg::EAggStage m_aggStage;
 
 	// compute required distribution of the n-th child of an intermediate aggregate
-	gpos::owner<CDistributionSpec *> PdsRequiredIntermediateAgg(
+	gpos::Ref<CDistributionSpec> PdsRequiredIntermediateAgg(
 		CMemoryPool *mp, ULONG ulOptReq) const;
 
 	// compute required distribution of the n-th child of a global aggregate
-	gpos::owner<CDistributionSpec *> PdsRequiredGlobalAgg(
+	gpos::Ref<CDistributionSpec> PdsRequiredGlobalAgg(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
-		gpos::pointer<CColRefArray *> pdrgpcrGrp,
-		gpos::pointer<CColRefArray *> pdrgpcrGrpMinimal, ULONG ulOptReq) const;
+		CDistributionSpec *pdsInput, ULONG child_index,
+		CColRefArray *pdrgpcrGrp, CColRefArray *pdrgpcrGrpMinimal,
+		ULONG ulOptReq) const;
 
 	// compute a maximal hashed distribution using the given columns,
 	// if no such distribution can be created, return a Singleton distribution
-	static gpos::owner<CDistributionSpec *> PdsMaximalHashed(
-		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array);
+	static gpos::Ref<CDistributionSpec> PdsMaximalHashed(
+		CMemoryPool *mp, CColRefArray *colref_array);
 
 protected:
 	// array of minimal grouping columns based on FDs
-	gpos::owner<CColRefArray *> m_pdrgpcrMinimal;
+	gpos::Ref<CColRefArray> m_pdrgpcrMinimal;
 
 	// could the local / intermediate / global aggregate generate
 	// duplicate values for the same group across segments
@@ -69,7 +69,7 @@ protected:
 
 	// array of columns used in distinct qualified aggregates (DQA)
 	// used only in the case of intermediate aggregates
-	gpos::owner<CColRefArray *> m_pdrgpcrArgDQA;
+	gpos::Ref<CColRefArray> m_pdrgpcrArgDQA;
 
 	// is agg part of multi-stage aggregation
 	BOOL m_fMultiStage;
@@ -87,27 +87,26 @@ protected:
 	BOOL m_should_enforce_distribution;
 
 	// compute required columns of the n-th child
-	gpos::owner<CColRefSet *> PcrsRequiredAgg(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
-		gpos::pointer<CColRefArray *> pdrgpcrGrp);
+	gpos::Ref<CColRefSet> PcrsRequiredAgg(CMemoryPool *mp,
+										  CExpressionHandle &exprhdl,
+										  CColRefSet *pcrsRequired,
+										  ULONG child_index,
+										  CColRefArray *pdrgpcrGrp);
 
 	// compute required distribution of the n-th child
-	gpos::owner<CDistributionSpec *> PdsRequiredAgg(
+	gpos::Ref<CDistributionSpec> PdsRequiredAgg(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
-		ULONG ulOptReq, gpos::pointer<CColRefArray *> pdrgpcgGrp,
-		gpos::pointer<CColRefArray *> pdrgpcrGrpMinimal) const;
+		CDistributionSpec *pdsInput, ULONG child_index, ULONG ulOptReq,
+		CColRefArray *pdrgpcgGrp, CColRefArray *pdrgpcrGrpMinimal) const;
 
 public:
 	CPhysicalAgg(const CPhysicalAgg &) = delete;
 
 	// ctor
-	CPhysicalAgg(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-				 gpos::pointer<CColRefArray *>
-					 pdrgpcrMinimal,  // FD's on grouping columns
+	CPhysicalAgg(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+				 CColRefArray *pdrgpcrMinimal,	// FD's on grouping columns
 				 COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-				 gpos::owner<CColRefArray *> pdrgpcrArgDQA, BOOL fMultiStage,
+				 gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,
 				 BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
 				 BOOL should_enforce_distribution);
 
@@ -130,17 +129,17 @@ public:
 		return m_fGeneratesDuplicates;
 	}
 
-	virtual gpos::pointer<const CColRefArray *>
+	virtual const CColRefArray *
 	PdrgpcrGroupingCols() const
 	{
-		return m_pdrgpcr;
+		return m_pdrgpcr.get();
 	}
 
 	// array of columns used in distinct qualified aggregates (DQA)
-	virtual gpos::pointer<const CColRefArray *>
+	virtual const CColRefArray *
 	PdrgpcrArgDQA() const
 	{
-		return m_pdrgpcrArgDQA;
+		return m_pdrgpcrArgDQA.get();
 	}
 
 	// aggregate type
@@ -165,7 +164,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
@@ -182,40 +181,40 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	gpos::owner<CColRefSet *> PcrsRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override;
+	gpos::Ref<CColRefSet> PcrsRequired(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl,
+									   CColRefSet *pcrsRequired,
+									   ULONG child_index,
+									   CDrvdPropArray *pdrgpdpCtxt,
+									   ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
-	gpos::owner<CCTEReq *> PcteRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CCTEReq *> pcter, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
+									CCTEReq *pcter, ULONG child_index,
+									CDrvdPropArray *pdrgpdpCtxt,
+									ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	gpos::owner<CDistributionSpec *>
+	gpos::Ref<CDistributionSpec>
 	PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				gpos::pointer<CDistributionSpec *> pdsRequired,
-				ULONG child_index,
-				gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
+				CDistributionSpec *pdsRequired, ULONG child_index,
+				CDrvdPropArray *,  //pdrgpdpCtxt,
 				ULONG ulOptReq) const override
 	{
 		return PdsRequiredAgg(mp, exprhdl, pdsRequired, child_index, ulOptReq,
-							  m_pdrgpcr, m_pdrgpcrMinimal);
+							  m_pdrgpcr.get(), m_pdrgpcrMinimal.get());
 	}
 
 	// compute required rewindability of the n-th child
-	gpos::owner<CRewindabilitySpec *> PrsRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<CRewindabilitySpec> PrsRequired(CMemoryPool *mp,
+											  CExpressionHandle &exprhdl,
+											  CRewindabilitySpec *prsRequired,
+											  ULONG child_index,
+											  CDrvdPropArray *pdrgpdpCtxt,
+											  ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
-						   gpos::pointer<CColRefSet *> pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 
@@ -224,11 +223,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive distribution
-	gpos::owner<CDistributionSpec *> PdsDerive(
+	gpos::Ref<CDistributionSpec> PdsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive rewindability
-	gpos::owner<CRewindabilitySpec *> PrsDerive(
+	gpos::Ref<CRewindabilitySpec> PrsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -238,12 +237,12 @@ public:
 	// return distribution property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetDistribution(
 		CExpressionHandle &exprhdl,
-		gpos::pointer<const CEnfdDistribution *> ped) const override;
+		const CEnfdDistribution *ped) const override;
 
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
-		CExpressionHandle &,					   // exprhdl
-		gpos::pointer<const CEnfdRewindability *>  // per
+		CExpressionHandle &,		// exprhdl
+		const CEnfdRewindability *	// per
 	) const override;
 
 	// return true if operator passes through stats obtained from children,
@@ -259,7 +258,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CPhysicalAgg *>
+	static CPhysicalAgg *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(CUtils::FPhysicalAgg(pop));

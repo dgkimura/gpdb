@@ -26,7 +26,7 @@ using namespace gpopt;
 //		expression has to take care of this on a higher level
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDrvdProp *>
+gpos::Ref<CDrvdProp>
 CPattern::PdpCreate(CMemoryPool *  // mp
 ) const
 {
@@ -44,7 +44,7 @@ CPattern::PdpCreate(CMemoryPool *  // mp
 //		expression has to take care of this on a higher level
 //
 //---------------------------------------------------------------------------
-gpos::owner<CReqdProp *>
+gpos::Ref<CReqdProp>
 CPattern::PrpCreate(CMemoryPool *  // mp
 ) const
 {
@@ -62,7 +62,7 @@ CPattern::PrpCreate(CMemoryPool *  // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CPattern::Matches(gpos::pointer<COperator *> pop) const
+CPattern::Matches(COperator *pop) const
 {
 	return Eopid() == pop->Eopid();
 }
@@ -91,11 +91,10 @@ CPattern::FInputOrderSensitive() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
-CPattern::PopCopyWithRemappedColumns(
-	CMemoryPool *,						//mp,
-	gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-	BOOL								//must_exist
+gpos::Ref<COperator>
+CPattern::PopCopyWithRemappedColumns(CMemoryPool *,		  //mp,
+									 UlongToColRefMap *,  //colref_mapping,
+									 BOOL				  //must_exist
 )
 {
 	GPOS_ASSERT(

@@ -27,7 +27,7 @@ class CDrvdPropCtxt;
 class CDrvdProp;
 
 // dynamic array for properties
-using CDrvdPropCtxtArray = CDynamicPtrArray<CDrvdPropCtxt, CleanupRelease>;
+using CDrvdPropCtxtArray = gpos::Vector<gpos::Ref<CDrvdPropCtxt>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -46,10 +46,10 @@ protected:
 	CMemoryPool *m_mp;
 
 	// copy function
-	virtual gpos::owner<CDrvdPropCtxt *> PdpctxtCopy(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<CDrvdPropCtxt> PdpctxtCopy(CMemoryPool *mp) const = 0;
 
 	// add props to context
-	virtual void AddProps(gpos::pointer<CDrvdProp *> pdp) = 0;
+	virtual void AddProps(CDrvdProp *pdp) = 0;
 
 public:
 	CDrvdPropCtxt(const CDrvdPropCtxt &) = delete;
@@ -88,8 +88,8 @@ public:
 #endif	// GPOS_DEBUG
 
 	// copy function
-	static gpos::owner<CDrvdPropCtxt *>
-	PdpctxtCopy(CMemoryPool *mp, gpos::pointer<CDrvdPropCtxt *> pdpctxt)
+	static gpos::Ref<CDrvdPropCtxt>
+	PdpctxtCopy(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt)
 	{
 		if (nullptr == pdpctxt)
 		{
@@ -101,8 +101,7 @@ public:
 
 	// add derived props to context
 	static void
-	AddDerivedProps(gpos::pointer<CDrvdProp *> pdp,
-					gpos::pointer<CDrvdPropCtxt *> pdpctxt)
+	AddDerivedProps(CDrvdProp *pdp, CDrvdPropCtxt *pdpctxt)
 	{
 		if (nullptr != pdpctxt)
 		{

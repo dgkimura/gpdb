@@ -50,9 +50,9 @@ CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp,
-							   gpos::owner<CTableDescriptor *> ptabdesc,
-							   gpos::owner<CColRefArray *> pdrgpcrDelete,
-							   gpos::owner<CColRefArray *> pdrgpcrInsert,
+							   gpos::Ref<CTableDescriptor> ptabdesc,
+							   gpos::Ref<CColRefArray> pdrgpcrDelete,
+							   gpos::Ref<CColRefArray> pdrgpcrInsert,
 							   CColRef *pcrCtid, CColRef *pcrSegmentId,
 							   CColRef *pcrTupleOid)
 	: CLogical(mp),
@@ -71,8 +71,8 @@ CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != pcrCtid);
 	GPOS_ASSERT(nullptr != pcrSegmentId);
 
-	m_pcrsLocalUsed->Include(m_pdrgpcrDelete);
-	m_pcrsLocalUsed->Include(m_pdrgpcrInsert);
+	m_pcrsLocalUsed->Include(m_pdrgpcrDelete.get());
+	m_pcrsLocalUsed->Include(m_pdrgpcrInsert.get());
 	m_pcrsLocalUsed->Include(m_pcrCtid);
 	m_pcrsLocalUsed->Include(m_pcrSegmentId);
 
@@ -92,9 +92,9 @@ CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CLogicalUpdate::~CLogicalUpdate()
 {
-	CRefCount::SafeRelease(m_ptabdesc);
-	CRefCount::SafeRelease(m_pdrgpcrDelete);
-	CRefCount::SafeRelease(m_pdrgpcrInsert);
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -106,15 +106,14 @@ CLogicalUpdate::~CLogicalUpdate()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalUpdate::Matches(gpos::pointer<COperator *> pop) const
+CLogicalUpdate::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CLogicalUpdate *> popUpdate =
-		gpos::dyn_cast<CLogicalUpdate>(pop);
+	CLogicalUpdate *popUpdate = gpos::dyn_cast<CLogicalUpdate>(pop);
 
 	return m_pcrCtid == popUpdate->PcrCtid() &&
 		   m_pcrSegmentId == popUpdate->PcrSegmentId() &&
@@ -137,10 +136,10 @@ CLogicalUpdate::HashValue() const
 {
 	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(),
 									   m_ptabdesc->MDId()->HashValue());
-	ulHash =
-		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrDelete));
-	ulHash =
-		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrInsert));
+	ulHash = gpos::CombineHashes(ulHash,
+								 CUtils::UlHashColArray(m_pdrgpcrDelete.get()));
+	ulHash = gpos::CombineHashes(ulHash,
+								 CUtils::UlHashColArray(m_pdrgpcrInsert.get()));
 	ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrCtid));
 	ulHash =
 		gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrSegmentId));
@@ -156,19 +155,19 @@ CLogicalUpdate::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
-CLogicalUpdate::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+gpos::Ref<COperator>
+CLogicalUpdate::PopCopyWithRemappedColumns(CMemoryPool *mp,
+										   UlongToColRefMap *colref_mapping,
+										   BOOL must_exist)
 {
-	gpos::owner<CColRefArray *> pdrgpcrDelete =
-		CUtils::PdrgpcrRemap(mp, m_pdrgpcrDelete, colref_mapping, must_exist);
-	gpos::owner<CColRefArray *> pdrgpcrInsert =
-		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInsert, colref_mapping, must_exist);
+	gpos::Ref<CColRefArray> pdrgpcrDelete = CUtils::PdrgpcrRemap(
+		mp, m_pdrgpcrDelete.get(), colref_mapping, must_exist);
+	gpos::Ref<CColRefArray> pdrgpcrInsert = CUtils::PdrgpcrRemap(
+		mp, m_pdrgpcrInsert.get(), colref_mapping, must_exist);
 	CColRef *pcrCtid = CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
 	CColRef *pcrSegmentId =
 		CUtils::PcrRemap(m_pcrSegmentId, colref_mapping, must_exist);
-	m_ptabdesc->AddRef();
+	;
 
 	CColRef *pcrTupleOid = nullptr;
 	if (nullptr != m_pcrTupleOid)
@@ -189,13 +188,13 @@ CLogicalUpdate::PopCopyWithRemappedColumns(
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CLogicalUpdate::DeriveOutputColumns(CMemoryPool *mp,
 									CExpressionHandle &	 //exprhdl
 )
 {
-	gpos::owner<CColRefSet *> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
-	pcrsOutput->Include(m_pdrgpcrInsert);
+	gpos::Ref<CColRefSet> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	pcrsOutput->Include(m_pdrgpcrInsert.get());
 	pcrsOutput->Include(m_pcrCtid);
 	pcrsOutput->Include(m_pcrSegmentId);
 
@@ -214,7 +213,7 @@ CLogicalUpdate::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-gpos::owner<CKeyCollection *>
+gpos::Ref<CKeyCollection>
 CLogicalUpdate::DeriveKeyCollection(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl) const
 {
@@ -245,10 +244,10 @@ CLogicalUpdate::DeriveMaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalUpdate::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfUpdate2DML);
 	return xform_set;
 }
@@ -261,10 +260,10 @@ CLogicalUpdate::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
+gpos::Ref<IStatistics>
 CLogicalUpdate::PstatsDerive(CMemoryPool *,	 // mp,
 							 CExpressionHandle &exprhdl,
-							 gpos::pointer<IStatisticsArray *>	// not used
+							 IStatisticsArray *	 // not used
 ) const
 {
 	return PstatsPassThruOuter(exprhdl);
@@ -289,9 +288,9 @@ CLogicalUpdate::OsPrint(IOstream &os) const
 	os << SzId() << " (";
 	m_ptabdesc->Name().OsPrint(os);
 	os << "), Delete Columns: [";
-	CUtils::OsPrintDrgPcr(os, m_pdrgpcrDelete);
+	CUtils::OsPrintDrgPcr(os, m_pdrgpcrDelete.get());
 	os << "], Insert Columns: [";
-	CUtils::OsPrintDrgPcr(os, m_pdrgpcrInsert);
+	CUtils::OsPrintDrgPcr(os, m_pdrgpcrInsert.get());
 	os << "], ";
 	m_pcrCtid->OsPrint(os);
 	os << ", ";

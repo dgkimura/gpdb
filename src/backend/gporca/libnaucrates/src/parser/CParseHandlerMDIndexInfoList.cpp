@@ -36,14 +36,14 @@ CParseHandlerMDIndexInfoList::CParseHandlerMDIndexInfoList(
 // dtor
 CParseHandlerMDIndexInfoList::~CParseHandlerMDIndexInfoList()
 {
-	CRefCount::SafeRelease(m_mdindex_info_array);
+	;
 }
 
 // returns array of indexinfo
-gpos::pointer<CMDIndexInfoArray *>
+CMDIndexInfoArray *
 CParseHandlerMDIndexInfoList::GetMdIndexInfoArray()
 {
-	return m_mdindex_info_array;
+	return m_mdindex_info_array.get();
 }
 
 // invoked by Xerces to process an opening tag
@@ -65,7 +65,7 @@ CParseHandlerMDIndexInfoList::StartElement(
 					  element_local_name))
 	{
 		// parse mdid
-		gpos::owner<IMDId *> mdid =
+		gpos::Ref<IMDId> mdid =
 			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 				EdxltokenMdid, EdxltokenIndexInfo);
@@ -75,7 +75,7 @@ CParseHandlerMDIndexInfoList::StartElement(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenIndexPartial, EdxltokenIndexInfo);
 
-		gpos::owner<CMDIndexInfo *> md_index_info =
+		gpos::Ref<CMDIndexInfo> md_index_info =
 			GPOS_NEW(m_mp) CMDIndexInfo(std::move(mdid), is_partial);
 		m_mdindex_info_array->Append(std::move(md_index_info));
 	}

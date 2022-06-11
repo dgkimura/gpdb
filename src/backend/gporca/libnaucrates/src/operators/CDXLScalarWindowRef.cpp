@@ -32,8 +32,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarWindowRef::CDXLScalarWindowRef(
-	CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
-	gpos::owner<IMDId *> mdid_return_type, BOOL is_distinct, BOOL is_star_arg,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+	gpos::Ref<IMDId> mdid_return_type, BOOL is_distinct, BOOL is_star_arg,
 	BOOL is_simple_agg, EdxlWinStage dxl_win_stage, ULONG ulWinspecPosition)
 	: CDXLScalar(mp),
 	  m_func_mdid(std::move(mdid_func)),
@@ -59,8 +59,8 @@ CDXLScalarWindowRef::CDXLScalarWindowRef(
 //---------------------------------------------------------------------------
 CDXLScalarWindowRef::~CDXLScalarWindowRef()
 {
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -133,9 +133,8 @@ CDXLScalarWindowRef::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowRef::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarWindowRef::SerializeToDXL(CXMLSerializer *xml_serializer,
+									const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -176,8 +175,8 @@ CDXLScalarWindowRef::SerializeToDXL(
 BOOL
 CDXLScalarWindowRef::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	gpos::pointer<IMDId *> mdid =
-		md_accessor->RetrieveFunc(m_func_mdid)->GetResultTypeMdid();
+	IMDId *mdid =
+		md_accessor->RetrieveFunc(m_func_mdid.get())->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());
 }
@@ -192,7 +191,7 @@ CDXLScalarWindowRef::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowRef::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarWindowRef::AssertValid(const CDXLNode *dxlnode,
 								 BOOL validate_children) const
 {
 	EdxlWinStage edxlwinrefstage =
@@ -204,7 +203,7 @@ CDXLScalarWindowRef::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_winref_arg = (*dxlnode)[ul];
+		CDXLNode *dxlnode_winref_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_winref_arg->GetOperator()->GetDXLOperatorType());
 

@@ -27,7 +27,7 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdColStats::CMDIdColStats(gpos::owner<CMDIdGPDB *> rel_mdid, ULONG pos)
+CMDIdColStats::CMDIdColStats(gpos::Ref<CMDIdGPDB> rel_mdid, ULONG pos)
 	: m_rel_mdid(std::move(rel_mdid)),
 	  m_attr_pos(pos),
 	  m_str(m_mdid_buffer, GPOS_ARRAY_SIZE(m_mdid_buffer))
@@ -48,7 +48,7 @@ CMDIdColStats::CMDIdColStats(gpos::owner<CMDIdGPDB *> rel_mdid, ULONG pos)
 //---------------------------------------------------------------------------
 CMDIdColStats::~CMDIdColStats()
 {
-	m_rel_mdid->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -90,10 +90,10 @@ CMDIdColStats::GetBuffer() const
 //		Returns the base relation id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDIdColStats::GetRelMdId() const
 {
-	return m_rel_mdid;
+	return m_rel_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -119,15 +119,14 @@ CMDIdColStats::Position() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdColStats::Equals(gpos::pointer<const IMDId *> mdid) const
+CMDIdColStats::Equals(const IMDId *mdid) const
 {
 	if (nullptr == mdid || EmdidColStats != mdid->MdidType())
 	{
 		return false;
 	}
 
-	gpos::pointer<const CMDIdColStats *> mdid_col_stats =
-		CMDIdColStats::CastMdid(mdid);
+	const CMDIdColStats *mdid_col_stats = CMDIdColStats::CastMdid(mdid);
 
 	return m_rel_mdid->Equals(mdid_col_stats->GetRelMdId()) &&
 		   m_attr_pos == mdid_col_stats->Position();

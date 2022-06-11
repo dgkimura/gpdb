@@ -41,22 +41,22 @@ protected:
 	const CWStringDynamic *m_dxl_str;
 
 	// func id
-	gpos::owner<IMDId *> m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// func name
 	CMDName *m_mdname;
 
 	// source type
-	gpos::owner<IMDId *> m_mdid_src;
+	gpos::Ref<IMDId> m_mdid_src;
 
 	// destination type
-	gpos::owner<IMDId *> m_mdid_dest;
+	gpos::Ref<IMDId> m_mdid_dest;
 
 	// is cast between binary coercible types, i.e. the types are binary compatible
 	BOOL m_is_binary_coercible;
 
 	// cast func id
-	gpos::owner<IMDId *> m_mdid_cast_func;
+	gpos::Ref<IMDId> m_mdid_cast_func;
 
 	// coercion path type
 	EmdCoercepathType m_path_type;
@@ -65,9 +65,9 @@ public:
 	CMDCastGPDB(const CMDCastGPDB &) = delete;
 
 	// ctor
-	CMDCastGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
-				gpos::owner<IMDId *> mdid_src, gpos::owner<IMDId *> mdid_dest,
-				BOOL is_binary_coercible, gpos::owner<IMDId *> mdid_cast_func,
+	CMDCastGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+				gpos::Ref<IMDId> mdid_src, gpos::Ref<IMDId> mdid_dest,
+				BOOL is_binary_coercible, gpos::Ref<IMDId> mdid_cast_func,
 				EmdCoercepathType path_type = EmdtNone);
 
 	// dtor
@@ -81,16 +81,16 @@ public:
 	}
 
 	// cast object id
-	gpos::pointer<IMDId *> MDId() const override;
+	IMDId *MDId() const override;
 
 	// cast object name
 	CMDName Mdname() const override;
 
 	// source type
-	gpos::pointer<IMDId *> MdidSrc() const override;
+	IMDId *MdidSrc() const override;
 
 	// destination type
-	gpos::pointer<IMDId *> MdidDest() const override;
+	IMDId *MdidDest() const override;
 
 	// is this a cast between binary coeercible types, i.e. the types are binary compatible
 	BOOL IsBinaryCoercible() const override;
@@ -99,7 +99,7 @@ public:
 	EmdCoercepathType GetMDPathType() const override;
 
 	// cast function id
-	gpos::pointer<IMDId *> GetCastFuncMdId() const override;
+	IMDId *GetCastFuncMdId() const override;
 
 	// serialize object in DXL format
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;

@@ -74,36 +74,34 @@ CXformGbAgg2ScalarAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformGbAgg2ScalarAgg::Transform(gpos::pointer<CXformContext *> pxfctxt,
-								 gpos::pointer<CXformResult *> pxfres,
-								 gpos::pointer<CExpression *> pexpr) const
+CXformGbAgg2ScalarAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+								 CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CLogicalGbAgg *> popAgg =
-		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
-	gpos::owner<CColRefArray *> colref_array = popAgg->Pdrgpcr();
-	colref_array->AddRef();
+	gpos::Ref<CColRefArray> colref_array = popAgg->Pdrgpcr();
+	;
 
 	// extract components
 	CExpression *pexprRel = (*pexpr)[0];
 	CExpression *pexprScalar = (*pexpr)[1];
 
 	// addref children
-	pexprRel->AddRef();
-	pexprScalar->AddRef();
+	;
+	;
 
 	CColRefArray *pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
 	if (pdrgpcrArgDQA != nullptr && 0 != pdrgpcrArgDQA->Size())
 	{
-		pdrgpcrArgDQA->AddRef();
+		;
 	}
 
 	// create alternative expression
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalScalarAgg(
 			mp, std::move(colref_array), popAgg->PdrgpcrMinimal(),

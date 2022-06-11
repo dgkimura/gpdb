@@ -96,11 +96,10 @@ public:
 	~CJobGroupExpressionImplementation() override;
 
 	// initialize job
-	void Init(gpos::pointer<CGroupExpression *> pgexpr);
+	void Init(CGroupExpression *pgexpr);
 
 	// schedule a new group expression implementation job
-	static void ScheduleJob(CSchedulerContext *psc,
-							gpos::pointer<CGroupExpression *> pgexpr,
+	static void ScheduleJob(CSchedulerContext *psc, CGroupExpression *pgexpr,
 							CJob *pjParent);
 
 	// job's function

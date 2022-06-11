@@ -49,7 +49,7 @@ CParseHandlerSearchStrategy::CParseHandlerSearchStrategy(
 //---------------------------------------------------------------------------
 CParseHandlerSearchStrategy::~CParseHandlerSearchStrategy()
 {
-	CRefCount::SafeRelease(m_search_stage_array);
+	;
 }
 
 
@@ -131,9 +131,9 @@ CParseHandlerSearchStrategy::EndElement(const XMLCh *const,	 // element_uri,
 	{
 		CParseHandlerSearchStage *search_stage_parse_handler =
 			dynamic_cast<CParseHandlerSearchStage *>((*this)[idx]);
-		gpos::owner<CXformSet *> xform_set =
+		gpos::Ref<CXformSet> xform_set =
 			search_stage_parse_handler->GetXformSet();
-		xform_set->AddRef();
+		;
 		CSearchStage *search_stage = GPOS_NEW(m_mp)
 			CSearchStage(xform_set, search_stage_parse_handler->TimeThreshold(),
 						 search_stage_parse_handler->CostThreshold());

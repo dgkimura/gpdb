@@ -28,12 +28,12 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CConstraintNegation::CConstraintNegation(CMemoryPool *mp,
-										 gpos::owner<CConstraint *> pcnstr)
+										 gpos::Ref<CConstraint> pcnstr)
 	: CConstraint(mp, pcnstr->PcrsUsed()), m_pcnstr(std::move(pcnstr))
 {
 	GPOS_ASSERT(nullptr != m_pcnstr);
 
-	m_pcrsUsed->AddRef();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -46,7 +46,7 @@ CConstraintNegation::CConstraintNegation(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CConstraintNegation::~CConstraintNegation()
 {
-	m_pcnstr->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -57,12 +57,11 @@ CConstraintNegation::~CConstraintNegation()
 //		Return a copy of the constraint with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CConstraint *>
+gpos::Ref<CConstraint>
 CConstraintNegation::PcnstrCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
-	gpos::owner<CConstraint *> pcnstr =
+	gpos::Ref<CConstraint> pcnstr =
 		m_pcnstr->PcnstrCopyWithRemappedColumns(mp, colref_mapping, must_exist);
 	return GPOS_NEW(mp) CConstraintNegation(mp, std::move(pcnstr));
 }
@@ -75,7 +74,7 @@ CConstraintNegation::PcnstrCopyWithRemappedColumns(
 //		Return constraint on a given column
 //
 //---------------------------------------------------------------------------
-gpos::owner<CConstraint *>
+gpos::Ref<CConstraint>
 CConstraintNegation::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 {
 	if (!m_pcrsUsed->FMember(colref) || (1 != m_pcrsUsed->Size()))
@@ -102,8 +101,8 @@ CConstraintNegation::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 //		Return constraint on a given column set
 //
 //---------------------------------------------------------------------------
-gpos::owner<CConstraint *>
-CConstraintNegation::Pcnstr(CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs)
+gpos::Ref<CConstraint>
+CConstraintNegation::Pcnstr(CMemoryPool *mp, CColRefSet *pcrs)
 {
 	if (!m_pcrsUsed->Equals(pcrs))
 	{
@@ -121,7 +120,7 @@ CConstraintNegation::Pcnstr(CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs)
 //		Return a copy of the constraint for a different column
 //
 //---------------------------------------------------------------------------
-gpos::owner<CConstraint *>
+gpos::Ref<CConstraint>
 CConstraintNegation::PcnstrRemapForColumn(CMemoryPool *mp,
 										  CColRef *colref) const
 {
@@ -139,7 +138,7 @@ CConstraintNegation::PcnstrRemapForColumn(CMemoryPool *mp,
 //		Scalar expression
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CExpression *>
+CExpression *
 CConstraintNegation::PexprScalar(CMemoryPool *mp)
 {
 	if (nullptr == m_pexprScalar)
@@ -147,29 +146,29 @@ CConstraintNegation::PexprScalar(CMemoryPool *mp)
 		EConstraintType ect = m_pcnstr->Ect();
 		if (EctNegation == ect)
 		{
-			gpos::pointer<CConstraintNegation *> pcn =
-				gpos::cast<CConstraintNegation>(m_pcnstr);
+			CConstraintNegation *pcn =
+				gpos::cast<CConstraintNegation>(m_pcnstr.get());
 			m_pexprScalar = pcn->PcnstrChild()->PexprScalar(mp);
-			m_pexprScalar->AddRef();
+			;
 		}
 		else if (EctInterval == ect)
 		{
-			gpos::pointer<CConstraintInterval *> pci =
-				gpos::cast<CConstraintInterval>(m_pcnstr);
-			gpos::owner<CConstraintInterval *> pciComp = pci->PciComplement(mp);
+			CConstraintInterval *pci =
+				gpos::cast<CConstraintInterval>(m_pcnstr.get());
+			gpos::Ref<CConstraintInterval> pciComp = pci->PciComplement(mp);
 			m_pexprScalar = pciComp->PexprScalar(mp);
-			m_pexprScalar->AddRef();
-			pciComp->Release();
+			;
+			;
 		}
 		else
 		{
-			gpos::owner<CExpression *> pexpr = m_pcnstr->PexprScalar(mp);
-			pexpr->AddRef();
+			gpos::Ref<CExpression> pexpr = m_pcnstr->PexprScalar(mp);
+			;
 			m_pexprScalar = CUtils::PexprNegate(mp, pexpr);
 		}
 	}
 
-	return m_pexprScalar;
+	return m_pexprScalar.get();
 }
 
 //---------------------------------------------------------------------------

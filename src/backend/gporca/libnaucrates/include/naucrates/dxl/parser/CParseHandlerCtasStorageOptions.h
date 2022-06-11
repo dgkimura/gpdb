@@ -42,11 +42,10 @@ private:
 	CDXLCtasStorageOptions::ECtasOnCommitAction m_ctas_on_commit_action;
 
 	// CTAS storage options
-	gpos::owner<CDXLCtasStorageOptions *> m_dxl_ctas_storage_option;
+	gpos::Ref<CDXLCtasStorageOptions> m_dxl_ctas_storage_option;
 
 	// parsed array of key-value pairs of options
-	gpos::pointer<CDXLCtasStorageOptions::CDXLCtasOptionArray *>
-		m_ctas_storage_option_array;
+	CDXLCtasStorageOptions::CDXLCtasOptionArray *m_ctas_storage_option_array;
 
 	// process the start of an element
 	void StartElement(
@@ -76,7 +75,7 @@ public:
 	~CParseHandlerCtasStorageOptions() override;
 
 	// parsed storage options
-	gpos::pointer<CDXLCtasStorageOptions *> GetDxlCtasStorageOption() const;
+	CDXLCtasStorageOptions *GetDxlCtasStorageOption() const;
 };
 }  // namespace gpdxl
 

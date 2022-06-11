@@ -52,18 +52,17 @@ private:
 	);
 
 	// translate a dxl document into Expr Tree
-	static gpos::owner<CExpression *> Pexpr(
+	static gpos::Ref<CExpression> Pexpr(
 		CMemoryPool *mp,  // memory pool
 		const CHAR
 			*dxl_filename  // DXL document representing the DXL logical tree
 	);
 
 	// generate a string representation of a given Expr tree
-	static CWStringDynamic *Pstr(CMemoryPool *mp,
-								 gpos::pointer<CExpression *> pexpr);
+	static CWStringDynamic *Pstr(CMemoryPool *mp, CExpression *pexpr);
 
 	// create a get expression for a table (r) with two integer columns
-	static gpos::owner<CExpression *> PexprGet(CMemoryPool *mp);
+	static gpos::Ref<CExpression> PexprGet(CMemoryPool *mp);
 
 public:
 	// unittests

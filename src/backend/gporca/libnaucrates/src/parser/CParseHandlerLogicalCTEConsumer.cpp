@@ -67,7 +67,7 @@ CParseHandlerLogicalCTEConsumer::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenCTEId,
 		EdxltokenLogicalCTEConsumer);
 
-	gpos::owner<ULongPtrArray *> output_colids_array =
+	gpos::Ref<ULongPtrArray> output_colids_array =
 		CDXLOperatorFactory::ExtractConvertValuesToArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenColumns,
 			EdxltokenLogicalCTEConsumer);
@@ -104,7 +104,7 @@ CParseHandlerLogicalCTEConsumer::EndElement(
 
 	GPOS_ASSERT(nullptr != m_dxl_node);
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node,
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node.get(),
 										   false /* validate_children */);
 #endif	// GPOS_DEBUG
 

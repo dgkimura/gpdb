@@ -90,9 +90,8 @@ CDXLScalarNullTest::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarNullTest::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarNullTest::SerializeToDXL(CXMLSerializer *xml_serializer,
+								   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -115,12 +114,12 @@ CDXLScalarNullTest::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarNullTest::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarNullTest::AssertValid(const CDXLNode *dxlnode,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[0];
+	CDXLNode *dxlnode_arg = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeScalar ==
 				dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

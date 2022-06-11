@@ -42,18 +42,18 @@ class CDXLPhysicalWindow : public CDXLPhysical
 {
 private:
 	// partition columns
-	gpos::owner<ULongPtrArray *> m_part_by_colid_array;
+	gpos::Ref<ULongPtrArray> m_part_by_colid_array;
 
 	// window keys
-	gpos::owner<CDXLWindowKeyArray *> m_dxl_window_key_array;
+	gpos::Ref<CDXLWindowKeyArray> m_dxl_window_key_array;
 
 public:
 	CDXLPhysicalWindow(CDXLPhysicalWindow &) = delete;
 
 	//ctor
 	CDXLPhysicalWindow(CMemoryPool *mp,
-					   gpos::owner<ULongPtrArray *> part_by_colid_array,
-					   gpos::owner<CDXLWindowKeyArray *> window_key_array);
+					   gpos::Ref<ULongPtrArray> part_by_colid_array,
+					   gpos::Ref<CDXLWindowKeyArray> window_key_array);
 
 	//dtor
 	~CDXLPhysicalWindow() override;
@@ -66,24 +66,24 @@ public:
 	ULONG PartByColsCount() const;
 
 	// return partition columns
-	gpos::pointer<const ULongPtrArray *>
+	const ULongPtrArray *
 	GetPartByColsArray() const
 	{
-		return m_part_by_colid_array;
+		return m_part_by_colid_array.get();
 	}
 
 	// number of window keys
 	ULONG WindowKeysCount() const;
 
 	// return the window key at a given position
-	gpos::pointer<CDXLWindowKey *> GetDXLWindowKeyAt(ULONG ulPos) const;
+	CDXLWindowKey *GetDXLWindowKeyAt(ULONG ulPos) const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalWindow *>
+	static CDXLPhysicalWindow *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -95,8 +95,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

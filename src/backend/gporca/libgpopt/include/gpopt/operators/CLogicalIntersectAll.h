@@ -36,9 +36,8 @@ public:
 	// ctor
 	explicit CLogicalIntersectAll(CMemoryPool *mp);
 
-	CLogicalIntersectAll(CMemoryPool *mp,
-						 gpos::owner<CColRefArray *> pdrgpcrOutput,
-						 gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput);
+	CLogicalIntersectAll(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+						 gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput);
 
 	// dtor
 	~CLogicalIntersectAll() override;
@@ -65,8 +64,8 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -78,11 +77,11 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive key collections
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *>
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -94,7 +93,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Stats
@@ -108,16 +107,16 @@ public:
 	}
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CLogicalIntersectAll *>
+	static CLogicalIntersectAll *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -127,10 +126,9 @@ public:
 	}
 
 	// derive statistics
-	static gpos::owner<IStatistics *> PstatsDerive(
+	static gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput,
-		gpos::pointer<CColRefSetArray *> output_colrefsets);
+		CColRef2dArray *pdrgpdrgpcrInput, CColRefSetArray *output_colrefsets);
 
 };	// class CLogicalIntersectAll
 

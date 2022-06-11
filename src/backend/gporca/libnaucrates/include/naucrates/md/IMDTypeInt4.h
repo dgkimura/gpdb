@@ -49,9 +49,8 @@ public:
 	}
 
 	// factory function for INT4 datums
-	virtual gpos::owner<IDatumInt4 *> CreateInt4Datum(CMemoryPool *mp,
-													  INT value,
-													  BOOL is_null) const = 0;
+	virtual gpos::Ref<IDatumInt4> CreateInt4Datum(CMemoryPool *mp, INT value,
+												  BOOL is_null) const = 0;
 };
 
 }  // namespace gpmd

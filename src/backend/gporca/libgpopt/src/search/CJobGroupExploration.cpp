@@ -111,7 +111,7 @@ CJobGroupExploration::~CJobGroupExploration() = default;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExploration::Init(gpos::pointer<CGroup *> pgroup)
+CJobGroupExploration::Init(CGroup *pgroup)
 {
 	CJobGroup::Init(pgroup);
 
@@ -187,7 +187,7 @@ CJobGroupExploration::EevtStartExploration(CSchedulerContext *,	 //psc
 {
 	// get a job pointer
 	CJobGroupExploration *pjge = PjConvert(pjOwner);
-	gpos::pointer<CGroup *> pgroup = pjge->m_pgroup;
+	CGroup *pgroup = pjge->m_pgroup;
 
 	// move group to exploration state
 	{
@@ -262,8 +262,7 @@ CJobGroupExploration::FExecute(CSchedulerContext *psc)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExploration::ScheduleJob(CSchedulerContext *psc,
-								  gpos::pointer<CGroup *> pgroup,
+CJobGroupExploration::ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
 								  CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtGroupExploration);

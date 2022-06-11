@@ -47,13 +47,13 @@ public:
 
 	// ctors
 	CLogicalDynamicBitmapTableGet(CMemoryPool *mp,
-								  gpos::owner<CTableDescriptor *> ptabdesc,
+								  gpos::Ref<CTableDescriptor> ptabdesc,
 								  ULONG ulOriginOpId,
 								  const CName *pnameTableAlias,
 								  ULONG ulPartIndex,
-								  gpos::owner<CColRefArray *> pdrgpcrOutput,
-								  gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
-								  gpos::owner<IMdIdArray *> partition_mdids);
+								  gpos::Ref<CColRefArray> pdrgpcrOutput,
+								  gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
+								  gpos::Ref<IMdIdArray> partition_mdids);
 
 	explicit CLogicalDynamicBitmapTableGet(CMemoryPool *mp);
 
@@ -78,7 +78,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -88,36 +88,36 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// derive outer references
-	gpos::owner<CColRefSet *> DeriveOuterReferences(
+	gpos::Ref<CColRefSet> DeriveOuterReferences(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *> DerivePropertyConstraint(
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// compute required stat columns of the n-th child
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	PcrsStat(CMemoryPool *mp,
-			 CExpressionHandle &,		   // exprhdl
-			 gpos::pointer<CColRefSet *>,  //pcrsInput
-			 ULONG						   // child_index
+			 CExpressionHandle &,  // exprhdl
+			 CColRefSet *,		   //pcrsInput
+			 ULONG				   // child_index
 	) const override
 	{
 		return GPOS_NEW(mp) CColRefSet(mp);
 	}
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -137,7 +137,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion
-	static gpos::cast_func<CLogicalDynamicBitmapTableGet *>
+	static CLogicalDynamicBitmapTableGet *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

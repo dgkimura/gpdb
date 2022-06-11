@@ -56,7 +56,7 @@ CEnumSetTest::EresUnittest_Basics()
 	typedef CEnumSet<eTest, eTestSentinel> CETestSet;
 	typedef CEnumSetIter<eTest, eTestSentinel> CETestIter;
 
-	gpos::owner<CETestSet *> enum_set = GPOS_NEW(mp) CETestSet(mp);
+	gpos::Ref<CETestSet> enum_set = GPOS_NEW(mp) CETestSet(mp);
 
 	(void) enum_set->ExchangeSet(eTestOne);
 	(void) enum_set->ExchangeSet(eTestTwo);
@@ -72,7 +72,7 @@ CEnumSetTest::EresUnittest_Basics()
 		GPOS_ASSERT(enum_set->Get(type_info.TBit()));
 	}
 
-	enum_set->Release();
+	;
 
 	return GPOS_OK;
 }

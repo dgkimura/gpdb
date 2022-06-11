@@ -18,11 +18,10 @@
 using namespace gpopt;
 
 // return statistics object after performing LSJ operation
-gpos::owner<CStatistics *>
+gpos::Ref<CStatistics>
 CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
-	CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats_input,
-	gpos::pointer<const IStatistics *> inner_stats_input,
-	gpos::pointer<CStatsPredJoinArray *> join_preds_stats)
+	CMemoryPool *mp, const IStatistics *outer_stats_input,
+	const IStatistics *inner_stats_input, CStatsPredJoinArray *join_preds_stats)
 {
 	GPOS_ASSERT(nullptr != outer_stats_input);
 	GPOS_ASSERT(nullptr != inner_stats_input);
@@ -31,7 +30,7 @@ CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
 	const ULONG length = join_preds_stats->Size();
 
 	// iterate over all inner columns and perform a group by to remove duplicates
-	gpos::owner<ULongPtrArray *> inner_colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> inner_colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		if ((*join_preds_stats)[ul]->HasValidColIdInner())
@@ -42,27 +41,27 @@ CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
 	}
 
 	// dummy agg columns required for group by derivation
-	gpos::owner<ULongPtrArray *> aggs = GPOS_NEW(mp) ULongPtrArray(mp);
-	gpos::owner<IStatistics *> inner_stats =
+	gpos::Ref<ULongPtrArray> aggs = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<IStatistics> inner_stats =
 		CGroupByStatsProcessor::CalcGroupByStats(
 			mp, dynamic_cast<const CStatistics *>(inner_stats_input),
-			inner_colids, aggs,
+			inner_colids.get(), aggs.get(),
 			nullptr	 // keys: no keys, use all grouping cols
 		);
 
-	gpos::pointer<const CStatistics *> outer_stats =
+	const CStatistics *outer_stats =
 		dynamic_cast<const CStatistics *>(outer_stats_input);
-	gpos::owner<CStatistics *> semi_join_stats =
+	gpos::Ref<CStatistics> semi_join_stats =
 		CJoinStatsProcessor::SetResultingJoinStats(
-			mp, outer_stats->GetStatsConfig(), outer_stats, inner_stats,
+			mp, outer_stats->GetStatsConfig(), outer_stats, inner_stats.get(),
 			join_preds_stats, IStatistics::EsjtLeftSemiJoin /* esjt */,
 			true /* DoIgnoreLASJHistComputation */
 		);
 
 	// clean up
-	inner_colids->Release();
-	aggs->Release();
-	inner_stats->Release();
+	;
+	;
+	;
 
 	return semi_join_stats;
 }

@@ -52,7 +52,7 @@ private:
 	CDouble m_freq_remaining;
 
 	// derived column stats
-	gpos::owner<CDXLStatsDerivedColumn *> m_dxl_stats_derived_col;
+	gpos::Ref<CDXLStatsDerivedColumn> m_dxl_stats_derived_col;
 
 	// process the start of an element
 	void StartElement(
@@ -82,10 +82,10 @@ public:
 	~CParseHandlerStatsDerivedColumn() override;
 
 	// derived column stats
-	gpos::pointer<CDXLStatsDerivedColumn *>
+	CDXLStatsDerivedColumn *
 	GetDxlStatsDerivedCol() const
 	{
-		return m_dxl_stats_derived_col;
+		return m_dxl_stats_derived_col.get();
 	}
 };
 }  // namespace gpdxl

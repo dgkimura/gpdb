@@ -61,12 +61,12 @@ using namespace gpmd;
 // 		Get the next data point for new bucket boundary
 //
 //---------------------------------------------------------------------------
-gpos::owner<CPoint *>
+gpos::Ref<CPoint>
 CStatisticsUtils::NextPoint(CMemoryPool *mp, CMDAccessor *md_accessor,
-							gpos::pointer<CPoint *> point)
+							CPoint *point)
 {
-	gpos::pointer<IMDId *> mdid = point->GetDatum()->MDId();
-	gpos::pointer<const IMDType *> mdtype = md_accessor->RetrieveType(mdid);
+	IMDId *mdid = point->GetDatum()->MDId();
+	const IMDType *mdtype = md_accessor->RetrieveType(mdid);
 
 	// type has integer mapping
 	if (mdtype->GetDatumType() == IMDType::EtiInt2 ||
@@ -74,9 +74,9 @@ CStatisticsUtils::NextPoint(CMemoryPool *mp, CMDAccessor *md_accessor,
 		mdtype->GetDatumType() == IMDType::EtiInt8 ||
 		mdtype->GetDatumType() == IMDType::EtiOid)
 	{
-		gpos::owner<IDatum *> datum_new = nullptr;
+		gpos::Ref<IDatum> datum_new = nullptr;
 
-		gpos::pointer<IDatum *> datum_old = point->GetDatum();
+		IDatum *datum_old = point->GetDatum();
 
 		if (mdtype->GetDatumType() == IMDType::EtiInt2)
 		{
@@ -125,22 +125,21 @@ CStatisticsUtils::NextPoint(CMemoryPool *mp, CMDAccessor *md_accessor,
 //---------------------------------------------------------------------------
 CHistogram *
 CStatisticsUtils::TransformMCVToHist(CMemoryPool *mp,
-									 gpos::pointer<const IMDType *>,  // mdtype,
-									 gpos::pointer<IDatumArray *> mcv_datums,
-									 gpos::pointer<CDoubleArray *> freq_array,
+									 const IMDType *,  // mdtype,
+									 IDatumArray *mcv_datums,
+									 CDoubleArray *freq_array,
 									 ULONG num_mcv_values)
 {
 	GPOS_ASSERT(mcv_datums->Size() == num_mcv_values);
 
 	// put MCV values and their corresponding frequencies
 	// into a structure in order to sort
-	gpos::owner<SMcvPairPtrArray *> mcv_pairs =
-		GPOS_NEW(mp) SMcvPairPtrArray(mp);
+	gpos::Ref<SMcvPairPtrArray> mcv_pairs = GPOS_NEW(mp) SMcvPairPtrArray(mp);
 	for (ULONG i = 0; i < num_mcv_values; i++)
 	{
 		IDatum *datum = (*mcv_datums)[i];
 		CDouble mcv_freq = *((*freq_array)[i]);
-		datum->AddRef();
+		;
 		SMcvPair *mcv_pair = GPOS_NEW(mp) SMcvPair(datum, mcv_freq);
 		mcv_pairs->Append(mcv_pair);
 	}
@@ -152,13 +151,13 @@ CStatisticsUtils::TransformMCVToHist(CMemoryPool *mp,
 	}
 
 	// now put MCVs and their frequencies in buckets
-	gpos::owner<CBucketArray *> mcv_buckets = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> mcv_buckets = GPOS_NEW(mp) CBucketArray(mp);
 
 	for (ULONG i = 0; i < num_mcv_values; i++)
 	{
-		gpos::owner<IDatum *> datum = (*mcv_pairs)[i]->m_datum_mcv;
-		datum->AddRef();
-		datum->AddRef();
+		gpos::Ref<IDatum> datum = (*mcv_pairs)[i]->m_datum_mcv;
+		;
+		;
 		CDouble bucket_freq = (*mcv_pairs)[i]->m_mcv_freq;
 		CBucket *bucket = GPOS_NEW(mp)
 			CBucket(GPOS_NEW(mp) CPoint(datum), GPOS_NEW(mp) CPoint(datum),
@@ -168,7 +167,7 @@ CStatisticsUtils::TransformMCVToHist(CMemoryPool *mp,
 	}
 	CHistogram *histogram = GPOS_NEW(mp) CHistogram(mp, std::move(mcv_buckets));
 	GPOS_ASSERT(histogram->IsValid());
-	mcv_pairs->Release();
+	;
 
 	return histogram;
 }
@@ -193,13 +192,10 @@ CStatisticsUtils::MergeMCVHist(CMemoryPool *mp, const CHistogram *mcv_histogram,
 	GPOS_ASSERT(0 < mcv_histogram->GetNumBuckets());
 	GPOS_ASSERT(0 < histogram->GetNumBuckets());
 
-	gpos::pointer<const CBucketArray *> mcv_buckets =
-		mcv_histogram->GetBuckets();
-	gpos::pointer<const CBucketArray *> histogram_buckets =
-		histogram->GetBuckets();
+	const CBucketArray *mcv_buckets = mcv_histogram->GetBuckets();
+	const CBucketArray *histogram_buckets = histogram->GetBuckets();
 
-	gpos::pointer<IDatum *> datum =
-		(*mcv_buckets)[0]->GetLowerBound()->GetDatum();
+	IDatum *datum = (*mcv_buckets)[0]->GetLowerBound()->GetDatum();
 
 	// data types that are not supported in the new optimizer yet
 	if (!datum->StatsAreComparable(datum))
@@ -219,7 +215,7 @@ CStatisticsUtils::MergeMCVHist(CMemoryPool *mp, const CHistogram *mcv_histogram,
 	GPOS_ASSERT(mcv_histogram->IsValid());
 	GPOS_ASSERT(histogram->IsValid());
 
-	gpos::owner<CBucketArray *> merged_buckets =
+	gpos::Ref<CBucketArray> merged_buckets =
 		MergeMcvHistBucket(mp, mcv_buckets, histogram_buckets);
 
 	CHistogram *merged_histogram =
@@ -238,12 +234,12 @@ CStatisticsUtils::MergeMCVHist(CMemoryPool *mp, const CHistogram *mcv_histogram,
 //		an array of buckets.
 //
 //---------------------------------------------------------------------------
-gpos::owner<CBucketArray *>
-CStatisticsUtils::MergeMcvHistBucket(
-	CMemoryPool *mp, gpos::pointer<const CBucketArray *> mcv_buckets,
-	gpos::pointer<const CBucketArray *> histogram_buckets)
+gpos::Ref<CBucketArray>
+CStatisticsUtils::MergeMcvHistBucket(CMemoryPool *mp,
+									 const CBucketArray *mcv_buckets,
+									 const CBucketArray *histogram_buckets)
 {
-	gpos::owner<CBucketArray *> merged_buckets = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> merged_buckets = GPOS_NEW(mp) CBucketArray(mp);
 	const ULONG mcv = mcv_buckets->Size();
 	const ULONG num_histograms = histogram_buckets->Size();
 	ULONG mcv_index = 0;
@@ -267,15 +263,15 @@ CStatisticsUtils::MergeMcvHistBucket(
 		else  // mcv_bucket is contained in histogram_bucket
 		{
 			GPOS_ASSERT(histogram_bucket->Subsumes(mcv_bucket));
-			SplitHistDriver(mp, histogram_bucket, mcv_buckets, merged_buckets,
-							&mcv_index, mcv);
+			SplitHistDriver(mp, histogram_bucket, mcv_buckets,
+							merged_buckets.get(), &mcv_index, mcv);
 			histogram_index++;
 		}
 	}
 
 	// append leftover buckets from either MCV or histogram
-	AddRemainingBuckets(mp, mcv_buckets, merged_buckets, &mcv_index);
-	AddRemainingBuckets(mp, histogram_buckets, merged_buckets,
+	AddRemainingBuckets(mp, mcv_buckets, merged_buckets.get(), &mcv_index);
+	AddRemainingBuckets(mp, histogram_buckets, merged_buckets.get(),
 						&histogram_index);
 
 	return merged_buckets;
@@ -290,9 +286,10 @@ CStatisticsUtils::MergeMcvHistBucket(
 //
 //---------------------------------------------------------------------------
 void
-CStatisticsUtils::AddRemainingBuckets(
-	CMemoryPool *mp, gpos::pointer<const CBucketArray *> src_buckets,
-	gpos::pointer<CBucketArray *> dest_buckets, ULONG *start_val)
+CStatisticsUtils::AddRemainingBuckets(CMemoryPool *mp,
+									  const CBucketArray *src_buckets,
+									  CBucketArray *dest_buckets,
+									  ULONG *start_val)
 {
 	const ULONG ulTotal = src_buckets->Size();
 
@@ -314,16 +311,16 @@ CStatisticsUtils::AddRemainingBuckets(
 //
 //---------------------------------------------------------------------------
 void
-CStatisticsUtils::SplitHistDriver(
-	CMemoryPool *mp, const CBucket *histogram_bucket,
-	gpos::pointer<const CBucketArray *> mcv_buckets,
-	gpos::pointer<CBucketArray *> merged_buckets, ULONG *mcv_index, ULONG mcv)
+CStatisticsUtils::SplitHistDriver(CMemoryPool *mp,
+								  const CBucket *histogram_bucket,
+								  const CBucketArray *mcv_buckets,
+								  CBucketArray *merged_buckets,
+								  ULONG *mcv_index, ULONG mcv)
 {
 	GPOS_ASSERT(nullptr != histogram_bucket);
 	GPOS_ASSERT(nullptr != mcv_buckets);
 
-	gpos::owner<CBucketArray *> temp_mcv_buckets =
-		GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> temp_mcv_buckets = GPOS_NEW(mp) CBucketArray(mp);
 
 	// find the MCVs that fall into the same histogram bucket and put them in a temp array
 	// E.g. MCV = ..., 6, 8, 12, ... and the current histogram bucket is [5,10)
@@ -337,8 +334,8 @@ CStatisticsUtils::SplitHistDriver(
 	}
 
 	// split histogram_bucket given one or more MCVs it contains
-	gpos::owner<CBucketArray *> split_buckets =
-		SplitHistBucketGivenMcvBuckets(mp, histogram_bucket, temp_mcv_buckets);
+	gpos::Ref<CBucketArray> split_buckets = SplitHistBucketGivenMcvBuckets(
+		mp, histogram_bucket, temp_mcv_buckets.get());
 	const ULONG split_bucket_size = split_buckets->Size();
 
 	// copy buckets from pdrgpbucketSplitted to pdrgbucketMerged
@@ -348,8 +345,8 @@ CStatisticsUtils::SplitHistDriver(
 		merged_buckets->Append(curr_split_bucket->MakeBucketCopy(mp));
 	}
 
-	temp_mcv_buckets->Release();
-	split_buckets->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -363,16 +360,15 @@ CStatisticsUtils::SplitHistDriver(
 //		buckets.
 //
 //---------------------------------------------------------------------------
-gpos::owner<CBucketArray *>
+gpos::Ref<CBucketArray>
 CStatisticsUtils::SplitHistBucketGivenMcvBuckets(
 	CMemoryPool *mp, const CBucket *histogram_bucket,
-	gpos::pointer<const CBucketArray *> mcv_buckets)
+	const CBucketArray *mcv_buckets)
 {
 	GPOS_ASSERT(nullptr != histogram_bucket);
 	GPOS_ASSERT(nullptr != mcv_buckets);
 
-	gpos::owner<CBucketArray *> buckets_after_split =
-		GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> buckets_after_split = GPOS_NEW(mp) CBucketArray(mp);
 	const ULONG mcv = mcv_buckets->Size();
 	GPOS_ASSERT(0 < mcv);
 
@@ -425,10 +421,10 @@ CStatisticsUtils::SplitHistBucketGivenMcvBuckets(
 	// re-balance distinct and frequency in pdrgpbucketNew
 	CDouble total_distinct_values =
 		std::max(CDouble(1.0), histogram_bucket->GetNumDistinct() - mcv);
-	gpos::owner<CBucketArray *> complete_buckets =
-		DistributeBucketProperties(mp, histogram_bucket->GetFrequency(),
-								   total_distinct_values, buckets_after_split);
-	buckets_after_split->Release();
+	gpos::Ref<CBucketArray> complete_buckets = DistributeBucketProperties(
+		mp, histogram_bucket->GetFrequency(), total_distinct_values,
+		buckets_after_split.get());
+	;
 
 	return complete_buckets;
 }
@@ -451,9 +447,8 @@ CStatisticsUtils::CreateValidBucket(CMemoryPool *mp, CPoint *bucket_lower_bound,
 					   is_upper_closed))
 	{
 		return nullptr;
-	}
-	bucket_lower_bound->AddRef();
-	bucket_upper_bound->AddRef();
+	};
+	;
 
 	return GPOS_NEW(mp) CBucket(
 		bucket_lower_bound, bucket_upper_bound, is_lower_closed,
@@ -476,8 +471,8 @@ CStatisticsUtils::CreateValidBucket(CMemoryPool *mp, CPoint *bucket_lower_bound,
 //
 //---------------------------------------------------------------------------
 BOOL
-CStatisticsUtils::IsValidBucket(gpos::pointer<CPoint *> bucket_lower_bound,
-								gpos::pointer<CPoint *> bucket_upper_bound,
+CStatisticsUtils::IsValidBucket(CPoint *bucket_lower_bound,
+								CPoint *bucket_upper_bound,
 								BOOL is_lower_closed, BOOL is_upper_closed)
 {
 	if (bucket_lower_bound->IsGreaterThan(bucket_upper_bound))
@@ -493,7 +488,7 @@ CStatisticsUtils::IsValidBucket(gpos::pointer<CPoint *> bucket_lower_bound,
 	}
 
 	// datum has statsDistance, so must be statsMappable
-	gpos::pointer<const IDatum *> datum = bucket_lower_bound->GetDatum();
+	const IDatum *datum = bucket_lower_bound->GetDatum();
 
 	// for types which have integer mapping for stats purposes, e.g. int2,int4, etc.
 	if (datum->IsDatumMappableToLINT())
@@ -522,10 +517,11 @@ CStatisticsUtils::IsValidBucket(gpos::pointer<CPoint *> bucket_lower_bound,
 //		copies and returns a new array of complete buckets.
 //
 //---------------------------------------------------------------------------
-gpos::owner<CBucketArray *>
-CStatisticsUtils::DistributeBucketProperties(
-	CMemoryPool *mp, CDouble total_frequency, CDouble total_distinct_values,
-	gpos::pointer<const CBucketArray *> buckets)
+gpos::Ref<CBucketArray>
+CStatisticsUtils::DistributeBucketProperties(CMemoryPool *mp,
+											 CDouble total_frequency,
+											 CDouble total_distinct_values,
+											 const CBucketArray *buckets)
 {
 	GPOS_ASSERT(nullptr != buckets);
 
@@ -541,7 +537,7 @@ CStatisticsUtils::DistributeBucketProperties(
 			bucket_width = bucket_width + bucket->Width();
 		}
 	}
-	gpos::owner<CBucketArray *> histogram_buckets =
+	gpos::Ref<CBucketArray> histogram_buckets =
 		CHistogram::DeepCopyHistogramBuckets(mp, buckets);
 
 	for (ULONG i = 0; i < histogram_buckets->Size(); i++)
@@ -575,8 +571,7 @@ CStatisticsUtils::DistributeBucketProperties(
 //
 //---------------------------------------------------------------------------
 void
-CStatisticsUtils::PrintColStats(CMemoryPool *mp,
-								gpos::pointer<CStatsPred *> pred_stats,
+CStatisticsUtils::PrintColStats(CMemoryPool *mp, CStatsPred *pred_stats,
 								ULONG cond_colid, CHistogram *histogram,
 								CDouble last_scale_factor,
 								BOOL is_filter_applied_before)
@@ -613,7 +608,7 @@ CStatisticsUtils::PrintColStats(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 void
 CStatisticsUtils::ExtractUsedColIds(CMemoryPool *mp, CBitSet *colids_bitset,
-									gpos::pointer<CStatsPred *> pred_stats,
+									CStatsPred *pred_stats,
 									ULongPtrArray *colids)
 {
 	GPOS_ASSERT(nullptr != colids_bitset);
@@ -638,7 +633,7 @@ CStatisticsUtils::ExtractUsedColIds(CMemoryPool *mp, CBitSet *colids_bitset,
 	GPOS_ASSERT(CStatsPred::EsptConj == pred_stats->GetPredStatsType() ||
 				CStatsPred::EsptDisj == pred_stats->GetPredStatsType());
 
-	gpos::pointer<CStatsPredPtrArry *> stats_pred_array = nullptr;
+	CStatsPredPtrArry *stats_pred_array = nullptr;
 	if (CStatsPred::EsptConj == pred_stats->GetPredStatsType())
 	{
 		stats_pred_array =
@@ -654,7 +649,7 @@ CStatisticsUtils::ExtractUsedColIds(CMemoryPool *mp, CBitSet *colids_bitset,
 	const ULONG arity = stats_pred_array->Size();
 	for (ULONG i = 0; i < arity; i++)
 	{
-		gpos::pointer<CStatsPred *> curr_stats_pred = (*stats_pred_array)[i];
+		CStatsPred *curr_stats_pred = (*stats_pred_array)[i].get();
 		ULONG colid = curr_stats_pred->GetColId();
 
 		if (gpos::ulong_max != colid)
@@ -688,11 +683,10 @@ CStatisticsUtils::ExtractUsedColIds(CMemoryPool *mp, CBitSet *colids_bitset,
 //---------------------------------------------------------------------------
 void
 CStatisticsUtils::UpdateDisjStatistics(
-	CMemoryPool *mp, gpos::pointer<CBitSet *> dont_update_stats_bitset,
+	CMemoryPool *mp, CBitSet *dont_update_stats_bitset,
 	CDouble input_disjunct_rows, CDouble local_rows,
 	CHistogram *previous_histogram,
-	gpos::pointer<UlongToHistogramMap *> disjunctive_result_histograms,
-	ULONG colid)
+	UlongToHistogramMap *disjunctive_result_histograms, ULONG colid)
 {
 	GPOS_ASSERT(nullptr != dont_update_stats_bitset);
 	GPOS_ASSERT(nullptr != disjunctive_result_histograms);
@@ -736,9 +730,9 @@ CStatisticsUtils::UpdateDisjStatistics(
 // 		histogram buckets cannot be changed by applying the predicates in the
 //		disjunction
 //---------------------------------------------------------------------------
-gpos::owner<CBitSet *>
-CStatisticsUtils::GetColsNonUpdatableHistForDisj(
-	CMemoryPool *mp, gpos::pointer<CStatsPredDisj *> pred_stats)
+gpos::Ref<CBitSet>
+CStatisticsUtils::GetColsNonUpdatableHistForDisj(CMemoryPool *mp,
+												 CStatsPredDisj *pred_stats)
 {
 	GPOS_ASSERT(nullptr != pred_stats);
 
@@ -755,7 +749,7 @@ CStatisticsUtils::GetColsNonUpdatableHistForDisj(
 	// the union of stats of each predicate being applied separately.
 	// In other words, DO update histogram buckets for both x and y.
 
-	gpos::owner<CBitSet *> non_updateable_bitset = GPOS_NEW(mp) CBitSet(mp);
+	gpos::Ref<CBitSet> non_updateable_bitset = GPOS_NEW(mp) CBitSet(mp);
 
 	const ULONG disj_colid = pred_stats->GetColId();
 	if (gpos::ulong_max != disj_colid)
@@ -764,19 +758,17 @@ CStatisticsUtils::GetColsNonUpdatableHistForDisj(
 		return non_updateable_bitset;
 	}
 
-	gpos::owner<CBitSet *> disj_bitset = GPOS_NEW(mp) CBitSet(mp);
-	gpos::owner<ULongPtrArray *> disjuncts = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<CBitSet> disj_bitset = GPOS_NEW(mp) CBitSet(mp);
+	gpos::Ref<ULongPtrArray> disjuncts = GPOS_NEW(mp) ULongPtrArray(mp);
 	ExtractUsedColIds(mp, disj_bitset, pred_stats, disjuncts);
 	const ULONG num_disj_used_col = disjuncts->Size();
 
 	const ULONG arity = pred_stats->GetNumPreds();
 	for (ULONG child_index = 0; child_index < arity; child_index++)
 	{
-		gpos::pointer<CStatsPred *> child_pred_stats =
-			pred_stats->GetPredStats(child_index);
-		gpos::owner<CBitSet *> child_bitset = GPOS_NEW(mp) CBitSet(mp);
-		gpos::owner<ULongPtrArray *> child_colids =
-			GPOS_NEW(mp) ULongPtrArray(mp);
+		CStatsPred *child_pred_stats = pred_stats->GetPredStats(child_index);
+		gpos::Ref<CBitSet> child_bitset = GPOS_NEW(mp) CBitSet(mp);
+		gpos::Ref<ULongPtrArray> child_colids = GPOS_NEW(mp) ULongPtrArray(mp);
 		ExtractUsedColIds(mp, child_bitset, child_pred_stats, child_colids);
 
 		const ULONG length = child_colids->Size();
@@ -797,13 +789,13 @@ CStatisticsUtils::GetColsNonUpdatableHistForDisj(
 		}
 
 		// clean up
-		child_colids->Release();
-		child_bitset->Release();
+		;
+		;
 	}
 
 	// clean up
-	disjuncts->Release();
-	disj_bitset->Release();
+	;
+	;
 
 	return non_updateable_bitset;
 }
@@ -818,10 +810,10 @@ CStatisticsUtils::GetColsNonUpdatableHistForDisj(
 //
 //---------------------------------------------------------------------------
 void
-CStatisticsUtils::AddHistogram(
-	CMemoryPool *mp, ULONG colid, const CHistogram *histogram,
-	gpos::pointer<UlongToHistogramMap *> col_histogram_mapping,
-	BOOL replace_old)
+CStatisticsUtils::AddHistogram(CMemoryPool *mp, ULONG colid,
+							   const CHistogram *histogram,
+							   UlongToHistogramMap *col_histogram_mapping,
+							   BOOL replace_old)
 {
 	GPOS_ASSERT(nullptr != histogram);
 
@@ -850,8 +842,8 @@ CStatisticsUtils::AddHistogram(
 //
 //---------------------------------------------------------------------------
 void
-CStatisticsUtils::PrintHistogramMap(
-	IOstream &os, gpos::pointer<UlongToHistogramMap *> col_histogram_mapping)
+CStatisticsUtils::PrintHistogramMap(IOstream &os,
+									UlongToHistogramMap *col_histogram_mapping)
 {
 	GPOS_ASSERT(nullptr != col_histogram_mapping);
 
@@ -876,11 +868,12 @@ CStatisticsUtils::PrintHistogramMap(
 //		the histograms generated by the child of disjunction
 //
 //---------------------------------------------------------------------------
-gpos::owner<UlongToHistogramMap *>
-CStatisticsUtils::MergeHistogramMapsForDisjPreds(
-	CMemoryPool *mp, gpos::pointer<CBitSet *> non_updatable_cols,
-	gpos::pointer<UlongToHistogramMap *> hmap1,
-	gpos::pointer<UlongToHistogramMap *> hmap2, CDouble rows1, CDouble rows2)
+gpos::Ref<UlongToHistogramMap>
+CStatisticsUtils::MergeHistogramMapsForDisjPreds(CMemoryPool *mp,
+												 CBitSet *non_updatable_cols,
+												 UlongToHistogramMap *hmap1,
+												 UlongToHistogramMap *hmap2,
+												 CDouble rows1, CDouble rows2)
 {
 	GPOS_ASSERT(nullptr != non_updatable_cols);
 	GPOS_ASSERT(nullptr != hmap1);
@@ -888,7 +881,7 @@ CStatisticsUtils::MergeHistogramMapsForDisjPreds(
 
 	CDouble output_rows(CStatistics::MinRows.Get());
 
-	gpos::owner<UlongToHistogramMap *> merged_hmap =
+	gpos::Ref<UlongToHistogramMap> merged_hmap =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// iterate over the new hash map of histograms and only add
@@ -902,7 +895,7 @@ CStatisticsUtils::MergeHistogramMapsForDisjPreds(
 			const CHistogram *histogram = hmap2_iter.Value();
 			if (!non_updatable_cols->Get(colid))
 			{
-				AddHistogram(mp, colid, histogram, merged_hmap);
+				AddHistogram(mp, colid, histogram, merged_hmap.get());
 			}
 			GPOS_CHECK_ABORT;
 		}
@@ -928,13 +921,13 @@ CStatisticsUtils::MergeHistogramMapsForDisjPreds(
 							rows1, histogram2, rows2, &output_rows);
 
 					AddHistogram(mp, colid, normalized_union_histogram,
-								 merged_hmap, true /* fReplaceOld */);
+								 merged_hmap.get(), true /* fReplaceOld */);
 
 					GPOS_DELETE(normalized_union_histogram);
 				}
 				else
 				{
-					AddHistogram(mp, colid, histogram1, merged_hmap);
+					AddHistogram(mp, colid, histogram1, merged_hmap.get());
 				}
 
 				GPOS_CHECK_ABORT;
@@ -954,13 +947,13 @@ CStatisticsUtils::MergeHistogramMapsForDisjPreds(
 //		Helper method to copy the hash map of histograms
 //
 //---------------------------------------------------------------------------
-gpos::owner<UlongToHistogramMap *>
-CStatisticsUtils::CopyHistHashMap(
-	CMemoryPool *mp, gpos::pointer<UlongToHistogramMap *> col_histogram_mapping)
+gpos::Ref<UlongToHistogramMap>
+CStatisticsUtils::CopyHistHashMap(CMemoryPool *mp,
+								  UlongToHistogramMap *col_histogram_mapping)
 {
 	GPOS_ASSERT(nullptr != col_histogram_mapping);
 
-	gpos::owner<UlongToHistogramMap *> histograms_copy =
+	gpos::Ref<UlongToHistogramMap> histograms_copy =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	UlongToHistogramMapIter col_hist_mapping_iter(col_histogram_mapping);
@@ -968,7 +961,7 @@ CStatisticsUtils::CopyHistHashMap(
 	{
 		ULONG colid = *(col_hist_mapping_iter.Key());
 		const CHistogram *histogram = col_hist_mapping_iter.Value();
-		AddHistogram(mp, colid, histogram, histograms_copy);
+		AddHistogram(mp, colid, histogram, histograms_copy.get());
 		GPOS_CHECK_ABORT;
 	}
 
@@ -986,8 +979,7 @@ CStatisticsUtils::CopyHistHashMap(
 //
 //---------------------------------------------------------------------------
 ULONG
-CStatisticsUtils::GetColId(
-	gpos::pointer<const CStatsPredPtrArry *> pred_stats_array)
+CStatisticsUtils::GetColId(const CStatsPredPtrArry *pred_stats_array)
 {
 	GPOS_ASSERT(nullptr != pred_stats_array);
 
@@ -997,7 +989,7 @@ CStatisticsUtils::GetColId(
 	const ULONG length = pred_stats_array->Size();
 	for (ULONG i = 0; i < length && is_same_col; i++)
 	{
-		gpos::pointer<CStatsPred *> pred_stats = (*pred_stats_array)[i];
+		CStatsPred *pred_stats = (*pred_stats_array)[i].get();
 		ULONG colid = pred_stats->GetColId();
 		if (gpos::ulong_max == result_colid)
 		{
@@ -1023,13 +1015,13 @@ CStatisticsUtils::GetColId(
 //		Generate a null datum given a column reference
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CStatisticsUtils::DatumNull(const CColRef *colref)
 {
-	gpos::pointer<const IMDType *> mdtype = colref->RetrieveType();
+	const IMDType *mdtype = colref->RetrieveType();
 
-	gpos::owner<IDatum *> datum = mdtype->DatumNull();
-	datum->AddRef();
+	gpos::Ref<IDatum> datum = mdtype->DatumNull();
+	;
 
 	return datum;
 }
@@ -1048,13 +1040,14 @@ CStatisticsUtils::DatumNull(const CColRef *colref)
 //		condition (R.pk=T.x)
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
-CStatisticsUtils::DeriveStatsForDynamicScan(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, ULONG scan_id,
-	gpos::pointer<CPartitionPropagationSpec *> pps_reqd)
+gpos::Ref<IStatistics>
+CStatisticsUtils::DeriveStatsForDynamicScan(CMemoryPool *mp,
+											CExpressionHandle &exprhdl,
+											ULONG scan_id,
+											CPartitionPropagationSpec *pps_reqd)
 {
 	// extract part table base stats from passed handle
-	gpos::pointer<IStatistics *> base_table_stats = exprhdl.Pstats();
+	IStatistics *base_table_stats = exprhdl.Pstats();
 	GPOS_ASSERT(nullptr != base_table_stats);
 	if (nullptr == base_table_stats)
 	{
@@ -1066,16 +1059,15 @@ CStatisticsUtils::DeriveStatsForDynamicScan(
 	{
 		// return base stats if stats derivation with dynamic partition
 		// elimination is disabled
-		base_table_stats->AddRef();
+		;
 		return base_table_stats;
 	}
 
-	gpos::pointer<const CBitSet *> selector_ids =
-		pps_reqd->SelectorIds(scan_id);
+	const CBitSet *selector_ids = pps_reqd->SelectorIds(scan_id);
 	if (!pps_reqd->Contains(scan_id) || selector_ids->Size() == 0)
 	{
 		// no corresponding partition selector is present, return base stats
-		base_table_stats->AddRef();
+		;
 		return base_table_stats;
 	}
 
@@ -1096,12 +1088,10 @@ CStatisticsUtils::DeriveStatsForDynamicScan(
 		GPOS_ASSERT(part_selector_info != nullptr);
 	}
 
-	gpos::pointer<IStatistics *> part_selector_stats =
-		part_selector_info->m_stats;
-	gpos::pointer<CExpression *> scalar_expr =
-		part_selector_info->m_filter_expr;
+	IStatistics *part_selector_stats = part_selector_info->m_stats.get();
+	CExpression *scalar_expr = part_selector_info->m_filter_expr.get();
 
-	gpos::owner<CColRefSetArray *> output_colrefs =
+	gpos::Ref<CColRefSetArray> output_colrefs =
 		GPOS_NEW(mp) CColRefSetArray(mp);
 	output_colrefs->Append(base_table_stats->GetColRefSet(mp));
 	output_colrefs->Append(part_selector_stats->GetColRefSet(mp));
@@ -1112,37 +1102,37 @@ CStatisticsUtils::DeriveStatsForDynamicScan(
 	 * This can never happen for a Dynamic table scan since we need the predicate to contain the
 	 * partition key in order to generate the DTS in the first place
 	 */
-	gpos::owner<CColRefSet *> outer_refs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> outer_refs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// extract all the conjuncts
-	gpos::owner<CStatsPred *> unsupported_pred_stats = nullptr;
-	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
+	gpos::Ref<CStatsPred> unsupported_pred_stats = nullptr;
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromJoinPredArray(
-			mp, scalar_expr, output_colrefs, outer_refs,
+			mp, scalar_expr, output_colrefs.get(), outer_refs,
 			true,  // semi-join
 			&unsupported_pred_stats);
 
-	gpos::owner<IStatistics *> left_semi_join_stats =
+	gpos::Ref<IStatistics> left_semi_join_stats =
 		base_table_stats->CalcLSJoinStats(mp, part_selector_stats,
-										  join_preds_stats);
+										  join_preds_stats.get());
 
 	if (nullptr != unsupported_pred_stats)
 	{
 		// apply the unsupported join filters as a filter on top of the join results.
 		// TODO,  June 13 2014 we currently only cap NDVs for filters
 		// (also look at CJoinStatsProcessor::CalcAllJoinStats since most of this code was taken from there)
-		gpos::owner<IStatistics *> stats_after_join_filter =
+		gpos::Ref<IStatistics> stats_after_join_filter =
 			CFilterStatsProcessor::MakeStatsFilter(
-				mp, gpos::dyn_cast<CStatistics>(left_semi_join_stats),
-				unsupported_pred_stats, false /* do_cap_NDVs */);
-		left_semi_join_stats->Release();
+				mp, gpos::dyn_cast<CStatistics>(left_semi_join_stats.get()),
+				unsupported_pred_stats.get(), false /* do_cap_NDVs */);
+		;
 		left_semi_join_stats = stats_after_join_filter;
 	}
 
-	CRefCount::SafeRelease(std::move(unsupported_pred_stats));
-	output_colrefs->Release();
-	outer_refs->Release();
-	join_preds_stats->Release();
+	;
+	;
+	;
+	;
 
 	return left_semi_join_stats;
 }
@@ -1156,9 +1146,9 @@ CStatisticsUtils::DeriveStatsForDynamicScan(
 //
 //---------------------------------------------------------------------------
 IStatistics *
-CStatisticsUtils::DeriveStatsForIndexGet(
-	CMemoryPool *mp, CExpressionHandle &expr_handle,
-	gpos::pointer<IStatisticsArray *> stats_contexts)
+CStatisticsUtils::DeriveStatsForIndexGet(CMemoryPool *mp,
+										 CExpressionHandle &expr_handle,
+										 IStatisticsArray *stats_contexts)
 {
 	COperator::EOperatorId operator_id = expr_handle.Pop()->Eopid();
 	GPOS_ASSERT(CLogical::EopLogicalIndexGet == operator_id ||
@@ -1166,12 +1156,12 @@ CStatisticsUtils::DeriveStatsForIndexGet(
 
 	// collect columns used by index conditions and distribution of the table
 	// for statistics
-	gpos::owner<CColRefSet *> used_col_refset = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> used_col_refset = GPOS_NEW(mp) CColRefSet(mp);
 
-	gpos::pointer<CTableDescriptor *> table_descriptor = nullptr;
+	CTableDescriptor *table_descriptor = nullptr;
 	if (CLogical::EopLogicalIndexGet == operator_id)
 	{
-		gpos::pointer<CLogicalIndexGet *> index_get_op =
+		CLogicalIndexGet *index_get_op =
 			gpos::dyn_cast<CLogicalIndexGet>(expr_handle.Pop());
 		table_descriptor = index_get_op->Ptabdesc();
 		if (nullptr != index_get_op->PcrsDist())
@@ -1181,7 +1171,7 @@ CStatisticsUtils::DeriveStatsForIndexGet(
 	}
 	else
 	{
-		gpos::pointer<CLogicalDynamicIndexGet *> dynamic_index_get_op =
+		CLogicalDynamicIndexGet *dynamic_index_get_op =
 			gpos::dyn_cast<CLogicalDynamicIndexGet>(expr_handle.Pop());
 		table_descriptor = dynamic_index_get_op->Ptabdesc();
 		if (nullptr != dynamic_index_get_op->PcrsDist())
@@ -1192,8 +1182,8 @@ CStatisticsUtils::DeriveStatsForIndexGet(
 
 	CExpression *scalar_expr =
 		expr_handle.PexprScalarRepChild(0 /*ulChidIndex*/);
-	gpos::owner<CExpression *> local_expr = nullptr;
-	gpos::owner<CExpression *> outer_refs_expr = nullptr;
+	gpos::Ref<CExpression> local_expr = nullptr;
+	gpos::Ref<CExpression> outer_refs_expr = nullptr;
 
 	// get outer references from expression handle
 	CColRefSet *outer_col_refset = expr_handle.DeriveOuterReferences();
@@ -1206,17 +1196,17 @@ CStatisticsUtils::DeriveStatsForIndexGet(
 	// filter out outer references in used columns
 	used_col_refset->Difference(outer_col_refset);
 
-	gpos::owner<IStatistics *> base_table_stats = CLogical::PstatsBaseTable(
-		mp, expr_handle, table_descriptor, used_col_refset);
-	used_col_refset->Release();
+	gpos::Ref<IStatistics> base_table_stats = CLogical::PstatsBaseTable(
+		mp, expr_handle, table_descriptor, used_col_refset.get());
+	;
 
 	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
-		mp, expr_handle, base_table_stats, local_expr, outer_refs_expr,
-		stats_contexts);
+		mp, expr_handle, base_table_stats.get(), local_expr.get(),
+		outer_refs_expr, stats_contexts);
 
-	base_table_stats->Release();
-	local_expr->Release();
-	outer_refs_expr->Release();
+	;
+	;
+	;
 
 	return stats;
 }
@@ -1230,43 +1220,42 @@ CStatisticsUtils::DeriveStatsForIndexGet(
 //
 //---------------------------------------------------------------------------
 IStatistics *
-CStatisticsUtils::DeriveStatsForBitmapTableGet(
-	CMemoryPool *mp, CExpressionHandle &expr_handle,
-	gpos::pointer<IStatisticsArray *> stats_contexts)
+CStatisticsUtils::DeriveStatsForBitmapTableGet(CMemoryPool *mp,
+											   CExpressionHandle &expr_handle,
+											   IStatisticsArray *stats_contexts)
 {
 	GPOS_ASSERT(CLogical::EopLogicalBitmapTableGet ==
 					expr_handle.Pop()->Eopid() ||
 				CLogical::EopLogicalDynamicBitmapTableGet ==
 					expr_handle.Pop()->Eopid());
-	gpos::pointer<CTableDescriptor *> table_descriptor =
-		expr_handle.DeriveTableDescriptor();
+	CTableDescriptor *table_descriptor = expr_handle.DeriveTableDescriptor();
 
 	// the index of the condition
 	ULONG child_cond_index = 0;
 
 	// get outer references from expression handle
 	CColRefSet *outer_col_refset = expr_handle.DeriveOuterReferences();
-	gpos::owner<CExpression *> local_expr = nullptr;
-	gpos::owner<CExpression *> outer_refs_expr = nullptr;
+	gpos::Ref<CExpression> local_expr = nullptr;
+	gpos::Ref<CExpression> outer_refs_expr = nullptr;
 	CExpression *scalar_expr =
 		expr_handle.PexprScalarRepChild(child_cond_index);
 	CPredicateUtils::SeparateOuterRefs(mp, scalar_expr, outer_col_refset,
 									   &local_expr, &outer_refs_expr);
 
 	// collect columns used by the index
-	gpos::owner<CColRefSet *> used_col_refset = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> used_col_refset = GPOS_NEW(mp) CColRefSet(mp);
 	used_col_refset->Union(expr_handle.DeriveUsedColumns(child_cond_index));
 	used_col_refset->Difference(outer_col_refset);
-	gpos::owner<IStatistics *> base_table_stats = CLogical::PstatsBaseTable(
-		mp, expr_handle, table_descriptor, used_col_refset);
-	used_col_refset->Release();
+	gpos::Ref<IStatistics> base_table_stats = CLogical::PstatsBaseTable(
+		mp, expr_handle, table_descriptor, used_col_refset.get());
+	;
 	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
-		mp, expr_handle, base_table_stats, local_expr, outer_refs_expr,
-		stats_contexts);
+		mp, expr_handle, base_table_stats.get(), local_expr.get(),
+		outer_refs_expr, stats_contexts);
 
-	base_table_stats->Release();
-	local_expr->Release();
-	outer_refs_expr->Release();
+	;
+	;
+	;
 
 	return stats;
 }
@@ -1281,17 +1270,16 @@ CStatisticsUtils::DeriveStatsForBitmapTableGet(
 //	    logical operator id where it was defined. If the grouping column is
 //      not a table column then the logical op id is initialized to gpos::ulong_max
 //---------------------------------------------------------------------------
-gpos::owner<UlongToUlongPtrArrayMap *>
+gpos::Ref<UlongToUlongPtrArrayMap>
 CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
-	CMemoryPool *mp, gpos::pointer<CStatistics *> stats,
-	gpos::pointer<const CColRefSet *> grp_cols_refset,
-	gpos::pointer<CBitSet *> keys  // keys derived during optimization
+	CMemoryPool *mp, CStatistics *stats, const CColRefSet *grp_cols_refset,
+	CBitSet *keys  // keys derived during optimization
 )
 {
 	GPOS_ASSERT(nullptr != grp_cols_refset);
 	GPOS_ASSERT(nullptr != stats);
 
-	gpos::owner<UlongToUlongPtrArrayMap *> grp_colid_upper_bound_ndv_idx_map =
+	gpos::Ref<UlongToUlongPtrArrayMap> grp_colid_upper_bound_ndv_idx_map =
 		GPOS_NEW(mp) UlongToUlongPtrArrayMap(mp);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
@@ -1309,11 +1297,11 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 			const CColRef *grouping_colref = col_factory->LookupColRef(colid);
 			const ULONG upper_bound_ndv_idx =
 				stats->GetIndexUpperBoundNDVs(grouping_colref);
-			gpos::pointer<const ULongPtrArray *> ndv_colid =
+			const ULongPtrArray *ndv_colid =
 				grp_colid_upper_bound_ndv_idx_map->Find(&upper_bound_ndv_idx);
 			if (nullptr == ndv_colid)
 			{
-				gpos::owner<ULongPtrArray *> colids_new =
+				gpos::Ref<ULongPtrArray> colids_new =
 					GPOS_NEW(mp) ULongPtrArray(mp);
 				colids_new->Append(GPOS_NEW(mp) ULONG(colid));
 				BOOL fres GPOS_ASSERTS_ONLY =
@@ -1342,10 +1330,10 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 //---------------------------------------------------------------------------
 void
 CStatisticsUtils::AddNdvForAllGrpCols(
-	CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
-	gpos::pointer<const ULongPtrArray *>
-		grouping_columns,  // array of grouping column ids from a source
-	gpos::pointer<CDoubleArray *> output_ndvs  // output array of ndvs
+	CMemoryPool *mp, const CStatistics *input_stats,
+	const ULongPtrArray
+		*grouping_columns,	   // array of grouping column ids from a source
+	CDoubleArray *output_ndvs  // output array of ndvs
 )
 {
 	GPOS_ASSERT(nullptr != grouping_columns);
@@ -1386,37 +1374,36 @@ CStatisticsUtils::AddNdvForAllGrpCols(
 //		than the card of filter table. Else we add the NDVs for all grouping
 //      columns as is.
 //---------------------------------------------------------------------------
-gpos::owner<CDoubleArray *>
+gpos::Ref<CDoubleArray>
 CStatisticsUtils::ExtractNDVForGrpCols(
-	CMemoryPool *mp, gpos::pointer<const CStatisticsConfig *> stats_config,
-	gpos::pointer<const IStatistics *> stats,
-	gpos::pointer<CColRefSet *> grp_cols_refset,
-	gpos::pointer<CBitSet *> keys  // keys derived during optimization
+	CMemoryPool *mp, const CStatisticsConfig *stats_config,
+	const IStatistics *stats, CColRefSet *grp_cols_refset,
+	CBitSet *keys  // keys derived during optimization
 )
 {
 	GPOS_ASSERT(nullptr != stats);
 	GPOS_ASSERT(nullptr != grp_cols_refset);
 
-	gpos::pointer<CStatistics *> input_stats =
+	CStatistics *input_stats =
 		gpos::dyn_cast<CStatistics>(const_cast<IStatistics *>(stats));
 
-	gpos::owner<CDoubleArray *> ndvs = GPOS_NEW(mp) CDoubleArray(mp);
+	gpos::Ref<CDoubleArray> ndvs = GPOS_NEW(mp) CDoubleArray(mp);
 
-	gpos::owner<UlongToUlongPtrArrayMap *> grp_colid_upper_bound_ndv_idx_map =
+	gpos::Ref<UlongToUlongPtrArrayMap> grp_colid_upper_bound_ndv_idx_map =
 		GetGrpColIdToUpperBoundNDVIdxMap(mp, input_stats, grp_cols_refset,
 										 keys);
-	UlongToUlongPtrArrayMapIter map_iter(grp_colid_upper_bound_ndv_idx_map);
+	UlongToUlongPtrArrayMapIter map_iter(
+		grp_colid_upper_bound_ndv_idx_map.get());
 	while (map_iter.Advance())
 	{
 		ULONG source_id = *(map_iter.Key());
-		gpos::pointer<const ULongPtrArray *> src_grouping_cols =
-			map_iter.Value();
+		const ULongPtrArray *src_grouping_cols = map_iter.Value();
 
 		if (gpos::ulong_max == source_id)
 		{
 			// this array of grouping columns represents computed columns.
 			// Since we currently do not cap computed columns, we add all of their NDVs as is
-			AddNdvForAllGrpCols(mp, input_stats, src_grouping_cols, ndvs);
+			AddNdvForAllGrpCols(mp, input_stats, src_grouping_cols, ndvs.get());
 		}
 		else
 		{
@@ -1428,7 +1415,7 @@ CStatisticsUtils::ExtractNDVForGrpCols(
 	}
 
 	// clean up
-	grp_colid_upper_bound_ndv_idx_map->Release();
+	;
 
 	return ndvs;
 }
@@ -1441,9 +1428,8 @@ CStatisticsUtils::ExtractNDVForGrpCols(
 //       Check to see if any one of the grouping columns has been capped
 //---------------------------------------------------------------------------
 BOOL
-CStatisticsUtils::CappedGrpColExists(
-	gpos::pointer<const CStatistics *> stats,
-	gpos::pointer<const ULongPtrArray *> grouping_columns)
+CStatisticsUtils::CappedGrpColExists(const CStatistics *stats,
+									 const ULongPtrArray *grouping_columns)
 {
 	GPOS_ASSERT(nullptr != stats);
 	GPOS_ASSERT(nullptr != grouping_columns);
@@ -1472,8 +1458,8 @@ CStatisticsUtils::CappedGrpColExists(
 //      Return the maximum NDV given an array of grouping columns
 //---------------------------------------------------------------------------
 CDouble
-CStatisticsUtils::MaxNdv(gpos::pointer<const CStatistics *> stats,
-						 gpos::pointer<const ULongPtrArray *> grouping_columns)
+CStatisticsUtils::MaxNdv(const CStatistics *stats,
+						 const ULongPtrArray *grouping_columns)
 {
 	GPOS_ASSERT(nullptr != stats);
 	GPOS_ASSERT(nullptr != grouping_columns);
@@ -1515,9 +1501,8 @@ CStatisticsUtils::MaxNdv(gpos::pointer<const CStatistics *> stats,
 //---------------------------------------------------------------------------
 CDouble
 CStatisticsUtils::MaxNumGroupsForGivenSrcGprCols(
-	CMemoryPool *mp, gpos::pointer<const CStatisticsConfig *> stats_config,
-	gpos::pointer<CStatistics *> input_stats,
-	gpos::pointer<const ULongPtrArray *> src_grouping_cols)
+	CMemoryPool *mp, const CStatisticsConfig *stats_config,
+	CStatistics *input_stats, const ULongPtrArray *src_grouping_cols)
 {
 	GPOS_ASSERT(nullptr != input_stats);
 	GPOS_ASSERT(nullptr != src_grouping_cols);
@@ -1529,8 +1514,8 @@ CStatisticsUtils::MaxNumGroupsForGivenSrcGprCols(
 	CColRef *first_colref = col_factory->LookupColRef(*(*src_grouping_cols)[0]);
 	CDouble upper_bound_ndvs = input_stats->GetColUpperBoundNDVs(first_colref);
 
-	gpos::owner<CDoubleArray *> ndvs = GPOS_NEW(mp) CDoubleArray(mp);
-	AddNdvForAllGrpCols(mp, input_stats, src_grouping_cols, ndvs);
+	gpos::Ref<CDoubleArray> ndvs = GPOS_NEW(mp) CDoubleArray(mp);
+	AddNdvForAllGrpCols(mp, input_stats, src_grouping_cols, ndvs.get());
 
 	// take the minimum of (a) the estimated number of groups from the columns of this source,
 	// (b) input rows, and (c) cardinality upper bound for the given source in the
@@ -1542,9 +1527,9 @@ CStatisticsUtils::MaxNumGroupsForGivenSrcGprCols(
 	// in DNumOfDistVal when we compute the final group by cardinality
 	CDouble groups =
 		std::min(std::max(CStatistics::MinRows.Get(),
-						  GetCumulativeNDVs(stats_config, ndvs).Get()),
+						  GetCumulativeNDVs(stats_config, ndvs.get()).Get()),
 				 std::min(input_rows.Get(), upper_bound_ndvs.Get()));
-	ndvs->Release();
+	;
 
 	return groups;
 }
@@ -1558,33 +1543,31 @@ CStatisticsUtils::MaxNumGroupsForGivenSrcGprCols(
 //
 //---------------------------------------------------------------------------
 CDouble
-CStatisticsUtils::Groups(
-	CMemoryPool *mp, gpos::pointer<IStatistics *> stats,
-	gpos::pointer<const CStatisticsConfig *> stats_config,
-	gpos::pointer<ULongPtrArray *> grouping_cols,
-	gpos::pointer<CBitSet *> keys  // keys derived during optimization
+CStatisticsUtils::Groups(CMemoryPool *mp, IStatistics *stats,
+						 const CStatisticsConfig *stats_config,
+						 ULongPtrArray *grouping_cols,
+						 CBitSet *keys	// keys derived during optimization
 )
 {
 	GPOS_ASSERT(nullptr != stats);
 	GPOS_ASSERT(nullptr != stats_config);
 	GPOS_ASSERT(nullptr != grouping_cols);
 
-	gpos::owner<CColRefSet *> computed_groupby_cols =
-		GPOS_NEW(mp) CColRefSet(mp);
-	gpos::owner<CColRefSet *> grp_col_for_stats =
-		MakeGroupByColsForStats(mp, grouping_cols, computed_groupby_cols);
+	gpos::Ref<CColRefSet> computed_groupby_cols = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> grp_col_for_stats =
+		MakeGroupByColsForStats(mp, grouping_cols, computed_groupby_cols.get());
 
-	gpos::owner<CDoubleArray *> ndvs =
-		ExtractNDVForGrpCols(mp, stats_config, stats, grp_col_for_stats, keys);
+	gpos::Ref<CDoubleArray> ndvs = ExtractNDVForGrpCols(
+		mp, stats_config, stats, grp_col_for_stats.get(), keys);
 	CDouble groups =
 		std::min(std::max(CStatistics::MinRows.Get(),
-						  GetCumulativeNDVs(stats_config, ndvs).Get()),
+						  GetCumulativeNDVs(stats_config, ndvs.get()).Get()),
 				 stats->Rows().Get());
 
 	// clean up
-	grp_col_for_stats->Release();
-	computed_groupby_cols->Release();
-	ndvs->Release();
+	;
+	;
+	;
 
 	return groups;
 }
@@ -1599,9 +1582,8 @@ CStatisticsUtils::Groups(
 //		from the array of NDVs of the individual grouping columns
 //---------------------------------------------------------------------------
 CDouble
-CStatisticsUtils::GetCumulativeNDVs(
-	gpos::pointer<const CStatisticsConfig *> stats_config,
-	gpos::pointer<CDoubleArray *> ndvs)
+CStatisticsUtils::GetCumulativeNDVs(const CStatisticsConfig *stats_config,
+									CDoubleArray *ndvs)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 	GPOS_ASSERT(nullptr != ndvs);
@@ -1638,11 +1620,11 @@ CStatisticsUtils::GetCumulativeNDVs(
 //		Add the statistics (histogram and width) of the grouping columns
 //---------------------------------------------------------------------------
 void
-CStatisticsUtils::AddGrpColStats(
-	CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
-	gpos::pointer<CColRefSet *> grp_cols_refset,
-	gpos::pointer<UlongToHistogramMap *> output_histograms,
-	gpos::pointer<UlongToDoubleMap *> output_col_widths)
+CStatisticsUtils::AddGrpColStats(CMemoryPool *mp,
+								 const CStatistics *input_stats,
+								 CColRefSet *grp_cols_refset,
+								 UlongToHistogramMap *output_histograms,
+								 UlongToDoubleMap *output_col_widths)
 {
 	GPOS_ASSERT(nullptr != input_stats);
 	GPOS_ASSERT(nullptr != grp_cols_refset);
@@ -1690,17 +1672,17 @@ CStatisticsUtils::AddGrpColStats(
 //		If the grouping column (c) is a computed column, for example c = f(a,b),
 //		then we include columns a and b as the grouping column instead of c.
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
-CStatisticsUtils::MakeGroupByColsForStats(
-	CMemoryPool *mp, gpos::pointer<const ULongPtrArray *> grouping_columns,
-	gpos::pointer<CColRefSet *> computed_groupby_cols)
+gpos::Ref<CColRefSet>
+CStatisticsUtils::MakeGroupByColsForStats(CMemoryPool *mp,
+										  const ULongPtrArray *grouping_columns,
+										  CColRefSet *computed_groupby_cols)
 {
 	GPOS_ASSERT(nullptr != grouping_columns);
 	GPOS_ASSERT(nullptr != computed_groupby_cols);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
-	gpos::owner<CColRefSet *> grp_col_for_stats = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> grp_col_for_stats = GPOS_NEW(mp) CColRefSet(mp);
 
 	const ULONG ulGrpCols = grouping_columns->Size();
 
@@ -1712,7 +1694,7 @@ CStatisticsUtils::MakeGroupByColsForStats(
 		GPOS_ASSERT(nullptr != grp_col_ref);
 
 		// check to see if the grouping column is a computed attribute
-		gpos::pointer<const CColRefSet *> used_col_refset =
+		const CColRefSet *used_col_refset =
 			col_factory->PcrsUsedInComputedCol(grp_col_ref);
 		if (nullptr == used_col_refset || 0 == used_col_refset->Size())
 		{
@@ -1739,8 +1721,7 @@ CStatisticsUtils::MakeGroupByColsForStats(
 //
 //---------------------------------------------------------------------------
 CDouble
-CStatisticsUtils::GetNumDistinct(
-	gpos::pointer<const CBucketArray *> histogram_buckets)
+CStatisticsUtils::GetNumDistinct(const CBucketArray *histogram_buckets)
 {
 	GPOS_ASSERT(nullptr != histogram_buckets);
 
@@ -1765,8 +1746,7 @@ CStatisticsUtils::GetNumDistinct(
 //
 //---------------------------------------------------------------------------
 CDouble
-CStatisticsUtils::GetFrequency(
-	gpos::pointer<const CBucketArray *> histogram_buckets)
+CStatisticsUtils::GetFrequency(const CBucketArray *histogram_buckets)
 {
 	GPOS_ASSERT(nullptr != histogram_buckets);
 
@@ -1797,7 +1777,7 @@ CStatisticsUtils::IsStatsCmpTypeNdvEq(CStatsPred::EStatsCmpType stats_cmp_type)
 //---------------------------------------------------------------------------
 
 BOOL
-CStatisticsUtils::IncreasesRisk(gpos::pointer<CLogical *> logical_op)
+CStatisticsUtils::IncreasesRisk(CLogical *logical_op)
 {
 	if (logical_op->FSelectionOp())
 	{
@@ -1833,7 +1813,7 @@ CStatisticsUtils::IncreasesRisk(gpos::pointer<CLogical *> logical_op)
 //
 //---------------------------------------------------------------------------
 CDouble
-CStatisticsUtils::DefaultColumnWidth(gpos::pointer<const IMDType *> mdtype)
+CStatisticsUtils::DefaultColumnWidth(const IMDType *mdtype)
 {
 	CDouble width(CStatistics::DefaultColumnWidth);
 	if (mdtype->IsFixedLength())
@@ -1846,9 +1826,8 @@ CStatisticsUtils::DefaultColumnWidth(gpos::pointer<const IMDType *> mdtype)
 
 //	add width information
 void
-CStatisticsUtils::AddWidthInfo(CMemoryPool *mp,
-							   gpos::pointer<UlongToDoubleMap *> src_width,
-							   gpos::pointer<UlongToDoubleMap *> dest_width)
+CStatisticsUtils::AddWidthInfo(CMemoryPool *mp, UlongToDoubleMap *src_width,
+							   UlongToDoubleMap *dest_width)
 {
 	UlongToDoubleMapIter col_width_map_iterator(src_width);
 	while (col_width_map_iterator.Advance())
@@ -1872,9 +1851,9 @@ CStatisticsUtils::AddWidthInfo(CMemoryPool *mp,
 //  and information maintained in the current statistics object
 void
 CStatisticsUtils::ComputeCardUpperBounds(
-	CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
-	gpos::pointer<CStatistics *>
-		output_stats,	  // output statistics object that is to be updated
+	CMemoryPool *mp, const CStatistics *input_stats,
+	CStatistics
+		*output_stats,	  // output statistics object that is to be updated
 	CDouble rows_output,  // estimated output cardinality of the operator
 	CStatistics::ECardBoundingMethod
 		card_bounding_method  // technique used to estimate max source cardinality in the output stats object
@@ -1883,7 +1862,7 @@ CStatisticsUtils::ComputeCardUpperBounds(
 	GPOS_ASSERT(nullptr != output_stats);
 	GPOS_ASSERT(CStatistics::EcbmSentinel != card_bounding_method);
 
-	gpos::pointer<const CUpperBoundNDVPtrArray *> input_stats_ndv_upper_bound =
+	const CUpperBoundNDVPtrArray *input_stats_ndv_upper_bound =
 		input_stats->GetUpperBoundNDVs();
 	ULONG length = input_stats_ndv_upper_bound->Size();
 	for (ULONG i = 0; i < length; i++)

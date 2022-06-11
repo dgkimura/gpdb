@@ -35,11 +35,11 @@ public:
 	// ctors
 	CPhysicalDynamicTableScan(
 		CMemoryPool *mp, const CName *pnameAlias,
-		gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId,
-		ULONG scan_id, gpos::owner<CColRefArray *> pdrgpcrOutput,
-		gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
-		gpos::owner<IMdIdArray *> partition_mdids,
-		gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part);
+		gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId, ULONG scan_id,
+		gpos::Ref<CColRefArray> pdrgpcrOutput,
+		gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
+		gpos::Ref<IMdIdArray> partition_mdids,
+		gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part);
 
 	// ident accessors
 	EOperatorId
@@ -56,16 +56,15 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *>) const override;
+	BOOL Matches(COperator *) const override;
 
 	// statistics derivation during costing
-	gpos::owner<IStatistics *> PstatsDerive(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CReqdPropPlan *> prpplan,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan,
+		IStatisticsArray *stats_ctxt) const override;
 
 	// conversion function
-	static gpos::cast_func<CPhysicalDynamicTableScan *>
+	static CPhysicalDynamicTableScan *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -74,7 +73,7 @@ public:
 		return dynamic_cast<CPhysicalDynamicTableScan *>(pop);
 	}
 
-	gpos::owner<CPartitionPropagationSpec *> PppsDerive(
+	gpos::Ref<CPartitionPropagationSpec> PppsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 };	// class CPhysicalDynamicTableScan

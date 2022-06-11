@@ -70,8 +70,8 @@ public:
 	CScalarWindowFunc(const CScalarWindowFunc &) = delete;
 
 	// ctor
-	CScalarWindowFunc(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
-					  gpos::owner<IMDId *> mdid_return_type,
+	CScalarWindowFunc(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+					  gpos::Ref<IMDId> mdid_return_type,
 					  const CWStringConst *pstrFunc, EWinStage ewinstage,
 					  BOOL is_distinct, BOOL is_star_arg, BOOL is_simple_agg);
 
@@ -102,10 +102,10 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// conversion function
-	static gpos::cast_func<CScalarWindowFunc *>
+	static CScalarWindowFunc *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

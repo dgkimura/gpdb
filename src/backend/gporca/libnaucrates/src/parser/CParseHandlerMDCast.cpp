@@ -73,22 +73,21 @@ CParseHandlerMDCast::StartElement(const XMLCh *const,  // element_uri,
 
 
 	// parse cast properties
-	gpos::owner<IMDId *> mdid =
-		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBCast);
+	gpos::Ref<IMDId> mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+		EdxltokenGPDBCast);
 
-	gpos::owner<IMDId *> mdid_src =
+	gpos::Ref<IMDId> mdid_src =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenGPDBCastSrcType, EdxltokenGPDBCast);
 
-	gpos::owner<IMDId *> mdid_dest =
+	gpos::Ref<IMDId> mdid_dest =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenGPDBCastDestType, EdxltokenGPDBCast);
 
-	gpos::owner<IMDId *> mdid_cast_func =
+	gpos::Ref<IMDId> mdid_cast_func =
 		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenGPDBCastFuncId, EdxltokenGPDBCast);

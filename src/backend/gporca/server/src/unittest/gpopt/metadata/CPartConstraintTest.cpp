@@ -78,11 +78,11 @@ CPartConstraintTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
-	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
+	gpos::Ref<CConstExprEvaluatorForDates> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
@@ -108,78 +108,80 @@ CPartConstraintTest::EresUnittest_Basic()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup an MD accessor
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
-	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
+	const IMDTypeInt4 *pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 	CColRef *colref =
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier);
 
 	// create a constraint col \in [1,3)
-	gpos::owner<CConstraint *> pcnstr13 =
+	gpos::Ref<CConstraint> pcnstr13 =
 		PcnstrInterval(mp, colref, 1 /*ulLeft*/, 3 /*ulRight*/);
 
 	// create a constraint col \in [1,5)
-	gpos::owner<CConstraint *> pcnstr15 =
+	gpos::Ref<CConstraint> pcnstr15 =
 		PcnstrInterval(mp, colref, 1 /*ulLeft*/, 5 /*ulRight*/);
 
-	gpos::owner<CPartConstraint *> ppartcnstr13Default =
+	gpos::Ref<CPartConstraint> ppartcnstr13Default =
 		GPOS_NEW(mp) CPartConstraint(mp, pcnstr13, true /*fDefaultPartition*/,
 									 false /*is_unbounded*/);
-	gpos::owner<CPartConstraint *> ppartcnstr15Default =
+	gpos::Ref<CPartConstraint> ppartcnstr15Default =
 		GPOS_NEW(mp) CPartConstraint(mp, pcnstr15, true /*fDefaultPartition*/,
 									 false /*is_unbounded*/);
 
-	pcnstr13->AddRef();
-	gpos::owner<CPartConstraint *> ppartcnstr13NoDefault =
+	;
+	gpos::Ref<CPartConstraint> ppartcnstr13NoDefault =
 		GPOS_NEW(mp) CPartConstraint(mp, pcnstr13, false /*fDefaultPartition*/,
 									 false /*is_unbounded*/);
 
-	pcnstr13->AddRef();
-	gpos::owner<CPartConstraint *> ppartcnstr13DefaultUnbounded =
+	;
+	gpos::Ref<CPartConstraint> ppartcnstr13DefaultUnbounded =
 		GPOS_NEW(mp) CPartConstraint(mp, pcnstr13, true /*fDefaultPartition*/,
 									 true /*is_unbounded*/);
 
-	pcnstr15->AddRef();
-	gpos::owner<CPartConstraint *> ppartcnstr15DefaultUnbounded =
+	;
+	gpos::Ref<CPartConstraint> ppartcnstr15DefaultUnbounded =
 		GPOS_NEW(mp) CPartConstraint(mp, pcnstr15, true /*fDefaultPartition*/,
 									 true /*is_unbounded*/);
 
 	// tests
 
 	// equivalence
-	GPOS_ASSERT(ppartcnstr13Default->FEquivalent(ppartcnstr13Default));
+	GPOS_ASSERT(ppartcnstr13Default->FEquivalent(ppartcnstr13Default.get()));
 	GPOS_ASSERT(ppartcnstr13DefaultUnbounded->FEquivalent(
-		ppartcnstr13DefaultUnbounded));
+		ppartcnstr13DefaultUnbounded.get()));
 	GPOS_ASSERT(ppartcnstr13DefaultUnbounded->FEquivalent(
-		ppartcnstr15DefaultUnbounded));
+		ppartcnstr15DefaultUnbounded.get()));
 	GPOS_ASSERT(
-		!ppartcnstr13DefaultUnbounded->FEquivalent(ppartcnstr13Default));
-	GPOS_ASSERT(!ppartcnstr13Default->FEquivalent(ppartcnstr13NoDefault));
-	GPOS_ASSERT(!ppartcnstr13Default->FEquivalent(ppartcnstr15Default));
+		!ppartcnstr13DefaultUnbounded->FEquivalent(ppartcnstr13Default.get()));
+	GPOS_ASSERT(!ppartcnstr13Default->FEquivalent(ppartcnstr13NoDefault.get()));
+	GPOS_ASSERT(!ppartcnstr13Default->FEquivalent(ppartcnstr15Default.get()));
 
 	// unboundedness
 	GPOS_ASSERT(!ppartcnstr13Default->IsConstraintUnbounded());
 	GPOS_ASSERT(ppartcnstr13DefaultUnbounded->IsConstraintUnbounded());
 
 	// subsumption & overlap
-	GPOS_ASSERT(ppartcnstr13DefaultUnbounded->FSubsume(ppartcnstr13Default));
-	GPOS_ASSERT(ppartcnstr13DefaultUnbounded->FSubsume(ppartcnstr15Default));
-	GPOS_ASSERT(ppartcnstr15Default->FSubsume(ppartcnstr13Default));
-	GPOS_ASSERT(!ppartcnstr13Default->FSubsume(ppartcnstr15Default));
-	GPOS_ASSERT(ppartcnstr13Default->FOverlap(mp, ppartcnstr15Default));
-	GPOS_ASSERT(ppartcnstr13NoDefault->FOverlap(mp, ppartcnstr13Default));
+	GPOS_ASSERT(
+		ppartcnstr13DefaultUnbounded->FSubsume(ppartcnstr13Default.get()));
+	GPOS_ASSERT(
+		ppartcnstr13DefaultUnbounded->FSubsume(ppartcnstr15Default.get()));
+	GPOS_ASSERT(ppartcnstr15Default->FSubsume(ppartcnstr13Default.get()));
+	GPOS_ASSERT(!ppartcnstr13Default->FSubsume(ppartcnstr15Default.get()));
+	GPOS_ASSERT(ppartcnstr13Default->FOverlap(mp, ppartcnstr15Default.get()));
+	GPOS_ASSERT(ppartcnstr13NoDefault->FOverlap(mp, ppartcnstr13Default.get()));
 
 	// cleanup
-	ppartcnstr13Default->Release();
-	ppartcnstr15Default->Release();
-	ppartcnstr13DefaultUnbounded->Release();
-	ppartcnstr15DefaultUnbounded->Release();
-	ppartcnstr13NoDefault->Release();
+	;
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -192,29 +194,28 @@ CPartConstraintTest::EresUnittest_Basic()
 //		Create an interval constraint for the given column and interval boundaries
 //
 //---------------------------------------------------------------------------
-gpos::owner<CConstraint *>
+gpos::Ref<CConstraint>
 CPartConstraintTest::PcnstrInterval(CMemoryPool *mp, CColRef *colref,
 									ULONG ulLeft, ULONG ulRight)
 {
-	gpos::owner<CExpression *> pexprConstLeft =
+	gpos::Ref<CExpression> pexprConstLeft =
 		CUtils::PexprScalarConstInt4(mp, ulLeft);
-	gpos::owner<CExpression *> pexprConstRight =
+	gpos::Ref<CExpression> pexprConstRight =
 		CUtils::PexprScalarConstInt4(mp, ulRight);
 
 	// AND
-	gpos::owner<CExpressionArray *> pdrgpexpr =
-		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	pdrgpexpr->Append(CUtils::PexprScalarCmp(
 		mp, colref, std::move(pexprConstLeft), IMDType::EcmptGEq));
 	pdrgpexpr->Append(CUtils::PexprScalarCmp(
 		mp, colref, std::move(pexprConstRight), IMDType::EcmptL));
 
-	gpos::owner<CExpression *> pexpr = CUtils::PexprScalarBoolOp(
+	gpos::Ref<CExpression> pexpr = CUtils::PexprScalarBoolOp(
 		mp, CScalarBoolOp::EboolopAnd, std::move(pdrgpexpr));
-	gpos::owner<CConstraint *> pcnstr =
-		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
+	gpos::Ref<CConstraint> pcnstr =
+		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr.get(), colref);
 
-	pexpr->Release();
+	;
 
 	return pcnstr;
 }
@@ -238,13 +239,12 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup an MD accessor
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
-	gpos::pointer<const IMDType *> pmdtype =
-		mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
+	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
 	CWStringConst str(GPOS_WSZ_LIT("date_col"));
 	CName name(mp, &str);
 	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
@@ -253,76 +253,77 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	// create a date interval: ['01-01-2012', '01-21-2012')
 	CWStringDynamic pstrLowerDate1(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate1(mp, wszInternalRepresentationFor2012_01_21);
-	gpos::owner<CConstraintInterval *> pciFirst =
-		CTestUtils::PciGenericInterval(
-			mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
-			lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
-			&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
-			CRange::EriExcluded);
+	gpos::Ref<CConstraintInterval> pciFirst = CTestUtils::PciGenericInterval(
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
+		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
+		&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
+		CRange::EriExcluded);
 
 	// create a date interval: ['01-01-2012', '01-22-2012')
 	CWStringDynamic pstrLowerDate2(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate2(mp, wszInternalRepresentationFor2012_01_22);
-	gpos::owner<CConstraintInterval *> pciSecond =
-		CTestUtils::PciGenericInterval(
-			mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate2,
-			lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
-			&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
-			CRange::EriExcluded);
+	gpos::Ref<CConstraintInterval> pciSecond = CTestUtils::PciGenericInterval(
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate2,
+		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
+		&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
+		CRange::EriExcluded);
 
-	gpos::owner<CPartConstraint *> ppartcnstr1Default =
+	gpos::Ref<CPartConstraint> ppartcnstr1Default =
 		GPOS_NEW(mp) CPartConstraint(mp, pciFirst, true /*fDefaultPartition*/,
 									 false /*is_unbounded*/);
-	gpos::owner<CPartConstraint *> ppartcnstr2Default =
+	gpos::Ref<CPartConstraint> ppartcnstr2Default =
 		GPOS_NEW(mp) CPartConstraint(mp, pciSecond, true /*fDefaultPartition*/,
 									 false /*is_unbounded*/);
 
-	pciFirst->AddRef();
-	gpos::owner<CPartConstraint *> ppartcnstr1NoDefault =
+	;
+	gpos::Ref<CPartConstraint> ppartcnstr1NoDefault =
 		GPOS_NEW(mp) CPartConstraint(mp, pciFirst, false /*fDefaultPartition*/,
 									 false /*is_unbounded*/);
 
-	pciFirst->AddRef();
-	gpos::owner<CPartConstraint *> ppartcnstr1DefaultUnbounded =
+	;
+	gpos::Ref<CPartConstraint> ppartcnstr1DefaultUnbounded =
 		GPOS_NEW(mp) CPartConstraint(mp, pciFirst, true /*fDefaultPartition*/,
 									 true /*is_unbounded*/);
 
-	pciSecond->AddRef();
-	gpos::owner<CPartConstraint *> ppartcnstr2DefaultUnbounded =
+	;
+	gpos::Ref<CPartConstraint> ppartcnstr2DefaultUnbounded =
 		GPOS_NEW(mp) CPartConstraint(mp, pciSecond, true /*fDefaultPartition*/,
 									 true /*is_unbounded*/);
 
 	// tests
 
 	// equivalence
-	GPOS_ASSERT(ppartcnstr1Default->FEquivalent(ppartcnstr1Default));
+	GPOS_ASSERT(ppartcnstr1Default->FEquivalent(ppartcnstr1Default.get()));
+	GPOS_ASSERT(ppartcnstr1DefaultUnbounded->FEquivalent(
+		ppartcnstr1DefaultUnbounded.get()));
+	GPOS_ASSERT(ppartcnstr1DefaultUnbounded->FEquivalent(
+		ppartcnstr2DefaultUnbounded.get()));
 	GPOS_ASSERT(
-		ppartcnstr1DefaultUnbounded->FEquivalent(ppartcnstr1DefaultUnbounded));
-	GPOS_ASSERT(
-		ppartcnstr1DefaultUnbounded->FEquivalent(ppartcnstr2DefaultUnbounded));
-	GPOS_ASSERT(!ppartcnstr1DefaultUnbounded->FEquivalent(ppartcnstr1Default));
-	GPOS_ASSERT(!ppartcnstr1Default->FEquivalent(ppartcnstr1NoDefault));
-	GPOS_ASSERT(!ppartcnstr1Default->FEquivalent(ppartcnstr2Default));
+		!ppartcnstr1DefaultUnbounded->FEquivalent(ppartcnstr1Default.get()));
+	GPOS_ASSERT(!ppartcnstr1Default->FEquivalent(ppartcnstr1NoDefault.get()));
+	GPOS_ASSERT(!ppartcnstr1Default->FEquivalent(ppartcnstr2Default.get()));
 
 	// unboundedness
 	GPOS_ASSERT(!ppartcnstr1Default->IsConstraintUnbounded());
 	GPOS_ASSERT(ppartcnstr1DefaultUnbounded->IsConstraintUnbounded());
 
 	// subsumption & overlap
-	GPOS_ASSERT(ppartcnstr1DefaultUnbounded->FSubsume(ppartcnstr1Default));
-	GPOS_ASSERT(ppartcnstr1DefaultUnbounded->FSubsume(ppartcnstr2Default));
-	GPOS_ASSERT(pciSecond->FContainsInterval(mp, pciFirst));
-	GPOS_ASSERT(ppartcnstr2Default->FSubsume(ppartcnstr1Default));
-	GPOS_ASSERT(!ppartcnstr1Default->FSubsume(ppartcnstr2Default));
-	GPOS_ASSERT(ppartcnstr1Default->FOverlap(mp, ppartcnstr2Default));
-	GPOS_ASSERT(ppartcnstr1NoDefault->FOverlap(mp, ppartcnstr1Default));
+	GPOS_ASSERT(
+		ppartcnstr1DefaultUnbounded->FSubsume(ppartcnstr1Default.get()));
+	GPOS_ASSERT(
+		ppartcnstr1DefaultUnbounded->FSubsume(ppartcnstr2Default.get()));
+	GPOS_ASSERT(pciSecond->FContainsInterval(mp, pciFirst.get()));
+	GPOS_ASSERT(ppartcnstr2Default->FSubsume(ppartcnstr1Default.get()));
+	GPOS_ASSERT(!ppartcnstr1Default->FSubsume(ppartcnstr2Default.get()));
+	GPOS_ASSERT(ppartcnstr1Default->FOverlap(mp, ppartcnstr2Default.get()));
+	GPOS_ASSERT(ppartcnstr1NoDefault->FOverlap(mp, ppartcnstr1Default.get()));
 
 	// cleanup
-	ppartcnstr1Default->Release();
-	ppartcnstr2Default->Release();
-	ppartcnstr1DefaultUnbounded->Release();
-	ppartcnstr2DefaultUnbounded->Release();
-	ppartcnstr1NoDefault->Release();
+	;
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }

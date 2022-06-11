@@ -51,7 +51,7 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// relation mdid
-	gpos::owner<IMDId *> m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -60,30 +60,30 @@ private:
 	Ereldistrpolicy m_rel_distr_policy;
 
 	// columns
-	gpos::owner<CMDColumnArray *> m_md_col_array;
+	gpos::Ref<CMDColumnArray> m_md_col_array;
 
 	// number of dropped columns
 	ULONG m_dropped_cols;
 
 	// indices of distribution columns
-	gpos::owner<ULongPtrArray *> m_distr_col_array;
+	gpos::Ref<ULongPtrArray> m_distr_col_array;
 
-	gpos::owner<IMdIdArray *> m_distr_opfamilies;
+	gpos::Ref<IMdIdArray> m_distr_opfamilies;
 
 	// do we need to consider a hash distributed table as random distributed
 	BOOL m_convert_hash_to_random;
 
 	// array of key sets
-	gpos::owner<ULongPtr2dArray *> m_keyset_array;
+	gpos::Ref<ULongPtr2dArray> m_keyset_array;
 
 	// array of index infos
-	gpos::owner<CMDIndexInfoArray *> m_mdindex_info_array;
+	gpos::Ref<CMDIndexInfoArray> m_mdindex_info_array;
 
 	// array of trigger ids
-	gpos::owner<IMdIdArray *> m_mdid_trigger_array;
+	gpos::Ref<IMdIdArray> m_mdid_trigger_array;
 
 	// array of check constraint mdids
-	gpos::owner<IMdIdArray *> m_mdid_check_constraint_array;
+	gpos::Ref<IMdIdArray> m_mdid_check_constraint_array;
 
 	// reject limit
 	INT m_reject_limit;
@@ -92,23 +92,23 @@ private:
 	BOOL m_is_rej_limit_in_rows;
 
 	// format error table mdid
-	gpos::owner<IMDId *> m_mdid_fmt_err_table;
+	gpos::Ref<IMDId> m_mdid_fmt_err_table;
 
 	// number of system columns
 	ULONG m_system_columns;
 
 	// mapping of column position to positions excluding dropped columns
-	gpos::owner<UlongToUlongMap *> m_colpos_nondrop_colpos_map;
+	gpos::Ref<UlongToUlongMap> m_colpos_nondrop_colpos_map;
 
 	// mapping of attribute number in the system catalog to the positions of
 	// the non dropped column in the metadata object
-	gpos::owner<IntToUlongMap *> m_attrno_nondrop_col_pos_map;
+	gpos::Ref<IntToUlongMap> m_attrno_nondrop_col_pos_map;
 
 	// the original positions of all the non-dropped columns
-	gpos::owner<ULongPtrArray *> m_nondrop_col_pos_array;
+	gpos::Ref<ULongPtrArray> m_nondrop_col_pos_array;
 
 	// array of column widths including dropped columns
-	gpos::owner<CDoubleArray *> m_col_width_array;
+	gpos::Ref<CDoubleArray> m_col_width_array;
 
 	// format type for the relation
 	const CWStringConst *GetRelFormatType() const;
@@ -118,17 +118,18 @@ private:
 
 public:
 	// ctor
-	CMDRelationExternalGPDB(
-		CMemoryPool *mp, gpos::owner<IMDId *> mdid, CMDName *mdname,
-		Ereldistrpolicy rel_distr_policy,
-		gpos::owner<CMDColumnArray *> mdcol_array,
-		gpos::owner<ULongPtrArray *> distr_col_array,
-		gpos::owner<IMdIdArray *> distr_opfamilies, BOOL convert_hash_to_random,
-		gpos::owner<ULongPtr2dArray *> keyset_array,
-		gpos::owner<CMDIndexInfoArray *> md_index_info_array,
-		gpos::owner<IMdIdArray *> mdid_triggers_array,
-		gpos::owner<IMdIdArray *> mdid_check_constraint_array, INT reject_limit,
-		BOOL is_reject_limit_in_rows, gpos::owner<IMDId *> mdid_fmt_err_table);
+	CMDRelationExternalGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+							CMDName *mdname, Ereldistrpolicy rel_distr_policy,
+							gpos::Ref<CMDColumnArray> mdcol_array,
+							gpos::Ref<ULongPtrArray> distr_col_array,
+							gpos::Ref<IMdIdArray> distr_opfamilies,
+							BOOL convert_hash_to_random,
+							gpos::Ref<ULongPtr2dArray> keyset_array,
+							gpos::Ref<CMDIndexInfoArray> md_index_info_array,
+							gpos::Ref<IMdIdArray> mdid_triggers_array,
+							gpos::Ref<IMdIdArray> mdid_check_constraint_array,
+							INT reject_limit, BOOL is_reject_limit_in_rows,
+							gpos::Ref<IMDId> mdid_fmt_err_table);
 
 	// dtor
 	~CMDRelationExternalGPDB() override;
@@ -141,7 +142,7 @@ public:
 	}
 
 	// the metadata id
-	gpos::pointer<IMDId *> MDId() const override;
+	IMDId *MDId() const override;
 
 	// relation name
 	CMDName Mdname() const override;
@@ -162,7 +163,7 @@ public:
 	ULONG NonDroppedColsCount() const override;
 
 	// return the original positions of all the non-dropped columns
-	gpos::pointer<ULongPtrArray *> NonDroppedColsArray() const override;
+	ULongPtrArray *NonDroppedColsArray() const override;
 
 	// number of system columns
 	ULONG SystemColumnsCount() const override;
@@ -177,24 +178,24 @@ public:
 	BOOL IsRejectLimitInRows() const override;
 
 	// format error table mdid
-	gpos::pointer<IMDId *> GetFormatErrTableMdid() const override;
+	IMDId *GetFormatErrTableMdid() const override;
 
 	// retrieve the column at the given position
-	gpos::pointer<const IMDColumn *> GetMdCol(ULONG pos) const override;
+	const IMDColumn *GetMdCol(ULONG pos) const override;
 
 	// number of key sets
 	ULONG KeySetCount() const override;
 
 	// key set at given position
-	gpos::pointer<const ULongPtrArray *> KeySetAt(ULONG pos) const override;
+	const ULongPtrArray *KeySetAt(ULONG pos) const override;
 
 	// number of distribution columns
 	ULONG DistrColumnCount() const override;
 
 	// retrieve the column at the given position in the distribution columns list for the relation
-	gpos::pointer<const IMDColumn *> GetDistrColAt(ULONG pos) const override;
+	const IMDColumn *GetDistrColAt(ULONG pos) const override;
 
-	gpos::pointer<IMDId *> GetDistrOpfamilyAt(ULONG pos) const override;
+	IMDId *GetDistrOpfamilyAt(ULONG pos) const override;
 
 	// number of indices
 	ULONG IndexCount() const override;
@@ -212,7 +213,7 @@ public:
 	IMDId *IndexMDidAt(ULONG pos) const override;
 
 	// retrieve the id of the metadata cache trigger at the given position
-	gpos::pointer<IMDId *> TriggerMDidAt(ULONG pos) const override;
+	IMDId *TriggerMDidAt(ULONG pos) const override;
 
 	// serialize metadata relation in DXL format given a serializer object
 	void Serialize(gpdxl::CXMLSerializer *) const override;
@@ -221,7 +222,7 @@ public:
 	ULONG CheckConstraintCount() const override;
 
 	// retrieve the id of the check constraint cache at the given position
-	gpos::pointer<IMDId *> CheckConstraintMDidAt(ULONG pos) const override;
+	IMDId *CheckConstraintMDidAt(ULONG pos) const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the metadata relation

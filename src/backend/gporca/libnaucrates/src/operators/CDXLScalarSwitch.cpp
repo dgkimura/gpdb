@@ -29,8 +29,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSwitch::CDXLScalarSwitch(CMemoryPool *mp,
-								   gpos::owner<IMDId *> mdid_type)
+CDXLScalarSwitch::CDXLScalarSwitch(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type)
 	: CDXLScalar(mp), m_mdid_type(std::move(mdid_type))
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
@@ -46,7 +45,7 @@ CDXLScalarSwitch::CDXLScalarSwitch(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarSwitch::~CDXLScalarSwitch()
 {
-	m_mdid_type->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -85,10 +84,10 @@ CDXLScalarSwitch::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarSwitch::MdidType() const
 {
-	return m_mdid_type;
+	return m_mdid_type.get();
 }
 
 //---------------------------------------------------------------------------
@@ -101,7 +100,7 @@ CDXLScalarSwitch::MdidType() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarSwitch::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 gpos::pointer<const CDXLNode *> dxlnode) const
+								 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -126,7 +125,7 @@ BOOL
 CDXLScalarSwitch::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
+			md_accessor->RetrieveType(m_mdid_type.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG
@@ -139,7 +138,7 @@ CDXLScalarSwitch::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSwitch::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarSwitch::AssertValid(const CDXLNode *dxlnode,
 							  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
@@ -147,7 +146,7 @@ CDXLScalarSwitch::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[ul];
+		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

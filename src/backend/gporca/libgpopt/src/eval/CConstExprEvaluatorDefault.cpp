@@ -42,10 +42,10 @@ CConstExprEvaluatorDefault::~CConstExprEvaluatorDefault() = default;
 //		Returns the given expression after having increased its ref count
 //
 //---------------------------------------------------------------------------
-gpos::owner<CExpression *>
-CConstExprEvaluatorDefault::PexprEval(gpos::pointer<CExpression *> pexpr)
+gpos::Ref<CExpression>
+CConstExprEvaluatorDefault::PexprEval(CExpression *pexpr)
 {
-	pexpr->AddRef();
+	;
 	return pexpr;
 }
 

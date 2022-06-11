@@ -55,16 +55,15 @@ private:
 	// frequency of remaining tuples
 	CDouble m_freq_remaining;
 
-	gpos::owner<CDXLBucketArray *> m_dxl_stats_bucket_array;
+	gpos::Ref<CDXLBucketArray> m_dxl_stats_bucket_array;
 
 public:
 	CDXLStatsDerivedColumn(const CDXLStatsDerivedColumn &) = delete;
 
 	// ctor
-	CDXLStatsDerivedColumn(
-		ULONG colid, CDouble width, CDouble null_freq,
-		CDouble distinct_remaining, CDouble freq_remaining,
-		gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array);
+	CDXLStatsDerivedColumn(ULONG colid, CDouble width, CDouble null_freq,
+						   CDouble distinct_remaining, CDouble freq_remaining,
+						   gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array);
 
 	// dtor
 	~CDXLStatsDerivedColumn() override;
@@ -104,8 +103,7 @@ public:
 		return m_freq_remaining;
 	}
 
-	gpos::pointer<const CDXLBucketArray *> TransformHistogramToDXLBucketArray()
-		const;
+	const CDXLBucketArray *TransformHistogramToDXLBucketArray() const;
 
 	// serialize bucket in DXL format
 	void Serialize(gpdxl::CXMLSerializer *) const;
@@ -118,7 +116,7 @@ public:
 
 // array of dxl buckets
 using CDXLStatsDerivedColumnArray =
-	CDynamicPtrArray<CDXLStatsDerivedColumn, CleanupRelease>;
+	gpos::Vector<gpos::Ref<CDXLStatsDerivedColumn>>;
 }  // namespace gpmd
 
 #endif	// !GPMD_CDXLStatsDerivedColumn_H

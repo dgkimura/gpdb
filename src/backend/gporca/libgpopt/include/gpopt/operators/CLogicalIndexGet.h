@@ -37,10 +37,10 @@ class CLogicalIndexGet : public CLogical
 {
 private:
 	// index descriptor
-	gpos::owner<CIndexDescriptor *> m_pindexdesc;
+	gpos::Ref<CIndexDescriptor> m_pindexdesc;
 
 	// table descriptor
-	gpos::owner<CTableDescriptor *> m_ptabdesc;
+	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 	// origin operator id -- gpos::ulong_max if operator was not generated via a transformation
 	ULONG m_ulOriginOpId;
@@ -49,16 +49,16 @@ private:
 	const CName *m_pnameAlias;
 
 	// output columns
-	gpos::owner<CColRefArray *> m_pdrgpcrOutput;
+	gpos::Ref<CColRefArray> m_pdrgpcrOutput;
 
 	// set representation of output columns
-	gpos::owner<CColRefSet *> m_pcrsOutput;
+	gpos::Ref<CColRefSet> m_pcrsOutput;
 
 	// order spec
-	gpos::owner<COrderSpec *> m_pos;
+	gpos::Ref<COrderSpec> m_pos;
 
 	// distribution columns (empty for master only tables)
-	gpos::owner<CColRefSet *> m_pcrsDist;
+	gpos::Ref<CColRefSet> m_pcrsDist;
 
 public:
 	CLogicalIndexGet(const CLogicalIndexGet &) = delete;
@@ -66,10 +66,10 @@ public:
 	// ctors
 	explicit CLogicalIndexGet(CMemoryPool *mp);
 
-	CLogicalIndexGet(CMemoryPool *mp, gpos::pointer<const IMDIndex *> pmdindex,
-					 gpos::owner<CTableDescriptor *> ptabdesc,
-					 ULONG ulOriginOpId, const CName *pnameAlias,
-					 gpos::owner<CColRefArray *> pdrgpcrOutput);
+	CLogicalIndexGet(CMemoryPool *mp, const IMDIndex *pmdindex,
+					 gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+					 const CName *pnameAlias,
+					 gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// dtor
 	~CLogicalIndexGet() override;
@@ -89,17 +89,17 @@ public:
 	}
 
 	// distribution columns
-	virtual gpos::pointer<const CColRefSet *>
+	virtual const CColRefSet *
 	PcrsDist() const
 	{
-		return m_pcrsDist;
+		return m_pcrsDist.get();
 	}
 
 	// array of output columns
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrOutput() const
 	{
-		return m_pdrgpcrOutput;
+		return m_pdrgpcrOutput.get();
 	}
 
 	// origin operator id -- gpos::ulong_max if operator was not generated via a transformation
@@ -124,38 +124,38 @@ public:
 	}
 
 	// index descriptor
-	gpos::pointer<CIndexDescriptor *>
+	CIndexDescriptor *
 	Pindexdesc() const
 	{
-		return m_pindexdesc;
+		return m_pindexdesc.get();
 	}
 
 	// table descriptor
-	gpos::pointer<CTableDescriptor *>
+	CTableDescriptor *
 	Ptabdesc() const
 	{
-		return m_ptabdesc;
+		return m_ptabdesc.get();
 	}
 
 	// order spec
-	gpos::pointer<COrderSpec *>
+	COrderSpec *
 	Pos() const
 	{
-		return m_pos;
+		return m_pos.get();
 	}
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -163,15 +163,15 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	gpos::owner<CColRefSet *> DeriveOutputColumns(
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive outer references
-	gpos::owner<CColRefSet *> DeriveOuterReferences(
+	gpos::Ref<CColRefSet> DeriveOuterReferences(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive partition consumer info
-	gpos::owner<CPartInfo *>
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &	 //exprhdl
 	) const override
@@ -180,16 +180,17 @@ public:
 	}
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *>
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &  // exprhdl
 	) const override
 	{
-		return PpcDeriveConstraintFromTable(mp, m_ptabdesc, m_pdrgpcrOutput);
+		return PpcDeriveConstraintFromTable(mp, m_ptabdesc.get(),
+											m_pdrgpcrOutput.get());
 	}
 
 	// derive key collections
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive join depth
@@ -206,11 +207,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	PcrsStat(CMemoryPool *mp,
-			 CExpressionHandle &,		   // exprhdl
-			 gpos::pointer<CColRefSet *>,  //pcrsInput
-			 ULONG						   // child_index
+			 CExpressionHandle &,  // exprhdl
+			 CColRefSet *,		   //pcrsInput
+			 ULONG				   // child_index
 	) const override
 	{
 		// TODO:  March 26 2012; statistics derivation for indexes
@@ -218,16 +219,16 @@ public:
 	}
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// stat promise
 	EStatPromise
@@ -240,7 +241,7 @@ public:
 	// conversion function
 	//-------------------------------------------------------------------------------------
 
-	static gpos::cast_func<CLogicalIndexGet *>
+	static CLogicalIndexGet *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

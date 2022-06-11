@@ -30,8 +30,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalSplit::CDXLPhysicalSplit(
-	CMemoryPool *mp, gpos::owner<ULongPtrArray *> delete_colid_array,
-	gpos::owner<ULongPtrArray *> insert_colid_array, ULONG action_colid,
+	CMemoryPool *mp, gpos::Ref<ULongPtrArray> delete_colid_array,
+	gpos::Ref<ULongPtrArray> insert_colid_array, ULONG action_colid,
 	ULONG ctid_colid, ULONG segid_colid, BOOL preserve_oids, ULONG tuple_oid)
 	: CDXLPhysical(mp),
 	  m_deletion_colid_array(std::move(delete_colid_array)),
@@ -56,8 +56,8 @@ CDXLPhysicalSplit::CDXLPhysicalSplit(
 //---------------------------------------------------------------------------
 CDXLPhysicalSplit::~CDXLPhysicalSplit()
 {
-	m_deletion_colid_array->Release();
-	m_insert_colid_array->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -98,20 +98,20 @@ CDXLPhysicalSplit::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalSplit::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  gpos::pointer<const CDXLNode *> dxlnode) const
+								  const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
 	CWStringDynamic *delete_cols =
-		CDXLUtils::Serialize(m_mp, m_deletion_colid_array);
+		CDXLUtils::Serialize(m_mp, m_deletion_colid_array.get());
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenDeleteCols), delete_cols);
 	GPOS_DELETE(delete_cols);
 
 	CWStringDynamic *insert_cols =
-		CDXLUtils::Serialize(m_mp, m_insert_colid_array);
+		CDXLUtils::Serialize(m_mp, m_insert_colid_array.get());
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenInsertCols), insert_cols);
 	GPOS_DELETE(insert_cols);
@@ -155,11 +155,11 @@ CDXLPhysicalSplit::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSplit::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalSplit::AssertValid(const CDXLNode *dxlnode,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
-	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[1];
+	CDXLNode *child_dxlnode = (*dxlnode)[1];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

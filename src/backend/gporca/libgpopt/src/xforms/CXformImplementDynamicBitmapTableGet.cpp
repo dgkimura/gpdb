@@ -70,36 +70,34 @@ CXformImplementDynamicBitmapTableGet::Exfp(CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 void
 CXformImplementDynamicBitmapTableGet::Transform(
-	gpos::pointer<CXformContext *> pxfctxt GPOS_ASSERTS_ONLY,
-	gpos::pointer<CXformResult *> pxfres GPOS_UNUSED,
-	gpos::pointer<CExpression *> pexpr GPOS_ASSERTS_ONLY) const
+	CXformContext *pxfctxt GPOS_ASSERTS_ONLY, CXformResult *pxfres GPOS_UNUSED,
+	CExpression *pexpr GPOS_ASSERTS_ONLY) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	gpos::pointer<CLogicalDynamicBitmapTableGet *> popLogical =
+	CLogicalDynamicBitmapTableGet *popLogical =
 		gpos::dyn_cast<CLogicalDynamicBitmapTableGet>(pexpr->Pop());
 
-	gpos::owner<CTableDescriptor *> ptabdesc = popLogical->Ptabdesc();
-	ptabdesc->AddRef();
+	gpos::Ref<CTableDescriptor> ptabdesc = popLogical->Ptabdesc();
+	;
 
 	CName *pname = GPOS_NEW(mp) CName(mp, popLogical->Name());
 
 	CColRefArray *pdrgpcrOutput = popLogical->PdrgpcrOutput();
 
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
-	pdrgpcrOutput->AddRef();
+	;
 
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart =
-		popLogical->PdrgpdrgpcrPart();
-	pdrgpdrgpcrPart->AddRef();
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart = popLogical->PdrgpdrgpcrPart();
+	;
 
-	popLogical->GetPartitionMdids()->AddRef();
-	popLogical->GetRootColMappingPerPart()->AddRef();
+	;
+	;
 
-	gpos::owner<CPhysicalDynamicBitmapTableScan *> popPhysical =
+	gpos::Ref<CPhysicalDynamicBitmapTableScan> popPhysical =
 		GPOS_NEW(mp) CPhysicalDynamicBitmapTableScan(
 			mp, std::move(ptabdesc), pexpr->Pop()->UlOpId(), pname,
 			popLogical->ScanId(), pdrgpcrOutput, std::move(pdrgpdrgpcrPart),
@@ -108,10 +106,10 @@ CXformImplementDynamicBitmapTableGet::Transform(
 
 	CExpression *pexprCondition = (*pexpr)[0];
 	CExpression *pexprIndexPath = (*pexpr)[1];
-	pexprCondition->AddRef();
-	pexprIndexPath->AddRef();
+	;
+	;
 
-	gpos::owner<CExpression *> pexprPhysical = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprPhysical = GPOS_NEW(mp)
 		CExpression(mp, std::move(popPhysical), pexprCondition, pexprIndexPath);
 	pxfres->Add(std::move(pexprPhysical));
 }

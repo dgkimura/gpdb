@@ -32,12 +32,12 @@ class CXformSplitLimit : public CXformExploration
 {
 private:
 	// helper function for creating a limit expression
-	static gpos::owner<CExpression *> PexprLimit(
-		CMemoryPool *mp,							 // memory pool
-		gpos::owner<CExpression *> pexprRelational,	 // relational child
-		CExpression *pexprScalarStart,				 // limit offset
-		CExpression *pexprScalarRows,				 // limit count
-		COrderSpec *pos,							 // ordering specification
+	static gpos::Ref<CExpression> PexprLimit(
+		CMemoryPool *mp,						 // memory pool
+		gpos::Ref<CExpression> pexprRelational,	 // relational child
+		CExpression *pexprScalarStart,			 // limit offset
+		CExpression *pexprScalarRows,			 // limit count
+		COrderSpec *pos,						 // ordering specification
 		BOOL fGlobal,	 // is it a local or global limit
 		BOOL fHasCount,	 // does limit specify a number of rows
 		BOOL fTopLimitUnderDML);
@@ -76,9 +76,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(gpos::pointer<CXformContext *> pxfctxt,
-				   gpos::pointer<CXformResult *> pxfres,
-				   gpos::pointer<CExpression *> pexpr) const override;
+	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+				   CExpression *pexpr) const override;
 
 };	// class CXformSplitLimit
 

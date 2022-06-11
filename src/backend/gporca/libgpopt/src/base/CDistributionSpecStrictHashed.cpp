@@ -8,7 +8,7 @@
 namespace gpopt
 {
 CDistributionSpecStrictHashed::CDistributionSpecStrictHashed(
-	gpos::owner<CExpressionArray *> pdrgpexpr, BOOL fNullsColocated)
+	gpos::Ref<CExpressionArray> pdrgpexpr, BOOL fNullsColocated)
 	: CDistributionSpecHashed(std::move(pdrgpexpr), fNullsColocated)
 {
 }

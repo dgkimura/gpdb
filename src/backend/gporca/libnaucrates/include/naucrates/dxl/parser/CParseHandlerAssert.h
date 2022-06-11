@@ -36,7 +36,7 @@ class CParseHandlerAssert : public CParseHandlerPhysicalOp
 {
 private:
 	// physical assert operator
-	gpos::pointer<CDXLPhysicalAssert *> m_dxl_op;
+	CDXLPhysicalAssert *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

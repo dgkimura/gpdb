@@ -66,14 +66,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CLogicalLeftAntiSemiJoinNotIn *>
+	static CLogicalLeftAntiSemiJoinNotIn *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

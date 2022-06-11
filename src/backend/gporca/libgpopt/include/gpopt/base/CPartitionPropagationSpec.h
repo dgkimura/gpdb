@@ -51,16 +51,16 @@ private:
 		EPartPropSpecInfoType m_type;
 
 		// relation id of the DynamicScan
-		gpos::owner<IMDId *> m_root_rel_mdid;
+		gpos::Ref<IMDId> m_root_rel_mdid;
 
 		//  partition selector ids to use (reqd only)
-		gpos::owner<CBitSet *> m_selector_ids = nullptr;
+		gpos::Ref<CBitSet> m_selector_ids = nullptr;
 
 		// filter expressions to generate partition pruning data in the translator (reqd only)
-		gpos::owner<CExpression *> m_filter_expr = nullptr;
+		gpos::Ref<CExpression> m_filter_expr = nullptr;
 
 		SPartPropSpecInfo(ULONG scan_id, EPartPropSpecInfoType type,
-						  gpos::owner<IMDId *> rool_rel_mdid)
+						  gpos::Ref<IMDId> rool_rel_mdid)
 			: m_scan_id(scan_id),
 			  m_type(type),
 			  m_root_rel_mdid(std::move(rool_rel_mdid))
@@ -73,30 +73,29 @@ private:
 
 		~SPartPropSpecInfo() override
 		{
-			m_root_rel_mdid->Release();
-			CRefCount::SafeRelease(m_selector_ids);
-			CRefCount::SafeRelease(m_filter_expr);
+			;
+			;
+			;
 		}
 
 		IOstream &OsPrint(IOstream &os) const;
 
 		// used for determining equality in memo (e.g in optimization contexts)
-		BOOL Equals(gpos::pointer<const SPartPropSpecInfo *>) const;
+		BOOL Equals(const SPartPropSpecInfo *) const;
 
-		BOOL FSatisfies(gpos::pointer<const SPartPropSpecInfo *>) const;
+		BOOL FSatisfies(const SPartPropSpecInfo *) const;
 
 		// used for sorting SPartPropSpecInfo in an array
 		static INT CmpFunc(const void *val1, const void *val2);
 	};
 
-	using SPartPropSpecInfoArray =
-		CDynamicPtrArray<SPartPropSpecInfo, CleanupRelease>;
+	using SPartPropSpecInfoArray = gpos::Vector<gpos::Ref<SPartPropSpecInfo>>;
 
 	// partition required/derived info, sorted by scanid
-	gpos::owner<SPartPropSpecInfoArray *> m_part_prop_spec_infos = nullptr;
+	gpos::Ref<SPartPropSpecInfoArray> m_part_prop_spec_infos = nullptr;
 
 	// Present scanids (for easy lookup)
-	gpos::owner<CBitSet *> m_scan_ids = nullptr;
+	gpos::Ref<CBitSet> m_scan_ids = nullptr;
 
 public:
 	CPartitionPropagationSpec(const CPartitionPropagationSpec &) = delete;
@@ -109,9 +108,8 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 gpos::pointer<CReqdPropPlan *> prpp,
-						 gpos::pointer<CExpressionArray *> pdrgpexpr,
-						 gpos::pointer<CExpression *> pexpr) override;
+						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 CExpression *pexpr) override;
 
 	// hash function
 	ULONG
@@ -122,7 +120,7 @@ public:
 	}
 
 	// extract columns used by the partition propagation spec
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	PcrsUsed(CMemoryPool *mp) const override
 	{
 		// return an empty set
@@ -145,30 +143,27 @@ public:
 	BOOL ContainsAnyConsumers() const;
 
 	// equality check to determine compatibility of derived & required properties
-	BOOL Equals(gpos::pointer<const CPartitionPropagationSpec *> ppps) const;
+	BOOL Equals(const CPartitionPropagationSpec *ppps) const;
 
 	// satisfies function
-	BOOL FSatisfies(
-		gpos::pointer<const CPartitionPropagationSpec *> pps_reqd) const;
+	BOOL FSatisfies(const CPartitionPropagationSpec *pps_reqd) const;
 
 
 	SPartPropSpecInfo *FindPartPropSpecInfo(ULONG scan_id) const;
 
 	void Insert(ULONG scan_id, EPartPropSpecInfoType type, IMDId *rool_rel_mdid,
-				gpos::pointer<CBitSet *> selector_ids,
-				gpos::pointer<CExpression *> expr);
+				CBitSet *selector_ids, CExpression *expr);
 
-	void Insert(gpos::pointer<SPartPropSpecInfo *> other);
+	void Insert(SPartPropSpecInfo *other);
 
-	void InsertAll(gpos::pointer<CPartitionPropagationSpec *> pps);
+	void InsertAll(CPartitionPropagationSpec *pps);
 
-	void InsertAllowedConsumers(gpos::pointer<CPartitionPropagationSpec *> pps,
-								gpos::pointer<CBitSet *> allowed_scan_ids);
+	void InsertAllowedConsumers(CPartitionPropagationSpec *pps,
+								CBitSet *allowed_scan_ids);
 
-	void InsertAllExcept(gpos::pointer<CPartitionPropagationSpec *> pps,
-						 ULONG scan_id);
+	void InsertAllExcept(CPartitionPropagationSpec *pps, ULONG scan_id);
 
-	gpos::pointer<const CBitSet *> SelectorIds(ULONG scan_id) const;
+	const CBitSet *SelectorIds(ULONG scan_id) const;
 
 	// is partition propagation required
 	BOOL
@@ -180,7 +175,7 @@ public:
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
 
-	void InsertAllResolve(gpos::pointer<CPartitionPropagationSpec *> pSpec);
+	void InsertAllResolve(CPartitionPropagationSpec *pSpec);
 };	// class CPartitionPropagationSpec
 
 }  // namespace gpopt

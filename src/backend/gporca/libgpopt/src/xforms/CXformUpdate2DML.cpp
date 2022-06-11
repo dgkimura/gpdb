@@ -70,16 +70,14 @@ CXformUpdate2DML::Exfp(CExpressionHandle &	// exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformUpdate2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
-							gpos::pointer<CXformResult *> pxfres,
-							gpos::pointer<CExpression *> pexpr) const
+CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+							CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CLogicalUpdate *> popUpdate =
-		gpos::dyn_cast<CLogicalUpdate>(pexpr->Pop());
+	CLogicalUpdate *popUpdate = gpos::dyn_cast<CLogicalUpdate>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
@@ -92,16 +90,16 @@ CXformUpdate2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	CColRef *pcrTupleOid = popUpdate->PcrTupleOid();
 
 	// child of update operator
-	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
+	;
 
 	IMDId *rel_mdid = ptabdesc->MDId();
 	if (CXformUtils::FTriggersExist(CLogicalDML::EdmlUpdate, ptabdesc,
 									true /*fBefore*/))
 	{
-		rel_mdid->AddRef();
-		pdrgpcrDelete->AddRef();
-		pdrgpcrInsert->AddRef();
+		;
+		;
+		;
 		pexprChild = CXformUtils::PexprRowTrigger(
 			mp, pexprChild, CLogicalDML::EdmlUpdate, rel_mdid, true /*fBefore*/,
 			pdrgpcrDelete, pdrgpcrInsert);
@@ -112,29 +110,28 @@ CXformUpdate2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	CMDAccessor *md_accessor = poctxt->Pmda();
 	CColumnFactory *col_factory = poctxt->Pcf();
 
-	pdrgpcrDelete->AddRef();
-	pdrgpcrInsert->AddRef();
+	;
+	;
 
-	gpos::pointer<const IMDType *> pmdtype =
-		md_accessor->PtMDType<IMDTypeInt4>();
+	const IMDType *pmdtype = md_accessor->PtMDType<IMDTypeInt4>();
 	CColRef *pcrAction = col_factory->PcrCreate(pmdtype, default_type_modifier);
 
-	gpos::owner<CExpression *> pexprProjElem = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprProjElem = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CScalarProjectElement(mp, pcrAction),
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarDMLAction(mp)));
 
-	gpos::owner<CExpression *> pexprProjList = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprProjList = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp), pexprProjElem);
-	gpos::owner<CExpression *> pexprSplit = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprSplit = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalSplit(mp, pdrgpcrDelete, pdrgpcrInsert, pcrCtid,
 								   pcrSegmentId, pcrAction, pcrTupleOid),
 		pexprChild, pexprProjList);
 
 	// add assert checking that no NULL values are inserted for nullable columns or no check constraints are violated
-	gpos::pointer<COptimizerConfig *> optimizer_config =
+	COptimizerConfig *optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
-	gpos::owner<CExpression *> pexprAssertConstraints;
+	gpos::Ref<CExpression> pexprAssertConstraints;
 	if (optimizer_config->GetHint()->FEnforceConstraintsOnDML())
 	{
 		pexprAssertConstraints = CXformUtils::PexprAssertConstraints(
@@ -146,7 +143,7 @@ CXformUpdate2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	}
 
 	// generate oid column and project operator
-	gpos::owner<CExpression *> pexprProject = nullptr;
+	gpos::Ref<CExpression> pexprProject = nullptr;
 	CColRef *pcrTableOid = nullptr;
 	if (ptabdesc->IsPartitioned())
 	{
@@ -160,16 +157,16 @@ CXformUpdate2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	else
 	{
 		// generate a project operator
-		gpos::pointer<IMDId *> pmdidTable = ptabdesc->MDId();
+		IMDId *pmdidTable = ptabdesc->MDId();
 
 		OID oidTable = gpos::dyn_cast<CMDIdGPDB>(pmdidTable)->Oid();
-		gpos::owner<CExpression *> pexprOid =
+		gpos::Ref<CExpression> pexprOid =
 			CUtils::PexprScalarConstOid(mp, oidTable);
 
 		pexprProject =
 			CUtils::PexprAddProjection(mp, pexprAssertConstraints, pexprOid);
 
-		gpos::pointer<CExpression *> pexprPrL = (*pexprProject)[1];
+		CExpression *pexprPrL = (*pexprProject)[1];
 		pcrTableOid = CUtils::PcrFromProjElem((*pexprPrL)[0]);
 	}
 
@@ -177,7 +174,7 @@ CXformUpdate2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
 
 	const ULONG num_cols = pdrgpcrInsert->Size();
 
-	gpos::owner<CBitSet *> pbsModified =
+	gpos::Ref<CBitSet> pbsModified =
 		GPOS_NEW(mp) CBitSet(mp, ptabdesc->ColumnCount());
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
@@ -192,9 +189,9 @@ CXformUpdate2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
 		}
 	}
 	// create logical DML
-	ptabdesc->AddRef();
-	pdrgpcrDelete->AddRef();
-	gpos::owner<CExpression *> pexprDML = GPOS_NEW(mp) CExpression(
+	;
+	;
+	gpos::Ref<CExpression> pexprDML = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
 			CLogicalDML(mp, CLogicalDML::EdmlUpdate, ptabdesc, pdrgpcrDelete,

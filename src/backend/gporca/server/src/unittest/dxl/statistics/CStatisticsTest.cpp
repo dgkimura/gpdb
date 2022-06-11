@@ -75,8 +75,8 @@ CStatisticsTest::EresUnittest()
 		CMemoryPool *mp = amp.Pmp();
 
 		// setup a file-based provider
-		gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-		pmdp->AddRef();
+		gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+		;
 		CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 						pmdp);
 
@@ -124,41 +124,39 @@ CStatisticsTest::EresUnittest_UnionAll()
 		GPOS_CHECK_ABORT;
 
 		// parse the input statistics objects
-		gpos::owner<CDXLStatsDerivedRelationArray *>
-			dxl_derived_rel_stats_array =
-				CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput,
-														  nullptr);
-		gpos::owner<CStatisticsArray *> pdrgpstatBefore =
+		gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
+			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, nullptr);
+		gpos::Ref<CStatisticsArray> pdrgpstatBefore =
 			CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
-				mp, md_accessor, dxl_derived_rel_stats_array);
-		dxl_derived_rel_stats_array->Release();
+				mp, md_accessor, dxl_derived_rel_stats_array.get());
+		;
 
 		GPOS_ASSERT(nullptr != pdrgpstatBefore);
 		GPOS_ASSERT(2 == pdrgpstatBefore->Size());
-		gpos::pointer<CStatistics *> pstats1 = (*pdrgpstatBefore)[0];
-		gpos::pointer<CStatistics *> pstats2 = (*pdrgpstatBefore)[1];
+		CStatistics *pstats1 = (*pdrgpstatBefore)[0].get();
+		CStatistics *pstats2 = (*pdrgpstatBefore)[1].get();
 
 		GPOS_CHECK_ABORT;
 
-		gpos::owner<ULongPtrArray *> pdrgpulColIdOutput = Pdrgpul(mp, 1);
-		gpos::owner<ULongPtrArray *> pdrgpulColIdInput1 = Pdrgpul(mp, 1);
-		gpos::owner<ULongPtrArray *> pdrgpulColIdInput2 = Pdrgpul(mp, 2);
+		gpos::Ref<ULongPtrArray> pdrgpulColIdOutput = Pdrgpul(mp, 1);
+		gpos::Ref<ULongPtrArray> pdrgpulColIdInput1 = Pdrgpul(mp, 1);
+		gpos::Ref<ULongPtrArray> pdrgpulColIdInput2 = Pdrgpul(mp, 2);
 
-		gpos::owner<CStatistics *> pstatsOutput =
+		gpos::Ref<CStatistics> pstatsOutput =
 			CUnionAllStatsProcessor::CreateStatsForUnionAll(
 				mp, pstats1, pstats2, pdrgpulColIdOutput, pdrgpulColIdInput1,
 				pdrgpulColIdInput2);
 
 		GPOS_ASSERT(nullptr != pstatsOutput);
 
-		gpos::owner<CStatisticsArray *> pdrgpstatOutput =
+		gpos::Ref<CStatisticsArray> pdrgpstatOutput =
 			GPOS_NEW(mp) CStatisticsArray(mp);
 		pdrgpstatOutput->Append(pstatsOutput);
 
 		// serialize and compare against expected stats
 		CWStringDynamic *pstrOutput = CDXLUtils::SerializeStatistics(
-			mp, md_accessor, pdrgpstatOutput, true /*serialize_header_footer*/,
-			true /*indentation*/
+			mp, md_accessor, pdrgpstatOutput.get(),
+			true /*serialize_header_footer*/, true /*indentation*/
 		);
 		CWStringDynamic dstrExpected(mp);
 		dstrExpected.AppendFormat(GPOS_WSZ_LIT("%s"), szDXLOutput);
@@ -182,8 +180,8 @@ CStatisticsTest::EresUnittest_UnionAll()
 
 
 		// clean up
-		pdrgpstatBefore->Release();
-		pdrgpstatOutput->Release();
+		;
+		;
 
 		GPOS_DELETE_ARRAY(szDXLInput);
 		GPOS_DELETE_ARRAY(szDXLOutput);
@@ -206,50 +204,50 @@ CStatisticsTest::EresUnittest_GbAggWithRepeatedGbCols()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr /* pceeval */,
 					 CTestUtils::GetCostModel(mp));
 
-	gpos::owner<CExpression *> pexpr =
+	gpos::Ref<CExpression> pexpr =
 		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
-	gpos::pointer<CColRefSet *> colrefs = pexpr->DeriveOutputColumns();
+	CColRefSet *colrefs = pexpr->DeriveOutputColumns();
 
 	// create first GbAgg expression: GbAgg on top of given expression
-	gpos::owner<CColRefArray *> pdrgpcr1 = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> pdrgpcr1 = GPOS_NEW(mp) CColRefArray(mp);
 	pdrgpcr1->Append(colrefs->PcrFirst());
-	gpos::owner<CExpression *> pexprGbAgg1 = CUtils::PexprLogicalGbAggGlobal(
+	gpos::Ref<CExpression> pexprGbAgg1 = CUtils::PexprLogicalGbAggGlobal(
 		mp, pdrgpcr1, pexpr,
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp)));
 
 	// create second GbAgg expression: GbAgg with repeated base column on top of given expression
-	gpos::owner<CColRefArray *> pdrgpcr2 = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> pdrgpcr2 = GPOS_NEW(mp) CColRefArray(mp);
 	pdrgpcr2->Append(colrefs->PcrFirst());
 	pdrgpcr2->Append(colrefs->PcrFirst());
-	pexpr->AddRef();
-	gpos::owner<CExpression *> pexprGbAgg2 = CUtils::PexprLogicalGbAggGlobal(
+	;
+	gpos::Ref<CExpression> pexprGbAgg2 = CUtils::PexprLogicalGbAggGlobal(
 		mp, pdrgpcr2, pexpr,
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp)));
 
 	// create third GbAgg expression: GbAgg with a repeated projected base column on top of given expression
-	pexpr->AddRef();
-	gpos::owner<CExpression *> pexprPrj = CUtils::PexprAddProjection(
+	;
+	gpos::Ref<CExpression> pexprPrj = CUtils::PexprAddProjection(
 		mp, pexpr, CUtils::PexprScalarIdent(mp, colrefs->PcrFirst()));
 	CColRef *pcrComputed =
 		gpos::dyn_cast<CScalarProjectElement>((*(*pexprPrj)[1])[0]->Pop())
 			->Pcr();
-	gpos::owner<CColRefArray *> pdrgpcr3 = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::Ref<CColRefArray> pdrgpcr3 = GPOS_NEW(mp) CColRefArray(mp);
 	pdrgpcr3->Append(colrefs->PcrFirst());
 	pdrgpcr3->Append(pcrComputed);
-	gpos::owner<CExpression *> pexprGbAgg3 = CUtils::PexprLogicalGbAggGlobal(
+	gpos::Ref<CExpression> pexprGbAgg3 = CUtils::PexprLogicalGbAggGlobal(
 		mp, pdrgpcr3, pexprPrj,
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp)));
 
 	// derive stats on different GbAgg expressions
-	gpos::owner<CReqdPropRelational *> prprel =
+	gpos::Ref<CReqdPropRelational> prprel =
 		GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp));
 	(void) pexprGbAgg1->PstatsDerive(prprel, nullptr /* stats_ctxt */);
 	(void) pexprGbAgg2->PstatsDerive(prprel, nullptr /* stats_ctxt */);
@@ -274,10 +272,10 @@ CStatisticsTest::EresUnittest_GbAggWithRepeatedGbCols()
 	}
 
 	// cleanup
-	pexprGbAgg1->Release();
-	pexprGbAgg2->Release();
-	pexprGbAgg3->Release();
-	prprel->Release();
+	;
+	;
+	;
+	;
 
 	if (fRows1EqualRows2 && fRows2EqualRows3)
 	{
@@ -292,8 +290,7 @@ CHistogram *
 CStatisticsTest::PhistExampleInt4Dim(CMemoryPool *mp)
 {
 	// generate histogram of the form [0, 10), [10, 20), [20, 30) ... [80, 90)
-	gpos::owner<CBucketArray *> histogram_buckets =
-		GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
 	for (ULONG idx = 0; idx < 9; idx++)
 	{
 		INT iLower = INT(idx * 10);
@@ -309,13 +306,14 @@ CStatisticsTest::PhistExampleInt4Dim(CMemoryPool *mp)
 }
 
 // create a table descriptor with two columns having the given names.
-gpos::owner<CTableDescriptor *>
-CStatisticsTest::PtabdescTwoColumnSource(
-	CMemoryPool *mp, const CName &nameTable,
-	gpos::pointer<const IMDTypeInt4 *> pmdtype, const CWStringConst &strColA,
-	const CWStringConst &strColB)
+gpos::Ref<CTableDescriptor>
+CStatisticsTest::PtabdescTwoColumnSource(CMemoryPool *mp,
+										 const CName &nameTable,
+										 const IMDTypeInt4 *pmdtype,
+										 const CWStringConst &strColA,
+										 const CWStringConst &strColB)
 {
-	gpos::owner<CTableDescriptor *> ptabdesc = GPOS_NEW(mp) CTableDescriptor(
+	gpos::Ref<CTableDescriptor> ptabdesc = GPOS_NEW(mp) CTableDescriptor(
 		mp, GPOS_NEW(mp) CMDIdGPDB(GPOPT_TEST_REL_OID1, 1, 1), nameTable,
 		false,	// convert_hash_to_random
 		IMDRelation::EreldistrRandom, IMDRelation::ErelstorageHeap,
@@ -333,7 +331,7 @@ CStatisticsTest::PtabdescTwoColumnSource(
 		}
 		CName nameColumn(str_name);
 
-		gpos::owner<CColumnDescriptor *> pcoldesc = GPOS_NEW(mp)
+		gpos::Ref<CColumnDescriptor> pcoldesc = GPOS_NEW(mp)
 			CColumnDescriptor(mp, pmdtype, default_type_modifier, nameColumn,
 							  i + 1, false /*is_nullable*/
 			);
@@ -383,16 +381,16 @@ CStatisticsTest::EresUnittest_CStatisticsBasic()
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
-	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
+	const IMDTypeInt4 *pmdtypeint4 =
 		COptCtxt::PoctxtFromTLS()->Pmda()->PtMDType<IMDTypeInt4>();
 
 	CWStringConst strRelAlias(GPOS_WSZ_LIT("Rel1"));
 	CWStringConst strColA(GPOS_WSZ_LIT("a"));
 	CWStringConst strColB(GPOS_WSZ_LIT("b"));
 	CWStringConst strColC(GPOS_WSZ_LIT("int4_10"));
-	gpos::owner<CTableDescriptor *> ptabdesc = PtabdescTwoColumnSource(
+	gpos::Ref<CTableDescriptor> ptabdesc = PtabdescTwoColumnSource(
 		mp, CName(&strRelAlias), pmdtypeint4, strColA, strColB);
-	gpos::owner<CExpression *> pexprGet =
+	gpos::Ref<CExpression> pexprGet =
 		CTestUtils::PexprLogicalGet(mp, ptabdesc, &strRelAlias);
 
 	if (nullptr == col_factory->LookupColRef(1 /*id*/))
@@ -424,7 +422,7 @@ CStatisticsTest::EresUnittest_CStatisticsBasic()
 	}
 
 	// create hash map from colid -> histogram
-	gpos::owner<UlongToHistogramMap *> col_histogram_mapping =
+	gpos::Ref<UlongToHistogramMap> col_histogram_mapping =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// generate bool histogram for column 1
@@ -436,7 +434,7 @@ CStatisticsTest::EresUnittest_CStatisticsBasic()
 								  CCardinalityTestUtils::PhistExampleInt4(mp));
 
 	// array capturing columns for which width information is available
-	gpos::owner<UlongToDoubleMap *> colid_width_mapping =
+	gpos::Ref<UlongToDoubleMap> colid_width_mapping =
 		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	// width for boolean
@@ -447,7 +445,7 @@ CStatisticsTest::EresUnittest_CStatisticsBasic()
 	colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(2),
 								GPOS_NEW(mp) CDouble(4.0));
 
-	gpos::owner<CStatistics *> stats = GPOS_NEW(mp) CStatistics(
+	gpos::Ref<CStatistics> stats = GPOS_NEW(mp) CStatistics(
 		mp, std::move(col_histogram_mapping), std::move(colid_width_mapping),
 		1000.0 /* rows */, false /* is_empty */);
 	stats->Rows();
@@ -455,137 +453,137 @@ CStatisticsTest::EresUnittest_CStatisticsBasic()
 	GPOS_TRACE(GPOS_WSZ_LIT("stats"));
 
 	// before stats
-	CCardinalityTestUtils::PrintStats(mp, stats);
+	CCardinalityTestUtils::PrintStats(mp, stats.get());
 
 	// create a filter: column 1: [25,45), column 2: [true, true)
-	gpos::owner<CStatsPredPtrArry *> pdrgpstatspred = Pdrgpstatspred1(mp);
+	gpos::Ref<CStatsPredPtrArry> pdrgpstatspred = Pdrgpstatspred1(mp);
 
-	gpos::owner<CStatsPredConj *> pred_stats =
+	gpos::Ref<CStatsPredConj> pred_stats =
 		GPOS_NEW(mp) CStatsPredConj(std::move(pdrgpstatspred));
-	gpos::owner<CStatistics *> pstats1 = CFilterStatsProcessor::MakeStatsFilter(
-		mp, stats, pred_stats, true /* do_cap_NDVs */);
+	gpos::Ref<CStatistics> pstats1 = CFilterStatsProcessor::MakeStatsFilter(
+		mp, stats.get(), pred_stats.get(), true /* do_cap_NDVs */);
 	pstats1->Rows();
 
 	GPOS_TRACE(GPOS_WSZ_LIT("pstats1 after filter"));
 
 	// after stats
-	CCardinalityTestUtils::PrintStats(mp, pstats1);
+	CCardinalityTestUtils::PrintStats(mp, pstats1.get());
 
 	// create another statistics structure with a single int4 column with id 10
-	gpos::owner<UlongToHistogramMap *> phmulhist2 =
+	gpos::Ref<UlongToHistogramMap> phmulhist2 =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 	phmulhist2->Insert(GPOS_NEW(mp) ULONG(10), PhistExampleInt4Dim(mp));
 
-	gpos::owner<UlongToDoubleMap *> phmuldoubleWidth2 =
+	gpos::Ref<UlongToDoubleMap> phmuldoubleWidth2 =
 		GPOS_NEW(mp) UlongToDoubleMap(mp);
 	phmuldoubleWidth2->Insert(GPOS_NEW(mp) ULONG(10),
 							  GPOS_NEW(mp) CDouble(4.0));
 
-	gpos::owner<CStatistics *> pstats2 = GPOS_NEW(mp)
+	gpos::Ref<CStatistics> pstats2 = GPOS_NEW(mp)
 		CStatistics(mp, std::move(phmulhist2), std::move(phmuldoubleWidth2),
 					100.0 /* rows */, false /* is_empty */);
 
 	GPOS_TRACE(GPOS_WSZ_LIT("pstats2"));
-	CCardinalityTestUtils::PrintStats(mp, pstats2);
+	CCardinalityTestUtils::PrintStats(mp, pstats2.get());
 
 	// join stats with pstats2
-	gpos::owner<CStatsPredJoin *> pstatspredjoin =
+	gpos::Ref<CStatsPredJoin> pstatspredjoin =
 		GPOS_NEW(mp) CStatsPredJoin(2, CStatsPred::EstatscmptEq, 10);
-	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		GPOS_NEW(mp) CStatsPredJoinArray(mp);
 	join_preds_stats->Append(std::move(pstatspredjoin));
-	gpos::owner<IStatistics *> pstats3 =
-		stats->CalcInnerJoinStats(mp, pstats2, join_preds_stats);
+	gpos::Ref<IStatistics> pstats3 =
+		stats->CalcInnerJoinStats(mp, pstats2.get(), join_preds_stats.get());
 
 	GPOS_TRACE(GPOS_WSZ_LIT("pstats3 = stats JOIN pstats2 on (col2 = col10)"));
 	// after stats
-	CCardinalityTestUtils::PrintStats(mp, pstats3);
+	CCardinalityTestUtils::PrintStats(mp, pstats3.get());
 
 	// group by stats on columns 1 and 2
-	gpos::owner<ULongPtrArray *> GCs = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> GCs = GPOS_NEW(mp) ULongPtrArray(mp);
 	GCs->Append(GPOS_NEW(mp) ULONG(1));
 	GCs->Append(GPOS_NEW(mp) ULONG(2));
 
-	gpos::owner<ULongPtrArray *> aggs = GPOS_NEW(mp) ULongPtrArray(mp);
-	gpos::owner<CStatistics *> pstats4 =
-		CGroupByStatsProcessor::CalcGroupByStats(mp, stats, GCs, aggs,
-												 nullptr /*keys*/);
+	gpos::Ref<ULongPtrArray> aggs = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<CStatistics> pstats4 = CGroupByStatsProcessor::CalcGroupByStats(
+		mp, stats.get(), GCs.get(), aggs.get(), nullptr /*keys*/);
 
 	GPOS_TRACE(GPOS_WSZ_LIT("pstats4 = stats group by"));
-	CCardinalityTestUtils::PrintStats(mp, pstats4);
+	CCardinalityTestUtils::PrintStats(mp, pstats4.get());
 
 	// LASJ stats
-	gpos::owner<IStatistics *> pstats5 = stats->CalcLASJoinStats(
-		mp, pstats2, join_preds_stats, true /* DoIgnoreLASJHistComputation */);
+	gpos::Ref<IStatistics> pstats5 =
+		stats->CalcLASJoinStats(mp, pstats2.get(), join_preds_stats.get(),
+								true /* DoIgnoreLASJHistComputation */);
 
 	GPOS_TRACE(GPOS_WSZ_LIT("pstats5 = stats LASJ pstats2 on (col2 = col10)"));
-	CCardinalityTestUtils::PrintStats(mp, pstats5);
+	CCardinalityTestUtils::PrintStats(mp, pstats5.get());
 
 	// union all
-	gpos::owner<ULongPtrArray *> colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	colids->Append(GPOS_NEW(mp) ULONG(1));
 	colids->Append(GPOS_NEW(mp) ULONG(2));
-	colids->AddRef();
-	colids->AddRef();
-	colids->AddRef();
+	;
+	;
+	;
 
-	gpos::owner<CStatistics *> pstats6 =
-		CUnionAllStatsProcessor::CreateStatsForUnionAll(mp, stats, stats,
-														colids, colids, colids);
+	gpos::Ref<CStatistics> pstats6 =
+		CUnionAllStatsProcessor::CreateStatsForUnionAll(
+			mp, stats.get(), stats.get(), colids, colids, colids);
 
 	GPOS_TRACE(GPOS_WSZ_LIT("pstats6 = pstats1 union all pstats1"));
-	CCardinalityTestUtils::PrintStats(mp, pstats6);
+	CCardinalityTestUtils::PrintStats(mp, pstats6.get());
 
-	gpos::owner<CStatistics *> pstats7 =
-		CLimitStatsProcessor::CalcLimitStats(mp, stats, CDouble(4.0));
+	gpos::Ref<CStatistics> pstats7 =
+		CLimitStatsProcessor::CalcLimitStats(mp, stats.get(), CDouble(4.0));
 
 	GPOS_TRACE(GPOS_WSZ_LIT("pstats7 = stats limit 4"));
-	CCardinalityTestUtils::PrintStats(mp, pstats7);
+	CCardinalityTestUtils::PrintStats(mp, pstats7.get());
 
-	stats->Release();
-	pstats1->Release();
-	pstats2->Release();
-	pstats3->Release();
-	pstats4->Release();
-	pstats5->Release();
-	pstats6->Release();
-	pstats7->Release();
-	pred_stats->Release();
-	join_preds_stats->Release();
-	GCs->Release();
-	aggs->Release();
-	colids->Release();
-	pexprGet->Release();
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
 
 // create a filter clause
-gpos::owner<CStatsPredPtrArry *>
+gpos::Ref<CStatsPredPtrArry>
 CStatisticsTest::Pdrgpstatspred1(CMemoryPool *mp)
 {
-	gpos::owner<CStatsPredPtrArry *> pdrgpstatspred =
+	gpos::Ref<CStatsPredPtrArry> pdrgpstatspred =
 		GPOS_NEW(mp) CStatsPredPtrArry(mp);
 
 	// col1 = true
-	StatsFilterBool(mp, 1, true, pdrgpstatspred);
+	StatsFilterBool(mp, 1, true, pdrgpstatspred.get());
 
 	// col2 >= 25 and col2 < 35
-	StatsFilterInt4(mp, 2, 25, 35, pdrgpstatspred);
+	StatsFilterInt4(mp, 2, 25, 35, pdrgpstatspred.get());
 
 	return pdrgpstatspred;
 }
 
 // create a filter clause
-gpos::owner<CStatsPredPtrArry *>
+gpos::Ref<CStatsPredPtrArry>
 CStatisticsTest::Pdrgpstatspred2(CMemoryPool *mp)
 {
 	// contain for filters
-	gpos::owner<CStatsPredPtrArry *> pdrgpstatspred =
+	gpos::Ref<CStatsPredPtrArry> pdrgpstatspred =
 		GPOS_NEW(mp) CStatsPredPtrArry(mp);
 
 	// create int4 filter column 2: [5,15)::int4
-	StatsFilterInt4(mp, 2, 5, 15, pdrgpstatspred);
+	StatsFilterInt4(mp, 2, 5, 15, pdrgpstatspred.get());
 
 	// create numeric filter column 3: [1.0, 2.0)::numeric
 	CWStringDynamic *pstrLowerNumeric =
@@ -594,7 +592,7 @@ CStatisticsTest::Pdrgpstatspred2(CMemoryPool *mp)
 		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("AAAACgAAAQACAA=="));
 
 	StatsFilterNumeric(mp, 3, pstrLowerNumeric, pstrUpperNumeric, CDouble(1.0),
-					   CDouble(2.0), pdrgpstatspred);
+					   CDouble(2.0), pdrgpstatspred.get());
 
 	GPOS_DELETE(pstrLowerNumeric);
 	GPOS_DELETE(pstrUpperNumeric);
@@ -607,7 +605,7 @@ CStatisticsTest::Pdrgpstatspred2(CMemoryPool *mp)
 	LINT lLowerDate = LINT(4383);
 	LINT lUpperDate = LINT(4397);
 	StatsFilterGeneric(mp, 4, GPDB_DATE, pstrLowerDate, pstrUpperDate,
-					   lLowerDate, lUpperDate, pdrgpstatspred);
+					   lLowerDate, lUpperDate, pdrgpstatspred.get());
 
 	GPOS_DELETE(pstrLowerDate);
 	GPOS_DELETE(pstrUpperDate);
@@ -621,7 +619,7 @@ CStatisticsTest::Pdrgpstatspred2(CMemoryPool *mp)
 	LINT lUpperTS = LINT(INT64_C(378727200000000));	 // microseconds
 
 	StatsFilterGeneric(mp, 5, GPDB_TIMESTAMP, pstrLowerTS, pstrUpperTS,
-					   lLowerTS, lUpperTS, pdrgpstatspred);
+					   lLowerTS, lUpperTS, pdrgpstatspred.get());
 
 	GPOS_DELETE(pstrLowerTS);
 	GPOS_DELETE(pstrUpperTS);
@@ -631,14 +629,13 @@ CStatisticsTest::Pdrgpstatspred2(CMemoryPool *mp)
 
 // create a stats filter on integer range
 void
-CStatisticsTest::StatsFilterInt4(
-	CMemoryPool *mp, ULONG colid, INT iLower, INT iUpper,
-	gpos::pointer<CStatsPredPtrArry *> pdrgpstatspred)
+CStatisticsTest::StatsFilterInt4(CMemoryPool *mp, ULONG colid, INT iLower,
+								 INT iUpper, CStatsPredPtrArry *pdrgpstatspred)
 {
-	gpos::owner<CStatsPredPoint *> pstatspred1 = GPOS_NEW(mp) CStatsPredPoint(
+	gpos::Ref<CStatsPredPoint> pstatspred1 = GPOS_NEW(mp) CStatsPredPoint(
 		colid, CStatsPred::EstatscmptGEq, CTestUtils::PpointInt4(mp, iLower));
 
-	gpos::owner<CStatsPredPoint *> pstatspred2 = GPOS_NEW(mp) CStatsPredPoint(
+	gpos::Ref<CStatsPredPoint> pstatspred2 = GPOS_NEW(mp) CStatsPredPoint(
 		colid, CStatsPred::EstatscmptL, CTestUtils::PpointInt4(mp, iUpper));
 
 	pdrgpstatspred->Append(std::move(pstatspred1));
@@ -647,11 +644,10 @@ CStatisticsTest::StatsFilterInt4(
 
 // create a stats filter on boolean
 void
-CStatisticsTest::StatsFilterBool(
-	CMemoryPool *mp, ULONG colid, BOOL fValue,
-	gpos::pointer<CStatsPredPtrArry *> pdrgpstatspred)
+CStatisticsTest::StatsFilterBool(CMemoryPool *mp, ULONG colid, BOOL fValue,
+								 CStatsPredPtrArry *pdrgpstatspred)
 {
-	gpos::owner<CStatsPredPoint *> pstatspred1 = GPOS_NEW(mp) CStatsPredPoint(
+	gpos::Ref<CStatsPredPoint> pstatspred1 = GPOS_NEW(mp) CStatsPredPoint(
 		colid, CStatsPred::EstatscmptEq, CTestUtils::PpointBool(mp, fValue));
 
 	pdrgpstatspred->Append(std::move(pstatspred1));
@@ -659,16 +655,17 @@ CStatisticsTest::StatsFilterBool(
 
 // create a stats filter on numeric types
 void
-CStatisticsTest::StatsFilterNumeric(
-	CMemoryPool *mp, ULONG colid, CWStringDynamic *pstrLowerEncoded,
-	CWStringDynamic *pstrUpperEncoded, CDouble dValLower, CDouble dValUpper,
-	gpos::pointer<CStatsPredPtrArry *> pdrgpstatspred)
+CStatisticsTest::StatsFilterNumeric(CMemoryPool *mp, ULONG colid,
+									CWStringDynamic *pstrLowerEncoded,
+									CWStringDynamic *pstrUpperEncoded,
+									CDouble dValLower, CDouble dValUpper,
+									CStatsPredPtrArry *pdrgpstatspred)
 {
-	gpos::owner<CStatsPredPoint *> pstatspred1 = GPOS_NEW(mp) CStatsPredPoint(
+	gpos::Ref<CStatsPredPoint> pstatspred1 = GPOS_NEW(mp) CStatsPredPoint(
 		colid, CStatsPred::EstatscmptGEq,
 		CCardinalityTestUtils::PpointNumeric(mp, pstrLowerEncoded, dValLower));
 
-	gpos::owner<CStatsPredPoint *> pstatspred2 = GPOS_NEW(mp) CStatsPredPoint(
+	gpos::Ref<CStatsPredPoint> pstatspred2 = GPOS_NEW(mp) CStatsPredPoint(
 		colid, CStatsPred::EstatscmptL,
 		CCardinalityTestUtils::PpointNumeric(mp, pstrUpperEncoded, dValUpper));
 
@@ -678,17 +675,18 @@ CStatisticsTest::StatsFilterNumeric(
 
 // create a stats filter on other types
 void
-CStatisticsTest::StatsFilterGeneric(
-	CMemoryPool *mp, ULONG colid, OID oid, CWStringDynamic *pstrLowerEncoded,
-	CWStringDynamic *pstrUpperEncoded, LINT lValueLower, LINT lValueUpper,
-	gpos::pointer<CStatsPredPtrArry *> pdrgpstatspred)
+CStatisticsTest::StatsFilterGeneric(CMemoryPool *mp, ULONG colid, OID oid,
+									CWStringDynamic *pstrLowerEncoded,
+									CWStringDynamic *pstrUpperEncoded,
+									LINT lValueLower, LINT lValueUpper,
+									CStatsPredPtrArry *pdrgpstatspred)
 {
-	gpos::owner<CStatsPredPoint *> pstatspred1 = GPOS_NEW(mp)
+	gpos::Ref<CStatsPredPoint> pstatspred1 = GPOS_NEW(mp)
 		CStatsPredPoint(colid, CStatsPred::EstatscmptGEq,
 						CCardinalityTestUtils::PpointGeneric(
 							mp, oid, pstrLowerEncoded, lValueLower));
 
-	gpos::owner<CStatsPredPoint *> pstatspred2 = GPOS_NEW(mp)
+	gpos::Ref<CStatsPredPoint> pstatspred2 = GPOS_NEW(mp)
 		CStatsPredPoint(colid, CStatsPred::EstatscmptL,
 						CCardinalityTestUtils::PpointGeneric(
 							mp, oid, pstrUpperEncoded, lValueUpper));

@@ -34,8 +34,7 @@ public:
 
 	// ctor
 	CPhysicalExternalScan(CMemoryPool *, const CName *,
-						  gpos::owner<CTableDescriptor *>,
-						  gpos::owner<CColRefArray *>);
+						  gpos::Ref<CTableDescriptor>, gpos::Ref<CColRefArray>);
 
 	// ident accessors
 	EOperatorId
@@ -52,14 +51,14 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *>) const override;
+	BOOL Matches(COperator *) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive rewindability
-	gpos::owner<CRewindabilitySpec *>
+	gpos::Ref<CRewindabilitySpec>
 	PrsDerive(CMemoryPool *mp,
 			  CExpressionHandle &  // exprhdl
 	) const override
@@ -76,14 +75,14 @@ public:
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
 		CExpressionHandle &exprhdl,
-		gpos::pointer<const CEnfdRewindability *> per) const override;
+		const CEnfdRewindability *per) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CPhysicalExternalScan *>
+	static CPhysicalExternalScan *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

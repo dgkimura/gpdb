@@ -30,7 +30,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalGet::CDXLLogicalGet(CMemoryPool *mp,
-							   gpos::owner<CDXLTableDescr *> table_descr)
+							   gpos::Ref<CDXLTableDescr> table_descr)
 	: CDXLLogical(mp), m_dxl_table_descr(std::move(table_descr))
 {
 }
@@ -45,7 +45,7 @@ CDXLLogicalGet::CDXLLogicalGet(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLLogicalGet::~CDXLLogicalGet()
 {
-	CRefCount::SafeRelease(m_dxl_table_descr);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -84,10 +84,10 @@ CDXLLogicalGet::GetOpNameStr() const
 //		Table descriptor for the table scan
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLTableDescr *>
+CDXLTableDescr *
 CDXLLogicalGet::GetDXLTableDescr() const
 {
-	return m_dxl_table_descr;
+	return m_dxl_table_descr.get();
 }
 
 
@@ -101,7 +101,7 @@ CDXLLogicalGet::GetDXLTableDescr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalGet::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   gpos::pointer<const CDXLNode *>	//dxlnode
+							   const CDXLNode *	 //dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -150,8 +150,8 @@ CDXLLogicalGet::IsColDefined(ULONG colid) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalGet::AssertValid(gpos::pointer<const CDXLNode *>,  //dxlnode
-							BOOL  // validate_children
+CDXLLogicalGet::AssertValid(const CDXLNode *,  //dxlnode
+							BOOL			   // validate_children
 ) const
 {
 	// assert validity of table descriptor

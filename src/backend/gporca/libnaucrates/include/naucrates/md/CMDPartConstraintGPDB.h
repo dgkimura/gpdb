@@ -51,20 +51,19 @@ private:
 	CMemoryPool *m_mp;
 
 	// included default partitions
-	gpos::owner<ULongPtrArray *> m_level_with_default_part_array;
+	gpos::Ref<ULongPtrArray> m_level_with_default_part_array;
 
 	// is constraint unbounded
 	BOOL m_is_unbounded;
 
 	// the DXL representation of the part constraint
-	gpos::owner<CDXLNode *> m_dxl_node;
+	gpos::Ref<CDXLNode> m_dxl_node;
 
 public:
 	// ctor
 	CMDPartConstraintGPDB(
-		CMemoryPool *mp,
-		gpos::owner<ULongPtrArray *> level_with_default_part_array,
-		BOOL is_unbounded, gpos::owner<CDXLNode *> dxlnode);
+		CMemoryPool *mp, gpos::Ref<ULongPtrArray> level_with_default_part_array,
+		BOOL is_unbounded, gpos::Ref<CDXLNode> dxlnode);
 
 	// dtor
 	~CMDPartConstraintGPDB() override;
@@ -73,12 +72,12 @@ public:
 	void Serialize(CXMLSerializer *xml_serializer) const override;
 
 	// the scalar expression of the part constraint
-	gpos::owner<CExpression *> GetPartConstraintExpr(
+	gpos::Ref<CExpression> GetPartConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::pointer<CColRefArray *> colref_array) const override;
+		CColRefArray *colref_array) const override;
 
 	// included default partitions
-	gpos::pointer<ULongPtrArray *> GetDefaultPartsArray() const override;
+	ULongPtrArray *GetDefaultPartsArray() const override;
 
 	// is constraint unbounded
 	BOOL IsConstraintUnbounded() const override;

@@ -51,28 +51,28 @@ CMDProviderRelcache::CMDProviderRelcache(CMemoryPool *mp) : m_mp(mp)
 //---------------------------------------------------------------------------
 CWStringBase *
 CMDProviderRelcache::GetMDObjDXLStr(CMemoryPool *mp, CMDAccessor *md_accessor,
-									gpos::pointer<IMDId *> md_id) const
+									IMDId *md_id) const
 {
-	gpos::owner<IMDCacheObject *> md_obj =
+	gpos::Ref<IMDCacheObject> md_obj =
 		CTranslatorRelcacheToDXL::RetrieveObject(mp, md_accessor, md_id);
 
 	GPOS_ASSERT(nullptr != md_obj);
 
 	CWStringDynamic *str = CDXLUtils::SerializeMDObj(
-		m_mp, md_obj, true /*fSerializeHeaders*/, false /*findent*/);
+		m_mp, md_obj.get(), true /*fSerializeHeaders*/, false /*findent*/);
 
 	// cleanup DXL object
-	md_obj->Release();
+	;
 
 	return str;
 }
 
 // return the requested metadata object
-gpos::owner<IMDCacheObject *>
+gpos::Ref<IMDCacheObject>
 CMDProviderRelcache::GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
-							  gpos::pointer<IMDId *> mdid) const
+							  IMDId *mdid) const
 {
-	gpos::owner<IMDCacheObject *> md_obj =
+	gpos::Ref<IMDCacheObject> md_obj =
 		CTranslatorRelcacheToDXL::RetrieveObject(mp, md_accessor, mdid);
 	GPOS_ASSERT(nullptr != md_obj);
 

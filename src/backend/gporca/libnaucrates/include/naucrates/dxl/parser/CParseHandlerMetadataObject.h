@@ -39,7 +39,7 @@ class CParseHandlerMetadataObject : public CParseHandlerBase
 private:
 protected:
 	// the metadata object constructed by the parse handler
-	gpos::owner<IMDCacheObject *> m_imd_obj;
+	gpos::Ref<IMDCacheObject> m_imd_obj;
 
 public:
 	CParseHandlerMetadataObject(const CParseHandlerMetadataObject &) = delete;
@@ -52,7 +52,7 @@ public:
 	~CParseHandlerMetadataObject() override;
 
 	// returns constructed metadata object
-	gpos::pointer<IMDCacheObject *> GetImdObj() const;
+	IMDCacheObject *GetImdObj() const;
 };
 }  // namespace gpdxl
 

@@ -33,7 +33,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarDMLAction::Matches(gpos::pointer<COperator *> pop) const
+CScalarDMLAction::Matches(COperator *pop) const
 {
 	return pop->Eopid() == Eopid();
 }
@@ -46,7 +46,7 @@ CScalarDMLAction::Matches(gpos::pointer<COperator *> pop) const
 //		Operator type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarDMLAction::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

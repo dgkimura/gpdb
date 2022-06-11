@@ -32,8 +32,7 @@ BOOL CJoinStatsProcessor::m_compute_scale_factor_from_histogram_buckets = false;
 void
 CJoinStatsProcessor::JoinHistograms(
 	CMemoryPool *mp, const CHistogram *histogram1, const CHistogram *histogram2,
-	gpos::pointer<CStatsPredJoin *> join_pred_stats, CDouble num_rows1,
-	CDouble num_rows2,
+	CStatsPredJoin *join_pred_stats, CDouble num_rows1, CDouble num_rows2,
 	CHistogram **result_hist1,	// output: histogram 1 after join
 	CHistogram **result_hist2,	// output: histogram 2 after join
 	CDouble *scale_factor,		// output: scale factor based on the join
@@ -120,10 +119,10 @@ CJoinStatsProcessor::JoinHistograms(
 }
 
 //	derive statistics for the given join's predicate(s)
-gpos::owner<IStatistics *>
-CJoinStatsProcessor::CalcAllJoinStats(
-	CMemoryPool *mp, gpos::pointer<IStatisticsArray *> statistics_array,
-	CExpression *expr, gpos::pointer<COperator *> pop)
+gpos::Ref<IStatistics>
+CJoinStatsProcessor::CalcAllJoinStats(CMemoryPool *mp,
+									  IStatisticsArray *statistics_array,
+									  CExpression *expr, COperator *pop)
 {
 	GPOS_ASSERT(nullptr != expr);
 	GPOS_ASSERT(nullptr != statistics_array);
@@ -133,14 +132,14 @@ CJoinStatsProcessor::CalcAllJoinStats(
 	BOOL left_outer_2_way_join = false;
 
 	// create an empty set of outer references for statistics derivation
-	gpos::owner<CColRefSet *> outer_refs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> outer_refs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// join statistics objects one by one using relevant predicates in given scalar expression
 	const ULONG num_stats = statistics_array->Size();
-	gpos::owner<IStatistics *> stats = (*statistics_array)[0]->CopyStats(mp);
+	gpos::Ref<IStatistics> stats = (*statistics_array)[0]->CopyStats(mp);
 	CDouble num_rows_outer = stats->Rows();
 	// predicate indexes, if we have a mix of inner and LOJs
-	gpos::pointer<ULongPtrArray *> predIndexes = nullptr;
+	ULongPtrArray *predIndexes = nullptr;
 	CExpression *inner_or_simple_2_way_loj_preds = expr;
 
 	switch (pop->Eopid())
@@ -172,14 +171,14 @@ CJoinStatsProcessor::CalcAllJoinStats(
 
 	for (ULONG i = 1; i < num_stats; i++)
 	{
-		gpos::pointer<IStatistics *> current_stats = (*statistics_array)[i];
+		IStatistics *current_stats = (*statistics_array)[i].get();
 
-		gpos::owner<CColRefSetArray *> output_colrefsets =
+		gpos::Ref<CColRefSetArray> output_colrefsets =
 			GPOS_NEW(mp) CColRefSetArray(mp);
 		output_colrefsets->Append(stats->GetColRefSet(mp));
 		output_colrefsets->Append(current_stats->GetColRefSet(mp));
 
-		gpos::owner<CStatsPred *> unsupported_pred_stats = nullptr;
+		gpos::Ref<CStatsPred> unsupported_pred_stats = nullptr;
 		BOOL is_a_left_join = left_outer_2_way_join;
 		CExpression *join_preds_available = nullptr;
 
@@ -195,25 +194,24 @@ CJoinStatsProcessor::CalcAllJoinStats(
 			join_preds_available = (*expr)[*(*predIndexes)[i]];
 		}
 
-		gpos::owner<CStatsPredJoinArray *> join_preds_stats =
+		gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 			CStatsPredUtils::ExtractJoinStatsFromJoinPredArray(
-				mp, join_preds_available, output_colrefsets, outer_refs,
+				mp, join_preds_available, output_colrefsets.get(), outer_refs,
 				is_a_left_join,	 // left joins use an anti-semijoin internally
 				&unsupported_pred_stats);
 
-		gpos::owner<IStatistics *> new_stats = nullptr;
+		gpos::Ref<IStatistics> new_stats = nullptr;
 
 		if (is_a_left_join)
 		{
-			new_stats =
-				stats->CalcLOJoinStats(mp, current_stats, join_preds_stats);
+			new_stats = stats->CalcLOJoinStats(mp, current_stats,
+											   join_preds_stats.get());
 		}
 		else
 		{
-			new_stats =
-				stats->CalcInnerJoinStats(mp, current_stats, join_preds_stats);
-		}
-		stats->Release();
+			new_stats = stats->CalcInnerJoinStats(mp, current_stats,
+												  join_preds_stats.get());
+		};
 		stats = new_stats;
 
 		if (nullptr != unsupported_pred_stats)
@@ -221,10 +219,10 @@ CJoinStatsProcessor::CalcAllJoinStats(
 			// apply the unsupported join filters as a filter on top of the join results.
 			// TODO,  June 13 2014 we currently only cap NDVs for filters
 			// immediately on top of tables.
-			gpos::owner<IStatistics *> stats_after_join_filter =
+			gpos::Ref<IStatistics> stats_after_join_filter =
 				CFilterStatsProcessor::MakeStatsFilter(
-					mp, gpos::dyn_cast<CStatistics>(stats),
-					unsupported_pred_stats, false /* do_cap_NDVs */);
+					mp, gpos::dyn_cast<CStatistics>(stats.get()),
+					unsupported_pred_stats.get(), false /* do_cap_NDVs */);
 
 			// If it is outer join and the cardinality after applying the unsupported join
 			// filters is less than the cardinality of outer child, we don't use this stats.
@@ -232,37 +230,36 @@ CJoinStatsProcessor::CalcAllJoinStats(
 			if (is_a_left_join &&
 				stats_after_join_filter->Rows() < num_rows_outer)
 			{
-				stats_after_join_filter->Release();
+				;
 			}
 			else
 			{
-				stats->Release();
+				;
 				stats = stats_after_join_filter;
 			}
 
-			unsupported_pred_stats->Release();
+			;
 		}
 
 		num_rows_outer = stats->Rows();
 
-		join_preds_stats->Release();
-		output_colrefsets->Release();
+		;
+		;
 	}
 
 	// clean up
-	outer_refs->Release();
+	;
 
 	return stats;
 }
 
 
 // main driver to generate join stats
-gpos::owner<CStatistics *>
+gpos::Ref<CStatistics>
 CJoinStatsProcessor::SetResultingJoinStats(
-	CMemoryPool *mp, gpos::pointer<CStatisticsConfig *> stats_config,
-	gpos::pointer<const IStatistics *> outer_stats_input,
-	gpos::pointer<const IStatistics *> inner_stats_input,
-	gpos::pointer<CStatsPredJoinArray *> join_pred_stats_info,
+	CMemoryPool *mp, CStatisticsConfig *stats_config,
+	const IStatistics *outer_stats_input, const IStatistics *inner_stats_input,
+	CStatsPredJoinArray *join_pred_stats_info,
 	IStatistics::EStatsJoinType join_type, BOOL DoIgnoreLASJHistComputation)
 {
 	GPOS_ASSERT(nullptr != mp);
@@ -279,20 +276,20 @@ CJoinStatsProcessor::SetResultingJoinStats(
 	// However, currently only CStatistics implements IStatistics
 	// Until this changes, the interfaces have been designed to take IStatistics as parameters
 	// In the future, IStatistics should be removed, as it is not being utilized as designed
-	gpos::pointer<const CStatistics *> outer_stats =
+	const CStatistics *outer_stats =
 		dynamic_cast<const CStatistics *>(outer_stats_input);
-	gpos::pointer<const CStatistics *> inner_side_stats =
+	const CStatistics *inner_side_stats =
 		dynamic_cast<const CStatistics *>(inner_stats_input);
 
 	// create hash map from colid -> histogram for resultant structure
-	gpos::owner<UlongToHistogramMap *> result_col_hist_mapping =
+	gpos::Ref<UlongToHistogramMap> result_col_hist_mapping =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// build a bitset with all join columns
-	gpos::owner<CBitSet *> join_colids = GPOS_NEW(mp) CBitSet(mp);
+	gpos::Ref<CBitSet> join_colids = GPOS_NEW(mp) CBitSet(mp);
 	for (ULONG i = 0; i < join_pred_stats_info->Size(); i++)
 	{
-		gpos::pointer<CStatsPredJoin *> join_stats = (*join_pred_stats_info)[i];
+		CStatsPredJoin *join_stats = (*join_pred_stats_info)[i].get();
 
 		if (join_stats->HasValidColIdOuter())
 		{
@@ -306,17 +303,16 @@ CJoinStatsProcessor::SetResultingJoinStats(
 
 	// histograms on columns that do not appear in join condition will
 	// be copied over to the result structure
-	outer_stats->AddNotExcludedHistograms(mp, join_colids,
-										  result_col_hist_mapping);
+	outer_stats->AddNotExcludedHistograms(mp, join_colids.get(),
+										  result_col_hist_mapping.get());
 	if (!semi_join)
 	{
-		inner_side_stats->AddNotExcludedHistograms(mp, join_colids,
-												   result_col_hist_mapping);
+		inner_side_stats->AddNotExcludedHistograms(
+			mp, join_colids.get(), result_col_hist_mapping.get());
 	}
 
-	gpos::owner<CScaleFactorUtils::SJoinConditionArray *>
-		join_conds_scale_factors =
-			GPOS_NEW(mp) CScaleFactorUtils::SJoinConditionArray(mp);
+	gpos::Ref<CScaleFactorUtils::SJoinConditionArray> join_conds_scale_factors =
+		GPOS_NEW(mp) CScaleFactorUtils::SJoinConditionArray(mp);
 	const ULONG num_join_conds = join_pred_stats_info->Size();
 
 	BOOL output_is_empty = false;
@@ -324,7 +320,7 @@ CJoinStatsProcessor::SetResultingJoinStats(
 	// iterate over join's predicate(s)
 	for (ULONG i = 0; i < num_join_conds; i++)
 	{
-		gpos::pointer<CStatsPredJoin *> pred_info = (*join_pred_stats_info)[i];
+		CStatsPredJoin *pred_info = (*join_pred_stats_info)[i].get();
 		ULONG colid1 = pred_info->ColIdOuter();
 		ULONG colid2 = pred_info->ColIdInner();
 		GPOS_ASSERT(colid1 != colid2);
@@ -377,11 +373,11 @@ CJoinStatsProcessor::SetResultingJoinStats(
 			inner_histogram, outer_histogram_after, join_type);
 
 		CStatisticsUtils::AddHistogram(mp, colid1, outer_histogram_after,
-									   result_col_hist_mapping);
+									   result_col_hist_mapping.get());
 		if (!semi_join && colid1 != colid2)
 		{
 			CStatisticsUtils::AddHistogram(mp, colid2, inner_histogram_after,
-										   result_col_hist_mapping);
+										   result_col_hist_mapping.get());
 		}
 
 		GPOS_DELETE(outer_histogram_after);
@@ -398,7 +394,7 @@ CJoinStatsProcessor::SetResultingJoinStats(
 
 		IMDId *mdid_outer = colref_outer->GetMdidTable();
 		IMDId *mdid_inner = colref_inner->GetMdidTable();
-		gpos::owner<IMdIdArray *> mdid_pair = nullptr;
+		gpos::Ref<IMdIdArray> mdid_pair = nullptr;
 		BOOL both_dist_keys = false;
 		if ((mdid_outer != nullptr) && (mdid_inner != nullptr))
 		{
@@ -409,8 +405,8 @@ CJoinStatsProcessor::SetResultingJoinStats(
 			// but we know that CColRef::GetMdidTable() will always return the same
 			// pointer for a given table.
 			mdid_pair = GPOS_NEW(mp) IMdIdArray(mp, 2);
-			mdid_outer->AddRef();
-			mdid_inner->AddRef();
+			;
+			;
 			mdid_pair->Append(mdid_outer);
 			mdid_pair->Append(mdid_inner);
 			mdid_pair->Sort();
@@ -432,12 +428,12 @@ CJoinStatsProcessor::SetResultingJoinStats(
 	{
 		num_join_rows = CalcJoinCardinality(
 			mp, stats_config, outer_stats->Rows(), inner_side_stats->Rows(),
-			join_conds_scale_factors, join_type);
+			join_conds_scale_factors.get(), join_type);
 	}
 
 	// clean up
-	join_conds_scale_factors->Release();
-	join_colids->Release();
+	;
+	;
 
 	UlongToDoubleMap *col_width_mapping_result = outer_stats->CopyWidths(mp);
 	if (!semi_join)
@@ -446,7 +442,7 @@ CJoinStatsProcessor::SetResultingJoinStats(
 	}
 
 	// create an output stats object
-	gpos::owner<CStatistics *> join_stats = GPOS_NEW(mp) CStatistics(
+	gpos::Ref<CStatistics> join_stats = GPOS_NEW(mp) CStatistics(
 		mp, result_col_hist_mapping, col_width_mapping_result, num_join_rows,
 		output_is_empty, outer_stats->GetNumberOfPredicates());
 
@@ -457,12 +453,12 @@ CJoinStatsProcessor::SetResultingJoinStats(
 	// and estimated join cardinality.
 
 	CStatisticsUtils::ComputeCardUpperBounds(
-		mp, outer_stats, join_stats, num_join_rows,
+		mp, outer_stats, join_stats.get(), num_join_rows,
 		CStatistics::EcbmMin /* card_bounding_method */);
 	if (!semi_join)
 	{
 		CStatisticsUtils::ComputeCardUpperBounds(
-			mp, inner_side_stats, join_stats, num_join_rows,
+			mp, inner_side_stats, join_stats.get(), num_join_rows,
 			CStatistics::EcbmMin /* card_bounding_method */);
 	}
 
@@ -473,10 +469,9 @@ CJoinStatsProcessor::SetResultingJoinStats(
 // return join cardinality based on scaling factor and join type
 CDouble
 CJoinStatsProcessor::CalcJoinCardinality(
-	CMemoryPool *mp, gpos::pointer<CStatisticsConfig *> stats_config,
-	CDouble left_num_rows, CDouble right_num_rows,
-	gpos::pointer<CScaleFactorUtils::SJoinConditionArray *>
-		join_conds_scale_factors,
+	CMemoryPool *mp, CStatisticsConfig *stats_config, CDouble left_num_rows,
+	CDouble right_num_rows,
+	CScaleFactorUtils::SJoinConditionArray *join_conds_scale_factors,
 	IStatistics::EStatsJoinType join_type)
 {
 	GPOS_ASSERT(nullptr != stats_config);
@@ -536,40 +531,40 @@ CJoinStatsProcessor::JoinStatsAreEmpty(BOOL outer_is_empty,
 }
 
 // Derive statistics for join operation given array of statistics object
-gpos::owner<IStatistics *>
-CJoinStatsProcessor::DeriveJoinStats(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<IStatisticsArray *> stats_ctxt)
+gpos::Ref<IStatistics>
+CJoinStatsProcessor::DeriveJoinStats(CMemoryPool *mp,
+									 CExpressionHandle &exprhdl,
+									 IStatisticsArray *stats_ctxt)
 {
 	GPOS_ASSERT(CLogical::EspNone <
 				gpos::dyn_cast<CLogical>(exprhdl.Pop())->Esp(exprhdl));
 
-	gpos::owner<IStatisticsArray *> statistics_array =
+	gpos::Ref<IStatisticsArray> statistics_array =
 		GPOS_NEW(mp) IStatisticsArray(mp);
 	const ULONG arity = exprhdl.Arity();
 	for (ULONG i = 0; i < arity - 1; i++)
 	{
-		gpos::owner<IStatistics *> child_stats = exprhdl.Pstats(i);
-		child_stats->AddRef();
+		gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(i);
+		;
 		statistics_array->Append(child_stats);
 	}
 
-	gpos::owner<CExpression *> join_pred_expr =
+	gpos::Ref<CExpression> join_pred_expr =
 		exprhdl.PexprScalarRepChild(arity - 1);
 
 	join_pred_expr = CPredicateUtils::PexprRemoveImpliedConjuncts(
-		mp, join_pred_expr, exprhdl);
+		mp, join_pred_expr.get(), exprhdl);
 
 	// split join predicate into local predicate and predicate involving outer references
-	gpos::owner<CExpression *> local_expr = nullptr;
-	gpos::owner<CExpression *> expr_with_outer_refs = nullptr;
+	gpos::Ref<CExpression> local_expr = nullptr;
+	gpos::Ref<CExpression> expr_with_outer_refs = nullptr;
 
 	// get outer references from expression handle
 	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
 
 	CPredicateUtils::SeparateOuterRefs(mp, join_pred_expr, outer_refs,
 									   &local_expr, &expr_with_outer_refs);
-	join_pred_expr->Release();
+	;
 
 #ifdef GPOS_DEBUG
 	COperator::EOperatorId op_id = exprhdl.Pop()->Eopid();
@@ -581,23 +576,22 @@ CJoinStatsProcessor::DeriveJoinStats(
 #endif
 
 	// derive stats based on local join condition
-	gpos::owner<IStatistics *> join_stats =
-		CJoinStatsProcessor::CalcAllJoinStats(mp, statistics_array, local_expr,
-											  exprhdl.Pop());
+	gpos::Ref<IStatistics> join_stats = CJoinStatsProcessor::CalcAllJoinStats(
+		mp, statistics_array.get(), local_expr, exprhdl.Pop());
 
 	if (exprhdl.HasOuterRefs() && 0 < stats_ctxt->Size())
 	{
 		// derive stats based on outer references
-		gpos::owner<IStatistics *> stats = DeriveStatsWithOuterRefs(
+		gpos::Ref<IStatistics> stats = DeriveStatsWithOuterRefs(
 			mp, exprhdl, expr_with_outer_refs, join_stats, stats_ctxt);
-		join_stats->Release();
+		;
 		join_stats = stats;
 	}
 
-	local_expr->Release();
-	expr_with_outer_refs->Release();
+	;
+	;
 
-	statistics_array->Release();
+	;
 
 	return join_stats;
 }
@@ -655,14 +649,14 @@ CJoinStatsProcessor::DeriveJoinStats(
 //
 // when deriving statistics on 'Select(T.t=R.r)', we join T with the cross
 // product (R x S) based on the condition (T.t=R.r)
-gpos::owner<IStatistics *>
+gpos::Ref<IStatistics>
 CJoinStatsProcessor::DeriveStatsWithOuterRefs(
 	CMemoryPool *mp,
 	CExpressionHandle &
 		exprhdl,  // handle attached to the logical expression we want to derive stats for
 	CExpression *expr,	 // scalar condition to be used for stats derivation
 	IStatistics *stats,	 // statistics object of the attached expression
-	gpos::pointer<IStatisticsArray *>
+	IStatisticsArray *
 		all_outer_stats	 // array of stats objects where outer references are defined
 )
 {
@@ -675,27 +669,26 @@ CJoinStatsProcessor::DeriveStatsWithOuterRefs(
 
 	// join outer stats object based on given scalar expression,
 	// we use inner join semantics here to consider all relevant combinations of outer tuples
-	gpos::owner<IStatistics *> outer_stats =
-		CJoinStatsProcessor::CalcAllJoinStats(mp, all_outer_stats, expr,
-											  exprhdl.Pop());
+	gpos::Ref<IStatistics> outer_stats = CJoinStatsProcessor::CalcAllJoinStats(
+		mp, all_outer_stats, expr, exprhdl.Pop());
 	CDouble num_rows_outer = outer_stats->Rows();
 
 	// join passed stats object and outer stats based on the passed join type
-	gpos::owner<IStatisticsArray *> statistics_array =
+	gpos::Ref<IStatisticsArray> statistics_array =
 		GPOS_NEW(mp) IStatisticsArray(mp);
 	statistics_array->Append(std::move(outer_stats));
-	stats->AddRef();
+	;
 	statistics_array->Append(stats);
-	gpos::owner<IStatistics *> result_join_stats =
-		CJoinStatsProcessor::CalcAllJoinStats(mp, statistics_array, expr,
+	gpos::Ref<IStatistics> result_join_stats =
+		CJoinStatsProcessor::CalcAllJoinStats(mp, statistics_array.get(), expr,
 											  exprhdl.Pop());
-	statistics_array->Release();
+	;
 
 	// scale result using cardinality of outer stats and set number of rebinds of returned stats
-	gpos::owner<IStatistics *> result_stats =
+	gpos::Ref<IStatistics> result_stats =
 		result_join_stats->ScaleStats(mp, CDouble(1.0 / num_rows_outer));
 	result_stats->SetRebinds(num_rows_outer);
-	result_join_stats->Release();
+	;
 
 	return result_stats;
 }

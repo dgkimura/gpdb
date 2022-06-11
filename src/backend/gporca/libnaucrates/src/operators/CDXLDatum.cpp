@@ -32,7 +32,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatum::CDXLDatum(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+CDXLDatum::CDXLDatum(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 					 INT type_modifier, BOOL is_null, ULONG length)
 	: m_mp(mp),
 	  m_mdid_type(std::move(mdid_type)),

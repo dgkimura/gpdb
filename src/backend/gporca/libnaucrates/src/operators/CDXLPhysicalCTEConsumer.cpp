@@ -31,7 +31,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalCTEConsumer::CDXLPhysicalCTEConsumer(
-	CMemoryPool *mp, ULONG id, gpos::owner<ULongPtrArray *> output_colids_array)
+	CMemoryPool *mp, ULONG id, gpos::Ref<ULongPtrArray> output_colids_array)
 	: CDXLPhysical(mp),
 	  m_id(id),
 	  m_output_colids_array(std::move(output_colids_array))
@@ -49,7 +49,7 @@ CDXLPhysicalCTEConsumer::CDXLPhysicalCTEConsumer(
 //---------------------------------------------------------------------------
 CDXLPhysicalCTEConsumer::~CDXLPhysicalCTEConsumer()
 {
-	m_output_colids_array->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -89,9 +89,8 @@ CDXLPhysicalCTEConsumer::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalCTEConsumer::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLPhysicalCTEConsumer::SerializeToDXL(CXMLSerializer *xml_serializer,
+										const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -101,7 +100,7 @@ CDXLPhysicalCTEConsumer::SerializeToDXL(
 								 Id());
 
 	CWStringDynamic *str_colids =
-		CDXLUtils::Serialize(m_mp, m_output_colids_array);
+		CDXLUtils::Serialize(m_mp, m_output_colids_array.get());
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenColumns),
 								 str_colids);
 	GPOS_DELETE(str_colids);
@@ -124,12 +123,12 @@ CDXLPhysicalCTEConsumer::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalCTEConsumer::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalCTEConsumer::AssertValid(const CDXLNode *dxlnode,
 									 BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	gpos::pointer<CDXLNode *> dxlnode_proj_list = (*dxlnode)[0];
+	CDXLNode *dxlnode_proj_list = (*dxlnode)[0];
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				dxlnode_proj_list->GetOperator()->GetDXLOperator());
 

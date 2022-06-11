@@ -63,15 +63,14 @@ CXformDynamicIndexGet2DynamicIndexScan::Exfp(CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 void
 CXformDynamicIndexGet2DynamicIndexScan::Transform(
-	gpos::pointer<CXformContext *> pxfctxt GPOS_ASSERTS_ONLY,
-	gpos::pointer<CXformResult *> pxfres GPOS_UNUSED,
-	gpos::pointer<CExpression *> pexpr GPOS_ASSERTS_ONLY) const
+	CXformContext *pxfctxt GPOS_ASSERTS_ONLY, CXformResult *pxfres GPOS_UNUSED,
+	CExpression *pexpr GPOS_ASSERTS_ONLY) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CLogicalDynamicIndexGet *> popIndexGet =
+	CLogicalDynamicIndexGet *popIndexGet =
 		gpos::dyn_cast<CLogicalDynamicIndexGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
@@ -80,31 +79,30 @@ CXformDynamicIndexGet2DynamicIndexScan::Transform(
 	GPOS_ASSERT(pname != nullptr);
 
 	// extract components
-	gpos::owner<CExpression *> pexprIndexCond = (*pexpr)[0];
-	pexprIndexCond->AddRef();
+	gpos::Ref<CExpression> pexprIndexCond = (*pexpr)[0];
+	;
 
-	gpos::owner<CTableDescriptor *> ptabdesc = popIndexGet->Ptabdesc();
-	ptabdesc->AddRef();
+	gpos::Ref<CTableDescriptor> ptabdesc = popIndexGet->Ptabdesc();
+	;
 
-	gpos::owner<CIndexDescriptor *> pindexdesc = popIndexGet->Pindexdesc();
-	pindexdesc->AddRef();
+	gpos::Ref<CIndexDescriptor> pindexdesc = popIndexGet->Pindexdesc();
+	;
 
 	CColRefArray *pdrgpcrOutput = popIndexGet->PdrgpcrOutput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
-	pdrgpcrOutput->AddRef();
+	;
 
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart =
-		popIndexGet->PdrgpdrgpcrPart();
-	pdrgpdrgpcrPart->AddRef();
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart = popIndexGet->PdrgpdrgpcrPart();
+	;
 
-	gpos::owner<COrderSpec *> pos = popIndexGet->Pos();
-	pos->AddRef();
+	gpos::Ref<COrderSpec> pos = popIndexGet->Pos();
+	;
 
-	popIndexGet->GetPartitionMdids()->AddRef();
-	popIndexGet->GetRootColMappingPerPart()->AddRef();
+	;
+	;
 
 	// create alternative expression
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CPhysicalDynamicIndexScan(
 						mp, std::move(pindexdesc), std::move(ptabdesc),

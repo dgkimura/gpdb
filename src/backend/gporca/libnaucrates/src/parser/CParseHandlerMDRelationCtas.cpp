@@ -107,9 +107,11 @@ CParseHandlerMDRelationCtas::StartElement(const XMLCh *const,
 	// parse vartypemod
 	const XMLCh *vartypemod_xml = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenVarTypeModList, EdxltokenRelation);
-	m_vartypemod_array = CDXLOperatorFactory::ExtractIntsToIntArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), vartypemod_xml,
-		EdxltokenVarTypeModList, EdxltokenRelation);
+	m_vartypemod_array =
+		CDXLOperatorFactory::ExtractIntsToIntArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), vartypemod_xml,
+			EdxltokenVarTypeModList, EdxltokenRelation)
+			.get();
 
 	// parse handler for distr opclasses
 	CParseHandlerBase *opclasses_parse_handler =
@@ -189,18 +191,18 @@ CParseHandlerMDRelationCtas::EndElement(const XMLCh *const,	 // element_uri,
 	CDXLCtasStorageOptions *dxl_ctas_storage_options =
 		ctas_options_parse_handler->GetDxlCtasStorageOption();
 
-	md_col_array->AddRef();
-	dxl_ctas_storage_options->AddRef();
+	;
+	;
 
-	gpos::owner<IMdIdArray *> distr_opfamilies =
+	gpos::Ref<IMdIdArray> distr_opfamilies =
 		dynamic_cast<CParseHandlerMetadataIdList *>(opfamilies_parse_handler)
 			->GetMdIdArray();
-	distr_opfamilies->AddRef();
+	;
 
-	gpos::owner<IMdIdArray *> distr_opclasses =
+	gpos::Ref<IMdIdArray> distr_opclasses =
 		dynamic_cast<CParseHandlerMetadataIdList *>(opclasses_parse_handler)
 			->GetMdIdArray();
-	distr_opclasses->AddRef();
+	;
 
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDRelationCtasGPDB(

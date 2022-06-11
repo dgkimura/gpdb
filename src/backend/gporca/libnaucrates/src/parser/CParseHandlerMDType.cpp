@@ -83,23 +83,23 @@ CParseHandlerMDType::CParseHandlerMDType(
 //---------------------------------------------------------------------------
 CParseHandlerMDType::~CParseHandlerMDType()
 {
-	m_mdid->Release();
-	CRefCount::SafeRelease(m_distr_opfamily);
-	CRefCount::SafeRelease(m_legacy_distr_opfamily);
-	m_mdid_eq_op->Release();
-	m_mdid_neq_op->Release();
-	m_mdid_lt_op->Release();
-	m_mdid_lteq_op->Release();
-	m_mdid_gt_op->Release();
-	m_mdid_gteq_op->Release();
-	m_mdid_cmp_op->Release();
-	m_mdid_array_type->Release();
-	m_mdid_min_op->Release();
-	m_mdid_max_op->Release();
-	m_mdid_avg_op->Release();
-	m_mdid_sum_op->Release();
-	m_mdid_count_op->Release();
-	CRefCount::SafeRelease(m_mdid_base_rel);
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -124,7 +124,7 @@ CParseHandlerMDType::StartElement(const XMLCh *const,  // element_uri,
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
 			EdxltokenMDType);
 
-		if (!IsBuiltInType(m_mdid))
+		if (!IsBuiltInType(m_mdid.get()))
 		{
 			// parse type name
 			const XMLCh *xmlszTypeName = CDXLOperatorFactory::ExtractAttrValue(
@@ -285,14 +285,14 @@ CParseHandlerMDType::ParseMdid(const XMLCh *element_local_name,
 //
 //---------------------------------------------------------------------------
 BOOL
-CParseHandlerMDType::IsBuiltInType(gpos::pointer<const IMDId *> mdid)
+CParseHandlerMDType::IsBuiltInType(const IMDId *mdid)
 {
 	if (IMDId::EmdidGPDB != mdid->MdidType())
 	{
 		return false;
 	}
 
-	gpos::pointer<const CMDIdGPDB *> mdidGPDB = CMDIdGPDB::CastMdid(mdid);
+	const CMDIdGPDB *mdidGPDB = CMDIdGPDB::CastMdid(mdid);
 
 	switch (mdidGPDB->Oid())
 	{
@@ -329,8 +329,7 @@ CParseHandlerMDType::EndElement(const XMLCh *const,	 // element_uri,
 
 		// TODO:  - Jan 30, 2012; add support for other types of mdids
 
-		gpos::pointer<const CMDIdGPDB *> pmdidGPDB =
-			gpos::dyn_cast<CMDIdGPDB>(m_mdid);
+		const CMDIdGPDB *pmdidGPDB = gpos::dyn_cast<CMDIdGPDB>(m_mdid.get());
 
 		switch (pmdidGPDB->Oid())
 		{
@@ -354,33 +353,30 @@ CParseHandlerMDType::EndElement(const XMLCh *const,	 // element_uri,
 				m_imd_obj = GPOS_NEW(m_mp) CMDTypeOidGPDB(m_mp);
 				break;
 
-			default:
-				m_mdid->AddRef();
+			default:;
 				if (nullptr != m_distr_opfamily)
 				{
-					m_distr_opfamily->AddRef();
+					;
 				}
 				if (nullptr != m_legacy_distr_opfamily)
 				{
-					m_legacy_distr_opfamily->AddRef();
-				}
-				m_mdid_eq_op->AddRef();
-				m_mdid_neq_op->AddRef();
-				m_mdid_lt_op->AddRef();
-				m_mdid_lteq_op->AddRef();
-				m_mdid_gt_op->AddRef();
-				m_mdid_gteq_op->AddRef();
-				m_mdid_cmp_op->AddRef();
-				m_mdid_min_op->AddRef();
-				m_mdid_max_op->AddRef();
-				m_mdid_avg_op->AddRef();
-				m_mdid_sum_op->AddRef();
-				m_mdid_count_op->AddRef();
+					;
+				};
+				;
+				;
+				;
+				;
+				;
+				;
+				;
+				;
+				;
+				;
+				;
 				if (nullptr != m_mdid_base_rel)
 				{
-					m_mdid_base_rel->AddRef();
-				}
-				m_mdid_array_type->AddRef();
+					;
+				};
 
 				ULONG length = 0;
 				if (0 < m_type_length)

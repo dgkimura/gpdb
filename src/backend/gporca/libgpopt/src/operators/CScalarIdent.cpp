@@ -48,12 +48,11 @@ CScalarIdent::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIdent::Matches(gpos::pointer<COperator *> pop) const
+CScalarIdent::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarIdent *> popIdent =
-			gpos::dyn_cast<CScalarIdent>(pop);
+		CScalarIdent *popIdent = gpos::dyn_cast<CScalarIdent>(pop);
 
 		// match if column reference is same
 		return Pcr() == popIdent->Pcr();
@@ -86,10 +85,10 @@ CScalarIdent::FInputOrderSensitive() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
-CScalarIdent::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+gpos::Ref<COperator>
+CScalarIdent::PopCopyWithRemappedColumns(CMemoryPool *mp,
+										 UlongToColRefMap *colref_mapping,
+										 BOOL must_exist)
 {
 	ULONG id = m_pcr->Id();
 	CColRef *colref = colref_mapping->Find(&id);
@@ -123,7 +122,7 @@ CScalarIdent::PopCopyWithRemappedColumns(
 //		Expression type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarIdent::MdidType() const
 {
 	return m_pcr->RetrieveType()->MDId();
@@ -144,7 +143,7 @@ CScalarIdent::TypeModifier() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIdent::FCastedScId(gpos::pointer<CExpression *> pexpr)
+CScalarIdent::FCastedScId(CExpression *pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -161,7 +160,7 @@ CScalarIdent::FCastedScId(gpos::pointer<CExpression *> pexpr)
 }
 
 BOOL
-CScalarIdent::FCastedScId(gpos::pointer<CExpression *> pexpr, CColRef *colref)
+CScalarIdent::FCastedScId(CExpression *pexpr, CColRef *colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != colref);
@@ -171,8 +170,7 @@ CScalarIdent::FCastedScId(gpos::pointer<CExpression *> pexpr, CColRef *colref)
 		return false;
 	}
 
-	gpos::pointer<CScalarIdent *> pScIdent =
-		gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
+	CScalarIdent *pScIdent = gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
 
 	return colref == pScIdent->Pcr();
 }
@@ -187,7 +185,7 @@ CScalarIdent::FCastedScId(gpos::pointer<CExpression *> pexpr, CColRef *colref)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIdent::FAllowedFuncScId(gpos::pointer<CExpression *> pexpr)
+CScalarIdent::FAllowedFuncScId(CExpression *pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -195,10 +193,8 @@ CScalarIdent::FAllowedFuncScId(gpos::pointer<CExpression *> pexpr)
 		pexpr->Arity() > 0 &&
 		COperator::EopScalarIdent == (*pexpr)[0]->Pop()->Eopid())
 	{
-		gpos::pointer<CScalarFunc *> func =
-			gpos::dyn_cast<CScalarFunc>(pexpr->Pop());
-		gpos::pointer<CMDIdGPDB *> funcmdid =
-			gpos::dyn_cast<CMDIdGPDB>(func->FuncMdId());
+		CScalarFunc *func = gpos::dyn_cast<CScalarFunc>(pexpr->Pop());
+		CMDIdGPDB *funcmdid = gpos::dyn_cast<CMDIdGPDB>(func->FuncMdId());
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 		return md_accessor->RetrieveFunc(funcmdid)->IsAllowedForPS();
 	}
@@ -206,8 +202,7 @@ CScalarIdent::FAllowedFuncScId(gpos::pointer<CExpression *> pexpr)
 }
 
 BOOL
-CScalarIdent::FAllowedFuncScId(gpos::pointer<CExpression *> pexpr,
-							   CColRef *colref)
+CScalarIdent::FAllowedFuncScId(CExpression *pexpr, CColRef *colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != colref);
@@ -217,8 +212,7 @@ CScalarIdent::FAllowedFuncScId(gpos::pointer<CExpression *> pexpr,
 		return false;
 	}
 
-	gpos::pointer<CScalarIdent *> pScIdent =
-		gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
+	CScalarIdent *pScIdent = gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
 
 	return colref == pScIdent->Pcr();
 }

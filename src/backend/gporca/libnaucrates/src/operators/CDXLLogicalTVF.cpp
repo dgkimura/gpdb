@@ -28,10 +28,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLLogicalTVF::CDXLLogicalTVF(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
-							   gpos::owner<IMDId *> mdid_return_type,
+CDXLLogicalTVF::CDXLLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+							   gpos::Ref<IMDId> mdid_return_type,
 							   CMDName *mdname,
-							   gpos::owner<CDXLColDescrArray *> pdrgdxlcd)
+							   gpos::Ref<CDXLColDescrArray> pdrgdxlcd)
 	: CDXLLogical(mp),
 	  m_func_mdid(std::move(mdid_func)),
 	  m_return_type_mdid(std::move(mdid_return_type)),
@@ -51,9 +51,9 @@ CDXLLogicalTVF::CDXLLogicalTVF(CMemoryPool *mp, gpos::owner<IMDId *> mdid_func,
 //---------------------------------------------------------------------------
 CDXLLogicalTVF::~CDXLLogicalTVF()
 {
-	m_dxl_col_descr_array->Release();
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
+	;
+	;
+	;
 	GPOS_DELETE(m_mdname);
 }
 
@@ -107,10 +107,10 @@ CDXLLogicalTVF::Arity() const
 //		Get the column descriptor at the given position
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLColDescr *>
+const CDXLColDescr *
 CDXLLogicalTVF::GetColumnDescrAt(ULONG ul) const
 {
-	return (*m_dxl_col_descr_array)[ul];
+	return (*m_dxl_col_descr_array)[ul].get();
 }
 
 //---------------------------------------------------------------------------
@@ -147,7 +147,7 @@ CDXLLogicalTVF::IsColDefined(ULONG colid) const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   gpos::pointer<const CDXLNode *> dxlnode) const
+							   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -167,7 +167,7 @@ CDXLLogicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	for (ULONG ul = 0; ul < Arity(); ul++)
 	{
-		gpos::pointer<CDXLColDescr *> pdxlcd = (*m_dxl_col_descr_array)[ul];
+		CDXLColDescr *pdxlcd = (*m_dxl_col_descr_array)[ul].get();
 		pdxlcd->SerializeToDXL(xml_serializer);
 	}
 
@@ -192,7 +192,7 @@ CDXLLogicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalTVF::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLLogicalTVF::AssertValid(const CDXLNode *dxlnode,
 							BOOL validate_children) const
 {
 	// assert validity of function id and return type
@@ -202,7 +202,7 @@ CDXLLogicalTVF::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[ul];
+		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

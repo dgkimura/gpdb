@@ -66,7 +66,8 @@ CParseHandlerMaterialize::StartElement(const XMLCh *const,	//element_uri,
 
 		m_dxl_op = gpos::cast<CDXLPhysicalMaterialize>(
 			CDXLOperatorFactory::MakeDXLMaterialize(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs)
+				.get());
 
 		// parse handler for child node
 		CParseHandlerBase *child_parse_handler =
@@ -148,7 +149,7 @@ CParseHandlerMaterialize::EndElement(const XMLCh *const,  // element_uri,
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 	// set statictics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add constructed children
 	AddChildFromParseHandler(proj_list_parse_handler);
@@ -157,7 +158,7 @@ CParseHandlerMaterialize::EndElement(const XMLCh *const,  // element_uri,
 
 
 #ifdef GPOS_DEBUG
-	m_dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxl_op->AssertValid(m_dxl_node.get(), false /* validate_children */);
 #endif	// GPOS_DEBUG
 
 	// deactivate handler

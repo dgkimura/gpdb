@@ -34,18 +34,18 @@ class CDXLLogicalConstTable : public CDXLLogical
 {
 private:
 	// list of column descriptors
-	gpos::owner<CDXLColDescrArray *> m_col_descr_array;
+	gpos::Ref<CDXLColDescrArray> m_col_descr_array;
 
 	// array of datum arrays (const tuples)
-	gpos::owner<CDXLDatum2dArray *> m_const_tuples_datum_array;
+	gpos::Ref<CDXLDatum2dArray> m_const_tuples_datum_array;
 
 public:
 	CDXLLogicalConstTable(CDXLLogicalConstTable &) = delete;
 
 	// ctor
 	CDXLLogicalConstTable(CMemoryPool *mp,
-						  gpos::owner<CDXLColDescrArray *> dxl_col_descr_array,
-						  gpos::owner<CDXLDatum2dArray *> pdrgpdrgpdxldatum);
+						  gpos::Ref<CDXLColDescrArray> dxl_col_descr_array,
+						  gpos::Ref<CDXLDatum2dArray> pdrgpdrgpdxldatum);
 
 	//dtor
 	~CDXLLogicalConstTable() override;
@@ -59,14 +59,14 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// column descriptors
-	gpos::pointer<const CDXLColDescrArray *>
+	const CDXLColDescrArray *
 	GetDXLColumnDescrArray() const
 	{
-		return m_col_descr_array;
+		return m_col_descr_array.get();
 	}
 
 	// return the column descriptor at a given position
-	gpos::pointer<CDXLColDescr *> GetColumnDescrAt(ULONG ul) const;
+	CDXLColDescr *GetColumnDescrAt(ULONG ul) const;
 
 	// number of columns
 	ULONG Arity() const;
@@ -79,21 +79,21 @@ public:
 	}
 
 	// return the const tuple (datum array) at a given position
-	gpos::pointer<const CDXLDatumArray *>
+	const CDXLDatumArray *
 	GetConstTupleDatumArrayAt(ULONG ulTuplePos) const
 	{
-		return (*m_const_tuples_datum_array)[ulTuplePos];
+		return (*m_const_tuples_datum_array)[ulTuplePos].get();
 	}
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// check if given column is defined by operator
 	BOOL IsColDefined(ULONG colid) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLLogicalConstTable *>
+	static CDXLLogicalConstTable *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -105,8 +105,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

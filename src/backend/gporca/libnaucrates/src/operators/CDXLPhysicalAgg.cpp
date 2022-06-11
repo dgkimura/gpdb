@@ -49,7 +49,7 @@ CDXLPhysicalAgg::CDXLPhysicalAgg(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLPhysicalAgg::~CDXLPhysicalAgg()
 {
-	CRefCount::SafeRelease(m_grouping_colids_array);
+	;
 }
 
 
@@ -132,10 +132,10 @@ CDXLPhysicalAgg::GetAggStrategyNameStr() const
 //		Grouping column indices
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const ULongPtrArray *>
+const ULongPtrArray *
 CDXLPhysicalAgg::GetGroupingColidArray() const
 {
-	return m_grouping_colids_array;
+	return m_grouping_colids_array.get();
 }
 
 
@@ -148,8 +148,7 @@ CDXLPhysicalAgg::GetGroupingColidArray() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAgg::SetGroupingCols(
-	gpos::owner<ULongPtrArray *> grouping_colids_array)
+CDXLPhysicalAgg::SetGroupingCols(gpos::Ref<ULongPtrArray> grouping_colids_array)
 {
 	GPOS_ASSERT(nullptr != grouping_colids_array);
 	m_grouping_colids_array = grouping_colids_array;
@@ -209,7 +208,7 @@ CDXLPhysicalAgg::SerializeGroupingColsToDXL(
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalAgg::SerializeToDXL(CXMLSerializer *xml_serializer,
-								gpos::pointer<const CDXLNode *> node) const
+								const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -243,8 +242,7 @@ CDXLPhysicalAgg::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAgg::AssertValid(gpos::pointer<const CDXLNode *> node,
-							 BOOL validate_children) const
+CDXLPhysicalAgg::AssertValid(const CDXLNode *node, BOOL validate_children) const
 {
 	// assert proj list and filter are valid
 	CDXLPhysical::AssertValid(node, validate_children);
@@ -255,7 +253,7 @@ CDXLPhysicalAgg::AssertValid(gpos::pointer<const CDXLNode *> node,
 	GPOS_ASSERT(EdxlaggIndexSentinel == node->Arity());
 	GPOS_ASSERT(nullptr != m_grouping_colids_array);
 
-	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[EdxlaggIndexChild];
+	CDXLNode *child_dxlnode = (*node)[EdxlaggIndexChild];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

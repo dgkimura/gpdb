@@ -39,7 +39,7 @@ class CPoint : public CRefCount, public DbgPrintMixin<CPoint>
 {
 private:
 	// datum corresponding to the point
-	gpos::owner<IDatum *> m_datum;
+	gpos::Ref<IDatum> m_datum;
 
 public:
 	CPoint &operator=(CPoint &) = delete;
@@ -47,39 +47,38 @@ public:
 	CPoint(const CPoint &) = delete;
 
 	// c'tor
-	explicit CPoint(gpos::owner<IDatum *>);
+	explicit CPoint(gpos::Ref<IDatum>);
 
 	// get underlying datum
-	gpos::pointer<IDatum *>
+	IDatum *
 	GetDatum() const
 	{
-		return m_datum;
+		return m_datum.get();
 	}
 
 	// is this point equal to another
-	BOOL Equals(gpos::pointer<const CPoint *>) const;
+	BOOL Equals(const CPoint *) const;
 
 	// is this point not equal to another
-	BOOL IsNotEqual(gpos::pointer<const CPoint *>) const;
+	BOOL IsNotEqual(const CPoint *) const;
 
 	// less than
-	BOOL IsLessThan(gpos::pointer<const CPoint *>) const;
+	BOOL IsLessThan(const CPoint *) const;
 
 	// less than or equals
-	BOOL IsLessThanOrEqual(gpos::pointer<const CPoint *>) const;
+	BOOL IsLessThanOrEqual(const CPoint *) const;
 
 	// greater than
-	BOOL IsGreaterThan(gpos::pointer<const CPoint *>) const;
+	BOOL IsGreaterThan(const CPoint *) const;
 
 	// greater than or equals
-	BOOL IsGreaterThanOrEqual(gpos::pointer<const CPoint *>) const;
+	BOOL IsGreaterThanOrEqual(const CPoint *) const;
 
 	// distance between two points
-	CDouble Distance(gpos::pointer<const CPoint *>) const;
+	CDouble Distance(const CPoint *) const;
 
 	// distance between two points, taking bounds into account
-	CDouble Width(gpos::pointer<const CPoint *>, BOOL include_lower,
-				  BOOL include_upper) const;
+	CDouble Width(const CPoint *, BOOL include_lower, BOOL include_upper) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;
@@ -87,12 +86,12 @@ public:
 	// d'tor
 	~CPoint() override
 	{
-		m_datum->Release();
+		;
 	}
 
 	// translate the point into its DXL representation
-	gpos::owner<CDXLDatum *> GetDatumVal(CMemoryPool *mp,
-										 CMDAccessor *md_accessor) const;
+	gpos::Ref<CDXLDatum> GetDatumVal(CMemoryPool *mp,
+									 CMDAccessor *md_accessor) const;
 
 	// minimum of two points using <=
 	static CPoint *MinPoint(CPoint *point1, CPoint *point2);
@@ -102,7 +101,7 @@ public:
 };	// class CPoint
 
 // array of CPoints
-using CPointArray = CDynamicPtrArray<CPoint, CleanupRelease>;
+using CPointArray = gpos::Vector<gpos::Ref<CPoint>>;
 }  // namespace gpnaucrates
 
 #endif	// !GPNAUCRATES_CPoint_H

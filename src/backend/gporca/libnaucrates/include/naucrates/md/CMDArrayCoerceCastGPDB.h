@@ -46,11 +46,10 @@ public:
 	CMDArrayCoerceCastGPDB(const CMDArrayCoerceCastGPDB &) = delete;
 
 	// ctor
-	CMDArrayCoerceCastGPDB(CMemoryPool *mp, gpos::owner<IMDId *> mdid,
-						   CMDName *mdname, gpos::owner<IMDId *> mdid_src,
-						   gpos::owner<IMDId *> mdid_dest,
-						   BOOL is_binary_coercible,
-						   gpos::owner<IMDId *> mdid_cast_func,
+	CMDArrayCoerceCastGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+						   CMDName *mdname, gpos::Ref<IMDId> mdid_src,
+						   gpos::Ref<IMDId> mdid_dest, BOOL is_binary_coercible,
+						   gpos::Ref<IMDId> mdid_cast_func,
 						   EmdCoercepathType path_type, INT type_modifier,
 						   BOOL is_explicit, EdxlCoercionForm dxl_coerce_format,
 						   INT location);

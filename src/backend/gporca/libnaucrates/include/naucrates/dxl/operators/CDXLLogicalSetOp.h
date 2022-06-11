@@ -51,10 +51,10 @@ private:
 	EdxlSetOpType m_set_operation_dxl_type;
 
 	// list of output column descriptors
-	gpos::owner<CDXLColDescrArray *> m_col_descr_array;
+	gpos::Ref<CDXLColDescrArray> m_col_descr_array;
 
 	// array of input colid arrays
-	gpos::owner<ULongPtr2dArray *> m_input_colids_arrays;
+	gpos::Ref<ULongPtr2dArray> m_input_colids_arrays;
 
 	// do the columns need to be casted accross inputs
 	BOOL m_cast_across_input_req;
@@ -64,8 +64,8 @@ public:
 
 	// ctor
 	CDXLLogicalSetOp(CMemoryPool *mp, EdxlSetOpType edxlsetoptype,
-					 gpos::owner<CDXLColDescrArray *> pdrgdxlcd,
-					 gpos::owner<ULongPtr2dArray *> array_2D,
+					 gpos::Ref<CDXLColDescrArray> pdrgdxlcd,
+					 gpos::Ref<ULongPtr2dArray> array_2D,
 					 BOOL fCastAcrossInput);
 
 	// dtor
@@ -85,10 +85,10 @@ public:
 	}
 
 	// array of output columns
-	gpos::pointer<const CDXLColDescrArray *>
+	const CDXLColDescrArray *
 	GetDXLColumnDescrArray() const
 	{
-		return m_col_descr_array;
+		return m_col_descr_array.get();
 	}
 
 	// number of output columns
@@ -99,10 +99,10 @@ public:
 	}
 
 	// output column descriptor at a given position
-	gpos::pointer<const CDXLColDescr *>
+	const CDXLColDescr *
 	GetColumnDescrAt(ULONG idx) const
 	{
-		return (*m_col_descr_array)[idx];
+		return (*m_col_descr_array)[idx].get();
 	}
 
 	// number of inputs to the n-ary set operation
@@ -113,12 +113,12 @@ public:
 	}
 
 	// column array of the input at a given position
-	gpos::pointer<const ULongPtrArray *>
+	const ULongPtrArray *
 	GetInputColIdArrayAt(ULONG idx) const
 	{
 		GPOS_ASSERT(idx < ChildCount());
 
-		return (*m_input_colids_arrays)[idx];
+		return (*m_input_colids_arrays)[idx].get();
 	}
 
 	// do the columns across inputs need to be casted
@@ -130,13 +130,13 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// check if given column is defined by operator
 	BOOL IsColDefined(ULONG colid) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLLogicalSetOp *>
+	static CDXLLogicalSetOp *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -148,8 +148,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

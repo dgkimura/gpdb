@@ -43,7 +43,7 @@ const WCHAR CScalarBitmapBoolOp::m_rgwszBitmapOpType[EbitmapboolSentinel][30] =
 //---------------------------------------------------------------------------
 CScalarBitmapBoolOp::CScalarBitmapBoolOp(CMemoryPool *mp,
 										 EBitmapBoolOp ebitmapboolop,
-										 gpos::owner<IMDId *> pmdidBitmapType)
+										 gpos::Ref<IMDId> pmdidBitmapType)
 	: CScalar(mp),
 	  m_ebitmapboolop(ebitmapboolop),
 	  m_pmdidBitmapType(std::move(pmdidBitmapType))
@@ -63,7 +63,7 @@ CScalarBitmapBoolOp::CScalarBitmapBoolOp(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CScalarBitmapBoolOp::~CScalarBitmapBoolOp()
 {
-	m_pmdidBitmapType->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -92,17 +92,17 @@ CScalarBitmapBoolOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBitmapBoolOp::Matches(gpos::pointer<COperator *> pop) const
+CScalarBitmapBoolOp::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	gpos::pointer<CScalarBitmapBoolOp *> popBitmapBoolOp =
+	CScalarBitmapBoolOp *popBitmapBoolOp =
 		gpos::dyn_cast<CScalarBitmapBoolOp>(pop);
 
 	return popBitmapBoolOp->Ebitmapboolop() == Ebitmapboolop() &&
-		   popBitmapBoolOp->MdidType()->Equals(m_pmdidBitmapType);
+		   popBitmapBoolOp->MdidType()->Equals(m_pmdidBitmapType.get());
 }
 
 //---------------------------------------------------------------------------

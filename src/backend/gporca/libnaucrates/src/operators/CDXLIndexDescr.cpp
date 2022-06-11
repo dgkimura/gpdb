@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLIndexDescr::CDXLIndexDescr(gpos::owner<IMDId *> mdid, CMDName *mdname)
+CDXLIndexDescr::CDXLIndexDescr(gpos::Ref<IMDId> mdid, CMDName *mdname)
 	: m_mdid(std::move(mdid)), m_mdname(mdname)
 {
 	GPOS_ASSERT(m_mdid->IsValid());
@@ -46,7 +46,7 @@ CDXLIndexDescr::CDXLIndexDescr(gpos::owner<IMDId *> mdid, CMDName *mdname)
 //---------------------------------------------------------------------------
 CDXLIndexDescr::~CDXLIndexDescr()
 {
-	m_mdid->Release();
+	;
 	GPOS_DELETE(m_mdname);
 }
 
@@ -59,10 +59,10 @@ CDXLIndexDescr::~CDXLIndexDescr()
 //		Return the metadata id for the index
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLIndexDescr::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------

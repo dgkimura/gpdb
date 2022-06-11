@@ -33,8 +33,8 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLWindowFrame::CDXLWindowFrame(EdxlFrameSpec edxlfs,
 								 EdxlFrameExclusionStrategy frame_exc_strategy,
-								 gpos::owner<CDXLNode *> dxlnode_leading,
-								 gpos::owner<CDXLNode *> dxlnode_trailing)
+								 gpos::Ref<CDXLNode> dxlnode_leading,
+								 gpos::Ref<CDXLNode> dxlnode_trailing)
 	: m_dxl_win_frame_spec(edxlfs),
 	  m_dxl_frame_exclusion_strategy(frame_exc_strategy),
 	  m_dxlnode_leading(std::move(dxlnode_leading)),
@@ -56,8 +56,8 @@ CDXLWindowFrame::CDXLWindowFrame(EdxlFrameSpec edxlfs,
 //---------------------------------------------------------------------------
 CDXLWindowFrame::~CDXLWindowFrame()
 {
-	m_dxlnode_leading->Release();
-	m_dxlnode_trailing->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------

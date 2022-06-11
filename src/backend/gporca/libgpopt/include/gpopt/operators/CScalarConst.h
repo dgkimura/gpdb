@@ -36,13 +36,13 @@ class CScalarConst : public CScalar
 {
 private:
 	// constant
-	gpos::owner<IDatum *> m_pdatum;
+	gpos::Ref<IDatum> m_pdatum;
 
 public:
 	CScalarConst(const CScalarConst &) = delete;
 
 	// ctor
-	CScalarConst(CMemoryPool *mp, gpos::owner<IDatum *> datum);
+	CScalarConst(CMemoryPool *mp, gpos::Ref<IDatum> datum);
 
 	// dtor
 	~CScalarConst() override;
@@ -62,17 +62,17 @@ public:
 	}
 
 	// accessor of contained constant
-	gpos::pointer<IDatum *>
+	IDatum *
 	GetDatum() const
 	{
-		return m_pdatum;
+		return m_pdatum.get();
 	}
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -82,18 +82,17 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarConst *>
+	static CScalarConst *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -103,24 +102,22 @@ public:
 	}
 
 	// the type of the scalar expression
-	gpos::pointer<IMDId *> MdidType() const override;
+	IMDId *MdidType() const override;
 
 	INT TypeModifier() const override;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(
-		gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override;
+	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
 
 	// print
 	IOstream &OsPrint(IOstream &) const override;
 
 	// is the given expression a scalar cast of a constant
-	static BOOL FCastedConst(gpos::pointer<CExpression *> pexpr);
+	static BOOL FCastedConst(CExpression *pexpr);
 
 	// extract the constant from the given constant expression or a casted constant expression.
 	// Else return NULL.
-	static CScalarConst *PopExtractFromConstOrCastConst(
-		gpos::pointer<CExpression *> pexpr);
+	static CScalarConst *PopExtractFromConstOrCastConst(CExpression *pexpr);
 
 };	// class CScalarConst
 

@@ -44,10 +44,10 @@ public:
 
 	// type of intermediate results computed by the aggregate's
 	// transformation function
-	virtual gpos::pointer<IMDId *> GetIntermediateResultTypeMdid() const = 0;
+	virtual IMDId *GetIntermediateResultTypeMdid() const = 0;
 
 	// result type
-	virtual gpos::pointer<IMDId *> GetResultTypeMdid() const = 0;
+	virtual IMDId *GetResultTypeMdid() const = 0;
 
 	// is aggregate ordered
 	virtual BOOL IsOrdered() const = 0;

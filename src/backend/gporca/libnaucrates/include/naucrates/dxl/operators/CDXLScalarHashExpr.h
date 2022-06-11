@@ -35,13 +35,13 @@ class CDXLScalarHashExpr : public CDXLScalar
 {
 private:
 	// catalog Oid of the distribution opfamily
-	gpos::owner<IMDId *> m_mdid_opfamily;
+	gpos::Ref<IMDId> m_mdid_opfamily;
 
 public:
 	CDXLScalarHashExpr(CDXLScalarHashExpr &) = delete;
 
 	// ctor/dtor
-	CDXLScalarHashExpr(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type);
+	CDXLScalarHashExpr(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	~CDXLScalarHashExpr() override;
 
@@ -51,14 +51,14 @@ public:
 	// name of the operator
 	const CWStringConst *GetOpNameStr() const override;
 
-	gpos::pointer<IMDId *> MdidOpfamily() const;
+	IMDId *MdidOpfamily() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarHashExpr *>
+	static CDXLScalarHashExpr *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -77,7 +77,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure
-	void AssertValid(gpos::pointer<const CDXLNode *> node,
+	void AssertValid(const CDXLNode *node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

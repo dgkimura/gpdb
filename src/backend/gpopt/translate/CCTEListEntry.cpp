@@ -35,8 +35,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level,
-							 CommonTableExpr *cte,
-							 gpos::pointer<CDXLNode *> cte_producer)
+							 CommonTableExpr *cte, CDXLNode *cte_producer)
 	: m_query_level(query_level), m_cte_info(nullptr)
 {
 	GPOS_ASSERT(nullptr != cte && nullptr != cte_producer);
@@ -60,7 +59,7 @@ CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level,
 //
 //---------------------------------------------------------------------------
 CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level, List *cte_list,
-							 gpos::pointer<CDXLNodeArray *> cte_dxl_arr)
+							 CDXLNodeArray *cte_dxl_arr)
 	: m_query_level(query_level), m_cte_info(nullptr)
 {
 	GPOS_ASSERT(nullptr != cte_dxl_arr);
@@ -71,7 +70,7 @@ CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level, List *cte_list,
 
 	for (ULONG ul = 0; ul < num_cte; ul++)
 	{
-		gpos::pointer<CDXLNode *> cte_producer = (*cte_dxl_arr)[ul];
+		CDXLNode *cte_producer = (*cte_dxl_arr)[ul].get();
 		CommonTableExpr *cte = (CommonTableExpr *) gpdb::ListNth(cte_list, ul);
 
 		Query *cte_query = (Query *) cte->ctequery;
@@ -93,7 +92,7 @@ CCTEListEntry::CCTEListEntry(CMemoryPool *mp, ULONG query_level, List *cte_list,
 //		Return the query of the CTE referenced in the range table entry
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLNode *>
+const CDXLNode *
 CCTEListEntry::GetCTEProducer(const CHAR *cte_str) const
 {
 	SCTEProducerInfo *cte_info = m_cte_info->Find(cte_str);
@@ -135,7 +134,7 @@ CCTEListEntry::GetCTEProducerTargetList(const CHAR *cte_str) const
 //---------------------------------------------------------------------------
 void
 CCTEListEntry::AddCTEProducer(CMemoryPool *mp, CommonTableExpr *cte,
-							  gpos::pointer<const CDXLNode *> cte_producer)
+							  const CDXLNode *cte_producer)
 {
 	GPOS_ASSERT(nullptr == m_cte_info->Find(cte->ctename) &&
 				"CTE entry already exists");

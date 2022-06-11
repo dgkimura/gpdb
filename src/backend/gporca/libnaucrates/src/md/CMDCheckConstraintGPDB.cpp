@@ -31,10 +31,10 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CMDCheckConstraintGPDB::CMDCheckConstraintGPDB(CMemoryPool *mp,
-											   gpos::owner<IMDId *> mdid,
+											   gpos::Ref<IMDId> mdid,
 											   CMDName *mdname,
-											   gpos::owner<IMDId *> rel_mdid,
-											   gpos::owner<CDXLNode *> dxlnode)
+											   gpos::Ref<IMDId> rel_mdid,
+											   gpos::Ref<CDXLNode> dxlnode)
 	: m_mp(mp),
 	  m_mdid(std::move(mdid)),
 	  m_mdname(mdname),
@@ -62,9 +62,9 @@ CMDCheckConstraintGPDB::~CMDCheckConstraintGPDB()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid->Release();
-	m_rel_mdid->Release();
-	m_dxl_node->Release();
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -75,15 +75,14 @@ CMDCheckConstraintGPDB::~CMDCheckConstraintGPDB()
 //		Scalar expression of the check constraint
 //
 //---------------------------------------------------------------------------
-gpos::owner<CExpression *>
-CMDCheckConstraintGPDB::GetCheckConstraintExpr(
-	CMemoryPool *mp, CMDAccessor *md_accessor,
-	gpos::pointer<CColRefArray *> colref_array) const
+gpos::Ref<CExpression>
+CMDCheckConstraintGPDB::GetCheckConstraintExpr(CMemoryPool *mp,
+											   CMDAccessor *md_accessor,
+											   CColRefArray *colref_array) const
 {
 	GPOS_ASSERT(nullptr != colref_array);
 
-	gpos::pointer<const IMDRelation *> mdrel =
-		md_accessor->RetrieveRel(m_rel_mdid);
+	const IMDRelation *mdrel = md_accessor->RetrieveRel(m_rel_mdid.get());
 #ifdef GPOS_DEBUG
 	const ULONG len = colref_array->Size();
 	GPOS_ASSERT(len > 0);
@@ -95,7 +94,7 @@ CMDCheckConstraintGPDB::GetCheckConstraintExpr(
 
 	// translate the DXL representation of the check constraint expression
 	CTranslatorDXLToExpr dxltr(mp, md_accessor);
-	return dxltr.PexprTranslateScalar(m_dxl_node, colref_array,
+	return dxltr.PexprTranslateScalar(m_dxl_node.get(), colref_array,
 									  mdrel->NonDroppedColsArray());
 }
 

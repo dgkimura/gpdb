@@ -80,10 +80,10 @@ public:
 	virtual EFuncDataAcc GetFuncDataAccess() const = 0;
 
 	// result type
-	virtual gpos::pointer<IMDId *> GetResultTypeMdid() const = 0;
+	virtual IMDId *GetResultTypeMdid() const = 0;
 
 	// output argument types
-	virtual gpos::pointer<IMdIdArray *> OutputArgTypesMdidArray() const = 0;
+	virtual IMdIdArray *OutputArgTypesMdidArray() const = 0;
 };
 
 }  // namespace gpmd

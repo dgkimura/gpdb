@@ -41,19 +41,16 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CMDAccessorUtils::PstrWindowFuncName(CMDAccessor *md_accessor,
-									 gpos::pointer<IMDId *> mdid_func)
+CMDAccessorUtils::PstrWindowFuncName(CMDAccessor *md_accessor, IMDId *mdid_func)
 {
 	if (md_accessor->FAggWindowFunc(mdid_func))
 	{
-		gpos::pointer<const IMDAggregate *> pmdagg =
-			md_accessor->RetrieveAgg(mdid_func);
+		const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(mdid_func);
 
 		return pmdagg->Mdname().GetMDName();
 	}
 
-	gpos::pointer<const IMDFunction *> pmdfunc =
-		md_accessor->RetrieveFunc(mdid_func);
+	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(mdid_func);
 
 	return pmdfunc->Mdname().GetMDName();
 }
@@ -68,26 +65,22 @@ CMDAccessorUtils::PstrWindowFuncName(CMDAccessor *md_accessor,
 //---------------------------------------------------------------------------
 IMDId *
 CMDAccessorUtils::PmdidWindowReturnType(CMDAccessor *md_accessor,
-										gpos::pointer<IMDId *> mdid_func)
+										IMDId *mdid_func)
 {
 	if (md_accessor->FAggWindowFunc(mdid_func))
 	{
-		gpos::pointer<const IMDAggregate *> pmdagg =
-			md_accessor->RetrieveAgg(mdid_func);
+		const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(mdid_func);
 		return pmdagg->GetResultTypeMdid();
 	}
 
-	gpos::pointer<const IMDFunction *> pmdfunc =
-		md_accessor->RetrieveFunc(mdid_func);
+	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(mdid_func);
 	return pmdfunc->GetResultTypeMdid();
 }
 
 // Does a scalar comparison object between given types exists
 BOOL
-CMDAccessorUtils::FCmpExists(CMDAccessor *md_accessor,
-							 gpos::pointer<IMDId *> left_mdid,
-							 gpos::pointer<IMDId *> right_mdid,
-							 IMDType::ECmpType cmp_type)
+CMDAccessorUtils::FCmpExists(CMDAccessor *md_accessor, IMDId *left_mdid,
+							 IMDId *right_mdid, IMDType::ECmpType cmp_type)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 	GPOS_ASSERT(nullptr != left_mdid);
@@ -116,10 +109,8 @@ CMDAccessorUtils::FCmpExists(CMDAccessor *md_accessor,
 // Throws an exception if no such comparison exists! Use
 // CMDAccessorUtils::FCmpExists() to check that before calling this function.
 IMDId *
-CMDAccessorUtils::GetScCmpMdid(CMDAccessor *md_accessor,
-							   gpos::pointer<IMDId *> left_mdid,
-							   gpos::pointer<IMDId *> right_mdid,
-							   IMDType::ECmpType cmp_type)
+CMDAccessorUtils::GetScCmpMdid(CMDAccessor *md_accessor, IMDId *left_mdid,
+							   IMDId *right_mdid, IMDType::ECmpType cmp_type)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 	GPOS_ASSERT(nullptr != left_mdid);
@@ -131,8 +122,7 @@ CMDAccessorUtils::GetScCmpMdid(CMDAccessor *md_accessor,
 	// if the left & right are the same, first check the MDType
 	if (left_mdid->Equals(right_mdid))
 	{
-		gpos::pointer<const IMDType *> pmdtypeLeft =
-			md_accessor->RetrieveType(left_mdid);
+		const IMDType *pmdtypeLeft = md_accessor->RetrieveType(left_mdid);
 		sc_cmp_mdid = pmdtypeLeft->GetMdidForCmpType(cmp_type);
 
 		if (IMDId::IsValid(sc_cmp_mdid))
@@ -155,8 +145,7 @@ CMDAccessorUtils::GetScCmpMdid(CMDAccessor *md_accessor,
 // check is a comparison between given types or a comparison after casting one
 // side to an another exists
 BOOL
-CMDAccessorUtils::FCmpOrCastedCmpExists(gpos::pointer<IMDId *> left_mdid,
-										gpos::pointer<IMDId *> right_mdid,
+CMDAccessorUtils::FCmpOrCastedCmpExists(IMDId *left_mdid, IMDId *right_mdid,
 										IMDType::ECmpType cmp_type)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -191,8 +180,7 @@ CMDAccessorUtils::FCmpOrCastedCmpExists(gpos::pointer<IMDId *> left_mdid,
 // function.
 IMDId *
 CMDAccessorUtils::GetScCmpMdIdConsiderCasts(CMDAccessor *md_accessor,
-											gpos::pointer<IMDId *> left_mdid,
-											gpos::pointer<IMDId *> right_mdid,
+											IMDId *left_mdid, IMDId *right_mdid,
 											IMDType::ECmpType cmp_type)
 {
 	GPOS_ASSERT(nullptr != left_mdid);
@@ -231,14 +219,13 @@ CMDAccessorUtils::GetScCmpMdIdConsiderCasts(CMDAccessor *md_accessor,
 }
 
 IMDId *
-CMDAccessorUtils::GetScCmpMdIdConsiderCasts(
-	CMDAccessor *md_accessor, gpos::pointer<CExpression *> pexprLeft,
-	gpos::pointer<CExpression *> pexprRight, IMDType::ECmpType cmp_type)
+CMDAccessorUtils::GetScCmpMdIdConsiderCasts(CMDAccessor *md_accessor,
+											CExpression *pexprLeft,
+											CExpression *pexprRight,
+											IMDType::ECmpType cmp_type)
 {
-	gpos::pointer<IMDId *> left_mdid =
-		gpos::dyn_cast<CScalar>(pexprLeft->Pop())->MdidType();
-	gpos::pointer<IMDId *> right_mdid =
-		gpos::dyn_cast<CScalar>(pexprRight->Pop())->MdidType();
+	IMDId *left_mdid = gpos::dyn_cast<CScalar>(pexprLeft->Pop())->MdidType();
+	IMDId *right_mdid = gpos::dyn_cast<CScalar>(pexprRight->Pop())->MdidType();
 
 	return CMDAccessorUtils::GetScCmpMdIdConsiderCasts(md_accessor, left_mdid,
 													   right_mdid, cmp_type);
@@ -248,12 +235,12 @@ void
 CMDAccessorUtils::ApplyCastsForScCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 									 gpos::owner<CExpression *> &pexprLeft,
 									 gpos::owner<CExpression *> &pexprRight,
-									 gpos::pointer<IMDId *> op_mdid)
+									 IMDId *op_mdid)
 {
 	IMDId *left_mdid = gpos::dyn_cast<CScalar>(pexprLeft->Pop())->MdidType();
 	IMDId *right_mdid = gpos::dyn_cast<CScalar>(pexprRight->Pop())->MdidType();
 
-	gpos::pointer<const IMDScalarOp *> op = md_accessor->RetrieveScOp(op_mdid);
+	const IMDScalarOp *op = md_accessor->RetrieveScOp(op_mdid);
 	IMDId *op_left_mdid = op->GetLeftMdid();
 	IMDId *op_right_mdid = op->GetRightMdid();
 
@@ -350,9 +337,8 @@ CMDAccessorUtils::ApplyCastsForScCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDAccessorUtils::FCastExists(CMDAccessor *md_accessor,
-							  gpos::pointer<IMDId *> mdid_src,
-							  gpos::pointer<IMDId *> mdid_dest)
+CMDAccessorUtils::FCastExists(CMDAccessor *md_accessor, IMDId *mdid_src,
+							  IMDId *mdid_dest)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 	GPOS_ASSERT(nullptr != mdid_src);
@@ -386,8 +372,8 @@ CMDAccessorUtils::FCastExists(CMDAccessor *md_accessor,
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(
-	CMDAccessor *md_accessor, gpos::pointer<IMDId *> mdid_op)
+CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(CMDAccessor *md_accessor,
+												  IMDId *mdid_op)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 
@@ -399,8 +385,7 @@ CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(
 
 	GPOS_TRY
 	{
-		gpos::pointer<const IMDScalarOp *> md_scalar_op =
-			md_accessor->RetrieveScOp(mdid_op);
+		const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid_op);
 
 		return md_scalar_op->ReturnsNullOnNullInput();
 	}
@@ -428,8 +413,7 @@ CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDAccessorUtils::FBoolType(CMDAccessor *md_accessor,
-							gpos::pointer<IMDId *> mdid_type)
+CMDAccessorUtils::FBoolType(CMDAccessor *md_accessor, IMDId *mdid_type)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 
@@ -451,14 +435,12 @@ CMDAccessorUtils::FBoolType(CMDAccessor *md_accessor,
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDAccessorUtils::FCommutativeScalarOp(CMDAccessor *md_accessor,
-									   gpos::pointer<IMDId *> mdid_op)
+CMDAccessorUtils::FCommutativeScalarOp(CMDAccessor *md_accessor, IMDId *mdid_op)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 	GPOS_ASSERT(nullptr != mdid_op);
 
-	gpos::pointer<const IMDScalarOp *> md_scalar_op =
-		md_accessor->RetrieveScOp(mdid_op);
+	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid_op);
 
 	return mdid_op->Equals(md_scalar_op->GetCommuteOpMdid());
 }

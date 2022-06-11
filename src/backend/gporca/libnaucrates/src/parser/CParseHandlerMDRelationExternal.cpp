@@ -107,9 +107,11 @@ CParseHandlerMDRelationExternal::StartElement(
 		attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenExtRelFmtErrRel));
 	if (nullptr != xml_str_err_rel_id)
 	{
-		m_mdid_fmt_err_table = CDXLOperatorFactory::MakeMdIdFromStr(
-			m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_err_rel_id,
-			EdxltokenExtRelFmtErrRel, EdxltokenRelationExternal);
+		m_mdid_fmt_err_table =
+			CDXLOperatorFactory::MakeMdIdFromStr(
+				m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_err_rel_id,
+				EdxltokenExtRelFmtErrRel, EdxltokenRelationExternal)
+				.get();
 	}
 
 	// parse whether a hash distributed relation needs to be considered as random distributed
@@ -175,10 +177,10 @@ CParseHandlerMDRelationExternal::EndElement(
 	IMdIdArray *mdid_check_constraint_array =
 		mdid_check_constraint_parse_handler->GetMdIdArray();
 
-	md_col_array->AddRef();
-	md_index_info_array->AddRef();
-	mdid_triggers_array->AddRef();
-	mdid_check_constraint_array->AddRef();
+	;
+	;
+	;
+	;
 
 	IMdIdArray *distr_opfamilies = nullptr;
 	if (m_rel_distr_policy == IMDRelation::EreldistrHash &&
@@ -187,7 +189,7 @@ CParseHandlerMDRelationExternal::EndElement(
 		distr_opfamilies = dynamic_cast<CParseHandlerMetadataIdList *>(
 							   m_opfamilies_parse_handler)
 							   ->GetMdIdArray();
-		distr_opfamilies->AddRef();
+		;
 	}
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDRelationExternalGPDB(

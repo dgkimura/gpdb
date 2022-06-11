@@ -56,8 +56,8 @@ const CWindowFrame CWindowFrame::m_wfEmpty;
 CWindowFrame::CWindowFrame(CMemoryPool *mp, EFrameSpec efs,
 						   EFrameBoundary efbLeading,
 						   EFrameBoundary efbTrailing,
-						   gpos::owner<CExpression *> pexprLeading,
-						   gpos::owner<CExpression *> pexprTrailing,
+						   gpos::Ref<CExpression> pexprLeading,
+						   gpos::Ref<CExpression> pexprTrailing,
 						   EFrameExclusionStrategy efes)
 	: m_efs(efs),
 	  m_efbLeading(efbLeading),
@@ -112,9 +112,9 @@ CWindowFrame::CWindowFrame()
 //---------------------------------------------------------------------------
 CWindowFrame::~CWindowFrame()
 {
-	CRefCount::SafeRelease(m_pexprLeading);
-	CRefCount::SafeRelease(m_pexprTrailing);
-	CRefCount::SafeRelease(m_pcrsUsed);
+	;
+	;
+	;
 }
 
 
@@ -127,12 +127,12 @@ CWindowFrame::~CWindowFrame()
 //
 //---------------------------------------------------------------------------
 BOOL
-CWindowFrame::Matches(gpos::pointer<const CWindowFrame *> pwf) const
+CWindowFrame::Matches(const CWindowFrame *pwf) const
 {
 	return m_efs == pwf->Efs() && m_efbLeading == pwf->EfbLeading() &&
 		   m_efbTrailing == pwf->EfbTrailing() && m_efes == pwf->Efes() &&
-		   CUtils::Equals(m_pexprLeading, pwf->PexprLeading()) &&
-		   CUtils::Equals(m_pexprTrailing, pwf->PexprTrailing());
+		   CUtils::Equals(m_pexprLeading.get(), pwf->PexprLeading()) &&
+		   CUtils::Equals(m_pexprTrailing.get(), pwf->PexprTrailing());
 }
 
 
@@ -154,14 +154,14 @@ CWindowFrame::HashValue() const
 	ulHash = gpos::CombineHashes(ulHash, m_efes);
 	if (nullptr != m_pexprLeading)
 	{
-		ulHash =
-			gpos::CombineHashes(ulHash, CExpression::HashValue(m_pexprLeading));
+		ulHash = gpos::CombineHashes(
+			ulHash, CExpression::HashValue(m_pexprLeading.get()));
 	}
 
 	if (nullptr != m_pexprTrailing)
 	{
-		ulHash = gpos::CombineHashes(ulHash,
-									 CExpression::HashValue(m_pexprTrailing));
+		ulHash = gpos::CombineHashes(
+			ulHash, CExpression::HashValue(m_pexprTrailing.get()));
 	}
 
 	return ulHash;
@@ -176,25 +176,25 @@ CWindowFrame::HashValue() const
 //		Return a copy of the window frame with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CWindowFrame *>
+gpos::Ref<CWindowFrame>
 CWindowFrame::PwfCopyWithRemappedColumns(CMemoryPool *mp,
 										 UlongToColRefMap *colref_mapping,
 										 BOOL must_exist)
 {
 	if (this == &m_wfEmpty)
 	{
-		this->AddRef();
+		;
 		return this;
 	}
 
-	gpos::owner<CExpression *> pexprLeading = nullptr;
+	gpos::Ref<CExpression> pexprLeading = nullptr;
 	if (nullptr != m_pexprLeading)
 	{
 		pexprLeading = m_pexprLeading->PexprCopyWithRemappedColumns(
 			mp, colref_mapping, must_exist);
 	}
 
-	gpos::owner<CExpression *> pexprTrailing = nullptr;
+	gpos::Ref<CExpression> pexprTrailing = nullptr;
 	if (nullptr != m_pexprTrailing)
 	{
 		pexprTrailing = m_pexprTrailing->PexprCopyWithRemappedColumns(
@@ -254,8 +254,8 @@ CWindowFrame::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CWindowFrame::Equals(gpos::pointer<const CWindowFrameArray *> pdrgpwfFirst,
-					 gpos::pointer<const CWindowFrameArray *> pdrgpwfSecond)
+CWindowFrame::Equals(const CWindowFrameArray *pdrgpwfFirst,
+					 const CWindowFrameArray *pdrgpwfSecond)
 {
 	if (nullptr == pdrgpwfFirst || nullptr == pdrgpwfSecond)
 	{
@@ -271,7 +271,7 @@ CWindowFrame::Equals(gpos::pointer<const CWindowFrameArray *> pdrgpwfFirst,
 	BOOL fMatch = true;
 	for (ULONG ul = 0; fMatch && ul < size; ul++)
 	{
-		fMatch = (*pdrgpwfFirst)[ul]->Matches((*pdrgpwfSecond)[ul]);
+		fMatch = (*pdrgpwfFirst)[ul]->Matches((*pdrgpwfSecond)[ul].get());
 	}
 
 	return fMatch;
@@ -287,8 +287,7 @@ CWindowFrame::Equals(gpos::pointer<const CWindowFrameArray *> pdrgpwfFirst,
 //
 //---------------------------------------------------------------------------
 ULONG
-CWindowFrame::HashValue(gpos::pointer<const CWindowFrameArray *> pdrgpwf,
-						ULONG ulMaxSize)
+CWindowFrame::HashValue(const CWindowFrameArray *pdrgpwf, ULONG ulMaxSize)
 {
 	GPOS_ASSERT(nullptr != pdrgpwf);
 	const ULONG size = std::min(ulMaxSize, pdrgpwf->Size());
@@ -311,8 +310,7 @@ CWindowFrame::HashValue(gpos::pointer<const CWindowFrameArray *> pdrgpwf,
 //
 //---------------------------------------------------------------------------
 IOstream &
-CWindowFrame::OsPrint(IOstream &os,
-					  gpos::pointer<const CWindowFrameArray *> pdrgpwf)
+CWindowFrame::OsPrint(IOstream &os, const CWindowFrameArray *pdrgpwf)
 {
 	os << "[";
 	const ULONG size = pdrgpwf->Size();

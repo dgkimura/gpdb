@@ -58,10 +58,10 @@ private:
 	EdxlFrameExclusionStrategy m_dxl_frame_exclusion_strategy;
 
 	// scalar value representing the boundary leading
-	gpos::owner<CDXLNode *> m_dxlnode_leading;
+	gpos::Ref<CDXLNode> m_dxlnode_leading;
 
 	// scalar value representing the boundary trailing
-	gpos::owner<CDXLNode *> m_dxlnode_trailing;
+	gpos::Ref<CDXLNode> m_dxlnode_trailing;
 
 public:
 	CDXLWindowFrame(const CDXLWindowFrame &) = delete;
@@ -69,8 +69,8 @@ public:
 	// ctor
 	CDXLWindowFrame(EdxlFrameSpec edxlfs,
 					EdxlFrameExclusionStrategy frame_exc_strategy,
-					gpos::owner<CDXLNode *> dxlnode_leading,
-					gpos::owner<CDXLNode *> dxlnode_trailing);
+					gpos::Ref<CDXLNode> dxlnode_leading,
+					gpos::Ref<CDXLNode> dxlnode_trailing);
 
 	//dtor
 	~CDXLWindowFrame() override;
@@ -89,17 +89,17 @@ public:
 	}
 
 	// return window boundary trailing
-	gpos::pointer<CDXLNode *>
+	CDXLNode *
 	PdxlnTrailing() const
 	{
-		return m_dxlnode_trailing;
+		return m_dxlnode_trailing.get();
 	}
 
 	// return window boundary leading
-	gpos::pointer<CDXLNode *>
+	CDXLNode *
 	PdxlnLeading() const
 	{
-		return m_dxlnode_leading;
+		return m_dxlnode_leading.get();
 	}
 
 	// return the string representation of the exclusion strategy

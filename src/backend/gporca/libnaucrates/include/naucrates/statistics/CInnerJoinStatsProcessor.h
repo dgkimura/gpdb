@@ -22,10 +22,10 @@ class CInnerJoinStatsProcessor : public CJoinStatsProcessor
 {
 public:
 	// inner join with another stats structure
-	static gpos::owner<CStatistics *> CalcInnerJoinStatsStatic(
-		CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats_input,
-		gpos::pointer<const IStatistics *> inner_stats_input,
-		gpos::pointer<CStatsPredJoinArray *> join_preds_stats);
+	static gpos::Ref<CStatistics> CalcInnerJoinStatsStatic(
+		CMemoryPool *mp, const IStatistics *outer_stats_input,
+		const IStatistics *inner_stats_input,
+		CStatsPredJoinArray *join_preds_stats);
 };
 }  // namespace gpnaucrates
 

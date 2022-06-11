@@ -49,7 +49,7 @@ private:
 	const CDXLTranslateContextBaseTable *m_base_table_context;
 
 	// the array of translator context (one for each child of the DXL operator)
-	gpos::pointer<CDXLTranslationContextArray *> m_child_contexts;
+	CDXLTranslationContextArray *m_child_contexts;
 
 	CDXLTranslateContext *m_output_context;
 
@@ -61,16 +61,15 @@ public:
 	CMappingColIdVarPlStmt(
 		CMemoryPool *mp,
 		const CDXLTranslateContextBaseTable *base_table_context,
-		gpos::pointer<CDXLTranslationContextArray *> child_contexts,
+		CDXLTranslationContextArray *child_contexts,
 		CDXLTranslateContext *output_context,
 		CContextDXLToPlStmt *dxl_to_plstmt_context);
 
 	// translate DXL ScalarIdent node into GPDB Var node
-	Var *VarFromDXLNodeScId(
-		gpos::pointer<const CDXLScalarIdent *> dxlop) override;
+	Var *VarFromDXLNodeScId(const CDXLScalarIdent *dxlop) override;
 
 	// translate DXL ScalarIdent node into GPDB Param node
-	Param *ParamFromDXLNodeScId(gpos::pointer<const CDXLScalarIdent *> dxlop);
+	Param *ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop);
 
 	// get the output translator context
 	CDXLTranslateContext *GetOutputContext();

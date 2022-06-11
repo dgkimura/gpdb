@@ -29,7 +29,7 @@ using namespace gpdxl;
 //		Constructs a scalar comparison node
 //
 //---------------------------------------------------------------------------
-CDXLScalarComp::CDXLScalarComp(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
+CDXLScalarComp::CDXLScalarComp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 							   const CWStringConst *comparison_operator_name)
 	: CDXLScalar(mp),
 	  m_mdid(std::move(mdid_op)),
@@ -48,7 +48,7 @@ CDXLScalarComp::CDXLScalarComp(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
 //---------------------------------------------------------------------------
 CDXLScalarComp::~CDXLScalarComp()
 {
-	m_mdid->Release();
+	;
 	GPOS_DELETE(m_comparison_operator_name);
 }
 
@@ -74,10 +74,10 @@ CDXLScalarComp::GetComparisonOpName() const
 //		Comparison operator id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CDXLScalarComp::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -119,7 +119,7 @@ CDXLScalarComp::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarComp::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   gpos::pointer<const CDXLNode *> node) const
+							   const CDXLNode *node) const
 {
 	GPOS_CHECK_ABORT;
 
@@ -151,15 +151,14 @@ CDXLScalarComp::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarComp::AssertValid(gpos::pointer<const CDXLNode *> node,
-							BOOL validate_children) const
+CDXLScalarComp::AssertValid(const CDXLNode *node, BOOL validate_children) const
 {
 	const ULONG arity = node->Arity();
 	GPOS_ASSERT(2 == arity);
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		gpos::pointer<CDXLNode *> child_dxlnode = (*node)[ul];
+		CDXLNode *child_dxlnode = (*node)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 						child_dxlnode->GetOperator()->GetDXLOperatorType() ||
 					EdxloptypeLogical ==

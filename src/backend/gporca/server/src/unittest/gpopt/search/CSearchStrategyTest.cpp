@@ -64,14 +64,13 @@ CSearchStrategyTest::EresUnittest()
 //
 //---------------------------------------------------------------------------
 void
-CSearchStrategyTest::Optimize(
-	CMemoryPool *mp, Pfpexpr pfnGenerator,
-	gpos::owner<CSearchStageArray *> search_stage_array,
-	PfnOptimize pfnOptimize)
+CSearchStrategyTest::Optimize(CMemoryPool *mp, Pfpexpr pfnGenerator,
+							  gpos::Ref<CSearchStageArray> search_stage_array,
+							  PfnOptimize pfnOptimize)
 {
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, std::move(pmdp));
 
@@ -79,9 +78,9 @@ CSearchStrategyTest::Optimize(
 	{
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 						 CTestUtils::GetCostModel(mp));
-		gpos::owner<CExpression *> pexpr = pfnGenerator(mp);
+		gpos::Ref<CExpression> pexpr = pfnGenerator(mp);
 		pfnOptimize(mp, pexpr, search_stage_array);
-		pexpr->Release();
+		;
 	}
 }
 
@@ -149,8 +148,7 @@ CSearchStrategyTest::EresUnittest_Parsing()
 	{
 		CAutoTrace at(mp);
 		(*search_stage_array)[ul]->OsPrint(at.Os());
-	}
-	search_stage_array->AddRef();
+	};
 	Optimize(mp, CTestUtils::PexprLogicalSelectOnOuterJoin, search_stage_array,
 			 BuildMemo);
 
@@ -177,9 +175,9 @@ CSearchStrategyTest::EresUnittest_Timeout()
 	CAutoTraceFlag atf(EopttracePrintOptimizationStatistics, true);
 	CParseHandlerDXL *pphDXL = CDXLUtils::GetParseHandlerForDXLFile(
 		mp, "../data/dxl/search/timeout-strategy.xml", nullptr);
-	gpos::owner<CSearchStageArray *> search_stage_array =
+	gpos::Ref<CSearchStageArray> search_stage_array =
 		pphDXL->GetSearchStageArray();
-	search_stage_array->AddRef();
+	;
 	Optimize(mp, CTestUtils::PexprLogicalNAryJoin,
 			 std::move(search_stage_array), BuildMemo);
 
@@ -218,13 +216,13 @@ CSearchStrategyTest::EresUnittest_ParsingWithException()
 //		Generate a search strategy with random xform allocation
 //
 //---------------------------------------------------------------------------
-gpos::owner<CSearchStageArray *>
+gpos::Ref<CSearchStageArray>
 CSearchStrategyTest::PdrgpssRandom(CMemoryPool *mp)
 {
-	gpos::owner<CSearchStageArray *> search_stage_array =
+	gpos::Ref<CSearchStageArray> search_stage_array =
 		GPOS_NEW(mp) CSearchStageArray(mp);
-	gpos::owner<CXformSet *> pxfsFst = GPOS_NEW(mp) CXformSet(mp);
-	gpos::owner<CXformSet *> pxfsSnd = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> pxfsFst = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> pxfsSnd = GPOS_NEW(mp) CXformSet(mp);
 
 	// first xforms set contains essential rules to produce simple equality join plan
 	(void) pxfsFst->ExchangeSet(CXform::ExfGet2TableScan);
@@ -234,7 +232,7 @@ CSearchStrategyTest::PdrgpssRandom(CMemoryPool *mp)
 	// second xforms set contains all other rules
 	pxfsSnd->Union(CXformFactory::Pxff()->PxfsExploration());
 	pxfsSnd->Union(CXformFactory::Pxff()->PxfsImplementation());
-	pxfsSnd->Difference(pxfsFst);
+	pxfsSnd->Difference(pxfsFst.get());
 
 	search_stage_array->Append(
 		GPOS_NEW(mp) CSearchStage(std::move(pxfsFst), 1000 /*ulTimeThreshold*/,
@@ -255,9 +253,8 @@ CSearchStrategyTest::PdrgpssRandom(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CSearchStrategyTest::BuildMemo(
-	CMemoryPool *mp, gpos::pointer<CExpression *> pexprInput,
-	gpos::owner<CSearchStageArray *> search_stage_array)
+CSearchStrategyTest::BuildMemo(CMemoryPool *mp, CExpression *pexprInput,
+							   gpos::Ref<CSearchStageArray> search_stage_array)
 {
 	CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexprInput);
 	GPOS_CHECK_ABORT;
@@ -275,14 +272,14 @@ CSearchStrategyTest::BuildMemo(
 	eng.Init(pqc, std::move(search_stage_array));
 	eng.Optimize();
 
-	gpos::owner<CExpression *> pexprPlan = eng.PexprExtractPlan();
+	gpos::Ref<CExpression> pexprPlan = eng.PexprExtractPlan();
 
 	oss << std::endl << "OUTPUT PLAN:" << std::endl;
 	(void) pexprPlan->OsPrint(oss);
 	oss << std::endl << std::endl;
 
 	GPOS_TRACE(str.GetBuffer());
-	pexprPlan->Release();
+	;
 	GPOS_DELETE(pqc);
 
 	GPOS_CHECK_ABORT;

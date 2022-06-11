@@ -59,12 +59,12 @@ CDrvdPropScalar::CDrvdPropScalar(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CDrvdPropScalar::~CDrvdPropScalar()
 {
-	CRefCount::SafeRelease(m_is_prop_derived);
-	CRefCount::SafeRelease(m_pcrsDefined);
-	CRefCount::SafeRelease(m_pcrsSetReturningFunction);
-	CRefCount::SafeRelease(m_pcrsUsed);
-	CRefCount::SafeRelease(m_ppartinfo);
-	CRefCount::SafeRelease(m_pfp);
+	;
+	;
+	;
+	;
+	;
+	;
 }
 
 
@@ -78,7 +78,7 @@ CDrvdPropScalar::~CDrvdPropScalar()
 //---------------------------------------------------------------------------
 void
 CDrvdPropScalar::Derive(CMemoryPool *, CExpressionHandle &exprhdl,
-						gpos::pointer<CDrvdPropCtxt *>	// pdpctxt
+						CDrvdPropCtxt *	 // pdpctxt
 )
 {
 	// call derivation functions on the operator
@@ -118,7 +118,7 @@ CDrvdPropScalar::Derive(CMemoryPool *, CExpressionHandle &exprhdl,
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-gpos::cast_func<CDrvdPropScalar *>
+CDrvdPropScalar *
 CDrvdPropScalar::GetDrvdScalarProps(CDrvdProp *pdp)
 {
 	GPOS_ASSERT(nullptr != pdp);
@@ -138,7 +138,7 @@ CDrvdPropScalar::GetDrvdScalarProps(CDrvdProp *pdp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CDrvdPropScalar::FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const
+CDrvdPropScalar::FSatisfies(const CReqdPropPlan *prpp) const
 {
 	GPOS_ASSERT(nullptr != prpp);
 	GPOS_ASSERT(nullptr != prpp->PcrsRequired());
@@ -149,20 +149,19 @@ CDrvdPropScalar::FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const
 }
 
 // defined columns
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropScalar::GetDefinedColumns() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_pcrsDefined;
+	return m_pcrsDefined.get();
 }
 
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropScalar::DeriveDefinedColumns(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPcrsDefined))
 	{
-		gpos::pointer<CScalar *> popScalar =
-			gpos::dyn_cast<CScalar>(exprhdl.Pop());
+		CScalar *popScalar = gpos::dyn_cast<CScalar>(exprhdl.Pop());
 		m_pcrsDefined = popScalar->PcrsDefined(m_mp, exprhdl);
 
 		// add defined columns of children
@@ -176,24 +175,23 @@ CDrvdPropScalar::DeriveDefinedColumns(CExpressionHandle &exprhdl)
 			}
 		}
 	}
-	return m_pcrsDefined;
+	return m_pcrsDefined.get();
 }
 
 // used columns
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropScalar::GetUsedColumns() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_pcrsUsed;
+	return m_pcrsUsed.get();
 }
 
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropScalar::DeriveUsedColumns(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPcrsUsed))
 	{
-		gpos::pointer<CScalar *> popScalar =
-			gpos::dyn_cast<CScalar>(exprhdl.Pop());
+		CScalar *popScalar = gpos::dyn_cast<CScalar>(exprhdl.Pop());
 		m_pcrsUsed = popScalar->PcrsUsed(m_mp, exprhdl);
 
 		// add used columns of children
@@ -214,24 +212,23 @@ CDrvdPropScalar::DeriveUsedColumns(CExpressionHandle &exprhdl)
 			}
 		}
 	}
-	return m_pcrsUsed;
+	return m_pcrsUsed.get();
 }
 
 // columns containing set-returning function
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropScalar::GetSetReturningFunctionColumns() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_pcrsSetReturningFunction;
+	return m_pcrsSetReturningFunction.get();
 }
 
-gpos::pointer<CColRefSet *>
+CColRefSet *
 CDrvdPropScalar::DeriveSetReturningFunctionColumns(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPcrsSetReturningFunction))
 	{
-		gpos::pointer<CScalar *> popScalar =
-			gpos::dyn_cast<CScalar>(exprhdl.Pop());
+		CScalar *popScalar = gpos::dyn_cast<CScalar>(exprhdl.Pop());
 		m_pcrsSetReturningFunction =
 			popScalar->PcrsSetReturningFunction(m_mp, exprhdl);
 
@@ -249,13 +246,13 @@ CDrvdPropScalar::DeriveSetReturningFunctionColumns(CExpressionHandle &exprhdl)
 		{
 			if (DeriveHasNonScalarFunction(exprhdl))
 			{
-				gpos::pointer<CScalarProjectElement *> pspeProject =
+				CScalarProjectElement *pspeProject =
 					gpos::cast<CScalarProjectElement>((exprhdl.Pop()));
 				m_pcrsSetReturningFunction->Include(pspeProject->Pcr());
 			}
 		}
 	}
-	return m_pcrsSetReturningFunction;
+	return m_pcrsSetReturningFunction.get();
 }
 
 // do subqueries appear in the operator's tree?
@@ -271,30 +268,28 @@ CDrvdPropScalar::DeriveHasSubquery(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptFHasSubquery))
 	{
-		gpos::pointer<CScalar *> popScalar =
-			gpos::dyn_cast<CScalar>(exprhdl.Pop());
+		CScalar *popScalar = gpos::dyn_cast<CScalar>(exprhdl.Pop());
 		m_fHasSubquery = popScalar->FHasSubquery(exprhdl);
 	}
 	return m_fHasSubquery;
 }
 
 // derived partition consumers
-gpos::pointer<CPartInfo *>
+CPartInfo *
 CDrvdPropScalar::GetPartitionInfo() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_ppartinfo;
+	return m_ppartinfo.get();
 }
 
-gpos::pointer<CPartInfo *>
+CPartInfo *
 CDrvdPropScalar::DerivePartitionInfo(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPPartInfo))
 	{
 		if (DeriveHasSubquery(exprhdl))
 		{
-			gpos::pointer<CScalar *> popScalar =
-				gpos::dyn_cast<CScalar>(exprhdl.Pop());
+			CScalar *popScalar = gpos::dyn_cast<CScalar>(exprhdl.Pop());
 			m_ppartinfo = popScalar->PpartinfoDerive(m_mp, exprhdl);
 		}
 		else
@@ -302,27 +297,26 @@ CDrvdPropScalar::DerivePartitionInfo(CExpressionHandle &exprhdl)
 			m_ppartinfo = GPOS_NEW(m_mp) CPartInfo(m_mp);
 		}
 	}
-	return m_ppartinfo;
+	return m_ppartinfo.get();
 }
 
 // function properties
-gpos::pointer<CFunctionProp *>
+CFunctionProp *
 CDrvdPropScalar::GetFunctionProperties() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
-	return m_pfp;
+	return m_pfp.get();
 }
 
-gpos::pointer<CFunctionProp *>
+CFunctionProp *
 CDrvdPropScalar::DeriveFunctionProperties(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPfp))
 	{
-		gpos::pointer<CScalar *> popScalar =
-			gpos::dyn_cast<CScalar>(exprhdl.Pop());
+		CScalar *popScalar = gpos::dyn_cast<CScalar>(exprhdl.Pop());
 		m_pfp = popScalar->DeriveFunctionProperties(m_mp, exprhdl);
 	}
-	return m_pfp;
+	return m_pfp.get();
 }
 
 // scalar expression contains non-scalar function?
@@ -338,8 +332,7 @@ CDrvdPropScalar::DeriveHasNonScalarFunction(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptFHasNonScalarFunction))
 	{
-		gpos::pointer<CScalar *> popScalar =
-			gpos::dyn_cast<CScalar>(exprhdl.Pop());
+		CScalar *popScalar = gpos::dyn_cast<CScalar>(exprhdl.Pop());
 		m_fHasNonScalarFunction = popScalar->FHasNonScalarFunction(exprhdl);
 	}
 	return m_fHasNonScalarFunction;
@@ -420,8 +413,7 @@ CDrvdPropScalar::DeriveHasScalarArrayCmp(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptFHasScalarArrayCmp))
 	{
-		gpos::pointer<CScalar *> popScalar =
-			gpos::dyn_cast<CScalar>(exprhdl.Pop());
+		CScalar *popScalar = gpos::dyn_cast<CScalar>(exprhdl.Pop());
 		m_fHasScalarArrayCmp = popScalar->FHasScalarArrayCmp(exprhdl);
 	}
 	return m_fHasScalarArrayCmp;

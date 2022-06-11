@@ -19,7 +19,7 @@ using namespace gpdxl;
 using namespace gpmd;
 
 // ctor
-CMDIndexInfo::CMDIndexInfo(gpos::owner<IMDId *> mdid, BOOL is_partial)
+CMDIndexInfo::CMDIndexInfo(gpos::Ref<IMDId> mdid, BOOL is_partial)
 	: m_mdid(std::move(mdid)), m_is_partial(is_partial)
 {
 	GPOS_ASSERT(m_mdid->IsValid());
@@ -28,14 +28,14 @@ CMDIndexInfo::CMDIndexInfo(gpos::owner<IMDId *> mdid, BOOL is_partial)
 // dtor
 CMDIndexInfo::~CMDIndexInfo()
 {
-	m_mdid->Release();
+	;
 }
 
 // returns the metadata id of this index
-gpos::pointer<IMDId *>
+IMDId *
 CMDIndexInfo::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 // is the index partial

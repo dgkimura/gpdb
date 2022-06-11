@@ -37,7 +37,7 @@ class CParseHandlerScalarSubqueryQuantified : public CParseHandlerScalarOp
 {
 private:
 	// scalar subquery operator
-	gpos::pointer<CDXLScalar *> m_dxl_op;
+	CDXLScalar *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

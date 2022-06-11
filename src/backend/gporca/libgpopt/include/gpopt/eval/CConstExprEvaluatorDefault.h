@@ -49,8 +49,7 @@ public:
 	~CConstExprEvaluatorDefault() override;
 
 	// Evaluate the given expression and return the result as a new expression
-	gpos::owner<CExpression *> PexprEval(
-		gpos::pointer<CExpression *> pexpr) override;
+	gpos::Ref<CExpression> PexprEval(CExpression *pexpr) override;
 
 	// Returns true iff the evaluator can evaluate constant expressions
 	BOOL FCanEvalExpressions() override;

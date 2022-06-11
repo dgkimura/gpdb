@@ -36,13 +36,13 @@ class CParseHandlerQuery : public CParseHandlerBase
 {
 private:
 	// the root of the parsed DXL tree constructed by the parse handler
-	gpos::owner<CDXLNode *> m_dxl_node;
+	gpos::Ref<CDXLNode> m_dxl_node;
 
 	// list of output columns (represented as scalar ident nodes)
-	gpos::owner<CDXLNodeArray *> m_output_colums_dxl_array;
+	gpos::Ref<CDXLNodeArray> m_output_colums_dxl_array;
 
 	// list of CTE priducers
-	gpos::owner<CDXLNodeArray *> m_cte_producers;
+	gpos::Ref<CDXLNodeArray> m_cte_producers;
 
 	// process the start of an element
 	void StartElement(
@@ -70,13 +70,13 @@ public:
 	~CParseHandlerQuery() override;
 
 	// returns the root of constructed DXL plan
-	gpos::pointer<CDXLNode *> CreateDXLNode() const;
+	CDXLNode *CreateDXLNode() const;
 
 	// returns the dxl representation of the query output
-	gpos::pointer<CDXLNodeArray *> GetOutputColumnsDXLArray() const;
+	CDXLNodeArray *GetOutputColumnsDXLArray() const;
 
 	// returns the CTEs
-	gpos::pointer<CDXLNodeArray *> GetCTEProducerDXLArray() const;
+	CDXLNodeArray *GetCTEProducerDXLArray() const;
 
 	EDxlParseHandlerType GetParseHandlerType() const override;
 };

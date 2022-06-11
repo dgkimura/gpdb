@@ -85,42 +85,42 @@ CMinidumperUtils::PdxlmdLoad(CMemoryPool *mp, const CHAR *file_name)
 
 	if (nullptr != pbs)
 	{
-		pbs->AddRef();
+		;
 	}
 
 	if (nullptr != optimizer_config)
 	{
-		optimizer_config->AddRef();
+		;
 	}
 
 	if (nullptr != query)
 	{
-		query->AddRef();
+		;
 	}
 
 	if (nullptr != query_output_dxlnode_array)
 	{
-		query_output_dxlnode_array->AddRef();
+		;
 	}
 
 	if (nullptr != cte_producers)
 	{
-		cte_producers->AddRef();
+		;
 	}
 
 	if (nullptr != mdcache_obj_array)
 	{
-		mdcache_obj_array->AddRef();
+		;
 	}
 
 	if (nullptr != pdrgpsysid)
 	{
-		pdrgpsysid->AddRef();
+		;
 	}
 
 	if (nullptr != pdxlnPlan)
 	{
-		pdxlnPlan->AddRef();
+		;
 	}
 
 	// cleanup
@@ -222,11 +222,12 @@ CMinidumperUtils::Finalize(CMiniDumperDXL *pmdmp, BOOL fSerializeErrCtx)
 //		Load and execute the minidump in the given file
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
-CMinidumperUtils::PdxlnExecuteMinidump(
-	CMemoryPool *mp, const CHAR *file_name, ULONG ulSegments, ULONG ulSessionId,
-	ULONG ulCmdId, gpos::pointer<COptimizerConfig *> optimizer_config,
-	gpos::pointer<IConstExprEvaluator *> pceeval)
+gpos::Ref<CDXLNode>
+CMinidumperUtils::PdxlnExecuteMinidump(CMemoryPool *mp, const CHAR *file_name,
+									   ULONG ulSegments, ULONG ulSessionId,
+									   ULONG ulCmdId,
+									   COptimizerConfig *optimizer_config,
+									   IConstExprEvaluator *pceeval)
 {
 	GPOS_ASSERT(nullptr != file_name);
 	GPOS_ASSERT(nullptr != optimizer_config);
@@ -237,7 +238,7 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 	CDXLMinidump *pdxlmd = CMinidumperUtils::PdxlmdLoad(mp, file_name);
 	GPOS_CHECK_ABORT;
 
-	gpos::owner<CDXLNode *> pdxlnPlan =
+	gpos::Ref<CDXLNode> pdxlnPlan =
 		PdxlnExecuteMinidump(mp, pdxlmd, file_name, ulSegments, ulSessionId,
 							 ulCmdId, optimizer_config, pceeval);
 
@@ -256,12 +257,12 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 //		Execute the given minidump
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
-CMinidumperUtils::PdxlnExecuteMinidump(
-	CMemoryPool *mp, CDXLMinidump *pdxlmd, const CHAR *file_name,
-	ULONG ulSegments, ULONG ulSessionId, ULONG ulCmdId,
-	gpos::pointer<COptimizerConfig *> optimizer_config,
-	gpos::pointer<IConstExprEvaluator *> pceeval)
+gpos::Ref<CDXLNode>
+CMinidumperUtils::PdxlnExecuteMinidump(CMemoryPool *mp, CDXLMinidump *pdxlmd,
+									   const CHAR *file_name, ULONG ulSegments,
+									   ULONG ulSessionId, ULONG ulCmdId,
+									   COptimizerConfig *optimizer_config,
+									   IConstExprEvaluator *pceeval)
 {
 	GPOS_ASSERT(nullptr != file_name);
 
@@ -270,7 +271,7 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 
 	CMetadataAccessorFactory factory(mp, pdxlmd, file_name);
 
-	gpos::owner<CDXLNode *> result = CMinidumperUtils::PdxlnExecuteMinidump(
+	gpos::Ref<CDXLNode> result = CMinidumperUtils::PdxlnExecuteMinidump(
 		mp, factory.Pmda(), pdxlmd, file_name, ulSegments, ulSessionId, ulCmdId,
 		optimizer_config, pceeval);
 
@@ -286,12 +287,11 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 //		Execute the given minidump using the given MD accessor
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
+gpos::Ref<CDXLNode>
 CMinidumperUtils::PdxlnExecuteMinidump(
 	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLMinidump *pdxlmd,
 	const CHAR *file_name, ULONG ulSegments, ULONG ulSessionId, ULONG ulCmdId,
-	gpos::pointer<COptimizerConfig *> optimizer_config,
-	gpos::pointer<IConstExprEvaluator *> pceeval)
+	COptimizerConfig *optimizer_config, IConstExprEvaluator *pceeval)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 	GPOS_ASSERT(nullptr != pdxlmd->GetQueryDXLRoot() &&
@@ -303,14 +303,14 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 				"No metadata found in Minidump");
 	GPOS_ASSERT(nullptr != optimizer_config);
 
-	gpos::owner<CDXLNode *> pdxlnPlan = nullptr;
+	gpos::Ref<CDXLNode> pdxlnPlan = nullptr;
 	CAutoTimer at("Minidump", true /*fPrint*/);
 
 	GPOS_CHECK_ABORT;
 
 	// set trace flags
-	gpos::owner<CBitSet *> pbsEnabled = nullptr;
-	gpos::owner<CBitSet *> pbsDisabled = nullptr;
+	gpos::Ref<CBitSet> pbsEnabled = nullptr;
+	gpos::Ref<CBitSet> pbsDisabled = nullptr;
 	SetTraceflags(mp, pdxlmd->Pbs(), &pbsEnabled, &pbsDisabled);
 
 	if (nullptr == pceeval)
@@ -333,21 +333,21 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 	GPOS_CATCH_EX(ex)
 	{
 		// reset trace flags
-		ResetTraceflags(pbsEnabled, pbsDisabled);
+		ResetTraceflags(pbsEnabled.get(), pbsDisabled.get());
 
-		CRefCount::SafeRelease(pbsEnabled);
-		CRefCount::SafeRelease(pbsDisabled);
+		;
+		;
 
 		GPOS_RETHROW(ex);
 	}
 	GPOS_CATCH_END;
 
 	// reset trace flags
-	ResetTraceflags(pbsEnabled, pbsDisabled);
+	ResetTraceflags(pbsEnabled.get(), pbsDisabled.get());
 
 	// clean up
-	CRefCount::SafeRelease(pbsEnabled);
-	CRefCount::SafeRelease(pbsDisabled);
+	;
+	;
 
 	GPOS_CHECK_ABORT;
 

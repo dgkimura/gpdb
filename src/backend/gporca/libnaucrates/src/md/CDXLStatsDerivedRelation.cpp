@@ -30,7 +30,7 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CDXLStatsDerivedRelation::CDXLStatsDerivedRelation(
 	CDouble rows, BOOL is_empty,
-	gpos::owner<CDXLStatsDerivedColumnArray *> dxl_stats_derived_col_array)
+	gpos::Ref<CDXLStatsDerivedColumnArray> dxl_stats_derived_col_array)
 	: m_rows(rows),
 	  m_empty(is_empty),
 	  m_dxl_stats_derived_col_array(std::move(dxl_stats_derived_col_array))
@@ -48,7 +48,7 @@ CDXLStatsDerivedRelation::CDXLStatsDerivedRelation(
 //---------------------------------------------------------------------------
 CDXLStatsDerivedRelation::~CDXLStatsDerivedRelation()
 {
-	m_dxl_stats_derived_col_array->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -59,10 +59,10 @@ CDXLStatsDerivedRelation::~CDXLStatsDerivedRelation()
 //		Returns the array of derived columns stats
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLStatsDerivedColumnArray *>
+const CDXLStatsDerivedColumnArray *
 CDXLStatsDerivedRelation::GetDXLStatsDerivedColArray() const
 {
-	return m_dxl_stats_derived_col_array;
+	return m_dxl_stats_derived_col_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -90,8 +90,8 @@ CDXLStatsDerivedRelation::Serialize(CXMLSerializer *xml_serializer) const
 	{
 		GPOS_CHECK_ABORT;
 
-		gpos::pointer<CDXLStatsDerivedColumn *> derived_col_stats_dxl =
-			(*m_dxl_stats_derived_col_array)[ul];
+		CDXLStatsDerivedColumn *derived_col_stats_dxl =
+			(*m_dxl_stats_derived_col_array)[ul].get();
 		derived_col_stats_dxl->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;

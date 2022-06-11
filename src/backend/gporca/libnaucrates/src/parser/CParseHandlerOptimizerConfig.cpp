@@ -64,8 +64,8 @@ CParseHandlerOptimizerConfig::CParseHandlerOptimizerConfig(
 //---------------------------------------------------------------------------
 CParseHandlerOptimizerConfig::~CParseHandlerOptimizerConfig()
 {
-	CRefCount::SafeRelease(m_pbs);
-	CRefCount::SafeRelease(m_optimizer_config);
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -194,29 +194,28 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 
 	CParseHandlerEnumeratorConfig *pphEnumeratorConfig =
 		dynamic_cast<CParseHandlerEnumeratorConfig *>((*this)[0]);
-	gpos::owner<CEnumeratorConfig *> pec =
-		pphEnumeratorConfig->GetEnumeratorCfg();
-	pec->AddRef();
+	gpos::Ref<CEnumeratorConfig> pec = pphEnumeratorConfig->GetEnumeratorCfg();
+	;
 
 	CParseHandlerStatisticsConfig *pphStatisticsConfig =
 		dynamic_cast<CParseHandlerStatisticsConfig *>((*this)[1]);
-	gpos::owner<CStatisticsConfig *> stats_config =
+	gpos::Ref<CStatisticsConfig> stats_config =
 		pphStatisticsConfig->GetStatsConf();
-	stats_config->AddRef();
+	;
 
 	CParseHandlerCTEConfig *pphCTEConfig =
 		dynamic_cast<CParseHandlerCTEConfig *>((*this)[2]);
-	gpos::owner<CCTEConfig *> pcteconfig = pphCTEConfig->GetCteConf();
-	pcteconfig->AddRef();
+	gpos::Ref<CCTEConfig> pcteconfig = pphCTEConfig->GetCteConf();
+	;
 
 	CParseHandlerWindowOids *pphDefoidsGPDB =
 		dynamic_cast<CParseHandlerWindowOids *>((*this)[3]);
 	CWindowOids *pwindowoidsGPDB = pphDefoidsGPDB->GetWindowOids();
 	GPOS_ASSERT(nullptr != pwindowoidsGPDB);
-	pwindowoidsGPDB->AddRef();
+	;
 
-	gpos::owner<ICostModel *> pcm = nullptr;
-	gpos::owner<CHint *> phint = nullptr;
+	gpos::Ref<ICostModel> pcm = nullptr;
+	gpos::Ref<CHint> phint = nullptr;
 	if (5 == this->Length())
 	{
 		// no cost model: use default one
@@ -229,7 +228,7 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 			dynamic_cast<CParseHandlerCostModel *>((*this)[4]);
 		pcm = pphCostModelConfig->GetCostModel();
 		GPOS_ASSERT(nullptr != pcm);
-		pcm->AddRef();
+		;
 
 		if (6 == this->Length())
 		{
@@ -241,7 +240,7 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 				dynamic_cast<CParseHandlerHint *>((*this)[5]);
 			phint = pphHint->GetHint();
 			GPOS_ASSERT(nullptr != phint);
-			phint->AddRef();
+			;
 		}
 	}
 
@@ -251,7 +250,7 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 
 	CParseHandlerTraceFlags *pphTraceFlags =
 		dynamic_cast<CParseHandlerTraceFlags *>((*this)[this->Length() - 1]);
-	pphTraceFlags->GetTraceFlagBitSet()->AddRef();
+	;
 	m_pbs = pphTraceFlags->GetTraceFlagBitSet();
 
 	// deactivate handler
@@ -280,10 +279,10 @@ CParseHandlerOptimizerConfig::GetParseHandlerType() const
 //		Returns the bitset for the trace flags
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CBitSet *>
+CBitSet *
 CParseHandlerOptimizerConfig::Pbs() const
 {
-	return m_pbs;
+	return m_pbs.get();
 }
 
 //---------------------------------------------------------------------------
@@ -294,10 +293,10 @@ CParseHandlerOptimizerConfig::Pbs() const
 //		Returns the optimizer config
 //
 //---------------------------------------------------------------------------
-gpos::pointer<COptimizerConfig *>
+COptimizerConfig *
 CParseHandlerOptimizerConfig::GetOptimizerConfig() const
 {
-	return m_optimizer_config;
+	return m_optimizer_config.get();
 }
 
 // EOF

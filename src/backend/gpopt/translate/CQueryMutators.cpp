@@ -576,11 +576,10 @@ CQueryMutators::GetTargetEntryForAggExpr(CMemoryPool *mp,
 	{
 		Aggref *aggref = (Aggref *) node;
 
-		gpos::owner<CMDIdGPDB *> agg_mdid =
+		gpos::Ref<CMDIdGPDB> agg_mdid =
 			GPOS_NEW(mp) CMDIdGPDB(aggref->aggfnoid);
-		gpos::pointer<const IMDAggregate *> md_agg =
-			md_accessor->RetrieveAgg(agg_mdid);
-		agg_mdid->Release();
+		const IMDAggregate *md_agg = md_accessor->RetrieveAgg(agg_mdid.get());
+		;
 
 		const CWStringConst *str = md_agg->Mdname().GetMDName();
 		name = CTranslatorUtils::CreateMultiByteCharStringFromWCString(
@@ -1561,11 +1560,11 @@ CQueryMutators::RunWindowProjListMutator(Node *node,
 		GPOS_ASSERT(IsA(window_func, WindowFunc));
 
 		// get the function name and create a new target entry for window_func
-		gpos::owner<CMDIdGPDB *> mdid_func =
+		gpos::Ref<CMDIdGPDB> mdid_func =
 			GPOS_NEW(context->m_mp) CMDIdGPDB(window_func->winfnoid);
-		const CWStringConst *str =
-			CMDAccessorUtils::PstrWindowFuncName(context->m_mda, mdid_func);
-		mdid_func->Release();
+		const CWStringConst *str = CMDAccessorUtils::PstrWindowFuncName(
+			context->m_mda, mdid_func.get());
+		;
 
 		TargetEntry *target_entry = gpdb::MakeTargetEntry(
 			(Expr *) window_func, (AttrNumber) resno,

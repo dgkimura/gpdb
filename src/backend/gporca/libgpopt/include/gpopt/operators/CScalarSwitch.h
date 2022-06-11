@@ -45,7 +45,7 @@ class CScalarSwitch : public CScalar
 {
 private:
 	// return type
-	gpos::owner<IMDId *> m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// is operator return type BOOL?
 	BOOL m_fBoolReturnType;
@@ -54,7 +54,7 @@ public:
 	CScalarSwitch(const CScalarSwitch &) = delete;
 
 	// ctor
-	CScalarSwitch(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type);
+	CScalarSwitch(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CScalarSwitch() override;
@@ -74,17 +74,17 @@ public:
 	}
 
 	// the type of the scalar expression
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// operator specific hash function
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -94,25 +94,24 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override
+	Eber(ULongPtrArray *pdrgpulChildren) const override
 	{
 		return EberNullOnAllNullChildren(pdrgpulChildren);
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarSwitch *>
+	static CScalarSwitch *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

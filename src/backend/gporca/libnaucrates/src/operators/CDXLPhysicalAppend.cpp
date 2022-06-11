@@ -35,10 +35,10 @@ CDXLPhysicalAppend::CDXLPhysicalAppend(CMemoryPool *mp, BOOL fIsTarget,
 {
 }
 
-CDXLPhysicalAppend::CDXLPhysicalAppend(
-	CMemoryPool *mp, BOOL fIsTarget, BOOL fIsZapped, ULONG scan_id,
-	gpos::owner<CDXLTableDescr *> dxl_table_desc,
-	gpos::owner<ULongPtrArray *> selector_ids)
+CDXLPhysicalAppend::CDXLPhysicalAppend(CMemoryPool *mp, BOOL fIsTarget,
+									   BOOL fIsZapped, ULONG scan_id,
+									   gpos::Ref<CDXLTableDescr> dxl_table_desc,
+									   gpos::Ref<ULongPtrArray> selector_ids)
 	: CDXLPhysical(mp),
 	  m_used_in_upd_del(fIsTarget),
 	  m_is_zapped(fIsZapped),
@@ -50,8 +50,8 @@ CDXLPhysicalAppend::CDXLPhysicalAppend(
 
 CDXLPhysicalAppend::~CDXLPhysicalAppend()
 {
-	CRefCount::SafeRelease(m_dxl_table_descr);
-	CRefCount::SafeRelease(m_selector_ids);
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -120,9 +120,8 @@ CDXLPhysicalAppend::IsZapped() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAppend::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLPhysicalAppend::SerializeToDXL(CXMLSerializer *xml_serializer,
+								   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -140,7 +139,7 @@ CDXLPhysicalAppend::SerializeToDXL(
 			CDXLTokens::GetDXLTokenStr(EdxltokenPartIndexId), m_scan_id);
 
 		CWStringDynamic *serialized_selector_ids =
-			CDXLUtils::Serialize(m_mp, m_selector_ids);
+			CDXLUtils::Serialize(m_mp, m_selector_ids.get());
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenSelectorIds),
 			serialized_selector_ids);
@@ -174,7 +173,7 @@ CDXLPhysicalAppend::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAppend::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalAppend::AssertValid(const CDXLNode *dxlnode,
 								BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -183,7 +182,7 @@ CDXLPhysicalAppend::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG ulChildren = dxlnode->Arity();
 	for (ULONG ul = EdxlappendIndexFirstChild; ul < ulChildren; ul++)
 	{
-		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[ul];
+		CDXLNode *child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypePhysical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

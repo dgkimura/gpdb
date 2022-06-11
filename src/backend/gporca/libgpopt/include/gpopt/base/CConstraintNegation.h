@@ -33,13 +33,13 @@ class CConstraintNegation : public CConstraint
 {
 private:
 	// child constraint
-	gpos::owner<CConstraint *> m_pcnstr;
+	gpos::Ref<CConstraint> m_pcnstr;
 
 public:
 	CConstraintNegation(const CConstraintNegation &) = delete;
 
 	// ctor
-	CConstraintNegation(CMemoryPool *mp, gpos::owner<CConstraint *> pcnstr);
+	CConstraintNegation(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr);
 
 	// dtor
 	~CConstraintNegation() override;
@@ -52,10 +52,10 @@ public:
 	}
 
 	// child constraint
-	gpos::pointer<CConstraint *>
+	CConstraint *
 	PcnstrChild() const
 	{
-		return m_pcnstr;
+		return m_pcnstr.get();
 	}
 
 	// is this constraint a contradiction
@@ -73,7 +73,7 @@ public:
 	}
 
 	// scalar expression
-	gpos::pointer<CExpression *> PexprScalar(CMemoryPool *mp) override;
+	CExpression *PexprScalar(CMemoryPool *mp) override;
 
 	// check if there is a constraint on the given column
 	BOOL
@@ -83,21 +83,20 @@ public:
 	}
 
 	// return a copy of the constraint with remapped columns
-	gpos::owner<CConstraint *> PcnstrCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<CConstraint> PcnstrCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// return constraint on a given column
-	gpos::owner<CConstraint *> Pcnstr(CMemoryPool *mp,
-									  const CColRef *colref) override;
+	gpos::Ref<CConstraint> Pcnstr(CMemoryPool *mp,
+								  const CColRef *colref) override;
 
 	// return constraint on a given column set
-	gpos::owner<CConstraint *> Pcnstr(
-		CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs) override;
+	gpos::Ref<CConstraint> Pcnstr(CMemoryPool *mp, CColRefSet *pcrs) override;
 
 	// return a clone of the constraint for a different column
-	gpos::owner<CConstraint *> PcnstrRemapForColumn(
-		CMemoryPool *mp, CColRef *colref) const override;
+	gpos::Ref<CConstraint> PcnstrRemapForColumn(CMemoryPool *mp,
+												CColRef *colref) const override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

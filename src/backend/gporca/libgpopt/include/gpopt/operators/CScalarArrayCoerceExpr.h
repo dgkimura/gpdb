@@ -40,7 +40,7 @@ class CScalarArrayCoerceExpr : public CScalarCoerceBase
 {
 private:
 	// catalog MDId of the element function
-	gpos::owner<IMDId *> m_pmdidElementFunc;
+	gpos::Ref<IMDId> m_pmdidElementFunc;
 
 	// conversion semantics flag to pass to func
 	BOOL m_is_explicit;
@@ -49,16 +49,16 @@ public:
 	CScalarArrayCoerceExpr(const CScalarArrayCoerceExpr &) = delete;
 
 	// ctor
-	CScalarArrayCoerceExpr(CMemoryPool *mp, gpos::owner<IMDId *> element_func,
-						   gpos::owner<IMDId *> result_type_mdid,
-						   INT type_modifier, BOOL is_explicit,
-						   ECoercionForm dxl_coerce_format, INT location);
+	CScalarArrayCoerceExpr(CMemoryPool *mp, gpos::Ref<IMDId> element_func,
+						   gpos::Ref<IMDId> result_type_mdid, INT type_modifier,
+						   BOOL is_explicit, ECoercionForm dxl_coerce_format,
+						   INT location);
 
 	// dtor
 	~CScalarArrayCoerceExpr() override;
 
 	// return metadata id of element coerce function
-	gpos::pointer<IMDId *> PmdidElementFunc() const;
+	IMDId *PmdidElementFunc() const;
 
 	BOOL IsExplicit() const;
 
@@ -68,13 +68,13 @@ public:
 	const CHAR *SzId() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// conversion function
-	static gpos::cast_func<CScalarArrayCoerceExpr *> PopConvert(COperator *pop);
+	static CScalarArrayCoerceExpr *PopConvert(COperator *pop);
 
 };	// class CScalarArrayCoerceExpr
 

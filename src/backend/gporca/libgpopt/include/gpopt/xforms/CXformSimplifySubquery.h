@@ -34,37 +34,36 @@ class CXformSimplifySubquery : public CXformExploration
 {
 private:
 	// definition of simplification function
-	using FnSimplify = BOOL(CMemoryPool *, gpos::pointer<CExpression *>,
-							gpos::owner<CExpression *> *);
+	using FnSimplify = BOOL(CMemoryPool *, CExpression *,
+							gpos::Ref<CExpression> *);
 
 	// definition of matching function
-	using FnMatch = BOOL(gpos::pointer<COperator *>);
+	using FnMatch = BOOL(COperator *);
 
 	// transform existential subqueries to count(*) subqueries
-	static BOOL FSimplifyExistential(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprScalar,
-		gpos::owner<CExpression *> *ppexprNewScalar);
+	static BOOL FSimplifyExistential(CMemoryPool *mp, CExpression *pexprScalar,
+									 gpos::Ref<CExpression> *ppexprNewScalar);
 
 	// transform quantified subqueries to count(*) subqueries
-	static BOOL FSimplifyQuantified(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprScalar,
-		gpos::owner<CExpression *> *ppexprNewScalar);
+	static BOOL FSimplifyQuantified(CMemoryPool *mp, CExpression *pexprScalar,
+									gpos::Ref<CExpression> *ppexprNewScalar);
 
 	// main driver, transform existential/quantified subqueries to count(*) subqueries
 	static BOOL FSimplifySubqueryRecursive(
 		CMemoryPool *mp, CExpression *pexprScalar,
-		gpos::owner<CExpression *> *ppexprNewScalar, FnSimplify *pfnsimplify,
+		gpos::Ref<CExpression> *ppexprNewScalar, FnSimplify *pfnsimplify,
 		FnMatch *pfnmatch);
 
-	static gpos::owner<CExpression *> FSimplifySubquery(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprInput,
-		FnSimplify *pfnsimplify, FnMatch *pfnmatch);
+	static gpos::Ref<CExpression> FSimplifySubquery(CMemoryPool *mp,
+													CExpression *pexprInput,
+													FnSimplify *pfnsimplify,
+													FnMatch *pfnmatch);
 
 public:
 	CXformSimplifySubquery(const CXformSimplifySubquery &) = delete;
 
 	// ctor
-	explicit CXformSimplifySubquery(gpos::owner<CExpression *> pexprPattern);
+	explicit CXformSimplifySubquery(gpos::Ref<CExpression> pexprPattern);
 
 	// dtor
 	~CXformSimplifySubquery() override = default;
@@ -73,9 +72,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(gpos::pointer<CXformContext *> pxfctxt,
-				   gpos::pointer<CXformResult *> pxfres,
-				   gpos::pointer<CExpression *> pexpr) const override;
+	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+				   CExpression *pexpr) const override;
 
 
 };	// class CXformSimplifySubquery

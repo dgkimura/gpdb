@@ -50,7 +50,7 @@ public:
 	CDXLScalarCoerceToDomain(const CDXLScalarCoerceToDomain &) = delete;
 
 	// ctor/dtor
-	CDXLScalarCoerceToDomain(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+	CDXLScalarCoerceToDomain(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 							 INT type_modifier,
 							 EdxlCoercionForm dxl_coerce_format, INT location);
 
@@ -67,7 +67,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarCoerceToDomain *>
+	static CDXLScalarCoerceToDomain *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

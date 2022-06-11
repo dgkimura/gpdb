@@ -177,11 +177,11 @@ private:
 	// this identifies a group and one expression belonging to that group
 	struct SGroupAndExpression
 	{
-		gpos::pointer<SGroupInfo *> m_group_info{nullptr};
+		SGroupInfo *m_group_info{nullptr};
 		ULONG m_expr_index{gpos::ulong_max};
 
 		SGroupAndExpression() = default;
-		SGroupAndExpression(gpos::pointer<SGroupInfo *> g, ULONG ix)
+		SGroupAndExpression(SGroupInfo *g, ULONG ix)
 			: m_group_info(g), m_expr_index(ix)
 		{
 		}
@@ -190,7 +190,8 @@ private:
 		{
 			return m_expr_index == gpos::ulong_max
 					   ? nullptr
-					   : (*m_group_info->m_best_expr_info_array)[m_expr_index];
+					   : (*m_group_info->m_best_expr_info_array)[m_expr_index]
+							 .get();
 		}
 		BOOL
 		IsValid() const
@@ -211,7 +212,7 @@ private:
 	struct SExpressionInfo : public CRefCount
 	{
 		// the expression
-		gpos::owner<CExpression *> m_expr;
+		gpos::Ref<CExpression> m_expr;
 
 		// left/right child group/expr info (group for left/right child of m_expr),
 		// we do not keep a refcount for these
@@ -224,7 +225,7 @@ private:
 		// like distribution spec, partition selectors
 
 		// Stores part keys for atoms that are partitioned tables. NULL otherwise.
-		gpos::pointer<CPartKeysArray *> m_atom_part_keys_array;
+		CPartKeysArray *m_atom_part_keys_array;
 
 		// cost of the expression
 		CDouble m_cost;
@@ -236,9 +237,9 @@ private:
 		CDouble m_atom_base_table_rows;
 
 		// stores atom ids that are fufilled by a PS in this expression
-		gpos::owner<CBitSet *> m_contain_PS;
+		gpos::Ref<CBitSet> m_contain_PS;
 
-		SExpressionInfo(CMemoryPool *mp, gpos::owner<CExpression *> expr,
+		SExpressionInfo(CMemoryPool *mp, gpos::Ref<CExpression> expr,
 						const SGroupAndExpression &left_child_expr_info,
 						const SGroupAndExpression &right_child_expr_info,
 						SExpressionProperties &properties)
@@ -258,7 +259,7 @@ private:
 			this->UnionPSProperties(right_child_expr_info.GetExprInfo());
 		}
 
-		SExpressionInfo(CMemoryPool *mp, gpos::owner<CExpression *> expr,
+		SExpressionInfo(CMemoryPool *mp, gpos::Ref<CExpression> expr,
 						SExpressionProperties &properties)
 			: m_expr(std::move(expr)),
 			  m_properties(properties),
@@ -273,8 +274,8 @@ private:
 
 		~SExpressionInfo() override
 		{
-			m_expr->Release();
-			CRefCount::SafeRelease(m_contain_PS);
+			;
+			;
 		}
 
 		// cost (use -1 for greedy solutions to ensure we keep all of them)
@@ -291,9 +292,9 @@ private:
 		}
 
 		void
-		UnionPSProperties(gpos::pointer<SExpressionInfo *> other) const
+		UnionPSProperties(SExpressionInfo *other) const
 		{
-			m_contain_PS->Union(other->m_contain_PS);
+			m_contain_PS->Union(other->m_contain_PS.get());
 		}
 		BOOL
 		ChildrenAreEqual(const SExpressionInfo &other) const
@@ -303,8 +304,7 @@ private:
 		}
 	};
 
-	using SExpressionInfoArray =
-		CDynamicPtrArray<SExpressionInfo, CleanupRelease<SExpressionInfo>>;
+	using SExpressionInfoArray = gpos::Vector<gpos::Ref<SExpressionInfo>>;
 
 	//---------------------------------------------------------------------------
 	//	@struct:
@@ -317,14 +317,14 @@ private:
 	struct SGroupInfo : public CRefCount
 	{
 		// the set of atoms, this uniquely identifies the group
-		gpos::owner<CBitSet *> m_atoms;
+		gpos::Ref<CBitSet> m_atoms;
 		// infos of the best (lowest cost) expressions (so far, if at the current level)
 		// for each interesting property
-		gpos::owner<SExpressionInfoArray *> m_best_expr_info_array;
+		gpos::Ref<SExpressionInfoArray> m_best_expr_info_array;
 		CDouble m_cardinality;
 		CDouble m_lowest_expr_cost;
 
-		SGroupInfo(CMemoryPool *mp, gpos::owner<CBitSet *> atoms)
+		SGroupInfo(CMemoryPool *mp, gpos::Ref<CBitSet> atoms)
 			: m_atoms(std::move(atoms)),
 			  m_cardinality(-1.0),
 			  m_lowest_expr_cost(-1.0)
@@ -334,8 +334,8 @@ private:
 
 		~SGroupInfo() override
 		{
-			m_atoms->Release();
-			m_best_expr_info_array->Release();
+			;
+			;
 		}
 
 		BOOL
@@ -351,17 +351,16 @@ private:
 	};
 
 	// dynamic array of SGroupInfo, where each index represents an alternative group of a given level k
-	using SGroupInfoArray =
-		CDynamicPtrArray<SGroupInfo, CleanupRelease<SGroupInfo>>;
+	using SGroupInfoArray = gpos::Vector<gpos::Ref<SGroupInfo>>;
 
 	// info for a join level, the set of all groups representing <m_level>-way joins
 	struct SLevelInfo : public CRefCount
 	{
 		ULONG m_level;
-		gpos::owner<SGroupInfoArray *> m_groups;
-		gpos::owner<CKHeap<SGroupInfoArray, SGroupInfo> *> m_top_k_groups;
+		gpos::Ref<SGroupInfoArray> m_groups;
+		gpos::Ref<CKHeap<SGroupInfoArray, SGroupInfo>> m_top_k_groups;
 
-		SLevelInfo(ULONG level, gpos::owner<SGroupInfoArray *> groups)
+		SLevelInfo(ULONG level, gpos::Ref<SGroupInfoArray> groups)
 			: m_level(level),
 			  m_groups(std::move(groups)),
 			  m_top_k_groups(nullptr)
@@ -370,14 +369,14 @@ private:
 
 		~SLevelInfo() override
 		{
-			m_groups->Release();
-			CRefCount::SafeRelease(m_top_k_groups);
+			;
+			;
 		}
 	};
 
 	// hashing function
 	static ULONG
-	UlHashBitSet(gpos::pointer<const CBitSet *> pbs)
+	UlHashBitSet(const CBitSet *pbs)
 	{
 		GPOS_ASSERT(nullptr != pbs);
 
@@ -386,8 +385,7 @@ private:
 
 	// equality function
 	static BOOL
-	FEqualBitSet(gpos::pointer<const CBitSet *> pbsFst,
-				 gpos::pointer<const CBitSet *> pbsSnd)
+	FEqualBitSet(const CBitSet *pbsFst, const CBitSet *pbsSnd)
 	{
 		GPOS_ASSERT(nullptr != pbsFst);
 		GPOS_ASSERT(nullptr != pbsSnd);
@@ -396,74 +394,76 @@ private:
 	}
 
 	using ExpressionToEdgeMap =
-		CHashMap<CExpression, SEdge, CExpression::HashValue, CUtils::Equals,
-				 CleanupRelease<CExpression>, CleanupRelease<SEdge>>;
+		gpos::UnorderedMap<gpos::Ref<CExpression>, gpos::Ref<SEdge>,
+						   gpos::RefHash<CExpression, CExpression::HashValue>,
+						   gpos::RefEq<CExpression, CUtils::Equals>>;
 
 	// dynamic array of SGroupInfos
 	using BitSetToGroupInfoMap =
-		CHashMap<CBitSet, SGroupInfo, UlHashBitSet, FEqualBitSet,
-				 CleanupRelease<CBitSet>, CleanupRelease<SGroupInfo>>;
+		gpos::UnorderedMap<gpos::Ref<CBitSet>, gpos::Ref<SGroupInfo>,
+						   gpos::RefHash<CBitSet, UlHashBitSet>,
+						   gpos::RefEq<CBitSet, FEqualBitSet>>;
 
 	// iterator over group infos in a level
 	using BitSetToGroupInfoMapIter =
-		CHashMapIter<CBitSet, SGroupInfo, UlHashBitSet, FEqualBitSet,
-					 CleanupRelease<CBitSet>, CleanupRelease<SGroupInfo>>;
+		gpos::UnorderedMap<gpos::Ref<CBitSet>, gpos::Ref<SGroupInfo>,
+						   gpos::RefHash<CBitSet, UlHashBitSet>,
+						   gpos::RefEq<CBitSet, FEqualBitSet>>::LegacyIterator;
 
 	// dynamic array of SLevelInfos, where each index represents the level
-	using DPv2Levels = CDynamicPtrArray<SLevelInfo, CleanupRelease<SLevelInfo>>;
+	using DPv2Levels = gpos::Vector<gpos::Ref<SLevelInfo>>;
 
 	// an array of an array of groups, organized by level at the first array dimension,
 	// main data structure for dynamic programming
-	gpos::owner<DPv2Levels *> m_join_levels;
+	gpos::Ref<DPv2Levels> m_join_levels;
 
 	// map to find the associated edge in the join graph from a join predicate
-	gpos::owner<ExpressionToEdgeMap *> m_expression_to_edge_map;
+	gpos::Ref<ExpressionToEdgeMap> m_expression_to_edge_map;
 
 	// map to check whether a DPv2 group already exists
-	gpos::owner<BitSetToGroupInfoMap *> m_bitset_to_group_info_map;
+	gpos::Ref<BitSetToGroupInfoMap> m_bitset_to_group_info_map;
 
 	// ON predicates for NIJs (non-inner joins, e.g. LOJs)
 	// currently NIJs are LOJs only, this may change in the future
 	// if/when we add semijoins, anti-semijoins and relatives
-	gpos::owner<CExpressionArray *> m_on_pred_conjuncts;
+	gpos::Ref<CExpressionArray> m_on_pred_conjuncts;
 
 	// association between logical children and inner join/ON preds
 	// (which of the logical children are right children of NIJs and what ON predicates are they using)
-	gpos::owner<ULongPtrArray *> m_child_pred_indexes;
+	gpos::Ref<ULongPtrArray> m_child_pred_indexes;
 
 	// for each non-inner join (entry in m_on_pred_conjuncts), the required atoms on the left
-	gpos::owner<CBitSetArray *> m_non_inner_join_dependencies;
+	gpos::Ref<CBitSetArray> m_non_inner_join_dependencies;
 
 	// top K expressions at the top level
-	gpos::owner<CKHeap<SExpressionInfoArray, SExpressionInfo> *>
+	gpos::Ref<CKHeap<SExpressionInfoArray, SExpressionInfo>>
 		m_top_k_expressions;
 
 	// top K expressions at top level that contain promising dynamic partiion selectors
 	// if there are no promising dynamic partition selectors, this will be empty
-	gpos::owner<CKHeap<SExpressionInfoArray, SExpressionInfo> *>
+	gpos::Ref<CKHeap<SExpressionInfoArray, SExpressionInfo>>
 		m_top_k_part_expressions;
 
 	// current penalty for cross products (depends on enumeration algorithm)
 	CDouble m_cross_prod_penalty;
 
 	// outer references, if any
-	gpos::owner<CColRefSet *> m_outer_refs;
+	gpos::Ref<CColRefSet> m_outer_refs;
 
 	CMemoryPool *m_mp;
 
-	gpos::pointer<SLevelInfo *>
+	SLevelInfo *
 	Level(ULONG l)
 	{
-		return (*m_join_levels)[l];
+		return (*m_join_levels)[l].get();
 	}
 
 	// build expression linking given groups
-	gpos::owner<CExpression *> PexprBuildInnerJoinPred(
-		gpos::pointer<CBitSet *> pbsFst, gpos::pointer<CBitSet *> pbsSnd);
+	gpos::Ref<CExpression> PexprBuildInnerJoinPred(CBitSet *pbsFst,
+												   CBitSet *pbsSnd);
 
 	// compute cost of a join expression in a group
-	void ComputeCost(gpos::pointer<SExpressionInfo *> expr_info,
-					 CDouble join_cardinality);
+	void ComputeCost(SExpressionInfo *expr_info, CDouble join_cardinality);
 
 	// if we need to keep track of used edges, make a map that
 	// speeds up this usage check
@@ -471,11 +471,11 @@ private:
 
 	// add a select node with any remaining edges (predicates) that have
 	// not been incorporated in the join tree
-	gpos::owner<CExpression *> AddSelectNodeForRemainingEdges(
-		gpos::owner<CExpression *> join_expr);
+	gpos::Ref<CExpression> AddSelectNodeForRemainingEdges(
+		gpos::Ref<CExpression> join_expr);
 
 	// mark all the edges used in a join tree
-	void RecursivelyMarkEdgesAsUsed(gpos::pointer<CExpression *> expr);
+	void RecursivelyMarkEdgesAsUsed(CExpression *expr);
 
 	// enumerate all possible joins between left_level-way joins on the left side
 	// and right_level-way joins on the right side, resulting in left_level + right_level-way joins
@@ -483,16 +483,15 @@ private:
 
 	void GreedySearchJoinOrders(ULONG left_level, JoinOrderPropType algo);
 
-	void DeriveStats(gpos::pointer<CExpression *> pexpr) override;
+	void DeriveStats(CExpression *pexpr) override;
 
 	// create a CLogicalJoin and a CExpression to join two groups, for a required property
-	gpos::owner<SExpressionInfo *> GetJoinExprForProperties(
-		gpos::pointer<SGroupInfo *> left_child,
-		gpos::pointer<SGroupInfo *> right_child,
+	gpos::Ref<SExpressionInfo> GetJoinExprForProperties(
+		SGroupInfo *left_child, SGroupInfo *right_child,
 		SExpressionProperties &required_properties);
 
 	// get a join expression from two child groups with specified child expressions
-	gpos::owner<SExpressionInfo *> GetJoinExpr(
+	gpos::Ref<SExpressionInfo> GetJoinExpr(
 		const SGroupAndExpression &left_child_expr,
 		const SGroupAndExpression &right_child_expr,
 		SExpressionProperties &result_properties);
@@ -507,34 +506,33 @@ private:
 
 	// get best expression in a group for a given set of properties
 	static SGroupAndExpression GetBestExprForProperties(
-		gpos::pointer<SGroupInfo *> group_info, SExpressionProperties &props);
+		SGroupInfo *group_info, SExpressionProperties &props);
 
 	// add a new property to an existing predicate
-	static void AddNewPropertyToExpr(gpos::pointer<SExpressionInfo *> expr_info,
+	static void AddNewPropertyToExpr(SExpressionInfo *expr_info,
 									 SExpressionProperties props);
 
 	// enumerate bushy joins (joins where both children are also joins) of level "current_level"
 	void SearchBushyJoinOrders(ULONG current_level);
 
 	// look up an existing group or create a new one, with an expression to be used for stats
-	gpos::pointer<SGroupInfo *> LookupOrCreateGroupInfo(
-		gpos::pointer<SLevelInfo *> levelInfo, gpos::owner<CBitSet *> atoms,
-		gpos::pointer<SExpressionInfo *> stats_expr_info);
+	SGroupInfo *LookupOrCreateGroupInfo(SLevelInfo *levelInfo,
+										gpos::Ref<CBitSet> atoms,
+										SExpressionInfo *stats_expr_info);
 	// add a new expression to a group, unless there already is an existing expression that dominates it
-	void AddExprToGroupIfNecessary(
-		gpos::pointer<SGroupInfo *> group_info,
-		gpos::owner<SExpressionInfo *> new_expr_info);
+	void AddExprToGroupIfNecessary(SGroupInfo *group_info,
+								   gpos::Ref<SExpressionInfo> new_expr_info);
 
-	void PopulateDPEInfo(gpos::pointer<SExpressionInfo *> join_expr_info,
-						 gpos::pointer<SGroupInfo *> left_group_info,
-						 gpos::pointer<SGroupInfo *> right_group_info);
+	void PopulateDPEInfo(SExpressionInfo *join_expr_info,
+						 SGroupInfo *left_group_info,
+						 SGroupInfo *right_group_info);
 
 	void FinalizeDPLevel(ULONG level);
 
-	gpos::pointer<SGroupInfoArray *>
+	SGroupInfoArray *
 	GetGroupsForLevel(ULONG level) const
 	{
-		return (*m_join_levels)[level]->m_groups;
+		return (*m_join_levels)[level]->m_groups.get();
 	}
 
 	ULONG FindLogicalChildByNijId(ULONG nij_num);
@@ -549,12 +547,11 @@ private:
 
 public:
 	// ctor
-	CJoinOrderDPv2(CMemoryPool *mp,
-				   gpos::owner<CExpressionArray *> pdrgpexprAtoms,
-				   gpos::owner<CExpressionArray *> innerJoinConjuncts,
-				   gpos::owner<CExpressionArray *> onPredConjuncts,
-				   gpos::owner<ULongPtrArray *> childPredIndexes,
-				   gpos::owner<CColRefSet *> outerRefs);
+	CJoinOrderDPv2(CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprAtoms,
+				   gpos::Ref<CExpressionArray> innerJoinConjuncts,
+				   gpos::Ref<CExpressionArray> onPredConjuncts,
+				   gpos::Ref<ULongPtrArray> childPredIndexes,
+				   gpos::Ref<CColRefSet> outerRefs);
 
 	// dtor
 	~CJoinOrderDPv2() override;
@@ -562,13 +559,12 @@ public:
 	// main handler
 	virtual void PexprExpand();
 
-	gpos::owner<CExpression *> GetNextOfTopK();
+	gpos::Ref<CExpression> GetNextOfTopK();
 
 	// check for NIJs
-	BOOL IsRightChildOfNIJ(
-		gpos::pointer<SGroupInfo *> groupInfo,
-		gpos::owner<CExpression *> *onPredToUse = nullptr,
-		gpos::pointer<CBitSet *> *requiredBitsOnLeft = nullptr);
+	BOOL IsRightChildOfNIJ(SGroupInfo *groupInfo,
+						   gpos::Ref<CExpression> *onPredToUse = nullptr,
+						   CBitSet **requiredBitsOnLeft = nullptr);
 
 	// print function
 	IOstream &OsPrint(IOstream &) const;

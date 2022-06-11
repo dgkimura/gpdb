@@ -31,7 +31,7 @@ class CDatumInt8GPDB : public IDatumInt8
 {
 private:
 	// type information
-	gpos::owner<IMDId *> m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// integer value
 	LINT m_val;
@@ -45,13 +45,13 @@ public:
 
 	// ctors
 	CDatumInt8GPDB(CSystemId sysid, LINT val, BOOL is_null = false);
-	CDatumInt8GPDB(gpos::owner<IMDId *> mdid, LINT val, BOOL is_null = false);
+	CDatumInt8GPDB(gpos::Ref<IMDId> mdid, LINT val, BOOL is_null = false);
 
 	// dtor
 	~CDatumInt8GPDB() override;
 
 	// accessor of metadata type id
-	gpos::pointer<IMDId *> MDId() const override;
+	IMDId *MDId() const override;
 
 	// accessor of size
 	ULONG Size() const override;
@@ -69,10 +69,10 @@ public:
 	ULONG HashValue() const override;
 
 	// match function for datums
-	BOOL Matches(gpos::pointer<const IDatum *>) const override;
+	BOOL Matches(const IDatum *) const override;
 
 	// copy datum
-	gpos::owner<IDatum *> MakeCopy(CMemoryPool *mp) const override;
+	gpos::Ref<IDatum> MakeCopy(CMemoryPool *mp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

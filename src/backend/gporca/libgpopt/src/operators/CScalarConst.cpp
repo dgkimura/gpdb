@@ -31,7 +31,7 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarConst::CScalarConst(CMemoryPool *mp, gpos::owner<IDatum *> datum)
+CScalarConst::CScalarConst(CMemoryPool *mp, gpos::Ref<IDatum> datum)
 	: CScalar(mp), m_pdatum(std::move(datum))
 {
 	GPOS_ASSERT(nullptr != m_pdatum);
@@ -48,7 +48,7 @@ CScalarConst::CScalarConst(CMemoryPool *mp, gpos::owner<IDatum *> datum)
 //---------------------------------------------------------------------------
 CScalarConst::~CScalarConst()
 {
-	m_pdatum->Release();
+	;
 }
 
 
@@ -76,12 +76,11 @@ CScalarConst::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarConst::Matches(gpos::pointer<COperator *> pop) const
+CScalarConst::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarConst *> psconst =
-			gpos::dyn_cast<CScalarConst>(pop);
+		CScalarConst *psconst = gpos::dyn_cast<CScalarConst>(pop);
 
 		// match if constant values are the same
 		return GetDatum()->Matches(psconst->GetDatum());
@@ -98,7 +97,7 @@ CScalarConst::Matches(gpos::pointer<COperator *> pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarConst::MdidType() const
 {
 	return m_pdatum->MDId();
@@ -132,7 +131,7 @@ CScalarConst::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarConst::FCastedConst(gpos::pointer<CExpression *> pexpr)
+CScalarConst::FCastedConst(CExpression *pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -159,7 +158,7 @@ CScalarConst::FCastedConst(gpos::pointer<CExpression *> pexpr)
 //
 //---------------------------------------------------------------------------
 CScalarConst *
-CScalarConst::PopExtractFromConstOrCastConst(gpos::pointer<CExpression *> pexpr)
+CScalarConst::PopExtractFromConstOrCastConst(CExpression *pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -191,7 +190,7 @@ CScalarConst::PopExtractFromConstOrCastConst(gpos::pointer<CExpression *> pexpr)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarConst::Eber(gpos::pointer<ULongPtrArray *>  //pdrgpulChildren
+CScalarConst::Eber(ULongPtrArray *	//pdrgpulChildren
 ) const
 {
 	if (m_pdatum->IsNull())
@@ -201,8 +200,7 @@ CScalarConst::Eber(gpos::pointer<ULongPtrArray *>  //pdrgpulChildren
 
 	if (IMDType::EtiBool == m_pdatum->GetDatumType())
 	{
-		gpos::pointer<IDatumBool *> pdatumBool =
-			gpos::dyn_cast<IDatumBool>(m_pdatum);
+		IDatumBool *pdatumBool = gpos::dyn_cast<IDatumBool>(m_pdatum.get());
 		if (pdatumBool->GetValue())
 		{
 			return EberTrue;

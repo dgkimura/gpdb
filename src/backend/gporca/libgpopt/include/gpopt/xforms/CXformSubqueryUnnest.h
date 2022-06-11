@@ -33,21 +33,19 @@ class CXformSubqueryUnnest : public CXformExploration
 private:
 protected:
 	// helper for subquery unnesting
-	static gpos::owner<CExpression *> PexprSubqueryUnnest(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
-		BOOL fEnforceCorrelatedApply);
+	static gpos::Ref<CExpression> PexprSubqueryUnnest(
+		CMemoryPool *mp, CExpression *pexpr, BOOL fEnforceCorrelatedApply);
 
 	// actual transform
-	virtual void Transform(gpos::pointer<CXformContext *> pxfctxt,
-						   gpos::pointer<CXformResult *> pxfres,
-						   gpos::pointer<CExpression *> pexpr,
+	virtual void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+						   CExpression *pexpr,
 						   BOOL fEnforceCorrelatedApply) const;
 
 public:
 	CXformSubqueryUnnest(const CXformSubqueryUnnest &) = delete;
 
 	// ctor
-	explicit CXformSubqueryUnnest(gpos::owner<CExpression *> pexprPattern)
+	explicit CXformSubqueryUnnest(gpos::Ref<CExpression> pexprPattern)
 		: CXformExploration(std::move(pexprPattern))
 	{
 	}
@@ -59,9 +57,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(gpos::pointer<CXformContext *> pxfctxt,
-				   gpos::pointer<CXformResult *> pxfres,
-				   gpos::pointer<CExpression *> pexpr) const override;
+	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+				   CExpression *pexpr) const override;
 
 	// is transformation a subquery unnesting (Subquery To Apply) xform?
 	BOOL

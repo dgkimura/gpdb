@@ -40,10 +40,10 @@ class CScalarBitmapIndexProbe : public CScalar
 {
 private:
 	// index descriptor
-	gpos::owner<CIndexDescriptor *> m_pindexdesc;
+	gpos::Ref<CIndexDescriptor> m_pindexdesc;
 
 	// bitmap type id
-	gpos::owner<IMDId *> m_pmdidBitmapType;
+	gpos::Ref<IMDId> m_pmdidBitmapType;
 
 	// private copy ctor
 	CScalarBitmapIndexProbe(const CScalarBitmapIndexProbe &);
@@ -51,8 +51,8 @@ private:
 public:
 	// ctor
 	CScalarBitmapIndexProbe(CMemoryPool *mp,
-							gpos::owner<CIndexDescriptor *> pindexdesc,
-							gpos::owner<IMDId *> pmdidBitmapType);
+							gpos::Ref<CIndexDescriptor> pindexdesc,
+							gpos::Ref<IMDId> pmdidBitmapType);
 
 	// ctor
 	// only for transforms
@@ -62,17 +62,17 @@ public:
 	~CScalarBitmapIndexProbe() override;
 
 	// index descriptor
-	gpos::pointer<CIndexDescriptor *>
+	CIndexDescriptor *
 	Pindexdesc() const
 	{
-		return m_pindexdesc;
+		return m_pindexdesc.get();
 	}
 
 	// bitmap type id
-	gpos::pointer<IMDId *>
+	IMDId *
 	MdidType() const override
 	{
-		return m_pmdidBitmapType;
+		return m_pmdidBitmapType.get();
 	}
 
 	// identifier
@@ -93,7 +93,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -103,12 +103,11 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
@@ -117,7 +116,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion
-	static gpos::cast_func<CScalarBitmapIndexProbe *>
+	static CScalarBitmapIndexProbe *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

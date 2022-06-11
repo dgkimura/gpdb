@@ -36,7 +36,7 @@ private:
 #ifdef GPOS_DEBUG
 
 	// type definition for of expression generator
-	using Pfpexpr = gpos::owner<CExpression *> (*)(CMemoryPool *);
+	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *);
 
 	// helper for testing engine using an array of expression generators
 	static GPOS_RESULT EresTestEngine(Pfpexpr rgpf[], ULONG size);
@@ -51,8 +51,8 @@ private:
 
 public:
 	// type definition of optimizer test function
-	using FnOptimize = void(CMemoryPool *, gpos::pointer<CExpression *>,
-							gpos::owner<CSearchStageArray *>);
+	using FnOptimize = void(CMemoryPool *, CExpression *,
+							gpos::Ref<CSearchStageArray>);
 
 	// main driver
 	static GPOS_RESULT EresUnittest();
@@ -66,7 +66,7 @@ public:
 		CWStringConst *str,	 // array of relation names
 		ULONG *pul,			 // array of relation OIDs
 		ULONG ulRels,		 // number of array entries
-		gpos::pointer<CBitSet *>
+		CBitSet *
 			pbs	 // if a bit is set, the corresponding join expression will be optimized
 	);
 
@@ -74,8 +74,8 @@ public:
 
 	// build memo by recursive optimization
 	static void BuildMemoRecursive(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprInput,
-		gpos::owner<CSearchStageArray *> search_stage_array);
+		CMemoryPool *mp, CExpression *pexprInput,
+		gpos::Ref<CSearchStageArray> search_stage_array);
 
 	// test of recursive memo building
 	static GPOS_RESULT EresUnittest_BuildMemo();

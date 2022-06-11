@@ -87,8 +87,9 @@ CParseHandlerMDGPDBScalarOp::StartElement(const XMLCh *const element_uri,
 
 		// parse metadata id info
 		m_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBScalarOp);
+					 m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+					 EdxltokenMdid, EdxltokenGPDBScalarOp)
+					 .get();
 
 		const XMLCh *xml_str_comp_type = CDXLOperatorFactory::ExtractAttrValue(
 			attrs, EdxltokenGPDBScalarOpCmpType, EdxltokenGPDBScalarOp);
@@ -123,9 +124,11 @@ CParseHandlerMDGPDBScalarOp::StartElement(const XMLCh *const element_uri,
 		// parse left operand's type
 		GPOS_ASSERT(nullptr != m_mdname);
 
-		m_mdid_type_left = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBScalarOpLeftTypeId);
+		m_mdid_type_left =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenGPDBScalarOpLeftTypeId)
+				.get();
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenGPDBScalarOpRightTypeId),
@@ -134,9 +137,11 @@ CParseHandlerMDGPDBScalarOp::StartElement(const XMLCh *const element_uri,
 		// parse right operand's type
 		GPOS_ASSERT(nullptr != m_mdname);
 
-		m_mdid_type_right = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBScalarOpRightTypeId);
+		m_mdid_type_right =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenGPDBScalarOpRightTypeId)
+				.get();
 	}
 	else if (0 ==
 			 XMLString::compareString(
@@ -146,9 +151,11 @@ CParseHandlerMDGPDBScalarOp::StartElement(const XMLCh *const element_uri,
 		// parse result type
 		GPOS_ASSERT(nullptr != m_mdname);
 
-		m_mdid_type_result = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBScalarOpResultTypeId);
+		m_mdid_type_result =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenGPDBScalarOpResultTypeId)
+				.get();
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenGPDBScalarOpFuncId),
@@ -158,8 +165,9 @@ CParseHandlerMDGPDBScalarOp::StartElement(const XMLCh *const element_uri,
 		GPOS_ASSERT(nullptr != m_mdname);
 
 		m_func_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBScalarOpFuncId);
+						  m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+						  EdxltokenMdid, EdxltokenGPDBScalarOpFuncId)
+						  .get();
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenGPDBScalarOpCommOpId),
@@ -168,9 +176,11 @@ CParseHandlerMDGPDBScalarOp::StartElement(const XMLCh *const element_uri,
 		// parse commutator operator
 		GPOS_ASSERT(nullptr != m_mdname);
 
-		m_mdid_commute_opr = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBScalarOpCommOpId);
+		m_mdid_commute_opr =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenGPDBScalarOpCommOpId)
+				.get();
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenGPDBScalarOpInverseOpId),
@@ -179,9 +189,11 @@ CParseHandlerMDGPDBScalarOp::StartElement(const XMLCh *const element_uri,
 		// parse inverse operator id
 		GPOS_ASSERT(nullptr != m_mdname);
 
-		m_mdid_inverse_opr = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-			EdxltokenGPDBScalarOpInverseOpId);
+		m_mdid_inverse_opr =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenGPDBScalarOpInverseOpId)
+				.get();
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenOpfamilies),
@@ -209,7 +221,8 @@ CParseHandlerMDGPDBScalarOp::StartElement(const XMLCh *const element_uri,
 		m_mdid_hash_opfamily =
 			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-				EdxltokenMdid, EdxltokenGPDBScalarOpHashOpfamily);
+				EdxltokenMdid, EdxltokenGPDBScalarOpHashOpfamily)
+				.get();
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(
@@ -222,7 +235,8 @@ CParseHandlerMDGPDBScalarOp::StartElement(const XMLCh *const element_uri,
 		m_mdid_legacy_hash_opfamily =
 			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-				EdxltokenMdid, EdxltokenGPDBScalarOpLegacyHashOpfamily);
+				EdxltokenMdid, EdxltokenGPDBScalarOpLegacyHashOpfamily)
+				.get();
 	}
 	else
 	{
@@ -257,13 +271,13 @@ CParseHandlerMDGPDBScalarOp::EndElement(const XMLCh *const,	 // element_uri,
 
 		GPOS_ASSERT(0 == this->Length() || 1 == this->Length());
 
-		gpos::owner<IMdIdArray *> mdid_opfamilies_array = nullptr;
+		gpos::Ref<IMdIdArray> mdid_opfamilies_array = nullptr;
 		if (0 < this->Length())
 		{
 			CParseHandlerMetadataIdList *mdid_list_parse_handler =
 				dynamic_cast<CParseHandlerMetadataIdList *>((*this)[0]);
 			mdid_opfamilies_array = mdid_list_parse_handler->GetMdIdArray();
-			mdid_opfamilies_array->AddRef();
+			;
 		}
 		else
 		{

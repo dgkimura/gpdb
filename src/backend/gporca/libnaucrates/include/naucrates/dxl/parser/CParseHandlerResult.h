@@ -37,7 +37,7 @@ class CParseHandlerResult : public CParseHandlerPhysicalOp
 {
 private:
 	// the result operator
-	gpos::pointer<CDXLPhysicalResult *> m_dxl_op;
+	CDXLPhysicalResult *m_dxl_op;
 
 	// set up initial handlers
 	void SetupInitialHandlers();

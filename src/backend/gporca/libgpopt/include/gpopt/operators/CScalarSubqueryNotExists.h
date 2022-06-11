@@ -57,7 +57,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarSubqueryNotExists *>
+	static CScalarSubqueryNotExists *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

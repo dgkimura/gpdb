@@ -127,22 +127,22 @@ public:
 	BOOL ExchangeClear(ULONG pos);
 
 	// union sets
-	void Union(gpos::pointer<const CBitSet *>);
+	void Union(const CBitSet *);
 
 	// intersect sets
-	void Intersection(gpos::pointer<const CBitSet *>);
+	void Intersection(const CBitSet *);
 
 	// difference of sets
-	void Difference(gpos::pointer<const CBitSet *>);
+	void Difference(const CBitSet *);
 
 	// is subset
-	BOOL ContainsAll(gpos::pointer<const CBitSet *>) const;
+	BOOL ContainsAll(const CBitSet *) const;
 
 	// equality
-	BOOL Equals(gpos::pointer<const CBitSet *>) const;
+	BOOL Equals(const CBitSet *) const;
 
 	// disjoint
-	BOOL IsDisjoint(gpos::pointer<const CBitSet *>) const;
+	BOOL IsDisjoint(const CBitSet *) const;
 
 	// hash value for set
 	ULONG HashValue() const;

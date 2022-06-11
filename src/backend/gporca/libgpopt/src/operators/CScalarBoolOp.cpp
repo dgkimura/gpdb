@@ -54,12 +54,11 @@ CScalarBoolOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBoolOp::Matches(gpos::pointer<COperator *> pop) const
+CScalarBoolOp::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarBoolOp *> popLog =
-			gpos::dyn_cast<CScalarBoolOp>(pop);
+		CScalarBoolOp *popLog = gpos::dyn_cast<CScalarBoolOp>(pop);
 
 		// match if operators are identical
 		return Eboolop() == popLog->Eboolop();
@@ -101,7 +100,7 @@ CScalarBoolOp::FCommutative(EBoolOperator eboolop)
 //		Expression type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CScalarBoolOp::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -118,7 +117,7 @@ CScalarBoolOp::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarBoolOp::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
+CScalarBoolOp::Eber(ULongPtrArray *pdrgpulChildren) const
 {
 	if (EboolopAnd == m_eboolop)
 	{

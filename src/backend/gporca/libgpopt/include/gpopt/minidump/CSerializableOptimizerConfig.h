@@ -40,15 +40,14 @@ private:
 	CMemoryPool *m_mp;
 
 	// optimizer configurations
-	gpos::pointer<const COptimizerConfig *> m_optimizer_config;
+	const COptimizerConfig *m_optimizer_config;
 
 public:
 	CSerializableOptimizerConfig(const CSerializableOptimizerConfig &) = delete;
 
 	// ctor
-	CSerializableOptimizerConfig(
-		CMemoryPool *mp,
-		gpos::pointer<const COptimizerConfig *> optimizer_config);
+	CSerializableOptimizerConfig(CMemoryPool *mp,
+								 const COptimizerConfig *optimizer_config);
 
 	// dtor
 	~CSerializableOptimizerConfig() override;

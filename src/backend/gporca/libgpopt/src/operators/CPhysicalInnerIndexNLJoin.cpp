@@ -35,8 +35,8 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalInnerIndexNLJoin::CPhysicalInnerIndexNLJoin(
-	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-	gpos::owner<CExpression *> origJoinPred)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	gpos::Ref<CExpression> origJoinPred)
 	: CPhysicalInnerNLJoin(mp),
 	  m_pdrgpcrOuterRefs(colref_array),
 	  m_origJoinPred(origJoinPred)
@@ -44,7 +44,7 @@ CPhysicalInnerIndexNLJoin::CPhysicalInnerIndexNLJoin(
 	GPOS_ASSERT(nullptr != m_pdrgpcrOuterRefs);
 	if (nullptr != m_origJoinPred)
 	{
-		m_origJoinPred->AddRef();
+		;
 	}
 }
 
@@ -59,8 +59,8 @@ CPhysicalInnerIndexNLJoin::CPhysicalInnerIndexNLJoin(
 //---------------------------------------------------------------------------
 CPhysicalInnerIndexNLJoin::~CPhysicalInnerIndexNLJoin()
 {
-	m_pdrgpcrOuterRefs->Release();
-	CRefCount::SafeRelease(m_origJoinPred);
+	;
+	;
 }
 
 
@@ -73,7 +73,7 @@ CPhysicalInnerIndexNLJoin::~CPhysicalInnerIndexNLJoin()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalInnerIndexNLJoin::Matches(gpos::pointer<COperator *> pop) const
+CPhysicalInnerIndexNLJoin::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -93,13 +93,13 @@ CPhysicalInnerIndexNLJoin::Matches(gpos::pointer<COperator *> pop) const
 //		Compute required distribution of the n-th child;
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDistributionSpec *>
-CPhysicalInnerIndexNLJoin::PdsRequired(
-	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
-	gpos::pointer<CDistributionSpec *>,	 //pdsRequired,
-	ULONG child_index GPOS_UNUSED,
-	gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt GPOS_UNUSED,
-	ULONG  // ulOptReq
+gpos::Ref<CDistributionSpec>
+CPhysicalInnerIndexNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
+									   CExpressionHandle &exprhdl GPOS_UNUSED,
+									   CDistributionSpec *,	 //pdsRequired,
+									   ULONG child_index GPOS_UNUSED,
+									   CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+									   ULONG  // ulOptReq
 ) const
 {
 	GPOS_RAISE(
@@ -109,12 +109,10 @@ CPhysicalInnerIndexNLJoin::PdsRequired(
 	return nullptr;
 }
 
-gpos::owner<CEnfdDistribution *>
+gpos::Ref<CEnfdDistribution>
 CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   gpos::pointer<CReqdPropPlan *> prppInput,
-							   ULONG child_index,
-							   gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-							   ULONG ulDistrReq)
+							   CReqdPropPlan *prppInput, ULONG child_index,
+							   CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq)
 {
 	GPOS_ASSERT(2 > child_index);
 
@@ -133,7 +131,7 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// we need to match distribution of inner
-	gpos::pointer<CDistributionSpec *> pdsInner =
+	CDistributionSpec *pdsInner =
 		gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Pds();
 	CDistributionSpec::EDistributionType edtInner = pdsInner->Edt();
 	if (CDistributionSpec::EdtSingleton == edtInner ||
@@ -148,10 +146,9 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (CDistributionSpec::EdtHashed == edtInner)
 	{
 		// check if we could create an equivalent hashed distribution request to the inner child
-		gpos::pointer<CDistributionSpecHashed *> pdshashed =
+		CDistributionSpecHashed *pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(pdsInner);
-		gpos::pointer<CDistributionSpecHashed *> pdshashedEquiv =
-			pdshashed->PdshashedEquiv();
+		CDistributionSpecHashed *pdshashedEquiv = pdshashed->PdshashedEquiv();
 
 		// If the inner child is a IndexScan on a multi-key distributed index, it
 		// may derive an incomplete equiv spec (see CPhysicalScan::PdsDerive()).
@@ -160,11 +157,10 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		if (pdshashed->HasCompleteEquivSpec(mp))
 		{
 			// request hashed distribution from outer
-			pdshashedEquiv->Pdrgpexpr()->AddRef();
-			gpos::owner<CDistributionSpecHashed *> pdsHashedRequired =
-				GPOS_NEW(mp)
-					CDistributionSpecHashed(pdshashedEquiv->Pdrgpexpr(),
-											pdshashedEquiv->FNullsColocated());
+			;
+			gpos::Ref<CDistributionSpecHashed> pdsHashedRequired = GPOS_NEW(mp)
+				CDistributionSpecHashed(pdshashedEquiv->Pdrgpexpr(),
+										pdshashedEquiv->FNullsColocated());
 			pdsHashedRequired->ComputeEquivHashExprs(mp, exprhdl);
 
 			return GPOS_NEW(mp)

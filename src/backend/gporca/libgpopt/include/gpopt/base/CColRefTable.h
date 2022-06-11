@@ -56,11 +56,11 @@ public:
 	CColRefTable(const CColRefTable &) = delete;
 
 	// ctors
-	CColRefTable(gpos::pointer<const CColumnDescriptor *> pcd, ULONG id,
-				 const CName *pname, ULONG ulOpSource);
+	CColRefTable(const CColumnDescriptor *pcd, ULONG id, const CName *pname,
+				 ULONG ulOpSource);
 
-	CColRefTable(gpos::pointer<const IMDType *> pmdtype, INT type_modifier,
-				 INT attno, BOOL is_nullable, ULONG id, const CName *pname,
+	CColRefTable(const IMDType *pmdtype, INT type_modifier, INT attno,
+				 BOOL is_nullable, ULONG id, const CName *pname,
 				 ULONG ulOpSource, BOOL is_dist_col,
 				 ULONG ulWidth = gpos::ulong_max);
 

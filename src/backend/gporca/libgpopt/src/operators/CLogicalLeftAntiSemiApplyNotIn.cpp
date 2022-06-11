@@ -24,10 +24,10 @@ using namespace gpopt;
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalLeftAntiSemiApplyNotIn::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(
 		CXform::ExfLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotIn);
 	(void) xform_set->ExchangeSet(
@@ -45,13 +45,12 @@ CLogicalLeftAntiSemiApplyNotIn::PxfsCandidates(CMemoryPool *mp) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
+gpos::Ref<COperator>
 CLogicalLeftAntiSemiApplyNotIn::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
-	gpos::owner<CColRefArray *> pdrgpcrInner =
-		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
+	gpos::Ref<CColRefArray> pdrgpcrInner = CUtils::PdrgpcrRemap(
+		mp, m_pdrgpcrInner.get(), colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalLeftAntiSemiApplyNotIn(
 		mp, std::move(pdrgpcrInner), m_eopidOriginSubq);

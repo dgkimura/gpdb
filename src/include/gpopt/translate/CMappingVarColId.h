@@ -81,23 +81,27 @@ private:
 	CMemoryPool *m_mp;
 
 	// hash map structure to store gpdb att -> opt col information
-	typedef CHashMap<CGPDBAttInfo, CGPDBAttOptCol, HashGPDBAttInfo,
-					 EqualGPDBAttInfo, CleanupRelease, CleanupRelease>
+	typedef gpos::UnorderedMap<gpos::Ref<CGPDBAttInfo>,
+							   gpos::Ref<CGPDBAttOptCol>,
+							   gpos::RefHash<CGPDBAttInfo, HashGPDBAttInfo>,
+							   gpos::RefEq<CGPDBAttInfo, EqualGPDBAttInfo>>
 		GPDBAttOptColHashMap;
 
 	// iterator
-	typedef CHashMapIter<CGPDBAttInfo, CGPDBAttOptCol, HashGPDBAttInfo,
-						 EqualGPDBAttInfo, CleanupRelease, CleanupRelease>
+	typedef gpos::UnorderedMap<
+		gpos::Ref<CGPDBAttInfo>, gpos::Ref<CGPDBAttOptCol>,
+		gpos::RefHash<CGPDBAttInfo, HashGPDBAttInfo>,
+		gpos::RefEq<CGPDBAttInfo, EqualGPDBAttInfo>>::LegacyIterator
 		GPDBAttOptColHashMapIter;
 
 	// map from gpdb att to optimizer col
-	gpos::owner<GPDBAttOptColHashMap *> m_gpdb_att_opt_col_mapping;
+	gpos::Ref<GPDBAttOptColHashMap> m_gpdb_att_opt_col_mapping;
 
 	// insert mapping entry
 	void Insert(ULONG, ULONG, INT, ULONG, CWStringBase *str);
 
 	// helper function to access mapping
-	gpos::pointer<const CGPDBAttOptCol *> GetGPDBAttOptColMapping(
+	const CGPDBAttOptCol *GetGPDBAttOptColMapping(
 		ULONG current_query_level, const Var *var,
 		EPlStmtPhysicalOpType plstmt_physical_op_type) const;
 
@@ -110,7 +114,7 @@ public:
 	// dtor
 	virtual ~CMappingVarColId()
 	{
-		m_gpdb_att_opt_col_mapping->Release();
+		;
 	}
 
 	// given a gpdb attribute, return a column name in optimizer world
@@ -123,35 +127,30 @@ public:
 						   EPlStmtPhysicalOpType plstmt_physical_op_type) const;
 
 	// load up mapping information from an index
-	void LoadIndexColumns(
-		ULONG query_level, ULONG RTE_index,
-		gpos::pointer<const gpmd::IMDIndex *> index,
-		gpos::pointer<const gpdxl::CDXLTableDescr *> table_descr);
+	void LoadIndexColumns(ULONG query_level, ULONG RTE_index,
+						  const gpmd::IMDIndex *index,
+						  const gpdxl::CDXLTableDescr *table_descr);
 
 	// load up mapping information from table descriptor
-	void LoadTblColumns(
-		ULONG query_level, ULONG RTE_index,
-		gpos::pointer<const gpdxl::CDXLTableDescr *> table_descr);
+	void LoadTblColumns(ULONG query_level, ULONG RTE_index,
+						const gpdxl::CDXLTableDescr *table_descr);
 
 	// load up column id mapping information from the array of column descriptors
 	void LoadColumns(ULONG query_level, ULONG RTE_index,
-					 gpos::pointer<const CDXLColDescrArray *> column_descrs);
+					 const CDXLColDescrArray *column_descrs);
 
 	// load up mapping information from derived table columns
-	void LoadDerivedTblColumns(
-		ULONG query_level, ULONG RTE_index,
-		gpos::pointer<const gpdxl::CDXLNodeArray *> derived_columns_dxl,
-		List *target_list);
+	void LoadDerivedTblColumns(ULONG query_level, ULONG RTE_index,
+							   const gpdxl::CDXLNodeArray *derived_columns_dxl,
+							   List *target_list);
 
 	// load information from CTE columns
 	void LoadCTEColumns(ULONG query_level, ULONG RTE_index,
-						gpos::pointer<const ULongPtrArray *> pdrgpulCTE,
-						List *target_list);
+						const ULongPtrArray *pdrgpulCTE, List *target_list);
 
 	// load up mapping information from scalar projection list
-	void LoadProjectElements(
-		ULONG query_level, ULONG RTE_index,
-		gpos::pointer<const CDXLNode *> project_list_dxlnode);
+	void LoadProjectElements(ULONG query_level, ULONG RTE_index,
+							 const CDXLNode *project_list_dxlnode);
 
 	// load up mapping information from list of column names
 	void Load(ULONG query_level, ULONG RTE_index, CIdGenerator *id_generator,
@@ -164,9 +163,8 @@ public:
 	CMappingVarColId *CopyMapColId(ULONG query_level) const;
 
 	// create a copy of the mapping replacing old col ids with new ones
-	CMappingVarColId *CopyRemapColId(
-		CMemoryPool *mp, gpos::pointer<ULongPtrArray *> old_colids,
-		gpos::pointer<ULongPtrArray *> new_colids) const;
+	CMappingVarColId *CopyRemapColId(CMemoryPool *mp, ULongPtrArray *old_colids,
+									 ULongPtrArray *new_colids) const;
 };
 }  // namespace gpdxl
 

@@ -45,15 +45,14 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode,
+	void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode,
 						const CHAR *attrname) const;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarValuesList *> Cast(CDXLOperator *dxl_op);
+	static CDXLScalarValuesList *Cast(CDXLOperator *dxl_op);
 
 	// does the operator return a boolean result
 	BOOL HasBoolResult(CMDAccessor * /*md_accessor*/) const override;
@@ -61,7 +60,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

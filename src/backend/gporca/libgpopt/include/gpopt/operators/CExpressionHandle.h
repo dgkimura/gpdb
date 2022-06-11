@@ -57,36 +57,36 @@ private:
 	CMemoryPool *m_mp;
 
 	// attached expression
-	gpos::owner<CExpression *> m_pexpr;
+	gpos::Ref<CExpression> m_pexpr;
 
 	// attached group expression
-	gpos::owner<CGroupExpression *> m_pgexpr;
+	gpos::Ref<CGroupExpression> m_pgexpr;
 
 	// attached cost context
-	gpos::pointer<CCostContext *> m_pcc;
+	CCostContext *m_pcc;
 
 	// derived plan properties of the gexpr attached by a CostContext under
 	// the default CDrvdPropCtxtPlan. See DerivePlanPropsForCostContext()
 	// NB: does NOT support on-demand property derivation
-	gpos::owner<CDrvdProp *> m_pdpplan;
+	gpos::Ref<CDrvdProp> m_pdpplan;
 
 	// statistics of attached expr/gexpr;
 	// set during derived stats computation
-	gpos::owner<IStatistics *> m_pstats;
+	gpos::Ref<IStatistics> m_pstats;
 
 	// required properties of attached expr/gexpr;
 	// set during required property computation
-	gpos::owner<CReqdProp *> m_prp;
+	gpos::Ref<CReqdProp> m_prp;
 
 	// array of children's derived stats
-	gpos::owner<IStatisticsArray *> m_pdrgpstat;
+	gpos::Ref<IStatisticsArray> m_pdrgpstat;
 
 	// array of children's required properties
-	gpos::owner<CReqdPropArray *> m_pdrgprp;
+	gpos::Ref<CReqdPropArray> m_pdrgprp;
 
 	// return an array of stats objects starting from the first stats object referenced by child
-	gpos::owner<IStatisticsArray *> PdrgpstatOuterRefs(
-		gpos::pointer<IStatisticsArray *> statistics_array, ULONG child_index);
+	gpos::Ref<IStatisticsArray> PdrgpstatOuterRefs(
+		IStatisticsArray *statistics_array, ULONG child_index);
 
 	// check if stats are derived for attached expression and its children
 	BOOL FStatsDerived() const;
@@ -110,13 +110,13 @@ public:
 	~CExpressionHandle();
 
 	// attach handle to a given expression
-	void Attach(gpos::pointer<CExpression *> pexpr);
+	void Attach(CExpression *pexpr);
 
 	// attach handle to a given group expression
-	void Attach(gpos::pointer<CGroupExpression *> pgexpr);
+	void Attach(CGroupExpression *pgexpr);
 
 	// attach handle to a given cost context
-	void Attach(gpos::pointer<CCostContext *> pcc);
+	void Attach(CCostContext *pcc);
 
 	// recursive property derivation,
 	void DeriveProps(CDrvdPropCtxt *pdpctxt);
@@ -138,26 +138,26 @@ public:
 	void DerivePlanPropsForCostContext();
 
 	// initialize required properties container
-	void InitReqdProps(gpos::pointer<CReqdProp *> prpInput);
+	void InitReqdProps(CReqdProp *prpInput);
 
 	// compute required properties of the n-th child
 	void ComputeChildReqdProps(ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
 							   ULONG ulOptReq);
 
 	// copy required properties of the n-th child
-	void CopyChildReqdProps(ULONG child_index, gpos::owner<CReqdProp *> prp);
+	void CopyChildReqdProps(ULONG child_index, gpos::Ref<CReqdProp> prp);
 
 	// compute required columns of the n-th child
 	void ComputeChildReqdCols(ULONG child_index, CDrvdPropArray *pdrgpdpCtxt);
 
 	// required properties computation of all children
-	void ComputeReqdProps(gpos::pointer<CReqdProp *> prpInput, ULONG ulOptReq);
+	void ComputeReqdProps(CReqdProp *prpInput, ULONG ulOptReq);
 
 	// derived relational props of n-th child
 	CDrvdPropRelational *GetRelationalProperties(ULONG child_index) const;
 
 	// derived stats of n-th child
-	gpos::pointer<IStatistics *> Pstats(ULONG child_index) const;
+	IStatistics *Pstats(ULONG child_index) const;
 
 	// derived plan props of n-th child
 	CDrvdPropPlan *Pdpplan(ULONG child_index) const;
@@ -166,19 +166,19 @@ public:
 	CDrvdPropScalar *GetDrvdScalarProps(ULONG child_index) const;
 
 	// derived properties of attached expr/gexpr
-	gpos::pointer<CDrvdProp *> Pdp() const;
+	CDrvdProp *Pdp() const;
 
 	// derived relational properties of attached expr/gexpr
 	CDrvdPropRelational *GetRelationalProperties() const;
 
 	// stats of attached expr/gexpr
-	gpos::pointer<IStatistics *> Pstats();
+	IStatistics *Pstats();
 
 	// required properties of attached expr/gexpr
-	gpos::pointer<CReqdProp *>
+	CReqdProp *
 	Prp() const
 	{
-		return m_prp;
+		return m_prp.get();
 	}
 
 	// check if given child is a scalar
@@ -213,17 +213,17 @@ public:
 							 CCostContext **grandchildContext) const;
 
 	// accessor for expression
-	gpos::pointer<CExpression *>
+	CExpression *
 	Pexpr() const
 	{
-		return m_pexpr;
+		return m_pexpr.get();
 	}
 
 	// accessor for group expression
-	gpos::pointer<CGroupExpression *>
+	CGroupExpression *
 	Pgexpr() const
 	{
-		return m_pgexpr;
+		return m_pgexpr.get();
 	}
 
 	// check for outer references
@@ -273,7 +273,7 @@ public:
 	CExpression *PexprScalarRepChild(ULONG child_index) const;
 
 	// return a representative (inexact) scalar expression attached to handle
-	gpos::pointer<CExpression *> PexprScalarRep() const;
+	CExpression *PexprScalarRep() const;
 
 	// return an exact scalar child at given index or return null if not possible
 	CExpression *PexprScalarExactChild(ULONG child_index,
@@ -282,12 +282,11 @@ public:
 	// return an exact scalar expression attached to handle or null if not possible
 	CExpression *PexprScalarExact() const;
 
-	void DeriveProducerStats(ULONG child_index,
-							 gpos::pointer<CColRefSet *> pcrsStat) const;
+	void DeriveProducerStats(ULONG child_index, CColRefSet *pcrsStat) const;
 
 	// return the columns used by a logical operator internally as well
 	// as columns used by all its scalar children
-	gpos::owner<CColRefSet *> PcrsUsedColumns(CMemoryPool *mp) const;
+	gpos::Ref<CColRefSet> PcrsUsedColumns(CMemoryPool *mp) const;
 
 	CColRefSet *DeriveOuterReferences() const;
 	CColRefSet *DeriveOuterReferences(ULONG child_index) const;

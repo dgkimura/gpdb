@@ -36,9 +36,9 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLWindowSpec::CDXLWindowSpec(
-	CMemoryPool *mp, gpos::owner<ULongPtrArray *> partition_by_colid_array,
-	CMDName *mdname, gpos::owner<CDXLNode *> sort_col_list_dxlnode,
-	gpos::owner<CDXLWindowFrame *> window_frame)
+	CMemoryPool *mp, gpos::Ref<ULongPtrArray> partition_by_colid_array,
+	CMDName *mdname, gpos::Ref<CDXLNode> sort_col_list_dxlnode,
+	gpos::Ref<CDXLWindowFrame> window_frame)
 	: m_mp(mp),
 	  m_partition_by_colid_array(std::move(partition_by_colid_array)),
 	  m_mdname(mdname),
@@ -59,9 +59,9 @@ CDXLWindowSpec::CDXLWindowSpec(
 //---------------------------------------------------------------------------
 CDXLWindowSpec::~CDXLWindowSpec()
 {
-	m_partition_by_colid_array->Release();
-	CRefCount::SafeRelease(m_window_frame);
-	CRefCount::SafeRelease(m_sort_col_list_dxlnode);
+	;
+	;
+	;
 	GPOS_DELETE(m_mdname);
 }
 
@@ -85,7 +85,7 @@ CDXLWindowSpec::SerializeToDXL(CXMLSerializer *xml_serializer) const
 
 	// serialize partition keys
 	CWStringDynamic *partition_by_colid_string =
-		CDXLUtils::Serialize(m_mp, m_partition_by_colid_array);
+		CDXLUtils::Serialize(m_mp, m_partition_by_colid_array.get());
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenPartKeys),
 								 partition_by_colid_string);
 	GPOS_DELETE(partition_by_colid_string);

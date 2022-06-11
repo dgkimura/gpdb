@@ -63,38 +63,35 @@ CXformInsert2DML::Exfp(CExpressionHandle &	// exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformInsert2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
-							gpos::pointer<CXformResult *> pxfres,
-							gpos::pointer<CExpression *> pexpr) const
+CXformInsert2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+							CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CLogicalInsert *> popInsert =
-		gpos::dyn_cast<CLogicalInsert>(pexpr->Pop());
+	CLogicalInsert *popInsert = gpos::dyn_cast<CLogicalInsert>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
 
-	gpos::owner<CTableDescriptor *> ptabdesc = popInsert->Ptabdesc();
-	ptabdesc->AddRef();
+	gpos::Ref<CTableDescriptor> ptabdesc = popInsert->Ptabdesc();
+	;
 
-	gpos::owner<CColRefArray *> pdrgpcrSource = popInsert->PdrgpcrSource();
-	pdrgpcrSource->AddRef();
+	gpos::Ref<CColRefArray> pdrgpcrSource = popInsert->PdrgpcrSource();
+	;
 
 	// child of insert operator
-	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
+	;
 
 	// create logical DML
-	gpos::owner<CExpression *> pexprAlt =
-		CXformUtils::PexprLogicalDMLOverProject(
-			mp, std::move(pexprChild), CLogicalDML::EdmlInsert,
-			std::move(ptabdesc), std::move(pdrgpcrSource),
-			nullptr,  //pcrCtid
-			nullptr	  //pcrSegmentId
-		);
+	gpos::Ref<CExpression> pexprAlt = CXformUtils::PexprLogicalDMLOverProject(
+		mp, std::move(pexprChild), CLogicalDML::EdmlInsert, std::move(ptabdesc),
+		std::move(pdrgpcrSource),
+		nullptr,  //pcrCtid
+		nullptr	  //pcrSegmentId
+	);
 
 	// add alternative to transformation result
 	pxfres->Add(std::move(pexprAlt));

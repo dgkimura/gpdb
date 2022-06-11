@@ -48,7 +48,7 @@ public:
 	CDXLDatumInt2(const CDXLDatumInt2 &) = delete;
 
 	// ctor
-	CDXLDatumInt2(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type, BOOL is_null,
+	CDXLDatumInt2(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type, BOOL is_null,
 				  SINT val);
 
 	// dtor
@@ -68,7 +68,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CDXLDatumInt2 *>
+	static CDXLDatumInt2 *
 	Cast(CDXLDatum *dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);

@@ -38,16 +38,16 @@ class CParseHandlerMDGPDBTrigger : public CParseHandlerMetadataObject
 {
 private:
 	// trigger id
-	gpos::pointer<IMDId *> m_mdid;
+	IMDId *m_mdid;
 
 	// trigger name
 	CMDName *m_mdname;
 
 	// relation id
-	gpos::pointer<IMDId *> m_rel_mdid;
+	IMDId *m_rel_mdid;
 
 	// function id
-	gpos::pointer<IMDId *> m_func_mdid;
+	IMDId *m_func_mdid;
 
 	// trigger type
 	INT m_type;

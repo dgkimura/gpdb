@@ -45,7 +45,7 @@ CLogicalApply::CLogicalApply(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalApply::CLogicalApply(CMemoryPool *mp,
-							 gpos::owner<CColRefArray *> pdrgpcrInner,
+							 gpos::Ref<CColRefArray> pdrgpcrInner,
 							 EOperatorId eopidOriginSubq)
 	: CLogical(mp),
 	  m_pdrgpcrInner(std::move(pdrgpcrInner)),
@@ -64,7 +64,7 @@ CLogicalApply::CLogicalApply(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CLogicalApply::~CLogicalApply()
 {
-	CRefCount::SafeRelease(m_pdrgpcrInner);
+	;
 }
 
 
@@ -76,14 +76,13 @@ CLogicalApply::~CLogicalApply()
 //		Compute required stat columns of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						gpos::pointer<CColRefSet *> pcrsInput,
-						ULONG child_index) const
+						CColRefSet *pcrsInput, ULONG child_index) const
 {
 	GPOS_ASSERT(3 == exprhdl.Arity());
 
-	gpos::owner<CColRefSet *> pcrsUsed = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsUsed = GPOS_NEW(mp) CColRefSet(mp);
 	// add columns used by scalar child
 	pcrsUsed->Union(exprhdl.DeriveUsedColumns(2));
 
@@ -93,9 +92,9 @@ CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		pcrsUsed->Union(exprhdl.DeriveOuterReferences(1));
 	}
 
-	gpos::owner<CColRefSet *> pcrsStat =
-		PcrsReqdChildStats(mp, exprhdl, pcrsInput, pcrsUsed, child_index);
-	pcrsUsed->Release();
+	gpos::Ref<CColRefSet> pcrsStat =
+		PcrsReqdChildStats(mp, exprhdl, pcrsInput, pcrsUsed.get(), child_index);
+	;
 
 	return pcrsStat;
 }
@@ -109,11 +108,11 @@ CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalApply::Matches(gpos::pointer<COperator *> pop) const
+CLogicalApply::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CColRefArray *> pdrgpcrInner =
+		CColRefArray *pdrgpcrInner =
 			gpos::dyn_cast<CLogicalApply>(pop)->PdrgPcrInner();
 		if (nullptr == m_pdrgpcrInner || nullptr == pdrgpcrInner)
 		{
@@ -141,7 +140,7 @@ CLogicalApply::OsPrint(IOstream &os) const
 	if (nullptr != m_pdrgpcrInner)
 	{
 		os << " (Reqd Inner Cols: ";
-		(void) CUtils::OsPrintDrgPcr(os, m_pdrgpcrInner);
+		(void) CUtils::OsPrintDrgPcr(os, m_pdrgpcrInner.get());
 		os << ")";
 	}
 

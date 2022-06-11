@@ -68,26 +68,25 @@ CXformImplementBitmapTableGet::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementBitmapTableGet::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+CXformImplementBitmapTableGet::Transform(CXformContext *pxfctxt,
+										 CXformResult *pxfres,
+										 CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	gpos::pointer<CLogicalBitmapTableGet *> popLogical =
+	CLogicalBitmapTableGet *popLogical =
 		gpos::dyn_cast<CLogicalBitmapTableGet>(pexpr->Pop());
 
-	gpos::owner<CTableDescriptor *> ptabdesc = popLogical->Ptabdesc();
-	ptabdesc->AddRef();
+	gpos::Ref<CTableDescriptor> ptabdesc = popLogical->Ptabdesc();
+	;
 
-	gpos::owner<CColRefArray *> pdrgpcrOutput = popLogical->PdrgpcrOutput();
-	pdrgpcrOutput->AddRef();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popLogical->PdrgpcrOutput();
+	;
 
-	gpos::owner<CPhysicalBitmapTableScan *> popPhysical =
+	gpos::Ref<CPhysicalBitmapTableScan> popPhysical =
 		GPOS_NEW(mp) CPhysicalBitmapTableScan(
 			mp, std::move(ptabdesc), pexpr->Pop()->UlOpId(),
 			GPOS_NEW(mp) CName(mp, *popLogical->PnameTableAlias()),
@@ -95,10 +94,10 @@ CXformImplementBitmapTableGet::Transform(
 
 	CExpression *pexprCondition = (*pexpr)[0];
 	CExpression *pexprIndexPath = (*pexpr)[1];
-	pexprCondition->AddRef();
-	pexprIndexPath->AddRef();
+	;
+	;
 
-	gpos::owner<CExpression *> pexprPhysical = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprPhysical = GPOS_NEW(mp)
 		CExpression(mp, std::move(popPhysical), pexprCondition, pexprIndexPath);
 	pxfres->Add(std::move(pexprPhysical));
 }

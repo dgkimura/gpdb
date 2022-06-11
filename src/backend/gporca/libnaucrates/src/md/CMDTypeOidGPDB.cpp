@@ -70,7 +70,7 @@ CMDTypeOidGPDB::CMDTypeOidGPDB(CMemoryPool *mp) : m_mp(mp)
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 
 	GPOS_ASSERT(GPDB_OID_OID == gpos::dyn_cast<CMDIdGPDB>(m_mdid)->Oid());
-	m_mdid->AddRef();
+	;
 	m_datum_null =
 		GPOS_NEW(mp) CDatumOidGPDB(m_mdid, 1 /* value */, true /* is_null */);
 }
@@ -85,24 +85,24 @@ CMDTypeOidGPDB::CMDTypeOidGPDB(CMemoryPool *mp) : m_mp(mp)
 //---------------------------------------------------------------------------
 CMDTypeOidGPDB::~CMDTypeOidGPDB()
 {
-	m_mdid->Release();
-	CRefCount::SafeRelease(m_distr_opfamily);
-	CRefCount::SafeRelease(m_legacy_distr_opfamily);
-	m_mdid_op_eq->Release();
-	m_mdid_op_neq->Release();
-	m_mdid_op_lt->Release();
-	m_mdid_op_leq->Release();
-	m_mdid_op_gt->Release();
-	m_mdid_op_geq->Release();
-	m_mdid_op_cmp->Release();
-	m_mdid_type_array->Release();
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
 
-	m_mdid_min->Release();
-	m_mdid_max->Release();
-	m_mdid_avg->Release();
-	m_mdid_sum->Release();
-	m_mdid_count->Release();
-	m_datum_null->Release();
+	;
+	;
+	;
+	;
+	;
+	;
 
 	GPOS_DELETE(m_dxl_str);
 }
@@ -115,7 +115,7 @@ CMDTypeOidGPDB::~CMDTypeOidGPDB()
 //		Factory function for creating OID datums
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatumOid *>
+gpos::Ref<IDatumOid>
 CMDTypeOidGPDB::CreateOidDatum(CMemoryPool *mp, OID oValue, BOOL is_null) const
 {
 	return GPOS_NEW(mp) CDatumOidGPDB(m_mdid->Sysid(), oValue, is_null);
@@ -129,22 +129,22 @@ CMDTypeOidGPDB::CreateOidDatum(CMemoryPool *mp, OID oValue, BOOL is_null) const
 //		Returns the metadata id of this type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDTypeOidGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
-gpos::pointer<IMDId *>
+IMDId *
 CMDTypeOidGPDB::GetDistrOpfamilyMdid() const
 {
 	if (GPOS_FTRACE(EopttraceUseLegacyOpfamilies))
 	{
-		return m_legacy_distr_opfamily;
+		return m_legacy_distr_opfamily.get();
 	}
 	else
 	{
-		return m_distr_opfamily;
+		return m_distr_opfamily.get();
 	}
 }
 
@@ -170,23 +170,23 @@ CMDTypeOidGPDB::Mdname() const
 //		Return mdid of specified comparison operator type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDTypeOidGPDB::GetMdidForCmpType(ECmpType cmp_type) const
 {
 	switch (cmp_type)
 	{
 		case EcmptEq:
-			return m_mdid_op_eq;
+			return m_mdid_op_eq.get();
 		case EcmptNEq:
-			return m_mdid_op_neq;
+			return m_mdid_op_neq.get();
 		case EcmptL:
-			return m_mdid_op_lt;
+			return m_mdid_op_lt.get();
 		case EcmptLEq:
-			return m_mdid_op_leq;
+			return m_mdid_op_leq.get();
 		case EcmptG:
-			return m_mdid_op_gt;
+			return m_mdid_op_gt.get();
 		case EcmptGEq:
-			return m_mdid_op_geq;
+			return m_mdid_op_geq.get();
 		default:
 			GPOS_ASSERT(!"Invalid operator type");
 			return nullptr;
@@ -201,21 +201,21 @@ CMDTypeOidGPDB::GetMdidForCmpType(ECmpType cmp_type) const
 //		Return mdid of specified aggregate type
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDTypeOidGPDB::GetMdidForAggType(EAggType agg_type) const
 {
 	switch (agg_type)
 	{
 		case EaggMin:
-			return m_mdid_min;
+			return m_mdid_min.get();
 		case EaggMax:
-			return m_mdid_max;
+			return m_mdid_max.get();
 		case EaggAvg:
-			return m_mdid_avg;
+			return m_mdid_avg.get();
 		case EaggSum:
-			return m_mdid_sum;
+			return m_mdid_sum.get();
 		case EaggCount:
-			return m_mdid_count;
+			return m_mdid_count.get();
 		default:
 			GPOS_ASSERT(!"Invalid aggregate type");
 			return nullptr;
@@ -244,11 +244,10 @@ CMDTypeOidGPDB::Serialize(CXMLSerializer *xml_serializer) const
 //		Transformation method for generating oid datum from CDXLScalarConstValue
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
-CMDTypeOidGPDB::GetDatumForDXLConstVal(
-	gpos::pointer<const CDXLScalarConstValue *> dxl_op) const
+gpos::Ref<IDatum>
+CMDTypeOidGPDB::GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) const
 {
-	gpos::pointer<CDXLDatumOid *> dxl_datum = gpos::dyn_cast<CDXLDatumOid>(
+	CDXLDatumOid *dxl_datum = gpos::dyn_cast<CDXLDatumOid>(
 		const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
 
 	return GPOS_NEW(m_mp) CDatumOidGPDB(m_mdid->Sysid(), dxl_datum->OidValue(),
@@ -263,11 +262,11 @@ CMDTypeOidGPDB::GetDatumForDXLConstVal(
 //		Construct an oid datum from a DXL datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
-CMDTypeOidGPDB::GetDatumForDXLDatum(
-	CMemoryPool *mp, gpos::pointer<const CDXLDatum *> dxl_datum) const
+gpos::Ref<IDatum>
+CMDTypeOidGPDB::GetDatumForDXLDatum(CMemoryPool *mp,
+									const CDXLDatum *dxl_datum) const
 {
-	gpos::pointer<CDXLDatumOid *> dxl_datumOid =
+	CDXLDatumOid *dxl_datumOid =
 		gpos::dyn_cast<CDXLDatumOid>(const_cast<CDXLDatum *>(dxl_datum));
 	OID oid_value = dxl_datumOid->OidValue();
 	BOOL is_null = dxl_datumOid->IsNull();
@@ -283,13 +282,11 @@ CMDTypeOidGPDB::GetDatumForDXLDatum(
 // 		Generate dxl datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLDatum *>
-CMDTypeOidGPDB::GetDatumVal(CMemoryPool *mp,
-							gpos::pointer<IDatum *> datum) const
+gpos::Ref<CDXLDatum>
+CMDTypeOidGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 {
-	m_mdid->AddRef();
-	gpos::pointer<CDatumOidGPDB *> oid_datum =
-		dynamic_cast<CDatumOidGPDB *>(datum);
+	;
+	CDatumOidGPDB *oid_datum = dynamic_cast<CDatumOidGPDB *>(datum);
 
 	return GPOS_NEW(mp)
 		CDXLDatumOid(mp, m_mdid, oid_datum->IsNull(), oid_datum->OidValue());
@@ -303,15 +300,13 @@ CMDTypeOidGPDB::GetDatumVal(CMemoryPool *mp,
 // 		Generate a dxl scalar constant from a datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLScalarConstValue *>
-CMDTypeOidGPDB::GetDXLOpScConst(CMemoryPool *mp,
-								gpos::pointer<IDatum *> datum) const
+gpos::Ref<CDXLScalarConstValue>
+CMDTypeOidGPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
 {
-	gpos::pointer<CDatumOidGPDB *> datum_oidGPDB =
-		dynamic_cast<CDatumOidGPDB *>(datum);
+	CDatumOidGPDB *datum_oidGPDB = dynamic_cast<CDatumOidGPDB *>(datum);
 
-	m_mdid->AddRef();
-	gpos::owner<CDXLDatumOid *> dxl_datum = GPOS_NEW(mp) CDXLDatumOid(
+	;
+	gpos::Ref<CDXLDatumOid> dxl_datum = GPOS_NEW(mp) CDXLDatumOid(
 		mp, m_mdid, datum_oidGPDB->IsNull(), datum_oidGPDB->OidValue());
 
 	return GPOS_NEW(mp) CDXLScalarConstValue(mp, std::move(dxl_datum));
@@ -325,10 +320,10 @@ CMDTypeOidGPDB::GetDXLOpScConst(CMemoryPool *mp,
 // 		Generate dxl datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLDatum *>
+gpos::Ref<CDXLDatum>
 CMDTypeOidGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
-	m_mdid->AddRef();
+	;
 
 	return GPOS_NEW(mp) CDXLDatumOid(mp, m_mdid, true /*is_null*/, 1);
 }

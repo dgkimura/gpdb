@@ -27,9 +27,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CStatsPredLike::CStatsPredLike(ULONG colid,
-							   gpos::owner<CExpression *> expr_left,
-							   gpos::owner<CExpression *> expr_right,
+CStatsPredLike::CStatsPredLike(ULONG colid, gpos::Ref<CExpression> expr_left,
+							   gpos::Ref<CExpression> expr_right,
 							   CDouble default_scale_factor)
 	: CStatsPred(colid),
 	  m_expr_left(std::move(expr_left)),
@@ -52,8 +51,8 @@ CStatsPredLike::CStatsPredLike(ULONG colid,
 //---------------------------------------------------------------------------
 CStatsPredLike::~CStatsPredLike()
 {
-	m_expr_left->Release();
-	m_expr_right->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------

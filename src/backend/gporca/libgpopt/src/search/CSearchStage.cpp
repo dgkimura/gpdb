@@ -29,7 +29,7 @@ FORCE_GENERATE_DBGSTR(CSearchStage);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CSearchStage::CSearchStage(gpos::owner<CXformSet *> xform_set,
+CSearchStage::CSearchStage(gpos::Ref<CXformSet> xform_set,
 						   ULONG ulTimeThreshold, CCost costThreshold)
 	: m_xforms(xform_set),
 	  m_time_threshold(ulTimeThreshold),
@@ -60,8 +60,8 @@ CSearchStage::CSearchStage(gpos::owner<CXformSet *> xform_set,
 //---------------------------------------------------------------------------
 CSearchStage::~CSearchStage()
 {
-	m_xforms->Release();
-	CRefCount::SafeRelease(m_pexprBest);
+	;
+	;
 }
 
 
@@ -119,12 +119,12 @@ CSearchStage::SetBestExpr(CExpression *pexpr)
 //		one stage with all xforms and no time/cost thresholds
 //
 //---------------------------------------------------------------------------
-gpos::owner<CSearchStageArray *>
+gpos::Ref<CSearchStageArray>
 CSearchStage::PdrgpssDefault(CMemoryPool *mp)
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	xform_set->Union(CXformFactory::Pxff()->PxfsExploration());
-	gpos::owner<CSearchStageArray *> search_stage_array =
+	gpos::Ref<CSearchStageArray> search_stage_array =
 		GPOS_NEW(mp) CSearchStageArray(mp);
 
 	search_stage_array->Append(GPOS_NEW(mp) CSearchStage(std::move(xform_set)));

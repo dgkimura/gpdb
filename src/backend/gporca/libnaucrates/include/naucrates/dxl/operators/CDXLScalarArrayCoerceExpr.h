@@ -40,7 +40,7 @@ class CDXLScalarArrayCoerceExpr : public CDXLScalarCoerceBase
 {
 private:
 	// catalog MDId of element coerce function
-	gpos::owner<IMDId *> m_coerce_func_mdid;
+	gpos::Ref<IMDId> m_coerce_func_mdid;
 
 	// conversion semantics flag to pass to func
 	BOOL m_explicit;
@@ -49,14 +49,14 @@ public:
 	CDXLScalarArrayCoerceExpr(const CDXLScalarArrayCoerceExpr &) = delete;
 
 	CDXLScalarArrayCoerceExpr(CMemoryPool *mp,
-							  gpos::owner<IMDId *> coerce_func_mdid,
-							  gpos::owner<IMDId *> result_type_mdid,
+							  gpos::Ref<IMDId> coerce_func_mdid,
+							  gpos::Ref<IMDId> result_type_mdid,
 							  INT type_modifier, BOOL is_explicit,
 							  EdxlCoercionForm coerce_format, INT location);
 
 	~CDXLScalarArrayCoerceExpr() override
 	{
-		m_coerce_func_mdid->Release();
+		;
 	}
 
 	// ident accessor
@@ -67,10 +67,10 @@ public:
 	}
 
 	// return metadata id of element coerce function
-	gpos::pointer<IMDId *>
+	IMDId *
 	GetCoerceFuncMDid() const
 	{
-		return m_coerce_func_mdid;
+		return m_coerce_func_mdid.get();
 	}
 
 	BOOL
@@ -84,10 +84,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarArrayCoerceExpr *>
+	static CDXLScalarArrayCoerceExpr *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

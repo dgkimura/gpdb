@@ -30,7 +30,7 @@ class CPhysicalCorrelatedInnerNLJoin : public CPhysicalInnerNLJoin
 {
 private:
 	// columns from inner child used in correlated execution
-	gpos::owner<CColRefArray *> m_pdrgpcrInner;
+	gpos::Ref<CColRefArray> m_pdrgpcrInner;
 
 	// origin subquery id
 	EOperatorId m_eopidOriginSubq;
@@ -41,7 +41,7 @@ public:
 
 	// ctor
 	CPhysicalCorrelatedInnerNLJoin(CMemoryPool *mp,
-								   gpos::owner<CColRefArray *> pdrgpcrInner,
+								   gpos::Ref<CColRefArray> pdrgpcrInner,
 								   EOperatorId eopidOriginSubq)
 		: CPhysicalInnerNLJoin(mp),
 		  m_pdrgpcrInner(std::move(pdrgpcrInner)),
@@ -56,7 +56,7 @@ public:
 	// dtor
 	~CPhysicalCorrelatedInnerNLJoin() override
 	{
-		m_pdrgpcrInner->Release();
+		;
 	}
 
 	// ident accessors
@@ -75,7 +75,7 @@ public:
 
 	// match function
 	BOOL
-	Matches(gpos::pointer<COperator *> pop) const override
+	Matches(COperator *pop) const override
 	{
 		if (pop->Eopid() == Eopid())
 		{
@@ -89,32 +89,31 @@ public:
 
 	// distribution matching type
 	CEnfdDistribution::EDistributionMatching
-	Edm(gpos::pointer<CReqdPropPlan *>,	  // prppInput
-		ULONG,							  // child_index
-		gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt
-		ULONG							  // ulOptReq
+	Edm(CReqdPropPlan *,   // prppInput
+		ULONG,			   // child_index
+		CDrvdPropArray *,  //pdrgpdpCtxt
+		ULONG			   // ulOptReq
 		) override
 	{
 		return CEnfdDistribution::EdmSatisfy;
 	}
 
-	gpos::owner<CEnfdDistribution *>
-	Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override
+	gpos::Ref<CEnfdDistribution>
+	Ped(CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
+		ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override
 	{
 		return PedCorrelatedJoin(mp, exprhdl, prppInput, child_index,
 								 pdrgpdpCtxt, ulOptReq);
 	}
 
 	// compute required distribution of the n-th child
-	gpos::owner<CDistributionSpec *>
-	PdsRequired(CMemoryPool *,						 // mp
-				CExpressionHandle &,				 // exprhdl,
-				gpos::pointer<CDistributionSpec *>,	 // pdsRequired,
-				ULONG,								 // child_index,
-				gpos::pointer<CDrvdPropArray *>,	 // pdrgpdpCtxt,
-				ULONG								 //ulOptReq
+	gpos::Ref<CDistributionSpec>
+	PdsRequired(CMemoryPool *,		  // mp
+				CExpressionHandle &,  // exprhdl,
+				CDistributionSpec *,  // pdsRequired,
+				ULONG,				  // child_index,
+				CDrvdPropArray *,	  // pdrgpdpCtxt,
+				ULONG				  //ulOptReq
 	) const override
 	{
 		GPOS_RAISE(
@@ -125,18 +124,17 @@ public:
 	}
 
 	// compute required rewindability of the n-th child
-	gpos::owner<CRewindabilitySpec *>
+	gpos::Ref<CRewindabilitySpec>
 	PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				gpos::pointer<CRewindabilitySpec *> prsRequired,
-				ULONG child_index, gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-				ULONG ulOptReq) const override
+				CRewindabilitySpec *prsRequired, ULONG child_index,
+				CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override
 	{
 		return PrsRequiredCorrelatedJoin(mp, exprhdl, prsRequired, child_index,
 										 pdrgpdpCtxt, ulOptReq);
 	}
 
 	// conversion function
-	static gpos::cast_func<CPhysicalCorrelatedInnerNLJoin *>
+	static CPhysicalCorrelatedInnerNLJoin *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -153,10 +151,10 @@ public:
 	}
 
 	// return required inner columns
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgPcrInner() const override
 	{
-		return m_pdrgpcrInner;
+		return m_pdrgpcrInner.get();
 	}
 
 	// origin subquery id
@@ -171,7 +169,7 @@ public:
 	OsPrint(IOstream &os) const override
 	{
 		os << this->SzId() << "(";
-		(void) CUtils::OsPrintDrgPcr(os, m_pdrgpcrInner);
+		(void) CUtils::OsPrintDrgPcr(os, m_pdrgpcrInner.get());
 		os << ")";
 
 		return os;

@@ -91,26 +91,26 @@ private:
 	ULONG m_id{GPOPT_INVALID_GEXPR_ID};
 
 	// duplicate group expression
-	gpos::pointer<CGroupExpression *> m_pgexprDuplicate;
+	CGroupExpression *m_pgexprDuplicate;
 
 	// operator class
-	gpos::owner<COperator *> m_pop{nullptr};
+	gpos::Ref<COperator> m_pop{nullptr};
 
 	// array of child groups
-	gpos::owner<CGroupArray *> m_pdrgpgroup{nullptr};
+	gpos::Ref<CGroupArray> m_pdrgpgroup{nullptr};
 
 	// sorted array of children groups for faster comparison
 	// of order-insensitive operators
-	gpos::owner<CGroupArray *> m_pdrgpgroupSorted{nullptr};
+	gpos::Ref<CGroupArray> m_pdrgpgroupSorted{nullptr};
 
 	// back pointer to group
-	gpos::pointer<CGroup *> m_pgroup{nullptr};
+	CGroup *m_pgroup{nullptr};
 
 	// id of xform that generated group expression
 	CXform::EXformId m_exfidOrigin{CXform::ExfInvalid};
 
 	// group expression that generated current group expression via xform
-	gpos::pointer<CGroupExpression *> m_pgexprOrigin{nullptr};
+	CGroupExpression *m_pgexprOrigin{nullptr};
 
 	// flag to indicate if group expression was created as a node at some
 	// intermediate level when origin expression was inserted to memo
@@ -123,7 +123,7 @@ private:
 	EOptimizationLevel m_eol{EolLow};
 
 	// map of partial plans to their cost lower bound
-	gpos::owner<PartialPlanToCostMap *> m_ppartialplancostmap{nullptr};
+	gpos::Ref<PartialPlanToCostMap> m_ppartialplancostmap{nullptr};
 
 	// circular dependency state
 	ECircularDependency m_ecirculardependency;
@@ -132,42 +132,38 @@ private:
 	ShtCC m_sht;
 
 	// set group back pointer
-	void SetGroup(gpos::pointer<CGroup *> pgroup);
+	void SetGroup(CGroup *pgroup);
 
 	// set group expression id
 	void SetId(ULONG id);
 
 	// print transformation
-	static void PrintXform(CMemoryPool *mp, gpos::pointer<CXform *> pxform,
-						   gpos::pointer<CExpression *> pexpr,
-						   gpos::pointer<CXformResult *> pxfres,
-						   ULONG ulNumResults);
+	static void PrintXform(CMemoryPool *mp, CXform *pxform, CExpression *pexpr,
+						   CXformResult *pxfres, ULONG ulNumResults);
 
 	// preprocessing before applying transformation
 	void PreprocessTransform(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-							 gpos::pointer<CXform *> pxform);
+							 CXform *pxform);
 
 	// postprocessing after applying transformation
 	void PostprocessTransform(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-							  gpos::pointer<CXform *> pxform) const;
+							  CXform *pxform) const;
 
 	// costing scheme
-	static CCost CostCompute(CMemoryPool *mp,
-							 gpos::pointer<CCostContext *> pcc);
+	static CCost CostCompute(CMemoryPool *mp, CCostContext *pcc);
 
 	// set optimization level of group expression
 	void SetOptimizationLevel();
 
 	// check validity of group expression
-	BOOL FValidContext(CMemoryPool *mp,
-					   gpos::pointer<COptimizationContext *> poc,
-					   gpos::pointer<COptimizationContextArray *> pdrgpocChild);
+	BOOL FValidContext(CMemoryPool *mp, COptimizationContext *poc,
+					   COptimizationContextArray *pdrgpocChild);
 
 	// remove cost context in hash table
 	CCostContext *PccRemove(COptimizationContext *poc, ULONG ulOptReq);
 
 	// insert given context in hash table only if a better context does not exist, return the context that is kept it in hash table
-	CCostContext *PccInsertBest(gpos::owner<CCostContext *> pcc);
+	CCostContext *PccInsertBest(gpos::Ref<CCostContext> pcc);
 
 	// print group expression cost contexts
 	IOstream &OsPrintCostContexts(IOstream &os, const CHAR *szPrefix) const;
@@ -180,17 +176,15 @@ public:
 	CGroupExpression(const CGroupExpression &) = delete;
 
 	// ctor
-	CGroupExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-					 gpos::owner<CGroupArray *> pdrgpgroup,
-					 CXform::EXformId exfid,
-					 gpos::pointer<CGroupExpression *> pgexprOrigin,
-					 BOOL fIntermediate);
+	CGroupExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+					 gpos::Ref<CGroupArray> pdrgpgroup, CXform::EXformId exfid,
+					 CGroupExpression *pgexprOrigin, BOOL fIntermediate);
 
 	// dtor
 	~CGroupExpression() override;
 
 	// duplicate group expression accessor
-	gpos::pointer<CGroupExpression *>
+	CGroupExpression *
 	PgexprDuplicate() const
 	{
 		return m_pgexprDuplicate;
@@ -198,7 +192,7 @@ public:
 
 	// set duplicate group expression
 	void
-	SetDuplicate(gpos::pointer<CGroupExpression *> pgexpr)
+	SetDuplicate(CGroupExpression *pgexpr)
 	{
 		GPOS_ASSERT(nullptr != pgexpr);
 
@@ -210,7 +204,7 @@ public:
 
 	// check if cost context already exists in group expression hash table
 	BOOL FCostContextExists(COptimizationContext *poc,
-							gpos::pointer<COptimizationContextArray *> pdrgpoc);
+							COptimizationContextArray *pdrgpoc);
 
 	// compute and store expression's cost under a given context
 	CCostContext *PccComputeCost(CMemoryPool *mp, COptimizationContext *poc,
@@ -223,11 +217,11 @@ public:
 						 CCostContext *pccChild, ULONG child_index);
 
 	// initialize group expression
-	void Init(gpos::pointer<CGroup *> pgroup, ULONG id);
+	void Init(CGroup *pgroup, ULONG id);
 
 	// reset group expression
 	void
-	Reset(gpos::pointer<CGroup *> pgroup, ULONG id)
+	Reset(CGroup *pgroup, ULONG id)
 	{
 		m_pgroup = pgroup;
 		m_id = id;
@@ -267,10 +261,10 @@ public:
 	}
 
 	// accessor for operator
-	gpos::pointer<COperator *>
+	COperator *
 	Pop() const
 	{
-		return m_pop;
+		return m_pop.get();
 	}
 
 	// accessor for id
@@ -281,7 +275,7 @@ public:
 	}
 
 	// accessor for containing group
-	gpos::pointer<CGroup *>
+	CGroup *
 	Pgroup() const
 	{
 		return m_pgroup;
@@ -295,7 +289,7 @@ public:
 	}
 
 	// origin group expression
-	gpos::pointer<CGroupExpression *>
+	CGroupExpression *
 	PgexprOrigin() const
 	{
 		return m_pgexprOrigin;
@@ -324,30 +318,27 @@ public:
 	}
 
 	// match group expression against given operator and its children
-	BOOL Matches(gpos::pointer<const CGroupExpression *>) const;
+	BOOL Matches(const CGroupExpression *) const;
 
 	// match non-scalar children of group expression against given children of passed expression
-	BOOL FMatchNonScalarChildren(
-		gpos::pointer<const CGroupExpression *> pgexpr) const;
+	BOOL FMatchNonScalarChildren(const CGroupExpression *pgexpr) const;
 
 	// hash function
 	ULONG
 	HashValue() const
 	{
-		return HashValue(m_pop, m_pdrgpgroup);
+		return HashValue(m_pop.get(), m_pdrgpgroup.get());
 	}
 
 	// static hash function for operator and group references
-	static ULONG HashValue(gpos::pointer<COperator *> pop,
-						   gpos::pointer<CGroupArray *> drgpgroup);
+	static ULONG HashValue(COperator *pop, CGroupArray *drgpgroup);
 
 	// static hash function for group expression
 	static ULONG HashValue(const CGroupExpression &);
 
 	// transform group expression
-	void Transform(CMemoryPool *mp, CMemoryPool *pmpLocal,
-				   gpos::pointer<CXform *> pxform,
-				   gpos::pointer<CXformResult *> pxfres, ULONG *pulElapsedTime,
+	void Transform(CMemoryPool *mp, CMemoryPool *pmpLocal, CXform *pxform,
+				   CXformResult *pxfres, ULONG *pulElapsedTime,
 				   ULONG *pulNumberOfBindings);
 
 	// set group expression state
@@ -373,27 +364,28 @@ public:
 	// check if transition to the given state is completed
 	BOOL FTransitioned(EState estate) const;
 
-	gpos::pointer<CGroupArray *>
+	CGroupArray *
 	Pdrgpgroup() const
 	{
-		return m_pdrgpgroup;
+		return m_pdrgpgroup.get();
 	}
 
 	// lookup cost context in hash table
 	CCostContext *PccLookup(COptimizationContext *poc, ULONG ulOptReq);
 
 	// lookup all cost contexts matching given optimization context
-	gpos::owner<CCostContextArray *> PdrgpccLookupAll(
-		CMemoryPool *mp, COptimizationContext *poc);
+	gpos::Ref<CCostContextArray> PdrgpccLookupAll(CMemoryPool *mp,
+												  COptimizationContext *poc);
 
 	// insert a cost context in hash table
 	CCostContext *PccInsert(CCostContext *pcc);
 
 	// derive statistics recursively on a given group expression
-	IStatistics *PstatsRecursiveDerive(
-		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-		gpos::pointer<CReqdPropRelational *> prprel,
-		IStatisticsArray *stats_ctxt, BOOL fComputeRootStats = true);
+	IStatistics *PstatsRecursiveDerive(CMemoryPool *pmpLocal,
+									   CMemoryPool *pmpGlobal,
+									   CReqdPropRelational *prprel,
+									   IStatisticsArray *stats_ctxt,
+									   BOOL fComputeRootStats = true);
 
 	// print driver
 	IOstream &OsPrint(IOstream &os) const;
