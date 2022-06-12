@@ -215,7 +215,7 @@ CDXLScalarAggref::SerializeValuesListChildToDXL(CXMLSerializer *xml_serializer,
 {
 	CDXLScalarValuesList *child = gpos::dyn_cast<CDXLScalarValuesList>(
 		((*dxlnode)[index])->GetOperator());
-	child->SerializeToDXL(xml_serializer, (*dxlnode)[index], attr_name);
+	child->SerializeToDXL(xml_serializer, (*dxlnode)[index].get(), attr_name);
 }
 
 //---------------------------------------------------------------------------
