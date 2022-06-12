@@ -104,7 +104,7 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 			mp, mdcache_obj, true /*fSerializeHeaders*/, false /*findent*/);
 
 		GPOS_CHECK_ABORT;
-		BOOL fInserted = m_mdmap->Insert(mdid_key, str.Value());
+		BOOL fInserted = m_mdmap->Insert(mdid_key.get(), str.Value());
 		if (!fInserted)
 		{
 			GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryDuplicate,

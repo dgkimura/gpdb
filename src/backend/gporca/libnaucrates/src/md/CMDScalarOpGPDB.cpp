@@ -289,10 +289,11 @@ CMDScalarOpGPDB::Serialize(CXMLSerializer *xml_serializer) const
 									EdxltokenGPDBScalarOpHashOpfamily,
 									EdxltokenGPDBScalarOpLegacyHashOpfamily};
 
-	IMDId *mdid_array[8] = {m_mdid_type_left,	  m_mdid_type_right,
-							m_mdid_type_result,	  m_func_mdid,
-							m_mdid_commute_opr,	  m_mdid_inverse_opr,
-							m_mdid_hash_opfamily, m_mdid_legacy_hash_opfamily};
+	IMDId *mdid_array[8] = {
+		m_mdid_type_left.get(),		m_mdid_type_right.get(),
+		m_mdid_type_result.get(),	m_func_mdid.get(),
+		m_mdid_commute_opr.get(),	m_mdid_inverse_opr.get(),
+		m_mdid_hash_opfamily.get(), m_mdid_legacy_hash_opfamily.get()};
 
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(dxl_token_array); ul++)
 	{
