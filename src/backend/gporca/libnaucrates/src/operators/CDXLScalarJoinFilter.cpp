@@ -106,13 +106,13 @@ CDXLScalarJoinFilter::AssertValid(const CDXLNode *node,
 
 	if (1 == node->Arity())
 	{
-		CDXLNode *dxlnode_condition = (*node)[0];
+		gpos::Ref<CDXLNode> dxlnode_condition = (*node)[0];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_condition->GetOperator()->GetDXLOperatorType());
 
 		if (validate_children)
 		{
-			dxlnode_condition->GetOperator()->AssertValid(dxlnode_condition,
+			dxlnode_condition->GetOperator()->AssertValid(dxlnode_condition.get(),
 														  validate_children);
 		}
 	}

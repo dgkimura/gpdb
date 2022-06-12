@@ -134,18 +134,18 @@ CDXLLogicalJoin::AssertValid(const CDXLNode *node, BOOL validate_children) const
 
 	for (ULONG idx = 0; idx < num_of_child - 1; ++idx)
 	{
-		CDXLNode *child_dxlnode = (*node)[idx];
+		gpos::Ref<CDXLNode> child_dxlnode = (*node)[idx];
 		GPOS_ASSERT(EdxloptypeLogical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 
 		if (validate_children)
 		{
-			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+			child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 													  validate_children);
 		}
 	}
 
-	CDXLNode *node_last_child = (*node)[num_of_child - 1];
+	gpos::Ref<CDXLNode> node_last_child = (*node)[num_of_child - 1];
 	GPOS_ASSERT(nullptr != node_last_child);
 
 	//The last child is a CDXLScalar operator representing the join qual
@@ -154,7 +154,7 @@ CDXLLogicalJoin::AssertValid(const CDXLNode *node, BOOL validate_children) const
 
 	if (validate_children)
 	{
-		node_last_child->GetOperator()->AssertValid(node_last_child,
+		node_last_child->GetOperator()->AssertValid(node_last_child.get(),
 													validate_children);
 	}
 }

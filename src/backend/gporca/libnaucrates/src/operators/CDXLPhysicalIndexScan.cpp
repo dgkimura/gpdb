@@ -190,7 +190,7 @@ CDXLPhysicalIndexScan::AssertValid(const CDXLNode *node,
 	GPOS_ASSERT(nullptr != m_dxl_table_descr->MdName());
 	GPOS_ASSERT(m_dxl_table_descr->MdName()->GetMDName()->IsValid());
 
-	CDXLNode *index_cond_dxlnode = (*node)[EdxlisIndexCondition];
+	gpos::Ref<CDXLNode> index_cond_dxlnode = (*node)[EdxlisIndexCondition];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarIndexCondList ==
@@ -198,7 +198,7 @@ CDXLPhysicalIndexScan::AssertValid(const CDXLNode *node,
 
 	if (validate_children)
 	{
-		index_cond_dxlnode->GetOperator()->AssertValid(index_cond_dxlnode,
+		index_cond_dxlnode->GetOperator()->AssertValid(index_cond_dxlnode.get(),
 													   validate_children);
 	}
 }

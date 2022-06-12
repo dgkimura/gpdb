@@ -139,8 +139,8 @@ CDXLLogicalProject::AssertValid(const CDXLNode *dxlnode,
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
 
-	CDXLNode *proj_list_dxlnode = (*dxlnode)[0];
-	CDXLNode *child_dxlnode = (*dxlnode)[1];
+	gpos::Ref<CDXLNode> proj_list_dxlnode = (*dxlnode)[0];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[1];
 
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list_dxlnode->GetOperator()->GetDXLOperator());
@@ -149,16 +149,16 @@ CDXLLogicalProject::AssertValid(const CDXLNode *dxlnode,
 
 	if (validate_children)
 	{
-		proj_list_dxlnode->GetOperator()->AssertValid(proj_list_dxlnode,
+		proj_list_dxlnode->GetOperator()->AssertValid(proj_list_dxlnode.get(),
 													  validate_children);
-		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 												  validate_children);
 	}
 
 	const ULONG arity = proj_list_dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *pdxlnPrEl = (*proj_list_dxlnode)[ul];
+		gpos::Ref<CDXLNode> pdxlnPrEl = (*proj_list_dxlnode)[ul];
 		GPOS_ASSERT(EdxlopScalarIdent !=
 					pdxlnPrEl->GetOperator()->GetDXLOperator());
 	}

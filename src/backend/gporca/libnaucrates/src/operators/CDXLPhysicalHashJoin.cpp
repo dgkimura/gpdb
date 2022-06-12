@@ -112,10 +112,10 @@ CDXLPhysicalHashJoin::AssertValid(const CDXLNode *node,
 	GPOS_ASSERT(EdxlhjIndexSentinel == node->Arity());
 	GPOS_ASSERT(EdxljtSentinel > GetJoinType());
 
-	CDXLNode *join_filter = (*node)[EdxlhjIndexJoinFilter];
-	CDXLNode *hash_clauses = (*node)[EdxlhjIndexHashCondList];
-	CDXLNode *left = (*node)[EdxlhjIndexHashLeft];
-	CDXLNode *right = (*node)[EdxlhjIndexHashRight];
+	gpos::Ref<CDXLNode> join_filter = (*node)[EdxlhjIndexJoinFilter];
+	gpos::Ref<CDXLNode> hash_clauses = (*node)[EdxlhjIndexHashCondList];
+	gpos::Ref<CDXLNode> left = (*node)[EdxlhjIndexHashLeft];
+	gpos::Ref<CDXLNode> right = (*node)[EdxlhjIndexHashRight];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarJoinFilter ==
@@ -129,11 +129,11 @@ CDXLPhysicalHashJoin::AssertValid(const CDXLNode *node,
 
 	if (validate_children)
 	{
-		join_filter->GetOperator()->AssertValid(join_filter, validate_children);
-		hash_clauses->GetOperator()->AssertValid(hash_clauses,
+		join_filter->GetOperator()->AssertValid(join_filter.get(), validate_children);
+		hash_clauses->GetOperator()->AssertValid(hash_clauses.get(),
 												 validate_children);
-		left->GetOperator()->AssertValid(left, validate_children);
-		right->GetOperator()->AssertValid(right, validate_children);
+		left->GetOperator()->AssertValid(left.get(), validate_children);
+		right->GetOperator()->AssertValid(right.get(), validate_children);
 	}
 }
 #endif	// GPOS_DEBUG

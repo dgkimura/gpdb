@@ -98,13 +98,13 @@ CDXLScalarHashExprList::AssertValid(const CDXLNode *node,
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDXLNode *child_dxlnode = (*node)[ul];
+		gpos::Ref<CDXLNode> child_dxlnode = (*node)[ul];
 		GPOS_ASSERT(EdxlopScalarHashExpr ==
 					child_dxlnode->GetOperator()->GetDXLOperator());
 
 		if (validate_children)
 		{
-			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+			child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 													  validate_children);
 		}
 	}

@@ -96,13 +96,13 @@ CDXLScalarSortColList::AssertValid(const CDXLNode *dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG idx = 0; idx < arity; idx++)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[idx];
+		gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxlopScalarSortCol ==
 					child_dxlnode->GetOperator()->GetDXLOperator());
 
 		if (validate_children)
 		{
-			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+			child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 													  validate_children);
 		}
 	}

@@ -253,13 +253,13 @@ CDXLPhysicalAgg::AssertValid(const CDXLNode *node, BOOL validate_children) const
 	GPOS_ASSERT(EdxlaggIndexSentinel == node->Arity());
 	GPOS_ASSERT(nullptr != m_grouping_colids_array);
 
-	CDXLNode *child_dxlnode = (*node)[EdxlaggIndexChild];
+	gpos::Ref<CDXLNode> child_dxlnode = (*node)[EdxlaggIndexChild];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 
 	if (validate_children)
 	{
-		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 												  validate_children);
 	}
 }

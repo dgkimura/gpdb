@@ -101,8 +101,8 @@ CDXLScalarSubqueryQuantified::AssertValid(const CDXLNode *dxlnode,
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
 
-	CDXLNode *pdxlnScalarChild = (*dxlnode)[EdxlsqquantifiedIndexScalar];
-	CDXLNode *pdxlnRelationalChild =
+	gpos::Ref<CDXLNode> pdxlnScalarChild = (*dxlnode)[EdxlsqquantifiedIndexScalar];
+	gpos::Ref<CDXLNode> pdxlnRelationalChild =
 		(*dxlnode)[EdxlsqquantifiedIndexRelational];
 
 	GPOS_ASSERT(EdxloptypeScalar ==

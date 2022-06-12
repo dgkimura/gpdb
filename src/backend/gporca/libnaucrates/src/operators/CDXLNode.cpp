@@ -328,8 +328,8 @@ CDXLNode::AssertValid(BOOL validate_children) const
 	const ULONG arity = Arity();
 	for (ULONG idx = 0; idx < arity; idx++)
 	{
-		CDXLNode *child_dxlnode = (*this)[idx];
-		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+		gpos::Ref<CDXLNode> child_dxlnode = (*this)[idx];
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 												  validate_children);
 	}
 }

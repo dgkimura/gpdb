@@ -235,8 +235,8 @@ CDXLPhysicalCTAS::AssertValid(const CDXLNode *dxlnode,
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
 
-	CDXLNode *proj_list_dxlnode = (*dxlnode)[0];
-	CDXLNode *child_dxlnode = (*dxlnode)[1];
+	gpos::Ref<CDXLNode> proj_list_dxlnode = (*dxlnode)[0];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[1];
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list_dxlnode->GetOperator()->GetDXLOperator());
 	GPOS_ASSERT(EdxloptypePhysical ==
@@ -244,7 +244,7 @@ CDXLPhysicalCTAS::AssertValid(const CDXLNode *dxlnode,
 
 	if (validate_children)
 	{
-		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 												  validate_children);
 	}
 }

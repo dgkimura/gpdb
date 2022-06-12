@@ -236,7 +236,7 @@ CDXLScalarSubPlan::AssertValid(const CDXLNode *dxlnode,
 
 	// assert child plan is a physical plan and is valid
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlSubPlanIndexChildPlan];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[EdxlSubPlanIndexChildPlan];
 	GPOS_ASSERT(nullptr != child_dxlnode);
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
@@ -247,7 +247,7 @@ CDXLScalarSubPlan::AssertValid(const CDXLNode *dxlnode,
 
 	if (validate_children)
 	{
-		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 												  validate_children);
 	}
 }

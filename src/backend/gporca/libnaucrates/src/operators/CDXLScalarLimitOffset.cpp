@@ -102,13 +102,13 @@ CDXLScalarLimitOffset::AssertValid(const CDXLNode *node,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*node)[ul];
+		gpos::Ref<CDXLNode> dxlnode_arg = (*node)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 
 		if (validate_children)
 		{
-			dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg,
+			dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg.get(),
 													validate_children);
 		}
 	}

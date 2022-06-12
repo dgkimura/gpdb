@@ -203,13 +203,13 @@ CDXLScalarWindowRef::AssertValid(const CDXLNode *dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_winref_arg = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> dxlnode_winref_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_winref_arg->GetOperator()->GetDXLOperatorType());
 
 		if (validate_children)
 		{
-			dxlnode_winref_arg->GetOperator()->AssertValid(dxlnode_winref_arg,
+			dxlnode_winref_arg->GetOperator()->AssertValid(dxlnode_winref_arg.get(),
 														   validate_children);
 		}
 	}

@@ -225,13 +225,13 @@ CDXLLogicalSetOp::AssertValid(const CDXLNode *node,
 	const ULONG num_of_child = node->Arity();
 	for (ULONG idx = 0; idx < num_of_child; ++idx)
 	{
-		CDXLNode *child_dxlnode = (*node)[idx];
+		gpos::Ref<CDXLNode> child_dxlnode = (*node)[idx];
 		GPOS_ASSERT(EdxloptypeLogical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 
 		if (validate_children)
 		{
-			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+			child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 													  validate_children);
 		}
 	}

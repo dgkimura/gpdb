@@ -120,14 +120,14 @@ CDXLPhysicalRoutedDistributeMotion::AssertValid(const CDXLNode *dxlnode,
 
 	GPOS_ASSERT(EdxlroutedmIndexSentinel == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlroutedmIndexChild];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[EdxlroutedmIndexChild];
 
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 
 	if (validate_children)
 	{
-		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 												  validate_children);
 	}
 }

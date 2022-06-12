@@ -108,10 +108,10 @@ CDXLScalarBitmapIndexProbe::AssertValid(const CDXLNode *dxlnode,
 
 	if (validate_children)
 	{
-		CDXLNode *pdxlnIndexCondList = (*dxlnode)[0];
+		gpos::Ref<CDXLNode> pdxlnIndexCondList = (*dxlnode)[0];
 		GPOS_ASSERT(EdxlopScalarIndexCondList ==
 					pdxlnIndexCondList->GetOperator()->GetDXLOperator());
-		pdxlnIndexCondList->GetOperator()->AssertValid(pdxlnIndexCondList,
+		pdxlnIndexCondList->GetOperator()->AssertValid(pdxlnIndexCondList.get(),
 													   validate_children);
 	}
 

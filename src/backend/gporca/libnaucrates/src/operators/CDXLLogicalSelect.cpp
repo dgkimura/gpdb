@@ -100,8 +100,8 @@ CDXLLogicalSelect::AssertValid(const CDXLNode *node,
 {
 	GPOS_ASSERT(2 == node->Arity());
 
-	CDXLNode *condition_dxl = (*node)[0];
-	CDXLNode *child_dxlnode = (*node)[1];
+	gpos::Ref<CDXLNode> condition_dxl = (*node)[0];
+	gpos::Ref<CDXLNode> child_dxlnode = (*node)[1];
 
 	GPOS_ASSERT(EdxloptypeScalar ==
 				condition_dxl->GetOperator()->GetDXLOperatorType());
@@ -110,9 +110,9 @@ CDXLLogicalSelect::AssertValid(const CDXLNode *node,
 
 	if (validate_children)
 	{
-		condition_dxl->GetOperator()->AssertValid(condition_dxl,
+		condition_dxl->GetOperator()->AssertValid(condition_dxl.get(),
 												  validate_children);
-		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 												  validate_children);
 	}
 }

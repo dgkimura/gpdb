@@ -100,13 +100,13 @@ CDXLScalarSwitchCase::AssertValid(const CDXLNode *dxlnode,
 
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[idx];
+		gpos::Ref<CDXLNode> dxlnode_arg = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 
 		if (validate_children)
 		{
-			dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg,
+			dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg.get(),
 													validate_children);
 		}
 	}

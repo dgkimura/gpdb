@@ -179,13 +179,13 @@ CDXLPhysicalMaterialize::AssertValid(const CDXLNode *node,
 				EdxlspoolMaterialize == m_spool_type);
 	GPOS_ASSERT(EdxlmatIndexSentinel == node->Arity());
 
-	CDXLNode *child_dxlnode = (*node)[EdxlmatIndexChild];
+	gpos::Ref<CDXLNode> child_dxlnode = (*node)[EdxlmatIndexChild];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 
 	if (validate_children)
 	{
-		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 												  validate_children);
 	}
 }

@@ -158,7 +158,7 @@ CDXLScalarComp::AssertValid(const CDXLNode *node, BOOL validate_children) const
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *child_dxlnode = (*node)[ul];
+		gpos::Ref<CDXLNode> child_dxlnode = (*node)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 						child_dxlnode->GetOperator()->GetDXLOperatorType() ||
 					EdxloptypeLogical ==
@@ -166,7 +166,7 @@ CDXLScalarComp::AssertValid(const CDXLNode *node, BOOL validate_children) const
 
 		if (validate_children)
 		{
-			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+			child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 													  validate_children);
 		}
 	}

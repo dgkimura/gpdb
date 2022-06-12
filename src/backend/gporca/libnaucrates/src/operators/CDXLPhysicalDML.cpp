@@ -197,13 +197,13 @@ void
 CDXLPhysicalDML::AssertValid(const CDXLNode *node, BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == node->Arity());
-	CDXLNode *child_dxlnode = (*node)[1];
+	gpos::Ref<CDXLNode> child_dxlnode = (*node)[1];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 
 	if (validate_children)
 	{
-		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 												  validate_children);
 	}
 }

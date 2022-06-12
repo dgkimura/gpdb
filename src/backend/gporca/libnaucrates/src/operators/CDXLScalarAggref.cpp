@@ -303,13 +303,13 @@ CDXLScalarAggref::AssertValid(const CDXLNode *dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *aggref_child_dxl = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> aggref_child_dxl = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					aggref_child_dxl->GetOperator()->GetDXLOperatorType());
 
 		if (validate_children)
 		{
-			aggref_child_dxl->GetOperator()->AssertValid(aggref_child_dxl,
+			aggref_child_dxl->GetOperator()->AssertValid(aggref_child_dxl.get(),
 														 validate_children);
 		}
 	}

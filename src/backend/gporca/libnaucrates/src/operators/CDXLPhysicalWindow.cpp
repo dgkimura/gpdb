@@ -192,10 +192,10 @@ CDXLPhysicalWindow::AssertValid(const CDXLNode *dxlnode,
 	GPOS_ASSERT(nullptr != m_part_by_colid_array);
 	GPOS_ASSERT(nullptr != m_dxl_window_key_array);
 	GPOS_ASSERT(EdxlwindowIndexSentinel == dxlnode->Arity());
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlwindowIndexChild];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[EdxlwindowIndexChild];
 	if (validate_children)
 	{
-		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 												  validate_children);
 	}
 }

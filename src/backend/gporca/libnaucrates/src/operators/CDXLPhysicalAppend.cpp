@@ -182,13 +182,13 @@ CDXLPhysicalAppend::AssertValid(const CDXLNode *dxlnode,
 	const ULONG ulChildren = dxlnode->Arity();
 	for (ULONG ul = EdxlappendIndexFirstChild; ul < ulChildren; ul++)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypePhysical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 
 		if (validate_children)
 		{
-			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+			child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 													  validate_children);
 		}
 	}

@@ -71,8 +71,8 @@ CDXLPhysical::AssertValid(const CDXLNode *node, BOOL validate_children) const
 
 	GPOS_ASSERT(2 <= node->Arity());
 
-	CDXLNode *proj_list_dxlnode = (*node)[0];
-	CDXLNode *filter_dxlnode = (*node)[1];
+	gpos::Ref<CDXLNode> proj_list_dxlnode = (*node)[0];
+	gpos::Ref<CDXLNode> filter_dxlnode = (*node)[1];
 
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list_dxlnode->GetOperator()->GetDXLOperator());
@@ -81,9 +81,9 @@ CDXLPhysical::AssertValid(const CDXLNode *node, BOOL validate_children) const
 
 	if (validate_children)
 	{
-		proj_list_dxlnode->GetOperator()->AssertValid(proj_list_dxlnode,
+		proj_list_dxlnode->GetOperator()->AssertValid(proj_list_dxlnode.get(),
 													  validate_children);
-		filter_dxlnode->GetOperator()->AssertValid(filter_dxlnode,
+		filter_dxlnode->GetOperator()->AssertValid(filter_dxlnode.get(),
 												   validate_children);
 	}
 }

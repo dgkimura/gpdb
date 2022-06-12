@@ -202,13 +202,13 @@ CDXLScalarFuncExpr::AssertValid(const CDXLNode *dxlnode,
 {
 	for (ULONG ul = 0; ul < dxlnode->Arity(); ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 
 		if (validate_children)
 		{
-			dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg,
+			dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg.get(),
 													validate_children);
 		}
 	}

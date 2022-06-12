@@ -116,10 +116,10 @@ CDXLPhysicalMergeJoin::AssertValid(const CDXLNode *dxlnode,
 	GPOS_ASSERT(EdxlmjIndexSentinel == dxlnode->Arity());
 	GPOS_ASSERT(EdxljtSentinel > GetJoinType());
 
-	CDXLNode *dxlnode_join_filter = (*dxlnode)[EdxlmjIndexJoinFilter];
-	CDXLNode *dxlnode_merge_clauses = (*dxlnode)[EdxlmjIndexMergeCondList];
-	CDXLNode *dxlnode_left = (*dxlnode)[EdxlmjIndexLeftChild];
-	CDXLNode *dxlnode_right = (*dxlnode)[EdxlmjIndexRightChild];
+	gpos::Ref<CDXLNode> dxlnode_join_filter = (*dxlnode)[EdxlmjIndexJoinFilter];
+	gpos::Ref<CDXLNode> dxlnode_merge_clauses = (*dxlnode)[EdxlmjIndexMergeCondList];
+	gpos::Ref<CDXLNode> dxlnode_left = (*dxlnode)[EdxlmjIndexLeftChild];
+	gpos::Ref<CDXLNode> dxlnode_right = (*dxlnode)[EdxlmjIndexRightChild];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarJoinFilter ==
@@ -133,13 +133,13 @@ CDXLPhysicalMergeJoin::AssertValid(const CDXLNode *dxlnode,
 
 	if (validate_children)
 	{
-		dxlnode_join_filter->GetOperator()->AssertValid(dxlnode_join_filter,
+		dxlnode_join_filter->GetOperator()->AssertValid(dxlnode_join_filter.get(),
 														validate_children);
-		dxlnode_merge_clauses->GetOperator()->AssertValid(dxlnode_merge_clauses,
+		dxlnode_merge_clauses->GetOperator()->AssertValid(dxlnode_merge_clauses.get(),
 														  validate_children);
-		dxlnode_left->GetOperator()->AssertValid(dxlnode_left,
+		dxlnode_left->GetOperator()->AssertValid(dxlnode_left.get(),
 												 validate_children);
-		dxlnode_right->GetOperator()->AssertValid(dxlnode_right,
+		dxlnode_right->GetOperator()->AssertValid(dxlnode_right.get(),
 												  validate_children);
 	}
 }

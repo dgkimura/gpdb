@@ -145,13 +145,13 @@ CDXLScalarBooleanTest::AssertValid(const CDXLNode *dxlnode,
 				(EdxlbooleantestIsNotUnknown == dxl_bool_type));
 
 	GPOS_ASSERT(1 == dxlnode->Arity());
-	CDXLNode *dxlnode_arg = (*dxlnode)[0];
+	gpos::Ref<CDXLNode> dxlnode_arg = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeScalar ==
 				dxlnode_arg->GetOperator()->GetDXLOperatorType());
 
 	if (validate_children)
 	{
-		dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg, validate_children);
+		dxlnode_arg->GetOperator()->AssertValid(dxlnode_arg.get(), validate_children);
 	}
 }
 

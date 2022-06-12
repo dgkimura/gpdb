@@ -140,13 +140,13 @@ CDXLPhysicalSubqueryScan::AssertValid(const CDXLNode *dxlnode,
 	// subquery scan has 3 children
 	GPOS_ASSERT(EdxlsubqscanIndexSentinel == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlsubqscanIndexChild];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[EdxlsubqscanIndexChild];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 
 	if (validate_children)
 	{
-		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
+		child_dxlnode->GetOperator()->AssertValid(child_dxlnode.get(),
 												  validate_children);
 	}
 
