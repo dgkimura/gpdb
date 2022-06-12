@@ -19,6 +19,7 @@
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/base/COrderSpec.h"
+#include "gpopt/base/CPartitionPropagationSpec.h"
 #include "gpopt/base/CRewindabilitySpec.h"
 
 namespace gpopt

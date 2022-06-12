@@ -56,6 +56,19 @@ CPartitionPropagationSpec::SPartPropSpecInfo::CmpFunc(const void *val1,
 }
 
 
+CPartitionPropagationSpec::SPartPropSpecInfo::SPartPropSpecInfo(
+	ULONG scan_id, EPartPropSpecInfoType type, gpos::Ref<IMDId> rool_rel_mdid)
+	: m_scan_id(scan_id),
+	  m_type(type),
+	  m_root_rel_mdid(std::move(rool_rel_mdid))
+{
+	GPOS_ASSERT(m_root_rel_mdid != nullptr);
+
+	CMemoryPool *mp = COptCtxt::PoctxtFromTLS()->Pmp();
+	m_selector_ids = GPOS_NEW(mp) CBitSet(mp);
+}
+
+
 CPartitionPropagationSpec::CPartitionPropagationSpec(CMemoryPool *mp)
 {
 	m_part_prop_spec_infos = GPOS_NEW(mp) SPartPropSpecInfoArray(mp);
