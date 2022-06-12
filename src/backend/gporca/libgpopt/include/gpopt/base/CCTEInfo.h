@@ -26,6 +26,7 @@ namespace gpopt
 {
 // fwd declarations
 class CLogicalCTEConsumer;
+class CCTEReq;
 
 //---------------------------------------------------------------------------
 //	@class:
