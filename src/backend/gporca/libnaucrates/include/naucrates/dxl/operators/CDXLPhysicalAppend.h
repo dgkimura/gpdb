@@ -87,7 +87,7 @@ public:
 	}
 
 	void
-	SetDXLTableDesc(CDXLTableDescr *dxl_table_desc)
+	SetDXLTableDesc(gpos::Ref<CDXLTableDescr> dxl_table_desc)
 	{
 		m_dxl_table_descr = dxl_table_desc;
 	}
