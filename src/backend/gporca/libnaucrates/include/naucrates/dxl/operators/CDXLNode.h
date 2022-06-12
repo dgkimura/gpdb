@@ -85,11 +85,11 @@ public:
 	~CDXLNode() override;
 
 	// shorthand to access children
-	inline CDXLNode *
+	inline gpos::Ref<CDXLNode>
 	operator[](ULONG idx) const
 	{
 		GPOS_ASSERT(nullptr != m_dxl_array);
-		CDXLNode *dxl_node = (*m_dxl_array)[idx];
+		gpos::Ref<CDXLNode>dxl_node = (*m_dxl_array)[idx];
 		GPOS_ASSERT(nullptr != dxl_node);
 		return dxl_node;
 	};
