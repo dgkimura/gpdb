@@ -67,7 +67,7 @@ public:
 	}
 
 	// mapping
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsEquivClass(const CColRef *colref) const
 	{
 		if (nullptr == m_phmcrcrs)
