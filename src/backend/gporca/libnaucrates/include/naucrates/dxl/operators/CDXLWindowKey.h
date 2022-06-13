@@ -61,7 +61,7 @@ public:
 	}
 
 	// set the list of sort columns
-	void SetSortColList(CDXLNode *sort_col_list_dxlnode);
+	void SetSortColList(gpos::Ref<CDXLNode> sort_col_list_dxlnode);
 
 	// sort columns
 	CDXLNode *
