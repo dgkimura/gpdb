@@ -139,7 +139,8 @@ private:
 			os << m_id << (EctProducer == m_ect ? "p" : "c");
 			if (nullptr != m_pdpplan)
 			{
-				os << "(" << *m_pdpplan << ")";
+				//FIXME: dkimura
+				//os << "(" << *m_pdpplan << ")";
 			}
 			return os;
 		}

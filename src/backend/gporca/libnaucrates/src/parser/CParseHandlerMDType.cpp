@@ -230,25 +230,25 @@ CParseHandlerMDType::ParseMdid(const XMLCh *element_local_name,
 							   const Attributes &attrs)
 {
 	const SMdidMapElem rgmdidmap[] = {
-		{EdxltokenMDTypeEqOp, &m_mdid_eq_op},
-		{EdxltokenMDTypeNEqOp, &m_mdid_neq_op},
-		{EdxltokenMDTypeLTOp, &m_mdid_lt_op},
-		{EdxltokenMDTypeLEqOp, &m_mdid_lteq_op},
-		{EdxltokenMDTypeGTOp, &m_mdid_gt_op},
-		{EdxltokenMDTypeGEqOp, &m_mdid_gteq_op},
-		{EdxltokenMDTypeCompOp, &m_mdid_cmp_op},
-		{EdxltokenMDTypeArray, &m_mdid_array_type},
-		{EdxltokenMDTypeAggMin, &m_mdid_min_op},
-		{EdxltokenMDTypeAggMax, &m_mdid_max_op},
-		{EdxltokenMDTypeAggAvg, &m_mdid_avg_op},
-		{EdxltokenMDTypeAggSum, &m_mdid_sum_op},
-		{EdxltokenMDTypeAggCount, &m_mdid_count_op},
-		{EdxltokenMDTypeDistrOpfamily, &m_distr_opfamily},
-		{EdxltokenMDTypeLegacyDistrOpfamily, &m_legacy_distr_opfamily},
+		{EdxltokenMDTypeEqOp, m_mdid_eq_op},
+		{EdxltokenMDTypeNEqOp, m_mdid_neq_op},
+		{EdxltokenMDTypeLTOp, m_mdid_lt_op},
+		{EdxltokenMDTypeLEqOp, m_mdid_lteq_op},
+		{EdxltokenMDTypeGTOp, m_mdid_gt_op},
+		{EdxltokenMDTypeGEqOp, m_mdid_gteq_op},
+		{EdxltokenMDTypeCompOp, m_mdid_cmp_op},
+		{EdxltokenMDTypeArray, m_mdid_array_type},
+		{EdxltokenMDTypeAggMin, m_mdid_min_op},
+		{EdxltokenMDTypeAggMax, m_mdid_max_op},
+		{EdxltokenMDTypeAggAvg, m_mdid_avg_op},
+		{EdxltokenMDTypeAggSum, m_mdid_sum_op},
+		{EdxltokenMDTypeAggCount, m_mdid_count_op},
+		{EdxltokenMDTypeDistrOpfamily, m_distr_opfamily},
+		{EdxltokenMDTypeLegacyDistrOpfamily, m_legacy_distr_opfamily},
 	};
 
 	Edxltoken token_type = EdxltokenSentinel;
-	IMDId **token_mdid = nullptr;
+	gpos::Ref<IMDId> token_mdid = nullptr;
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(rgmdidmap); ul++)
 	{
 		SMdidMapElem mdidmapelem = rgmdidmap[ul];
@@ -264,14 +264,7 @@ CParseHandlerMDType::ParseMdid(const XMLCh *element_local_name,
 	GPOS_ASSERT(EdxltokenSentinel != token_type);
 	GPOS_ASSERT(nullptr != token_mdid);
 
-	if (m_mdid_min_op == *token_mdid || m_mdid_max_op == *token_mdid ||
-		m_mdid_avg_op == *token_mdid || m_mdid_sum_op == *token_mdid ||
-		m_mdid_count_op == *token_mdid)
-	{
-		(*token_mdid)->Release();
-	}
-
-	*token_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+	token_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
 		token_type);
 }

@@ -43,7 +43,7 @@ private:
 		Edxltoken m_edxltoken;
 
 		// address of the member variable for that name
-		gpos::owner<IMDId *> *m_token_mdid;
+		gpos::Ref<IMDId> m_token_mdid;
 	};
 
 	// id and version of the type
