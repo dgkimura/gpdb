@@ -196,7 +196,7 @@ CJoinStatsProcessor::CalcAllJoinStats(CMemoryPool *mp,
 
 		gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 			CStatsPredUtils::ExtractJoinStatsFromJoinPredArray(
-				mp, join_preds_available, output_colrefsets.get(), outer_refs,
+				mp, join_preds_available, output_colrefsets.get(), outer_refs.get(),
 				is_a_left_join,	 // left joins use an anti-semijoin internally
 				&unsupported_pred_stats);
 
@@ -435,10 +435,10 @@ CJoinStatsProcessor::SetResultingJoinStats(
 	;
 	;
 
-	UlongToDoubleMap *col_width_mapping_result = outer_stats->CopyWidths(mp);
+	gpos::Ref<UlongToDoubleMap> col_width_mapping_result = outer_stats->CopyWidths(mp);
 	if (!semi_join)
 	{
-		inner_side_stats->CopyWidthsInto(mp, col_width_mapping_result);
+		inner_side_stats->CopyWidthsInto(mp, col_width_mapping_result.get());
 	}
 
 	// create an output stats object
@@ -562,7 +562,7 @@ CJoinStatsProcessor::DeriveJoinStats(CMemoryPool *mp,
 	// get outer references from expression handle
 	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
 
-	CPredicateUtils::SeparateOuterRefs(mp, join_pred_expr, outer_refs,
+	CPredicateUtils::SeparateOuterRefs(mp, join_pred_expr, outer_refs.get(),
 									   &local_expr, &expr_with_outer_refs);
 	;
 
@@ -583,7 +583,7 @@ CJoinStatsProcessor::DeriveJoinStats(CMemoryPool *mp,
 	{
 		// derive stats based on outer references
 		gpos::Ref<IStatistics> stats = DeriveStatsWithOuterRefs(
-			mp, exprhdl, expr_with_outer_refs, join_stats, stats_ctxt);
+			mp, exprhdl, expr_with_outer_refs.get(), join_stats, stats_ctxt);
 		;
 		join_stats = stats;
 	}

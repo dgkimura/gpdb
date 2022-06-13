@@ -137,7 +137,7 @@ CStatisticsUtils::TransformMCVToHist(CMemoryPool *mp,
 	gpos::Ref<SMcvPairPtrArray> mcv_pairs = GPOS_NEW(mp) SMcvPairPtrArray(mp);
 	for (ULONG i = 0; i < num_mcv_values; i++)
 	{
-		IDatum *datum = (*mcv_datums)[i];
+		gpos::Ref<IDatum> datum = (*mcv_datums)[i];
 		CDouble mcv_freq = *((*freq_array)[i]);
 		;
 		SMcvPair *mcv_pair = GPOS_NEW(mp) SMcvPair(datum, mcv_freq);

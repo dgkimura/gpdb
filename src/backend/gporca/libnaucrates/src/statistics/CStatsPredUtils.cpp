@@ -617,7 +617,7 @@ CStatsPredUtils::CreateStatsPredConj(CMemoryPool *mp, CExpression *scalar_expr,
 		}
 		else
 		{
-			AddSupportedStatsFilters(mp, pred_stats_array, predicate_expr,
+			AddSupportedStatsFilters(mp, pred_stats_array.get(), predicate_expr,
 									 outer_refs);
 		}
 	}
