@@ -199,6 +199,10 @@ private:
 	static CExpression *PexprReorderScalarCmpChildren(CMemoryPool *mp,
 													  CExpression *pexpr);
 
+	// attempt to push down a project element to a corresponding logical get
+	static CExpression *PexprTransposeSelectAndProject(CMemoryPool *mp,
+													   CExpression *pexpr);
+
 	// private ctor
 	CExpressionPreprocessor();
 

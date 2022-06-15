@@ -33,6 +33,7 @@
 #include "gpopt/operators/CLogicalLimit.h"
 #include "gpopt/operators/CLogicalNAryJoin.h"
 #include "gpopt/operators/CLogicalProject.h"
+#include "gpopt/operators/CLogicalSelect.h"
 #include "gpopt/operators/CLogicalSequenceProject.h"
 #include "gpopt/operators/CLogicalSetOp.h"
 #include "gpopt/operators/CLogicalUnion.h"
@@ -2573,6 +2574,104 @@ CExpressionPreprocessor::PexprExistWithPredFromINSubq(CMemoryPool *mp,
 	return pexprNew;
 }
 
+// Collapse select (remove project) and update references.
+static CExpression *
+ReplaceReferences(CMemoryPool *mp, CExpression *pexpr, CColRef *pcolref,
+				  CExpression *pProjectExpr)
+{
+	if (pexpr->Pop()->Eopid() == COperator::EopLogicalSelect &&
+		(*pexpr)[0]->Pop()->Eopid() == COperator::EopLogicalProject)
+	{
+		// TODO if select->project->nary
+		(*(*pexpr)[0])[0]->AddRef();
+		return GPOS_NEW(mp) CExpression(
+			mp, GPOS_NEW(mp) CLogicalSelect(mp), (*(*pexpr)[0])[0],
+			ReplaceReferences(mp, (*pexpr)[1], pcolref, pProjectExpr));
+	}
+
+	// replace reference
+	if (pexpr->Pop()->Eopid() == COperator::EopScalarIdent &&
+		CColRef::Equals(CScalarIdent::PopConvert(pexpr->Pop())->Pcr(), pcolref))
+	{
+		pProjectExpr->AddRef();
+		return pProjectExpr;
+	}
+
+	// recurse to children
+	CExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) CExpressionArray(mp);
+	for (ULONG ul = 0; ul < pexpr->Arity(); ul++)
+	{
+		pdrgpexprChildren->Append(
+			ReplaceReferences(mp, (*pexpr)[ul], pcolref, pProjectExpr));
+	}
+
+	COperator *pop = pexpr->Pop();
+	pop->AddRef();
+	return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexprChildren);
+}
+
+CExpression *
+CExpressionPreprocessor::PexprTransposeSelectAndProject(CMemoryPool *mp,
+														CExpression *pexpr)
+{
+	// protect against stack overflow during recursion
+	GPOS_CHECK_STACK_SIZE;
+	GPOS_ASSERT(NULL != mp);
+	GPOS_ASSERT(NULL != pexpr);
+
+	// Transpose:
+	//
+	// Input:
+	// +--CLogicalSelect (x = 'meh')
+	//    +--CLogicalProject (col1...n, expr as x)
+	//       +-- CLogicalNAryJoin
+	// Output:
+	// +--CLogicalProject (col1..n, expr as x)
+	//    +--CLogicalSelect (expr = 'meh')
+	//       +-- CLogicalNAryJoin
+	if (pexpr->Pop()->Eopid() == COperator::EopLogicalSelect &&
+		(*pexpr)[0]->Pop()->Eopid() == COperator::EopLogicalProject &&
+		(*(*pexpr)[0])[0]->Pop()->Eopid() == COperator::EopLogicalNAryJoin)
+	{
+		CExpression *pproject = (*pexpr)[0];
+		CExpression *pselectNew = pexpr;
+
+		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+		for (ULONG ul = 0; ul < (*pproject)[1]->Arity(); ul++)
+		{
+			pselectNew = ReplaceReferences(
+				mp, pselectNew, CUtils::PNthProjectElement(pproject, ul)->Pcr(),
+				CUtils::PNthProjectElementExpr(pproject, ul));
+		}
+		pdrgpexpr->Append(pselectNew);
+
+		CExpressionArray *pdrgpprojelems = GPOS_NEW(mp) CExpressionArray(mp);
+		for (ULONG ul = 0; ul < (*pproject)[1]->Arity(); ul++)
+		{
+			(*(*pproject)[1])[ul]->AddRef();
+			pdrgpprojelems->Append((*(*pproject)[1])[ul]);
+		}
+		pdrgpexpr->Append(GPOS_NEW(mp) CExpression(
+			mp, GPOS_NEW(mp) CScalarProjectList(mp), pdrgpprojelems));
+
+		return GPOS_NEW(mp)
+			CExpression(mp, GPOS_NEW(mp) CLogicalProject(mp), pdrgpexpr);
+	}
+	else
+	{
+		CExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) CExpressionArray(mp);
+		for (ULONG ul = 0; ul < pexpr->Arity(); ul++)
+		{
+			pdrgpexprChildren->Append(
+				PexprTransposeSelectAndProject(mp, (*pexpr)[ul]));
+		}
+
+		COperator *pop = pexpr->Pop();
+		pop->AddRef();
+		return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexprChildren);
+	}
+}
+
 // main driver, pre-processing of input logical expression
 CExpression *
 CExpressionPreprocessor::PexprPreprocess(
@@ -2754,11 +2853,16 @@ CExpressionPreprocessor::PexprPreprocess(
 	GPOS_CHECK_ABORT;
 	pexrReorderedScalarCmpChildren->Release();
 
-	// (27) normalize expression again
-	CExpression *pexprNormalized2 =
-		CNormalizer::PexprNormalize(mp, pexprExistWithPredFromINSubq);
-	GPOS_CHECK_ABORT;
+	// (17) push down project elemnts
+	CExpression *pexprPushedDownProjects =
+		PexprTransposeSelectAndProject(mp, pexprExistWithPredFromINSubq);
 	pexprExistWithPredFromINSubq->Release();
+
+	// (28) normalize expression again
+	CExpression *pexprNormalized2 =
+		CNormalizer::PexprNormalize(mp, pexprPushedDownProjects);
+	GPOS_CHECK_ABORT;
+	pexprPushedDownProjects->Release();
 
 	return pexprNormalized2;
 }
