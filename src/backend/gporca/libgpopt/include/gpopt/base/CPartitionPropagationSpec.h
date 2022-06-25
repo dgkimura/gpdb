@@ -59,14 +59,7 @@ private:
 		CExpression *m_filter_expr = nullptr;
 
 		SPartPropSpecInfo(ULONG scan_id, EPartPropSpecInfoType type,
-						  IMDId *rool_rel_mdid)
-			: m_scan_id(scan_id), m_type(type), m_root_rel_mdid(rool_rel_mdid)
-		{
-			GPOS_ASSERT(m_root_rel_mdid != nullptr);
-
-			CMemoryPool *mp = COptCtxt::PoctxtFromTLS()->Pmp();
-			m_selector_ids = GPOS_NEW(mp) CBitSet(mp);
-		}
+						  IMDId *rool_rel_mdid);
 
 		~SPartPropSpecInfo() override
 		{
