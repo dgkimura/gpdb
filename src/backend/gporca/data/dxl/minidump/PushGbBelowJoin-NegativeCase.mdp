@@ -535,9 +535,9 @@
                     </dxl:GroupingColumns>
                     <dxl:ProjList>
                       <dxl:ProjElem ColId="16" Alias="avg">
-                        <dxl:AggFunc AggMdid="0.2101.1.0" AggDistinct="false" AggStage="Normal" AggKind="n" >
+                        <dxl:AggFunc AggMdid="0.2101.1.0" AggDistinct="false" AggStage="Normal" AggKind="n">
                           <dxl:ValuesList ParamType="aggargs">
-                          <dxl:Ident ColId="8" ColName="c504" TypeMdid="0.23.1.0"/>
+                            <dxl:Ident ColId="8" ColName="c504" TypeMdid="0.23.1.0"/>
                           </dxl:ValuesList>
                           <dxl:ValuesList ParamType="aggdirectargs"/>
                           <dxl:ValuesList ParamType="aggorder"/>
@@ -545,9 +545,9 @@
                         </dxl:AggFunc>
                       </dxl:ProjElem>
                       <dxl:ProjElem ColId="17" Alias="max">
-                        <dxl:AggFunc AggMdid="0.2116.1.0" AggDistinct="false" AggStage="Normal" AggKind="n" >
+                        <dxl:AggFunc AggMdid="0.2116.1.0" AggDistinct="false" AggStage="Normal" AggKind="n">
                           <dxl:ValuesList ParamType="aggargs">
-                          <dxl:Ident ColId="8" ColName="c504" TypeMdid="0.23.1.0"/>
+                            <dxl:Ident ColId="8" ColName="c504" TypeMdid="0.23.1.0"/>
                           </dxl:ValuesList>
                           <dxl:ValuesList ParamType="aggdirectargs"/>
                           <dxl:ValuesList ParamType="aggorder"/>
@@ -700,9 +700,9 @@
                         </dxl:GroupingColumns>
                         <dxl:ProjList>
                           <dxl:ProjElem ColId="2" Alias="min">
-                            <dxl:AggFunc AggMdid="0.2132.1.0" AggDistinct="false" AggStage="Normal" AggKind="n" >
+                            <dxl:AggFunc AggMdid="0.2132.1.0" AggDistinct="false" AggStage="Normal" AggKind="n">
                               <dxl:ValuesList ParamType="aggargs">
-                              <dxl:Ident ColId="1" ColName="?column?" TypeMdid="0.23.1.0"/>
+                                <dxl:Ident ColId="1" ColName="?column?" TypeMdid="0.23.1.0"/>
                               </dxl:ValuesList>
                               <dxl:ValuesList ParamType="aggdirectargs"/>
                               <dxl:ValuesList ParamType="aggorder"/>
