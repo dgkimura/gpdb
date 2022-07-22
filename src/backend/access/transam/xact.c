@@ -3553,7 +3553,7 @@ AbortTransaction(void)
 		AtEOXact_ComboCid_Dsm_Detach();
 		AtEOXact_Buffers(false);
 		AtEOXact_RelationCache(false);
-		AtEOXact_Inval(false);
+		AtEOXact_Inval(true);
 		AtEOXact_MultiXact();
 
 		ResourceOwnerRelease(TopTransactionResourceOwner,
