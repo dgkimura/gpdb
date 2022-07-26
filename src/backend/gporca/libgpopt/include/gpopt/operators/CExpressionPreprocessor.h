@@ -199,10 +199,6 @@ private:
 	static CExpression *PexprReorderScalarCmpChildren(CMemoryPool *mp,
 													  CExpression *pexpr);
 
-	// swap logical select over logical project
-	static CExpression *PexprTransposeSelectAndProject(CMemoryPool *mp,
-													   CExpression *pexpr);
-
 	// private ctor
 	CExpressionPreprocessor();
 

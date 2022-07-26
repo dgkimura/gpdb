@@ -22,7 +22,6 @@
 #include "gpopt/operators/CScalarArrayCmp.h"
 #include "gpopt/operators/CScalarBoolOp.h"
 #include "gpopt/operators/CScalarConst.h"
-#include "gpopt/operators/CScalarProjectElement.h"
 #include "gpopt/xforms/CXform.h"
 
 // fwd declarations
@@ -700,9 +699,6 @@ public:
 
 	// returns true if the subquery is a ScalarSubqueryAny
 	static BOOL FAnySubquery(COperator *pop);
-
-	static CScalarProjectElement *PNthProjectElement(CExpression *pexpr,
-													 ULONG ul);
 
 	// returns the expression under the Nth project element of a CLogicalProject
 	static CExpression *PNthProjectElementExpr(CExpression *pexpr, ULONG ul);
