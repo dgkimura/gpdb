@@ -18,7 +18,6 @@ OBJS        = CExpression.o \
               CHashedDistributions.o \
               CLogical.o \
               CLogicalApply.o \
-              CLogicalAssert.o \
               CLogicalBitmapTableGet.o \
               CLogicalCTEAnchor.o \
               CLogicalCTEConsumer.o \
@@ -61,7 +60,6 @@ OBJS        = CExpression.o \
               CLogicalLeftSemiCorrelatedApplyIn.o \
               CLogicalLeftSemiJoin.o \
               CLogicalLimit.o \
-              CLogicalMaxOneRow.o \
               CLogicalNAryJoin.o \
               CLogicalPartitionSelector.o \
               CLogicalProject.o \
@@ -82,7 +80,6 @@ OBJS        = CExpression.o \
               CPattern.o \
               CPhysical.o \
               CPhysicalAgg.o \
-              CPhysicalAssert.o \
               CPhysicalBitmapTableScan.o \
               CPhysicalCTEConsumer.o \
               CPhysicalCTEProducer.o \
@@ -148,8 +145,6 @@ OBJS        = CExpression.o \
               CScalarArrayRef.o \
               CScalarArrayRefIndexList.o \
               CScalarValuesList.o \
-              CScalarAssertConstraint.o \
-              CScalarAssertConstraintList.o \
               CScalarBitmapBoolOp.o \
               CScalarBitmapIndexProbe.o \
               CScalarBoolOp.o \

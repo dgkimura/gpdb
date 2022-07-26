@@ -99,7 +99,6 @@ CXformTest::EresUnittest_ApplyXforms()
 		CTestUtils::PexprLogicalInsert,
 		CTestUtils::PexprLogicalDelete,
 		CTestUtils::PexprLogicalUpdate,
-		CTestUtils::PexprLogicalAssert,
 		CTestUtils::PexprLogicalJoin<CLogicalFullOuterJoin>,
 		PexprJoinTree,
 		CTestUtils::PexprLogicalJoinWithPartitionedAndIndexedInnerChild,

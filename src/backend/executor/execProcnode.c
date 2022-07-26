@@ -122,7 +122,6 @@
 
 #include "cdb/cdbvars.h"
 #include "cdb/ml_ipc.h"			/* interconnect context */
-#include "executor/nodeAssertOp.h"
 #include "executor/nodeDynamicIndexscan.h"
 #include "executor/nodeDynamicSeqscan.h"
 #include "executor/nodeMotion.h"
@@ -473,10 +472,6 @@ ExecInitNode(Plan *node, EState *estate, int eflags)
 		case T_SplitUpdate:
 			result = (PlanState *) ExecInitSplitUpdate((SplitUpdate *) node,
 												  estate, eflags);
-			break;
-		case T_AssertOp:
- 			result = (PlanState *) ExecInitAssertOp((AssertOp *) node,
- 												  estate, eflags);
 			break;
 		case T_PartitionSelector:
 			result = (PlanState *) ExecInitPartitionSelector((PartitionSelector *) node,
@@ -984,9 +979,6 @@ ExecEndNode(PlanState *node)
 			 */
 		case T_SplitUpdateState:
 			ExecEndSplitUpdate((SplitUpdateState *) node);
-			break;
-		case T_AssertOpState:
-			ExecEndAssertOp((AssertOpState *) node);
 			break;
 		case T_PartitionSelectorState:
 			ExecEndPartitionSelector((PartitionSelectorState *) node);

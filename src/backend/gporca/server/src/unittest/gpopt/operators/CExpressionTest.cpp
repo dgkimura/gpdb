@@ -178,13 +178,12 @@ CExpressionTest::EresUnittest_SimpleOps()
 		CTestUtils::PexprLogicalDynamicGet,
 		CTestUtils::PexprLogicalSequence,
 		CTestUtils::PexprLogicalTVFTwoArgs,
-		CTestUtils::PexprLogicalAssert,
 		PexprComplexJoinTree};
 
 #ifdef GPOS_DEBUG
 	// misestimation risk for the roots of the plans in rgpf
 	ULONG rgulRisk[] = {1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-						2, 3, 2, 1, 2, 1, 1, 1, 1, 1, 1, 6};
+						2, 3, 2, 1, 2, 1, 1, 1, 1, 1, 6};
 #endif	// GPOS_DEBUG
 
 	for (ULONG i = 0; i < GPOS_ARRAY_SIZE(rgpf); i++)

@@ -45,7 +45,6 @@ OBJS        = CDecorrelator.o \
               CXformGbAggDedup2StreamAggDedup.o \
               CXformGbAggWithMDQA2Join.o \
               CXformGet2TableScan.o \
-              CXformImplementAssert.o \
               CXformImplementBitmapTableGet.o \
               CXformImplementCTEConsumer.o \
               CXformImplementCTEProducer.o \
@@ -103,7 +102,6 @@ OBJS        = CDecorrelator.o \
               CXformLeftSemiJoin2InnerJoin.o \
               CXformLeftSemiJoin2InnerJoinUnderGb.o \
               CXformLeftSemiJoin2NLJoin.o \
-              CXformMaxOneRow2Assert.o \
               CXformProject2Apply.o \
               CXformProject2ComputeScalar.o \
               CXformPushDownLeftOuterJoin.o \

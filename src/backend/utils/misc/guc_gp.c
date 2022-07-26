@@ -312,7 +312,6 @@ bool		optimizer_enable_hashjoin_redistribute_broadcast_children;
 bool		optimizer_enable_broadcast_nestloop_outer_child;
 bool		optimizer_enable_streaming_material;
 bool		optimizer_enable_gather_on_segment_for_dml;
-bool		optimizer_enable_assert_maxonerow;
 bool		optimizer_enable_constant_expression_evaluation;
 bool		optimizer_enable_bitmapscan;
 bool		optimizer_enable_outerjoin_to_unionall_rewrite;
@@ -2419,16 +2418,6 @@ struct config_bool ConfigureNamesBool_gp[] =
 		},
 		&optimizer_enforce_subplans,
 		false,
-		NULL, NULL, NULL
-	},
-	{
-		{"optimizer_enable_assert_maxonerow", PGC_USERSET, QUERY_TUNING_METHOD,
-			gettext_noop("Enable Assert MaxOneRow plans to check number of rows at runtime."),
-			NULL,
-			GUC_NOT_IN_SAMPLE
-		},
-		&optimizer_enable_assert_maxonerow,
-		true,
 		NULL, NULL, NULL
 	},
 	{

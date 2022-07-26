@@ -51,7 +51,6 @@ OBJS        = CDXLColDescr.o \
               CDXLPhysicalAbstractBitmapScan.o \
               CDXLPhysicalAgg.o \
               CDXLPhysicalAppend.o \
-              CDXLPhysicalAssert.o \
               CDXLPhysicalBitmapTableScan.o \
               CDXLPhysicalBroadcastMotion.o \
               CDXLPhysicalCTAS.o \
@@ -95,8 +94,6 @@ OBJS        = CDXLColDescr.o \
               CDXLScalarArrayComp.o \
               CDXLScalarArrayRef.o \
               CDXLScalarArrayRefIndexList.o \
-              CDXLScalarAssertConstraint.o \
-              CDXLScalarAssertConstraintList.o \
               CDXLScalarBitmapBoolOp.o \
               CDXLScalarBitmapIndexProbe.o \
               CDXLScalarBoolExpr.o \

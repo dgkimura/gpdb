@@ -23,7 +23,6 @@
 #include "gpopt/base/CUtils.h"
 #include "gpopt/exception.h"
 #include "gpopt/operators/CExpressionHandle.h"
-#include "gpopt/operators/CLogicalAssert.h"
 #include "gpopt/operators/CLogicalBitmapTableGet.h"
 #include "gpopt/operators/CLogicalCTEConsumer.h"
 #include "gpopt/operators/CLogicalCTEProducer.h"
@@ -39,8 +38,6 @@
 #include "gpopt/operators/CLogicalSelect.h"
 #include "gpopt/operators/CLogicalSequenceProject.h"
 #include "gpopt/operators/CPhysicalInnerHashJoin.h"
-#include "gpopt/operators/CScalarAssertConstraint.h"
-#include "gpopt/operators/CScalarAssertConstraintList.h"
 #include "gpopt/operators/CScalarBitmapBoolOp.h"
 #include "gpopt/operators/CScalarBitmapIndexProbe.h"
 #include "gpopt/operators/CScalarCmp.h"
@@ -1394,18 +1391,6 @@ CXformUtils::PexprLogicalDMLOverProject(CMemoryPool *mp,
 									   true /*fBefore*/, colref_array);
 	}
 
-	if (CLogicalDML::EdmlInsert == edmlop)
-	{
-		// add assert for check constraints and nullness checks if needed
-		COptimizerConfig *optimizer_config =
-			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
-		if (optimizer_config->GetHint()->FEnforceConstraintsOnDML())
-		{
-			pexprProject = PexprAssertConstraints(mp, pexprProject, ptabdesc,
-												  colref_array);
-		}
-	}
-
 	CExpression *pexprDML = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
@@ -1508,79 +1493,6 @@ CXformUtils::PexprRowTrigger(CMemoryPool *mp, CExpression *pexprChild,
 
 //---------------------------------------------------------------------------
 //	@function:
-//		CXformUtils::PexprAssertNotNull
-//
-//	@doc:
-//		Construct an assert on top of the given expression for nullness checks
-//
-//---------------------------------------------------------------------------
-CExpression *
-CXformUtils::PexprAssertNotNull(CMemoryPool *mp, CExpression *pexprChild,
-								CTableDescriptor *ptabdesc,
-								CColRefArray *colref_array)
-{
-	CColumnDescriptorArray *pdrgpcoldesc = ptabdesc->Pdrgpcoldesc();
-
-	const ULONG num_cols = pdrgpcoldesc->Size();
-	CColRefSet *pcrsNotNull = pexprChild->DeriveNotNullColumns();
-
-	CExpressionArray *pdrgpexprAssertConstraints =
-		GPOS_NEW(mp) CExpressionArray(mp);
-
-	for (ULONG ul = 0; ul < num_cols; ul++)
-	{
-		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
-		if (pcoldesc->IsNullable() || pcoldesc->IsSystemColumn())
-		{
-			// target column is nullable or it's a system column: no need to check for NULL
-			continue;
-		}
-
-		CColRef *colref = (*colref_array)[ul];
-
-		if (pcrsNotNull->FMember(colref))
-		{
-			// source column not nullable: no need to check for NULL
-			continue;
-		}
-
-		// add not null check for current column
-		CExpression *pexprNotNull =
-			CUtils::PexprIsNotNull(mp, CUtils::PexprScalarIdent(mp, colref));
-
-		CWStringConst *pstrErrorMsg =
-			PstrErrorMessage(mp, gpos::CException::ExmaSQL,
-							 gpos::CException::ExmiSQLNotNullViolation,
-							 pcoldesc->Name().Pstr()->GetBuffer(),
-							 ptabdesc->Name().Pstr()->GetBuffer());
-
-		CExpression *pexprAssertConstraint = GPOS_NEW(mp) CExpression(
-			mp, GPOS_NEW(mp) CScalarAssertConstraint(mp, pstrErrorMsg),
-			pexprNotNull);
-
-		pdrgpexprAssertConstraints->Append(pexprAssertConstraint);
-	}
-
-	if (0 == pdrgpexprAssertConstraints->Size())
-	{
-		pdrgpexprAssertConstraints->Release();
-		return pexprChild;
-	}
-
-	CExpression *pexprAssertPredicate = GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) CScalarAssertConstraintList(mp),
-					pdrgpexprAssertConstraints);
-
-	CLogicalAssert *popAssert = GPOS_NEW(mp) CLogicalAssert(
-		mp, GPOS_NEW(mp) CException(gpos::CException::ExmaSQL,
-									gpos::CException::ExmiSQLNotNullViolation));
-
-	return GPOS_NEW(mp)
-		CExpression(mp, popAssert, pexprChild, pexprAssertPredicate);
-}
-
-//---------------------------------------------------------------------------
-//	@function:
 //		CXformUtils::PexprRowTrigger
 //
 //	@doc:
@@ -1653,94 +1565,6 @@ CXformUtils::PdrgpexprPartEqFilters(CMemoryPool *mp, CTableDescriptor *ptabdesc,
 	}
 
 	return pdrgpexpr;
-}
-
-//---------------------------------------------------------------------------
-//      @function:
-//              CXformUtils::PexprAssertConstraints
-//
-//      @doc:
-//          Construct an assert on top of the given expression for check constraints
-//
-//---------------------------------------------------------------------------
-CExpression *
-CXformUtils::PexprAssertConstraints(CMemoryPool *mp, CExpression *pexprChild,
-									CTableDescriptor *ptabdesc,
-									CColRefArray *colref_array)
-{
-	CExpression *pexprAssertNotNull =
-		PexprAssertNotNull(mp, pexprChild, ptabdesc, colref_array);
-
-	return PexprAssertCheckConstraints(mp, pexprAssertNotNull, ptabdesc,
-									   colref_array);
-}
-
-//---------------------------------------------------------------------------
-//      @function:
-//              CXformUtils::PexprAssertCheckConstraints
-//
-//      @doc:
-//          Construct an assert on top of the given expression for check constraints
-//
-//---------------------------------------------------------------------------
-CExpression *
-CXformUtils::PexprAssertCheckConstraints(CMemoryPool *mp,
-										 CExpression *pexprChild,
-										 CTableDescriptor *ptabdesc,
-										 CColRefArray *colref_array)
-{
-	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
-
-	const ULONG ulCheckConstraint = pmdrel->CheckConstraintCount();
-	if (0 < ulCheckConstraint)
-	{
-		CExpressionArray *pdrgpexprAssertConstraints =
-			GPOS_NEW(mp) CExpressionArray(mp);
-
-		for (ULONG ul = 0; ul < ulCheckConstraint; ul++)
-		{
-			IMDId *pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(ul);
-			const IMDCheckConstraint *pmdCheckConstraint =
-				md_accessor->RetrieveCheckConstraints(pmdidCheckConstraint);
-
-			// extract the check constraint expression
-			CExpression *pexprCheckConstraint =
-				pmdCheckConstraint->GetCheckConstraintExpr(mp, md_accessor,
-														   colref_array);
-
-			// A table check constraint is satisfied if and only if the specified <search condition>
-			// evaluates to True or Unknown for every row of the table to which it applies.
-			// Add an "is not false" expression on top to handle such scenarios
-			CExpression *pexprIsNotFalse =
-				CUtils::PexprIsNotFalse(mp, pexprCheckConstraint);
-			CWStringConst *pstrErrMsg = PstrErrorMessage(
-				mp, gpos::CException::ExmaSQL,
-				gpos::CException::ExmiSQLCheckConstraintViolation,
-				pmdCheckConstraint->Mdname().GetMDName()->GetBuffer(),
-				ptabdesc->Name().Pstr()->GetBuffer());
-			CExpression *pexprAssertConstraint = GPOS_NEW(mp) CExpression(
-				mp, GPOS_NEW(mp) CScalarAssertConstraint(mp, pstrErrMsg),
-				pexprIsNotFalse);
-
-			pdrgpexprAssertConstraints->Append(pexprAssertConstraint);
-		}
-
-		CExpression *pexprAssertPredicate = GPOS_NEW(mp)
-			CExpression(mp, GPOS_NEW(mp) CScalarAssertConstraintList(mp),
-						pdrgpexprAssertConstraints);
-
-		CLogicalAssert *popAssert = GPOS_NEW(mp) CLogicalAssert(
-			mp, GPOS_NEW(mp) CException(
-					gpos::CException::ExmaSQL,
-					gpos::CException::ExmiSQLCheckConstraintViolation));
-
-
-		return GPOS_NEW(mp)
-			CExpression(mp, popAssert, pexprChild, pexprAssertPredicate);
-	}
-
-	return pexprChild;
 }
 
 
@@ -2269,47 +2093,6 @@ CXformUtils::PexprWindowWithRowNumber(CMemoryPool *mp,
 
 	return pexprLgSequence;
 }
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CXformUtils::PexprAssertOneRow
-//
-//	@doc:
-//		Generate a logical Assert expression that errors out when more than
-//		one row is generated
-//
-//---------------------------------------------------------------------------
-CExpression *
-CXformUtils::PexprAssertOneRow(CMemoryPool *mp, CExpression *pexprChild)
-{
-	GPOS_ASSERT(nullptr != pexprChild);
-	GPOS_ASSERT(pexprChild->Pop()->FLogical());
-
-	CExpression *pexprSeqPrj =
-		PexprWindowWithRowNumber(mp, pexprChild, nullptr /*pdrgpcrInput*/);
-	CColRef *pcrRowNumber =
-		CScalarProjectElement::PopConvert((*(*pexprSeqPrj)[1])[0]->Pop())
-			->Pcr();
-	CExpression *pexprCmp = CUtils::PexprScalarEqCmp(
-		mp, pcrRowNumber, CUtils::PexprScalarConstInt4(mp, 1 /*value*/));
-
-	CWStringConst *pstrErrorMsg = PstrErrorMessage(
-		mp, gpos::CException::ExmaSQL, gpos::CException::ExmiSQLMaxOneRow);
-	CExpression *pexprAssertConstraint = GPOS_NEW(mp) CExpression(
-		mp, GPOS_NEW(mp) CScalarAssertConstraint(mp, pstrErrorMsg), pexprCmp);
-
-	CExpression *pexprAssertPredicate = GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) CScalarAssertConstraintList(mp),
-					pexprAssertConstraint);
-
-	CLogicalAssert *popAssert = GPOS_NEW(mp) CLogicalAssert(
-		mp, GPOS_NEW(mp) CException(gpos::CException::ExmaSQL,
-									gpos::CException::ExmiSQLMaxOneRow));
-
-	return GPOS_NEW(mp)
-		CExpression(mp, popAssert, pexprSeqPrj, pexprAssertPredicate);
-}
-
 
 //---------------------------------------------------------------------------
 //	@function:

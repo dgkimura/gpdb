@@ -52,7 +52,6 @@ extern "C" {
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLPhysicalRandomMotion.h"
 #include "naucrates/dxl/operators/CDXLPhysicalRedistributeMotion.h"
-#include "naucrates/dxl/operators/CDXLScalarAssertConstraint.h"
 #include "naucrates/dxl/operators/CDXLScalarIdent.h"
 #include "naucrates/dxl/operators/CDXLScalarProjElem.h"
 #include "naucrates/dxl/operators/CDXLSpoolInfo.h"
@@ -2376,40 +2375,6 @@ CTranslatorUtils::RelHasConstraints(const IMDRelation *rel)
 	}
 
 	return false;
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CTranslatorUtils::GetAssertErrorMsgs
-//
-//	@doc:
-//		Construct a list of error messages from a list of assert constraints
-//
-//---------------------------------------------------------------------------
-List *
-CTranslatorUtils::GetAssertErrorMsgs(CDXLNode *assert_constraint_list)
-{
-	GPOS_ASSERT(nullptr != assert_constraint_list);
-	GPOS_ASSERT(EdxlopScalarAssertConstraintList ==
-				assert_constraint_list->GetOperator()->GetDXLOperator());
-
-	List *error_msgs_list = NIL;
-	const ULONG num_constraints = assert_constraint_list->Arity();
-
-	for (ULONG ul = 0; ul < num_constraints; ul++)
-	{
-		CDXLNode *dxl_constraint_node = (*assert_constraint_list)[ul];
-		CDXLScalarAssertConstraint *dxl_constraint_op =
-			CDXLScalarAssertConstraint::Cast(
-				dxl_constraint_node->GetOperator());
-		CWStringBase *error_msg = dxl_constraint_op->GetErrorMsgStr();
-		error_msgs_list = gpdb::LAppend(
-			error_msgs_list,
-			gpdb::MakeStringValue(
-				CreateMultiByteCharStringFromWCString(error_msg->GetBuffer())));
-	}
-
-	return error_msgs_list;
 }
 
 //---------------------------------------------------------------------------

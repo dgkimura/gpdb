@@ -13,7 +13,6 @@ include $(top_srcdir)/src/backend/gporca/gporca.mk
 OBJS        = CParseHandlerAgg.o \
               CParseHandlerAppend.o \
               CParseHandlerArray.o \
-              CParseHandlerAssert.o \
               CParseHandlerBase.o \
               CParseHandlerBroadcastMotion.o \
               CParseHandlerCTEConfig.o \
@@ -125,7 +124,6 @@ OBJS        = CParseHandlerAgg.o \
               CParseHandlerScalarArrayComp.o \
               CParseHandlerScalarArrayRef.o \
               CParseHandlerScalarArrayRefIndexList.o \
-              CParseHandlerScalarAssertConstraintList.o \
               CParseHandlerScalarBitmapBoolOp.o \
               CParseHandlerScalarBitmapIndexProbe.o \
               CParseHandlerScalarBoolExpr.o \

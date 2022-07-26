@@ -363,13 +363,6 @@ private:
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
-	// translate an Assert operator
-	Plan *TranslateDXLAssert(
-		const CDXLNode *assert_dxlnode, CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *
-			ctxt_translation_prev_siblings	// translation contexts of previous siblings
-	);
-
 	// translate a CTE producer into a GPDB share input scan
 	Plan *TranslateDXLCTEProducerToSharedScan(
 		const CDXLNode *cte_producer_dxlnode,
@@ -539,11 +532,6 @@ private:
 		CDXLNode *filter_dxlnode, CDXLTranslateContext *output_context,
 		CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *ctxt_translation_prev_siblings);
-
-	// translate the assert constraints
-	List *TranslateDXLAssertConstraints(
-		CDXLNode *filter_dxlnode, CDXLTranslateContext *output_context,
-		CDXLTranslationContextArray *child_contexts);
 
 	// translate a CTAS operator
 	Plan *TranslateDXLCtas(

@@ -823,11 +823,6 @@ private:
 		CMemoryPool *mp, CParseHandlerManager *parse_handler_mgr,
 		CParseHandlerBase *parse_handler_root);
 
-	// construct a physical assert parse handler
-	static CParseHandlerBase *CreatePhysicalAssertParseHandler(
-		CMemoryPool *mp, CParseHandlerManager *parse_handler_mgr,
-		CParseHandlerBase *parse_handler_root);
-
 	// construct a logical set operator parse handler
 	static CParseHandlerBase *CreateLogicalSetOpParseHandler(
 		CMemoryPool *mp, CParseHandlerManager *parse_handler_mgr,

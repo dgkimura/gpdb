@@ -201,9 +201,6 @@ CParseHandlerFactory::Init(CMemoryPool *mp)
 		{EdxltokenScalarArrayRefIndexList,
 		 &CreateScArrayRefIdxListParseHandler},
 
-		{EdxltokenScalarAssertConstraintList,
-		 &CreateScAssertConstraintListParseHandler},
-
 		{EdxltokenScalarDMLAction, &CreateScDMLActionParseHandler},
 		{EdxltokenDirectDispatchInfo, &CreateDirectDispatchParseHandler},
 
@@ -243,7 +240,6 @@ CParseHandlerFactory::Init(CMemoryPool *mp)
 		{EdxltokenPhysicalDMLUpdate, &CreatePhysicalDMLParseHandler},
 		{EdxltokenPhysicalSplit, &CreatePhysicalSplitParseHandler},
 		{EdxltokenPhysicalRowTrigger, &CreatePhysicalRowTriggerParseHandler},
-		{EdxltokenPhysicalAssert, &CreatePhysicalAssertParseHandler},
 		{EdxltokenPhysicalCTEProducer, &CreatePhysicalCTEProdParseHandler},
 		{EdxltokenPhysicalCTEConsumer, &CreatePhysicalCTEConsParseHandler},
 		{EdxltokenLogicalCTAS, &CreateLogicalCTASParseHandler},
@@ -904,16 +900,6 @@ CParseHandlerFactory::CreateScArrayRefIdxListParseHandler(
 	CParseHandlerBase *parse_handler_root)
 {
 	return GPOS_NEW(mp) CParseHandlerScalarArrayRefIndexList(
-		mp, parse_handler_mgr, parse_handler_root);
-}
-
-// creates a parse handler for parsing a scalar assert predicate operator.
-CParseHandlerBase *
-CParseHandlerFactory::CreateScAssertConstraintListParseHandler(
-	CMemoryPool *mp, CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root)
-{
-	return GPOS_NEW(mp) CParseHandlerScalarAssertConstraintList(
 		mp, parse_handler_mgr, parse_handler_root);
 }
 
@@ -1951,16 +1937,6 @@ CParseHandlerFactory::CreatePhysicalRowTriggerParseHandler(
 {
 	return GPOS_NEW(mp) CParseHandlerPhysicalRowTrigger(mp, parse_handler_mgr,
 														parse_handler_root);
-}
-
-// creates a parse handler for parsing a physical assert operator
-CParseHandlerBase *
-CParseHandlerFactory::CreatePhysicalAssertParseHandler(
-	CMemoryPool *mp, CParseHandlerManager *parse_handler_mgr,
-	CParseHandlerBase *parse_handler_root)
-{
-	return GPOS_NEW(mp)
-		CParseHandlerAssert(mp, parse_handler_mgr, parse_handler_root);
 }
 
 // creates a trailing window frame edge parser

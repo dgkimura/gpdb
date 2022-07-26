@@ -30,7 +30,6 @@
 #include "gpopt/exception.h"
 #include "gpopt/mdcache/CMDAccessorUtils.h"
 #include "gpopt/operators/CPhysicalAgg.h"
-#include "gpopt/operators/CPhysicalAssert.h"
 #include "gpopt/operators/CPhysicalBitmapTableScan.h"
 #include "gpopt/operators/CPhysicalCTEConsumer.h"
 #include "gpopt/operators/CPhysicalCTEProducer.h"
@@ -69,7 +68,6 @@
 #include "gpopt/operators/CScalarArray.h"
 #include "gpopt/operators/CScalarArrayCoerceExpr.h"
 #include "gpopt/operators/CScalarArrayRef.h"
-#include "gpopt/operators/CScalarAssertConstraint.h"
 #include "gpopt/operators/CScalarBitmapBoolOp.h"
 #include "gpopt/operators/CScalarBitmapIndexProbe.h"
 #include "gpopt/operators/CScalarBooleanTest.h"
@@ -95,7 +93,6 @@
 #include "naucrates/dxl/operators/CDXLDatumBool.h"
 #include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
 #include "naucrates/dxl/operators/CDXLPhysicalAppend.h"
-#include "naucrates/dxl/operators/CDXLPhysicalAssert.h"
 #include "naucrates/dxl/operators/CDXLPhysicalBitmapTableScan.h"
 #include "naucrates/dxl/operators/CDXLPhysicalBroadcastMotion.h"
 #include "naucrates/dxl/operators/CDXLPhysicalCTAS.h"
@@ -130,8 +127,6 @@
 #include "naucrates/dxl/operators/CDXLScalarArrayCoerceExpr.h"
 #include "naucrates/dxl/operators/CDXLScalarArrayComp.h"
 #include "naucrates/dxl/operators/CDXLScalarArrayRef.h"
-#include "naucrates/dxl/operators/CDXLScalarAssertConstraint.h"
-#include "naucrates/dxl/operators/CDXLScalarAssertConstraintList.h"
 #include "naucrates/dxl/operators/CDXLScalarBitmapBoolOp.h"
 #include "naucrates/dxl/operators/CDXLScalarBitmapIndexProbe.h"
 #include "naucrates/dxl/operators/CDXLScalarBooleanTest.h"
@@ -512,11 +507,6 @@ CTranslatorExprToDXL::CreateDXLNode(CExpression *pexpr,
 				pexpr, colref_array, pdrgpdsBaseTables, pulNonGatherMotions,
 				pfDML);
 			break;
-		case COperator::EopPhysicalAssert:
-			dxlnode = CTranslatorExprToDXL::PdxlnAssert(
-				pexpr, colref_array, pdrgpdsBaseTables, pulNonGatherMotions,
-				pfDML);
-			break;
 		case COperator::EopPhysicalCTEProducer:
 			dxlnode = CTranslatorExprToDXL::PdxlnCTEProducer(
 				pexpr, colref_array, pdrgpdsBaseTables, pulNonGatherMotions,
@@ -643,10 +633,6 @@ CTranslatorExprToDXL::PdxlnScalar(CExpression *pexpr)
 			return CTranslatorExprToDXL::PdxlnArrayRef(pexpr);
 		case COperator::EopScalarArrayRefIndexList:
 			return CTranslatorExprToDXL::PdxlnArrayRefIndexList(pexpr);
-		case COperator::EopScalarAssertConstraintList:
-			return CTranslatorExprToDXL::PdxlnAssertPredicate(pexpr);
-		case COperator::EopScalarAssertConstraint:
-			return CTranslatorExprToDXL::PdxlnAssertConstraint(pexpr);
 		case COperator::EopScalarDMLAction:
 			return CTranslatorExprToDXL::PdxlnDMLAction(pexpr);
 		case COperator::EopScalarBitmapIndexProbe:
@@ -2102,56 +2088,6 @@ CTranslatorExprToDXL::PdxlnResultFromFilter(
 	return CTranslatorExprToDXLUtils::PdxlnResult(
 		m_mp, dxl_properties, pdxlnPrL, filter_dxlnode, one_time_filter_dxlnode,
 		child_dxlnode);
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CTranslatorExprToDXL::PdxlnAssert
-//
-//	@doc:
-//		Translate a physical assert expression
-//
-//---------------------------------------------------------------------------
-CDXLNode *
-CTranslatorExprToDXL::PdxlnAssert(CExpression *pexprAssert,
-								  CColRefArray *colref_array,
-								  CDistributionSpecArray *pdrgpdsBaseTables,
-								  ULONG *pulNonGatherMotions, BOOL *pfDML)
-{
-	GPOS_ASSERT(nullptr != pexprAssert);
-
-	// extract components
-	CExpression *pexprRelational = (*pexprAssert)[0];
-	CExpression *pexprScalar = (*pexprAssert)[1];
-	CPhysicalAssert *popAssert =
-		CPhysicalAssert::PopConvert(pexprAssert->Pop());
-
-	// extract physical properties from assert
-	CDXLPhysicalProperties *dxl_properties = GetProperties(pexprAssert);
-
-	CColRefSet *pcrsOutput = pexprAssert->Prpp()->PcrsRequired();
-
-	// translate relational child expression
-	CDXLNode *child_dxlnode = CreateDXLNode(
-		pexprRelational, nullptr /* colref_array */, pdrgpdsBaseTables,
-		pulNonGatherMotions, pfDML, false /*fRemap*/, false /*fRoot*/);
-
-	// translate scalar expression
-	CDXLNode *pdxlnAssertPredicate = PdxlnScalar(pexprScalar);
-
-	GPOS_ASSERT(nullptr != pexprAssert->Prpp());
-
-	CDXLNode *pdxlnPrL = PdxlnProjList(pcrsOutput, colref_array);
-
-	const CHAR *sql_state = popAssert->Pexc()->GetSQLState();
-	CDXLPhysicalAssert *pdxlopAssert =
-		GPOS_NEW(m_mp) CDXLPhysicalAssert(m_mp, sql_state);
-	CDXLNode *pdxlnAssert = GPOS_NEW(m_mp) CDXLNode(
-		m_mp, pdxlopAssert, pdxlnPrL, pdxlnAssertPredicate, child_dxlnode);
-
-	pdxlnAssert->SetProperties(dxl_properties);
-
-	return pdxlnAssert;
 }
 
 //---------------------------------------------------------------------------
@@ -6475,48 +6411,6 @@ CTranslatorExprToDXL::PdxlnArrayRefIndexList(CExpression *pexpr)
 	TranslateScalarChildren(pexpr, pdxlnIndexlist);
 
 	return pdxlnIndexlist;
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CTranslatorExprToDXL::PdxlnAssertPredicate
-//
-//	@doc:
-//		Create a DXL assert predicate from an optimizer assert predicate expression
-//
-//---------------------------------------------------------------------------
-CDXLNode *
-CTranslatorExprToDXL::PdxlnAssertPredicate(CExpression *pexpr)
-{
-	GPOS_ASSERT(nullptr != pexpr);
-
-	CDXLNode *pdxlnAssertConstraintList = GPOS_NEW(m_mp)
-		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarAssertConstraintList(m_mp));
-	TranslateScalarChildren(pexpr, pdxlnAssertConstraintList);
-	return pdxlnAssertConstraintList;
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CTranslatorExprToDXL::PdxlnAssertConstraint
-//
-//	@doc:
-//		Create a DXL assert constraint from an optimizer assert constraint expression
-//
-//---------------------------------------------------------------------------
-CDXLNode *
-CTranslatorExprToDXL::PdxlnAssertConstraint(CExpression *pexpr)
-{
-	GPOS_ASSERT(nullptr != pexpr);
-	CScalarAssertConstraint *popAssertConstraint =
-		CScalarAssertConstraint::PopConvert(pexpr->Pop());
-	CWStringDynamic *pstrErrorMsg = GPOS_NEW(m_mp)
-		CWStringDynamic(m_mp, popAssertConstraint->PstrErrorMsg()->GetBuffer());
-
-	CDXLNode *pdxlnAssertConstraint = GPOS_NEW(m_mp) CDXLNode(
-		m_mp, GPOS_NEW(m_mp) CDXLScalarAssertConstraint(m_mp, pstrErrorMsg));
-	TranslateScalarChildren(pexpr, pdxlnAssertConstraint);
-	return pdxlnAssertConstraint;
 }
 
 //---------------------------------------------------------------------------

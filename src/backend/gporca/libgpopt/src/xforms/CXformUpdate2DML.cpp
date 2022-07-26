@@ -127,20 +127,6 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 								   pcrSegmentId, pcrAction, pcrTupleOid),
 		pexprChild, pexprProjList);
 
-	// add assert checking that no NULL values are inserted for nullable columns or no check constraints are violated
-	COptimizerConfig *optimizer_config =
-		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
-	CExpression *pexprAssertConstraints;
-	if (optimizer_config->GetHint()->FEnforceConstraintsOnDML())
-	{
-		pexprAssertConstraints = CXformUtils::PexprAssertConstraints(
-			mp, pexprSplit, ptabdesc, pdrgpcrInsert);
-	}
-	else
-	{
-		pexprAssertConstraints = pexprSplit;
-	}
-
 	// generate oid column and project operator
 	CExpression *pexprProject = nullptr;
 	CColRef *pcrTableOid = nullptr;
@@ -148,7 +134,7 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	{
 		// generate a partition selector
 		pexprProject = CXformUtils::PexprLogicalPartitionSelector(
-			mp, ptabdesc, pdrgpcrInsert, pexprAssertConstraints);
+			mp, ptabdesc, pdrgpcrInsert, pexprSplit);
 		pcrTableOid = CLogicalPartitionSelector::PopConvert(pexprProject->Pop())
 						  ->PcrOid();
 	}
@@ -160,8 +146,7 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		OID oidTable = CMDIdGPDB::CastMdid(pmdidTable)->Oid();
 		CExpression *pexprOid = CUtils::PexprScalarConstOid(mp, oidTable);
 
-		pexprProject =
-			CUtils::PexprAddProjection(mp, pexprAssertConstraints, pexprOid);
+		pexprProject = CUtils::PexprAddProjection(mp, pexprSplit, pexprOid);
 
 		CExpression *pexprPrL = (*pexprProject)[1];
 		pcrTableOid = CUtils::PcrFromProjElem((*pexprPrL)[0]);

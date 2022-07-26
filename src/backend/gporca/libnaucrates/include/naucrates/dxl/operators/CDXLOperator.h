@@ -165,8 +165,6 @@ enum Edxlopid
 	EdxlopPhysicalSplit,
 	EdxlopPhysicalRowTrigger,
 
-	EdxlopPhysicalAssert,
-
 	EdxlopSentinel
 };
 

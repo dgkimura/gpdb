@@ -402,11 +402,6 @@ private:
 						 CDistributionSpecArray *pdrgpdsBaseTables,
 						 ULONG *pulNonGatherMotions, BOOL *pfDML);
 
-	// translate an assert operator
-	CDXLNode *PdxlnAssert(CExpression *pexprAssert, CColRefArray *colref_array,
-						  CDistributionSpecArray *pdrgpdsBaseTables,
-						  ULONG *pulNonGatherMotions, BOOL *pfDML);
-
 	// translate a row trigger operator
 	CDXLNode *PdxlnRowTrigger(CExpression *pexpr, CColRefArray *colref_array,
 							  CDistributionSpecArray *pdrgpdsBaseTables,
@@ -500,12 +495,6 @@ private:
 
 	// translate an array compare
 	CDXLNode *PdxlnArrayCmp(CExpression *pexpr);
-
-	// translate an assert predicate
-	CDXLNode *PdxlnAssertPredicate(CExpression *pexpr);
-
-	// translate an assert constraint
-	CDXLNode *PdxlnAssertConstraint(CExpression *pexpr);
 
 	// translate a DML action expression
 	CDXLNode *PdxlnDMLAction(CExpression *pexpr);

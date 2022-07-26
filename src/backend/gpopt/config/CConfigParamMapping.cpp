@@ -373,13 +373,6 @@ CConfigParamMapping::PackConfigParamInBitset(
 			CXform::ExfLeftOuter2InnerUnionAllLeftAntiSemiJoin));
 	}
 
-	// disable Assert MaxOneRow plans if GUC is turned off
-	if (!optimizer_enable_assert_maxonerow)
-	{
-		traceflag_bitset->ExchangeSet(
-			GPOPT_DISABLE_XFORM_TF(CXform::ExfMaxOneRow2Assert));
-	}
-
 	if (!optimizer_enable_partial_index)
 	{
 		// GPDB_12_MERGE_FIXME: Remove this GUC

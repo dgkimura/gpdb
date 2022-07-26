@@ -149,7 +149,6 @@ CDXLTokens::Init(CMemoryPool *mp)
 		{EdxltokenPhysicalPartitionSelectorScanId, GPOS_WSZ_LIT("ScanId")},
 		{EdxltokenPhysicalSplit, GPOS_WSZ_LIT("Split")},
 		{EdxltokenPhysicalRowTrigger, GPOS_WSZ_LIT("RowTrigger")},
-		{EdxltokenPhysicalAssert, GPOS_WSZ_LIT("Assert")},
 		{EdxltokenPhysicalCTEProducer, GPOS_WSZ_LIT("CTEProducer")},
 		{EdxltokenPhysicalCTEConsumer, GPOS_WSZ_LIT("CTEConsumer")},
 
@@ -232,10 +231,6 @@ CDXLTokens::Init(CMemoryPool *mp)
 		{EdxltokenScalarArrayRefIndexListUpper, GPOS_WSZ_LIT("Upper")},
 		{EdxltokenScalarArrayRefExpr, GPOS_WSZ_LIT("RefExpr")},
 		{EdxltokenScalarArrayRefAssignExpr, GPOS_WSZ_LIT("AssignExpr")},
-
-		{EdxltokenScalarAssertConstraintList,
-		 GPOS_WSZ_LIT("AssertConstraintList")},
-		{EdxltokenScalarAssertConstraint, GPOS_WSZ_LIT("AssertConstraint")},
 
 		{EdxltokenScalarSubquery, GPOS_WSZ_LIT("ScalarSubquery")},
 		{EdxltokenScalarSubqueryAny, GPOS_WSZ_LIT("SubqueryAny")},

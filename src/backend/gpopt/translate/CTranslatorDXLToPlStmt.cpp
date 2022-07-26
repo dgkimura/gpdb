@@ -59,7 +59,6 @@ extern "C" {
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLPhysicalAgg.h"
 #include "naucrates/dxl/operators/CDXLPhysicalAppend.h"
-#include "naucrates/dxl/operators/CDXLPhysicalAssert.h"
 #include "naucrates/dxl/operators/CDXLPhysicalBitmapTableScan.h"
 #include "naucrates/dxl/operators/CDXLPhysicalCTAS.h"
 #include "naucrates/dxl/operators/CDXLPhysicalCTEConsumer.h"
@@ -454,8 +453,6 @@ CTranslatorDXLToPlStmt::TranslateDXLOperatorToPlan(
 									 ctxt_translation_prev_siblings);
 			break;
 		}
-		// GPDB_12_MERGE_FIXME: stop generating AssertOp from ORCA
-		//			case EdxlopPhysicalAssert: { plan = TranslateDXLAssert(dxlnode, output_context, ctxt_translation_prev_siblings); break;}
 		case EdxlopPhysicalCTEProducer:
 		{
 			plan = TranslateDXLCTEProducerToSharedScan(
@@ -1134,41 +1131,6 @@ CTranslatorDXLToPlStmt::TranslateIndexConditions(
 
 	// clean up
 	index_qual_info_array->Release();
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CTranslatorDXLToPlStmt::TranslateDXLAssertConstraints
-//
-//	@doc:
-//		Translate the constraints from an Assert node into a list of quals
-//
-//---------------------------------------------------------------------------
-List *
-CTranslatorDXLToPlStmt::TranslateDXLAssertConstraints(
-	CDXLNode *assert_contraint_list_dxlnode,
-	CDXLTranslateContext *output_context,
-	CDXLTranslationContextArray *child_contexts)
-{
-	List *quals_list = NIL;
-
-	// build colid->var mapping
-	CMappingColIdVarPlStmt colid_var_mapping(
-		m_mp, nullptr /*base_table_context*/, child_contexts, output_context,
-		m_dxl_to_plstmt_context);
-
-	const ULONG arity = assert_contraint_list_dxlnode->Arity();
-	for (ULONG ul = 0; ul < arity; ul++)
-	{
-		CDXLNode *assert_contraint_dxlnode =
-			(*assert_contraint_list_dxlnode)[ul];
-		Expr *assert_contraint_expr =
-			m_translator_dxl_to_scalar->TranslateDXLToScalar(
-				(*assert_contraint_dxlnode)[0], &colid_var_mapping);
-		quals_list = gpdb::LAppend(quals_list, assert_contraint_expr);
-	}
-
-	return quals_list;
 }
 
 //---------------------------------------------------------------------------
@@ -4533,84 +4495,6 @@ CTranslatorDXLToPlStmt::TranslateDXLSplit(
 	TranslatePlanCosts(split_dxlnode, plan);
 
 	return (Plan *) split;
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CTranslatorDXLToPlStmt::TranslateDXLAssert
-//
-//	@doc:
-//		Translate DXL assert node into GPDB assert plan node
-//
-//---------------------------------------------------------------------------
-Plan *
-CTranslatorDXLToPlStmt::TranslateDXLAssert(
-	const CDXLNode *assert_dxlnode, CDXLTranslateContext *output_context,
-	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
-{
-	// create assert plan node
-	AssertOp *assert_node = MakeNode(AssertOp);
-
-	Plan *plan = &(assert_node->plan);
-	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
-
-	CDXLPhysicalAssert *assert_dxlop =
-		CDXLPhysicalAssert::Cast(assert_dxlnode->GetOperator());
-
-	// translate error code into the its internal GPDB representation
-	const CHAR *error_code = assert_dxlop->GetSQLState();
-	GPOS_ASSERT(GPOS_SQLSTATE_LENGTH == clib::Strlen(error_code));
-
-	assert_node->errcode =
-		MAKE_SQLSTATE(error_code[0], error_code[1], error_code[2],
-					  error_code[3], error_code[4]);
-	CDXLNode *filter_dxlnode =
-		(*assert_dxlnode)[CDXLPhysicalAssert::EdxlassertIndexFilter];
-
-	assert_node->errmessage =
-		CTranslatorUtils::GetAssertErrorMsgs(filter_dxlnode);
-
-	// translate operator costs
-	TranslatePlanCosts(assert_dxlnode, plan);
-
-	CDXLTranslateContext child_context(m_mp, false,
-									   output_context->GetColIdToParamIdMap());
-
-	// translate child plan
-	CDXLNode *child_dxlnode =
-		(*assert_dxlnode)[CDXLPhysicalAssert::EdxlassertIndexChild];
-	Plan *child_plan = TranslateDXLOperatorToPlan(
-		child_dxlnode, &child_context, ctxt_translation_prev_siblings);
-
-	GPOS_ASSERT(nullptr != child_plan && "child plan cannot be NULL");
-
-	assert_node->plan.lefttree = child_plan;
-
-	CDXLNode *project_list_dxlnode =
-		(*assert_dxlnode)[CDXLPhysicalAssert::EdxlassertIndexProjList];
-
-	CDXLTranslationContextArray *child_contexts =
-		GPOS_NEW(m_mp) CDXLTranslationContextArray(m_mp);
-	child_contexts->Append(&child_context);
-
-	// translate proj list
-	plan->targetlist =
-		TranslateDXLProjList(project_list_dxlnode,
-							 nullptr,  // translate context for the base table
-							 child_contexts, output_context);
-
-	// translate assert constraints
-	plan->qual = TranslateDXLAssertConstraints(filter_dxlnode, output_context,
-											   child_contexts);
-
-	GPOS_ASSERT(gpdb::ListLength(plan->qual) ==
-				gpdb::ListLength(assert_node->errmessage));
-	SetParamIds(plan);
-
-	// cleanup
-	child_contexts->Release();
-
-	return (Plan *) assert_node;
 }
 
 //---------------------------------------------------------------------------

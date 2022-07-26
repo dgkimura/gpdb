@@ -73,19 +73,6 @@ private:
 		EicIncluded
 	};
 
-	// create a logical assert for the not nullable columns of the given table
-	// on top of the given child expression
-	static CExpression *PexprAssertNotNull(CMemoryPool *mp,
-										   CExpression *pexprChild,
-										   CTableDescriptor *ptabdesc,
-										   CColRefArray *colref_array);
-
-	// create a logical assert for the check constraints on the given table
-	static CExpression *PexprAssertCheckConstraints(CMemoryPool *mp,
-													CExpression *pexprChild,
-													CTableDescriptor *ptabdesc,
-													CColRefArray *colref_array);
-
 	// helper for extracting foreign key
 	static CColRefSet *PcrsFKey(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
 								CColRefSet *prcsOutput, CColRefSet *pcrsKey);
@@ -381,12 +368,6 @@ public:
 								 CExpression **ppexprNewSubquery,
 								 CExpression **ppexprNewScalar);
 
-	// create a logical assert for the check constraints on the given table
-	static CExpression *PexprAssertConstraints(CMemoryPool *mp,
-											   CExpression *pexprChild,
-											   CTableDescriptor *ptabdesc,
-											   CColRefArray *colref_array);
-
 	// return true if stats derivation is needed for this xform
 	static BOOL FDeriveStatsBeforeXform(CXform *pxform);
 
@@ -447,10 +428,6 @@ public:
 	static CExpression *PexprWindowWithRowNumber(CMemoryPool *mp,
 												 CExpression *pexprWindowChild,
 												 CColRefArray *pdrgpcrInput);
-
-	// generate a logical Assert expression that errors out when more than one row is generated
-	static CExpression *PexprAssertOneRow(CMemoryPool *mp,
-										  CExpression *pexprChild);
 
 	// helper for adding CTE producer to global CTE info structure
 	static CExpression *PexprAddCTEProducer(CMemoryPool *mp, ULONG ulCTEId,

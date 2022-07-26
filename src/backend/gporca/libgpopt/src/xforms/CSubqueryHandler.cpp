@@ -40,7 +40,6 @@
 #include "gpopt/operators/CLogicalLeftOuterCorrelatedApply.h"
 #include "gpopt/operators/CLogicalLeftSemiCorrelatedApply.h"
 #include "gpopt/operators/CLogicalLeftSemiCorrelatedApplyIn.h"
-#include "gpopt/operators/CLogicalMaxOneRow.h"
 #include "gpopt/operators/CScalarBooleanTest.h"
 #include "gpopt/operators/CScalarCmp.h"
 #include "gpopt/operators/CScalarCoalesce.h"
@@ -531,8 +530,7 @@ CSubqueryHandler::FGenerateCorrelatedApplyForScalarSubquery(
 	// (1) correlated execution is not enforced,
 	// (2) there are no outer references below, and
 	// (3) transformation converting MaxOneRow to Assert is enabled
-	BOOL fUseMaxOneRow = !fEnforceCorrelatedApply && !psd->m_fHasOuterRefs &&
-						 GPOPT_FENABLED_XFORM(CXform::ExfMaxOneRow2Assert);
+	BOOL fUseMaxOneRow = !fEnforceCorrelatedApply && !psd->m_fHasOuterRefs;
 
 	if (psd->m_fValueSubquery)
 	{
@@ -540,10 +538,8 @@ CSubqueryHandler::FGenerateCorrelatedApplyForScalarSubquery(
 		{
 			// we need correlated execution here to check if more than one row are generated
 			// by inner expression during execution, we generate a MaxOneRow expression to handle this case
-			CExpression *pexprMaxOneRow = GPOS_NEW(mp)
-				CExpression(mp, GPOS_NEW(mp) CLogicalMaxOneRow(mp), pexprInner);
 			*ppexprNewOuter = CUtils::PexprLogicalApply<CLogicalLeftOuterApply>(
-				mp, pexprOuter, pexprMaxOneRow, colref, eopidSubq);
+				mp, pexprOuter, pexprInner, colref, eopidSubq);
 		}
 		else
 		{
@@ -563,10 +559,8 @@ CSubqueryHandler::FGenerateCorrelatedApplyForScalarSubquery(
 	{
 		// we need correlated execution here to check if more than one row are generated
 		// by inner expression during execution, we generate a MaxOneRow expression to handle this case
-		CExpression *pexprMaxOneRow = GPOS_NEW(mp)
-			CExpression(mp, GPOS_NEW(mp) CLogicalMaxOneRow(mp), pexprInner);
 		*ppexprNewOuter = CUtils::PexprLogicalApply<CLogicalInnerApply>(
-			mp, pexprOuter, pexprMaxOneRow, colref, eopidSubq);
+			mp, pexprOuter, pexprInner, colref, eopidSubq);
 	}
 	else
 	{

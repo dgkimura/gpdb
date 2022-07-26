@@ -486,7 +486,6 @@ extern bool optimizer_enable_hashjoin_redistribute_broadcast_children;
 extern bool optimizer_enable_broadcast_nestloop_outer_child;
 extern bool optimizer_enable_streaming_material;
 extern bool optimizer_enable_gather_on_segment_for_dml;
-extern bool optimizer_enable_assert_maxonerow;
 extern bool optimizer_enable_constant_expression_evaluation;
 extern bool optimizer_enable_bitmapscan;
 extern bool optimizer_enable_outerjoin_to_unionall_rewrite;

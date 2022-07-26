@@ -189,9 +189,6 @@ enum Edxltoken
 	EdxltokenScalarArrayRefExpr,
 	EdxltokenScalarArrayRefAssignExpr,
 
-	EdxltokenScalarAssertConstraint,
-	EdxltokenScalarAssertConstraintList,
-
 	EdxltokenScalarSubPlanType,
 	EdxltokenScalarSubPlanTypeScalar,
 	EdxltokenScalarSubPlanTypeExists,
@@ -669,7 +666,6 @@ enum Edxltoken
 	EdxltokenDirectDispatchKeyValue,
 	EdxltokenPhysicalSplit,
 	EdxltokenPhysicalRowTrigger,
-	EdxltokenPhysicalAssert,
 
 	EdxltokenErrorCode,
 	EdxltokenErrorMessage,

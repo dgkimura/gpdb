@@ -246,8 +246,6 @@ public:
 		EopPhysicalSplit,
 		EopPhysicalRowTrigger,
 
-		EopPhysicalAssert,
-
 		EopPatternTree,
 		EopPatternLeaf,
 		EopPatternMultiLeaf,

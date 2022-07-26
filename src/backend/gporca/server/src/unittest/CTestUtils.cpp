@@ -39,7 +39,6 @@
 #include "gpopt/mdcache/CMDCache.h"
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/minidump/CMinidumperUtils.h"
-#include "gpopt/operators/CLogicalAssert.h"
 #include "gpopt/operators/CLogicalCTEConsumer.h"
 #include "gpopt/operators/CLogicalCTEProducer.h"
 #include "gpopt/operators/CLogicalConstTableGet.h"
@@ -61,8 +60,6 @@
 #include "gpopt/operators/CLogicalTVF.h"
 #include "gpopt/operators/CLogicalUnion.h"
 #include "gpopt/operators/CLogicalUpdate.h"
-#include "gpopt/operators/CScalarAssertConstraint.h"
-#include "gpopt/operators/CScalarAssertConstraintList.h"
 #include "gpopt/operators/CScalarIdent.h"
 #include "gpopt/operators/CScalarProjectElement.h"
 #include "gpopt/operators/CScalarSubqueryAll.h"
@@ -573,44 +570,6 @@ CTestUtils::PexprLogicalSelectPartitioned(CMemoryPool *mp)
 								 CUtils::PexprScalarConstInt4(mp, val));
 
 	return CUtils::PexprLogicalSelect(mp, pexprGet, pexprScalar);
-}
-
-//---------------------------------------------------------------------------
-//	@function:
-//		CTestUtils::PexprLogicalAssert
-//
-//	@doc:
-//		Generate randomized Assert expression
-//
-//---------------------------------------------------------------------------
-CExpression *
-CTestUtils::PexprLogicalAssert(CMemoryPool *mp)
-{
-	CExpression *pexprGet = PexprLogicalGet(mp);
-
-	// get any two columns
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
-	CColRef *pcrLeft = pcrs->PcrAny();
-	CColRef *pcrRight = pcrs->PcrAny();
-	CExpression *pexprPredicate =
-		CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
-
-	CWStringConst *pstrErrMsg = CXformUtils::PstrErrorMessage(
-		mp, gpos::CException::ExmaSQL, gpos::CException::ExmiSQLTest,
-		GPOS_WSZ_LIT("Test msg"));
-	CExpression *pexprAssertConstraint = GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) CScalarAssertConstraint(mp, pstrErrMsg),
-					pexprPredicate);
-	CExpression *pexprAssertPredicate = GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) CScalarAssertConstraintList(mp),
-					pexprAssertConstraint);
-
-	CLogicalAssert *popAssert = GPOS_NEW(mp) CLogicalAssert(
-		mp, GPOS_NEW(mp) CException(gpos::CException::ExmaSQL,
-									gpos::CException::ExmiSQLTest));
-
-	return GPOS_NEW(mp)
-		CExpression(mp, popAssert, pexprGet, pexprAssertPredicate);
 }
 
 //---------------------------------------------------------------------------

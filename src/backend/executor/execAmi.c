@@ -58,7 +58,6 @@
 #include "executor/nodeValuesscan.h"
 #include "executor/nodeWindowAgg.h"
 #include "executor/nodeWorktablescan.h"
-#include "executor/nodeAssertOp.h"
 #include "executor/nodeDynamicSeqscan.h"
 #include "executor/nodeDynamicIndexscan.h"
 #include "executor/nodeMotion.h"
@@ -180,10 +179,6 @@ ExecReScan(PlanState *node)
 
 		case T_RecursiveUnionState:
 			ExecReScanRecursiveUnion((RecursiveUnionState *) node);
-			break;
-
-		case T_AssertOpState:
-			ExecReScanAssertOp((AssertOpState *) node);
 			break;
 
 		case T_BitmapAndState:
@@ -740,7 +735,6 @@ ExecSquelchNode(PlanState *node)
 			 * Node types that need no special handling, just recurse to
 			 * children.
 			 */
-		case T_AssertOpState:
 		case T_BitmapAndState:
 		case T_BitmapOrState:
 		case T_DynamicBitmapHeapScanState:

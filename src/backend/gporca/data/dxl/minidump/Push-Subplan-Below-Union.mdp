@@ -41,7 +41,6 @@ CREATE TABLE countrylanguage (
 )distributed by (countrycode,language);
 
 
-set optimizer_enable_assert_maxonerow = off;
 set optimizer=on;
 
 explain
