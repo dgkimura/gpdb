@@ -505,7 +505,7 @@ CSubqueryHandler::FGenerateCorrelatedApplyForScalarSubquery(
 		esqctxt
 #endif	// GPOS_DEBUG
 	,
-	CSubqueryHandler::SSubqueryDesc *psd, BOOL fEnforceCorrelatedApply,
+	CSubqueryHandler::SSubqueryDesc *psd, BOOL /*fEnforceCorrelatedApply*/,
 	CExpression **ppexprNewOuter, CExpression **ppexprResidualScalar)
 {
 #ifdef GPOS_DEBUG
@@ -513,7 +513,7 @@ CSubqueryHandler::FGenerateCorrelatedApplyForScalarSubquery(
 						 ppexprResidualScalar);
 #endif	// GPOS_DEBUG
 	GPOS_ASSERT(nullptr != psd);
-	GPOS_ASSERT(psd->m_fCorrelatedExecution || fEnforceCorrelatedApply);
+	//GPOS_ASSERT(psd->m_fCorrelatedExecution || fEnforceCorrelatedApply);
 
 	CScalarSubquery *popScalarSubquery =
 		CScalarSubquery::PopConvert(pexprSubquery->Pop());
@@ -525,29 +525,12 @@ CSubqueryHandler::FGenerateCorrelatedApplyForScalarSubquery(
 	// inner expression
 	pexprInner->AddRef();
 
-	// in order to check cardinality of subquery output at run time, we can
-	// use MaxOneRow expression, only if
-	// (1) correlated execution is not enforced,
-	// (2) there are no outer references below, and
-	// (3) transformation converting MaxOneRow to Assert is enabled
-	BOOL fUseMaxOneRow = !fEnforceCorrelatedApply && !psd->m_fHasOuterRefs;
-
 	if (psd->m_fValueSubquery)
 	{
-		if (fUseMaxOneRow)
-		{
-			// we need correlated execution here to check if more than one row are generated
-			// by inner expression during execution, we generate a MaxOneRow expression to handle this case
-			*ppexprNewOuter = CUtils::PexprLogicalApply<CLogicalLeftOuterApply>(
+		// correlated inner expression requires correlated execution
+		*ppexprNewOuter =
+			CUtils::PexprLogicalApply<CLogicalLeftOuterCorrelatedApply>(
 				mp, pexprOuter, pexprInner, colref, eopidSubq);
-		}
-		else
-		{
-			// correlated inner expression requires correlated execution
-			*ppexprNewOuter =
-				CUtils::PexprLogicalApply<CLogicalLeftOuterCorrelatedApply>(
-					mp, pexprOuter, pexprInner, colref, eopidSubq);
-		}
 		*ppexprResidualScalar = CUtils::PexprScalarIdent(mp, colref);
 
 		return true;
@@ -555,20 +538,9 @@ CSubqueryHandler::FGenerateCorrelatedApplyForScalarSubquery(
 
 	GPOS_ASSERT(EsqctxtFilter == esqctxt);
 
-	if (fUseMaxOneRow)
-	{
-		// we need correlated execution here to check if more than one row are generated
-		// by inner expression during execution, we generate a MaxOneRow expression to handle this case
-		*ppexprNewOuter = CUtils::PexprLogicalApply<CLogicalInnerApply>(
-			mp, pexprOuter, pexprInner, colref, eopidSubq);
-	}
-	else
-	{
-		// correlated inner expression requires correlated execution
-		*ppexprNewOuter =
-			CUtils::PexprLogicalApply<CLogicalInnerCorrelatedApply>(
-				mp, pexprOuter, pexprInner, colref, eopidSubq);
-	}
+	// correlated inner expression requires correlated execution
+	*ppexprNewOuter = CUtils::PexprLogicalApply<CLogicalInnerCorrelatedApply>(
+		mp, pexprOuter, pexprInner, colref, eopidSubq);
 	*ppexprResidualScalar = CUtils::PexprScalarIdent(mp, colref);
 
 	return true;
