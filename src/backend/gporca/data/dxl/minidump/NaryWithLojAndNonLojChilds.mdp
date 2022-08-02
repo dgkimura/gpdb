@@ -1729,10 +1729,10 @@
         </dxl:Comparison>
       </dxl:LogicalJoin>
     </dxl:Query>
-    <dxl:Plan Id="0" SpaceSize="665">
+    <dxl:Plan Id="0" SpaceSize="1548">
       <dxl:GatherMotion InputSegments="0,1,2" OutputSegments="-1">
         <dxl:Properties>
-          <dxl:Cost StartupCost="0" TotalCost="2155.770115" Rows="17.263546" Width="24"/>
+          <dxl:Cost StartupCost="0" TotalCost="2155.770401" Rows="19.699210" Width="24"/>
         </dxl:Properties>
         <dxl:ProjList>
           <dxl:ProjElem ColId="0" Alias="a">
@@ -1758,7 +1758,7 @@
         <dxl:SortingColumnList/>
         <dxl:HashJoin JoinType="Left">
           <dxl:Properties>
-            <dxl:Cost StartupCost="0" TotalCost="2155.768571" Rows="17.263546" Width="24"/>
+            <dxl:Cost StartupCost="0" TotalCost="2155.768639" Rows="19.699210" Width="24"/>
           </dxl:Properties>
           <dxl:ProjList>
             <dxl:ProjElem ColId="0" Alias="a">
