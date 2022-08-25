@@ -2519,6 +2519,10 @@ ExecModifyTable(PlanState *pstate)
 					estate->es_result_relation_info = resultRelInfo;
 				break;
 			case CMD_UPDATE:
+				/* Prepare for tuple routing if needed. */
+				if (castNode(ModifyTable, node->ps.plan)->forceTupleRouting)
+					slot = ExecPrepareTupleRouting(node, estate, proute,
+												   resultRelInfo, slot);
 				if (!AttributeNumberIsValid(action_attno))
 				{
 					/* normal non-split UPDATE */
@@ -2541,6 +2545,9 @@ ExecModifyTable(PlanState *pstate)
 									  true /* splitUpdate */ ,
 									  NULL, NULL);
 				}
+				/* Revert ExecPrepareTupleRouting's state change. */
+				if (castNode(ModifyTable, node->ps.plan)->forceTupleRouting)
+					estate->es_result_relation_info = resultRelInfo;
 				break;
 			case CMD_DELETE:
 				if (proute)
@@ -2749,12 +2756,22 @@ ExecInitModifyTable(ModifyTable *node, EState *estate, int eflags)
 	rel = (getTargetResultRelInfo(mtstate))->ri_RelationDesc;
 
 	/*
-	 * GPDB: ORCA performs DELETE on a partitioned table via the root
-	 * partition. However, during execution we still need to find the
-	 * corresponding leaf partitions. Thus routing is also set up in this
-	 * scenario.
+	 * GPDB dynamic scan nodes optimize memory usage by avoiding the need to
+	 * maintain a data structure for every partition node. In the plan tree
+	 * this is represented as a single dynamic scan node as opposed to an
+	 * append over many leaf partitions. The different plan representations
+	 * require different execution paths in modify table.
+	 *
+	 * In the case of append, a basic scan on a leaf partition requires no
+	 * tuple routing unless an update to the partition key causes the tuple to
+	 * be routed to another relation.
+	 *
+	 * In the case of dynamic scan, the node heirarchy always requires tuple
+	 * routing to find the corresponding relation. If update to a partition key
+	 * causes the tuple to be routed, then we must perform tuple routing a
+	 * second time.
 	 */
-	if (estate->es_plannedstmt->planGen == PLANGEN_OPTIMIZER && operation == CMD_DELETE)
+	if (node->forceTupleRouting)
 		update_tuple_routing_needed = true;
 
 	/*
