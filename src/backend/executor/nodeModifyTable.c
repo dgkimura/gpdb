@@ -691,37 +691,6 @@ ExecInsert(ModifyTableState *mtstate,
 	return result;
 }
 
-static bool
-ExecFetchPartOid(PlanState *node, void *context)
-{
-	if (node == NULL)
-		return false;
-
-	switch (nodeTag(node))
-	{
-		case T_DynamicIndexScanState:
-		{
-			List **partlist = (List**)context;
-			DynamicIndexScanState *scanNode = castNode(DynamicIndexScanState,  node);
-			if (scanNode->whichPart < scanNode->nOids)
-				*partlist = lappend_oid(*partlist, scanNode->partOids[scanNode->whichPart]);
-			break;
-		}
-		case T_DynamicSeqScanState:
-		{
-			List **partlist = (List**)context;
-			DynamicSeqScanState *scanNode = castNode(DynamicSeqScanState,  node);
-			if (scanNode->whichPart < scanNode->nOids)
-				*partlist = lappend_oid(*partlist, scanNode->partOids[scanNode->whichPart]);
-			break;
-		}
-		default:
-			break;
-	}
-
-	return planstate_tree_walker(node, ExecFetchPartOid, context);
-}
-
 /* ----------------------------------------------------------------
  *		ExecDelete
  *
@@ -762,7 +731,6 @@ ExecDelete(ModifyTableState *mtstate,
 		   bool *tupleDeleted,
 		   TupleTableSlot **epqreturnslot)
 {
-	PlanGenerator planGen = estate->es_plannedstmt->planGen;
 	ResultRelInfo *resultRelInfo;
 	Relation	resultRelationDesc;
 	TM_Result	result;
@@ -790,33 +758,7 @@ ExecDelete(ModifyTableState *mtstate,
 	/*
 	 * get information on the (current) result relation
 	 */
-	if (planGen == PLANGEN_OPTIMIZER)
-	{
-		List *partoidList = NIL;
-		ExecFetchPartOid(mtstate->mt_plans[mtstate->mt_whichplan], &partoidList);
-
-		if (partoidList != NIL)
-		{
-			Oid partoid = linitial_oid(partoidList);
-
-			resultRelInfo = (ResultRelInfo*)palloc(sizeof(ResultRelInfo));
-			Relation	resultRelation = table_open(partoid, NoLock);
-			InitResultRelInfo(resultRelInfo,
-							  resultRelation,
-							  0,
-							  NULL,
-							  estate->es_instrument);
-			table_close(resultRelation, NoLock);
-		}
-		else
-		{
-			resultRelInfo = estate->es_result_relation_info;
-		}
-	}
-	else
-	{
-		resultRelInfo = estate->es_result_relation_info;
-	}
+	resultRelInfo = estate->es_result_relation_info;
 	resultRelationDesc = resultRelInfo->ri_RelationDesc;
 
 	/* BEFORE ROW DELETE Triggers */
@@ -2602,8 +2544,8 @@ ExecModifyTable(PlanState *pstate)
 				break;
 			case CMD_DELETE:
 				if (proute)
-					planSlot = ExecPrepareTupleRouting(node, estate, proute,
-												   resultRelInfo, planSlot);
+					slot = ExecPrepareTupleRouting(node, estate, proute,
+												   resultRelInfo, slot);
 				slot = ExecDelete(node, tupleid, segid, oldtuple, planSlot,
 								  &node->mt_epqstate, estate,
 								  true, node->canSetTag,
