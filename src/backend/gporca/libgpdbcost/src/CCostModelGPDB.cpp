@@ -13,11 +13,12 @@
 
 #include <limits>
 
+#include "gpos/common/Ref.h"
+
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/COrderSpec.h"
 #include "gpopt/base/CWindowFrame.h"
-#include "gpos/common/Ref.h"
 #include "gpopt/engine/CHint.h"
 #include "gpopt/metadata/CIndexDescriptor.h"
 #include "gpopt/metadata/CPartConstraint.h"
@@ -93,7 +94,6 @@ CCostModelGPDB::DRowsPerHost(CDouble dRowsTotal) const
 //---------------------------------------------------------------------------
 CCostModelGPDB::~CCostModelGPDB()
 {
-	m_cost_model_params->Release();
 }
 
 
@@ -1640,7 +1640,7 @@ CCostModelGPDB::CostBitmapTableScan(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		exprhdl.PexprScalarRepChild(1 /*child_index*/);
 	CColRefSet *pcrsUsed = pexprIndexCond->DeriveUsedColumns();
 	CColRefSet *outerRefs = exprhdl.DeriveOuterReferences();
-	CColRefSet *pcrsLocalUsed = GPOS_NEW(mp) CColRefSet(mp, *pcrsUsed);
+	gpos::Ref<CColRefSet> pcrsLocalUsed = GPOS_NEW(mp) CColRefSet(mp, *pcrsUsed);
 	IMDIndex::EmdindexType indexType = IMDIndex::EmdindSentinel;
 
 	if (COperator::EopScalarBitmapIndexProbe == pexprIndexCond->Pop()->Eopid())
@@ -1821,8 +1821,6 @@ CCostModelGPDB::CostBitmapTableScan(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		}
 	}
 
-	pcrsLocalUsed->Release();
-
 	return result;
 }
 
@@ -1988,11 +1986,12 @@ CCostModelGPDB::Cost(
 	COperator::EOperatorId op_id = exprhdl.Pop()->Eopid();
 	if (op_id == COperator::EopPhysicalComputeScalar)
 	{
-		return CostComputeScalar(m_mp, exprhdl, pci, m_cost_model_params, this);
+		return CostComputeScalar(m_mp, exprhdl, pci, m_cost_model_params.get(),
+								 this);
 	}
 	if (FUnary(op_id))
 	{
-		return CostUnary(m_mp, exprhdl, pci, m_cost_model_params);
+		return CostUnary(m_mp, exprhdl, pci, m_cost_model_params.get());
 	}
 
 	switch (op_id)
