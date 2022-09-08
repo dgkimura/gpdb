@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
+#include "gpos/common/Ref.h"
 
 #include "gpdbcost/CCostModelParamsGPDB.h"
 #include "gpopt/cost/CCost.h"
@@ -46,7 +47,7 @@ private:
 	ULONG m_num_of_segments;
 
 	// cost model parameters
-	CCostModelParamsGPDB *m_cost_model_params;
+	gpos::Ref<CCostModelParamsGPDB> m_cost_model_params;
 
 	// return cost of processing the given number of rows
 	static CCost CostTupleProcessing(DOUBLE rows, DOUBLE width,
@@ -223,7 +224,7 @@ public:
 	ICostModelParams *
 	GetCostModelParams() const override
 	{
-		return m_cost_model_params;
+		return m_cost_model_params.get();
 	}
 
 
