@@ -17,6 +17,7 @@
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/COrderSpec.h"
 #include "gpopt/base/CWindowFrame.h"
+#include "gpos/common/Ref.h"
 #include "gpopt/engine/CHint.h"
 #include "gpopt/metadata/CIndexDescriptor.h"
 #include "gpopt/metadata/CPartConstraint.h"
@@ -1003,11 +1004,11 @@ CCostModelGPDB::CostHashJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 			}
 
 			CPhysicalMotion *motion = CPhysicalMotion::PopConvert(popChild);
-			CColRefSet *columns = motion->Pds()->PcrsUsed(mp);
+			gpos::Ref<CColRefSet> columns(motion->Pds()->PcrsUsed(mp));
 
 			// we decide if there is a skew by calculating the NDVs of the HashRedistribute
 			CDouble ndv = 1.0;
-			CColRefSetIter iter(*columns);
+			CColRefSetIter iter(*(columns.get()));
 			while (iter.Advance())
 			{
 				CColRef *colref = iter.Pcr();
@@ -1024,8 +1025,6 @@ CCostModelGPDB::CostHashJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				CDouble sk = pcmgpdb->UlHosts() / ndv;
 				skew_ratio = CDouble(std::max(sk.Get(), skew_ratio.Get()));
 			}
-
-			columns->Release();
 		}
 	}
 
