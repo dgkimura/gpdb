@@ -71,7 +71,9 @@ class Ref
 public:
 	Ref(T *p = nullptr) noexcept : p_(p)
 	{
-		AddRef();
+		// This is a hack, but in the current model the allocated object
+		// constructor initializes CRefCount to 1.
+		//AddRef();
 	}
 	~Ref()
 	{
