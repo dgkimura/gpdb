@@ -1640,7 +1640,8 @@ CCostModelGPDB::CostBitmapTableScan(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		exprhdl.PexprScalarRepChild(1 /*child_index*/);
 	CColRefSet *pcrsUsed = pexprIndexCond->DeriveUsedColumns();
 	CColRefSet *outerRefs = exprhdl.DeriveOuterReferences();
-	gpos::Ref<CColRefSet> pcrsLocalUsed = GPOS_NEW(mp) CColRefSet(mp, *pcrsUsed);
+	gpos::Ref<CColRefSet> pcrsLocalUsed =
+		GPOS_NEW(mp) CColRefSet(mp, *pcrsUsed);
 	IMDIndex::EmdindexType indexType = IMDIndex::EmdindSentinel;
 
 	if (COperator::EopScalarBitmapIndexProbe == pexprIndexCond->Pop()->Eopid())

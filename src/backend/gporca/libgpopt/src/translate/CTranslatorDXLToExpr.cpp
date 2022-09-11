@@ -3949,8 +3949,7 @@ CTranslatorDXLToExpr::Pos(const CDXLNode *dxlnode)
 		// get its column reference from the hash map
 		CColRef *colref = LookupColRef(m_phmulcr, colid);
 
-		IMDId *sort_op_id = dxl_op->GetMdIdSortOp();
-		sort_op_id->AddRef();
+		gpos::Ref<IMDId> sort_op_id = dxl_op->GetMdIdSortOp();
 
 		COrderSpec::ENullTreatment ent = COrderSpec::EntLast;
 		if (dxl_op->IsSortedNullsFirst())

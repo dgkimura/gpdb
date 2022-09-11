@@ -120,7 +120,7 @@ COrderSpecTest::EresUnittest_Basics()
 
 		GPOS_ASSERT(nullptr != colref);
 
-		const IMDId *mdid GPOS_ASSERTS_ONLY = pos1->GetMdIdSortOp(ul);
+		const gpos::Ref<IMDId> mdid GPOS_ASSERTS_ONLY = pos1->GetMdIdSortOp(ul);
 
 		GPOS_ASSERT(mdid->IsValid());
 

@@ -7233,8 +7233,7 @@ CTranslatorExprToDXL::GetSortColListDXL(const COrderSpec *pos)
 	for (ULONG ul = 0; ul < pos->UlSortColumns(); ul++)
 	{
 		// get sort column components
-		IMDId *sort_op_id = pos->GetMdIdSortOp(ul);
-		sort_op_id->AddRef();
+		gpos::Ref<IMDId> sort_op_id = pos->GetMdIdSortOp(ul);
 
 		const CColRef *colref = pos->Pcr(ul);
 
@@ -7243,7 +7242,8 @@ CTranslatorExprToDXL::GetSortColListDXL(const COrderSpec *pos)
 					COrderSpec::EntAuto == ent);
 
 		// get sort operator name
-		const IMDScalarOp *md_scalar_op = m_pmda->RetrieveScOp(sort_op_id);
+		const IMDScalarOp *md_scalar_op =
+			m_pmda->RetrieveScOp(sort_op_id.get());
 
 		CWStringConst *sort_op_name = GPOS_NEW(m_mp) CWStringConst(
 			m_mp, md_scalar_op->Mdname().GetMDName()->GetBuffer());
