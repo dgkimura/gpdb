@@ -29,12 +29,12 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarBitmapBoolOp::CDXLScalarBitmapBoolOp(CMemoryPool *mp,
-											   IMDId *mdid_type,
+											   gpos::Ref<IMDId> mdid_type,
 											   EdxlBitmapBoolOp bitmap_op_type)
 	: CDXLScalar(mp), m_mdid_type(mdid_type), m_bitmap_op_type(bitmap_op_type)
 {
 	GPOS_ASSERT(EdxlbitmapSentinel > bitmap_op_type);
-	GPOS_ASSERT(IMDId::IsValid(mdid_type));
+	GPOS_ASSERT(IMDId::IsValid(mdid_type.get()));
 }
 
 //---------------------------------------------------------------------------
@@ -47,7 +47,6 @@ CDXLScalarBitmapBoolOp::CDXLScalarBitmapBoolOp(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarBitmapBoolOp::~CDXLScalarBitmapBoolOp()
 {
-	m_mdid_type->Release();
 }
 
 
@@ -76,7 +75,7 @@ CDXLScalarBitmapBoolOp::GetDXLOperator() const
 IMDId *
 CDXLScalarBitmapBoolOp::MdidType() const
 {
-	return m_mdid_type;
+	return m_mdid_type.get();
 }
 
 //---------------------------------------------------------------------------
@@ -105,7 +104,7 @@ BOOL
 CDXLScalarBitmapBoolOp::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
+			md_accessor->RetrieveType(m_mdid_type.get())->GetDatumType());
 }
 
 //---------------------------------------------------------------------------

@@ -29,7 +29,7 @@ class CLogicalRowTrigger : public CLogical
 {
 private:
 	// relation id on which triggers are to be executed
-	IMDId *m_rel_mdid;
+	gpos::Ref<IMDId> m_rel_mdid;
 
 	// trigger type
 	INT m_type;
@@ -56,7 +56,7 @@ public:
 	explicit CLogicalRowTrigger(CMemoryPool *mp);
 
 	// ctor
-	CLogicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid, INT type,
+	CLogicalRowTrigger(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid, INT type,
 					   CColRefArray *pdrgpcrOld, CColRefArray *pdrgpcrNew);
 
 	// dtor
@@ -80,7 +80,7 @@ public:
 	IMDId *
 	GetRelMdId() const
 	{
-		return m_rel_mdid;
+		return m_rel_mdid.get();
 	}
 
 	// trigger type

@@ -33,16 +33,17 @@ class CDXLScalarNullIf : public CDXLScalar
 {
 private:
 	// operator number
-	IMDId *m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CDXLScalarNullIf(CDXLScalarNullIf &) = delete;
 
 	// ctor
-	CDXLScalarNullIf(CMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type);
+	CDXLScalarNullIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+					 gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CDXLScalarNullIf() override;

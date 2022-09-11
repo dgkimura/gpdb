@@ -17,10 +17,9 @@ using namespace gpos;
 using namespace gpdxl;
 
 // Ctor
-CDXLScalarPartListValues::CDXLScalarPartListValues(CMemoryPool *mp,
-												   ULONG partitioning_level,
-												   IMDId *result_type_mdid,
-												   IMDId *elem_type_mdid)
+CDXLScalarPartListValues::CDXLScalarPartListValues(
+	CMemoryPool *mp, ULONG partitioning_level,
+	gpos::Ref<IMDId> result_type_mdid, gpos::Ref<IMDId> elem_type_mdid)
 	: CDXLScalar(mp),
 	  m_partitioning_level(partitioning_level),
 	  m_result_type_mdid(result_type_mdid),
@@ -34,8 +33,6 @@ CDXLScalarPartListValues::CDXLScalarPartListValues(CMemoryPool *mp,
 // Dtor
 CDXLScalarPartListValues::~CDXLScalarPartListValues()
 {
-	m_result_type_mdid->Release();
-	m_elem_type_mdid->Release();
 }
 
 // Operator type
@@ -63,14 +60,14 @@ CDXLScalarPartListValues::GetPartitioningLevel() const
 IMDId *
 CDXLScalarPartListValues::GetResultTypeMdId() const
 {
-	return m_result_type_mdid;
+	return m_result_type_mdid.get();
 }
 
 // element type
 IMDId *
 CDXLScalarPartListValues::GetElemTypeMdId() const
 {
-	return m_elem_type_mdid;
+	return m_elem_type_mdid.get();
 }
 
 // does the operator return a boolean result

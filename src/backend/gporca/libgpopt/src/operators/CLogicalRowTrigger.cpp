@@ -46,8 +46,9 @@ CLogicalRowTrigger::CLogicalRowTrigger(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalRowTrigger::CLogicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
-									   INT type, CColRefArray *pdrgpcrOld,
+CLogicalRowTrigger::CLogicalRowTrigger(CMemoryPool *mp,
+									   gpos::Ref<IMDId> rel_mdid, INT type,
+									   CColRefArray *pdrgpcrOld,
 									   CColRefArray *pdrgpcrNew)
 	: CLogical(mp),
 	  m_rel_mdid(rel_mdid),
@@ -73,7 +74,6 @@ CLogicalRowTrigger::CLogicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
 //---------------------------------------------------------------------------
 CLogicalRowTrigger::~CLogicalRowTrigger()
 {
-	CRefCount::SafeRelease(m_rel_mdid);
 	CRefCount::SafeRelease(m_pdrgpcrOld);
 	CRefCount::SafeRelease(m_pdrgpcrNew);
 }
@@ -90,7 +90,7 @@ void
 CLogicalRowTrigger::InitFunctionProperties()
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_rel_mdid);
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_rel_mdid.get());
 	const ULONG ulTriggers = pmdrel->TriggerCount();
 
 	for (ULONG ul = 0; ul < ulTriggers; ul++)
@@ -229,8 +229,6 @@ CLogicalRowTrigger::PopCopyWithRemappedColumns(CMemoryPool *mp,
 		pdrgpcrNew =
 			CUtils::PdrgpcrRemap(mp, m_pdrgpcrNew, colref_mapping, must_exist);
 	}
-
-	m_rel_mdid->AddRef();
 
 	return GPOS_NEW(mp)
 		CLogicalRowTrigger(mp, m_rel_mdid, m_type, pdrgpcrOld, pdrgpcrNew);

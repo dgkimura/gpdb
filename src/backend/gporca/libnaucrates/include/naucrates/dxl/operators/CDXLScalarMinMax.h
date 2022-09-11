@@ -43,7 +43,7 @@ public:
 
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// min/max type
 	EdxlMinMaxType m_min_max_type;
@@ -52,7 +52,7 @@ public:
 	CDXLScalarMinMax(const CDXLScalarMinMax &) = delete;
 
 	// ctor
-	CDXLScalarMinMax(CMemoryPool *mp, IMDId *mdid_type,
+	CDXLScalarMinMax(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 					 EdxlMinMaxType min_max_type);
 
 	//dtor
@@ -65,7 +65,7 @@ public:
 	virtual IMDId *
 	MdidType() const
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// DXL Operator ID

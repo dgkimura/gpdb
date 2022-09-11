@@ -33,10 +33,10 @@ class CDXLScalarArray : public CDXLScalar
 {
 private:
 	// base element type id
-	IMDId *m_elem_type_mdid;
+	gpos::Ref<IMDId> m_elem_type_mdid;
 
 	// array type id
-	IMDId *m_array_type_mdid;
+	gpos::Ref<IMDId> m_array_type_mdid;
 
 	// is it a multidimensional array
 	BOOL m_multi_dimensional_array;
@@ -45,8 +45,9 @@ public:
 	CDXLScalarArray(const CDXLScalarArray &) = delete;
 
 	// ctor
-	CDXLScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
-					IMDId *array_type_mdid, BOOL multi_dimensional_array);
+	CDXLScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+					gpos::Ref<IMDId> array_type_mdid,
+					BOOL multi_dimensional_array);
 
 	// dtor
 	~CDXLScalarArray() override;

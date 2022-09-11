@@ -31,7 +31,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLDatumGeneric::CDXLDatumGeneric(CMemoryPool *mp, IMDId *mdid_type,
+CDXLDatumGeneric::CDXLDatumGeneric(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 								   INT type_modifier, BOOL is_null,
 								   BYTE *byte_array, ULONG length)
 	: CDXLDatum(mp, mdid_type, type_modifier, is_null, length),

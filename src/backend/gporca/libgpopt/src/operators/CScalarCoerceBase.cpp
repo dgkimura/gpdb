@@ -31,7 +31,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCoerceBase::CScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type,
+CScalarCoerceBase::CScalarCoerceBase(CMemoryPool *mp,
+									 gpos::Ref<IMDId> mdid_type,
 									 INT type_modifier, ECoercionForm ecf,
 									 INT location)
 	: CScalar(mp),
@@ -55,7 +56,6 @@ CScalarCoerceBase::CScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type,
 //---------------------------------------------------------------------------
 CScalarCoerceBase::~CScalarCoerceBase()
 {
-	m_result_type_mdid->Release();
 }
 
 
@@ -70,7 +70,7 @@ CScalarCoerceBase::~CScalarCoerceBase()
 IMDId *
 CScalarCoerceBase::MdidType() const
 {
-	return m_result_type_mdid;
+	return m_result_type_mdid.get();
 }
 
 

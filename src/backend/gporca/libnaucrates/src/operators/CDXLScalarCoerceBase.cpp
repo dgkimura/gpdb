@@ -34,7 +34,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCoerceBase::CDXLScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type,
+CDXLScalarCoerceBase::CDXLScalarCoerceBase(CMemoryPool *mp,
+										   gpos::Ref<IMDId> mdid_type,
 										   INT type_modifier,
 										   EdxlCoercionForm dxl_coerce_format,
 										   INT location)
@@ -59,7 +60,6 @@ CDXLScalarCoerceBase::CDXLScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type,
 //---------------------------------------------------------------------------
 CDXLScalarCoerceBase::~CDXLScalarCoerceBase()
 {
-	m_result_type_mdid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -110,8 +110,9 @@ CDXLScalarCoerceBase::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarCoerceBase::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_result_type_mdid)->GetDatumType());
+	return (
+		IMDType::EtiBool ==
+		md_accessor->RetrieveType(m_result_type_mdid.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG

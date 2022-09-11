@@ -29,12 +29,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarWindowRef::CDXLScalarWindowRef(CMemoryPool *mp, IMDId *mdid_func,
-										 IMDId *mdid_return_type,
-										 BOOL is_distinct, BOOL is_star_arg,
-										 BOOL is_simple_agg,
-										 EdxlWinStage dxl_win_stage,
-										 ULONG ulWinspecPosition)
+CDXLScalarWindowRef::CDXLScalarWindowRef(
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+	gpos::Ref<IMDId> mdid_return_type, BOOL is_distinct, BOOL is_star_arg,
+	BOOL is_simple_agg, EdxlWinStage dxl_win_stage, ULONG ulWinspecPosition)
 	: CDXLScalar(mp),
 	  m_func_mdid(mdid_func),
 	  m_return_type_mdid(mdid_return_type),
@@ -59,8 +57,6 @@ CDXLScalarWindowRef::CDXLScalarWindowRef(CMemoryPool *mp, IMDId *mdid_func,
 //---------------------------------------------------------------------------
 CDXLScalarWindowRef::~CDXLScalarWindowRef()
 {
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -175,7 +171,8 @@ CDXLScalarWindowRef::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarWindowRef::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	IMDId *mdid = md_accessor->RetrieveFunc(m_func_mdid)->GetResultTypeMdid();
+	IMDId *mdid =
+		md_accessor->RetrieveFunc(m_func_mdid.get())->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());
 }

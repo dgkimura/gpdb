@@ -39,7 +39,7 @@ class CScalarArrayCoerceExpr : public CScalarCoerceBase
 {
 private:
 	// catalog MDId of the element function
-	IMDId *m_pmdidElementFunc;
+	gpos::Ref<IMDId> m_pmdidElementFunc;
 
 	// conversion semantics flag to pass to func
 	BOOL m_is_explicit;
@@ -48,8 +48,8 @@ public:
 	CScalarArrayCoerceExpr(const CScalarArrayCoerceExpr &) = delete;
 
 	// ctor
-	CScalarArrayCoerceExpr(CMemoryPool *mp, IMDId *element_func,
-						   IMDId *result_type_mdid, INT type_modifier,
+	CScalarArrayCoerceExpr(CMemoryPool *mp, gpos::Ref<IMDId> element_func,
+						   gpos::Ref<IMDId> result_type_mdid, INT type_modifier,
 						   BOOL is_explicit, ECoercionForm dxl_coerce_format,
 						   INT location);
 

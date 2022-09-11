@@ -25,8 +25,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarArray::CDXLScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
-								 IMDId *array_type_mdid,
+CDXLScalarArray::CDXLScalarArray(CMemoryPool *mp,
+								 gpos::Ref<IMDId> elem_type_mdid,
+								 gpos::Ref<IMDId> array_type_mdid,
 								 BOOL multi_dimensional_array)
 	: CDXLScalar(mp),
 	  m_elem_type_mdid(elem_type_mdid),
@@ -47,8 +48,6 @@ CDXLScalarArray::CDXLScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
 //---------------------------------------------------------------------------
 CDXLScalarArray::~CDXLScalarArray()
 {
-	m_elem_type_mdid->Release();
-	m_array_type_mdid->Release();
 }
 
 
@@ -91,7 +90,7 @@ CDXLScalarArray::GetOpNameStr() const
 IMDId *
 CDXLScalarArray::ElementTypeMDid() const
 {
-	return m_elem_type_mdid;
+	return m_elem_type_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -105,7 +104,7 @@ CDXLScalarArray::ElementTypeMDid() const
 IMDId *
 CDXLScalarArray::ArrayTypeMDid() const
 {
-	return m_array_type_mdid;
+	return m_array_type_mdid.get();
 }
 
 //---------------------------------------------------------------------------

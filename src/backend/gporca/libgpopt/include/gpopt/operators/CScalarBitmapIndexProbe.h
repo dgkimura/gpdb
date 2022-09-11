@@ -43,7 +43,7 @@ private:
 	CIndexDescriptor *m_pindexdesc;
 
 	// bitmap type id
-	IMDId *m_pmdidBitmapType;
+	gpos::Ref<IMDId> m_pmdidBitmapType;
 
 	// private copy ctor
 	CScalarBitmapIndexProbe(const CScalarBitmapIndexProbe &);
@@ -51,7 +51,7 @@ private:
 public:
 	// ctor
 	CScalarBitmapIndexProbe(CMemoryPool *mp, CIndexDescriptor *pindexdesc,
-							IMDId *pmdidBitmapType);
+							gpos::Ref<IMDId> pmdidBitmapType);
 
 	// ctor
 	// only for transforms
@@ -71,7 +71,7 @@ public:
 	IMDId *
 	MdidType() const override
 	{
-		return m_pmdidBitmapType;
+		return m_pmdidBitmapType.get();
 	}
 
 	// identifier

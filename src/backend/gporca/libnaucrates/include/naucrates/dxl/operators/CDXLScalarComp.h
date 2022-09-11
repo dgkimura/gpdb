@@ -42,7 +42,7 @@ class CDXLScalarComp : public CDXLScalar
 {
 protected:
 	// operator number in the catalog
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// comparison operator name
 	const CWStringConst *m_comparison_operator_name;
@@ -52,7 +52,7 @@ public:
 	CDXLScalarComp(CDXLScalarComp &) = delete;
 
 	// ctor/dtor
-	CDXLScalarComp(CMemoryPool *mp, IMDId *operator_mdid,
+	CDXLScalarComp(CMemoryPool *mp, gpos::Ref<IMDId> operator_mdid,
 				   const CWStringConst *comparison_operator_name);
 
 	~CDXLScalarComp() override;

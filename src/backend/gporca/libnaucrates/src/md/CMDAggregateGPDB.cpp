@@ -29,11 +29,11 @@ using namespace gpdxl;
 //		Constructs a metadata aggregate
 //
 //---------------------------------------------------------------------------
-CMDAggregateGPDB::CMDAggregateGPDB(CMemoryPool *mp, IMDId *mdid,
-								   CMDName *mdname, IMDId *result_type_mdid,
-								   IMDId *intermediate_result_type_mdid,
-								   BOOL fOrdered, BOOL is_splittable,
-								   BOOL is_hash_agg_capable)
+CMDAggregateGPDB::CMDAggregateGPDB(
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+	gpos::Ref<IMDId> result_type_mdid,
+	gpos::Ref<IMDId> intermediate_result_type_mdid, BOOL fOrdered,
+	BOOL is_splittable, BOOL is_hash_agg_capable)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -59,9 +59,6 @@ CMDAggregateGPDB::CMDAggregateGPDB(CMemoryPool *mp, IMDId *mdid,
 //---------------------------------------------------------------------------
 CMDAggregateGPDB::~CMDAggregateGPDB()
 {
-	m_mdid->Release();
-	m_mdid_type_intermediate->Release();
-	m_mdid_type_result->Release();
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }
@@ -77,7 +74,7 @@ CMDAggregateGPDB::~CMDAggregateGPDB()
 IMDId *
 CMDAggregateGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -106,7 +103,7 @@ CMDAggregateGPDB::Mdname() const
 IMDId *
 CMDAggregateGPDB::GetResultTypeMdid() const
 {
-	return m_mdid_type_result;
+	return m_mdid_type_result.get();
 }
 
 //---------------------------------------------------------------------------
@@ -120,7 +117,7 @@ CMDAggregateGPDB::GetResultTypeMdid() const
 IMDId *
 CMDAggregateGPDB::GetIntermediateResultTypeMdid() const
 {
-	return m_mdid_type_intermediate;
+	return m_mdid_type_intermediate.get();
 }
 
 //---------------------------------------------------------------------------
@@ -160,11 +157,11 @@ CMDAggregateGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	SerializeMDIdAsElem(
 		xml_serializer,
 		CDXLTokens::GetDXLTokenStr(EdxltokenGPDBAggResultTypeId),
-		m_mdid_type_result);
+		m_mdid_type_result.get());
 	SerializeMDIdAsElem(
 		xml_serializer,
 		CDXLTokens::GetDXLTokenStr(EdxltokenGPDBAggIntermediateResultTypeId),
-		m_mdid_type_intermediate);
+		m_mdid_type_intermediate.get());
 
 	xml_serializer->CloseElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),

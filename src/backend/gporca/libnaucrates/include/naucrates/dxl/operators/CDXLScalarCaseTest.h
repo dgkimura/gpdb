@@ -35,13 +35,13 @@ class CDXLScalarCaseTest : public CDXLScalar
 {
 private:
 	// expression type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CDXLScalarCaseTest(const CDXLScalarCaseTest &) = delete;
 
 	// ctor
-	CDXLScalarCaseTest(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarCaseTest(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CDXLScalarCaseTest() override;

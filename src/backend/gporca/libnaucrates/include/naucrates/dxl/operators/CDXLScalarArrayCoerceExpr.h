@@ -39,7 +39,7 @@ class CDXLScalarArrayCoerceExpr : public CDXLScalarCoerceBase
 {
 private:
 	// catalog MDId of element coerce function
-	IMDId *m_coerce_func_mdid;
+	gpos::Ref<IMDId> m_coerce_func_mdid;
 
 	// conversion semantics flag to pass to func
 	BOOL m_explicit;
@@ -47,14 +47,14 @@ private:
 public:
 	CDXLScalarArrayCoerceExpr(const CDXLScalarArrayCoerceExpr &) = delete;
 
-	CDXLScalarArrayCoerceExpr(CMemoryPool *mp, IMDId *coerce_func_mdid,
-							  IMDId *result_type_mdid, INT type_modifier,
-							  BOOL is_explicit, EdxlCoercionForm coerce_format,
-							  INT location);
+	CDXLScalarArrayCoerceExpr(CMemoryPool *mp,
+							  gpos::Ref<IMDId> coerce_func_mdid,
+							  gpos::Ref<IMDId> result_type_mdid,
+							  INT type_modifier, BOOL is_explicit,
+							  EdxlCoercionForm coerce_format, INT location);
 
 	~CDXLScalarArrayCoerceExpr() override
 	{
-		m_coerce_func_mdid->Release();
 	}
 
 	// ident accessor
@@ -68,7 +68,7 @@ public:
 	IMDId *
 	GetCoerceFuncMDid() const
 	{
-		return m_coerce_func_mdid;
+		return m_coerce_func_mdid.get();
 	}
 
 	BOOL

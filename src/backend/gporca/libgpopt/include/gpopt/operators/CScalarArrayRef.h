@@ -36,23 +36,24 @@ class CScalarArrayRef : public CScalar
 {
 private:
 	// element type id
-	IMDId *m_pmdidElem;
+	gpos::Ref<IMDId> m_pmdidElem;
 
 	// element type modifier
 	INT m_type_modifier;
 
 	// array type id
-	IMDId *m_pmdidArray;
+	gpos::Ref<IMDId> m_pmdidArray;
 
 	// return type id
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CScalarArrayRef(const CScalarArrayRef &) = delete;
 
 	// ctor
-	CScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid, INT type_modifier,
-					IMDId *array_type_mdid, IMDId *return_type_mdid);
+	CScalarArrayRef(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+					INT type_modifier, gpos::Ref<IMDId> array_type_mdid,
+					gpos::Ref<IMDId> return_type_mdid);
 
 	// dtor
 	~CScalarArrayRef() override;
@@ -75,7 +76,7 @@ public:
 	IMDId *
 	PmdidElem() const
 	{
-		return m_pmdidElem;
+		return m_pmdidElem.get();
 	}
 
 	// element type modifier
@@ -85,7 +86,7 @@ public:
 	IMDId *
 	PmdidArray() const
 	{
-		return m_pmdidArray;
+		return m_pmdidArray.get();
 	}
 
 	// operator specific hash function
@@ -115,7 +116,7 @@ public:
 	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// conversion function

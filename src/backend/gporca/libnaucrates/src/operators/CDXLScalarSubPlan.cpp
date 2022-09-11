@@ -30,7 +30,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CDXLScalarSubPlan::CDXLScalarSubPlan(CMemoryPool *mp,
-									 IMDId *first_col_type_mdid,
+									 gpos::Ref<IMDId> first_col_type_mdid,
 									 CDXLColRefArray *dxl_colref_array,
 									 EdxlSubPlanType dxl_subplan_type,
 									 CDXLNode *dxlnode_test_expr,
@@ -58,7 +58,6 @@ CDXLScalarSubPlan::CDXLScalarSubPlan(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarSubPlan::~CDXLScalarSubPlan()
 {
-	m_first_col_type_mdid->Release();
 	m_dxl_colref_array->Release();
 	CRefCount::SafeRelease(m_dxlnode_test_expr);
 }
@@ -88,7 +87,7 @@ CDXLScalarSubPlan::GetOpNameStr() const
 IMDId *
 CDXLScalarSubPlan::GetFirstColTypeMdId() const
 {
-	return m_first_col_type_mdid;
+	return m_first_col_type_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -102,8 +101,9 @@ CDXLScalarSubPlan::GetFirstColTypeMdId() const
 BOOL
 CDXLScalarSubPlan::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_first_col_type_mdid)->GetDatumType());
+	return (
+		IMDType::EtiBool ==
+		md_accessor->RetrieveType(m_first_col_type_mdid.get())->GetDatumType());
 }
 
 

@@ -32,8 +32,9 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CScalarArrayCoerceExpr::CScalarArrayCoerceExpr(
-	CMemoryPool *mp, IMDId *element_func, IMDId *result_type_mdid,
-	INT type_modifier, BOOL is_explicit, ECoercionForm ecf, INT location)
+	CMemoryPool *mp, gpos::Ref<IMDId> element_func,
+	gpos::Ref<IMDId> result_type_mdid, INT type_modifier, BOOL is_explicit,
+	ECoercionForm ecf, INT location)
 	: CScalarCoerceBase(mp, result_type_mdid, type_modifier, ecf, location),
 	  m_pmdidElementFunc(element_func),
 	  m_is_explicit(is_explicit)
@@ -51,7 +52,6 @@ CScalarArrayCoerceExpr::CScalarArrayCoerceExpr(
 //---------------------------------------------------------------------------
 CScalarArrayCoerceExpr::~CScalarArrayCoerceExpr()
 {
-	m_pmdidElementFunc->Release();
 }
 
 
@@ -66,7 +66,7 @@ CScalarArrayCoerceExpr::~CScalarArrayCoerceExpr()
 IMDId *
 CScalarArrayCoerceExpr::PmdidElementFunc() const
 {
-	return m_pmdidElementFunc;
+	return m_pmdidElementFunc.get();
 }
 
 
@@ -133,7 +133,7 @@ CScalarArrayCoerceExpr::Matches(COperator *pop) const
 
 	CScalarArrayCoerceExpr *popCoerce = CScalarArrayCoerceExpr::PopConvert(pop);
 
-	return popCoerce->PmdidElementFunc()->Equals(m_pmdidElementFunc) &&
+	return popCoerce->PmdidElementFunc()->Equals(m_pmdidElementFunc.get()) &&
 		   popCoerce->MdidType()->Equals(MdidType()) &&
 		   popCoerce->TypeModifier() == TypeModifier() &&
 		   popCoerce->IsExplicit() == m_is_explicit &&

@@ -31,10 +31,10 @@ class CScalarNullIf : public CScalar
 {
 private:
 	// operator id
-	IMDId *m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// does operator return NULL on NULL input?
 	BOOL m_returns_null_on_null_input;
@@ -46,7 +46,8 @@ public:
 	CScalarNullIf(const CScalarNullIf &) = delete;
 
 	// ctor
-	CScalarNullIf(CMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type);
+	CScalarNullIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+				  gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CScalarNullIf() override;
@@ -62,14 +63,14 @@ public:
 	virtual IMDId *
 	MdIdOp() const
 	{
-		return m_mdid_op;
+		return m_mdid_op.get();
 	}
 
 	// return type
 	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// return a string for operator name

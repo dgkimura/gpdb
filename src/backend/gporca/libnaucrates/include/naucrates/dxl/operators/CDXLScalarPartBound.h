@@ -34,7 +34,7 @@ private:
 	ULONG m_partitioning_level;
 
 	// boundary type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// whether this represents a lower or upper bound
 	BOOL m_is_lower_bound;
@@ -44,7 +44,7 @@ public:
 
 	// ctor
 	CDXLScalarPartBound(CMemoryPool *mp, ULONG partitioning_level,
-						IMDId *mdid_type, BOOL is_lower_bound);
+						gpos::Ref<IMDId> mdid_type, BOOL is_lower_bound);
 
 	// dtor
 	~CDXLScalarPartBound() override;
@@ -66,7 +66,7 @@ public:
 	IMDId *
 	MdidType() const
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// is this a lower (or upper) bound

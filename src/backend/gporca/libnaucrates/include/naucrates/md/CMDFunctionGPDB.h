@@ -40,13 +40,13 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// func id
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// func name
 	CMDName *m_mdname;
 
 	// result type
-	IMDId *m_mdid_type_result;
+	gpos::Ref<IMDId> m_mdid_type_result;
 
 	// output argument types
 	IMdIdArray *m_mdid_types_array;
@@ -92,8 +92,8 @@ public:
 	CMDFunctionGPDB(const CMDFunctionGPDB &) = delete;
 
 	// ctor/dtor
-	CMDFunctionGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-					IMDId *result_type_mdid, IMdIdArray *mdid_array,
+	CMDFunctionGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+					gpos::Ref<IMDId> result_type_mdid, IMdIdArray *mdid_array,
 					BOOL ReturnsSet, EFuncStbl func_stability,
 					EFuncDataAcc func_data_access, BOOL is_strict,
 					BOOL is_ndv_preserving, BOOL is_allowed_for_PS);

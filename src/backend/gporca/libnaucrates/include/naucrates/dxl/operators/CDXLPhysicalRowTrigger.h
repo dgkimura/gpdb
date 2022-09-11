@@ -34,7 +34,7 @@ class CDXLPhysicalRowTrigger : public CDXLPhysical
 {
 private:
 	// relation id on which triggers are to be executed
-	IMDId *m_rel_mdid;
+	gpos::Ref<IMDId> m_rel_mdid;
 
 	// trigger type
 	INT m_type;
@@ -49,7 +49,7 @@ public:
 	CDXLPhysicalRowTrigger(const CDXLPhysicalRowTrigger &) = delete;
 
 	// ctor
-	CDXLPhysicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid, INT type,
+	CDXLPhysicalRowTrigger(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid, INT type,
 						   ULongPtrArray *colids_old,
 						   ULongPtrArray *colids_new);
 
@@ -66,7 +66,7 @@ public:
 	IMDId *
 	GetRelMdId() const
 	{
-		return m_rel_mdid;
+		return m_rel_mdid.get();
 	}
 
 	// trigger type

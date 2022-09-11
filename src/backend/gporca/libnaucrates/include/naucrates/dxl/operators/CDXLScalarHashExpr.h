@@ -34,13 +34,13 @@ class CDXLScalarHashExpr : public CDXLScalar
 {
 private:
 	// catalog Oid of the distribution opfamily
-	IMDId *m_mdid_opfamily;
+	gpos::Ref<IMDId> m_mdid_opfamily;
 
 public:
 	CDXLScalarHashExpr(CDXLScalarHashExpr &) = delete;
 
 	// ctor/dtor
-	CDXLScalarHashExpr(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarHashExpr(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	~CDXLScalarHashExpr() override;
 

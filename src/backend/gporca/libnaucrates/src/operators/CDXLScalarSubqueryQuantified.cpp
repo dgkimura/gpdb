@@ -29,7 +29,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CDXLScalarSubqueryQuantified::CDXLScalarSubqueryQuantified(
-	CMemoryPool *mp, IMDId *scalar_op_mdid, CMDName *scalar_op_mdname,
+	CMemoryPool *mp, gpos::Ref<IMDId> scalar_op_mdid, CMDName *scalar_op_mdname,
 	ULONG colid)
 	: CDXLScalar(mp),
 	  m_scalar_op_mdid(scalar_op_mdid),
@@ -50,7 +50,6 @@ CDXLScalarSubqueryQuantified::CDXLScalarSubqueryQuantified(
 //---------------------------------------------------------------------------
 CDXLScalarSubqueryQuantified::~CDXLScalarSubqueryQuantified()
 {
-	m_scalar_op_mdid->Release();
 	GPOS_DELETE(m_scalar_op_mdname);
 }
 

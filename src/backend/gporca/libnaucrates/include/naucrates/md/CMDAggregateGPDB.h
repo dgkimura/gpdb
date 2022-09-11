@@ -43,16 +43,16 @@ class CMDAggregateGPDB : public IMDAggregate
 	const CWStringDynamic *m_dxl_str;
 
 	// aggregate id
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// aggregate name
 	CMDName *m_mdname;
 
 	// result type
-	IMDId *m_mdid_type_result;
+	gpos::Ref<IMDId> m_mdid_type_result;
 
 	// type of intermediate results
-	IMDId *m_mdid_type_intermediate;
+	gpos::Ref<IMDId> m_mdid_type_intermediate;
 
 	// is aggregate ordered
 	BOOL m_is_ordered;
@@ -67,10 +67,11 @@ public:
 	CMDAggregateGPDB(const CMDAggregateGPDB &) = delete;
 
 	// ctor
-	CMDAggregateGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-					 IMDId *result_type_mdid,
-					 IMDId *intermediate_result_type_mdid, BOOL is_ordered_agg,
-					 BOOL is_splittable, BOOL is_hash_agg_capable);
+	CMDAggregateGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+					 gpos::Ref<IMDId> result_type_mdid,
+					 gpos::Ref<IMDId> intermediate_result_type_mdid,
+					 BOOL is_ordered_agg, BOOL is_splittable,
+					 BOOL is_hash_agg_capable);
 
 	//dtor
 	~CMDAggregateGPDB() override;

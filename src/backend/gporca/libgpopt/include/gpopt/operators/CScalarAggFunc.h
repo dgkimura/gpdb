@@ -59,16 +59,16 @@ class CScalarAggFunc : public CScalar
 {
 private:
 	// aggregate func id
-	IMDId *m_pmdidAggFunc;
+	gpos::Ref<IMDId> m_pmdidAggFunc;
 
 	// resolved return type refers to a non-ambiguous type that was resolved during query
 	// parsing if the actual return type of Agg is ambiguous (e.g., AnyElement in GPDB)
 	// if resolved return type is NULL, then we can get Agg return type by looking up MD cache
 	// using Agg MDId
-	IMDId *m_pmdidResolvedRetType;
+	gpos::Ref<IMDId> m_pmdidResolvedRetType;
 
 	// return type obtained by looking up MD cache
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// aggregate function name
 	const CWStringConst *m_pstrAggFunc;
@@ -90,17 +90,15 @@ public:
 	CScalarAggFunc(const CScalarAggFunc &) = delete;
 
 	// ctor
-	CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
-				   IMDId *resolved_rettype, const CWStringConst *pstrAggFunc,
-				   BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
+	CScalarAggFunc(CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
+				   gpos::Ref<IMDId> resolved_rettype,
+				   const CWStringConst *pstrAggFunc, BOOL is_distinct,
+				   EAggfuncStage eaggfuncstage, BOOL fSplit,
 				   EAggfuncKind aggkind, ULongPtrArray *argtypes);
 
 	// dtor
 	~CScalarAggFunc() override
 	{
-		m_pmdidAggFunc->Release();
-		CRefCount::SafeRelease(m_pmdidResolvedRetType);
-		CRefCount::SafeRelease(m_return_type_mdid);
 		GPOS_DELETE(m_pstrAggFunc);
 		CRefCount::SafeRelease(m_argtypes);
 	}
@@ -213,17 +211,17 @@ public:
 	{
 		if (nullptr == m_pmdidResolvedRetType)
 		{
-			return m_return_type_mdid;
+			return m_return_type_mdid.get();
 		}
 
-		return m_pmdidResolvedRetType;
+		return m_pmdidResolvedRetType.get();
 	}
 
 	// is return type of Agg ambiguous?
 	BOOL
 	FHasAmbiguousReturnType() const
 	{
-		return (nullptr != m_pmdidResolvedRetType);
+		return (nullptr != m_pmdidResolvedRetType.get());
 	}
 
 	// is function count(*)?
@@ -239,7 +237,8 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// lookup mdid of return type for given Agg function
-	static IMDId *PmdidLookupReturnType(IMDId *pmdidAggFunc, BOOL fGlobal,
+	static IMDId *PmdidLookupReturnType(gpos::Ref<IMDId> pmdidAggFunc,
+										BOOL fGlobal,
 										CMDAccessor *pmdaInput = nullptr);
 
 };	// class CScalarAggFunc

@@ -47,7 +47,7 @@ private:
 	INT m_attno;
 
 	// column type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	INT m_type_modifier;
 
@@ -67,8 +67,8 @@ public:
 	CMDColumn(const CMDColumn &) = delete;
 
 	// ctor
-	CMDColumn(CMDName *mdname, INT attrnum, IMDId *mdid_type, INT type_modifier,
-			  BOOL is_nullable, BOOL is_dropped,
+	CMDColumn(CMDName *mdname, INT attrnum, gpos::Ref<IMDId> mdid_type,
+			  INT type_modifier, BOOL is_nullable, BOOL is_dropped,
 			  gpdxl::CDXLNode *dxl_dafault_value,
 			  ULONG length = gpos::ulong_max);
 

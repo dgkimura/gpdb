@@ -28,8 +28,9 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalRowTrigger::CPhysicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
-										 INT type, CColRefArray *pdrgpcrOld,
+CPhysicalRowTrigger::CPhysicalRowTrigger(CMemoryPool *mp,
+										 gpos::Ref<IMDId> rel_mdid, INT type,
+										 CColRefArray *pdrgpcrOld,
 										 CColRefArray *pdrgpcrNew)
 	: CPhysical(mp),
 	  m_rel_mdid(rel_mdid),
@@ -66,7 +67,6 @@ CPhysicalRowTrigger::CPhysicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
 //---------------------------------------------------------------------------
 CPhysicalRowTrigger::~CPhysicalRowTrigger()
 {
-	m_rel_mdid->Release();
 	CRefCount::SafeRelease(m_pdrgpcrOld);
 	CRefCount::SafeRelease(m_pdrgpcrNew);
 	m_pcrsRequiredLocal->Release();

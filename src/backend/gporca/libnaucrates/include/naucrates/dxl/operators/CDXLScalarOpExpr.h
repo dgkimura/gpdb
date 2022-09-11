@@ -34,10 +34,10 @@ class CDXLScalarOpExpr : public CDXLScalar
 {
 private:
 	// operator number in the catalog
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// return type (or invalid if type can be infered from the metadata)
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// operator name
 	const CWStringConst *m_str_opname;
@@ -46,7 +46,8 @@ public:
 	CDXLScalarOpExpr(const CDXLScalarOpExpr &) = delete;
 
 	// ctor/dtor
-	CDXLScalarOpExpr(CMemoryPool *mp, IMDId *mdid_op, IMDId *return_type_mdid,
+	CDXLScalarOpExpr(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+					 gpos::Ref<IMDId> return_type_mdid,
 					 const CWStringConst *str_opname);
 
 	~CDXLScalarOpExpr() override;

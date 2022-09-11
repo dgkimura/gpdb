@@ -45,7 +45,7 @@ public:
 
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// min/max type
 	EScalarMinMaxType m_esmmt;
@@ -57,7 +57,8 @@ public:
 	CScalarMinMax(const CScalarMinMax &) = delete;
 
 	// ctor
-	CScalarMinMax(CMemoryPool *mp, IMDId *mdid_type, EScalarMinMaxType esmmt);
+	CScalarMinMax(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+				  EScalarMinMaxType esmmt);
 
 	// dtor
 	~CScalarMinMax() override;
@@ -80,7 +81,7 @@ public:
 	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// min/max type

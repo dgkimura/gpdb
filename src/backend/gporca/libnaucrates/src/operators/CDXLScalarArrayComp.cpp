@@ -25,7 +25,8 @@ using namespace gpdxl;
 //		Constructs a ScalarArrayComp node
 //
 //---------------------------------------------------------------------------
-CDXLScalarArrayComp::CDXLScalarArrayComp(CMemoryPool *mp, IMDId *mdid_op,
+CDXLScalarArrayComp::CDXLScalarArrayComp(CMemoryPool *mp,
+										 gpos::Ref<IMDId> mdid_op,
 										 const CWStringConst *str_opname,
 										 EdxlArrayCompType comparison_type)
 	: CDXLScalarComp(mp, mdid_op, str_opname),

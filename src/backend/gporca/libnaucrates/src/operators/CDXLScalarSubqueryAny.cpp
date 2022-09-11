@@ -29,7 +29,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CDXLScalarSubqueryAny::CDXLScalarSubqueryAny(CMemoryPool *mp,
-											 IMDId *scalar_op_mdid,
+											 gpos::Ref<IMDId> scalar_op_mdid,
 											 CMDName *scalar_op_mdname,
 											 ULONG colid)
 	: CDXLScalarSubqueryQuantified(mp, scalar_op_mdid, scalar_op_mdname, colid)

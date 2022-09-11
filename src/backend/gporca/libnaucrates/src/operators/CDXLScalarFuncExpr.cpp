@@ -28,8 +28,9 @@ using namespace gpdxl;
 //		Constructs a scalar FuncExpr node
 //
 //---------------------------------------------------------------------------
-CDXLScalarFuncExpr::CDXLScalarFuncExpr(CMemoryPool *mp, IMDId *mdid_func,
-									   IMDId *mdid_return_type,
+CDXLScalarFuncExpr::CDXLScalarFuncExpr(CMemoryPool *mp,
+									   gpos::Ref<IMDId> mdid_func,
+									   gpos::Ref<IMDId> mdid_return_type,
 									   INT return_type_modifier, BOOL fRetSet)
 	: CDXLScalar(mp),
 	  m_func_mdid(mdid_func),
@@ -51,8 +52,6 @@ CDXLScalarFuncExpr::CDXLScalarFuncExpr(CMemoryPool *mp, IMDId *mdid_func,
 //---------------------------------------------------------------------------
 CDXLScalarFuncExpr::~CDXLScalarFuncExpr()
 {
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -95,7 +94,7 @@ CDXLScalarFuncExpr::GetOpNameStr() const
 IMDId *
 CDXLScalarFuncExpr::FuncMdId() const
 {
-	return m_func_mdid;
+	return m_func_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -109,7 +108,7 @@ CDXLScalarFuncExpr::FuncMdId() const
 IMDId *
 CDXLScalarFuncExpr::ReturnTypeMdId() const
 {
-	return m_return_type_mdid;
+	return m_return_type_mdid.get();
 }
 
 INT
@@ -178,7 +177,8 @@ CDXLScalarFuncExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarFuncExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	IMDId *mdid = md_accessor->RetrieveFunc(m_func_mdid)->GetResultTypeMdid();
+	IMDId *mdid =
+		md_accessor->RetrieveFunc(m_func_mdid.get())->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());
 }

@@ -39,7 +39,7 @@ class CDXLScalarCoerceBase : public CDXLScalar
 {
 private:
 	// catalog MDId of the result type
-	IMDId *m_result_type_mdid;
+	gpos::Ref<IMDId> m_result_type_mdid;
 
 	// output type modifier
 	INT m_type_modifier;
@@ -54,8 +54,9 @@ public:
 	CDXLScalarCoerceBase(const CDXLScalarCoerceBase &) = delete;
 
 	// ctor/dtor
-	CDXLScalarCoerceBase(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
-						 EdxlCoercionForm dxl_coerce_format, INT location);
+	CDXLScalarCoerceBase(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+						 INT type_modifier, EdxlCoercionForm dxl_coerce_format,
+						 INT location);
 
 	~CDXLScalarCoerceBase() override;
 
@@ -63,7 +64,7 @@ public:
 	IMDId *
 	GetResultTypeMdId() const
 	{
-		return m_result_type_mdid;
+		return m_result_type_mdid.get();
 	}
 
 	// return type modifier

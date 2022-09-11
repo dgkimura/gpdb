@@ -38,7 +38,7 @@ public:
 	CDXLScalarSubqueryAny(CDXLScalarSubqueryAny &) = delete;
 
 	// ctor
-	CDXLScalarSubqueryAny(CMemoryPool *mp, IMDId *scalar_op_mdid,
+	CDXLScalarSubqueryAny(CMemoryPool *mp, gpos::Ref<IMDId> scalar_op_mdid,
 						  CMDName *mdname, ULONG colid);
 
 	// ident accessors

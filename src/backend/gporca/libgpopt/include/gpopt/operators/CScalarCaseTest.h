@@ -32,13 +32,13 @@ class CScalarCaseTest : public CScalar
 {
 private:
 	// type id
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CScalarCaseTest(const CScalarCaseTest &) = delete;
 
 	// ctor
-	CScalarCaseTest(CMemoryPool *mp, IMDId *mdid_type);
+	CScalarCaseTest(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CScalarCaseTest() override;
@@ -61,7 +61,7 @@ public:
 	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// operator specific hash function

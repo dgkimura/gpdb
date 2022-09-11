@@ -32,10 +32,10 @@ class CDXLPhysicalTVF : public CDXLPhysical
 {
 private:
 	// function mdid
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// function name
 	CWStringConst *func_name;
@@ -44,8 +44,8 @@ public:
 	CDXLPhysicalTVF(const CDXLPhysicalTVF &) = delete;
 
 	// ctor
-	CDXLPhysicalTVF(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-					CWStringConst *str);
+	CDXLPhysicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+					gpos::Ref<IMDId> mdid_return_type, CWStringConst *str);
 
 	// dtor
 	~CDXLPhysicalTVF() override;
@@ -67,14 +67,14 @@ public:
 	IMDId *
 	FuncMdId() const
 	{
-		return m_func_mdid;
+		return m_func_mdid.get();
 	}
 
 	// get return type
 	IMDId *
 	ReturnTypeMdId() const
 	{
-		return m_return_type_mdid;
+		return m_return_type_mdid.get();
 	}
 
 	// serialize operator in DXL format

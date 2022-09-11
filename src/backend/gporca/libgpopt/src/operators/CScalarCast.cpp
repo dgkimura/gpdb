@@ -32,8 +32,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCast::CScalarCast(CMemoryPool *mp, IMDId *return_type_mdid,
-						 IMDId *mdid_func, BOOL is_binary_coercible)
+CScalarCast::CScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> return_type_mdid,
+						 gpos::Ref<IMDId> mdid_func, BOOL is_binary_coercible)
 	: CScalar(mp),
 	  m_return_type_mdid(return_type_mdid),
 	  m_func_mdid(mdid_func),
@@ -44,11 +44,12 @@ CScalarCast::CScalarCast(CMemoryPool *mp, IMDId *return_type_mdid,
 	if (nullptr != m_func_mdid && m_func_mdid->IsValid())
 	{
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+		const IMDFunction *pmdfunc =
+			md_accessor->RetrieveFunc(m_func_mdid.get());
 
 		m_returns_null_on_null_input = pmdfunc->IsStrict();
 		m_fBoolReturnType =
-			CMDAccessorUtils::FBoolType(md_accessor, m_return_type_mdid);
+			CMDAccessorUtils::FBoolType(md_accessor, m_return_type_mdid.get());
 	}
 }
 
@@ -69,10 +70,10 @@ CScalarCast::Matches(COperator *pop) const
 		CScalarCast *pscop = CScalarCast::PopConvert(pop);
 
 		// match if the return type oids are identical
-		return pscop->MdidType()->Equals(m_return_type_mdid) &&
+		return pscop->MdidType()->Equals(m_return_type_mdid.get()) &&
 			   ((!IMDId::IsValid(pscop->FuncMdId()) &&
-				 !IMDId::IsValid(m_func_mdid)) ||
-				pscop->FuncMdId()->Equals(m_func_mdid));
+				 !IMDId::IsValid(m_func_mdid.get())) ||
+				pscop->FuncMdId()->Equals(m_func_mdid.get()));
 	}
 
 	return false;

@@ -29,7 +29,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CDXLColDescr::CDXLColDescr(CMDName *md_name, ULONG column_id, INT attr_no,
-						   IMDId *column_mdid_type, INT type_modifier,
+						   gpos::Ref<IMDId> column_mdid_type, INT type_modifier,
 						   BOOL is_dropped, ULONG width)
 	: m_md_name(md_name),
 	  m_column_id(column_id),
@@ -52,7 +52,6 @@ CDXLColDescr::CDXLColDescr(CMDName *md_name, ULONG column_id, INT attr_no,
 //---------------------------------------------------------------------------
 CDXLColDescr::~CDXLColDescr()
 {
-	m_column_mdid_type->Release();
 	GPOS_DELETE(m_md_name);
 }
 
@@ -109,7 +108,7 @@ CDXLColDescr::AttrNum() const
 IMDId *
 CDXLColDescr::MdidType() const
 {
-	return m_column_mdid_type;
+	return m_column_mdid_type.get();
 }
 
 INT

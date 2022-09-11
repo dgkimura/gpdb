@@ -29,8 +29,9 @@ using namespace gpdxl;
 //		Constructs a metadata func
 //
 //---------------------------------------------------------------------------
-CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-								 IMDId *result_type_mdid,
+CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+								 CMDName *mdname,
+								 gpos::Ref<IMDId> result_type_mdid,
 								 IMdIdArray *mdid_array, BOOL ReturnsSet,
 								 EFuncStbl func_stability,
 								 EFuncDataAcc func_data_access, BOOL is_strict,
@@ -66,8 +67,6 @@ CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 //---------------------------------------------------------------------------
 CMDFunctionGPDB::~CMDFunctionGPDB()
 {
-	m_mdid->Release();
-	m_mdid_type_result->Release();
 	CRefCount::SafeRelease(m_mdid_types_array);
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
@@ -108,7 +107,7 @@ CMDFunctionGPDB::InitDXLTokenArrays()
 IMDId *
 CMDFunctionGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -137,7 +136,7 @@ CMDFunctionGPDB::Mdname() const
 IMDId *
 CMDFunctionGPDB::GetResultTypeMdid() const
 {
-	return m_mdid_type_result;
+	return m_mdid_type_result.get();
 }
 
 //---------------------------------------------------------------------------
@@ -243,7 +242,7 @@ CMDFunctionGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	SerializeMDIdAsElem(
 		xml_serializer,
 		CDXLTokens::GetDXLTokenStr(EdxltokenGPDBFuncResultTypeId),
-		m_mdid_type_result);
+		m_mdid_type_result.get());
 
 	if (nullptr != m_mdid_types_array)
 	{

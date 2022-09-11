@@ -55,11 +55,6 @@ CMDProviderGeneric::CMDProviderGeneric(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CMDProviderGeneric::~CMDProviderGeneric()
 {
-	m_mdid_int2->Release();
-	m_mdid_int4->Release();
-	m_mdid_int8->Release();
-	m_mdid_bool->Release();
-	m_mdid_oid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -78,19 +73,19 @@ CMDProviderGeneric::MDId(IMDType::ETypeInfo type_info) const
 	switch (type_info)
 	{
 		case IMDType::EtiInt2:
-			return m_mdid_int2;
+			return m_mdid_int2.get();
 
 		case IMDType::EtiInt4:
-			return m_mdid_int4;
+			return m_mdid_int4.get();
 
 		case IMDType::EtiInt8:
-			return m_mdid_int8;
+			return m_mdid_int8.get();
 
 		case IMDType::EtiBool:
-			return m_mdid_bool;
+			return m_mdid_bool.get();
 
 		case IMDType::EtiOid:
-			return m_mdid_oid;
+			return m_mdid_oid.get();
 
 		default:
 			return nullptr;

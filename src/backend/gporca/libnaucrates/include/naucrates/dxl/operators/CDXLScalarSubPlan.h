@@ -52,7 +52,7 @@ class CDXLScalarSubPlan : public CDXLScalar
 {
 private:
 	// catalog MDId of the first column type
-	IMDId *m_first_col_type_mdid;
+	gpos::Ref<IMDId> m_first_col_type_mdid;
 
 	// array of outer column references
 	CDXLColRefArray *m_dxl_colref_array;
@@ -70,7 +70,7 @@ public:
 	CDXLScalarSubPlan(CDXLScalarSubPlan &) = delete;
 
 	// ctor/dtor
-	CDXLScalarSubPlan(CMemoryPool *mp, IMDId *first_col_type_mdid,
+	CDXLScalarSubPlan(CMemoryPool *mp, gpos::Ref<IMDId> first_col_type_mdid,
 					  CDXLColRefArray *dxl_colref_array,
 					  EdxlSubPlanType dxl_subplan_type,
 					  CDXLNode *dxlnode_test_expr, BOOL outer_param = false);

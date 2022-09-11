@@ -32,7 +32,7 @@ class CScalarCoalesce : public CScalar
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// is operator return type BOOL?
 	BOOL m_fBoolReturnType;
@@ -41,7 +41,7 @@ public:
 	CScalarCoalesce(const CScalarCoalesce &) = delete;
 
 	// ctor
-	CScalarCoalesce(CMemoryPool *mp, IMDId *mdid_type);
+	CScalarCoalesce(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CScalarCoalesce() override;
@@ -64,7 +64,7 @@ public:
 	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// operator specific hash function

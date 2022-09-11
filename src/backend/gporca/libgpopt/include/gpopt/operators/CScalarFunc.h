@@ -34,10 +34,10 @@ class CScalarFunc : public CScalar
 {
 protected:
 	// func id
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	const INT m_return_type_modifier;
 
@@ -63,8 +63,9 @@ public:
 	explicit CScalarFunc(CMemoryPool *mp);
 
 	// ctor
-	CScalarFunc(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				INT return_type_modifier, const CWStringConst *pstrFunc);
+	CScalarFunc(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+				gpos::Ref<IMDId> mdid_return_type, INT return_type_modifier,
+				const CWStringConst *pstrFunc);
 
 	// dtor
 	~CScalarFunc() override;

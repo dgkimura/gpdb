@@ -44,13 +44,13 @@ private:
 	CMemoryPool *m_mp;
 
 	// check constraint mdid
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// check constraint name
 	CMDName *m_mdname;
 
 	// relation mdid
-	IMDId *m_rel_mdid;
+	gpos::Ref<IMDId> m_rel_mdid;
 
 	// the DXL representation of the check constraint
 	CDXLNode *m_dxl_node;
@@ -60,8 +60,9 @@ private:
 
 public:
 	// ctor
-	CMDCheckConstraintGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-						   IMDId *rel_mdid, CDXLNode *dxlnode);
+	CMDCheckConstraintGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+						   CMDName *mdname, gpos::Ref<IMDId> rel_mdid,
+						   CDXLNode *dxlnode);
 
 	// dtor
 	~CMDCheckConstraintGPDB() override;
@@ -70,7 +71,7 @@ public:
 	IMDId *
 	MDId() const override
 	{
-		return m_mdid;
+		return m_mdid.get();
 	}
 
 	// check constraint name
@@ -84,7 +85,7 @@ public:
 	IMDId *
 	GetRelMdId() const override
 	{
-		return m_rel_mdid;
+		return m_rel_mdid.get();
 	}
 
 	// DXL string for check constraint

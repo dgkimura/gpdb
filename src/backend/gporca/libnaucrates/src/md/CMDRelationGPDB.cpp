@@ -30,7 +30,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDRelationGPDB::CMDRelationGPDB(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname, BOOL fTemporary,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname, BOOL fTemporary,
 	Erelstoragetype rel_storage_type, Ereldistrpolicy rel_distr_policy,
 	CMDColumnArray *mdcol_array, ULongPtrArray *distr_col_array,
 	IMdIdArray *distr_opfamilies, ULongPtrArray *partition_cols_array,
@@ -129,7 +129,6 @@ CMDRelationGPDB::~CMDRelationGPDB()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid->Release();
 	m_md_col_array->Release();
 	CRefCount::SafeRelease(m_distr_col_array);
 	CRefCount::SafeRelease(m_distr_opfamilies);
@@ -158,7 +157,7 @@ CMDRelationGPDB::~CMDRelationGPDB()
 IMDId *
 CMDRelationGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------

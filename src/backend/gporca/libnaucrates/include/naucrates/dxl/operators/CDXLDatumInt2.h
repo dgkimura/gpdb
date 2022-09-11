@@ -47,7 +47,8 @@ public:
 	CDXLDatumInt2(const CDXLDatumInt2 &) = delete;
 
 	// ctor
-	CDXLDatumInt2(CMemoryPool *mp, IMDId *mdid_type, BOOL is_null, SINT val);
+	CDXLDatumInt2(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type, BOOL is_null,
+				  SINT val);
 
 	// dtor
 	~CDXLDatumInt2() override = default;

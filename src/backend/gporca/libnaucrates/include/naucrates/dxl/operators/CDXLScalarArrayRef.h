@@ -33,24 +33,24 @@ class CDXLScalarArrayRef : public CDXLScalar
 {
 private:
 	// base element type id
-	IMDId *m_elem_type_mdid;
+	gpos::Ref<IMDId> m_elem_type_mdid;
 
 	// element type modifier
 	INT m_type_modifier;
 
 	// array type id
-	IMDId *m_array_type_mdid;
+	gpos::Ref<IMDId> m_array_type_mdid;
 
 	// return type id
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 public:
 	CDXLScalarArrayRef(const CDXLScalarArrayRef &) = delete;
 
 	// ctor
-	CDXLScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
-					   INT type_modifier, IMDId *array_type_mdid,
-					   IMDId *return_type_mdid);
+	CDXLScalarArrayRef(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+					   INT type_modifier, gpos::Ref<IMDId> array_type_mdid,
+					   gpos::Ref<IMDId> return_type_mdid);
 
 	// dtor
 	~CDXLScalarArrayRef() override;
@@ -65,7 +65,7 @@ public:
 	IMDId *
 	ElementTypeMDid() const
 	{
-		return m_elem_type_mdid;
+		return m_elem_type_mdid.get();
 	}
 
 	// element type modifier
@@ -75,14 +75,14 @@ public:
 	IMDId *
 	ArrayTypeMDid() const
 	{
-		return m_array_type_mdid;
+		return m_array_type_mdid.get();
 	}
 
 	// return type id
 	IMDId *
 	ReturnTypeMDid() const
 	{
-		return m_return_type_mdid;
+		return m_return_type_mdid.get();
 	}
 
 	// serialize operator in DXL format

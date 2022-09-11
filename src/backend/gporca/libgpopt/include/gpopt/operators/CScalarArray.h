@@ -36,10 +36,10 @@ class CScalarArray : public CScalar
 {
 private:
 	// element type id
-	IMDId *m_pmdidElem;
+	gpos::Ref<IMDId> m_pmdidElem;
 
 	// array type id
-	IMDId *m_pmdidArray;
+	gpos::Ref<IMDId> m_pmdidArray;
 
 	// is array multidimensional
 	BOOL m_fMultiDimensional;
@@ -51,12 +51,13 @@ public:
 	CScalarArray(const CScalarArray &) = delete;
 
 	// ctor
-	CScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid, IMDId *array_type_mdid,
-				 BOOL is_multidimenstional);
+	CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+				 gpos::Ref<IMDId> array_type_mdid, BOOL is_multidimenstional);
 
 	// ctor
-	CScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid, IMDId *array_type_mdid,
-				 BOOL is_multidimenstional, CScalarConstArray *pdrgPconst);
+	CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+				 gpos::Ref<IMDId> array_type_mdid, BOOL is_multidimenstional,
+				 CScalarConstArray *pdrgPconst);
 
 	// dtor
 	~CScalarArray() override;
