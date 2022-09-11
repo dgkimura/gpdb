@@ -57,7 +57,7 @@ private:
 		ULONG m_scan_id;
 
 		// partition table mdid
-		IMDId *m_mdid;
+		gpos::Ref<IMDId> m_mdid;
 
 		// partition keys
 		CPartKeysArray *m_pdrgppartkeys;
@@ -66,7 +66,7 @@ private:
 		CPartInfoEntry(const CPartInfoEntry &) = delete;
 
 		// ctor
-		CPartInfoEntry(ULONG scan_id, IMDId *mdid,
+		CPartInfoEntry(ULONG scan_id, gpos::Ref<IMDId> mdid,
 					   CPartKeysArray *pdrgppartkeys);
 
 		// dtor
@@ -89,7 +89,7 @@ private:
 		virtual IMDId *
 		MDId() const
 		{
-			return m_mdid;
+			return m_mdid.get();
 		}
 
 		// partition keys of partition table

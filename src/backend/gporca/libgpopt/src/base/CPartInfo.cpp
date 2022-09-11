@@ -30,7 +30,7 @@ FORCE_GENERATE_DBGSTR(CPartInfo::CPartInfoEntry);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPartInfo::CPartInfoEntry::CPartInfoEntry(ULONG scan_id, IMDId *mdid,
+CPartInfo::CPartInfoEntry::CPartInfoEntry(ULONG scan_id, gpos::Ref<IMDId> mdid,
 										  CPartKeysArray *pdrgppartkeys)
 	: m_scan_id(scan_id), m_mdid(mdid), m_pdrgppartkeys(pdrgppartkeys)
 {
@@ -49,7 +49,6 @@ CPartInfo::CPartInfoEntry::CPartInfoEntry(ULONG scan_id, IMDId *mdid,
 //---------------------------------------------------------------------------
 CPartInfo::CPartInfoEntry::~CPartInfoEntry()
 {
-	m_mdid->Release();
 	m_pdrgppartkeys->Release();
 }
 
@@ -84,8 +83,6 @@ CPartInfo::CPartInfoEntry::PpartinfoentryAddRemappedKeys(
 			break;
 		}
 	}
-
-	m_mdid->AddRef();
 
 	return GPOS_NEW(mp) CPartInfoEntry(m_scan_id, m_mdid, pdrgppartkeys);
 }

@@ -20,6 +20,7 @@
 #include "gpos/common/CHashSet.h"
 #include "gpos/common/CHashSetIter.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/Ref.h"
 #include "gpos/string/CWStringConst.h"
 
 #include "naucrates/dxl/gpdb_types.h"
