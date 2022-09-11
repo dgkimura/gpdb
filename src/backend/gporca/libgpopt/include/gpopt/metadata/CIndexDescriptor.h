@@ -38,7 +38,7 @@ class CIndexDescriptor : public CRefCount,
 {
 private:
 	// mdid of the index
-	IMDId *m_pmdidIndex;
+	gpos::Ref<IMDId> m_pmdidIndex;
 
 	// name of index
 	CName m_name;
@@ -59,7 +59,8 @@ public:
 	CIndexDescriptor(const CIndexDescriptor &) = delete;
 
 	// ctor
-	CIndexDescriptor(CMemoryPool *mp, IMDId *pmdidIndex, const CName &name,
+	CIndexDescriptor(CMemoryPool *mp, gpos::Ref<IMDId> pmdidIndex,
+					 const CName &name,
 					 CColumnDescriptorArray *pdrgcoldescKeyCols,
 					 CColumnDescriptorArray *pdrgcoldescIncludedCols,
 					 BOOL is_clustered, IMDIndex::EmdindexType emdindt);
@@ -77,7 +78,7 @@ public:
 	IMDId *
 	MDId() const
 	{
-		return m_pmdidIndex;
+		return m_pmdidIndex.get();
 	}
 
 	// index name

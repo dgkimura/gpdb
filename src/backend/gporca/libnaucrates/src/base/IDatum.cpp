@@ -203,15 +203,15 @@ IDatum::StatsAreComparable(const IDatum *datum) const
 {
 	GPOS_ASSERT(nullptr != datum);
 
-	BOOL is_types_match = this->MDId()->Equals(datum->MDId());
+	BOOL is_types_match = this->MDId()->Equals(datum->MDId().get());
 
 	// the statistics for different time related types can't be directly compared, eg: timestamp vs timestamp with time zone.
 	// to prevent inaccurate statistics, mark as non-comparable
 	if (!is_types_match)
 	{
 		BOOL is_time_comparison =
-			CMDTypeGenericGPDB::IsTimeRelatedType(this->MDId()) &&
-			CMDTypeGenericGPDB::IsTimeRelatedType(datum->MDId());
+			CMDTypeGenericGPDB::IsTimeRelatedType(this->MDId().get()) &&
+			CMDTypeGenericGPDB::IsTimeRelatedType(datum->MDId().get());
 		if (is_time_comparison)
 		{
 			return false;

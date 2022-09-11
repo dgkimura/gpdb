@@ -39,7 +39,7 @@ const CDouble CDatumGenericGPDB::DefaultCdbRolloffSelectivity(0.14);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDatumGenericGPDB::CDatumGenericGPDB(CMemoryPool *mp, IMDId *mdid,
+CDatumGenericGPDB::CDatumGenericGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 									 INT type_modifier, const void *src,
 									 ULONG size, BOOL is_null,
 									 LINT stats_comp_val_int,
@@ -78,7 +78,6 @@ CDatumGenericGPDB::CDatumGenericGPDB(CMemoryPool *mp, IMDId *mdid,
 CDatumGenericGPDB::~CDatumGenericGPDB()
 {
 	GPOS_DELETE_ARRAY(m_bytearray_value);
-	m_mdid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -119,7 +118,7 @@ CDatumGenericGPDB::Size() const
 //		Accessor of the type information
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDatumGenericGPDB::MDId() const
 {
 	return m_mdid;
@@ -215,7 +214,7 @@ CDatumGenericGPDB::GetStrRepr(CMemoryPool *mp) const
 BOOL
 CDatumGenericGPDB::Matches(const IDatum *datum) const
 {
-	if (!datum->MDId()->Equals(m_mdid) || (datum->Size() != Size()))
+	if (!datum->MDId()->Equals(m_mdid.get()) || (datum->Size() != Size()))
 	{
 		return false;
 	}
@@ -251,8 +250,6 @@ CDatumGenericGPDB::Matches(const IDatum *datum) const
 IDatum *
 CDatumGenericGPDB::MakeCopy(CMemoryPool *mp) const
 {
-	m_mdid->AddRef();
-
 	// CDatumGenericGPDB makes a copy of the buffer
 	return GPOS_NEW(mp) CDatumGenericGPDB(
 		mp, m_mdid, m_type_modifier, m_bytearray_value, m_size, m_is_null,
@@ -289,7 +286,7 @@ CDatumGenericGPDB::OsPrint(IOstream &os) const
 BOOL
 CDatumGenericGPDB::IsDatumMappableToDouble() const
 {
-	return CMDTypeGenericGPDB::HasByte2DoubleMapping(this->MDId());
+	return CMDTypeGenericGPDB::HasByte2DoubleMapping(this->MDId().get());
 }
 
 //---------------------------------------------------------------------------
@@ -305,7 +302,8 @@ CDatumGenericGPDB::IsDatumMappableToLINT() const
 {
 	if (nullptr == m_cached_type)
 	{
-		m_cached_type = COptCtxt::PoctxtFromTLS()->Pmda()->RetrieveType(MDId());
+		m_cached_type =
+			COptCtxt::PoctxtFromTLS()->Pmda()->RetrieveType(MDId().get());
 	}
 	return CMDTypeGenericGPDB::HasByte2IntMapping(m_cached_type);
 }

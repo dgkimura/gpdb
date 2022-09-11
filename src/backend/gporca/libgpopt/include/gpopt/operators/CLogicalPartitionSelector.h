@@ -32,7 +32,7 @@ class CLogicalPartitionSelector : public CLogical
 {
 private:
 	// mdid of partitioned table
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// filter expressions corresponding to various levels
 	CExpressionArray *m_pdrgpexprFilters;
@@ -46,7 +46,7 @@ public:
 	// ctors
 	explicit CLogicalPartitionSelector(CMemoryPool *mp);
 
-	CLogicalPartitionSelector(CMemoryPool *mp, IMDId *mdid,
+	CLogicalPartitionSelector(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 							  CExpressionArray *pdrgpexprFilters,
 							  CColRef *pcrOid);
 
@@ -71,7 +71,7 @@ public:
 	IMDId *
 	MDId() const
 	{
-		return m_mdid;
+		return m_mdid.get();
 	}
 
 	// oid column

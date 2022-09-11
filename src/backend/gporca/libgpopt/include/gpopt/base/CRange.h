@@ -56,7 +56,7 @@ public:
 
 private:
 	// range type
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// datum comparator
 	const IComparator *m_pcomp;
@@ -102,7 +102,7 @@ public:
 	CRange(const CRange &) = delete;
 
 	// ctor
-	CRange(IMDId *mdid, const IComparator *pcomp, IDatum *pdatumLeft,
+	CRange(gpos::Ref<IMDId> mdid, const IComparator *pcomp, IDatum *pdatumLeft,
 		   ERangeInclusion eriLeft, IDatum *pdatumRight,
 		   ERangeInclusion eriRight);
 
@@ -113,7 +113,7 @@ public:
 	~CRange() override;
 
 	// range type
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_mdid;

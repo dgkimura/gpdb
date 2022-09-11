@@ -64,8 +64,8 @@ CPoint *
 CStatisticsUtils::NextPoint(CMemoryPool *mp, CMDAccessor *md_accessor,
 							CPoint *point)
 {
-	IMDId *mdid = point->GetDatum()->MDId();
-	const IMDType *mdtype = md_accessor->RetrieveType(mdid);
+	gpos::Ref<IMDId> mdid = point->GetDatum()->MDId();
+	const IMDType *mdtype = md_accessor->RetrieveType(mdid.get());
 
 	// type has integer mapping
 	if (mdtype->GetDatumType() == IMDType::EtiInt2 ||

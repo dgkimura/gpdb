@@ -99,7 +99,7 @@ CScalarConst::Matches(COperator *pop) const
 IMDId *
 CScalarConst::MdidType() const
 {
-	return m_pdatum->MDId();
+	return m_pdatum->MDId().get();
 }
 
 

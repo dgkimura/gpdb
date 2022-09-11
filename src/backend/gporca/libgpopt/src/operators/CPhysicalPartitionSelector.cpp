@@ -32,7 +32,7 @@ using namespace gpopt;
 CPhysicalPartitionSelector::CPhysicalPartitionSelector(CMemoryPool *mp,
 													   ULONG scan_id,
 													   ULONG selector_id,
-													   IMDId *mdid,
+													   gpos::Ref<IMDId> mdid,
 													   CExpression *pexprScalar)
 	: CPhysical(mp),
 	  m_scan_id(scan_id),
@@ -54,7 +54,6 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CPhysicalPartitionSelector::~CPhysicalPartitionSelector()
 {
-	m_mdid->Release();
 	CRefCount::SafeRelease(m_filter_expr);
 }
 
@@ -319,7 +318,7 @@ CPhysicalPartitionSelector::PppsDerive(CMemoryPool *mp,
 
 	pps_result->InsertAll(pps_child);
 	pps_result->Insert(m_scan_id, CPartitionPropagationSpec::EpptPropagator,
-					   m_mdid, selector_ids, nullptr);
+					   m_mdid.get(), selector_ids, nullptr);
 	selector_ids->Release();
 
 	return pps_result;

@@ -30,7 +30,7 @@ FORCE_GENERATE_DBGSTR(CIndexDescriptor);
 //
 //---------------------------------------------------------------------------
 CIndexDescriptor::CIndexDescriptor(
-	CMemoryPool *mp, IMDId *pmdidIndex, const CName &name,
+	CMemoryPool *mp, gpos::Ref<IMDId> pmdidIndex, const CName &name,
 	CColumnDescriptorArray *pdrgcoldescKeyCols,
 	CColumnDescriptorArray *pdrgcoldescIncludedCols, BOOL is_clustered,
 	IMDIndex::EmdindexType index_type)
@@ -57,8 +57,6 @@ CIndexDescriptor::CIndexDescriptor(
 //---------------------------------------------------------------------------
 CIndexDescriptor::~CIndexDescriptor()
 {
-	m_pmdidIndex->Release();
-
 	m_pdrgpcoldescKeyCols->Release();
 	m_pdrgpcoldescIncludedCols->Release();
 }

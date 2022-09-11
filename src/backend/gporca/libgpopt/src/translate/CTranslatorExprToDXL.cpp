@@ -6602,7 +6602,7 @@ CTranslatorExprToDXL::PdxlnScConst(CExpression *pexprScConst)
 
 	IDatum *datum = popScConst->GetDatum();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDType *pmdtype = md_accessor->RetrieveType(datum->MDId());
+	const IMDType *pmdtype = md_accessor->RetrieveType(datum->MDId().get());
 
 	CDXLNode *dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, pmdtype->GetDXLOpScConst(m_mp, datum));

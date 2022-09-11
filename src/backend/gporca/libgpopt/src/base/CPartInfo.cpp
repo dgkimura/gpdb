@@ -115,8 +115,7 @@ CPartInfo::CPartInfoEntry::OsPrint(IOstream &os) const
 CPartInfo::CPartInfoEntry *
 CPartInfo::CPartInfoEntry::PpartinfoentryCopy(CMemoryPool *mp) const
 {
-	IMDId *mdid = MDId();
-	mdid->AddRef();
+	gpos::Ref<IMDId> mdid = MDId();
 
 	// copy part keys
 	CPartKeysArray *pdrgppartkeysCopy =
@@ -239,7 +238,7 @@ CPartInfo::ScanId(ULONG ulPos) const
 IMDId *
 CPartInfo::GetRelMdId(ULONG ulPos) const
 {
-	return (*m_pdrgppartentries)[ulPos]->MDId();
+	return (*m_pdrgppartentries)[ulPos]->MDId().get();
 }
 
 //---------------------------------------------------------------------------

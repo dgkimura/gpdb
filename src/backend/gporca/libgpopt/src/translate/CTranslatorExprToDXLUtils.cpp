@@ -1126,7 +1126,8 @@ CTranslatorExprToDXLUtils::PdxlnValuesScan(
 		{
 			IDatum *datum = (*pdrgpdatum)[ulColPos];
 			CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-			const IMDType *pmdtype = md_accessor->RetrieveType(datum->MDId());
+			const IMDType *pmdtype =
+				md_accessor->RetrieveType(datum->MDId().get());
 
 			CDXLNode *pdxlnValue =
 				GPOS_NEW(mp) CDXLNode(mp, pmdtype->GetDXLOpScConst(mp, datum));

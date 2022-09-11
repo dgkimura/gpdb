@@ -91,8 +91,8 @@ CDefaultComparator::FUseInternalEvaluator(const IDatum *datum1,
 										  const IDatum *datum2,
 										  BOOL *can_use_external_evaluator)
 {
-	IMDId *mdid1 = datum1->MDId();
-	IMDId *mdid2 = datum2->MDId();
+	IMDId *mdid1 = datum1->MDId().get();
+	IMDId *mdid2 = datum2->MDId().get();
 
 	// be conservative for now and require this extra condition that
 	// has been in place for a while (might be relaxed in the future)
@@ -113,7 +113,8 @@ CDefaultComparator::FUseInternalEvaluator(const IDatum *datum1,
 	// since Jan 1, 2000 and therefore those can be compared precisely, just like
 	// integer types. Same goes for float types, since they map naturally to a
 	// double value
-	if (mdid1->Equals(datum2->MDId()) && datum1->StatsAreComparable(datum2) &&
+	if (mdid1->Equals(datum2->MDId().get()) &&
+		datum1->StatsAreComparable(datum2) &&
 		(CMDIdGPDB::m_mdid_date.Equals(mdid1) ||
 		 CMDIdGPDB::m_mdid_time.Equals(mdid1) ||
 		 CMDIdGPDB::m_mdid_timestamp.Equals(mdid1) ||
