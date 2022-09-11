@@ -281,7 +281,7 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(CMemoryPool *mp,
 				datum = (*apdatumsortedset)[ul];
 				datum->AddRef();
 
-				IMDId *mdid = datum->MDId();
+				IMDId *mdid = datum->MDId().get();
 				mdid->AddRef();
 
 				CRange *prng = GPOS_NEW(mp)
@@ -293,7 +293,7 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(CMemoryPool *mp,
 			}
 
 			// add the last datum, making range (last, inf)
-			IMDId *mdid = pprevdatum->MDId();
+			IMDId *mdid = pprevdatum->MDId().get();
 			pprevdatum->AddRef();
 			mdid->AddRef();
 			CRange *prng = GPOS_NEW(mp)
@@ -1299,7 +1299,7 @@ CConstraintInterval::MdidType()
 	if (0 < m_pdrgprng->Size())
 	{
 		CRange *prange = (*m_pdrgprng)[0];
-		return prange->MDId();
+		return prange->MDId().get();
 	}
 
 	// otherwise return type of column ref

@@ -44,7 +44,7 @@ private:
 	BOOL m_is_null;
 
 	// type information
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	INT m_type_modifier;
 
@@ -61,7 +61,7 @@ public:
 	CDatumGenericGPDB(const CDatumGenericGPDB &) = delete;
 
 	// ctor
-	CDatumGenericGPDB(CMemoryPool *mp, IMDId *mdid, INT type_modifier,
+	CDatumGenericGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, INT type_modifier,
 					  const void *src, ULONG size, BOOL is_null,
 					  LINT stats_comp_val_int, CDouble stats_comp_val_double);
 
@@ -69,7 +69,7 @@ public:
 	~CDatumGenericGPDB() override;
 
 	// accessor of metadata type id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	INT TypeModifier() const override;
 

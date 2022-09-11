@@ -46,7 +46,7 @@ CLogicalPartitionSelector::CLogicalPartitionSelector(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalPartitionSelector::CLogicalPartitionSelector(
-	CMemoryPool *mp, IMDId *mdid, CExpressionArray *pdrgpexprFilters,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CExpressionArray *pdrgpexprFilters,
 	CColRef *pcrOid)
 	: CLogical(mp),
 	  m_mdid(mdid),
@@ -69,7 +69,6 @@ CLogicalPartitionSelector::CLogicalPartitionSelector(
 //---------------------------------------------------------------------------
 CLogicalPartitionSelector::~CLogicalPartitionSelector()
 {
-	CRefCount::SafeRelease(m_mdid);
 	CRefCount::SafeRelease(m_pdrgpexprFilters);
 }
 
@@ -93,7 +92,7 @@ CLogicalPartitionSelector::Matches(COperator *pop) const
 		CLogicalPartitionSelector::PopConvert(pop);
 
 	return popPartSelector->PcrOid() == m_pcrOid &&
-		   popPartSelector->MDId()->Equals(m_mdid) &&
+		   popPartSelector->MDId()->Equals(m_mdid.get()) &&
 		   popPartSelector->m_pdrgpexprFilters->Equals(m_pdrgpexprFilters);
 }
 
@@ -126,8 +125,6 @@ CLogicalPartitionSelector::PopCopyWithRemappedColumns(
 	CColRef *pcrOid = CUtils::PcrRemap(m_pcrOid, colref_mapping, must_exist);
 	CExpressionArray *pdrgpexpr =
 		CUtils::PdrgpexprRemap(mp, m_pdrgpexprFilters, colref_mapping);
-
-	m_mdid->AddRef();
 
 	return GPOS_NEW(mp)
 		CLogicalPartitionSelector(mp, m_mdid, pdrgpexpr, pcrOid);

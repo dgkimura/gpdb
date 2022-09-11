@@ -289,7 +289,7 @@ CStatsPredUtils::GetPredStats(CMemoryPool *mp, CExpression *expr)
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	IDatum *datum = scalar_const_op->GetDatum();
-	const IMDType *datum_type = md_accessor->RetrieveType(datum->MDId());
+	const IMDType *datum_type = md_accessor->RetrieveType(datum->MDId().get());
 
 	BOOL is_text_related =
 		datum_type->IsTextRelated() && col_ref->RetrieveType()->IsTextRelated();

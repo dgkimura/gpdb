@@ -251,8 +251,8 @@ public:
 	static CDXLDatum *
 	GetDatumVal(CMemoryPool *mp, CMDAccessor *md_accessor, IDatum *datum)
 	{
-		IMDId *mdid = datum->MDId();
-		return md_accessor->RetrieveType(mdid)->GetDatumVal(mp, datum);
+		gpos::Ref<IMDId> mdid = datum->MDId();
+		return md_accessor->RetrieveType(mdid.get())->GetDatumVal(mp, datum);
 	}
 
 	// return a copy the dxl node's physical properties

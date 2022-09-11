@@ -56,7 +56,7 @@ public:
 	virtual IMDType::ETypeInfo GetDatumType() = 0;
 
 	// accessor of metadata id
-	virtual IMDId *MDId() const = 0;
+	virtual gpos::Ref<IMDId> MDId() const = 0;
 
 	virtual INT
 	TypeModifier() const

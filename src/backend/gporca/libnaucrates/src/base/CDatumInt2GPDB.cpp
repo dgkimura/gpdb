@@ -59,11 +59,11 @@ CDatumInt2GPDB::CDatumInt2GPDB(CSystemId sysid, SINT val, BOOL is_null)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDatumInt2GPDB::CDatumInt2GPDB(IMDId *mdid, SINT val, BOOL is_null)
+CDatumInt2GPDB::CDatumInt2GPDB(gpos::Ref<IMDId> mdid, SINT val, BOOL is_null)
 	: m_mdid(mdid), m_val(val), m_is_null(is_null)
 {
-	GPOS_ASSERT(nullptr != m_mdid);
-	GPOS_ASSERT(GPDB_INT2_OID == CMDIdGPDB::CastMdid(m_mdid)->Oid());
+	GPOS_ASSERT(nullptr != m_mdid.get());
+	GPOS_ASSERT(GPDB_INT2_OID == CMDIdGPDB::CastMdid(m_mdid.get())->Oid());
 
 	if (IsNull())
 	{
@@ -82,7 +82,6 @@ CDatumInt2GPDB::CDatumInt2GPDB(IMDId *mdid, SINT val, BOOL is_null)
 //---------------------------------------------------------------------------
 CDatumInt2GPDB::~CDatumInt2GPDB()
 {
-	m_mdid->Release();
 }
 
 
@@ -139,7 +138,7 @@ CDatumInt2GPDB::Size() const
 //		Accessor of type information
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDatumInt2GPDB::MDId() const
 {
 	return m_mdid;
@@ -197,7 +196,7 @@ CDatumInt2GPDB::GetStrRepr(CMemoryPool *mp) const
 BOOL
 CDatumInt2GPDB::Matches(const IDatum *datum) const
 {
-	if (!datum->MDId()->Equals(m_mdid))
+	if (!datum->MDId()->Equals(m_mdid.get()))
 	{
 		return false;
 	}
@@ -225,7 +224,6 @@ CDatumInt2GPDB::Matches(const IDatum *datum) const
 IDatum *
 CDatumInt2GPDB::MakeCopy(CMemoryPool *mp) const
 {
-	m_mdid->AddRef();
 	return GPOS_NEW(mp) CDatumInt2GPDB(m_mdid, m_val, m_is_null);
 }
 

@@ -86,10 +86,10 @@ private:
 			UlongToColRefMap *colref_mapping);
 
 		// mdid of partition table
-		virtual IMDId *
+		virtual gpos::Ref<IMDId>
 		MDId() const
 		{
-			return m_mdid.get();
+			return m_mdid;
 		}
 
 		// partition keys of partition table

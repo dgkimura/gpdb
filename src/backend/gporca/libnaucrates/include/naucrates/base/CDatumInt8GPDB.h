@@ -30,7 +30,7 @@ class CDatumInt8GPDB : public IDatumInt8
 {
 private:
 	// type information
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// integer value
 	LINT m_val;
@@ -44,13 +44,13 @@ public:
 
 	// ctors
 	CDatumInt8GPDB(CSystemId sysid, LINT val, BOOL is_null = false);
-	CDatumInt8GPDB(IMDId *mdid, LINT val, BOOL is_null = false);
+	CDatumInt8GPDB(gpos::Ref<IMDId> mdid, LINT val, BOOL is_null = false);
 
 	// dtor
 	~CDatumInt8GPDB() override;
 
 	// accessor of metadata type id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// accessor of size
 	ULONG Size() const override;

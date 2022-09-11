@@ -232,8 +232,8 @@ CPoint::MaxPoint(CPoint *point1, CPoint *point2)
 CDXLDatum *
 CPoint::GetDatumVal(CMemoryPool *mp, CMDAccessor *md_accessor) const
 {
-	IMDId *mdid = m_datum->MDId();
-	return md_accessor->RetrieveType(mdid)->GetDatumVal(mp, m_datum);
+	gpos::Ref<IMDId> mdid = m_datum->MDId();
+	return md_accessor->RetrieveType(mdid.get())->GetDatumVal(mp, m_datum);
 }
 
 // EOF

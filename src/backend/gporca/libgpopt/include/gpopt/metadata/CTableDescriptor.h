@@ -49,7 +49,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// mdid of the table
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// name of table
 	CName m_name;
@@ -92,7 +92,7 @@ public:
 	CTableDescriptor(const CTableDescriptor &) = delete;
 
 	// ctor
-	CTableDescriptor(CMemoryPool *, IMDId *mdid, const CName &,
+	CTableDescriptor(CMemoryPool *, gpos::Ref<IMDId> mdid, const CName &,
 					 BOOL convert_hash_to_random,
 					 IMDRelation::Ereldistrpolicy rel_distr_policy,
 					 IMDRelation::Erelstoragetype erelstoragetype,
@@ -121,7 +121,7 @@ public:
 	IMDId *
 	MDId() const
 	{
-		return m_mdid;
+		return m_mdid.get();
 	}
 
 	// name accessor

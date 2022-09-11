@@ -29,7 +29,7 @@ class CDatumOidGPDB : public IDatumOid
 {
 private:
 	// type information
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// oid value
 	OID m_val;
@@ -42,13 +42,13 @@ public:
 
 	// ctors
 	CDatumOidGPDB(CSystemId sysid, OID oid_val, BOOL is_null = false);
-	CDatumOidGPDB(IMDId *mdid, OID oid_val, BOOL is_null = false);
+	CDatumOidGPDB(gpos::Ref<IMDId> mdid, OID oid_val, BOOL is_null = false);
 
 	// dtor
 	~CDatumOidGPDB() override;
 
 	// accessor of metadata type id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// accessor of size
 	ULONG Size() const override;

@@ -35,7 +35,7 @@ FORCE_GENERATE_DBGSTR(CTableDescriptor);
 //
 //---------------------------------------------------------------------------
 CTableDescriptor::CTableDescriptor(
-	CMemoryPool *mp, IMDId *mdid, const CName &name,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, const CName &name,
 	BOOL convert_hash_to_random, IMDRelation::Ereldistrpolicy rel_distr_policy,
 	IMDRelation::Erelstoragetype erelstoragetype, ULONG ulExecuteAsUser,
 	INT lockmode)
@@ -77,8 +77,6 @@ CTableDescriptor::CTableDescriptor(
 //---------------------------------------------------------------------------
 CTableDescriptor::~CTableDescriptor()
 {
-	m_mdid->Release();
-
 	m_pdrgpcoldesc->Release();
 	m_pdrgpcoldescDist->Release();
 	m_pdrgpulPart->Release();
@@ -296,10 +294,10 @@ CTableDescriptor::OsPrint(IOstream &os) const
 ULONG
 CTableDescriptor::IndexCount()
 {
-	GPOS_ASSERT(nullptr != m_mdid);
+	GPOS_ASSERT(nullptr != m_mdid.get());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_mdid);
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_mdid.get());
 	const ULONG ulIndices = pmdrel->IndexCount();
 
 	return ulIndices;
@@ -317,10 +315,10 @@ CTableDescriptor::IndexCount()
 ULONG
 CTableDescriptor::PartitionCount() const
 {
-	GPOS_ASSERT(nullptr != m_mdid);
+	GPOS_ASSERT(nullptr != m_mdid.get());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_mdid);
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_mdid.get());
 	const ULONG ulPartitions = pmdrel->PartitionCount();
 
 	return ulPartitions;

@@ -38,7 +38,7 @@ private:
 	ULONG m_selector_id;
 
 	// mdid of partitioned table
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// partition selection predicate
 	CExpression *m_filter_expr;
@@ -48,7 +48,7 @@ public:
 
 	// ctor
 	CPhysicalPartitionSelector(CMemoryPool *mp, ULONG scan_id,
-							   ULONG selector_id, IMDId *mdid,
+							   ULONG selector_id, gpos::Ref<IMDId> mdid,
 							   CExpression *pexprScalar);
 
 	// dtor
@@ -85,7 +85,7 @@ public:
 	IMDId *
 	MDId() const
 	{
-		return m_mdid;
+		return m_mdid.get();
 	}
 
 	// return the partition selection predicate
