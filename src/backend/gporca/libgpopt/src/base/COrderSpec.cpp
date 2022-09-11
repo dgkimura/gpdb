@@ -134,7 +134,8 @@ COrderSpec::~COrderSpec()
 //
 //---------------------------------------------------------------------------
 void
-COrderSpec::Append(gpmd::IMDId *mdid, const CColRef *colref, ENullTreatment ent)
+COrderSpec::Append(gpos::Ref<gpmd::IMDId> mdid, const CColRef *colref,
+				   ENullTreatment ent)
 {
 	COrderExpression *poe = GPOS_NEW(m_mp) COrderExpression(mdid, colref, ent);
 	m_pdrgpoe->Append(poe);
@@ -261,8 +262,7 @@ COrderSpec::PosCopyWithRemappedColumns(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
 		COrderExpression *poe = (*m_pdrgpoe)[ul];
-		IMDId *mdid = poe->GetMdIdSortOp();
-		mdid->AddRef();
+		gpos::Ref<IMDId> mdid = poe->GetMdIdSortOp();
 
 		const CColRef *colref = poe->Pcr();
 		ULONG id = colref->Id();
@@ -318,8 +318,7 @@ COrderSpec::PosExcludeColumns(CMemoryPool *mp, CColRefSet *pcrs)
 			continue;
 		}
 
-		IMDId *mdid = poe->GetMdIdSortOp();
-		mdid->AddRef();
+		gpos::Ref<IMDId> mdid = poe->GetMdIdSortOp();
 		pos->Append(mdid, colref, poe->Ent());
 	}
 

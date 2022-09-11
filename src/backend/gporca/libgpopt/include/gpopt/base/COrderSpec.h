@@ -87,10 +87,10 @@ private:
 		virtual ~COrderExpression();
 
 		// accessor of sort operator midid
-		gpmd::IMDId *
+		gpos::Ref<gpmd::IMDId>
 		GetMdIdSortOp() const
 		{
-			return m_mdid.get();
+			return m_mdid;
 		}
 
 		// accessor of sort column
@@ -146,7 +146,7 @@ public:
 	}
 
 	// accessor of sort operator of the n-th component
-	IMDId *
+	gpos::Ref<IMDId>
 	GetMdIdSortOp(ULONG ul) const
 	{
 		COrderExpression *poe = (*m_pdrgpoe)[ul];
@@ -177,7 +177,8 @@ public:
 	}
 
 	// append new component
-	void Append(gpmd::IMDId *mdid, const CColRef *colref, ENullTreatment ent);
+	void Append(gpos::Ref<gpmd::IMDId> mdid, const CColRef *colref,
+				ENullTreatment ent);
 
 	// extract colref set of order columns
 	CColRefSet *PcrsUsed(CMemoryPool *mp) const override;

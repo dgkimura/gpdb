@@ -124,8 +124,7 @@ CPhysicalSequenceProject::CreateOrderSpec(CMemoryPool *mp)
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		const CColRef *colref = posFirst->Pcr(ul);
-		gpmd::IMDId *mdid = posFirst->GetMdIdSortOp(ul);
-		mdid->AddRef();
+		gpos::Ref<gpmd::IMDId> mdid = posFirst->GetMdIdSortOp(ul);
 		COrderSpec::ENullTreatment ent = posFirst->Ent(ul);
 		m_pos->Append(mdid, colref, ent);
 	}

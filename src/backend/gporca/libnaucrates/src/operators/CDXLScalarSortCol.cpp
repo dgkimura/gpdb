@@ -26,7 +26,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarSortCol::CDXLScalarSortCol(CMemoryPool *mp, ULONG colid,
-									 IMDId *mdid_sort_op,
+									 gpos::Ref<IMDId> mdid_sort_op,
 									 CWStringConst *sort_op_name_str,
 									 BOOL sort_nulls_first)
 	: CDXLScalar(mp),
@@ -48,7 +48,6 @@ CDXLScalarSortCol::CDXLScalarSortCol(CMemoryPool *mp, ULONG colid,
 //---------------------------------------------------------------------------
 CDXLScalarSortCol::~CDXLScalarSortCol()
 {
-	m_mdid_sort_op->Release();
 	GPOS_DELETE(m_sort_op_name_str);
 }
 
@@ -103,7 +102,7 @@ CDXLScalarSortCol::GetColId() const
 //		Oid of the sorting operator for the column from the catalog
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarSortCol::GetMdIdSortOp() const
 {
 	return m_mdid_sort_op;

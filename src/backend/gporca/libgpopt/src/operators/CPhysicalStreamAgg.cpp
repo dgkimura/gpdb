@@ -132,9 +132,8 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
 		for (ULONG ul = 0; ul < ulReqdSortCols; ul++)
 		{
 			CColRef *colref = const_cast<CColRef *>(posRequired->Pcr(ul));
-			IMDId *mdid = posRequired->GetMdIdSortOp(ul);
+			gpos::Ref<IMDId> mdid = posRequired->GetMdIdSortOp(ul);
 			COrderSpec::ENullTreatment ent = posRequired->Ent(ul);
-			mdid->AddRef();
 			pos->Append(mdid, colref, ent);
 		}
 
