@@ -35,7 +35,7 @@ GPOS_CPL_ASSERT(COrderSpec::EntSentinel == GPOS_ARRAY_SIZE(rgszNullCode));
 //		Ctor
 //
 //---------------------------------------------------------------------------
-COrderSpec::COrderExpression::COrderExpression(gpmd::IMDId *mdid,
+COrderSpec::COrderExpression::COrderExpression(gpos::Ref<gpmd::IMDId> mdid,
 											   const CColRef *colref,
 											   ENullTreatment ent)
 	: m_mdid(mdid), m_pcr(colref), m_ent(ent)
@@ -54,7 +54,6 @@ COrderSpec::COrderExpression::COrderExpression(gpmd::IMDId *mdid,
 //---------------------------------------------------------------------------
 COrderSpec::COrderExpression::~COrderExpression()
 {
-	m_mdid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -70,7 +69,7 @@ COrderSpec::COrderExpression::Matches(const COrderExpression *poe) const
 {
 	GPOS_ASSERT(nullptr != poe);
 
-	return poe->m_mdid->Equals(m_mdid) && poe->m_pcr == m_pcr &&
+	return poe->m_mdid->Equals(m_mdid.get()) && poe->m_pcr == m_pcr &&
 		   poe->m_ent == m_ent;
 }
 
