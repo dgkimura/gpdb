@@ -59,7 +59,7 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// metadata id
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// type name
 	CMDName *m_mdname;
@@ -79,45 +79,45 @@ private:
 	// is type passed by value or by reference
 	BOOL m_is_passed_by_value;
 
-	IMDId *m_distr_opfamily;
+	gpos::Ref<IMDId> m_distr_opfamily;
 
-	IMDId *m_legacy_distr_opfamily;
+	gpos::Ref<IMDId> m_legacy_distr_opfamily;
 
 	// id of equality operator for type
-	IMDId *m_mdid_op_eq;
+	gpos::Ref<IMDId> m_mdid_op_eq;
 
 	// id of inequality operator for type
-	IMDId *m_mdid_op_neq;
+	gpos::Ref<IMDId> m_mdid_op_neq;
 
 	// id of less than operator for type
-	IMDId *m_mdid_op_lt;
+	gpos::Ref<IMDId> m_mdid_op_lt;
 
 	// id of less than equals operator for type
-	IMDId *m_mdid_op_leq;
+	gpos::Ref<IMDId> m_mdid_op_leq;
 
 	// id of greater than operator for type
-	IMDId *m_mdid_op_gt;
+	gpos::Ref<IMDId> m_mdid_op_gt;
 
 	// id of greater than equals operator for type
-	IMDId *m_mdid_op_geq;
+	gpos::Ref<IMDId> m_mdid_op_geq;
 
 	// id of comparison operator for type used in btree lookups
-	IMDId *m_mdid_op_cmp;
+	gpos::Ref<IMDId> m_mdid_op_cmp;
 
 	// min aggregate
-	IMDId *m_mdid_min;
+	gpos::Ref<IMDId> m_mdid_min;
 
 	// max aggregate
-	IMDId *m_mdid_max;
+	gpos::Ref<IMDId> m_mdid_max;
 
 	// avg aggregate
-	IMDId *m_mdid_avg;
+	gpos::Ref<IMDId> m_mdid_avg;
 
 	// sum aggregate
-	IMDId *m_mdid_sum;
+	gpos::Ref<IMDId> m_mdid_sum;
 
 	// count aggregate
-	IMDId *m_mdid_count;
+	gpos::Ref<IMDId> m_mdid_count;
 
 	// is type hashable
 	BOOL m_is_hashable;
@@ -132,10 +132,10 @@ private:
 	BOOL m_is_text_related;
 
 	// id of the relation corresponding to a composite type
-	IMDId *m_mdid_base_relation;
+	gpos::Ref<IMDId> m_mdid_base_relation;
 
 	// id of array type for type
-	IMDId *m_mdid_type_array;
+	gpos::Ref<IMDId> m_mdid_type_array;
 
 	// GPDB specific length
 	INT m_gpdb_length;
@@ -148,15 +148,19 @@ public:
 
 	// ctor
 	CMDTypeGenericGPDB(
-		CMemoryPool *mp, IMDId *mdid, CMDName *mdname, BOOL is_redistributable,
-		BOOL is_fixed_length, ULONG length, BOOL is_passed_by_value,
-		IMDId *mdid_distr_opfamily, IMDId *mdid_legacy_distr_opfamily,
-		IMDId *mdid_op_eq, IMDId *mdid_op_neq, IMDId *mdid_op_lt,
-		IMDId *mdid_op_leq, IMDId *mdid_op_gt, IMDId *mdid_op_geq,
-		IMDId *mdid_op_cmp, IMDId *pmdidMin, IMDId *pmdidMax, IMDId *pmdidAvg,
-		IMDId *pmdidSum, IMDId *pmdidCount, BOOL is_hashable,
-		BOOL is_merge_joinable, BOOL is_composite_type, BOOL is_text_related,
-		IMDId *mdid_base_relation, IMDId *mdid_type_array, INT gpdb_length);
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+		BOOL is_redistributable, BOOL is_fixed_length, ULONG length,
+		BOOL is_passed_by_value, gpos::Ref<IMDId> mdid_distr_opfamily,
+		gpos::Ref<IMDId> mdid_legacy_distr_opfamily,
+		gpos::Ref<IMDId> mdid_op_eq, gpos::Ref<IMDId> mdid_op_neq,
+		gpos::Ref<IMDId> mdid_op_lt, gpos::Ref<IMDId> mdid_op_leq,
+		gpos::Ref<IMDId> mdid_op_gt, gpos::Ref<IMDId> mdid_op_geq,
+		gpos::Ref<IMDId> mdid_op_cmp, gpos::Ref<IMDId> pmdidMin,
+		gpos::Ref<IMDId> pmdidMax, gpos::Ref<IMDId> pmdidAvg,
+		gpos::Ref<IMDId> pmdidSum, gpos::Ref<IMDId> pmdidCount,
+		BOOL is_hashable, BOOL is_merge_joinable, BOOL is_composite_type,
+		BOOL is_text_related, gpos::Ref<IMDId> mdid_base_relation,
+		gpos::Ref<IMDId> mdid_type_array, INT gpdb_length);
 
 	// dtor
 	~CMDTypeGenericGPDB() override;
@@ -208,7 +212,7 @@ public:
 	const IMDId *
 	CmpOpMdid() const override
 	{
-		return m_mdid_op_cmp;
+		return m_mdid_op_cmp.get();
 	}
 
 	// is type hashable
@@ -235,13 +239,13 @@ public:
 	IMDId *
 	GetBaseRelMdid() const override
 	{
-		return m_mdid_base_relation;
+		return m_mdid_base_relation.get();
 	}
 
 	IMDId *
 	GetArrayTypeMdid() const override
 	{
-		return m_mdid_type_array;
+		return m_mdid_type_array.get();
 	}
 
 	IMDId *GetDistrOpfamilyMdid() const override;

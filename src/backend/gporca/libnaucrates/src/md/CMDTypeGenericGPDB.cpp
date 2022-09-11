@@ -44,16 +44,20 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDTypeGenericGPDB::CMDTypeGenericGPDB(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname, BOOL is_redistributable,
-	BOOL is_fixed_length, ULONG length GPOS_ASSERTS_ONLY,
-	BOOL is_passed_by_value, IMDId *mdid_distr_opfamily,
-	IMDId *mdid_legacy_distr_opfamily, IMDId *mdid_op_eq, IMDId *mdid_op_neq,
-	IMDId *mdid_op_lt, IMDId *mdid_op_leq, IMDId *mdid_op_gt,
-	IMDId *mdid_op_geq, IMDId *mdid_op_cmp, IMDId *mdid_op_min,
-	IMDId *mdid_op_max, IMDId *mdid_op_avg, IMDId *mdid_op_sum,
-	IMDId *mdid_op_count, BOOL is_hashable, BOOL is_merge_joinable,
-	BOOL is_composite_type, BOOL is_text_related, IMDId *mdid_base_relation,
-	IMDId *mdid_type_array, INT gpdb_length)
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+	BOOL is_redistributable, BOOL is_fixed_length,
+	ULONG length GPOS_ASSERTS_ONLY, BOOL is_passed_by_value,
+	gpos::Ref<IMDId> mdid_distr_opfamily,
+	gpos::Ref<IMDId> mdid_legacy_distr_opfamily, gpos::Ref<IMDId> mdid_op_eq,
+	gpos::Ref<IMDId> mdid_op_neq, gpos::Ref<IMDId> mdid_op_lt,
+	gpos::Ref<IMDId> mdid_op_leq, gpos::Ref<IMDId> mdid_op_gt,
+	gpos::Ref<IMDId> mdid_op_geq, gpos::Ref<IMDId> mdid_op_cmp,
+	gpos::Ref<IMDId> mdid_op_min, gpos::Ref<IMDId> mdid_op_max,
+	gpos::Ref<IMDId> mdid_op_avg, gpos::Ref<IMDId> mdid_op_sum,
+	gpos::Ref<IMDId> mdid_op_count, BOOL is_hashable, BOOL is_merge_joinable,
+	BOOL is_composite_type, BOOL is_text_related,
+	gpos::Ref<IMDId> mdid_base_relation, gpos::Ref<IMDId> mdid_type_array,
+	INT gpdb_length)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -91,7 +95,6 @@ CMDTypeGenericGPDB::CMDTypeGenericGPDB(
 	m_dxl_str = CDXLUtils::SerializeMDObj(
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 
-	m_mdid->AddRef();
 	m_datum_null = GPOS_NEW(m_mp) CDatumGenericGPDB(
 		m_mp, m_mdid, default_type_modifier, nullptr /*pba*/, 0 /*length*/,
 		true /*constNull*/, 0 /*lValue */, 0 /*dValue */);
@@ -107,23 +110,6 @@ CMDTypeGenericGPDB::CMDTypeGenericGPDB(
 //---------------------------------------------------------------------------
 CMDTypeGenericGPDB::~CMDTypeGenericGPDB()
 {
-	m_mdid->Release();
-	CRefCount::SafeRelease(m_distr_opfamily);
-	CRefCount::SafeRelease(m_legacy_distr_opfamily);
-	m_mdid_op_eq->Release();
-	m_mdid_op_neq->Release();
-	m_mdid_op_lt->Release();
-	m_mdid_op_leq->Release();
-	m_mdid_op_gt->Release();
-	m_mdid_op_geq->Release();
-	m_mdid_op_cmp->Release();
-	m_mdid_type_array->Release();
-	m_mdid_min->Release();
-	m_mdid_max->Release();
-	m_mdid_avg->Release();
-	m_mdid_sum->Release();
-	m_mdid_count->Release();
-	CRefCount::SafeRelease(m_mdid_base_relation);
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 	m_datum_null->Release();
@@ -144,15 +130,15 @@ CMDTypeGenericGPDB::GetMdidForAggType(EAggType agg_type) const
 	switch (agg_type)
 	{
 		case EaggMin:
-			return m_mdid_min;
+			return m_mdid_min.get();
 		case EaggMax:
-			return m_mdid_max;
+			return m_mdid_max.get();
 		case EaggAvg:
-			return m_mdid_avg;
+			return m_mdid_avg.get();
 		case EaggSum:
-			return m_mdid_sum;
+			return m_mdid_sum.get();
 		case EaggCount:
-			return m_mdid_count;
+			return m_mdid_count.get();
 		default:
 			GPOS_ASSERT(!"Invalid aggregate type");
 			return nullptr;
@@ -170,7 +156,7 @@ CMDTypeGenericGPDB::GetMdidForAggType(EAggType agg_type) const
 IMDId *
 CMDTypeGenericGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -201,17 +187,17 @@ CMDTypeGenericGPDB::GetMdidForCmpType(ECmpType cmp_type) const
 	switch (cmp_type)
 	{
 		case EcmptEq:
-			return m_mdid_op_eq;
+			return m_mdid_op_eq.get();
 		case EcmptNEq:
-			return m_mdid_op_neq;
+			return m_mdid_op_neq.get();
 		case EcmptL:
-			return m_mdid_op_lt;
+			return m_mdid_op_lt.get();
 		case EcmptLEq:
-			return m_mdid_op_leq;
+			return m_mdid_op_leq.get();
 		case EcmptG:
-			return m_mdid_op_gt;
+			return m_mdid_op_gt.get();
 		case EcmptGEq:
-			return m_mdid_op_geq;
+			return m_mdid_op_geq.get();
 		default:
 			GPOS_ASSERT(!"Invalid operator type");
 			return nullptr;
@@ -333,10 +319,10 @@ CMDTypeGenericGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 	}
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDType *md_type = md_accessor->RetrieveType(m_mdid);
-	return CreateDXLDatumVal(mp, m_mdid, md_type, datum_generic->TypeModifier(),
-							 datum_generic->IsNull(), pba, length, lValue,
-							 dValue);
+	const IMDType *md_type = md_accessor->RetrieveType(m_mdid.get());
+	return CreateDXLDatumVal(
+		mp, m_mdid.get(), md_type, datum_generic->TypeModifier(),
+		datum_generic->IsNull(), pba, length, lValue, dValue);
 }
 
 //---------------------------------------------------------------------------
@@ -350,7 +336,7 @@ CMDTypeGenericGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 BOOL
 CMDTypeGenericGPDB::IsAmbiguous() const
 {
-	OID oid = CMDIdGPDB::CastMdid(m_mdid)->Oid();
+	OID oid = CMDIdGPDB::CastMdid(m_mdid.get())->Oid();
 	// This should match the IsPolymorphicType() macro in GPDB's pg_type.h
 	return (GPDB_ANYELEMENT_OID == oid || GPDB_ANYARRAY_OID == oid ||
 			GPDB_ANYNONARRAY_OID == oid || GPDB_ANYENUM_OID == oid);
@@ -456,8 +442,8 @@ CMDTypeGenericGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
 	m_mdid->AddRef();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDType *md_type = md_accessor->RetrieveType(m_mdid);
-	return CreateDXLDatumVal(mp, m_mdid, md_type, default_type_modifier,
+	const IMDType *md_type = md_accessor->RetrieveType(m_mdid.get());
+	return CreateDXLDatumVal(mp, m_mdid.get(), md_type, default_type_modifier,
 							 true /*fConstNull*/, nullptr /*byte_array*/,
 							 0 /*length*/, 0 /*lint_value */,
 							 0 /*double_value */);
@@ -551,11 +537,11 @@ CMDTypeGenericGPDB::GetDistrOpfamilyMdid() const
 {
 	if (GPOS_FTRACE(EopttraceUseLegacyOpfamilies))
 	{
-		return m_legacy_distr_opfamily;
+		return m_legacy_distr_opfamily.get();
 	}
 	else
 	{
-		return m_distr_opfamily;
+		return m_distr_opfamily.get();
 	}
 }
 

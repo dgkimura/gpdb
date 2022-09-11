@@ -68,9 +68,7 @@ CMDTypeBoolGPDB::CMDTypeBoolGPDB(CMemoryPool *mp) : m_mp(mp)
 	m_dxl_str = CDXLUtils::SerializeMDObj(
 		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 
-	m_mdid->AddRef();
-
-	GPOS_ASSERT(GPDB_BOOL_OID == CMDIdGPDB::CastMdid(m_mdid)->Oid());
+	GPOS_ASSERT(GPDB_BOOL_OID == CMDIdGPDB::CastMdid(m_mdid.get())->Oid());
 	m_datum_null = GPOS_NEW(mp)
 		CDatumBoolGPDB(m_mdid, false /* value */, true /* is_null */);
 }
@@ -85,23 +83,6 @@ CMDTypeBoolGPDB::CMDTypeBoolGPDB(CMemoryPool *mp) : m_mp(mp)
 //---------------------------------------------------------------------------
 CMDTypeBoolGPDB::~CMDTypeBoolGPDB()
 {
-	m_mdid->Release();
-	CRefCount::SafeRelease(m_distr_opfamily);
-	CRefCount::SafeRelease(m_legacy_distr_opfamily);
-	m_mdid_op_eq->Release();
-	m_mdid_op_neq->Release();
-	m_mdid_op_lt->Release();
-	m_mdid_op_leq->Release();
-	m_mdid_op_gt->Release();
-	m_mdid_op_geq->Release();
-	m_mdid_op_cmp->Release();
-	m_mdid_type_array->Release();
-
-	m_mdid_min->Release();
-	m_mdid_max->Release();
-	m_mdid_avg->Release();
-	m_mdid_sum->Release();
-	m_mdid_count->Release();
 	m_datum_null->Release();
 	GPOS_DELETE(m_dxl_str);
 }
@@ -120,17 +101,17 @@ CMDTypeBoolGPDB::GetMdidForCmpType(ECmpType cmp_type) const
 	switch (cmp_type)
 	{
 		case EcmptEq:
-			return m_mdid_op_eq;
+			return m_mdid_op_eq.get();
 		case EcmptNEq:
-			return m_mdid_op_neq;
+			return m_mdid_op_neq.get();
 		case EcmptL:
-			return m_mdid_op_lt;
+			return m_mdid_op_lt.get();
 		case EcmptLEq:
-			return m_mdid_op_leq;
+			return m_mdid_op_leq.get();
 		case EcmptG:
-			return m_mdid_op_gt;
+			return m_mdid_op_gt.get();
 		case EcmptGEq:
-			return m_mdid_op_geq;
+			return m_mdid_op_geq.get();
 		default:
 			GPOS_ASSERT(!"Invalid operator type");
 			return nullptr;
@@ -151,15 +132,15 @@ CMDTypeBoolGPDB::GetMdidForAggType(EAggType agg_type) const
 	switch (agg_type)
 	{
 		case EaggMin:
-			return m_mdid_min;
+			return m_mdid_min.get();
 		case EaggMax:
-			return m_mdid_max;
+			return m_mdid_max.get();
 		case EaggAvg:
-			return m_mdid_avg;
+			return m_mdid_avg.get();
 		case EaggSum:
-			return m_mdid_sum;
+			return m_mdid_sum.get();
 		case EaggCount:
-			return m_mdid_count;
+			return m_mdid_count.get();
 		default:
 			GPOS_ASSERT(!"Invalid aggregate type");
 			return nullptr;
@@ -192,7 +173,7 @@ CMDTypeBoolGPDB::CreateBoolDatum(CMemoryPool *mp, BOOL bool_val,
 IMDId *
 CMDTypeBoolGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 IMDId *
@@ -200,11 +181,11 @@ CMDTypeBoolGPDB::GetDistrOpfamilyMdid() const
 {
 	if (GPOS_FTRACE(EopttraceUseLegacyOpfamilies))
 	{
-		return m_legacy_distr_opfamily;
+		return m_legacy_distr_opfamily.get();
 	}
 	else
 	{
-		return m_distr_opfamily;
+		return m_distr_opfamily.get();
 	}
 }
 
@@ -290,8 +271,8 @@ CMDTypeBoolGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 {
 	CDatumBoolGPDB *datum_bool = dynamic_cast<CDatumBoolGPDB *>(datum);
 	m_mdid->AddRef();
-	return GPOS_NEW(mp)
-		CDXLDatumBool(mp, m_mdid, datum_bool->IsNull(), datum_bool->GetValue());
+	return GPOS_NEW(mp) CDXLDatumBool(mp, m_mdid.get(), datum_bool->IsNull(),
+									  datum_bool->GetValue());
 }
 
 //---------------------------------------------------------------------------
@@ -308,8 +289,9 @@ CMDTypeBoolGPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
 	CDatumBoolGPDB *datum_bool_gpdb = dynamic_cast<CDatumBoolGPDB *>(datum);
 
 	m_mdid->AddRef();
-	CDXLDatumBool *dxl_datum = GPOS_NEW(mp) CDXLDatumBool(
-		mp, m_mdid, datum_bool_gpdb->IsNull(), datum_bool_gpdb->GetValue());
+	CDXLDatumBool *dxl_datum =
+		GPOS_NEW(mp) CDXLDatumBool(mp, m_mdid.get(), datum_bool_gpdb->IsNull(),
+								   datum_bool_gpdb->GetValue());
 
 	return GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum);
 }
@@ -327,7 +309,8 @@ CMDTypeBoolGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
 	m_mdid->AddRef();
 
-	return GPOS_NEW(mp) CDXLDatumBool(mp, m_mdid, true /*is_null*/, false);
+	return GPOS_NEW(mp)
+		CDXLDatumBool(mp, m_mdid.get(), true /*is_null*/, false);
 }
 
 #ifdef GPOS_DEBUG
