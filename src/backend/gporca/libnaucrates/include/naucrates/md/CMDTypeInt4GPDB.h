@@ -72,34 +72,34 @@ private:
 	CMemoryPool *m_mp;
 
 	// type id
-	IMDId *m_mdid;
-	IMDId *m_distr_opfamily;
-	IMDId *m_legacy_distr_opfamily;
+	gpos::Ref<IMDId> m_mdid;
+	gpos::Ref<IMDId> m_distr_opfamily;
+	gpos::Ref<IMDId> m_legacy_distr_opfamily;
 
 	// mdids of different operators
-	IMDId *m_mdid_op_eq;
-	IMDId *m_mdid_op_neq;
-	IMDId *m_mdid_op_lt;
-	IMDId *m_mdid_op_leq;
-	IMDId *m_mdid_op_gt;
-	IMDId *m_mdid_op_geq;
-	IMDId *m_mdid_op_cmp;
-	IMDId *m_mdid_type_array;
+	gpos::Ref<IMDId> m_mdid_op_eq;
+	gpos::Ref<IMDId> m_mdid_op_neq;
+	gpos::Ref<IMDId> m_mdid_op_lt;
+	gpos::Ref<IMDId> m_mdid_op_leq;
+	gpos::Ref<IMDId> m_mdid_op_gt;
+	gpos::Ref<IMDId> m_mdid_op_geq;
+	gpos::Ref<IMDId> m_mdid_op_cmp;
+	gpos::Ref<IMDId> m_mdid_type_array;
 
 	// min aggregate
-	IMDId *m_mdid_min;
+	gpos::Ref<IMDId> m_mdid_min;
 
 	// max aggregate
-	IMDId *m_mdid_max;
+	gpos::Ref<IMDId> m_mdid_max;
 
 	// avg aggregate
-	IMDId *m_mdid_avg;
+	gpos::Ref<IMDId> m_mdid_avg;
 
 	// sum aggregate
-	IMDId *m_mdid_sum;
+	gpos::Ref<IMDId> m_mdid_sum;
 
 	// count aggregate
-	IMDId *m_mdid_count;
+	gpos::Ref<IMDId> m_mdid_count;
 
 	// DXL for object
 	const CWStringDynamic *m_dxl_str;
@@ -184,7 +184,7 @@ public:
 	const IMDId *
 	CmpOpMdid() const override
 	{
-		return m_mdid_op_cmp;
+		return m_mdid_op_cmp.get();
 	}
 
 	// is type hashable
@@ -204,7 +204,7 @@ public:
 	IMDId *
 	GetArrayTypeMdid() const override
 	{
-		return m_mdid_type_array;
+		return m_mdid_type_array.get();
 	}
 
 	// id of the relation corresponding to a composite type
