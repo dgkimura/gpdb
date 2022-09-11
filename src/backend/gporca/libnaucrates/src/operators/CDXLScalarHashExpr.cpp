@@ -25,7 +25,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarHashExpr::CDXLScalarHashExpr(CMemoryPool *mp, IMDId *opfamily)
+CDXLScalarHashExpr::CDXLScalarHashExpr(CMemoryPool *mp,
+									   gpos::Ref<IMDId> opfamily)
 	: CDXLScalar(mp), m_mdid_opfamily(opfamily)
 {
 	GPOS_ASSERT_IMP(GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution),
@@ -42,7 +43,6 @@ CDXLScalarHashExpr::CDXLScalarHashExpr(CMemoryPool *mp, IMDId *opfamily)
 //---------------------------------------------------------------------------
 CDXLScalarHashExpr::~CDXLScalarHashExpr()
 {
-	CRefCount::SafeRelease(m_mdid_opfamily);
 }
 
 //---------------------------------------------------------------------------
@@ -85,7 +85,7 @@ CDXLScalarHashExpr::GetOpNameStr() const
 IMDId *
 CDXLScalarHashExpr::MdidOpfamily() const
 {
-	return m_mdid_opfamily;
+	return m_mdid_opfamily.get();
 }
 
 //---------------------------------------------------------------------------

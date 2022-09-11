@@ -44,7 +44,7 @@ class CDXLPhysicalPartitionSelector : public CDXLPhysical
 {
 private:
 	// table id
-	IMDId *m_rel_mdid;
+	gpos::Ref<IMDId> m_rel_mdid;
 
 	// selector id
 	ULONG m_selector_id;
@@ -58,7 +58,7 @@ public:
 	CDXLPhysicalPartitionSelector(CDXLPhysicalPartitionSelector &) = delete;
 
 	// ctor
-	CDXLPhysicalPartitionSelector(CMemoryPool *mp, IMDId *mdid_rel,
+	CDXLPhysicalPartitionSelector(CMemoryPool *mp, gpos::Ref<IMDId> mdid_rel,
 								  ULONG selector_id, ULONG scan_id,
 								  ULongPtrArray *parts);
 
@@ -75,7 +75,7 @@ public:
 	IMDId *
 	GetRelMdId() const
 	{
-		return m_rel_mdid;
+		return m_rel_mdid.get();
 	}
 
 	// number of partitioning levels

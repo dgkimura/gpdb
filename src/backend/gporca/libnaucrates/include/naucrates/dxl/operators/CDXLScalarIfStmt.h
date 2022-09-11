@@ -35,13 +35,13 @@ class CDXLScalarIfStmt : public CDXLScalar
 {
 private:
 	// catalog MDId of the return type
-	IMDId *m_result_type_mdid;
+	gpos::Ref<IMDId> m_result_type_mdid;
 
 public:
 	CDXLScalarIfStmt(const CDXLScalarIfStmt &) = delete;
 
 	// ctor
-	CDXLScalarIfStmt(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarIfStmt(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	//dtor
 	~CDXLScalarIfStmt() override;

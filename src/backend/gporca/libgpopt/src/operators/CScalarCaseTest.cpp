@@ -24,7 +24,7 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCaseTest::CScalarCaseTest(CMemoryPool *mp, IMDId *mdid_type)
+CScalarCaseTest::CScalarCaseTest(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type)
 	: CScalar(mp), m_mdid_type(mdid_type)
 {
 	GPOS_ASSERT(mdid_type->IsValid());
@@ -40,7 +40,6 @@ CScalarCaseTest::CScalarCaseTest(CMemoryPool *mp, IMDId *mdid_type)
 //---------------------------------------------------------------------------
 CScalarCaseTest::~CScalarCaseTest()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -90,7 +89,7 @@ CScalarCaseTest::Matches(COperator *pop) const
 		CScalarCaseTest *popScCaseTest = CScalarCaseTest::PopConvert(pop);
 
 		// match if return types are identical
-		return popScCaseTest->MdidType()->Equals(m_mdid_type);
+		return popScCaseTest->MdidType()->Equals(m_mdid_type.get());
 	}
 
 	return false;

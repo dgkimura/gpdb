@@ -29,8 +29,8 @@ using namespace gpmd;
 //		Constructs a scalar OpExpr node
 //
 //---------------------------------------------------------------------------
-CDXLScalarOpExpr::CDXLScalarOpExpr(CMemoryPool *mp, IMDId *mdid_op,
-								   IMDId *return_type_mdid,
+CDXLScalarOpExpr::CDXLScalarOpExpr(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+								   gpos::Ref<IMDId> return_type_mdid,
 								   const CWStringConst *str_opname)
 	: CDXLScalar(mp),
 	  m_mdid(mdid_op),
@@ -50,8 +50,6 @@ CDXLScalarOpExpr::CDXLScalarOpExpr(CMemoryPool *mp, IMDId *mdid_op,
 //---------------------------------------------------------------------------
 CDXLScalarOpExpr::~CDXLScalarOpExpr()
 {
-	m_mdid->Release();
-	CRefCount::SafeRelease(m_return_type_mdid);
 	GPOS_DELETE(m_str_opname);
 }
 
@@ -108,7 +106,7 @@ CDXLScalarOpExpr::GetOpNameStr() const
 IMDId *
 CDXLScalarOpExpr::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -122,7 +120,7 @@ CDXLScalarOpExpr::MDId() const
 IMDId *
 CDXLScalarOpExpr::GetReturnTypeMdId() const
 {
-	return m_return_type_mdid;
+	return m_return_type_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -136,7 +134,7 @@ CDXLScalarOpExpr::GetReturnTypeMdId() const
 BOOL
 CDXLScalarOpExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(m_mdid);
+	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(m_mdid.get());
 	IMDId *mdid = md_accessor->RetrieveFunc(md_scalar_op->FuncMdId())
 					  ->GetResultTypeMdid();
 	return (IMDType::EtiBool ==

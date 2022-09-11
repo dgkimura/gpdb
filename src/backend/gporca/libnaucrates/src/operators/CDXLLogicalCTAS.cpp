@@ -30,8 +30,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalCTAS::CDXLLogicalCTAS(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname_schema, CMDName *mdname_rel,
-	CDXLColDescrArray *dxl_col_descr_array,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname_schema,
+	CMDName *mdname_rel, CDXLColDescrArray *dxl_col_descr_array,
 	CDXLCtasStorageOptions *dxl_ctas_storage_options,
 	IMDRelation::Ereldistrpolicy rel_distr_policy,
 	ULongPtrArray *distr_column_pos_array, IMdIdArray *distr_opfamilies,
@@ -80,7 +80,6 @@ CDXLLogicalCTAS::CDXLLogicalCTAS(
 //---------------------------------------------------------------------------
 CDXLLogicalCTAS::~CDXLLogicalCTAS()
 {
-	m_mdid->Release();
 	GPOS_DELETE(m_mdname_schema);
 	GPOS_DELETE(m_mdname_rel);
 	m_col_descr_array->Release();

@@ -27,7 +27,8 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLScalarIfStmt::CDXLScalarIfStmt(CMemoryPool *mp, IMDId *result_type_mdid)
+CDXLScalarIfStmt::CDXLScalarIfStmt(CMemoryPool *mp,
+								   gpos::Ref<IMDId> result_type_mdid)
 	: CDXLScalar(mp), m_result_type_mdid(result_type_mdid)
 {
 	GPOS_ASSERT(m_result_type_mdid->IsValid());
@@ -43,7 +44,6 @@ CDXLScalarIfStmt::CDXLScalarIfStmt(CMemoryPool *mp, IMDId *result_type_mdid)
 //---------------------------------------------------------------------------
 CDXLScalarIfStmt::~CDXLScalarIfStmt()
 {
-	m_result_type_mdid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -85,7 +85,7 @@ CDXLScalarIfStmt::GetOpNameStr() const
 IMDId *
 CDXLScalarIfStmt::GetResultTypeMdId() const
 {
-	return m_result_type_mdid;
+	return m_result_type_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -122,8 +122,9 @@ CDXLScalarIfStmt::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarIfStmt::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_result_type_mdid)->GetDatumType());
+	return (
+		IMDType::EtiBool ==
+		md_accessor->RetrieveType(m_result_type_mdid.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG

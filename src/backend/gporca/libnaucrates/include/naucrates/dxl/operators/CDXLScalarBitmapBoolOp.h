@@ -42,7 +42,7 @@ public:
 
 private:
 	// type id
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// operator type
 	const EdxlBitmapBoolOp m_bitmap_op_type;
@@ -51,7 +51,7 @@ public:
 	CDXLScalarBitmapBoolOp(const CDXLScalarBitmapBoolOp &) = delete;
 
 	// ctor
-	CDXLScalarBitmapBoolOp(CMemoryPool *mp, IMDId *mdid_type,
+	CDXLScalarBitmapBoolOp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 						   EdxlBitmapBoolOp bitmap_op_type);
 
 	// dtor

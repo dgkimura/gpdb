@@ -49,7 +49,7 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// relation mdid
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -90,7 +90,7 @@ private:
 	BOOL m_is_rej_limit_in_rows;
 
 	// format error table mdid
-	IMDId *m_mdid_fmt_err_table;
+	gpos::Ref<IMDId> m_mdid_fmt_err_table;
 
 	// number of system columns
 	ULONG m_system_columns;
@@ -117,13 +117,13 @@ private:
 public:
 	// ctor
 	CMDRelationExternalGPDB(
-		CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
 		ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
 		BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
 		CMDIndexInfoArray *md_index_info_array, IMdIdArray *mdid_triggers_array,
 		IMdIdArray *mdid_check_constraint_array, INT reject_limit,
-		BOOL is_reject_limit_in_rows, IMDId *mdid_fmt_err_table);
+		BOOL is_reject_limit_in_rows, gpos::Ref<IMDId> mdid_fmt_err_table);
 
 	// dtor
 	~CMDRelationExternalGPDB() override;

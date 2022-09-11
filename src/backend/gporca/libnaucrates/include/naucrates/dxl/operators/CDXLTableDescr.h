@@ -36,7 +36,7 @@ class CDXLTableDescr : public CRefCount
 {
 private:
 	// id and version information for the table
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -56,7 +56,7 @@ public:
 	CDXLTableDescr(const CDXLTableDescr &) = delete;
 
 	// ctor/dtor
-	CDXLTableDescr(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
+	CDXLTableDescr(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 				   ULONG ulExecuteAsUser, int lockmode);
 
 	~CDXLTableDescr() override;

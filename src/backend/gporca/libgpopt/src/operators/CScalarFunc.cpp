@@ -53,8 +53,9 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarFunc::CScalarFunc(CMemoryPool *mp, IMDId *mdid_func,
-						 IMDId *mdid_return_type, INT return_type_modifier,
+CScalarFunc::CScalarFunc(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+						 gpos::Ref<IMDId> mdid_return_type,
+						 INT return_type_modifier,
 						 const CWStringConst *pstrFunc)
 	: CScalar(mp),
 	  m_func_mdid(mdid_func),
@@ -69,14 +70,14 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp, IMDId *mdid_func,
 	GPOS_ASSERT(mdid_return_type->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid.get());
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_returns_set = pmdfunc->ReturnsSet();
 
 	m_returns_null_on_null_input = pmdfunc->IsStrict();
 	m_fBoolReturnType =
-		CMDAccessorUtils::FBoolType(md_accessor, m_return_type_mdid);
+		CMDAccessorUtils::FBoolType(md_accessor, m_return_type_mdid.get());
 }
 
 
@@ -90,8 +91,6 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp, IMDId *mdid_func,
 //---------------------------------------------------------------------------
 CScalarFunc::~CScalarFunc()
 {
-	CRefCount::SafeRelease(m_func_mdid);
-	CRefCount::SafeRelease(m_return_type_mdid);
 	GPOS_DELETE(m_pstrFunc);
 }
 
@@ -120,7 +119,7 @@ CScalarFunc::PstrFunc() const
 IMDId *
 CScalarFunc::FuncMdId() const
 {
-	return m_func_mdid;
+	return m_func_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -174,8 +173,8 @@ CScalarFunc::Matches(COperator *pop) const
 	CScalarFunc *popScFunc = CScalarFunc::PopConvert(pop);
 
 	// match if func ids are identical
-	return popScFunc->FuncMdId()->Equals(m_func_mdid) &&
-		   popScFunc->MdidType()->Equals(m_return_type_mdid);
+	return popScFunc->FuncMdId()->Equals(m_func_mdid.get()) &&
+		   popScFunc->MdidType()->Equals(m_return_type_mdid.get());
 }
 
 //---------------------------------------------------------------------------
@@ -189,7 +188,7 @@ CScalarFunc::Matches(COperator *pop) const
 IMDId *
 CScalarFunc::MdidType() const
 {
-	return m_return_type_mdid;
+	return m_return_type_mdid.get();
 }
 
 INT

@@ -34,10 +34,10 @@ class CDXLScalarFuncExpr : public CDXLScalar
 {
 private:
 	// catalog id of the function
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	const INT m_return_type_modifier;
 
@@ -48,9 +48,9 @@ public:
 	CDXLScalarFuncExpr(const CDXLScalarFuncExpr &) = delete;
 
 	// ctor
-	CDXLScalarFuncExpr(CMemoryPool *mp, IMDId *mdid_func,
-					   IMDId *mdid_return_type, INT return_type_modifier,
-					   BOOL returns_set);
+	CDXLScalarFuncExpr(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+					   gpos::Ref<IMDId> mdid_return_type,
+					   INT return_type_modifier, BOOL returns_set);
 
 	//dtor
 	~CDXLScalarFuncExpr() override;

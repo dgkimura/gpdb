@@ -35,10 +35,10 @@ class CScalarOp : public CScalar
 {
 private:
 	// metadata id in the catalog
-	IMDId *m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// return type id or NULL if it can be inferred from the metadata
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// scalar operator name
 	const CWStringConst *m_pstrOp;
@@ -57,14 +57,12 @@ private:
 
 public:
 	// ctor
-	CScalarOp(CMemoryPool *mp, IMDId *mdid_op, IMDId *return_type_mdid,
-			  const CWStringConst *pstrOp);
+	CScalarOp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+			  gpos::Ref<IMDId> return_type_mdid, const CWStringConst *pstrOp);
 
 	// dtor
 	~CScalarOp() override
 	{
-		m_mdid_op->Release();
-		CRefCount::SafeRelease(m_return_type_mdid);
 		GPOS_DELETE(m_pstrOp);
 	}
 

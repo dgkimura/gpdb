@@ -30,8 +30,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLTableDescr::CDXLTableDescr(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-							   ULONG ulExecuteAsUser, int lockmode)
+CDXLTableDescr::CDXLTableDescr(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+							   CMDName *mdname, ULONG ulExecuteAsUser,
+							   int lockmode)
 	: m_mdid(mdid),
 	  m_mdname(mdname),
 	  m_dxl_column_descr_array(nullptr),
@@ -53,7 +54,6 @@ CDXLTableDescr::CDXLTableDescr(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 //---------------------------------------------------------------------------
 CDXLTableDescr::~CDXLTableDescr()
 {
-	m_mdid->Release();
 	GPOS_DELETE(m_mdname);
 	CRefCount::SafeRelease(m_dxl_column_descr_array);
 }
@@ -70,7 +70,7 @@ CDXLTableDescr::~CDXLTableDescr()
 IMDId *
 CDXLTableDescr::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------

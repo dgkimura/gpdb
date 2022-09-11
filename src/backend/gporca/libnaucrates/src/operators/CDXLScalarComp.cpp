@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Constructs a scalar comparison node
 //
 //---------------------------------------------------------------------------
-CDXLScalarComp::CDXLScalarComp(CMemoryPool *mp, IMDId *mdid_op,
+CDXLScalarComp::CDXLScalarComp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 							   const CWStringConst *comparison_operator_name)
 	: CDXLScalar(mp),
 	  m_mdid(mdid_op),
@@ -46,7 +46,6 @@ CDXLScalarComp::CDXLScalarComp(CMemoryPool *mp, IMDId *mdid_op,
 //---------------------------------------------------------------------------
 CDXLScalarComp::~CDXLScalarComp()
 {
-	m_mdid->Release();
 	GPOS_DELETE(m_comparison_operator_name);
 }
 
@@ -75,7 +74,7 @@ CDXLScalarComp::GetComparisonOpName() const
 IMDId *
 CDXLScalarComp::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------

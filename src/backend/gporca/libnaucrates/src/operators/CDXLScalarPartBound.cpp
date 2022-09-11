@@ -30,7 +30,8 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLScalarPartBound::CDXLScalarPartBound(CMemoryPool *mp,
 										 ULONG partitioning_level,
-										 IMDId *mdid_type, BOOL is_lower_bound)
+										 gpos::Ref<IMDId> mdid_type,
+										 BOOL is_lower_bound)
 	: CDXLScalar(mp),
 	  m_partitioning_level(partitioning_level),
 	  m_mdid_type(mdid_type),
@@ -49,7 +50,6 @@ CDXLScalarPartBound::CDXLScalarPartBound(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarPartBound::~CDXLScalarPartBound()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -92,7 +92,7 @@ BOOL
 CDXLScalarPartBound::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
+			md_accessor->RetrieveType(m_mdid_type.get())->GetDatumType());
 }
 
 //---------------------------------------------------------------------------

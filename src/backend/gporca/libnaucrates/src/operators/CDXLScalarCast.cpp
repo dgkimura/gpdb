@@ -28,8 +28,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarCast::CDXLScalarCast(CMemoryPool *mp, IMDId *mdid_type,
-							   IMDId *func_mdid)
+CDXLScalarCast::CDXLScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+							   gpos::Ref<IMDId> func_mdid)
 	: CDXLScalar(mp), m_mdid_type(mdid_type), m_func_mdid(func_mdid)
 {
 	GPOS_ASSERT(nullptr != m_func_mdid);
@@ -47,8 +47,6 @@ CDXLScalarCast::CDXLScalarCast(CMemoryPool *mp, IMDId *mdid_type,
 //---------------------------------------------------------------------------
 CDXLScalarCast::~CDXLScalarCast()
 {
-	m_mdid_type->Release();
-	m_func_mdid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -90,7 +88,7 @@ CDXLScalarCast::GetOpNameStr() const
 IMDId *
 CDXLScalarCast::MdidType() const
 {
-	return m_mdid_type;
+	return m_mdid_type.get();
 }
 
 //---------------------------------------------------------------------------
@@ -104,7 +102,7 @@ CDXLScalarCast::MdidType() const
 IMDId *
 CDXLScalarCast::FuncMdId() const
 {
-	return m_func_mdid;
+	return m_func_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -146,7 +144,7 @@ BOOL
 CDXLScalarCast::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
+			md_accessor->RetrieveType(m_mdid_type.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG

@@ -27,7 +27,8 @@ using namespace gpdxl;
 //		Constructs a scalar distinct comparison node
 //
 //---------------------------------------------------------------------------
-CDXLScalarDistinctComp::CDXLScalarDistinctComp(CMemoryPool *mp, IMDId *mdid_op)
+CDXLScalarDistinctComp::CDXLScalarDistinctComp(CMemoryPool *mp,
+											   gpos::Ref<IMDId> mdid_op)
 	: CDXLScalarComp(
 		  mp, mdid_op,
 		  GPOS_NEW(mp) CWStringConst(

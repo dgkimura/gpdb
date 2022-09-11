@@ -35,7 +35,7 @@ class CScalarCmp : public CScalar
 {
 private:
 	// metadata id in the catalog
-	IMDId *m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// comparison operator name
 	const CWStringConst *m_pstrOp;
@@ -54,13 +54,12 @@ private:
 
 public:
 	// ctor
-	CScalarCmp(CMemoryPool *mp, IMDId *mdid_op, const CWStringConst *pstrOp,
-			   IMDType::ECmpType cmp_type);
+	CScalarCmp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+			   const CWStringConst *pstrOp, IMDType::ECmpType cmp_type);
 
 	// dtor
 	~CScalarCmp() override
 	{
-		m_mdid_op->Release();
 		GPOS_DELETE(m_pstrOp);
 	}
 

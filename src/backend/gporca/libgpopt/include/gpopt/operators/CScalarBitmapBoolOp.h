@@ -48,7 +48,7 @@ private:
 	EBitmapBoolOp m_ebitmapboolop;
 
 	// bitmap type id
-	IMDId *m_pmdidBitmapType;
+	gpos::Ref<IMDId> m_pmdidBitmapType;
 
 	static const WCHAR m_rgwszBitmapOpType[EbitmapboolSentinel][30];
 
@@ -57,7 +57,7 @@ public:
 
 	// ctor
 	CScalarBitmapBoolOp(CMemoryPool *mp, EBitmapBoolOp ebitmapboolop,
-						IMDId *pmdidBitmapType);
+						gpos::Ref<IMDId> pmdidBitmapType);
 
 
 	// dtor
@@ -74,7 +74,7 @@ public:
 	IMDId *
 	MdidType() const override
 	{
-		return m_pmdidBitmapType;
+		return m_pmdidBitmapType.get();
 	}
 
 	// identifier

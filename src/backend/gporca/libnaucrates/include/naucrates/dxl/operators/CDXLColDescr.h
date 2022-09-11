@@ -51,7 +51,7 @@ private:
 	INT m_attr_no;
 
 	// mdid of column's type
-	IMDId *m_column_mdid_type;
+	gpos::Ref<IMDId> m_column_mdid_type;
 
 	INT m_type_modifier;
 
@@ -66,8 +66,8 @@ public:
 
 	// ctor
 	CDXLColDescr(CMDName *, ULONG column_id, INT attr_no,
-				 IMDId *column_mdid_type, INT type_modifier, BOOL is_dropped,
-				 ULONG width = gpos::ulong_max);
+				 gpos::Ref<IMDId> column_mdid_type, INT type_modifier,
+				 BOOL is_dropped, ULONG width = gpos::ulong_max);
 
 	//dtor
 	~CDXLColDescr() override;

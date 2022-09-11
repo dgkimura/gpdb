@@ -38,7 +38,7 @@ class CDXLLogicalCTAS : public CDXLLogical
 {
 private:
 	// mdid of table to create
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// schema name
 	CMDName *m_mdname_schema;
@@ -81,8 +81,9 @@ public:
 	CDXLLogicalCTAS(const CDXLLogicalCTAS &) = delete;
 
 	// ctor
-	CDXLLogicalCTAS(CMemoryPool *mp, IMDId *mdid, CMDName *mdname_schema,
-					CMDName *mdname_rel, CDXLColDescrArray *dxl_col_descr_array,
+	CDXLLogicalCTAS(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+					CMDName *mdname_schema, CMDName *mdname_rel,
+					CDXLColDescrArray *dxl_col_descr_array,
 					CDXLCtasStorageOptions *dxl_ctas_storage_option,
 					IMDRelation::Ereldistrpolicy rel_distr_policy,
 					ULongPtrArray *distr_column_pos_array,
@@ -105,7 +106,7 @@ public:
 	IMDId *
 	MDId() const
 	{
-		return m_mdid;
+		return m_mdid.get();
 	}
 
 	// schema name

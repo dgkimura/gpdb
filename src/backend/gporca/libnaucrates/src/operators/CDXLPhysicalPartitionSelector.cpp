@@ -29,8 +29,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalPartitionSelector::CDXLPhysicalPartitionSelector(
-	CMemoryPool *mp, IMDId *mdid_rel, ULONG selector_id, ULONG scan_id,
-	ULongPtrArray *parts)
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid_rel, ULONG selector_id,
+	ULONG scan_id, ULongPtrArray *parts)
 	: CDXLPhysical(mp),
 	  m_rel_mdid(mdid_rel),
 	  m_selector_id(selector_id),
@@ -50,7 +50,6 @@ CDXLPhysicalPartitionSelector::CDXLPhysicalPartitionSelector(
 CDXLPhysicalPartitionSelector::~CDXLPhysicalPartitionSelector()
 {
 	CRefCount::SafeRelease(m_parts);
-	CRefCount::SafeRelease(m_rel_mdid);
 }
 
 //---------------------------------------------------------------------------

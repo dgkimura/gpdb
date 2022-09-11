@@ -34,13 +34,13 @@ class CDXLScalarCoalesce : public CDXLScalar
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CDXLScalarCoalesce(const CDXLScalarCoalesce &) = delete;
 
 	// ctor
-	CDXLScalarCoalesce(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarCoalesce(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	//dtor
 	~CDXLScalarCoalesce() override;
@@ -52,7 +52,7 @@ public:
 	virtual IMDId *
 	MdidType() const
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// DXL Operator ID

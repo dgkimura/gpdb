@@ -29,9 +29,10 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDScCmpGPDB::CMDScCmpGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-						   IMDId *left_mdid, IMDId *right_mdid,
-						   IMDType::ECmpType cmp_type, IMDId *mdid_op)
+CMDScCmpGPDB::CMDScCmpGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+						   CMDName *mdname, gpos::Ref<IMDId> left_mdid,
+						   gpos::Ref<IMDId> right_mdid,
+						   IMDType::ECmpType cmp_type, gpos::Ref<IMDId> mdid_op)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -60,10 +61,6 @@ CMDScCmpGPDB::CMDScCmpGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 //---------------------------------------------------------------------------
 CMDScCmpGPDB::~CMDScCmpGPDB()
 {
-	m_mdid->Release();
-	m_mdid_left->Release();
-	m_mdid_right->Release();
-	m_mdid_op->Release();
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }
@@ -80,7 +77,7 @@ CMDScCmpGPDB::~CMDScCmpGPDB()
 IMDId *
 CMDScCmpGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -108,7 +105,7 @@ CMDScCmpGPDB::Mdname() const
 IMDId *
 CMDScCmpGPDB::GetLeftMdid() const
 {
-	return m_mdid_left;
+	return m_mdid_left.get();
 }
 
 //---------------------------------------------------------------------------
@@ -122,7 +119,7 @@ CMDScCmpGPDB::GetLeftMdid() const
 IMDId *
 CMDScCmpGPDB::GetRightMdid() const
 {
-	return m_mdid_right;
+	return m_mdid_right.get();
 }
 
 //---------------------------------------------------------------------------
@@ -136,7 +133,7 @@ CMDScCmpGPDB::GetRightMdid() const
 IMDId *
 CMDScCmpGPDB::MdIdOp() const
 {
-	return m_mdid_op;
+	return m_mdid_op.get();
 }
 
 //---------------------------------------------------------------------------

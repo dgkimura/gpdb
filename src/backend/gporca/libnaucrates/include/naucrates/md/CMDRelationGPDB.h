@@ -51,7 +51,7 @@ private:
 	const CWStringDynamic *m_dxl_str;
 
 	// relation mdid
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -127,14 +127,14 @@ public:
 
 	// ctor
 	CMDRelationGPDB(
-		CMemoryPool *mp, IMDId *mdid, CMDName *mdname, BOOL is_temp_table,
-		Erelstoragetype rel_storage_type, Ereldistrpolicy rel_distr_policy,
-		CMDColumnArray *mdcol_array, ULongPtrArray *distr_col_array,
-		IMdIdArray *distr_opfamilies, ULongPtrArray *partition_cols_array,
-		CharPtrArray *str_part_types_array, ULONG num_of_partitions,
-		IMdIdArray *partition_oids, BOOL convert_hash_to_random,
-		ULongPtr2dArray *keyset_array, CMDIndexInfoArray *md_index_info_array,
-		IMdIdArray *mdid_triggers_array,
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+		BOOL is_temp_table, Erelstoragetype rel_storage_type,
+		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
+		ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
+		ULongPtrArray *partition_cols_array, CharPtrArray *str_part_types_array,
+		ULONG num_of_partitions, IMdIdArray *partition_oids,
+		BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
+		CMDIndexInfoArray *md_index_info_array, IMdIdArray *mdid_triggers_array,
 		IMdIdArray *mdid_check_constraint_array, CDXLNode *mdpart_constraint);
 
 	// dtor

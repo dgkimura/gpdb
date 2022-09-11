@@ -26,13 +26,13 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDRelationExternalGPDB::CMDRelationExternalGPDB(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 	Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
 	ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
 	BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
 	CMDIndexInfoArray *md_index_info_array, IMdIdArray *mdid_triggers_array,
 	IMdIdArray *mdid_check_constraint_array, INT reject_limit,
-	BOOL is_reject_limit_in_rows, IMDId *mdid_fmt_err_table)
+	BOOL is_reject_limit_in_rows, gpos::Ref<IMDId> mdid_fmt_err_table)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -120,7 +120,6 @@ CMDRelationExternalGPDB::~CMDRelationExternalGPDB()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid->Release();
 	m_md_col_array->Release();
 	CRefCount::SafeRelease(m_distr_col_array);
 	CRefCount::SafeRelease(m_distr_opfamilies);
@@ -129,7 +128,6 @@ CMDRelationExternalGPDB::~CMDRelationExternalGPDB()
 	m_mdid_trigger_array->Release();
 	m_col_width_array->Release();
 	m_mdid_check_constraint_array->Release();
-	CRefCount::SafeRelease(m_mdid_fmt_err_table);
 
 	CRefCount::SafeRelease(m_colpos_nondrop_colpos_map);
 	CRefCount::SafeRelease(m_attrno_nondrop_col_pos_map);
@@ -147,7 +145,7 @@ CMDRelationExternalGPDB::~CMDRelationExternalGPDB()
 IMDId *
 CMDRelationExternalGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -363,7 +361,7 @@ CMDRelationExternalGPDB::IsRejectLimitInRows() const
 IMDId *
 CMDRelationExternalGPDB::GetFormatErrTableMdid() const
 {
-	return m_mdid_fmt_err_table;
+	return m_mdid_fmt_err_table.get();
 }
 
 //---------------------------------------------------------------------------

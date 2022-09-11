@@ -26,7 +26,7 @@ using namespace gpdxl;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLIndexDescr::CDXLIndexDescr(IMDId *mdid, CMDName *mdname)
+CDXLIndexDescr::CDXLIndexDescr(gpos::Ref<IMDId> mdid, CMDName *mdname)
 	: m_mdid(mdid), m_mdname(mdname)
 {
 	GPOS_ASSERT(m_mdid->IsValid());
@@ -45,7 +45,6 @@ CDXLIndexDescr::CDXLIndexDescr(IMDId *mdid, CMDName *mdname)
 //---------------------------------------------------------------------------
 CDXLIndexDescr::~CDXLIndexDescr()
 {
-	m_mdid->Release();
 	GPOS_DELETE(m_mdname);
 }
 
@@ -61,7 +60,7 @@ CDXLIndexDescr::~CDXLIndexDescr()
 IMDId *
 CDXLIndexDescr::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------

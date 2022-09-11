@@ -31,7 +31,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarNullIf::CScalarNullIf(CMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type)
+CScalarNullIf::CScalarNullIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
+							 gpos::Ref<IMDId> mdid_type)
 	: CScalar(mp),
 	  m_mdid_op(mdid_op),
 	  m_mdid_type(mdid_type),
@@ -44,8 +45,9 @@ CScalarNullIf::CScalarNullIf(CMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type)
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	m_returns_null_on_null_input =
 		CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(md_accessor,
-														  m_mdid_op);
-	m_fBoolReturnType = CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type);
+														  m_mdid_op.get());
+	m_fBoolReturnType =
+		CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type.get());
 }
 
 
@@ -59,8 +61,6 @@ CScalarNullIf::CScalarNullIf(CMemoryPool *mp, IMDId *mdid_op, IMDId *mdid_type)
 //---------------------------------------------------------------------------
 CScalarNullIf::~CScalarNullIf()
 {
-	m_mdid_op->Release();
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------

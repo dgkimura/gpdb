@@ -52,10 +52,11 @@ CScalarWindowFunc::CScalarWindowFunc(CMemoryPool *mp, IMDId *mdid_func,
 	m_pstrFunc = pstrFunc;
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	m_fAgg = md_accessor->FAggWindowFunc(m_func_mdid);
+	m_fAgg = md_accessor->FAggWindowFunc(m_func_mdid.get());
 	if (!m_fAgg)
 	{
-		const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+		const IMDFunction *pmdfunc =
+			md_accessor->RetrieveFunc(m_func_mdid.get());
 		m_efs = pmdfunc->GetFuncStability();
 	}
 	else

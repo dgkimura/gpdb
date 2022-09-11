@@ -43,7 +43,7 @@ class CScalarSubqueryQuantified : public CScalar
 {
 private:
 	// id of comparison operator
-	IMDId *m_scalar_op_mdid;
+	gpos::Ref<IMDId> m_scalar_op_mdid;
 
 	// name of comparison operator
 	const CWStringConst *m_pstrScalarOp;
@@ -53,7 +53,7 @@ private:
 
 protected:
 	// ctor
-	CScalarSubqueryQuantified(CMemoryPool *mp, IMDId *scalar_op_mdid,
+	CScalarSubqueryQuantified(CMemoryPool *mp, gpos::Ref<IMDId> scalar_op_mdid,
 							  const CWStringConst *pstrScalarOp,
 							  const CColRef *colref);
 

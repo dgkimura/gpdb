@@ -30,10 +30,10 @@ class CPhysicalTVF : public CPhysical
 {
 private:
 	// function mdid
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// function name
 	CWStringConst *m_pstr;
@@ -51,9 +51,9 @@ public:
 	CPhysicalTVF(const CPhysicalTVF &) = delete;
 
 	// ctor
-	CPhysicalTVF(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				 CWStringConst *str, CColumnDescriptorArray *pdrgpcoldesc,
-				 CColRefSet *pcrsOutput);
+	CPhysicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+				 gpos::Ref<IMDId> mdid_return_type, CWStringConst *str,
+				 CColumnDescriptorArray *pdrgpcoldesc, CColRefSet *pcrsOutput);
 
 	// dtor
 	~CPhysicalTVF() override;
@@ -76,14 +76,14 @@ public:
 	IMDId *
 	FuncMdId() const
 	{
-		return m_func_mdid;
+		return m_func_mdid.get();
 	}
 
 	// return type
 	IMDId *
 	ReturnTypeMdId() const
 	{
-		return m_return_type_mdid;
+		return m_return_type_mdid.get();
 	}
 
 	// function name

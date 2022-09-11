@@ -27,8 +27,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalTVF::CDXLPhysicalTVF(CMemoryPool *mp, IMDId *mdid_func,
-								 IMDId *mdid_return_type, CWStringConst *str)
+CDXLPhysicalTVF::CDXLPhysicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+								 gpos::Ref<IMDId> mdid_return_type,
+								 CWStringConst *str)
 	: CDXLPhysical(mp),
 	  m_func_mdid(mdid_func),
 	  m_return_type_mdid(mdid_return_type),
@@ -50,8 +51,6 @@ CDXLPhysicalTVF::CDXLPhysicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 //---------------------------------------------------------------------------
 CDXLPhysicalTVF::~CDXLPhysicalTVF()
 {
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
 	GPOS_DELETE(func_name);
 }
 

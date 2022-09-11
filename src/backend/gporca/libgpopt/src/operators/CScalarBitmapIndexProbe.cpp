@@ -36,9 +36,9 @@ using namespace gpopt;
 //		Takes ownership of the index descriptor and the bitmap type id.
 //
 //---------------------------------------------------------------------------
-CScalarBitmapIndexProbe::CScalarBitmapIndexProbe(CMemoryPool *mp,
-												 CIndexDescriptor *pindexdesc,
-												 IMDId *pmdidBitmapType)
+CScalarBitmapIndexProbe::CScalarBitmapIndexProbe(
+	CMemoryPool *mp, CIndexDescriptor *pindexdesc,
+	gpos::Ref<IMDId> pmdidBitmapType)
 	: CScalar(mp), m_pindexdesc(pindexdesc), m_pmdidBitmapType(pmdidBitmapType)
 {
 	GPOS_ASSERT(nullptr != mp);
@@ -57,7 +57,6 @@ CScalarBitmapIndexProbe::CScalarBitmapIndexProbe(CMemoryPool *mp,
 CScalarBitmapIndexProbe::~CScalarBitmapIndexProbe()
 {
 	m_pindexdesc->Release();
-	m_pmdidBitmapType->Release();
 }
 
 //---------------------------------------------------------------------------

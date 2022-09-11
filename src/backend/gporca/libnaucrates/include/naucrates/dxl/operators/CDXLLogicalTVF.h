@@ -34,10 +34,10 @@ class CDXLLogicalTVF : public CDXLLogical
 {
 private:
 	// catalog id of the function
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// function name
 	CMDName *m_mdname;
@@ -49,8 +49,9 @@ public:
 	CDXLLogicalTVF(const CDXLLogicalTVF &) = delete;
 
 	// ctor/dtor
-	CDXLLogicalTVF(CMemoryPool *mp, IMDId *mdid_func, IMDId *mdid_return_type,
-				   CMDName *mdname, CDXLColDescrArray *pdrgdxlcd);
+	CDXLLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+				   gpos::Ref<IMDId> mdid_return_type, CMDName *mdname,
+				   CDXLColDescrArray *pdrgdxlcd);
 
 	~CDXLLogicalTVF() override;
 
@@ -71,14 +72,14 @@ public:
 	IMDId *
 	FuncMdId() const
 	{
-		return m_func_mdid;
+		return m_func_mdid.get();
 	}
 
 	// get return type
 	IMDId *
 	ReturnTypeMdId() const
 	{
-		return m_return_type_mdid;
+		return m_return_type_mdid.get();
 	}
 
 	// get number of output columns

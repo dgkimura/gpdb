@@ -28,8 +28,10 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDCheckConstraintGPDB::CMDCheckConstraintGPDB(CMemoryPool *mp, IMDId *mdid,
-											   CMDName *mdname, IMDId *rel_mdid,
+CMDCheckConstraintGPDB::CMDCheckConstraintGPDB(CMemoryPool *mp,
+											   gpos::Ref<IMDId> mdid,
+											   CMDName *mdname,
+											   gpos::Ref<IMDId> rel_mdid,
 											   CDXLNode *dxlnode)
 	: m_mp(mp),
 	  m_mdid(mdid),
@@ -58,8 +60,6 @@ CMDCheckConstraintGPDB::~CMDCheckConstraintGPDB()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid->Release();
-	m_rel_mdid->Release();
 	m_dxl_node->Release();
 }
 
@@ -78,7 +78,7 @@ CMDCheckConstraintGPDB::GetCheckConstraintExpr(CMemoryPool *mp,
 {
 	GPOS_ASSERT(nullptr != colref_array);
 
-	const IMDRelation *mdrel = md_accessor->RetrieveRel(m_rel_mdid);
+	const IMDRelation *mdrel = md_accessor->RetrieveRel(m_rel_mdid.get());
 #ifdef GPOS_DEBUG
 	const ULONG len = colref_array->Size();
 	GPOS_ASSERT(len > 0);

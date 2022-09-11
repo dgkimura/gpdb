@@ -32,7 +32,7 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCmp::CScalarCmp(CMemoryPool *mp, IMDId *mdid_op,
+CScalarCmp::CScalarCmp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 					   const CWStringConst *pstrOp, IMDType::ECmpType cmp_type)
 	: CScalar(mp),
 	  m_mdid_op(mdid_op),
@@ -45,9 +45,9 @@ CScalarCmp::CScalarCmp(CMemoryPool *mp, IMDId *mdid_op,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	m_returns_null_on_null_input =
 		CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(md_accessor,
-														  m_mdid_op);
+														  m_mdid_op.get());
 	m_fCommutative =
-		CMDAccessorUtils::FCommutativeScalarOp(md_accessor, m_mdid_op);
+		CMDAccessorUtils::FCommutativeScalarOp(md_accessor, m_mdid_op.get());
 }
 
 
@@ -76,7 +76,7 @@ CScalarCmp::Pstr() const
 IMDId *
 CScalarCmp::MdIdOp() const
 {
-	return m_mdid_op;
+	return m_mdid_op.get();
 }
 
 //---------------------------------------------------------------------------

@@ -44,7 +44,7 @@ public:
 
 private:
 	// id of the scalar comparison operator
-	IMDId *m_scalar_op_mdid;
+	gpos::Ref<IMDId> m_scalar_op_mdid;
 
 	// name of scalar comparison operator
 	CMDName *m_scalar_op_mdname;
@@ -56,7 +56,8 @@ public:
 	CDXLScalarSubqueryQuantified(CDXLScalarSubqueryQuantified &) = delete;
 
 	// ctor
-	CDXLScalarSubqueryQuantified(CMemoryPool *mp, IMDId *scalar_op_mdid,
+	CDXLScalarSubqueryQuantified(CMemoryPool *mp,
+								 gpos::Ref<IMDId> scalar_op_mdid,
 								 CMDName *mdname, ULONG colid);
 
 	// dtor
@@ -66,7 +67,7 @@ public:
 	IMDId *
 	GetScalarOpMdId() const
 	{
-		return m_scalar_op_mdid;
+		return m_scalar_op_mdid.get();
 	}
 
 	// scalar operator name

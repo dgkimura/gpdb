@@ -24,9 +24,11 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
-								 INT type_modifier, IMDId *array_type_mdid,
-								 IMDId *return_type_mdid)
+CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp,
+								 gpos::Ref<IMDId> elem_type_mdid,
+								 INT type_modifier,
+								 gpos::Ref<IMDId> array_type_mdid,
+								 gpos::Ref<IMDId> return_type_mdid)
 	: CScalar(mp),
 	  m_pmdidElem(elem_type_mdid),
 	  m_type_modifier(type_modifier),
@@ -36,8 +38,8 @@ CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
 	GPOS_ASSERT(elem_type_mdid->IsValid());
 	GPOS_ASSERT(array_type_mdid->IsValid());
 	GPOS_ASSERT(return_type_mdid->IsValid());
-	GPOS_ASSERT(return_type_mdid->Equals(elem_type_mdid) ||
-				return_type_mdid->Equals(array_type_mdid));
+	GPOS_ASSERT(return_type_mdid->Equals(elem_type_mdid.get()) ||
+				return_type_mdid->Equals(array_type_mdid.get()));
 }
 
 //---------------------------------------------------------------------------
@@ -50,9 +52,6 @@ CScalarArrayRef::CScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
 //---------------------------------------------------------------------------
 CScalarArrayRef::~CScalarArrayRef()
 {
-	m_pmdidElem->Release();
-	m_pmdidArray->Release();
-	m_mdid_type->Release();
 }
 
 

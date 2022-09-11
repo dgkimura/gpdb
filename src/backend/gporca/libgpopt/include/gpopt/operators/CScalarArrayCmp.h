@@ -44,7 +44,7 @@ public:
 
 private:
 	// compare operator mdid
-	IMDId *m_mdid_op;
+	gpos::Ref<IMDId> m_mdid_op;
 
 	// comparison operator name
 	const CWStringConst *m_pscOp;
@@ -62,13 +62,12 @@ public:
 	CScalarArrayCmp(const CScalarArrayCmp &) = delete;
 
 	// ctor
-	CScalarArrayCmp(CMemoryPool *mp, IMDId *mdid_op,
+	CScalarArrayCmp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 					const CWStringConst *pstrOp, EArrCmpType earrcmpt);
 
 	// dtor
 	~CScalarArrayCmp() override
 	{
-		m_mdid_op->Release();
 		GPOS_DELETE(m_pscOp);
 	}
 

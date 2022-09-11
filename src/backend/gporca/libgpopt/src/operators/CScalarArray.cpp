@@ -23,8 +23,9 @@ using namespace gpopt;
 using namespace gpmd;
 
 // Ctor
-CScalarArray::CScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
-						   IMDId *array_type_mdid, BOOL is_multidimenstional)
+CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+						   gpos::Ref<IMDId> array_type_mdid,
+						   BOOL is_multidimenstional)
 	: CScalar(mp),
 	  m_pmdidElem(elem_type_mdid),
 	  m_pmdidArray(array_type_mdid),
@@ -37,8 +38,9 @@ CScalarArray::CScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
 
 
 // Ctor
-CScalarArray::CScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
-						   IMDId *array_type_mdid, BOOL is_multidimenstional,
+CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
+						   gpos::Ref<IMDId> array_type_mdid,
+						   BOOL is_multidimenstional,
 						   CScalarConstArray *pdrgPconst)
 	: CScalar(mp),
 	  m_pmdidElem(elem_type_mdid),
@@ -53,8 +55,6 @@ CScalarArray::CScalarArray(CMemoryPool *mp, IMDId *elem_type_mdid,
 // Dtor
 CScalarArray::~CScalarArray()
 {
-	m_pmdidElem->Release();
-	m_pmdidArray->Release();
 	m_pdrgPconst->Release();
 }
 
@@ -69,7 +69,7 @@ CScalarArray::~CScalarArray()
 IMDId *
 CScalarArray::PmdidElem() const
 {
-	return m_pmdidElem;
+	return m_pmdidElem.get();
 }
 
 //---------------------------------------------------------------------------
@@ -83,7 +83,7 @@ CScalarArray::PmdidElem() const
 IMDId *
 CScalarArray::PmdidArray() const
 {
-	return m_pmdidArray;
+	return m_pmdidArray.get();
 }
 
 //---------------------------------------------------------------------------
@@ -165,7 +165,7 @@ CScalarArray::Matches(COperator *pop) const
 IMDId *
 CScalarArray::MdidType() const
 {
-	return m_pmdidArray;
+	return m_pmdidArray.get();
 }
 
 CScalarConstArray *

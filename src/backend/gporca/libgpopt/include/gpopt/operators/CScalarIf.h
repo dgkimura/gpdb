@@ -42,7 +42,7 @@ class CScalarIf : public CScalar
 {
 private:
 	// metadata id in the catalog
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// is operator return type BOOL?
 	BOOL m_fBoolReturnType;
@@ -51,12 +51,11 @@ public:
 	CScalarIf(const CScalarIf &) = delete;
 
 	// ctor
-	CScalarIf(CMemoryPool *mp, IMDId *mdid);
+	CScalarIf(CMemoryPool *mp, gpos::Ref<IMDId> mdid);
 
 	// dtor
 	~CScalarIf() override
 	{
-		m_mdid_type->Release();
 	}
 
 
@@ -78,7 +77,7 @@ public:
 	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// operator specific hash function

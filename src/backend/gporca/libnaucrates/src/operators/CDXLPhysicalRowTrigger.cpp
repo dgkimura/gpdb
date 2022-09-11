@@ -26,7 +26,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalRowTrigger::CDXLPhysicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
+CDXLPhysicalRowTrigger::CDXLPhysicalRowTrigger(CMemoryPool *mp,
+											   gpos::Ref<IMDId> rel_mdid,
 											   INT type,
 											   ULongPtrArray *colids_old,
 											   ULongPtrArray *colids_new)
@@ -53,7 +54,6 @@ CDXLPhysicalRowTrigger::CDXLPhysicalRowTrigger(CMemoryPool *mp, IMDId *rel_mdid,
 //---------------------------------------------------------------------------
 CDXLPhysicalRowTrigger::~CDXLPhysicalRowTrigger()
 {
-	m_rel_mdid->Release();
 	CRefCount::SafeRelease(m_colids_old);
 	CRefCount::SafeRelease(m_colids_new);
 }

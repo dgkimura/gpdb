@@ -41,7 +41,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// index mdid
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -56,7 +56,7 @@ private:
 	EmdindexType m_index_type;
 
 	// type of items returned by index
-	IMDId *m_mdid_item_type;
+	gpos::Ref<IMDId> m_mdid_item_type;
 
 	// index key columns
 	ULongPtrArray *m_index_key_cols_array;
@@ -82,9 +82,9 @@ public:
 	CMDIndexGPDB(const CMDIndexGPDB &) = delete;
 
 	// ctor
-	CMDIndexGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
+	CMDIndexGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 				 BOOL is_clustered, BOOL is_partitioned,
-				 EmdindexType index_type, IMDId *mdid_item_type,
+				 EmdindexType index_type, gpos::Ref<IMDId> mdid_item_type,
 				 ULongPtrArray *index_key_cols_array,
 				 ULongPtrArray *included_cols_array,
 				 IMdIdArray *mdid_opfamilies_array,

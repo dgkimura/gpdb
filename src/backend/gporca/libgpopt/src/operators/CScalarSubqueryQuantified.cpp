@@ -33,8 +33,8 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CScalarSubqueryQuantified::CScalarSubqueryQuantified(
-	CMemoryPool *mp, IMDId *scalar_op_mdid, const CWStringConst *pstrScalarOp,
-	const CColRef *colref)
+	CMemoryPool *mp, gpos::Ref<IMDId> scalar_op_mdid,
+	const CWStringConst *pstrScalarOp, const CColRef *colref)
 	: CScalar(mp),
 	  m_scalar_op_mdid(scalar_op_mdid),
 	  m_pstrScalarOp(pstrScalarOp),
@@ -55,7 +55,6 @@ CScalarSubqueryQuantified::CScalarSubqueryQuantified(
 //---------------------------------------------------------------------------
 CScalarSubqueryQuantified::~CScalarSubqueryQuantified()
 {
-	m_scalar_op_mdid->Release();
 	GPOS_DELETE(m_pstrScalarOp);
 }
 
@@ -84,7 +83,7 @@ CScalarSubqueryQuantified::PstrOp() const
 IMDId *
 CScalarSubqueryQuantified::MdIdOp() const
 {
-	return m_scalar_op_mdid;
+	return m_scalar_op_mdid.get();
 }
 
 //---------------------------------------------------------------------------
@@ -100,7 +99,7 @@ CScalarSubqueryQuantified::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	IMDId *mdid_type =
-		md_accessor->RetrieveScOp(m_scalar_op_mdid)->GetResultTypeMdid();
+		md_accessor->RetrieveScOp(m_scalar_op_mdid.get())->GetResultTypeMdid();
 
 	GPOS_ASSERT(
 		md_accessor->PtMDType<IMDTypeBool>()->MDId()->Equals(mdid_type));
@@ -145,7 +144,8 @@ CScalarSubqueryQuantified::Matches(COperator *pop) const
 	// match if contents are identical
 	CScalarSubqueryQuantified *popSsq =
 		CScalarSubqueryQuantified::PopConvert(pop);
-	return popSsq->Pcr() == m_pcr && popSsq->MdIdOp()->Equals(m_scalar_op_mdid);
+	return popSsq->Pcr() == m_pcr &&
+		   popSsq->MdIdOp()->Equals(m_scalar_op_mdid.get());
 }
 
 

@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarSwitch::CDXLScalarSwitch(CMemoryPool *mp, IMDId *mdid_type)
+CDXLScalarSwitch::CDXLScalarSwitch(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type)
 	: CDXLScalar(mp), m_mdid_type(mdid_type)
 {
 	GPOS_ASSERT(m_mdid_type->IsValid());
@@ -43,7 +43,6 @@ CDXLScalarSwitch::CDXLScalarSwitch(CMemoryPool *mp, IMDId *mdid_type)
 //---------------------------------------------------------------------------
 CDXLScalarSwitch::~CDXLScalarSwitch()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -85,7 +84,7 @@ CDXLScalarSwitch::GetOpNameStr() const
 IMDId *
 CDXLScalarSwitch::MdidType() const
 {
-	return m_mdid_type;
+	return m_mdid_type.get();
 }
 
 //---------------------------------------------------------------------------
@@ -123,7 +122,7 @@ BOOL
 CDXLScalarSwitch::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
+			md_accessor->RetrieveType(m_mdid_type.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG

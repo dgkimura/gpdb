@@ -32,10 +32,10 @@ class CScalarCast : public CScalar
 {
 private:
 	// return type metadata id in the catalog
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// function to be used for casting
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// whether or not this cast is binary coercible
 	BOOL m_is_binary_coercible;
@@ -50,14 +50,12 @@ public:
 	CScalarCast(const CScalarCast &) = delete;
 
 	// ctor
-	CScalarCast(CMemoryPool *mp, IMDId *return_type_mdid, IMDId *mdid_func,
-				BOOL is_binary_coercible);
+	CScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> return_type_mdid,
+				gpos::Ref<IMDId> mdid_func, BOOL is_binary_coercible);
 
 	// dtor
 	~CScalarCast() override
 	{
-		m_func_mdid->Release();
-		m_return_type_mdid->Release();
 	}
 
 
@@ -67,14 +65,14 @@ public:
 	IMDId *
 	MdidType() const override
 	{
-		return m_return_type_mdid;
+		return m_return_type_mdid.get();
 	}
 
 	// func that casts
 	IMDId *
 	FuncMdId() const
 	{
-		return m_func_mdid;
+		return m_func_mdid.get();
 	}
 
 	EOperatorId

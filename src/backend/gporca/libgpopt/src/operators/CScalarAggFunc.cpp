@@ -32,8 +32,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
-							   IMDId *resolved_rettype,
+CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
+							   gpos::Ref<IMDId> resolved_rettype,
 							   const CWStringConst *pstrAggFunc,
 							   BOOL is_distinct, EAggfuncStage eaggfuncstage,
 							   BOOL fSplit, EAggfuncKind aggkind,
@@ -87,7 +87,7 @@ CScalarAggFunc::PstrAggFunc() const
 IMDId *
 CScalarAggFunc::MDId() const
 {
-	return m_pmdidAggFunc;
+	return m_pmdidAggFunc.get();
 }
 
 
@@ -188,8 +188,8 @@ CScalarAggFunc::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 IMDId *
-CScalarAggFunc::PmdidLookupReturnType(IMDId *pmdidAggFunc, BOOL fGlobal,
-									  CMDAccessor *pmdaInput)
+CScalarAggFunc::PmdidLookupReturnType(gpos::Ref<IMDId> pmdidAggFunc,
+									  BOOL fGlobal, CMDAccessor *pmdaInput)
 {
 	GPOS_ASSERT(nullptr != pmdidAggFunc);
 	CMDAccessor *md_accessor = pmdaInput;
@@ -201,7 +201,7 @@ CScalarAggFunc::PmdidLookupReturnType(IMDId *pmdidAggFunc, BOOL fGlobal,
 	GPOS_ASSERT(nullptr != md_accessor);
 
 	// get aggregate function return type from the MD cache
-	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(pmdidAggFunc);
+	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(pmdidAggFunc.get());
 	if (fGlobal)
 	{
 		return pmdagg->GetResultTypeMdid();

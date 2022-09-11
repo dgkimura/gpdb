@@ -35,13 +35,13 @@ class CDXLScalarSwitch : public CDXLScalar
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 public:
 	CDXLScalarSwitch(const CDXLScalarSwitch &) = delete;
 
 	// ctor
-	CDXLScalarSwitch(CMemoryPool *mp, IMDId *mdid_type);
+	CDXLScalarSwitch(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	//dtor
 	~CDXLScalarSwitch() override;

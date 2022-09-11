@@ -53,8 +53,8 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
-						 IMDId *mdid_return_type, CWStringConst *str,
+CLogicalTVF::CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+						 gpos::Ref<IMDId> mdid_return_type, CWStringConst *str,
 						 CColumnDescriptorArray *pdrgpcoldesc)
 	: CLogical(mp),
 	  m_func_mdid(mdid_func),
@@ -73,7 +73,8 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	if (mdid_func->IsValid())
 	{
-		const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+		const IMDFunction *pmdfunc =
+			md_accessor->RetrieveFunc(m_func_mdid.get());
 
 		m_efs = pmdfunc->GetFuncStability();
 		m_returns_set = pmdfunc->ReturnsSet();
@@ -93,8 +94,8 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
-						 IMDId *mdid_return_type, CWStringConst *str,
+CLogicalTVF::CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+						 gpos::Ref<IMDId> mdid_return_type, CWStringConst *str,
 						 CColumnDescriptorArray *pdrgpcoldesc,
 						 CColRefArray *pdrgpcrOutput)
 	: CLogical(mp),
@@ -111,7 +112,7 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid.get());
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_returns_set = pmdfunc->ReturnsSet();
@@ -127,8 +128,6 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 //---------------------------------------------------------------------------
 CLogicalTVF::~CLogicalTVF()
 {
-	CRefCount::SafeRelease(m_func_mdid);
-	CRefCount::SafeRelease(m_return_type_mdid);
 	CRefCount::SafeRelease(m_pdrgpcoldesc);
 	CRefCount::SafeRelease(m_pdrgpcrOutput);
 	GPOS_DELETE(m_pstr);
@@ -208,8 +207,6 @@ CLogicalTVF::PopCopyWithRemappedColumns(CMemoryPool *mp,
 	}
 
 	CWStringConst *str = GPOS_NEW(mp) CWStringConst(m_pstr->GetBuffer());
-	m_func_mdid->AddRef();
-	m_return_type_mdid->AddRef();
 	m_pdrgpcoldesc->AddRef();
 
 	return GPOS_NEW(mp) CLogicalTVF(mp, m_func_mdid, m_return_type_mdid, str,

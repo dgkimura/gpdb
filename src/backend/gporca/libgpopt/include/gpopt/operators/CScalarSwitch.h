@@ -44,7 +44,7 @@ class CScalarSwitch : public CScalar
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// is operator return type BOOL?
 	BOOL m_fBoolReturnType;
@@ -53,7 +53,7 @@ public:
 	CScalarSwitch(const CScalarSwitch &) = delete;
 
 	// ctor
-	CScalarSwitch(CMemoryPool *mp, IMDId *mdid_type);
+	CScalarSwitch(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type);
 
 	// dtor
 	~CScalarSwitch() override;
@@ -76,7 +76,7 @@ public:
 	IMDId *
 	MdidType() const override
 	{
-		return m_mdid_type;
+		return m_mdid_type.get();
 	}
 
 	// operator specific hash function

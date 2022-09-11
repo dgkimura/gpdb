@@ -26,10 +26,11 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarArrayRef::CDXLScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
+CDXLScalarArrayRef::CDXLScalarArrayRef(CMemoryPool *mp,
+									   gpos::Ref<IMDId> elem_type_mdid,
 									   INT type_modifier,
-									   IMDId *array_type_mdid,
-									   IMDId *return_type_mdid)
+									   gpos::Ref<IMDId> array_type_mdid,
+									   gpos::Ref<IMDId> return_type_mdid)
 	: CDXLScalar(mp),
 	  m_elem_type_mdid(elem_type_mdid),
 	  m_type_modifier(type_modifier),
@@ -39,8 +40,8 @@ CDXLScalarArrayRef::CDXLScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
 	GPOS_ASSERT(m_elem_type_mdid->IsValid());
 	GPOS_ASSERT(m_array_type_mdid->IsValid());
 	GPOS_ASSERT(m_return_type_mdid->IsValid());
-	GPOS_ASSERT(m_return_type_mdid->Equals(m_elem_type_mdid) ||
-				m_return_type_mdid->Equals(m_array_type_mdid));
+	GPOS_ASSERT(m_return_type_mdid->Equals(m_elem_type_mdid.get()) ||
+				m_return_type_mdid->Equals(m_array_type_mdid.get()));
 }
 
 //---------------------------------------------------------------------------
@@ -53,9 +54,6 @@ CDXLScalarArrayRef::CDXLScalarArrayRef(CMemoryPool *mp, IMDId *elem_type_mdid,
 //---------------------------------------------------------------------------
 CDXLScalarArrayRef::~CDXLScalarArrayRef()
 {
-	m_elem_type_mdid->Release();
-	m_array_type_mdid->Release();
-	m_return_type_mdid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -164,8 +162,9 @@ CDXLScalarArrayRef::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarArrayRef::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_return_type_mdid)->GetDatumType());
+	return (
+		IMDType::EtiBool ==
+		md_accessor->RetrieveType(m_return_type_mdid.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG

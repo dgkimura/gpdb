@@ -43,10 +43,10 @@ class CDXLScalarWindowRef : public CDXLScalar
 {
 private:
 	// catalog id of the function
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// denotes whether it's agg(DISTINCT ...)
 	BOOL m_is_distinct;
@@ -67,8 +67,8 @@ public:
 	CDXLScalarWindowRef(const CDXLScalarWindowRef &) = delete;
 
 	// ctor
-	CDXLScalarWindowRef(CMemoryPool *mp, IMDId *pmdidWinfunc,
-						IMDId *mdid_return_type, BOOL is_distinct,
+	CDXLScalarWindowRef(CMemoryPool *mp, gpos::Ref<IMDId> pmdidWinfunc,
+						gpos::Ref<IMDId> mdid_return_type, BOOL is_distinct,
 						BOOL is_star_arg, BOOL is_simple_agg,
 						EdxlWinStage dxl_win_stage, ULONG ulWinspecPosition);
 
@@ -85,14 +85,14 @@ public:
 	IMDId *
 	FuncMdId() const
 	{
-		return m_func_mdid;
+		return m_func_mdid.get();
 	}
 
 	// return type of the function
 	IMDId *
 	ReturnTypeMdId() const
 	{
-		return m_return_type_mdid;
+		return m_return_type_mdid.get();
 	}
 
 	// window stage

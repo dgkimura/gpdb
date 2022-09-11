@@ -58,13 +58,13 @@ class CDXLScalarAggref : public CDXLScalar
 {
 private:
 	// catalog id of the function
-	IMDId *m_agg_func_mdid;
+	gpos::Ref<IMDId> m_agg_func_mdid;
 
 	// resolved return type refers to a non-ambiguous type that was resolved during query
 	// parsing if the actual return type of Agg is ambiguous (e.g., AnyElement in GPDB)
 	// if resolved return type is NULL, then we can get Agg return type by looking up MD cache
 	// using Agg MDId
-	IMDId *m_resolved_rettype_mdid;
+	gpos::Ref<IMDId> m_resolved_rettype_mdid;
 
 	// Denotes whether it's agg(DISTINCT ...)
 	BOOL m_is_distinct;
@@ -80,9 +80,10 @@ public:
 	CDXLScalarAggref(const CDXLScalarAggref &) = delete;
 
 	// ctor/dtor
-	CDXLScalarAggref(CMemoryPool *mp, IMDId *agg_mdid, IMDId *resolved_rettype,
-					 BOOL is_distinct, EdxlAggrefStage agg_stage,
-					 EdxlAggrefKind aggkind, ULongPtrArray *argtypes);
+	CDXLScalarAggref(CMemoryPool *mp, gpos::Ref<IMDId> agg_mdid,
+					 gpos::Ref<IMDId> resolved_rettype, BOOL is_distinct,
+					 EdxlAggrefStage agg_stage, EdxlAggrefKind aggkind,
+					 ULongPtrArray *argtypes);
 
 	~CDXLScalarAggref() override;
 

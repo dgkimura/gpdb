@@ -28,13 +28,14 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarSwitch::CScalarSwitch(CMemoryPool *mp, IMDId *mdid_type)
+CScalarSwitch::CScalarSwitch(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type)
 	: CScalar(mp), m_mdid_type(mdid_type), m_fBoolReturnType(false)
 {
 	GPOS_ASSERT(mdid_type->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	m_fBoolReturnType = CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type);
+	m_fBoolReturnType =
+		CMDAccessorUtils::FBoolType(md_accessor, m_mdid_type.get());
 }
 
 //---------------------------------------------------------------------------
@@ -47,7 +48,6 @@ CScalarSwitch::CScalarSwitch(CMemoryPool *mp, IMDId *mdid_type)
 //---------------------------------------------------------------------------
 CScalarSwitch::~CScalarSwitch()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -82,7 +82,7 @@ CScalarSwitch::Matches(COperator *pop) const
 		CScalarSwitch *popScSwitch = CScalarSwitch::PopConvert(pop);
 
 		// match if return types are identical
-		return popScSwitch->MdidType()->Equals(m_mdid_type);
+		return popScSwitch->MdidType()->Equals(m_mdid_type.get());
 	}
 
 	return false;

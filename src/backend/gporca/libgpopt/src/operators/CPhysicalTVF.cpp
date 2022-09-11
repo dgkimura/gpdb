@@ -31,8 +31,9 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalTVF::CPhysicalTVF(CMemoryPool *mp, IMDId *mdid_func,
-						   IMDId *mdid_return_type, CWStringConst *str,
+CPhysicalTVF::CPhysicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
+						   gpos::Ref<IMDId> mdid_return_type,
+						   CWStringConst *str,
 						   CColumnDescriptorArray *pdrgpcoldesc,
 						   CColRefSet *pcrsOutput)
 	: CPhysical(mp),
@@ -50,7 +51,7 @@ CPhysicalTVF::CPhysicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	if (m_func_mdid->IsValid())
 	{
-		m_pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
+		m_pmdfunc = md_accessor->RetrieveFunc(m_func_mdid.get());
 	}
 	else
 	{
@@ -69,8 +70,6 @@ CPhysicalTVF::CPhysicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 //---------------------------------------------------------------------------
 CPhysicalTVF::~CPhysicalTVF()
 {
-	m_func_mdid->Release();
-	m_return_type_mdid->Release();
 	m_pdrgpcoldesc->Release();
 	m_pcrsOutput->Release();
 	GPOS_DELETE(m_pstr);

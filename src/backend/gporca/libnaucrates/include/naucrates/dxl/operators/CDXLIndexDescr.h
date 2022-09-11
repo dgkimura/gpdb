@@ -33,7 +33,7 @@ class CDXLIndexDescr : public CRefCount
 {
 private:
 	// id and version information for the table
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// index name
 	CMDName *m_mdname;
@@ -42,7 +42,7 @@ public:
 	CDXLIndexDescr(const CDXLIndexDescr &) = delete;
 
 	// ctor
-	CDXLIndexDescr(IMDId *mdid, CMDName *mdname);
+	CDXLIndexDescr(gpos::Ref<IMDId> mdid, CMDName *mdname);
 
 	// dtor
 	~CDXLIndexDescr() override;

@@ -36,7 +36,7 @@ const CHAR CScalarArrayCmp::m_rgszCmpType[EarrcmpSentinel][10] = {"Any", "All"};
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarArrayCmp::CScalarArrayCmp(CMemoryPool *mp, IMDId *mdid_op,
+CScalarArrayCmp::CScalarArrayCmp(CMemoryPool *mp, gpos::Ref<IMDId> mdid_op,
 								 const CWStringConst *pstrOp,
 								 EArrCmpType earrcmpt)
 	: CScalar(mp),
@@ -51,7 +51,7 @@ CScalarArrayCmp::CScalarArrayCmp(CMemoryPool *mp, IMDId *mdid_op,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	m_returns_null_on_null_input =
 		CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(md_accessor,
-														  m_mdid_op);
+														  m_mdid_op.get());
 }
 
 
@@ -80,7 +80,7 @@ CScalarArrayCmp::Pstr() const
 IMDId *
 CScalarArrayCmp::MdIdOp() const
 {
-	return m_mdid_op;
+	return m_mdid_op.get();
 }
 
 //---------------------------------------------------------------------------

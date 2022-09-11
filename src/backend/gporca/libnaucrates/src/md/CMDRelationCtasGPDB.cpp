@@ -27,8 +27,8 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDRelationCtasGPDB::CMDRelationCtasGPDB(
-	CMemoryPool *mp, IMDId *mdid, CMDName *mdname_schema, CMDName *mdname,
-	BOOL fTemporary, Erelstoragetype rel_storage_type,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname_schema,
+	CMDName *mdname, BOOL fTemporary, Erelstoragetype rel_storage_type,
 	Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
 	ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamiles,
 	IMdIdArray *distr_opclasses, ULongPtr2dArray *keyset_array,
@@ -101,7 +101,6 @@ CMDRelationCtasGPDB::~CMDRelationCtasGPDB()
 	GPOS_DELETE(m_mdname_schema);
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid->Release();
 	m_md_col_array->Release();
 	m_keyset_array->Release();
 	m_col_width_array->Release();
@@ -125,7 +124,7 @@ CMDRelationCtasGPDB::~CMDRelationCtasGPDB()
 IMDId *
 CMDRelationCtasGPDB::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------

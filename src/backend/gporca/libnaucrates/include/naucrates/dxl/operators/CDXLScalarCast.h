@@ -40,16 +40,17 @@ class CDXLScalarCast : public CDXLScalar
 {
 private:
 	// catalog MDId of the column's type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// catalog MDId of the function implementing the casting
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 public:
 	CDXLScalarCast(const CDXLScalarCast &) = delete;
 
 	// ctor/dtor
-	CDXLScalarCast(CMemoryPool *mp, IMDId *mdid_type, IMDId *func_mdid);
+	CDXLScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+				   gpos::Ref<IMDId> func_mdid);
 
 	~CDXLScalarCast() override;
 

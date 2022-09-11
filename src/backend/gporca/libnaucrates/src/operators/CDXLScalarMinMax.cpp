@@ -27,7 +27,7 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLScalarMinMax::CDXLScalarMinMax(CMemoryPool *mp, IMDId *mdid_type,
+CDXLScalarMinMax::CDXLScalarMinMax(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 								   EdxlMinMaxType min_max_type)
 	: CDXLScalar(mp), m_mdid_type(mdid_type), m_min_max_type(min_max_type)
 {
@@ -45,7 +45,6 @@ CDXLScalarMinMax::CDXLScalarMinMax(CMemoryPool *mp, IMDId *mdid_type,
 //---------------------------------------------------------------------------
 CDXLScalarMinMax::~CDXLScalarMinMax()
 {
-	m_mdid_type->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -119,7 +118,7 @@ BOOL
 CDXLScalarMinMax::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	return (IMDType::EtiBool ==
-			md_accessor->RetrieveType(m_mdid_type)->GetDatumType());
+			md_accessor->RetrieveType(m_mdid_type.get())->GetDatumType());
 }
 
 #ifdef GPOS_DEBUG

@@ -29,8 +29,9 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDTriggerGPDB::CMDTriggerGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-							   IMDId *rel_mdid, IMDId *mdid_func, INT type,
+CMDTriggerGPDB::CMDTriggerGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+							   CMDName *mdname, gpos::Ref<IMDId> rel_mdid,
+							   gpos::Ref<IMDId> mdid_func, INT type,
 							   BOOL is_enabled)
 	: m_mp(mp),
 	  m_mdid(mdid),
@@ -59,9 +60,6 @@ CMDTriggerGPDB::CMDTriggerGPDB(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
 //---------------------------------------------------------------------------
 CMDTriggerGPDB::~CMDTriggerGPDB()
 {
-	m_mdid->Release();
-	m_rel_mdid->Release();
-	m_func_mdid->Release();
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }
