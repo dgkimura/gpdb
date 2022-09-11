@@ -68,7 +68,7 @@ private:
 	{
 	private:
 		// MD id of sort operator
-		gpmd::IMDId *m_mdid;
+		gpos::Ref<gpmd::IMDId> m_mdid;
 
 		// sort column
 		const CColRef *m_pcr;
@@ -80,7 +80,7 @@ private:
 		COrderExpression(const COrderExpression &) = delete;
 
 		// ctor
-		COrderExpression(gpmd::IMDId *mdid, const CColRef *colref,
+		COrderExpression(gpos::Ref<gpmd::IMDId> mdid, const CColRef *colref,
 						 ENullTreatment ent);
 
 		// dtor
@@ -90,7 +90,7 @@ private:
 		gpmd::IMDId *
 		GetMdIdSortOp() const
 		{
-			return m_mdid;
+			return m_mdid.get();
 		}
 
 		// accessor of sort column
