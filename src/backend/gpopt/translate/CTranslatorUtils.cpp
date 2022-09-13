@@ -138,7 +138,7 @@ CTranslatorUtils::GetTableDescr(CMemoryPool *mp, CMDAccessor *md_accessor,
 	CMDName *table_mdname = GPOS_NEW(mp) CMDName(mp, tablename);
 
 	CDXLTableDescr *table_descr = GPOS_NEW(mp) CDXLTableDescr(
-		mp, mdid, table_mdname, rte->checkAsUser, rte->rellockmode);
+		mp, mdid, table_mdname, rte->checkAsUser, rte->rellockmode, rel->PartitionCount());
 
 	const ULONG len = rel->ColumnCount();
 

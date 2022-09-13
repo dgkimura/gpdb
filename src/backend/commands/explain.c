@@ -2223,9 +2223,13 @@ ExplainNode(PlanState *planstate, List *ancestors,
 			 * Table Scan, we should be able to get that information back.
 			 */
 			if (IsA(plan, DynamicSeqScan))
-				ExplainPropertyInteger(
-					"Number of partitions to scan", "",
-					list_length(((DynamicSeqScan *) plan)->partOids), es);
+			{
+				pname = psprintf("%d (out of %d)",
+					list_length(((DynamicSeqScan *) plan)->partOids),
+					((DynamicSeqScan *) plan)->npartOids);
+				ExplainPropertyStringInfo(
+					"Number of partitions to scan", es, pname);
+			}
 			show_scan_qual(plan->qual, "Filter", planstate, ancestors, es);
 			if (plan->qual)
 				show_instrumentation_count("Rows Removed by Filter", 1,

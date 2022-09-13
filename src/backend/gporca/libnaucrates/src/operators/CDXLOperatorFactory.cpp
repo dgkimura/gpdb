@@ -1522,6 +1522,10 @@ CDXLOperatorFactory::MakeDXLTableDescr(CDXLMemoryManager *dxl_memory_manager,
 		dxl_memory_manager, attrs, EdxltokenLockMode, EdxltokenTableDescr,
 		true /* is_optional */, -1);
 
+	ULONG num_of_partitions = ExtractConvertAttrValueToUlong(
+		dxl_memory_manager, attrs, EdxltokenNumLeafPartitions, EdxltokenTableDescr,
+		true /* is_optional */, -1);
+
 	if (nullptr != execute_as_user_xml)
 	{
 		user_id = ConvertAttrValueToUlong(
@@ -1529,7 +1533,7 @@ CDXLOperatorFactory::MakeDXLTableDescr(CDXLMemoryManager *dxl_memory_manager,
 			EdxltokenTableDescr);
 	}
 
-	return GPOS_NEW(mp) CDXLTableDescr(mp, mdid, mdname, user_id, lockmode);
+	return GPOS_NEW(mp) CDXLTableDescr(mp, mdid, mdname, user_id, lockmode, num_of_partitions);
 }
 
 //---------------------------------------------------------------------------

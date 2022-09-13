@@ -3978,7 +3978,7 @@ CTranslatorDXLToPlStmt::TranslateDXLDynTblScan(
 	}
 
 	dyn_seq_scan->partOids = oids_list;
-
+	dyn_seq_scan->npartOids = dyn_tbl_scan_dxlop->GetDXLTableDescr()->PartitionCount();
 	dyn_seq_scan->join_prune_paramids = NIL;
 
 	OID oid_type =

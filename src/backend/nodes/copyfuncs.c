@@ -597,6 +597,7 @@ _copyDynamicSeqScan(const DynamicSeqScan *from)
 
 	CopyScanFields((Scan *) from, (Scan *) newnode);
 	COPY_NODE_FIELD(partOids);
+	COPY_SCALAR_FIELD(npartOids);
 	COPY_NODE_FIELD(part_prune_info);
 	COPY_NODE_FIELD(join_prune_paramids);
 

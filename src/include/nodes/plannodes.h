@@ -756,6 +756,8 @@ typedef struct DynamicSeqScan
 	 */
 	List	   *partOids;
 
+	int			npartOids;
+
 	/* Info for run-time subplan pruning; NULL if we're not doing that */
 	struct PartitionPruneInfo *part_prune_info;
 

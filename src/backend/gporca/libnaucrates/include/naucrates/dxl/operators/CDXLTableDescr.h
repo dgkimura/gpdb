@@ -50,6 +50,8 @@ private:
 	// lock mode from the parser
 	INT m_lockmode;
 
+	ULONG m_num_leaf_partitions;
+
 	void SerializeMDId(CXMLSerializer *xml_serializer) const;
 
 public:
@@ -57,7 +59,7 @@ public:
 
 	// ctor/dtor
 	CDXLTableDescr(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-				   ULONG ulExecuteAsUser, int lockmode);
+				   ULONG ulExecuteAsUser, int lockmode, ULONG num_leaf_partitions);
 
 	~CDXLTableDescr() override;
 
@@ -80,6 +82,11 @@ public:
 
 	// lock mode
 	INT LockMode() const;
+
+	ULONG PartitionCount() const
+	{
+		return m_num_leaf_partitions;
+	}
 
 	// get the column descriptor at the given position
 	const CDXLColDescr *GetColumnDescrAt(ULONG idx) const;

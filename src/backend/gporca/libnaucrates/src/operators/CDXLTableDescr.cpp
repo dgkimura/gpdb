@@ -31,12 +31,13 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLTableDescr::CDXLTableDescr(CMemoryPool *mp, IMDId *mdid, CMDName *mdname,
-							   ULONG ulExecuteAsUser, int lockmode)
+							   ULONG ulExecuteAsUser, int lockmode, ULONG num_leaf_partitions)
 	: m_mdid(mdid),
 	  m_mdname(mdname),
 	  m_dxl_column_descr_array(nullptr),
 	  m_execute_as_user_id(ulExecuteAsUser),
-	  m_lockmode(lockmode)
+	  m_lockmode(lockmode),
+	  m_num_leaf_partitions(num_leaf_partitions)
 {
 	GPOS_ASSERT(nullptr != m_mdname);
 	m_dxl_column_descr_array = GPOS_NEW(mp) CDXLColDescrArray(mp);
@@ -217,6 +218,9 @@ CDXLTableDescr::SerializeToDXL(CXMLSerializer *xml_serializer) const
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenLockMode), LockMode());
 	}
+
+	xml_serializer->AddAttribute(
+		CDXLTokens::GetDXLTokenStr(EdxltokenNumLeafPartitions), m_num_leaf_partitions);
 
 	// serialize columns
 	xml_serializer->OpenElement(
