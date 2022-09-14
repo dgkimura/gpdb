@@ -38,7 +38,7 @@ class CParseHandlerMDRelation : public CParseHandlerMetadataObject
 {
 protected:
 	// id and version of the relation
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// schema name
 	CMDName *m_mdname_schema;
