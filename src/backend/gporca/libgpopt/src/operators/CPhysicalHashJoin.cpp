@@ -44,7 +44,7 @@ using namespace gpopt;
 CPhysicalHashJoin::CPhysicalHashJoin(CMemoryPool *mp,
 									 CExpressionArray *pdrgpexprOuterKeys,
 									 CExpressionArray *pdrgpexprInnerKeys,
-									 IMdIdArray *hash_opfamilies,
+									 gpos::Ref<IMdIdArray> hash_opfamilies,
 									 CXform::EXformId origin_xform)
 	: CPhysicalJoin(mp, origin_xform),
 	  m_pdrgpexprOuterKeys(pdrgpexprOuterKeys),
@@ -79,7 +79,6 @@ CPhysicalHashJoin::~CPhysicalHashJoin()
 {
 	m_pdrgpexprOuterKeys->Release();
 	m_pdrgpexprInnerKeys->Release();
-	CRefCount::SafeRelease(m_hash_opfamilies);
 	CRefCount::SafeRelease(m_pdrgpdsRedistributeRequests);
 }
 
@@ -149,7 +148,7 @@ CPhysicalHashJoin::CreateHashRedistributeRequests(CMemoryPool *mp)
 		m_hash_opfamilies->AddRef();
 	}
 	CDistributionSpecHashed *pdshashed = GPOS_NEW(mp) CDistributionSpecHashed(
-		pdrgpexpr, true /* fNullsCollocated */, m_hash_opfamilies);
+		pdrgpexpr, true /* fNullsCollocated */, m_hash_opfamilies.get());
 	m_pdrgpdsRedistributeRequests->Append(pdshashed);
 }
 

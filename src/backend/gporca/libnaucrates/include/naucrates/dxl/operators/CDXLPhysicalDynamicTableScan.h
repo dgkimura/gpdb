@@ -44,7 +44,7 @@ private:
 	// table descriptor for the scanned table
 	CDXLTableDescr *m_dxl_table_descr;
 
-	IMdIdArray *m_part_mdids;
+	gpos::Ref<IMdIdArray> m_part_mdids;
 
 	ULongPtrArray *m_selector_ids = nullptr;
 
@@ -53,7 +53,7 @@ public:
 
 	// ctor
 	CDXLPhysicalDynamicTableScan(CMemoryPool *mp, CDXLTableDescr *table_descr,
-								 IMdIdArray *part_mdids,
+								 gpos::Ref<IMdIdArray> part_mdids,
 								 ULongPtrArray *selector_ids);
 
 	// dtor

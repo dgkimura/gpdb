@@ -56,7 +56,7 @@ CLogicalDynamicIndexGet::CLogicalDynamicIndexGet(
 	CMemoryPool *mp, const IMDIndex *pmdindex, CTableDescriptor *ptabdesc,
 	ULONG ulOriginOpId, const CName *pnameAlias, ULONG part_idx_id,
 	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
-	IMdIdArray *partition_mdids)
+	gpos::Ref<IMdIdArray> partition_mdids)
 	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, part_idx_id,
 							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
 	  m_pindexdesc(nullptr),

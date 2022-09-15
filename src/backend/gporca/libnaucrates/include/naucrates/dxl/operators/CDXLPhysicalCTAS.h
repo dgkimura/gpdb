@@ -54,7 +54,7 @@ private:
 	ULongPtrArray *m_distr_column_pos_array;
 
 	// list of distriution column opclasses
-	IMdIdArray *m_distr_opclasses;
+	gpos::Ref<IMdIdArray> m_distr_opclasses;
 
 	// is this a temporary table
 	BOOL m_is_temp_table;
@@ -78,7 +78,7 @@ public:
 					 CDXLCtasStorageOptions *dxl_ctas_storage_options,
 					 IMDRelation::Ereldistrpolicy rel_distr_policy,
 					 ULongPtrArray *distr_column_pos_array,
-					 IMdIdArray *distr_opclasses, BOOL is_temporary,
+					 gpos::Ref<IMdIdArray> distr_opclasses, BOOL is_temporary,
 					 IMDRelation::Erelstoragetype rel_storage_type,
 					 ULongPtrArray *src_colids_array,
 					 IntPtrArray *vartypemod_array);
@@ -158,7 +158,7 @@ public:
 	IMdIdArray *
 	GetDistrOpclasses() const
 	{
-		return m_distr_opclasses;
+		return m_distr_opclasses.get();
 	}
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

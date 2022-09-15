@@ -39,7 +39,7 @@ CLogicalDynamicBitmapTableGet::CLogicalDynamicBitmapTableGet(
 	CMemoryPool *mp, CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
 	const CName *pnameTableAlias, ULONG ulPartIndex,
 	CColRefArray *pdrgpcrOutput, CColRef2dArray *pdrgpdrgpcrPart,
-	IMdIdArray *partition_mdids)
+	gpos::Ref<IMdIdArray> partition_mdids)
 	: CLogicalDynamicGetBase(mp, pnameTableAlias, ptabdesc, ulPartIndex,
 							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
 	  m_ulOriginOpId(ulOriginOpId)
@@ -209,7 +209,7 @@ CLogicalDynamicBitmapTableGet::PopCopyWithRemappedColumns(
 
 	return GPOS_NEW(mp) CLogicalDynamicBitmapTableGet(
 		mp, m_ptabdesc, m_ulOriginOpId, pnameAlias, m_scan_id, pdrgpcrOutput,
-		pdrgpdrgpcrPart, m_partition_mdids);
+		pdrgpdrgpcrPart, m_partition_mdids.get());
 }
 
 //---------------------------------------------------------------------------

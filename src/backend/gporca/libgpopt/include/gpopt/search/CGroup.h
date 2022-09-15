@@ -173,7 +173,7 @@ private:
 	CExpressionArray *m_pdrgpexprJoinKeysInner;
 
 	// join op families (only for scalar groups) (used by hash & merge joins)
-	IMdIdArray *m_join_opfamilies;
+	gpos::Ref<IMdIdArray> m_join_opfamilies;
 
 	// list of group expressions
 	CList<CGroupExpression> m_listGExprs;
@@ -386,7 +386,7 @@ public:
 	IMdIdArray *
 	JoinOpfamilies() const
 	{
-		return m_join_opfamilies;
+		return m_join_opfamilies.get();
 	}
 
 	// return a representative cached scalar expression usable for stat derivation etc.

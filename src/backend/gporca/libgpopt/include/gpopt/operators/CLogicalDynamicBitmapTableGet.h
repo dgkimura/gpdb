@@ -53,7 +53,7 @@ public:
 								  ULONG ulPartIndex,
 								  CColRefArray *pdrgpcrOutput,
 								  CColRef2dArray *pdrgpdrgpcrPart,
-								  IMdIdArray *partition_mdids);
+								  gpos::Ref<IMdIdArray> partition_mdids);
 
 	explicit CLogicalDynamicBitmapTableGet(CMemoryPool *mp);
 

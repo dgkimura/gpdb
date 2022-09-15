@@ -55,7 +55,7 @@ CLogicalDynamicGet::CLogicalDynamicGet(CMemoryPool *mp)
 CLogicalDynamicGet::CLogicalDynamicGet(
 	CMemoryPool *mp, const CName *pnameAlias, CTableDescriptor *ptabdesc,
 	ULONG ulPartIndex, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrPart, IMdIdArray *partition_mdids,
+	CColRef2dArray *pdrgpdrgpcrPart, gpos::Ref<IMdIdArray> partition_mdids,
 	CConstraint *partition_cnstrs_disj, BOOL static_pruned)
 	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, ulPartIndex,
 							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
@@ -77,7 +77,7 @@ CLogicalDynamicGet::CLogicalDynamicGet(
 CLogicalDynamicGet::CLogicalDynamicGet(CMemoryPool *mp, const CName *pnameAlias,
 									   CTableDescriptor *ptabdesc,
 									   ULONG ulPartIndex,
-									   IMdIdArray *partition_mdids)
+									   gpos::Ref<IMdIdArray> partition_mdids)
 	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, ulPartIndex,
 							 partition_mdids)
 {
@@ -158,7 +158,6 @@ CLogicalDynamicGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 		PdrgpdrgpcrCreatePartCols(mp, pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameAlias);
 	m_ptabdesc->AddRef();
-	m_partition_mdids->AddRef();
 	if (m_partition_cnstrs_disj)
 	{
 		m_partition_cnstrs_disj->AddRef();

@@ -74,7 +74,7 @@ private:
 	// indices of distribution columns
 	ULongPtrArray *m_distr_col_array;
 
-	IMdIdArray *m_distr_opfamilies;
+	gpos::Ref<IMdIdArray> m_distr_opfamilies;
 
 	// do we need to consider a hash distributed table as random distributed
 	BOOL m_convert_hash_to_random;
@@ -89,7 +89,7 @@ private:
 	ULONG m_num_of_partitions;
 
 	// Child partition oids
-	IMdIdArray *m_partition_oids;
+	gpos::Ref<IMdIdArray> m_partition_oids;
 
 	// array of key sets
 	ULongPtr2dArray *m_keyset_array;
@@ -98,10 +98,10 @@ private:
 	CMDIndexInfoArray *m_mdindex_info_array;
 
 	// array of trigger ids
-	IMdIdArray *m_mdid_trigger_array;
+	gpos::Ref<IMdIdArray> m_mdid_trigger_array;
 
 	// array of check constraint mdids
-	IMdIdArray *m_mdid_check_constraint_array;
+	gpos::Ref<IMdIdArray> m_mdid_check_constraint_array;
 
 	// partition constraint
 	CDXLNode *m_mdpart_constraint;
@@ -126,16 +126,19 @@ public:
 	CMDRelationGPDB(const CMDRelationGPDB &) = delete;
 
 	// ctor
-	CMDRelationGPDB(
-		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
-		BOOL is_temp_table, Erelstoragetype rel_storage_type,
-		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-		ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
-		ULongPtrArray *partition_cols_array, CharPtrArray *str_part_types_array,
-		ULONG num_of_partitions, IMdIdArray *partition_oids,
-		BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
-		CMDIndexInfoArray *md_index_info_array, IMdIdArray *mdid_triggers_array,
-		IMdIdArray *mdid_check_constraint_array, CDXLNode *mdpart_constraint);
+	CMDRelationGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
+					BOOL is_temp_table, Erelstoragetype rel_storage_type,
+					Ereldistrpolicy rel_distr_policy,
+					CMDColumnArray *mdcol_array, ULongPtrArray *distr_col_array,
+					gpos::Ref<IMdIdArray> distr_opfamilies,
+					ULongPtrArray *partition_cols_array,
+					CharPtrArray *str_part_types_array, ULONG num_of_partitions,
+					gpos::Ref<IMdIdArray> partition_oids,
+					BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
+					CMDIndexInfoArray *md_index_info_array,
+					gpos::Ref<IMdIdArray> mdid_triggers_array,
+					gpos::Ref<IMdIdArray> mdid_check_constraint_array,
+					CDXLNode *mdpart_constraint);
 
 	// dtor
 	~CMDRelationGPDB() override;

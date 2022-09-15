@@ -32,8 +32,8 @@ using namespace gpdxl;
 CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 								 CMDName *mdname,
 								 gpos::Ref<IMDId> result_type_mdid,
-								 IMdIdArray *mdid_array, BOOL ReturnsSet,
-								 EFuncStbl func_stability,
+								 gpos::Ref<IMdIdArray> mdid_array,
+								 BOOL ReturnsSet, EFuncStbl func_stability,
 								 EFuncDataAcc func_data_access, BOOL is_strict,
 								 BOOL is_ndv_preserving, BOOL is_allowed_for_PS)
 	: m_mp(mp),
@@ -67,7 +67,6 @@ CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 //---------------------------------------------------------------------------
 CMDFunctionGPDB::~CMDFunctionGPDB()
 {
-	CRefCount::SafeRelease(m_mdid_types_array);
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }
@@ -150,7 +149,7 @@ CMDFunctionGPDB::GetResultTypeMdid() const
 IMdIdArray *
 CMDFunctionGPDB::OutputArgTypesMdidArray() const
 {
-	return m_mdid_types_array;
+	return m_mdid_types_array.get();
 }
 
 //---------------------------------------------------------------------------

@@ -59,10 +59,10 @@ private:
 	ULongPtrArray *m_distr_column_pos_array;
 
 	// list of distribution column opfamilies
-	IMdIdArray *m_distr_opfamilies;
+	gpos::Ref<IMdIdArray> m_distr_opfamilies;
 
 	// list of distribution column opclasses for populating dist policy of created table
-	IMdIdArray *m_distr_opclasses;
+	gpos::Ref<IMdIdArray> m_distr_opclasses;
 
 	// is this a temporary table
 	BOOL m_is_temp_table;
@@ -87,8 +87,8 @@ public:
 					CDXLCtasStorageOptions *dxl_ctas_storage_option,
 					IMDRelation::Ereldistrpolicy rel_distr_policy,
 					ULongPtrArray *distr_column_pos_array,
-					IMdIdArray *distr_opfamilies, IMdIdArray *distr_opclasses,
-					BOOL fTemporary,
+					gpos::Ref<IMdIdArray> distr_opfamilies,
+					gpos::Ref<IMdIdArray> distr_opclasses, BOOL fTemporary,
 					IMDRelation::Erelstoragetype rel_storage_type,
 					ULongPtrArray *src_colids_array,
 					IntPtrArray *vartypemod_array);
@@ -155,14 +155,14 @@ public:
 	IMdIdArray *
 	GetDistrOpfamilies() const
 	{
-		return m_distr_opfamilies;
+		return m_distr_opfamilies.get();
 	}
 
 	// distribution column opclasses
 	IMdIdArray *
 	GetDistrOpclasses() const
 	{
-		return m_distr_opclasses;
+		return m_distr_opclasses.get();
 	}
 
 	// source column ids

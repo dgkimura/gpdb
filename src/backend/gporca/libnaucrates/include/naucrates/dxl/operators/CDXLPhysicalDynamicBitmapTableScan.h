@@ -35,7 +35,7 @@ class CXMLSerializer;
 class CDXLPhysicalDynamicBitmapTableScan : public CDXLPhysicalAbstractBitmapScan
 {
 private:
-	IMdIdArray *m_part_mdids;
+	gpos::Ref<IMdIdArray> m_part_mdids;
 
 	ULongPtrArray *m_selector_ids = nullptr;
 
@@ -46,7 +46,7 @@ public:
 	// ctor
 	CDXLPhysicalDynamicBitmapTableScan(CMemoryPool *mp,
 									   CDXLTableDescr *table_descr,
-									   IMdIdArray *part_mdids,
+									   gpos::Ref<IMdIdArray> part_mdids,
 									   ULongPtrArray *selector_ids)
 		: CDXLPhysicalAbstractBitmapScan(mp, table_descr),
 		  m_part_mdids(part_mdids),

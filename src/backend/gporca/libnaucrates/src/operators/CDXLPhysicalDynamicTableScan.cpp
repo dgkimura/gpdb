@@ -30,8 +30,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalDynamicTableScan::CDXLPhysicalDynamicTableScan(
-	CMemoryPool *mp, CDXLTableDescr *table_descr, IMdIdArray *part_mdids,
-	ULongPtrArray *selector_ids)
+	CMemoryPool *mp, CDXLTableDescr *table_descr,
+	gpos::Ref<IMdIdArray> part_mdids, ULongPtrArray *selector_ids)
 	: CDXLPhysical(mp),
 	  m_dxl_table_descr(table_descr),
 	  m_part_mdids(part_mdids),
@@ -53,7 +53,6 @@ CDXLPhysicalDynamicTableScan::CDXLPhysicalDynamicTableScan(
 CDXLPhysicalDynamicTableScan::~CDXLPhysicalDynamicTableScan()
 {
 	m_dxl_table_descr->Release();
-	m_part_mdids->Release();
 	CRefCount::SafeRelease(m_selector_ids);
 }
 
@@ -103,7 +102,7 @@ CDXLPhysicalDynamicTableScan::GetDXLTableDescr() const
 IMdIdArray *
 CDXLPhysicalDynamicTableScan::GetParts() const
 {
-	return m_part_mdids;
+	return m_part_mdids.get();
 }
 
 //---------------------------------------------------------------------------
@@ -131,7 +130,7 @@ CDXLPhysicalDynamicTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
 	node->SerializePropertiesToDXL(xml_serializer);
 	node->SerializeChildrenToDXL(xml_serializer);
 	IMDCacheObject::SerializeMDIdList(
-		xml_serializer, m_part_mdids,
+		xml_serializer, m_part_mdids.get(),
 		CDXLTokens::GetDXLTokenStr(EdxltokenPartitions),
 		CDXLTokens::GetDXLTokenStr(EdxltokenPartition));
 	m_dxl_table_descr->SerializeToDXL(xml_serializer);

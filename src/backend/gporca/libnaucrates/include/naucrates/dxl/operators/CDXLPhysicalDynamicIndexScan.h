@@ -41,7 +41,7 @@ private:
 	// scan direction of the index
 	EdxlIndexScanDirection m_index_scan_dir;
 
-	IMdIdArray *m_part_mdids;
+	gpos::Ref<IMdIdArray> m_part_mdids;
 
 	ULongPtrArray *m_selector_ids = nullptr;
 
@@ -61,7 +61,7 @@ public:
 	CDXLPhysicalDynamicIndexScan(CMemoryPool *mp, CDXLTableDescr *table_descr,
 								 CDXLIndexDescr *dxl_index_descr,
 								 EdxlIndexScanDirection idx_scan_direction,
-								 IMdIdArray *part_mdids,
+								 gpos::Ref<IMdIdArray> part_mdids,
 								 ULongPtrArray *selector_ids);
 
 	//dtor

@@ -35,7 +35,7 @@ private:
 	// array of distribution expressions
 	CExpressionArray *m_pdrgpexpr;
 
-	IMdIdArray *m_opfamilies;
+	gpos::Ref<IMdIdArray> m_opfamilies;
 
 	// are NULLS consistently distributed
 	BOOL m_fNullsColocated;
@@ -79,12 +79,12 @@ public:
 
 	// ctor
 	CDistributionSpecHashed(CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
-							IMdIdArray *opfamilies = nullptr);
+							gpos::Ref<IMdIdArray> opfamilies = nullptr);
 
 	// ctor
 	CDistributionSpecHashed(CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
 							CDistributionSpecHashed *pdshashedEquiv,
-							IMdIdArray *opfamilies = nullptr);
+							gpos::Ref<IMdIdArray> opfamilies = nullptr);
 
 	static CDistributionSpecHashed *MakeHashedDistrSpec(
 		CMemoryPool *mp, CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
@@ -132,7 +132,7 @@ public:
 	IMdIdArray *
 	Opfamilies() const
 	{
-		return m_opfamilies;
+		return m_opfamilies.get();
 	}
 
 	// columns used by distribution expressions

@@ -49,12 +49,12 @@ public:
 					   CTableDescriptor *ptabdesc, ULONG ulPartIndex,
 					   CColRefArray *pdrgpcrOutput,
 					   CColRef2dArray *pdrgpdrgpcrPart,
-					   IMdIdArray *partition_mdids,
+					   gpos::Ref<IMdIdArray> partition_mdids,
 					   CConstraint *partition_cnstrs_disj, BOOL static_pruned);
 
 	CLogicalDynamicGet(CMemoryPool *mp, const CName *pnameAlias,
 					   CTableDescriptor *ptabdesc, ULONG ulPartIndex,
-					   IMdIdArray *partition_mdids);
+					   gpos::Ref<IMdIdArray> partition_mdids);
 
 	// dtor
 	~CLogicalDynamicGet() override;

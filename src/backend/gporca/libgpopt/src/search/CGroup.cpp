@@ -202,7 +202,6 @@ CGroup::~CGroup()
 {
 	CRefCount::SafeRelease(m_pdrgpexprJoinKeysOuter);
 	CRefCount::SafeRelease(m_pdrgpexprJoinKeysInner);
-	CRefCount::SafeRelease(m_join_opfamilies);
 	CRefCount::SafeRelease(m_pdp);
 	CRefCount::SafeRelease(m_pexprScalarRep);
 	CRefCount::SafeRelease(m_pccDummy);
