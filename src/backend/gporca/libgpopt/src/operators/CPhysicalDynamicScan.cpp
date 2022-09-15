@@ -57,7 +57,7 @@ CPhysicalDynamicScan::CPhysicalDynamicScan(
 	ULONG part_ptr = 0;
 	for (ULONG ul = 0; ul < partition_mdids->Size(); ul++)
 	{
-		IMDId *part_mdid = (*partition_mdids)[ul];
+		gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
 		while (part_mdid != (*all_partition_mdids)[part_ptr])
 		{
 			part_ptr++;

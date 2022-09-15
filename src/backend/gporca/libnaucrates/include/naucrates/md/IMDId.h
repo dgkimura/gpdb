@@ -21,6 +21,7 @@
 #include "gpos/common/CHashSetIter.h"
 #include "gpos/common/DbgPrintMixin.h"
 #include "gpos/common/Ref.h"
+#include "gpos/common/Vector.h"
 #include "gpos/string/CWStringConst.h"
 
 #include "naucrates/dxl/gpdb_types.h"
@@ -148,6 +149,24 @@ public:
 		return left_mdid->Equals(right_mdid);
 	}
 
+	static INT
+	IMDIdCmp(const gpos::Ref<IMDId> p1, const gpos::Ref<IMDId> p2)
+	{
+		ULONG_PTR ulp1 = *(ULONG_PTR *) p1.get();
+		ULONG_PTR ulp2 = *(ULONG_PTR *) p2.get();
+
+		if (ulp1 < ulp2)
+		{
+			return -1;
+		}
+
+		if (ulp1 > ulp2)
+		{
+			return 1;
+		}
+
+		return 0;
+	}
 
 	// is the mdid valid
 	virtual BOOL IsValid() const = 0;
@@ -169,8 +188,9 @@ public:
 	virtual IMDId *Copy(CMemoryPool *mp) const = 0;
 };
 
+
 // common structures over metadata id elements
-using IMdIdArray = CDynamicPtrArray<IMDId, CleanupRelease>;
+using IMdIdArray = gpos::Vector<gpos::Ref<IMDId>>;
 
 // hash set for mdid
 using MdidHashSet =

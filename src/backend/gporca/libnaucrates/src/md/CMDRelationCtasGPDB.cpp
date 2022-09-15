@@ -280,7 +280,7 @@ CMDRelationCtasGPDB::GetDistrOpfamilyAt(ULONG pos) const
 	}
 
 	GPOS_ASSERT(pos < m_distr_opfamilies->Size());
-	return (*m_distr_opfamilies)[pos];
+	return (*m_distr_opfamilies)[pos].get();
 }
 
 //---------------------------------------------------------------------------

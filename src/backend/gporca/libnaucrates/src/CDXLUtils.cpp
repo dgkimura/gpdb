@@ -414,7 +414,7 @@ CDXLUtils::ParseDXLToIMDObjectArray(CMemoryPool *mp, const CHAR *dxl_string,
 //		Parse an mdid from a DXL metadata document
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLUtils::ParseDXLToMDId(CMemoryPool *mp, const CWStringBase *dxl_string,
 						  const CHAR *xsd_file_path)
 {
@@ -430,10 +430,7 @@ CDXLUtils::ParseDXLToMDId(CMemoryPool *mp, const CWStringBase *dxl_string,
 
 	GPOS_ASSERT(1 == mdid_array->Size());
 
-	IMDId *mdid = (*mdid_array)[0];
-	mdid->AddRef();
-
-	return mdid;
+	return (*mdid_array)[0];
 }
 
 //---------------------------------------------------------------------------
@@ -1782,7 +1779,7 @@ CDXLUtils::DebugPrintMDIdArray(IOstream &os, IMdIdArray *mdid_array)
 	ULONG len = mdid_array->Size();
 	for (ULONG ul = 0; ul < len; ul++)
 	{
-		const IMDId *mdid = (*mdid_array)[ul];
+		gpos::Ref<IMDId> mdid = (*mdid_array)[ul];
 		mdid->OsPrint(os);
 		os << " ";
 	}

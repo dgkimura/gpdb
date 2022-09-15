@@ -2565,8 +2565,8 @@ CExpressionPreprocessor::PrunePartitions(CMemoryPool *mp, CExpression *expr)
 		IMdIdArray *all_partition_mdids = dyn_get->GetPartitionMdids();
 		for (ULONG ul = 0; ul < all_partition_mdids->Size(); ++ul)
 		{
-			IMDId *part_mdid = (*all_partition_mdids)[ul];
-			const IMDRelation *partrel = mda->RetrieveRel(part_mdid);
+			gpos::Ref<IMDId> part_mdid = (*all_partition_mdids)[ul];
+			const IMDRelation *partrel = mda->RetrieveRel(part_mdid.get());
 
 			CConstraint *rel_cnstr = PcnstrFromChildPartition(
 				partrel, dyn_get->PdrgpcrOutput(),
@@ -2591,7 +2591,6 @@ CExpressionPreprocessor::PrunePartitions(CMemoryPool *mp, CExpression *expr)
 			// undefined (e.g only has default partition)
 			if (nullptr == pcnstr || !pcnstr->FContradiction())
 			{
-				part_mdid->AddRef();
 				selected_partition_mdids->Append(part_mdid);
 				rel_cnstr = PcnstrFromChildPartition(
 					partrel, dyn_get->PdrgpcrOutput(),

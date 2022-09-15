@@ -331,7 +331,7 @@ CMDScalarOpGPDB::OpfamilyMdidAt(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_mdid_opfamilies_array->Size());
 
-	return (*m_mdid_opfamilies_array)[pos];
+	return (*m_mdid_opfamilies_array)[pos].get();
 }
 
 // compatible hash opfamily

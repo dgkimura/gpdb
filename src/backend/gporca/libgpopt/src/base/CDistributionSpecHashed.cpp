@@ -273,7 +273,7 @@ CDistributionSpecHashed::FMatchSubset(
 	{
 		CExpression *pexprOwn = CCastUtils::PexprWithoutBinaryCoercibleCasts(
 			(*m_pdrgpexpr)[ulOuter]);
-		IMDId *opfamily_own = nullptr;
+		gpos::Ref<IMDId> opfamily_own = nullptr;
 
 		BOOL fFound = false;
 		CExpressionArrays *equiv_hash_exprs = pdsHashed->HashSpecEquivExprs();
@@ -282,7 +282,7 @@ CDistributionSpecHashed::FMatchSubset(
 			CExpression *pexprOther =
 				CCastUtils::PexprWithoutBinaryCoercibleCasts(
 					(*(pdsHashed->m_pdrgpexpr))[ulInner]);
-			IMDId *opfamily_other = nullptr;
+			gpos::Ref<IMDId> opfamily_other = nullptr;
 
 			if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 			{
@@ -291,7 +291,7 @@ CDistributionSpecHashed::FMatchSubset(
 			}
 
 			if (CUtils::Equals(pexprOwn, pexprOther) &&
-				CUtils::Equals(opfamily_own, opfamily_other))
+				CUtils::Equals(opfamily_own.get(), opfamily_other.get()))
 			{
 				fFound = true;
 				break;
@@ -304,8 +304,8 @@ CDistributionSpecHashed::FMatchSubset(
 					CScalar::PopConvert(pexprOwn->Pop())->MdidType();
 				const IMDType *expr_type = mda->RetrieveType(expr_type_mdid);
 
-				if (expr_type->GetDistrOpfamilyMdid() != opfamily_own ||
-					expr_type->GetDistrOpfamilyMdid() != opfamily_other)
+				if (expr_type->GetDistrOpfamilyMdid() != opfamily_own.get() ||
+					expr_type->GetDistrOpfamilyMdid() != opfamily_other.get())
 				{
 					// check equiv_hash_exprs only for default opfamilies
 					continue;
@@ -457,7 +457,7 @@ CDistributionSpecHashed::HashValue() const
 	{
 		for (ULONG ul = 0; ul < m_opfamilies->Size(); ul++)
 		{
-			IMDId *mdid = (*m_opfamilies)[ul];
+			gpos::Ref<IMDId> mdid = (*m_opfamilies)[ul];
 			ulHash = gpos::CombineHashes(ulHash, mdid->HashValue());
 		}
 	}

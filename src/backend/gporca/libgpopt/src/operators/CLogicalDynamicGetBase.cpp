@@ -230,8 +230,8 @@ CLogicalDynamicGetBase::ConstructRootColMappingPerPart(
 	ColRefToUlongMapArray *part_maps = GPOS_NEW(mp) ColRefToUlongMapArray(mp);
 	for (ULONG ul = 0; ul < partition_mdids->Size(); ++ul)
 	{
-		IMDId *part_mdid = (*partition_mdids)[ul];
-		const IMDRelation *partrel = mda->RetrieveRel(part_mdid);
+		gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
+		const IMDRelation *partrel = mda->RetrieveRel(part_mdid.get());
 
 		GPOS_ASSERT(nullptr != partrel);
 

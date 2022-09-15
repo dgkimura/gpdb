@@ -63,8 +63,8 @@ public:
 		static ULONG
 		HashValue(const IMdIdArray *oid_pair)
 		{
-			return CombineHashes(gpos::HashPtr<IMDId>((*oid_pair)[0]),
-								 gpos::HashPtr<IMDId>((*oid_pair)[1]));
+			return CombineHashes(gpos::HashPtr<IMDId>((*oid_pair)[0].get()),
+								 gpos::HashPtr<IMDId>((*oid_pair)[1].get()));
 		}
 
 		static BOOL

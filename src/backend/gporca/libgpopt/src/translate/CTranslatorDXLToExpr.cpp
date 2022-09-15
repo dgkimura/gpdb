@@ -598,8 +598,8 @@ CTranslatorDXLToExpr::PexprLogicalGet(const CDXLNode *dxlnode)
 		IMdIdArray *partition_mdids = pmdrel->ChildPartitionMdids();
 		for (ULONG ul = 0; ul < partition_mdids->Size(); ++ul)
 		{
-			IMDId *part_mdid = (*partition_mdids)[ul];
-			const IMDRelation *partrel = m_pmda->RetrieveRel(part_mdid);
+			gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
+			const IMDRelation *partrel = m_pmda->RetrieveRel(part_mdid.get());
 
 			if (partrel->IsPartitioned())
 			{

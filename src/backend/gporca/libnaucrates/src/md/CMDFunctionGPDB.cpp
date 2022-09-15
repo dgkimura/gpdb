@@ -184,7 +184,7 @@ CMDFunctionGPDB::GetOutputArgTypeArrayStr() const
 	const ULONG len = m_mdid_types_array->Size();
 	for (ULONG ul = 0; ul < len; ul++)
 	{
-		IMDId *mdid = (*m_mdid_types_array)[ul];
+		gpos::Ref<IMDId> mdid = (*m_mdid_types_array)[ul];
 		if (ul == len - 1)
 		{
 			// last element: do not print a comma
