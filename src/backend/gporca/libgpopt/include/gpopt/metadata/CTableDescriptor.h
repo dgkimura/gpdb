@@ -67,7 +67,7 @@ private:
 	CColumnDescriptorArray *m_pdrgpcoldescDist;
 
 	// Opfamily used for hash distribution
-	IMdIdArray *m_distr_opfamilies;
+	gpos::Ref<IMdIdArray> m_distr_opfamilies;
 
 	// if true, we need to consider a hash distributed table as random
 	// there are two possible scenarios:
@@ -165,7 +165,7 @@ public:
 	const IMdIdArray *
 	DistrOpfamilies() const
 	{
-		return m_distr_opfamilies;
+		return m_distr_opfamilies.get();
 	}
 
 	// partition column indexes accessor

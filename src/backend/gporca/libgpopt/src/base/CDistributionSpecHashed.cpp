@@ -38,9 +38,9 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDistributionSpecHashed::CDistributionSpecHashed(CExpressionArray *pdrgpexpr,
-												 BOOL fNullsColocated,
-												 IMdIdArray *opfamilies)
+CDistributionSpecHashed::CDistributionSpecHashed(
+	CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
+	gpos::Ref<IMdIdArray> opfamilies)
 	: m_pdrgpexpr(pdrgpexpr),
 	  m_opfamilies(opfamilies),
 	  m_fNullsColocated(fNullsColocated),
@@ -68,7 +68,7 @@ CDistributionSpecHashed::CDistributionSpecHashed(CExpressionArray *pdrgpexpr,
 //---------------------------------------------------------------------------
 CDistributionSpecHashed::CDistributionSpecHashed(
 	CExpressionArray *pdrgpexpr, BOOL fNullsColocated,
-	CDistributionSpecHashed *pdshashedEquiv, IMdIdArray *opfamilies)
+	CDistributionSpecHashed *pdshashedEquiv, gpos::Ref<IMdIdArray> opfamilies)
 	: m_pdrgpexpr(pdrgpexpr),
 	  m_opfamilies(opfamilies),
 	  m_fNullsColocated(fNullsColocated),
@@ -98,7 +98,6 @@ CDistributionSpecHashed::~CDistributionSpecHashed()
 	m_pdrgpexpr->Release();
 	CRefCount::SafeRelease(m_pdshashedEquiv);
 	CRefCount::SafeRelease(m_equiv_hash_exprs);
-	CRefCount::SafeRelease(m_opfamilies);
 }
 
 void
@@ -151,10 +150,6 @@ CDistributionSpecHashed::PdsCopyWithRemappedColumns(
 		mp, colref_mapping, must_exist);
 	CDistributionSpecHashed *pdshashed =
 		CDistributionSpecHashed::PdsConvert(pds);
-	if (nullptr != m_opfamilies)
-	{
-		m_opfamilies->AddRef();
-	}
 	// Remapping columns should not change opfamily, used for passing distribution requests in CTEs
 	return GPOS_NEW(mp) CDistributionSpecHashed(pdrgpexpr, m_fNullsColocated,
 												pdshashed, m_opfamilies);
@@ -165,10 +160,6 @@ CDistributionSpec *
 CDistributionSpecHashed::StripEquivColumns(CMemoryPool *mp)
 {
 	m_pdrgpexpr->AddRef();
-	if (nullptr != m_opfamilies)
-	{
-		m_opfamilies->AddRef();
-	}
 	return GPOS_NEW(mp)
 		CDistributionSpecHashed(m_pdrgpexpr, m_fNullsColocated, m_opfamilies);
 }
@@ -516,7 +507,7 @@ CDistributionSpecHashed::FMatchHashedDistribution(
 		return false;
 	}
 
-	if (!CUtils::Equals(m_opfamilies, pdshashed->m_opfamilies))
+	if (!CUtils::Equals(m_opfamilies.get(), pdshashed->m_opfamilies.get()))
 	{
 		return false;
 	}
@@ -618,7 +609,7 @@ CDistributionSpecHashed::Equals(const CDistributionSpec *input_spec) const
 		return false;
 	}
 
-	if (!CUtils::Equals(m_opfamilies, other_spec->m_opfamilies))
+	if (!CUtils::Equals(m_opfamilies.get(), other_spec->m_opfamilies.get()))
 	{
 		return false;
 	}
@@ -829,10 +820,6 @@ CDistributionSpecHashed::Copy(CMemoryPool *mp)
 	}
 
 	distribution_exprs->AddRef();
-	if (nullptr != m_opfamilies)
-	{
-		m_opfamilies->AddRef();
-	}
 	CDistributionSpecHashed *spec_copy = GPOS_NEW(mp) CDistributionSpecHashed(
 		distribution_exprs, this->FNullsColocated(), spec, m_opfamilies);
 	equiv_distribution_exprs->Release();
@@ -974,10 +961,6 @@ CDistributionSpecHashed::Combine(CMemoryPool *mp,
 		GPOS_ASSERT(this->Pdrgpexpr()->Size() == exprs->Size());
 #endif
 		exprs->AddRef();
-		if (nullptr != m_opfamilies)
-		{
-			m_opfamilies->AddRef();
-		}
 		combined_hashed_spec = GPOS_NEW(mp) CDistributionSpecHashed(
 			exprs, this->FNullsColocated(), combined_hashed_spec, m_opfamilies);
 	}

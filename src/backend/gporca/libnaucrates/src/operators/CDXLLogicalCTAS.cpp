@@ -34,8 +34,9 @@ CDXLLogicalCTAS::CDXLLogicalCTAS(
 	CMDName *mdname_rel, CDXLColDescrArray *dxl_col_descr_array,
 	CDXLCtasStorageOptions *dxl_ctas_storage_options,
 	IMDRelation::Ereldistrpolicy rel_distr_policy,
-	ULongPtrArray *distr_column_pos_array, IMdIdArray *distr_opfamilies,
-	IMdIdArray *distr_opclasses, BOOL is_temporary,
+	ULongPtrArray *distr_column_pos_array,
+	gpos::Ref<IMdIdArray> distr_opfamilies,
+	gpos::Ref<IMdIdArray> distr_opclasses, BOOL is_temporary,
 	IMDRelation::Erelstoragetype rel_storage_type,
 	ULongPtrArray *src_colids_array, IntPtrArray *vartypemod_array)
 	: CDXLLogical(mp),
@@ -87,8 +88,6 @@ CDXLLogicalCTAS::~CDXLLogicalCTAS()
 	CRefCount::SafeRelease(m_distr_column_pos_array);
 	m_src_colids_array->Release();
 	m_vartypemod_array->Release();
-	m_distr_opfamilies->Release();
-	m_distr_opclasses->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -237,12 +236,12 @@ CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 
 	IMDCacheObject::SerializeMDIdList(
-		xml_serializer, m_distr_opfamilies,
+		xml_serializer, m_distr_opfamilies.get(),
 		CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpfamilies),
 		CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpfamily));
 
 	IMDCacheObject::SerializeMDIdList(
-		xml_serializer, m_distr_opclasses,
+		xml_serializer, m_distr_opclasses.get(),
 		CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpclasses),
 		CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpclass));
 

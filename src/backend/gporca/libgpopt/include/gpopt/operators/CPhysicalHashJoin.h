@@ -41,7 +41,7 @@ private:
 	CExpressionArray *m_pdrgpexprInnerKeys;
 
 	// Hash op families of the operators used in the join conditions
-	IMdIdArray *m_hash_opfamilies;
+	gpos::Ref<IMdIdArray> m_hash_opfamilies;
 
 	// array redistribute request sent to the first hash join child
 	CDistributionSpecArray *m_pdrgpdsRedistributeRequests;
@@ -115,7 +115,7 @@ public:
 	// ctor
 	CPhysicalHashJoin(CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
 					  CExpressionArray *pdrgpexprInnerKeys,
-					  IMdIdArray *hash_opfamilies,
+					  gpos::Ref<IMdIdArray> hash_opfamilies,
 					  CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// dtor

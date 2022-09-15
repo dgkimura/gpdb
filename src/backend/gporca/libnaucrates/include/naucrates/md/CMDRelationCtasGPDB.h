@@ -75,10 +75,10 @@ private:
 	ULongPtrArray *m_distr_col_array;
 
 	// distribution opfamilies
-	IMdIdArray *m_distr_opfamilies;
+	gpos::Ref<IMdIdArray> m_distr_opfamilies;
 
 	// distribution opclasses
-	IMdIdArray *m_distr_opclasses;
+	gpos::Ref<IMdIdArray> m_distr_opclasses;
 
 	// array of key sets
 	ULongPtr2dArray *m_keyset_array;
@@ -110,8 +110,8 @@ public:
 		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname_schema,
 		CMDName *mdname, BOOL fTemporary, Erelstoragetype rel_storage_type,
 		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-		ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
-		IMdIdArray *distr_opclasses, ULongPtr2dArray *keyset_array,
+		ULongPtrArray *distr_col_array, gpos::Ref<IMdIdArray> distr_opfamilies,
+		gpos::Ref<IMdIdArray> distr_opclasses, ULongPtr2dArray *keyset_array,
 		CDXLCtasStorageOptions *dxl_ctas_storage_options,
 		IntPtrArray *vartypemod_array);
 
@@ -226,7 +226,7 @@ public:
 	virtual IMdIdArray *
 	GetDistrOpClasses() const
 	{
-		return m_distr_opclasses;
+		return m_distr_opclasses.get();
 	}
 
 	// retrieve the id of the metadata cache index at the given position

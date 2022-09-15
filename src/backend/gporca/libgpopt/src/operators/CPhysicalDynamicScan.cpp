@@ -38,7 +38,7 @@ using namespace gpos;
 CPhysicalDynamicScan::CPhysicalDynamicScan(
 	CMemoryPool *mp, CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
 	const CName *pnameAlias, ULONG scan_id, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
+	CColRef2dArray *pdrgpdrgpcrParts, gpos::Ref<IMdIdArray> partition_mdids,
 	ColRefToUlongMapArray *root_col_mapping_per_part)
 	: CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput),
 	  m_ulOriginOpId(ulOriginOpId),
@@ -77,7 +77,6 @@ CPhysicalDynamicScan::CPhysicalDynamicScan(
 CPhysicalDynamicScan::~CPhysicalDynamicScan()
 {
 	m_pdrgpdrgpcrPart->Release();
-	m_partition_mdids->Release();
 	m_root_col_mapping_per_part->Release();
 }
 

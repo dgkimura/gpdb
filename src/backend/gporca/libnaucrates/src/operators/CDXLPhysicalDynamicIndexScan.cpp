@@ -31,7 +31,7 @@ using namespace gpdxl;
 CDXLPhysicalDynamicIndexScan::CDXLPhysicalDynamicIndexScan(
 	CMemoryPool *mp, CDXLTableDescr *table_descr,
 	CDXLIndexDescr *dxl_index_descr, EdxlIndexScanDirection idx_scan_direction,
-	IMdIdArray *part_mdids, ULongPtrArray *selector_ids)
+	gpos::Ref<IMdIdArray> part_mdids, ULongPtrArray *selector_ids)
 	: CDXLPhysical(mp),
 	  m_dxl_table_descr(table_descr),
 	  m_dxl_index_descr(dxl_index_descr),
@@ -55,7 +55,6 @@ CDXLPhysicalDynamicIndexScan::~CDXLPhysicalDynamicIndexScan()
 {
 	m_dxl_index_descr->Release();
 	m_dxl_table_descr->Release();
-	m_part_mdids->Release();
 	CRefCount::SafeRelease(m_selector_ids);
 }
 
@@ -132,7 +131,7 @@ CDXLPhysicalDynamicIndexScan::GetDXLTableDescr() const
 IMdIdArray *
 CDXLPhysicalDynamicIndexScan::GetParts() const
 {
-	return m_part_mdids;
+	return m_part_mdids.get();
 }
 
 //---------------------------------------------------------------------------
@@ -170,7 +169,7 @@ CDXLPhysicalDynamicIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	// serialize partition mdids
 	IMDCacheObject::SerializeMDIdList(
-		xml_serializer, m_part_mdids,
+		xml_serializer, m_part_mdids.get(),
 		CDXLTokens::GetDXLTokenStr(EdxltokenPartitions),
 		CDXLTokens::GetDXLTokenStr(EdxltokenPartition));
 

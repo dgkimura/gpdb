@@ -50,7 +50,7 @@ private:
 	CColRef2dArray *m_pdrgpdrgpcrPart;
 
 	// child partitions
-	IMdIdArray *m_partition_mdids;
+	gpos::Ref<IMdIdArray> m_partition_mdids;
 
 	// Map of Root colref -> col index in child tabledesc
 	// per child partition in m_partition_mdid
@@ -64,7 +64,7 @@ public:
 						 ULONG ulOriginOpId, const CName *pnameAlias,
 						 ULONG scan_id, CColRefArray *pdrgpcrOutput,
 						 CColRef2dArray *pdrgpdrgpcrParts,
-						 IMdIdArray *partition_mdids,
+						 gpos::Ref<IMdIdArray> partition_mdids,
 						 ColRefToUlongMapArray *root_col_mapping_per_part);
 
 	// dtor
@@ -111,7 +111,7 @@ public:
 	IMdIdArray *
 	GetPartitionMdids() const
 	{
-		return m_partition_mdids;
+		return m_partition_mdids.get();
 	}
 
 	ColRefToUlongMapArray *

@@ -66,7 +66,7 @@ private:
 	// indices of distribution columns
 	ULongPtrArray *m_distr_col_array;
 
-	IMdIdArray *m_distr_opfamilies;
+	gpos::Ref<IMdIdArray> m_distr_opfamilies;
 
 	// do we need to consider a hash distributed table as random distributed
 	BOOL m_convert_hash_to_random;
@@ -78,10 +78,10 @@ private:
 	CMDIndexInfoArray *m_mdindex_info_array;
 
 	// array of trigger ids
-	IMdIdArray *m_mdid_trigger_array;
+	gpos::Ref<IMdIdArray> m_mdid_trigger_array;
 
 	// array of check constraint mdids
-	IMdIdArray *m_mdid_check_constraint_array;
+	gpos::Ref<IMdIdArray> m_mdid_check_constraint_array;
 
 	// reject limit
 	INT m_reject_limit;
@@ -119,10 +119,11 @@ public:
 	CMDRelationExternalGPDB(
 		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-		ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
+		ULongPtrArray *distr_col_array, gpos::Ref<IMdIdArray> distr_opfamilies,
 		BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
-		CMDIndexInfoArray *md_index_info_array, IMdIdArray *mdid_triggers_array,
-		IMdIdArray *mdid_check_constraint_array, INT reject_limit,
+		CMDIndexInfoArray *md_index_info_array,
+		gpos::Ref<IMdIdArray> mdid_triggers_array,
+		gpos::Ref<IMdIdArray> mdid_check_constraint_array, INT reject_limit,
 		BOOL is_reject_limit_in_rows, gpos::Ref<IMDId> mdid_fmt_err_table);
 
 	// dtor

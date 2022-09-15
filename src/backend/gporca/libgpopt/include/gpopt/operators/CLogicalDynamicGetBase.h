@@ -60,7 +60,7 @@ protected:
 							ULongPtrArray *pdrgpulPos) const;
 
 	// Child partitions
-	IMdIdArray *m_partition_mdids = nullptr;
+	gpos::Ref<IMdIdArray> m_partition_mdids = nullptr;
 	// Map of Root colref -> col index in child tabledesc
 	// per child partition in m_partition_mdid
 	ColRefToUlongMapArray *m_root_col_mapping_per_part = nullptr;
@@ -68,7 +68,8 @@ protected:
 	// Construct a mapping from each column in root table to an index in each
 	// child partition's table descr by matching column names$
 	static ColRefToUlongMapArray *ConstructRootColMappingPerPart(
-		CMemoryPool *mp, CColRefArray *root_cols, IMdIdArray *partition_mdids);
+		CMemoryPool *mp, CColRefArray *root_cols,
+		gpos::Ref<IMdIdArray> partition_mdids);
 
 public:
 	// ctors
@@ -78,11 +79,11 @@ public:
 						   CTableDescriptor *ptabdesc, ULONG scan_id,
 						   CColRefArray *pdrgpcrOutput,
 						   CColRef2dArray *pdrgpdrgpcrPart,
-						   IMdIdArray *partition_mdids);
+						   gpos::Ref<IMdIdArray> partition_mdids);
 
 	CLogicalDynamicGetBase(CMemoryPool *mp, const CName *pnameAlias,
 						   CTableDescriptor *ptabdesc, ULONG scan_id,
-						   IMdIdArray *partition_mdids);
+						   gpos::Ref<IMdIdArray> partition_mdids);
 
 	// dtor
 	~CLogicalDynamicGetBase() override;
@@ -170,7 +171,7 @@ public:
 	IMdIdArray *
 	GetPartitionMdids() const
 	{
-		return m_partition_mdids;
+		return m_partition_mdids.get();
 	}
 
 	ColRefToUlongMapArray *

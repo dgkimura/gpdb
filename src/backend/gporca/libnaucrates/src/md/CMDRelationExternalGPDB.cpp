@@ -28,10 +28,11 @@ using namespace gpmd;
 CMDRelationExternalGPDB::CMDRelationExternalGPDB(
 	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 	Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-	ULongPtrArray *distr_col_array, IMdIdArray *distr_opfamilies,
+	ULongPtrArray *distr_col_array, gpos::Ref<IMdIdArray> distr_opfamilies,
 	BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
-	CMDIndexInfoArray *md_index_info_array, IMdIdArray *mdid_triggers_array,
-	IMdIdArray *mdid_check_constraint_array, INT reject_limit,
+	CMDIndexInfoArray *md_index_info_array,
+	gpos::Ref<IMdIdArray> mdid_triggers_array,
+	gpos::Ref<IMdIdArray> mdid_check_constraint_array, INT reject_limit,
 	BOOL is_reject_limit_in_rows, gpos::Ref<IMDId> mdid_fmt_err_table)
 	: m_mp(mp),
 	  m_mdid(mdid),
@@ -122,12 +123,9 @@ CMDRelationExternalGPDB::~CMDRelationExternalGPDB()
 	GPOS_DELETE(m_dxl_str);
 	m_md_col_array->Release();
 	CRefCount::SafeRelease(m_distr_col_array);
-	CRefCount::SafeRelease(m_distr_opfamilies);
 	CRefCount::SafeRelease(m_keyset_array);
 	m_mdindex_info_array->Release();
-	m_mdid_trigger_array->Release();
 	m_col_width_array->Release();
-	m_mdid_check_constraint_array->Release();
 
 	CRefCount::SafeRelease(m_colpos_nondrop_colpos_map);
 	CRefCount::SafeRelease(m_attrno_nondrop_col_pos_map);
@@ -628,12 +626,12 @@ CMDRelationExternalGPDB::Serialize(CXMLSerializer *xml_serializer) const
 		CDXLTokens::GetDXLTokenStr(EdxltokenIndexInfoList));
 
 	// serialize trigger information
-	SerializeMDIdList(xml_serializer, m_mdid_trigger_array,
+	SerializeMDIdList(xml_serializer, m_mdid_trigger_array.get(),
 					  CDXLTokens::GetDXLTokenStr(EdxltokenTriggers),
 					  CDXLTokens::GetDXLTokenStr(EdxltokenTrigger));
 
 	// serialize check constraint information
-	SerializeMDIdList(xml_serializer, m_mdid_check_constraint_array,
+	SerializeMDIdList(xml_serializer, m_mdid_check_constraint_array.get(),
 					  CDXLTokens::GetDXLTokenStr(EdxltokenCheckConstraints),
 					  CDXLTokens::GetDXLTokenStr(EdxltokenCheckConstraint));
 
@@ -641,7 +639,7 @@ CMDRelationExternalGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	if (EreldistrHash == m_rel_distr_policy && nullptr != m_distr_opfamilies)
 	{
 		SerializeMDIdList(
-			xml_serializer, m_distr_opfamilies,
+			xml_serializer, m_distr_opfamilies.get(),
 			CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpfamilies),
 			CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpfamily));
 	}
@@ -705,10 +703,10 @@ CMDRelationExternalGPDB::DebugPrint(IOstream &os) const
 	}
 
 	os << "Triggers: ";
-	CDXLUtils::DebugPrintMDIdArray(os, m_mdid_trigger_array);
+	CDXLUtils::DebugPrintMDIdArray(os, m_mdid_trigger_array.get());
 
 	os << "Check Constraint: ";
-	CDXLUtils::DebugPrintMDIdArray(os, m_mdid_check_constraint_array);
+	CDXLUtils::DebugPrintMDIdArray(os, m_mdid_check_constraint_array.get());
 
 	os << "Reject limit: " << m_reject_limit;
 	if (m_is_rej_limit_in_rows)

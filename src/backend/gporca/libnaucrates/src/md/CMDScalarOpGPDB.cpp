@@ -35,7 +35,8 @@ CMDScalarOpGPDB::CMDScalarOpGPDB(
 	gpos::Ref<IMDId> result_type_mdid, gpos::Ref<IMDId> mdid_func,
 	gpos::Ref<IMDId> mdid_commute_opr, gpos::Ref<IMDId> mdid_inverse_opr,
 	IMDType::ECmpType cmp_type, BOOL returns_null_on_null_input,
-	IMdIdArray *mdid_opfamilies_array, gpos::Ref<IMDId> mdid_hash_opfamily,
+	gpos::Ref<IMdIdArray> mdid_opfamilies_array,
+	gpos::Ref<IMDId> mdid_hash_opfamily,
 	gpos::Ref<IMDId> mdid_legacy_hash_opfamily, BOOL is_ndv_preserving)
 	: m_mp(mp),
 	  m_mdid(mdid),
@@ -71,7 +72,6 @@ CMDScalarOpGPDB::~CMDScalarOpGPDB()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid_opfamilies_array->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -294,7 +294,7 @@ CMDScalarOpGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	// serialize opfamilies information
 	if (0 < m_mdid_opfamilies_array->Size())
 	{
-		SerializeMDIdList(xml_serializer, m_mdid_opfamilies_array,
+		SerializeMDIdList(xml_serializer, m_mdid_opfamilies_array.get(),
 						  CDXLTokens::GetDXLTokenStr(EdxltokenOpfamilies),
 						  CDXLTokens::GetDXLTokenStr(EdxltokenOpfamily));
 	}

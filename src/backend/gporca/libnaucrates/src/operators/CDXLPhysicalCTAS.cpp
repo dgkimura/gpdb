@@ -35,8 +35,9 @@ CDXLPhysicalCTAS::CDXLPhysicalCTAS(
 	CDXLColDescrArray *dxl_col_descr_array,
 	CDXLCtasStorageOptions *dxl_ctas_opt,
 	IMDRelation::Ereldistrpolicy rel_distr_policy,
-	ULongPtrArray *distr_column_pos_array, IMdIdArray *distr_opclasses,
-	BOOL is_temporary, IMDRelation::Erelstoragetype rel_storage_type,
+	ULongPtrArray *distr_column_pos_array,
+	gpos::Ref<IMdIdArray> distr_opclasses, BOOL is_temporary,
+	IMDRelation::Erelstoragetype rel_storage_type,
 	ULongPtrArray *src_colids_array, IntPtrArray *vartypemod_array)
 	: CDXLPhysical(mp),
 	  m_mdname_schema(mdname_schema),
@@ -80,7 +81,6 @@ CDXLPhysicalCTAS::~CDXLPhysicalCTAS()
 	CRefCount::SafeRelease(m_distr_column_pos_array);
 	m_src_colids_array->Release();
 	m_vartypemod_array->Release();
-	m_distr_opclasses->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -186,7 +186,7 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 	// serialize opclasses list
 
 	IMDCacheObject::SerializeMDIdList(
-		xml_serializer, m_distr_opclasses,
+		xml_serializer, m_distr_opclasses.get(),
 		CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpclasses),
 		CDXLTokens::GetDXLTokenStr(EdxltokenRelDistrOpclass));
 
