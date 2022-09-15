@@ -44,7 +44,6 @@ CParseHandlerMDRequest::CParseHandlerMDRequest(
 //---------------------------------------------------------------------------
 CParseHandlerMDRequest::~CParseHandlerMDRequest()
 {
-	CRefCount::SafeRelease(m_mdid_array);
 	CRefCount::SafeRelease(m_mdtype_request_array);
 }
 
@@ -161,7 +160,7 @@ CParseHandlerMDRequest::GetParseHandlerType() const
 IMdIdArray *
 CParseHandlerMDRequest::GetMdIdArray() const
 {
-	return m_mdid_array;
+	return m_mdid_array.get();
 }
 
 //---------------------------------------------------------------------------

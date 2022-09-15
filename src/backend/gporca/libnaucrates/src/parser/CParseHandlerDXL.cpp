@@ -82,7 +82,6 @@ CParseHandlerDXL::~CParseHandlerDXL()
 	CRefCount::SafeRelease(m_cte_producers);
 	CRefCount::SafeRelease(m_plan_dxl_root);
 	CRefCount::SafeRelease(m_mdid_cached_obj_array);
-	CRefCount::SafeRelease(m_mdid_array);
 	CRefCount::SafeRelease(m_scalar_expr_dxl);
 	CRefCount::SafeRelease(m_system_id_array);
 	CRefCount::SafeRelease(m_dxl_stats_derived_rel_array);
@@ -199,7 +198,7 @@ CParseHandlerDXL::GetMdIdCachedObjArray() const
 IMdIdArray *
 CParseHandlerDXL::GetMdIdArray() const
 {
-	return m_mdid_array;
+	return m_mdid_array.get();
 }
 
 //---------------------------------------------------------------------------

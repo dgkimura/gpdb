@@ -46,7 +46,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// metadata id of the object
-	CMDIdColStats *m_mdid_col_stats;
+	gpos::Ref<CMDIdColStats> m_mdid_col_stats;
 
 	// column name
 	CMDName *m_mdname;
@@ -76,7 +76,7 @@ public:
 	CDXLColStats(const CDXLColStats &) = delete;
 
 	// ctor
-	CDXLColStats(CMemoryPool *mp, CMDIdColStats *mdid_col_stats,
+	CDXLColStats(CMemoryPool *mp, gpos::Ref<CMDIdColStats> mdid_col_stats,
 				 CMDName *mdname, CDouble width, CDouble null_freq,
 				 CDouble distinct_remaining, CDouble freq_remaining,
 				 CDXLBucketArray *dxl_stats_bucket_array,

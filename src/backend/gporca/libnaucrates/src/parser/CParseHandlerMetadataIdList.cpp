@@ -47,7 +47,6 @@ CParseHandlerMetadataIdList::CParseHandlerMetadataIdList(
 //---------------------------------------------------------------------------
 CParseHandlerMetadataIdList::~CParseHandlerMetadataIdList()
 {
-	CRefCount::SafeRelease(m_mdid_array);
 }
 
 
@@ -280,6 +279,6 @@ CParseHandlerMetadataIdList::FSupportedListType(const XMLCh *const xml_str)
 IMdIdArray *
 CParseHandlerMetadataIdList::GetMdIdArray()
 {
-	return m_mdid_array;
+	return m_mdid_array.get();
 }
 // EOF

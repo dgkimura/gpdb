@@ -45,8 +45,9 @@ public:
 	CDXLScalarCoerceViaIO(const CDXLScalarCoerceViaIO &) = delete;
 
 	// ctor/dtor
-	CDXLScalarCoerceViaIO(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
-						  EdxlCoercionForm dxl_coerce_format, INT location);
+	CDXLScalarCoerceViaIO(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
+						  INT type_modifier, EdxlCoercionForm dxl_coerce_format,
+						  INT location);
 
 	~CDXLScalarCoerceViaIO() override = default;
 

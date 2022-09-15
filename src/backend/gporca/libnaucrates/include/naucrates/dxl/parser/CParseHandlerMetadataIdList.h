@@ -36,7 +36,7 @@ class CParseHandlerMetadataIdList : public CParseHandlerBase
 {
 private:
 	// list of metadata identifiers
-	IMdIdArray *m_mdid_array;
+	gpos::Ref<IMdIdArray> m_mdid_array;
 
 
 	// process the start of an element
