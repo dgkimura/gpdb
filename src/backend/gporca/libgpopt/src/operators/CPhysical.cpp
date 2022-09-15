@@ -312,9 +312,9 @@ CPhysical::PdsCompute(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
 				opfamilies = GPOS_NEW(mp) IMdIdArray(mp);
 				for (ULONG ul = 0; ul < size; ul++)
 				{
-					IMDId *opfamily = (*ptabdesc->DistrOpfamilies())[ul];
+					gpos::Ref<IMDId> opfamily =
+						(*ptabdesc->DistrOpfamilies())[ul];
 					GPOS_ASSERT(nullptr != opfamily && opfamily->IsValid());
-					opfamily->AddRef();
 					opfamilies->Append(opfamily);
 				}
 				GPOS_ASSERT(opfamilies->Size() == pdrgpexpr->Size());

@@ -127,8 +127,7 @@ CPhysicalHashJoin::CreateHashRedistributeRequests(CMemoryPool *mp)
 			{
 				GPOS_ASSERT(nullptr != m_hash_opfamilies);
 				opfamilies = GPOS_NEW(mp) IMdIdArray(mp);
-				IMDId *opfamily = (*m_hash_opfamilies)[ul];
-				opfamily->AddRef();
+				gpos::Ref<IMDId> opfamily = (*m_hash_opfamilies)[ul];
 				opfamilies->Append(opfamily);
 			}
 
@@ -366,8 +365,7 @@ CPhysicalHashJoin::PdshashedMatching(
 				if (nullptr != opfamilies)
 				{
 					GPOS_ASSERT(nullptr != m_hash_opfamilies);
-					IMDId *opfamily = (*m_hash_opfamilies)[idx];
-					opfamily->AddRef();
+					gpos::Ref<IMDId> opfamily = (*m_hash_opfamilies)[idx];
 					opfamilies->Append(opfamily);
 				}
 				break;

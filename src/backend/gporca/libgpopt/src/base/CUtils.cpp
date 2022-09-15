@@ -4908,7 +4908,7 @@ CUtils::Equals(const IMdIdArray *mdids, const IMdIdArray *other_mdids)
 	// if all the elements are equal, then both the arrays are equal
 	for (ULONG id = 0; id < mdids->Size(); id++)
 	{
-		if (!CUtils::Equals((*mdids)[id], (*other_mdids)[id]))
+		if (!CUtils::Equals((*mdids)[id].get(), (*other_mdids)[id].get()))
 		{
 			return false;
 		}

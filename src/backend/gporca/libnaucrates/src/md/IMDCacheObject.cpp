@@ -71,7 +71,7 @@ IMDCacheObject::SerializeMDIdList(CXMLSerializer *xml_serializer,
 			CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 			strTokenListItem);
 
-		IMDId *mdid = (*mdid_array)[ul];
+		gpos::Ref<IMDId> mdid = (*mdid_array)[ul];
 		mdid->Serialize(xml_serializer,
 						CDXLTokens::GetDXLTokenStr(EdxltokenMdid));
 		xml_serializer->CloseElement(

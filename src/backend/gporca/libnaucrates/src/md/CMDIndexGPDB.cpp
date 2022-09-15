@@ -422,7 +422,7 @@ CMDIndexGPDB::IsCompatible(const IMDScalarOp *md_scalar_op, ULONG key_pos) const
 
 	// check if the index opfamily for the key at the given position is one of
 	// the families the scalar comparison belongs to
-	const IMDId *mdid_opfamily = (*m_mdid_opfamilies_array)[key_pos];
+	const gpos::Ref<IMDId> mdid_opfamily = (*m_mdid_opfamilies_array)[key_pos];
 
 	const ULONG opfamilies_count = md_scalar_op->OpfamiliesCount();
 

@@ -7287,11 +7287,10 @@ CTranslatorExprToDXL::PdxlnHashExprList(const CExpressionArray *pdrgpexpr,
 	{
 		CExpression *pexpr = (*pdrgpexpr)[ul];
 
-		IMDId *opfamily = nullptr;
+		gpos::Ref<IMDId> opfamily = nullptr;
 		if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 		{
 			opfamily = (*opfamilies)[ul];
-			opfamily->AddRef();
 		}
 
 		// constrct a hash expr node for the col ref

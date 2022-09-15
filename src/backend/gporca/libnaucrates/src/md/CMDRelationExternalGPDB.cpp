@@ -290,7 +290,7 @@ CMDRelationExternalGPDB::GetDistrOpfamilyAt(ULONG pos) const
 	}
 
 	GPOS_ASSERT(pos < m_distr_opfamilies->Size());
-	return (*m_distr_opfamilies)[pos];
+	return (*m_distr_opfamilies)[pos].get();
 }
 //---------------------------------------------------------------------------
 //	@function:
@@ -495,7 +495,7 @@ CMDRelationExternalGPDB::IndexMDidAt(ULONG pos) const
 IMDId *
 CMDRelationExternalGPDB::TriggerMDidAt(ULONG pos) const
 {
-	return (*m_mdid_trigger_array)[pos];
+	return (*m_mdid_trigger_array)[pos].get();
 }
 
 //---------------------------------------------------------------------------
@@ -524,7 +524,7 @@ CMDRelationExternalGPDB::CheckConstraintCount() const
 IMDId *
 CMDRelationExternalGPDB::CheckConstraintMDidAt(ULONG pos) const
 {
-	return (*m_mdid_check_constraint_array)[pos];
+	return (*m_mdid_check_constraint_array)[pos].get();
 }
 
 //---------------------------------------------------------------------------

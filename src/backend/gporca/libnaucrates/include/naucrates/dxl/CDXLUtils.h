@@ -123,8 +123,9 @@ public:
 		const CHAR *xsd_file_path);
 
 	// parse mdid from a metadata document
-	static IMDId *ParseDXLToMDId(CMemoryPool *, const CWStringBase *dxl_string,
-								 const CHAR *xsd_file_path);
+	static gpos::Ref<IMDId> ParseDXLToMDId(CMemoryPool *,
+										   const CWStringBase *dxl_string,
+										   const CHAR *xsd_file_path);
 
 	static IMDCacheObject *ParseDXLToIMDIdCacheObj(
 		CMemoryPool *, const CWStringBase *dxl_string,
