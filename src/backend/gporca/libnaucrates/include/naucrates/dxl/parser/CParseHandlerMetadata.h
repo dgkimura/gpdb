@@ -42,7 +42,7 @@ private:
 	IMDCacheObjectArray *m_mdid_cached_obj_array;
 
 	// list of parsed mdids
-	IMdIdArray *m_mdid_array;
+	gpos::Ref<IMdIdArray> m_mdid_array;
 
 	// list of parsed metatadata source system ids
 	CSystemIdArray *m_system_id_array;

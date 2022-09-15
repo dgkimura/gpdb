@@ -64,7 +64,7 @@ private:
 	IMDCacheObjectArray *m_mdid_cached_obj_array;
 
 	// list of parsed metadata ids
-	IMdIdArray *m_mdid_array;
+	gpos::Ref<IMdIdArray> m_mdid_array;
 
 	// the root of the parsed scalar expression
 	CDXLNode *m_scalar_expr_dxl;

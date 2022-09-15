@@ -36,7 +36,7 @@ class CParseHandlerMDRequest : public CParseHandlerBase
 {
 private:
 	// array of metadata ids
-	IMdIdArray *m_mdid_array;
+	gpos::Ref<IMdIdArray> m_mdid_array;
 
 	// array of type requests
 	CMDRequest::SMDTypeRequestArray *m_mdtype_request_array;

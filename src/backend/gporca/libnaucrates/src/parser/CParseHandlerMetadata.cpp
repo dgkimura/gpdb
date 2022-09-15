@@ -53,7 +53,6 @@ CParseHandlerMetadata::CParseHandlerMetadata(
 CParseHandlerMetadata::~CParseHandlerMetadata()
 {
 	CRefCount::SafeRelease(m_mdid_cached_obj_array);
-	CRefCount::SafeRelease(m_mdid_array);
 	CRefCount::SafeRelease(m_system_id_array);
 }
 
@@ -97,7 +96,7 @@ CParseHandlerMetadata::GetMdIdCachedObjArray()
 IMdIdArray *
 CParseHandlerMetadata::GetMdIdArray()
 {
-	return m_mdid_array;
+	return m_mdid_array.get();
 }
 
 //---------------------------------------------------------------------------

@@ -30,7 +30,8 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLColStats::CDXLColStats(CMemoryPool *mp, CMDIdColStats *mdid_col_stats,
+CDXLColStats::CDXLColStats(CMemoryPool *mp,
+						   gpos::Ref<CMDIdColStats> mdid_col_stats,
 						   CMDName *mdname, CDouble width, CDouble null_freq,
 						   CDouble distinct_remaining, CDouble freq_remaining,
 						   CDXLBucketArray *dxl_stats_bucket_array,
@@ -63,7 +64,6 @@ CDXLColStats::~CDXLColStats()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_mdid_col_stats->Release();
 	m_dxl_stats_bucket_array->Release();
 }
 
@@ -78,7 +78,7 @@ CDXLColStats::~CDXLColStats()
 IMDId *
 CDXLColStats::MDId() const
 {
-	return m_mdid_col_stats;
+	return m_mdid_col_stats.get();
 }
 
 //---------------------------------------------------------------------------
