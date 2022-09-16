@@ -81,23 +81,6 @@ CParseHandlerMDType::CParseHandlerMDType(
 //---------------------------------------------------------------------------
 CParseHandlerMDType::~CParseHandlerMDType()
 {
-	m_mdid->Release();
-	CRefCount::SafeRelease(m_distr_opfamily);
-	CRefCount::SafeRelease(m_legacy_distr_opfamily);
-	m_mdid_eq_op->Release();
-	m_mdid_neq_op->Release();
-	m_mdid_lt_op->Release();
-	m_mdid_lteq_op->Release();
-	m_mdid_gt_op->Release();
-	m_mdid_gteq_op->Release();
-	m_mdid_cmp_op->Release();
-	m_mdid_array_type->Release();
-	m_mdid_min_op->Release();
-	m_mdid_max_op->Release();
-	m_mdid_avg_op->Release();
-	m_mdid_sum_op->Release();
-	m_mdid_count_op->Release();
-	CRefCount::SafeRelease(m_mdid_base_rel);
 }
 
 //---------------------------------------------------------------------------
@@ -122,7 +105,7 @@ CParseHandlerMDType::StartElement(const XMLCh *const,  // element_uri,
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
 			EdxltokenMDType);
 
-		if (!IsBuiltInType(m_mdid))
+		if (!IsBuiltInType(m_mdid.get()))
 		{
 			// parse type name
 			const XMLCh *xmlszTypeName = CDXLOperatorFactory::ExtractAttrValue(
@@ -227,51 +210,128 @@ void
 CParseHandlerMDType::ParseMdid(const XMLCh *element_local_name,
 							   const Attributes &attrs)
 {
-	const SMdidMapElem rgmdidmap[] = {
-		{EdxltokenMDTypeEqOp, &m_mdid_eq_op},
-		{EdxltokenMDTypeNEqOp, &m_mdid_neq_op},
-		{EdxltokenMDTypeLTOp, &m_mdid_lt_op},
-		{EdxltokenMDTypeLEqOp, &m_mdid_lteq_op},
-		{EdxltokenMDTypeGTOp, &m_mdid_gt_op},
-		{EdxltokenMDTypeGEqOp, &m_mdid_gteq_op},
-		{EdxltokenMDTypeCompOp, &m_mdid_cmp_op},
-		{EdxltokenMDTypeArray, &m_mdid_array_type},
-		{EdxltokenMDTypeAggMin, &m_mdid_min_op},
-		{EdxltokenMDTypeAggMax, &m_mdid_max_op},
-		{EdxltokenMDTypeAggAvg, &m_mdid_avg_op},
-		{EdxltokenMDTypeAggSum, &m_mdid_sum_op},
-		{EdxltokenMDTypeAggCount, &m_mdid_count_op},
-		{EdxltokenMDTypeDistrOpfamily, &m_distr_opfamily},
-		{EdxltokenMDTypeLegacyDistrOpfamily, &m_legacy_distr_opfamily},
-	};
-
-	Edxltoken token_type = EdxltokenSentinel;
-	IMDId **token_mdid = nullptr;
-	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(rgmdidmap); ul++)
+	if (0 ==
+		XMLString::compareString(CDXLTokens::XmlstrToken(EdxltokenMDTypeEqOp),
+								 element_local_name))
 	{
-		SMdidMapElem mdidmapelem = rgmdidmap[ul];
-		if (0 == XMLString::compareString(
-					 CDXLTokens::XmlstrToken(mdidmapelem.m_edxltoken),
-					 element_local_name))
-		{
-			token_type = mdidmapelem.m_edxltoken;
-			token_mdid = mdidmapelem.m_token_mdid;
-		}
+		m_mdid_eq_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeEqOp);
 	}
-
-	GPOS_ASSERT(EdxltokenSentinel != token_type);
-	GPOS_ASSERT(nullptr != token_mdid);
-
-	if (m_mdid_min_op == *token_mdid || m_mdid_max_op == *token_mdid ||
-		m_mdid_avg_op == *token_mdid || m_mdid_sum_op == *token_mdid ||
-		m_mdid_count_op == *token_mdid)
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeNEqOp),
+					  element_local_name))
 	{
-		(*token_mdid)->Release();
+		m_mdid_neq_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeNEqOp);
 	}
-
-	*token_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
-		token_type);
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeLTOp),
+					  element_local_name))
+	{
+		m_mdid_lt_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeLTOp);
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeLEqOp),
+					  element_local_name))
+	{
+		m_mdid_lteq_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeLEqOp);
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeGTOp),
+					  element_local_name))
+	{
+		m_mdid_gt_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeGTOp);
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeGEqOp),
+					  element_local_name))
+	{
+		m_mdid_gteq_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeGEqOp);
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeCompOp),
+					  element_local_name))
+	{
+		m_mdid_cmp_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeCompOp);
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeArray),
+					  element_local_name))
+	{
+		m_mdid_array_type = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeArray);
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeAggMin),
+					  element_local_name))
+	{
+		m_mdid_min_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeAggMin);
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeAggMax),
+					  element_local_name))
+	{
+		m_mdid_max_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeAggMax);
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeAggAvg),
+					  element_local_name))
+	{
+		m_mdid_avg_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeAggAvg);
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeAggSum),
+					  element_local_name))
+	{
+		m_mdid_sum_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeAggSum);
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeAggCount),
+					  element_local_name))
+	{
+		m_mdid_count_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeAggCount);
+	}
+	else if (0 == XMLString::compareString(
+					  CDXLTokens::XmlstrToken(EdxltokenMDTypeDistrOpfamily),
+					  element_local_name))
+	{
+		m_distr_opfamily = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
+			EdxltokenMDTypeDistrOpfamily);
+	}
+	else if (0 ==
+			 XMLString::compareString(
+				 CDXLTokens::XmlstrToken(EdxltokenMDTypeLegacyDistrOpfamily),
+				 element_local_name))
+	{
+		m_legacy_distr_opfamily =
+			CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenMdid, EdxltokenMDTypeLegacyDistrOpfamily);
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -327,7 +387,7 @@ CParseHandlerMDType::EndElement(const XMLCh *const,	 // element_uri,
 
 		// TODO:  - Jan 30, 2012; add support for other types of mdids
 
-		const CMDIdGPDB *pmdidGPDB = CMDIdGPDB::CastMdid(m_mdid);
+		const CMDIdGPDB *pmdidGPDB = CMDIdGPDB::CastMdid(m_mdid.get());
 
 		switch (pmdidGPDB->Oid())
 		{
@@ -352,32 +412,6 @@ CParseHandlerMDType::EndElement(const XMLCh *const,	 // element_uri,
 				break;
 
 			default:
-				m_mdid->AddRef();
-				if (nullptr != m_distr_opfamily)
-				{
-					m_distr_opfamily->AddRef();
-				}
-				if (nullptr != m_legacy_distr_opfamily)
-				{
-					m_legacy_distr_opfamily->AddRef();
-				}
-				m_mdid_eq_op->AddRef();
-				m_mdid_neq_op->AddRef();
-				m_mdid_lt_op->AddRef();
-				m_mdid_lteq_op->AddRef();
-				m_mdid_gt_op->AddRef();
-				m_mdid_gteq_op->AddRef();
-				m_mdid_cmp_op->AddRef();
-				m_mdid_min_op->AddRef();
-				m_mdid_max_op->AddRef();
-				m_mdid_avg_op->AddRef();
-				m_mdid_sum_op->AddRef();
-				m_mdid_count_op->AddRef();
-				if (nullptr != m_mdid_base_rel)
-				{
-					m_mdid_base_rel->AddRef();
-				}
-				m_mdid_array_type->AddRef();
 
 				ULONG length = 0;
 				if (0 < m_type_length)
