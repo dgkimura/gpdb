@@ -71,7 +71,7 @@ public:
 	~CParseHandlerMetadataIdList() override;
 
 	// return the constructed list of metadata identifiers
-	IMdIdArray *GetMdIdArray();
+	gpos::Ref<IMdIdArray> GetMdIdArray();
 };
 }  // namespace gpdxl
 

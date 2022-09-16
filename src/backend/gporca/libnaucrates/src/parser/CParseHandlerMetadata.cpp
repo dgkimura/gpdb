@@ -93,10 +93,10 @@ CParseHandlerMetadata::GetMdIdCachedObjArray()
 //		Returns the list of metadata ids constructed by the parser
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CParseHandlerMetadata::GetMdIdArray()
 {
-	return m_mdid_array.get();
+	return m_mdid_array;
 }
 
 //---------------------------------------------------------------------------

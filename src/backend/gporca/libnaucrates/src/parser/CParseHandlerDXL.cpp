@@ -195,10 +195,10 @@ CParseHandlerDXL::GetMdIdCachedObjArray() const
 //		Returns the list of metadata ids constructed by the parser
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CParseHandlerDXL::GetMdIdArray() const
 {
-	return m_mdid_array.get();
+	return m_mdid_array;
 }
 
 //---------------------------------------------------------------------------
@@ -564,7 +564,6 @@ CParseHandlerDXL::ExtractMetadataObjects(CParseHandlerBase *parse_handler_base)
 	m_mdid_cached_obj_array->AddRef();
 
 	m_mdid_array = parse_handler_md->GetMdIdArray();
-	m_mdid_array->AddRef();
 
 	m_system_id_array = parse_handler_md->GetSysidPtrArray();
 
@@ -642,11 +641,10 @@ CParseHandlerDXL::ExtractMDRequest(CParseHandlerBase *parse_handler_base)
 	GPOS_ASSERT(nullptr != parse_handler_mdrequest &&
 				nullptr != parse_handler_mdrequest->GetMdIdArray());
 
-	IMdIdArray *mdid_array = parse_handler_mdrequest->GetMdIdArray();
+	gpos::Ref<IMdIdArray> mdid_array = parse_handler_mdrequest->GetMdIdArray();
 	CMDRequest::SMDTypeRequestArray *md_type_request_array =
 		parse_handler_mdrequest->GetMDTypeRequestArray();
 
-	mdid_array->AddRef();
 	md_type_request_array->AddRef();
 
 	m_mdrequest =

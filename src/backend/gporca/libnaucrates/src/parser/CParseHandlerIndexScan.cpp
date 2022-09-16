@@ -238,9 +238,8 @@ CParseHandlerIndexScan::EndElementHelper(const XMLCh *const element_local_name,
 	{
 		GPOS_ASSERT(EdxltokenPhysicalDynamicIndexScan == token_type);
 
-		IMdIdArray *mdid_partitions_array =
+		gpos::Ref<IMdIdArray> mdid_partitions_array =
 			partition_mdids_parse_handler->GetMdIdArray();
-		mdid_partitions_array->AddRef();
 		dxl_op = GPOS_NEW(m_mp) CDXLPhysicalDynamicIndexScan(
 			m_mp, dxl_table_descr, dxl_index_descr, m_index_scan_dir,
 			mdid_partitions_array, selector_ids);

@@ -172,9 +172,8 @@ CParseHandlerPhysicalAbstractBitmapScan::EndElementHelper(
 	else
 	{
 		GPOS_ASSERT(EdxltokenPhysicalDynamicBitmapTableScan == token_type);
-		IMdIdArray *mdid_partitions_array =
+		gpos::Ref<IMdIdArray> mdid_partitions_array =
 			partition_mdids_parse_handler->GetMdIdArray();
-		mdid_partitions_array->AddRef();
 		dxl_op = GPOS_NEW(m_mp) CDXLPhysicalDynamicBitmapTableScan(
 			m_mp, table_descr, mdid_partitions_array, selector_ids);
 	}

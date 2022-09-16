@@ -97,10 +97,10 @@ public:
 	// accessors
 
 	// array of mdids
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	GetMdIdArray() const
 	{
-		return m_mdid_array.get();
+		return m_mdid_array;
 	}
 
 	// array of type info requests

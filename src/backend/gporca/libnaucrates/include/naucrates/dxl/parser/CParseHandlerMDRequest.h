@@ -71,7 +71,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// parsed mdids
-	IMdIdArray *GetMdIdArray() const;
+	gpos::Ref<IMdIdArray> GetMdIdArray() const;
 
 	// parsed type requests
 	CMDRequest::SMDTypeRequestArray *GetMDTypeRequestArray() const;

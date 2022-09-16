@@ -171,23 +171,21 @@ CParseHandlerMDRelationExternal::EndElement(
 	CMDColumnArray *md_col_array = md_cols_parse_handler->GetMdColArray();
 	CMDIndexInfoArray *md_index_info_array =
 		md_index_info_list_parse_handler->GetMdIndexInfoArray();
-	IMdIdArray *mdid_triggers_array = mdid_triggers_parse_list->GetMdIdArray();
-	IMdIdArray *mdid_check_constraint_array =
+	gpos::Ref<IMdIdArray> mdid_triggers_array =
+		mdid_triggers_parse_list->GetMdIdArray();
+	gpos::Ref<IMdIdArray> mdid_check_constraint_array =
 		mdid_check_constraint_parse_handler->GetMdIdArray();
 
 	md_col_array->AddRef();
 	md_index_info_array->AddRef();
-	mdid_triggers_array->AddRef();
-	mdid_check_constraint_array->AddRef();
 
-	IMdIdArray *distr_opfamilies = nullptr;
+	gpos::Ref<IMdIdArray> distr_opfamilies = nullptr;
 	if (m_rel_distr_policy == IMDRelation::EreldistrHash &&
 		m_opfamilies_parse_handler != nullptr)
 	{
 		distr_opfamilies = dynamic_cast<CParseHandlerMetadataIdList *>(
 							   m_opfamilies_parse_handler)
 							   ->GetMdIdArray();
-		distr_opfamilies->AddRef();
 	}
 
 	m_imd_obj = GPOS_NEW(m_mp) CMDRelationExternalGPDB(

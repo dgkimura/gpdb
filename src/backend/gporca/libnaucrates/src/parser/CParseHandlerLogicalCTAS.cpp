@@ -227,15 +227,13 @@ CParseHandlerLogicalCTAS::EndElement(const XMLCh *const,  // element_uri,
 	dxl_ctas_storage_opt->AddRef();
 
 
-	IMdIdArray *distr_opfamilies =
+	gpos::Ref<IMdIdArray> distr_opfamilies =
 		dynamic_cast<CParseHandlerMetadataIdList *>(opfamilies_parse_handler)
 			->GetMdIdArray();
-	distr_opfamilies->AddRef();
 
-	IMdIdArray *distr_opclasses =
+	gpos::Ref<IMdIdArray> distr_opclasses =
 		dynamic_cast<CParseHandlerMetadataIdList *>(opclasses_parse_handler)
 			->GetMdIdArray();
-	distr_opclasses->AddRef();
 
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(

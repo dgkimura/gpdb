@@ -166,7 +166,7 @@ public:
 	IMDCacheObjectArray *GetMdIdCachedObjArray() const;
 
 	// return the list of parsed metadata ids
-	IMdIdArray *GetMdIdArray() const;
+	gpos::Ref<IMdIdArray> GetMdIdArray() const;
 
 	// return the MD request object
 	CMDRequest *GetMiniDumper() const;

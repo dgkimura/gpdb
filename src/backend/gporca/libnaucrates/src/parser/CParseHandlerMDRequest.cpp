@@ -157,10 +157,10 @@ CParseHandlerMDRequest::GetParseHandlerType() const
 //		Parsed array of mdids
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CParseHandlerMDRequest::GetMdIdArray() const
 {
-	return m_mdid_array.get();
+	return m_mdid_array;
 }
 
 //---------------------------------------------------------------------------

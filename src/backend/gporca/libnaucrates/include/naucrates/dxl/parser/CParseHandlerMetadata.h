@@ -86,7 +86,7 @@ public:
 	IMDCacheObjectArray *GetMdIdCachedObjArray();
 
 	// return the list of parsed mdids
-	IMdIdArray *GetMdIdArray();
+	gpos::Ref<IMdIdArray> GetMdIdArray();
 
 	// return the list of parsed system ids
 	CSystemIdArray *GetSysidPtrArray();
