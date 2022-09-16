@@ -35,10 +35,10 @@ class CParseHandlerPhysicalTVF : public CParseHandlerPhysicalOp
 {
 private:
 	// catalog id of the function
-	IMDId *m_func_mdid;
+	gpos::Ref<IMDId> m_func_mdid;
 
 	// return type
-	IMDId *m_return_type_mdid;
+	gpos::Ref<IMDId> m_return_type_mdid;
 
 	// function name
 	CWStringConst *m_pstr;

@@ -36,7 +36,7 @@ class CParseHandlerScalarSubPlan : public CParseHandlerScalarOp
 {
 private:
 	// first col type
-	IMDId *m_mdid_first_col;
+	gpos::Ref<IMDId> m_mdid_first_col;
 
 	// subplan type
 	EdxlSubPlanType m_dxl_subplan_type;

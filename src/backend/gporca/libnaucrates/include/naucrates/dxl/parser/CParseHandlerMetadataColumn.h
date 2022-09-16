@@ -45,7 +45,7 @@ private:
 	INT m_attno;
 
 	// attribute type oid
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	INT m_type_modifier;
 

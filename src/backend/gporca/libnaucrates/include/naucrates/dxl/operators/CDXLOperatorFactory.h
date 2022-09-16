@@ -226,7 +226,7 @@ public:
 
 	// create a subplan operator
 	static CDXLScalar *MakeDXLSubPlan(CDXLMemoryManager *dxl_memory_manager,
-									  IMDId *mdid,
+									  gpos::Ref<IMDId> mdid,
 									  CDXLColRefArray *dxl_colref_array,
 									  EdxlSubPlanType dxl_subplan_type,
 									  CDXLNode *dxlnode_test_expr);

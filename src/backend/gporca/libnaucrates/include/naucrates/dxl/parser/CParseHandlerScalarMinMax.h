@@ -36,7 +36,7 @@ class CParseHandlerScalarMinMax : public CParseHandlerScalarOp
 {
 private:
 	// return type
-	IMDId *m_mdid_type;
+	gpos::Ref<IMDId> m_mdid_type;
 
 	// min/max type
 	CDXLScalarMinMax::EdxlMinMaxType m_min_max_type;
