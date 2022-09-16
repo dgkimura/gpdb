@@ -426,7 +426,7 @@ CDXLUtils::ParseDXLToMDId(CMemoryPool *mp, const CWStringBase *dxl_string,
 	CAutoP<CParseHandlerDXL> parse_handler_dxl_wrapper(parse_handler_dxl);
 
 	// collect metadata objects from dxl parse handler
-	IMdIdArray *mdid_array = parse_handler_dxl->GetMdIdArray();
+	gpos::Ref<IMdIdArray> mdid_array = parse_handler_dxl->GetMdIdArray();
 
 	GPOS_ASSERT(1 == mdid_array->Size());
 
