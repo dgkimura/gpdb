@@ -38,7 +38,7 @@ class CParseHandlerMDIndex : public CParseHandlerMetadataObject
 {
 private:
 	// mdid of the index
-	IMDId *m_mdid;
+	gpos::Ref<IMDId> m_mdid;
 
 	// name of the index
 	CMDName *m_mdname;
@@ -51,7 +51,7 @@ private:
 
 	// type id of index items
 	// for instance, for bitmap indexes, this is the type id of the bitmap
-	IMDId *m_mdid_item_type;
+	gpos::Ref<IMDId> m_mdid_item_type;
 
 	// index keys
 	ULongPtrArray *m_index_key_cols_array;
