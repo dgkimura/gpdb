@@ -131,7 +131,7 @@ private:
 
 	public:
 		// hash key
-		IMDId *m_mdid;
+		gpos::Ref<IMDId> m_mdid;
 
 		// generic link
 		SLink m_link;
@@ -140,7 +140,7 @@ private:
 		static const MdidPtr m_pmdidInvalid;
 
 		// ctor
-		SMDAccessorElem(IMDCacheObject *pimdobj, IMDId *mdid);
+		SMDAccessorElem(IMDCacheObject *pimdobj, gpos::Ref<IMDId> mdid);
 
 		// dtor
 		~SMDAccessorElem();

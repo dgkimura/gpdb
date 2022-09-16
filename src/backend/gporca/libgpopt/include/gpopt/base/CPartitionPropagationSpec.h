@@ -50,7 +50,7 @@ private:
 		EPartPropSpecInfoType m_type;
 
 		// relation id of the DynamicScan
-		IMDId *m_root_rel_mdid;
+		gpos::Ref<IMDId> m_root_rel_mdid;
 
 		//  partition selector ids to use (reqd only)
 		CBitSet *m_selector_ids = nullptr;
@@ -59,7 +59,7 @@ private:
 		CExpression *m_filter_expr = nullptr;
 
 		SPartPropSpecInfo(ULONG scan_id, EPartPropSpecInfoType type,
-						  IMDId *rool_rel_mdid)
+						  gpos::Ref<IMDId> rool_rel_mdid)
 			: m_scan_id(scan_id), m_type(type), m_root_rel_mdid(rool_rel_mdid)
 		{
 			GPOS_ASSERT(m_root_rel_mdid != nullptr);
@@ -70,7 +70,6 @@ private:
 
 		~SPartPropSpecInfo() override
 		{
-			m_root_rel_mdid->Release();
 			CRefCount::SafeRelease(m_selector_ids);
 			CRefCount::SafeRelease(m_filter_expr);
 		}
