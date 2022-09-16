@@ -24,7 +24,7 @@ CPartitionPropagationSpec::SPartPropSpecInfo::Equals(
 	const SPartPropSpecInfo *other) const
 {
 	GPOS_ASSERT_IMP(m_scan_id == other->m_scan_id,
-					m_root_rel_mdid->Equals(other->m_root_rel_mdid));
+					m_root_rel_mdid->Equals(other->m_root_rel_mdid.get()));
 	return m_scan_id == other->m_scan_id && m_type == other->m_type &&
 		   m_selector_ids->Equals(other->m_selector_ids);
 }
@@ -34,7 +34,7 @@ CPartitionPropagationSpec::SPartPropSpecInfo::FSatisfies(
 	const SPartPropSpecInfo *other) const
 {
 	GPOS_ASSERT_IMP(m_scan_id == other->m_scan_id,
-					m_root_rel_mdid->Equals(other->m_root_rel_mdid));
+					m_root_rel_mdid->Equals(other->m_root_rel_mdid.get()));
 	return m_scan_id == other->m_scan_id && m_type == other->m_type;
 }
 
@@ -161,7 +161,7 @@ CPartitionPropagationSpec::Insert(ULONG scan_id, EPartPropSpecInfoType type,
 void
 CPartitionPropagationSpec::Insert(SPartPropSpecInfo *other)
 {
-	Insert(other->m_scan_id, other->m_type, other->m_root_rel_mdid,
+	Insert(other->m_scan_id, other->m_type, other->m_root_rel_mdid.get(),
 		   other->m_selector_ids, other->m_filter_expr);
 }
 
@@ -370,7 +370,6 @@ CPartitionPropagationSpec::AppendEnforcers(CMemoryPool *mp,
 		COptCtxt *opt_ctxt = COptCtxt::PoctxtFromTLS();
 		ULONG selector_id = opt_ctxt->NextPartSelectorId();
 
-		info->m_root_rel_mdid->AddRef();
 		info->m_filter_expr->AddRef();
 		expr->AddRef();
 

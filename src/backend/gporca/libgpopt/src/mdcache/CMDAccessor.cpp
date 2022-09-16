@@ -74,7 +74,7 @@ const CMDAccessor::SMDProviderElem
 //
 //---------------------------------------------------------------------------
 CMDAccessor::SMDAccessorElem::SMDAccessorElem(IMDCacheObject *pimdobj,
-											  IMDId *mdid)
+											  gpos::Ref<IMDId> mdid)
 	: m_imd_obj(pimdobj), m_mdid(mdid)
 {
 }
@@ -91,7 +91,6 @@ CMDAccessor::SMDAccessorElem::~SMDAccessorElem()
 {
 	// deleting the cache accessor will effectively unpin the cache entry for that object
 	m_imd_obj->Release();
-	m_mdid->Release();
 }
 
 
@@ -106,7 +105,7 @@ CMDAccessor::SMDAccessorElem::~SMDAccessorElem()
 IMDId *
 CMDAccessor::SMDAccessorElem::MDId() const
 {
-	return m_mdid;
+	return m_mdid.get();
 }
 
 //---------------------------------------------------------------------------
