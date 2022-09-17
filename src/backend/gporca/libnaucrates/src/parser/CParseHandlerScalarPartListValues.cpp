@@ -46,12 +46,14 @@ CParseHandlerScalarPartListValues::StartElement(
 	ULONG partition_level = CDXLOperatorFactory::ExtractConvertAttrValueToUlong(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenPartLevel,
 		EdxltokenScalarPartListValues);
-	IMDId *mdid_result = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBScalarOpResultTypeId, EdxltokenScalarPartListValues);
-	IMDId *mdid_element = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenArrayElementType, EdxltokenScalarPartListValues);
+	gpos::Ref<IMDId> mdid_result =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBScalarOpResultTypeId, EdxltokenScalarPartListValues);
+	gpos::Ref<IMDId> mdid_element =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenArrayElementType, EdxltokenScalarPartListValues);
 	m_dxl_node = GPOS_NEW(m_mp)
 		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLScalarPartListValues(
 						   m_mp, partition_level, mdid_result, mdid_element));

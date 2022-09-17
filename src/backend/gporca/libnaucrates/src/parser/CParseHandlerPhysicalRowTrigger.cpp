@@ -64,9 +64,10 @@ CParseHandlerPhysicalRowTrigger::StartElement(
 				   str->GetBuffer());
 	}
 
-	IMDId *rel_mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenRelationMdid, EdxltokenPhysicalRowTrigger);
+	gpos::Ref<IMDId> rel_mdid =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenRelationMdid, EdxltokenPhysicalRowTrigger);
 
 	INT type = CDXLOperatorFactory::ExtractConvertAttrValueToInt(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMDType,
