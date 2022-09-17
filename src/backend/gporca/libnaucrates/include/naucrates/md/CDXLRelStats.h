@@ -46,7 +46,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// metadata id of the object
-	CMDIdRelStats *m_rel_stats_mdid;
+	gpos::Ref<CMDIdRelStats> m_rel_stats_mdid;
 
 	// table name
 	CMDName *m_mdname;
@@ -69,7 +69,7 @@ private:
 public:
 	CDXLRelStats(const CDXLRelStats &) = delete;
 
-	CDXLRelStats(CMemoryPool *mp, CMDIdRelStats *rel_stats_mdid,
+	CDXLRelStats(CMemoryPool *mp, gpos::Ref<CMDIdRelStats> rel_stats_mdid,
 				 CMDName *mdname, CDouble rows, BOOL is_empty, ULONG relpages,
 				 ULONG relallvisible);
 
