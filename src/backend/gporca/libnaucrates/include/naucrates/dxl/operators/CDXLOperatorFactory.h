@@ -90,44 +90,45 @@ private:
 public:
 	static CDXLDatum *GetDatumOid(CDXLMemoryManager *dxl_memory_manager,
 								  const Attributes &attrs,
-								  Edxltoken target_elem, IMDId *mdid,
+								  Edxltoken target_elem, gpos::Ref<IMDId> mdid,
 								  BOOL is_const_null);
 
 	static CDXLDatum *GetDatumInt2(CDXLMemoryManager *dxl_memory_manager,
 								   const Attributes &attrs,
-								   Edxltoken target_elem, IMDId *mdid,
+								   Edxltoken target_elem, gpos::Ref<IMDId> mdid,
 								   BOOL is_const_null);
 
 	static CDXLDatum *GetDatumInt4(CDXLMemoryManager *dxl_memory_manager,
 								   const Attributes &attrs,
-								   Edxltoken target_elem, IMDId *mdid,
+								   Edxltoken target_elem, gpos::Ref<IMDId> mdid,
 								   BOOL is_const_null);
 
 	static CDXLDatum *GetDatumInt8(CDXLMemoryManager *dxl_memory_manager,
 								   const Attributes &attrs,
-								   Edxltoken target_elem, IMDId *mdid,
+								   Edxltoken target_elem, gpos::Ref<IMDId> mdid,
 								   BOOL is_const_null);
 
 	static CDXLDatum *GetDatumBool(CDXLMemoryManager *dxl_memory_manager,
 								   const Attributes &attrs,
-								   Edxltoken target_elem, IMDId *mdid,
+								   Edxltoken target_elem, gpos::Ref<IMDId> mdid,
 								   BOOL is_const_null);
 
 	// parse a dxl datum of type generic
 	static CDXLDatum *GetDatumGeneric(CDXLMemoryManager *dxl_memory_manager,
 									  const Attributes &attrs,
-									  Edxltoken target_elem, IMDId *mdid,
+									  Edxltoken target_elem,
+									  gpos::Ref<IMDId> mdid,
 									  BOOL is_const_null);
 
 	// parse a dxl datum of types that need double mapping
 	static CDXLDatum *GetDatumStatsDoubleMappable(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
+		Edxltoken target_elem, gpos::Ref<IMDId> mdid, BOOL is_const_null);
 
 	// parse a dxl datum of types that need lint mapping
 	static CDXLDatum *GetDatumStatsLintMappable(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
-		Edxltoken target_elem, IMDId *mdid, BOOL is_const_null);
+		Edxltoken target_elem, gpos::Ref<IMDId> mdid, BOOL is_const_null);
 
 	// create a table scan operator
 	static CDXLPhysical *MakeDXLTblScan(CDXLMemoryManager *dxl_memory_manager,

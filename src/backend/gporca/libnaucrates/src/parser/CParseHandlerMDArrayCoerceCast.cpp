@@ -56,21 +56,24 @@ CParseHandlerMDArrayCoerceCast::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_fun_name);
 
 	// parse cast properties
-	IMDId *mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+	gpos::Ref<IMDId> mdid = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenMdid,
 		EdxltokenGPDBArrayCoerceCast);
 
-	IMDId *mdid_src = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBCastSrcType, EdxltokenGPDBArrayCoerceCast);
+	gpos::Ref<IMDId> mdid_src =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBCastSrcType, EdxltokenGPDBArrayCoerceCast);
 
-	IMDId *mdid_dest = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBCastDestType, EdxltokenGPDBArrayCoerceCast);
+	gpos::Ref<IMDId> mdid_dest =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBCastDestType, EdxltokenGPDBArrayCoerceCast);
 
-	IMDId *mdid_cast_func = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-		EdxltokenGPDBCastFuncId, EdxltokenGPDBArrayCoerceCast);
+	gpos::Ref<IMDId> mdid_cast_func =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenGPDBCastFuncId, EdxltokenGPDBArrayCoerceCast);
 
 	// parse whether func returns a set
 	BOOL is_binary_coercible =

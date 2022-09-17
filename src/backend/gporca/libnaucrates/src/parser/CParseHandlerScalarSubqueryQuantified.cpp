@@ -75,9 +75,10 @@ CParseHandlerScalarSubqueryQuantified::StartElement(
 	}
 
 	// parse operator id
-	IMDId *mdid_op = CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
-		dxl_token);
+	gpos::Ref<IMDId> mdid_op =
+		CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenOpNo,
+			dxl_token);
 
 	// parse operator name
 	const XMLCh *xmlszScalarOpName = CDXLOperatorFactory::ExtractAttrValue(
