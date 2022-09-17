@@ -30,7 +30,8 @@ using namespace gpmd;
 //		Constructs a metadata relation
 //
 //---------------------------------------------------------------------------
-CDXLRelStats::CDXLRelStats(CMemoryPool *mp, CMDIdRelStats *rel_stats_mdid,
+CDXLRelStats::CDXLRelStats(CMemoryPool *mp,
+						   gpos::Ref<CMDIdRelStats> rel_stats_mdid,
 						   CMDName *mdname, CDouble rows, BOOL is_empty,
 						   ULONG relpages, ULONG relallvisible)
 	: m_mp(mp),
@@ -58,7 +59,6 @@ CDXLRelStats::~CDXLRelStats()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_rel_stats_mdid->Release();
 }
 
 //---------------------------------------------------------------------------
@@ -72,7 +72,7 @@ CDXLRelStats::~CDXLRelStats()
 IMDId *
 CDXLRelStats::MDId() const
 {
-	return m_rel_stats_mdid;
+	return m_rel_stats_mdid.get();
 }
 
 //---------------------------------------------------------------------------
