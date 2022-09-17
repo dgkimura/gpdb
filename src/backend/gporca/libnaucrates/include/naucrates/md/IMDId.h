@@ -19,6 +19,7 @@
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CHashSet.h"
 #include "gpos/common/CHashSetIter.h"
+#include "gpos/common/Casting.h"
 #include "gpos/common/DbgPrintMixin.h"
 #include "gpos/common/Ref.h"
 #include "gpos/common/Vector.h"
