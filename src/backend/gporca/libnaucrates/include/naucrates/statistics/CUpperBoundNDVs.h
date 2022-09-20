@@ -13,6 +13,7 @@
 #define GPNAUCRATES_CUpperBoundNDVs_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 
@@ -40,7 +41,7 @@ class CUpperBoundNDVs
 {
 private:
 	// set of column references
-	CColRefSet *m_column_refset;
+	gpos::owner<CColRefSet *> m_column_refset;
 
 	// upper bound of ndvs
 	CDouble m_upper_bound_ndv;

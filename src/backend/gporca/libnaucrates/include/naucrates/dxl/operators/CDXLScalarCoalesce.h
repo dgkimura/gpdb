@@ -13,6 +13,7 @@
 #define GPDXL_CDXLScalarCoalesce_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 #include "naucrates/md/IMDId.h"
@@ -60,7 +61,7 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						gpos::pointer<const CDXLNode *> node) const override;
 
 	// does the operator return a boolean result
 	BOOL HasBoolResult(CMDAccessor *md_accessor) const override;
@@ -68,12 +69,12 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(gpos::pointer<const CDXLNode *> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarCoalesce *
+	static gpos::cast_func<CDXLScalarCoalesce *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

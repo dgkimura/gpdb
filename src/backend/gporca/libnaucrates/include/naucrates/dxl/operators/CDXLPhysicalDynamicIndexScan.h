@@ -13,6 +13,7 @@
 #define GPDXL_CDXLPhysicalDynamicIndexScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLIndexDescr.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -74,17 +75,17 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// index descriptor
-	const CDXLIndexDescr *GetDXLIndexDescr() const;
+	gpos::pointer<const CDXLIndexDescr *> GetDXLIndexDescr() const;
 
 	//table descriptor
-	const CDXLTableDescr *GetDXLTableDescr() const;
+	gpos::pointer<const CDXLTableDescr *> GetDXLTableDescr() const;
 
 	// scan direction
 	EdxlIndexScanDirection GetIndexScanDir() const;
 
 	IMdIdArray *GetParts() const;
 
-	const ULongPtrArray *
+	gpos::pointer<const ULongPtrArray *>
 	GetSelectorIds() const
 	{
 		return m_selector_ids;
@@ -92,10 +93,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						gpos::pointer<const CDXLNode *> node) const override;
 
 	// conversion function
-	static CDXLPhysicalDynamicIndexScan *
+	static gpos::cast_func<CDXLPhysicalDynamicIndexScan *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -107,7 +108,8 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(gpos::pointer<const CDXLNode *>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

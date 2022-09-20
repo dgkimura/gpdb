@@ -15,6 +15,7 @@
 #define GPOPT_CMDKey_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringConst.h"
 
 #include "naucrates/md/IMDId.h"
@@ -38,17 +39,17 @@ class CMDKey
 {
 private:
 	// id of the object in the underlying source
-	const IMDId *m_mdid;
+	gpos::pointer<const IMDId *> m_mdid;
 
 public:
 	// ctors
-	explicit CMDKey(const IMDId *mdid);
+	explicit CMDKey(gpos::pointer<const IMDId *> mdid);
 
 	// dtor
 	~CMDKey() = default;
 
 
-	const IMDId *
+	gpos::pointer<const IMDId *>
 	MDId() const
 	{
 		return m_mdid;

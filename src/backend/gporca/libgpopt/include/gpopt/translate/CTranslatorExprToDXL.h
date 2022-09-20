@@ -228,12 +228,12 @@ private:
 								  CDistributionSpecArray *pdrgpdsBaseTables,
 								  ULONG *pulNonGatherMotions, BOOL *pfDML);
 
-	CDXLNode *PdxlnAggregate(CExpression *pexprAgg, CColRefArray *colref_array,
-							 CDistributionSpecArray *pdrgpdsBaseTables,
-							 ULONG *pulNonGatherMotions, BOOL *pfDML,
-							 EdxlAggStrategy dxl_agg_strategy,
-							 const CColRefArray *pdrgpcrGroupingCols,
-							 CColRefSet *pcrsKeys);
+	CDXLNode *PdxlnAggregate(
+		CExpression *pexprAgg, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+		BOOL *pfDML, EdxlAggStrategy dxl_agg_strategy,
+		gpos::pointer<const CColRefArray *> pdrgpcrGroupingCols,
+		CColRefSet *pcrsKeys);
 
 	CDXLNode *PdxlnSort(CExpression *pexprSort, CColRefArray *colref_array,
 						CDistributionSpecArray *pdrgpdsBaseTables,
@@ -334,13 +334,15 @@ private:
 		BOOL *pfDML);
 
 	// Construct a table descr for a child partition
-	CTableDescriptor *MakeTableDescForPart(const IMDRelation *part,
-										   CTableDescriptor *root_table_desc);
+	CTableDescriptor *MakeTableDescForPart(
+		gpos::pointer<const IMDRelation *> part,
+		CTableDescriptor *root_table_desc);
 
 	// Construct a dxl index descriptor for a child partition
 	static CDXLIndexDescr *PdxlnIndexDescForPart(
 		CMemoryPool *m_mp, MdidHashSet *child_index_mdids_set,
-		const IMDRelation *part, const CWStringConst *index_name);
+		gpos::pointer<const IMDRelation *> part,
+		const CWStringConst *index_name);
 
 	// translate a dynamic bitmap table scan
 	CDXLNode *PdxlnDynamicBitmapTableScan(
@@ -514,38 +516,41 @@ private:
 	// translate a window frame
 	CDXLWindowFrame *GetWindowFrame(CWindowFrame *pwf);
 
-	CDXLTableDescr *MakeDXLTableDescr(const CTableDescriptor *ptabdesc,
-									  const CColRefArray *pdrgpcrOutput,
-									  const CReqdPropPlan *requiredProperties);
+	CDXLTableDescr *MakeDXLTableDescr(
+		gpos::pointer<const CTableDescriptor *> ptabdesc,
+		gpos::pointer<const CColRefArray *> pdrgpcrOutput,
+		gpos::pointer<const CReqdPropPlan *> requiredProperties);
 
 	// compute physical properties like operator cost from the expression
-	CDXLPhysicalProperties *GetProperties(const CExpression *pexpr);
+	CDXLPhysicalProperties *GetProperties(
+		gpos::pointer<const CExpression *> pexpr);
 
 	// translate a colref set of output col into a dxl proj list
-	CDXLNode *PdxlnProjList(const CColRefSet *pcrsOutput,
+	CDXLNode *PdxlnProjList(gpos::pointer<const CColRefSet *> pcrsOutput,
 							CColRefArray *colref_array);
 
 	// Construct a project list for a child partition
 	CDXLNode *PdxlnProjListForChildPart(
-		const ColRefToUlongMap *root_col_mapping,
-		const CColRefArray *part_colrefs, const CColRefSet *reqd_colrefs,
-		const CColRefArray *colref_array);
+		gpos::pointer<const ColRefToUlongMap *> root_col_mapping,
+		gpos::pointer<const CColRefArray *> part_colrefs,
+		gpos::pointer<const CColRefSet *> reqd_colrefs,
+		gpos::pointer<const CColRefArray *> colref_array);
 
 	// translate a filter expr on the root for a child partition
-	CDXLNode *PdxlnCondForChildPart(const ColRefToUlongMap *root_col_mapping,
-									const CColRefArray *part_colrefs,
-									const CColRefArray *root_colrefs,
-									CExpression *pred);
+	CDXLNode *PdxlnCondForChildPart(
+		gpos::pointer<const ColRefToUlongMap *> root_col_mapping,
+		gpos::pointer<const CColRefArray *> part_colrefs,
+		gpos::pointer<const CColRefArray *> root_colrefs, CExpression *pred);
 
 	// translate a project list expression into a DXL proj list node
 	// according to the order specified in the dynamic array
-	CDXLNode *PdxlnProjList(const CExpression *pexprProjList,
-							const CColRefSet *pcrsOutput,
+	CDXLNode *PdxlnProjList(gpos::pointer<const CExpression *> pexprProjList,
+							gpos::pointer<const CColRefSet *> pcrsOutput,
 							CColRefArray *colref_array);
 
 	// translate a project list expression into a DXL proj list node
-	CDXLNode *PdxlnProjList(const CExpression *pexprProjList,
-							const CColRefSet *pcrsOutput);
+	CDXLNode *PdxlnProjList(gpos::pointer<const CExpression *> pexprProjList,
+							gpos::pointer<const CColRefSet *> pcrsOutput);
 
 	// create a project list for a result node from a tuple of a
 	// const table get operator
@@ -554,21 +559,22 @@ private:
 											 IDatumArray *pdrgpdatumValues);
 
 	// create a DXL project elem node from a proj element expression
-	CDXLNode *PdxlnProjElem(const CExpression *pexprProjElem);
+	CDXLNode *PdxlnProjElem(gpos::pointer<const CExpression *> pexprProjElem);
 
 	// create a project element for a computed column from a column reference
 	// and value expresison
 	CDXLNode *PdxlnProjElem(const CColRef *colref, CDXLNode *pdxlnValue);
 
 	// create a DXL sort col list node from an order spec
-	CDXLNode *GetSortColListDXL(const COrderSpec *pos);
+	CDXLNode *GetSortColListDXL(gpos::pointer<const COrderSpec *> pos);
 
 	// create a DXL sort col list node for a Motion expression
 	CDXLNode *GetSortColListDXL(CExpression *pexprMotion);
 
 	// create a DXL hash expr list from an array of hash columns
-	CDXLNode *PdxlnHashExprList(const CExpressionArray *pdrgpexpr,
-								const IMdIdArray *opfamilies);
+	CDXLNode *PdxlnHashExprList(
+		gpos::pointer<const CExpressionArray *> pdrgpexpr,
+		gpos::pointer<const IMdIdArray *> opfamilies);
 
 	// create a DXL filter node with the given scalar expression
 	CDXLNode *PdxlnFilter(CDXLNode *pdxlnCond);
@@ -581,7 +587,7 @@ private:
 
 	// find the position of the given colref in the array
 	static ULONG UlPosInArray(const CColRef *colref,
-							  const CColRefArray *colref_array);
+							  gpos::pointer<const CColRefArray *> colref_array);
 
 	// return hash join type
 	static EdxlJoinType EdxljtHashJoin(CPhysicalHashJoin *popHJ);
@@ -619,7 +625,8 @@ private:
 	CDXLNode *PdxlnRestrictResult(CDXLNode *dxlnode, const CColRef *colref);
 
 	// helper to build a Result expression with project list restricted to required columns
-	CDXLNode *PdxlnRestrictResult(CDXLNode *dxlnode, const CColRefSet *colrefs);
+	CDXLNode *PdxlnRestrictResult(CDXLNode *dxlnode,
+								  gpos::pointer<const CColRefSet *> colrefs);
 
 	//	helper to build subplans from correlated LOJ
 	void BuildSubplansForCorrelatedLOJ(

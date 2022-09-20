@@ -15,6 +15,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CDrvdPropRelational.h"
@@ -151,7 +152,7 @@ public:
 	~CExpression() override;
 
 	// shorthand to access children
-	CExpression *
+	gpos::pointer<CExpression *>
 	operator[](ULONG ulPos) const
 	{
 		GPOS_ASSERT(nullptr != m_pdrgpexpr);
@@ -166,7 +167,7 @@ public:
 	}
 
 	// accessor for operator
-	COperator *
+	gpos::pointer<COperator *>
 	Pop() const
 	{
 		GPOS_ASSERT(nullptr != m_pop);
@@ -174,21 +175,21 @@ public:
 	}
 
 	// accessor of children array
-	CExpressionArray *
+	gpos::pointer<CExpressionArray *>
 	PdrgPexpr() const
 	{
 		return m_pdrgpexpr;
 	}
 
 	// accessor for origin group expression
-	CGroupExpression *
+	gpos::pointer<CGroupExpression *>
 	Pgexpr() const
 	{
 		return m_pgexpr;
 	}
 
 	// accessor for computed required plan props
-	CReqdPropPlan *
+	gpos::pointer<CReqdPropPlan *>
 	Prpp() const
 	{
 		return m_prpp;
@@ -201,7 +202,7 @@ public:
 	CDrvdPropScalar *GetDrvdPropScalar() const;
 
 	// get derived statistics object
-	const IStatistics *
+	gpos::pointer<const IStatistics *>
 	Pstats() const
 	{
 		return m_pstats;
@@ -272,13 +273,14 @@ public:
 #endif	// GPOS_DEBUG
 
 	// check if the expression satisfies given required properties
-	BOOL FValidPlan(const CReqdPropPlan *prpp, CDrvdPropCtxtPlan *pdpctxtplan);
+	BOOL FValidPlan(gpos::pointer<const CReqdPropPlan *> prpp,
+					CDrvdPropCtxtPlan *pdpctxtplan);
 
 	// static hash function
-	static ULONG HashValue(const CExpression *pexpr);
+	static ULONG HashValue(gpos::pointer<const CExpression *> pexpr);
 
 	// static hash function
-	static ULONG UlHashDedup(const CExpression *pexpr);
+	static ULONG UlHashDedup(gpos::pointer<const CExpression *> pexpr);
 
 	// rehydrate expression from a given cost context and child expressions
 	static CExpression *PexprRehydrate(CMemoryPool *mp, CCostContext *pcc,

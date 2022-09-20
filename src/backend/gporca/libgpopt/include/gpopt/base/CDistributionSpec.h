@@ -13,6 +13,7 @@
 #define GPOPT_IDistributionSpec_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/utils.h"
 
 #include "gpopt/base/CPropSpec.h"
@@ -78,7 +79,8 @@ public:
 	virtual EDistributionType Edt() const = 0;
 
 	// does this distribution satisfy the given one
-	virtual BOOL FSatisfies(const CDistributionSpec *pds) const = 0;
+	virtual BOOL FSatisfies(
+		gpos::pointer<const CDistributionSpec *> pds) const = 0;
 
 	// default hash function for distribution spec
 	ULONG
@@ -89,7 +91,7 @@ public:
 	}
 
 	// extract columns used by the distribution spec
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	PcrsUsed(CMemoryPool *mp) const override
 	{
 		// by default, return an empty set
@@ -119,7 +121,7 @@ public:
 
 	// default match function for distribution specs
 	virtual BOOL
-	Matches(const CDistributionSpec *pds) const
+	Matches(gpos::pointer<const CDistributionSpec *> pds) const
 	{
 		return Edt() == pds->Edt();
 	}
@@ -128,7 +130,7 @@ public:
 	// CDistributionSpec, if any class requires special Equals
 	// handling, they should override it.
 	virtual BOOL
-	Equals(const CDistributionSpec *pds) const
+	Equals(gpos::pointer<const CDistributionSpec *> pds) const
 	{
 		return Matches(pds);
 	}

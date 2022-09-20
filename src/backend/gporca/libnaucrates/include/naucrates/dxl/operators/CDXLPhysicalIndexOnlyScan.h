@@ -13,6 +13,7 @@
 #define GPDXL_CDXLPhysicalIndexOnlyScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLIndexDescr.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -50,7 +51,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLPhysicalIndexOnlyScan *
+	static gpos::cast_func<CDXLPhysicalIndexOnlyScan *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

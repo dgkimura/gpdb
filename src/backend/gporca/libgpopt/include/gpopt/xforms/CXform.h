@@ -16,6 +16,7 @@
 #include "gpos/common/CEnumSet.h"
 #include "gpos/common/CEnumSetIter.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CPhysical.h"
@@ -277,14 +278,15 @@ public:
 						   CExpression *pexpr) const = 0;
 
 	// accessor
-	CExpression *
+	gpos::pointer<CExpression *>
 	PexprPattern() const
 	{
 		return m_pexpr;
 	}
 
 	// check compatibility with another xform
-	virtual BOOL FCompatible(CXform::EXformId)
+	virtual BOOL
+	FCompatible(CXform::EXformId)
 	{
 		return true;
 	}
@@ -301,8 +303,9 @@ public:
 	BOOL FCheckPattern(CExpression *pexpr) const;
 
 	// verify xform promise on the given expression
-	static BOOL FPromising(CMemoryPool *mp, const CXform *pxform,
-						   CExpression *pexpr);
+	static BOOL FPromising(CMemoryPool *mp,
+						   gpos::pointer<const CXform *> pxform,
+						   gpos::pointer<CExpression *> pexpr);
 
 #endif	// GPOS_DEBUG
 

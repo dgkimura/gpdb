@@ -13,6 +13,7 @@
 #define GPMD_IMDRelation_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/md/CMDIndexInfo.h"
@@ -122,19 +123,19 @@ public:
 	virtual ULONG SystemColumnsCount() const = 0;
 
 	// retrieve the column at the given position
-	virtual const IMDColumn *GetMdCol(ULONG pos) const = 0;
+	virtual gpos::pointer<const IMDColumn *> GetMdCol(ULONG pos) const = 0;
 
 	// number of key sets
 	virtual ULONG KeySetCount() const = 0;
 
 	// key set at given position
-	virtual const ULongPtrArray *KeySetAt(ULONG pos) const = 0;
+	virtual gpos::pointer<const ULongPtrArray *> KeySetAt(ULONG pos) const = 0;
 
 	// number of distribution columns
 	virtual ULONG DistrColumnCount() const = 0;
 
 	// retrieve the column at the given position in the distribution key for the relation
-	virtual const IMDColumn *GetDistrColAt(ULONG pos) const = 0;
+	virtual gpos::pointer<const IMDColumn *> GetDistrColAt(ULONG pos) const = 0;
 
 	virtual IMDId *GetDistrOpfamilyAt(ULONG pos) const = 0;
 
@@ -151,7 +152,7 @@ public:
 	virtual ULONG PartitionCount() const = 0;
 
 	// retrieve the partition column at the given position
-	virtual const IMDColumn *PartColAt(ULONG pos) const = 0;
+	virtual gpos::pointer<const IMDColumn *> PartColAt(ULONG pos) const = 0;
 
 	// retrieve list of partition types
 	virtual CharPtrArray *GetPartitionTypes() const = 0;

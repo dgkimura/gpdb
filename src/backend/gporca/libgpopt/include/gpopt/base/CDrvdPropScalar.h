@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CColRefSet.h"
@@ -169,7 +170,7 @@ public:
 				CDrvdPropCtxt *pdpctxt) override;
 
 	// check for satisfying required plan properties
-	BOOL FSatisfies(const CReqdPropPlan *prpp) const override;
+	BOOL FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const override;
 
 	// defined columns
 	CColRefSet *GetDefinedColumns() const;

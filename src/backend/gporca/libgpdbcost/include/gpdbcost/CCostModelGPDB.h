@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
 #include "gpos/common/Ref.h"
+#include "gpos/common/owner.h"
 
 #include "gpdbcost/CCostModelParamsGPDB.h"
 #include "gpopt/cost/CCost.h"
@@ -78,129 +79,128 @@ private:
 
 	// cost of scan
 	static CCost CostScan(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  const CCostModelGPDB *pcmgpdb,
+						  gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 						  const SCostingInfo *pci);
 
 	// cost of filter
 	static CCost CostFilter(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							const CCostModelGPDB *pcmgpdb,
+							gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							const SCostingInfo *pci);
 
 	// cost of index scan
 	static CCost CostIndexScan(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   const CCostModelGPDB *pcmgpdb,
+							   gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							   const SCostingInfo *pci);
 
 	// cost of index only scan
-	static CCost CostIndexOnlyScan(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   const CCostModelGPDB *pcmgpdb,
-								   const SCostingInfo *pci);
+	static CCost CostIndexOnlyScan(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<const CCostModelGPDB *> pcmgpdb, const SCostingInfo *pci);
 
 	// cost of bitmap table scan
-	static CCost CostBitmapTableScan(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl,
-									 const CCostModelGPDB *pcmgpdb,
-									 const SCostingInfo *pci);
+	static CCost CostBitmapTableScan(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<const CCostModelGPDB *> pcmgpdb, const SCostingInfo *pci);
 
 	// cost of sequence project
-	static CCost CostSequenceProject(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl,
-									 const CCostModelGPDB *pcmgpdb,
-									 const SCostingInfo *pci);
+	static CCost CostSequenceProject(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<const CCostModelGPDB *> pcmgpdb, const SCostingInfo *pci);
 
 	// cost of CTE producer
 	static CCost CostCTEProducer(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 const CCostModelGPDB *pcmgpdb,
+								 gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 								 const SCostingInfo *pci);
 
 	// cost of CTE consumer
 	static CCost CostCTEConsumer(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 const CCostModelGPDB *pcmgpdb,
+								 gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 								 const SCostingInfo *pci);
 
 	// cost of const table get
-	static CCost CostConstTableGet(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   const CCostModelGPDB *pcmgpdb,
-								   const SCostingInfo *pci);
+	static CCost CostConstTableGet(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<const CCostModelGPDB *> pcmgpdb, const SCostingInfo *pci);
 
 	// cost of DML
 	static CCost CostDML(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 const CCostModelGPDB *pcmgpdb,
+						 gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 						 const SCostingInfo *pci);
 
 	// cost of hash agg
 	static CCost CostHashAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 const CCostModelGPDB *pcmgpdb,
+							 gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							 const SCostingInfo *pci);
 
 	// cost of scalar agg
 	static CCost CostScalarAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   const CCostModelGPDB *pcmgpdb,
+							   gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							   const SCostingInfo *pci);
 
 	// cost of stream agg
 	static CCost CostStreamAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   const CCostModelGPDB *pcmgpdb,
+							   gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							   const SCostingInfo *pci);
 
 	// cost of sequence
 	static CCost CostSequence(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const CCostModelGPDB *pcmgpdb,
+							  gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							  const SCostingInfo *pci);
 
 	// cost of sort
 	static CCost CostSort(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  const CCostModelGPDB *pcmgpdb,
+						  gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 						  const SCostingInfo *pci);
 
 	// cost of TVF
 	static CCost CostTVF(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 const CCostModelGPDB *pcmgpdb,
+						 gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 						 const SCostingInfo *pci);
 
 	// cost of UnionAll
 	static CCost CostUnionAll(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const CCostModelGPDB *pcmgpdb,
+							  gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							  const SCostingInfo *pci);
 
 	// cost of hash join
 	static CCost CostHashJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const CCostModelGPDB *pcmgpdb,
+							  gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							  const SCostingInfo *pci);
 
 	// cost of merge join
 	static CCost CostMergeJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   const CCostModelGPDB *pcmgpdb,
+							   gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							   const SCostingInfo *pci);
 
 	// cost of nljoin
 	static CCost CostNLJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							const CCostModelGPDB *pcmgpdb,
+							gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							const SCostingInfo *pci);
 
 	// cost of inner or outer index-nljoin
 	static CCost CostIndexNLJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 const CCostModelGPDB *pcmgpdb,
+								 gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 								 const SCostingInfo *pci);
 
 	// cost of motion
 	static CCost CostMotion(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							const CCostModelGPDB *pcmgpdb,
+							gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							const SCostingInfo *pci);
 
 	// cost of bitmap scan when the NDV is small
-	static CCost CostBitmapSmallNDV(const CCostModelGPDB *pcmgpdb,
-									const SCostingInfo *pci, CDouble dNDV);
+	static CCost CostBitmapSmallNDV(
+		gpos::pointer<const CCostModelGPDB *> pcmgpdb, const SCostingInfo *pci,
+		CDouble dNDV);
 
 	// cost of bitmap scan when the NDV is large
-	static CCost CostBitmapLargeNDV(const CCostModelGPDB *pcmgpdb,
-									const SCostingInfo *pci, CDouble dNDV);
+	static CCost CostBitmapLargeNDV(
+		gpos::pointer<const CCostModelGPDB *> pcmgpdb, const SCostingInfo *pci,
+		CDouble dNDV);
 
 	// cost of compute scalar
-	static CCost CostComputeScalar(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   const SCostingInfo *pci,
-								   ICostModelParams *pcp,
-								   const CCostModelGPDB *pcmgpdb);
+	static CCost CostComputeScalar(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, const SCostingInfo *pci,
+		ICostModelParams *pcp, gpos::pointer<const CCostModelGPDB *> pcmgpdb);
 
 public:
 	// ctor

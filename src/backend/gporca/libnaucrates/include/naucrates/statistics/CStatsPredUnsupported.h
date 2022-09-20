@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/statistics/CStatsPred.h"
 
@@ -70,7 +71,7 @@ public:
 	}
 
 	// conversion function
-	static CStatsPredUnsupported *
+	static gpos::cast_func<CStatsPredUnsupported *>
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

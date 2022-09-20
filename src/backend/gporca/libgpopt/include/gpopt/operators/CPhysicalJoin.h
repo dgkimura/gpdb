@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/operators/CPhysical.h"
@@ -75,20 +76,20 @@ protected:
 	// helper for checking if required sort columns come from outer child
 	static BOOL FSortColsInOuterChild(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl,
-									  COrderSpec *pos);
+									  gpos::pointer<COrderSpec *> pos);
 
 	// helper for checking if the outer input of a binary join operator
 	// includes the required columns
-	static BOOL FOuterProvidesReqdCols(CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired);
+	static BOOL FOuterProvidesReqdCols(
+		CExpressionHandle &exprhdl, gpos::pointer<CColRefSet *> pcrsRequired);
 
 
 	// Do each of the given predicate children use columns from a different
 	// join child?
-	static BOOL FPredKeysSeparated(CExpression *pexprOuter,
-								   CExpression *pexprInner,
-								   CExpression *pexprPredOuter,
-								   CExpression *pexprPredInner);
+	static BOOL FPredKeysSeparated(gpos::pointer<CExpression *> pexprOuter,
+								   gpos::pointer<CExpression *> pexprInner,
+								   gpos::pointer<CExpression *> pexprPredOuter,
+								   gpos::pointer<CExpression *> pexprPredInner);
 
 	static CEnfdDistribution *PedInnerHashedFromOuterHashed(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -172,7 +173,7 @@ public:
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
 		CExpressionHandle &exprhdl,
-		const CEnfdRewindability *per) const override;
+		gpos::pointer<const CEnfdRewindability *> per) const override;
 
 	// return true if operator passes through stats obtained from children,
 	// this is used when computing stats during costing
@@ -192,14 +193,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// is given predicate hash-join compatible
-	static BOOL FHashJoinCompatible(CExpression *pexprPred,
-									CExpression *pexprOuter,
-									CExpression *pexprInner);
+	static BOOL FHashJoinCompatible(gpos::pointer<CExpression *> pexprPred,
+									gpos::pointer<CExpression *> pexprOuter,
+									gpos::pointer<CExpression *> pexprInner);
 
 	// is given predicate merge-join compatible
-	static BOOL FMergeJoinCompatible(CExpression *pexprPred,
-									 CExpression *pexprOuter,
-									 CExpression *pexprInner);
+	static BOOL FMergeJoinCompatible(gpos::pointer<CExpression *> pexprPred,
+									 gpos::pointer<CExpression *> pexprOuter,
+									 gpos::pointer<CExpression *> pexprInner);
 
 	// return number of distribution requests for correlated join
 	static ULONG UlDistrRequestsForCorrelatedJoin();

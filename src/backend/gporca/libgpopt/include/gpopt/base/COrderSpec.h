@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CColRefSet.h"
@@ -189,10 +190,10 @@ public:
 	}
 
 	// check if order specs match
-	BOOL Matches(const COrderSpec *pos) const;
+	BOOL Matches(gpos::pointer<const COrderSpec *> pos) const;
 
 	// check if order specs satisfies req'd spec
-	BOOL FSatisfies(const COrderSpec *pos) const;
+	BOOL FSatisfies(gpos::pointer<const COrderSpec *> pos) const;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,

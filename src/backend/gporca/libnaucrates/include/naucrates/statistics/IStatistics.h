@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/CHashMapIter.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CColRefSet.h"
@@ -139,22 +140,22 @@ public:
 
 	// inner join with another stats structure
 	virtual IStatistics *CalcInnerJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const = 0;
 
 	// LOJ with another stats structure
 	virtual IStatistics *CalcLOJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const = 0;
 
 	// semi join stats computation
 	virtual IStatistics *CalcLSJoinStats(
-		CMemoryPool *mp, const IStatistics *inner_side_stats,
+		CMemoryPool *mp, gpos::pointer<const IStatistics *> inner_side_stats,
 		CStatsPredJoinArray *join_preds_stats) const = 0;
 
 	// anti semi join
 	virtual IStatistics *CalcLASJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
 		CStatsPredJoinArray *join_preds_stats,
 		BOOL DoIgnoreLASJHistComputation) const = 0;
 

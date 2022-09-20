@@ -13,6 +13,7 @@
 #define GPDXL_CDXLScalarSubqueryAny_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLScalarSubqueryQuantified.h"
@@ -48,7 +49,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLScalarSubqueryAny *
+	static gpos::cast_func<CDXLScalarSubqueryAny *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

@@ -283,9 +283,9 @@ private:
 
 	// return true if first promise is better than second promise
 	static BOOL FBetterPromise(CMemoryPool *mp, CLogical::EStatPromise espFst,
-							   CGroupExpression *pgexprFst,
+							   gpos::pointer<CGroupExpression *> pgexprFst,
 							   CLogical::EStatPromise espSnd,
-							   CGroupExpression *pgexprSnd);
+							   gpos::pointer<CGroupExpression *> pgexprSnd);
 
 	// derive stats recursively on child groups
 	static CLogical::EStatPromise EspDerive(CMemoryPool *pmpLocal,
@@ -340,7 +340,7 @@ public:
 	}
 
 	// group properties accessor
-	CDrvdProp *
+	gpos::pointer<CDrvdProp *>
 	Pdp() const
 	{
 		return m_pdp;
@@ -370,14 +370,14 @@ public:
 	}
 
 	// join keys of outer child
-	CExpressionArray *
+	gpos::pointer<CExpressionArray *>
 	PdrgpexprJoinKeysOuter() const
 	{
 		return m_pdrgpexprJoinKeysOuter;
 	}
 
 	// join keys of inner child
-	CExpressionArray *
+	gpos::pointer<CExpressionArray *>
 	PdrgpexprJoinKeysInner() const
 	{
 		return m_pdrgpexprJoinKeysInner;
@@ -391,7 +391,7 @@ public:
 	}
 
 	// return a representative cached scalar expression usable for stat derivation etc.
-	CExpression *
+	gpos::pointer<CExpression *>
 	PexprScalarRep() const
 	{
 		return m_pexprScalarRep;
@@ -405,7 +405,7 @@ public:
 	}
 
 	// return dummy cost context for scalar group
-	CCostContext *
+	gpos::pointer<CCostContext *>
 	PccDummy() const
 	{
 		GPOS_ASSERT(FScalar());
@@ -499,7 +499,7 @@ public:
 	}
 
 	// duplicate group accessor
-	CGroup *
+	gpos::pointer<CGroup *>
 	PgroupDuplicate() const
 	{
 		return m_pgroupDuplicate;
@@ -593,15 +593,17 @@ public:
 	CCost CostLowerBound(CMemoryPool *mp, CReqdPropPlan *prppInput);
 
 	// matching of pairs of arrays of groups
-	static BOOL FMatchGroups(CGroupArray *pdrgpgroupFst,
-							 CGroupArray *pdrgpgroupSnd);
+	static BOOL FMatchGroups(gpos::pointer<CGroupArray *> pdrgpgroupFst,
+							 gpos::pointer<CGroupArray *> pdrgpgroupSnd);
 
 	// matching of pairs of arrays of groups while skipping scalar groups
-	static BOOL FMatchNonScalarGroups(CGroupArray *pdrgpgroupFst,
-									  CGroupArray *pdrgpgroupSnd);
+	static BOOL FMatchNonScalarGroups(
+		gpos::pointer<CGroupArray *> pdrgpgroupFst,
+		gpos::pointer<CGroupArray *> pdrgpgroupSnd);
 
 	// determine if a pair of groups are duplicates
-	static BOOL FDuplicateGroups(CGroup *pgroupFst, CGroup *pgroupSnd);
+	static BOOL FDuplicateGroups(gpos::pointer<CGroup *> pgroupFst,
+								 gpos::pointer<CGroup *> pgroupSnd);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;

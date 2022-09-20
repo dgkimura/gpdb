@@ -14,6 +14,7 @@
 #define GPDXL_CDXLLogicalConstTable_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
 #include "naucrates/dxl/operators/CDXLLogical.h"
@@ -58,7 +59,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// column descriptors
-	const CDXLColDescrArray *
+	gpos::pointer<const CDXLColDescrArray *>
 	GetDXLColumnDescrArray() const
 	{
 		return m_col_descr_array;
@@ -78,7 +79,7 @@ public:
 	}
 
 	// return the const tuple (datum array) at a given position
-	const CDXLDatumArray *
+	gpos::pointer<const CDXLDatumArray *>
 	GetConstTupleDatumArrayAt(ULONG ulTuplePos) const
 	{
 		return (*m_const_tuples_datum_array)[ulTuplePos];
@@ -86,13 +87,13 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// check if given column is defined by operator
 	BOOL IsColDefined(ULONG colid) const override;
 
 	// conversion function
-	static CDXLLogicalConstTable *
+	static gpos::cast_func<CDXLLogicalConstTable *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -104,7 +105,8 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(gpos::pointer<const CDXLNode *>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

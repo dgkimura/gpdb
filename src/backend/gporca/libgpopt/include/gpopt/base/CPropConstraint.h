@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CConstraint.h"
@@ -59,14 +60,14 @@ public:
 	~CPropConstraint() override;
 
 	// equivalence classes
-	CColRefSetArray *
+	gpos::pointer<CColRefSetArray *>
 	PdrgpcrsEquivClasses() const
 	{
 		return m_pdrgpcrs;
 	}
 
 	// mapping
-	CColRefSet *
+	gpos::pointer<CColRefSet *>
 	PcrsEquivClass(const CColRef *colref) const
 	{
 		if (nullptr == m_phmcrcrs)
@@ -77,7 +78,7 @@ public:
 	}
 
 	// constraint
-	CConstraint *
+	gpos::pointer<CConstraint *>
 	Pcnstr() const
 	{
 		return m_pcnstr;

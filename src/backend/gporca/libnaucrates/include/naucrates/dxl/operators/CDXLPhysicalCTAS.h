@@ -12,6 +12,7 @@
 #define GPDXL_CDXLPhysicalCTAS_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLColDescr.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
@@ -93,7 +94,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// column descriptors
-	CDXLColDescrArray *
+	gpos::pointer<CDXLColDescrArray *>
 	GetDXLColumnDescrArray() const
 	{
 		return m_col_descr_array;
@@ -107,21 +108,21 @@ public:
 	}
 
 	// distribution column positions
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	GetDistrColPosArray() const
 	{
 		return m_distr_column_pos_array;
 	}
 
 	// source column ids
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	GetSrcColidsArray() const
 	{
 		return m_src_colids_array;
 	}
 
 	// list of vartypmod for target expressions
-	IntPtrArray *
+	gpos::pointer<IntPtrArray *>
 	GetVarTypeModArray() const
 	{
 		return m_vartypemod_array;
@@ -149,7 +150,7 @@ public:
 	}
 
 	// CTAS storage options
-	CDXLCtasStorageOptions *
+	gpos::pointer<CDXLCtasStorageOptions *>
 	GetDxlCtasStorageOption() const
 	{
 		return m_dxl_ctas_storage_option;
@@ -162,17 +163,17 @@ public:
 	}
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLPhysicalCTAS *
+	static gpos::cast_func<CDXLPhysicalCTAS *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

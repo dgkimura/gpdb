@@ -16,6 +16,7 @@
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CList.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CName.h"
 #include "naucrates/md/IMDType.h"
@@ -90,14 +91,14 @@ public:
 	};
 
 	// ctor
-	CColRef(const IMDType *pmdtype, const INT type_modifier, ULONG id,
-			const CName *pname);
+	CColRef(gpos::pointer<const IMDType *> pmdtype, const INT type_modifier,
+			ULONG id, const CName *pname);
 
 	// dtor
 	virtual ~CColRef();
 
 	// accessor to type info
-	const IMDType *
+	gpos::pointer<const IMDType *>
 	RetrieveType() const
 	{
 		return m_pmdtype;
@@ -154,8 +155,8 @@ public:
 	static ULongPtrArray *Pdrgpul(CMemoryPool *mp, CColRefArray *colref_array);
 
 	// check if the the array of column references are equal
-	static BOOL Equals(const CColRefArray *pdrgpcr1,
-					   const CColRefArray *pdrgpcr2);
+	static BOOL Equals(gpos::pointer<const CColRefArray *> pdrgpcr1,
+					   gpos::pointer<const CColRefArray *> pdrgpcr2);
 
 	// check if the the array of column reference arrays are equal
 	static BOOL Equals(const CColRef2dArray *pdrgdrgpcr1,
@@ -215,7 +216,7 @@ public:
 		return m_used;
 	}
 
-	IMDId *
+	gpos::pointer<IMDId *>
 	GetMdidTable() const
 	{
 		return m_mdid_table;

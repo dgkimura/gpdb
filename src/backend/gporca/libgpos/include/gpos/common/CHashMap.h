@@ -19,6 +19,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
 #include "gpos/common/UnorderedMap.h"
+#include "gpos/common/owner.h"
 
 namespace gpos
 {
@@ -58,8 +59,8 @@ private:
 	{
 	private:
 		// key/value pair
-		K *m_key;
-		T *m_value;
+		gpos::pointer<K *> m_key;
+		gpos::pointer<T *> m_value;
 
 		// own objects
 		BOOL m_owns_objects;
@@ -135,9 +136,9 @@ private:
 	// array for keys
 	// We use CleanupNULL because the keys are owned by the hash table
 	using Keys = CDynamicPtrArray<K, CleanupNULL>;
-	Keys *const m_keys;
+	gpos::owner<Keys *> const m_keys;
 
-	IntPtrArray *const m_filled_chains;
+	gpos::owner<IntPtrArray *> const m_filled_chains;
 
 	// lookup appropriate hash chain in static table, may be NULL if
 	// no elements have been inserted yet

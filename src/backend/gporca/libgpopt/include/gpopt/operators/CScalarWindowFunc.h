@@ -18,6 +18,7 @@
 #define GPOPT_CScalarWindowFunc_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalarFunc.h"
@@ -104,7 +105,7 @@ public:
 	BOOL Matches(COperator *pop) const override;
 
 	// conversion function
-	static CScalarWindowFunc *
+	static gpos::cast_func<CScalarWindowFunc *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

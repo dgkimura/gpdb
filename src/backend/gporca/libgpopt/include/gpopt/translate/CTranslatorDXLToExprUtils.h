@@ -12,6 +12,7 @@
 #define GPOPT_CTranslatorDXLToExprUtils_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/metadata/CTableDescriptor.h"
@@ -50,24 +51,26 @@ public:
 									   CSystemId sysid, LINT liValue);
 
 	// create a scalar const operator from a DXL scalar const operator
-	static CScalarConst *PopConst(CMemoryPool *mp, CMDAccessor *md_accessor,
-								  const CDXLScalarConstValue *dxl_op);
+	static CScalarConst *PopConst(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		gpos::pointer<const CDXLScalarConstValue *> dxl_op);
 
 	// create a datum from a DXL scalar const operator
 	static IDatum *GetDatum(CMDAccessor *md_accessor,
-							const CDXLScalarConstValue *dxl_op);
+							gpos::pointer<const CDXLScalarConstValue *> dxl_op);
 
 	// create a datum array from a dxl datum array
-	static IDatumArray *Pdrgpdatum(CMemoryPool *mp, CMDAccessor *md_accessor,
-								   const CDXLDatumArray *pdrgpdatum);
+	static IDatumArray *Pdrgpdatum(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		gpos::pointer<const CDXLDatumArray *> pdrgpdatum);
 
 	// update table descriptor's key sets info from the MD cache object
 	static void AddKeySets(CMemoryPool *mp, CTableDescriptor *ptabdesc,
-						   const IMDRelation *pmdrel,
+						   gpos::pointer<const IMDRelation *> pmdrel,
 						   UlongToUlongMap *phmululColMapping);
 
 	// check if a dxl node is a boolean expression of the given type
-	static BOOL FScalarBool(const CDXLNode *dxlnode,
+	static BOOL FScalarBool(gpos::pointer<const CDXLNode *> dxlnode,
 							EdxlBoolExprType edxlboolexprtype);
 
 	// returns the equivalent bool expression type in the optimizer for
@@ -78,11 +81,12 @@ public:
 	// construct a dynamic array of col refs corresponding to the given col ids
 	static CColRefArray *Pdrgpcr(CMemoryPool *mp,
 								 UlongToColRefMap *colref_mapping,
-								 const ULongPtrArray *colids);
+								 gpos::pointer<const ULongPtrArray *> colids);
 
 	// is the given expression is a scalar function that casts
-	static BOOL FCastFunc(CMDAccessor *md_accessor, const CDXLNode *dxlnode,
-						  IMDId *pmdidInput);
+	static BOOL FCastFunc(CMDAccessor *md_accessor,
+						  gpos::pointer<const CDXLNode *> dxlnode,
+						  gpos::pointer<IMDId *> pmdidInput);
 };
 }  // namespace gpopt
 

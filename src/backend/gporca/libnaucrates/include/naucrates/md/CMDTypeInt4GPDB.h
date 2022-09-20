@@ -15,6 +15,7 @@
 #define GPMD_CMDTypeInt4GPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatumInt4.h"
 #include "naucrates/md/CGPDBTypeHelper.h"
@@ -177,7 +178,7 @@ public:
 		return true;
 	}
 
-	const IMDId *
+	gpos::pointer<const IMDId *>
 	CmpOpMdid() const override
 	{
 		return m_mdid_op_cmp.get();
@@ -214,7 +215,7 @@ public:
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;
 
 	// return the null constant for this type
-	IDatum *
+	gpos::pointer<IDatum *>
 	DatumNull() const override
 	{
 		return m_datum_null;
@@ -222,11 +223,12 @@ public:
 
 	// transformation method for generating datum from CDXLScalarConstValue
 	IDatum *GetDatumForDXLConstVal(
-		const CDXLScalarConstValue *dxl_op) const override;
+		gpos::pointer<const CDXLScalarConstValue *> dxl_op) const override;
 
 	// create typed datum from DXL datum
-	IDatum *GetDatumForDXLDatum(CMemoryPool *mp,
-								const CDXLDatum *dxl_datum) const override;
+	IDatum *GetDatumForDXLDatum(
+		CMemoryPool *mp,
+		gpos::pointer<const CDXLDatum *> dxl_datum) const override;
 
 	// generate the DXL datum from IDatum
 	CDXLDatum *GetDatumVal(CMemoryPool *mp, IDatum *datum) const override;

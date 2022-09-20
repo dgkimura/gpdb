@@ -19,6 +19,7 @@
 #define GPOPT_IComparator_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 namespace gpnaucrates
 {
@@ -44,24 +45,28 @@ public:
 	virtual ~IComparator() = default;
 
 	// tests if the two arguments are equal
-	virtual gpos::BOOL Equals(const IDatum *datum1,
-							  const IDatum *datum2) const = 0;
+	virtual gpos::BOOL Equals(gpos::pointer<const IDatum *> datum1,
+							  gpos::pointer<const IDatum *> datum2) const = 0;
 
 	// tests if the first argument is less than the second
-	virtual gpos::BOOL IsLessThan(const IDatum *datum1,
-								  const IDatum *datum2) const = 0;
+	virtual gpos::BOOL IsLessThan(
+		gpos::pointer<const IDatum *> datum1,
+		gpos::pointer<const IDatum *> datum2) const = 0;
 
 	// tests if the first argument is less or equal to the second
-	virtual gpos::BOOL IsLessThanOrEqual(const IDatum *datum1,
-										 const IDatum *datum2) const = 0;
+	virtual gpos::BOOL IsLessThanOrEqual(
+		gpos::pointer<const IDatum *> datum1,
+		gpos::pointer<const IDatum *> datum2) const = 0;
 
 	// tests if the first argument is greater than the second
-	virtual gpos::BOOL IsGreaterThan(const IDatum *datum1,
-									 const IDatum *datum2) const = 0;
+	virtual gpos::BOOL IsGreaterThan(
+		gpos::pointer<const IDatum *> datum1,
+		gpos::pointer<const IDatum *> datum2) const = 0;
 
 	// tests if the first argument is greater or equal to the second
-	virtual gpos::BOOL IsGreaterThanOrEqual(const IDatum *datum1,
-											const IDatum *datum2) const = 0;
+	virtual gpos::BOOL IsGreaterThanOrEqual(
+		gpos::pointer<const IDatum *> datum1,
+		gpos::pointer<const IDatum *> datum2) const = 0;
 };
 }  // namespace gpopt
 

@@ -15,6 +15,7 @@
 #define GPDXL_CDXLTableDescriptor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLColDescr.h"
 #include "naucrates/md/CMDName.h"
@@ -82,7 +83,7 @@ public:
 	INT LockMode() const;
 
 	// get the column descriptor at the given position
-	const CDXLColDescr *GetColumnDescrAt(ULONG idx) const;
+	gpos::pointer<const CDXLColDescr *> GetColumnDescrAt(ULONG idx) const;
 
 	// serialize to dxl format
 	void SerializeToDXL(CXMLSerializer *xml_serializer) const;

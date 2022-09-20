@@ -19,6 +19,7 @@
 #define GPDXL_CDXLDirectDispatchInfo_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
 
@@ -65,7 +66,7 @@ public:
 	}
 
 	// accessor to array of datums
-	CDXLDatum2dArray *
+	gpos::pointer<CDXLDatum2dArray *>
 	GetDispatchIdentifierDatumArray() const
 	{
 		return m_dispatch_identifer_datum_array;

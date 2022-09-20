@@ -9,6 +9,7 @@
 
 #include "gpos/attributes.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/unordered_map.h"
 #include "gpos/types.h"
 
@@ -96,7 +97,7 @@ public:
 		const const_iterator end_;
 
 	public:
-		LegacyIterator(const UnorderedMap *map)
+		LegacyIterator(gpos::pointer<const UnorderedMap *> map)
 			: iterator_(map->begin()), end_(map->end())
 		{
 		}

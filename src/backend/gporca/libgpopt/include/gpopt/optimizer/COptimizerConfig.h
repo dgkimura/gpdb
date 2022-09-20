@@ -15,6 +15,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CWindowOids.h"
 #include "gpopt/cost/ICostModel.h"
@@ -74,42 +75,42 @@ public:
 
 
 	// plan enumeration configuration
-	CEnumeratorConfig *
+	gpos::pointer<CEnumeratorConfig *>
 	GetEnumeratorCfg() const
 	{
 		return m_enumerator_cfg;
 	}
 
 	// statistics configuration
-	CStatisticsConfig *
+	gpos::pointer<CStatisticsConfig *>
 	GetStatsConf() const
 	{
 		return m_stats_conf;
 	}
 
 	// CTE configuration
-	CCTEConfig *
+	gpos::pointer<CCTEConfig *>
 	GetCteConf() const
 	{
 		return m_cte_conf;
 	}
 
 	// cost model configuration
-	ICostModel *
+	gpos::pointer<ICostModel *>
 	GetCostModel() const
 	{
 		return m_cost_model;
 	}
 
 	// default window oids
-	CWindowOids *
+	gpos::pointer<CWindowOids *>
 	GetWindowOids() const
 	{
 		return m_window_oids;
 	}
 
 	// hint configuration
-	CHint *
+	gpos::pointer<CHint *>
 	GetHint() const
 	{
 		return m_hint;

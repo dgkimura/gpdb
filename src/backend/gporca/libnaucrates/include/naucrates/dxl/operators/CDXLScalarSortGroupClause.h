@@ -17,6 +17,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -96,7 +97,7 @@ public:
 		return m_hashable;
 	}
 
-	static CDXLScalarSortGroupClause *
+	static gpos::cast_func<CDXLScalarSortGroupClause *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -114,7 +115,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	void
-	AssertValid(const CDXLNode *, BOOL) const override
+	AssertValid(gpos::pointer<const CDXLNode *>, BOOL) const override
 	{
 	}
 #endif	// GPOS_DEBUG
@@ -133,7 +134,7 @@ public:
 
 	void
 	SerializeToDXL(CXMLSerializer *xml_serializer,
-				   const CDXLNode *) const override
+				   gpos::pointer<const CDXLNode *>) const override
 	{
 		const CWStringConst *element_name = GetOpNameStr();
 

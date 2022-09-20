@@ -23,6 +23,7 @@
 #include "gpos/common/DbgPrintMixin.h"
 #include "gpos/common/Ref.h"
 #include "gpos/common/Vector.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringConst.h"
 
 #include "naucrates/dxl/gpdb_types.h"
@@ -97,7 +98,7 @@ public:
 
 
 	// equality check
-	virtual BOOL Equals(const IMDId *mdid) const = 0;
+	virtual BOOL Equals(gpos::pointer<const IMDId *> mdid) const = 0;
 
 	// computes the hash value for the metadata id
 	virtual ULONG HashValue() const = 0;
@@ -135,7 +136,7 @@ public:
 	// static hash functions for use in different indexing structures,
 	// e.g. hashmaps, MD cache, etc.
 	static ULONG
-	MDIdHash(const IMDId *mdid)
+	MDIdHash(gpos::pointer<const IMDId *> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid);
 		return mdid->HashValue();
@@ -144,7 +145,8 @@ public:
 	// static equality functions for use in different structures,
 	// e.g. hashmaps, MD cache, etc.
 	static BOOL
-	MDIdCompare(const IMDId *left_mdid, const IMDId *right_mdid)
+	MDIdCompare(gpos::pointer<const IMDId *> left_mdid,
+				gpos::pointer<const IMDId *> right_mdid)
 	{
 		GPOS_ASSERT(nullptr != left_mdid && nullptr != right_mdid);
 		return left_mdid->Equals(right_mdid);
@@ -178,7 +180,7 @@ public:
 
 	// safe validity function
 	static BOOL
-	IsValid(const IMDId *mdid)
+	IsValid(gpos::pointer<const IMDId *> mdid)
 	{
 		return nullptr != mdid && mdid->IsValid();
 	}

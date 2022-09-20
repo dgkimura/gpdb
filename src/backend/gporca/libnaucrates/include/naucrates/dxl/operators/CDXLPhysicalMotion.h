@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLPhysical.h"
@@ -37,7 +38,7 @@ class CDXLPhysicalMotion : public CDXLPhysical
 private:
 	// serialize the given list of segment ids into a comma-separated string
 	CWStringDynamic *GetSegIdsCommaSeparatedStr(
-		const IntPtrArray *segment_ids_array) const;
+		gpos::pointer<const IntPtrArray *> segment_ids_array) const;
 
 	// serialize input and output segment ids into a comma-separated string
 	CWStringDynamic *GetInputSegIdsStr() const;
@@ -62,8 +63,8 @@ public:
 	~CDXLPhysicalMotion() override;
 
 	// accessors
-	const IntPtrArray *GetInputSegIdsArray() const;
-	const IntPtrArray *GetOutputSegIdsArray() const;
+	gpos::pointer<const IntPtrArray *> GetInputSegIdsArray() const;
+	gpos::pointer<const IntPtrArray *> GetOutputSegIdsArray() const;
 
 	// setters
 	void SetInputSegIds(IntPtrArray *input_segids_array);
@@ -75,7 +76,7 @@ public:
 	virtual ULONG GetRelationChildIdx() const = 0;
 
 	// conversion function
-	static CDXLPhysicalMotion *
+	static gpos::cast_func<CDXLPhysicalMotion *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

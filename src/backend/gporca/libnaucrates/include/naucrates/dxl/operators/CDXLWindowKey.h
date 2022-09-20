@@ -13,6 +13,7 @@
 #define GPDXL_CDXLWindowKey_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLWindowFrame.h"
 
@@ -53,7 +54,7 @@ public:
 	void SetWindowFrame(CDXLWindowFrame *window_frame);
 
 	// return window frame
-	CDXLWindowFrame *
+	gpos::pointer<CDXLWindowFrame *>
 	GetWindowFrame() const
 	{
 		return m_window_frame_dxl;
@@ -63,7 +64,7 @@ public:
 	void SetSortColList(CDXLNode *sort_col_list_dxlnode);
 
 	// sort columns
-	CDXLNode *
+	gpos::pointer<CDXLNode *>
 	GetSortColListDXL() const
 	{
 		return m_sort_col_list_dxlnode;

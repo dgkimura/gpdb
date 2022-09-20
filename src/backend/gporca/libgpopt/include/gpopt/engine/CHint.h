@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPool.h"
 
 #define JOIN_ORDER_DP_THRESHOLD ULONG(10)
@@ -146,7 +147,7 @@ public:
 
 	// generate default hint configurations, which disables sort during insert on
 	// append only row-oriented partitioned tables by default
-	static CHint *
+	static gpos::owner<CHint *>
 	PhintDefault(CMemoryPool *mp)
 	{
 		return GPOS_NEW(mp) CHint(

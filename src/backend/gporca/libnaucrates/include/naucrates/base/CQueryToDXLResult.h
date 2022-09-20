@@ -14,6 +14,7 @@
 #define GPDXL_CTranslatorQueryToDXLOutput_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 
@@ -50,13 +51,13 @@ public:
 	~CQueryToDXLResult();
 
 	// return the DXL representation of the query
-	const CDXLNode *CreateDXLNode() const;
+	gpos::pointer<const CDXLNode *> CreateDXLNode() const;
 
 	// return the array of output columns
-	const CDXLNodeArray *GetOutputColumnsDXLArray() const;
+	gpos::pointer<const CDXLNodeArray *> GetOutputColumnsDXLArray() const;
 
 	// return the array of CTEs
-	const CDXLNodeArray *GetCTEProducerDXLArray() const;
+	gpos::pointer<const CDXLNodeArray *> GetCTEProducerDXLArray() const;
 };
 }  // namespace gpdxl
 

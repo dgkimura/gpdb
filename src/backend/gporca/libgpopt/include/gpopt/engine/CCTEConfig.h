@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPool.h"
 
 namespace gpopt
@@ -51,7 +52,7 @@ public:
 	}
 
 	// generate default optimizer configurations
-	static CCTEConfig *
+	static gpos::owner<CCTEConfig *>
 	PcteconfDefault(CMemoryPool *mp)
 	{
 		return GPOS_NEW(mp) CCTEConfig(0 /* cte_inlining_cut_off */);

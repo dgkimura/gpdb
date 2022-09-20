@@ -12,6 +12,7 @@
 #define GPOPT_CScalarBoolOp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
@@ -106,7 +107,7 @@ public:
 	}
 
 	// conversion function
-	static CScalarBoolOp *
+	static gpos::cast_func<CScalarBoolOp *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

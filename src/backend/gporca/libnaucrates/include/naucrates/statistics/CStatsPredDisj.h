@@ -12,6 +12,7 @@
 #define GPNAUCRATES_CStatsPredDisj_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/statistics/CPoint.h"
 #include "naucrates/statistics/CStatsPred.h"
@@ -37,7 +38,7 @@ private:
 	CStatsPredDisj &operator=(CStatsPredDisj &);
 
 	// array of filters
-	CStatsPredPtrArry *m_disj_pred_stats_array;
+	gpos::owner<CStatsPredPtrArry *> m_disj_pred_stats_array;
 
 public:
 	// ctor
@@ -60,7 +61,7 @@ public:
 	}
 
 	// return the array of predicate filters
-	CStatsPredPtrArry *
+	gpos::pointer<CStatsPredPtrArry *>
 	GetDisjPredStatsArray() const
 	{
 		return m_disj_pred_stats_array;
@@ -80,10 +81,11 @@ public:
 	}
 
 	// return the column id of the filter based on the column ids of its child filters
-	static ULONG GetColId(const CStatsPredPtrArry *pdrgpstatspred);
+	static ULONG GetColId(
+		gpos::pointer<const CStatsPredPtrArry *> pdrgpstatspred);
 
 	// conversion function
-	static CStatsPredDisj *
+	static gpos::cast_func<CStatsPredDisj *>
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

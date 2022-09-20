@@ -105,7 +105,8 @@ private:
 	CTranslatorDXLToExpr(const CTranslatorDXLToExpr &);
 
 	// collapse a not node based on its child, return NULL if it is not collapsible.
-	CExpression *PexprCollapseNot(const CDXLNode *pdxlnBoolExpr);
+	CExpression *PexprCollapseNot(
+		gpos::pointer<const CDXLNode *> pdxlnBoolExpr);
 
 	// helper for creating quantified subquery
 	CExpression *PexprScalarSubqueryQuantified(
@@ -113,27 +114,32 @@ private:
 		ULONG colid, CDXLNode *pdxlnLogicalChild, CDXLNode *pdxlnScalarChild);
 
 	// translate a logical DXL operator into an optimizer expression
-	CExpression *PexprLogical(const CDXLNode *dxlnode);
+	CExpression *PexprLogical(gpos::pointer<const CDXLNode *> dxlnode);
 
 	// translate a DXL logical select into an expr logical select
-	CExpression *PexprLogicalSelect(const CDXLNode *pdxlnLgSelect);
+	CExpression *PexprLogicalSelect(
+		gpos::pointer<const CDXLNode *> pdxlnLgSelect);
 
 	// translate a DXL logical project into an expr logical project
-	CExpression *PexprLogicalProject(const CDXLNode *pdxlnLgProject);
+	CExpression *PexprLogicalProject(
+		gpos::pointer<const CDXLNode *> pdxlnLgProject);
 
 	// translate a DXL logical window into an expr logical project
-	CExpression *PexprLogicalSeqPr(const CDXLNode *pdxlnLgProject);
+	CExpression *PexprLogicalSeqPr(
+		gpos::pointer<const CDXLNode *> pdxlnLgProject);
 
 	// create the array of column reference used in the partition by column
 	// list of a window specification
 	CColRefArray *PdrgpcrPartitionByCol(
-		const ULongPtrArray *partition_by_colid_array);
+		gpos::pointer<const ULongPtrArray *> partition_by_colid_array);
 
 	// translate a DXL logical window into an expr logical project
-	CExpression *PexprCreateWindow(const CDXLNode *pdxlnLgProject);
+	CExpression *PexprCreateWindow(
+		gpos::pointer<const CDXLNode *> pdxlnLgProject);
 
 	// translate a DXL logical set op into an expr logical set op
-	CExpression *PexprLogicalSetOp(const CDXLNode *pdxlnLgProject);
+	CExpression *PexprLogicalSetOp(
+		gpos::pointer<const CDXLNode *> pdxlnLgProject);
 
 	// return a project element on a cast expression
 	CExpression *PexprCastPrjElem(IMDId *pmdidSource, IMDId *mdid_dest,
@@ -142,7 +148,7 @@ private:
 
 	// build expression and columns of SetOpChild
 	void BuildSetOpChild(
-		const CDXLNode *pdxlnSetOp, ULONG child_index,
+		gpos::pointer<const CDXLNode *> pdxlnSetOp, ULONG child_index,
 		CExpression **ppexprChild,	   // output: generated child expression
 		CColRefArray **ppdrgpcrChild,  // output: generated child input columns
 		CExpressionArray **
@@ -151,117 +157,131 @@ private:
 
 	// preprocess inputs to the set operator (adding casts to columns  when needed)
 	CExpressionArray *PdrgpexprPreprocessSetOpInputs(
-		const CDXLNode *dxlnode, CColRef2dArray *pdrgdrgpcrInput,
-		ULongPtrArray *pdrgpulOutput);
+		gpos::pointer<const CDXLNode *> dxlnode,
+		CColRef2dArray *pdrgdrgpcrInput, ULongPtrArray *pdrgpulOutput);
 
 	// create new column reference and add to the hashmap maintaining
 	// the mapping between DXL ColIds and column reference.
-	CColRef *PcrCreate(const CColRef *colref, const IMDType *pmdtype,
+	CColRef *PcrCreate(const CColRef *colref,
+					   gpos::pointer<const IMDType *> pmdtype,
 					   INT type_modifier, BOOL fStoreMapping, ULONG colid);
 
 	// check if we currently support the casting of such column types
-	static BOOL FCastingUnknownType(IMDId *pmdidSource, IMDId *mdid_dest);
+	static BOOL FCastingUnknownType(gpos::pointer<IMDId *> pmdidSource,
+									gpos::pointer<IMDId *> mdid_dest);
 
 	// translate a DXL logical get into an expr logical get
-	CExpression *PexprLogicalGet(const CDXLNode *pdxlnLgGet);
+	CExpression *PexprLogicalGet(gpos::pointer<const CDXLNode *> pdxlnLgGet);
 
 	// translate a DXL logical func get into an expr logical TVF
-	CExpression *PexprLogicalTVF(const CDXLNode *pdxlnLgTVF);
+	CExpression *PexprLogicalTVF(gpos::pointer<const CDXLNode *> pdxlnLgTVF);
 
 	// translate a DXL logical group by into an expr logical group by
-	CExpression *PexprLogicalGroupBy(const CDXLNode *pdxlnLgSelect);
+	CExpression *PexprLogicalGroupBy(
+		gpos::pointer<const CDXLNode *> pdxlnLgSelect);
 
 	// translate a DXL limit node into an expr logical limit expression
-	CExpression *PexprLogicalLimit(const CDXLNode *pdxlnLgLimit);
+	CExpression *PexprLogicalLimit(
+		gpos::pointer<const CDXLNode *> pdxlnLgLimit);
 
 	// translate a DXL logical join into an expr logical join
-	CExpression *PexprLogicalJoin(const CDXLNode *pdxlnLgJoin);
+	CExpression *PexprLogicalJoin(gpos::pointer<const CDXLNode *> pdxlnLgJoin);
 
 	// translate a DXL right outer join
-	CExpression *PexprRightOuterJoin(const CDXLNode *dxlnode);
+	CExpression *PexprRightOuterJoin(gpos::pointer<const CDXLNode *> dxlnode);
 
 	// translate a DXL logical CTE anchor into an expr logical CTE anchor
-	CExpression *PexprLogicalCTEAnchor(const CDXLNode *pdxlnLgCTEAnchor);
+	CExpression *PexprLogicalCTEAnchor(
+		gpos::pointer<const CDXLNode *> pdxlnLgCTEAnchor);
 
 	// translate a DXL logical CTE producer into an expr logical CTE producer
-	CExpression *PexprLogicalCTEProducer(const CDXLNode *pdxlnLgCTEProducer);
+	CExpression *PexprLogicalCTEProducer(
+		gpos::pointer<const CDXLNode *> pdxlnLgCTEProducer);
 
 	// translate a DXL logical CTE consumer into an expr logical CTE consumer
-	CExpression *PexprLogicalCTEConsumer(const CDXLNode *pdxlnLgCTEConsumer);
+	CExpression *PexprLogicalCTEConsumer(
+		gpos::pointer<const CDXLNode *> pdxlnLgCTEConsumer);
 
 	// get cte id for the given dxl cte id
 	ULONG UlMapCTEId(const ULONG ulIdOld);
 
 	// translate a DXL logical insert into expression
-	CExpression *PexprLogicalInsert(const CDXLNode *dxlnode);
+	CExpression *PexprLogicalInsert(gpos::pointer<const CDXLNode *> dxlnode);
 
 	// translate a DXL logical delete into expression
-	CExpression *PexprLogicalDelete(const CDXLNode *dxlnode);
+	CExpression *PexprLogicalDelete(gpos::pointer<const CDXLNode *> dxlnode);
 
 	// translate a DXL logical update into expression
-	CExpression *PexprLogicalUpdate(const CDXLNode *dxlnode);
+	CExpression *PexprLogicalUpdate(gpos::pointer<const CDXLNode *> dxlnode);
 
 	// translate a DXL logical CTAS into an INSERT expression
-	CExpression *PexprLogicalCTAS(const CDXLNode *dxlnode);
+	CExpression *PexprLogicalCTAS(gpos::pointer<const CDXLNode *> dxlnode);
 
 	// translate existential subquery
 	CExpression *PexprScalarSubqueryExistential(Edxlopid edxlopid,
 												CDXLNode *pdxlnLogicalChild);
 
 	// translate a DXL logical const table into the corresponding optimizer object
-	CExpression *PexprLogicalConstTableGet(const CDXLNode *pdxlnConstTableGet);
+	CExpression *PexprLogicalConstTableGet(
+		gpos::pointer<const CDXLNode *> pdxlnConstTableGet);
 
 	// translate a DXL ANY/ALL-quantified subquery into the corresponding subquery expression
 	CExpression *PexprScalarSubqueryQuantified(
-		const CDXLNode *pdxlnSubqueryAny);
+		gpos::pointer<const CDXLNode *> pdxlnSubqueryAny);
 
 	// translate a DXL scalar into an expr scalar
-	CExpression *PexprScalar(const CDXLNode *dxlnode);
+	CExpression *PexprScalar(gpos::pointer<const CDXLNode *> dxlnode);
 
 	// translate a DXL scalar if stmt into a scalar if
-	CExpression *PexprScalarIf(const CDXLNode *pdxlnIf);
+	CExpression *PexprScalarIf(gpos::pointer<const CDXLNode *> pdxlnIf);
 
 	// translate a DXL scalar switch into a scalar switch
-	CExpression *PexprScalarSwitch(const CDXLNode *pdxlnSwitch);
+	CExpression *PexprScalarSwitch(gpos::pointer<const CDXLNode *> pdxlnSwitch);
 
 	// translate a DXL scalar switch case into a scalar switch case
-	CExpression *PexprScalarSwitchCase(const CDXLNode *pdxlnSwitchCase);
+	CExpression *PexprScalarSwitchCase(
+		gpos::pointer<const CDXLNode *> pdxlnSwitchCase);
 
 	// translate a DXL scalar case test into a scalar case test
-	CExpression *PexprScalarCaseTest(const CDXLNode *pdxlnCaseTest);
+	CExpression *PexprScalarCaseTest(
+		gpos::pointer<const CDXLNode *> pdxlnCaseTest);
 
 	// translate a DXL scalar coalesce into a scalar coalesce
-	CExpression *PexprScalarCoalesce(const CDXLNode *pdxlnCoalesce);
+	CExpression *PexprScalarCoalesce(
+		gpos::pointer<const CDXLNode *> pdxlnCoalesce);
 
 	// translate a DXL scalar Min/Max into a scalar Min/Max
-	CExpression *PexprScalarMinMax(const CDXLNode *pdxlnMinMax);
+	CExpression *PexprScalarMinMax(gpos::pointer<const CDXLNode *> pdxlnMinMax);
 
 	// translate a DXL scalar compare into an expr scalar compare
-	CExpression *PexprScalarCmp(const CDXLNode *pdxlnCmp);
+	CExpression *PexprScalarCmp(gpos::pointer<const CDXLNode *> pdxlnCmp);
 
 	// translate a DXL scalar distinct compare into an expr scalar is distinct from
-	CExpression *PexprScalarIsDistinctFrom(const CDXLNode *pdxlnDistCmp);
+	CExpression *PexprScalarIsDistinctFrom(
+		gpos::pointer<const CDXLNode *> pdxlnDistCmp);
 
 	// translate a DXL scalar bool expr into scalar bool operator in the optimizer
-	CExpression *PexprScalarBoolOp(const CDXLNode *pdxlnBoolExpr);
+	CExpression *PexprScalarBoolOp(
+		gpos::pointer<const CDXLNode *> pdxlnBoolExpr);
 
 	// translate a DXL scalar operation into an expr scalar op
-	CExpression *PexprScalarOp(const CDXLNode *pdxlnOpExpr);
+	CExpression *PexprScalarOp(gpos::pointer<const CDXLNode *> pdxlnOpExpr);
 
 	// translate a DXL scalar func expr into scalar func operator in the optimizer
-	CExpression *PexprScalarFunc(const CDXLNode *pdxlnFuncExpr);
+	CExpression *PexprScalarFunc(gpos::pointer<const CDXLNode *> pdxlnFuncExpr);
 
 	// translate a DXL scalar agg ref expr into scalar agg func operator in the optimizer
-	CExpression *PexprAggFunc(const CDXLNode *pdxlnAggref);
+	CExpression *PexprAggFunc(gpos::pointer<const CDXLNode *> pdxlnAggref);
 
 	// translate a DXL scalar window ref expr into scalar window function operator in the optimizer
-	CExpression *PexprWindowFunc(const CDXLNode *pdxlnWindowRef);
+	CExpression *PexprWindowFunc(
+		gpos::pointer<const CDXLNode *> pdxlnWindowRef);
 
 	// translate the DXL representation of the window stage
 	static CScalarWindowFunc::EWinStage Ews(EdxlWinStage edxlws);
 
 	// translate the DXL representation of window frame into its respective representation in the optimizer
-	CWindowFrame *Pwf(const CDXLWindowFrame *window_frame);
+	CWindowFrame *Pwf(gpos::pointer<const CDXLWindowFrame *> window_frame);
 
 	// translate the DXL representation of window frame boundary into its respective representation in the optimizer
 	static CWindowFrame::EFrameBoundary Efb(EdxlFrameBoundary frame_boundary);
@@ -271,82 +291,92 @@ private:
 		EdxlFrameExclusionStrategy edxlfeb);
 
 	// translate a DXL scalar array
-	CExpression *PexprArray(const CDXLNode *dxlnode);
+	CExpression *PexprArray(gpos::pointer<const CDXLNode *> dxlnode);
 
 	// translate a DXL scalar arrayref
-	CExpression *PexprArrayRef(const CDXLNode *dxlnode);
+	CExpression *PexprArrayRef(gpos::pointer<const CDXLNode *> dxlnode);
 
-	CExpression *PexprValuesList(const CDXLNode *dxlnode);
+	CExpression *PexprValuesList(gpos::pointer<const CDXLNode *> dxlnode);
 
 	// translate a DXL scalar arrayref index list
-	CExpression *PexprArrayRefIndexList(const CDXLNode *dxlnode);
+	CExpression *PexprArrayRefIndexList(
+		gpos::pointer<const CDXLNode *> dxlnode);
 
 	// translate the arrayref index list type
 	static CScalarArrayRefIndexList::EIndexListType Eilt(
 		const CDXLScalarArrayRefIndexList::EIndexListBound eilb);
 
 	// translate a DXL scalar array compare
-	CExpression *PexprArrayCmp(const CDXLNode *dxlnode);
+	CExpression *PexprArrayCmp(gpos::pointer<const CDXLNode *> dxlnode);
 
 	// translate a DXL scalar ident into an expr scalar ident
-	CExpression *PexprScalarIdent(const CDXLNode *pdxlnIdent);
+	CExpression *PexprScalarIdent(gpos::pointer<const CDXLNode *> pdxlnIdent);
 
 	// translate a DXL scalar nullif into a scalar nullif expression
-	CExpression *PexprScalarNullIf(const CDXLNode *pdxlnNullIf);
+	CExpression *PexprScalarNullIf(gpos::pointer<const CDXLNode *> pdxlnNullIf);
 
 	// translate a DXL scalar null test into a scalar null test
 	gpos::owner<CExpression *> PexprScalarNullTest(
-		const CDXLNode *pdxlnNullTest);
+		gpos::pointer<const CDXLNode *> pdxlnNullTest);
 
 	// translate a DXL scalar boolean test into a scalar boolean test
-	CExpression *PexprScalarBooleanTest(const CDXLNode *pdxlnScBoolTest);
+	CExpression *PexprScalarBooleanTest(
+		gpos::pointer<const CDXLNode *> pdxlnScBoolTest);
 
 	// translate a DXL scalar cast type into a scalar cast type
-	CExpression *PexprScalarCast(const CDXLNode *pdxlnCast);
+	CExpression *PexprScalarCast(gpos::pointer<const CDXLNode *> pdxlnCast);
 
 	// translate a DXL scalar coerce a scalar coerce
-	CExpression *PexprScalarCoerceToDomain(const CDXLNode *pdxlnCoerce);
+	CExpression *PexprScalarCoerceToDomain(
+		gpos::pointer<const CDXLNode *> pdxlnCoerce);
 
 	// translate a DXL scalar coerce a scalar coerce using I/O functions
-	CExpression *PexprScalarCoerceViaIO(const CDXLNode *pdxlnCoerce);
+	CExpression *PexprScalarCoerceViaIO(
+		gpos::pointer<const CDXLNode *> pdxlnCoerce);
 
 	// translate a DXL scalar array coerce expression using given element coerce function
 	CExpression *PexprScalarArrayCoerceExpr(
-		const CDXLNode *pdxlnArrayCoerceExpr);
+		gpos::pointer<const CDXLNode *> pdxlnArrayCoerceExpr);
 
 	// translate a DXL scalar subquery operator into a scalar subquery expression
-	CExpression *PexprScalarSubquery(const CDXLNode *pdxlnSubquery);
+	CExpression *PexprScalarSubquery(
+		gpos::pointer<const CDXLNode *> pdxlnSubquery);
 
 	// translate a DXL scalar const value into a
 	// scalar constant representation in optimizer
-	CExpression *PexprScalarConst(const CDXLNode *pdxlnConst);
+	CExpression *PexprScalarConst(gpos::pointer<const CDXLNode *> pdxlnConst);
 
-	CExpression *PexprSortGroupClause(const CDXLNode *pdxlnSortGroupClause);
+	CExpression *PexprSortGroupClause(
+		gpos::pointer<const CDXLNode *> pdxlnSortGroupClause);
 
 	// translate a DXL project list node into a project list expression
-	CExpression *PexprScalarProjList(const CDXLNode *proj_list_dxlnode);
+	CExpression *PexprScalarProjList(
+		gpos::pointer<const CDXLNode *> proj_list_dxlnode);
 
 	// translate a DXL project elem node into a project elem expression
-	CExpression *PexprScalarProjElem(const CDXLNode *pdxlnProjElem);
+	CExpression *PexprScalarProjElem(
+		gpos::pointer<const CDXLNode *> pdxlnProjElem);
 
 	// construct an order spec from a dxl sort col list node
-	COrderSpec *Pos(const CDXLNode *sort_col_list_dxlnode);
+	COrderSpec *Pos(gpos::pointer<const CDXLNode *> sort_col_list_dxlnode);
 
 	// translate a dxl node into an expression tree
-	CExpression *Pexpr(const CDXLNode *dxlnode);
+	CExpression *Pexpr(gpos::pointer<const CDXLNode *> dxlnode);
 
 	// update table descriptor's distribution columns from the MD cache object
-	static void AddDistributionColumns(CTableDescriptor *ptabdesc,
-									   const IMDRelation *pmdrel,
-									   IntToUlongMap *phmiulAttnoColMapping);
+	static void AddDistributionColumns(
+		CTableDescriptor *ptabdesc, gpos::pointer<const IMDRelation *> pmdrel,
+		IntToUlongMap *phmiulAttnoColMapping);
 
 	// main translation routine for DXL tree -> Expr tree
-	CExpression *Pexpr(const CDXLNode *dxlnode,
-					   const CDXLNodeArray *query_output_dxlnode_array,
-					   const CDXLNodeArray *cte_producers);
+	CExpression *Pexpr(
+		gpos::pointer<const CDXLNode *> dxlnode,
+		gpos::pointer<const CDXLNodeArray *> query_output_dxlnode_array,
+		gpos::pointer<const CDXLNodeArray *> cte_producers);
 
 	// translate children of a DXL node
-	CExpressionArray *PdrgpexprChildren(const CDXLNode *dxlnode);
+	CExpressionArray *PdrgpexprChildren(
+		gpos::pointer<const CDXLNode *> dxlnode);
 
 	// construct a table descriptor from DXL
 	CTableDescriptor *Ptabdesc(CDXLTableDescr *table_descr);
@@ -358,12 +388,13 @@ private:
 	void RegisterMDRelationCtas(CDXLLogicalCTAS *pdxlopCTAS);
 
 	// create an array of column references from an array of dxl column references
-	CColRefArray *Pdrgpcr(const CDXLColDescrArray *dxl_col_descr_array);
+	CColRefArray *Pdrgpcr(
+		gpos::pointer<const CDXLColDescrArray *> dxl_col_descr_array);
 
 	// construct the mapping between the DXL ColId and CColRef
 	void ConstructDXLColId2ColRefMapping(
-		const CDXLColDescrArray *dxl_col_descr_array,
-		const CColRefArray *colref_array);
+		gpos::pointer<const CDXLColDescrArray *> dxl_col_descr_array,
+		gpos::pointer<const CColRefArray *> colref_array);
 
 	void MarkUnknownColsAsUnused();
 
@@ -381,12 +412,12 @@ public:
 
 	// translate the dxl query with its associated output column and CTEs
 	CExpression *PexprTranslateQuery(
-		const CDXLNode *dxlnode,
-		const CDXLNodeArray *query_output_dxlnode_array,
-		const CDXLNodeArray *cte_producers);
+		gpos::pointer<const CDXLNode *> dxlnode,
+		gpos::pointer<const CDXLNodeArray *> query_output_dxlnode_array,
+		gpos::pointer<const CDXLNodeArray *> cte_producers);
 
 	// translate a dxl scalar expression
-	CExpression *PexprTranslateScalar(const CDXLNode *dxlnode,
+	CExpression *PexprTranslateScalar(gpos::pointer<const CDXLNode *> dxlnode,
 									  CColRefArray *colref_array,
 									  ULongPtrArray *colids = nullptr);
 

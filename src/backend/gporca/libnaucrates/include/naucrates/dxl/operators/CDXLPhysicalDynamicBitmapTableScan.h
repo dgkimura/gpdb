@@ -13,6 +13,7 @@
 #define GPDXL_CDXLPhysicalDynamicBitmapTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalAbstractBitmapScan.h"
 
@@ -70,7 +71,7 @@ public:
 
 	IMdIdArray *GetParts() const;
 
-	const ULongPtrArray *
+	gpos::pointer<const ULongPtrArray *>
 	GetSelectorIds() const
 	{
 		return m_selector_ids;
@@ -78,10 +79,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						gpos::pointer<const CDXLNode *> node) const override;
 
 	// conversion function
-	static CDXLPhysicalDynamicBitmapTableScan *
+	static gpos::cast_func<CDXLPhysicalDynamicBitmapTableScan *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

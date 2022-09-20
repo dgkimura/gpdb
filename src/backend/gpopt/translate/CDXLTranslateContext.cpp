@@ -15,6 +15,8 @@
 
 #include "gpopt/translate/CDXLTranslateContext.h"
 
+#include "gpos/common/owner.h"
+
 using namespace gpdxl;
 using namespace gpos;
 
@@ -128,7 +130,7 @@ CDXLTranslateContext::GetTargetEntry(ULONG colid) const
 //		Lookup col->param mapping associated with a given col id
 //
 //---------------------------------------------------------------------------
-const CMappingElementColIdParamId *
+gpos::pointer<const CMappingElementColIdParamId *>
 CDXLTranslateContext::GetParamIdMappingElement(ULONG colid) const
 {
 	return m_colid_to_paramid_map->Find(&colid);

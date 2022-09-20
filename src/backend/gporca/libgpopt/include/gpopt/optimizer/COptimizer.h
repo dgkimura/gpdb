@@ -82,10 +82,10 @@ public:
 	static CDXLNode *PdxlnOptimize(
 		CMemoryPool *mp,
 		CMDAccessor *md_accessor,  // MD accessor
-		const CDXLNode *query,
-		const CDXLNodeArray
-			*query_output_dxlnode_array,  // required output columns
-		const CDXLNodeArray *cte_producers,
+		gpos::pointer<const CDXLNode *> query,
+		gpos::pointer<const CDXLNodeArray *>
+			query_output_dxlnode_array,	 // required output columns
+		gpos::pointer<const CDXLNodeArray *> cte_producers,
 		gpos::pointer<IConstExprEvaluator *>
 			pceeval,		// constant expression evaluator
 		ULONG ulHosts,		// number of hosts (data nodes) in the system

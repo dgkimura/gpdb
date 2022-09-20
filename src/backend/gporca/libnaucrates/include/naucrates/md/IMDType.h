@@ -15,6 +15,7 @@
 #define GPMD_IMDCacheType_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLDatum.h"
 #include "naucrates/dxl/operators/CDXLScalarConstValue.h"
@@ -102,7 +103,7 @@ public:
 	virtual IMDId *GetMdidForAggType(EAggType agg_type) const = 0;
 
 	// id of comparison operator for type used in btree lookups
-	virtual const IMDId *CmpOpMdid() const = 0;
+	virtual gpos::pointer<const IMDId *> CmpOpMdid() const = 0;
 
 	// id of hash operator for type
 	virtual BOOL IsHashable() const = 0;
@@ -121,11 +122,11 @@ public:
 
 	// transformation function for datums
 	virtual IDatum *GetDatumForDXLConstVal(
-		const CDXLScalarConstValue *dxl_op) const = 0;
+		gpos::pointer<const CDXLScalarConstValue *> dxl_op) const = 0;
 
 	// construct a datum from a DXL datum
-	virtual IDatum *GetDatumForDXLDatum(CMemoryPool *mp,
-										const CDXLDatum *dxl_datum) const = 0;
+	virtual IDatum *GetDatumForDXLDatum(
+		CMemoryPool *mp, gpos::pointer<const CDXLDatum *> dxl_datum) const = 0;
 
 	// is type fixed length
 	virtual BOOL IsFixedLength() const = 0;
@@ -172,12 +173,13 @@ public:
 	static const CWStringConst *GetCmpTypeStr(IMDType::ECmpType cmp_type);
 
 	// return true if we can perform statistical comparison between datums of these two types; else return false
-	static BOOL StatsAreComparable(const IMDType *mdtype_first,
-								   const IMDType *mdtype_second);
+	static BOOL StatsAreComparable(
+		gpos::pointer<const IMDType *> mdtype_first,
+		gpos::pointer<const IMDType *> mdtype_second);
 
 	// return true if we can perform statistical comparison between datum of the given type and a given datum; else return false
-	static BOOL StatsAreComparable(const IMDType *mdtype_first,
-								   const IDatum *datum_second);
+	static BOOL StatsAreComparable(gpos::pointer<const IMDType *> mdtype_first,
+								   gpos::pointer<const IDatum *> datum_second);
 };
 }  // namespace gpmd
 

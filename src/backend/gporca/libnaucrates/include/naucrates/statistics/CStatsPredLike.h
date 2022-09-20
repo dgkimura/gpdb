@@ -12,6 +12,7 @@
 #define GPNAUCRATES_CStatsPredLike_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 #include "naucrates/md/IMDType.h"
@@ -64,14 +65,14 @@ public:
 	}
 
 	// left hand side of the LIKE expression
-	virtual CExpression *
+	virtual gpos::pointer<CExpression *>
 	GetExprOnLeft() const
 	{
 		return m_expr_left;
 	}
 
 	// right hand side of the LIKE expression
-	virtual CExpression *
+	virtual gpos::pointer<CExpression *>
 	GetExprOnRight() const
 	{
 		return m_expr_right;
@@ -81,7 +82,7 @@ public:
 	virtual CDouble DefaultScaleFactor() const;
 
 	// conversion function
-	static CStatsPredLike *
+	static gpos::cast_func<CStatsPredLike *>
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

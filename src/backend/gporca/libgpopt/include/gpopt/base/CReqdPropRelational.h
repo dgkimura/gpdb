@@ -12,6 +12,7 @@
 #define GPOPT_CReqdPropRelational_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CColRefSet.h"
@@ -66,14 +67,14 @@ public:
 	}
 
 	// stat columns accessor
-	CColRefSet *
+	gpos::pointer<CColRefSet *>
 	PcrsStat() const
 	{
 		return m_pcrsStat;
 	}
 
 	// partition predicate accessor
-	CExpression *
+	gpos::pointer<CExpression *>
 	PexprPartPred() const
 	{
 		return m_pexprPartPred;

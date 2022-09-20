@@ -16,6 +16,7 @@
 #define GPDXL_CConstExprEvaluator_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/eval/IConstDXLNodeEvaluator.h"
 #include "gpopt/mdcache/CMDAccessor.h"
@@ -59,7 +60,8 @@ private:
 
 		~CEmptyMappingColIdVar() override = default;
 
-		Var *VarFromDXLNodeScId(const CDXLScalarIdent *scalar_ident) override;
+		Var *VarFromDXLNodeScId(
+			gpos::pointer<const CDXLScalarIdent *> scalar_ident) override;
 	};
 
 	// memory pool, not owned
@@ -90,7 +92,7 @@ public:
 	// evaluate given constant expressionand return the DXL representation of the result.
 	// if the expression has variables, an error is thrown.
 	// caller keeps ownership of 'expr_dxlnode' and takes ownership of the returned pointer
-	CDXLNode *EvaluateExpr(const CDXLNode *expr) override;
+	CDXLNode *EvaluateExpr(gpos::pointer<const CDXLNode *> expr) override;
 
 	// returns true iff the evaluator can evaluate constant expressions without subqueries
 	BOOL

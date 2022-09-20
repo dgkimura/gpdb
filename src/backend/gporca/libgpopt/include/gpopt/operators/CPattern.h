@@ -12,6 +12,7 @@
 #define GPOPT_CPattern_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/COperator.h"
 
@@ -70,7 +71,7 @@ public:
 										  BOOL must_exist) override;
 
 	// conversion function
-	static CPattern *
+	static gpos::cast_func<CPattern *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -81,7 +82,7 @@ public:
 
 	// helper to check multi-node pattern
 	static BOOL
-	FMultiNode(COperator *pop)
+	FMultiNode(gpos::pointer<COperator *> pop)
 	{
 		return COperator::EopPatternMultiLeaf == pop->Eopid() ||
 			   COperator::EopPatternMultiTree == pop->Eopid();

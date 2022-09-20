@@ -12,6 +12,7 @@
 #define GPNAUCRATES_CStatsPredPoint_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDType.h"
 #include "naucrates/statistics/CPoint.h"
@@ -43,7 +44,7 @@ private:
 	CStatsPred::EStatsCmpType m_stats_cmp_type;
 
 	// point to be used for comparison
-	CPoint *m_pred_point;
+	gpos::owner<CPoint *> m_pred_point;
 
 	// add padding to datums when needed
 	static IDatum *PreprocessDatum(CMemoryPool *mp, const CColRef *colref,
@@ -76,7 +77,7 @@ public:
 	}
 
 	// filter point
-	virtual CPoint *
+	virtual gpos::pointer<CPoint *>
 	GetPredPoint() const
 	{
 		return m_pred_point;
@@ -90,7 +91,7 @@ public:
 	}
 
 	// conversion function
-	static CStatsPredPoint *
+	static gpos::cast_func<CStatsPredPoint *>
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

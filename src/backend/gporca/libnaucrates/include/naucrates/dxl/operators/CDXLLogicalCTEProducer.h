@@ -12,6 +12,7 @@
 #define GPDXL_CDXLLogicalCTEProducer_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLLogical.h"
 
@@ -57,7 +58,7 @@ public:
 		return m_id;
 	}
 
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	GetOutputColIdsArray() const
 	{
 		return m_output_colids_array;
@@ -65,16 +66,17 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(gpos::pointer<const CDXLNode *>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLLogicalCTEProducer *
+	static gpos::cast_func<CDXLLogicalCTEProducer *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

@@ -13,6 +13,7 @@
 #define GPDXL_CDXLScalarConstValue_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/dxl/operators/CDXLDatum.h"
@@ -48,7 +49,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// return the datum value
-	const CDXLDatum *
+	gpos::pointer<const CDXLDatum *>
 	GetDatumVal() const
 	{
 		return m_dxl_datum;
@@ -59,10 +60,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						gpos::pointer<const CDXLNode *> node) const override;
 
 	// conversion function
-	static CDXLScalarConstValue *
+	static gpos::cast_func<CDXLScalarConstValue *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -76,7 +77,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

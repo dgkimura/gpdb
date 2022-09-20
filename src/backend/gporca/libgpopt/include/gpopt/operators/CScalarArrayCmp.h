@@ -12,6 +12,7 @@
 #define GPOPT_CScalarArrayCmp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
@@ -118,7 +119,7 @@ public:
 	}
 
 	// conversion function
-	static CScalarArrayCmp *
+	static gpos::cast_func<CScalarArrayCmp *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

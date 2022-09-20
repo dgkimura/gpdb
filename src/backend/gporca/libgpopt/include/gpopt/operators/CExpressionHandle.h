@@ -14,6 +14,7 @@
 #define GPOPT_CExpressionHandle_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdProp.h"
@@ -174,7 +175,7 @@ public:
 	IStatistics *Pstats();
 
 	// required properties of attached expr/gexpr
-	CReqdProp *
+	gpos::pointer<CReqdProp *>
 	Prp() const
 	{
 		return m_prp;
@@ -212,14 +213,14 @@ public:
 							 CCostContext **grandchildContext) const;
 
 	// accessor for expression
-	CExpression *
+	gpos::pointer<CExpression *>
 	Pexpr() const
 	{
 		return m_pexpr;
 	}
 
 	// accessor for group expression
-	CGroupExpression *
+	gpos::pointer<CGroupExpression *>
 	Pgexpr() const
 	{
 		return m_pgexpr;

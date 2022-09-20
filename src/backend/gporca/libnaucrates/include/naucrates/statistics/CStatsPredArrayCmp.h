@@ -12,6 +12,7 @@
 #define GPNAUCRATES_CStatsPredArrayCmp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDType.h"
 #include "naucrates/statistics/CPoint.h"
@@ -35,7 +36,7 @@ private:
 	// comparison type
 	CStatsPred::EStatsCmpType m_stats_cmp_type;
 
-	CPointArray *m_points;
+	gpos::owner<CPointArray *> m_points;
 
 public:
 	CStatsPredArrayCmp &operator=(CStatsPredArrayCmp &) = delete;
@@ -66,14 +67,14 @@ public:
 		return CStatsPred::EsptArrayCmp;
 	}
 
-	virtual CPointArray *
+	virtual gpos::pointer<CPointArray *>
 	GetPoints() const
 	{
 		return m_points;
 	}
 
 	// conversion function
-	static CStatsPredArrayCmp *
+	static gpos::cast_func<CStatsPredArrayCmp *>
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

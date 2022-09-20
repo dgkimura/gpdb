@@ -13,6 +13,7 @@
 #define GPDXL_CDXLScalarSubPlan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLColRef.h"
 #include "naucrates/dxl/operators/CDXLScalar.h"
@@ -91,7 +92,7 @@ public:
 	IMDId *GetFirstColTypeMdId() const;
 
 	// outer references
-	const CDXLColRefArray *
+	gpos::pointer<const CDXLColRefArray *>
 	GetDxlOuterColRefsArray() const
 	{
 		return m_dxl_colref_array;
@@ -105,7 +106,7 @@ public:
 	}
 
 	// return test expression
-	CDXLNode *
+	gpos::pointer<CDXLNode *>
 	GetDxlTestExpr() const
 	{
 		return m_dxlnode_test_expr;
@@ -119,10 +120,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// conversion function
-	static CDXLScalarSubPlan *
+	static gpos::cast_func<CDXLScalarSubPlan *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -140,7 +141,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

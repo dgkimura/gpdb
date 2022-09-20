@@ -17,6 +17,7 @@
 #define GPDXL_CTranslatorScalarToDXL_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 extern "C" {
 #include "postgres.h"
@@ -83,10 +84,10 @@ private:
 	EPlStmtPhysicalOpType m_op_type;
 
 	// hash map that maintains the list of CTEs defined at a particular query level
-	HMUlCTEListEntry *m_cte_entries;
+	gpos::pointer<HMUlCTEListEntry *> m_cte_entries;
 
 	// list of CTE producers shared among the logical and scalar translators
-	CDXLNodeArray *m_cte_producers;
+	gpos::pointer<CDXLNodeArray *> m_cte_producers;
 
 	static EdxlBoolExprType EdxlbooltypeFromGPDBBoolType(BoolExprType);
 
@@ -154,7 +155,7 @@ private:
 		const CaseExpr *case_expr, const CMappingVarColId *var_colid_mapping);
 
 	// create a DXL node for a case test from a GPDB Expr.
-	CDXLNode *TranslateCaseTestExprToDXL(
+	gpos::owner<CDXLNode *> TranslateCaseTestExprToDXL(
 		const Expr *expr, const CMappingVarColId *var_colid_mapping);
 
 	// create a DXL scalar coalesce node from a GPDB expression
@@ -292,64 +293,57 @@ public:
 										  const Const *constant);
 
 	// translate GPDB datum to CDXLDatum
-	static CDXLDatum *TranslateDatumToDXL(CMemoryPool *mp,
-										  const IMDType *md_type,
-										  INT type_modifier, BOOL is_null,
-										  ULONG len, Datum datum);
+	static CDXLDatum *TranslateDatumToDXL(
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type,
+		INT type_modifier, BOOL is_null, ULONG len, Datum datum);
 
 	// translate GPDB datum to IDatum
-	static IDatum *CreateIDatumFromGpdbDatum(CMemoryPool *mp,
-											 const IMDType *md_type,
-											 BOOL is_null, Datum datum);
+	static IDatum *CreateIDatumFromGpdbDatum(
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type, BOOL is_null,
+		Datum datum);
 
 	// extract the byte array value of the datum
-	static BYTE *ExtractByteArrayFromDatum(CMemoryPool *mp,
-										   const IMDType *md_type, BOOL is_null,
-										   ULONG len, Datum datum);
+	static BYTE *ExtractByteArrayFromDatum(
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type, BOOL is_null,
+		ULONG len, Datum datum);
 
 	static CDouble ExtractDoubleValueFromDatum(IMDId *mdid, BOOL is_null,
 											   BYTE *bytes, Datum datum);
 
 	// extract the long int value of a datum
-	static LINT ExtractLintValueFromDatum(const IMDType *md_type, BOOL is_null,
-										  BYTE *bytes, ULONG len);
+	static LINT ExtractLintValueFromDatum(
+		gpos::pointer<const IMDType *> md_type, BOOL is_null, BYTE *bytes,
+		ULONG len);
 
 	// datum to oid CDXLDatum
-	static CDXLDatum *TranslateOidDatumToDXL(CMemoryPool *mp,
-											 const IMDType *md_type,
-											 BOOL is_null, ULONG len,
-											 Datum datum);
+	static gpos::owner<CDXLDatum *> TranslateOidDatumToDXL(
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type, BOOL is_null,
+		ULONG len, Datum datum);
 
 	// datum to int2 CDXLDatum
-	static CDXLDatum *TranslateInt2DatumToDXL(CMemoryPool *mp,
-											  const IMDType *md_type,
-											  BOOL is_null, ULONG len,
-											  Datum datum);
+	static gpos::owner<CDXLDatum *> TranslateInt2DatumToDXL(
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type, BOOL is_null,
+		ULONG len, Datum datum);
 
 	// datum to int4 CDXLDatum
-	static CDXLDatum *TranslateInt4DatumToDXL(CMemoryPool *mp,
-											  const IMDType *md_type,
-											  BOOL is_null, ULONG len,
-											  Datum datum);
+	static gpos::owner<CDXLDatum *> TranslateInt4DatumToDXL(
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type, BOOL is_null,
+		ULONG len, Datum datum);
 
 	// datum to int8 CDXLDatum
-	static CDXLDatum *TranslateInt8DatumToDXL(CMemoryPool *mp,
-											  const IMDType *md_type,
-											  BOOL is_null, ULONG len,
-											  Datum datum);
+	static gpos::owner<CDXLDatum *> TranslateInt8DatumToDXL(
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type, BOOL is_null,
+		ULONG len, Datum datum);
 
 	// datum to bool CDXLDatum
-	static CDXLDatum *TranslateBoolDatumToDXL(CMemoryPool *mp,
-											  const IMDType *md_type,
-											  BOOL is_null, ULONG len,
-											  Datum datum);
+	static gpos::owner<CDXLDatum *> TranslateBoolDatumToDXL(
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type, BOOL is_null,
+		ULONG len, Datum datum);
 
 	// datum to generic CDXLDatum
-	static CDXLDatum *TranslateGenericDatumToDXL(CMemoryPool *mp,
-												 const IMDType *md_type,
-												 INT type_modifier,
-												 BOOL is_null, ULONG len,
-												 Datum datum);
+	static CDXLDatum *TranslateGenericDatumToDXL(
+		CMemoryPool *mp, gpos::pointer<const IMDType *> md_type,
+		INT type_modifier, BOOL is_null, ULONG len, Datum datum);
 };
 }  // namespace gpdxl
 #endif	// GPDXL_CTranslatorScalarToDXL_H

@@ -13,6 +13,7 @@
 #define GPDXL_CDXLWindowFrame_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 #include "naucrates/md/IMDId.h"
@@ -87,14 +88,14 @@ public:
 	}
 
 	// return window boundary trailing
-	CDXLNode *
+	gpos::pointer<CDXLNode *>
 	PdxlnTrailing() const
 	{
 		return m_dxlnode_trailing;
 	}
 
 	// return window boundary leading
-	CDXLNode *
+	gpos::pointer<CDXLNode *>
 	PdxlnLeading() const
 	{
 		return m_dxlnode_leading;

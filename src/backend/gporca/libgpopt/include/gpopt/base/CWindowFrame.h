@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CPropSpec.h"
@@ -133,14 +134,14 @@ public:
 	}
 
 	// scalar value of leading edge
-	CExpression *
+	gpos::pointer<CExpression *>
 	PexprLeading() const
 	{
 		return m_pexprLeading;
 	}
 
 	// scalar value of trailing edge
-	CExpression *
+	gpos::pointer<CExpression *>
 	PexprTrailing() const
 	{
 		return m_pexprTrailing;
@@ -154,7 +155,7 @@ public:
 	}
 
 	// matching function
-	BOOL Matches(const CWindowFrame *pwf) const;
+	BOOL Matches(gpos::pointer<const CWindowFrame *> pwf) const;
 
 	// hash function
 	virtual ULONG HashValue() const;
@@ -164,7 +165,7 @@ public:
 		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 	// return columns used by frame edges
-	CColRefSet *
+	gpos::pointer<CColRefSet *>
 	PcrsUsed() const
 	{
 		return m_pcrsUsed;
@@ -186,13 +187,13 @@ public:
 
 	// check if a given window frame is empty
 	static BOOL
-	IsEmpty(CWindowFrame *pwf)
+	IsEmpty(gpos::pointer<CWindowFrame *> pwf)
 	{
 		return pwf == &m_wfEmpty;
 	}
 
 	// return pointer to singleton empty window frame
-	static const CWindowFrame *
+	static gpos::pointer<const CWindowFrame *>
 	PwfEmpty()
 	{
 		return &m_wfEmpty;

@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/cost/CCost.h"
 #include "naucrates/traceflags/traceflags.h"
@@ -326,7 +327,7 @@ public:
 									 DOUBLE *pdY, ULONG size);
 
 	// generate default enumerator configurations
-	static CEnumeratorConfig *
+	static gpos::owner<CEnumeratorConfig *>
 	PecDefault(CMemoryPool *mp)
 	{
 		return GPOS_NEW(mp)
@@ -334,7 +335,7 @@ public:
 	}
 
 	// generate enumerator configuration for a given plan id
-	static CEnumeratorConfig *
+	static gpos::owner<CEnumeratorConfig *>
 	GetEnumeratorCfg(CMemoryPool *mp, ULLONG plan_id)
 	{
 		return GPOS_NEW(mp) CEnumeratorConfig(mp, plan_id, 0 /*ullSamples*/);

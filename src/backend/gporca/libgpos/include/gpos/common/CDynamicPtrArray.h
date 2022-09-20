@@ -15,6 +15,7 @@
 #include "gpos/common/CRefCount.h"
 #include "gpos/common/Vector.h"
 #include "gpos/common/clibwrapper.h"
+#include "gpos/common/owner.h"
 
 namespace gpos
 {
@@ -192,7 +193,7 @@ public:
 		{
 			// resize at least by 4 elements or percentage as given by ulExp
 			ULONG new_size =
-				(ULONG)(m_capacity * (1 + (m_expansion_factor / 100.0)));
+				(ULONG) (m_capacity * (1 + (m_expansion_factor / 100.0)));
 			ULONG min_expand_size = m_capacity + 4;
 
 			Resize(std::max(std::max(min_expand_size, new_size), m_min_size));
@@ -206,7 +207,7 @@ public:
 
 	// append array -- flatten it
 	void
-	AppendArray(const CDynamicPtrArray<T, CleanupFn> *arr)
+	AppendArray(gpos::pointer<const CDynamicPtrArray<T, CleanupFn> *> arr)
 	{
 		GPOS_ASSERT(nullptr != arr);
 		GPOS_ASSERT(this != arr && "Cannot append array to itself");
@@ -250,7 +251,7 @@ public:
 
 	// equality check
 	BOOL
-	Equals(const CDynamicPtrArray<T, CleanupFn> *arr) const
+	Equals(gpos::pointer<const CDynamicPtrArray<T, CleanupFn> *> arr) const
 	{
 		BOOL is_equal = (Size() == arr->Size());
 
@@ -364,7 +365,8 @@ public:
 		GPOS_ASSERT(nullptr != subsequence);
 
 		ULONG subsequence_length = subsequence->Size();
-		ULongPtrArray *indexes = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+		gpos::owner<ULongPtrArray *> indexes =
+			GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 
 		for (ULONG ul1 = 0; ul1 < subsequence_length; ul1++)
 		{
@@ -386,7 +388,7 @@ public:
 	CDynamicPtrArray<T, CleanupFn> *
 	CreateReducedArray(ULongPtrArray *indexes_to_choose)
 	{
-		CDynamicPtrArray<T, CleanupFn> *result =
+		gpos::owner<CDynamicPtrArray<T, CleanupFn> *> result =
 			GPOS_NEW(m_mp) CDynamicPtrArray<T, CleanupFn>(m_mp, m_min_size,
 														  m_expansion_factor);
 		ULONG list_size = indexes_to_choose->Size();

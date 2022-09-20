@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/statistics/CHistogram.h"
@@ -227,17 +228,17 @@ public:
 
 	// inner join with another stats structure
 	IStatistics *CalcInnerJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const override;
 
 	// LOJ with another stats structure
 	IStatistics *CalcLOJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const override;
 
 	// left anti semi join with another stats structure
 	IStatistics *CalcLASJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
 		CStatsPredJoinArray *join_preds_stats,
 		BOOL
 			DoIgnoreLASJHistComputation	 // except for the case of LOJ cardinality estimation this flag is always
@@ -246,7 +247,7 @@ public:
 
 	// semi join stats computation
 	IStatistics *CalcLSJoinStats(
-		CMemoryPool *mp, const IStatistics *inner_side_stats,
+		CMemoryPool *mp, gpos::pointer<const IStatistics *> inner_side_stats,
 		CStatsPredJoinArray *join_preds_stats) const override;
 
 	// return required props associated with stats object
@@ -303,7 +304,7 @@ public:
 		return m_num_predicates;
 	}
 
-	CStatisticsConfig *
+	gpos::pointer<CStatisticsConfig *>
 	GetStatsConfig() const
 	{
 		return m_stats_conf;
@@ -318,7 +319,7 @@ public:
 	static CStatistics *
 	MakeEmptyStats(CMemoryPool *mp)
 	{
-		ULongPtrArray *colids = GPOS_NEW(mp) ULongPtrArray(mp);
+		gpos::owner<ULongPtrArray *> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 		CStatistics *stats = MakeDummyStats(mp, colids, DefaultRelationRows);
 
 		// clean up
@@ -328,7 +329,7 @@ public:
 	}
 
 	// conversion function
-	static CStatistics *
+	static gpos::cast_func<CStatistics *>
 	CastStats(IStatistics *pstats)
 	{
 		GPOS_ASSERT(nullptr != pstats);
@@ -361,8 +362,9 @@ public:
 	static const CDouble DefaultDistinctValues;
 
 	// check if the input statistics from join statistics computation empty
-	static BOOL IsEmptyJoin(const CStatistics *outer_stats,
-							const CStatistics *inner_side_stats, BOOL IsLASJ);
+	static BOOL IsEmptyJoin(gpos::pointer<const CStatistics *> outer_stats,
+							gpos::pointer<const CStatistics *> inner_side_stats,
+							BOOL IsLASJ);
 
 	// add upper bound ndvs information for a given set of columns
 	static void CreateAndInsertUpperBoundNDVs(CMemoryPool *mp,

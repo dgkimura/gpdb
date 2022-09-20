@@ -12,6 +12,7 @@
 #define GPOPT_CScalarAggFunc_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
@@ -78,7 +79,7 @@ private:
 
 	EAggfuncKind m_aggkind;
 
-	ULongPtrArray *m_argtypes;
+	gpos::owner<ULongPtrArray *> m_argtypes;
 
 	// stage of the aggregate function
 	EAggfuncStage m_eaggfuncstage;
@@ -143,7 +144,7 @@ public:
 	}
 
 	// conversion function
-	static CScalarAggFunc *
+	static gpos::cast_func<CScalarAggFunc *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -178,7 +179,7 @@ public:
 		return m_aggkind;
 	}
 
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	GetArgTypes() const
 	{
 		return m_argtypes;
@@ -231,7 +232,7 @@ public:
 	BOOL FCountAny() const;
 
 	// is function either min() or max()?
-	BOOL IsMinMax(const IMDType *mdtype) const;
+	BOOL IsMinMax(gpos::pointer<const IMDType *> mdtype) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

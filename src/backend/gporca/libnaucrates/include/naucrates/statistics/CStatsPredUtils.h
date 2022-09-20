@@ -12,6 +12,7 @@
 #define GPOPT_CStatsPredUtils_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/operators/CExpression.h"
@@ -83,25 +84,29 @@ private:
 		CMemoryPool *mp, CExpression *predicate_expr);
 
 	// is the condition a conjunctive predicate
-	static BOOL IsConjunction(CMemoryPool *mp, CExpression *predicate_expr);
+	static BOOL IsConjunction(CMemoryPool *mp,
+							  gpos::pointer<CExpression *> predicate_expr);
 
 	// is the condition a boolean predicate
-	static BOOL IsPredBooleanScIdent(CExpression *predicate_expr);
+	static BOOL IsPredBooleanScIdent(
+		gpos::pointer<CExpression *> predicate_expr);
 
 	// is the condition a point predicate
-	static BOOL IsPointPredicate(CExpression *predicate_expr);
+	static BOOL IsPointPredicate(gpos::pointer<CExpression *> predicate_expr);
 
 	// is the condition an IDF point predicate
-	static BOOL IsPredPointIDF(CExpression *predicate_expr);
+	static BOOL IsPredPointIDF(gpos::pointer<CExpression *> predicate_expr);
 
 	// is the condition an INDF point predicate
-	static BOOL IsPredPointINDF(CExpression *predicate_expr);
+	static BOOL IsPredPointINDF(gpos::pointer<CExpression *> predicate_expr);
 
 	// is the condition 'is null' on a scalar ident
-	static BOOL IsPredScalarIdentIsNull(CExpression *predicate_expr);
+	static BOOL IsPredScalarIdentIsNull(
+		gpos::pointer<CExpression *> predicate_expr);
 
 	// is the condition 'is not null' on a scalar ident
-	static BOOL IsPredScalarIdentIsNotNull(CExpression *predicate_expr);
+	static BOOL IsPredScalarIdentIsNotNull(
+		gpos::pointer<CExpression *> predicate_expr);
 
 	// extract statistics filtering information from a point comparison
 	static CStatsPred *GetStatsPredPoint(CMemoryPool *mp,
@@ -141,8 +146,8 @@ private:
 	// Is the expression a comparison of scalar idents (or casted scalar idents),
 	// or of other supported expressions? If so, extract relevant info.
 	static BOOL IsJoinPredSupportedForStatsEstimation(
-		CExpression *expr,
-		CColRefSetArray *
+		gpos::pointer<CExpression *> expr,
+		gpos::pointer<CColRefSetArray *>
 			output_col_refsets,	 // array of output columns of join's relational inputs
 		BOOL is_semi_or_anti_join,
 		CStatsPred::EStatsCmpType *stats_pred_cmp_type,
@@ -182,10 +187,11 @@ public:
 		CColRefSet *outer_refs, BOOL is_semi_or_anti_join);
 
 	// is the predicate a conjunctive or disjunctive predicate
-	static BOOL IsConjOrDisjPred(CStatsPred *pred_stats);
+	static BOOL IsConjOrDisjPred(gpos::pointer<CStatsPred *> pred_stats);
 
 	// is unsupported predicate on unknown column
-	static BOOL IsUnsupportedPredOnDefinedCol(CStatsPred *pred_stats);
+	static BOOL IsUnsupportedPredOnDefinedCol(
+		gpos::pointer<CStatsPred *> pred_stats);
 
 };	// class CStatsPredUtils
 }  // namespace gpopt

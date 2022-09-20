@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringConst.h"
 
 #include "naucrates/dxl/gpdb_types.h"
@@ -84,7 +85,7 @@ public:
 	IMDId *MdidDest() const;
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(gpos::pointer<const IMDId *> mdid) const override;
 
 	// computes the hash value for the metadata id
 	ULONG
@@ -110,8 +111,8 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// const converter
-	static const CMDIdCast *
-	CastMdid(const IMDId *mdid)
+	static gpos::pointer<const CMDIdCast *>
+	CastMdid(gpos::pointer<const IMDId *> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidCastFunc == mdid->MdidType());
 
@@ -119,7 +120,7 @@ public:
 	}
 
 	// non-const converter
-	static CMDIdCast *
+	static gpos::cast_func<CMDIdCast *>
 	CastMdid(IMDId *mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidCastFunc == mdid->MdidType());
@@ -128,7 +129,7 @@ public:
 	}
 
 	// make a copy in the given memory pool
-	IMDId *
+	gpos::owner<IMDId *>
 	Copy(CMemoryPool *mp) const override
 	{
 		CMDIdGPDB *mdid_src = CMDIdGPDB::CastMdid(m_mdid_src->Copy(mp));

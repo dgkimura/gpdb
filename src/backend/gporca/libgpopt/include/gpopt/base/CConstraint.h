@@ -15,6 +15,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/types.h"
 
 #include "gpopt/base/CColRef.h"
@@ -189,7 +190,7 @@ public:
 	virtual BOOL Equals(CConstraint *pcnstr);
 
 	// columns in this constraint
-	virtual CColRefSet *
+	virtual gpos::pointer<CColRefSet *>
 	PcrsUsed() const
 	{
 		return m_pcrsUsed;
@@ -222,8 +223,8 @@ public:
 
 	// return constraint on a given set of columns
 	virtual CConstraint *
-	Pcnstr(CMemoryPool *,  //mp,
-		   CColRefSet *	   //pcrs
+	Pcnstr(CMemoryPool *,				//mp,
+		   gpos::pointer<CColRefSet *>	//pcrs
 	)
 	{
 		return nullptr;
@@ -264,7 +265,7 @@ public:
 
 // shorthand for printing, pointer.
 inline IOstream &
-operator<<(IOstream &os, const CConstraint *cnstr)
+operator<<(IOstream &os, gpos::pointer<const CConstraint *> cnstr)
 {
 	return cnstr->OsPrint(os);
 }

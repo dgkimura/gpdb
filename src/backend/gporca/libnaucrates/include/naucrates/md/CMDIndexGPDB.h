@@ -15,6 +15,7 @@
 #define GPMD_CMDIndexGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/IMDIndex.h"
 #include "naucrates/md/IMDPartConstraint.h"
@@ -143,7 +144,7 @@ public:
 
 	// check if given scalar comparison can be used with the index key
 	// at the specified position
-	BOOL IsCompatible(const IMDScalarOp *md_scalar_op,
+	BOOL IsCompatible(gpos::pointer<const IMDScalarOp *> md_scalar_op,
 					  ULONG key_pos) const override;
 
 	// child index oids

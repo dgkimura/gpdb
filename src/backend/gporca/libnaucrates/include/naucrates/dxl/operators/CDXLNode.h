@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CHashMap.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
@@ -97,28 +98,28 @@ public:
 	}
 
 	// accessor for operator
-	inline CDXLOperator *
+	inline gpos::pointer<CDXLOperator *>
 	GetOperator() const
 	{
 		return m_dxl_op;
 	}
 
 	// return properties
-	CDXLProperties *
+	gpos::pointer<CDXLProperties *>
 	GetProperties() const
 	{
 		return m_dxl_properties;
 	}
 
 	// accessor for children nodes
-	const CDXLNodeArray *
+	gpos::pointer<const CDXLNodeArray *>
 	GetChildDXLNodeArray() const
 	{
 		return m_dxl_array;
 	}
 
 	// accessor to direct dispatch info
-	CDXLDirectDispatchInfo *
+	gpos::pointer<CDXLDirectDispatchInfo *>
 	GetDXLDirectDispatchInfo() const
 	{
 		return m_direct_dispatch_info;

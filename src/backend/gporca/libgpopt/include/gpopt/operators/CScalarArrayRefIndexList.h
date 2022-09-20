@@ -12,6 +12,7 @@
 #define GPOPT_CScalarArrayRefIndexList_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalar.h"
 #include "naucrates/md/IMDId.h"
@@ -100,7 +101,7 @@ public:
 	}
 
 	// conversion function
-	static CScalarArrayRefIndexList *
+	static gpos::cast_func<CScalarArrayRefIndexList *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

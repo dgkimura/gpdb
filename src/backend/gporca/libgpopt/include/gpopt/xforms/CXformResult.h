@@ -12,6 +12,7 @@
 #define GPOPT_CXformResult_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 
@@ -46,7 +47,7 @@ public:
 	~CXformResult() override;
 
 	// accessor
-	inline CExpressionArray *
+	inline gpos::pointer<CExpressionArray *>
 	Pdrgpexpr() const
 	{
 		return m_pdrgpexpr;

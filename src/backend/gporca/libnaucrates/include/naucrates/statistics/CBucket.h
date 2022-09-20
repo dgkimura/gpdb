@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/task/CTask.h"
 
@@ -78,16 +79,16 @@ public:
 	~CBucket() override;
 
 	// does bucket contain point
-	BOOL Contains(const CPoint *point) const;
+	BOOL Contains(gpos::pointer<const CPoint *> point) const;
 
 	// is the point before the lower bound of the bucket
-	BOOL IsBefore(const CPoint *point) const;
+	BOOL IsBefore(gpos::pointer<const CPoint *> point) const;
 
 	// is the point after the upper bound of the bucket
-	BOOL IsAfter(const CPoint *point) const;
+	BOOL IsAfter(gpos::pointer<const CPoint *> point) const;
 
 	// what percentage of bucket is covered by [lb,pp]
-	CDouble GetOverlapPercentage(const CPoint *point,
+	CDouble GetOverlapPercentage(gpos::pointer<const CPoint *> point,
 								 BOOL include_point = true) const;
 
 	// frequency associated with bucket
@@ -125,14 +126,14 @@ public:
 	}
 
 	// lower point
-	CPoint *
+	gpos::pointer<CPoint *>
 	GetLowerBound() const override
 	{
 		return m_bucket_lower_bound;
 	}
 
 	// upper point
-	CPoint *
+	gpos::pointer<CPoint *>
 	GetUpperBound() const override
 	{
 		return m_bucket_upper_bound;

@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptimizationContext.h"
 #include "gpopt/cost/CCost.h"
@@ -106,10 +107,10 @@ private:
 
 	// for two cost contexts with join plans of the same cost, break the tie based on join depth,
 	// if tie-resolution succeeded, store a pointer to preferred cost context in output argument
-	static void BreakCostTiesForJoinPlans(const CCostContext *pccFst,
-										  const CCostContext *pccSnd,
-										  CONST_COSTCTXT_PTR *ppccPrefered,
-										  BOOL *pfTiesResolved);
+	static void BreakCostTiesForJoinPlans(
+		gpos::pointer<const CCostContext *> pccFst,
+		gpos::pointer<const CCostContext *> pccSnd,
+		CONST_COSTCTXT_PTR *ppccPrefered, BOOL *pfTiesResolved);
 
 public:
 	CCostContext(const CCostContext &) = delete;
@@ -128,7 +129,7 @@ public:
 	~CCostContext() override;
 
 	// main optimization context accessor
-	COptimizationContext *
+	gpos::pointer<COptimizationContext *>
 	Poc() const
 	{
 		return m_poc;
@@ -179,21 +180,21 @@ public:
 	}
 
 	// owner group expression accessor
-	CGroupExpression *
+	gpos::pointer<CGroupExpression *>
 	Pgexpr() const
 	{
 		return m_pgexpr;
 	}
 
 	// group expression for stats derivation
-	CGroupExpression *
+	gpos::pointer<CGroupExpression *>
 	PgexprForStats() const
 	{
 		return m_pgexprForStats;
 	}
 
 	// return stats of owner group expression
-	IStatistics *
+	gpos::pointer<IStatistics *>
 	Pstats() const
 	{
 		return m_pstats;
@@ -206,7 +207,7 @@ public:
 	BOOL FOwnsStats() const;
 
 	// derived plan properties accessor
-	CDrvdPropPlan *
+	gpos::pointer<CDrvdPropPlan *>
 	Pdpplan() const
 	{
 		return m_pdpplan;
@@ -227,7 +228,7 @@ public:
 	void
 	SetState(EState estNewState)
 	{
-		GPOS_ASSERT(estNewState == (EState)(m_estate + 1));
+		GPOS_ASSERT(estNewState == (EState) (m_estate + 1));
 
 		m_estate = estNewState;
 	}
@@ -253,13 +254,15 @@ public:
 	CCost CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren);
 
 	// is current context better than the given equivalent context based on cost?
-	BOOL FBetterThan(const CCostContext *pcc) const;
+	BOOL FBetterThan(gpos::pointer<const CCostContext *> pcc) const;
 
 	// is this cost context of a two stage scalar DQA created by CXformSplitDQA
-	static BOOL IsTwoStageScalarDQACostCtxt(const CCostContext *pcc);
+	static BOOL IsTwoStageScalarDQACostCtxt(
+		gpos::pointer<const CCostContext *> pcc);
 
 	// is this cost context of a three stage scalar DQA created by CXformSplitDQA
-	static BOOL IsThreeStageScalarDQACostCtxt(const CCostContext *pcc);
+	static BOOL IsThreeStageScalarDQACostCtxt(
+		gpos::pointer<const CCostContext *> pcc);
 
 	// equality function
 	static BOOL
@@ -278,7 +281,8 @@ public:
 
 	// equality function
 	static BOOL
-	Equals(const CCostContext *pccLeft, const CCostContext *pccRight)
+	Equals(gpos::pointer<const CCostContext *> pccLeft,
+		   gpos::pointer<const CCostContext *> pccRight)
 	{
 		return Equals(*pccLeft, *pccRight);
 	}
@@ -292,7 +296,7 @@ public:
 
 	// hash function
 	static ULONG
-	HashValue(const CCostContext *pcc)
+	HashValue(gpos::pointer<const CCostContext *> pcc)
 	{
 		return HashValue(*pcc);
 	}

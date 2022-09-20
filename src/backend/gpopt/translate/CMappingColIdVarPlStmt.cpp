@@ -14,6 +14,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include "gpos/common/owner.h"
 extern "C" {
 #include "postgres.h"
 
@@ -92,14 +93,15 @@ CMappingColIdVarPlStmt::GetOutputContext()
 //
 //---------------------------------------------------------------------------
 Param *
-CMappingColIdVarPlStmt::ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop)
+CMappingColIdVarPlStmt::ParamFromDXLNodeScId(
+	gpos::pointer<const CDXLScalarIdent *> dxlop)
 {
 	GPOS_ASSERT(nullptr != m_output_context);
 
 	Param *param = nullptr;
 
 	const ULONG colid = dxlop->GetDXLColRef()->Id();
-	const CMappingElementColIdParamId *elem =
+	gpos::pointer<const CMappingElementColIdParamId *> elem =
 		m_output_context->GetParamIdMappingElement(colid);
 
 	if (nullptr != elem)
@@ -124,7 +126,8 @@ CMappingColIdVarPlStmt::ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop)
 //
 //---------------------------------------------------------------------------
 Var *
-CMappingColIdVarPlStmt::VarFromDXLNodeScId(const CDXLScalarIdent *dxlop)
+CMappingColIdVarPlStmt::VarFromDXLNodeScId(
+	gpos::pointer<const CDXLScalarIdent *> dxlop)
 {
 	Index varno = 0;
 	AttrNumber attno = 0;

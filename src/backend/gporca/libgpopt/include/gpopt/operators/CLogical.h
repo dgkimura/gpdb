@@ -12,6 +12,7 @@
 #define GPOPT_CLogical_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdProp.h"
@@ -73,7 +74,7 @@ protected:
 	// initialize the array of partition columns
 	static CColRef2dArray *PdrgpdrgpcrCreatePartCols(
 		CMemoryPool *mp, CColRefArray *colref_array,
-		const ULongPtrArray *pdrgpulPart);
+		gpos::pointer<const ULongPtrArray *> pdrgpulPart);
 
 	// derive dummy statistics
 	IStatistics *PstatsDeriveDummy(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -116,9 +117,9 @@ protected:
 										  CExpressionHandle &exprhdl);
 
 	// helper function for computing the keys in a base relation
-	static CKeyCollection *PkcKeysBaseTable(CMemoryPool *mp,
-											const CBitSetArray *pdrgpbsKeys,
-											const CColRefArray *pdrgpcrOutput);
+	static CKeyCollection *PkcKeysBaseTable(
+		CMemoryPool *mp, gpos::pointer<const CBitSetArray *> pdrgpbsKeys,
+		gpos::pointer<const CColRefArray *> pdrgpcrOutput);
 
 	// helper for the common case of passing through partition consumer info
 	static CPartInfo *PpartinfoPassThruOuter(CExpressionHandle &exprhdl);
@@ -129,13 +130,14 @@ protected:
 
 	// derive constraint property from a table/index get
 	static CPropConstraint *PpcDeriveConstraintFromTable(
-		CMemoryPool *mp, const CTableDescriptor *ptabdesc,
-		const CColRefArray *pdrgpcrOutput);
+		CMemoryPool *mp, gpos::pointer<const CTableDescriptor *> ptabdesc,
+		gpos::pointer<const CColRefArray *> pdrgpcrOutput);
 
 	// derive constraint property from a table/index get with predicates
 	static CPropConstraint *PpcDeriveConstraintFromTableWithPredicates(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		const CTableDescriptor *ptabdesc, const CColRefArray *pdrgpcrOutput);
+		gpos::pointer<const CTableDescriptor *> ptabdesc,
+		gpos::pointer<const CColRefArray *> pdrgpcrOutput);
 
 	// shorthand to addref and pass through constraint from a given child
 	static CPropConstraint *PpcDeriveConstraintPassThru(
@@ -153,9 +155,10 @@ protected:
 							CMaxCard maxcard);
 
 	// compute order spec based on an index
-	static COrderSpec *PosFromIndex(CMemoryPool *mp, const IMDIndex *pmdindex,
-									CColRefArray *colref_array,
-									const CTableDescriptor *ptabdesc);
+	static COrderSpec *PosFromIndex(
+		CMemoryPool *mp, gpos::pointer<const IMDIndex *> pmdindex,
+		CColRefArray *colref_array,
+		gpos::pointer<const CTableDescriptor *> ptabdesc);
 
 	// derive function properties using data access property of scalar child
 	static CFunctionProp *PfpDeriveFromScalar(CMemoryPool *mp,
@@ -182,7 +185,7 @@ public:
 	}
 
 	// return the locally used columns
-	CColRefSet *
+	gpos::pointer<CColRefSet *>
 	PcrsLocalUsed() const
 	{
 		return m_pcrsLocalUsed;
@@ -212,7 +215,7 @@ public:
 												CExpressionHandle &exprhdl);
 
 	// derive not nullable output columns
-	virtual CColRefSet *
+	virtual gpos::owner<CColRefSet *>
 	DeriveNotNullColumns(CMemoryPool *mp,
 						 CExpressionHandle &  // exprhdl
 	) const
@@ -302,7 +305,8 @@ public:
 	}
 
 	// return true if we can pull projections up past this operator from its given child
-	virtual BOOL FCanPullProjectionsUp(ULONG  //child_index
+	virtual BOOL
+	FCanPullProjectionsUp(ULONG	 //child_index
 	) const
 	{
 		return true;
@@ -315,7 +319,7 @@ public:
 										CColRefSet *pcrsStatExtra = nullptr);
 
 	// conversion function
-	static CLogical *
+	static gpos::cast_func<CLogical *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -337,9 +341,9 @@ public:
 	static const CName &NameFromLogicalGet(CLogical *pop);
 
 	// return the set of distribution columns
-	static CColRefSet *PcrsDist(CMemoryPool *mp,
-								const CTableDescriptor *ptabdesc,
-								const CColRefArray *colref_array);
+	static CColRefSet *PcrsDist(
+		CMemoryPool *mp, gpos::pointer<const CTableDescriptor *> ptabdesc,
+		gpos::pointer<const CColRefArray *> colref_array);
 
 	// derive constraint property when expression has relational children and predicates
 	static CPropConstraint *PpcDeriveConstraintFromPredicates(

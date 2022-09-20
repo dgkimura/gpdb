@@ -16,6 +16,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CList.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/owner.h"
 
 
 namespace gpos
@@ -126,22 +127,22 @@ public:
 	BOOL ExchangeClear(ULONG pos);
 
 	// union sets
-	void Union(const CBitSet *);
+	void Union(gpos::pointer<const CBitSet *>);
 
 	// intersect sets
-	void Intersection(const CBitSet *);
+	void Intersection(gpos::pointer<const CBitSet *>);
 
 	// difference of sets
-	void Difference(const CBitSet *);
+	void Difference(gpos::pointer<const CBitSet *>);
 
 	// is subset
-	BOOL ContainsAll(const CBitSet *) const;
+	BOOL ContainsAll(gpos::pointer<const CBitSet *>) const;
 
 	// equality
-	BOOL Equals(const CBitSet *) const;
+	BOOL Equals(gpos::pointer<const CBitSet *>) const;
 
 	// disjoint
-	BOOL IsDisjoint(const CBitSet *) const;
+	BOOL IsDisjoint(gpos::pointer<const CBitSet *>) const;
 
 	// hash value for set
 	ULONG HashValue() const;

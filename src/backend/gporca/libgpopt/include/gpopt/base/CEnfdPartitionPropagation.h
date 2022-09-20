@@ -12,6 +12,7 @@
 #define GPOPT_CEnfdPartitionPropagation_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CEnfdProp.h"
 #include "gpopt/base/CPartitionPropagationSpec.h"
@@ -59,7 +60,7 @@ public:
 	~CEnfdPartitionPropagation() override;
 
 	// partition spec accessor
-	CPropSpec *
+	gpos::pointer<CPropSpec *>
 	Pps() const override
 	{
 		return m_ppps;
@@ -69,7 +70,7 @@ public:
 	ULONG HashValue() const override;
 
 	// required propagation accessor
-	CPartitionPropagationSpec *
+	gpos::pointer<CPartitionPropagationSpec *>
 	PppsRequired() const
 	{
 		return m_ppps;
