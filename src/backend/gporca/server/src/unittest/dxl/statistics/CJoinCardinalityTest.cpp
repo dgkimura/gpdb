@@ -278,7 +278,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 		gpos::owner<CStatsPredJoinArray *> join_preds_stats = pf(mp);
 
 		// calculate the output stats
-		IStatistics *pstatsOutput = nullptr;
+		gpos::owner<IStatistics *> pstatsOutput = nullptr;
 		if (left_outer_join)
 		{
 			pstatsOutput =

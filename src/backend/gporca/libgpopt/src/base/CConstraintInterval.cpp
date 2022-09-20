@@ -239,7 +239,8 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(
 	IMDType::ECmpType cmp_type = CUtils::ParseCmpType(popScArrayCmp->MdIdOp());
 
 
-	CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexpr);
+	gpos::pointer<CExpression *> pexprArray =
+		CUtils::PexprScalarArrayChild(pexpr);
 	const ULONG ulArrayExprArity = CUtils::UlScalarArrayArity(pexprArray);
 	if (0 == ulArrayExprArity)
 	{
@@ -785,7 +786,7 @@ CConstraintInterval::PexprConstructDisjunctionScalar(CMemoryPool *mp) const
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		gpos::pointer<CRange *> prange = (*m_pdrgprng)[ul];
-		CExpression *pexprChild = prange->PexprScalar(mp, m_pcr);
+		gpos::owner<CExpression *> pexprChild = prange->PexprScalar(mp, m_pcr);
 		pdrgpexpr->Append(pexprChild);
 	}
 

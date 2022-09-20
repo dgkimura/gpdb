@@ -37,12 +37,12 @@ using namespace gpopt;
 CPhysicalDynamicTableScan::CPhysicalDynamicTableScan(
 	CMemoryPool *mp, const CName *pnameAlias,
 	gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId, ULONG scan_id,
-	CColRefArray *pdrgpcrOutput, gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
-	IMdIdArray *partition_mdids,
+	gpos::owner<CColRefArray *> pdrgpcrOutput,
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
 	gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part)
 	: CPhysicalDynamicScan(mp, std::move(ptabdesc), ulOriginOpId, pnameAlias,
-						   scan_id, pdrgpcrOutput, std::move(pdrgpdrgpcrParts),
-						   partition_mdids,
+						   scan_id, std::move(pdrgpcrOutput),
+						   std::move(pdrgpdrgpcrParts), partition_mdids,
 						   std::move(root_col_mapping_per_part))
 {
 }

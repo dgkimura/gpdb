@@ -174,7 +174,7 @@ CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// computed columns
 	gpos::owner<ULongPtrArray *> pdrgpulComputedCols =
 		GPOS_NEW(mp) ULongPtrArray(mp);
-	IStatistics *stats = CLogicalGbAgg::PstatsDerive(
+	gpos::owner<IStatistics *> stats = CLogicalGbAgg::PstatsDerive(
 		mp, LASJ_stats,
 		(*m_pdrgpdrgpcrInput)[0],  // we group by the columns of the first child
 		pdrgpulComputedCols,	   // no computed columns for set ops

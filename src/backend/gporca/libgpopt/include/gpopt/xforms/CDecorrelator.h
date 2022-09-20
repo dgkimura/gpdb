@@ -149,7 +149,8 @@ public:
 	CDecorrelator(const CDecorrelator &) = delete;
 
 	// main handler
-	static BOOL FProcess(CMemoryPool *mp, CExpression *pexprOrig,
+	static BOOL FProcess(CMemoryPool *mp,
+						 gpos::pointer<CExpression *> pexprOrig,
 						 BOOL fEqualityOnly,
 						 gpos::owner<CExpression *> *ppexprDecorrelated,
 						 CExpressionArray *pdrgpexprCorrelations,

@@ -165,12 +165,13 @@ CLogicalUnionAll::PstatsDeriveUnionAll(CMemoryPool *mp,
 	for (ULONG ul = 1; ul < arity; ul++)
 	{
 		gpos::pointer<IStatistics *> child_stats = exprhdl.Pstats(ul);
-		CStatistics *stats = CUnionAllStatsProcessor::CreateStatsForUnionAll(
-			mp, gpos::dyn_cast<CStatistics>(result_stats),
-			dynamic_cast<CStatistics *>(child_stats),
-			CColRef::Pdrgpul(mp, pdrgpcrOutput),
-			CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[0]),
-			CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[ul]));
+		gpos::owner<CStatistics *> stats =
+			CUnionAllStatsProcessor::CreateStatsForUnionAll(
+				mp, gpos::dyn_cast<CStatistics>(result_stats),
+				dynamic_cast<CStatistics *>(child_stats),
+				CColRef::Pdrgpul(mp, pdrgpcrOutput),
+				CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[0]),
+				CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[ul]));
 		result_stats->Release();
 		result_stats = stats;
 	}

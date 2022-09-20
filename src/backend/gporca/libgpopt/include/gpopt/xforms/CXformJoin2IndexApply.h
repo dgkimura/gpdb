@@ -32,7 +32,8 @@ private:
 		gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
 		CExpression *endOfNodesToInsertAboveIndexGet,
 		gpos::pointer<CTableDescriptor *> ptabdescInner,
-		gpos::pointer<CColRefSet *> pcrsScalarExpr, CColRefSet *outer_refs,
+		gpos::pointer<CColRefSet *> pcrsScalarExpr,
+		gpos::pointer<CColRefSet *> outer_refs,
 		gpos::pointer<CColRefSet *> pcrsReqd, ULONG ulIndices,
 		gpos::pointer<CXformResult *> pxfres);
 
@@ -44,8 +45,9 @@ private:
 		gpos::owner<CExpression *> origJoinPred,
 		gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
 		CExpression *endOfNodesToInsertAboveIndexGet, CMDAccessor *md_accessor,
-		CExpressionArray *pdrgpexprConjuncts,
-		gpos::pointer<CColRefSet *> pcrsScalarExpr, CColRefSet *outer_refs,
+		gpos::pointer<CExpressionArray *> pdrgpexprConjuncts,
+		gpos::pointer<CColRefSet *> pcrsScalarExpr,
+		gpos::pointer<CColRefSet *> outer_refs,
 		gpos::pointer<CColRefSet *> pcrsReqd,
 		gpos::pointer<const IMDRelation *> pmdrel,
 		gpos::pointer<const IMDIndex *> pmdindex,

@@ -1561,7 +1561,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOuterJoin()
 	gpos::owner<CExpression *> pexprPredicate1 = CUtils::PexprScalarEqCmp(
 		mp, pcrInner, CUtils::PexprScalarConstInt4(mp, 1 /*val*/));
 	gpos::owner<CExpression *> pexprSelect1 =
-		CUtils::PexprLogicalSelect(mp, pexprLOJ, pexprPredicate1);
+		CUtils::PexprLogicalSelect(mp, pexprLOJ, std::move(pexprPredicate1));
 
 	gpos::owner<CExpression *> pexprPreprocessed1 =
 		CExpressionPreprocessor::PexprPreprocess(mp, pexprSelect1);
@@ -1590,7 +1590,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOuterJoin()
 	pexprCmp2->Release();
 	pexprLOJ->AddRef();
 	gpos::owner<CExpression *> pexprSelect2 =
-		CUtils::PexprLogicalSelect(mp, pexprLOJ, pexprPredicate2);
+		CUtils::PexprLogicalSelect(mp, pexprLOJ, std::move(pexprPredicate2));
 	gpos::owner<CExpression *> pexprPreprocessed2 =
 		CExpressionPreprocessor::PexprPreprocess(mp, pexprSelect2);
 	{
@@ -1614,7 +1614,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOuterJoin()
 	pexprCmp2->Release();
 	pexprLOJ->AddRef();
 	gpos::owner<CExpression *> pexprSelect3 =
-		CUtils::PexprLogicalSelect(mp, pexprLOJ, pexprPredicate3);
+		CUtils::PexprLogicalSelect(mp, pexprLOJ, std::move(pexprPredicate3));
 
 	gpos::owner<CExpression *> pexprPreprocessed3 =
 		CExpressionPreprocessor::PexprPreprocess(mp, pexprSelect3);
@@ -1638,7 +1638,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOuterJoin()
 	pexprCmp2->Release();
 	pexprLOJ->AddRef();
 	gpos::owner<CExpression *> pexprSelect4 =
-		CUtils::PexprLogicalSelect(mp, pexprLOJ, pexprPredicate4);
+		CUtils::PexprLogicalSelect(mp, pexprLOJ, std::move(pexprPredicate4));
 
 	gpos::owner<CExpression *> pexprPreprocessed4 =
 		CExpressionPreprocessor::PexprPreprocess(mp, pexprSelect4);
@@ -1682,7 +1682,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOuterJoin()
 		CUtils::PexprNegate(mp, pexprPredicate5);
 	pexprLOJ->AddRef();
 	gpos::owner<CExpression *> pexprSelect6 =
-		CUtils::PexprLogicalSelect(mp, pexprLOJ, pexprPredicate6);
+		CUtils::PexprLogicalSelect(mp, pexprLOJ, std::move(pexprPredicate6));
 
 	gpos::owner<CExpression *> pexprPreprocessed6 =
 		CExpressionPreprocessor::PexprPreprocess(mp, pexprSelect6);

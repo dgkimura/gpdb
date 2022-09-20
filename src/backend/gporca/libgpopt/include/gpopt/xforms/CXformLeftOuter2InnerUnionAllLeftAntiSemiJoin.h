@@ -64,7 +64,8 @@ private:
 	// and a group by as inner
 	static gpos::owner<CExpression *> PexprLeftAntiSemiJoinWithInnerGroupBy(
 		CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrOuter,
-		CColRefArray *pdrgpcrOuterCopy, gpos::pointer<CColRefSet *> pcrsScalar,
+		gpos::owner<CColRefArray *> pdrgpcrOuterCopy,
+		gpos::pointer<CColRefSet *> pcrsScalar,
 		gpos::pointer<CColRefSet *> pcrsInner,
 		gpos::pointer<CColRefArray *> pdrgpcrJoinOutput, ULONG ulCTEJoinId,
 		ULONG ulCTEOuterId);

@@ -54,12 +54,15 @@ CLogicalDynamicGet::CLogicalDynamicGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalDynamicGet::CLogicalDynamicGet(
-	CMemoryPool *mp, const CName *pnameAlias, CTableDescriptor *ptabdesc,
-	ULONG ulPartIndex, gpos::owner<CColRefArray *> pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrPart, gpos::Ref<IMdIdArray> partition_mdids,
+	CMemoryPool *mp, const CName *pnameAlias,
+	gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulPartIndex,
+	gpos::owner<CColRefArray *> pdrgpcrOutput,
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
+	gpos::Ref<IMdIdArray> partition_mdids,
 	gpos::owner<CConstraint *> partition_cnstrs_disj, BOOL static_pruned)
-	: CLogicalDynamicGetBase(mp, pnameAlias, ptabdesc, ulPartIndex,
-							 pdrgpcrOutput, pdrgpdrgpcrPart, partition_mdids),
+	: CLogicalDynamicGetBase(mp, pnameAlias, std::move(ptabdesc), ulPartIndex,
+							 std::move(pdrgpcrOutput),
+							 std::move(pdrgpdrgpcrPart), partition_mdids),
 	  m_partition_cnstrs_disj(std::move(partition_cnstrs_disj)),
 	  m_static_pruned(static_pruned)
 {
@@ -155,7 +158,7 @@ CLogicalDynamicGet::PopCopyWithRemappedColumns(
 		pdrgpcrOutput = CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput,
 											 colref_mapping, must_exist);
 	}
-	CColRef2dArray *pdrgpdrgpcrPart =
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart =
 		PdrgpdrgpcrCreatePartCols(mp, pdrgpcrOutput, m_ptabdesc->PdrgpulPart());
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, *m_pnameAlias);
 	m_ptabdesc->AddRef();
@@ -166,7 +169,7 @@ CLogicalDynamicGet::PopCopyWithRemappedColumns(
 
 	return GPOS_NEW(mp) CLogicalDynamicGet(
 		mp, pnameAlias, m_ptabdesc, m_scan_id, std::move(pdrgpcrOutput),
-		pdrgpdrgpcrPart, m_partition_mdids, m_partition_cnstrs_disj,
+		std::move(pdrgpdrgpcrPart), m_partition_mdids, m_partition_cnstrs_disj,
 		m_static_pruned);
 }
 
@@ -350,8 +353,9 @@ CLogicalDynamicGet::PstatsDeriveFilter(
 	);
 	pexprFilterNew->Release();
 
-	IStatistics *result_stats = CFilterStatsProcessor::MakeStatsFilter(
-		mp, pstatsFullTable, pred_stats, true /* do_cap_NDVs */);
+	gpos::owner<IStatistics *> result_stats =
+		CFilterStatsProcessor::MakeStatsFilter(mp, pstatsFullTable, pred_stats,
+											   true /* do_cap_NDVs */);
 	pred_stats->Release();
 	pstatsFullTable->Release();
 

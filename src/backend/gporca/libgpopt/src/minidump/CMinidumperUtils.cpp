@@ -222,7 +222,7 @@ CMinidumperUtils::Finalize(CMiniDumperDXL *pmdmp, BOOL fSerializeErrCtx)
 //		Load and execute the minidump in the given file
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::owner<CDXLNode *>
 CMinidumperUtils::PdxlnExecuteMinidump(
 	CMemoryPool *mp, const CHAR *file_name, ULONG ulSegments, ULONG ulSessionId,
 	ULONG ulCmdId, gpos::pointer<COptimizerConfig *> optimizer_config,
@@ -237,7 +237,7 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 	CDXLMinidump *pdxlmd = CMinidumperUtils::PdxlmdLoad(mp, file_name);
 	GPOS_CHECK_ABORT;
 
-	CDXLNode *pdxlnPlan =
+	gpos::owner<CDXLNode *> pdxlnPlan =
 		PdxlnExecuteMinidump(mp, pdxlmd, file_name, ulSegments, ulSessionId,
 							 ulCmdId, optimizer_config, pceeval);
 
@@ -256,7 +256,7 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 //		Execute the given minidump
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::owner<CDXLNode *>
 CMinidumperUtils::PdxlnExecuteMinidump(
 	CMemoryPool *mp, CDXLMinidump *pdxlmd, const CHAR *file_name,
 	ULONG ulSegments, ULONG ulSessionId, ULONG ulCmdId,
@@ -270,7 +270,7 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 
 	CMetadataAccessorFactory factory(mp, pdxlmd, file_name);
 
-	CDXLNode *result = CMinidumperUtils::PdxlnExecuteMinidump(
+	gpos::owner<CDXLNode *> result = CMinidumperUtils::PdxlnExecuteMinidump(
 		mp, factory.Pmda(), pdxlmd, file_name, ulSegments, ulSessionId, ulCmdId,
 		optimizer_config, pceeval);
 
@@ -286,7 +286,7 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 //		Execute the given minidump using the given MD accessor
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::owner<CDXLNode *>
 CMinidumperUtils::PdxlnExecuteMinidump(
 	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLMinidump *pdxlmd,
 	const CHAR *file_name, ULONG ulSegments, ULONG ulSessionId, ULONG ulCmdId,
@@ -303,7 +303,7 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 				"No metadata found in Minidump");
 	GPOS_ASSERT(nullptr != optimizer_config);
 
-	CDXLNode *pdxlnPlan = nullptr;
+	gpos::owner<CDXLNode *> pdxlnPlan = nullptr;
 	CAutoTimer at("Minidump", true /*fPrint*/);
 
 	GPOS_CHECK_ABORT;

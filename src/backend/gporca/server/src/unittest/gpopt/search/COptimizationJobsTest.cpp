@@ -88,7 +88,7 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 		// Initialize engine
 		eng.Init(pqc, nullptr /*search_stage_array*/);
 
-		CGroup *pgroup = eng.PgroupRoot();
+		gpos::pointer<CGroup *> pgroup = eng.PgroupRoot();
 		pqc->Prpp()->AddRef();
 		gpos::owner<COptimizationContext *> poc =
 			GPOS_NEW(mp) COptimizationContext(

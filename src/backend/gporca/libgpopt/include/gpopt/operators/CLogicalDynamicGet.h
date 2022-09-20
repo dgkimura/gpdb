@@ -45,9 +45,10 @@ public:
 	explicit CLogicalDynamicGet(CMemoryPool *mp);
 
 	CLogicalDynamicGet(CMemoryPool *mp, const CName *pnameAlias,
-					   CTableDescriptor *ptabdesc, ULONG ulPartIndex,
+					   gpos::owner<CTableDescriptor *> ptabdesc,
+					   ULONG ulPartIndex,
 					   gpos::owner<CColRefArray *> pdrgpcrOutput,
-					   CColRef2dArray *pdrgpdrgpcrPart,
+					   gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
 					   gpos::Ref<IMdIdArray> partition_mdids,
 					   gpos::owner<CConstraint *> partition_cnstrs_disj,
 					   BOOL static_pruned);

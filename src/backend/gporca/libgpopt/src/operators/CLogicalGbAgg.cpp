@@ -622,12 +622,12 @@ CLogicalGbAgg::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalGbAgg::PstatsDerive(CMemoryPool *mp,
 							gpos::pointer<IStatistics *> child_stats,
 							gpos::pointer<CColRefArray *> pdrgpcrGroupingCols,
 							gpos::pointer<ULongPtrArray *> pdrgpulComputedCols,
-							CBitSet *keys)
+							gpos::pointer<CBitSet *> keys)
 {
 	const ULONG ulGroupingCols = pdrgpcrGroupingCols->Size();
 
@@ -640,7 +640,7 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp,
 		pdrgpulGroupingCols->Append(GPOS_NEW(mp) ULONG(colref->Id()));
 	}
 
-	IStatistics *stats = CGroupByStatsProcessor::CalcGroupByStats(
+	gpos::owner<IStatistics *> stats = CGroupByStatsProcessor::CalcGroupByStats(
 		mp, dynamic_cast<CStatistics *>(child_stats), pdrgpulGroupingCols,
 		pdrgpulComputedCols, keys);
 
@@ -672,8 +672,8 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		GPOS_NEW(mp) ULongPtrArray(mp);
 	exprhdl.DeriveDefinedColumns(1)->ExtractColIds(mp, pdrgpulComputedCols);
 
-	IStatistics *stats = PstatsDerive(mp, child_stats, Pdrgpcr(),
-									  pdrgpulComputedCols, nullptr /*keys*/);
+	gpos::owner<IStatistics *> stats = PstatsDerive(
+		mp, child_stats, Pdrgpcr(), pdrgpulComputedCols, nullptr /*keys*/);
 
 	pdrgpulComputedCols->Release();
 

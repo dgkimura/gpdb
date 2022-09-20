@@ -46,7 +46,7 @@ class CTreeMapTest
 		CNode(const CNode &) = delete;
 
 		// ctor
-		CNode(CMemoryPool *mp, const ULONG *pulData,
+		CNode(CMemoryPool *mp, gpos::pointer<const ULONG *> pulData,
 			  gpos::owner<CNodeArray *> pdrgpnd);
 
 		// dtor
@@ -62,7 +62,7 @@ private:
 	static ULONG m_ulTestCounter;
 
 	// factory function for result object
-	static gpos::owner<CNode *> Pnd(CMemoryPool *mp, ULONG *pul,
+	static gpos::owner<CNode *> Pnd(CMemoryPool *mp, gpos::pointer<ULONG *> pul,
 									gpos::owner<CNodeArray *> pdrgpnd,
 									BOOL *fTestTrue);
 

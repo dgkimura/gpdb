@@ -166,7 +166,7 @@ private:
 	static GPOS_RESULT EresUnittest_CStatisticsCompare(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::pointer<CStatisticsArray *> pdrgpstatBefore,
-		CStatsPred *pred_stats, const CHAR *szDXLOutput,
+		gpos::pointer<CStatsPred *> pred_stats, const CHAR *szDXLOutput,
 		BOOL fApplyTwice = false);
 
 public:

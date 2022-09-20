@@ -83,7 +83,7 @@ public:
 	void InitProperties(CDrvdProp *pdp);
 
 	// initialize group's stat;
-	void InitStats(IStatistics *stats);
+	void InitStats(gpos::owner<IStatistics *> stats);
 
 	// retrieve first group expression
 	CGroupExpression *PgexprFirst();

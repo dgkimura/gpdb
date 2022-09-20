@@ -72,7 +72,7 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp,
 
 	// extract components
 	CExpression *pexprOuter = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::pointer<CExpression *> pexprScalar = (*pexpr)[1];
 
 	// we add-ref the logical child since the resulting expression must re-use it
 	pexprOuter->AddRef();

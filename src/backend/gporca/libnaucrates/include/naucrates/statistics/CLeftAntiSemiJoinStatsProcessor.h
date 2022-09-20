@@ -34,7 +34,7 @@ public:
 		IStatistics::EStatsJoinType join_type,
 		BOOL DoIgnoreLASJHistComputation);
 	// left anti semi join with another stats structure
-	static CStatistics *CalcLASJoinStatsStatic(
+	static gpos::owner<CStatistics *> CalcLASJoinStatsStatic(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats_input,
 		gpos::pointer<const IStatistics *> inner_stats_input,
 		gpos::pointer<CStatsPredJoinArray *> join_preds_stats,

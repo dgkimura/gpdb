@@ -113,9 +113,10 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 gpos::pointer<CColRefSet *> pcrsInput,
-						 ULONG child_index) const override;
+	gpos::owner<CColRefSet *> PcrsStat(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl,
+									   gpos::pointer<CColRefSet *> pcrsInput,
+									   ULONG child_index) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
@@ -125,7 +126,7 @@ public:
 	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
-	IStatistics *PstatsDerive(
+	gpos::owner<IStatistics *> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
 

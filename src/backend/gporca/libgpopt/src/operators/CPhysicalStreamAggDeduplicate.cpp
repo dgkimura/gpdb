@@ -30,14 +30,14 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalStreamAggDeduplicate::CPhysicalStreamAggDeduplicate(
 	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-	CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
-	gpos::owner<CColRefArray *> pdrgpcrKeys, BOOL fGeneratesDuplicates,
-	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
-	BOOL should_enforce_distribution)
+	gpos::pointer<CColRefArray *> pdrgpcrMinimal,
+	COperator::EGbAggType egbaggtype, gpos::owner<CColRefArray *> pdrgpcrKeys,
+	BOOL fGeneratesDuplicates, BOOL fMultiStage, BOOL isAggFromSplitDQA,
+	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
 	: CPhysicalStreamAgg(
-		  mp, colref_array, pdrgpcrMinimal, egbaggtype, fGeneratesDuplicates,
-		  nullptr /*pdrgpcrGbMinusDistinct*/, fMultiStage, isAggFromSplitDQA,
-		  aggStage, should_enforce_distribution),
+		  mp, std::move(colref_array), pdrgpcrMinimal, egbaggtype,
+		  fGeneratesDuplicates, nullptr /*pdrgpcrGbMinusDistinct*/, fMultiStage,
+		  isAggFromSplitDQA, aggStage, should_enforce_distribution),
 	  m_pdrgpcrKeys(std::move(pdrgpcrKeys))
 {
 	GPOS_ASSERT(nullptr != m_pdrgpcrKeys);

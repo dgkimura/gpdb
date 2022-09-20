@@ -64,7 +64,7 @@ CLogicalUnary::Esp(CExpressionHandle &exprhdl) const
 //		Derive statistics for projection operators
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalUnary::PstatsDeriveProject(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::pointer<UlongToIDatumMap *> phmuldatum) const
@@ -77,7 +77,7 @@ CLogicalUnary::PstatsDeriveProject(
 	gpos::owner<ULongPtrArray *> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	pcrs->ExtractColIds(mp, colids);
 
-	IStatistics *stats = CProjectStatsProcessor::CalcProjStats(
+	gpos::owner<IStatistics *> stats = CProjectStatsProcessor::CalcProjStats(
 		mp, dynamic_cast<CStatistics *>(child_stats), colids, phmuldatum);
 
 	// clean up

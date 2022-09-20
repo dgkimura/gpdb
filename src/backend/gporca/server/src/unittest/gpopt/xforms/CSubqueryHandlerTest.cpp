@@ -223,14 +223,14 @@ CSubqueryHandlerTest::EresUnittest_SubqueryWithDisjunction()
 
 	// create a subquery with const table get expression
 
-	CExpression *pexprOuter = nullptr;
-	CExpression *pexprInner = nullptr;
+	gpos::owner<CExpression *> pexprOuter = nullptr;
+	gpos::owner<CExpression *> pexprInner = nullptr;
 	CSubqueryTestUtils::GenerateGetExpressions(mp, &pexprOuter, &pexprInner);
 
 	gpos::owner<CExpression *> pexpr =
 		CSubqueryTestUtils::PexprSelectWithSubqueryBoolOp(
-			mp, pexprOuter, pexprInner, true /*fCorrelated*/,
-			CScalarBoolOp::EboolopOr);
+			mp, std::move(pexprOuter), std::move(pexprInner),
+			true /*fCorrelated*/, CScalarBoolOp::EboolopOr);
 
 	gpos::pointer<CXform *> pxform =
 		CXformFactory::Pxff()->Pxf(CXform::ExfSelect2Apply);

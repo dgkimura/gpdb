@@ -44,7 +44,7 @@ CLogicalInnerApply::CLogicalInnerApply(CMemoryPool *mp) : CLogicalApply(mp)
 CLogicalInnerApply::CLogicalInnerApply(CMemoryPool *mp,
 									   gpos::owner<CColRefArray *> pdrgpcrInner,
 									   EOperatorId eopidOriginSubq)
-	: CLogicalApply(mp, pdrgpcrInner, eopidOriginSubq)
+	: CLogicalApply(mp, std::move(pdrgpcrInner), eopidOriginSubq)
 {
 	GPOS_ASSERT(0 < pdrgpcrInner->Size());
 }

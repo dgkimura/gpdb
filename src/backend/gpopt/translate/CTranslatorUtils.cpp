@@ -291,9 +291,9 @@ CTranslatorUtils::ConvertToCDXLLogicalTVF(CMemoryPool *mp,
 			CDXLUtils::CreateMDNameFromCharArray(mp, rte->eref->aliasname);
 
 		// if TVF evaluates to const, pass invalid key as funcid
-		gpos::owner<CDXLLogicalTVF *> tvf_dxl = GPOS_NEW(mp)
-			CDXLLogicalTVF(mp, GPOS_NEW(mp) CMDIdGPDB(0), mdid_return_type,
-						   func_name, std::move(column_descrs));
+		gpos::owner<CDXLLogicalTVF *> tvf_dxl = GPOS_NEW(mp) CDXLLogicalTVF(
+			mp, GPOS_NEW(mp) CMDIdGPDB(0), std::move(mdid_return_type),
+			func_name, std::move(column_descrs));
 
 		return tvf_dxl;
 	}
@@ -366,8 +366,9 @@ CTranslatorUtils::ConvertToCDXLLogicalTVF(CMemoryPool *mp,
 
 	CMDName *pmdfuncname = GPOS_NEW(mp) CMDName(mp, func->Mdname().GetMDName());
 
-	gpos::owner<CDXLLogicalTVF *> tvf_dxl = GPOS_NEW(mp) CDXLLogicalTVF(
-		mp, mdid_func, mdid_return_type, pmdfuncname, std::move(column_descrs));
+	gpos::owner<CDXLLogicalTVF *> tvf_dxl = GPOS_NEW(mp)
+		CDXLLogicalTVF(mp, std::move(mdid_func), std::move(mdid_return_type),
+					   pmdfuncname, std::move(column_descrs));
 
 	return tvf_dxl;
 }
@@ -650,7 +651,7 @@ CTranslatorUtils::ExpandCompositeType(CMemoryPool *mp, CMDAccessor *md_accessor,
 	GPOS_ASSERT(nullptr != type);
 	GPOS_ASSERT(type->IsComposite());
 
-	IMDId *rel_mdid = type->GetBaseRelMdid();
+	gpos::pointer<IMDId *> rel_mdid = type->GetBaseRelMdid();
 	gpos::pointer<const IMDRelation *> rel = md_accessor->RetrieveRel(rel_mdid);
 	GPOS_ASSERT(nullptr != rel);
 

@@ -73,7 +73,7 @@ CPhysicalInnerNLJoin::~CPhysicalInnerNLJoin() = default;
 //		  is requested for Non-Singleton (or Singleton if outer delivered Universal distribution)
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalInnerNLJoin::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
 	gpos::pointer<CDistributionSpec *>,	 //pdsRequired,

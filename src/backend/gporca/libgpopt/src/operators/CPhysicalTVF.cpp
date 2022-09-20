@@ -124,7 +124,7 @@ CPhysicalTVF::FInputOrderSensitive() const
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CPhysicalTVF::PcrsRequired(CMemoryPool *,					 // mp,
 						   CExpressionHandle &,				 // exprhdl,
 						   gpos::pointer<CColRefSet *>,		 // pcrsRequired,
@@ -208,13 +208,13 @@ CPhysicalTVF::PrsRequired(CMemoryPool *,						// mp,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
-CPhysicalTVF::PcteRequired(CMemoryPool *,			  //mp,
-						   CExpressionHandle &,		  //exprhdl,
-						   gpos::pointer<CCTEReq *>,  //pcter,
-						   ULONG,					  //child_index,
-						   CDrvdPropArray *,		  //pdrgpdpCtxt,
-						   ULONG					  //ulOptReq
+gpos::owner<CCTEReq *>
+CPhysicalTVF::PcteRequired(CMemoryPool *,					 //mp,
+						   CExpressionHandle &,				 //exprhdl,
+						   gpos::pointer<CCTEReq *>,		 //pcter,
+						   ULONG,							 //child_index,
+						   gpos::pointer<CDrvdPropArray *>,	 //pdrgpdpCtxt,
+						   ULONG							 //ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalTVF has no relational children");

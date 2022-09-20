@@ -20,7 +20,7 @@ namespace gpnaucrates
 class CLeftSemiJoinStatsProcessor : public CJoinStatsProcessor
 {
 public:
-	static CStatistics *CalcLSJoinStatsStatic(
+	static gpos::owner<CStatistics *> CalcLSJoinStatsStatic(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats,
 		gpos::pointer<const IStatistics *> inner_side_stats,
 		gpos::pointer<CStatsPredJoinArray *> join_preds_stats);

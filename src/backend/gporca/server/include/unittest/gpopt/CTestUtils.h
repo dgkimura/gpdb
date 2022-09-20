@@ -512,11 +512,13 @@ public:
 		BOOL fCrossProduct);
 
 	// generate a query context from an array of required column references
-	static CQueryContext *PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
+	static CQueryContext *PqcGenerate(CMemoryPool *mp,
+									  gpos::pointer<CExpression *> pexpr,
 									  CColRefArray *colref_array);
 
 	// generate a dummy query context for testing
-	static CQueryContext *PqcGenerate(CMemoryPool *mp, CExpression *pexpr);
+	static CQueryContext *PqcGenerate(CMemoryPool *mp,
+									  gpos::pointer<CExpression *> pexpr);
 
 	// generate a nested AND/OR tree
 	static gpos::owner<CExpression *> PexprScalarNestedPreds(

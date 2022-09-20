@@ -184,13 +184,13 @@ CSubqueryHandler::PexprReplace(CMemoryPool *mp,
 gpos::owner<CExpression *>
 CSubqueryHandler::PexprSubqueryPred(CExpression *pexprOuter,
 									gpos::pointer<CExpression *> pexprSubquery,
-									CExpression **ppexprResult,
+									gpos::owner<CExpression *> *ppexprResult,
 									CSubqueryHandler::ESubqueryCtxt esqctxt)
 {
 	GPOS_ASSERT(CUtils::FQuantifiedSubquery(pexprSubquery->Pop()));
 
 	gpos::owner<CExpression *> pexprNewScalar = nullptr;
-	CExpression *pexprNewLogical = nullptr;
+	gpos::owner<CExpression *> pexprNewLogical = nullptr;
 
 	CExpression *pexprScalarChild = (*pexprSubquery)[1];
 
@@ -1122,7 +1122,7 @@ CSubqueryHandler::FCreateOuterApplyForExistOrQuant(
 {
 	BOOL fExistential = CUtils::FExistentialSubquery(pexprSubquery->Pop());
 
-	CColRefArray *colref_array = nullptr;
+	gpos::owner<CColRefArray *> colref_array = nullptr;
 	BOOL fGbOnInner = false;
 	if (!FCreateGrpCols(mp, pexprOuter, pexprInner, fExistential,
 						fOuterRefsUnderInner, &colref_array, &fGbOnInner))
@@ -1134,7 +1134,7 @@ CSubqueryHandler::FCreateOuterApplyForExistOrQuant(
 	GPOS_ASSERT(0 < colref_array->Size());
 
 	// add a project node on top of inner expression
-	CExpression *pexprPrjInner = nullptr;
+	gpos::owner<CExpression *> pexprPrjInner = nullptr;
 
 	AddProjectNode(mp, pexprInner, &pexprPrjInner);
 	gpos::pointer<CExpression *> pexprPrjList = (*pexprPrjInner)[1];
@@ -1510,7 +1510,7 @@ CSubqueryHandler::FRemoveAnySubquery(
 	COperator::EOperatorId eopidSubq = pexprSubquery->Pop()->Eopid();
 
 	// build subquery quantified comparison
-	CExpression *pexprResult = nullptr;
+	gpos::owner<CExpression *> pexprResult = nullptr;
 	gpos::owner<CExpression *> pexprPredicate =
 		PexprSubqueryPred(pexprInner, pexprSubquery, &pexprResult, esqctxt);
 
@@ -2027,7 +2027,7 @@ CSubqueryHandler::FRemoveExistsSubquery(
 	gpos::owner<CExpression *> pexprOuter,
 	gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
 	gpos::owner<CExpression *> *ppexprNewOuter,
-	CExpression **ppexprResidualScalar)
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 	if (m_fEnforceCorrelatedApply)
 	{
@@ -2056,7 +2056,7 @@ CSubqueryHandler::FRemoveNotExistsSubquery(
 	gpos::owner<CExpression *> pexprOuter,
 	gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
 	gpos::owner<CExpression *> *ppexprNewOuter,
-	CExpression **ppexprResidualScalar)
+	gpos::owner<CExpression *> *ppexprResidualScalar)
 {
 	if (m_fEnforceCorrelatedApply)
 	{
@@ -2114,7 +2114,7 @@ CSubqueryHandler::FRecursiveHandler(
 	{
 		gpos::pointer<CExpression *> pexprScalarChild = (*pexprScalar)[ul];
 		gpos::pointer<COperator *> popScalarChild = pexprScalarChild->Pop();
-		CExpression *pexprNewLogical = nullptr;
+		gpos::owner<CExpression *> pexprNewLogical = nullptr;
 		gpos::owner<CExpression *> pexprNewScalar = nullptr;
 
 		// Set the subquery context to Value for a non-scalar subquery nested in a

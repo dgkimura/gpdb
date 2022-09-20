@@ -2336,7 +2336,8 @@ CTranslatorDXLToScalar::TranslateDXLScalarSortGroupClauseToScalar(
 //
 //---------------------------------------------------------------------------
 Oid
-CTranslatorDXLToScalar::GetFunctionReturnTypeOid(IMDId *mdid) const
+CTranslatorDXLToScalar::GetFunctionReturnTypeOid(
+	gpos::pointer<IMDId *> mdid) const
 {
 	return gpos::dyn_cast<CMDIdGPDB>(
 			   m_md_accessor->RetrieveFunc(mdid)->GetResultTypeMdid())

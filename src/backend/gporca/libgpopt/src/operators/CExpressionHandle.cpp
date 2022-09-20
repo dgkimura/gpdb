@@ -1305,8 +1305,8 @@ CExpressionHandle::PopGrandchild(ULONG child_index, ULONG grandchild_index,
 //
 //---------------------------------------------------------------------------
 void
-CExpressionHandle::DeriveProducerStats(ULONG child_index,
-									   CColRefSet *pcrsStats) const
+CExpressionHandle::DeriveProducerStats(
+	ULONG child_index, gpos::pointer<CColRefSet *> pcrsStats) const
 {
 	// check to see if there are any CTE consumers in the group whose properties have
 	// to be pushed to its corresponding CTE producer
@@ -1318,7 +1318,7 @@ CExpressionHandle::DeriveProducerStats(ULONG child_index,
 		{
 			gpos::pointer<CGroupExpression *> pgexprCTEConsumer =
 				pgroupChild->PgexprAnyCTEConsumer();
-			CLogicalCTEConsumer *popConsumer =
+			gpos::pointer<CLogicalCTEConsumer *> popConsumer =
 				gpos::dyn_cast<CLogicalCTEConsumer>(pgexprCTEConsumer->Pop());
 			COptCtxt::PoctxtFromTLS()->Pcteinfo()->DeriveProducerStats(
 				popConsumer, pcrsStats);
@@ -1336,7 +1336,7 @@ CExpressionHandle::DeriveProducerStats(ULONG child_index,
 		gpos::pointer<CExpression *> pexprChild = (*pexpr)[child_index];
 		if (COperator::EopLogicalCTEConsumer == pexprChild->Pop()->Eopid())
 		{
-			CLogicalCTEConsumer *popConsumer =
+			gpos::pointer<CLogicalCTEConsumer *> popConsumer =
 				gpos::dyn_cast<CLogicalCTEConsumer>(pexprChild->Pop());
 			COptCtxt::PoctxtFromTLS()->Pcteinfo()->DeriveProducerStats(
 				popConsumer, pcrsStats);

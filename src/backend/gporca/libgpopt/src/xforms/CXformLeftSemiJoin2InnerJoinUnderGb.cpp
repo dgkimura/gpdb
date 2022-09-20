@@ -106,7 +106,7 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform(
 	pexprScalar->AddRef();
 
 	gpos::owner<CColRefArray *> pdrgpcrKeys = nullptr;
-	CColRefArray *pdrgpcrGrouping =
+	gpos::owner<CColRefArray *> pdrgpcrGrouping =
 		CUtils::PdrgpcrGroupingKey(mp, pexprOuter, &pdrgpcrKeys);
 	GPOS_ASSERT(nullptr != pdrgpcrKeys);
 
@@ -117,8 +117,8 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform(
 	gpos::owner<CExpression *> pexprGb = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAggDeduplicate(
-			mp, pdrgpcrGrouping, COperator::EgbaggtypeGlobal /*egbaggtype*/,
-			std::move(pdrgpcrKeys)),
+			mp, std::move(pdrgpcrGrouping),
+			COperator::EgbaggtypeGlobal /*egbaggtype*/, std::move(pdrgpcrKeys)),
 		std::move(pexprInnerJoin),
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp)));
 

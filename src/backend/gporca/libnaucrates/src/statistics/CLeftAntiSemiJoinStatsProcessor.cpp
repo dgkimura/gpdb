@@ -78,7 +78,7 @@ CLeftAntiSemiJoinStatsProcessor::JoinHistogramsLASJ(
 }
 
 //	Return statistics object after performing LASJ
-CStatistics *
+gpos::owner<CStatistics *>
 CLeftAntiSemiJoinStatsProcessor::CalcLASJoinStatsStatic(
 	CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats_input,
 	gpos::pointer<const IStatistics *> inner_stats_input,

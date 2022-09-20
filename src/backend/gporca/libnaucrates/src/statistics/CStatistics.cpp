@@ -403,7 +403,7 @@ CStatistics::IsEmptyJoin(gpos::pointer<const CStatistics *> outer_stats,
 // for deriving the stat objects for the corresponding join operator
 
 //	return statistics object after performing LOJ operation with another statistics structure
-IStatistics *
+gpos::owner<IStatistics *>
 CStatistics::CalcLOJoinStats(CMemoryPool *mp,
 							 gpos::pointer<const IStatistics *> other_stats,
 							 CStatsPredJoinArray *join_preds_stats) const
@@ -415,10 +415,10 @@ CStatistics::CalcLOJoinStats(CMemoryPool *mp,
 
 
 //	return statistics object after performing semi-join with another statistics structure
-IStatistics *
+gpos::owner<IStatistics *>
 CStatistics::CalcLSJoinStats(
 	CMemoryPool *mp, gpos::pointer<const IStatistics *> inner_side_stats,
-	CStatsPredJoinArray *join_preds_stats) const
+	gpos::pointer<CStatsPredJoinArray *> join_preds_stats) const
 {
 	return CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
 		mp, this, inner_side_stats, join_preds_stats);
@@ -427,21 +427,21 @@ CStatistics::CalcLSJoinStats(
 
 
 // return statistics object after performing inner join
-IStatistics *
-CStatistics::CalcInnerJoinStats(CMemoryPool *mp,
-								gpos::pointer<const IStatistics *> other_stats,
-								CStatsPredJoinArray *join_preds_stats) const
+gpos::owner<IStatistics *>
+CStatistics::CalcInnerJoinStats(
+	CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
+	gpos::pointer<CStatsPredJoinArray *> join_preds_stats) const
 {
 	return CInnerJoinStatsProcessor::CalcInnerJoinStatsStatic(
 		mp, this, other_stats, join_preds_stats);
 }
 
 // return statistics object after performing LASJ
-IStatistics *
-CStatistics::CalcLASJoinStats(CMemoryPool *mp,
-							  gpos::pointer<const IStatistics *> other_stats,
-							  CStatsPredJoinArray *join_preds_stats,
-							  BOOL DoIgnoreLASJHistComputation) const
+gpos::owner<IStatistics *>
+CStatistics::CalcLASJoinStats(
+	CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
+	gpos::pointer<CStatsPredJoinArray *> join_preds_stats,
+	BOOL DoIgnoreLASJHistComputation) const
 {
 	return CLeftAntiSemiJoinStatsProcessor::CalcLASJoinStatsStatic(
 		mp, this, other_stats, join_preds_stats, DoIgnoreLASJHistComputation);

@@ -238,7 +238,7 @@ public:
 	// create constraint from scalar expression and pass back any discovered
 	// equivalence classes
 	static gpos::owner<CConstraint *> PcnstrFromScalarExpr(
-		CMemoryPool *mp, CExpression *pexpr,
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
 		gpos::owner<CColRefSetArray *> *ppdrgpcrs, BOOL infer_nulls_as = false);
 
 	// create conjunction from array of constraints

@@ -2567,7 +2567,7 @@ CTestUtils::PexprLogicalNAryJoin(CMemoryPool *mp, CWStringConst *pstrRel,
 //
 //---------------------------------------------------------------------------
 CQueryContext *
-CTestUtils::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
+CTestUtils::PqcGenerate(CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
 						CColRefArray *colref_array)
 {
 	// generate required columns
@@ -2628,7 +2628,7 @@ CTestUtils::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 //
 //---------------------------------------------------------------------------
 CQueryContext *
-CTestUtils::PqcGenerate(CMemoryPool *mp, CExpression *pexpr)
+CTestUtils::PqcGenerate(CMemoryPool *mp, gpos::pointer<CExpression *> pexpr)
 {
 	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pexpr->DeriveOutputColumns());

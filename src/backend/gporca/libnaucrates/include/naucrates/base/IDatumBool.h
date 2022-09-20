@@ -12,6 +12,7 @@
 #define GPNAUCRATES_IDatumBool_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatum.h"
 
@@ -100,7 +101,7 @@ public:
 	}
 
 	// return the padded datum
-	IDatum *
+	gpos::owner<IDatum *>
 	MakePaddedDatum(CMemoryPool *,	// mp,
 					ULONG			// col_len
 	) const override

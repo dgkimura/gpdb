@@ -1522,8 +1522,8 @@ CTranslatorRelcacheToDXL::RetrieveCheckConstraints(CMemoryPool *mp,
 
 	mdid->AddRef();
 
-	return GPOS_NEW(mp) CMDCheckConstraintGPDB(mp, mdid, mdname, mdid_rel,
-											   std::move(scalar_dxlnode));
+	return GPOS_NEW(mp) CMDCheckConstraintGPDB(
+		mp, mdid, mdname, std::move(mdid_rel), std::move(scalar_dxlnode));
 }
 
 //---------------------------------------------------------------------------
@@ -1723,7 +1723,7 @@ CTranslatorRelcacheToDXL::RetrieveColStats(CMemoryPool *mp,
 										   IMDId *mdid)
 {
 	CMDIdColStats *mdid_col_stats = gpos::dyn_cast<CMDIdColStats>(mdid);
-	IMDId *mdid_rel = mdid_col_stats->GetRelMdId();
+	gpos::pointer<IMDId *> mdid_rel = mdid_col_stats->GetRelMdId();
 	ULONG pos = mdid_col_stats->Position();
 	OID rel_oid = gpos::dyn_cast<CMDIdGPDB>(mdid_rel)->Oid();
 
@@ -1749,9 +1749,9 @@ CTranslatorRelcacheToDXL::RetrieveColStats(CMemoryPool *mp,
 	if (0 > attno)
 	{
 		mdid_col_stats->AddRef();
-		return GenerateStatsForSystemCols(mp, rel_oid, mdid_col_stats,
-										  md_colname, att_type, attno,
-										  dxl_stats_bucket_array, num_rows);
+		return GenerateStatsForSystemCols(
+			mp, rel_oid, mdid_col_stats, md_colname, att_type, attno,
+			std::move(dxl_stats_bucket_array), num_rows);
 	}
 
 	// extract out histogram and mcv information from pg_statistic
@@ -1939,7 +1939,8 @@ CTranslatorRelcacheToDXL::RetrieveColStats(CMemoryPool *mp,
 	mdid_col_stats->AddRef();
 	gpos::owner<CDXLColStats *> dxl_col_stats = GPOS_NEW(mp) CDXLColStats(
 		mp, mdid_col_stats, md_colname, width, null_freq, distinct_remaining,
-		freq_remaining, dxl_stats_bucket_array, false /* is_col_stats_missing */
+		freq_remaining, std::move(dxl_stats_bucket_array),
+		false /* is_col_stats_missing */
 	);
 
 	return dxl_col_stats;
@@ -1958,7 +1959,7 @@ gpos::owner<CDXLColStats *>
 CTranslatorRelcacheToDXL::GenerateStatsForSystemCols(
 	CMemoryPool *mp, OID rel_oid, CMDIdColStats *mdid_col_stats,
 	CMDName *md_colname, OID att_type, AttrNumber attno,
-	CDXLBucketArray *dxl_stats_bucket_array, CDouble num_rows)
+	gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array, CDouble num_rows)
 {
 	GPOS_ASSERT(nullptr != mdid_col_stats);
 	GPOS_ASSERT(nullptr != md_colname);
@@ -2011,9 +2012,10 @@ CTranslatorRelcacheToDXL::GenerateStatsForSystemCols(
 	mdid_atttype->Release();
 	md_type->Release();
 
-	return GPOS_NEW(mp) CDXLColStats(
-		mp, mdid_col_stats, md_colname, width, null_freq, distinct_remaining,
-		freq_remaining, dxl_stats_bucket_array, is_col_stats_missing);
+	return GPOS_NEW(mp)
+		CDXLColStats(mp, mdid_col_stats, md_colname, width, null_freq,
+					 distinct_remaining, freq_remaining,
+					 std::move(dxl_stats_bucket_array), is_col_stats_missing);
 }
 
 
@@ -2442,10 +2444,12 @@ CTranslatorRelcacheToDXL::TransformHistogramToDXLBucketArray(
 	for (ULONG ul = 0; ul < num_buckets; ul++)
 	{
 		CBucket *bucket = (*buckets)[ul];
-		IDatum *datum_lower = bucket->GetLowerBound()->GetDatum();
+		gpos::pointer<IDatum *> datum_lower =
+			bucket->GetLowerBound()->GetDatum();
 		gpos::owner<CDXLDatum *> dxl_lower =
 			md_type->GetDatumVal(mp, datum_lower);
-		IDatum *datum_upper = bucket->GetUpperBound()->GetDatum();
+		gpos::pointer<IDatum *> datum_upper =
+			bucket->GetUpperBound()->GetDatum();
 		gpos::owner<CDXLDatum *> dxl_upper =
 			md_type->GetDatumVal(mp, datum_upper);
 		gpos::owner<CDXLBucket *> dxl_bucket = GPOS_NEW(mp)

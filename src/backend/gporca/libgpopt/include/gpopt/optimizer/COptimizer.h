@@ -55,11 +55,10 @@ private:
 		gpos::owner<CSearchStageArray *> search_stage_array);
 
 	// translate an optimizer expression into a DXL tree
-	static CDXLNode *CreateDXLNode(CMemoryPool *mp, CMDAccessor *md_accessor,
-								   CExpression *pexpr,
-								   CColRefArray *colref_array,
-								   gpos::pointer<CMDNameArray *> pdrgpmdname,
-								   ULONG ulHosts);
+	static gpos::owner<CDXLNode *> CreateDXLNode(
+		CMemoryPool *mp, CMDAccessor *md_accessor, CExpression *pexpr,
+		CColRefArray *colref_array, gpos::pointer<CMDNameArray *> pdrgpmdname,
+		ULONG ulHosts);
 
 	// helper function to print query expression
 	static void PrintQuery(CMemoryPool *mp,
@@ -86,7 +85,7 @@ private:
 
 public:
 	// main optimizer function
-	static CDXLNode *PdxlnOptimize(
+	static gpos::owner<CDXLNode *> PdxlnOptimize(
 		CMemoryPool *mp,
 		CMDAccessor *md_accessor,  // MD accessor
 		gpos::pointer<const CDXLNode *> query,

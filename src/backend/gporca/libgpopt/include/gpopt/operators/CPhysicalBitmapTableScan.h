@@ -90,7 +90,7 @@ public:
 	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// statistics derivation during costing
-	IStatistics *
+	gpos::owner<IStatistics *>
 	PstatsDerive(CMemoryPool *,						// mp
 				 CExpressionHandle &,				// exprhdl
 				 gpos::pointer<CReqdPropPlan *>,	// prpplan

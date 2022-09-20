@@ -32,7 +32,8 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalExternalScan::CPhysicalExternalScan(
 	CMemoryPool *mp, const CName *pnameAlias,
-	gpos::owner<CTableDescriptor *> ptabdesc, CColRefArray *pdrgpcrOutput)
+	gpos::owner<CTableDescriptor *> ptabdesc,
+	gpos::owner<CColRefArray *> pdrgpcrOutput)
 	: CPhysicalTableScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput)
 {
 	// if this table is master only, then keep the original distribution spec.

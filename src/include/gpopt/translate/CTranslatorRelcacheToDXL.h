@@ -325,7 +325,7 @@ private:
 	static gpos::owner<CDXLColStats *> GenerateStatsForSystemCols(
 		CMemoryPool *mp, OID rel_oid, CMDIdColStats *mdid_col_stats,
 		CMDName *md_colname, OID att_type, AttrNumber attrnum,
-		CDXLBucketArray *dxl_stats_bucket_array, CDouble rows);
+		gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array, CDouble rows);
 
 	static gpos::owner<IMdIdArray *> RetrieveIndexPartitions(CMemoryPool *mp,
 															 OID rel_oid);

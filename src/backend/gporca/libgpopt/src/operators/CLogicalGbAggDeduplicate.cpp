@@ -46,7 +46,7 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(CMemoryPool *mp)
 CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
 	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
 	COperator::EGbAggType egbaggtype, gpos::owner<CColRefArray *> pdrgpcrKeys)
-	: CLogicalGbAgg(mp, colref_array, egbaggtype),
+	: CLogicalGbAgg(mp, std::move(colref_array), egbaggtype),
 	  m_pdrgpcrKeys(std::move(pdrgpcrKeys))
 {
 	GPOS_ASSERT(nullptr != m_pdrgpcrKeys);
@@ -64,7 +64,8 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
 	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
 	gpos::owner<CColRefArray *> pdrgpcrMinimal,
 	COperator::EGbAggType egbaggtype, gpos::owner<CColRefArray *> pdrgpcrKeys)
-	: CLogicalGbAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype),
+	: CLogicalGbAgg(mp, std::move(colref_array), std::move(pdrgpcrMinimal),
+					egbaggtype),
 	  m_pdrgpcrKeys(std::move(pdrgpcrKeys))
 {
 	GPOS_ASSERT(nullptr != m_pdrgpcrKeys);
@@ -123,7 +124,7 @@ CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns(
 //		Compute required stats columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalGbAggDeduplicate::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   gpos::pointer<CColRefSet *> pcrsInput,
 								   ULONG child_index) const
@@ -237,7 +238,7 @@ CLogicalGbAggDeduplicate::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalGbAggDeduplicate::PstatsDerive(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::pointer<IStatisticsArray *>  // not used
@@ -260,8 +261,8 @@ CLogicalGbAggDeduplicate::PstatsDerive(
 		keys->ExchangeSet(colref->Id());
 	}
 
-	IStatistics *stats = CLogicalGbAgg::PstatsDerive(mp, child_stats, Pdrgpcr(),
-													 pdrgpulComputedCols, keys);
+	gpos::owner<IStatistics *> stats = CLogicalGbAgg::PstatsDerive(
+		mp, child_stats, Pdrgpcr(), pdrgpulComputedCols, keys);
 	keys->Release();
 	pdrgpulComputedCols->Release();
 

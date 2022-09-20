@@ -162,7 +162,8 @@ CDecorrelator::FDelayable(gpos::pointer<CExpression *>
 //
 //---------------------------------------------------------------------------
 BOOL
-CDecorrelator::FProcess(CMemoryPool *mp, CExpression *pexpr, BOOL fEqualityOnly,
+CDecorrelator::FProcess(CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+						BOOL fEqualityOnly,
 						gpos::owner<CExpression *> *ppexprDecorrelated,
 						CExpressionArray *pdrgpexprCorrelations,
 						CColRefSet *outerRefsToRemove)
@@ -381,7 +382,7 @@ CDecorrelator::FProcessSelect(CMemoryPool *mp,
 	}
 
 	// process predicate
-	CExpression *pexprPredicate = nullptr;
+	gpos::owner<CExpression *> pexprPredicate = nullptr;
 	BOOL fSuccess = FProcessPredicate(mp, pexpr, (*pexpr)[1], fEqualityOnly,
 									  &pexprPredicate, pdrgpexprCorrelations,
 									  outerRefsToRemove);

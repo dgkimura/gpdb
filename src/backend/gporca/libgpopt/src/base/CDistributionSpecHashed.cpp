@@ -772,7 +772,7 @@ CDistributionSpecHashed::ComputeEquivHashExprs(
 													 equiv_col);
 					// add cast on the expressions if required, both the outer and inner hash exprs
 					// should be of the same data type else they may be hashed to different segments
-					CExpression *predicate_expr_with_casts =
+					gpos::owner<CExpression *> predicate_expr_with_casts =
 						CCastUtils::PexprAddCast(
 							mp, predicate_expr_with_inferred_quals);
 					gpos::owner<CExpression *> original_predicate_expr =

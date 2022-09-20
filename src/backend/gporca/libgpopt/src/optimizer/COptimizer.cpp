@@ -229,7 +229,7 @@ COptimizer::PrintQueryOrPlan(CMemoryPool *mp,
 //		must happen at the caller side if needed
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::owner<CDXLNode *>
 COptimizer::PdxlnOptimize(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
 	gpos::pointer<const CDXLNode *> query,
@@ -271,7 +271,7 @@ COptimizer::PdxlnOptimize(
 
 		mdmp.Init(osMinidump.Value());
 	}
-	CDXLNode *pdxlnPlan = nullptr;
+	gpos::owner<CDXLNode *> pdxlnPlan = nullptr;
 	CErrorHandlerStandard errhdl;
 	GPOS_TRY_HDL(&errhdl)
 	{
@@ -457,7 +457,7 @@ COptimizer::PexprOptimize(CMemoryPool *mp, CQueryContext *pqc,
 //		Translate an optimizer expression into a DXL tree
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::owner<CDXLNode *>
 COptimizer::CreateDXLNode(CMemoryPool *mp, CMDAccessor *md_accessor,
 						  CExpression *pexpr, CColRefArray *colref_array,
 						  gpos::pointer<CMDNameArray *> pdrgpmdname,
@@ -472,7 +472,7 @@ COptimizer::CreateDXLNode(CMemoryPool *mp, CMDAccessor *md_accessor,
 	}
 
 	CTranslatorExprToDXL ptrexprtodxl(mp, md_accessor, std::move(pdrgpiHosts));
-	CDXLNode *pdxlnPlan =
+	gpos::owner<CDXLNode *> pdxlnPlan =
 		ptrexprtodxl.PdxlnTranslate(pexpr, colref_array, pdrgpmdname);
 
 	return pdxlnPlan;

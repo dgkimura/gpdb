@@ -159,7 +159,8 @@ CXformJoin2IndexApply::CreateHomogeneousBtreeIndexApplyAlternatives(
 	gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
 	CExpression *endOfNodesToInsertAboveIndexGet,
 	gpos::pointer<CTableDescriptor *> ptabdescInner,
-	gpos::pointer<CColRefSet *> pcrsScalarExpr, CColRefSet *outer_refs,
+	gpos::pointer<CColRefSet *> pcrsScalarExpr,
+	gpos::pointer<CColRefSet *> outer_refs,
 	gpos::pointer<CColRefSet *> pcrsReqd, ULONG ulIndices,
 	gpos::pointer<CXformResult *> pxfres)
 {
@@ -206,8 +207,9 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 	gpos::owner<CExpression *> origJoinPred,
 	gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
 	CExpression *endOfNodesToInsertAboveIndexGet, CMDAccessor *md_accessor,
-	CExpressionArray *pdrgpexprConjuncts,
-	gpos::pointer<CColRefSet *> pcrsScalarExpr, CColRefSet *outer_refs,
+	gpos::pointer<CExpressionArray *> pdrgpexprConjuncts,
+	gpos::pointer<CColRefSet *> pcrsScalarExpr,
+	gpos::pointer<CColRefSet *> outer_refs,
 	gpos::pointer<CColRefSet *> pcrsReqd,
 	gpos::pointer<const IMDRelation *> pmdrel,
 	gpos::pointer<const IMDIndex *> pmdindex,
@@ -285,7 +287,8 @@ CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives(
 	CTableDescriptor *ptabdescInner, CColRefSet *outer_refs,
 	CColRefSet *pcrsReqd, gpos::pointer<CXformResult *> pxfres)
 {
-	CLogical *popGet = gpos::dyn_cast<CLogical>(pexprInner->Pop());
+	gpos::pointer<CLogical *> popGet =
+		gpos::dyn_cast<CLogical>(pexprInner->Pop());
 	gpos::owner<CExpression *> pexprLogicalIndexGet =
 		CXformUtils::PexprBitmapTableGet(mp, popGet, joinOp->UlOpId(),
 										 ptabdescInner, pexprScalar, outer_refs,

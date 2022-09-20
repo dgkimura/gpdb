@@ -34,7 +34,8 @@ public:
 
 	// ctor
 	CPhysicalExternalScan(CMemoryPool *, const CName *,
-						  gpos::owner<CTableDescriptor *>, CColRefArray *);
+						  gpos::owner<CTableDescriptor *>,
+						  gpos::owner<CColRefArray *>);
 
 	// ident accessors
 	EOperatorId

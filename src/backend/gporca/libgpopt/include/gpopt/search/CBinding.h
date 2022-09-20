@@ -56,8 +56,9 @@ private:
 						  CExpressionArray *pdrgpexpr);
 
 	// move cursor
-	static CGroupExpression *PgexprNext(gpos::pointer<CGroup *> pgroup,
-										CGroupExpression *pgexpr);
+	static CGroupExpression *PgexprNext(
+		gpos::pointer<CGroup *> pgroup,
+		gpos::pointer<CGroupExpression *> pgexpr);
 
 	// expand n-th child of pattern
 	static CExpression *PexprExpandPattern(CExpression *pexpr, ULONG ulPos,

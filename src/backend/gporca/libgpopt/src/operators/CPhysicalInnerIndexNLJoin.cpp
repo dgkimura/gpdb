@@ -93,7 +93,7 @@ CPhysicalInnerIndexNLJoin::Matches(gpos::pointer<COperator *> pop) const
 //		Compute required distribution of the n-th child;
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalInnerIndexNLJoin::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
 	gpos::pointer<CDistributionSpec *>,	 //pdsRequired,

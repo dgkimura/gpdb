@@ -890,7 +890,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 	CColRef *colref = pexpr->DeriveOutputColumns()->PcrAny();
 
 	// remove the array child
-	CExpression *pexprArrayComp = (*pexpr->PdrgPexpr())[1];
+	gpos::pointer<CExpression *> pexprArrayComp = (*pexpr->PdrgPexpr())[1];
 	GPOS_ASSERT(CUtils::FScalarArrayCmp(pexprArrayComp));
 
 	gpos::owner<CConstraintInterval *> pcnstIn =
@@ -909,7 +909,8 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 	gpos::owner<CExpression *> pexprNotIn =
 		CTestUtils::PexprLogicalSelectArrayCmp(mp, CScalarArrayCmp::EarrcmpAll,
 											   IMDType::EcmptNEq);
-	CExpression *pexprArrayNotInComp = (*pexprNotIn->PdrgPexpr())[1];
+	gpos::pointer<CExpression *> pexprArrayNotInComp =
+		(*pexprNotIn->PdrgPexpr())[1];
 	CColRef *pcrNot = pexprNotIn->DeriveOutputColumns()->PcrAny();
 	gpos::owner<CConstraintInterval *> pcnstNotIn =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexprArrayNotInComp,
@@ -936,7 +937,8 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 											   IMDType::EcmptEq, pdrgpi);
 	CColRef *pcrInRepeats =
 		pexprInRepeatsSelect->DeriveOutputColumns()->PcrAny();
-	CExpression *pexprArrayCmpRepeats = (*pexprInRepeatsSelect->PdrgPexpr())[1];
+	gpos::pointer<CExpression *> pexprArrayCmpRepeats =
+		(*pexprInRepeatsSelect->PdrgPexpr())[1];
 	// add 2 repeated values and one unique
 	gpos::owner<CConstraintInterval *> pcnstInRepeats =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexprArrayCmpRepeats,
@@ -951,7 +953,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 											   IMDType::EcmptNEq, pdrgpi);
 	CColRef *pcrNotInRepeats =
 		pexprNotInRepeatsSelect->DeriveOutputColumns()->PcrAny();
-	CExpression *pexprNotInArrayCmpRepeats =
+	gpos::pointer<CExpression *> pexprNotInArrayCmpRepeats =
 		(*pexprNotInRepeatsSelect->PdrgPexpr())[1];
 	gpos::owner<CConstraintInterval *> pcnstNotInRepeats =
 		CConstraintInterval::PciIntervalFromScalarExpr(

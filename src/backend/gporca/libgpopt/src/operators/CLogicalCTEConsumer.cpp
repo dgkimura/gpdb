@@ -416,7 +416,8 @@ CLogicalCTEConsumer::PstatsDerive(
 	GPOS_ASSERT(nullptr != stats);
 
 	// copy the stats with the remaped colids
-	IStatistics *new_stats = stats->CopyStatsWithRemap(mp, m_phmulcr);
+	gpos::owner<IStatistics *> new_stats =
+		stats->CopyStatsWithRemap(mp, m_phmulcr);
 
 	return new_stats;
 }

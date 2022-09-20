@@ -183,8 +183,9 @@ CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		//
 		// This way the equiv spec stays incomplete only as long as it needs to be.
 
-		CExpression *pexprIndexPred = exprhdl.PexprScalarExactChild(
-			0 /*child_index*/, true /*error_on_null_return*/);
+		gpos::pointer<CExpression *> pexprIndexPred =
+			exprhdl.PexprScalarExactChild(0 /*child_index*/,
+										  true /*error_on_null_return*/);
 
 		gpos::pointer<CDistributionSpecHashed *> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(m_pds);

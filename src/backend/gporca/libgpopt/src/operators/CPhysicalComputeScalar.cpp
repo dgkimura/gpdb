@@ -276,16 +276,17 @@ CPhysicalComputeScalar::PrsRequired(
 //
 //---------------------------------------------------------------------------
 gpos::owner<CCTEReq *>
-CPhysicalComputeScalar::PcteRequired(CMemoryPool *,		   //mp,
-									 CExpressionHandle &,  //exprhdl,
-									 gpos::pointer<CCTEReq *> pcter,
-									 ULONG
+CPhysicalComputeScalar::PcteRequired(
+	CMemoryPool *,		  //mp,
+	CExpressionHandle &,  //exprhdl,
+	gpos::pointer<CCTEReq *> pcter,
+	ULONG
 #ifdef GPOS_DEBUG
-										 child_index
+		child_index
 #endif
-									 ,
-									 CDrvdPropArray *,	//pdrgpdpCtxt,
-									 ULONG				//ulOptReq
+	,
+	gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
+	ULONG							  //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

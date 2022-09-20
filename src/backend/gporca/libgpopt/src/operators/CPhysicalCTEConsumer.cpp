@@ -64,7 +64,7 @@ CPhysicalCTEConsumer::~CPhysicalCTEConsumer()
 //		Compute required output columns of the n-th child
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CPhysicalCTEConsumer::PcrsRequired(
 	CMemoryPool *,					  // mp,
 	CExpressionHandle &,			  // exprhdl,
@@ -152,13 +152,14 @@ CPhysicalCTEConsumer::PrsRequired(
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
-CPhysicalCTEConsumer::PcteRequired(CMemoryPool *,			  //mp,
-								   CExpressionHandle &,		  //exprhdl,
-								   gpos::pointer<CCTEReq *>,  //pcter,
-								   ULONG,					  //child_index,
-								   CDrvdPropArray *,		  //pdrgpdpCtxt,
-								   ULONG					  //ulOptReq
+gpos::owner<CCTEReq *>
+CPhysicalCTEConsumer::PcteRequired(
+	CMemoryPool *,					  //mp,
+	CExpressionHandle &,			  //exprhdl,
+	gpos::pointer<CCTEReq *>,		  //pcter,
+	ULONG,							  //child_index,
+	gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
+	ULONG							  //ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalCTEConsumer has no relational children");

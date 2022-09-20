@@ -206,7 +206,7 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::owner<CConstraint *>
 CConstraint::PcnstrFromScalarExpr(
-	CMemoryPool *mp, CExpression *pexpr,
+	CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
 	gpos::owner<CColRefSetArray *> *ppdrgpcrs,	// output equivalence classes
 	BOOL infer_nulls_as)
 {

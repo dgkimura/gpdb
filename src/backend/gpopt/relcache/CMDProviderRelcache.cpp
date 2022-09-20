@@ -70,7 +70,7 @@ CMDProviderRelcache::GetMDObjDXLStr(CMemoryPool *mp, CMDAccessor *md_accessor,
 // return the requested metadata object
 gpos::owner<IMDCacheObject *>
 CMDProviderRelcache::GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
-							  IMDId *mdid) const
+							  gpos::pointer<IMDId *> mdid) const
 {
 	gpos::owner<IMDCacheObject *> md_obj =
 		CTranslatorRelcacheToDXL::RetrieveObject(mp, md_accessor, mdid);

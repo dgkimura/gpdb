@@ -208,11 +208,11 @@ CPhysicalAgg::PcrsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 gpos::owner<CDistributionSpec *>
-CPhysicalAgg::PdsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 gpos::pointer<CDistributionSpec *> pdsInput,
-							 ULONG child_index, ULONG ulOptReq,
-							 gpos::pointer<CColRefArray *> pdrgpcgGrp,
-							 CColRefArray *pdrgpcrGrpMinimal) const
+CPhysicalAgg::PdsRequiredAgg(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
+	ULONG ulOptReq, gpos::pointer<CColRefArray *> pdrgpcgGrp,
+	gpos::pointer<CColRefArray *> pdrgpcrGrpMinimal) const
 {
 	GPOS_ASSERT(0 == child_index);
 
@@ -276,7 +276,8 @@ CPhysicalAgg::PdsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 gpos::owner<CDistributionSpec *>
-CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp, CColRefArray *colref_array)
+CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp,
+							   gpos::pointer<CColRefArray *> colref_array)
 {
 	GPOS_ASSERT(nullptr != colref_array);
 
@@ -303,12 +304,11 @@ CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp, CColRefArray *colref_array)
 //
 //---------------------------------------------------------------------------
 gpos::owner<CDistributionSpec *>
-CPhysicalAgg::PdsRequiredGlobalAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   gpos::pointer<CDistributionSpec *> pdsInput,
-								   ULONG child_index,
-								   gpos::pointer<CColRefArray *> pdrgpcrGrp,
-								   CColRefArray *pdrgpcrGrpMinimal,
-								   ULONG ulOptReq) const
+CPhysicalAgg::PdsRequiredGlobalAgg(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
+	gpos::pointer<CColRefArray *> pdrgpcrGrp,
+	gpos::pointer<CColRefArray *> pdrgpcrGrpMinimal, ULONG ulOptReq) const
 {
 	GPOS_ASSERT(FGlobal());
 	GPOS_ASSERT(2 > ulOptReq);
@@ -426,8 +426,8 @@ CPhysicalAgg::PcteRequired(CMemoryPool *,		 //mp,
 							   child_index
 #endif
 						   ,
-						   CDrvdPropArray *,  //pdrgpdpCtxt,
-						   ULONG			  //ulOptReq
+						   gpos::pointer<CDrvdPropArray *>,	 //pdrgpdpCtxt,
+						   ULONG							 //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

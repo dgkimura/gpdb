@@ -509,7 +509,7 @@ CNormalizer::PushThruSelect(CMemoryPool *mp,
 		gpos::owner<CExpressionArray *> pdrgpexprConjuncts =
 			CPredicateUtils::PdrgpexprConjuncts(mp, pexprPred);
 		gpos::owner<CExpressionArray *> pdrgpexprRemaining = nullptr;
-		CExpression *pexpr = nullptr;
+		gpos::owner<CExpression *> pexpr = nullptr;
 		PushThru(mp, pexprLogicalChild, pdrgpexprConjuncts, &pexpr,
 				 &pdrgpexprRemaining);
 		*ppexprResult = PexprSelect(mp, pexpr, pdrgpexprRemaining);

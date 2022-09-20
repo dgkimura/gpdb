@@ -1108,8 +1108,9 @@ CFilterCardinalityTest::EresUnittest_CStatisticsBasicsFromDXL()
 GPOS_RESULT
 CFilterCardinalityTest::EresUnittest_CStatisticsCompare(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	gpos::pointer<CStatisticsArray *> pdrgpstatBefore, CStatsPred *pred_stats,
-	const CHAR *szDXLOutput, BOOL fApplyTwice)
+	gpos::pointer<CStatisticsArray *> pdrgpstatBefore,
+	gpos::pointer<CStatsPred *> pred_stats, const CHAR *szDXLOutput,
+	BOOL fApplyTwice)
 {
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
@@ -1119,8 +1120,9 @@ CFilterCardinalityTest::EresUnittest_CStatisticsCompare(
 	GPOS_TRACE(GPOS_WSZ_LIT("Statistics before"));
 	CCardinalityTestUtils::PrintStats(mp, input_stats);
 
-	CStatistics *pstatsOutput = CFilterStatsProcessor::MakeStatsFilter(
-		mp, input_stats, pred_stats, true /* do_cap_NDVs */);
+	gpos::owner<CStatistics *> pstatsOutput =
+		CFilterStatsProcessor::MakeStatsFilter(mp, input_stats, pred_stats,
+											   true /* do_cap_NDVs */);
 
 	GPOS_TRACE(GPOS_WSZ_LIT("Statistics after"));
 	CCardinalityTestUtils::PrintStats(mp, pstatsOutput);
@@ -1160,8 +1162,9 @@ CFilterCardinalityTest::EresUnittest_CStatisticsCompare(
 
 	if (fApplyTwice && GPOS_OK == eres)
 	{
-		CStatistics *pstatsOutput2 = CFilterStatsProcessor::MakeStatsFilter(
-			mp, pstatsOutput, pred_stats, true /* do_cap_NDVs */);
+		gpos::owner<CStatistics *> pstatsOutput2 =
+			CFilterStatsProcessor::MakeStatsFilter(mp, pstatsOutput, pred_stats,
+												   true /* do_cap_NDVs */);
 		pstatsOutput2->Rows();
 		GPOS_TRACE(GPOS_WSZ_LIT("Statistics after another filter"));
 		CCardinalityTestUtils::PrintStats(mp, pstatsOutput2);

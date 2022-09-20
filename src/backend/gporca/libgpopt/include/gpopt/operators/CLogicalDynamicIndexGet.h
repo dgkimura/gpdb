@@ -57,7 +57,7 @@ public:
 							CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
 							const CName *pnameAlias, ULONG ulPartIndex,
 							gpos::owner<CColRefArray *> pdrgpcrOutput,
-							CColRef2dArray *pdrgpdrgpcrPart,
+							gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
 							gpos::Ref<IMdIdArray> partition_mdids);
 
 	// dtor

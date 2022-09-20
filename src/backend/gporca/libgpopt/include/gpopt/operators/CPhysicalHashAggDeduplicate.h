@@ -36,12 +36,15 @@ public:
 	CPhysicalHashAggDeduplicate(const CPhysicalHashAggDeduplicate &) = delete;
 
 	// ctor
-	CPhysicalHashAggDeduplicate(
-		CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-		CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
-		gpos::owner<CColRefArray *> pdrgpcrKeys, BOOL fGeneratesDuplicates,
-		BOOL fMultiStage, BOOL isAggFromSplitDQA,
-		CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution);
+	CPhysicalHashAggDeduplicate(CMemoryPool *mp,
+								gpos::owner<CColRefArray *> colref_array,
+								gpos::pointer<CColRefArray *> pdrgpcrMinimal,
+								COperator::EGbAggType egbaggtype,
+								gpos::owner<CColRefArray *> pdrgpcrKeys,
+								BOOL fGeneratesDuplicates, BOOL fMultiStage,
+								BOOL isAggFromSplitDQA,
+								CLogicalGbAgg::EAggStage aggStage,
+								BOOL should_enforce_distribution);
 
 	// dtor
 	~CPhysicalHashAggDeduplicate() override;

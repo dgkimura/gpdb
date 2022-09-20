@@ -256,10 +256,11 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// derive statistics
-	static IStatistics *PstatsDerive(
+	static gpos::owner<IStatistics *> PstatsDerive(
 		CMemoryPool *mp, gpos::pointer<IStatistics *> child_stats,
 		gpos::pointer<CColRefArray *> pdrgpcrGroupingCols,
-		gpos::pointer<ULongPtrArray *> pdrgpulComputedCols, CBitSet *keys);
+		gpos::pointer<ULongPtrArray *> pdrgpulComputedCols,
+		gpos::pointer<CBitSet *> keys);
 
 	// print group by aggregate type
 	static IOstream &OsPrintGbAggType(IOstream &os,

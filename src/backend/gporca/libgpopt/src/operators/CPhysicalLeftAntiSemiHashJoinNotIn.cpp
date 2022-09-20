@@ -28,10 +28,11 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalLeftAntiSemiHashJoinNotIn::CPhysicalLeftAntiSemiHashJoinNotIn(
-	CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-	CExpressionArray *pdrgpexprInnerKeys,
+	CMemoryPool *mp, gpos::owner<CExpressionArray *> pdrgpexprOuterKeys,
+	gpos::owner<CExpressionArray *> pdrgpexprInnerKeys,
 	gpos::owner<IMdIdArray *> hash_opfamilies, CXform::EXformId origin_xform)
-	: CPhysicalLeftAntiSemiHashJoin(mp, pdrgpexprOuterKeys, pdrgpexprInnerKeys,
+	: CPhysicalLeftAntiSemiHashJoin(mp, std::move(pdrgpexprOuterKeys),
+									std::move(pdrgpexprInnerKeys),
 									std::move(hash_opfamilies), origin_xform)
 {
 }
@@ -44,7 +45,7 @@ CPhysicalLeftAntiSemiHashJoinNotIn::CPhysicalLeftAntiSemiHashJoinNotIn(
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalLeftAntiSemiHashJoinNotIn::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
 	gpos::pointer<CDistributionSpec *> pdsInput GPOS_UNUSED,

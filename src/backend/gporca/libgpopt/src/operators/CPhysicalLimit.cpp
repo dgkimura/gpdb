@@ -290,8 +290,8 @@ CPhysicalLimit::PcteRequired(CMemoryPool *,		   //mp,
 								 child_index
 #endif
 							 ,
-							 CDrvdPropArray *,	//pdrgpdpCtxt,
-							 ULONG				//ulOptReq
+							 gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
+							 ULONG							   //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

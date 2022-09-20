@@ -120,7 +120,8 @@ CReqdPropPlan::ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 void
 CReqdPropPlan::ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   gpos::pointer<CReqdProp *> prpInput,
-							   ULONG child_index, CDrvdPropArray *pdrgpdpCtxt)
+							   ULONG child_index,
+							   gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr == m_pcter);
 
@@ -144,7 +145,8 @@ CReqdPropPlan::ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
 void
 CReqdPropPlan::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 					   gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
-					   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+					   gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+					   ULONG ulOptReq)
 {
 	GPOS_CHECK_ABORT;
 

@@ -37,12 +37,15 @@ public:
 		delete;
 
 	// ctor
-	CPhysicalStreamAggDeduplicate(
-		CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-		CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
-		gpos::owner<CColRefArray *> pdrgpcrKeys, BOOL fGeneratesDuplicates,
-		BOOL fMultiStage, BOOL isAggFromSplitDQA,
-		CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution);
+	CPhysicalStreamAggDeduplicate(CMemoryPool *mp,
+								  gpos::owner<CColRefArray *> colref_array,
+								  gpos::pointer<CColRefArray *> pdrgpcrMinimal,
+								  COperator::EGbAggType egbaggtype,
+								  gpos::owner<CColRefArray *> pdrgpcrKeys,
+								  BOOL fGeneratesDuplicates, BOOL fMultiStage,
+								  BOOL isAggFromSplitDQA,
+								  CLogicalGbAgg::EAggStage aggStage,
+								  BOOL should_enforce_distribution);
 
 	// dtor
 	~CPhysicalStreamAggDeduplicate() override;
