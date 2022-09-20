@@ -173,7 +173,7 @@ CDXLScalarBitmapBoolOp::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 									BOOL validate_children) const
 {
 	EdxlBitmapBoolOp bitmap_bool_dxlop =
-		((CDXLScalarBitmapBoolOp *) dxlnode->GetOperator())
+		(gpos::cast<CDXLScalarBitmapBoolOp>(dxlnode->GetOperator()))
 			->GetDXLBitmapOpType();
 
 	GPOS_ASSERT((bitmap_bool_dxlop == EdxlbitmapAnd) ||
@@ -185,7 +185,7 @@ CDXLScalarBitmapBoolOp::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[ul];
 		Edxlopid dxl_operator = dxlnode_arg->GetOperator()->GetDXLOperator();
 
 		GPOS_ASSERT(EdxlopScalarBitmapBoolOp == dxl_operator ||

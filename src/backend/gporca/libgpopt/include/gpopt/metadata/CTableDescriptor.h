@@ -103,7 +103,7 @@ public:
 	~CTableDescriptor() override;
 
 	// add a column to the table descriptor
-	void AddColumn(CColumnDescriptor *);
+	void AddColumn(gpos::owner<CColumnDescriptor *>);
 
 	// add the column at the specified position to the list of distribution columns
 	void AddDistributionColumn(ULONG ulPos, IMDId *opfamily);
@@ -112,7 +112,7 @@ public:
 	void AddPartitionColumn(ULONG ulPos);
 
 	// add a keyset
-	BOOL FAddKeySet(CBitSet *pbs);
+	BOOL FAddKeySet(gpos::owner<CBitSet *> pbs);
 
 	// accessors
 	ULONG ColumnCount() const;

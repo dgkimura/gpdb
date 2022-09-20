@@ -52,8 +52,9 @@ CXformGbAgg2HashAgg::CXformGbAgg2HashAgg(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CXformGbAgg2HashAgg::CXformGbAgg2HashAgg(CExpression *pexprPattern)
-	: CXformImplementation(pexprPattern)
+CXformGbAgg2HashAgg::CXformGbAgg2HashAgg(
+	gpos::owner<CExpression *> pexprPattern)
+	: CXformImplementation(std::move(pexprPattern))
 {
 }
 
@@ -69,8 +70,9 @@ CXformGbAgg2HashAgg::CXformGbAgg2HashAgg(CExpression *pexprPattern)
 CXform::EXformPromise
 CXformGbAgg2HashAgg::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
-	CColRefArray *colref_array = popAgg->Pdrgpcr();
+	gpos::pointer<CLogicalGbAgg *> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
+	gpos::pointer<CColRefArray *> colref_array = popAgg->Pdrgpcr();
 	if (0 == colref_array->Size() || exprhdl.DeriveHasSubquery(1) ||
 		!CUtils::FComparisonPossible(colref_array, IMDType::EcmptEq) ||
 		!CUtils::IsHashable(colref_array))
@@ -92,8 +94,9 @@ CXformGbAgg2HashAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformGbAgg2HashAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							   CExpression *pexpr) const
+CXformGbAgg2HashAgg::Transform(gpos::pointer<CXformContext *> pxfctxt,
+							   gpos::pointer<CXformResult *> pxfres,
+							   gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -109,7 +112,8 @@ CXformGbAgg2HashAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalGbAgg *> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	gpos::owner<CColRefArray *> colref_array = popAgg->Pdrgpcr();
 	colref_array->AddRef();
 
@@ -132,15 +136,15 @@ CXformGbAgg2HashAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalHashAgg(
-			mp, colref_array, popAgg->PdrgpcrMinimal(), popAgg->Egbaggtype(),
-			popAgg->FGeneratesDuplicates(), pdrgpcrArgDQA,
+			mp, std::move(colref_array), popAgg->PdrgpcrMinimal(),
+			popAgg->Egbaggtype(), popAgg->FGeneratesDuplicates(), pdrgpcrArgDQA,
 			CXformUtils::FMultiStageAgg(pexpr),
 			CXformUtils::FAggGenBySplitDQAXform(pexpr), popAgg->AggStage(),
 			!CXformUtils::FLocalAggCreatedByEagerAggXform(pexpr)),
 		pexprRel, pexprScalar);
 
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 //---------------------------------------------------------------------------
@@ -154,16 +158,16 @@ CXformGbAgg2HashAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 BOOL
 CXformGbAgg2HashAgg::FApplicable(gpos::pointer<CExpression *> pexpr)
 {
-	CExpression *pexprPrjList = (*pexpr)[1];
+	gpos::pointer<CExpression *> pexprPrjList = (*pexpr)[1];
 	ULONG arity = pexprPrjList->Arity();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprPrjEl = (*pexprPrjList)[ul];
-		CExpression *pexprAggFunc = (*pexprPrjEl)[0];
-		CScalarAggFunc *popScAggFunc =
-			CScalarAggFunc::PopConvert(pexprAggFunc->Pop());
+		gpos::pointer<CExpression *> pexprPrjEl = (*pexprPrjList)[ul];
+		gpos::pointer<CExpression *> pexprAggFunc = (*pexprPrjEl)[0];
+		gpos::pointer<CScalarAggFunc *> popScAggFunc =
+			gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 
 		if (popScAggFunc->IsDistinct() ||
 			!md_accessor->RetrieveAgg(popScAggFunc->MDId())->IsHashAggCapable())

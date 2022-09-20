@@ -66,8 +66,8 @@ protected:
 
 	// Construct a mapping from each column in root table to an index in each
 	// child partition's table descr by matching column names$
-	static ColRefToUlongMapArray *ConstructRootColMappingPerPart(
-		CMemoryPool *mp, CColRefArray *root_cols,
+	static gpos::owner<ColRefToUlongMapArray *> ConstructRootColMappingPerPart(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> root_cols,
 		gpos::Ref<IMdIdArray> partition_mdids);
 
 public:
@@ -75,13 +75,15 @@ public:
 	explicit CLogicalDynamicGetBase(CMemoryPool *mp);
 
 	CLogicalDynamicGetBase(CMemoryPool *mp, const CName *pnameAlias,
-						   CTableDescriptor *ptabdesc, ULONG scan_id,
-						   CColRefArray *pdrgpcrOutput,
-						   CColRef2dArray *pdrgpdrgpcrPart,
+						   gpos::owner<CTableDescriptor *> ptabdesc,
+						   ULONG scan_id,
+						   gpos::owner<CColRefArray *> pdrgpcrOutput,
+						   gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
 						   gpos::Ref<IMdIdArray> partition_mdids);
 
 	CLogicalDynamicGetBase(CMemoryPool *mp, const CName *pnameAlias,
-						   CTableDescriptor *ptabdesc, ULONG scan_id,
+						   gpos::owner<CTableDescriptor *> ptabdesc,
+						   ULONG scan_id,
 						   gpos::Ref<IMdIdArray> partition_mdids);
 
 	// dtor
@@ -134,19 +136,19 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *,
-									CExpressionHandle &) override;
+	gpos::owner<CColRefSet *> DeriveOutputColumns(CMemoryPool *,
+												  CExpressionHandle &) override;
 
 	// derive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::owner<CKeyCollection *> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *DerivePartitionInfo(CMemoryPool *mp,
-								   CExpressionHandle &exprhdl) const override;
+	gpos::owner<CPartInfo *> DerivePartitionInfo(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *DerivePropertyConstraint(
+	gpos::owner<CPropConstraint *> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive join depth

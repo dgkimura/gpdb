@@ -62,14 +62,13 @@ public:
 	CDistributionSpec *PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
-	gpos::owner<CEnfdDistribution *> Ped(CMemoryPool *mp,
-										 CExpressionHandle &exprhdl,
-										 CReqdPropPlan *prppInput,
-										 ULONG child_index,
-										 CDrvdPropArray *pdrgpdpCtxt,
-										 ULONG ulDistrReq) override;
+	gpos::owner<CEnfdDistribution *> Ped(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulDistrReq) override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------

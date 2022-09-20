@@ -51,9 +51,10 @@ CLogicalMaxOneRow::Esp(CExpressionHandle &exprhdl) const
 //		Promise level for stat derivation
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalMaxOneRow::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							CColRefSet *pcrsInput, ULONG child_index) const
+							gpos::pointer<CColRefSet *> pcrsInput,
+							ULONG child_index) const
 {
 	GPOS_ASSERT(0 == child_index);
 
@@ -74,7 +75,7 @@ CLogicalMaxOneRow::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalMaxOneRow::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -91,13 +92,13 @@ CLogicalMaxOneRow::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalMaxOneRow::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								IStatisticsArray *	// stats_ctxt
+								gpos::pointer<IStatisticsArray *>  // stats_ctxt
 ) const
 {
 	// no more than one row can be produced by operator, scale down input statistics accordingly
-	IStatistics *stats = exprhdl.Pstats(0);
+	gpos::pointer<IStatistics *> stats = exprhdl.Pstats(0);
 	return stats->ScaleStats(mp, CDouble(1.0 / stats->Rows()));
 }
 

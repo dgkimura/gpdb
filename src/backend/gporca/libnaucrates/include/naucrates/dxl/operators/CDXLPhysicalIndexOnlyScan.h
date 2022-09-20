@@ -37,8 +37,9 @@ public:
 	CDXLPhysicalIndexOnlyScan(CDXLPhysicalIndexOnlyScan &) = delete;
 
 	//ctor
-	CDXLPhysicalIndexOnlyScan(CMemoryPool *mp, CDXLTableDescr *table_descr,
-							  CDXLIndexDescr *dxl_index_descr,
+	CDXLPhysicalIndexOnlyScan(CMemoryPool *mp,
+							  gpos::owner<CDXLTableDescr *> table_descr,
+							  gpos::owner<CDXLIndexDescr *> dxl_index_descr,
 							  EdxlIndexScanDirection idx_scan_direction);
 
 	//dtor

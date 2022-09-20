@@ -31,21 +31,24 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLMinidump::CDXLMinidump(CBitSet *pbs, COptimizerConfig *optimizer_config,
-						   CDXLNode *query,
-						   CDXLNodeArray *query_output_dxlnode_array,
-						   CDXLNodeArray *cte_producers, CDXLNode *pdxlnPlan,
-						   IMDCacheObjectArray *mdcache_obj_array,
-						   CSystemIdArray *pdrgpsysid, ULLONG plan_id,
-						   ULLONG plan_space_size)
-	: m_pbs(pbs),
-	  m_optimizer_config(optimizer_config),
-	  m_query_dxl_root(query),
-	  m_query_output(query_output_dxlnode_array),
-	  m_cte_producers(cte_producers),
-	  m_plan_dxl_root(pdxlnPlan),
-	  m_mdid_cached_obj_array(mdcache_obj_array),
-	  m_system_id_array(pdrgpsysid),
+CDXLMinidump::CDXLMinidump(
+	gpos::owner<CBitSet *> pbs,
+	gpos::owner<COptimizerConfig *> optimizer_config,
+	gpos::owner<CDXLNode *> query,
+	gpos::owner<CDXLNodeArray *> query_output_dxlnode_array,
+	gpos::owner<CDXLNodeArray *> cte_producers,
+	gpos::owner<CDXLNode *> pdxlnPlan,
+	gpos::owner<IMDCacheObjectArray *> mdcache_obj_array,
+	gpos::owner<CSystemIdArray *> pdrgpsysid, ULLONG plan_id,
+	ULLONG plan_space_size)
+	: m_pbs(std::move(pbs)),
+	  m_optimizer_config(std::move(optimizer_config)),
+	  m_query_dxl_root(std::move(query)),
+	  m_query_output(std::move(query_output_dxlnode_array)),
+	  m_cte_producers(std::move(cte_producers)),
+	  m_plan_dxl_root(std::move(pdxlnPlan)),
+	  m_mdid_cached_obj_array(std::move(mdcache_obj_array)),
+	  m_system_id_array(std::move(pdrgpsysid)),
 	  m_plan_id(plan_id),
 	  m_plan_space_size(plan_space_size)
 {

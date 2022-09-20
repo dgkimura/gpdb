@@ -66,9 +66,11 @@ private:
 
 public:
 	// ctor
-	COptimizerConfig(CEnumeratorConfig *pec, CStatisticsConfig *stats_config,
-					 CCTEConfig *pcteconf, ICostModel *pcm, CHint *phint,
-					 CWindowOids *pdefoidsGPDB);
+	COptimizerConfig(gpos::owner<CEnumeratorConfig *> pec,
+					 gpos::owner<CStatisticsConfig *> stats_config,
+					 gpos::owner<CCTEConfig *> pcteconf,
+					 gpos::owner<ICostModel *> pcm, gpos::owner<CHint *> phint,
+					 gpos::owner<CWindowOids *> pdefoidsGPDB);
 
 	// dtor
 	~COptimizerConfig() override;
@@ -120,11 +122,11 @@ public:
 	static gpos::owner<COptimizerConfig *> PoconfDefault(CMemoryPool *mp);
 
 	// generate default optimizer configurations with the given cost model
-	static gpos::owner<COptimizerConfig *> PoconfDefault(CMemoryPool *mp,
-														 ICostModel *pcm);
+	static gpos::owner<COptimizerConfig *> PoconfDefault(
+		CMemoryPool *mp, gpos::owner<ICostModel *> pcm);
 
 	void Serialize(CMemoryPool *mp, CXMLSerializer *xml_serializer,
-				   CBitSet *pbsTrace) const;
+				   gpos::pointer<CBitSet *> pbsTrace) const;
 
 };	// class COptimizerConfig
 

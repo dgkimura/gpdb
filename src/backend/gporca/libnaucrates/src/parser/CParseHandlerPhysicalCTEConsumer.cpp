@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalCTEConsumer.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLPhysicalCTEConsumer.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -67,14 +69,14 @@ CParseHandlerPhysicalCTEConsumer::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenCTEId,
 		EdxltokenPhysicalCTEConsumer);
 
-	ULongPtrArray *output_colids_array =
+	gpos::owner<ULongPtrArray *> output_colids_array =
 		CDXLOperatorFactory::ExtractConvertValuesToArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenColumns,
 			EdxltokenPhysicalCTEConsumer);
 
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(
-		m_mp,
-		GPOS_NEW(m_mp) CDXLPhysicalCTEConsumer(m_mp, id, output_colids_array));
+	m_dxl_node = GPOS_NEW(m_mp)
+		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLPhysicalCTEConsumer(
+						   m_mp, id, std::move(output_colids_array)));
 
 	// parse handler for the proj list
 	CParseHandlerBase *proj_list_parse_handler =

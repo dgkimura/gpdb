@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformPushGbBelowJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CLogicalInnerJoin.h"
@@ -57,8 +58,9 @@ CXformPushGbBelowJoin::CXformPushGbBelowJoin(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CXformPushGbBelowJoin::CXformPushGbBelowJoin(CExpression *pexprPattern)
-	: CXformExploration(pexprPattern)
+CXformPushGbBelowJoin::CXformPushGbBelowJoin(
+	gpos::owner<CExpression *> pexprPattern)
+	: CXformExploration(std::move(pexprPattern))
 {
 }
 
@@ -74,7 +76,8 @@ CXformPushGbBelowJoin::CXformPushGbBelowJoin(CExpression *pexprPattern)
 CXform::EXformPromise
 CXformPushGbBelowJoin::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
+	gpos::pointer<CLogicalGbAgg *> popGbAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 	if (!popGbAgg->FGlobal())
 	{
 		return CXform::ExfpNone;
@@ -93,8 +96,9 @@ CXformPushGbBelowJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformPushGbBelowJoin::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformPushGbBelowJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
+								 gpos::pointer<CXformResult *> pxfres,
+								 gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -102,12 +106,13 @@ CXformPushGbBelowJoin::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	CExpression *pexprResult = CXformUtils::PexprPushGbBelowJoin(mp, pexpr);
+	gpos::owner<CExpression *> pexprResult =
+		CXformUtils::PexprPushGbBelowJoin(mp, pexpr);
 
 	if (nullptr != pexprResult)
 	{
 		// add alternative to results
-		pxfres->Add(pexprResult);
+		pxfres->Add(std::move(pexprResult));
 	}
 }
 

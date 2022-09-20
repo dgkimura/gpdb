@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarArrayRef.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 using namespace gpmd;
@@ -86,14 +87,15 @@ CScalarArrayRef::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayRef::Matches(COperator *pop) const
+CScalarArrayRef::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CScalarArrayRef *popArrayRef = CScalarArrayRef::PopConvert(pop);
+	gpos::pointer<CScalarArrayRef *> popArrayRef =
+		gpos::dyn_cast<CScalarArrayRef>(pop);
 
 	return m_mdid_type->Equals(popArrayRef->MdidType()) &&
 		   m_pmdidElem->Equals(popArrayRef->PmdidElem()) &&

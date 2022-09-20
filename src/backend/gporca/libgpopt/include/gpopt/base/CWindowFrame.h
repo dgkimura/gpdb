@@ -106,8 +106,10 @@ public:
 
 	// ctor
 	CWindowFrame(CMemoryPool *mp, EFrameSpec efs, EFrameBoundary efbLeading,
-				 EFrameBoundary efbTrailing, CExpression *pexprLeading,
-				 CExpression *pexprTrailing, EFrameExclusionStrategy efes);
+				 EFrameBoundary efbTrailing,
+				 gpos::owner<CExpression *> pexprLeading,
+				 gpos::owner<CExpression *> pexprTrailing,
+				 EFrameExclusionStrategy efes);
 
 	// dtor
 	~CWindowFrame() override;

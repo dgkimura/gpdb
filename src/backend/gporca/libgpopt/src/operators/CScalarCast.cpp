@@ -64,11 +64,11 @@ CScalarCast::CScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> return_type_mdid,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCast::Matches(COperator *pop) const
+CScalarCast::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCast *pscop = CScalarCast::PopConvert(pop);
+		gpos::pointer<CScalarCast *> pscop = gpos::dyn_cast<CScalarCast>(pop);
 
 		// match if the return type oids are identical
 		return pscop->MdidType()->Equals(m_return_type_mdid.get()) &&

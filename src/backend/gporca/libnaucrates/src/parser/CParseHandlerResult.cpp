@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerResult.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFilter.h"
@@ -57,8 +59,9 @@ CParseHandlerResult::SetupInitialHandlers()
 	GPOS_ASSERT(0 == this->Length() &&
 				"No handlers should have been added yet");
 
-	m_dxl_op = (CDXLPhysicalResult *) CDXLOperatorFactory::MakeDXLResult(
-		m_parse_handler_mgr->GetDXLMemoryManager());
+	m_dxl_op =
+		gpos::cast<CDXLPhysicalResult>(CDXLOperatorFactory::MakeDXLResult(
+			m_parse_handler_mgr->GetDXLMemoryManager()));
 
 	// parse handler for the one-time filter
 	CParseHandlerBase *one_time_filter_parse_handler =

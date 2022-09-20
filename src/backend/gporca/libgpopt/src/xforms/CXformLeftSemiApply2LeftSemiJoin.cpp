@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformLeftSemiApply2LeftSemiJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 
 using namespace gpopt;
@@ -50,9 +51,10 @@ CXformLeftSemiApply2LeftSemiJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftSemiApply2LeftSemiJoin::Transform(CXformContext *pxfctxt,
-											CXformResult *pxfres,
-											CExpression *pexpr) const
+CXformLeftSemiApply2LeftSemiJoin::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

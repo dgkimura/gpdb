@@ -41,7 +41,7 @@ public:
 	CDXLScalarIdent(CDXLScalarIdent &) = delete;
 
 	// ctor/dtor
-	CDXLScalarIdent(CMemoryPool *, CDXLColRef *);
+	CDXLScalarIdent(CMemoryPool *, gpos::owner<CDXLColRef *>);
 
 	~CDXLScalarIdent() override;
 

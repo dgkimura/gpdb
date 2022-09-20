@@ -69,7 +69,8 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	{
@@ -253,12 +254,14 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 		{
 			CAutoTrace at(mp);
 			gpos::owner<CXformSet *> xform_set =
-				CLogical::PopConvert(pgexprLogical->Pop())->PxfsCandidates(mp);
+				gpos::dyn_cast<CLogical>(pgexprLogical->Pop())
+					->PxfsCandidates(mp);
 
 			CXformSetIter xsi(*(xform_set));
 			while (xsi.Advance())
 			{
-				CXform *pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
+				gpos::pointer<CXform *> pxform =
+					CXformFactory::Pxff()->Pxf(xsi.TBit());
 				CJobTransformation jt;
 				jt.Init(pgexprLogical, pxform);
 				at.Os() << std::endl

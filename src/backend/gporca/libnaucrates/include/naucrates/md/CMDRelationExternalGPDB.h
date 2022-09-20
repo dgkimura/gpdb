@@ -120,10 +120,12 @@ public:
 	// ctor
 	CMDRelationExternalGPDB(
 		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
-		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-		ULongPtrArray *distr_col_array, gpos::Ref<IMdIdArray> distr_opfamilies,
-		BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
-		CMDIndexInfoArray *md_index_info_array,
+		Ereldistrpolicy rel_distr_policy,
+		gpos::owner<CMDColumnArray *> mdcol_array,
+		gpos::owner<ULongPtrArray *> distr_col_array,
+		gpos::Ref<IMdIdArray> distr_opfamilies, BOOL convert_hash_to_random,
+		gpos::owner<ULongPtr2dArray *> keyset_array,
+		gpos::owner<CMDIndexInfoArray *> md_index_info_array,
 		gpos::Ref<IMdIdArray> mdid_triggers_array,
 		gpos::Ref<IMdIdArray> mdid_check_constraint_array, INT reject_limit,
 		BOOL is_reject_limit_in_rows, gpos::Ref<IMDId> mdid_fmt_err_table);

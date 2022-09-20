@@ -63,7 +63,7 @@ public:
 	// ctor
 	CMDCheckConstraintGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 						   CMDName *mdname, gpos::Ref<IMDId> rel_mdid,
-						   CDXLNode *dxlnode);
+						   gpos::owner<CDXLNode *> dxlnode);
 
 	// dtor
 	~CMDCheckConstraintGPDB() override;
@@ -97,9 +97,9 @@ public:
 	}
 
 	// the scalar expression of the check constraint
-	CExpression *GetCheckConstraintExpr(
+	gpos::owner<CExpression *> GetCheckConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CColRefArray *colref_array) const override;
+		gpos::pointer<CColRefArray *> colref_array) const override;
 
 	// serialize MD check constraint in DXL format given a serializer object
 	void Serialize(gpdxl::CXMLSerializer *) const override;

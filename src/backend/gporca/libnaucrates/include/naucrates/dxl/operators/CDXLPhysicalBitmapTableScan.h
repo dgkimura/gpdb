@@ -40,8 +40,9 @@ public:
 	CDXLPhysicalBitmapTableScan(const CDXLPhysicalBitmapTableScan &) = delete;
 
 	// ctors
-	CDXLPhysicalBitmapTableScan(CMemoryPool *mp, CDXLTableDescr *table_descr)
-		: CDXLPhysicalAbstractBitmapScan(mp, table_descr)
+	CDXLPhysicalBitmapTableScan(CMemoryPool *mp,
+								gpos::owner<CDXLTableDescr *> table_descr)
+		: CDXLPhysicalAbstractBitmapScan(mp, std::move(table_descr))
 	{
 	}
 

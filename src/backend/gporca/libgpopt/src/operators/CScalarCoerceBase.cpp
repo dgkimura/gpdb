@@ -18,6 +18,7 @@
 #include "gpopt/operators/CScalarCoerceBase.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 using namespace gpmd;
@@ -127,11 +128,11 @@ CScalarCoerceBase::Location() const
 //		return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CScalarCoerceBase::PopCopyWithRemappedColumns(
-	CMemoryPool *,		 //mp,
-	UlongToColRefMap *,	 //colref_mapping,
-	BOOL				 //must_exist
+	CMemoryPool *,						//mp,
+	gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+	BOOL								//must_exist
 )
 {
 	return PopCopyDefault();

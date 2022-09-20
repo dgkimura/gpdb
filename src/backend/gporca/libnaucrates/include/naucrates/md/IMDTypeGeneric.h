@@ -15,6 +15,7 @@
 #define GPMD_IMDTypeGeneric_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/md/IMDType.h"
@@ -49,8 +50,8 @@ public:
 		return IMDTypeGeneric::GetTypeInfo();
 	}
 
-	virtual IDatum *CreateGenericNullDatum(CMemoryPool *mp,
-										   INT type_modifier) const = 0;
+	virtual gpos::owner<IDatum *> CreateGenericNullDatum(
+		CMemoryPool *mp, INT type_modifier) const = 0;
 };
 }  // namespace gpmd
 

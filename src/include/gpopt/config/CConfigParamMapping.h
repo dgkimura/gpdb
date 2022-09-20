@@ -17,6 +17,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPool.h"
 
 #include "naucrates/traceflags/traceflags.h"
@@ -68,7 +69,8 @@ public:
 	CConfigParamMapping(const CConfigParamMapping &) = delete;
 
 	// pack enabled optimizer config params in a traceflag bitset
-	static CBitSet *PackConfigParamInBitset(CMemoryPool *mp, ULONG xform_id);
+	static gpos::owner<CBitSet *> PackConfigParamInBitset(CMemoryPool *mp,
+														  ULONG xform_id);
 };
 }  // namespace gpdxl
 

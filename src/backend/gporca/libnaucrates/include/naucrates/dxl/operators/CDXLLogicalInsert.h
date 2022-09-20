@@ -43,8 +43,9 @@ public:
 	CDXLLogicalInsert(const CDXLLogicalInsert &) = delete;
 
 	// ctor/dtor
-	CDXLLogicalInsert(CMemoryPool *mp, CDXLTableDescr *table_descr,
-					  ULongPtrArray *src_colids_array);
+	CDXLLogicalInsert(CMemoryPool *mp,
+					  gpos::owner<CDXLTableDescr *> table_descr,
+					  gpos::owner<ULongPtrArray *> src_colids_array);
 
 	~CDXLLogicalInsert() override;
 

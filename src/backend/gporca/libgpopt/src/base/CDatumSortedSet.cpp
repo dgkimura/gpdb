@@ -13,7 +13,8 @@
 
 using namespace gpopt;
 
-CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp, CExpression *pexprArray,
+CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp,
+								 gpos::pointer<CExpression *> pexprArray,
 								 const IComparator *pcomp)
 	: IDatumArray(mp), m_fIncludesNull(false)
 {
@@ -25,7 +26,7 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp, CExpression *pexprArray,
 	gpos::CAutoRef<IDatumArray> aprngdatum(GPOS_NEW(mp) IDatumArray(mp));
 	for (ULONG ul = 0; ul < ulArrayExprArity; ul++)
 	{
-		CScalarConst *popScConst =
+		gpos::pointer<CScalarConst *> popScConst =
 			CUtils::PScalarArrayConstChildAt(pexprArray, ul);
 		IDatum *datum = popScConst->GetDatum();
 		if (datum->IsNull())

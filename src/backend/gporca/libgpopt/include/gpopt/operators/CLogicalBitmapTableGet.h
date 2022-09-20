@@ -54,9 +54,10 @@ public:
 	CLogicalBitmapTableGet(const CLogicalBitmapTableGet &) = delete;
 
 	// ctor
-	CLogicalBitmapTableGet(CMemoryPool *mp, CTableDescriptor *ptabdesc,
+	CLogicalBitmapTableGet(CMemoryPool *mp,
+						   gpos::owner<CTableDescriptor *> ptabdesc,
 						   ULONG ulOriginOpId, const CName *pnameTableAlias,
-						   CColRefArray *pdrgpcrOutput);
+						   gpos::owner<CColRefArray *> pdrgpcrOutput);
 
 	// ctor
 	// only for transformations
@@ -111,7 +112,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -122,7 +123,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	// derive output columns
@@ -130,8 +131,8 @@ public:
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive outer references
-	CColRefSet *DeriveOuterReferences(CMemoryPool *mp,
-									  CExpressionHandle &exprhdl) override;
+	gpos::owner<CColRefSet *> DeriveOuterReferences(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive partition consumer info
 	gpos::owner<CPartInfo *>
@@ -143,7 +144,7 @@ public:
 	}
 
 	// derive constraint property
-	CPropConstraint *DerivePropertyConstraint(
+	gpos::owner<CPropConstraint *> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive join depth
@@ -176,11 +177,12 @@ public:
 	}
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::owner<IStatistics *> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise

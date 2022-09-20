@@ -56,8 +56,8 @@ public:
 	CMDIdScCmp(const CMDIdScCmp &) = delete;
 
 	// ctor
-	CMDIdScCmp(CMDIdGPDB *left_mdid, CMDIdGPDB *right_mdid,
-			   IMDType::ECmpType cmp_type);
+	CMDIdScCmp(gpos::owner<CMDIdGPDB *> left_mdid,
+			   gpos::owner<CMDIdGPDB *> right_mdid, IMDType::ECmpType cmp_type);
 
 	// dtor
 	~CMDIdScCmp() override;
@@ -133,11 +133,13 @@ public:
 	gpos::owner<IMDId *>
 	Copy(CMemoryPool *mp) const override
 	{
-		CMDIdGPDB *mdid_left = CMDIdGPDB::CastMdid(m_mdid_left->Copy(mp));
-		CMDIdGPDB *mdid_right = CMDIdGPDB::CastMdid(m_mdid_right->Copy(mp));
+		gpos::owner<CMDIdGPDB *> mdid_left =
+			gpos::dyn_cast<CMDIdGPDB>(m_mdid_left->Copy(mp));
+		gpos::owner<CMDIdGPDB *> mdid_right =
+			gpos::dyn_cast<CMDIdGPDB>(m_mdid_right->Copy(mp));
 
-		return GPOS_NEW(mp)
-			CMDIdScCmp(mdid_left, mdid_right, m_comparision_type);
+		return GPOS_NEW(mp) CMDIdScCmp(
+			std::move(mdid_left), std::move(mdid_right), m_comparision_type);
 	}
 };
 }  // namespace gpmd

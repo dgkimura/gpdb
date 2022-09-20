@@ -71,9 +71,9 @@ public:
 	CBucket(const CBucket &) = delete;
 
 	// ctor
-	CBucket(CPoint *bucket_lower_bound, CPoint *bucket_upper_bound,
-			BOOL is_lower_closed, BOOL is_upper_closed, CDouble frequency,
-			CDouble distinct);
+	CBucket(gpos::owner<CPoint *> bucket_lower_bound,
+			gpos::owner<CPoint *> bucket_upper_bound, BOOL is_lower_closed,
+			BOOL is_upper_closed, CDouble frequency, CDouble distinct);
 
 	// dtor
 	~CBucket() override;

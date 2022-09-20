@@ -46,8 +46,10 @@ FORCE_GENERATE_DBGSTR(CCostContext);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CCostContext::CCostContext(CMemoryPool *mp, COptimizationContext *poc,
-						   ULONG ulOptReq, CGroupExpression *pgexpr)
+CCostContext::CCostContext(CMemoryPool *mp,
+						   gpos::owner<COptimizationContext *> poc,
+						   ULONG ulOptReq,
+						   gpos::owner<CGroupExpression *> pgexpr)
 	: m_mp(mp),
 	  m_cost(GPOPT_INVALID_COST),
 	  m_estate(estUncosted),
@@ -64,12 +66,12 @@ CCostContext::CCostContext(CMemoryPool *mp, COptimizationContext *poc,
 	GPOS_ASSERT(nullptr != m_pgexpr);
 	GPOS_ASSERT_IMP(
 		m_pgexpr->Pop()->FPhysical(),
-		ulOptReq < CPhysical::PopConvert(m_pgexpr->Pop())->UlOptRequests());
+		ulOptReq < gpos::dyn_cast<CPhysical>(m_pgexpr->Pop())->UlOptRequests());
 
 	if (!m_pgexpr->Pop()->FScalar() &&
-		!CPhysical::PopConvert(m_pgexpr->Pop())->FPassThruStats())
+		!gpos::dyn_cast<CPhysical>(m_pgexpr->Pop())->FPassThruStats())
 	{
-		CGroupExpression *pgexprForStats =
+		gpos::pointer<CGroupExpression *> pgexprForStats =
 			m_pgexpr->Pgroup()->PgexprBestPromise(m_mp, m_pgexpr);
 		if (nullptr != pgexprForStats)
 		{
@@ -132,7 +134,7 @@ CCostContext::FOwnsStats() const
 BOOL
 CCostContext::FNeedsNewStats() const
 {
-	COperator *pop = m_pgexpr->Pop();
+	gpos::pointer<COperator *> pop = m_pgexpr->Pop();
 	if (pop->FScalar())
 	{
 		// return false if scalar operator
@@ -148,7 +150,7 @@ CCostContext::FNeedsNewStats() const
 	}
 
 	if (GPOS_FTRACE(EopttraceDeriveStatsForDPE) && CUtils::FPhysicalScan(pop) &&
-		CPhysicalScan::PopConvert(pop)->FDynamicScan())
+		gpos::dyn_cast<CPhysicalScan>(pop)->FDynamicScan())
 	{
 		// context is attached to a dynamic scan that went through
 		// partition elimination in another part of the plan
@@ -160,8 +162,8 @@ CCostContext::FNeedsNewStats() const
 	const ULONG arity = Pdrgpoc()->Size();
 	for (ULONG ul = 0; !fDeriveStats && ul < arity; ul++)
 	{
-		COptimizationContext *pocChild = (*Pdrgpoc())[ul];
-		CCostContext *pccChild = pocChild->PccBest();
+		gpos::pointer<COptimizationContext *> pocChild = (*Pdrgpoc())[ul];
+		gpos::pointer<CCostContext *> pccChild = pocChild->PccBest();
 		GPOS_ASSERT(nullptr != pccChild);
 
 		fDeriveStats = pccChild->FOwnsStats();
@@ -230,7 +232,8 @@ CCostContext::DerivePlanProps(CMemoryPool *mp)
 		CExpressionHandle exprhdl(mp);
 		exprhdl.Attach(this);
 		exprhdl.DerivePlanPropsForCostContext();
-		CDrvdPropPlan *pdpplan = CDrvdPropPlan::Pdpplan(exprhdl.Pdp());
+		gpos::pointer<CDrvdPropPlan *> pdpplan =
+			gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp());
 		GPOS_ASSERT(nullptr != pdpplan);
 
 		// set derived plan properties
@@ -271,8 +274,8 @@ CCostContext::IsValid(CMemoryPool *mp)
 	GPOS_ASSERT(nullptr != m_pdrgpoc);
 
 	// obtain relational properties from group
-	CDrvdPropRelational *pdprel =
-		CDrvdPropRelational::GetRelationalProperties(Pgexpr()->Pgroup()->Pdp());
+	gpos::pointer<CDrvdPropRelational *> pdprel =
+		gpos::dyn_cast<CDrvdPropRelational>(Pgexpr()->Pgroup()->Pdp());
 	GPOS_ASSERT(nullptr != pdprel);
 
 	// derive plan properties
@@ -322,7 +325,8 @@ void
 CCostContext::BreakCostTiesForJoinPlans(
 	gpos::pointer<const CCostContext *> pccFst,
 	gpos::pointer<const CCostContext *> pccSnd,
-	CONST_COSTCTXT_PTR *ppccPrefered,  // output: preferred cost context
+	gpos::pointer<CONST_COSTCTXT_PTR>
+		*ppccPrefered,	  // output: preferred cost context
 	BOOL *pfTiesResolved  // output: if true, tie resolution has succeeded
 )
 {
@@ -374,12 +378,12 @@ CCostContext::BreakCostTiesForJoinPlans(
 
 	// both plans have equal estimated rows for both children, break tie based on join depth
 	*pfTiesResolved = true;
-	ULONG ulOuterJoinDepthFst = CDrvdPropRelational::GetRelationalProperties(
-									(*pccFst->Pgexpr())[0]->Pdp())
-									->GetJoinDepth();
-	ULONG ulInnerJoinDepthFst = CDrvdPropRelational::GetRelationalProperties(
-									(*pccFst->Pgexpr())[1]->Pdp())
-									->GetJoinDepth();
+	ULONG ulOuterJoinDepthFst =
+		gpos::dyn_cast<CDrvdPropRelational>((*pccFst->Pgexpr())[0]->Pdp())
+			->GetJoinDepth();
+	ULONG ulInnerJoinDepthFst =
+		gpos::dyn_cast<CDrvdPropRelational>((*pccFst->Pgexpr())[1]->Pdp())
+			->GetJoinDepth();
 	if (ulInnerJoinDepthFst < ulOuterJoinDepthFst)
 	{
 		*ppccPrefered = pccFst;
@@ -488,10 +492,10 @@ CCostContext::FBetterThan(gpos::pointer<const CCostContext *> pcc) const
 	if (COperator::EopPhysicalSpool == pcc->Pgexpr()->Pop()->Eopid() &&
 		COperator::EopPhysicalSpool == Pgexpr()->Pop()->Eopid())
 	{
-		CPhysicalSpool *current_best_ctxt =
-			CPhysicalSpool::PopConvert(Pgexpr()->Pop());
-		CPhysicalSpool *new_ctxt =
-			CPhysicalSpool::PopConvert(pcc->Pgexpr()->Pop());
+		gpos::pointer<CPhysicalSpool *> current_best_ctxt =
+			gpos::dyn_cast<CPhysicalSpool>(Pgexpr()->Pop());
+		gpos::pointer<CPhysicalSpool *> new_ctxt =
+			gpos::dyn_cast<CPhysicalSpool>(pcc->Pgexpr()->Pop());
 
 		// if the request does not need to be conscious of motion, then always prefer a
 		// streaming spool since a blocking one will be unnecessary
@@ -513,7 +517,8 @@ CCostContext::IsTwoStageScalarDQACostCtxt(
 {
 	if (CUtils::FPhysicalAgg(pcc->Pgexpr()->Pop()))
 	{
-		CPhysicalAgg *popAgg = CPhysicalAgg::PopConvert(pcc->Pgexpr()->Pop());
+		gpos::pointer<CPhysicalAgg *> popAgg =
+			gpos::dyn_cast<CPhysicalAgg>(pcc->Pgexpr()->Pop());
 		// 2 stage scalar agg are only generated by split dqa xform
 		GPOS_ASSERT_IMP(popAgg->IsTwoStageScalarDQA(),
 						popAgg->IsAggFromSplitDQA());
@@ -529,7 +534,8 @@ CCostContext::IsThreeStageScalarDQACostCtxt(
 {
 	if (CUtils::FPhysicalAgg(pcc->Pgexpr()->Pop()))
 	{
-		CPhysicalAgg *popAgg = CPhysicalAgg::PopConvert(pcc->Pgexpr()->Pop());
+		gpos::pointer<CPhysicalAgg *> popAgg =
+			gpos::dyn_cast<CPhysicalAgg>(pcc->Pgexpr()->Pop());
 		// 3 stage scalar agg are only generated by split dqa xform
 		GPOS_ASSERT_IMP(popAgg->IsThreeStageScalarDQA(),
 						popAgg->IsAggFromSplitDQA());
@@ -569,7 +575,8 @@ CCostContext::IsThreeStageScalarDQACostCtxt(
 //
 //---------------------------------------------------------------------------
 CCost
-CCostContext::CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren)
+CCostContext::CostCompute(CMemoryPool *mp,
+						  gpos::pointer<CCostArray *> pdrgpcostChildren)
 {
 	// derive context stats
 	DeriveStats();
@@ -584,7 +591,7 @@ CCostContext::CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren)
 	ICostModel::SCostingInfo ci(
 		mp, arity, GPOS_NEW(mp) ICostModel::CCostingStats(m_pstats));
 
-	ICostModel *pcm = COptCtxt::PoctxtFromTLS()->GetCostModel();
+	gpos::pointer<ICostModel *> pcm = COptCtxt::PoctxtFromTLS()->GetCostModel();
 
 	CExpressionHandle exprhdl(mp);
 	exprhdl.Attach(this);
@@ -611,8 +618,8 @@ CCostContext::CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren)
 	// extract children costing info
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		COptimizationContext *pocChild = (*m_pdrgpoc)[ul];
-		CCostContext *pccChild = pocChild->PccBest();
+		gpos::pointer<COptimizationContext *> pocChild = (*m_pdrgpoc)[ul];
+		gpos::pointer<CCostContext *> pccChild = pocChild->PccBest();
 		GPOS_ASSERT(nullptr != pccChild);
 
 		gpos::owner<IStatistics *> child_stats = pccChild->Pstats();
@@ -664,12 +671,12 @@ CCostContext::DRowsPerHost() const
 	COptCtxt *poptctxt = COptCtxt::PoctxtFromTLS();
 	const ULONG ulHosts = poptctxt->GetCostModel()->UlHosts();
 
-	CDistributionSpec *pds = Pdpplan()->Pds();
+	gpos::pointer<CDistributionSpec *> pds = Pdpplan()->Pds();
 	if (CDistributionSpec::EdtHashed == pds->Edt())
 	{
-		CDistributionSpecHashed *pdshashed =
-			CDistributionSpecHashed::PdsConvert(pds);
-		CExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
+		gpos::pointer<CDistributionSpecHashed *> pdshashed =
+			gpos::dyn_cast<CDistributionSpecHashed>(pds);
+		gpos::pointer<CExpressionArray *> pdrgpexpr = pdshashed->Pdrgpexpr();
 		gpos::owner<CColRefSet *> pcrsUsed =
 			CUtils::PcrsExtractColumns(m_mp, pdrgpexpr);
 
@@ -690,7 +697,7 @@ CCostContext::DRowsPerHost() const
 		pcrsUsed->ExtractColIds(m_mp, pdrgpul);
 		pcrsUsed->Release();
 
-		CStatisticsConfig *stats_config =
+		gpos::pointer<CStatisticsConfig *> stats_config =
 			poptctxt->GetOptimizerConfig()->GetStatsConf();
 		CDouble dNDVs = CStatisticsUtils::Groups(m_mp, Pstats(), stats_config,
 												 pdrgpul, nullptr /*keys*/);

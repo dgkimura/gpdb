@@ -57,7 +57,7 @@ CDrvdPropCtxtPlan::~CDrvdPropCtxtPlan()
 //		Copy function
 //
 //---------------------------------------------------------------------------
-CDrvdPropCtxt *
+gpos::owner<CDrvdPropCtxt *>
 CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 {
 	gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
@@ -91,7 +91,7 @@ CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 void
-CDrvdPropCtxtPlan::AddProps(CDrvdProp *pdp)
+CDrvdPropCtxtPlan::AddProps(gpos::pointer<CDrvdProp *> pdp)
 {
 	if (CDrvdProp::EptPlan != pdp->Ept())
 	{
@@ -99,7 +99,7 @@ CDrvdPropCtxtPlan::AddProps(CDrvdProp *pdp)
 		return;
 	}
 
-	CDrvdPropPlan *pdpplan = CDrvdPropPlan::Pdpplan(pdp);
+	gpos::pointer<CDrvdPropPlan *> pdpplan = gpos::dyn_cast<CDrvdPropPlan>(pdp);
 
 	ULONG ulProducerId = gpos::ulong_max;
 	CDrvdPropPlan *pdpplanProducer =
@@ -135,7 +135,7 @@ CDrvdPropCtxtPlan::OsPrint(IOstream &os) const
 	while (hmulpdpiter.Advance())
 	{
 		ULONG id = *(hmulpdpiter.Key());
-		CDrvdPropPlan *pdpplan =
+		gpos::pointer<CDrvdPropPlan *> pdpplan =
 			const_cast<CDrvdPropPlan *>(hmulpdpiter.Value());
 
 		os << id << "-->" << *pdpplan << std::endl;

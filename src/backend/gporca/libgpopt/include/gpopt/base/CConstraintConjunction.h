@@ -44,7 +44,8 @@ public:
 	CConstraintConjunction(const CConstraintConjunction &) = delete;
 
 	// ctor
-	CConstraintConjunction(CMemoryPool *mp, CConstraintArray *pdrgpcnstr);
+	CConstraintConjunction(CMemoryPool *mp,
+						   gpos::owner<CConstraintArray *> pdrgpcnstr);
 
 	// dtor
 	~CConstraintConjunction() override;
@@ -67,7 +68,7 @@ public:
 	BOOL FContradiction() const override;
 
 	// scalar expression
-	CExpression *PexprScalar(CMemoryPool *mp) override;
+	gpos::pointer<CExpression *> PexprScalar(CMemoryPool *mp) override;
 
 	// check if there is a constraint on the given column
 	BOOL FConstraint(const CColRef *colref) const override;
@@ -78,14 +79,16 @@ public:
 		BOOL must_exist) override;
 
 	// return constraint on a given column
-	CConstraint *Pcnstr(CMemoryPool *mp, const CColRef *colref) override;
+	gpos::owner<CConstraint *> Pcnstr(CMemoryPool *mp,
+									  const CColRef *colref) override;
 
 	// return constraint on a given column set
-	CConstraint *Pcnstr(CMemoryPool *mp, CColRefSet *pcrs) override;
+	gpos::owner<CConstraint *> Pcnstr(
+		CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs) override;
 
 	// return a clone of the constraint for a different column
-	CConstraint *PcnstrRemapForColumn(CMemoryPool *mp,
-									  CColRef *colref) const override;
+	gpos::owner<CConstraint *> PcnstrRemapForColumn(
+		CMemoryPool *mp, CColRef *colref) const override;
 
 	// print
 	IOstream &

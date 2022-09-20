@@ -88,14 +88,14 @@ private:
 		}
 
 		// key accessor
-		K *
+		gpos::pointer<K *>
 		Key() const
 		{
 			return m_key;
 		}
 
 		// value accessor
-		T *
+		gpos::pointer<T *>
 		Value() const
 		{
 			return m_value;

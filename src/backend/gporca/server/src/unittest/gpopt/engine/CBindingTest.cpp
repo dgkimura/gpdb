@@ -122,7 +122,8 @@ CBindingTest::EresUnittest_Basic()
 		pdxlmd->GetQueryDXLRoot(), pdxlmd->PdrgpdxlnQueryOutput(),
 		pdxlmd->GetCTEProducerDXLArray());
 
-	gpdxl::ULongPtrArray *pdrgul = pdxltr->PdrgpulOutputColRefs();
+	gpos::pointer<gpdxl::ULongPtrArray *> pdrgul =
+		pdxltr->PdrgpulOutputColRefs();
 	gpmd::CMDNameArray *pdrgpmdname = pdxltr->Pdrgpmdname();
 
 	CQueryContext *pqc = CQueryContext::PqcGenerate(
@@ -137,7 +138,8 @@ CBindingTest::EresUnittest_Basic()
 	gpos::owner<CExpression *> pexprPlan = eng.PexprExtractPlan();
 	GPOS_ASSERT(nullptr != pexprPlan);
 
-	UlongPtrArray *number_of_bindings = eng.GetNumberOfBindings();
+	gpos::pointer<UlongPtrArray *> number_of_bindings =
+		eng.GetNumberOfBindings();
 	ULONG search_stage = 0;
 	ULONG bindings_for_xform =
 		(ULONG) (*number_of_bindings)[search_stage]

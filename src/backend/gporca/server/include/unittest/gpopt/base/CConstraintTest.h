@@ -72,9 +72,9 @@ private:
 	static const WCHAR *wszInternalRepresentationFor2012_01_22;
 
 	// construct an array of ranges to be used to create an interval
-	static CRangeArray *Pdrgprng(CMemoryPool *mp, IMDId *mdid,
-								 const SRangeInfo rgRangeInfo[],
-								 ULONG ulRanges);
+	static gpos::owner<CRangeArray *> Pdrgprng(CMemoryPool *mp, IMDId *mdid,
+											   const SRangeInfo rgRangeInfo[],
+											   ULONG ulRanges);
 
 	static gpos::owner<CConstraintInterval *> PciFirstInterval(CMemoryPool *mp,
 															   IMDId *mdid,
@@ -88,17 +88,19 @@ private:
 		CMemoryPool *mp, CMDAccessor *md_accessor, CColRef *colref);
 
 	// generate comparison expression
-	static CExpression *PexprScalarCmp(CMemoryPool *mp,
-									   CMDAccessor *md_accessor,
-									   CColRef *colref,
-									   IMDType::ECmpType cmp_type, LINT val);
+	static gpos::owner<CExpression *> PexprScalarCmp(CMemoryPool *mp,
+													 CMDAccessor *md_accessor,
+													 CColRef *colref,
+													 IMDType::ECmpType cmp_type,
+													 LINT val);
 
 	// interval from scalar bool op
 	static GPOS_RESULT EresUnittest_CIntervalFromScalarBoolOp(
 		CMemoryPool *mp, CMDAccessor *md_accessor, CColRef *colref);
 
 	// debug print
-	static void PrintConstraint(CMemoryPool *mp, CConstraint *pcnstr);
+	static void PrintConstraint(CMemoryPool *mp,
+								gpos::pointer<CConstraint *> pcnstr);
 
 	// build a conjunction
 	static gpos::owner<CConstraintConjunction *> Pcstconjunction(
@@ -130,7 +132,8 @@ public:
 	static GPOS_RESULT EresUnittest_ConstraintsOnDates();
 
 	// print equivalence classes
-	static void PrintEquivClasses(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
+	static void PrintEquivClasses(CMemoryPool *mp,
+								  gpos::pointer<CColRefSetArray *> pdrgpcrs,
 								  BOOL fExpected = false);
 };	// class CConstraintTest
 }  // namespace gpopt

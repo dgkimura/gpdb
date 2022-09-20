@@ -31,15 +31,16 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalDynamicIndexScan::CDXLPhysicalDynamicIndexScan(
-	CMemoryPool *mp, CDXLTableDescr *table_descr,
-	CDXLIndexDescr *dxl_index_descr, EdxlIndexScanDirection idx_scan_direction,
-	gpos::Ref<IMdIdArray> part_mdids, ULongPtrArray *selector_ids)
+	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr,
+	gpos::owner<CDXLIndexDescr *> dxl_index_descr,
+	EdxlIndexScanDirection idx_scan_direction, gpos::Ref<IMdIdArray> part_mdids,
+	gpos::owner<ULongPtrArray *> selector_ids)
 	: CDXLPhysical(mp),
-	  m_dxl_table_descr(table_descr),
-	  m_dxl_index_descr(dxl_index_descr),
+	  m_dxl_table_descr(std::move(table_descr)),
+	  m_dxl_index_descr(std::move(dxl_index_descr)),
 	  m_index_scan_dir(idx_scan_direction),
 	  m_part_mdids(part_mdids),
-	  m_selector_ids(selector_ids)
+	  m_selector_ids(std::move(selector_ids))
 {
 	GPOS_ASSERT(nullptr != m_dxl_table_descr);
 	GPOS_ASSERT(nullptr != m_dxl_index_descr);
@@ -214,8 +215,10 @@ CDXLPhysicalDynamicIndexScan::AssertValid(gpos::pointer<const CDXLNode *> node,
 	GPOS_ASSERT(nullptr != m_dxl_table_descr->MdName());
 	GPOS_ASSERT(m_dxl_table_descr->MdName()->GetMDName()->IsValid());
 
-	CDXLNode *index_filter_dxlnode = (*node)[EdxldisIndexFilter];
-	CDXLNode *index_cond_dxlnode = (*node)[EdxldisIndexCondition];
+	gpos::pointer<CDXLNode *> index_filter_dxlnode =
+		(*node)[EdxldisIndexFilter];
+	gpos::pointer<CDXLNode *> index_cond_dxlnode =
+		(*node)[EdxldisIndexCondition];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarIndexCondList ==

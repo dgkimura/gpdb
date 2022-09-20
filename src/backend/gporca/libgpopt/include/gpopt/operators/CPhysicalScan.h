@@ -68,8 +68,9 @@ private:
 
 public:
 	// ctors
-	CPhysicalScan(CMemoryPool *mp, const CName *pname, CTableDescriptor *,
-				  CColRefArray *colref_array);
+	CPhysicalScan(CMemoryPool *mp, const CName *pname,
+				  gpos::owner<CTableDescriptor *>,
+				  gpos::owner<CColRefArray *> colref_array);
 
 	// dtor
 	~CPhysicalScan() override;
@@ -97,12 +98,12 @@ public:
 
 	// compute required output columns of the n-th child
 	CColRefSet *
-	PcrsRequired(CMemoryPool *,				   // mp
-				 CExpressionHandle &,		   // exprhdl
-				 gpos::pointer<CColRefSet *>,  // pcrsRequired
-				 ULONG,						   // child_index
-				 CDrvdPropArray *,			   // pdrgpdpCtxt
-				 ULONG						   // ulOptReq
+	PcrsRequired(CMemoryPool *,					   // mp
+				 CExpressionHandle &,			   // exprhdl
+				 gpos::pointer<CColRefSet *>,	   // pcrsRequired
+				 ULONG,							   // child_index
+				 gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+				 ULONG							   // ulOptReq
 				 ) override
 	{
 		GPOS_ASSERT(!"CPhysicalScan has no children");
@@ -124,13 +125,13 @@ public:
 	}
 
 	// compute required sort columns of the n-th child
-	COrderSpec *
-	PosRequired(CMemoryPool *,				  // mp
-				CExpressionHandle &,		  // exprhdl
-				gpos::pointer<COrderSpec *>,  // posRequired
-				ULONG,						  // child_index
-				CDrvdPropArray *,			  // pdrgpdpCtxt
-				ULONG						  // ulOptReq
+	gpos::owner<COrderSpec *>
+	PosRequired(CMemoryPool *,					  // mp
+				CExpressionHandle &,			  // exprhdl
+				gpos::pointer<COrderSpec *>,	  // posRequired
+				ULONG,							  // child_index
+				gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+				ULONG							  // ulOptReq
 	) const override
 	{
 		GPOS_ASSERT(!"CPhysicalScan has no children");
@@ -138,12 +139,12 @@ public:
 	}
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *
+	gpos::owner<CDistributionSpec *>
 	PdsRequired(CMemoryPool *,						 // mp
 				CExpressionHandle &,				 // exprhdl
 				gpos::pointer<CDistributionSpec *>,	 // pdsRequired
 				ULONG,								 // child_index
-				CDrvdPropArray *,					 // pdrgpdpCtxt
+				gpos::pointer<CDrvdPropArray *>,	 // pdrgpdpCtxt
 				ULONG								 // ulOptReq
 	) const override
 	{
@@ -152,12 +153,12 @@ public:
 	}
 
 	// compute required rewindability of the n-th child
-	CRewindabilitySpec *
+	gpos::owner<CRewindabilitySpec *>
 	PrsRequired(CMemoryPool *,						  //mp
 				CExpressionHandle &,				  //exprhdl
 				gpos::pointer<CRewindabilitySpec *>,  //prsRequired
 				ULONG,								  // child_index
-				CDrvdPropArray *,					  // pdrgpdpCtxt
+				gpos::pointer<CDrvdPropArray *>,	  // pdrgpdpCtxt
 				ULONG								  // ulOptReq
 	) const override
 	{
@@ -167,7 +168,8 @@ public:
 
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::pointer<CColRefSet *> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -257,7 +259,7 @@ public:
 	}
 
 	// statistics derivation during costing
-	virtual IStatistics *PstatsDerive(
+	virtual gpos::owner<IStatistics *> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CReqdPropPlan *> prpplan,
 		gpos::pointer<IStatisticsArray *> stats_ctxt) const = 0;

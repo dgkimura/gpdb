@@ -50,8 +50,10 @@ public:
 	CUpperBoundNDVs(const CUpperBoundNDVs &) = delete;
 
 	// ctor
-	CUpperBoundNDVs(CColRefSet *column_refset, CDouble upper_bound_ndv)
-		: m_column_refset(column_refset), m_upper_bound_ndv(upper_bound_ndv)
+	CUpperBoundNDVs(gpos::owner<CColRefSet *> column_refset,
+					CDouble upper_bound_ndv)
+		: m_column_refset(std::move(column_refset)),
+		  m_upper_bound_ndv(upper_bound_ndv)
 	{
 		GPOS_ASSERT(nullptr != m_column_refset);
 	}
@@ -84,7 +86,8 @@ public:
 	// copy upper bound ndvs with remapped column id; function will
 	// return null if there is no mapping found for any of the columns
 	CUpperBoundNDVs *CopyUpperBoundNDVWithRemap(
-		CMemoryPool *mp, UlongToColRefMap *colid_to_colref_map) const;
+		CMemoryPool *mp,
+		gpos::pointer<UlongToColRefMap *> colid_to_colref_map) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;

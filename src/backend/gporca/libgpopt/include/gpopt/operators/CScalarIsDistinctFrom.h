@@ -36,9 +36,9 @@ public:
 	CScalarIsDistinctFrom(const CScalarIsDistinctFrom &) = delete;
 
 	// ctor
-	CScalarIsDistinctFrom(CMemoryPool *mp, IMDId *mdid_op,
+	CScalarIsDistinctFrom(CMemoryPool *mp, gpos::owner<IMDId *> mdid_op,
 						  const CWStringConst *pstrOp)
-		: CScalarCmp(mp, mdid_op, pstrOp, IMDType::EcmptIDF)
+		: CScalarCmp(mp, std::move(mdid_op), pstrOp, IMDType::EcmptIDF)
 	{
 		GPOS_ASSERT(mdid_op->IsValid());
 	}
@@ -54,7 +54,8 @@ public:
 	}
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override;
 
 	// return a string for operator name
 	const CHAR *
@@ -63,7 +64,7 @@ public:
 		return "CScalarIsDistinctFrom";
 	}
 
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// conversion function
 	static gpos::cast_func<CScalarIsDistinctFrom *> PopConvert(COperator *pop);

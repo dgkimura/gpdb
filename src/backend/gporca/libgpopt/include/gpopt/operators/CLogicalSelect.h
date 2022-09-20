@@ -46,7 +46,7 @@ public:
 	explicit CLogicalSelect(CMemoryPool *mp);
 
 	// ctor
-	CLogicalSelect(CMemoryPool *mp, CTableDescriptor *ptabdesc);
+	CLogicalSelect(CMemoryPool *mp, gpos::pointer<CTableDescriptor *> ptabdesc);
 
 	// dtor
 	~CLogicalSelect() override;
@@ -76,11 +76,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *,
-									CExpressionHandle &) override;
+	gpos::owner<CColRefSet *> DeriveOutputColumns(CMemoryPool *,
+												  CExpressionHandle &) override;
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::owner<CKeyCollection *> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -88,7 +88,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -96,7 +96,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	gpos::pointer<CTableDescriptor *>
 	DeriveTableDescriptor(CMemoryPool *,  // mp
 						  CExpressionHandle &exprhdl) const override
 	{
@@ -114,7 +114,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ public:
 	// derive statistics
 	gpos::owner<IStatistics *> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
 
 };	// class CLogicalSelect
 

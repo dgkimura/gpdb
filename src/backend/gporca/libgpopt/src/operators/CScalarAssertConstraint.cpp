@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarAssertConstraint.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "naucrates/md/IMDTypeBool.h"
@@ -57,7 +58,7 @@ CScalarAssertConstraint::~CScalarAssertConstraint()
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarAssertConstraint::Matches(COperator *pop) const
+CScalarAssertConstraint::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
@@ -65,7 +66,7 @@ CScalarAssertConstraint::Matches(COperator *pop) const
 	}
 
 	return m_pstrErrorMsg->Equals(
-		CScalarAssertConstraint::PopConvert(pop)->PstrErrorMsg());
+		gpos::dyn_cast<CScalarAssertConstraint>(pop)->PstrErrorMsg());
 }
 
 //---------------------------------------------------------------------------

@@ -184,7 +184,7 @@ CParseHandlerTableScan::EndElement(const XMLCh *const element_local_name,
 	gpos::owner<CDXLTableDescr *> table_descr =
 		table_descr_parse_handler->GetDXLTableDescr();
 	table_descr->AddRef();
-	m_dxl_op->SetTableDescriptor(table_descr);
+	m_dxl_op->SetTableDescriptor(std::move(table_descr));
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 	// set statictics and physical properties

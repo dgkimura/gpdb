@@ -111,9 +111,9 @@ public:
 	CDXLCtasStorageOptions(const CDXLCtasStorageOptions &) = delete;
 
 	// ctor
-	CDXLCtasStorageOptions(CMDName *mdname_tablespace,
-						   ECtasOnCommitAction ctas_on_commit_action,
-						   CDXLCtasOptionArray *ctas_storage_option_array);
+	CDXLCtasStorageOptions(
+		CMDName *mdname_tablespace, ECtasOnCommitAction ctas_on_commit_action,
+		gpos::owner<CDXLCtasOptionArray *> ctas_storage_option_array);
 
 	// dtor
 	~CDXLCtasStorageOptions() override;

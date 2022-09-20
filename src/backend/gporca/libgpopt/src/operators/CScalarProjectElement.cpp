@@ -45,12 +45,12 @@ CScalarProjectElement::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarProjectElement::Matches(COperator *pop) const
+CScalarProjectElement::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarProjectElement *popScPrEl =
-			CScalarProjectElement::PopConvert(pop);
+		gpos::pointer<CScalarProjectElement *> popScPrEl =
+			gpos::dyn_cast<CScalarProjectElement>(pop);
 
 		// match if column reference is same
 		return Pcr() == popScPrEl->Pcr();
@@ -83,7 +83,8 @@ CScalarProjectElement::FInputOrderSensitive() const
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
 CScalarProjectElement::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
 	ULONG id = m_pcr->Id();
 	CColRef *colref = colref_mapping->Find(&id);

@@ -31,8 +31,10 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CStatsPredPoint::CStatsPredPoint(ULONG colid,
 								 CStatsPred::EStatsCmpType stats_cmp_type,
-								 CPoint *point)
-	: CStatsPred(colid), m_stats_cmp_type(stats_cmp_type), m_pred_point(point)
+								 gpos::owner<CPoint *> point)
+	: CStatsPred(colid),
+	  m_stats_cmp_type(stats_cmp_type),
+	  m_pred_point(std::move(point))
 {
 	GPOS_ASSERT(nullptr != m_pred_point);
 }
@@ -47,7 +49,7 @@ CStatsPredPoint::CStatsPredPoint(ULONG colid,
 //---------------------------------------------------------------------------
 CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
 								 CStatsPred::EStatsCmpType stats_cmp_type,
-								 IDatum *datum)
+								 gpos::pointer<IDatum *> datum)
 	: CStatsPred(gpos::ulong_max),
 	  m_stats_cmp_type(stats_cmp_type),
 	  m_pred_point(nullptr)
@@ -56,9 +58,9 @@ CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
 	GPOS_ASSERT(nullptr != datum);
 
 	m_colid = colref->Id();
-	IDatum *padded_datum = PreprocessDatum(mp, colref, datum);
+	gpos::owner<IDatum *> padded_datum = PreprocessDatum(mp, colref, datum);
 
-	m_pred_point = GPOS_NEW(mp) CPoint(padded_datum);
+	m_pred_point = GPOS_NEW(mp) CPoint(std::move(padded_datum));
 }
 
 //---------------------------------------------------------------------------

@@ -81,10 +81,10 @@ CLogical::~CLogical()
 //		a pointer to the operator creating that column
 //
 //---------------------------------------------------------------------------
-CColRefArray *
+gpos::owner<CColRefArray *>
 CLogical::PdrgpcrCreateMapping(
 	CMemoryPool *mp, gpos::pointer<const CColumnDescriptorArray *> pdrgpcoldesc,
-	ULONG ulOpSourceId, IMDId *mdid_table)
+	ULONG ulOpSourceId, gpos::pointer<IMDId *> mdid_table)
 {
 	// get column factory from optimizer context object
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
@@ -95,7 +95,7 @@ CLogical::PdrgpcrCreateMapping(
 		GPOS_NEW(mp) CColRefArray(mp, num_cols);
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
-		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
+		gpos::pointer<CColumnDescriptor *> pcoldesc = (*pdrgpcoldesc)[ul];
 		CName name(mp, pcoldesc->Name());
 		CColRef *colref = col_factory->PcrCreate(
 			pcoldesc, name, ulOpSourceId, false /* mark_as_used */, mdid_table);
@@ -113,9 +113,9 @@ CLogical::PdrgpcrCreateMapping(
 //		Initialize array of partition columns from the array with their indexes
 //
 //---------------------------------------------------------------------------
-CColRef2dArray *
+gpos::owner<CColRef2dArray *>
 CLogical::PdrgpdrgpcrCreatePartCols(
-	CMemoryPool *mp, CColRefArray *colref_array,
+	CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array,
 	gpos::pointer<const ULongPtrArray *> pdrgpulPart)
 {
 	GPOS_ASSERT(nullptr != colref_array && "Output columns cannot be NULL");
@@ -147,10 +147,10 @@ CLogical::PdrgpdrgpcrCreatePartCols(
 
 //		Compute an order spec based on an index
 
-COrderSpec *
+gpos::owner<COrderSpec *>
 CLogical::PosFromIndex(CMemoryPool *mp,
 					   gpos::pointer<const IMDIndex *> pmdindex,
-					   CColRefArray *colref_array,
+					   gpos::pointer<CColRefArray *> colref_array,
 					   gpos::pointer<const CTableDescriptor *> ptabdesc)
 {
 	// compute the order spec after getting the current position of the index key
@@ -256,7 +256,7 @@ CLogical::PcrsDeriveNotNullPassThruOuter(CExpressionHandle &exprhdl)
 //		children
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogical::PcrsDeriveOutputCombineLogical(CMemoryPool *mp,
 										 CExpressionHandle &exprhdl)
 {
@@ -266,7 +266,7 @@ CLogical::PcrsDeriveOutputCombineLogical(CMemoryPool *mp,
 	ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
-		CColRefSet *pcrsChild = exprhdl.DeriveOutputColumns(ul);
+		gpos::pointer<CColRefSet *> pcrsChild = exprhdl.DeriveOutputColumns(ul);
 		GPOS_ASSERT(pcrs->IsDisjoint(pcrsChild) &&
 					"Input columns are not disjoint");
 
@@ -286,7 +286,7 @@ CLogical::PcrsDeriveOutputCombineLogical(CMemoryPool *mp,
 //		children
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogical::PcrsDeriveNotNullCombineLogical(CMemoryPool *mp,
 										  CExpressionHandle &exprhdl)
 {
@@ -296,7 +296,8 @@ CLogical::PcrsDeriveNotNullCombineLogical(CMemoryPool *mp,
 	ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
-		CColRefSet *pcrsChild = exprhdl.DeriveNotNullColumns(ul);
+		gpos::pointer<CColRefSet *> pcrsChild =
+			exprhdl.DeriveNotNullColumns(ul);
 		GPOS_ASSERT(pcrs->IsDisjoint(pcrsChild) &&
 					"Input columns are not disjoint");
 
@@ -339,7 +340,7 @@ CLogical::PkcCombineKeys(CMemoryPool *mp, CExpressionHandle &exprhdl)
 	const ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
-		CKeyCollection *pkc = exprhdl.DeriveKeyCollection(ul);
+		gpos::pointer<CKeyCollection *> pkc = exprhdl.DeriveKeyCollection(ul);
 		if (nullptr == pkc)
 		{
 			// if a child has no key, the operator has no key
@@ -352,7 +353,7 @@ CLogical::PkcCombineKeys(CMemoryPool *mp, CExpressionHandle &exprhdl)
 		colref_array->Release();
 	}
 
-	return GPOS_NEW(mp) CKeyCollection(mp, pcrs);
+	return GPOS_NEW(mp) CKeyCollection(mp, std::move(pcrs));
 }
 
 //---------------------------------------------------------------------------
@@ -363,7 +364,7 @@ CLogical::PkcCombineKeys(CMemoryPool *mp, CExpressionHandle &exprhdl)
 //		Helper function for computing the keys in a base table
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogical::PkcKeysBaseTable(CMemoryPool *mp,
 						   gpos::pointer<const CBitSetArray *> pdrgpbsKeys,
 						   gpos::pointer<const CColRefArray *> pdrgpcrOutput)
@@ -381,7 +382,7 @@ CLogical::PkcKeysBaseTable(CMemoryPool *mp,
 	{
 		gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
-		CBitSet *pbs = (*pdrgpbsKeys)[ul];
+		gpos::pointer<CBitSet *> pbs = (*pdrgpbsKeys)[ul];
 		CBitSetIter bsiter(*pbs);
 
 		while (bsiter.Advance())
@@ -403,7 +404,7 @@ CLogical::PkcKeysBaseTable(CMemoryPool *mp,
 //		Common case of combining partition info of all logical children
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::owner<CPartInfo *>
 CLogical::PpartinfoDeriveCombine(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
 	const ULONG arity = exprhdl.Arity();
@@ -423,7 +424,7 @@ CLogical::PpartinfoDeriveCombine(CMemoryPool *mp, CExpressionHandle &exprhdl)
 			ppartinfoChild = exprhdl.DerivePartitionInfo(ul);
 		}
 		GPOS_ASSERT(nullptr != ppartinfoChild);
-		CPartInfo *ppartinfoCombined =
+		gpos::owner<CPartInfo *> ppartinfoCombined =
 			CPartInfo::PpartinfoCombine(mp, ppartinfo, ppartinfoChild);
 		ppartinfo->Release();
 		ppartinfo = ppartinfoCombined;
@@ -440,9 +441,9 @@ CLogical::PpartinfoDeriveCombine(CMemoryPool *mp, CExpressionHandle &exprhdl)
 //		Derive outer references
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogical::DeriveOuterReferences(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								CColRefSet *pcrsUsedAdditional)
+								gpos::pointer<CColRefSet *> pcrsUsedAdditional)
 {
 	ULONG arity = exprhdl.Arity();
 	gpos::owner<CColRefSet *> outer_refs = GPOS_NEW(mp) CColRefSet(mp);
@@ -489,7 +490,7 @@ CLogical::DeriveOuterReferences(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Derive outer references for index get and dynamic index get operators
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogical::PcrsDeriveOuterIndexGet(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
 	ULONG arity = exprhdl.Arity();
@@ -523,7 +524,7 @@ CLogical::PcrsDeriveOuterIndexGet(CMemoryPool *mp, CExpressionHandle &exprhdl)
 //		that can be used above the apply expression
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogical::DeriveCorrelatedApplyColumns(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl) const
 {
@@ -535,7 +536,8 @@ CLogical::DeriveCorrelatedApplyColumns(CMemoryPool *mp,
 	if (CUtils::FCorrelatedApply(exprhdl.Pop()))
 	{
 		// add inner columns of correlated-apply expression
-		pcrs->Include(CLogicalApply::PopConvert(exprhdl.Pop())->PdrgPcrInner());
+		pcrs->Include(
+			gpos::dyn_cast<CLogicalApply>(exprhdl.Pop())->PdrgPcrInner());
 	}
 
 	// combine correlated-apply columns from logical children
@@ -543,7 +545,8 @@ CLogical::DeriveCorrelatedApplyColumns(CMemoryPool *mp,
 	{
 		if (!exprhdl.FScalarChild(ul))
 		{
-			CDrvdPropRelational *pdprel = exprhdl.GetRelationalProperties(ul);
+			gpos::pointer<CDrvdPropRelational *> pdprel =
+				exprhdl.GetRelationalProperties(ul);
 			pcrs->Union(pdprel->GetCorrelatedApplyColumns());
 		}
 	}
@@ -584,7 +587,7 @@ CLogical::PkcDeriveKeysPassThru(CExpressionHandle &exprhdl, ULONG ulChild)
 //		Derive key collections
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogical::DeriveKeyCollection(CMemoryPool *,	   // mp
 							  CExpressionHandle &  // exprhdl
 ) const
@@ -629,15 +632,16 @@ CLogical::PpcDeriveConstraintFromPredicates(CMemoryPool *mp,
 			GPOS_ASSERT(COperator::EopScalarNAryJoinPredList !=
 						pexprScalar->Pop()->Eopid());
 			gpos::owner<CColRefSetArray *> pdrgpcrsChild = nullptr;
-			CConstraint *pcnstr = CConstraint::PcnstrFromScalarExpr(
-				mp, pexprScalar, &pdrgpcrsChild);
+			gpos::owner<CConstraint *> pcnstr =
+				CConstraint::PcnstrFromScalarExpr(mp, pexprScalar,
+												  &pdrgpcrsChild);
 
 			if (nullptr != pcnstr)
 			{
 				pdrgpcnstr->Append(pcnstr);
 
 				// merge with the equivalence classes we have so far
-				CColRefSetArray *pdrgpcrsMerged =
+				gpos::owner<CColRefSetArray *> pdrgpcrsMerged =
 					CUtils::PdrgpcrsMergeEquivClasses(mp, pdrgpcrs,
 													  pdrgpcrsChild);
 				pdrgpcrs->Release();
@@ -647,13 +651,15 @@ CLogical::PpcDeriveConstraintFromPredicates(CMemoryPool *mp,
 		}
 		else
 		{
-			CPropConstraint *ppc = exprhdl.DerivePropertyConstraint(ul);
+			gpos::pointer<CPropConstraint *> ppc =
+				exprhdl.DerivePropertyConstraint(ul);
 
 			// equivalence classes coming from child
-			CColRefSetArray *pdrgpcrsChild = ppc->PdrgpcrsEquivClasses();
+			gpos::pointer<CColRefSetArray *> pdrgpcrsChild =
+				ppc->PdrgpcrsEquivClasses();
 
 			// merge with the equivalence classes we have so far
-			CColRefSetArray *pdrgpcrsMerged =
+			gpos::owner<CColRefSetArray *> pdrgpcrsMerged =
 				CUtils::PdrgpcrsMergeEquivClasses(mp, pdrgpcrs, pdrgpcrsChild);
 			pdrgpcrs->Release();
 			pdrgpcrs = pdrgpcrsMerged;
@@ -668,9 +674,11 @@ CLogical::PpcDeriveConstraintFromPredicates(CMemoryPool *mp,
 		}
 	}
 
-	CConstraint *pcnstrNew = CConstraint::PcnstrConjunction(mp, pdrgpcnstr);
+	gpos::owner<CConstraint *> pcnstrNew =
+		CConstraint::PcnstrConjunction(mp, std::move(pdrgpcnstr));
 
-	return GPOS_NEW(mp) CPropConstraint(mp, pdrgpcrs, pcnstrNew);
+	return GPOS_NEW(mp)
+		CPropConstraint(mp, std::move(pdrgpcrs), std::move(pcnstrNew));
 }
 
 //---------------------------------------------------------------------------
@@ -700,7 +708,7 @@ CLogical::PpcDeriveConstraintFromTable(
 
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
-		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
+		gpos::pointer<CColumnDescriptor *> pcoldesc = (*pdrgpcoldesc)[ul];
 		CColRef *colref = (*pdrgpcrOutput)[ul];
 		// we are only interested in non-system columns that are defined as
 		// being NOT NULL
@@ -718,7 +726,7 @@ CLogical::PpcDeriveConstraintFromTable(
 		}
 
 		// add a "not null" constraint and an equivalence class
-		CConstraint *pcnstr = CConstraintInterval::PciUnbounded(
+		gpos::owner<CConstraint *> pcnstr = CConstraintInterval::PciUnbounded(
 			mp, colref, false /*fIncludesNull*/);
 
 		if (pcnstr == nullptr)
@@ -739,7 +747,8 @@ CLogical::PpcDeriveConstraintFromTable(
 	const ULONG ulCheckConstraint = pmdrel->CheckConstraintCount();
 	for (ULONG ul = 0; ul < ulCheckConstraint; ul++)
 	{
-		IMDId *pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(ul);
+		gpos::pointer<IMDId *> pmdidCheckConstraint =
+			pmdrel->CheckConstraintMDidAt(ul);
 
 		gpos::pointer<const IMDCheckConstraint *> pmdCheckConstraint =
 			md_accessor->RetrieveCheckConstraints(pmdidCheckConstraint);
@@ -755,7 +764,7 @@ CLogical::PpcDeriveConstraintFromTable(
 
 		// Check constraints are satisfied if the check expression evaluates to
 		// true or NULL, so infer NULLs as true here.
-		CConstraint *pcnstr = CConstraint::PcnstrFromScalarExpr(
+		gpos::owner<CConstraint *> pcnstr = CConstraint::PcnstrFromScalarExpr(
 			mp, pexprCheckConstraint, &pdrgpcrsChild,
 			true /* infer_nulls_as */);
 		if (nullptr != pcnstr)
@@ -763,7 +772,7 @@ CLogical::PpcDeriveConstraintFromTable(
 			pdrgpcnstr->Append(pcnstr);
 
 			// merge with the equivalence classes we have so far
-			CColRefSetArray *pdrgpcrsMerged =
+			gpos::owner<CColRefSetArray *> pdrgpcrsMerged =
 				CUtils::PdrgpcrsMergeEquivClasses(mp, pdrgpcrs, pdrgpcrsChild);
 			pdrgpcrs->Release();
 			pdrgpcrs = pdrgpcrsMerged;
@@ -775,7 +784,8 @@ CLogical::PpcDeriveConstraintFromTable(
 	pdrgpcrNonSystem->Release();
 
 	return GPOS_NEW(mp) CPropConstraint(
-		mp, pdrgpcrs, CConstraint::PcnstrConjunction(mp, pdrgpcnstr));
+		mp, std::move(pdrgpcrs),
+		CConstraint::PcnstrConjunction(mp, std::move(pdrgpcnstr)));
 }
 
 //---------------------------------------------------------------------------
@@ -786,7 +796,7 @@ CLogical::PpcDeriveConstraintFromTable(
 //		Derive constraint property from a table/index get with predicates
 //
 //---------------------------------------------------------------------------
-CPropConstraint *
+gpos::owner<CPropConstraint *>
 CLogical::PpcDeriveConstraintFromTableWithPredicates(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::pointer<const CTableDescriptor *> ptabdesc,
@@ -822,11 +832,13 @@ CLogical::PpcDeriveConstraintFromTableWithPredicates(
 		return ppcnstrCond;
 	}
 
-	CColRefSetArray *pdrgpcrsCond = ppcnstrCond->PdrgpcrsEquivClasses();
-	CColRefSetArray *pdrgpcrs = CUtils::PdrgpcrsMergeEquivClasses(
+	gpos::pointer<CColRefSetArray *> pdrgpcrsCond =
+		ppcnstrCond->PdrgpcrsEquivClasses();
+	gpos::owner<CColRefSetArray *> pdrgpcrs = CUtils::PdrgpcrsMergeEquivClasses(
 		mp, pdrgpcrsEquivClassesTable, pdrgpcrsCond);
 	gpos::owner<CPropConstraint *> ppc = GPOS_NEW(mp) CPropConstraint(
-		mp, pdrgpcrs, CConstraint::PcnstrConjunction(mp, pdrgpcnstr));
+		mp, std::move(pdrgpcrs),
+		CConstraint::PcnstrConjunction(mp, std::move(pdrgpcnstr)));
 
 	ppcnstrCond->Release();
 	ppcTable->Release();
@@ -865,11 +877,11 @@ CLogical::PpcDeriveConstraintPassThru(CExpressionHandle &exprhdl, ULONG ulChild)
 gpos::owner<CPropConstraint *>
 CLogical::PpcDeriveConstraintRestrict(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl,
-									  CColRefSet *pcrsOutput)
+									  gpos::pointer<CColRefSet *> pcrsOutput)
 {
 	// constraint property from relational child
-	CPropConstraint *ppc = exprhdl.DerivePropertyConstraint(0);
-	CColRefSetArray *pdrgpcrs = ppc->PdrgpcrsEquivClasses();
+	gpos::pointer<CPropConstraint *> ppc = exprhdl.DerivePropertyConstraint(0);
+	gpos::pointer<CColRefSetArray *> pdrgpcrs = ppc->PdrgpcrsEquivClasses();
 
 	// construct new array of equivalence classes
 	gpos::owner<CColRefSetArray *> pdrgpcrsNew =
@@ -892,10 +904,11 @@ CLogical::PpcDeriveConstraintRestrict(CMemoryPool *mp,
 		}
 	}
 
-	CConstraint *pcnstrChild = ppc->Pcnstr();
+	gpos::pointer<CConstraint *> pcnstrChild = ppc->Pcnstr();
 	if (nullptr == pcnstrChild)
 	{
-		return GPOS_NEW(mp) CPropConstraint(mp, pdrgpcrsNew, nullptr);
+		return GPOS_NEW(mp)
+			CPropConstraint(mp, std::move(pdrgpcrsNew), nullptr);
 	}
 
 	gpos::owner<CConstraintArray *> pdrgpcnstr =
@@ -921,9 +934,11 @@ CLogical::PpcDeriveConstraintRestrict(CMemoryPool *mp,
 		pdrgpcnstr->Append(pcnstrCol);
 	}
 
-	CConstraint *pcnstr = CConstraint::PcnstrConjunction(mp, pdrgpcnstr);
+	gpos::owner<CConstraint *> pcnstr =
+		CConstraint::PcnstrConjunction(mp, std::move(pdrgpcnstr));
 
-	return GPOS_NEW(mp) CPropConstraint(mp, pdrgpcrsNew, pcnstr);
+	return GPOS_NEW(mp)
+		CPropConstraint(mp, std::move(pdrgpcrsNew), std::move(pcnstr));
 }
 
 //---------------------------------------------------------------------------
@@ -953,7 +968,7 @@ CLogical::DeriveFunctionProperties(CMemoryPool *mp,
 //		Derive table descriptor for tables used by operator
 //
 //---------------------------------------------------------------------------
-CTableDescriptor *
+gpos::pointer<CTableDescriptor *>
 CLogical::DeriveTableDescriptor(CMemoryPool *, CExpressionHandle &) const
 {
 	//currently return null unless there is a single table being used. Later we may want
@@ -1066,7 +1081,8 @@ CLogical::Maxcard(CExpressionHandle &exprhdl, ULONG ulScalarIndex,
 				  CMaxCard maxcard)
 {
 	// in case of a false condition (when the operator is not Full / Left Outer Join) or a contradiction, maxcard should be zero
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(ulScalarIndex);
+	gpos::pointer<CExpression *> pexprScalar =
+		exprhdl.PexprScalarExactChild(ulScalarIndex);
 
 	if (nullptr != pexprScalar)
 	{
@@ -1097,10 +1113,11 @@ CLogical::Maxcard(CExpressionHandle &exprhdl, ULONG ulScalarIndex,
 //		Helper for compute required stat columns of the n-th child
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogical::PcrsReqdChildStats(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput,
-	CColRefSet *pcrsUsed,  // columns used by scalar child(ren)
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CColRefSet *> pcrsInput,
+	gpos::pointer<CColRefSet *> pcrsUsed,  // columns used by scalar child(ren)
 	ULONG child_index)
 {
 	GPOS_ASSERT(child_index < exprhdl.Arity() - 1);
@@ -1163,15 +1180,16 @@ CLogical::PstatsPassThruOuter(CExpressionHandle &exprhdl)
 //		Helper for deriving statistics on a base table
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogical::PstatsBaseTable(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CTableDescriptor *ptabdesc,
-	CColRefSet *
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CTableDescriptor *> ptabdesc,
+	gpos::pointer<CColRefSet *>
 		pcrsHistExtra  // additional columns required for stats, not required by parent
 )
 {
-	CReqdPropRelational *prprel =
-		CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
+	gpos::pointer<CReqdPropRelational *> prprel =
+		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
 	gpos::owner<CColRefSet *> pcrsHist = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsHist->Include(prprel->PcrsStat());
 	if (nullptr != pcrsHistExtra)
@@ -1179,18 +1197,18 @@ CLogical::PstatsBaseTable(
 		pcrsHist->Include(pcrsHistExtra);
 	}
 
-	CColRefSet *pcrsOutput = exprhdl.DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrsOutput = exprhdl.DeriveOutputColumns();
 	gpos::owner<CColRefSet *> pcrsWidth = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsWidth->Include(pcrsOutput);
 	pcrsWidth->Exclude(pcrsHist);
 
 	const COptCtxt *poctxt = COptCtxt::PoctxtFromTLS();
 	CMDAccessor *md_accessor = poctxt->Pmda();
-	CStatisticsConfig *stats_config =
+	gpos::pointer<CStatisticsConfig *> stats_config =
 		poctxt->GetOptimizerConfig()->GetStatsConf();
 
-	IStatistics *stats = md_accessor->Pstats(mp, ptabdesc->MDId(), pcrsHist,
-											 pcrsWidth, stats_config);
+	gpos::owner<IStatistics *> stats = md_accessor->Pstats(
+		mp, ptabdesc->MDId(), pcrsHist, pcrsWidth, stats_config);
 
 	// clean up
 	pcrsWidth->Release();
@@ -1207,7 +1225,7 @@ CLogical::PstatsBaseTable(
 //		Derive dummy statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogical::PstatsDeriveDummy(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							CDouble rows) const
 {
@@ -1216,13 +1234,14 @@ CLogical::PstatsDeriveDummy(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// return a dummy stats object that has a histogram for every
 	// required-stats column
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	CReqdPropRelational *prprel =
-		CReqdPropRelational::GetReqdRelationalProps(exprhdl.Prp());
-	CColRefSet *pcrs = prprel->PcrsStat();
+	gpos::pointer<CReqdPropRelational *> prprel =
+		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
+	gpos::pointer<CColRefSet *> pcrs = prprel->PcrsStat();
 	gpos::owner<ULongPtrArray *> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	pcrs->ExtractColIds(mp, colids);
 
-	IStatistics *stats = CStatistics::MakeDummyStats(mp, colids, rows);
+	gpos::owner<IStatistics *> stats =
+		CStatistics::MakeDummyStats(mp, colids, rows);
 
 	// clean up
 	colids->Release();
@@ -1238,7 +1257,7 @@ CLogical::PstatsDeriveDummy(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute partition predicate to pass down to n-th child
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CLogical::PexprPartPred(CMemoryPool *,				   //mp,
 						CExpressionHandle &,		   //exprhdl,
 						gpos::pointer<CExpression *>,  //pexprInput,
@@ -1291,21 +1310,22 @@ CLogical::PrpCreate(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 CTableDescriptor *
-CLogical::PtabdescFromTableGet(COperator *pop)
+CLogical::PtabdescFromTableGet(gpos::pointer<COperator *> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	switch (pop->Eopid())
 	{
 		case CLogical::EopLogicalGet:
-			return CLogicalGet::PopConvert(pop)->Ptabdesc();
+			return gpos::dyn_cast<CLogicalGet>(pop)->Ptabdesc();
 		case CLogical::EopLogicalDynamicGet:
-			return CLogicalDynamicGet::PopConvert(pop)->Ptabdesc();
+			return gpos::dyn_cast<CLogicalDynamicGet>(pop)->Ptabdesc();
 		case CLogical::EopLogicalBitmapTableGet:
-			return CLogicalBitmapTableGet::PopConvert(pop)->Ptabdesc();
+			return gpos::dyn_cast<CLogicalBitmapTableGet>(pop)->Ptabdesc();
 		case CLogical::EopLogicalDynamicBitmapTableGet:
-			return CLogicalDynamicBitmapTableGet::PopConvert(pop)->Ptabdesc();
+			return gpos::dyn_cast<CLogicalDynamicBitmapTableGet>(pop)
+				->Ptabdesc();
 		case CLogical::EopLogicalSelect:
-			return CLogicalSelect::PopConvert(pop)->Ptabdesc();
+			return gpos::dyn_cast<CLogicalSelect>(pop)->Ptabdesc();
 		default:
 			return nullptr;
 	}
@@ -1320,7 +1340,7 @@ CLogical::PtabdescFromTableGet(COperator *pop)
 //
 //---------------------------------------------------------------------------
 CColRefArray *
-CLogical::PdrgpcrOutputFromLogicalGet(CLogical *pop)
+CLogical::PdrgpcrOutputFromLogicalGet(gpos::pointer<CLogical *> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(COperator::EopLogicalGet == pop->Eopid() ||
@@ -1328,10 +1348,10 @@ CLogical::PdrgpcrOutputFromLogicalGet(CLogical *pop)
 
 	if (COperator::EopLogicalGet == pop->Eopid())
 	{
-		return CLogicalGet::PopConvert(pop)->PdrgpcrOutput();
+		return gpos::dyn_cast<CLogicalGet>(pop)->PdrgpcrOutput();
 	}
 
-	return CLogicalDynamicGet::PopConvert(pop)->PdrgpcrOutput();
+	return gpos::dyn_cast<CLogicalDynamicGet>(pop)->PdrgpcrOutput();
 }
 
 //---------------------------------------------------------------------------
@@ -1343,7 +1363,7 @@ CLogical::PdrgpcrOutputFromLogicalGet(CLogical *pop)
 //
 //---------------------------------------------------------------------------
 const CName &
-CLogical::NameFromLogicalGet(CLogical *pop)
+CLogical::NameFromLogicalGet(gpos::pointer<CLogical *> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(COperator::EopLogicalGet == pop->Eopid() ||
@@ -1351,10 +1371,10 @@ CLogical::NameFromLogicalGet(CLogical *pop)
 
 	if (COperator::EopLogicalGet == pop->Eopid())
 	{
-		return CLogicalGet::PopConvert(pop)->Name();
+		return gpos::dyn_cast<CLogicalGet>(pop)->Name();
 	}
 
-	return CLogicalDynamicGet::PopConvert(pop)->Name();
+	return gpos::dyn_cast<CLogicalDynamicGet>(pop)->Name();
 }
 
 //---------------------------------------------------------------------------
@@ -1365,7 +1385,7 @@ CLogical::NameFromLogicalGet(CLogical *pop)
 //		Return the set of distribution columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogical::PcrsDist(CMemoryPool *mp,
 				   gpos::pointer<const CTableDescriptor *> ptabdesc,
 				   gpos::pointer<const CColRefArray *> pdrgpcrOutput)
@@ -1387,7 +1407,7 @@ CLogical::PcrsDist(CMemoryPool *mp,
 	const ULONG num_cols = pdrgpcoldesc->Size();
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
-		CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul];
+		gpos::pointer<CColumnDescriptor *> pcoldesc = (*pdrgpcoldesc)[ul];
 		CColRef *colref = (*pdrgpcrOutput)[ul];
 
 		phmicr->Insert(GPOS_NEW(mp) INT(pcoldesc->AttrNum()), colref);
@@ -1397,7 +1417,7 @@ CLogical::PcrsDist(CMemoryPool *mp,
 	const ULONG ulDistCols = pdrgpcoldescDist->Size();
 	for (ULONG ul2 = 0; ul2 < ulDistCols; ul2++)
 	{
-		CColumnDescriptor *pcoldesc = (*pdrgpcoldescDist)[ul2];
+		gpos::pointer<CColumnDescriptor *> pcoldesc = (*pdrgpcoldescDist)[ul2];
 		const INT attno = pcoldesc->AttrNum();
 		CColRef *pcrMapped = phmicr->Find(&attno);
 		GPOS_ASSERT(nullptr != pcrMapped);

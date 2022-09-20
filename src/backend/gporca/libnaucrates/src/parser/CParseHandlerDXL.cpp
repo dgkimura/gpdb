@@ -589,7 +589,7 @@ CParseHandlerDXL::ExtractStats(CParseHandlerBase *parse_handler_base)
 		dynamic_cast<CParseHandlerStatistics *>(parse_handler_base);
 	GPOS_ASSERT(nullptr != parse_handler_stats);
 
-	CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
+	gpos::pointer<CDXLStatsDerivedRelationArray *> dxl_derived_rel_stats_array =
 		parse_handler_stats->GetStatsDerivedRelDXLArray();
 	GPOS_ASSERT(nullptr != dxl_derived_rel_stats_array);
 
@@ -648,8 +648,8 @@ CParseHandlerDXL::ExtractMDRequest(CParseHandlerBase *parse_handler_base)
 
 	md_type_request_array->AddRef();
 
-	m_mdrequest =
-		GPOS_NEW(m_mp) CMDRequest(m_mp, mdid_array, md_type_request_array);
+	m_mdrequest = GPOS_NEW(m_mp)
+		CMDRequest(m_mp, mdid_array, std::move(md_type_request_array));
 }
 
 

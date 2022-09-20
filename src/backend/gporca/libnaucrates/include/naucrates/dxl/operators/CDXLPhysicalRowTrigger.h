@@ -51,8 +51,8 @@ public:
 
 	// ctor
 	CDXLPhysicalRowTrigger(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid, INT type,
-						   ULongPtrArray *colids_old,
-						   ULongPtrArray *colids_new);
+						   gpos::owner<ULongPtrArray *> colids_old,
+						   gpos::owner<ULongPtrArray *> colids_new);
 
 	// dtor
 	~CDXLPhysicalRowTrigger() override;

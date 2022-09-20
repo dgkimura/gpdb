@@ -39,9 +39,10 @@ public:
 	}
 
 	// ctor
-	CLogicalLeftAntiSemiApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
+	CLogicalLeftAntiSemiApply(CMemoryPool *mp,
+							  gpos::owner<CColRefArray *> pdrgpcrInner,
 							  EOperatorId eopidOriginSubq)
-		: CLogicalApply(mp, pdrgpcrInner, eopidOriginSubq)
+		: CLogicalApply(mp, std::move(pdrgpcrInner), eopidOriginSubq)
 	{
 	}
 
@@ -74,7 +75,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	DeriveOutputColumns(CMemoryPool *,	// mp
 						CExpressionHandle &exprhdl) override
 	{
@@ -84,7 +85,7 @@ public:
 	}
 
 	// derive not nullable output columns
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	DeriveNotNullColumns(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -92,7 +93,7 @@ public:
 	}
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::owner<CKeyCollection *> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -100,7 +101,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -112,7 +113,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -127,7 +128,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function

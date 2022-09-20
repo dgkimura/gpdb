@@ -24,7 +24,7 @@ class CLimitStatsProcessor
 {
 public:
 	// limit
-	static CStatistics *CalcLimitStats(
+	static gpos::owner<CStatistics *> CalcLimitStats(
 		CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
 		CDouble input_limit_rows);
 };

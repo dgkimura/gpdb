@@ -48,29 +48,31 @@ public:
 	CPhysicalMotion(const CPhysicalMotion &) = delete;
 
 	// output distribution accessor
-	virtual CDistributionSpec *Pds() const = 0;
+	virtual gpos::pointer<CDistributionSpec *> Pds() const = 0;
 
 	// check if optimization contexts is valid
-	BOOL FValidContext(CMemoryPool *mp, COptimizationContext *poc,
-					   COptimizationContextArray *pdrgpocChild) const override;
+	BOOL FValidContext(
+		CMemoryPool *mp, gpos::pointer<COptimizationContext *> poc,
+		gpos::pointer<COptimizationContextArray *> pdrgpocChild) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// compute required ctes of the n-th child
-	CCTEReq *PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  CCTEReq *pcter, ULONG child_index,
-						  CDrvdPropArray *pdrgpdpCtxt,
-						  ULONG ulOptReq) const override;
+	gpos::owner<CCTEReq *> PcteRequired(CMemoryPool *mp,
+										CExpressionHandle &exprhdl,
+										gpos::pointer<CCTEReq *> pcter,
+										ULONG child_index,
+										CDrvdPropArray *pdrgpdpCtxt,
+										ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	gpos::owner<CDistributionSpec *> PdsRequired(CMemoryPool *mp,
-												 CExpressionHandle &exprhdl,
-												 CDistributionSpec *pdsRequired,
-												 ULONG child_index,
-												 CDrvdPropArray *pdrgpdpCtxt,
-												 ULONG ulOptReq) const override;
+	gpos::owner<CDistributionSpec *> PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	gpos::owner<CRewindabilitySpec *> PrsRequired(
@@ -78,13 +80,14 @@ public:
 		CExpressionHandle &,				  // exprhdl
 		gpos::pointer<CRewindabilitySpec *>,  // prsRequired
 		ULONG,								  // child_index
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// compute required partition propoagation spec of the n-th child
 	gpos::owner<CPartitionPropagationSpec *> PppsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CPartitionPropagationSpec *> pppsRequired,
-		ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+		ULONG child_index, gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
 		ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------

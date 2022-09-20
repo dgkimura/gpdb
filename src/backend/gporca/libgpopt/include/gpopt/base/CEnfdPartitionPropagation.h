@@ -53,7 +53,7 @@ public:
 	CEnfdPartitionPropagation(const CEnfdPartitionPropagation &) = delete;
 
 	// ctor
-	CEnfdPartitionPropagation(CPartitionPropagationSpec *ppps,
+	CEnfdPartitionPropagation(gpos::owner<CPartitionPropagationSpec *> ppps,
 							  EPartitionPropagationMatching eppm);
 
 	// dtor
@@ -77,7 +77,8 @@ public:
 	}
 
 	// get distribution enforcing type for the given operator
-	EPropEnforcingType Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+	EPropEnforcingType Epet(CExpressionHandle &exprhdl,
+							gpos::pointer<CPhysical *> popPhysical,
 							BOOL fPropagationReqd) const;
 
 	// return matching type
@@ -88,9 +89,9 @@ public:
 	}
 
 	// matching function
-	BOOL Matches(CEnfdPartitionPropagation *pepp);
+	BOOL Matches(gpos::pointer<CEnfdPartitionPropagation *> pepp);
 
-	BOOL FCompatible(CPartitionPropagationSpec *pps_drvd) const;
+	BOOL FCompatible(gpos::pointer<CPartitionPropagationSpec *> pps_drvd) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

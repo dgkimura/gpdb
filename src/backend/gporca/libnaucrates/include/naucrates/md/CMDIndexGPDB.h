@@ -84,10 +84,10 @@ public:
 	CMDIndexGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 				 BOOL is_clustered, BOOL is_partitioned,
 				 EmdindexType index_type, gpos::Ref<IMDId> mdid_item_type,
-				 ULongPtrArray *index_key_cols_array,
-				 ULongPtrArray *included_cols_array,
+				 gpos::owner<ULongPtrArray *> index_key_cols_array,
+				 gpos::owner<ULongPtrArray *> included_cols_array,
 				 gpos::Ref<IMdIdArray> mdid_opfamilies_array,
-				 IMDPartConstraint *mdpart_constraint,
+				 gpos::owner<IMDPartConstraint *> mdpart_constraint,
 				 gpos::Ref<IMdIdArray> child_index_oids);
 
 	// dtor

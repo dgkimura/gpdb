@@ -53,7 +53,8 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -67,9 +68,10 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 #ifdef GPOS_DEBUG
 		gpos::owner<CExpression *> pexprUlResult =
 			pceevaldefault->PexprEval(pexprUl);
-		CScalarConst *pscalarconstUl = CScalarConst::PopConvert(pexprUl->Pop());
-		CScalarConst *pscalarconstUlResult =
-			CScalarConst::PopConvert(pexprUlResult->Pop());
+		gpos::pointer<CScalarConst *> pscalarconstUl =
+			gpos::dyn_cast<CScalarConst>(pexprUl->Pop());
+		gpos::pointer<CScalarConst *> pscalarconstUlResult =
+			gpos::dyn_cast<CScalarConst>(pexprUlResult->Pop());
 		GPOS_ASSERT(pscalarconstUl->Matches(pscalarconstUlResult));
 		pexprUlResult->Release();
 #endif	// GPOS_DEBUG
@@ -79,14 +81,15 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 	// Test evaluation of a null test expression
 	{
 		ULONG ulVal = 123456;
-		CExpression *pexprUl = CUtils::PexprScalarConstInt4(mp, ulVal);
+		gpos::owner<CExpression *> pexprUl =
+			CUtils::PexprScalarConstInt4(mp, ulVal);
 		gpos::owner<CExpression *> pexprIsNull =
 			CUtils::PexprIsNull(mp, pexprUl);
 #ifdef GPOS_DEBUG
 		gpos::owner<CExpression *> pexprResult =
 			pceevaldefault->PexprEval(pexprIsNull);
-		gpopt::CScalarNullTest *pscalarnulltest =
-			CScalarNullTest::PopConvert(pexprIsNull->Pop());
+		gpos::pointer<gpopt::CScalarNullTest *> pscalarnulltest =
+			gpos::dyn_cast<CScalarNullTest>(pexprIsNull->Pop());
 		GPOS_ASSERT(pscalarnulltest->Matches(pexprResult->Pop()));
 		pexprResult->Release();
 #endif	// GPOS_DEBUG

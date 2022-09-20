@@ -4,6 +4,8 @@
 #ifndef GPOPT_CDistributionSpecStrictHashed_H
 #define GPOPT_CDistributionSpecStrictHashed_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CDistributionSpecHashed.h"
 
 namespace gpopt
@@ -14,7 +16,7 @@ namespace gpopt
 class CDistributionSpecStrictHashed : public CDistributionSpecHashed
 {
 public:
-	CDistributionSpecStrictHashed(CExpressionArray *pdrgpexpr,
+	CDistributionSpecStrictHashed(gpos::owner<CExpressionArray *> pdrgpexpr,
 								  BOOL fNullsColocated);
 
 	EDistributionType Edt() const override;

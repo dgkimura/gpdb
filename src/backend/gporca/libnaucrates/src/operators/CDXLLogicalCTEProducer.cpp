@@ -32,8 +32,10 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalCTEProducer::CDXLLogicalCTEProducer(
-	CMemoryPool *mp, ULONG id, ULongPtrArray *output_colids_array)
-	: CDXLLogical(mp), m_id(id), m_output_colids_array(output_colids_array)
+	CMemoryPool *mp, ULONG id, gpos::owner<ULongPtrArray *> output_colids_array)
+	: CDXLLogical(mp),
+	  m_id(id),
+	  m_output_colids_array(std::move(output_colids_array))
 {
 	GPOS_ASSERT(nullptr != m_output_colids_array);
 }
@@ -125,7 +127,7 @@ CDXLLogicalCTEProducer::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[0];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeLogical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

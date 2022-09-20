@@ -39,7 +39,7 @@ public:
 	CConstraintNegation(const CConstraintNegation &) = delete;
 
 	// ctor
-	CConstraintNegation(CMemoryPool *mp, CConstraint *pcnstr);
+	CConstraintNegation(CMemoryPool *mp, gpos::owner<CConstraint *> pcnstr);
 
 	// dtor
 	~CConstraintNegation() override;
@@ -73,7 +73,7 @@ public:
 	}
 
 	// scalar expression
-	CExpression *PexprScalar(CMemoryPool *mp) override;
+	gpos::pointer<CExpression *> PexprScalar(CMemoryPool *mp) override;
 
 	// check if there is a constraint on the given column
 	BOOL
@@ -92,8 +92,8 @@ public:
 									  const CColRef *colref) override;
 
 	// return constraint on a given column set
-	gpos::owner<CConstraint *> Pcnstr(CMemoryPool *mp,
-									  CColRefSet *pcrs) override;
+	gpos::owner<CConstraint *> Pcnstr(
+		CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs) override;
 
 	// return a clone of the constraint for a different column
 	gpos::owner<CConstraint *> PcnstrRemapForColumn(

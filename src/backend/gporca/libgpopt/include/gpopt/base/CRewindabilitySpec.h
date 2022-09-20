@@ -136,8 +136,9 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::pointer<CReqdPropPlan *> prpp,
+						 gpos::pointer<CExpressionArray *> pdrgpexpr,
+						 gpos::pointer<CExpression *> pexpr) override;
 
 	// hash function
 	ULONG HashValue() const override;

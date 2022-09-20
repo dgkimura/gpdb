@@ -127,7 +127,8 @@ CPartitionPropagationSpec::FindPartPropSpecInfo(ULONG scan_id) const
 gpos::pointer<const CBitSet *>
 CPartitionPropagationSpec::SelectorIds(ULONG scan_id) const
 {
-	SPartPropSpecInfo *found_info = FindPartPropSpecInfo(scan_id);
+	gpos::pointer<SPartPropSpecInfo *> found_info =
+		FindPartPropSpecInfo(scan_id);
 
 	if (found_info == nullptr)
 	{
@@ -139,8 +140,9 @@ CPartitionPropagationSpec::SelectorIds(ULONG scan_id) const
 
 void
 CPartitionPropagationSpec::Insert(ULONG scan_id, EPartPropSpecInfoType type,
-								  IMDId *rool_rel_mdid, CBitSet *selector_ids,
-								  CExpression *expr)
+								  IMDId *rool_rel_mdid,
+								  gpos::pointer<CBitSet *> selector_ids,
+								  gpos::pointer<CExpression *> expr)
 {
 	GPOS_RTL_ASSERT(!Contains(scan_id));
 
@@ -161,26 +163,28 @@ CPartitionPropagationSpec::Insert(ULONG scan_id, EPartPropSpecInfoType type,
 	}
 
 	m_scan_ids->ExchangeSet(scan_id);
-	m_part_prop_spec_infos->Insert(GPOS_NEW(mp) ULONG(scan_id), info);
+	m_part_prop_spec_infos->Insert(GPOS_NEW(mp) ULONG(scan_id),
+								   std::move(info));
 }
 
 void
-CPartitionPropagationSpec::Insert(SPartPropSpecInfo *other)
+CPartitionPropagationSpec::Insert(gpos::pointer<SPartPropSpecInfo *> other)
 {
 	Insert(other->m_scan_id, other->m_type, other->m_root_rel_mdid.get(),
 		   other->m_selector_ids, other->m_filter_expr);
 }
 
 void
-CPartitionPropagationSpec::InsertAll(CPartitionPropagationSpec *pps)
+CPartitionPropagationSpec::InsertAll(
+	gpos::pointer<CPartitionPropagationSpec *> pps)
 {
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		SPartPropSpecInfo *other_info =
+		gpos::pointer<SPartPropSpecInfo *> other_info =
 			const_cast<SPartPropSpecInfo *>(hmulpi.Value());
 
-		SPartPropSpecInfo *found_info =
+		gpos::pointer<SPartPropSpecInfo *> found_info =
 			FindPartPropSpecInfo(other_info->m_scan_id);
 
 		if (found_info == nullptr)
@@ -203,12 +207,13 @@ CPartitionPropagationSpec::InsertAll(CPartitionPropagationSpec *pps)
 
 void
 CPartitionPropagationSpec::InsertAllowedConsumers(
-	CPartitionPropagationSpec *pps, CBitSet *allowed_scan_ids)
+	gpos::pointer<CPartitionPropagationSpec *> pps,
+	gpos::pointer<CBitSet *> allowed_scan_ids)
 {
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		SPartPropSpecInfo *other_info =
+		gpos::pointer<SPartPropSpecInfo *> other_info =
 			const_cast<SPartPropSpecInfo *>(hmulpi.Value());
 
 		// only process allowed_scan_ids ...
@@ -224,7 +229,7 @@ CPartitionPropagationSpec::InsertAllowedConsumers(
 			continue;
 		}
 
-		SPartPropSpecInfo *found_info =
+		gpos::pointer<SPartPropSpecInfo *> found_info =
 			FindPartPropSpecInfo(other_info->m_scan_id);
 
 		if (found_info == nullptr)
@@ -246,13 +251,13 @@ CPartitionPropagationSpec::InsertAllowedConsumers(
 }
 
 void
-CPartitionPropagationSpec::InsertAllExcept(CPartitionPropagationSpec *pps,
-										   ULONG scan_id)
+CPartitionPropagationSpec::InsertAllExcept(
+	gpos::pointer<CPartitionPropagationSpec *> pps, ULONG scan_id)
 {
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		SPartPropSpecInfo *other_info =
+		gpos::pointer<SPartPropSpecInfo *> other_info =
 			const_cast<SPartPropSpecInfo *>(hmulpi.Value());
 
 		if (other_info->m_scan_id == scan_id)
@@ -260,7 +265,7 @@ CPartitionPropagationSpec::InsertAllExcept(CPartitionPropagationSpec *pps,
 			continue;
 		}
 
-		SPartPropSpecInfo *found_info =
+		gpos::pointer<SPartPropSpecInfo *> found_info =
 			FindPartPropSpecInfo(other_info->m_scan_id);
 
 		if (found_info == nullptr)
@@ -282,15 +287,16 @@ CPartitionPropagationSpec::InsertAllExcept(CPartitionPropagationSpec *pps,
 }
 
 void
-CPartitionPropagationSpec::InsertAllResolve(CPartitionPropagationSpec *pps)
+CPartitionPropagationSpec::InsertAllResolve(
+	gpos::pointer<CPartitionPropagationSpec *> pps)
 {
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		SPartPropSpecInfo *other_info =
+		gpos::pointer<SPartPropSpecInfo *> other_info =
 			const_cast<SPartPropSpecInfo *>(hmulpi.Value());
 
-		SPartPropSpecInfo *found_info =
+		gpos::pointer<SPartPropSpecInfo *> found_info =
 			FindPartPropSpecInfo(other_info->m_scan_id);
 
 		if (found_info == nullptr)
@@ -337,7 +343,7 @@ CPartitionPropagationSpec::FSatisfies(
 	while (hmulpi.Advance())
 	{
 		gpos::pointer<const SPartPropSpecInfo *> reqd_info = hmulpi.Value();
-		SPartPropSpecInfo *found_info =
+		gpos::pointer<SPartPropSpecInfo *> found_info =
 			FindPartPropSpecInfo(reqd_info->m_scan_id);
 
 		if (found_info == nullptr || !found_info->FSatisfies(reqd_info))
@@ -357,11 +363,10 @@ CPartitionPropagationSpec::FSatisfies(
 //
 //---------------------------------------------------------------------------
 void
-CPartitionPropagationSpec::AppendEnforcers(CMemoryPool *mp,
-										   CExpressionHandle &exprhdl,
-										   gpos::pointer<CReqdPropPlan *>,
-										   CExpressionArray *pdrgpexpr,
-										   CExpression *expr)
+CPartitionPropagationSpec::AppendEnforcers(
+	CMemoryPool *mp, CExpressionHandle &exprhdl, gpos::pointer<CReqdPropPlan *>,
+	gpos::pointer<CExpressionArray *> pdrgpexpr,
+	gpos::pointer<CExpression *> expr)
 {
 	UlongToSPartPropSpecInfoMapIter hmulpi(m_part_prop_spec_infos);
 	while (hmulpi.Advance())

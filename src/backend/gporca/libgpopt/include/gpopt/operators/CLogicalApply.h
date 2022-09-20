@@ -42,7 +42,7 @@ protected:
 	explicit CLogicalApply(CMemoryPool *mp);
 
 	// ctor
-	CLogicalApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
+	CLogicalApply(CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrInner,
 				  EOperatorId eopidOriginSubq);
 
 	// dtor
@@ -52,7 +52,7 @@ public:
 	CLogicalApply(const CLogicalApply &) = delete;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -69,7 +69,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
@@ -80,7 +80,7 @@ public:
 	}
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::owner<CPartInfo *>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -88,7 +88,7 @@ public:
 	}
 
 	// derive keys
-	CKeyCollection *
+	gpos::owner<CKeyCollection *>
 	DeriveKeyCollection(CMemoryPool *mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -96,7 +96,7 @@ public:
 	}
 
 	// derive function properties
-	CFunctionProp *
+	gpos::owner<CFunctionProp *>
 	DeriveFunctionProperties(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -108,7 +108,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive statistics
-	IStatistics *
+	gpos::owner<IStatistics *>
 	PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				 gpos::pointer<IStatisticsArray *>	// stats_ctxt
 	) const override
@@ -131,9 +131,10 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CColRefSet *pcrsInput,
-						 ULONG child_index) const override;
+	gpos::owner<CColRefSet *> PcrsStat(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl,
+									   gpos::pointer<CColRefSet *> pcrsInput,
+									   ULONG child_index) const override;
 
 	// return true if operator is a correlated apply
 	virtual BOOL

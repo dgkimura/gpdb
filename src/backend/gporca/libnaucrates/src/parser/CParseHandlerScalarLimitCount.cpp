@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarLimitCount.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarLimitCount.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -56,10 +58,11 @@ CParseHandlerScalarLimitCount::StartElement(
 				 element_local_name))
 	{
 		// parse and create scalar limit count
-		CDXLScalarLimitCount *dxl_op =
-			(CDXLScalarLimitCount *) CDXLOperatorFactory::MakeDXLLimitCount(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
-		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+		gpos::owner<CDXLScalarLimitCount *> dxl_op =
+			gpos::cast<CDXLScalarLimitCount>(
+				CDXLOperatorFactory::MakeDXLLimitCount(
+					m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 	}
 	else
 	{

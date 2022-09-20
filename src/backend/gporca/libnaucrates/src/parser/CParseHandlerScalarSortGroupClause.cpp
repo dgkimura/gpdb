@@ -69,7 +69,7 @@ CParseHandlerScalarSortGroupClause::StartElement(
 	gpos::owner<CDXLScalarSortGroupClause *> dxl_op =
 		GPOS_NEW(m_mp) CDXLScalarSortGroupClause(m_mp, index, eqop, sortop,
 												 nullsfirst, hashable);
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 }
 
 // invoked by Xerces to process a closing tag

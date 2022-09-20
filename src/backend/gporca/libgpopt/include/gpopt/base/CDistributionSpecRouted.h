@@ -68,20 +68,20 @@ public:
 
 	// return a copy of the distribution spec with remapped columns
 	gpos::owner<CDistributionSpec *> PdsCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::pointer<CReqdPropPlan *> prpp,
-						 CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::pointer<CExpressionArray *> pdrgpexpr,
+						 gpos::pointer<CExpression *> pexpr) override;
 
 	// hash function for routed distribution spec
 	ULONG HashValue() const override;
 
 	// extract columns used by the distribution spec
-	CColRefSet *PcrsUsed(CMemoryPool *mp) const override;
+	gpos::owner<CColRefSet *> PcrsUsed(CMemoryPool *mp) const override;
 
 	// return distribution partitioning type
 	EDistributionPartitioningType

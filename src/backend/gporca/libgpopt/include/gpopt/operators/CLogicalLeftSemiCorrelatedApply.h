@@ -39,7 +39,8 @@ public:
 	explicit CLogicalLeftSemiCorrelatedApply(CMemoryPool *mp);
 
 	// ctor
-	CLogicalLeftSemiCorrelatedApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
+	CLogicalLeftSemiCorrelatedApply(CMemoryPool *mp,
+									gpos::owner<CColRefArray *> pdrgpcrInner,
 									EOperatorId eopidOriginSubq);
 
 	// dtor
@@ -60,7 +61,7 @@ public:
 	}
 
 	// applicable transformations
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// return true if operator is a correlated apply
 	BOOL
@@ -71,7 +72,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function

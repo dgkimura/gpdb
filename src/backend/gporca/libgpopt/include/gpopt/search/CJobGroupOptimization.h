@@ -99,7 +99,8 @@ public:
 	~CJobGroupOptimization() override;
 
 	// initialize job
-	void Init(CGroup *pgroup, CGroupExpression *pgexprOrigin,
+	void Init(gpos::pointer<CGroup *> pgroup,
+			  gpos::pointer<CGroupExpression *> pgexprOrigin,
 			  COptimizationContext *poc);
 
 	// current optimization level accessor
@@ -127,8 +128,9 @@ public:
 	BOOL FScheduleGroupExpressions(CSchedulerContext *psc) override;
 
 	// schedule a new group optimization job
-	static void ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
-							CGroupExpression *pgexprOrigin,
+	static void ScheduleJob(CSchedulerContext *psc,
+							gpos::pointer<CGroup *> pgroup,
+							gpos::pointer<CGroupExpression *> pgexprOrigin,
 							COptimizationContext *poc, CJob *pjParent);
 
 	// job's function

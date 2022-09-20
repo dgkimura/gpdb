@@ -44,8 +44,9 @@ public:
 	CScalarCoerceViaIO(const CScalarCoerceViaIO &) = delete;
 
 	// ctor
-	CScalarCoerceViaIO(CMemoryPool *mp, IMDId *mdid_type, INT type_modifier,
-					   ECoercionForm dxl_coerce_format, INT location);
+	CScalarCoerceViaIO(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+					   INT type_modifier, ECoercionForm dxl_coerce_format,
+					   INT location);
 
 	// dtor
 	~CScalarCoerceViaIO() override = default;
@@ -64,7 +65,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::pointer<COperator *>) const override;
 
 	// sensitivity to order of inputs
 	BOOL

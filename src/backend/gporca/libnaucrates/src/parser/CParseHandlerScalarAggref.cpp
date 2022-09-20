@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarAggref.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -56,12 +58,12 @@ CParseHandlerScalarAggref::StartElement(const XMLCh *const element_uri,
 								 element_local_name))
 	{
 		// parse and create scalar AggRef
-		CDXLScalarAggref *dxl_op =
-			(CDXLScalarAggref *) CDXLOperatorFactory::MakeDXLAggFunc(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+		gpos::owner<CDXLScalarAggref *> dxl_op =
+			gpos::cast<CDXLScalarAggref>(CDXLOperatorFactory::MakeDXLAggFunc(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 		// construct node from the created scalar AggRef
-		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenScalarValuesList),

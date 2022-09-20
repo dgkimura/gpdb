@@ -31,8 +31,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarConst::CScalarConst(CMemoryPool *mp, IDatum *datum)
-	: CScalar(mp), m_pdatum(datum)
+CScalarConst::CScalarConst(CMemoryPool *mp, gpos::owner<IDatum *> datum)
+	: CScalar(mp), m_pdatum(std::move(datum))
 {
 	GPOS_ASSERT(nullptr != m_pdatum);
 }
@@ -76,11 +76,12 @@ CScalarConst::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarConst::Matches(COperator *pop) const
+CScalarConst::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarConst *psconst = CScalarConst::PopConvert(pop);
+		gpos::pointer<CScalarConst *> psconst =
+			gpos::dyn_cast<CScalarConst>(pop);
 
 		// match if constant values are the same
 		return GetDatum()->Matches(psconst->GetDatum());
@@ -158,7 +159,7 @@ CScalarConst::FCastedConst(gpos::pointer<CExpression *> pexpr)
 //
 //---------------------------------------------------------------------------
 CScalarConst *
-CScalarConst::PopExtractFromConstOrCastConst(CExpression *pexpr)
+CScalarConst::PopExtractFromConstOrCastConst(gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -173,12 +174,12 @@ CScalarConst::PopExtractFromConstOrCastConst(CExpression *pexpr)
 
 	if (fScConst)
 	{
-		return CScalarConst::PopConvert(pexpr->Pop());
+		return gpos::dyn_cast<CScalarConst>(pexpr->Pop());
 	}
 
 	GPOS_ASSERT(fCastedScConst);
 
-	return CScalarConst::PopConvert((*pexpr)[0]->Pop());
+	return gpos::dyn_cast<CScalarConst>((*pexpr)[0]->Pop());
 }
 
 //---------------------------------------------------------------------------
@@ -200,7 +201,8 @@ CScalarConst::Eber(gpos::pointer<ULongPtrArray *>  //pdrgpulChildren
 
 	if (IMDType::EtiBool == m_pdatum->GetDatumType())
 	{
-		IDatumBool *pdatumBool = dynamic_cast<IDatumBool *>(m_pdatum);
+		gpos::pointer<IDatumBool *> pdatumBool =
+			gpos::dyn_cast<IDatumBool>(m_pdatum);
 		if (pdatumBool->GetValue())
 		{
 			return EberTrue;

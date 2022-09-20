@@ -67,8 +67,9 @@ public:
 
 	// ctor for partitioned table scan
 	CDXLPhysicalAppend(CMemoryPool *mp, BOOL fIsTarget, BOOL fIsZapped,
-					   ULONG scan_id, CDXLTableDescr *dxl_table_desc,
-					   ULongPtrArray *selector_ids);
+					   ULONG scan_id,
+					   gpos::owner<CDXLTableDescr *> dxl_table_desc,
+					   gpos::owner<ULongPtrArray *> selector_ids);
 
 	// dtor
 	~CDXLPhysicalAppend() override;

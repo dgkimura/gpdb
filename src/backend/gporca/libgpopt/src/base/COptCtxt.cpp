@@ -36,8 +36,9 @@ ULONG COptCtxt::m_ulFirstValidPartId = 1;
 //
 //---------------------------------------------------------------------------
 COptCtxt::COptCtxt(CMemoryPool *mp, CColumnFactory *col_factory,
-				   CMDAccessor *md_accessor, IConstExprEvaluator *pceeval,
-				   COptimizerConfig *optimizer_config)
+				   CMDAccessor *md_accessor,
+				   gpos::owner<IConstExprEvaluator *> pceeval,
+				   gpos::owner<COptimizerConfig *> optimizer_config)
 	: CTaskLocalStorageObject(CTaskLocalStorage::EtlsidxOptCtxt),
 	  m_mp(mp),
 	  m_pcf(col_factory),
@@ -47,7 +48,7 @@ COptCtxt::COptCtxt(CMemoryPool *mp, CColumnFactory *col_factory,
 	  m_auPartId(m_ulFirstValidPartId),
 	  m_pcteinfo(nullptr),
 	  m_pdrgpcrSystemCols(nullptr),
-	  m_optimizer_config(optimizer_config),
+	  m_optimizer_config(std::move(optimizer_config)),
 	  m_fDMLQuery(false),
 	  m_has_master_only_tables(false),
 	  m_has_replicated_tables(false),
@@ -103,8 +104,8 @@ COptCtxt::~COptCtxt()
 //---------------------------------------------------------------------------
 COptCtxt *
 COptCtxt::PoctxtCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
-					   IConstExprEvaluator *pceeval,
-					   COptimizerConfig *optimizer_config)
+					   gpos::owner<IConstExprEvaluator *> pceeval,
+					   gpos::owner<COptimizerConfig *> optimizer_config)
 {
 	GPOS_ASSERT(nullptr != optimizer_config);
 
@@ -121,7 +122,8 @@ COptCtxt::PoctxtCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
 		a_pcf.Value()->Initialize();
 
 		poctxt = GPOS_NEW(mp)
-			COptCtxt(mp, col_factory, md_accessor, pceeval, optimizer_config);
+			COptCtxt(mp, col_factory, md_accessor, std::move(pceeval),
+					 std::move(optimizer_config));
 
 		// detach safety
 		(void) a_pcf.Reset();

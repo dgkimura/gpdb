@@ -12,6 +12,7 @@
 #include "gpdbcost/CCostModelParamsGPDB.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringConst.h"
 
 using namespace gpopt;
@@ -575,9 +576,10 @@ CCostModelParamsGPDB::OsPrint(IOstream &os) const
 }
 
 BOOL
-CCostModelParamsGPDB::Equals(ICostModelParams *pcm) const
+CCostModelParamsGPDB::Equals(gpos::pointer<ICostModelParams *> pcm) const
 {
-	CCostModelParamsGPDB *pcmgOther = dynamic_cast<CCostModelParamsGPDB *>(pcm);
+	gpos::pointer<CCostModelParamsGPDB *> pcmgOther =
+		dynamic_cast<CCostModelParamsGPDB *>(pcm);
 	if (nullptr == pcmgOther)
 	{
 		return false;

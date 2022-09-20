@@ -52,10 +52,11 @@ public:
 	CDXLLogicalUpdate(const CDXLLogicalUpdate &) = delete;
 
 	// ctor
-	CDXLLogicalUpdate(CMemoryPool *mp, CDXLTableDescr *table_descr,
+	CDXLLogicalUpdate(CMemoryPool *mp,
+					  gpos::owner<CDXLTableDescr *> table_descr,
 					  ULONG ctid_colid, ULONG segid_colid,
-					  ULongPtrArray *delete_colid_array,
-					  ULongPtrArray *insert_colid_array);
+					  gpos::owner<ULongPtrArray *> delete_colid_array,
+					  gpos::owner<ULongPtrArray *> insert_colid_array);
 
 	// dtor
 	~CDXLLogicalUpdate() override;

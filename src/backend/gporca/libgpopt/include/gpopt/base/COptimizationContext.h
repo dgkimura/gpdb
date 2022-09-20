@@ -140,17 +140,18 @@ private:
 public:
 	// ctor
 	COptimizationContext(
-		CMemoryPool *mp, CGroup *pgroup, CReqdPropPlan *prpp,
-		CReqdPropRelational *
+		CMemoryPool *mp, gpos::pointer<CGroup *> pgroup,
+		gpos::owner<CReqdPropPlan *> prpp,
+		gpos::owner<CReqdPropRelational *>
 			prprel,	 // required relational props -- used during stats derivation
-		IStatisticsArray
-			*stats_ctxt,  // stats of previously optimized expressions
+		gpos::owner<IStatisticsArray *>
+			stats_ctxt,	 // stats of previously optimized expressions
 		ULONG ulSearchStageIndex)
 		: m_mp(mp),
 		  m_pgroup(pgroup),
-		  m_prpp(prpp),
-		  m_prprel(prprel),
-		  m_pdrgpstatCtxt(stats_ctxt),
+		  m_prpp(std::move(prpp)),
+		  m_prprel(std::move(prprel)),
+		  m_pdrgpstatCtxt(std::move(stats_ctxt)),
 		  m_ulSearchStageIndex(ulSearchStageIndex)
 	{
 		GPOS_ASSERT(nullptr != pgroup);
@@ -257,7 +258,7 @@ public:
 	}
 
 	// set best cost context
-	void SetBest(CCostContext *pcc);
+	void SetBest(gpos::pointer<CCostContext *> pcc);
 
 	// comparison operator for hashtables
 	BOOL
@@ -335,9 +336,9 @@ public:
 		gpos::pointer<COptimizationContextArray *> pdrgpocSnd);
 
 	// compute required properties to CTE producer based on plan properties of CTE consumer
-	static CReqdPropPlan *PrppCTEProducer(CMemoryPool *mp,
-										  COptimizationContext *poc,
-										  ULONG ulSearchStages);
+	static gpos::owner<CReqdPropPlan *> PrppCTEProducer(
+		CMemoryPool *mp, gpos::pointer<COptimizationContext *> poc,
+		ULONG ulSearchStages);
 
 	// link for optimization context hash table in CGroup
 	SLink m_link;

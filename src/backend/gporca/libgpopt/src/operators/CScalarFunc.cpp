@@ -166,13 +166,13 @@ CScalarFunc::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarFunc::Matches(COperator *pop) const
+CScalarFunc::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	CScalarFunc *popScFunc = CScalarFunc::PopConvert(pop);
+	gpos::pointer<CScalarFunc *> popScFunc = gpos::dyn_cast<CScalarFunc>(pop);
 
 	// match if func ids are identical
 	return popScFunc->FuncMdId()->Equals(m_func_mdid.get()) &&
@@ -241,7 +241,7 @@ CScalarFunc::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarFunc::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarFunc::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

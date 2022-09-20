@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarMinMax.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -87,14 +88,15 @@ CScalarMinMax::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarMinMax::Matches(COperator *pop) const
+CScalarMinMax::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CScalarMinMax *popScMinMax = CScalarMinMax::PopConvert(pop);
+	gpos::pointer<CScalarMinMax *> popScMinMax =
+		gpos::dyn_cast<CScalarMinMax>(pop);
 
 	// match if return types are identical
 	return popScMinMax->Esmmt() == m_esmmt &&

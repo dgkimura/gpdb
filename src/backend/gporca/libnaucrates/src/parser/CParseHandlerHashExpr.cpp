@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerHashExpr.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -62,8 +64,9 @@ CParseHandlerHashExpr::StartElement(const XMLCh *const,	 // element_uri,
 	}
 
 	// parse and create hash expr operator
-	m_dxl_op = (CDXLScalarHashExpr *) CDXLOperatorFactory::MakeDXLHashExpr(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	m_dxl_op =
+		gpos::cast<CDXLScalarHashExpr>(CDXLOperatorFactory::MakeDXLHashExpr(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// create and activate the parse handler for the child scalar expression node
 

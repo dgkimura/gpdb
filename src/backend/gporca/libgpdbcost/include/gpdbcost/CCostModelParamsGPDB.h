@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringConst.h"
 
 #include "gpopt/cost/ICostModelParams.h"
@@ -305,7 +306,7 @@ public:
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;
 
-	BOOL Equals(ICostModelParams *pcm) const override;
+	BOOL Equals(gpos::pointer<ICostModelParams *> pcm) const override;
 
 	const CHAR *SzNameLookup(ULONG id) const override;
 

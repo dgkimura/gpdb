@@ -397,7 +397,7 @@ COptTasks::CreateOptimizerConfig(CMemoryPool *mp, ICostModel *cost_model)
 //
 //---------------------------------------------------------------------------
 void
-COptTasks::SetCostModelParams(ICostModel *cost_model)
+COptTasks::SetCostModelParams(gpos::pointer<ICostModel *> cost_model)
 {
 	GPOS_ASSERT(nullptr != cost_model);
 
@@ -436,7 +436,7 @@ COptTasks::SetCostModelParams(ICostModel *cost_model)
 //			Generate an instance of optimizer cost model
 //
 //---------------------------------------------------------------------------
-ICostModel *
+gpos::owner<ICostModel *>
 COptTasks::GetCostModel(CMemoryPool *mp, ULONG num_segments)
 {
 	gpos::owner<ICostModel *> cost_model =
@@ -534,7 +534,8 @@ COptTasks::OptimizeTask(void *ptr)
 			query_to_dxl_translator = CTranslatorQueryToDXL::QueryToDXLInstance(
 				mp, &mda, (Query *) opt_ctxt->m_query);
 
-			ICostModel *cost_model = GetCostModel(mp, num_segments_for_costing);
+			gpos::owner<ICostModel *> cost_model =
+				GetCostModel(mp, num_segments_for_costing);
 			gpos::owner<COptimizerConfig *> optimizer_config =
 				CreateOptimizerConfig(mp, cost_model);
 			CConstExprEvaluatorProxy expr_eval_proxy(mp, &mda);
@@ -543,9 +544,9 @@ COptTasks::OptimizeTask(void *ptr)
 
 			gpos::owner<CDXLNode *> query_dxl =
 				query_to_dxl_translator->TranslateQueryToDXL();
-			CDXLNodeArray *query_output_dxlnode_array =
+			gpos::pointer<CDXLNodeArray *> query_output_dxlnode_array =
 				query_to_dxl_translator->GetQueryOutputCols();
-			CDXLNodeArray *cte_dxlnode_array =
+			gpos::pointer<CDXLNodeArray *> cte_dxlnode_array =
 				query_to_dxl_translator->GetCTEs();
 			GPOS_ASSERT(nullptr != query_output_dxlnode_array);
 
@@ -592,7 +593,8 @@ COptTasks::OptimizeTask(void *ptr)
 						query_to_dxl_translator->GetDistributionHashOpsKind()));
 			}
 
-			CStatisticsConfig *stats_conf = optimizer_config->GetStatsConf();
+			gpos::pointer<CStatisticsConfig *> stats_conf =
+				optimizer_config->GetStatsConf();
 			col_stats = GPOS_NEW(mp) IMdIdArray(mp);
 			stats_conf->CollectMissingStatsColumns(col_stats);
 
@@ -611,12 +613,12 @@ COptTasks::OptimizeTask(void *ptr)
 	GPOS_CATCH_EX(ex)
 	{
 		ResetTraceflags(enabled_trace_flags, disabled_trace_flags);
-		CRefCount::SafeRelease(rel_stats);
+		CRefCount::SafeRelease(std::move(rel_stats));
 		CRefCount::SafeRelease(col_stats);
 		CRefCount::SafeRelease(enabled_trace_flags);
 		CRefCount::SafeRelease(disabled_trace_flags);
 		CRefCount::SafeRelease(trace_flags);
-		CRefCount::SafeRelease(plan_dxl);
+		CRefCount::SafeRelease(std::move(plan_dxl));
 		CMDCache::Shutdown();
 
 		IErrorContext *errctxt = CTask::Self()->GetErrCtxt();
@@ -654,8 +656,8 @@ COptTasks::OptimizeTask(void *ptr)
 //---------------------------------------------------------------------------
 void
 COptTasks::PrintMissingStatsWarning(CMemoryPool *mp, CMDAccessor *md_accessor,
-									IMdIdArray *col_stats,
-									MdidHashSet *rel_stats)
+									gpos::pointer<IMdIdArray *> col_stats,
+									gpos::pointer<MdidHashSet *> rel_stats)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 	GPOS_ASSERT(nullptr != col_stats);
@@ -775,7 +777,7 @@ COptTasks::GPOPTOptimizedPlan(Query *query, SOptContext *gpopt_context)
 bool
 COptTasks::SetXform(char *xform_str, bool should_disable)
 {
-	CXform *xform = CXformFactory::Pxff()->Pxf(xform_str);
+	gpos::pointer<CXform *> xform = CXformFactory::Pxff()->Pxf(xform_str);
 	if (nullptr != xform)
 	{
 		optimizer_xforms[xform->Exfid()] = should_disable;

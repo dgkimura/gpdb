@@ -121,11 +121,11 @@ public:
 	virtual ETypeInfo GetDatumType() const = 0;
 
 	// transformation function for datums
-	virtual IDatum *GetDatumForDXLConstVal(
+	virtual gpos::owner<IDatum *> GetDatumForDXLConstVal(
 		gpos::pointer<const CDXLScalarConstValue *> dxl_op) const = 0;
 
 	// construct a datum from a DXL datum
-	virtual IDatum *GetDatumForDXLDatum(
+	virtual gpos::owner<IDatum *> GetDatumForDXLDatum(
 		CMemoryPool *mp, gpos::pointer<const CDXLDatum *> dxl_datum) const = 0;
 
 	// is type fixed length
@@ -150,17 +150,18 @@ public:
 	virtual BOOL IsPassedByValue() const = 0;
 
 	// return the null constant for this type
-	virtual IDatum *DatumNull() const = 0;
+	virtual gpos::pointer<IDatum *> DatumNull() const = 0;
 
 	// generate the DXL scalar constant from IDatum
-	virtual CDXLScalarConstValue *GetDXLOpScConst(CMemoryPool *mp,
-												  IDatum *datum) const = 0;
+	virtual gpos::owner<CDXLScalarConstValue *> GetDXLOpScConst(
+		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const = 0;
 
 	// generate the DXL datum from IDatum
-	virtual CDXLDatum *GetDatumVal(CMemoryPool *mp, IDatum *datum) const = 0;
+	virtual gpos::owner<CDXLDatum *> GetDatumVal(
+		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const = 0;
 
 	// generate the DXL datum representing null value
-	virtual CDXLDatum *GetDXLDatumNull(CMemoryPool *mp) const = 0;
+	virtual gpos::owner<CDXLDatum *> GetDXLDatumNull(CMemoryPool *mp) const = 0;
 
 	// is type an ambiguous one? e.g., AnyElement in GPDB
 	virtual BOOL

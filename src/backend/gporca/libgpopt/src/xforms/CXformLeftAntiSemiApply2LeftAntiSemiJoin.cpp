@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformLeftAntiSemiApply2LeftAntiSemiJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 
 using namespace gpopt;
@@ -50,9 +51,10 @@ CXformLeftAntiSemiApply2LeftAntiSemiJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftAntiSemiApply2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
-													CXformResult *pxfres,
-													CExpression *pexpr) const
+CXformLeftAntiSemiApply2LeftAntiSemiJoin::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

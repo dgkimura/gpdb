@@ -53,9 +53,10 @@ public:
 	CDXLPhysicalDynamicTableScan(CDXLPhysicalDynamicTableScan &) = delete;
 
 	// ctor
-	CDXLPhysicalDynamicTableScan(CMemoryPool *mp, CDXLTableDescr *table_descr,
+	CDXLPhysicalDynamicTableScan(CMemoryPool *mp,
+								 gpos::owner<CDXLTableDescr *> table_descr,
 								 gpos::Ref<IMdIdArray> part_mdids,
-								 ULongPtrArray *selector_ids);
+								 gpos::owner<ULongPtrArray *> selector_ids);
 
 	// dtor
 	~CDXLPhysicalDynamicTableScan() override;

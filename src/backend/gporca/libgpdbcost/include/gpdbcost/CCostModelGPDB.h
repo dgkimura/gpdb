@@ -52,23 +52,27 @@ private:
 
 	// return cost of processing the given number of rows
 	static CCost CostTupleProcessing(DOUBLE rows, DOUBLE width,
-									 ICostModelParams *pcp);
+									 gpos::pointer<ICostModelParams *> pcp);
 
 	// helper function to return cost of producing output tuples from Scan operator
 	static CCost CostScanOutput(CMemoryPool *mp, DOUBLE rows, DOUBLE width,
-								DOUBLE num_rebinds, ICostModelParams *pcp);
+								DOUBLE num_rebinds,
+								gpos::pointer<ICostModelParams *> pcp);
 
 	// helper function to return cost of a plan rooted by unary operator
 	static CCost CostUnary(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   const SCostingInfo *pci, ICostModelParams *pcp);
+						   const SCostingInfo *pci,
+						   gpos::pointer<ICostModelParams *> pcp);
 
 	// cost of spooling
 	static CCost CostSpooling(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const SCostingInfo *pci, ICostModelParams *pcp);
+							  const SCostingInfo *pci,
+							  gpos::pointer<ICostModelParams *> pcp);
 
 	// add up children cost
 	static CCost CostChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const SCostingInfo *pci, ICostModelParams *pcp);
+							  const SCostingInfo *pci,
+							  gpos::pointer<ICostModelParams *> pcp);
 
 	// returns cost of highest costed child
 	static CCost CostMaxChild(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -201,7 +205,8 @@ private:
 	// cost of compute scalar
 	static CCost CostComputeScalar(
 		CMemoryPool *mp, CExpressionHandle &exprhdl, const SCostingInfo *pci,
-		ICostModelParams *pcp, gpos::pointer<const CCostModelGPDB *> pcmgpdb);
+		gpos::pointer<ICostModelParams *> pcp,
+		gpos::pointer<const CCostModelGPDB *> pcmgpdb);
 
 public:
 	// ctor

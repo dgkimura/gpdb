@@ -309,10 +309,11 @@ CMappingVarColId::LoadDerivedTblColumns(
 		if (!target_entry->resjunk)
 		{
 			GPOS_ASSERT(0 < target_entry->resno);
-			CDXLNode *dxlnode = (*derived_columns_dxl)[drvd_tbl_col_counter];
+			gpos::pointer<CDXLNode *> dxlnode =
+				(*derived_columns_dxl)[drvd_tbl_col_counter];
 			GPOS_ASSERT(nullptr != dxlnode);
-			CDXLScalarIdent *dxl_sc_ident =
-				CDXLScalarIdent::Cast(dxlnode->GetOperator());
+			gpos::pointer<CDXLScalarIdent *> dxl_sc_ident =
+				gpos::dyn_cast<CDXLScalarIdent>(dxlnode->GetOperator());
 			gpos::pointer<const CDXLColRef *> dxl_colref =
 				dxl_sc_ident->GetDXLColRef();
 			this->Insert(query_level, RTE_index, INT(target_entry->resno),
@@ -377,9 +378,9 @@ CMappingVarColId::LoadProjectElements(
 	// add mapping information for columns
 	for (ULONG i = 0; i < size; i++)
 	{
-		CDXLNode *dxlnode = (*project_list_dxlnode)[i];
-		CDXLScalarProjElem *dxl_proj_elem =
-			CDXLScalarProjElem::Cast(dxlnode->GetOperator());
+		gpos::pointer<CDXLNode *> dxlnode = (*project_list_dxlnode)[i];
+		gpos::pointer<CDXLScalarProjElem *> dxl_proj_elem =
+			gpos::dyn_cast<CDXLScalarProjElem>(dxlnode->GetOperator());
 		this->Insert(query_level, RTE_index, INT(i + 1), dxl_proj_elem->Id(),
 					 dxl_proj_elem->GetMdNameAlias()->GetMDName()->Copy(m_mp));
 	}
@@ -490,8 +491,9 @@ CMappingVarColId::CopyMapColId(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 CMappingVarColId *
-CMappingVarColId::CopyRemapColId(CMemoryPool *mp, ULongPtrArray *old_colids,
-								 ULongPtrArray *new_colids) const
+CMappingVarColId::CopyRemapColId(
+	CMemoryPool *mp, gpos::pointer<ULongPtrArray *> old_colids,
+	gpos::pointer<ULongPtrArray *> new_colids) const
 {
 	GPOS_ASSERT(nullptr != old_colids);
 	GPOS_ASSERT(nullptr != new_colids);

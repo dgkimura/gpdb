@@ -278,14 +278,15 @@ public:
 	}
 
 	// generate the DXL datum from IDatum
-	CDXLDatum *GetDatumVal(CMemoryPool *mp, IDatum *datum) const override;
+	gpos::owner<CDXLDatum *> GetDatumVal(
+		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const override;
 
 	// generate the DXL datum representing null value
-	CDXLDatum *GetDXLDatumNull(CMemoryPool *mp) const override;
+	gpos::owner<CDXLDatum *> GetDXLDatumNull(CMemoryPool *mp) const override;
 
 	// generate the DXL scalar constant from IDatum
 	gpos::owner<CDXLScalarConstValue *> GetDXLOpScConst(
-		CMemoryPool *mp, IDatum *datum) const override;
+		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the type in the provided stream
@@ -297,9 +298,9 @@ public:
 
 	// create a dxl datum
 	static gpos::owner<CDXLDatum *> CreateDXLDatumVal(
-		CMemoryPool *mp, IMDId *mdid, gpos::pointer<const IMDType *> md_type,
-		INT type_modifier, BOOL is_null, BYTE *byte_array, ULONG length,
-		LINT lint_Value, CDouble double_Value);
+		CMemoryPool *mp, gpos::owner<IMDId *> mdid,
+		gpos::pointer<const IMDType *> md_type, INT type_modifier, BOOL is_null,
+		BYTE *byte_array, ULONG length, LINT lint_Value, CDouble double_Value);
 
 	// create a dxl datum of types having double mapping
 	static gpos::owner<CDXLDatum *> CreateDXLDatumStatsDoubleMappable(

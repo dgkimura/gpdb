@@ -322,7 +322,7 @@ CCacheTest::EresUnittest_Refcount()
 		GPOS_ASSERT(1 == pso->RefCount());
 
 #ifdef GPOS_DEBUG
-		SSimpleObject *psoReturned =
+		gpos::pointer<SSimpleObject *> psoReturned =
 #endif	// GPOS_DEBUG
 			ca.Insert(&(pso->m_ulKey), pso);
 

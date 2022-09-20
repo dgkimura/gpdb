@@ -47,15 +47,17 @@ protected:
 	gpos::owner<MDIdToSerializedMDIdMap *> m_mdmap;
 
 	// load MD objects in the hash map
-	void LoadMetadataObjectsFromArray(CMemoryPool *mp,
-									  IMDCacheObjectArray *mdcache_obj_array);
+	void LoadMetadataObjectsFromArray(
+		CMemoryPool *mp,
+		gpos::pointer<IMDCacheObjectArray *> mdcache_obj_array);
 
 	// private copy ctor
 	CMDProviderMemory(const CMDProviderMemory &);
 
 public:
 	// ctor
-	CMDProviderMemory(CMemoryPool *mp, IMDCacheObjectArray *mdcache_obj_array);
+	CMDProviderMemory(CMemoryPool *mp,
+					  gpos::pointer<IMDCacheObjectArray *> mdcache_obj_array);
 
 	// ctor
 	CMDProviderMemory(CMemoryPool *mp, const CHAR *file_name);
@@ -68,12 +70,13 @@ public:
 								 gpos::pointer<IMDId *> mdid) const override;
 
 	// returns the requested metadata object
-	IMDCacheObject *GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
-							 IMDId *mdid) const override;
+	gpos::owner<IMDCacheObject *> GetMDObj(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		gpos::pointer<IMDId *> mdid) const override;
 
 	// return the mdid for the specified system id and type
-	IMDId *MDId(CMemoryPool *mp, CSystemId sysid,
-				IMDType::ETypeInfo type_info) const override;
+	gpos::owner<IMDId *> MDId(CMemoryPool *mp, CSystemId sysid,
+							  IMDType::ETypeInfo type_info) const override;
 };
 }  // namespace gpmd
 

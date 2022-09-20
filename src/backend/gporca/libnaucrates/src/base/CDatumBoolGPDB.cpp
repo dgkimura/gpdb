@@ -64,7 +64,8 @@ CDatumBoolGPDB::CDatumBoolGPDB(gpos::Ref<IMDId> mdid, BOOL value, BOOL is_null)
 	: m_mdid(mdid), m_value(value), m_is_null(is_null)
 {
 	GPOS_ASSERT(nullptr != m_mdid.get());
-	GPOS_ASSERT(GPDB_BOOL_OID == CMDIdGPDB::CastMdid(m_mdid.get())->Oid());
+	GPOS_ASSERT(GPDB_BOOL_OID ==
+				gpos::dyn_cast<CMDIdGPDB>(m_mdid.get())->Oid());
 
 	if (IsNull())
 	{

@@ -58,7 +58,7 @@ public:
 	CMDIdColStats(const CMDIdColStats &) = delete;
 
 	// ctor
-	CMDIdColStats(CMDIdGPDB *rel_mdid, ULONG attno);
+	CMDIdColStats(gpos::owner<CMDIdGPDB *> rel_mdid, ULONG attno);
 
 	// dtor
 	~CMDIdColStats() override;
@@ -130,8 +130,9 @@ public:
 	gpos::owner<IMDId *>
 	Copy(CMemoryPool *mp) const override
 	{
-		CMDIdGPDB *mdid_rel = CMDIdGPDB::CastMdid(m_rel_mdid->Copy(mp));
-		return GPOS_NEW(mp) CMDIdColStats(mdid_rel, m_attr_pos);
+		gpos::owner<CMDIdGPDB *> mdid_rel =
+			gpos::dyn_cast<CMDIdGPDB>(m_rel_mdid->Copy(mp));
+		return GPOS_NEW(mp) CMDIdColStats(std::move(mdid_rel), m_attr_pos);
 	}
 };
 

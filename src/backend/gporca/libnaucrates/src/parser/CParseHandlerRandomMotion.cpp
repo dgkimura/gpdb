@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerRandomMotion.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFilter.h"
@@ -66,9 +68,9 @@ CParseHandlerRandomMotion::StartElement(const XMLCh *const,	 // element_uri,
 				   str->GetBuffer());
 	}
 
-	m_dxl_op =
-		(CDXLPhysicalRandomMotion *) CDXLOperatorFactory::MakeDXLRandomMotion(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	m_dxl_op = gpos::cast<CDXLPhysicalRandomMotion>(
+		CDXLOperatorFactory::MakeDXLRandomMotion(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance

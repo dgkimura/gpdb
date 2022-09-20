@@ -58,7 +58,8 @@ public:
 	CAutoMDAccessor(const CAutoMDAccessor &) = delete;
 
 	// ctor
-	CAutoMDAccessor(CMemoryPool *mp, IMDProvider *pmdp, CSystemId sysid)
+	CAutoMDAccessor(CMemoryPool *mp, gpos::owner<IMDProvider *> pmdp,
+					CSystemId sysid)
 		: m_pimdp(pmdp), m_fOwnCache(true), m_sysid(sysid)
 	{
 		GPOS_ASSERT(nullptr != pmdp);
@@ -67,18 +68,18 @@ public:
 			CCacheFactory::CreateCache<gpmd::IMDCacheObject *, gpopt::CMDKey *>(
 				true /*fUnique*/, 0 /* unlimited cache quota */,
 				gpopt::CMDKey::UlHashMDKey, gpopt::CMDKey::FEqualMDKey);
-		m_pmda = GPOS_NEW(mp) CMDAccessor(mp, m_pcache, sysid, pmdp);
+		m_pmda = GPOS_NEW(mp) CMDAccessor(mp, m_pcache, sysid, std::move(pmdp));
 	}
 
 	// ctor
-	CAutoMDAccessor(CMemoryPool *mp, IMDProvider *pmdp, CSystemId sysid,
-					CMDAccessor::MDCache *pcache)
+	CAutoMDAccessor(CMemoryPool *mp, gpos::owner<IMDProvider *> pmdp,
+					CSystemId sysid, CMDAccessor::MDCache *pcache)
 		: m_pimdp(pmdp), m_fOwnCache(false), m_pcache(pcache), m_sysid(sysid)
 	{
 		GPOS_ASSERT(nullptr != pmdp);
 		GPOS_ASSERT(nullptr != pcache);
 
-		m_pmda = GPOS_NEW(mp) CMDAccessor(mp, m_pcache, sysid, pmdp);
+		m_pmda = GPOS_NEW(mp) CMDAccessor(mp, m_pcache, sysid, std::move(pmdp));
 	}
 
 	// dtor

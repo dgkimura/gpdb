@@ -38,7 +38,7 @@ public:
 	explicit CXformEagerAgg(CMemoryPool *mp);
 
 	// ctor
-	explicit CXformEagerAgg(CExpression *exprPattern);
+	explicit CXformEagerAgg(gpos::owner<CExpression *> exprPattern);
 
 	// dtor
 	~CXformEagerAgg() override = default;
@@ -69,8 +69,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *expr) const override;
+	void Transform(gpos::pointer<CXformContext *> pxfctxt,
+				   gpos::pointer<CXformResult *> pxfres,
+				   gpos::pointer<CExpression *> expr) const override;
 
 	// return true if xform should be applied only once
 	BOOL
@@ -90,11 +91,12 @@ private:
 	// generate project lists for the lower and upper aggregates
 	// from all the original aggregates
 	static void PopulateLowerUpperProjectList(
-		CMemoryPool *mp,			  // memory pool
-		CExpression *orig_proj_list,  // project list of the original aggregate
-		CExpression *
+		CMemoryPool *mp,  // memory pool
+		gpos::pointer<CExpression *>
+			orig_proj_list,	 // project list of the original aggregate
+		gpos::owner<CExpression *>
 			*lower_proj_list,  // output project list of the new lower aggregate
-		CExpression *
+		gpos::owner<CExpression *>
 			*upper_proj_list  // output project list of the new upper aggregate
 	);
 
@@ -104,8 +106,9 @@ private:
 		IMDId *agg_mdid,  // original global aggregate function
 		CWStringConst *agg_name, CExpressionArray *agg_arg_array,
 		BOOL is_distinct,
-		CExpression **lower_proj_elem_expr	// output project element of the new
-											// lower aggregate
+		gpos::owner<CExpression *>
+			*lower_proj_elem_expr  // output project element of the new
+								   // lower aggregate
 	);
 
 	// generate project element for upper aggregate
@@ -114,8 +117,9 @@ private:
 		IMDId *agg_mdid,  // aggregate mdid to create
 		CWStringConst *agg_name, CColRef *lower_colref, CColRef *output_colref,
 		BOOL is_distinct,
-		CExpression **upper_proj_elem_expr	// output project element of the new
-											// upper aggregate
+		gpos::owner<CExpression *>
+			*upper_proj_elem_expr  // output project element of the new
+								   // upper aggregate
 	);
 };	// class CXformEagerAgg
 }  // namespace gpopt

@@ -227,7 +227,7 @@ CParseHandlerMetadata::EndElement(const XMLCh *const,  // element_uri,
 //		Parse a list of source system ids
 //
 //---------------------------------------------------------------------------
-CSystemIdArray *
+gpos::owner<CSystemIdArray *>
 CParseHandlerMetadata::GetSrcSysIdArray(const Attributes &attrs,
 										Edxltoken dxl_token_attr,
 										Edxltoken dxl_token_element)

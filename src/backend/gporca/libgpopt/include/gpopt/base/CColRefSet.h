@@ -121,10 +121,10 @@ public:
 	BOOL FIntersects(gpos::pointer<const CColRefSet *> pcrs);
 
 	// convert to array
-	CColRefArray *Pdrgpcr(CMemoryPool *mp) const;
+	gpos::owner<CColRefArray *> Pdrgpcr(CMemoryPool *mp) const;
 
 	// convert to id colref map
-	IntToColRefMap *Phmicr(CMemoryPool *mp) const;
+	gpos::owner<IntToColRefMap *> Phmicr(CMemoryPool *mp) const;
 
 	// hash function
 	ULONG HashValue();
@@ -134,7 +134,8 @@ public:
 	IOstream &OsPrint(IOstream &os, ULONG ulLenMax) const;
 
 	// extract all column ids
-	void ExtractColIds(CMemoryPool *mp, ULongPtrArray *colids) const;
+	void ExtractColIds(CMemoryPool *mp,
+					   gpos::pointer<ULongPtrArray *> colids) const;
 
 	// are the columns in the column reference set covered by the array of column ref sets
 	static BOOL FCovered(gpos::pointer<CColRefSetArray *> pdrgpcrs,

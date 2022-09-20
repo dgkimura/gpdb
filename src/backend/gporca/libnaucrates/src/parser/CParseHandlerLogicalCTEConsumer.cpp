@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalCTEConsumer.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLLogicalCTEConsumer.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -65,14 +67,14 @@ CParseHandlerLogicalCTEConsumer::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenCTEId,
 		EdxltokenLogicalCTEConsumer);
 
-	ULongPtrArray *output_colids_array =
+	gpos::owner<ULongPtrArray *> output_colids_array =
 		CDXLOperatorFactory::ExtractConvertValuesToArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenColumns,
 			EdxltokenLogicalCTEConsumer);
 
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(
-		m_mp,
-		GPOS_NEW(m_mp) CDXLLogicalCTEConsumer(m_mp, id, output_colids_array));
+	m_dxl_node = GPOS_NEW(m_mp)
+		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLLogicalCTEConsumer(
+						   m_mp, id, std::move(output_colids_array)));
 }
 
 //---------------------------------------------------------------------------

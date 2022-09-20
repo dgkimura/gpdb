@@ -126,27 +126,34 @@ public:
 	// ctor's with different arity
 
 	// ctor for leaf nodes
-	CExpression(CMemoryPool *mp, COperator *pop,
-				CGroupExpression *pgexpr = nullptr);
+	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
+				gpos::pointer<CGroupExpression *> pgexpr = nullptr);
 
 	// ctor for unary expressions
-	CExpression(CMemoryPool *mp, COperator *pop, CExpression *pexpr);
+	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
+				gpos::owner<CExpression *> pexpr);
 
 	// ctor for binary expressions
-	CExpression(CMemoryPool *mp, COperator *pop, CExpression *pexprChildFirst,
-				CExpression *pexprChildSecond);
+	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
+				gpos::owner<CExpression *> pexprChildFirst,
+				gpos::owner<CExpression *> pexprChildSecond);
 
 	// ctor for ternary expressions
-	CExpression(CMemoryPool *mp, COperator *pop, CExpression *pexprChildFirst,
-				CExpression *pexprChildSecond, CExpression *pexprChildThird);
+	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
+				gpos::owner<CExpression *> pexprChildFirst,
+				gpos::owner<CExpression *> pexprChildSecond,
+				gpos::owner<CExpression *> pexprChildThird);
 
 	// ctor n-ary expressions
-	CExpression(CMemoryPool *mp, COperator *pop, CExpressionArray *pdrgpexpr);
+	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
+				gpos::owner<CExpressionArray *> pdrgpexpr);
 
 	// ctor for n-ary expression with origin group expression
-	CExpression(CMemoryPool *mp, COperator *pop, CGroupExpression *pgexpr,
-				CExpressionArray *pdrgpexpr, CReqdPropPlan *prpp,
-				IStatistics *input_stats, CCost cost);
+	CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
+				gpos::pointer<CGroupExpression *> pgexpr,
+				gpos::owner<CExpressionArray *> pdrgpexpr,
+				gpos::owner<CReqdPropPlan *> prpp, IStatistics *input_stats,
+				CCost cost);
 
 	// dtor
 	~CExpression() override;
@@ -224,8 +231,8 @@ public:
 	CDrvdProp *PdpDerive(CDrvdPropCtxt *pdpctxt = nullptr);
 
 	// derive statistics
-	IStatistics *PstatsDerive(CReqdPropRelational *prprel,
-							  IStatisticsArray *stats_ctxt);
+	gpos::pointer<IStatistics *> PstatsDerive(CReqdPropRelational *prprel,
+											  IStatisticsArray *stats_ctxt);
 
 	// reset a derived property
 	void ResetDerivedProperty(CDrvdProp::EPropType ept);
@@ -247,7 +254,7 @@ public:
 								BOOL fLast = true) const;
 
 	// match with group expression
-	BOOL FMatchPattern(CGroupExpression *pgexpr) const;
+	BOOL FMatchPattern(gpos::pointer<CGroupExpression *> pgexpr) const;
 
 	// return a copy of the expression with remapped columns
 	gpos::owner<CExpression *> PexprCopyWithRemappedColumns(
@@ -255,17 +262,17 @@ public:
 		BOOL must_exist) const;
 
 	// compare entire expression rooted here
-	BOOL Matches(CExpression *pexpr) const;
+	BOOL Matches(gpos::pointer<CExpression *> pexpr) const;
 
 #ifdef GPOS_DEBUG
 	// match against given pattern
-	BOOL FMatchPattern(CExpression *pexpr) const;
+	BOOL FMatchPattern(gpos::pointer<CExpression *> pexpr) const;
 
 	// match children against given pattern
-	BOOL FMatchPatternChildren(CExpression *pexpr) const;
+	BOOL FMatchPatternChildren(gpos::pointer<CExpression *> pexpr) const;
 
 	// compare entire expression rooted here
-	BOOL FMatchDebug(CExpression *pexpr) const;
+	BOOL FMatchDebug(gpos::pointer<CExpression *> pexpr) const;
 
 	// debug print; for interactive debugging sessions only
 	// prints expression properties as well
@@ -283,9 +290,10 @@ public:
 	static ULONG UlHashDedup(gpos::pointer<const CExpression *> pexpr);
 
 	// rehydrate expression from a given cost context and child expressions
-	static CExpression *PexprRehydrate(CMemoryPool *mp, CCostContext *pcc,
-									   CExpressionArray *pdrgpexpr,
-									   CDrvdPropCtxtPlan *pdpctxtplan);
+	static gpos::owner<CExpression *> PexprRehydrate(
+		CMemoryPool *mp, gpos::pointer<CCostContext *> pcc,
+		gpos::owner<CExpressionArray *> pdrgpexpr,
+		CDrvdPropCtxtPlan *pdpctxtplan);
 
 	// Relational property accessors - derived as needed
 	CColRefSet *DeriveOuterReferences();

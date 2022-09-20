@@ -39,8 +39,9 @@ CLogicalLeftSemiCorrelatedApply::CLogicalLeftSemiCorrelatedApply(
 //
 //---------------------------------------------------------------------------
 CLogicalLeftSemiCorrelatedApply::CLogicalLeftSemiCorrelatedApply(
-	CMemoryPool *mp, CColRefArray *pdrgpcrInner, EOperatorId eopidOriginSubq)
-	: CLogicalLeftSemiApply(mp, pdrgpcrInner, eopidOriginSubq)
+	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrInner,
+	EOperatorId eopidOriginSubq)
+	: CLogicalLeftSemiApply(mp, std::move(pdrgpcrInner), eopidOriginSubq)
 {
 }
 
@@ -52,7 +53,7 @@ CLogicalLeftSemiCorrelatedApply::CLogicalLeftSemiCorrelatedApply(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalLeftSemiCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -71,13 +72,14 @@ CLogicalLeftSemiCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
 CLogicalLeftSemiCorrelatedApply::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrInner =
+	gpos::owner<CColRefArray *> pdrgpcrInner =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
 
-	return GPOS_NEW(mp)
-		CLogicalLeftSemiCorrelatedApply(mp, pdrgpcrInner, m_eopidOriginSubq);
+	return GPOS_NEW(mp) CLogicalLeftSemiCorrelatedApply(
+		mp, std::move(pdrgpcrInner), m_eopidOriginSubq);
 }
 
 

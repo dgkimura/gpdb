@@ -57,8 +57,9 @@ CXformSplitGbAggDedup::CXformSplitGbAggDedup(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformSplitGbAggDedup::Transform(gpos::pointer<CXformContext *> pxfctxt,
+								 gpos::pointer<CXformResult *> pxfres,
+								 gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -66,12 +67,12 @@ CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalGbAggDeduplicate *popAggDedup =
-		CLogicalGbAggDeduplicate::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalGbAggDeduplicate *> popAggDedup =
+		gpos::dyn_cast<CLogicalGbAggDeduplicate>(pexpr->Pop());
 
 	// extract components
 	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprProjectList = (*pexpr)[1];
+	gpos::pointer<CExpression *> pexprProjectList = (*pexpr)[1];
 
 	// check if the transformation is applicable
 	if (!FApplicable(pexprProjectList))
@@ -81,8 +82,8 @@ CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	pexprRelational->AddRef();
 
-	CExpression *pexprProjectListLocal = nullptr;
-	CExpression *pexprProjectListGlobal = nullptr;
+	gpos::owner<CExpression *> pexprProjectListLocal = nullptr;
+	gpos::owner<CExpression *> pexprProjectListGlobal = nullptr;
 
 	(void) PopulateLocalGlobalProjectList(
 		mp, pexprProjectList, &pexprProjectListLocal, &pexprProjectListGlobal);
@@ -109,16 +110,16 @@ CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 					GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 						mp, colref_array, pdrgpcrMinimal,
 						COperator::EgbaggtypeLocal /*egbaggtype*/, pdrgpcrKeys),
-					pexprRelational, pexprProjectListLocal);
+					pexprRelational, std::move(pexprProjectListLocal));
 
 	gpos::owner<CExpression *> pexprGlobal = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 			mp, colref_array, pdrgpcrMinimal,
 			COperator::EgbaggtypeGlobal /*egbaggtype*/, pdrgpcrKeys),
-		local_expr, pexprProjectListGlobal);
+		std::move(local_expr), std::move(pexprProjectListGlobal));
 
-	pxfres->Add(pexprGlobal);
+	pxfres->Add(std::move(pexprGlobal));
 }
 
 // EOF

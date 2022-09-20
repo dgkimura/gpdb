@@ -359,8 +359,9 @@ public:
 	// in the second array if the first array is not included in the second,
 	// return null
 	// equality comparison between elements is via the "==" operator
-	ULongPtrArray *
-	IndexesOfSubsequence(CDynamicPtrArray<T, CleanupFn> *subsequence)
+	gpos::owner<ULongPtrArray *>
+	IndexesOfSubsequence(
+		gpos::pointer<CDynamicPtrArray<T, CleanupFn> *> subsequence)
 	{
 		GPOS_ASSERT(nullptr != subsequence);
 
@@ -385,8 +386,8 @@ public:
 	}
 
 	// Eliminate members from an array that are not contained in a given list of indexes
-	CDynamicPtrArray<T, CleanupFn> *
-	CreateReducedArray(ULongPtrArray *indexes_to_choose)
+	gpos::owner<CDynamicPtrArray<T, CleanupFn> *>
+	CreateReducedArray(gpos::pointer<ULongPtrArray *> indexes_to_choose)
 	{
 		gpos::owner<CDynamicPtrArray<T, CleanupFn> *> result =
 			GPOS_NEW(m_mp) CDynamicPtrArray<T, CleanupFn>(m_mp, m_min_size,

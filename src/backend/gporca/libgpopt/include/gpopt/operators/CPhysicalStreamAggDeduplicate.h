@@ -37,14 +37,12 @@ public:
 		delete;
 
 	// ctor
-	CPhysicalStreamAggDeduplicate(CMemoryPool *mp, CColRefArray *colref_array,
-								  CColRefArray *pdrgpcrMinimal,
-								  COperator::EGbAggType egbaggtype,
-								  CColRefArray *pdrgpcrKeys,
-								  BOOL fGeneratesDuplicates, BOOL fMultiStage,
-								  BOOL isAggFromSplitDQA,
-								  CLogicalGbAgg::EAggStage aggStage,
-								  BOOL should_enforce_distribution);
+	CPhysicalStreamAggDeduplicate(
+		CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+		CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+		gpos::owner<CColRefArray *> pdrgpcrKeys, BOOL fGeneratesDuplicates,
+		BOOL fMultiStage, BOOL isAggFromSplitDQA,
+		CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution);
 
 	// dtor
 	~CPhysicalStreamAggDeduplicate() override;
@@ -75,11 +73,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 CColRefSet *pcrsRequired, ULONG child_index,
-				 CDrvdPropArray *,	//pdrgpdpCtxt,
-				 ULONG				//ulOptReq
+				 gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
+				 gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
+				 ULONG							   //ulOptReq
 				 ) override
 	{
 		return PcrsRequiredAgg(mp, exprhdl, pcrsRequired, child_index,
@@ -87,11 +85,11 @@ public:
 	}
 
 	// compute required sort columns of the n-th child
-	COrderSpec *
+	gpos::owner<COrderSpec *>
 	PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				COrderSpec *posRequired, ULONG child_index,
-				CDrvdPropArray *,  //pdrgpdpCtxt,
-				ULONG			   //ulOptReq
+				gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
+				gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
+				ULONG							  //ulOptReq
 	) const override
 	{
 		return PosRequiredStreamAgg(mp, exprhdl, posRequired, child_index,
@@ -99,10 +97,11 @@ public:
 	}
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *
+	gpos::owner<CDistributionSpec *>
 	PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDistributionSpec *pdsRequired, ULONG child_index,
-				CDrvdPropArray *,  //pdrgpdpCtxt,
+				gpos::pointer<CDistributionSpec *> pdsRequired,
+				ULONG child_index,
+				gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
 				ULONG ulOptReq) const override
 	{
 		return PdsRequiredAgg(mp, exprhdl, pdsRequired, child_index, ulOptReq,

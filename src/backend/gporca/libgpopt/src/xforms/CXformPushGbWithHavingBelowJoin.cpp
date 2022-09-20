@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformPushGbWithHavingBelowJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CLogicalInnerJoin.h"
@@ -83,9 +84,10 @@ CXformPushGbWithHavingBelowJoin::Exfp(CExpressionHandle &  // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformPushGbWithHavingBelowJoin::Transform(CXformContext *pxfctxt,
-										   CXformResult *pxfres,
-										   CExpression *pexpr) const
+CXformPushGbWithHavingBelowJoin::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -93,20 +95,22 @@ CXformPushGbWithHavingBelowJoin::Transform(CXformContext *pxfctxt,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	CExpression *pexprGb = (*pexpr)[0];
-	CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(pexprGb->Pop());
+	gpos::pointer<CExpression *> pexprGb = (*pexpr)[0];
+	gpos::pointer<CLogicalGbAgg *> popGbAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexprGb->Pop());
 	if (!popGbAgg->FGlobal())
 	{
 		// xform only applies to global aggs
 		return;
 	}
 
-	CExpression *pexprResult = CXformUtils::PexprPushGbBelowJoin(mp, pexpr);
+	gpos::owner<CExpression *> pexprResult =
+		CXformUtils::PexprPushGbBelowJoin(mp, pexpr);
 
 	if (nullptr != pexprResult)
 	{
 		// add alternative to results
-		pxfres->Add(pexprResult);
+		pxfres->Add(std::move(pexprResult));
 	}
 }
 

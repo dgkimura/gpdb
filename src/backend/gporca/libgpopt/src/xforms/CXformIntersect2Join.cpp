@@ -59,8 +59,9 @@ CXformIntersect2Join::CXformIntersect2Join(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformIntersect2Join::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformIntersect2Join::Transform(gpos::pointer<CXformContext *> pxfctxt,
+								gpos::pointer<CXformResult *> pxfres,
+								gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -75,9 +76,10 @@ CXformIntersect2Join::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CExpression *pexprLeftChild = (*pexpr)[0];
 	CExpression *pexprRightChild = (*pexpr)[1];
 
-	CLogicalIntersect *popIntersect =
-		CLogicalIntersect::PopConvert(pexpr->Pop());
-	CColRef2dArray *pdrgpdrgpcrInput = popIntersect->PdrgpdrgpcrInput();
+	gpos::pointer<CLogicalIntersect *> popIntersect =
+		gpos::dyn_cast<CLogicalIntersect>(pexpr->Pop());
+	gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput =
+		popIntersect->PdrgpdrgpcrInput();
 
 	// construct group by over the left and right expressions
 
@@ -90,19 +92,20 @@ CXformIntersect2Join::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	(*pdrgpdrgpcrInput)[0]->AddRef();
 	(*pdrgpdrgpcrInput)[1]->AddRef();
 
-	CExpression *pexprLeftAgg = CUtils::PexprLogicalGbAggGlobal(
+	gpos::owner<CExpression *> pexprLeftAgg = CUtils::PexprLogicalGbAggGlobal(
 		mp, (*pdrgpdrgpcrInput)[0], pexprLeftChild, pexprProjList);
-	CExpression *pexprRightAgg = CUtils::PexprLogicalGbAggGlobal(
+	gpos::owner<CExpression *> pexprRightAgg = CUtils::PexprLogicalGbAggGlobal(
 		mp, (*pdrgpdrgpcrInput)[1], pexprRightChild, pexprProjList);
 
-	CExpression *pexprScCond = CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
+	gpos::owner<CExpression *> pexprScCond =
+		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
 
-	gpos::owner<CExpression *> pexprJoin =
-		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp),
-								 pexprLeftAgg, pexprRightAgg, pexprScCond);
+	gpos::owner<CExpression *> pexprJoin = GPOS_NEW(mp) CExpression(
+		mp, GPOS_NEW(mp) CLogicalInnerJoin(mp), std::move(pexprLeftAgg),
+		std::move(pexprRightAgg), std::move(pexprScCond));
 
 
-	pxfres->Add(pexprJoin);
+	pxfres->Add(std::move(pexprJoin));
 }
 
 // EOF

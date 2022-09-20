@@ -59,11 +59,12 @@ public:
 	};
 
 	//ctor
-	CDXLPhysicalDynamicIndexScan(CMemoryPool *mp, CDXLTableDescr *table_descr,
-								 CDXLIndexDescr *dxl_index_descr,
+	CDXLPhysicalDynamicIndexScan(CMemoryPool *mp,
+								 gpos::owner<CDXLTableDescr *> table_descr,
+								 gpos::owner<CDXLIndexDescr *> dxl_index_descr,
 								 EdxlIndexScanDirection idx_scan_direction,
 								 gpos::Ref<IMdIdArray> part_mdids,
-								 ULongPtrArray *selector_ids);
+								 gpos::owner<ULongPtrArray *> selector_ids);
 
 	//dtor
 	~CDXLPhysicalDynamicIndexScan() override;

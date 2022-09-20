@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarIdent.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -72,8 +74,9 @@ CParseHandlerScalarIdent::StartElement(const XMLCh *const,	// element_uri,
 	}
 
 	// parse and create identifier operator
-	m_dxl_op = (CDXLScalarIdent *) CDXLOperatorFactory::MakeDXLScalarIdent(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	m_dxl_op =
+		gpos::cast<CDXLScalarIdent>(CDXLOperatorFactory::MakeDXLScalarIdent(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 }
 
 //---------------------------------------------------------------------------

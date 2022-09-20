@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalHashAggDeduplicate.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecRandom.h"
@@ -30,15 +31,16 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalHashAggDeduplicate::CPhysicalHashAggDeduplicate(
-	CMemoryPool *mp, CColRefArray *colref_array, CColRefArray *pdrgpcrMinimal,
-	COperator::EGbAggType egbaggtype, CColRefArray *pdrgpcrKeys,
-	BOOL fGeneratesDuplicates, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
+	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+	CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	gpos::owner<CColRefArray *> pdrgpcrKeys, BOOL fGeneratesDuplicates,
+	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+	BOOL should_enforce_distribution)
 	: CPhysicalHashAgg(mp, colref_array, pdrgpcrMinimal, egbaggtype,
 					   fGeneratesDuplicates, nullptr /*pdrgpcrGbMinusDistinct*/,
 					   fMultiStage, isAggFromSplitDQA, aggStage,
 					   should_enforce_distribution),
-	  m_pdrgpcrKeys(pdrgpcrKeys)
+	  m_pdrgpcrKeys(std::move(pdrgpcrKeys))
 {
 	GPOS_ASSERT(nullptr != m_pdrgpcrKeys);
 }

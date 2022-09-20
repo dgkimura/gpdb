@@ -30,8 +30,12 @@ FORCE_GENERATE_DBGSTR(CCTEReq::CCTEReqEntry);
 //
 //---------------------------------------------------------------------------
 CCTEReq::CCTEReqEntry::CCTEReqEntry(ULONG id, CCTEMap::ECteType ect,
-									BOOL fRequired, CDrvdPropPlan *pdpplan)
-	: m_id(id), m_ect(ect), m_fRequired(fRequired), m_pdpplan(pdpplan)
+									BOOL fRequired,
+									gpos::owner<CDrvdPropPlan *> pdpplan)
+	: m_id(id),
+	  m_ect(ect),
+	  m_fRequired(fRequired),
+	  m_pdpplan(std::move(pdpplan))
 {
 	GPOS_ASSERT(CCTEMap::EctSentinel > ect);
 	GPOS_ASSERT_IMP(nullptr == m_pdpplan, CCTEMap::EctProducer == ect);
@@ -83,7 +87,7 @@ CCTEReq::CCTEReqEntry::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CCTEReq::CCTEReqEntry::Equals(CCTEReqEntry *pcre) const
+CCTEReq::CCTEReqEntry::Equals(gpos::pointer<CCTEReqEntry *> pcre) const
 {
 	GPOS_ASSERT(nullptr != pcre);
 	if (m_id != pcre->Id() || m_ect != pcre->Ect() ||
@@ -92,7 +96,7 @@ CCTEReq::CCTEReqEntry::Equals(CCTEReqEntry *pcre) const
 		return false;
 	}
 
-	CDrvdPropPlan *pdpplan = pcre->PdpplanProducer();
+	gpos::pointer<CDrvdPropPlan *> pdpplan = pcre->PdpplanProducer();
 	if (nullptr == m_pdpplan && nullptr == pdpplan)
 	{
 		return true;
@@ -168,7 +172,7 @@ CCTEReq::~CCTEReq()
 //---------------------------------------------------------------------------
 void
 CCTEReq::Insert(ULONG ulCteId, CCTEMap::ECteType ect, BOOL fRequired,
-				CDrvdPropPlan *pdpplan)
+				gpos::owner<CDrvdPropPlan *> pdpplan)
 {
 	GPOS_ASSERT(CCTEMap::EctSentinel > ect);
 	gpos::owner<CCTEReqEntry *> pcre =
@@ -192,10 +196,10 @@ CCTEReq::Insert(ULONG ulCteId, CCTEMap::ECteType ect, BOOL fRequired,
 //
 //---------------------------------------------------------------------------
 void
-CCTEReq::InsertConsumer(ULONG id, CDrvdPropArray *pdrgpdpCtxt)
+CCTEReq::InsertConsumer(ULONG id, gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt)
 {
 	ULONG ulProducerId = gpos::ulong_max;
-	CDrvdPropPlan *pdpplan = CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])
+	CDrvdPropPlan *pdpplan = gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])
 								 ->GetCostModel()
 								 ->PdpplanProducer(&ulProducerId);
 	GPOS_ASSERT(nullptr != pdpplan);
@@ -250,7 +254,7 @@ CCTEReq::FSubset(gpos::pointer<const CCTEReq *> pcter) const
 	while (hmcri.Advance())
 	{
 		gpos::pointer<const CCTEReqEntry *> pcre = hmcri.Value();
-		CCTEReqEntry *pcreOther = pcter->PcreLookup(pcre->Id());
+		gpos::pointer<CCTEReqEntry *> pcreOther = pcter->PcreLookup(pcre->Id());
 		if (nullptr == pcreOther || !pcre->Equals(pcreOther))
 		{
 			return false;
@@ -271,7 +275,7 @@ CCTEReq::FSubset(gpos::pointer<const CCTEReq *> pcter) const
 BOOL
 CCTEReq::FContainsRequirement(const ULONG id, const CCTEMap::ECteType ect) const
 {
-	CCTEReqEntry *pcre = PcreLookup(id);
+	gpos::pointer<CCTEReqEntry *> pcre = PcreLookup(id);
 	return (nullptr != pcre && pcre->Ect() == ect);
 }
 
@@ -286,7 +290,7 @@ CCTEReq::FContainsRequirement(const ULONG id, const CCTEMap::ECteType ect) const
 CCTEMap::ECteType
 CCTEReq::Ect(const ULONG id) const
 {
-	CCTEReqEntry *pcre = PcreLookup(id);
+	gpos::pointer<CCTEReqEntry *> pcre = PcreLookup(id);
 	GPOS_ASSERT(nullptr != pcre);
 	return pcre->Ect();
 }
@@ -327,8 +331,8 @@ CCTEReq::HashValue() const
 //		Unresolved CTE requirements given a derived CTE map
 //
 //---------------------------------------------------------------------------
-CCTEReq *
-CCTEReq::PcterUnresolved(CMemoryPool *mp, CCTEMap *pcm)
+gpos::owner<CCTEReq *>
+CCTEReq::PcterUnresolved(CMemoryPool *mp, gpos::pointer<CCTEMap *> pcm)
 {
 	GPOS_ASSERT(nullptr != pcm);
 	gpos::owner<CCTEReq *> pcterUnresolved = GPOS_NEW(mp) CCTEReq(mp);
@@ -363,10 +367,10 @@ CCTEReq::PcterUnresolved(CMemoryPool *mp, CCTEMap *pcm)
 //		operator
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::owner<CCTEReq *>
 CCTEReq::PcterUnresolvedSequence(
-	CMemoryPool *mp, CCTEMap *pcm,
-	CDrvdPropArray *
+	CMemoryPool *mp, gpos::pointer<CCTEMap *> pcm,
+	gpos::pointer<CDrvdPropArray *>
 		pdrgpdpCtxt	 // context contains derived plan properties of producer tree
 )
 {
@@ -439,7 +443,7 @@ CCTEReq::PcterUnresolvedSequence(
 //		Create a copy of the current requirement where all the entries are marked optional
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::owner<CCTEReq *>
 CCTEReq::PcterAllOptional(CMemoryPool *mp)
 {
 	gpos::owner<CCTEReq *> pcter = GPOS_NEW(mp) CCTEReq(mp);
@@ -495,7 +499,8 @@ CCTEReq::OsPrint(IOstream &os) const
 	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
-		CCTEReqEntry *pcre = const_cast<CCTEReqEntry *>(hmcri.Value());
+		gpos::pointer<CCTEReqEntry *> pcre =
+			const_cast<CCTEReqEntry *>(hmcri.Value());
 		pcre->OsPrint(os);
 	}
 

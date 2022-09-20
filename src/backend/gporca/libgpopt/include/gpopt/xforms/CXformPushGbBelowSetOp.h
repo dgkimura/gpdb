@@ -63,7 +63,8 @@ public:
 	EXformPromise
 	Exfp(CExpressionHandle &exprhdl) const override
 	{
-		CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
+		gpos::pointer<CLogicalGbAgg *> popGbAgg =
+			gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 		if (popGbAgg->FGlobal())
 		{
 			return ExfpHigh;
@@ -74,18 +75,19 @@ public:
 
 	// actual transform
 	void
-	Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-			  CExpression *pexpr) const override
+	Transform(gpos::pointer<CXformContext *> pxfctxt,
+			  gpos::pointer<CXformResult *> pxfres,
+			  gpos::pointer<CExpression *> pexpr) const override
 	{
 		GPOS_ASSERT(nullptr != pxfctxt);
 		GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 		GPOS_ASSERT(FCheckPattern(pexpr));
 
 		CMemoryPool *mp = pxfctxt->Pmp();
-		COptimizerConfig *optconfig =
+		gpos::pointer<COptimizerConfig *> optconfig =
 			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 
-		CExpression *pexprSetOp = (*pexpr)[0];
+		gpos::pointer<CExpression *> pexprSetOp = (*pexpr)[0];
 		if (pexprSetOp->Arity() >
 			optconfig->GetHint()->UlPushGroupByBelowSetopThreshold())
 		{
@@ -99,14 +101,16 @@ public:
 			return;
 		}
 
-		CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
-		CLogicalSetOp *popSetOp = CLogicalSetOp::PopConvert(pexprSetOp->Pop());
+		CLogicalGbAgg *popGbAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+		gpos::pointer<CLogicalSetOp *> popSetOp =
+			gpos::dyn_cast<CLogicalSetOp>(pexprSetOp->Pop());
 
 		CColRefArray *pdrgpcrGb = popGbAgg->Pdrgpcr();
-		CColRefArray *pdrgpcrOutput = popSetOp->PdrgpcrOutput();
+		gpos::pointer<CColRefArray *> pdrgpcrOutput = popSetOp->PdrgpcrOutput();
 		gpos::owner<CColRefSet *> pcrsOutput =
 			GPOS_NEW(mp) CColRefSet(mp, pdrgpcrOutput);
-		CColRef2dArray *pdrgpdrgpcrInput = popSetOp->PdrgpdrgpcrInput();
+		gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput =
+			popSetOp->PdrgpdrgpcrInput();
 		gpos::owner<CExpressionArray *> pdrgpexprNewChildren =
 			GPOS_NEW(mp) CExpressionArray(mp);
 		gpos::owner<CColRef2dArray *> pdrgpdrgpcrNewInput =
@@ -118,11 +122,12 @@ public:
 		for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 		{
 			CExpression *pexprChild = (*pexprSetOp)[ulChild];
-			CColRefArray *pdrgpcrChild = (*pdrgpdrgpcrInput)[ulChild];
+			gpos::pointer<CColRefArray *> pdrgpcrChild =
+				(*pdrgpdrgpcrInput)[ulChild];
 			gpos::owner<CColRefSet *> pcrsChild =
 				GPOS_NEW(mp) CColRefSet(mp, pdrgpcrChild);
 
-			CColRefArray *pdrgpcrChildGb = nullptr;
+			gpos::owner<CColRefArray *> pdrgpcrChildGb = nullptr;
 			if (!pcrsChild->Equals(pcrsOutput))
 			{
 				// use column mapping in SetOp to set child grouping colums
@@ -144,10 +149,11 @@ public:
 
 			// if child of setop is already an Agg with the same grouping columns
 			// that we want to use, there is no need to add another agg on top of it
-			COperator *popChild = pexprChild->Pop();
+			gpos::pointer<COperator *> popChild = pexprChild->Pop();
 			if (COperator::EopLogicalGbAgg == popChild->Eopid())
 			{
-				CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(popChild);
+				gpos::pointer<CLogicalGbAgg *> popGbAgg =
+					gpos::dyn_cast<CLogicalGbAgg>(popChild);
 				if (CColRef::Equals(popGbAgg->Pdrgpcr(), pdrgpcrChildGb))
 				{
 					pdrgpexprNewChildren->Append(pexprChild);
@@ -159,8 +165,9 @@ public:
 
 			fNewChild = true;
 			pexprPrjList->AddRef();
-			CExpression *pexprChildGb = CUtils::PexprLogicalGbAggGlobal(
-				mp, pdrgpcrChildGb, pexprChild, pexprPrjList);
+			gpos::owner<CExpression *> pexprChildGb =
+				CUtils::PexprLogicalGbAggGlobal(mp, pdrgpcrChildGb, pexprChild,
+												pexprPrjList);
 			pdrgpexprNewChildren->Append(pexprChildGb);
 
 			pdrgpcrChildGb->AddRef();
@@ -181,16 +188,16 @@ public:
 
 		pdrgpcrGb->AddRef();
 		gpos::owner<TSetOp *> popSetOpNew =
-			GPOS_NEW(mp) TSetOp(mp, pdrgpcrGb, pdrgpdrgpcrNewInput);
-		gpos::owner<CExpression *> pexprNewSetOp =
-			GPOS_NEW(mp) CExpression(mp, popSetOpNew, pdrgpexprNewChildren);
+			GPOS_NEW(mp) TSetOp(mp, pdrgpcrGb, std::move(pdrgpdrgpcrNewInput));
+		gpos::owner<CExpression *> pexprNewSetOp = GPOS_NEW(mp) CExpression(
+			mp, std::move(popSetOpNew), std::move(pdrgpexprNewChildren));
 
 		popGbAgg->AddRef();
 		pexprPrjList->AddRef();
-		gpos::owner<CExpression *> pexprResult =
-			GPOS_NEW(mp) CExpression(mp, popGbAgg, pexprNewSetOp, pexprPrjList);
+		gpos::owner<CExpression *> pexprResult = GPOS_NEW(mp)
+			CExpression(mp, popGbAgg, std::move(pexprNewSetOp), pexprPrjList);
 
-		pxfres->Add(pexprResult);
+		pxfres->Add(std::move(pexprResult));
 	}
 
 };	// class CXformPushGbBelowSetOp

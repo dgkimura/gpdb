@@ -210,7 +210,7 @@ CParseHandlerMDIndex::EndElement(const XMLCh *const,  // element_uri,
 		pdxlnPartConstraint->AddRef();
 		m_part_constraint = GPOS_NEW(m_mp) CMDPartConstraintGPDB(
 			m_mp, m_level_with_default_part_array, m_part_constraint_unbounded,
-			pdxlnPartConstraint);
+			std::move(pdxlnPartConstraint));
 		return;
 	}
 

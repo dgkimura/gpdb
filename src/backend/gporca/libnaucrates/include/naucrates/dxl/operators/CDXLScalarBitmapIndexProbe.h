@@ -44,7 +44,7 @@ public:
 
 	// ctor
 	CDXLScalarBitmapIndexProbe(CMemoryPool *mp,
-							   CDXLIndexDescr *dxl_index_descr);
+							   gpos::owner<CDXLIndexDescr *> dxl_index_descr);
 
 	//dtor
 	~CDXLScalarBitmapIndexProbe() override;

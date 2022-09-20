@@ -60,8 +60,9 @@ CParseHandlerAppend::SetupInitialHandlers(const Attributes &attrs)
 	GPOS_ASSERT(this->Length() == 0 &&
 				"No handlers should have been added yet");
 
-	m_dxl_op = (CDXLPhysicalAppend *) CDXLOperatorFactory::MakeDXLAppend(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	m_dxl_op =
+		gpos::cast<CDXLPhysicalAppend>(CDXLOperatorFactory::MakeDXLAppend(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// parse handler for the filter
 	CParseHandlerBase *filter_parse_handler =

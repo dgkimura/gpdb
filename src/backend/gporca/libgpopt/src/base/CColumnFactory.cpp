@@ -172,7 +172,7 @@ CColumnFactory::PcrCreate(gpos::pointer<const IMDType *> pmdtype,
 CColRef *
 CColumnFactory::PcrCreate(gpos::pointer<const CColumnDescriptor *> pcoldesc,
 						  ULONG id, const CName &name, ULONG ulOpSource,
-						  BOOL mark_as_used, IMDId *mdid_table)
+						  BOOL mark_as_used, gpos::pointer<IMDId *> mdid_table)
 {
 	CName *pnameCopy = GPOS_NEW(m_mp) CName(m_mp, name);
 	CAutoP<CName> a_pnameCopy(pnameCopy);
@@ -210,9 +210,10 @@ CColumnFactory::PcrCreate(gpos::pointer<const CColumnDescriptor *> pcoldesc,
 //---------------------------------------------------------------------------
 CColRef *
 CColumnFactory::PcrCreate(gpos::pointer<const IMDType *> pmdtype,
-						  INT type_modifier, IMDId *mdid_table, INT attno,
-						  BOOL is_nullable, ULONG id, const CName &name,
-						  ULONG ulOpSource, BOOL isDistCol, ULONG ulWidth)
+						  INT type_modifier, gpos::pointer<IMDId *> mdid_table,
+						  INT attno, BOOL is_nullable, ULONG id,
+						  const CName &name, ULONG ulOpSource, BOOL isDistCol,
+						  ULONG ulWidth)
 {
 	CName *pnameCopy = GPOS_NEW(m_mp) CName(m_mp, name);
 	CAutoP<CName> a_pnameCopy(pnameCopy);
@@ -243,7 +244,7 @@ CColumnFactory::PcrCreate(gpos::pointer<const IMDType *> pmdtype,
 CColRef *
 CColumnFactory::PcrCreate(gpos::pointer<const CColumnDescriptor *> pcoldesc,
 						  const CName &name, ULONG ulOpSource,
-						  BOOL mark_as_used, IMDId *mdid_table)
+						  BOOL mark_as_used, gpos::pointer<IMDId *> mdid_table)
 {
 	ULONG id = m_aul++;
 
@@ -357,16 +358,16 @@ CColumnFactory::PcrsUsedInComputedCol(const CColRef *colref)
 //
 //---------------------------------------------------------------------------
 void
-CColumnFactory::AddComputedToUsedColsMap(CExpression *pexpr)
+CColumnFactory::AddComputedToUsedColsMap(gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != m_phmcrcrs);
 
 	gpos::pointer<const CScalarProjectElement *> popScPrEl =
-		CScalarProjectElement::PopConvert(pexpr->Pop());
+		gpos::dyn_cast<CScalarProjectElement>(pexpr->Pop());
 	CColRef *pcrComputedCol = popScPrEl->Pcr();
 
-	CColRefSet *pcrsUsed = pexpr->DeriveUsedColumns();
+	gpos::pointer<CColRefSet *> pcrsUsed = pexpr->DeriveUsedColumns();
 	if (nullptr != pcrsUsed && 0 < pcrsUsed->Size())
 	{
 		BOOL fres GPOS_ASSERTS_ONLY = m_phmcrcrs->Insert(

@@ -12,6 +12,7 @@
 #define GPOPT_CXformProject2ComputeScalar_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/xforms/CXformImplementation.h"
@@ -66,8 +67,9 @@ public:
 	}
 
 	// actual transform
-	void Transform(CXformContext *, CXformResult *,
-				   CExpression *) const override;
+	void Transform(gpos::pointer<CXformContext *>,
+				   gpos::pointer<CXformResult *>,
+				   gpos::pointer<CExpression *>) const override;
 
 };	// class CXformProject2ComputeScalar
 

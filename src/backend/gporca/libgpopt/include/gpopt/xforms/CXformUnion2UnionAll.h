@@ -18,6 +18,7 @@
 #define GPOPT_CXformUnion2UnionAll_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformExploration.h"
 
@@ -67,8 +68,9 @@ public:
 	}
 
 	// actual transform
-	void Transform(CXformContext *, CXformResult *,
-				   CExpression *) const override;
+	void Transform(gpos::pointer<CXformContext *>,
+				   gpos::pointer<CXformResult *>,
+				   gpos::pointer<CExpression *>) const override;
 
 };	// class CXformUnion2UnionAll
 

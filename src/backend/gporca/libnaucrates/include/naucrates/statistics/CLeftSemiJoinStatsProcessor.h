@@ -23,7 +23,7 @@ public:
 	static CStatistics *CalcLSJoinStatsStatic(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> outer_stats,
 		gpos::pointer<const IStatistics *> inner_side_stats,
-		CStatsPredJoinArray *join_preds_stats);
+		gpos::pointer<CStatsPredJoinArray *> join_preds_stats);
 };
 }  // namespace gpnaucrates
 

@@ -64,14 +64,16 @@ CXformImplementDML::Exfp(CExpressionHandle &  // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementDML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							  CExpression *pexpr) const
+CXformImplementDML::Transform(gpos::pointer<CXformContext *> pxfctxt,
+							  gpos::pointer<CXformResult *> pxfres,
+							  gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDML *popDML = CLogicalDML::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalDML *> popDML =
+		gpos::dyn_cast<CLogicalDML>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
@@ -100,11 +102,12 @@ CXformImplementDML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
-			CPhysicalDML(mp, edmlop, ptabdesc, pdrgpcrSource, pbsModified,
+			CPhysicalDML(mp, edmlop, std::move(ptabdesc),
+						 std::move(pdrgpcrSource), std::move(pbsModified),
 						 pcrAction, pcrTableOid, pcrCtid, pcrSegmentId, fSplit),
-		pexprChild);
+		std::move(pexprChild));
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 // EOF

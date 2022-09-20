@@ -41,11 +41,11 @@ public:
 	explicit CLogicalExternalGet(CMemoryPool *mp);
 
 	CLogicalExternalGet(CMemoryPool *mp, const CName *pnameAlias,
-						CTableDescriptor *ptabdesc);
+						gpos::owner<CTableDescriptor *> ptabdesc);
 
 	CLogicalExternalGet(CMemoryPool *mp, const CName *pnameAlias,
-						CTableDescriptor *ptabdesc,
-						CColRefArray *pdrgpcrOutput);
+						gpos::owner<CTableDescriptor *> ptabdesc,
+						gpos::owner<CColRefArray *> pdrgpcrOutput);
 
 	// ident accessors
 	EOperatorId
@@ -62,11 +62,11 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	PcrsStat(CMemoryPool *,				   // mp,
 			 CExpressionHandle &,		   // exprhdl
 			 gpos::pointer<CColRefSet *>,  // pcrsInput
@@ -90,7 +90,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------

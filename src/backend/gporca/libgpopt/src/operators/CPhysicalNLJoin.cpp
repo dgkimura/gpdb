@@ -68,7 +68,8 @@ CPhysicalNLJoin::~CPhysicalNLJoin() = default;
 //---------------------------------------------------------------------------
 gpos::owner<COrderSpec *>
 CPhysicalNLJoin::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 COrderSpec *posInput, ULONG child_index,
+							 gpos::pointer<COrderSpec *> posInput,
+							 ULONG child_index,
 							 gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
 							 ULONG							   // ulOptReq
 ) const
@@ -96,8 +97,9 @@ CPhysicalNLJoin::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::owner<CRewindabilitySpec *>
 CPhysicalNLJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CRewindabilitySpec *prsRequired, ULONG child_index,
-							 CDrvdPropArray *pdrgpdpCtxt,
+							 gpos::pointer<CRewindabilitySpec *> prsRequired,
+							 ULONG child_index,
+							 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
 							 ULONG	// ulOptReq
 ) const
 {
@@ -115,8 +117,9 @@ CPhysicalNLJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				CRewindabilitySpec::ErtRewindable, prsRequired->Emht(), true);
 		}
 
-		CRewindabilitySpec *prsOuter =
-			CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0 /*outer child*/])->Prs();
+		gpos::pointer<CRewindabilitySpec *> prsOuter =
+			gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0 /*outer child*/])
+				->Prs();
 		CRewindabilitySpec::EMotionHazardType motion_hazard =
 			GPOS_FTRACE(EopttraceMotionHazardHandling) &&
 					(prsOuter->HasMotionHazard() ||
@@ -141,9 +144,10 @@ CPhysicalNLJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required output columns of n-th child
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CColRefSet *pcrsRequired, ULONG child_index,
+							  gpos::pointer<CColRefSet *> pcrsRequired,
+							  ULONG child_index,
 							  gpos::pointer<CDrvdPropArray *>,	// pdrgpdpCtxt
 							  ULONG								// ulOptReq
 )
@@ -160,7 +164,8 @@ CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// so we can use the outer refs of the inner child as required from outer child
 	if (0 == child_index)
 	{
-		CColRefSet *outer_refs = exprhdl.DeriveOuterReferences(1);
+		gpos::pointer<CColRefSet *> outer_refs =
+			exprhdl.DeriveOuterReferences(1);
 		pcrs->Include(outer_refs);
 	}
 
@@ -170,7 +175,7 @@ CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		pcrs->Include(PdrgPcrInner());
 	}
 
-	CColRefSet *pcrsReqd =
+	gpos::owner<CColRefSet *> pcrsReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, 2 /*ulScalarIndex*/);
 	pcrs->Release();
 

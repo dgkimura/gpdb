@@ -132,16 +132,19 @@ public:
 	CMDRelationGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 					BOOL is_temp_table, Erelstoragetype rel_storage_type,
 					Ereldistrpolicy rel_distr_policy,
-					CMDColumnArray *mdcol_array, ULongPtrArray *distr_col_array,
+					gpos::owner<CMDColumnArray *> mdcol_array,
+					gpos::owner<ULongPtrArray *> distr_col_array,
 					gpos::Ref<IMdIdArray> distr_opfamilies,
-					ULongPtrArray *partition_cols_array,
-					CharPtrArray *str_part_types_array, ULONG num_of_partitions,
+					gpos::owner<ULongPtrArray *> partition_cols_array,
+					gpos::owner<CharPtrArray *> str_part_types_array,
+					ULONG num_of_partitions,
 					gpos::Ref<IMdIdArray> partition_oids,
-					BOOL convert_hash_to_random, ULongPtr2dArray *keyset_array,
-					CMDIndexInfoArray *md_index_info_array,
+					BOOL convert_hash_to_random,
+					gpos::owner<ULongPtr2dArray *> keyset_array,
+					gpos::owner<CMDIndexInfoArray *> md_index_info_array,
 					gpos::Ref<IMdIdArray> mdid_triggers_array,
 					gpos::Ref<IMdIdArray> mdid_check_constraint_array,
-					CDXLNode *mdpart_constraint);
+					gpos::owner<CDXLNode *> mdpart_constraint);
 
 	// dtor
 	~CMDRelationGPDB() override;

@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarOpExpr.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -59,12 +61,12 @@ CParseHandlerScalarOpExpr::StartElement(const XMLCh *const element_uri,
 		(nullptr == m_dxl_node))
 	{
 		// parse and create scalar OpExpr
-		CDXLScalarOpExpr *dxl_op =
-			(CDXLScalarOpExpr *) CDXLOperatorFactory::MakeDXLOpExpr(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+		gpos::owner<CDXLScalarOpExpr *> dxl_op =
+			gpos::cast<CDXLScalarOpExpr>(CDXLOperatorFactory::MakeDXLOpExpr(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 		// construct node from the created child nodes
-		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 	}
 	else if (nullptr != m_dxl_node)
 	{

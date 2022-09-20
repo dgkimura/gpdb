@@ -12,6 +12,7 @@
 #define GPOPT_CXformJoinAssociativity_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformExploration.h"
 
@@ -31,9 +32,10 @@ class CXformJoinAssociativity : public CXformExploration
 {
 private:
 	// helper function for creating the new join predicate
-	static void CreatePredicates(CMemoryPool *mp, CExpression *pexpr,
-								 CExpressionArray *pdrgpexprLower,
-								 CExpressionArray *pdrgpexprUpper);
+	static void CreatePredicates(
+		CMemoryPool *mp, CExpression *pexpr,
+		gpos::pointer<CExpressionArray *> pdrgpexprLower,
+		gpos::pointer<CExpressionArray *> pdrgpexprUpper);
 
 public:
 	CXformJoinAssociativity(const CXformJoinAssociativity &) = delete;
@@ -62,8 +64,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::pointer<CXformContext *> pxfctxt,
+				   gpos::pointer<CXformResult *> pxfres,
+				   gpos::pointer<CExpression *> pexpr) const override;
 
 };	// class CXformJoinAssociativity
 

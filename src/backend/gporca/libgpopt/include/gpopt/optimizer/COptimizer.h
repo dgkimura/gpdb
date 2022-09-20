@@ -50,32 +50,39 @@ private:
 	static void HandleExceptionAfterFinalizingMinidump(CException &ex);
 
 	// optimize query in the given query context
-	static CExpression *PexprOptimize(CMemoryPool *mp, CQueryContext *pqc,
-									  CSearchStageArray *search_stage_array);
+	static gpos::owner<CExpression *> PexprOptimize(
+		CMemoryPool *mp, CQueryContext *pqc,
+		gpos::owner<CSearchStageArray *> search_stage_array);
 
 	// translate an optimizer expression into a DXL tree
 	static CDXLNode *CreateDXLNode(CMemoryPool *mp, CMDAccessor *md_accessor,
 								   CExpression *pexpr,
 								   CColRefArray *colref_array,
-								   CMDNameArray *pdrgpmdname, ULONG ulHosts);
+								   gpos::pointer<CMDNameArray *> pdrgpmdname,
+								   ULONG ulHosts);
 
 	// helper function to print query expression
-	static void PrintQuery(CMemoryPool *mp, CExpression *pexprTranslated,
+	static void PrintQuery(CMemoryPool *mp,
+						   gpos::pointer<CExpression *> pexprTranslated,
 						   CQueryContext *pqc);
 
 	// helper function to print query plan
-	static void PrintPlan(CMemoryPool *mp, CExpression *pexprPlan);
+	static void PrintPlan(CMemoryPool *mp,
+						  gpos::pointer<CExpression *> pexprPlan);
 
 	// helper function to dump plan samples
-	static void DumpSamples(CMemoryPool *mp, CEnumeratorConfig *pec,
+	static void DumpSamples(CMemoryPool *mp,
+							gpos::pointer<CEnumeratorConfig *> pec,
 							ULONG ulSessionId, ULONG ulCmdId);
 
 	// print query or plan tree
-	static void PrintQueryOrPlan(CMemoryPool *mp, CExpression *pexpr,
+	static void PrintQueryOrPlan(CMemoryPool *mp,
+								 gpos::pointer<CExpression *> pexpr,
 								 CQueryContext *pqc = nullptr);
 
 	// Check for a plan with CTE, if both CTEProducer and CTEConsumer are executed on the same locality.
-	static void CheckCTEConsistency(CMemoryPool *mp, CExpression *pexpr);
+	static void CheckCTEConsistency(CMemoryPool *mp,
+									gpos::pointer<CExpression *> pexpr);
 
 public:
 	// main optimizer function

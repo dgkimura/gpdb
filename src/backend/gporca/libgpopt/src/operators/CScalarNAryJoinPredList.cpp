@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarNAryJoinPredList.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 
 using namespace gpopt;
@@ -39,7 +40,7 @@ CScalarNAryJoinPredList::CScalarNAryJoinPredList(CMemoryPool *mp) : CScalar(mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarNAryJoinPredList::Matches(COperator *pop) const
+CScalarNAryJoinPredList::Matches(gpos::pointer<COperator *> pop) const
 {
 	return (pop->Eopid() == Eopid());
 }

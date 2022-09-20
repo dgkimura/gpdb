@@ -31,9 +31,12 @@ FORCE_GENERATE_DBGSTR(CPropConstraint);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPropConstraint::CPropConstraint(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
-								 CConstraint *pcnstr)
-	: m_pdrgpcrs(pdrgpcrs), m_phmcrcrs(nullptr), m_pcnstr(pcnstr)
+CPropConstraint::CPropConstraint(CMemoryPool *mp,
+								 gpos::owner<CColRefSetArray *> pdrgpcrs,
+								 gpos::owner<CConstraint *> pcnstr)
+	: m_pdrgpcrs(std::move(pdrgpcrs)),
+	  m_phmcrcrs(nullptr),
+	  m_pcnstr(std::move(pcnstr))
 {
 	GPOS_ASSERT(nullptr != m_pdrgpcrs);
 	InitHashMap(mp);
@@ -110,16 +113,16 @@ CPropConstraint::FContradiction() const
 //		on its equivalent columns
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CPropConstraint::PexprScalarMappedFromEquivCols(
 	CMemoryPool *mp, CColRef *colref,
-	CPropConstraint *constraintsForOuterRefs) const
+	gpos::pointer<CPropConstraint *> constraintsForOuterRefs) const
 {
 	if (nullptr == m_pcnstr || nullptr == m_phmcrcrs)
 	{
 		return nullptr;
 	}
-	CColRefSet *pcrs = m_phmcrcrs->Find(colref);
+	gpos::pointer<CColRefSet *> pcrs = m_phmcrcrs->Find(colref);
 	gpos::owner<CColRefSet *> equivOuterRefs = nullptr;
 
 	if (nullptr != constraintsForOuterRefs &&
@@ -147,7 +150,7 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 
 	// local constraints on the equivalent column(s)
 	gpos::owner<CConstraint *> pcnstr = m_pcnstr->Pcnstr(mp, pcrsEquiv);
-	CConstraint *pcnstrFromOuterRefs = nullptr;
+	gpos::owner<CConstraint *> pcnstrFromOuterRefs = nullptr;
 
 	if (nullptr != constraintsForOuterRefs &&
 		nullptr != constraintsForOuterRefs->m_pcnstr)
@@ -217,7 +220,7 @@ CPropConstraint::OsPrint(IOstream &os) const
 
 		for (ULONG ul = 0; ul < length; ul++)
 		{
-			CColRefSet *pcrs = (*m_pdrgpcrs)[ul];
+			gpos::pointer<CColRefSet *> pcrs = (*m_pdrgpcrs)[ul];
 			os << "(" << *pcrs << ") ";
 		}
 

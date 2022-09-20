@@ -13,6 +13,7 @@
 #define GPMD_IMDCheckConstraint_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "naucrates/md/IMDCacheObject.h"
@@ -52,7 +53,7 @@ public:
 	// the scalar expression of the check constraint
 	virtual CExpression *GetCheckConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CColRefArray *colref_array) const = 0;
+		gpos::pointer<CColRefArray *> colref_array) const = 0;
 };
 }  // namespace gpmd
 

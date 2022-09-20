@@ -30,16 +30,17 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-COptimizerConfig::COptimizerConfig(CEnumeratorConfig *pec,
-								   CStatisticsConfig *stats_config,
-								   CCTEConfig *pcteconf, ICostModel *cost_model,
-								   CHint *phint, CWindowOids *pwindowoids)
-	: m_enumerator_cfg(pec),
-	  m_stats_conf(stats_config),
-	  m_cte_conf(pcteconf),
-	  m_cost_model(cost_model),
-	  m_hint(phint),
-	  m_window_oids(pwindowoids)
+COptimizerConfig::COptimizerConfig(
+	gpos::owner<CEnumeratorConfig *> pec,
+	gpos::owner<CStatisticsConfig *> stats_config,
+	gpos::owner<CCTEConfig *> pcteconf, gpos::owner<ICostModel *> cost_model,
+	gpos::owner<CHint *> phint, gpos::owner<CWindowOids *> pwindowoids)
+	: m_enumerator_cfg(std::move(pec)),
+	  m_stats_conf(std::move(stats_config)),
+	  m_cte_conf(std::move(pcteconf)),
+	  m_cost_model(std::move(cost_model)),
+	  m_hint(std::move(phint)),
+	  m_window_oids(std::move(pwindowoids))
 {
 	GPOS_ASSERT(nullptr != m_enumerator_cfg);
 	GPOS_ASSERT(nullptr != m_stats_conf);
@@ -94,15 +95,15 @@ COptimizerConfig::PoconfDefault(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 gpos::owner<COptimizerConfig *>
-COptimizerConfig::PoconfDefault(CMemoryPool *mp, ICostModel *pcm)
+COptimizerConfig::PoconfDefault(CMemoryPool *mp, gpos::owner<ICostModel *> pcm)
 {
 	GPOS_ASSERT(nullptr != pcm);
 
 	return GPOS_NEW(mp) COptimizerConfig(
 		GPOS_NEW(mp) CEnumeratorConfig(mp, 0 /*plan_id*/, 0 /*ullSamples*/),
 		CStatisticsConfig::PstatsconfDefault(mp),
-		CCTEConfig::PcteconfDefault(mp), pcm, CHint::PhintDefault(mp),
-		CWindowOids::GetWindowOids(mp));
+		CCTEConfig::PcteconfDefault(mp), std::move(pcm),
+		CHint::PhintDefault(mp), CWindowOids::GetWindowOids(mp));
 }
 
 //---------------------------------------------------------------------------
@@ -115,7 +116,7 @@ COptimizerConfig::PoconfDefault(CMemoryPool *mp, ICostModel *pcm)
 //---------------------------------------------------------------------------
 void
 COptimizerConfig::Serialize(CMemoryPool *mp, CXMLSerializer *xml_serializer,
-							CBitSet *pbsTrace) const
+							gpos::pointer<CBitSet *> pbsTrace) const
 {
 	GPOS_ASSERT(nullptr != xml_serializer);
 	GPOS_ASSERT(nullptr != pbsTrace);

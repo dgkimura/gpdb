@@ -89,7 +89,9 @@ CDistributionSpecSingleton::FSatisfies(
 	}
 
 	return (EdtSingleton == pds->Edt() &&
-			m_est == ((CDistributionSpecSingleton *) pds)->Est());
+			m_est == (const_cast<CDistributionSpecSingleton *>(
+						  gpos::cast<CDistributionSpecSingleton>(pds)))
+						 ->Est());
 }
 
 
@@ -102,11 +104,12 @@ CDistributionSpecSingleton::FSatisfies(
 //
 //---------------------------------------------------------------------------
 void
-CDistributionSpecSingleton::AppendEnforcers(CMemoryPool *mp,
-											CExpressionHandle &,  // exprhdl
-											CReqdPropPlan *prpp,
-											CExpressionArray *pdrgpexpr,
-											CExpression *pexpr)
+CDistributionSpecSingleton::AppendEnforcers(
+	CMemoryPool *mp,
+	CExpressionHandle &,  // exprhdl
+	gpos::pointer<CReqdPropPlan *> prpp,
+	gpos::pointer<CExpressionArray *> pdrgpexpr,
+	gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);
@@ -136,8 +139,9 @@ CDistributionSpecSingleton::AppendEnforcers(CMemoryPool *mp,
 		pexpr->AddRef();
 
 		gpos::owner<CExpression *> pexprGatherMerge = GPOS_NEW(mp) CExpression(
-			mp, GPOS_NEW(mp) CPhysicalMotionGather(mp, m_est, pos), pexpr);
-		pdrgpexpr->Append(pexprGatherMerge);
+			mp, GPOS_NEW(mp) CPhysicalMotionGather(mp, m_est, std::move(pos)),
+			pexpr);
+		pdrgpexpr->Append(std::move(pexprGatherMerge));
 	}
 }
 

@@ -72,9 +72,10 @@ public:
 
 	// ctor/dtor
 	CDXLScalarSubPlan(CMemoryPool *mp, gpos::Ref<IMDId> first_col_type_mdid,
-					  CDXLColRefArray *dxl_colref_array,
+					  gpos::owner<CDXLColRefArray *> dxl_colref_array,
 					  EdxlSubPlanType dxl_subplan_type,
-					  CDXLNode *dxlnode_test_expr, BOOL outer_param = false);
+					  gpos::owner<CDXLNode *> dxlnode_test_expr,
+					  BOOL outer_param = false);
 
 	~CDXLScalarSubPlan() override;
 

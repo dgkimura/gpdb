@@ -68,14 +68,18 @@ public:
 	// ctors
 
 	explicit CDXLNode(CMemoryPool *mp);
-	CDXLNode(CMemoryPool *mp, CDXLOperator *dxl_op);
-	CDXLNode(CMemoryPool *mp, CDXLOperator *dxl_op, CDXLNode *child_dxlnode);
-	CDXLNode(CMemoryPool *mp, CDXLOperator *dxl_op,
-			 CDXLNode *first_child_dxlnode, CDXLNode *second_child_dxlnode);
-	CDXLNode(CMemoryPool *mp, CDXLOperator *dxl_op,
-			 CDXLNode *first_child_dxlnode, CDXLNode *second_child_dxlnode,
-			 CDXLNode *third_child_dxlnode);
-	CDXLNode(CDXLOperator *dxl_op, CDXLNodeArray *dxl_array);
+	CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op);
+	CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op,
+			 gpos::owner<CDXLNode *> child_dxlnode);
+	CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op,
+			 gpos::owner<CDXLNode *> first_child_dxlnode,
+			 gpos::owner<CDXLNode *> second_child_dxlnode);
+	CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op,
+			 gpos::owner<CDXLNode *> first_child_dxlnode,
+			 gpos::owner<CDXLNode *> second_child_dxlnode,
+			 gpos::owner<CDXLNode *> third_child_dxlnode);
+	CDXLNode(gpos::owner<CDXLOperator *> dxl_op,
+			 gpos::owner<CDXLNodeArray *> dxl_array);
 
 	// dtor
 	~CDXLNode() override;
@@ -126,23 +130,23 @@ public:
 	}
 
 	// setters
-	void AddChild(CDXLNode *child_dxlnode);
+	void AddChild(gpos::owner<CDXLNode *> child_dxlnode);
 
-	void SetOperator(CDXLOperator *dxl_op);
+	void SetOperator(gpos::owner<CDXLOperator *> dxl_op);
 
 	void SerializeToDXL(CXMLSerializer *) const;
 
 	// replace a given child of this DXL node with the given node
-	void ReplaceChild(ULONG idx, CDXLNode *child_dxlnode);
+	void ReplaceChild(ULONG idx, gpos::owner<CDXLNode *> child_dxlnode);
 
 	void SerializeChildrenToDXL(CXMLSerializer *xml_serializer) const;
 
 	// setter
-	void SetProperties(CDXLProperties *dxl_properties);
+	void SetProperties(gpos::owner<CDXLProperties *> dxl_properties);
 
 	// setter for direct dispatch info
 	void SetDirectDispatchInfo(
-		CDXLDirectDispatchInfo *dxl_direct_dispatch_info);
+		gpos::owner<CDXLDirectDispatchInfo *> dxl_direct_dispatch_info);
 
 	// serialize properties in DXL format
 	void SerializePropertiesToDXL(CXMLSerializer *xml_serializer) const;

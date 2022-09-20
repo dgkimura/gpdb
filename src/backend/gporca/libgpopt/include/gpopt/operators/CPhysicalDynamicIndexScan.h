@@ -46,11 +46,13 @@ public:
 	CPhysicalDynamicIndexScan(const CPhysicalDynamicIndexScan &) = delete;
 
 	// ctors
-	CPhysicalDynamicIndexScan(CMemoryPool *mp, CIndexDescriptor *pindexdesc,
-							  CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
-							  const CName *pnameAlias,
+	CPhysicalDynamicIndexScan(CMemoryPool *mp,
+							  gpos::owner<CIndexDescriptor *> pindexdesc,
+							  gpos::owner<CTableDescriptor *> ptabdesc,
+							  ULONG ulOriginOpId, const CName *pnameAlias,
 							  CColRefArray *pdrgpcrOutput, ULONG scan_id,
-							  CColRef2dArray *pdrgpdrgpcrPart, COrderSpec *pos,
+							  gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart,
+							  gpos::owner<COrderSpec *> pos,
 							  IMdIdArray *partition_mdids,
 							  ColRefToUlongMapArray *root_col_mapping_per_part);
 
@@ -83,7 +85,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
@@ -122,9 +124,10 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// statistics derivation during costing
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CReqdPropPlan *prpplan,
-							  IStatisticsArray *stats_ctxt) const override;
+	IStatistics *PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CReqdPropPlan *> prpplan,
+		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
 
 };	// class CPhysicalDynamicIndexScan
 

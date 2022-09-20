@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/md/CMDIdRelStats.h"
@@ -117,7 +118,8 @@ public:
 #endif
 
 	// dummy relstats
-	static CDXLRelStats *CreateDXLDummyRelStats(CMemoryPool *mp, IMDId *mdid);
+	static gpos::owner<CDXLRelStats *> CreateDXLDummyRelStats(CMemoryPool *mp,
+															  IMDId *mdid);
 };
 
 }  // namespace gpmd

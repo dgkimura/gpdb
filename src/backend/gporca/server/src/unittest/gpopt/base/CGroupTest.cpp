@@ -43,17 +43,17 @@ CGroupTest::EresUnittest()
 }
 
 
-static CExpression *
+static gpos::owner<CExpression *>
 InsertGroupIntoMemo(CMemo *pmemo, CMemoryPool *mp)
 {
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
 	pexprGet->Pop()->AddRef();
 	gpos::owner<CGroupExpression *> pgexpr = GPOS_NEW(mp)
 		CGroupExpression(mp, pexprGet->Pop(), GPOS_NEW(mp) CGroupArray(mp),
 						 CXform::ExfInvalid /*exfidOrigin*/,
 						 nullptr /*pgexprOrigin*/, false /*fIntermediate*/);
 
-	pmemo->PgroupInsert(nullptr, pexprGet, pgexpr);
+	pmemo->PgroupInsert(nullptr, pexprGet, std::move(pgexpr));
 
 	return pexprGet;
 }

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarDMLAction.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -32,7 +33,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarDMLAction::Matches(COperator *pop) const
+CScalarDMLAction::Matches(gpos::pointer<COperator *> pop) const
 {
 	return pop->Eopid() == Eopid();
 }

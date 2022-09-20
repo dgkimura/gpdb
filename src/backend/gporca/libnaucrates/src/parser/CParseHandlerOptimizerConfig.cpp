@@ -215,8 +215,8 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 	GPOS_ASSERT(nullptr != pwindowoidsGPDB);
 	pwindowoidsGPDB->AddRef();
 
-	ICostModel *pcm = nullptr;
-	CHint *phint = nullptr;
+	gpos::owner<ICostModel *> pcm = nullptr;
+	gpos::owner<CHint *> phint = nullptr;
 	if (5 == this->Length())
 	{
 		// no cost model: use default one
@@ -246,7 +246,8 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 	}
 
 	m_optimizer_config = GPOS_NEW(m_mp) COptimizerConfig(
-		pec, stats_config, pcteconfig, pcm, phint, pwindowoidsGPDB);
+		std::move(pec), std::move(stats_config), std::move(pcteconfig),
+		std::move(pcm), std::move(phint), pwindowoidsGPDB);
 
 	CParseHandlerTraceFlags *pphTraceFlags =
 		dynamic_cast<CParseHandlerTraceFlags *>((*this)[this->Length() - 1]);

@@ -52,9 +52,10 @@ CXformImplementSequenceProject::CXformImplementSequenceProject(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementSequenceProject::Transform(CXformContext *pxfctxt,
-										  CXformResult *pxfres,
-										  CExpression *pexpr) const
+CXformImplementSequenceProject::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -71,8 +72,8 @@ CXformImplementSequenceProject::Transform(CXformContext *pxfctxt,
 	pexprScalar->AddRef();
 
 	// extract members of logical sequence project operator
-	CLogicalSequenceProject *popLogicalSequenceProject =
-		CLogicalSequenceProject::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalSequenceProject *> popLogicalSequenceProject =
+		gpos::dyn_cast<CLogicalSequenceProject>(pexpr->Pop());
 	CDistributionSpec *pds = popLogicalSequenceProject->Pds();
 	COrderSpecArray *pdrgpos = popLogicalSequenceProject->Pdrgpos();
 	CWindowFrameArray *pdrgpwf = popLogicalSequenceProject->Pdrgpwf();
@@ -86,7 +87,7 @@ CXformImplementSequenceProject::Transform(CXformContext *pxfctxt,
 		pexprRelational, pexprScalar);
 
 	// add alternative to results
-	pxfres->Add(pexprSequenceProject);
+	pxfres->Add(std::move(pexprSequenceProject));
 }
 
 

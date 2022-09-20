@@ -48,7 +48,8 @@ public:
 	CStatsPredLike(const CStatsPredLike &) = delete;
 
 	// ctor
-	CStatsPredLike(ULONG colid, CExpression *expr_left, CExpression *expr_right,
+	CStatsPredLike(ULONG colid, gpos::owner<CExpression *> expr_left,
+				   gpos::owner<CExpression *> expr_right,
 				   CDouble default_scale_factor);
 
 	// dtor

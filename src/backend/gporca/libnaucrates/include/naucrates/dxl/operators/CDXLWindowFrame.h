@@ -69,7 +69,8 @@ public:
 	// ctor
 	CDXLWindowFrame(EdxlFrameSpec edxlfs,
 					EdxlFrameExclusionStrategy frame_exc_strategy,
-					CDXLNode *dxlnode_leading, CDXLNode *dxlnode_trailing);
+					gpos::owner<CDXLNode *> dxlnode_leading,
+					gpos::owner<CDXLNode *> dxlnode_trailing);
 
 	//dtor
 	~CDXLWindowFrame() override;

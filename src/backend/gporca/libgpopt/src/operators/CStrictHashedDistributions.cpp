@@ -11,15 +11,16 @@
 using namespace gpopt;
 
 CStrictHashedDistributions::CStrictHashedDistributions(
-	CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-	CColRef2dArray *pdrgpdrgpcrInput)
+	CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrOutput,
+	gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput)
 	: CDistributionSpecArray(mp)
 {
 	const ULONG num_cols = pdrgpcrOutput->Size();
 	const ULONG arity = pdrgpdrgpcrInput->Size();
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
-		CColRefArray *colref_array = (*pdrgpdrgpcrInput)[ulChild];
+		gpos::pointer<CColRefArray *> colref_array =
+			(*pdrgpdrgpcrInput)[ulChild];
 		gpos::owner<CExpressionArray *> pdrgpexpr =
 			GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
@@ -27,7 +28,8 @@ CStrictHashedDistributions::CStrictHashedDistributions(
 			CColRef *colref = (*colref_array)[ulCol];
 			if (colref->RetrieveType()->IsRedistributable())
 			{
-				CExpression *pexpr = CUtils::PexprScalarIdent(mp, colref);
+				gpos::owner<CExpression *> pexpr =
+					CUtils::PexprScalarIdent(mp, colref);
 				pdrgpexpr->Append(pexpr);
 			}
 		}

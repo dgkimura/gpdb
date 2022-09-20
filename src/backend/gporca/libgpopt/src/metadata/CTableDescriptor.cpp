@@ -148,7 +148,7 @@ CTableDescriptor::GetAttributePosition(INT attno) const
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CColumnDescriptor *pcoldesc = (*m_pdrgpcoldesc)[ul];
+		gpos::pointer<CColumnDescriptor *> pcoldesc = (*m_pdrgpcoldesc)[ul];
 		if (pcoldesc->AttrNum() == attno)
 		{
 			ulPos = ul;
@@ -168,11 +168,11 @@ CTableDescriptor::GetAttributePosition(INT attno) const
 //
 //---------------------------------------------------------------------------
 void
-CTableDescriptor::AddColumn(CColumnDescriptor *pcoldesc)
+CTableDescriptor::AddColumn(gpos::owner<CColumnDescriptor *> pcoldesc)
 {
 	GPOS_ASSERT(nullptr != pcoldesc);
 
-	m_pdrgpcoldesc->Append(pcoldesc);
+	m_pdrgpcoldesc->Append(std::move(pcoldesc));
 }
 
 //---------------------------------------------------------------------------
@@ -226,7 +226,7 @@ CTableDescriptor::AddPartitionColumn(ULONG ulPos)
 //
 //---------------------------------------------------------------------------
 BOOL
-CTableDescriptor::FAddKeySet(CBitSet *pbs)
+CTableDescriptor::FAddKeySet(gpos::owner<CBitSet *> pbs)
 {
 	GPOS_ASSERT(nullptr != pbs);
 	GPOS_ASSERT(pbs->Size() <= m_pdrgpcoldesc->Size());
@@ -235,7 +235,7 @@ CTableDescriptor::FAddKeySet(CBitSet *pbs)
 	BOOL fFound = false;
 	for (ULONG ul = 0; !fFound && ul < size; ul++)
 	{
-		CBitSet *pbsCurrent = (*m_pdrgpbsKeys)[ul];
+		gpos::pointer<CBitSet *> pbsCurrent = (*m_pdrgpbsKeys)[ul];
 		fFound = pbsCurrent->Equals(pbs);
 	}
 

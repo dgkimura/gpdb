@@ -48,19 +48,19 @@ private:
 	gpos::owner<CDistributionSpecArray *> m_pdrgpdsRedistributeRequests;
 
 	// compute a distribution matching the distribution delivered by given child
-	gpos::owner<CDistributionSpec *> PdsMatch(CMemoryPool *mp,
-											  CDistributionSpec *pds,
-											  ULONG ulSourceChildIndex) const;
+	gpos::owner<CDistributionSpec *> PdsMatch(
+		CMemoryPool *mp, gpos::pointer<CDistributionSpec *> pds,
+		ULONG ulSourceChildIndex) const;
 
 protected:
 	// compute required hashed distribution from the n-th child
 	gpos::owner<CDistributionSpecHashed *> PdshashedRequired(
 		CMemoryPool *mp, ULONG child_index, ULONG ulReqIndex) const;
 	// create (redistribute, redistribute) optimization request
-	CDistributionSpec *PdsRequiredRedistribute(
+	gpos::owner<CDistributionSpec *> PdsRequiredRedistribute(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) const;
 
 	// create the set of redistribute requests to send to first hash join child
 	void CreateHashRedistributeRequests(CMemoryPool *mp);
@@ -69,34 +69,38 @@ private:
 	// create (non-singleton, replicate) optimization request
 	gpos::owner<CDistributionSpec *> PdsRequiredReplicate(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CDistributionSpec *pdsInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq, CReqdPropPlan *prppInput);
+		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq,
+		gpos::pointer<CReqdPropPlan *> prppInput);
 
 	// create a child hashed distribution request based on input hashed distribution,
 	// return NULL if no such request can be created
-	static CDistributionSpecHashed *PdshashedPassThru(
+	static gpos::owner<CDistributionSpecHashed *> PdshashedPassThru(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CDistributionSpecHashed *pdshashedInput, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq);
+		gpos::pointer<CDistributionSpecHashed *> pdshashedInput,
+		ULONG child_index, gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq);
 
 	// check whether a hash key is nullable
-	BOOL FNullableHashKey(ULONG ulKey, CColRefSet *pcrsNotNullInner,
+	BOOL FNullableHashKey(ULONG ulKey,
+						  gpos::pointer<CColRefSet *> pcrsNotNullInner,
 						  BOOL fInner) const;
 
 protected:
 	// helper for computing a hashed distribution matching the given distribution
 	gpos::owner<CDistributionSpecHashed *> PdshashedMatching(
-		CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
+		CMemoryPool *mp, gpos::pointer<CDistributionSpecHashed *> pdshashed,
 		ULONG ulSourceChild) const;
 
 	// create (singleton, singleton) optimization request
 	gpos::owner<CDistributionSpec *> PdsRequiredSingleton(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt) const;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt) const;
 
 	// check whether the hash keys from one child are nullable
-	BOOL FNullableHashKeys(CColRefSet *pcrsNotNullInner, BOOL fInner) const;
+	BOOL FNullableHashKeys(gpos::pointer<CColRefSet *> pcrsNotNullInner,
+						   BOOL fInner) const;
 
 	ULONG
 	NumDistrReq() const
@@ -111,8 +115,9 @@ public:
 	CPhysicalHashJoin(const CPhysicalHashJoin &) = delete;
 
 	// ctor
-	CPhysicalHashJoin(CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-					  CExpressionArray *pdrgpexprInnerKeys,
+	CPhysicalHashJoin(CMemoryPool *mp,
+					  gpos::owner<CExpressionArray *> pdrgpexprOuterKeys,
+					  gpos::owner<CExpressionArray *> pdrgpexprInnerKeys,
 					  gpos::Ref<IMdIdArray> hash_opfamilies,
 					  CXform::EXformId origin_xform = CXform::ExfSentinel);
 
@@ -147,7 +152,7 @@ public:
 	// compute required rewindability of the n-th child
 	gpos::owner<CRewindabilitySpec *> PrsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CRewindabilitySpec *prsRequired, ULONG child_index,
+		gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index,
 		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
 		ULONG ulOptReq) const override;
 
@@ -158,12 +163,10 @@ public:
 		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
 		ULONG ulOptReq) const override;
 
-	gpos::owner<CEnfdDistribution *> Ped(CMemoryPool *mp,
-										 CExpressionHandle &exprhdl,
-										 CReqdPropPlan *prppInput,
-										 ULONG child_index,
-										 CDrvdPropArray *pdrgpdpCtxt,
-										 ULONG ulDistrReq) override;
+	gpos::owner<CEnfdDistribution *> Ped(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulDistrReq) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties

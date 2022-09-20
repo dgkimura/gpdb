@@ -61,7 +61,7 @@ public:
 	// ctor
 	CDXLPhysicalPartitionSelector(CMemoryPool *mp, gpos::Ref<IMDId> mdid_rel,
 								  ULONG selector_id, ULONG scan_id,
-								  ULongPtrArray *parts);
+								  gpos::owner<ULongPtrArray *> parts);
 
 	// dtor
 	~CDXLPhysicalPartitionSelector() override;

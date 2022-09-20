@@ -135,7 +135,8 @@ CDXLScalarBooleanTest::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								   BOOL validate_children) const
 {
 	EdxlBooleanTestType dxl_bool_type =
-		((CDXLScalarBooleanTest *) dxlnode->GetOperator())->GetDxlBoolTypeStr();
+		(gpos::cast<CDXLScalarBooleanTest>(dxlnode->GetOperator()))
+			->GetDxlBoolTypeStr();
 
 	GPOS_ASSERT((EdxlbooleantestIsTrue == dxl_bool_type) ||
 				(EdxlbooleantestIsNotTrue == dxl_bool_type) ||
@@ -145,7 +146,7 @@ CDXLScalarBooleanTest::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 				(EdxlbooleantestIsNotUnknown == dxl_bool_type));
 
 	GPOS_ASSERT(1 == dxlnode->Arity());
-	CDXLNode *dxlnode_arg = (*dxlnode)[0];
+	gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeScalar ==
 				dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

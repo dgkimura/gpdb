@@ -42,7 +42,8 @@ public:
 
 	// ctors
 	explicit CDXLLogicalGroupBy(CMemoryPool *mp);
-	CDXLLogicalGroupBy(CMemoryPool *mp, ULongPtrArray *pdrgpulGrpColIds);
+	CDXLLogicalGroupBy(CMemoryPool *mp,
+					   gpos::owner<ULongPtrArray *> pdrgpulGrpColIds);
 
 	// dtor
 	~CDXLLogicalGroupBy() override;
@@ -53,7 +54,7 @@ public:
 	gpos::pointer<const ULongPtrArray *> GetGroupingColidArray() const;
 
 	// set grouping column indices
-	void SetGroupingColumns(ULongPtrArray *);
+	void SetGroupingColumns(gpos::owner<ULongPtrArray *>);
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

@@ -150,7 +150,7 @@ CParseHandlerScalarAssertConstraintList::EndElement(
 		gpos::owner<CDXLNode *> pdxlnAssertConstraint = GPOS_NEW(m_mp)
 			CDXLNode(m_mp, m_dxl_op_assert_constraint, child_dxlnode);
 		m_dxlnode_assert_constraints_parsed_array->Append(
-			pdxlnAssertConstraint);
+			std::move(pdxlnAssertConstraint));
 		m_dxl_op_assert_constraint = nullptr;
 	}
 	else

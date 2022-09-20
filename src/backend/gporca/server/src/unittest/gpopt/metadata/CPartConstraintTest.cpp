@@ -80,12 +80,14 @@ CPartConstraintTest::EresUnittest()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 	gpos::owner<CConstExprEvaluatorForDates *> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorForDates(mp);
 
 	// install opt context in TLS
-	CAutoOptCtxt aoc(mp, &mda, pceeval, CTestUtils::GetCostModel(mp));
+	CAutoOptCtxt aoc(mp, &mda, std::move(pceeval),
+					 CTestUtils::GetCostModel(mp));
 
 	return CUnittest::EresExecute(rgut, GPOS_ARRAY_SIZE(rgut));
 }
@@ -108,7 +110,8 @@ CPartConstraintTest::EresUnittest_Basic()
 	// setup an MD accessor
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
@@ -117,11 +120,11 @@ CPartConstraintTest::EresUnittest_Basic()
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier);
 
 	// create a constraint col \in [1,3)
-	CConstraint *pcnstr13 =
+	gpos::owner<CConstraint *> pcnstr13 =
 		PcnstrInterval(mp, colref, 1 /*ulLeft*/, 3 /*ulRight*/);
 
 	// create a constraint col \in [1,5)
-	CConstraint *pcnstr15 =
+	gpos::owner<CConstraint *> pcnstr15 =
 		PcnstrInterval(mp, colref, 1 /*ulLeft*/, 5 /*ulRight*/);
 
 	gpos::owner<CPartConstraint *> ppartcnstr13Default =
@@ -189,24 +192,26 @@ CPartConstraintTest::EresUnittest_Basic()
 //		Create an interval constraint for the given column and interval boundaries
 //
 //---------------------------------------------------------------------------
-CConstraint *
+gpos::owner<CConstraint *>
 CPartConstraintTest::PcnstrInterval(CMemoryPool *mp, CColRef *colref,
 									ULONG ulLeft, ULONG ulRight)
 {
-	CExpression *pexprConstLeft = CUtils::PexprScalarConstInt4(mp, ulLeft);
-	CExpression *pexprConstRight = CUtils::PexprScalarConstInt4(mp, ulRight);
+	gpos::owner<CExpression *> pexprConstLeft =
+		CUtils::PexprScalarConstInt4(mp, ulLeft);
+	gpos::owner<CExpression *> pexprConstRight =
+		CUtils::PexprScalarConstInt4(mp, ulRight);
 
 	// AND
 	gpos::owner<CExpressionArray *> pdrgpexpr =
 		GPOS_NEW(mp) CExpressionArray(mp);
-	pdrgpexpr->Append(
-		CUtils::PexprScalarCmp(mp, colref, pexprConstLeft, IMDType::EcmptGEq));
-	pdrgpexpr->Append(
-		CUtils::PexprScalarCmp(mp, colref, pexprConstRight, IMDType::EcmptL));
+	pdrgpexpr->Append(CUtils::PexprScalarCmp(
+		mp, colref, std::move(pexprConstLeft), IMDType::EcmptGEq));
+	pdrgpexpr->Append(CUtils::PexprScalarCmp(
+		mp, colref, std::move(pexprConstRight), IMDType::EcmptL));
 
-	gpos::owner<CExpression *> pexpr =
-		CUtils::PexprScalarBoolOp(mp, CScalarBoolOp::EboolopAnd, pdrgpexpr);
-	CConstraint *pcnstr =
+	gpos::owner<CExpression *> pexpr = CUtils::PexprScalarBoolOp(
+		mp, CScalarBoolOp::EboolopAnd, std::move(pdrgpexpr));
+	gpos::owner<CConstraint *> pcnstr =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexpr, colref);
 
 	pexpr->Release();
@@ -235,7 +240,8 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	// setup an MD accessor
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	gpos::pointer<const IMDType *> pmdtype =
 		mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
@@ -247,20 +253,22 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	// create a date interval: ['01-01-2012', '01-21-2012')
 	CWStringDynamic pstrLowerDate1(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate1(mp, wszInternalRepresentationFor2012_01_21);
-	CConstraintInterval *pciFirst = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
-		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
-		&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
-		CRange::EriExcluded);
+	gpos::owner<CConstraintInterval *> pciFirst =
+		CTestUtils::PciGenericInterval(
+			mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
+			lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
+			&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
+			CRange::EriExcluded);
 
 	// create a date interval: ['01-01-2012', '01-22-2012')
 	CWStringDynamic pstrLowerDate2(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate2(mp, wszInternalRepresentationFor2012_01_22);
-	CConstraintInterval *pciSecond = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate2,
-		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
-		&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
-		CRange::EriExcluded);
+	gpos::owner<CConstraintInterval *> pciSecond =
+		CTestUtils::PciGenericInterval(
+			mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate2,
+			lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
+			&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
+			CRange::EriExcluded);
 
 	gpos::owner<CPartConstraint *> ppartcnstr1Default =
 		GPOS_NEW(mp) CPartConstraint(mp, pciFirst, true /*fDefaultPartition*/,

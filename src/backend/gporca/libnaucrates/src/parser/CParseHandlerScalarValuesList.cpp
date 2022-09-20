@@ -44,7 +44,7 @@ CParseHandlerScalarValuesList::StartElement(
 	{
 		gpos::owner<CDXLScalarValuesList *> dxl_op =
 			GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
-		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 	}
 	else
 	{

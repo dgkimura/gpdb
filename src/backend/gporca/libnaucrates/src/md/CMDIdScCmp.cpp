@@ -26,10 +26,11 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdScCmp::CMDIdScCmp(CMDIdGPDB *left_mdid, CMDIdGPDB *right_mdid,
+CMDIdScCmp::CMDIdScCmp(gpos::owner<CMDIdGPDB *> left_mdid,
+					   gpos::owner<CMDIdGPDB *> right_mdid,
 					   IMDType::ECmpType cmp_type)
-	: m_mdid_left(left_mdid),
-	  m_mdid_right(right_mdid),
+	: m_mdid_left(std::move(left_mdid)),
+	  m_mdid_right(std::move(right_mdid)),
 	  m_comparision_type(cmp_type),
 	  m_str(m_mdid_array, GPOS_ARRAY_SIZE(m_mdid_array))
 {

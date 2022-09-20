@@ -68,67 +68,74 @@ private:
 						   BOOL fEqualityOnly);
 
 	// switch function for all operators
-	static BOOL FProcessOperator(CMemoryPool *mp, CExpression *pexpr,
+	static BOOL FProcessOperator(CMemoryPool *mp,
+								 gpos::pointer<CExpression *> pexpr,
 								 BOOL fEqualityOnly,
-								 CExpression **ppexprDecorrelated,
+								 gpos::owner<CExpression *> *ppexprDecorrelated,
 								 CExpressionArray *pdrgpexprCorrelations,
 								 CColRefSet *outerRefsToRemove);
 
 	// processor for predicates
-	static BOOL FProcessPredicate(CMemoryPool *mp, CExpression *pexprLogical,
-								  CExpression *pexprScalar, BOOL fEqualityOnly,
-								  CExpression **ppexprDecorrelated,
-								  CExpressionArray *pdrgpexprCorrelations,
-								  CColRefSet *outerRefsToRemove);
+	static BOOL FProcessPredicate(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprLogical,
+		gpos::pointer<CExpression *> pexprScalar, BOOL fEqualityOnly,
+		gpos::owner<CExpression *> *ppexprDecorrelated,
+		gpos::pointer<CExpressionArray *> pdrgpexprCorrelations,
+		gpos::pointer<CColRefSet *> outerRefsToRemove);
 
 	// processor for select operators
-	static BOOL FProcessSelect(CMemoryPool *mp, CExpression *pexpr,
+	static BOOL FProcessSelect(CMemoryPool *mp,
+							   gpos::pointer<CExpression *> pexpr,
 							   BOOL fEqualityOnly,
-							   CExpression **ppexprDecorrelated,
+							   gpos::owner<CExpression *> *ppexprDecorrelated,
 							   CExpressionArray *pdrgpexprCorrelations,
 							   CColRefSet *outerRefsToRemove);
 
 
 	// processor for aggregates
-	static BOOL FProcessGbAgg(CMemoryPool *mp, CExpression *pexpr,
+	static BOOL FProcessGbAgg(CMemoryPool *mp,
+							  gpos::pointer<CExpression *> pexpr,
 							  BOOL fEqualityOnly,
-							  CExpression **ppexprDecorrelated,
+							  gpos::owner<CExpression *> *ppexprDecorrelated,
 							  CExpressionArray *pdrgpexprCorrelations,
 							  CColRefSet *outerRefsToRemove);
 
 	// processor for joins (inner/n-ary)
-	static BOOL FProcessJoin(CMemoryPool *mp, CExpression *pexpr,
+	static BOOL FProcessJoin(CMemoryPool *mp,
+							 gpos::pointer<CExpression *> pexpr,
 							 BOOL fEqualityOnly,
-							 CExpression **ppexprDecorrelated,
+							 gpos::owner<CExpression *> *ppexprDecorrelated,
 							 CExpressionArray *pdrgpexprCorrelations,
 							 CColRefSet *outerRefsToRemove);
 
 
 	// processor for projects
-	static BOOL FProcessProject(CMemoryPool *mp, CExpression *pexpr,
+	static BOOL FProcessProject(CMemoryPool *mp,
+								gpos::pointer<CExpression *> pexpr,
 								BOOL fEqualityOnly,
-								CExpression **ppexprDecorrelated,
+								gpos::owner<CExpression *> *ppexprDecorrelated,
 								CExpressionArray *pdrgpexprCorrelations,
 								CColRefSet *outerRefsToRemove);
 
 	// processor for assert
-	static BOOL FProcessAssert(CMemoryPool *mp, CExpression *pexpr,
+	static BOOL FProcessAssert(CMemoryPool *mp,
+							   gpos::pointer<CExpression *> pexpr,
 							   BOOL fEqualityOnly,
-							   CExpression **ppexprDecorrelated,
+							   gpos::owner<CExpression *> *ppexprDecorrelated,
 							   CExpressionArray *pdrgpexprCorrelations,
 							   CColRefSet *outerRefsToRemove);
 
 	// processor for MaxOneRow
-	static BOOL FProcessMaxOneRow(CMemoryPool *mp, CExpression *pexpr,
-								  BOOL fEqualityOnly,
-								  CExpression **ppexprDecorrelated,
-								  CExpressionArray *pdrgpexprCorrelations,
-								  CColRefSet *outerRefsToRemove);
+	static BOOL FProcessMaxOneRow(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr, BOOL fEqualityOnly,
+		gpos::owner<CExpression *> *ppexprDecorrelated,
+		CExpressionArray *pdrgpexprCorrelations, CColRefSet *outerRefsToRemove);
 
 	// processor for limits
-	static BOOL FProcessLimit(CMemoryPool *mp, CExpression *pexpr,
+	static BOOL FProcessLimit(CMemoryPool *mp,
+							  gpos::pointer<CExpression *> pexpr,
 							  BOOL fEqualityOnly,
-							  CExpression **ppexprDecorrelated,
+							  gpos::owner<CExpression *> *ppexprDecorrelated,
 							  CExpressionArray *pdrgpexprCorrelations,
 							  CColRefSet *outerRefsToRemove);
 

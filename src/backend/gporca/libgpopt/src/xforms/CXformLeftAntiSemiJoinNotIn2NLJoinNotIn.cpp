@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformLeftAntiSemiJoinNotIn2NLJoinNotIn.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalLeftAntiSemiJoinNotIn.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -68,9 +69,10 @@ CXformLeftAntiSemiJoinNotIn2NLJoinNotIn::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftAntiSemiJoinNotIn2NLJoinNotIn::Transform(CXformContext *pxfctxt,
-												   CXformResult *pxfres,
-												   CExpression *pexpr) const
+CXformLeftAntiSemiJoinNotIn2NLJoinNotIn::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

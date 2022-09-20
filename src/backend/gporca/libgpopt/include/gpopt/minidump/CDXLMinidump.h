@@ -69,11 +69,14 @@ public:
 	CDXLMinidump(const CDXLMinidump &) = delete;
 
 	// ctor
-	CDXLMinidump(CBitSet *pbs, COptimizerConfig *optimizer_config,
-				 CDXLNode *query, CDXLNodeArray *query_output_dxlnode_array,
-				 CDXLNodeArray *cte_producers, CDXLNode *pdxlnPlan,
-				 IMDCacheObjectArray *mdcache_obj_array,
-				 CSystemIdArray *pdrgpsysid, ULLONG plan_id,
+	CDXLMinidump(gpos::owner<CBitSet *> pbs,
+				 gpos::owner<COptimizerConfig *> optimizer_config,
+				 gpos::owner<CDXLNode *> query,
+				 gpos::owner<CDXLNodeArray *> query_output_dxlnode_array,
+				 gpos::owner<CDXLNodeArray *> cte_producers,
+				 gpos::owner<CDXLNode *> pdxlnPlan,
+				 gpos::owner<IMDCacheObjectArray *> mdcache_obj_array,
+				 gpos::owner<CSystemIdArray *> pdrgpsysid, ULLONG plan_id,
 				 ULLONG plan_space_size);
 
 	// dtor

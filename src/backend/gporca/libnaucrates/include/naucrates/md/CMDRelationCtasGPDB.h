@@ -111,11 +111,14 @@ public:
 	CMDRelationCtasGPDB(
 		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname_schema,
 		CMDName *mdname, BOOL fTemporary, Erelstoragetype rel_storage_type,
-		Ereldistrpolicy rel_distr_policy, CMDColumnArray *mdcol_array,
-		ULongPtrArray *distr_col_array, gpos::Ref<IMdIdArray> distr_opfamilies,
-		gpos::Ref<IMdIdArray> distr_opclasses, ULongPtr2dArray *keyset_array,
-		CDXLCtasStorageOptions *dxl_ctas_storage_options,
-		IntPtrArray *vartypemod_array);
+		Ereldistrpolicy rel_distr_policy,
+		gpos::owner<CMDColumnArray *> mdcol_array,
+		gpos::owner<ULongPtrArray *> distr_col_array,
+		gpos::Ref<IMdIdArray> distr_opfamilies,
+		gpos::Ref<IMdIdArray> distr_opclasses,
+		gpos::owner<ULongPtr2dArray *> keyset_array,
+		gpos::owner<CDXLCtasStorageOptions *> dxl_ctas_storage_options,
+		gpos::owner<IntPtrArray *> vartypemod_array);
 
 	// dtor
 	~CMDRelationCtasGPDB() override;

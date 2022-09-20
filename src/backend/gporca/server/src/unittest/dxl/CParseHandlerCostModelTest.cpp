@@ -115,7 +115,7 @@ Eres_ParseCalibratedCostModel()
 
 	fixture.Parse((const XMLByte *) a_szDXL.Rgt(), strlen(a_szDXL.Rgt()));
 
-	ICostModel *pcm = pphcm->GetCostModel();
+	gpos::pointer<ICostModel *> pcm = pphcm->GetCostModel();
 
 	GPOS_RTL_ASSERT(ICostModel::EcmtGPDBCalibrated == pcm->Ecmt());
 	GPOS_RTL_ASSERT(3 == pcm->UlHosts());

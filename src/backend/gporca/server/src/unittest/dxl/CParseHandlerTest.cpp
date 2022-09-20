@@ -490,11 +490,11 @@ CParseHandlerTest::EresParseAndSerializeQuery(CMemoryPool *mp,
 
 	oss << "Serializing parsed tree" << std::endl;
 
-	CDXLNode *root_dxlnode =
+	gpos::pointer<CDXLNode *> root_dxlnode =
 		const_cast<CDXLNode *>(pq2dxlresult->CreateDXLNode());
-	CDXLNodeArray *dxl_array =
+	gpos::pointer<CDXLNodeArray *> dxl_array =
 		const_cast<CDXLNodeArray *>(pq2dxlresult->GetOutputColumnsDXLArray());
-	CDXLNodeArray *cte_producers =
+	gpos::pointer<CDXLNodeArray *> cte_producers =
 		const_cast<CDXLNodeArray *>(pq2dxlresult->GetCTEProducerDXLArray());
 
 	CWStringDynamic wstrQuery(mp);
@@ -683,7 +683,7 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 
 	GPOS_ASSERT(nullptr != statistics_array);
 
-	CStatistics *stats = (*statistics_array)[0];
+	gpos::pointer<CStatistics *> stats = (*statistics_array)[0];
 	GPOS_ASSERT(stats);
 
 	stats->Rows();

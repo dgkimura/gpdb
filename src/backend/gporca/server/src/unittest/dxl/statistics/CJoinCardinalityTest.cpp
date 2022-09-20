@@ -47,7 +47,8 @@ CJoinCardinalityTest::EresUnittest()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr /* pceeval */,
@@ -266,8 +267,8 @@ CJoinCardinalityTest::EresUnittest_Join()
 
 		GPOS_ASSERT(nullptr != pdrgpstatBefore);
 		GPOS_ASSERT(2 == pdrgpstatBefore->Size());
-		CStatistics *pstats1 = (*pdrgpstatBefore)[0];
-		CStatistics *pstats2 = (*pdrgpstatBefore)[1];
+		gpos::pointer<CStatistics *> pstats1 = (*pdrgpstatBefore)[0];
+		gpos::pointer<CStatistics *> pstats2 = (*pdrgpstatBefore)[1];
 
 		GPOS_CHECK_ABORT;
 
@@ -292,7 +293,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 
 		gpos::owner<CStatisticsArray *> pdrgpstatOutput =
 			GPOS_NEW(mp) CStatisticsArray(mp);
-		pdrgpstatOutput->Append(CStatistics::CastStats(pstatsOutput));
+		pdrgpstatOutput->Append(gpos::dyn_cast<CStatistics>(pstatsOutput));
 
 		// serialize and compare against expected stats
 		CWStringDynamic *pstrOutput = CDXLUtils::SerializeStatistics(
@@ -338,7 +339,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 }
 
 //	helper method to generate a single join predicate
-CStatsPredJoinArray *
+gpos::owner<CStatsPredJoinArray *>
 CJoinCardinalityTest::PdrgpstatspredjoinSingleJoinPredicate(CMemoryPool *mp)
 {
 	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
@@ -350,7 +351,7 @@ CJoinCardinalityTest::PdrgpstatspredjoinSingleJoinPredicate(CMemoryPool *mp)
 }
 
 //	helper method to generate generate multiple join predicates
-CStatsPredJoinArray *
+gpos::owner<CStatsPredJoinArray *>
 CJoinCardinalityTest::PdrgpstatspredjoinMultiplePredicates(CMemoryPool *mp)
 {
 	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
@@ -368,7 +369,7 @@ CJoinCardinalityTest::PdrgpstatspredjoinMultiplePredicates(CMemoryPool *mp)
 }
 
 // helper method to generate join predicate over columns that contain null values
-CStatsPredJoinArray *
+gpos::owner<CStatsPredJoinArray *>
 CJoinCardinalityTest::PdrgpstatspredjoinNullableCols(CMemoryPool *mp)
 {
 	gpos::owner<CStatsPredJoinArray *> join_preds_stats =

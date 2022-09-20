@@ -50,9 +50,10 @@ CXformDifference2LeftAntiSemiJoin::CXformDifference2LeftAntiSemiJoin(
 //
 //---------------------------------------------------------------------------
 void
-CXformDifference2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
-											 CXformResult *pxfres,
-											 CExpression *pexpr) const
+CXformDifference2LeftAntiSemiJoin::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -68,21 +69,23 @@ CXformDifference2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
 	CExpression *pexprLeftChild = (*pexpr)[0];
 	CExpression *pexprRightChild = (*pexpr)[1];
 
-	CLogicalDifference *popDifference =
-		CLogicalDifference::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalDifference *> popDifference =
+		gpos::dyn_cast<CLogicalDifference>(pexpr->Pop());
 	CColRefArray *pdrgpcrOutput = popDifference->PdrgpcrOutput();
-	CColRef2dArray *pdrgpdrgpcrInput = popDifference->PdrgpdrgpcrInput();
+	gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput =
+		popDifference->PdrgpdrgpcrInput();
 
 	// generate the scalar condition for the left anti-semi join
-	CExpression *pexprScCond = CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
+	gpos::owner<CExpression *> pexprScCond =
+		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
 
 	pexprLeftChild->AddRef();
 	pexprRightChild->AddRef();
 
 	// assemble the new left anti-semi join logical operator
-	gpos::owner<CExpression *> pexprLASJ =
-		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalLeftAntiSemiJoin(mp),
-								 pexprLeftChild, pexprRightChild, pexprScCond);
+	gpos::owner<CExpression *> pexprLASJ = GPOS_NEW(mp)
+		CExpression(mp, GPOS_NEW(mp) CLogicalLeftAntiSemiJoin(mp),
+					pexprLeftChild, pexprRightChild, std::move(pexprScCond));
 
 	// assemble the aggregate operator
 	pdrgpcrOutput->AddRef();
@@ -91,11 +94,11 @@ CXformDifference2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp),
 								 GPOS_NEW(mp) CExpressionArray(mp));
 
-	CExpression *pexprAgg = CUtils::PexprLogicalGbAggGlobal(
-		mp, pdrgpcrOutput, pexprLASJ, pexprProjList);
+	gpos::owner<CExpression *> pexprAgg = CUtils::PexprLogicalGbAggGlobal(
+		mp, pdrgpcrOutput, std::move(pexprLASJ), std::move(pexprProjList));
 
 	// add alternative to results
-	pxfres->Add(pexprAgg);
+	pxfres->Add(std::move(pexprAgg));
 }
 
 // EOF

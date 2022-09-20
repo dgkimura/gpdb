@@ -51,8 +51,9 @@ public:
 	CDXLPhysicalWindow(CDXLPhysicalWindow &) = delete;
 
 	//ctor
-	CDXLPhysicalWindow(CMemoryPool *mp, ULongPtrArray *part_by_colid_array,
-					   CDXLWindowKeyArray *window_key_array);
+	CDXLPhysicalWindow(CMemoryPool *mp,
+					   gpos::owner<ULongPtrArray *> part_by_colid_array,
+					   gpos::owner<CDXLWindowKeyArray *> window_key_array);
 
 	//dtor
 	~CDXLPhysicalWindow() override;

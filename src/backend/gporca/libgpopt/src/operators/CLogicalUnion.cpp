@@ -43,12 +43,13 @@ CLogicalUnion::CLogicalUnion(CMemoryPool *mp) : CLogicalSetOp(mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalUnion::CLogicalUnion(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-							 CColRef2dArray *pdrgpdrgpcrInput)
+CLogicalUnion::CLogicalUnion(CMemoryPool *mp,
+							 gpos::owner<CColRefArray *> pdrgpcrOutput,
+							 gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput)
 	: CLogicalSetOp(mp, pdrgpcrOutput, pdrgpdrgpcrInput)
 {
 #ifdef GPOS_DEBUG
-	CColRefArray *pdrgpcrInput = (*pdrgpdrgpcrInput)[0];
+	gpos::pointer<CColRefArray *> pdrgpcrInput = (*pdrgpdrgpcrInput)[0];
 	const ULONG num_cols = pdrgpcrOutput->Size();
 	GPOS_ASSERT(num_cols == pdrgpcrInput->Size());
 
@@ -81,16 +82,17 @@ CLogicalUnion::~CLogicalUnion() = default;
 //
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
-CLogicalUnion::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist)
+CLogicalUnion::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrOutput =
+	gpos::owner<CColRefArray *> pdrgpcrOutput =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
-	CColRef2dArray *pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
 		mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
 
-	return GPOS_NEW(mp) CLogicalUnion(mp, pdrgpcrOutput, pdrgpdrgpcrInput);
+	return GPOS_NEW(mp) CLogicalUnion(mp, std::move(pdrgpcrOutput),
+									  std::move(pdrgpdrgpcrInput));
 }
 
 //---------------------------------------------------------------------------
@@ -124,7 +126,7 @@ CLogicalUnion::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalUnion::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -140,9 +142,9 @@ CLogicalUnion::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalUnion::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							IStatisticsArray *	// not used
+							gpos::pointer<IStatisticsArray *>  // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);

@@ -31,12 +31,12 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLColStats::CDXLColStats(CMemoryPool *mp,
-						   gpos::Ref<CMDIdColStats> mdid_col_stats,
-						   CMDName *mdname, CDouble width, CDouble null_freq,
-						   CDouble distinct_remaining, CDouble freq_remaining,
-						   CDXLBucketArray *dxl_stats_bucket_array,
-						   BOOL is_col_stats_missing)
+CDXLColStats::CDXLColStats(
+	CMemoryPool *mp, gpos::Ref<CMDIdColStats> mdid_col_stats, CMDName *mdname,
+	CDouble width, CDouble null_freq, CDouble distinct_remaining,
+	CDouble freq_remaining,
+	gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array,
+	BOOL is_col_stats_missing)
 	: m_mp(mp),
 	  m_mdid_col_stats(mdid_col_stats),
 	  m_mdname(mdname),
@@ -44,7 +44,7 @@ CDXLColStats::CDXLColStats(CMemoryPool *mp,
 	  m_null_freq(null_freq),
 	  m_distinct_remaining(distinct_remaining),
 	  m_freq_remaining(freq_remaining),
-	  m_dxl_stats_bucket_array(dxl_stats_bucket_array),
+	  m_dxl_stats_bucket_array(std::move(dxl_stats_bucket_array)),
 	  m_is_col_stats_missing(is_col_stats_missing)
 {
 	GPOS_ASSERT(m_mdid_col_stats->IsValid());
@@ -224,11 +224,11 @@ CDXLColStats::DebugPrint(IOstream &os) const
 //		Dummy statistics
 //
 //---------------------------------------------------------------------------
-CDXLColStats *
+gpos::owner<CDXLColStats *>
 CDXLColStats::CreateDXLDummyColStats(CMemoryPool *mp, IMDId *mdid,
 									 CMDName *mdname, CDouble width)
 {
-	CMDIdColStats *mdid_col_stats = CMDIdColStats::CastMdid(mdid);
+	CMDIdColStats *mdid_col_stats = gpos::dyn_cast<CMDIdColStats>(mdid);
 
 	gpos::owner<CDXLBucketArray *> dxl_bucket_array;
 	dxl_bucket_array = GPOS_NEW(mp) CDXLBucketArray(mp);
@@ -236,7 +236,7 @@ CDXLColStats::CreateDXLDummyColStats(CMemoryPool *mp, IMDId *mdid,
 	dxl_col_stats = GPOS_NEW(mp) CDXLColStats(
 		mp, mdid_col_stats, mdname, width, CHistogram::DefaultNullFreq,
 		CHistogram::DefaultNDVRemain, CHistogram::DefaultNDVFreqRemain,
-		dxl_bucket_array, true /* is_col_stats_missing */
+		std::move(dxl_bucket_array), true /* is_col_stats_missing */
 	);
 	return dxl_col_stats;
 }

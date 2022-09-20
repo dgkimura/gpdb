@@ -12,6 +12,7 @@
 #define GPOPT_CXformJoinSwap_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPatternLeaf.h"
 #include "gpopt/xforms/CXformExploration.h"
@@ -72,8 +73,9 @@ public:
 
 	// actual transform
 	void
-	Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-			  CExpression *pexpr) const override
+	Transform(gpos::pointer<CXformContext *> pxfctxt,
+			  gpos::pointer<CXformResult *> pxfres,
+			  gpos::pointer<CExpression *> pexpr) const override
 	{
 		GPOS_ASSERT(nullptr != pxfctxt);
 		GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -81,14 +83,14 @@ public:
 
 		CMemoryPool *mp = pxfctxt->Pmp();
 
-		CExpression *pexprResult =
+		gpos::owner<CExpression *> pexprResult =
 			CXformUtils::PexprSwapJoins(mp, pexpr, (*pexpr)[0]);
 		if (nullptr == pexprResult)
 		{
 			return;
 		}
 
-		pxfres->Add(pexprResult);
+		pxfres->Add(std::move(pexprResult));
 	}
 
 };	// class CXformJoinSwap

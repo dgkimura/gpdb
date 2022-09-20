@@ -34,18 +34,21 @@ class CXformSimplifySubquery : public CXformExploration
 {
 private:
 	// definition of simplification function
-	using FnSimplify = BOOL(CMemoryPool *, CExpression *, CExpression **);
+	using FnSimplify = BOOL(CMemoryPool *, gpos::pointer<CExpression *>,
+							gpos::owner<CExpression *> *);
 
 	// definition of matching function
-	using FnMatch = BOOL(COperator *);
+	using FnMatch = BOOL(gpos::pointer<COperator *>);
 
 	// transform existential subqueries to count(*) subqueries
-	static BOOL FSimplifyExistential(CMemoryPool *mp, CExpression *pexprScalar,
-									 CExpression **ppexprNewScalar);
+	static BOOL FSimplifyExistential(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprScalar,
+		gpos::owner<CExpression *> *ppexprNewScalar);
 
 	// transform quantified subqueries to count(*) subqueries
-	static BOOL FSimplifyQuantified(CMemoryPool *mp, CExpression *pexprScalar,
-									CExpression **ppexprNewScalar);
+	static BOOL FSimplifyQuantified(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprScalar,
+		gpos::owner<CExpression *> *ppexprNewScalar);
 
 	// main driver, transform existential/quantified subqueries to count(*) subqueries
 	static BOOL FSimplifySubqueryRecursive(
@@ -53,16 +56,15 @@ private:
 		gpos::owner<CExpression *> *ppexprNewScalar, FnSimplify *pfnsimplify,
 		FnMatch *pfnmatch);
 
-	static CExpression *FSimplifySubquery(CMemoryPool *mp,
-										  CExpression *pexprInput,
-										  FnSimplify *pfnsimplify,
-										  FnMatch *pfnmatch);
+	static gpos::owner<CExpression *> FSimplifySubquery(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprInput,
+		FnSimplify *pfnsimplify, FnMatch *pfnmatch);
 
 public:
 	CXformSimplifySubquery(const CXformSimplifySubquery &) = delete;
 
 	// ctor
-	explicit CXformSimplifySubquery(CExpression *pexprPattern);
+	explicit CXformSimplifySubquery(gpos::owner<CExpression *> pexprPattern);
 
 	// dtor
 	~CXformSimplifySubquery() override = default;
@@ -71,8 +73,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::pointer<CXformContext *> pxfctxt,
+				   gpos::pointer<CXformResult *> pxfres,
+				   gpos::pointer<CExpression *> pexpr) const override;
 
 
 };	// class CXformSimplifySubquery

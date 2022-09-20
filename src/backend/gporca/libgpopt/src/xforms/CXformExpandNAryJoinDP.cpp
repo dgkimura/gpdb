@@ -61,7 +61,7 @@ CXformExpandNAryJoinDP::CXformExpandNAryJoinDP(CMemoryPool *mp)
 CXform::EXformPromise
 CXformExpandNAryJoinDP::Exfp(CExpressionHandle &exprhdl) const
 {
-	COptimizerConfig *optimizer_config =
+	gpos::pointer<COptimizerConfig *> optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 	gpos::pointer<const CHint *> phint = optimizer_config->GetHint();
 
@@ -90,8 +90,9 @@ CXformExpandNAryJoinDP::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformExpandNAryJoinDP::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								  CExpression *pexpr) const
+CXformExpandNAryJoinDP::Transform(gpos::pointer<CXformContext *> pxfctxt,
+								  gpos::pointer<CXformResult *> pxfres,
+								  gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -112,8 +113,8 @@ CXformExpandNAryJoinDP::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		pdrgpexpr->Append(pexprChild);
 	}
 
-	CExpression *pexprScalar = (*pexpr)[arity - 1];
-	CExpressionArray *pdrgpexprPreds =
+	gpos::pointer<CExpression *> pexprScalar = (*pexpr)[arity - 1];
+	gpos::owner<CExpressionArray *> pdrgpexprPreds =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 
 	// create join order using dynamic programming
@@ -123,7 +124,7 @@ CXformExpandNAryJoinDP::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	if (nullptr != pexprResult)
 	{
 		// normalize resulting expression
-		CExpression *pexprNormalized =
+		gpos::owner<CExpression *> pexprNormalized =
 			CNormalizer::PexprNormalize(mp, pexprResult);
 		pexprResult->Release();
 		pxfres->Add(pexprNormalized);

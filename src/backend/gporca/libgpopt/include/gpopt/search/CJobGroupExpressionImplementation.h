@@ -11,6 +11,8 @@
 #ifndef GPOPT_CJobGroupExpressionImplementation_H
 #define GPOPT_CJobGroupExpressionImplementation_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/search/CJobGroupExpression.h"
 #include "gpopt/search/CJobStateMachine.h"
 
@@ -94,10 +96,11 @@ public:
 	~CJobGroupExpressionImplementation() override;
 
 	// initialize job
-	void Init(CGroupExpression *pgexpr);
+	void Init(gpos::pointer<CGroupExpression *> pgexpr);
 
 	// schedule a new group expression implementation job
-	static void ScheduleJob(CSchedulerContext *psc, CGroupExpression *pgexpr,
+	static void ScheduleJob(CSchedulerContext *psc,
+							gpos::pointer<CGroupExpression *> pgexpr,
 							CJob *pjParent);
 
 	// job's function

@@ -67,7 +67,7 @@ private:
 
 		// ctor
 		CCTEReqEntry(ULONG id, CCTEMap::ECteType ect, BOOL fRequired,
-					 CDrvdPropPlan *pdpplan);
+					 gpos::owner<CDrvdPropPlan *> pdpplan);
 
 		// dtor
 		~CCTEReqEntry() override;
@@ -104,7 +104,7 @@ private:
 		ULONG HashValue() const;
 
 		// equality function
-		BOOL Equals(CCTEReqEntry *pcre) const;
+		BOOL Equals(gpos::pointer<CCTEReqEntry *> pcre) const;
 
 		// print function
 		IOstream &OsPrint(IOstream &os) const;
@@ -156,11 +156,11 @@ public:
 
 	// insert a new entry, no entry with the same id can already exist
 	void Insert(ULONG ulCteId, CCTEMap::ECteType ect, BOOL fRequired,
-				CDrvdPropPlan *pdpplan);
+				gpos::owner<CDrvdPropPlan *> pdpplan);
 
 	// insert a new consumer entry with the given id. The plan properties are
 	// taken from the given context
-	void InsertConsumer(ULONG id, CDrvdPropArray *pdrgpdpCtxt);
+	void InsertConsumer(ULONG id, gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt);
 
 	// check if two cte requirements are equal
 	BOOL
@@ -182,15 +182,17 @@ public:
 	ULONG HashValue() const;
 
 	// returns a new requirement containing unresolved CTE requirements given a derived CTE map
-	CCTEReq *PcterUnresolved(CMemoryPool *mp, CCTEMap *pcm);
+	gpos::owner<CCTEReq *> PcterUnresolved(CMemoryPool *mp,
+										   gpos::pointer<CCTEMap *> pcm);
 
 	// unresolved CTE requirements given a derived CTE map for a sequence
 	// operator
-	CCTEReq *PcterUnresolvedSequence(CMemoryPool *mp, CCTEMap *pcm,
-									 CDrvdPropArray *pdrgpdpCtxt);
+	gpos::owner<CCTEReq *> PcterUnresolvedSequence(
+		CMemoryPool *mp, gpos::pointer<CCTEMap *> pcm,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt);
 
 	// create a copy of the current requirement where all the entries are marked optional
-	CCTEReq *PcterAllOptional(CMemoryPool *mp);
+	gpos::owner<CCTEReq *> PcterAllOptional(CMemoryPool *mp);
 
 	// lookup plan properties for given cte id
 	CDrvdPropPlan *Pdpplan(ULONG ulCteId) const;

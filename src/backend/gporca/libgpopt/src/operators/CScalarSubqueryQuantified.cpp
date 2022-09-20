@@ -135,7 +135,7 @@ CScalarSubqueryQuantified::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSubqueryQuantified::Matches(COperator *pop) const
+CScalarSubqueryQuantified::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
@@ -143,8 +143,8 @@ CScalarSubqueryQuantified::Matches(COperator *pop) const
 	}
 
 	// match if contents are identical
-	CScalarSubqueryQuantified *popSsq =
-		CScalarSubqueryQuantified::PopConvert(pop);
+	gpos::pointer<CScalarSubqueryQuantified *> popSsq =
+		gpos::dyn_cast<CScalarSubqueryQuantified>(pop);
 	return popSsq->Pcr() == m_pcr &&
 		   popSsq->MdIdOp()->Equals(m_scalar_op_mdid.get());
 }
@@ -158,13 +158,13 @@ CScalarSubqueryQuantified::Matches(COperator *pop) const
 //		Locally used columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CScalarSubqueryQuantified::PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
 	// used columns is an empty set unless subquery column is an outer reference
 	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
-	CColRefSet *pcrsChildOutput =
+	gpos::pointer<CColRefSet *> pcrsChildOutput =
 		exprhdl.DeriveOutputColumns(0 /* child_index */);
 	if (!pcrsChildOutput->FMember(m_pcr))
 	{

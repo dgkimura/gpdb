@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarLimitOffset.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarLimitOffset.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -57,10 +59,11 @@ CParseHandlerScalarLimitOffset::StartElement(
 				 element_local_name))
 	{
 		// parse and create scalar OpExpr
-		CDXLScalarLimitOffset *dxl_op =
-			(CDXLScalarLimitOffset *) CDXLOperatorFactory::MakeDXLLimitOffset(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
-		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+		gpos::owner<CDXLScalarLimitOffset *> dxl_op =
+			gpos::cast<CDXLScalarLimitOffset>(
+				CDXLOperatorFactory::MakeDXLLimitOffset(
+					m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 	}
 	else
 	{

@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformLeftOuterJoin2NLJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalLeftOuterJoin.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -68,9 +69,9 @@ CXformLeftOuterJoin2NLJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftOuterJoin2NLJoin::Transform(CXformContext *pxfctxt,
-									  CXformResult *pxfres,
-									  CExpression *pexpr) const
+CXformLeftOuterJoin2NLJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
+									  gpos::pointer<CXformResult *> pxfres,
+									  gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

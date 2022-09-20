@@ -27,8 +27,9 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdRelStats::CMDIdRelStats(CMDIdGPDB *rel_mdid)
-	: m_rel_mdid(rel_mdid), m_str(m_mdid_array, GPOS_ARRAY_SIZE(m_mdid_array))
+CMDIdRelStats::CMDIdRelStats(gpos::owner<CMDIdGPDB *> rel_mdid)
+	: m_rel_mdid(std::move(rel_mdid)),
+	  m_str(m_mdid_array, GPOS_ARRAY_SIZE(m_mdid_array))
 {
 	// serialize mdid into static string
 	Serialize();

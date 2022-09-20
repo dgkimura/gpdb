@@ -30,10 +30,10 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CDXLStatsDerivedRelation::CDXLStatsDerivedRelation(
 	CDouble rows, BOOL is_empty,
-	CDXLStatsDerivedColumnArray *dxl_stats_derived_col_array)
+	gpos::owner<CDXLStatsDerivedColumnArray *> dxl_stats_derived_col_array)
 	: m_rows(rows),
 	  m_empty(is_empty),
-	  m_dxl_stats_derived_col_array(dxl_stats_derived_col_array)
+	  m_dxl_stats_derived_col_array(std::move(dxl_stats_derived_col_array))
 {
 	GPOS_ASSERT(nullptr != m_dxl_stats_derived_col_array);
 }
@@ -90,7 +90,7 @@ CDXLStatsDerivedRelation::Serialize(CXMLSerializer *xml_serializer) const
 	{
 		GPOS_CHECK_ABORT;
 
-		CDXLStatsDerivedColumn *derived_col_stats_dxl =
+		gpos::pointer<CDXLStatsDerivedColumn *> derived_col_stats_dxl =
 			(*m_dxl_stats_derived_col_array)[ul];
 		derived_col_stats_dxl->Serialize(xml_serializer);
 

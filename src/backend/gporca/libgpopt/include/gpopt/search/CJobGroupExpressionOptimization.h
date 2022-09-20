@@ -171,16 +171,18 @@ public:
 	~CJobGroupExpressionOptimization() override;
 
 	// initialize job
-	void Init(CGroupExpression *pgexpr, COptimizationContext *poc,
-			  ULONG ulOptReq, CReqdPropPlan *prppCTEProducer = nullptr);
+	void Init(gpos::pointer<CGroupExpression *> pgexpr,
+			  gpos::pointer<COptimizationContext *> poc, ULONG ulOptReq,
+			  CReqdPropPlan *prppCTEProducer = nullptr);
 
 	// cleanup internal state
 	void Cleanup() override;
 
 	// schedule a new group expression optimization job
-	static void ScheduleJob(CSchedulerContext *psc, CGroupExpression *pgexpr,
-							COptimizationContext *poc, ULONG ulOptReq,
-							CJob *pjParent);
+	static void ScheduleJob(CSchedulerContext *psc,
+							gpos::pointer<CGroupExpression *> pgexpr,
+							gpos::pointer<COptimizationContext *> poc,
+							ULONG ulOptReq, CJob *pjParent);
 
 	// job's function
 	BOOL FExecute(CSchedulerContext *psc) override;

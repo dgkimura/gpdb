@@ -121,7 +121,7 @@ CDXLPhysicalRoutedDistributeMotion::AssertValid(
 
 	GPOS_ASSERT(EdxlroutedmIndexSentinel == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlroutedmIndexChild];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[EdxlroutedmIndexChild];
 
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());

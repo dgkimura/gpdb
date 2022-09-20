@@ -76,8 +76,9 @@ private:
 		gpos::pointer<const IMDType *> pmdtype);
 
 	//	append the expressions in the source array to destination array
-	static void AppendArrayExpr(CExpressionArray *pdrgpexprSrc,
-								CExpressionArray *pdrgpexprDest);
+	static void AppendArrayExpr(
+		gpos::pointer<CExpressionArray *> pdrgpexprSrc,
+		gpos::pointer<CExpressionArray *> pdrgpexprDest);
 
 public:
 	enum EExecLocalityType
@@ -98,7 +99,8 @@ public:
 #endif	// GPOS_DEBUG
 
 	static IOstream &OsPrintDrgPcoldesc(
-		IOstream &os, CColumnDescriptorArray *pdrgpcoldescIncludedCols,
+		IOstream &os,
+		gpos::pointer<CColumnDescriptorArray *> pdrgpcoldescIncludedCols,
 		ULONG length);
 
 	//-------------------------------------------------------------------
@@ -108,8 +110,8 @@ public:
 	// recursively check for a plan with CTE, if both CTEProducer and CTEConsumer are executed on the same locality.
 	// raises an exception if CTE Producer and CTE Consumer does not have the same locality
 	static void ValidateCTEProducerConsumerLocality(
-		CMemoryPool *mp, CExpression *pexpr, EExecLocalityType edt,
-		gpos::owner<UlongToUlongMap *> phmulul);
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+		EExecLocalityType edt, gpos::owner<UlongToUlongMap *> phmulul);
 
 	// generate a comparison expression for two column references
 	static gpos::owner<CExpression *> PexprScalarCmp(
@@ -118,79 +120,84 @@ public:
 
 	// generate a comparison expression for a column reference and an expression
 	static gpos::owner<CExpression *> PexprScalarCmp(
-		CMemoryPool *mp, const CColRef *pcrLeft, CExpression *pexprRight,
-		CWStringConst strOp, gpos::owner<IMDId *> mdid_op);
+		CMemoryPool *mp, const CColRef *pcrLeft,
+		gpos::owner<CExpression *> pexprRight, CWStringConst strOp,
+		gpos::owner<IMDId *> mdid_op);
 
 	// generate a comparison expression for an expression and a column reference
 	static gpos::owner<CExpression *> PexprScalarCmp(
-		CMemoryPool *mp, CExpression *pexprLeft, const CColRef *pcrRight,
-		CWStringConst strOp, gpos::owner<IMDId *> mdid_op);
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		const CColRef *pcrRight, CWStringConst strOp,
+		gpos::owner<IMDId *> mdid_op);
 
 	// generate a comparison expression for two expressions
 	static gpos::owner<CExpression *> PexprScalarCmp(
-		CMemoryPool *mp, CExpression *pexprLeft, CExpression *pexprRight,
-		CWStringConst strOp, gpos::owner<IMDId *> mdid_op);
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		gpos::owner<CExpression *> pexprRight, CWStringConst strOp,
+		gpos::owner<IMDId *> mdid_op);
 
 	// generate a comparison expression for two expressions
-	static CExpression *PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
-									   CExpression *pexprRight,
-									   IMDId *mdid_scop);
+	static gpos::owner<CExpression *> PexprScalarCmp(CMemoryPool *mp,
+													 CExpression *pexprLeft,
+													 CExpression *pexprRight,
+													 IMDId *mdid_scop);
 
 	// generate a comparison expression for a column reference and an expression
-	static CExpression *PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
-									   CExpression *pexprRight,
-									   IMDType::ECmpType cmp_type);
+	static gpos::owner<CExpression *> PexprScalarCmp(
+		CMemoryPool *mp, const CColRef *pcrLeft,
+		gpos::owner<CExpression *> pexprRight, IMDType::ECmpType cmp_type);
 
 	// generate a comparison expression between two column references
-	static CExpression *PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
-									   const CColRef *pcrRight,
-									   IMDType::ECmpType cmp_type);
+	static gpos::owner<CExpression *> PexprScalarCmp(
+		CMemoryPool *mp, const CColRef *pcrLeft, const CColRef *pcrRight,
+		IMDType::ECmpType cmp_type);
 
 	// generate a comparison expression between an expression and a column reference
-	static CExpression *PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
-									   const CColRef *pcrRight,
-									   IMDType::ECmpType cmp_type);
+	static gpos::owner<CExpression *> PexprScalarCmp(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		const CColRef *pcrRight, IMDType::ECmpType cmp_type);
 
 	// generate a comparison expression for two expressions
-	static CExpression *PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
-									   CExpression *pexprRight,
-									   IMDType::ECmpType cmp_type);
+	static gpos::owner<CExpression *> PexprScalarCmp(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		gpos::owner<CExpression *> pexprRight, IMDType::ECmpType cmp_type);
 
 	// generate a comparison against Zero
 	static gpos::owner<CExpression *> PexprCmpWithZero(
-		CMemoryPool *mp, CExpression *pexprLeft, IMDId *mdid_type_left,
-		IMDType::ECmpType ecmptype);
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		gpos::pointer<IMDId *> mdid_type_left, IMDType::ECmpType ecmptype);
 
 	// generate an equality comparison expression for column references
-	static CExpression *PexprScalarEqCmp(CMemoryPool *mp,
-										 const CColRef *pcrLeft,
-										 const CColRef *pcrRight);
+	static gpos::owner<CExpression *> PexprScalarEqCmp(CMemoryPool *mp,
+													   const CColRef *pcrLeft,
+													   const CColRef *pcrRight);
 
 	// generate an equality comparison expression for two expressions
-	static CExpression *PexprScalarEqCmp(CMemoryPool *mp,
-										 CExpression *pexprLeft,
-										 CExpression *pexprRight);
+	static gpos::owner<CExpression *> PexprScalarEqCmp(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		gpos::owner<CExpression *> pexprRight);
 
 	// generate an equality comparison expression for a column reference and an expression
-	static CExpression *PexprScalarEqCmp(CMemoryPool *mp,
-										 const CColRef *pcrLeft,
-										 CExpression *pexprRight);
+	static gpos::owner<CExpression *> PexprScalarEqCmp(
+		CMemoryPool *mp, const CColRef *pcrLeft,
+		gpos::owner<CExpression *> pexprRight);
 
 	// generate an equality comparison expression for an expression and a column reference
-	static CExpression *PexprScalarEqCmp(CMemoryPool *mp,
-										 CExpression *pexprLeft,
-										 const CColRef *pcrRight);
+	static gpos::owner<CExpression *> PexprScalarEqCmp(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		const CColRef *pcrRight);
 
 	// generate an array comparison expression for a column reference and an expression
 	static gpos::owner<CExpression *> PexprScalarArrayCmp(
 		CMemoryPool *mp, CScalarArrayCmp::EArrCmpType earrcmptype,
-		IMDType::ECmpType ecmptype, CExpressionArray *pexprScalarChildren,
+		IMDType::ECmpType ecmptype,
+		gpos::owner<CExpressionArray *> pexprScalarChildren,
 		const CColRef *colref);
 
 	// generate an Is Distinct From expression
-	static gpos::owner<CExpression *> PexprIDF(CMemoryPool *mp,
-											   CExpression *pexprLeft,
-											   CExpression *pexprRight);
+	static gpos::owner<CExpression *> PexprIDF(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		gpos::owner<CExpression *> pexprRight);
 
 	static gpos::owner<CExpression *> PexprIDF(CMemoryPool *mp,
 											   CExpression *pexprLeft,
@@ -198,25 +205,31 @@ public:
 											   IMDId *mdid_scop);
 
 	// generate an Is NOT Distinct From expression for two column references
-	static CExpression *PexprINDF(CMemoryPool *mp, const CColRef *pcrLeft,
-								  const CColRef *pcrRight);
+	static gpos::owner<CExpression *> PexprINDF(CMemoryPool *mp,
+												const CColRef *pcrLeft,
+												const CColRef *pcrRight);
 
 	// generate an Is NOT Distinct From expression for scalar expressions
-	static CExpression *PexprINDF(CMemoryPool *mp, CExpression *pexprLeft,
-								  CExpression *pexprRight);
+	static gpos::owner<CExpression *> PexprINDF(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		gpos::owner<CExpression *> pexprRight);
 
-	static CExpression *PexprINDF(CMemoryPool *mp, CExpression *pexprLeft,
-								  CExpression *pexprRight, IMDId *mdid_scop);
+	static gpos::owner<CExpression *> PexprINDF(CMemoryPool *mp,
+												CExpression *pexprLeft,
+												CExpression *pexprRight,
+												IMDId *mdid_scop);
 
 	// generate an Is NULL expression
-	static gpos::owner<CExpression *> PexprIsNull(CMemoryPool *mp,
-												  CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprIsNull(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexpr);
 
 	// generate an Is NOT NULL expression
-	static CExpression *PexprIsNotNull(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprIsNotNull(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexpr);
 
 	// generate an Is NOT FALSE expression
-	static CExpression *PexprIsNotFalse(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprIsNotFalse(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexpr);
 
 	// find if a scalar expression uses a nullable columns from the output of a logical expression
 	static BOOL FUsesNullableCol(CMemoryPool *mp,
@@ -225,16 +238,18 @@ public:
 
 	// generate a scalar op expression for a column reference and an expression
 	static gpos::owner<CExpression *> PexprScalarOp(
-		CMemoryPool *mp, const CColRef *pcrLeft, CExpression *pexpr,
-		CWStringConst strOp, IMDId *mdid_op, IMDId *return_type_mdid = nullptr);
+		CMemoryPool *mp, const CColRef *pcrLeft,
+		gpos::owner<CExpression *> pexpr, CWStringConst strOp,
+		gpos::owner<IMDId *> mdid_op, IMDId *return_type_mdid = nullptr);
 
 	// generate a scalar bool op expression
 	static gpos::owner<CExpression *> PexprScalarBoolOp(
 		CMemoryPool *mp, CScalarBoolOp::EBoolOperator eboolop,
-		CExpressionArray *pdrgpexpr);
+		gpos::owner<CExpressionArray *> pdrgpexpr);
 
 	// negate the given expression
-	static CExpression *PexprNegate(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprNegate(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexpr);
 
 	// generate a scalar ident expression
 	static gpos::owner<CExpression *> PexprScalarIdent(CMemoryPool *mp,
@@ -242,28 +257,29 @@ public:
 
 	// generate a scalar project element expression
 	static gpos::owner<CExpression *> PexprScalarProjectElement(
-		CMemoryPool *mp, CColRef *colref, CExpression *pexpr);
+		CMemoryPool *mp, CColRef *colref, gpos::owner<CExpression *> pexpr);
 
 	// generate an aggregate function operator
 	static gpos::owner<CScalarAggFunc *> PopAggFunc(
-		CMemoryPool *mp, IMDId *pmdidAggFunc, const CWStringConst *pstrAggFunc,
-		BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
+		CMemoryPool *mp, gpos::owner<IMDId *> pmdidAggFunc,
+		const CWStringConst *pstrAggFunc, BOOL is_distinct,
+		EAggfuncStage eaggfuncstage, BOOL fSplit,
 		IMDId *
 			pmdidResolvedReturnType,  // return type to be used if original return type is ambiguous
-		EAggfuncKind aggkind, ULongPtrArray *argtypes);
+		EAggfuncKind aggkind, gpos::owner<ULongPtrArray *> argtypes);
 
 	// generate an aggregate function
 	static gpos::owner<CExpression *> PexprAggFunc(
-		CMemoryPool *mp, IMDId *pmdidAggFunc, const CWStringConst *pstrAggFunc,
-		const CColRef *colref, BOOL is_distinct, EAggfuncStage eaggfuncstage,
-		BOOL fSplit);
+		CMemoryPool *mp, gpos::owner<IMDId *> pmdidAggFunc,
+		const CWStringConst *pstrAggFunc, const CColRef *colref,
+		BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit);
 
 	// generate a count(*) expression
-	static CExpression *PexprCountStar(CMemoryPool *mp);
+	static gpos::owner<CExpression *> PexprCountStar(CMemoryPool *mp);
 
 	// generate a GbAgg with count(*) function over the given expression
-	static CExpression *PexprCountStar(CMemoryPool *mp,
-									   CExpression *pexprLogical);
+	static gpos::owner<CExpression *> PexprCountStar(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLogical);
 
 	// return True if passed expression is a Project Element defined on count(*)/count(any) agg
 	static BOOL FCountAggProjElem(gpos::pointer<CExpression *> pexprPrjElem,
@@ -276,41 +292,47 @@ public:
 	// check if given expression has count matching the given column, returns the Logical GroupBy Agg above
 	static BOOL FHasCountAggMatchingColumn(
 		gpos::pointer<const CExpression *> pexpr, const CColRef *colref,
-		const CLogicalGbAgg **ppgbAgg);
+		gpos::pointer<const CLogicalGbAgg *> *ppgbAgg);
 
 	// generate a GbAgg with count(*) and sum(col) over the given expression
-	static CExpression *PexprCountStarAndSum(CMemoryPool *mp,
-											 const CColRef *colref,
-											 CExpression *pexprLogical);
+	static gpos::owner<CExpression *> PexprCountStarAndSum(
+		CMemoryPool *mp, const CColRef *colref,
+		gpos::owner<CExpression *> pexprLogical);
 
 	// generate a sum(col) expression
-	static CExpression *PexprSum(CMemoryPool *mp, const CColRef *colref);
+	static gpos::owner<CExpression *> PexprSum(CMemoryPool *mp,
+											   const CColRef *colref);
 
 	// generate a GbAgg with sum(col) expressions for all columns in the given array
-	static CExpression *PexprGbAggSum(CMemoryPool *mp,
-									  CExpression *pexprLogical,
-									  CColRefArray *pdrgpcrSum);
+	static gpos::owner<CExpression *> PexprGbAggSum(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLogical,
+		gpos::pointer<CColRefArray *> pdrgpcrSum);
 
 	// generate a count(col) expression
-	static CExpression *PexprCount(CMemoryPool *mp, const CColRef *colref,
-								   BOOL is_distinct);
+	static gpos::owner<CExpression *> PexprCount(CMemoryPool *mp,
+												 const CColRef *colref,
+												 BOOL is_distinct);
 
 	// generate a min(col) expression
-	static CExpression *PexprMin(CMemoryPool *mp, CMDAccessor *md_accessor,
-								 const CColRef *colref);
+	static gpos::owner<CExpression *> PexprMin(CMemoryPool *mp,
+											   CMDAccessor *md_accessor,
+											   const CColRef *colref);
 
 	// generate an aggregate expression
-	static CExpression *PexprAgg(CMemoryPool *mp, CMDAccessor *md_accessor,
-								 IMDType::EAggType agg_type,
-								 const CColRef *colref, BOOL is_distinct);
+	static gpos::owner<CExpression *> PexprAgg(CMemoryPool *mp,
+											   CMDAccessor *md_accessor,
+											   IMDType::EAggType agg_type,
+											   const CColRef *colref,
+											   BOOL is_distinct);
 
 	// generate a select expression
 	static gpos::owner<CExpression *> PexprLogicalSelect(
-		CMemoryPool *mp, CExpression *pexpr, CExpression *pexprPredicate);
+		CMemoryPool *mp, gpos::owner<CExpression *> pexpr,
+		gpos::owner<CExpression *> pexprPredicate);
 
 	// if predicate is True return logical expression, otherwise return a new select node
-	static CExpression *PexprSafeSelect(
-		CMemoryPool *mp, CExpression *pexprLogical,
+	static gpos::owner<CExpression *> PexprSafeSelect(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLogical,
 		gpos::owner<CExpression *> pexprPredicate);
 
 	// generate a select expression, if child is another Select expression collapse both Selects into one expression
@@ -319,46 +341,52 @@ public:
 
 	// generate a project expression
 	static gpos::owner<CExpression *> PexprLogicalProject(
-		CMemoryPool *mp, CExpression *pexpr, CExpression *pexprPrjList,
-		BOOL fNewComputedCol);
+		CMemoryPool *mp, gpos::owner<CExpression *> pexpr,
+		gpos::owner<CExpression *> pexprPrjList, BOOL fNewComputedCol);
 
 	// generate a sequence project expression
 	static gpos::owner<CExpression *> PexprLogicalSequenceProject(
-		CMemoryPool *mp, CDistributionSpec *pds, COrderSpecArray *pdrgpos,
-		CWindowFrameArray *pdrgpwf, CExpression *pexpr,
-		CExpression *pexprPrjList);
+		CMemoryPool *mp, gpos::owner<CDistributionSpec *> pds,
+		gpos::owner<COrderSpecArray *> pdrgpos,
+		gpos::owner<CWindowFrameArray *> pdrgpwf,
+		gpos::owner<CExpression *> pexpr,
+		gpos::owner<CExpression *> pexprPrjList);
 
 	// generate a projection of NULL constants
 	// to the map 'colref_mapping', and add the mappings to the colref_mapping map if not NULL
-	static CExpression *PexprLogicalProjectNulls(
-		CMemoryPool *mp, CColRefArray *colref_array, CExpression *pexpr,
-		UlongToColRefMap *colref_mapping = nullptr);
+	static gpos::owner<CExpression *> PexprLogicalProjectNulls(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array,
+		gpos::owner<CExpression *> pexpr,
+		gpos::pointer<UlongToColRefMap *> colref_mapping = nullptr);
 
 	// construct a project list using the given columns and datums
 	// store the mapping in the colref_mapping map if not NULL
 	static gpos::owner<CExpression *> PexprScalarProjListConst(
-		CMemoryPool *mp, CColRefArray *colref_array, IDatumArray *pdrgpdatum,
-		UlongToColRefMap *colref_mapping);
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array,
+		gpos::pointer<IDatumArray *> pdrgpdatum,
+		gpos::pointer<UlongToColRefMap *> colref_mapping);
 
 	// generate a project expression
-	static CExpression *PexprAddProjection(CMemoryPool *mp, CExpression *pexpr,
-										   CExpression *pexprProjected);
+	static gpos::owner<CExpression *> PexprAddProjection(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexpr,
+		gpos::owner<CExpression *> pexprProjected);
 
 	// generate a project expression with one or more additional project elements
-	static CExpression *PexprAddProjection(CMemoryPool *mp, CExpression *pexpr,
-										   CExpressionArray *pdrgpexprProjected,
-										   BOOL fNewComputedCol = true);
+	static gpos::owner<CExpression *> PexprAddProjection(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexpr,
+		gpos::pointer<CExpressionArray *> pdrgpexprProjected,
+		BOOL fNewComputedCol = true);
 
 	// generate an aggregate expression
-	static CExpression *PexprLogicalGbAggGlobal(CMemoryPool *mp,
-												CColRefArray *colref_array,
-												CExpression *pexpr,
-												CExpression *pexprPrL);
+	static gpos::owner<CExpression *> PexprLogicalGbAggGlobal(
+		CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+		gpos::owner<CExpression *> pexpr, gpos::owner<CExpression *> pexprPrL);
 
 	// generate an aggregate expression
 	static gpos::owner<CExpression *> PexprLogicalGbAgg(
-		CMemoryPool *mp, CColRefArray *colref_array, CExpression *pexpr,
-		CExpression *pexprPrL, COperator::EGbAggType egbaggtype);
+		CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+		gpos::owner<CExpression *> pexpr, gpos::owner<CExpression *> pexprPrL,
+		COperator::EGbAggType egbaggtype);
 
 	// check if the aggregate is local or global
 	static BOOL FHasGlobalAggFunc(
@@ -370,35 +398,38 @@ public:
 		gpos::pointer<const CExpression *> pexprProjList);
 
 	// generate a bool expression
-	static CExpression *PexprScalarConstBool(CMemoryPool *mp, BOOL value,
-											 BOOL is_null = false);
+	static gpos::owner<CExpression *> PexprScalarConstBool(
+		CMemoryPool *mp, BOOL value, BOOL is_null = false);
 
 	// generate an int4 expression
-	static CExpression *PexprScalarConstInt4(CMemoryPool *mp, INT val);
+	static gpos::owner<CExpression *> PexprScalarConstInt4(CMemoryPool *mp,
+														   INT val);
 
 	// generate an int8 expression
-	static CExpression *PexprScalarConstInt8(CMemoryPool *mp, LINT val,
-											 BOOL is_null = false);
+	static gpos::owner<CExpression *> PexprScalarConstInt8(
+		CMemoryPool *mp, LINT val, BOOL is_null = false);
 
 	// generate an oid constant expression
-	static CExpression *PexprScalarConstOid(CMemoryPool *mp, OID oid_val);
+	static gpos::owner<CExpression *> PexprScalarConstOid(CMemoryPool *mp,
+														  OID oid_val);
 
 	// generate a NULL constant of a given type
 	static gpos::owner<CExpression *> PexprScalarConstNull(
 		CMemoryPool *mp, gpos::pointer<const IMDType *> typ, INT type_modifier);
 
 	// comparison operator type
-	static IMDType::ECmpType ParseCmpType(IMDId *mdid);
+	static IMDType::ECmpType ParseCmpType(gpos::pointer<IMDId *> mdid);
 
 	// comparison operator type
 	static IMDType::ECmpType ParseCmpType(CMDAccessor *md_accessor,
-										  IMDId *mdid);
+										  gpos::pointer<IMDId *> mdid);
 
 	// generate a binary join expression
 	template <class T>
 	static gpos::owner<CExpression *> PexprLogicalJoin(
-		CMemoryPool *mp, CExpression *pexprLeft, CExpression *pexprRight,
-		CExpression *pexprPredicate,
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		gpos::owner<CExpression *> pexprRight,
+		gpos::owner<CExpression *> pexprPredicate,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// generate an apply expression
@@ -410,21 +441,24 @@ public:
 	// generate an apply expression with a known inner column
 	template <class T>
 	static gpos::owner<CExpression *> PexprLogicalApply(
-		CMemoryPool *mp, CExpression *pexprLeft, CExpression *pexprRight,
-		const CColRef *pcrInner, COperator::EOperatorId eopidOriginSubq,
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		CExpression *pexprRight, const CColRef *pcrInner,
+		COperator::EOperatorId eopidOriginSubq,
 		CExpression *pexprPred = nullptr);
 
 	// generate an apply expression with a known array of inner columns
 	template <class T>
 	static gpos::owner<CExpression *> PexprLogicalApply(
-		CMemoryPool *mp, CExpression *pexprLeft, CExpression *pexprRight,
-		CColRefArray *pdrgpcrInner, COperator::EOperatorId eopidOriginSubq,
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+		gpos::owner<CExpression *> pexprRight,
+		gpos::owner<CColRefArray *> pdrgpcrInner,
+		COperator::EOperatorId eopidOriginSubq,
 		CExpression *pexprPred = nullptr);
 
 	// generate a correlated apply for quantified subquery with a known array of inner columns
 	template <class T>
 	static gpos::owner<CExpression *> PexprLogicalCorrelatedQuantifiedApply(
-		CMemoryPool *mp, CExpression *pexprLeft,
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
 		gpos::owner<CExpression *> pexprRight, CColRefArray *pdrgpcrInner,
 		COperator::EOperatorId eopidOriginSubq,
 		CExpression *pexprPred = nullptr);
@@ -434,16 +468,16 @@ public:
 	//-------------------------------------------------------------------
 
 	// extract the nth partition key from the given array of partition keys
-	static CColRef *PcrExtractPartKey(CColRef2dArray *pdrgpdrgpcr,
-									  ULONG ulLevel);
+	static CColRef *PcrExtractPartKey(
+		gpos::pointer<CColRef2dArray *> pdrgpdrgpcr, ULONG ulLevel);
 
 	//-------------------------------------------------------------------
 	// Helpers for comparisons
 	//-------------------------------------------------------------------
 
 	// deduplicate array of expressions
-	static CExpressionArray *PdrgpexprDedup(CMemoryPool *mp,
-											CExpressionArray *pdrgpexpr);
+	static gpos::owner<CExpressionArray *> PdrgpexprDedup(
+		CMemoryPool *mp, gpos::pointer<CExpressionArray *> pdrgpexpr);
 
 	// deep equality of expression trees
 	static BOOL Equals(gpos::pointer<const CExpression *> pexprLeft,
@@ -464,7 +498,7 @@ public:
 	// return the number of occurrences of the given expression in the given
 	// array of expressions
 	static ULONG UlOccurrences(gpos::pointer<const CExpression *> pexpr,
-							   CExpressionArray *pdrgpexpr);
+							   gpos::pointer<CExpressionArray *> pdrgpexpr);
 
 	//-------------------------------------------------------------------
 	// Helpers for datums
@@ -494,24 +528,25 @@ public:
 	//-------------------------------------------------------------------
 
 	// create an array of output columns including a key for grouping
-	static CColRefArray *PdrgpcrGroupingKey(CMemoryPool *mp, CExpression *pexpr,
-											CColRefArray **ppdrgpcrKey);
+	static gpos::owner<CColRefArray *> PdrgpcrGroupingKey(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+		gpos::owner<CColRefArray *> *ppdrgpcrKey);
 
 	// add an equivalence class (col ref set) to the array. If the new equiv
 	// class contains columns from existing equiv classes, then these are merged
-	static CColRefSetArray *AddEquivClassToArray(
+	static gpos::owner<CColRefSetArray *> AddEquivClassToArray(
 		CMemoryPool *mp, gpos::pointer<const CColRefSet *> pcrsNew,
 		gpos::pointer<const CColRefSetArray *> pdrgpcrs);
 
 	// merge 2 arrays of equivalence classes
-	static CColRefSetArray *PdrgpcrsMergeEquivClasses(
+	static gpos::owner<CColRefSetArray *> PdrgpcrsMergeEquivClasses(
 		CMemoryPool *mp, CColRefSetArray *pdrgpcrsFst,
-		CColRefSetArray *pdrgpcrsSnd);
+		gpos::pointer<CColRefSetArray *> pdrgpcrsSnd);
 
 	// intersect 2 arrays of equivalence classes
-	static CColRefSetArray *PdrgpcrsIntersectEquivClasses(
-		CMemoryPool *mp, CColRefSetArray *pdrgpcrsFst,
-		CColRefSetArray *pdrgpcrsSnd);
+	static gpos::owner<CColRefSetArray *> PdrgpcrsIntersectEquivClasses(
+		CMemoryPool *mp, gpos::pointer<CColRefSetArray *> pdrgpcrsFst,
+		gpos::pointer<CColRefSetArray *> pdrgpcrsSnd);
 
 	// return a copy of equivalence classes from all children
 	static gpos::owner<CColRefSetArray *> PdrgpcrsCopyChildEquivClasses(
@@ -519,9 +554,9 @@ public:
 
 	// return a copy of the given array of columns, excluding the columns
 	// in the given colrefset
-	static CColRefArray *PdrgpcrExcludeColumns(CMemoryPool *mp,
-											   CColRefArray *pdrgpcrOriginal,
-											   CColRefSet *pcrsExcluded);
+	static gpos::owner<CColRefArray *> PdrgpcrExcludeColumns(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrOriginal,
+		gpos::pointer<CColRefSet *> pcrsExcluded);
 
 	//-------------------------------------------------------------------
 	// General helpers
@@ -654,13 +689,14 @@ public:
 					   const COperator::EOperatorId *peopid, ULONG ulOps);
 
 	// return number of inlinable CTEs in the given expression
-	static ULONG UlInlinableCTEs(CExpression *pexpr, ULONG ulDepth = 1);
+	static ULONG UlInlinableCTEs(gpos::pointer<CExpression *> pexpr,
+								 ULONG ulDepth = 1);
 
 	// return number of joins in the given expression
-	static ULONG UlJoins(CExpression *pexpr);
+	static ULONG UlJoins(gpos::pointer<CExpression *> pexpr);
 
 	// return number of subqueries in the given expression
-	static ULONG UlSubqueries(CExpression *pexpr);
+	static ULONG UlSubqueries(gpos::pointer<CExpression *> pexpr);
 
 	// check if expression is scalar bool op
 	static BOOL FScalarBoolOp(gpos::pointer<CExpression *> pexpr);
@@ -691,18 +727,19 @@ public:
 	static BOOL FScalarArray(gpos::pointer<CExpression *> pexpr);
 
 	// returns number of children or constants of it is all constants
-	static ULONG UlScalarArrayArity(CExpression *pexpr);
+	static ULONG UlScalarArrayArity(gpos::pointer<CExpression *> pexpr);
 
 	// returns constant operator of a scalar array expression
-	static CScalarConst *PScalarArrayConstChildAt(CExpression *pexprArray,
-												  ULONG ul);
+	static CScalarConst *PScalarArrayConstChildAt(
+		gpos::pointer<CExpression *> pexprArray, ULONG ul);
 
 	// returns constant expression of a scalar array expression
 	static gpos::owner<CExpression *> PScalarArrayExprChildAt(
-		CMemoryPool *mp, CExpression *pexprArray, ULONG ul);
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprArray, ULONG ul);
 
 	// returns the scalar array expression child of CScalarArrayComp
-	static CExpression *PexprScalarArrayChild(CExpression *pexpr);
+	static CExpression *PexprScalarArrayChild(
+		gpos::pointer<CExpression *> pexpr);
 
 	// returns if the scalar array has all constant elements or children
 	static BOOL FScalarConstArray(gpos::pointer<CExpression *> pexpr);
@@ -712,7 +749,7 @@ public:
 
 	// returns MDId for gp_percentile based on return type
 	static gpos::owner<CMDIdGPDB *> GetPercentileAggMDId(
-		CMemoryPool *mp, CExpression *pexprAggFn);
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprAggFn);
 
 	// returns if the scalar constant array has already been collapased
 	static BOOL FScalarArrayCollapsed(gpos::pointer<CExpression *> pexprArray);
@@ -720,11 +757,12 @@ public:
 	// returns true if the subquery is a ScalarSubqueryAny
 	static BOOL FAnySubquery(gpos::pointer<COperator *> pop);
 
-	static CScalarProjectElement *PNthProjectElement(CExpression *pexpr,
-													 ULONG ul);
+	static CScalarProjectElement *PNthProjectElement(
+		gpos::pointer<CExpression *> pexpr, ULONG ul);
 
 	// returns the expression under the Nth project element of a CLogicalProject
-	static CExpression *PNthProjectElementExpr(CExpression *pexpr, ULONG ul);
+	static CExpression *PNthProjectElementExpr(
+		gpos::pointer<CExpression *> pexpr, ULONG ul);
 
 	// check if the Project list has an inner reference assuming project list has one projecet element
 	static BOOL FInnerRefInProjectList(gpos::pointer<CExpression *> pexpr);
@@ -736,7 +774,7 @@ public:
 	// If it's a scalar array of all CScalarConst, collapse it into a single
 	// expression but keep the constants in the operator.
 	static gpos::owner<CExpression *> PexprCollapseConstArray(
-		CMemoryPool *mp, CExpression *pexprArray);
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprArray);
 
 	// check if expression is scalar array coerce
 	static BOOL FScalarArrayCoerce(gpos::pointer<CExpression *> pexpr);
@@ -777,8 +815,8 @@ public:
 								 COperator::EOperatorId op_id);
 
 	// return the max subset of redistributable columns for the given columns
-	static CColRefArray *PdrgpcrRedistributableSubset(
-		CMemoryPool *mp, CColRefArray *colref_array);
+	static gpos::owner<CColRefArray *> PdrgpcrRedistributableSubset(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array);
 
 	// check if hashing is possible for the given columns
 	static BOOL IsHashable(gpos::pointer<CColRefArray *> colref_array);
@@ -791,10 +829,10 @@ public:
 													   WCHAR *wsz);
 
 	// return column reference defined by project element
-	static CColRef *PcrFromProjElem(CExpression *pexprPrEl);
+	static CColRef *PcrFromProjElem(gpos::pointer<CExpression *> pexprPrEl);
 
 	// construct an array of colids from the given array of column references
-	static ULongPtrArray *Pdrgpul(
+	static gpos::owner<ULongPtrArray *> Pdrgpul(
 		CMemoryPool *mp, gpos::pointer<const CColRefArray *> colref_array);
 
 	// generate a timestamp-based file name
@@ -804,61 +842,61 @@ public:
 
 	// return the mapping of the given colref based on the given hashmap
 	static CColRef *PcrRemap(const CColRef *colref,
-							 UlongToColRefMap *colref_mapping, BOOL must_exist);
+							 gpos::pointer<UlongToColRefMap *> colref_mapping,
+							 BOOL must_exist);
 
 	// create a new colrefset corresponding to the given colrefset
 	// and based on the given mapping
-	static CColRefSet *PcrsRemap(CMemoryPool *mp, CColRefSet *pcrs,
-								 UlongToColRefMap *colref_mapping,
-								 BOOL must_exist);
+	static gpos::owner<CColRefSet *> PcrsRemap(
+		CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs,
+		gpos::pointer<UlongToColRefMap *> colref_mapping, BOOL must_exist);
 
 	// create an array of column references corresponding to the given array
 	// and based on the given mapping
-	static CColRefArray *PdrgpcrRemap(CMemoryPool *mp,
-									  CColRefArray *colref_array,
-									  UlongToColRefMap *colref_mapping,
-									  BOOL must_exist);
+	static gpos::owner<CColRefArray *> PdrgpcrRemap(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array,
+		gpos::pointer<UlongToColRefMap *> colref_mapping, BOOL must_exist);
 
 	// create an array of column references corresponding to the given array
 	// and based on the given mapping and create new colrefs if necessary
-	static CColRefArray *PdrgpcrRemapAndCreate(
-		CMemoryPool *mp, CColRefArray *colref_array,
-		UlongToColRefMap *colref_mapping);
+	static gpos::owner<CColRefArray *> PdrgpcrRemapAndCreate(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array,
+		gpos::pointer<UlongToColRefMap *> colref_mapping);
 
 	// create an array of column arrays corresponding to the given array
 	// and based on the given mapping
-	static CColRef2dArray *PdrgpdrgpcrRemap(CMemoryPool *mp,
-											CColRef2dArray *pdrgpdrgpcr,
-											UlongToColRefMap *colref_mapping,
-											BOOL must_exist);
+	static gpos::owner<CColRef2dArray *> PdrgpdrgpcrRemap(
+		CMemoryPool *mp, gpos::pointer<CColRef2dArray *> pdrgpdrgpcr,
+		gpos::pointer<UlongToColRefMap *> colref_mapping, BOOL must_exist);
 
 	// remap given array of expressions with provided column mappings
-	static CExpressionArray *PdrgpexprRemap(CMemoryPool *mp,
-											CExpressionArray *pdrgpexpr,
-											UlongToColRefMap *colref_mapping);
+	static gpos::owner<CExpressionArray *> PdrgpexprRemap(
+		CMemoryPool *mp, gpos::pointer<CExpressionArray *> pdrgpexpr,
+		gpos::pointer<UlongToColRefMap *> colref_mapping);
 
 	// create ColRef->ColRef mapping using the given ColRef arrays
-	static UlongToColRefMap *PhmulcrMapping(CMemoryPool *mp,
-											CColRefArray *pdrgpcrFrom,
-											CColRefArray *pdrgpcrTo);
+	static gpos::owner<UlongToColRefMap *> PhmulcrMapping(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrFrom,
+		gpos::pointer<CColRefArray *> pdrgpcrTo);
 
 	// add col ID->ColRef mappings to the given hashmap based on the
 	// given ColRef arrays
-	static void AddColumnMapping(CMemoryPool *mp,
-								 UlongToColRefMap *colref_mapping,
-								 CColRefArray *pdrgpcrFrom,
-								 CColRefArray *pdrgpcrTo);
+	static void AddColumnMapping(
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+		gpos::pointer<CColRefArray *> pdrgpcrFrom,
+		gpos::pointer<CColRefArray *> pdrgpcrTo);
 
 	// create a copy of the array of column references
-	static CColRefArray *PdrgpcrExactCopy(CMemoryPool *mp,
-										  CColRefArray *colref_array);
+	static gpos::owner<CColRefArray *> PdrgpcrExactCopy(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array);
 
 	// create an array of new column references with the same names and
 	// types as the given column references.
 	// if the passed map is not null, mappings from old to copied variables are added to it
-	static CColRefArray *PdrgpcrCopy(
-		CMemoryPool *mp, CColRefArray *colref_array, BOOL fAllComputed = false,
-		UlongToColRefMap *colref_mapping = nullptr);
+	static gpos::owner<CColRefArray *> PdrgpcrCopy(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array,
+		BOOL fAllComputed = false,
+		gpos::pointer<UlongToColRefMap *> colref_mapping = nullptr);
 
 	// equality check between two arrays of column refs. Inputs can be NULL
 	static BOOL Equals(gpos::pointer<CColRefArray *> pdrgpcrFst,
@@ -871,57 +909,61 @@ public:
 
 	// return the set of column reference from the CTE Producer corresponding to the
 	// subset of input columns from the CTE Consumer
-	static CColRefSet *PcrsCTEProducerColumns(
-		CMemoryPool *mp, CColRefSet *pcrsInput,
-		CLogicalCTEConsumer *popCTEConsumer);
+	static gpos::owner<CColRefSet *> PcrsCTEProducerColumns(
+		CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrsInput,
+		gpos::pointer<CLogicalCTEConsumer *> popCTEConsumer);
 
 	// construct the join condition (AND-tree of INDF operators)
 	// from the array of input columns reference arrays (aligned)
-	static CExpression *PexprConjINDFCond(CMemoryPool *mp,
-										  CColRef2dArray *pdrgpdrgpcrInput);
+	static gpos::owner<CExpression *> PexprConjINDFCond(
+		CMemoryPool *mp, gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput);
 
 	// check whether a colref array contains repeated items
 	static BOOL FHasDuplicates(
 		gpos::pointer<const CColRefArray *> colref_array);
 
 	// cast the input expression to the destination mdid
-	static CExpression *PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
-								  CExpression *pexpr, IMDId *mdid_dest);
+	static gpos::owner<CExpression *> PexprCast(CMemoryPool *mp,
+												CMDAccessor *md_accessor,
+												CExpression *pexpr,
+												IMDId *mdid_dest);
 
 	// construct a logical join expression of the given type, with the given children
 	static gpos::owner<CExpression *> PexprLogicalJoin(
 		CMemoryPool *mp, EdxlJoinType edxljointype,
-		CExpressionArray *pdrgpexpr);
+		gpos::owner<CExpressionArray *> pdrgpexpr);
 
 	// construct an array of scalar ident expressions from the given array
 	// of column references
-	static CExpressionArray *PdrgpexprScalarIdents(CMemoryPool *mp,
-												   CColRefArray *colref_array);
+	static gpos::owner<CExpressionArray *> PdrgpexprScalarIdents(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array);
 
 	// return the columns from the scalar ident expressions in the given array
-	static CColRefSet *PcrsExtractColumns(
+	static gpos::owner<CColRefSet *> PcrsExtractColumns(
 		CMemoryPool *mp, gpos::pointer<const CExpressionArray *> pdrgpexpr);
 
 	// create a new bitset of the given length, where all the bits are set
-	static CBitSet *PbsAllSet(CMemoryPool *mp, ULONG size);
+	static gpos::owner<CBitSet *> PbsAllSet(CMemoryPool *mp, ULONG size);
 
 	// return a new bitset, setting the bits in the given array
-	static CBitSet *Pbs(CMemoryPool *mp, ULongPtrArray *pdrgpul);
+	static gpos::owner<CBitSet *> Pbs(CMemoryPool *mp,
+									  gpos::pointer<ULongPtrArray *> pdrgpul);
 
 	// helper to create a dummy constant table expression
 	static gpos::owner<CExpression *> PexprLogicalCTGDummy(CMemoryPool *mp);
 
 	// map a column from source array to destination array based on position
-	static CColRef *PcrMap(CColRef *pcrSource, CColRefArray *pdrgpcrSource,
-						   CColRefArray *pdrgpcrTarget);
+	static CColRef *PcrMap(CColRef *pcrSource,
+						   gpos::pointer<CColRefArray *> pdrgpcrSource,
+						   gpos::pointer<CColRefArray *> pdrgpcrTarget);
 
 	//	return index of the set containing given column
-	static ULONG UlPcrIndexContainingSet(CColRefSetArray *pdrgpcrs,
-										 const CColRef *colref);
+	static ULONG UlPcrIndexContainingSet(
+		gpos::pointer<CColRefSetArray *> pdrgpcrs, const CColRef *colref);
 
 	// collapse the top two project nodes, if unable return NULL
-	static gpos::owner<CExpression *> PexprCollapseProjects(CMemoryPool *mp,
-															CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprCollapseProjects(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr);
 
 	// match function between index get/scan operators
 	template <class T>
@@ -960,12 +1002,13 @@ public:
 		gpos::pointer<CColRefSetArray *> pdrgpcrsSnd);
 
 	// get execution locality
-	static EExecLocalityType ExecLocalityType(CDistributionSpec *pds);
+	static EExecLocalityType ExecLocalityType(
+		gpos::pointer<CDistributionSpec *> pds);
 
 	// generate a limit expression on top of the given relational child with the given offset and limit count
-	static gpos::owner<CExpression *> PexprLimit(CMemoryPool *mp,
-												 CExpression *pexpr,
-												 ULONG ulOffSet, ULONG count);
+	static gpos::owner<CExpression *> PexprLimit(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexpr, ULONG ulOffSet,
+		ULONG count);
 
 	// generate part oid
 	static BOOL FGeneratePartOid(gpos::pointer<IMDId *> mdid);
@@ -991,11 +1034,12 @@ public:
 	// DISTINCT FROM operators that has one side equal to the given expression
 	static CExpression *PexprMatchEqualityOrINDF(
 		CExpression *pexprToMatch,
-		CExpressionArray *pdrgpexpr	 // array of predicates to inspect
+		gpos::pointer<CExpressionArray *>
+			pdrgpexpr  // array of predicates to inspect
 	);
 
 	static gpos::owner<CExpression *> MakeJoinWithoutInferredPreds(
-		CMemoryPool *mp, CExpression *join_expr);
+		CMemoryPool *mp, gpos::pointer<CExpression *> join_expr);
 
 	static BOOL Contains(gpos::pointer<const CExpressionArray *> exprs,
 						 gpos::pointer<CExpression *> expr_to_match);
@@ -1012,12 +1056,12 @@ public:
 
 	static BOOL CanRemoveInferredPredicates(COperator::EOperatorId op_id);
 
-	static CExpressionArrays *GetCombinedExpressionArrays(
-		CMemoryPool *mp, CExpressionArrays *exprs_array,
-		CExpressionArrays *exprs_array_other);
+	static gpos::owner<CExpressionArrays *> GetCombinedExpressionArrays(
+		CMemoryPool *mp, gpos::pointer<CExpressionArrays *> exprs_array,
+		gpos::pointer<CExpressionArrays *> exprs_array_other);
 
-	static void AddExprs(CExpressionArrays *results_exprs,
-						 CExpressionArrays *input_exprs);
+	static void AddExprs(gpos::pointer<CExpressionArrays *> results_exprs,
+						 gpos::pointer<CExpressionArrays *> input_exprs);
 
 	static BOOL FScalarConstBoolNull(gpos::pointer<CExpression *> pexpr);
 };	// class CUtils
@@ -1037,16 +1081,18 @@ using ExprHashSet = CHashSet<CExpression, CExpression::UlHashDedup,
 //---------------------------------------------------------------------------
 template <class T>
 gpos::owner<CExpression *>
-CUtils::PexprLogicalJoin(CMemoryPool *mp, CExpression *pexprLeft,
-						 CExpression *pexprRight, CExpression *pexprPredicate,
+CUtils::PexprLogicalJoin(CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+						 gpos::owner<CExpression *> pexprRight,
+						 gpos::owner<CExpression *> pexprPredicate,
 						 CXform::EXformId origin_xform)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
 	GPOS_ASSERT(nullptr != pexprRight);
 	GPOS_ASSERT(nullptr != pexprPredicate);
 
-	return GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) T(mp, origin_xform),
-									pexprLeft, pexprRight, pexprPredicate);
+	return GPOS_NEW(mp)
+		CExpression(mp, GPOS_NEW(mp) T(mp, origin_xform), std::move(pexprLeft),
+					std::move(pexprRight), std::move(pexprPredicate));
 }
 
 //---------------------------------------------------------------------------
@@ -1065,7 +1111,7 @@ CUtils::PexprLogicalApply(CMemoryPool *mp, CExpression *pexprLeft,
 	GPOS_ASSERT(nullptr != pexprLeft);
 	GPOS_ASSERT(nullptr != pexprRight);
 
-	CExpression *pexprScalar = pexprPred;
+	gpos::owner<CExpression *> pexprScalar = pexprPred;
 	if (nullptr == pexprPred)
 	{
 		pexprScalar = PexprScalarConstBool(mp, true /*value*/);
@@ -1086,8 +1132,9 @@ CUtils::PexprLogicalApply(CMemoryPool *mp, CExpression *pexprLeft,
 //---------------------------------------------------------------------------
 template <class T>
 gpos::owner<CExpression *>
-CUtils::PexprLogicalApply(CMemoryPool *mp, CExpression *pexprLeft,
-						  CExpression *pexprRight, const CColRef *pcrInner,
+CUtils::PexprLogicalApply(CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+						  gpos::owner<CExpression *> pexprRight,
+						  const CColRef *pcrInner,
 						  COperator::EOperatorId eopidOriginSubq,
 						  CExpression *pexprPred)
 {
@@ -1095,7 +1142,7 @@ CUtils::PexprLogicalApply(CMemoryPool *mp, CExpression *pexprLeft,
 	GPOS_ASSERT(nullptr != pexprRight);
 	GPOS_ASSERT(nullptr != pcrInner);
 
-	CExpression *pexprScalar = pexprPred;
+	gpos::owner<CExpression *> pexprScalar = pexprPred;
 	if (nullptr == pexprPred)
 	{
 		pexprScalar = PexprScalarConstBool(mp, true /*value*/);
@@ -1103,9 +1150,9 @@ CUtils::PexprLogicalApply(CMemoryPool *mp, CExpression *pexprLeft,
 
 	gpos::owner<CColRefArray *> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 	colref_array->Append(const_cast<CColRef *>(pcrInner));
-	return GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) T(mp, colref_array, eopidOriginSubq),
-					pexprLeft, pexprRight, pexprScalar);
+	return GPOS_NEW(mp) CExpression(
+		mp, GPOS_NEW(mp) T(mp, std::move(colref_array), eopidOriginSubq),
+		std::move(pexprLeft), std::move(pexprRight), std::move(pexprScalar));
 }
 
 //---------------------------------------------------------------------------
@@ -1118,8 +1165,9 @@ CUtils::PexprLogicalApply(CMemoryPool *mp, CExpression *pexprLeft,
 //---------------------------------------------------------------------------
 template <class T>
 gpos::owner<CExpression *>
-CUtils::PexprLogicalApply(CMemoryPool *mp, CExpression *pexprLeft,
-						  CExpression *pexprRight, CColRefArray *pdrgpcrInner,
+CUtils::PexprLogicalApply(CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+						  gpos::owner<CExpression *> pexprRight,
+						  gpos::owner<CColRefArray *> pdrgpcrInner,
 						  COperator::EOperatorId eopidOriginSubq,
 						  CExpression *pexprPred)
 {
@@ -1128,15 +1176,15 @@ CUtils::PexprLogicalApply(CMemoryPool *mp, CExpression *pexprLeft,
 	GPOS_ASSERT(nullptr != pdrgpcrInner);
 	GPOS_ASSERT(0 < pdrgpcrInner->Size());
 
-	CExpression *pexprScalar = pexprPred;
+	gpos::owner<CExpression *> pexprScalar = pexprPred;
 	if (nullptr == pexprPred)
 	{
 		pexprScalar = PexprScalarConstBool(mp, true /*value*/);
 	}
 
-	return GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) T(mp, pdrgpcrInner, eopidOriginSubq),
-					pexprLeft, pexprRight, pexprScalar);
+	return GPOS_NEW(mp) CExpression(
+		mp, GPOS_NEW(mp) T(mp, std::move(pdrgpcrInner), eopidOriginSubq),
+		std::move(pexprLeft), std::move(pexprRight), std::move(pexprScalar));
 }
 
 //---------------------------------------------------------------------------
@@ -1150,8 +1198,9 @@ CUtils::PexprLogicalApply(CMemoryPool *mp, CExpression *pexprLeft,
 template <class T>
 gpos::owner<CExpression *>
 CUtils::PexprLogicalCorrelatedQuantifiedApply(
-	CMemoryPool *mp, CExpression *pexprLeft,
-	gpos::owner<CExpression *> pexprRight, CColRefArray *pdrgpcrInner,
+	CMemoryPool *mp, gpos::owner<CExpression *> pexprLeft,
+	gpos::owner<CExpression *> pexprRight,
+	gpos::owner<CColRefArray *> pdrgpcrInner,
 	COperator::EOperatorId eopidOriginSubq, CExpression *pexprPred)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
@@ -1188,9 +1237,9 @@ CUtils::PexprLogicalCorrelatedQuantifiedApply(
 		pexprRight = pexprChild;
 	}
 
-	return GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) T(mp, pdrgpcrInner, eopidOriginSubq),
-					pexprLeft, pexprRight, pexprScalar);
+	return GPOS_NEW(mp) CExpression(
+		mp, GPOS_NEW(mp) T(mp, std::move(pdrgpcrInner), eopidOriginSubq),
+		std::move(pexprLeft), std::move(pexprRight), std::move(pexprScalar));
 }
 
 //---------------------------------------------------------------------------
@@ -1255,10 +1304,11 @@ CUtils::FScalarConstInt(gpos::pointer<CExpression *> pexpr)
 	GPOS_ASSERT(IMDType::EtiInt2 == type_info ||
 				IMDType::EtiInt4 == type_info || IMDType::EtiInt8 == type_info);
 
-	COperator *pop = pexpr->Pop();
+	gpos::pointer<COperator *> pop = pexpr->Pop();
 	if (COperator::EopScalarConst == pop->Eopid())
 	{
-		CScalarConst *popScalarConst = CScalarConst::PopConvert(pop);
+		gpos::pointer<CScalarConst *> popScalarConst =
+			gpos::dyn_cast<CScalarConst>(pop);
 		if (type_info == popScalarConst->GetDatum()->GetDatumType())
 		{
 			return true;
@@ -1285,7 +1335,7 @@ CUtils::FMatchIndex(T *pop1, gpos::pointer<COperator *> pop2)
 		return false;
 	}
 
-	T *popIndex = T::PopConvert(pop2);
+	T *popIndex = gpos::dyn_cast<T>(pop2);
 
 	return pop1->UlOriginOpId() == popIndex->UlOriginOpId() &&
 		   pop1->Ptabdesc()->MDId()->Equals(popIndex->Ptabdesc()->MDId()) &&
@@ -1310,7 +1360,7 @@ CUtils::FMatchDynamicIndex(T *pop1, gpos::pointer<COperator *> pop2)
 		return false;
 	}
 
-	T *popIndex2 = T::PopConvert(pop2);
+	T *popIndex2 = gpos::dyn_cast<T>(pop2);
 
 	// match if the index descriptors are identical
 	// we will compare MDIds, so both indexes should be partial or non-partial.
@@ -1345,7 +1395,7 @@ CUtils::FMatchDynamicScan(T *pop1, gpos::pointer<COperator *> pop2)
 		return false;
 	}
 
-	T *popScan2 = T::PopConvert(pop2);
+	T *popScan2 = gpos::dyn_cast<T>(pop2);
 
 	// match if the table descriptors are identical
 	// Possible improvement:
@@ -1375,7 +1425,7 @@ CUtils::FMatchDynamicBitmapScan(T *pop1, gpos::pointer<COperator *> pop2)
 		return false;
 	}
 
-	T *popDynamicBitmapScan2 = T::PopConvert(pop2);
+	T *popDynamicBitmapScan2 = gpos::dyn_cast<T>(pop2);
 
 	return pop1->UlOriginOpId() == popDynamicBitmapScan2->UlOriginOpId() &&
 		   FMatchDynamicScan(
@@ -1401,7 +1451,7 @@ CUtils::FMatchBitmapScan(T *pop1, gpos::pointer<COperator *> pop2)
 		return false;
 	}
 
-	T *popScan2 = T::PopConvert(pop2);
+	T *popScan2 = gpos::dyn_cast<T>(pop2);
 
 	return pop1->UlOriginOpId() == popScan2->UlOriginOpId() &&
 		   pop1->Ptabdesc()->MDId()->Equals(popScan2->Ptabdesc()->MDId()) &&

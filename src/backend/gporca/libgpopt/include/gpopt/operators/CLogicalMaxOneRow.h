@@ -58,7 +58,7 @@ public:
 
 	// match function;
 	BOOL
-	Matches(COperator *pop) const override
+	Matches(gpos::pointer<COperator *> pop) const override
 	{
 		return (Eopid() == pop->Eopid());
 	}
@@ -71,11 +71,12 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	gpos::owner<COperator *>
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -93,7 +94,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	DeriveOutputColumns(CMemoryPool *,	// mp
 						CExpressionHandle &exprhdl) override
 	{
@@ -101,7 +102,7 @@ public:
 	}
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::owner<CPartInfo *>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -109,7 +110,7 @@ public:
 	}
 
 	// dervive keys
-	CKeyCollection *
+	gpos::owner<CKeyCollection *>
 	DeriveKeyCollection(CMemoryPool *,	// mp
 						CExpressionHandle &exprhdl) const override
 	{
@@ -126,7 +127,7 @@ public:
 	}
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -141,16 +142,17 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CColRefSet *pcrsInput,
-						 ULONG child_index) const override;
+	gpos::owner<CColRefSet *> PcrsStat(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl,
+									   gpos::pointer<CColRefSet *> pcrsInput,
+									   ULONG child_index) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -167,8 +169,9 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *  // stats_ctxt
+	gpos::owner<IStatistics *> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<IStatisticsArray *>  // stats_ctxt
 	) const override;
 
 

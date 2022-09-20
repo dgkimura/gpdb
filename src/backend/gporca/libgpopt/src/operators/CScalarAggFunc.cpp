@@ -38,7 +38,7 @@ CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
 							   const CWStringConst *pstrAggFunc,
 							   BOOL is_distinct, EAggfuncStage eaggfuncstage,
 							   BOOL fSplit, EAggfuncKind aggkind,
-							   ULongPtrArray *argtypes)
+							   gpos::owner<ULongPtrArray *> argtypes)
 	: CScalar(mp),
 	  m_pmdidAggFunc(pmdidAggFunc),
 	  m_pmdidResolvedRetType(resolved_rettype),
@@ -46,7 +46,7 @@ CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
 	  m_pstrAggFunc(pstrAggFunc),
 	  m_is_distinct(is_distinct),
 	  m_aggkind(aggkind),
-	  m_argtypes(argtypes),
+	  m_argtypes(std::move(argtypes)),
 	  m_eaggfuncstage(eaggfuncstage),
 	  m_fSplit(fSplit)
 {
@@ -61,7 +61,7 @@ CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
 	gpos::owner<IMDId *> mdid = PmdidLookupReturnType(
 		m_pmdidAggFunc, (EaggfuncstageGlobal == m_eaggfuncstage));
 	mdid->AddRef();
-	m_return_type_mdid = mdid;
+	m_return_type_mdid = std::move(mdid);
 }
 
 //---------------------------------------------------------------------------
@@ -164,11 +164,12 @@ CScalarAggFunc::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarAggFunc::Matches(COperator *pop) const
+CScalarAggFunc::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarAggFunc *popScAggFunc = CScalarAggFunc::PopConvert(pop);
+		gpos::pointer<CScalarAggFunc *> popScAggFunc =
+			gpos::dyn_cast<CScalarAggFunc>(pop);
 
 		// match if func ids are identical
 		return ((popScAggFunc->IsDistinct() == m_is_distinct) &&

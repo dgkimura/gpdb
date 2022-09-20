@@ -125,9 +125,9 @@ CParseHandlerScalarBitmapIndexProbe::EndElement(
 		index_descr_parse_handler->GetDXLIndexDescr();
 	dxl_index_descr->AddRef();
 
-	gpos::owner<CDXLScalar *> dxl_op =
-		GPOS_NEW(m_mp) CDXLScalarBitmapIndexProbe(m_mp, dxl_index_descr);
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+	gpos::owner<CDXLScalar *> dxl_op = GPOS_NEW(m_mp)
+		CDXLScalarBitmapIndexProbe(m_mp, std::move(dxl_index_descr));
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 
 	// add children
 	AddChildFromParseHandler(index_cond_list_parse_handler);

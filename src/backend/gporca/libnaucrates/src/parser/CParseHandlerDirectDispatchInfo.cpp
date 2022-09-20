@@ -104,10 +104,10 @@ CParseHandlerDirectDispatchInfo::StartElement(
 	{
 		GPOS_ASSERT(nullptr != m_dxl_datum_array);
 
-		CDXLDatum *dxl_datum = CDXLOperatorFactory::GetDatumVal(
+		gpos::owner<CDXLDatum *> dxl_datum = CDXLOperatorFactory::GetDatumVal(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenDirectDispatchInfo);
-		m_dxl_datum_array->Append(dxl_datum);
+		m_dxl_datum_array->Append(std::move(dxl_datum));
 	}
 	else
 	{

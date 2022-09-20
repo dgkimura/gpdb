@@ -12,6 +12,7 @@
 #define GPOPT_CXformLeftSemiApply2LeftSemiJoinNoCorrelations_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalLeftSemiApply.h"
 #include "gpopt/operators/CLogicalLeftSemiJoin.h"
@@ -48,10 +49,10 @@ public:
 	~CXformLeftSemiApply2LeftSemiJoinNoCorrelations() override = default;
 
 	// ctor with a passed pattern
-	CXformLeftSemiApply2LeftSemiJoinNoCorrelations(CMemoryPool *mp,
-												   CExpression *pexprPattern)
+	CXformLeftSemiApply2LeftSemiJoinNoCorrelations(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexprPattern)
 		: CXformApply2Join<CLogicalLeftSemiApply, CLogicalLeftSemiJoin>(
-			  mp, pexprPattern)
+			  mp, std::move(pexprPattern))
 	{
 	}
 
@@ -72,8 +73,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::pointer<CXformContext *> pxfctxt,
+				   gpos::pointer<CXformResult *> pxfres,
+				   gpos::pointer<CExpression *> pexpr) const override;
 
 
 };	// class CXformLeftSemiApply2LeftSemiJoinNoCorrelations

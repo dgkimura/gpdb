@@ -180,7 +180,7 @@ CParseHandlerPhysicalAbstractBitmapScan::EndElementHelper(
 		dxl_op = GPOS_NEW(m_mp) CDXLPhysicalDynamicBitmapTableScan(
 			m_mp, table_descr, mdid_partitions_array, selector_ids);
 	}
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 
 	// set statictics and physical properties
 	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);

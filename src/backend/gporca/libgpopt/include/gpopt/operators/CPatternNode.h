@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPattern.h"
 
@@ -50,7 +51,7 @@ public:
 
 	// match function
 	BOOL
-	Matches(COperator *pop) const override
+	Matches(gpos::pointer<COperator *> pop) const override
 	{
 		return Eopid() == pop->Eopid() &&
 			   m_match == static_cast<CPatternNode *>(pop)->m_match;

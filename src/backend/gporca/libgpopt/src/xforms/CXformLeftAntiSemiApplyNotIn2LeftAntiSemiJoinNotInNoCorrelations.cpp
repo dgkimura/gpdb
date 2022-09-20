@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotInNoCorrelations.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 
@@ -49,7 +50,9 @@ CXformLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotInNoCorrelations::Exfp(
 //---------------------------------------------------------------------------
 void
 CXformLeftAntiSemiApplyNotIn2LeftAntiSemiJoinNotInNoCorrelations::Transform(
-	CXformContext *pxfctxt, CXformResult *pxfres, CExpression *pexpr) const
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

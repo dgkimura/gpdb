@@ -186,7 +186,7 @@ CParseHandlerStatsDerivedColumn::EndElement(
 
 	m_dxl_stats_derived_col = GPOS_NEW(m_mp) CDXLStatsDerivedColumn(
 		m_colid, m_width, m_null_freq, m_distinct_remaining, m_freq_remaining,
-		dxl_stats_bucket_array);
+		std::move(dxl_stats_bucket_array));
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

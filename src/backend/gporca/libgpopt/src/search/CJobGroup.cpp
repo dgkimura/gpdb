@@ -11,6 +11,8 @@
 
 #include "gpopt/search/CJobGroup.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/search/CGroupProxy.h"
 #include "gpopt/search/CJobFactory.h"
 #include "gpopt/search/CJobGroupExpressionExploration.h"
@@ -28,7 +30,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroup::Init(CGroup *pgroup)
+CJobGroup::Init(gpos::pointer<CGroup *> pgroup)
 {
 	GPOS_ASSERT(!FInit());
 	GPOS_ASSERT(nullptr != pgroup);

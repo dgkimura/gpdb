@@ -37,19 +37,18 @@ private:
 					   gpos::pointer<CExpression *> pexprChild);
 
 	// simplify outer joins
-	static BOOL FSimplifySelectOnOuterJoin(CMemoryPool *mp,
-										   CExpression *pexprOuterJoin,
-										   CExpression *pexprPred,
-										   CExpression **ppexprResult);
+	static BOOL FSimplifySelectOnOuterJoin(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprOuterJoin,
+		gpos::pointer<CExpression *> pexprPred,
+		gpos::owner<CExpression *> *ppexprResult);
 
-	static BOOL FSimplifySelectOnFullJoin(CMemoryPool *mp,
-										  CExpression *pexprFullJoin,
-										  CExpression *pexprPred,
-										  CExpression **ppexprResult);
+	static BOOL FSimplifySelectOnFullJoin(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprFullJoin,
+		CExpression *pexprPred, gpos::owner<CExpression *> *ppexprResult);
 
 	// call normalizer recursively on expression children
 	static gpos::owner<CExpression *> PexprRecursiveNormalize(
-		CMemoryPool *mp, CExpression *pexpr);
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr);
 
 	// check if a scalar predicate can be pushed through a logical expression
 	static BOOL FPushable(gpos::pointer<CExpression *> pexprLogical,
@@ -64,68 +63,74 @@ private:
 	static BOOL FPushThruOuterChild(gpos::pointer<CExpression *> pexprLogical);
 
 	// return a Select expression, if needed, with a scalar condition made of given array of conjuncts
-	static CExpression *PexprSelect(CMemoryPool *mp, CExpression *pexpr,
-									gpos::owner<CExpressionArray *> pdrgpexpr);
+	static gpos::owner<CExpression *> PexprSelect(
+		CMemoryPool *mp, gpos::owner<CExpression *> pexpr,
+		gpos::owner<CExpressionArray *> pdrgpexpr);
 
 	// push scalar expression through an expression with unary operator with scalar child
-	static void PushThruUnaryWithScalarChild(CMemoryPool *mp,
-											 CExpression *pexprLogical,
-											 CExpression *pexprConj,
-											 CExpression **ppexprResult);
+	static void PushThruUnaryWithScalarChild(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprLogical,
+		gpos::pointer<CExpression *> pexprConj,
+		gpos::owner<CExpression *> *ppexprResult);
 
 	// push scalar expression through a sequence project expression
-	static void PushThruSeqPrj(CMemoryPool *mp, CExpression *pexprSeqPrj,
-							   CExpression *pexprConj,
-							   CExpression **ppexprResult);
+	static void PushThruSeqPrj(CMemoryPool *mp,
+							   gpos::pointer<CExpression *> pexprSeqPrj,
+							   gpos::pointer<CExpression *> pexprConj,
+							   gpos::owner<CExpression *> *ppexprResult);
 
 	// push scalar expression through a set operation
-	static void PushThruSetOp(CMemoryPool *mp, CExpression *pexprSetOp,
+	static void PushThruSetOp(CMemoryPool *mp,
+							  gpos::pointer<CExpression *> pexprSetOp,
 							  CExpression *pexprConj,
-							  CExpression **ppexprResult);
+							  gpos::owner<CExpression *> *ppexprResult);
 
 	// push a conjunct through a CTE anchor operator
-	static void PushThruUnaryWithoutScalarChild(CMemoryPool *mp,
-												CExpression *pexprLogical,
-												CExpression *pexprConj,
-												CExpression **ppexprResult);
+	static void PushThruUnaryWithoutScalarChild(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprLogical,
+		gpos::pointer<CExpression *> pexprConj,
+		gpos::owner<CExpression *> *ppexprResult);
 
 	// push scalar expression through a select expression
-	static void PushThruSelect(CMemoryPool *mp, CExpression *pexprSelect,
-							   CExpression *pexprConj,
-							   CExpression **ppexprResult);
+	static void PushThruSelect(CMemoryPool *mp,
+							   gpos::pointer<CExpression *> pexprSelect,
+							   gpos::pointer<CExpression *> pexprConj,
+							   gpos::owner<CExpression *> *ppexprResult);
 
 	// split the given conjunct into pushable and unpushable predicates
-	static void SplitConjunct(CMemoryPool *mp, CExpression *pexpr,
-							  CExpression *pexprConj,
-							  CExpressionArray **ppdrgpexprPushable,
-							  CExpressionArray **ppdrgpexprUnpushable);
+	static void SplitConjunct(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+		gpos::pointer<CExpression *> pexprConj,
+		gpos::owner<CExpressionArray *> *ppdrgpexprPushable,
+		gpos::owner<CExpressionArray *> *ppdrgpexprUnpushable);
 
 	// split the given conjunct into pushable and unpushable predicates for a sequence project expression
-	static void SplitConjunctForSeqPrj(CMemoryPool *mp,
-									   CExpression *pexprSeqPrj,
-									   CExpression *pexprConj,
-									   CExpressionArray **ppdrgpexprPushable,
-									   CExpressionArray **ppdrgpexprUnpushable);
+	static void SplitConjunctForSeqPrj(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprSeqPrj,
+		gpos::pointer<CExpression *> pexprConj,
+		gpos::owner<CExpressionArray *> *ppdrgpexprPushable,
+		gpos::owner<CExpressionArray *> *ppdrgpexprUnpushable);
 
 	// push scalar expression through left outer join children
 	static void PushThruOuterChild(CMemoryPool *mp, CExpression *pexpr,
 								   CExpression *pexprConj,
-								   CExpression **ppexprResult);
+								   gpos::owner<CExpression *> *ppexprResult);
 
 	// push scalar expression through a join expression
 	static void PushThruJoin(CMemoryPool *mp, CExpression *pexprJoin,
 							 CExpression *pexprConj,
-							 CExpression **ppexprResult);
+							 gpos::owner<CExpression *> *ppexprResult);
 
 	// push scalar expression through logical expression
 	static void PushThru(CMemoryPool *mp, CExpression *pexprLogical,
-						 CExpression *pexprConj, CExpression **ppexprResult);
+						 CExpression *pexprConj,
+						 gpos::owner<CExpression *> *ppexprResult);
 
 	// push an array of conjuncts through logical expression, and compute an array of remaining conjuncts
 	static void PushThru(CMemoryPool *mp, CExpression *pexprLogical,
-						 CExpressionArray *pdrgpexprConjuncts,
-						 CExpression **ppexprResult,
-						 CExpressionArray **ppdrgpexprRemaining);
+						 gpos::pointer<CExpressionArray *> pdrgpexprConjuncts,
+						 gpos::owner<CExpression *> *ppexprResult,
+						 gpos::owner<CExpressionArray *> *ppdrgpexprRemaining);
 
 	// private copy ctor
 	CNormalizer(const CNormalizer &);
@@ -139,8 +144,9 @@ private:
 	// exist in the given used columns set
 	static gpos::owner<CExpression *> PexprPullUpProjectElements(
 		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
-		CColRefSet *pcrsUsed, CColRefSet *pcrsOutput,
-		CExpressionArray *pdrgpexprPrElPullUp);
+		gpos::pointer<CColRefSet *> pcrsUsed,
+		gpos::pointer<CColRefSet *> pcrsOutput,
+		gpos::pointer<CExpressionArray *> pdrgpexprPrElPullUp);
 
 #ifdef GPOS_DEBUG
 	// check if the columns used by the operator are a subset of its input columns
@@ -159,8 +165,8 @@ public:
 
 	// pull logical projects as far up the logical tree as possible, and
 	// combine consecutive projects if possible
-	static CExpression *PexprPullUpProjections(CMemoryPool *mp,
-											   CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprPullUpProjections(
+		CMemoryPool *mp, CExpression *pexpr);
 
 };	// class CNormalizer
 }  // namespace gpopt

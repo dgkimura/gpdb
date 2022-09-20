@@ -114,7 +114,7 @@ CDXLScalarValuesList::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *pdxlnConstVal = (*dxlnode)[idx];
+		gpos::pointer<CDXLNode *> pdxlnConstVal = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					pdxlnConstVal->GetOperator()->GetDXLOperatorType());
 

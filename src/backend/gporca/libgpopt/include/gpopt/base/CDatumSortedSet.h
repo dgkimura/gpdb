@@ -4,6 +4,7 @@
 #ifndef GPOPT_CDatumSortedSet_H
 #define GPOPT_CDatumSortedSet_H
 
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPool.h"
 
 #include "gpopt/base/IComparator.h"
@@ -20,7 +21,7 @@ private:
 	BOOL m_fIncludesNull;
 
 public:
-	CDatumSortedSet(CMemoryPool *mp, CExpression *pexprArray,
+	CDatumSortedSet(CMemoryPool *mp, gpos::pointer<CExpression *> pexprArray,
 					const IComparator *pcomp);
 
 	BOOL FIncludesNull() const;

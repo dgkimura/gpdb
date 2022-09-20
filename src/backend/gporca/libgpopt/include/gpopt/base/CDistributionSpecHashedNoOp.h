@@ -14,7 +14,7 @@ namespace gpopt
 class CDistributionSpecHashedNoOp : public CDistributionSpecHashed
 {
 public:
-	CDistributionSpecHashedNoOp(CExpressionArray *pdrgpexr);
+	CDistributionSpecHashedNoOp(gpos::owner<CExpressionArray *> pdrgpexr);
 
 	EDistributionType Edt() const override;
 
@@ -28,8 +28,8 @@ public:
 
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::pointer<CReqdPropPlan *> prpp,
-						 CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::pointer<CExpressionArray *> pdrgpexpr,
+						 gpos::pointer<CExpression *> pexpr) override;
 };
 }  // namespace gpopt
 

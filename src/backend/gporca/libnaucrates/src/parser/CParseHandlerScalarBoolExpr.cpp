@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarBoolExpr.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -79,13 +81,14 @@ CParseHandlerScalarBoolExpr::StartElement(const XMLCh *const element_uri,
 			}
 
 			// parse and create scalar BoolExpr
-			CDXLScalarBoolExpr *dxl_op =
-				(CDXLScalarBoolExpr *) CDXLOperatorFactory::MakeDXLBoolExpr(
-					m_parse_handler_mgr->GetDXLMemoryManager(),
-					m_dxl_bool_type);
+			gpos::owner<CDXLScalarBoolExpr *> dxl_op =
+				gpos::cast<CDXLScalarBoolExpr>(
+					CDXLOperatorFactory::MakeDXLBoolExpr(
+						m_parse_handler_mgr->GetDXLMemoryManager(),
+						m_dxl_bool_type));
 
 			// construct node from the created child nodes
-			m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+			m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 		}
 		else
 		{
@@ -157,10 +160,10 @@ CParseHandlerScalarBoolExpr::EndElement(const XMLCh *const,	 // element_uri,
 
 	const ULONG size = this->Length();
 	// If the operation is NOT then it only has one child.
-	if (((((CDXLScalarBoolExpr *) m_dxl_node->GetOperator())
+	if ((((gpos::cast<CDXLScalarBoolExpr>(m_dxl_node->GetOperator()))
 			  ->GetDxlBoolTypeStr() == Edxlnot) &&
 		 (1 != size)) ||
-		((((CDXLScalarBoolExpr *) m_dxl_node->GetOperator())
+		(((gpos::cast<CDXLScalarBoolExpr>(m_dxl_node->GetOperator()))
 			  ->GetDxlBoolTypeStr() != Edxlnot) &&
 		 (2 > size)))
 	{

@@ -3,11 +3,13 @@
 
 #include "gpopt/base/CColConstraintsArrayMapper.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CConstraint.h"
 
 using namespace gpopt;
 
-CConstraintArray *
+gpos::owner<CConstraintArray *>
 CColConstraintsArrayMapper::PdrgPcnstrLookup(CColRef *colref)
 {
 	const BOOL fExclusive = true;
@@ -16,8 +18,8 @@ CColConstraintsArrayMapper::PdrgPcnstrLookup(CColRef *colref)
 }
 
 CColConstraintsArrayMapper::CColConstraintsArrayMapper(
-	gpos::CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
-	: m_mp(mp), m_pdrgpcnstr(pdrgpcnstr)
+	gpos::CMemoryPool *mp, gpos::owner<CConstraintArray *> pdrgpcnstr)
+	: m_mp(mp), m_pdrgpcnstr(std::move(pdrgpcnstr))
 {
 }
 

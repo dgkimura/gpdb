@@ -30,12 +30,12 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CMDPartConstraintGPDB::CMDPartConstraintGPDB(
-	CMemoryPool *mp, ULongPtrArray *level_with_default_part_array,
-	BOOL is_unbounded, CDXLNode *dxlnode)
+	CMemoryPool *mp, gpos::owner<ULongPtrArray *> level_with_default_part_array,
+	BOOL is_unbounded, gpos::owner<CDXLNode *> dxlnode)
 	: m_mp(mp),
-	  m_level_with_default_part_array(level_with_default_part_array),
+	  m_level_with_default_part_array(std::move(level_with_default_part_array)),
 	  m_is_unbounded(is_unbounded),
-	  m_dxl_node(dxlnode)
+	  m_dxl_node(std::move(dxlnode))
 {
 	GPOS_ASSERT(nullptr != m_level_with_default_part_array);
 }
@@ -62,10 +62,10 @@ CMDPartConstraintGPDB::~CMDPartConstraintGPDB()
 //		Scalar expression of the check constraint
 //
 //---------------------------------------------------------------------------
-CExpression *
-CMDPartConstraintGPDB::GetPartConstraintExpr(CMemoryPool *mp,
-											 CMDAccessor *md_accessor,
-											 CColRefArray *colref_array) const
+gpos::owner<CExpression *>
+CMDPartConstraintGPDB::GetPartConstraintExpr(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	gpos::pointer<CColRefArray *> colref_array) const
 {
 	GPOS_ASSERT(nullptr != colref_array);
 

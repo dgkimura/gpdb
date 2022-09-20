@@ -31,13 +31,14 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CDXLStatsDerivedColumn::CDXLStatsDerivedColumn(
 	ULONG colid, CDouble width, CDouble null_freq, CDouble distinct_remaining,
-	CDouble freq_remaining, CDXLBucketArray *dxl_stats_bucket_array)
+	CDouble freq_remaining,
+	gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array)
 	: m_colid(colid),
 	  m_width(width),
 	  m_null_freq(null_freq),
 	  m_distinct_remaining(distinct_remaining),
 	  m_freq_remaining(freq_remaining),
-	  m_dxl_stats_bucket_array(dxl_stats_bucket_array)
+	  m_dxl_stats_bucket_array(std::move(dxl_stats_bucket_array))
 {
 	GPOS_ASSERT(0 <= m_width);
 	GPOS_ASSERT(0 <= m_null_freq);
@@ -106,7 +107,8 @@ CDXLStatsDerivedColumn::Serialize(CXMLSerializer *xml_serializer) const
 	{
 		GPOS_CHECK_ABORT;
 
-		CDXLBucket *dxl_bucket = (*m_dxl_stats_bucket_array)[ul];
+		gpos::pointer<CDXLBucket *> dxl_bucket =
+			(*m_dxl_stats_bucket_array)[ul];
 		dxl_bucket->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;

@@ -163,11 +163,11 @@ CParseHandlerDynamicTableScan::EndElement(const XMLCh *const,  // element_uri,
 
 	gpos::Ref<IMdIdArray> mdid_partitions_array =
 		partition_mdids_parse_handler->GetMdIdArray();
-	gpos::owner<CDXLPhysicalDynamicTableScan *> dxl_op =
-		GPOS_NEW(m_mp) CDXLPhysicalDynamicTableScan(
-			m_mp, table_descr, mdid_partitions_array, m_selector_ids);
+	gpos::owner<CDXLPhysicalDynamicTableScan *> dxl_op = GPOS_NEW(m_mp)
+		CDXLPhysicalDynamicTableScan(m_mp, std::move(table_descr),
+									 mdid_partitions_array, m_selector_ids);
 
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 	// set statictics and physical properties
 	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
 

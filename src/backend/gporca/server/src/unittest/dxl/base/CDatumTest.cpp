@@ -79,7 +79,7 @@ CDatumTest::EresUnittest_Basics()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	using Pfpdatum = IDatum *(*) (CMemoryPool *, BOOL);
+	using Pfpdatum = gpos::owner<IDatum *> (*)(CMemoryPool *, BOOL);
 
 	Pfpdatum rgpf[] = {
 		CreateInt2Datum, CreateInt4Datum, CreateInt8Datum,
@@ -231,7 +231,7 @@ CDatumTest::CreateGenericDatum(CMemoryPool *mp, BOOL is_null)
 
 	const CHAR *val = "test";
 	return GPOS_NEW(mp)
-		CDatumGenericGPDB(mp, pmdidChar, default_type_modifier, val,
+		CDatumGenericGPDB(mp, std::move(pmdidChar), default_type_modifier, val,
 						  5 /*length*/, is_null, 0 /*value*/, 0 /*value*/
 		);
 }

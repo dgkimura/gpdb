@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarBoolOp.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -53,11 +54,12 @@ CScalarBoolOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBoolOp::Matches(COperator *pop) const
+CScalarBoolOp::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarBoolOp *popLog = CScalarBoolOp::PopConvert(pop);
+		gpos::pointer<CScalarBoolOp *> popLog =
+			gpos::dyn_cast<CScalarBoolOp>(pop);
 
 		// match if operators are identical
 		return Eboolop() == popLog->Eboolop();
@@ -116,7 +118,7 @@ CScalarBoolOp::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarBoolOp::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarBoolOp::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	if (EboolopAnd == m_eboolop)
 	{

@@ -117,10 +117,12 @@ CDXLPhysicalMergeJoin::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	GPOS_ASSERT(EdxlmjIndexSentinel == dxlnode->Arity());
 	GPOS_ASSERT(EdxljtSentinel > GetJoinType());
 
-	CDXLNode *dxlnode_join_filter = (*dxlnode)[EdxlmjIndexJoinFilter];
-	CDXLNode *dxlnode_merge_clauses = (*dxlnode)[EdxlmjIndexMergeCondList];
-	CDXLNode *dxlnode_left = (*dxlnode)[EdxlmjIndexLeftChild];
-	CDXLNode *dxlnode_right = (*dxlnode)[EdxlmjIndexRightChild];
+	gpos::pointer<CDXLNode *> dxlnode_join_filter =
+		(*dxlnode)[EdxlmjIndexJoinFilter];
+	gpos::pointer<CDXLNode *> dxlnode_merge_clauses =
+		(*dxlnode)[EdxlmjIndexMergeCondList];
+	gpos::pointer<CDXLNode *> dxlnode_left = (*dxlnode)[EdxlmjIndexLeftChild];
+	gpos::pointer<CDXLNode *> dxlnode_right = (*dxlnode)[EdxlmjIndexRightChild];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarJoinFilter ==

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarOp.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -109,11 +110,11 @@ CScalarOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarOp::Matches(COperator *pop) const
+CScalarOp::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarOp *pscop = CScalarOp::PopConvert(pop);
+		gpos::pointer<CScalarOp *> pscop = gpos::dyn_cast<CScalarOp>(pop);
 
 		// match if operator oid are identical
 		return m_mdid_op->Equals(pscop->MdIdOp());
@@ -198,7 +199,7 @@ CScalarOp::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarOp::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarOp::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

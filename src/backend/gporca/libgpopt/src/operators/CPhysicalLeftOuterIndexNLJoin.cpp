@@ -21,7 +21,8 @@
 using namespace gpopt;
 
 CPhysicalLeftOuterIndexNLJoin::CPhysicalLeftOuterIndexNLJoin(
-	CMemoryPool *mp, CColRefArray *colref_array, CExpression *origJoinPred)
+	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+	gpos::owner<CExpression *> origJoinPred)
 	: CPhysicalLeftOuterNLJoin(mp),
 	  m_pdrgpcrOuterRefs(colref_array),
 	  m_origJoinPred(origJoinPred)
@@ -42,12 +43,13 @@ CPhysicalLeftOuterIndexNLJoin::~CPhysicalLeftOuterIndexNLJoin()
 
 
 BOOL
-CPhysicalLeftOuterIndexNLJoin::Matches(COperator *pop) const
+CPhysicalLeftOuterIndexNLJoin::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
 		return m_pdrgpcrOuterRefs->Equals(
-			CPhysicalLeftOuterIndexNLJoin::PopConvert(pop)->PdrgPcrOuterRefs());
+			gpos::dyn_cast<CPhysicalLeftOuterIndexNLJoin>(pop)
+				->PdrgPcrOuterRefs());
 	}
 
 	return false;
@@ -67,7 +69,8 @@ CPhysicalLeftOuterIndexNLJoin::EpetDistribution(
 	}
 
 	// get distribution delivered by the physical node
-	CDistributionSpec *pds = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Pds();
+	gpos::pointer<CDistributionSpec *> pds =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pds();
 	if (ped->FCompatible(pds))
 	{
 		// required distribution is already provided
@@ -95,8 +98,10 @@ CPhysicalLeftOuterIndexNLJoin::PdsRequired(
 
 gpos::owner<CEnfdDistribution *>
 CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CReqdPropPlan *prppInput, ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+								   gpos::pointer<CReqdPropPlan *> prppInput,
+								   ULONG child_index,
+								   gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+								   ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 
@@ -121,7 +126,7 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// we need to match distribution of inner
 	CDistributionSpec *pdsInner =
-		CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Pds();
+		gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Pds();
 	CDistributionSpec::EDistributionType edtInner = pdsInner->Edt();
 	if (CDistributionSpec::EdtSingleton == edtInner ||
 		CDistributionSpec::EdtStrictSingleton == edtInner ||
@@ -136,8 +141,9 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	{
 		// check if we could create an equivalent hashed distribution request to the inner child
 		CDistributionSpecHashed *pdshashed =
-			CDistributionSpecHashed::PdsConvert(pdsInner);
-		CDistributionSpecHashed *pdshashedEquiv = pdshashed->PdshashedEquiv();
+			gpos::dyn_cast<CDistributionSpecHashed>(pdsInner);
+		gpos::pointer<CDistributionSpecHashed *> pdshashedEquiv =
+			pdshashed->PdshashedEquiv();
 
 		// If the inner child is a IndexScan on a multi-key distributed index, it
 		// may derive an incomplete equiv spec (see CPhysicalScan::PdsDerive()).
@@ -163,7 +169,8 @@ CPhysicalLeftOuterIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 											pdshashedEquiv->FNullsColocated());
 			pdsHashedRequired->ComputeEquivHashExprs(mp, exprhdl);
 
-			return GPOS_NEW(mp) CEnfdDistribution(pdsHashedRequired, dmatch);
+			return GPOS_NEW(mp)
+				CEnfdDistribution(std::move(pdsHashedRequired), dmatch);
 		}
 
 		// if the equivalent spec cannot be used, request the original - even

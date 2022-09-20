@@ -34,10 +34,11 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CJoinOrderGreedy::CJoinOrderGreedy(CMemoryPool *pmp,
-								   CExpressionArray *pdrgpexprComponents,
-								   CExpressionArray *pdrgpexprConjuncts)
-	: CJoinOrder(pmp, pdrgpexprComponents, pdrgpexprConjuncts,
+CJoinOrderGreedy::CJoinOrderGreedy(
+	CMemoryPool *pmp, gpos::owner<CExpressionArray *> pdrgpexprComponents,
+	gpos::owner<CExpressionArray *> pdrgpexprConjuncts)
+	: CJoinOrder(pmp, std::move(pdrgpexprComponents),
+				 std::move(pdrgpexprConjuncts),
 				 true /* m_include_loj_childs */),
 	  m_pcompResult(nullptr)
 {
@@ -79,8 +80,8 @@ CJoinOrderGreedy::GetStartingJoins()
 	{
 		for (ULONG ul2 = ul1 + 1; ul2 < m_ulComps; ul2++)
 		{
-			SComponent *comp1 = m_rgpcomp[ul1];
-			SComponent *comp2 = m_rgpcomp[ul2];
+			gpos::pointer<SComponent *> comp1 = m_rgpcomp[ul1];
+			gpos::pointer<SComponent *> comp2 = m_rgpcomp[ul2];
 
 			if (!IsValidJoinCombination(comp1, comp2))
 			{
@@ -117,9 +118,9 @@ CJoinOrderGreedy::GetStartingJoins()
 		return nullptr;
 	}
 
-	SComponent *comp1 = m_rgpcomp[ul1Counter];
+	gpos::pointer<SComponent *> comp1 = m_rgpcomp[ul1Counter];
 	comp1->m_fUsed = true;
-	SComponent *comp2 = m_rgpcomp[ul2Counter];
+	gpos::pointer<SComponent *> comp2 = m_rgpcomp[ul2Counter];
 	comp2->m_fUsed = true;
 	pcompBest->m_fUsed = true;
 
@@ -221,7 +222,7 @@ CJoinOrderGreedy::PexprExpand()
  * the component which was picked
  */
 ULONG
-CJoinOrderGreedy::PickBestJoin(CBitSet *candidate_comp_set)
+CJoinOrderGreedy::PickBestJoin(gpos::pointer<CBitSet *> candidate_comp_set)
 {
 	SComponent *pcompBestComponent =
 		nullptr;  // component which gives minimum cardinality when joined with m_pcompResult
@@ -277,7 +278,7 @@ CJoinOrderGreedy::PickBestJoin(CBitSet *candidate_comp_set)
 /*
  * Get components that are reachable from the result component by a single edge
  */
-CBitSet *
+gpos::owner<CBitSet *>
 CJoinOrderGreedy::GetAdjacentComponentsToJoinCandidate()
 {
 	// iterator over index of edges in m_rgpedge array associated with this component
@@ -287,7 +288,7 @@ CJoinOrderGreedy::GetAdjacentComponentsToJoinCandidate()
 
 	while (edges_iter.Advance())
 	{
-		SEdge *edge = m_rgpedge[edges_iter.Bit()];
+		gpos::pointer<SEdge *> edge = m_rgpedge[edges_iter.Bit()];
 		if (!edge->m_fUsed)
 		{
 			// components connected via the edges

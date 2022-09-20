@@ -45,13 +45,13 @@ public:
 		const CDXLPhysicalDynamicBitmapTableScan &) = delete;
 
 	// ctor
-	CDXLPhysicalDynamicBitmapTableScan(CMemoryPool *mp,
-									   CDXLTableDescr *table_descr,
-									   gpos::Ref<IMdIdArray> part_mdids,
-									   ULongPtrArray *selector_ids)
-		: CDXLPhysicalAbstractBitmapScan(mp, table_descr),
+	CDXLPhysicalDynamicBitmapTableScan(
+		CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr,
+		gpos::Ref<IMdIdArray> part_mdids,
+		gpos::owner<ULongPtrArray *> selector_ids)
+		: CDXLPhysicalAbstractBitmapScan(mp, std::move(table_descr)),
 		  m_part_mdids(part_mdids),
-		  m_selector_ids(selector_ids)
+		  m_selector_ids(std::move(selector_ids))
 	{
 		GPOS_ASSERT(nullptr != table_descr);
 	}

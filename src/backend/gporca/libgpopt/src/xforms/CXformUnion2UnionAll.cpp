@@ -48,8 +48,9 @@ CXformUnion2UnionAll::CXformUnion2UnionAll(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformUnion2UnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformUnion2UnionAll::Transform(gpos::pointer<CXformContext *> pxfctxt,
+								gpos::pointer<CXformResult *> pxfres,
+								gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -58,7 +59,8 @@ CXformUnion2UnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CLogicalUnion *popUnion = CLogicalUnion::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalUnion *> popUnion =
+		gpos::dyn_cast<CLogicalUnion>(pexpr->Pop());
 	CColRefArray *pdrgpcrOutput = popUnion->PdrgpcrOutput();
 	CColRef2dArray *pdrgpdrgpcrInput = popUnion->PdrgpdrgpcrInput();
 
@@ -79,7 +81,7 @@ CXformUnion2UnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	// assemble new logical operator
 	gpos::owner<CExpression *> pexprUnionAll = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalUnionAll(mp, pdrgpcrOutput, pdrgpdrgpcrInput),
-		pdrgpexpr);
+		std::move(pdrgpexpr));
 
 	pdrgpcrOutput->AddRef();
 
@@ -91,10 +93,10 @@ CXformUnion2UnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		mp,
 		GPOS_NEW(mp) CLogicalGbAgg(mp, pdrgpcrOutput,
 								   COperator::EgbaggtypeGlobal /*egbaggtype*/),
-		pexprUnionAll, pexprProjList);
+		std::move(pexprUnionAll), std::move(pexprProjList));
 
 	// add alternative to results
-	pxfres->Add(pexprAgg);
+	pxfres->Add(std::move(pexprAgg));
 }
 
 // EOF

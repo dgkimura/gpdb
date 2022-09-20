@@ -53,7 +53,8 @@ CMCVTest::EresUnittest()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr /* pceeval */,
@@ -115,15 +116,15 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 	colid_width_mapping->Insert(GPOS_NEW(mp) ULONG(1),
 								GPOS_NEW(mp) CDouble(4.0));
 
-	gpos::owner<CStatistics *> stats =
-		GPOS_NEW(mp) CStatistics(mp, col_histogram_mapping, colid_width_mapping,
-								 1000.0 /* rows */, false /* is_empty */
-		);
+	gpos::owner<CStatistics *> stats = GPOS_NEW(mp) CStatistics(
+		mp, std::move(col_histogram_mapping), std::move(colid_width_mapping),
+		1000.0 /* rows */, false /* is_empty */
+	);
 
 	// put stats object in an array in order to serialize
 	gpos::owner<CStatisticsArray *> pdrgpstats =
 		GPOS_NEW(mp) CStatisticsArray(mp);
-	pdrgpstats->Append(stats);
+	pdrgpstats->Append(std::move(stats));
 
 	// serialize stats object
 	CWStringDynamic *pstrOutput =
@@ -198,26 +199,28 @@ CMCVTest::EresUnittest_MergeHistMCV()
 
 		GPOS_CHECK_ABORT;
 
-		CDXLStatsDerivedRelation *pdxlstatsderrelMCV =
+		gpos::pointer<CDXLStatsDerivedRelation *> pdxlstatsderrelMCV =
 			(*pdrgpdxlstatsderrelMCV)[0];
 		gpos::pointer<const CDXLStatsDerivedColumnArray *>
 			pdrgpdxlstatsdercolMCV =
 				pdxlstatsderrelMCV->GetDXLStatsDerivedColArray();
-		CDXLStatsDerivedColumn *pdxlstatsdercolMCV =
+		gpos::pointer<CDXLStatsDerivedColumn *> pdxlstatsdercolMCV =
 			(*pdrgpdxlstatsdercolMCV)[0];
-		CBucketArray *pdrgppbucketMCV = CDXLUtils::ParseDXLToBucketsArray(
-			mp, md_accessor, pdxlstatsdercolMCV);
+		gpos::owner<CBucketArray *> pdrgppbucketMCV =
+			CDXLUtils::ParseDXLToBucketsArray(mp, md_accessor,
+											  pdxlstatsdercolMCV);
 		CHistogram *phistMCV = GPOS_NEW(mp) CHistogram(mp, pdrgppbucketMCV);
 
-		CDXLStatsDerivedRelation *pdxlstatsderrelHist =
+		gpos::pointer<CDXLStatsDerivedRelation *> pdxlstatsderrelHist =
 			(*pdrgpdxlstatsderrelHist)[0];
 		gpos::pointer<const CDXLStatsDerivedColumnArray *>
 			pdrgpdxlstatsdercolHist =
 				pdxlstatsderrelHist->GetDXLStatsDerivedColArray();
-		CDXLStatsDerivedColumn *pdxlstatsdercolHist =
+		gpos::pointer<CDXLStatsDerivedColumn *> pdxlstatsdercolHist =
 			(*pdrgpdxlstatsdercolHist)[0];
-		CBucketArray *pdrgppbucketHist = CDXLUtils::ParseDXLToBucketsArray(
-			mp, md_accessor, pdxlstatsdercolHist);
+		gpos::owner<CBucketArray *> pdrgppbucketHist =
+			CDXLUtils::ParseDXLToBucketsArray(mp, md_accessor,
+											  pdxlstatsdercolHist);
 		CHistogram *phistHist = GPOS_NEW(mp) CHistogram(mp, pdrgppbucketHist);
 
 		GPOS_CHECK_ABORT;

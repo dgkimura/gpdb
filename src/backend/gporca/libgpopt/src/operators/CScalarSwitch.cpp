@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarSwitch.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/mdcache/CMDAccessorUtils.h"
@@ -75,11 +76,12 @@ CScalarSwitch::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSwitch::Matches(COperator *pop) const
+CScalarSwitch::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarSwitch *popScSwitch = CScalarSwitch::PopConvert(pop);
+		gpos::pointer<CScalarSwitch *> popScSwitch =
+			gpos::dyn_cast<CScalarSwitch>(pop);
 
 		// match if return types are identical
 		return popScSwitch->MdidType()->Equals(m_mdid_type.get());

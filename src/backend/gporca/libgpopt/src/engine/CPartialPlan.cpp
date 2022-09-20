@@ -32,12 +32,14 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPartialPlan::CPartialPlan(CGroupExpression *pgexpr, CReqdPropPlan *prpp,
-						   CCostContext *pccChild,
+CPartialPlan::CPartialPlan(gpos::pointer<CGroupExpression *> pgexpr,
+						   gpos::owner<CReqdPropPlan *> prpp,
+						   gpos::owner<CCostContext *> pccChild,
 						   ULONG child_index)
 	: m_pgexpr(pgexpr),	 // not owned
-	  m_prpp(prpp),
-	  m_pccChild(pccChild),	 // cost context of an already optimized child
+	  m_prpp(std::move(prpp)),
+	  m_pccChild(
+		  std::move(pccChild)),	 // cost context of an already optimized child
 	  m_ulChildIndex(child_index)
 {
 	GPOS_ASSERT(nullptr != pgexpr);
@@ -69,7 +71,8 @@ CPartialPlan::~CPartialPlan()
 //
 //---------------------------------------------------------------------------
 void
-CPartialPlan::ExtractChildrenCostingInfo(CMemoryPool *mp, ICostModel *pcm,
+CPartialPlan::ExtractChildrenCostingInfo(CMemoryPool *mp,
+										 gpos::pointer<ICostModel *> pcm,
 										 CExpressionHandle &exprhdl,
 										 ICostModel::SCostingInfo *pci)
 {
@@ -81,7 +84,7 @@ CPartialPlan::ExtractChildrenCostingInfo(CMemoryPool *mp, ICostModel *pcm,
 	ULONG ulIndex = 0;
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CGroup *pgroupChild = (*m_pgexpr)[ul];
+		gpos::pointer<CGroup *> pgroupChild = (*m_pgexpr)[ul];
 		if (pgroupChild->FScalar())
 		{
 			// skip scalar children
@@ -89,7 +92,7 @@ CPartialPlan::ExtractChildrenCostingInfo(CMemoryPool *mp, ICostModel *pcm,
 		}
 
 		CReqdPropPlan *prppChild = exprhdl.Prpp(ul);
-		IStatistics *child_stats = pgroupChild->Pstats();
+		gpos::pointer<IStatistics *> child_stats = pgroupChild->Pstats();
 		if (nullptr == child_stats)
 		{
 			GPOS_RAISE(gpopt::ExmaGPOPT, gpopt::ExmiNoStats,
@@ -186,7 +189,7 @@ CPartialPlan::CostCompute(CMemoryPool *mp)
 	ICostModel::SCostingInfo ci(mp, exprhdl.UlNonScalarChildren(),
 								GPOS_NEW(mp) ICostModel::CCostingStats(stats));
 
-	ICostModel *pcm = COptCtxt::PoctxtFromTLS()->GetCostModel();
+	gpos::pointer<ICostModel *> pcm = COptCtxt::PoctxtFromTLS()->GetCostModel();
 	ExtractChildrenCostingInfo(mp, pcm, exprhdl, &ci);
 
 	CDistributionSpec::EDistributionPartitioningType edpt =
@@ -196,11 +199,11 @@ CPartialPlan::CostCompute(CMemoryPool *mp)
 		edpt = m_prpp->Ped()->PdsRequired()->Edpt();
 	}
 
-	COperator *pop = m_pgexpr->Pop();
+	gpos::pointer<COperator *> pop = m_pgexpr->Pop();
 	BOOL fDataPartitioningMotion =
 		CUtils::FPhysicalMotion(pop) &&
 		CDistributionSpec::EdptPartitioned ==
-			CPhysicalMotion::PopConvert(pop)->Pds()->Edpt();
+			gpos::dyn_cast<CPhysicalMotion>(pop)->Pds()->Edpt();
 
 	// extract rows from stats
 	DOUBLE rows = m_pgexpr->Pgroup()->Pstats()->Rows().Get();

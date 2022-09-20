@@ -84,7 +84,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -94,7 +94,8 @@ public:
 	}
 
 	// return locally used columns
-	CColRefSet *PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl) override;
+	gpos::owner<CColRefSet *> PcrsUsed(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl) override;
 
 	// derive partition consumer info
 	gpos::owner<CPartInfo *> PpartinfoDerive(

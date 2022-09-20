@@ -84,7 +84,7 @@ public:
 	CDXLScalarAggref(CMemoryPool *mp, gpos::Ref<IMDId> agg_mdid,
 					 gpos::Ref<IMDId> resolved_rettype, BOOL is_distinct,
 					 EdxlAggrefStage agg_stage, EdxlAggrefKind aggkind,
-					 ULongPtrArray *argtypes);
+					 gpos::owner<ULongPtrArray *> argtypes);
 
 	~CDXLScalarAggref() override;
 

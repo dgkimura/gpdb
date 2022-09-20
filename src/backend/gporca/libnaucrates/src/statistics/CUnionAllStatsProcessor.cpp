@@ -19,7 +19,7 @@
 using namespace gpopt;
 
 // return statistics object after union all operation with input statistics object
-CStatistics *
+gpos::owner<CStatistics *>
 CUnionAllStatsProcessor::CreateStatsForUnionAll(
 	CMemoryPool *mp, gpos::pointer<const CStatistics *> stats_first_child,
 	gpos::pointer<const CStatistics *> stats_second_child,
@@ -107,10 +107,10 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 	second_child_colids->Release();
 
 	// create an output stats object
-	gpos::owner<CStatistics *> unionall_stats = GPOS_NEW(mp)
-		CStatistics(mp, histograms_new, column_to_width_map, unionall_rows,
-					is_empty_unionall, 0 /* m_num_predicates */
-		);
+	gpos::owner<CStatistics *> unionall_stats = GPOS_NEW(mp) CStatistics(
+		mp, std::move(histograms_new), std::move(column_to_width_map),
+		unionall_rows, is_empty_unionall, 0 /* m_num_predicates */
+	);
 
 	// In the output statistics object, the upper bound source cardinality of the UNION ALL column
 	// is the estimate union all cardinality.

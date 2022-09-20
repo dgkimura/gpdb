@@ -47,7 +47,7 @@ public:
 	CPoint(const CPoint &) = delete;
 
 	// c'tor
-	explicit CPoint(IDatum *);
+	explicit CPoint(gpos::owner<IDatum *>);
 
 	// get underlying datum
 	gpos::pointer<IDatum *>
@@ -91,7 +91,8 @@ public:
 	}
 
 	// translate the point into its DXL representation
-	CDXLDatum *GetDatumVal(CMemoryPool *mp, CMDAccessor *md_accessor) const;
+	gpos::owner<CDXLDatum *> GetDatumVal(CMemoryPool *mp,
+										 CMDAccessor *md_accessor) const;
 
 	// minimum of two points using <=
 	static CPoint *MinPoint(CPoint *point1, CPoint *point2);

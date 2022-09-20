@@ -87,7 +87,7 @@ private:
 	BOOL FCanNegate() const;
 
 	// construct the combined constraint
-	CConstraint *PcnstrBuildCombined(CMemoryPool *mp);
+	gpos::owner<CConstraint *> PcnstrBuildCombined(CMemoryPool *mp);
 
 	// return the remaining part of the first constraint that is not covered by
 	// the second constraint
@@ -111,9 +111,10 @@ public:
 	CPartConstraint(const CPartConstraint &) = delete;
 
 	// ctors
-	CPartConstraint(CMemoryPool *mp, UlongToConstraintMap *phmulcnstr,
-					CBitSet *pbsDefaultParts, BOOL is_unbounded,
-					CColRef2dArray *pdrgpdrgpcr);
+	CPartConstraint(CMemoryPool *mp,
+					gpos::owner<UlongToConstraintMap *> phmulcnstr,
+					gpos::owner<CBitSet *> pbsDefaultParts, BOOL is_unbounded,
+					gpos::owner<CColRef2dArray *> pdrgpdrgpcr);
 	CPartConstraint(CMemoryPool *mp, CConstraint *pcnstr,
 					BOOL fDefaultPartition, BOOL is_unbounded);
 
@@ -170,7 +171,7 @@ public:
 	// the given part constraint. Returns NULL is the difference cannot be
 	// performed
 	gpos::owner<CPartConstraint *> PpartcnstrRemaining(
-		CMemoryPool *mp, CPartConstraint *ppartcnstr);
+		CMemoryPool *mp, gpos::pointer<CPartConstraint *> ppartcnstr);
 
 	// return a copy of the part constraint with remapped columns
 	gpos::owner<CPartConstraint *> PpartcnstrCopyWithRemappedColumns(
@@ -192,8 +193,9 @@ public:
 
 	// copy the part constraints from the source map into the destination map
 	static void CopyPartConstraints(
-		CMemoryPool *mp, UlongToPartConstraintMap *ppartcnstrmapDest,
-		UlongToPartConstraintMap *ppartcnstrmapSource);
+		CMemoryPool *mp,
+		gpos::pointer<UlongToPartConstraintMap *> ppartcnstrmapDest,
+		gpos::pointer<UlongToPartConstraintMap *> ppartcnstrmapSource);
 
 };	// class CPartConstraint
 

@@ -100,7 +100,8 @@ CTreeMapTest::CNode::OsPrintWithIndent(IOstream &os, ULONG ulIndent) const
 //
 //---------------------------------------------------------------------------
 CTreeMapTest::CNode::CNode(CMemoryPool *,  // mp
-						   const ULONG *pulData, CNodeArray *pdrgpnd)
+						   const ULONG *pulData,
+						   gpos::owner<CNodeArray *> pdrgpnd)
 	: m_ulData(gpos::ulong_max), m_pdrgpnd(pdrgpnd)
 {
 	if (nullptr != pulData)
@@ -133,14 +134,14 @@ CTreeMapTest::CNode::~CNode()
 //
 //---------------------------------------------------------------------------
 gpos::owner<CTreeMapTest::CNode *>
-CTreeMapTest::Pnd(CMemoryPool *mp, ULONG *pul, CNodeArray *pdrgpnd,
-				  BOOL *fTestTrue)
+CTreeMapTest::Pnd(CMemoryPool *mp, ULONG *pul,
+				  gpos::owner<CNodeArray *> pdrgpnd, BOOL *fTestTrue)
 {
 	// The test passes 'true' to PrUnrank and the rehydrate function expects to find it here.
 	GPOS_ASSERT(nullptr != fTestTrue);
 	GPOS_ASSERT(*fTestTrue && "Flag is expected to be true");
 	*fTestTrue = true;
-	return GPOS_NEW(mp) CNode(mp, pul, pdrgpnd);
+	return GPOS_NEW(mp) CNode(mp, pul, std::move(pdrgpnd));
 }
 
 
@@ -417,7 +418,7 @@ CTreeMapTest::EresUnittest_Memo()
 	}
 
 	// clean up
-	CRefCount::SafeRelease(pexprPlan);
+	CRefCount::SafeRelease(std::move(pexprPlan));
 	GPOS_DELETE(pqc);
 	CRefCount::SafeRelease(pexpr);
 	GPOS_DELETE(peng);

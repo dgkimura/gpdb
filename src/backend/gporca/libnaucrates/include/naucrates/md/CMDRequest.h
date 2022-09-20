@@ -87,7 +87,7 @@ public:
 
 	// ctor
 	CMDRequest(CMemoryPool *mp, gpos::Ref<IMdIdArray> mdid_array,
-			   SMDTypeRequestArray *mdtype_request_array);
+			   gpos::owner<SMDTypeRequestArray *> mdtype_request_array);
 
 	// ctor: type request only
 	CMDRequest(CMemoryPool *mp, SMDTypeRequest *md_type_request);

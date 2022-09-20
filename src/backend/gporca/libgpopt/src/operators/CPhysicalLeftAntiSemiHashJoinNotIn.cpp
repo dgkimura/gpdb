@@ -32,7 +32,7 @@ CPhysicalLeftAntiSemiHashJoinNotIn::CPhysicalLeftAntiSemiHashJoinNotIn(
 	CExpressionArray *pdrgpexprInnerKeys,
 	gpos::owner<IMdIdArray *> hash_opfamilies, CXform::EXformId origin_xform)
 	: CPhysicalLeftAntiSemiHashJoin(mp, pdrgpexprOuterKeys, pdrgpexprInnerKeys,
-									hash_opfamilies, origin_xform)
+									std::move(hash_opfamilies), origin_xform)
 {
 }
 
@@ -48,7 +48,8 @@ CDistributionSpec *
 CPhysicalLeftAntiSemiHashJoinNotIn::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
 	gpos::pointer<CDistributionSpec *> pdsInput GPOS_UNUSED,
-	ULONG child_index GPOS_UNUSED, CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+	ULONG child_index GPOS_UNUSED,
+	gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt GPOS_UNUSED,
 	ULONG ulOptReq
 		GPOS_UNUSED	 // identifies which optimization request should be created
 ) const
@@ -62,8 +63,9 @@ CPhysicalLeftAntiSemiHashJoinNotIn::PdsRequired(
 
 gpos::owner<CEnfdDistribution *>
 CPhysicalLeftAntiSemiHashJoinNotIn::Ped(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
-	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
+	gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());

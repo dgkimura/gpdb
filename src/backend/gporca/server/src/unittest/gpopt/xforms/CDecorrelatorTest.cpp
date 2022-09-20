@@ -63,7 +63,7 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// test cases
-	using Pfpexpr = CExpression *(*) (CMemoryPool *);
+	using Pfpexpr = gpos::owner<CExpression *> (*)(CMemoryPool *);
 	Pfpexpr rgpf[] = {CTestUtils::PexprLogicalGbAggCorrelated,
 					  CTestUtils::PexprLogicalSelectCorrelated,
 					  CTestUtils::PexprLogicalJoinCorrelated,

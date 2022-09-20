@@ -36,7 +36,7 @@ public:
 	CScalarSubqueryAny(const CScalarSubqueryAny &) = delete;
 
 	// ctor
-	CScalarSubqueryAny(CMemoryPool *mp, IMDId *scalar_op_mdid,
+	CScalarSubqueryAny(CMemoryPool *mp, gpos::owner<IMDId *> scalar_op_mdid,
 					   const CWStringConst *pstrScalarOp,
 					   const CColRef *colref);
 
@@ -59,7 +59,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function

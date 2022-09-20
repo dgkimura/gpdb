@@ -4,6 +4,7 @@
 #ifndef GPOPT_CHashedDistributions_H
 #define GPOPT_CHashedDistributions_H
 
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPool.h"
 
 #include "gpopt/base/CColRef.h"
@@ -21,8 +22,9 @@ namespace gpopt
 class CStrictHashedDistributions : public CDistributionSpecArray
 {
 public:
-	CStrictHashedDistributions(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
-							   CColRef2dArray *pdrgpdrgpcrInput);
+	CStrictHashedDistributions(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrOutput,
+		gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput);
 };
 }  // namespace gpopt
 

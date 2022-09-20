@@ -75,9 +75,9 @@ CXformExpandNAryJoinDPv2::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformExpandNAryJoinDPv2::Transform(CXformContext *pxfctxt,
-									CXformResult *pxfres,
-									CExpression *pexpr) const
+CXformExpandNAryJoinDPv2::Transform(gpos::pointer<CXformContext *> pxfctxt,
+									gpos::pointer<CXformResult *> pxfres,
+									gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -103,13 +103,14 @@ CXformExpandNAryJoinDPv2::Transform(CXformContext *pxfctxt,
 	// every conjunct (ANDed condition),
 	// plus an array of all the non-inner join predicates, together with
 	// a lookup table for each child whether it is a non-inner join
-	CLogicalNAryJoin *naryJoin = CLogicalNAryJoin::PopConvert(pexpr->Pop());
-	CExpression *pexprScalar = (*pexpr)[arity - 1];
-	CExpressionArray *innerJoinPreds = nullptr;
+	gpos::pointer<CLogicalNAryJoin *> naryJoin =
+		gpos::dyn_cast<CLogicalNAryJoin>(pexpr->Pop());
+	gpos::pointer<CExpression *> pexprScalar = (*pexpr)[arity - 1];
+	gpos::owner<CExpressionArray *> innerJoinPreds = nullptr;
 	gpos::owner<CExpressionArray *> onPreds = GPOS_NEW(mp) CExpressionArray(mp);
 	ULongPtrArray *childPredIndexes = nullptr;
 
-	if (nullptr != CScalarNAryJoinPredList::PopConvert(pexprScalar->Pop()))
+	if (nullptr != gpos::dyn_cast<CScalarNAryJoinPredList>(pexprScalar->Pop()))
 	{
 		innerJoinPreds =
 			CPredicateUtils::PdrgpexprConjuncts(mp, (*pexprScalar)[0]);
@@ -143,7 +144,7 @@ CXformExpandNAryJoinDPv2::Transform(CXformContext *pxfctxt,
 
 	while (nullptr != (nextJoinOrder = jodp.GetNextOfTopK()))
 	{
-		CExpression *pexprNormalized =
+		gpos::owner<CExpression *> pexprNormalized =
 			CNormalizer::PexprNormalize(mp, nextJoinOrder);
 
 		nextJoinOrder->Release();

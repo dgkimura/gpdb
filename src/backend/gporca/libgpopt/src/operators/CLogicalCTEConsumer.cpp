@@ -50,11 +50,11 @@ CLogicalCTEConsumer::CLogicalCTEConsumer(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalCTEConsumer::CLogicalCTEConsumer(CMemoryPool *mp, ULONG id,
-										 CColRefArray *colref_array)
+CLogicalCTEConsumer::CLogicalCTEConsumer(
+	CMemoryPool *mp, ULONG id, gpos::owner<CColRefArray *> colref_array)
 	: CLogical(mp),
 	  m_id(id),
-	  m_pdrgpcr(colref_array),
+	  m_pdrgpcr(std::move(colref_array)),
 	  m_pexprInlined(nullptr),
 	  m_phmulcr(nullptr)
 {
@@ -94,14 +94,14 @@ CLogicalCTEConsumer::~CLogicalCTEConsumer()
 void
 CLogicalCTEConsumer::CreateInlinedExpr(CMemoryPool *mp)
 {
-	CExpression *pexprProducer =
+	gpos::pointer<CExpression *> pexprProducer =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexprProducer);
 	// the actual definition of the CTE is the first child of the producer
-	CExpression *pexprCTEDef = (*pexprProducer)[0];
+	gpos::pointer<CExpression *> pexprCTEDef = (*pexprProducer)[0];
 
-	CLogicalCTEProducer *popProducer =
-		CLogicalCTEProducer::PopConvert(pexprProducer->Pop());
+	gpos::pointer<CLogicalCTEProducer *> popProducer =
+		gpos::dyn_cast<CLogicalCTEProducer>(pexprProducer->Pop());
 
 	m_phmulcr = CUtils::PhmulcrMapping(mp, popProducer->Pdrgpcr(), m_pdrgpcr);
 	m_pexprInlined = pexprCTEDef->PexprCopyWithRemappedColumns(
@@ -134,20 +134,21 @@ CLogicalCTEConsumer::DeriveOutputColumns(CMemoryPool *,		  //mp,
 //		Derive not nullable output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalCTEConsumer::DeriveNotNullColumns(CMemoryPool *mp,
 										  CExpressionHandle &  // exprhdl
 ) const
 {
-	CExpression *pexprProducer =
+	gpos::pointer<CExpression *> pexprProducer =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexprProducer);
 
 	// find producer's not null columns
-	CColRefSet *pcrsProducerNotNull = pexprProducer->DeriveNotNullColumns();
+	gpos::pointer<CColRefSet *> pcrsProducerNotNull =
+		pexprProducer->DeriveNotNullColumns();
 
 	// map producer's not null columns to consumer's output columns
-	CColRefSet *pcrsConsumerNotNull = CUtils::PcrsRemap(
+	gpos::owner<CColRefSet *> pcrsConsumerNotNull = CUtils::PcrsRemap(
 		mp, pcrsProducerNotNull, m_phmulcr, true /*must_exist*/);
 	GPOS_ASSERT(pcrsConsumerNotNull->Size() == pcrsProducerNotNull->Size());
 
@@ -163,12 +164,12 @@ CLogicalCTEConsumer::DeriveNotNullColumns(CMemoryPool *mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalCTEConsumer::DeriveKeyCollection(CMemoryPool *,		  //mp,
 										 CExpressionHandle &  //exprhdl
 ) const
 {
-	CExpression *pexpr =
+	gpos::pointer<CExpression *> pexpr =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexpr);
 	CKeyCollection *pkc = pexpr->DeriveKeyCollection();
@@ -212,7 +213,7 @@ CLogicalCTEConsumer::DeriveMaxCard(CMemoryPool *,		//mp,
 								   CExpressionHandle &	//exprhdl
 ) const
 {
-	CExpression *pexpr =
+	gpos::pointer<CExpression *> pexpr =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexpr);
 	return pexpr->DeriveMaxCard();
@@ -232,19 +233,19 @@ CLogicalCTEConsumer::DeriveJoinDepth(CMemoryPool *,		  //mp,
 									 CExpressionHandle &  //exprhdl
 ) const
 {
-	CExpression *pexpr =
+	gpos::pointer<CExpression *> pexpr =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexpr);
 	return pexpr->DeriveJoinDepth();
 }
 
 // derive table descriptor
-CTableDescriptor *
+gpos::pointer<CTableDescriptor *>
 CLogicalCTEConsumer::DeriveTableDescriptor(CMemoryPool *,		//mp
 										   CExpressionHandle &	//exprhdl
 ) const
 {
-	CExpression *pexpr =
+	gpos::pointer<CExpression *> pexpr =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexpr);
 	return pexpr->DeriveTableDescriptor();
@@ -259,14 +260,15 @@ CLogicalCTEConsumer::DeriveTableDescriptor(CMemoryPool *,		//mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalCTEConsumer::Matches(COperator *pop) const
+CLogicalCTEConsumer::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalCTEConsumer *popCTEConsumer = CLogicalCTEConsumer::PopConvert(pop);
+	gpos::pointer<CLogicalCTEConsumer *> popCTEConsumer =
+		gpos::dyn_cast<CLogicalCTEConsumer>(pop);
 
 	return m_id == popCTEConsumer->UlCTEId() &&
 		   m_pdrgpcr->Equals(popCTEConsumer->Pdrgpcr());
@@ -314,9 +316,10 @@ CLogicalCTEConsumer::FInputOrderSensitive() const
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
 CLogicalCTEConsumer::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *colref_array = nullptr;
+	gpos::owner<CColRefArray *> colref_array = nullptr;
 	if (must_exist)
 	{
 		colref_array =
@@ -327,7 +330,7 @@ CLogicalCTEConsumer::PopCopyWithRemappedColumns(
 		colref_array =
 			CUtils::PdrgpcrRemap(mp, m_pdrgpcr, colref_mapping, must_exist);
 	}
-	return GPOS_NEW(mp) CLogicalCTEConsumer(mp, m_id, colref_array);
+	return GPOS_NEW(mp) CLogicalCTEConsumer(mp, m_id, std::move(colref_array));
 }
 
 //---------------------------------------------------------------------------
@@ -338,7 +341,7 @@ CLogicalCTEConsumer::PopCopyWithRemappedColumns(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalCTEConsumer::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -360,12 +363,13 @@ CLogicalCTEConsumer::DerivePropertyConstraint(CMemoryPool *mp,
 											  CExpressionHandle &  //exprhdl
 ) const
 {
-	CExpression *pexprProducer =
+	gpos::pointer<CExpression *> pexprProducer =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexprProducer);
-	CPropConstraint *ppc = pexprProducer->DerivePropertyConstraint();
-	CColRefSetArray *pdrgpcrs = ppc->PdrgpcrsEquivClasses();
-	CConstraint *pcnstr = ppc->Pcnstr();
+	gpos::pointer<CPropConstraint *> ppc =
+		pexprProducer->DerivePropertyConstraint();
+	gpos::pointer<CColRefSetArray *> pdrgpcrs = ppc->PdrgpcrsEquivClasses();
+	gpos::pointer<CConstraint *> pcnstr = ppc->Pcnstr();
 
 	// remap producer columns to consumer columns
 	gpos::owner<CColRefSetArray *> pdrgpcrsMapped =
@@ -373,20 +377,21 @@ CLogicalCTEConsumer::DerivePropertyConstraint(CMemoryPool *mp,
 	const ULONG length = pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRefSet *pcrs = (*pdrgpcrs)[ul];
-		CColRefSet *pcrsMapped =
+		gpos::pointer<CColRefSet *> pcrs = (*pdrgpcrs)[ul];
+		gpos::owner<CColRefSet *> pcrsMapped =
 			CUtils::PcrsRemap(mp, pcrs, m_phmulcr, true /*must_exist*/);
 		pdrgpcrsMapped->Append(pcrsMapped);
 	}
 
-	CConstraint *pcnstrMapped = nullptr;
+	gpos::owner<CConstraint *> pcnstrMapped = nullptr;
 	if (nullptr != pcnstr)
 	{
 		pcnstrMapped = pcnstr->PcnstrCopyWithRemappedColumns(
 			mp, m_phmulcr, true /*must_exist*/);
 	}
 
-	return GPOS_NEW(mp) CPropConstraint(mp, pdrgpcrsMapped, pcnstrMapped);
+	return GPOS_NEW(mp)
+		CPropConstraint(mp, std::move(pdrgpcrsMapped), std::move(pcnstrMapped));
 }
 
 //---------------------------------------------------------------------------
@@ -397,13 +402,14 @@ CLogicalCTEConsumer::DerivePropertyConstraint(CMemoryPool *mp,
 //		Derive statistics based on cte producer
 //
 //---------------------------------------------------------------------------
-IStatistics *
-CLogicalCTEConsumer::PstatsDerive(CMemoryPool *mp,
-								  CExpressionHandle &,	//exprhdl,
-								  IStatisticsArray *	// statistics_array
+gpos::owner<IStatistics *>
+CLogicalCTEConsumer::PstatsDerive(
+	CMemoryPool *mp,
+	CExpressionHandle &,			   //exprhdl,
+	gpos::pointer<IStatisticsArray *>  // statistics_array
 ) const
 {
-	CExpression *pexprProducer =
+	gpos::pointer<CExpression *> pexprProducer =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexprProducer);
 	gpos::pointer<const IStatistics *> stats = pexprProducer->Pstats();

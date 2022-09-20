@@ -45,9 +45,9 @@ CDXLTranslateContext::CDXLTranslateContext(CMemoryPool *mp,
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLTranslateContext::CDXLTranslateContext(CMemoryPool *mp,
-										   BOOL is_child_agg_node,
-										   ULongToColParamMap *original)
+CDXLTranslateContext::CDXLTranslateContext(
+	CMemoryPool *mp, BOOL is_child_agg_node,
+	gpos::pointer<ULongToColParamMap *> original)
 	: m_mp(mp), m_is_child_agg_node(is_child_agg_node)
 {
 	m_colid_to_target_entry_map = GPOS_NEW(m_mp) ULongToTargetEntryMap(m_mp);
@@ -92,7 +92,8 @@ CDXLTranslateContext::IsParentAggNode() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLTranslateContext::CopyParamHashmap(ULongToColParamMap *original)
+CDXLTranslateContext::CopyParamHashmap(
+	gpos::pointer<ULongToColParamMap *> original)
 {
 	// iterate over full map
 	ULongToColParamMapIter hashmapiter(original);
@@ -169,13 +170,13 @@ CDXLTranslateContext::InsertMapping(ULONG colid, TargetEntry *target_entry)
 //---------------------------------------------------------------------------
 BOOL
 CDXLTranslateContext::FInsertParamMapping(
-	ULONG colid, CMappingElementColIdParamId *colidparamid)
+	ULONG colid, gpos::owner<CMappingElementColIdParamId *> colidparamid)
 {
 	// copy key
 	ULONG *key = GPOS_NEW(m_mp) ULONG(colid);
 
 	// insert colid->target entry mapping in the hash map
-	return m_colid_to_paramid_map->Insert(key, colidparamid);
+	return m_colid_to_paramid_map->Insert(key, std::move(colidparamid));
 }
 
 // EOF

@@ -13,6 +13,7 @@
 #define GPMD_IMDTypeInt4_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatumInt4.h"
 #include "naucrates/md/IMDType.h"
@@ -48,8 +49,9 @@ public:
 	}
 
 	// factory function for INT4 datums
-	virtual IDatumInt4 *CreateInt4Datum(CMemoryPool *mp, INT value,
-										BOOL is_null) const = 0;
+	virtual gpos::owner<IDatumInt4 *> CreateInt4Datum(CMemoryPool *mp,
+													  INT value,
+													  BOOL is_null) const = 0;
 };
 
 }  // namespace gpmd

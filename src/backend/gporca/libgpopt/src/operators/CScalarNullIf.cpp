@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarNullIf.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -89,14 +90,15 @@ CScalarNullIf::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarNullIf::Matches(COperator *pop) const
+CScalarNullIf::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CScalarNullIf *popScNullIf = CScalarNullIf::PopConvert(pop);
+	gpos::pointer<CScalarNullIf *> popScNullIf =
+		gpos::dyn_cast<CScalarNullIf>(pop);
 
 	// match if operators and return types are identical
 	return m_mdid_op->Equals(popScNullIf->MdIdOp()) &&
@@ -113,7 +115,7 @@ CScalarNullIf::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarNullIf::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarNullIf::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

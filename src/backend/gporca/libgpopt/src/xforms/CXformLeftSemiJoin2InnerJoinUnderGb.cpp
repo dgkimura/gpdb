@@ -61,8 +61,9 @@ CXformLeftSemiJoin2InnerJoinUnderGb::CXformLeftSemiJoin2InnerJoinUnderGb(
 CXform::EXformPromise
 CXformLeftSemiJoin2InnerJoinUnderGb::Exfp(CExpressionHandle &exprhdl) const
 {
-	CColRefSet *pcrsInnerOutput = exprhdl.DeriveOutputColumns(1);
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(2);
+	gpos::pointer<CColRefSet *> pcrsInnerOutput =
+		exprhdl.DeriveOutputColumns(1);
+	gpos::pointer<CExpression *> pexprScalar = exprhdl.PexprScalarExactChild(2);
 	CAutoMemoryPool amp;
 	if (exprhdl.HasOuterRefs() || nullptr == exprhdl.DeriveKeyCollection(0) ||
 		nullptr == pexprScalar ||
@@ -84,9 +85,10 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftSemiJoin2InnerJoinUnderGb::Transform(CXformContext *pxfctxt,
-											   CXformResult *pxfres,
-											   CExpression *pexpr) const
+CXformLeftSemiJoin2InnerJoinUnderGb::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -103,23 +105,24 @@ CXformLeftSemiJoin2InnerJoinUnderGb::Transform(CXformContext *pxfctxt,
 	pexprInner->AddRef();
 	pexprScalar->AddRef();
 
-	CColRefArray *pdrgpcrKeys = nullptr;
+	gpos::owner<CColRefArray *> pdrgpcrKeys = nullptr;
 	CColRefArray *pdrgpcrGrouping =
 		CUtils::PdrgpcrGroupingKey(mp, pexprOuter, &pdrgpcrKeys);
 	GPOS_ASSERT(nullptr != pdrgpcrKeys);
 
-	CExpression *pexprInnerJoin = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
-		mp, pexprOuter, pexprInner, pexprScalar);
+	gpos::owner<CExpression *> pexprInnerJoin =
+		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprOuter, pexprInner,
+													pexprScalar);
 
 	gpos::owner<CExpression *> pexprGb = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 			mp, pdrgpcrGrouping, COperator::EgbaggtypeGlobal /*egbaggtype*/,
-			pdrgpcrKeys),
-		pexprInnerJoin,
+			std::move(pdrgpcrKeys)),
+		std::move(pexprInnerJoin),
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp)));
 
-	pxfres->Add(pexprGb);
+	pxfres->Add(std::move(pexprGb));
 }
 
 // EOF

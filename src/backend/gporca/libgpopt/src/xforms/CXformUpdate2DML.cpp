@@ -70,14 +70,16 @@ CXformUpdate2DML::Exfp(CExpressionHandle &	// exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							CExpression *pexpr) const
+CXformUpdate2DML::Transform(gpos::pointer<CXformContext *> pxfctxt,
+							gpos::pointer<CXformResult *> pxfres,
+							gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalUpdate *popUpdate = CLogicalUpdate::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalUpdate *> popUpdate =
+		gpos::dyn_cast<CLogicalUpdate>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
@@ -138,9 +140,9 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 
 	// add assert checking that no NULL values are inserted for nullable columns or no check constraints are violated
-	COptimizerConfig *optimizer_config =
+	gpos::pointer<COptimizerConfig *> optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
-	CExpression *pexprAssertConstraints;
+	gpos::owner<CExpression *> pexprAssertConstraints;
 	if (optimizer_config->GetHint()->FEnforceConstraintsOnDML())
 	{
 		pexprAssertConstraints = CXformUtils::PexprAssertConstraints(
@@ -152,28 +154,30 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// generate oid column and project operator
-	CExpression *pexprProject = nullptr;
+	gpos::owner<CExpression *> pexprProject = nullptr;
 	CColRef *pcrTableOid = nullptr;
 	if (ptabdesc->IsPartitioned())
 	{
 		// generate a partition selector
 		pexprProject = CXformUtils::PexprLogicalPartitionSelector(
 			mp, ptabdesc, pdrgpcrInsert, pexprAssertConstraints);
-		pcrTableOid = CLogicalPartitionSelector::PopConvert(pexprProject->Pop())
-						  ->PcrOid();
+		pcrTableOid =
+			gpos::dyn_cast<CLogicalPartitionSelector>(pexprProject->Pop())
+				->PcrOid();
 	}
 	else
 	{
 		// generate a project operator
-		IMDId *pmdidTable = ptabdesc->MDId();
+		gpos::pointer<IMDId *> pmdidTable = ptabdesc->MDId();
 
-		OID oidTable = CMDIdGPDB::CastMdid(pmdidTable)->Oid();
-		CExpression *pexprOid = CUtils::PexprScalarConstOid(mp, oidTable);
+		OID oidTable = gpos::dyn_cast<CMDIdGPDB>(pmdidTable)->Oid();
+		gpos::owner<CExpression *> pexprOid =
+			CUtils::PexprScalarConstOid(mp, oidTable);
 
 		pexprProject =
 			CUtils::PexprAddProjection(mp, pexprAssertConstraints, pexprOid);
 
-		CExpression *pexprPrL = (*pexprProject)[1];
+		gpos::pointer<CExpression *> pexprPrL = (*pexprProject)[1];
 		pcrTableOid = CUtils::PcrFromProjElem((*pexprPrL)[0]);
 	}
 
@@ -223,7 +227,7 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	// TODO:  - Oct 30, 2012; detect and handle AFTER triggers on update
 
-	pxfres->Add(pexprDML);
+	pxfres->Add(std::move(pexprDML));
 }
 
 // EOF

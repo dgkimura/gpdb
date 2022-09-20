@@ -12,6 +12,7 @@
 
 #include "naucrates/md/CMDRequest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -29,10 +30,10 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDRequest::CMDRequest(CMemoryPool *mp, gpos::Ref<IMdIdArray> mdid_array,
-					   SMDTypeRequestArray *mdtype_request_array)
+					   gpos::owner<SMDTypeRequestArray *> mdtype_request_array)
 	: m_mp(mp),
 	  m_mdid_array(mdid_array),
-	  m_mdtype_request_array(mdtype_request_array)
+	  m_mdtype_request_array(std::move(mdtype_request_array))
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != m_mdid_array);

@@ -68,21 +68,22 @@ CXformInlineCTEConsumerUnderSelect::Exfp(CExpressionHandle &  //exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformInlineCTEConsumerUnderSelect::Transform(CXformContext *pxfctxt,
-											  CXformResult *pxfres,
-											  CExpression *pexpr) const
+CXformInlineCTEConsumerUnderSelect::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CExpression *pexprConsumer = (*pexpr)[0];
+	gpos::pointer<CExpression *> pexprConsumer = (*pexpr)[0];
 	CExpression *pexprScalar = (*pexpr)[1];
 
-	CLogicalCTEConsumer *popConsumer =
-		CLogicalCTEConsumer::PopConvert(pexprConsumer->Pop());
+	gpos::pointer<CLogicalCTEConsumer *> popConsumer =
+		gpos::dyn_cast<CLogicalCTEConsumer>(pexprConsumer->Pop());
 	ULONG id = popConsumer->UlCTEId();
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::pointer<CCTEInfo *> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	// only continue if inlining is enabled or if this CTE has only 1 consumer
 	if (!pcteinfo->FEnableInlining() && 1 < pcteinfo->UlConsumers(id))
 	{
@@ -107,14 +108,15 @@ CXformInlineCTEConsumerUnderSelect::Transform(CXformContext *pxfctxt,
 	pexprInlinedConsumer->AddRef();
 	pexprScalar->AddRef();
 
-	gpos::owner<CExpression *> pexprSelect =
-		CUtils::PexprLogicalSelect(mp, pexprInlinedConsumer, pexprScalar);
+	gpos::owner<CExpression *> pexprSelect = CUtils::PexprLogicalSelect(
+		mp, std::move(pexprInlinedConsumer), pexprScalar);
 
-	CExpression *pexprNormalized = CNormalizer::PexprNormalize(mp, pexprSelect);
+	gpos::owner<CExpression *> pexprNormalized =
+		CNormalizer::PexprNormalize(mp, pexprSelect);
 	pexprSelect->Release();
 
 	// add alternative to xform result
-	pxfres->Add(pexprNormalized);
+	pxfres->Add(std::move(pexprNormalized));
 }
 
 // EOF

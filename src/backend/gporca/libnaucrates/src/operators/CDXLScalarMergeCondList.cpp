@@ -99,7 +99,7 @@ CDXLScalarMergeCondList::AssertValid(gpos::pointer<const CDXLNode *> node,
 	const ULONG arity = node->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDXLNode *child_dxlnode = (*node)[ul];
+		gpos::pointer<CDXLNode *> child_dxlnode = (*node)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

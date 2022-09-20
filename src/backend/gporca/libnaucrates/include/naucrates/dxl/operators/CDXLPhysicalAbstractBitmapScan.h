@@ -56,8 +56,9 @@ public:
 		delete;
 
 	// ctor
-	CDXLPhysicalAbstractBitmapScan(CMemoryPool *mp, CDXLTableDescr *table_descr)
-		: CDXLPhysical(mp), m_dxl_table_descr(table_descr)
+	CDXLPhysicalAbstractBitmapScan(CMemoryPool *mp,
+								   gpos::owner<CDXLTableDescr *> table_descr)
+		: CDXLPhysical(mp), m_dxl_table_descr(std::move(table_descr))
 	{
 		GPOS_ASSERT(nullptr != m_dxl_table_descr);
 	}

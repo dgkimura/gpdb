@@ -63,16 +63,16 @@ CXformImplementRowTrigger::Exfp(CExpressionHandle &	 // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementRowTrigger::Transform(CXformContext *pxfctxt,
-									 CXformResult *pxfres,
-									 CExpression *pexpr) const
+CXformImplementRowTrigger::Transform(gpos::pointer<CXformContext *> pxfctxt,
+									 gpos::pointer<CXformResult *> pxfres,
+									 gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalRowTrigger *popRowTrigger =
-		CLogicalRowTrigger::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalRowTrigger *> popRowTrigger =
+		gpos::dyn_cast<CLogicalRowTrigger>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
@@ -98,13 +98,13 @@ CXformImplementRowTrigger::Transform(CXformContext *pxfctxt,
 	pexprChild->AddRef();
 
 	// create physical RowTrigger
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
-		mp,
-		GPOS_NEW(mp)
-			CPhysicalRowTrigger(mp, rel_mdid, type, pdrgpcrOld, pdrgpcrNew),
-		pexprChild);
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
+		CExpression(mp,
+					GPOS_NEW(mp) CPhysicalRowTrigger(
+						mp, std::move(rel_mdid), type, pdrgpcrOld, pdrgpcrNew),
+					std::move(pexprChild));
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 // EOF

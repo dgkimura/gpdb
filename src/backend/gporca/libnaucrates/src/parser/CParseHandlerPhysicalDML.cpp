@@ -232,10 +232,10 @@ CParseHandlerPhysicalDML::EndElement(const XMLCh *const,  // element_uri,
 		direct_dispatch_parse_handler->GetDXLDirectDispatchInfo();
 	dxl_direct_dispatch_info->AddRef();
 	gpos::owner<CDXLPhysicalDML *> dxl_op = GPOS_NEW(m_mp) CDXLPhysicalDML(
-		m_mp, m_dxl_dml_type, table_descr, m_src_colids_array, m_action_colid,
-		m_oid_colid, m_ctid_colid, m_segid_colid, dxl_direct_dispatch_info,
-		m_input_sort_req, m_fSplit);
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+		m_mp, m_dxl_dml_type, std::move(table_descr), m_src_colids_array,
+		m_action_colid, m_oid_colid, m_ctid_colid, m_segid_colid,
+		std::move(dxl_direct_dispatch_info), m_input_sort_req, m_fSplit);
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 
 	// set statistics and physical properties
 	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);

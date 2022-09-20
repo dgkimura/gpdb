@@ -61,7 +61,7 @@ private:
 	explicit CXformFactory(CMemoryPool *mp);
 
 	// actual adding of xform
-	void Add(CXform *pxform);
+	void Add(gpos::owner<CXform *> pxform);
 
 	// skip unused xforms that have been removed, preserving
 	// xform ids of the remaining ones

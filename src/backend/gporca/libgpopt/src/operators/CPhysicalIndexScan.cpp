@@ -30,13 +30,14 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalIndexScan::CPhysicalIndexScan(
-	CMemoryPool *mp, CIndexDescriptor *pindexdesc, CTableDescriptor *ptabdesc,
-	ULONG ulOriginOpId, const CName *pnameAlias, CColRefArray *pdrgpcrOutput,
-	COrderSpec *pos)
+	CMemoryPool *mp, gpos::owner<CIndexDescriptor *> pindexdesc,
+	gpos::owner<CTableDescriptor *> ptabdesc, ULONG ulOriginOpId,
+	const CName *pnameAlias, gpos::owner<CColRefArray *> pdrgpcrOutput,
+	gpos::owner<COrderSpec *> pos)
 	: CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput),
-	  m_pindexdesc(pindexdesc),
+	  m_pindexdesc(std::move(pindexdesc)),
 	  m_ulOriginOpId(ulOriginOpId),
-	  m_pos(pos)
+	  m_pos(std::move(pos))
 {
 	GPOS_ASSERT(nullptr != m_pindexdesc);
 	GPOS_ASSERT(nullptr != m_pos);
@@ -112,7 +113,7 @@ CPhysicalIndexScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalIndexScan::Matches(COperator *pop) const
+CPhysicalIndexScan::Matches(gpos::pointer<COperator *> pop) const
 {
 	return CUtils::FMatchIndex(this, pop);
 }

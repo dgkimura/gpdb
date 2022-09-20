@@ -64,15 +64,16 @@ CSearchStrategyTest::EresUnittest()
 //
 //---------------------------------------------------------------------------
 void
-CSearchStrategyTest::Optimize(CMemoryPool *mp, Pfpexpr pfnGenerator,
-							  CSearchStageArray *search_stage_array,
-							  PfnOptimize pfnOptimize)
+CSearchStrategyTest::Optimize(
+	CMemoryPool *mp, Pfpexpr pfnGenerator,
+	gpos::owner<CSearchStageArray *> search_stage_array,
+	PfnOptimize pfnOptimize)
 {
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
-	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
+	mda.RegisterProvider(CTestUtils::m_sysidDefault, std::move(pmdp));
 
 	// install opt context in TLS
 	{
@@ -179,8 +180,8 @@ CSearchStrategyTest::EresUnittest_Timeout()
 	gpos::owner<CSearchStageArray *> search_stage_array =
 		pphDXL->GetSearchStageArray();
 	search_stage_array->AddRef();
-	Optimize(mp, CTestUtils::PexprLogicalNAryJoin, search_stage_array,
-			 BuildMemo);
+	Optimize(mp, CTestUtils::PexprLogicalNAryJoin,
+			 std::move(search_stage_array), BuildMemo);
 
 	GPOS_DELETE(pphDXL);
 
@@ -217,7 +218,7 @@ CSearchStrategyTest::EresUnittest_ParsingWithException()
 //		Generate a search strategy with random xform allocation
 //
 //---------------------------------------------------------------------------
-CSearchStageArray *
+gpos::owner<CSearchStageArray *>
 CSearchStrategyTest::PdrgpssRandom(CMemoryPool *mp)
 {
 	gpos::owner<CSearchStageArray *> search_stage_array =
@@ -235,10 +236,12 @@ CSearchStrategyTest::PdrgpssRandom(CMemoryPool *mp)
 	pxfsSnd->Union(CXformFactory::Pxff()->PxfsImplementation());
 	pxfsSnd->Difference(pxfsFst);
 
-	search_stage_array->Append(GPOS_NEW(mp) CSearchStage(
-		pxfsFst, 1000 /*ulTimeThreshold*/, CCost(10E4) /*costThreshold*/));
-	search_stage_array->Append(GPOS_NEW(mp) CSearchStage(
-		pxfsSnd, 10000 /*ulTimeThreshold*/, CCost(10E8) /*costThreshold*/));
+	search_stage_array->Append(
+		GPOS_NEW(mp) CSearchStage(std::move(pxfsFst), 1000 /*ulTimeThreshold*/,
+								  CCost(10E4) /*costThreshold*/));
+	search_stage_array->Append(
+		GPOS_NEW(mp) CSearchStage(std::move(pxfsSnd), 10000 /*ulTimeThreshold*/,
+								  CCost(10E8) /*costThreshold*/));
 
 	return search_stage_array;
 }
@@ -252,8 +255,9 @@ CSearchStrategyTest::PdrgpssRandom(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CSearchStrategyTest::BuildMemo(CMemoryPool *mp, CExpression *pexprInput,
-							   CSearchStageArray *search_stage_array)
+CSearchStrategyTest::BuildMemo(
+	CMemoryPool *mp, CExpression *pexprInput,
+	gpos::owner<CSearchStageArray *> search_stage_array)
 {
 	CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexprInput);
 	GPOS_CHECK_ABORT;
@@ -268,7 +272,7 @@ CSearchStrategyTest::BuildMemo(CMemoryPool *mp, CExpression *pexprInput,
 	(void) pexprInput->OsPrint(oss);
 
 	CEngine eng(mp);
-	eng.Init(pqc, search_stage_array);
+	eng.Init(pqc, std::move(search_stage_array));
 	eng.Optimize();
 
 	gpos::owner<CExpression *> pexprPlan = eng.PexprExtractPlan();

@@ -60,10 +60,11 @@ public:
 	explicit CLogicalGet(CMemoryPool *mp);
 
 	CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
-				CTableDescriptor *ptabdesc);
+				gpos::owner<CTableDescriptor *> ptabdesc);
 
 	CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
-				CTableDescriptor *ptabdesc, CColRefArray *pdrgpcrOutput);
+				gpos::owner<CTableDescriptor *> ptabdesc,
+				gpos::owner<CColRefArray *> pdrgpcrOutput);
 
 	// dtor
 	~CLogicalGet() override;
@@ -121,14 +122,14 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -136,12 +137,12 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::owner<CColRefSet *> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive not nullable output columns
-	CColRefSet *DeriveNotNullColumns(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl) const override;
+	gpos::owner<CColRefSet *> DeriveNotNullColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
 	gpos::owner<CPartInfo *>
@@ -153,7 +154,7 @@ public:
 	}
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &  // exprhdl
 	) const override
@@ -184,7 +185,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	PcrsStat(CMemoryPool *,				   // mp,
 			 CExpressionHandle &,		   // exprhdl
 			 gpos::pointer<CColRefSet *>,  // pcrsInput
@@ -200,15 +201,16 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive key collections
-	CKeyCollection *DeriveKeyCollection(
+	gpos::owner<CKeyCollection *> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::owner<IStatistics *> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise

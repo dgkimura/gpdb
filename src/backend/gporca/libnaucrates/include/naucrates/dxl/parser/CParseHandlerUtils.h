@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerUtils_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLOperator.h"
 #include "naucrates/dxl/parser/CParseHandlerProperties.h"
@@ -35,7 +36,7 @@ class CParseHandlerUtils
 {
 public:
 	// parse and the set operator's costing and statistical properties
-	static void SetProperties(CDXLNode *dxlnode,
+	static void SetProperties(gpos::pointer<CDXLNode *> dxlnode,
 							  CParseHandlerProperties *prop_parse_handler);
 };
 }  // namespace gpdxl

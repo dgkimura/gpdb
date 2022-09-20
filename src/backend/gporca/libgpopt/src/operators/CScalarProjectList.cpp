@@ -48,7 +48,7 @@ CScalarProjectList::CScalarProjectList(CMemoryPool *mp) : CScalar(mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarProjectList::Matches(COperator *pop) const
+CScalarProjectList::Matches(gpos::pointer<COperator *> pop) const
 {
 	return (pop->Eopid() == Eopid());
 }
@@ -83,7 +83,7 @@ CScalarProjectList::UlDistinctAggs(CExpressionHandle &exprhdl)
 	// We make do with an inexact representative expression returned by exprhdl.PexprScalarRep(),
 	// knowing that at this time, aggregate functions are accurately contained in it. What's not
 	// exact are subqueries. This is better than just returning 0 for project lists with subqueries.
-	CExpression *pexprPrjList = exprhdl.PexprScalarRep();
+	gpos::pointer<CExpression *> pexprPrjList = exprhdl.PexprScalarRep();
 
 	GPOS_ASSERT(nullptr != pexprPrjList);
 	GPOS_ASSERT(COperator::EopScalarProjectList ==
@@ -93,14 +93,14 @@ CScalarProjectList::UlDistinctAggs(CExpressionHandle &exprhdl)
 	const ULONG arity = pexprPrjList->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprPrjEl = (*pexprPrjList)[ul];
-		CExpression *pexprChild = (*pexprPrjEl)[0];
+		gpos::pointer<CExpression *> pexprPrjEl = (*pexprPrjList)[ul];
+		gpos::pointer<CExpression *> pexprChild = (*pexprPrjEl)[0];
 		COperator::EOperatorId eopidChild = pexprChild->Pop()->Eopid();
 
 		if (COperator::EopScalarAggFunc == eopidChild)
 		{
-			CScalarAggFunc *popScAggFunc =
-				CScalarAggFunc::PopConvert(pexprChild->Pop());
+			gpos::pointer<CScalarAggFunc *> popScAggFunc =
+				gpos::dyn_cast<CScalarAggFunc>(pexprChild->Pop());
 			if (popScAggFunc->IsDistinct())
 			{
 				ulDistinctAggs++;
@@ -108,8 +108,8 @@ CScalarProjectList::UlDistinctAggs(CExpressionHandle &exprhdl)
 		}
 		else if (COperator::EopScalarWindowFunc == eopidChild)
 		{
-			CScalarWindowFunc *popScWinFunc =
-				CScalarWindowFunc::PopConvert(pexprChild->Pop());
+			gpos::pointer<CScalarWindowFunc *> popScWinFunc =
+				gpos::dyn_cast<CScalarWindowFunc>(pexprChild->Pop());
 			if (popScWinFunc->IsDistinct() && popScWinFunc->FAgg())
 			{
 				ulDistinctAggs++;
@@ -126,7 +126,7 @@ CScalarProjectList::UlOrderedAggs(CExpressionHandle &exprhdl)
 	// We make do with an inexact representative expression returned by exprhdl.PexprScalarRep(),
 	// knowing that at this time, aggregate functions are accurately contained in it. What's not
 	// exact are subqueries. This is better than just returning 0 for project lists with subqueries.
-	CExpression *pexprPrjList = exprhdl.PexprScalarRep();
+	gpos::pointer<CExpression *> pexprPrjList = exprhdl.PexprScalarRep();
 
 	GPOS_ASSERT(nullptr != pexprPrjList);
 	GPOS_ASSERT(COperator::EopScalarProjectList ==
@@ -136,8 +136,8 @@ CScalarProjectList::UlOrderedAggs(CExpressionHandle &exprhdl)
 	const ULONG arity = pexprPrjList->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprPrjEl = (*pexprPrjList)[ul];
-		CExpression *pexprChild = (*pexprPrjEl)[0];
+		gpos::pointer<CExpression *> pexprPrjEl = (*pexprPrjList)[ul];
+		gpos::pointer<CExpression *> pexprChild = (*pexprPrjEl)[0];
 		COperator::EOperatorId eopidChild = pexprChild->Pop()->Eopid();
 
 		if (COperator::EopScalarAggFunc == eopidChild)
@@ -169,7 +169,7 @@ CScalarProjectList::FHasMultipleDistinctAggs(CExpressionHandle &exprhdl)
 	// We make do with an inexact representative expression returned by exprhdl.PexprScalarRep(),
 	// knowing that at this time, aggregate functions are accurately contained in it. What's not
 	// exact are subqueries. This is better than just returning false for project lists with subqueries.
-	CExpression *pexprPrjList = exprhdl.PexprScalarRep();
+	gpos::pointer<CExpression *> pexprPrjList = exprhdl.PexprScalarRep();
 
 	GPOS_ASSERT(COperator::EopScalarProjectList ==
 				pexprPrjList->Pop()->Eopid());
@@ -204,7 +204,7 @@ CScalarProjectList::FHasScalarFunc(CExpressionHandle &exprhdl)
 	// We make do with an inexact representative expression returned by exprhdl.PexprScalarRep(),
 	// knowing that at this time, aggregate functions are accurately contained in it. What's not
 	// exact are subqueries. This is better than just returning 0 for project lists with subqueries.
-	CExpression *pexprPrjList = exprhdl.PexprScalarRep();
+	gpos::pointer<CExpression *> pexprPrjList = exprhdl.PexprScalarRep();
 
 	GPOS_ASSERT(nullptr != pexprPrjList);
 	GPOS_ASSERT(COperator::EopScalarProjectList ==
@@ -213,8 +213,8 @@ CScalarProjectList::FHasScalarFunc(CExpressionHandle &exprhdl)
 	const ULONG arity = pexprPrjList->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprPrjEl = (*pexprPrjList)[ul];
-		CExpression *pexprChild = (*pexprPrjEl)[0];
+		gpos::pointer<CExpression *> pexprPrjEl = (*pexprPrjList)[ul];
+		gpos::pointer<CExpression *> pexprChild = (*pexprPrjEl)[0];
 		COperator::EOperatorId eopidChild = pexprChild->Pop()->Eopid();
 
 		if (COperator::EopScalarFunc == eopidChild)
@@ -243,7 +243,7 @@ CScalarProjectList::FContainsOnlyReplicationSafeAggFuncs(
 	// We make do with an inexact representative expression returned by exprhdl.PexprScalarRep(),
 	// knowing that at this time, aggregate functions are accurately contained in it. What's not
 	// exact are subqueries. This is better than just returning 0 for project lists with subqueries.
-	CExpression *pexprPrjList = exprhdl.PexprScalarRep();
+	gpos::pointer<CExpression *> pexprPrjList = exprhdl.PexprScalarRep();
 
 	GPOS_ASSERT(nullptr != pexprPrjList);
 	GPOS_ASSERT(COperator::EopScalarProjectList ==
@@ -252,15 +252,15 @@ CScalarProjectList::FContainsOnlyReplicationSafeAggFuncs(
 	const ULONG arity = pexprPrjList->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprPrjEl = (*pexprPrjList)[ul];
-		CExpression *pexprAggFunc = (*pexprPrjEl)[0];
+		gpos::pointer<CExpression *> pexprPrjEl = (*pexprPrjList)[ul];
+		gpos::pointer<CExpression *> pexprAggFunc = (*pexprPrjEl)[0];
 		if (EopScalarAggFunc != pexprAggFunc->Pop()->Eopid())
 		{
 			continue;
 		}
-		CScalarAggFunc *popScAggFunc =
-			CScalarAggFunc::PopConvert(pexprAggFunc->Pop());
-		OID safe_oid = CMDIdGPDB::CastMdid(popScAggFunc->MDId())->Oid();
+		gpos::pointer<CScalarAggFunc *> popScAggFunc =
+			gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
+		OID safe_oid = gpos::dyn_cast<CMDIdGPDB>(popScAggFunc->MDId())->Oid();
 
 		// We use an allow-list approach here. While there are other functions that can be
 		// safely replicated, users could create custom agg funcs that could lead to wrong results

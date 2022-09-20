@@ -34,12 +34,12 @@ CMDCheckConstraintGPDB::CMDCheckConstraintGPDB(CMemoryPool *mp,
 											   gpos::Ref<IMDId> mdid,
 											   CMDName *mdname,
 											   gpos::Ref<IMDId> rel_mdid,
-											   CDXLNode *dxlnode)
+											   gpos::owner<CDXLNode *> dxlnode)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
 	  m_rel_mdid(rel_mdid),
-	  m_dxl_node(dxlnode)
+	  m_dxl_node(std::move(dxlnode))
 {
 	GPOS_ASSERT(m_mdid->IsValid());
 	GPOS_ASSERT(m_rel_mdid->IsValid());
@@ -73,10 +73,10 @@ CMDCheckConstraintGPDB::~CMDCheckConstraintGPDB()
 //		Scalar expression of the check constraint
 //
 //---------------------------------------------------------------------------
-CExpression *
-CMDCheckConstraintGPDB::GetCheckConstraintExpr(CMemoryPool *mp,
-											   CMDAccessor *md_accessor,
-											   CColRefArray *colref_array) const
+gpos::owner<CExpression *>
+CMDCheckConstraintGPDB::GetCheckConstraintExpr(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	gpos::pointer<CColRefArray *> colref_array) const
 {
 	GPOS_ASSERT(nullptr != colref_array);
 

@@ -38,14 +38,14 @@ CDXLScalarAggref::CDXLScalarAggref(CMemoryPool *mp,
 								   gpos::Ref<IMDId> resolved_rettype_mdid,
 								   BOOL is_distinct, EdxlAggrefStage agg_stage,
 								   EdxlAggrefKind aggkind,
-								   ULongPtrArray *argtypes)
+								   gpos::owner<ULongPtrArray *> argtypes)
 	: CDXLScalar(mp),
 	  m_agg_func_mdid(agg_func_mdid),
 	  m_resolved_rettype_mdid(resolved_rettype_mdid),
 	  m_is_distinct(is_distinct),
 	  m_agg_stage(agg_stage),
 	  m_aggkind(aggkind),
-	  m_argtypes(argtypes)
+	  m_argtypes(std::move(argtypes))
 {
 	GPOS_ASSERT(nullptr != m_agg_func_mdid);
 	GPOS_ASSERT_IMP(nullptr != m_resolved_rettype_mdid,
@@ -210,8 +210,9 @@ CDXLScalarAggref::SerializeValuesListChildToDXL(
 	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> dxlnode,
 	ULONG index, const CHAR *attr_name) const
 {
-	CDXLScalarValuesList *child =
-		CDXLScalarValuesList::Cast(((*dxlnode)[index])->GetOperator());
+	gpos::pointer<CDXLScalarValuesList *> child =
+		gpos::dyn_cast<CDXLScalarValuesList>(
+			((*dxlnode)[index])->GetOperator());
 	child->SerializeToDXL(xml_serializer, (*dxlnode)[index], attr_name);
 }
 
@@ -291,7 +292,8 @@ CDXLScalarAggref::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							  BOOL validate_children) const
 {
 	EdxlAggrefStage aggrefstage =
-		((CDXLScalarAggref *) dxlnode->GetOperator())->GetDXLAggStage();
+		(gpos::cast<CDXLScalarAggref>(dxlnode->GetOperator()))
+			->GetDXLAggStage();
 
 	GPOS_ASSERT((EdxlaggstageFinal >= aggrefstage) &&
 				(EdxlaggstageNormal <= aggrefstage));
@@ -299,7 +301,7 @@ CDXLScalarAggref::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *aggref_child_dxl = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> aggref_child_dxl = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					aggref_child_dxl->GetOperator()->GetDXLOperatorType());
 

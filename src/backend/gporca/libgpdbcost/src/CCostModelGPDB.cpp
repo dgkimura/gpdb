@@ -108,7 +108,7 @@ CCostModelGPDB::~CCostModelGPDB()
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostTupleProcessing(DOUBLE rows, DOUBLE width,
-									ICostModelParams *pcp)
+									gpos::pointer<ICostModelParams *> pcp)
 {
 	GPOS_ASSERT(nullptr != pcp);
 
@@ -133,7 +133,7 @@ CCostModelGPDB::CostTupleProcessing(DOUBLE rows, DOUBLE width,
 CCost
 CCostModelGPDB::CostScanOutput(CMemoryPool *,  // mp
 							   DOUBLE rows, DOUBLE width, DOUBLE num_rebinds,
-							   ICostModelParams *pcp)
+							   gpos::pointer<ICostModelParams *> pcp)
 {
 	GPOS_ASSERT(nullptr != pcp);
 
@@ -157,7 +157,7 @@ CCostModelGPDB::CostScanOutput(CMemoryPool *,  // mp
 CCost
 CCostModelGPDB::CostComputeScalar(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								  const SCostingInfo *pci,
-								  ICostModelParams *pcp,
+								  gpos::pointer<ICostModelParams *> pcp,
 								  gpos::pointer<const CCostModelGPDB *> pcmgpdb)
 {
 	GPOS_ASSERT(nullptr != pci);
@@ -201,7 +201,8 @@ CCostModelGPDB::CostComputeScalar(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostUnary(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  const SCostingInfo *pci, ICostModelParams *pcp)
+						  const SCostingInfo *pci,
+						  gpos::pointer<ICostModelParams *> pcp)
 {
 	GPOS_ASSERT(nullptr != pci);
 	GPOS_ASSERT(nullptr != pcp);
@@ -228,7 +229,8 @@ CCostModelGPDB::CostUnary(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostSpooling(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 const SCostingInfo *pci, ICostModelParams *pcp)
+							 const SCostingInfo *pci,
+							 gpos::pointer<ICostModelParams *> pcp)
 {
 	GPOS_ASSERT(nullptr != pci);
 	GPOS_ASSERT(nullptr != pcp);
@@ -280,7 +282,8 @@ CCostModelGPDB::FUnary(COperator::EOperatorId op_id)
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 const SCostingInfo *pci, ICostModelParams *pcp)
+							 const SCostingInfo *pci,
+							 gpos::pointer<ICostModelParams *> pcp)
 {
 	GPOS_ASSERT(nullptr != pci);
 	GPOS_ASSERT(nullptr != pcp);
@@ -305,7 +308,7 @@ CCostModelGPDB::CostChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 			if (fFilterParent)
 			{
-				CPhysicalPartitionSelector *ps =
+				gpos::pointer<CPhysicalPartitionSelector *> ps =
 					dynamic_cast<CPhysicalPartitionSelector *>(popChild);
 
 				if (ps)
@@ -313,7 +316,7 @@ CCostModelGPDB::CostChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
 					CCostContext *grandchildContext = nullptr;
 
 					scanOp = exprhdl.PopGrandchild(ul, 0, &grandchildContext);
-					CPhysicalDynamicScan *scan =
+					gpos::pointer<CPhysicalDynamicScan *> scan =
 						dynamic_cast<CPhysicalDynamicScan *>(scanOp);
 
 					if (scan && scan->ScanId() == ps->ScanId() &&
@@ -408,7 +411,7 @@ CCostModelGPDB::CostCTEProducer(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// only be a materialize or sort. Here, we check if a materialize node
 	// needs to be added during DXL->PlStmt translation
 
-	COperator *popChild = exprhdl.Pop(0 /*child_index*/);
+	gpos::pointer<COperator *> popChild = exprhdl.Pop(0 /*child_index*/);
 	if (nullptr == popChild)
 	{
 		// child operator is not known, this could happen when computing cost bound
@@ -746,7 +749,7 @@ CCostModelGPDB::CostUnionAll(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
 	GPOS_ASSERT(nullptr != pci);
-	GPOS_ASSERT(nullptr != CPhysicalUnionAll::PopConvert(exprhdl.Pop()));
+	GPOS_ASSERT(nullptr != gpos::dyn_cast<CPhysicalUnionAll>(exprhdl.Pop()));
 
 	if (COperator::EopPhysicalParallelUnionAll == exprhdl.Pop()->Eopid())
 	{
@@ -800,7 +803,8 @@ CCostModelGPDB::CostHashAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// the cardinality out as (rows + num_rows_outer)/2 to increase the local hash agg cost
 	DOUBLE rows = pci->Rows();
-	CPhysicalHashAgg *popAgg = CPhysicalHashAgg::PopConvert(exprhdl.Pop());
+	gpos::pointer<CPhysicalHashAgg *> popAgg =
+		gpos::dyn_cast<CPhysicalHashAgg>(exprhdl.Pop());
 	if ((COperator::EgbaggtypeLocal == popAgg->Egbaggtype()) &&
 		popAgg->FGeneratesDuplicates())
 	{
@@ -808,7 +812,7 @@ CCostModelGPDB::CostHashAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// get the number of grouping columns
-	const ULONG ulGrpCols = CPhysicalHashAgg::PopConvert(exprhdl.Pop())
+	const ULONG ulGrpCols = gpos::dyn_cast<CPhysicalHashAgg>(exprhdl.Pop())
 								->PdrgpcrGroupingCols()
 								->Size();
 
@@ -940,8 +944,8 @@ CCostModelGPDB::CostHashJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	GPOS_ASSERT(0 < dPenalizeHJSkewUpperLimit);
 
 	// get the number of columns used in join condition
-	CExpression *pexprJoinCond = exprhdl.PexprScalarRepChild(2);
-	CColRefSet *pcrsUsed = pexprJoinCond->DeriveUsedColumns();
+	gpos::pointer<CExpression *> pexprJoinCond = exprhdl.PexprScalarRepChild(2);
+	gpos::pointer<CColRefSet *> pcrsUsed = pexprJoinCond->DeriveUsedColumns();
 	const ULONG ulColsUsed = pcrsUsed->Size();
 
 	// TODO 2014-03-14
@@ -1001,14 +1005,15 @@ CCostModelGPDB::CostHashJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	{
 		for (ULONG ul = 0; ul < arity - 1; ++ul)
 		{
-			COperator *popChild = exprhdl.Pop(ul);
+			gpos::pointer<COperator *> popChild = exprhdl.Pop(ul);
 			if (nullptr == popChild ||
 				COperator::EopPhysicalMotionHashDistribute != popChild->Eopid())
 			{
 				continue;
 			}
 
-			CPhysicalMotion *motion = CPhysicalMotion::PopConvert(popChild);
+			gpos::pointer<CPhysicalMotion *> motion =
+				gpos::dyn_cast<CPhysicalMotion>(popChild);
 			gpos::Ref<CColRefSet> columns(motion->Pds()->PcrsUsed(mp));
 
 			// we decide if there is a skew by calculating the NDVs of the HashRedistribute
@@ -1092,8 +1097,8 @@ CCostModelGPDB::CostMergeJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	GPOS_ASSERT(0 < dOutputTupCostUnit);
 
 	// get the number of columns used in join condition
-	CExpression *pexprJoinCond = exprhdl.PexprScalarRepChild(2);
-	CColRefSet *pcrsUsed = pexprJoinCond->DeriveUsedColumns();
+	gpos::pointer<CExpression *> pexprJoinCond = exprhdl.PexprScalarRepChild(2);
+	gpos::pointer<CColRefSet *> pcrsUsed = pexprJoinCond->DeriveUsedColumns();
 	const ULONG ulColsUsed = pcrsUsed->Size();
 
 	// We assume for costing, that the outer tuples are unique. This means that
@@ -1157,8 +1162,8 @@ CCostModelGPDB::CostIndexNLJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	GPOS_ASSERT(0 < dJoinOutputTupCostUnit);
 
 	// get the number of columns used in join condition
-	CExpression *pexprJoinCond = exprhdl.PexprScalarRepChild(2);
-	CColRefSet *pcrsUsed = pexprJoinCond->DeriveUsedColumns();
+	gpos::pointer<CExpression *> pexprJoinCond = exprhdl.PexprScalarRepChild(2);
+	gpos::pointer<CColRefSet *> pcrsUsed = pexprJoinCond->DeriveUsedColumns();
 	const ULONG ulColsUsed = pcrsUsed->Size();
 
 	// cost of Index apply contains three parts:
@@ -1265,8 +1270,8 @@ CCostModelGPDB::CostNLJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	GPOS_ASSERT(0 < dNLJFactor);
 
 	// get the number of columns used in join condition
-	CExpression *pexprJoinCond = exprhdl.PexprScalarRepChild(2);
-	CColRefSet *pcrsUsed = pexprJoinCond->DeriveUsedColumns();
+	gpos::pointer<CExpression *> pexprJoinCond = exprhdl.PexprScalarRepChild(2);
+	gpos::pointer<CColRefSet *> pcrsUsed = pexprJoinCond->DeriveUsedColumns();
 	const ULONG ulColsUsed = pcrsUsed->Size();
 
 	// cost of nested loop join contains three parts:
@@ -1391,8 +1396,9 @@ CCostModelGPDB::CostMotion(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				->Get();
 
 		// Adjust the cost of no-op hashed distribution to correctly reflect that no tuple movement is needed
-		CPhysicalMotion *pMotion = CPhysicalMotion::PopConvert(exprhdl.Pop());
-		CDistributionSpec *pds = pMotion->Pds();
+		gpos::pointer<CPhysicalMotion *> pMotion =
+			gpos::dyn_cast<CPhysicalMotion>(exprhdl.Pop());
+		gpos::pointer<CDistributionSpec *> pds = pMotion->Pds();
 		if (CDistributionSpec::EdtHashedNoOp == pds->Edt())
 		{
 			// promote the plan with redistribution on same distributed columns of base table for parallel append
@@ -1433,7 +1439,7 @@ CCostModelGPDB::CostMotion(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	if (COperator::EopPhysicalMotionBroadcast == op_id)
 	{
-		COptimizerConfig *optimizer_config =
+		gpos::pointer<COptimizerConfig *> optimizer_config =
 			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 		ULONG broadcast_threshold =
 			optimizer_config->GetHint()->UlBroadcastThreshold();
@@ -1475,12 +1481,12 @@ CCostModelGPDB::CostSequenceProject(
 	const DOUBLE dWidthOuter = pci->GetWidth()[0];
 
 	ULONG ulSortCols = 0;
-	COrderSpecArray *pdrgpos =
-		CPhysicalSequenceProject::PopConvert(exprhdl.Pop())->Pdrgpos();
+	gpos::pointer<COrderSpecArray *> pdrgpos =
+		gpos::dyn_cast<CPhysicalSequenceProject>(exprhdl.Pop())->Pdrgpos();
 	const ULONG ulOrderSpecs = pdrgpos->Size();
 	for (ULONG ul = 0; ul < ulOrderSpecs; ul++)
 	{
-		COrderSpec *pos = (*pdrgpos)[ul];
+		gpos::pointer<COrderSpec *> pos = (*pdrgpos)[ul];
 		ulSortCols += pos->UlSortColumns();
 	}
 
@@ -1518,13 +1524,13 @@ CCostModelGPDB::CostIndexScan(CMemoryPool *,  // mp
 	GPOS_ASSERT(nullptr != pcmgpdb);
 	GPOS_ASSERT(nullptr != pci);
 
-	COperator *pop = exprhdl.Pop();
+	gpos::pointer<COperator *> pop = exprhdl.Pop();
 	COperator::EOperatorId op_id = pop->Eopid();
 	GPOS_ASSERT(COperator::EopPhysicalIndexScan == op_id ||
 				COperator::EopPhysicalDynamicIndexScan == op_id);
 
 	const CDouble dTableWidth =
-		CPhysicalScan::PopConvert(pop)->PstatsBaseTable()->Width();
+		gpos::dyn_cast<CPhysicalScan>(pop)->PstatsBaseTable()->Width();
 
 	const CDouble dIndexFilterCostUnit =
 		pcmgpdb->GetCostModelParams()
@@ -1547,12 +1553,14 @@ CCostModelGPDB::CostIndexScan(CMemoryPool *,  // mp
 	ULONG ulIndexKeys = 1;
 	if (COperator::EopPhysicalIndexScan == op_id)
 	{
-		ulIndexKeys = CPhysicalIndexScan::PopConvert(pop)->Pindexdesc()->Keys();
+		ulIndexKeys =
+			gpos::dyn_cast<CPhysicalIndexScan>(pop)->Pindexdesc()->Keys();
 	}
 	else
 	{
-		ulIndexKeys =
-			CPhysicalDynamicIndexScan::PopConvert(pop)->Pindexdesc()->Keys();
+		ulIndexKeys = gpos::dyn_cast<CPhysicalDynamicIndexScan>(pop)
+						  ->Pindexdesc()
+						  ->Keys();
 	}
 
 	// TODO: 2014-02-01
@@ -1583,11 +1591,11 @@ CCostModelGPDB::CostIndexOnlyScan(
 	GPOS_ASSERT(nullptr != pcmgpdb);
 	GPOS_ASSERT(nullptr != pci);
 
-	COperator *pop = exprhdl.Pop();
+	gpos::pointer<COperator *> pop = exprhdl.Pop();
 	GPOS_ASSERT(COperator::EopPhysicalIndexOnlyScan == pop->Eopid());
 
 	const CDouble dTableWidth =
-		CPhysicalScan::PopConvert(pop)->PstatsBaseTable()->Width();
+		gpos::dyn_cast<CPhysicalScan>(pop)->PstatsBaseTable()->Width();
 
 	const CDouble dIndexFilterCostUnit =
 		pcmgpdb->GetCostModelParams()
@@ -1608,9 +1616,9 @@ CCostModelGPDB::CostIndexOnlyScan(
 	CDouble dRowsIndex = pci->Rows();
 
 	ULONG ulIndexKeys =
-		CPhysicalIndexOnlyScan::PopConvert(pop)->Pindexdesc()->Keys();
-	IStatistics *stats =
-		CPhysicalIndexOnlyScan::PopConvert(pop)->PstatsBaseTable();
+		gpos::dyn_cast<CPhysicalIndexOnlyScan>(pop)->Pindexdesc()->Keys();
+	gpos::pointer<IStatistics *> stats =
+		gpos::dyn_cast<CPhysicalIndexOnlyScan>(pop)->PstatsBaseTable();
 
 	// Calculating cost of index-only-scan is identical to index-scan with the
 	// addition of dPartialVisFrac which indicates the percentage of pages not
@@ -1642,19 +1650,20 @@ CCostModelGPDB::CostBitmapTableScan(
 		COperator::EopPhysicalDynamicBitmapTableScan == exprhdl.Pop()->Eopid());
 
 	CCost result(0.0);
-	CExpression *pexprIndexCond =
+	gpos::pointer<CExpression *> pexprIndexCond =
 		exprhdl.PexprScalarRepChild(1 /*child_index*/);
-	CColRefSet *pcrsUsed = pexprIndexCond->DeriveUsedColumns();
-	CColRefSet *outerRefs = exprhdl.DeriveOuterReferences();
+	gpos::pointer<CColRefSet *> pcrsUsed = pexprIndexCond->DeriveUsedColumns();
+	gpos::pointer<CColRefSet *> outerRefs = exprhdl.DeriveOuterReferences();
 	gpos::Ref<CColRefSet> pcrsLocalUsed =
 		GPOS_NEW(mp) CColRefSet(mp, *pcrsUsed);
 	IMDIndex::EmdindexType indexType = IMDIndex::EmdindSentinel;
 
 	if (COperator::EopScalarBitmapIndexProbe == pexprIndexCond->Pop()->Eopid())
 	{
-		indexType = CScalarBitmapIndexProbe::PopConvert(pexprIndexCond->Pop())
-						->Pindexdesc()
-						->IndexType();
+		indexType =
+			gpos::dyn_cast<CScalarBitmapIndexProbe>(pexprIndexCond->Pop())
+				->Pindexdesc()
+				->IndexType();
 	}
 
 	BOOL isInPredOnBtreeIndex =
@@ -1741,7 +1750,8 @@ CCostModelGPDB::CostBitmapTableScan(
 			if (1 < pcrsUsed->Size() && COperator::EopScalarBitmapIndexProbe ==
 											pexprIndexCond->Pop()->Eopid())
 			{
-				CExpression *pexprScalarCmp = (*pexprIndexCond)[0];
+				gpos::pointer<CExpression *> pexprScalarCmp =
+					(*pexprIndexCond)[0];
 				// The index condition contains an outer reference. Adjust
 				// the NDV to 1, if we compare the colref with a single value
 				if (CPredicateUtils::IsEqualityOp(pexprScalarCmp))
@@ -1778,7 +1788,7 @@ CCostModelGPDB::CostBitmapTableScan(
 				pcmgpdb->GetCostModelParams()
 					->PcpLookup(CCostModelParamsGPDB::EcpBitmapPageCost)
 					->Get();
-			BOOL isAOTable = CPhysicalScan::PopConvert(exprhdl.Pop())
+			BOOL isAOTable = gpos::dyn_cast<CPhysicalScan>(exprhdl.Pop())
 								 ->Ptabdesc()
 								 ->IsAORowOrColTable();
 
@@ -1809,9 +1819,10 @@ CCostModelGPDB::CostBitmapTableScan(
 
 			if (!isAOTable && indexType == IMDIndex::EmdindBitmap && dNDV > 1.0)
 			{
-				CDouble baseTableRows = CPhysicalScan::PopConvert(exprhdl.Pop())
-											->PstatsBaseTable()
-											->Rows();
+				CDouble baseTableRows =
+					gpos::dyn_cast<CPhysicalScan>(exprhdl.Pop())
+						->PstatsBaseTable()
+						->Rows();
 
 				// for bitmap index scans on heap tables, we found that there is an additional cost
 				// associated with unioning them that is proportional to the number of bitmaps involved
@@ -1902,7 +1913,7 @@ CCostModelGPDB::CostScan(CMemoryPool *,	 // mp
 	GPOS_ASSERT(nullptr != pcmgpdb);
 	GPOS_ASSERT(nullptr != pci);
 
-	COperator *pop = exprhdl.Pop();
+	gpos::pointer<COperator *> pop = exprhdl.Pop();
 	COperator::EOperatorId op_id = pop->Eopid();
 	GPOS_ASSERT(COperator::EopPhysicalTableScan == op_id ||
 				COperator::EopPhysicalDynamicTableScan == op_id ||
@@ -1913,7 +1924,7 @@ CCostModelGPDB::CostScan(CMemoryPool *,	 // mp
 			->PcpLookup(CCostModelParamsGPDB::EcpInitScanFactor)
 			->Get();
 	const CDouble dTableWidth =
-		CPhysicalScan::PopConvert(pop)->PstatsBaseTable()->Width();
+		gpos::dyn_cast<CPhysicalScan>(pop)->PstatsBaseTable()->Width();
 
 	// Get total rows for each host to scan
 	const CDouble dTableScanCostUnit =

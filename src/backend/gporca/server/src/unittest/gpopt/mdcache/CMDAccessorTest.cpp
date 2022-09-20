@@ -100,7 +100,8 @@ CMDAccessorTest::EresUnittest_Basic()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -227,7 +228,8 @@ CMDAccessorTest::EresUnittest_Datum()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -301,7 +303,8 @@ CMDAccessorTest::EresUnittest_DatumGeneric()
 	// Setup an MD cache with a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// attempt to obtain a generic type from the cache should assert
 	(void) mda.PtMDType<IMDTypeGeneric>();
@@ -328,7 +331,8 @@ CMDAccessorTest::EresUnittest_Navigate()
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// lookup a function in the MD cache
 	gpos::owner<CMDIdGPDB *> mdid_func =
@@ -338,12 +342,13 @@ CMDAccessorTest::EresUnittest_Navigate()
 	gpos::pointer<const IMDFunction *> pmdfunc = mda.RetrieveFunc(mdid_func);
 
 	// lookup function return type
-	IMDId *pmdidFuncReturnType = pmdfunc->GetResultTypeMdid();
+	gpos::pointer<IMDId *> pmdidFuncReturnType = pmdfunc->GetResultTypeMdid();
 	gpos::pointer<const IMDType *> pimdtype =
 		mda.RetrieveType(pmdidFuncReturnType);
 
 	// lookup equality operator for function return type
-	IMDId *pmdidEqOp = pimdtype->GetMdidForCmpType(IMDType::EcmptEq);
+	gpos::pointer<IMDId *> pmdidEqOp =
+		pimdtype->GetMdidForCmpType(IMDType::EcmptEq);
 
 	gpos::pointer<const IMDScalarOp *> md_scalar_op GPOS_ASSERTS_ONLY =
 		mda.RetrieveScOp(pmdidEqOp);
@@ -412,7 +417,7 @@ CMDAccessorTest::EresUnittest_Indexes()
 
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 
-	IMDId *pmdidIndex = pmdrel->IndexMDidAt(0);
+	gpos::pointer<IMDId *> pmdidIndex = pmdrel->IndexMDidAt(0);
 	gpos::pointer<const IMDIndex *> pmdindex = mda.RetrieveIndex(pmdidIndex);
 
 	ULONG ulKeys = pmdindex->Keys();
@@ -497,7 +502,8 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 	}
 
 	// get one of its check constraint
-	IMDId *pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(0);
+	gpos::pointer<IMDId *> pmdidCheckConstraint =
+		pmdrel->CheckConstraintMDidAt(0);
 	gpos::pointer<const IMDCheckConstraint *> pmdCheckConstraint =
 		mda.RetrieveCheckConstraints(pmdidCheckConstraint);
 
@@ -544,7 +550,8 @@ CMDAccessorTest::EresUnittest_Cast()
 	// Setup an MD cache with a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -605,7 +612,8 @@ CMDAccessorTest::EresUnittest_ScCmp()
 	// Setup an MD cache with a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -647,7 +655,8 @@ CMDAccessorTest::EresUnittest_Negative()
 	// Setup an MD cache with a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// lookup a non-existing objects
 	gpos::owner<CMDIdGPDB *> pmdidNonExistingObject =

@@ -65,8 +65,8 @@ CMDProviderMemory::CMDProviderMemory(CMemoryPool *mp, const CHAR *file_name)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDProviderMemory::CMDProviderMemory(CMemoryPool *mp,
-									 IMDCacheObjectArray *mdcache_obj_array)
+CMDProviderMemory::CMDProviderMemory(
+	CMemoryPool *mp, gpos::pointer<IMDCacheObjectArray *> mdcache_obj_array)
 	: m_mdmap(nullptr)
 {
 	LoadMetadataObjectsFromArray(mp, mdcache_obj_array);
@@ -82,7 +82,7 @@ CMDProviderMemory::CMDProviderMemory(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 void
 CMDProviderMemory::LoadMetadataObjectsFromArray(
-	CMemoryPool *mp, IMDCacheObjectArray *mdcache_obj_array)
+	CMemoryPool *mp, gpos::pointer<IMDCacheObjectArray *> mdcache_obj_array)
 {
 	GPOS_ASSERT(nullptr != mdcache_obj_array);
 
@@ -95,7 +95,7 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 	{
 		GPOS_CHECK_ABORT;
 
-		IMDCacheObject *mdcache_obj = (*mdcache_obj_array)[ul];
+		gpos::pointer<IMDCacheObject *> mdcache_obj = (*mdcache_obj_array)[ul];
 		gpos::owner<IMDId *> mdid_key = mdcache_obj->MDId();
 		mdid_key->AddRef();
 
@@ -210,7 +210,7 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 //		The caller takes ownership over the object.
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::owner<IMDId *>
 CMDProviderMemory::MDId(CMemoryPool *mp, CSystemId sysid,
 						IMDType::ETypeInfo type_info) const
 {
@@ -218,17 +218,18 @@ CMDProviderMemory::MDId(CMemoryPool *mp, CSystemId sysid,
 }
 
 // return the requested metadata object
-IMDCacheObject *
+gpos::owner<IMDCacheObject *>
 CMDProviderMemory::GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
-							IMDId *mdid) const
+							gpos::pointer<IMDId *> mdid) const
 {
 	CAutoP<CWStringBase> a_pstr;
 	a_pstr = GetMDObjDXLStr(mp, md_accessor, mdid);
 
 	GPOS_ASSERT(nullptr != a_pstr.Value());
 
-	IMDCacheObject *pmdobjNew = gpdxl::CDXLUtils::ParseDXLToIMDIdCacheObj(
-		mp, a_pstr.Value(), nullptr /* XSD path */);
+	gpos::owner<IMDCacheObject *> pmdobjNew =
+		gpdxl::CDXLUtils::ParseDXLToIMDIdCacheObj(mp, a_pstr.Value(),
+												  nullptr /* XSD path */);
 	GPOS_ASSERT(nullptr != pmdobjNew);
 
 	return pmdobjNew;

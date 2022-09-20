@@ -118,17 +118,19 @@ private:
 	BOOL m_is_complete;
 
 protected:
-	CColRefSet *DeriveDefinedColumns(CExpressionHandle &);
+	gpos::pointer<CColRefSet *> DeriveDefinedColumns(CExpressionHandle &);
 
-	CColRefSet *DeriveUsedColumns(CExpressionHandle &);
+	gpos::pointer<CColRefSet *> DeriveUsedColumns(CExpressionHandle &);
 
-	CColRefSet *DeriveSetReturningFunctionColumns(CExpressionHandle &);
+	gpos::pointer<CColRefSet *> DeriveSetReturningFunctionColumns(
+		CExpressionHandle &);
 
 	BOOL DeriveHasSubquery(CExpressionHandle &);
 
-	CPartInfo *DerivePartitionInfo(CExpressionHandle &);
+	gpos::pointer<CPartInfo *> DerivePartitionInfo(CExpressionHandle &);
 
-	CFunctionProp *DeriveFunctionProperties(CExpressionHandle &);
+	gpos::pointer<CFunctionProp *> DeriveFunctionProperties(
+		CExpressionHandle &);
 
 	BOOL DeriveHasNonScalarFunction(CExpressionHandle &);
 
@@ -167,7 +169,7 @@ public:
 
 	// derivation function
 	void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDrvdPropCtxt *pdpctxt) override;
+				gpos::pointer<CDrvdPropCtxt *> pdpctxt) override;
 
 	// check for satisfying required plan properties
 	BOOL FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const override;

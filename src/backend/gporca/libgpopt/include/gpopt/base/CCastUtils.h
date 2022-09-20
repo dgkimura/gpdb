@@ -41,11 +41,14 @@ public:
 	// extract the column reference if the given expression a scalar identifier
 	// or a cast of a scalar identifier or a function that casts a scalar identifier.
 	// Else return NULL.
-	static const CColRef *PcrExtractFromScIdOrCastScId(CExpression *pexpr);
+	static const CColRef *PcrExtractFromScIdOrCastScId(
+		gpos::pointer<CExpression *> pexpr);
 
 	// cast the input column reference to the destination mdid
-	static CExpression *PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
-								  const CColRef *colref, IMDId *mdid_dest);
+	static gpos::owner<CExpression *> PexprCast(CMemoryPool *mp,
+												CMDAccessor *md_accessor,
+												const CColRef *colref,
+												IMDId *mdid_dest);
 
 	// check whether the given expression is a binary coercible cast of something
 	static BOOL FBinaryCoercibleCast(gpos::pointer<CExpression *> pexpr);
@@ -58,15 +61,18 @@ public:
 	static CExpression *PexprWithoutBinaryCoercibleCasts(CExpression *pexpr);
 
 	// add explicit casting to equality operations between compatible types
-	static CExpressionArray *PdrgpexprCastEquality(CMemoryPool *mp,
-												   CExpression *pexpr);
+	static gpos::owner<CExpressionArray *> PdrgpexprCastEquality(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr);
 
 	// helper to add explicit casting to left child of given equality predicate
-	static CExpression *PexprAddCast(CMemoryPool *mp, CExpression *pexprPred);
+	static gpos::owner<CExpression *> PexprAddCast(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprPred);
 
 	// add explicit casting on the input expression to the destination type
-	static CExpression *PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
-								  CExpression *pexpr, IMDId *mdid_dest);
+	static gpos::owner<CExpression *> PexprCast(CMemoryPool *mp,
+												CMDAccessor *md_accessor,
+												CExpression *pexpr,
+												IMDId *mdid_dest);
 };	// class CCastUtils
 
 }  // namespace gpopt

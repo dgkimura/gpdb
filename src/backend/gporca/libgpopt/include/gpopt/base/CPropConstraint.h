@@ -53,8 +53,8 @@ public:
 	CPropConstraint(const CPropConstraint &) = delete;
 
 	// ctor
-	CPropConstraint(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
-					CConstraint *pcnstr);
+	CPropConstraint(CMemoryPool *mp, gpos::owner<CColRefSetArray *> pdrgpcrs,
+					gpos::owner<CConstraint *> pcnstr);
 
 	// dtor
 	~CPropConstraint() override;
@@ -89,9 +89,9 @@ public:
 
 	// scalar expression on given column mapped from all constraints
 	// on its equivalent columns
-	CExpression *PexprScalarMappedFromEquivCols(
+	gpos::owner<CExpression *> PexprScalarMappedFromEquivCols(
 		CMemoryPool *mp, CColRef *colref,
-		CPropConstraint *constraintsForOuterRefs) const;
+		gpos::pointer<CPropConstraint *> constraintsForOuterRefs) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;

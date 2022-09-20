@@ -5,6 +5,7 @@
 #include "gpopt/xforms/CXformImplementFullOuterMergeJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalFullOuterJoin.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -42,9 +43,10 @@ CXformImplementFullOuterMergeJoin::Exfp(CExpressionHandle &exprhdl) const
 }
 
 void
-CXformImplementFullOuterMergeJoin::Transform(CXformContext *pxfctxt,
-											 CXformResult *pxfres,
-											 CExpression *pexpr) const
+CXformImplementFullOuterMergeJoin::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

@@ -20,10 +20,11 @@ using namespace gpopt;
 
 
 //  return a statistics object for a project operation
-CStatistics *
+gpos::owner<CStatistics *>
 CProjectStatsProcessor::CalcProjStats(
 	CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
-	ULongPtrArray *projection_colids, UlongToIDatumMap *datum_map)
+	gpos::pointer<ULongPtrArray *> projection_colids,
+	gpos::pointer<UlongToIDatumMap *> datum_map)
 {
 	GPOS_ASSERT(nullptr != projection_colids);
 
@@ -118,8 +119,9 @@ CProjectStatsProcessor::CalcProjStats(
 	CDouble input_rows = input_stats->Rows();
 	// create an output stats object
 	gpos::owner<CStatistics *> projection_stats = GPOS_NEW(mp) CStatistics(
-		mp, histograms_new, colid_width_mapping, input_rows,
-		input_stats->IsEmpty(), input_stats->GetNumberOfPredicates());
+		mp, std::move(histograms_new), std::move(colid_width_mapping),
+		input_rows, input_stats->IsEmpty(),
+		input_stats->GetNumberOfPredicates());
 
 	// In the output statistics object, the upper bound source cardinality of the project column
 	// is equivalent the estimate project cardinality.

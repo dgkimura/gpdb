@@ -169,7 +169,7 @@ CParseHandlerProperties::EndElement(const XMLCh *const,	 // element_uri,
 		m_dxl_stats_derived_relation = dxl_stats_derived_relation;
 	}
 
-	m_dxl_properties = GPOS_NEW(m_mp) CDXLPhysicalProperties(cost);
+	m_dxl_properties = GPOS_NEW(m_mp) CDXLPhysicalProperties(std::move(cost));
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

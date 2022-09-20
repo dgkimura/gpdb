@@ -102,7 +102,7 @@ CDXLScalarAssertConstraintList::AssertValid(
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxlopScalarAssertConstraint ==
 					child_dxlnode->GetOperator()->GetDXLOperator());
 

@@ -61,9 +61,10 @@ public:
 	CDXLStatsDerivedColumn(const CDXLStatsDerivedColumn &) = delete;
 
 	// ctor
-	CDXLStatsDerivedColumn(ULONG colid, CDouble width, CDouble null_freq,
-						   CDouble distinct_remaining, CDouble freq_remaining,
-						   CDXLBucketArray *dxl_stats_bucket_array);
+	CDXLStatsDerivedColumn(
+		ULONG colid, CDouble width, CDouble null_freq,
+		CDouble distinct_remaining, CDouble freq_remaining,
+		gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array);
 
 	// dtor
 	~CDXLStatsDerivedColumn() override;

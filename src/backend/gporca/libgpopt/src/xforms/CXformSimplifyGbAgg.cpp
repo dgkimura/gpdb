@@ -60,7 +60,8 @@ CXformSimplifyGbAgg::CXformSimplifyGbAgg(CMemoryPool *mp)
 CXform::EXformPromise
 CXformSimplifyGbAgg::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
+	gpos::pointer<CLogicalGbAgg *> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 
 	GPOS_ASSERT(COperator::EgbaggtypeGlobal == popAgg->Egbaggtype());
 
@@ -87,9 +88,10 @@ CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp,
 								gpos::pointer<CExpression *> pexpr,
 								gpos::pointer<CXformResult *> pxfres)
 {
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalGbAgg *> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprProjectList = (*pexpr)[1];
+	gpos::pointer<CExpression *> pexprProjectList = (*pexpr)[1];
 
 	if (0 < pexprProjectList->Arity())
 	{
@@ -97,7 +99,8 @@ CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp,
 		return false;
 	}
 
-	CKeyCollection *pkc = pexprRelational->DeriveKeyCollection();
+	gpos::pointer<CKeyCollection *> pkc =
+		pexprRelational->DeriveKeyCollection();
 	if (nullptr == pkc)
 	{
 		// relational child does not have key
@@ -123,7 +126,7 @@ CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp,
 		{
 			// Gb operator can be dropped
 			pexprRelational->AddRef();
-			CExpression *pexprResult = CUtils::PexprLogicalSelect(
+			gpos::owner<CExpression *> pexprResult = CUtils::PexprLogicalSelect(
 				mp, pexprRelational,
 				CPredicateUtils::PexprConjunction(mp, nullptr));
 			pxfres->Add(pexprResult);
@@ -144,8 +147,9 @@ CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 void
-CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							   CExpression *pexpr) const
+CXformSimplifyGbAgg::Transform(gpos::pointer<CXformContext *> pxfctxt,
+							   gpos::pointer<CXformResult *> pxfres,
+							   gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -161,7 +165,8 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// extract components
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalGbAgg *> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	CExpression *pexprRelational = (*pexpr)[0];
 	CExpression *pexprProjectList = (*pexpr)[1];
 
@@ -173,13 +178,14 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		GPOS_NEW(mp) CColRefSet(mp);  // set of grouping columns covered by FD's
 	gpos::owner<CColRefSet *> pcrsMinimal = GPOS_NEW(mp)
 		CColRefSet(mp);	 // a set of minimal grouping columns based on FD's
-	CFunctionalDependencyArray *pdrgpfd = pexpr->DeriveFunctionalDependencies();
+	gpos::pointer<CFunctionalDependencyArray *> pdrgpfd =
+		pexpr->DeriveFunctionalDependencies();
 
 	// collect grouping columns FD's
 	const ULONG size = (pdrgpfd == nullptr) ? 0 : pdrgpfd->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CFunctionalDependency *pfd = (*pdrgpfd)[ul];
+		gpos::pointer<CFunctionalDependency *> pfd = (*pdrgpfd)[ul];
 		if (pfd->FIncluded(pcrsGrpCols))
 		{
 			pcrsCovered->Include(pfd->PcrsDetermined());
@@ -209,9 +215,9 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	pexprRelational->AddRef();
 	pexprProjectList->AddRef();
-	gpos::owner<CExpression *> pexprResult = GPOS_NEW(mp)
-		CExpression(mp, popAggNew, pexprRelational, pexprProjectList);
-	pxfres->Add(pexprResult);
+	gpos::owner<CExpression *> pexprResult = GPOS_NEW(mp) CExpression(
+		mp, std::move(popAggNew), pexprRelational, pexprProjectList);
+	pxfres->Add(std::move(pexprResult));
 }
 
 

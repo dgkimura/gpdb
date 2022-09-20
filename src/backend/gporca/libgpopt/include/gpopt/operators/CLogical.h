@@ -67,19 +67,20 @@ protected:
 	gpos::owner<CColRefSet *> m_pcrsLocalUsed;
 
 	// output column generation given a list of column descriptors
-	static CColRefArray *PdrgpcrCreateMapping(
+	static gpos::owner<CColRefArray *> PdrgpcrCreateMapping(
 		CMemoryPool *mp,
 		gpos::pointer<const CColumnDescriptorArray *> pdrgpcoldesc,
-		ULONG ulOpSourceId, IMDId *mdid_table = nullptr);
+		ULONG ulOpSourceId, gpos::pointer<IMDId *> mdid_table = nullptr);
 
 	// initialize the array of partition columns
-	static CColRef2dArray *PdrgpdrgpcrCreatePartCols(
-		CMemoryPool *mp, CColRefArray *colref_array,
+	static gpos::owner<CColRef2dArray *> PdrgpdrgpcrCreatePartCols(
+		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array,
 		gpos::pointer<const ULongPtrArray *> pdrgpulPart);
 
 	// derive dummy statistics
-	IStatistics *PstatsDeriveDummy(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDouble rows) const;
+	gpos::owner<IStatistics *> PstatsDeriveDummy(CMemoryPool *mp,
+												 CExpressionHandle &exprhdl,
+												 CDouble rows) const;
 
 	// helper for common case of output derivation from outer child
 	static gpos::owner<CColRefSet *> PcrsDeriveOutputPassThru(
@@ -90,19 +91,18 @@ protected:
 		CExpressionHandle &exprhdl);
 
 	// helper for common case of output derivation from all logical children
-	static CColRefSet *PcrsDeriveOutputCombineLogical(
+	static gpos::owner<CColRefSet *> PcrsDeriveOutputCombineLogical(
 		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// helper for common case of combining not nullable columns from all logical children
-	static CColRefSet *PcrsDeriveNotNullCombineLogical(
+	static gpos::owner<CColRefSet *> PcrsDeriveNotNullCombineLogical(
 		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// helper for common case of stat columns computation
-	static CColRefSet *PcrsReqdChildStats(CMemoryPool *mp,
-										  CExpressionHandle &exprhdl,
-										  CColRefSet *pcrsInput,
-										  CColRefSet *pcrsUsed,
-										  ULONG child_index);
+	static gpos::owner<CColRefSet *> PcrsReqdChildStats(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CColRefSet *> pcrsInput,
+		gpos::pointer<CColRefSet *> pcrsUsed, ULONG child_index);
 
 	// helper for common case of passing through required stat columns
 	static gpos::owner<CColRefSet *> PcrsStatsPassThru(
@@ -121,7 +121,7 @@ protected:
 		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// helper function for computing the keys in a base relation
-	static CKeyCollection *PkcKeysBaseTable(
+	static gpos::owner<CKeyCollection *> PkcKeysBaseTable(
 		CMemoryPool *mp, gpos::pointer<const CBitSetArray *> pdrgpbsKeys,
 		gpos::pointer<const CColRefArray *> pdrgpcrOutput);
 
@@ -130,8 +130,8 @@ protected:
 		CExpressionHandle &exprhdl);
 
 	// helper for common case of combining partition consumer info from logical children
-	static CPartInfo *PpartinfoDeriveCombine(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl);
+	static gpos::owner<CPartInfo *> PpartinfoDeriveCombine(
+		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// derive constraint property from a table/index get
 	static gpos::owner<CPropConstraint *> PpcDeriveConstraintFromTable(
@@ -139,7 +139,8 @@ protected:
 		gpos::pointer<const CColRefArray *> pdrgpcrOutput);
 
 	// derive constraint property from a table/index get with predicates
-	static CPropConstraint *PpcDeriveConstraintFromTableWithPredicates(
+	static gpos::owner<CPropConstraint *>
+	PpcDeriveConstraintFromTableWithPredicates(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<const CTableDescriptor *> ptabdesc,
 		gpos::pointer<const CColRefArray *> pdrgpcrOutput);
@@ -150,7 +151,8 @@ protected:
 
 	// derive constraint property only on the given columns
 	static gpos::owner<CPropConstraint *> PpcDeriveConstraintRestrict(
-		CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsOutput);
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CColRefSet *> pcrsOutput);
 
 	// default max card for join and apply operators
 	static CMaxCard MaxcardDef(CExpressionHandle &exprhdl);
@@ -160,9 +162,9 @@ protected:
 							CMaxCard maxcard);
 
 	// compute order spec based on an index
-	static COrderSpec *PosFromIndex(
+	static gpos::owner<COrderSpec *> PosFromIndex(
 		CMemoryPool *mp, gpos::pointer<const IMDIndex *> pmdindex,
-		CColRefArray *colref_array,
+		gpos::pointer<CColRefArray *> colref_array,
 		gpos::pointer<const CTableDescriptor *> ptabdesc);
 
 	// derive function properties using data access property of scalar child
@@ -170,9 +172,9 @@ protected:
 		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// derive outer references
-	static CColRefSet *DeriveOuterReferences(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl,
-											 CColRefSet *pcrsUsedAdditional);
+	static gpos::owner<CColRefSet *> DeriveOuterReferences(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CColRefSet *> pcrsUsedAdditional);
 
 public:
 	// ctor
@@ -204,11 +206,11 @@ public:
 	gpos::owner<CDrvdProp *> PdpCreate(CMemoryPool *mp) const override;
 
 	// derive output columns
-	virtual CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-											CExpressionHandle &exprhdl) = 0;
+	virtual gpos::owner<CColRefSet *> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) = 0;
 
 	// derive outer references
-	virtual CColRefSet *
+	virtual gpos::owner<CColRefSet *>
 	DeriveOuterReferences(CMemoryPool *mp, CExpressionHandle &exprhdl)
 	{
 		return DeriveOuterReferences(mp, exprhdl,
@@ -216,8 +218,8 @@ public:
 	}
 
 	// derive outer references for index get and dynamic index get operators
-	virtual CColRefSet *PcrsDeriveOuterIndexGet(CMemoryPool *mp,
-												CExpressionHandle &exprhdl);
+	virtual gpos::owner<CColRefSet *> PcrsDeriveOuterIndexGet(
+		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// derive not nullable output columns
 	virtual gpos::owner<CColRefSet *>
@@ -230,11 +232,11 @@ public:
 	}
 
 	// derive columns from the inner child of a correlated-apply expression that can be used above the apply expression
-	virtual CColRefSet *DeriveCorrelatedApplyColumns(
+	virtual gpos::owner<CColRefSet *> DeriveCorrelatedApplyColumns(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 	// derive key collections
-	virtual CKeyCollection *DeriveKeyCollection(
+	virtual gpos::owner<CKeyCollection *> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 	// derive max card
@@ -246,18 +248,18 @@ public:
 								  CExpressionHandle &exprhdl) const;
 
 	// derive partition information
-	virtual CPartInfo *DerivePartitionInfo(
+	virtual gpos::owner<CPartInfo *> DerivePartitionInfo(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const = 0;
 
 	// derive constraint property
-	virtual CPropConstraint *DerivePropertyConstraint(
+	virtual gpos::owner<CPropConstraint *> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const = 0;
 
 	// derive function properties
 	virtual gpos::owner<CFunctionProp *> DeriveFunctionProperties(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
-	virtual CTableDescriptor *DeriveTableDescriptor(
+	virtual gpos::pointer<CTableDescriptor *> DeriveTableDescriptor(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 	//-------------------------------------------------------------------------------------
@@ -265,7 +267,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive statistics
-	virtual IStatistics *PstatsDerive(
+	virtual gpos::owner<IStatistics *> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<IStatisticsArray *> stats_ctxt) const = 0;
 
@@ -280,22 +282,21 @@ public:
 	gpos::owner<CReqdProp *> PrpCreate(CMemoryPool *mp) const override;
 
 	// compute required stat columns of the n-th child
-	virtual CColRefSet *PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 gpos::pointer<CColRefSet *> pcrsInput,
-								 ULONG child_index) const = 0;
+	virtual gpos::owner<CColRefSet *> PcrsStat(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CColRefSet *> pcrsInput, ULONG child_index) const = 0;
 
 	// compute partition predicate to pass down to n-th child
-	virtual CExpression *PexprPartPred(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   gpos::pointer<CExpression *> pexprInput,
-									   ULONG child_index) const;
+	virtual gpos::owner<CExpression *> PexprPartPred(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CExpression *> pexprInput, ULONG child_index) const;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	virtual CXformSet *PxfsCandidates(CMemoryPool *mp) const = 0;
+	virtual gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const = 0;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -318,10 +319,10 @@ public:
 	}
 
 	// helper for deriving statistics on a base table
-	static IStatistics *PstatsBaseTable(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										CTableDescriptor *ptabdesc,
-										CColRefSet *pcrsStatExtra = nullptr);
+	static gpos::owner<IStatistics *> PstatsBaseTable(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CTableDescriptor *> ptabdesc,
+		gpos::pointer<CColRefSet *> pcrsStatExtra = nullptr);
 
 	// conversion function
 	static gpos::cast_func<CLogical *>
@@ -334,19 +335,21 @@ public:
 	}
 
 	// returns the table descriptor for (Dynamic)(BitmapTable)Get operators
-	static CTableDescriptor *PtabdescFromTableGet(COperator *pop);
+	static CTableDescriptor *PtabdescFromTableGet(
+		gpos::pointer<COperator *> pop);
 
 	// returns the output columns for selected operator
 	static CColRefArray *PoutputColsFromTableGet(COperator *pop);
 
 	// extract the output columns descriptor from a logical get or dynamic get operator
-	static CColRefArray *PdrgpcrOutputFromLogicalGet(CLogical *pop);
+	static CColRefArray *PdrgpcrOutputFromLogicalGet(
+		gpos::pointer<CLogical *> pop);
 
 	// extract the table name from a logical get or dynamic get operator
-	static const CName &NameFromLogicalGet(CLogical *pop);
+	static const CName &NameFromLogicalGet(gpos::pointer<CLogical *> pop);
 
 	// return the set of distribution columns
-	static CColRefSet *PcrsDist(
+	static gpos::owner<CColRefSet *> PcrsDist(
 		CMemoryPool *mp, gpos::pointer<const CTableDescriptor *> ptabdesc,
 		gpos::pointer<const CColRefArray *> colref_array);
 

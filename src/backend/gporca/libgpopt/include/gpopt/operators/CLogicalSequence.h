@@ -54,7 +54,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 
 	// sensitivity to order of inputs
@@ -65,11 +65,12 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	gpos::owner<COperator *>
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -83,7 +84,7 @@ public:
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	CKeyCollection *DeriveKeyCollection(
+	gpos::owner<CKeyCollection *> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -91,11 +92,11 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *DerivePartitionInfo(CMemoryPool *mp,
-								   CExpressionHandle &exprhdl) const override;
+	gpos::owner<CPartInfo *> DerivePartitionInfo(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -108,7 +109,8 @@ public:
 
 	// compute required stat columns of the n-th child
 	gpos::owner<CColRefSet *>
-	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput,
+	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+			 gpos::pointer<CColRefSet *> pcrsInput,
 			 ULONG child_index) const override
 	{
 		const ULONG ulLastChildIndex = exprhdl.Arity() - 1;
@@ -126,7 +128,7 @@ public:
 	gpos::owner<IStatistics *>
 	PstatsDerive(CMemoryPool *,	 //mp,
 				 CExpressionHandle &exprhdl,
-				 IStatisticsArray *	 //stats_ctxt
+				 gpos::pointer<IStatisticsArray *>	//stats_ctxt
 	) const override
 	{
 		// pass through stats from last child
@@ -141,7 +143,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// stat promise
 	EStatPromise

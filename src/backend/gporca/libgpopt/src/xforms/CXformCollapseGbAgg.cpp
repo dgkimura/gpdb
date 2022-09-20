@@ -64,7 +64,8 @@ CXformCollapseGbAgg::CXformCollapseGbAgg(CMemoryPool *mp)
 CXform::EXformPromise
 CXformCollapseGbAgg::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
+	gpos::pointer<CLogicalGbAgg *> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 	if (!popAgg->FGlobal() || 0 == popAgg->Pdrgpcr()->Size())
 	{
 		return CXform::ExfpNone;
@@ -87,8 +88,9 @@ CXformCollapseGbAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformCollapseGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							   CExpression *pexpr) const
+CXformCollapseGbAgg::Transform(gpos::pointer<CXformContext *> pxfctxt,
+							   gpos::pointer<CXformResult *> pxfres,
+							   gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -98,17 +100,17 @@ CXformCollapseGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CLogicalGbAgg *popTopGbAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
+	CLogicalGbAgg *popTopGbAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	GPOS_ASSERT(0 < popTopGbAgg->Pdrgpcr()->Size());
 	GPOS_ASSERT(popTopGbAgg->FGlobal());
 
-	CExpression *pexprRelational = (*pexpr)[0];
+	gpos::pointer<CExpression *> pexprRelational = (*pexpr)[0];
 	CExpression *pexprTopProjectList = (*pexpr)[1];
 
-	CLogicalGbAgg *popBottomGbAgg =
-		CLogicalGbAgg::PopConvert(pexprRelational->Pop());
+	gpos::pointer<CLogicalGbAgg *> popBottomGbAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexprRelational->Pop());
 	CExpression *pexprChild = (*pexprRelational)[0];
-	CExpression *pexprBottomProjectList = (*pexprRelational)[1];
+	gpos::pointer<CExpression *> pexprBottomProjectList = (*pexprRelational)[1];
 
 	if (!popBottomGbAgg->FGlobal())
 	{
@@ -136,16 +138,16 @@ CXformCollapseGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 #endif	// GPOS_DEBUG
 
 	pexprChild->AddRef();
-	CExpression *pexprSelect = CUtils::PexprLogicalSelect(
+	gpos::owner<CExpression *> pexprSelect = CUtils::PexprLogicalSelect(
 		mp, pexprChild,
 		CPredicateUtils::PexprConjunction(mp, nullptr /*pdrgpexpr*/));
 
 	popTopGbAgg->AddRef();
 	pexprTopProjectList->AddRef();
-	gpos::owner<CExpression *> pexprGbAggNew = GPOS_NEW(mp)
-		CExpression(mp, popTopGbAgg, pexprSelect, pexprTopProjectList);
+	gpos::owner<CExpression *> pexprGbAggNew = GPOS_NEW(mp) CExpression(
+		mp, popTopGbAgg, std::move(pexprSelect), pexprTopProjectList);
 
-	pxfres->Add(pexprGbAggNew);
+	pxfres->Add(std::move(pexprGbAggNew));
 }
 
 

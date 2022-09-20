@@ -67,10 +67,10 @@ public:
 	gpos::pointer<const IntPtrArray *> GetOutputSegIdsArray() const;
 
 	// setters
-	void SetInputSegIds(IntPtrArray *input_segids_array);
-	void SetOutputSegIds(IntPtrArray *output_segids_array);
-	void SetSegmentInfo(IntPtrArray *input_segids_array,
-						IntPtrArray *output_segids_array);
+	void SetInputSegIds(gpos::owner<IntPtrArray *> input_segids_array);
+	void SetOutputSegIds(gpos::owner<IntPtrArray *> output_segids_array);
+	void SetSegmentInfo(gpos::owner<IntPtrArray *> input_segids_array,
+						gpos::owner<IntPtrArray *> output_segids_array);
 
 	// index of relational child node in the children array
 	virtual ULONG GetRelationChildIdx() const = 0;

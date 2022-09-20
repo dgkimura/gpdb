@@ -85,7 +85,8 @@ CEngineTest::EresUnittest_Basic()
 	// setup a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -136,7 +137,7 @@ CEngineTest::EresOptimize(
 	CWStringConst *str,	 // array of relation names
 	ULONG *pul,			 // array of relation OIDs
 	ULONG ulRels,		 // number of array entries
-	CBitSet *
+	gpos::pointer<CBitSet *>
 		pbs	 // if a bit is set, the corresponding join expression will be optimized
 )
 {
@@ -188,10 +189,10 @@ CEngineTest::EresOptimize(
 		m_ulTestCounter = 0;
 
 		(*pdrgpexprCrossProducts)[ulRels - 1]->Release();
-		CRefCount::SafeRelease(pdrgpexprCrossProducts);
+		CRefCount::SafeRelease(std::move(pdrgpexprCrossProducts));
 
 		(*pdrgpexpr)[ulRels - 1]->Release();
-		CRefCount::SafeRelease(pdrgpexpr);
+		CRefCount::SafeRelease(std::move(pdrgpexpr));
 	}
 
 	return GPOS_OK;
@@ -277,7 +278,7 @@ CEngineTest::EresUnittest_AppendStats()
 	// Initialize engine
 	eng.Init(pqc, nullptr /*search_stage_array*/);
 
-	CGroupExpression *pgexpr = nullptr;
+	gpos::pointer<CGroupExpression *> pgexpr = nullptr;
 	{
 		CGroupProxy gp(eng.PgroupRoot());
 		pgexpr = gp.PgexprFirst();
@@ -310,7 +311,7 @@ CEngineTest::EresUnittest_AppendStats()
 	}
 
 	gpos::owner<CReqdPropRelational *> prprel =
-		GPOS_NEW(mp) CReqdPropRelational(pcrs);
+		GPOS_NEW(mp) CReqdPropRelational(std::move(pcrs));
 
 	// derive stats with non-empty requirements
 	// missing stats should be appended to the already derived ones
@@ -471,7 +472,7 @@ CEngineTest::EresTestEngine(Pfpexpr rgpf[], ULONG size)
 GPOS_RESULT
 CEngineTest::EresUnittest_BuildMemoWithSubqueries()
 {
-	using Pfpexpr = CExpression *(*) (CMemoryPool *, BOOL);
+	using Pfpexpr = gpos::owner<CExpression *> (*)(CMemoryPool *, BOOL);
 	Pfpexpr rgpf[] = {
 		CSubqueryTestUtils::PexprSelectWithAllAggSubquery,
 		CSubqueryTestUtils::PexprSelectWithAggSubquery,
@@ -644,26 +645,27 @@ CEngineTest::EresUnittest_BuildMemoWithCTE()
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
-	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
+	mda.RegisterProvider(CTestUtils::m_sysidDefault, std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	CExpression *pexprCTE = CTestUtils::PexprCTETree(mp);
-	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
+	gpos::owner<CExpression *> pexprCTE = CTestUtils::PexprCTETree(mp);
+	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
 
-	CColRefSet *pcrsLeft = pexprCTE->DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrsLeft = pexprCTE->DeriveOutputColumns();
 	CColRef *pcrLeft = pcrsLeft->PcrAny();
 
-	CColRefSet *pcrsRight = pexprGet->DeriveOutputColumns();
+	gpos::pointer<CColRefSet *> pcrsRight = pexprGet->DeriveOutputColumns();
 	CColRef *pcrRight = pcrsRight->PcrAny();
 
-	CExpression *pexprScalar = CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
+	gpos::owner<CExpression *> pexprScalar =
+		CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
 
-	gpos::owner<CExpression *> pexpr =
-		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp),
-								 pexprCTE, pexprGet, pexprScalar);
+	gpos::owner<CExpression *> pexpr = GPOS_NEW(mp)
+		CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp), std::move(pexprCTE),
+					std::move(pexprGet), std::move(pexprScalar));
 
 	BuildMemoRecursive(mp, pexpr, nullptr /*search_stage_array*/);
 	pexpr->Release();

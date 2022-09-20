@@ -64,9 +64,9 @@ private:
 		) override;
 
 	// parse an array of system ids from the XML attributes
-	CSystemIdArray *GetSrcSysIdArray(const Attributes &attr,
-									 Edxltoken target_attr,
-									 Edxltoken target_elem);
+	gpos::owner<CSystemIdArray *> GetSrcSysIdArray(const Attributes &attr,
+												   Edxltoken target_attr,
+												   Edxltoken target_elem);
 
 
 public:

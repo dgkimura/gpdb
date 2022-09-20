@@ -28,12 +28,12 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalWindow::CDXLPhysicalWindow(CMemoryPool *mp,
-									   ULongPtrArray *part_by_colid_array,
-									   CDXLWindowKeyArray *window_key_array)
+CDXLPhysicalWindow::CDXLPhysicalWindow(
+	CMemoryPool *mp, gpos::owner<ULongPtrArray *> part_by_colid_array,
+	gpos::owner<CDXLWindowKeyArray *> window_key_array)
 	: CDXLPhysical(mp),
-	  m_part_by_colid_array(part_by_colid_array),
-	  m_dxl_window_key_array(window_key_array)
+	  m_part_by_colid_array(std::move(part_by_colid_array)),
+	  m_dxl_window_key_array(std::move(window_key_array))
 {
 	GPOS_ASSERT(nullptr != m_part_by_colid_array);
 	GPOS_ASSERT(nullptr != m_dxl_window_key_array);
@@ -164,7 +164,8 @@ CDXLPhysicalWindow::SerializeToDXL(
 	const ULONG size = m_dxl_window_key_array->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CDXLWindowKey *window_key_dxlnode = (*m_dxl_window_key_array)[ul];
+		gpos::pointer<CDXLWindowKey *> window_key_dxlnode =
+			(*m_dxl_window_key_array)[ul];
 		window_key_dxlnode->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -193,7 +194,7 @@ CDXLPhysicalWindow::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	GPOS_ASSERT(nullptr != m_part_by_colid_array);
 	GPOS_ASSERT(nullptr != m_dxl_window_key_array);
 	GPOS_ASSERT(EdxlwindowIndexSentinel == dxlnode->Arity());
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlwindowIndexChild];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[EdxlwindowIndexChild];
 	if (validate_children)
 	{
 		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,

@@ -44,7 +44,7 @@ private:
 
 	// ctor
 	CPartPruneStepsBuilder(Relation relation, Index rtindex,
-						   ULongPtrArray *part_indexes,
+						   gpos::pointer<ULongPtrArray *> part_indexes,
 						   CMappingColIdVarPlStmt *colid_var_mapping,
 						   CTranslatorDXLToScalar *translator_dxl_to_scalar);
 
@@ -55,21 +55,22 @@ public:
 	~CPartPruneStepsBuilder() = default;
 
 	static List *CreatePartPruneInfos(
-		CDXLNode *filterNode, Relation relation, Index rtindex,
-		ULongPtrArray *part_indexes, CMappingColIdVarPlStmt *colid_var_mapping,
+		gpos::pointer<CDXLNode *> filterNode, Relation relation, Index rtindex,
+		gpos::pointer<ULongPtrArray *> part_indexes,
+		CMappingColIdVarPlStmt *colid_var_mapping,
 		CTranslatorDXLToScalar *translator_dxl_to_scalar);
 
 	PartitionedRelPruneInfo *CreatePartPruneInfoForOneLevel(
-		CDXLNode *filterNode);
+		gpos::pointer<CDXLNode *> filterNode);
 
-	List *PartPruneStepsFromFilter(CDXLNode *filterNode, INT *step_id,
-								   List *steps_list);
+	List *PartPruneStepsFromFilter(gpos::pointer<CDXLNode *> filterNode,
+								   INT *step_id, List *steps_list);
 
-	List *PartPruneStepFromScalarCmp(CDXLNode *node, INT *step_id,
-									 List *steps_list);
+	List *PartPruneStepFromScalarCmp(gpos::pointer<CDXLNode *> node,
+									 INT *step_id, List *steps_list);
 
-	List *PartPruneStepFromScalarBoolExpr(CDXLNode *node, INT *step_id,
-										  List *steps_list);
+	List *PartPruneStepFromScalarBoolExpr(gpos::pointer<CDXLNode *> node,
+										  INT *step_id, List *steps_list);
 };
 }  // namespace gpdxl
 

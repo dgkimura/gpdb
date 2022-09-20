@@ -52,7 +52,7 @@ public:
 	// ctor/dtor
 	CDXLLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 				   gpos::Ref<IMDId> mdid_return_type, CMDName *mdname,
-				   CDXLColDescrArray *pdrgdxlcd);
+				   gpos::owner<CDXLColDescrArray *> pdrgdxlcd);
 
 	~CDXLLogicalTVF() override;
 

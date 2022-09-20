@@ -82,7 +82,7 @@ protected:
 	}
 
 	// initialize job
-	void Init(CGroupExpression *pgexpr);
+	void Init(gpos::pointer<CGroupExpression *> pgexpr);
 
 	// schedule transformation jobs for applicable xforms
 	virtual void ScheduleApplicableTransformations(CSchedulerContext *psc) = 0;
@@ -91,7 +91,8 @@ protected:
 	virtual void ScheduleChildGroupsJobs(CSchedulerContext *psc) = 0;
 
 	// schedule transformation jobs for the given set of xforms
-	void ScheduleTransformations(CSchedulerContext *psc, CXformSet *xform_set);
+	void ScheduleTransformations(CSchedulerContext *psc,
+								 gpos::pointer<CXformSet *> xform_set);
 
 	// job's function
 	BOOL FExecute(CSchedulerContext *psc) override = 0;

@@ -174,8 +174,8 @@ CParseHandlerStatsDerivedRelation::EndElement(
 		dxl_stats_derived_col_array->Append(pdxlstatdercol);
 	}
 
-	m_dxl_stats_derived_relation = GPOS_NEW(m_mp)
-		CDXLStatsDerivedRelation(m_rows, m_empty, dxl_stats_derived_col_array);
+	m_dxl_stats_derived_relation = GPOS_NEW(m_mp) CDXLStatsDerivedRelation(
+		m_rows, m_empty, std::move(dxl_stats_derived_col_array));
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

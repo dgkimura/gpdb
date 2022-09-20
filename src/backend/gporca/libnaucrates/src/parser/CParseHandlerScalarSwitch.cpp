@@ -70,7 +70,7 @@ CParseHandlerScalarSwitch::StartElement(const XMLCh *const element_uri,
 		// construct node
 		gpos::owner<CDXLScalarSwitch *> dxl_op =
 			GPOS_NEW(m_mp) CDXLScalarSwitch(m_mp, m_mdid_type);
-		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 	}
 	else if (0 == XMLString::compareString(
 					  CDXLTokens::XmlstrToken(EdxltokenScalarSwitchCase),

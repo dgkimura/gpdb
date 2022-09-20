@@ -77,7 +77,7 @@ CParseHandlerMDIndexInfoList::StartElement(
 
 		gpos::owner<CMDIndexInfo *> md_index_info =
 			GPOS_NEW(m_mp) CMDIndexInfo(mdid, is_partial);
-		m_mdindex_info_array->Append(md_index_info);
+		m_mdindex_info_array->Append(std::move(md_index_info));
 	}
 	else
 	{

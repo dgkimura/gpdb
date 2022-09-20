@@ -180,7 +180,7 @@ CDXLScalarFuncExpr::SerializeToDXL(
 BOOL
 CDXLScalarFuncExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	IMDId *mdid =
+	gpos::pointer<IMDId *> mdid =
 		md_accessor->RetrieveFunc(m_func_mdid.get())->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());
@@ -201,7 +201,7 @@ CDXLScalarFuncExpr::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 {
 	for (ULONG ul = 0; ul < dxlnode->Arity(); ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

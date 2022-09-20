@@ -34,11 +34,13 @@ public:
 
 	// ctor
 	CPhysicalScalarAgg(
-		CMemoryPool *mp, CColRefArray *colref_array,
-		CColRefArray *pdrgpcrMinimal,  // minimal grouping columns based on FD's
+		CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
+		gpos::pointer<CColRefArray *>
+			pdrgpcrMinimal,	 // minimal grouping columns based on FD's
 		COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-		CColRefArray *pdrgpcrArgDQA, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-		CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution);
+		gpos::owner<CColRefArray *> pdrgpcrArgDQA, BOOL fMultiStage,
+		BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+		BOOL should_enforce_distribution);
 
 	// dtor
 	~CPhysicalScalarAgg() override;
@@ -66,7 +68,8 @@ public:
 	gpos::owner<COrderSpec *> PosRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties

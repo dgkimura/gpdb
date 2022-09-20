@@ -78,8 +78,8 @@ public:
 
 protected:
 	// serialize an array of column ids into a comma-separated string
-	static CWStringDynamic *ColumnsToStr(CMemoryPool *mp,
-										 ULongPtrArray *colid_array);
+	static CWStringDynamic *ColumnsToStr(
+		CMemoryPool *mp, gpos::pointer<ULongPtrArray *> colid_array);
 
 public:
 	// object type
@@ -117,7 +117,7 @@ public:
 	virtual ULONG GetPosFromAttno(INT attno) const = 0;
 
 	// return the original positions of all the non-dropped columns
-	virtual ULongPtrArray *NonDroppedColsArray() const = 0;
+	virtual gpos::pointer<ULongPtrArray *> NonDroppedColsArray() const = 0;
 
 	// number of system columns
 	virtual ULONG SystemColumnsCount() const = 0;
@@ -155,7 +155,7 @@ public:
 	virtual gpos::pointer<const IMDColumn *> PartColAt(ULONG pos) const = 0;
 
 	// retrieve list of partition types
-	virtual CharPtrArray *GetPartitionTypes() const = 0;
+	virtual gpos::pointer<CharPtrArray *> GetPartitionTypes() const = 0;
 
 	// retrieve the partition type of the given partition level
 	virtual CHAR PartTypeAtLevel(ULONG pos) const = 0;
@@ -179,7 +179,7 @@ public:
 	virtual IMDId *CheckConstraintMDidAt(ULONG pos) const = 0;
 
 	// part constraint
-	virtual CDXLNode *MDPartConstraint() const = 0;
+	virtual gpos::pointer<CDXLNode *> MDPartConstraint() const = 0;
 
 	// child partition oids
 	virtual IMdIdArray *

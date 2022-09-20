@@ -44,8 +44,8 @@ CXformRemoveSubqDistinct::Exfp(CExpressionHandle &exprhdl) const
 	}
 
 	CGroupProxy gp((*exprhdl.Pgexpr())[1]);
-	CGroupExpression *pexprScalar = gp.PgexprFirst();
-	COperator *pop = pexprScalar->Pop();
+	gpos::pointer<CGroupExpression *> pexprScalar = gp.PgexprFirst();
+	gpos::pointer<COperator *> pop = pexprScalar->Pop();
 	if (CUtils::FQuantifiedSubquery(pop) || CUtils::FExistentialSubquery(pop))
 	{
 		return CXform::ExfpHigh;
@@ -87,21 +87,21 @@ CXformRemoveSubqDistinct::Exfp(CExpressionHandle &exprhdl) const
 //    +--CLogicalGet "bar"
 //
 void
-CXformRemoveSubqDistinct::Transform(CXformContext *pxfctxt,
-									CXformResult *pxfres,
-									CExpression *pexpr) const
+CXformRemoveSubqDistinct::Transform(gpos::pointer<CXformContext *> pxfctxt,
+									gpos::pointer<CXformResult *> pxfres,
+									gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CExpression *pexprScalar = (*pexpr)[1];
-	CExpression *pexprGbAgg = (*pexprScalar)[0];
+	gpos::pointer<CExpression *> pexprScalar = (*pexpr)[1];
+	gpos::pointer<CExpression *> pexprGbAgg = (*pexprScalar)[0];
 
 	if (COperator::EopLogicalGbAgg == pexprGbAgg->Pop()->Eopid())
 	{
-		CExpression *pexprGbAggProjectList = (*pexprGbAgg)[1];
+		gpos::pointer<CExpression *> pexprGbAggProjectList = (*pexprGbAgg)[1];
 		// only consider removing distinct when there is no aggregation functions
 		if (0 == pexprGbAggProjectList->Arity())
 		{
@@ -130,9 +130,9 @@ CXformRemoveSubqDistinct::Transform(CXformContext *pxfctxt,
 			(*pexpr)[0]->AddRef();	 // relational child of logical select
 
 			// new logical select expression
-			gpos::owner<CExpression *> ppexprNew = GPOS_NEW(mp)
-				CExpression(mp, pexpr->Pop(), (*pexpr)[0], pexprNewScalar);
-			pxfres->Add(ppexprNew);
+			gpos::owner<CExpression *> ppexprNew = GPOS_NEW(mp) CExpression(
+				mp, pexpr->Pop(), (*pexpr)[0], std::move(pexprNewScalar));
+			pxfres->Add(std::move(ppexprNew));
 		}
 	}
 }

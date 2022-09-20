@@ -18,6 +18,8 @@
 
 #include "naucrates/dxl/operators/CDXLWindowSpec.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -33,15 +35,15 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLWindowSpec::CDXLWindowSpec(CMemoryPool *mp,
-							   ULongPtrArray *partition_by_colid_array,
-							   CMDName *mdname, CDXLNode *sort_col_list_dxlnode,
-							   CDXLWindowFrame *window_frame)
+CDXLWindowSpec::CDXLWindowSpec(
+	CMemoryPool *mp, gpos::owner<ULongPtrArray *> partition_by_colid_array,
+	CMDName *mdname, gpos::owner<CDXLNode *> sort_col_list_dxlnode,
+	gpos::owner<CDXLWindowFrame *> window_frame)
 	: m_mp(mp),
-	  m_partition_by_colid_array(partition_by_colid_array),
+	  m_partition_by_colid_array(std::move(partition_by_colid_array)),
 	  m_mdname(mdname),
-	  m_sort_col_list_dxlnode(sort_col_list_dxlnode),
-	  m_window_frame(window_frame)
+	  m_sort_col_list_dxlnode(std::move(sort_col_list_dxlnode)),
+	  m_window_frame(std::move(window_frame))
 {
 	GPOS_ASSERT(nullptr != m_mp);
 	GPOS_ASSERT(nullptr != m_partition_by_colid_array);

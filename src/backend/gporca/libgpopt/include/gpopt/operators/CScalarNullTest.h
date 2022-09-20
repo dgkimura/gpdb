@@ -59,7 +59,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::pointer<COperator *>) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -69,7 +69,7 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *
+	gpos::owner<COperator *>
 	PopCopyWithRemappedColumns(
 		CMemoryPool *,						//mp,
 		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
@@ -83,7 +83,8 @@ public:
 	IMDId *MdidType() const override;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override;
 
 	// conversion function
 	static gpos::cast_func<CScalarNullTest *>

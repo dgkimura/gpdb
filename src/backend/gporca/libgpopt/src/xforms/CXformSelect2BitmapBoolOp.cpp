@@ -17,6 +17,8 @@
 
 #include "gpopt/xforms/CXformSelect2BitmapBoolOp.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/operators/CLogicalGet.h"
 #include "gpopt/operators/CLogicalSelect.h"
 #include "gpopt/xforms/CXformUtils.h"
@@ -67,20 +69,20 @@ CXformSelect2BitmapBoolOp::Exfp(CExpressionHandle &	 // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformSelect2BitmapBoolOp::Transform(CXformContext *pxfctxt,
-									 CXformResult *pxfres,
-									 CExpression *pexpr) const
+CXformSelect2BitmapBoolOp::Transform(gpos::pointer<CXformContext *> pxfctxt,
+									 gpos::pointer<CXformResult *> pxfres,
+									 gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CExpression *pexprResult =
+	gpos::owner<CExpression *> pexprResult =
 		CXformUtils::PexprSelect2BitmapBoolOp(pxfctxt->Pmp(), pexpr);
 
 	if (nullptr != pexprResult)
 	{
-		pxfres->Add(pexprResult);
+		pxfres->Add(std::move(pexprResult));
 	}
 }
 

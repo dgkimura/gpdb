@@ -131,7 +131,7 @@ CDXLScalarHashExpr::AssertValid(gpos::pointer<const CDXLNode *> node,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == node->Arity());
-	CDXLNode *child_dxlnode = (*node)[0];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[0];
 
 	GPOS_ASSERT(EdxloptypeScalar ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());

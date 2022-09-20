@@ -46,9 +46,10 @@ class CTranslatorDXLToExprUtils
 {
 public:
 	// create a cast expression from INT to INT8
-	static CExpression *PexprConstInt8(CMemoryPool *mp,
-									   CMDAccessor *md_accessor,
-									   CSystemId sysid, LINT liValue);
+	static gpos::owner<CExpression *> PexprConstInt8(CMemoryPool *mp,
+													 CMDAccessor *md_accessor,
+													 CSystemId sysid,
+													 LINT liValue);
 
 	// create a scalar const operator from a DXL scalar const operator
 	static gpos::owner<CScalarConst *> PopConst(
@@ -56,18 +57,20 @@ public:
 		gpos::pointer<const CDXLScalarConstValue *> dxl_op);
 
 	// create a datum from a DXL scalar const operator
-	static IDatum *GetDatum(CMDAccessor *md_accessor,
-							gpos::pointer<const CDXLScalarConstValue *> dxl_op);
+	static gpos::owner<IDatum *> GetDatum(
+		CMDAccessor *md_accessor,
+		gpos::pointer<const CDXLScalarConstValue *> dxl_op);
 
 	// create a datum array from a dxl datum array
-	static IDatumArray *Pdrgpdatum(
+	static gpos::owner<IDatumArray *> Pdrgpdatum(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::pointer<const CDXLDatumArray *> pdrgpdatum);
 
 	// update table descriptor's key sets info from the MD cache object
-	static void AddKeySets(CMemoryPool *mp, CTableDescriptor *ptabdesc,
+	static void AddKeySets(CMemoryPool *mp,
+						   gpos::pointer<CTableDescriptor *> ptabdesc,
 						   gpos::pointer<const IMDRelation *> pmdrel,
-						   UlongToUlongMap *phmululColMapping);
+						   gpos::pointer<UlongToUlongMap *> phmululColMapping);
 
 	// check if a dxl node is a boolean expression of the given type
 	static BOOL FScalarBool(gpos::pointer<const CDXLNode *> dxlnode,
@@ -79,9 +82,9 @@ public:
 		EdxlBoolExprType edxlbooltype);
 
 	// construct a dynamic array of col refs corresponding to the given col ids
-	static CColRefArray *Pdrgpcr(CMemoryPool *mp,
-								 UlongToColRefMap *colref_mapping,
-								 gpos::pointer<const ULongPtrArray *> colids);
+	static gpos::owner<CColRefArray *> Pdrgpcr(
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+		gpos::pointer<const ULongPtrArray *> colids);
 
 	// is the given expression is a scalar function that casts
 	static BOOL FCastFunc(CMDAccessor *md_accessor,

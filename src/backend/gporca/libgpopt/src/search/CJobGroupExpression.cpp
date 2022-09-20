@@ -11,6 +11,8 @@
 
 #include "gpopt/search/CJobGroupExpression.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/operators/CLogical.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "gpopt/search/CJobFactory.h"
@@ -32,7 +34,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExpression::Init(CGroupExpression *pgexpr)
+CJobGroupExpression::Init(gpos::pointer<CGroupExpression *> pgexpr)
 {
 	GPOS_ASSERT(!FInit());
 	GPOS_ASSERT(nullptr != pgexpr);
@@ -54,14 +56,14 @@ CJobGroupExpression::Init(CGroupExpression *pgexpr)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExpression::ScheduleTransformations(CSchedulerContext *psc,
-											 CXformSet *xform_set)
+CJobGroupExpression::ScheduleTransformations(
+	CSchedulerContext *psc, gpos::pointer<CXformSet *> xform_set)
 {
 	// iterate on xforms
 	CXformSetIter xsi(*(xform_set));
 	while (xsi.Advance())
 	{
-		CXform *pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
+		gpos::pointer<CXform *> pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
 		CJobTransformation::ScheduleJob(psc, m_pgexpr, pxform, this);
 	}
 }

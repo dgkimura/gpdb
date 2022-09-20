@@ -29,10 +29,10 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLCtasStorageOptions::CDXLCtasStorageOptions(
 	CMDName *mdname_tablespace, ECtasOnCommitAction ctas_on_commit_action,
-	CDXLCtasOptionArray *ctas_storage_option_array)
+	gpos::owner<CDXLCtasOptionArray *> ctas_storage_option_array)
 	: m_mdname_tablespace(mdname_tablespace),
 	  m_ctas_on_commit_action(ctas_on_commit_action),
-	  m_ctas_storage_option_array(ctas_storage_option_array)
+	  m_ctas_storage_option_array(std::move(ctas_storage_option_array))
 {
 	GPOS_ASSERT(EctascommitSentinel > ctas_on_commit_action);
 }

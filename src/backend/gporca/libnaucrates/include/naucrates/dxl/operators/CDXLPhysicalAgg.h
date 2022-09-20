@@ -82,7 +82,7 @@ public:
 	gpos::pointer<const ULongPtrArray *> GetGroupingColidArray() const;
 
 	// set grouping column indices
-	void SetGroupingCols(ULongPtrArray *);
+	void SetGroupingCols(gpos::owner<ULongPtrArray *>);
 
 	// is aggregate a hash aggregate that it safe to stream
 	BOOL

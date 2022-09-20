@@ -122,7 +122,7 @@ CDXLPhysicalRandomMotion::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	GPOS_ASSERT(EdxlrandommIndexSentinel == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlrandommIndexChild];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[EdxlrandommIndexChild];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

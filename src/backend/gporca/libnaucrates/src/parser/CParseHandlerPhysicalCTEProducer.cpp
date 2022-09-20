@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalCTEProducer.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLPhysicalCTEProducer.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -68,14 +70,14 @@ CParseHandlerPhysicalCTEProducer::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenCTEId,
 		EdxltokenPhysicalCTEProducer);
 
-	ULongPtrArray *output_colids_array =
+	gpos::owner<ULongPtrArray *> output_colids_array =
 		CDXLOperatorFactory::ExtractConvertValuesToArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenColumns,
 			EdxltokenPhysicalCTEProducer);
 
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(
-		m_mp,
-		GPOS_NEW(m_mp) CDXLPhysicalCTEProducer(m_mp, id, output_colids_array));
+	m_dxl_node = GPOS_NEW(m_mp)
+		CDXLNode(m_mp, GPOS_NEW(m_mp) CDXLPhysicalCTEProducer(
+						   m_mp, id, std::move(output_colids_array)));
 
 	// create and activate the parse handler for the child expression node
 	CParseHandlerBase *child_parse_handler =

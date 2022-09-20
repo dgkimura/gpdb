@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPattern.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 
@@ -25,7 +26,7 @@ using namespace gpopt;
 //		expression has to take care of this on a higher level
 //
 //---------------------------------------------------------------------------
-CDrvdProp *
+gpos::owner<CDrvdProp *>
 CPattern::PdpCreate(CMemoryPool *  // mp
 ) const
 {
@@ -43,7 +44,7 @@ CPattern::PdpCreate(CMemoryPool *  // mp
 //		expression has to take care of this on a higher level
 //
 //---------------------------------------------------------------------------
-CReqdProp *
+gpos::owner<CReqdProp *>
 CPattern::PrpCreate(CMemoryPool *  // mp
 ) const
 {
@@ -61,7 +62,7 @@ CPattern::PrpCreate(CMemoryPool *  // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CPattern::Matches(COperator *pop) const
+CPattern::Matches(gpos::pointer<COperator *> pop) const
 {
 	return Eopid() == pop->Eopid();
 }
@@ -90,10 +91,11 @@ CPattern::FInputOrderSensitive() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
-CPattern::PopCopyWithRemappedColumns(CMemoryPool *,		  //mp,
-									 UlongToColRefMap *,  //colref_mapping,
-									 BOOL				  //must_exist
+gpos::owner<COperator *>
+CPattern::PopCopyWithRemappedColumns(
+	CMemoryPool *,						//mp,
+	gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+	BOOL								//must_exist
 )
 {
 	GPOS_ASSERT(

@@ -105,11 +105,11 @@ CScalarCmp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCmp::Matches(COperator *pop) const
+CScalarCmp::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCmp *popScCmp = CScalarCmp::PopConvert(pop);
+		gpos::pointer<CScalarCmp *> popScCmp = gpos::dyn_cast<CScalarCmp>(pop);
 
 		// match if operator oid are identical
 		return m_mdid_op->Equals(popScCmp->MdIdOp());
@@ -158,7 +158,7 @@ CScalarCmp::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarCmp::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarCmp::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{
@@ -170,9 +170,10 @@ CScalarCmp::Eber(ULongPtrArray *pdrgpulChildren) const
 
 // get metadata id of the commuted operator
 IMDId *
-CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor, COperator *pop)
+CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor,
+						   gpos::pointer<COperator *> pop)
 {
-	CScalarCmp *popScalarCmp = dynamic_cast<CScalarCmp *>(pop);
+	gpos::pointer<CScalarCmp *> popScalarCmp = dynamic_cast<CScalarCmp *>(pop);
 	gpos::pointer<const IMDScalarOp *> pmdScalarCmpOp =
 		md_accessor->RetrieveScOp(popScalarCmp->MdIdOp());
 
@@ -182,7 +183,8 @@ CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor, COperator *pop)
 
 // get the string representation of a metadata object
 CWStringConst *
-CScalarCmp::Pstr(CMemoryPool *mp, CMDAccessor *md_accessor, IMDId *mdid)
+CScalarCmp::Pstr(CMemoryPool *mp, CMDAccessor *md_accessor,
+				 gpos::pointer<IMDId *> mdid)
 {
 	mdid->AddRef();
 	return GPOS_NEW(mp) CWStringConst(

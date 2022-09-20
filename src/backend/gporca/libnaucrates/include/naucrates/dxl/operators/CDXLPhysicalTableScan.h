@@ -50,13 +50,14 @@ public:
 	// ctors
 	explicit CDXLPhysicalTableScan(CMemoryPool *mp);
 
-	CDXLPhysicalTableScan(CMemoryPool *mp, CDXLTableDescr *table_descr);
+	CDXLPhysicalTableScan(CMemoryPool *mp,
+						  gpos::owner<CDXLTableDescr *> table_descr);
 
 	// dtor
 	~CDXLPhysicalTableScan() override;
 
 	// setters
-	void SetTableDescriptor(CDXLTableDescr *);
+	void SetTableDescriptor(gpos::owner<CDXLTableDescr *>);
 
 	// operator type
 	Edxlopid GetDXLOperator() const override;

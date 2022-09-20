@@ -33,8 +33,8 @@ public:
 	CPhysicalExternalScan(const CPhysicalExternalScan &) = delete;
 
 	// ctor
-	CPhysicalExternalScan(CMemoryPool *, const CName *, CTableDescriptor *,
-						  CColRefArray *);
+	CPhysicalExternalScan(CMemoryPool *, const CName *,
+						  gpos::owner<CTableDescriptor *>, CColRefArray *);
 
 	// ident accessors
 	EOperatorId
@@ -51,7 +51,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::pointer<COperator *>) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties

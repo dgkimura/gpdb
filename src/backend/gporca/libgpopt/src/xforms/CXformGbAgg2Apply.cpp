@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformGbAgg2Apply.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -51,7 +52,8 @@ CXformGbAgg2Apply::CXformGbAgg2Apply(CMemoryPool *mp)
 CXform::EXformPromise
 CXformGbAgg2Apply::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popGbAgg = CLogicalGbAgg::PopConvert(exprhdl.Pop());
+	gpos::pointer<CLogicalGbAgg *> popGbAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 	if (popGbAgg->FGlobal() && exprhdl.DeriveHasSubquery(1))
 	{
 		return CXform::ExfpHigh;

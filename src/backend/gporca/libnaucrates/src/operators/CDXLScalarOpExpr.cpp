@@ -138,8 +138,9 @@ CDXLScalarOpExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	gpos::pointer<const IMDScalarOp *> md_scalar_op =
 		md_accessor->RetrieveScOp(m_mdid.get());
-	IMDId *mdid = md_accessor->RetrieveFunc(md_scalar_op->FuncMdId())
-					  ->GetResultTypeMdid();
+	gpos::pointer<IMDId *> mdid =
+		md_accessor->RetrieveFunc(md_scalar_op->FuncMdId())
+			->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());
 }
@@ -199,7 +200,7 @@ CDXLScalarOpExpr::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

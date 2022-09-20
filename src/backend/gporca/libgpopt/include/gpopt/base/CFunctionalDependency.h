@@ -52,7 +52,8 @@ public:
 	CFunctionalDependency(const CFunctionalDependency &) = delete;
 
 	// ctor
-	CFunctionalDependency(CColRefSet *pcrsKey, CColRefSet *pcrsDetermined);
+	CFunctionalDependency(gpos::owner<CColRefSet *> pcrsKey,
+						  gpos::owner<CColRefSet *> pcrsDetermined);
 
 	// dtor
 	~CFunctionalDependency() override;
@@ -72,7 +73,7 @@ public:
 	}
 
 	// determine if all FD columns are included in the given column set
-	BOOL FIncluded(CColRefSet *pcrs) const;
+	BOOL FIncluded(gpos::pointer<CColRefSet *> pcrs) const;
 
 	// hash function
 	virtual ULONG HashValue() const;
@@ -82,7 +83,7 @@ public:
 
 	// do the given arguments form a functional dependency
 	BOOL
-	FFunctionallyDependent(CColRefSet *pcrsKey, CColRef *colref)
+	FFunctionallyDependent(gpos::pointer<CColRefSet *> pcrsKey, CColRef *colref)
 	{
 		GPOS_ASSERT(nullptr != pcrsKey);
 		GPOS_ASSERT(nullptr != colref);
@@ -103,12 +104,12 @@ public:
 		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfdSnd);
 
 	// create a set of all keys in the passed FD's array
-	static CColRefSet *PcrsKeys(
+	static gpos::owner<CColRefSet *> PcrsKeys(
 		CMemoryPool *mp,
 		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd);
 
 	// create an array of all keys in the passed FD's array
-	static CColRefArray *PdrgpcrKeys(
+	static gpos::owner<CColRefArray *> PdrgpcrKeys(
 		CMemoryPool *mp,
 		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd);
 

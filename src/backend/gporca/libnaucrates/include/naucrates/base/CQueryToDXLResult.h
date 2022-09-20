@@ -44,8 +44,9 @@ private:
 
 public:
 	// ctor
-	CQueryToDXLResult(CDXLNode *query, CDXLNodeArray *query_output,
-					  CDXLNodeArray *cte_producers);
+	CQueryToDXLResult(gpos::owner<CDXLNode *> query,
+					  gpos::owner<CDXLNodeArray *> query_output,
+					  gpos::owner<CDXLNodeArray *> cte_producers);
 
 	// dtor
 	~CQueryToDXLResult();

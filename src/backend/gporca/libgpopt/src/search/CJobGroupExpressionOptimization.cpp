@@ -182,8 +182,9 @@ CJobGroupExpressionOptimization::~CJobGroupExpressionOptimization() = default;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExpressionOptimization::Init(CGroupExpression *pgexpr,
-									  COptimizationContext *poc, ULONG ulOptReq,
+CJobGroupExpressionOptimization::Init(gpos::pointer<CGroupExpression *> pgexpr,
+									  gpos::pointer<COptimizationContext *> poc,
+									  ULONG ulOptReq,
 									  CReqdPropPlan *prppCTEProducer)
 {
 	GPOS_ASSERT(nullptr != poc);
@@ -192,7 +193,7 @@ CJobGroupExpressionOptimization::Init(CGroupExpression *pgexpr,
 	GPOS_ASSERT(pgexpr->Pop()->FPhysical());
 	GPOS_ASSERT(pgexpr->Pgroup() == poc->Pgroup());
 	GPOS_ASSERT(ulOptReq <=
-				CPhysical::PopConvert(pgexpr->Pop())->UlOptRequests());
+				gpos::dyn_cast<CPhysical>(pgexpr->Pop())->UlOptRequests());
 
 	m_jsm.Init(rgeev
 #ifdef GPOS_DEBUG
@@ -213,7 +214,7 @@ CJobGroupExpressionOptimization::Init(CGroupExpression *pgexpr,
 	m_pdrgpdp = nullptr;
 	m_pexprhdlPlan = nullptr;
 	m_pexprhdlRel = nullptr;
-	m_eceo = CPhysical::PopConvert(pgexpr->Pop())->Eceo();
+	m_eceo = gpos::dyn_cast<CPhysical>(pgexpr->Pop())->Eceo();
 	m_ulArity = pgexpr->Arity();
 	m_ulChildIndex = gpos::ulong_max;
 
@@ -282,8 +283,9 @@ CJobGroupExpressionOptimization::InitChildGroupsOptimization(
 	// initialize required relational properties computation
 	m_pexprhdlRel = GPOS_NEW(psc->GetGlobalMemoryPool())
 		CExpressionHandle(psc->GetGlobalMemoryPool());
-	CGroupExpression *pgexprForStats = m_pgexpr->Pgroup()->PgexprBestPromise(
-		psc->GetGlobalMemoryPool(), m_pgexpr);
+	gpos::pointer<CGroupExpression *> pgexprForStats =
+		m_pgexpr->Pgroup()->PgexprBestPromise(psc->GetGlobalMemoryPool(),
+											  m_pgexpr);
 	if (nullptr != pgexprForStats)
 	{
 		m_pexprhdlRel->Attach(pgexprForStats);
@@ -361,14 +363,14 @@ CJobGroupExpressionOptimization::DerivePrevChildProps(CSchedulerContext *psc)
 		m_pexprhdlPlan->UlPreviousOptimizedChildIndex(m_ulChildIndex);
 
 	// retrieve plan properties of the optimal implementation of previous child group
-	CGroup *pgroupChild = (*m_pgexpr)[ulPrevChildIndex];
+	gpos::pointer<CGroup *> pgroupChild = (*m_pgexpr)[ulPrevChildIndex];
 	if (pgroupChild->FScalar())
 	{
 		// exit if previous child is a scalar group
 		return;
 	}
 
-	COptimizationContext *pocChild = pgroupChild->PocLookupBest(
+	gpos::pointer<COptimizationContext *> pocChild = pgroupChild->PocLookupBest(
 		psc->GetGlobalMemoryPool(), psc->Peng()->UlSearchStages(),
 		m_pexprhdlPlan->Prpp(ulPrevChildIndex));
 	GPOS_ASSERT(nullptr != pocChild);
@@ -403,7 +405,7 @@ CJobGroupExpressionOptimization::DerivePrevChildProps(CSchedulerContext *psc)
 	// copy stats of child's best cost context to current stats context
 	gpos::owner<IStatistics *> pstat = pccChildBest->Pstats();
 	pstat->AddRef();
-	m_pdrgpstatCurrentCtxt->Append(pstat);
+	m_pdrgpstatCurrentCtxt->Append(std::move(pstat));
 }
 
 
@@ -487,7 +489,7 @@ CJobGroupExpressionOptimization::ScheduleChildGroupsJobs(CSchedulerContext *psc)
 
 	// compute required relational properties
 	CReqdPropRelational *prprel = nullptr;
-	if (CPhysical::PopConvert(m_pgexpr->Pop())->FPassThruStats())
+	if (gpos::dyn_cast<CPhysical>(m_pgexpr->Pop())->FPassThruStats())
 	{
 		// copy requirements from origin context
 		prprel = m_poc->GetReqdRelationalProps();
@@ -627,7 +629,7 @@ CJobGroupExpressionOptimization::EevtOptimizeSelf(CSchedulerContext *psc,
 
 	// compute group expression cost under current context
 	COptimizationContext *poc = pjgeo->m_poc;
-	CGroupExpression *pgexpr = pjgeo->m_pgexpr;
+	gpos::pointer<CGroupExpression *> pgexpr = pjgeo->m_pgexpr;
 	COptimizationContextArray *pdrgpoc = pjgeo->m_pdrgpoc;
 	ULONG ulOptReq = pjgeo->m_ulOptReq;
 
@@ -675,7 +677,7 @@ CJobGroupExpressionOptimization::EevtFinalize(CSchedulerContext *,	// psc
 	GPOS_ASSERT(!pjgeo->m_fChildOptimizationFailed);
 
 #ifdef GPOS_DEBUG
-	CCostContext *pcc = pjgeo->m_poc->PccBest();
+	gpos::pointer<CCostContext *> pcc = pjgeo->m_poc->PccBest();
 #endif	// GPOS_DEBUG
 
 	GPOS_ASSERT(nullptr != pcc);
@@ -713,10 +715,9 @@ CJobGroupExpressionOptimization::FExecute(CSchedulerContext *psc)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExpressionOptimization::ScheduleJob(CSchedulerContext *psc,
-											 CGroupExpression *pgexpr,
-											 COptimizationContext *poc,
-											 ULONG ulOptReq, CJob *pjParent)
+CJobGroupExpressionOptimization::ScheduleJob(
+	CSchedulerContext *psc, gpos::pointer<CGroupExpression *> pgexpr,
+	gpos::pointer<COptimizationContext *> poc, ULONG ulOptReq, CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtGroupExpressionOptimization);
 

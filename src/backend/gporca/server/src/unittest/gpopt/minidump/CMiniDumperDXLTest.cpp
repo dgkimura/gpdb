@@ -141,7 +141,8 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 			ptroutput->CreateDXLNode(), ptroutput->GetOutputColumnsDXLArray(),
 			ptroutput->GetCTEProducerDXLArray());
 
-		gpdxl::ULongPtrArray *pdrgul = pdxltr->PdrgpulOutputColRefs();
+		gpos::pointer<gpdxl::ULongPtrArray *> pdrgul =
+			pdxltr->PdrgpulOutputColRefs();
 		gpmd::CMDNameArray *pdrgpmdname = pdxltr->Pdrgpmdname();
 
 		ULONG ulSegments = GPOPT_TEST_SEGMENTS;

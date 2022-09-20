@@ -20,7 +20,8 @@ private:
 	gpos::pointer<CLogicalUnionAll *> const m_popLogicalUnionAll;
 
 public:
-	CPhysicalUnionAllFactory(CLogicalUnionAll *popLogicalUnionAll);
+	CPhysicalUnionAllFactory(
+		gpos::pointer<CLogicalUnionAll *> popLogicalUnionAll);
 
 	gpos::owner<CPhysicalUnionAll *> PopPhysicalUnionAll(CMemoryPool *mp,
 														 BOOL fParallel);

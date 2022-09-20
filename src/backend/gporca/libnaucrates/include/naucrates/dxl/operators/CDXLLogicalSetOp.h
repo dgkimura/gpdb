@@ -64,7 +64,8 @@ public:
 
 	// ctor
 	CDXLLogicalSetOp(CMemoryPool *mp, EdxlSetOpType edxlsetoptype,
-					 CDXLColDescrArray *pdrgdxlcd, ULongPtr2dArray *array_2D,
+					 gpos::owner<CDXLColDescrArray *> pdrgdxlcd,
+					 gpos::owner<ULongPtr2dArray *> array_2D,
 					 BOOL fCastAcrossInput);
 
 	// dtor

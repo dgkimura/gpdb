@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerSortCol.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarSortCol.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -61,10 +63,10 @@ CParseHandlerSortCol::StartElement(const XMLCh *const,	// element_uri,
 	}
 
 	// parse and create sort col operator
-	CDXLScalarSortCol *dxl_op =
-		(CDXLScalarSortCol *) CDXLOperatorFactory::MakeDXLSortCol(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+	gpos::owner<CDXLScalarSortCol *> dxl_op =
+		gpos::cast<CDXLScalarSortCol>(CDXLOperatorFactory::MakeDXLSortCol(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 }
 
 //---------------------------------------------------------------------------

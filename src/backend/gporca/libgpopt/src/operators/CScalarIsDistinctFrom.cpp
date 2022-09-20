@@ -32,7 +32,8 @@ CScalarIsDistinctFrom::PopConvert(COperator *pop)
 
 // perform boolean expression evaluation
 CScalar::EBoolEvalResult
-CScalarIsDistinctFrom::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarIsDistinctFrom::Eber(
+	gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 {
 	GPOS_ASSERT(2 == pdrgpulChildren->Size());
 
@@ -54,11 +55,12 @@ CScalarIsDistinctFrom::Eber(ULongPtrArray *pdrgpulChildren) const
 }
 
 BOOL
-CScalarIsDistinctFrom::Matches(COperator *pop) const
+CScalarIsDistinctFrom::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarIsDistinctFrom *popIDF = CScalarIsDistinctFrom::PopConvert(pop);
+		gpos::pointer<CScalarIsDistinctFrom *> popIDF =
+			gpos::dyn_cast<CScalarIsDistinctFrom>(pop);
 
 		// match if operator mdids are identical
 		return MdIdOp()->Equals(popIDF->MdIdOp());

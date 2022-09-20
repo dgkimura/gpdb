@@ -40,7 +40,7 @@ public:
 
 	// ctor
 	CDXLLogicalCTEProducer(CMemoryPool *mp, ULONG id,
-						   ULongPtrArray *output_colids_array);
+						   gpos::owner<ULongPtrArray *> output_colids_array);
 
 	// dtor
 	~CDXLLogicalCTEProducer() override;

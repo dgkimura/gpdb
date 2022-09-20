@@ -126,13 +126,13 @@ CParseHandlerLogicalWindow::EndElement(const XMLCh *const,	// element_uri,
 	CParseHandlerLogicalOp *lg_op_parse_handler =
 		dynamic_cast<CParseHandlerLogicalOp *>((*this)[2]);
 
-	CDXLWindowSpecArray *window_spec_array =
+	gpos::owner<CDXLWindowSpecArray *> window_spec_array =
 		window_speclist_parse_handler->GetDxlWindowSpecArray();
 	GPOS_ASSERT(nullptr != window_spec_array);
 
 	gpos::owner<CDXLLogicalWindow *> lg_window =
-		GPOS_NEW(m_mp) CDXLLogicalWindow(m_mp, window_spec_array);
-	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, lg_window);
+		GPOS_NEW(m_mp) CDXLLogicalWindow(m_mp, std::move(window_spec_array));
+	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(lg_window));
 	GPOS_ASSERT(nullptr != proj_list_parse_handler->CreateDXLNode());
 	GPOS_ASSERT(nullptr != lg_op_parse_handler->CreateDXLNode());
 

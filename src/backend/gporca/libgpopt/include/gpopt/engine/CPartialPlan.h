@@ -56,7 +56,8 @@ private:
 	ULONG m_ulChildIndex;
 
 	// extract costing info from children
-	void ExtractChildrenCostingInfo(CMemoryPool *mp, ICostModel *pcm,
+	void ExtractChildrenCostingInfo(CMemoryPool *mp,
+									gpos::pointer<ICostModel *> pcm,
 									CExpressionHandle &exprhdl,
 									ICostModel::SCostingInfo *pci);
 
@@ -65,8 +66,9 @@ public:
 	CPartialPlan(const CPartialPlan &) = delete;
 
 	// ctor
-	CPartialPlan(CGroupExpression *pgexpr, CReqdPropPlan *prpp,
-				 CCostContext *pccChild, ULONG child_index);
+	CPartialPlan(gpos::pointer<CGroupExpression *> pgexpr,
+				 gpos::owner<CReqdPropPlan *> prpp,
+				 gpos::owner<CCostContext *> pccChild, ULONG child_index);
 
 	// dtor
 	~CPartialPlan() override;

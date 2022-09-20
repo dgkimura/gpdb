@@ -134,7 +134,8 @@ public:
 	BOOL NeedsPadding() const override;
 
 	// return the padded datum
-	IDatum *MakePaddedDatum(CMemoryPool *mp, ULONG col_len) const override;
+	gpos::owner<IDatum *> MakePaddedDatum(CMemoryPool *mp,
+										  ULONG col_len) const override;
 
 	// does datum support like predicate
 	BOOL

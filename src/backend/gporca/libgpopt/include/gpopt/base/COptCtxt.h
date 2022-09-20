@@ -127,8 +127,9 @@ public:
 
 	// ctor
 	COptCtxt(CMemoryPool *mp, CColumnFactory *col_factory,
-			 CMDAccessor *md_accessor, IConstExprEvaluator *pceeval,
-			 COptimizerConfig *optimizer_config);
+			 CMDAccessor *md_accessor,
+			 gpos::owner<IConstExprEvaluator *> pceeval,
+			 gpos::owner<COptimizerConfig *> optimizer_config);
 
 	// dtor
 	~COptCtxt() override;
@@ -307,9 +308,10 @@ public:
 	}
 
 	// factory method
-	static COptCtxt *PoctxtCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
-								  IConstExprEvaluator *pceeval,
-								  COptimizerConfig *optimizer_config);
+	static COptCtxt *PoctxtCreate(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		gpos::owner<IConstExprEvaluator *> pceeval,
+		gpos::owner<COptimizerConfig *> optimizer_config);
 
 	// shorthand to retrieve opt context from TLS
 	inline static COptCtxt *

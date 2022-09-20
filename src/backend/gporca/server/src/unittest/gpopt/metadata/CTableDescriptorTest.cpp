@@ -63,7 +63,8 @@ CTableDescriptorTest::EresUnittest_Basic()
 	// Setup an MD cache with a file-based provider
 	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
-	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
+					std::move(pmdp));
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
@@ -73,7 +74,7 @@ CTableDescriptorTest::EresUnittest_Basic()
 	gpos::owner<CMDIdGPDB *> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(GPOPT_MDCACHE_TEST_OID, 1, 1);
 	gpos::owner<CTableDescriptor *> ptabdesc =
-		CTestUtils::PtabdescCreate(mp, 10, mdid, CName(&strName));
+		CTestUtils::PtabdescCreate(mp, 10, std::move(mdid), CName(&strName));
 
 #ifdef GPOS_DEBUG
 	CWStringDynamic str(mp);

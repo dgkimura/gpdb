@@ -40,7 +40,8 @@ private:
 
 public:
 	//ctor
-	CDXLLogicalWindow(CMemoryPool *mp, CDXLWindowSpecArray *pdrgpdxlwinspec);
+	CDXLLogicalWindow(CMemoryPool *mp,
+					  gpos::owner<CDXLWindowSpecArray *> pdrgpdxlwinspec);
 
 	//dtor
 	~CDXLLogicalWindow() override;

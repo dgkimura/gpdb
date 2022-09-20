@@ -111,8 +111,8 @@ CDXLScalarDistinctComp::AssertValid(gpos::pointer<const CDXLNode *> node,
 {
 	GPOS_ASSERT(EdxlscdistcmpSentinel == node->Arity());
 
-	CDXLNode *dxlnode_left = (*node)[EdxlscdistcmpIndexLeft];
-	CDXLNode *dxlnode_right = (*node)[EdxlscdistcmpIndexRight];
+	gpos::pointer<CDXLNode *> dxlnode_left = (*node)[EdxlscdistcmpIndexLeft];
+	gpos::pointer<CDXLNode *> dxlnode_right = (*node)[EdxlscdistcmpIndexRight];
 
 	// assert children are of right type (scalar)
 	GPOS_ASSERT(EdxloptypeScalar ==

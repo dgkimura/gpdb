@@ -32,12 +32,14 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalSplit::CPhysicalSplit(CMemoryPool *mp, CColRefArray *pdrgpcrDelete,
-							   CColRefArray *pdrgpcrInsert, CColRef *pcrCtid,
-							   CColRef *pcrSegmentId, CColRef *pcrAction)
+CPhysicalSplit::CPhysicalSplit(CMemoryPool *mp,
+							   gpos::owner<CColRefArray *> pdrgpcrDelete,
+							   gpos::owner<CColRefArray *> pdrgpcrInsert,
+							   CColRef *pcrCtid, CColRef *pcrSegmentId,
+							   CColRef *pcrAction)
 	: CPhysical(mp),
-	  m_pdrgpcrDelete(pdrgpcrDelete),
-	  m_pdrgpcrInsert(pdrgpcrInsert),
+	  m_pdrgpcrDelete(std::move(pdrgpcrDelete)),
+	  m_pdrgpcrInsert(std::move(pdrgpcrInsert)),
 	  m_pcrCtid(pcrCtid),
 	  m_pcrSegmentId(pcrSegmentId),
 	  m_pcrAction(pcrAction),
@@ -87,8 +89,8 @@ CPhysicalSplit::PosRequired(CMemoryPool *mp,
 								child_index
 #endif	// GPOS_DEBUG
 							,
-							CDrvdPropArray *,  // pdrgpdpCtxt
-							ULONG			   // ulOptReq
+							gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+							ULONG							  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -105,7 +107,7 @@ CPhysicalSplit::PosRequired(CMemoryPool *mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalSplit::PosDerive(CMemoryPool *,  //mp,
 						  CExpressionHandle &exprhdl) const
 {
@@ -144,17 +146,17 @@ CPhysicalSplit::EpetOrder(CExpressionHandle &,	// exprhdl
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CPhysicalSplit::PcrsRequired(CMemoryPool *mp,
 							 CExpressionHandle &,  // exprhdl,
-							 CColRefSet *pcrsRequired,
+							 gpos::pointer<CColRefSet *> pcrsRequired,
 							 ULONG
 #ifdef GPOS_DEBUG
 								 child_index
 #endif	// GPOS_DEBUG
 							 ,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+							 ULONG							   // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -184,8 +186,8 @@ CPhysicalSplit::PdsRequired(CMemoryPool *mp,
 								child_index
 #endif	// GPOS_DEBUG
 							,
-							CDrvdPropArray *,  // pdrgpdpCtxt
-							ULONG			   // ulOptReq
+							gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+							ULONG							  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -201,11 +203,12 @@ CPhysicalSplit::PdsRequired(CMemoryPool *mp,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalSplit::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							CRewindabilitySpec *prsRequired, ULONG child_index,
-							CDrvdPropArray *,  // pdrgpdpCtxt
-							ULONG			   // ulOptReq
+							gpos::pointer<CRewindabilitySpec *> prsRequired,
+							ULONG child_index,
+							gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+							ULONG							  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -221,10 +224,10 @@ CPhysicalSplit::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-CCTEReq *
+gpos::owner<CCTEReq *>
 CPhysicalSplit::PcteRequired(CMemoryPool *,		   //mp,
 							 CExpressionHandle &,  //exprhdl,
-							 CCTEReq *pcter,
+							 gpos::pointer<CCTEReq *> pcter,
 							 ULONG
 #ifdef GPOS_DEBUG
 								 child_index
@@ -248,7 +251,7 @@ CPhysicalSplit::PcteRequired(CMemoryPool *,		   //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalSplit::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								  CColRefSet *pcrsRequired,
+								  gpos::pointer<CColRefSet *> pcrsRequired,
 								  ULONG	 // ulOptReq
 ) const
 {
@@ -324,8 +327,8 @@ CPhysicalSplit::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		}
 	}
 
-	CDistributionSpecHashed *pdsHashed =
-		CDistributionSpecHashed::PdsConvert(pdsOuter);
+	gpos::pointer<CDistributionSpecHashed *> pdsHashed =
+		gpos::dyn_cast<CDistributionSpecHashed>(pdsOuter);
 
 	// Consider the below case for updating the same table.:
 	// create table s (a int, b int) distributed by (a);
@@ -376,7 +379,7 @@ CPhysicalSplit::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalSplit::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	return PrsDerivePassThruOuter(mp, exprhdl);
@@ -412,11 +415,12 @@ CPhysicalSplit::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalSplit::Matches(COperator *pop) const
+CPhysicalSplit::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CPhysicalSplit *popSplit = CPhysicalSplit::PopConvert(pop);
+		gpos::pointer<CPhysicalSplit *> popSplit =
+			gpos::dyn_cast<CPhysicalSplit>(pop);
 
 		return m_pcrCtid == popSplit->PcrCtid() &&
 			   m_pcrSegmentId == popSplit->PcrSegmentId() &&
@@ -443,7 +447,8 @@ CPhysicalSplit::EpetRewindability(
 	gpos::pointer<const CEnfdRewindability *> per) const
 {
 	// get rewindability delivered by the split node
-	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
+	gpos::pointer<CRewindabilitySpec *> prs =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{
 		// required rewindability is already provided

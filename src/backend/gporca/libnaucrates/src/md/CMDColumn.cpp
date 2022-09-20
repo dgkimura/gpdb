@@ -13,6 +13,8 @@
 
 #include "naucrates/md/CMDColumn.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -29,7 +31,7 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CMDColumn::CMDColumn(CMDName *mdname, INT attrnum, gpos::Ref<IMDId> mdid_type,
 					 INT type_modifier, BOOL is_nullable, BOOL is_dropped,
-					 CDXLNode *dxl_dafault_value, ULONG length)
+					 gpos::owner<CDXLNode *> dxl_dafault_value, ULONG length)
 	: m_mdname(mdname),
 	  m_attno(attrnum),
 	  m_mdid_type(mdid_type),
@@ -37,7 +39,7 @@ CMDColumn::CMDColumn(CMDName *mdname, INT attrnum, gpos::Ref<IMDId> mdid_type,
 	  m_is_nullable(is_nullable),
 	  m_is_dropped(is_dropped),
 	  m_length(length),
-	  m_dxl_default_val(dxl_dafault_value)
+	  m_dxl_default_val(std::move(dxl_dafault_value))
 {
 }
 

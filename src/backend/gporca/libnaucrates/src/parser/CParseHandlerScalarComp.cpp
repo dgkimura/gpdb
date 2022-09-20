@@ -13,6 +13,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarComp.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -72,8 +74,8 @@ CParseHandlerScalarComp::StartElement(const XMLCh *const,  // element_uri,
 	}
 
 	// parse and create comparison operator
-	m_dxl_op = (CDXLScalarComp *) CDXLOperatorFactory::MakeDXLScalarCmp(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	m_dxl_op = gpos::cast<CDXLScalarComp>(CDXLOperatorFactory::MakeDXLScalarCmp(
+		m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance

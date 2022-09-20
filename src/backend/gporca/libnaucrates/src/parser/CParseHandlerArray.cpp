@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerArray.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarArray.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -56,10 +58,10 @@ CParseHandlerArray::StartElement(const XMLCh *const element_uri,
 		nullptr == m_dxl_node)
 	{
 		// parse and create array
-		CDXLScalarArray *dxl_op =
-			(CDXLScalarArray *) CDXLOperatorFactory::MakeDXLArray(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
-		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
+		gpos::owner<CDXLScalarArray *> dxl_op =
+			gpos::cast<CDXLScalarArray>(CDXLOperatorFactory::MakeDXLArray(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 	}
 	else
 	{

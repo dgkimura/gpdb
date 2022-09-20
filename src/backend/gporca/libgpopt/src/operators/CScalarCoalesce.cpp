@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarCoalesce.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -78,11 +79,12 @@ CScalarCoalesce::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCoalesce::Matches(COperator *pop) const
+CScalarCoalesce::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCoalesce *popScCoalesce = CScalarCoalesce::PopConvert(pop);
+		gpos::pointer<CScalarCoalesce *> popScCoalesce =
+			gpos::dyn_cast<CScalarCoalesce>(pop);
 
 		// match if return types are identical
 		return popScCoalesce->MdidType()->Equals(m_mdid_type.get());

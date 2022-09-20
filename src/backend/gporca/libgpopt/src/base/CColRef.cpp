@@ -121,8 +121,8 @@ CColRef::OsPrint(IOstream &os) const
 //		Extract array of colids from array of colrefs
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
-CColRef::Pdrgpul(CMemoryPool *mp, CColRefArray *colref_array)
+gpos::owner<ULongPtrArray *>
+CColRef::Pdrgpul(CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array)
 {
 	gpos::owner<ULongPtrArray *> pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 	const ULONG length = colref_array->Size();

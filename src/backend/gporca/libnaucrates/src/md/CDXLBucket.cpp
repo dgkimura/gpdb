@@ -29,11 +29,12 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLBucket::CDXLBucket(CDXLDatum *dxl_datum_lower, CDXLDatum *dxl_datum_upper,
+CDXLBucket::CDXLBucket(gpos::owner<CDXLDatum *> dxl_datum_lower,
+					   gpos::owner<CDXLDatum *> dxl_datum_upper,
 					   BOOL is_lower_closed, BOOL is_upper_closed,
 					   CDouble frequency, CDouble distinct)
-	: m_lower_bound_dxl_datum(dxl_datum_lower),
-	  m_upper_bound_dxl_datum(dxl_datum_upper),
+	: m_lower_bound_dxl_datum(std::move(dxl_datum_lower)),
+	  m_upper_bound_dxl_datum(std::move(dxl_datum_upper)),
 	  m_is_lower_closed(is_lower_closed),
 	  m_is_upper_closed(is_upper_closed),
 	  m_frequency(frequency),
@@ -165,7 +166,8 @@ CDXLBucket::Serialize(CXMLSerializer *xml_serializer) const
 void
 CDXLBucket::SerializeBoundaryValue(CXMLSerializer *xml_serializer,
 								   const CWStringConst *elem_str,
-								   CDXLDatum *dxl_datum, BOOL is_bound_closed)
+								   gpos::pointer<CDXLDatum *> dxl_datum,
+								   BOOL is_bound_closed)
 {
 	xml_serializer->OpenElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), elem_str);

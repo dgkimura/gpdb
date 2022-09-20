@@ -56,9 +56,10 @@ public:
 	CPhysicalSequenceProject(const CPhysicalSequenceProject &) = delete;
 
 	// ctor
-	CPhysicalSequenceProject(CMemoryPool *mp, CDistributionSpec *pds,
-							 COrderSpecArray *pdrgpos,
-							 CWindowFrameArray *pdrgpwf);
+	CPhysicalSequenceProject(CMemoryPool *mp,
+							 gpos::owner<CDistributionSpec *> pds,
+							 gpos::owner<COrderSpecArray *> pdrgpos,
+							 gpos::owner<CWindowFrameArray *> pdrgpwf);
 
 	// dtor
 	~CPhysicalSequenceProject() override;
@@ -99,7 +100,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::pointer<COperator *> pop) const override;
 
 	// hashing function
 	ULONG HashValue() const override;
@@ -116,40 +117,43 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	CColRefSet *PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsRequired, ULONG child_index,
-							 CDrvdPropArray *pdrgpdpCtxt,
-							 ULONG ulOptReq) override;
+	gpos::owner<CColRefSet *> PcrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
-	CCTEReq *PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  CCTEReq *pcter, ULONG child_index,
-						  CDrvdPropArray *pdrgpdpCtxt,
-						  ULONG ulOptReq) const override;
+	gpos::owner<CCTEReq *> PcteRequired(CMemoryPool *mp,
+										CExpressionHandle &exprhdl,
+										gpos::pointer<CCTEReq *> pcter,
+										ULONG child_index,
+										CDrvdPropArray *pdrgpdpCtxt,
+										ULONG ulOptReq) const override;
 
 	// compute required sort order of the n-th child
 	gpos::owner<COrderSpec *> PosRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	gpos::owner<CDistributionSpec *> PdsRequired(CMemoryPool *mp,
-												 CExpressionHandle &exprhdl,
-												 CDistributionSpec *pdsRequired,
-												 ULONG child_index,
-												 CDrvdPropArray *pdrgpdpCtxt,
-												 ULONG ulOptReq) const override;
+	gpos::owner<CDistributionSpec *> PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
-	CRewindabilitySpec *PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CRewindabilitySpec *prsRequired,
-									ULONG child_index,
-									CDrvdPropArray *pdrgpdpCtxt,
-									ULONG ulOptReq) const override;
+	gpos::owner<CRewindabilitySpec *> PrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::pointer<CColRefSet *> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -157,16 +161,16 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *PosDerive(CMemoryPool *mp,
-						  CExpressionHandle &exprhdl) const override;
+	gpos::owner<COrderSpec *> PosDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive distribution
 	gpos::owner<CDistributionSpec *> PdsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive rewindability
-	CRewindabilitySpec *PrsDerive(CMemoryPool *mp,
-								  CExpressionHandle &exprhdl) const override;
+	gpos::owner<CRewindabilitySpec *> PrsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties

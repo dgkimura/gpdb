@@ -97,8 +97,9 @@ CXformExpandNAryJoin::Exfp(CExpressionHandle &exprhdl) const
 //			 |--CScalarIdent "a" (0)
 //			 +--CScalarIdent "a" (18)
 void
-CXformExpandNAryJoin::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformExpandNAryJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
+								gpos::pointer<CXformResult *> pxfres,
+								gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -121,9 +122,10 @@ CXformExpandNAryJoin::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	//	   +--CScalarConst (1)
 	(*pexpr)[0]->AddRef();
 	(*pexpr)[1]->AddRef();
-	CExpression *pexprJoin = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
-		mp, (*pexpr)[0], (*pexpr)[1],
-		CPredicateUtils::PexprConjunction(mp, nullptr));
+	gpos::owner<CExpression *> pexprJoin =
+		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
+			mp, (*pexpr)[0], (*pexpr)[1],
+			CPredicateUtils::PexprConjunction(mp, nullptr));
 	for (ULONG ul = 2; ul < arity - 1; ul++)
 	{
 		(*pexpr)[ul]->AddRef();
@@ -136,13 +138,14 @@ CXformExpandNAryJoin::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pexprScalar->AddRef();
 
 	// create a logical select with the join expression and scalar condition child
-	gpos::owner<CExpression *> pexprSelect =
-		CUtils::PexprLogicalSelect(mp, pexprJoin, pexprScalar);
+	gpos::owner<CExpression *> pexprSelect = CUtils::PexprLogicalSelect(
+		mp, std::move(pexprJoin), std::move(pexprScalar));
 
 	// normalize the tree and push down the predicates
-	CExpression *pexprNormalized = CNormalizer::PexprNormalize(mp, pexprSelect);
+	gpos::owner<CExpression *> pexprNormalized =
+		CNormalizer::PexprNormalize(mp, pexprSelect);
 	pexprSelect->Release();
-	pxfres->Add(pexprNormalized);
+	pxfres->Add(std::move(pexprNormalized));
 }
 
 // EOF

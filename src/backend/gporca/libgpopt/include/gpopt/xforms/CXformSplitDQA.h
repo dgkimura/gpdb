@@ -41,24 +41,25 @@ private:
 	// generate an expression with multi-level aggregation
 	static gpos::owner<CExpression *> PexprMultiLevelAggregation(
 		CMemoryPool *mp, CExpression *pexprRelational,
-		CExpressionArray *pdrgpexprPrElFirstStage,
+		gpos::owner<CExpressionArray *> pdrgpexprPrElFirstStage,
 		CExpressionArray *pdrgpexprPrElSecondStage,
-		CExpressionArray *pdrgpexprPrElThirdStage, CColRefArray *pdrgpcrArgDQA,
-		CColRefArray *pdrgpcrLastStage, BOOL fSplit2LevelsOnly,
-		BOOL fAddDistinctColToLocalGb, CLogicalGbAgg::EAggStage aggStage);
+		gpos::owner<CExpressionArray *> pdrgpexprPrElThirdStage,
+		CColRefArray *pdrgpcrArgDQA, CColRefArray *pdrgpcrLastStage,
+		BOOL fSplit2LevelsOnly, BOOL fAddDistinctColToLocalGb,
+		CLogicalGbAgg::EAggStage aggStage);
 
 	// split DQA into a local DQA and global non-DQA aggregate function
-	static CExpression *PexprSplitIntoLocalDQAGlobalAgg(
+	static gpos::owner<CExpression *> PexprSplitIntoLocalDQAGlobalAgg(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-		CExpression *pexpr, CExpression *pexprRelational,
-		ExprToColRefMap *phmexprcr, CColRefArray *pdrgpcrArgDQA,
+		gpos::pointer<CExpression *> pexpr, CExpression *pexprRelational,
+		gpos::pointer<ExprToColRefMap *> phmexprcr, CColRefArray *pdrgpcrArgDQA,
 		CLogicalGbAgg::EAggStage aggStage);
 
 	// helper function to split DQA
-	static CExpression *PexprSplitHelper(
+	static gpos::owner<CExpression *> PexprSplitHelper(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-		CExpression *pexpr, CExpression *pexprRelational,
-		ExprToColRefMap *phmexprcr, CColRefArray *pdrgpcrArgDQA,
+		gpos::pointer<CExpression *> pexpr, CExpression *pexprRelational,
+		gpos::pointer<ExprToColRefMap *> phmexprcr, CColRefArray *pdrgpcrArgDQA,
 		CLogicalGbAgg::EAggStage aggStage);
 
 	// given a scalar aggregate generate the local, intermediate and global
@@ -67,28 +68,31 @@ private:
 	// aggregation
 	static void PopulatePrLMultiPhaseAgg(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-		CExpression *pexprPrEl, CExpressionArray *pdrgpexprPrElFirstStage,
-		CExpressionArray *pdrgpexprPrElSecondStage,
-		CExpressionArray *pdrgpexprPrElLastStage, BOOL fSplit2LevelsOnly);
+		gpos::pointer<CExpression *> pexprPrEl,
+		gpos::pointer<CExpressionArray *> pdrgpexprPrElFirstStage,
+		gpos::pointer<CExpressionArray *> pdrgpexprPrElSecondStage,
+		gpos::pointer<CExpressionArray *> pdrgpexprPrElLastStage,
+		BOOL fSplit2LevelsOnly);
 
 	// create project element for the aggregate function of a particular level
-	static CExpression *PexprPrElAgg(CMemoryPool *mp, CExpression *pexprAggFunc,
-									 EAggfuncStage eaggfuncstage,
-									 CColRef *pcrPreviousStage,
-									 CColRef *pcrGlobal);
+	static gpos::owner<CExpression *> PexprPrElAgg(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprAggFunc,
+		EAggfuncStage eaggfuncstage, CColRef *pcrPreviousStage,
+		CColRef *pcrGlobal);
 
 	// extract arguments of distinct aggs
 	static void ExtractDistinctCols(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-		CExpression *pexpr, CExpressionArray *pdrgpexprChildPrEl,
-		ExprToColRefMap *phmexprcr, CColRefArray **ppdrgpcrArgDQA);
+		gpos::pointer<CExpression *> pexpr,
+		gpos::pointer<CExpressionArray *> pdrgpexprChildPrEl,
+		gpos::pointer<ExprToColRefMap *> phmexprcr,
+		gpos::owner<CColRefArray *> *ppdrgpcrArgDQA);
 
 	// return the column reference of the argument to the aggregate function
-	static CColRef *PcrAggFuncArgument(CMemoryPool *mp,
-									   CMDAccessor *md_accessor,
-									   CColumnFactory *col_factory,
-									   CExpression *pexprArg,
-									   CExpressionArray *pdrgpexprChildPrEl);
+	static CColRef *PcrAggFuncArgument(
+		CMemoryPool *mp, CMDAccessor *md_accessor, CColumnFactory *col_factory,
+		CExpression *pexprArg,
+		gpos::pointer<CExpressionArray *> pdrgpexprChildPrEl);
 
 public:
 	CXformSplitDQA(const CXformSplitDQA &) = delete;
@@ -125,8 +129,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *, CXformResult *,
-				   CExpression *) const override;
+	void Transform(gpos::pointer<CXformContext *>,
+				   gpos::pointer<CXformResult *>,
+				   gpos::pointer<CExpression *>) const override;
 
 };	// class CXformSplitDQA
 

@@ -43,7 +43,7 @@ CLogicalSequence::CLogicalSequence(CMemoryPool *mp) : CLogical(mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalSequence::Matches(COperator *pop) const
+CLogicalSequence::Matches(gpos::pointer<COperator *> pop) const
 {
 	return pop->Eopid() == Eopid();
 }
@@ -56,7 +56,7 @@ CLogicalSequence::Matches(COperator *pop) const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalSequence::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -97,7 +97,7 @@ CLogicalSequence::DeriveOutputColumns(CMemoryPool *,  // mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalSequence::DeriveKeyCollection(CMemoryPool *,  // mp
 									  CExpressionHandle &exprhdl) const
 {
@@ -131,7 +131,7 @@ CLogicalSequence::DeriveMaxCard(CMemoryPool *,	// mp
 //		Derive part consumers
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::owner<CPartInfo *>
 CLogicalSequence::DerivePartitionInfo(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl) const
 {

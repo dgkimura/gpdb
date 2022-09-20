@@ -11,6 +11,8 @@
 
 #include "gpopt/search/CJobGroupOptimization.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/engine/CEngine.h"
 #include "gpopt/search/CGroup.h"
 #include "gpopt/search/CGroupExpression.h"
@@ -135,10 +137,10 @@ CJobGroupOptimization::~CJobGroupOptimization() = default;
 //---------------------------------------------------------------------------
 void
 CJobGroupOptimization::Init(
-	CGroup *pgroup,
-	CGroupExpression
-		*pgexprOrigin,	// group expression that triggered optimization job,
-						// NULL if this is the Root group
+	gpos::pointer<CGroup *> pgroup,
+	gpos::pointer<CGroupExpression *>
+		pgexprOrigin,  // group expression that triggered optimization job,
+					   // NULL if this is the Root group
 	COptimizationContext *poc)
 {
 	GPOS_ASSERT(nullptr != poc);
@@ -199,7 +201,7 @@ CJobGroupOptimization::FScheduleGroupExpressions(CSchedulerContext *psc)
 										EolCurrent()))
 		{
 			const ULONG ulOptRequests =
-				CPhysical::PopConvert(pgexpr->Pop())->UlOptRequests();
+				gpos::dyn_cast<CPhysical>(pgexpr->Pop())->UlOptRequests();
 			for (ULONG ul = 0; ul < ulOptRequests; ul++)
 			{
 				// schedule an optimization job for each request
@@ -352,9 +354,10 @@ CJobGroupOptimization::FExecute(CSchedulerContext *psc)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupOptimization::ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
-								   CGroupExpression *pgexprOrigin,
-								   COptimizationContext *poc, CJob *pjParent)
+CJobGroupOptimization::ScheduleJob(
+	CSchedulerContext *psc, gpos::pointer<CGroup *> pgroup,
+	gpos::pointer<CGroupExpression *> pgexprOrigin, COptimizationContext *poc,
+	CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtGroupOptimization);
 

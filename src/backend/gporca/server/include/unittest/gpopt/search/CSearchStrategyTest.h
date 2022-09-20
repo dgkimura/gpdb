@@ -12,6 +12,7 @@
 #define GPOPT_CSearchStrategyTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/search/CSearchStage.h"
@@ -30,22 +31,22 @@ class CSearchStrategyTest
 {
 private:
 	// type definition for of expression generator
-	using Pfpexpr = CExpression *(*) (CMemoryPool *);
+	using Pfpexpr = gpos::owner<CExpression *> (*)(CMemoryPool *);
 
 	// type definition for of optimize function
 	using PfnOptimize = void (*)(CMemoryPool *, CExpression *,
-								 CSearchStageArray *);
+								 gpos::owner<CSearchStageArray *>);
 
 	// generate random search strategy
-	static CSearchStageArray *PdrgpssRandom(CMemoryPool *mp);
+	static gpos::owner<CSearchStageArray *> PdrgpssRandom(CMemoryPool *mp);
 
 	// run optimize function on given expression
 	static void Optimize(CMemoryPool *mp, Pfpexpr pfnGenerator,
-						 CSearchStageArray *search_stage_array,
+						 gpos::owner<CSearchStageArray *> search_stage_array,
 						 PfnOptimize pfnOptimize);
 
 	static void BuildMemo(CMemoryPool *mp, CExpression *pexprInput,
-						  CSearchStageArray *search_stage_array);
+						  gpos::owner<CSearchStageArray *> search_stage_array);
 
 public:
 	// unittests driver

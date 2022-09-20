@@ -24,7 +24,7 @@ using namespace gpopt;
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalLeftAntiSemiCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -44,13 +44,14 @@ CLogicalLeftAntiSemiCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
 CLogicalLeftAntiSemiCorrelatedApply::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrInner =
+	gpos::owner<CColRefArray *> pdrgpcrInner =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
 
-	return GPOS_NEW(mp) CLogicalLeftAntiSemiCorrelatedApply(mp, pdrgpcrInner,
-															m_eopidOriginSubq);
+	return GPOS_NEW(mp) CLogicalLeftAntiSemiCorrelatedApply(
+		mp, std::move(pdrgpcrInner), m_eopidOriginSubq);
 }
 
 

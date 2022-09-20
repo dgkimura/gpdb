@@ -55,7 +55,7 @@ public:
 	CMDIdRelStats(const CMDIdRelStats &) = delete;
 
 	// ctor
-	explicit CMDIdRelStats(CMDIdGPDB *rel_mdid);
+	explicit CMDIdRelStats(gpos::owner<CMDIdGPDB *> rel_mdid);
 
 	// dtor
 	~CMDIdRelStats() override;
@@ -125,8 +125,9 @@ public:
 	gpos::owner<IMDId *>
 	Copy(CMemoryPool *mp) const override
 	{
-		CMDIdGPDB *mdid_rel = CMDIdGPDB::CastMdid(m_rel_mdid->Copy(mp));
-		return GPOS_NEW(mp) CMDIdRelStats(mdid_rel);
+		gpos::owner<CMDIdGPDB *> mdid_rel =
+			gpos::dyn_cast<CMDIdGPDB>(m_rel_mdid->Copy(mp));
+		return GPOS_NEW(mp) CMDIdRelStats(std::move(mdid_rel));
 	}
 };
 

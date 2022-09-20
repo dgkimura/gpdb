@@ -40,9 +40,10 @@ public:
 	}
 
 	// ctor
-	CLogicalLeftSemiApplyIn(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
+	CLogicalLeftSemiApplyIn(CMemoryPool *mp,
+							gpos::owner<CColRefArray *> pdrgpcrInner,
 							EOperatorId eopidOriginSubq)
-		: CLogicalLeftSemiApply(mp, pdrgpcrInner, eopidOriginSubq)
+		: CLogicalLeftSemiApply(mp, std::move(pdrgpcrInner), eopidOriginSubq)
 	{
 	}
 
@@ -68,7 +69,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	CXformSet *PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -76,7 +77,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function

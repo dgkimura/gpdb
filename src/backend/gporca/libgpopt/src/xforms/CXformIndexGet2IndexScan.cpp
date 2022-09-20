@@ -45,10 +45,11 @@ CXformIndexGet2IndexScan::CXformIndexGet2IndexScan(CMemoryPool *mp)
 CXform::EXformPromise
 CXformIndexGet2IndexScan::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalIndexGet *popGet = CLogicalIndexGet::PopConvert(exprhdl.Pop());
+	gpos::pointer<CLogicalIndexGet *> popGet =
+		gpos::dyn_cast<CLogicalIndexGet>(exprhdl.Pop());
 
-	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
-	CIndexDescriptor *pindexdesc = popGet->Pindexdesc();
+	gpos::pointer<CTableDescriptor *> ptabdesc = popGet->Ptabdesc();
+	gpos::pointer<CIndexDescriptor *> pindexdesc = popGet->Pindexdesc();
 	BOOL possible_ao_table = ptabdesc->IsAORowOrColTable() ||
 							 ptabdesc->RetrieveRelStorageType() ==
 								 IMDRelation::ErelstorageMixedPartitioned;
@@ -76,15 +77,16 @@ CXformIndexGet2IndexScan::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformIndexGet2IndexScan::Transform(CXformContext *pxfctxt,
-									CXformResult *pxfres,
-									CExpression *pexpr) const
+CXformIndexGet2IndexScan::Transform(gpos::pointer<CXformContext *> pxfctxt,
+									gpos::pointer<CXformResult *> pxfres,
+									gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalIndexGet *pop = CLogicalIndexGet::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalIndexGet *> pop =
+		gpos::dyn_cast<CLogicalIndexGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 	CIndexDescriptor *pindexdesc = pop->Pindexdesc();
 	CTableDescriptor *ptabdesc = pop->Ptabdesc();
@@ -116,7 +118,7 @@ CXformIndexGet2IndexScan::Transform(CXformContext *pxfctxt,
 			mp, pindexdesc, ptabdesc, pexpr->Pop()->UlOpId(),
 			GPOS_NEW(mp) CName(mp, pop->NameAlias()), pdrgpcrOutput, pos),
 		pexprIndexCond);
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 

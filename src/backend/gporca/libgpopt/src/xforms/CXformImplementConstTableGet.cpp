@@ -45,16 +45,17 @@ CXformImplementConstTableGet::CXformImplementConstTableGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementConstTableGet::Transform(CXformContext *pxfctxt,
-										CXformResult *pxfres,
-										CExpression *pexpr) const
+CXformImplementConstTableGet::Transform(
+	gpos::pointer<CXformContext *> pxfctxt,
+	gpos::pointer<CXformResult *> pxfres,
+	gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalConstTableGet *popConstTableGet =
-		CLogicalConstTableGet::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalConstTableGet *> popConstTableGet =
+		gpos::dyn_cast<CLogicalConstTableGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
@@ -71,12 +72,13 @@ CXformImplementConstTableGet::Transform(CXformContext *pxfctxt,
 	pdrgpcrOutput->AddRef();
 
 	// create alternative expression
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) CPhysicalConstTableGet(
-							mp, pdrgpcoldesc, pdrgpdrgpdatum, pdrgpcrOutput));
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
+		mp, GPOS_NEW(mp) CPhysicalConstTableGet(mp, std::move(pdrgpcoldesc),
+												std::move(pdrgpdrgpdatum),
+												std::move(pdrgpcrOutput)));
 
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 

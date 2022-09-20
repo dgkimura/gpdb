@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformResult.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 
@@ -56,13 +57,13 @@ CXformResult::~CXformResult()
 //
 //---------------------------------------------------------------------------
 void
-CXformResult::Add(CExpression *pexpr)
+CXformResult::Add(gpos::owner<CExpression *> pexpr)
 {
 	GPOS_ASSERT(0 == m_ulExpr &&
 				"Incorrect workflow: cannot add further alternatives");
 
 	GPOS_ASSERT(nullptr != pexpr);
-	m_pdrgpexpr->Append(pexpr);
+	m_pdrgpexpr->Append(std::move(pexpr));
 }
 
 

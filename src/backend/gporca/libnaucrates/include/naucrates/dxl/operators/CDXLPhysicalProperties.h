@@ -40,7 +40,7 @@ public:
 	CDXLPhysicalProperties(const CDXLPhysicalProperties &) = delete;
 
 	// ctor
-	explicit CDXLPhysicalProperties(CDXLOperatorCost *cost);
+	explicit CDXLPhysicalProperties(gpos::owner<CDXLOperatorCost *> cost);
 
 	// dtor
 	~CDXLPhysicalProperties() override;

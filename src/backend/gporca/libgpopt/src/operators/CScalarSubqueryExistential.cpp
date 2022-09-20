@@ -72,7 +72,7 @@ CScalarSubqueryExistential::MdidType() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSubqueryExistential::Matches(COperator *pop) const
+CScalarSubqueryExistential::Matches(gpos::pointer<COperator *> pop) const
 {
 	GPOS_ASSERT(nullptr != pop);
 

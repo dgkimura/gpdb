@@ -31,8 +31,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarBitmapIndexProbe::CDXLScalarBitmapIndexProbe(
-	CMemoryPool *mp, CDXLIndexDescr *dxl_index_descr)
-	: CDXLScalar(mp), m_dxl_index_descr(dxl_index_descr)
+	CMemoryPool *mp, gpos::owner<CDXLIndexDescr *> dxl_index_descr)
+	: CDXLScalar(mp), m_dxl_index_descr(std::move(dxl_index_descr))
 {
 	GPOS_ASSERT(nullptr != m_dxl_index_descr);
 }
@@ -109,7 +109,7 @@ CDXLScalarBitmapIndexProbe::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	if (validate_children)
 	{
-		CDXLNode *pdxlnIndexCondList = (*dxlnode)[0];
+		gpos::pointer<CDXLNode *> pdxlnIndexCondList = (*dxlnode)[0];
 		GPOS_ASSERT(EdxlopScalarIndexCondList ==
 					pdxlnIndexCondList->GetOperator()->GetDXLOperator());
 		pdxlnIndexCondList->GetOperator()->AssertValid(pdxlnIndexCondList,

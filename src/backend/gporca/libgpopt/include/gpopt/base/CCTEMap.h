@@ -88,8 +88,9 @@ private:
 		CCTEMapEntry(const CCTEMapEntry &) = delete;
 
 		// ctor
-		CCTEMapEntry(ULONG id, CCTEMap::ECteType ect, CDrvdPropPlan *pdpplan)
-			: m_id(id), m_ect(ect), m_pdpplan(pdpplan)
+		CCTEMapEntry(ULONG id, CCTEMap::ECteType ect,
+					 gpos::owner<CDrvdPropPlan *> pdpplan)
+			: m_id(id), m_ect(ect), m_pdpplan(std::move(pdpplan))
 		{
 			GPOS_ASSERT(EctSentinel > ect);
 			GPOS_ASSERT_IMP(EctProducer == ect, nullptr != m_pdpplan);
@@ -169,7 +170,7 @@ private:
 
 	// helper to add entries found in first map and are unresolved based on second map
 	static void AddUnresolved(const CCTEMap &cmFirst, const CCTEMap &cmSecond,
-							  CCTEMap *pcmResult);
+							  gpos::pointer<CCTEMap *> pcmResult);
 
 public:
 	CCTEMap(const CCTEMap &) = delete;
@@ -206,15 +207,16 @@ public:
 	BOOL FSatisfies(gpos::pointer<const CCTEReq *> pcter) const;
 
 	// return producer ids that are in this map but not in the given requirement
-	ULongPtrArray *PdrgpulAdditionalProducers(
+	gpos::owner<ULongPtrArray *> PdrgpulAdditionalProducers(
 		CMemoryPool *mp, gpos::pointer<const CCTEReq *> pcter) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;
 
 	// combine the two given maps and return the resulting map
-	static CCTEMap *PcmCombine(CMemoryPool *mp, const CCTEMap &cmFirst,
-							   const CCTEMap &cmSecond);
+	static gpos::owner<CCTEMap *> PcmCombine(CMemoryPool *mp,
+											 const CCTEMap &cmFirst,
+											 const CCTEMap &cmSecond);
 
 };	// class CCTEMap
 

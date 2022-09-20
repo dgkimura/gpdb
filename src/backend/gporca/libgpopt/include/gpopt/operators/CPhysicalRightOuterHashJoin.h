@@ -38,8 +38,8 @@ public:
 
 	// ctor
 	CPhysicalRightOuterHashJoin(
-		CMemoryPool *mp, CExpressionArray *pdrgpexprOuterKeys,
-		CExpressionArray *pdrgpexprInnerKeys,
+		CMemoryPool *mp, gpos::owner<CExpressionArray *> pdrgpexprOuterKeys,
+		gpos::owner<CExpressionArray *> pdrgpexprInnerKeys,
 		gpos::owner<IMdIdArray *> hash_opfamilies,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 
@@ -74,12 +74,10 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required distribution of the n-th child
-	gpos::owner<CEnfdDistribution *> Ped(CMemoryPool *mp,
-										 CExpressionHandle &exprhdl,
-										 CReqdPropPlan *prppInput,
-										 ULONG child_index,
-										 CDrvdPropArray *pdrgpdpCtxt,
-										 ULONG ulOptReq) override;
+	gpos::owner<CEnfdDistribution *> Ped(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override;
 
 };	// class CPhysicalRightOuterHashJoin
 

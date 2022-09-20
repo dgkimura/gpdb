@@ -35,7 +35,8 @@ public:
 	CDXLLogicalExternalGet(CDXLLogicalExternalGet &) = delete;
 
 	// ctor
-	CDXLLogicalExternalGet(CMemoryPool *mp, CDXLTableDescr *table_descr);
+	CDXLLogicalExternalGet(CMemoryPool *mp,
+						   gpos::owner<CDXLTableDescr *> table_descr);
 
 	// operator type
 	Edxlopid GetDXLOperator() const override;

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarValuesList.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 using namespace gpmd;
@@ -37,7 +38,7 @@ CScalarValuesList::CScalarValuesList(CMemoryPool *mp) : CScalar(mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarValuesList::Matches(COperator *pop) const
+CScalarValuesList::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

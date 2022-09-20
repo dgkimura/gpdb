@@ -125,14 +125,15 @@ CScalarArrayCoerceExpr::SzId() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayCoerceExpr::Matches(COperator *pop) const
+CScalarArrayCoerceExpr::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CScalarArrayCoerceExpr *popCoerce = CScalarArrayCoerceExpr::PopConvert(pop);
+	gpos::pointer<CScalarArrayCoerceExpr *> popCoerce =
+		gpos::dyn_cast<CScalarArrayCoerceExpr>(pop);
 
 	return popCoerce->PmdidElementFunc()->Equals(m_pmdidElementFunc.get()) &&
 		   popCoerce->MdidType()->Equals(MdidType()) &&

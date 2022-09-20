@@ -75,7 +75,7 @@ public:
 	CDefaultComparator(const CDefaultComparator &) = delete;
 
 	// ctor
-	CDefaultComparator(IConstExprEvaluator *pceeval);
+	CDefaultComparator(gpos::pointer<IConstExprEvaluator *> pceeval);
 
 	// dtor
 	~CDefaultComparator() override = default;

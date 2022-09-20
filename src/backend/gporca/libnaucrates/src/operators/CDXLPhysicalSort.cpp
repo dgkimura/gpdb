@@ -126,10 +126,13 @@ CDXLPhysicalSort::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	GPOS_ASSERT(EdxlsortIndexSentinel == dxlnode->Arity());
 
-	CDXLNode *sort_col_list_dxlnode = (*dxlnode)[EdxlsortIndexSortColList];
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlsortIndexChild];
-	CDXLNode *limit_count_dxlnode = (*dxlnode)[EdxlsortIndexLimitCount];
-	CDXLNode *limit_offset_dxlnode = (*dxlnode)[EdxlsortIndexLimitOffset];
+	gpos::pointer<CDXLNode *> sort_col_list_dxlnode =
+		(*dxlnode)[EdxlsortIndexSortColList];
+	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[EdxlsortIndexChild];
+	gpos::pointer<CDXLNode *> limit_count_dxlnode =
+		(*dxlnode)[EdxlsortIndexLimitCount];
+	gpos::pointer<CDXLNode *> limit_offset_dxlnode =
+		(*dxlnode)[EdxlsortIndexLimitOffset];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxloptypeScalar ==

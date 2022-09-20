@@ -280,7 +280,7 @@ CColRefSet::Replace(gpos::pointer<const CColRefArray *> pdrgpcrOut,
 //		Convert set into array
 //
 //---------------------------------------------------------------------------
-CColRefArray *
+gpos::owner<CColRefArray *>
 CColRefSet::Pdrgpcr(CMemoryPool *mp) const
 {
 	gpos::owner<CColRefArray *> colref_array = GPOS_NEW(mp) CColRefArray(mp);
@@ -303,7 +303,7 @@ CColRefSet::Pdrgpcr(CMemoryPool *mp) const
 //		Convert set into map
 //
 //---------------------------------------------------------------------------
-IntToColRefMap *
+gpos::owner<IntToColRefMap *>
 CColRefSet::Phmicr(CMemoryPool *mp) const
 {
 	gpos::owner<IntToColRefMap *> phmicr = GPOS_NEW(mp) IntToColRefMap(mp);
@@ -396,7 +396,8 @@ CColRefSet::OsPrint(IOstream &os, ULONG ulLenMax) const
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::ExtractColIds(CMemoryPool *mp, ULongPtrArray *colids) const
+CColRefSet::ExtractColIds(CMemoryPool *mp,
+						  gpos::pointer<ULongPtrArray *> colids) const
 {
 	CColRefSetIter crsi(*this);
 	while (crsi.Advance())
@@ -476,7 +477,7 @@ CColRefSet::FCovered(gpos::pointer<CColRefSetArray *> pdrgpcrs,
 		const ULONG length = pdrgpcrs->Size();
 		for (ULONG ul = 0; ul < length && !fFound; ul++)
 		{
-			CColRefSet *pcrs = (*pdrgpcrs)[ul];
+			gpos::pointer<CColRefSet *> pcrs = (*pdrgpcrs)[ul];
 			if (pcrs->FMember(colref))
 			{
 				fFound = true;

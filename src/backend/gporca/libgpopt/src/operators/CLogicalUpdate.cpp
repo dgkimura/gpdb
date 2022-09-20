@@ -49,14 +49,16 @@ CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp, CTableDescriptor *ptabdesc,
-							   CColRefArray *pdrgpcrDelete,
-							   CColRefArray *pdrgpcrInsert, CColRef *pcrCtid,
-							   CColRef *pcrSegmentId, BOOL fSplit)
+CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp,
+							   gpos::owner<CTableDescriptor *> ptabdesc,
+							   gpos::owner<CColRefArray *> pdrgpcrDelete,
+							   gpos::owner<CColRefArray *> pdrgpcrInsert,
+							   CColRef *pcrCtid, CColRef *pcrSegmentId,
+							   BOOL fSplit)
 	: CLogical(mp),
-	  m_ptabdesc(ptabdesc),
-	  m_pdrgpcrDelete(pdrgpcrDelete),
-	  m_pdrgpcrInsert(pdrgpcrInsert),
+	  m_ptabdesc(std::move(ptabdesc)),
+	  m_pdrgpcrDelete(std::move(pdrgpcrDelete)),
+	  m_pdrgpcrInsert(std::move(pdrgpcrInsert)),
 	  m_pcrCtid(pcrCtid),
 	  m_pcrSegmentId(pcrSegmentId),
 	  m_fSplit(fSplit)
@@ -99,14 +101,15 @@ CLogicalUpdate::~CLogicalUpdate()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalUpdate::Matches(COperator *pop) const
+CLogicalUpdate::Matches(gpos::pointer<COperator *> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	CLogicalUpdate *popUpdate = CLogicalUpdate::PopConvert(pop);
+	gpos::pointer<CLogicalUpdate *> popUpdate =
+		gpos::dyn_cast<CLogicalUpdate>(pop);
 
 	return m_pcrCtid == popUpdate->PcrCtid() &&
 		   m_pcrSegmentId == popUpdate->PcrSegmentId() &&
@@ -149,22 +152,22 @@ CLogicalUpdate::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::owner<COperator *>
-CLogicalUpdate::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										   UlongToColRefMap *colref_mapping,
-										   BOOL must_exist)
+CLogicalUpdate::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	BOOL must_exist)
 {
-	CColRefArray *pdrgpcrDelete =
+	gpos::owner<CColRefArray *> pdrgpcrDelete =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrDelete, colref_mapping, must_exist);
-	CColRefArray *pdrgpcrInsert =
+	gpos::owner<CColRefArray *> pdrgpcrInsert =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInsert, colref_mapping, must_exist);
 	CColRef *pcrCtid = CUtils::PcrRemap(m_pcrCtid, colref_mapping, must_exist);
 	CColRef *pcrSegmentId =
 		CUtils::PcrRemap(m_pcrSegmentId, colref_mapping, must_exist);
 	m_ptabdesc->AddRef();
 
-	return GPOS_NEW(mp)
-		CLogicalUpdate(mp, m_ptabdesc, pdrgpcrDelete, pdrgpcrInsert, pcrCtid,
-					   pcrSegmentId, m_fSplit);
+	return GPOS_NEW(mp) CLogicalUpdate(mp, m_ptabdesc, std::move(pdrgpcrDelete),
+									   std::move(pdrgpcrInsert), pcrCtid,
+									   pcrSegmentId, m_fSplit);
 }
 
 //---------------------------------------------------------------------------
@@ -175,7 +178,7 @@ CLogicalUpdate::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalUpdate::DeriveOutputColumns(CMemoryPool *mp,
 									CExpressionHandle &	 //exprhdl
 )
@@ -196,7 +199,7 @@ CLogicalUpdate::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-CKeyCollection *
+gpos::owner<CKeyCollection *>
 CLogicalUpdate::DeriveKeyCollection(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl) const
 {
@@ -227,7 +230,7 @@ CLogicalUpdate::DeriveMaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-CXformSet *
+gpos::owner<CXformSet *>
 CLogicalUpdate::PxfsCandidates(CMemoryPool *mp) const
 {
 	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
@@ -243,10 +246,10 @@ CLogicalUpdate::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalUpdate::PstatsDerive(CMemoryPool *,	 // mp,
 							 CExpressionHandle &exprhdl,
-							 IStatisticsArray *	 // not used
+							 gpos::pointer<IStatisticsArray *>	// not used
 ) const
 {
 	return PstatsPassThruOuter(exprhdl);

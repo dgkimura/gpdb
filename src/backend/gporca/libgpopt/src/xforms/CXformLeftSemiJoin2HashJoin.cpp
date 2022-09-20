@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformLeftSemiJoin2HashJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalLeftSemiJoin.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -69,9 +70,9 @@ CXformLeftSemiJoin2HashJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftSemiJoin2HashJoin::Transform(CXformContext *pxfctxt,
-									   CXformResult *pxfres,
-									   CExpression *pexpr) const
+CXformLeftSemiJoin2HashJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
+									   gpos::pointer<CXformResult *> pxfres,
+									   gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

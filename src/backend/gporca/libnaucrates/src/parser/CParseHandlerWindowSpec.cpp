@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerWindowSpec.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -151,7 +153,7 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,	 // element_uri,
 	CDXLNode *sort_col_list_dxlnode = nullptr;
 
 	// window frame associated with the window key
-	CDXLWindowFrame *window_frame = nullptr;
+	gpos::owner<CDXLWindowFrame *> window_frame = nullptr;
 
 	if (1 == this->Length())
 	{
@@ -185,9 +187,9 @@ CParseHandlerWindowSpec::EndElement(const XMLCh *const,	 // element_uri,
 			dynamic_cast<CParseHandlerWindowFrame *>((*this)[1]);
 		window_frame = window_frame_parse_handler->GetWindowFrame();
 	}
-	m_dxl_window_spec_gen =
-		GPOS_NEW(m_mp) CDXLWindowSpec(m_mp, m_part_by_colid_array, m_mdname,
-									  sort_col_list_dxlnode, window_frame);
+	m_dxl_window_spec_gen = GPOS_NEW(m_mp)
+		CDXLWindowSpec(m_mp, m_part_by_colid_array, m_mdname,
+					   sort_col_list_dxlnode, std::move(window_frame));
 
 	// deactivate handler
 	m_parse_handler_mgr->DeactivateHandler();

@@ -334,16 +334,16 @@ public:
 
 	// match function;
 	// abstract to enforce an implementation for each new operator
-	virtual BOOL Matches(COperator *pop) const = 0;
+	virtual BOOL Matches(gpos::pointer<COperator *> pop) const = 0;
 
 	// create container for derived properties
-	virtual CDrvdProp *PdpCreate(CMemoryPool *mp) const = 0;
+	virtual gpos::owner<CDrvdProp *> PdpCreate(CMemoryPool *mp) const = 0;
 
 	// create container for required properties
-	virtual CReqdProp *PrpCreate(CMemoryPool *mp) const = 0;
+	virtual gpos::owner<CReqdProp *> PrpCreate(CMemoryPool *mp) const = 0;
 
 	// return a copy of the operator with remapped columns
-	virtual COperator *PopCopyWithRemappedColumns(
+	virtual gpos::owner<COperator *> PopCopyWithRemappedColumns(
 		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
 		BOOL must_exist) = 0;
 

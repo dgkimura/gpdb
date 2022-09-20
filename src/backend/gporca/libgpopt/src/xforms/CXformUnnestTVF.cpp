@@ -82,11 +82,12 @@ CXformUnnestTVF::Exfp(CExpressionHandle &exprhdl) const
 //		after mapping to consumer output
 //
 //---------------------------------------------------------------------------
-CColRefArray *
-CXformUnnestTVF::PdrgpcrSubqueries(CMemoryPool *mp, CExpression *pexprCTEProd,
-								   CExpression *pexprCTECons)
+gpos::owner<CColRefArray *>
+CXformUnnestTVF::PdrgpcrSubqueries(CMemoryPool *mp,
+								   gpos::pointer<CExpression *> pexprCTEProd,
+								   gpos::pointer<CExpression *> pexprCTECons)
 {
-	CExpression *pexprProject = (*pexprCTEProd)[0];
+	gpos::pointer<CExpression *> pexprProject = (*pexprCTEProd)[0];
 	GPOS_ASSERT(COperator::EopLogicalProject == pexprProject->Pop()->Eopid());
 
 	gpos::owner<CColRefArray *> pdrgpcrProdOutput =
@@ -99,11 +100,13 @@ CXformUnnestTVF::PdrgpcrSubqueries(CMemoryPool *mp, CExpression *pexprCTEProd,
 	const ULONG ulPrjElems = (*pexprProject)[1]->Arity();
 	for (ULONG ulOuter = 0; ulOuter < ulPrjElems; ulOuter++)
 	{
-		CExpression *pexprPrjElem = (*(*pexprProject)[1])[ulOuter];
+		gpos::pointer<CExpression *> pexprPrjElem =
+			(*(*pexprProject)[1])[ulOuter];
 		if ((*pexprPrjElem)[0]->DeriveHasSubquery())
 		{
 			CColRef *pcrProducer =
-				CScalarProjectElement::PopConvert(pexprPrjElem->Pop())->Pcr();
+				gpos::dyn_cast<CScalarProjectElement>(pexprPrjElem->Pop())
+					->Pcr();
 			CColRef *pcrConsumer = CUtils::PcrMap(
 				pcrProducer, pdrgpcrProdOutput, pdrgpcrConsOutput);
 			GPOS_ASSERT(nullptr != pcrConsumer);
@@ -128,8 +131,9 @@ CXformUnnestTVF::PdrgpcrSubqueries(CMemoryPool *mp, CExpression *pexprCTEProd,
 //		collected subqueries in project list
 //
 //---------------------------------------------------------------------------
-CExpression *
-CXformUnnestTVF::PexprProjectSubqueries(CMemoryPool *mp, CExpression *pexprTVF)
+gpos::owner<CExpression *>
+CXformUnnestTVF::PexprProjectSubqueries(CMemoryPool *mp,
+										gpos::pointer<CExpression *> pexprTVF)
 {
 	GPOS_ASSERT(COperator::EopLogicalTVF == pexprTVF->Pop()->Eopid());
 
@@ -148,9 +152,9 @@ CXformUnnestTVF::PexprProjectSubqueries(CMemoryPool *mp, CExpression *pexprTVF)
 	}
 	GPOS_ASSERT(0 < pdrgpexprSubqueries->Size());
 
-	CExpression *pexprCTG = CUtils::PexprLogicalCTGDummy(mp);
-	CExpression *pexprProject =
-		CUtils::PexprAddProjection(mp, pexprCTG, pdrgpexprSubqueries);
+	gpos::owner<CExpression *> pexprCTG = CUtils::PexprLogicalCTGDummy(mp);
+	gpos::owner<CExpression *> pexprProject = CUtils::PexprAddProjection(
+		mp, std::move(pexprCTG), pdrgpexprSubqueries);
 	pdrgpexprSubqueries->Release();
 
 	return pexprProject;
@@ -180,8 +184,9 @@ CXformUnnestTVF::PexprProjectSubqueries(CMemoryPool *mp, CExpression *pexprTVF)
 //
 //---------------------------------------------------------------------------
 void
-CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-						   CExpression *pexpr) const
+CXformUnnestTVF::Transform(gpos::pointer<CXformContext *> pxfctxt,
+						   gpos::pointer<CXformResult *> pxfres,
+						   gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -193,7 +198,7 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	gpos::owner<CExpression *> pexprProject = PexprProjectSubqueries(mp, pexpr);
 
 	// create a CTE producer on top of the project
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::pointer<CCTEInfo *> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	const ULONG ulCTEId = pcteinfo->next_id();
 
 	// construct CTE producer output from subquery columns
@@ -201,24 +206,27 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	const ULONG ulPrjElems = (*pexprProject)[1]->Arity();
 	for (ULONG ulOuter = 0; ulOuter < ulPrjElems; ulOuter++)
 	{
-		CExpression *pexprPrjElem = (*(*pexprProject)[1])[ulOuter];
+		gpos::pointer<CExpression *> pexprPrjElem =
+			(*(*pexprProject)[1])[ulOuter];
 		if ((*pexprPrjElem)[0]->DeriveHasSubquery())
 		{
 			CColRef *pcrSubq =
-				CScalarProjectElement::PopConvert(pexprPrjElem->Pop())->Pcr();
+				gpos::dyn_cast<CScalarProjectElement>(pexprPrjElem->Pop())
+					->Pcr();
 			pdrgpcrOutput->Append(pcrSubq);
 		}
 	}
 
-	CExpression *pexprCTEProd = CXformUtils::PexprAddCTEProducer(
-		mp, ulCTEId, pdrgpcrOutput, pexprProject);
+	gpos::pointer<CExpression *> pexprCTEProd =
+		CXformUtils::PexprAddCTEProducer(mp, ulCTEId, pdrgpcrOutput,
+										 pexprProject);
 	pdrgpcrOutput->Release();
 	pexprProject->Release();
 
 	// create CTE consumer
 	gpos::owner<CColRefArray *> pdrgpcrProducerOutput =
 		pexprCTEProd->DeriveOutputColumns()->Pdrgpcr(mp);
-	CColRefArray *pdrgpcrConsumerOutput =
+	gpos::owner<CColRefArray *> pdrgpcrConsumerOutput =
 		CUtils::PdrgpcrCopy(mp, pdrgpcrProducerOutput);
 	gpos::owner<CLogicalCTEConsumer *> popConsumer =
 		GPOS_NEW(mp) CLogicalCTEConsumer(mp, ulCTEId, pdrgpcrConsumerOutput);
@@ -228,7 +236,7 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pdrgpcrProducerOutput->Release();
 
 	// find columns corresponding to subqueries in consumer's output
-	CColRefArray *pdrgpcrSubqueries =
+	gpos::owner<CColRefArray *> pdrgpcrSubqueries =
 		PdrgpcrSubqueries(mp, pexprCTEProd, pexprCTECons);
 
 	// create new function arguments by replacing subqueries with columns in CTE consumer output
@@ -238,7 +246,7 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	const ULONG arity = pexpr->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprScalarChild = (*pexpr)[ul];
+		gpos::pointer<CExpression *> pexprScalarChild = (*pexpr)[ul];
 		if (pexprScalarChild->DeriveHasSubquery())
 		{
 			CColRef *colref = (*pdrgpcrSubqueries)[ulIndex];
@@ -253,21 +261,26 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// finally, create correlated apply expression
-	gpos::owner<CLogicalTVF *> popTVF = CLogicalTVF::PopConvert(pexpr->Pop());
+	gpos::owner<CLogicalTVF *> popTVF =
+		gpos::dyn_cast<CLogicalTVF>(pexpr->Pop());
 	popTVF->AddRef();
-	CExpression *pexprCorrApply =
+	gpos::owner<CExpression *> pexprCorrApply =
 		CUtils::PexprLogicalApply<CLogicalLeftOuterCorrelatedApply>(
-			mp, GPOS_NEW(mp) CExpression(mp, popTVF, pdrgpexprNewArgs),
-			pexprCTECons, pdrgpcrSubqueries, COperator::EopScalarSubquery,
+			mp,
+			GPOS_NEW(mp)
+				CExpression(mp, std::move(popTVF), std::move(pdrgpexprNewArgs)),
+			std::move(pexprCTECons), std::move(pdrgpcrSubqueries),
+			COperator::EopScalarSubquery,
 			CPredicateUtils::PexprConjunction(
 				mp, nullptr /*pdrgpexpr*/)	// scalar expression is const True
 		);
 
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
-		mp, GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEId), pexprCorrApply);
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
+		CExpression(mp, GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEId),
+					std::move(pexprCorrApply));
 
 	// add alternative to transformation result
-	pxfres->Add(pexprAlt);
+	pxfres->Add(std::move(pexprAlt));
 }
 
 

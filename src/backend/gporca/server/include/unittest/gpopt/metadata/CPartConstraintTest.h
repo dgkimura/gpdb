@@ -12,6 +12,7 @@
 #define GPOPT_CPartConstraintTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CConstraint.h"
 
@@ -52,8 +53,10 @@ private:
 	static const WCHAR *wszInternalRepresentationFor2012_01_22;
 
 	// create an interval constraint for the given column and interval boundaries
-	static CConstraint *PcnstrInterval(CMemoryPool *mp, CColRef *colref,
-									   ULONG ulLeft, ULONG ulRight);
+	static gpos::owner<CConstraint *> PcnstrInterval(CMemoryPool *mp,
+													 CColRef *colref,
+													 ULONG ulLeft,
+													 ULONG ulRight);
 
 public:
 	// unittests

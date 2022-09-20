@@ -49,8 +49,9 @@ CXformImplementUnionAll::CXformImplementUnionAll(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementUnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								   CExpression *pexpr) const
+CXformImplementUnionAll::Transform(gpos::pointer<CXformContext *> pxfctxt,
+								   gpos::pointer<CXformResult *> pxfres,
+								   gpos::pointer<CExpression *> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -59,7 +60,8 @@ CXformImplementUnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CLogicalUnionAll *popUnionAll = CLogicalUnionAll::PopConvert(pexpr->Pop());
+	gpos::pointer<CLogicalUnionAll *> popUnionAll =
+		gpos::dyn_cast<CLogicalUnionAll>(pexpr->Pop());
 	CPhysicalUnionAllFactory factory(popUnionAll);
 
 	gpos::owner<CExpressionArray *> pdrgpexpr =
@@ -73,7 +75,7 @@ CXformImplementUnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		pdrgpexpr->Append(pexprChild);
 	}
 
-	CPhysicalUnionAll *popPhysicalSerialUnionAll =
+	gpos::owner<CPhysicalUnionAll *> popPhysicalSerialUnionAll =
 		factory.PopPhysicalUnionAll(mp, false);
 
 	// assemble serial union physical operator
@@ -88,17 +90,17 @@ CXformImplementUnionAll::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	if (fParallel)
 	{
-		CPhysicalUnionAll *popPhysicalParallelUnionAll =
+		gpos::owner<CPhysicalUnionAll *> popPhysicalParallelUnionAll =
 			factory.PopPhysicalUnionAll(mp, true);
 
 		pdrgpexpr->AddRef();
 
 		// assemble physical parallel operator
 		gpos::owner<CExpression *> pexprParallelUnionAll = GPOS_NEW(mp)
-			CExpression(mp, popPhysicalParallelUnionAll, pdrgpexpr);
+			CExpression(mp, std::move(popPhysicalParallelUnionAll), pdrgpexpr);
 
 		// add parallel union alternative to results
-		pxfres->Add(pexprParallelUnionAll);
+		pxfres->Add(std::move(pexprParallelUnionAll));
 	}
 }
 

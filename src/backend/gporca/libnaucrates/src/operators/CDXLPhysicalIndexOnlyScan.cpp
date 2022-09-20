@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalIndexOnlyScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -27,10 +29,11 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexOnlyScan::CDXLPhysicalIndexOnlyScan(
-	CMemoryPool *mp, CDXLTableDescr *table_descr,
-	CDXLIndexDescr *dxl_index_descr, EdxlIndexScanDirection idx_scan_direction)
-	: CDXLPhysicalIndexScan(mp, table_descr, dxl_index_descr,
-							idx_scan_direction)
+	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr,
+	gpos::owner<CDXLIndexDescr *> dxl_index_descr,
+	EdxlIndexScanDirection idx_scan_direction)
+	: CDXLPhysicalIndexScan(mp, std::move(table_descr),
+							std::move(dxl_index_descr), idx_scan_direction)
 {
 }
 
