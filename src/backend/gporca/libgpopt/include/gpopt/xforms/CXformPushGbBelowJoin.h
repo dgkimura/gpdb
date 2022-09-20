@@ -38,7 +38,7 @@ public:
 	explicit CXformPushGbBelowJoin(CMemoryPool *mp);
 
 	// ctor
-	explicit CXformPushGbBelowJoin(gpos::owner<CExpression *> pexprPattern);
+	explicit CXformPushGbBelowJoin(gpos::Ref<CExpression> pexprPattern);
 
 	// dtor
 	~CXformPushGbBelowJoin() override = default;
@@ -60,9 +60,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(gpos::pointer<CXformContext *> pxfctxt,
-				   gpos::pointer<CXformResult *> pxfres,
-				   gpos::pointer<CExpression *> pexpr) const override;
+	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+				   CExpression *pexpr) const override;
 
 };	// class CXformPushGbBelowJoin
 

@@ -33,14 +33,13 @@ class CXformSubqJoin2Apply : public CXformSubqueryUnnest
 private:
 	// hash map between expression and a column reference
 	using ExprToColRefMap =
-		CHashMap<CExpression, CColRef, HashPtr<CExpression>,
-				 EqualPtr<CExpression>, CleanupRelease<CExpression>,
-				 CleanupNULL<CColRef>>;
+		gpos::UnorderedMap<gpos::Ref<CExpression>, CColRef *,
+						   gpos::RefHash<CExpression, HashPtr<CExpression>>,
+						   gpos::RefEq<CExpression, EqualPtr<CExpression>>>;
 
 	// helper to transform function
-	void Transform(gpos::pointer<CXformContext *> pxfctxt,
-				   gpos::pointer<CXformResult *> pxfres,
-				   gpos::pointer<CExpression *> pexpr,
+	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+				   CExpression *pexpr,
 				   BOOL fEnforceCorrelatedApply) const override;
 
 	// collect subqueries that exclusively use outer/inner child
@@ -49,14 +48,12 @@ private:
 								  CExpressionArrays *pdrgpdrgpexprSubqs);
 
 	// replace subqueries with scalar identifier based on given map
-	static gpos::owner<CExpression *> PexprReplaceSubqueries(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprScalar,
-		ExprToColRefMap *phmexprcr);
+	static gpos::Ref<CExpression> PexprReplaceSubqueries(
+		CMemoryPool *mp, CExpression *pexprScalar, ExprToColRefMap *phmexprcr);
 
 	// push down subquery below join
-	static gpos::owner<CExpression *> PexprSubqueryPushDown(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
-		BOOL fEnforceCorrelatedApply);
+	static gpos::Ref<CExpression> PexprSubqueryPushDown(
+		CMemoryPool *mp, CExpression *pexpr, BOOL fEnforceCorrelatedApply);
 
 public:
 	CXformSubqJoin2Apply(const CXformSubqJoin2Apply &) = delete;
@@ -65,7 +62,7 @@ public:
 	explicit CXformSubqJoin2Apply(CMemoryPool *mp);
 
 	// ctor
-	explicit CXformSubqJoin2Apply(gpos::owner<CExpression *> pexprPattern)
+	explicit CXformSubqJoin2Apply(gpos::Ref<CExpression> pexprPattern)
 		: CXformSubqueryUnnest(std::move(pexprPattern))
 	{
 	}

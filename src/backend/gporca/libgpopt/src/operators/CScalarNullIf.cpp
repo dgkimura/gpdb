@@ -90,15 +90,14 @@ CScalarNullIf::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarNullIf::Matches(gpos::pointer<COperator *> pop) const
+CScalarNullIf::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CScalarNullIf *> popScNullIf =
-		gpos::dyn_cast<CScalarNullIf>(pop);
+	CScalarNullIf *popScNullIf = gpos::dyn_cast<CScalarNullIf>(pop);
 
 	// match if operators and return types are identical
 	return m_mdid_op->Equals(popScNullIf->MdIdOp()) &&
@@ -115,7 +114,7 @@ CScalarNullIf::Matches(gpos::pointer<COperator *> pop) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarNullIf::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
+CScalarNullIf::Eber(ULongPtrArray *pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

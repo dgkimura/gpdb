@@ -118,9 +118,8 @@ CDXLScalarWindowFrameEdge::GetFrameBoundaryStr(EdxlFrameBoundary frame_boundary)
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowFrameEdge::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarWindowFrameEdge::SerializeToDXL(CXMLSerializer *xml_serializer,
+										  const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -154,7 +153,7 @@ CDXLScalarWindowFrameEdge::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowFrameEdge::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarWindowFrameEdge::AssertValid(const CDXLNode *dxlnode,
 									   BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
@@ -172,7 +171,7 @@ CDXLScalarWindowFrameEdge::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[idx];
+		CDXLNode *dxlnode_arg = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

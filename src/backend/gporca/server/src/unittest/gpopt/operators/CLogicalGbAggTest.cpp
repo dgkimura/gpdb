@@ -48,24 +48,23 @@ CLogicalGbAggTest::EresUnittest_PxfsCandidates()
 	BOOL test_passed = true;
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	gpos::owner<CLogicalGbAgg *> pGlobalGbAgg = GPOS_NEW(mp) CLogicalGbAgg(
+	gpos::Ref<CLogicalGbAgg> pGlobalGbAgg = GPOS_NEW(mp) CLogicalGbAgg(
 		mp, GPOS_NEW(mp) CColRefArray(mp), COperator::EgbaggtypeGlobal);
 
-	gpos::owner<CXformSet *> xfset = pGlobalGbAgg->PxfsCandidates(mp);
+	gpos::Ref<CXformSet> xfset = pGlobalGbAgg->PxfsCandidates(mp);
 
 	// allow xform split agg on "global" aggregate
 	GPOS_ASSERT(xfset->Get(CXform::ExfSplitGbAgg));
 	if (!xfset->Get(CXform::ExfSplitGbAgg))
 	{
 		test_passed = false;
-	}
-	xfset->Release();
+	};
 
-	gpos::owner<CLogicalGbAgg *> pLocalGbAgg = GPOS_NEW(mp) CLogicalGbAgg(
+	gpos::Ref<CLogicalGbAgg> pLocalGbAgg = GPOS_NEW(mp) CLogicalGbAgg(
 		mp, GPOS_NEW(mp) CColRefArray(mp), COperator::EgbaggtypeLocal);
 
 	// don't allow xform split agg on "local" aggregate
@@ -74,14 +73,12 @@ CLogicalGbAggTest::EresUnittest_PxfsCandidates()
 	if (xfset->Get(CXform::ExfSplitGbAgg))
 	{
 		test_passed = false;
-	}
-	xfset->Release();
+	};
 
-	gpos::owner<CLogicalGbAgg *> pIntermediateGbAgg = GPOS_NEW(mp)
-		CLogicalGbAgg(mp, GPOS_NEW(mp) CColRefArray(mp),
-					  COperator::EgbaggtypeIntermediate,
-					  false /* fGeneratesDuplicates */,
-					  GPOS_NEW(mp) CColRefArray(mp) /*pdrgpcrArgDQA*/);
+	gpos::Ref<CLogicalGbAgg> pIntermediateGbAgg = GPOS_NEW(mp) CLogicalGbAgg(
+		mp, GPOS_NEW(mp) CColRefArray(mp), COperator::EgbaggtypeIntermediate,
+		false /* fGeneratesDuplicates */,
+		GPOS_NEW(mp) CColRefArray(mp) /*pdrgpcrArgDQA*/);
 
 	// don't allow xform split agg on "intermediate" aggregate
 	xfset = pIntermediateGbAgg->PxfsCandidates(mp);
@@ -89,12 +86,11 @@ CLogicalGbAggTest::EresUnittest_PxfsCandidates()
 	if (xfset->Get(CXform::ExfSplitGbAgg))
 	{
 		test_passed = false;
-	}
-	xfset->Release();
+	};
 
-	pLocalGbAgg->Release();
-	pGlobalGbAgg->Release();
-	pIntermediateGbAgg->Release();
+	;
+	;
+	;
 
 	return test_passed ? GPOS_OK : GPOS_FAILED;
 }

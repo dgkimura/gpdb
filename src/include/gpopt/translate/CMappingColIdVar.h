@@ -57,7 +57,7 @@ public:
 	virtual ~CMappingColIdVar() = default;
 
 	// translate DXL ScalarIdent node into GPDB Var node
-	virtual Var *VarFromDXLNodeScId(gpos::pointer<const CDXLScalarIdent *>) = 0;
+	virtual Var *VarFromDXLNodeScId(const CDXLScalarIdent *) = 0;
 };
 }  // namespace gpdxl
 

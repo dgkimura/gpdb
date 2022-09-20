@@ -58,11 +58,11 @@ CKeyCollectionTest::EresUnittest_Basics()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// Setup an MD cache with a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -77,10 +77,9 @@ CKeyCollectionTest::EresUnittest_Basics()
 	// create test set
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
-	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
-		mda.PtMDType<IMDTypeInt4>();
+	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
-	gpos::owner<CKeyCollection *> pkc = GPOS_NEW(mp) CKeyCollection(mp);
+	gpos::Ref<CKeyCollection> pkc = GPOS_NEW(mp) CKeyCollection(mp);
 
 	const ULONG num_cols = 10;
 	for (ULONG i = 0; i < num_cols; i++)
@@ -91,17 +90,17 @@ CKeyCollectionTest::EresUnittest_Basics()
 	}
 
 	pkc->Add(pcrs);
-	GPOS_ASSERT(pkc->FKey(pcrs));
+	GPOS_ASSERT(pkc->FKey(pcrs.get()));
 
-	gpos::owner<CColRefArray *> colref_array = pkc->PdrgpcrKey(mp);
-	GPOS_ASSERT(pkc->FKey(mp, colref_array));
+	gpos::Ref<CColRefArray> colref_array = pkc->PdrgpcrKey(mp);
+	GPOS_ASSERT(pkc->FKey(mp, colref_array.get()));
 
-	pcrs->Include(colref_array);
-	GPOS_ASSERT(pkc->FKey(pcrs));
+	pcrs->Include(colref_array.get());
+	GPOS_ASSERT(pkc->FKey(pcrs.get()));
 
-	colref_array->Release();
+	;
 
-	pkc->Release();
+	;
 
 	return GPOS_OK;
 }
@@ -121,8 +120,8 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -137,14 +136,13 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	// create test set
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
-	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
-		mda.PtMDType<IMDTypeInt4>();
+	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
-	gpos::owner<CKeyCollection *> pkc = GPOS_NEW(mp) CKeyCollection(mp);
+	gpos::Ref<CKeyCollection> pkc = GPOS_NEW(mp) CKeyCollection(mp);
 
-	gpos::owner<CColRefSet *> pcrs0 = GPOS_NEW(mp) CColRefSet(mp);
-	gpos::owner<CColRefSet *> pcrs1 = GPOS_NEW(mp) CColRefSet(mp);
-	gpos::owner<CColRefSet *> pcrs2 = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs0 = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs1 = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs2 = GPOS_NEW(mp) CColRefSet(mp);
 
 	const ULONG num_cols = 10;
 	const ULONG ulLen1 = 3;
@@ -169,20 +167,20 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	pkc->Add(std::move(pcrs1));
 	pkc->Add(std::move(pcrs2));
 
-	GPOS_ASSERT(pkc->FKey(pcrs2));
+	GPOS_ASSERT(pkc->FKey(pcrs2.get()));
 
 	// get the second key
-	gpos::owner<CColRefArray *> colref_array = pkc->PdrgpcrKey(mp, 1);
+	gpos::Ref<CColRefArray> colref_array = pkc->PdrgpcrKey(mp, 1);
 	GPOS_ASSERT(ulLen1 == colref_array->Size());
-	GPOS_ASSERT(pkc->FKey(mp, colref_array));
+	GPOS_ASSERT(pkc->FKey(mp, colref_array.get()));
 
 	// get the subsumed key
-	gpos::owner<CColRefArray *> pdrgpcrSubsumed =
-		pkc->PdrgpcrTrim(mp, colref_array);
+	gpos::Ref<CColRefArray> pdrgpcrSubsumed =
+		pkc->PdrgpcrTrim(mp, colref_array.get());
 	GPOS_ASSERT(colref_array->Size() >= pdrgpcrSubsumed->Size());
 
-	gpos::owner<CColRefSet *> pcrsSubsumed = GPOS_NEW(mp) CColRefSet(mp);
-	pcrsSubsumed->Include(colref_array);
+	gpos::Ref<CColRefSet> pcrsSubsumed = GPOS_NEW(mp) CColRefSet(mp);
+	pcrsSubsumed->Include(colref_array.get());
 
 #ifdef GPOS_DEBUG
 	const ULONG ulLenSubsumed = pdrgpcrSubsumed->Size();
@@ -193,10 +191,10 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	}
 #endif	// GPOS_DEBUG
 
-	pcrsSubsumed->Release();
-	colref_array->Release();
-	pdrgpcrSubsumed->Release();
-	pkc->Release();
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }

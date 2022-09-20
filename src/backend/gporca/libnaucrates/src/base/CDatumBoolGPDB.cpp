@@ -38,10 +38,10 @@ CDatumBoolGPDB::CDatumBoolGPDB(CSystemId sysid, BOOL value, BOOL is_null)
 	: m_value(value), m_is_null(is_null)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	gpos::owner<IMDId *> mdid = dynamic_cast<const CMDTypeBoolGPDB *>(
-									md_accessor->PtMDType<IMDTypeBool>(sysid))
-									->MDId();
-	mdid->AddRef();
+	gpos::Ref<IMDId> mdid = dynamic_cast<const CMDTypeBoolGPDB *>(
+								md_accessor->PtMDType<IMDTypeBool>(sysid))
+								->MDId();
+	;
 
 	m_mdid = mdid;
 
@@ -194,14 +194,14 @@ CDatumBoolGPDB::GetStrRepr(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumBoolGPDB::Matches(gpos::pointer<const IDatum *> other) const
+CDatumBoolGPDB::Matches(const IDatum *other) const
 {
 	if (!other->MDId()->Equals(m_mdid.get()))
 	{
 		return false;
 	}
 
-	gpos::pointer<const CDatumBoolGPDB *> other_cast =
+	const CDatumBoolGPDB *other_cast =
 		dynamic_cast<const CDatumBoolGPDB *>(other);
 
 	if (!other_cast->IsNull() && !IsNull())
@@ -225,7 +225,7 @@ CDatumBoolGPDB::Matches(gpos::pointer<const IDatum *> other) const
 //		Returns a copy of the datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CDatumBoolGPDB::MakeCopy(CMemoryPool *mp) const
 {
 	return GPOS_NEW(mp) CDatumBoolGPDB(m_mdid, m_value, m_is_null);

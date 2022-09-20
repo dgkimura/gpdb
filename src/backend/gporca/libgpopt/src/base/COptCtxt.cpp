@@ -37,14 +37,14 @@ ULONG COptCtxt::m_ulFirstValidPartId = 1;
 //---------------------------------------------------------------------------
 COptCtxt::COptCtxt(CMemoryPool *mp, CColumnFactory *col_factory,
 				   CMDAccessor *md_accessor,
-				   gpos::owner<IConstExprEvaluator *> pceeval,
-				   gpos::owner<COptimizerConfig *> optimizer_config)
+				   gpos::Ref<IConstExprEvaluator> pceeval,
+				   gpos::Ref<COptimizerConfig> optimizer_config)
 	: CTaskLocalStorageObject(CTaskLocalStorage::EtlsidxOptCtxt),
 	  m_mp(mp),
 	  m_pcf(col_factory),
 	  m_pmda(md_accessor),
 	  m_pceeval(pceeval),
-	  m_pcomp(GPOS_NEW(m_mp) CDefaultComparator(pceeval)),
+	  m_pcomp(GPOS_NEW(m_mp) CDefaultComparator(pceeval.get())),
 	  m_auPartId(m_ulFirstValidPartId),
 	  m_pcteinfo(nullptr),
 	  m_pdrgpcrSystemCols(nullptr),
@@ -84,13 +84,13 @@ COptCtxt::~COptCtxt()
 {
 	GPOS_DELETE(m_pcf);
 	GPOS_DELETE(m_pcomp);
-	m_pceeval->Release();
-	m_pcteinfo->Release();
-	m_optimizer_config->Release();
-	CRefCount::SafeRelease(m_pdrgpcrSystemCols);
-	CRefCount::SafeRelease(m_direct_dispatchable_filters);
-	m_scanid_to_part_map->Release();
-	m_part_selector_info->Release();
+	;
+	;
+	;
+	;
+	;
+	;
+	;
 }
 
 
@@ -104,8 +104,8 @@ COptCtxt::~COptCtxt()
 //---------------------------------------------------------------------------
 COptCtxt *
 COptCtxt::PoctxtCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
-					   gpos::owner<IConstExprEvaluator *> pceeval,
-					   gpos::owner<COptimizerConfig *> optimizer_config)
+					   gpos::Ref<IConstExprEvaluator> pceeval,
+					   gpos::Ref<COptimizerConfig> optimizer_config)
 {
 	GPOS_ASSERT(nullptr != optimizer_config);
 
@@ -160,7 +160,7 @@ COptCtxt::FAllEnforcersEnabled()
 void
 COptCtxt::AddPartForScanId(ULONG scanid, ULONG index)
 {
-	gpos::owner<CBitSet *> parts = m_scanid_to_part_map->Find(&scanid);
+	gpos::Ref<CBitSet> parts = m_scanid_to_part_map->Find(&scanid);
 	if (nullptr == parts)
 	{
 		parts = GPOS_NEW(m_mp) CBitSet(m_mp);

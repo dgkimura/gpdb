@@ -57,11 +57,11 @@ CColRefSetTest::EresUnittest_Basics()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// Setup an MD cache with a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -75,8 +75,7 @@ CColRefSetTest::EresUnittest_Basics()
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
-	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
-		mda.PtMDType<IMDTypeInt4>();
+	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	ULONG num_cols = 10;
 	for (ULONG i = 0; i < num_cols; i++)
@@ -90,11 +89,11 @@ CColRefSetTest::EresUnittest_Basics()
 
 	GPOS_ASSERT(pcrs->Size() == num_cols);
 
-	gpos::owner<CColRefSet *> pcrsTwo = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
+	gpos::Ref<CColRefSet> pcrsTwo = GPOS_NEW(mp) CColRefSet(mp, *pcrs);
 	GPOS_ASSERT(pcrsTwo->Size() == num_cols);
 
-	pcrsTwo->Release();
-	pcrs->Release();
+	;
+	;
 
 	return GPOS_OK;
 }

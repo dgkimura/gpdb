@@ -31,13 +31,13 @@ using namespace gpmd;
 CMDRelationCtasGPDB::CMDRelationCtasGPDB(
 	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname_schema,
 	CMDName *mdname, BOOL fTemporary, Erelstoragetype rel_storage_type,
-	Ereldistrpolicy rel_distr_policy, gpos::owner<CMDColumnArray *> mdcol_array,
-	gpos::owner<ULongPtrArray *> distr_col_array,
+	Ereldistrpolicy rel_distr_policy, gpos::Ref<CMDColumnArray> mdcol_array,
+	gpos::Ref<ULongPtrArray> distr_col_array,
 	gpos::Ref<IMdIdArray> distr_opfamiles,
 	gpos::Ref<IMdIdArray> distr_opclasses,
-	gpos::owner<ULongPtr2dArray *> keyset_array,
-	gpos::owner<CDXLCtasStorageOptions *> dxl_ctas_storage_options,
-	gpos::owner<IntPtrArray *> vartypemod_array)
+	gpos::Ref<ULongPtr2dArray> keyset_array,
+	gpos::Ref<CDXLCtasStorageOptions> dxl_ctas_storage_options,
+	gpos::Ref<IntPtrArray> vartypemod_array)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname_schema(mdname_schema),
@@ -69,7 +69,7 @@ CMDRelationCtasGPDB::CMDRelationCtasGPDB(
 	const ULONG arity = m_md_col_array->Size();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		gpos::pointer<IMDColumn *> mdcol = (*m_md_col_array)[ul];
+		IMDColumn *mdcol = (*m_md_col_array)[ul].get();
 		GPOS_ASSERT(!mdcol->IsDropped() &&
 					"Cannot create a table with dropped columns");
 
@@ -105,14 +105,14 @@ CMDRelationCtasGPDB::~CMDRelationCtasGPDB()
 	GPOS_DELETE(m_mdname_schema);
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_md_col_array->Release();
-	m_keyset_array->Release();
-	m_col_width_array->Release();
-	CRefCount::SafeRelease(m_distr_col_array);
-	CRefCount::SafeRelease(m_attrno_nondrop_col_pos_map);
-	CRefCount::SafeRelease(m_nondrop_col_pos_array);
-	m_dxl_ctas_storage_option->Release();
-	m_vartypemod_array->Release();
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -247,12 +247,12 @@ CMDRelationCtasGPDB::DistrColumnCount() const
 //		Returns the column at the specified position
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const IMDColumn *>
+const IMDColumn *
 CMDRelationCtasGPDB::GetMdCol(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_md_col_array->Size());
 
-	return (*m_md_col_array)[pos];
+	return (*m_md_col_array)[pos].get();
 }
 
 //---------------------------------------------------------------------------
@@ -263,7 +263,7 @@ CMDRelationCtasGPDB::GetMdCol(ULONG pos) const
 //		Returns the distribution column at the specified position in the distribution column list
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const IMDColumn *>
+const IMDColumn *
 CMDRelationCtasGPDB::GetDistrColAt(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_distr_col_array->Size());
@@ -318,7 +318,7 @@ CMDRelationCtasGPDB::Serialize(CXMLSerializer *xml_serializer) const
 
 	// serialize vartypmod list
 	CWStringDynamic *var_typemod_list_array =
-		CDXLUtils::Serialize(m_mp, m_vartypemod_array);
+		CDXLUtils::Serialize(m_mp, m_vartypemod_array.get());
 	GPOS_ASSERT(nullptr != var_typemod_list_array);
 
 	xml_serializer->AddAttribute(
@@ -336,7 +336,7 @@ CMDRelationCtasGPDB::Serialize(CXMLSerializer *xml_serializer) const
 
 		// serialize distribution columns
 		CWStringDynamic *distr_col_array =
-			ColumnsToStr(m_mp, m_distr_col_array);
+			ColumnsToStr(m_mp, m_distr_col_array.get());
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenDistrColumns), distr_col_array);
 		GPOS_DELETE(distr_col_array);
@@ -349,7 +349,7 @@ CMDRelationCtasGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	const ULONG columns = m_md_col_array->Size();
 	for (ULONG ul = 0; ul < columns; ul++)
 	{
-		gpos::pointer<CMDColumn *> mdcol = (*m_md_col_array)[ul];
+		CMDColumn *mdcol = (*m_md_col_array)[ul].get();
 		mdcol->Serialize(xml_serializer);
 	}
 
@@ -400,7 +400,7 @@ CMDRelationCtasGPDB::DebugPrint(IOstream &os) const
 	const ULONG total_columns = ColumnCount();
 	for (ULONG ul = 0; ul < total_columns; ul++)
 	{
-		gpos::pointer<const IMDColumn *> mdcol = GetMdCol(ul);
+		const IMDColumn *mdcol = GetMdCol(ul);
 		mdcol->DebugPrint(os);
 	}
 	os << std::endl;
@@ -414,7 +414,7 @@ CMDRelationCtasGPDB::DebugPrint(IOstream &os) const
 			os << ", ";
 		}
 
-		gpos::pointer<const IMDColumn *> mdcol_distr_key = GetDistrColAt(ul);
+		const IMDColumn *mdcol_distr_key = GetDistrColAt(ul);
 		os << (mdcol_distr_key->Mdname()).GetMDName()->GetBuffer();
 	}
 

@@ -45,34 +45,32 @@ CXformImplementConstTableGet::CXformImplementConstTableGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementConstTableGet::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+CXformImplementConstTableGet::Transform(CXformContext *pxfctxt,
+										CXformResult *pxfres,
+										CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CLogicalConstTableGet *> popConstTableGet =
+	CLogicalConstTableGet *popConstTableGet =
 		gpos::dyn_cast<CLogicalConstTableGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
-	gpos::owner<CColumnDescriptorArray *> pdrgpcoldesc =
+	gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc =
 		popConstTableGet->Pdrgpcoldesc();
-	pdrgpcoldesc->AddRef();
+	;
 
-	gpos::owner<IDatum2dArray *> pdrgpdrgpdatum =
+	gpos::Ref<IDatum2dArray> pdrgpdrgpdatum =
 		popConstTableGet->Pdrgpdrgpdatum();
-	pdrgpdrgpdatum->AddRef();
+	;
 
-	gpos::owner<CColRefArray *> pdrgpcrOutput =
-		popConstTableGet->PdrgpcrOutput();
-	pdrgpcrOutput->AddRef();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popConstTableGet->PdrgpcrOutput();
+	;
 
 	// create alternative expression
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalConstTableGet(mp, std::move(pdrgpcoldesc),
 												std::move(pdrgpdrgpdatum),
 												std::move(pdrgpcrOutput)));

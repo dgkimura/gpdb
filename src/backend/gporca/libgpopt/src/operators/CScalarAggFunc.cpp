@@ -38,7 +38,7 @@ CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
 							   const CWStringConst *pstrAggFunc,
 							   BOOL is_distinct, EAggfuncStage eaggfuncstage,
 							   BOOL fSplit, EAggfuncKind aggkind,
-							   gpos::owner<ULongPtrArray *> argtypes)
+							   gpos::Ref<ULongPtrArray> argtypes)
 	: CScalar(mp),
 	  m_pmdidAggFunc(pmdidAggFunc),
 	  m_pmdidResolvedRetType(resolved_rettype),
@@ -58,9 +58,9 @@ CScalarAggFunc::CScalarAggFunc(CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
 	GPOS_ASSERT(EaggfuncstageSentinel > eaggfuncstage);
 
 	// store id of type obtained by looking up MD cache
-	gpos::owner<IMDId *> mdid = PmdidLookupReturnType(
+	gpos::Ref<IMDId> mdid = PmdidLookupReturnType(
 		m_pmdidAggFunc, (EaggfuncstageGlobal == m_eaggfuncstage));
-	mdid->AddRef();
+	;
 	m_return_type_mdid = std::move(mdid);
 }
 
@@ -128,7 +128,7 @@ CScalarAggFunc::FCountAny() const
 
 // Is function either min() or max()?
 BOOL
-CScalarAggFunc::IsMinMax(gpos::pointer<const IMDType *> mdtype) const
+CScalarAggFunc::IsMinMax(const IMDType *mdtype) const
 {
 	return m_pmdidAggFunc->Equals(
 			   mdtype->GetMdidForAggType(IMDType::EaggMin)) ||
@@ -164,12 +164,11 @@ CScalarAggFunc::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarAggFunc::Matches(gpos::pointer<COperator *> pop) const
+CScalarAggFunc::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarAggFunc *> popScAggFunc =
-			gpos::dyn_cast<CScalarAggFunc>(pop);
+		CScalarAggFunc *popScAggFunc = gpos::dyn_cast<CScalarAggFunc>(pop);
 
 		// match if func ids are identical
 		return ((popScAggFunc->IsDistinct() == m_is_distinct) &&
@@ -204,8 +203,7 @@ CScalarAggFunc::PmdidLookupReturnType(gpos::Ref<IMDId> pmdidAggFunc,
 	GPOS_ASSERT(nullptr != md_accessor);
 
 	// get aggregate function return type from the MD cache
-	gpos::pointer<const IMDAggregate *> pmdagg =
-		md_accessor->RetrieveAgg(pmdidAggFunc.get());
+	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(pmdidAggFunc.get());
 	if (fGlobal)
 	{
 		return pmdagg->GetResultTypeMdid();

@@ -34,17 +34,17 @@ class CDXLPhysicalDynamicIndexScan : public CDXLPhysical
 {
 private:
 	// table descriptor for the scanned table
-	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 	// index descriptor associated with the scanned table
-	gpos::owner<CDXLIndexDescr *> m_dxl_index_descr;
+	gpos::Ref<CDXLIndexDescr> m_dxl_index_descr;
 
 	// scan direction of the index
 	EdxlIndexScanDirection m_index_scan_dir;
 
 	gpos::Ref<IMdIdArray> m_part_mdids;
 
-	gpos::owner<ULongPtrArray *> m_selector_ids = nullptr;
+	gpos::Ref<ULongPtrArray> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalDynamicIndexScan(CDXLPhysicalDynamicIndexScan &) = delete;
@@ -60,11 +60,11 @@ public:
 
 	//ctor
 	CDXLPhysicalDynamicIndexScan(CMemoryPool *mp,
-								 gpos::owner<CDXLTableDescr *> table_descr,
-								 gpos::owner<CDXLIndexDescr *> dxl_index_descr,
+								 gpos::Ref<CDXLTableDescr> table_descr,
+								 gpos::Ref<CDXLIndexDescr> dxl_index_descr,
 								 EdxlIndexScanDirection idx_scan_direction,
 								 gpos::Ref<IMdIdArray> part_mdids,
-								 gpos::owner<ULongPtrArray *> selector_ids);
+								 gpos::Ref<ULongPtrArray> selector_ids);
 
 	//dtor
 	~CDXLPhysicalDynamicIndexScan() override;
@@ -76,28 +76,28 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// index descriptor
-	gpos::pointer<const CDXLIndexDescr *> GetDXLIndexDescr() const;
+	const CDXLIndexDescr *GetDXLIndexDescr() const;
 
 	//table descriptor
-	gpos::pointer<const CDXLTableDescr *> GetDXLTableDescr() const;
+	const CDXLTableDescr *GetDXLTableDescr() const;
 
 	// scan direction
 	EdxlIndexScanDirection GetIndexScanDir() const;
 
 	IMdIdArray *GetParts() const;
 
-	gpos::pointer<const ULongPtrArray *>
+	const ULongPtrArray *
 	GetSelectorIds() const
 	{
-		return m_selector_ids;
+		return m_selector_ids.get();
 	}
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalDynamicIndexScan *>
+	static CDXLPhysicalDynamicIndexScan *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -109,8 +109,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

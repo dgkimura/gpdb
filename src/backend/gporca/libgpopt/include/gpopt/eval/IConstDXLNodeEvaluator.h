@@ -41,8 +41,8 @@ public:
 
 	// evaluate the given DXL node representing an expression and return the result
 	// as DXL. caller takes ownership of returned DXL node
-	virtual gpos::owner<gpdxl::CDXLNode *> EvaluateExpr(
-		gpos::pointer<const gpdxl::CDXLNode *> pdxlnExpr) = 0;
+	virtual gpos::Ref<gpdxl::CDXLNode> EvaluateExpr(
+		const gpdxl::CDXLNode *pdxlnExpr) = 0;
 
 	// returns true iff the evaluator can evaluate constant expressions without
 	// subqueries

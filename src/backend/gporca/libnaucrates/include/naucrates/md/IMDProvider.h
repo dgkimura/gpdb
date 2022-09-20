@@ -40,9 +40,8 @@ class IMDProvider : public CRefCount
 {
 protected:
 	// return the mdid for the requested type
-	static gpos::owner<IMDId *> GetGPDBTypeMdid(CMemoryPool *mp,
-												CSystemId sysid,
-												IMDType::ETypeInfo type_info);
+	static gpos::Ref<IMDId> GetGPDBTypeMdid(CMemoryPool *mp, CSystemId sysid,
+											IMDType::ETypeInfo type_info);
 
 public:
 	~IMDProvider() override = default;
@@ -50,20 +49,20 @@ public:
 	// returns the DXL string of the requested metadata object
 	virtual CWStringBase *GetMDObjDXLStr(CMemoryPool *mp,
 										 CMDAccessor *md_accessor,
-										 gpos::pointer<IMDId *> mdid) const = 0;
+										 IMDId *mdid) const = 0;
 
 	// return the requested metadata object
-	virtual gpos::owner<IMDCacheObject *> GetMDObj(
-		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::pointer<IMDId *> mdid) const = 0;
+	virtual gpos::Ref<IMDCacheObject> GetMDObj(CMemoryPool *mp,
+											   CMDAccessor *md_accessor,
+											   IMDId *mdid) const = 0;
 
 	// return the mdid for the specified system id and type
-	virtual gpos::owner<IMDId *> MDId(CMemoryPool *mp, CSystemId sysid,
-									  IMDType::ETypeInfo type_info) const = 0;
+	virtual gpos::Ref<IMDId> MDId(CMemoryPool *mp, CSystemId sysid,
+								  IMDType::ETypeInfo type_info) const = 0;
 };
 
 // arrays of MD providers
-using CMDProviderArray = CDynamicPtrArray<IMDProvider, CleanupRelease>;
+using CMDProviderArray = gpos::Vector<gpos::Ref<IMDProvider>>;
 
 }  // namespace gpmd
 

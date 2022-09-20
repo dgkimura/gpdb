@@ -63,10 +63,10 @@ CLogicalLeftAntiSemiJoin::MaxCard(CMemoryPool *,  // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalLeftAntiSemiJoin::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfAntiSemiJoinAntiSemiJoinSwap);
 	(void) xform_set->ExchangeSet(CXform::ExfAntiSemiJoinAntiSemiJoinNotInSwap);
@@ -87,7 +87,7 @@ CLogicalLeftAntiSemiJoin::PxfsCandidates(CMemoryPool *mp) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CLogicalLeftAntiSemiJoin::DeriveOutputColumns(CMemoryPool *,  // mp
 											  CExpressionHandle &exprhdl)
 {
@@ -105,7 +105,7 @@ CLogicalLeftAntiSemiJoin::DeriveOutputColumns(CMemoryPool *,  // mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-gpos::owner<CKeyCollection *>
+gpos::Ref<CKeyCollection>
 CLogicalLeftAntiSemiJoin::DeriveKeyCollection(CMemoryPool *,  // mp
 											  CExpressionHandle &exprhdl) const
 {
@@ -120,25 +120,25 @@ CLogicalLeftAntiSemiJoin::DeriveKeyCollection(CMemoryPool *,  // mp
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
-CLogicalLeftAntiSemiJoin::PstatsDerive(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<IStatisticsArray *>  // not used
+gpos::Ref<IStatistics>
+CLogicalLeftAntiSemiJoin::PstatsDerive(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl,
+									   IStatisticsArray *  // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	gpos::pointer<IStatistics *> outer_stats = exprhdl.Pstats(0);
-	gpos::pointer<IStatistics *> inner_side_stats = exprhdl.Pstats(1);
-	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
+	IStatistics *outer_stats = exprhdl.Pstats(0);
+	IStatistics *inner_side_stats = exprhdl.Pstats(1);
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExprHandle(mp, exprhdl,
 														true /*LASJ*/);
-	gpos::owner<IStatistics *> pstatsLASJoin =
-		outer_stats->CalcLASJoinStats(mp, inner_side_stats, join_preds_stats,
-									  true /* DoIgnoreLASJHistComputation */
-		);
+	gpos::Ref<IStatistics> pstatsLASJoin = outer_stats->CalcLASJoinStats(
+		mp, inner_side_stats, join_preds_stats.get(),
+		true /* DoIgnoreLASJHistComputation */
+	);
 
 	// clean up
-	join_preds_stats->Release();
+	;
 
 	return pstatsLASJoin;
 }

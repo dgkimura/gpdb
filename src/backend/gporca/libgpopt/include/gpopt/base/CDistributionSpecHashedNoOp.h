@@ -14,11 +14,11 @@ namespace gpopt
 class CDistributionSpecHashedNoOp : public CDistributionSpecHashed
 {
 public:
-	CDistributionSpecHashedNoOp(gpos::owner<CExpressionArray *> pdrgpexr);
+	CDistributionSpecHashedNoOp(gpos::Ref<CExpressionArray> pdrgpexr);
 
 	EDistributionType Edt() const override;
 
-	BOOL Matches(gpos::pointer<const CDistributionSpec *> pds) const override;
+	BOOL Matches(const CDistributionSpec *pds) const override;
 
 	const CHAR *
 	SzId() const override
@@ -27,9 +27,8 @@ public:
 	}
 
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 gpos::pointer<CReqdPropPlan *> prpp,
-						 gpos::pointer<CExpressionArray *> pdrgpexpr,
-						 gpos::pointer<CExpression *> pexpr) override;
+						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 CExpression *pexpr) override;
 };
 }  // namespace gpopt
 

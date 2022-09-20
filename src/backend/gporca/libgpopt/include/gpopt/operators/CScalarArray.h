@@ -23,7 +23,7 @@ namespace gpopt
 using namespace gpos;
 using namespace gpmd;
 
-using CScalarConstArray = CDynamicPtrArray<CScalarConst, CleanupRelease>;
+using CScalarConstArray = gpos::Vector<gpos::Ref<CScalarConst>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -46,7 +46,7 @@ private:
 	BOOL m_fMultiDimensional;
 
 	// const values
-	gpos::owner<CScalarConstArray *> m_pdrgPconst;
+	gpos::Ref<CScalarConstArray> m_pdrgPconst;
 
 public:
 	CScalarArray(const CScalarArray &) = delete;
@@ -58,7 +58,7 @@ public:
 	// ctor
 	CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
 				 gpos::Ref<IMDId> array_type_mdid, BOOL is_multidimenstional,
-				 gpos::owner<CScalarConstArray *> pdrgPconst);
+				 gpos::Ref<CScalarConstArray> pdrgPconst);
 
 	// dtor
 	~CScalarArray() override;
@@ -82,7 +82,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -92,18 +92,17 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarArray *>
+	static CScalarArray *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -125,7 +124,7 @@ public:
 	IMDId *MdidType() const override;
 
 	// CScalarConst array
-	gpos::pointer<CScalarConstArray *> PdrgPconst() const;
+	CScalarConstArray *PdrgPconst() const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

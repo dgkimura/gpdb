@@ -32,8 +32,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalExternalScan::CPhysicalExternalScan(
 	CMemoryPool *mp, const CName *pnameAlias,
-	gpos::owner<CTableDescriptor *> ptabdesc,
-	gpos::owner<CColRefArray *> pdrgpcrOutput)
+	gpos::Ref<CTableDescriptor> ptabdesc, gpos::Ref<CColRefArray> pdrgpcrOutput)
 	: CPhysicalTableScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput)
 {
 	// if this table is master only, then keep the original distribution spec.
@@ -45,7 +44,7 @@ CPhysicalExternalScan::CPhysicalExternalScan(
 	// otherwise, override the distribution spec for external table
 	if (m_pds)
 	{
-		m_pds->Release();
+		;
 	}
 
 	m_pds = GPOS_NEW(mp) CDistributionSpecRandom();
@@ -60,14 +59,14 @@ CPhysicalExternalScan::CPhysicalExternalScan(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalExternalScan::Matches(gpos::pointer<COperator *> pop) const
+CPhysicalExternalScan::Matches(COperator *pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CPhysicalExternalScan *> popExternalScan =
+	CPhysicalExternalScan *popExternalScan =
 		gpos::dyn_cast<CPhysicalExternalScan>(pop);
 	return m_ptabdesc == popExternalScan->Ptabdesc() &&
 		   m_pdrgpcrOutput->Equals(popExternalScan->PdrgpcrOutput());
@@ -82,11 +81,10 @@ CPhysicalExternalScan::Matches(gpos::pointer<COperator *> pop) const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalExternalScan::EpetRewindability(
-	CExpressionHandle &exprhdl,
-	gpos::pointer<const CEnfdRewindability *> per) const
+CPhysicalExternalScan::EpetRewindability(CExpressionHandle &exprhdl,
+										 const CEnfdRewindability *per) const
 {
-	gpos::pointer<CRewindabilitySpec *> prs =
+	CRewindabilitySpec *prs =
 		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{

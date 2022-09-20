@@ -39,8 +39,8 @@ public:
 	CColRefComputed(const CColRefComputed &) = delete;
 
 	// ctor
-	CColRefComputed(gpos::pointer<const IMDType *> pmdtype, INT type_modifier,
-					ULONG id, const CName *pname);
+	CColRefComputed(const IMDType *pmdtype, INT type_modifier, ULONG id,
+					const CName *pname);
 
 	// dtor
 	~CColRefComputed() override;

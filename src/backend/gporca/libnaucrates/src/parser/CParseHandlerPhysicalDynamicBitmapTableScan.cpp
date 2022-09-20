@@ -33,9 +33,11 @@ CParseHandlerPhysicalDynamicBitmapTableScan::StartElement(
 	StartElementHelper(element_local_name,
 					   EdxltokenPhysicalDynamicBitmapTableScan);
 
-	m_selector_ids = CDXLOperatorFactory::ExtractConvertValuesToArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenSelectorIds,
-		EdxltokenPhysicalDynamicTableScan);
+	m_selector_ids =
+		CDXLOperatorFactory::ExtractConvertValuesToArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenSelectorIds, EdxltokenPhysicalDynamicTableScan)
+			.get();
 }
 
 //---------------------------------------------------------------------------

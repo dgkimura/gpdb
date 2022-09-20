@@ -30,22 +30,19 @@ class CPhysicalStreamAggDeduplicate : public CPhysicalStreamAgg
 {
 private:
 	// array of keys from the join's child
-	gpos::owner<CColRefArray *> m_pdrgpcrKeys;
+	gpos::Ref<CColRefArray> m_pdrgpcrKeys;
 
 public:
 	CPhysicalStreamAggDeduplicate(const CPhysicalStreamAggDeduplicate &) =
 		delete;
 
 	// ctor
-	CPhysicalStreamAggDeduplicate(CMemoryPool *mp,
-								  gpos::owner<CColRefArray *> colref_array,
-								  gpos::pointer<CColRefArray *> pdrgpcrMinimal,
-								  COperator::EGbAggType egbaggtype,
-								  gpos::owner<CColRefArray *> pdrgpcrKeys,
-								  BOOL fGeneratesDuplicates, BOOL fMultiStage,
-								  BOOL isAggFromSplitDQA,
-								  CLogicalGbAgg::EAggStage aggStage,
-								  BOOL should_enforce_distribution);
+	CPhysicalStreamAggDeduplicate(
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+		CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+		gpos::Ref<CColRefArray> pdrgpcrKeys, BOOL fGeneratesDuplicates,
+		BOOL fMultiStage, BOOL isAggFromSplitDQA,
+		CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution);
 
 	// dtor
 	~CPhysicalStreamAggDeduplicate() override;
@@ -65,10 +62,10 @@ public:
 	}
 
 	// array of keys from the join's child
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrKeys() const
 	{
-		return m_pdrgpcrKeys;
+		return m_pdrgpcrKeys.get();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -76,39 +73,38 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
-				 gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
-				 ULONG							   //ulOptReq
+				 CColRefSet *pcrsRequired, ULONG child_index,
+				 CDrvdPropArray *,	//pdrgpdpCtxt,
+				 ULONG				//ulOptReq
 				 ) override
 	{
 		return PcrsRequiredAgg(mp, exprhdl, pcrsRequired, child_index,
-							   m_pdrgpcrKeys);
+							   m_pdrgpcrKeys.get());
 	}
 
 	// compute required sort columns of the n-th child
-	gpos::owner<COrderSpec *>
+	gpos::Ref<COrderSpec>
 	PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
-				gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
-				ULONG							  //ulOptReq
+				COrderSpec *posRequired, ULONG child_index,
+				CDrvdPropArray *,  //pdrgpdpCtxt,
+				ULONG			   //ulOptReq
 	) const override
 	{
 		return PosRequiredStreamAgg(mp, exprhdl, posRequired, child_index,
-									m_pdrgpcrKeys);
+									m_pdrgpcrKeys.get());
 	}
 
 	// compute required distribution of the n-th child
-	gpos::owner<CDistributionSpec *>
+	gpos::Ref<CDistributionSpec>
 	PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				gpos::pointer<CDistributionSpec *> pdsRequired,
-				ULONG child_index,
-				gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
+				CDistributionSpec *pdsRequired, ULONG child_index,
+				CDrvdPropArray *,  //pdrgpdpCtxt,
 				ULONG ulOptReq) const override
 	{
 		return PdsRequiredAgg(mp, exprhdl, pdsRequired, child_index, ulOptReq,
-							  m_pdrgpcrKeys, m_pdrgpcrKeys);
+							  m_pdrgpcrKeys.get(), m_pdrgpcrKeys.get());
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -119,7 +115,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static gpos::cast_func<CPhysicalStreamAggDeduplicate *>
+	static CPhysicalStreamAggDeduplicate *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

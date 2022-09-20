@@ -89,8 +89,7 @@ CJobTransformation::~CJobTransformation() = default;
 //
 //---------------------------------------------------------------------------
 void
-CJobTransformation::Init(gpos::pointer<CGroupExpression *> pgexpr,
-						 gpos::pointer<CXform *> pxform)
+CJobTransformation::Init(CGroupExpression *pgexpr, CXform *pxform)
 {
 	GPOS_ASSERT(!FInit());
 	GPOS_ASSERT(nullptr != pgexpr);
@@ -130,18 +129,19 @@ CJobTransformation::EevtTransform(CSchedulerContext *psc, CJob *pjOwner)
 	CMemoryPool *pmpGlobal = psc->GetGlobalMemoryPool();
 	CMemoryPool *pmpLocal = psc->PmpLocal();
 	CGroupExpression *pgexpr = pjt->m_pgexpr;
-	gpos::pointer<CXform *> pxform = pjt->m_xform;
+	CXform *pxform = pjt->m_xform;
 
 	// insert transformation results to memo
-	gpos::owner<CXformResult *> pxfres =
+	gpos::Ref<CXformResult> pxfres =
 		GPOS_NEW(pmpGlobal) CXformResult(pmpGlobal);
 	ULONG ulElapsedTime = 0;
 	ULONG ulNumberOfBindings = 0;
-	pgexpr->Transform(pmpGlobal, pmpLocal, pxform, pxfres, &ulElapsedTime,
+	pgexpr->Transform(pmpGlobal, pmpLocal, pxform, pxfres.get(), &ulElapsedTime,
 					  &ulNumberOfBindings);
-	psc->Peng()->InsertXformResult(pgexpr->Pgroup(), pxfres, pxform->Exfid(),
-								   pgexpr, ulElapsedTime, ulNumberOfBindings);
-	pxfres->Release();
+	psc->Peng()->InsertXformResult(pgexpr->Pgroup(), pxfres.get(),
+								   pxform->Exfid(), pgexpr, ulElapsedTime,
+								   ulNumberOfBindings);
+	;
 
 	return eevCompleted;
 }
@@ -174,8 +174,8 @@ CJobTransformation::FExecute(CSchedulerContext *psc)
 //---------------------------------------------------------------------------
 void
 CJobTransformation::ScheduleJob(CSchedulerContext *psc,
-								gpos::pointer<CGroupExpression *> pgexpr,
-								gpos::pointer<CXform *> pxform, CJob *pjParent)
+								CGroupExpression *pgexpr, CXform *pxform,
+								CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtTransformation);
 

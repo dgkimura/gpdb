@@ -33,10 +33,9 @@ using namespace gpopt;
 //		ctor
 //
 //---------------------------------------------------------------------------
-CPhysicalTableScan::CPhysicalTableScan(
-	CMemoryPool *mp, const CName *pnameAlias,
-	gpos::owner<CTableDescriptor *> ptabdesc,
-	gpos::owner<CColRefArray *> pdrgpcrOutput)
+CPhysicalTableScan::CPhysicalTableScan(CMemoryPool *mp, const CName *pnameAlias,
+									   gpos::Ref<CTableDescriptor> ptabdesc,
+									   gpos::Ref<CColRefArray> pdrgpcrOutput)
 	: CPhysicalScan(mp, pnameAlias, std::move(ptabdesc),
 					std::move(pdrgpcrOutput))
 {
@@ -55,8 +54,8 @@ CPhysicalTableScan::HashValue() const
 {
 	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(),
 									   m_ptabdesc->MDId()->HashValue());
-	ulHash =
-		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrOutput));
+	ulHash = gpos::CombineHashes(ulHash,
+								 CUtils::UlHashColArray(m_pdrgpcrOutput.get()));
 
 	return ulHash;
 }
@@ -71,15 +70,14 @@ CPhysicalTableScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalTableScan::Matches(gpos::pointer<COperator *> pop) const
+CPhysicalTableScan::Matches(COperator *pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CPhysicalTableScan *> popTableScan =
-		gpos::dyn_cast<CPhysicalTableScan>(pop);
+	CPhysicalTableScan *popTableScan = gpos::dyn_cast<CPhysicalTableScan>(pop);
 	return m_ptabdesc->MDId()->Equals(popTableScan->Ptabdesc()->MDId()) &&
 		   m_pdrgpcrOutput->Equals(popTableScan->PdrgpcrOutput());
 }

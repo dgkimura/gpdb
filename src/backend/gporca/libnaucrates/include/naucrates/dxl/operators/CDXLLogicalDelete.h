@@ -34,7 +34,7 @@ class CDXLLogicalDelete : public CDXLLogical
 {
 private:
 	// target table descriptor
-	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 	// ctid column id
 	ULONG m_ctid_colid;
@@ -43,16 +43,15 @@ private:
 	ULONG m_segid_colid;
 
 	// list of deletion column ids
-	gpos::owner<ULongPtrArray *> m_deletion_colid_array;
+	gpos::Ref<ULongPtrArray> m_deletion_colid_array;
 
 public:
 	CDXLLogicalDelete(const CDXLLogicalDelete &) = delete;
 
 	// ctor
-	CDXLLogicalDelete(CMemoryPool *mp,
-					  gpos::owner<CDXLTableDescr *> table_descr,
+	CDXLLogicalDelete(CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
 					  ULONG ctid_colid, ULONG segid_colid,
-					  gpos::owner<ULongPtrArray *> delete_colid_array);
+					  gpos::Ref<ULongPtrArray> delete_colid_array);
 
 	// dtor
 	~CDXLLogicalDelete() override;
@@ -64,10 +63,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// target table descriptor
-	gpos::pointer<CDXLTableDescr *>
+	CDXLTableDescr *
 	GetDXLTableDescr() const
 	{
-		return m_dxl_table_descr;
+		return m_dxl_table_descr.get();
 	}
 
 	// ctid column
@@ -85,25 +84,25 @@ public:
 	}
 
 	// deletion column ids
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetDeletionColIdArray() const
 	{
-		return m_deletion_colid_array;
+		return m_deletion_colid_array.get();
 	}
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> node,
+	void AssertValid(const CDXLNode *node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLLogicalDelete *>
+	static CDXLLogicalDelete *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

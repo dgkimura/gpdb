@@ -38,17 +38,17 @@ class CDXLPhysicalDynamicBitmapTableScan : public CDXLPhysicalAbstractBitmapScan
 private:
 	gpos::Ref<IMdIdArray> m_part_mdids;
 
-	gpos::owner<ULongPtrArray *> m_selector_ids = nullptr;
+	gpos::Ref<ULongPtrArray> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalDynamicBitmapTableScan(
 		const CDXLPhysicalDynamicBitmapTableScan &) = delete;
 
 	// ctor
-	CDXLPhysicalDynamicBitmapTableScan(
-		CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr,
-		gpos::Ref<IMdIdArray> part_mdids,
-		gpos::owner<ULongPtrArray *> selector_ids)
+	CDXLPhysicalDynamicBitmapTableScan(CMemoryPool *mp,
+									   gpos::Ref<CDXLTableDescr> table_descr,
+									   gpos::Ref<IMdIdArray> part_mdids,
+									   gpos::Ref<ULongPtrArray> selector_ids)
 		: CDXLPhysicalAbstractBitmapScan(mp, std::move(table_descr)),
 		  m_part_mdids(part_mdids),
 		  m_selector_ids(std::move(selector_ids))
@@ -71,18 +71,18 @@ public:
 
 	IMdIdArray *GetParts() const;
 
-	gpos::pointer<const ULongPtrArray *>
+	const ULongPtrArray *
 	GetSelectorIds() const
 	{
-		return m_selector_ids;
+		return m_selector_ids.get();
 	}
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalDynamicBitmapTableScan *>
+	static CDXLPhysicalDynamicBitmapTableScan *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

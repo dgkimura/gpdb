@@ -32,8 +32,7 @@ namespace gpnaucrates
 class CJoinCardinalityTest
 {
 	// shorthand for functions for generating the join predicates
-	typedef gpos::owner<CStatsPredJoinArray *>(FnPdrgpstatjoin)(
-		CMemoryPool *mp);
+	typedef gpos::Ref<CStatsPredJoinArray>(FnPdrgpstatjoin)(CMemoryPool *mp);
 
 private:
 	// test case for join evaluation
@@ -92,15 +91,15 @@ private:
 	};	// SHistogramTestCase
 
 	// helper method to generate a single join predicate
-	static gpos::owner<CStatsPredJoinArray *>
-	PdrgpstatspredjoinSingleJoinPredicate(CMemoryPool *mp);
+	static gpos::Ref<CStatsPredJoinArray> PdrgpstatspredjoinSingleJoinPredicate(
+		CMemoryPool *mp);
 
 	// helper method to generate generate multiple join predicates
-	static gpos::owner<CStatsPredJoinArray *>
-	PdrgpstatspredjoinMultiplePredicates(CMemoryPool *mp);
+	static gpos::Ref<CStatsPredJoinArray> PdrgpstatspredjoinMultiplePredicates(
+		CMemoryPool *mp);
 
 	// helper method to generate join predicate over columns that contain null values
-	static gpos::owner<CStatsPredJoinArray *> PdrgpstatspredjoinNullableCols(
+	static gpos::Ref<CStatsPredJoinArray> PdrgpstatspredjoinNullableCols(
 		CMemoryPool *mp);
 
 public:

@@ -39,7 +39,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CScalarBitmapIndexProbe::CScalarBitmapIndexProbe(
-	CMemoryPool *mp, gpos::owner<CIndexDescriptor *> pindexdesc,
+	CMemoryPool *mp, gpos::Ref<CIndexDescriptor> pindexdesc,
 	gpos::Ref<IMDId> pmdidBitmapType)
 	: CScalar(mp),
 	  m_pindexdesc(std::move(pindexdesc)),
@@ -60,7 +60,7 @@ CScalarBitmapIndexProbe::CScalarBitmapIndexProbe(
 //---------------------------------------------------------------------------
 CScalarBitmapIndexProbe::~CScalarBitmapIndexProbe()
 {
-	m_pindexdesc->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -88,13 +88,13 @@ CScalarBitmapIndexProbe::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBitmapIndexProbe::Matches(gpos::pointer<COperator *> pop) const
+CScalarBitmapIndexProbe::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	gpos::pointer<CScalarBitmapIndexProbe *> popIndexProbe =
+	CScalarBitmapIndexProbe *popIndexProbe =
 		gpos::dyn_cast<CScalarBitmapIndexProbe>(pop);
 
 	return m_pindexdesc->MDId()->Equals(popIndexProbe->Pindexdesc()->MDId());

@@ -112,7 +112,7 @@ CParseHandlerDefaultValueExpr::EndElement(const XMLCh *const,  // element_uri,
 		CParseHandlerScalarOp *child_parse_handler =
 			dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);
 		m_dxl_node = child_parse_handler->CreateDXLNode();
-		m_dxl_node->AddRef();
+		;
 	}
 
 	// deactivate handler

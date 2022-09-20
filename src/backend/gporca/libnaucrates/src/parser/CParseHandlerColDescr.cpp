@@ -51,7 +51,7 @@ CParseHandlerColDescr::CParseHandlerColDescr(
 
 CParseHandlerColDescr::~CParseHandlerColDescr()
 {
-	CRefCount::SafeRelease(m_dxl_column_descr_array);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -62,10 +62,10 @@ CParseHandlerColDescr::~CParseHandlerColDescr()
 //		Returns the array of column descriptors.
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLColDescrArray *>
+CDXLColDescrArray *
 CParseHandlerColDescr::GetDXLColumnDescrArray()
 {
-	return m_dxl_column_descr_array;
+	return m_dxl_column_descr_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -93,8 +93,10 @@ CParseHandlerColDescr::StartElement(const XMLCh *const,	 // element_uri,
 									  CDXLTokens::XmlstrToken(EdxltokenColumn)))
 	{
 		// start of a new column descriptor
-		m_current_column_descr = CDXLOperatorFactory::MakeColumnDescr(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+		m_current_column_descr =
+			CDXLOperatorFactory::MakeColumnDescr(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs)
+				.get();
 	}
 	else
 	{

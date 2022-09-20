@@ -51,13 +51,13 @@ public:
 	}
 
 	// create derived properties container
-	gpos::owner<CDrvdProp *> PdpCreate(CMemoryPool *mp) const override;
+	gpos::Ref<CDrvdProp> PdpCreate(CMemoryPool *mp) const override;
 
 	// create required properties container
-	gpos::owner<CReqdProp *> PrpCreate(CMemoryPool *mp) const override;
+	gpos::Ref<CReqdProp> PrpCreate(CMemoryPool *mp) const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *>) const override;
+	BOOL Matches(COperator *) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
@@ -66,12 +66,12 @@ public:
 	virtual BOOL FLeaf() const = 0;
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function
-	static gpos::cast_func<CPattern *>
+	static CPattern *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -82,7 +82,7 @@ public:
 
 	// helper to check multi-node pattern
 	static BOOL
-	FMultiNode(gpos::pointer<COperator *> pop)
+	FMultiNode(COperator *pop)
 	{
 		return COperator::EopPatternMultiLeaf == pop->Eopid() ||
 			   COperator::EopPatternMultiTree == pop->Eopid();

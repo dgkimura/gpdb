@@ -25,7 +25,7 @@ using namespace gpmd;
 // Ctor
 CStatsPredArrayCmp::CStatsPredArrayCmp(ULONG colid,
 									   CStatsPred::EStatsCmpType stats_cmp_type,
-									   gpos::owner<CPointArray *> points)
+									   gpos::Ref<CPointArray> points)
 	: CStatsPred(colid),
 	  m_stats_cmp_type(stats_cmp_type),
 	  m_points(std::move(points))

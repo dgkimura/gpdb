@@ -91,7 +91,7 @@ CMDTypeInt8GPDB::CMDTypeInt8GPDB(CMemoryPool *mp) : m_mp(mp)
 //---------------------------------------------------------------------------
 CMDTypeInt8GPDB::~CMDTypeInt8GPDB()
 {
-	m_datum_null->Release();
+	;
 
 	GPOS_DELETE(m_dxl_str);
 }
@@ -104,7 +104,7 @@ CMDTypeInt8GPDB::~CMDTypeInt8GPDB()
 //		Factory function for creating Int8 datums
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatumInt8 *>
+gpos::Ref<IDatumInt8>
 CMDTypeInt8GPDB::CreateInt8Datum(CMemoryPool *mp, LINT value,
 								 BOOL is_null) const
 {
@@ -234,11 +234,11 @@ CMDTypeInt8GPDB::Serialize(CXMLSerializer *xml_serializer) const
 //		Transformation method for generating Int8 datum from CDXLScalarConstValue
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CMDTypeInt8GPDB::GetDatumForDXLConstVal(
-	gpos::pointer<const CDXLScalarConstValue *> dxl_op) const
+	const CDXLScalarConstValue *dxl_op) const
 {
-	gpos::pointer<CDXLDatumInt8 *> dxl_datum = gpos::dyn_cast<CDXLDatumInt8>(
+	CDXLDatumInt8 *dxl_datum = gpos::dyn_cast<CDXLDatumInt8>(
 		const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
 
 	return GPOS_NEW(m_mp) CDatumInt8GPDB(m_mdid->Sysid(), dxl_datum->Value(),
@@ -253,11 +253,11 @@ CMDTypeInt8GPDB::GetDatumForDXLConstVal(
 //		Construct an int8 datum from a DXL datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
-CMDTypeInt8GPDB::GetDatumForDXLDatum(
-	CMemoryPool *mp, gpos::pointer<const CDXLDatum *> dxl_datum) const
+gpos::Ref<IDatum>
+CMDTypeInt8GPDB::GetDatumForDXLDatum(CMemoryPool *mp,
+									 const CDXLDatum *dxl_datum) const
 {
-	gpos::pointer<CDXLDatumInt8 *> int8_dxl_datum =
+	CDXLDatumInt8 *int8_dxl_datum =
 		gpos::dyn_cast<CDXLDatumInt8>(const_cast<CDXLDatum *>(dxl_datum));
 
 	LINT val = int8_dxl_datum->Value();
@@ -274,14 +274,12 @@ CMDTypeInt8GPDB::GetDatumForDXLDatum(
 // 		Generate dxl datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLDatum *>
-CMDTypeInt8GPDB::GetDatumVal(CMemoryPool *mp,
-							 gpos::pointer<IDatum *> datum) const
+gpos::Ref<CDXLDatum>
+CMDTypeInt8GPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 {
-	gpos::pointer<CDatumInt8GPDB *> int8_datum =
-		dynamic_cast<CDatumInt8GPDB *>(datum);
+	CDatumInt8GPDB *int8_datum = dynamic_cast<CDatumInt8GPDB *>(datum);
 
-	m_mdid->AddRef();
+	;
 	return GPOS_NEW(mp) CDXLDatumInt8(mp, m_mdid.get(), int8_datum->IsNull(),
 									  int8_datum->Value());
 }
@@ -294,15 +292,13 @@ CMDTypeInt8GPDB::GetDatumVal(CMemoryPool *mp,
 // 		Generate a dxl scalar constant from a datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLScalarConstValue *>
-CMDTypeInt8GPDB::GetDXLOpScConst(CMemoryPool *mp,
-								 gpos::pointer<IDatum *> datum) const
+gpos::Ref<CDXLScalarConstValue>
+CMDTypeInt8GPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
 {
-	gpos::pointer<CDatumInt8GPDB *> int8gpdb_datum =
-		dynamic_cast<CDatumInt8GPDB *>(datum);
+	CDatumInt8GPDB *int8gpdb_datum = dynamic_cast<CDatumInt8GPDB *>(datum);
 
-	m_mdid->AddRef();
-	gpos::owner<CDXLDatumInt8 *> dxl_datum = GPOS_NEW(mp) CDXLDatumInt8(
+	;
+	gpos::Ref<CDXLDatumInt8> dxl_datum = GPOS_NEW(mp) CDXLDatumInt8(
 		mp, m_mdid.get(), int8gpdb_datum->IsNull(), int8gpdb_datum->Value());
 
 	return GPOS_NEW(mp) CDXLScalarConstValue(mp, std::move(dxl_datum));
@@ -316,10 +312,10 @@ CMDTypeInt8GPDB::GetDXLOpScConst(CMemoryPool *mp,
 // 		Generate dxl null datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLDatum *>
+gpos::Ref<CDXLDatum>
 CMDTypeInt8GPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
-	m_mdid->AddRef();
+	;
 
 	return GPOS_NEW(mp) CDXLDatumInt8(mp, m_mdid.get(), true /*is_null*/, 1);
 }

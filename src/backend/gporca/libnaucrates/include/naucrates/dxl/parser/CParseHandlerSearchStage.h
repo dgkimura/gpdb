@@ -35,7 +35,7 @@ class CParseHandlerSearchStage : public CParseHandlerBase
 {
 private:
 	// set of search stage xforms
-	gpos::owner<CXformSet *> m_xforms;
+	gpos::Ref<CXformSet> m_xforms;
 
 	// cost threshold
 	CCost m_cost_threshold;
@@ -71,10 +71,10 @@ public:
 	~CParseHandlerSearchStage() override;
 
 	// returns stage xforms
-	gpos::pointer<CXformSet *>
+	CXformSet *
 	GetXformSet() const
 	{
-		return m_xforms;
+		return m_xforms.get();
 	}
 
 	// returns stage cost threshold

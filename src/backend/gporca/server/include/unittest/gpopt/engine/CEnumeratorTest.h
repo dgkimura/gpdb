@@ -71,28 +71,28 @@ private:
 	static ULONG m_ulSamplingTestNoOneStageAgg;
 
 	// check if a given expression has no Motion nodes
-	static BOOL FHasNoMotions(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasNoMotions(CExpression *pexpr);
 
 	// check if a given expression has no MotionBroadcast nodes
-	static BOOL FHasNoMotionBroadcast(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasNoMotionBroadcast(CExpression *pexpr);
 
 	// check if a given expression has no motion redistribute nodes
-	static BOOL FHasNoMotionRedistribute(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasNoMotionRedistribute(CExpression *pexpr);
 
 	// check if a given expression has no Motion Gather nodes
-	static BOOL FHasNoMotionGather(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasNoMotionGather(CExpression *pexpr);
 
 	// check if a given expression has no Sort nodes
-	static BOOL FHasNoSort(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasNoSort(CExpression *pexpr);
 
 	// check if a given expression has no Spool nodes
-	static BOOL FHasNoSpool(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasNoSpool(CExpression *pexpr);
 
 	// check if a given expression has no Part Propagation nodes
-	static BOOL FHasNoPartPropagation(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasNoPartPropagation(CExpression *pexpr);
 
 	// check if a given expression has no one stage agg nodes
-	static BOOL FHasNoOneStageAgg(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasNoOneStageAgg(CExpression *pexpr);
 
 	// test plan checking
 	static GPOS_RESULT EresUnittest_CheckPlans(EOptTraceFlag eopttrace,

@@ -30,7 +30,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CMDRequest::CMDRequest(CMemoryPool *mp, gpos::Ref<IMdIdArray> mdid_array,
-					   gpos::owner<SMDTypeRequestArray *> mdtype_request_array)
+					   gpos::Ref<SMDTypeRequestArray> mdtype_request_array)
 	: m_mp(mp),
 	  m_mdid_array(mdid_array),
 	  m_mdtype_request_array(std::move(mdtype_request_array))
@@ -70,7 +70,7 @@ CMDRequest::CMDRequest(CMemoryPool *mp, SMDTypeRequest *md_type_request)
 //---------------------------------------------------------------------------
 CMDRequest::~CMDRequest()
 {
-	m_mdtype_request_array->Release();
+	;
 }
 
 //---------------------------------------------------------------------------

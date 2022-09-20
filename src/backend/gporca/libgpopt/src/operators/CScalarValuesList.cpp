@@ -38,7 +38,7 @@ CScalarValuesList::CScalarValuesList(CMemoryPool *mp) : CScalar(mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarValuesList::Matches(gpos::pointer<COperator *> pop) const
+CScalarValuesList::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

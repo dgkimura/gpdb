@@ -110,7 +110,7 @@ private:
 	List *m_partitioned_tables_list;
 
 	// number of partition selectors for each dynamic scan
-	gpos::owner<ULongPtrArray *> m_num_partition_selectors_array;
+	gpos::Ref<ULongPtrArray> m_num_partition_selectors_array;
 
 	// list of all subplan entries
 	List *m_subplan_entries_list;
@@ -125,7 +125,7 @@ private:
 	ULONG m_result_relation_index;
 
 	// hash map of the cte identifiers and the cte consumers with the same cte identifier
-	gpos::owner<HMUlCTEConsumerInfo *> m_cte_consumer_info;
+	gpos::Ref<HMUlCTEConsumerInfo> m_cte_consumer_info;
 
 	// into clause
 	IntoClause *m_into_clause;
@@ -136,7 +136,7 @@ private:
 	// FXIME: this uses NEW/DELETE, should we use palloc/pfree/memory pool?
 	std::vector<List *> m_static_prune_results;
 
-	gpos::owner<UlongToUlongMap *> m_part_selector_to_param_map;
+	gpos::Ref<UlongToUlongMap> m_part_selector_to_param_map;
 
 
 public:

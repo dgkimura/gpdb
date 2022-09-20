@@ -40,22 +40,20 @@ class CXformLeftSemiApplyWithExternalCorrs2InnerJoin
 private:
 	// helper for splitting correlations into external and residual
 	static BOOL FSplitCorrelations(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprOuter,
-		gpos::pointer<CExpression *> pexprInner,
-		gpos::pointer<CExpressionArray *> pdrgpexprAllCorr,
-		gpos::owner<CExpressionArray *> *ppdrgpexprExternal,
-		gpos::owner<CExpressionArray *> *ppdrgpexprResidual,
-		gpos::owner<CColRefSet *> *ppcrsInnerUsed);
+		CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
+		CExpressionArray *pdrgpexprAllCorr,
+		gpos::Ref<CExpressionArray> *ppdrgpexprExternal,
+		gpos::Ref<CExpressionArray> *ppdrgpexprResidual,
+		gpos::Ref<CColRefSet> *ppcrsInnerUsed);
 
 	// helper for collecting correlations
-	static BOOL FDecorrelate(CMemoryPool *mp,
-							 gpos::pointer<CExpression *> pexpr,
-							 gpos::owner<CExpression *> *ppexprInnerNew,
-							 gpos::owner<CExpressionArray *> *ppdrgpexprCorr);
+	static BOOL FDecorrelate(CMemoryPool *mp, CExpression *pexpr,
+							 gpos::Ref<CExpression> *ppexprInnerNew,
+							 gpos::Ref<CExpressionArray> *ppdrgpexprCorr);
 
 	// decorrelate semi apply with external correlations
-	static gpos::owner<CExpression *> PexprDecorrelate(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr);
+	static gpos::Ref<CExpression> PexprDecorrelate(CMemoryPool *mp,
+												   CExpression *pexpr);
 
 public:
 	CXformLeftSemiApplyWithExternalCorrs2InnerJoin(
@@ -70,7 +68,7 @@ public:
 
 	// ctor with a passed pattern
 	CXformLeftSemiApplyWithExternalCorrs2InnerJoin(
-		CMemoryPool *mp, gpos::owner<CExpression *> pexprPattern)
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprPattern)
 		: CXformApply2Join<CLogicalLeftSemiApply, CLogicalInnerJoin>(
 			  mp, std::move(pexprPattern))
 	{
@@ -96,9 +94,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(gpos::pointer<CXformContext *> pxfctxt,
-				   gpos::pointer<CXformResult *> pxfres,
-				   gpos::pointer<CExpression *> pexpr) const override;
+	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+				   CExpression *pexpr) const override;
 
 };	// class CXformLeftSemiApplyWithExternalCorrs2InnerJoin
 

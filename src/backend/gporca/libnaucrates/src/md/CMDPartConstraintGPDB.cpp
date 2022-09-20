@@ -30,8 +30,8 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CMDPartConstraintGPDB::CMDPartConstraintGPDB(
-	CMemoryPool *mp, gpos::owner<ULongPtrArray *> level_with_default_part_array,
-	BOOL is_unbounded, gpos::owner<CDXLNode *> dxlnode)
+	CMemoryPool *mp, gpos::Ref<ULongPtrArray> level_with_default_part_array,
+	BOOL is_unbounded, gpos::Ref<CDXLNode> dxlnode)
 	: m_mp(mp),
 	  m_level_with_default_part_array(std::move(level_with_default_part_array)),
 	  m_is_unbounded(is_unbounded),
@@ -50,8 +50,8 @@ CMDPartConstraintGPDB::CMDPartConstraintGPDB(
 //---------------------------------------------------------------------------
 CMDPartConstraintGPDB::~CMDPartConstraintGPDB()
 {
-	CRefCount::SafeRelease(m_dxl_node);
-	m_level_with_default_part_array->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -62,16 +62,16 @@ CMDPartConstraintGPDB::~CMDPartConstraintGPDB()
 //		Scalar expression of the check constraint
 //
 //---------------------------------------------------------------------------
-gpos::owner<CExpression *>
-CMDPartConstraintGPDB::GetPartConstraintExpr(
-	CMemoryPool *mp, CMDAccessor *md_accessor,
-	gpos::pointer<CColRefArray *> colref_array) const
+gpos::Ref<CExpression>
+CMDPartConstraintGPDB::GetPartConstraintExpr(CMemoryPool *mp,
+											 CMDAccessor *md_accessor,
+											 CColRefArray *colref_array) const
 {
 	GPOS_ASSERT(nullptr != colref_array);
 
 	// translate the DXL representation of the part constraint expression
 	CTranslatorDXLToExpr dxltr(mp, md_accessor);
-	return dxltr.PexprTranslateScalar(m_dxl_node, colref_array);
+	return dxltr.PexprTranslateScalar(m_dxl_node.get(), colref_array);
 }
 
 //---------------------------------------------------------------------------
@@ -82,10 +82,10 @@ CMDPartConstraintGPDB::GetPartConstraintExpr(
 //		Included default partitions
 //
 //---------------------------------------------------------------------------
-gpos::pointer<ULongPtrArray *>
+ULongPtrArray *
 CMDPartConstraintGPDB::GetDefaultPartsArray() const
 {
-	return m_level_with_default_part_array;
+	return m_level_with_default_part_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -119,7 +119,7 @@ CMDPartConstraintGPDB::Serialize(CXMLSerializer *xml_serializer) const
 
 	// serialize default parts
 	CWStringDynamic *default_part_array =
-		CDXLUtils::Serialize(m_mp, m_level_with_default_part_array);
+		CDXLUtils::Serialize(m_mp, m_level_with_default_part_array.get());
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenDefaultPartition),
 		default_part_array);

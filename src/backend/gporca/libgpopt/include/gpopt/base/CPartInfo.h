@@ -61,14 +61,14 @@ private:
 		gpos::Ref<IMDId> m_mdid;
 
 		// partition keys
-		gpos::owner<CPartKeysArray *> m_pdrgppartkeys;
+		gpos::Ref<CPartKeysArray> m_pdrgppartkeys;
 
 	public:
 		CPartInfoEntry(const CPartInfoEntry &) = delete;
 
 		// ctor
 		CPartInfoEntry(ULONG scan_id, gpos::Ref<IMDId> mdid,
-					   gpos::owner<CPartKeysArray *> pdrgppartkeys);
+					   gpos::Ref<CPartKeysArray> pdrgppartkeys);
 
 		// dtor
 		~CPartInfoEntry() override;
@@ -82,8 +82,8 @@ private:
 
 		// create a copy of the current object, and add a set of remapped
 		// part keys to this entry, using the existing keys and the given hashmap
-		gpos::owner<CPartInfoEntry *> PpartinfoentryAddRemappedKeys(
-			CMemoryPool *mp, gpos::pointer<CColRefSet *> pcrs,
+		gpos::Ref<CPartInfoEntry> PpartinfoentryAddRemappedKeys(
+			CMemoryPool *mp, CColRefSet *pcrs,
 			UlongToColRefMap *colref_mapping);
 
 		// mdid of partition table
@@ -94,28 +94,27 @@ private:
 		}
 
 		// partition keys of partition table
-		virtual gpos::pointer<CPartKeysArray *>
+		virtual CPartKeysArray *
 		Pdrgppartkeys() const
 		{
-			return m_pdrgppartkeys;
+			return m_pdrgppartkeys.get();
 		}
 
 		// print function
 		IOstream &OsPrint(IOstream &os) const;
 
 		// copy part info entry into given memory pool
-		gpos::owner<CPartInfoEntry *> PpartinfoentryCopy(CMemoryPool *mp) const;
+		gpos::Ref<CPartInfoEntry> PpartinfoentryCopy(CMemoryPool *mp) const;
 
 	};	// CPartInfoEntry
 
-	using CPartInfoEntryArray =
-		CDynamicPtrArray<CPartInfoEntry, CleanupRelease>;
+	using CPartInfoEntryArray = gpos::Vector<gpos::Ref<CPartInfoEntry>>;
 
 	// partition table consumers
-	gpos::owner<CPartInfoEntryArray *> m_pdrgppartentries;
+	gpos::Ref<CPartInfoEntryArray> m_pdrgppartentries;
 
 	// private ctor
-	explicit CPartInfo(gpos::owner<CPartInfoEntryArray *> pdrgppartentries);
+	explicit CPartInfo(gpos::Ref<CPartInfoEntryArray> pdrgppartentries);
 
 public:
 	CPartInfo(const CPartInfo &) = delete;
@@ -134,9 +133,8 @@ public:
 	}
 
 	// add part table consumer
-	void AddPartConsumer(CMemoryPool *mp, ULONG scan_id,
-						 gpos::owner<IMDId *> mdid,
-						 gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart);
+	void AddPartConsumer(CMemoryPool *mp, ULONG scan_id, gpos::Ref<IMDId> mdid,
+						 gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart);
 
 	// scan id of the entry at the given position
 	ULONG ScanId(ULONG ulPos) const;
@@ -154,17 +152,17 @@ public:
 	CPartKeysArray *PdrgppartkeysByScanId(ULONG scan_id) const;
 
 	// return a new part info object with an additional set of remapped keys
-	gpos::owner<CPartInfo *> PpartinfoWithRemappedKeys(
-		CMemoryPool *mp, gpos::pointer<CColRefArray *> pdrgpcrSrc,
-		gpos::pointer<CColRefArray *> pdrgpcrDest) const;
+	gpos::Ref<CPartInfo> PpartinfoWithRemappedKeys(
+		CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
+		CColRefArray *pdrgpcrDest) const;
 
 	// print
 	IOstream &OsPrint(IOstream &) const;
 
 	// combine two part info objects
-	static gpos::owner<CPartInfo *> PpartinfoCombine(
-		CMemoryPool *mp, gpos::pointer<CPartInfo *> ppartinfoFst,
-		gpos::pointer<CPartInfo *> ppartinfoSnd);
+	static gpos::Ref<CPartInfo> PpartinfoCombine(CMemoryPool *mp,
+												 CPartInfo *ppartinfoFst,
+												 CPartInfo *ppartinfoSnd);
 
 };	// CPartInfo
 

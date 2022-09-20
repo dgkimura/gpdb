@@ -32,7 +32,7 @@ class CDXLLogicalGroupBy : public CDXLLogical
 {
 private:
 	// grouping column ids
-	gpos::owner<ULongPtrArray *> m_grouping_colid_array;
+	gpos::Ref<ULongPtrArray> m_grouping_colid_array;
 
 	// serialize output grouping columns indices in DXL
 	void SerializeGrpColsToDXL(CXMLSerializer *) const;
@@ -43,7 +43,7 @@ public:
 	// ctors
 	explicit CDXLLogicalGroupBy(CMemoryPool *mp);
 	CDXLLogicalGroupBy(CMemoryPool *mp,
-					   gpos::owner<ULongPtrArray *> pdrgpulGrpColIds);
+					   gpos::Ref<ULongPtrArray> pdrgpulGrpColIds);
 
 	// dtor
 	~CDXLLogicalGroupBy() override;
@@ -51,17 +51,17 @@ public:
 	// accessors
 	Edxlopid GetDXLOperator() const override;
 	const CWStringConst *GetOpNameStr() const override;
-	gpos::pointer<const ULongPtrArray *> GetGroupingColidArray() const;
+	const ULongPtrArray *GetGroupingColidArray() const;
 
 	// set grouping column indices
-	void SetGroupingColumns(gpos::owner<ULongPtrArray *>);
+	void SetGroupingColumns(gpos::Ref<ULongPtrArray>);
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLLogicalGroupBy *>
+	static CDXLLogicalGroupBy *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -73,8 +73,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

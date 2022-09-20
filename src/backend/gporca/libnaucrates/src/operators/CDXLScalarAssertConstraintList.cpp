@@ -70,9 +70,8 @@ CDXLScalarAssertConstraintList::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAssertConstraintList::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarAssertConstraintList::SerializeToDXL(CXMLSerializer *xml_serializer,
+											   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -94,15 +93,15 @@ CDXLScalarAssertConstraintList::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAssertConstraintList::AssertValid(
-	gpos::pointer<const CDXLNode *> dxlnode, BOOL validate_children) const
+CDXLScalarAssertConstraintList::AssertValid(const CDXLNode *dxlnode,
+											BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	GPOS_ASSERT(0 < arity);
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[ul];
+		CDXLNode *child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxlopScalarAssertConstraint ==
 					child_dxlnode->GetOperator()->GetDXLOperator());
 

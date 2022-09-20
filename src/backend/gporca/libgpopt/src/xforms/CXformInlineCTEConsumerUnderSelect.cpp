@@ -68,22 +68,21 @@ CXformInlineCTEConsumerUnderSelect::Exfp(CExpressionHandle &  //exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformInlineCTEConsumerUnderSelect::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+CXformInlineCTEConsumerUnderSelect::Transform(CXformContext *pxfctxt,
+											  CXformResult *pxfres,
+											  CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CExpression *> pexprConsumer = (*pexpr)[0];
+	CExpression *pexprConsumer = (*pexpr)[0];
 	CExpression *pexprScalar = (*pexpr)[1];
 
-	gpos::pointer<CLogicalCTEConsumer *> popConsumer =
+	CLogicalCTEConsumer *popConsumer =
 		gpos::dyn_cast<CLogicalCTEConsumer>(pexprConsumer->Pop());
 	ULONG id = popConsumer->UlCTEId();
-	gpos::pointer<CCTEInfo *> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	// only continue if inlining is enabled or if this CTE has only 1 consumer
 	if (!pcteinfo->FEnableInlining() && 1 < pcteinfo->UlConsumers(id))
 	{
@@ -103,17 +102,16 @@ CXformInlineCTEConsumerUnderSelect::Transform(
 
 	// inline consumer
 	GPOS_ASSERT(nullptr != popConsumer->Phmulcr());
-	gpos::owner<CExpression *> pexprInlinedConsumer =
-		popConsumer->PexprInlined();
-	pexprInlinedConsumer->AddRef();
-	pexprScalar->AddRef();
+	gpos::Ref<CExpression> pexprInlinedConsumer = popConsumer->PexprInlined();
+	;
+	;
 
-	gpos::owner<CExpression *> pexprSelect = CUtils::PexprLogicalSelect(
+	gpos::Ref<CExpression> pexprSelect = CUtils::PexprLogicalSelect(
 		mp, std::move(pexprInlinedConsumer), pexprScalar);
 
-	gpos::owner<CExpression *> pexprNormalized =
-		CNormalizer::PexprNormalize(mp, pexprSelect);
-	pexprSelect->Release();
+	gpos::Ref<CExpression> pexprNormalized =
+		CNormalizer::PexprNormalize(mp, pexprSelect.get());
+	;
 
 	// add alternative to xform result
 	pxfres->Add(std::move(pexprNormalized));

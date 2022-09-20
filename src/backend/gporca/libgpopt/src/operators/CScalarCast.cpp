@@ -45,7 +45,7 @@ CScalarCast::CScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> return_type_mdid,
 	if (nullptr != m_func_mdid && m_func_mdid->IsValid())
 	{
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		gpos::pointer<const IMDFunction *> pmdfunc =
+		const IMDFunction *pmdfunc =
 			md_accessor->RetrieveFunc(m_func_mdid.get());
 
 		m_returns_null_on_null_input = pmdfunc->IsStrict();
@@ -64,11 +64,11 @@ CScalarCast::CScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> return_type_mdid,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCast::Matches(gpos::pointer<COperator *> pop) const
+CScalarCast::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarCast *> pscop = gpos::dyn_cast<CScalarCast>(pop);
+		CScalarCast *pscop = gpos::dyn_cast<CScalarCast>(pop);
 
 		// match if the return type oids are identical
 		return pscop->MdidType()->Equals(m_return_type_mdid.get()) &&

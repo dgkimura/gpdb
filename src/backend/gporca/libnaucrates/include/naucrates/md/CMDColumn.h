@@ -62,7 +62,7 @@ private:
 	ULONG m_length;
 
 	// default value expression
-	gpos::owner<gpdxl::CDXLNode *> m_dxl_default_val;
+	gpos::Ref<gpdxl::CDXLNode> m_dxl_default_val;
 
 public:
 	CMDColumn(const CMDColumn &) = delete;
@@ -70,7 +70,7 @@ public:
 	// ctor
 	CMDColumn(CMDName *mdname, INT attrnum, gpos::Ref<IMDId> mdid_type,
 			  INT type_modifier, BOOL is_nullable, BOOL is_dropped,
-			  gpos::owner<gpdxl::CDXLNode *> dxl_dafault_value,
+			  gpos::Ref<gpdxl::CDXLNode> dxl_dafault_value,
 			  ULONG length = gpos::ulong_max);
 
 	// dtor
@@ -117,7 +117,7 @@ public:
 };
 
 // array of metadata column descriptor
-using CMDColumnArray = CDynamicPtrArray<CMDColumn, CleanupRelease>;
+using CMDColumnArray = gpos::Vector<gpos::Ref<CMDColumn>>;
 
 }  // namespace gpmd
 

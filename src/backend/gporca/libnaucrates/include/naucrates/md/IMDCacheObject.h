@@ -55,7 +55,7 @@ public:
 	//		<strTokenListItem .../>...
 	// </strTokenList>
 	static void SerializeMDIdList(CXMLSerializer *xml_serializer,
-								  gpos::pointer<const IMdIdArray *> mdid_array,
+								  const IMdIdArray *mdid_array,
 								  const CWStringConst *strTokenList,
 								  const CWStringConst *strTokenListItem);
 
@@ -96,14 +96,14 @@ public:
 	// element with the given name
 	virtual void SerializeMDIdAsElem(gpdxl::CXMLSerializer *xml_serializer,
 									 const CWStringConst *element_name,
-									 gpos::pointer<const IMDId *> mdid) const;
+									 const IMDId *mdid) const;
 
 #ifdef GPOS_DEBUG
 	virtual void DebugPrint(IOstream &os) const = 0;
 #endif
 };
 
-using IMDCacheObjectArray = CDynamicPtrArray<IMDCacheObject, CleanupRelease>;
+using IMDCacheObjectArray = gpos::Vector<gpos::Ref<IMDCacheObject>>;
 
 }  // namespace gpmd
 

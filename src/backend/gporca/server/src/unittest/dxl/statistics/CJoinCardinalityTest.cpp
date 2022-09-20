@@ -45,8 +45,8 @@ CJoinCardinalityTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -76,7 +76,7 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 		 500}  // distinct values spread in both buckets and NDVRemain
 	};
 
-	gpos::owner<UlongToHistogramMap *> col_histogram_mapping =
+	gpos::Ref<UlongToHistogramMap> col_histogram_mapping =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	const ULONG ulHist = GPOS_ARRAY_SIZE(rghisttc);
@@ -177,7 +177,7 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 		GPOS_DELETE(join_histogram);
 	}
 	// clean up
-	col_histogram_mapping->Release();
+	;
 
 	return eres;
 }
@@ -213,10 +213,10 @@ CJoinCardinalityTest::EresUnittest_Join()
 	};
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
-	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
+	const IMDTypeInt4 *pmdtypeint4 =
 		COptCtxt::PoctxtFromTLS()->Pmda()->PtMDType<IMDTypeInt4>();
 
-	gpos::owner<ULongPtrArray *> cols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::Ref<ULongPtrArray> cols = GPOS_NEW(mp) ULongPtrArray(mp);
 	cols->Append(GPOS_NEW(mp) ULONG(0));
 	cols->Append(GPOS_NEW(mp) ULONG(1));
 	cols->Append(GPOS_NEW(mp) ULONG(2));
@@ -240,8 +240,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 										  false /*IsNullable*/, id, CName(&str),
 										  false /*IsDistCol*/, false);
 		}
-	}
-	cols->Release();
+	};
 
 	const ULONG ulTestCases = GPOS_ARRAY_SIZE(rgstatsjointc);
 	for (ULONG ul = 0; ul < ulTestCases; ul++)
@@ -256,49 +255,47 @@ CJoinCardinalityTest::EresUnittest_Join()
 		GPOS_CHECK_ABORT;
 
 		// parse the input statistics objects
-		gpos::owner<CDXLStatsDerivedRelationArray *>
-			dxl_derived_rel_stats_array =
-				CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput,
-														  nullptr);
-		gpos::owner<CStatisticsArray *> pdrgpstatBefore =
+		gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
+			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, nullptr);
+		gpos::Ref<CStatisticsArray> pdrgpstatBefore =
 			CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
-				mp, md_accessor, dxl_derived_rel_stats_array);
-		dxl_derived_rel_stats_array->Release();
+				mp, md_accessor, dxl_derived_rel_stats_array.get());
+		;
 
 		GPOS_ASSERT(nullptr != pdrgpstatBefore);
 		GPOS_ASSERT(2 == pdrgpstatBefore->Size());
-		gpos::pointer<CStatistics *> pstats1 = (*pdrgpstatBefore)[0];
-		gpos::pointer<CStatistics *> pstats2 = (*pdrgpstatBefore)[1];
+		CStatistics *pstats1 = (*pdrgpstatBefore)[0].get();
+		CStatistics *pstats2 = (*pdrgpstatBefore)[1].get();
 
 		GPOS_CHECK_ABORT;
 
 		// generate the join conditions
 		FnPdrgpstatjoin *pf = elem.m_pf;
 		GPOS_ASSERT(nullptr != pf);
-		gpos::owner<CStatsPredJoinArray *> join_preds_stats = pf(mp);
+		gpos::Ref<CStatsPredJoinArray> join_preds_stats = pf(mp);
 
 		// calculate the output stats
-		gpos::owner<IStatistics *> pstatsOutput = nullptr;
+		gpos::Ref<IStatistics> pstatsOutput = nullptr;
 		if (left_outer_join)
 		{
 			pstatsOutput =
-				pstats1->CalcLOJoinStats(mp, pstats2, join_preds_stats);
+				pstats1->CalcLOJoinStats(mp, pstats2, join_preds_stats.get());
 		}
 		else
 		{
-			pstatsOutput =
-				pstats1->CalcInnerJoinStats(mp, pstats2, join_preds_stats);
+			pstatsOutput = pstats1->CalcInnerJoinStats(mp, pstats2,
+													   join_preds_stats.get());
 		}
 		GPOS_ASSERT(nullptr != pstatsOutput);
 
-		gpos::owner<CStatisticsArray *> pdrgpstatOutput =
+		gpos::Ref<CStatisticsArray> pdrgpstatOutput =
 			GPOS_NEW(mp) CStatisticsArray(mp);
 		pdrgpstatOutput->Append(gpos::dyn_cast<CStatistics>(pstatsOutput));
 
 		// serialize and compare against expected stats
 		CWStringDynamic *pstrOutput = CDXLUtils::SerializeStatistics(
-			mp, md_accessor, pdrgpstatOutput, true /*serialize_header_footer*/,
-			true /*indentation*/
+			mp, md_accessor, pdrgpstatOutput.get(),
+			true /*serialize_header_footer*/, true /*indentation*/
 		);
 		CWStringDynamic dstrExpected(mp);
 		dstrExpected.AppendFormat(GPOS_WSZ_LIT("%s"), szDXLOutput);
@@ -321,9 +318,9 @@ CJoinCardinalityTest::EresUnittest_Join()
 		}
 
 		// clean up
-		pdrgpstatBefore->Release();
-		pdrgpstatOutput->Release();
-		join_preds_stats->Release();
+		;
+		;
+		;
 
 		GPOS_DELETE_ARRAY(szDXLInput);
 		GPOS_DELETE_ARRAY(szDXLOutput);
@@ -339,10 +336,10 @@ CJoinCardinalityTest::EresUnittest_Join()
 }
 
 //	helper method to generate a single join predicate
-gpos::owner<CStatsPredJoinArray *>
+gpos::Ref<CStatsPredJoinArray>
 CJoinCardinalityTest::PdrgpstatspredjoinSingleJoinPredicate(CMemoryPool *mp)
 {
-	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		GPOS_NEW(mp) CStatsPredJoinArray(mp);
 	join_preds_stats->Append(
 		GPOS_NEW(mp) CStatsPredJoin(0, CStatsPred::EstatscmptEq, 8));
@@ -351,10 +348,10 @@ CJoinCardinalityTest::PdrgpstatspredjoinSingleJoinPredicate(CMemoryPool *mp)
 }
 
 //	helper method to generate generate multiple join predicates
-gpos::owner<CStatsPredJoinArray *>
+gpos::Ref<CStatsPredJoinArray>
 CJoinCardinalityTest::PdrgpstatspredjoinMultiplePredicates(CMemoryPool *mp)
 {
-	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		GPOS_NEW(mp) CStatsPredJoinArray(mp);
 	join_preds_stats->Append(
 		GPOS_NEW(mp) CStatsPredJoin(16, CStatsPred::EstatscmptEq, 32));
@@ -369,10 +366,10 @@ CJoinCardinalityTest::PdrgpstatspredjoinMultiplePredicates(CMemoryPool *mp)
 }
 
 // helper method to generate join predicate over columns that contain null values
-gpos::owner<CStatsPredJoinArray *>
+gpos::Ref<CStatsPredJoinArray>
 CJoinCardinalityTest::PdrgpstatspredjoinNullableCols(CMemoryPool *mp)
 {
-	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
+	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		GPOS_NEW(mp) CStatsPredJoinArray(mp);
 	join_preds_stats->Append(
 		GPOS_NEW(mp) CStatsPredJoin(1, CStatsPred::EstatscmptEq, 2));

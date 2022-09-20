@@ -46,11 +46,11 @@ CDrvdPropPlan::CDrvdPropPlan() = default;
 //---------------------------------------------------------------------------
 CDrvdPropPlan::~CDrvdPropPlan()
 {
-	CRefCount::SafeRelease(m_pos);
-	CRefCount::SafeRelease(m_pds);
-	CRefCount::SafeRelease(m_prs);
-	CRefCount::SafeRelease(m_ppps);
-	CRefCount::SafeRelease(m_pcm);
+	;
+	;
+	;
+	;
+	;
 }
 
 
@@ -62,7 +62,7 @@ CDrvdPropPlan::~CDrvdPropPlan()
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-gpos::cast_func<CDrvdPropPlan *>
+CDrvdPropPlan *
 CDrvdPropPlan::Pdpplan(CDrvdProp *pdp)
 {
 	GPOS_ASSERT(nullptr != pdp);
@@ -83,10 +83,9 @@ CDrvdPropPlan::Pdpplan(CDrvdProp *pdp)
 //---------------------------------------------------------------------------
 void
 CDrvdPropPlan::Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					  gpos::pointer<CDrvdPropCtxt *> pdpctxt)
+					  CDrvdPropCtxt *pdpctxt)
 {
-	gpos::pointer<CPhysical *> popPhysical =
-		gpos::dyn_cast<CPhysical>(exprhdl.Pop());
+	CPhysical *popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 	if (nullptr != pdpctxt &&
 		COperator::EopPhysicalCTEConsumer == popPhysical->Eopid())
 	{
@@ -117,19 +116,15 @@ CDrvdPropPlan::Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 void
-CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp,
-										gpos::pointer<CDrvdPropCtxt *> pdpctxt,
-										gpos::pointer<COperator *> pop)
+CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
+										COperator *pop)
 {
-	gpos::pointer<CDrvdPropCtxtPlan *> pdpctxtplan =
-		gpos::dyn_cast<CDrvdPropCtxtPlan>(pdpctxt);
-	gpos::pointer<CPhysicalCTEConsumer *> popCTEConsumer =
+	CDrvdPropCtxtPlan *pdpctxtplan = gpos::dyn_cast<CDrvdPropCtxtPlan>(pdpctxt);
+	CPhysicalCTEConsumer *popCTEConsumer =
 		gpos::dyn_cast<CPhysicalCTEConsumer>(pop);
 	ULONG ulCTEId = popCTEConsumer->UlCTEId();
-	gpos::pointer<UlongToColRefMap *> colref_mapping =
-		popCTEConsumer->Phmulcr();
-	gpos::pointer<CDrvdPropPlan *> pdpplan =
-		pdpctxtplan->PdpplanCTEProducer(ulCTEId);
+	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
+	CDrvdPropPlan *pdpplan = pdpctxtplan->PdpplanCTEProducer(ulCTEId);
 	if (nullptr != pdpplan)
 	{
 		// copy producer plan properties after remapping columns
@@ -139,7 +134,7 @@ CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp,
 														   true /*must_exist*/);
 		// rewindability and partition filter map do not need column remapping,
 		// we add-ref producer's properties directly
-		pdpplan->Prs()->AddRef();
+		;
 		m_prs = pdpplan->Prs();
 
 		// no need to copy the part index map. return an empty one. This is to
@@ -161,7 +156,7 @@ CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDrvdPropPlan::FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const
+CDrvdPropPlan::FSatisfies(const CReqdPropPlan *prpp) const
 {
 	GPOS_ASSERT(nullptr != prpp);
 	GPOS_ASSERT(nullptr != prpp->Peo());
@@ -204,7 +199,7 @@ CDrvdPropPlan::HashValue() const
 //
 //---------------------------------------------------------------------------
 ULONG
-CDrvdPropPlan::Equals(gpos::pointer<const CDrvdPropPlan *> pdpplan) const
+CDrvdPropPlan::Equals(const CDrvdPropPlan *pdpplan) const
 {
 	return m_pos->Matches(pdpplan->Pos()) && m_pds->Equals(pdpplan->Pds()) &&
 		   m_prs->Matches(pdpplan->Prs()) && m_ppps->Equals(pdpplan->Ppps()) &&

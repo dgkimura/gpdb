@@ -57,8 +57,8 @@ static CHAR szExprPlusOpPrefix[] = "+--";
 //		Ctor for leaf nodes
 //
 //---------------------------------------------------------------------------
-CExpression::CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-						 gpos::pointer<CGroupExpression *> pgexpr)
+CExpression::CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+						 CGroupExpression *pgexpr)
 	: m_mp(mp),
 	  m_pop(pop),
 	  m_pdrgpexpr(nullptr),
@@ -93,8 +93,8 @@ CExpression::CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
 //		Ctor, unary
 //
 //---------------------------------------------------------------------------
-CExpression::CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-						 gpos::owner<CExpression *> pexpr)
+CExpression::CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+						 gpos::Ref<CExpression> pexpr)
 	: m_mp(mp),
 	  m_pop(std::move(pop)),
 	  m_pdrgpexpr(nullptr),
@@ -129,9 +129,9 @@ CExpression::CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
 //		Ctor, binary
 //
 //---------------------------------------------------------------------------
-CExpression::CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-						 gpos::owner<CExpression *> pexprChildFirst,
-						 gpos::owner<CExpression *> pexprChildSecond)
+CExpression::CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+						 gpos::Ref<CExpression> pexprChildFirst,
+						 gpos::Ref<CExpression> pexprChildSecond)
 	: m_mp(mp),
 	  m_pop(std::move(pop)),
 	  m_pdrgpexpr(nullptr),
@@ -169,10 +169,10 @@ CExpression::CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
 //		Ctor, ternary
 //
 //---------------------------------------------------------------------------
-CExpression::CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-						 gpos::owner<CExpression *> pexprChildFirst,
-						 gpos::owner<CExpression *> pexprChildSecond,
-						 gpos::owner<CExpression *> pexprChildThird)
+CExpression::CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+						 gpos::Ref<CExpression> pexprChildFirst,
+						 gpos::Ref<CExpression> pexprChildSecond,
+						 gpos::Ref<CExpression> pexprChildThird)
 	: m_mp(mp),
 	  m_pop(std::move(pop)),
 	  m_pdrgpexpr(nullptr),
@@ -212,8 +212,8 @@ CExpression::CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
 //		Ctor, generic n-ary
 //
 //---------------------------------------------------------------------------
-CExpression::CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-						 gpos::owner<CExpressionArray *> pdrgpexpr)
+CExpression::CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+						 gpos::Ref<CExpressionArray> pdrgpexpr)
 	: m_mp(mp),
 	  m_pop(std::move(pop)),
 	  m_pdrgpexpr(std::move(pdrgpexpr)),
@@ -244,10 +244,10 @@ CExpression::CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
 //		Ctor, generic n-ary with origin group expression
 //
 //---------------------------------------------------------------------------
-CExpression::CExpression(CMemoryPool *mp, gpos::owner<COperator *> pop,
-						 gpos::pointer<CGroupExpression *> pgexpr,
-						 gpos::owner<CExpressionArray *> pdrgpexpr,
-						 gpos::owner<CReqdPropPlan *> prpp,
+CExpression::CExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
+						 CGroupExpression *pgexpr,
+						 gpos::Ref<CExpressionArray> pdrgpexpr,
+						 gpos::Ref<CReqdPropPlan> prpp,
 						 IStatistics *input_stats, CCost cost)
 	: m_mp(mp),
 	  m_pop(std::move(pop)),
@@ -288,14 +288,14 @@ CExpression::~CExpression()
 	{
 		CAutoSuspendAbort asa;
 
-		CRefCount::SafeRelease(m_pdprel);
-		CRefCount::SafeRelease(m_pstats);
-		CRefCount::SafeRelease(m_prpp);
-		CRefCount::SafeRelease(m_pdpplan);
-		CRefCount::SafeRelease(m_pdpscalar);
-		CRefCount::SafeRelease(m_pdrgpexpr);
+		;
+		;
+		;
+		;
+		;
+		;
 
-		m_pop->Release();
+		;
 	}
 }
 
@@ -317,15 +317,15 @@ CExpression::CopyGroupPropsAndStats(IStatistics *input_stats)
 	GPOS_ASSERT(nullptr != pdp);
 
 	// copy properties
-	pdp->AddRef();
+	;
 	if (m_pgexpr->Pgroup()->FScalar())
 	{
-		m_pdpscalar->Release();
+		;
 		m_pdpscalar = gpos::dyn_cast<CDrvdPropScalar>(pdp);
 	}
 	else
 	{
-		m_pdprel->Release();
+		;
 		m_pdprel = gpos::dyn_cast<CDrvdPropRelational>(pdp);
 	}
 
@@ -343,7 +343,7 @@ CExpression::CopyGroupPropsAndStats(IStatistics *input_stats)
 
 	if (nullptr != stats)
 	{
-		stats->AddRef();
+		;
 		m_pstats = stats;
 	}
 
@@ -361,17 +361,17 @@ CExpression::CopyGroupPropsAndStats(IStatistics *input_stats)
 //		only used internally during property derivation
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDrvdProp *>
+CDrvdProp *
 CExpression::Pdp(const CDrvdProp::EPropType ept) const
 {
 	switch (ept)
 	{
 		case CDrvdProp::EptRelational:
-			return m_pdprel;
+			return m_pdprel.get();
 		case CDrvdProp::EptPlan:
-			return m_pdpplan;
+			return m_pdpplan.get();
 		case CDrvdProp::EptScalar:
-			return m_pdpscalar;
+			return m_pdpscalar.get();
 		default:
 			break;
 	}
@@ -381,25 +381,25 @@ CExpression::Pdp(const CDrvdProp::EPropType ept) const
 	return nullptr;
 }
 
-gpos::pointer<CDrvdPropRelational *>
+CDrvdPropRelational *
 CExpression::GetDrvdPropRelational() const
 {
 	GPOS_RTL_ASSERT(m_pdprel->IsComplete());
-	return m_pdprel;
+	return m_pdprel.get();
 }
 
-gpos::pointer<CDrvdPropPlan *>
+CDrvdPropPlan *
 CExpression::GetDrvdPropPlan() const
 {
 	GPOS_RTL_ASSERT(m_pdpplan->IsComplete());
-	return m_pdpplan;
+	return m_pdpplan.get();
 }
 
-gpos::pointer<CDrvdPropScalar *>
+CDrvdPropScalar *
 CExpression::GetDrvdPropScalar() const
 {
 	GPOS_RTL_ASSERT(m_pdpscalar->IsComplete());
-	return m_pdpscalar;
+	return m_pdpscalar.get();
 }
 
 #ifdef GPOS_DEBUG
@@ -415,7 +415,7 @@ CExpression::GetDrvdPropScalar() const
 void
 CExpression::AssertValidPropDerivation(const CDrvdProp::EPropType ept)
 {
-	gpos::pointer<COperator *> pop = Pop();
+	COperator *pop = Pop();
 
 	GPOS_ASSERT_IMP(pop->FScalar(), CDrvdProp::EptScalar == ept);
 	GPOS_ASSERT_IMP(pop->FLogical(), CDrvdProp::EptRelational == ept);
@@ -495,8 +495,8 @@ CExpression::PdpDerive(
 		const ULONG arity = Arity();
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			gpos::pointer<CExpression *> pexprChild = (*m_pdrgpexpr)[ul];
-			gpos::pointer<CDrvdProp *> pdp = pexprChild->PdpDerive(pdpctxt);
+			CExpression *pexprChild = (*m_pdrgpexpr)[ul].get();
+			CDrvdProp *pdp = pexprChild->PdpDerive(pdpctxt);
 
 			// add child props to derivation context
 			CDrvdPropCtxt::AddDerivedProps(pdp, pdpctxt);
@@ -535,7 +535,7 @@ CExpression::PdpDerive(
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IStatistics *>
+IStatistics *
 CExpression::PstatsDerive(CReqdPropRelational *prprel,
 						  IStatisticsArray *stats_ctxt)
 {
@@ -552,33 +552,33 @@ CExpression::PstatsDerive(CReqdPropRelational *prprel,
 			m_pstats = CStatistics::MakeEmptyStats(m_mp);
 		}
 
-		return m_pstats;
+		return m_pstats.get();
 	}
 
-	prprel->AddRef();
-	gpos::owner<CReqdPropRelational *> prprelInput = prprel;
+	;
+	gpos::Ref<CReqdPropRelational> prprelInput = prprel;
 
 	// if expression has derived statistics, check if requirements are covered
 	// by what's already derived
 	if (nullptr != m_pstats)
 	{
-		prprelInput->Release();
-		gpos::owner<CReqdPropRelational *> prprelExisting =
+		;
+		gpos::Ref<CReqdPropRelational> prprelExisting =
 			m_pstats->GetReqdRelationalProps(m_mp);
-		prprelInput = prprel->PrprelDifference(m_mp, prprelExisting);
-		prprelExisting->Release();
+		prprelInput = prprel->PrprelDifference(m_mp, prprelExisting.get());
+		;
 
 		if (prprelInput->IsEmpty())
 		{
 			// required statistics columns are already covered by existing statistics
 
 			// clean up
-			prprelInput->Release();
-			return m_pstats;
+			;
+			return m_pstats.get();
 		}
 	}
 
-	gpos::owner<IStatisticsArray *> pdrgpstatCtxtNew = stats_ctxt;
+	gpos::Ref<IStatisticsArray> pdrgpstatCtxtNew = stats_ctxt;
 	if (nullptr == stats_ctxt)
 	{
 		// create an empty context
@@ -586,48 +586,48 @@ CExpression::PstatsDerive(CReqdPropRelational *prprel,
 	}
 	else
 	{
-		pdrgpstatCtxtNew->AddRef();
+		;
 	}
 
 	// trigger recursive property derivation
 	CExpressionHandle exprhdl(m_mp);
 	exprhdl.Attach(this);
-	gpos::owner<CDrvdPropCtxtRelational *> pdpctxtrel =
+	gpos::Ref<CDrvdPropCtxtRelational> pdpctxtrel =
 		GPOS_NEW(m_mp) CDrvdPropCtxtRelational(m_mp);
 	exprhdl.DeriveProps(pdpctxtrel);
 
 	// compute required relational properties of expression's children
-	exprhdl.ComputeReqdProps(prprelInput, 0 /*ulOptReq*/);
+	exprhdl.ComputeReqdProps(prprelInput.get(), 0 /*ulOptReq*/);
 
 	// trigger recursive statistics derivation
 	exprhdl.DeriveStats(pdrgpstatCtxtNew);
 
 	// cache derived stats on expression
-	gpos::pointer<IStatistics *> stats = exprhdl.Pstats();
+	IStatistics *stats = exprhdl.Pstats();
 	GPOS_ASSERT(nullptr != stats);
 
 	if (nullptr == m_pstats)
 	{
-		stats->AddRef();
+		;
 		m_pstats = stats;
 	}
 	else
 	{
-		gpos::owner<IStatistics *> stats_copy = stats->CopyStats(m_mp);
-		stats_copy->AppendStats(m_mp, m_pstats);
+		gpos::Ref<IStatistics> stats_copy = stats->CopyStats(m_mp);
+		stats_copy->AppendStats(m_mp, m_pstats.get());
 
-		m_pstats->Release();
+		;
 		m_pstats = nullptr;
 		m_pstats = stats_copy;
 	}
 	GPOS_ASSERT(nullptr != m_pstats);
 
 	// clean up
-	prprelInput->Release();
-	pdrgpstatCtxtNew->Release();
-	pdpctxtrel->Release();
+	;
+	;
+	;
 
-	return m_pstats;
+	return m_pstats.get();
 }
 
 
@@ -644,16 +644,13 @@ CExpression::ResetDerivedProperty(CDrvdProp::EPropType ept)
 {
 	switch (ept)
 	{
-		case CDrvdProp::EptRelational:
-			CRefCount::SafeRelease(m_pdprel);
+		case CDrvdProp::EptRelational:;
 			m_pdprel = GPOS_NEW(m_mp) CDrvdPropRelational(m_mp);
 			break;
-		case CDrvdProp::EptPlan:
-			CRefCount::SafeRelease(m_pdpplan);
+		case CDrvdProp::EptPlan:;
 			m_pdpplan = nullptr;
 			break;
-		case CDrvdProp::EptScalar:
-			CRefCount::SafeRelease(m_pdpscalar);
+		case CDrvdProp::EptScalar:;
 			m_pdpscalar = GPOS_NEW(m_mp) CDrvdPropScalar(m_mp);
 			break;
 		default:
@@ -709,7 +706,7 @@ CExpression::ResetStats()
 	GPOS_CHECK_STACK_SIZE;
 
 	// reset stats on self
-	CRefCount::SafeRelease(m_pstats);
+	;
 	m_pstats = nullptr;
 
 	const ULONG arity = Arity();
@@ -746,7 +743,7 @@ CExpression::HasOuterRefs()
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpression::FMatchPattern(gpos::pointer<CGroupExpression *> pgexpr) const
+CExpression::FMatchPattern(CGroupExpression *pgexpr) const
 {
 	GPOS_ASSERT(nullptr != pgexpr);
 
@@ -790,7 +787,7 @@ CExpression::FMatchPattern(gpos::pointer<CGroupExpression *> pgexpr) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpression::Matches(gpos::pointer<CExpression *> pexpr) const
+CExpression::Matches(CExpression *pexpr) const
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -826,7 +823,7 @@ CExpression::Matches(gpos::pointer<CExpression *> pexpr) const
 //		Return a copy of the expression with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CExpression *>
+gpos::Ref<CExpression>
 CExpression::PexprCopyWithRemappedColumns(CMemoryPool *mp,
 										  UlongToColRefMap *colref_mapping,
 										  BOOL must_exist) const
@@ -836,22 +833,21 @@ CExpression::PexprCopyWithRemappedColumns(CMemoryPool *mp,
 	GPOS_ASSERT(m_pop->FLogical() || m_pop->FScalar());
 
 	// copy children
-	gpos::owner<CExpressionArray *> pdrgpexpr =
-		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG arity = Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		gpos::pointer<CExpression *> pexprChild = (*m_pdrgpexpr)[ul];
+		CExpression *pexprChild = (*m_pdrgpexpr)[ul].get();
 		pdrgpexpr->Append(pexprChild->PexprCopyWithRemappedColumns(
 			mp, colref_mapping, must_exist));
 	}
 
-	gpos::owner<COperator *> pop =
+	gpos::Ref<COperator> pop =
 		m_pop->PopCopyWithRemappedColumns(mp, colref_mapping, must_exist);
 
 	if (0 == arity)
 	{
-		pdrgpexpr->Release();
+		;
 		return GPOS_NEW(mp) CExpression(mp, std::move(pop));
 	}
 
@@ -869,7 +865,7 @@ CExpression::PexprCopyWithRemappedColumns(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpression::FMatchPattern(gpos::pointer<CExpression *> pexprPattern) const
+CExpression::FMatchPattern(CExpression *pexprPattern) const
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexprPattern);
@@ -905,8 +901,7 @@ CExpression::FMatchPattern(gpos::pointer<CExpression *> pexprPattern) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpression::FMatchPatternChildren(
-	gpos::pointer<CExpression *> pexprPattern) const
+CExpression::FMatchPatternChildren(CExpression *pexprPattern) const
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -927,7 +922,7 @@ CExpression::FMatchPatternChildren(
 		else
 		{
 			// check last child explicitly
-			gpos::pointer<CExpression *> pexpr = (*this)[arity - 1];
+			CExpression *pexpr = (*this)[arity - 1];
 			return arity > 1 &&
 				   pexpr->FMatchPattern((*pexprPattern)[ulArityPattern - 1]);
 		}
@@ -942,7 +937,7 @@ CExpression::FMatchPatternChildren(
 	BOOL fMatch = true;
 	for (ULONG ul = 0; ul < arity && fMatch; ul++)
 	{
-		gpos::pointer<CExpression *> pexpr = (*this)[ul];
+		CExpression *pexpr = (*this)[ul];
 		fMatch = fMatch && pexpr->FMatchPattern((*pexprPattern)[ul]);
 	}
 
@@ -959,7 +954,7 @@ CExpression::FMatchPatternChildren(
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpression::FMatchDebug(gpos::pointer<CExpression *> pexpr) const
+CExpression::FMatchDebug(CExpression *pexpr) const
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -1150,7 +1145,7 @@ CExpression::OsPrintExpression(IOstream &os, const CPrintPrefix *ppfx,
 //
 //---------------------------------------------------------------------------
 ULONG
-CExpression::HashValue(gpos::pointer<const CExpression *> pexpr)
+CExpression::HashValue(const CExpression *pexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -1170,7 +1165,7 @@ CExpression::HashValue(gpos::pointer<const CExpression *> pexpr)
 // sensitive. This hash function specifically used in CUtils::PdrgpexprDedup
 // for deduping the expressions in a given list.
 ULONG
-CExpression::UlHashDedup(gpos::pointer<const CExpression *> pexpr)
+CExpression::UlHashDedup(const CExpression *pexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -1209,34 +1204,33 @@ CExpression::UlHashDedup(gpos::pointer<const CExpression *> pexpr)
 //		Rehydrate expression from a given cost context and child expressions
 //
 //---------------------------------------------------------------------------
-gpos::owner<CExpression *>
-CExpression::PexprRehydrate(CMemoryPool *mp, gpos::pointer<CCostContext *> pcc,
-							gpos::owner<CExpressionArray *> pdrgpexpr,
+gpos::Ref<CExpression>
+CExpression::PexprRehydrate(CMemoryPool *mp, CCostContext *pcc,
+							gpos::Ref<CExpressionArray> pdrgpexpr,
 							CDrvdPropCtxtPlan *pdpctxtplan)
 {
 	GPOS_ASSERT(nullptr != pcc);
 	GPOS_ASSERT(nullptr != pdpctxtplan);
 
-	gpos::pointer<CGroupExpression *> pgexpr = pcc->Pgexpr();
-	gpos::owner<COperator *> pop = pgexpr->Pop();
-	pop->AddRef();
+	CGroupExpression *pgexpr = pcc->Pgexpr();
+	gpos::Ref<COperator> pop = pgexpr->Pop();
+	;
 
 	CCost cost = pcc->Cost();
 	if (pop->FPhysical())
 	{
 		const ULONG arity = pgexpr->Arity();
-		gpos::owner<CCostArray *> pdrgpcost = GPOS_NEW(mp) CCostArray(mp);
+		gpos::Ref<CCostArray> pdrgpcost = GPOS_NEW(mp) CCostArray(mp);
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			gpos::pointer<CExpression *> pexprChild = (*pdrgpexpr)[ul];
+			CExpression *pexprChild = (*pdrgpexpr)[ul].get();
 			CCost costChild = pexprChild->Cost();
 			pdrgpcost->Append(GPOS_NEW(mp) CCost(costChild));
 		}
-		cost = pcc->CostCompute(mp, pdrgpcost);
-		pdrgpcost->Release();
-	}
-	pcc->Poc()->Prpp()->AddRef();
-	gpos::owner<CExpression *> pexpr =
+		cost = pcc->CostCompute(mp, pdrgpcost.get());
+		;
+	};
+	gpos::Ref<CExpression> pexpr =
 		GPOS_NEW(mp) CExpression(mp, pop, pgexpr, pdrgpexpr, pcc->Poc()->Prpp(),
 								 pcc->Pstats(), CCost(cost));
 
@@ -1272,7 +1266,7 @@ CExpression::PexprRehydrate(CMemoryPool *mp, gpos::pointer<CCostContext *> pcc,
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpression::FValidPlan(gpos::pointer<const CReqdPropPlan *> prpp,
+CExpression::FValidPlan(const CReqdPropPlan *prpp,
 						CDrvdPropCtxtPlan *pdpctxtplan)
 {
 	GPOS_ASSERT(Pop()->FPhysical());
@@ -1291,11 +1285,11 @@ CExpression::FValidPlan(gpos::pointer<const CReqdPropPlan *> prpp,
 		pdpctxtplan->CopyCTEProducerProps(pdpplan, ulCTEId);
 	}
 
-	gpos::pointer<CDrvdPropRelational *> pdprel = GetDrvdPropRelational();
+	CDrvdPropRelational *pdprel = GetDrvdPropRelational();
 
 	// GPDB_12_MERGE_FIXME: Also check FValidPartEnforcers()
-	return prpp->FCompatible(exprhdl, gpos::dyn_cast<CPhysical>(m_pop), pdprel,
-							 pdpplan) &&
+	return prpp->FCompatible(exprhdl, gpos::dyn_cast<CPhysical>(m_pop.get()),
+							 pdprel, pdpplan) &&
 		   FValidChildrenDistribution(pdpctxtplan);
 }
 
@@ -1312,7 +1306,7 @@ CExpression::FValidChildrenDistribution(CDrvdPropCtxtPlan *pdpctxtplan)
 {
 	GPOS_ASSERT(Pop()->FPhysical());
 
-	gpos::pointer<CPhysical *> pop = gpos::dyn_cast<CPhysical>(Pop());
+	CPhysical *pop = gpos::dyn_cast<CPhysical>(Pop());
 	CExpressionHandle exprhdl(m_mp);
 	exprhdl.Attach(this);
 	exprhdl.DeriveProps(pdpctxtplan);
@@ -1325,8 +1319,8 @@ CExpression::FValidChildrenDistribution(CDrvdPropCtxtPlan *pdpctxtplan)
 	// we cannot enforce a motion gather if the input is already on the master
 	if (COperator::EopPhysicalMotionGather == Pop()->Eopid())
 	{
-		gpos::pointer<CExpression *> pexprChild = (*this)[0];
-		gpos::pointer<CDrvdPropPlan *> pdpplanChild =
+		CExpression *pexprChild = (*this)[0];
+		CDrvdPropPlan *pdpplanChild =
 			gpos::dyn_cast<CDrvdPropPlan>(pexprChild->PdpDerive(pdpctxtplan));
 		if (CDistributionSpec::EdtSingleton == pdpplanChild->Pds()->Edt() ||
 			CDistributionSpec::EdtStrictSingleton == pdpplanChild->Pds()->Edt())

@@ -47,7 +47,7 @@ class CParseHandlerDXL;
 class CDXLMemoryManager;
 class CQueryToDXLResult;
 
-using CStatisticsArray = CDynamicPtrArray<CStatistics, CleanupRelease>;
+using CStatisticsArray = gpos::Vector<gpos::Ref<CStatistics>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -82,11 +82,11 @@ public:
 		CMemoryPool *, const CHAR *dxl_filename, const CHAR *xsd_file_path);
 
 	// parse a DXL document containing a DXL plan
-	static gpos::owner<CDXLNode *> GetPlanDXLNode(CMemoryPool *,
-												  const CHAR *dxl_string,
-												  const CHAR *xsd_file_path,
-												  ULLONG *plan_id,
-												  ULLONG *plan_space_size);
+	static gpos::Ref<CDXLNode> GetPlanDXLNode(CMemoryPool *,
+											  const CHAR *dxl_string,
+											  const CHAR *xsd_file_path,
+											  ULLONG *plan_id,
+											  ULLONG *plan_space_size);
 
 	// parse a DXL document representing a query
 	// to return the DXL tree representing the query and
@@ -95,25 +95,27 @@ public:
 		CMemoryPool *, const CHAR *dxl_string, const CHAR *xsd_file_path);
 
 	// parse a DXL document containing a scalar expression
-	static gpos::owner<CDXLNode *> ParseDXLToScalarExprDXLNode(
+	static gpos::Ref<CDXLNode> ParseDXLToScalarExprDXLNode(
 		CMemoryPool *, const CHAR *dxl_string, const CHAR *xsd_file_path);
 
 	// parse an MD request
-	static gpos::owner<CMDRequest *> ParseDXLToMDRequest(
-		CMemoryPool *mp, const CHAR *dxl_string, const CHAR *xsd_file_path);
+	static gpos::Ref<CMDRequest> ParseDXLToMDRequest(CMemoryPool *mp,
+													 const CHAR *dxl_string,
+													 const CHAR *xsd_file_path);
 
 	// parse a list of mdids from a MD request message
-	static gpos::owner<CMDRequest *> ParseDXLToMDRequest(
-		CMemoryPool *mp, const WCHAR *dxl_string, const CHAR *xsd_file_path);
+	static gpos::Ref<CMDRequest> ParseDXLToMDRequest(CMemoryPool *mp,
+													 const WCHAR *dxl_string,
+													 const CHAR *xsd_file_path);
 
 	// parse optimizer config DXL
-	static gpos::owner<COptimizerConfig *> ParseDXLToOptimizerConfig(
+	static gpos::Ref<COptimizerConfig> ParseDXLToOptimizerConfig(
 		CMemoryPool *mp, const CHAR *dxl_string, const CHAR *xsd_file_path);
 
-	static gpos::owner<IMDCacheObjectArray *> ParseDXLToIMDObjectArray(
+	static gpos::Ref<IMDCacheObjectArray> ParseDXLToIMDObjectArray(
 		CMemoryPool *, const CHAR *dxl_string, const CHAR *xsd_file_path);
 
-	static gpos::owner<IMDCacheObjectArray *> ParseDXLToIMDObjectArray(
+	static gpos::Ref<IMDCacheObjectArray> ParseDXLToIMDObjectArray(
 		CMemoryPool *, const CWStringBase *dxl_string,
 		const CHAR *xsd_file_path);
 
@@ -122,103 +124,101 @@ public:
 										   const CWStringBase *dxl_string,
 										   const CHAR *xsd_file_path);
 
-	static gpos::owner<IMDCacheObject *> ParseDXLToIMDIdCacheObj(
+	static gpos::Ref<IMDCacheObject> ParseDXLToIMDIdCacheObj(
 		CMemoryPool *, const CWStringBase *dxl_string,
 		const CHAR *xsd_file_path);
 
 	// parse statistics object from the statistics document
-	static gpos::owner<CDXLStatsDerivedRelationArray *>
+	static gpos::Ref<CDXLStatsDerivedRelationArray>
 	ParseDXLToStatsDerivedRelArray(CMemoryPool *, const CHAR *dxl_string,
 								   const CHAR *xsd_file_path);
 
 	// parse statistics object from the statistics document
-	static gpos::owner<CDXLStatsDerivedRelationArray *>
+	static gpos::Ref<CDXLStatsDerivedRelationArray>
 	ParseDXLToStatsDerivedRelArray(CMemoryPool *,
 								   const CWStringBase *dxl_string,
 								   const CHAR *xsd_file_path);
 
 	// translate the dxl statistics object to optimizer statistics object
-	static gpos::owner<CStatisticsArray *> ParseDXLToOptimizerStatisticObjArray(
+	static gpos::Ref<CStatisticsArray> ParseDXLToOptimizerStatisticObjArray(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::pointer<CDXLStatsDerivedRelationArray *>
-			dxl_derived_rel_stats_array);
+		CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array);
 
 	// extract the array of optimizer buckets from the dxl representation of
 	// dxl buckets in the dxl derived column statistics object
-	static gpos::owner<CBucketArray *> ParseDXLToBucketsArray(
+	static gpos::Ref<CBucketArray> ParseDXLToBucketsArray(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::pointer<CDXLStatsDerivedColumn *> dxl_derived_col_stats);
+		CDXLStatsDerivedColumn *dxl_derived_col_stats);
 
 	// serialize a DXL query tree into DXL Document
-	static void SerializeQuery(
-		CMemoryPool *mp, IOstream &os,
-		gpos::pointer<const CDXLNode *> dxl_query_node,
-		gpos::pointer<const CDXLNodeArray *> query_output_dxlnode_array,
-		gpos::pointer<const CDXLNodeArray *> cte_producers,
-		BOOL serialize_document_header_footer, BOOL indentation);
+	static void SerializeQuery(CMemoryPool *mp, IOstream &os,
+							   const CDXLNode *dxl_query_node,
+							   const CDXLNodeArray *query_output_dxlnode_array,
+							   const CDXLNodeArray *cte_producers,
+							   BOOL serialize_document_header_footer,
+							   BOOL indentation);
 
 	// serialize a ULLONG value
 	static CWStringDynamic *SerializeULLONG(CMemoryPool *mp, ULLONG value);
 
 	// serialize a plan into DXL
 	static void SerializePlan(CMemoryPool *mp, IOstream &os,
-							  gpos::pointer<const CDXLNode *> node,
-							  ULLONG plan_id, ULLONG plan_space_size,
+							  const CDXLNode *node, ULLONG plan_id,
+							  ULLONG plan_space_size,
 							  BOOL serialize_document_header_footer,
 							  BOOL indentation);
 
 	static CWStringDynamic *SerializeStatistics(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::pointer<const CStatisticsArray *> statistics_array,
-		BOOL serialize_header_footer, BOOL indentation);
+		const CStatisticsArray *statistics_array, BOOL serialize_header_footer,
+		BOOL indentation);
 
 	// serialize statistics objects into DXL and write to stream
-	static void SerializeStatistics(
-		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::pointer<const CStatisticsArray *> statistics_array, IOstream &os,
-		BOOL serialize_document_header_footer, BOOL indentation);
+	static void SerializeStatistics(CMemoryPool *mp, CMDAccessor *md_accessor,
+									const CStatisticsArray *statistics_array,
+									IOstream &os,
+									BOOL serialize_document_header_footer,
+									BOOL indentation);
 
 	// serialize metadata objects into DXL and write to stream
-	static void SerializeMetadata(
-		CMemoryPool *mp,
-		gpos::pointer<const IMDCacheObjectArray *> imd_obj_array, IOstream &os,
-		BOOL serialize_document_header_footer, BOOL indentation);
+	static void SerializeMetadata(CMemoryPool *mp,
+								  const IMDCacheObjectArray *imd_obj_array,
+								  IOstream &os,
+								  BOOL serialize_document_header_footer,
+								  BOOL indentation);
 
 	// serialize metadata ids into a MD request message
-	static void SerializeMDRequest(CMemoryPool *mp,
-								   gpos::pointer<CMDRequest *> md_request,
+	static void SerializeMDRequest(CMemoryPool *mp, CMDRequest *md_request,
 								   IOstream &os,
 								   BOOL serialize_document_header_footer,
 								   BOOL indentation);
 
 	// serialize a list of metadata objects into DXL
 	static CWStringDynamic *SerializeMetadata(
-		CMemoryPool *, gpos::pointer<const IMDCacheObjectArray *>,
+		CMemoryPool *, const IMDCacheObjectArray *,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// serialize a metadata id into DXL
 	static CWStringDynamic *SerializeMetadata(
-		CMemoryPool *mp, gpos::pointer<const IMDId *> mdid,
+		CMemoryPool *mp, const IMDId *mdid,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// serialize sample plans
 	static CWStringDynamic *SerializeSamplePlans(
-		CMemoryPool *mp, gpos::pointer<CEnumeratorConfig *> enumerator_cfg,
-		BOOL indentation);
+		CMemoryPool *mp, CEnumeratorConfig *enumerator_cfg, BOOL indentation);
 
 	// serialize cost distribution plans
 	static CWStringDynamic *SerializeCostDistr(
-		CMemoryPool *mp, gpos::pointer<CEnumeratorConfig *> enumerator_cfg,
-		BOOL indentation);
+		CMemoryPool *mp, CEnumeratorConfig *enumerator_cfg, BOOL indentation);
 
 	// serialize a metadata object into DXL
 	static CWStringDynamic *SerializeMDObj(
-		CMemoryPool *, gpos::pointer<const IMDCacheObject *>,
+		CMemoryPool *, const IMDCacheObject *,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// serialize a scalar expression into DXL
 	static CWStringDynamic *SerializeScalarExpr(
-		CMemoryPool *mp, gpos::pointer<const CDXLNode *> node,
+		CMemoryPool *mp, const CDXLNode *node,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// create a GPOS dynamic string from a Xerces XMLCh array
@@ -252,12 +252,12 @@ public:
 		CMemoryPool *mp, const CDynamicPtrArray<T, CleanupFn> *arr);
 
 	// serialize a list of lists of integers into a comma-separate string
-	static CWStringDynamic *Serialize(
-		CMemoryPool *mp, gpos::pointer<const ULongPtr2dArray *> pdrgpul);
+	static CWStringDynamic *Serialize(CMemoryPool *mp,
+									  const ULongPtr2dArray *pdrgpul);
 
 	// serialize a list of chars into a comma-separate string
 	static CWStringDynamic *SerializeToCommaSeparatedString(
-		CMemoryPool *mp, gpos::pointer<const CharPtrArray *> pdrgpsz);
+		CMemoryPool *mp, const CharPtrArray *pdrgpsz);
 
 	// decode a byte array from a string
 	static BYTE *DecodeByteArrayFromString(CMemoryPool *mp,
@@ -275,14 +275,12 @@ public:
 											CDouble value);
 
 	// translate the optimizer datum from dxl datum object
-	static gpos::owner<IDatum *> GetDatum(
-		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::pointer<const CDXLDatum *> dxl_datum);
+	static gpos::Ref<IDatum> GetDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
+									  const CDXLDatum *dxl_datum);
 
 #ifdef GPOS_DEBUG
 	// debug print of the metadata relation
-	static void DebugPrintMDIdArray(IOstream &os,
-									gpos::pointer<IMdIdArray *> mdid_array);
+	static void DebugPrintMDIdArray(IOstream &os, IMdIdArray *mdid_array);
 #endif
 };
 

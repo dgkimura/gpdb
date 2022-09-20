@@ -60,9 +60,10 @@ CParseHandlerAppend::SetupInitialHandlers(const Attributes &attrs)
 	GPOS_ASSERT(this->Length() == 0 &&
 				"No handlers should have been added yet");
 
-	m_dxl_op =
-		gpos::cast<CDXLPhysicalAppend>(CDXLOperatorFactory::MakeDXLAppend(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+	m_dxl_op = gpos::cast<CDXLPhysicalAppend>(
+		CDXLOperatorFactory::MakeDXLAppend(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs)
+			.get());
 
 	// parse handler for the filter
 	CParseHandlerBase *filter_parse_handler =
@@ -182,9 +183,9 @@ CParseHandlerAppend::EndElement(const XMLCh *const,	 // element_uri,
 	{
 		CParseHandlerTableDescr *table_descr_parse_handler =
 			dynamic_cast<CParseHandlerTableDescr *>((*this)[child_index++]);
-		gpos::owner<CDXLTableDescr *> table_descr =
+		gpos::Ref<CDXLTableDescr> table_descr =
 			table_descr_parse_handler->GetDXLTableDescr();
-		table_descr->AddRef();
+		;
 		m_dxl_op->SetDXLTableDesc(table_descr);
 	}
 	CParseHandlerProjList *proj_list_parse_handler =
@@ -193,7 +194,7 @@ CParseHandlerAppend::EndElement(const XMLCh *const,	 // element_uri,
 		dynamic_cast<CParseHandlerFilter *>((*this)[child_index++]);
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add constructed children
 	AddChildFromParseHandler(proj_list_parse_handler);
@@ -211,7 +212,7 @@ CParseHandlerAppend::EndElement(const XMLCh *const,	 // element_uri,
 	}
 
 #ifdef GPOS_DEBUG
-	m_dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxl_op->AssertValid(m_dxl_node.get(), false /* validate_children */);
 #endif	// GPOS_DEBUG
 
 	// deactivate handler

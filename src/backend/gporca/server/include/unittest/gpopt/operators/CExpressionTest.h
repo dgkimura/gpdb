@@ -37,28 +37,29 @@ namespace gpopt
 class CExpressionTest
 {
 private:
-	static gpos::owner<CReqdPropPlan *> PrppCreateRequiredProperties(
-		CMemoryPool *mp, gpos::owner<CColRefSet *> pcrs);
+	static gpos::Ref<CReqdPropPlan> PrppCreateRequiredProperties(
+		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs);
 
-	static gpos::owner<CExpression *> PexprCreateGbyWithColumnFormat(
+	static gpos::Ref<CExpression> PexprCreateGbyWithColumnFormat(
 		CMemoryPool *mp, const WCHAR *wszColNameFormat);
 
 	// helper for testing required column computation
 	static GPOS_RESULT EresComputeReqdCols(const CHAR *szFilePath);
 
 	// helper for checking cached required columns
-	static GPOS_RESULT EresCheckCachedReqdCols(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
-		gpos::pointer<CReqdPropPlan *> prppInput);
+	static GPOS_RESULT EresCheckCachedReqdCols(CMemoryPool *mp,
+											   CExpression *pexpr,
+											   CReqdPropPlan *prppInput);
 
 	// helper function for the FValidPlan tests
-	static void SetupPlanForFValidPlanTest(
-		CMemoryPool *mp, gpos::owner<CExpression *> *ppexprGby,
-		CColRefSet **ppcrs, gpos::owner<CExpression *> *ppexprPlan,
-		gpos::owner<CReqdPropPlan *> *pprpp);
+	static void SetupPlanForFValidPlanTest(CMemoryPool *mp,
+										   gpos::Ref<CExpression> *ppexprGby,
+										   CColRefSet **ppcrs,
+										   gpos::Ref<CExpression> *ppexprPlan,
+										   gpos::Ref<CReqdPropPlan> *pprpp);
 
 	// return an expression with several joins
-	static gpos::owner<CExpression *> PexprComplexJoinTree(CMemoryPool *mp);
+	static gpos::Ref<CExpression> PexprComplexJoinTree(CMemoryPool *mp);
 
 public:
 	// unittests

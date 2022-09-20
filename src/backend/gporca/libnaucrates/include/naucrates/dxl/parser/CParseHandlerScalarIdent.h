@@ -36,7 +36,7 @@ class CParseHandlerScalarIdent : public CParseHandlerScalarOp
 {
 private:
 	// the scalar identifier
-	gpos::pointer<CDXLScalarIdent *> m_dxl_op;
+	CDXLScalarIdent *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

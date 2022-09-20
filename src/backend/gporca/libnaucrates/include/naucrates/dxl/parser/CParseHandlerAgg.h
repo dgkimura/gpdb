@@ -36,7 +36,7 @@ class CParseHandlerAgg : public CParseHandlerPhysicalOp
 {
 private:
 	// the aggregate operator
-	gpos::pointer<CDXLPhysicalAgg *> m_dxl_op;
+	CDXLPhysicalAgg *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

@@ -58,10 +58,10 @@ private:
 	gpos::Ref<IMDId> m_mdid_item_type;
 
 	// index key columns
-	gpos::owner<ULongPtrArray *> m_index_key_cols_array;
+	gpos::Ref<ULongPtrArray> m_index_key_cols_array;
 
 	// included columns
-	gpos::owner<ULongPtrArray *> m_included_cols_array;
+	gpos::Ref<ULongPtrArray> m_included_cols_array;
 
 	// operator families for each index key
 	gpos::Ref<IMdIdArray> m_mdid_opfamilies_array;
@@ -69,7 +69,7 @@ private:
 	// partition constraint
 	// GPDB_12_MERGE_FIXME: This field is no longer needed,
 	// we should get rid of it.
-	gpos::owner<IMDPartConstraint *> m_mdpart_constraint;
+	gpos::Ref<IMDPartConstraint> m_mdpart_constraint;
 
 	// DXL for object
 	const CWStringDynamic *m_dxl_str;
@@ -84,10 +84,10 @@ public:
 	CMDIndexGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
 				 BOOL is_clustered, BOOL is_partitioned,
 				 EmdindexType index_type, gpos::Ref<IMDId> mdid_item_type,
-				 gpos::owner<ULongPtrArray *> index_key_cols_array,
-				 gpos::owner<ULongPtrArray *> included_cols_array,
+				 gpos::Ref<ULongPtrArray> index_key_cols_array,
+				 gpos::Ref<ULongPtrArray> included_cols_array,
 				 gpos::Ref<IMdIdArray> mdid_opfamilies_array,
-				 gpos::owner<IMDPartConstraint *> mdpart_constraint,
+				 gpos::Ref<IMDPartConstraint> mdpart_constraint,
 				 gpos::Ref<IMdIdArray> child_index_oids);
 
 	// dtor
@@ -127,7 +127,7 @@ public:
 	ULONG GetIncludedColPos(ULONG column) const override;
 
 	// part constraint
-	gpos::pointer<IMDPartConstraint *> MDPartConstraint() const override;
+	IMDPartConstraint *MDPartConstraint() const override;
 
 	// DXL string for index
 	const CWStringDynamic *
@@ -144,7 +144,7 @@ public:
 
 	// check if given scalar comparison can be used with the index key
 	// at the specified position
-	BOOL IsCompatible(gpos::pointer<const IMDScalarOp *> md_scalar_op,
+	BOOL IsCompatible(const IMDScalarOp *md_scalar_op,
 					  ULONG key_pos) const override;
 
 	// child index oids

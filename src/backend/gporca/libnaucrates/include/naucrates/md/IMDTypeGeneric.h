@@ -50,7 +50,7 @@ public:
 		return IMDTypeGeneric::GetTypeInfo();
 	}
 
-	virtual gpos::owner<IDatum *> CreateGenericNullDatum(
+	virtual gpos::Ref<IDatum> CreateGenericNullDatum(
 		CMemoryPool *mp, INT type_modifier) const = 0;
 };
 }  // namespace gpmd

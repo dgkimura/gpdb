@@ -34,7 +34,7 @@ CAutoTaskProxy::CAutoTaskProxy(CMemoryPool *mp, CWorkerPoolManager *pwpm,
 	m_list.Init(GPOS_OFFSET(CTask, m_proxy_link));
 
 	// register new ATP to worker pool
-	m_pwpm->AddRef();
+	;
 }
 
 

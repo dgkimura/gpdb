@@ -31,7 +31,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarConstValue::CDXLScalarConstValue(CMemoryPool *mp,
-										   gpos::owner<CDXLDatum *> dxl_datum)
+										   gpos::Ref<CDXLDatum> dxl_datum)
 	: CDXLScalar(mp), m_dxl_datum(std::move(dxl_datum))
 {
 }
@@ -46,7 +46,7 @@ CDXLScalarConstValue::CDXLScalarConstValue(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarConstValue::~CDXLScalarConstValue()
 {
-	m_dxl_datum->Release();
+	;
 }
 
 
@@ -90,7 +90,7 @@ CDXLScalarConstValue::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarConstValue::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 gpos::pointer<const CDXLNode *>  //node
+									 const CDXLNode *  //node
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -122,7 +122,7 @@ CDXLScalarConstValue::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarConstValue::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLScalarConstValue::AssertValid(const CDXLNode *node,
 								  BOOL	// validate_children
 ) const
 {

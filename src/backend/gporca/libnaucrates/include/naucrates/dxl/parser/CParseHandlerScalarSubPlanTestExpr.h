@@ -36,7 +36,7 @@ class CParseHandlerScalarSubPlanTestExpr : public CParseHandlerScalarOp
 {
 private:
 	// child test expression
-	gpos::owner<CDXLNode *> m_dxl_test_expr;
+	gpos::Ref<CDXLNode> m_dxl_test_expr;
 
 	// process the start of an element
 	void StartElement(
@@ -65,10 +65,10 @@ public:
 	~CParseHandlerScalarSubPlanTestExpr() override;
 
 	// return test expression
-	gpos::pointer<CDXLNode *>
+	CDXLNode *
 	GetDXLTestExpr() const
 	{
-		return m_dxl_test_expr;
+		return m_dxl_test_expr.get();
 	}
 };
 }  // namespace gpdxl

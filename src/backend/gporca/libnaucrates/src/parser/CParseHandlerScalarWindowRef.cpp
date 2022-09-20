@@ -56,7 +56,7 @@ CParseHandlerScalarWindowRef::StartElement(
 				 element_local_name))
 	{
 		// parse and create scalar WindowRef (window function)
-		gpos::owner<CDXLScalarWindowRef *> dxl_op =
+		gpos::Ref<CDXLScalarWindowRef> dxl_op =
 			gpos::cast<CDXLScalarWindowRef>(CDXLOperatorFactory::MakeWindowRef(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 

@@ -37,24 +37,23 @@ class CPhysicalIndexScan : public CPhysicalScan
 {
 private:
 	// index descriptor
-	gpos::owner<CIndexDescriptor *> m_pindexdesc;
+	gpos::Ref<CIndexDescriptor> m_pindexdesc;
 
 	// origin operator id -- gpos::ulong_max if operator was not generated via a transformation
 	ULONG m_ulOriginOpId;
 
 	// order
-	gpos::owner<COrderSpec *> m_pos;
+	gpos::Ref<COrderSpec> m_pos;
 
 public:
 	CPhysicalIndexScan(const CPhysicalIndexScan &) = delete;
 
 	// ctors
-	CPhysicalIndexScan(CMemoryPool *mp,
-					   gpos::owner<CIndexDescriptor *> pindexdesc,
-					   gpos::owner<CTableDescriptor *> ptabdesc,
-					   ULONG ulOriginOpId, const CName *pnameAlias,
-					   gpos::owner<CColRefArray *> colref_array,
-					   gpos::owner<COrderSpec *> pos);
+	CPhysicalIndexScan(CMemoryPool *mp, gpos::Ref<CIndexDescriptor> pindexdesc,
+					   gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+					   const CName *pnameAlias,
+					   gpos::Ref<CColRefArray> colref_array,
+					   gpos::Ref<COrderSpec> pos);
 
 	// dtor
 	~CPhysicalIndexScan() override;
@@ -92,13 +91,13 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// index descriptor
-	gpos::pointer<CIndexDescriptor *>
+	CIndexDescriptor *
 	Pindexdesc() const
 	{
-		return m_pindexdesc;
+		return m_pindexdesc.get();
 	}
 
 	// sensitivity to order of inputs
@@ -113,16 +112,16 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	gpos::owner<COrderSpec *>
+	gpos::Ref<COrderSpec>
 	PosDerive(CMemoryPool *,	   //mp
 			  CExpressionHandle &  //exprhdl
 	) const override
 	{
-		m_pos->AddRef();
+		;
 		return m_pos;
 	}
 
-	gpos::owner<CRewindabilitySpec *>
+	gpos::Ref<CRewindabilitySpec>
 	PrsDerive(CMemoryPool *mp,
 			  CExpressionHandle &  // exprhdl
 	) const override
@@ -139,11 +138,10 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl,
-		gpos::pointer<const CEnfdOrder *> peo) const override;
+		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
 
 	// conversion function
-	static gpos::cast_func<CPhysicalIndexScan *>
+	static CPhysicalIndexScan *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -153,11 +151,11 @@ public:
 	}
 
 	// statistics derivation during costing
-	gpos::owner<IStatistics *>
-	PstatsDerive(CMemoryPool *,						// mp
-				 CExpressionHandle &,				// exprhdl
-				 gpos::pointer<CReqdPropPlan *>,	// prpplan
-				 gpos::pointer<IStatisticsArray *>	//stats_ctxt
+	gpos::Ref<IStatistics>
+	PstatsDerive(CMemoryPool *,		   // mp
+				 CExpressionHandle &,  // exprhdl
+				 CReqdPropPlan *,	   // prpplan
+				 IStatisticsArray *	   //stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(

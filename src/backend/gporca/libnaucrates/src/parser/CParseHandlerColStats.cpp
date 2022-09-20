@@ -183,7 +183,7 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 
 	// get histogram buckets from child parse handlers
 
-	gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array =
+	gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array =
 		GPOS_NEW(m_mp) CDXLBucketArray(m_mp);
 
 	for (ULONG ul = 0; ul < this->Length(); ul++)
@@ -191,9 +191,9 @@ CParseHandlerColStats::EndElement(const XMLCh *const,  // element_uri,
 		CParseHandlerColStatsBucket *parse_handler_col_stats_bucket =
 			dynamic_cast<CParseHandlerColStatsBucket *>((*this)[ul]);
 
-		gpos::owner<CDXLBucket *> dxl_bucket =
+		gpos::Ref<CDXLBucket> dxl_bucket =
 			parse_handler_col_stats_bucket->GetDXLBucketAt();
-		dxl_bucket->AddRef();
+		;
 
 		dxl_stats_bucket_array->Append(dxl_bucket);
 	}

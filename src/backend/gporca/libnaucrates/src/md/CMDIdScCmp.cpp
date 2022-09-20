@@ -26,8 +26,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdScCmp::CMDIdScCmp(gpos::owner<CMDIdGPDB *> left_mdid,
-					   gpos::owner<CMDIdGPDB *> right_mdid,
+CMDIdScCmp::CMDIdScCmp(gpos::Ref<CMDIdGPDB> left_mdid,
+					   gpos::Ref<CMDIdGPDB> right_mdid,
 					   IMDType::ECmpType cmp_type)
 	: m_mdid_left(std::move(left_mdid)),
 	  m_mdid_right(std::move(right_mdid)),
@@ -54,8 +54,8 @@ CMDIdScCmp::CMDIdScCmp(gpos::owner<CMDIdGPDB *> left_mdid,
 //---------------------------------------------------------------------------
 CMDIdScCmp::~CMDIdScCmp()
 {
-	m_mdid_left->Release();
-	m_mdid_right->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -99,10 +99,10 @@ CMDIdScCmp::GetBuffer() const
 //		Returns the source type id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDIdScCmp::GetLeftMdid() const
 {
-	return m_mdid_left;
+	return m_mdid_left.get();
 }
 
 //---------------------------------------------------------------------------
@@ -113,10 +113,10 @@ CMDIdScCmp::GetLeftMdid() const
 //		Returns the destination type id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDId *>
+IMDId *
 CMDIdScCmp::GetRightMdid() const
 {
-	return m_mdid_right;
+	return m_mdid_right.get();
 }
 
 //---------------------------------------------------------------------------
@@ -144,14 +144,14 @@ CMDIdScCmp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdScCmp::Equals(gpos::pointer<const IMDId *> mdid) const
+CMDIdScCmp::Equals(const IMDId *mdid) const
 {
 	if (nullptr == mdid || EmdidScCmp != mdid->MdidType())
 	{
 		return false;
 	}
 
-	gpos::pointer<const CMDIdScCmp *> pmdidScCmp = CMDIdScCmp::CastMdid(mdid);
+	const CMDIdScCmp *pmdidScCmp = CMDIdScCmp::CastMdid(mdid);
 
 	return m_mdid_left->Equals(pmdidScCmp->GetLeftMdid()) &&
 		   m_mdid_right->Equals(pmdidScCmp->GetRightMdid()) &&

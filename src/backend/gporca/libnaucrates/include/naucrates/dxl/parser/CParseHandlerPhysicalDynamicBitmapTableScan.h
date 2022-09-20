@@ -36,7 +36,7 @@ class CParseHandlerPhysicalDynamicBitmapTableScan
 	: public CParseHandlerPhysicalAbstractBitmapScan
 {
 private:
-	gpos::pointer<ULongPtrArray *> m_selector_ids;
+	ULongPtrArray *m_selector_ids;
 
 	// process the start of an element
 	void StartElement(

@@ -55,7 +55,7 @@ CParseHandlerIndexDescr::CParseHandlerIndexDescr(
 //---------------------------------------------------------------------------
 CParseHandlerIndexDescr::~CParseHandlerIndexDescr()
 {
-	CRefCount::SafeRelease(m_dxl_index_descr);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -66,10 +66,10 @@ CParseHandlerIndexDescr::~CParseHandlerIndexDescr()
 //		Returns the index descriptor constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLIndexDescr *>
+CDXLIndexDescr *
 CParseHandlerIndexDescr::GetDXLIndexDescr()
 {
-	return m_dxl_index_descr;
+	return m_dxl_index_descr.get();
 }
 
 //---------------------------------------------------------------------------

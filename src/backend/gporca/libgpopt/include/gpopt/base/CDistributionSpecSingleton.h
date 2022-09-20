@@ -86,8 +86,7 @@ public:
 	}
 
 	// does this distribution satisfy the given one
-	BOOL FSatisfies(
-		gpos::pointer<const CDistributionSpec *> pds) const override;
+	BOOL FSatisfies(const CDistributionSpec *pds) const override;
 
 	// hash function for singleton distribution spec
 	ULONG
@@ -102,7 +101,7 @@ public:
 
 	// match function for singleton distribution specs
 	BOOL
-	Matches(gpos::pointer<const CDistributionSpec *> pds) const override
+	Matches(const CDistributionSpec *pds) const override
 	{
 		return Edt() == pds->Edt() &&
 			   FOnMaster() ==
@@ -112,15 +111,14 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 gpos::pointer<CReqdPropPlan *> prpp,
-						 gpos::pointer<CExpressionArray *> pdrgpexpr,
-						 gpos::pointer<CExpression *> pexpr) override;
+						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 CExpression *pexpr) override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static gpos::cast_func<CDistributionSpecSingleton *>
+	static CDistributionSpecSingleton *
 	PdssConvert(CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
@@ -131,8 +129,8 @@ public:
 	}
 
 	// conversion function
-	static gpos::pointer<const CDistributionSpecSingleton *>
-	PdssConvert(gpos::pointer<const CDistributionSpec *> pds)
+	static const CDistributionSpecSingleton *
+	PdssConvert(const CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtSingleton == pds->Edt() ||

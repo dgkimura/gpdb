@@ -137,9 +137,8 @@ CDXLScalarBitmapBoolOp::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBitmapBoolOp::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarBitmapBoolOp::SerializeToDXL(CXMLSerializer *xml_serializer,
+									   const CDXLNode *dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 
@@ -169,7 +168,7 @@ CDXLScalarBitmapBoolOp::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBitmapBoolOp::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarBitmapBoolOp::AssertValid(const CDXLNode *dxlnode,
 									BOOL validate_children) const
 {
 	EdxlBitmapBoolOp bitmap_bool_dxlop =
@@ -185,7 +184,7 @@ CDXLScalarBitmapBoolOp::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[ul];
+		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
 		Edxlopid dxl_operator = dxlnode_arg->GetOperator()->GetDXLOperator();
 
 		GPOS_ASSERT(EdxlopScalarBitmapBoolOp == dxl_operator ||

@@ -28,7 +28,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalMotionRandom::CPhysicalMotionRandom(
-	CMemoryPool *mp, gpos::owner<CDistributionSpecRandom *> pdsRandom)
+	CMemoryPool *mp, gpos::Ref<CDistributionSpecRandom> pdsRandom)
 	: CPhysicalMotion(mp), m_pdsRandom(std::move(pdsRandom))
 {
 	GPOS_ASSERT(nullptr != m_pdsRandom);
@@ -44,7 +44,7 @@ CPhysicalMotionRandom::CPhysicalMotionRandom(
 //---------------------------------------------------------------------------
 CPhysicalMotionRandom::~CPhysicalMotionRandom()
 {
-	m_pdsRandom->Release();
+	;
 }
 
 
@@ -57,7 +57,7 @@ CPhysicalMotionRandom::~CPhysicalMotionRandom()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionRandom::Matches(gpos::pointer<COperator *> pop) const
+CPhysicalMotionRandom::Matches(COperator *pop) const
 {
 	return Eopid() == pop->Eopid();
 }
@@ -70,12 +70,11 @@ CPhysicalMotionRandom::Matches(gpos::pointer<COperator *> pop) const
 //		Compute required columns of the n-th child;
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
-CPhysicalMotionRandom::PcrsRequired(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
-	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
-	ULONG							  // ulOptReq
+gpos::Ref<CColRefSet>
+CPhysicalMotionRandom::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
+									CColRefSet *pcrsRequired, ULONG child_index,
+									CDrvdPropArray *,  // pdrgpdpCtxt
+									ULONG			   // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -93,9 +92,9 @@ CPhysicalMotionRandom::PcrsRequired(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionRandom::FProvidesReqdCols(
-	CExpressionHandle &exprhdl, gpos::pointer<CColRefSet *> pcrsRequired,
-	ULONG  // ulOptReq
+CPhysicalMotionRandom::FProvidesReqdCols(CExpressionHandle &exprhdl,
+										 CColRefSet *pcrsRequired,
+										 ULONG	// ulOptReq
 ) const
 {
 	return FUnaryProvidesReqdCols(exprhdl, pcrsRequired);
@@ -111,7 +110,7 @@ CPhysicalMotionRandom::FProvidesReqdCols(
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalMotionRandom::EpetOrder(CExpressionHandle &,  // exprhdl
-								 gpos::pointer<const CEnfdOrder *>
+								 const CEnfdOrder *
 #ifdef GPOS_DEBUG
 									 peo
 #endif	// GPOS_DEBUG
@@ -132,18 +131,17 @@ CPhysicalMotionRandom::EpetOrder(CExpressionHandle &,  // exprhdl
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<COrderSpec *>
-CPhysicalMotionRandom::PosRequired(
-	CMemoryPool *mp,
-	CExpressionHandle &,		  //exprhdl,
-	gpos::pointer<COrderSpec *>,  //posInput,
-	ULONG
+gpos::Ref<COrderSpec>
+CPhysicalMotionRandom::PosRequired(CMemoryPool *mp,
+								   CExpressionHandle &,	 //exprhdl,
+								   COrderSpec *,		 //posInput,
+								   ULONG
 #ifdef GPOS_DEBUG
-		child_index
+									   child_index
 #endif	// GPOS_DEBUG
-	,
-	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
-	ULONG							  // ulOptReq
+								   ,
+								   CDrvdPropArray *,  // pdrgpdpCtxt
+								   ULONG			  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -159,7 +157,7 @@ CPhysicalMotionRandom::PosRequired(
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-gpos::owner<COrderSpec *>
+gpos::Ref<COrderSpec>
 CPhysicalMotionRandom::PosDerive(CMemoryPool *mp,
 								 CExpressionHandle &  // exprhdl
 ) const
@@ -193,7 +191,7 @@ CPhysicalMotionRandom::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-gpos::cast_func<CPhysicalMotionRandom *>
+CPhysicalMotionRandom *
 CPhysicalMotionRandom::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);

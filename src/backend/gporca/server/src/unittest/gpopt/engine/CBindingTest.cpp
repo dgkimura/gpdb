@@ -90,26 +90,24 @@ CBindingTest::EresUnittest_Basic()
 	GPOS_CHECK_ABORT;
 
 	// set up MD providers
-	gpos::owner<CMDProviderMemory *> pmdp =
+	gpos::Ref<CMDProviderMemory> pmdp =
 		GPOS_NEW(mp) CMDProviderMemory(mp, szQueryFile);
-	pmdp->AddRef();
+	;
 
-	gpos::pointer<const CSystemIdArray *> pdrgpsysid =
-		pdxlmd->GetSysidPtrArray();
-	gpos::owner<CMDProviderArray *> pdrgpmdp =
-		GPOS_NEW(mp) CMDProviderArray(mp);
+	const CSystemIdArray *pdrgpsysid = pdxlmd->GetSysidPtrArray();
+	gpos::Ref<CMDProviderArray> pdrgpmdp = GPOS_NEW(mp) CMDProviderArray(mp);
 	pdrgpmdp->Append(pmdp);
 
 	for (ULONG ul = 1; ul < pdrgpsysid->Size(); ul++)
 	{
-		pmdp->AddRef();
+		;
 		pdrgpmdp->Append(pmdp);
 	}
 
-	CMDAccessor mda(mp, CMDCache::Pcache(), pdrgpsysid, pdrgpmdp);
+	CMDAccessor mda(mp, CMDCache::Pcache(), pdrgpsysid, pdrgpmdp.get());
 
-	leaked<CBitSet *> pbsEnabled = nullptr;
-	leaked<CBitSet *> pbsDisabled = nullptr;
+	gpos::Ref<CBitSet> pbsEnabled = nullptr;
+	gpos::Ref<CBitSet> pbsDisabled = nullptr;
 	SetTraceflags(mp, pdxlmd->Pbs(), &pbsEnabled, &pbsDisabled);
 
 	// setup opt ctx
@@ -118,16 +116,15 @@ CBindingTest::EresUnittest_Basic()
 
 	// translate DXL Tree -> Expr Tree
 	CTranslatorDXLToExpr *pdxltr = GPOS_NEW(mp) CTranslatorDXLToExpr(mp, &mda);
-	gpos::owner<CExpression *> pexprTranslated = pdxltr->PexprTranslateQuery(
+	gpos::Ref<CExpression> pexprTranslated = pdxltr->PexprTranslateQuery(
 		pdxlmd->GetQueryDXLRoot(), pdxlmd->PdrgpdxlnQueryOutput(),
 		pdxlmd->GetCTEProducerDXLArray());
 
-	gpos::pointer<gpdxl::ULongPtrArray *> pdrgul =
-		pdxltr->PdrgpulOutputColRefs();
+	gpdxl::ULongPtrArray *pdrgul = pdxltr->PdrgpulOutputColRefs();
 	gpmd::CMDNameArray *pdrgpmdname = pdxltr->Pdrgpmdname();
 
 	CQueryContext *pqc = CQueryContext::PqcGenerate(
-		mp, pexprTranslated, pdrgul, pdrgpmdname, true /*fDeriveStats*/);
+		mp, pexprTranslated.get(), pdrgul, pdrgpmdname, true /*fDeriveStats*/);
 
 	// initialize engine and optimize query
 	CEngine eng(mp);
@@ -135,11 +132,10 @@ CBindingTest::EresUnittest_Basic()
 	eng.Optimize();
 
 	// extract plan
-	gpos::owner<CExpression *> pexprPlan = eng.PexprExtractPlan();
+	gpos::Ref<CExpression> pexprPlan = eng.PexprExtractPlan();
 	GPOS_ASSERT(nullptr != pexprPlan);
 
-	gpos::pointer<UlongPtrArray *> number_of_bindings =
-		eng.GetNumberOfBindings();
+	UlongPtrArray *number_of_bindings = eng.GetNumberOfBindings();
 	ULONG search_stage = 0;
 	ULONG bindings_for_xform =
 		(ULONG) (*number_of_bindings)[search_stage]
@@ -153,13 +149,13 @@ CBindingTest::EresUnittest_Basic()
 	}
 
 	// clean up
-	pexprPlan->Release();
-	pdrgpmdp->Release();
+	;
+	;
 	GPOS_DELETE(pqc);
 	GPOS_DELETE(pdxlmd);
 	GPOS_DELETE(pdxltr);
-	pexprTranslated->Release();
-	pmdp->Release();
+	;
+	;
 
 	return eres;
 }

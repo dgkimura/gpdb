@@ -30,7 +30,7 @@ class CTreeMapTest
 {
 	// fwd declaration
 	class CNode;
-	using CNodeArray = CDynamicPtrArray<CNode, CleanupRelease<CNode>>;
+	using CNodeArray = gpos::Vector<gpos::Ref<CNode>>;
 
 	// struct for resulting trees
 	class CNode : public CRefCount
@@ -40,14 +40,14 @@ class CTreeMapTest
 		ULONG m_ulData;
 
 		// children
-		gpos::owner<CNodeArray *> m_pdrgpnd;
+		gpos::Ref<CNodeArray> m_pdrgpnd;
 
 	public:
 		CNode(const CNode &) = delete;
 
 		// ctor
-		CNode(CMemoryPool *mp, gpos::pointer<const ULONG *> pulData,
-			  gpos::owner<CNodeArray *> pdrgpnd);
+		CNode(CMemoryPool *mp, const ULONG *pulData,
+			  gpos::Ref<CNodeArray> pdrgpnd);
 
 		// dtor
 		~CNode() override;
@@ -62,9 +62,8 @@ private:
 	static ULONG m_ulTestCounter;
 
 	// factory function for result object
-	static gpos::owner<CNode *> Pnd(CMemoryPool *mp, gpos::pointer<ULONG *> pul,
-									gpos::owner<CNodeArray *> pdrgpnd,
-									BOOL *fTestTrue);
+	static gpos::Ref<CNode> Pnd(CMemoryPool *mp, ULONG *pul,
+								gpos::Ref<CNodeArray> pdrgpnd, BOOL *fTestTrue);
 
 	// shorthand for tests
 	using TestMap =

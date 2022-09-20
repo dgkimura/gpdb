@@ -32,7 +32,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarIdent::CDXLScalarIdent(CMemoryPool *mp,
-								 gpos::owner<CDXLColRef *> dxl_colref)
+								 gpos::Ref<CDXLColRef> dxl_colref)
 	: CDXLScalar(mp), m_dxl_colref(std::move(dxl_colref))
 {
 	GPOS_ASSERT(nullptr != m_dxl_colref);
@@ -49,7 +49,7 @@ CDXLScalarIdent::CDXLScalarIdent(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLScalarIdent::~CDXLScalarIdent()
 {
-	m_dxl_colref->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -89,10 +89,10 @@ CDXLScalarIdent::GetOpNameStr() const
 //		Return column reference of the identifier operator
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLColRef *>
+const CDXLColRef *
 CDXLScalarIdent::GetDXLColRef() const
 {
-	return m_dxl_colref;
+	return m_dxl_colref.get();
 }
 
 //---------------------------------------------------------------------------
@@ -125,7 +125,7 @@ CDXLScalarIdent::TypeModifier() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarIdent::SerializeToDXL(CXMLSerializer *xml_serializer,
-								gpos::pointer<const CDXLNode *> node) const
+								const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -180,7 +180,7 @@ CDXLScalarIdent::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarIdent::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLScalarIdent::AssertValid(const CDXLNode *node,
 							 BOOL  // validate_children
 ) const
 {

@@ -64,8 +64,7 @@ CXformCollapseGbAgg::CXformCollapseGbAgg(CMemoryPool *mp)
 CXform::EXformPromise
 CXformCollapseGbAgg::Exfp(CExpressionHandle &exprhdl) const
 {
-	gpos::pointer<CLogicalGbAgg *> popAgg =
-		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
+	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 	if (!popAgg->FGlobal() || 0 == popAgg->Pdrgpcr()->Size())
 	{
 		return CXform::ExfpNone;
@@ -88,9 +87,8 @@ CXformCollapseGbAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformCollapseGbAgg::Transform(gpos::pointer<CXformContext *> pxfctxt,
-							   gpos::pointer<CXformResult *> pxfres,
-							   gpos::pointer<CExpression *> pexpr) const
+CXformCollapseGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+							   CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -104,13 +102,13 @@ CXformCollapseGbAgg::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	GPOS_ASSERT(0 < popTopGbAgg->Pdrgpcr()->Size());
 	GPOS_ASSERT(popTopGbAgg->FGlobal());
 
-	gpos::pointer<CExpression *> pexprRelational = (*pexpr)[0];
+	CExpression *pexprRelational = (*pexpr)[0];
 	CExpression *pexprTopProjectList = (*pexpr)[1];
 
-	gpos::pointer<CLogicalGbAgg *> popBottomGbAgg =
+	CLogicalGbAgg *popBottomGbAgg =
 		gpos::dyn_cast<CLogicalGbAgg>(pexprRelational->Pop());
 	CExpression *pexprChild = (*pexprRelational)[0];
-	gpos::pointer<CExpression *> pexprBottomProjectList = (*pexprRelational)[1];
+	CExpression *pexprBottomProjectList = (*pexprRelational)[1];
 
 	if (!popBottomGbAgg->FGlobal())
 	{
@@ -127,24 +125,24 @@ CXformCollapseGbAgg::Transform(gpos::pointer<CXformContext *> pxfctxt,
 #ifdef GPOS_DEBUG
 	// for two cascaded GbAgg ops with no agg functions, top grouping
 	// columns must be a subset of bottom grouping columns
-	gpos::owner<CColRefSet *> pcrsTopGrpCols =
+	gpos::Ref<CColRefSet> pcrsTopGrpCols =
 		GPOS_NEW(mp) CColRefSet(mp, popTopGbAgg->Pdrgpcr());
-	gpos::owner<CColRefSet *> pcrsBottomGrpCols =
+	gpos::Ref<CColRefSet> pcrsBottomGrpCols =
 		GPOS_NEW(mp) CColRefSet(mp, popBottomGbAgg->Pdrgpcr());
-	GPOS_ASSERT(pcrsBottomGrpCols->ContainsAll(pcrsTopGrpCols));
+	GPOS_ASSERT(pcrsBottomGrpCols->ContainsAll(pcrsTopGrpCols.get()));
 
-	pcrsTopGrpCols->Release();
-	pcrsBottomGrpCols->Release();
+	;
+	;
 #endif	// GPOS_DEBUG
 
-	pexprChild->AddRef();
-	gpos::owner<CExpression *> pexprSelect = CUtils::PexprLogicalSelect(
+	;
+	gpos::Ref<CExpression> pexprSelect = CUtils::PexprLogicalSelect(
 		mp, pexprChild,
 		CPredicateUtils::PexprConjunction(mp, nullptr /*pdrgpexpr*/));
 
-	popTopGbAgg->AddRef();
-	pexprTopProjectList->AddRef();
-	gpos::owner<CExpression *> pexprGbAggNew = GPOS_NEW(mp) CExpression(
+	;
+	;
+	gpos::Ref<CExpression> pexprGbAggNew = GPOS_NEW(mp) CExpression(
 		mp, popTopGbAgg, std::move(pexprSelect), pexprTopProjectList);
 
 	pxfres->Add(std::move(pexprGbAggNew));

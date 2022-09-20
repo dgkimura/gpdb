@@ -30,8 +30,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexScan::CDXLPhysicalIndexScan(
-	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr,
-	gpos::owner<CDXLIndexDescr *> dxl_index_descr,
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
+	gpos::Ref<CDXLIndexDescr> dxl_index_descr,
 	EdxlIndexScanDirection idx_scan_direction)
 	: CDXLPhysical(mp),
 	  m_dxl_table_descr(std::move(table_descr)),
@@ -52,8 +52,8 @@ CDXLPhysicalIndexScan::CDXLPhysicalIndexScan(
 //---------------------------------------------------------------------------
 CDXLPhysicalIndexScan::~CDXLPhysicalIndexScan()
 {
-	m_dxl_index_descr->Release();
-	m_dxl_table_descr->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -92,10 +92,10 @@ CDXLPhysicalIndexScan::GetOpNameStr() const
 //		Index descriptor for the index scan
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLIndexDescr *>
+const CDXLIndexDescr *
 CDXLPhysicalIndexScan::GetDXLIndexDescr() const
 {
-	return m_dxl_index_descr;
+	return m_dxl_index_descr.get();
 }
 
 //---------------------------------------------------------------------------
@@ -120,10 +120,10 @@ CDXLPhysicalIndexScan::GetIndexScanDir() const
 //		Return the associated table descriptor
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLTableDescr *>
+const CDXLTableDescr *
 CDXLPhysicalIndexScan::GetDXLTableDescr() const
 {
-	return m_dxl_table_descr;
+	return m_dxl_table_descr.get();
 }
 
 //---------------------------------------------------------------------------
@@ -135,8 +135,8 @@ CDXLPhysicalIndexScan::GetDXLTableDescr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalIndexScan::SerializeToDXL(
-	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
+CDXLPhysicalIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer,
+									  const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -153,11 +153,12 @@ CDXLPhysicalIndexScan::SerializeToDXL(
 	node->SerializeChildrenToDXL(xml_serializer);
 
 	// serialize partition mdids (null in this case)
-	gpos::owner<IMdIdArray *> empty = GPOS_NEW(m_mp) IMdIdArray(m_mp);
+	gpos::Ref<IMdIdArray> empty = GPOS_NEW(m_mp) IMdIdArray(m_mp);
 	IMDCacheObject::SerializeMDIdList(
-		xml_serializer, empty, CDXLTokens::GetDXLTokenStr(EdxltokenPartitions),
+		xml_serializer, empty.get(),
+		CDXLTokens::GetDXLTokenStr(EdxltokenPartitions),
 		CDXLTokens::GetDXLTokenStr(EdxltokenPartition));
-	empty->Release();
+	;
 	// serialize index descriptor
 	m_dxl_index_descr->SerializeToDXL(xml_serializer);
 
@@ -178,7 +179,7 @@ CDXLPhysicalIndexScan::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalIndexScan::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLPhysicalIndexScan::AssertValid(const CDXLNode *node,
 								   BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -197,8 +198,7 @@ CDXLPhysicalIndexScan::AssertValid(gpos::pointer<const CDXLNode *> node,
 	GPOS_ASSERT(nullptr != m_dxl_table_descr->MdName());
 	GPOS_ASSERT(m_dxl_table_descr->MdName()->GetMDName()->IsValid());
 
-	gpos::pointer<CDXLNode *> index_cond_dxlnode =
-		(*node)[EdxlisIndexCondition];
+	CDXLNode *index_cond_dxlnode = (*node)[EdxlisIndexCondition];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarIndexCondList ==

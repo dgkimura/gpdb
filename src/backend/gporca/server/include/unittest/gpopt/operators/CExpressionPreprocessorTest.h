@@ -33,8 +33,8 @@ class CExpressionPreprocessorTest
 {
 private:
 	// shorthand for functions for generating the expression for unnest test
-	using FnPexprUnnestTestCase =
-		gpos::owner<CExpression *>(CMemoryPool *, gpos::pointer<CExpression *>);
+	using FnPexprUnnestTestCase = gpos::Ref<CExpression>(CMemoryPool *,
+														 CExpression *);
 
 	// unnest scalar subqueries test cases
 	struct SUnnestSubqueriesTestCase
@@ -56,54 +56,52 @@ private:
 	};	// SUnnestSubqueriesTestCase
 
 	// count number of scalar subqueries
-	static ULONG UlScalarSubqs(gpos::pointer<CExpression *> pexpr);
+	static ULONG UlScalarSubqs(CExpression *pexpr);
 
 	// check if a given expression has a subquery exists node
-	static BOOL FHasSubqueryExists(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasSubqueryExists(CExpression *pexpr);
 
 	// check if a given expression has a subquery not exitst node
-	static BOOL FHasSubqueryNotExists(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasSubqueryNotExists(CExpression *pexpr);
 
 	// check if a given expression has an ALL subquery
-	static BOOL FHasSubqueryAll(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasSubqueryAll(CExpression *pexpr);
 
 	// check if a given expression has an ANY subquery
-	static BOOL FHasSubqueryAny(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasSubqueryAny(CExpression *pexpr);
 
 	// check the type of the subquery
 	static GPOS_RESULT EresCheckSubqueryType(
-		gpos::pointer<CExpression *> pexpr,
-		COperator::EOperatorId eopidPresent);
+		CExpression *pexpr, COperator::EOperatorId eopidPresent);
 
 	static
 		// check the type of the existential subquery
 		GPOS_RESULT
-		EresCheckExistsSubqueryType(gpos::pointer<CExpression *> pexpr,
+		EresCheckExistsSubqueryType(CExpression *pexpr,
 									COperator::EOperatorId eopidPresent);
 
 	// check the type of the quantified subquery
 	static GPOS_RESULT EresCheckQuantifiedSubqueryType(
-		gpos::pointer<CExpression *> pexpr,
-		COperator::EOperatorId eopidPresent);
+		CExpression *pexpr, COperator::EOperatorId eopidPresent);
 
 #ifdef GPOS_DEBUG
 	// check if a given expression has no Outer Join nodes
-	static BOOL FHasNoOuterJoin(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasNoOuterJoin(CExpression *pexpr);
 
 	// check if a given expression has outer references in any node
-	static BOOL HasOuterRefs(gpos::pointer<CExpression *> pexpr);
+	static BOOL HasOuterRefs(CExpression *pexpr);
 
 	// check if a given expression has Sequence Project nodes
-	static BOOL FHasSeqPrj(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasSeqPrj(CExpression *pexpr);
 
 	// check if a given expression has IS DISTINCT FROM nodes
-	static BOOL FHasIDF(gpos::pointer<CExpression *> pexpr);
+	static BOOL FHasIDF(CExpression *pexpr);
 
 #endif	// GPOS_DEBUG
 
 	// create a conjunction of comparisons using the given columns
-	static gpos::owner<CExpression *> PexprCreateConjunction(
-		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array);
+	static gpos::Ref<CExpression> PexprCreateConjunction(
+		CMemoryPool *mp, CColRefArray *colref_array);
 
 	// Helper for preprocessing window functions with outer references
 	static void PreprocessWinFuncWithOuterRefs(const CHAR *szFilePath,
@@ -125,13 +123,14 @@ private:
 		CDrvdPropRelational *rgpdprel[]);
 
 	// helper function for testing cascaded inner/outer joins
-	static gpos::owner<CExpression *> PexprJoinHelper(
-		CMemoryPool *mp, CExpression *pexprLOJ, BOOL fCascadedLOJ,
-		BOOL fIntermediateInnerjoin);
+	static gpos::Ref<CExpression> PexprJoinHelper(CMemoryPool *mp,
+												  CExpression *pexprLOJ,
+												  BOOL fCascadedLOJ,
+												  BOOL fIntermediateInnerjoin);
 
 	// helper function for testing window functions with outer join
-	static gpos::owner<CExpression *> PexprWindowFuncWithLOJHelper(
-		CMemoryPool *mp, gpos::owner<CExpression *> pexprLOJ,
+	static gpos::Ref<CExpression> PexprWindowFuncWithLOJHelper(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprLOJ,
 		CColRef *pcrPartitionBy, BOOL fAddWindowFunction, BOOL fOuterChildPred,
 		BOOL fCascadedLOJ, BOOL fPredBelowWindow);
 
@@ -151,7 +150,7 @@ private:
 	static GPOS_RESULT EresTestLOJ(BOOL fAddWindowFunction);
 
 	// helper to create an expression with a predicate containing an array and other comparisons
-	static gpos::owner<CExpression *> PexprCreateConvertableArray(
+	static gpos::Ref<CExpression> PexprCreateConvertableArray(
 		CMemoryPool *mp, BOOL fCreateInStatement);
 
 public:

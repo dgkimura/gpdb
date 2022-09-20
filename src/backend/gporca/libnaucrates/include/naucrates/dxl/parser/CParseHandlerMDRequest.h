@@ -40,7 +40,7 @@ private:
 	gpos::Ref<IMdIdArray> m_mdid_array;
 
 	// array of type requests
-	gpos::owner<CMDRequest::SMDTypeRequestArray *> m_mdtype_request_array;
+	gpos::Ref<CMDRequest::SMDTypeRequestArray> m_mdtype_request_array;
 
 	// process the start of an element
 	void StartElement(
@@ -75,8 +75,7 @@ public:
 	gpos::Ref<IMdIdArray> GetMdIdArray() const;
 
 	// parsed type requests
-	gpos::pointer<CMDRequest::SMDTypeRequestArray *> GetMDTypeRequestArray()
-		const;
+	CMDRequest::SMDTypeRequestArray *GetMDTypeRequestArray() const;
 };
 }  // namespace gpdxl
 

@@ -44,7 +44,7 @@ private:
 	ULONG m_scan_id;
 
 	// partitions
-	gpos::pointer<ULongPtrArray *> m_partitions;
+	ULongPtrArray *m_partitions;
 
 	// process the start of an element
 	void StartElement(

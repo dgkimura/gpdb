@@ -67,8 +67,8 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -79,24 +79,23 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 		CEngine eng(mp);
 
 		// generate  join expression
-		gpos::owner<CExpression *> pexpr =
+		gpos::Ref<CExpression> pexpr =
 			CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
 
 		// generate query context
-		CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexpr);
+		CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexpr.get());
 
 		// Initialize engine
 		eng.Init(pqc, nullptr /*search_stage_array*/);
 
-		gpos::pointer<CGroup *> pgroup = eng.PgroupRoot();
-		pqc->Prpp()->AddRef();
-		gpos::owner<COptimizationContext *> poc =
-			GPOS_NEW(mp) COptimizationContext(
-				mp, pgroup, pqc->Prpp(),
-				GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp)),
-				GPOS_NEW(mp) IStatisticsArray(mp),
-				0  // ulSearchStageIndex
-			);
+		CGroup *pgroup = eng.PgroupRoot();
+		;
+		gpos::Ref<COptimizationContext> poc = GPOS_NEW(mp) COptimizationContext(
+			mp, pgroup, pqc->Prpp(),
+			GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp)),
+			GPOS_NEW(mp) IStatisticsArray(mp),
+			0  // ulSearchStageIndex
+		);
 
 		// optimize query
 		CJobFactory jf(mp, 1000 /*ulJobs*/);
@@ -185,7 +184,7 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 		{
 			CAutoTrace at(mp);
 			CJobGroupExpressionOptimization jgeo;
-			jgeo.Init(pgexprPhysical, poc, 0 /*ulOptReq*/);
+			jgeo.Init(pgexprPhysical, poc.get(), 0 /*ulOptReq*/);
 			at.Os() << std::endl
 					<< "GROUP EXPRESSION OPTIMIZATION:" << std::endl;
 			(void) jgeo.OsPrint(at.Os());
@@ -253,15 +252,14 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 
 		{
 			CAutoTrace at(mp);
-			gpos::owner<CXformSet *> xform_set =
+			gpos::Ref<CXformSet> xform_set =
 				gpos::dyn_cast<CLogical>(pgexprLogical->Pop())
 					->PxfsCandidates(mp);
 
 			CXformSetIter xsi(*(xform_set));
 			while (xsi.Advance())
 			{
-				gpos::pointer<CXform *> pxform =
-					CXformFactory::Pxff()->Pxf(xsi.TBit());
+				CXform *pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
 				CJobTransformation jt;
 				jt.Init(pgexprLogical, pxform);
 				at.Os() << std::endl
@@ -282,12 +280,12 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 				GPOS_DELETE_ARRAY(pestate);
 			}
 
-			xform_set->Release();
+			;
 		}
 #endif	// GPOS_DEBUG
 
-		pexpr->Release();
-		poc->Release();
+		;
+		;
 		GPOS_DELETE(pqc);
 	}
 

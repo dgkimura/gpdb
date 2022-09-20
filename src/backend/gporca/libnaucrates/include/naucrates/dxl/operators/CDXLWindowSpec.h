@@ -41,16 +41,16 @@ private:
 	CMemoryPool *m_mp;
 
 	// partition-by column identifiers
-	gpos::owner<ULongPtrArray *> m_partition_by_colid_array;
+	gpos::Ref<ULongPtrArray> m_partition_by_colid_array;
 
 	// name of window specification
 	CMDName *m_mdname;
 
 	// sorting columns
-	gpos::owner<CDXLNode *> m_sort_col_list_dxlnode;
+	gpos::Ref<CDXLNode> m_sort_col_list_dxlnode;
 
 	// window frame associated with the window key
-	gpos::owner<CDXLWindowFrame *> m_window_frame;
+	gpos::Ref<CDXLWindowFrame> m_window_frame;
 
 	// private copy ctor
 	CDXLWindowSpec(const CDXLWindowSpec &);
@@ -58,10 +58,9 @@ private:
 public:
 	// ctor
 	CDXLWindowSpec(CMemoryPool *mp,
-				   gpos::owner<ULongPtrArray *> partition_by_colid_array,
-				   CMDName *mdname,
-				   gpos::owner<CDXLNode *> sort_col_list_dxlnode,
-				   gpos::owner<CDXLWindowFrame *> window_frame);
+				   gpos::Ref<ULongPtrArray> partition_by_colid_array,
+				   CMDName *mdname, gpos::Ref<CDXLNode> sort_col_list_dxlnode,
+				   gpos::Ref<CDXLWindowFrame> window_frame);
 
 	// dtor
 	~CDXLWindowSpec() override;
@@ -73,24 +72,24 @@ public:
 	void SetWindowFrame(CDXLWindowFrame *window_frame);
 
 	// return window frame
-	gpos::pointer<CDXLWindowFrame *>
+	CDXLWindowFrame *
 	GetWindowFrame() const
 	{
-		return m_window_frame;
+		return m_window_frame.get();
 	}
 
 	// partition-by column identifiers
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetPartitionByColIdArray() const
 	{
-		return m_partition_by_colid_array;
+		return m_partition_by_colid_array.get();
 	}
 
 	// sort columns
-	gpos::pointer<CDXLNode *>
+	CDXLNode *
 	GetSortColListDXL() const
 	{
-		return m_sort_col_list_dxlnode;
+		return m_sort_col_list_dxlnode.get();
 	}
 
 	// window specification name
@@ -101,7 +100,7 @@ public:
 	}
 };
 
-using CDXLWindowSpecArray = CDynamicPtrArray<CDXLWindowSpec, CleanupRelease>;
+using CDXLWindowSpecArray = gpos::Vector<gpos::Ref<CDXLWindowSpec>>;
 }  // namespace gpdxl
 #endif	// !GPDXL_CDXLWindowSpec_H
 

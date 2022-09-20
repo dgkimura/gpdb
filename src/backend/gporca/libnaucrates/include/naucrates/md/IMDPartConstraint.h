@@ -44,12 +44,12 @@ class IMDPartConstraint : public IMDInterface
 public:
 	// extract the scalar expression of the constraint with the given
 	// column mappings
-	virtual gpos::owner<CExpression *> GetPartConstraintExpr(
+	virtual gpos::Ref<CExpression> GetPartConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::pointer<CColRefArray *> colref_array) const = 0;
+		CColRefArray *colref_array) const = 0;
 
 	// included default partitions
-	virtual gpos::pointer<ULongPtrArray *> GetDefaultPartsArray() const = 0;
+	virtual ULongPtrArray *GetDefaultPartsArray() const = 0;
 
 	// is constraint unbounded
 	virtual BOOL IsConstraintUnbounded() const = 0;

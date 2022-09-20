@@ -44,7 +44,7 @@ private:
 	CMDName *m_mdname;
 
 	// list of column descriptors
-	gpos::owner<CDXLColDescrArray *> m_dxl_col_descr_array;
+	gpos::Ref<CDXLColDescrArray> m_dxl_col_descr_array;
 
 public:
 	CDXLLogicalTVF(const CDXLLogicalTVF &) = delete;
@@ -52,7 +52,7 @@ public:
 	// ctor/dtor
 	CDXLLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 				   gpos::Ref<IMDId> mdid_return_type, CMDName *mdname,
-				   gpos::owner<CDXLColDescrArray *> pdrgdxlcd);
+				   gpos::Ref<CDXLColDescrArray> pdrgdxlcd);
 
 	~CDXLLogicalTVF() override;
 
@@ -87,24 +87,24 @@ public:
 	ULONG Arity() const;
 
 	// return the array of column descriptors
-	gpos::pointer<const CDXLColDescrArray *>
+	const CDXLColDescrArray *
 	GetDXLColumnDescrArray() const
 	{
-		return m_dxl_col_descr_array;
+		return m_dxl_col_descr_array.get();
 	}
 
 	// get the column descriptor at the given position
-	gpos::pointer<const CDXLColDescr *> GetColumnDescrAt(ULONG ul) const;
+	const CDXLColDescr *GetColumnDescrAt(ULONG ul) const;
 
 	// check if given column is defined by operator
 	BOOL IsColDefined(ULONG colid) const override;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLLogicalTVF *>
+	static CDXLLogicalTVF *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -116,8 +116,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

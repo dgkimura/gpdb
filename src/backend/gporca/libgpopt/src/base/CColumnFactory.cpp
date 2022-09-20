@@ -62,7 +62,7 @@ CColumnFactory::CColumnFactory()
 //---------------------------------------------------------------------------
 CColumnFactory::~CColumnFactory()
 {
-	CRefCount::SafeRelease(m_phmcrcrs);
+	;
 
 	// dealloc hash table
 	m_sht.Cleanup();
@@ -95,8 +95,7 @@ CColumnFactory::Initialize()
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(gpos::pointer<const IMDType *> pmdtype,
-						  INT type_modifier)
+CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier)
 {
 	// increment atomic counter
 	ULONG id = m_aul++;
@@ -119,8 +118,8 @@ CColumnFactory::PcrCreate(gpos::pointer<const IMDType *> pmdtype,
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(gpos::pointer<const IMDType *> pmdtype,
-						  INT type_modifier, const CName &name)
+CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier,
+						  const CName &name)
 {
 	ULONG id = m_aul++;
 
@@ -139,8 +138,8 @@ CColumnFactory::PcrCreate(gpos::pointer<const IMDType *> pmdtype,
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(gpos::pointer<const IMDType *> pmdtype,
-						  INT type_modifier, ULONG id, const CName &name)
+CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier, ULONG id,
+						  const CName &name)
 {
 	CName *pnameCopy = GPOS_NEW(m_mp) CName(m_mp, name);
 	CAutoP<CName> a_pnameCopy(pnameCopy);
@@ -170,9 +169,9 @@ CColumnFactory::PcrCreate(gpos::pointer<const IMDType *> pmdtype,
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(gpos::pointer<const CColumnDescriptor *> pcoldesc,
-						  ULONG id, const CName &name, ULONG ulOpSource,
-						  BOOL mark_as_used, gpos::pointer<IMDId *> mdid_table)
+CColumnFactory::PcrCreate(const CColumnDescriptor *pcoldesc, ULONG id,
+						  const CName &name, ULONG ulOpSource,
+						  BOOL mark_as_used, IMDId *mdid_table)
 {
 	CName *pnameCopy = GPOS_NEW(m_mp) CName(m_mp, name);
 	CAutoP<CName> a_pnameCopy(pnameCopy);
@@ -209,11 +208,10 @@ CColumnFactory::PcrCreate(gpos::pointer<const CColumnDescriptor *> pcoldesc,
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(gpos::pointer<const IMDType *> pmdtype,
-						  INT type_modifier, gpos::pointer<IMDId *> mdid_table,
-						  INT attno, BOOL is_nullable, ULONG id,
-						  const CName &name, ULONG ulOpSource, BOOL isDistCol,
-						  ULONG ulWidth)
+CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier,
+						  IMDId *mdid_table, INT attno, BOOL is_nullable,
+						  ULONG id, const CName &name, ULONG ulOpSource,
+						  BOOL isDistCol, ULONG ulWidth)
 {
 	CName *pnameCopy = GPOS_NEW(m_mp) CName(m_mp, name);
 	CAutoP<CName> a_pnameCopy(pnameCopy);
@@ -242,9 +240,9 @@ CColumnFactory::PcrCreate(gpos::pointer<const IMDType *> pmdtype,
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(gpos::pointer<const CColumnDescriptor *> pcoldesc,
-						  const CName &name, ULONG ulOpSource,
-						  BOOL mark_as_used, gpos::pointer<IMDId *> mdid_table)
+CColumnFactory::PcrCreate(const CColumnDescriptor *pcoldesc, const CName &name,
+						  ULONG ulOpSource, BOOL mark_as_used,
+						  IMDId *mdid_table)
 {
 	ULONG id = m_aul++;
 
@@ -336,14 +334,14 @@ CColumnFactory::Destroy(CColRef *colref)
 //		Lookup the set of used column references (if any) based on id of
 //		computed column
 //---------------------------------------------------------------------------
-gpos::pointer<const CColRefSet *>
+const CColRefSet *
 CColumnFactory::PcrsUsedInComputedCol(const CColRef *colref)
 {
 	GPOS_ASSERT(nullptr != colref);
 	GPOS_ASSERT(nullptr != m_phmcrcrs);
 
 	// get its column reference set from the hash map
-	gpos::pointer<const CColRefSet *> pcrs = m_phmcrcrs->Find(colref);
+	const CColRefSet *pcrs = m_phmcrcrs->Find(colref);
 
 	return pcrs;
 }
@@ -358,16 +356,16 @@ CColumnFactory::PcrsUsedInComputedCol(const CColRef *colref)
 //
 //---------------------------------------------------------------------------
 void
-CColumnFactory::AddComputedToUsedColsMap(gpos::pointer<CExpression *> pexpr)
+CColumnFactory::AddComputedToUsedColsMap(CExpression *pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != m_phmcrcrs);
 
-	gpos::pointer<const CScalarProjectElement *> popScPrEl =
+	const CScalarProjectElement *popScPrEl =
 		gpos::dyn_cast<CScalarProjectElement>(pexpr->Pop());
 	CColRef *pcrComputedCol = popScPrEl->Pcr();
 
-	gpos::pointer<CColRefSet *> pcrsUsed = pexpr->DeriveUsedColumns();
+	CColRefSet *pcrsUsed = pexpr->DeriveUsedColumns();
 	if (nullptr != pcrsUsed && 0 < pcrsUsed->Size())
 	{
 		BOOL fres GPOS_ASSERTS_ONLY = m_phmcrcrs->Insert(

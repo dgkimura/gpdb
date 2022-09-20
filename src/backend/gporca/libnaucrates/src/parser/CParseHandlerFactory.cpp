@@ -25,7 +25,7 @@ using namespace gpdxl;
 
 XERCES_CPP_NAMESPACE_USE
 
-gpos::owner<CParseHandlerFactory::TokenParseHandlerFuncMap *>
+gpos::Ref<CParseHandlerFactory::TokenParseHandlerFuncMap>
 	CParseHandlerFactory::m_token_parse_handler_func_map = nullptr;
 
 // adds a new mapping of token to corresponding parse handler

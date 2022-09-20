@@ -43,7 +43,7 @@ CDXLPhysicalTableScan::CDXLPhysicalTableScan(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalTableScan::CDXLPhysicalTableScan(
-	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr)
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr)
 	: CDXLPhysical(mp), m_dxl_table_descr(std::move(table_descr))
 {
 }
@@ -59,7 +59,7 @@ CDXLPhysicalTableScan::CDXLPhysicalTableScan(
 //---------------------------------------------------------------------------
 CDXLPhysicalTableScan::~CDXLPhysicalTableScan()
 {
-	CRefCount::SafeRelease(m_dxl_table_descr);
+	;
 }
 
 
@@ -72,8 +72,7 @@ CDXLPhysicalTableScan::~CDXLPhysicalTableScan()
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalTableScan::SetTableDescriptor(
-	gpos::owner<CDXLTableDescr *> table_descr)
+CDXLPhysicalTableScan::SetTableDescriptor(gpos::Ref<CDXLTableDescr> table_descr)
 {
 	// allow setting table descriptor only once
 	GPOS_ASSERT(nullptr == m_dxl_table_descr);
@@ -118,10 +117,10 @@ CDXLPhysicalTableScan::GetOpNameStr() const
 //		Table descriptor for the table scan
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLTableDescr *>
+const CDXLTableDescr *
 CDXLPhysicalTableScan::GetDXLTableDescr()
 {
-	return m_dxl_table_descr;
+	return m_dxl_table_descr.get();
 }
 
 
@@ -134,9 +133,8 @@ CDXLPhysicalTableScan::GetDXLTableDescr()
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalTableScan::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLPhysicalTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
+									  const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -166,7 +164,7 @@ CDXLPhysicalTableScan::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalTableScan::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalTableScan::AssertValid(const CDXLNode *dxlnode,
 								   BOOL validate_children) const
 {
 	// assert proj list and filter are valid

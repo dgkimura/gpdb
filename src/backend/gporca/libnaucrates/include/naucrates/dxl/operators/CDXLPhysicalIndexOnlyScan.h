@@ -38,8 +38,8 @@ public:
 
 	//ctor
 	CDXLPhysicalIndexOnlyScan(CMemoryPool *mp,
-							  gpos::owner<CDXLTableDescr *> table_descr,
-							  gpos::owner<CDXLIndexDescr *> dxl_index_descr,
+							  gpos::Ref<CDXLTableDescr> table_descr,
+							  gpos::Ref<CDXLIndexDescr> dxl_index_descr,
 							  EdxlIndexScanDirection idx_scan_direction);
 
 	//dtor
@@ -52,7 +52,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalIndexOnlyScan *>
+	static CDXLPhysicalIndexOnlyScan *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

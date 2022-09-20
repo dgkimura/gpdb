@@ -68,13 +68,13 @@ public:
 	const CHAR *SzId() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
 
 	// conversion function
-	static gpos::cast_func<CScalarArrayCoerceExpr *> PopConvert(COperator *pop);
+	static CScalarArrayCoerceExpr *PopConvert(COperator *pop);
 
 };	// class CScalarArrayCoerceExpr
 

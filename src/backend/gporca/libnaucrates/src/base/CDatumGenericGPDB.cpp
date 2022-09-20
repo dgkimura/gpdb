@@ -213,14 +213,14 @@ CDatumGenericGPDB::GetStrRepr(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumGenericGPDB::Matches(gpos::pointer<const IDatum *> datum) const
+CDatumGenericGPDB::Matches(const IDatum *datum) const
 {
 	if (!datum->MDId()->Equals(m_mdid.get()) || (datum->Size() != Size()))
 	{
 		return false;
 	}
 
-	gpos::pointer<const CDatumGenericGPDB *> datum_generic =
+	const CDatumGenericGPDB *datum_generic =
 		dynamic_cast<const CDatumGenericGPDB *>(datum);
 
 	if (datum_generic->IsNull() && IsNull())
@@ -248,7 +248,7 @@ CDatumGenericGPDB::Matches(gpos::pointer<const IDatum *> datum) const
 //		Returns a copy of the datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CDatumGenericGPDB::MakeCopy(CMemoryPool *mp) const
 {
 	// CDatumGenericGPDB makes a copy of the buffer
@@ -332,7 +332,7 @@ CDatumGenericGPDB::GetByteArrayValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumGenericGPDB::StatsAreEqual(gpos::pointer<const IDatum *> datum) const
+CDatumGenericGPDB::StatsAreEqual(const IDatum *datum) const
 {
 	// if mapping exists, use that to compute equality
 	if (IsDatumMappableToLINT() || IsDatumMappableToDouble())
@@ -347,7 +347,7 @@ CDatumGenericGPDB::StatsAreEqual(gpos::pointer<const IDatum *> datum) const
 	}
 
 	// fall back to memcmp
-	gpos::pointer<const CDatumGenericGPDB *> datum_generic_gpdb =
+	const CDatumGenericGPDB *datum_generic_gpdb =
 		dynamic_cast<const CDatumGenericGPDB *>(datum);
 
 	ULONG size = this->Size();
@@ -410,7 +410,7 @@ CDatumGenericGPDB::NeedsPadding() const
 //		Return the padded datum
 //
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CDatumGenericGPDB::MakePaddedDatum(CMemoryPool *mp, ULONG col_len) const
 {
 	// in GPDB the first four bytes of the datum are used for the header
@@ -435,8 +435,8 @@ CDatumGenericGPDB::MakePaddedDatum(CMemoryPool *mp, ULONG col_len) const
 							adjusted_col_width - datum_len);
 
 		// create a new datum
-		this->MDId()->AddRef();
-		gpos::owner<CDatumGenericGPDB *> datum_new = GPOS_NEW(m_mp)
+		;
+		gpos::Ref<CDatumGenericGPDB> datum_new = GPOS_NEW(m_mp)
 			CDatumGenericGPDB(mp, this->MDId(), this->TypeModifier(), dest,
 							  adjusted_col_width, this->IsNull(),
 							  this->GetLINTMapping(), 0 /* dValue */

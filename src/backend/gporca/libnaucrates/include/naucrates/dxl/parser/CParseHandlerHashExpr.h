@@ -38,7 +38,7 @@ class CParseHandlerHashExpr : public CParseHandlerScalarOp
 {
 private:
 	// hash expr operator
-	gpos::pointer<CDXLScalarHashExpr *> m_dxl_op;
+	CDXLScalarHashExpr *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

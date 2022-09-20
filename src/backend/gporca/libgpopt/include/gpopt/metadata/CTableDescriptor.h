@@ -28,11 +28,10 @@ using namespace gpos;
 using namespace gpmd;
 
 // dynamic array of columns -- array owns columns
-using CColumnDescriptorArray =
-	CDynamicPtrArray<CColumnDescriptor, CleanupRelease>;
+using CColumnDescriptorArray = gpos::Vector<gpos::Ref<CColumnDescriptor>>;
 
 // dynamic array of bitsets
-using CBitSetArray = CDynamicPtrArray<CBitSet, CleanupRelease>;
+using CBitSetArray = gpos::Vector<gpos::Ref<CBitSet>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -56,7 +55,7 @@ private:
 	CName m_name;
 
 	// array of columns
-	gpos::owner<CColumnDescriptorArray *> m_pdrgpcoldesc;
+	gpos::Ref<CColumnDescriptorArray> m_pdrgpcoldesc;
 
 	// distribution policy
 	IMDRelation::Ereldistrpolicy m_rel_distr_policy;
@@ -65,7 +64,7 @@ private:
 	IMDRelation::Erelstoragetype m_erelstoragetype;
 
 	// distribution columns for hash distribution
-	gpos::owner<CColumnDescriptorArray *> m_pdrgpcoldescDist;
+	gpos::Ref<CColumnDescriptorArray> m_pdrgpcoldescDist;
 
 	// Opfamily used for hash distribution
 	gpos::Ref<IMdIdArray> m_distr_opfamilies;
@@ -78,10 +77,10 @@ private:
 	BOOL m_convert_hash_to_random;
 
 	// indexes of partition columns for partitioned tables
-	gpos::owner<ULongPtrArray *> m_pdrgpulPart;
+	gpos::Ref<ULongPtrArray> m_pdrgpulPart;
 
 	// key sets
-	gpos::owner<CBitSetArray *> m_pdrgpbsKeys;
+	gpos::Ref<CBitSetArray> m_pdrgpbsKeys;
 
 	// id of user the table needs to be accessed with
 	ULONG m_execute_as_user_id;
@@ -103,7 +102,7 @@ public:
 	~CTableDescriptor() override;
 
 	// add a column to the table descriptor
-	void AddColumn(gpos::owner<CColumnDescriptor *>);
+	void AddColumn(gpos::Ref<CColumnDescriptor>);
 
 	// add the column at the specified position to the list of distribution columns
 	void AddDistributionColumn(ULONG ulPos, IMDId *opfamily);
@@ -112,11 +111,11 @@ public:
 	void AddPartitionColumn(ULONG ulPos);
 
 	// add a keyset
-	BOOL FAddKeySet(gpos::owner<CBitSet *> pbs);
+	BOOL FAddKeySet(gpos::Ref<CBitSet> pbs);
 
 	// accessors
 	ULONG ColumnCount() const;
-	gpos::pointer<const CColumnDescriptor *> Pcoldesc(ULONG) const;
+	const CColumnDescriptor *Pcoldesc(ULONG) const;
 
 	// mdid accessor
 	IMDId *
@@ -149,38 +148,38 @@ public:
 	ULONG GetAttributePosition(INT attno) const;
 
 	// column descriptor accessor
-	gpos::pointer<CColumnDescriptorArray *>
+	CColumnDescriptorArray *
 	Pdrgpcoldesc() const
 	{
-		return m_pdrgpcoldesc;
+		return m_pdrgpcoldesc.get();
 	}
 
 	// distribution column descriptors accessor
-	gpos::pointer<const CColumnDescriptorArray *>
+	const CColumnDescriptorArray *
 	PdrgpcoldescDist() const
 	{
-		return m_pdrgpcoldescDist;
+		return m_pdrgpcoldescDist.get();
 	}
 
 	// distribution column descriptors accessor
-	gpos::pointer<const IMdIdArray *>
+	const IMdIdArray *
 	DistrOpfamilies() const
 	{
 		return m_distr_opfamilies.get();
 	}
 
 	// partition column indexes accessor
-	gpos::pointer<const ULongPtrArray *>
+	const ULongPtrArray *
 	PdrgpulPart() const
 	{
-		return m_pdrgpulPart;
+		return m_pdrgpulPart.get();
 	}
 
 	// array of key sets
-	gpos::pointer<const CBitSetArray *>
+	const CBitSetArray *
 	PdrgpbsKeys() const
 	{
-		return m_pdrgpbsKeys;
+		return m_pdrgpbsKeys.get();
 	}
 
 	// return the number of leaf partitions
@@ -217,8 +216,8 @@ public:
 
 	// helper function for finding the index of a column descriptor in
 	// an array of column descriptors
-	static ULONG UlPos(gpos::pointer<const CColumnDescriptor *>,
-					   gpos::pointer<const CColumnDescriptorArray *>);
+	static ULONG UlPos(const CColumnDescriptor *,
+					   const CColumnDescriptorArray *);
 
 	IOstream &OsPrint(IOstream &os) const;
 

@@ -50,7 +50,7 @@ private:
 	INT m_type_modifier;
 
 	// cached type information (can be set from const methods)
-	mutable gpos::pointer<const IMDType *> m_cached_type;
+	mutable const IMDType *m_cached_type;
 
 	// long int value used for statistic computation
 	LINT m_stats_comp_val_int;
@@ -87,10 +87,10 @@ public:
 	ULONG HashValue() const override;
 
 	// match function for datums
-	BOOL Matches(gpos::pointer<const IDatum *> datum) const override;
+	BOOL Matches(const IDatum *datum) const override;
 
 	// copy datum
-	gpos::owner<IDatum *> MakeCopy(CMemoryPool *mp) const override;
+	gpos::Ref<IDatum> MakeCopy(CMemoryPool *mp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;
@@ -128,14 +128,14 @@ public:
 	const BYTE *GetByteArrayValue() const override;
 
 	// stats equality
-	BOOL StatsAreEqual(gpos::pointer<const IDatum *> datum) const override;
+	BOOL StatsAreEqual(const IDatum *datum) const override;
 
 	// does the datum need to be padded before statistical derivation
 	BOOL NeedsPadding() const override;
 
 	// return the padded datum
-	gpos::owner<IDatum *> MakePaddedDatum(CMemoryPool *mp,
-										  ULONG col_len) const override;
+	gpos::Ref<IDatum> MakePaddedDatum(CMemoryPool *mp,
+									  ULONG col_len) const override;
 
 	// does datum support like predicate
 	BOOL

@@ -78,10 +78,10 @@ CTableDescriptor::CTableDescriptor(
 //---------------------------------------------------------------------------
 CTableDescriptor::~CTableDescriptor()
 {
-	m_pdrgpcoldesc->Release();
-	m_pdrgpcoldescDist->Release();
-	m_pdrgpulPart->Release();
-	m_pdrgpbsKeys->Release();
+	;
+	;
+	;
+	;
 }
 
 
@@ -112,9 +112,8 @@ CTableDescriptor::ColumnCount() const
 //
 //---------------------------------------------------------------------------
 ULONG
-CTableDescriptor::UlPos(
-	gpos::pointer<const CColumnDescriptor *> pcoldesc,
-	gpos::pointer<const CColumnDescriptorArray *> pdrgpcoldesc)
+CTableDescriptor::UlPos(const CColumnDescriptor *pcoldesc,
+						const CColumnDescriptorArray *pdrgpcoldesc)
 {
 	GPOS_ASSERT(nullptr != pcoldesc);
 	GPOS_ASSERT(nullptr != pdrgpcoldesc);
@@ -148,7 +147,7 @@ CTableDescriptor::GetAttributePosition(INT attno) const
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		gpos::pointer<CColumnDescriptor *> pcoldesc = (*m_pdrgpcoldesc)[ul];
+		CColumnDescriptor *pcoldesc = (*m_pdrgpcoldesc)[ul].get();
 		if (pcoldesc->AttrNum() == attno)
 		{
 			ulPos = ul;
@@ -168,7 +167,7 @@ CTableDescriptor::GetAttributePosition(INT attno) const
 //
 //---------------------------------------------------------------------------
 void
-CTableDescriptor::AddColumn(gpos::owner<CColumnDescriptor *> pcoldesc)
+CTableDescriptor::AddColumn(gpos::Ref<CColumnDescriptor> pcoldesc)
 {
 	GPOS_ASSERT(nullptr != pcoldesc);
 
@@ -187,15 +186,15 @@ CTableDescriptor::AddColumn(gpos::owner<CColumnDescriptor *> pcoldesc)
 void
 CTableDescriptor::AddDistributionColumn(ULONG ulPos, IMDId *opfamily)
 {
-	gpos::owner<CColumnDescriptor *> pcoldesc = (*m_pdrgpcoldesc)[ulPos];
-	pcoldesc->AddRef();
+	gpos::Ref<CColumnDescriptor> pcoldesc = (*m_pdrgpcoldesc)[ulPos];
+	;
 	m_pdrgpcoldescDist->Append(pcoldesc);
 	pcoldesc->SetAsDistCol();
 
 	if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 	{
 		GPOS_ASSERT(nullptr != opfamily && opfamily->IsValid());
-		opfamily->AddRef();
+		;
 		m_distr_opfamilies->Append(opfamily);
 
 		GPOS_ASSERT(m_pdrgpcoldescDist->Size() == m_distr_opfamilies->Size());
@@ -226,7 +225,7 @@ CTableDescriptor::AddPartitionColumn(ULONG ulPos)
 //
 //---------------------------------------------------------------------------
 BOOL
-CTableDescriptor::FAddKeySet(gpos::owner<CBitSet *> pbs)
+CTableDescriptor::FAddKeySet(gpos::Ref<CBitSet> pbs)
 {
 	GPOS_ASSERT(nullptr != pbs);
 	GPOS_ASSERT(pbs->Size() <= m_pdrgpcoldesc->Size());
@@ -235,8 +234,8 @@ CTableDescriptor::FAddKeySet(gpos::owner<CBitSet *> pbs)
 	BOOL fFound = false;
 	for (ULONG ul = 0; !fFound && ul < size; ul++)
 	{
-		gpos::pointer<CBitSet *> pbsCurrent = (*m_pdrgpbsKeys)[ul];
-		fFound = pbsCurrent->Equals(pbs);
+		CBitSet *pbsCurrent = (*m_pdrgpbsKeys)[ul].get();
+		fFound = pbsCurrent->Equals(pbs.get());
 	}
 
 	if (!fFound)
@@ -255,12 +254,12 @@ CTableDescriptor::FAddKeySet(gpos::owner<CBitSet *> pbs)
 //		Get n-th column descriptor
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CColumnDescriptor *>
+const CColumnDescriptor *
 CTableDescriptor::Pcoldesc(ULONG ulCol) const
 {
 	GPOS_ASSERT(ulCol < ColumnCount());
 
-	return (*m_pdrgpcoldesc)[ulCol];
+	return (*m_pdrgpcoldesc)[ulCol].get();
 }
 
 
@@ -277,7 +276,8 @@ CTableDescriptor::OsPrint(IOstream &os) const
 {
 	m_name.OsPrint(os);
 	os << ": (";
-	CUtils::OsPrintDrgPcoldesc(os, m_pdrgpcoldesc, m_pdrgpcoldesc->Size());
+	CUtils::OsPrintDrgPcoldesc(os, m_pdrgpcoldesc.get(),
+							   m_pdrgpcoldesc->Size());
 	os << ")";
 	return os;
 }
@@ -298,8 +298,7 @@ CTableDescriptor::IndexCount()
 	GPOS_ASSERT(nullptr != m_mdid.get());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	gpos::pointer<const IMDRelation *> pmdrel =
-		md_accessor->RetrieveRel(m_mdid.get());
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_mdid.get());
 	const ULONG ulIndices = pmdrel->IndexCount();
 
 	return ulIndices;
@@ -320,8 +319,7 @@ CTableDescriptor::PartitionCount() const
 	GPOS_ASSERT(nullptr != m_mdid.get());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	gpos::pointer<const IMDRelation *> pmdrel =
-		md_accessor->RetrieveRel(m_mdid.get());
+	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_mdid.get());
 	const ULONG ulPartitions = pmdrel->PartitionCount();
 
 	return ulPartitions;

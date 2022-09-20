@@ -87,7 +87,7 @@ CDXLPhysicalSort::FDiscardDuplicates() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalSort::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 gpos::pointer<const CDXLNode *> dxlnode) const
+								 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -118,7 +118,7 @@ CDXLPhysicalSort::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSort::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalSort::AssertValid(const CDXLNode *dxlnode,
 							  BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -126,13 +126,10 @@ CDXLPhysicalSort::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	GPOS_ASSERT(EdxlsortIndexSentinel == dxlnode->Arity());
 
-	gpos::pointer<CDXLNode *> sort_col_list_dxlnode =
-		(*dxlnode)[EdxlsortIndexSortColList];
-	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[EdxlsortIndexChild];
-	gpos::pointer<CDXLNode *> limit_count_dxlnode =
-		(*dxlnode)[EdxlsortIndexLimitCount];
-	gpos::pointer<CDXLNode *> limit_offset_dxlnode =
-		(*dxlnode)[EdxlsortIndexLimitOffset];
+	CDXLNode *sort_col_list_dxlnode = (*dxlnode)[EdxlsortIndexSortColList];
+	CDXLNode *child_dxlnode = (*dxlnode)[EdxlsortIndexChild];
+	CDXLNode *limit_count_dxlnode = (*dxlnode)[EdxlsortIndexLimitCount];
+	CDXLNode *limit_offset_dxlnode = (*dxlnode)[EdxlsortIndexLimitOffset];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxloptypeScalar ==

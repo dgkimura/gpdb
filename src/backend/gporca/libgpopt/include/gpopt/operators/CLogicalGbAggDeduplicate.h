@@ -43,7 +43,7 @@ class CLogicalGbAggDeduplicate : public CLogicalGbAgg
 {
 private:
 	// array of keys from the join's child
-	gpos::owner<CColRefArray *> m_pdrgpcrKeys;
+	gpos::Ref<CColRefArray> m_pdrgpcrKeys;
 
 public:
 	CLogicalGbAggDeduplicate(const CLogicalGbAggDeduplicate &) = delete;
@@ -53,16 +53,16 @@ public:
 
 	// ctor
 	CLogicalGbAggDeduplicate(CMemoryPool *mp,
-							 gpos::owner<CColRefArray *> colref_array,
+							 gpos::Ref<CColRefArray> colref_array,
 							 COperator::EGbAggType egbaggtype,
-							 gpos::owner<CColRefArray *> pdrgpcrKeys = nullptr);
+							 gpos::Ref<CColRefArray> pdrgpcrKeys = nullptr);
 
 	// ctor
 	CLogicalGbAggDeduplicate(CMemoryPool *mp,
-							 gpos::owner<CColRefArray *> colref_array,
-							 gpos::owner<CColRefArray *> pdrgpcrMinimal,
+							 gpos::Ref<CColRefArray> colref_array,
+							 gpos::Ref<CColRefArray> pdrgpcrMinimal,
 							 COperator::EGbAggType egbaggtype,
-							 gpos::owner<CColRefArray *> pdrgpcrKeys = nullptr);
+							 gpos::Ref<CColRefArray> pdrgpcrKeys = nullptr);
 
 	// dtor
 	~CLogicalGbAggDeduplicate() override;
@@ -82,21 +82,21 @@ public:
 	}
 
 	// array of keys from the join's child that needs to be deduped
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrKeys() const
 	{
-		return m_pdrgpcrKeys;
+		return m_pdrgpcrKeys.get();
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive key collections
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// compute required stats columns of the n-th child
@@ -113,29 +113,28 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	gpos::owner<CColRefSet *> PcrsStat(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   gpos::pointer<CColRefSet *> pcrsInput,
-									   ULONG child_index) const override;
+	gpos::Ref<CColRefSet> PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								   CColRefSet *pcrsInput,
+								   ULONG child_index) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CLogicalGbAggDeduplicate *>
+	static CLogicalGbAggDeduplicate *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -67,50 +67,48 @@ CXformJoinAssociativity::CXformJoinAssociativity(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformJoinAssociativity::CreatePredicates(
-	CMemoryPool *mp, CExpression *pexpr,
-	gpos::pointer<CExpressionArray *> pdrgpexprLower,
-	gpos::pointer<CExpressionArray *> pdrgpexprUpper)
+CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp, CExpression *pexpr,
+										  CExpressionArray *pdrgpexprLower,
+										  CExpressionArray *pdrgpexprUpper)
 {
 	GPOS_CHECK_ABORT;
 
 	// bind operators
 	CExpression *pexprLeft = (*pexpr)[0];
-	gpos::pointer<CExpression *> pexprLeftLeft = (*pexprLeft)[0];
-	gpos::pointer<CExpression *> pexprRight = (*pexpr)[1];
+	CExpression *pexprLeftLeft = (*pexprLeft)[0];
+	CExpression *pexprRight = (*pexpr)[1];
 
-	gpos::owner<CExpressionArray *> pdrgpexprJoins =
+	gpos::Ref<CExpressionArray> pdrgpexprJoins =
 		GPOS_NEW(mp) CExpressionArray(mp);
 
-	pexprLeft->AddRef();
+	;
 	pdrgpexprJoins->Append(pexprLeft);
 
-	pexpr->AddRef();
+	;
 	pdrgpexprJoins->Append(pexpr);
 
 	// columns for new lower join
-	gpos::owner<CColRefSet *> pcrsLower = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsLower = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsLower->Union(pexprLeftLeft->DeriveOutputColumns());
 	pcrsLower->Union(pexprRight->DeriveOutputColumns());
 
 	// convert current predicates into arrays of conjuncts
-	gpos::owner<CExpressionArray *> pdrgpexprOrig =
+	gpos::Ref<CExpressionArray> pdrgpexprOrig =
 		GPOS_NEW(mp) CExpressionArray(mp);
 
 	for (ULONG ul = 0; ul < 2; ul++)
 	{
-		gpos::owner<CExpressionArray *> pdrgpexprPreds =
+		gpos::Ref<CExpressionArray> pdrgpexprPreds =
 			CPredicateUtils::PdrgpexprConjuncts(mp,
 												(*(*pdrgpexprJoins)[ul])[2]);
 		ULONG length = pdrgpexprPreds->Size();
 		for (ULONG ulConj = 0; ulConj < length; ulConj++)
 		{
-			gpos::owner<CExpression *> pexprConj = (*pdrgpexprPreds)[ulConj];
-			pexprConj->AddRef();
+			gpos::Ref<CExpression> pexprConj = (*pdrgpexprPreds)[ulConj];
+			;
 
 			pdrgpexprOrig->Append(pexprConj);
-		}
-		pdrgpexprPreds->Release();
+		};
 	}
 
 	// divvy up conjuncts for upper and lower join
@@ -118,9 +116,9 @@ CXformJoinAssociativity::CreatePredicates(
 	for (ULONG ul = 0; ul < ulConj; ul++)
 	{
 		CExpression *pexprPred = (*pdrgpexprOrig)[ul];
-		gpos::pointer<CColRefSet *> pcrs = pexprPred->DeriveUsedColumns();
+		CColRefSet *pcrs = pexprPred->DeriveUsedColumns();
 
-		pexprPred->AddRef();
+		;
 		if (pcrsLower->ContainsAll(pcrs))
 		{
 			pdrgpexprLower->Append(pexprPred);
@@ -135,7 +133,7 @@ CXformJoinAssociativity::CreatePredicates(
 	// predicate to be a scalar const "true".
 	if (pdrgpexprLower->Size() == 0)
 	{
-		gpos::owner<CExpression *> pexprCrossLowerJoinPred =
+		gpos::Ref<CExpression> pexprCrossLowerJoinPred =
 			CUtils::PexprScalarConstBool(mp, true, false);
 		pdrgpexprLower->Append(pexprCrossLowerJoinPred);
 	}
@@ -143,16 +141,16 @@ CXformJoinAssociativity::CreatePredicates(
 	// Same for upper predicates
 	if (pdrgpexprUpper->Size() == 0)
 	{
-		gpos::owner<CExpression *> pexprCrossUpperJoinPred =
+		gpos::Ref<CExpression> pexprCrossUpperJoinPred =
 			CUtils::PexprScalarConstBool(mp, true, false);
 		pdrgpexprUpper->Append(pexprCrossUpperJoinPred);
 	}
 
 	// clean up
-	pcrsLower->Release();
-	pdrgpexprOrig->Release();
+	;
+	;
 
-	pdrgpexprJoins->Release();
+	;
 }
 
 
@@ -213,9 +211,8 @@ CXformJoinAssociativity::Exfp(CExpressionHandle &exprhdl) const
 //				+--CScalarIdent "b" (9) ==> from t2
 
 void
-CXformJoinAssociativity::Transform(gpos::pointer<CXformContext *> pxfctxt,
-								   gpos::pointer<CXformResult *> pxfres,
-								   gpos::pointer<CExpression *> pexpr) const
+CXformJoinAssociativity::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+								   CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -224,11 +221,11 @@ CXformJoinAssociativity::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create new predicates
-	gpos::owner<CExpressionArray *> pdrgpexprLower =
+	gpos::Ref<CExpressionArray> pdrgpexprLower =
 		GPOS_NEW(mp) CExpressionArray(mp);
-	gpos::owner<CExpressionArray *> pdrgpexprUpper =
+	gpos::Ref<CExpressionArray> pdrgpexprUpper =
 		GPOS_NEW(mp) CExpressionArray(mp);
-	CreatePredicates(mp, pexpr, pdrgpexprLower, pdrgpexprUpper);
+	CreatePredicates(mp, pexpr, pdrgpexprLower.get(), pdrgpexprUpper.get());
 
 	GPOS_ASSERT(pdrgpexprLower->Size() > 0);
 
@@ -267,31 +264,31 @@ CXformJoinAssociativity::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	// check if the output lower join would result in a cross join
 	BOOL fOutputLeftIsCrossJoin =
 		(1 == pdrgpexprLower->Size() &&
-		 CUtils::FScalarConstTrue((*pdrgpexprLower)[0]));
+		 CUtils::FScalarConstTrue((*pdrgpexprLower)[0].get()));
 
 	// build a join only if it does not result in a cross join
 	// unless the input itself was a cross join (see earlier comments)
 	if (!fOutputLeftIsCrossJoin || fInputLeftIsCrossJoin)
 	{
 		// bind operators
-		gpos::pointer<CExpression *> pexprLeft = (*pexpr)[0];
+		CExpression *pexprLeft = (*pexpr)[0];
 		CExpression *pexprLeftLeft = (*pexprLeft)[0];
 		CExpression *pexprLeftRight = (*pexprLeft)[1];
 		CExpression *pexprRight = (*pexpr)[1];
 
 		// add-ref all components for re-use
-		pexprLeftLeft->AddRef();
-		pexprRight->AddRef();
-		pexprLeftRight->AddRef();
+		;
+		;
+		;
 
 		// build new joins
-		gpos::owner<CExpression *> pexprBottomJoin =
+		gpos::Ref<CExpression> pexprBottomJoin =
 			CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 				mp, pexprLeftLeft, pexprRight,
 				CPredicateUtils::PexprConjunction(mp,
 												  std::move(pdrgpexprLower)));
 
-		gpos::owner<CExpression *> pexprResult =
+		gpos::Ref<CExpression> pexprResult =
 			CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 				mp, std::move(pexprBottomJoin), pexprLeftRight,
 				CPredicateUtils::PexprConjunction(mp,
@@ -302,8 +299,8 @@ CXformJoinAssociativity::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	}
 	else
 	{
-		pdrgpexprLower->Release();
-		pdrgpexprUpper->Release();
+		;
+		;
 	}
 }
 

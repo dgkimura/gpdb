@@ -38,10 +38,10 @@ class CParseHandlerColDescr : public CParseHandlerBase
 {
 private:
 	// array of column descriptors to build
-	gpos::owner<CDXLColDescrArray *> m_dxl_column_descr_array;
+	gpos::Ref<CDXLColDescrArray> m_dxl_column_descr_array;
 
 	// current column descriptor being parsed
-	gpos::pointer<CDXLColDescr *> m_current_column_descr;
+	CDXLColDescr *m_current_column_descr;
 
 	// process the start of an element
 	void StartElement(
@@ -68,7 +68,7 @@ public:
 
 	~CParseHandlerColDescr() override;
 
-	gpos::pointer<CDXLColDescrArray *> GetDXLColumnDescrArray();
+	CDXLColDescrArray *GetDXLColumnDescrArray();
 };
 }  // namespace gpdxl
 

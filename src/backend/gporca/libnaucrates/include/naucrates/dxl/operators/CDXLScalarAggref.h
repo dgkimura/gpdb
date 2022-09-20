@@ -75,7 +75,7 @@ private:
 
 	EdxlAggrefKind m_aggkind;
 
-	gpos::owner<ULongPtrArray *> m_argtypes;
+	gpos::Ref<ULongPtrArray> m_argtypes;
 
 public:
 	CDXLScalarAggref(const CDXLScalarAggref &) = delete;
@@ -84,7 +84,7 @@ public:
 	CDXLScalarAggref(CMemoryPool *mp, gpos::Ref<IMDId> agg_mdid,
 					 gpos::Ref<IMDId> resolved_rettype, BOOL is_distinct,
 					 EdxlAggrefStage agg_stage, EdxlAggrefKind aggkind,
-					 gpos::owner<ULongPtrArray *> argtypes);
+					 gpos::Ref<ULongPtrArray> argtypes);
 
 	~CDXLScalarAggref() override;
 
@@ -111,23 +111,22 @@ public:
 		return m_aggkind;
 	}
 
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetArgTypes() const
 	{
-		return m_argtypes;
+		return m_argtypes.get();
 	}
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	void SerializeValuesListChildToDXL(CXMLSerializer *xml_serializer,
-									   gpos::pointer<const CDXLNode *> dxlnode,
-									   ULONG index,
+									   const CDXLNode *dxlnode, ULONG index,
 									   const CHAR *attr_name) const;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarAggref *>
+	static CDXLScalarAggref *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -142,7 +141,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

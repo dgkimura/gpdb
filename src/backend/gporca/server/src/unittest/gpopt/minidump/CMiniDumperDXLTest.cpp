@@ -101,13 +101,13 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 									ptroutput->GetCTEProducerDXLArray());
 
 		// setup a file-based provider
-		gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-		pmdp->AddRef();
+		gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+		;
 
 		// we need to use an auto pointer for the cache here to ensure
 		// deleting memory of cached objects when we throw
 		CAutoP<CMDAccessor::MDCache> apcache;
-		apcache = CCacheFactory::CreateCache<gpopt::IMDCacheObject *,
+		apcache = CCacheFactory::CreateCache<gpos::Ref<gpopt::IMDCacheObject>,
 											 gpopt::CMDKey *>(
 			true,  // fUnique
 			0 /* unlimited cache quota */, CMDKey::UlHashMDKey,
@@ -123,7 +123,7 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 		CAutoTraceFlag atfPrintPlan(EopttracePrintPlan, true);
 		CAutoTraceFlag atfTest(EtraceTest, true);
 
-		leaked<COptimizerConfig *> optimizer_config =
+		gpos::Ref<COptimizerConfig> optimizer_config =
 			GPOS_NEW(mp) COptimizerConfig(
 				CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
 				CStatisticsConfig::PstatsconfDefault(mp),
@@ -137,32 +137,31 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 		// translate DXL Tree -> Expr Tree
 		CTranslatorDXLToExpr *pdxltr =
 			GPOS_NEW(mp) CTranslatorDXLToExpr(mp, &mda);
-		leaked<CExpression *> pexprTranslated = pdxltr->PexprTranslateQuery(
+		gpos::Ref<CExpression> pexprTranslated = pdxltr->PexprTranslateQuery(
 			ptroutput->CreateDXLNode(), ptroutput->GetOutputColumnsDXLArray(),
 			ptroutput->GetCTEProducerDXLArray());
 
-		gpos::pointer<gpdxl::ULongPtrArray *> pdrgul =
-			pdxltr->PdrgpulOutputColRefs();
+		gpdxl::ULongPtrArray *pdrgul = pdxltr->PdrgpulOutputColRefs();
 		gpmd::CMDNameArray *pdrgpmdname = pdxltr->Pdrgpmdname();
 
 		ULONG ulSegments = GPOPT_TEST_SEGMENTS;
-		CQueryContext *pqc = CQueryContext::PqcGenerate(
-			mp, pexprTranslated, pdrgul, pdrgpmdname, true /*fDeriveStats*/);
+		CQueryContext *pqc =
+			CQueryContext::PqcGenerate(mp, pexprTranslated.get(), pdrgul,
+									   pdrgpmdname, true /*fDeriveStats*/);
 
 		// optimize logical expression tree into physical expression tree.
 
 		CEngine eng(mp);
 
-		CSerializableOptimizerConfig serOptConfig(mp, optimizer_config);
+		CSerializableOptimizerConfig serOptConfig(mp, optimizer_config.get());
 
 		eng.Init(pqc, nullptr /*search_stage_array*/);
 		eng.Optimize();
 
-		leaked<CExpression *> pexprPlan = eng.PexprExtractPlan();
+		gpos::Ref<CExpression> pexprPlan = eng.PexprExtractPlan();
 
 		// translate plan into DXL
-		gpos::owner<IntPtrArray *> pdrgpiSegments =
-			GPOS_NEW(mp) IntPtrArray(mp);
+		gpos::Ref<IntPtrArray> pdrgpiSegments = GPOS_NEW(mp) IntPtrArray(mp);
 
 
 		GPOS_ASSERT(0 < ulSegments);
@@ -173,12 +172,13 @@ CMiniDumperDXLTest::EresUnittest_Basic()
 		}
 
 		CTranslatorExprToDXL ptrexprtodxl(mp, &mda, pdrgpiSegments);
-		leaked<CDXLNode *> pdxlnPlan = ptrexprtodxl.PdxlnTranslate(
+		gpos::Ref<CDXLNode> pdxlnPlan = ptrexprtodxl.PdxlnTranslate(
 			pexprPlan, pqc->PdrgPcr(), pqc->Pdrgpmdname());
 		GPOS_ASSERT(nullptr != pdxlnPlan);
 
 		CSerializablePlan serPlan(
-			mp, pdxlnPlan, optimizer_config->GetEnumeratorCfg()->GetPlanId(),
+			mp, pdxlnPlan.get(),
+			optimizer_config->GetEnumeratorCfg()->GetPlanId(),
 			optimizer_config->GetEnumeratorCfg()->GetPlanSpaceSize());
 		GPOS_CHECK_ABORT;
 

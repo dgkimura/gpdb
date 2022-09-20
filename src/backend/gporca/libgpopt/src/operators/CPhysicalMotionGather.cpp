@@ -49,7 +49,7 @@ CPhysicalMotionGather::CPhysicalMotionGather(
 //---------------------------------------------------------------------------
 CPhysicalMotionGather::CPhysicalMotionGather(
 	CMemoryPool *mp, CDistributionSpecSingleton::ESegmentType est,
-	gpos::owner<COrderSpec *> pos)
+	gpos::Ref<COrderSpec> pos)
 	: CPhysicalMotion(mp),
 	  m_pdssSingeton(nullptr),
 	  m_pos(std::move(pos)),
@@ -72,9 +72,9 @@ CPhysicalMotionGather::CPhysicalMotionGather(
 //---------------------------------------------------------------------------
 CPhysicalMotionGather::~CPhysicalMotionGather()
 {
-	m_pos->Release();
-	m_pdssSingeton->Release();
-	m_pcrsSort->Release();
+	;
+	;
+	;
 }
 
 
@@ -87,14 +87,14 @@ CPhysicalMotionGather::~CPhysicalMotionGather()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionGather::Matches(gpos::pointer<COperator *> pop) const
+CPhysicalMotionGather::Matches(COperator *pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CPhysicalMotionGather *> popGather =
+	CPhysicalMotionGather *popGather =
 		gpos::dyn_cast<CPhysicalMotionGather>(pop);
 
 	return Est() == popGather->Est() && m_pos->Matches(popGather->Pos());
@@ -108,22 +108,21 @@ CPhysicalMotionGather::Matches(gpos::pointer<COperator *> pop) const
 //		Compute required columns of the n-th child;
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
-CPhysicalMotionGather::PcrsRequired(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
-	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
-	ULONG							  // ulOptReq
+gpos::Ref<CColRefSet>
+CPhysicalMotionGather::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
+									CColRefSet *pcrsRequired, ULONG child_index,
+									CDrvdPropArray *,  // pdrgpdpCtxt
+									ULONG			   // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
 
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsSort);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsSort);
 	pcrs->Union(pcrsRequired);
 
-	gpos::owner<CColRefSet *> pcrsChildReqd =
-		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
-	pcrs->Release();
+	gpos::Ref<CColRefSet> pcrsChildReqd =
+		PcrsChildReqd(mp, exprhdl, pcrs.get(), child_index, gpos::ulong_max);
+	;
 
 	return pcrsChildReqd;
 }
@@ -137,9 +136,9 @@ CPhysicalMotionGather::PcrsRequired(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionGather::FProvidesReqdCols(
-	CExpressionHandle &exprhdl, gpos::pointer<CColRefSet *> pcrsRequired,
-	ULONG  // ulOptReq
+CPhysicalMotionGather::FProvidesReqdCols(CExpressionHandle &exprhdl,
+										 CColRefSet *pcrsRequired,
+										 ULONG	// ulOptReq
 ) const
 {
 	return FUnaryProvidesReqdCols(exprhdl, pcrsRequired);
@@ -155,7 +154,7 @@ CPhysicalMotionGather::FProvidesReqdCols(
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalMotionGather::EpetOrder(CExpressionHandle &,  // exprhdl
-								 gpos::pointer<const CEnfdOrder *> peo) const
+								 const CEnfdOrder *peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
@@ -165,7 +164,7 @@ CPhysicalMotionGather::EpetOrder(CExpressionHandle &,  // exprhdl
 		return CEnfdProp::EpetRequired;
 	}
 
-	if (peo->FCompatible(m_pos))
+	if (peo->FCompatible(m_pos.get()))
 	{
 		// required order is already established by gather merge operator
 		return CEnfdProp::EpetUnnecessary;
@@ -185,20 +184,19 @@ CPhysicalMotionGather::EpetOrder(CExpressionHandle &,  // exprhdl
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<COrderSpec *>
-CPhysicalMotionGather::PosRequired(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<COrderSpec *>,  //posInput,
-	ULONG child_index,
-	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
-	ULONG							  // ulOptReq
+gpos::Ref<COrderSpec>
+CPhysicalMotionGather::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								   COrderSpec *,  //posInput,
+								   ULONG child_index,
+								   CDrvdPropArray *,  // pdrgpdpCtxt
+								   ULONG			  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
 
 	if (FOrderPreserving())
 	{
-		return PosPassThru(mp, exprhdl, m_pos, child_index);
+		return PosPassThru(mp, exprhdl, m_pos.get(), child_index);
 	}
 
 	return GPOS_NEW(mp) COrderSpec(mp);
@@ -212,12 +210,12 @@ CPhysicalMotionGather::PosRequired(
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-gpos::owner<COrderSpec *>
+gpos::Ref<COrderSpec>
 CPhysicalMotionGather::PosDerive(CMemoryPool *,		  // mp
 								 CExpressionHandle &  // exprhdl
 ) const
 {
-	m_pos->AddRef();
+	;
 	return m_pos;
 }
 
@@ -252,7 +250,7 @@ CPhysicalMotionGather::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-gpos::cast_func<CPhysicalMotionGather *>
+CPhysicalMotionGather *
 CPhysicalMotionGather::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);

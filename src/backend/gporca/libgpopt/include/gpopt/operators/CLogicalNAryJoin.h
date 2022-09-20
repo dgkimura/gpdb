@@ -41,7 +41,7 @@ private:
 	// of an LOJ, the corresponding index indicates the child index of the
 	// CScalarNAryJoinPredList expression that contains the ON predicate for the
 	// LOJ.
-	gpos::owner<ULongPtrArray *> m_lojChildPredIndexes;
+	gpos::Ref<ULongPtrArray> m_lojChildPredIndexes;
 
 public:
 	CLogicalNAryJoin(const CLogicalNAryJoin &) = delete;
@@ -49,13 +49,12 @@ public:
 	// ctor
 	explicit CLogicalNAryJoin(CMemoryPool *mp);
 
-	CLogicalNAryJoin(CMemoryPool *mp,
-					 gpos::owner<ULongPtrArray *> lojChildIndexes);
+	CLogicalNAryJoin(CMemoryPool *mp, gpos::Ref<ULongPtrArray> lojChildIndexes);
 
 	// dtor
 	~CLogicalNAryJoin() override
 	{
-		CRefCount::SafeRelease(m_lojChildPredIndexes);
+		;
 	}
 
 	// ident accessors
@@ -77,7 +76,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive not nullable columns
-	gpos::owner<CColRefSet *> DeriveNotNullColumns(
+	gpos::Ref<CColRefSet> DeriveNotNullColumns(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -85,7 +84,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *> DerivePropertyConstraint(
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -106,14 +105,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CLogicalNAryJoin *>
+	static CLogicalNAryJoin *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -137,14 +136,14 @@ public:
 				*((*m_lojChildPredIndexes)[child_num]) == 0);
 	}
 
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetLojChildPredIndexes() const
 	{
-		return m_lojChildPredIndexes;
+		return m_lojChildPredIndexes.get();
 	}
 
 	CExpression *
-	GetInnerJoinPreds(gpos::pointer<CExpression *> nary_join_expr) const
+	GetInnerJoinPreds(CExpression *nary_join_expr) const
 	{
 		GPOS_ASSERT(nary_join_expr->Pop() == this);
 		if (HasOuterJoinChildren())
@@ -156,7 +155,7 @@ public:
 	}
 
 	CExpression *
-	GetOnPredicateForLOJChild(gpos::pointer<CExpression *> nary_join_expr,
+	GetOnPredicateForLOJChild(CExpression *nary_join_expr,
 							  ULONG child_num) const
 	{
 		GPOS_ASSERT(nary_join_expr->Pop() == this);
@@ -171,14 +170,14 @@ public:
 
 	// get the true inner join predicates, excluding predicates that use ColRefs
 	// coming from non-inner joins
-	gpos::owner<CExpression *> GetTrueInnerJoinPreds(
+	gpos::Ref<CExpression> GetTrueInnerJoinPreds(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 	// given an existing scalar child of an NAry join, make a new copy, replacing
 	// only the inner join predicates and leaving the LOJ ON predicates the same
-	gpos::owner<CExpression *> ReplaceInnerJoinPredicates(
-		CMemoryPool *mp, gpos::pointer<CExpression *> old_nary_join_scalar_expr,
-		gpos::owner<CExpression *> new_inner_join_preds);
+	gpos::Ref<CExpression> ReplaceInnerJoinPredicates(
+		CMemoryPool *mp, CExpression *old_nary_join_scalar_expr,
+		gpos::Ref<CExpression> new_inner_join_preds);
 
 	IOstream &OsPrint(IOstream &os) const override;
 

@@ -52,7 +52,7 @@ public:
 	}
 
 	// generate default optimizer configurations
-	static gpos::owner<CCTEConfig *>
+	static gpos::Ref<CCTEConfig>
 	PcteconfDefault(CMemoryPool *mp)
 	{
 		return GPOS_NEW(mp) CCTEConfig(0 /* cte_inlining_cut_off */);

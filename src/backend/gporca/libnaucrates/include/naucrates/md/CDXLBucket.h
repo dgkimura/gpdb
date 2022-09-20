@@ -43,10 +43,10 @@ class CDXLBucket : public CRefCount
 {
 private:
 	// lower bound value for the bucket
-	gpos::owner<CDXLDatum *> m_lower_bound_dxl_datum;
+	gpos::Ref<CDXLDatum> m_lower_bound_dxl_datum;
 
 	// max value for the bucket
-	gpos::owner<CDXLDatum *> m_upper_bound_dxl_datum;
+	gpos::Ref<CDXLDatum> m_upper_bound_dxl_datum;
 
 	// is lower bound closed (i.e., the boundary point is included in the bucket)
 	BOOL m_is_lower_closed;
@@ -63,15 +63,15 @@ private:
 	// serialize the bucket boundary
 	static void SerializeBoundaryValue(CXMLSerializer *xml_serializer,
 									   const CWStringConst *elem_str,
-									   gpos::pointer<CDXLDatum *> dxl_datum,
+									   CDXLDatum *dxl_datum,
 									   BOOL is_bound_closed);
 
 public:
 	CDXLBucket(const CDXLBucket &) = delete;
 
 	// ctor
-	CDXLBucket(gpos::owner<CDXLDatum *> dxl_datum_lower,
-			   gpos::owner<CDXLDatum *> dxl_datum_upper, BOOL is_lower_closed,
+	CDXLBucket(gpos::Ref<CDXLDatum> dxl_datum_lower,
+			   gpos::Ref<CDXLDatum> dxl_datum_upper, BOOL is_lower_closed,
 			   BOOL is_upper_closed, CDouble frequency, CDouble distinct);
 
 	// dtor
@@ -92,10 +92,10 @@ public:
 	}
 
 	// min value for the bucket
-	gpos::pointer<const CDXLDatum *> GetDXLDatumLower() const;
+	const CDXLDatum *GetDXLDatumLower() const;
 
 	// max value for the bucket
-	gpos::pointer<const CDXLDatum *> GetDXLDatumUpper() const;
+	const CDXLDatum *GetDXLDatumUpper() const;
 
 	// frequency
 	CDouble GetFrequency() const;
@@ -113,7 +113,7 @@ public:
 };
 
 // array of dxl buckets
-using CDXLBucketArray = CDynamicPtrArray<CDXLBucket, CleanupRelease>;
+using CDXLBucketArray = gpos::Vector<gpos::Ref<CDXLBucket>>;
 }  // namespace gpmd
 
 #endif	// !GPMD_CDXLBucket_H

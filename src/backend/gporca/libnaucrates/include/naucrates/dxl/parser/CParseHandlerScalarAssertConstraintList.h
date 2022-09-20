@@ -37,13 +37,13 @@ class CParseHandlerScalarAssertConstraintList : public CParseHandlerScalarOp
 {
 private:
 	// scalar assert operator
-	gpos::pointer<CDXLScalarAssertConstraintList *> m_dxl_op;
+	CDXLScalarAssertConstraintList *m_dxl_op;
 
 	// current assert constraint
-	gpos::pointer<CDXLScalarAssertConstraint *> m_dxl_op_assert_constraint;
+	CDXLScalarAssertConstraint *m_dxl_op_assert_constraint;
 
 	// array of assert constraint nodes parsed so far
-	gpos::pointer<CDXLNodeArray *> m_dxlnode_assert_constraints_parsed_array;
+	CDXLNodeArray *m_dxlnode_assert_constraints_parsed_array;
 
 	// process the start of an element
 	void StartElement(

@@ -10,15 +10,13 @@ using namespace gpopt;
 CDistributionSpecStrictRandom::CDistributionSpecStrictRandom() = default;
 
 BOOL
-CDistributionSpecStrictRandom::Matches(
-	gpos::pointer<const CDistributionSpec *> pds) const
+CDistributionSpecStrictRandom::Matches(const CDistributionSpec *pds) const
 {
 	return pds->Edt() == Edt();
 }
 
 BOOL
-CDistributionSpecStrictRandom::FSatisfies(
-	gpos::pointer<const CDistributionSpec *> pds) const
+CDistributionSpecStrictRandom::FSatisfies(const CDistributionSpec *pds) const
 {
 	return Matches(pds) || EdtAny == pds->Edt() || EdtRandom == pds->Edt() ||
 		   EdtNonSingleton == pds->Edt();

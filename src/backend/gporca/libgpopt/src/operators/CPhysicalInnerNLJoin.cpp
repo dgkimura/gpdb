@@ -73,13 +73,13 @@ CPhysicalInnerNLJoin::~CPhysicalInnerNLJoin() = default;
 //		  is requested for Non-Singleton (or Singleton if outer delivered Universal distribution)
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDistributionSpec *>
-CPhysicalInnerNLJoin::PdsRequired(
-	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
-	gpos::pointer<CDistributionSpec *>,	 //pdsRequired,
-	ULONG child_index GPOS_UNUSED,
-	gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt GPOS_UNUSED,
-	ULONG  // ulOptReq
+gpos::Ref<CDistributionSpec>
+CPhysicalInnerNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
+								  CExpressionHandle &exprhdl GPOS_UNUSED,
+								  CDistributionSpec *,	//pdsRequired,
+								  ULONG child_index GPOS_UNUSED,
+								  CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+								  ULONG	 // ulOptReq
 ) const
 {
 	GPOS_RAISE(
@@ -89,20 +89,17 @@ CPhysicalInnerNLJoin::PdsRequired(
 	return nullptr;
 }
 
-gpos::owner<CEnfdDistribution *>
+gpos::Ref<CEnfdDistribution>
 CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  gpos::pointer<CReqdPropPlan *> prppInput,
-						  ULONG child_index,
-						  gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-						  ULONG ulOptReq)
+						  CReqdPropPlan *prppInput, ULONG child_index,
+						  CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());
 
 	CEnfdDistribution::EDistributionMatching dmatch =
 		Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
-	gpos::pointer<CDistributionSpec *> const pdsRequired =
-		prppInput->Ped()->PdsRequired();
+	CDistributionSpec *const pdsRequired = prppInput->Ped()->PdsRequired();
 
 	// if expression has to execute on a single host then we need a gather
 	if (exprhdl.NeedsSingletonExecution())
@@ -130,9 +127,9 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	{
 		if (1 == child_index)
 		{
-			gpos::owner<CEnfdDistribution *> pEnfdHashedDistribution =
+			gpos::Ref<CEnfdDistribution> pEnfdHashedDistribution =
 				CPhysicalJoin::PedInnerHashedFromOuterHashed(
-					mp, exprhdl, dmatch, (*pdrgpdpCtxt)[0]);
+					mp, exprhdl, dmatch, (*pdrgpdpCtxt)[0].get());
 			if (pEnfdHashedDistribution)
 			{
 				return pEnfdHashedDistribution;
@@ -152,7 +149,7 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// compute a matching distribution based on derived distribution of outer child
-	gpos::pointer<CDistributionSpec *> pdsOuter =
+	CDistributionSpec *pdsOuter =
 		gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Pds();
 	if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 	{

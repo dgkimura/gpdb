@@ -35,9 +35,9 @@ public:
 
 	// ctor
 	CPhysicalLeftAntiSemiHashJoinNotIn(
-		CMemoryPool *mp, gpos::owner<CExpressionArray *> pdrgpexprOuterKeys,
-		gpos::owner<CExpressionArray *> pdrgpexprInnerKeys,
-		gpos::owner<IMdIdArray *> hash_opfamilies,
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+		gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+		gpos::Ref<IMdIdArray> hash_opfamilies,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// ident accessors
@@ -59,23 +59,26 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required distribution of the n-th child
-	gpos::owner<CDistributionSpec *> PdsRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<CDistributionSpec> PdsRequired(CMemoryPool *mp,
+											 CExpressionHandle &exprhdl,
+											 CDistributionSpec *pdsRequired,
+											 ULONG child_index,
+											 CDrvdPropArray *pdrgpdpCtxt,
+											 ULONG ulOptReq) const override;
 
-	gpos::owner<CEnfdDistribution *> Ped(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulDistrReq) override;
+	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
+									 CExpressionHandle &exprhdl,
+									 CReqdPropPlan *prppInput,
+									 ULONG child_index,
+									 CDrvdPropArray *pdrgpdpCtxt,
+									 ULONG ulDistrReq) override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CPhysicalLeftAntiSemiHashJoinNotIn *>
+	static CPhysicalLeftAntiSemiHashJoinNotIn *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftAntiSemiHashJoinNotIn == pop->Eopid());

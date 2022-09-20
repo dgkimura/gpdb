@@ -91,13 +91,13 @@ CScalarBitmapBoolOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBitmapBoolOp::Matches(gpos::pointer<COperator *> pop) const
+CScalarBitmapBoolOp::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
-	gpos::pointer<CScalarBitmapBoolOp *> popBitmapBoolOp =
+	CScalarBitmapBoolOp *popBitmapBoolOp =
 		gpos::dyn_cast<CScalarBitmapBoolOp>(pop);
 
 	return popBitmapBoolOp->Ebitmapboolop() == Ebitmapboolop() &&

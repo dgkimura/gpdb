@@ -38,7 +38,7 @@ public:
 	explicit CXformEagerAgg(CMemoryPool *mp);
 
 	// ctor
-	explicit CXformEagerAgg(gpos::owner<CExpression *> exprPattern);
+	explicit CXformEagerAgg(gpos::Ref<CExpression> exprPattern);
 
 	// dtor
 	~CXformEagerAgg() override = default;
@@ -69,9 +69,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(gpos::pointer<CXformContext *> pxfctxt,
-				   gpos::pointer<CXformResult *> pxfres,
-				   gpos::pointer<CExpression *> expr) const override;
+	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+				   CExpression *expr) const override;
 
 	// return true if xform should be applied only once
 	BOOL
@@ -82,21 +81,19 @@ public:
 
 private:
 	// check if transform can be applied
-	static BOOL CanApplyTransform(gpos::pointer<CExpression *> agg_expr);
+	static BOOL CanApplyTransform(CExpression *agg_expr);
 
 	// is this aggregate supported for push down?
-	static BOOL CanPushAggBelowJoin(
-		gpos::pointer<CExpression *> scalar_agg_func_expr);
+	static BOOL CanPushAggBelowJoin(CExpression *scalar_agg_func_expr);
 
 	// generate project lists for the lower and upper aggregates
 	// from all the original aggregates
 	static void PopulateLowerUpperProjectList(
-		CMemoryPool *mp,  // memory pool
-		gpos::pointer<CExpression *>
-			orig_proj_list,	 // project list of the original aggregate
-		gpos::owner<CExpression *>
+		CMemoryPool *mp,			  // memory pool
+		CExpression *orig_proj_list,  // project list of the original aggregate
+		gpos::Ref<CExpression>
 			*lower_proj_list,  // output project list of the new lower aggregate
-		gpos::owner<CExpression *>
+		gpos::Ref<CExpression>
 			*upper_proj_list  // output project list of the new upper aggregate
 	);
 
@@ -106,7 +103,7 @@ private:
 		IMDId *agg_mdid,  // original global aggregate function
 		CWStringConst *agg_name, CExpressionArray *agg_arg_array,
 		BOOL is_distinct,
-		gpos::owner<CExpression *>
+		gpos::Ref<CExpression>
 			*lower_proj_elem_expr  // output project element of the new
 								   // lower aggregate
 	);
@@ -117,7 +114,7 @@ private:
 		IMDId *agg_mdid,  // aggregate mdid to create
 		CWStringConst *agg_name, CColRef *lower_colref, CColRef *output_colref,
 		BOOL is_distinct,
-		gpos::owner<CExpression *>
+		gpos::Ref<CExpression>
 			*upper_proj_elem_expr  // output project element of the new
 								   // upper aggregate
 	);

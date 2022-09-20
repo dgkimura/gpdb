@@ -28,7 +28,7 @@ using namespace gpmd;
 class CXMLSerializer;
 class CDXLColDescr;
 
-using CDXLColDescrArray = CDynamicPtrArray<CDXLColDescr, CleanupRelease>;
+using CDXLColDescrArray = gpos::Vector<gpos::Ref<CDXLColDescr>>;
 
 //---------------------------------------------------------------------------
 //	@class:

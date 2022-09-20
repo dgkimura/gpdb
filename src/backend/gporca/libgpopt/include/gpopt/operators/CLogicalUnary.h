@@ -36,9 +36,9 @@ class CLogicalUnary : public CLogical
 private:
 protected:
 	// derive statistics for projection operators
-	gpos::owner<IStatistics *> PstatsDeriveProject(
+	gpos::Ref<IStatistics> PstatsDeriveProject(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<UlongToIDatumMap *> phmuldatum = nullptr) const;
+		UlongToIDatumMap *phmuldatum = nullptr) const;
 
 public:
 	CLogicalUnary(const CLogicalUnary &) = delete;
@@ -52,7 +52,7 @@ public:
 	~CLogicalUnary() override = default;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -62,12 +62,11 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
@@ -77,7 +76,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive not nullable output columns
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	DeriveNotNullColumns(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -86,7 +85,7 @@ public:
 	}
 
 	// derive partition consumer info
-	gpos::owner<CPartInfo *>
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -94,7 +93,7 @@ public:
 	}
 
 	// derive function properties
-	gpos::owner<CFunctionProp *>
+	gpos::Ref<CFunctionProp>
 	DeriveFunctionProperties(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -113,9 +112,8 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	gpos::owner<CColRefSet *>
-	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-			 gpos::pointer<CColRefSet *> pcrsInput,
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput,
 			 ULONG child_index) const override
 	{
 		return PcrsReqdChildStats(mp, exprhdl, pcrsInput,

@@ -17,8 +17,8 @@ namespace gpopt
 {
 struct DatumLess
 {
-	bool operator()(gpos::pointer<const gpnaucrates::IDatum *> a,
-					gpos::pointer<const gpnaucrates::IDatum *> b) const;
+	bool operator()(const gpnaucrates::IDatum *a,
+					const gpnaucrates::IDatum *b) const;
 
 	bool operator()(const gpos::Ref<gpnaucrates::IDatum> &a,
 					const gpos::Ref<gpnaucrates::IDatum> &b) const;

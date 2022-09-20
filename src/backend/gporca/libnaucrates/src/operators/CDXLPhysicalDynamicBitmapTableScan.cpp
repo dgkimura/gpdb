@@ -45,7 +45,7 @@ CDXLPhysicalDynamicBitmapTableScan::GetParts() const
 
 CDXLPhysicalDynamicBitmapTableScan::~CDXLPhysicalDynamicBitmapTableScan()
 {
-	CRefCount::SafeRelease(m_selector_ids);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -58,14 +58,14 @@ CDXLPhysicalDynamicBitmapTableScan::~CDXLPhysicalDynamicBitmapTableScan()
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalDynamicBitmapTableScan::SerializeToDXL(
-	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
+	CXMLSerializer *xml_serializer, const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 
 	CWStringDynamic *serialized_selector_ids =
-		CDXLUtils::Serialize(m_mp, m_selector_ids);
+		CDXLUtils::Serialize(m_mp, m_selector_ids.get());
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenSelectorIds),
 		serialized_selector_ids);

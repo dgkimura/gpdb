@@ -47,7 +47,7 @@ private:
 	BOOL m_empty;
 
 	// array of derived column statistics
-	gpos::owner<CDXLStatsDerivedColumnArray *> m_dxl_stats_derived_col_array;
+	gpos::Ref<CDXLStatsDerivedColumnArray> m_dxl_stats_derived_col_array;
 
 public:
 	CDXLStatsDerivedRelation(const CDXLStatsDerivedRelation &) = delete;
@@ -55,7 +55,7 @@ public:
 	// ctor
 	CDXLStatsDerivedRelation(
 		CDouble rows, BOOL is_empty,
-		gpos::owner<CDXLStatsDerivedColumnArray *> dxl_stats_derived_col_array);
+		gpos::Ref<CDXLStatsDerivedColumnArray> dxl_stats_derived_col_array);
 
 	// dtor
 	~CDXLStatsDerivedRelation() override;
@@ -75,8 +75,7 @@ public:
 	}
 
 	// derived column statistics
-	gpos::pointer<const CDXLStatsDerivedColumnArray *>
-	GetDXLStatsDerivedColArray() const;
+	const CDXLStatsDerivedColumnArray *GetDXLStatsDerivedColArray() const;
 
 	// serialize bucket in DXL format
 	void Serialize(gpdxl::CXMLSerializer *) const;
@@ -89,7 +88,7 @@ public:
 
 // array of dxl buckets
 using CDXLStatsDerivedRelationArray =
-	CDynamicPtrArray<CDXLStatsDerivedRelation, CleanupRelease>;
+	gpos::Vector<gpos::Ref<CDXLStatsDerivedRelation>>;
 }  // namespace gpmd
 
 #endif	// !GPMD_CDXLStatsDerivedRelation_H

@@ -54,7 +54,7 @@ private:
 	CDXLPhysicalAgg(const CDXLPhysicalAgg &);
 
 	// grouping column ids
-	gpos::owner<ULongPtrArray *> m_grouping_colids_array;
+	gpos::Ref<ULongPtrArray> m_grouping_colids_array;
 
 	EdxlAggStrategy m_dxl_agg_strategy;
 
@@ -79,10 +79,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 	const CWStringConst *GetAggStrategyNameStr() const;
 	const CWStringConst *PstrAggLevel() const;
-	gpos::pointer<const ULongPtrArray *> GetGroupingColidArray() const;
+	const ULongPtrArray *GetGroupingColidArray() const;
 
 	// set grouping column indices
-	void SetGroupingCols(gpos::owner<ULongPtrArray *>);
+	void SetGroupingCols(gpos::Ref<ULongPtrArray>);
 
 	// is aggregate a hash aggregate that it safe to stream
 	BOOL
@@ -93,10 +93,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalAgg *>
+	static CDXLPhysicalAgg *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -108,8 +108,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

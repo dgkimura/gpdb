@@ -31,12 +31,12 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLColStats::CDXLColStats(
-	CMemoryPool *mp, gpos::Ref<CMDIdColStats> mdid_col_stats, CMDName *mdname,
-	CDouble width, CDouble null_freq, CDouble distinct_remaining,
-	CDouble freq_remaining,
-	gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array,
-	BOOL is_col_stats_missing)
+CDXLColStats::CDXLColStats(CMemoryPool *mp,
+						   gpos::Ref<CMDIdColStats> mdid_col_stats,
+						   CMDName *mdname, CDouble width, CDouble null_freq,
+						   CDouble distinct_remaining, CDouble freq_remaining,
+						   gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array,
+						   BOOL is_col_stats_missing)
 	: m_mp(mp),
 	  m_mdid_col_stats(mdid_col_stats),
 	  m_mdname(mdname),
@@ -65,7 +65,7 @@ CDXLColStats::~CDXLColStats()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_dxl_stats_bucket_array->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -132,10 +132,10 @@ CDXLColStats::Buckets() const
 //		Returns the bucket at the given position
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLBucket *>
+const CDXLBucket *
 CDXLColStats::GetDXLBucketAt(ULONG pos) const
 {
-	return (*m_dxl_stats_bucket_array)[pos];
+	return (*m_dxl_stats_bucket_array)[pos].get();
 }
 
 
@@ -176,7 +176,7 @@ CDXLColStats::Serialize(CXMLSerializer *xml_serializer) const
 	ULONG num_of_buckets = Buckets();
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
 	{
-		gpos::pointer<const CDXLBucket *> dxl_bucket = GetDXLBucketAt(ul);
+		const CDXLBucket *dxl_bucket = GetDXLBucketAt(ul);
 		dxl_bucket->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -209,7 +209,7 @@ CDXLColStats::DebugPrint(IOstream &os) const
 
 	for (ULONG ul = 0; ul < Buckets(); ul++)
 	{
-		gpos::pointer<const CDXLBucket *> dxl_bucket = GetDXLBucketAt(ul);
+		const CDXLBucket *dxl_bucket = GetDXLBucketAt(ul);
 		dxl_bucket->DebugPrint(os);
 	}
 }
@@ -224,15 +224,15 @@ CDXLColStats::DebugPrint(IOstream &os) const
 //		Dummy statistics
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLColStats *>
+gpos::Ref<CDXLColStats>
 CDXLColStats::CreateDXLDummyColStats(CMemoryPool *mp, IMDId *mdid,
 									 CMDName *mdname, CDouble width)
 {
 	CMDIdColStats *mdid_col_stats = gpos::dyn_cast<CMDIdColStats>(mdid);
 
-	gpos::owner<CDXLBucketArray *> dxl_bucket_array;
+	gpos::Ref<CDXLBucketArray> dxl_bucket_array;
 	dxl_bucket_array = GPOS_NEW(mp) CDXLBucketArray(mp);
-	gpos::owner<CDXLColStats *> dxl_col_stats;
+	gpos::Ref<CDXLColStats> dxl_col_stats;
 	dxl_col_stats = GPOS_NEW(mp) CDXLColStats(
 		mp, mdid_col_stats, mdname, width, CHistogram::DefaultNullFreq,
 		CHistogram::DefaultNDVRemain, CHistogram::DefaultNDVFreqRemain,

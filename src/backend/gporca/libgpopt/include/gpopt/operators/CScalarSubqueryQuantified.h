@@ -84,7 +84,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -94,15 +94,15 @@ public:
 	}
 
 	// return locally used columns
-	gpos::owner<CColRefSet *> PcrsUsed(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl) override;
+	gpos::Ref<CColRefSet> PcrsUsed(CMemoryPool *mp,
+								   CExpressionHandle &exprhdl) override;
 
 	// derive partition consumer info
-	gpos::owner<CPartInfo *> PpartinfoDerive(
+	gpos::Ref<CPartInfo> PpartinfoDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// conversion function
-	static gpos::cast_func<CScalarSubqueryQuantified *>
+	static CScalarSubqueryQuantified *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

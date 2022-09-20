@@ -70,9 +70,11 @@ CParseHandlerDynamicTableScan::StartElement(
 				   str->GetBuffer());
 	}
 
-	m_selector_ids = CDXLOperatorFactory::ExtractConvertValuesToArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenSelectorIds,
-		EdxltokenPhysicalDynamicTableScan);
+	m_selector_ids =
+		CDXLOperatorFactory::ExtractConvertValuesToArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenSelectorIds, EdxltokenPhysicalDynamicTableScan)
+			.get();
 
 	// create child node parsers in reverse order of their expected occurrence
 
@@ -157,26 +159,26 @@ CParseHandlerDynamicTableScan::EndElement(const XMLCh *const,  // element_uri,
 
 
 	// set table descriptor
-	gpos::owner<CDXLTableDescr *> table_descr =
+	gpos::Ref<CDXLTableDescr> table_descr =
 		table_descr_parse_handler->GetDXLTableDescr();
-	table_descr->AddRef();
+	;
 
 	gpos::Ref<IMdIdArray> mdid_partitions_array =
 		partition_mdids_parse_handler->GetMdIdArray();
-	gpos::owner<CDXLPhysicalDynamicTableScan *> dxl_op = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLPhysicalDynamicTableScan> dxl_op = GPOS_NEW(m_mp)
 		CDXLPhysicalDynamicTableScan(m_mp, std::move(table_descr),
 									 mdid_partitions_array, m_selector_ids);
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
 	// set statictics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add constructed children
 	AddChildFromParseHandler(proj_list_parse_handler);
 	AddChildFromParseHandler(filter_parse_handler);
 
 #ifdef GPOS_DEBUG
-	dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+	dxl_op->AssertValid(m_dxl_node.get(), false /* validate_children */);
 #endif	// GPOS_DEBUG
 
 	// deactivate handler

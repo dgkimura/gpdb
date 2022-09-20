@@ -77,19 +77,19 @@ private:
 	JSM m_jsm;
 
 	// optimization context of the job
-	gpos::pointer<COptimizationContext *> m_poc;
+	COptimizationContext *m_poc;
 
 	// optimization request number
 	ULONG m_ulOptReq;
 
 	// array of child groups optimization contexts
-	gpos::owner<COptimizationContextArray *> m_pdrgpoc;
+	gpos::Ref<COptimizationContextArray> m_pdrgpoc;
 
 	// stats context to be used during costing
-	gpos::owner<IStatisticsArray *> m_pdrgpstatCurrentCtxt;
+	gpos::Ref<IStatisticsArray> m_pdrgpstatCurrentCtxt;
 
 	// array of derived properties of optimal implementations of child groups
-	gpos::owner<CDrvdPropArray *> m_pdrgpdp;
+	gpos::Ref<CDrvdPropArray> m_pdrgpdp;
 
 	// optimization order of children
 	CPhysical::EChildExecOrder m_eceo;
@@ -107,7 +107,7 @@ private:
 	BOOL m_fOptimizeCTESequence;
 
 	// plan properties required from CTE producer based on consumer derived plan properties
-	gpos::owner<CReqdPropPlan *> m_prppCTEProducer;
+	gpos::Ref<CReqdPropPlan> m_prppCTEProducer;
 
 	// flag to indicate if a child job for optimizing CTE has been scheduled
 	BOOL m_fScheduledCTEOptimization;
@@ -143,10 +143,10 @@ private:
 	static EEvent EevtFinalize(CSchedulerContext *psc, CJob *pj);
 
 	// schedule a new group expression optimization job for CTE optimization
-	static BOOL FScheduleCTEOptimization(
-		CSchedulerContext *psc, gpos::pointer<CGroupExpression *> pgexpr,
-		gpos::pointer<COptimizationContext *> poc, ULONG ulOptReq,
-		CJob *pjParent);
+	static BOOL FScheduleCTEOptimization(CSchedulerContext *psc,
+										 CGroupExpression *pgexpr,
+										 COptimizationContext *poc,
+										 ULONG ulOptReq, CJob *pjParent);
 
 protected:
 	// schedule transformation jobs for applicable xforms
@@ -171,18 +171,16 @@ public:
 	~CJobGroupExpressionOptimization() override;
 
 	// initialize job
-	void Init(gpos::pointer<CGroupExpression *> pgexpr,
-			  gpos::pointer<COptimizationContext *> poc, ULONG ulOptReq,
-			  CReqdPropPlan *prppCTEProducer = nullptr);
+	void Init(CGroupExpression *pgexpr, COptimizationContext *poc,
+			  ULONG ulOptReq, CReqdPropPlan *prppCTEProducer = nullptr);
 
 	// cleanup internal state
 	void Cleanup() override;
 
 	// schedule a new group expression optimization job
-	static void ScheduleJob(CSchedulerContext *psc,
-							gpos::pointer<CGroupExpression *> pgexpr,
-							gpos::pointer<COptimizationContext *> poc,
-							ULONG ulOptReq, CJob *pjParent);
+	static void ScheduleJob(CSchedulerContext *psc, CGroupExpression *pgexpr,
+							COptimizationContext *poc, ULONG ulOptReq,
+							CJob *pjParent);
 
 	// job's function
 	BOOL FExecute(CSchedulerContext *psc) override;

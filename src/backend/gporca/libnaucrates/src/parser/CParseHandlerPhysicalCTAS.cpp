@@ -98,9 +98,11 @@ CParseHandlerPhysicalCTAS::StartElement(const XMLCh *const,	 // element_uri,
 		// parse distribution columns
 		const XMLCh *rel_distr_cols_xml = CDXLOperatorFactory::ExtractAttrValue(
 			attrs, EdxltokenDistrColumns, EdxltokenPhysicalCTAS);
-		m_distr_column_pos_array = CDXLOperatorFactory::ExtractIntsToUlongArray(
-			m_parse_handler_mgr->GetDXLMemoryManager(), rel_distr_cols_xml,
-			EdxltokenDistrColumns, EdxltokenPhysicalCTAS);
+		m_distr_column_pos_array =
+			CDXLOperatorFactory::ExtractIntsToUlongArray(
+				m_parse_handler_mgr->GetDXLMemoryManager(), rel_distr_cols_xml,
+				EdxltokenDistrColumns, EdxltokenPhysicalCTAS)
+				.get();
 	}
 
 	// parse storage type
@@ -111,15 +113,19 @@ CParseHandlerPhysicalCTAS::StartElement(const XMLCh *const,	 // element_uri,
 
 	const XMLCh *src_colids_xml = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenInsertCols, EdxltokenPhysicalCTAS);
-	m_src_colids_array = CDXLOperatorFactory::ExtractIntsToUlongArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), src_colids_xml,
-		EdxltokenInsertCols, EdxltokenPhysicalCTAS);
+	m_src_colids_array =
+		CDXLOperatorFactory::ExtractIntsToUlongArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), src_colids_xml,
+			EdxltokenInsertCols, EdxltokenPhysicalCTAS)
+			.get();
 
 	const XMLCh *vartypemod_xml = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenVarTypeModList, EdxltokenPhysicalCTAS);
-	m_vartypemod_array = CDXLOperatorFactory::ExtractIntsToIntArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), vartypemod_xml,
-		EdxltokenVarTypeModList, EdxltokenPhysicalCTAS);
+	m_vartypemod_array =
+		CDXLOperatorFactory::ExtractIntsToIntArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), vartypemod_xml,
+			EdxltokenVarTypeModList, EdxltokenPhysicalCTAS)
+			.get();
 
 	m_is_temp_table = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
@@ -226,13 +232,13 @@ CParseHandlerPhysicalCTAS::EndElement(const XMLCh *const,  // element_uri,
 	GPOS_ASSERT(nullptr != proj_list_parse_handler->CreateDXLNode());
 	GPOS_ASSERT(nullptr != child_parse_handler->CreateDXLNode());
 
-	gpos::owner<CDXLColDescrArray *> dxl_col_descr_array =
+	gpos::Ref<CDXLColDescrArray> dxl_col_descr_array =
 		col_descr_parse_handler->GetDXLColumnDescrArray();
-	dxl_col_descr_array->AddRef();
+	;
 
-	gpos::owner<CDXLCtasStorageOptions *> ctas_options =
+	gpos::Ref<CDXLCtasStorageOptions> ctas_options =
 		ctas_options_parse_handler->GetDxlCtasStorageOption();
-	ctas_options->AddRef();
+	;
 
 	gpos::Ref<IMdIdArray> opclasses_array =
 		opclasses_parse_handler->GetMdIdArray();
@@ -245,13 +251,13 @@ CParseHandlerPhysicalCTAS::EndElement(const XMLCh *const,  // element_uri,
 			m_distr_column_pos_array, opclasses_array, m_is_temp_table,
 			m_rel_storage_type, m_src_colids_array, m_vartypemod_array));
 	// set statistics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	AddChildFromParseHandler(proj_list_parse_handler);
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node,
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node.get(),
 										   false /* validate_children */);
 #endif	// GPOS_DEBUG
 

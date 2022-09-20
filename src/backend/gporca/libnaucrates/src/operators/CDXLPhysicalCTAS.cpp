@@ -33,14 +33,14 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLPhysicalCTAS::CDXLPhysicalCTAS(
 	CMemoryPool *mp, CMDName *mdname_schema, CMDName *mdname_rel,
-	gpos::owner<CDXLColDescrArray *> dxl_col_descr_array,
-	gpos::owner<CDXLCtasStorageOptions *> dxl_ctas_opt,
+	gpos::Ref<CDXLColDescrArray> dxl_col_descr_array,
+	gpos::Ref<CDXLCtasStorageOptions> dxl_ctas_opt,
 	IMDRelation::Ereldistrpolicy rel_distr_policy,
-	gpos::owner<ULongPtrArray *> distr_column_pos_array,
+	gpos::Ref<ULongPtrArray> distr_column_pos_array,
 	gpos::Ref<IMdIdArray> distr_opclasses, BOOL is_temporary,
 	IMDRelation::Erelstoragetype rel_storage_type,
-	gpos::owner<ULongPtrArray *> src_colids_array,
-	gpos::owner<IntPtrArray *> vartypemod_array)
+	gpos::Ref<ULongPtrArray> src_colids_array,
+	gpos::Ref<IntPtrArray> vartypemod_array)
 	: CDXLPhysical(mp),
 	  m_mdname_schema(mdname_schema),
 	  m_mdname_rel(mdname_rel),
@@ -78,11 +78,11 @@ CDXLPhysicalCTAS::~CDXLPhysicalCTAS()
 {
 	GPOS_DELETE(m_mdname_schema);
 	GPOS_DELETE(m_mdname_rel);
-	m_col_descr_array->Release();
-	m_dxl_ctas_storage_option->Release();
-	CRefCount::SafeRelease(m_distr_column_pos_array);
-	m_src_colids_array->Release();
-	m_vartypemod_array->Release();
+	;
+	;
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -123,7 +123,7 @@ CDXLPhysicalCTAS::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 gpos::pointer<const CDXLNode *> dxlnode) const
+								 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -154,7 +154,7 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 		// serialize distribution columns
 		CWStringDynamic *str_distribution_columns =
-			CDXLUtils::Serialize(m_mp, m_distr_column_pos_array);
+			CDXLUtils::Serialize(m_mp, m_distr_column_pos_array.get());
 		GPOS_ASSERT(nullptr != str_distribution_columns);
 
 		xml_serializer->AddAttribute(
@@ -165,7 +165,7 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	// serialize input columns
 	CWStringDynamic *str_input_cols =
-		CDXLUtils::Serialize(m_mp, m_src_colids_array);
+		CDXLUtils::Serialize(m_mp, m_src_colids_array.get());
 	GPOS_ASSERT(nullptr != str_input_cols);
 
 	xml_serializer->AddAttribute(
@@ -174,7 +174,7 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	// serialize vartypmod list
 	CWStringDynamic *str_vartypmod_list =
-		CDXLUtils::Serialize(m_mp, m_vartypemod_array);
+		CDXLUtils::Serialize(m_mp, m_vartypemod_array.get());
 	GPOS_ASSERT(nullptr != str_vartypmod_list);
 
 	xml_serializer->AddAttribute(
@@ -200,7 +200,7 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 	const ULONG arity = m_col_descr_array->Size();
 	for (ULONG idx = 0; idx < arity; idx++)
 	{
-		gpos::pointer<CDXLColDescr *> dxl_col_descr = (*m_col_descr_array)[idx];
+		CDXLColDescr *dxl_col_descr = (*m_col_descr_array)[idx].get();
 		dxl_col_descr->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -226,13 +226,13 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalCTAS::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalCTAS::AssertValid(const CDXLNode *dxlnode,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
 
-	gpos::pointer<CDXLNode *> proj_list_dxlnode = (*dxlnode)[0];
-	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[1];
+	CDXLNode *proj_list_dxlnode = (*dxlnode)[0];
+	CDXLNode *child_dxlnode = (*dxlnode)[1];
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list_dxlnode->GetOperator()->GetDXLOperator());
 	GPOS_ASSERT(EdxloptypePhysical ==

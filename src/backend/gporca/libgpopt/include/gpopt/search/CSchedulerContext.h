@@ -43,7 +43,7 @@ private:
 	CMemoryPool *m_pmpLocal{nullptr};
 
 	// job factory
-	gpos::pointer<CJobFactory *> m_pjf;
+	CJobFactory *m_pjf;
 
 	// scheduler
 	CScheduler *m_psched{nullptr};
@@ -90,7 +90,7 @@ public:
 	}
 
 	// job factory accessor
-	gpos::pointer<CJobFactory *>
+	CJobFactory *
 	Pjf() const
 	{
 		GPOS_ASSERT(FInit() && "Scheduling context is not initialized");

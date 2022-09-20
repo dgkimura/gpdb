@@ -33,7 +33,7 @@ const CHAR *CEnfdOrder::m_szOrderMatching[EomSentinel] = {"satisfy"};
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CEnfdOrder::CEnfdOrder(gpos::owner<COrderSpec *> pos, EOrderMatching eom)
+CEnfdOrder::CEnfdOrder(gpos::Ref<COrderSpec> pos, EOrderMatching eom)
 	: m_pos(std::move(pos)), m_eom(eom)
 {
 	GPOS_ASSERT(nullptr != m_pos);
@@ -51,7 +51,7 @@ CEnfdOrder::CEnfdOrder(gpos::owner<COrderSpec *> pos, EOrderMatching eom)
 //---------------------------------------------------------------------------
 CEnfdOrder::~CEnfdOrder()
 {
-	CRefCount::SafeRelease(m_pos);
+	;
 }
 
 
@@ -65,14 +65,14 @@ CEnfdOrder::~CEnfdOrder()
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnfdOrder::FCompatible(gpos::pointer<COrderSpec *> pos) const
+CEnfdOrder::FCompatible(COrderSpec *pos) const
 {
 	GPOS_ASSERT(nullptr != pos);
 
 	switch (m_eom)
 	{
 		case EomSatisfy:
-			return pos->FSatisfies(m_pos);
+			return pos->FSatisfies(m_pos.get());
 
 		case EomSentinel:
 			GPOS_ASSERT("invalid matching type");
@@ -106,8 +106,8 @@ CEnfdOrder::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdOrder::Epet(CExpressionHandle &exprhdl,
-				 gpos::pointer<CPhysical *> popPhysical, BOOL fOrderReqd) const
+CEnfdOrder::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+				 BOOL fOrderReqd) const
 {
 	if (fOrderReqd)
 	{

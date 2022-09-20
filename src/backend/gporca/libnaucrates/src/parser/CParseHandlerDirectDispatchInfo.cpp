@@ -58,8 +58,8 @@ CParseHandlerDirectDispatchInfo::CParseHandlerDirectDispatchInfo(
 //---------------------------------------------------------------------------
 CParseHandlerDirectDispatchInfo::~CParseHandlerDirectDispatchInfo()
 {
-	CRefCount::SafeRelease(m_dxl_datum_array);
-	CRefCount::SafeRelease(m_direct_dispatch_info);
+	;
+	;
 }
 
 
@@ -95,7 +95,7 @@ CParseHandlerDirectDispatchInfo::StartElement(
 					  CDXLTokens::XmlstrToken(EdxltokenDirectDispatchKeyValue),
 					  element_local_name))
 	{
-		CRefCount::SafeRelease(m_dxl_datum_array);
+		;
 		m_dxl_datum_array = GPOS_NEW(m_mp) CDXLDatumArray(m_mp);
 	}
 	else if (0 ==
@@ -104,7 +104,7 @@ CParseHandlerDirectDispatchInfo::StartElement(
 	{
 		GPOS_ASSERT(nullptr != m_dxl_datum_array);
 
-		gpos::owner<CDXLDatum *> dxl_datum = CDXLOperatorFactory::GetDatumVal(
+		gpos::Ref<CDXLDatum> dxl_datum = CDXLOperatorFactory::GetDatumVal(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenDirectDispatchInfo);
 		m_dxl_datum_array->Append(std::move(dxl_datum));
@@ -146,7 +146,7 @@ CParseHandlerDirectDispatchInfo::EndElement(
 					  element_local_name))
 	{
 		GPOS_ASSERT(nullptr != m_dxl_datum_array);
-		m_dxl_datum_array->AddRef();
+		;
 		m_datum_array_combination->Append(m_dxl_datum_array);
 	}
 	else if (0 !=
@@ -168,10 +168,10 @@ CParseHandlerDirectDispatchInfo::EndElement(
 //		Return parsed DXL datum array
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLDirectDispatchInfo *>
+CDXLDirectDispatchInfo *
 CParseHandlerDirectDispatchInfo::GetDXLDirectDispatchInfo() const
 {
-	return m_direct_dispatch_info;
+	return m_direct_dispatch_info.get();
 }
 
 // EOF

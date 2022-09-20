@@ -63,7 +63,7 @@ CParseHandlerSortCol::StartElement(const XMLCh *const,	// element_uri,
 	}
 
 	// parse and create sort col operator
-	gpos::owner<CDXLScalarSortCol *> dxl_op =
+	gpos::Ref<CDXLScalarSortCol> dxl_op =
 		gpos::cast<CDXLScalarSortCol>(CDXLOperatorFactory::MakeDXLSortCol(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
@@ -96,7 +96,7 @@ CParseHandlerSortCol::EndElement(const XMLCh *const,  // element_uri,
 	GPOS_ASSERT(nullptr != m_dxl_node);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node,
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node.get(),
 										   false /* validate_children */);
 #endif	// GPOS_DEBUG
 

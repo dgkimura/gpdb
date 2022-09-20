@@ -147,7 +147,7 @@ public:
 
 	// generate default hint configurations, which disables sort during insert on
 	// append only row-oriented partitioned tables by default
-	static gpos::owner<CHint *>
+	static gpos::Ref<CHint>
 	PhintDefault(CMemoryPool *mp)
 	{
 		return GPOS_NEW(mp) CHint(

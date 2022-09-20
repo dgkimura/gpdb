@@ -37,7 +37,7 @@ CMDCache::Init()
 {
 	GPOS_ASSERT(nullptr == m_pcache && "Metadata cache was already created");
 
-	m_pcache = CCacheFactory::CreateCache<IMDCacheObject *, CMDKey *>(
+	m_pcache = CCacheFactory::CreateCache<gpos::Ref<IMDCacheObject>, CMDKey *>(
 		true /*fUnique*/, m_ullCacheQuota, CMDKey::UlHashMDKey,
 		CMDKey::FEqualMDKey);
 }

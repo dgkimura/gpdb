@@ -38,8 +38,8 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLLogicalSetOp::CDXLLogicalSetOp(
 	CMemoryPool *mp, EdxlSetOpType edxlsetoptype,
-	gpos::owner<CDXLColDescrArray *> col_descr_array,
-	gpos::owner<ULongPtr2dArray *> input_colids_arrays, BOOL fCastAcrossInputs)
+	gpos::Ref<CDXLColDescrArray> col_descr_array,
+	gpos::Ref<ULongPtr2dArray> input_colids_arrays, BOOL fCastAcrossInputs)
 	: CDXLLogical(mp),
 	  m_set_operation_dxl_type(edxlsetoptype),
 	  m_col_descr_array(std::move(col_descr_array)),
@@ -55,8 +55,7 @@ CDXLLogicalSetOp::CDXLLogicalSetOp(
 	const ULONG length = m_input_colids_arrays->Size();
 	for (ULONG idx = 0; idx < length; idx++)
 	{
-		gpos::pointer<ULongPtrArray *> input_colids_array =
-			(*m_input_colids_arrays)[idx];
+		ULongPtrArray *input_colids_array = (*m_input_colids_arrays)[idx].get();
 		GPOS_ASSERT(num_of_cols == input_colids_array->Size());
 	}
 
@@ -73,8 +72,8 @@ CDXLLogicalSetOp::CDXLLogicalSetOp(
 //---------------------------------------------------------------------------
 CDXLLogicalSetOp::~CDXLLogicalSetOp()
 {
-	m_col_descr_array->Release();
-	m_input_colids_arrays->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -138,7 +137,7 @@ CDXLLogicalSetOp::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalSetOp::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 gpos::pointer<const CDXLNode *> node) const
+								 const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -146,7 +145,7 @@ CDXLLogicalSetOp::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	// serialize the array of input colid arrays
 	CWStringDynamic *input_colids_array_str =
-		CDXLUtils::Serialize(m_mp, m_input_colids_arrays);
+		CDXLUtils::Serialize(m_mp, m_input_colids_arrays.get());
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenInputCols),
 								 input_colids_array_str);
 	GPOS_DELETE(input_colids_array_str);
@@ -164,7 +163,7 @@ CDXLLogicalSetOp::SerializeToDXL(CXMLSerializer *xml_serializer,
 	const ULONG length = m_col_descr_array->Size();
 	for (ULONG idx = 0; idx < length; idx++)
 	{
-		gpos::pointer<CDXLColDescr *> col_descr_dxl = (*m_col_descr_array)[idx];
+		CDXLColDescr *col_descr_dxl = (*m_col_descr_array)[idx].get();
 		col_descr_dxl->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -212,7 +211,7 @@ CDXLLogicalSetOp::IsColDefined(ULONG colid) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalSetOp::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLLogicalSetOp::AssertValid(const CDXLNode *node,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(2 <= node->Arity());
@@ -226,7 +225,7 @@ CDXLLogicalSetOp::AssertValid(gpos::pointer<const CDXLNode *> node,
 	const ULONG num_of_child = node->Arity();
 	for (ULONG idx = 0; idx < num_of_child; ++idx)
 	{
-		gpos::pointer<CDXLNode *> child_dxlnode = (*node)[idx];
+		CDXLNode *child_dxlnode = (*node)[idx];
 		GPOS_ASSERT(EdxloptypeLogical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

@@ -34,41 +34,41 @@ private:
 	// iterate over project elements and split elements between Ordered Aggs
 	// list, and Others list
 	static void SplitPrjList(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprInputAggPrj,
-		gpos::owner<CExpressionArray *> *ppdrgpexprOrderedAggsPrEl,
-		gpos::owner<CExpressionArray *> *ppdrgpexprOtherPrjElems);
+		CMemoryPool *mp, CExpression *pexprInputAggPrj,
+		gpos::Ref<CExpressionArray> *ppdrgpexprOrderedAggsPrEl,
+		gpos::Ref<CExpressionArray> *ppdrgpexprOtherPrjElems);
 
 	// split given InputAgg expression into:
 	//	- A GbAgg expression containing ordered aggs split to gp_percentile agg, and
 	//	- A GbAgg expression containing all other non-ordered agg functions
-	static void SplitOrderedAggsPrj(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprInputAggPrj,
-		gpos::owner<CExpression *> *ppexprGbAgg,
-		gpos::owner<CExpression *> *ppexprOutputSeqPrj);
+	static void SplitOrderedAggsPrj(CMemoryPool *mp,
+									CExpression *pexprInputAggPrj,
+									gpos::Ref<CExpression> *ppexprGbAgg,
+									gpos::Ref<CExpression> *ppexprOutputSeqPrj);
 
 	// create a CTE with two consumers using the child expression of Sequence
 	// Project
-	static void CreateCTE(CMemoryPool *mp,
-						  gpos::pointer<CExpression *> pexprInputAggPrj,
-						  gpos::owner<CExpression *> *ppexprFirstConsumer,
-						  gpos::owner<CExpression *> *ppexprSecondConsumer);
+	static void CreateCTE(CMemoryPool *mp, CExpression *pexprInputAggPrj,
+						  gpos::Ref<CExpression> *ppexprFirstConsumer,
+						  gpos::Ref<CExpression> *ppexprSecondConsumer);
 
 	// create an expression for final agg function
-	static gpos::owner<CExpression *> PexprFinalAgg(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprAggFunc,
-		CColRef *arg_col_ref, CColRef *total_count_colref,
-		CColRef *peer_count_colref);
+	static gpos::Ref<CExpression> PexprFinalAgg(CMemoryPool *mp,
+												CExpression *pexprAggFunc,
+												CColRef *arg_col_ref,
+												CColRef *total_count_colref,
+												CColRef *peer_count_colref);
 
 	// transform sequence project expression into an inner join expression
-	static CExpression *PexprInputAggPrj2Join(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprInputAggPrj);
+	static CExpression *PexprInputAggPrj2Join(CMemoryPool *mp,
+											  CExpression *pexprInputAggPrj);
 
 public:
 	COrderedAggPreprocessor(const COrderedAggPreprocessor &) = delete;
 
 	// main driver
-	static gpos::owner<CExpression *> PexprPreprocess(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr);
+	static gpos::Ref<CExpression> PexprPreprocess(CMemoryPool *mp,
+												  CExpression *pexpr);
 
 };	// class COrderedAggPreprocessor
 }  // namespace gpopt

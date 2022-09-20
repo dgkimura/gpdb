@@ -17,28 +17,29 @@ class CPhysicalParallelUnionAll : public CPhysicalUnionAll
 {
 private:
 	// array of child hashed distributions -- used locally for distribution derivation
-	gpos::owner<CDistributionSpecArray *> const m_pdrgpds;
+	gpos::Ref<CDistributionSpecArray> const m_pdrgpds;
 
 public:
 	CPhysicalParallelUnionAll(CMemoryPool *mp,
-							  gpos::owner<CColRefArray *> pdrgpcrOutput,
-							  gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput);
+							  gpos::Ref<CColRefArray> pdrgpcrOutput,
+							  gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput);
 
 	EOperatorId Eopid() const override;
 
 	const CHAR *SzId() const override;
 
-	gpos::owner<CDistributionSpec *> PdsRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<CDistributionSpec> PdsRequired(CMemoryPool *mp,
+											 CExpressionHandle &exprhdl,
+											 CDistributionSpec *pdsRequired,
+											 ULONG child_index,
+											 CDrvdPropArray *pdrgpdpCtxt,
+											 ULONG ulOptReq) const override;
 
 	CEnfdDistribution::EDistributionMatching Edm(
-		gpos::pointer<CReqdPropPlan *>,	  // prppInput
-		ULONG,							  // child_index
-		gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt
-		ULONG							  // ulOptReq
+		CReqdPropPlan *,   // prppInput
+		ULONG,			   // child_index
+		CDrvdPropArray *,  //pdrgpdpCtxt
+		ULONG			   // ulOptReq
 		) override;
 
 	~CPhysicalParallelUnionAll() override;

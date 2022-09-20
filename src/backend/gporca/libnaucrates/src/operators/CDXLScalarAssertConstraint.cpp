@@ -99,9 +99,8 @@ CDXLScalarAssertConstraint::GetErrorMsgStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAssertConstraint::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarAssertConstraint::SerializeToDXL(CXMLSerializer *xml_serializer,
+										   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -126,12 +125,12 @@ CDXLScalarAssertConstraint::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAssertConstraint::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarAssertConstraint::AssertValid(const CDXLNode *dxlnode,
 										BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[0];
+	CDXLNode *child_dxlnode = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeScalar ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

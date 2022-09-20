@@ -50,7 +50,7 @@ CParseHandlerStatistics::CParseHandlerStatistics(
 //---------------------------------------------------------------------------
 CParseHandlerStatistics::~CParseHandlerStatistics()
 {
-	CRefCount::SafeRelease(m_dxl_stats_derived_rel_array);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -76,10 +76,10 @@ CParseHandlerStatistics::GetParseHandlerType() const
 //		Returns the list of statistics objects constructed by the parser
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLStatsDerivedRelationArray *>
+CDXLStatsDerivedRelationArray *
 CParseHandlerStatistics::GetStatsDerivedRelDXLArray() const
 {
-	return m_dxl_stats_derived_rel_array;
+	return m_dxl_stats_derived_rel_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -158,9 +158,9 @@ CParseHandlerStatistics::EndElement(const XMLCh *const,	 // element_uri,
 		CParseHandlerStatsDerivedRelation *stats_derived_rel_parse_handler =
 			dynamic_cast<CParseHandlerStatsDerivedRelation *>((*this)[idx]);
 
-		gpos::owner<CDXLStatsDerivedRelation *> dxl_stats_derived_relation =
+		gpos::Ref<CDXLStatsDerivedRelation> dxl_stats_derived_relation =
 			stats_derived_rel_parse_handler->GetDxlStatsDrvdRelation();
-		dxl_stats_derived_relation->AddRef();
+		;
 		m_dxl_stats_derived_rel_array->Append(dxl_stats_derived_relation);
 	}
 

@@ -74,9 +74,10 @@ CParseHandlerScalarIdent::StartElement(const XMLCh *const,	// element_uri,
 	}
 
 	// parse and create identifier operator
-	m_dxl_op =
-		gpos::cast<CDXLScalarIdent>(CDXLOperatorFactory::MakeDXLScalarIdent(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+	m_dxl_op = gpos::cast<CDXLScalarIdent>(
+		CDXLOperatorFactory::MakeDXLScalarIdent(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs)
+			.get());
 }
 
 //---------------------------------------------------------------------------

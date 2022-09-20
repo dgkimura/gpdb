@@ -41,14 +41,14 @@ CScalarArrayRefIndexList::CScalarArrayRefIndexList(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayRefIndexList::Matches(gpos::pointer<COperator *> pop) const
+CScalarArrayRefIndexList::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CScalarArrayRefIndexList *> popIndexList =
+	CScalarArrayRefIndexList *popIndexList =
 		gpos::dyn_cast<CScalarArrayRefIndexList>(pop);
 
 	return m_eilt == popIndexList->Eilt();

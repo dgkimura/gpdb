@@ -41,8 +41,8 @@ CPointTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -63,23 +63,23 @@ CPointTest::EresUnittest_CPointInt4()
 	CMemoryPool *mp = amp.Pmp();
 
 	// generate integer points
-	gpos::owner<CPoint *> point1 = CTestUtils::PpointInt4(mp, 1);
-	gpos::owner<CPoint *> point2 = CTestUtils::PpointInt4(mp, 2);
+	gpos::Ref<CPoint> point1 = CTestUtils::PpointInt4(mp, 1);
+	gpos::Ref<CPoint> point2 = CTestUtils::PpointInt4(mp, 2);
 
-	GPOS_RTL_ASSERT_MSG(point1->Equals(point1), "1 == 1");
-	GPOS_RTL_ASSERT_MSG(point1->IsLessThan(point2), "1 < 2");
-	GPOS_RTL_ASSERT_MSG(point2->IsGreaterThan(point1), "2 > 1");
-	GPOS_RTL_ASSERT_MSG(point1->IsLessThanOrEqual(point2), "1 <= 2");
-	GPOS_RTL_ASSERT_MSG(point2->IsGreaterThanOrEqual(point2), "2 >= 2");
+	GPOS_RTL_ASSERT_MSG(point1->Equals(point1.get()), "1 == 1");
+	GPOS_RTL_ASSERT_MSG(point1->IsLessThan(point2.get()), "1 < 2");
+	GPOS_RTL_ASSERT_MSG(point2->IsGreaterThan(point1.get()), "2 > 1");
+	GPOS_RTL_ASSERT_MSG(point1->IsLessThanOrEqual(point2.get()), "1 <= 2");
+	GPOS_RTL_ASSERT_MSG(point2->IsGreaterThanOrEqual(point2.get()), "2 >= 2");
 
-	CDouble dDistance = point2->Distance(point1);
+	CDouble dDistance = point2->Distance(point1.get());
 
 	// should be 1.0
 	GPOS_RTL_ASSERT_MSG(0.99 < dDistance && dDistance < 1.01,
 						"incorrect distance calculation");
 
-	point1->Release();
-	point2->Release();
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -93,18 +93,19 @@ CPointTest::EresUnittest_CPointBool()
 	CMemoryPool *mp = amp.Pmp();
 
 	// generate boolean points
-	gpos::owner<CPoint *> point1 = CTestUtils::PpointBool(mp, true);
-	gpos::owner<CPoint *> point2 = CTestUtils::PpointBool(mp, false);
+	gpos::Ref<CPoint> point1 = CTestUtils::PpointBool(mp, true);
+	gpos::Ref<CPoint> point2 = CTestUtils::PpointBool(mp, false);
 
 	// true == true
-	GPOS_RTL_ASSERT_MSG(point1->Equals(point1), "true must be equal to true");
+	GPOS_RTL_ASSERT_MSG(point1->Equals(point1.get()),
+						"true must be equal to true");
 
 	// true != false
-	GPOS_RTL_ASSERT_MSG(point1->IsNotEqual(point2),
+	GPOS_RTL_ASSERT_MSG(point1->IsNotEqual(point2.get()),
 						"true must not be equal to false");
 
-	point1->Release();
-	point2->Release();
+	;
+	;
 
 	return GPOS_OK;
 }

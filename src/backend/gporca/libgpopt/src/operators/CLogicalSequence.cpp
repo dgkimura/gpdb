@@ -43,7 +43,7 @@ CLogicalSequence::CLogicalSequence(CMemoryPool *mp) : CLogical(mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalSequence::Matches(gpos::pointer<COperator *> pop) const
+CLogicalSequence::Matches(COperator *pop) const
 {
 	return pop->Eopid() == Eopid();
 }
@@ -56,10 +56,10 @@ CLogicalSequence::Matches(gpos::pointer<COperator *> pop) const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalSequence::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementSequence);
 	return xform_set;
 }
@@ -73,16 +73,16 @@ CLogicalSequence::PxfsCandidates(CMemoryPool *mp) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CLogicalSequence::DeriveOutputColumns(CMemoryPool *,  // mp
 									  CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(1 <= exprhdl.Arity());
 
 	// get output columns of last child
-	gpos::owner<CColRefSet *> pcrs =
+	gpos::Ref<CColRefSet> pcrs =
 		exprhdl.DeriveOutputColumns(exprhdl.Arity() - 1);
-	pcrs->AddRef();
+	;
 
 	return pcrs;
 }
@@ -97,7 +97,7 @@ CLogicalSequence::DeriveOutputColumns(CMemoryPool *,  // mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-gpos::owner<CKeyCollection *>
+gpos::Ref<CKeyCollection>
 CLogicalSequence::DeriveKeyCollection(CMemoryPool *,  // mp
 									  CExpressionHandle &exprhdl) const
 {
@@ -131,7 +131,7 @@ CLogicalSequence::DeriveMaxCard(CMemoryPool *,	// mp
 //		Derive part consumers
 //
 //---------------------------------------------------------------------------
-gpos::owner<CPartInfo *>
+gpos::Ref<CPartInfo>
 CLogicalSequence::DerivePartitionInfo(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl) const
 {

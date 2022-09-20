@@ -29,11 +29,11 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalStreamAggDeduplicate::CPhysicalStreamAggDeduplicate(
-	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-	gpos::pointer<CColRefArray *> pdrgpcrMinimal,
-	COperator::EGbAggType egbaggtype, gpos::owner<CColRefArray *> pdrgpcrKeys,
-	BOOL fGeneratesDuplicates, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	gpos::Ref<CColRefArray> pdrgpcrKeys, BOOL fGeneratesDuplicates,
+	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+	BOOL should_enforce_distribution)
 	: CPhysicalStreamAgg(
 		  mp, std::move(colref_array), pdrgpcrMinimal, egbaggtype,
 		  fGeneratesDuplicates, nullptr /*pdrgpcrGbMinusDistinct*/, fMultiStage,
@@ -41,7 +41,7 @@ CPhysicalStreamAggDeduplicate::CPhysicalStreamAggDeduplicate(
 	  m_pdrgpcrKeys(std::move(pdrgpcrKeys))
 {
 	GPOS_ASSERT(nullptr != m_pdrgpcrKeys);
-	InitOrderSpec(mp, m_pdrgpcrKeys);
+	InitOrderSpec(mp, m_pdrgpcrKeys.get());
 }
 
 //---------------------------------------------------------------------------
@@ -54,7 +54,7 @@ CPhysicalStreamAggDeduplicate::CPhysicalStreamAggDeduplicate(
 //---------------------------------------------------------------------------
 CPhysicalStreamAggDeduplicate::~CPhysicalStreamAggDeduplicate()
 {
-	m_pdrgpcrKeys->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -81,7 +81,7 @@ CPhysicalStreamAggDeduplicate::OsPrint(IOstream &os) const
 	CUtils::OsPrintDrgPcr(os, PdrgpcrGroupingCols());
 	os << "]"
 	   << ", Key Cols:[";
-	CUtils::OsPrintDrgPcr(os, m_pdrgpcrKeys);
+	CUtils::OsPrintDrgPcr(os, m_pdrgpcrKeys.get());
 	os << "]";
 
 	os << ", Generates Duplicates :[ " << FGeneratesDuplicates() << " ] ";

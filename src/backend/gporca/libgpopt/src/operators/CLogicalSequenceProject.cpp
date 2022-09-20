@@ -33,9 +33,8 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CLogicalSequenceProject::CLogicalSequenceProject(
-	CMemoryPool *mp, gpos::owner<CDistributionSpec *> pds,
-	gpos::owner<COrderSpecArray *> pdrgpos,
-	gpos::owner<CWindowFrameArray *> pdrgpwf)
+	CMemoryPool *mp, gpos::Ref<CDistributionSpec> pds,
+	gpos::Ref<COrderSpecArray> pdrgpos, gpos::Ref<CWindowFrameArray> pdrgpwf)
 	: CLogicalUnary(mp),
 	  m_pds(pds),
 	  m_pdrgpos(pdrgpos),
@@ -54,23 +53,23 @@ CLogicalSequenceProject::CLogicalSequenceProject(
 	SetHasFrameSpecs(mp);
 
 	// include columns used by Partition By, Order By, and window frame edges
-	gpos::owner<CColRefSet *> pcrsSort =
-		COrderSpec::GetColRefSet(mp, m_pdrgpos);
-	m_pcrsLocalUsed->Include(pcrsSort);
-	pcrsSort->Release();
+	gpos::Ref<CColRefSet> pcrsSort =
+		COrderSpec::GetColRefSet(mp, m_pdrgpos.get());
+	m_pcrsLocalUsed->Include(pcrsSort.get());
+	;
 
 	if (CDistributionSpec::EdtHashed == m_pds->Edt())
 	{
-		gpos::owner<CColRefSet *> pcrsHashed =
+		gpos::Ref<CColRefSet> pcrsHashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(m_pds)->PcrsUsed(mp);
-		m_pcrsLocalUsed->Include(pcrsHashed);
-		pcrsHashed->Release();
+		m_pcrsLocalUsed->Include(pcrsHashed.get());
+		;
 	}
 
 	const ULONG ulFrames = m_pdrgpwf->Size();
 	for (ULONG ul = 0; ul < ulFrames; ul++)
 	{
-		gpos::pointer<CWindowFrame *> pwf = (*m_pdrgpwf)[ul];
+		CWindowFrame *pwf = (*m_pdrgpwf)[ul].get();
 		if (!CWindowFrame::IsEmpty(pwf))
 		{
 			m_pcrsLocalUsed->Include(pwf->PcrsUsed());
@@ -108,9 +107,9 @@ CLogicalSequenceProject::CLogicalSequenceProject(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CLogicalSequenceProject::~CLogicalSequenceProject()
 {
-	CRefCount::SafeRelease(m_pds);
-	CRefCount::SafeRelease(m_pdrgpos);
-	CRefCount::SafeRelease(m_pdrgpwf);
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -121,30 +120,28 @@ CLogicalSequenceProject::~CLogicalSequenceProject()
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
+gpos::Ref<COperator>
 CLogicalSequenceProject::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
-	gpos::owner<CDistributionSpec *> pds =
+	gpos::Ref<CDistributionSpec> pds =
 		m_pds->PdsCopyWithRemappedColumns(mp, colref_mapping, must_exist);
 
-	gpos::owner<COrderSpecArray *> pdrgpos = GPOS_NEW(mp) COrderSpecArray(mp);
+	gpos::Ref<COrderSpecArray> pdrgpos = GPOS_NEW(mp) COrderSpecArray(mp);
 	const ULONG ulOrderSpec = m_pdrgpos->Size();
 	for (ULONG ul = 0; ul < ulOrderSpec; ul++)
 	{
-		gpos::owner<COrderSpec *> pos =
+		gpos::Ref<COrderSpec> pos =
 			((*m_pdrgpos)[ul])
 				->PosCopyWithRemappedColumns(mp, colref_mapping, must_exist);
 		pdrgpos->Append(pos);
 	}
 
-	gpos::owner<CWindowFrameArray *> pdrgpwf =
-		GPOS_NEW(mp) CWindowFrameArray(mp);
+	gpos::Ref<CWindowFrameArray> pdrgpwf = GPOS_NEW(mp) CWindowFrameArray(mp);
 	const ULONG ulWindowFrames = m_pdrgpwf->Size();
 	for (ULONG ul = 0; ul < ulWindowFrames; ul++)
 	{
-		gpos::owner<CWindowFrame *> pwf =
+		gpos::Ref<CWindowFrame> pwf =
 			((*m_pdrgpwf)[ul])
 				->PwfCopyWithRemappedColumns(mp, colref_mapping, must_exist);
 		pdrgpwf->Append(pwf);
@@ -201,15 +198,15 @@ CLogicalSequenceProject::SetHasFrameSpecs(CMemoryPool *	 // mp
 	if (0 == ulFrameSpecs)
 	{
 		// if no frame specs are given, we add one empty frame
-		gpos::owner<CWindowFrame *> pwf =
+		gpos::Ref<CWindowFrame> pwf =
 			const_cast<CWindowFrame *>(CWindowFrame::PwfEmpty());
-		pwf->AddRef();
+		;
 		m_pdrgpwf->Append(pwf);
 	}
 	BOOL fHasFrameSpecs = false;
 	for (ULONG ul = 0; !fHasFrameSpecs && ul < ulFrameSpecs; ul++)
 	{
-		fHasFrameSpecs = !CWindowFrame::IsEmpty((*m_pdrgpwf)[ul]);
+		fHasFrameSpecs = !CWindowFrame::IsEmpty((*m_pdrgpwf)[ul].get());
 	}
 	m_fHasFrameSpecs = fHasFrameSpecs;
 }
@@ -223,13 +220,13 @@ CLogicalSequenceProject::SetHasFrameSpecs(CMemoryPool *	 // mp
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CLogicalSequenceProject::DeriveOutputColumns(CMemoryPool *mp,
 											 CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	pcrs->Union(exprhdl.DeriveOutputColumns(0));
 
@@ -248,12 +245,12 @@ CLogicalSequenceProject::DeriveOutputColumns(CMemoryPool *mp,
 //		Derive outer references
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CLogicalSequenceProject::DeriveOuterReferences(CMemoryPool *mp,
 											   CExpressionHandle &exprhdl)
 {
-	gpos::owner<CColRefSet *> outer_refs =
-		CLogical::DeriveOuterReferences(mp, exprhdl, m_pcrsLocalUsed);
+	gpos::Ref<CColRefSet> outer_refs =
+		CLogical::DeriveOuterReferences(mp, exprhdl, m_pcrsLocalUsed.get());
 
 	return outer_refs;
 }
@@ -267,9 +264,9 @@ CLogicalSequenceProject::DeriveOuterReferences(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 BOOL
 CLogicalSequenceProject::FHasLocalReferencesTo(
-	gpos::pointer<const CColRefSet *> outerRefsToCheck) const
+	const CColRefSet *outerRefsToCheck) const
 {
-	return !outerRefsToCheck->IsDisjoint(m_pcrsLocalUsed);
+	return !outerRefsToCheck->IsDisjoint(m_pcrsLocalUsed.get());
 }
 
 
@@ -281,7 +278,7 @@ CLogicalSequenceProject::FHasLocalReferencesTo(
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-gpos::owner<CKeyCollection *>
+gpos::Ref<CKeyCollection>
 CLogicalSequenceProject::DeriveKeyCollection(CMemoryPool *,	 // mp
 											 CExpressionHandle &exprhdl) const
 {
@@ -315,17 +312,17 @@ CLogicalSequenceProject::DeriveMaxCard(CMemoryPool *,  // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalSequenceProject::Matches(gpos::pointer<COperator *> pop) const
+CLogicalSequenceProject::Matches(COperator *pop) const
 {
 	GPOS_ASSERT(nullptr != pop);
 	if (Eopid() == pop->Eopid())
 	{
-		gpos::pointer<CLogicalSequenceProject *> popLogicalSequenceProject =
+		CLogicalSequenceProject *popLogicalSequenceProject =
 			gpos::dyn_cast<CLogicalSequenceProject>(pop);
 		return m_pds->Matches(popLogicalSequenceProject->Pds()) &&
-			   CWindowFrame::Equals(m_pdrgpwf,
+			   CWindowFrame::Equals(m_pdrgpwf.get(),
 									popLogicalSequenceProject->Pdrgpwf()) &&
-			   COrderSpec::Equals(m_pdrgpos,
+			   COrderSpec::Equals(m_pdrgpos.get(),
 								  popLogicalSequenceProject->Pdrgpos());
 	}
 
@@ -347,9 +344,9 @@ CLogicalSequenceProject::HashValue() const
 	ULONG ulHash = 0;
 	ulHash = gpos::CombineHashes(ulHash, m_pds->HashValue());
 	ulHash = gpos::CombineHashes(
-		ulHash, CWindowFrame::HashValue(m_pdrgpwf, 3 /*ulMaxSize*/));
+		ulHash, CWindowFrame::HashValue(m_pdrgpwf.get(), 3 /*ulMaxSize*/));
 	ulHash = gpos::CombineHashes(
-		ulHash, COrderSpec::HashValue(m_pdrgpos, 3 /*ulMaxSize*/));
+		ulHash, COrderSpec::HashValue(m_pdrgpos.get(), 3 /*ulMaxSize*/));
 
 	return ulHash;
 }
@@ -363,10 +360,10 @@ CLogicalSequenceProject::HashValue() const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalSequenceProject::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfSequenceProject2Apply);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementSequenceProject);
 
@@ -382,10 +379,10 @@ CLogicalSequenceProject::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics based on filter predicates
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
-CLogicalSequenceProject::PstatsDerive(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<IStatisticsArray *>  // stats_ctxt
+gpos::Ref<IStatistics>
+CLogicalSequenceProject::PstatsDerive(CMemoryPool *mp,
+									  CExpressionHandle &exprhdl,
+									  IStatisticsArray *  // stats_ctxt
 ) const
 {
 	return PstatsDeriveProject(mp, exprhdl);
@@ -407,10 +404,10 @@ CLogicalSequenceProject::OsPrint(IOstream &os) const
 	(void) m_pds->OsPrint(os);
 	os << ", ";
 	os << "Order Spec:";
-	(void) COrderSpec::OsPrint(os, m_pdrgpos);
+	(void) COrderSpec::OsPrint(os, m_pdrgpos.get());
 	os << ", ";
 	os << "WindowFrame Spec:";
-	(void) CWindowFrame::OsPrint(os, m_pdrgpwf);
+	(void) CWindowFrame::OsPrint(os, m_pdrgpwf.get());
 
 	return os << ")";
 }
@@ -424,14 +421,14 @@ CLogicalSequenceProject::OsPrint(IOstream &os) const
 //		clauses, and return a new operator
 //
 //---------------------------------------------------------------------------
-gpos::owner<CLogicalSequenceProject *>
+gpos::Ref<CLogicalSequenceProject>
 CLogicalSequenceProject::PopRemoveLocalOuterRefs(CMemoryPool *mp,
 												 CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(this == exprhdl.Pop());
 
-	gpos::pointer<CColRefSet *> outer_refs = exprhdl.DeriveOuterReferences();
-	gpos::owner<CDistributionSpec *> pds = m_pds;
+	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
+	gpos::Ref<CDistributionSpec> pds = m_pds;
 	if (CDistributionSpec::EdtHashed == m_pds->Edt())
 	{
 		pds = gpos::dyn_cast<CDistributionSpecHashed>(m_pds)
@@ -445,16 +442,16 @@ CLogicalSequenceProject::PopRemoveLocalOuterRefs(CMemoryPool *mp,
 	}
 	else
 	{
-		pds->AddRef();
+		;
 	}
 
-	gpos::owner<COrderSpecArray *> pdrgpos =
-		COrderSpec::PdrgposExclude(mp, m_pdrgpos, outer_refs);
+	gpos::Ref<COrderSpecArray> pdrgpos =
+		COrderSpec::PdrgposExclude(mp, m_pdrgpos.get(), outer_refs);
 
 	// for window frame edges, outer references cannot be removed since this can change
 	// the semantics of frame edge from delayed-bounding to unbounded,
 	// we re-use the frame edges without changing here
-	m_pdrgpwf->AddRef();
+	;
 
 	return GPOS_NEW(mp) CLogicalSequenceProject(mp, std::move(pds),
 												std::move(pdrgpos), m_pdrgpwf);

@@ -55,16 +55,16 @@ private:
 	gpos::Ref<IMDId> m_mdid_item_type;
 
 	// index keys
-	gpos::pointer<ULongPtrArray *> m_index_key_cols_array;
+	ULongPtrArray *m_index_key_cols_array;
 
 	// included columns
-	gpos::pointer<ULongPtrArray *> m_included_cols_array;
+	ULongPtrArray *m_included_cols_array;
 
 	// index part constraint
-	gpos::pointer<CMDPartConstraintGPDB *> m_part_constraint;
+	CMDPartConstraintGPDB *m_part_constraint;
 
 	// levels that include default partitions
-	gpos::pointer<ULongPtrArray *> m_level_with_default_part_array;
+	ULongPtrArray *m_level_with_default_part_array;
 
 	// is constraint unbounded
 	BOOL m_part_constraint_unbounded;

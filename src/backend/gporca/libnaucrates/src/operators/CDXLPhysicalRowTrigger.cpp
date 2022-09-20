@@ -30,8 +30,7 @@ using namespace gpdxl;
 //---------------------------------------------------------------------------
 CDXLPhysicalRowTrigger::CDXLPhysicalRowTrigger(
 	CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid, INT type,
-	gpos::owner<ULongPtrArray *> colids_old,
-	gpos::owner<ULongPtrArray *> colids_new)
+	gpos::Ref<ULongPtrArray> colids_old, gpos::Ref<ULongPtrArray> colids_new)
 	: CDXLPhysical(mp),
 	  m_rel_mdid(rel_mdid),
 	  m_type(type),
@@ -55,8 +54,8 @@ CDXLPhysicalRowTrigger::CDXLPhysicalRowTrigger(
 //---------------------------------------------------------------------------
 CDXLPhysicalRowTrigger::~CDXLPhysicalRowTrigger()
 {
-	CRefCount::SafeRelease(m_colids_old);
-	CRefCount::SafeRelease(m_colids_new);
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -96,9 +95,8 @@ CDXLPhysicalRowTrigger::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalRowTrigger::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLPhysicalRowTrigger::SerializeToDXL(CXMLSerializer *xml_serializer,
+									   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -110,7 +108,8 @@ CDXLPhysicalRowTrigger::SerializeToDXL(
 
 	if (nullptr != m_colids_old)
 	{
-		CWStringDynamic *pstrColsOld = CDXLUtils::Serialize(m_mp, m_colids_old);
+		CWStringDynamic *pstrColsOld =
+			CDXLUtils::Serialize(m_mp, m_colids_old.get());
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenOldCols), pstrColsOld);
 		GPOS_DELETE(pstrColsOld);
@@ -118,7 +117,8 @@ CDXLPhysicalRowTrigger::SerializeToDXL(
 
 	if (nullptr != m_colids_new)
 	{
-		CWStringDynamic *pstrColsNew = CDXLUtils::Serialize(m_mp, m_colids_new);
+		CWStringDynamic *pstrColsNew =
+			CDXLUtils::Serialize(m_mp, m_colids_new.get());
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenNewCols), pstrColsNew);
 		GPOS_DELETE(pstrColsNew);
@@ -146,11 +146,11 @@ CDXLPhysicalRowTrigger::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalRowTrigger::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalRowTrigger::AssertValid(const CDXLNode *dxlnode,
 									BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
-	gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[1];
+	CDXLNode *child_dxlnode = (*dxlnode)[1];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

@@ -72,10 +72,9 @@ CXformLeftAntiSemiJoin2HashJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftAntiSemiJoin2HashJoin::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+CXformLeftAntiSemiJoin2HashJoin::Transform(CXformContext *pxfctxt,
+										   CXformResult *pxfres,
+										   CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -86,14 +85,14 @@ CXformLeftAntiSemiJoin2HashJoin::Transform(
 
 	if (pxfres->Pdrgpexpr()->Size() == 0)
 	{
-		gpos::owner<CExpression *> pexprProcessed = nullptr;
+		gpos::Ref<CExpression> pexprProcessed = nullptr;
 		if (CXformUtils::FProcessGPDBAntiSemiHashJoin(pxfctxt->Pmp(), pexpr,
 													  &pexprProcessed))
 		{
 			// try again after simplifying join predicate
 			CXformUtils::ImplementHashJoin<CPhysicalLeftAntiSemiHashJoin>(
 				pxfctxt, pxfres, pexprProcessed);
-			pexprProcessed->Release();
+			;
 		}
 	}
 }

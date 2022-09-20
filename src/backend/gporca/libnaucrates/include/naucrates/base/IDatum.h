@@ -78,14 +78,14 @@ public:
 	virtual ULONG HashValue() const = 0;
 
 	// Match function on datums
-	virtual BOOL Matches(gpos::pointer<const IDatum *>) const = 0;
+	virtual BOOL Matches(const IDatum *) const = 0;
 
 	// create a copy of the datum
-	virtual gpos::owner<IDatum *> MakeCopy(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<IDatum> MakeCopy(CMemoryPool *mp) const = 0;
 
 	// stats greater than
 	virtual BOOL
-	StatsAreGreaterThan(gpos::pointer<const IDatum *> datum) const
+	StatsAreGreaterThan(const IDatum *datum) const
 	{
 		BOOL stats_are_comparable = datum->StatsAreComparable(this);
 		GPOS_ASSERT(stats_are_comparable &&
@@ -97,8 +97,8 @@ public:
 	virtual BOOL NeedsPadding() const = 0;
 
 	// return the padded datum
-	virtual gpos::owner<IDatum *> MakePaddedDatum(CMemoryPool *mp,
-												  ULONG col_len) const = 0;
+	virtual gpos::Ref<IDatum> MakePaddedDatum(CMemoryPool *mp,
+											  ULONG col_len) const = 0;
 
 	// does datum support like predicate
 	virtual BOOL SupportsLikePredicate() const = 0;
@@ -129,26 +129,25 @@ public:
 	virtual LINT GetLINTMapping() const = 0;
 
 	// equality based on mapping to LINT or CDouble
-	virtual BOOL StatsAreEqual(gpos::pointer<const IDatum *> datum) const;
+	virtual BOOL StatsAreEqual(const IDatum *datum) const;
 
 	// stats less than
-	virtual BOOL StatsAreLessThan(gpos::pointer<const IDatum *> datum) const;
+	virtual BOOL StatsAreLessThan(const IDatum *datum) const;
 
 	// distance function
-	virtual CDouble GetStatsDistanceFrom(
-		gpos::pointer<const IDatum *> datum) const;
+	virtual CDouble GetStatsDistanceFrom(const IDatum *datum) const;
 
 	// return double representation of mapping value
 	CDouble GetValAsDouble() const;
 
 	// check if the given pair of datums are stats comparable
-	virtual BOOL StatsAreComparable(gpos::pointer<const IDatum *> datum) const;
+	virtual BOOL StatsAreComparable(const IDatum *datum) const;
 
 	virtual gpos::IOstream &OsPrint(gpos::IOstream &os) const = 0;
 };	// class IDatum
 
 // array of idatums
-using IDatumArray = CDynamicPtrArray<IDatum, CleanupRelease>;
+using IDatumArray = gpos::Vector<gpos::Ref<IDatum>>;
 }  // namespace gpnaucrates
 
 

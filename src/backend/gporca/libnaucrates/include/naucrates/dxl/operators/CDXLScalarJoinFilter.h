@@ -42,11 +42,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *,
-						gpos::pointer<const CDXLNode *>) const override;
+	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLScalarJoinFilter *>
+	static CDXLScalarJoinFilter *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -67,7 +66,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> node,
+	void AssertValid(const CDXLNode *node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

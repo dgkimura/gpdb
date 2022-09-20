@@ -48,18 +48,17 @@ const INT CConstExprEvaluatorDXLTest::m_iDefaultEvalValue = 300;
 //		value as DXL. Caller must release it.
 //
 //---------------------------------------------------------------------------
-gpos::owner<gpdxl::CDXLNode *>
+gpos::Ref<gpdxl::CDXLNode>
 CConstExprEvaluatorDXLTest::CDummyConstDXLNodeEvaluator::EvaluateExpr(
-	gpos::pointer<const gpdxl::CDXLNode *> /*pdxlnExpr*/
+	const gpdxl::CDXLNode * /*pdxlnExpr*/
 )
 {
-	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
-		m_pmda->PtMDType<IMDTypeInt4>();
-	pmdtypeint4->MDId()->AddRef();
+	const IMDTypeInt4 *pmdtypeint4 = m_pmda->PtMDType<IMDTypeInt4>();
+	;
 
-	gpos::owner<CDXLDatumInt4 *> dxl_datum = GPOS_NEW(m_mp) CDXLDatumInt4(
+	gpos::Ref<CDXLDatumInt4> dxl_datum = GPOS_NEW(m_mp) CDXLDatumInt4(
 		m_mp, pmdtypeint4->MDId(), false /*is_const_null*/, m_val);
-	gpos::owner<CDXLScalarConstValue *> pdxlnConst =
+	gpos::Ref<CDXLScalarConstValue> pdxlnConst =
 		GPOS_NEW(m_mp) CDXLScalarConstValue(m_mp, std::move(dxl_datum));
 
 	return GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(pdxlnConst));
@@ -109,17 +108,17 @@ CConstExprEvaluatorDXLTest::EresUnittest_NonScalar()
 	CMemoryPool *mp = testsetup.Pmp();
 	CDummyConstDXLNodeEvaluator consteval(mp, testsetup.Pmda(),
 										  m_iDefaultEvalValue);
-	gpos::owner<CConstExprEvaluatorDXL *> pceeval =
+	gpos::Ref<CConstExprEvaluatorDXL> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorDXL(mp, testsetup.Pmda(), &consteval);
 
-	gpos::owner<CExpression *> pexprGet =
+	gpos::Ref<CExpression> pexprGet =
 		CTestUtils::PexprLogicalGet(testsetup.Pmp());
 
 	// this call should raise an exception
-	gpos::owner<CExpression *> pexprResult = pceeval->PexprEval(pexprGet);
-	CRefCount::SafeRelease(std::move(pexprResult));
-	pexprGet->Release();
-	pceeval->Release();
+	gpos::Ref<CExpression> pexprResult = pceeval->PexprEval(pexprGet.get());
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -139,20 +138,20 @@ CConstExprEvaluatorDXLTest::EresUnittest_NestedSubquery()
 	CMemoryPool *mp = testsetup.Pmp();
 	CDummyConstDXLNodeEvaluator consteval(mp, testsetup.Pmda(),
 										  m_iDefaultEvalValue);
-	gpos::owner<CConstExprEvaluatorDXL *> pceeval =
+	gpos::Ref<CConstExprEvaluatorDXL> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorDXL(mp, testsetup.Pmda(), &consteval);
 
-	gpos::owner<CExpression *> pexprSelect =
+	gpos::Ref<CExpression> pexprSelect =
 		CTestUtils::PexprLogicalSelectWithConstAnySubquery(testsetup.Pmp());
-	gpos::pointer<CExpression *> pexprPredicate = (*pexprSelect)[1];
+	CExpression *pexprPredicate = (*pexprSelect)[1];
 	GPOS_ASSERT(COperator::EopScalarSubqueryAny ==
 				pexprPredicate->Pop()->Eopid());
 
 	// this call should raise an exception
-	gpos::owner<CExpression *> pexprResult = pceeval->PexprEval(pexprPredicate);
-	CRefCount::SafeRelease(std::move(pexprResult));
-	pexprSelect->Release();
-	pceeval->Release();
+	gpos::Ref<CExpression> pexprResult = pceeval->PexprEval(pexprPredicate);
+	;
+	;
+	;
 
 	return GPOS_OK;
 }
@@ -172,26 +171,25 @@ CConstExprEvaluatorDXLTest::EresUnittest_ScalarContainingVariables()
 	CMemoryPool *mp = testsetup.Pmp();
 	CDummyConstDXLNodeEvaluator consteval(mp, testsetup.Pmda(),
 										  m_iDefaultEvalValue);
-	gpos::owner<CConstExprEvaluatorDXL *> pceeval =
+	gpos::Ref<CConstExprEvaluatorDXL> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorDXL(mp, testsetup.Pmda(), &consteval);
 
-	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
-		testsetup.Pmda()->PtMDType<IMDTypeInt4>();
+	const IMDTypeInt4 *pmdtypeint4 = testsetup.Pmda()->PtMDType<IMDTypeInt4>();
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 	CColRef *pcrComputed =
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier);
 
 	// create a comparison, where one of the children is a variable
-	gpos::owner<CExpression *> pexprFunCall = CUtils::PexprScalarEqCmp(
+	gpos::Ref<CExpression> pexprFunCall = CUtils::PexprScalarEqCmp(
 		testsetup.Pmp(),
 		CUtils::PexprScalarConstInt4(testsetup.Pmp(), 200 /*val*/),
 		CUtils::PexprScalarIdent(testsetup.Pmp(), pcrComputed));
 
 	// this call should raise an exception
-	gpos::owner<CExpression *> pexprResult = pceeval->PexprEval(pexprFunCall);
-	CRefCount::SafeRelease(std::move(pexprResult));
-	pexprFunCall->Release();
-	pceeval->Release();
+	gpos::Ref<CExpression> pexprResult = pceeval->PexprEval(pexprFunCall.get());
+	;
+	;
+	;
 
 	return GPOS_OK;
 }

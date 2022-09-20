@@ -41,7 +41,7 @@ CDistributionSpecStrictSingleton::CDistributionSpecStrictSingleton(
 //---------------------------------------------------------------------------
 BOOL
 CDistributionSpecStrictSingleton::FSatisfies(
-	gpos::pointer<const CDistributionSpec *> pdss) const
+	const CDistributionSpec *pdss) const
 {
 	if (Matches(pdss))
 	{

@@ -124,8 +124,8 @@ private:
 	static void LogExceptionMessageAndDelete(CHAR *err_buf);
 
 	// create optimizer configuration object
-	static gpos::owner<COptimizerConfig *> CreateOptimizerConfig(
-		CMemoryPool *mp, gpos::owner<ICostModel *> cost_model);
+	static gpos::Ref<COptimizerConfig> CreateOptimizerConfig(
+		CMemoryPool *mp, gpos::Ref<ICostModel> cost_model);
 
 	// optimize a query to a physical DXL
 	static void *OptimizeTask(void *ptr);
@@ -133,7 +133,7 @@ private:
 	// translate a DXL tree into a planned statement
 	static PlannedStmt *ConvertToPlanStmtFromDXL(
 		CMemoryPool *mp, CMDAccessor *md_accessor, const Query *orig_query,
-		gpos::pointer<const CDXLNode *> dxlnode, bool can_set_tag,
+		const CDXLNode *dxlnode, bool can_set_tag,
 		DistributionHashOpsKind distribution_hashops);
 
 	// load search strategy from given path
@@ -143,17 +143,17 @@ private:
 	static CHAR *CreateMultiByteCharStringFromWCString(const WCHAR *wcstr);
 
 	// set cost model parameters
-	static void SetCostModelParams(gpos::pointer<ICostModel *> cost_model);
+	static void SetCostModelParams(ICostModel *cost_model);
 
 	// generate an instance of optimizer cost model
-	static gpos::owner<ICostModel *> GetCostModel(CMemoryPool *mp,
-												  ULONG num_segments);
+	static gpos::Ref<ICostModel> GetCostModel(CMemoryPool *mp,
+											  ULONG num_segments);
 
 	// print warning messages for columns with missing statistics
-	static void PrintMissingStatsWarning(
-		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::pointer<IMdIdArray *> col_stats,
-		gpos::pointer<MdidHashSet *> phsmdidRel);
+	static void PrintMissingStatsWarning(CMemoryPool *mp,
+										 CMDAccessor *md_accessor,
+										 IMdIdArray *col_stats,
+										 MdidHashSet *phsmdidRel);
 
 public:
 	// convert Query->DXL->LExpr->Optimize->PExpr->DXL

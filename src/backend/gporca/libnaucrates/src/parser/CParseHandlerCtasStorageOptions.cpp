@@ -50,7 +50,7 @@ CParseHandlerCtasStorageOptions::CParseHandlerCtasStorageOptions(
 //---------------------------------------------------------------------------
 CParseHandlerCtasStorageOptions::~CParseHandlerCtasStorageOptions()
 {
-	CRefCount::SafeRelease(m_dxl_ctas_storage_option);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -166,10 +166,10 @@ CParseHandlerCtasStorageOptions::EndElement(
 //		Return parsed storage options
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLCtasStorageOptions *>
+CDXLCtasStorageOptions *
 CParseHandlerCtasStorageOptions::GetDxlCtasStorageOption() const
 {
-	return m_dxl_ctas_storage_option;
+	return m_dxl_ctas_storage_option.get();
 }
 
 // EOF

@@ -45,7 +45,7 @@ public:
 	CScalarCoerceToDomain(const CScalarCoerceToDomain &) = delete;
 
 	// ctor
-	CScalarCoerceToDomain(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+	CScalarCoerceToDomain(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 						  INT type_modifier, ECoercionForm dxl_coerce_format,
 						  INT location);
 
@@ -66,7 +66,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *>) const override;
+	BOOL Matches(COperator *) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -76,11 +76,10 @@ public:
 	}
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(
-		gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override;
+	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
 
 	// conversion function
-	static gpos::cast_func<CScalarCoerceToDomain *>
+	static CScalarCoerceToDomain *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -36,7 +36,7 @@ XERCES_CPP_NAMESPACE_USE
 class CParseHandlerDynamicIndexScan : public CParseHandlerIndexScan
 {
 private:
-	gpos::pointer<ULongPtrArray *> m_selector_ids;
+	ULongPtrArray *m_selector_ids;
 
 	// process the start of an element
 	void StartElement(

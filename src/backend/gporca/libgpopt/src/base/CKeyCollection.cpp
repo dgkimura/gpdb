@@ -44,7 +44,7 @@ CKeyCollection::CKeyCollection(CMemoryPool *mp) : m_pdrgpcrs(nullptr)
 //		ctor
 //
 //---------------------------------------------------------------------------
-CKeyCollection::CKeyCollection(CMemoryPool *mp, gpos::owner<CColRefSet *> pcrs)
+CKeyCollection::CKeyCollection(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs)
 	: m_pdrgpcrs(nullptr)
 {
 	GPOS_ASSERT(nullptr != pcrs && 0 < pcrs->Size());
@@ -65,7 +65,7 @@ CKeyCollection::CKeyCollection(CMemoryPool *mp, gpos::owner<CColRefSet *> pcrs)
 //
 //---------------------------------------------------------------------------
 CKeyCollection::CKeyCollection(CMemoryPool *mp,
-							   gpos::owner<CColRefArray *> colref_array)
+							   gpos::Ref<CColRefArray> colref_array)
 	: m_pdrgpcrs(nullptr)
 {
 	GPOS_ASSERT(nullptr != mp);
@@ -73,12 +73,12 @@ CKeyCollection::CKeyCollection(CMemoryPool *mp,
 
 	m_pdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
 
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
-	pcrs->Include(colref_array);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	pcrs->Include(colref_array.get());
 	Add(std::move(pcrs));
 
 	// we own the array
-	colref_array->Release();
+	;
 }
 
 
@@ -92,7 +92,7 @@ CKeyCollection::CKeyCollection(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CKeyCollection::~CKeyCollection()
 {
-	m_pdrgpcrs->Release();
+	;
 }
 
 
@@ -105,9 +105,9 @@ CKeyCollection::~CKeyCollection()
 //
 //---------------------------------------------------------------------------
 void
-CKeyCollection::Add(gpos::owner<CColRefSet *> pcrs)
+CKeyCollection::Add(gpos::Ref<CColRefSet> pcrs)
 {
-	GPOS_ASSERT(!FKey(pcrs) && "no duplicates allowed");
+	GPOS_ASSERT(!FKey(pcrs.get()) && "no duplicates allowed");
 
 	m_pdrgpcrs->Append(std::move(pcrs));
 }
@@ -122,7 +122,7 @@ CKeyCollection::Add(gpos::owner<CColRefSet *> pcrs)
 //
 //---------------------------------------------------------------------------
 BOOL
-CKeyCollection::FKey(gpos::pointer<const CColRefSet *> pcrs,
+CKeyCollection::FKey(const CColRefSet *pcrs,
 					 BOOL fExactMatch  // true: match keys exactly,
 									   //  false: match keys by inclusion
 ) const
@@ -133,7 +133,7 @@ CKeyCollection::FKey(gpos::pointer<const CColRefSet *> pcrs,
 		if (fExactMatch)
 		{
 			// accept only exact matches
-			if (pcrs->Equals((*m_pdrgpcrs)[ul]))
+			if (pcrs->Equals((*m_pdrgpcrs)[ul].get()))
 			{
 				return true;
 			}
@@ -141,7 +141,7 @@ CKeyCollection::FKey(gpos::pointer<const CColRefSet *> pcrs,
 		else
 		{
 			// if given column set includes a key, then it is also a key
-			if (pcrs->ContainsAll((*m_pdrgpcrs)[ul]))
+			if (pcrs->ContainsAll((*m_pdrgpcrs)[ul].get()))
 			{
 				return true;
 			}
@@ -162,14 +162,13 @@ CKeyCollection::FKey(gpos::pointer<const CColRefSet *> pcrs,
 //
 //---------------------------------------------------------------------------
 BOOL
-CKeyCollection::FKey(CMemoryPool *mp,
-					 gpos::pointer<const CColRefArray *> colref_array) const
+CKeyCollection::FKey(CMemoryPool *mp, const CColRefArray *colref_array) const
 {
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(colref_array);
 
-	BOOL fKey = FKey(pcrs);
-	pcrs->Release();
+	BOOL fKey = FKey(pcrs.get());
+	;
 
 	return fKey;
 }
@@ -183,25 +182,24 @@ CKeyCollection::FKey(CMemoryPool *mp,
 //		Return first subsumed key as column array
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefArray *>
-CKeyCollection::PdrgpcrTrim(
-	CMemoryPool *mp, gpos::pointer<const CColRefArray *> colref_array) const
+gpos::Ref<CColRefArray>
+CKeyCollection::PdrgpcrTrim(CMemoryPool *mp,
+							const CColRefArray *colref_array) const
 {
-	gpos::owner<CColRefArray *> pdrgpcrTrim = nullptr;
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefArray> pdrgpcrTrim = nullptr;
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(colref_array);
 
 	const ULONG ulSets = m_pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < ulSets; ul++)
 	{
-		gpos::pointer<CColRefSet *> pcrsKey = (*m_pdrgpcrs)[ul];
+		CColRefSet *pcrsKey = (*m_pdrgpcrs)[ul].get();
 		if (pcrs->ContainsAll(pcrsKey))
 		{
 			pdrgpcrTrim = pcrsKey->Pdrgpcr(mp);
 			break;
 		}
-	}
-	pcrs->Release();
+	};
 
 	return pdrgpcrTrim;
 }
@@ -214,7 +212,7 @@ CKeyCollection::PdrgpcrTrim(
 //		Extract a key
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefArray *>
+gpos::Ref<CColRefArray>
 CKeyCollection::PdrgpcrKey(CMemoryPool *mp) const
 {
 	if (0 == m_pdrgpcrs->Size())
@@ -224,7 +222,7 @@ CKeyCollection::PdrgpcrKey(CMemoryPool *mp) const
 
 	GPOS_ASSERT(nullptr != (*m_pdrgpcrs)[0]);
 
-	gpos::owner<CColRefArray *> colref_array = (*m_pdrgpcrs)[0]->Pdrgpcr(mp);
+	gpos::Ref<CColRefArray> colref_array = (*m_pdrgpcrs)[0]->Pdrgpcr(mp);
 	return colref_array;
 }
 
@@ -237,18 +235,17 @@ CKeyCollection::PdrgpcrKey(CMemoryPool *mp) const
 //		Extract a hashable key
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefArray *>
+gpos::Ref<CColRefArray>
 CKeyCollection::PdrgpcrHashableKey(CMemoryPool *mp) const
 {
 	const ULONG ulSets = m_pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < ulSets; ul++)
 	{
-		gpos::owner<CColRefArray *> pdrgpcrKey = (*m_pdrgpcrs)[ul]->Pdrgpcr(mp);
-		if (CUtils::IsHashable(pdrgpcrKey))
+		gpos::Ref<CColRefArray> pdrgpcrKey = (*m_pdrgpcrs)[ul]->Pdrgpcr(mp);
+		if (CUtils::IsHashable(pdrgpcrKey.get()))
 		{
 			return pdrgpcrKey;
-		}
-		pdrgpcrKey->Release();
+		};
 	}
 
 	// no hashable key is found
@@ -264,7 +261,7 @@ CKeyCollection::PdrgpcrHashableKey(CMemoryPool *mp) const
 //		Extract the key at a position
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefArray *>
+gpos::Ref<CColRefArray>
 CKeyCollection::PdrgpcrKey(CMemoryPool *mp, ULONG ulIndex) const
 {
 	if (0 == m_pdrgpcrs->Size())
@@ -274,8 +271,7 @@ CKeyCollection::PdrgpcrKey(CMemoryPool *mp, ULONG ulIndex) const
 
 	GPOS_ASSERT(nullptr != (*m_pdrgpcrs)[ulIndex]);
 
-	gpos::owner<CColRefArray *> colref_array =
-		(*m_pdrgpcrs)[ulIndex]->Pdrgpcr(mp);
+	gpos::Ref<CColRefArray> colref_array = (*m_pdrgpcrs)[ulIndex]->Pdrgpcr(mp);
 	return colref_array;
 }
 
@@ -288,7 +284,7 @@ CKeyCollection::PdrgpcrKey(CMemoryPool *mp, ULONG ulIndex) const
 //		Extract key at given position
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CKeyCollection::PcrsKey(CMemoryPool *mp, ULONG ulIndex) const
 {
 	if (0 == m_pdrgpcrs->Size())
@@ -298,7 +294,7 @@ CKeyCollection::PcrsKey(CMemoryPool *mp, ULONG ulIndex) const
 
 	GPOS_ASSERT(nullptr != (*m_pdrgpcrs)[ulIndex]);
 
-	gpos::pointer<CColRefSet *> pcrsKey = (*m_pdrgpcrs)[ulIndex];
+	CColRefSet *pcrsKey = (*m_pdrgpcrs)[ulIndex].get();
 	return GPOS_NEW(mp) CColRefSet(mp, *pcrsKey);
 }
 

@@ -59,9 +59,10 @@ CParseHandlerResult::SetupInitialHandlers()
 	GPOS_ASSERT(0 == this->Length() &&
 				"No handlers should have been added yet");
 
-	m_dxl_op =
-		gpos::cast<CDXLPhysicalResult>(CDXLOperatorFactory::MakeDXLResult(
-			m_parse_handler_mgr->GetDXLMemoryManager()));
+	m_dxl_op = gpos::cast<CDXLPhysicalResult>(
+		CDXLOperatorFactory::MakeDXLResult(
+			m_parse_handler_mgr->GetDXLMemoryManager())
+			.get());
 
 	// parse handler for the one-time filter
 	CParseHandlerBase *one_time_filter_parse_handler =
@@ -177,7 +178,7 @@ CParseHandlerResult::EndElement(const XMLCh *const,	 // element_uri,
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 	// set statictics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add constructed children
 	AddChildFromParseHandler(proj_list_parse_handler);
@@ -192,7 +193,7 @@ CParseHandlerResult::EndElement(const XMLCh *const,	 // element_uri,
 	}
 
 #ifdef GPOS_DEBUG
-	m_dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxl_op->AssertValid(m_dxl_node.get(), false /* validate_children */);
 #endif	// GPOS_DEBUG
 
 	// deactivate handler

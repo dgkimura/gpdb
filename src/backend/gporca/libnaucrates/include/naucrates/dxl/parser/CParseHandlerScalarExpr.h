@@ -34,7 +34,7 @@ class CParseHandlerScalarExpr : public CParseHandlerBase
 {
 private:
 	// the root of the parsed DXL tree constructed by the parse handler
-	gpos::owner<CDXLNode *> m_dxl_node;
+	gpos::Ref<CDXLNode> m_dxl_node;
 
 protected:
 	// returns the parse handler type
@@ -67,7 +67,7 @@ public:
 	~CParseHandlerScalarExpr() override;
 
 	// root of constructed DXL expression
-	gpos::pointer<CDXLNode *> CreateDXLNode() const;
+	CDXLNode *CreateDXLNode() const;
 };
 }  // namespace gpdxl
 

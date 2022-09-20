@@ -38,7 +38,7 @@ public:
 	CXformGbAgg2StreamAgg(CMemoryPool *mp);
 
 	// ctor
-	explicit CXformGbAgg2StreamAgg(gpos::owner<CExpression *> pexprPattern);
+	explicit CXformGbAgg2StreamAgg(gpos::Ref<CExpression> pexprPattern);
 
 	// dtor
 	~CXformGbAgg2StreamAgg() override = default;
@@ -61,9 +61,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(gpos::pointer<CXformContext *> pxfctxt,
-				   gpos::pointer<CXformResult *> pxfres,
-				   gpos::pointer<CExpression *> pexpr) const override;
+	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+				   CExpression *pexpr) const override;
 
 };	// class CXformGbAgg2StreamAgg
 

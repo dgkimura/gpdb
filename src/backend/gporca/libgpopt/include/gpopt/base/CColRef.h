@@ -31,7 +31,7 @@ class CColRef;
 
 // colref array
 using CColRefArray = CDynamicPtrArray<CColRef, CleanupNULL>;
-using CColRef2dArray = CDynamicPtrArray<CColRefArray, CleanupRelease>;
+using CColRef2dArray = gpos::Vector<gpos::Ref<CColRefArray>>;
 
 // hash map mapping ULONG -> CColRef
 using UlongToColRefMap =
@@ -65,7 +65,7 @@ public:
 
 private:
 	// type information
-	gpos::pointer<const IMDType *> m_pmdtype;
+	const IMDType *m_pmdtype;
 
 	// type modifier
 	const INT m_type_modifier;
@@ -77,7 +77,7 @@ private:
 	EUsedStatus m_used;
 
 	// table info
-	gpos::pointer<IMDId *> m_mdid_table;
+	IMDId *m_mdid_table;
 
 public:
 	CColRef(const CColRef &) = delete;
@@ -91,14 +91,14 @@ public:
 	};
 
 	// ctor
-	CColRef(gpos::pointer<const IMDType *> pmdtype, const INT type_modifier,
-			ULONG id, const CName *pname);
+	CColRef(const IMDType *pmdtype, const INT type_modifier, ULONG id,
+			const CName *pname);
 
 	// dtor
 	virtual ~CColRef();
 
 	// accessor to type info
-	gpos::pointer<const IMDType *>
+	const IMDType *
 	RetrieveType() const
 	{
 		return m_pmdtype;
@@ -152,16 +152,16 @@ public:
 	}
 
 	// extract array of colids from array of colrefs
-	static gpos::owner<ULongPtrArray *> Pdrgpul(
-		CMemoryPool *mp, gpos::pointer<CColRefArray *> colref_array);
+	static gpos::Ref<ULongPtrArray> Pdrgpul(CMemoryPool *mp,
+											CColRefArray *colref_array);
 
 	// check if the the array of column references are equal
-	static BOOL Equals(gpos::pointer<const CColRefArray *> pdrgpcr1,
-					   gpos::pointer<const CColRefArray *> pdrgpcr2);
+	static BOOL Equals(const CColRefArray *pdrgpcr1,
+					   const CColRefArray *pdrgpcr2);
 
 	// check if the the array of column reference arrays are equal
-	static BOOL Equals(gpos::pointer<const CColRef2dArray *> pdrgdrgpcr1,
-					   gpos::pointer<const CColRef2dArray *> pdrgdrgpcr2);
+	static BOOL Equals(const CColRef2dArray *pdrgdrgpcr1,
+					   const CColRef2dArray *pdrgdrgpcr2);
 
 	// type of column reference (base/computed)
 	virtual Ecolreftype Ecrt() const = 0;
@@ -217,14 +217,14 @@ public:
 		return m_used;
 	}
 
-	gpos::pointer<IMDId *>
+	IMDId *
 	GetMdidTable() const
 	{
 		return m_mdid_table;
 	};
 
 	void
-	SetMdidTable(gpos::pointer<IMDId *> mdid_table)
+	SetMdidTable(IMDId *mdid_table)
 	{
 		m_mdid_table = mdid_table;
 	}
@@ -243,8 +243,7 @@ using ColRefToUlongMap =
 	CHashMap<CColRef, ULONG, CColRef::HashValue, gpos::Equals<CColRef>,
 			 CleanupNULL<CColRef>, CleanupDelete<ULONG>>;
 
-using ColRefToUlongMapArray =
-	CDynamicPtrArray<ColRefToUlongMap, CleanupRelease>;
+using ColRefToUlongMapArray = gpos::Vector<gpos::Ref<ColRefToUlongMap>>;
 
 }  // namespace gpopt
 

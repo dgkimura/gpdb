@@ -34,11 +34,10 @@ public:
 
 	// ctor
 	CPhysicalScalarAgg(
-		CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-		gpos::pointer<CColRefArray *>
-			pdrgpcrMinimal,	 // minimal grouping columns based on FD's
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+		CColRefArray *pdrgpcrMinimal,  // minimal grouping columns based on FD's
 		COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
-		gpos::owner<CColRefArray *> pdrgpcrArgDQA, BOOL fMultiStage,
+		gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,
 		BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
 		BOOL should_enforce_distribution);
 
@@ -65,19 +64,20 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required sort columns of the n-th child
-	gpos::owner<COrderSpec *> PosRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<COrderSpec> PosRequired(CMemoryPool *mp,
+									  CExpressionHandle &exprhdl,
+									  COrderSpec *posRequired,
+									  ULONG child_index,
+									  CDrvdPropArray *pdrgpdpCtxt,
+									  ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	gpos::owner<COrderSpec *> PosDerive(
-		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
+	gpos::Ref<COrderSpec> PosDerive(CMemoryPool *mp,
+									CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -85,15 +85,14 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl,
-		gpos::pointer<const CEnfdOrder *> peo) const override;
+		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CPhysicalScalarAgg *>
+	static CPhysicalScalarAgg *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -14,8 +14,8 @@ class CPoint;
 
 struct PointLess
 {
-	bool operator()(gpos::pointer<const gpnaucrates::CPoint *> a,
-					gpos::pointer<const gpnaucrates::CPoint *> b) const;
+	bool operator()(const gpnaucrates::CPoint *a,
+					const gpnaucrates::CPoint *b) const;
 
 	bool operator()(const gpos::Ref<gpnaucrates::CPoint> &a,
 					const gpos::Ref<gpnaucrates::CPoint> &b) const;

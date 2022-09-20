@@ -74,9 +74,8 @@ CXformSelect2Filter::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformSelect2Filter::Transform(gpos::pointer<CXformContext *> pxfctxt,
-							   gpos::pointer<CXformResult *> pxfres,
-							   gpos::pointer<CExpression *> pexpr) const
+CXformSelect2Filter::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+							   CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -89,11 +88,11 @@ CXformSelect2Filter::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	CExpression *pexprScalar = (*pexpr)[1];
 
 	// addref all children
-	pexprRelational->AddRef();
-	pexprScalar->AddRef();
+	;
+	;
 
 	// assemble physical operator
-	gpos::owner<CExpression *> pexprFilter = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprFilter = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalFilter(mp), pexprRelational, pexprScalar);
 
 	// add alternative to results

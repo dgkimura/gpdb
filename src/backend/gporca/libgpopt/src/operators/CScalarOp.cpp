@@ -110,11 +110,11 @@ CScalarOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarOp::Matches(gpos::pointer<COperator *> pop) const
+CScalarOp::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarOp *> pscop = gpos::dyn_cast<CScalarOp>(pop);
+		CScalarOp *pscop = gpos::dyn_cast<CScalarOp>(pop);
 
 		// match if operator oid are identical
 		return m_mdid_op->Equals(pscop->MdIdOp());
@@ -199,7 +199,7 @@ CScalarOp::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarOp::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
+CScalarOp::Eber(ULongPtrArray *pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

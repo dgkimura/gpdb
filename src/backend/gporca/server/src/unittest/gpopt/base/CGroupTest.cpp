@@ -43,17 +43,17 @@ CGroupTest::EresUnittest()
 }
 
 
-static gpos::owner<CExpression *>
+static gpos::Ref<CExpression>
 InsertGroupIntoMemo(CMemo *pmemo, CMemoryPool *mp)
 {
-	gpos::owner<CExpression *> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	pexprGet->Pop()->AddRef();
-	gpos::owner<CGroupExpression *> pgexpr = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
+	;
+	gpos::Ref<CGroupExpression> pgexpr = GPOS_NEW(mp)
 		CGroupExpression(mp, pexprGet->Pop(), GPOS_NEW(mp) CGroupArray(mp),
 						 CXform::ExfInvalid /*exfidOrigin*/,
 						 nullptr /*pgexprOrigin*/, false /*fIntermediate*/);
 
-	pmemo->PgroupInsert(nullptr, pexprGet, std::move(pgexpr));
+	pmemo->PgroupInsert(nullptr, pexprGet.get(), std::move(pgexpr));
 
 	return pexprGet;
 }
@@ -66,8 +66,8 @@ CGroupTest::EresUnittest_FResetStatsOnCGroupWithDuplicateGroup()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -76,8 +76,8 @@ CGroupTest::EresUnittest_FResetStatsOnCGroupWithDuplicateGroup()
 
 	CMemo *pmemo = GPOS_NEW(mp) CMemo(mp);
 
-	gpos::owner<CExpression *> pexprGet1 = InsertGroupIntoMemo(pmemo, mp);
-	gpos::owner<CExpression *> pexprGet2 = InsertGroupIntoMemo(pmemo, mp);
+	gpos::Ref<CExpression> pexprGet1 = InsertGroupIntoMemo(pmemo, mp);
+	gpos::Ref<CExpression> pexprGet2 = InsertGroupIntoMemo(pmemo, mp);
 
 	CGroupExpression *pgexprFirst = nullptr;
 	{
@@ -108,14 +108,14 @@ CGroupTest::EresUnittest_FResetStatsOnCGroupWithDuplicateGroup()
 		pmemo->Pgroup(1)->Pstats() != nullptr)
 	{
 		GPOS_DELETE(pmemo);
-		pexprGet1->Release();
-		pexprGet2->Release();
+		;
+		;
 		return GPOS_FAILED;
 	}
 
 	GPOS_DELETE(pmemo);
-	pexprGet1->Release();
-	pexprGet2->Release();
+	;
+	;
 	return GPOS_OK;
 }
 

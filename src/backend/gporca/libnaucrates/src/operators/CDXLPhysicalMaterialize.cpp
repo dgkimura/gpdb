@@ -127,8 +127,8 @@ CDXLPhysicalMaterialize::IsEager() const
 
 //		Serialize operator in DXL format
 void
-CDXLPhysicalMaterialize::SerializeToDXL(
-	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
+CDXLPhysicalMaterialize::SerializeToDXL(CXMLSerializer *xml_serializer,
+										const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -172,14 +172,14 @@ CDXLPhysicalMaterialize::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalMaterialize::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLPhysicalMaterialize::AssertValid(const CDXLNode *node,
 									 BOOL validate_children) const
 {
 	GPOS_ASSERT(EdxlspoolNone == m_spool_type ||
 				EdxlspoolMaterialize == m_spool_type);
 	GPOS_ASSERT(EdxlmatIndexSentinel == node->Arity());
 
-	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[EdxlmatIndexChild];
+	CDXLNode *child_dxlnode = (*node)[EdxlmatIndexChild];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

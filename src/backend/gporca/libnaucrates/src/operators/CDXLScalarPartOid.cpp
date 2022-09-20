@@ -73,7 +73,7 @@ CDXLScalarPartOid::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarPartOid::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  gpos::pointer<const CDXLNode *>  // dxlnode
+								  const CDXLNode *	// dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -96,7 +96,7 @@ CDXLScalarPartOid::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarPartOid::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarPartOid::AssertValid(const CDXLNode *dxlnode,
 							   BOOL	 // validate_children
 ) const
 {

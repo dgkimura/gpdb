@@ -75,7 +75,7 @@ public:
 
 	// equality check
 	BOOL
-	Equals(gpos::pointer<const Vector *> arr) const noexcept
+	Equals(const Vector *arr) const noexcept
 	{
 		return std::equal(v_.begin(), v_.end(), arr->v_.begin(), arr->v_.end());
 	}

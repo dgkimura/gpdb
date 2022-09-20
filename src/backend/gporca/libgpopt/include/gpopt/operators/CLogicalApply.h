@@ -33,7 +33,7 @@ class CLogicalApply : public CLogical
 private:
 protected:
 	// columns used from Apply's inner child
-	gpos::owner<CColRefArray *> m_pdrgpcrInner;
+	gpos::Ref<CColRefArray> m_pdrgpcrInner;
 
 	// origin subquery id
 	EOperatorId m_eopidOriginSubq;
@@ -42,7 +42,7 @@ protected:
 	explicit CLogicalApply(CMemoryPool *mp);
 
 	// ctor
-	CLogicalApply(CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrInner,
+	CLogicalApply(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrInner,
 				  EOperatorId eopidOriginSubq);
 
 	// dtor
@@ -52,7 +52,7 @@ public:
 	CLogicalApply(const CLogicalApply &) = delete;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -62,25 +62,24 @@ public:
 	}
 
 	// inner column references accessor
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgPcrInner() const
 	{
-		return m_pdrgpcrInner;
+		return m_pdrgpcrInner.get();
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
 
 	// derive partition consumer info
-	gpos::owner<CPartInfo *>
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -88,7 +87,7 @@ public:
 	}
 
 	// derive keys
-	gpos::owner<CKeyCollection *>
+	gpos::Ref<CKeyCollection>
 	DeriveKeyCollection(CMemoryPool *mp,
 						CExpressionHandle &exprhdl) const override
 	{
@@ -96,7 +95,7 @@ public:
 	}
 
 	// derive function properties
-	gpos::owner<CFunctionProp *>
+	gpos::Ref<CFunctionProp>
 	DeriveFunctionProperties(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -108,9 +107,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive statistics
-	gpos::owner<IStatistics *>
+	gpos::Ref<IStatistics>
 	PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 gpos::pointer<IStatisticsArray *>	// stats_ctxt
+				 IStatisticsArray *	 // stats_ctxt
 	) const override
 	{
 		// we should use stats from the corresponding Join tree if decorrelation succeeds
@@ -131,10 +130,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	gpos::owner<CColRefSet *> PcrsStat(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   gpos::pointer<CColRefSet *> pcrsInput,
-									   ULONG child_index) const override;
+	gpos::Ref<CColRefSet> PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								   CColRefSet *pcrsInput,
+								   ULONG child_index) const override;
 
 	// return true if operator is a correlated apply
 	virtual BOOL
@@ -175,7 +173,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static gpos::cast_func<CLogicalApply *>
+	static CLogicalApply *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

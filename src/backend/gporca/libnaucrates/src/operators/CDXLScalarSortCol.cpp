@@ -134,7 +134,7 @@ CDXLScalarSortCol::IsSortedNullsFirst() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarSortCol::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  gpos::pointer<const CDXLNode *>  // dxlnode
+								  const CDXLNode *	// dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -164,7 +164,7 @@ CDXLScalarSortCol::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSortCol::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarSortCol::AssertValid(const CDXLNode *dxlnode,
 							   BOOL	 // validate_children
 ) const
 {

@@ -40,7 +40,7 @@ class CMDIdColStats : public IMDId
 {
 private:
 	// mdid of base relation
-	gpos::owner<CMDIdGPDB *> m_rel_mdid;
+	gpos::Ref<CMDIdGPDB> m_rel_mdid;
 
 	// position of the attribute in the base relation
 	ULONG m_attr_pos;
@@ -58,7 +58,7 @@ public:
 	CMDIdColStats(const CMDIdColStats &) = delete;
 
 	// ctor
-	CMDIdColStats(gpos::owner<CMDIdGPDB *> rel_mdid, ULONG attno);
+	CMDIdColStats(gpos::Ref<CMDIdGPDB> rel_mdid, ULONG attno);
 
 	// dtor
 	~CMDIdColStats() override;
@@ -80,11 +80,11 @@ public:
 	}
 
 	// accessors
-	gpos::pointer<IMDId *> GetRelMdId() const;
+	IMDId *GetRelMdId() const;
 	ULONG Position() const;
 
 	// equality check
-	BOOL Equals(gpos::pointer<const IMDId *> mdid) const override;
+	BOOL Equals(const IMDId *mdid) const override;
 
 	// computes the hash value for the metadata id
 	ULONG
@@ -98,7 +98,7 @@ public:
 	BOOL
 	IsValid() const override
 	{
-		return IMDId::IsValid(m_rel_mdid);
+		return IMDId::IsValid(m_rel_mdid.get());
 	}
 
 	// serialize mdid in DXL as the value of the specified attribute
@@ -109,8 +109,8 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// const converter
-	static gpos::pointer<const CMDIdColStats *>
-	CastMdid(gpos::pointer<const IMDId *> mdid)
+	static const CMDIdColStats *
+	CastMdid(const IMDId *mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidColStats == mdid->MdidType());
 
@@ -118,7 +118,7 @@ public:
 	}
 
 	// non-const converter
-	static gpos::cast_func<CMDIdColStats *>
+	static CMDIdColStats *
 	CastMdid(IMDId *mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidColStats == mdid->MdidType());
@@ -127,10 +127,10 @@ public:
 	}
 
 	// make a copy in the given memory pool
-	gpos::owner<IMDId *>
+	gpos::Ref<IMDId>
 	Copy(CMemoryPool *mp) const override
 	{
-		gpos::owner<CMDIdGPDB *> mdid_rel =
+		gpos::Ref<CMDIdGPDB> mdid_rel =
 			gpos::dyn_cast<CMDIdGPDB>(m_rel_mdid->Copy(mp));
 		return GPOS_NEW(mp) CMDIdColStats(std::move(mdid_rel), m_attr_pos);
 	}

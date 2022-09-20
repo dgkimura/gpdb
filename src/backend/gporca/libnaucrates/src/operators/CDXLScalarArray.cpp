@@ -133,7 +133,7 @@ CDXLScalarArray::IsMultiDimensional() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarArray::SerializeToDXL(CXMLSerializer *xml_serializer,
-								gpos::pointer<const CDXLNode *> dxlnode) const
+								const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -163,13 +163,13 @@ CDXLScalarArray::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArray::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarArray::AssertValid(const CDXLNode *dxlnode,
 							 BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		gpos::pointer<CDXLNode *> child_dxlnode = (*dxlnode)[ul];
+		CDXLNode *child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

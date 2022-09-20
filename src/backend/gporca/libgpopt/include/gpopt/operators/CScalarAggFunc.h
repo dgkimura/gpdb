@@ -79,7 +79,7 @@ private:
 
 	EAggfuncKind m_aggkind;
 
-	gpos::owner<ULongPtrArray *> m_argtypes;
+	gpos::Ref<ULongPtrArray> m_argtypes;
 
 	// stage of the aggregate function
 	EAggfuncStage m_eaggfuncstage;
@@ -95,13 +95,13 @@ public:
 				   gpos::Ref<IMDId> resolved_rettype,
 				   const CWStringConst *pstrAggFunc, BOOL is_distinct,
 				   EAggfuncStage eaggfuncstage, BOOL fSplit,
-				   EAggfuncKind aggkind, gpos::owner<ULongPtrArray *> argtypes);
+				   EAggfuncKind aggkind, gpos::Ref<ULongPtrArray> argtypes);
 
 	// dtor
 	~CScalarAggFunc() override
 	{
 		GPOS_DELETE(m_pstrAggFunc);
-		CRefCount::SafeRelease(m_argtypes);
+		;
 	}
 
 
@@ -124,7 +124,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -134,18 +134,17 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarAggFunc *>
+	static CScalarAggFunc *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -180,10 +179,10 @@ public:
 		return m_aggkind;
 	}
 
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetArgTypes() const
 	{
-		return m_argtypes;
+		return m_argtypes.get();
 	}
 
 	// stage of the aggregate function
@@ -233,7 +232,7 @@ public:
 	BOOL FCountAny() const;
 
 	// is function either min() or max()?
-	BOOL IsMinMax(gpos::pointer<const IMDType *> mdtype) const;
+	BOOL IsMinMax(const IMDType *mdtype) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

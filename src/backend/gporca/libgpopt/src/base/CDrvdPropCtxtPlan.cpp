@@ -45,7 +45,7 @@ CDrvdPropCtxtPlan::CDrvdPropCtxtPlan(CMemoryPool *mp, BOOL fUpdateCTEMap)
 //---------------------------------------------------------------------------
 CDrvdPropCtxtPlan::~CDrvdPropCtxtPlan()
 {
-	m_phmulpdpCTEs->Release();
+	;
 }
 
 
@@ -57,19 +57,19 @@ CDrvdPropCtxtPlan::~CDrvdPropCtxtPlan()
 //		Copy function
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDrvdPropCtxt *>
+gpos::Ref<CDrvdPropCtxt>
 CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 {
-	gpos::owner<CDrvdPropCtxtPlan *> pdpctxtplan =
+	gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 		GPOS_NEW(mp) CDrvdPropCtxtPlan(mp);
 
-	UlongToDrvdPropPlanMapIter hmulpdpiter(m_phmulpdpCTEs);
+	UlongToDrvdPropPlanMapIter hmulpdpiter(m_phmulpdpCTEs.get());
 	while (hmulpdpiter.Advance())
 	{
 		ULONG id = *(hmulpdpiter.Key());
-		gpos::owner<CDrvdPropPlan *> pdpplan =
+		gpos::Ref<CDrvdPropPlan> pdpplan =
 			const_cast<CDrvdPropPlan *>(hmulpdpiter.Value());
-		pdpplan->AddRef();
+		;
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
 #endif	// GPOS_DEBUG
@@ -91,7 +91,7 @@ CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 void
-CDrvdPropCtxtPlan::AddProps(gpos::pointer<CDrvdProp *> pdp)
+CDrvdPropCtxtPlan::AddProps(CDrvdProp *pdp)
 {
 	if (CDrvdProp::EptPlan != pdp->Ept())
 	{
@@ -99,7 +99,7 @@ CDrvdPropCtxtPlan::AddProps(gpos::pointer<CDrvdProp *> pdp)
 		return;
 	}
 
-	gpos::pointer<CDrvdPropPlan *> pdpplan = gpos::dyn_cast<CDrvdPropPlan>(pdp);
+	CDrvdPropPlan *pdpplan = gpos::dyn_cast<CDrvdPropPlan>(pdp);
 
 	ULONG ulProducerId = gpos::ulong_max;
 	CDrvdPropPlan *pdpplanProducer =
@@ -111,7 +111,7 @@ CDrvdPropCtxtPlan::AddProps(gpos::pointer<CDrvdProp *> pdp)
 
 	if (m_fUpdateCTEMap)
 	{
-		pdpplanProducer->AddRef();
+		;
 		BOOL fInserted GPOS_ASSERTS_ONLY = m_phmulpdpCTEs->Insert(
 			GPOS_NEW(m_mp) ULONG(ulProducerId), pdpplanProducer);
 		GPOS_ASSERT(fInserted);
@@ -131,11 +131,11 @@ IOstream &
 CDrvdPropCtxtPlan::OsPrint(IOstream &os) const
 {
 	// iterate on local map and print entries
-	UlongToDrvdPropPlanMapIter hmulpdpiter(m_phmulpdpCTEs);
+	UlongToDrvdPropPlanMapIter hmulpdpiter(m_phmulpdpCTEs.get());
 	while (hmulpdpiter.Advance())
 	{
 		ULONG id = *(hmulpdpiter.Key());
-		gpos::pointer<CDrvdPropPlan *> pdpplan =
+		CDrvdPropPlan *pdpplan =
 			const_cast<CDrvdPropPlan *>(hmulpdpiter.Value());
 
 		os << id << "-->" << *pdpplan << std::endl;
@@ -153,7 +153,7 @@ CDrvdPropCtxtPlan::OsPrint(IOstream &os) const
 //		Return the plan properties of cte producer with given id
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDrvdPropPlan *>
+CDrvdPropPlan *
 CDrvdPropCtxtPlan::PdpplanCTEProducer(ULONG ulCTEId) const
 {
 	GPOS_ASSERT(nullptr != m_phmulpdpCTEs);
@@ -175,7 +175,7 @@ CDrvdPropCtxtPlan::CopyCTEProducerProps(CDrvdPropPlan *pdpplan, ULONG ulCTEId)
 {
 	GPOS_ASSERT(nullptr != pdpplan);
 
-	pdpplan->AddRef();
+	;
 	BOOL fInserted GPOS_ASSERTS_ONLY =
 		m_phmulpdpCTEs->Insert(GPOS_NEW(m_mp) ULONG(ulCTEId), pdpplan);
 	GPOS_ASSERT(fInserted);

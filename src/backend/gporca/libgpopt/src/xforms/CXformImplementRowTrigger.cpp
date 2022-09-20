@@ -63,42 +63,42 @@ CXformImplementRowTrigger::Exfp(CExpressionHandle &	 // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementRowTrigger::Transform(gpos::pointer<CXformContext *> pxfctxt,
-									 gpos::pointer<CXformResult *> pxfres,
-									 gpos::pointer<CExpression *> pexpr) const
+CXformImplementRowTrigger::Transform(CXformContext *pxfctxt,
+									 CXformResult *pxfres,
+									 CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	gpos::pointer<CLogicalRowTrigger *> popRowTrigger =
+	CLogicalRowTrigger *popRowTrigger =
 		gpos::dyn_cast<CLogicalRowTrigger>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
-	gpos::owner<IMDId *> rel_mdid = popRowTrigger->GetRelMdId();
-	rel_mdid->AddRef();
+	gpos::Ref<IMDId> rel_mdid = popRowTrigger->GetRelMdId();
+	;
 
 	INT type = popRowTrigger->GetType();
 
 	CColRefArray *pdrgpcrOld = popRowTrigger->PdrgpcrOld();
 	if (nullptr != pdrgpcrOld)
 	{
-		pdrgpcrOld->AddRef();
+		;
 	}
 
 	CColRefArray *pdrgpcrNew = popRowTrigger->PdrgpcrNew();
 	if (nullptr != pdrgpcrNew)
 	{
-		pdrgpcrNew->AddRef();
+		;
 	}
 
 	// child of RowTrigger operator
-	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
-	pexprChild->AddRef();
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
+	;
 
 	// create physical RowTrigger
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CPhysicalRowTrigger(
 						mp, std::move(rel_mdid), type, pdrgpcrOld, pdrgpcrNew),

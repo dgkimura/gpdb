@@ -48,9 +48,9 @@ public:
 
 	// ctor
 	CPhysicalBitmapTableScan(CMemoryPool *mp,
-							 gpos::owner<CTableDescriptor *> ptabdesc,
+							 gpos::Ref<CTableDescriptor> ptabdesc,
 							 ULONG ulOriginOpId, const CName *pnameTableAlias,
-							 gpos::owner<CColRefArray *> pdrgpcrOutput);
+							 gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// dtor
 	~CPhysicalBitmapTableScan() override = default;
@@ -87,14 +87,14 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// statistics derivation during costing
-	gpos::owner<IStatistics *>
-	PstatsDerive(CMemoryPool *,						// mp
-				 CExpressionHandle &,				// exprhdl
-				 gpos::pointer<CReqdPropPlan *>,	// prpplan
-				 gpos::pointer<IStatisticsArray *>	//stats_ctxt
+	gpos::Ref<IStatistics>
+	PstatsDerive(CMemoryPool *,		   // mp
+				 CExpressionHandle &,  // exprhdl
+				 CReqdPropPlan *,	   // prpplan
+				 IStatisticsArray *	   //stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(
@@ -107,7 +107,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static gpos::cast_func<CPhysicalBitmapTableScan *>
+	static CPhysicalBitmapTableScan *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -44,12 +44,12 @@ private:
 	CStatsPred::EStatsCmpType m_stats_cmp_type;
 
 	// point to be used for comparison
-	gpos::owner<CPoint *> m_pred_point;
+	gpos::Ref<CPoint> m_pred_point;
 
 	// add padding to datums when needed
-	static gpos::owner<IDatum *> PreprocessDatum(CMemoryPool *mp,
-												 const CColRef *colref,
-												 gpos::pointer<IDatum *> datum);
+	static gpos::Ref<IDatum> PreprocessDatum(CMemoryPool *mp,
+											 const CColRef *colref,
+											 IDatum *datum);
 
 public:
 	CStatsPredPoint &operator=(CStatsPredPoint &) = delete;
@@ -58,17 +58,16 @@ public:
 
 	// ctor
 	CStatsPredPoint(ULONG colid, CStatsPred::EStatsCmpType stats_cmp_type,
-					gpos::owner<CPoint *> point);
+					gpos::Ref<CPoint> point);
 
 	// ctor
 	CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
-					CStatsPred::EStatsCmpType stats_cmp_type,
-					gpos::pointer<IDatum *> datum);
+					CStatsPred::EStatsCmpType stats_cmp_type, IDatum *datum);
 
 	// dtor
 	~CStatsPredPoint() override
 	{
-		m_pred_point->Release();
+		;
 	}
 
 	// comparison types for stats computation
@@ -79,10 +78,10 @@ public:
 	}
 
 	// filter point
-	virtual gpos::pointer<CPoint *>
+	virtual CPoint *
 	GetPredPoint() const
 	{
-		return m_pred_point;
+		return m_pred_point.get();
 	}
 
 	// filter type id
@@ -93,7 +92,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CStatsPredPoint *>
+	static CStatsPredPoint *
 	ConvertPredStats(CStatsPred *pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);

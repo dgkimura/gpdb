@@ -83,7 +83,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CDXLDatumStatsDoubleMappable *>
+	static CDXLDatumStatsDoubleMappable *
 	Cast(CDXLDatum *dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);

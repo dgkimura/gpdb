@@ -206,11 +206,10 @@ CICGTest::EresUnittest_RunUnsupportedMinidumpTests()
 
 		GPOS_TRY
 		{
-			gpos::owner<ICostModel *> pcm = CTestUtils::GetCostModel(mp);
+			gpos::Ref<ICostModel> pcm = CTestUtils::GetCostModel(mp);
 
-			gpos::pointer<COptimizerConfig *> optimizer_config =
-				pdxlmd->GetOptimizerConfig();
-			gpos::owner<CDXLNode *> pdxlnPlan =
+			COptimizerConfig *optimizer_config = pdxlmd->GetOptimizerConfig();
+			gpos::Ref<CDXLNode> pdxlnPlan =
 				CMinidumperUtils::PdxlnExecuteMinidump(
 					mp, filename,
 					optimizer_config->GetCostModel()->UlHosts() /*ulSegments*/,
@@ -220,8 +219,8 @@ CICGTest::EresUnittest_RunUnsupportedMinidumpTests()
 
 
 			GPOS_CHECK_ABORT;
-			pdxlnPlan->Release();
-			pcm->Release();
+			;
+			;
 
 			// test should have thrown
 			eres = GPOS_FAILED;
@@ -304,25 +303,25 @@ CICGTest::EresUnittest_NegativeIndexApplyTests()
 	{
 		GPOS_TRY
 		{
-			gpos::owner<ICostModel *> pcm = CTestUtils::GetCostModel(mp);
+			gpos::Ref<ICostModel> pcm = CTestUtils::GetCostModel(mp);
 
-			gpos::owner<COptimizerConfig *> optimizer_config =
+			gpos::Ref<COptimizerConfig> optimizer_config =
 				GPOS_NEW(mp) COptimizerConfig(
 					CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
 					CStatisticsConfig::PstatsconfDefault(mp),
 					CCTEConfig::PcteconfDefault(mp), pcm,
 					CHint::PhintDefault(mp), CWindowOids::GetWindowOids(mp));
-			gpos::owner<CDXLNode *> pdxlnPlan =
+			gpos::Ref<CDXLNode> pdxlnPlan =
 				CMinidumperUtils::PdxlnExecuteMinidump(
 					mp, rgszNegativeIndexApplyFileNames[ul],
 					GPOPT_TEST_SEGMENTS /*ulSegments*/, 1 /*ulSessionId*/,
-					1,						  /*ulCmdId*/
-					optimizer_config, nullptr /*pceeval*/
+					1,								/*ulCmdId*/
+					optimizer_config.get(), nullptr /*pceeval*/
 				);
 			GPOS_CHECK_ABORT;
-			optimizer_config->Release();
-			pdxlnPlan->Release();
-			pcm->Release();
+			;
+			;
+			;
 
 			// test should have thrown
 			eres = GPOS_FAILED;
@@ -360,8 +359,7 @@ CICGTest::EresUnittest_NegativeIndexApplyTests()
 //
 //---------------------------------------------------------------------------
 BOOL
-CICGTest::FDXLOpSatisfiesPredicate(gpos::pointer<CDXLNode *> pdxl,
-								   FnDXLOpPredicate fdop)
+CICGTest::FDXLOpSatisfiesPredicate(CDXLNode *pdxl, FnDXLOpPredicate fdop)
 {
 	using namespace gpdxl;
 
@@ -392,7 +390,7 @@ CICGTest::FDXLOpSatisfiesPredicate(gpos::pointer<CDXLNode *> pdxl,
 //
 //---------------------------------------------------------------------------
 BOOL
-CICGTest::FIsNotIndexJoin(gpos::pointer<CDXLOperator *> dxl_op)
+CICGTest::FIsNotIndexJoin(CDXLOperator *dxl_op)
 {
 	if (EdxlopPhysicalNLJoin == dxl_op->GetDXLOperator())
 	{
@@ -414,7 +412,7 @@ CICGTest::FIsNotIndexJoin(gpos::pointer<CDXLOperator *> dxl_op)
 //
 //---------------------------------------------------------------------------
 BOOL
-CICGTest::FHasNoIndexJoin(gpos::pointer<CDXLNode *> pdxl)
+CICGTest::FHasNoIndexJoin(CDXLNode *pdxl)
 {
 	return FDXLOpSatisfiesPredicate(pdxl, FIsNotIndexJoin);
 }
@@ -439,7 +437,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 					   true /*value*/);
 
 	// When the risk threshold is infinite, we should pick index join
-	gpos::owner<ICostModelParamsArray *> pdrgpcpUnlimited =
+	gpos::Ref<ICostModelParamsArray> pdrgpcpUnlimited =
 		GPOS_NEW(mp) ICostModelParamsArray(mp);
 	ICostModelParams::SCostParam *pcpUnlimited =
 		GPOS_NEW(mp) ICostModelParams::SCostParam(
@@ -456,7 +454,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 		1,	// ulSessionId
 		1,	// ulCmdId
 		FHasIndexJoin, pdrgpcpUnlimited);
-	pdrgpcpUnlimited->Release();
+	;
 
 	if (GPOS_OK != eres)
 	{
@@ -464,7 +462,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 	}
 
 	// When the risk threshold is zero, we should not pick index join
-	gpos::owner<ICostModelParamsArray *> pdrgpcpNoIndexJoin =
+	gpos::Ref<ICostModelParamsArray> pdrgpcpNoIndexJoin =
 		GPOS_NEW(mp) ICostModelParamsArray(mp);
 	ICostModelParams::SCostParam *pcpNoIndexJoin =
 		GPOS_NEW(mp) ICostModelParams::SCostParam(
@@ -481,7 +479,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 		1,	// ulSessionId
 		1,	// ulCmdId
 		FHasNoIndexJoin, pdrgpcpNoIndexJoin);
-	pdrgpcpNoIndexJoin->Release();
+	;
 
 	return eres;
 }

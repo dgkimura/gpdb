@@ -32,7 +32,7 @@ class CDXLScalarSortGroupClause;
 
 // arrays of column references
 using CDXLScalarSortGroupClauseArray =
-	CDynamicPtrArray<CDXLScalarSortGroupClause, CleanupRelease>;
+	gpos::Vector<gpos::Ref<CDXLScalarSortGroupClause>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -97,7 +97,7 @@ public:
 		return m_hashable;
 	}
 
-	static gpos::cast_func<CDXLScalarSortGroupClause *>
+	static CDXLScalarSortGroupClause *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -115,7 +115,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	void
-	AssertValid(gpos::pointer<const CDXLNode *>, BOOL) const override
+	AssertValid(const CDXLNode *, BOOL) const override
 	{
 	}
 #endif	// GPOS_DEBUG
@@ -134,7 +134,7 @@ public:
 
 	void
 	SerializeToDXL(CXMLSerializer *xml_serializer,
-				   gpos::pointer<const CDXLNode *>) const override
+				   const CDXLNode *) const override
 	{
 		const CWStringConst *element_name = GetOpNameStr();
 

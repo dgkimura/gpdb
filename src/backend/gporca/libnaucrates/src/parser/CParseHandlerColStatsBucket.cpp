@@ -57,7 +57,7 @@ CParseHandlerColStatsBucket::CParseHandlerColStatsBucket(
 //---------------------------------------------------------------------------
 CParseHandlerColStatsBucket::~CParseHandlerColStatsBucket()
 {
-	m_dxl_bucket->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -68,10 +68,10 @@ CParseHandlerColStatsBucket::~CParseHandlerColStatsBucket()
 //		The bucket constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLBucket *>
+CDXLBucket *
 CParseHandlerColStatsBucket::GetDXLBucketAt() const
 {
-	return m_dxl_bucket;
+	return m_dxl_bucket.get();
 }
 
 //---------------------------------------------------------------------------
@@ -107,9 +107,11 @@ CParseHandlerColStatsBucket::StartElement(const XMLCh *const,  // element_uri,
 					  element_local_name))
 	{
 		// parse lower bound
-		m_lower_bound_dxl_datum = CDXLOperatorFactory::GetDatumVal(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-			EdxltokenStatsBucketLowerBound);
+		m_lower_bound_dxl_datum =
+			CDXLOperatorFactory::GetDatumVal(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenStatsBucketLowerBound)
+				.get();
 		m_is_lower_closed = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenStatsBoundClosed, EdxltokenStatsBucketLowerBound);
@@ -119,9 +121,11 @@ CParseHandlerColStatsBucket::StartElement(const XMLCh *const,  // element_uri,
 					  element_local_name))
 	{
 		// parse upper bound
-		m_upper_bound_dxl_datum = CDXLOperatorFactory::GetDatumVal(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
-			EdxltokenStatsBucketUpperBound);
+		m_upper_bound_dxl_datum =
+			CDXLOperatorFactory::GetDatumVal(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+				EdxltokenStatsBucketUpperBound)
+				.get();
 		m_is_upper_closed = CDXLOperatorFactory::ExtractConvertAttrValueToBool(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
 			EdxltokenStatsBoundClosed, EdxltokenStatsBucketUpperBound);

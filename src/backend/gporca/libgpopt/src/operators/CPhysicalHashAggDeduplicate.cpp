@@ -31,11 +31,11 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalHashAggDeduplicate::CPhysicalHashAggDeduplicate(
-	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-	gpos::pointer<CColRefArray *> pdrgpcrMinimal,
-	COperator::EGbAggType egbaggtype, gpos::owner<CColRefArray *> pdrgpcrKeys,
-	BOOL fGeneratesDuplicates, BOOL fMultiStage, BOOL isAggFromSplitDQA,
-	CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	gpos::Ref<CColRefArray> pdrgpcrKeys, BOOL fGeneratesDuplicates,
+	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
+	BOOL should_enforce_distribution)
 	: CPhysicalHashAgg(mp, std::move(colref_array), pdrgpcrMinimal, egbaggtype,
 					   fGeneratesDuplicates, nullptr /*pdrgpcrGbMinusDistinct*/,
 					   fMultiStage, isAggFromSplitDQA, aggStage,
@@ -55,7 +55,7 @@ CPhysicalHashAggDeduplicate::CPhysicalHashAggDeduplicate(
 //---------------------------------------------------------------------------
 CPhysicalHashAggDeduplicate::~CPhysicalHashAggDeduplicate()
 {
-	m_pdrgpcrKeys->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -82,7 +82,7 @@ CPhysicalHashAggDeduplicate::OsPrint(IOstream &os) const
 	CUtils::OsPrintDrgPcr(os, PdrgpcrGroupingCols());
 	os << "]"
 	   << ", Key Cols:[";
-	CUtils::OsPrintDrgPcr(os, m_pdrgpcrKeys);
+	CUtils::OsPrintDrgPcr(os, m_pdrgpcrKeys.get());
 	os << "]";
 
 	os << ", Generates Duplicates :[ " << FGeneratesDuplicates() << " ] ";

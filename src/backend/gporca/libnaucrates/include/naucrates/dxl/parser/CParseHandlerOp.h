@@ -39,7 +39,7 @@ class CParseHandlerOp : public CParseHandlerBase
 private:
 protected:
 	// the root of the parsed DXL tree constructed by the parse handler
-	gpos::owner<CDXLNode *> m_dxl_node;
+	gpos::Ref<CDXLNode> m_dxl_node;
 
 
 	void AddChildFromParseHandler(const CParseHandlerOp *);
@@ -54,7 +54,7 @@ public:
 	~CParseHandlerOp() override;
 
 	// returns constructed DXL node
-	gpos::pointer<CDXLNode *> CreateDXLNode() const;
+	CDXLNode *CreateDXLNode() const;
 };
 }  // namespace gpdxl
 

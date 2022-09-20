@@ -29,7 +29,7 @@ using namespace gpopt;
 //		Constructs a md cache key
 //
 //---------------------------------------------------------------------------
-CMDKey::CMDKey(gpos::pointer<const IMDId *> mdid) : m_mdid(mdid)
+CMDKey::CMDKey(const IMDId *mdid) : m_mdid(mdid)
 {
 	GPOS_ASSERT(mdid->IsValid());
 }

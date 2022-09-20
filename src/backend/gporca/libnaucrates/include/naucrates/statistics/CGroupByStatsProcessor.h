@@ -23,10 +23,9 @@ class CGroupByStatsProcessor
 {
 public:
 	// group by
-	static gpos::owner<CStatistics *> CalcGroupByStats(
-		CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
-		gpos::pointer<ULongPtrArray *> GCs, gpos::pointer<ULongPtrArray *> aggs,
-		gpos::pointer<CBitSet *> keys);
+	static gpos::Ref<CStatistics> CalcGroupByStats(
+		CMemoryPool *mp, const CStatistics *input_stats, ULongPtrArray *GCs,
+		ULongPtrArray *aggs, CBitSet *keys);
 };
 }  // namespace gpnaucrates
 

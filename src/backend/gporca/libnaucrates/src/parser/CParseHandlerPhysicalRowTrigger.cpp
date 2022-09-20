@@ -77,7 +77,7 @@ CParseHandlerPhysicalRowTrigger::StartElement(
 
 	const XMLCh *xmlszOldColIds =
 		attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenOldCols));
-	gpos::owner<ULongPtrArray *> colids_old = nullptr;
+	gpos::Ref<ULongPtrArray> colids_old = nullptr;
 	if (nullptr != xmlszOldColIds)
 	{
 		colids_old = CDXLOperatorFactory::ExtractIntsToUlongArray(
@@ -87,7 +87,7 @@ CParseHandlerPhysicalRowTrigger::StartElement(
 
 	const XMLCh *xmlszNewColIds =
 		attrs.getValue(CDXLTokens::XmlstrToken(EdxltokenNewCols));
-	gpos::owner<ULongPtrArray *> colids_new = nullptr;
+	gpos::Ref<ULongPtrArray> colids_new = nullptr;
 	if (nullptr != xmlszNewColIds)
 	{
 		colids_new = CDXLOperatorFactory::ExtractIntsToUlongArray(
@@ -158,7 +158,7 @@ CParseHandlerPhysicalRowTrigger::EndElement(
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 
 	// set statistics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	CParseHandlerProjList *proj_list_parse_handler =
 		dynamic_cast<CParseHandlerProjList *>((*this)[1]);
@@ -171,7 +171,7 @@ CParseHandlerPhysicalRowTrigger::EndElement(
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node,
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node.get(),
 										   false /* validate_children */);
 #endif	// GPOS_DEBUG
 

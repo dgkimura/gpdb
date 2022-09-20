@@ -32,8 +32,8 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalDynamicTableScan::CDXLPhysicalDynamicTableScan(
-	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr,
-	gpos::Ref<IMdIdArray> part_mdids, gpos::owner<ULongPtrArray *> selector_ids)
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
+	gpos::Ref<IMdIdArray> part_mdids, gpos::Ref<ULongPtrArray> selector_ids)
 	: CDXLPhysical(mp),
 	  m_dxl_table_descr(std::move(table_descr)),
 	  m_part_mdids(part_mdids),
@@ -54,8 +54,8 @@ CDXLPhysicalDynamicTableScan::CDXLPhysicalDynamicTableScan(
 //---------------------------------------------------------------------------
 CDXLPhysicalDynamicTableScan::~CDXLPhysicalDynamicTableScan()
 {
-	m_dxl_table_descr->Release();
-	CRefCount::SafeRelease(m_selector_ids);
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -95,10 +95,10 @@ CDXLPhysicalDynamicTableScan::GetOpNameStr() const
 //		Table descriptor for the table scan
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLTableDescr *>
+const CDXLTableDescr *
 CDXLPhysicalDynamicTableScan::GetDXLTableDescr() const
 {
-	return m_dxl_table_descr;
+	return m_dxl_table_descr.get();
 }
 
 IMdIdArray *
@@ -116,15 +116,15 @@ CDXLPhysicalDynamicTableScan::GetParts() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicTableScan::SerializeToDXL(
-	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
+CDXLPhysicalDynamicTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
+											 const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
 	xml_serializer->OpenElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), element_name);
 	CWStringDynamic *serialized_selector_ids =
-		CDXLUtils::Serialize(m_mp, m_selector_ids);
+		CDXLUtils::Serialize(m_mp, m_selector_ids.get());
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenSelectorIds),
 		serialized_selector_ids);
@@ -150,7 +150,7 @@ CDXLPhysicalDynamicTableScan::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicTableScan::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLPhysicalDynamicTableScan::AssertValid(const CDXLNode *node,
 										  BOOL	// validate_children
 ) const
 {

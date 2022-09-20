@@ -63,7 +63,7 @@ private:
 	{
 	private:
 		// pointer to object
-		gpos::pointer<T *> m_value;
+		T *m_value;
 
 		// does hash set element own object?
 		BOOL m_owns_object;
@@ -89,7 +89,7 @@ private:
 		}
 
 		// object accessor
-		gpos::pointer<T *>
+		T *
 		Value() const
 		{
 			return m_value;
@@ -119,9 +119,9 @@ private:
 	// array for elements
 	// We use CleanupNULL because the elements are owned by the hash table
 	using Elements = CDynamicPtrArray<T, CleanupNULL>;
-	gpos::owner<Elements *> const m_elements;
+	gpos::Ref<Elements> const m_elements;
 
-	gpos::owner<IntPtrArray *> const m_filled_chains;
+	gpos::Ref<IntPtrArray> const m_filled_chains;
 
 	// lookup appropriate hash chain in static table, may be NULL if
 	// no elements have been inserted yet
@@ -185,8 +185,8 @@ public:
 		Clear();
 
 		GPOS_DELETE_ARRAY(m_chains);
-		m_elements->Release();
-		m_filled_chains->Release();
+		;
+		;
 	}
 
 	// insert an element if not present

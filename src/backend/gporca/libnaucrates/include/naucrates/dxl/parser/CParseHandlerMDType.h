@@ -142,7 +142,7 @@ private:
 	// parse the value for the given mdid variable name from the attributes
 	void ParseMdid(const XMLCh *element_local_name, const Attributes &attrs);
 
-	static BOOL IsBuiltInType(gpos::pointer<const IMDId *> mdid);
+	static BOOL IsBuiltInType(const IMDId *mdid);
 
 public:
 	CParseHandlerMDType(const CParseHandlerMDType &) = delete;

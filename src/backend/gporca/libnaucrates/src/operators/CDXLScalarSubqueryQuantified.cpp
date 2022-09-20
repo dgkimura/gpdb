@@ -63,9 +63,8 @@ CDXLScalarSubqueryQuantified::~CDXLScalarSubqueryQuantified()
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubqueryQuantified::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarSubqueryQuantified::SerializeToDXL(CXMLSerializer *xml_serializer,
+											 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -96,14 +95,13 @@ CDXLScalarSubqueryQuantified::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubqueryQuantified::AssertValid(
-	gpos::pointer<const CDXLNode *> dxlnode, BOOL validate_children) const
+CDXLScalarSubqueryQuantified::AssertValid(const CDXLNode *dxlnode,
+										  BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
 
-	gpos::pointer<CDXLNode *> pdxlnScalarChild =
-		(*dxlnode)[EdxlsqquantifiedIndexScalar];
-	gpos::pointer<CDXLNode *> pdxlnRelationalChild =
+	CDXLNode *pdxlnScalarChild = (*dxlnode)[EdxlsqquantifiedIndexScalar];
+	CDXLNode *pdxlnRelationalChild =
 		(*dxlnode)[EdxlsqquantifiedIndexRelational];
 
 	GPOS_ASSERT(EdxloptypeScalar ==

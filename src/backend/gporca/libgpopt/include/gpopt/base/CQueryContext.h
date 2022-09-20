@@ -53,19 +53,19 @@ class CQueryContext : public DbgPrintMixin<CQueryContext>
 {
 private:
 	// required plan properties in optimizer's produced plan
-	gpos::owner<CReqdPropPlan *> m_prpp;
+	gpos::Ref<CReqdPropPlan> m_prpp;
 
 	// required array of output columns
-	gpos::owner<CColRefArray *> m_pdrgpcr;
+	gpos::Ref<CColRefArray> m_pdrgpcr;
 
 	// required system columns, collected from of output columns
-	gpos::owner<CColRefArray *> m_pdrgpcrSystemCols;
+	gpos::Ref<CColRefArray> m_pdrgpcrSystemCols;
 
 	// array of output column names
-	gpos::owner<CMDNameArray *> m_pdrgpmdname;
+	gpos::Ref<CMDNameArray> m_pdrgpmdname;
 
 	// logical expression tree to be optimized
-	gpos::owner<CExpression *> m_pexpr;
+	gpos::Ref<CExpression> m_pexpr;
 
 	// should statistics derivation take place
 	BOOL m_fDeriveStats;
@@ -74,16 +74,16 @@ private:
 	void SetSystemCols(CMemoryPool *mp);
 
 	// return top level operator in the given expression
-	static COperator *PopTop(gpos::pointer<CExpression *> pexpr);
+	static COperator *PopTop(CExpression *pexpr);
 
 public:
 	CQueryContext(const CQueryContext &) = delete;
 
 	// ctor
-	CQueryContext(CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
-				  gpos::owner<CReqdPropPlan *> prpp,
-				  gpos::owner<CColRefArray *> colref_array,
-				  gpos::owner<CMDNameArray *> pdrgpmdname, BOOL fDeriveStats);
+	CQueryContext(CMemoryPool *mp, CExpression *pexpr,
+				  gpos::Ref<CReqdPropPlan> prpp,
+				  gpos::Ref<CColRefArray> colref_array,
+				  gpos::Ref<CMDNameArray> pdrgpmdname, BOOL fDeriveStats);
 
 	// dtor
 	virtual ~CQueryContext();
@@ -95,48 +95,47 @@ public:
 	}
 
 	// expression accessor
-	gpos::pointer<CExpression *>
+	CExpression *
 	Pexpr() const
 	{
-		return m_pexpr;
+		return m_pexpr.get();
 	}
 
 	// required plan properties accessor
-	gpos::pointer<CReqdPropPlan *>
+	CReqdPropPlan *
 	Prpp() const
 	{
-		return m_prpp;
+		return m_prpp.get();
 	}
 
 	// return the array of output column references
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgPcr() const
 	{
-		return m_pdrgpcr;
+		return m_pdrgpcr.get();
 	}
 
 	// system columns
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrSystemCols() const
 	{
-		return m_pdrgpcrSystemCols;
+		return m_pdrgpcrSystemCols.get();
 	}
 
 	// return the array of output column names
-	gpos::pointer<CMDNameArray *>
+	CMDNameArray *
 	Pdrgpmdname() const
 	{
-		return m_pdrgpmdname;
+		return m_pdrgpmdname.get();
 	}
 
 	// generate the query context for the given expression and array of output column ref ids
 	static CQueryContext *PqcGenerate(
-		CMemoryPool *mp,  // memory pool
-		gpos::pointer<CExpression *>
-			pexpr,	// expression representing the query
-		gpos::pointer<ULongPtrArray *>
-			pdrgpulQueryOutputColRefId,	 // array of output column reference id
-		CMDNameArray *pdrgpmdname,		 // array of output column names
+		CMemoryPool *mp,	 // memory pool
+		CExpression *pexpr,	 // expression representing the query
+		ULongPtrArray
+			*pdrgpulQueryOutputColRefId,  // array of output column reference id
+		CMDNameArray *pdrgpmdname,		  // array of output column names
 		BOOL fDeriveStats);
 
 #ifdef GPOS_DEBUG
@@ -147,7 +146,7 @@ public:
 	// walk the expression and add the mapping between computed column
 	// and their corresponding used column(s)
 	static void MapComputedToUsedCols(CColumnFactory *col_factory,
-									  gpos::pointer<CExpression *> pexpr);
+									  CExpression *pexpr);
 
 };	// class CQueryContext
 }  // namespace gpopt

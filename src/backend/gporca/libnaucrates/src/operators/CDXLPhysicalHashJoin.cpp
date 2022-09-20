@@ -73,7 +73,7 @@ CDXLPhysicalHashJoin::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalHashJoin::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 gpos::pointer<const CDXLNode *> node) const
+									 const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -103,7 +103,7 @@ CDXLPhysicalHashJoin::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalHashJoin::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLPhysicalHashJoin::AssertValid(const CDXLNode *node,
 								  BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -112,10 +112,10 @@ CDXLPhysicalHashJoin::AssertValid(gpos::pointer<const CDXLNode *> node,
 	GPOS_ASSERT(EdxlhjIndexSentinel == node->Arity());
 	GPOS_ASSERT(EdxljtSentinel > GetJoinType());
 
-	gpos::pointer<CDXLNode *> join_filter = (*node)[EdxlhjIndexJoinFilter];
-	gpos::pointer<CDXLNode *> hash_clauses = (*node)[EdxlhjIndexHashCondList];
-	gpos::pointer<CDXLNode *> left = (*node)[EdxlhjIndexHashLeft];
-	gpos::pointer<CDXLNode *> right = (*node)[EdxlhjIndexHashRight];
+	CDXLNode *join_filter = (*node)[EdxlhjIndexJoinFilter];
+	CDXLNode *hash_clauses = (*node)[EdxlhjIndexHashCondList];
+	CDXLNode *left = (*node)[EdxlhjIndexHashLeft];
+	CDXLNode *right = (*node)[EdxlhjIndexHashRight];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarJoinFilter ==

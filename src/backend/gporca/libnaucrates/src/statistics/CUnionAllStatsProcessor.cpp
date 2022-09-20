@@ -19,13 +19,13 @@
 using namespace gpopt;
 
 // return statistics object after union all operation with input statistics object
-gpos::owner<CStatistics *>
+gpos::Ref<CStatistics>
 CUnionAllStatsProcessor::CreateStatsForUnionAll(
-	CMemoryPool *mp, gpos::pointer<const CStatistics *> stats_first_child,
-	gpos::pointer<const CStatistics *> stats_second_child,
-	gpos::owner<ULongPtrArray *> output_colids,
-	gpos::owner<ULongPtrArray *> first_child_colids,
-	gpos::owner<ULongPtrArray *> second_child_colids)
+	CMemoryPool *mp, const CStatistics *stats_first_child,
+	const CStatistics *stats_second_child,
+	gpos::Ref<ULongPtrArray> output_colids,
+	gpos::Ref<ULongPtrArray> first_child_colids,
+	gpos::Ref<ULongPtrArray> second_child_colids)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != stats_second_child);
@@ -35,11 +35,11 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 	GPOS_ASSERT(output_colids->Size() == second_child_colids->Size());
 
 	// create hash map from colid -> histogram for resultant structure
-	gpos::owner<UlongToHistogramMap *> histograms_new =
+	gpos::Ref<UlongToHistogramMap> histograms_new =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// column ids on which widths are to be computed
-	gpos::owner<UlongToDoubleMap *> column_to_width_map =
+	gpos::Ref<UlongToDoubleMap> column_to_width_map =
 		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	BOOL is_empty_unionall =
@@ -49,8 +49,8 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 	if (is_empty_unionall)
 	{
 		CHistogram::AddDummyHistogramAndWidthInfo(
-			mp, col_factory, histograms_new, column_to_width_map, output_colids,
-			true /*is_empty*/);
+			mp, col_factory, histograms_new.get(), column_to_width_map.get(),
+			output_colids.get(), true /*is_empty*/);
 	}
 	else
 	{
@@ -76,7 +76,7 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 						stats_first_child->Rows(), second_child_histogram,
 						stats_second_child->Rows());
 				CStatisticsUtils::AddHistogram(
-					mp, output_colid, output_histogram, histograms_new);
+					mp, output_colid, output_histogram, histograms_new.get());
 				GPOS_DELETE(output_histogram);
 			}
 			else
@@ -102,12 +102,12 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 	}
 
 	// release inputs
-	output_colids->Release();
-	first_child_colids->Release();
-	second_child_colids->Release();
+	;
+	;
+	;
 
 	// create an output stats object
-	gpos::owner<CStatistics *> unionall_stats = GPOS_NEW(mp) CStatistics(
+	gpos::Ref<CStatistics> unionall_stats = GPOS_NEW(mp) CStatistics(
 		mp, std::move(histograms_new), std::move(column_to_width_map),
 		unionall_rows, is_empty_unionall, 0 /* m_num_predicates */
 	);
@@ -117,7 +117,7 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 
 	// modify upper bound card information
 	CStatisticsUtils::ComputeCardUpperBounds(
-		mp, stats_first_child, unionall_stats, unionall_rows,
+		mp, stats_first_child, unionall_stats.get(), unionall_rows,
 		CStatistics::EcbmOutputCard /* card_bounding_method */);
 
 	return unionall_stats;

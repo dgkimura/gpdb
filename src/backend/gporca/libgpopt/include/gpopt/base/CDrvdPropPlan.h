@@ -47,24 +47,23 @@ class CDrvdPropPlan : public CDrvdProp
 {
 private:
 	// derived sort order
-	gpos::owner<COrderSpec *> m_pos{nullptr};
+	gpos::Ref<COrderSpec> m_pos{nullptr};
 
 	// derived distribution
-	gpos::owner<CDistributionSpec *> m_pds{nullptr};
+	gpos::Ref<CDistributionSpec> m_pds{nullptr};
 
 	// derived rewindability
-	gpos::owner<CRewindabilitySpec *> m_prs{nullptr};
+	gpos::Ref<CRewindabilitySpec> m_prs{nullptr};
 
 	// derived partition propagation spec
-	gpos::owner<CPartitionPropagationSpec *> m_ppps{nullptr};
+	gpos::Ref<CPartitionPropagationSpec> m_ppps{nullptr};
 
 	// derived cte map
-	gpos::owner<CCTEMap *> m_pcm{nullptr};
+	gpos::Ref<CCTEMap> m_pcm{nullptr};
 
 	// copy CTE producer plan properties from given context to current object
-	void CopyCTEProducerPlanProps(CMemoryPool *mp,
-								  gpos::pointer<CDrvdPropCtxt *> pdpctxt,
-								  gpos::pointer<COperator *> pop);
+	void CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
+								  COperator *pop);
 
 public:
 	CDrvdPropPlan(const CDrvdPropPlan &) = delete;
@@ -84,53 +83,53 @@ public:
 
 	// derivation function
 	void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				gpos::pointer<CDrvdPropCtxt *> pdpctxt) override;
+				CDrvdPropCtxt *pdpctxt) override;
 
 	// short hand for conversion
-	static gpos::cast_func<CDrvdPropPlan *> Pdpplan(CDrvdProp *pdp);
+	static CDrvdPropPlan *Pdpplan(CDrvdProp *pdp);
 
 	// sort order accessor
-	gpos::pointer<COrderSpec *>
+	COrderSpec *
 	Pos() const
 	{
-		return m_pos;
+		return m_pos.get();
 	}
 
 	// distribution accessor
-	gpos::pointer<CDistributionSpec *>
+	CDistributionSpec *
 	Pds() const
 	{
-		return m_pds;
+		return m_pds.get();
 	}
 
 	// rewindability accessor
-	gpos::pointer<CRewindabilitySpec *>
+	CRewindabilitySpec *
 	Prs() const
 	{
-		return m_prs;
+		return m_prs.get();
 	}
 
-	gpos::pointer<CPartitionPropagationSpec *>
+	CPartitionPropagationSpec *
 	Ppps() const
 	{
-		return m_ppps;
+		return m_ppps.get();
 	}
 
 	// cte map
-	gpos::pointer<CCTEMap *>
+	CCTEMap *
 	GetCostModel() const
 	{
-		return m_pcm;
+		return m_pcm.get();
 	}
 
 	// hash function
 	virtual ULONG HashValue() const;
 
 	// equality function
-	virtual ULONG Equals(gpos::pointer<const CDrvdPropPlan *> pdpplan) const;
+	virtual ULONG Equals(const CDrvdPropPlan *pdpplan) const;
 
 	// check for satisfying required plan properties
-	BOOL FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const override;
+	BOOL FSatisfies(const CReqdPropPlan *prpp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

@@ -64,10 +64,10 @@ private:
 	CMDAccessor *m_pmda;
 
 	// cost model
-	gpos::pointer<ICostModel *> m_cost_model;
+	ICostModel *m_cost_model;
 
 	// constant expression evaluator
-	gpos::owner<IConstExprEvaluator *> m_pceeval;
+	gpos::Ref<IConstExprEvaluator> m_pceeval;
 
 	// comparator between IDatum instances
 	IComparator *m_pcomp;
@@ -76,13 +76,13 @@ private:
 	ULONG m_auPartId;
 
 	// global CTE information
-	gpos::owner<CCTEInfo *> m_pcteinfo;
+	gpos::Ref<CCTEInfo> m_pcteinfo;
 
 	// system columns required in query output
-	gpos::owner<CColRefArray *> m_pdrgpcrSystemCols;
+	gpos::Ref<CColRefArray> m_pdrgpcrSystemCols;
 
 	// optimizer configurations
-	gpos::owner<COptimizerConfig *> m_optimizer_config;
+	gpos::Ref<COptimizerConfig> m_optimizer_config;
 
 	// whether or not we are optimizing a DML query
 	BOOL m_fDMLQuery;
@@ -101,7 +101,7 @@ private:
 	BOOL m_has_replicated_tables;
 
 	// does this plan have a direct dispatchable filter
-	gpos::owner<CExpressionArray *> m_direct_dispatchable_filters;
+	gpos::Ref<CExpressionArray> m_direct_dispatchable_filters;
 
 	// mappings of dynamic scan -> partition indexes (after static elimination)
 	// this is mainetained here to avoid dependencies on optimization order
@@ -113,23 +113,22 @@ private:
 	// making an assumption about the order the scan vs partition selector
 	// is translated, and would also need information from the append's
 	// child dxl nodes.
-	gpos::owner<UlongToBitSetMap *> m_scanid_to_part_map;
+	gpos::Ref<UlongToBitSetMap> m_scanid_to_part_map;
 
 	// unique id per partition selector in the memo
 	ULONG m_selector_id_counter;
 
 	// detailed info (filter expr, stats etc) per partition selector
 	// (required by CDynamicPhysicalScan for recomputing statistics for DPE)
-	gpos::owner<SPartSelectorInfo *> m_part_selector_info;
+	gpos::Ref<SPartSelectorInfo> m_part_selector_info;
 
 public:
 	COptCtxt(COptCtxt &) = delete;
 
 	// ctor
 	COptCtxt(CMemoryPool *mp, CColumnFactory *col_factory,
-			 CMDAccessor *md_accessor,
-			 gpos::owner<IConstExprEvaluator *> pceeval,
-			 gpos::owner<COptimizerConfig *> optimizer_config);
+			 CMDAccessor *md_accessor, gpos::Ref<IConstExprEvaluator> pceeval,
+			 gpos::Ref<COptimizerConfig> optimizer_config);
 
 	// dtor
 	~COptCtxt() override;
@@ -142,10 +141,10 @@ public:
 	}
 
 	// optimizer configurations
-	gpos::pointer<COptimizerConfig *>
+	COptimizerConfig *
 	GetOptimizerConfig() const
 	{
-		return m_optimizer_config;
+		return m_optimizer_config.get();
 	}
 
 	// are we optimizing a DML query
@@ -183,7 +182,7 @@ public:
 	void
 	AddDirectDispatchableFilterCandidate(CExpression *filter_expression)
 	{
-		filter_expression->AddRef();
+		;
 		m_direct_dispatchable_filters->Append(filter_expression);
 	}
 
@@ -205,10 +204,10 @@ public:
 		return m_has_replicated_tables;
 	}
 
-	gpos::pointer<CExpressionArray *>
+	CExpressionArray *
 	GetDirectDispatchableFilters() const
 	{
-		return m_direct_dispatchable_filters;
+		return m_direct_dispatchable_filters.get();
 	}
 
 	BOOL
@@ -238,17 +237,17 @@ public:
 	}
 
 	// cost model accessor
-	gpos::pointer<ICostModel *>
+	ICostModel *
 	GetCostModel() const
 	{
 		return m_cost_model;
 	}
 
 	// constant expression evaluator
-	gpos::pointer<IConstExprEvaluator *>
+	IConstExprEvaluator *
 	Pceeval()
 	{
-		return m_pceeval;
+		return m_pceeval.get();
 	}
 
 	// comparator
@@ -259,10 +258,10 @@ public:
 	}
 
 	// cte info
-	gpos::pointer<CCTEInfo *>
+	CCTEInfo *
 	Pcteinfo()
 	{
-		return m_pcteinfo;
+		return m_pcteinfo.get();
 	}
 
 	// return a new part index id
@@ -279,15 +278,15 @@ public:
 	}
 
 	// required system columns
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgpcrSystemCols() const
 	{
-		return m_pdrgpcrSystemCols;
+		return m_pdrgpcrSystemCols.get();
 	}
 
 	void AddPartForScanId(ULONG scanid, ULONG index);
 
-	gpos::pointer<CBitSet *>
+	CBitSet *
 	GetPartitionsForScanId(ULONG scanid)
 	{
 		return m_scanid_to_part_map->Find(&scanid);
@@ -303,15 +302,14 @@ public:
 	{
 		GPOS_ASSERT(nullptr != pdrgpcrSystemCols);
 
-		CRefCount::SafeRelease(m_pdrgpcrSystemCols);
+		;
 		m_pdrgpcrSystemCols = pdrgpcrSystemCols;
 	}
 
 	// factory method
-	static COptCtxt *PoctxtCreate(
-		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::owner<IConstExprEvaluator *> pceeval,
-		gpos::owner<COptimizerConfig *> optimizer_config);
+	static COptCtxt *PoctxtCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
+								  gpos::Ref<IConstExprEvaluator> pceeval,
+								  gpos::Ref<COptimizerConfig> optimizer_config);
 
 	// shorthand to retrieve opt context from TLS
 	inline static COptCtxt *

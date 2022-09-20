@@ -63,7 +63,7 @@ public:
 	}
 
 	// retrieve the partition column at the given position
-	gpos::pointer<const IMDColumn *>
+	const IMDColumn *
 	PartColAt(ULONG	 // pos
 	) const override
 	{
@@ -72,7 +72,7 @@ public:
 	}
 
 	// retrieve list of partition types
-	gpos::pointer<CharPtrArray *>
+	CharPtrArray *
 	GetPartitionTypes() const override
 	{
 		GPOS_ASSERT(!"CTAS tables have no partition types");
@@ -102,7 +102,7 @@ public:
 	}
 
 	// returns the key set at the specified position
-	gpos::pointer<const ULongPtrArray *>
+	const ULongPtrArray *
 	KeySetAt(ULONG	// pos
 	) const override
 	{
@@ -111,15 +111,14 @@ public:
 	}
 
 	// part constraint
-	gpos::pointer<CDXLNode *>
+	CDXLNode *
 	MDPartConstraint() const override
 	{
 		return nullptr;
 	}
 
 	// CTAS storage options
-	virtual gpos::pointer<CDXLCtasStorageOptions *> GetDxlCtasStorageOption()
-		const = 0;
+	virtual CDXLCtasStorageOptions *GetDxlCtasStorageOption() const = 0;
 };
 }  // namespace gpmd
 

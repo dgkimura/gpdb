@@ -14,8 +14,7 @@ namespace gpopt
 class IColConstraintsMapper : public CRefCount
 {
 public:
-	virtual gpos::owner<CConstraintArray *> PdrgPcnstrLookup(
-		CColRef *colref) = 0;
+	virtual gpos::Ref<CConstraintArray> PdrgPcnstrLookup(CColRef *colref) = 0;
 
 	~IColConstraintsMapper() override = 0;
 };

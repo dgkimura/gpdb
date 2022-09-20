@@ -51,7 +51,7 @@ public:
 
 	// match function
 	BOOL
-	Matches(gpos::pointer<COperator *> pop) const override
+	Matches(COperator *pop) const override
 	{
 		return Eopid() == pop->Eopid() &&
 			   m_match == static_cast<CPatternNode *>(pop)->m_match;

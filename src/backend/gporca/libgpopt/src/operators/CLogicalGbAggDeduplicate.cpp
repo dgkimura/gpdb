@@ -44,8 +44,8 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
-	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-	COperator::EGbAggType egbaggtype, gpos::owner<CColRefArray *> pdrgpcrKeys)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	COperator::EGbAggType egbaggtype, gpos::Ref<CColRefArray> pdrgpcrKeys)
 	: CLogicalGbAgg(mp, std::move(colref_array), egbaggtype),
 	  m_pdrgpcrKeys(std::move(pdrgpcrKeys))
 {
@@ -61,9 +61,9 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
 //
 //---------------------------------------------------------------------------
 CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
-	CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array,
-	gpos::owner<CColRefArray *> pdrgpcrMinimal,
-	COperator::EGbAggType egbaggtype, gpos::owner<CColRefArray *> pdrgpcrKeys)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+	gpos::Ref<CColRefArray> pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	gpos::Ref<CColRefArray> pdrgpcrKeys)
 	: CLogicalGbAgg(mp, std::move(colref_array), std::move(pdrgpcrMinimal),
 					egbaggtype),
 	  m_pdrgpcrKeys(std::move(pdrgpcrKeys))
@@ -82,7 +82,7 @@ CLogicalGbAggDeduplicate::CLogicalGbAggDeduplicate(
 CLogicalGbAggDeduplicate::~CLogicalGbAggDeduplicate()
 {
 	// safe release -- to allow for instances used in patterns
-	CRefCount::SafeRelease(m_pdrgpcrKeys);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -93,23 +93,22 @@ CLogicalGbAggDeduplicate::~CLogicalGbAggDeduplicate()
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
+gpos::Ref<COperator>
 CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
-	gpos::owner<CColRefArray *> colref_array =
+	gpos::Ref<CColRefArray> colref_array =
 		CUtils::PdrgpcrRemap(mp, Pdrgpcr(), colref_mapping, must_exist);
 
-	gpos::owner<CColRefArray *> pdrgpcrMinimal = PdrgpcrMinimal();
+	gpos::Ref<CColRefArray> pdrgpcrMinimal = PdrgpcrMinimal();
 	if (nullptr != pdrgpcrMinimal)
 	{
-		pdrgpcrMinimal = CUtils::PdrgpcrRemap(mp, pdrgpcrMinimal,
+		pdrgpcrMinimal = CUtils::PdrgpcrRemap(mp, pdrgpcrMinimal.get(),
 											  colref_mapping, must_exist);
 	}
 
-	gpos::owner<CColRefArray *> pdrgpcrKeys =
-		CUtils::PdrgpcrRemap(mp, m_pdrgpcrKeys, colref_mapping, must_exist);
+	gpos::Ref<CColRefArray> pdrgpcrKeys = CUtils::PdrgpcrRemap(
+		mp, m_pdrgpcrKeys.get(), colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalGbAggDeduplicate(
 		mp, std::move(colref_array), std::move(pdrgpcrMinimal), Egbaggtype(),
@@ -124,12 +123,13 @@ CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns(
 //		Compute required stats columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CLogicalGbAggDeduplicate::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   gpos::pointer<CColRefSet *> pcrsInput,
+								   CColRefSet *pcrsInput,
 								   ULONG child_index) const
 {
-	return PcrsStatGbAgg(mp, exprhdl, pcrsInput, child_index, m_pdrgpcrKeys);
+	return PcrsStatGbAgg(mp, exprhdl, pcrsInput, child_index,
+						 m_pdrgpcrKeys.get());
 }
 
 //---------------------------------------------------------------------------
@@ -145,7 +145,8 @@ CLogicalGbAggDeduplicate::HashValue() const
 {
 	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(),
 									   CUtils::UlHashColArray(Pdrgpcr()));
-	ulHash = gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrKeys));
+	ulHash = gpos::CombineHashes(ulHash,
+								 CUtils::UlHashColArray(m_pdrgpcrKeys.get()));
 
 	ULONG ulGbaggtype = (ULONG) Egbaggtype();
 
@@ -163,18 +164,18 @@ CLogicalGbAggDeduplicate::HashValue() const
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-gpos::owner<CKeyCollection *>
+gpos::Ref<CKeyCollection>
 CLogicalGbAggDeduplicate::DeriveKeyCollection(CMemoryPool *mp,
 											  CExpressionHandle &  //exprhdl
 ) const
 {
-	gpos::owner<CKeyCollection *> pkc = nullptr;
+	gpos::Ref<CKeyCollection> pkc = nullptr;
 
 	// Gb produces a key only if it's global
 	if (FGlobal())
 	{
 		// keys from join child are still keys
-		m_pdrgpcrKeys->AddRef();
+		;
 		pkc = GPOS_NEW(mp) CKeyCollection(mp, m_pdrgpcrKeys);
 	}
 
@@ -190,14 +191,14 @@ CLogicalGbAggDeduplicate::DeriveKeyCollection(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalGbAggDeduplicate::Matches(gpos::pointer<COperator *> pop) const
+CLogicalGbAggDeduplicate::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CLogicalGbAggDeduplicate *> popAgg =
+	CLogicalGbAggDeduplicate *popAgg =
 		gpos::dyn_cast<CLogicalGbAggDeduplicate>(pop);
 
 	if (FGeneratesDuplicates() != popAgg->FGeneratesDuplicates())
@@ -219,10 +220,10 @@ CLogicalGbAggDeduplicate::Matches(gpos::pointer<COperator *> pop) const
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalGbAggDeduplicate::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfPushGbDedupBelowJoin);
 	(void) xform_set->ExchangeSet(CXform::ExfSplitGbAggDedup);
 	(void) xform_set->ExchangeSet(CXform::ExfGbAggDedup2HashAggDedup);
@@ -238,22 +239,23 @@ CLogicalGbAggDeduplicate::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
-CLogicalGbAggDeduplicate::PstatsDerive(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<IStatisticsArray *>  // not used
+gpos::Ref<IStatistics>
+CLogicalGbAggDeduplicate::PstatsDerive(CMemoryPool *mp,
+									   CExpressionHandle &exprhdl,
+									   IStatisticsArray *  // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	gpos::pointer<IStatistics *> child_stats = exprhdl.Pstats(0);
+	IStatistics *child_stats = exprhdl.Pstats(0);
 
 	// extract computed columns
-	gpos::owner<ULongPtrArray *> pdrgpulComputedCols =
+	gpos::Ref<ULongPtrArray> pdrgpulComputedCols =
 		GPOS_NEW(mp) ULongPtrArray(mp);
-	exprhdl.DeriveDefinedColumns(1)->ExtractColIds(mp, pdrgpulComputedCols);
+	exprhdl.DeriveDefinedColumns(1)->ExtractColIds(mp,
+												   pdrgpulComputedCols.get());
 
 	// construct bitset with keys of join child
-	gpos::owner<CBitSet *> keys = GPOS_NEW(mp) CBitSet(mp);
+	gpos::Ref<CBitSet> keys = GPOS_NEW(mp) CBitSet(mp);
 	const ULONG ulKeys = m_pdrgpcrKeys->Size();
 	for (ULONG ul = 0; ul < ulKeys; ul++)
 	{
@@ -261,10 +263,10 @@ CLogicalGbAggDeduplicate::PstatsDerive(
 		keys->ExchangeSet(colref->Id());
 	}
 
-	gpos::owner<IStatistics *> stats = CLogicalGbAgg::PstatsDerive(
-		mp, child_stats, Pdrgpcr(), pdrgpulComputedCols, keys);
-	keys->Release();
-	pdrgpulComputedCols->Release();
+	gpos::Ref<IStatistics> stats = CLogicalGbAgg::PstatsDerive(
+		mp, child_stats, Pdrgpcr(), pdrgpulComputedCols.get(), keys.get());
+	;
+	;
 
 	return stats;
 }
@@ -297,7 +299,7 @@ CLogicalGbAggDeduplicate::OsPrint(IOstream &os) const
 		CUtils::OsPrintDrgPcr(os, PdrgpcrMinimal());
 	}
 	os << "], Join Child Keys: [";
-	CUtils::OsPrintDrgPcr(os, m_pdrgpcrKeys);
+	CUtils::OsPrintDrgPcr(os, m_pdrgpcrKeys.get());
 	os << "]";
 	os << ", Generates Duplicates :[ " << FGeneratesDuplicates() << " ] ";
 

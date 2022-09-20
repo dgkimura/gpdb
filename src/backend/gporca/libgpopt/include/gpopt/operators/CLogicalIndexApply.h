@@ -23,22 +23,21 @@ class CLogicalIndexApply : public CLogicalApply
 private:
 protected:
 	// columns used from Apply's outer child used by index in Apply's inner child
-	gpos::owner<CColRefArray *> m_pdrgpcrOuterRefs;
+	gpos::Ref<CColRefArray> m_pdrgpcrOuterRefs;
 
 	// is this an outer join?
 	BOOL m_fOuterJoin;
 
 	// a copy of the original join predicate that has been pushed down to the inner side
-	gpos::owner<CExpression *> m_origJoinPred;
+	gpos::Ref<CExpression> m_origJoinPred;
 
 public:
 	CLogicalIndexApply(const CLogicalIndexApply &) = delete;
 
 	// ctor
 	CLogicalIndexApply(CMemoryPool *mp,
-					   gpos::owner<CColRefArray *> pdrgpcrOuterRefs,
-					   BOOL fOuterJoin,
-					   gpos::owner<CExpression *> origJoinPred);
+					   gpos::Ref<CColRefArray> pdrgpcrOuterRefs,
+					   BOOL fOuterJoin, gpos::Ref<CExpression> origJoinPred);
 
 	// ctor for patterns
 	explicit CLogicalIndexApply(CMemoryPool *mp);
@@ -61,10 +60,10 @@ public:
 	}
 
 	// outer column references accessor
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgPcrOuterRefs() const
 	{
-		return m_pdrgpcrOuterRefs;
+		return m_pdrgpcrOuterRefs.get();
 	}
 
 	// outer column references accessor
@@ -74,10 +73,10 @@ public:
 		return m_fOuterJoin;
 	}
 
-	gpos::pointer<CExpression *>
+	CExpression *
 	OrigJoinPred()
 	{
-		return m_origJoinPred;
+		return m_origJoinPred.get();
 	}
 
 	//-------------------------------------------------------------------------------------
@@ -85,7 +84,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &exprhdl) override
 	{
 		GPOS_ASSERT(3 == exprhdl.Arity());
@@ -94,7 +93,7 @@ public:
 	}
 
 	// derive not nullable columns
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	DeriveNotNullColumns(CMemoryPool *mp,
 						 CExpressionHandle &exprhdl) const override
 	{
@@ -106,7 +105,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *>
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -114,19 +113,19 @@ public:
 	}
 
 	// applicable transformations
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Stats
 	//-------------------------------------------------------------------------------------
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	// stat promise
 	EStatPromise
@@ -137,12 +136,12 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// conversion function
-	static gpos::cast_func<CLogicalIndexApply *>
+	static CLogicalIndexApply *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

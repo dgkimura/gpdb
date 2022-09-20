@@ -73,9 +73,8 @@ public:
 
 	// actual transform
 	void
-	Transform(gpos::pointer<CXformContext *> pxfctxt,
-			  gpos::pointer<CXformResult *> pxfres,
-			  gpos::pointer<CExpression *> pexpr) const override
+	Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+			  CExpression *pexpr) const override
 	{
 		GPOS_ASSERT(nullptr != pxfctxt);
 		GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -83,7 +82,7 @@ public:
 
 		CMemoryPool *mp = pxfctxt->Pmp();
 
-		gpos::owner<CExpression *> pexprResult =
+		gpos::Ref<CExpression> pexprResult =
 			CXformUtils::PexprSwapJoins(mp, pexpr, (*pexpr)[0]);
 		if (nullptr == pexprResult)
 		{

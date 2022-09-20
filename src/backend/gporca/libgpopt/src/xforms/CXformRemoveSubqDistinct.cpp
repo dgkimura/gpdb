@@ -44,8 +44,8 @@ CXformRemoveSubqDistinct::Exfp(CExpressionHandle &exprhdl) const
 	}
 
 	CGroupProxy gp((*exprhdl.Pgexpr())[1]);
-	gpos::pointer<CGroupExpression *> pexprScalar = gp.PgexprFirst();
-	gpos::pointer<COperator *> pop = pexprScalar->Pop();
+	CGroupExpression *pexprScalar = gp.PgexprFirst();
+	COperator *pop = pexprScalar->Pop();
 	if (CUtils::FQuantifiedSubquery(pop) || CUtils::FExistentialSubquery(pop))
 	{
 		return CXform::ExfpHigh;
@@ -87,31 +87,31 @@ CXformRemoveSubqDistinct::Exfp(CExpressionHandle &exprhdl) const
 //    +--CLogicalGet "bar"
 //
 void
-CXformRemoveSubqDistinct::Transform(gpos::pointer<CXformContext *> pxfctxt,
-									gpos::pointer<CXformResult *> pxfres,
-									gpos::pointer<CExpression *> pexpr) const
+CXformRemoveSubqDistinct::Transform(CXformContext *pxfctxt,
+									CXformResult *pxfres,
+									CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	gpos::pointer<CExpression *> pexprScalar = (*pexpr)[1];
-	gpos::pointer<CExpression *> pexprGbAgg = (*pexprScalar)[0];
+	CExpression *pexprScalar = (*pexpr)[1];
+	CExpression *pexprGbAgg = (*pexprScalar)[0];
 
 	if (COperator::EopLogicalGbAgg == pexprGbAgg->Pop()->Eopid())
 	{
-		gpos::pointer<CExpression *> pexprGbAggProjectList = (*pexprGbAgg)[1];
+		CExpression *pexprGbAggProjectList = (*pexprGbAgg)[1];
 		// only consider removing distinct when there is no aggregation functions
 		if (0 == pexprGbAggProjectList->Arity())
 		{
-			gpos::owner<CExpression *> pexprNewScalar = nullptr;
-			gpos::owner<CExpression *> pexprRelChild = (*pexprGbAgg)[0];
-			pexprRelChild->AddRef();
+			gpos::Ref<CExpression> pexprNewScalar = nullptr;
+			gpos::Ref<CExpression> pexprRelChild = (*pexprGbAgg)[0];
+			;
 
-			gpos::owner<COperator *> pop = pexprScalar->Pop();
-			pop->AddRef();
-			if (CUtils::FExistentialSubquery(pop))
+			gpos::Ref<COperator> pop = pexprScalar->Pop();
+			;
+			if (CUtils::FExistentialSubquery(pop.get()))
 			{
 				// EXIST/NOT EXIST scalar subquery
 				pexprNewScalar =
@@ -120,17 +120,17 @@ CXformRemoveSubqDistinct::Transform(gpos::pointer<CXformContext *> pxfctxt,
 			else
 			{
 				// IN/NOT IN scalar subquery
-				gpos::owner<CExpression *> pexprScalarIdent = (*pexprScalar)[1];
-				pexprScalarIdent->AddRef();
+				gpos::Ref<CExpression> pexprScalarIdent = (*pexprScalar)[1];
+				;
 				pexprNewScalar = GPOS_NEW(mp)
 					CExpression(mp, pop, pexprRelChild, pexprScalarIdent);
 			}
 
-			pexpr->Pop()->AddRef();	 // logical select operator
-			(*pexpr)[0]->AddRef();	 // relational child of logical select
+			;  // logical select operator
+			;  // relational child of logical select
 
 			// new logical select expression
-			gpos::owner<CExpression *> ppexprNew = GPOS_NEW(mp) CExpression(
+			gpos::Ref<CExpression> ppexprNew = GPOS_NEW(mp) CExpression(
 				mp, pexpr->Pop(), (*pexpr)[0], std::move(pexprNewScalar));
 			pxfres->Add(std::move(ppexprNew));
 		}

@@ -50,11 +50,11 @@ CMDProviderMemory::CMDProviderMemory(CMemoryPool *mp, const CHAR *file_name)
 	CAutoRg<CHAR> dxl_file;
 	dxl_file = CDXLUtils::Read(mp, file_name);
 
-	CAutoRef<IMDCacheObjectArray> mdcache_obj_array;
+	gpos::Ref<IMDCacheObjectArray> mdcache_obj_array;
 	mdcache_obj_array = CDXLUtils::ParseDXLToIMDObjectArray(
 		mp, dxl_file.Rgt(), nullptr /*xsd_file_path*/);
 
-	LoadMetadataObjectsFromArray(mp, mdcache_obj_array.Value());
+	LoadMetadataObjectsFromArray(mp, mdcache_obj_array.get());
 }
 
 //---------------------------------------------------------------------------
@@ -65,8 +65,8 @@ CMDProviderMemory::CMDProviderMemory(CMemoryPool *mp, const CHAR *file_name)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDProviderMemory::CMDProviderMemory(
-	CMemoryPool *mp, gpos::pointer<IMDCacheObjectArray *> mdcache_obj_array)
+CMDProviderMemory::CMDProviderMemory(CMemoryPool *mp,
+									 IMDCacheObjectArray *mdcache_obj_array)
 	: m_mdmap(nullptr)
 {
 	LoadMetadataObjectsFromArray(mp, mdcache_obj_array);
@@ -82,7 +82,7 @@ CMDProviderMemory::CMDProviderMemory(
 //---------------------------------------------------------------------------
 void
 CMDProviderMemory::LoadMetadataObjectsFromArray(
-	CMemoryPool *mp, gpos::pointer<IMDCacheObjectArray *> mdcache_obj_array)
+	CMemoryPool *mp, IMDCacheObjectArray *mdcache_obj_array)
 {
 	GPOS_ASSERT(nullptr != mdcache_obj_array);
 
@@ -95,9 +95,9 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 	{
 		GPOS_CHECK_ABORT;
 
-		gpos::pointer<IMDCacheObject *> mdcache_obj = (*mdcache_obj_array)[ul];
-		gpos::owner<IMDId *> mdid_key = mdcache_obj->MDId();
-		mdid_key->AddRef();
+		IMDCacheObject *mdcache_obj = (*mdcache_obj_array)[ul].get();
+		gpos::Ref<IMDId> mdid_key = mdcache_obj->MDId();
+		;
 
 		CAutoP<CWStringDynamic> str;
 		str = CDXLUtils::SerializeMDObj(
@@ -124,7 +124,7 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 //---------------------------------------------------------------------------
 CMDProviderMemory::~CMDProviderMemory()
 {
-	CRefCount::SafeRelease(m_mdmap);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -138,7 +138,7 @@ CMDProviderMemory::~CMDProviderMemory()
 CWStringBase *
 CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 								  CMDAccessor *,  //md_accessor
-								  gpos::pointer<IMDId *> mdid) const
+								  IMDId *mdid) const
 {
 	GPOS_ASSERT(nullptr != m_mdmap);
 
@@ -158,11 +158,11 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 		{
 			case IMDId::EmdidRelStats:
 			{
-				mdid->AddRef();
-				CAutoRef<CDXLRelStats> a_pdxlrelstats;
+				;
+				gpos::Ref<CDXLRelStats> a_pdxlrelstats;
 				a_pdxlrelstats = CDXLRelStats::CreateDXLDummyRelStats(mp, mdid);
 				a_pstrResult = CDXLUtils::SerializeMDObj(
-					mp, a_pdxlrelstats.Value(), true /*fSerializeHeaders*/,
+					mp, a_pdxlrelstats.get(), true /*fSerializeHeaders*/,
 					false /*findent*/);
 				break;
 			}
@@ -172,14 +172,14 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 				a_pstr = GPOS_NEW(mp) CWStringDynamic(mp, mdid->GetBuffer());
 				CAutoP<CMDName> a_pmdname;
 				a_pmdname = GPOS_NEW(mp) CMDName(mp, a_pstr.Value());
-				mdid->AddRef();
-				CAutoRef<CDXLColStats> a_pdxlcolstats;
+				;
+				gpos::Ref<CDXLColStats> a_pdxlcolstats;
 				a_pdxlcolstats = CDXLColStats::CreateDXLDummyColStats(
 					mp, mdid, a_pmdname.Value(),
 					CStatistics::DefaultColumnWidth /* width */);
 				a_pmdname.Reset();
 				a_pstrResult = CDXLUtils::SerializeMDObj(
-					mp, a_pdxlcolstats.Value(), true /*fSerializeHeaders*/,
+					mp, a_pdxlcolstats.get(), true /*fSerializeHeaders*/,
 					false /*findent*/);
 				break;
 			}
@@ -210,7 +210,7 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 //		The caller takes ownership over the object.
 //
 //---------------------------------------------------------------------------
-gpos::owner<IMDId *>
+gpos::Ref<IMDId>
 CMDProviderMemory::MDId(CMemoryPool *mp, CSystemId sysid,
 						IMDType::ETypeInfo type_info) const
 {
@@ -218,16 +218,16 @@ CMDProviderMemory::MDId(CMemoryPool *mp, CSystemId sysid,
 }
 
 // return the requested metadata object
-gpos::owner<IMDCacheObject *>
+gpos::Ref<IMDCacheObject>
 CMDProviderMemory::GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
-							gpos::pointer<IMDId *> mdid) const
+							IMDId *mdid) const
 {
 	CAutoP<CWStringBase> a_pstr;
 	a_pstr = GetMDObjDXLStr(mp, md_accessor, mdid);
 
 	GPOS_ASSERT(nullptr != a_pstr.Value());
 
-	gpos::owner<IMDCacheObject *> pmdobjNew =
+	gpos::Ref<IMDCacheObject> pmdobjNew =
 		gpdxl::CDXLUtils::ParseDXLToIMDIdCacheObj(mp, a_pstr.Value(),
 												  nullptr /* XSD path */);
 	GPOS_ASSERT(nullptr != pmdobjNew);

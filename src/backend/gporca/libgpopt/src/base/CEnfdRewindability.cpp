@@ -34,7 +34,7 @@ const CHAR *CEnfdRewindability::m_szRewindabilityMatching[ErmSentinel] = {
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CEnfdRewindability::CEnfdRewindability(gpos::owner<CRewindabilitySpec *> prs,
+CEnfdRewindability::CEnfdRewindability(gpos::Ref<CRewindabilitySpec> prs,
 									   ERewindabilityMatching erm)
 	: m_prs(std::move(prs)), m_erm(erm)
 {
@@ -53,7 +53,7 @@ CEnfdRewindability::CEnfdRewindability(gpos::owner<CRewindabilitySpec *> prs,
 //---------------------------------------------------------------------------
 CEnfdRewindability::~CEnfdRewindability()
 {
-	CRefCount::SafeRelease(m_prs);
+	;
 }
 
 
@@ -68,14 +68,14 @@ CEnfdRewindability::~CEnfdRewindability()
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnfdRewindability::FCompatible(gpos::pointer<CRewindabilitySpec *> prs) const
+CEnfdRewindability::FCompatible(CRewindabilitySpec *prs) const
 {
 	GPOS_ASSERT(nullptr != prs);
 
 	switch (m_erm)
 	{
 		case ErmSatisfy:
-			return prs->FSatisfies(m_prs);
+			return prs->FSatisfies(m_prs.get());
 
 		case ErmSentinel:
 			GPOS_ASSERT("invalid matching type");
@@ -109,8 +109,7 @@ CEnfdRewindability::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdRewindability::Epet(CExpressionHandle &exprhdl,
-						 gpos::pointer<CPhysical *> popPhysical,
+CEnfdRewindability::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
 						 BOOL fRewindabilityReqd) const
 {
 	if (fRewindabilityReqd)

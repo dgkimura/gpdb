@@ -55,7 +55,7 @@ CParseHandlerMetadataColumn::CParseHandlerMetadataColumn(
 //---------------------------------------------------------------------------
 CParseHandlerMetadataColumn::~CParseHandlerMetadataColumn()
 {
-	CRefCount::SafeRelease(m_mdcol);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -177,7 +177,7 @@ CParseHandlerMetadataColumn::EndElement(const XMLCh *const,	 // element_uri,
 
 	if (nullptr != m_dxl_default_val)
 	{
-		m_dxl_default_val->AddRef();
+		;
 	}
 
 	m_mdcol = GPOS_NEW(m_mp)
@@ -197,10 +197,10 @@ CParseHandlerMetadataColumn::EndElement(const XMLCh *const,	 // element_uri,
 //		Return the constructed list of metadata columns
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CMDColumn *>
+CMDColumn *
 CParseHandlerMetadataColumn::GetMdCol()
 {
-	return m_mdcol;
+	return m_mdcol.get();
 }
 
 // EOF

@@ -31,7 +31,7 @@ class CXMLSerializer;
 class CDXLColRef;
 
 // arrays of column references
-using CDXLColRefArray = CDynamicPtrArray<CDXLColRef, CleanupRelease>;
+using CDXLColRefArray = gpos::Vector<gpos::Ref<CDXLColRef>>;
 
 //---------------------------------------------------------------------------
 //	@class:

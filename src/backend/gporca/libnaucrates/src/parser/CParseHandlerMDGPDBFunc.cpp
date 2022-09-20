@@ -139,9 +139,11 @@ CParseHandlerMDGPDBFunc::StartElement(const XMLCh *const,  // element_uri,
 		const XMLCh *xmlszTypes = CDXLOperatorFactory::ExtractAttrValue(
 			attrs, EdxltokenTypeIds, EdxltokenOutputCols);
 
-		m_mdid_types_array = CDXLOperatorFactory::ExtractConvertMdIdsToArray(
-			m_parse_handler_mgr->GetDXLMemoryManager(), xmlszTypes,
-			EdxltokenTypeIds, EdxltokenOutputCols);
+		m_mdid_types_array =
+			CDXLOperatorFactory::ExtractConvertMdIdsToArray(
+				m_parse_handler_mgr->GetDXLMemoryManager(), xmlszTypes,
+				EdxltokenTypeIds, EdxltokenOutputCols)
+				.get();
 	}
 }
 

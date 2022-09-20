@@ -13,12 +13,11 @@
 namespace gpopt
 {
 bool
-ProjectElementArrayLess::operator()(
-	gpos::pointer<const CExpressionArray *> a,
-	gpos::pointer<const CExpressionArray *> b) const
+ProjectElementArrayLess::operator()(const CExpressionArray *a,
+									const CExpressionArray *b) const
 {
-	gpos::pointer<CExpression *> pexprPrjElemFst = (*a)[0];
-	gpos::pointer<CExpression *> pexprPrjElemSnd = (*b)[0];
+	CExpression *pexprPrjElemFst = (*a)[0].get();
+	CExpression *pexprPrjElemSnd = (*b)[0].get();
 	ULONG ulIdFst =
 		gpos::cast<CScalarProjectElement>(pexprPrjElemFst->Pop())->Pcr()->Id();
 	ULONG ulIdSnd =

@@ -28,7 +28,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalUnary::Matches(gpos::pointer<COperator *> pop) const
+CLogicalUnary::Matches(COperator *pop) const
 {
 	return (pop->Eopid() == Eopid());
 }
@@ -64,24 +64,23 @@ CLogicalUnary::Esp(CExpressionHandle &exprhdl) const
 //		Derive statistics for projection operators
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
-CLogicalUnary::PstatsDeriveProject(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<UlongToIDatumMap *> phmuldatum) const
+gpos::Ref<IStatistics>
+CLogicalUnary::PstatsDeriveProject(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								   UlongToIDatumMap *phmuldatum) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	gpos::pointer<IStatistics *> child_stats = exprhdl.Pstats(0);
-	gpos::pointer<CReqdPropRelational *> prprel =
+	IStatistics *child_stats = exprhdl.Pstats(0);
+	CReqdPropRelational *prprel =
 		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
-	gpos::pointer<CColRefSet *> pcrs = prprel->PcrsStat();
-	gpos::owner<ULongPtrArray *> colids = GPOS_NEW(mp) ULongPtrArray(mp);
-	pcrs->ExtractColIds(mp, colids);
+	CColRefSet *pcrs = prprel->PcrsStat();
+	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(mp) ULongPtrArray(mp);
+	pcrs->ExtractColIds(mp, colids.get());
 
-	gpos::owner<IStatistics *> stats = CProjectStatsProcessor::CalcProjStats(
-		mp, dynamic_cast<CStatistics *>(child_stats), colids, phmuldatum);
+	gpos::Ref<IStatistics> stats = CProjectStatsProcessor::CalcProjStats(
+		mp, dynamic_cast<CStatistics *>(child_stats), colids.get(), phmuldatum);
 
 	// clean up
-	colids->Release();
+	;
 
 	return stats;
 }

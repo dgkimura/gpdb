@@ -44,7 +44,7 @@ CDXLNode::CDXLNode(CMemoryPool *mp)
 //		Constructs a DXL node with given operator
 //
 //---------------------------------------------------------------------------
-CDXLNode::CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op)
+CDXLNode::CDXLNode(CMemoryPool *mp, gpos::Ref<CDXLOperator> dxl_op)
 	: m_dxl_op(std::move(dxl_op)),
 	  m_dxl_properties(nullptr),
 	  m_direct_dispatch_info(nullptr)
@@ -61,8 +61,8 @@ CDXLNode::CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLNode::CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op,
-				   gpos::owner<CDXLNode *> child_dxlnode)
+CDXLNode::CDXLNode(CMemoryPool *mp, gpos::Ref<CDXLOperator> dxl_op,
+				   gpos::Ref<CDXLNode> child_dxlnode)
 	: m_dxl_op(std::move(dxl_op)),
 	  m_dxl_properties(nullptr),
 	  m_dxl_array(nullptr),
@@ -83,9 +83,9 @@ CDXLNode::CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op,
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLNode::CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op,
-				   gpos::owner<CDXLNode *> first_child_dxlnode,
-				   gpos::owner<CDXLNode *> second_child_dxlnode)
+CDXLNode::CDXLNode(CMemoryPool *mp, gpos::Ref<CDXLOperator> dxl_op,
+				   gpos::Ref<CDXLNode> first_child_dxlnode,
+				   gpos::Ref<CDXLNode> second_child_dxlnode)
 	: m_dxl_op(std::move(dxl_op)),
 	  m_dxl_properties(nullptr),
 	  m_dxl_array(nullptr),
@@ -108,10 +108,10 @@ CDXLNode::CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op,
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLNode::CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op,
-				   gpos::owner<CDXLNode *> first_child_dxlnode,
-				   gpos::owner<CDXLNode *> second_child_dxlnode,
-				   gpos::owner<CDXLNode *> third_child_dxlnode)
+CDXLNode::CDXLNode(CMemoryPool *mp, gpos::Ref<CDXLOperator> dxl_op,
+				   gpos::Ref<CDXLNode> first_child_dxlnode,
+				   gpos::Ref<CDXLNode> second_child_dxlnode,
+				   gpos::Ref<CDXLNode> third_child_dxlnode)
 	: m_dxl_op(std::move(dxl_op)),
 	  m_dxl_properties(nullptr),
 	  m_dxl_array(nullptr),
@@ -136,8 +136,8 @@ CDXLNode::CDXLNode(CMemoryPool *mp, gpos::owner<CDXLOperator *> dxl_op,
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLNode::CDXLNode(gpos::owner<CDXLOperator *> dxl_op,
-				   gpos::owner<CDXLNodeArray *> dxl_array)
+CDXLNode::CDXLNode(gpos::Ref<CDXLOperator> dxl_op,
+				   gpos::Ref<CDXLNodeArray> dxl_array)
 	: m_dxl_op(std::move(dxl_op)),
 	  m_dxl_properties(nullptr),
 	  m_dxl_array(std::move(dxl_array)),
@@ -157,10 +157,10 @@ CDXLNode::CDXLNode(gpos::owner<CDXLOperator *> dxl_op,
 //---------------------------------------------------------------------------
 CDXLNode::~CDXLNode()
 {
-	m_dxl_array->Release();
-	CRefCount::SafeRelease(m_dxl_op);
-	CRefCount::SafeRelease(m_dxl_properties);
-	CRefCount::SafeRelease(m_direct_dispatch_info);
+	;
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -172,7 +172,7 @@ CDXLNode::~CDXLNode()
 //
 //---------------------------------------------------------------------------
 void
-CDXLNode::AddChild(gpos::owner<CDXLNode *> child_dxlnode)
+CDXLNode::AddChild(gpos::Ref<CDXLNode> child_dxlnode)
 {
 	GPOS_ASSERT(nullptr != m_dxl_array);
 	GPOS_ASSERT(nullptr != child_dxlnode);
@@ -189,7 +189,7 @@ CDXLNode::AddChild(gpos::owner<CDXLNode *> child_dxlnode)
 //
 //---------------------------------------------------------------------------
 void
-CDXLNode::ReplaceChild(ULONG pos, gpos::owner<CDXLNode *> child_dxlnode)
+CDXLNode::ReplaceChild(ULONG pos, gpos::Ref<CDXLNode> child_dxlnode)
 {
 	GPOS_ASSERT(nullptr != m_dxl_array);
 	GPOS_ASSERT(nullptr != child_dxlnode);
@@ -206,7 +206,7 @@ CDXLNode::ReplaceChild(ULONG pos, gpos::owner<CDXLNode *> child_dxlnode)
 //
 //---------------------------------------------------------------------------
 void
-CDXLNode::SetOperator(gpos::owner<CDXLOperator *> dxl_op)
+CDXLNode::SetOperator(gpos::Ref<CDXLOperator> dxl_op)
 {
 	GPOS_ASSERT(nullptr == m_dxl_op);
 	m_dxl_op = dxl_op;
@@ -252,7 +252,7 @@ CDXLNode::SerializeChildrenToDXL(CXMLSerializer *xml_serializer) const
 	{
 		GPOS_CHECK_ABORT;
 
-		gpos::pointer<CDXLNode *> child_dxlnode = (*m_dxl_array)[idx];
+		CDXLNode *child_dxlnode = (*m_dxl_array)[idx].get();
 		child_dxlnode->SerializeToDXL(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -268,7 +268,7 @@ CDXLNode::SerializeChildrenToDXL(CXMLSerializer *xml_serializer) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLNode::SetProperties(gpos::owner<CDXLProperties *> dxl_properties)
+CDXLNode::SetProperties(gpos::Ref<CDXLProperties> dxl_properties)
 {
 	// allow setting properties only once
 	GPOS_ASSERT(nullptr == m_dxl_properties);
@@ -285,7 +285,7 @@ CDXLNode::SetProperties(gpos::owner<CDXLProperties *> dxl_properties)
 //---------------------------------------------------------------------------
 void
 CDXLNode::SetDirectDispatchInfo(
-	gpos::owner<CDXLDirectDispatchInfo *> dxl_direct_dispatch_info)
+	gpos::Ref<CDXLDirectDispatchInfo> dxl_direct_dispatch_info)
 {
 	// allow setting direct dispatch info only once
 	GPOS_ASSERT(nullptr == m_direct_dispatch_info);
@@ -328,7 +328,7 @@ CDXLNode::AssertValid(BOOL validate_children) const
 	const ULONG arity = Arity();
 	for (ULONG idx = 0; idx < arity; idx++)
 	{
-		gpos::pointer<CDXLNode *> child_dxlnode = (*this)[idx];
+		CDXLNode *child_dxlnode = (*this)[idx];
 		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
 												  validate_children);
 	}

@@ -31,16 +31,15 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CDXLMinidump::CDXLMinidump(
-	gpos::owner<CBitSet *> pbs,
-	gpos::owner<COptimizerConfig *> optimizer_config,
-	gpos::owner<CDXLNode *> query,
-	gpos::owner<CDXLNodeArray *> query_output_dxlnode_array,
-	gpos::owner<CDXLNodeArray *> cte_producers,
-	gpos::owner<CDXLNode *> pdxlnPlan,
-	gpos::owner<IMDCacheObjectArray *> mdcache_obj_array,
-	gpos::owner<CSystemIdArray *> pdrgpsysid, ULLONG plan_id,
-	ULLONG plan_space_size)
+CDXLMinidump::CDXLMinidump(gpos::Ref<CBitSet> pbs,
+						   gpos::Ref<COptimizerConfig> optimizer_config,
+						   gpos::Ref<CDXLNode> query,
+						   gpos::Ref<CDXLNodeArray> query_output_dxlnode_array,
+						   gpos::Ref<CDXLNodeArray> cte_producers,
+						   gpos::Ref<CDXLNode> pdxlnPlan,
+						   gpos::Ref<IMDCacheObjectArray> mdcache_obj_array,
+						   gpos::Ref<CSystemIdArray> pdrgpsysid, ULLONG plan_id,
+						   ULLONG plan_space_size)
 	: m_pbs(std::move(pbs)),
 	  m_optimizer_config(std::move(optimizer_config)),
 	  m_query_dxl_root(std::move(query)),
@@ -66,14 +65,14 @@ CDXLMinidump::CDXLMinidump(
 CDXLMinidump::~CDXLMinidump()
 {
 	// some of the structures may be NULL as they are not included in the minidump
-	CRefCount::SafeRelease(m_pbs);
-	CRefCount::SafeRelease(m_optimizer_config);
-	CRefCount::SafeRelease(m_query_dxl_root);
-	CRefCount::SafeRelease(m_query_output);
-	CRefCount::SafeRelease(m_cte_producers);
-	CRefCount::SafeRelease(m_plan_dxl_root);
-	CRefCount::SafeRelease(m_mdid_cached_obj_array);
-	CRefCount::SafeRelease(m_system_id_array);
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -84,10 +83,10 @@ CDXLMinidump::~CDXLMinidump()
 //		Traceflags
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CBitSet *>
+const CBitSet *
 CDXLMinidump::Pbs() const
 {
-	return m_pbs;
+	return m_pbs.get();
 }
 
 //---------------------------------------------------------------------------
@@ -98,10 +97,10 @@ CDXLMinidump::Pbs() const
 //		Query object
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLNode *>
+const CDXLNode *
 CDXLMinidump::GetQueryDXLRoot() const
 {
-	return m_query_dxl_root;
+	return m_query_dxl_root.get();
 }
 
 //---------------------------------------------------------------------------
@@ -112,10 +111,10 @@ CDXLMinidump::GetQueryDXLRoot() const
 //		Query output columns
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLNodeArray *>
+const CDXLNodeArray *
 CDXLMinidump::PdrgpdxlnQueryOutput() const
 {
-	return m_query_output;
+	return m_query_output.get();
 }
 
 //---------------------------------------------------------------------------
@@ -126,10 +125,10 @@ CDXLMinidump::PdrgpdxlnQueryOutput() const
 //		CTE list
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLNodeArray *>
+const CDXLNodeArray *
 CDXLMinidump::GetCTEProducerDXLArray() const
 {
-	return m_cte_producers;
+	return m_cte_producers.get();
 }
 
 //---------------------------------------------------------------------------
@@ -140,10 +139,10 @@ CDXLMinidump::GetCTEProducerDXLArray() const
 //		Query object
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLNode *>
+const CDXLNode *
 CDXLMinidump::PdxlnPlan() const
 {
-	return m_plan_dxl_root;
+	return m_plan_dxl_root.get();
 }
 
 //---------------------------------------------------------------------------
@@ -154,10 +153,10 @@ CDXLMinidump::PdxlnPlan() const
 //		Metadata objects
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const IMDCacheObjectArray *>
+const IMDCacheObjectArray *
 CDXLMinidump::GetMdIdCachedObjArray() const
 {
-	return m_mdid_cached_obj_array;
+	return m_mdid_cached_obj_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -168,10 +167,10 @@ CDXLMinidump::GetMdIdCachedObjArray() const
 //		Metadata source system ids
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CSystemIdArray *>
+const CSystemIdArray *
 CDXLMinidump::GetSysidPtrArray() const
 {
-	return m_system_id_array;
+	return m_system_id_array.get();
 }
 
 

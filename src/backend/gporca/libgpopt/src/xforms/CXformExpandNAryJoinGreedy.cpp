@@ -73,9 +73,9 @@ CXformExpandNAryJoinGreedy::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformExpandNAryJoinGreedy::Transform(gpos::pointer<CXformContext *> pxfctxt,
-									  gpos::pointer<CXformResult *> pxfres,
-									  gpos::pointer<CExpression *> pexpr) const
+CXformExpandNAryJoinGreedy::Transform(CXformContext *pxfctxt,
+									  CXformResult *pxfres,
+									  CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -87,29 +87,28 @@ CXformExpandNAryJoinGreedy::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	const ULONG ulArity = pexpr->Arity();
 	GPOS_ASSERT(ulArity >= 3);
 
-	gpos::owner<CExpressionArray *> pdrgpexpr =
-		GPOS_NEW(pmp) CExpressionArray(pmp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(pmp) CExpressionArray(pmp);
 	for (ULONG ul = 0; ul < ulArity - 1; ul++)
 	{
-		gpos::owner<CExpression *> pexprChild = (*pexpr)[ul];
-		pexprChild->AddRef();
+		gpos::Ref<CExpression> pexprChild = (*pexpr)[ul];
+		;
 		pdrgpexpr->Append(pexprChild);
 	}
 
-	gpos::pointer<CExpression *> pexprScalar = (*pexpr)[ulArity - 1];
-	gpos::owner<CExpressionArray *> pdrgpexprPreds =
+	CExpression *pexprScalar = (*pexpr)[ulArity - 1];
+	gpos::Ref<CExpressionArray> pdrgpexprPreds =
 		CPredicateUtils::PdrgpexprConjuncts(pmp, pexprScalar);
 
 	// create a join order based on cardinality of intermediate results
 	CJoinOrderGreedy jomc(pmp, pdrgpexpr, pdrgpexprPreds);
-	gpos::owner<CExpression *> pexprResult = jomc.PexprExpand();
+	gpos::Ref<CExpression> pexprResult = jomc.PexprExpand();
 
 	if (nullptr != pexprResult)
 	{
 		// normalize resulting expression
-		gpos::owner<CExpression *> pexprNormalized =
-			CNormalizer::PexprNormalize(pmp, pexprResult);
-		pexprResult->Release();
+		gpos::Ref<CExpression> pexprNormalized =
+			CNormalizer::PexprNormalize(pmp, pexprResult.get());
+		;
 		pxfres->Add(std::move(pexprNormalized));
 	}
 }

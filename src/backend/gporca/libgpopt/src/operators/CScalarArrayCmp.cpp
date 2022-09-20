@@ -111,12 +111,11 @@ CScalarArrayCmp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayCmp::Matches(gpos::pointer<COperator *> pop) const
+CScalarArrayCmp::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarArrayCmp *> popCmp =
-			gpos::dyn_cast<CScalarArrayCmp>(pop);
+		CScalarArrayCmp *popCmp = gpos::dyn_cast<CScalarArrayCmp>(pop);
 
 		// match if operator oid are identical
 		return m_earrccmpt == popCmp->Earrcmpt() &&
@@ -151,7 +150,7 @@ CScalarArrayCmp::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarArrayCmp::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
+CScalarArrayCmp::Eber(ULongPtrArray *pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{
@@ -189,21 +188,19 @@ CScalarArrayCmp::OsPrint(IOstream &os) const
 //		expression
 //
 //---------------------------------------------------------------------------
-gpos::owner<CExpression *>
-CScalarArrayCmp::PexprExpand(CMemoryPool *mp,
-							 gpos::pointer<CExpression *> pexprArrayCmp)
+gpos::Ref<CExpression>
+CScalarArrayCmp::PexprExpand(CMemoryPool *mp, CExpression *pexprArrayCmp)
 {
 	GPOS_ASSERT(nullptr != pexprArrayCmp);
 	GPOS_ASSERT(EopScalarArrayCmp == pexprArrayCmp->Pop()->Eopid());
 
-	gpos::pointer<COptimizerConfig *> optimizer_config =
+	COptimizerConfig *optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 	ULONG array_expansion_threshold =
 		optimizer_config->GetHint()->UlArrayExpansionThreshold();
 	CExpression *pexprIdent = (*pexprArrayCmp)[0];
-	gpos::pointer<CExpression *> pexprArray =
-		CUtils::PexprScalarArrayChild(pexprArrayCmp);
-	gpos::pointer<CScalarArrayCmp *> popArrayCmp =
+	CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexprArrayCmp);
+	CScalarArrayCmp *popArrayCmp =
 		gpos::dyn_cast<CScalarArrayCmp>(pexprArrayCmp->Pop());
 	ULONG ulArrayElems = 0;
 
@@ -217,33 +214,32 @@ CScalarArrayCmp::PexprExpand(CMemoryPool *mp,
 	{
 		// if right child is not an actual array (e.g., Const of type array), return input
 		// expression without expansion
-		pexprArrayCmp->AddRef();
+		;
 		return pexprArrayCmp;
 	}
 
-	gpos::owner<CExpressionArray *> pdrgpexpr =
-		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < ulArrayElems; ul++)
 	{
-		gpos::owner<CExpression *> pexprArrayElem =
+		gpos::Ref<CExpression> pexprArrayElem =
 			CUtils::PScalarArrayExprChildAt(mp, pexprArray, ul);
-		pexprIdent->AddRef();
+		;
 		const CWStringConst *str_opname = popArrayCmp->Pstr();
 		IMDId *mdid_op = popArrayCmp->MdIdOp();
 		GPOS_ASSERT(IMDId::IsValid(mdid_op));
 
-		mdid_op->AddRef();
+		;
 
-		gpos::owner<CExpression *> pexprCmp = CUtils::PexprScalarCmp(
+		gpos::Ref<CExpression> pexprCmp = CUtils::PexprScalarCmp(
 			mp, pexprIdent, pexprArrayElem, *str_opname, mdid_op);
 		pdrgpexpr->Append(pexprCmp);
 	}
 	GPOS_ASSERT(0 < pdrgpexpr->Size());
 
 	// deduplicate resulting array
-	gpos::owner<CExpressionArray *> pdrgpexprDeduped =
-		CUtils::PdrgpexprDedup(mp, pdrgpexpr);
-	pdrgpexpr->Release();
+	gpos::Ref<CExpressionArray> pdrgpexprDeduped =
+		CUtils::PdrgpexprDedup(mp, pdrgpexpr.get());
+	;
 
 	EArrCmpType earrcmpt = popArrayCmp->Earrcmpt();
 	if (EarrcmpAny == earrcmpt)

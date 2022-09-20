@@ -42,8 +42,8 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CPhysicalSerialUnionAll::CPhysicalSerialUnionAll(
-	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrOutput,
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput)
+	CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput)
 	: CPhysicalUnionAll(mp, std::move(pdrgpcrOutput),
 						std::move(pdrgpdrgpcrInput))
 {
@@ -68,17 +68,16 @@ CPhysicalSerialUnionAll::~CPhysicalSerialUnionAll() = default;
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDistributionSpec *>
+gpos::Ref<CDistributionSpec>
 CPhysicalSerialUnionAll::PdsRequired(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
-	gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) const
+	CMemoryPool *mp, CExpressionHandle &exprhdl, CDistributionSpec *pdsRequired,
+	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const
 {
 	GPOS_ASSERT(nullptr != PdrgpdrgpcrInput());
 	GPOS_ASSERT(child_index < PdrgpdrgpcrInput()->Size());
 	GPOS_ASSERT(2 > ulOptReq);
 
-	gpos::owner<CDistributionSpec *> pds = PdsRequireSingletonOrReplicated(
+	gpos::Ref<CDistributionSpec> pds = PdsRequireSingletonOrReplicated(
 		mp, exprhdl, pdsRequired, child_index, ulOptReq);
 	if (nullptr != pds)
 	{
@@ -88,7 +87,7 @@ CPhysicalSerialUnionAll::PdsRequired(
 	if (0 == ulOptReq && CDistributionSpec::EdtHashed == pdsRequired->Edt())
 	{
 		// attempt passing requested hashed distribution to children
-		gpos::owner<CDistributionSpecHashed *> pdshashed = PdshashedPassThru(
+		gpos::Ref<CDistributionSpecHashed> pdshashed = PdshashedPassThru(
 			mp, gpos::dyn_cast<CDistributionSpecHashed>(pdsRequired),
 			child_index);
 		if (nullptr != pdshashed)
@@ -104,7 +103,7 @@ CPhysicalSerialUnionAll::PdsRequired(
 	}
 
 	// inspect distribution delivered by outer child
-	gpos::pointer<CDistributionSpec *> pdsOuter =
+	CDistributionSpec *pdsOuter =
 		gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Pds();
 
 	if (CDistributionSpec::EdtSingleton == pdsOuter->Edt() ||

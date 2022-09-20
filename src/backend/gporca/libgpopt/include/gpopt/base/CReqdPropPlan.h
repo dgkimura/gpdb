@@ -46,22 +46,22 @@ class CReqdPropPlan : public CReqdProp
 {
 private:
 	// required columns
-	gpos::owner<CColRefSet *> m_pcrs{nullptr};
+	gpos::Ref<CColRefSet> m_pcrs{nullptr};
 
 	// required sort order
-	gpos::owner<CEnfdOrder *> m_peo{nullptr};
+	gpos::Ref<CEnfdOrder> m_peo{nullptr};
 
 	// required distribution
-	gpos::owner<CEnfdDistribution *> m_ped{nullptr};
+	gpos::Ref<CEnfdDistribution> m_ped{nullptr};
 
 	// required rewindability
-	gpos::owner<CEnfdRewindability *> m_per{nullptr};
+	gpos::Ref<CEnfdRewindability> m_per{nullptr};
 
 	// required partition propagation
-	gpos::owner<CEnfdPartitionPropagation *> m_pepp{nullptr};
+	gpos::Ref<CEnfdPartitionPropagation> m_pepp{nullptr};
 
 	// required ctes
-	gpos::owner<CCTEReq *> m_pcter{nullptr};
+	gpos::Ref<CCTEReq> m_pcter{nullptr};
 
 public:
 	CReqdPropPlan(const CReqdPropPlan &) = delete;
@@ -70,11 +70,11 @@ public:
 	CReqdPropPlan() = default;
 
 	// ctor
-	CReqdPropPlan(gpos::owner<CColRefSet *> pcrs, gpos::owner<CEnfdOrder *> peo,
-				  gpos::owner<CEnfdDistribution *> ped,
-				  gpos::owner<CEnfdRewindability *> per,
-				  gpos::owner<CEnfdPartitionPropagation *> pepp,
-				  gpos::owner<CCTEReq *> pcter);
+	CReqdPropPlan(gpos::Ref<CColRefSet> pcrs, gpos::Ref<CEnfdOrder> peo,
+				  gpos::Ref<CEnfdDistribution> ped,
+				  gpos::Ref<CEnfdRewindability> per,
+				  gpos::Ref<CEnfdPartitionPropagation> pepp,
+				  gpos::Ref<CCTEReq> pcter);
 
 	// dtor
 	~CReqdPropPlan() override;
@@ -89,87 +89,85 @@ public:
 
 	// required properties computation function
 	void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
-				 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-				 ULONG ulOptReq) override;
+				 CReqdProp *prpInput, ULONG child_index,
+				 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// required columns computation function
 	void ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
-						 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt);
+						 CReqdProp *prpInput, ULONG child_index,
+						 CDrvdPropArray *pdrgpdpCtxt);
 
 	// required ctes computation function
 	void ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
-						 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt);
+						 CReqdProp *prpInput, ULONG child_index,
+						 CDrvdPropArray *pdrgpdpCtxt);
 
 	// required columns accessor
-	gpos::pointer<CColRefSet *>
+	CColRefSet *
 	PcrsRequired() const
 	{
-		return m_pcrs;
+		return m_pcrs.get();
 	}
 
 	// required order accessor
-	gpos::pointer<CEnfdOrder *>
+	CEnfdOrder *
 	Peo() const
 	{
-		return m_peo;
+		return m_peo.get();
 	}
 
 	// required distribution accessor
-	gpos::pointer<CEnfdDistribution *>
+	CEnfdDistribution *
 	Ped() const
 	{
-		return m_ped;
+		return m_ped.get();
 	}
 
 	// required rewindability accessor
-	gpos::pointer<CEnfdRewindability *>
+	CEnfdRewindability *
 	Per() const
 	{
-		return m_per;
+		return m_per.get();
 	}
 
 	// required partition propagation accessor
-	gpos::pointer<CEnfdPartitionPropagation *>
+	CEnfdPartitionPropagation *
 	Pepp() const
 	{
-		return m_pepp;
+		return m_pepp.get();
 	}
 
 	// required cte accessor
-	gpos::pointer<CCTEReq *>
+	CCTEReq *
 	Pcter() const
 	{
-		return m_pcter;
+		return m_pcter.get();
 	}
 
 	// given a property spec type, return the corresponding property spec member
 	CPropSpec *Pps(ULONG ul) const;
 
 	// equality function
-	BOOL Equals(gpos::pointer<const CReqdPropPlan *> prpp) const;
+	BOOL Equals(const CReqdPropPlan *prpp) const;
 
 	// hash function
 	ULONG HashValue() const;
 
 	// check if plan properties are satisfied by the given derived properties
-	BOOL FSatisfied(gpos::pointer<const CDrvdPropRelational *> pdprel,
-					gpos::pointer<const CDrvdPropPlan *> pdpplan) const;
+	BOOL FSatisfied(const CDrvdPropRelational *pdprel,
+					const CDrvdPropPlan *pdpplan) const;
 
 	// check if plan properties are compatible with the given derived properties
-	BOOL FCompatible(CExpressionHandle &exprhdl,
-					 gpos::pointer<CPhysical *> popPhysical,
-					 gpos::pointer<const CDrvdPropRelational *> pdprel,
-					 gpos::pointer<const CDrvdPropPlan *> pdpplan) const;
+	BOOL FCompatible(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+					 const CDrvdPropRelational *pdprel,
+					 const CDrvdPropPlan *pdpplan) const;
 
 	// check if expression attached to handle provides required columns by all plan properties
 	BOOL FProvidesReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						   ULONG ulOptReq) const;
 
 	// shorthand for conversion
-	static gpos::cast_func<CReqdPropPlan *>
+	static CReqdPropPlan *
 	Prpp(CReqdProp *prp)
 	{
 		GPOS_ASSERT(nullptr != prp);
@@ -178,21 +176,18 @@ public:
 	}
 
 	//generate empty required properties
-	static gpos::owner<CReqdPropPlan *> PrppEmpty(CMemoryPool *mp);
+	static gpos::Ref<CReqdPropPlan> PrppEmpty(CMemoryPool *mp);
 
 	// hash function used for cost bounding
-	static ULONG UlHashForCostBounding(
-		gpos::pointer<const CReqdPropPlan *> prpp);
+	static ULONG UlHashForCostBounding(const CReqdPropPlan *prpp);
 
 	// equality function used for cost bounding
-	static BOOL FEqualForCostBounding(
-		gpos::pointer<const CReqdPropPlan *> prppFst,
-		gpos::pointer<const CReqdPropPlan *> prppSnd);
+	static BOOL FEqualForCostBounding(const CReqdPropPlan *prppFst,
+									  const CReqdPropPlan *prppSnd);
 
 	// map input required and derived plan properties into new required plan properties
-	static gpos::owner<CReqdPropPlan *> PrppRemapForCTE(
-		CMemoryPool *mp, gpos::pointer<CReqdPropPlan *> prppInput,
-		gpos::pointer<CDrvdPropPlan *> pdpplanInput,
+	static gpos::Ref<CReqdPropPlan> PrppRemapForCTE(
+		CMemoryPool *mp, CReqdPropPlan *prppInput, CDrvdPropPlan *pdpplanInput,
 		UlongToColRefMap *colref_mapping);
 
 	// print function

@@ -38,7 +38,7 @@ CLogicalInnerCorrelatedApply::CLogicalInnerCorrelatedApply(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalInnerCorrelatedApply::CLogicalInnerCorrelatedApply(
-	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrInner,
+	CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrInner,
 	EOperatorId eopidOriginSubq)
 	: CLogicalInnerApply(mp, std::move(pdrgpcrInner), eopidOriginSubq)
 {
@@ -52,10 +52,10 @@ CLogicalInnerCorrelatedApply::CLogicalInnerCorrelatedApply(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalInnerCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementInnerCorrelatedApply);
 
 	return xform_set;
@@ -70,7 +70,7 @@ CLogicalInnerCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalInnerCorrelatedApply::Matches(gpos::pointer<COperator *> pop) const
+CLogicalInnerCorrelatedApply::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -89,13 +89,12 @@ CLogicalInnerCorrelatedApply::Matches(gpos::pointer<COperator *> pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
+gpos::Ref<COperator>
 CLogicalInnerCorrelatedApply::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
-	gpos::owner<CColRefArray *> pdrgpcrInner =
-		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
+	gpos::Ref<CColRefArray> pdrgpcrInner = CUtils::PdrgpcrRemap(
+		mp, m_pdrgpcrInner.get(), colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalInnerCorrelatedApply(
 		mp, std::move(pdrgpcrInner), m_eopidOriginSubq);

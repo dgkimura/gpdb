@@ -30,7 +30,7 @@ FORCE_GENERATE_DBGSTR(CPartKeys);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CPartKeys::CPartKeys(gpos::owner<CColRef2dArray *> pdrgpdrgpcr)
+CPartKeys::CPartKeys(gpos::Ref<CColRef2dArray> pdrgpdrgpcr)
 	: m_pdrgpdrgpcr(std::move(pdrgpdrgpcr))
 {
 	GPOS_ASSERT(nullptr != m_pdrgpdrgpcr);
@@ -47,7 +47,7 @@ CPartKeys::CPartKeys(gpos::owner<CColRef2dArray *> pdrgpdrgpcr)
 //---------------------------------------------------------------------------
 CPartKeys::~CPartKeys()
 {
-	m_pdrgpdrgpcr->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ CColRef *
 CPartKeys::PcrKey(ULONG ulLevel) const
 {
 	GPOS_ASSERT(ulLevel < m_num_of_part_levels);
-	gpos::pointer<CColRefArray *> colref_array = (*m_pdrgpdrgpcr)[ulLevel];
+	CColRefArray *colref_array = (*m_pdrgpdrgpcr)[ulLevel].get();
 	return (*colref_array)[0];
 }
 
@@ -75,7 +75,7 @@ CPartKeys::PcrKey(ULONG ulLevel) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPartKeys::FOverlap(gpos::pointer<CColRefSet *> pcrs) const
+CPartKeys::FOverlap(CColRefSet *pcrs) const
 {
 	for (ULONG ul = 0; ul < m_num_of_part_levels; ul++)
 	{
@@ -97,17 +97,16 @@ CPartKeys::FOverlap(gpos::pointer<CColRefSet *> pcrs) const
 //		Copy part key into the given memory pool
 //
 //---------------------------------------------------------------------------
-gpos::owner<CPartKeys *>
+gpos::Ref<CPartKeys>
 CPartKeys::PpartkeysCopy(CMemoryPool *mp)
 {
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrCopy =
-		GPOS_NEW(mp) CColRef2dArray(mp);
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrCopy = GPOS_NEW(mp) CColRef2dArray(mp);
 
 	const ULONG length = m_pdrgpdrgpcr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		gpos::pointer<CColRefArray *> colref_array = (*m_pdrgpdrgpcr)[ul];
-		gpos::owner<CColRefArray *> pdrgpcrCopy = GPOS_NEW(mp) CColRefArray(mp);
+		CColRefArray *colref_array = (*m_pdrgpdrgpcr)[ul].get();
+		gpos::Ref<CColRefArray> pdrgpcrCopy = GPOS_NEW(mp) CColRefArray(mp);
 		const ULONG num_cols = colref_array->Size();
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 		{
@@ -127,13 +126,13 @@ CPartKeys::PpartkeysCopy(CMemoryPool *mp)
 //		Copy array of part keys into given memory pool
 //
 //---------------------------------------------------------------------------
-gpos::owner<CPartKeysArray *>
-CPartKeys::PdrgppartkeysCopy(
-	CMemoryPool *mp, gpos::pointer<const CPartKeysArray *> pdrgppartkeys)
+gpos::Ref<CPartKeysArray>
+CPartKeys::PdrgppartkeysCopy(CMemoryPool *mp,
+							 const CPartKeysArray *pdrgppartkeys)
 {
 	GPOS_ASSERT(nullptr != pdrgppartkeys);
 
-	gpos::owner<CPartKeysArray *> pdrgppartkeysCopy =
+	gpos::Ref<CPartKeysArray> pdrgppartkeysCopy =
 		GPOS_NEW(mp) CPartKeysArray(mp);
 	const ULONG length = pdrgppartkeys->Size();
 	for (ULONG ul = 0; ul < length; ul++)
@@ -153,20 +152,19 @@ CPartKeys::PdrgppartkeysCopy(
 //		keys using the given hashmap
 //
 //---------------------------------------------------------------------------
-gpos::owner<CPartKeys *>
+gpos::Ref<CPartKeys>
 CPartKeys::PpartkeysRemap(CMemoryPool *mp,
 						  UlongToColRefMap *colref_mapping) const
 {
 	GPOS_ASSERT(nullptr != colref_mapping);
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcr = GPOS_NEW(mp) CColRef2dArray(mp);
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcr = GPOS_NEW(mp) CColRef2dArray(mp);
 
 	for (ULONG ul = 0; ul < m_num_of_part_levels; ul++)
 	{
 		CColRef *colref =
 			CUtils::PcrRemap(PcrKey(ul), colref_mapping, false /*must_exist*/);
 
-		gpos::owner<CColRefArray *> colref_array =
-			GPOS_NEW(mp) CColRefArray(mp);
+		gpos::Ref<CColRefArray> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 		colref_array->Append(colref);
 
 		pdrgpdrgpcr->Append(colref_array);

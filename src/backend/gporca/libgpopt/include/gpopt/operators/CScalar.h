@@ -51,25 +51,23 @@ public:
 
 private:
 	// helper for combining partition consumer arrays of scalar children
-	static gpos::owner<CPartInfo *> PpartinfoDeriveCombineScalar(
+	static gpos::Ref<CPartInfo> PpartinfoDeriveCombineScalar(
 		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 protected:
 	// perform conjunction of child boolean evaluation results
-	static EBoolEvalResult EberConjunction(
-		gpos::pointer<ULongPtrArray *> pdrgpulChildren);
+	static EBoolEvalResult EberConjunction(ULongPtrArray *pdrgpulChildren);
 
 	// perform disjunction of child boolean evaluation results
-	static EBoolEvalResult EberDisjunction(
-		gpos::pointer<ULongPtrArray *> pdrgpulChildren);
+	static EBoolEvalResult EberDisjunction(ULongPtrArray *pdrgpulChildren);
 
 	// return Null if any child is Null
 	static EBoolEvalResult EberNullOnAnyNullChild(
-		gpos::pointer<ULongPtrArray *> pdrgpulChildren);
+		ULongPtrArray *pdrgpulChildren);
 
 	// return Null if all children are Null
 	static EBoolEvalResult EberNullOnAllNullChildren(
-		gpos::pointer<ULongPtrArray *> pdrgpulChildren);
+		ULongPtrArray *pdrgpulChildren);
 
 public:
 	CScalar(const CScalar &) = delete;
@@ -91,13 +89,13 @@ public:
 	}
 
 	// create derived properties container
-	gpos::owner<CDrvdProp *> PdpCreate(CMemoryPool *mp) const override;
+	gpos::Ref<CDrvdProp> PdpCreate(CMemoryPool *mp) const override;
 
 	// create required properties container
-	gpos::owner<CReqdProp *> PrpCreate(CMemoryPool *mp) const override;
+	gpos::Ref<CReqdProp> PrpCreate(CMemoryPool *mp) const override;
 
 	// return locally defined columns
-	virtual gpos::owner<CColRefSet *>
+	virtual gpos::Ref<CColRefSet>
 	PcrsDefined(CMemoryPool *mp,
 				CExpressionHandle &	 // exprhdl
 	)
@@ -107,7 +105,7 @@ public:
 	}
 
 	// return columns containing set-returning function
-	virtual gpos::owner<CColRefSet *>
+	virtual gpos::Ref<CColRefSet>
 	PcrsSetReturningFunction(CMemoryPool *mp,
 							 CExpressionHandle &  // exprhdl
 	)
@@ -117,7 +115,7 @@ public:
 	}
 
 	// return locally used columns
-	virtual gpos::owner<CColRefSet *>
+	virtual gpos::Ref<CColRefSet>
 	PcrsUsed(CMemoryPool *mp,
 			 CExpressionHandle &  // exprhdl
 	)
@@ -127,14 +125,14 @@ public:
 	}
 
 	// derive partition consumer info
-	virtual gpos::owner<CPartInfo *>
+	virtual gpos::Ref<CPartInfo>
 	PpartinfoDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	{
 		return PpartinfoDeriveCombineScalar(mp, exprhdl);
 	}
 
 	// derive function properties
-	virtual gpos::owner<CFunctionProp *>
+	virtual gpos::Ref<CFunctionProp>
 	DeriveFunctionProperties(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	{
 		return PfpDeriveFromChildren(mp, exprhdl,
@@ -154,7 +152,7 @@ public:
 
 	// boolean expression evaluation
 	virtual EBoolEvalResult
-	Eber(gpos::pointer<ULongPtrArray *>	 // pdrgpulChildren
+	Eber(ULongPtrArray *  // pdrgpulChildren
 	) const
 	{
 		// by default, evaluation result can be false, true or NULL
@@ -162,11 +160,11 @@ public:
 	}
 
 	// perform boolean evaluation of the given expression tree
-	static EBoolEvalResult EberEvaluate(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprScalar);
+	static EBoolEvalResult EberEvaluate(CMemoryPool *mp,
+										CExpression *pexprScalar);
 
 	// conversion function
-	static gpos::cast_func<CScalar *>
+	static CScalar *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

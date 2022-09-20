@@ -36,7 +36,7 @@ class CParseHandlerLogicalInsert : public CParseHandlerLogicalOp
 {
 private:
 	// source col ids
-	gpos::pointer<ULongPtrArray *> m_pdrgpul;
+	ULongPtrArray *m_pdrgpul;
 
 	// process the start of an element
 	void StartElement(

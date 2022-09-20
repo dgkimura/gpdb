@@ -44,7 +44,7 @@ CXformResult::CXformResult(CMemoryPool *mp) : m_ulExpr(0)
 CXformResult::~CXformResult()
 {
 	// release array (releases all elements)
-	m_pdrgpexpr->Release();
+	;
 }
 
 
@@ -57,7 +57,7 @@ CXformResult::~CXformResult()
 //
 //---------------------------------------------------------------------------
 void
-CXformResult::Add(gpos::owner<CExpression *> pexpr)
+CXformResult::Add(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(0 == m_ulExpr &&
 				"Incorrect workflow: cannot add further alternatives");

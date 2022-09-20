@@ -38,10 +38,10 @@ class CReqdPropRelational : public CReqdProp
 {
 private:
 	// required stat columns
-	gpos::owner<CColRefSet *> m_pcrsStat{nullptr};
+	gpos::Ref<CColRefSet> m_pcrsStat{nullptr};
 
 	// predicate on partition key
-	gpos::owner<CExpression *> m_pexprPartPred{nullptr};
+	gpos::Ref<CExpression> m_pexprPartPred{nullptr};
 
 public:
 	CReqdPropRelational(const CReqdPropRelational &) = delete;
@@ -50,11 +50,11 @@ public:
 	CReqdPropRelational();
 
 	// ctor
-	explicit CReqdPropRelational(gpos::owner<CColRefSet *> pcrs);
+	explicit CReqdPropRelational(gpos::Ref<CColRefSet> pcrs);
 
 	// ctor
-	CReqdPropRelational(gpos::owner<CColRefSet *> pcrs,
-						gpos::owner<CExpression *> pexprPartPred);
+	CReqdPropRelational(gpos::Ref<CColRefSet> pcrs,
+						gpos::Ref<CExpression> pexprPartPred);
 
 	// dtor
 	~CReqdPropRelational() override;
@@ -68,35 +68,33 @@ public:
 	}
 
 	// stat columns accessor
-	gpos::pointer<CColRefSet *>
+	CColRefSet *
 	PcrsStat() const
 	{
-		return m_pcrsStat;
+		return m_pcrsStat.get();
 	}
 
 	// partition predicate accessor
-	gpos::pointer<CExpression *>
+	CExpression *
 	PexprPartPred() const
 	{
-		return m_pexprPartPred;
+		return m_pexprPartPred.get();
 	}
 
 	// required properties computation function
 	void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
-				 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-				 ULONG ulOptReq) override;
+				 CReqdProp *prpInput, ULONG child_index,
+				 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// return difference from given properties
-	gpos::owner<CReqdPropRelational *> PrprelDifference(
-		CMemoryPool *mp, gpos::pointer<CReqdPropRelational *> prprel);
+	gpos::Ref<CReqdPropRelational> PrprelDifference(
+		CMemoryPool *mp, CReqdPropRelational *prprel);
 
 	// return true if property container is empty
 	BOOL IsEmpty() const;
 
 	// shorthand for conversion
-	static gpos::cast_func<CReqdPropRelational *> GetReqdRelationalProps(
-		CReqdProp *prp);
+	static CReqdPropRelational *GetReqdRelationalProps(CReqdProp *prp);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

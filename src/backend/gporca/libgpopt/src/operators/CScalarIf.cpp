@@ -69,11 +69,11 @@ CScalarIf::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIf::Matches(gpos::pointer<COperator *> pop) const
+CScalarIf::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarIf *> popScIf = gpos::dyn_cast<CScalarIf>(pop);
+		CScalarIf *popScIf = gpos::dyn_cast<CScalarIf>(pop);
 
 		// match if return types are identical
 		return popScIf->MdidType()->Equals(m_mdid_type.get());

@@ -42,7 +42,7 @@ const CHAR *CEnfdDistribution::m_szDistributionMatching[EdmSentinel] = {
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CEnfdDistribution::CEnfdDistribution(gpos::owner<CDistributionSpec *> pds,
+CEnfdDistribution::CEnfdDistribution(gpos::Ref<CDistributionSpec> pds,
 									 EDistributionMatching edm)
 	: m_pds(std::move(pds)), m_edm(edm)
 {
@@ -61,7 +61,7 @@ CEnfdDistribution::CEnfdDistribution(gpos::owner<CDistributionSpec *> pds,
 //---------------------------------------------------------------------------
 CEnfdDistribution::~CEnfdDistribution()
 {
-	CRefCount::SafeRelease(m_pds);
+	;
 }
 
 
@@ -75,17 +75,17 @@ CEnfdDistribution::~CEnfdDistribution()
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnfdDistribution::FCompatible(gpos::pointer<CDistributionSpec *> pds) const
+CEnfdDistribution::FCompatible(CDistributionSpec *pds) const
 {
 	GPOS_ASSERT(nullptr != pds);
 
 	switch (m_edm)
 	{
 		case EdmExact:
-			return pds->Matches(m_pds);
+			return pds->Matches(m_pds.get());
 
 		case EdmSatisfy:
-			return pds->FSatisfies(m_pds);
+			return pds->FSatisfies(m_pds.get());
 
 		case EdmSubset:
 			if (CDistributionSpec::EdtHashed == m_pds->Edt() &&
@@ -93,7 +93,7 @@ CEnfdDistribution::FCompatible(gpos::pointer<CDistributionSpec *> pds) const
 			{
 				return gpos::dyn_cast<CDistributionSpecHashed>(pds)
 					->FMatchSubset(
-						gpos::dyn_cast<CDistributionSpecHashed>(m_pds));
+						gpos::dyn_cast<CDistributionSpecHashed>(m_pds.get()));
 			}
 
 		case (EdmSentinel):
@@ -127,13 +127,12 @@ CEnfdDistribution::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdDistribution::Epet(CExpressionHandle &exprhdl,
-						gpos::pointer<CPhysical *> popPhysical,
+CEnfdDistribution::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
 						BOOL fDistribReqd) const
 {
 	if (fDistribReqd)
 	{
-		gpos::pointer<CDistributionSpec *> pds =
+		CDistributionSpec *pds =
 			gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pds();
 
 		if (CDistributionSpec::EdtStrictReplicated == pds->Edt() &&

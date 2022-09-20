@@ -70,8 +70,10 @@ CParseHandlerSort::StartElement(const XMLCh *const,	 // element_uri,
 	}
 
 	// parse and create Sort operator
-	m_dxl_op = gpos::cast<CDXLPhysicalSort>(CDXLOperatorFactory::MakeDXLSort(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+	m_dxl_op = gpos::cast<CDXLPhysicalSort>(
+		CDXLOperatorFactory::MakeDXLSort(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs)
+			.get());
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance
@@ -176,7 +178,7 @@ CParseHandlerSort::EndElement(const XMLCh *const,  // element_uri,
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 	// set statictics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add children
 	AddChildFromParseHandler(proj_list_parse_handler);
@@ -187,7 +189,7 @@ CParseHandlerSort::EndElement(const XMLCh *const,  // element_uri,
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxl_op->AssertValid(m_dxl_node.get(), false /* validate_children */);
 #endif	// GPOS_DEBUG
 
 	// deactivate handler

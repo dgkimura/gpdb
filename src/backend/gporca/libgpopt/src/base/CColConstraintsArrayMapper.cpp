@@ -9,21 +9,21 @@
 
 using namespace gpopt;
 
-gpos::owner<CConstraintArray *>
+gpos::Ref<CConstraintArray>
 CColConstraintsArrayMapper::PdrgPcnstrLookup(CColRef *colref)
 {
 	const BOOL fExclusive = true;
-	return CConstraint::PdrgpcnstrOnColumn(m_mp, m_pdrgpcnstr, colref,
+	return CConstraint::PdrgpcnstrOnColumn(m_mp, m_pdrgpcnstr.get(), colref,
 										   fExclusive);
 }
 
 CColConstraintsArrayMapper::CColConstraintsArrayMapper(
-	gpos::CMemoryPool *mp, gpos::owner<CConstraintArray *> pdrgpcnstr)
+	gpos::CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr)
 	: m_mp(mp), m_pdrgpcnstr(std::move(pdrgpcnstr))
 {
 }
 
 CColConstraintsArrayMapper::~CColConstraintsArrayMapper()
 {
-	m_pdrgpcnstr->Release();
+	;
 }

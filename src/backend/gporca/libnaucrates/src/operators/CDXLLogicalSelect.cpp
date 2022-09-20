@@ -71,7 +71,7 @@ CDXLLogicalSelect::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalSelect::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  gpos::pointer<const CDXLNode *> node) const
+								  const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -95,13 +95,13 @@ CDXLLogicalSelect::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalSelect::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLLogicalSelect::AssertValid(const CDXLNode *node,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == node->Arity());
 
-	gpos::pointer<CDXLNode *> condition_dxl = (*node)[0];
-	gpos::pointer<CDXLNode *> child_dxlnode = (*node)[1];
+	CDXLNode *condition_dxl = (*node)[0];
+	CDXLNode *child_dxlnode = (*node)[1];
 
 	GPOS_ASSERT(EdxloptypeScalar ==
 				condition_dxl->GetOperator()->GetDXLOperatorType());

@@ -46,13 +46,13 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	gpos::owner<CConstExprEvaluatorDefault *> pceevaldefault =
+	gpos::Ref<CConstExprEvaluatorDefault> pceevaldefault =
 		GPOS_NEW(mp) CConstExprEvaluatorDefault();
 	GPOS_ASSERT(!pceevaldefault->FCanEvalExpressions());
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
@@ -63,39 +63,38 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 	// Test evaluation of an integer constant
 	{
 		ULONG ulVal = 123456;
-		gpos::owner<CExpression *> pexprUl =
+		gpos::Ref<CExpression> pexprUl =
 			CUtils::PexprScalarConstInt4(mp, ulVal);
 #ifdef GPOS_DEBUG
-		gpos::owner<CExpression *> pexprUlResult =
-			pceevaldefault->PexprEval(pexprUl);
-		gpos::pointer<CScalarConst *> pscalarconstUl =
+		gpos::Ref<CExpression> pexprUlResult =
+			pceevaldefault->PexprEval(pexprUl.get());
+		CScalarConst *pscalarconstUl =
 			gpos::dyn_cast<CScalarConst>(pexprUl->Pop());
-		gpos::pointer<CScalarConst *> pscalarconstUlResult =
+		CScalarConst *pscalarconstUlResult =
 			gpos::dyn_cast<CScalarConst>(pexprUlResult->Pop());
 		GPOS_ASSERT(pscalarconstUl->Matches(pscalarconstUlResult));
-		pexprUlResult->Release();
+		;
 #endif	// GPOS_DEBUG
-		pexprUl->Release();
+		;
 	}
 
 	// Test evaluation of a null test expression
 	{
 		ULONG ulVal = 123456;
-		gpos::owner<CExpression *> pexprUl =
+		gpos::Ref<CExpression> pexprUl =
 			CUtils::PexprScalarConstInt4(mp, ulVal);
-		gpos::owner<CExpression *> pexprIsNull =
+		gpos::Ref<CExpression> pexprIsNull =
 			CUtils::PexprIsNull(mp, std::move(pexprUl));
 #ifdef GPOS_DEBUG
-		gpos::owner<CExpression *> pexprResult =
-			pceevaldefault->PexprEval(pexprIsNull);
-		gpos::pointer<gpopt::CScalarNullTest *> pscalarnulltest =
+		gpos::Ref<CExpression> pexprResult =
+			pceevaldefault->PexprEval(pexprIsNull.get());
+		gpopt::CScalarNullTest *pscalarnulltest =
 			gpos::dyn_cast<CScalarNullTest>(pexprIsNull->Pop());
 		GPOS_ASSERT(pscalarnulltest->Matches(pexprResult->Pop()));
-		pexprResult->Release();
+		;
 #endif	// GPOS_DEBUG
-		pexprIsNull->Release();
-	}
-	pceevaldefault->Release();
+		;
+	};
 
 	return GPOS_OK;
 }

@@ -37,7 +37,7 @@ class CColumnDescriptor : public CRefCount,
 {
 private:
 	// type information
-	gpos::pointer<const IMDType *> m_pmdtype;
+	const IMDType *m_pmdtype;
 
 	// type modifier
 	const INT m_type_modifier;
@@ -59,7 +59,7 @@ private:
 
 public:
 	// ctor
-	CColumnDescriptor(CMemoryPool *mp, gpos::pointer<const IMDType *> pmdtype,
+	CColumnDescriptor(CMemoryPool *mp, const IMDType *pmdtype,
 					  INT type_modifier, const CName &name, INT attno,
 					  BOOL is_nullable, ULONG ulWidth = gpos::ulong_max);
 
@@ -74,7 +74,7 @@ public:
 	}
 
 	// return metadata type
-	gpos::pointer<const IMDType *>
+	const IMDType *
 	RetrieveType() const
 	{
 		return m_pmdtype;

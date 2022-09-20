@@ -79,12 +79,11 @@ CScalarCoalesce::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCoalesce::Matches(gpos::pointer<COperator *> pop) const
+CScalarCoalesce::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarCoalesce *> popScCoalesce =
-			gpos::dyn_cast<CScalarCoalesce>(pop);
+		CScalarCoalesce *popScCoalesce = gpos::dyn_cast<CScalarCoalesce>(pop);
 
 		// match if return types are identical
 		return popScCoalesce->MdidType()->Equals(m_mdid_type.get());

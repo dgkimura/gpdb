@@ -29,7 +29,7 @@ class COperator;
 class CReqdProp;
 
 // dynamic array for required properties
-using CReqdPropArray = CDynamicPtrArray<CReqdProp, CleanupRelease>;
+using CReqdPropArray = gpos::Vector<gpos::Ref<CReqdProp>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -104,9 +104,8 @@ public:
 
 	// required properties computation function
 	virtual void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 gpos::pointer<CReqdProp *> prpInput, ULONG child_index,
-						 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-						 ULONG ulOptReq) = 0;
+						 CReqdProp *prpInput, ULONG child_index,
+						 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) = 0;
 
 	virtual gpos::IOstream &OsPrint(gpos::IOstream &os) const = 0;
 

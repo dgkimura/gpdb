@@ -32,7 +32,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalCTEConsumer::CDXLLogicalCTEConsumer(
-	CMemoryPool *mp, ULONG id, gpos::owner<ULongPtrArray *> output_colids_array)
+	CMemoryPool *mp, ULONG id, gpos::Ref<ULongPtrArray> output_colids_array)
 	: CDXLLogical(mp),
 	  m_id(id),
 	  m_output_colids_array(std::move(output_colids_array))
@@ -50,7 +50,7 @@ CDXLLogicalCTEConsumer::CDXLLogicalCTEConsumer(
 //---------------------------------------------------------------------------
 CDXLLogicalCTEConsumer::~CDXLLogicalCTEConsumer()
 {
-	m_output_colids_array->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -114,9 +114,8 @@ CDXLLogicalCTEConsumer::IsColDefined(ULONG colid) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalCTEConsumer::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *>	 //dxlnode
+CDXLLogicalCTEConsumer::SerializeToDXL(CXMLSerializer *xml_serializer,
+									   const CDXLNode *	 //dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -127,7 +126,7 @@ CDXLLogicalCTEConsumer::SerializeToDXL(
 								 Id());
 
 	CWStringDynamic *str_colids =
-		CDXLUtils::Serialize(m_mp, m_output_colids_array);
+		CDXLUtils::Serialize(m_mp, m_output_colids_array.get());
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenColumns),
 								 str_colids);
 	GPOS_DELETE(str_colids);
@@ -146,7 +145,7 @@ CDXLLogicalCTEConsumer::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalCTEConsumer::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLLogicalCTEConsumer::AssertValid(const CDXLNode *dxlnode,
 									BOOL  // validate_children
 ) const
 {

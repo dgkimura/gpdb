@@ -37,7 +37,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// plan DXL node
-	gpos::pointer<const CDXLNode *> m_plan_dxl_root;
+	const CDXLNode *m_plan_dxl_root;
 
 	// serialized plan
 	CWStringDynamic *m_pstrPlan;
@@ -53,9 +53,8 @@ public:
 	CSerializablePlan(const CSerializablePlan &) = delete;
 
 	// ctor
-	CSerializablePlan(CMemoryPool *mp,
-					  gpos::pointer<const CDXLNode *> pdxlnPlan, ULLONG plan_id,
-					  ULLONG plan_space_size);
+	CSerializablePlan(CMemoryPool *mp, const CDXLNode *pdxlnPlan,
+					  ULLONG plan_id, ULLONG plan_space_size);
 
 	// dtor
 	~CSerializablePlan() override;

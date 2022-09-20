@@ -48,7 +48,7 @@ CLogicalPartitionSelector::CLogicalPartitionSelector(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CLogicalPartitionSelector::CLogicalPartitionSelector(
 	CMemoryPool *mp, gpos::Ref<IMDId> mdid,
-	gpos::owner<CExpressionArray *> pdrgpexprFilters, CColRef *pcrOid)
+	gpos::Ref<CExpressionArray> pdrgpexprFilters, CColRef *pcrOid)
 	: CLogical(mp),
 	  m_mdid(mdid),
 	  m_pdrgpexprFilters(std::move(pdrgpexprFilters)),
@@ -70,7 +70,7 @@ CLogicalPartitionSelector::CLogicalPartitionSelector(
 //---------------------------------------------------------------------------
 CLogicalPartitionSelector::~CLogicalPartitionSelector()
 {
-	CRefCount::SafeRelease(m_pdrgpexprFilters);
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -82,19 +82,20 @@ CLogicalPartitionSelector::~CLogicalPartitionSelector()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalPartitionSelector::Matches(gpos::pointer<COperator *> pop) const
+CLogicalPartitionSelector::Matches(COperator *pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CLogicalPartitionSelector *> popPartSelector =
+	CLogicalPartitionSelector *popPartSelector =
 		gpos::dyn_cast<CLogicalPartitionSelector>(pop);
 
 	return popPartSelector->PcrOid() == m_pcrOid &&
 		   popPartSelector->MDId()->Equals(m_mdid.get()) &&
-		   popPartSelector->m_pdrgpexprFilters->Equals(m_pdrgpexprFilters);
+		   popPartSelector->m_pdrgpexprFilters->Equals(
+			   m_pdrgpexprFilters.get());
 }
 
 //---------------------------------------------------------------------------
@@ -119,14 +120,13 @@ CLogicalPartitionSelector::HashValue() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
+gpos::Ref<COperator>
 CLogicalPartitionSelector::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
 	CColRef *pcrOid = CUtils::PcrRemap(m_pcrOid, colref_mapping, must_exist);
-	gpos::owner<CExpressionArray *> pdrgpexpr =
-		CUtils::PdrgpexprRemap(mp, m_pdrgpexprFilters, colref_mapping);
+	gpos::Ref<CExpressionArray> pdrgpexpr =
+		CUtils::PdrgpexprRemap(mp, m_pdrgpexprFilters.get(), colref_mapping);
 
 	return GPOS_NEW(mp)
 		CLogicalPartitionSelector(mp, m_mdid, std::move(pdrgpexpr), pcrOid);
@@ -140,11 +140,11 @@ CLogicalPartitionSelector::PopCopyWithRemappedColumns(
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CLogicalPartitionSelector::DeriveOutputColumns(CMemoryPool *mp,
 											   CExpressionHandle &exprhdl)
 {
-	gpos::owner<CColRefSet *> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrsOutput = GPOS_NEW(mp) CColRefSet(mp);
 
 	pcrsOutput->Union(exprhdl.DeriveOutputColumns(0));
 	pcrsOutput->Include(m_pcrOid);
@@ -176,10 +176,10 @@ CLogicalPartitionSelector::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalPartitionSelector::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementPartitionSelector);
 	return xform_set;
 }

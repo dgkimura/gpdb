@@ -20,8 +20,9 @@
 namespace gpopt
 {
 using ExprPredToExprPredPartMap =
-	CHashMap<CExpression, CExpression, CExpression::HashValue, CUtils::Equals,
-			 CleanupRelease<CExpression>, CleanupRelease<CExpression>>;
+	gpos::UnorderedMap<gpos::Ref<CExpression>, gpos::Ref<CExpression>,
+					   gpos::RefHash<CExpression, CExpression::HashValue>,
+					   gpos::RefEq<CExpression, CUtils::Equals>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -34,10 +35,10 @@ using ExprPredToExprPredPartMap =
 class CLogicalSelect : public CLogicalUnary
 {
 private:
-	gpos::owner<ExprPredToExprPredPartMap *> m_phmPexprPartPred;
+	gpos::Ref<ExprPredToExprPredPartMap> m_phmPexprPartPred;
 
 	// table descriptor
-	gpos::pointer<CTableDescriptor *> m_ptabdesc;
+	CTableDescriptor *m_ptabdesc;
 
 public:
 	CLogicalSelect(const CLogicalSelect &) = delete;
@@ -46,7 +47,7 @@ public:
 	explicit CLogicalSelect(CMemoryPool *mp);
 
 	// ctor
-	CLogicalSelect(CMemoryPool *mp, gpos::pointer<CTableDescriptor *> ptabdesc);
+	CLogicalSelect(CMemoryPool *mp, CTableDescriptor *ptabdesc);
 
 	// dtor
 	~CLogicalSelect() override;
@@ -65,7 +66,7 @@ public:
 	}
 
 	// return table's descriptor
-	gpos::pointer<CTableDescriptor *>
+	CTableDescriptor *
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
@@ -76,11 +77,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	gpos::owner<CColRefSet *> DeriveOutputColumns(CMemoryPool *,
-												  CExpressionHandle &) override;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(CMemoryPool *,
+											  CExpressionHandle &) override;
 
 	// dervive keys
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -88,7 +89,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *>
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -96,7 +97,7 @@ public:
 	}
 
 	// derive table descriptor
-	gpos::pointer<CTableDescriptor *>
+	CTableDescriptor *
 	DeriveTableDescriptor(CMemoryPool *,  // mp
 						  CExpressionHandle &exprhdl) const override
 	{
@@ -104,17 +105,17 @@ public:
 	}
 
 	// compute partition predicate to pass down to n-th child
-	gpos::owner<CExpression *> PexprPartPred(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CExpression *> pexprInput,
-		ULONG child_index) const override;
+	gpos::Ref<CExpression> PexprPartPred(CMemoryPool *mp,
+										 CExpressionHandle &exprhdl,
+										 CExpression *pexprInput,
+										 ULONG child_index) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -128,7 +129,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CLogicalSelect *>
+	static CLogicalSelect *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -138,9 +139,9 @@ public:
 	}
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 };	// class CLogicalSelect
 

@@ -105,11 +105,11 @@ CScalarCmp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCmp::Matches(gpos::pointer<COperator *> pop) const
+CScalarCmp::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarCmp *> popScCmp = gpos::dyn_cast<CScalarCmp>(pop);
+		CScalarCmp *popScCmp = gpos::dyn_cast<CScalarCmp>(pop);
 
 		// match if operator oid are identical
 		return m_mdid_op->Equals(popScCmp->MdIdOp());
@@ -158,7 +158,7 @@ CScalarCmp::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarCmp::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
+CScalarCmp::Eber(ULongPtrArray *pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{
@@ -170,11 +170,10 @@ CScalarCmp::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
 
 // get metadata id of the commuted operator
 IMDId *
-CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor,
-						   gpos::pointer<COperator *> pop)
+CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor, COperator *pop)
 {
-	gpos::pointer<CScalarCmp *> popScalarCmp = dynamic_cast<CScalarCmp *>(pop);
-	gpos::pointer<const IMDScalarOp *> pmdScalarCmpOp =
+	CScalarCmp *popScalarCmp = dynamic_cast<CScalarCmp *>(pop);
+	const IMDScalarOp *pmdScalarCmpOp =
 		md_accessor->RetrieveScOp(popScalarCmp->MdIdOp());
 
 	IMDId *pmdidScalarCmpCommute = pmdScalarCmpOp->GetCommuteOpMdid();
@@ -183,17 +182,16 @@ CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor,
 
 // get the string representation of a metadata object
 CWStringConst *
-CScalarCmp::Pstr(CMemoryPool *mp, CMDAccessor *md_accessor,
-				 gpos::pointer<IMDId *> mdid)
+CScalarCmp::Pstr(CMemoryPool *mp, CMDAccessor *md_accessor, IMDId *mdid)
 {
-	mdid->AddRef();
+	;
 	return GPOS_NEW(mp) CWStringConst(
 		mp,
 		(md_accessor->RetrieveScOp(mdid)->Mdname().GetMDName())->GetBuffer());
 }
 
 // get commuted scalar comparision operator
-gpos::owner<CScalarCmp *>
+gpos::Ref<CScalarCmp>
 CScalarCmp::PopCommutedOp(CMemoryPool *mp)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

@@ -30,8 +30,8 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
-						   gpos::owner<IConstExprEvaluator *> pceeval,
-						   gpos::owner<COptimizerConfig *> optimizer_config)
+						   gpos::Ref<IConstExprEvaluator> pceeval,
+						   gpos::Ref<COptimizerConfig> optimizer_config)
 {
 	if (nullptr == optimizer_config)
 	{
@@ -59,13 +59,13 @@ CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
 //
 //---------------------------------------------------------------------------
 CAutoOptCtxt::CAutoOptCtxt(CMemoryPool *mp, CMDAccessor *md_accessor,
-						   gpos::owner<IConstExprEvaluator *> pceeval,
-						   gpos::owner<ICostModel *> pcm)
+						   gpos::Ref<IConstExprEvaluator> pceeval,
+						   gpos::Ref<ICostModel> pcm)
 {
 	GPOS_ASSERT(nullptr != pcm);
 
 	// create default statistics configuration
-	gpos::owner<COptimizerConfig *> optimizer_config =
+	gpos::Ref<COptimizerConfig> optimizer_config =
 		COptimizerConfig::PoconfDefault(mp, pcm);
 
 	if (nullptr == pceeval)

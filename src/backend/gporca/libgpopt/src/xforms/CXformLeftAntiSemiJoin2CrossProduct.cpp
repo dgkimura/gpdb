@@ -62,7 +62,7 @@ CXformLeftAntiSemiJoin2CrossProduct::CXformLeftAntiSemiJoin2CrossProduct(
 //
 //---------------------------------------------------------------------------
 CXformLeftAntiSemiJoin2CrossProduct::CXformLeftAntiSemiJoin2CrossProduct(
-	gpos::owner<CExpression *> pexprPattern)
+	gpos::Ref<CExpression> pexprPattern)
 	: CXformExploration(std::move(pexprPattern))
 {
 }
@@ -96,10 +96,9 @@ CXformLeftAntiSemiJoin2CrossProduct::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftAntiSemiJoin2CrossProduct::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+CXformLeftAntiSemiJoin2CrossProduct::Transform(CXformContext *pxfctxt,
+											   CXformResult *pxfres,
+											   CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -111,34 +110,34 @@ CXformLeftAntiSemiJoin2CrossProduct::Transform(
 	CExpression *pexprOuter = (*pexpr)[0];
 	CExpression *pexprInner = (*pexpr)[1];
 	CExpression *pexprScalar = (*pexpr)[2];
-	pexprOuter->AddRef();
-	pexprInner->AddRef();
-	pexprScalar->AddRef();
+	;
+	;
+	;
 
-	gpos::owner<CExpression *> pexprNegatedScalar =
+	gpos::Ref<CExpression> pexprNegatedScalar =
 		CUtils::PexprNegate(mp, pexprScalar);
 
 	// create a (limit 1) on top of inner child
-	gpos::owner<CExpression *> pexprLimitOffset =
+	gpos::Ref<CExpression> pexprLimitOffset =
 		CUtils::PexprScalarConstInt8(mp, 0 /*val*/);
-	gpos::owner<CExpression *> pexprLimitCount =
+	gpos::Ref<CExpression> pexprLimitCount =
 		CUtils::PexprScalarConstInt8(mp, 1 /*val*/);
-	gpos::owner<COrderSpec *> pos = GPOS_NEW(mp) COrderSpec(mp);
-	gpos::owner<CLogicalLimit *> popLimit = GPOS_NEW(mp)
+	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
+	gpos::Ref<CLogicalLimit> popLimit = GPOS_NEW(mp)
 		CLogicalLimit(mp, std::move(pos), true /*fGlobal*/, true /*fHasCount*/,
 					  false /*fNonRemovableLimit*/);
-	gpos::owner<CExpression *> pexprLimit = GPOS_NEW(mp)
+	gpos::Ref<CExpression> pexprLimit = GPOS_NEW(mp)
 		CExpression(mp, std::move(popLimit), pexprInner,
 					std::move(pexprLimitOffset), std::move(pexprLimitCount));
 
 	// create cross product
-	gpos::owner<CExpression *> pexprJoin =
+	gpos::Ref<CExpression> pexprJoin =
 		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
 			mp, pexprOuter, std::move(pexprLimit),
 			std::move(pexprNegatedScalar));
-	gpos::owner<CExpression *> pexprNormalized =
-		CNormalizer::PexprNormalize(mp, pexprJoin);
-	pexprJoin->Release();
+	gpos::Ref<CExpression> pexprNormalized =
+		CNormalizer::PexprNormalize(mp, pexprJoin.get());
+	;
 
 	pxfres->Add(std::move(pexprNormalized));
 }

@@ -67,7 +67,7 @@ CParseHandlerScalarCast::StartElement(const XMLCh *const,  // element_uri,
 		}
 
 		// parse and create scalar cast
-		gpos::owner<CDXLScalarCast *> dxl_op =
+		gpos::Ref<CDXLScalarCast> dxl_op =
 			gpos::cast<CDXLScalarCast>(CDXLOperatorFactory::MakeDXLCast(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 

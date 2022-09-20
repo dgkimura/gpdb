@@ -51,9 +51,9 @@ public:
 	virtual IMDId *GetRelMdId() const = 0;
 
 	// the scalar expression of the check constraint
-	virtual gpos::owner<CExpression *> GetCheckConstraintExpr(
+	virtual gpos::Ref<CExpression> GetCheckConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::pointer<CColRefArray *> colref_array) const = 0;
+		CColRefArray *colref_array) const = 0;
 };
 }  // namespace gpmd
 

@@ -101,7 +101,7 @@ private:
 	ECtasOnCommitAction m_ctas_on_commit_action;
 
 	// array of name-value pairs of storage options
-	gpos::owner<CDXLCtasOptionArray *> m_ctas_storage_option_array;
+	gpos::Ref<CDXLCtasOptionArray> m_ctas_storage_option_array;
 
 	// string representation of OnCommit action
 	static const CWStringConst *GetOnCommitActionStr(
@@ -113,7 +113,7 @@ public:
 	// ctor
 	CDXLCtasStorageOptions(
 		CMDName *mdname_tablespace, ECtasOnCommitAction ctas_on_commit_action,
-		gpos::owner<CDXLCtasOptionArray *> ctas_storage_option_array);
+		gpos::Ref<CDXLCtasOptionArray> ctas_storage_option_array);
 
 	// dtor
 	~CDXLCtasStorageOptions() override;
@@ -125,7 +125,7 @@ public:
 	CDXLCtasStorageOptions::ECtasOnCommitAction GetOnCommitAction() const;
 
 	// accessor to options
-	gpos::pointer<CDXLCtasOptionArray *> GetDXLCtasOptionArray() const;
+	CDXLCtasOptionArray *GetDXLCtasOptionArray() const;
 
 	// serialize to DXL
 	void Serialize(CXMLSerializer *xml_serializer) const;

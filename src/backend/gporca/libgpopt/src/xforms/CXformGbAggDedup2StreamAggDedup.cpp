@@ -50,10 +50,9 @@ CXformGbAggDedup2StreamAggDedup::CXformGbAggDedup2StreamAggDedup(
 //
 //---------------------------------------------------------------------------
 void
-CXformGbAggDedup2StreamAggDedup::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+CXformGbAggDedup2StreamAggDedup::Transform(CXformContext *pxfctxt,
+										   CXformResult *pxfres,
+										   CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -66,19 +65,19 @@ CXformGbAggDedup2StreamAggDedup::Transform(
 	GPOS_ASSERT(0 == pexprScalar->Arity());
 
 	// addref children
-	pexprRel->AddRef();
-	pexprScalar->AddRef();
+	;
+	;
 
-	gpos::pointer<CLogicalGbAggDeduplicate *> popAggDedup =
+	CLogicalGbAggDeduplicate *popAggDedup =
 		gpos::dyn_cast<CLogicalGbAggDeduplicate>(pexpr->Pop());
-	gpos::owner<CColRefArray *> colref_array = popAggDedup->Pdrgpcr();
-	colref_array->AddRef();
+	gpos::Ref<CColRefArray> colref_array = popAggDedup->Pdrgpcr();
+	;
 
-	gpos::owner<CColRefArray *> pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
-	pdrgpcrKeys->AddRef();
+	gpos::Ref<CColRefArray> pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
+	;
 
 	// create alternative expression
-	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalStreamAggDeduplicate(
 			mp, std::move(colref_array), popAggDedup->PdrgpcrMinimal(),

@@ -35,19 +35,19 @@ class CJoinOrderMinCard : public CJoinOrder
 {
 private:
 	// result component
-	gpos::owner<SComponent *> m_pcompResult;
+	gpos::Ref<SComponent> m_pcompResult;
 
 public:
 	// ctor
 	CJoinOrderMinCard(CMemoryPool *mp,
-					  gpos::owner<CExpressionArray *> pdrgpexprComponents,
-					  gpos::owner<CExpressionArray *> pdrgpexprConjuncts);
+					  gpos::Ref<CExpressionArray> pdrgpexprComponents,
+					  gpos::Ref<CExpressionArray> pdrgpexprConjuncts);
 
 	// dtor
 	~CJoinOrderMinCard() override;
 
 	// main handler
-	virtual gpos::owner<CExpression *> PexprExpand();
+	virtual gpos::Ref<CExpression> PexprExpand();
 
 	// print function
 	IOstream &OsPrint(IOstream &) const;

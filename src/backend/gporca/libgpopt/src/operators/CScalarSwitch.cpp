@@ -76,12 +76,11 @@ CScalarSwitch::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSwitch::Matches(gpos::pointer<COperator *> pop) const
+CScalarSwitch::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarSwitch *> popScSwitch =
-			gpos::dyn_cast<CScalarSwitch>(pop);
+		CScalarSwitch *popScSwitch = gpos::dyn_cast<CScalarSwitch>(pop);
 
 		// match if return types are identical
 		return popScSwitch->MdidType()->Equals(m_mdid_type.get());

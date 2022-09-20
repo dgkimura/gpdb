@@ -87,15 +87,14 @@ CScalarArrayRef::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayRef::Matches(gpos::pointer<COperator *> pop) const
+CScalarArrayRef::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CScalarArrayRef *> popArrayRef =
-		gpos::dyn_cast<CScalarArrayRef>(pop);
+	CScalarArrayRef *popArrayRef = gpos::dyn_cast<CScalarArrayRef>(pop);
 
 	return m_mdid_type->Equals(popArrayRef->MdidType()) &&
 		   m_pmdidElem->Equals(popArrayRef->PmdidElem()) &&

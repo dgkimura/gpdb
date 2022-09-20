@@ -26,7 +26,7 @@ class CFunctionalDependency;
 
 // definition of array of functional dependencies
 using CFunctionalDependencyArray =
-	CDynamicPtrArray<CFunctionalDependency, CleanupRelease>;
+	gpos::Vector<gpos::Ref<CFunctionalDependency>>;
 
 using namespace gpos;
 
@@ -43,47 +43,47 @@ class CFunctionalDependency : public CRefCount,
 {
 private:
 	// the left hand side of the FD
-	gpos::owner<CColRefSet *> m_pcrsKey;
+	gpos::Ref<CColRefSet> m_pcrsKey;
 
 	// the right hand side of the FD
-	gpos::owner<CColRefSet *> m_pcrsDetermined;
+	gpos::Ref<CColRefSet> m_pcrsDetermined;
 
 public:
 	CFunctionalDependency(const CFunctionalDependency &) = delete;
 
 	// ctor
-	CFunctionalDependency(gpos::owner<CColRefSet *> pcrsKey,
-						  gpos::owner<CColRefSet *> pcrsDetermined);
+	CFunctionalDependency(gpos::Ref<CColRefSet> pcrsKey,
+						  gpos::Ref<CColRefSet> pcrsDetermined);
 
 	// dtor
 	~CFunctionalDependency() override;
 
 	// key set accessor
-	gpos::pointer<CColRefSet *>
+	CColRefSet *
 	PcrsKey() const
 	{
-		return m_pcrsKey;
+		return m_pcrsKey.get();
 	}
 
 	// determined set accessor
-	gpos::pointer<CColRefSet *>
+	CColRefSet *
 	PcrsDetermined() const
 	{
-		return m_pcrsDetermined;
+		return m_pcrsDetermined.get();
 	}
 
 	// determine if all FD columns are included in the given column set
-	BOOL FIncluded(gpos::pointer<CColRefSet *> pcrs) const;
+	BOOL FIncluded(CColRefSet *pcrs) const;
 
 	// hash function
 	virtual ULONG HashValue() const;
 
 	// equality function
-	BOOL Equals(gpos::pointer<const CFunctionalDependency *> pfd) const;
+	BOOL Equals(const CFunctionalDependency *pfd) const;
 
 	// do the given arguments form a functional dependency
 	BOOL
-	FFunctionallyDependent(gpos::pointer<CColRefSet *> pcrsKey, CColRef *colref)
+	FFunctionallyDependent(CColRefSet *pcrsKey, CColRef *colref)
 	{
 		GPOS_ASSERT(nullptr != pcrsKey);
 		GPOS_ASSERT(nullptr != colref);
@@ -95,23 +95,19 @@ public:
 	IOstream &OsPrint(IOstream &os) const;
 
 	// hash function
-	static ULONG HashValue(
-		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd);
+	static ULONG HashValue(const CFunctionalDependencyArray *pdrgpfd);
 
 	// equality function
-	static BOOL Equals(
-		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfdFst,
-		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfdSnd);
+	static BOOL Equals(const CFunctionalDependencyArray *pdrgpfdFst,
+					   const CFunctionalDependencyArray *pdrgpfdSnd);
 
 	// create a set of all keys in the passed FD's array
-	static gpos::owner<CColRefSet *> PcrsKeys(
-		CMemoryPool *mp,
-		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd);
+	static gpos::Ref<CColRefSet> PcrsKeys(
+		CMemoryPool *mp, const CFunctionalDependencyArray *pdrgpfd);
 
 	// create an array of all keys in the passed FD's array
-	static gpos::owner<CColRefArray *> PdrgpcrKeys(
-		CMemoryPool *mp,
-		gpos::pointer<const CFunctionalDependencyArray *> pdrgpfd);
+	static gpos::Ref<CColRefArray> PdrgpcrKeys(
+		CMemoryPool *mp, const CFunctionalDependencyArray *pdrgpfd);
 
 
 };	// class CFunctionalDependency

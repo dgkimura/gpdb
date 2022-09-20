@@ -49,9 +49,8 @@ CXformImplementPartitionSelector::CXformImplementPartitionSelector(
 //---------------------------------------------------------------------------
 void
 CXformImplementPartitionSelector::Transform(
-	gpos::pointer<CXformContext *> pxfctxt GPOS_UNUSED,
-	gpos::pointer<CXformResult *> pxfres GPOS_UNUSED,
-	gpos::pointer<CExpression *> pexpr GPOS_UNUSED) const
+	CXformContext *pxfctxt GPOS_UNUSED, CXformResult *pxfres GPOS_UNUSED,
+	CExpression *pexpr GPOS_UNUSED) const
 {
 }
 

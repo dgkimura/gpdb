@@ -26,52 +26,43 @@ private:
 	// helper to add IndexApply expression to given xform results container
 	// for homogeneous b-tree indexes
 	static void CreateHomogeneousBtreeIndexApplyAlternatives(
-		CMemoryPool *mp, gpos::pointer<COperator *> joinOp,
-		CExpression *pexprOuter, gpos::pointer<CExpression *> pexprInner,
-		gpos::pointer<CExpression *> pexprScalar, CExpression *origJoinPred,
-		gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
+		CMemoryPool *mp, COperator *joinOp, CExpression *pexprOuter,
+		CExpression *pexprInner, CExpression *pexprScalar,
+		CExpression *origJoinPred, CExpression *nodesToInsertAboveIndexGet,
 		CExpression *endOfNodesToInsertAboveIndexGet,
-		gpos::pointer<CTableDescriptor *> ptabdescInner,
-		gpos::pointer<CColRefSet *> pcrsScalarExpr,
-		gpos::pointer<CColRefSet *> outer_refs,
-		gpos::pointer<CColRefSet *> pcrsReqd, ULONG ulIndices,
-		gpos::pointer<CXformResult *> pxfres);
+		CTableDescriptor *ptabdescInner, CColRefSet *pcrsScalarExpr,
+		CColRefSet *outer_refs, CColRefSet *pcrsReqd, ULONG ulIndices,
+		CXformResult *pxfres);
 
 	// helper to add IndexApply expression to given xform results container
 	// for homogeneous b-tree indexes
 	static void CreateAlternativesForBtreeIndex(
-		CMemoryPool *mp, gpos::pointer<COperator *> joinOp,
-		CExpression *pexprOuter, gpos::pointer<CExpression *> pexprInner,
-		gpos::owner<CExpression *> origJoinPred,
-		gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
+		CMemoryPool *mp, COperator *joinOp, CExpression *pexprOuter,
+		CExpression *pexprInner, gpos::Ref<CExpression> origJoinPred,
+		CExpression *nodesToInsertAboveIndexGet,
 		CExpression *endOfNodesToInsertAboveIndexGet, CMDAccessor *md_accessor,
-		gpos::pointer<CExpressionArray *> pdrgpexprConjuncts,
-		gpos::pointer<CColRefSet *> pcrsScalarExpr,
-		gpos::pointer<CColRefSet *> outer_refs,
-		gpos::pointer<CColRefSet *> pcrsReqd,
-		gpos::pointer<const IMDRelation *> pmdrel,
-		gpos::pointer<const IMDIndex *> pmdindex,
-		gpos::pointer<CXformResult *> pxfres);
+		CExpressionArray *pdrgpexprConjuncts, CColRefSet *pcrsScalarExpr,
+		CColRefSet *outer_refs, CColRefSet *pcrsReqd, const IMDRelation *pmdrel,
+		const IMDIndex *pmdindex, CXformResult *pxfres);
 
 	// helper to add IndexApply expression to given xform results container
 	// for homogeneous bitmap indexes
 	static void CreateHomogeneousBitmapIndexApplyAlternatives(
-		CMemoryPool *mp, gpos::pointer<COperator *> joinOp,
-		CExpression *pexprOuter, gpos::pointer<CExpression *> pexprInner,
-		CExpression *pexprScalar, gpos::owner<CExpression *> origJoinPred,
-		gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
+		CMemoryPool *mp, COperator *joinOp, CExpression *pexprOuter,
+		CExpression *pexprInner, CExpression *pexprScalar,
+		gpos::Ref<CExpression> origJoinPred,
+		CExpression *nodesToInsertAboveIndexGet,
 		CExpression *endOfNodesToInsertAboveIndexGet,
 		CTableDescriptor *ptabdescInner, CColRefSet *outer_refs,
-		CColRefSet *pcrsReqd, gpos::pointer<CXformResult *> pxfres);
+		CColRefSet *pcrsReqd, CXformResult *pxfres);
 
 	// based on the inner and the scalar expression, it computes scalar expression
 	// columns, outer references and required columns
-	static void ComputeColumnSets(CMemoryPool *mp,
-								  gpos::pointer<CExpression *> pexprInner,
-								  gpos::pointer<CExpression *> pexprScalar,
+	static void ComputeColumnSets(CMemoryPool *mp, CExpression *pexprInner,
+								  CExpression *pexprScalar,
 								  CColRefSet **ppcrsScalarExpr,
-								  gpos::owner<CColRefSet *> *ppcrsOuterRefs,
-								  gpos::owner<CColRefSet *> *ppcrsReqd);
+								  gpos::Ref<CColRefSet> *ppcrsOuterRefs,
+								  gpos::Ref<CColRefSet> *ppcrsReqd);
 
 protected:
 	// is the logical join that is being transformed an outer join?
@@ -80,19 +71,18 @@ protected:
 	// helper to add IndexApply expression to given xform results container
 	// for homogeneous indexes
 	virtual void CreateHomogeneousIndexApplyAlternatives(
-		CMemoryPool *mp, gpos::pointer<COperator *> joinOp,
-		CExpression *pexprOuter, gpos::pointer<CExpression *> pexprInner,
-		CExpression *pexprScalar, CExpression *origJoinPred,
-		gpos::pointer<CExpression *> nodesToInsertAboveIndexGet,
+		CMemoryPool *mp, COperator *joinOp, CExpression *pexprOuter,
+		CExpression *pexprInner, CExpression *pexprScalar,
+		CExpression *origJoinPred, CExpression *nodesToInsertAboveIndexGet,
 		CExpression *endOfNodesToInsertAboveIndexGet,
-		CTableDescriptor *PtabdescInner, gpos::pointer<CXformResult *> pxfres,
+		CTableDescriptor *PtabdescInner, CXformResult *pxfres,
 		gpmd::IMDIndex::EmdindexType emdtype) const;
 
 public:
 	CXformJoin2IndexApply(const CXformJoin2IndexApply &) = delete;
 
 	// ctor
-	explicit CXformJoin2IndexApply(gpos::owner<CExpression *> pexprPattern)
+	explicit CXformJoin2IndexApply(gpos::Ref<CExpression> pexprPattern)
 		: CXformExploration(pexprPattern)
 	{
 		m_fOuterJoin = (COperator::EopLogicalLeftOuterJoin ==

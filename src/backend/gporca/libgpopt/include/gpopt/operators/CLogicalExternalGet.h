@@ -41,11 +41,11 @@ public:
 	explicit CLogicalExternalGet(CMemoryPool *mp);
 
 	CLogicalExternalGet(CMemoryPool *mp, const CName *pnameAlias,
-						gpos::owner<CTableDescriptor *> ptabdesc);
+						gpos::Ref<CTableDescriptor> ptabdesc);
 
 	CLogicalExternalGet(CMemoryPool *mp, const CName *pnameAlias,
-						gpos::owner<CTableDescriptor *> ptabdesc,
-						gpos::owner<CColRefArray *> pdrgpcrOutput);
+						gpos::Ref<CTableDescriptor> ptabdesc,
+						gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// ident accessors
 	EOperatorId
@@ -62,11 +62,11 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -74,11 +74,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	gpos::owner<CColRefSet *>
-	PcrsStat(CMemoryPool *,				   // mp,
-			 CExpressionHandle &,		   // exprhdl
-			 gpos::pointer<CColRefSet *>,  // pcrsInput
-			 ULONG						   // child_index
+	gpos::Ref<CColRefSet>
+	PcrsStat(CMemoryPool *,		   // mp,
+			 CExpressionHandle &,  // exprhdl
+			 CColRefSet *,		   // pcrsInput
+			 ULONG				   // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalExternalGet has no children");
@@ -90,14 +90,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CLogicalExternalGet *>
+	static CLogicalExternalGet *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

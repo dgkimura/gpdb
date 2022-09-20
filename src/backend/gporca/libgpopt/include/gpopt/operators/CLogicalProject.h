@@ -32,15 +32,14 @@ class CLogicalProject : public CLogicalUnary
 {
 private:
 	// return equivalence class from scalar ident project element
-	static gpos::owner<CColRefSetArray *> PdrgpcrsEquivClassFromScIdent(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprPrEl,
-		gpos::pointer<CColRefSet *> not_null_columns);
+	static gpos::Ref<CColRefSetArray> PdrgpcrsEquivClassFromScIdent(
+		CMemoryPool *mp, CExpression *pexprPrEl, CColRefSet *not_null_columns);
 
 	// extract constraint from scalar constant project element
-	static void ExtractConstraintFromScConst(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprPrEl,
-		gpos::pointer<CConstraintArray *> pdrgpcnstr,
-		gpos::pointer<CColRefSetArray *> pdrgpcrs);
+	static void ExtractConstraintFromScConst(CMemoryPool *mp,
+											 CExpression *pexprPrEl,
+											 CConstraintArray *pdrgpcnstr,
+											 CColRefSetArray *pdrgpcrs);
 
 public:
 	CLogicalProject(const CLogicalProject &) = delete;
@@ -69,11 +68,11 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	gpos::owner<CColRefSet *> DeriveOutputColumns(
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -81,7 +80,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *> DerivePropertyConstraint(
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -89,19 +88,19 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *mp) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CLogicalProject *>
+	static CLogicalProject *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -83,12 +83,11 @@ CScalarCaseTest::FInputOrderSensitive() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCaseTest::Matches(gpos::pointer<COperator *> pop) const
+CScalarCaseTest::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarCaseTest *> popScCaseTest =
-			gpos::dyn_cast<CScalarCaseTest>(pop);
+		CScalarCaseTest *popScCaseTest = gpos::dyn_cast<CScalarCaseTest>(pop);
 
 		// match if return types are identical
 		return popScCaseTest->MdidType()->Equals(m_mdid_type.get());

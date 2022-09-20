@@ -38,12 +38,12 @@ using namespace gpos;
 //
 //---------------------------------------------------------------------------
 CPhysicalDynamicScan::CPhysicalDynamicScan(
-	CMemoryPool *mp, gpos::owner<CTableDescriptor *> ptabdesc,
-	ULONG ulOriginOpId, const CName *pnameAlias, ULONG scan_id,
-	gpos::owner<CColRefArray *> pdrgpcrOutput,
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrParts,
+	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+	const CName *pnameAlias, ULONG scan_id,
+	gpos::Ref<CColRefArray> pdrgpcrOutput,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
 	gpos::Ref<IMdIdArray> partition_mdids,
-	gpos::owner<ColRefToUlongMapArray *> root_col_mapping_per_part)
+	gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part)
 	: CPhysicalScan(mp, pnameAlias, ptabdesc, pdrgpcrOutput),
 	  m_ulOriginOpId(ulOriginOpId),
 	  m_scan_id(scan_id),
@@ -56,10 +56,8 @@ CPhysicalDynamicScan::CPhysicalDynamicScan(
 	GPOS_ASSERT(0 < m_pdrgpdrgpcrPart->Size());
 
 	CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
-	gpos::pointer<const IMDRelation *> root_rel =
-		mda->RetrieveRel(ptabdesc->MDId());
-	gpos::pointer<IMdIdArray *> all_partition_mdids =
-		root_rel->ChildPartitionMdids();
+	const IMDRelation *root_rel = mda->RetrieveRel(ptabdesc->MDId());
+	IMdIdArray *all_partition_mdids = root_rel->ChildPartitionMdids();
 	ULONG part_ptr = 0;
 	for (ULONG ul = 0; ul < m_partition_mdids->Size(); ul++)
 	{
@@ -82,8 +80,8 @@ CPhysicalDynamicScan::CPhysicalDynamicScan(
 //---------------------------------------------------------------------------
 CPhysicalDynamicScan::~CPhysicalDynamicScan()
 {
-	m_pdrgpdrgpcrPart->Release();
-	m_root_col_mapping_per_part->Release();
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -101,8 +99,8 @@ CPhysicalDynamicScan::HashValue() const
 		COperator::HashValue(),
 		gpos::CombineHashes(gpos::HashValue(&m_scan_id),
 							m_ptabdesc->MDId()->HashValue()));
-	ulHash =
-		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrOutput));
+	ulHash = gpos::CombineHashes(ulHash,
+								 CUtils::UlHashColArray(m_pdrgpcrOutput.get()));
 
 	return ulHash;
 }
@@ -127,7 +125,7 @@ CPhysicalDynamicScan::OsPrint(IOstream &os) const
 	os << " (";
 	m_ptabdesc->Name().OsPrint(os);
 	os << "), Columns: [";
-	CUtils::OsPrintDrgPcr(os, m_pdrgpcrOutput);
+	CUtils::OsPrintDrgPcr(os, m_pdrgpcrOutput.get());
 	os << "] Scan Id: " << m_scan_id;
 
 
@@ -143,7 +141,7 @@ CPhysicalDynamicScan::OsPrint(IOstream &os) const
 //		conversion function
 //
 //---------------------------------------------------------------------------
-gpos::cast_func<CPhysicalDynamicScan *>
+CPhysicalDynamicScan *
 CPhysicalDynamicScan::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);

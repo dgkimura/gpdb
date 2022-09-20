@@ -47,7 +47,7 @@ private:
 	gpos::Ref<IMDId> m_mdid_type_result;
 
 	// output argument types
-	gpos::pointer<IMdIdArray *> m_mdid_types_array;
+	IMdIdArray *m_mdid_types_array;
 
 	// whether function returns a set of values
 	BOOL m_returns_set;

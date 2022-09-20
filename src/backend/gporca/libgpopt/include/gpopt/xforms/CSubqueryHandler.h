@@ -96,40 +96,39 @@ private:
 	BOOL m_fEnforceCorrelatedApply;
 
 	// helper for adding nullness check, only if needed, to the given scalar expression
-	static gpos::owner<CExpression *> PexprIsNotNull(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprOuter,
-		gpos::pointer<CExpression *> pexprLogical, CExpression *pexprScalar);
+	static gpos::Ref<CExpression> PexprIsNotNull(CMemoryPool *mp,
+												 CExpression *pexprOuter,
+												 CExpression *pexprLogical,
+												 CExpression *pexprScalar);
 
 	// helper for adding a Project node with a const TRUE on top of the given expression
-	static void AddProjectNode(CMemoryPool *mp,
-							   gpos::owner<CExpression *> pexpr,
-							   gpos::owner<CExpression *> *ppexprResult);
+	static void AddProjectNode(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+							   gpos::Ref<CExpression> *ppexprResult);
 
 	// helper for creating a groupby node above or below the apply
-	static gpos::owner<CExpression *> CreateGroupByNode(
+	static gpos::Ref<CExpression> CreateGroupByNode(
 		CMemoryPool *mp, CExpression *pexprChild,
-		gpos::owner<CColRefArray *> colref_array, BOOL fExistential,
+		gpos::Ref<CColRefArray> colref_array, BOOL fExistential,
 		CColRef *colref, CExpression *pexprPredicate, CColRef **pcrCount,
 		CColRef **pcrSum);
 
 	// helper for creating an inner select expression when creating outer apply
-	static gpos::owner<CExpression *> PexprInnerSelect(
+	static gpos::Ref<CExpression> PexprInnerSelect(
 		CMemoryPool *mp, const CColRef *pcrInner, CExpression *pexprInner,
 		CExpression *pexprPredicate, BOOL *useNotNullableInnerOpt);
 
 	// helper for creating outer apply expression for scalar subqueries
 	static BOOL FCreateOuterApplyForScalarSubquery(
 		CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-		gpos::pointer<CExpression *> pexprSubquery, BOOL fOuterRefsUnderInner,
-		gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar);
+		CExpression *pexprSubquery, BOOL fOuterRefsUnderInner,
+		gpos::Ref<CExpression> *ppexprNewOuter,
+		gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// helper for creating grouping columns for outer apply expression
 	static BOOL FCreateGrpCols(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprOuter,
-		gpos::pointer<CExpression *> pexprInner, BOOL fExistential,
-		BOOL fOuterRefsUnderInner,
-		gpos::owner<CColRefArray *>
+		CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
+		BOOL fExistential, BOOL fOuterRefsUnderInner,
+		gpos::Ref<CColRefArray>
 			*ppdrgpcr,	   // output: constructed grouping columns
 		BOOL *pfGbOnInner  // output: is Gb created on inner expression
 	);
@@ -137,146 +136,141 @@ private:
 	// helper for creating outer apply expression for existential/quantified subqueries
 	static BOOL FCreateOuterApplyForExistOrQuant(
 		CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-		gpos::pointer<CExpression *> pexprSubquery, CExpression *pexprPredicate,
-		BOOL fOuterRefsUnderInner, gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar,
+		CExpression *pexprSubquery, CExpression *pexprPredicate,
+		BOOL fOuterRefsUnderInner, gpos::Ref<CExpression> *ppexprNewOuter,
+		gpos::Ref<CExpression> *ppexprResidualScalar,
 		BOOL useNotNullableInnerOpt);
 
 	// helper for creating outer apply expression
-	static BOOL FCreateOuterApply(
-		CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-		gpos::pointer<CExpression *> pexprSubquery, CExpression *pexprPredicate,
-		BOOL fOuterRefsUnderInner, gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar,
-		BOOL useNotNullableInnerOpt);
+	static BOOL FCreateOuterApply(CMemoryPool *mp, CExpression *pexprOuter,
+								  CExpression *pexprInner,
+								  CExpression *pexprSubquery,
+								  CExpression *pexprPredicate,
+								  BOOL fOuterRefsUnderInner,
+								  gpos::Ref<CExpression> *ppexprNewOuter,
+								  gpos::Ref<CExpression> *ppexprResidualScalar,
+								  BOOL useNotNullableInnerOpt);
 
 	// helper for creating a scalar if expression used when generating an outer apply
-	static gpos::owner<CExpression *> PexprScalarIf(
+	static gpos::Ref<CExpression> PexprScalarIf(
 		CMemoryPool *mp, CColRef *pcrBool, CColRef *pcrSum, CColRef *pcrCount,
-		gpos::pointer<CExpression *> pexprSubquery,
-		BOOL useNotNullableInnerOpt);
+		CExpression *pexprSubquery, BOOL useNotNullableInnerOpt);
 
 	// helper for creating a correlated apply expression for existential subquery
 	static BOOL FCreateCorrelatedApplyForExistentialSubquery(
-		CMemoryPool *mp, gpos::owner<CExpression *> pexprOuter,
-		gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
-		gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+		CExpression *pexprSubquery, ESubqueryCtxt esqctxt,
+		gpos::Ref<CExpression> *ppexprNewOuter,
+		gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// helper for creating a correlated apply expression for quantified subquery
 	static BOOL FCreateCorrelatedApplyForQuantifiedSubquery(
-		CMemoryPool *mp, gpos::owner<CExpression *> pexprOuter,
-		gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
-		gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+		CExpression *pexprSubquery, ESubqueryCtxt esqctxt,
+		gpos::Ref<CExpression> *ppexprNewOuter,
+		gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// helper for creating correlated apply expression
 	static BOOL FCreateCorrelatedApplyForExistOrQuant(
-		CMemoryPool *mp, gpos::owner<CExpression *> pexprOuter,
-		gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
-		gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+		CExpression *pexprSubquery, ESubqueryCtxt esqctxt,
+		gpos::Ref<CExpression> *ppexprNewOuter,
+		gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// create subquery descriptor
-	static SSubqueryDesc *Psd(CMemoryPool *mp,
-							  gpos::pointer<CExpression *> pexprSubquery,
-							  gpos::pointer<CExpression *> pexprOuter,
+	static SSubqueryDesc *Psd(CMemoryPool *mp, CExpression *pexprSubquery,
+							  CExpression *pexprOuter,
 							  const CColRef *pcrSubquery,
 							  ESubqueryCtxt esqctxt);
 
 	// detect subqueries with expressions over count aggregate similar to
 	// (SELECT 'abc' || (SELECT count(*) from X))
-	static BOOL FProjectCountSubquery(
-		gpos::pointer<CExpression *> pexprSubquery, CColRef *ppcrCount);
+	static BOOL FProjectCountSubquery(CExpression *pexprSubquery,
+									  CColRef *ppcrCount);
 
 	// given an input expression, replace all occurrences of given column with the given scalar expression
-	static gpos::owner<CExpression *> PexprReplace(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr, CColRef *colref,
-		gpos::pointer<CExpression *> pexprSubquery);
+	static gpos::Ref<CExpression> PexprReplace(CMemoryPool *mp,
+											   CExpression *pexpr,
+											   CColRef *colref,
+											   CExpression *pexprSubquery);
 
 	// remove a scalar subquery node from scalar tree
-	BOOL FRemoveScalarSubquery(
-		CExpression *pexprOuter, gpos::pointer<CExpression *> pexprSubquery,
-		ESubqueryCtxt esqctxt, gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar);
+	BOOL FRemoveScalarSubquery(CExpression *pexprOuter,
+							   CExpression *pexprSubquery,
+							   ESubqueryCtxt esqctxt,
+							   gpos::Ref<CExpression> *ppexprNewOuter,
+							   gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// helper to generate a correlated apply expression when needed
 	static BOOL FGenerateCorrelatedApplyForScalarSubquery(
-		CMemoryPool *mp, CExpression *pexprOuter,
-		gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
-		CSubqueryHandler::SSubqueryDesc *psd, BOOL fEnforceCorrelatedApply,
-		gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar);
+		CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprSubquery,
+		ESubqueryCtxt esqctxt, CSubqueryHandler::SSubqueryDesc *psd,
+		BOOL fEnforceCorrelatedApply, gpos::Ref<CExpression> *ppexprNewOuter,
+		gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// internal function for removing a scalar subquery node from scalar tree
 	static BOOL FRemoveScalarSubqueryInternal(
-		CMemoryPool *mp, gpos::owner<CExpression *> pexprOuter,
-		gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
-		SSubqueryDesc *psd, BOOL fEnforceCorrelatedApply,
-		gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+		CExpression *pexprSubquery, ESubqueryCtxt esqctxt, SSubqueryDesc *psd,
+		BOOL fEnforceCorrelatedApply, gpos::Ref<CExpression> *ppexprNewOuter,
+		gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// remove a subquery ANY node from scalar tree
-	BOOL FRemoveAnySubquery(gpos::owner<CExpression *> pexprOuter,
-							gpos::pointer<CExpression *> pexprSubquery,
-							ESubqueryCtxt esqctxt,
-							gpos::owner<CExpression *> *ppexprNewOuter,
-							gpos::owner<CExpression *> *ppexprResidualScalar);
+	BOOL FRemoveAnySubquery(gpos::Ref<CExpression> pexprOuter,
+							CExpression *pexprSubquery, ESubqueryCtxt esqctxt,
+							gpos::Ref<CExpression> *ppexprNewOuter,
+							gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// remove a subquery ALL node from scalar tree
-	BOOL FRemoveAllSubquery(gpos::owner<CExpression *> pexprOuter,
-							gpos::pointer<CExpression *> pexprSubquery,
-							ESubqueryCtxt esqctxt,
-							gpos::owner<CExpression *> *ppexprNewOuter,
-							gpos::owner<CExpression *> *ppexprResidualScalar);
+	BOOL FRemoveAllSubquery(gpos::Ref<CExpression> pexprOuter,
+							CExpression *pexprSubquery, ESubqueryCtxt esqctxt,
+							gpos::Ref<CExpression> *ppexprNewOuter,
+							gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// add a limit 1 expression over given expression,
 	// removing any existing limits
-	static gpos::owner<CExpression *> AddOrReplaceLimitOne(CMemoryPool *mp,
-														   CExpression *pexpr);
+	static gpos::Ref<CExpression> AddOrReplaceLimitOne(CMemoryPool *mp,
+													   CExpression *pexpr);
 
 	// remove a subquery EXISTS/NOT EXISTS node from scalar tree
 	static BOOL FRemoveExistentialSubquery(
 		CMemoryPool *mp, COperator::EOperatorId op_id, CExpression *pexprOuter,
-		gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
-		gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar);
+		CExpression *pexprSubquery, ESubqueryCtxt esqctxt,
+		gpos::Ref<CExpression> *ppexprNewOuter,
+		gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// remove a subquery EXISTS from scalar tree
-	BOOL FRemoveExistsSubquery(
-		gpos::owner<CExpression *> pexprOuter,
-		gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
-		gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar);
+	BOOL FRemoveExistsSubquery(gpos::Ref<CExpression> pexprOuter,
+							   CExpression *pexprSubquery,
+							   ESubqueryCtxt esqctxt,
+							   gpos::Ref<CExpression> *ppexprNewOuter,
+							   gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// remove a subquery NOT EXISTS from scalar tree
-	BOOL FRemoveNotExistsSubquery(
-		gpos::owner<CExpression *> pexprOuter,
-		gpos::pointer<CExpression *> pexprSubquery, ESubqueryCtxt esqctxt,
-		gpos::owner<CExpression *> *ppexprNewOuter,
-		gpos::owner<CExpression *> *ppexprResidualScalar);
+	BOOL FRemoveNotExistsSubquery(gpos::Ref<CExpression> pexprOuter,
+								  CExpression *pexprSubquery,
+								  ESubqueryCtxt esqctxt,
+								  gpos::Ref<CExpression> *ppexprNewOuter,
+								  gpos::Ref<CExpression> *ppexprResidualScalar);
 
 	// handle subqueries in scalar tree recursively
-	BOOL FRecursiveHandler(CExpression *pexprOuter,
-						   gpos::pointer<CExpression *> pexprScalar,
+	BOOL FRecursiveHandler(CExpression *pexprOuter, CExpression *pexprScalar,
 						   ESubqueryCtxt esqctxt,
-						   gpos::owner<CExpression *> *ppexprNewOuter,
-						   gpos::owner<CExpression *> *ppexprNewScalar);
+						   gpos::Ref<CExpression> *ppexprNewOuter,
+						   gpos::Ref<CExpression> *ppexprNewScalar);
 
 	// handle subqueries on a case-by-case basis
 	BOOL FProcessScalarOperator(CExpression *pexprOuter,
-								gpos::pointer<CExpression *> pexprScalar,
-								ESubqueryCtxt esqctxt,
-								gpos::owner<CExpression *> *ppexprNewOuter,
-								gpos::owner<CExpression *> *ppexprNewScalar);
+								CExpression *pexprScalar, ESubqueryCtxt esqctxt,
+								gpos::Ref<CExpression> *ppexprNewOuter,
+								gpos::Ref<CExpression> *ppexprNewScalar);
 
 #ifdef GPOS_DEBUG
 	// assert valid values of arguments
-	static void AssertValidArguments(
-		CMemoryPool *mp, gpos::pointer<CExpression *> pexprOuter,
-		gpos::pointer<CExpression *> pexprScalar,
-		gpos::pointer<CExpression *> *ppexprNewOuter,
-		gpos::pointer<CExpression *> *ppexprResidualScalar);
+	static void AssertValidArguments(CMemoryPool *mp, CExpression *pexprOuter,
+									 CExpression *pexprScalar,
+									 CExpression **ppexprNewOuter,
+									 CExpression **ppexprResidualScalar);
 #endif	// GPOS_DEBUG
 
 public:
@@ -289,20 +283,19 @@ public:
 	}
 
 	// build an expression for the quantified comparison of the subquery
-	gpos::owner<CExpression *> PexprSubqueryPred(
-		CExpression *pexprOuter, gpos::pointer<CExpression *> pexprSubquery,
-		gpos::owner<CExpression *> *ppexprResult,
+	gpos::Ref<CExpression> PexprSubqueryPred(
+		CExpression *pexprOuter, CExpression *pexprSubquery,
+		gpos::Ref<CExpression> *ppexprResult,
 		CSubqueryHandler::ESubqueryCtxt esqctxt);
 
 	// main driver
 	BOOL FProcess(
-		CExpression *pexprOuter,  // logical child of a SELECT node
-		gpos::pointer<CExpression *>
-			pexprScalar,		// scalar child of a SELECT node
-		ESubqueryCtxt esqctxt,	// context in which subquery occurs
-		gpos::owner<CExpression *>
+		CExpression *pexprOuter,   // logical child of a SELECT node
+		CExpression *pexprScalar,  // scalar child of a SELECT node
+		ESubqueryCtxt esqctxt,	   // context in which subquery occurs
+		gpos::Ref<CExpression>
 			*ppexprNewOuter,  // an Apply logical expression produced as output
-		gpos::owner<CExpression *> *
+		gpos::Ref<CExpression> *
 			ppexprResidualScalar  // residual scalar expression produced as output
 	);
 

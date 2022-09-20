@@ -42,7 +42,7 @@ using namespace gpos;
 //---------------------------------------------------------------------------
 Var *
 CConstExprEvaluatorProxy::CEmptyMappingColIdVar::VarFromDXLNodeScId(
-	gpos::pointer<const CDXLScalarIdent *> /*scalar_ident*/
+	const CDXLScalarIdent * /*scalar_ident*/
 )
 {
 	elog(LOG,
@@ -61,8 +61,8 @@ CConstExprEvaluatorProxy::CEmptyMappingColIdVar::VarFromDXLNodeScId(
 // 		of the result. Caller keeps ownership of 'expr' and takes ownership of the returned pointer.
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLNode *>
-CConstExprEvaluatorProxy::EvaluateExpr(gpos::pointer<const CDXLNode *> dxl_expr)
+gpos::Ref<CDXLNode>
+CConstExprEvaluatorProxy::EvaluateExpr(const CDXLNode *dxl_expr)
 {
 	// Translate DXL -> GPDB Expr
 	Expr *expr = m_dxl2scalar_translator.TranslateDXLToScalar(
@@ -85,10 +85,10 @@ CConstExprEvaluatorProxy::EvaluateExpr(gpos::pointer<const CDXLNode *> dxl_expr)
 	}
 
 	Const *const_result = (Const *) result;
-	gpos::owner<CDXLDatum *> datum_dxl =
+	gpos::Ref<CDXLDatum> datum_dxl =
 		CTranslatorScalarToDXL::TranslateConstToDXL(m_mp, m_md_accessor,
 													const_result);
-	gpos::owner<CDXLNode *> dxl_result = GPOS_NEW(m_mp) CDXLNode(
+	gpos::Ref<CDXLNode> dxl_result = GPOS_NEW(m_mp) CDXLNode(
 		m_mp, GPOS_NEW(m_mp) CDXLScalarConstValue(m_mp, std::move(datum_dxl)));
 	gpdb::GPDBFree(result);
 	gpdb::GPDBFree(expr);

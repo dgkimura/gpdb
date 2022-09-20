@@ -47,86 +47,86 @@ class COptimizerConfig : public CRefCount
 {
 private:
 	// plan enumeration configuration
-	gpos::owner<CEnumeratorConfig *> m_enumerator_cfg;
+	gpos::Ref<CEnumeratorConfig> m_enumerator_cfg;
 
 	// statistics configuration
-	gpos::owner<CStatisticsConfig *> m_stats_conf;
+	gpos::Ref<CStatisticsConfig> m_stats_conf;
 
 	// CTE configuration
-	gpos::owner<CCTEConfig *> m_cte_conf;
+	gpos::Ref<CCTEConfig> m_cte_conf;
 
 	// cost model configuration
-	gpos::owner<ICostModel *> m_cost_model;
+	gpos::Ref<ICostModel> m_cost_model;
 
 	// hint configuration
-	gpos::owner<CHint *> m_hint;
+	gpos::Ref<CHint> m_hint;
 
 	// default window oids
-	gpos::owner<CWindowOids *> m_window_oids;
+	gpos::Ref<CWindowOids> m_window_oids;
 
 public:
 	// ctor
-	COptimizerConfig(gpos::owner<CEnumeratorConfig *> pec,
-					 gpos::owner<CStatisticsConfig *> stats_config,
-					 gpos::owner<CCTEConfig *> pcteconf,
-					 gpos::owner<ICostModel *> pcm, gpos::owner<CHint *> phint,
-					 gpos::owner<CWindowOids *> pdefoidsGPDB);
+	COptimizerConfig(gpos::Ref<CEnumeratorConfig> pec,
+					 gpos::Ref<CStatisticsConfig> stats_config,
+					 gpos::Ref<CCTEConfig> pcteconf, gpos::Ref<ICostModel> pcm,
+					 gpos::Ref<CHint> phint,
+					 gpos::Ref<CWindowOids> pdefoidsGPDB);
 
 	// dtor
 	~COptimizerConfig() override;
 
 
 	// plan enumeration configuration
-	gpos::pointer<CEnumeratorConfig *>
+	CEnumeratorConfig *
 	GetEnumeratorCfg() const
 	{
-		return m_enumerator_cfg;
+		return m_enumerator_cfg.get();
 	}
 
 	// statistics configuration
-	gpos::pointer<CStatisticsConfig *>
+	CStatisticsConfig *
 	GetStatsConf() const
 	{
-		return m_stats_conf;
+		return m_stats_conf.get();
 	}
 
 	// CTE configuration
-	gpos::pointer<CCTEConfig *>
+	CCTEConfig *
 	GetCteConf() const
 	{
-		return m_cte_conf;
+		return m_cte_conf.get();
 	}
 
 	// cost model configuration
-	gpos::pointer<ICostModel *>
+	ICostModel *
 	GetCostModel() const
 	{
-		return m_cost_model;
+		return m_cost_model.get();
 	}
 
 	// default window oids
-	gpos::pointer<CWindowOids *>
+	CWindowOids *
 	GetWindowOids() const
 	{
-		return m_window_oids;
+		return m_window_oids.get();
 	}
 
 	// hint configuration
-	gpos::pointer<CHint *>
+	CHint *
 	GetHint() const
 	{
-		return m_hint;
+		return m_hint.get();
 	}
 
 	// generate default optimizer configurations
-	static gpos::owner<COptimizerConfig *> PoconfDefault(CMemoryPool *mp);
+	static gpos::Ref<COptimizerConfig> PoconfDefault(CMemoryPool *mp);
 
 	// generate default optimizer configurations with the given cost model
-	static gpos::owner<COptimizerConfig *> PoconfDefault(
-		CMemoryPool *mp, gpos::owner<ICostModel *> pcm);
+	static gpos::Ref<COptimizerConfig> PoconfDefault(CMemoryPool *mp,
+													 gpos::Ref<ICostModel> pcm);
 
 	void Serialize(CMemoryPool *mp, CXMLSerializer *xml_serializer,
-				   gpos::pointer<CBitSet *> pbsTrace) const;
+				   CBitSet *pbsTrace) const;
 
 };	// class COptimizerConfig
 

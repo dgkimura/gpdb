@@ -144,7 +144,7 @@ CParseHandlerPhysicalTVF::EndElement(const XMLCh *const,  // element_uri,
 				   str->GetBuffer());
 	}
 
-	gpos::owner<CDXLPhysicalTVF *> dxl_op = GPOS_NEW(m_mp)
+	gpos::Ref<CDXLPhysicalTVF> dxl_op = GPOS_NEW(m_mp)
 		CDXLPhysicalTVF(m_mp, m_func_mdid, m_return_type_mdid, m_pstr);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 
@@ -152,7 +152,7 @@ CParseHandlerPhysicalTVF::EndElement(const XMLCh *const,  // element_uri,
 		dynamic_cast<CParseHandlerProperties *>((*this)[0]);
 
 	// set statistics and physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	CParseHandlerProjList *proj_list_parse_handler =
 		dynamic_cast<CParseHandlerProjList *>((*this)[1]);

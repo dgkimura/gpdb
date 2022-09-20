@@ -35,46 +35,43 @@ class CKeyCollection : public CRefCount, public DbgPrintMixin<CKeyCollection>
 {
 private:
 	// array of key sets
-	gpos::owner<CColRefSetArray *> m_pdrgpcrs;
+	gpos::Ref<CColRefSetArray> m_pdrgpcrs;
 
 public:
 	CKeyCollection(const CKeyCollection &) = delete;
 
 	// ctors
 	explicit CKeyCollection(CMemoryPool *mp);
-	CKeyCollection(CMemoryPool *mp, gpos::owner<CColRefSet *> pcrs);
-	CKeyCollection(CMemoryPool *mp, gpos::owner<CColRefArray *> colref_array);
+	CKeyCollection(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs);
+	CKeyCollection(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// dtor
 	~CKeyCollection() override;
 
 	// add individual set -- takes ownership
-	void Add(gpos::owner<CColRefSet *> pcrs);
+	void Add(gpos::Ref<CColRefSet> pcrs);
 
 	// check if set forms a key
-	BOOL FKey(gpos::pointer<const CColRefSet *> pcrs,
-			  BOOL fExactMatch = true) const;
+	BOOL FKey(const CColRefSet *pcrs, BOOL fExactMatch = true) const;
 
 	// check if an array of columns constitutes a key
-	BOOL FKey(CMemoryPool *mp,
-			  gpos::pointer<const CColRefArray *> colref_array) const;
+	BOOL FKey(CMemoryPool *mp, const CColRefArray *colref_array) const;
 
 	// trim off non-key columns
-	gpos::owner<CColRefArray *> PdrgpcrTrim(
-		CMemoryPool *mp,
-		gpos::pointer<const CColRefArray *> colref_array) const;
+	gpos::Ref<CColRefArray> PdrgpcrTrim(CMemoryPool *mp,
+										const CColRefArray *colref_array) const;
 
 	// extract a key
-	gpos::owner<CColRefArray *> PdrgpcrKey(CMemoryPool *mp) const;
+	gpos::Ref<CColRefArray> PdrgpcrKey(CMemoryPool *mp) const;
 
 	// extract a hashable key
-	gpos::owner<CColRefArray *> PdrgpcrHashableKey(CMemoryPool *mp) const;
+	gpos::Ref<CColRefArray> PdrgpcrHashableKey(CMemoryPool *mp) const;
 
 	// extract key at given position
-	gpos::owner<CColRefArray *> PdrgpcrKey(CMemoryPool *mp, ULONG ul) const;
+	gpos::Ref<CColRefArray> PdrgpcrKey(CMemoryPool *mp, ULONG ul) const;
 
 	// extract key at given position
-	gpos::owner<CColRefSet *> PcrsKey(CMemoryPool *mp, ULONG ul) const;
+	gpos::Ref<CColRefSet> PcrsKey(CMemoryPool *mp, ULONG ul) const;
 
 	// number of keys
 	ULONG

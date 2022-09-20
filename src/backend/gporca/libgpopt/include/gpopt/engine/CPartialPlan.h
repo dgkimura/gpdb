@@ -44,20 +44,19 @@ class CPartialPlan : public CRefCount
 {
 private:
 	// root group expression
-	gpos::pointer<CGroupExpression *> m_pgexpr;
+	CGroupExpression *m_pgexpr;
 
 	// required plan properties of root operator
-	gpos::owner<CReqdPropPlan *> m_prpp;
+	gpos::Ref<CReqdPropPlan> m_prpp;
 
 	// cost context of known child plan -- can be null if no child plans are known
-	gpos::owner<CCostContext *> m_pccChild;
+	gpos::Ref<CCostContext> m_pccChild;
 
 	// index of known child plan
 	ULONG m_ulChildIndex;
 
 	// extract costing info from children
-	void ExtractChildrenCostingInfo(CMemoryPool *mp,
-									gpos::pointer<ICostModel *> pcm,
+	void ExtractChildrenCostingInfo(CMemoryPool *mp, ICostModel *pcm,
 									CExpressionHandle &exprhdl,
 									ICostModel::SCostingInfo *pci);
 
@@ -66,32 +65,31 @@ public:
 	CPartialPlan(const CPartialPlan &) = delete;
 
 	// ctor
-	CPartialPlan(gpos::pointer<CGroupExpression *> pgexpr,
-				 gpos::owner<CReqdPropPlan *> prpp,
-				 gpos::owner<CCostContext *> pccChild, ULONG child_index);
+	CPartialPlan(CGroupExpression *pgexpr, gpos::Ref<CReqdPropPlan> prpp,
+				 gpos::Ref<CCostContext> pccChild, ULONG child_index);
 
 	// dtor
 	~CPartialPlan() override;
 
 	// group expression accessor
-	gpos::pointer<CGroupExpression *>
+	CGroupExpression *
 	Pgexpr() const
 	{
 		return m_pgexpr;
 	}
 
 	// plan properties accessor
-	gpos::pointer<CReqdPropPlan *>
+	CReqdPropPlan *
 	Prpp() const
 	{
-		return m_prpp;
+		return m_prpp.get();
 	}
 
 	// child cost context accessor
-	gpos::pointer<CCostContext *>
+	CCostContext *
 	PccChild() const
 	{
-		return m_pccChild;
+		return m_pccChild.get();
 	}
 
 	// child index accessor
@@ -105,11 +103,10 @@ public:
 	CCost CostCompute(CMemoryPool *mp);
 
 	// hash function used for cost bounding
-	static ULONG HashValue(gpos::pointer<const CPartialPlan *> ppp);
+	static ULONG HashValue(const CPartialPlan *ppp);
 
 	// equality function used for for cost bounding
-	static BOOL Equals(gpos::pointer<const CPartialPlan *> pppFst,
-					   gpos::pointer<const CPartialPlan *> pppSnd);
+	static BOOL Equals(const CPartialPlan *pppFst, const CPartialPlan *pppSnd);
 
 };	// class CPartialPlan
 }  // namespace gpopt

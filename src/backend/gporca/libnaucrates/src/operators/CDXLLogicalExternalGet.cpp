@@ -27,7 +27,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLLogicalExternalGet::CDXLLogicalExternalGet(
-	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr)
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr)
 	: CDXLLogicalGet(mp, std::move(table_descr))
 {
 }

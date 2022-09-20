@@ -102,7 +102,7 @@ public:
 
 // hash function
 inline ULONG
-HashGPDBAttInfo(gpos::pointer<const CGPDBAttInfo *> gpdb_att_info)
+HashGPDBAttInfo(const CGPDBAttInfo *gpdb_att_info)
 {
 	GPOS_ASSERT(nullptr != gpdb_att_info);
 	return gpdb_att_info->HashValue();
@@ -110,8 +110,8 @@ HashGPDBAttInfo(gpos::pointer<const CGPDBAttInfo *> gpdb_att_info)
 
 // equality function
 inline BOOL
-EqualGPDBAttInfo(gpos::pointer<const CGPDBAttInfo *> gpdb_att_info_a,
-				 gpos::pointer<const CGPDBAttInfo *> gpdb_att_info_b)
+EqualGPDBAttInfo(const CGPDBAttInfo *gpdb_att_info_a,
+				 const CGPDBAttInfo *gpdb_att_info_b)
 {
 	GPOS_ASSERT(nullptr != gpdb_att_info_a && nullptr != gpdb_att_info_b);
 	return gpdb_att_info_a->Equals(*gpdb_att_info_b);

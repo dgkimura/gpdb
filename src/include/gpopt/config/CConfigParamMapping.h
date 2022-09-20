@@ -69,8 +69,8 @@ public:
 	CConfigParamMapping(const CConfigParamMapping &) = delete;
 
 	// pack enabled optimizer config params in a traceflag bitset
-	static gpos::owner<CBitSet *> PackConfigParamInBitset(CMemoryPool *mp,
-														  ULONG xform_id);
+	static gpos::Ref<CBitSet> PackConfigParamInBitset(CMemoryPool *mp,
+													  ULONG xform_id);
 };
 }  // namespace gpdxl
 

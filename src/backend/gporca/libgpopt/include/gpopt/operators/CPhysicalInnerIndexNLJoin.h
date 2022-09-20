@@ -30,18 +30,18 @@ class CPhysicalInnerIndexNLJoin : public CPhysicalInnerNLJoin
 {
 private:
 	// columns from outer child used for index lookup in inner child
-	gpos::owner<CColRefArray *> m_pdrgpcrOuterRefs;
+	gpos::Ref<CColRefArray> m_pdrgpcrOuterRefs;
 
 	// a copy of the original join predicate that has been pushed down to the inner side
-	gpos::owner<CExpression *> m_origJoinPred;
+	gpos::Ref<CExpression> m_origJoinPred;
 
 public:
 	CPhysicalInnerIndexNLJoin(const CPhysicalInnerIndexNLJoin &) = delete;
 
 	// ctor
 	CPhysicalInnerIndexNLJoin(CMemoryPool *mp,
-							  gpos::owner<CColRefArray *> colref_array,
-							  gpos::owner<CExpression *> origJoinPred);
+							  gpos::Ref<CColRefArray> colref_array,
+							  gpos::Ref<CExpression> origJoinPred);
 
 	// dtor
 	~CPhysicalInnerIndexNLJoin() override;
@@ -61,26 +61,29 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *> pop) const override;
+	BOOL Matches(COperator *pop) const override;
 
 	// outer column references accessor
-	gpos::pointer<CColRefArray *>
+	CColRefArray *
 	PdrgPcrOuterRefs() const
 	{
-		return m_pdrgpcrOuterRefs;
+		return m_pdrgpcrOuterRefs.get();
 	}
 
 	// compute required distribution of the n-th child
-	gpos::owner<CDistributionSpec *> PdsRequired(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
-		ULONG ulOptReq) const override;
+	gpos::Ref<CDistributionSpec> PdsRequired(CMemoryPool *mp,
+											 CExpressionHandle &exprhdl,
+											 CDistributionSpec *pdsRequired,
+											 ULONG child_index,
+											 CDrvdPropArray *pdrgpdpCtxt,
+											 ULONG ulOptReq) const override;
 
-	gpos::owner<CEnfdDistribution *> Ped(
-		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
-		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulDistrReq) override;
+	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
+									 CExpressionHandle &exprhdl,
+									 CReqdPropPlan *prppInput,
+									 ULONG child_index,
+									 CDrvdPropArray *pdrgpdpCtxt,
+									 ULONG ulDistrReq) override;
 
 	// execution order of children
 	EChildExecOrder
@@ -91,7 +94,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CPhysicalInnerIndexNLJoin *>
+	static CPhysicalInnerIndexNLJoin *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(EopPhysicalInnerIndexNLJoin == pop->Eopid());
@@ -99,10 +102,10 @@ public:
 		return dynamic_cast<CPhysicalInnerIndexNLJoin *>(pop);
 	}
 
-	gpos::pointer<CExpression *>
+	CExpression *
 	OrigJoinPred()
 	{
-		return m_origJoinPred;
+		return m_origJoinPred.get();
 	}
 
 };	// class CPhysicalInnerIndexNLJoin

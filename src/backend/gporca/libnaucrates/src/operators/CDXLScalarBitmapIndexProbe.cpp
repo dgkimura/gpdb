@@ -31,7 +31,7 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLScalarBitmapIndexProbe::CDXLScalarBitmapIndexProbe(
-	CMemoryPool *mp, gpos::owner<CDXLIndexDescr *> dxl_index_descr)
+	CMemoryPool *mp, gpos::Ref<CDXLIndexDescr> dxl_index_descr)
 	: CDXLScalar(mp), m_dxl_index_descr(std::move(dxl_index_descr))
 {
 	GPOS_ASSERT(nullptr != m_dxl_index_descr);
@@ -47,7 +47,7 @@ CDXLScalarBitmapIndexProbe::CDXLScalarBitmapIndexProbe(
 //---------------------------------------------------------------------------
 CDXLScalarBitmapIndexProbe::~CDXLScalarBitmapIndexProbe()
 {
-	m_dxl_index_descr->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -73,9 +73,8 @@ CDXLScalarBitmapIndexProbe::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBitmapIndexProbe::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarBitmapIndexProbe::SerializeToDXL(CXMLSerializer *xml_serializer,
+										   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -101,7 +100,7 @@ CDXLScalarBitmapIndexProbe::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBitmapIndexProbe::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarBitmapIndexProbe::AssertValid(const CDXLNode *dxlnode,
 										BOOL validate_children) const
 {
 	// bitmap index probe has 1 child: the index condition list
@@ -109,7 +108,7 @@ CDXLScalarBitmapIndexProbe::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	if (validate_children)
 	{
-		gpos::pointer<CDXLNode *> pdxlnIndexCondList = (*dxlnode)[0];
+		CDXLNode *pdxlnIndexCondList = (*dxlnode)[0];
 		GPOS_ASSERT(EdxlopScalarIndexCondList ==
 					pdxlnIndexCondList->GetOperator()->GetDXLOperator());
 		pdxlnIndexCondList->GetOperator()->AssertValid(pdxlnIndexCondList,

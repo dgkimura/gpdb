@@ -54,7 +54,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CPhysicalLeftAntiSemiNLJoinNotIn *>
+	static CPhysicalLeftAntiSemiNLJoinNotIn *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftAntiSemiNLJoinNotIn == pop->Eopid());

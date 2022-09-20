@@ -30,7 +30,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroup::Init(gpos::pointer<CGroup *> pgroup)
+CJobGroup::Init(CGroup *pgroup)
 {
 	GPOS_ASSERT(!FInit());
 	GPOS_ASSERT(nullptr != pgroup);

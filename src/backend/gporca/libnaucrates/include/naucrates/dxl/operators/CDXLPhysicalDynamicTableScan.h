@@ -43,20 +43,20 @@ class CDXLPhysicalDynamicTableScan : public CDXLPhysical
 {
 private:
 	// table descriptor for the scanned table
-	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 	gpos::Ref<IMdIdArray> m_part_mdids;
 
-	gpos::owner<ULongPtrArray *> m_selector_ids = nullptr;
+	gpos::Ref<ULongPtrArray> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalDynamicTableScan(CDXLPhysicalDynamicTableScan &) = delete;
 
 	// ctor
 	CDXLPhysicalDynamicTableScan(CMemoryPool *mp,
-								 gpos::owner<CDXLTableDescr *> table_descr,
+								 gpos::Ref<CDXLTableDescr> table_descr,
 								 gpos::Ref<IMdIdArray> part_mdids,
-								 gpos::owner<ULongPtrArray *> selector_ids);
+								 gpos::Ref<ULongPtrArray> selector_ids);
 
 	// dtor
 	~CDXLPhysicalDynamicTableScan() override;
@@ -68,21 +68,21 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// table descriptor
-	gpos::pointer<const CDXLTableDescr *> GetDXLTableDescr() const;
+	const CDXLTableDescr *GetDXLTableDescr() const;
 
 	IMdIdArray *GetParts() const;
 
-	gpos::pointer<const ULongPtrArray *>
+	const ULongPtrArray *
 	GetSelectorIds() const
 	{
-		return m_selector_ids;
+		return m_selector_ids.get();
 	}
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalDynamicTableScan *>
+	static CDXLPhysicalDynamicTableScan *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -94,8 +94,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

@@ -31,7 +31,7 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CStatsPredPoint::CStatsPredPoint(ULONG colid,
 								 CStatsPred::EStatsCmpType stats_cmp_type,
-								 gpos::owner<CPoint *> point)
+								 gpos::Ref<CPoint> point)
 	: CStatsPred(colid),
 	  m_stats_cmp_type(stats_cmp_type),
 	  m_pred_point(std::move(point))
@@ -49,7 +49,7 @@ CStatsPredPoint::CStatsPredPoint(ULONG colid,
 //---------------------------------------------------------------------------
 CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
 								 CStatsPred::EStatsCmpType stats_cmp_type,
-								 gpos::pointer<IDatum *> datum)
+								 IDatum *datum)
 	: CStatsPred(gpos::ulong_max),
 	  m_stats_cmp_type(stats_cmp_type),
 	  m_pred_point(nullptr)
@@ -58,7 +58,7 @@ CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
 	GPOS_ASSERT(nullptr != datum);
 
 	m_colid = colref->Id();
-	gpos::owner<IDatum *> padded_datum = PreprocessDatum(mp, colref, datum);
+	gpos::Ref<IDatum> padded_datum = PreprocessDatum(mp, colref, datum);
 
 	m_pred_point = GPOS_NEW(mp) CPoint(std::move(padded_datum));
 }
@@ -69,9 +69,9 @@ CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
 //	@doc:
 //		Add padding to datums when needed
 //---------------------------------------------------------------------------
-gpos::owner<IDatum *>
+gpos::Ref<IDatum>
 CStatsPredPoint::PreprocessDatum(CMemoryPool *mp, const CColRef *colref,
-								 gpos::pointer<IDatum *> datum)
+								 IDatum *datum)
 {
 	GPOS_ASSERT(nullptr != colref);
 	GPOS_ASSERT(nullptr != datum);
@@ -80,7 +80,7 @@ CStatsPredPoint::PreprocessDatum(CMemoryPool *mp, const CColRef *colref,
 		datum->IsNull())
 	{
 		// we do not pad datum for comparison against computed columns
-		datum->AddRef();
+		;
 		return datum;
 	}
 

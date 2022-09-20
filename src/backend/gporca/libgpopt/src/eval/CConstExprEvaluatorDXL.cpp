@@ -69,8 +69,8 @@ CConstExprEvaluatorDXL::~CConstExprEvaluatorDXL() = default;
 //		Caller takes ownership of returned expression
 //
 //---------------------------------------------------------------------------
-gpos::owner<CExpression *>
-CConstExprEvaluatorDXL::PexprEval(gpos::pointer<CExpression *> pexpr)
+gpos::Ref<CExpression>
+CConstExprEvaluatorDXL::PexprEval(CExpression *pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -78,17 +78,17 @@ CConstExprEvaluatorDXL::PexprEval(gpos::pointer<CExpression *> pexpr)
 	{
 		GPOS_RAISE(gpopt::ExmaGPOPT, gpopt::ExmiEvalUnsupportedScalarExpr);
 	}
-	gpos::owner<CDXLNode *> pdxlnExpr = m_trexpr2dxl.PdxlnScalar(pexpr);
-	gpos::owner<CDXLNode *> pdxlnResult =
-		m_pconstdxleval->EvaluateExpr(pdxlnExpr);
+	gpos::Ref<CDXLNode> pdxlnExpr = m_trexpr2dxl.PdxlnScalar(pexpr);
+	gpos::Ref<CDXLNode> pdxlnResult =
+		m_pconstdxleval->EvaluateExpr(pdxlnExpr.get());
 
 	GPOS_ASSERT(EdxloptypeScalar ==
 				pdxlnResult->GetOperator()->GetDXLOperatorType());
 
-	gpos::owner<CExpression *> pexprResult = m_trdxl2expr.PexprTranslateScalar(
-		pdxlnResult, nullptr /*colref_array*/);
-	pdxlnResult->Release();
-	pdxlnExpr->Release();
+	gpos::Ref<CExpression> pexprResult = m_trdxl2expr.PexprTranslateScalar(
+		pdxlnResult.get(), nullptr /*colref_array*/);
+	;
+	;
 
 	return pexprResult;
 }

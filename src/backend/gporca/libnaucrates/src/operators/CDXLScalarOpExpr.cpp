@@ -136,11 +136,9 @@ CDXLScalarOpExpr::GetReturnTypeMdId() const
 BOOL
 CDXLScalarOpExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	gpos::pointer<const IMDScalarOp *> md_scalar_op =
-		md_accessor->RetrieveScOp(m_mdid.get());
-	gpos::pointer<IMDId *> mdid =
-		md_accessor->RetrieveFunc(md_scalar_op->FuncMdId())
-			->GetResultTypeMdid();
+	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(m_mdid.get());
+	IMDId *mdid = md_accessor->RetrieveFunc(md_scalar_op->FuncMdId())
+					  ->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());
 }
@@ -155,7 +153,7 @@ CDXLScalarOpExpr::HasBoolResult(CMDAccessor *md_accessor) const
 //---------------------------------------------------------------------------
 void
 CDXLScalarOpExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 gpos::pointer<const CDXLNode *> dxlnode) const
+								 const CDXLNode *dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 
@@ -192,7 +190,7 @@ CDXLScalarOpExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarOpExpr::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarOpExpr::AssertValid(const CDXLNode *dxlnode,
 							  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
@@ -200,7 +198,7 @@ CDXLScalarOpExpr::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[ul];
+		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

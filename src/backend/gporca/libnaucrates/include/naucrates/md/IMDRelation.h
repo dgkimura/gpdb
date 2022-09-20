@@ -78,8 +78,8 @@ public:
 
 protected:
 	// serialize an array of column ids into a comma-separated string
-	static CWStringDynamic *ColumnsToStr(
-		CMemoryPool *mp, gpos::pointer<ULongPtrArray *> colid_array);
+	static CWStringDynamic *ColumnsToStr(CMemoryPool *mp,
+										 ULongPtrArray *colid_array);
 
 public:
 	// object type
@@ -117,25 +117,25 @@ public:
 	virtual ULONG GetPosFromAttno(INT attno) const = 0;
 
 	// return the original positions of all the non-dropped columns
-	virtual gpos::pointer<ULongPtrArray *> NonDroppedColsArray() const = 0;
+	virtual ULongPtrArray *NonDroppedColsArray() const = 0;
 
 	// number of system columns
 	virtual ULONG SystemColumnsCount() const = 0;
 
 	// retrieve the column at the given position
-	virtual gpos::pointer<const IMDColumn *> GetMdCol(ULONG pos) const = 0;
+	virtual const IMDColumn *GetMdCol(ULONG pos) const = 0;
 
 	// number of key sets
 	virtual ULONG KeySetCount() const = 0;
 
 	// key set at given position
-	virtual gpos::pointer<const ULongPtrArray *> KeySetAt(ULONG pos) const = 0;
+	virtual const ULongPtrArray *KeySetAt(ULONG pos) const = 0;
 
 	// number of distribution columns
 	virtual ULONG DistrColumnCount() const = 0;
 
 	// retrieve the column at the given position in the distribution key for the relation
-	virtual gpos::pointer<const IMDColumn *> GetDistrColAt(ULONG pos) const = 0;
+	virtual const IMDColumn *GetDistrColAt(ULONG pos) const = 0;
 
 	virtual IMDId *GetDistrOpfamilyAt(ULONG pos) const = 0;
 
@@ -152,10 +152,10 @@ public:
 	virtual ULONG PartitionCount() const = 0;
 
 	// retrieve the partition column at the given position
-	virtual gpos::pointer<const IMDColumn *> PartColAt(ULONG pos) const = 0;
+	virtual const IMDColumn *PartColAt(ULONG pos) const = 0;
 
 	// retrieve list of partition types
-	virtual gpos::pointer<CharPtrArray *> GetPartitionTypes() const = 0;
+	virtual CharPtrArray *GetPartitionTypes() const = 0;
 
 	// retrieve the partition type of the given partition level
 	virtual CHAR PartTypeAtLevel(ULONG pos) const = 0;
@@ -179,7 +179,7 @@ public:
 	virtual IMDId *CheckConstraintMDidAt(ULONG pos) const = 0;
 
 	// part constraint
-	virtual gpos::pointer<CDXLNode *> MDPartConstraint() const = 0;
+	virtual CDXLNode *MDPartConstraint() const = 0;
 
 	// child partition oids
 	virtual IMdIdArray *
@@ -206,7 +206,7 @@ public:
 };
 
 // common structure over relation and external relation metadata for index info
-using CMDIndexInfoArray = CDynamicPtrArray<CMDIndexInfo, CleanupRelease>;
+using CMDIndexInfoArray = gpos::Vector<gpos::Ref<CMDIndexInfo>>;
 
 }  // namespace gpmd
 

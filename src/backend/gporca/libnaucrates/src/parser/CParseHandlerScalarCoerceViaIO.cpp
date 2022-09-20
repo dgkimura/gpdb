@@ -74,7 +74,7 @@ CParseHandlerScalarCoerceViaIO::StartElement(
 		}
 
 		// parse and create scalar coerce
-		gpos::owner<CDXLScalarCoerceViaIO *> dxl_op =
+		gpos::Ref<CDXLScalarCoerceViaIO> dxl_op =
 			gpos::cast<CDXLScalarCoerceViaIO>(
 				CDXLOperatorFactory::MakeDXLCoerceViaIO(
 					m_parse_handler_mgr->GetDXLMemoryManager(), attrs));

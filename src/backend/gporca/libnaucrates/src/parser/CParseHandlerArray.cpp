@@ -58,7 +58,7 @@ CParseHandlerArray::StartElement(const XMLCh *const element_uri,
 		nullptr == m_dxl_node)
 	{
 		// parse and create array
-		gpos::owner<CDXLScalarArray *> dxl_op =
+		gpos::Ref<CDXLScalarArray> dxl_op =
 			gpos::cast<CDXLScalarArray>(CDXLOperatorFactory::MakeDXLArray(
 				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(dxl_op));
@@ -114,7 +114,7 @@ CParseHandlerArray::EndElement(const XMLCh *const,	// element_uri,
 	}
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node,
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node.get(),
 										   false /* validate_children */);
 #endif	// GPOS_DEBUG
 

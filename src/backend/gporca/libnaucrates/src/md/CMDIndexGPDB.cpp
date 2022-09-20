@@ -37,10 +37,10 @@ CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 						   CMDName *mdname, BOOL is_clustered,
 						   BOOL is_partitioned, EmdindexType index_type,
 						   gpos::Ref<IMDId> mdid_item_type,
-						   gpos::owner<ULongPtrArray *> index_key_cols_array,
-						   gpos::owner<ULongPtrArray *> included_cols_array,
+						   gpos::Ref<ULongPtrArray> index_key_cols_array,
+						   gpos::Ref<ULongPtrArray> included_cols_array,
 						   gpos::Ref<IMdIdArray> mdid_opfamilies_array,
-						   gpos::owner<IMDPartConstraint *> mdpart_constraint,
+						   gpos::Ref<IMDPartConstraint> mdpart_constraint,
 						   gpos::Ref<IMdIdArray> child_index_oids)
 	: m_mp(mp),
 	  m_mdid(mdid),
@@ -86,9 +86,9 @@ CMDIndexGPDB::~CMDIndexGPDB()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_index_key_cols_array->Release();
-	m_included_cols_array->Release();
-	CRefCount::SafeRelease(m_mdpart_constraint);
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -275,10 +275,10 @@ CMDIndexGPDB::GetIncludedColPos(ULONG column) const
 //		Return the part constraint
 //
 //---------------------------------------------------------------------------
-gpos::pointer<IMDPartConstraint *>
+IMDPartConstraint *
 CMDIndexGPDB::MDPartConstraint() const
 {
-	return m_mdpart_constraint;
+	return m_mdpart_constraint.get();
 }
 
 //---------------------------------------------------------------------------
@@ -313,13 +313,13 @@ CMDIndexGPDB::Serialize(CXMLSerializer *xml_serializer) const
 
 	// serialize index keys
 	CWStringDynamic *index_key_cols_str =
-		CDXLUtils::Serialize(m_mp, m_index_key_cols_array);
+		CDXLUtils::Serialize(m_mp, m_index_key_cols_array.get());
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenIndexKeyCols), index_key_cols_str);
 	GPOS_DELETE(index_key_cols_str);
 
 	CWStringDynamic *available_cols_str =
-		CDXLUtils::Serialize(m_mp, m_included_cols_array);
+		CDXLUtils::Serialize(m_mp, m_included_cols_array.get());
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenIndexIncludedCols),
 		available_cols_str);
@@ -417,8 +417,7 @@ CMDIndexGPDB::GetIndexRetItemTypeMdid() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIndexGPDB::IsCompatible(gpos::pointer<const IMDScalarOp *> md_scalar_op,
-						   ULONG key_pos) const
+CMDIndexGPDB::IsCompatible(const IMDScalarOp *md_scalar_op, ULONG key_pos) const
 {
 	GPOS_ASSERT(nullptr != md_scalar_op);
 	GPOS_ASSERT(key_pos < m_mdid_opfamilies_array->Size());

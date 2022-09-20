@@ -33,17 +33,17 @@ using namespace gpmd;
 CMDRelationGPDB::CMDRelationGPDB(
 	CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname, BOOL fTemporary,
 	Erelstoragetype rel_storage_type, Ereldistrpolicy rel_distr_policy,
-	gpos::owner<CMDColumnArray *> mdcol_array,
-	gpos::owner<ULongPtrArray *> distr_col_array,
+	gpos::Ref<CMDColumnArray> mdcol_array,
+	gpos::Ref<ULongPtrArray> distr_col_array,
 	gpos::Ref<IMdIdArray> distr_opfamilies,
-	gpos::owner<ULongPtrArray *> partition_cols_array,
-	gpos::owner<CharPtrArray *> str_part_types_array, ULONG num_of_partitions,
+	gpos::Ref<ULongPtrArray> partition_cols_array,
+	gpos::Ref<CharPtrArray> str_part_types_array, ULONG num_of_partitions,
 	gpos::Ref<IMdIdArray> partition_oids, BOOL convert_hash_to_random,
-	gpos::owner<ULongPtr2dArray *> keyset_array,
-	gpos::owner<CMDIndexInfoArray *> md_index_info_array,
+	gpos::Ref<ULongPtr2dArray> keyset_array,
+	gpos::Ref<CMDIndexInfoArray> md_index_info_array,
 	gpos::Ref<IMdIdArray> mdid_triggers_array,
 	gpos::Ref<IMdIdArray> mdid_check_constraint_array,
-	gpos::owner<CDXLNode *> mdpart_constraint)
+	gpos::Ref<CDXLNode> mdpart_constraint)
 	: m_mp(mp),
 	  m_mdid(mdid),
 	  m_mdname(mdname),
@@ -90,7 +90,7 @@ CMDRelationGPDB::CMDRelationGPDB(
 	ULONG non_dropped_col_pos = 0;
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		gpos::pointer<IMDColumn *> mdcol = (*m_md_col_array)[ul];
+		IMDColumn *mdcol = (*m_md_col_array)[ul].get();
 		BOOL is_system_col = mdcol->IsSystemColumn();
 		if (is_system_col)
 		{
@@ -134,17 +134,17 @@ CMDRelationGPDB::~CMDRelationGPDB()
 {
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
-	m_md_col_array->Release();
-	CRefCount::SafeRelease(m_distr_col_array);
-	CRefCount::SafeRelease(m_partition_cols_array);
-	CRefCount::SafeRelease(m_str_part_types_array);
-	CRefCount::SafeRelease(m_keyset_array);
-	m_mdindex_info_array->Release();
-	m_col_width_array->Release();
-	CRefCount::SafeRelease(m_mdpart_constraint);
-	CRefCount::SafeRelease(m_colpos_nondrop_colpos_map);
-	CRefCount::SafeRelease(m_attrno_nondrop_col_pos_map);
-	CRefCount::SafeRelease(m_nondrop_col_pos_array);
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -318,10 +318,10 @@ CMDRelationGPDB::GetPosFromAttno(INT attno) const
 //		Returns the original positions of all the non-dropped columns
 //
 //---------------------------------------------------------------------------
-gpos::pointer<ULongPtrArray *>
+ULongPtrArray *
 CMDRelationGPDB::NonDroppedColsArray() const
 {
-	return m_nondrop_col_pos_array;
+	return m_nondrop_col_pos_array.get();
 }
 
 //---------------------------------------------------------------------------
@@ -360,12 +360,12 @@ CMDRelationGPDB::KeySetCount() const
 //		Returns the key set at the specified position
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const ULongPtrArray *>
+const ULongPtrArray *
 CMDRelationGPDB::KeySetAt(ULONG pos) const
 {
 	GPOS_ASSERT(nullptr != m_keyset_array);
 
-	return (*m_keyset_array)[pos];
+	return (*m_keyset_array)[pos].get();
 }
 
 //---------------------------------------------------------------------------
@@ -426,10 +426,10 @@ CMDRelationGPDB::PartColumnCount() const
 }
 
 // Retrieve list of partition types
-gpos::pointer<CharPtrArray *>
+CharPtrArray *
 CMDRelationGPDB::GetPartitionTypes() const
 {
-	return m_str_part_types_array;
+	return m_str_part_types_array.get();
 }
 
 // Returns the partition type of the given level
@@ -449,7 +449,7 @@ CMDRelationGPDB::PartTypeAtLevel(ULONG ulLevel) const
 //		partition key list
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const IMDColumn *>
+const IMDColumn *
 CMDRelationGPDB::PartColAt(ULONG pos) const
 {
 	ULONG partition_key_pos = (*(*m_partition_cols_array)[pos]);
@@ -492,12 +492,12 @@ CMDRelationGPDB::TriggerCount() const
 //		Returns the column at the specified position
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const IMDColumn *>
+const IMDColumn *
 CMDRelationGPDB::GetMdCol(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_md_col_array->Size());
 
-	return (*m_md_col_array)[pos];
+	return (*m_md_col_array)[pos].get();
 }
 
 //---------------------------------------------------------------------------
@@ -508,7 +508,7 @@ CMDRelationGPDB::GetMdCol(ULONG pos) const
 //		Returns the distribution column at the specified position in the distribution column list
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const IMDColumn *>
+const IMDColumn *
 CMDRelationGPDB::GetDistrColAt(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_distr_col_array->Size());
@@ -608,10 +608,10 @@ CMDRelationGPDB::CheckConstraintMDidAt(ULONG pos) const
 //		Return the part constraint
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLNode *>
+CDXLNode *
 CMDRelationGPDB::MDPartConstraint() const
 {
-	return m_mdpart_constraint;
+	return m_mdpart_constraint.get();
 }
 
 
@@ -651,7 +651,7 @@ CMDRelationGPDB::Serialize(CXMLSerializer *xml_serializer) const
 
 		// serialize distribution columns
 		CWStringDynamic *distr_col_str_array =
-			ColumnsToStr(m_mp, m_distr_col_array);
+			ColumnsToStr(m_mp, m_distr_col_array.get());
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenDistrColumns),
 			distr_col_str_array);
@@ -662,7 +662,7 @@ CMDRelationGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	if (m_keyset_array != nullptr && m_keyset_array->Size() > 0)
 	{
 		CWStringDynamic *keyset_str_array =
-			CDXLUtils::Serialize(m_mp, m_keyset_array);
+			CDXLUtils::Serialize(m_mp, m_keyset_array.get());
 		xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenKeys),
 									 keyset_str_array);
 		GPOS_DELETE(keyset_str_array);
@@ -676,7 +676,7 @@ CMDRelationGPDB::Serialize(CXMLSerializer *xml_serializer) const
 
 		// serialize partition keys
 		CWStringDynamic *part_keys_str_array =
-			CDXLUtils::Serialize(m_mp, m_partition_cols_array);
+			CDXLUtils::Serialize(m_mp, m_partition_cols_array.get());
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenPartKeys), part_keys_str_array);
 		GPOS_DELETE(part_keys_str_array);
@@ -686,8 +686,8 @@ CMDRelationGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	{
 		// serialize partition types
 		CWStringDynamic *part_types_str_array =
-			CDXLUtils::SerializeToCommaSeparatedString(m_mp,
-													   m_str_part_types_array);
+			CDXLUtils::SerializeToCommaSeparatedString(
+				m_mp, m_str_part_types_array.get());
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenPartTypes),
 			part_types_str_array);
@@ -711,7 +711,7 @@ CMDRelationGPDB::Serialize(CXMLSerializer *xml_serializer) const
 		CDXLTokens::GetDXLTokenStr(EdxltokenColumns));
 	for (ULONG ul = 0; ul < m_md_col_array->Size(); ul++)
 	{
-		gpos::pointer<CMDColumn *> mdcol = (*m_md_col_array)[ul];
+		CMDColumn *mdcol = (*m_md_col_array)[ul].get();
 		mdcol->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -728,7 +728,7 @@ CMDRelationGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	const ULONG indexes = m_mdindex_info_array->Size();
 	for (ULONG ul = 0; ul < indexes; ul++)
 	{
-		gpos::pointer<CMDIndexInfo *> index_info = (*m_mdindex_info_array)[ul];
+		CMDIndexInfo *index_info = (*m_mdindex_info_array)[ul].get();
 		index_info->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -827,7 +827,7 @@ CMDRelationGPDB::DebugPrint(IOstream &os) const
 	const ULONG num_of_columns = ColumnCount();
 	for (ULONG ul = 0; ul < num_of_columns; ul++)
 	{
-		gpos::pointer<const IMDColumn *> mdcol = GetMdCol(ul);
+		const IMDColumn *mdcol = GetMdCol(ul);
 		mdcol->DebugPrint(os);
 	}
 	os << std::endl;
@@ -841,7 +841,7 @@ CMDRelationGPDB::DebugPrint(IOstream &os) const
 			os << ", ";
 		}
 
-		gpos::pointer<const IMDColumn *> mdcol_distr_key = GetDistrColAt(ul);
+		const IMDColumn *mdcol_distr_key = GetDistrColAt(ul);
 		os << (mdcol_distr_key->Mdname()).GetMDName()->GetBuffer();
 	}
 
@@ -856,7 +856,7 @@ CMDRelationGPDB::DebugPrint(IOstream &os) const
 			os << ", ";
 		}
 
-		gpos::pointer<const IMDColumn *> mdcol_part_key = PartColAt(ul);
+		const IMDColumn *mdcol_part_key = PartColAt(ul);
 		os << (mdcol_part_key->Mdname()).GetMDName()->GetBuffer();
 	}
 
@@ -866,8 +866,7 @@ CMDRelationGPDB::DebugPrint(IOstream &os) const
 	const ULONG indexes = m_mdindex_info_array->Size();
 	for (ULONG ul = 0; ul < indexes; ul++)
 	{
-		gpos::pointer<CMDIndexInfo *> mdindex_info =
-			(*m_mdindex_info_array)[ul];
+		CMDIndexInfo *mdindex_info = (*m_mdindex_info_array)[ul].get();
 		mdindex_info->DebugPrint(os);
 	}
 

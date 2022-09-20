@@ -36,28 +36,28 @@ class CDXLMinidump
 {
 private:
 	// traceflags
-	gpos::owner<CBitSet *> m_pbs;
+	gpos::Ref<CBitSet> m_pbs;
 
 	// optimizer configuration
-	gpos::owner<COptimizerConfig *> m_optimizer_config;
+	gpos::Ref<COptimizerConfig> m_optimizer_config;
 
 	// DXL query tree
-	gpos::owner<CDXLNode *> m_query_dxl_root;
+	gpos::Ref<CDXLNode> m_query_dxl_root;
 
 	// Array of DXL nodes that represent the query output
-	gpos::owner<CDXLNodeArray *> m_query_output;
+	gpos::Ref<CDXLNodeArray> m_query_output;
 
 	// Array of DXL nodes that represent the CTE producers
-	gpos::owner<CDXLNodeArray *> m_cte_producers;
+	gpos::Ref<CDXLNodeArray> m_cte_producers;
 
 	// DXL plan
-	gpos::owner<CDXLNode *> m_plan_dxl_root;
+	gpos::Ref<CDXLNode> m_plan_dxl_root;
 
 	// metadata objects
-	gpos::owner<IMDCacheObjectArray *> m_mdid_cached_obj_array;
+	gpos::Ref<IMDCacheObjectArray> m_mdid_cached_obj_array;
 
 	// source system ids
-	gpos::owner<CSystemIdArray *> m_system_id_array;
+	gpos::Ref<CSystemIdArray> m_system_id_array;
 
 	// plan Id
 	ULLONG m_plan_id;
@@ -69,46 +69,46 @@ public:
 	CDXLMinidump(const CDXLMinidump &) = delete;
 
 	// ctor
-	CDXLMinidump(gpos::owner<CBitSet *> pbs,
-				 gpos::owner<COptimizerConfig *> optimizer_config,
-				 gpos::owner<CDXLNode *> query,
-				 gpos::owner<CDXLNodeArray *> query_output_dxlnode_array,
-				 gpos::owner<CDXLNodeArray *> cte_producers,
-				 gpos::owner<CDXLNode *> pdxlnPlan,
-				 gpos::owner<IMDCacheObjectArray *> mdcache_obj_array,
-				 gpos::owner<CSystemIdArray *> pdrgpsysid, ULLONG plan_id,
+	CDXLMinidump(gpos::Ref<CBitSet> pbs,
+				 gpos::Ref<COptimizerConfig> optimizer_config,
+				 gpos::Ref<CDXLNode> query,
+				 gpos::Ref<CDXLNodeArray> query_output_dxlnode_array,
+				 gpos::Ref<CDXLNodeArray> cte_producers,
+				 gpos::Ref<CDXLNode> pdxlnPlan,
+				 gpos::Ref<IMDCacheObjectArray> mdcache_obj_array,
+				 gpos::Ref<CSystemIdArray> pdrgpsysid, ULLONG plan_id,
 				 ULLONG plan_space_size);
 
 	// dtor
 	~CDXLMinidump();
 
 	// traceflags
-	gpos::pointer<const CBitSet *> Pbs() const;
+	const CBitSet *Pbs() const;
 
 	// optimizer configuration
-	gpos::pointer<COptimizerConfig *>
+	COptimizerConfig *
 	GetOptimizerConfig() const
 	{
-		return m_optimizer_config;
+		return m_optimizer_config.get();
 	}
 
 	// query object
-	gpos::pointer<const CDXLNode *> GetQueryDXLRoot() const;
+	const CDXLNode *GetQueryDXLRoot() const;
 
 	// query output columns
-	gpos::pointer<const CDXLNodeArray *> PdrgpdxlnQueryOutput() const;
+	const CDXLNodeArray *PdrgpdxlnQueryOutput() const;
 
 	// CTE list
-	gpos::pointer<const CDXLNodeArray *> GetCTEProducerDXLArray() const;
+	const CDXLNodeArray *GetCTEProducerDXLArray() const;
 
 	// plan
-	gpos::pointer<const CDXLNode *> PdxlnPlan() const;
+	const CDXLNode *PdxlnPlan() const;
 
 	// metadata objects
-	gpos::pointer<const IMDCacheObjectArray *> GetMdIdCachedObjArray() const;
+	const IMDCacheObjectArray *GetMdIdCachedObjArray() const;
 
 	// source system ids
-	gpos::pointer<const CSystemIdArray *> GetSysidPtrArray() const;
+	const CSystemIdArray *GetSysidPtrArray() const;
 
 	// return plan id
 	ULLONG GetPlanId() const;

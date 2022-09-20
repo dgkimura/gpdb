@@ -44,7 +44,7 @@ public:
 	CScalarCoerceViaIO(const CScalarCoerceViaIO &) = delete;
 
 	// ctor
-	CScalarCoerceViaIO(CMemoryPool *mp, gpos::owner<IMDId *> mdid_type,
+	CScalarCoerceViaIO(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 					   INT type_modifier, ECoercionForm dxl_coerce_format,
 					   INT location);
 
@@ -65,7 +65,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *>) const override;
+	BOOL Matches(COperator *) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -75,7 +75,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarCoerceViaIO *>
+	static CScalarCoerceViaIO *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

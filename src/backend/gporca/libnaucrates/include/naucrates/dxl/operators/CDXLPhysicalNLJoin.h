@@ -50,7 +50,7 @@ private:
 
 	// array holding nest params col references used for creating nestparam
 	// node during translation
-	gpos::owner<CDXLColRefArray *> m_nest_params_col_refs;
+	gpos::Ref<CDXLColRefArray> m_nest_params_col_refs;
 
 	// if nest params are required to be parsed
 	BOOL m_nest_params_exists;
@@ -82,15 +82,15 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	void SetNestLoopParamsColRefs(
-		gpos::owner<CDXLColRefArray *> nest_params_col_refs);
+		gpos::Ref<CDXLColRefArray> nest_params_col_refs);
 
-	gpos::pointer<CDXLColRefArray *> GetNestLoopParamsColRefs() const;
+	CDXLColRefArray *GetNestLoopParamsColRefs() const;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalNLJoin *>
+	static CDXLPhysicalNLJoin *
 	PdxlConvert(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -102,8 +102,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

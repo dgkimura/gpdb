@@ -55,32 +55,33 @@ CXformRightOuterJoin2HashJoinTest::EresUnittest_Transform()
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	gpos::owner<CXformContext *> context = GPOS_NEW(mp) CXformContext(mp);
-	gpos::owner<CXformResult *> result = GPOS_NEW(mp) CXformResult(mp);
+	gpos::Ref<CXformContext> context = GPOS_NEW(mp) CXformContext(mp);
+	gpos::Ref<CXformResult> result = GPOS_NEW(mp) CXformResult(mp);
 
-	gpos::owner<CXformRightOuterJoin2HashJoin *> xform =
+	gpos::Ref<CXformRightOuterJoin2HashJoin> xform =
 		GPOS_NEW(mp) CXformRightOuterJoin2HashJoin(mp);
 
-	gpos::owner<CExpression *> pLogicalRightOuterJoin =
+	gpos::Ref<CExpression> pLogicalRightOuterJoin =
 		CTestUtils::PexprRightOuterJoin(mp);
 
 	// xform should work even if child stats aren't derived yet.
 	GPOS_ASSERT(nullptr == (*pLogicalRightOuterJoin)[0]->Pstats());
 	GPOS_ASSERT(nullptr == (*pLogicalRightOuterJoin)[1]->Pstats());
 
-	(void) xform->Transform(context, result, pLogicalRightOuterJoin);
+	(void) xform->Transform(context.get(), result.get(),
+							pLogicalRightOuterJoin.get());
 
-	pLogicalRightOuterJoin->Release();
-	xform->Release();
-	context->Release();
-	result->Release();
+	;
+	;
+	;
+	;
 
 	return GPOS_OK;
 }

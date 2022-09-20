@@ -176,8 +176,8 @@ CParseHandlerMDRelationExternal::EndElement(
 	gpos::Ref<IMdIdArray> mdid_check_constraint_array =
 		mdid_check_constraint_parse_handler->GetMdIdArray();
 
-	md_col_array->AddRef();
-	md_index_info_array->AddRef();
+	;
+	;
 
 	gpos::Ref<IMdIdArray> distr_opfamilies = nullptr;
 	if (m_rel_distr_policy == IMDRelation::EreldistrHash &&

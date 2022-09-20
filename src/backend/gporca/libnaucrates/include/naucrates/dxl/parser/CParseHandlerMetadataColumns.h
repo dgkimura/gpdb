@@ -39,7 +39,7 @@ class CParseHandlerMetadataColumns : public CParseHandlerBase
 {
 private:
 	// list of columns
-	gpos::owner<CMDColumnArray *> m_md_col_array;
+	gpos::Ref<CMDColumnArray> m_md_col_array;
 
 	// process the start of an element
 	void StartElement(
@@ -68,7 +68,7 @@ public:
 
 
 	// returns the constructed columns list
-	gpos::pointer<CMDColumnArray *> GetMdColArray();
+	CMDColumnArray *GetMdColArray();
 };
 }  // namespace gpdxl
 

@@ -65,9 +65,11 @@ CParseHandlerDynamicIndexScan::StartElement(
 	StartElementHelper(element_local_name, attrs,
 					   EdxltokenPhysicalDynamicIndexScan);
 
-	m_selector_ids = CDXLOperatorFactory::ExtractConvertValuesToArray(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenSelectorIds,
-		EdxltokenPhysicalDynamicIndexScan);
+	m_selector_ids =
+		CDXLOperatorFactory::ExtractConvertValuesToArray(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs,
+			EdxltokenSelectorIds, EdxltokenPhysicalDynamicIndexScan)
+			.get();
 }
 
 //---------------------------------------------------------------------------

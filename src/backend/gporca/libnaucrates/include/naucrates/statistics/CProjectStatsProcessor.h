@@ -22,10 +22,9 @@ class CProjectStatsProcessor
 {
 public:
 	// project
-	static gpos::owner<CStatistics *> CalcProjStats(
-		CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
-		gpos::pointer<ULongPtrArray *> projection_colids,
-		gpos::pointer<UlongToIDatumMap *> datum_map);
+	static gpos::Ref<CStatistics> CalcProjStats(
+		CMemoryPool *mp, const CStatistics *input_stats,
+		ULongPtrArray *projection_colids, UlongToIDatumMap *datum_map);
 };
 }  // namespace gpnaucrates
 

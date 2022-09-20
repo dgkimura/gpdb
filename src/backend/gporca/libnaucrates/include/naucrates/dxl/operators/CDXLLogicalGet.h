@@ -34,13 +34,13 @@ class CDXLLogicalGet : public CDXLLogical
 {
 private:
 	// table descriptor for the scanned table
-	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
+	gpos::Ref<CDXLTableDescr> m_dxl_table_descr;
 
 public:
 	CDXLLogicalGet(CDXLLogicalGet &) = delete;
 
 	// ctor
-	CDXLLogicalGet(CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr);
+	CDXLLogicalGet(CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr);
 
 	// dtor
 	~CDXLLogicalGet() override;
@@ -48,17 +48,17 @@ public:
 	// accessors
 	Edxlopid GetDXLOperator() const override;
 	const CWStringConst *GetOpNameStr() const override;
-	gpos::pointer<CDXLTableDescr *> GetDXLTableDescr() const;
+	CDXLTableDescr *GetDXLTableDescr() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// check if given column is defined by operator
 	BOOL IsColDefined(ULONG colid) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLLogicalGet *>
+	static CDXLLogicalGet *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -71,8 +71,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

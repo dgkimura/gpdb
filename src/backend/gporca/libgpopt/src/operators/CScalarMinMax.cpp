@@ -88,15 +88,14 @@ CScalarMinMax::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarMinMax::Matches(gpos::pointer<COperator *> pop) const
+CScalarMinMax::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CScalarMinMax *> popScMinMax =
-		gpos::dyn_cast<CScalarMinMax>(pop);
+	CScalarMinMax *popScMinMax = gpos::dyn_cast<CScalarMinMax>(pop);
 
 	// match if return types are identical
 	return popScMinMax->Esmmt() == m_esmmt &&

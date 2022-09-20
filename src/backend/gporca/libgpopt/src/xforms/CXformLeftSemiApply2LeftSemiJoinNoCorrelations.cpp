@@ -53,9 +53,7 @@ CXformLeftSemiApply2LeftSemiJoinNoCorrelations::Exfp(
 //---------------------------------------------------------------------------
 void
 CXformLeftSemiApply2LeftSemiJoinNoCorrelations::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+	CXformContext *pxfctxt, CXformResult *pxfres, CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

@@ -33,7 +33,7 @@ class CLogicalLimit : public CLogical
 {
 private:
 	// required sort order
-	gpos::owner<COrderSpec *> m_pos;
+	gpos::Ref<COrderSpec> m_pos;
 
 	// global limit
 	BOOL m_fGlobal;
@@ -49,7 +49,7 @@ public:
 
 	// ctors
 	explicit CLogicalLimit(CMemoryPool *mp);
-	CLogicalLimit(CMemoryPool *mp, gpos::owner<COrderSpec *> pos, BOOL fGlobal,
+	CLogicalLimit(CMemoryPool *mp, gpos::Ref<COrderSpec> pos, BOOL fGlobal,
 				  BOOL fHasCount, BOOL fTopLimitUnderDML);
 
 	// dtor
@@ -69,10 +69,10 @@ public:
 	}
 
 	// order spec
-	gpos::pointer<COrderSpec *>
+	COrderSpec *
 	Pos() const
 	{
-		return m_pos;
+		return m_pos.get();
 	}
 
 	// global limit
@@ -97,7 +97,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *>) const override;
+	BOOL Matches(COperator *) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -110,8 +110,8 @@ public:
 	ULONG HashValue() const override;
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
+	gpos::Ref<COperator> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// print
@@ -122,15 +122,15 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	gpos::owner<CColRefSet *> DeriveOutputColumns(
+	gpos::Ref<CColRefSet> DeriveOutputColumns(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// derive outer references
-	gpos::owner<CColRefSet *> DeriveOuterReferences(
+	gpos::Ref<CColRefSet> DeriveOuterReferences(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
-	gpos::owner<CKeyCollection *> DeriveKeyCollection(
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive max card
@@ -138,7 +138,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	gpos::owner<CPartInfo *>
+	gpos::Ref<CPartInfo>
 	DerivePartitionInfo(CMemoryPool *,	// mp
 						CExpressionHandle &exprhdl) const override
 	{
@@ -146,7 +146,7 @@ public:
 	}
 
 	// derive constraint property
-	gpos::owner<CPropConstraint *>
+	gpos::Ref<CPropConstraint>
 	DerivePropertyConstraint(CMemoryPool *,	 //mp,
 							 CExpressionHandle &exprhdl) const override
 	{
@@ -158,17 +158,16 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	gpos::owner<CColRefSet *> PcrsStat(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   gpos::pointer<CColRefSet *> pcrsInput,
-									   ULONG child_index) const override;
+	gpos::Ref<CColRefSet> PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								   CColRefSet *pcrsInput,
+								   ULONG child_index) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
 	//-------------------------------------------------------------------------------------
 
 	// candidate set of xforms
-	gpos::owner<CXformSet *> PxfsCandidates(CMemoryPool *) const override;
+	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *) const override;
 
 	// stat promise
 	EStatPromise
@@ -178,16 +177,16 @@ public:
 	}
 
 	// derive statistics
-	gpos::owner<IStatistics *> PstatsDerive(
+	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		gpos::pointer<IStatisticsArray *> stats_ctxt) const override;
+		IStatisticsArray *stats_ctxt) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static gpos::cast_func<CLogicalLimit *>
+	static CLogicalLimit *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

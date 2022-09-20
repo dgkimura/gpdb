@@ -36,7 +36,7 @@ class CParseHandlerRoutedMotion : public CParseHandlerPhysicalOp
 {
 private:
 	// motion operator
-	gpos::pointer<CDXLPhysicalRoutedDistributeMotion *> m_dxl_op;
+	CDXLPhysicalRoutedDistributeMotion *m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

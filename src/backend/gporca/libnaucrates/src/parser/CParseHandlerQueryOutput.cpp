@@ -51,7 +51,7 @@ CParseHandlerQueryOutput::CParseHandlerQueryOutput(
 //---------------------------------------------------------------------------
 CParseHandlerQueryOutput::~CParseHandlerQueryOutput()
 {
-	m_dxl_array->Release();
+	;
 }
 
 
@@ -63,11 +63,11 @@ CParseHandlerQueryOutput::~CParseHandlerQueryOutput()
 //		Return the list of query output columns
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CDXLNodeArray *>
+CDXLNodeArray *
 CParseHandlerQueryOutput::GetOutputColumnsDXLArray()
 {
 	GPOS_ASSERT(nullptr != m_dxl_array);
-	return m_dxl_array;
+	return m_dxl_array.get();
 }
 
 
@@ -155,9 +155,8 @@ CParseHandlerQueryOutput::EndElement(const XMLCh *const,  // element_uri,
 
 		GPOS_ASSERT(nullptr != child_parse_handler);
 
-		gpos::owner<CDXLNode *> pdxlnIdent =
-			child_parse_handler->CreateDXLNode();
-		pdxlnIdent->AddRef();
+		gpos::Ref<CDXLNode> pdxlnIdent = child_parse_handler->CreateDXLNode();
+		;
 		m_dxl_array->Append(pdxlnIdent);
 	}
 

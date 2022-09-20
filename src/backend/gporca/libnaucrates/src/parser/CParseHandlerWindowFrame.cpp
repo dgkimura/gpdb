@@ -121,16 +121,16 @@ CParseHandlerWindowFrame::EndElement(const XMLCh *const,  // element_uri,
 	CParseHandlerScalarOp *trailing_val_parse_handler_base =
 		dynamic_cast<CParseHandlerScalarOp *>((*this)[0]);
 	GPOS_ASSERT(nullptr != trailing_val_parse_handler_base);
-	gpos::owner<CDXLNode *> dxlnode_trailing =
+	gpos::Ref<CDXLNode> dxlnode_trailing =
 		trailing_val_parse_handler_base->CreateDXLNode();
-	dxlnode_trailing->AddRef();
+	;
 
 	CParseHandlerScalarOp *leading_val_parse_handler_base =
 		dynamic_cast<CParseHandlerScalarOp *>((*this)[1]);
 	GPOS_ASSERT(nullptr != leading_val_parse_handler_base);
-	gpos::owner<CDXLNode *> dxlnode_leading =
+	gpos::Ref<CDXLNode> dxlnode_leading =
 		leading_val_parse_handler_base->CreateDXLNode();
-	dxlnode_leading->AddRef();
+	;
 
 	m_window_frame = GPOS_NEW(m_mp) CDXLWindowFrame(
 		m_dxl_win_frame_spec, m_dxl_frame_exclusion_strategy,

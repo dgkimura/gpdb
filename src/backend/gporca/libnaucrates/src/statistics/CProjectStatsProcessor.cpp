@@ -20,22 +20,22 @@ using namespace gpopt;
 
 
 //  return a statistics object for a project operation
-gpos::owner<CStatistics *>
-CProjectStatsProcessor::CalcProjStats(
-	CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
-	gpos::pointer<ULongPtrArray *> projection_colids,
-	gpos::pointer<UlongToIDatumMap *> datum_map)
+gpos::Ref<CStatistics>
+CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
+									  const CStatistics *input_stats,
+									  ULongPtrArray *projection_colids,
+									  UlongToIDatumMap *datum_map)
 {
 	GPOS_ASSERT(nullptr != projection_colids);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 	// create hash map from colid -> histogram for resultant structure
-	gpos::owner<UlongToHistogramMap *> histograms_new =
+	gpos::Ref<UlongToHistogramMap> histograms_new =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// column ids on which widths are to be computed
-	gpos::owner<UlongToDoubleMap *> colid_width_mapping =
+	gpos::Ref<UlongToDoubleMap> colid_width_mapping =
 		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	const ULONG length = projection_colids->Size();
@@ -47,7 +47,7 @@ CProjectStatsProcessor::CalcProjStats(
 		if (nullptr == histogram)
 		{
 			// create histogram for the new project column
-			gpos::owner<CBucketArray *> proj_col_bucket =
+			gpos::Ref<CBucketArray> proj_col_bucket =
 				GPOS_NEW(mp) CBucketArray(mp);
 			CDouble null_freq = 0.0;
 
@@ -77,7 +77,7 @@ CProjectStatsProcessor::CalcProjStats(
 			if (0 == proj_col_bucket->Size() &&
 				IMDType::EtiBool == colref->RetrieveType()->GetDatumType())
 			{
-				proj_col_bucket->Release();
+				;
 				proj_col_histogram = CHistogram::MakeDefaultBoolHistogram(mp);
 			}
 			else
@@ -118,7 +118,7 @@ CProjectStatsProcessor::CalcProjStats(
 
 	CDouble input_rows = input_stats->Rows();
 	// create an output stats object
-	gpos::owner<CStatistics *> projection_stats = GPOS_NEW(mp) CStatistics(
+	gpos::Ref<CStatistics> projection_stats = GPOS_NEW(mp) CStatistics(
 		mp, std::move(histograms_new), std::move(colid_width_mapping),
 		input_rows, input_stats->IsEmpty(),
 		input_stats->GetNumberOfPredicates());
@@ -126,11 +126,11 @@ CProjectStatsProcessor::CalcProjStats(
 	// In the output statistics object, the upper bound source cardinality of the project column
 	// is equivalent the estimate project cardinality.
 	CStatisticsUtils::ComputeCardUpperBounds(
-		mp, input_stats, projection_stats, input_rows,
+		mp, input_stats, projection_stats.get(), input_rows,
 		CStatistics::EcbmInputSourceMaxCard /* card_bounding_method */);
 
 	// add upper bound card information for the project columns
-	CStatistics::CreateAndInsertUpperBoundNDVs(mp, projection_stats,
+	CStatistics::CreateAndInsertUpperBoundNDVs(mp, projection_stats.get(),
 											   projection_colids, input_rows);
 
 	return projection_stats;

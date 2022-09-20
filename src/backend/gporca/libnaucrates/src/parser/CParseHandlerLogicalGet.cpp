@@ -117,9 +117,9 @@ CParseHandlerLogicalGet::EndElement(const XMLCh *const element_local_name,
 
 	GPOS_ASSERT(nullptr != table_descr_parse_handler->GetDXLTableDescr());
 
-	gpos::owner<CDXLTableDescr *> table_descr =
+	gpos::Ref<CDXLTableDescr> table_descr =
 		table_descr_parse_handler->GetDXLTableDescr();
-	table_descr->AddRef();
+	;
 
 	if (EdxltokenLogicalGet == token_type)
 	{
@@ -134,7 +134,7 @@ CParseHandlerLogicalGet::EndElement(const XMLCh *const element_local_name,
 	}
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node,
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node.get(),
 										   false /* validate_children */);
 #endif	// GPOS_DEBUG
 

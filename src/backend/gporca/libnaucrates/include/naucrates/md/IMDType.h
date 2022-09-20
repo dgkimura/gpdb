@@ -103,7 +103,7 @@ public:
 	virtual IMDId *GetMdidForAggType(EAggType agg_type) const = 0;
 
 	// id of comparison operator for type used in btree lookups
-	virtual gpos::pointer<const IMDId *> CmpOpMdid() const = 0;
+	virtual const IMDId *CmpOpMdid() const = 0;
 
 	// id of hash operator for type
 	virtual BOOL IsHashable() const = 0;
@@ -121,12 +121,12 @@ public:
 	virtual ETypeInfo GetDatumType() const = 0;
 
 	// transformation function for datums
-	virtual gpos::owner<IDatum *> GetDatumForDXLConstVal(
-		gpos::pointer<const CDXLScalarConstValue *> dxl_op) const = 0;
+	virtual gpos::Ref<IDatum> GetDatumForDXLConstVal(
+		const CDXLScalarConstValue *dxl_op) const = 0;
 
 	// construct a datum from a DXL datum
-	virtual gpos::owner<IDatum *> GetDatumForDXLDatum(
-		CMemoryPool *mp, gpos::pointer<const CDXLDatum *> dxl_datum) const = 0;
+	virtual gpos::Ref<IDatum> GetDatumForDXLDatum(
+		CMemoryPool *mp, const CDXLDatum *dxl_datum) const = 0;
 
 	// is type fixed length
 	virtual BOOL IsFixedLength() const = 0;
@@ -150,18 +150,18 @@ public:
 	virtual BOOL IsPassedByValue() const = 0;
 
 	// return the null constant for this type
-	virtual gpos::pointer<IDatum *> DatumNull() const = 0;
+	virtual IDatum *DatumNull() const = 0;
 
 	// generate the DXL scalar constant from IDatum
-	virtual gpos::owner<CDXLScalarConstValue *> GetDXLOpScConst(
-		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const = 0;
+	virtual gpos::Ref<CDXLScalarConstValue> GetDXLOpScConst(
+		CMemoryPool *mp, IDatum *datum) const = 0;
 
 	// generate the DXL datum from IDatum
-	virtual gpos::owner<CDXLDatum *> GetDatumVal(
-		CMemoryPool *mp, gpos::pointer<IDatum *> datum) const = 0;
+	virtual gpos::Ref<CDXLDatum> GetDatumVal(CMemoryPool *mp,
+											 IDatum *datum) const = 0;
 
 	// generate the DXL datum representing null value
-	virtual gpos::owner<CDXLDatum *> GetDXLDatumNull(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<CDXLDatum> GetDXLDatumNull(CMemoryPool *mp) const = 0;
 
 	// is type an ambiguous one? e.g., AnyElement in GPDB
 	virtual BOOL
@@ -174,13 +174,12 @@ public:
 	static const CWStringConst *GetCmpTypeStr(IMDType::ECmpType cmp_type);
 
 	// return true if we can perform statistical comparison between datums of these two types; else return false
-	static BOOL StatsAreComparable(
-		gpos::pointer<const IMDType *> mdtype_first,
-		gpos::pointer<const IMDType *> mdtype_second);
+	static BOOL StatsAreComparable(const IMDType *mdtype_first,
+								   const IMDType *mdtype_second);
 
 	// return true if we can perform statistical comparison between datum of the given type and a given datum; else return false
-	static BOOL StatsAreComparable(gpos::pointer<const IMDType *> mdtype_first,
-								   gpos::pointer<const IDatum *> datum_second);
+	static BOOL StatsAreComparable(const IMDType *mdtype_first,
+								   const IDatum *datum_second);
 };
 }  // namespace gpmd
 

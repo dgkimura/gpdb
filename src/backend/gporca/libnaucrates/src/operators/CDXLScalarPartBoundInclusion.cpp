@@ -75,9 +75,8 @@ CDXLScalarPartBoundInclusion::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarPartBoundInclusion::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *>	 // dxlnode
+CDXLScalarPartBoundInclusion::SerializeToDXL(CXMLSerializer *xml_serializer,
+											 const CDXLNode *  // dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -103,9 +102,8 @@ CDXLScalarPartBoundInclusion::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarPartBoundInclusion::AssertValid(
-	gpos::pointer<const CDXLNode *> dxlnode,
-	BOOL  // validate_children
+CDXLScalarPartBoundInclusion::AssertValid(const CDXLNode *dxlnode,
+										  BOOL	// validate_children
 ) const
 {
 	GPOS_ASSERT(0 == dxlnode->Arity());

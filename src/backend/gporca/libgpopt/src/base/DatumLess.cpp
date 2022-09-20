@@ -12,8 +12,8 @@
 namespace gpopt
 {
 bool
-DatumLess::operator()(gpos::pointer<const gpnaucrates::IDatum *> a,
-					  gpos::pointer<const gpnaucrates::IDatum *> b) const
+DatumLess::operator()(const gpnaucrates::IDatum *a,
+					  const gpnaucrates::IDatum *b) const
 {
 	const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
 	return pcomp->IsLessThan(a, b);

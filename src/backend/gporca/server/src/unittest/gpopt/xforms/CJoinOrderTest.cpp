@@ -87,8 +87,8 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 	GPOS_ASSERT(GPOS_ARRAY_SIZE(rgulRel) == ulRels);
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
 
@@ -97,29 +97,28 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 						 CTestUtils::GetCostModel(mp));
 
-		gpos::owner<CExpression *> pexprNAryJoin =
-			CTestUtils::PexprLogicalNAryJoin(mp, rgscRel, rgulRel, ulRels,
-											 false /*fCrossProduct*/);
+		gpos::Ref<CExpression> pexprNAryJoin = CTestUtils::PexprLogicalNAryJoin(
+			mp, rgscRel, rgulRel, ulRels, false /*fCrossProduct*/);
 
 		// derive stats on input expression
 		CExpressionHandle exprhdl(mp);
-		exprhdl.Attach(pexprNAryJoin);
+		exprhdl.Attach(pexprNAryJoin.get());
 		exprhdl.DeriveStats(mp, mp, nullptr /*prprel*/, nullptr /*stats_ctxt*/);
 
-		gpos::owner<CExpressionArray *> pdrgpexpr =
+		gpos::Ref<CExpressionArray> pdrgpexpr =
 			GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ul = 0; ul < ulRels; ul++)
 		{
-			gpos::owner<CExpression *> pexprChild = (*pexprNAryJoin)[ul];
-			pexprChild->AddRef();
+			gpos::Ref<CExpression> pexprChild = (*pexprNAryJoin)[ul];
+			;
 			pdrgpexpr->Append(pexprChild);
 		}
-		gpos::owner<CExpressionArray *> pdrgpexprPred =
+		gpos::Ref<CExpressionArray> pdrgpexprPred =
 			CPredicateUtils::PdrgpexprConjuncts(mp, (*pexprNAryJoin)[ulRels]);
-		pdrgpexpr->AddRef();
-		pdrgpexprPred->AddRef();
+		;
+		;
 		CJoinOrderMinCard jomc(mp, pdrgpexpr, pdrgpexprPred);
-		gpos::owner<CExpression *> pexprResult = jomc.PexprExpand();
+		gpos::Ref<CExpression> pexprResult = jomc.PexprExpand();
 		{
 			CAutoTrace at(mp);
 			at.Os() << std::endl
@@ -128,11 +127,10 @@ CJoinOrderTest::EresUnittest_ExpandMinCard()
 			at.Os() << std::endl
 					<< "OUTPUT:" << std::endl
 					<< *pexprResult << std::endl;
-		}
-		pexprResult->Release();
-		pexprNAryJoin->Release();
-		pdrgpexpr->Release();
-		pdrgpexprPred->Release();
+		};
+		;
+		;
+		;
 	}
 
 	return GPOS_OK;

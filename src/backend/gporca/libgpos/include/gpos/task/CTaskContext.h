@@ -26,7 +26,7 @@ class CTaskContext
 
 private:
 	// trace vector
-	gpos::owner<CBitSet *> m_bitset;
+	gpos::Ref<CBitSet> m_bitset;
 
 	// output log abstraction
 	ILogger *m_log_out;
@@ -98,7 +98,7 @@ public:
 		m_locale = locale;
 	}
 
-	gpos::owner<CBitSet *>
+	gpos::Ref<CBitSet>
 	copy_trace_flags(CMemoryPool *mp) const
 	{
 		return GPOS_NEW(mp) CBitSet(mp, *m_bitset);

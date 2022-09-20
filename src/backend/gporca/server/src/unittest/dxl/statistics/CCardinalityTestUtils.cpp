@@ -37,11 +37,11 @@ CCardinalityTestUtils::PbucketIntegerClosedLowerBound(CMemoryPool *mp,
 													  CDouble frequency,
 													  CDouble distinct)
 {
-	gpos::owner<CPoint *> ppLower = CTestUtils::PpointInt4(mp, iLower);
-	gpos::owner<CPoint *> ppUpper = CTestUtils::PpointInt4(mp, iUpper);
+	gpos::Ref<CPoint> ppLower = CTestUtils::PpointInt4(mp, iLower);
+	gpos::Ref<CPoint> ppUpper = CTestUtils::PpointInt4(mp, iUpper);
 
 	BOOL is_upper_closed = false;
-	if (ppLower->Equals(ppUpper))
+	if (ppLower->Equals(ppUpper.get()))
 	{
 		is_upper_closed = true;
 	}
@@ -58,8 +58,8 @@ CCardinalityTestUtils::PbucketInteger(CMemoryPool *mp, INT iLower, INT iUpper,
 									  BOOL is_upper_closed, CDouble frequency,
 									  CDouble distinct)
 {
-	gpos::owner<CPoint *> ppLower = CTestUtils::PpointInt4(mp, iLower);
-	gpos::owner<CPoint *> ppUpper = CTestUtils::PpointInt4(mp, iUpper);
+	gpos::Ref<CPoint> ppLower = CTestUtils::PpointInt4(mp, iLower);
+	gpos::Ref<CPoint> ppUpper = CTestUtils::PpointInt4(mp, iUpper);
 
 	return GPOS_NEW(mp)
 		CBucket(std::move(ppLower), std::move(ppUpper), is_lower_closed,
@@ -71,10 +71,10 @@ CBucket *
 CCardinalityTestUtils::PbucketSingletonBoolVal(CMemoryPool *mp, BOOL fValue,
 											   CDouble frequency)
 {
-	gpos::owner<CPoint *> ppLower = CTestUtils::PpointBool(mp, fValue);
+	gpos::Ref<CPoint> ppLower = CTestUtils::PpointBool(mp, fValue);
 
 	// lower bound is also upper bound
-	ppLower->AddRef();
+	;
 	return GPOS_NEW(mp) CBucket(ppLower, ppLower, true /* fClosedUpper */,
 								true /* fClosedUpper */, frequency, 1.0);
 }
@@ -86,8 +86,7 @@ CCardinalityTestUtils::PhistInt4Remain(CMemoryPool *mp, ULONG num_of_buckets,
 									   CDouble num_NDV_remain)
 {
 	// generate histogram of the form [0, 100), [100, 200), [200, 300) ...
-	gpos::owner<CBucketArray *> histogram_buckets =
-		GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
 	for (ULONG idx = 0; idx < num_of_buckets; idx++)
 	{
 		INT iLower = INT(idx * 100);
@@ -99,7 +98,7 @@ CCardinalityTestUtils::PhistInt4Remain(CMemoryPool *mp, ULONG num_of_buckets,
 		histogram_buckets->Append(bucket);
 	}
 
-	CDouble freq = CStatisticsUtils::GetFrequency(histogram_buckets);
+	CDouble freq = CStatisticsUtils::GetFrequency(histogram_buckets.get());
 	CDouble null_freq(0.0);
 	if (fNullFreq && 1 > freq)
 	{
@@ -123,8 +122,7 @@ CHistogram *
 CCardinalityTestUtils::PhistExampleInt4(CMemoryPool *mp)
 {
 	// generate histogram of the form [0, 10), [10, 20), [20, 30) ... [80, 90)
-	gpos::owner<CBucketArray *> histogram_buckets =
-		GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
 	for (ULONG idx = 0; idx < 9; idx++)
 	{
 		INT iLower = INT(idx * 10);
@@ -148,8 +146,7 @@ CCardinalityTestUtils::PhistExampleInt4(CMemoryPool *mp)
 CHistogram *
 CCardinalityTestUtils::PhistExampleBool(CMemoryPool *mp)
 {
-	gpos::owner<CBucketArray *> histogram_buckets =
-		GPOS_NEW(mp) CBucketArray(mp);
+	gpos::Ref<CBucketArray> histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
 	CBucket *pbucketFalse =
 		CCardinalityTestUtils::PbucketSingletonBoolVal(mp, false, 0.1);
 	CBucket *pbucketTrue =
@@ -160,58 +157,58 @@ CCardinalityTestUtils::PhistExampleBool(CMemoryPool *mp)
 }
 
 // helper function to generate a point from an encoded value of specific datatype
-gpos::owner<CPoint *>
+gpos::Ref<CPoint>
 CCardinalityTestUtils::PpointGeneric(CMemoryPool *mp, OID oid,
 									 CWStringDynamic *pstrEncodedValue,
 									 LINT value)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	gpos::owner<IMDId *> mdid = GPOS_NEW(mp) CMDIdGPDB(oid);
-	gpos::owner<IDatum *> datum = CTestUtils::CreateGenericDatum(
+	gpos::Ref<IMDId> mdid = GPOS_NEW(mp) CMDIdGPDB(oid);
+	gpos::Ref<IDatum> datum = CTestUtils::CreateGenericDatum(
 		mp, md_accessor, std::move(mdid), pstrEncodedValue, value);
-	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(std::move(datum));
+	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(std::move(datum));
 
 	return point;
 }
 
 // helper function to generate a point of numeric datatype
-gpos::owner<CPoint *>
+gpos::Ref<CPoint>
 CCardinalityTestUtils::PpointNumeric(CMemoryPool *mp,
 									 CWStringDynamic *pstrEncodedValue,
 									 CDouble value)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	gpos::owner<CMDIdGPDB *> mdid =
+	gpos::Ref<CMDIdGPDB> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_numeric);
-	gpos::pointer<const IMDType *> pmdtype = md_accessor->RetrieveType(mdid);
+	const IMDType *pmdtype = md_accessor->RetrieveType(mdid.get());
 
 	ULONG ulbaSize = 0;
 	BYTE *data =
 		CDXLUtils::DecodeByteArrayFromString(mp, pstrEncodedValue, &ulbaSize);
 
-	gpos::owner<CDXLDatumStatsDoubleMappable *> dxl_datum = GPOS_NEW(mp)
+	gpos::Ref<CDXLDatumStatsDoubleMappable> dxl_datum = GPOS_NEW(mp)
 		CDXLDatumStatsDoubleMappable(mp, std::move(mdid), default_type_modifier,
 									 false /*is_const_null*/, data, ulbaSize,
 									 value);
 
-	gpos::owner<IDatum *> datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
-	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(std::move(datum));
-	dxl_datum->Release();
+	gpos::Ref<IDatum> datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum.get());
+	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(std::move(datum));
+	;
 
 	return point;
 }
 
 // helper function to generate a point from an encoded value of specific datatype
-gpos::owner<CPoint *>
+gpos::Ref<CPoint>
 CCardinalityTestUtils::PpointDouble(CMemoryPool *mp, OID oid, CDouble value)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	gpos::owner<IMDId *> mdid = GPOS_NEW(mp) CMDIdGPDB(oid);
-	gpos::owner<IDatum *> datum =
+	gpos::Ref<IMDId> mdid = GPOS_NEW(mp) CMDIdGPDB(oid);
+	gpos::Ref<IDatum> datum =
 		CTestUtils::CreateDoubleDatum(mp, md_accessor, std::move(mdid), value);
-	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(std::move(datum));
+	gpos::Ref<CPoint> point = GPOS_NEW(mp) CPoint(std::move(datum));
 
 	return point;
 }
@@ -246,8 +243,7 @@ CCardinalityTestUtils::PrintHist(CMemoryPool *mp, const char *pcPrefix,
 
 // helper function to print the statistics object
 void
-CCardinalityTestUtils::PrintStats(CMemoryPool *mp,
-								  gpos::pointer<const IStatistics *> stats)
+CCardinalityTestUtils::PrintStats(CMemoryPool *mp, const IStatistics *stats)
 {
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);

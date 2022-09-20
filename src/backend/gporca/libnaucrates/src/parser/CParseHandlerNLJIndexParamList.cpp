@@ -38,7 +38,7 @@ CParseHandlerNLJIndexParamList::CParseHandlerNLJIndexParamList(
 // ctor
 CParseHandlerNLJIndexParamList::~CParseHandlerNLJIndexParamList()
 {
-	m_nest_params_colrefs_array->Release();
+	;
 }
 
 
@@ -111,9 +111,9 @@ CParseHandlerNLJIndexParamList::EndElement(
 		CParseHandlerNLJIndexParam *nest_param_parse_handler =
 			dynamic_cast<CParseHandlerNLJIndexParam *>((*this)[idx]);
 
-		gpos::owner<CDXLColRef *> nest_param_colref_dxl =
+		gpos::Ref<CDXLColRef> nest_param_colref_dxl =
 			nest_param_parse_handler->GetNestParamColRefDxl();
-		nest_param_colref_dxl->AddRef();
+		;
 		m_nest_params_colrefs_array->Append(nest_param_colref_dxl);
 	}
 

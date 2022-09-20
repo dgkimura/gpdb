@@ -125,14 +125,14 @@ CScalarArrayCoerceExpr::SzId() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayCoerceExpr::Matches(gpos::pointer<COperator *> pop) const
+CScalarArrayCoerceExpr::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CScalarArrayCoerceExpr *> popCoerce =
+	CScalarArrayCoerceExpr *popCoerce =
 		gpos::dyn_cast<CScalarArrayCoerceExpr>(pop);
 
 	return popCoerce->PmdidElementFunc()->Equals(m_pmdidElementFunc.get()) &&
@@ -166,7 +166,7 @@ CScalarArrayCoerceExpr::FInputOrderSensitive() const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-gpos::cast_func<CScalarArrayCoerceExpr *>
+CScalarArrayCoerceExpr *
 CScalarArrayCoerceExpr::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);

@@ -71,7 +71,7 @@ public:
 	}
 
 	// retrieve the partition column at the given position
-	gpos::pointer<const IMDColumn *>
+	const IMDColumn *
 	PartColAt(ULONG /*pos*/) const override
 	{
 		GPOS_ASSERT(!"External tables have no partition columns");
@@ -79,7 +79,7 @@ public:
 	}
 
 	// retrieve list of partition types
-	gpos::pointer<CharPtrArray *>
+	CharPtrArray *
 	GetPartitionTypes() const override
 	{
 		GPOS_ASSERT(!"External tables have no partition types");
@@ -95,7 +95,7 @@ public:
 	}
 
 	// part constraint
-	gpos::pointer<CDXLNode *>
+	CDXLNode *
 	MDPartConstraint() const override
 	{
 		return nullptr;

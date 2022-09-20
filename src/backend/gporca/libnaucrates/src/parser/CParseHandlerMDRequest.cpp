@@ -46,7 +46,7 @@ CParseHandlerMDRequest::CParseHandlerMDRequest(
 //---------------------------------------------------------------------------
 CParseHandlerMDRequest::~CParseHandlerMDRequest()
 {
-	CRefCount::SafeRelease(m_mdtype_request_array);
+	;
 }
 
 
@@ -174,10 +174,10 @@ CParseHandlerMDRequest::GetMdIdArray() const
 //		Parsed array of type requests
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CMDRequest::SMDTypeRequestArray *>
+CMDRequest::SMDTypeRequestArray *
 CParseHandlerMDRequest::GetMDTypeRequestArray() const
 {
-	return m_mdtype_request_array;
+	return m_mdtype_request_array.get();
 }
 
 // EOF

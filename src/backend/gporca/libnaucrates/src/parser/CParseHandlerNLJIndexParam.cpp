@@ -37,7 +37,7 @@ CParseHandlerNLJIndexParam::CParseHandlerNLJIndexParam(
 // dtor
 CParseHandlerNLJIndexParam::~CParseHandlerNLJIndexParam()
 {
-	m_nest_param_colref_dxl->Release();
+	;
 }
 
 

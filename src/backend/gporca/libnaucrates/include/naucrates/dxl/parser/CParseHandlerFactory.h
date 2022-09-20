@@ -63,8 +63,9 @@ IsXMLStrEqual(const XMLCh *xml_str1, const XMLCh *xml_str2)
 class CParseHandlerFactory
 {
 	using TokenParseHandlerFuncMap =
-		CHashMap<const XMLCh, ParseHandlerOpCreatorFunc, GetHashXMLStr,
-				 IsXMLStrEqual, CleanupNULL, CleanupNULL>;
+		gpos::UnorderedMap<const XMLCh *, ParseHandlerOpCreatorFunc *,
+						   gpos::PtrHash<XMLCh, GetHashXMLStr>,
+						   gpos::PtrEqual<XMLCh, IsXMLStrEqual>>;
 
 	// pair of DXL token type and the corresponding parse handler
 	struct SParseHandlerMapping
@@ -78,8 +79,7 @@ class CParseHandlerFactory
 
 private:
 	// mappings DXL token -> ParseHandler creator
-	static gpos::owner<TokenParseHandlerFuncMap *>
-		m_token_parse_handler_func_map;
+	static gpos::Ref<TokenParseHandlerFuncMap> m_token_parse_handler_func_map;
 
 	static void AddMapping(Edxltoken token_type,
 						   ParseHandlerOpCreatorFunc *parse_handler_op_func);

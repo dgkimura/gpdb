@@ -36,10 +36,10 @@ class CParseHandlerPhysicalSplit : public CParseHandlerPhysicalOp
 {
 private:
 	// deletion col ids
-	gpos::pointer<ULongPtrArray *> m_deletion_colid_array;
+	ULongPtrArray *m_deletion_colid_array;
 
 	// insertion col ids
-	gpos::pointer<ULongPtrArray *> m_insert_colid_array;
+	ULongPtrArray *m_insert_colid_array;
 
 	// action column id
 	ULONG m_action_colid;

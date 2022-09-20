@@ -31,7 +31,7 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CMDColumn::CMDColumn(CMDName *mdname, INT attrnum, gpos::Ref<IMDId> mdid_type,
 					 INT type_modifier, BOOL is_nullable, BOOL is_dropped,
-					 gpos::owner<CDXLNode *> dxl_dafault_value, ULONG length)
+					 gpos::Ref<CDXLNode> dxl_dafault_value, ULONG length)
 	: m_mdname(mdname),
 	  m_attno(attrnum),
 	  m_mdid_type(mdid_type),
@@ -54,7 +54,7 @@ CMDColumn::CMDColumn(CMDName *mdname, INT attrnum, gpos::Ref<IMDId> mdid_type,
 CMDColumn::~CMDColumn()
 {
 	GPOS_DELETE(m_mdname);
-	CRefCount::SafeRelease(m_dxl_default_val);
+	;
 }
 
 

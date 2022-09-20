@@ -135,7 +135,7 @@ CScalarSubqueryQuantified::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSubqueryQuantified::Matches(gpos::pointer<COperator *> pop) const
+CScalarSubqueryQuantified::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
@@ -143,7 +143,7 @@ CScalarSubqueryQuantified::Matches(gpos::pointer<COperator *> pop) const
 	}
 
 	// match if contents are identical
-	gpos::pointer<CScalarSubqueryQuantified *> popSsq =
+	CScalarSubqueryQuantified *popSsq =
 		gpos::dyn_cast<CScalarSubqueryQuantified>(pop);
 	return popSsq->Pcr() == m_pcr &&
 		   popSsq->MdIdOp()->Equals(m_scalar_op_mdid.get());
@@ -158,13 +158,13 @@ CScalarSubqueryQuantified::Matches(gpos::pointer<COperator *> pop) const
 //		Locally used columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CScalarSubqueryQuantified::PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
 	// used columns is an empty set unless subquery column is an outer reference
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
-	gpos::pointer<CColRefSet *> pcrsChildOutput =
+	CColRefSet *pcrsChildOutput =
 		exprhdl.DeriveOutputColumns(0 /* child_index */);
 	if (!pcrsChildOutput->FMember(m_pcr))
 	{
@@ -184,13 +184,13 @@ CScalarSubqueryQuantified::PcrsUsed(CMemoryPool *mp, CExpressionHandle &exprhdl)
 //		Derive partition consumers
 //
 //---------------------------------------------------------------------------
-gpos::owner<CPartInfo *>
+gpos::Ref<CPartInfo>
 CScalarSubqueryQuantified::PpartinfoDerive(CMemoryPool *,  // mp,
 										   CExpressionHandle &exprhdl) const
 {
-	gpos::pointer<CPartInfo *> ppartinfoChild = exprhdl.DerivePartitionInfo(0);
+	CPartInfo *ppartinfoChild = exprhdl.DerivePartitionInfo(0);
 	GPOS_ASSERT(nullptr != ppartinfoChild);
-	ppartinfoChild->AddRef();
+	;
 	return ppartinfoChild;
 }
 

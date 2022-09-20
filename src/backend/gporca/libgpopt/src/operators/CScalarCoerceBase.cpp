@@ -128,11 +128,11 @@ CScalarCoerceBase::Location() const
 //		return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
+gpos::Ref<COperator>
 CScalarCoerceBase::PopCopyWithRemappedColumns(
-	CMemoryPool *,						//mp,
-	gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-	BOOL								//must_exist
+	CMemoryPool *,		 //mp,
+	UlongToColRefMap *,	 //colref_mapping,
+	BOOL				 //must_exist
 )
 {
 	return PopCopyDefault();

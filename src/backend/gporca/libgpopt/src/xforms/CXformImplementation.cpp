@@ -25,7 +25,7 @@ using namespace gpopt;
 //		Dtor
 //
 //---------------------------------------------------------------------------
-CXformImplementation::CXformImplementation(gpos::owner<CExpression *> pexpr)
+CXformImplementation::CXformImplementation(gpos::Ref<CExpression> pexpr)
 	: CXform(std::move(pexpr))
 {
 	GPOS_ASSERT(nullptr != pexpr);

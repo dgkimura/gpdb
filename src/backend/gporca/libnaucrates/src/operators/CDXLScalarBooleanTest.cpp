@@ -105,9 +105,8 @@ CDXLScalarBooleanTest::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBooleanTest::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	gpos::pointer<const CDXLNode *> dxlnode) const
+CDXLScalarBooleanTest::SerializeToDXL(CXMLSerializer *xml_serializer,
+									  const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -131,7 +130,7 @@ CDXLScalarBooleanTest::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBooleanTest::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarBooleanTest::AssertValid(const CDXLNode *dxlnode,
 								   BOOL validate_children) const
 {
 	EdxlBooleanTestType dxl_bool_type =
@@ -146,7 +145,7 @@ CDXLScalarBooleanTest::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 				(EdxlbooleantestIsNotUnknown == dxl_bool_type));
 
 	GPOS_ASSERT(1 == dxlnode->Arity());
-	gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[0];
+	CDXLNode *dxlnode_arg = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeScalar ==
 				dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

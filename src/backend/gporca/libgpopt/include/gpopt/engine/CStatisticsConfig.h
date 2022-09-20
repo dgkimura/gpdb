@@ -55,7 +55,7 @@ private:
 	ULONG m_max_stats_buckets;
 
 	// hash set of md ids for columns with missing statistics
-	gpos::owner<MdidHashSet *> m_phsmdidcolinfo;
+	gpos::Ref<MdidHashSet> m_phsmdidcolinfo;
 
 public:
 	// ctor
@@ -98,10 +98,10 @@ public:
 	void AddMissingStatsColumn(CMDIdColStats *pmdidCol);
 
 	// collect the missing statistics columns
-	void CollectMissingStatsColumns(gpos::pointer<IMdIdArray *> pdrgmdid);
+	void CollectMissingStatsColumns(IMdIdArray *pdrgmdid);
 
 	// generate default optimizer configurations
-	static gpos::owner<CStatisticsConfig *>
+	static gpos::Ref<CStatisticsConfig>
 	PstatsconfDefault(CMemoryPool *mp)
 	{
 		return GPOS_NEW(mp) CStatisticsConfig(

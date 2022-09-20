@@ -37,7 +37,7 @@ class CParseHandlerPhysicalWindow : public CParseHandlerPhysicalOp
 {
 private:
 	// array of partition columns used by the window functions
-	gpos::pointer<ULongPtrArray *> m_part_by_colid_array;
+	ULongPtrArray *m_part_by_colid_array;
 
 	// process the start of an element
 	void StartElement(

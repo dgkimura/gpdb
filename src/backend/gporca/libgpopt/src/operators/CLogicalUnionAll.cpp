@@ -41,9 +41,9 @@ CLogicalUnionAll::CLogicalUnionAll(CMemoryPool *mp) : CLogicalUnion(mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalUnionAll::CLogicalUnionAll(
-	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrOutput,
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput)
+CLogicalUnionAll::CLogicalUnionAll(CMemoryPool *mp,
+								   gpos::Ref<CColRefArray> pdrgpcrOutput,
+								   gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput)
 	: CLogicalUnion(mp, std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrInput))
 {
 }
@@ -89,15 +89,15 @@ CLogicalUnionAll::DeriveMaxCard(CMemoryPool *,	// mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
-CLogicalUnionAll::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+gpos::Ref<COperator>
+CLogicalUnionAll::PopCopyWithRemappedColumns(CMemoryPool *mp,
+											 UlongToColRefMap *colref_mapping,
+											 BOOL must_exist)
 {
-	gpos::owner<CColRefArray *> pdrgpcrOutput =
-		CUtils::PdrgpcrRemap(mp, m_pdrgpcrOutput, colref_mapping, must_exist);
-	gpos::owner<CColRef2dArray *> pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
-		mp, m_pdrgpdrgpcrInput, colref_mapping, must_exist);
+	gpos::Ref<CColRefArray> pdrgpcrOutput = CUtils::PdrgpcrRemap(
+		mp, m_pdrgpcrOutput.get(), colref_mapping, must_exist);
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrInput = CUtils::PdrgpdrgpcrRemap(
+		mp, m_pdrgpdrgpcrInput.get(), colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalUnionAll(mp, std::move(pdrgpcrOutput),
 										 std::move(pdrgpdrgpcrInput));
@@ -111,7 +111,7 @@ CLogicalUnionAll::PopCopyWithRemappedColumns(
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-gpos::owner<CKeyCollection *>
+gpos::Ref<CKeyCollection>
 CLogicalUnionAll::DeriveKeyCollection(CMemoryPool *,	   //mp,
 									  CExpressionHandle &  // exprhdl
 ) const
@@ -127,10 +127,10 @@ CLogicalUnionAll::DeriveKeyCollection(CMemoryPool *,	   //mp,
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalUnionAll::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementUnionAll);
 
 	return xform_set;
@@ -145,34 +145,34 @@ CLogicalUnionAll::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics based on union all semantics
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
+gpos::Ref<IStatistics>
 CLogicalUnionAll::PstatsDeriveUnionAll(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(COperator::EopLogicalUnionAll == exprhdl.Pop()->Eopid() ||
 				COperator::EopLogicalUnion == exprhdl.Pop()->Eopid());
 
-	gpos::pointer<CColRefArray *> pdrgpcrOutput =
+	CColRefArray *pdrgpcrOutput =
 		gpos::dyn_cast<CLogicalSetOp>(exprhdl.Pop())->PdrgpcrOutput();
-	gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput =
+	CColRef2dArray *pdrgpdrgpcrInput =
 		gpos::dyn_cast<CLogicalSetOp>(exprhdl.Pop())->PdrgpdrgpcrInput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 	GPOS_ASSERT(nullptr != pdrgpdrgpcrInput);
 
-	gpos::owner<IStatistics *> result_stats = exprhdl.Pstats(0);
-	result_stats->AddRef();
+	gpos::Ref<IStatistics> result_stats = exprhdl.Pstats(0);
+	;
 	const ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 1; ul < arity; ul++)
 	{
-		gpos::pointer<IStatistics *> child_stats = exprhdl.Pstats(ul);
-		gpos::owner<CStatistics *> stats =
+		IStatistics *child_stats = exprhdl.Pstats(ul);
+		gpos::Ref<CStatistics> stats =
 			CUnionAllStatsProcessor::CreateStatsForUnionAll(
-				mp, gpos::dyn_cast<CStatistics>(result_stats),
+				mp, gpos::dyn_cast<CStatistics>(result_stats.get()),
 				dynamic_cast<CStatistics *>(child_stats),
 				CColRef::Pdrgpul(mp, pdrgpcrOutput),
-				CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[0]),
-				CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[ul]));
-		result_stats->Release();
+				CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[0].get()),
+				CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[ul].get()));
+		;
 		result_stats = stats;
 	}
 
@@ -187,9 +187,9 @@ CLogicalUnionAll::PstatsDeriveUnionAll(CMemoryPool *mp,
 //		Derive statistics based on union all semantics
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
+gpos::Ref<IStatistics>
 CLogicalUnionAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   gpos::pointer<IStatisticsArray *>  // not used
+							   IStatisticsArray *  // not used
 ) const
 {
 	GPOS_ASSERT(EspNone < Esp(exprhdl));

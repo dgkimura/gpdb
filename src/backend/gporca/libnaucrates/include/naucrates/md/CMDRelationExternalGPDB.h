@@ -60,13 +60,13 @@ private:
 	Ereldistrpolicy m_rel_distr_policy;
 
 	// columns
-	gpos::owner<CMDColumnArray *> m_md_col_array;
+	gpos::Ref<CMDColumnArray> m_md_col_array;
 
 	// number of dropped columns
 	ULONG m_dropped_cols;
 
 	// indices of distribution columns
-	gpos::owner<ULongPtrArray *> m_distr_col_array;
+	gpos::Ref<ULongPtrArray> m_distr_col_array;
 
 	gpos::Ref<IMdIdArray> m_distr_opfamilies;
 
@@ -74,10 +74,10 @@ private:
 	BOOL m_convert_hash_to_random;
 
 	// array of key sets
-	gpos::owner<ULongPtr2dArray *> m_keyset_array;
+	gpos::Ref<ULongPtr2dArray> m_keyset_array;
 
 	// array of index infos
-	gpos::owner<CMDIndexInfoArray *> m_mdindex_info_array;
+	gpos::Ref<CMDIndexInfoArray> m_mdindex_info_array;
 
 	// array of trigger ids
 	gpos::Ref<IMdIdArray> m_mdid_trigger_array;
@@ -98,17 +98,17 @@ private:
 	ULONG m_system_columns;
 
 	// mapping of column position to positions excluding dropped columns
-	gpos::owner<UlongToUlongMap *> m_colpos_nondrop_colpos_map;
+	gpos::Ref<UlongToUlongMap> m_colpos_nondrop_colpos_map;
 
 	// mapping of attribute number in the system catalog to the positions of
 	// the non dropped column in the metadata object
-	gpos::owner<IntToUlongMap *> m_attrno_nondrop_col_pos_map;
+	gpos::Ref<IntToUlongMap> m_attrno_nondrop_col_pos_map;
 
 	// the original positions of all the non-dropped columns
-	gpos::owner<ULongPtrArray *> m_nondrop_col_pos_array;
+	gpos::Ref<ULongPtrArray> m_nondrop_col_pos_array;
 
 	// array of column widths including dropped columns
-	gpos::owner<CDoubleArray *> m_col_width_array;
+	gpos::Ref<CDoubleArray> m_col_width_array;
 
 	// format type for the relation
 	const CWStringConst *GetRelFormatType() const;
@@ -118,17 +118,18 @@ private:
 
 public:
 	// ctor
-	CMDRelationExternalGPDB(
-		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CMDName *mdname,
-		Ereldistrpolicy rel_distr_policy,
-		gpos::owner<CMDColumnArray *> mdcol_array,
-		gpos::owner<ULongPtrArray *> distr_col_array,
-		gpos::Ref<IMdIdArray> distr_opfamilies, BOOL convert_hash_to_random,
-		gpos::owner<ULongPtr2dArray *> keyset_array,
-		gpos::owner<CMDIndexInfoArray *> md_index_info_array,
-		gpos::Ref<IMdIdArray> mdid_triggers_array,
-		gpos::Ref<IMdIdArray> mdid_check_constraint_array, INT reject_limit,
-		BOOL is_reject_limit_in_rows, gpos::Ref<IMDId> mdid_fmt_err_table);
+	CMDRelationExternalGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+							CMDName *mdname, Ereldistrpolicy rel_distr_policy,
+							gpos::Ref<CMDColumnArray> mdcol_array,
+							gpos::Ref<ULongPtrArray> distr_col_array,
+							gpos::Ref<IMdIdArray> distr_opfamilies,
+							BOOL convert_hash_to_random,
+							gpos::Ref<ULongPtr2dArray> keyset_array,
+							gpos::Ref<CMDIndexInfoArray> md_index_info_array,
+							gpos::Ref<IMdIdArray> mdid_triggers_array,
+							gpos::Ref<IMdIdArray> mdid_check_constraint_array,
+							INT reject_limit, BOOL is_reject_limit_in_rows,
+							gpos::Ref<IMDId> mdid_fmt_err_table);
 
 	// dtor
 	~CMDRelationExternalGPDB() override;
@@ -162,7 +163,7 @@ public:
 	ULONG NonDroppedColsCount() const override;
 
 	// return the original positions of all the non-dropped columns
-	gpos::pointer<ULongPtrArray *> NonDroppedColsArray() const override;
+	ULongPtrArray *NonDroppedColsArray() const override;
 
 	// number of system columns
 	ULONG SystemColumnsCount() const override;
@@ -180,19 +181,19 @@ public:
 	IMDId *GetFormatErrTableMdid() const override;
 
 	// retrieve the column at the given position
-	gpos::pointer<const IMDColumn *> GetMdCol(ULONG pos) const override;
+	const IMDColumn *GetMdCol(ULONG pos) const override;
 
 	// number of key sets
 	ULONG KeySetCount() const override;
 
 	// key set at given position
-	gpos::pointer<const ULongPtrArray *> KeySetAt(ULONG pos) const override;
+	const ULongPtrArray *KeySetAt(ULONG pos) const override;
 
 	// number of distribution columns
 	ULONG DistrColumnCount() const override;
 
 	// retrieve the column at the given position in the distribution columns list for the relation
-	gpos::pointer<const IMDColumn *> GetDistrColAt(ULONG pos) const override;
+	const IMDColumn *GetDistrColAt(ULONG pos) const override;
 
 	IMDId *GetDistrOpfamilyAt(ULONG pos) const override;
 

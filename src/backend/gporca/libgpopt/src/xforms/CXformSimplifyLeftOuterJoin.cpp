@@ -59,8 +59,7 @@ CXformSimplifyLeftOuterJoin::CXformSimplifyLeftOuterJoin(CMemoryPool *mp)
 CXform::EXformPromise
 CXformSimplifyLeftOuterJoin::Exfp(CExpressionHandle &exprhdl) const
 {
-	gpos::pointer<CExpression *> pexprScalar =
-		exprhdl.PexprScalarExactChild(2 /*child_index*/);
+	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(2 /*child_index*/);
 	if (nullptr != pexprScalar && CUtils::FScalarConstFalse(pexprScalar))
 	{
 		// if LOJ predicate is False, we can replace inner child with empty table
@@ -80,9 +79,9 @@ CXformSimplifyLeftOuterJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformSimplifyLeftOuterJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
-									   gpos::pointer<CXformResult *> pxfres,
-									   gpos::pointer<CExpression *> pexpr) const
+CXformSimplifyLeftOuterJoin::Transform(CXformContext *pxfctxt,
+									   CXformResult *pxfres,
+									   CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -93,22 +92,22 @@ CXformSimplifyLeftOuterJoin::Transform(gpos::pointer<CXformContext *> pxfctxt,
 
 	// extract components
 	CExpression *pexprOuter = (*pexpr)[0];
-	gpos::pointer<CExpression *> pexprInner = (*pexpr)[1];
+	CExpression *pexprInner = (*pexpr)[1];
 	CExpression *pexprScalar = (*pexpr)[2];
 
-	pexprOuter->AddRef();
-	pexprScalar->AddRef();
-	gpos::owner<CExpression *> pexprResult = nullptr;
+	;
+	;
+	gpos::Ref<CExpression> pexprResult = nullptr;
 
 	// inner child of LOJ can be replaced with empty table
 	GPOS_ASSERT(CUtils::FScalarConstFalse(pexprScalar));
 
 	// extract output columns of inner child
-	gpos::owner<CColRefArray *> colref_array =
+	gpos::Ref<CColRefArray> colref_array =
 		pexprInner->DeriveOutputColumns()->Pdrgpcr(mp);
 
 	// generate empty constant table with the same columns
-	gpos::owner<COperator *> popCTG = GPOS_NEW(mp) CLogicalConstTableGet(
+	gpos::Ref<COperator> popCTG = GPOS_NEW(mp) CLogicalConstTableGet(
 		mp, std::move(colref_array), GPOS_NEW(mp) IDatum2dArray(mp));
 	pexprResult = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalLeftOuterJoin(mp), pexprOuter,

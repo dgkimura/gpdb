@@ -93,7 +93,7 @@ CDXLPhysicalTVF::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
-								gpos::pointer<const CDXLNode *> dxlnode) const
+								const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -125,7 +125,7 @@ CDXLPhysicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalTVF::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLPhysicalTVF::AssertValid(const CDXLNode *dxlnode,
 							 BOOL validate_children) const
 {
 	// assert validity of function id and return type
@@ -135,7 +135,7 @@ CDXLPhysicalTVF::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		gpos::pointer<CDXLNode *> dxlnode_arg = (*dxlnode)[idx];
+		CDXLNode *dxlnode_arg = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

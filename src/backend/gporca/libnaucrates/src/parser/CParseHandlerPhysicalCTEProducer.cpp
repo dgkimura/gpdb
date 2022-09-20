@@ -70,7 +70,7 @@ CParseHandlerPhysicalCTEProducer::StartElement(
 		m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenCTEId,
 		EdxltokenPhysicalCTEProducer);
 
-	gpos::owner<ULongPtrArray *> output_colids_array =
+	gpos::Ref<ULongPtrArray> output_colids_array =
 		CDXLOperatorFactory::ExtractConvertValuesToArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), attrs, EdxltokenColumns,
 			EdxltokenPhysicalCTEProducer);
@@ -142,14 +142,14 @@ CParseHandlerPhysicalCTEProducer::EndElement(
 		dynamic_cast<CParseHandlerPhysicalOp *>((*this)[2]);
 
 	// set physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add constructed children
 	AddChildFromParseHandler(proj_list_parse_handler);
 	AddChildFromParseHandler(child_parse_handler);
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node,
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node.get(),
 										   false /* validate_children */);
 #endif	// GPOS_DEBUG
 

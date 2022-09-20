@@ -61,15 +61,14 @@ CLogicalAssert::CLogicalAssert(CMemoryPool *mp, CException *pexc)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalAssert::Matches(gpos::pointer<COperator *> pop) const
+CLogicalAssert::Matches(COperator *pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CLogicalAssert *> popAssert =
-		gpos::dyn_cast<CLogicalAssert>(pop);
+	CLogicalAssert *popAssert = gpos::dyn_cast<CLogicalAssert>(pop);
 	return CException::Equals(*(popAssert->Pexc()), *m_pexc);
 }
 
@@ -81,7 +80,7 @@ CLogicalAssert::Matches(gpos::pointer<COperator *> pop) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CLogicalAssert::DeriveOutputColumns(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl)
 {
@@ -97,7 +96,7 @@ CLogicalAssert::DeriveOutputColumns(CMemoryPool *,	// mp
 //		Derive key collection
 //
 //---------------------------------------------------------------------------
-gpos::owner<CKeyCollection *>
+gpos::Ref<CKeyCollection>
 CLogicalAssert::DeriveKeyCollection(CMemoryPool *,	// mp
 									CExpressionHandle &exprhdl) const
 {
@@ -113,10 +112,10 @@ CLogicalAssert::DeriveKeyCollection(CMemoryPool *,	// mp
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalAssert::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementAssert);
 	return xform_set;
 }
@@ -134,7 +133,7 @@ CLogicalAssert::DeriveMaxCard(CMemoryPool *,  // mp
 							  CExpressionHandle &exprhdl) const
 {
 	// in case of a false condition or a contradiction, maxcard should be 1
-	gpos::pointer<CExpression *> pexprScalar = exprhdl.PexprScalarExactChild(1);
+	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(1);
 
 	if ((nullptr != pexprScalar && CUtils::FScalarConstFalse(pexprScalar)) ||
 		exprhdl.DerivePropertyConstraint()->FContradiction())
@@ -163,9 +162,9 @@ CLogicalAssert::DeriveMaxCard(CMemoryPool *,  // mp
 //		Derive statistics based on filter predicates
 //
 //---------------------------------------------------------------------------
-gpos::owner<IStatistics *>
+gpos::Ref<IStatistics>
 CLogicalAssert::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 gpos::pointer<IStatisticsArray *>	// not used
+							 IStatisticsArray *	 // not used
 ) const
 {
 	CMaxCard maxcard = gpos::dyn_cast<CLogicalAssert>(exprhdl.Pop())
@@ -173,7 +172,7 @@ CLogicalAssert::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (1 == maxcard.Ull())
 	{
 		// a max card of one requires re-scaling stats
-		gpos::pointer<IStatistics *> stats = exprhdl.Pstats(0);
+		IStatistics *stats = exprhdl.Pstats(0);
 		return stats->ScaleStats(mp, CDouble(1.0 / stats->Rows()));
 	}
 

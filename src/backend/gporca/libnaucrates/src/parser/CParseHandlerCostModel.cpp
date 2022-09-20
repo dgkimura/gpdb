@@ -56,7 +56,7 @@ CParseHandlerCostModel::CParseHandlerCostModel(
 //---------------------------------------------------------------------------
 CParseHandlerCostModel::~CParseHandlerCostModel()
 {
-	CRefCount::SafeRelease(m_cost_model);
+	;
 	GPOS_DELETE(m_parse_handler_cost_params);
 }
 
@@ -153,7 +153,7 @@ CParseHandlerCostModel::EndElement(const XMLCh *const,	// element_uri,
 				pcp = dynamic_cast<CCostModelParamsGPDB *>(
 					m_parse_handler_cost_params->GetCostModelParams());
 				GPOS_ASSERT(nullptr != pcp);
-				pcp->AddRef();
+				;
 			}
 			m_cost_model =
 				GPOS_NEW(m_mp) CCostModelGPDB(m_mp, m_num_of_segments, pcp);
@@ -175,10 +175,10 @@ CParseHandlerCostModel::EndElement(const XMLCh *const,	// element_uri,
 //		Returns the cost model config object
 //
 //---------------------------------------------------------------------------
-gpos::pointer<ICostModel *>
+ICostModel *
 CParseHandlerCostModel::GetCostModel() const
 {
-	return m_cost_model;
+	return m_cost_model.get();
 }
 
 // EOF

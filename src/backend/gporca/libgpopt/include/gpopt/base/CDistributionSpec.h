@@ -79,8 +79,7 @@ public:
 	virtual EDistributionType Edt() const = 0;
 
 	// does this distribution satisfy the given one
-	virtual BOOL FSatisfies(
-		gpos::pointer<const CDistributionSpec *> pds) const = 0;
+	virtual BOOL FSatisfies(const CDistributionSpec *pds) const = 0;
 
 	// default hash function for distribution spec
 	ULONG
@@ -91,7 +90,7 @@ public:
 	}
 
 	// extract columns used by the distribution spec
-	gpos::owner<CColRefSet *>
+	gpos::Ref<CColRefSet>
 	PcrsUsed(CMemoryPool *mp) const override
 	{
 		// by default, return an empty set
@@ -121,7 +120,7 @@ public:
 
 	// default match function for distribution specs
 	virtual BOOL
-	Matches(gpos::pointer<const CDistributionSpec *> pds) const
+	Matches(const CDistributionSpec *pds) const
 	{
 		return Edt() == pds->Edt();
 	}
@@ -130,29 +129,28 @@ public:
 	// CDistributionSpec, if any class requires special Equals
 	// handling, they should override it.
 	virtual BOOL
-	Equals(gpos::pointer<const CDistributionSpec *> pds) const
+	Equals(const CDistributionSpec *pds) const
 	{
 		return Matches(pds);
 	}
 
 	// return a copy of the distribution spec with remapped columns
-	virtual gpos::owner<CDistributionSpec *>
-	PdsCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
+	virtual gpos::Ref<CDistributionSpec>
+	PdsCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
 	)
 	{
-		this->AddRef();
+		;
 		return this;
 	}
 
 	// strip off any equivalent columns embedded in the distribution spec
 	// (default implementation doesn't strip anything)
-	virtual gpos::owner<CDistributionSpec *>
+	virtual gpos::Ref<CDistributionSpec>
 	StripEquivColumns(CMemoryPool *)
 	{
-		AddRef();
+		;
 		return this;
 	}
 	// print
@@ -172,8 +170,7 @@ public:
 };	// class CDistributionSpec
 
 // arrays of distribution spec
-using CDistributionSpecArray =
-	CDynamicPtrArray<CDistributionSpec, CleanupRelease>;
+using CDistributionSpecArray = gpos::Vector<gpos::Ref<CDistributionSpec>>;
 }  // namespace gpopt
 
 #endif	// !GPOPT_IDistributionSpec_H

@@ -33,7 +33,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarDMLAction::Matches(gpos::pointer<COperator *> pop) const
+CScalarDMLAction::Matches(COperator *pop) const
 {
 	return pop->Eopid() == Eopid();
 }

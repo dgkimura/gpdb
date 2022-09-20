@@ -44,8 +44,7 @@ class CXformApply2Join : public CXformExploration
 private:
 	// check if we can create a correlated apply expression from the given expression
 	static BOOL
-	FCanCreateCorrelatedApply(CMemoryPool *,
-							  gpos::pointer<CExpression *> pexprApply)
+	FCanCreateCorrelatedApply(CMemoryPool *, CExpression *pexprApply)
 	{
 		GPOS_ASSERT(nullptr != pexprApply);
 
@@ -62,9 +61,8 @@ private:
 
 	// create correlated apply expression
 	static void
-	CreateCorrelatedApply(CMemoryPool *mp,
-						  gpos::pointer<CExpression *> pexprApply,
-						  gpos::pointer<CXformResult *> pxfres)
+	CreateCorrelatedApply(CMemoryPool *mp, CExpression *pexprApply,
+						  CXformResult *pxfres)
 	{
 		if (!FCanCreateCorrelatedApply(mp, pexprApply))
 		{
@@ -75,17 +73,17 @@ private:
 		CExpression *pexprOuter = (*pexprApply)[0];
 		CExpression *pexprScalar = (*pexprApply)[2];
 
-		pexprOuter->AddRef();
-		pexprInner->AddRef();
-		pexprScalar->AddRef();
-		gpos::owner<CExpression *> pexprResult = nullptr;
+		;
+		;
+		;
+		gpos::Ref<CExpression> pexprResult = nullptr;
 
 		TApply *popApply = gpos::dyn_cast<TApply>(pexprApply->Pop());
 		CColRefArray *colref_array = popApply->PdrgPcrInner();
 		GPOS_ASSERT(nullptr != colref_array);
 		GPOS_ASSERT(1 == colref_array->Size());
 
-		colref_array->AddRef();
+		;
 		COperator::EOperatorId eopidSubq = popApply->EopidOriginSubq();
 		COperator::EOperatorId op_id = pexprApply->Pop()->Eopid();
 		switch (op_id)
@@ -136,9 +134,9 @@ private:
 protected:
 	// helper function to attempt decorrelating Apply's inner child
 	static BOOL
-	FDecorrelate(CMemoryPool *mp, gpos::pointer<CExpression *> pexprApply,
-				 gpos::owner<CExpression *> *ppexprInner,
-				 gpos::owner<CExpressionArray *> *ppdrgpexpr)
+	FDecorrelate(CMemoryPool *mp, CExpression *pexprApply,
+				 gpos::Ref<CExpression> *ppexprInner,
+				 gpos::Ref<CExpressionArray> *ppdrgpexpr)
 	{
 		GPOS_ASSERT(nullptr != pexprApply);
 		GPOS_ASSERT(nullptr != ppexprInner);
@@ -146,10 +144,10 @@ protected:
 
 		*ppdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 
-		gpos::owner<CExpression *> pexprPredicateOrig = (*pexprApply)[2];
+		gpos::Ref<CExpression> pexprPredicateOrig = (*pexprApply)[2];
 
 		// add original predicate to array
-		pexprPredicateOrig->AddRef();
+		;
 		(*ppdrgpexpr)->Append(pexprPredicateOrig);
 
 		// since properties of inner child have been copied from
@@ -163,7 +161,7 @@ protected:
 				*ppdrgpexpr, (*pexprApply)[0]->DeriveOutputColumns()))
 		{
 			// decorrelation filed
-			(*ppdrgpexpr)->Release();
+			;
 			return false;
 		}
 
@@ -171,10 +169,11 @@ protected:
 		if ((COperator::EopLogicalLeftSemiJoin == pexprApply->Pop()->Eopid() ||
 			 COperator::EopLogicalLeftAntiSemiJoin ==
 				 pexprApply->Pop()->Eopid()) &&
-			!CPredicateUtils::FValidSemiJoinCorrelations(
-				mp, (*pexprApply)[0], (*ppexprInner), (*ppdrgpexpr)))
+			!CPredicateUtils::FValidSemiJoinCorrelations(mp, (*pexprApply)[0],
+														 (ppexprInner->get()),
+														 (ppdrgpexpr->get())))
 		{
-			(*ppdrgpexpr)->Release();
+			;
 
 			return false;
 		}
@@ -184,9 +183,8 @@ protected:
 
 	// helper function to decorrelate apply expression and insert alternative into results container
 	static void
-	Decorrelate(gpos::pointer<CXformContext *> pxfctxt,
-				gpos::pointer<CXformResult *> pxfres,
-				gpos::pointer<CExpression *> pexprApply)
+	Decorrelate(CXformContext *pxfctxt, CXformResult *pxfres,
+				CExpression *pexprApply)
 	{
 		GPOS_ASSERT(CUtils::HasOuterRefs((*pexprApply)[1]) &&
 					"Apply's inner child must have outer references");
@@ -198,8 +196,8 @@ protected:
 		}
 
 		CMemoryPool *mp = pxfctxt->Pmp();
-		gpos::owner<CExpressionArray *> pdrgpexpr = nullptr;
-		gpos::owner<CExpression *> pexprInner = nullptr;
+		gpos::Ref<CExpressionArray> pdrgpexpr = nullptr;
+		gpos::Ref<CExpression> pexprInner = nullptr;
 		if (!FDecorrelate(mp, pexprApply, &pexprInner, &pdrgpexpr))
 		{
 			// decorrelation failed, create correlated apply expression if possible
@@ -210,19 +208,19 @@ protected:
 
 		// build substitute
 		GPOS_ASSERT(nullptr != pexprInner);
-		(*pexprApply)[0]->AddRef();
-		gpos::owner<CExpression *> pexprOuter = (*pexprApply)[0];
-		gpos::owner<CExpression *> pexprPredicate =
+		;
+		gpos::Ref<CExpression> pexprOuter = (*pexprApply)[0];
+		gpos::Ref<CExpression> pexprPredicate =
 			CPredicateUtils::PexprConjunction(mp, std::move(pdrgpexpr));
 
-		gpos::owner<CExpression *> pexprResult = GPOS_NEW(mp)
+		gpos::Ref<CExpression> pexprResult = GPOS_NEW(mp)
 			CExpression(mp,
 						GPOS_NEW(mp) TJoin(mp),	 // join operator
 						std::move(pexprOuter), std::move(pexprInner),
 						std::move(pexprPredicate));
-		gpos::owner<CExpression *> pexprNormalized =
-			CNormalizer::PexprNormalize(mp, pexprResult);
-		pexprResult->Release();
+		gpos::Ref<CExpression> pexprNormalized =
+			CNormalizer::PexprNormalize(mp, pexprResult.get());
+		;
 
 		// add alternative to results
 		pxfres->Add(std::move(pexprNormalized));
@@ -230,9 +228,8 @@ protected:
 
 	// helper function to create a join expression from an apply expression and insert alternative into results container
 	static void
-	CreateJoinAlternative(gpos::pointer<CXformContext *> pxfctxt,
-						  gpos::pointer<CXformResult *> pxfres,
-						  gpos::pointer<CExpression *> pexprApply)
+	CreateJoinAlternative(CXformContext *pxfctxt, CXformResult *pxfres,
+						  CExpression *pexprApply)
 	{
 #ifdef GPOS_DEBUG
 		CExpressionHandle exprhdl(pxfctxt->Pmp());
@@ -248,10 +245,10 @@ protected:
 		CExpression *pexprOuter = (*pexprApply)[0];
 		CExpression *pexprInner = (*pexprApply)[1];
 		CExpression *pexprPred = (*pexprApply)[2];
-		pexprOuter->AddRef();
-		pexprInner->AddRef();
-		pexprPred->AddRef();
-		gpos::owner<CExpression *> pexprResult =
+		;
+		;
+		;
+		gpos::Ref<CExpression> pexprResult =
 			GPOS_NEW(mp) CExpression(mp,
 									 GPOS_NEW(mp) TJoin(mp),  // join operator
 									 pexprOuter, pexprInner, pexprPred);
@@ -295,7 +292,7 @@ public:
 
 	// ctor for passed pattern
 	CXformApply2Join<TApply, TJoin>(CMemoryPool *,	// mp
-									gpos::owner<CExpression *> pexprPattern)
+									gpos::Ref<CExpression> pexprPattern)
 		: CXformExploration(std::move(pexprPattern))
 	{
 	}

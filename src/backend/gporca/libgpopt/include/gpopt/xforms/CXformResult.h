@@ -32,7 +32,7 @@ class CXformResult : public CRefCount, public DbgPrintMixin<CXformResult>
 {
 private:
 	// set of alternatives
-	gpos::owner<CExpressionArray *> m_pdrgpexpr;
+	gpos::Ref<CExpressionArray> m_pdrgpexpr;
 
 	// cursor for retrieval
 	ULONG m_ulExpr;
@@ -47,14 +47,14 @@ public:
 	~CXformResult() override;
 
 	// accessor
-	inline gpos::pointer<CExpressionArray *>
+	inline CExpressionArray *
 	Pdrgpexpr() const
 	{
-		return m_pdrgpexpr;
+		return m_pdrgpexpr.get();
 	}
 
 	// add alternative
-	void Add(gpos::owner<CExpression *> pexpr);
+	void Add(gpos::Ref<CExpression> pexpr);
 
 	// retrieve next alternative
 	CExpression *PexprNext();

@@ -30,11 +30,12 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-COptimizerConfig::COptimizerConfig(
-	gpos::owner<CEnumeratorConfig *> pec,
-	gpos::owner<CStatisticsConfig *> stats_config,
-	gpos::owner<CCTEConfig *> pcteconf, gpos::owner<ICostModel *> cost_model,
-	gpos::owner<CHint *> phint, gpos::owner<CWindowOids *> pwindowoids)
+COptimizerConfig::COptimizerConfig(gpos::Ref<CEnumeratorConfig> pec,
+								   gpos::Ref<CStatisticsConfig> stats_config,
+								   gpos::Ref<CCTEConfig> pcteconf,
+								   gpos::Ref<ICostModel> cost_model,
+								   gpos::Ref<CHint> phint,
+								   gpos::Ref<CWindowOids> pwindowoids)
 	: m_enumerator_cfg(std::move(pec)),
 	  m_stats_conf(std::move(stats_config)),
 	  m_cte_conf(std::move(pcteconf)),
@@ -60,12 +61,12 @@ COptimizerConfig::COptimizerConfig(
 //---------------------------------------------------------------------------
 COptimizerConfig::~COptimizerConfig()
 {
-	m_enumerator_cfg->Release();
-	m_stats_conf->Release();
-	m_cte_conf->Release();
-	m_cost_model->Release();
-	m_hint->Release();
-	m_window_oids->Release();
+	;
+	;
+	;
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -76,7 +77,7 @@ COptimizerConfig::~COptimizerConfig()
 //		Default optimizer configuration
 //
 //---------------------------------------------------------------------------
-gpos::owner<COptimizerConfig *>
+gpos::Ref<COptimizerConfig>
 COptimizerConfig::PoconfDefault(CMemoryPool *mp)
 {
 	return GPOS_NEW(mp) COptimizerConfig(
@@ -94,8 +95,8 @@ COptimizerConfig::PoconfDefault(CMemoryPool *mp)
 //		Default optimizer configuration with the given cost model
 //
 //---------------------------------------------------------------------------
-gpos::owner<COptimizerConfig *>
-COptimizerConfig::PoconfDefault(CMemoryPool *mp, gpos::owner<ICostModel *> pcm)
+gpos::Ref<COptimizerConfig>
+COptimizerConfig::PoconfDefault(CMemoryPool *mp, gpos::Ref<ICostModel> pcm)
 {
 	GPOS_ASSERT(nullptr != pcm);
 
@@ -116,7 +117,7 @@ COptimizerConfig::PoconfDefault(CMemoryPool *mp, gpos::owner<ICostModel *> pcm)
 //---------------------------------------------------------------------------
 void
 COptimizerConfig::Serialize(CMemoryPool *mp, CXMLSerializer *xml_serializer,
-							gpos::pointer<CBitSet *> pbsTrace) const
+							CBitSet *pbsTrace) const
 {
 	GPOS_ASSERT(nullptr != xml_serializer);
 	GPOS_ASSERT(nullptr != pbsTrace);
@@ -181,7 +182,7 @@ COptimizerConfig::Serialize(CMemoryPool *mp, CXMLSerializer *xml_serializer,
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 		CDXLTokens::GetDXLTokenStr(EdxltokenWindowOids));
 
-	CCostModelConfigSerializer cmcSerializer(m_cost_model);
+	CCostModelConfigSerializer cmcSerializer(m_cost_model.get());
 	cmcSerializer.Serialize(*xml_serializer);
 
 	xml_serializer->OpenElement(

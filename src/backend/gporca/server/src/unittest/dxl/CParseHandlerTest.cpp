@@ -421,7 +421,7 @@ CParseHandlerTest::EresParseAndSerializePlan(CMemoryPool *mp,
 	// the root of the parsed DXL tree
 	ULLONG plan_id = gpos::ullong_max;
 	ULLONG plan_space_size = gpos::ullong_max;
-	gpos::owner<CDXLNode *> root_dxl_node = CDXLUtils::GetPlanDXLNode(
+	gpos::Ref<CDXLNode> root_dxl_node = CDXLUtils::GetPlanDXLNode(
 		mp, dxl_string, szValidationPath, &plan_id, &plan_space_size);
 
 	GPOS_CHECK_ABORT;
@@ -431,7 +431,7 @@ CParseHandlerTest::EresParseAndSerializePlan(CMemoryPool *mp,
 	CWStringDynamic strPlan(mp);
 	COstreamString osPlan(&strPlan);
 
-	CDXLUtils::SerializePlan(mp, osPlan, root_dxl_node, plan_id,
+	CDXLUtils::SerializePlan(mp, osPlan, root_dxl_node.get(), plan_id,
 							 plan_space_size, true /*serialize_header_footer*/,
 							 true /*indentation*/);
 
@@ -449,7 +449,7 @@ CParseHandlerTest::EresParseAndSerializePlan(CMemoryPool *mp,
 	}
 
 	// cleanup
-	root_dxl_node->Release();
+	;
 	GPOS_DELETE_ARRAY(dxl_string);
 
 	return GPOS_OK;
@@ -490,11 +490,11 @@ CParseHandlerTest::EresParseAndSerializeQuery(CMemoryPool *mp,
 
 	oss << "Serializing parsed tree" << std::endl;
 
-	gpos::pointer<CDXLNode *> root_dxlnode =
+	CDXLNode *root_dxlnode =
 		const_cast<CDXLNode *>(pq2dxlresult->CreateDXLNode());
-	gpos::pointer<CDXLNodeArray *> dxl_array =
+	CDXLNodeArray *dxl_array =
 		const_cast<CDXLNodeArray *>(pq2dxlresult->GetOutputColumnsDXLArray());
-	gpos::pointer<CDXLNodeArray *> cte_producers =
+	CDXLNodeArray *cte_producers =
 		const_cast<CDXLNodeArray *>(pq2dxlresult->GetCTEProducerDXLArray());
 
 	CWStringDynamic wstrQuery(mp);
@@ -549,7 +549,7 @@ CParseHandlerTest::EresParseAndSerializeMetadata(CMemoryPool *mp,
 		szValidationPath = CTestUtils::m_szXSDPath;
 	}
 
-	gpos::owner<IMDCacheObjectArray *> mdcache_obj_array =
+	gpos::Ref<IMDCacheObjectArray> mdcache_obj_array =
 		CDXLUtils::ParseDXLToIMDObjectArray(mp, dxl_string, szValidationPath);
 
 	GPOS_ASSERT(nullptr != mdcache_obj_array);
@@ -558,7 +558,7 @@ CParseHandlerTest::EresParseAndSerializeMetadata(CMemoryPool *mp,
 
 	oss << "Serializing metadata objects" << std::endl;
 	CWStringDynamic *metadata_str = CDXLUtils::SerializeMetadata(
-		mp, mdcache_obj_array, true /*serialize_header_footer*/,
+		mp, mdcache_obj_array.get(), true /*serialize_header_footer*/,
 		true /*indentation*/);
 
 	GPOS_CHECK_ABORT;
@@ -572,7 +572,7 @@ CParseHandlerTest::EresParseAndSerializeMetadata(CMemoryPool *mp,
 		GPOS_ASSERT(false);
 	}
 
-	mdcache_obj_array->Release();
+	;
 	GPOS_DELETE(metadata_str);
 	GPOS_DELETE_ARRAY(dxl_string);
 
@@ -608,15 +608,16 @@ CParseHandlerTest::EresParseAndSerializeMDRequest(CMemoryPool *mp,
 		szValidationPath = CTestUtils::m_szXSDPath;
 	}
 
-	gpos::owner<CMDRequest *> pmdr =
+	gpos::Ref<CMDRequest> pmdr =
 		CDXLUtils::ParseDXLToMDRequest(mp, dxl_string, szValidationPath);
 
 	GPOS_ASSERT(nullptr != pmdr);
 
 	GPOS_CHECK_ABORT;
 
-	CDXLUtils::SerializeMDRequest(
-		mp, pmdr, oss, true /*serialize_header_footer*/, true /*indentation*/);
+	CDXLUtils::SerializeMDRequest(mp, pmdr.get(), oss,
+								  true /*serialize_header_footer*/,
+								  true /*indentation*/);
 
 	GPOS_CHECK_ABORT;
 
@@ -625,7 +626,7 @@ CParseHandlerTest::EresParseAndSerializeMDRequest(CMemoryPool *mp,
 
 	GPOS_ASSERT(strExpected.Equals(&str));
 
-	pmdr->Release();
+	;
 	GPOS_DELETE_ARRAY(dxl_string);
 
 	return GPOS_OK;
@@ -647,8 +648,8 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 												   BOOL fValidate)
 {
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 	// install opt context in TLS
@@ -671,19 +672,19 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 	}
 
 	// parse the statistics objects
-	gpos::owner<CDXLStatsDerivedRelationArray *> dxl_derived_rel_stats_array =
+	gpos::Ref<CDXLStatsDerivedRelationArray> dxl_derived_rel_stats_array =
 		CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, dxl_string,
 												  szValidationPath);
-	gpos::owner<CStatisticsArray *> statistics_array =
+	gpos::Ref<CStatisticsArray> statistics_array =
 		CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
-			mp, &mda, dxl_derived_rel_stats_array);
+			mp, &mda, dxl_derived_rel_stats_array.get());
 
-	dxl_derived_rel_stats_array->Release();
+	;
 
 
 	GPOS_ASSERT(nullptr != statistics_array);
 
-	gpos::pointer<CStatistics *> stats = (*statistics_array)[0];
+	CStatistics *stats = (*statistics_array)[0].get();
 	GPOS_ASSERT(stats);
 
 	stats->Rows();
@@ -694,7 +695,7 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 
 	oss << "Serializing Statistics Objects" << std::endl;
 	CWStringDynamic *statistics_str = CDXLUtils::SerializeStatistics(
-		mp, &mda, statistics_array, true /*serialize_header_footer*/,
+		mp, &mda, statistics_array.get(), true /*serialize_header_footer*/,
 		true /*indentation*/
 	);
 
@@ -703,7 +704,7 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 
 	GPOS_ASSERT(dstrExpected.Equals(statistics_str));
 
-	statistics_array->Release();
+	;
 
 	GPOS_DELETE_ARRAY(dxl_string);
 	GPOS_DELETE(statistics_str);
@@ -736,16 +737,15 @@ CParseHandlerTest::EresParseAndSerializeScalarExpr(CMemoryPool *mp,
 	}
 
 	// the root of the parsed DXL tree
-	gpos::owner<CDXLNode *> root_dxl_node =
-		CDXLUtils::ParseDXLToScalarExprDXLNode(mp, dxl_string,
-											   szValidationPath);
+	gpos::Ref<CDXLNode> root_dxl_node = CDXLUtils::ParseDXLToScalarExprDXLNode(
+		mp, dxl_string, szValidationPath);
 	GPOS_CHECK_ABORT;
 
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 	oss << "Serializing parsed tree" << std::endl;
 	CWStringDynamic *scalar_expr_str = CDXLUtils::SerializeScalarExpr(
-		mp, root_dxl_node, true /*serialize_header_footer*/,
+		mp, root_dxl_node.get(), true /*serialize_header_footer*/,
 		true /*indentation*/);
 	GPOS_CHECK_ABORT;
 
@@ -763,7 +763,7 @@ CParseHandlerTest::EresParseAndSerializeScalarExpr(CMemoryPool *mp,
 	}
 
 	// cleanup
-	root_dxl_node->Release();
+	;
 	GPOS_DELETE(scalar_expr_str);
 	GPOS_DELETE_ARRAY(dxl_string);
 

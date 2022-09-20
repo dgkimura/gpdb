@@ -40,7 +40,7 @@ private:
 	EdxlDmlType m_dxl_dml_type;
 
 	// source col ids
-	gpos::pointer<ULongPtrArray *> m_src_colids_array;
+	ULongPtrArray *m_src_colids_array;
 
 	// action column id
 	ULONG m_action_colid;

@@ -40,7 +40,7 @@ CLogicalLeftOuterCorrelatedApply::CLogicalLeftOuterCorrelatedApply(
 //
 //---------------------------------------------------------------------------
 CLogicalLeftOuterCorrelatedApply::CLogicalLeftOuterCorrelatedApply(
-	CMemoryPool *mp, gpos::owner<CColRefArray *> pdrgpcrInner,
+	CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrInner,
 	EOperatorId eopidOriginSubq)
 	: CLogicalLeftOuterApply(mp, std::move(pdrgpcrInner), eopidOriginSubq),
 	  // In the case of subquery all, we cannot push down the predicate.
@@ -97,10 +97,10 @@ CLogicalLeftOuterCorrelatedApply::CLogicalLeftOuterCorrelatedApply(
 //		Get candidate xforms
 //
 //---------------------------------------------------------------------------
-gpos::owner<CXformSet *>
+gpos::Ref<CXformSet>
 CLogicalLeftOuterCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 {
-	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::Ref<CXformSet> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementLeftOuterCorrelatedApply);
 
 	return xform_set;
@@ -115,7 +115,7 @@ CLogicalLeftOuterCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalLeftOuterCorrelatedApply::Matches(gpos::pointer<COperator *> pop) const
+CLogicalLeftOuterCorrelatedApply::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -135,13 +135,12 @@ CLogicalLeftOuterCorrelatedApply::Matches(gpos::pointer<COperator *> pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
+gpos::Ref<COperator>
 CLogicalLeftOuterCorrelatedApply::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
-	gpos::owner<CColRefArray *> pdrgpcrInner =
-		CUtils::PdrgpcrRemap(mp, m_pdrgpcrInner, colref_mapping, must_exist);
+	gpos::Ref<CColRefArray> pdrgpcrInner = CUtils::PdrgpcrRemap(
+		mp, m_pdrgpcrInner.get(), colref_mapping, must_exist);
 
 	return GPOS_NEW(mp) CLogicalLeftOuterCorrelatedApply(
 		mp, std::move(pdrgpcrInner), m_eopidOriginSubq);

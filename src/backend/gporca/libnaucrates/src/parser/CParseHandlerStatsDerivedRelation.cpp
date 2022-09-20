@@ -54,7 +54,7 @@ CParseHandlerStatsDerivedRelation::CParseHandlerStatsDerivedRelation(
 //---------------------------------------------------------------------------
 CParseHandlerStatsDerivedRelation::~CParseHandlerStatsDerivedRelation()
 {
-	m_dxl_stats_derived_relation->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -160,7 +160,7 @@ CParseHandlerStatsDerivedRelation::EndElement(
 	GPOS_ASSERT(0 < this->Length());
 
 	// array of derived column statistics
-	gpos::owner<CDXLStatsDerivedColumnArray *> dxl_stats_derived_col_array =
+	gpos::Ref<CDXLStatsDerivedColumnArray> dxl_stats_derived_col_array =
 		GPOS_NEW(m_mp) CDXLStatsDerivedColumnArray(m_mp);
 	const ULONG num_of_drvd_col_stats = this->Length();
 	for (ULONG idx = 0; idx < num_of_drvd_col_stats; idx++)
@@ -168,9 +168,9 @@ CParseHandlerStatsDerivedRelation::EndElement(
 		CParseHandlerStatsDerivedColumn *stats_derived_col_parse_handler =
 			dynamic_cast<CParseHandlerStatsDerivedColumn *>((*this)[idx]);
 
-		gpos::owner<CDXLStatsDerivedColumn *> pdxlstatdercol =
+		gpos::Ref<CDXLStatsDerivedColumn> pdxlstatdercol =
 			stats_derived_col_parse_handler->GetDxlStatsDerivedCol();
-		pdxlstatdercol->AddRef();
+		;
 		dxl_stats_derived_col_array->Append(pdxlstatdercol);
 	}
 

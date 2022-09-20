@@ -31,10 +31,10 @@ using namespace gpdxl;
 //
 //---------------------------------------------------------------------------
 CDXLPhysicalDynamicIndexScan::CDXLPhysicalDynamicIndexScan(
-	CMemoryPool *mp, gpos::owner<CDXLTableDescr *> table_descr,
-	gpos::owner<CDXLIndexDescr *> dxl_index_descr,
+	CMemoryPool *mp, gpos::Ref<CDXLTableDescr> table_descr,
+	gpos::Ref<CDXLIndexDescr> dxl_index_descr,
 	EdxlIndexScanDirection idx_scan_direction, gpos::Ref<IMdIdArray> part_mdids,
-	gpos::owner<ULongPtrArray *> selector_ids)
+	gpos::Ref<ULongPtrArray> selector_ids)
 	: CDXLPhysical(mp),
 	  m_dxl_table_descr(std::move(table_descr)),
 	  m_dxl_index_descr(std::move(dxl_index_descr)),
@@ -56,9 +56,9 @@ CDXLPhysicalDynamicIndexScan::CDXLPhysicalDynamicIndexScan(
 //---------------------------------------------------------------------------
 CDXLPhysicalDynamicIndexScan::~CDXLPhysicalDynamicIndexScan()
 {
-	m_dxl_index_descr->Release();
-	m_dxl_table_descr->Release();
-	CRefCount::SafeRelease(m_selector_ids);
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -97,10 +97,10 @@ CDXLPhysicalDynamicIndexScan::GetOpNameStr() const
 //		Index descriptor for the index scan
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLIndexDescr *>
+const CDXLIndexDescr *
 CDXLPhysicalDynamicIndexScan::GetDXLIndexDescr() const
 {
-	return m_dxl_index_descr;
+	return m_dxl_index_descr.get();
 }
 
 //---------------------------------------------------------------------------
@@ -125,10 +125,10 @@ CDXLPhysicalDynamicIndexScan::GetIndexScanDir() const
 //		Return the associated table descriptor
 //
 //---------------------------------------------------------------------------
-gpos::pointer<const CDXLTableDescr *>
+const CDXLTableDescr *
 CDXLPhysicalDynamicIndexScan::GetDXLTableDescr() const
 {
-	return m_dxl_table_descr;
+	return m_dxl_table_descr.get();
 }
 
 IMdIdArray *
@@ -146,8 +146,8 @@ CDXLPhysicalDynamicIndexScan::GetParts() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicIndexScan::SerializeToDXL(
-	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
+CDXLPhysicalDynamicIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer,
+											 const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -158,7 +158,7 @@ CDXLPhysicalDynamicIndexScan::SerializeToDXL(
 		CDXLOperator::GetIdxScanDirectionStr(m_index_scan_dir));
 
 	CWStringDynamic *serialized_selector_ids =
-		CDXLUtils::Serialize(m_mp, m_selector_ids);
+		CDXLUtils::Serialize(m_mp, m_selector_ids.get());
 	xml_serializer->AddAttribute(
 		CDXLTokens::GetDXLTokenStr(EdxltokenSelectorIds),
 		serialized_selector_ids);
@@ -196,7 +196,7 @@ CDXLPhysicalDynamicIndexScan::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicIndexScan::AssertValid(gpos::pointer<const CDXLNode *> node,
+CDXLPhysicalDynamicIndexScan::AssertValid(const CDXLNode *node,
 										  BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -215,10 +215,8 @@ CDXLPhysicalDynamicIndexScan::AssertValid(gpos::pointer<const CDXLNode *> node,
 	GPOS_ASSERT(nullptr != m_dxl_table_descr->MdName());
 	GPOS_ASSERT(m_dxl_table_descr->MdName()->GetMDName()->IsValid());
 
-	gpos::pointer<CDXLNode *> index_filter_dxlnode =
-		(*node)[EdxldisIndexFilter];
-	gpos::pointer<CDXLNode *> index_cond_dxlnode =
-		(*node)[EdxldisIndexCondition];
+	CDXLNode *index_filter_dxlnode = (*node)[EdxldisIndexFilter];
+	CDXLNode *index_cond_dxlnode = (*node)[EdxldisIndexCondition];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarIndexCondList ==

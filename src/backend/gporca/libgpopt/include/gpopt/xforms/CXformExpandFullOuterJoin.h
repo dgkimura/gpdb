@@ -34,11 +34,11 @@ class CXformExpandFullOuterJoin : public CXformExploration
 private:
 	// construct a join expression of two CTEs using the given CTE ids
 	// and output columns
-	static gpos::owner<CExpression *> PexprLogicalJoinOverCTEs(
+	static gpos::Ref<CExpression> PexprLogicalJoinOverCTEs(
 		CMemoryPool *mp, EdxlJoinType edxljointype, ULONG ulLeftCTEId,
-		gpos::owner<CColRefArray *> pdrgpcrLeft, ULONG ulRightCTEId,
-		gpos::owner<CColRefArray *> pdrgpcrRight,
-		gpos::owner<CExpression *> pexprScalar);
+		gpos::Ref<CColRefArray> pdrgpcrLeft, ULONG ulRightCTEId,
+		gpos::Ref<CColRefArray> pdrgpcrRight,
+		gpos::Ref<CExpression> pexprScalar);
 
 public:
 	CXformExpandFullOuterJoin(const CXformExpandFullOuterJoin &) = delete;
@@ -67,9 +67,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(gpos::pointer<CXformContext *> pxfctxt,
-				   gpos::pointer<CXformResult *> pxfres,
-				   gpos::pointer<CExpression *> pexpr) const override;
+	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+				   CExpression *pexpr) const override;
 
 };	// class CXformExpandFullOuterJoin
 }  // namespace gpopt

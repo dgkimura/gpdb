@@ -118,8 +118,8 @@ public:
 #endif
 
 	// dummy relstats
-	static gpos::owner<CDXLRelStats *> CreateDXLDummyRelStats(CMemoryPool *mp,
-															  IMDId *mdid);
+	static gpos::Ref<CDXLRelStats> CreateDXLDummyRelStats(CMemoryPool *mp,
+														  IMDId *mdid);
 };
 
 }  // namespace gpmd

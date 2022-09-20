@@ -27,7 +27,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 CScalarSubqueryAll::CScalarSubqueryAll(CMemoryPool *mp,
-									   gpos::owner<IMDId *> scalar_op_mdid,
+									   gpos::Ref<IMDId> scalar_op_mdid,
 									   const CWStringConst *pstrScalarOp,
 									   const CColRef *colref)
 	: CScalarSubqueryQuantified(mp, std::move(scalar_op_mdid), pstrScalarOp,
@@ -43,15 +43,15 @@ CScalarSubqueryAll::CScalarSubqueryAll(CMemoryPool *mp,
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-gpos::owner<COperator *>
-CScalarSubqueryAll::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, gpos::pointer<UlongToColRefMap *> colref_mapping,
-	BOOL must_exist)
+gpos::Ref<COperator>
+CScalarSubqueryAll::PopCopyWithRemappedColumns(CMemoryPool *mp,
+											   UlongToColRefMap *colref_mapping,
+											   BOOL must_exist)
 {
 	CColRef *colref = CUtils::PcrRemap(Pcr(), colref_mapping, must_exist);
 
-	gpos::owner<IMDId *> scalar_op_mdid = MdIdOp();
-	scalar_op_mdid->AddRef();
+	gpos::Ref<IMDId> scalar_op_mdid = MdIdOp();
+	;
 
 	CWStringConst *pstrScalarOp =
 		GPOS_NEW(mp) CWStringConst(mp, PstrOp()->GetBuffer());

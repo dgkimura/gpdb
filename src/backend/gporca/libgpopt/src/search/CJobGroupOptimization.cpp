@@ -137,10 +137,10 @@ CJobGroupOptimization::~CJobGroupOptimization() = default;
 //---------------------------------------------------------------------------
 void
 CJobGroupOptimization::Init(
-	gpos::pointer<CGroup *> pgroup,
-	gpos::pointer<CGroupExpression *>
-		pgexprOrigin,  // group expression that triggered optimization job,
-					   // NULL if this is the Root group
+	CGroup *pgroup,
+	CGroupExpression
+		*pgexprOrigin,	// group expression that triggered optimization job,
+						// NULL if this is the Root group
 	COptimizationContext *poc)
 {
 	GPOS_ASSERT(nullptr != poc);
@@ -164,7 +164,7 @@ CJobGroupOptimization::Init(
 	if (poc == m_poc)
 	{
 		// pin down context in hash table
-		m_poc->AddRef();
+		;
 	}
 	SetJobQueue(m_poc->PjqOptimization());
 
@@ -241,7 +241,7 @@ CJobGroupOptimization::EevtStartOptimization(CSchedulerContext *psc,
 {
 	// get a job pointer
 	CJobGroupOptimization *pjgo = PjConvert(pjOwner);
-	gpos::pointer<CGroup *> pgroup = pjgo->m_pgroup;
+	CGroup *pgroup = pjgo->m_pgroup;
 	GPOS_ASSERT(COptimizationContext::estUnoptimized == pjgo->m_poc->Est() &&
 				"Group is already optimized under this context");
 
@@ -354,10 +354,9 @@ CJobGroupOptimization::FExecute(CSchedulerContext *psc)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupOptimization::ScheduleJob(
-	CSchedulerContext *psc, gpos::pointer<CGroup *> pgroup,
-	gpos::pointer<CGroupExpression *> pgexprOrigin, COptimizationContext *poc,
-	CJob *pjParent)
+CJobGroupOptimization::ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
+								   CGroupExpression *pgexprOrigin,
+								   COptimizationContext *poc, CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtGroupOptimization);
 

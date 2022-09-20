@@ -15,12 +15,12 @@
 namespace gpopt
 {
 CPhysicalUnionAllFactory::CPhysicalUnionAllFactory(
-	gpos::pointer<CLogicalUnionAll *> popLogicalUnionAll)
+	CLogicalUnionAll *popLogicalUnionAll)
 	: m_popLogicalUnionAll(popLogicalUnionAll)
 {
 }
 
-gpos::owner<CPhysicalUnionAll *>
+gpos::Ref<CPhysicalUnionAll>
 CPhysicalUnionAllFactory::PopPhysicalUnionAll(CMemoryPool *mp, BOOL fParallel)
 {
 	CColRefArray *pdrgpcrOutput = m_popLogicalUnionAll->PdrgpcrOutput();
@@ -33,8 +33,8 @@ CPhysicalUnionAllFactory::PopPhysicalUnionAll(CMemoryPool *mp, BOOL fParallel)
 				   GPOS_WSZ_LIT("Union of non-identical types"));
 	}
 
-	pdrgpcrOutput->AddRef();
-	pdrgpdrgpcrInput->AddRef();
+	;
+	;
 
 	if (fParallel)
 	{

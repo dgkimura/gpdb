@@ -53,15 +53,14 @@ CScalarSortGroupClause::CScalarSortGroupClause(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSortGroupClause::Matches(gpos::pointer<COperator *> other) const
+CScalarSortGroupClause::Matches(COperator *other) const
 {
 	if (Eopid() != other->Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CScalarSortGroupClause *> op =
-		gpos::dyn_cast<CScalarSortGroupClause>(other);
+	CScalarSortGroupClause *op = gpos::dyn_cast<CScalarSortGroupClause>(other);
 
 	return Index() == op->Index() && EqOp() == op->EqOp() &&
 		   SortOp() == op->SortOp() && NullsFirst() == op->NullsFirst() &&
@@ -98,7 +97,7 @@ CScalarSortGroupClause::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarSortGroupClause::Eber(gpos::pointer<ULongPtrArray *>	 //pdrgpulChildren
+CScalarSortGroupClause::Eber(ULongPtrArray *  //pdrgpulChildren
 ) const
 {
 	return EberAny;

@@ -69,9 +69,8 @@ public:
 	}
 
 	// actual transform
-	void Transform(gpos::pointer<CXformContext *>,
-				   gpos::pointer<CXformResult *>,
-				   gpos::pointer<CExpression *>) const override;
+	void Transform(CXformContext *, CXformResult *,
+				   CExpression *) const override;
 
 };	// class CXformDifferenceAll2LeftAntiSemiJoin
 

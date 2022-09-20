@@ -65,7 +65,7 @@ private:
 	CDouble m_freq_remaining;
 
 	// histogram buckets
-	gpos::owner<CDXLBucketArray *> m_dxl_stats_bucket_array;
+	gpos::Ref<CDXLBucketArray> m_dxl_stats_bucket_array;
 
 	// is column statistics missing in the database
 	BOOL m_is_col_stats_missing;
@@ -80,7 +80,7 @@ public:
 	CDXLColStats(CMemoryPool *mp, gpos::Ref<CMDIdColStats> mdid_col_stats,
 				 CMDName *mdname, CDouble width, CDouble null_freq,
 				 CDouble distinct_remaining, CDouble freq_remaining,
-				 gpos::owner<CDXLBucketArray *> dxl_stats_bucket_array,
+				 gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array,
 				 BOOL is_col_stats_missing);
 
 	// dtor
@@ -134,7 +134,7 @@ public:
 	}
 
 	// get the bucket at the given position
-	gpos::pointer<const CDXLBucket *> GetDXLBucketAt(ULONG ul) const override;
+	const CDXLBucket *GetDXLBucketAt(ULONG ul) const override;
 
 	// serialize column stats in DXL format
 	void Serialize(gpdxl::CXMLSerializer *) const override;
@@ -145,14 +145,14 @@ public:
 #endif
 
 	// dummy colstats
-	static gpos::owner<CDXLColStats *> CreateDXLDummyColStats(CMemoryPool *mp,
-															  IMDId *mdid,
-															  CMDName *mdname,
-															  CDouble width);
+	static gpos::Ref<CDXLColStats> CreateDXLDummyColStats(CMemoryPool *mp,
+														  IMDId *mdid,
+														  CMDName *mdname,
+														  CDouble width);
 };
 
 // array of dxl column stats
-using CDXLColStatsArray = CDynamicPtrArray<CDXLColStats, CleanupRelease>;
+using CDXLColStatsArray = gpos::Vector<gpos::Ref<CDXLColStats>>;
 }  // namespace gpmd
 
 

@@ -71,9 +71,8 @@ CXformImplementAssert::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementAssert::Transform(gpos::pointer<CXformContext *> pxfctxt,
-								 gpos::pointer<CXformResult *> pxfres,
-								 gpos::pointer<CExpression *> pexpr) const
+CXformImplementAssert::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+								 CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -82,23 +81,21 @@ CXformImplementAssert::Transform(gpos::pointer<CXformContext *> pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	gpos::pointer<CLogicalAssert *> popAssert =
-		gpos::dyn_cast<CLogicalAssert>(pexpr->Pop());
+	CLogicalAssert *popAssert = gpos::dyn_cast<CLogicalAssert>(pexpr->Pop());
 	CExpression *pexprRelational = (*pexpr)[0];
 	CExpression *pexprScalar = (*pexpr)[1];
 	CException *pexc = popAssert->Pexc();
 
 	// addref all children
-	pexprRelational->AddRef();
-	pexprScalar->AddRef();
+	;
+	;
 
 	// assemble physical operator
-	gpos::owner<CPhysicalAssert *> popPhysicalAssert =
-		GPOS_NEW(mp) CPhysicalAssert(
-			mp, GPOS_NEW(mp) CException(pexc->Major(), pexc->Minor(),
-										pexc->Filename(), pexc->Line()));
+	gpos::Ref<CPhysicalAssert> popPhysicalAssert = GPOS_NEW(mp) CPhysicalAssert(
+		mp, GPOS_NEW(mp) CException(pexc->Major(), pexc->Minor(),
+									pexc->Filename(), pexc->Line()));
 
-	gpos::owner<CExpression *> pexprAssert = GPOS_NEW(mp) CExpression(
+	gpos::Ref<CExpression> pexprAssert = GPOS_NEW(mp) CExpression(
 		mp, std::move(popPhysicalAssert), pexprRelational, pexprScalar);
 
 	// add alternative to results

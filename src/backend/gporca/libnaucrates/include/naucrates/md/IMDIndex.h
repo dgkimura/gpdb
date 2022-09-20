@@ -84,14 +84,14 @@ public:
 	virtual ULONG GetIncludedColPos(ULONG column) const = 0;
 
 	// part constraint
-	virtual gpos::pointer<IMDPartConstraint *> MDPartConstraint() const = 0;
+	virtual IMDPartConstraint *MDPartConstraint() const = 0;
 
 	// type id of items returned by the index
 	virtual IMDId *GetIndexRetItemTypeMdid() const = 0;
 
 	// check if given scalar comparison can be used with the index key
 	// at the specified position
-	virtual BOOL IsCompatible(gpos::pointer<const IMDScalarOp *> md_scalar_op,
+	virtual BOOL IsCompatible(const IMDScalarOp *md_scalar_op,
 							  ULONG key_pos) const = 0;
 
 	// child index oids

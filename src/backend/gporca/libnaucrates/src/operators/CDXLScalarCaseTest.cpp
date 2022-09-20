@@ -100,7 +100,7 @@ CDXLScalarCaseTest::MdidType() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarCaseTest::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   gpos::pointer<const CDXLNode *>	//dxlnode
+								   const CDXLNode *	 //dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -138,7 +138,7 @@ CDXLScalarCaseTest::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCaseTest::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+CDXLScalarCaseTest::AssertValid(const CDXLNode *dxlnode,
 								BOOL  // validate_children
 ) const
 {

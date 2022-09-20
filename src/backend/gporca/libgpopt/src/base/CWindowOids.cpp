@@ -25,7 +25,7 @@ CWindowOids::OidRank() const
 	return m_oidRank;
 }
 
-gpos::owner<CWindowOids *>
+gpos::Ref<CWindowOids>
 CWindowOids::GetWindowOids(CMemoryPool *mp)
 {
 	return GPOS_NEW(mp) CWindowOids(DUMMY_ROW_NUMBER_OID, DUMMY_WIN_RANK);

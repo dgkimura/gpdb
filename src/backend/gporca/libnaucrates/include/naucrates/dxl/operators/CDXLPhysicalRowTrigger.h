@@ -41,18 +41,18 @@ private:
 	INT m_type;
 
 	// old column ids
-	gpos::owner<ULongPtrArray *> m_colids_old;
+	gpos::Ref<ULongPtrArray> m_colids_old;
 
 	// new column ids
-	gpos::owner<ULongPtrArray *> m_colids_new;
+	gpos::Ref<ULongPtrArray> m_colids_new;
 
 public:
 	CDXLPhysicalRowTrigger(const CDXLPhysicalRowTrigger &) = delete;
 
 	// ctor
 	CDXLPhysicalRowTrigger(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid, INT type,
-						   gpos::owner<ULongPtrArray *> colids_old,
-						   gpos::owner<ULongPtrArray *> colids_new);
+						   gpos::Ref<ULongPtrArray> colids_old,
+						   gpos::Ref<ULongPtrArray> colids_new);
 
 	// dtor
 	~CDXLPhysicalRowTrigger() override;
@@ -78,32 +78,32 @@ public:
 	}
 
 	// old column ids
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetColIdsOld() const
 	{
-		return m_colids_old;
+		return m_colids_old.get();
 	}
 
 	// new column ids
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	GetColIdsNew() const
 	{
-		return m_colids_new;
+		return m_colids_new.get();
 	}
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
+	void AssertValid(const CDXLNode *dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalRowTrigger *>
+	static CDXLPhysicalRowTrigger *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

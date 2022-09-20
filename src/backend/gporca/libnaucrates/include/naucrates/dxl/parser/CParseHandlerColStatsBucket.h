@@ -53,10 +53,10 @@ private:
 	CDouble m_distinct;
 
 	// lower bound value for the bucket
-	gpos::pointer<CDXLDatum *> m_lower_bound_dxl_datum;
+	CDXLDatum *m_lower_bound_dxl_datum;
 
 	// upper bound value for the bucket
-	gpos::pointer<CDXLDatum *> m_upper_bound_dxl_datum;
+	CDXLDatum *m_upper_bound_dxl_datum;
 
 	// is lower bound closed
 	BOOL m_is_lower_closed;
@@ -65,7 +65,7 @@ private:
 	BOOL m_is_upper_closed;
 
 	// dxl bucket object
-	gpos::owner<CDXLBucket *> m_dxl_bucket;
+	gpos::Ref<CDXLBucket> m_dxl_bucket;
 
 	// process the start of an element
 	void StartElement(
@@ -94,7 +94,7 @@ public:
 	~CParseHandlerColStatsBucket() override;
 
 	// returns the constructed bucket
-	gpos::pointer<CDXLBucket *> GetDXLBucketAt() const;
+	CDXLBucket *GetDXLBucketAt() const;
 };
 }  // namespace gpdxl
 

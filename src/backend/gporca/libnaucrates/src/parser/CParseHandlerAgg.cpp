@@ -69,8 +69,10 @@ CParseHandlerAgg::StartElement(const XMLCh *const,	// element_uri,
 	}
 
 	// parse and create group by operator
-	m_dxl_op = gpos::cast<CDXLPhysicalAgg>(CDXLOperatorFactory::MakeDXLAgg(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+	m_dxl_op = gpos::cast<CDXLPhysicalAgg>(
+		CDXLOperatorFactory::MakeDXLAgg(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs)
+			.get());
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance
@@ -161,15 +163,15 @@ CParseHandlerAgg::EndElement(const XMLCh *const,  // element_uri,
 	GPOS_ASSERT(nullptr !=
 				grouping_col_list_parse_handler->GetGroupingColidArray());
 
-	gpos::owner<ULongPtrArray *> grouping_colid_array =
+	gpos::Ref<ULongPtrArray> grouping_colid_array =
 		grouping_col_list_parse_handler->GetGroupingColidArray();
-	grouping_colid_array->AddRef();
+	;
 	m_dxl_op->SetGroupingCols(std::move(grouping_colid_array));
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 
 	// set physical properties
-	CParseHandlerUtils::SetProperties(m_dxl_node, prop_parse_handler);
+	CParseHandlerUtils::SetProperties(m_dxl_node.get(), prop_parse_handler);
 
 	// add children
 	AddChildFromParseHandler(proj_list_parse_handler);

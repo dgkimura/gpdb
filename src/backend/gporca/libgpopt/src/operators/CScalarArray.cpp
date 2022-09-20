@@ -42,7 +42,7 @@ CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
 CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
 						   gpos::Ref<IMDId> array_type_mdid,
 						   BOOL is_multidimenstional,
-						   gpos::owner<CScalarConstArray *> pdrgPconst)
+						   gpos::Ref<CScalarConstArray> pdrgPconst)
 	: CScalar(mp),
 	  m_pmdidElem(elem_type_mdid),
 	  m_pmdidArray(array_type_mdid),
@@ -56,7 +56,7 @@ CScalarArray::CScalarArray(CMemoryPool *mp, gpos::Ref<IMDId> elem_type_mdid,
 // Dtor
 CScalarArray::~CScalarArray()
 {
-	m_pdrgPconst->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -127,12 +127,11 @@ CScalarArray::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArray::Matches(gpos::pointer<COperator *> pop) const
+CScalarArray::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		gpos::pointer<CScalarArray *> popArray =
-			gpos::dyn_cast<CScalarArray>(pop);
+		CScalarArray *popArray = gpos::dyn_cast<CScalarArray>(pop);
 
 		// match if components are identical
 		if (popArray->FMultiDimensional() == FMultiDimensional() &&
@@ -142,9 +141,8 @@ CScalarArray::Matches(gpos::pointer<COperator *> pop) const
 		{
 			for (ULONG ul = 0; ul < m_pdrgPconst->Size(); ul++)
 			{
-				gpos::pointer<CScalarConst *> popConst1 = (*m_pdrgPconst)[ul];
-				gpos::pointer<CScalarConst *> popConst2 =
-					(*popArray->PdrgPconst())[ul];
+				CScalarConst *popConst1 = (*m_pdrgPconst)[ul].get();
+				CScalarConst *popConst2 = (*popArray->PdrgPconst())[ul].get();
 				if (!popConst1->Matches(popConst2))
 				{
 					return false;
@@ -171,10 +169,10 @@ CScalarArray::MdidType() const
 	return m_pmdidArray.get();
 }
 
-gpos::pointer<CScalarConstArray *>
+CScalarConstArray *
 CScalarArray::PdrgPconst() const
 {
-	return m_pdrgPconst;
+	return m_pdrgPconst.get();
 }
 
 IOstream &

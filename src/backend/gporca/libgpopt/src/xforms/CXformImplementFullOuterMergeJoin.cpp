@@ -43,10 +43,9 @@ CXformImplementFullOuterMergeJoin::Exfp(CExpressionHandle &exprhdl) const
 }
 
 void
-CXformImplementFullOuterMergeJoin::Transform(
-	gpos::pointer<CXformContext *> pxfctxt,
-	gpos::pointer<CXformResult *> pxfres,
-	gpos::pointer<CExpression *> pexpr) const
+CXformImplementFullOuterMergeJoin::Transform(CXformContext *pxfctxt,
+											 CXformResult *pxfres,
+											 CExpression *pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

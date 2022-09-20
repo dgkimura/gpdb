@@ -30,7 +30,7 @@ class CDrvdPropCtxt;
 class CReqdPropPlan;
 
 // dynamic array for properties
-using CDrvdPropArray = CDynamicPtrArray<CDrvdProp, CleanupRelease>;
+using CDrvdPropArray = gpos::Vector<gpos::Ref<CDrvdProp>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -93,11 +93,10 @@ public:
 
 	// derivation function
 	virtual void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						gpos::pointer<CDrvdPropCtxt *> pdppropctxt) = 0;
+						CDrvdPropCtxt *pdppropctxt) = 0;
 
 	// check for satisfying required plan properties
-	virtual BOOL FSatisfies(
-		gpos::pointer<const CReqdPropPlan *> prpp) const = 0;
+	virtual BOOL FSatisfies(const CReqdPropPlan *prpp) const = 0;
 
 	virtual BOOL
 	IsComplete() const

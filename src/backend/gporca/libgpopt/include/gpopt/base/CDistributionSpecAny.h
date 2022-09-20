@@ -66,7 +66,7 @@ public:
 
 	// does current distribution satisfy the given one
 	BOOL
-	FSatisfies(gpos::pointer<const CDistributionSpec *> pds) const override
+	FSatisfies(const CDistributionSpec *pds) const override
 	{
 		return EdtAny == pds->Edt();
 	}
@@ -83,9 +83,9 @@ public:
 	AppendEnforcers(
 		CMemoryPool *,		  // mp
 		CExpressionHandle &,  // exprhdl: gives access to child properties
-		gpos::pointer<CReqdPropPlan *>,		// prpp
-		gpos::pointer<CExpressionArray *>,	// pdrgpexpr
-		gpos::pointer<CExpression *>		// pexpr
+		CReqdPropPlan *,	  // prpp
+		CExpressionArray *,	  // pdrgpexpr
+		CExpression *		  // pexpr
 		) override
 	{
 		GPOS_ASSERT(!"attempt to enforce ANY distribution");
@@ -114,7 +114,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CDistributionSpecAny *>
+	static CDistributionSpecAny *
 	PdsConvert(CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(nullptr != pds);

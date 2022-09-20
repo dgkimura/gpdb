@@ -192,7 +192,7 @@ CDXLRelStats::DebugPrint(IOstream &os) const
 //		Dummy relation stats
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDXLRelStats *>
+gpos::Ref<CDXLRelStats>
 CDXLRelStats::CreateDXLDummyRelStats(CMemoryPool *mp, IMDId *mdid)
 {
 	CMDIdRelStats *rel_stats_mdid = gpos::dyn_cast<CMDIdRelStats>(mdid);
@@ -200,7 +200,7 @@ CDXLRelStats::CreateDXLDummyRelStats(CMemoryPool *mp, IMDId *mdid)
 	str = GPOS_NEW(mp) CWStringDynamic(mp, rel_stats_mdid->GetBuffer());
 	CAutoP<CMDName> mdname;
 	mdname = GPOS_NEW(mp) CMDName(mp, str.Value());
-	gpos::owner<CDXLRelStats *> rel_stats_dxl;
+	gpos::Ref<CDXLRelStats> rel_stats_dxl;
 	rel_stats_dxl = GPOS_NEW(mp) CDXLRelStats(
 		mp, rel_stats_mdid, mdname.Value(), CStatistics::DefaultColumnWidth,
 		false /* is_empty */, 0 /* relpages */, 0 /* relallvisible */);

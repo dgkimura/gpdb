@@ -72,7 +72,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CDXLDatumBool *>
+	static CDXLDatumBool *
 	Cast(CDXLDatum *dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);

@@ -85,7 +85,7 @@ const BYTE CScalarBooleanTest::m_rgBoolEvalMap[][3] = {
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBooleanTest::Matches(gpos::pointer<COperator *> pop) const
+CScalarBooleanTest::Matches(COperator *pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -121,7 +121,7 @@ CScalarBooleanTest::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarBooleanTest::Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const
+CScalarBooleanTest::Eber(ULongPtrArray *pdrgpulChildren) const
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 	GPOS_ASSERT(1 == pdrgpulChildren->Size());

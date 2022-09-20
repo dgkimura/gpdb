@@ -32,7 +32,7 @@ class CParseHandlerMDIndexInfoList : public CParseHandlerBase
 {
 private:
 	// list of indexinfo
-	gpos::owner<CMDIndexInfoArray *> m_mdindex_info_array;
+	gpos::Ref<CMDIndexInfoArray> m_mdindex_info_array;
 
 	// process the start of an element
 	void StartElement(
@@ -61,7 +61,7 @@ public:
 	~CParseHandlerMDIndexInfoList() override;
 
 	// returns array of indexinfo
-	gpos::pointer<CMDIndexInfoArray *> GetMdIndexInfoArray();
+	CMDIndexInfoArray *GetMdIndexInfoArray();
 };
 }  // namespace gpdxl
 

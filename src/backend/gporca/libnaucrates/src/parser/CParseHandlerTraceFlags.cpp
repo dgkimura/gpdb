@@ -51,7 +51,7 @@ CParseHandlerTraceFlags::CParseHandlerTraceFlags(
 //---------------------------------------------------------------------------
 CParseHandlerTraceFlags::~CParseHandlerTraceFlags()
 {
-	m_trace_flags_bitset->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -82,7 +82,7 @@ CParseHandlerTraceFlags::StartElement(const XMLCh *const,  //element_uri,
 	const XMLCh *xml_str_trace_flags = CDXLOperatorFactory::ExtractAttrValue(
 		attrs, EdxltokenValue, EdxltokenTraceFlags);
 
-	gpos::owner<ULongPtrArray *> trace_flag_array =
+	gpos::Ref<ULongPtrArray> trace_flag_array =
 		CDXLOperatorFactory::ExtractIntsToUlongArray(
 			m_parse_handler_mgr->GetDXLMemoryManager(), xml_str_trace_flags,
 			EdxltokenDistrColumns, EdxltokenRelation);
@@ -93,7 +93,7 @@ CParseHandlerTraceFlags::StartElement(const XMLCh *const,  //element_uri,
 		m_trace_flags_bitset->ExchangeSet(*trace_flag);
 	}
 
-	trace_flag_array->Release();
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -146,9 +146,9 @@ CParseHandlerTraceFlags::GetParseHandlerType() const
 //		Returns the bitset for the trace flags
 //
 //---------------------------------------------------------------------------
-gpos::pointer<CBitSet *>
+CBitSet *
 CParseHandlerTraceFlags::GetTraceFlagBitSet()
 {
-	return m_trace_flags_bitset;
+	return m_trace_flags_bitset.get();
 }
 // EOF

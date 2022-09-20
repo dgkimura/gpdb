@@ -31,8 +31,8 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalRowTrigger::CPhysicalRowTrigger(CMemoryPool *mp,
 										 gpos::Ref<IMDId> rel_mdid, INT type,
-										 gpos::owner<CColRefArray *> pdrgpcrOld,
-										 gpos::owner<CColRefArray *> pdrgpcrNew)
+										 gpos::Ref<CColRefArray> pdrgpcrOld,
+										 gpos::Ref<CColRefArray> pdrgpcrNew)
 	: CPhysical(mp),
 	  m_rel_mdid(rel_mdid),
 	  m_type(type),
@@ -49,12 +49,12 @@ CPhysicalRowTrigger::CPhysicalRowTrigger(CMemoryPool *mp,
 	m_pcrsRequiredLocal = GPOS_NEW(mp) CColRefSet(mp);
 	if (nullptr != m_pdrgpcrOld)
 	{
-		m_pcrsRequiredLocal->Include(m_pdrgpcrOld);
+		m_pcrsRequiredLocal->Include(m_pdrgpcrOld.get());
 	}
 
 	if (nullptr != m_pdrgpcrNew)
 	{
-		m_pcrsRequiredLocal->Include(m_pdrgpcrNew);
+		m_pcrsRequiredLocal->Include(m_pdrgpcrNew.get());
 	}
 }
 
@@ -68,9 +68,9 @@ CPhysicalRowTrigger::CPhysicalRowTrigger(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CPhysicalRowTrigger::~CPhysicalRowTrigger()
 {
-	CRefCount::SafeRelease(m_pdrgpcrOld);
-	CRefCount::SafeRelease(m_pdrgpcrNew);
-	m_pcrsRequiredLocal->Release();
+	;
+	;
+	;
 }
 
 //---------------------------------------------------------------------------
@@ -81,18 +81,17 @@ CPhysicalRowTrigger::~CPhysicalRowTrigger()
 //		Compute required sort columns of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<COrderSpec *>
-CPhysicalRowTrigger::PosRequired(
-	CMemoryPool *mp,
-	CExpressionHandle &,		  //exprhdl,
-	gpos::pointer<COrderSpec *>,  //posRequired,
-	ULONG
+gpos::Ref<COrderSpec>
+CPhysicalRowTrigger::PosRequired(CMemoryPool *mp,
+								 CExpressionHandle &,  //exprhdl,
+								 COrderSpec *,		   //posRequired,
+								 ULONG
 #ifdef GPOS_DEBUG
-		child_index
+									 child_index
 #endif
-	,
-	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
-	ULONG							  // ulOptReq
+								 ,
+								 CDrvdPropArray *,	// pdrgpdpCtxt
+								 ULONG				// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -108,7 +107,7 @@ CPhysicalRowTrigger::PosRequired(
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-gpos::owner<COrderSpec *>
+gpos::Ref<COrderSpec>
 CPhysicalRowTrigger::PosDerive(CMemoryPool *mp,
 							   CExpressionHandle &	//exprhdl
 ) const
@@ -126,7 +125,7 @@ CPhysicalRowTrigger::PosDerive(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalRowTrigger::EpetOrder(CExpressionHandle &,	 // exprhdl
-							   gpos::pointer<const CEnfdOrder *>
+							   const CEnfdOrder *
 #ifdef GPOS_DEBUG
 								   peo
 #endif	// GPOS_DEBUG
@@ -147,23 +146,22 @@ CPhysicalRowTrigger::EpetOrder(CExpressionHandle &,	 // exprhdl
 //		we only compute required columns for the relational child;
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
-CPhysicalRowTrigger::PcrsRequired(
-	CMemoryPool *mp,
-	CExpressionHandle &,  // exprhdl,
-	gpos::pointer<CColRefSet *> pcrsRequired,
-	ULONG
+gpos::Ref<CColRefSet>
+CPhysicalRowTrigger::PcrsRequired(CMemoryPool *mp,
+								  CExpressionHandle &,	// exprhdl,
+								  CColRefSet *pcrsRequired,
+								  ULONG
 #ifdef GPOS_DEBUG
-		child_index
+									  child_index
 #endif	// GPOS_DEBUG
-	,
-	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
-	ULONG							  // ulOptReq
+								  ,
+								  CDrvdPropArray *,	 // pdrgpdpCtxt
+								  ULONG				 // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
 
-	gpos::owner<CColRefSet *> pcrs =
+	gpos::Ref<CColRefSet> pcrs =
 		GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
 	pcrs->Union(pcrsRequired);
 
@@ -178,12 +176,11 @@ CPhysicalRowTrigger::PcrsRequired(
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDistributionSpec *>
-CPhysicalRowTrigger::PdsRequired(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
-	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
-	ULONG							  // ulOptReq
+gpos::Ref<CDistributionSpec>
+CPhysicalRowTrigger::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								 CDistributionSpec *pdsInput, ULONG child_index,
+								 CDrvdPropArray *,	// pdrgpdpCtxt
+								 ULONG				// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -205,12 +202,12 @@ CPhysicalRowTrigger::PdsRequired(
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CRewindabilitySpec *>
-CPhysicalRowTrigger::PrsRequired(
-	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index,
-	gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
-	ULONG							  // ulOptReq
+gpos::Ref<CRewindabilitySpec>
+CPhysicalRowTrigger::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
+								 CRewindabilitySpec *prsRequired,
+								 ULONG child_index,
+								 CDrvdPropArray *,	// pdrgpdpCtxt
+								 ULONG				// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -226,18 +223,17 @@ CPhysicalRowTrigger::PrsRequired(
 //		Compute required CTE map of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CCTEReq *>
-CPhysicalRowTrigger::PcteRequired(
-	CMemoryPool *,		  //mp,
-	CExpressionHandle &,  //exprhdl,
-	gpos::pointer<CCTEReq *> pcter,
-	ULONG
+gpos::Ref<CCTEReq>
+CPhysicalRowTrigger::PcteRequired(CMemoryPool *,		//mp,
+								  CExpressionHandle &,	//exprhdl,
+								  CCTEReq *pcter,
+								  ULONG
 #ifdef GPOS_DEBUG
-		child_index
+									  child_index
 #endif
-	,
-	gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt,
-	ULONG							  //ulOptReq
+								  ,
+								  CDrvdPropArray *,	 //pdrgpdpCtxt,
+								  ULONG				 //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -254,7 +250,7 @@ CPhysicalRowTrigger::PcteRequired(
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalRowTrigger::FProvidesReqdCols(CExpressionHandle &exprhdl,
-									   gpos::pointer<CColRefSet *> pcrsRequired,
+									   CColRefSet *pcrsRequired,
 									   ULONG  // ulOptReq
 ) const
 {
@@ -269,7 +265,7 @@ CPhysicalRowTrigger::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-gpos::owner<CDistributionSpec *>
+gpos::Ref<CDistributionSpec>
 CPhysicalRowTrigger::PdsDerive(CMemoryPool *,  // mp
 							   CExpressionHandle &exprhdl) const
 {
@@ -284,7 +280,7 @@ CPhysicalRowTrigger::PdsDerive(CMemoryPool *,  // mp
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-gpos::owner<CRewindabilitySpec *>
+gpos::Ref<CRewindabilitySpec>
 CPhysicalRowTrigger::PrsDerive(CMemoryPool *mp,
 							   CExpressionHandle &exprhdl) const
 {
@@ -308,14 +304,14 @@ CPhysicalRowTrigger::HashValue() const
 
 	if (nullptr != m_pdrgpcrOld)
 	{
-		ulHash =
-			gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrOld));
+		ulHash = gpos::CombineHashes(
+			ulHash, CUtils::UlHashColArray(m_pdrgpcrOld.get()));
 	}
 
 	if (nullptr != m_pdrgpcrNew)
 	{
-		ulHash =
-			gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrNew));
+		ulHash = gpos::CombineHashes(
+			ulHash, CUtils::UlHashColArray(m_pdrgpcrNew.get()));
 	}
 
 	return ulHash;
@@ -330,23 +326,23 @@ CPhysicalRowTrigger::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalRowTrigger::Matches(gpos::pointer<COperator *> pop) const
+CPhysicalRowTrigger::Matches(COperator *pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
 		return false;
 	}
 
-	gpos::pointer<CPhysicalRowTrigger *> popRowTrigger =
+	CPhysicalRowTrigger *popRowTrigger =
 		gpos::dyn_cast<CPhysicalRowTrigger>(pop);
 
-	gpos::pointer<CColRefArray *> pdrgpcrOld = popRowTrigger->PdrgpcrOld();
-	gpos::pointer<CColRefArray *> pdrgpcrNew = popRowTrigger->PdrgpcrNew();
+	CColRefArray *pdrgpcrOld = popRowTrigger->PdrgpcrOld();
+	CColRefArray *pdrgpcrNew = popRowTrigger->PdrgpcrNew();
 
 	return m_rel_mdid->Equals(popRowTrigger->GetRelMdId()) &&
 		   m_type == popRowTrigger->GetType() &&
-		   CUtils::Equals(m_pdrgpcrOld, pdrgpcrOld) &&
-		   CUtils::Equals(m_pdrgpcrNew, pdrgpcrNew);
+		   CUtils::Equals(m_pdrgpcrOld.get(), pdrgpcrOld) &&
+		   CUtils::Equals(m_pdrgpcrNew.get(), pdrgpcrNew);
 }
 
 
@@ -359,11 +355,10 @@ CPhysicalRowTrigger::Matches(gpos::pointer<COperator *> pop) const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalRowTrigger::EpetRewindability(
-	CExpressionHandle &exprhdl,
-	gpos::pointer<const CEnfdRewindability *> per) const
+CPhysicalRowTrigger::EpetRewindability(CExpressionHandle &exprhdl,
+									   const CEnfdRewindability *per) const
 {
-	gpos::pointer<CRewindabilitySpec *> prs =
+	CRewindabilitySpec *prs =
 		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))
 	{
@@ -396,14 +391,14 @@ CPhysicalRowTrigger::OsPrint(IOstream &os) const
 	if (nullptr != m_pdrgpcrOld)
 	{
 		os << ", Old Columns: [";
-		CUtils::OsPrintDrgPcr(os, m_pdrgpcrOld);
+		CUtils::OsPrintDrgPcr(os, m_pdrgpcrOld.get());
 		os << "]";
 	}
 
 	if (nullptr != m_pdrgpcrNew)
 	{
 		os << ", New Columns: [";
-		CUtils::OsPrintDrgPcr(os, m_pdrgpcrNew);
+		CUtils::OsPrintDrgPcr(os, m_pdrgpcrNew.get());
 		os << "]";
 	}
 

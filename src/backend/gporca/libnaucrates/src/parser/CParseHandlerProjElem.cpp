@@ -64,9 +64,10 @@ CParseHandlerProjElem::StartElement(const XMLCh *const,	 // element_uri,
 	}
 
 	// parse and create proj elem operator
-	m_dxl_op =
-		gpos::cast<CDXLScalarProjElem>(CDXLOperatorFactory::MakeDXLProjElem(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+	m_dxl_op = gpos::cast<CDXLScalarProjElem>(
+		CDXLOperatorFactory::MakeDXLProjElem(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs)
+			.get());
 
 	// create and activate the parse handler for the child scalar expression node
 

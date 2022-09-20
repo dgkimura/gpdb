@@ -45,7 +45,7 @@ using namespace gpmd;
 //---------------------------------------------------------------------------
 CMappingColIdVarPlStmt::CMappingColIdVarPlStmt(
 	CMemoryPool *mp, const CDXLTranslateContextBaseTable *base_table_context,
-	gpos::pointer<CDXLTranslationContextArray *> child_contexts,
+	CDXLTranslationContextArray *child_contexts,
 	CDXLTranslateContext *output_context,
 	CContextDXLToPlStmt *dxl_to_plstmt_context)
 	: CMappingColIdVar(mp),
@@ -93,15 +93,14 @@ CMappingColIdVarPlStmt::GetOutputContext()
 //
 //---------------------------------------------------------------------------
 Param *
-CMappingColIdVarPlStmt::ParamFromDXLNodeScId(
-	gpos::pointer<const CDXLScalarIdent *> dxlop)
+CMappingColIdVarPlStmt::ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop)
 {
 	GPOS_ASSERT(nullptr != m_output_context);
 
 	Param *param = nullptr;
 
 	const ULONG colid = dxlop->GetDXLColRef()->Id();
-	gpos::pointer<const CMappingElementColIdParamId *> elem =
+	const CMappingElementColIdParamId *elem =
 		m_output_context->GetParamIdMappingElement(colid);
 
 	if (nullptr != elem)
@@ -126,8 +125,7 @@ CMappingColIdVarPlStmt::ParamFromDXLNodeScId(
 //
 //---------------------------------------------------------------------------
 Var *
-CMappingColIdVarPlStmt::VarFromDXLNodeScId(
-	gpos::pointer<const CDXLScalarIdent *> dxlop)
+CMappingColIdVarPlStmt::VarFromDXLNodeScId(const CDXLScalarIdent *dxlop)
 {
 	Index varno = 0;
 	AttrNumber attno = 0;

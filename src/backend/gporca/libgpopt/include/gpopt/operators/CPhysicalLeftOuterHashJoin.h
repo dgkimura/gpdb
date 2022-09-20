@@ -34,9 +34,9 @@ public:
 
 	// ctor
 	CPhysicalLeftOuterHashJoin(
-		CMemoryPool *mp, gpos::owner<CExpressionArray *> pdrgpexprOuterKeys,
-		gpos::owner<CExpressionArray *> pdrgpexprInnerKeys,
-		gpos::owner<IMdIdArray *> hash_opfamilies,
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprOuterKeys,
+		gpos::Ref<CExpressionArray> pdrgpexprInnerKeys,
+		gpos::Ref<IMdIdArray> hash_opfamilies,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// dtor
@@ -57,7 +57,7 @@ public:
 	}
 
 	// conversion function
-	static gpos::cast_func<CPhysicalLeftOuterHashJoin *>
+	static CPhysicalLeftOuterHashJoin *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

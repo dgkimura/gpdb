@@ -167,7 +167,7 @@ CParseHandlerScalarSubqueryQuantified::EndElement(
 	AddChildFromParseHandler(parse_handler_logical_child);
 
 #ifdef GPOS_DEBUG
-	m_dxl_op->AssertValid(m_dxl_node, false /* validate_children */);
+	m_dxl_op->AssertValid(m_dxl_node.get(), false /* validate_children */);
 #endif	// GPOS_DEBUG
 
 	// deactivate handler

@@ -66,12 +66,11 @@ CPhysicalNLJoin::~CPhysicalNLJoin() = default;
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<COrderSpec *>
+gpos::Ref<COrderSpec>
 CPhysicalNLJoin::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 gpos::pointer<COrderSpec *> posInput,
-							 ULONG child_index,
-							 gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
-							 ULONG							   // ulOptReq
+							 COrderSpec *posInput, ULONG child_index,
+							 CDrvdPropArray *,	// pdrgpdpCtxt
+							 ULONG				// ulOptReq
 ) const
 {
 	GPOS_ASSERT(
@@ -95,11 +94,10 @@ CPhysicalNLJoin::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CRewindabilitySpec *>
+gpos::Ref<CRewindabilitySpec>
 CPhysicalNLJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 gpos::pointer<CRewindabilitySpec *> prsRequired,
-							 ULONG child_index,
-							 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+							 CRewindabilitySpec *prsRequired, ULONG child_index,
+							 CDrvdPropArray *pdrgpdpCtxt,
 							 ULONG	// ulOptReq
 ) const
 {
@@ -117,7 +115,7 @@ CPhysicalNLJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				CRewindabilitySpec::ErtRewindable, prsRequired->Emht(), true);
 		}
 
-		gpos::pointer<CRewindabilitySpec *> prsOuter =
+		CRewindabilitySpec *prsOuter =
 			gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0 /*outer child*/])
 				->Prs();
 		CRewindabilitySpec::EMotionHazardType motion_hazard =
@@ -144,19 +142,18 @@ CPhysicalNLJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required output columns of n-th child
 //
 //---------------------------------------------------------------------------
-gpos::owner<CColRefSet *>
+gpos::Ref<CColRefSet>
 CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  gpos::pointer<CColRefSet *> pcrsRequired,
-							  ULONG child_index,
-							  gpos::pointer<CDrvdPropArray *>,	// pdrgpdpCtxt
-							  ULONG								// ulOptReq
+							  CColRefSet *pcrsRequired, ULONG child_index,
+							  CDrvdPropArray *,	 // pdrgpdpCtxt
+							  ULONG				 // ulOptReq
 )
 {
 	GPOS_ASSERT(
 		child_index < 2 &&
 		"Required properties can only be computed on the relational child");
 
-	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pcrsRequired);
 
 	// For subqueries in the projection list, the required columns from the outer child
@@ -164,8 +161,7 @@ CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// so we can use the outer refs of the inner child as required from outer child
 	if (0 == child_index)
 	{
-		gpos::pointer<CColRefSet *> outer_refs =
-			exprhdl.DeriveOuterReferences(1);
+		CColRefSet *outer_refs = exprhdl.DeriveOuterReferences(1);
 		pcrs->Include(outer_refs);
 	}
 
@@ -175,9 +171,9 @@ CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		pcrs->Include(PdrgPcrInner());
 	}
 
-	gpos::owner<CColRefSet *> pcrsReqd =
-		PcrsChildReqd(mp, exprhdl, pcrs, child_index, 2 /*ulScalarIndex*/);
-	pcrs->Release();
+	gpos::Ref<CColRefSet> pcrsReqd = PcrsChildReqd(
+		mp, exprhdl, pcrs.get(), child_index, 2 /*ulScalarIndex*/);
+	;
 
 	return pcrsReqd;
 }
@@ -193,7 +189,7 @@ CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalNLJoin::EpetOrder(CExpressionHandle &exprhdl,
-						   gpos::pointer<const CEnfdOrder *> peo) const
+						   const CEnfdOrder *peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());

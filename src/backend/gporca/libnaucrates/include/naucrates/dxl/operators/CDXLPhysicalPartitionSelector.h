@@ -53,7 +53,7 @@ private:
 	// scan id
 	ULONG m_scan_id;
 
-	gpos::owner<ULongPtrArray *> m_parts;
+	gpos::Ref<ULongPtrArray> m_parts;
 
 public:
 	CDXLPhysicalPartitionSelector(CDXLPhysicalPartitionSelector &) = delete;
@@ -61,7 +61,7 @@ public:
 	// ctor
 	CDXLPhysicalPartitionSelector(CMemoryPool *mp, gpos::Ref<IMDId> mdid_rel,
 								  ULONG selector_id, ULONG scan_id,
-								  gpos::owner<ULongPtrArray *> parts);
+								  gpos::Ref<ULongPtrArray> parts);
 
 	// dtor
 	~CDXLPhysicalPartitionSelector() override;
@@ -93,25 +93,24 @@ public:
 		return m_scan_id;
 	}
 
-	gpos::pointer<ULongPtrArray *>
+	ULongPtrArray *
 	Partitions() const
 	{
-		return m_parts;
+		return m_parts.get();
 	}
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						gpos::pointer<const CDXLNode *> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(gpos::pointer<const CDXLNode *>,
-					 BOOL validate_children) const override;
+	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalPartitionSelector *>
+	static CDXLPhysicalPartitionSelector *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

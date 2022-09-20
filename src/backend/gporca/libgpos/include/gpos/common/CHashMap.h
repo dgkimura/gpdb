@@ -59,8 +59,8 @@ private:
 	{
 	private:
 		// key/value pair
-		gpos::pointer<K *> m_key;
-		gpos::pointer<T *> m_value;
+		K *m_key;
+		T *m_value;
 
 		// own objects
 		BOOL m_owns_objects;
@@ -88,14 +88,14 @@ private:
 		}
 
 		// key accessor
-		gpos::pointer<K *>
+		K *
 		Key() const
 		{
 			return m_key;
 		}
 
 		// value accessor
-		gpos::pointer<T *>
+		T *
 		Value() const
 		{
 			return m_value;
@@ -136,9 +136,9 @@ private:
 	// array for keys
 	// We use CleanupNULL because the keys are owned by the hash table
 	using Keys = CDynamicPtrArray<K, CleanupNULL>;
-	gpos::owner<Keys *> const m_keys;
+	gpos::Ref<Keys> const m_keys;
 
-	gpos::owner<IntPtrArray *> const m_filled_chains;
+	gpos::Ref<IntPtrArray> const m_filled_chains;
 
 	// lookup appropriate hash chain in static table, may be NULL if
 	// no elements have been inserted yet
@@ -204,8 +204,8 @@ public:
 		Clear();
 
 		GPOS_DELETE_ARRAY(m_chains);
-		m_keys->Release();
-		m_filled_chains->Release();
+		;
+		;
 	}
 
 	// insert an element if key is not yet present

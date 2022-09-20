@@ -39,15 +39,15 @@ private:
 	static CMDAccessor *m_pmda;
 
 	// generate a random join tree
-	static gpos::owner<CExpression *> PexprJoinTree(CMemoryPool *mp);
+	static gpos::Ref<CExpression> PexprJoinTree(CMemoryPool *mp);
 
 	// generate random star join tree
-	static gpos::owner<CExpression *> PexprStarJoinTree(CMemoryPool *mp,
-														ULONG ulTabs);
+	static gpos::Ref<CExpression> PexprStarJoinTree(CMemoryPool *mp,
+													ULONG ulTabs);
 
 	// application of different xforms for the given expression
 	static void ApplyExprXforms(CMemoryPool *mp, IOstream &os,
-								gpos::pointer<CExpression *> pexpr);
+								CExpression *pexpr);
 
 public:
 	// test driver

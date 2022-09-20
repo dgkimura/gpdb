@@ -37,7 +37,7 @@ class CParseHandlerGroupingColList : public CParseHandlerBase
 {
 private:
 	// array of grouping column ids
-	gpos::owner<ULongPtrArray *> m_grouping_colids_array;
+	gpos::Ref<ULongPtrArray> m_grouping_colids_array;
 
 	// process the start of an element
 	void StartElement(
@@ -65,7 +65,7 @@ public:
 	~CParseHandlerGroupingColList() override;
 
 	// accessor
-	gpos::pointer<ULongPtrArray *> GetGroupingColidArray();
+	ULongPtrArray *GetGroupingColidArray();
 };
 }  // namespace gpdxl
 

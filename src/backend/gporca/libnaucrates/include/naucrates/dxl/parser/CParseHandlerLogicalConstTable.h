@@ -38,10 +38,10 @@ class CParseHandlerLogicalConstTable : public CParseHandlerLogicalOp
 {
 private:
 	// array of datum arrays
-	gpos::pointer<CDXLDatum2dArray *> m_const_tuples_datum_array;
+	CDXLDatum2dArray *m_const_tuples_datum_array;
 
 	// array of datums
-	gpos::pointer<CDXLDatumArray *> m_dxl_datum_array;
+	CDXLDatumArray *m_dxl_datum_array;
 
 	// process the start of an element
 	void StartElement(

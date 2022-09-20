@@ -38,7 +38,7 @@ class CDXLPhysicalMotion : public CDXLPhysical
 private:
 	// serialize the given list of segment ids into a comma-separated string
 	CWStringDynamic *GetSegIdsCommaSeparatedStr(
-		gpos::pointer<const IntPtrArray *> segment_ids_array) const;
+		const IntPtrArray *segment_ids_array) const;
 
 	// serialize input and output segment ids into a comma-separated string
 	CWStringDynamic *GetInputSegIdsStr() const;
@@ -46,10 +46,10 @@ private:
 
 protected:
 	// list of input segment ids
-	gpos::owner<IntPtrArray *> m_input_segids_array;
+	gpos::Ref<IntPtrArray> m_input_segids_array;
 
 	// list of output segment ids
-	gpos::owner<IntPtrArray *> m_output_segids_array;
+	gpos::Ref<IntPtrArray> m_output_segids_array;
 
 	void SerializeSegmentInfoToDXL(CXMLSerializer *xml_serializer) const;
 
@@ -63,20 +63,20 @@ public:
 	~CDXLPhysicalMotion() override;
 
 	// accessors
-	gpos::pointer<const IntPtrArray *> GetInputSegIdsArray() const;
-	gpos::pointer<const IntPtrArray *> GetOutputSegIdsArray() const;
+	const IntPtrArray *GetInputSegIdsArray() const;
+	const IntPtrArray *GetOutputSegIdsArray() const;
 
 	// setters
-	void SetInputSegIds(gpos::owner<IntPtrArray *> input_segids_array);
-	void SetOutputSegIds(gpos::owner<IntPtrArray *> output_segids_array);
-	void SetSegmentInfo(gpos::owner<IntPtrArray *> input_segids_array,
-						gpos::owner<IntPtrArray *> output_segids_array);
+	void SetInputSegIds(gpos::Ref<IntPtrArray> input_segids_array);
+	void SetOutputSegIds(gpos::Ref<IntPtrArray> output_segids_array);
+	void SetSegmentInfo(gpos::Ref<IntPtrArray> input_segids_array,
+						gpos::Ref<IntPtrArray> output_segids_array);
 
 	// index of relational child node in the children array
 	virtual ULONG GetRelationChildIdx() const = 0;
 
 	// conversion function
-	static gpos::cast_func<CDXLPhysicalMotion *>
+	static CDXLPhysicalMotion *
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

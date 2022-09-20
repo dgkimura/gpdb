@@ -70,7 +70,7 @@ class CParseHandlerBase : public DefaultHandler
 {
 private:
 	// array of parse handlers for child elements
-	gpos::owner<CParseHandlerBaseArray *> m_parse_handler_base_array;
+	gpos::Ref<CParseHandlerBaseArray> m_parse_handler_base_array;
 
 protected:
 	// memory pool to create DXL objects in

@@ -36,7 +36,7 @@ class CDrvdPropPlan;
 class CCostContext;
 
 // array of cost contexts
-using CCostContextArray = CDynamicPtrArray<CCostContext, CleanupRelease>;
+using CCostContextArray = gpos::Vector<gpos::Ref<CCostContext>>;
 
 // cost context pointer definition
 using COSTCTXT_PTR = CCostContext *;
@@ -77,16 +77,16 @@ private:
 	EState m_estate;
 
 	// back pointer to owner group expression
-	gpos::owner<CGroupExpression *> m_pgexpr;
+	gpos::Ref<CGroupExpression> m_pgexpr;
 
 	// group expression to be used stats derivation during costing
-	gpos::owner<CGroupExpression *> m_pgexprForStats;
+	gpos::Ref<CGroupExpression> m_pgexprForStats;
 
 	// array of optimization contexts of child groups
-	gpos::owner<COptimizationContextArray *> m_pdrgpoc;
+	gpos::Ref<COptimizationContextArray> m_pdrgpoc;
 
 	// derived properties of the carried plan
-	gpos::owner<CDrvdPropPlan *> m_pdpplan;
+	gpos::Ref<CDrvdPropPlan> m_pdpplan;
 
 	// optimization request number
 	ULONG m_ulOptReq;
@@ -97,7 +97,7 @@ private:
 	BOOL m_fPruned;
 
 	// stats of owner group expression
-	gpos::owner<IStatistics *> m_pstats;
+	gpos::Ref<IStatistics> m_pstats;
 
 	// derive stats of owner group expression
 	void DeriveStats();
@@ -107,32 +107,32 @@ private:
 
 	// for two cost contexts with join plans of the same cost, break the tie based on join depth,
 	// if tie-resolution succeeded, store a pointer to preferred cost context in output argument
-	static void BreakCostTiesForJoinPlans(
-		gpos::pointer<const CCostContext *> pccFst,
-		gpos::pointer<const CCostContext *> pccSnd,
-		gpos::pointer<CONST_COSTCTXT_PTR> *ppccPrefered, BOOL *pfTiesResolved);
+	static void BreakCostTiesForJoinPlans(const CCostContext *pccFst,
+										  const CCostContext *pccSnd,
+										  CONST_COSTCTXT_PTR *ppccPrefered,
+										  BOOL *pfTiesResolved);
 
 public:
 	CCostContext(const CCostContext &) = delete;
 
 	// main optimization context
-	gpos::owner<COptimizationContext *> m_poc;
+	gpos::Ref<COptimizationContext> m_poc;
 
 	// link for cost context hash table in CGroupExpression
 	SLink m_link;
 
 	// ctor
-	CCostContext(CMemoryPool *mp, gpos::owner<COptimizationContext *> poc,
-				 ULONG ulOptReq, gpos::owner<CGroupExpression *> pgexpr);
+	CCostContext(CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
+				 ULONG ulOptReq, gpos::Ref<CGroupExpression> pgexpr);
 
 	// dtor
 	~CCostContext() override;
 
 	// main optimization context accessor
-	gpos::pointer<COptimizationContext *>
+	COptimizationContext *
 	Poc() const
 	{
-		return m_poc;
+		return m_poc.get();
 	}
 
 	// accessor of optimization request number
@@ -159,10 +159,10 @@ public:
 	}
 
 	// accessor of child optimization contexts array
-	gpos::pointer<COptimizationContextArray *>
+	COptimizationContextArray *
 	Pdrgpoc() const
 	{
-		return m_pdrgpoc;
+		return m_pdrgpoc.get();
 	}
 
 	// cost accessor
@@ -180,24 +180,24 @@ public:
 	}
 
 	// owner group expression accessor
-	gpos::pointer<CGroupExpression *>
+	CGroupExpression *
 	Pgexpr() const
 	{
-		return m_pgexpr;
+		return m_pgexpr.get();
 	}
 
 	// group expression for stats derivation
-	gpos::pointer<CGroupExpression *>
+	CGroupExpression *
 	PgexprForStats() const
 	{
-		return m_pgexprForStats;
+		return m_pgexprForStats.get();
 	}
 
 	// return stats of owner group expression
-	gpos::pointer<IStatistics *>
+	IStatistics *
 	Pstats() const
 	{
-		return m_pstats;
+		return m_pstats.get();
 	}
 
 	// check if we need to derive stats for this context
@@ -207,10 +207,10 @@ public:
 	BOOL FOwnsStats() const;
 
 	// derived plan properties accessor
-	gpos::pointer<CDrvdPropPlan *>
+	CDrvdPropPlan *
 	Pdpplan() const
 	{
-		return m_pdpplan;
+		return m_pdpplan.get();
 	}
 
 	// set cost value
@@ -251,19 +251,16 @@ public:
 	BOOL operator==(const CCostContext &cc) const;
 
 	// compute cost
-	CCost CostCompute(CMemoryPool *mp,
-					  gpos::pointer<CCostArray *> pdrgpcostChildren);
+	CCost CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren);
 
 	// is current context better than the given equivalent context based on cost?
-	BOOL FBetterThan(gpos::pointer<const CCostContext *> pcc) const;
+	BOOL FBetterThan(const CCostContext *pcc) const;
 
 	// is this cost context of a two stage scalar DQA created by CXformSplitDQA
-	static BOOL IsTwoStageScalarDQACostCtxt(
-		gpos::pointer<const CCostContext *> pcc);
+	static BOOL IsTwoStageScalarDQACostCtxt(const CCostContext *pcc);
 
 	// is this cost context of a three stage scalar DQA created by CXformSplitDQA
-	static BOOL IsThreeStageScalarDQACostCtxt(
-		gpos::pointer<const CCostContext *> pcc);
+	static BOOL IsThreeStageScalarDQACostCtxt(const CCostContext *pcc);
 
 	// equality function
 	static BOOL
@@ -282,8 +279,7 @@ public:
 
 	// equality function
 	static BOOL
-	Equals(gpos::pointer<const CCostContext *> pccLeft,
-		   gpos::pointer<const CCostContext *> pccRight)
+	Equals(const CCostContext *pccLeft, const CCostContext *pccRight)
 	{
 		return Equals(*pccLeft, *pccRight);
 	}
@@ -297,7 +293,7 @@ public:
 
 	// hash function
 	static ULONG
-	HashValue(gpos::pointer<const CCostContext *> pcc)
+	HashValue(const CCostContext *pcc)
 	{
 		return HashValue(*pcc);
 	}

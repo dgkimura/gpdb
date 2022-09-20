@@ -63,12 +63,12 @@ CContradictionTest::EresUnittest_Constraint()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
-	pmdp->AddRef();
+	gpos::Ref<CMDProviderMemory> pmdp = CTestUtils::m_pmdpf;
+	;
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
 
-	using Pfpexpr = gpos::owner<CExpression *> (*)(CMemoryPool *);
+	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *);
 
 	Pfpexpr rgpf[] = {
 		CTestUtils::PexprLogicalApplyWithOuterRef<CLogicalInnerApply>,
@@ -104,10 +104,10 @@ CContradictionTest::EresUnittest_Constraint()
 						 CTestUtils::GetCostModel(mp));
 
 		// generate simple expression
-		gpos::owner<CExpression *> pexpr = rgpf[i](mp);
+		gpos::Ref<CExpression> pexpr = rgpf[i](mp);
 
 		// self-match
-		GPOS_ASSERT(pexpr->FMatchDebug(pexpr));
+		GPOS_ASSERT(pexpr->FMatchDebug(pexpr.get()));
 
 		// debug print
 		CWStringDynamic str(mp, GPOS_WSZ_LIT("\n"));
@@ -128,8 +128,8 @@ CContradictionTest::EresUnittest_Constraint()
 		pexpr->DbgPrint();
 #endif	// GPOS_DEBUG
 
-		gpos::owner<CExpression *> pexprPreprocessed =
-			CExpressionPreprocessor::PexprPreprocess(mp, pexpr);
+		gpos::Ref<CExpression> pexprPreprocessed =
+			CExpressionPreprocessor::PexprPreprocess(mp, pexpr.get());
 		oss << std::endl
 			<< "PREPROCESSED EXPR:" << std::endl
 			<< *pexprPreprocessed << std::endl;
@@ -137,8 +137,8 @@ CContradictionTest::EresUnittest_Constraint()
 		str.Reset();
 
 		// cleanup
-		pexprPreprocessed->Release();
-		pexpr->Release();
+		;
+		;
 	}
 
 	return GPOS_OK;

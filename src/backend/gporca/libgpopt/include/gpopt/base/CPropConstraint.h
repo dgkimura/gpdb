@@ -38,13 +38,13 @@ class CPropConstraint : public CRefCount, public DbgPrintMixin<CPropConstraint>
 {
 private:
 	// array of equivalence classes
-	gpos::owner<CColRefSetArray *> m_pdrgpcrs;
+	gpos::Ref<CColRefSetArray> m_pdrgpcrs;
 
 	// mapping from column to equivalence class
-	gpos::owner<ColRefToColRefSetMap *> m_phmcrcrs;
+	gpos::Ref<ColRefToColRefSetMap> m_phmcrcrs;
 
 	// constraint
-	gpos::owner<CConstraint *> m_pcnstr;
+	gpos::Ref<CConstraint> m_pcnstr;
 
 	// initialize mapping from columns to equivalence classes
 	void InitHashMap(CMemoryPool *mp);
@@ -53,21 +53,21 @@ public:
 	CPropConstraint(const CPropConstraint &) = delete;
 
 	// ctor
-	CPropConstraint(CMemoryPool *mp, gpos::owner<CColRefSetArray *> pdrgpcrs,
-					gpos::owner<CConstraint *> pcnstr);
+	CPropConstraint(CMemoryPool *mp, gpos::Ref<CColRefSetArray> pdrgpcrs,
+					gpos::Ref<CConstraint> pcnstr);
 
 	// dtor
 	~CPropConstraint() override;
 
 	// equivalence classes
-	gpos::pointer<CColRefSetArray *>
+	CColRefSetArray *
 	PdrgpcrsEquivClasses() const
 	{
-		return m_pdrgpcrs;
+		return m_pdrgpcrs.get();
 	}
 
 	// mapping
-	gpos::pointer<CColRefSet *>
+	CColRefSet *
 	PcrsEquivClass(const CColRef *colref) const
 	{
 		if (nullptr == m_phmcrcrs)
@@ -78,10 +78,10 @@ public:
 	}
 
 	// constraint
-	gpos::pointer<CConstraint *>
+	CConstraint *
 	Pcnstr() const
 	{
-		return m_pcnstr;
+		return m_pcnstr.get();
 	}
 
 	// is this a contradiction
@@ -89,9 +89,9 @@ public:
 
 	// scalar expression on given column mapped from all constraints
 	// on its equivalent columns
-	gpos::owner<CExpression *> PexprScalarMappedFromEquivCols(
+	gpos::Ref<CExpression> PexprScalarMappedFromEquivCols(
 		CMemoryPool *mp, CColRef *colref,
-		gpos::pointer<CPropConstraint *> constraintsForOuterRefs) const;
+		CPropConstraint *constraintsForOuterRefs) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;

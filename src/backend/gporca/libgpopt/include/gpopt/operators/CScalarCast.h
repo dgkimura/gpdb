@@ -90,7 +90,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(gpos::pointer<COperator *>) const override;
+	BOOL Matches(COperator *) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -100,12 +100,11 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	gpos::owner<COperator *>
-	PopCopyWithRemappedColumns(
-		CMemoryPool *,						//mp,
-		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
-		BOOL								//must_exist
-		) override
+	gpos::Ref<COperator>
+	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
+							   UlongToColRefMap *,	//colref_mapping,
+							   BOOL					//must_exist
+							   ) override
 	{
 		return PopCopyDefault();
 	}
@@ -119,13 +118,13 @@ public:
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(gpos::pointer<ULongPtrArray *> pdrgpulChildren) const override
+	Eber(ULongPtrArray *pdrgpulChildren) const override
 	{
 		return EberNullOnAllNullChildren(pdrgpulChildren);
 	}
 
 	// conversion function
-	static gpos::cast_func<CScalarCast *>
+	static CScalarCast *
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

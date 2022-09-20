@@ -345,14 +345,14 @@ CParseHandlerMDType::ParseMdid(const XMLCh *element_local_name,
 //
 //---------------------------------------------------------------------------
 BOOL
-CParseHandlerMDType::IsBuiltInType(gpos::pointer<const IMDId *> mdid)
+CParseHandlerMDType::IsBuiltInType(const IMDId *mdid)
 {
 	if (IMDId::EmdidGPDB != mdid->MdidType())
 	{
 		return false;
 	}
 
-	gpos::pointer<const CMDIdGPDB *> mdidGPDB = CMDIdGPDB::CastMdid(mdid);
+	const CMDIdGPDB *mdidGPDB = CMDIdGPDB::CastMdid(mdid);
 
 	switch (mdidGPDB->Oid())
 	{
@@ -389,8 +389,7 @@ CParseHandlerMDType::EndElement(const XMLCh *const,	 // element_uri,
 
 		// TODO:  - Jan 30, 2012; add support for other types of mdids
 
-		gpos::pointer<const CMDIdGPDB *> pmdidGPDB =
-			gpos::dyn_cast<CMDIdGPDB>(m_mdid.get());
+		const CMDIdGPDB *pmdidGPDB = gpos::dyn_cast<CMDIdGPDB>(m_mdid.get());
 
 		switch (pmdidGPDB->Oid())
 		{

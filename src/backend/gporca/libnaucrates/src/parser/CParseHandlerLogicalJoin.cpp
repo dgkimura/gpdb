@@ -68,10 +68,9 @@ CParseHandlerLogicalJoin::StartElement(const XMLCh *const element_uri,
 		if (nullptr == m_dxl_node)
 		{
 			// parse and create logical join operator
-			gpos::owner<CDXLLogicalJoin *> pdxlopJoin =
-				gpos::cast<CDXLLogicalJoin>(
-					CDXLOperatorFactory::MakeLogicalJoin(
-						m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
+			gpos::Ref<CDXLLogicalJoin> pdxlopJoin = gpos::cast<CDXLLogicalJoin>(
+				CDXLOperatorFactory::MakeLogicalJoin(
+					m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 			// construct node from the created child nodes
 			m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, std::move(pdxlopJoin));
@@ -159,7 +158,7 @@ CParseHandlerLogicalJoin::EndElement(const XMLCh *const,  // element_uri,
 	}
 
 #ifdef GPOS_DEBUG
-	m_dxl_node->GetOperator()->AssertValid(m_dxl_node,
+	m_dxl_node->GetOperator()->AssertValid(m_dxl_node.get(),
 										   false /* validate_children */);
 #endif	// GPOS_DEBUG
 

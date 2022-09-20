@@ -11,7 +11,7 @@
 using namespace gpopt;
 
 CDistributionSpecHashedNoOp::CDistributionSpecHashedNoOp(
-	gpos::owner<CExpressionArray *> pdrgpexpr)
+	gpos::Ref<CExpressionArray> pdrgpexpr)
 	: CDistributionSpecHashed(std::move(pdrgpexpr), true)
 {
 }
@@ -23,22 +23,21 @@ CDistributionSpecHashedNoOp::Edt() const
 }
 
 BOOL
-CDistributionSpecHashedNoOp::Matches(
-	gpos::pointer<const CDistributionSpec *> pds) const
+CDistributionSpecHashedNoOp::Matches(const CDistributionSpec *pds) const
 {
 	return pds->Edt() == Edt();
 }
 
 void
-CDistributionSpecHashedNoOp::AppendEnforcers(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, gpos::pointer<CReqdPropPlan *>,
-	gpos::pointer<CExpressionArray *> pdrgpexpr,
-	gpos::pointer<CExpression *> pexpr)
+CDistributionSpecHashedNoOp::AppendEnforcers(CMemoryPool *mp,
+											 CExpressionHandle &exprhdl,
+											 CReqdPropPlan *,
+											 CExpressionArray *pdrgpexpr,
+											 CExpression *pexpr)
 {
-	gpos::pointer<CDrvdProp *> pdp = exprhdl.Pdp();
-	gpos::pointer<CDistributionSpec *> pdsChild =
-		gpos::dyn_cast<CDrvdPropPlan>(pdp)->Pds();
-	gpos::pointer<CDistributionSpecHashed *> pdsChildHashed =
+	CDrvdProp *pdp = exprhdl.Pdp();
+	CDistributionSpec *pdsChild = gpos::dyn_cast<CDrvdPropPlan>(pdp)->Pds();
+	CDistributionSpecHashed *pdsChildHashed =
 		dynamic_cast<CDistributionSpecHashed *>(pdsChild);
 
 	if (nullptr == pdsChildHashed)
@@ -46,14 +45,14 @@ CDistributionSpecHashedNoOp::AppendEnforcers(
 		return;
 	}
 
-	gpos::owner<CExpressionArray *> pdrgpexprNoOpRedistributionColumns =
+	gpos::Ref<CExpressionArray> pdrgpexprNoOpRedistributionColumns =
 		pdsChildHashed->Pdrgpexpr();
-	pdrgpexprNoOpRedistributionColumns->AddRef();
-	gpos::owner<CDistributionSpecHashedNoOp *> pdsNoOp =
+	;
+	gpos::Ref<CDistributionSpecHashedNoOp> pdsNoOp =
 		GPOS_NEW(mp) CDistributionSpecHashedNoOp(
 			std::move(pdrgpexprNoOpRedistributionColumns));
-	pexpr->AddRef();
-	gpos::owner<CExpression *> pexprMotion = GPOS_NEW(mp) CExpression(
+	;
+	gpos::Ref<CExpression> pexprMotion = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalMotionHashDistribute(mp, std::move(pdsNoOp)),
 		pexpr);
 	pdrgpexpr->Append(std::move(pexprMotion));
