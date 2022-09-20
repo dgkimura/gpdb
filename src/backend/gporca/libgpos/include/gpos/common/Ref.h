@@ -9,10 +9,13 @@
 #include <utility>	  // for exchange
 
 #include "gpos/common/Hash.h"  // FIXME: sneaky
-#include "gpos/types.h"		   // for ULONG
+#include "gpos/types.h"	 // for ULONG
 
 namespace gpos
 {
+template <class T>
+using owner = T;
+
 // Specialize this in case of a forward-declared T
 template <class T>
 struct RefPtrInfo
@@ -24,7 +27,7 @@ struct RefPtrInfo
 	}
 
 	static void
-	Release(T *t) noexcept(std::is_nothrow_destructible<T>::value)
+	Release(gpos::owner<T *> t) noexcept(std::is_nothrow_destructible<T>::value)
 	{
 		t->Release();
 	}
