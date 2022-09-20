@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalDML.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -114,7 +116,7 @@ CDXLPhysicalDML::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalDML::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *node) const
+								gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

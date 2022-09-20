@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarValuesList.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarValuesList.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -40,7 +42,7 @@ CParseHandlerScalarValuesList::StartElement(
 				 CDXLTokens::XmlstrToken(EdxltokenScalarValuesList),
 				 element_local_name))
 	{
-		CDXLScalarValuesList *dxl_op =
+		gpos::owner<CDXLScalarValuesList *> dxl_op =
 			GPOS_NEW(m_mp) CDXLScalarValuesList(m_mp);
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}

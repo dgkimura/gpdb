@@ -44,13 +44,13 @@ class CPartialPlan : public CRefCount
 {
 private:
 	// root group expression
-	CGroupExpression *m_pgexpr;
+	gpos::pointer<CGroupExpression *> m_pgexpr;
 
 	// required plan properties of root operator
-	CReqdPropPlan *m_prpp;
+	gpos::owner<CReqdPropPlan *> m_prpp;
 
 	// cost context of known child plan -- can be null if no child plans are known
-	CCostContext *m_pccChild;
+	gpos::owner<CCostContext *> m_pccChild;
 
 	// index of known child plan
 	ULONG m_ulChildIndex;

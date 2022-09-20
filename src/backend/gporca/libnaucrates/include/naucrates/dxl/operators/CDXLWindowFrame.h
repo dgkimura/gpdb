@@ -58,10 +58,10 @@ private:
 	EdxlFrameExclusionStrategy m_dxl_frame_exclusion_strategy;
 
 	// scalar value representing the boundary leading
-	CDXLNode *m_dxlnode_leading;
+	gpos::owner<CDXLNode *> m_dxlnode_leading;
 
 	// scalar value representing the boundary trailing
-	CDXLNode *m_dxlnode_trailing;
+	gpos::owner<CDXLNode *> m_dxlnode_trailing;
 
 public:
 	CDXLWindowFrame(const CDXLWindowFrame &) = delete;

@@ -48,10 +48,10 @@ class CBucket : public IBucket, public gpos::DbgPrintMixin<CBucket>
 {
 private:
 	// lower bound of bucket
-	CPoint *m_bucket_lower_bound;
+	gpos::owner<CPoint *> m_bucket_lower_bound;
 
 	// upper bound of bucket
-	CPoint *m_bucket_upper_bound;
+	gpos::owner<CPoint *> m_bucket_upper_bound;
 
 	// is lower bound closed (does bucket include boundary value)
 	BOOL m_is_lower_closed;

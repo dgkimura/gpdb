@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalDynamicIndexScan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/COptCtxt.h"
@@ -74,8 +75,9 @@ CPhysicalDynamicIndexScan::~CPhysicalDynamicIndexScan()
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalDynamicIndexScan::EpetOrder(CExpressionHandle &,  // exprhdl
-									 const CEnfdOrder *peo) const
+CPhysicalDynamicIndexScan::EpetOrder(
+	CExpressionHandle &,  // exprhdl
+	gpos::pointer<const CEnfdOrder *> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
@@ -170,13 +172,14 @@ CPhysicalDynamicIndexScan::PstatsDerive(CMemoryPool *mp,
 {
 	GPOS_ASSERT(nullptr != prpplan);
 
-	IStatistics *pstatsBaseTable = CStatisticsUtils::DeriveStatsForDynamicScan(
-		mp, exprhdl, ScanId(), prpplan->Pepp()->PppsRequired());
+	gpos::owner<IStatistics *> pstatsBaseTable =
+		CStatisticsUtils::DeriveStatsForDynamicScan(
+			mp, exprhdl, ScanId(), prpplan->Pepp()->PppsRequired());
 
 	// create a conjunction of index condition and additional filters
 	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(0 /*ulChidIndex*/);
-	CExpression *local_expr = nullptr;
-	CExpression *expr_with_outer_refs = nullptr;
+	gpos::owner<CExpression *> local_expr = nullptr;
+	gpos::owner<CExpression *> expr_with_outer_refs = nullptr;
 
 	// get outer references from expression handle
 	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();

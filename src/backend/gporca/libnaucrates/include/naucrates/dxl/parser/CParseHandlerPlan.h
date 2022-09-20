@@ -14,6 +14,7 @@
 #define GPDXL_CParseHandlerPlan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 
@@ -41,7 +42,7 @@ private:
 	ULLONG m_plan_space_size;
 
 	// the root of the parsed DXL tree constructed by the parse handler
-	CDXLNode *m_dxl_node;
+	gpos::owner<CDXLNode *> m_dxl_node;
 
 	// process the end of an element
 	void StartElement(
@@ -69,7 +70,7 @@ public:
 	~CParseHandlerPlan() override;
 
 	// returns the root of constructed DXL plan
-	CDXLNode *CreateDXLNode();
+	gpos::pointer<CDXLNode *> CreateDXLNode();
 
 	// return plan id
 	ULLONG

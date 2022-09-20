@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalInnerIndexNLJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
@@ -93,12 +94,12 @@ CPhysicalInnerIndexNLJoin::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 CDistributionSpec *
-CPhysicalInnerIndexNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
-									   CExpressionHandle &exprhdl GPOS_UNUSED,
-									   CDistributionSpec *,	 //pdsRequired,
-									   ULONG child_index GPOS_UNUSED,
-									   CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
-									   ULONG  // ulOptReq
+CPhysicalInnerIndexNLJoin::PdsRequired(
+	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
+	gpos::pointer<CDistributionSpec *>,	 //pdsRequired,
+	ULONG child_index GPOS_UNUSED,
+	gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt GPOS_UNUSED,
+	ULONG  // ulOptReq
 ) const
 {
 	GPOS_RAISE(
@@ -108,7 +109,7 @@ CPhysicalInnerIndexNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 	return nullptr;
 }
 
-CEnfdDistribution *
+gpos::owner<CEnfdDistribution *>
 CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   CReqdPropPlan *prppInput, ULONG child_index,
 							   CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq)
@@ -157,9 +158,10 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		{
 			// request hashed distribution from outer
 			pdshashedEquiv->Pdrgpexpr()->AddRef();
-			CDistributionSpecHashed *pdsHashedRequired = GPOS_NEW(mp)
-				CDistributionSpecHashed(pdshashedEquiv->Pdrgpexpr(),
-										pdshashedEquiv->FNullsColocated());
+			gpos::owner<CDistributionSpecHashed *> pdsHashedRequired =
+				GPOS_NEW(mp)
+					CDistributionSpecHashed(pdshashedEquiv->Pdrgpexpr(),
+											pdshashedEquiv->FNullsColocated());
 			pdsHashedRequired->ComputeEquivHashExprs(mp, exprhdl);
 
 			return GPOS_NEW(mp) CEnfdDistribution(pdsHashedRequired, dmatch);

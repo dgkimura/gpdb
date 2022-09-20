@@ -53,7 +53,7 @@ private:
 	// scan id
 	ULONG m_scan_id;
 
-	ULongPtrArray *m_parts;
+	gpos::owner<ULongPtrArray *> m_parts;
 
 public:
 	CDXLPhysicalPartitionSelector(CDXLPhysicalPartitionSelector &) = delete;

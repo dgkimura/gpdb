@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementLimit.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalLimit.h"
@@ -89,7 +90,7 @@ CXformImplementLimit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	popLimit->Pos()->AddRef();
 
 	// assemble physical operator
-	CExpression *pexprLimit = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprLimit = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
 			CPhysicalLimit(mp, pos, popLimit->FGlobal(), popLimit->FHasCount(),

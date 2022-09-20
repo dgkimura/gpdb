@@ -121,14 +121,14 @@ private:
 	{
 	private:
 		// cost context in a parent group
-		CCostContext *m_pccParent;
+		gpos::owner<CCostContext *> m_pccParent;
 
 		// index used when treating current group as a child of group expression
 		ULONG m_ulChildIndex;
 
 		// optimization context used to locate group expressions in
 		// current group to be linked with parent group expression
-		COptimizationContext *m_poc;
+		gpos::owner<COptimizationContext *> m_poc;
 
 	public:
 		// ctor
@@ -168,10 +168,10 @@ private:
 	BOOL m_fScalar;
 
 	// join keys for outer child (only for scalar groups) (used by hash & merge joins)
-	CExpressionArray *m_pdrgpexprJoinKeysOuter;
+	gpos::owner<CExpressionArray *> m_pdrgpexprJoinKeysOuter;
 
 	// join keys for inner child (only for scalar groups) (used by hash & merge joins)
-	CExpressionArray *m_pdrgpexprJoinKeysInner;
+	gpos::owner<CExpressionArray *> m_pdrgpexprJoinKeysInner;
 
 	// join op families (only for scalar groups) (used by hash & merge joins)
 	gpos::Ref<IMdIdArray> m_join_opfamilies;
@@ -183,29 +183,29 @@ private:
 	CList<CGroupExpression> m_listDupGExprs;
 
 	// group derived properties
-	CDrvdProp *m_pdp;
+	gpos::owner<CDrvdProp *> m_pdp;
 
 	// group stats
-	IStatistics *m_pstats;
+	gpos::owner<IStatistics *> m_pstats;
 
 	// scalar expression for stat derivation (subqueries substituted with a dummy)
-	CExpression *m_pexprScalarRep;
+	gpos::owner<CExpression *> m_pexprScalarRep;
 
 	// scalar expression above is exactly the same as the scalar expr in the group
 	BOOL m_pexprScalarRepIsExact;
 
 	// dummy cost context used in scalar groups for plan enumeration
-	CCostContext *m_pccDummy;
+	gpos::owner<CCostContext *> m_pccDummy;
 
 	// pointer to group containing the group expressions
 	// of all duplicate groups
-	CGroup *m_pgroupDuplicate;
+	gpos::pointer<CGroup *> m_pgroupDuplicate;
 
 	// map of processed links
-	LinkMap *m_plinkmap;
+	gpos::owner<LinkMap *> m_plinkmap;
 
 	// map of computed stats during costing
-	OptCtxtToIStatisticsMap *m_pstatsmap;
+	gpos::owner<OptCtxtToIStatisticsMap *> m_pstatsmap;
 
 	// hashtable of optimization contexts
 	ShtOC m_sht;
@@ -214,7 +214,7 @@ private:
 	ULONG m_ulGExprs;
 
 	// map of cost lower bounds
-	ReqdPropPlanToCostMap *m_pcostmap;
+	gpos::owner<ReqdPropPlanToCostMap *> m_pcostmap;
 
 	// number of optimization contexts
 	ULONG_PTR m_ulpOptCtxts;
@@ -347,7 +347,7 @@ public:
 	}
 
 	// group stats accessor
-	IStatistics *Pstats() const;
+	gpos::pointer<IStatistics *> Pstats() const;
 
 	// attempt initializing stats with the given stat object
 	BOOL FInitStats(IStatistics *stats);

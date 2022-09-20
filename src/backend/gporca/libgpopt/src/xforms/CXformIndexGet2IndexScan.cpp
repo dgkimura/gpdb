@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformIndexGet2IndexScan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CIndexDescriptor.h"
 #include "gpopt/metadata/CTableDescriptor.h"
@@ -109,7 +110,7 @@ CXformIndexGet2IndexScan::Transform(CXformContext *pxfctxt,
 	// addref all children
 	pexprIndexCond->AddRef();
 
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalIndexScan(
 			mp, pindexdesc, ptabdesc, pexpr->Pop()->UlOpId(),

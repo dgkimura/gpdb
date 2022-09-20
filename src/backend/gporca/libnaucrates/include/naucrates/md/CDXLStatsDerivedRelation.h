@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CDXLStatsDerivedColumn.h"
 
@@ -46,7 +47,7 @@ private:
 	BOOL m_empty;
 
 	// array of derived column statistics
-	CDXLStatsDerivedColumnArray *m_dxl_stats_derived_col_array;
+	gpos::owner<CDXLStatsDerivedColumnArray *> m_dxl_stats_derived_col_array;
 
 public:
 	CDXLStatsDerivedRelation(const CDXLStatsDerivedRelation &) = delete;
@@ -74,7 +75,8 @@ public:
 	}
 
 	// derived column statistics
-	const CDXLStatsDerivedColumnArray *GetDXLStatsDerivedColArray() const;
+	gpos::pointer<const CDXLStatsDerivedColumnArray *>
+	GetDXLStatsDerivedColArray() const;
 
 	// serialize bucket in DXL format
 	void Serialize(gpdxl::CXMLSerializer *) const;

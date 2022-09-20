@@ -17,6 +17,8 @@
 
 #include "gpopt/operators/CPhysicalDynamicBitmapTableScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CName.h"
@@ -77,13 +79,14 @@ CPhysicalDynamicBitmapTableScan::PstatsDerive(
 {
 	GPOS_ASSERT(nullptr != prpplan);
 
-	IStatistics *pstatsBaseTable = CStatisticsUtils::DeriveStatsForDynamicScan(
-		mp, exprhdl, ScanId(), prpplan->Pepp()->PppsRequired());
+	gpos::owner<IStatistics *> pstatsBaseTable =
+		CStatisticsUtils::DeriveStatsForDynamicScan(
+			mp, exprhdl, ScanId(), prpplan->Pepp()->PppsRequired());
 
 	CExpression *pexprCondChild =
 		exprhdl.PexprScalarRepChild(0 /*ulChidIndex*/);
-	CExpression *local_expr = nullptr;
-	CExpression *expr_with_outer_refs = nullptr;
+	gpos::owner<CExpression *> local_expr = nullptr;
+	gpos::owner<CExpression *> expr_with_outer_refs = nullptr;
 
 	// get outer references from expression handle
 	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();

@@ -11,9 +11,8 @@
 
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
+#include "gpos/common/owner.h"
 #endif
-
-#include "unittest/dxl/statistics/CJoinCardinalityTest.h"
 
 #include <stdint.h>
 
@@ -26,6 +25,7 @@
 
 #include "unittest/base.h"
 #include "unittest/dxl/statistics/CCardinalityTestUtils.h"
+#include "unittest/dxl/statistics/CJoinCardinalityTest.h"
 #include "unittest/gpopt/CTestUtils.h"
 
 // unittest for join cardinality estimation
@@ -45,7 +45,7 @@ CJoinCardinalityTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -75,7 +75,7 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 		 500}  // distinct values spread in both buckets and NDVRemain
 	};
 
-	UlongToHistogramMap *col_histogram_mapping =
+	gpos::owner<UlongToHistogramMap *> col_histogram_mapping =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	const ULONG ulHist = GPOS_ARRAY_SIZE(rghisttc);
@@ -212,10 +212,10 @@ CJoinCardinalityTest::EresUnittest_Join()
 	};
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
-	const IMDTypeInt4 *pmdtypeint4 =
+	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
 		COptCtxt::PoctxtFromTLS()->Pmda()->PtMDType<IMDTypeInt4>();
 
-	ULongPtrArray *cols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> cols = GPOS_NEW(mp) ULongPtrArray(mp);
 	cols->Append(GPOS_NEW(mp) ULONG(0));
 	cols->Append(GPOS_NEW(mp) ULONG(1));
 	cols->Append(GPOS_NEW(mp) ULONG(2));
@@ -255,9 +255,11 @@ CJoinCardinalityTest::EresUnittest_Join()
 		GPOS_CHECK_ABORT;
 
 		// parse the input statistics objects
-		CDXLStatsDerivedRelationArray *dxl_derived_rel_stats_array =
-			CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput, nullptr);
-		CStatisticsArray *pdrgpstatBefore =
+		gpos::owner<CDXLStatsDerivedRelationArray *>
+			dxl_derived_rel_stats_array =
+				CDXLUtils::ParseDXLToStatsDerivedRelArray(mp, szDXLInput,
+														  nullptr);
+		gpos::owner<CStatisticsArray *> pdrgpstatBefore =
 			CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 				mp, md_accessor, dxl_derived_rel_stats_array);
 		dxl_derived_rel_stats_array->Release();
@@ -272,7 +274,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 		// generate the join conditions
 		FnPdrgpstatjoin *pf = elem.m_pf;
 		GPOS_ASSERT(nullptr != pf);
-		CStatsPredJoinArray *join_preds_stats = pf(mp);
+		gpos::owner<CStatsPredJoinArray *> join_preds_stats = pf(mp);
 
 		// calculate the output stats
 		IStatistics *pstatsOutput = nullptr;
@@ -288,7 +290,8 @@ CJoinCardinalityTest::EresUnittest_Join()
 		}
 		GPOS_ASSERT(nullptr != pstatsOutput);
 
-		CStatisticsArray *pdrgpstatOutput = GPOS_NEW(mp) CStatisticsArray(mp);
+		gpos::owner<CStatisticsArray *> pdrgpstatOutput =
+			GPOS_NEW(mp) CStatisticsArray(mp);
 		pdrgpstatOutput->Append(CStatistics::CastStats(pstatsOutput));
 
 		// serialize and compare against expected stats
@@ -338,7 +341,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 CStatsPredJoinArray *
 CJoinCardinalityTest::PdrgpstatspredjoinSingleJoinPredicate(CMemoryPool *mp)
 {
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
 		GPOS_NEW(mp) CStatsPredJoinArray(mp);
 	join_preds_stats->Append(
 		GPOS_NEW(mp) CStatsPredJoin(0, CStatsPred::EstatscmptEq, 8));
@@ -350,7 +353,7 @@ CJoinCardinalityTest::PdrgpstatspredjoinSingleJoinPredicate(CMemoryPool *mp)
 CStatsPredJoinArray *
 CJoinCardinalityTest::PdrgpstatspredjoinMultiplePredicates(CMemoryPool *mp)
 {
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
 		GPOS_NEW(mp) CStatsPredJoinArray(mp);
 	join_preds_stats->Append(
 		GPOS_NEW(mp) CStatsPredJoin(16, CStatsPred::EstatscmptEq, 32));
@@ -368,7 +371,7 @@ CJoinCardinalityTest::PdrgpstatspredjoinMultiplePredicates(CMemoryPool *mp)
 CStatsPredJoinArray *
 CJoinCardinalityTest::PdrgpstatspredjoinNullableCols(CMemoryPool *mp)
 {
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
 		GPOS_NEW(mp) CStatsPredJoinArray(mp);
 	join_preds_stats->Append(
 		GPOS_NEW(mp) CStatsPredJoin(1, CStatsPred::EstatscmptEq, 2));

@@ -58,20 +58,19 @@ protected:
 	BOOL FFirstChildToOptimize(ULONG child_index) const;
 
 	// helper to compute required distribution of correlated join's children
-	CEnfdDistribution *PedCorrelatedJoin(
+	gpos::owner<CEnfdDistribution *> PedCorrelatedJoin(
 		CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
 		ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
 
 	// helper to compute required rewindability of correlated join's children
-	static CRewindabilitySpec *PrsRequiredCorrelatedJoin(
+	static gpos::owner<CRewindabilitySpec *> PrsRequiredCorrelatedJoin(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CRewindabilitySpec *prsRequired, ULONG child_index,
 		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
 
 	// helper for propagating required sort order to outer child
-	static COrderSpec *PosPropagateToOuter(CMemoryPool *mp,
-										   CExpressionHandle &exprhdl,
-										   COrderSpec *posRequired);
+	static gpos::owner<COrderSpec *> PosPropagateToOuter(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, COrderSpec *posRequired);
 
 	// helper for checking if required sort columns come from outer child
 	static BOOL FSortColsInOuterChild(CMemoryPool *mp,
@@ -91,7 +90,7 @@ protected:
 								   gpos::pointer<CExpression *> pexprPredOuter,
 								   gpos::pointer<CExpression *> pexprPredInner);
 
-	static CEnfdDistribution *PedInnerHashedFromOuterHashed(
+	static gpos::owner<CEnfdDistribution *> PedInnerHashedFromOuterHashed(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CEnfdDistribution::EDistributionMatching dmatch,
 		CDrvdProp *outerDrvdProp);
@@ -114,7 +113,7 @@ public:
 	// compute required output columns of the n-th child
 	CColRefSet *PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 CColRefSet *pcrsRequired, ULONG child_index,
-							 CDrvdPropArray *pdrgpdpCtxt,
+							 gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
 							 ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
@@ -124,26 +123,27 @@ public:
 						  ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	CDistributionSpec *PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
-	CEnfdDistribution *Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   CReqdPropPlan *prppInput, ULONG child_index,
-						   CDrvdPropArray *pdrgpdpCtxt,
-						   ULONG ulDistrReq) override;
+	gpos::owner<CEnfdDistribution *> Ped(CMemoryPool *mp,
+										 CExpressionHandle &exprhdl,
+										 CReqdPropPlan *prppInput,
+										 ULONG child_index,
+										 CDrvdPropArray *pdrgpdpCtxt,
+										 ULONG ulDistrReq) override;
 
 	// check if required columns are included in output columns
 	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	// distribution matching type
-	CEnfdDistribution::EDistributionMatching Edm(CReqdPropPlan *prppInput,
-												 ULONG child_index,
-												 CDrvdPropArray *pdrgpdpCtxt,
-												 ULONG ulOptReq) override;
+	CEnfdDistribution::EDistributionMatching Edm(
+		gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
@@ -158,12 +158,12 @@ public:
 	}
 
 	// derive distribution
-	CDistributionSpec *PdsDerive(CMemoryPool *mp,
-								 CExpressionHandle &exprhdl) const override;
+	gpos::owner<CDistributionSpec *> PdsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive rewindability
-	CRewindabilitySpec *PrsDerive(CMemoryPool *mp,
-								  CExpressionHandle &exprhdl) const override;
+	gpos::owner<CRewindabilitySpec *> PrsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 
 	//-------------------------------------------------------------------------------------
@@ -207,7 +207,7 @@ public:
 
 	static void AlignJoinKeyOuterInner(CExpression *pexprConjunct,
 									   CExpression *pexprOuter,
-									   CExpression *pexprInner,
+									   gpos::pointer<CExpression *> pexprInner,
 									   CExpression **ppexprKeyOuter,
 									   CExpression **ppexprKeyInner,
 									   IMDId **mdid_scop);

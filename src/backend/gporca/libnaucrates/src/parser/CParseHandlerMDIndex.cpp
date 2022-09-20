@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMDIndex.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -203,7 +205,8 @@ CParseHandlerMDIndex::EndElement(const XMLCh *const,  // element_uri,
 
 		CParseHandlerScalarOp *pphPartCnstr =
 			dynamic_cast<CParseHandlerScalarOp *>((*this)[1]);
-		CDXLNode *pdxlnPartConstraint = pphPartCnstr->CreateDXLNode();
+		gpos::owner<CDXLNode *> pdxlnPartConstraint =
+			pphPartCnstr->CreateDXLNode();
 		pdxlnPartConstraint->AddRef();
 		m_part_constraint = GPOS_NEW(m_mp) CMDPartConstraintGPDB(
 			m_mp, m_level_with_default_part_array, m_part_constraint_unbounded,

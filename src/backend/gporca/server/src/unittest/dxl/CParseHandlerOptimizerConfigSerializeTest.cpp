@@ -3,6 +3,7 @@
 
 #include "unittest/dxl/CParseHandlerOptimizerConfigSerializeTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/io/COstreamString.h"
 
 #include "gpopt/optimizer/COptimizerConfig.h"
@@ -68,7 +69,7 @@ SerializeOptimizerConfig(CMemoryPool *mp, COptimizerConfig *optimizer_config,
 	CDXLUtils::SerializeHeader(mp, &xml_serializer);
 
 	// Make a dummy bitset
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, 256);
+	gpos::owner<CBitSet *> pbs = GPOS_NEW(mp) CBitSet(mp, 256);
 
 	optimizer_config->Serialize(mp, &xml_serializer, pbs);
 
@@ -102,7 +103,7 @@ CParseHandlerOptimizerConfigSerializeTest::EresUnittest()
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
-	COptimizerConfig *poc =
+	gpos::owner<COptimizerConfig *> poc =
 		CDXLUtils::ParseDXLToOptimizerConfig(mp, dxl_string, szValidationPath);
 
 	GPOS_ASSERT(nullptr != poc);

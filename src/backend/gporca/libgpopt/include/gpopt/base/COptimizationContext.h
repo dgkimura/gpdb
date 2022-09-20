@@ -76,22 +76,22 @@ private:
 	ULONG m_id{GPOPT_INVALID_OPTCTXT_ID};
 
 	// back pointer to owner group, used for debugging
-	CGroup *m_pgroup{nullptr};
+	gpos::pointer<CGroup *> m_pgroup{nullptr};
 
 	// required plan properties
-	CReqdPropPlan *m_prpp{nullptr};
+	gpos::owner<CReqdPropPlan *> m_prpp{nullptr};
 
 	// required relational properties -- used for stats computation during costing
-	CReqdPropRelational *m_prprel{nullptr};
+	gpos::owner<CReqdPropRelational *> m_prprel{nullptr};
 
 	// stats of previously optimized expressions
-	IStatisticsArray *m_pdrgpstatCtxt{nullptr};
+	gpos::owner<IStatisticsArray *> m_pdrgpstatCtxt{nullptr};
 
 	// index of search stage where context is generated
 	ULONG m_ulSearchStageIndex{0};
 
 	// best cost context under the optimization context
-	CCostContext *m_pccBest{nullptr};
+	gpos::pointer<CCostContext *> m_pccBest{nullptr};
 
 	// optimization context state
 	EState m_estate{estUnoptimized};
@@ -197,7 +197,7 @@ public:
 	}
 
 	// stats of previously optimized expressions
-	IStatisticsArray *
+	gpos::pointer<IStatisticsArray *>
 	Pdrgpstat() const
 	{
 		return m_pdrgpstatCtxt;
@@ -330,8 +330,9 @@ public:
 						  ULONG ulSearchStages);
 
 	// compare array of contexts based on context ids
-	static BOOL FEqualContextIds(COptimizationContextArray *pdrgpocFst,
-								 COptimizationContextArray *pdrgpocSnd);
+	static BOOL FEqualContextIds(
+		gpos::pointer<COptimizationContextArray *> pdrgpocFst,
+		gpos::pointer<COptimizationContextArray *> pdrgpocSnd);
 
 	// compute required properties to CTE producer based on plan properties of CTE consumer
 	static CReqdPropPlan *PrppCTEProducer(CMemoryPool *mp,

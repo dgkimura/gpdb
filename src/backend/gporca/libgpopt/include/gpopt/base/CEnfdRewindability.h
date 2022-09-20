@@ -47,7 +47,7 @@ public:
 
 private:
 	// required rewindability
-	CRewindabilitySpec *m_prs;
+	gpos::owner<CRewindabilitySpec *> m_prs;
 
 	// rewindability matching type
 	ERewindabilityMatching m_erm;

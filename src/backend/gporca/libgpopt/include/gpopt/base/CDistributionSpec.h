@@ -137,9 +137,10 @@ public:
 
 	// return a copy of the distribution spec with remapped columns
 	virtual CDistributionSpec *
-	PdsCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PdsCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
 	)
 	{
 		this->AddRef();

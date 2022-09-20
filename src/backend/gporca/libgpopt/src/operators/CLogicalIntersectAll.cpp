@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalIntersectAll.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/CUtils.h"
@@ -96,7 +97,7 @@ CLogicalIntersectAll::DeriveMaxCard(CMemoryPool *,	// mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalIntersectAll::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -137,7 +138,7 @@ CLogicalIntersectAll::DeriveKeyCollection(CMemoryPool *,	   //mp,
 CXformSet *
 CLogicalIntersectAll::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfIntersectAll2LeftSemiJoin);
 
 	return xform_set;
@@ -167,9 +168,10 @@ CLogicalIntersectAll::PstatsDerive(
 	// over a window operation on the individual input (for row_number)
 
 	// TODO:  Jan 8th 2012, add the stats for window operation
-	CExpression *pexprScCond = CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
+	gpos::owner<CExpression *> pexprScCond =
+		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
 	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExpr(mp, exprhdl, pexprScCond,
 												  output_colrefsets, outer_refs,
 												  true	// is a semi-join
@@ -199,11 +201,12 @@ CLogicalIntersectAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 
-	CColRefSetArray *output_colrefsets = GPOS_NEW(mp) CColRefSetArray(mp);
+	gpos::owner<CColRefSetArray *> output_colrefsets =
+		GPOS_NEW(mp) CColRefSetArray(mp);
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs =
+		gpos::owner<CColRefSet *> pcrs =
 			GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul]);
 		output_colrefsets->Append(pcrs);
 	}

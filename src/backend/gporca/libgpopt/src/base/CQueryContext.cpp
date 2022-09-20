@@ -12,6 +12,7 @@
 #include "gpopt/base/CQueryContext.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/CColRefSetIter.h"
@@ -55,8 +56,10 @@ CQueryContext::CQueryContext(CMemoryPool *mp, CExpression *pexpr,
 	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	pcteinfo->MarkUnusedCTEs();
 
-	CColRefSet *pcrsOutputAndOrderingCols = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefSet *pcrsOrderSpec = m_prpp->Peo()->PosRequired()->PcrsUsed(mp);
+	gpos::owner<CColRefSet *> pcrsOutputAndOrderingCols =
+		GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsOrderSpec =
+		m_prpp->Peo()->PosRequired()->PcrsUsed(mp);
 
 	pcrsOutputAndOrderingCols->Include(m_pdrgpcr);
 	pcrsOutputAndOrderingCols->Include(pcrsOrderSpec);
@@ -168,8 +171,8 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 {
 	GPOS_ASSERT(nullptr != pexpr && nullptr != pdrgpulQueryOutputColRefId);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefArray *colref_array = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefArray *> colref_array = GPOS_NEW(mp) CColRefArray(mp);
 
 	COptCtxt *poptctxt = COptCtxt::PoctxtFromTLS();
 	CColumnFactory *col_factory = poptctxt->Pcf();
@@ -194,7 +197,7 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	// By default no sort order requirement is added, unless the root operator in
 	// the input logical expression is a LIMIT. This is because Orca always
 	// attaches top level Sort to a LIMIT node.
-	COrderSpec *pos = nullptr;
+	gpos::owner<COrderSpec *> pos = nullptr;
 	CExpression *pexprResult = pexpr;
 	COperator *popTop = PopTop(pexpr);
 	if (COperator::EopLogicalLimit == popTop->Eopid())
@@ -209,7 +212,7 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 		pos = GPOS_NEW(mp) COrderSpec(mp);
 	}
 
-	CDistributionSpec *pds = nullptr;
+	gpos::owner<CDistributionSpec *> pds = nullptr;
 
 	BOOL fDML = CUtils::FLogicalDML(pexpr->Pop());
 	poptctxt->MarkDMLQuery(fDML);
@@ -227,20 +230,21 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	}
 
 	// By default, no rewindability requirement needs to be satisfied at the top level
-	CRewindabilitySpec *prs = GPOS_NEW(mp) CRewindabilitySpec(
+	gpos::owner<CRewindabilitySpec *> prs = GPOS_NEW(mp) CRewindabilitySpec(
 		CRewindabilitySpec::ErtNone, CRewindabilitySpec::EmhtNoMotion);
 
 	// No partition propagation required at the top
-	CPartitionPropagationSpec *ppps =
+	gpos::owner<CPartitionPropagationSpec *> ppps =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 
 	// Ensure order, distribution and rewindability meet 'satisfy' matching at the top level
-	CEnfdOrder *peo = GPOS_NEW(mp) CEnfdOrder(pos, CEnfdOrder::EomSatisfy);
-	CEnfdDistribution *ped =
+	gpos::owner<CEnfdOrder *> peo =
+		GPOS_NEW(mp) CEnfdOrder(pos, CEnfdOrder::EomSatisfy);
+	gpos::owner<CEnfdDistribution *> ped =
 		GPOS_NEW(mp) CEnfdDistribution(pds, CEnfdDistribution::EdmSatisfy);
-	CEnfdRewindability *per =
+	gpos::owner<CEnfdRewindability *> per =
 		GPOS_NEW(mp) CEnfdRewindability(prs, CEnfdRewindability::ErmSatisfy);
-	CEnfdPartitionPropagation *pepp = GPOS_NEW(mp)
+	gpos::owner<CEnfdPartitionPropagation *> pepp = GPOS_NEW(mp)
 		CEnfdPartitionPropagation(ppps, CEnfdPartitionPropagation::EppmSatisfy);
 
 	// Required CTEs are obtained from the CTEInfo global information in the optimizer context
@@ -250,7 +254,7 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	// constructed later based on derived relation properties (CPartInfo) by
 	// CReqdPropPlan::InitReqdPartitionPropagation().
 
-	CReqdPropPlan *prpp =
+	gpos::owner<CReqdPropPlan *> prpp =
 		GPOS_NEW(mp) CReqdPropPlan(pcrs, peo, ped, per, pepp, pcter);
 
 	// Finally, create the CQueryContext

@@ -12,6 +12,7 @@
 #include "gpopt/engine/CPartialPlan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
@@ -165,7 +166,7 @@ CPartialPlan::CostCompute(CMemoryPool *mp)
 	exprhdl.InitReqdProps(m_prpp);
 
 	// create array of child derived properties
-	CDrvdPropArray *pdrgpdp = GPOS_NEW(mp) CDrvdPropArray(mp);
+	gpos::owner<CDrvdPropArray *> pdrgpdp = GPOS_NEW(mp) CDrvdPropArray(mp);
 	const ULONG arity = m_pgexpr->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
@@ -253,7 +254,7 @@ CPartialPlan::CostCompute(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 ULONG
-CPartialPlan::HashValue(const CPartialPlan *ppp)
+CPartialPlan::HashValue(gpos::pointer<const CPartialPlan *> ppp)
 {
 	GPOS_ASSERT(nullptr != ppp);
 
@@ -272,7 +273,8 @@ CPartialPlan::HashValue(const CPartialPlan *ppp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CPartialPlan::Equals(const CPartialPlan *pppFst, const CPartialPlan *pppSnd)
+CPartialPlan::Equals(gpos::pointer<const CPartialPlan *> pppFst,
+					 gpos::pointer<const CPartialPlan *> pppSnd)
 {
 	GPOS_ASSERT(nullptr != pppFst);
 	GPOS_ASSERT(nullptr != pppSnd);

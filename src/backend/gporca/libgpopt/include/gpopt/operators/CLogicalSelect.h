@@ -12,6 +12,7 @@
 #define GPOS_CLogicalSelect_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalUnary.h"
@@ -33,10 +34,10 @@ using ExprPredToExprPredPartMap =
 class CLogicalSelect : public CLogicalUnary
 {
 private:
-	ExprPredToExprPredPartMap *m_phmPexprPartPred;
+	gpos::owner<ExprPredToExprPredPartMap *> m_phmPexprPartPred;
 
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::pointer<CTableDescriptor *> m_ptabdesc;
 
 public:
 	CLogicalSelect(const CLogicalSelect &) = delete;
@@ -64,7 +65,7 @@ public:
 	}
 
 	// return table's descriptor
-	CTableDescriptor *
+	gpos::pointer<CTableDescriptor *>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
@@ -103,9 +104,10 @@ public:
 	}
 
 	// compute partition predicate to pass down to n-th child
-	CExpression *PexprPartPred(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   CExpression *pexprInput,
-							   ULONG child_index) const override;
+	gpos::owner<CExpression *> PexprPartPred(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CExpression *> pexprInput,
+		ULONG child_index) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Transformations
@@ -126,7 +128,7 @@ public:
 	}
 
 	// conversion function
-	static CLogicalSelect *
+	static gpos::cast_func<CLogicalSelect *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -136,8 +138,9 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *stats_ctxt) const override;
+	gpos::owner<IStatistics *> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		IStatisticsArray *stats_ctxt) const override;
 
 };	// class CLogicalSelect
 

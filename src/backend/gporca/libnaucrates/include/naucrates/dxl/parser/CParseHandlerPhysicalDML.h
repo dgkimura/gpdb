@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerPhysicalDML_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalDML.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -39,7 +40,7 @@ private:
 	EdxlDmlType m_dxl_dml_type;
 
 	// source col ids
-	ULongPtrArray *m_src_colids_array;
+	gpos::pointer<ULongPtrArray *> m_src_colids_array;
 
 	// action column id
 	ULONG m_action_colid;

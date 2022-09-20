@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 #include "gpos/io/IOstream.h"
 
 #include "gpopt/xforms/CJoinOrder.h"
@@ -34,7 +35,7 @@ class CJoinOrderMinCard : public CJoinOrder
 {
 private:
 	// result component
-	SComponent *m_pcompResult;
+	gpos::owner<SComponent *> m_pcompResult;
 
 public:
 	// ctor
@@ -45,7 +46,7 @@ public:
 	~CJoinOrderMinCard() override;
 
 	// main handler
-	virtual CExpression *PexprExpand();
+	virtual gpos::owner<CExpression *> PexprExpand();
 
 	// print function
 	IOstream &OsPrint(IOstream &) const;

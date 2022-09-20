@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerNLJIndexParamList.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -109,7 +111,7 @@ CParseHandlerNLJIndexParamList::EndElement(
 		CParseHandlerNLJIndexParam *nest_param_parse_handler =
 			dynamic_cast<CParseHandlerNLJIndexParam *>((*this)[idx]);
 
-		CDXLColRef *nest_param_colref_dxl =
+		gpos::owner<CDXLColRef *> nest_param_colref_dxl =
 			nest_param_parse_handler->GetNestParamColRefDxl();
 		nest_param_colref_dxl->AddRef();
 		m_nest_params_colrefs_array->Append(nest_param_colref_dxl);

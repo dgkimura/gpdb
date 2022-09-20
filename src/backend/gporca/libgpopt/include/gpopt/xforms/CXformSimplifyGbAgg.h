@@ -13,6 +13,7 @@
 #define GPOPT_CXformSimplifyGbAgg_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformExploration.h"
 
@@ -33,8 +34,8 @@ class CXformSimplifyGbAgg : public CXformExploration
 {
 private:
 	// helper to check if GbAgg can be transformed to a Select
-	static BOOL FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
-						   CXformResult *pxfres);
+	static BOOL FDropGbAgg(CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+						   gpos::pointer<CXformResult *> pxfres);
 
 public:
 	CXformSimplifyGbAgg(const CXformSimplifyGbAgg &) = delete;

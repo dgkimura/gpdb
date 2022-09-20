@@ -34,17 +34,17 @@ class CDXLPhysicalDynamicIndexScan : public CDXLPhysical
 {
 private:
 	// table descriptor for the scanned table
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
 
 	// index descriptor associated with the scanned table
-	CDXLIndexDescr *m_dxl_index_descr;
+	gpos::owner<CDXLIndexDescr *> m_dxl_index_descr;
 
 	// scan direction of the index
 	EdxlIndexScanDirection m_index_scan_dir;
 
 	gpos::Ref<IMdIdArray> m_part_mdids;
 
-	ULongPtrArray *m_selector_ids = nullptr;
+	gpos::owner<ULongPtrArray *> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalDynamicIndexScan(CDXLPhysicalDynamicIndexScan &) = delete;

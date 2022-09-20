@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerPhysicalSplit_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
 
@@ -35,10 +36,10 @@ class CParseHandlerPhysicalSplit : public CParseHandlerPhysicalOp
 {
 private:
 	// deletion col ids
-	ULongPtrArray *m_deletion_colid_array;
+	gpos::pointer<ULongPtrArray *> m_deletion_colid_array;
 
 	// insertion col ids
-	ULongPtrArray *m_insert_colid_array;
+	gpos::pointer<ULongPtrArray *> m_insert_colid_array;
 
 	// action column id
 	ULONG m_action_colid;

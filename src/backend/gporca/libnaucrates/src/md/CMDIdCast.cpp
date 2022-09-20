@@ -12,6 +12,8 @@
 
 #include "naucrates/md/CMDIdCast.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpos;
@@ -92,7 +94,7 @@ CMDIdCast::GetBuffer() const
 //		Returns the source type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDIdCast::MdidSrc() const
 {
 	return m_mdid_src;
@@ -106,7 +108,7 @@ CMDIdCast::MdidSrc() const
 //		Returns the destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDIdCast::MdidDest() const
 {
 	return m_mdid_dest;
@@ -121,14 +123,14 @@ CMDIdCast::MdidDest() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdCast::Equals(const IMDId *mdid) const
+CMDIdCast::Equals(gpos::pointer<const IMDId *> mdid) const
 {
 	if (nullptr == mdid || EmdidCastFunc != mdid->MdidType())
 	{
 		return false;
 	}
 
-	const CMDIdCast *mdid_cast_func = CMDIdCast::CastMdid(mdid);
+	gpos::pointer<const CMDIdCast *> mdid_cast_func = CMDIdCast::CastMdid(mdid);
 
 	return m_mdid_src->Equals(mdid_cast_func->MdidSrc()) &&
 		   m_mdid_dest->Equals(mdid_cast_func->MdidDest());

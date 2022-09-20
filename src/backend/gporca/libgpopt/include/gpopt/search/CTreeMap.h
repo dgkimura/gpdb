@@ -78,13 +78,13 @@ private:
 	{
 	private:
 		// parent node
-		const T *m_ptParent;
+		gpos::pointer<const T *> m_ptParent;
 
 		// child index
 		ULONG m_ulChildIndex;
 
 		// child node
-		const T *m_ptChild;
+		gpos::pointer<const T *> m_ptChild;
 
 	public:
 		// ctor
@@ -151,10 +151,10 @@ private:
 		ULONG m_ul;
 
 		// element
-		const T *m_value;
+		gpos::pointer<const T *> m_value;
 
 		// array of children arrays
-		CTreeNode2dArray *m_pdrgdrgptn;
+		gpos::owner<CTreeNode2dArray *> m_pdrgdrgptn;
 
 		// number of trees rooted in this node
 		ULLONG m_ullCount;
@@ -247,7 +247,8 @@ private:
 			ULONG length = m_pdrgdrgptn->Size();
 			for (ULONG ul = length; ul <= ulPos; ul++)
 			{
-				CTreeNodeArray *pdrg = GPOS_NEW(m_mp) CTreeNodeArray(m_mp);
+				gpos::owner<CTreeNodeArray *> pdrg =
+					GPOS_NEW(m_mp) CTreeNodeArray(m_mp);
 				m_pdrgdrgptn->Append(pdrg);
 			}
 
@@ -334,7 +335,7 @@ private:
 			}
 			else
 			{
-				DrgPr *pdrg = GPOS_NEW(mp) DrgPr(mp);
+				gpos::owner<DrgPr *> pdrg = GPOS_NEW(mp) DrgPr(mp);
 
 				ULLONG ullRankRem = ullRank;
 
@@ -415,10 +416,10 @@ private:
 		CHashMap<STreeLink, BOOL, STreeLink::HashValue, STreeLink::Equals,
 				 CleanupDelete<STreeLink>, CleanupDelete<BOOL>>;
 
-	TMap *m_ptmap;
+	gpos::owner<TMap *> m_ptmap;
 
 	// map of nodes to outgoing links
-	LinkMap *m_plinkmap;
+	gpos::owner<LinkMap *> m_plinkmap;
 
 	// recursive count starting in given node
 	ULLONG UllCount(CTreeNode *ptn);

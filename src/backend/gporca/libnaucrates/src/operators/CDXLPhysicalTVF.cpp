@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalTVF.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
@@ -92,7 +93,7 @@ CDXLPhysicalTVF::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *dxlnode) const
+								gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

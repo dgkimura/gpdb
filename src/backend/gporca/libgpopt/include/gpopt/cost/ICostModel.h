@@ -356,7 +356,7 @@ public:
 	void SetParams(ICostModelParamsArray *pdrgpcp) const;
 
 	// create a default cost model instance
-	static ICostModel *PcmDefault(CMemoryPool *mp);
+	static gpos::owner<ICostModel *> PcmDefault(CMemoryPool *mp);
 };
 }  // namespace gpopt
 

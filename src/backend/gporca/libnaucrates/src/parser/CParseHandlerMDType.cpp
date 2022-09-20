@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMDType.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -343,14 +345,14 @@ CParseHandlerMDType::ParseMdid(const XMLCh *element_local_name,
 //
 //---------------------------------------------------------------------------
 BOOL
-CParseHandlerMDType::IsBuiltInType(const IMDId *mdid)
+CParseHandlerMDType::IsBuiltInType(gpos::pointer<const IMDId *> mdid)
 {
 	if (IMDId::EmdidGPDB != mdid->MdidType())
 	{
 		return false;
 	}
 
-	const CMDIdGPDB *mdidGPDB = CMDIdGPDB::CastMdid(mdid);
+	gpos::pointer<const CMDIdGPDB *> mdidGPDB = CMDIdGPDB::CastMdid(mdid);
 
 	switch (mdidGPDB->Oid())
 	{
@@ -387,7 +389,8 @@ CParseHandlerMDType::EndElement(const XMLCh *const,	 // element_uri,
 
 		// TODO:  - Jan 30, 2012; add support for other types of mdids
 
-		const CMDIdGPDB *pmdidGPDB = CMDIdGPDB::CastMdid(m_mdid.get());
+		gpos::pointer<const CMDIdGPDB *> pmdidGPDB =
+			CMDIdGPDB::CastMdid(m_mdid.get());
 
 		switch (pmdidGPDB->Oid())
 		{

@@ -11,6 +11,8 @@
 
 #include "gpopt/search/CJobGroupExpressionExploration.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/engine/CEngine.h"
 #include "gpopt/operators/CLogical.h"
 #include "gpopt/search/CGroup.h"
@@ -170,7 +172,7 @@ CJobGroupExpressionExploration::ScheduleApplicableTransformations(
 
 	// get all applicable xforms
 	COperator *pop = m_pgexpr->Pop();
-	CXformSet *xform_set =
+	gpos::owner<CXformSet *> xform_set =
 		CLogical::PopConvert(pop)->PxfsCandidates(psc->GetGlobalMemoryPool());
 
 	// intersect them with required xforms and schedule jobs

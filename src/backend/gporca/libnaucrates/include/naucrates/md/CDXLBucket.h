@@ -43,10 +43,10 @@ class CDXLBucket : public CRefCount
 {
 private:
 	// lower bound value for the bucket
-	CDXLDatum *m_lower_bound_dxl_datum;
+	gpos::owner<CDXLDatum *> m_lower_bound_dxl_datum;
 
 	// max value for the bucket
-	CDXLDatum *m_upper_bound_dxl_datum;
+	gpos::owner<CDXLDatum *> m_upper_bound_dxl_datum;
 
 	// is lower bound closed (i.e., the boundary point is included in the bucket)
 	BOOL m_is_lower_closed;

@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CDrvdProp.h"
@@ -36,8 +37,8 @@ namespace gpopt
 class CExpressionTest
 {
 private:
-	static CReqdPropPlan *PrppCreateRequiredProperties(CMemoryPool *mp,
-													   CColRefSet *pcrs);
+	static gpos::owner<CReqdPropPlan *> PrppCreateRequiredProperties(
+		CMemoryPool *mp, CColRefSet *pcrs);
 
 	static CExpression *PexprCreateGbyWithColumnFormat(
 		CMemoryPool *mp, const WCHAR *wszColNameFormat);

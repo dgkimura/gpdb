@@ -89,11 +89,11 @@ private:
 	// factorize common expressions in Or tree
 	static CExpression *PexprFactorizeDisj(
 		CMemoryPool *mp, CExpression *pexpr,
-		CExpression *  // pexprLowestLogicalAncestor
+		gpos::pointer<CExpression *>  // pexprLowestLogicalAncestor
 	);
 
 	// visitor-like function to process descendents that are OR operators
-	static CExpression *PexprProcessDisjDescendents(
+	static gpos::owner<CExpression *> PexprProcessDisjDescendents(
 		CMemoryPool *mp, CExpression *pexpr,
 		CExpression *pexprLowestLogicalAncestor, PexprProcessDisj pexprorfun);
 
@@ -109,7 +109,7 @@ private:
 	// only one computed column
 	// return true and set ppcrComputedColumn to that computed column,
 	// otherwise return false
-	static BOOL FOpSourceIdOrComputedColumn(CExpression *pexpr,
+	static BOOL FOpSourceIdOrComputedColumn(gpos::pointer<CExpression *> pexpr,
 											ULONG *ulOpSourceId,
 											CColRef **ppcrComputedColumn);
 
@@ -139,13 +139,13 @@ private:
 	static void StoreBaseOpToColumnExpr(
 		CMemoryPool *mp, CExpression *pexpr, SourceToArrayPosMap *psrc2array,
 		ColumnToArrayPosMap *pcol2array,
-		const CColRefSet *pcrsProducedByChildren, BOOL fAllowNewSources,
-		ULONG ulPosition);
+		gpos::pointer<const CColRefSet *> pcrsProducedByChildren,
+		BOOL fAllowNewSources, ULONG ulPosition);
 
 	// construct a filter based on the expressions from 'pdrgpdrgpexpr'
 	// and add to the array 'pdrgpexprPrefilters'
 	static void AddInferredFiltersFromArray(
-		CMemoryPool *mp, const CExpressionArrays *pdrgpdrgpexpr,
+		CMemoryPool *mp, gpos::pointer<const CExpressionArrays *> pdrgpdrgpexpr,
 		ULONG ulDisjChildrenLength, CExpressionArray *pdrgpexprPrefilters);
 
 	// create a conjunction of the given expression and inferred filters constructed out
@@ -160,8 +160,8 @@ private:
 													 CExpression *pexpr);
 
 	// compute disjunctive pre-filters that can be pushed to the column creators
-	static CExpression *PexprExtractInferredFiltersFromDisj(
-		CMemoryPool *mp, CExpression *pexpr,
+	static gpos::owner<CExpression *> PexprExtractInferredFiltersFromDisj(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
 		CExpression *pexprLowestLogicalAncestor);
 
 public:

@@ -72,7 +72,8 @@ private:
 
 	// returns cost of highest costed child
 	static CCost CostMaxChild(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const SCostingInfo *pci, ICostModelParams *pcp);
+							  const SCostingInfo *pci,
+							  gpos::pointer<ICostModelParams *> pcp);
 
 	// check if given operator is unary
 	static BOOL FUnary(COperator::EOperatorId op_id);

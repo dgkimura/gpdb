@@ -12,6 +12,7 @@
 #define GPOPT_CXformExploration_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXform.h"
 
@@ -69,7 +70,7 @@ public:
 	}
 
 	// conversion function
-	static CXformExploration *
+	static gpos::cast_func<CXformExploration *>
 	Pxformexp(CXform *pxform)
 	{
 		GPOS_ASSERT(nullptr != pxform);

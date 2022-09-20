@@ -65,7 +65,7 @@ private:
 	CDouble m_freq_remaining;
 
 	// histogram buckets
-	CDXLBucketArray *m_dxl_stats_bucket_array;
+	gpos::owner<CDXLBucketArray *> m_dxl_stats_bucket_array;
 
 	// is column statistics missing in the database
 	BOOL m_is_col_stats_missing;

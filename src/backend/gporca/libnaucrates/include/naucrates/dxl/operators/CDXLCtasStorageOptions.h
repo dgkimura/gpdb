@@ -17,6 +17,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CMDName.h"
 
@@ -100,7 +101,7 @@ private:
 	ECtasOnCommitAction m_ctas_on_commit_action;
 
 	// array of name-value pairs of storage options
-	CDXLCtasOptionArray *m_ctas_storage_option_array;
+	gpos::owner<CDXLCtasOptionArray *> m_ctas_storage_option_array;
 
 	// string representation of OnCommit action
 	static const CWStringConst *GetOnCommitActionStr(
@@ -124,7 +125,7 @@ public:
 	CDXLCtasStorageOptions::ECtasOnCommitAction GetOnCommitAction() const;
 
 	// accessor to options
-	CDXLCtasOptionArray *GetDXLCtasOptionArray() const;
+	gpos::pointer<CDXLCtasOptionArray *> GetDXLCtasOptionArray() const;
 
 	// serialize to DXL
 	void Serialize(CXMLSerializer *xml_serializer) const;

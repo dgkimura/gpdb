@@ -12,6 +12,7 @@
 #define GPOPT_CConstraintTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CConstraintConjunction.h"
 #include "gpopt/base/CConstraintDisjunction.h"
@@ -75,11 +76,12 @@ private:
 								 const SRangeInfo rgRangeInfo[],
 								 ULONG ulRanges);
 
-	static CConstraintInterval *PciFirstInterval(CMemoryPool *mp, IMDId *mdid,
-												 CColRef *colref);
+	static gpos::owner<CConstraintInterval *> PciFirstInterval(CMemoryPool *mp,
+															   IMDId *mdid,
+															   CColRef *colref);
 
-	static CConstraintInterval *PciSecondInterval(CMemoryPool *mp, IMDId *mdid,
-												  CColRef *colref);
+	static gpos::owner<CConstraintInterval *> PciSecondInterval(
+		CMemoryPool *mp, IMDId *mdid, CColRef *colref);
 
 	// interval from scalar comparison
 	static GPOS_RESULT EresUnittest_CIntervalFromScalarCmp(
@@ -99,12 +101,12 @@ private:
 	static void PrintConstraint(CMemoryPool *mp, CConstraint *pcnstr);
 
 	// build a conjunction
-	static CConstraintConjunction *Pcstconjunction(CMemoryPool *mp, IMDId *mdid,
-												   CColRef *colref);
+	static gpos::owner<CConstraintConjunction *> Pcstconjunction(
+		CMemoryPool *mp, IMDId *mdid, CColRef *colref);
 
 	// build a disjunction
-	static CConstraintDisjunction *Pcstdisjunction(CMemoryPool *mp, IMDId *mdid,
-												   CColRef *colref);
+	static gpos::owner<CConstraintDisjunction *> Pcstdisjunction(
+		CMemoryPool *mp, IMDId *mdid, CColRef *colref);
 
 public:
 	// unittests

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalSpool.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 
@@ -140,7 +141,7 @@ CPhysicalSpool::PcteRequired(CMemoryPool *,		   //mp,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalSpool::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							CRewindabilitySpec *prsRequired,
 							ULONG
@@ -220,7 +221,7 @@ CPhysicalSpool::PdsDerive(CMemoryPool *,  // mp
 //		Derive rewindability
 //
 //--------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalSpool::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	CRewindabilitySpec *prsChild = exprhdl.Pdpplan(0 /*child_index*/)->Prs();
@@ -289,7 +290,7 @@ CPhysicalSpool::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalSpool::EpetOrder(CExpressionHandle &,	// exprhdl
-						  const CEnfdOrder *
+						  gpos::pointer<const CEnfdOrder *>
 #ifdef GPOS_DEBUG
 							  peo
 #endif	// GPOS_DEBUG
@@ -313,7 +314,7 @@ CPhysicalSpool::EpetOrder(CExpressionHandle &,	// exprhdl
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalSpool::EpetDistribution(CExpressionHandle & /*exprhdl*/,
-								 const CEnfdDistribution *
+								 gpos::pointer<const CEnfdDistribution *>
 #ifdef GPOS_DEBUG
 									 ped
 #endif	// GPOS_DEBUG
@@ -336,8 +337,9 @@ CPhysicalSpool::EpetDistribution(CExpressionHandle & /*exprhdl*/,
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalSpool::EpetRewindability(CExpressionHandle &,		  // exprhdl
-								  const CEnfdRewindability *  // per
+CPhysicalSpool::EpetRewindability(
+	CExpressionHandle &,					   // exprhdl
+	gpos::pointer<const CEnfdRewindability *>  // per
 ) const
 {
 	// no need for enforcing rewindability on output

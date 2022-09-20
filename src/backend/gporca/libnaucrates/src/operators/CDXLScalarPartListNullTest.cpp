@@ -6,6 +6,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarPartListNullTest.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -41,8 +43,9 @@ CDXLScalarPartListNullTest::GetOpNameStr() const
 
 // Serialize operator in DXL format
 void
-CDXLScalarPartListNullTest::SerializeToDXL(CXMLSerializer *xml_serializer,
-										   const CDXLNode *	 // dxlnode
+CDXLScalarPartListNullTest::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *>	 // dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -91,7 +94,7 @@ CDXLScalarPartListNullTest::AssertValid(const CDXLNode *dxlnode,
 #endif	// GPOS_DEBUG
 
 // conversion function
-CDXLScalarPartListNullTest *
+gpos::cast_func<CDXLScalarPartListNullTest *>
 CDXLScalarPartListNullTest::Cast(CDXLOperator *dxl_op)
 {
 	GPOS_ASSERT(nullptr != dxl_op);

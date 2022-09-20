@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalInnerJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -66,7 +67,7 @@ CLogicalInnerJoin::DeriveMaxCard(CMemoryPool *,	 // mp
 CXformSet *
 CLogicalInnerJoin::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfImplementInnerJoin);
 	(void) xform_set->ExchangeSet(CXform::ExfSubqJoin2Apply);
@@ -94,8 +95,9 @@ CLogicalInnerJoin::PxfsCandidates(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalInnerJoin::FFewerConj(CMemoryPool *mp, CGroupExpression *pgexprFst,
-							  CGroupExpression *pgexprSnd)
+CLogicalInnerJoin::FFewerConj(CMemoryPool *mp,
+							  gpos::pointer<CGroupExpression *> pgexprFst,
+							  gpos::pointer<CGroupExpression *> pgexprSnd)
 {
 	if (nullptr == pgexprFst || nullptr == pgexprSnd)
 	{
@@ -114,10 +116,12 @@ CLogicalInnerJoin::FFewerConj(CMemoryPool *mp, CGroupExpression *pgexprFst,
 	GPOS_ASSERT(pgroupScalarFst->FScalar());
 	GPOS_ASSERT(pgroupScalarSnd->FScalar());
 
-	CExpressionArray *pdrgpexprConjFst = CPredicateUtils::PdrgpexprConjuncts(
-		mp, pgroupScalarFst->PexprScalarRep());
-	CExpressionArray *pdrgpexprConjSnd = CPredicateUtils::PdrgpexprConjuncts(
-		mp, pgroupScalarSnd->PexprScalarRep());
+	gpos::owner<CExpressionArray *> pdrgpexprConjFst =
+		CPredicateUtils::PdrgpexprConjuncts(mp,
+											pgroupScalarFst->PexprScalarRep());
+	gpos::owner<CExpressionArray *> pdrgpexprConjSnd =
+		CPredicateUtils::PdrgpexprConjuncts(mp,
+											pgroupScalarSnd->PexprScalarRep());
 
 	ULONG ulConjFst = pdrgpexprConjFst->Size();
 	ULONG ulConjSnd = pdrgpexprConjSnd->Size();

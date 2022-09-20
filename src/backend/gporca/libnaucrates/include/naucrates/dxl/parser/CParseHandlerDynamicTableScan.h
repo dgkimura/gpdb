@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerDynamicTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
 
@@ -36,7 +37,7 @@ class CDXLPhysicalDynamicTableScan;
 class CParseHandlerDynamicTableScan : public CParseHandlerPhysicalOp
 {
 private:
-	ULongPtrArray *m_selector_ids;
+	gpos::pointer<ULongPtrArray *> m_selector_ids;
 
 	// process the start of an element
 	void StartElement(

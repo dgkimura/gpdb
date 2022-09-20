@@ -38,7 +38,7 @@ class CDXLPhysicalDynamicBitmapTableScan : public CDXLPhysicalAbstractBitmapScan
 private:
 	gpos::Ref<IMdIdArray> m_part_mdids;
 
-	ULongPtrArray *m_selector_ids = nullptr;
+	gpos::owner<ULongPtrArray *> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalDynamicBitmapTableScan(

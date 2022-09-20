@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarArray.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -131,7 +133,7 @@ CDXLScalarArray::IsMultiDimensional() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarArray::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *dxlnode) const
+								gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

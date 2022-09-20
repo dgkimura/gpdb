@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformIntersect2Join.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefComputed.h"
 #include "gpopt/base/CUtils.h"
@@ -80,7 +81,7 @@ CXformIntersect2Join::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	// construct group by over the left and right expressions
 
-	CExpression *pexprProjList =
+	gpos::owner<CExpression *> pexprProjList =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp),
 								 GPOS_NEW(mp) CExpressionArray(mp));
 	pexprProjList->AddRef();
@@ -96,7 +97,7 @@ CXformIntersect2Join::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	CExpression *pexprScCond = CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
 
-	CExpression *pexprJoin =
+	gpos::owner<CExpression *> pexprJoin =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp),
 								 pexprLeftAgg, pexprRightAgg, pexprScCond);
 

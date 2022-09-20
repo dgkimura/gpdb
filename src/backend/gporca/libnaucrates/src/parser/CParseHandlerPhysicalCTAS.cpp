@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalCTAS.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLPhysicalCTAS.h"
 #include "naucrates/dxl/parser/CParseHandlerColDescr.h"
@@ -224,11 +226,11 @@ CParseHandlerPhysicalCTAS::EndElement(const XMLCh *const,  // element_uri,
 	GPOS_ASSERT(nullptr != proj_list_parse_handler->CreateDXLNode());
 	GPOS_ASSERT(nullptr != child_parse_handler->CreateDXLNode());
 
-	CDXLColDescrArray *dxl_col_descr_array =
+	gpos::owner<CDXLColDescrArray *> dxl_col_descr_array =
 		col_descr_parse_handler->GetDXLColumnDescrArray();
 	dxl_col_descr_array->AddRef();
 
-	CDXLCtasStorageOptions *ctas_options =
+	gpos::owner<CDXLCtasStorageOptions *> ctas_options =
 		ctas_options_parse_handler->GetDxlCtasStorageOption();
 	ctas_options->AddRef();
 

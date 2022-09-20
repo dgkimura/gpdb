@@ -17,6 +17,8 @@
 
 #include "gpopt/xforms/CXformImplementBitmapTableGet.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogicalBitmapTableGet.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -78,13 +80,13 @@ CXformImplementBitmapTableGet::Transform(CXformContext *pxfctxt,
 	CLogicalBitmapTableGet *popLogical =
 		CLogicalBitmapTableGet::PopConvert(pexpr->Pop());
 
-	CTableDescriptor *ptabdesc = popLogical->Ptabdesc();
+	gpos::owner<CTableDescriptor *> ptabdesc = popLogical->Ptabdesc();
 	ptabdesc->AddRef();
 
-	CColRefArray *pdrgpcrOutput = popLogical->PdrgpcrOutput();
+	gpos::owner<CColRefArray *> pdrgpcrOutput = popLogical->PdrgpcrOutput();
 	pdrgpcrOutput->AddRef();
 
-	CPhysicalBitmapTableScan *popPhysical = GPOS_NEW(mp)
+	gpos::owner<CPhysicalBitmapTableScan *> popPhysical = GPOS_NEW(mp)
 		CPhysicalBitmapTableScan(mp, ptabdesc, pexpr->Pop()->UlOpId(),
 								 GPOS_NEW(mp)
 									 CName(mp, *popLogical->PnameTableAlias()),
@@ -95,7 +97,7 @@ CXformImplementBitmapTableGet::Transform(CXformContext *pxfctxt,
 	pexprCondition->AddRef();
 	pexprIndexPath->AddRef();
 
-	CExpression *pexprPhysical = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprPhysical = GPOS_NEW(mp)
 		CExpression(mp, popPhysical, pexprCondition, pexprIndexPath);
 	pxfres->Add(pexprPhysical);
 }

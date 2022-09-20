@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementAssert.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalAssert.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -90,11 +91,12 @@ CXformImplementAssert::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	pexprScalar->AddRef();
 
 	// assemble physical operator
-	CPhysicalAssert *popPhysicalAssert = GPOS_NEW(mp) CPhysicalAssert(
-		mp, GPOS_NEW(mp) CException(pexc->Major(), pexc->Minor(),
-									pexc->Filename(), pexc->Line()));
+	gpos::owner<CPhysicalAssert *> popPhysicalAssert =
+		GPOS_NEW(mp) CPhysicalAssert(
+			mp, GPOS_NEW(mp) CException(pexc->Major(), pexc->Minor(),
+										pexc->Filename(), pexc->Line()));
 
-	CExpression *pexprAssert = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprAssert = GPOS_NEW(mp)
 		CExpression(mp, popPhysicalAssert, pexprRelational, pexprScalar);
 
 	// add alternative to results

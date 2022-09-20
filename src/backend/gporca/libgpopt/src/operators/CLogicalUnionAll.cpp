@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalUnionAll.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -87,7 +88,7 @@ CLogicalUnionAll::DeriveMaxCard(CMemoryPool *,	// mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalUnionAll::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											 UlongToColRefMap *colref_mapping,
 											 BOOL must_exist)
@@ -127,7 +128,7 @@ CLogicalUnionAll::DeriveKeyCollection(CMemoryPool *,	   //mp,
 CXformSet *
 CLogicalUnionAll::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementUnionAll);
 
 	return xform_set;
@@ -156,7 +157,7 @@ CLogicalUnionAll::PstatsDeriveUnionAll(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 	GPOS_ASSERT(nullptr != pdrgpdrgpcrInput);
 
-	IStatistics *result_stats = exprhdl.Pstats(0);
+	gpos::owner<IStatistics *> result_stats = exprhdl.Pstats(0);
 	result_stats->AddRef();
 	const ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 1; ul < arity; ul++)

@@ -43,7 +43,7 @@ private:
 	CMDName *m_mdname;
 
 	// list of column descriptors
-	CDXLColDescrArray *m_dxl_column_descr_array;
+	gpos::owner<CDXLColDescrArray *> m_dxl_column_descr_array;
 
 	// id of user the table needs to be accessed with
 	ULONG m_execute_as_user_id;

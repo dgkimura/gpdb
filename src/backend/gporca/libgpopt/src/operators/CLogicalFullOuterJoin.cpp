@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalFullOuterJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CExpression.h"
@@ -77,7 +78,7 @@ CLogicalFullOuterJoin::DeriveMaxCard(CMemoryPool *,	 // mp
 CXformSet *
 CLogicalFullOuterJoin::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfExpandFullOuterJoin);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementFullOuterMergeJoin);
 	return xform_set;

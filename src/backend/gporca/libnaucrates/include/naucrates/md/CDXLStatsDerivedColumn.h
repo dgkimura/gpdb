@@ -55,7 +55,7 @@ private:
 	// frequency of remaining tuples
 	CDouble m_freq_remaining;
 
-	CDXLBucketArray *m_dxl_stats_bucket_array;
+	gpos::owner<CDXLBucketArray *> m_dxl_stats_bucket_array;
 
 public:
 	CDXLStatsDerivedColumn(const CDXLStatsDerivedColumn &) = delete;

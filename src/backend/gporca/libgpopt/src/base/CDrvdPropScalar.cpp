@@ -12,6 +12,7 @@
 #include "gpopt/base/CDrvdPropScalar.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CScalar.h"
@@ -119,7 +120,7 @@ CDrvdPropScalar::Derive(CMemoryPool *, CExpressionHandle &exprhdl,
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-CDrvdPropScalar *
+gpos::cast_func<CDrvdPropScalar *>
 CDrvdPropScalar::GetDrvdScalarProps(CDrvdProp *pdp)
 {
 	GPOS_ASSERT(nullptr != pdp);
@@ -139,7 +140,7 @@ CDrvdPropScalar::GetDrvdScalarProps(CDrvdProp *pdp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CDrvdPropScalar::FSatisfies(const CReqdPropPlan *prpp) const
+CDrvdPropScalar::FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const
 {
 	GPOS_ASSERT(nullptr != prpp);
 	GPOS_ASSERT(nullptr != prpp->PcrsRequired());
@@ -150,7 +151,7 @@ CDrvdPropScalar::FSatisfies(const CReqdPropPlan *prpp) const
 }
 
 // defined columns
-CColRefSet *
+gpos::pointer<CColRefSet *>
 CDrvdPropScalar::GetDefinedColumns() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
@@ -180,7 +181,7 @@ CDrvdPropScalar::DeriveDefinedColumns(CExpressionHandle &exprhdl)
 }
 
 // used columns
-CColRefSet *
+gpos::pointer<CColRefSet *>
 CDrvdPropScalar::GetUsedColumns() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
@@ -217,7 +218,7 @@ CDrvdPropScalar::DeriveUsedColumns(CExpressionHandle &exprhdl)
 }
 
 // columns containing set-returning function
-CColRefSet *
+gpos::pointer<CColRefSet *>
 CDrvdPropScalar::GetSetReturningFunctionColumns() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
@@ -276,7 +277,7 @@ CDrvdPropScalar::DeriveHasSubquery(CExpressionHandle &exprhdl)
 }
 
 // derived partition consumers
-CPartInfo *
+gpos::pointer<CPartInfo *>
 CDrvdPropScalar::GetPartitionInfo() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
@@ -302,7 +303,7 @@ CDrvdPropScalar::DerivePartitionInfo(CExpressionHandle &exprhdl)
 }
 
 // function properties
-CFunctionProp *
+gpos::pointer<CFunctionProp *>
 CDrvdPropScalar::GetFunctionProperties() const
 {
 	GPOS_RTL_ASSERT(IsComplete());

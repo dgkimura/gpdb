@@ -64,10 +64,10 @@ private:
 	CMDAccessor *m_pmda;
 
 	// cost model
-	ICostModel *m_cost_model;
+	gpos::pointer<ICostModel *> m_cost_model;
 
 	// constant expression evaluator
-	IConstExprEvaluator *m_pceeval;
+	gpos::owner<IConstExprEvaluator *> m_pceeval;
 
 	// comparator between IDatum instances
 	IComparator *m_pcomp;
@@ -76,13 +76,13 @@ private:
 	ULONG m_auPartId;
 
 	// global CTE information
-	CCTEInfo *m_pcteinfo;
+	gpos::owner<CCTEInfo *> m_pcteinfo;
 
 	// system columns required in query output
 	gpos::owner<CColRefArray *> m_pdrgpcrSystemCols;
 
 	// optimizer configurations
-	COptimizerConfig *m_optimizer_config;
+	gpos::owner<COptimizerConfig *> m_optimizer_config;
 
 	// whether or not we are optimizing a DML query
 	BOOL m_fDMLQuery;
@@ -101,7 +101,7 @@ private:
 	BOOL m_has_replicated_tables;
 
 	// does this plan have a direct dispatchable filter
-	CExpressionArray *m_direct_dispatchable_filters;
+	gpos::owner<CExpressionArray *> m_direct_dispatchable_filters;
 
 	// mappings of dynamic scan -> partition indexes (after static elimination)
 	// this is mainetained here to avoid dependencies on optimization order
@@ -113,14 +113,14 @@ private:
 	// making an assumption about the order the scan vs partition selector
 	// is translated, and would also need information from the append's
 	// child dxl nodes.
-	UlongToBitSetMap *m_scanid_to_part_map;
+	gpos::owner<UlongToBitSetMap *> m_scanid_to_part_map;
 
 	// unique id per partition selector in the memo
 	ULONG m_selector_id_counter;
 
 	// detailed info (filter expr, stats etc) per partition selector
 	// (required by CDynamicPhysicalScan for recomputing statistics for DPE)
-	SPartSelectorInfo *m_part_selector_info;
+	gpos::owner<SPartSelectorInfo *> m_part_selector_info;
 
 public:
 	COptCtxt(COptCtxt &) = delete;

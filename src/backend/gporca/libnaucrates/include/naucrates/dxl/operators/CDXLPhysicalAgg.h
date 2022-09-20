@@ -54,7 +54,7 @@ private:
 	CDXLPhysicalAgg(const CDXLPhysicalAgg &);
 
 	// grouping column ids
-	ULongPtrArray *m_grouping_colids_array;
+	gpos::owner<ULongPtrArray *> m_grouping_colids_array;
 
 	EdxlAggStrategy m_dxl_agg_strategy;
 

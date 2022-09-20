@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalDynamicGet_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/metadata/CName.h"
@@ -32,7 +33,7 @@ class CLogicalDynamicGet : public CLogicalDynamicGetBase
 {
 protected:
 	// Disjunction of selected child partition's constraints after static pruning
-	CConstraint *m_partition_cnstrs_disj{nullptr};
+	gpos::owner<CConstraint *> m_partition_cnstrs_disj{nullptr};
 
 	// Has done static pruning
 	BOOL m_static_pruned{false};
@@ -72,7 +73,7 @@ public:
 	}
 
 	// return disjunctive constraint of selected partitions
-	CConstraint *
+	gpos::pointer<CConstraint *>
 	GetPartitionConstraintsDisj() const
 	{
 		return m_partition_cnstrs_disj;
@@ -95,9 +96,9 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -114,7 +115,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	gpos::pointer<CTableDescriptor *>
 	DeriveTableDescriptor(CMemoryPool *,	   // mp
 						  CExpressionHandle &  // exprhdl
 	) const override
@@ -133,10 +134,10 @@ public:
 
 	// compute required stat columns of the n-th child
 	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp,
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   //pcrsInput
-			 ULONG				   // child_index
+	PcrsStat(CMemoryPool *,				   // mp,
+			 CExpressionHandle &,		   // exprhdl
+			 gpos::pointer<CColRefSet *>,  //pcrsInput
+			 ULONG						   // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalDynamicGet has no children");
@@ -159,8 +160,9 @@ public:
 							  IStatisticsArray *stats_ctxt) const override;
 
 	// derive stats from base table using filters on partition and/or index columns
-	IStatistics *PstatsDeriveFilter(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CExpression *pexprFilter) const;
+	IStatistics *PstatsDeriveFilter(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::owner<CExpression *> pexprFilter) const;
 
 	// stat promise
 	EStatPromise
@@ -174,7 +176,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalDynamicGet *
+	static gpos::cast_func<CLogicalDynamicGet *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

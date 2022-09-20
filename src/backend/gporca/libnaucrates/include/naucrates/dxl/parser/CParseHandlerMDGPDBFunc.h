@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDGPDBFunc_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 #include "naucrates/md/CMDFunctionGPDB.h"
@@ -46,7 +47,7 @@ private:
 	gpos::Ref<IMDId> m_mdid_type_result;
 
 	// output argument types
-	IMdIdArray *m_mdid_types_array;
+	gpos::pointer<IMdIdArray *> m_mdid_types_array;
 
 	// whether function returns a set of values
 	BOOL m_returns_set;

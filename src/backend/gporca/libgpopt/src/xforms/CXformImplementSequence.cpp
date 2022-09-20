@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementSequence.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogicalSequence.h"
@@ -57,11 +58,11 @@ CXformImplementSequence::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	CExpressionArray *pdrgpexpr = pexpr->PdrgPexpr();
+	gpos::owner<CExpressionArray *> pdrgpexpr = pexpr->PdrgPexpr();
 	pdrgpexpr->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CPhysicalSequence(mp), pdrgpexpr);
 	// add alternative to transformation result
 	pxfres->Add(pexprAlt);

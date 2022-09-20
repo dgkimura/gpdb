@@ -12,6 +12,7 @@
 #define GPOPT_CJoinOrder_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/io/IOstream.h"
 
 #include "gpopt/operators/CExpression.h"
@@ -56,10 +57,10 @@ public:
 	struct SEdge : public CRefCount, public DbgPrintMixin<SEdge>
 	{
 		// cover of edge
-		CBitSet *m_pbs;
+		gpos::owner<CBitSet *> m_pbs;
 
 		// associated conjunct
-		CExpression *m_pexpr;
+		gpos::owner<CExpression *> m_pexpr;
 
 		// tracks if the associated join is a LOJ:
 		// check the derived classes of CJoinOrder, but here is a high-level summary:
@@ -93,13 +94,13 @@ public:
 	struct SComponent : public CRefCount, public DbgPrintMixin<SComponent>
 	{
 		// cover
-		CBitSet *m_pbs;
+		gpos::owner<CBitSet *> m_pbs;
 
 		// set of edges associated with this component (stored as indexes into m_rgpedge array)
-		CBitSet *m_edge_set;
+		gpos::owner<CBitSet *> m_edge_set;
 
 		// associated expression
-		CExpression *m_pexpr;
+		gpos::owner<CExpression *> m_pexpr;
 
 		// a flag to component edge as used
 		BOOL m_fUsed;
@@ -227,13 +228,15 @@ public:
 	CJoinOrder(const CJoinOrder &) = delete;
 
 	// ctor used in MinCard, Greedy and DP xforms
-	CJoinOrder(CMemoryPool *mp, CExpressionArray *pdrgpexprComponents,
-			   CExpressionArray *pdrgpexprConjuncts,
+	CJoinOrder(CMemoryPool *mp,
+			   gpos::owner<CExpressionArray *> pdrgpexprComponents,
+			   gpos::owner<CExpressionArray *> pdrgpexprConjuncts,
 			   BOOL include_outer_join_childs);
 
 	// ctor used in CXformExpandNAryJoinDPv2
-	CJoinOrder(CMemoryPool *mp, CExpressionArray *pdrgpexprComponents,
-			   CExpressionArray *innerJoinPredConjuncts,
+	CJoinOrder(CMemoryPool *mp,
+			   gpos::owner<CExpressionArray *> pdrgpexprComponents,
+			   gpos::owner<CExpressionArray *> innerJoinPredConjuncts,
 			   CExpressionArray *onPreds, ULongPtrArray *childPredIndexes);
 
 	// dtor
@@ -243,10 +246,12 @@ public:
 	IOstream &OsPrint(IOstream &) const;
 
 	// is this a valid join combination
-	static BOOL IsValidJoinCombination(SComponent *comp1, SComponent *comp2);
+	static BOOL IsValidJoinCombination(gpos::pointer<SComponent *> comp1,
+									   gpos::pointer<SComponent *> comp2);
 
 	// are these childs of the same LOJ
-	static BOOL IsChildOfSameLOJ(SComponent *comp1, SComponent *comp2);
+	static BOOL IsChildOfSameLOJ(gpos::pointer<SComponent *> comp1,
+								 gpos::pointer<SComponent *> comp2);
 
 	virtual CXform::EXformId
 	EOriginXForm() const

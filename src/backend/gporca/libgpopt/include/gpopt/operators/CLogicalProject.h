@@ -12,6 +12,7 @@
 #define GPOS_CLogicalProject_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -79,7 +80,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *DerivePropertyConstraint(
+	gpos::owner<CPropConstraint *> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -98,7 +99,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalProject *
+	static gpos::cast_func<CLogicalProject *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

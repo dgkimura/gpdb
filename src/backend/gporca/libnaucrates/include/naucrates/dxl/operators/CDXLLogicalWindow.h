@@ -33,7 +33,7 @@ class CDXLLogicalWindow : public CDXLLogical
 {
 private:
 	// array of window specifications
-	CDXLWindowSpecArray *m_window_spec_array;
+	gpos::owner<CDXLWindowSpecArray *> m_window_spec_array;
 
 	// private copy ctor
 	CDXLLogicalWindow(CDXLLogicalWindow &);
@@ -53,7 +53,7 @@ public:
 	ULONG NumOfWindowSpecs() const;
 
 	// return the window key at a given position
-	CDXLWindowSpec *GetWindowKeyAt(ULONG idx) const;
+	gpos::pointer<CDXLWindowSpec *> GetWindowKeyAt(ULONG idx) const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

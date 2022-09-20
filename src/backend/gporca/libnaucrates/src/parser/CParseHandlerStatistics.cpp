@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerStatistics.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -74,7 +76,7 @@ CParseHandlerStatistics::GetParseHandlerType() const
 //		Returns the list of statistics objects constructed by the parser
 //
 //---------------------------------------------------------------------------
-CDXLStatsDerivedRelationArray *
+gpos::pointer<CDXLStatsDerivedRelationArray *>
 CParseHandlerStatistics::GetStatsDerivedRelDXLArray() const
 {
 	return m_dxl_stats_derived_rel_array;
@@ -156,7 +158,7 @@ CParseHandlerStatistics::EndElement(const XMLCh *const,	 // element_uri,
 		CParseHandlerStatsDerivedRelation *stats_derived_rel_parse_handler =
 			dynamic_cast<CParseHandlerStatsDerivedRelation *>((*this)[idx]);
 
-		CDXLStatsDerivedRelation *dxl_stats_derived_relation =
+		gpos::owner<CDXLStatsDerivedRelation *> dxl_stats_derived_relation =
 			stats_derived_rel_parse_handler->GetDxlStatsDrvdRelation();
 		dxl_stats_derived_relation->AddRef();
 		m_dxl_stats_derived_rel_array->Append(dxl_stats_derived_relation);

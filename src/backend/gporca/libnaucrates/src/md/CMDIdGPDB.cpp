@@ -11,6 +11,8 @@
 
 #include "naucrates/md/CMDIdGPDB.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpos;
@@ -293,14 +295,14 @@ CMDIdGPDB::VersionMinor() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdGPDB::Equals(const IMDId *mdid) const
+CMDIdGPDB::Equals(gpos::pointer<const IMDId *> mdid) const
 {
 	if (nullptr == mdid || EmdidGPDB != mdid->MdidType())
 	{
 		return false;
 	}
 
-	const CMDIdGPDB *mdidGPDB =
+	gpos::pointer<const CMDIdGPDB *> mdidGPDB =
 		static_cast<CMDIdGPDB *>(const_cast<IMDId *>(mdid));
 
 	return (m_oid == mdidGPDB->Oid() &&

@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalSequence_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogical.h"
@@ -78,8 +79,8 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive output columns
-	CColRefSet *DeriveOutputColumns(CMemoryPool *mp,
-									CExpressionHandle &exprhdl) override;
+	gpos::owner<CColRefSet *> DeriveOutputColumns(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) override;
 
 	// dervive keys
 	CKeyCollection *DeriveKeyCollection(
@@ -106,7 +107,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required stat columns of the n-th child
-	CColRefSet *
+	gpos::owner<CColRefSet *>
 	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput,
 			 ULONG child_index) const override
 	{
@@ -122,14 +123,14 @@ public:
 	}
 
 	// derive statistics
-	IStatistics *
+	gpos::owner<IStatistics *>
 	PstatsDerive(CMemoryPool *,	 //mp,
 				 CExpressionHandle &exprhdl,
 				 IStatisticsArray *	 //stats_ctxt
 	) const override
 	{
 		// pass through stats from last child
-		IStatistics *stats = exprhdl.Pstats(exprhdl.Arity() - 1);
+		gpos::owner<IStatistics *> stats = exprhdl.Pstats(exprhdl.Arity() - 1);
 		stats->AddRef();
 
 		return stats;
@@ -154,7 +155,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalSequence *
+	static gpos::cast_func<CLogicalSequence *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

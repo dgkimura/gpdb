@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformGbAggDedup2HashAggDedup.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalGbAggDeduplicate.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -59,10 +60,10 @@ CXformGbAggDedup2HashAggDedup::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 	CLogicalGbAggDeduplicate *popAggDedup =
 		CLogicalGbAggDeduplicate::PopConvert(pexpr->Pop());
-	CColRefArray *colref_array = popAggDedup->Pdrgpcr();
+	gpos::owner<CColRefArray *> colref_array = popAggDedup->Pdrgpcr();
 	colref_array->AddRef();
 
-	CColRefArray *pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
+	gpos::owner<CColRefArray *> pdrgpcrKeys = popAggDedup->PdrgpcrKeys();
 	pdrgpcrKeys->AddRef();
 
 	// extract components
@@ -75,7 +76,7 @@ CXformGbAggDedup2HashAggDedup::Transform(CXformContext *pxfctxt,
 	pexprScalar->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalHashAggDeduplicate(
 			mp, colref_array, popAggDedup->PdrgpcrMinimal(),

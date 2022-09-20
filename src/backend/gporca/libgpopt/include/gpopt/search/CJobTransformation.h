@@ -11,6 +11,8 @@
 #ifndef GPOPT_CJobTransformation_H
 #define GPOPT_CJobTransformation_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/search/CJob.h"
 #include "gpopt/search/CJobStateMachine.h"
 
@@ -57,10 +59,10 @@ private:
 	using JSM = CJobStateMachine<EState, estSentinel, EEvent, eevSentinel>;
 
 	// target group expression
-	CGroupExpression *m_pgexpr;
+	gpos::pointer<CGroupExpression *> m_pgexpr;
 
 	// xform to apply to group expression
-	CXform *m_xform;
+	gpos::pointer<CXform *> m_xform;
 
 	// job state machine
 	JSM m_jsm;

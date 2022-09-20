@@ -47,7 +47,7 @@ public:
 
 private:
 	// required sort order
-	COrderSpec *m_pos;
+	gpos::owner<COrderSpec *> m_pos;
 
 	// order matching type
 	EOrderMatching m_eom;

@@ -12,6 +12,7 @@
 
 #include "naucrates/md/IMDCacheObject.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -30,7 +31,7 @@ using namespace gpmd;
 void
 IMDCacheObject::SerializeMDIdAsElem(CXMLSerializer *xml_serializer,
 									const CWStringConst *element_name,
-									const IMDId *mdid) const
+									gpos::pointer<const IMDId *> mdid) const
 {
 	if (nullptr == mdid)
 	{
@@ -57,7 +58,7 @@ IMDCacheObject::SerializeMDIdAsElem(CXMLSerializer *xml_serializer,
 //---------------------------------------------------------------------------
 void
 IMDCacheObject::SerializeMDIdList(CXMLSerializer *xml_serializer,
-								  const IMdIdArray *mdid_array,
+								  gpos::pointer<const IMdIdArray *> mdid_array,
 								  const CWStringConst *strTokenList,
 								  const CWStringConst *strTokenListItem)
 {

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerPhysicalDynamicBitmapTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalAbstractBitmapScan.h"
@@ -35,7 +36,7 @@ class CParseHandlerPhysicalDynamicBitmapTableScan
 	: public CParseHandlerPhysicalAbstractBitmapScan
 {
 private:
-	ULongPtrArray *m_selector_ids;
+	gpos::pointer<ULongPtrArray *> m_selector_ids;
 
 	// process the start of an element
 	void StartElement(

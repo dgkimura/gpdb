@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerDynamicTableScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLPhysicalDynamicTableScan.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -155,12 +157,13 @@ CParseHandlerDynamicTableScan::EndElement(const XMLCh *const,  // element_uri,
 
 
 	// set table descriptor
-	CDXLTableDescr *table_descr = table_descr_parse_handler->GetDXLTableDescr();
+	gpos::owner<CDXLTableDescr *> table_descr =
+		table_descr_parse_handler->GetDXLTableDescr();
 	table_descr->AddRef();
 
 	gpos::Ref<IMdIdArray> mdid_partitions_array =
 		partition_mdids_parse_handler->GetMdIdArray();
-	CDXLPhysicalDynamicTableScan *dxl_op =
+	gpos::owner<CDXLPhysicalDynamicTableScan *> dxl_op =
 		GPOS_NEW(m_mp) CDXLPhysicalDynamicTableScan(
 			m_mp, table_descr, mdid_partitions_array, m_selector_ids);
 

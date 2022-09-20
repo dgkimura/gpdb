@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/cost/CCostTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/task/CAutoTraceFlag.h"
 
@@ -214,7 +215,7 @@ CCostTest::EresUnittest_Params()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -292,11 +293,12 @@ CCostTest::EresUnittest_SetParams()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
-	ICostModel *pcm = GPOS_NEW(mp) CCostModelGPDB(mp, GPOPT_TEST_SEGMENTS);
+	gpos::owner<ICostModel *> pcm =
+		GPOS_NEW(mp) CCostModelGPDB(mp, GPOPT_TEST_SEGMENTS);
 
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */ pcm);
@@ -308,11 +310,12 @@ CCostTest::EresUnittest_SetParams()
 	const CColRef *pcrInner = pexprInner->DeriveOutputColumns()->PcrAny();
 	CExpression *pexprPred =
 		CUtils::PexprScalarCmp(mp, pcrOuter, pcrInner, IMDType::EcmptNEq);
-	CExpression *pexpr = CUtils::PexprLogicalJoin<CLogicalInnerJoin>(
-		mp, pexprOuter, pexprInner, pexprPred);
+	gpos::owner<CExpression *> pexpr =
+		CUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp, pexprOuter, pexprInner,
+													pexprPred);
 
 	// optimize in-equality join based on default cost model params
-	CExpression *pexprPlan1 = nullptr;
+	gpos::owner<CExpression *> pexprPlan1 = nullptr;
 	{
 		CEngine eng(mp);
 
@@ -341,7 +344,7 @@ CCostTest::EresUnittest_SetParams()
 										dVal + 0.5);
 
 	// optimize again after updating NLJ cost factor
-	CExpression *pexprPlan2 = nullptr;
+	gpos::owner<CExpression *> pexprPlan2 = nullptr;
 	{
 		CEngine eng(mp);
 

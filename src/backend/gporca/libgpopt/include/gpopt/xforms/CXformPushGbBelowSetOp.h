@@ -12,6 +12,7 @@
 #define GPOPT_CXformPushGbBelowSetOp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CPatternMultiLeaf.h"
@@ -103,11 +104,13 @@ public:
 
 		CColRefArray *pdrgpcrGb = popGbAgg->Pdrgpcr();
 		CColRefArray *pdrgpcrOutput = popSetOp->PdrgpcrOutput();
-		CColRefSet *pcrsOutput = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrOutput);
+		gpos::owner<CColRefSet *> pcrsOutput =
+			GPOS_NEW(mp) CColRefSet(mp, pdrgpcrOutput);
 		CColRef2dArray *pdrgpdrgpcrInput = popSetOp->PdrgpdrgpcrInput();
-		CExpressionArray *pdrgpexprNewChildren =
+		gpos::owner<CExpressionArray *> pdrgpexprNewChildren =
 			GPOS_NEW(mp) CExpressionArray(mp);
-		CColRef2dArray *pdrgpdrgpcrNewInput = GPOS_NEW(mp) CColRef2dArray(mp);
+		gpos::owner<CColRef2dArray *> pdrgpdrgpcrNewInput =
+			GPOS_NEW(mp) CColRef2dArray(mp);
 		const ULONG arity = pexprSetOp->Arity();
 
 		BOOL fNewChild = false;
@@ -116,13 +119,14 @@ public:
 		{
 			CExpression *pexprChild = (*pexprSetOp)[ulChild];
 			CColRefArray *pdrgpcrChild = (*pdrgpdrgpcrInput)[ulChild];
-			CColRefSet *pcrsChild = GPOS_NEW(mp) CColRefSet(mp, pdrgpcrChild);
+			gpos::owner<CColRefSet *> pcrsChild =
+				GPOS_NEW(mp) CColRefSet(mp, pdrgpcrChild);
 
 			CColRefArray *pdrgpcrChildGb = nullptr;
 			if (!pcrsChild->Equals(pcrsOutput))
 			{
 				// use column mapping in SetOp to set child grouping colums
-				UlongToColRefMap *colref_mapping =
+				gpos::owner<UlongToColRefMap *> colref_mapping =
 					CUtils::PhmulcrMapping(mp, pdrgpcrOutput, pdrgpcrChild);
 				pdrgpcrChildGb = CUtils::PdrgpcrRemap(
 					mp, pdrgpcrGb, colref_mapping, true /*must_exist*/);
@@ -176,14 +180,14 @@ public:
 		}
 
 		pdrgpcrGb->AddRef();
-		TSetOp *popSetOpNew =
+		gpos::owner<TSetOp *> popSetOpNew =
 			GPOS_NEW(mp) TSetOp(mp, pdrgpcrGb, pdrgpdrgpcrNewInput);
-		CExpression *pexprNewSetOp =
+		gpos::owner<CExpression *> pexprNewSetOp =
 			GPOS_NEW(mp) CExpression(mp, popSetOpNew, pdrgpexprNewChildren);
 
 		popGbAgg->AddRef();
 		pexprPrjList->AddRef();
-		CExpression *pexprResult =
+		gpos::owner<CExpression *> pexprResult =
 			GPOS_NEW(mp) CExpression(mp, popGbAgg, pexprNewSetOp, pexprPrjList);
 
 		pxfres->Add(pexprResult);

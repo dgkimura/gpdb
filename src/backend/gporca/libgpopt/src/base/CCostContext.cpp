@@ -12,6 +12,7 @@
 #include "gpopt/base/CCostContext.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/string/CWStringDynamic.h"
@@ -319,7 +320,8 @@ CCostContext::IsValid(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 void
 CCostContext::BreakCostTiesForJoinPlans(
-	const CCostContext *pccFst, const CCostContext *pccSnd,
+	gpos::pointer<const CCostContext *> pccFst,
+	gpos::pointer<const CCostContext *> pccSnd,
 	CONST_COSTCTXT_PTR *ppccPrefered,  // output: preferred cost context
 	BOOL *pfTiesResolved  // output: if true, tie resolution has succeeded
 )
@@ -399,7 +401,7 @@ CCostContext::BreakCostTiesForJoinPlans(
 //
 //---------------------------------------------------------------------------
 BOOL
-CCostContext::FBetterThan(const CCostContext *pcc) const
+CCostContext::FBetterThan(gpos::pointer<const CCostContext *> pcc) const
 {
 	GPOS_ASSERT(nullptr != pcc);
 	GPOS_ASSERT(*m_poc == *(pcc->Poc()));
@@ -474,7 +476,7 @@ CCostContext::FBetterThan(const CCostContext *pcc) const
 	if (CUtils::FPhysicalJoin(Pgexpr()->Pop()) &&
 		CUtils::FPhysicalJoin(pcc->Pgexpr()->Pop()))
 	{
-		CONST_COSTCTXT_PTR pccPrefered = nullptr;
+		gpos::pointer<CONST_COSTCTXT_PTR> pccPrefered = nullptr;
 		BOOL fSuccess = false;
 		BreakCostTiesForJoinPlans(this, pcc, &pccPrefered, &fSuccess);
 		if (fSuccess)
@@ -506,7 +508,8 @@ CCostContext::FBetterThan(const CCostContext *pcc) const
 }
 
 BOOL
-CCostContext::IsTwoStageScalarDQACostCtxt(const CCostContext *pcc)
+CCostContext::IsTwoStageScalarDQACostCtxt(
+	gpos::pointer<const CCostContext *> pcc)
 {
 	if (CUtils::FPhysicalAgg(pcc->Pgexpr()->Pop()))
 	{
@@ -521,7 +524,8 @@ CCostContext::IsTwoStageScalarDQACostCtxt(const CCostContext *pcc)
 }
 
 BOOL
-CCostContext::IsThreeStageScalarDQACostCtxt(const CCostContext *pcc)
+CCostContext::IsThreeStageScalarDQACostCtxt(
+	gpos::pointer<const CCostContext *> pcc)
 {
 	if (CUtils::FPhysicalAgg(pcc->Pgexpr()->Pop()))
 	{
@@ -601,7 +605,7 @@ CCostContext::CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren)
 	ci.SetRebinds(num_rebinds);
 	GPOS_ASSERT_IMP(
 		!exprhdl.HasOuterRefs(),
-		GPOPT_DEFAULT_REBINDS == (ULONG)(num_rebinds) &&
+		GPOPT_DEFAULT_REBINDS == (ULONG) (num_rebinds) &&
 			"invalid number of rebinds when there are no outer references");
 
 	// extract children costing info
@@ -611,7 +615,7 @@ CCostContext::CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren)
 		CCostContext *pccChild = pocChild->PccBest();
 		GPOS_ASSERT(nullptr != pccChild);
 
-		IStatistics *child_stats = pccChild->Pstats();
+		gpos::owner<IStatistics *> child_stats = pccChild->Pstats();
 
 		child_stats->AddRef();
 		ci.SetChildStats(ul,
@@ -634,7 +638,7 @@ CCostContext::CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren)
 		ci.SetChildRebinds(ul, dRebindsChild);
 		GPOS_ASSERT_IMP(
 			!exprhdl.HasOuterRefs(ul),
-			GPOPT_DEFAULT_REBINDS == (ULONG)(dRebindsChild) &&
+			GPOPT_DEFAULT_REBINDS == (ULONG) (dRebindsChild) &&
 				"invalid number of rebinds when there are no outer references");
 
 		DOUBLE dCostChild = (*pdrgpcostChildren)[ul]->Get();
@@ -666,9 +670,10 @@ CCostContext::DRowsPerHost() const
 		CDistributionSpecHashed *pdshashed =
 			CDistributionSpecHashed::PdsConvert(pds);
 		CExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
-		CColRefSet *pcrsUsed = CUtils::PcrsExtractColumns(m_mp, pdrgpexpr);
+		gpos::owner<CColRefSet *> pcrsUsed =
+			CUtils::PcrsExtractColumns(m_mp, pdrgpexpr);
 
-		const CColRefSet *pcrsReqdStats =
+		gpos::pointer<const CColRefSet *> pcrsReqdStats =
 			this->Poc()->GetReqdRelationalProps()->PcrsStat();
 		if (!pcrsReqdStats->ContainsAll(pcrsUsed))
 		{
@@ -680,7 +685,8 @@ CCostContext::DRowsPerHost() const
 			return CDouble(rows / ulHosts);
 		}
 
-		ULongPtrArray *pdrgpul = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
+		gpos::owner<ULongPtrArray *> pdrgpul =
+			GPOS_NEW(m_mp) ULongPtrArray(m_mp);
 		pcrsUsed->ExtractColIds(m_mp, pdrgpul);
 		pcrsUsed->Release();
 

@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalDynamicTableScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -93,7 +95,7 @@ CDXLPhysicalDynamicTableScan::GetOpNameStr() const
 //		Table descriptor for the table scan
 //
 //---------------------------------------------------------------------------
-const CDXLTableDescr *
+gpos::pointer<const CDXLTableDescr *>
 CDXLPhysicalDynamicTableScan::GetDXLTableDescr() const
 {
 	return m_dxl_table_descr;
@@ -114,8 +116,8 @@ CDXLPhysicalDynamicTableScan::GetParts() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
-											 const CDXLNode *node) const
+CDXLPhysicalDynamicTableScan::SerializeToDXL(
+	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

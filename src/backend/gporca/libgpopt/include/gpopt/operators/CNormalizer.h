@@ -13,6 +13,7 @@
 #define GPOPT_CNormalizer_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 
@@ -32,7 +33,8 @@ class CNormalizer
 {
 private:
 	//  return true if second expression is a child of first expression
-	static BOOL FChild(CExpression *pexpr, CExpression *pexprChild);
+	static BOOL FChild(gpos::pointer<CExpression *> pexpr,
+					   gpos::pointer<CExpression *> pexprChild);
 
 	// simplify outer joins
 	static BOOL FSimplifySelectOnOuterJoin(CMemoryPool *mp,
@@ -46,22 +48,24 @@ private:
 										  CExpression **ppexprResult);
 
 	// call normalizer recursively on expression children
-	static CExpression *PexprRecursiveNormalize(CMemoryPool *mp,
-												CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprRecursiveNormalize(
+		CMemoryPool *mp, CExpression *pexpr);
 
 	// check if a scalar predicate can be pushed through a logical expression
-	static BOOL FPushable(CExpression *pexprLogical, CExpression *pexprPred);
+	static BOOL FPushable(gpos::pointer<CExpression *> pexprLogical,
+						  gpos::pointer<CExpression *> pexprPred);
 
 	// check if a scalar predicate can be pushed through the child of a sequence project expression
-	static BOOL FPushableThruSeqPrjChild(CExpression *pexprSeqPrj,
-										 CExpression *pexprPred);
+	static BOOL FPushableThruSeqPrjChild(
+		gpos::pointer<CExpression *> pexprSeqPrj,
+		gpos::pointer<CExpression *> pexprPred);
 
 	// check if a conjunct should be pushed through expression's outer child
-	static BOOL FPushThruOuterChild(CExpression *pexprLogical);
+	static BOOL FPushThruOuterChild(gpos::pointer<CExpression *> pexprLogical);
 
 	// return a Select expression, if needed, with a scalar condition made of given array of conjuncts
 	static CExpression *PexprSelect(CMemoryPool *mp, CExpression *pexpr,
-									CExpressionArray *pdrgpexpr);
+									gpos::owner<CExpressionArray *> pdrgpexpr);
 
 	// push scalar expression through an expression with unary operator with scalar child
 	static void PushThruUnaryWithScalarChild(CMemoryPool *mp,
@@ -128,15 +132,15 @@ private:
 
 	// pull logical projects as far up the logical tree as possible, and
 	// combine consecutive projects if possible
-	static CExpression *PexprPullUpAndCombineProjects(CMemoryPool *mp,
-													  CExpression *pexpr,
-													  BOOL *pfSuccess);
+	static gpos::owner<CExpression *> PexprPullUpAndCombineProjects(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr, BOOL *pfSuccess);
 
 	// pull up project elements from the given projection expression that do not
 	// exist in the given used columns set
-	static CExpression *PexprPullUpProjectElements(
-		CMemoryPool *mp, CExpression *pexpr, CColRefSet *pcrsUsed,
-		CColRefSet *pcrsOutput, CExpressionArray *pdrgpexprPrElPullUp);
+	static gpos::owner<CExpression *> PexprPullUpProjectElements(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr,
+		CColRefSet *pcrsUsed, CColRefSet *pcrsOutput,
+		CExpressionArray *pdrgpexprPrElPullUp);
 
 #ifdef GPOS_DEBUG
 	// check if the columns used by the operator are a subset of its input columns
@@ -146,7 +150,8 @@ private:
 
 public:
 	// main driver
-	static CExpression *PexprNormalize(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprNormalize(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexpr);
 
 	// normalize joins so that they are on colrefs
 	static CExpression *PexprNormalizeJoins(CMemoryPool *mp,

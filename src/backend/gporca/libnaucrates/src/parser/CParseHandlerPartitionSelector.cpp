@@ -13,6 +13,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPartitionSelector.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLPhysicalPartitionSelector.h"
@@ -192,7 +194,7 @@ CParseHandlerPartitionSelector::EndElement(
 				   str->GetBuffer());
 	}
 
-	CDXLPhysicalPartitionSelector *dxl_op =
+	gpos::owner<CDXLPhysicalPartitionSelector *> dxl_op =
 		GPOS_NEW(m_mp) CDXLPhysicalPartitionSelector(
 			m_mp, m_rel_mdid, m_selector_id, m_scan_id, m_partitions);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);

@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalDynamicBitmapTableScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
@@ -56,7 +58,7 @@ CDXLPhysicalDynamicBitmapTableScan::~CDXLPhysicalDynamicBitmapTableScan()
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalDynamicBitmapTableScan::SerializeToDXL(
-	CXMLSerializer *xml_serializer, const CDXLNode *node) const
+	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

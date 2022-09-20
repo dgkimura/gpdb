@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CAutoRef.h"
 #include "gpos/common/CBitSetIter.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/test/CUnittest.h"
 
@@ -58,7 +59,7 @@ CBitSetIterTest::EresUnittest_Basics()
 	CMemoryPool *mp = amp.Pmp();
 
 	ULONG vector_size = 32;
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
+	gpos::owner<CBitSet *> pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
 
 	ULONG cInserts = 10;
 	for (ULONG i = 0; i < cInserts; i++)

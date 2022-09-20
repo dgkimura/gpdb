@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalDifferenceAll.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/CUtils.h"
@@ -88,7 +89,7 @@ CLogicalDifferenceAll::DeriveMaxCard(CMemoryPool *,	 // mp
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalDifferenceAll::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -135,11 +136,12 @@ CLogicalDifferenceAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// difference all is transformed into a LASJ,
 	// we follow the same route to compute statistics
-	CColRefSetArray *output_colrefsets = GPOS_NEW(mp) CColRefSetArray(mp);
+	gpos::owner<CColRefSetArray *> output_colrefsets =
+		GPOS_NEW(mp) CColRefSetArray(mp);
 	const ULONG size = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs =
+		gpos::owner<CColRefSet *> pcrs =
 			GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul]);
 		output_colrefsets->Append(pcrs);
 	}
@@ -148,12 +150,12 @@ CLogicalDifferenceAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	IStatistics *inner_side_stats = exprhdl.Pstats(1);
 
 	// construct the scalar condition for the LASJ
-	CExpression *pexprScCond =
+	gpos::owner<CExpression *> pexprScCond =
 		CUtils::PexprConjINDFCond(mp, m_pdrgpdrgpcrInput);
 
 	// compute the statistics for LASJ
 	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExpr(mp, exprhdl, pexprScCond,
 												  output_colrefsets, outer_refs,
 												  true	// is an LASJ
@@ -182,7 +184,7 @@ CLogicalDifferenceAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 CXformSet *
 CLogicalDifferenceAll::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfDifferenceAll2LeftAntiSemiJoin);
 	return xform_set;
 }

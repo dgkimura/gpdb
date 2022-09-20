@@ -12,6 +12,7 @@
 #define GPOPT_CXformImplementCorrelatedApply_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPatternLeaf.h"
 #include "gpopt/xforms/CXformImplementation.h"
@@ -81,7 +82,7 @@ public:
 		CExpression *pexprRight = (*pexpr)[1];
 		CExpression *pexprScalar = (*pexpr)[2];
 		TLogicalApply *popApply = TLogicalApply::PopConvert(pexpr->Pop());
-		CColRefArray *colref_array = popApply->PdrgPcrInner();
+		gpos::owner<CColRefArray *> colref_array = popApply->PdrgPcrInner();
 
 		colref_array->AddRef();
 
@@ -91,11 +92,11 @@ public:
 		pexprScalar->AddRef();
 
 		// assemble physical operator
-		CExpression *pexprPhysicalApply = GPOS_NEW(mp) CExpression(
-			mp,
-			GPOS_NEW(mp)
-				TPhysicalJoin(mp, colref_array, popApply->EopidOriginSubq()),
-			pexprLeft, pexprRight, pexprScalar);
+		gpos::owner<CExpression *> pexprPhysicalApply = GPOS_NEW(mp)
+			CExpression(mp,
+						GPOS_NEW(mp) TPhysicalJoin(mp, colref_array,
+												   popApply->EopidOriginSubq()),
+						pexprLeft, pexprRight, pexprScalar);
 
 		// add alternative to results
 		pxfres->Add(pexprPhysicalApply);

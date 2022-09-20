@@ -16,6 +16,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CAutoP.h"
 #include "gpos/common/CRandom.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/memory/CAutoMemoryPool.h"
@@ -130,7 +131,7 @@ CDXLUtilsTest::EresUnittest_SerializePlan()
 
 	ULLONG plan_id = gpos::ullong_max;
 	ULLONG plan_space_size = gpos::ullong_max;
-	CDXLNode *node = CDXLUtils::GetPlanDXLNode(
+	gpos::owner<CDXLNode *> node = CDXLUtils::GetPlanDXLNode(
 		mp, dxl_string, nullptr /*xsd_file_path*/, &plan_id, &plan_space_size);
 
 	// serialize with document header

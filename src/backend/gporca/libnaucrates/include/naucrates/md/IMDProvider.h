@@ -40,8 +40,9 @@ class IMDProvider : public CRefCount
 {
 protected:
 	// return the mdid for the requested type
-	static IMDId *GetGPDBTypeMdid(CMemoryPool *mp, CSystemId sysid,
-								  IMDType::ETypeInfo type_info);
+	static gpos::owner<IMDId *> GetGPDBTypeMdid(CMemoryPool *mp,
+												CSystemId sysid,
+												IMDType::ETypeInfo type_info);
 
 public:
 	~IMDProvider() override = default;

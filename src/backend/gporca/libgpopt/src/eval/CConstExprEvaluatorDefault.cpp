@@ -17,6 +17,8 @@
 
 #include "gpopt/eval/CConstExprEvaluatorDefault.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/operators/CExpression.h"
 
 using namespace gpopt;
@@ -40,8 +42,8 @@ CConstExprEvaluatorDefault::~CConstExprEvaluatorDefault() = default;
 //		Returns the given expression after having increased its ref count
 //
 //---------------------------------------------------------------------------
-CExpression *
-CConstExprEvaluatorDefault::PexprEval(CExpression *pexpr)
+gpos::owner<CExpression *>
+CConstExprEvaluatorDefault::PexprEval(gpos::pointer<CExpression *> pexpr)
 {
 	pexpr->AddRef();
 	return pexpr;

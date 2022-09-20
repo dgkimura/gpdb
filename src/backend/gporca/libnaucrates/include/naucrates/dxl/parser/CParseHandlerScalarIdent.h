@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerScalarIdent_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarIdent.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -35,7 +36,7 @@ class CParseHandlerScalarIdent : public CParseHandlerScalarOp
 {
 private:
 	// the scalar identifier
-	CDXLScalarIdent *m_dxl_op;
+	gpos::pointer<CDXLScalarIdent *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

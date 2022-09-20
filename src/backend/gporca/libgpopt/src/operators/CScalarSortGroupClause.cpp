@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarSortGroupClause.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -96,7 +97,7 @@ CScalarSortGroupClause::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarSortGroupClause::Eber(ULongPtrArray *  //pdrgpulChildren
+CScalarSortGroupClause::Eber(gpos::pointer<ULongPtrArray *>	 //pdrgpulChildren
 ) const
 {
 	return EberAny;

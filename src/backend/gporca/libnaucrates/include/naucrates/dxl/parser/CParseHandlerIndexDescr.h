@@ -14,6 +14,7 @@
 #define GPDXL_CParseHandlerIndexDescriptor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLIndexDescr.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -37,7 +38,7 @@ class CParseHandlerIndexDescr : public CParseHandlerBase
 {
 private:
 	// the index descriptor to construct
-	CDXLIndexDescr *m_dxl_index_descr;
+	gpos::owner<CDXLIndexDescr *> m_dxl_index_descr;
 
 	// process the start of an element
 	void StartElement(
@@ -64,7 +65,7 @@ public:
 	//dtor
 	~CParseHandlerIndexDescr() override;
 
-	CDXLIndexDescr *GetDXLIndexDescr();
+	gpos::pointer<CDXLIndexDescr *> GetDXLIndexDescr();
 };
 }  // namespace gpdxl
 

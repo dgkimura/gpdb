@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerScalarAssertConstraintList_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarAssertConstraint.h"
 #include "naucrates/dxl/operators/CDXLScalarAssertConstraintList.h"
@@ -36,13 +37,13 @@ class CParseHandlerScalarAssertConstraintList : public CParseHandlerScalarOp
 {
 private:
 	// scalar assert operator
-	CDXLScalarAssertConstraintList *m_dxl_op;
+	gpos::pointer<CDXLScalarAssertConstraintList *> m_dxl_op;
 
 	// current assert constraint
-	CDXLScalarAssertConstraint *m_dxl_op_assert_constraint;
+	gpos::pointer<CDXLScalarAssertConstraint *> m_dxl_op_assert_constraint;
 
 	// array of assert constraint nodes parsed so far
-	CDXLNodeArray *m_dxlnode_assert_constraints_parsed_array;
+	gpos::pointer<CDXLNodeArray *> m_dxlnode_assert_constraints_parsed_array;
 
 	// process the start of an element
 	void StartElement(

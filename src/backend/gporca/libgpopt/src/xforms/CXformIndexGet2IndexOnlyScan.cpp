@@ -14,6 +14,7 @@
 #include <cwchar>
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/metadata/CIndexDescriptor.h"
@@ -104,16 +105,18 @@ CXformIndexGet2IndexOnlyScan::Transform(CXformContext *pxfctxt,
 	}
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
-	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pindexdesc->MDId());
+	gpos::pointer<const IMDRelation *> pmdrel =
+		md_accessor->RetrieveRel(ptabdesc->MDId());
+	gpos::pointer<const IMDIndex *> pmdindex =
+		md_accessor->RetrieveIndex(pindexdesc->MDId());
 
-	CColRefArray *pdrgpcrOutput = pop->PdrgpcrOutput();
+	gpos::owner<CColRefArray *> pdrgpcrOutput = pop->PdrgpcrOutput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 	pdrgpcrOutput->AddRef();
 
-	CColRefSet *matched_cols =
+	gpos::owner<CColRefSet *> matched_cols =
 		CXformUtils::PcrsIndexKeys(mp, pdrgpcrOutput, pmdindex, pmdrel);
-	CColRefSet *output_cols = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> output_cols = GPOS_NEW(mp) CColRefSet(mp);
 
 	// An index only scan is allowed iff each used output column reference also
 	// exists as a column in the index.
@@ -158,7 +161,7 @@ CXformIndexGet2IndexOnlyScan::Transform(CXformContext *pxfctxt,
 	// addref all children
 	pexprIndexCond->AddRef();
 
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalIndexOnlyScan(
 			mp, pindexdesc, ptabdesc, pexpr->Pop()->UlOpId(),

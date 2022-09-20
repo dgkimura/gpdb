@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalDynamicGetBase.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -152,7 +153,7 @@ CLogicalDynamicGetBase::DeriveOutputColumns(CMemoryPool *mp,
 											CExpressionHandle &	 // exprhdl
 )
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	return pcrs;
@@ -206,11 +207,11 @@ CLogicalDynamicGetBase::DerivePartitionInfo(CMemoryPool *mp,
 											CExpressionHandle &	 // exprhdl
 ) const
 {
-	IMDId *mdid = m_ptabdesc->MDId();
+	gpos::owner<IMDId *> mdid = m_ptabdesc->MDId();
 	mdid->AddRef();
 	m_pdrgpdrgpcrPart->AddRef();
 
-	CPartInfo *ppartinfo = GPOS_NEW(mp) CPartInfo(mp);
+	gpos::owner<CPartInfo *> ppartinfo = GPOS_NEW(mp) CPartInfo(mp);
 	ppartinfo->AddPartConsumer(mp, m_scan_id, mdid, m_pdrgpdrgpcrPart);
 
 	return ppartinfo;
@@ -225,15 +226,18 @@ CLogicalDynamicGetBase::ConstructRootColMappingPerPart(
 {
 	CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	ColRefToUlongMapArray *part_maps = GPOS_NEW(mp) ColRefToUlongMapArray(mp);
+	gpos::owner<ColRefToUlongMapArray *> part_maps =
+		GPOS_NEW(mp) ColRefToUlongMapArray(mp);
 	for (ULONG ul = 0; ul < partition_mdids->Size(); ++ul)
 	{
 		gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
-		const IMDRelation *partrel = mda->RetrieveRel(part_mdid.get());
+		gpos::pointer<const IMDRelation *> partrel =
+			mda->RetrieveRel(part_mdid.get());
 
 		GPOS_ASSERT(nullptr != partrel);
 
-		ColRefToUlongMap *mapping = GPOS_NEW(mp) ColRefToUlongMap(mp);
+		gpos::owner<ColRefToUlongMap *> mapping =
+			GPOS_NEW(mp) ColRefToUlongMap(mp);
 
 		for (ULONG i = 0; i < root_cols->Size(); ++i)
 		{
@@ -242,7 +246,7 @@ CLogicalDynamicGetBase::ConstructRootColMappingPerPart(
 			BOOL found_mapping = false;
 			for (ULONG j = 0, idx = 0; j < partrel->ColumnCount(); ++j, ++idx)
 			{
-				const IMDColumn *coldesc = partrel->GetMdCol(j);
+				gpos::pointer<const IMDColumn *> coldesc = partrel->GetMdCol(j);
 				const CWStringConst *colname = coldesc->Mdname().GetMDName();
 
 				if (coldesc->IsDropped())

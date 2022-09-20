@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/metadata/CIndexDescriptorTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/string/CWStringDynamic.h"
 
@@ -57,7 +58,7 @@ CIndexDescriptorTest::EresUnittest_Basic()
 	CMemoryPool *mp = amp.Pmp();
 
 	// Setup an MD cache with a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -66,18 +67,20 @@ CIndexDescriptorTest::EresUnittest_Basic()
 					 CTestUtils::GetCostModel(mp));
 
 	CWStringConst strName(GPOS_WSZ_LIT("MyTable"));
-	CMDIdGPDB *mdid = GPOS_NEW(mp) CMDIdGPDB(GPOPT_MDCACHE_TEST_OID, 1, 1);
-	CTableDescriptor *ptabdesc =
+	gpos::owner<CMDIdGPDB *> mdid =
+		GPOS_NEW(mp) CMDIdGPDB(GPOPT_MDCACHE_TEST_OID, 1, 1);
+	gpos::owner<CTableDescriptor *> ptabdesc =
 		CTestUtils::PtabdescCreate(mp, 10, mdid, CName(&strName));
 
 	// get the index associated with the table
-	const IMDRelation *pmdrel = mda.RetrieveRel(ptabdesc->MDId());
+	gpos::pointer<const IMDRelation *> pmdrel =
+		mda.RetrieveRel(ptabdesc->MDId());
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 
 	// create an index descriptor
 	IMDId *pmdidIndex = pmdrel->IndexMDidAt(0);	 // get the first index
-	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
-	CIndexDescriptor *pindexdesc =
+	gpos::pointer<const IMDIndex *> pmdindex = mda.RetrieveIndex(pmdidIndex);
+	gpos::owner<CIndexDescriptor *> pindexdesc =
 		CIndexDescriptor::Pindexdesc(mp, ptabdesc, pmdindex);
 
 #ifdef GPOS_DEBUG

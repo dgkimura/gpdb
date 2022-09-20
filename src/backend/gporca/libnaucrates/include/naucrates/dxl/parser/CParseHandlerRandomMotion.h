@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerRandomMotion_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalRandomMotion.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -35,7 +36,7 @@ class CParseHandlerRandomMotion : public CParseHandlerPhysicalOp
 {
 private:
 	// motion operator
-	CDXLPhysicalRandomMotion *m_dxl_op;
+	gpos::pointer<CDXLPhysicalRandomMotion *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

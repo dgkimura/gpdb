@@ -12,6 +12,7 @@
 #include "gpopt/base/CReqdPropRelational.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/COptCtxt.h"
@@ -116,7 +117,7 @@ CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-CReqdPropRelational *
+gpos::cast_func<CReqdPropRelational *>
 CReqdPropRelational::GetReqdRelationalProps(CReqdProp *prp)
 {
 	return dynamic_cast<CReqdPropRelational *>(prp);
@@ -131,13 +132,13 @@ CReqdPropRelational::GetReqdRelationalProps(CReqdProp *prp)
 //		Return difference from given properties
 //
 //---------------------------------------------------------------------------
-CReqdPropRelational *
+gpos::owner<CReqdPropRelational *>
 CReqdPropRelational::PrprelDifference(CMemoryPool *mp,
 									  CReqdPropRelational *prprel)
 {
 	GPOS_ASSERT(nullptr != prprel);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Union(m_pcrsStat);
 	pcrs->Difference(prprel->PcrsStat());
 

@@ -12,6 +12,7 @@
 #define GPOS_CPhysicalHashAggDeduplicate_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalHashAgg.h"
 
@@ -29,7 +30,7 @@ class CPhysicalHashAggDeduplicate : public CPhysicalHashAgg
 {
 private:
 	// array of keys from the join's child
-	CColRefArray *m_pdrgpcrKeys;
+	gpos::owner<CColRefArray *> m_pdrgpcrKeys;
 
 public:
 	CPhysicalHashAggDeduplicate(const CPhysicalHashAggDeduplicate &) = delete;
@@ -63,7 +64,7 @@ public:
 	}
 
 	// array of keys from the join's child
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrKeys() const
 	{
 		return m_pdrgpcrKeys;
@@ -104,7 +105,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CPhysicalHashAggDeduplicate *
+	static gpos::cast_func<CPhysicalHashAggDeduplicate *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

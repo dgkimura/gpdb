@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalScan.h"
 
@@ -66,7 +67,7 @@ public:
 
 
 	// conversion function
-	static CPhysicalTableScan *
+	static gpos::cast_func<CPhysicalTableScan *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -78,10 +79,10 @@ public:
 
 	// statistics derivation during costing
 	IStatistics *
-	PstatsDerive(CMemoryPool *,		   // mp
-				 CExpressionHandle &,  // exprhdl
-				 CReqdPropPlan *,	   // prpplan
-				 IStatisticsArray *	   //stats_ctxt
+	PstatsDerive(CMemoryPool *,					  // mp
+				 CExpressionHandle &,			  // exprhdl
+				 gpos::pointer<CReqdPropPlan *>,  // prpplan
+				 IStatisticsArray *				  //stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(
@@ -90,7 +91,7 @@ public:
 		return nullptr;
 	}
 
-	CRewindabilitySpec *
+	gpos::owner<CRewindabilitySpec *>
 	PrsDerive(CMemoryPool *mp,
 			  CExpressionHandle &  // exprhdl
 	) const override

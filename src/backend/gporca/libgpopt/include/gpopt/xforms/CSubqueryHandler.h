@@ -148,10 +148,9 @@ private:
 		CExpression **ppexprResidualScalar, BOOL useNotNullableInnerOpt);
 
 	// helper for creating a scalar if expression used when generating an outer apply
-	static CExpression *PexprScalarIf(CMemoryPool *mp, CColRef *pcrBool,
-									  CColRef *pcrSum, CColRef *pcrCount,
-									  CExpression *pexprSubquery,
-									  BOOL useNotNullableInnerOpt);
+	static gpos::owner<CExpression *> PexprScalarIf(
+		CMemoryPool *mp, CColRef *pcrBool, CColRef *pcrSum, CColRef *pcrCount,
+		CExpression *pexprSubquery, BOOL useNotNullableInnerOpt);
 
 	// helper for creating a correlated apply expression for existential subquery
 	static BOOL FCreateCorrelatedApplyForExistentialSubquery(
@@ -179,13 +178,13 @@ private:
 
 	// detect subqueries with expressions over count aggregate similar to
 	// (SELECT 'abc' || (SELECT count(*) from X))
-	static BOOL FProjectCountSubquery(CExpression *pexprSubquery,
-									  CColRef *ppcrCount);
+	static BOOL FProjectCountSubquery(
+		gpos::pointer<CExpression *> pexprSubquery, CColRef *ppcrCount);
 
 	// given an input expression, replace all occurrences of given column with the given scalar expression
-	static CExpression *PexprReplace(CMemoryPool *mp, CExpression *pexpr,
-									 CColRef *colref,
-									 CExpression *pexprSubquery);
+	static gpos::owner<CExpression *> PexprReplace(
+		CMemoryPool *mp, CExpression *pexpr, CColRef *colref,
+		gpos::pointer<CExpression *> pexprSubquery);
 
 	// remove a scalar subquery node from scalar tree
 	BOOL FRemoveScalarSubquery(CExpression *pexprOuter,
@@ -252,7 +251,7 @@ private:
 	BOOL FProcessScalarOperator(CExpression *pexprOuter,
 								CExpression *pexprScalar, ESubqueryCtxt esqctxt,
 								CExpression **ppexprNewOuter,
-								CExpression **ppexprNewScalar);
+								gpos::owner<CExpression *> *ppexprNewScalar);
 
 #ifdef GPOS_DEBUG
 	// assert valid values of arguments
@@ -284,7 +283,7 @@ public:
 		ESubqueryCtxt esqctxt,	   // context in which subquery occurs
 		CExpression *
 			*ppexprNewOuter,  // an Apply logical expression produced as output
-		CExpression **
+		gpos::owner<CExpression *> *
 			ppexprResidualScalar  // residual scalar expression produced as output
 	);
 

@@ -12,6 +12,7 @@
 #define GPOPT_CJobGroupExpressionOptimization_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptimizationContext.h"
 #include "gpopt/search/CJobGroupExpression.h"
@@ -76,19 +77,19 @@ private:
 	JSM m_jsm;
 
 	// optimization context of the job
-	COptimizationContext *m_poc;
+	gpos::pointer<COptimizationContext *> m_poc;
 
 	// optimization request number
 	ULONG m_ulOptReq;
 
 	// array of child groups optimization contexts
-	COptimizationContextArray *m_pdrgpoc;
+	gpos::owner<COptimizationContextArray *> m_pdrgpoc;
 
 	// stats context to be used during costing
-	IStatisticsArray *m_pdrgpstatCurrentCtxt;
+	gpos::owner<IStatisticsArray *> m_pdrgpstatCurrentCtxt;
 
 	// array of derived properties of optimal implementations of child groups
-	CDrvdPropArray *m_pdrgpdp;
+	gpos::owner<CDrvdPropArray *> m_pdrgpdp;
 
 	// optimization order of children
 	CPhysical::EChildExecOrder m_eceo;
@@ -106,7 +107,7 @@ private:
 	BOOL m_fOptimizeCTESequence;
 
 	// plan properties required from CTE producer based on consumer derived plan properties
-	CReqdPropPlan *m_prppCTEProducer;
+	gpos::owner<CReqdPropPlan *> m_prppCTEProducer;
 
 	// flag to indicate if a child job for optimizing CTE has been scheduled
 	BOOL m_fScheduledCTEOptimization;
@@ -142,10 +143,10 @@ private:
 	static EEvent EevtFinalize(CSchedulerContext *psc, CJob *pj);
 
 	// schedule a new group expression optimization job for CTE optimization
-	static BOOL FScheduleCTEOptimization(CSchedulerContext *psc,
-										 CGroupExpression *pgexpr,
-										 COptimizationContext *poc,
-										 ULONG ulOptReq, CJob *pjParent);
+	static BOOL FScheduleCTEOptimization(
+		CSchedulerContext *psc, gpos::pointer<CGroupExpression *> pgexpr,
+		gpos::pointer<COptimizationContext *> poc, ULONG ulOptReq,
+		CJob *pjParent);
 
 protected:
 	// schedule transformation jobs for applicable xforms

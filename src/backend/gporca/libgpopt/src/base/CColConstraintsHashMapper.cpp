@@ -4,22 +4,25 @@
 #include "gpopt/base/CColConstraintsHashMapper.h"
 
 #include "gpos/common/CAutoRef.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 
-CConstraintArray *
+gpos::owner<CConstraintArray *>
 CColConstraintsHashMapper::PdrgPcnstrLookup(CColRef *colref)
 {
-	CConstraintArray *pdrgpcnstrCol = m_phmColConstr->Find(colref);
+	gpos::owner<CConstraintArray *> pdrgpcnstrCol =
+		m_phmColConstr->Find(colref);
 	pdrgpcnstrCol->AddRef();
 	return pdrgpcnstrCol;
 }
 
 // mapping between columns and single column constraints in array of constraints
 static ColRefToConstraintArrayMap *
-PhmcolconstrSingleColConstr(CMemoryPool *mp, const CConstraintArray *drgPcnstr)
+PhmcolconstrSingleColConstr(CMemoryPool *mp,
+							gpos::pointer<const CConstraintArray *> drgPcnstr)
 {
-	ColRefToConstraintArrayMap *phmcolconstr =
+	gpos::owner<ColRefToConstraintArrayMap *> phmcolconstr =
 		GPOS_NEW(mp) ColRefToConstraintArrayMap(mp);
 
 	const ULONG length = drgPcnstr->Size();
@@ -32,7 +35,8 @@ PhmcolconstrSingleColConstr(CMemoryPool *mp, const CConstraintArray *drgPcnstr)
 		if (1 == pcrs->Size())
 		{
 			CColRef *colref = pcrs->PcrFirst();
-			CConstraintArray *pcnstrMapped = phmcolconstr->Find(colref);
+			gpos::owner<CConstraintArray *> pcnstrMapped =
+				phmcolconstr->Find(colref);
 			if (nullptr == pcnstrMapped)
 			{
 				pcnstrMapped = GPOS_NEW(mp) CConstraintArray(mp);

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerCTEConfig_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/engine/CCTEConfig.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -35,7 +36,7 @@ class CParseHandlerCTEConfig : public CParseHandlerBase
 {
 private:
 	// CTE configuration
-	CCTEConfig *m_cte_conf;
+	gpos::owner<CCTEConfig *> m_cte_conf;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +68,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// enumerator configuration
-	CCTEConfig *GetCteConf() const;
+	gpos::pointer<CCTEConfig *> GetCteConf() const;
 };
 }  // namespace gpdxl
 

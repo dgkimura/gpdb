@@ -12,6 +12,7 @@
 #define GPOPT_CScalarCast_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
@@ -100,10 +101,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -123,7 +125,7 @@ public:
 	}
 
 	// conversion function
-	static CScalarCast *
+	static gpos::cast_func<CScalarCast *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

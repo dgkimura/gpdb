@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CAutoP.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDefaultComparator.h"
 #include "gpopt/cost/ICostModel.h"
@@ -157,7 +158,7 @@ COptCtxt::FAllEnforcersEnabled()
 void
 COptCtxt::AddPartForScanId(ULONG scanid, ULONG index)
 {
-	CBitSet *parts = m_scanid_to_part_map->Find(&scanid);
+	gpos::owner<CBitSet *> parts = m_scanid_to_part_map->Find(&scanid);
 	if (nullptr == parts)
 	{
 		parts = GPOS_NEW(m_mp) CBitSet(m_mp);

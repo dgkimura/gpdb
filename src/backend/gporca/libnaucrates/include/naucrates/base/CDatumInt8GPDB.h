@@ -12,6 +12,7 @@
 #define GPNAUCRATES_CDatumInt8GPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatumInt8.h"
 #include "naucrates/md/CMDTypeInt8GPDB.h"
@@ -68,10 +69,10 @@ public:
 	ULONG HashValue() const override;
 
 	// match function for datums
-	BOOL Matches(const IDatum *) const override;
+	BOOL Matches(gpos::pointer<const IDatum *>) const override;
 
 	// copy datum
-	IDatum *MakeCopy(CMemoryPool *mp) const override;
+	gpos::owner<IDatum *> MakeCopy(CMemoryPool *mp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

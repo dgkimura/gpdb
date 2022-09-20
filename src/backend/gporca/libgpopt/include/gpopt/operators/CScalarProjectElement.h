@@ -81,9 +81,9 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// return locally defined columns
 	CColRefSet *

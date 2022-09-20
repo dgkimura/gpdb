@@ -12,6 +12,7 @@
 #include "naucrates/base/CDatumInt4GPDB.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "gpopt/base/CAutoOptCtxt.h"
@@ -37,9 +38,9 @@ CDatumInt4GPDB::CDatumInt4GPDB(CSystemId sysid, INT val, BOOL is_null)
 	: m_mdid(nullptr), m_val(val), m_is_null(is_null)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	IMDId *mdid = dynamic_cast<const CMDTypeInt4GPDB *>(
-					  md_accessor->PtMDType<IMDTypeInt4>(sysid))
-					  ->MDId();
+	gpos::owner<IMDId *> mdid = dynamic_cast<const CMDTypeInt4GPDB *>(
+									md_accessor->PtMDType<IMDTypeInt4>(sysid))
+									->MDId();
 	mdid->AddRef();
 
 	m_mdid = mdid;
@@ -194,14 +195,14 @@ CDatumInt4GPDB::GetStrRepr(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumInt4GPDB::Matches(const IDatum *datum) const
+CDatumInt4GPDB::Matches(gpos::pointer<const IDatum *> datum) const
 {
 	if (!datum->MDId()->Equals(m_mdid.get()))
 	{
 		return false;
 	}
 
-	const CDatumInt4GPDB *datum_cast =
+	gpos::pointer<const CDatumInt4GPDB *> datum_cast =
 		dynamic_cast<const CDatumInt4GPDB *>(datum);
 
 	if (!datum_cast->IsNull() && !IsNull())
@@ -225,7 +226,7 @@ CDatumInt4GPDB::Matches(const IDatum *datum) const
 //		Returns a copy of the datum
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::owner<IDatum *>
 CDatumInt4GPDB::MakeCopy(CMemoryPool *mp) const
 {
 	return GPOS_NEW(mp) CDatumInt4GPDB(m_mdid, m_val, m_is_null);

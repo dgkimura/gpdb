@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalMaxOneRow.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -56,7 +57,7 @@ CLogicalMaxOneRow::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Union(pcrsInput);
 
 	// intersect with the output columns of relational child
@@ -76,7 +77,7 @@ CLogicalMaxOneRow::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 CXformSet *
 CLogicalMaxOneRow::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfMaxOneRow2Assert);
 	return xform_set;
 }

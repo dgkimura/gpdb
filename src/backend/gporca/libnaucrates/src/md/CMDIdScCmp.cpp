@@ -11,6 +11,8 @@
 
 #include "naucrates/md/CMDIdScCmp.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpos;
@@ -96,7 +98,7 @@ CMDIdScCmp::GetBuffer() const
 //		Returns the source type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDIdScCmp::GetLeftMdid() const
 {
 	return m_mdid_left;
@@ -110,7 +112,7 @@ CMDIdScCmp::GetLeftMdid() const
 //		Returns the destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::pointer<IMDId *>
 CMDIdScCmp::GetRightMdid() const
 {
 	return m_mdid_right;
@@ -141,14 +143,14 @@ CMDIdScCmp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdScCmp::Equals(const IMDId *mdid) const
+CMDIdScCmp::Equals(gpos::pointer<const IMDId *> mdid) const
 {
 	if (nullptr == mdid || EmdidScCmp != mdid->MdidType())
 	{
 		return false;
 	}
 
-	const CMDIdScCmp *pmdidScCmp = CMDIdScCmp::CastMdid(mdid);
+	gpos::pointer<const CMDIdScCmp *> pmdidScCmp = CMDIdScCmp::CastMdid(mdid);
 
 	return m_mdid_left->Equals(pmdidScCmp->GetLeftMdid()) &&
 		   m_mdid_right->Equals(pmdidScCmp->GetRightMdid()) &&

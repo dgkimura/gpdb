@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformDynamicIndexGet2DynamicIndexScan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CPartConstraint.h"
 #include "gpopt/metadata/CTableDescriptor.h"
@@ -62,8 +63,9 @@ CXformDynamicIndexGet2DynamicIndexScan::Exfp(CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 void
 CXformDynamicIndexGet2DynamicIndexScan::Transform(
-	CXformContext *pxfctxt GPOS_ASSERTS_ONLY, CXformResult *pxfres GPOS_UNUSED,
-	CExpression *pexpr GPOS_ASSERTS_ONLY) const
+	gpos::pointer<CXformContext *> pxfctxt GPOS_ASSERTS_ONLY,
+	gpos::pointer<CXformResult *> pxfres GPOS_UNUSED,
+	gpos::pointer<CExpression *> pexpr GPOS_ASSERTS_ONLY) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -78,30 +80,31 @@ CXformDynamicIndexGet2DynamicIndexScan::Transform(
 	GPOS_ASSERT(pname != nullptr);
 
 	// extract components
-	CExpression *pexprIndexCond = (*pexpr)[0];
+	gpos::owner<CExpression *> pexprIndexCond = (*pexpr)[0];
 	pexprIndexCond->AddRef();
 
-	CTableDescriptor *ptabdesc = popIndexGet->Ptabdesc();
+	gpos::owner<CTableDescriptor *> ptabdesc = popIndexGet->Ptabdesc();
 	ptabdesc->AddRef();
 
-	CIndexDescriptor *pindexdesc = popIndexGet->Pindexdesc();
+	gpos::owner<CIndexDescriptor *> pindexdesc = popIndexGet->Pindexdesc();
 	pindexdesc->AddRef();
 
 	CColRefArray *pdrgpcrOutput = popIndexGet->PdrgpcrOutput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 	pdrgpcrOutput->AddRef();
 
-	CColRef2dArray *pdrgpdrgpcrPart = popIndexGet->PdrgpdrgpcrPart();
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart =
+		popIndexGet->PdrgpdrgpcrPart();
 	pdrgpdrgpcrPart->AddRef();
 
-	COrderSpec *pos = popIndexGet->Pos();
+	gpos::owner<COrderSpec *> pos = popIndexGet->Pos();
 	pos->AddRef();
 
 	popIndexGet->GetPartitionMdids()->AddRef();
 	popIndexGet->GetRootColMappingPerPart()->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp)
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp)
 		CExpression(mp,
 					GPOS_NEW(mp) CPhysicalDynamicIndexScan(
 						mp, pindexdesc, ptabdesc, pexpr->Pop()->UlOpId(), pname,

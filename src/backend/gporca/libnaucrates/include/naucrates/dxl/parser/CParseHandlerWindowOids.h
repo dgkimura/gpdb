@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerWindowOids_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CWindowOids.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -35,7 +36,7 @@ class CParseHandlerWindowOids : public CParseHandlerBase
 {
 private:
 	// deafult oids
-	CWindowOids *m_window_oids;
+	gpos::owner<CWindowOids *> m_window_oids;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +68,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// return system specific window oids
-	CWindowOids *GetWindowOids() const;
+	gpos::pointer<CWindowOids *> GetWindowOids() const;
 };
 }  // namespace gpdxl
 

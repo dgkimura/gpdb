@@ -11,9 +11,8 @@
 
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
+#include "gpos/common/owner.h"
 #endif
-
-#include "unittest/dxl/statistics/CCardinalityTestUtils.h"
 
 #include "gpos/io/COstreamString.h"
 
@@ -27,6 +26,7 @@
 #include "naucrates/statistics/CStatistics.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
+#include "unittest/dxl/statistics/CCardinalityTestUtils.h"
 #include "unittest/gpopt/CTestUtils.h"
 
 
@@ -69,7 +69,7 @@ CBucket *
 CCardinalityTestUtils::PbucketSingletonBoolVal(CMemoryPool *mp, BOOL fValue,
 											   CDouble frequency)
 {
-	CPoint *ppLower = CTestUtils::PpointBool(mp, fValue);
+	gpos::owner<CPoint *> ppLower = CTestUtils::PpointBool(mp, fValue);
 
 	// lower bound is also upper bound
 	ppLower->AddRef();
@@ -84,7 +84,8 @@ CCardinalityTestUtils::PhistInt4Remain(CMemoryPool *mp, ULONG num_of_buckets,
 									   CDouble num_NDV_remain)
 {
 	// generate histogram of the form [0, 100), [100, 200), [200, 300) ...
-	CBucketArray *histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::owner<CBucketArray *> histogram_buckets =
+		GPOS_NEW(mp) CBucketArray(mp);
 	for (ULONG idx = 0; idx < num_of_buckets; idx++)
 	{
 		INT iLower = INT(idx * 100);
@@ -120,7 +121,8 @@ CHistogram *
 CCardinalityTestUtils::PhistExampleInt4(CMemoryPool *mp)
 {
 	// generate histogram of the form [0, 10), [10, 20), [20, 30) ... [80, 90)
-	CBucketArray *histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::owner<CBucketArray *> histogram_buckets =
+		GPOS_NEW(mp) CBucketArray(mp);
 	for (ULONG idx = 0; idx < 9; idx++)
 	{
 		INT iLower = INT(idx * 10);
@@ -144,7 +146,8 @@ CCardinalityTestUtils::PhistExampleInt4(CMemoryPool *mp)
 CHistogram *
 CCardinalityTestUtils::PhistExampleBool(CMemoryPool *mp)
 {
-	CBucketArray *histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
+	gpos::owner<CBucketArray *> histogram_buckets =
+		GPOS_NEW(mp) CBucketArray(mp);
 	CBucket *pbucketFalse =
 		CCardinalityTestUtils::PbucketSingletonBoolVal(mp, false, 0.1);
 	CBucket *pbucketTrue =
@@ -162,10 +165,10 @@ CCardinalityTestUtils::PpointGeneric(CMemoryPool *mp, OID oid,
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	IMDId *mdid = GPOS_NEW(mp) CMDIdGPDB(oid);
+	gpos::owner<IMDId *> mdid = GPOS_NEW(mp) CMDIdGPDB(oid);
 	IDatum *datum = CTestUtils::CreateGenericDatum(mp, md_accessor, mdid,
 												   pstrEncodedValue, value);
-	CPoint *point = GPOS_NEW(mp) CPoint(datum);
+	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(datum);
 
 	return point;
 }
@@ -177,20 +180,21 @@ CCardinalityTestUtils::PpointNumeric(CMemoryPool *mp,
 									 CDouble value)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	CMDIdGPDB *mdid = GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_numeric);
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid);
+	gpos::owner<CMDIdGPDB *> mdid =
+		GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_numeric);
+	gpos::pointer<const IMDType *> pmdtype = md_accessor->RetrieveType(mdid);
 
 	ULONG ulbaSize = 0;
 	BYTE *data =
 		CDXLUtils::DecodeByteArrayFromString(mp, pstrEncodedValue, &ulbaSize);
 
-	CDXLDatumStatsDoubleMappable *dxl_datum = GPOS_NEW(mp)
+	gpos::owner<CDXLDatumStatsDoubleMappable *> dxl_datum = GPOS_NEW(mp)
 		CDXLDatumStatsDoubleMappable(mp, mdid, default_type_modifier,
 									 false /*is_const_null*/, data, ulbaSize,
 									 value);
 
 	IDatum *datum = pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
-	CPoint *point = GPOS_NEW(mp) CPoint(datum);
+	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(datum);
 	dxl_datum->Release();
 
 	return point;
@@ -202,9 +206,9 @@ CCardinalityTestUtils::PpointDouble(CMemoryPool *mp, OID oid, CDouble value)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	IMDId *mdid = GPOS_NEW(mp) CMDIdGPDB(oid);
+	gpos::owner<IMDId *> mdid = GPOS_NEW(mp) CMDIdGPDB(oid);
 	IDatum *datum = CTestUtils::CreateDoubleDatum(mp, md_accessor, mdid, value);
-	CPoint *point = GPOS_NEW(mp) CPoint(datum);
+	gpos::owner<CPoint *> point = GPOS_NEW(mp) CPoint(datum);
 
 	return point;
 }
@@ -239,7 +243,8 @@ CCardinalityTestUtils::PrintHist(CMemoryPool *mp, const char *pcPrefix,
 
 // helper function to print the statistics object
 void
-CCardinalityTestUtils::PrintStats(CMemoryPool *mp, const IStatistics *stats)
+CCardinalityTestUtils::PrintStats(CMemoryPool *mp,
+								  gpos::pointer<const IStatistics *> stats)
 {
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);

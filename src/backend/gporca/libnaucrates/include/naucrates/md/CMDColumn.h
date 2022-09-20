@@ -15,6 +15,7 @@
 #define GPMD_CDXLColumn_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/md/CMDName.h"
@@ -61,7 +62,7 @@ private:
 	ULONG m_length;
 
 	// default value expression
-	gpdxl::CDXLNode *m_dxl_default_val;
+	gpos::owner<gpdxl::CDXLNode *> m_dxl_default_val;
 
 public:
 	CMDColumn(const CMDColumn &) = delete;

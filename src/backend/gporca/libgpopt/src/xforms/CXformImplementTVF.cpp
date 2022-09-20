@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementTVF.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalTVF.h"
@@ -97,28 +98,28 @@ CXformImplementTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative
-	IMDId *mdid_func = popTVF->FuncMdId();
+	gpos::owner<IMDId *> mdid_func = popTVF->FuncMdId();
 	mdid_func->AddRef();
 
-	IMDId *mdid_return_type = popTVF->ReturnTypeMdId();
+	gpos::owner<IMDId *> mdid_return_type = popTVF->ReturnTypeMdId();
 	mdid_return_type->AddRef();
 
 	CWStringConst *str =
 		GPOS_NEW(mp) CWStringConst(popTVF->Pstr()->GetBuffer());
 
-	CColumnDescriptorArray *pdrgpcoldesc = popTVF->Pdrgpcoldesc();
+	gpos::owner<CColumnDescriptorArray *> pdrgpcoldesc = popTVF->Pdrgpcoldesc();
 	pdrgpcoldesc->AddRef();
 
 	CColRefArray *pdrgpcrOutput = popTVF->PdrgpcrOutput();
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pdrgpcrOutput);
 
 	CExpressionArray *pdrgpexpr = pexpr->PdrgPexpr();
 
-	CPhysicalTVF *pphTVF = GPOS_NEW(mp)
+	gpos::owner<CPhysicalTVF *> pphTVF = GPOS_NEW(mp)
 		CPhysicalTVF(mp, mdid_func, mdid_return_type, str, pdrgpcoldesc, pcrs);
 
-	CExpression *pexprAlt = nullptr;
+	gpos::owner<CExpression *> pexprAlt = nullptr;
 	// create alternative expression
 	if (nullptr == pdrgpexpr || 0 == pdrgpexpr->Size())
 	{

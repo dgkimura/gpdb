@@ -12,6 +12,7 @@
 
 #include "naucrates/md/CDXLBucket.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -66,7 +67,7 @@ CDXLBucket::~CDXLBucket()
 //		Returns the lower bound for the bucket
 //
 //---------------------------------------------------------------------------
-const CDXLDatum *
+gpos::pointer<const CDXLDatum *>
 CDXLBucket::GetDXLDatumLower() const
 {
 	return m_lower_bound_dxl_datum;
@@ -80,7 +81,7 @@ CDXLBucket::GetDXLDatumLower() const
 //		Returns the upper bound for the bucket
 //
 //---------------------------------------------------------------------------
-const CDXLDatum *
+gpos::pointer<const CDXLDatum *>
 CDXLBucket::GetDXLDatumUpper() const
 {
 	return m_upper_bound_dxl_datum;

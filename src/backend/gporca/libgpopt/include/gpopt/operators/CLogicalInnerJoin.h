@@ -12,6 +12,7 @@
 #define GPOS_CLogicalInnerJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CLogicalJoin.h"
@@ -90,7 +91,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalInnerJoin *
+	static gpos::cast_func<CLogicalInnerJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -101,8 +102,9 @@ public:
 
 	// determine if an innerJoin group expression has
 	// less conjuncts than another
-	static BOOL FFewerConj(CMemoryPool *mp, CGroupExpression *pgexprFst,
-						   CGroupExpression *pgexprSnd);
+	static BOOL FFewerConj(CMemoryPool *mp,
+						   gpos::pointer<CGroupExpression *> pgexprFst,
+						   gpos::pointer<CGroupExpression *> pgexprSnd);
 
 
 };	// class CLogicalInnerJoin

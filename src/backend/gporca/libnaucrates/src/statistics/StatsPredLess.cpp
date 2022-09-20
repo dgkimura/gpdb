@@ -5,13 +5,16 @@
 
 #include "naucrates/statistics/StatsPredLess.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/statistics/CStatsPred.h"
 
 namespace gpnaucrates
 {
 bool
-StatsPredColIdLess::operator()(const gpnaucrates::CStatsPred *a,
-							   const gpnaucrates::CStatsPred *b) const
+StatsPredColIdLess::operator()(
+	gpos::pointer<const gpnaucrates::CStatsPred *> a,
+	gpos::pointer<const gpnaucrates::CStatsPred *> b) const
 {
 	return a->GetColId() < b->GetColId();
 }

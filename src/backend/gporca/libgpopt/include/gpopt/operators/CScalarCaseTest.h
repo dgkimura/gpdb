@@ -12,6 +12,7 @@
 #define GPOPT_CScalarCaseTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdProp.h"
 #include "gpopt/operators/CScalar.h"
@@ -75,16 +76,17 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
 
 	// conversion function
-	static CScalarCaseTest *
+	static gpos::cast_func<CScalarCaseTest *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

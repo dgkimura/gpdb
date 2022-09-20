@@ -204,52 +204,53 @@ protected:
 
 	// helper for computing required columns of the n-th child by including used
 	// columns and excluding defined columns of the scalar child
-	CColRefSet *PcrsChildReqd(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CColRefSet *pcrsInput, ULONG child_index,
-							  ULONG ulScalarIndex);
+	gpos::owner<CColRefSet *> PcrsChildReqd(CMemoryPool *mp,
+											CExpressionHandle &exprhdl,
+											CColRefSet *pcrsInput,
+											ULONG child_index,
+											ULONG ulScalarIndex);
 
 
 	// helper for a simple case of computing child's required sort order
-	static COrderSpec *PosPassThru(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   COrderSpec *posInput, ULONG child_index);
+	static gpos::owner<COrderSpec *> PosPassThru(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<COrderSpec *> posInput, ULONG child_index);
 
 	// helper for a simple case of computing child's required distribution
-	static CDistributionSpec *PdsPassThru(CMemoryPool *mp,
-										  CExpressionHandle &exprhdl,
-										  CDistributionSpec *pdsInput,
-										  ULONG child_index);
+	static gpos::owner<CDistributionSpec *> PdsPassThru(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index);
 
 	// helper for computing child's required distribution when Singleton/Replicated
 	// distributions must be requested
-	static CDistributionSpec *PdsRequireSingletonOrReplicated(
+	static gpos::owner<CDistributionSpec *> PdsRequireSingletonOrReplicated(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CDistributionSpec *pdsInput, ULONG child_index, ULONG ulOptReq);
 
 	// helper for computing child's required distribution in unary operators
 	// with a single scalar child
-	static CDistributionSpec *PdsUnary(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   CDistributionSpec *pdsInput,
-									   ULONG child_index, ULONG ulOptReq);
+	static gpos::owner<CDistributionSpec *> PdsUnary(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		CDistributionSpec *pdsInput, ULONG child_index, ULONG ulOptReq);
 
 	// helper for a simple case of computing child's required rewindability
-	static CRewindabilitySpec *PrsPassThru(CMemoryPool *mp,
-										   CExpressionHandle &exprhdl,
-										   CRewindabilitySpec *prsRequired,
-										   ULONG child_index);
+	static gpos::owner<CRewindabilitySpec *> PrsPassThru(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index);
 
 	// pass cte requirement to the child
-	static CCTEReq *PcterPushThru(CCTEReq *pcter);
+	static gpos::owner<CCTEReq *> PcterPushThru(gpos::pointer<CCTEReq *> pcter);
 
 	// combine the derived CTE maps of the first n children
 	// of the given expression handle
 	static CCTEMap *PcmCombine(CMemoryPool *mp, CDrvdPropArray *pdrgpdpCtxt);
 
 	// helper for common case of sort order derivation
-	static COrderSpec *PosDerivePassThruOuter(CExpressionHandle &exprhdl);
+	static gpos::owner<COrderSpec *> PosDerivePassThruOuter(
+		CExpressionHandle &exprhdl);
 
 	// helper for common case of distribution derivation
-	static CDistributionSpec *PdsDerivePassThruOuter(
+	static gpos::owner<CDistributionSpec *> PdsDerivePassThruOuter(
 		CExpressionHandle &exprhdl);
 
 	// helper for common case of rewindability derivation
@@ -262,10 +263,9 @@ protected:
 		CExpressionHandle &exprhdl, gpos::pointer<CColRefSet *> pcrsRequired);
 
 	// Generate a singleton distribution spec request
-	static CDistributionSpec *PdsRequireSingleton(CMemoryPool *mp,
-												  CExpressionHandle &exprhdl,
-												  CDistributionSpec *pds,
-												  ULONG child_index);
+	static gpos::owner<CDistributionSpec *> PdsRequireSingleton(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, CDistributionSpec *pds,
+		ULONG child_index);
 
 	// helper to compute skew estimate based on given stats and distribution spec
 	static CDouble GetSkew(IStatistics *stats, CDistributionSpec *pds);
@@ -280,12 +280,12 @@ protected:
 	virtual CDistributionSpec *PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const = 0;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) const = 0;
 
 	// distribution matching type
 	virtual CEnfdDistribution::EDistributionMatching Edm(
-		CReqdPropPlan *prppInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
+		gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq);
 
 public:
 	CPhysical(const CPhysical &) = delete;
@@ -309,22 +309,20 @@ public:
 	}
 
 	// create base container of derived properties
-	CDrvdProp *PdpCreate(CMemoryPool *mp) const override;
+	gpos::owner<CDrvdProp *> PdpCreate(CMemoryPool *mp) const override;
 
 	// create base container of required properties
-	CReqdProp *PrpCreate(CMemoryPool *mp) const override;
+	gpos::owner<CReqdProp *> PrpCreate(CMemoryPool *mp) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// compute required output columns of the n-th child
-	virtual CColRefSet *PcrsRequired(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl,
-									 gpos::pointer<CColRefSet *> pcrsRequired,
-									 ULONG child_index,
-									 CDrvdPropArray *pdrgpdpCtxt,
-									 ULONG ulOptReq) = 0;
+	virtual CColRefSet *PcrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CColRefSet *> pcrsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) = 0;
 
 	// compute required ctes of the n-th child
 	virtual CCTEReq *PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -334,7 +332,7 @@ public:
 								  ULONG ulOptReq) const = 0;
 
 	// compute distribution spec from the table descriptor
-	static CDistributionSpec *PdsCompute(
+	static gpos::owner<CDistributionSpec *> PdsCompute(
 		CMemoryPool *mp, gpos::pointer<const CTableDescriptor *> ptabdesc,
 		CColRefArray *pdrgpcrOutput, CColRef *gp_segment_id);
 
@@ -342,20 +340,21 @@ public:
 	virtual COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									gpos::pointer<COrderSpec *> posRequired,
 									ULONG child_index,
-									CDrvdPropArray *pdrgpdpCtxt,
+									gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
 									ULONG ulOptReq) const = 0;
 
 	// compute required rewindability of the n-th child
 	virtual CRewindabilitySpec *PrsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::pointer<CRewindabilitySpec *> prsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const = 0;
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq) const = 0;
 
 	// compute required partition propoagation spec of the n-th child
 	virtual CPartitionPropagationSpec *PppsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CPartitionPropagationSpec *pppsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const;
+		gpos::pointer<CPartitionPropagationSpec *> pppsRequired,
+		ULONG child_index, gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const;
 
 
 	// required properties: check if required columns are included in output columns
@@ -417,21 +416,20 @@ public:
 		gpos::pointer<const CEnfdPartitionPropagation *> per) const;
 
 	// order matching type
-	virtual CEnfdOrder::EOrderMatching Eom(CReqdPropPlan *prppInput,
-										   ULONG child_index,
-										   CDrvdPropArray *pdrgpdpCtxt,
-										   ULONG ulOptReq);
+	virtual CEnfdOrder::EOrderMatching Eom(
+		gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq);
 
 	// rewindability matching type
 	virtual CEnfdRewindability::ERewindabilityMatching Erm(
-		CReqdPropPlan *prppInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
+		gpos::pointer<CReqdPropPlan *> prppInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq);
 
 	// check if optimization contexts is valid
 	virtual BOOL
 	FValidContext(CMemoryPool *,								 // mp
 				  gpos::pointer<gpopt::COptimizationContext *>,	 // poc,
-				  COptimizationContextArray *					 // pdrgpocChild
+				  gpos::pointer<COptimizationContextArray *>	 // pdrgpocChild
 	) const
 	{
 		return true;
@@ -518,13 +516,12 @@ public:
 	}
 
 	// helper for computing a singleton distribution matching the given distribution
-	static CDistributionSpecSingleton *PdssMatching(
+	static gpos::owner<CDistributionSpecSingleton *> PdssMatching(
 		CMemoryPool *mp, CDistributionSpecSingleton *pdss);
 
-	virtual CEnfdDistribution *Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CReqdPropPlan *prppInput, ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulDistrReq);
+	virtual gpos::owner<CEnfdDistribution *> Ped(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
+		ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq);
 
 };	// class CPhysical
 

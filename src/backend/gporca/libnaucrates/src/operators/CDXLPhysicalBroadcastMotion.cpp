@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalBroadcastMotion.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -69,8 +71,9 @@ CDXLPhysicalBroadcastMotion::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalBroadcastMotion::SerializeToDXL(CXMLSerializer *xml_serializer,
-											const CDXLNode *dxlnode) const
+CDXLPhysicalBroadcastMotion::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

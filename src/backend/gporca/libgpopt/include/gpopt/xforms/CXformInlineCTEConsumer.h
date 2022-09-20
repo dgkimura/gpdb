@@ -13,6 +13,7 @@
 #define GPOPT_CXformInlineCTEConsumer_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformExploration.h"
 
@@ -59,7 +60,7 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
+	void Transform(gpos::pointer<CXformContext *> pxfctxt, CXformResult *pxfres,
 				   CExpression *pexpr) const override;
 
 };	// class CXformInlineCTEConsumer

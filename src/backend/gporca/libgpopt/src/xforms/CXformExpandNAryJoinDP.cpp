@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformExpandNAryJoinDP.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
@@ -62,7 +63,7 @@ CXformExpandNAryJoinDP::Exfp(CExpressionHandle &exprhdl) const
 {
 	COptimizerConfig *optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
-	const CHint *phint = optimizer_config->GetHint();
+	gpos::pointer<const CHint *> phint = optimizer_config->GetHint();
 
 	const ULONG arity = exprhdl.Arity();
 
@@ -102,10 +103,11 @@ CXformExpandNAryJoinDP::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	const ULONG arity = pexpr->Arity();
 	GPOS_ASSERT(arity >= 3);
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
-		CExpression *pexprChild = (*pexpr)[ul];
+		gpos::owner<CExpression *> pexprChild = (*pexpr)[ul];
 		pexprChild->AddRef();
 		pdrgpexpr->Append(pexprChild);
 	}
@@ -116,7 +118,7 @@ CXformExpandNAryJoinDP::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	// create join order using dynamic programming
 	CJoinOrderDP jodp(mp, pdrgpexpr, pdrgpexprPreds);
-	CExpression *pexprResult = jodp.PexprExpand();
+	gpos::owner<CExpression *> pexprResult = jodp.PexprExpand();
 
 	if (nullptr != pexprResult)
 	{

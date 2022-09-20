@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformExpandNAryJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/base/CUtils.h"
@@ -131,11 +132,11 @@ CXformExpandNAryJoin::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 			CPredicateUtils::PexprConjunction(mp, nullptr));
 	}
 
-	CExpression *pexprScalar = (*pexpr)[arity - 1];
+	gpos::owner<CExpression *> pexprScalar = (*pexpr)[arity - 1];
 	pexprScalar->AddRef();
 
 	// create a logical select with the join expression and scalar condition child
-	CExpression *pexprSelect =
+	gpos::owner<CExpression *> pexprSelect =
 		CUtils::PexprLogicalSelect(mp, pexprJoin, pexprScalar);
 
 	// normalize the tree and push down the predicates

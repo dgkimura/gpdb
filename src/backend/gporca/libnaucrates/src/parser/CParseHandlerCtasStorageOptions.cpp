@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerCtasStorageOptions.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -164,7 +166,7 @@ CParseHandlerCtasStorageOptions::EndElement(
 //		Return parsed storage options
 //
 //---------------------------------------------------------------------------
-CDXLCtasStorageOptions *
+gpos::pointer<CDXLCtasStorageOptions *>
 CParseHandlerCtasStorageOptions::GetDxlCtasStorageOption() const
 {
 	return m_dxl_ctas_storage_option;

@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformRemoveSubqDistinct.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalSelect.h"
 #include "gpopt/operators/COperator.h"
@@ -104,11 +105,11 @@ CXformRemoveSubqDistinct::Transform(CXformContext *pxfctxt,
 		// only consider removing distinct when there is no aggregation functions
 		if (0 == pexprGbAggProjectList->Arity())
 		{
-			CExpression *pexprNewScalar = nullptr;
-			CExpression *pexprRelChild = (*pexprGbAgg)[0];
+			gpos::owner<CExpression *> pexprNewScalar = nullptr;
+			gpos::owner<CExpression *> pexprRelChild = (*pexprGbAgg)[0];
 			pexprRelChild->AddRef();
 
-			COperator *pop = pexprScalar->Pop();
+			gpos::owner<COperator *> pop = pexprScalar->Pop();
 			pop->AddRef();
 			if (CUtils::FExistentialSubquery(pop))
 			{
@@ -119,7 +120,7 @@ CXformRemoveSubqDistinct::Transform(CXformContext *pxfctxt,
 			else
 			{
 				// IN/NOT IN scalar subquery
-				CExpression *pexprScalarIdent = (*pexprScalar)[1];
+				gpos::owner<CExpression *> pexprScalarIdent = (*pexprScalar)[1];
 				pexprScalarIdent->AddRef();
 				pexprNewScalar = GPOS_NEW(mp)
 					CExpression(mp, pop, pexprRelChild, pexprScalarIdent);
@@ -129,7 +130,7 @@ CXformRemoveSubqDistinct::Transform(CXformContext *pxfctxt,
 			(*pexpr)[0]->AddRef();	 // relational child of logical select
 
 			// new logical select expression
-			CExpression *ppexprNew = GPOS_NEW(mp)
+			gpos::owner<CExpression *> ppexprNew = GPOS_NEW(mp)
 				CExpression(mp, pexpr->Pop(), (*pexpr)[0], pexprNewScalar);
 			pxfres->Add(ppexprNew);
 		}

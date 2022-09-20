@@ -32,7 +32,7 @@ class CDXLLogicalGroupBy : public CDXLLogical
 {
 private:
 	// grouping column ids
-	ULongPtrArray *m_grouping_colid_array;
+	gpos::owner<ULongPtrArray *> m_grouping_colid_array;
 
 	// serialize output grouping columns indices in DXL
 	void SerializeGrpColsToDXL(CXMLSerializer *) const;

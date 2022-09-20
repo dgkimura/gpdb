@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalCTEAnchor.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 #include "naucrates/dxl/xml/dxltokens.h"
@@ -69,8 +71,9 @@ CDXLLogicalCTEAnchor::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalCTEAnchor::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 const CDXLNode *dxlnode) const
+CDXLLogicalCTEAnchor::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

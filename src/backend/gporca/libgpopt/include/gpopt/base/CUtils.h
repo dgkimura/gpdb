@@ -107,30 +107,29 @@ public:
 
 	// recursively check for a plan with CTE, if both CTEProducer and CTEConsumer are executed on the same locality.
 	// raises an exception if CTE Producer and CTE Consumer does not have the same locality
-	static void ValidateCTEProducerConsumerLocality(CMemoryPool *mp,
-													CExpression *pexpr,
-													EExecLocalityType edt,
-													UlongToUlongMap *phmulul);
+	static void ValidateCTEProducerConsumerLocality(
+		CMemoryPool *mp, CExpression *pexpr, EExecLocalityType edt,
+		gpos::owner<UlongToUlongMap *> phmulul);
 
 	// generate a comparison expression for two column references
-	static CExpression *PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
-									   const CColRef *pcrRight,
-									   CWStringConst strOp, IMDId *mdid_op);
+	static gpos::owner<CExpression *> PexprScalarCmp(
+		CMemoryPool *mp, const CColRef *pcrLeft, const CColRef *pcrRight,
+		CWStringConst strOp, gpos::owner<IMDId *> mdid_op);
 
 	// generate a comparison expression for a column reference and an expression
-	static CExpression *PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
-									   CExpression *pexprRight,
-									   CWStringConst strOp, IMDId *mdid_op);
+	static gpos::owner<CExpression *> PexprScalarCmp(
+		CMemoryPool *mp, const CColRef *pcrLeft, CExpression *pexprRight,
+		CWStringConst strOp, gpos::owner<IMDId *> mdid_op);
 
 	// generate a comparison expression for an expression and a column reference
-	static CExpression *PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
-									   const CColRef *pcrRight,
-									   CWStringConst strOp, IMDId *mdid_op);
+	static gpos::owner<CExpression *> PexprScalarCmp(
+		CMemoryPool *mp, CExpression *pexprLeft, const CColRef *pcrRight,
+		CWStringConst strOp, gpos::owner<IMDId *> mdid_op);
 
 	// generate a comparison expression for two expressions
-	static CExpression *PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
-									   CExpression *pexprRight,
-									   CWStringConst strOp, IMDId *mdid_op);
+	static gpos::owner<CExpression *> PexprScalarCmp(
+		CMemoryPool *mp, CExpression *pexprLeft, CExpression *pexprRight,
+		CWStringConst strOp, gpos::owner<IMDId *> mdid_op);
 
 	// generate a comparison expression for two expressions
 	static CExpression *PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
@@ -158,10 +157,9 @@ public:
 									   IMDType::ECmpType cmp_type);
 
 	// generate a comparison against Zero
-	static CExpression *PexprCmpWithZero(CMemoryPool *mp,
-										 CExpression *pexprLeft,
-										 IMDId *mdid_type_left,
-										 IMDType::ECmpType ecmptype);
+	static gpos::owner<CExpression *> PexprCmpWithZero(
+		CMemoryPool *mp, CExpression *pexprLeft, IMDId *mdid_type_left,
+		IMDType::ECmpType ecmptype);
 
 	// generate an equality comparison expression for column references
 	static CExpression *PexprScalarEqCmp(CMemoryPool *mp,
@@ -184,17 +182,20 @@ public:
 										 const CColRef *pcrRight);
 
 	// generate an array comparison expression for a column reference and an expression
-	static CExpression *PexprScalarArrayCmp(
+	static gpos::owner<CExpression *> PexprScalarArrayCmp(
 		CMemoryPool *mp, CScalarArrayCmp::EArrCmpType earrcmptype,
 		IMDType::ECmpType ecmptype, CExpressionArray *pexprScalarChildren,
 		const CColRef *colref);
 
 	// generate an Is Distinct From expression
-	static CExpression *PexprIDF(CMemoryPool *mp, CExpression *pexprLeft,
-								 CExpression *pexprRight);
+	static gpos::owner<CExpression *> PexprIDF(CMemoryPool *mp,
+											   CExpression *pexprLeft,
+											   CExpression *pexprRight);
 
-	static CExpression *PexprIDF(CMemoryPool *mp, CExpression *pexprLeft,
-								 CExpression *pexprRight, IMDId *mdid_scop);
+	static gpos::owner<CExpression *> PexprIDF(CMemoryPool *mp,
+											   CExpression *pexprLeft,
+											   CExpression *pexprRight,
+											   IMDId *mdid_scop);
 
 	// generate an Is NOT Distinct From expression for two column references
 	static CExpression *PexprINDF(CMemoryPool *mp, const CColRef *pcrLeft,
@@ -208,7 +209,8 @@ public:
 								  CExpression *pexprRight, IMDId *mdid_scop);
 
 	// generate an Is NULL expression
-	static CExpression *PexprIsNull(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprIsNull(CMemoryPool *mp,
+												  CExpression *pexpr);
 
 	// generate an Is NOT NULL expression
 	static CExpression *PexprIsNotNull(CMemoryPool *mp, CExpression *pexpr);
@@ -222,30 +224,28 @@ public:
 								 gpos::pointer<CExpression *> pexprLogical);
 
 	// generate a scalar op expression for a column reference and an expression
-	static CExpression *PexprScalarOp(CMemoryPool *mp, const CColRef *pcrLeft,
-									  CExpression *pexpr, CWStringConst strOp,
-									  IMDId *mdid_op,
-									  IMDId *return_type_mdid = nullptr);
+	static gpos::owner<CExpression *> PexprScalarOp(
+		CMemoryPool *mp, const CColRef *pcrLeft, CExpression *pexpr,
+		CWStringConst strOp, IMDId *mdid_op, IMDId *return_type_mdid = nullptr);
 
 	// generate a scalar bool op expression
-	static CExpression *PexprScalarBoolOp(CMemoryPool *mp,
-										  CScalarBoolOp::EBoolOperator eboolop,
-										  CExpressionArray *pdrgpexpr);
+	static gpos::owner<CExpression *> PexprScalarBoolOp(
+		CMemoryPool *mp, CScalarBoolOp::EBoolOperator eboolop,
+		CExpressionArray *pdrgpexpr);
 
 	// negate the given expression
 	static CExpression *PexprNegate(CMemoryPool *mp, CExpression *pexpr);
 
 	// generate a scalar ident expression
-	static CExpression *PexprScalarIdent(CMemoryPool *mp,
-										 const CColRef *colref);
+	static gpos::owner<CExpression *> PexprScalarIdent(CMemoryPool *mp,
+													   const CColRef *colref);
 
 	// generate a scalar project element expression
-	static CExpression *PexprScalarProjectElement(CMemoryPool *mp,
-												  CColRef *colref,
-												  CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprScalarProjectElement(
+		CMemoryPool *mp, CColRef *colref, CExpression *pexpr);
 
 	// generate an aggregate function operator
-	static CScalarAggFunc *PopAggFunc(
+	static gpos::owner<CScalarAggFunc *> PopAggFunc(
 		CMemoryPool *mp, IMDId *pmdidAggFunc, const CWStringConst *pstrAggFunc,
 		BOOL is_distinct, EAggfuncStage eaggfuncstage, BOOL fSplit,
 		IMDId *
@@ -253,10 +253,10 @@ public:
 		EAggfuncKind aggkind, ULongPtrArray *argtypes);
 
 	// generate an aggregate function
-	static CExpression *PexprAggFunc(CMemoryPool *mp, IMDId *pmdidAggFunc,
-									 const CWStringConst *pstrAggFunc,
-									 const CColRef *colref, BOOL is_distinct,
-									 EAggfuncStage eaggfuncstage, BOOL fSplit);
+	static gpos::owner<CExpression *> PexprAggFunc(
+		CMemoryPool *mp, IMDId *pmdidAggFunc, const CWStringConst *pstrAggFunc,
+		const CColRef *colref, BOOL is_distinct, EAggfuncStage eaggfuncstage,
+		BOOL fSplit);
 
 	// generate a count(*) expression
 	static CExpression *PexprCountStar(CMemoryPool *mp);
@@ -305,30 +305,28 @@ public:
 								 const CColRef *colref, BOOL is_distinct);
 
 	// generate a select expression
-	static CExpression *PexprLogicalSelect(CMemoryPool *mp, CExpression *pexpr,
-										   CExpression *pexprPredicate);
+	static gpos::owner<CExpression *> PexprLogicalSelect(
+		CMemoryPool *mp, CExpression *pexpr, CExpression *pexprPredicate);
 
 	// if predicate is True return logical expression, otherwise return a new select node
-	static CExpression *PexprSafeSelect(CMemoryPool *mp,
-										CExpression *pexprLogical,
-										CExpression *pexprPredicate);
+	static CExpression *PexprSafeSelect(
+		CMemoryPool *mp, CExpression *pexprLogical,
+		gpos::owner<CExpression *> pexprPredicate);
 
 	// generate a select expression, if child is another Select expression collapse both Selects into one expression
-	static CExpression *PexprCollapseSelect(CMemoryPool *mp, CExpression *pexpr,
-											CExpression *pexprPredicate);
+	static gpos::owner<CExpression *> PexprCollapseSelect(
+		CMemoryPool *mp, CExpression *pexpr, CExpression *pexprPredicate);
 
 	// generate a project expression
-	static CExpression *PexprLogicalProject(CMemoryPool *mp, CExpression *pexpr,
-											CExpression *pexprPrjList,
-											BOOL fNewComputedCol);
+	static gpos::owner<CExpression *> PexprLogicalProject(
+		CMemoryPool *mp, CExpression *pexpr, CExpression *pexprPrjList,
+		BOOL fNewComputedCol);
 
 	// generate a sequence project expression
-	static CExpression *PexprLogicalSequenceProject(CMemoryPool *mp,
-													CDistributionSpec *pds,
-													COrderSpecArray *pdrgpos,
-													CWindowFrameArray *pdrgpwf,
-													CExpression *pexpr,
-													CExpression *pexprPrjList);
+	static gpos::owner<CExpression *> PexprLogicalSequenceProject(
+		CMemoryPool *mp, CDistributionSpec *pds, COrderSpecArray *pdrgpos,
+		CWindowFrameArray *pdrgpwf, CExpression *pexpr,
+		CExpression *pexprPrjList);
 
 	// generate a projection of NULL constants
 	// to the map 'colref_mapping', and add the mappings to the colref_mapping map if not NULL
@@ -338,7 +336,7 @@ public:
 
 	// construct a project list using the given columns and datums
 	// store the mapping in the colref_mapping map if not NULL
-	static CExpression *PexprScalarProjListConst(
+	static gpos::owner<CExpression *> PexprScalarProjListConst(
 		CMemoryPool *mp, CColRefArray *colref_array, IDatumArray *pdrgpdatum,
 		UlongToColRefMap *colref_mapping);
 
@@ -358,11 +356,9 @@ public:
 												CExpression *pexprPrL);
 
 	// generate an aggregate expression
-	static CExpression *PexprLogicalGbAgg(CMemoryPool *mp,
-										  CColRefArray *colref_array,
-										  CExpression *pexpr,
-										  CExpression *pexprPrL,
-										  COperator::EGbAggType egbaggtype);
+	static gpos::owner<CExpression *> PexprLogicalGbAgg(
+		CMemoryPool *mp, CColRefArray *colref_array, CExpression *pexpr,
+		CExpression *pexprPrL, COperator::EGbAggType egbaggtype);
 
 	// check if the aggregate is local or global
 	static BOOL FHasGlobalAggFunc(
@@ -388,9 +384,8 @@ public:
 	static CExpression *PexprScalarConstOid(CMemoryPool *mp, OID oid_val);
 
 	// generate a NULL constant of a given type
-	static CExpression *PexprScalarConstNull(CMemoryPool *mp,
-											 gpos::pointer<const IMDType *> typ,
-											 INT type_modifier);
+	static gpos::owner<CExpression *> PexprScalarConstNull(
+		CMemoryPool *mp, gpos::pointer<const IMDType *> typ, INT type_modifier);
 
 	// comparison operator type
 	static IMDType::ECmpType ParseCmpType(IMDId *mdid);
@@ -703,9 +698,8 @@ public:
 												  ULONG ul);
 
 	// returns constant expression of a scalar array expression
-	static CExpression *PScalarArrayExprChildAt(CMemoryPool *mp,
-												CExpression *pexprArray,
-												ULONG ul);
+	static gpos::owner<CExpression *> PScalarArrayExprChildAt(
+		CMemoryPool *mp, CExpression *pexprArray, ULONG ul);
 
 	// returns the scalar array expression child of CScalarArrayComp
 	static CExpression *PexprScalarArrayChild(CExpression *pexpr);
@@ -717,8 +711,8 @@ public:
 	static BOOL FIsConstArray(gpos::pointer<CExpression *> pexpr);
 
 	// returns MDId for gp_percentile based on return type
-	static CMDIdGPDB *GetPercentileAggMDId(CMemoryPool *mp,
-										   CExpression *pexprAggFn);
+	static gpos::owner<CMDIdGPDB *> GetPercentileAggMDId(
+		CMemoryPool *mp, CExpression *pexprAggFn);
 
 	// returns if the scalar constant array has already been collapased
 	static BOOL FScalarArrayCollapsed(gpos::pointer<CExpression *> pexprArray);
@@ -741,8 +735,8 @@ public:
 
 	// If it's a scalar array of all CScalarConst, collapse it into a single
 	// expression but keep the constants in the operator.
-	static CExpression *PexprCollapseConstArray(CMemoryPool *mp,
-												CExpression *pexprArray);
+	static gpos::owner<CExpression *> PexprCollapseConstArray(
+		CMemoryPool *mp, CExpression *pexprArray);
 
 	// check if expression is scalar array coerce
 	static BOOL FScalarArrayCoerce(gpos::pointer<CExpression *> pexpr);
@@ -895,9 +889,9 @@ public:
 								  CExpression *pexpr, IMDId *mdid_dest);
 
 	// construct a logical join expression of the given type, with the given children
-	static CExpression *PexprLogicalJoin(CMemoryPool *mp,
-										 EdxlJoinType edxljointype,
-										 CExpressionArray *pdrgpexpr);
+	static gpos::owner<CExpression *> PexprLogicalJoin(
+		CMemoryPool *mp, EdxlJoinType edxljointype,
+		CExpressionArray *pdrgpexpr);
 
 	// construct an array of scalar ident expressions from the given array
 	// of column references
@@ -915,7 +909,7 @@ public:
 	static CBitSet *Pbs(CMemoryPool *mp, ULongPtrArray *pdrgpul);
 
 	// helper to create a dummy constant table expression
-	static CExpression *PexprLogicalCTGDummy(CMemoryPool *mp);
+	static gpos::owner<CExpression *> PexprLogicalCTGDummy(CMemoryPool *mp);
 
 	// map a column from source array to destination array based on position
 	static CColRef *PcrMap(CColRef *pcrSource, CColRefArray *pdrgpcrSource,
@@ -926,8 +920,8 @@ public:
 										 const CColRef *colref);
 
 	// collapse the top two project nodes, if unable return NULL
-	static CExpression *PexprCollapseProjects(CMemoryPool *mp,
-											  CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprCollapseProjects(CMemoryPool *mp,
+															CExpression *pexpr);
 
 	// match function between index get/scan operators
 	template <class T>
@@ -969,8 +963,9 @@ public:
 	static EExecLocalityType ExecLocalityType(CDistributionSpec *pds);
 
 	// generate a limit expression on top of the given relational child with the given offset and limit count
-	static CExpression *PexprLimit(CMemoryPool *mp, CExpression *pexpr,
-								   ULONG ulOffSet, ULONG count);
+	static gpos::owner<CExpression *> PexprLimit(CMemoryPool *mp,
+												 CExpression *pexpr,
+												 ULONG ulOffSet, ULONG count);
 
 	// generate part oid
 	static BOOL FGeneratePartOid(gpos::pointer<IMDId *> mdid);
@@ -999,14 +994,15 @@ public:
 		CExpressionArray *pdrgpexpr	 // array of predicates to inspect
 	);
 
-	static CExpression *MakeJoinWithoutInferredPreds(CMemoryPool *mp,
-													 CExpression *join_expr);
+	static gpos::owner<CExpression *> MakeJoinWithoutInferredPreds(
+		CMemoryPool *mp, CExpression *join_expr);
 
 	static BOOL Contains(gpos::pointer<const CExpressionArray *> exprs,
 						 gpos::pointer<CExpression *> expr_to_match);
 
-	static BOOL Equals(const CExpressionArrays *exprs_arr,
-					   const CExpressionArrays *other_exprs_arr);
+	static BOOL Equals(
+		gpos::pointer<const CExpressionArrays *> exprs_arr,
+		gpos::pointer<const CExpressionArrays *> other_exprs_arr);
 
 	static BOOL Equals(gpos::pointer<const IMdIdArray *> mdids,
 					   gpos::pointer<const IMdIdArray *> other_mdids);

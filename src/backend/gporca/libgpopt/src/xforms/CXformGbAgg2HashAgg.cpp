@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformGbAgg2HashAgg.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalGbAgg.h"
@@ -109,7 +110,7 @@ CXformGbAgg2HashAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
-	CColRefArray *colref_array = popAgg->Pdrgpcr();
+	gpos::owner<CColRefArray *> colref_array = popAgg->Pdrgpcr();
 	colref_array->AddRef();
 
 	// extract components
@@ -128,7 +129,7 @@ CXformGbAgg2HashAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalHashAgg(
 			mp, colref_array, popAgg->PdrgpcrMinimal(), popAgg->Egbaggtype(),
@@ -151,7 +152,7 @@ CXformGbAgg2HashAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 //
 //---------------------------------------------------------------------------
 BOOL
-CXformGbAgg2HashAgg::FApplicable(CExpression *pexpr)
+CXformGbAgg2HashAgg::FApplicable(gpos::pointer<CExpression *> pexpr)
 {
 	CExpression *pexprPrjList = (*pexpr)[1];
 	ULONG arity = pexprPrjList->Arity();

@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/base/CGroupTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/task/CAutoTraceFlag.h"
 
@@ -47,7 +48,7 @@ InsertGroupIntoMemo(CMemo *pmemo, CMemoryPool *mp)
 {
 	CExpression *pexprGet = CTestUtils::PexprLogicalGet(mp);
 	pexprGet->Pop()->AddRef();
-	CGroupExpression *pgexpr = GPOS_NEW(mp)
+	gpos::owner<CGroupExpression *> pgexpr = GPOS_NEW(mp)
 		CGroupExpression(mp, pexprGet->Pop(), GPOS_NEW(mp) CGroupArray(mp),
 						 CXform::ExfInvalid /*exfidOrigin*/,
 						 nullptr /*pgexprOrigin*/, false /*fIntermediate*/);
@@ -65,7 +66,7 @@ CGroupTest::EresUnittest_FResetStatsOnCGroupWithDuplicateGroup()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -75,8 +76,8 @@ CGroupTest::EresUnittest_FResetStatsOnCGroupWithDuplicateGroup()
 
 	CMemo *pmemo = GPOS_NEW(mp) CMemo(mp);
 
-	CExpression *pexprGet1 = InsertGroupIntoMemo(pmemo, mp);
-	CExpression *pexprGet2 = InsertGroupIntoMemo(pmemo, mp);
+	gpos::owner<CExpression *> pexprGet1 = InsertGroupIntoMemo(pmemo, mp);
+	gpos::owner<CExpression *> pexprGet2 = InsertGroupIntoMemo(pmemo, mp);
 
 	CGroupExpression *pgexprFirst = nullptr;
 	{

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMergeJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalMergeJoin.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -35,7 +36,7 @@ class CParseHandlerMergeJoin : public CParseHandlerPhysicalOp
 {
 private:
 	// the merge join operator
-	CDXLPhysicalMergeJoin *m_dxl_op;
+	gpos::pointer<CDXLPhysicalMergeJoin *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

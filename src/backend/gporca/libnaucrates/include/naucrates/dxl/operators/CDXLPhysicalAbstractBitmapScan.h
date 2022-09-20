@@ -49,7 +49,7 @@ class CDXLPhysicalAbstractBitmapScan : public CDXLPhysical
 private:
 protected:
 	// table descriptor for the scanned table
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
 
 public:
 	CDXLPhysicalAbstractBitmapScan(const CDXLPhysicalAbstractBitmapScan &) =

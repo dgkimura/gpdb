@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarProjectElement.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/COptCtxt.h"
@@ -80,7 +81,7 @@ CScalarProjectElement::FInputOrderSensitive() const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CScalarProjectElement::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

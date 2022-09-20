@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerDXL.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/task/CWorker.h"
 
 #include "gpopt/optimizer/COptimizerConfig.h"
@@ -97,7 +98,7 @@ CParseHandlerDXL::~CParseHandlerDXL()
 //		Returns the bitset of traceflags
 //
 //---------------------------------------------------------------------------
-CBitSet *
+gpos::pointer<CBitSet *>
 CParseHandlerDXL::Pbs() const
 {
 	return m_trace_flags_bitset;
@@ -111,7 +112,7 @@ CParseHandlerDXL::Pbs() const
 //		Returns the optimizer config object
 //
 //---------------------------------------------------------------------------
-COptimizerConfig *
+gpos::pointer<COptimizerConfig *>
 CParseHandlerDXL::GetOptimizerConfig() const
 {
 	return m_optimizer_config;
@@ -125,7 +126,7 @@ CParseHandlerDXL::GetOptimizerConfig() const
 //		Returns the root of the DXL query constructed by this parser
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::pointer<CDXLNode *>
 CParseHandlerDXL::GetQueryDXLRoot() const
 {
 	return m_query_dxl_root;
@@ -139,7 +140,7 @@ CParseHandlerDXL::GetQueryDXLRoot() const
 //		Returns the list of query output objects constructed by the parser
 //
 //---------------------------------------------------------------------------
-CDXLNodeArray *
+gpos::pointer<CDXLNodeArray *>
 CParseHandlerDXL::GetOutputColumnsDXLArray() const
 {
 	return m_output_colums_dxl_array;
@@ -153,7 +154,7 @@ CParseHandlerDXL::GetOutputColumnsDXLArray() const
 //		Returns the list of CTE producers
 //
 //---------------------------------------------------------------------------
-CDXLNodeArray *
+gpos::pointer<CDXLNodeArray *>
 CParseHandlerDXL::GetCTEProducerDXLArray() const
 {
 	return m_cte_producers;
@@ -167,7 +168,7 @@ CParseHandlerDXL::GetCTEProducerDXLArray() const
 //		Returns the root of the DXL plan constructed by this parser
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::pointer<CDXLNode *>
 CParseHandlerDXL::PdxlnPlan() const
 {
 	return m_plan_dxl_root;
@@ -181,7 +182,7 @@ CParseHandlerDXL::PdxlnPlan() const
 //		Returns the list of metadata objects constructed by the parser
 //
 //---------------------------------------------------------------------------
-IMDCacheObjectArray *
+gpos::pointer<IMDCacheObjectArray *>
 CParseHandlerDXL::GetMdIdCachedObjArray() const
 {
 	return m_mdid_cached_obj_array;
@@ -209,7 +210,7 @@ CParseHandlerDXL::GetMdIdArray() const
 //		Return the md request
 //
 //---------------------------------------------------------------------------
-CMDRequest *
+gpos::pointer<CMDRequest *>
 CParseHandlerDXL::GetMiniDumper() const
 {
 	return m_mdrequest;
@@ -223,7 +224,7 @@ CParseHandlerDXL::GetMiniDumper() const
 //		Returns the DXL node representing the parsed scalar expression
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::pointer<CDXLNode *>
 CParseHandlerDXL::GetScalarExprDXLRoot() const
 {
 	return m_scalar_expr_dxl;
@@ -238,7 +239,7 @@ CParseHandlerDXL::GetScalarExprDXLRoot() const
 //		Returns the list of source system ids for the metadata
 //
 //---------------------------------------------------------------------------
-CSystemIdArray *
+gpos::pointer<CSystemIdArray *>
 CParseHandlerDXL::GetSysidPtrArray() const
 {
 	return m_system_id_array;
@@ -252,7 +253,7 @@ CParseHandlerDXL::GetSysidPtrArray() const
 //		Returns the list of statistics objects constructed by the parser
 //
 //---------------------------------------------------------------------------
-CDXLStatsDerivedRelationArray *
+gpos::pointer<CDXLStatsDerivedRelationArray *>
 CParseHandlerDXL::GetStatsDerivedRelDXLArray() const
 {
 	return m_dxl_stats_derived_rel_array;
@@ -267,7 +268,7 @@ CParseHandlerDXL::GetStatsDerivedRelDXLArray() const
 //		Returns search strategy
 //
 //---------------------------------------------------------------------------
-CSearchStageArray *
+gpos::pointer<CSearchStageArray *>
 CParseHandlerDXL::GetSearchStageArray() const
 {
 	return m_search_stage_array;
@@ -312,7 +313,7 @@ CParseHandlerDXL::GetPlanSpaceSize() const
 //		Returns cost params
 //
 //---------------------------------------------------------------------------
-ICostModelParams *
+gpos::pointer<ICostModelParams *>
 CParseHandlerDXL::GetCostModelParams() const
 {
 	return m_cost_model_params;
@@ -642,7 +643,7 @@ CParseHandlerDXL::ExtractMDRequest(CParseHandlerBase *parse_handler_base)
 				nullptr != parse_handler_mdrequest->GetMdIdArray());
 
 	gpos::Ref<IMdIdArray> mdid_array = parse_handler_mdrequest->GetMdIdArray();
-	CMDRequest::SMDTypeRequestArray *md_type_request_array =
+	gpos::owner<CMDRequest::SMDTypeRequestArray *> md_type_request_array =
 		parse_handler_mdrequest->GetMDTypeRequestArray();
 
 	md_type_request_array->AddRef();
@@ -669,7 +670,7 @@ CParseHandlerDXL::ExtractSearchStrategy(CParseHandlerBase *parse_handler_base)
 				nullptr !=
 					parse_handler_search_strategy->GetSearchStageArray());
 
-	CSearchStageArray *search_stage_array =
+	gpos::owner<CSearchStageArray *> search_stage_array =
 		parse_handler_search_strategy->GetSearchStageArray();
 
 	search_stage_array->AddRef();
@@ -693,7 +694,7 @@ CParseHandlerDXL::ExtractCostParams(CParseHandlerBase *parse_handler_base)
 	GPOS_ASSERT(nullptr != parse_handler_cost_params &&
 				nullptr != parse_handler_cost_params->GetCostModelParams());
 
-	ICostModelParams *cost_model_params =
+	gpos::owner<ICostModelParams *> cost_model_params =
 		parse_handler_cost_params->GetCostModelParams();
 
 	cost_model_params->AddRef();

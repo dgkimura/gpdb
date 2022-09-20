@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalValuesScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -40,7 +42,7 @@ CDXLPhysicalValuesScan::GetOpNameStr() const
 	return CDXLTokens::GetDXLTokenStr(EdxltokenPhysicalValuesScan);
 }
 
-CDXLPhysicalValuesScan *
+gpos::cast_func<CDXLPhysicalValuesScan *>
 CDXLPhysicalValuesScan::Cast(CDXLOperator *dxl_op)
 {
 	GPOS_ASSERT(nullptr != dxl_op);
@@ -50,8 +52,9 @@ CDXLPhysicalValuesScan::Cast(CDXLOperator *dxl_op)
 }
 // serialize operator in DXL format
 void
-CDXLPhysicalValuesScan::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const CDXLNode *dxlnode) const
+CDXLPhysicalValuesScan::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

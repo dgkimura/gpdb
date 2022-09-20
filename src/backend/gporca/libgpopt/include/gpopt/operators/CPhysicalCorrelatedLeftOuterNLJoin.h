@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalCorrelatedLeftOuterNLJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalLeftOuterNLJoin.h"
 
@@ -29,7 +30,7 @@ class CPhysicalCorrelatedLeftOuterNLJoin : public CPhysicalLeftOuterNLJoin
 {
 private:
 	// columns from inner child used in correlated execution
-	CColRefArray *m_pdrgpcrInner;
+	gpos::owner<CColRefArray *> m_pdrgpcrInner;
 
 	// origin subquery id
 	EOperatorId m_eopidOriginSubq;
@@ -96,12 +97,12 @@ public:
 
 	// compute required distribution of the n-th child
 	CDistributionSpec *
-	PdsRequired(CMemoryPool *,		  // mp
-				CExpressionHandle &,  // exprhdl,
-				CDistributionSpec *,  // pdsRequired,
-				ULONG,				  // child_index,
-				CDrvdPropArray *,	  // pdrgpdpCtxt,
-				ULONG				  //ulOptReq
+	PdsRequired(CMemoryPool *,						 // mp
+				CExpressionHandle &,				 // exprhdl,
+				gpos::pointer<CDistributionSpec *>,	 // pdsRequired,
+				ULONG,								 // child_index,
+				gpos::pointer<CDrvdPropArray *>,	 // pdrgpdpCtxt,
+				ULONG								 //ulOptReq
 	) const override
 	{
 		GPOS_RAISE(
@@ -123,10 +124,10 @@ public:
 
 	// distribution matching type
 	CEnfdDistribution::EDistributionMatching
-	Edm(CReqdPropPlan *,   // prppInput
-		ULONG,			   // child_index
-		CDrvdPropArray *,  //pdrgpdpCtxt
-		ULONG			   // ulOptReq
+	Edm(gpos::pointer<CReqdPropPlan *>,	  // prppInput
+		ULONG,							  // child_index
+		gpos::pointer<CDrvdPropArray *>,  //pdrgpdpCtxt
+		ULONG							  // ulOptReq
 		) override
 	{
 		return CEnfdDistribution::EdmSatisfy;
@@ -140,7 +141,7 @@ public:
 	}
 
 	// return required inner columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgPcrInner() const override
 	{
 		return m_pdrgpcrInner;
@@ -154,7 +155,7 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalCorrelatedLeftOuterNLJoin *
+	static gpos::cast_func<CPhysicalCorrelatedLeftOuterNLJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -13,6 +13,7 @@
 #define GPMD_CMDPartConstraintGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/md/CMDName.h"
@@ -50,13 +51,13 @@ private:
 	CMemoryPool *m_mp;
 
 	// included default partitions
-	ULongPtrArray *m_level_with_default_part_array;
+	gpos::owner<ULongPtrArray *> m_level_with_default_part_array;
 
 	// is constraint unbounded
 	BOOL m_is_unbounded;
 
 	// the DXL representation of the part constraint
-	CDXLNode *m_dxl_node;
+	gpos::owner<CDXLNode *> m_dxl_node;
 
 public:
 	// ctor
@@ -76,7 +77,7 @@ public:
 		CColRefArray *colref_array) const override;
 
 	// included default partitions
-	ULongPtrArray *GetDefaultPartsArray() const override;
+	gpos::pointer<ULongPtrArray *> GetDefaultPartsArray() const override;
 
 	// is constraint unbounded
 	BOOL IsConstraintUnbounded() const override;

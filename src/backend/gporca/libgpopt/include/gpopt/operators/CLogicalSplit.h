@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalSplit_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogical.h"
@@ -33,10 +34,10 @@ class CLogicalSplit : public CLogical
 {
 private:
 	// deletion columns
-	CColRefArray *m_pdrgpcrDelete;
+	gpos::owner<CColRefArray *> m_pdrgpcrDelete;
 
 	// insertion columns
-	CColRefArray *m_pdrgpcrInsert;
+	gpos::owner<CColRefArray *> m_pdrgpcrInsert;
 
 	// ctid column
 	CColRef *m_pcrCtid;
@@ -76,14 +77,14 @@ public:
 	}
 
 	// deletion columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrDelete() const
 	{
 		return m_pdrgpcrDelete;
 	}
 
 	// insertion columns
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrInsert() const
 	{
 		return m_pdrgpcrInsert;
@@ -124,9 +125,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -193,7 +194,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalSplit *
+	static gpos::cast_func<CLogicalSplit *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

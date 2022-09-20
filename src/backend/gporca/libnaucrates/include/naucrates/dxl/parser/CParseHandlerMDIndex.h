@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDIndex_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 #include "naucrates/md/CMDPartConstraintGPDB.h"
@@ -54,16 +55,16 @@ private:
 	gpos::Ref<IMDId> m_mdid_item_type;
 
 	// index keys
-	ULongPtrArray *m_index_key_cols_array;
+	gpos::pointer<ULongPtrArray *> m_index_key_cols_array;
 
 	// included columns
-	ULongPtrArray *m_included_cols_array;
+	gpos::pointer<ULongPtrArray *> m_included_cols_array;
 
 	// index part constraint
-	CMDPartConstraintGPDB *m_part_constraint;
+	gpos::pointer<CMDPartConstraintGPDB *> m_part_constraint;
 
 	// levels that include default partitions
-	ULongPtrArray *m_level_with_default_part_array;
+	gpos::pointer<ULongPtrArray *> m_level_with_default_part_array;
 
 	// is constraint unbounded
 	BOOL m_part_constraint_unbounded;

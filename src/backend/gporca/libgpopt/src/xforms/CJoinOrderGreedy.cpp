@@ -72,7 +72,7 @@ CJoinOrderGreedy::GetStartingJoins()
 	CDouble dMinRows(0.0);
 	ULONG ul1Counter = 0;
 	ULONG ul2Counter = 0;
-	CJoinOrder::SComponent *pcompBest =
+	gpos::owner<CJoinOrder::SComponent *> pcompBest =
 		GPOS_NEW(m_mp) SComponent(m_mp, nullptr /*pexpr*/);
 
 	for (ULONG ul1 = 0; ul1 < m_ulComps; ul1++)
@@ -87,7 +87,8 @@ CJoinOrderGreedy::GetStartingJoins()
 				continue;
 			}
 
-			CJoinOrder::SComponent *compTemp = PcompCombine(comp1, comp2);
+			gpos::owner<CJoinOrder::SComponent *> compTemp =
+				PcompCombine(comp1, comp2);
 
 			// exclude cross joins to be considered as late as possible in the join order
 			if (CUtils::FCrossJoin(compTemp->m_pexpr))
@@ -133,7 +134,7 @@ CJoinOrderGreedy::GetStartingJoins()
 //		Create join order
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CJoinOrderGreedy::PexprExpand()
 {
 	GPOS_ASSERT(nullptr == m_pcompResult && "join order is already expanded");
@@ -152,7 +153,7 @@ CJoinOrderGreedy::PexprExpand()
 	}
 
 	// create a bitset for all the unused components
-	CBitSet *unused_components_set = GPOS_NEW(m_mp) CBitSet(m_mp);
+	gpos::owner<CBitSet *> unused_components_set = GPOS_NEW(m_mp) CBitSet(m_mp);
 	for (ULONG ul = 0; ul < m_ulComps; ul++)
 	{
 		if (!m_rgpcomp[ul]->m_fUsed)
@@ -164,7 +165,8 @@ CJoinOrderGreedy::PexprExpand()
 	while (unused_components_set->Size() > 0)
 	{
 		// get a set of components which can be joined with m_pcompResult
-		CBitSet *candidate_comp_set = GetAdjacentComponentsToJoinCandidate();
+		gpos::owner<CBitSet *> candidate_comp_set =
+			GetAdjacentComponentsToJoinCandidate();
 
 		// index for the best component that we will pick
 		ULONG best_comp_idx = gpos::ulong_max;
@@ -206,7 +208,7 @@ CJoinOrderGreedy::PexprExpand()
 	unused_components_set->Release();
 	GPOS_ASSERT(nullptr != m_pcompResult->m_pexpr);
 
-	CExpression *pexprResult = m_pcompResult->m_pexpr;
+	gpos::owner<CExpression *> pexprResult = m_pcompResult->m_pexpr;
 	pexprResult->AddRef();
 
 	return pexprResult;
@@ -223,7 +225,7 @@ CJoinOrderGreedy::PickBestJoin(CBitSet *candidate_comp_set)
 {
 	SComponent *pcompBestComponent =
 		nullptr;  // component which gives minimum cardinality when joined with m_pcompResult
-	SComponent *pcompBest =
+	gpos::owner<SComponent *> pcompBest =
 		nullptr;  // resulting join component using pcompBestComponent and original m_pcompResult which gives minimum cardinality
 	CDouble dMinRows = 0.0;
 	ULONG best_comp_idx = gpos::ulong_max;
@@ -237,7 +239,8 @@ CJoinOrderGreedy::PickBestJoin(CBitSet *candidate_comp_set)
 			continue;
 		}
 
-		SComponent *pcompTemp = PcompCombine(m_pcompResult, pcompCurrent);
+		gpos::owner<SComponent *> pcompTemp =
+			PcompCombine(m_pcompResult, pcompCurrent);
 		DeriveStats(pcompTemp->m_pexpr);
 		CDouble dRows = pcompTemp->m_pexpr->Pstats()->Rows();
 
@@ -279,7 +282,8 @@ CJoinOrderGreedy::GetAdjacentComponentsToJoinCandidate()
 {
 	// iterator over index of edges in m_rgpedge array associated with this component
 	CBitSetIter edges_iter(*(m_pcompResult->m_edge_set));
-	CBitSet *candidate_component_set = GPOS_NEW(m_mp) CBitSet(m_mp);
+	gpos::owner<CBitSet *> candidate_component_set =
+		GPOS_NEW(m_mp) CBitSet(m_mp);
 
 	while (edges_iter.Advance())
 	{

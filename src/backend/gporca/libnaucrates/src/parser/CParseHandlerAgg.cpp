@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerAgg.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFilter.h"
@@ -159,7 +161,7 @@ CParseHandlerAgg::EndElement(const XMLCh *const,  // element_uri,
 	GPOS_ASSERT(nullptr !=
 				grouping_col_list_parse_handler->GetGroupingColidArray());
 
-	ULongPtrArray *grouping_colid_array =
+	gpos::owner<ULongPtrArray *> grouping_colid_array =
 		grouping_col_list_parse_handler->GetGroupingColidArray();
 	grouping_colid_array->AddRef();
 	m_dxl_op->SetGroupingCols(grouping_colid_array);

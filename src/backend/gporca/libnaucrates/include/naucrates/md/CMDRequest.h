@@ -17,6 +17,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CSystemId.h"
 #include "naucrates/md/IMDFunction.h"
@@ -76,7 +77,7 @@ private:
 	gpos::Ref<IMdIdArray> m_mdid_array;
 
 	// type info requests
-	SMDTypeRequestArray *m_mdtype_request_array;
+	gpos::owner<SMDTypeRequestArray *> m_mdtype_request_array;
 
 	// serialize system id
 	CWStringDynamic *GetStrRepr(CSystemId sysid);
@@ -104,7 +105,7 @@ public:
 	}
 
 	// array of type info requests
-	SMDTypeRequestArray *
+	gpos::pointer<SMDTypeRequestArray *>
 	GetMDTypeRequestArray() const
 	{
 		return m_mdtype_request_array;

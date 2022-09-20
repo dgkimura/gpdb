@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/operators/CContradictionTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/string/CWStringDynamic.h"
 
@@ -62,7 +63,7 @@ CContradictionTest::EresUnittest_Constraint()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -103,7 +104,7 @@ CContradictionTest::EresUnittest_Constraint()
 						 CTestUtils::GetCostModel(mp));
 
 		// generate simple expression
-		CExpression *pexpr = rgpf[i](mp);
+		gpos::owner<CExpression *> pexpr = rgpf[i](mp);
 
 		// self-match
 		GPOS_ASSERT(pexpr->FMatchDebug(pexpr));
@@ -127,7 +128,7 @@ CContradictionTest::EresUnittest_Constraint()
 		pexpr->DbgPrint();
 #endif	// GPOS_DEBUG
 
-		CExpression *pexprPreprocessed =
+		gpos::owner<CExpression *> pexprPreprocessed =
 			CExpressionPreprocessor::PexprPreprocess(mp, pexpr);
 		oss << std::endl
 			<< "PREPROCESSED EXPR:" << std::endl

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalExternalGet.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -97,7 +98,7 @@ CLogicalExternalGet::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalExternalGet::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -114,7 +115,7 @@ CLogicalExternalGet::PopCopyWithRemappedColumns(
 	}
 	CName *pnameAlias = GPOS_NEW(mp) CName(mp, Name());
 
-	CTableDescriptor *ptabdesc = Ptabdesc();
+	gpos::owner<CTableDescriptor *> ptabdesc = Ptabdesc();
 	ptabdesc->AddRef();
 
 	return GPOS_NEW(mp)
@@ -132,7 +133,7 @@ CLogicalExternalGet::PopCopyWithRemappedColumns(
 CXformSet *
 CLogicalExternalGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfExternalGet2ExternalScan);
 
 	return xform_set;

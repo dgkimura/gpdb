@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalWindow.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -115,7 +117,7 @@ CDXLPhysicalWindow::WindowKeysCount() const
 //		Return the window key at a given position
 //
 //---------------------------------------------------------------------------
-CDXLWindowKey *
+gpos::pointer<CDXLWindowKey *>
 CDXLPhysicalWindow::GetDXLWindowKeyAt(ULONG position) const
 {
 	GPOS_ASSERT(position <= m_dxl_window_key_array->Size());
@@ -131,8 +133,9 @@ CDXLPhysicalWindow::GetDXLWindowKeyAt(ULONG position) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+CDXLPhysicalWindow::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

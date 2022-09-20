@@ -13,6 +13,7 @@
 #define GPDXL_CDXLScalarPartBound_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalar.h"
 
@@ -78,7 +79,7 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						gpos::pointer<const CDXLNode *> dxlnode) const override;
 
 	// does the operator return a boolean result
 	BOOL HasBoolResult(CMDAccessor *md_accessor) const override;
@@ -91,7 +92,7 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarPartBound *
+	static gpos::cast_func<CDXLScalarPartBound *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

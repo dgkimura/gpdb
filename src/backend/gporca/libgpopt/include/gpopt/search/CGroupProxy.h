@@ -12,6 +12,7 @@
 #define GPOPT_CGroupProxy_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/search/CGroup.h"
 
@@ -36,7 +37,7 @@ class CGroupProxy
 {
 private:
 	// group we're operating on
-	CGroup *m_pgroup;
+	gpos::pointer<CGroup *> m_pgroup;
 
 	// skip group expressions starting from the given expression;
 	CGroupExpression *PgexprSkip(CGroupExpression *pgexprStart,

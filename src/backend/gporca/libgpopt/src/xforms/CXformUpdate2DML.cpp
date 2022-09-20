@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformUpdate2DML.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogicalPartitionSelector.h"
@@ -89,7 +90,7 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	BOOL fSplit = popUpdate->FSplit();
 
 	// child of update operator
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
 	pexprChild->AddRef();
 
 	IMDId *rel_mdid = ptabdesc->MDId();
@@ -109,19 +110,20 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMDAccessor *md_accessor = poctxt->Pmda();
 	CColumnFactory *col_factory = poctxt->Pcf();
 
-	const IMDType *pmdtype = md_accessor->PtMDType<IMDTypeInt4>();
+	gpos::pointer<const IMDType *> pmdtype =
+		md_accessor->PtMDType<IMDTypeInt4>();
 	CColRef *pcrAction = col_factory->PcrCreate(pmdtype, default_type_modifier);
 
-	CExpression *pexprSplit = nullptr;
+	gpos::owner<CExpression *> pexprSplit = nullptr;
 	if (fSplit)
 	{
 		pdrgpcrDelete->AddRef();
 		pdrgpcrInsert->AddRef();
-		CExpression *pexprProjElem = GPOS_NEW(mp) CExpression(
+		gpos::owner<CExpression *> pexprProjElem = GPOS_NEW(mp) CExpression(
 			mp, GPOS_NEW(mp) CScalarProjectElement(mp, pcrAction),
 			GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarDMLAction(mp)));
 
-		CExpression *pexprProjList = GPOS_NEW(mp)
+		gpos::owner<CExpression *> pexprProjList = GPOS_NEW(mp)
 			CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp), pexprProjElem);
 		pexprSplit = GPOS_NEW(mp) CExpression(
 			mp,
@@ -179,12 +181,12 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	const ULONG num_cols = pdrgpcrInsert->Size();
 
-	CExpression *pexprDML = nullptr;
+	gpos::owner<CExpression *> pexprDML = nullptr;
 	// create logical DML
 	ptabdesc->AddRef();
 	if (fSplit)
 	{
-		CBitSet *pbsModified =
+		gpos::owner<CBitSet *> pbsModified =
 			GPOS_NEW(mp) CBitSet(mp, ptabdesc->ColumnCount());
 		for (ULONG ul = 0; ul < num_cols; ul++)
 		{

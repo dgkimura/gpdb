@@ -12,6 +12,7 @@
 #define GPOPT_CTreeMapTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/search/CTreeMap.h"
 
@@ -39,7 +40,7 @@ class CTreeMapTest
 		ULONG m_ulData;
 
 		// children
-		CNodeArray *m_pdrgpnd;
+		gpos::owner<CNodeArray *> m_pdrgpnd;
 
 	public:
 		CNode(const CNode &) = delete;
@@ -60,8 +61,8 @@ private:
 	static ULONG m_ulTestCounter;
 
 	// factory function for result object
-	static CNode *Pnd(CMemoryPool *mp, ULONG *pul, CNodeArray *pdrgpnd,
-					  BOOL *fTestTrue);
+	static gpos::owner<CNode *> Pnd(CMemoryPool *mp, ULONG *pul,
+									CNodeArray *pdrgpnd, BOOL *fTestTrue);
 
 	// shorthand for tests
 	using TestMap =

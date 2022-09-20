@@ -42,10 +42,10 @@ class CDXLPhysicalWindow : public CDXLPhysical
 {
 private:
 	// partition columns
-	ULongPtrArray *m_part_by_colid_array;
+	gpos::owner<ULongPtrArray *> m_part_by_colid_array;
 
 	// window keys
-	CDXLWindowKeyArray *m_dxl_window_key_array;
+	gpos::owner<CDXLWindowKeyArray *> m_dxl_window_key_array;
 
 public:
 	CDXLPhysicalWindow(CDXLPhysicalWindow &) = delete;
@@ -75,7 +75,7 @@ public:
 	ULONG WindowKeysCount() const;
 
 	// return the window key at a given position
-	CDXLWindowKey *GetDXLWindowKeyAt(ULONG ulPos) const;
+	gpos::pointer<CDXLWindowKey *> GetDXLWindowKeyAt(ULONG ulPos) const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

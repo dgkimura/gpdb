@@ -11,6 +11,7 @@
 
 #include "naucrates/md/CDXLStatsDerivedColumn.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -66,7 +67,7 @@ CDXLStatsDerivedColumn::~CDXLStatsDerivedColumn()
 //		Returns the array of buckets
 //
 //---------------------------------------------------------------------------
-const CDXLBucketArray *
+gpos::pointer<const CDXLBucketArray *>
 CDXLStatsDerivedColumn::TransformHistogramToDXLBucketArray() const
 {
 	return m_dxl_stats_bucket_array;

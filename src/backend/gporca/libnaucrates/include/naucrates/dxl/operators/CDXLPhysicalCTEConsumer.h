@@ -34,7 +34,7 @@ private:
 	ULONG m_id;
 
 	// output column ids
-	ULongPtrArray *m_output_colids_array;
+	gpos::owner<ULongPtrArray *> m_output_colids_array;
 
 public:
 	CDXLPhysicalCTEConsumer(CDXLPhysicalCTEConsumer &) = delete;

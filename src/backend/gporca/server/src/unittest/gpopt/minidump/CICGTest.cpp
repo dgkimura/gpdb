@@ -11,6 +11,7 @@
 
 #include "unittest/gpopt/minidump/CICGTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/task/CAutoTraceFlag.h"
 
@@ -205,15 +206,16 @@ CICGTest::EresUnittest_RunUnsupportedMinidumpTests()
 
 		GPOS_TRY
 		{
-			ICostModel *pcm = CTestUtils::GetCostModel(mp);
+			gpos::owner<ICostModel *> pcm = CTestUtils::GetCostModel(mp);
 
 			COptimizerConfig *optimizer_config = pdxlmd->GetOptimizerConfig();
-			CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
-				mp, filename,
-				optimizer_config->GetCostModel()->UlHosts() /*ulSegments*/,
-				1 /*ulSessionId*/, 1,	  /*ulCmdId*/
-				optimizer_config, nullptr /*pceeval*/
-			);
+			gpos::owner<CDXLNode *> pdxlnPlan =
+				CMinidumperUtils::PdxlnExecuteMinidump(
+					mp, filename,
+					optimizer_config->GetCostModel()->UlHosts() /*ulSegments*/,
+					1 /*ulSessionId*/, 1,	  /*ulCmdId*/
+					optimizer_config, nullptr /*pceeval*/
+				);
 
 
 			GPOS_CHECK_ABORT;
@@ -301,19 +303,21 @@ CICGTest::EresUnittest_NegativeIndexApplyTests()
 	{
 		GPOS_TRY
 		{
-			ICostModel *pcm = CTestUtils::GetCostModel(mp);
+			gpos::owner<ICostModel *> pcm = CTestUtils::GetCostModel(mp);
 
-			COptimizerConfig *optimizer_config = GPOS_NEW(mp) COptimizerConfig(
-				CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
-				CStatisticsConfig::PstatsconfDefault(mp),
-				CCTEConfig::PcteconfDefault(mp), pcm, CHint::PhintDefault(mp),
-				CWindowOids::GetWindowOids(mp));
-			CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
-				mp, rgszNegativeIndexApplyFileNames[ul],
-				GPOPT_TEST_SEGMENTS /*ulSegments*/, 1 /*ulSessionId*/,
-				1,						  /*ulCmdId*/
-				optimizer_config, nullptr /*pceeval*/
-			);
+			gpos::owner<COptimizerConfig *> optimizer_config =
+				GPOS_NEW(mp) COptimizerConfig(
+					CEnumeratorConfig::GetEnumeratorCfg(mp, 0 /*plan_id*/),
+					CStatisticsConfig::PstatsconfDefault(mp),
+					CCTEConfig::PcteconfDefault(mp), pcm,
+					CHint::PhintDefault(mp), CWindowOids::GetWindowOids(mp));
+			gpos::owner<CDXLNode *> pdxlnPlan =
+				CMinidumperUtils::PdxlnExecuteMinidump(
+					mp, rgszNegativeIndexApplyFileNames[ul],
+					GPOPT_TEST_SEGMENTS /*ulSegments*/, 1 /*ulSessionId*/,
+					1,						  /*ulCmdId*/
+					optimizer_config, nullptr /*pceeval*/
+				);
 			GPOS_CHECK_ABORT;
 			optimizer_config->Release();
 			pdxlnPlan->Release();
@@ -355,7 +359,8 @@ CICGTest::EresUnittest_NegativeIndexApplyTests()
 //
 //---------------------------------------------------------------------------
 BOOL
-CICGTest::FDXLOpSatisfiesPredicate(CDXLNode *pdxl, FnDXLOpPredicate fdop)
+CICGTest::FDXLOpSatisfiesPredicate(gpos::pointer<CDXLNode *> pdxl,
+								   FnDXLOpPredicate fdop)
 {
 	using namespace gpdxl;
 
@@ -386,7 +391,7 @@ CICGTest::FDXLOpSatisfiesPredicate(CDXLNode *pdxl, FnDXLOpPredicate fdop)
 //
 //---------------------------------------------------------------------------
 BOOL
-CICGTest::FIsNotIndexJoin(CDXLOperator *dxl_op)
+CICGTest::FIsNotIndexJoin(gpos::pointer<CDXLOperator *> dxl_op)
 {
 	if (EdxlopPhysicalNLJoin == dxl_op->GetDXLOperator())
 	{
@@ -408,7 +413,7 @@ CICGTest::FIsNotIndexJoin(CDXLOperator *dxl_op)
 //
 //---------------------------------------------------------------------------
 BOOL
-CICGTest::FHasNoIndexJoin(CDXLNode *pdxl)
+CICGTest::FHasNoIndexJoin(gpos::pointer<CDXLNode *> pdxl)
 {
 	return FDXLOpSatisfiesPredicate(pdxl, FIsNotIndexJoin);
 }
@@ -433,7 +438,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 					   true /*value*/);
 
 	// When the risk threshold is infinite, we should pick index join
-	ICostModelParamsArray *pdrgpcpUnlimited =
+	gpos::owner<ICostModelParamsArray *> pdrgpcpUnlimited =
 		GPOS_NEW(mp) ICostModelParamsArray(mp);
 	ICostModelParams::SCostParam *pcpUnlimited =
 		GPOS_NEW(mp) ICostModelParams::SCostParam(
@@ -458,7 +463,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 	}
 
 	// When the risk threshold is zero, we should not pick index join
-	ICostModelParamsArray *pdrgpcpNoIndexJoin =
+	gpos::owner<ICostModelParamsArray *> pdrgpcpNoIndexJoin =
 		GPOS_NEW(mp) ICostModelParamsArray(mp);
 	ICostModelParams::SCostParam *pcpNoIndexJoin =
 		GPOS_NEW(mp) ICostModelParams::SCostParam(

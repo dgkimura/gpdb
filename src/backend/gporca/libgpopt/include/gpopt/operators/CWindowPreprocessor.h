@@ -12,6 +12,7 @@
 #define GPOPT_CWindowPreprocessor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COrderSpec.h"
 #include "gpopt/base/CWindowFrame.h"
@@ -55,14 +56,15 @@ private:
 	static CColRefArray *PdrgpcrGrpCols(CExpression *pexprJoinDQAs);
 
 	// transform sequence project expression into an inner join expression
-	static CExpression *PexprSeqPrj2Join(CMemoryPool *mp,
-										 CExpression *pexprSeqPrj);
+	static gpos::owner<CExpression *> PexprSeqPrj2Join(
+		CMemoryPool *mp, CExpression *pexprSeqPrj);
 
 public:
 	CWindowPreprocessor(const CWindowPreprocessor &) = delete;
 
 	// main driver
-	static CExpression *PexprPreprocess(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprPreprocess(CMemoryPool *mp,
+													  CExpression *pexpr);
 
 };	// class CWindowPreprocessor
 }  // namespace gpopt

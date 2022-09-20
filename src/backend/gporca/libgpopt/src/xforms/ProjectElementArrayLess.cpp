@@ -6,14 +6,16 @@
 #include "gpopt/xforms/ProjectElementArrayLess.h"
 
 #include "gpos/common/Casting.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalarProjectElement.h"
 
 namespace gpopt
 {
 bool
-ProjectElementArrayLess::operator()(const CExpressionArray *a,
-									const CExpressionArray *b) const
+ProjectElementArrayLess::operator()(
+	gpos::pointer<const CExpressionArray *> a,
+	gpos::pointer<const CExpressionArray *> b) const
 {
 	CExpression *pexprPrjElemFst = (*a)[0];
 	CExpression *pexprPrjElemSnd = (*b)[0];

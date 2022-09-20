@@ -15,6 +15,7 @@
 #include "gpos/common/CAutoTimer.h"
 #include "gpos/common/CSyncHashtableAccessByIter.h"
 #include "gpos/common/CSyncHashtableAccessByKey.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/string/CWStringDynamic.h"
@@ -71,7 +72,7 @@ CMemo::CMemo(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CMemo::~CMemo()
 {
-	CGroup *pgroup = m_listGroups.PtFirst();
+	gpos::owner<CGroup *> pgroup = m_listGroups.PtFirst();
 	while (nullptr != pgroup)
 	{
 		CGroup *pgroupNext = m_listGroups.Next(pgroup);
@@ -232,8 +233,8 @@ CMemo::FNewGroup(CGroup **ppgroupTarget, CGroupExpression *pgexpr, BOOL fScalar)
 //
 //---------------------------------------------------------------------------
 CGroup *
-CMemo::PgroupInsert(CGroup *pgroupTarget, CExpression *pexprOrigin,
-					CGroupExpression *pgexpr)
+CMemo::PgroupInsert(gpos::owner<CGroup *> pgroupTarget,
+					CExpression *pexprOrigin, CGroupExpression *pgexpr)
 {
 	GPOS_ASSERT(nullptr != pgexpr);
 	GPOS_CHECK_ABORT;
@@ -340,7 +341,8 @@ CMemo::PexprExtractPlan(CMemoryPool *mp, CGroup *pgroupRoot,
 		return nullptr;
 	}
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	// Get the length of groups for the best group expression
 	// i.e. given the best expression is
 	// 0: CScalarCmp (>=) [ 1 7 ]
@@ -399,7 +401,7 @@ CMemo::PexprExtractPlan(CMemoryPool *mp, CGroup *pgroupRoot,
 		prpp = poc->Prpp();
 		prpp->AddRef();
 	}
-	CExpression *pexpr = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexpr = GPOS_NEW(mp) CExpression(
 		mp, pgexprBest->Pop(), pgexprBest, pdrgpexpr, prpp, stats, cost);
 
 	if (pexpr->Pop()->FPhysical() && !poc->PccBest()->IsValid(mp))

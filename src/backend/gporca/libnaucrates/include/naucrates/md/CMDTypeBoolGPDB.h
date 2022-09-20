@@ -105,7 +105,7 @@ private:
 	static CMDName m_mdname;
 
 	// a null datum of this type (used for statistics comparison)
-	IDatum *m_datum_null;
+	gpos::owner<IDatum *> m_datum_null;
 
 public:
 	CMDTypeBoolGPDB(const CMDTypeBoolGPDB &) = delete;
@@ -221,11 +221,11 @@ public:
 	}
 
 	// factory method for creating constants
-	IDatumBool *CreateBoolDatum(CMemoryPool *mp, BOOL fValue,
-								BOOL is_null) const override;
+	gpos::owner<IDatumBool *> CreateBoolDatum(CMemoryPool *mp, BOOL fValue,
+											  BOOL is_null) const override;
 
 	// create typed datum from DXL datum
-	IDatum *GetDatumForDXLDatum(
+	gpos::owner<IDatum *> GetDatumForDXLDatum(
 		CMemoryPool *mp,
 		gpos::pointer<const CDXLDatum *> dxl_datum) const override;
 
@@ -233,18 +233,19 @@ public:
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;
 
 	// transformation function to generate datum from CDXLScalarConstValue
-	IDatum *GetDatumForDXLConstVal(
+	gpos::owner<IDatum *> GetDatumForDXLConstVal(
 		gpos::pointer<const CDXLScalarConstValue *> dxl_op) const override;
 
 	// generate the DXL datum from IDatum
-	CDXLDatum *GetDatumVal(CMemoryPool *mp, IDatum *datum) const override;
+	gpos::owner<CDXLDatum *> GetDatumVal(CMemoryPool *mp,
+										 IDatum *datum) const override;
 
 	// generate the DXL scalar constant from IDatum
-	CDXLScalarConstValue *GetDXLOpScConst(CMemoryPool *mp,
-										  IDatum *datum) const override;
+	gpos::owner<CDXLScalarConstValue *> GetDXLOpScConst(
+		CMemoryPool *mp, IDatum *datum) const override;
 
 	// generate the DXL datum representing null value
-	CDXLDatum *GetDXLDatumNull(CMemoryPool *mp) const override;
+	gpos::owner<CDXLDatum *> GetDXLDatumNull(CMemoryPool *mp) const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the type in the provided stream

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerCostParams_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/cost/ICostModelParams.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -33,7 +34,7 @@ class CParseHandlerCostParams : public CParseHandlerBase
 {
 private:
 	// cost params
-	ICostModelParams *m_cost_model_params;
+	gpos::owner<ICostModelParams *> m_cost_model_params;
 
 	// process the start of an element
 	void StartElement(
@@ -62,7 +63,7 @@ public:
 	~CParseHandlerCostParams() override;
 
 	// returns the dxl representation of cost parameters
-	ICostModelParams *
+	gpos::pointer<ICostModelParams *>
 	GetCostModelParams()
 	{
 		return m_cost_model_params;

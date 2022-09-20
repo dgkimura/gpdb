@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarSubqueryAll.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 
@@ -40,14 +41,14 @@ CScalarSubqueryAll::CScalarSubqueryAll(CMemoryPool *mp, IMDId *scalar_op_mdid,
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CScalarSubqueryAll::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											   UlongToColRefMap *colref_mapping,
 											   BOOL must_exist)
 {
 	CColRef *colref = CUtils::PcrRemap(Pcr(), colref_mapping, must_exist);
 
-	IMDId *scalar_op_mdid = MdIdOp();
+	gpos::owner<IMDId *> scalar_op_mdid = MdIdOp();
 	scalar_op_mdid->AddRef();
 
 	CWStringConst *pstrScalarOp =

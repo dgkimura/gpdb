@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalLeftOuterNLJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalNLJoin.h"
 
@@ -53,7 +54,7 @@ public:
 
 
 	// conversion function
-	static CPhysicalLeftOuterNLJoin *
+	static gpos::cast_func<CPhysicalLeftOuterNLJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftOuterNLJoin == pop->Eopid());

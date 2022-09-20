@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerScalarComp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarComp.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerScalarComp : public CParseHandlerScalarOp
 {
 private:
 	// the scalar comparison operator
-	CDXLScalarComp *m_dxl_op;
+	gpos::pointer<CDXLScalarComp *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

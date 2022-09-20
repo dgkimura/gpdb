@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformSubqJoin2Apply.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalInnerJoin.h"
 #include "gpopt/operators/CLogicalNAryJoin.h"
@@ -95,7 +96,7 @@ CXformSubqJoin2Apply::CollectSubqueries(
 	if (CUtils::FSubquery(pop))
 	{
 		// extract outer references below subquery
-		CColRefSet *outer_refs = GPOS_NEW(mp)
+		gpos::owner<CColRefSet *> outer_refs = GPOS_NEW(mp)
 			CColRefSet(mp, *((*pexpr)[0]->DeriveOuterReferences()));
 
 		// add columns used by subquery
@@ -142,7 +143,7 @@ CXformSubqJoin2Apply::CollectSubqueries(
 //		Replace subqueries with scalar identifiers based on given map
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CXformSubqJoin2Apply::PexprReplaceSubqueries(CMemoryPool *mp,
 											 CExpression *pexprScalar,
 											 ExprToColRefMap *phmexprcr)
@@ -160,7 +161,8 @@ CXformSubqJoin2Apply::PexprReplaceSubqueries(CMemoryPool *mp,
 
 	// recursively process children
 	const ULONG arity = pexprScalar->Arity();
-	CExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprChildren =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		CExpression *pexprChild =
@@ -168,7 +170,7 @@ CXformSubqJoin2Apply::PexprReplaceSubqueries(CMemoryPool *mp,
 		pdrgpexprChildren->Append(pexprChild);
 	}
 
-	COperator *pop = pexprScalar->Pop();
+	gpos::owner<COperator *> pop = pexprScalar->Pop();
 	pop->AddRef();
 
 	return GPOS_NEW(mp) CExpression(mp, pop, pdrgpexprChildren);
@@ -183,7 +185,7 @@ CXformSubqJoin2Apply::PexprReplaceSubqueries(CMemoryPool *mp,
 //		Push down subquery below join
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CXformSubqJoin2Apply::PexprSubqueryPushDown(CMemoryPool *mp, CExpression *pexpr,
 											BOOL fEnforceCorrelatedApply)
 {
@@ -198,12 +200,13 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown(CMemoryPool *mp, CExpression *pexpr,
 		CLogicalNAryJoin::PopConvertNAryLOJ(pexprJoin->Pop());
 
 	// collect output columns of all logical children
-	CColRefSetArray *pdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
-	CExpressionArrays *pdrgpdrgpexprSubqs = GPOS_NEW(mp) CExpressionArrays(mp);
+	gpos::owner<CColRefSetArray *> pdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
+	gpos::owner<CExpressionArrays *> pdrgpdrgpexprSubqs =
+		GPOS_NEW(mp) CExpressionArrays(mp);
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
 		CExpression *pexprChild = (*pexprJoin)[ul];
-		CColRefSet *pcrsOutput = nullptr;
+		gpos::owner<CColRefSet *> pcrsOutput = nullptr;
 
 		if ((nullptr == naryLOJOp || naryLOJOp->IsInnerJoinChild(ul)))
 		{
@@ -229,13 +232,14 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown(CMemoryPool *mp, CExpression *pexpr,
 
 	// create new join children by pushing subqueries to Project nodes on top
 	// of corresponding join children
-	CExpressionArray *pdrgpexprNewChildren = GPOS_NEW(mp) CExpressionArray(mp);
-	ExprToColRefMap *phmexprcr = GPOS_NEW(mp) ExprToColRefMap(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprNewChildren =
+		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<ExprToColRefMap *> phmexprcr = GPOS_NEW(mp) ExprToColRefMap(mp);
 	for (ULONG ulChild = 0; ulChild < arity - 1; ulChild++)
 	{
-		CExpression *pexprChild = (*pexprJoin)[ulChild];
+		gpos::owner<CExpression *> pexprChild = (*pexprJoin)[ulChild];
 		pexprChild->AddRef();
-		CExpression *pexprNewChild = pexprChild;
+		gpos::owner<CExpression *> pexprNewChild = pexprChild;
 
 		CExpressionArray *pdrgpexprSubqs = (*pdrgpdrgpexprSubqs)[ulChild];
 		const ULONG ulSubqs = pdrgpexprSubqs->Size();
@@ -249,7 +253,8 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown(CMemoryPool *mp, CExpression *pexpr,
 			// add pushed subqueries to map
 			for (ULONG ulSubq = 0; ulSubq < ulSubqs; ulSubq++)
 			{
-				CExpression *pexprSubq = (*pdrgpexprSubqs)[ulSubq];
+				gpos::owner<CExpression *> pexprSubq =
+					(*pdrgpexprSubqs)[ulSubq];
 				pexprSubq->AddRef();
 				CColRef *colref = CScalarProjectElement::PopConvert(
 									  (*pexprPrjList)[ulSubq]->Pop())
@@ -287,9 +292,9 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown(CMemoryPool *mp, CExpression *pexpr,
 	pdrgpdrgpexprSubqs->Release();
 
 	// build the new join expression
-	COperator *pop = pexprJoin->Pop();
+	gpos::owner<COperator *> pop = pexprJoin->Pop();
 	pop->AddRef();
-	CExpression *pexprNewJoin =
+	gpos::owner<CExpression *> pexprNewJoin =
 		GPOS_NEW(mp) CExpression(mp, pop, pdrgpexprNewChildren);
 
 	// return a new Select expression
@@ -317,7 +322,7 @@ CXformSubqJoin2Apply::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CExpression *pexprSelect =
+	gpos::owner<CExpression *> pexprSelect =
 		CXformUtils::PexprSeparateSubqueryPreds(mp, pexpr);
 
 	if (nullptr == pexprSelect)
@@ -329,7 +334,7 @@ CXformSubqJoin2Apply::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	// attempt pushing subqueries to join children,
 	// this optimization may not always succeed since unnested subqueries below joins
 	// could hide columns needed to evaluate join condition
-	CExpression *pexprSubqsPushedDown =
+	gpos::owner<CExpression *> pexprSubqsPushedDown =
 		PexprSubqueryPushDown(mp, pexprSelect, fEnforceCorrelatedApply);
 
 	// check if join columns in join condition are still accessible after subquery pushdown
@@ -347,7 +352,7 @@ CXformSubqJoin2Apply::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	pexprSelect->Release();
 
-	CExpression *pexprResult = nullptr;
+	gpos::owner<CExpression *> pexprResult = nullptr;
 	BOOL fHasSubquery = (*pexprSubqsPushedDown)[1]->DeriveHasSubquery();
 	if (fHasSubquery)
 	{

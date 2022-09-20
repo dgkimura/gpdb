@@ -128,7 +128,7 @@ private:
 	{
 	private:
 		// hashed object
-		IMDCacheObject *m_imd_obj;
+		gpos::owner<IMDCacheObject *> m_imd_obj;
 
 	public:
 		// hash key
@@ -171,7 +171,7 @@ private:
 		CSystemId m_sysid;
 
 		// value of the hashed element
-		IMDProvider *m_pmdp;
+		gpos::owner<IMDProvider *> m_pmdp;
 
 	public:
 		// generic link
@@ -187,7 +187,7 @@ private:
 		~SMDProviderElem();
 
 		// return the MD provider
-		IMDProvider *Pmdp();
+		gpos::pointer<IMDProvider *> Pmdp();
 
 		// return the system id
 		CSystemId Sysid() const;
@@ -278,8 +278,8 @@ public:
 	CMDAccessor(CMemoryPool *mp, MDCache *pcache, CSystemId sysid,
 				IMDProvider *pmdp);
 	CMDAccessor(CMemoryPool *mp, MDCache *pcache,
-				const CSystemIdArray *pdrgpsysid,
-				const CMDProviderArray *pdrgpmdp);
+				gpos::pointer<const CSystemIdArray *> pdrgpsysid,
+				gpos::pointer<const CMDProviderArray *> pdrgpmdp);
 
 	//dtor
 	~CMDAccessor();
@@ -295,8 +295,8 @@ public:
 	void RegisterProvider(CSystemId sysid, IMDProvider *pmdp);
 
 	// register given MD providers
-	void RegisterProviders(const CSystemIdArray *pdrgpsysid,
-						   const CMDProviderArray *pdrgpmdp);
+	void RegisterProviders(gpos::pointer<const CSystemIdArray *> pdrgpsysid,
+						   gpos::pointer<const CMDProviderArray *> pdrgpmdp);
 
 	// interface to a relation object from the MD cache
 	gpos::pointer<const IMDRelation *> RetrieveRel(IMDId *mdid);
@@ -337,7 +337,7 @@ public:
 	gpos::pointer<const IMDAggregate *> RetrieveAgg(IMDId *mdid);
 
 	// interface to a trigger from the MD cache
-	const IMDTrigger *RetrieveTrigger(IMDId *mdid);
+	gpos::pointer<const IMDTrigger *> RetrieveTrigger(IMDId *mdid);
 
 	// interface to an index from the MD cache
 	gpos::pointer<const IMDIndex *> RetrieveIndex(IMDId *mdid);
@@ -361,7 +361,7 @@ public:
 											 IMDType::ECmpType cmp_type);
 
 	// construct a statistics object for the columns of the given relation
-	IStatistics *Pstats(
+	gpos::owner<IStatistics *> Pstats(
 		CMemoryPool *mp, IMDId *rel_mdid,
 		CColRefSet
 			*pcrsHist,	// set of column references for which stats are needed

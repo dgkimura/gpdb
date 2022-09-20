@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalConstTable.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 #include "naucrates/dxl/xml/dxltokens.h"
@@ -97,7 +99,7 @@ CDXLLogicalConstTable::GetOpNameStr() const
 //		Type of const table element at given position
 //
 //---------------------------------------------------------------------------
-CDXLColDescr *
+gpos::pointer<CDXLColDescr *>
 CDXLLogicalConstTable::GetColumnDescrAt(ULONG idx) const
 {
 	GPOS_ASSERT(m_col_descr_array->Size() > idx);
@@ -129,7 +131,7 @@ CDXLLogicalConstTable::Arity() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalConstTable::SerializeToDXL(CXMLSerializer *xml_serializer,
-									  const CDXLNode *	//dxlnode
+									  gpos::pointer<const CDXLNode *>  //dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();

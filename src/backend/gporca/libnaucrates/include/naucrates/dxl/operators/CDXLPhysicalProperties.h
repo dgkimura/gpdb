@@ -34,7 +34,7 @@ class CDXLPhysicalProperties : public CDXLProperties
 {
 private:
 	// cost estimate
-	CDXLOperatorCost *m_operator_cost_dxl;
+	gpos::owner<CDXLOperatorCost *> m_operator_cost_dxl;
 
 public:
 	CDXLPhysicalProperties(const CDXLPhysicalProperties &) = delete;
@@ -51,7 +51,7 @@ public:
 
 	// accessors
 	// the cost estimates for the operator node
-	CDXLOperatorCost *GetDXLOperatorCost() const;
+	gpos::pointer<CDXLOperatorCost *> GetDXLOperatorCost() const;
 
 	Edxlproperty
 	GetDXLPropertyType() const override

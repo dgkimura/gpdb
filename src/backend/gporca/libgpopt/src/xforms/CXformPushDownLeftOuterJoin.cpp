@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformPushDownLeftOuterJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CLogicalLeftOuterJoin.h"
@@ -116,8 +117,9 @@ CXformPushDownLeftOuterJoin::Transform(CXformContext *pxfctxt,
 	CExpression *pexprLOJScalarChild = (*pexpr)[2];
 
 	CColRefSet *pcrsLOJUsed = pexprLOJScalarChild->DeriveUsedColumns();
-	CExpressionArray *pdrgpexprLOJChildren = GPOS_NEW(mp) CExpressionArray(mp);
-	CExpressionArray *pdrgpexprNAryJoinChildren =
+	gpos::owner<CExpressionArray *> pdrgpexprLOJChildren =
+		GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprNAryJoinChildren =
 		GPOS_NEW(mp) CExpressionArray(mp);
 
 	const ULONG arity = pexprNAryJoin->Arity();
@@ -145,7 +147,7 @@ CXformPushDownLeftOuterJoin::Transform(CXformContext *pxfctxt,
 		return;
 	}
 
-	CExpression *pexprLOJOuterChild = (*pdrgpexprLOJChildren)[0];
+	gpos::owner<CExpression *> pexprLOJOuterChild = (*pdrgpexprLOJChildren)[0];
 	if (1 < pdrgpexprLOJChildren->Size())
 	{
 		// collect all relations needed by LOJ outer side into a cross product,
@@ -168,7 +170,7 @@ CXformPushDownLeftOuterJoin::Transform(CXformContext *pxfctxt,
 	pdrgpexprLOJChildren->Append(pexprLOJScalarChild);
 
 	// build new LOJ
-	CExpression *pexprLOJNew = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprLOJNew = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalLeftOuterJoin(mp), pdrgpexprLOJChildren);
 
 	// add new NAry join children
@@ -204,7 +206,7 @@ CXformPushDownLeftOuterJoin::Transform(CXformContext *pxfctxt,
 	}
 
 	// create new NAry join
-	CExpression *pexprNAryJoinNew = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprNAryJoinNew = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalNAryJoin(mp), pdrgpexprNAryJoinChildren);
 
 	// normalize resulting expression and add it to xform results

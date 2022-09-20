@@ -21,6 +21,7 @@
 #define GPOPT_CScalarCoerceViaIO_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalarCoerceBase.h"
 
@@ -73,7 +74,7 @@ public:
 	}
 
 	// conversion function
-	static CScalarCoerceViaIO *
+	static gpos::cast_func<CScalarCoerceViaIO *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

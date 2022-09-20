@@ -12,6 +12,7 @@
 #define GPOPT_CScalarSubqueryExists_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalarSubqueryExistential.h"
 
@@ -56,7 +57,7 @@ public:
 	}
 
 	// conversion function
-	static CScalarSubqueryExists *
+	static gpos::cast_func<CScalarSubqueryExists *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

@@ -71,7 +71,7 @@ public:
 
 private:
 	// containment map
-	ConstraintContainmentMap *m_phmcontain;
+	gpos::owner<ConstraintContainmentMap *> m_phmcontain;
 
 	// constant true
 	static BOOL m_fTrue;
@@ -102,25 +102,24 @@ private:
 											BOOL infer_nulls_as = false);
 
 	// create constraint from scalar boolean expression
-	static CConstraint *PcnstrFromScalarBoolOp(CMemoryPool *mp,
-											   CExpression *pexpr,
-											   CColRefSetArray **ppdrgpcrs,
-											   BOOL infer_nulls_as = false);
+	static gpos::owner<CConstraint *> PcnstrFromScalarBoolOp(
+		CMemoryPool *mp, CExpression *pexpr,
+		gpos::owner<CColRefSetArray *> *ppdrgpcrs, BOOL infer_nulls_as = false);
 
 	// create conjunction/disjunction from array of constraints
-	static CConstraint *PcnstrConjDisj(CMemoryPool *mp,
-									   CConstraintArray *pdrgpcnstr,
-									   BOOL fConj);
+	static CConstraint *PcnstrConjDisj(
+		CMemoryPool *mp, gpos::owner<CConstraintArray *> pdrgpcnstr,
+		BOOL fConj);
 
 protected:
 	// memory pool -- used for local computations
 	CMemoryPool *m_mp;
 
 	// columns used in this constraint
-	CColRefSet *m_pcrsUsed;
+	gpos::owner<CColRefSet *> m_pcrsUsed;
 
 	// equivalent scalar expression
-	CExpression *m_pexprScalar;
+	gpos::owner<CExpression *> m_pexprScalar;
 
 	// print
 	IOstream &PrintConjunctionDisjunction(IOstream &os,
@@ -133,14 +132,14 @@ protected:
 											BOOL fConj);
 
 	// flatten an array of constraints to be used as constraint children
-	static CConstraintArray *PdrgpcnstrFlatten(CMemoryPool *mp,
-											   CConstraintArray *pdrgpcnstr,
-											   EConstraintType ect);
+	static CConstraintArray *PdrgpcnstrFlatten(
+		CMemoryPool *mp, gpos::owner<CConstraintArray *> pdrgpcnstr,
+		EConstraintType ect);
 
 	// combine any two or more constraints that reference only one particular column
-	static CConstraintArray *PdrgpcnstrDeduplicate(CMemoryPool *mp,
-												   CConstraintArray *pdrgpcnstr,
-												   EConstraintType ect);
+	static CConstraintArray *PdrgpcnstrDeduplicate(
+		CMemoryPool *mp, gpos::owner<CConstraintArray *> pdrgpcnstr,
+		EConstraintType ect);
 
 	// mapping between columns and arrays of constraints
 	static ColRefToConstraintArrayMap *Phmcolconstr(
@@ -153,10 +152,9 @@ protected:
 
 	// create constraint from scalar array comparison expression originally generated for
 	// "scalar op ANY/ALL (array)" construct
-	static CConstraint *PcnstrFromScalarArrayCmp(CMemoryPool *mp,
-												 CExpression *pexpr,
-												 CColRef *colref,
-												 BOOL infer_nulls_as = false);
+	static gpos::owner<CConstraint *> PcnstrFromScalarArrayCmp(
+		CMemoryPool *mp, CExpression *pexpr, CColRef *colref,
+		BOOL infer_nulls_as = false);
 
 	static CColRefSet *PcrsFromConstraints(CMemoryPool *mp,
 										   CConstraintArray *pdrgpcnstr);
@@ -250,7 +248,7 @@ public:
 										  CConstraintArray *pdrgpcnstr);
 
 	// merge equivalence classes coming from children of a bool op
-	static CColRefSetArray *PdrgpcrsMergeFromBoolOp(
+	static gpos::owner<CColRefSetArray *> PdrgpcrsMergeFromBoolOp(
 		CMemoryPool *mp, CExpression *pexpr, CColRefSetArray *pdrgpcrsFst,
 		CColRefSetArray *pdrgpcrsSnd);
 

@@ -13,6 +13,7 @@
 #define GPMD_CMDRelationCTASGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/md/CMDColumn.h"
@@ -70,10 +71,10 @@ private:
 	Ereldistrpolicy m_rel_distr_policy;
 
 	// columns
-	CMDColumnArray *m_md_col_array;
+	gpos::owner<CMDColumnArray *> m_md_col_array;
 
 	// indices of distribution columns
-	ULongPtrArray *m_distr_col_array;
+	gpos::owner<ULongPtrArray *> m_distr_col_array;
 
 	// distribution opfamilies
 	gpos::Ref<IMdIdArray> m_distr_opfamilies;
@@ -82,26 +83,26 @@ private:
 	gpos::Ref<IMdIdArray> m_distr_opclasses;
 
 	// array of key sets
-	ULongPtr2dArray *m_keyset_array;
+	gpos::owner<ULongPtr2dArray *> m_keyset_array;
 
 	// number of system columns
 	ULONG m_system_columns;
 
 	// mapping of attribute number in the system catalog to the positions of
 	// the non dropped column in the metadata object
-	IntToUlongMap *m_attrno_nondrop_col_pos_map;
+	gpos::owner<IntToUlongMap *> m_attrno_nondrop_col_pos_map;
 
 	// the original positions of all the non-dropped columns
-	ULongPtrArray *m_nondrop_col_pos_array;
+	gpos::owner<ULongPtrArray *> m_nondrop_col_pos_array;
 
 	// storage options
-	CDXLCtasStorageOptions *m_dxl_ctas_storage_option;
+	gpos::owner<CDXLCtasStorageOptions *> m_dxl_ctas_storage_option;
 
 	// vartypemod list
-	IntPtrArray *m_vartypemod_array;
+	gpos::owner<IntPtrArray *> m_vartypemod_array;
 
 	// array of column widths
-	CDoubleArray *m_col_width_array;
+	gpos::owner<CDoubleArray *> m_col_width_array;
 
 public:
 	CMDRelationCtasGPDB(const CMDRelationCtasGPDB &) = delete;
@@ -153,7 +154,7 @@ public:
 	}
 
 	// CTAS storage options
-	CDXLCtasStorageOptions *
+	gpos::pointer<CDXLCtasStorageOptions *>
 	GetDxlCtasStorageOption() const override
 	{
 		return m_dxl_ctas_storage_option;
@@ -180,7 +181,7 @@ public:
 	}
 
 	// return the original positions of all the non-dropped columns
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	NonDroppedColsArray() const override
 	{
 		return m_nondrop_col_pos_array;
@@ -190,13 +191,13 @@ public:
 	ULONG SystemColumnsCount() const override;
 
 	// retrieve the column at the given position
-	const IMDColumn *GetMdCol(ULONG pos) const override;
+	gpos::pointer<const IMDColumn *> GetMdCol(ULONG pos) const override;
 
 	// number of distribution columns
 	ULONG DistrColumnCount() const override;
 
 	// retrieve the column at the given position in the distribution columns list for the relation
-	const IMDColumn *GetDistrColAt(ULONG pos) const override;
+	gpos::pointer<const IMDColumn *> GetDistrColAt(ULONG pos) const override;
 
 	IMDId *GetDistrOpfamilyAt(ULONG pos) const override;
 
@@ -231,7 +232,8 @@ public:
 	}
 
 	// retrieve the id of the metadata cache index at the given position
-	IMDId *IndexMDidAt(ULONG  // pos
+	IMDId *
+	IndexMDidAt(ULONG  // pos
 	) const override
 	{
 		GPOS_ASSERT("CTAS tables have no indexes");
@@ -239,7 +241,8 @@ public:
 	}
 
 	// retrieve the id of the metadata cache trigger at the given position
-	IMDId *TriggerMDidAt(ULONG	// pos
+	IMDId *
+	TriggerMDidAt(ULONG	 // pos
 	) const override
 	{
 		GPOS_ASSERT("CTAS tables have no triggers");
@@ -257,7 +260,8 @@ public:
 	}
 
 	// retrieve the id of the check constraint cache at the given position
-	IMDId *CheckConstraintMDidAt(ULONG	// pos
+	IMDId *
+	CheckConstraintMDidAt(ULONG	 // pos
 	) const override
 	{
 		GPOS_ASSERT("CTAS tables have no constraints");
@@ -265,7 +269,7 @@ public:
 	}
 
 	// list of vartypmod for target expressions
-	IntPtrArray *
+	gpos::pointer<IntPtrArray *>
 	GetVarTypeModArray() const
 	{
 		return m_vartypemod_array;

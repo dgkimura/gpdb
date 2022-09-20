@@ -11,6 +11,8 @@
 
 #include "gpopt/search/CSearchStage.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CCostContext.h"
 #include "gpopt/xforms/CXformFactory.h"
 
@@ -120,9 +122,10 @@ CSearchStage::SetBestExpr(CExpression *pexpr)
 CSearchStageArray *
 CSearchStage::PdrgpssDefault(CMemoryPool *mp)
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	xform_set->Union(CXformFactory::Pxff()->PxfsExploration());
-	CSearchStageArray *search_stage_array = GPOS_NEW(mp) CSearchStageArray(mp);
+	gpos::owner<CSearchStageArray *> search_stage_array =
+		GPOS_NEW(mp) CSearchStageArray(mp);
 
 	search_stage_array->Append(GPOS_NEW(mp) CSearchStage(xform_set));
 

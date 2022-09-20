@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerDynamicIndexScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalIndexScan.h"
 #include "naucrates/dxl/parser/CParseHandlerIndexScan.h"
@@ -35,7 +36,7 @@ XERCES_CPP_NAMESPACE_USE
 class CParseHandlerDynamicIndexScan : public CParseHandlerIndexScan
 {
 private:
-	ULongPtrArray *m_selector_ids;
+	gpos::pointer<ULongPtrArray *> m_selector_ids;
 
 	// process the start of an element
 	void StartElement(

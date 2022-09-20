@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformSplitLimit.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -143,7 +144,7 @@ CXformSplitLimit::PexprLimit(CMemoryPool *mp, CExpression *pexprRelational,
 	pos->AddRef();
 
 	// assemble global limit operator
-	CExpression *pexprLimit = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprLimit = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
 			CLogicalLimit(mp, pos, fGlobal, fHasCount, fTopLimitUnderDML),

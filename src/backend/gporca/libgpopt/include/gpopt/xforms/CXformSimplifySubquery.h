@@ -13,6 +13,7 @@
 #define GPOPT_CXformSimplifySubquery_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformExploration.h"
 
@@ -47,11 +48,10 @@ private:
 									CExpression **ppexprNewScalar);
 
 	// main driver, transform existential/quantified subqueries to count(*) subqueries
-	static BOOL FSimplifySubqueryRecursive(CMemoryPool *mp,
-										   CExpression *pexprScalar,
-										   CExpression **ppexprNewScalar,
-										   FnSimplify *pfnsimplify,
-										   FnMatch *pfnmatch);
+	static BOOL FSimplifySubqueryRecursive(
+		CMemoryPool *mp, CExpression *pexprScalar,
+		gpos::owner<CExpression *> *ppexprNewScalar, FnSimplify *pfnsimplify,
+		FnMatch *pfnmatch);
 
 	static CExpression *FSimplifySubquery(CMemoryPool *mp,
 										  CExpression *pexprInput,

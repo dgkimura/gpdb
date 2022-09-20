@@ -5,6 +5,8 @@
 #ifndef GPOPT_CDistributionSpecHashedNoOp_H
 #define GPOPT_CDistributionSpecHashedNoOp_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CDistributionSpecHashed.h"
 
 namespace gpopt
@@ -16,7 +18,7 @@ public:
 
 	EDistributionType Edt() const override;
 
-	BOOL Matches(const CDistributionSpec *pds) const override;
+	BOOL Matches(gpos::pointer<const CDistributionSpec *> pds) const override;
 
 	const CHAR *
 	SzId() const override
@@ -25,7 +27,8 @@ public:
 	}
 
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 gpos::pointer<CReqdPropPlan *> prpp,
+						 CExpressionArray *pdrgpexpr,
 						 CExpression *pexpr) override;
 };
 }  // namespace gpopt

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarArray.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -168,7 +169,7 @@ CScalarArray::MdidType() const
 	return m_pmdidArray.get();
 }
 
-CScalarConstArray *
+gpos::pointer<CScalarConstArray *>
 CScalarArray::PdrgPconst() const
 {
 	return m_pdrgPconst;

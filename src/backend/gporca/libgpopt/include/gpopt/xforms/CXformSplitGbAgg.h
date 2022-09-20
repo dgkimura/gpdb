@@ -12,6 +12,7 @@
 #define GPOPT_CXformSplitGbAgg_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformExploration.h"
 
@@ -32,7 +33,7 @@ class CXformSplitGbAgg : public CXformExploration
 private:
 protected:
 	// check if the transformation is applicable;
-	static BOOL FApplicable(CExpression *pexpr);
+	static BOOL FApplicable(gpos::pointer<CExpression *> pexpr);
 
 	// generate a project lists for the local and global aggregates
 	// from the original aggregate

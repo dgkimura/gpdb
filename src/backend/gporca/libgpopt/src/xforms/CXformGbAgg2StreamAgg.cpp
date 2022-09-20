@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformGbAgg2StreamAgg.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -96,7 +97,7 @@ CXformGbAgg2StreamAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	GPOS_ASSERT(FCheckPattern(pexpr));
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CColRefArray *colref_array = popAgg->Pdrgpcr();
+	gpos::owner<CColRefArray *> colref_array = popAgg->Pdrgpcr();
 	colref_array->AddRef();
 
 	// extract components
@@ -114,7 +115,7 @@ CXformGbAgg2StreamAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalStreamAgg(
 			mp, colref_array, popAgg->PdrgpcrMinimal(), popAgg->Egbaggtype(),

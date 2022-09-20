@@ -12,6 +12,7 @@
 
 #include "naucrates/md/CMDTypeBoolGPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/base/CDatumBoolGPDB.h"
@@ -155,7 +156,7 @@ CMDTypeBoolGPDB::GetMdidForAggType(EAggType agg_type) const
 //		Factory function for creating BOOL datums
 //
 //---------------------------------------------------------------------------
-IDatumBool *
+gpos::owner<IDatumBool *>
 CMDTypeBoolGPDB::CreateBoolDatum(CMemoryPool *mp, BOOL bool_val,
 								 BOOL is_null) const
 {
@@ -227,9 +228,9 @@ CMDTypeBoolGPDB::Serialize(CXMLSerializer *xml_serializer) const
 //		Transformation function to generate bool datum from CDXLScalarConstValue
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::owner<IDatum *>
 CMDTypeBoolGPDB::GetDatumForDXLConstVal(
-	const CDXLScalarConstValue *dxl_op) const
+	gpos::pointer<const CDXLScalarConstValue *> dxl_op) const
 {
 	CDXLDatumBool *dxl_datum =
 		CDXLDatumBool::Cast(const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
@@ -246,9 +247,9 @@ CMDTypeBoolGPDB::GetDatumForDXLConstVal(
 //		Construct a bool datum from a DXL datum
 //
 //---------------------------------------------------------------------------
-IDatum *
-CMDTypeBoolGPDB::GetDatumForDXLDatum(CMemoryPool *mp,
-									 const CDXLDatum *dxl_datum) const
+gpos::owner<IDatum *>
+CMDTypeBoolGPDB::GetDatumForDXLDatum(
+	CMemoryPool *mp, gpos::pointer<const CDXLDatum *> dxl_datum) const
 {
 	CDXLDatumBool *dxl_datum_bool =
 		CDXLDatumBool::Cast(const_cast<CDXLDatum *>(dxl_datum));
@@ -266,7 +267,7 @@ CMDTypeBoolGPDB::GetDatumForDXLDatum(CMemoryPool *mp,
 // 		Generate dxl datum
 //
 //---------------------------------------------------------------------------
-CDXLDatum *
+gpos::owner<CDXLDatum *>
 CMDTypeBoolGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 {
 	CDatumBoolGPDB *datum_bool = dynamic_cast<CDatumBoolGPDB *>(datum);
@@ -283,13 +284,13 @@ CMDTypeBoolGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 // 		Generate a dxl scalar constant from a datum
 //
 //---------------------------------------------------------------------------
-CDXLScalarConstValue *
+gpos::owner<CDXLScalarConstValue *>
 CMDTypeBoolGPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
 {
 	CDatumBoolGPDB *datum_bool_gpdb = dynamic_cast<CDatumBoolGPDB *>(datum);
 
 	m_mdid->AddRef();
-	CDXLDatumBool *dxl_datum =
+	gpos::owner<CDXLDatumBool *> dxl_datum =
 		GPOS_NEW(mp) CDXLDatumBool(mp, m_mdid.get(), datum_bool_gpdb->IsNull(),
 								   datum_bool_gpdb->GetValue());
 
@@ -304,7 +305,7 @@ CMDTypeBoolGPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
 // 		Generate dxl datum representing a null value
 //
 //---------------------------------------------------------------------------
-CDXLDatum *
+gpos::owner<CDXLDatum *>
 CMDTypeBoolGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
 	m_mdid->AddRef();

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerProjElem_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarProjElem.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -35,7 +36,7 @@ class CParseHandlerProjElem : public CParseHandlerScalarOp
 {
 private:
 	// project elem operator
-	CDXLScalarProjElem *m_dxl_op;
+	gpos::pointer<CDXLScalarProjElem *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

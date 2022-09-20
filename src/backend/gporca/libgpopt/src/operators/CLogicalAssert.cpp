@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalAssert.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -114,7 +115,7 @@ CLogicalAssert::DeriveKeyCollection(CMemoryPool *,	// mp
 CXformSet *
 CLogicalAssert::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementAssert);
 	return xform_set;
 }

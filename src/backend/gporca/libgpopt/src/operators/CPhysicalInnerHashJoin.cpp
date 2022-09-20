@@ -69,7 +69,7 @@ CPhysicalInnerHashJoin::PdshashedCreateMatching(
 {
 	GPOS_ASSERT(nullptr != pdshashed);
 
-	CDistributionSpecHashed *pdshashedMatching =
+	gpos::owner<CDistributionSpecHashed *> pdshashedMatching =
 		PdshashedMatching(mp, pdshashed, ulSourceChild);
 
 	// create a new spec with input and the output spec as equivalents, as you don't want to lose
@@ -81,7 +81,7 @@ CPhysicalInnerHashJoin::PdshashedCreateMatching(
 	{
 		pdshashedMatching->Opfamilies()->AddRef();
 	}
-	CDistributionSpecHashed *pdsHashedMatchingEquivalents =
+	gpos::owner<CDistributionSpecHashed *> pdsHashedMatchingEquivalents =
 		GPOS_NEW(mp) CDistributionSpecHashed(
 			pdshashedMatching->Pdrgpexpr(),
 			pdshashedMatching->FNullsColocated(),
@@ -137,15 +137,15 @@ CPhysicalInnerHashJoin::PdsDeriveFromHashedChildren(
 //		Derive hash join distribution from a replicated outer child;
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalInnerHashJoin::PdsDeriveFromReplicatedOuter(
 	CMemoryPool *mp,
-	CDistributionSpec *
+	gpos::pointer<CDistributionSpec *>
 #ifdef GPOS_DEBUG
 		pdsOuter
 #endif	// GPOS_DEBUG
 	,
-	CDistributionSpec *pdsInner) const
+	gpos::pointer<CDistributionSpec *> pdsInner) const
 {
 	GPOS_ASSERT(nullptr != pdsOuter);
 	GPOS_ASSERT(nullptr != pdsInner);
@@ -181,11 +181,11 @@ CPhysicalInnerHashJoin::PdsDeriveFromReplicatedOuter(
 //
 //---------------------------------------------------------------------------
 CDistributionSpec *
-CPhysicalInnerHashJoin::PdsDeriveFromHashedOuter(CMemoryPool *mp,
-												 CDistributionSpec *pdsOuter,
-												 CDistributionSpec *
+CPhysicalInnerHashJoin::PdsDeriveFromHashedOuter(
+	CMemoryPool *mp, CDistributionSpec *pdsOuter,
+	gpos::pointer<CDistributionSpec *>
 #ifdef GPOS_DEBUG
-													 pdsInner
+		pdsInner
 #endif	// GPOS_DEBUG
 ) const
 {
@@ -215,12 +215,14 @@ CPhysicalInnerHashJoin::PdsDeriveFromHashedOuter(CMemoryPool *mp,
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalInnerHashJoin::PdsDerive(CMemoryPool *mp,
 								  CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
-	CDistributionSpec *pdsInner = exprhdl.Pdpplan(1 /*child_index*/)->Pds();
+	gpos::pointer<CDistributionSpec *> pdsOuter =
+		exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	gpos::pointer<CDistributionSpec *> pdsInner =
+		exprhdl.Pdpplan(1 /*child_index*/)->Pds();
 
 	if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 	{
@@ -304,7 +306,7 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 	// CPartInfo *part_info_outer = exprhdl.DerivePartitionInfo(0);
 	// CPartInfo *part_info_inner = exprhdl.DerivePartitionInfo(1);
 
-	CPartitionPropagationSpec *pps_result;
+	gpos::owner<CPartitionPropagationSpec *> pps_result;
 	if (ulOptReq == 0)
 	{
 		// DPE: create a new request
@@ -317,7 +319,7 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 			CPartKeysArray *part_keys_array =
 				part_info_outer->Pdrgppartkeys(ul);
 
-			CExpression *pexprCmp =
+			gpos::owner<CExpression *> pexprCmp =
 				PexprJoinPredOnPartKeys(mp, pexprScalar, part_keys_array,
 										pcrsOutputInner /* pcrsAllowedRefs*/);
 			if (pexprCmp == nullptr)
@@ -330,7 +332,7 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 				CPartitionPropagationSpec *pps_inner =
 					CDrvdPropPlan::Pdpplan((*pdrgpdpCtxt)[0])->Ppps();
 
-				CBitSet *selector_ids =
+				gpos::owner<CBitSet *> selector_ids =
 					GPOS_NEW(mp) CBitSet(mp, *pps_inner->SelectorIds(scan_id));
 				pps_result->Insert(scan_id,
 								   CPartitionPropagationSpec::EpptConsumer,
@@ -347,7 +349,7 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 			pexprCmp->Release();
 		}
 
-		CBitSet *allowed_scan_ids = GPOS_NEW(mp) CBitSet(mp);
+		gpos::owner<CBitSet *> allowed_scan_ids = GPOS_NEW(mp) CBitSet(mp);
 		CPartInfo *part_info = exprhdl.DerivePartitionInfo(child_index);
 		for (ULONG ul = 0; ul < part_info->UlConsumers(); ++ul)
 		{
@@ -374,7 +376,7 @@ CPhysicalInnerHashJoin::PppsDerive(CMemoryPool *mp,
 	CPartitionPropagationSpec *pps_outer = exprhdl.Pdpplan(0)->Ppps();
 	CPartitionPropagationSpec *pps_inner = exprhdl.Pdpplan(1)->Ppps();
 
-	CPartitionPropagationSpec *pps_result =
+	gpos::owner<CPartitionPropagationSpec *> pps_result =
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	pps_result->InsertAll(pps_outer);
 	pps_result->InsertAllResolve(pps_inner);

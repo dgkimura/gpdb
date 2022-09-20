@@ -47,8 +47,9 @@ private:
 	gpos::owner<CPoint *> m_pred_point;
 
 	// add padding to datums when needed
-	static IDatum *PreprocessDatum(CMemoryPool *mp, const CColRef *colref,
-								   IDatum *datum);
+	static gpos::owner<IDatum *> PreprocessDatum(CMemoryPool *mp,
+												 const CColRef *colref,
+												 gpos::pointer<IDatum *> datum);
 
 public:
 	CStatsPredPoint &operator=(CStatsPredPoint &) = delete;

@@ -60,13 +60,13 @@ private:
 	Ereldistrpolicy m_rel_distr_policy;
 
 	// columns
-	CMDColumnArray *m_md_col_array;
+	gpos::owner<CMDColumnArray *> m_md_col_array;
 
 	// number of dropped columns
 	ULONG m_dropped_cols;
 
 	// indices of distribution columns
-	ULongPtrArray *m_distr_col_array;
+	gpos::owner<ULongPtrArray *> m_distr_col_array;
 
 	gpos::Ref<IMdIdArray> m_distr_opfamilies;
 
@@ -74,10 +74,10 @@ private:
 	BOOL m_convert_hash_to_random;
 
 	// array of key sets
-	ULongPtr2dArray *m_keyset_array;
+	gpos::owner<ULongPtr2dArray *> m_keyset_array;
 
 	// array of index infos
-	CMDIndexInfoArray *m_mdindex_info_array;
+	gpos::owner<CMDIndexInfoArray *> m_mdindex_info_array;
 
 	// array of trigger ids
 	gpos::Ref<IMdIdArray> m_mdid_trigger_array;
@@ -98,17 +98,17 @@ private:
 	ULONG m_system_columns;
 
 	// mapping of column position to positions excluding dropped columns
-	UlongToUlongMap *m_colpos_nondrop_colpos_map;
+	gpos::owner<UlongToUlongMap *> m_colpos_nondrop_colpos_map;
 
 	// mapping of attribute number in the system catalog to the positions of
 	// the non dropped column in the metadata object
-	IntToUlongMap *m_attrno_nondrop_col_pos_map;
+	gpos::owner<IntToUlongMap *> m_attrno_nondrop_col_pos_map;
 
 	// the original positions of all the non-dropped columns
-	ULongPtrArray *m_nondrop_col_pos_array;
+	gpos::owner<ULongPtrArray *> m_nondrop_col_pos_array;
 
 	// array of column widths including dropped columns
-	CDoubleArray *m_col_width_array;
+	gpos::owner<CDoubleArray *> m_col_width_array;
 
 	// format type for the relation
 	const CWStringConst *GetRelFormatType() const;
@@ -160,7 +160,7 @@ public:
 	ULONG NonDroppedColsCount() const override;
 
 	// return the original positions of all the non-dropped columns
-	ULongPtrArray *NonDroppedColsArray() const override;
+	gpos::pointer<ULongPtrArray *> NonDroppedColsArray() const override;
 
 	// number of system columns
 	ULONG SystemColumnsCount() const override;

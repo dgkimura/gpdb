@@ -12,6 +12,7 @@
 #include "naucrates/statistics/CPoint.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/statistics/CStatistics.h"
@@ -43,7 +44,7 @@ CPoint::CPoint(IDatum *datum) : m_datum(datum)
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::Equals(const CPoint *point) const
+CPoint::Equals(gpos::pointer<const CPoint *> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 	return m_datum->StatsAreEqual(point->m_datum);
@@ -58,7 +59,7 @@ CPoint::Equals(const CPoint *point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::IsNotEqual(const CPoint *point) const
+CPoint::IsNotEqual(gpos::pointer<const CPoint *> point) const
 {
 	return !(this->Equals(point));
 }
@@ -72,7 +73,7 @@ CPoint::IsNotEqual(const CPoint *point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::IsLessThan(const CPoint *point) const
+CPoint::IsLessThan(gpos::pointer<const CPoint *> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 	return m_datum->StatsAreComparable(point->m_datum) &&
@@ -88,7 +89,7 @@ CPoint::IsLessThan(const CPoint *point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::IsLessThanOrEqual(const CPoint *point) const
+CPoint::IsLessThanOrEqual(gpos::pointer<const CPoint *> point) const
 {
 	return (this->IsLessThan(point) || this->Equals(point));
 }
@@ -102,7 +103,7 @@ CPoint::IsLessThanOrEqual(const CPoint *point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::IsGreaterThan(const CPoint *point) const
+CPoint::IsGreaterThan(gpos::pointer<const CPoint *> point) const
 {
 	return m_datum->StatsAreComparable(point->m_datum) &&
 		   m_datum->StatsAreGreaterThan(point->m_datum);
@@ -117,14 +118,14 @@ CPoint::IsGreaterThan(const CPoint *point) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPoint::IsGreaterThanOrEqual(const CPoint *point) const
+CPoint::IsGreaterThanOrEqual(gpos::pointer<const CPoint *> point) const
 {
 	return (this->IsGreaterThan(point) || this->Equals(point));
 }
 
 // Distance between two points, assuming closed lower bound and open upper bound
 CDouble
-CPoint::Distance(const CPoint *point) const
+CPoint::Distance(gpos::pointer<const CPoint *> point) const
 {
 	return Width(point, true /*include_lower*/, false /*include_upper*/);
 }
@@ -133,7 +134,8 @@ CPoint::Distance(const CPoint *point) const
 // this" is usually the higher value and "point" is the lower value
 // [0,5) would return 5, [0,5] would return 6 and (0,5) would return 4
 CDouble
-CPoint::Width(const CPoint *point, BOOL include_lower, BOOL include_upper) const
+CPoint::Width(gpos::pointer<const CPoint *> point, BOOL include_lower,
+			  BOOL include_upper) const
 {
 	// default to a non zero constant for overlap computation
 	CDouble width = CDouble(1.0);

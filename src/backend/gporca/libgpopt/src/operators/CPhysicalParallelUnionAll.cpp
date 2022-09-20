@@ -3,6 +3,8 @@
 
 #include "gpopt/operators/CPhysicalParallelUnionAll.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CDistributionSpecHashedNoOp.h"
 #include "gpopt/base/CDistributionSpecRandom.h"
 #include "gpopt/base/CDistributionSpecStrictHashed.h"
@@ -40,14 +42,15 @@ CPhysicalParallelUnionAll::SzId() const
 	return "CPhysicalParallelUnionAll";
 }
 
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalParallelUnionAll::PdsRequired(CMemoryPool *mp, CExpressionHandle &,
-									   CDistributionSpec *, ULONG child_index,
-									   CDrvdPropArray *, ULONG ulOptReq) const
+									   gpos::pointer<CDistributionSpec *>,
+									   ULONG child_index, CDrvdPropArray *,
+									   ULONG ulOptReq) const
 {
 	if (0 == ulOptReq)
 	{
-		CDistributionSpec *pdsChild = (*m_pdrgpds)[child_index];
+		gpos::owner<CDistributionSpec *> pdsChild = (*m_pdrgpds)[child_index];
 		pdsChild->AddRef();
 		return pdsChild;
 	}
@@ -55,7 +58,7 @@ CPhysicalParallelUnionAll::PdsRequired(CMemoryPool *mp, CExpressionHandle &,
 	{
 		CColRefArray *pdrgpcrChildInputColumns =
 			(*PdrgpdrgpcrInput())[child_index];
-		CExpressionArray *pdrgpexprFakeRequestedColumns =
+		gpos::owner<CExpressionArray *> pdrgpexprFakeRequestedColumns =
 			GPOS_NEW(mp) CExpressionArray(mp);
 
 		CColRef *pcrFirstColumn = (*pdrgpcrChildInputColumns)[0];
@@ -69,10 +72,10 @@ CPhysicalParallelUnionAll::PdsRequired(CMemoryPool *mp, CExpressionHandle &,
 }
 
 CEnfdDistribution::EDistributionMatching
-CPhysicalParallelUnionAll::Edm(CReqdPropPlan *,	  // prppInput
-							   ULONG,			  // child_index
-							   CDrvdPropArray *,  //pdrgpdpCtxt
-							   ULONG			  // ulOptReq
+CPhysicalParallelUnionAll::Edm(gpos::pointer<CReqdPropPlan *>,	// prppInput
+							   ULONG,							// child_index
+							   CDrvdPropArray *,				//pdrgpdpCtxt
+							   ULONG							// ulOptReq
 )
 {
 	return CEnfdDistribution::EdmExact;

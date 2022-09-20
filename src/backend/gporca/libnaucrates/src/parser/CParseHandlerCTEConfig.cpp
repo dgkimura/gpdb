@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerCTEConfig.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/engine/CCTEConfig.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -138,7 +140,7 @@ CParseHandlerCTEConfig::GetParseHandlerType() const
 //		Returns the CTE configuration
 //
 //---------------------------------------------------------------------------
-CCTEConfig *
+gpos::pointer<CCTEConfig *>
 CParseHandlerCTEConfig::GetCteConf() const
 {
 	return m_cte_conf;

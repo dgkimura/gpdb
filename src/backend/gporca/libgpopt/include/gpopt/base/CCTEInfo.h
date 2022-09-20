@@ -121,10 +121,10 @@ private:
 		CMemoryPool *m_mp;
 
 		// logical producer expression
-		CExpression *m_pexprCTEProducer;
+		gpos::owner<CExpression *> m_pexprCTEProducer;
 
 		// map columns of all created consumers of current CTE to their positions in consumer output
-		ColRefToUlongMap *m_phmcrulConsumers;
+		gpos::owner<ColRefToUlongMap *> m_phmcrulConsumers;
 
 		// is this CTE used
 		BOOL m_fUsed;
@@ -186,7 +186,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// mapping from cte producer id -> cte info entry
-	UlongToCTEInfoEntryMap *m_phmulcteinfoentry;
+	gpos::owner<UlongToCTEInfoEntryMap *> m_phmulcteinfoentry;
 
 	// next available CTE Id
 	ULONG m_ulNextCTEId;
@@ -195,7 +195,7 @@ private:
 	BOOL m_fEnableInlining;
 
 	// consumers inside each cte/main query
-	UlongToProducerConsumerMap *m_phmulprodconsmap;
+	gpos::owner<UlongToProducerConsumerMap *> m_phmulprodconsmap;
 
 	// initialize default statistics for a given CTE Producer
 	void InitDefaultStats(CExpression *pexprCTEProducer);

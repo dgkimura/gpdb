@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalDelete.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -95,7 +96,7 @@ CDXLLogicalDelete::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalDelete::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  const CDXLNode *node) const
+								  gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

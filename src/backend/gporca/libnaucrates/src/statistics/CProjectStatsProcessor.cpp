@@ -11,6 +11,8 @@
 
 #include "naucrates/statistics/CProjectStatsProcessor.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/COptCtxt.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
@@ -19,20 +21,21 @@ using namespace gpopt;
 
 //  return a statistics object for a project operation
 CStatistics *
-CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
-									  const CStatistics *input_stats,
-									  ULongPtrArray *projection_colids,
-									  UlongToIDatumMap *datum_map)
+CProjectStatsProcessor::CalcProjStats(
+	CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
+	ULongPtrArray *projection_colids, UlongToIDatumMap *datum_map)
 {
 	GPOS_ASSERT(nullptr != projection_colids);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
 	// create hash map from colid -> histogram for resultant structure
-	UlongToHistogramMap *histograms_new = GPOS_NEW(mp) UlongToHistogramMap(mp);
+	gpos::owner<UlongToHistogramMap *> histograms_new =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// column ids on which widths are to be computed
-	UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::owner<UlongToDoubleMap *> colid_width_mapping =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	const ULONG length = projection_colids->Size();
 	for (ULONG ul = 0; ul < length; ul++)
@@ -43,7 +46,8 @@ CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
 		if (nullptr == histogram)
 		{
 			// create histogram for the new project column
-			CBucketArray *proj_col_bucket = GPOS_NEW(mp) CBucketArray(mp);
+			gpos::owner<CBucketArray *> proj_col_bucket =
+				GPOS_NEW(mp) CBucketArray(mp);
 			CDouble null_freq = 0.0;
 
 			BOOL is_well_defined = false;
@@ -113,7 +117,7 @@ CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
 
 	CDouble input_rows = input_stats->Rows();
 	// create an output stats object
-	CStatistics *projection_stats = GPOS_NEW(mp) CStatistics(
+	gpos::owner<CStatistics *> projection_stats = GPOS_NEW(mp) CStatistics(
 		mp, histograms_new, colid_width_mapping, input_rows,
 		input_stats->IsEmpty(), input_stats->GetNumberOfPredicates());
 

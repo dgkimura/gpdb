@@ -12,6 +12,7 @@
 #define GPOS_CPhysicalStreamAgg_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalAgg.h"
 
@@ -29,10 +30,10 @@ class CPhysicalStreamAgg : public CPhysicalAgg
 {
 private:
 	// local order spec
-	COrderSpec *m_pos;
+	gpos::owner<COrderSpec *> m_pos;
 
 	// set representation of minimal grouping columns
-	CColRefSet *m_pcrsMinimalGrpCols;
+	gpos::owner<CColRefSet *> m_pcrsMinimalGrpCols;
 
 	// construct order spec on grouping column so that it covers required order spec
 	static COrderSpec *PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
@@ -113,14 +114,15 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalStreamAgg *
+	static gpos::cast_func<CPhysicalStreamAgg *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

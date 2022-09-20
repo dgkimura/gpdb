@@ -58,10 +58,10 @@ private:
 	gpos::Ref<IMDId> m_mdid_item_type;
 
 	// index key columns
-	ULongPtrArray *m_index_key_cols_array;
+	gpos::owner<ULongPtrArray *> m_index_key_cols_array;
 
 	// included columns
-	ULongPtrArray *m_included_cols_array;
+	gpos::owner<ULongPtrArray *> m_included_cols_array;
 
 	// operator families for each index key
 	gpos::Ref<IMdIdArray> m_mdid_opfamilies_array;
@@ -69,7 +69,7 @@ private:
 	// partition constraint
 	// GPDB_12_MERGE_FIXME: This field is no longer needed,
 	// we should get rid of it.
-	IMDPartConstraint *m_mdpart_constraint;
+	gpos::owner<IMDPartConstraint *> m_mdpart_constraint;
 
 	// DXL for object
 	const CWStringDynamic *m_dxl_str;
@@ -127,7 +127,7 @@ public:
 	ULONG GetIncludedColPos(ULONG column) const override;
 
 	// part constraint
-	IMDPartConstraint *MDPartConstraint() const override;
+	gpos::pointer<IMDPartConstraint *> MDPartConstraint() const override;
 
 	// DXL string for index
 	const CWStringDynamic *

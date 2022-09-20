@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformDynamicGet2DynamicTableScan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CPartConstraint.h"
 #include "gpopt/metadata/CTableDescriptor.h"
@@ -61,7 +62,7 @@ CXformDynamicGet2DynamicTableScan::Transform(CXformContext *pxfctxt,
 	// create/extract components for alternative
 	CName *pname = GPOS_NEW(mp) CName(mp, popGet->Name());
 
-	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
+	gpos::owner<CTableDescriptor *> ptabdesc = popGet->Ptabdesc();
 	ptabdesc->AddRef();
 
 	CColRefArray *pdrgpcrOutput = popGet->PdrgpcrOutput();
@@ -69,14 +70,14 @@ CXformDynamicGet2DynamicTableScan::Transform(CXformContext *pxfctxt,
 
 	pdrgpcrOutput->AddRef();
 
-	CColRef2dArray *pdrgpdrgpcrPart = popGet->PdrgpdrgpcrPart();
+	gpos::owner<CColRef2dArray *> pdrgpdrgpcrPart = popGet->PdrgpdrgpcrPart();
 	pdrgpdrgpcrPart->AddRef();
 
 	popGet->GetPartitionMdids()->AddRef();
 	popGet->GetRootColMappingPerPart()->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalDynamicTableScan(
 				mp, pname, ptabdesc, popGet->UlOpId(), popGet->ScanId(),
 				pdrgpcrOutput, pdrgpdrgpcrPart, popGet->GetPartitionMdids(),

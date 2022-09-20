@@ -12,6 +12,7 @@
 #define GPOS_CPhysicalScalarAgg_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalAgg.h"
 
@@ -62,18 +63,18 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required sort columns of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posRequired, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
+	gpos::owner<COrderSpec *> PosRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *PosDerive(CMemoryPool *mp,
-						  CExpressionHandle &exprhdl) const override;
+	gpos::owner<COrderSpec *> PosDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -81,14 +82,15 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalScalarAgg *
+	static gpos::cast_func<CPhysicalScalarAgg *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

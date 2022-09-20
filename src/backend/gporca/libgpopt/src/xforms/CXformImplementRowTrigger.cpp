@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformImplementRowTrigger.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalRowTrigger.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -75,7 +76,7 @@ CXformImplementRowTrigger::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative
-	IMDId *rel_mdid = popRowTrigger->GetRelMdId();
+	gpos::owner<IMDId *> rel_mdid = popRowTrigger->GetRelMdId();
 	rel_mdid->AddRef();
 
 	INT type = popRowTrigger->GetType();
@@ -93,11 +94,11 @@ CXformImplementRowTrigger::Transform(CXformContext *pxfctxt,
 	}
 
 	// child of RowTrigger operator
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::owner<CExpression *> pexprChild = (*pexpr)[0];
 	pexprChild->AddRef();
 
 	// create physical RowTrigger
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp)
 			CPhysicalRowTrigger(mp, rel_mdid, type, pdrgpcrOld, pdrgpcrNew),

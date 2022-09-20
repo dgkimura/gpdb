@@ -12,6 +12,7 @@
 #define GPOPT_CBinding_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 
@@ -84,9 +85,10 @@ public:
 	~CBinding() = default;
 
 	// extract binding from group expression
-	CExpression *PexprExtract(CMemoryPool *mp, CGroupExpression *pgexpr,
-							  CExpression *pexprPatetrn,
-							  CExpression *pexprLast);
+	gpos::owner<CExpression *> PexprExtract(CMemoryPool *mp,
+											CGroupExpression *pgexpr,
+											CExpression *pexprPatetrn,
+											CExpression *pexprLast);
 
 };	// class CBinding
 

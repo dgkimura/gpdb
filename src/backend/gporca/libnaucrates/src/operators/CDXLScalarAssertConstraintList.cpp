@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarAssertConstraintList.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -68,8 +70,9 @@ CDXLScalarAssertConstraintList::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAssertConstraintList::SerializeToDXL(CXMLSerializer *xml_serializer,
-											   const CDXLNode *dxlnode) const
+CDXLScalarAssertConstraintList::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

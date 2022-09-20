@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerCTASStorageOptions_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLCtasStorageOptions.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -41,10 +42,11 @@ private:
 	CDXLCtasStorageOptions::ECtasOnCommitAction m_ctas_on_commit_action;
 
 	// CTAS storage options
-	CDXLCtasStorageOptions *m_dxl_ctas_storage_option;
+	gpos::owner<CDXLCtasStorageOptions *> m_dxl_ctas_storage_option;
 
 	// parsed array of key-value pairs of options
-	CDXLCtasStorageOptions::CDXLCtasOptionArray *m_ctas_storage_option_array;
+	gpos::pointer<CDXLCtasStorageOptions::CDXLCtasOptionArray *>
+		m_ctas_storage_option_array;
 
 	// process the start of an element
 	void StartElement(
@@ -74,7 +76,7 @@ public:
 	~CParseHandlerCtasStorageOptions() override;
 
 	// parsed storage options
-	CDXLCtasStorageOptions *GetDxlCtasStorageOption() const;
+	gpos::pointer<CDXLCtasStorageOptions *> GetDxlCtasStorageOption() const;
 };
 }  // namespace gpdxl
 

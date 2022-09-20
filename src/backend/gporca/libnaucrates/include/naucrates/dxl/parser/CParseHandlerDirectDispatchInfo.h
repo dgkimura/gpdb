@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerDirectDispatchInfo_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLDirectDispatchInfo.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -35,13 +36,13 @@ class CParseHandlerDirectDispatchInfo : public CParseHandlerBase
 {
 private:
 	// current array of datums being parsed
-	CDXLDatumArray *m_dxl_datum_array;
+	gpos::owner<CDXLDatumArray *> m_dxl_datum_array;
 
 	// array of datum combinations
-	CDXLDatum2dArray *m_datum_array_combination;
+	gpos::pointer<CDXLDatum2dArray *> m_datum_array_combination;
 
 	// direct dispatch spec
-	CDXLDirectDispatchInfo *m_direct_dispatch_info;
+	gpos::owner<CDXLDirectDispatchInfo *> m_direct_dispatch_info;
 
 	// true indicates m_dispatch_identifer_datum_array contains raw
 	// gp_segment_id values rather than hashable datums
@@ -75,7 +76,7 @@ public:
 	~CParseHandlerDirectDispatchInfo() override;
 
 	// accessor to the parsed direct dispatch spec
-	CDXLDirectDispatchInfo *GetDXLDirectDispatchInfo() const;
+	gpos::pointer<CDXLDirectDispatchInfo *> GetDXLDirectDispatchInfo() const;
 };
 }  // namespace gpdxl
 

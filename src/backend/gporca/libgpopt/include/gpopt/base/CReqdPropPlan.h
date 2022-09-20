@@ -46,22 +46,22 @@ class CReqdPropPlan : public CReqdProp
 {
 private:
 	// required columns
-	CColRefSet *m_pcrs{nullptr};
+	gpos::owner<CColRefSet *> m_pcrs{nullptr};
 
 	// required sort order
-	CEnfdOrder *m_peo{nullptr};
+	gpos::owner<CEnfdOrder *> m_peo{nullptr};
 
 	// required distribution
-	CEnfdDistribution *m_ped{nullptr};
+	gpos::owner<CEnfdDistribution *> m_ped{nullptr};
 
 	// required rewindability
-	CEnfdRewindability *m_per{nullptr};
+	gpos::owner<CEnfdRewindability *> m_per{nullptr};
 
 	// required partition propagation
-	CEnfdPartitionPropagation *m_pepp{nullptr};
+	gpos::owner<CEnfdPartitionPropagation *> m_pepp{nullptr};
 
 	// required ctes
-	CCTEReq *m_pcter{nullptr};
+	gpos::owner<CCTEReq *> m_pcter{nullptr};
 
 public:
 	CReqdPropPlan(const CReqdPropPlan &) = delete;
@@ -174,7 +174,7 @@ public:
 	}
 
 	//generate empty required properties
-	static CReqdPropPlan *PrppEmpty(CMemoryPool *mp);
+	static gpos::owner<CReqdPropPlan *> PrppEmpty(CMemoryPool *mp);
 
 	// hash function used for cost bounding
 	static ULONG UlHashForCostBounding(
@@ -186,10 +186,9 @@ public:
 		gpos::pointer<const CReqdPropPlan *> prppSnd);
 
 	// map input required and derived plan properties into new required plan properties
-	static CReqdPropPlan *PrppRemapForCTE(CMemoryPool *mp,
-										  CReqdPropPlan *prppInput,
-										  CDrvdPropPlan *pdpplanInput,
-										  UlongToColRefMap *colref_mapping);
+	static gpos::owner<CReqdPropPlan *> PrppRemapForCTE(
+		CMemoryPool *mp, CReqdPropPlan *prppInput, CDrvdPropPlan *pdpplanInput,
+		UlongToColRefMap *colref_mapping);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

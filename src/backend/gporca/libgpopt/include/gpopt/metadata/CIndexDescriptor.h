@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/metadata/CColumnDescriptor.h"
@@ -44,10 +45,10 @@ private:
 	CName m_name;
 
 	// array of index key columns
-	CColumnDescriptorArray *m_pdrgpcoldescKeyCols;
+	gpos::owner<CColumnDescriptorArray *> m_pdrgpcoldescKeyCols;
 
 	// array of index included columns
-	CColumnDescriptorArray *m_pdrgpcoldescIncludedCols;
+	gpos::owner<CColumnDescriptorArray *> m_pdrgpcoldescIncludedCols;
 
 	// clustered index
 	BOOL m_clustered;
@@ -89,14 +90,14 @@ public:
 	}
 
 	// key column descriptors
-	CColumnDescriptorArray *
+	gpos::pointer<CColumnDescriptorArray *>
 	PdrgpcoldescKey() const
 	{
 		return m_pdrgpcoldescKeyCols;
 	}
 
 	// included column descriptors
-	CColumnDescriptorArray *
+	gpos::pointer<CColumnDescriptorArray *>
 	PdrgpcoldescIncluded() const
 	{
 		return m_pdrgpcoldescIncludedCols;
@@ -118,9 +119,9 @@ public:
 	BOOL SupportsIndexOnlyScan() const;
 
 	// create an index descriptor
-	static CIndexDescriptor *Pindexdesc(CMemoryPool *mp,
-										const CTableDescriptor *ptabdesc,
-										const IMDIndex *pmdindex);
+	static CIndexDescriptor *Pindexdesc(
+		CMemoryPool *mp, gpos::pointer<const CTableDescriptor *> ptabdesc,
+		gpos::pointer<const IMDIndex *> pmdindex);
 
 	IOstream &OsPrint(IOstream &os) const;
 

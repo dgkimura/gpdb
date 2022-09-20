@@ -18,6 +18,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalSetOp.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerColDescr.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -211,11 +213,11 @@ CParseHandlerLogicalSetOp::EndElement(const XMLCh *const,  // element_uri,
 	CParseHandlerColDescr *col_descr_parse_handler =
 		dynamic_cast<CParseHandlerColDescr *>((*this)[0]);
 	GPOS_ASSERT(nullptr != col_descr_parse_handler->GetDXLColumnDescrArray());
-	CDXLColDescrArray *cold_descr_dxl_array =
+	gpos::owner<CDXLColDescrArray *> cold_descr_dxl_array =
 		col_descr_parse_handler->GetDXLColumnDescrArray();
 
 	cold_descr_dxl_array->AddRef();
-	CDXLLogicalSetOp *dxl_op = GPOS_NEW(m_mp)
+	gpos::owner<CDXLLogicalSetOp *> dxl_op = GPOS_NEW(m_mp)
 		CDXLLogicalSetOp(m_mp, setop_type, cold_descr_dxl_array,
 						 m_input_colids_arrays, m_cast_across_input_req);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);

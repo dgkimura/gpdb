@@ -65,7 +65,7 @@ public:
 
 private:
 	// type information
-	const IMDType *m_pmdtype;
+	gpos::pointer<const IMDType *> m_pmdtype;
 
 	// type modifier
 	const INT m_type_modifier;
@@ -77,7 +77,7 @@ private:
 	EUsedStatus m_used;
 
 	// table info
-	IMDId *m_mdid_table;
+	gpos::pointer<IMDId *> m_mdid_table;
 
 public:
 	CColRef(const CColRef &) = delete;
@@ -159,8 +159,8 @@ public:
 					   gpos::pointer<const CColRefArray *> pdrgpcr2);
 
 	// check if the the array of column reference arrays are equal
-	static BOOL Equals(const CColRef2dArray *pdrgdrgpcr1,
-					   const CColRef2dArray *pdrgdrgpcr2);
+	static BOOL Equals(gpos::pointer<const CColRef2dArray *> pdrgdrgpcr1,
+					   gpos::pointer<const CColRef2dArray *> pdrgdrgpcr2);
 
 	// type of column reference (base/computed)
 	virtual Ecolreftype Ecrt() const = 0;

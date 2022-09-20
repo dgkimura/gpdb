@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalTVF.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/COptCtxt.h"
@@ -73,7 +74,7 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	if (mdid_func->IsValid())
 	{
-		const IMDFunction *pmdfunc =
+		gpos::pointer<const IMDFunction *> pmdfunc =
 			md_accessor->RetrieveFunc(m_func_mdid.get());
 
 		m_efs = pmdfunc->GetFuncStability();
@@ -112,7 +113,8 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 	GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid.get());
+	gpos::pointer<const IMDFunction *> pmdfunc =
+		md_accessor->RetrieveFunc(m_func_mdid.get());
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_returns_set = pmdfunc->ReturnsSet();
@@ -189,7 +191,7 @@ CLogicalTVF::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalTVF::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										UlongToColRefMap *colref_mapping,
 										BOOL must_exist)
@@ -226,7 +228,7 @@ CLogicalTVF::DeriveOutputColumns(CMemoryPool *mp,
 								 CExpressionHandle &  // exprhdl
 )
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	return pcrs;
@@ -274,7 +276,7 @@ CLogicalTVF::FInputOrderSensitive() const
 CXformSet *
 CLogicalTVF::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfUnnestTVF);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementTVF);

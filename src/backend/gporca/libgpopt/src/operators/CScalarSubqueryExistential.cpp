@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarSubqueryExistential.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -87,11 +88,11 @@ CScalarSubqueryExistential::Matches(COperator *pop) const
 //		Derive partition consumers
 //
 //---------------------------------------------------------------------------
-CPartInfo *
+gpos::owner<CPartInfo *>
 CScalarSubqueryExistential::PpartinfoDerive(CMemoryPool *,	// mp,
 											CExpressionHandle &exprhdl) const
 {
-	CPartInfo *ppartinfoChild = exprhdl.DerivePartitionInfo(0);
+	gpos::pointer<CPartInfo *> ppartinfoChild = exprhdl.DerivePartitionInfo(0);
 	GPOS_ASSERT(nullptr != ppartinfoChild);
 	ppartinfoChild->AddRef();
 	return ppartinfoChild;

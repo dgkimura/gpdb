@@ -44,7 +44,7 @@ protected:
 				 CleanupRelease, CleanupDelete>;
 
 	// metadata objects indexed by their metadata id
-	MDIdToSerializedMDIdMap *m_mdmap;
+	gpos::owner<MDIdToSerializedMDIdMap *> m_mdmap;
 
 	// load MD objects in the hash map
 	void LoadMetadataObjectsFromArray(CMemoryPool *mp,

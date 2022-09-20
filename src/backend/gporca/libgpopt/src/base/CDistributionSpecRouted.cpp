@@ -11,6 +11,8 @@
 
 #include "gpopt/base/CDistributionSpecRouted.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
@@ -57,7 +59,8 @@ CDistributionSpecRouted::~CDistributionSpecRouted() = default;
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecRouted::FSatisfies(const CDistributionSpec *pds) const
+CDistributionSpecRouted::FSatisfies(
+	gpos::pointer<const CDistributionSpec *> pds) const
 {
 	if (Matches(pds))
 	{
@@ -82,7 +85,7 @@ CDistributionSpecRouted::FSatisfies(const CDistributionSpec *pds) const
 //		Return a copy of the distribution spec with remapped columns
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CDistributionSpecRouted::PdsCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -120,7 +123,7 @@ CDistributionSpecRouted::PdsCopyWithRemappedColumns(
 void
 CDistributionSpecRouted::AppendEnforcers(CMemoryPool *mp,
 										 CExpressionHandle &,  // exprhdl
-										 CReqdPropPlan *
+										 gpos::pointer<CReqdPropPlan *>
 #ifdef GPOS_DEBUG
 											 prpp
 #endif	// GPOS_DEBUG
@@ -146,7 +149,7 @@ CDistributionSpecRouted::AppendEnforcers(CMemoryPool *mp,
 	// add a routed distribution enforcer
 	AddRef();
 	pexpr->AddRef();
-	CExpression *pexprMotion = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprMotion = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CPhysicalMotionRoutedDistribute(mp, this), pexpr);
 	pdrgpexpr->Append(pexprMotion);
 }
@@ -179,7 +182,7 @@ CDistributionSpecRouted::HashValue() const
 CColRefSet *
 CDistributionSpecRouted::PcrsUsed(CMemoryPool *mp) const
 {
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(m_pcrSegmentId);
 
 	return pcrs;
@@ -195,14 +198,15 @@ CDistributionSpecRouted::PcrsUsed(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecRouted::Matches(const CDistributionSpec *pds) const
+CDistributionSpecRouted::Matches(
+	gpos::pointer<const CDistributionSpec *> pds) const
 {
 	if (Edt() != pds->Edt())
 	{
 		return false;
 	}
 
-	const CDistributionSpecRouted *pdsRouted =
+	gpos::pointer<const CDistributionSpecRouted *> pdsRouted =
 		CDistributionSpecRouted::PdsConvert(pds);
 	return m_pcrSegmentId == pdsRouted->Pcr();
 }

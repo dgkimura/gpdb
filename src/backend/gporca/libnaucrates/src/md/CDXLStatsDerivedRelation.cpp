@@ -11,6 +11,7 @@
 
 #include "naucrates/md/CDXLStatsDerivedRelation.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -58,7 +59,7 @@ CDXLStatsDerivedRelation::~CDXLStatsDerivedRelation()
 //		Returns the array of derived columns stats
 //
 //---------------------------------------------------------------------------
-const CDXLStatsDerivedColumnArray *
+gpos::pointer<const CDXLStatsDerivedColumnArray *>
 CDXLStatsDerivedRelation::GetDXLStatsDerivedColArray() const
 {
 	return m_dxl_stats_derived_col_array;

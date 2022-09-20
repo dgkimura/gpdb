@@ -12,6 +12,7 @@
 #define GPOS_CLogicalSequenceProject_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/COrderSpec.h"
@@ -32,13 +33,13 @@ class CLogicalSequenceProject : public CLogicalUnary
 {
 private:
 	// partition by keys
-	CDistributionSpec *m_pds;
+	gpos::owner<CDistributionSpec *> m_pds;
 
 	// order specs of child window functions
-	COrderSpecArray *m_pdrgpos;
+	gpos::owner<COrderSpecArray *> m_pdrgpos;
 
 	// frames of child window functions
-	CWindowFrameArray *m_pdrgpwf;
+	gpos::owner<CWindowFrameArray *> m_pdrgpwf;
 
 	// flag indicating if current operator has any non-empty order specs
 	BOOL m_fHasOrderSpecs;
@@ -81,21 +82,21 @@ public:
 	}
 
 	// distribution spec
-	CDistributionSpec *
+	gpos::pointer<CDistributionSpec *>
 	Pds() const
 	{
 		return m_pds;
 	}
 
 	// order by keys
-	COrderSpecArray *
+	gpos::pointer<COrderSpecArray *>
 	Pdrgpos() const
 	{
 		return m_pdrgpos;
 	}
 
 	// frame specifications
-	CWindowFrameArray *
+	gpos::pointer<CWindowFrameArray *>
 	Pdrgpwf() const
 	{
 		return m_pdrgpwf;
@@ -116,12 +117,13 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// return true if we can pull projections up past this operator from its given child
-	BOOL FCanPullProjectionsUp(ULONG  //child_index
+	BOOL
+	FCanPullProjectionsUp(ULONG	 //child_index
 	) const override
 	{
 		return false;
@@ -179,14 +181,15 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// remove outer references from Order By/ Partition By clauses, and return a new operator
-	CLogicalSequenceProject *PopRemoveLocalOuterRefs(
+	gpos::owner<CLogicalSequenceProject *> PopRemoveLocalOuterRefs(
 		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// check for outer references in Partition/Order, or window frame edges
-	BOOL FHasLocalReferencesTo(const CColRefSet *outerRefsToCheck) const;
+	BOOL FHasLocalReferencesTo(
+		gpos::pointer<const CColRefSet *> outerRefsToCheck) const;
 
 	// conversion function
-	static CLogicalSequenceProject *
+	static gpos::cast_func<CLogicalSequenceProject *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

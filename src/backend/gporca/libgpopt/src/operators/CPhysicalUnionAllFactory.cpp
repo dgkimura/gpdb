@@ -5,6 +5,7 @@
 #include "gpopt/operators/CPhysicalUnionAllFactory.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/exception.h"
 #include "gpopt/operators/CPhysicalParallelUnionAll.h"
@@ -19,7 +20,7 @@ CPhysicalUnionAllFactory::CPhysicalUnionAllFactory(
 {
 }
 
-CPhysicalUnionAll *
+gpos::owner<CPhysicalUnionAll *>
 CPhysicalUnionAllFactory::PopPhysicalUnionAll(CMemoryPool *mp, BOOL fParallel)
 {
 	CColRefArray *pdrgpcrOutput = m_popLogicalUnionAll->PdrgpcrOutput();

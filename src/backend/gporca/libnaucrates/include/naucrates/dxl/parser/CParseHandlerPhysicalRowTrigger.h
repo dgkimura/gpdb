@@ -12,6 +12,7 @@
 #define GPDXL_CParseHandlerPhysicalRowTrigger_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalRowTrigger.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -34,7 +35,7 @@ XERCES_CPP_NAMESPACE_USE
 class CParseHandlerPhysicalRowTrigger : public CParseHandlerPhysicalOp
 {
 private:
-	CDXLPhysicalRowTrigger *m_dxl_op;
+	gpos::pointer<CDXLPhysicalRowTrigger *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

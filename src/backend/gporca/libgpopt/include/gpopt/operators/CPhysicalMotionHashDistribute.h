@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalMotionHashDistribute_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/COrderSpec.h"
@@ -31,10 +32,10 @@ class CPhysicalMotionHashDistribute : public CPhysicalMotion
 {
 private:
 	// hash distribution spec
-	CDistributionSpecHashed *m_pdsHashed;
+	gpos::owner<CDistributionSpecHashed *> m_pdsHashed;
 
 	// required columns in distribution spec
-	CColRefSet *m_pcrsRequiredLocal;
+	gpos::owner<CColRefSet *> m_pcrsRequiredLocal;
 
 public:
 	CPhysicalMotionHashDistribute(const CPhysicalMotionHashDistribute &) =
@@ -61,7 +62,7 @@ public:
 	}
 
 	// output distribution accessor
-	CDistributionSpec *
+	gpos::pointer<CDistributionSpec *>
 	Pds() const override
 	{
 		return m_pdsHashed;
@@ -88,10 +89,12 @@ public:
 							 ULONG ulOptReq) override;
 
 	// compute required sort order of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posInput, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
+	gpos::owner<COrderSpec *> PosRequired(CMemoryPool *mp,
+										  CExpressionHandle &exprhdl,
+										  gpos::pointer<COrderSpec *> posInput,
+										  ULONG child_index,
+										  CDrvdPropArray *pdrgpdpCtxt,
+										  ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
 	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
@@ -102,8 +105,8 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *PosDerive(CMemoryPool *mp,
-						  CExpressionHandle &exprhdl) const override;
+	gpos::owner<COrderSpec *> PosDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Enforced Properties
@@ -111,7 +114,8 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
@@ -121,7 +125,8 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalMotionHashDistribute *PopConvert(COperator *pop);
+	static gpos::cast_func<CPhysicalMotionHashDistribute *> PopConvert(
+		COperator *pop);
 
 	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   CDistributionSpec *pdsRequired,

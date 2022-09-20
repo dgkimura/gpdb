@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDIndexInfoList_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 #include "naucrates/md/IMDIndex.h"
@@ -31,7 +32,7 @@ class CParseHandlerMDIndexInfoList : public CParseHandlerBase
 {
 private:
 	// list of indexinfo
-	CMDIndexInfoArray *m_mdindex_info_array;
+	gpos::owner<CMDIndexInfoArray *> m_mdindex_info_array;
 
 	// process the start of an element
 	void StartElement(
@@ -60,7 +61,7 @@ public:
 	~CParseHandlerMDIndexInfoList() override;
 
 	// returns array of indexinfo
-	CMDIndexInfoArray *GetMdIndexInfoArray();
+	gpos::pointer<CMDIndexInfoArray *> GetMdIndexInfoArray();
 };
 }  // namespace gpdxl
 

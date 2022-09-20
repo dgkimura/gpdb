@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarBitmapBoolOp.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -135,8 +137,9 @@ CDXLScalarBitmapBoolOp::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBitmapBoolOp::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const CDXLNode *dxlnode) const
+CDXLScalarBitmapBoolOp::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 

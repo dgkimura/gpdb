@@ -14,6 +14,7 @@
 #define GPDXL_CParseHandlerTableDescriptor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -37,7 +38,7 @@ class CParseHandlerTableDescr : public CParseHandlerBase
 {
 private:
 	// the table descriptor to construct
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
 
 	// process the start of an element
 	void StartElement(
@@ -64,7 +65,7 @@ public:
 
 	~CParseHandlerTableDescr() override;
 
-	CDXLTableDescr *GetDXLTableDescr();
+	gpos::pointer<CDXLTableDescr *> GetDXLTableDescr();
 };
 }  // namespace gpdxl
 

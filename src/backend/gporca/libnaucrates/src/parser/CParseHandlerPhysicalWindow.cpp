@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalWindow.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLPhysicalWindow.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -154,8 +156,9 @@ CParseHandlerPhysicalWindow::EndElement(const XMLCh *const,	 // element_uri,
 		dynamic_cast<CParseHandlerWindowKeyList *>((*this)[4]);
 	CDXLWindowKeyArray *window_key_array_dxlnode =
 		window_key_list_parse_handler->GetDxlWindowKeyArray();
-	CDXLPhysicalWindow *window_op_dxlnode = GPOS_NEW(m_mp) CDXLPhysicalWindow(
-		m_mp, m_part_by_colid_array, window_key_array_dxlnode);
+	gpos::owner<CDXLPhysicalWindow *> window_op_dxlnode =
+		GPOS_NEW(m_mp) CDXLPhysicalWindow(m_mp, m_part_by_colid_array,
+										  window_key_array_dxlnode);
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, window_op_dxlnode);
 
 	// set statistics and physical properties

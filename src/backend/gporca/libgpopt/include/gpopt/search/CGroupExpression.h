@@ -91,26 +91,26 @@ private:
 	ULONG m_id{GPOPT_INVALID_GEXPR_ID};
 
 	// duplicate group expression
-	CGroupExpression *m_pgexprDuplicate;
+	gpos::pointer<CGroupExpression *> m_pgexprDuplicate;
 
 	// operator class
-	COperator *m_pop{nullptr};
+	gpos::owner<COperator *> m_pop{nullptr};
 
 	// array of child groups
-	CGroupArray *m_pdrgpgroup{nullptr};
+	gpos::owner<CGroupArray *> m_pdrgpgroup{nullptr};
 
 	// sorted array of children groups for faster comparison
 	// of order-insensitive operators
-	CGroupArray *m_pdrgpgroupSorted{nullptr};
+	gpos::owner<CGroupArray *> m_pdrgpgroupSorted{nullptr};
 
 	// back pointer to group
-	CGroup *m_pgroup{nullptr};
+	gpos::pointer<CGroup *> m_pgroup{nullptr};
 
 	// id of xform that generated group expression
 	CXform::EXformId m_exfidOrigin{CXform::ExfInvalid};
 
 	// group expression that generated current group expression via xform
-	CGroupExpression *m_pgexprOrigin{nullptr};
+	gpos::pointer<CGroupExpression *> m_pgexprOrigin{nullptr};
 
 	// flag to indicate if group expression was created as a node at some
 	// intermediate level when origin expression was inserted to memo
@@ -123,7 +123,7 @@ private:
 	EOptimizationLevel m_eol{EolLow};
 
 	// map of partial plans to their cost lower bound
-	PartialPlanToCostMap *m_ppartialplancostmap{nullptr};
+	gpos::owner<PartialPlanToCostMap *> m_ppartialplancostmap{nullptr};
 
 	// circular dependency state
 	ECircularDependency m_ecirculardependency;
@@ -163,7 +163,7 @@ private:
 	CCostContext *PccRemove(COptimizationContext *poc, ULONG ulOptReq);
 
 	// insert given context in hash table only if a better context does not exist, return the context that is kept it in hash table
-	CCostContext *PccInsertBest(CCostContext *pcc);
+	CCostContext *PccInsertBest(gpos::owner<CCostContext *> pcc);
 
 	// print group expression cost contexts
 	IOstream &OsPrintCostContexts(IOstream &os, const CHAR *szPrefix) const;

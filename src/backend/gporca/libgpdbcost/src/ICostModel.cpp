@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringConst.h"
 
 #include "gpdbcost/CCostModelGPDB.h"
@@ -28,7 +29,7 @@ using namespace gpdbcost;
 //		Create default cost model
 //
 //---------------------------------------------------------------------------
-ICostModel *
+gpos::owner<ICostModel *>
 ICostModel::PcmDefault(CMemoryPool *mp)
 {
 	return GPOS_NEW(mp) CCostModelGPDB(mp, GPOPT_DEFAULT_SEGMENT_COUNT);

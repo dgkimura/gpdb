@@ -12,6 +12,8 @@
 
 #include "naucrates/base/CQueryToDXLResult.h"
 
+#include "gpos/common/owner.h"
+
 
 using namespace gpdxl;
 using namespace gpos;
@@ -57,7 +59,7 @@ CQueryToDXLResult::~CQueryToDXLResult()
 //		Return the array of dxl nodes representing the query output
 //
 //---------------------------------------------------------------------------
-const CDXLNodeArray *
+gpos::pointer<const CDXLNodeArray *>
 CQueryToDXLResult::GetOutputColumnsDXLArray() const
 {
 	return m_query_output;
@@ -71,7 +73,7 @@ CQueryToDXLResult::GetOutputColumnsDXLArray() const
 //		Return the array of CTEs
 //
 //---------------------------------------------------------------------------
-const CDXLNodeArray *
+gpos::pointer<const CDXLNodeArray *>
 CQueryToDXLResult::GetCTEProducerDXLArray() const
 {
 	return m_cte_producers;
@@ -85,7 +87,7 @@ CQueryToDXLResult::GetCTEProducerDXLArray() const
 //		Return the DXL node representing the query
 //
 //---------------------------------------------------------------------------
-const CDXLNode *
+gpos::pointer<const CDXLNode *>
 CQueryToDXLResult::CreateDXLNode() const
 {
 	return m_query_dxl;

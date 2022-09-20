@@ -3,6 +3,7 @@
 #ifndef GPOPT_CPhysicalUnionAllFactory_H
 #define GPOPT_CPhysicalUnionAllFactory_H
 
+#include "gpos/common/owner.h"
 #include "gpos/types.h"
 
 #include "gpopt/operators/CLogicalUnionAll.h"
@@ -16,12 +17,13 @@ namespace gpopt
 class CPhysicalUnionAllFactory
 {
 private:
-	CLogicalUnionAll *const m_popLogicalUnionAll;
+	gpos::pointer<CLogicalUnionAll *> const m_popLogicalUnionAll;
 
 public:
 	CPhysicalUnionAllFactory(CLogicalUnionAll *popLogicalUnionAll);
 
-	CPhysicalUnionAll *PopPhysicalUnionAll(CMemoryPool *mp, BOOL fParallel);
+	gpos::owner<CPhysicalUnionAll *> PopPhysicalUnionAll(CMemoryPool *mp,
+														 BOOL fParallel);
 };
 
 }  // namespace gpopt

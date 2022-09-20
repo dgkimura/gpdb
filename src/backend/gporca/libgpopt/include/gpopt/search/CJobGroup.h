@@ -12,6 +12,7 @@
 #define GPOPT_CJobGroup_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/search/CJob.h"
 
@@ -36,10 +37,10 @@ class CJobGroup : public CJob
 private:
 protected:
 	// target group
-	CGroup *m_pgroup{nullptr};
+	gpos::pointer<CGroup *> m_pgroup{nullptr};
 
 	// last scheduled group expression
-	CGroupExpression *m_pgexprLastScheduled;
+	gpos::pointer<CGroupExpression *> m_pgexprLastScheduled;
 
 	// ctor
 	CJobGroup() = default;

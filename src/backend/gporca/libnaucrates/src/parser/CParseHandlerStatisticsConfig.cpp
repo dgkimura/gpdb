@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerStatisticsConfig.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/engine/CStatisticsConfig.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -153,7 +155,7 @@ CParseHandlerStatisticsConfig::GetParseHandlerType() const
 //		Returns the statistics configuration
 //
 //---------------------------------------------------------------------------
-CStatisticsConfig *
+gpos::pointer<CStatisticsConfig *>
 CParseHandlerStatisticsConfig::GetStatsConf() const
 {
 	return m_stats_conf;

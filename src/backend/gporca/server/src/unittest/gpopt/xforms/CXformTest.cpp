@@ -107,7 +107,7 @@ CXformTest::EresUnittest_ApplyXforms()
 	};
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -121,7 +121,7 @@ CXformTest::EresUnittest_ApplyXforms()
 		COstreamString oss(&str);
 
 		// generate simple expression
-		CExpression *pexpr = rgpf[ul](mp);
+		gpos::owner<CExpression *> pexpr = rgpf[ul](mp);
 		ApplyExprXforms(mp, oss, pexpr);
 
 		GPOS_TRACE(str.GetBuffer());
@@ -146,7 +146,7 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -154,7 +154,8 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 
 	// create producer
 	ULONG ulCTEId = 0;
@@ -168,7 +169,7 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 		CLogicalCTEProducer::PopConvert(pexprProducer->Pop())->Pdrgpcr();
 	CColRefArray *pdrgpcrConsumer = CUtils::PdrgpcrCopy(mp, pdrgpcrProducer);
 
-	CExpression *pexprConsumer = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprConsumer = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEConsumer(mp, ulCTEId, pdrgpcrConsumer));
 
 	pdrgpexpr->Append(pexprConsumer);
@@ -180,7 +181,7 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 	pdrgpexpr->Append(pexprSelect);
 
 	pexprSelect->AddRef();
-	CExpression *pexprAnchor = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAnchor = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEId), pexprSelect);
 
 	pdrgpexpr->Append(pexprAnchor);
@@ -222,8 +223,9 @@ CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os, CExpression *pexpr)
 				CXformFactory::Pxff()->Pxf((CXform::EXformId) ulXformId);
 			os << std::endl << "XFORM " << pxform->SzId() << ":" << std::endl;
 
-			CXformContext *pxfctxt = GPOS_NEW(mp) CXformContext(mp);
-			CXformResult *pxfres = GPOS_NEW(mp) CXformResult(mp);
+			gpos::owner<CXformContext *> pxfctxt =
+				GPOS_NEW(mp) CXformContext(mp);
+			gpos::owner<CXformResult *> pxfres = GPOS_NEW(mp) CXformResult(mp);
 
 #ifdef GPOS_DEBUG
 			if (pxform->FCheckPattern(pexpr) &&

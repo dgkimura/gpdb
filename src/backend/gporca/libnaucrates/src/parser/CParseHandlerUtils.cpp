@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerUtils.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/statistics/IStatistics.h"
 
 using namespace gpos;
@@ -32,7 +34,7 @@ CParseHandlerUtils::SetProperties(CDXLNode *dxlnode,
 {
 	GPOS_ASSERT(nullptr != prop_parse_handler->GetProperties());
 	// set physical properties
-	CDXLPhysicalProperties *dxl_properties =
+	gpos::owner<CDXLPhysicalProperties *> dxl_properties =
 		prop_parse_handler->GetProperties();
 	dxl_properties->AddRef();
 	dxlnode->SetProperties(dxl_properties);

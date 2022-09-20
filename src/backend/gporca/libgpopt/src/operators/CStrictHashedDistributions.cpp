@@ -3,6 +3,8 @@
 
 #include "gpopt/operators/CStrictHashedDistributions.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CDistributionSpecStrictRandom.h"
 #include "gpopt/base/CUtils.h"
 
@@ -18,7 +20,8 @@ CStrictHashedDistributions::CStrictHashedDistributions(
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
 		CColRefArray *colref_array = (*pdrgpdrgpcrInput)[ulChild];
-		CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+		gpos::owner<CExpressionArray *> pdrgpexpr =
+			GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
 		{
 			CColRef *colref = (*colref_array)[ulCol];
@@ -29,7 +32,7 @@ CStrictHashedDistributions::CStrictHashedDistributions(
 			}
 		}
 
-		CDistributionSpec *pdshashed;
+		gpos::owner<CDistributionSpec *> pdshashed;
 		ULONG ulColumnsToRedistribute = pdrgpexpr->Size();
 		if (0 < ulColumnsToRedistribute)
 		{

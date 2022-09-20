@@ -46,10 +46,10 @@ private:
 
 protected:
 	// list of input segment ids
-	IntPtrArray *m_input_segids_array;
+	gpos::owner<IntPtrArray *> m_input_segids_array;
 
 	// list of output segment ids
-	IntPtrArray *m_output_segids_array;
+	gpos::owner<IntPtrArray *> m_output_segids_array;
 
 	void SerializeSegmentInfoToDXL(CXMLSerializer *xml_serializer) const;
 

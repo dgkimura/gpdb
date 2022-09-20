@@ -12,6 +12,7 @@
 #define GPOPT_CPartInfo_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CPartKeys.h"
@@ -60,7 +61,7 @@ private:
 		gpos::Ref<IMDId> m_mdid;
 
 		// partition keys
-		CPartKeysArray *m_pdrgppartkeys;
+		gpos::owner<CPartKeysArray *> m_pdrgppartkeys;
 
 	public:
 		CPartInfoEntry(const CPartInfoEntry &) = delete;
@@ -81,7 +82,7 @@ private:
 
 		// create a copy of the current object, and add a set of remapped
 		// part keys to this entry, using the existing keys and the given hashmap
-		CPartInfoEntry *PpartinfoentryAddRemappedKeys(
+		gpos::owner<CPartInfoEntry *> PpartinfoentryAddRemappedKeys(
 			CMemoryPool *mp, CColRefSet *pcrs,
 			UlongToColRefMap *colref_mapping);
 
@@ -93,7 +94,7 @@ private:
 		}
 
 		// partition keys of partition table
-		virtual CPartKeysArray *
+		virtual gpos::pointer<CPartKeysArray *>
 		Pdrgppartkeys() const
 		{
 			return m_pdrgppartkeys;
@@ -103,7 +104,7 @@ private:
 		IOstream &OsPrint(IOstream &os) const;
 
 		// copy part info entry into given memory pool
-		CPartInfoEntry *PpartinfoentryCopy(CMemoryPool *mp) const;
+		gpos::owner<CPartInfoEntry *> PpartinfoentryCopy(CMemoryPool *mp) const;
 
 	};	// CPartInfoEntry
 
@@ -111,7 +112,7 @@ private:
 		CDynamicPtrArray<CPartInfoEntry, CleanupRelease>;
 
 	// partition table consumers
-	CPartInfoEntryArray *m_pdrgppartentries;
+	gpos::owner<CPartInfoEntryArray *> m_pdrgppartentries;
 
 	// private ctor
 	explicit CPartInfo(CPartInfoEntryArray *pdrgppartentries);
@@ -152,16 +153,17 @@ public:
 	CPartKeysArray *PdrgppartkeysByScanId(ULONG scan_id) const;
 
 	// return a new part info object with an additional set of remapped keys
-	CPartInfo *PpartinfoWithRemappedKeys(CMemoryPool *mp,
-										 CColRefArray *pdrgpcrSrc,
-										 CColRefArray *pdrgpcrDest) const;
+	gpos::owner<CPartInfo *> PpartinfoWithRemappedKeys(
+		CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
+		CColRefArray *pdrgpcrDest) const;
 
 	// print
 	IOstream &OsPrint(IOstream &) const;
 
 	// combine two part info objects
-	static CPartInfo *PpartinfoCombine(CMemoryPool *mp, CPartInfo *ppartinfoFst,
-									   CPartInfo *ppartinfoSnd);
+	static gpos::owner<CPartInfo *> PpartinfoCombine(CMemoryPool *mp,
+													 CPartInfo *ppartinfoFst,
+													 CPartInfo *ppartinfoSnd);
 
 };	// CPartInfo
 

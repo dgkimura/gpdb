@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformExternalGet2ExternalScan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CLogicalExternalGet.h"
@@ -73,7 +74,7 @@ CXformExternalGet2ExternalScan::Transform(CXformContext *pxfctxt,
 	// extract components for alternative
 	CName *pname = GPOS_NEW(mp) CName(mp, popGet->Name());
 
-	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
+	gpos::owner<CTableDescriptor *> ptabdesc = popGet->Ptabdesc();
 	ptabdesc->AddRef();
 
 	CColRefArray *pdrgpcrOutput = popGet->PdrgpcrOutput();
@@ -82,7 +83,7 @@ CXformExternalGet2ExternalScan::Transform(CXformContext *pxfctxt,
 	pdrgpcrOutput->AddRef();
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalExternalScan(mp, pname, ptabdesc, pdrgpcrOutput));
 

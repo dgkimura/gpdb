@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerOp_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -38,7 +39,7 @@ class CParseHandlerOp : public CParseHandlerBase
 private:
 protected:
 	// the root of the parsed DXL tree constructed by the parse handler
-	CDXLNode *m_dxl_node;
+	gpos::owner<CDXLNode *> m_dxl_node;
 
 
 	void AddChildFromParseHandler(const CParseHandlerOp *);
@@ -53,7 +54,7 @@ public:
 	~CParseHandlerOp() override;
 
 	// returns constructed DXL node
-	CDXLNode *CreateDXLNode() const;
+	gpos::pointer<CDXLNode *> CreateDXLNode() const;
 };
 }  // namespace gpdxl
 

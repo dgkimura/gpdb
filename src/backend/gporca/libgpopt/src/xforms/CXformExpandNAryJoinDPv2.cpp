@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformExpandNAryJoinDPv2.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/engine/CHint.h"
@@ -89,10 +90,11 @@ CXformExpandNAryJoinDPv2::Transform(CXformContext *pxfctxt,
 	GPOS_ASSERT(arity >= 3);
 
 	// Make an expression array with all the atoms (the logical children)
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
-		CExpression *pexprChild = (*pexpr)[ul];
+		gpos::owner<CExpression *> pexprChild = (*pexpr)[ul];
 		pexprChild->AddRef();
 		pdrgpexpr->Append(pexprChild);
 	}
@@ -104,7 +106,7 @@ CXformExpandNAryJoinDPv2::Transform(CXformContext *pxfctxt,
 	CLogicalNAryJoin *naryJoin = CLogicalNAryJoin::PopConvert(pexpr->Pop());
 	CExpression *pexprScalar = (*pexpr)[arity - 1];
 	CExpressionArray *innerJoinPreds = nullptr;
-	CExpressionArray *onPreds = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> onPreds = GPOS_NEW(mp) CExpressionArray(mp);
 	ULongPtrArray *childPredIndexes = nullptr;
 
 	if (nullptr != CScalarNAryJoinPredList::PopConvert(pexprScalar->Pop()))
@@ -127,7 +129,7 @@ CXformExpandNAryJoinDPv2::Transform(CXformContext *pxfctxt,
 		innerJoinPreds = CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 	}
 
-	CColRefSet *outerRefs = pexpr->DeriveOuterReferences();
+	gpos::owner<CColRefSet *> outerRefs = pexpr->DeriveOuterReferences();
 
 	outerRefs->AddRef();
 
@@ -137,7 +139,7 @@ CXformExpandNAryJoinDPv2::Transform(CXformContext *pxfctxt,
 	jodp.PexprExpand();
 
 	// Retrieve top K join orders from jodp and add as alternatives
-	CExpression *nextJoinOrder = nullptr;
+	gpos::owner<CExpression *> nextJoinOrder = nullptr;
 
 	while (nullptr != (nextJoinOrder = jodp.GetNextOfTopK()))
 	{

@@ -12,6 +12,7 @@
 
 #include "naucrates/md/CMDTypeInt4GPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/base/CDatumInt4GPDB.h"
@@ -95,7 +96,7 @@ CMDTypeInt4GPDB::~CMDTypeInt4GPDB()
 //		Factory function for creating INT4 datums
 //
 //---------------------------------------------------------------------------
-IDatumInt4 *
+gpos::owner<IDatumInt4 *>
 CMDTypeInt4GPDB::CreateInt4Datum(CMemoryPool *mp, INT value, BOOL is_null) const
 {
 	return GPOS_NEW(mp) CDatumInt4GPDB(m_mdid->Sysid(), value, is_null);
@@ -224,9 +225,9 @@ CMDTypeInt4GPDB::Serialize(CXMLSerializer *xml_serializer) const
 //		Transformation method for generating int4 datum from CDXLScalarConstValue
 //
 //---------------------------------------------------------------------------
-IDatum *
+gpos::owner<IDatum *>
 CMDTypeInt4GPDB::GetDatumForDXLConstVal(
-	const CDXLScalarConstValue *dxl_op) const
+	gpos::pointer<const CDXLScalarConstValue *> dxl_op) const
 {
 	CDXLDatumInt4 *dxl_datum =
 		CDXLDatumInt4::Cast(const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
@@ -243,9 +244,9 @@ CMDTypeInt4GPDB::GetDatumForDXLConstVal(
 //		Construct an int4 datum from a DXL datum
 //
 //---------------------------------------------------------------------------
-IDatum *
-CMDTypeInt4GPDB::GetDatumForDXLDatum(CMemoryPool *mp,
-									 const CDXLDatum *dxl_datum) const
+gpos::owner<IDatum *>
+CMDTypeInt4GPDB::GetDatumForDXLDatum(
+	CMemoryPool *mp, gpos::pointer<const CDXLDatum *> dxl_datum) const
 {
 	CDXLDatumInt4 *int4_dxl_datum =
 		CDXLDatumInt4::Cast(const_cast<CDXLDatum *>(dxl_datum));
@@ -263,7 +264,7 @@ CMDTypeInt4GPDB::GetDatumForDXLDatum(CMemoryPool *mp,
 // 		Generate dxl datum
 //
 //---------------------------------------------------------------------------
-CDXLDatum *
+gpos::owner<CDXLDatum *>
 CMDTypeInt4GPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 {
 	m_mdid->AddRef();
@@ -281,13 +282,13 @@ CMDTypeInt4GPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 // 		Generate a dxl scalar constant from a datum
 //
 //---------------------------------------------------------------------------
-CDXLScalarConstValue *
+gpos::owner<CDXLScalarConstValue *>
 CMDTypeInt4GPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
 {
 	CDatumInt4GPDB *int4gpdb_datum = dynamic_cast<CDatumInt4GPDB *>(datum);
 
 	m_mdid->AddRef();
-	CDXLDatumInt4 *dxl_datum = GPOS_NEW(mp) CDXLDatumInt4(
+	gpos::owner<CDXLDatumInt4 *> dxl_datum = GPOS_NEW(mp) CDXLDatumInt4(
 		mp, m_mdid.get(), int4gpdb_datum->IsNull(), int4gpdb_datum->Value());
 
 	return GPOS_NEW(mp) CDXLScalarConstValue(mp, dxl_datum);
@@ -301,7 +302,7 @@ CMDTypeInt4GPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
 // 		Generate dxl datum
 //
 //---------------------------------------------------------------------------
-CDXLDatum *
+gpos::owner<CDXLDatum *>
 CMDTypeInt4GPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
 	m_mdid->AddRef();

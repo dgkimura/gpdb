@@ -51,16 +51,16 @@ class CDXLNode : public CRefCount
 {
 private:
 	// dxl tree operator class
-	CDXLOperator *m_dxl_op;
+	gpos::owner<CDXLOperator *> m_dxl_op;
 
 	// properties of the operator
-	CDXLProperties *m_dxl_properties;
+	gpos::owner<CDXLProperties *> m_dxl_properties;
 
 	// array of children
-	CDXLNodeArray *m_dxl_array;
+	gpos::owner<CDXLNodeArray *> m_dxl_array;
 
 	// direct dispatch spec
-	CDXLDirectDispatchInfo *m_direct_dispatch_info;
+	gpos::owner<CDXLDirectDispatchInfo *> m_direct_dispatch_info;
 
 public:
 	CDXLNode(const CDXLNode &) = delete;

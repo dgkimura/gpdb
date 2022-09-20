@@ -4,6 +4,8 @@
 #ifndef GPOPT_CPhysicalUnionAll_H
 #define GPOPT_CPhysicalUnionAll_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/operators/COperator.h"
@@ -16,16 +18,16 @@ class CPhysicalUnionAll : public CPhysical
 {
 private:
 	// output column array
-	CColRefArray *const m_pdrgpcrOutput;
+	gpos::owner<CColRefArray *> const m_pdrgpcrOutput;
 
 	// input column array
-	CColRef2dArray *const m_pdrgpdrgpcrInput;
+	gpos::owner<CColRef2dArray *> const m_pdrgpdrgpcrInput;
 
 	// set representation of input columns
-	CColRefSetArray *m_pdrgpcrsInput;
+	gpos::owner<CColRefSetArray *> m_pdrgpcrsInput;
 
 	// array of child hashed distributions -- used locally for distribution derivation
-	CDistributionSpecArray *m_pdrgpds;
+	gpos::owner<CDistributionSpecArray *> m_pdrgpds;
 
 	void PopulateDistrSpecs(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
 							CColRef2dArray *pdrgpdrgpcrInput);
@@ -47,12 +49,14 @@ private:
 
 	// derive strict random distribution spec if all the children of the parallel union all
 	// node derive strict random; derive null spec otherwise
-	static CDistributionSpecRandom *PdsStrictRandomParallelUnionAllChildren(
-		CMemoryPool *mp, CExpressionHandle &expr_handle);
+	static gpos::owner<CDistributionSpecRandom *>
+	PdsStrictRandomParallelUnionAllChildren(CMemoryPool *mp,
+											CExpressionHandle &expr_handle);
 
 	// compute output hashed distribution matching the outer child's hashed distribution
-	CDistributionSpecHashed *PdsMatching(
-		CMemoryPool *mp, const ULongPtrArray *pdrgpulOuter) const;
+	gpos::owner<CDistributionSpecHashed *> PdsMatching(
+		CMemoryPool *mp,
+		gpos::pointer<const ULongPtrArray *> pdrgpulOuter) const;
 
 	// derive output distribution based on child distribution
 	static CDistributionSpec *PdsDeriveFromChildren(CMemoryPool *mp,
@@ -60,7 +64,7 @@ private:
 
 protected:
 	// compute required hashed distribution of the n-th child
-	CDistributionSpecHashed *PdshashedPassThru(
+	gpos::owner<CDistributionSpecHashed *> PdshashedPassThru(
 		CMemoryPool *mp, CDistributionSpecHashed *pdshashedRequired,
 		ULONG child_index) const;
 
@@ -82,10 +86,10 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// accessor of output column array
-	CColRefArray *PdrgpcrOutput() const;
+	gpos::pointer<CColRefArray *> PdrgpcrOutput() const;
 
 	// accessor of input column array
-	CColRef2dArray *PdrgpdrgpcrInput() const;
+	gpos::pointer<CColRef2dArray *> PdrgpdrgpcrInput() const;
 
 	// return true if operator passes through stats obtained from children,
 	// this is used when computing stats during costing
@@ -108,10 +112,10 @@ public:
 						  ULONG ulOptReq) const override;
 
 	// compute required sort order of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posRequired, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
+	gpos::owner<COrderSpec *> PosRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<COrderSpec *> posRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	CRewindabilitySpec *PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -121,7 +125,7 @@ public:
 									ULONG ulOptReq) const override;
 
 	// conversion function
-	static CPhysicalUnionAll *PopConvert(COperator *pop);
+	static gpos::cast_func<CPhysicalUnionAll *> PopConvert(COperator *pop);
 
 
 	// check if required columns are included in output columns
@@ -133,12 +137,12 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// derive sort order
-	COrderSpec *PosDerive(CMemoryPool *mp,
-						  CExpressionHandle &exprhdl) const override;
+	gpos::owner<COrderSpec *> PosDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive distribution
-	CDistributionSpec *PdsDerive(CMemoryPool *mp,
-								 CExpressionHandle &exprhdl) const override;
+	gpos::owner<CDistributionSpec *> PdsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive rewindability
 	CRewindabilitySpec *PrsDerive(CMemoryPool *mp,
@@ -151,12 +155,13 @@ public:
 
 	// return order property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetOrder(
-		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
+		CExpressionHandle &exprhdl,
+		gpos::pointer<const CEnfdOrder *> peo) const override;
 
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
-		CExpressionHandle &,		// exprhdl
-		const CEnfdRewindability *	// per
+		CExpressionHandle &,					   // exprhdl
+		gpos::pointer<const CEnfdRewindability *>  // per
 	) const override;
 };
 }  // namespace gpopt

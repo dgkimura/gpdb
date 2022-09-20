@@ -11,6 +11,8 @@
 
 #include "naucrates/statistics/CStatsPredPoint.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CColRefTable.h"
 #include "naucrates/md/CMDIdGPDB.h"
@@ -65,9 +67,9 @@ CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
 //	@doc:
 //		Add padding to datums when needed
 //---------------------------------------------------------------------------
-IDatum *
+gpos::owner<IDatum *>
 CStatsPredPoint::PreprocessDatum(CMemoryPool *mp, const CColRef *colref,
-								 IDatum *datum)
+								 gpos::pointer<IDatum *> datum)
 {
 	GPOS_ASSERT(nullptr != colref);
 	GPOS_ASSERT(nullptr != datum);

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalMotionBroadcast.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecReplicated.h"
 #include "gpopt/base/COptCtxt.h"
@@ -83,7 +84,7 @@ CPhysicalMotionBroadcast::PcrsRequired(CMemoryPool *mp,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *pcrsRequired);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp, *pcrsRequired);
 
 	CColRefSet *pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
@@ -119,7 +120,7 @@ CPhysicalMotionBroadcast::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalMotionBroadcast::EpetOrder(CExpressionHandle &,  // exprhdl
-									const CEnfdOrder *	  // peo
+									gpos::pointer<const CEnfdOrder *>  // peo
 ) const
 {
 	// broadcast motion is not order-preserving
@@ -135,10 +136,10 @@ CPhysicalMotionBroadcast::EpetOrder(CExpressionHandle &,  // exprhdl
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalMotionBroadcast::PosRequired(CMemoryPool *mp,
-									  CExpressionHandle &,	// exprhdl
-									  COrderSpec *,			//posInput
+									  CExpressionHandle &,			// exprhdl
+									  gpos::pointer<COrderSpec *>,	//posInput
 									  ULONG
 #ifdef GPOS_DEBUG
 										  child_index
@@ -162,7 +163,7 @@ CPhysicalMotionBroadcast::PosRequired(CMemoryPool *mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalMotionBroadcast::PosDerive(CMemoryPool *mp,
 									CExpressionHandle &	 // exprhdl
 ) const
@@ -196,7 +197,7 @@ CPhysicalMotionBroadcast::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalMotionBroadcast *
+gpos::cast_func<CPhysicalMotionBroadcast *>
 CPhysicalMotionBroadcast::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);

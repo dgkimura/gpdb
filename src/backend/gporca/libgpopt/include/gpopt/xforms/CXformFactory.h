@@ -12,6 +12,7 @@
 #define GPOPT_CXformFactory_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXform.h"
 
@@ -42,13 +43,13 @@ private:
 	CXform *m_rgpxf[CXform::ExfSentinel];
 
 	// name -> xform map
-	XformNameToXformMap *m_phmszxform;
+	gpos::owner<XformNameToXformMap *> m_phmszxform;
 
 	// bitset of exploration xforms
-	CXformSet *m_pxfsExploration;
+	gpos::owner<CXformSet *> m_pxfsExploration;
 
 	// bitset of implementation xforms
-	CXformSet *m_pxfsImplementation;
+	gpos::owner<CXformSet *> m_pxfsImplementation;
 
 	// ensure that xforms are inserted in order
 	ULONG m_lastAddedOrSkippedXformId;
@@ -83,17 +84,17 @@ public:
 	CXform *Pxf(CXform::EXformId exfid) const;
 
 	// accessor by xform name
-	CXform *Pxf(const CHAR *szXformName) const;
+	gpos::pointer<CXform *> Pxf(const CHAR *szXformName) const;
 
 	// accessor of exploration xforms
-	CXformSet *
+	gpos::pointer<CXformSet *>
 	PxfsExploration() const
 	{
 		return m_pxfsExploration;
 	}
 
 	// accessor of implementation xforms
-	CXformSet *
+	gpos::pointer<CXformSet *>
 	PxfsImplementation() const
 	{
 		return m_pxfsImplementation;

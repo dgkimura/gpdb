@@ -13,6 +13,7 @@
 #define GPOPT_CLogicalPartitionSelector_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/metadata/CPartConstraint.h"
 #include "gpopt/operators/CLogical.h"
@@ -35,7 +36,7 @@ private:
 	gpos::Ref<IMDId> m_mdid;
 
 	// filter expressions corresponding to various levels
-	CExpressionArray *m_pdrgpexprFilters;
+	gpos::owner<CExpressionArray *> m_pdrgpexprFilters;
 
 	// oid column - holds the OIDs for leaf parts
 	CColRef *m_pcrOid;
@@ -89,7 +90,7 @@ public:
 	}
 
 	// filter expression for a given level
-	CExpression *
+	gpos::pointer<CExpression *>
 	PexprPartFilter(ULONG ulLevel) const
 	{
 		return (*m_pdrgpexprFilters)[ulLevel];
@@ -110,9 +111,9 @@ public:
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -191,7 +192,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalPartitionSelector *
+	static gpos::cast_func<CLogicalPartitionSelector *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

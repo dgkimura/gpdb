@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalLeftSemiApplyIn.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 
@@ -26,7 +27,7 @@ using namespace gpopt;
 CXformSet *
 CLogicalLeftSemiApplyIn::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfLeftSemiApplyIn2LeftSemiJoin);
 	(void) xform_set->ExchangeSet(
 		CXform::ExfLeftSemiApplyInWithExternalCorrs2InnerJoin);
@@ -44,7 +45,7 @@ CLogicalLeftSemiApplyIn::PxfsCandidates(CMemoryPool *mp) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalLeftSemiApplyIn::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

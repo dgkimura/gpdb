@@ -12,6 +12,7 @@
 #define GPOS_CLogicalGbAgg_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -38,7 +39,7 @@ protected:
 
 	// array of columns used in distinct qualified aggregates (DQA)
 	// used only in the case of intermediate aggregates
-	CColRefArray *m_pdrgpcrArgDQA;
+	gpos::owner<CColRefArray *> m_pdrgpcrArgDQA;
 
 	// compute required stats columns for a GbAgg
 	CColRefSet *PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -137,14 +138,14 @@ public:
 	ULONG HashValue() const override;
 
 	// grouping columns accessor
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	Pdrgpcr() const
 	{
 		return m_pdrgpcr;
 	}
 
 	// array of columns used in distinct qualified aggregates (DQA)
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrArgDQA() const
 	{
 		return m_pdrgpcrArgDQA;
@@ -165,16 +166,16 @@ public:
 	}
 
 	// minimal grouping columns accessor
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrMinimal() const
 	{
 		return m_pdrgpcrMinimal;
 	}
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -237,7 +238,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalGbAgg *
+	static gpos::cast_func<CLogicalGbAgg *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -262,10 +263,10 @@ public:
 
 private:
 	// array of grouping columns
-	CColRefArray *m_pdrgpcr;
+	gpos::owner<CColRefArray *> m_pdrgpcr;
 
 	// minimal grouping columns based on FD's
-	CColRefArray *m_pdrgpcrMinimal;
+	gpos::owner<CColRefArray *> m_pdrgpcrMinimal;
 
 	// local / intermediate / global aggregate
 	COperator::EGbAggType m_egbaggtype;

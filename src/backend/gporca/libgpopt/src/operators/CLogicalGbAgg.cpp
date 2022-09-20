@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalGbAgg.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdPropScalar.h"
@@ -255,7 +256,7 @@ CLogicalGbAgg::~CLogicalGbAgg()
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalGbAgg::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										  UlongToColRefMap *colref_mapping,
 										  BOOL must_exist)
@@ -294,7 +295,7 @@ CLogicalGbAgg::DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// include the intersection of the grouping columns and the child's output
 	pcrs->Include(Pdrgpcr());
@@ -318,7 +319,7 @@ CColRefSet *
 CLogicalGbAgg::DeriveOuterReferences(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl)
 {
-	CColRefSet *pcrsGrp = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsGrp = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGrp->Include(m_pdrgpcr);
 
 	CColRefSet *outer_refs =
@@ -340,7 +341,7 @@ CPropConstraint *
 CLogicalGbAgg::DerivePropertyConstraint(CMemoryPool *mp,
 										CExpressionHandle &exprhdl) const
 {
-	CColRefSet *pcrsGrouping = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsGrouping = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGrouping->Include(m_pdrgpcr);
 
 	// get the constraints on the grouping columns only
@@ -382,7 +383,7 @@ CLogicalGbAgg::PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 CColRefArray *pdrgpcrGrp) const
 {
 	GPOS_ASSERT(nullptr != pdrgpcrGrp);
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// include grouping columns
 	pcrs->Include(pdrgpcrGrp);
@@ -397,7 +398,7 @@ CLogicalGbAgg::PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	for (ULONG ul = 0; ul < ulGrpCols; ul++)
 	{
 		CColRef *pcrGrpCol = (*m_pdrgpcr)[ul];
-		const CColRefSet *pcrsUsed =
+		gpos::pointer<const CColRefSet *> pcrsUsed =
 			col_factory->PcrsUsedInComputedCol(pcrGrpCol);
 		if (nullptr != pcrsUsed)
 		{
@@ -427,7 +428,7 @@ CLogicalGbAgg::DeriveNotNullColumns(CMemoryPool *mp,
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// include grouping columns
 	pcrs->Include(Pdrgpcr());
@@ -481,7 +482,7 @@ CKeyCollection *
 CLogicalGbAgg::DeriveKeyCollection(CMemoryPool *mp,
 								   CExpressionHandle &exprhdl) const
 {
-	CKeyCollection *pkc = nullptr;
+	gpos::owner<CKeyCollection *> pkc = nullptr;
 
 	// Gb produces a key only if it's global
 	if (FGlobal())
@@ -582,7 +583,7 @@ CLogicalGbAgg::Matches(COperator *pop) const
 CXformSet *
 CLogicalGbAgg::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfSimplifyGbAgg);
 	(void) xform_set->ExchangeSet(CXform::ExfGbAggWithMDQA2Join);
@@ -620,7 +621,8 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, IStatistics *child_stats,
 	const ULONG ulGroupingCols = pdrgpcrGroupingCols->Size();
 
 	// extract grouping column ids
-	ULongPtrArray *pdrgpulGroupingCols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpulGroupingCols =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	for (ULONG ul = 0; ul < ulGroupingCols; ul++)
 	{
 		CColRef *colref = (*pdrgpcrGroupingCols)[ul];
@@ -655,7 +657,8 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	IStatistics *child_stats = exprhdl.Pstats(0);
 
 	// extract computed columns
-	ULongPtrArray *pdrgpulComputedCols = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpulComputedCols =
+		GPOS_NEW(mp) ULongPtrArray(mp);
 	exprhdl.DeriveDefinedColumns(1)->ExtractColIds(mp, pdrgpulComputedCols);
 
 	IStatistics *stats = PstatsDerive(mp, child_stats, Pdrgpcr(),

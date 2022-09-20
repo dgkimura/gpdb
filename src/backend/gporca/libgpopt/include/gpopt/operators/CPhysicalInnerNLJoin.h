@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalInnerNLJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalNLJoin.h"
 
@@ -52,19 +53,21 @@ public:
 	}
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	CDistributionSpec *PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
-	CEnfdDistribution *Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   CReqdPropPlan *prppInput, ULONG child_index,
-						   CDrvdPropArray *pdrgpdpCtxt,
-						   ULONG ulDistrReq) override;
+	gpos::owner<CEnfdDistribution *> Ped(CMemoryPool *mp,
+										 CExpressionHandle &exprhdl,
+										 CReqdPropPlan *prppInput,
+										 ULONG child_index,
+										 CDrvdPropArray *pdrgpdpCtxt,
+										 ULONG ulDistrReq) override;
 
 	// conversion function
-	static CPhysicalInnerNLJoin *
+	static gpos::cast_func<CPhysicalInnerNLJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(EopPhysicalInnerNLJoin == pop->Eopid());

@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformSelect2DynamicIndexGet.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CConstraint.h"
 #include "gpopt/base/CUtils.h"
@@ -99,7 +100,7 @@ CXformSelect2DynamicIndexGet::Transform(CXformContext *pxfctxt,
 	}
 
 	// array of expressions in the scalar expression
-	CExpressionArray *pdrgpexpr =
+	gpos::owner<CExpressionArray *> pdrgpexpr =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 	GPOS_ASSERT(0 < pdrgpexpr->Size());
 
@@ -107,22 +108,25 @@ CXformSelect2DynamicIndexGet::Transform(CXformContext *pxfctxt,
 	CColRefSet *pcrsOutput = pexpr->DeriveOutputColumns();
 	CColRefSet *pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
 
-	CColRefSet *pcrsReqd = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsReqd = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsReqd->Include(pcrsOutput);
 	pcrsReqd->Include(pcrsScalarExpr);
 
 	// find the indexes whose included columns meet the required columns
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel =
+	gpos::pointer<const IMDRelation *> pmdrel =
 		md_accessor->RetrieveRel(popDynamicGet->Ptabdesc()->MDId());
 
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
 		IMDId *pmdidIndex = pmdrel->IndexMDidAt(ul);
-		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdidIndex);
-		CExpression *pexprDynamicIndexGet = CXformUtils::PexprLogicalIndexGet(
-			mp, md_accessor, pexprRelational, pexpr->Pop()->UlOpId(), pdrgpexpr,
-			pcrsReqd, pcrsScalarExpr, nullptr /*outer_refs*/, pmdindex, pmdrel);
+		gpos::pointer<const IMDIndex *> pmdindex =
+			md_accessor->RetrieveIndex(pmdidIndex);
+		gpos::owner<CExpression *> pexprDynamicIndexGet =
+			CXformUtils::PexprLogicalIndexGet(
+				mp, md_accessor, pexprRelational, pexpr->Pop()->UlOpId(),
+				pdrgpexpr, pcrsReqd, pcrsScalarExpr, nullptr /*outer_refs*/,
+				pmdindex, pmdrel);
 		if (nullptr != pexprDynamicIndexGet)
 		{
 			// create a redundant SELECT on top of DynamicIndexGet to be able to use predicate in partition elimination

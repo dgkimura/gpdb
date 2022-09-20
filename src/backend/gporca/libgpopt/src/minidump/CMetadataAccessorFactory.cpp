@@ -4,6 +4,7 @@
 #include "gpopt/minidump/CMetadataAccessorFactory.h"
 
 #include "gpos/common/CAutoRef.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/mdcache/CMDCache.h"
 #include "naucrates/md/CMDProviderMemory.h"
@@ -17,7 +18,8 @@ CMetadataAccessorFactory::CMetadataAccessorFactory(CMemoryPool *mp,
 	// set up MD providers
 	CAutoRef<CMDProviderMemory> apmdp(GPOS_NEW(mp)
 										  CMDProviderMemory(mp, file_name));
-	const CSystemIdArray *pdrgpsysid = pdxlmd->GetSysidPtrArray();
+	gpos::pointer<const CSystemIdArray *> pdrgpsysid =
+		pdxlmd->GetSysidPtrArray();
 	CAutoRef<CMDProviderArray> apdrgpmdp(GPOS_NEW(mp) CMDProviderArray(mp));
 
 	// ensure there is at least ONE system id

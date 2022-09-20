@@ -11,6 +11,8 @@
 
 #include "gpopt/base/CPartitionPropagationSpec.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/exception.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPhysicalPartitionSelector.h"
@@ -21,7 +23,7 @@ using namespace gpopt;
 // used for determining equality in memo (e.g in optimization contexts)
 BOOL
 CPartitionPropagationSpec::SPartPropSpecInfo::Equals(
-	const SPartPropSpecInfo *other) const
+	gpos::pointer<const SPartPropSpecInfo *> other) const
 {
 	GPOS_ASSERT_IMP(m_scan_id == other->m_scan_id,
 					m_root_rel_mdid->Equals(other->m_root_rel_mdid.get()));
@@ -31,7 +33,7 @@ CPartitionPropagationSpec::SPartPropSpecInfo::Equals(
 
 BOOL
 CPartitionPropagationSpec::SPartPropSpecInfo::FSatisfies(
-	const SPartPropSpecInfo *other) const
+	gpos::pointer<const SPartPropSpecInfo *> other) const
 {
 	GPOS_ASSERT_IMP(m_scan_id == other->m_scan_id,
 					m_root_rel_mdid->Equals(other->m_root_rel_mdid.get()));
@@ -47,8 +49,10 @@ INT
 CPartitionPropagationSpec::SPartPropSpecInfo::CmpFunc(const void *val1,
 													  const void *val2)
 {
-	const SPartPropSpecInfo *info1 = *(const SPartPropSpecInfo **) val1;
-	const SPartPropSpecInfo *info2 = *(const SPartPropSpecInfo **) val2;
+	gpos::pointer<const SPartPropSpecInfo *> info1 =
+		*(const SPartPropSpecInfo **) val1;
+	gpos::pointer<const SPartPropSpecInfo *> info2 =
+		*(const SPartPropSpecInfo **) val2;
 
 	return info1->m_scan_id - info2->m_scan_id;
 }
@@ -68,7 +72,8 @@ CPartitionPropagationSpec::~CPartitionPropagationSpec()
 }
 
 BOOL
-CPartitionPropagationSpec::Equals(const CPartitionPropagationSpec *pps) const
+CPartitionPropagationSpec::Equals(
+	gpos::pointer<const CPartitionPropagationSpec *> pps) const
 {
 	if ((m_part_prop_spec_infos == nullptr) &&
 		(pps->m_part_prop_spec_infos == nullptr))
@@ -94,8 +99,9 @@ CPartitionPropagationSpec::Equals(const CPartitionPropagationSpec *pps) const
 	UlongToSPartPropSpecInfoMapIter hmulpi_other(pps->m_part_prop_spec_infos);
 	while (hmulpi.Advance() && hmulpi_other.Advance())
 	{
-		const SPartPropSpecInfo *info = hmulpi.Value();
-		const SPartPropSpecInfo *info_other = hmulpi_other.Value();
+		gpos::pointer<const SPartPropSpecInfo *> info = hmulpi.Value();
+		gpos::pointer<const SPartPropSpecInfo *> info_other =
+			hmulpi_other.Value();
 		if (!info->Equals(info_other))
 		{
 			return false;
@@ -118,7 +124,7 @@ CPartitionPropagationSpec::FindPartPropSpecInfo(ULONG scan_id) const
 	return info;
 }
 
-const CBitSet *
+gpos::pointer<const CBitSet *>
 CPartitionPropagationSpec::SelectorIds(ULONG scan_id) const
 {
 	SPartPropSpecInfo *found_info = FindPartPropSpecInfo(scan_id);
@@ -140,7 +146,7 @@ CPartitionPropagationSpec::Insert(ULONG scan_id, EPartPropSpecInfoType type,
 
 	CMemoryPool *mp = COptCtxt::PoctxtFromTLS()->Pmp();
 	rool_rel_mdid->AddRef();
-	SPartPropSpecInfo *info =
+	gpos::owner<SPartPropSpecInfo *> info =
 		GPOS_NEW(mp) SPartPropSpecInfo(scan_id, type, rool_rel_mdid);
 
 	if (selector_ids != nullptr)
@@ -320,7 +326,7 @@ CPartitionPropagationSpec::InsertAllResolve(CPartitionPropagationSpec *pps)
 
 BOOL
 CPartitionPropagationSpec::FSatisfies(
-	const CPartitionPropagationSpec *pps_reqd) const
+	gpos::pointer<const CPartitionPropagationSpec *> pps_reqd) const
 {
 	if (pps_reqd->m_part_prop_spec_infos == nullptr)
 	{
@@ -330,7 +336,7 @@ CPartitionPropagationSpec::FSatisfies(
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps_reqd->m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		const SPartPropSpecInfo *reqd_info = hmulpi.Value();
+		gpos::pointer<const SPartPropSpecInfo *> reqd_info = hmulpi.Value();
 		SPartPropSpecInfo *found_info =
 			FindPartPropSpecInfo(reqd_info->m_scan_id);
 
@@ -353,14 +359,14 @@ CPartitionPropagationSpec::FSatisfies(
 void
 CPartitionPropagationSpec::AppendEnforcers(CMemoryPool *mp,
 										   CExpressionHandle &exprhdl,
-										   CReqdPropPlan *,
+										   gpos::pointer<CReqdPropPlan *>,
 										   CExpressionArray *pdrgpexpr,
 										   CExpression *expr)
 {
 	UlongToSPartPropSpecInfoMapIter hmulpi(m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		const SPartPropSpecInfo *info = hmulpi.Value();
+		gpos::pointer<const SPartPropSpecInfo *> info = hmulpi.Value();
 
 		if (info->m_type != CPartitionPropagationSpec::EpptPropagator)
 		{
@@ -373,7 +379,7 @@ CPartitionPropagationSpec::AppendEnforcers(CMemoryPool *mp,
 		info->m_filter_expr->AddRef();
 		expr->AddRef();
 
-		CExpression *part_selector = GPOS_NEW(mp)
+		gpos::owner<CExpression *> part_selector = GPOS_NEW(mp)
 			CExpression(mp,
 						GPOS_NEW(mp) CPhysicalPartitionSelector(
 							mp, info->m_scan_id, selector_id,
@@ -415,7 +421,7 @@ CPartitionPropagationSpec::OsPrint(IOstream &os) const
 	UlongToSPartPropSpecInfoMapIter hmulpi(m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		const SPartPropSpecInfo *part_info = hmulpi.Value();
+		gpos::pointer<const SPartPropSpecInfo *> part_info = hmulpi.Value();
 
 		switch (part_info->m_type)
 		{
@@ -454,7 +460,7 @@ CPartitionPropagationSpec::ContainsAnyConsumers() const
 	UlongToSPartPropSpecInfoMapIter hmulpi(m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		const SPartPropSpecInfo *info = hmulpi.Value();
+		gpos::pointer<const SPartPropSpecInfo *> info = hmulpi.Value();
 
 		if (info->m_type == CPartitionPropagationSpec::EpptConsumer)
 		{

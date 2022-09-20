@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataObject.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 
@@ -56,7 +58,7 @@ CParseHandlerMetadataObject::~CParseHandlerMetadataObject()
 //		Returns the constructed metadata object.
 //
 //---------------------------------------------------------------------------
-IMDCacheObject *
+gpos::pointer<IMDCacheObject *>
 CParseHandlerMetadataObject::GetImdObj() const
 {
 	return m_imd_obj;

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalSort.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCTEMap.h"
 #include "gpopt/base/COptCtxt.h"
@@ -92,7 +93,7 @@ CPhysicalSort::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsSort);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsSort);
 	pcrs->Union(pcrsRequired);
 	CColRefSet *pcrsChildReqd =
 		PcrsChildReqd(mp, exprhdl, pcrs, child_index, gpos::ulong_max);
@@ -110,10 +111,10 @@ CPhysicalSort::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalSort::PosRequired(CMemoryPool *mp,
-						   CExpressionHandle &,	 // exprhdl
-						   COrderSpec *,		 // posRequired
+						   CExpressionHandle &,			 // exprhdl
+						   gpos::pointer<COrderSpec *>,	 // posRequired
 						   ULONG
 #ifdef GPOS_DEBUG
 							   child_index
@@ -160,9 +161,9 @@ CPhysicalSort::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalSort::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   CRewindabilitySpec *,  //prsRequired,
+						   gpos::pointer<CRewindabilitySpec *>,	 //prsRequired,
 						   ULONG
 #ifdef GPOS_DEBUG
 							   child_index
@@ -245,7 +246,7 @@ CPhysicalSort::FProvidesReqdCols(CExpressionHandle &exprhdl,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalSort::PosDerive(CMemoryPool *,		  // mp
 						 CExpressionHandle &  // exprhdl
 ) const
@@ -279,7 +280,7 @@ CPhysicalSort::PdsDerive(CMemoryPool *,	 // mp
 //		Derive rewindability
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalSort::PrsDerive(CMemoryPool *mp,
 						 CExpressionHandle &  // exprhdl
 ) const
@@ -300,7 +301,7 @@ CPhysicalSort::PrsDerive(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalSort::EpetOrder(CExpressionHandle &,  // exprhdl
-						 const CEnfdOrder *peo) const
+						 gpos::pointer<const CEnfdOrder *> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());
@@ -327,7 +328,7 @@ CPhysicalSort::EpetOrder(CExpressionHandle &,  // exprhdl
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalSort::EpetDistribution(CExpressionHandle & /*exprhdl*/,
-								const CEnfdDistribution *
+								gpos::pointer<const CEnfdDistribution *>
 #ifdef GPOS_DEBUG
 									ped
 #endif	// GPOS_DEBUG
@@ -349,8 +350,9 @@ CPhysicalSort::EpetDistribution(CExpressionHandle & /*exprhdl*/,
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalSort::EpetRewindability(CExpressionHandle &,		 // exprhdl
-								 const CEnfdRewindability *	 // per
+CPhysicalSort::EpetRewindability(
+	CExpressionHandle &,					   // exprhdl
+	gpos::pointer<const CEnfdRewindability *>  // per
 ) const
 {
 	// no need for enforcing rewindability on output

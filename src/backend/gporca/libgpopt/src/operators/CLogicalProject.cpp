@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalProject.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefTable.h"
@@ -55,7 +56,7 @@ CLogicalProject::DeriveOutputColumns(CMemoryPool *mp,
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 
 	// the scalar child defines additional columns
 	pcrs->Union(exprhdl.DeriveOutputColumns(0));
@@ -126,9 +127,10 @@ CLogicalProject::PdrgpcrsEquivClassFromScIdent(CMemoryPool *mp,
 	if (CColRef::EcrtTable == pcrScIdent->Ecrt() && non_nullable)
 	{
 		// equivalence class
-		CColRefSetArray *pdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
+		gpos::owner<CColRefSetArray *> pdrgpcrs =
+			GPOS_NEW(mp) CColRefSetArray(mp);
 
-		CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+		gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 		pcrs->Include(pcrPrEl);
 		pcrs->Include(pcrScIdent);
 		pdrgpcrs->Append(pcrs);
@@ -175,7 +177,7 @@ CLogicalProject::ExtractConstraintFromScConst(
 	CScalarConst *popConst = CScalarConst::PopConvert(pexprScalar->Pop());
 	IDatum *datum = popConst->GetDatum();
 
-	CRangeArray *pdrgprng = GPOS_NEW(mp) CRangeArray(mp);
+	gpos::owner<CRangeArray *> pdrgprng = GPOS_NEW(mp) CRangeArray(mp);
 	BOOL is_null = datum->IsNull();
 	if (!is_null)
 	{
@@ -187,7 +189,7 @@ CLogicalProject::ExtractConstraintFromScConst(
 	pdrgpcnstr->Append(GPOS_NEW(mp)
 						   CConstraintInterval(mp, colref, pdrgprng, is_null));
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(colref);
 	pdrgpcrs->Append(pcrs);
 }
@@ -201,7 +203,7 @@ CLogicalProject::ExtractConstraintFromScConst(
 //		Derive constraint property
 //
 //---------------------------------------------------------------------------
-CPropConstraint *
+gpos::owner<CPropConstraint *>
 CLogicalProject::DerivePropertyConstraint(CMemoryPool *mp,
 										  CExpressionHandle &exprhdl) const
 {
@@ -212,8 +214,9 @@ CLogicalProject::DerivePropertyConstraint(CMemoryPool *mp,
 		return PpcDeriveConstraintPassThru(exprhdl, 0 /*ulChild*/);
 	}
 
-	CConstraintArray *pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
-	CColRefSetArray *pdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
+	gpos::owner<CConstraintArray *> pdrgpcnstr =
+		GPOS_NEW(mp) CConstraintArray(mp);
+	gpos::owner<CColRefSetArray *> pdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
 
 	const ULONG ulProjElems = pexprPrL->Arity();
 	for (ULONG ul = 0; ul < ulProjElems; ul++)
@@ -229,7 +232,7 @@ CLogicalProject::DerivePropertyConstraint(CMemoryPool *mp,
 		{
 			CColRefSet *not_null_columns =
 				exprhdl.DeriveNotNullColumns(0 /*ulChild*/);
-			CColRefSetArray *pdrgpcrsChild =
+			gpos::owner<CColRefSetArray *> pdrgpcrsChild =
 				PdrgpcrsEquivClassFromScIdent(mp, pexprPrEl, not_null_columns);
 
 			if (nullptr != pdrgpcrsChild)
@@ -319,7 +322,7 @@ CLogicalProject::DeriveMaxCard(CMemoryPool *,  // mp
 CXformSet *
 CLogicalProject::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfSimplifyProjectWithSubquery);
 	(void) xform_set->ExchangeSet(CXform::ExfProject2Apply);
@@ -342,7 +345,8 @@ CLogicalProject::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							  IStatisticsArray *  // stats_ctxt
 ) const
 {
-	UlongToIDatumMap *phmuldatum = GPOS_NEW(mp) UlongToIDatumMap(mp);
+	gpos::owner<UlongToIDatumMap *> phmuldatum =
+		GPOS_NEW(mp) UlongToIDatumMap(mp);
 
 	// extract scalar constant expression that can be used for
 	// statistics calculation

@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMetadataColumn.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
@@ -195,7 +197,7 @@ CParseHandlerMetadataColumn::EndElement(const XMLCh *const,	 // element_uri,
 //		Return the constructed list of metadata columns
 //
 //---------------------------------------------------------------------------
-CMDColumn *
+gpos::pointer<CMDColumn *>
 CParseHandlerMetadataColumn::GetMdCol()
 {
 	return m_mdcol;

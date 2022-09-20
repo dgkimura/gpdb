@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CList.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/metadata/CName.h"
@@ -38,8 +39,8 @@ public:
 	CColRefComputed(const CColRefComputed &) = delete;
 
 	// ctor
-	CColRefComputed(const IMDType *pmdtype, INT type_modifier, ULONG id,
-					const CName *pname);
+	CColRefComputed(gpos::pointer<const IMDType *> pmdtype, INT type_modifier,
+					ULONG id, const CName *pname);
 
 	// dtor
 	~CColRefComputed() override;

@@ -55,7 +55,7 @@ private:
 	ULONG m_max_stats_buckets;
 
 	// hash set of md ids for columns with missing statistics
-	MdidHashSet *m_phsmdidcolinfo;
+	gpos::owner<MdidHashSet *> m_phsmdidcolinfo;
 
 public:
 	// ctor

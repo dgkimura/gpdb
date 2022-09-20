@@ -4,6 +4,7 @@
 #include "gpopt/base/CDatumSortedSet.h"
 
 #include "gpos/common/CAutoRef.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/base/DatumLess.h"
@@ -41,7 +42,7 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp, CExpression *pexprArray,
 
 	// de-duplicate
 	const ULONG ulRangeArrayArity = aprngdatum->Size();
-	IDatum *pdatumPrev = (*aprngdatum)[0];
+	gpos::owner<IDatum *> pdatumPrev = (*aprngdatum)[0];
 	pdatumPrev->AddRef();
 	Append(pdatumPrev);
 	for (ULONG ul = 1; ul < ulRangeArrayArity; ul++)

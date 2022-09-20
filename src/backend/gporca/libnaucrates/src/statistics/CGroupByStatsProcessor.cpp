@@ -11,6 +11,8 @@
 
 #include "naucrates/statistics/CGroupByStatsProcessor.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
 #include "naucrates/statistics/CStatistics.h"
@@ -20,21 +22,21 @@ using namespace gpopt;
 
 // return statistics object after Group by computation
 CStatistics *
-CGroupByStatsProcessor::CalcGroupByStats(CMemoryPool *mp,
-										 const CStatistics *input_stats,
-										 ULongPtrArray *GCs,
-										 ULongPtrArray *aggs, CBitSet *keys)
+CGroupByStatsProcessor::CalcGroupByStats(
+	CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
+	ULongPtrArray *GCs, ULongPtrArray *aggs, CBitSet *keys)
 {
 	// create hash map from colid -> histogram for resultant structure
-	UlongToHistogramMap *col_histogram_mapping =
+	gpos::owner<UlongToHistogramMap *> col_histogram_mapping =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// hash map colid -> width
-	UlongToDoubleMap *col_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::owner<UlongToDoubleMap *> col_width_mapping =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
-	CStatistics *agg_stats = nullptr;
+	gpos::owner<CStatistics *> agg_stats = nullptr;
 	CDouble agg_rows = CStatistics::MinRows;
 	if (input_stats->IsEmpty())
 	{
@@ -57,8 +59,9 @@ CGroupByStatsProcessor::CalcGroupByStats(CMemoryPool *mp,
 			mp, col_factory, col_histogram_mapping, col_width_mapping, aggs,
 			false /* is_empty */);
 
-		CColRefSet *computed_groupby_cols = GPOS_NEW(mp) CColRefSet(mp);
-		CColRefSet *groupby_cols_for_stats =
+		gpos::owner<CColRefSet *> computed_groupby_cols =
+			GPOS_NEW(mp) CColRefSet(mp);
+		gpos::owner<CColRefSet *> groupby_cols_for_stats =
 			CStatisticsUtils::MakeGroupByColsForStats(mp, GCs,
 													  computed_groupby_cols);
 
@@ -71,10 +74,12 @@ CGroupByStatsProcessor::CalcGroupByStats(CMemoryPool *mp,
 										 col_histogram_mapping,
 										 col_width_mapping);
 
-		const CStatisticsConfig *stats_config = input_stats->GetStatsConfig();
+		gpos::pointer<const CStatisticsConfig *> stats_config =
+			input_stats->GetStatsConfig();
 
-		CDoubleArray *NDVs = CStatisticsUtils::ExtractNDVForGrpCols(
-			mp, stats_config, input_stats, groupby_cols_for_stats, keys);
+		gpos::owner<CDoubleArray *> NDVs =
+			CStatisticsUtils::ExtractNDVForGrpCols(
+				mp, stats_config, input_stats, groupby_cols_for_stats, keys);
 		CDouble groups =
 			CStatisticsUtils::GetCumulativeNDVs(stats_config, NDVs);
 

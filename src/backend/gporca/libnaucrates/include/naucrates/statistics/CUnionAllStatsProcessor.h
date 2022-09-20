@@ -11,6 +11,8 @@
 #ifndef GPNAUCRATES_CUnionAllStatsProcessor_H
 #define GPNAUCRATES_CUnionAllStatsProcessor_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/optimizer/COptimizerConfig.h"
 #include "naucrates/statistics/CStatistics.h"
 
@@ -20,9 +22,11 @@ class CUnionAllStatsProcessor
 {
 public:
 	static CStatistics *CreateStatsForUnionAll(
-		CMemoryPool *mp, const CStatistics *stats_first_child,
-		const CStatistics *stats_second_child, ULongPtrArray *output_colids,
-		ULongPtrArray *first_child_colids, ULongPtrArray *second_child_colids);
+		CMemoryPool *mp, gpos::pointer<const CStatistics *> stats_first_child,
+		gpos::pointer<const CStatistics *> stats_second_child,
+		gpos::owner<ULongPtrArray *> output_colids,
+		gpos::owner<ULongPtrArray *> first_child_colids,
+		gpos::owner<ULongPtrArray *> second_child_colids);
 };
 }  // namespace gpnaucrates
 

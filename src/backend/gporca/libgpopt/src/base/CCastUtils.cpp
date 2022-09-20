@@ -11,6 +11,7 @@
 
 #include "gpopt/base/CCastUtils.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/base/COptCtxt.h"
@@ -28,7 +29,8 @@ using namespace gpmd;
 
 // is the given expression a binary coercible cast of a scalar identifier
 BOOL
-CCastUtils::FBinaryCoercibleCastedScId(CExpression *pexpr, CColRef *colref)
+CCastUtils::FBinaryCoercibleCastedScId(gpos::pointer<CExpression *> pexpr,
+									   CColRef *colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -46,7 +48,7 @@ CCastUtils::FBinaryCoercibleCastedScId(CExpression *pexpr, CColRef *colref)
 
 // is the given expression a binary coercible cast of a scalar identifier
 BOOL
-CCastUtils::FBinaryCoercibleCastedScId(CExpression *pexpr)
+CCastUtils::FBinaryCoercibleCastedScId(gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -63,7 +65,7 @@ CCastUtils::FBinaryCoercibleCastedScId(CExpression *pexpr)
 
 // is the given expression a binary coercible cast of a const
 BOOL
-CCastUtils::FBinaryCoercibleCastedConst(CExpression *pexpr)
+CCastUtils::FBinaryCoercibleCastedConst(gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -120,11 +122,12 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	GPOS_ASSERT(
 		CMDAccessorUtils::FCastExists(md_accessor, mdid_src, mdid_dest));
 
-	const IMDCast *pmdcast = md_accessor->Pmdcast(mdid_src, mdid_dest);
+	gpos::pointer<const IMDCast *> pmdcast =
+		md_accessor->Pmdcast(mdid_src, mdid_dest);
 
 	mdid_dest->AddRef();
 	pmdcast->GetCastFuncMdId()->AddRef();
-	CExpression *pexpr;
+	gpos::owner<CExpression *> pexpr;
 
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
@@ -142,7 +145,7 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	}
 	else
 	{
-		CScalarCast *popCast =
+		gpos::owner<CScalarCast *> popCast =
 			GPOS_NEW(mp) CScalarCast(mp, mdid_dest, pmdcast->GetCastFuncMdId(),
 									 pmdcast->IsBinaryCoercible());
 		pexpr = GPOS_NEW(mp)
@@ -153,7 +156,7 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 
 // check whether the given expression is a binary coercible cast of something
 BOOL
-CCastUtils::FBinaryCoercibleCast(CExpression *pexpr)
+CCastUtils::FBinaryCoercibleCast(gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	COperator *pop = pexpr->Pop();
@@ -163,7 +166,7 @@ CCastUtils::FBinaryCoercibleCast(CExpression *pexpr)
 }
 
 BOOL
-CCastUtils::FScalarCast(CExpression *pexpr)
+CCastUtils::FScalarCast(gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	COperator *pop = pexpr->Pop();
@@ -196,15 +199,16 @@ CCastUtils::PdrgpexprCastEquality(CMemoryPool *mp, CExpression *pexpr)
 {
 	GPOS_ASSERT(pexpr->Pop()->FScalar());
 
-	CExpressionArray *pdrgpexpr =
+	gpos::owner<CExpressionArray *> pdrgpexpr =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexpr);
-	CExpressionArray *pdrgpexprNew = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprNew =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG ulPreds = pdrgpexpr->Size();
 	for (ULONG ul = 0; ul < ulPreds; ul++)
 	{
-		CExpression *pexprPred = (*pdrgpexpr)[ul];
+		gpos::owner<CExpression *> pexprPred = (*pdrgpexpr)[ul];
 		pexprPred->AddRef();
-		CExpression *pexprNewPred = pexprPred;
+		gpos::owner<CExpression *> pexprNewPred = pexprPred;
 
 		if (CPredicateUtils::IsEqualityOp(pexprPred) ||
 			CPredicateUtils::FINDF(pexprPred))
@@ -301,11 +305,12 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 					  CExpression *pexpr, IMDId *mdid_dest)
 {
 	IMDId *mdid_src = CScalar::PopConvert(pexpr->Pop())->MdidType();
-	const IMDCast *pmdcast = md_accessor->Pmdcast(mdid_src, mdid_dest);
+	gpos::pointer<const IMDCast *> pmdcast =
+		md_accessor->Pmdcast(mdid_src, mdid_dest);
 
 	mdid_dest->AddRef();
 	pmdcast->GetCastFuncMdId()->AddRef();
-	CExpression *pexprCast;
+	gpos::owner<CExpression *> pexprCast;
 
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
@@ -323,7 +328,7 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	}
 	else
 	{
-		CScalarCast *popCast =
+		gpos::owner<CScalarCast *> popCast =
 			GPOS_NEW(mp) CScalarCast(mp, mdid_dest, pmdcast->GetCastFuncMdId(),
 									 pmdcast->IsBinaryCoercible());
 		pexprCast = GPOS_NEW(mp) CExpression(mp, popCast, pexpr);

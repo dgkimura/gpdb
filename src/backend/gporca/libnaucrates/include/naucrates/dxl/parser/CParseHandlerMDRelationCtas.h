@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerMDRelationCTAS_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerMDRelation.h"
 #include "naucrates/md/CMDRelationExternalGPDB.h"
@@ -36,7 +37,7 @@ class CParseHandlerMDRelationCtas : public CParseHandlerMDRelation
 {
 private:
 	// vartypemod list
-	IntPtrArray *m_vartypemod_array;
+	gpos::pointer<IntPtrArray *> m_vartypemod_array;
 
 	// process the start of an element
 	void StartElement(

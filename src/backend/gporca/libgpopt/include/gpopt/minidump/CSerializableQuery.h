@@ -12,6 +12,7 @@
 #define GPOS_CSerializableQuery_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CSerializable.h"
 #include "gpos/string/CWStringDynamic.h"
 
@@ -36,22 +37,23 @@ private:
 	CMemoryPool *m_mp;
 
 	// query DXL node;
-	const CDXLNode *m_query_dxl_root;
+	gpos::pointer<const CDXLNode *> m_query_dxl_root;
 
 	// query output
-	const CDXLNodeArray *m_query_output;
+	gpos::pointer<const CDXLNodeArray *> m_query_output;
 
 	// CTE DXL nodes
-	const CDXLNodeArray *m_cte_producers;
+	gpos::pointer<const CDXLNodeArray *> m_cte_producers;
 
 
 public:
 	CSerializableQuery(const CSerializableQuery &) = delete;
 
 	// ctor
-	CSerializableQuery(CMemoryPool *mp, const CDXLNode *query,
-					   const CDXLNodeArray *query_output_dxlnode_array,
-					   const CDXLNodeArray *cte_producers);
+	CSerializableQuery(
+		CMemoryPool *mp, gpos::pointer<const CDXLNode *> query,
+		gpos::pointer<const CDXLNodeArray *> query_output_dxlnode_array,
+		gpos::pointer<const CDXLNodeArray *> cte_producers);
 
 	// dtor
 	~CSerializableQuery() override;

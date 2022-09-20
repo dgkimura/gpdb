@@ -12,6 +12,7 @@
 #include "gpopt/base/CDrvdPropPlan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCTEMap.h"
 #include "gpopt/base/CDrvdPropCtxtPlan.h"
@@ -61,7 +62,7 @@ CDrvdPropPlan::~CDrvdPropPlan()
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-CDrvdPropPlan *
+gpos::cast_func<CDrvdPropPlan *>
 CDrvdPropPlan::Pdpplan(CDrvdProp *pdp)
 {
 	GPOS_ASSERT(nullptr != pdp);
@@ -156,7 +157,7 @@ CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDrvdPropPlan::FSatisfies(const CReqdPropPlan *prpp) const
+CDrvdPropPlan::FSatisfies(gpos::pointer<const CReqdPropPlan *> prpp) const
 {
 	GPOS_ASSERT(nullptr != prpp);
 	GPOS_ASSERT(nullptr != prpp->Peo());
@@ -199,7 +200,7 @@ CDrvdPropPlan::HashValue() const
 //
 //---------------------------------------------------------------------------
 ULONG
-CDrvdPropPlan::Equals(const CDrvdPropPlan *pdpplan) const
+CDrvdPropPlan::Equals(gpos::pointer<const CDrvdPropPlan *> pdpplan) const
 {
 	return m_pos->Matches(pdpplan->Pos()) && m_pds->Equals(pdpplan->Pds()) &&
 		   m_prs->Matches(pdpplan->Prs()) && m_ppps->Equals(pdpplan->Ppps()) &&

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalDynamicTableScan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
@@ -84,7 +85,8 @@ CPartitionPropagationSpec *
 CPhysicalDynamicTableScan::PppsDerive(CMemoryPool *mp,
 									  CExpressionHandle &) const
 {
-	CPartitionPropagationSpec *pps = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
+	gpos::owner<CPartitionPropagationSpec *> pps =
+		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 	pps->Insert(ScanId(), CPartitionPropagationSpec::EpptConsumer,
 				Ptabdesc()->MDId(), nullptr, nullptr);
 

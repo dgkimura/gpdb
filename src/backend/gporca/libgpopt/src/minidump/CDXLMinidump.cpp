@@ -12,6 +12,7 @@
 #include "gpopt/minidump/CDXLMinidump.h"
 
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/engine/CEnumeratorConfig.h"
 #include "gpopt/engine/CStatisticsConfig.h"
@@ -80,7 +81,7 @@ CDXLMinidump::~CDXLMinidump()
 //		Traceflags
 //
 //---------------------------------------------------------------------------
-const CBitSet *
+gpos::pointer<const CBitSet *>
 CDXLMinidump::Pbs() const
 {
 	return m_pbs;
@@ -94,7 +95,7 @@ CDXLMinidump::Pbs() const
 //		Query object
 //
 //---------------------------------------------------------------------------
-const CDXLNode *
+gpos::pointer<const CDXLNode *>
 CDXLMinidump::GetQueryDXLRoot() const
 {
 	return m_query_dxl_root;
@@ -108,7 +109,7 @@ CDXLMinidump::GetQueryDXLRoot() const
 //		Query output columns
 //
 //---------------------------------------------------------------------------
-const CDXLNodeArray *
+gpos::pointer<const CDXLNodeArray *>
 CDXLMinidump::PdrgpdxlnQueryOutput() const
 {
 	return m_query_output;
@@ -122,7 +123,7 @@ CDXLMinidump::PdrgpdxlnQueryOutput() const
 //		CTE list
 //
 //---------------------------------------------------------------------------
-const CDXLNodeArray *
+gpos::pointer<const CDXLNodeArray *>
 CDXLMinidump::GetCTEProducerDXLArray() const
 {
 	return m_cte_producers;
@@ -136,7 +137,7 @@ CDXLMinidump::GetCTEProducerDXLArray() const
 //		Query object
 //
 //---------------------------------------------------------------------------
-const CDXLNode *
+gpos::pointer<const CDXLNode *>
 CDXLMinidump::PdxlnPlan() const
 {
 	return m_plan_dxl_root;
@@ -150,7 +151,7 @@ CDXLMinidump::PdxlnPlan() const
 //		Metadata objects
 //
 //---------------------------------------------------------------------------
-const IMDCacheObjectArray *
+gpos::pointer<const IMDCacheObjectArray *>
 CDXLMinidump::GetMdIdCachedObjArray() const
 {
 	return m_mdid_cached_obj_array;
@@ -164,7 +165,7 @@ CDXLMinidump::GetMdIdCachedObjArray() const
 //		Metadata source system ids
 //
 //---------------------------------------------------------------------------
-const CSystemIdArray *
+gpos::pointer<const CSystemIdArray *>
 CDXLMinidump::GetSysidPtrArray() const
 {
 	return m_system_id_array;

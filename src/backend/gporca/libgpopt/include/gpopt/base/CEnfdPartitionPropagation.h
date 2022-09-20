@@ -43,7 +43,7 @@ public:
 
 private:
 	// partition propagation spec
-	CPartitionPropagationSpec *m_ppps;
+	gpos::owner<CPartitionPropagationSpec *> m_ppps;
 
 	// partition propagation matching type
 	EPartitionPropagationMatching m_eppm;

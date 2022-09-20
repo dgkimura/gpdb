@@ -12,6 +12,7 @@
 #include "gpopt/operators/CScalarProjectList.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/base/CColRefSet.h"
@@ -178,7 +179,7 @@ CScalarProjectList::FHasMultipleDistinctAggs(CExpressionHandle &exprhdl)
 	}
 
 	CAutoMemoryPool amp;
-	ExprToExprArrayMap *phmexprdrgpexpr = nullptr;
+	gpos::owner<ExprToExprArrayMap *> phmexprdrgpexpr = nullptr;
 	ULONG ulDifferentDQAs = 0;
 	CXformUtils::MapPrjElemsWithDistinctAggs(
 		amp.Pmp(), pexprPrjList, &phmexprdrgpexpr, &ulDifferentDQAs);

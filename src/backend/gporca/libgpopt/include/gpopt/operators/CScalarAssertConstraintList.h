@@ -27,6 +27,7 @@
 #define GPOPT_CScalarAssertConstraintList_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalar.h"
 #include "naucrates/md/IMDId.h"
@@ -79,10 +80,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -91,7 +93,7 @@ public:
 	IMDId *MdidType() const override;
 
 	// conversion function
-	static CScalarAssertConstraintList *
+	static gpos::cast_func<CScalarAssertConstraintList *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

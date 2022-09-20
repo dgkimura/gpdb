@@ -11,6 +11,8 @@
 #ifndef GPNAUCRATES_CGroupByStatsProcessor_H
 #define GPNAUCRATES_CGroupByStatsProcessor_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/optimizer/COptimizerConfig.h"
 #include "naucrates/statistics/CStatistics.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
@@ -21,10 +23,9 @@ class CGroupByStatsProcessor
 {
 public:
 	// group by
-	static CStatistics *CalcGroupByStats(CMemoryPool *mp,
-										 const CStatistics *input_stats,
-										 ULongPtrArray *GCs,
-										 ULongPtrArray *aggs, CBitSet *keys);
+	static CStatistics *CalcGroupByStats(
+		CMemoryPool *mp, gpos::pointer<const CStatistics *> input_stats,
+		ULongPtrArray *GCs, ULongPtrArray *aggs, CBitSet *keys);
 };
 }  // namespace gpnaucrates
 

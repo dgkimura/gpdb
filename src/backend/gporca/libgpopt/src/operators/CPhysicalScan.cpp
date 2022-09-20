@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalScan.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCastUtils.h"
 #include "gpopt/base/CDistributionSpec.h"
@@ -111,7 +112,7 @@ CPhysicalScan::FProvidesReqdCols(CExpressionHandle &,  // exprhdl
 {
 	GPOS_ASSERT(nullptr != pcrsRequired);
 
-	CColRefSet *pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
 	pcrs->Include(m_pdrgpcrOutput);
 
 	BOOL result = pcrs->ContainsAll(pcrsRequired);
@@ -131,7 +132,7 @@ CPhysicalScan::FProvidesReqdCols(CExpressionHandle &,  // exprhdl
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalScan::EpetOrder(CExpressionHandle &,  // exprhdl
-						 const CEnfdOrder *
+						 gpos::pointer<const CEnfdOrder *>
 #ifdef GPOS_DEBUG
 							 peo
 #endif	// GPOS_DEBUG
@@ -151,7 +152,7 @@ CPhysicalScan::EpetOrder(CExpressionHandle &,  // exprhdl
 //		Derive distribution
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
 	BOOL fIndexOrBitmapScan =
@@ -193,13 +194,14 @@ CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 
 		if (nullptr != pdshashedEquiv)
 		{
-			CExpressionArray *pdrgpexprHashed = pdshashed->Pdrgpexpr();
+			gpos::owner<CExpressionArray *> pdrgpexprHashed =
+				pdshashed->Pdrgpexpr();
 			pdrgpexprHashed->AddRef();
 			if (nullptr != pdshashed->Opfamilies())
 			{
 				pdshashed->Opfamilies()->AddRef();
 			}
-			CDistributionSpecHashed *pdshashedResult =
+			gpos::owner<CDistributionSpecHashed *> pdshashedResult =
 				GPOS_NEW(mp) CDistributionSpecHashed(
 					pdrgpexprHashed, pdshashed->FNullsColocated(),
 					pdshashedEquiv, pdshashed->Opfamilies());
@@ -223,8 +225,9 @@ CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalScan::EpetDistribution(CExpressionHandle & /*exprhdl*/,
-								const CEnfdDistribution *ped) const
+CPhysicalScan::EpetDistribution(
+	CExpressionHandle & /*exprhdl*/,
+	gpos::pointer<const CEnfdDistribution *> ped) const
 {
 	GPOS_ASSERT(nullptr != ped);
 
@@ -253,8 +256,9 @@ CPhysicalScan::ComputeTableStats(CMemoryPool *mp)
 {
 	GPOS_ASSERT(nullptr == m_pstatsBaseTable);
 
-	CColRefSet *pcrsHist = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefSet *pcrsWidth = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
+	gpos::owner<CColRefSet *> pcrsHist = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsWidth =
+		GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	m_pstatsBaseTable =
@@ -274,7 +278,7 @@ CPhysicalScan::ComputeTableStats(CMemoryPool *mp)
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalScan *
+gpos::cast_func<CPhysicalScan *>
 CPhysicalScan::PopConvert(COperator *pop)
 {
 	GPOS_ASSERT(nullptr != pop);

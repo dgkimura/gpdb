@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerScalarPartitionSelector_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
 
@@ -43,7 +44,7 @@ private:
 	ULONG m_scan_id;
 
 	// partitions
-	ULongPtrArray *m_partitions;
+	gpos::pointer<ULongPtrArray *> m_partitions;
 
 	// process the start of an element
 	void StartElement(

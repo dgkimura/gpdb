@@ -11,6 +11,8 @@
 
 #include "naucrates/statistics/CUnionAllStatsProcessor.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/COptCtxt.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
@@ -19,9 +21,11 @@ using namespace gpopt;
 // return statistics object after union all operation with input statistics object
 CStatistics *
 CUnionAllStatsProcessor::CreateStatsForUnionAll(
-	CMemoryPool *mp, const CStatistics *stats_first_child,
-	const CStatistics *stats_second_child, ULongPtrArray *output_colids,
-	ULongPtrArray *first_child_colids, ULongPtrArray *second_child_colids)
+	CMemoryPool *mp, gpos::pointer<const CStatistics *> stats_first_child,
+	gpos::pointer<const CStatistics *> stats_second_child,
+	gpos::owner<ULongPtrArray *> output_colids,
+	gpos::owner<ULongPtrArray *> first_child_colids,
+	gpos::owner<ULongPtrArray *> second_child_colids)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != stats_second_child);
@@ -31,10 +35,12 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 	GPOS_ASSERT(output_colids->Size() == second_child_colids->Size());
 
 	// create hash map from colid -> histogram for resultant structure
-	UlongToHistogramMap *histograms_new = GPOS_NEW(mp) UlongToHistogramMap(mp);
+	gpos::owner<UlongToHistogramMap *> histograms_new =
+		GPOS_NEW(mp) UlongToHistogramMap(mp);
 
 	// column ids on which widths are to be computed
-	UlongToDoubleMap *column_to_width_map = GPOS_NEW(mp) UlongToDoubleMap(mp);
+	gpos::owner<UlongToDoubleMap *> column_to_width_map =
+		GPOS_NEW(mp) UlongToDoubleMap(mp);
 
 	BOOL is_empty_unionall =
 		stats_first_child->IsEmpty() && stats_second_child->IsEmpty();
@@ -101,7 +107,7 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 	second_child_colids->Release();
 
 	// create an output stats object
-	CStatistics *unionall_stats = GPOS_NEW(mp)
+	gpos::owner<CStatistics *> unionall_stats = GPOS_NEW(mp)
 		CStatistics(mp, histograms_new, column_to_width_map, unionall_rows,
 					is_empty_unionall, 0 /* m_num_predicates */
 		);

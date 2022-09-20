@@ -35,41 +35,39 @@ class CPhysicalHashJoin : public CPhysicalJoin
 private:
 	// the array of expressions from the outer relation
 	// that are extracted from the hashing condition
-	CExpressionArray *m_pdrgpexprOuterKeys;
+	gpos::owner<CExpressionArray *> m_pdrgpexprOuterKeys;
 
 	// the array of expressions from the inner relation
 	// that are extracted from the hashing condition
-	CExpressionArray *m_pdrgpexprInnerKeys;
+	gpos::owner<CExpressionArray *> m_pdrgpexprInnerKeys;
 
 	// Hash op families of the operators used in the join conditions
 	gpos::Ref<IMdIdArray> m_hash_opfamilies;
 
 	// array redistribute request sent to the first hash join child
-	CDistributionSpecArray *m_pdrgpdsRedistributeRequests;
+	gpos::owner<CDistributionSpecArray *> m_pdrgpdsRedistributeRequests;
 
 	// compute a distribution matching the distribution delivered by given child
-	CDistributionSpec *PdsMatch(CMemoryPool *mp, CDistributionSpec *pds,
-								ULONG ulSourceChildIndex) const;
+	gpos::owner<CDistributionSpec *> PdsMatch(CMemoryPool *mp,
+											  CDistributionSpec *pds,
+											  ULONG ulSourceChildIndex) const;
 
 protected:
 	// compute required hashed distribution from the n-th child
-	CDistributionSpecHashed *PdshashedRequired(CMemoryPool *mp,
-											   ULONG child_index,
-											   ULONG ulReqIndex) const;
+	gpos::owner<CDistributionSpecHashed *> PdshashedRequired(
+		CMemoryPool *mp, ULONG child_index, ULONG ulReqIndex) const;
 	// create (redistribute, redistribute) optimization request
-	CDistributionSpec *PdsRequiredRedistribute(CMemoryPool *mp,
-											   CExpressionHandle &exprhdl,
-											   CDistributionSpec *pdsInput,
-											   ULONG child_index,
-											   CDrvdPropArray *pdrgpdpCtxt,
-											   ULONG ulOptReq) const;
+	CDistributionSpec *PdsRequiredRedistribute(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const;
 
 	// create the set of redistribute requests to send to first hash join child
 	void CreateHashRedistributeRequests(CMemoryPool *mp);
 
 private:
 	// create (non-singleton, replicate) optimization request
-	CDistributionSpec *PdsRequiredReplicate(
+	gpos::owner<CDistributionSpec *> PdsRequiredReplicate(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CDistributionSpec *pdsInput, ULONG child_index,
 		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq, CReqdPropPlan *prppInput);
@@ -79,7 +77,7 @@ private:
 	static CDistributionSpecHashed *PdshashedPassThru(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CDistributionSpecHashed *pdshashedInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt, ULONG ulOptReq);
 
 	// check whether a hash key is nullable
 	BOOL FNullableHashKey(ULONG ulKey, CColRefSet *pcrsNotNullInner,
@@ -87,16 +85,15 @@ private:
 
 protected:
 	// helper for computing a hashed distribution matching the given distribution
-	CDistributionSpecHashed *PdshashedMatching(
+	gpos::owner<CDistributionSpecHashed *> PdshashedMatching(
 		CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
 		ULONG ulSourceChild) const;
 
 	// create (singleton, singleton) optimization request
-	CDistributionSpec *PdsRequiredSingleton(CMemoryPool *mp,
-											CExpressionHandle &exprhdl,
-											CDistributionSpec *pdsInput,
-											ULONG child_index,
-											CDrvdPropArray *pdrgpdpCtxt) const;
+	gpos::owner<CDistributionSpec *> PdsRequiredSingleton(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CDistributionSpec *> pdsInput, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt) const;
 
 	// check whether the hash keys from one child are nullable
 	BOOL FNullableHashKeys(CColRefSet *pcrsNotNullInner, BOOL fInner) const;
@@ -141,29 +138,32 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// compute required sort order of the n-th child
-	COrderSpec *PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							COrderSpec *posInput, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
-							ULONG ulOptReq) const override;
+	gpos::owner<COrderSpec *> PosRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<COrderSpec *> posInput, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
-	CRewindabilitySpec *PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CRewindabilitySpec *prsRequired,
-									ULONG child_index,
-									CDrvdPropArray *pdrgpdpCtxt,
-									ULONG ulOptReq) const override;
+	gpos::owner<CRewindabilitySpec *> PrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		CRewindabilitySpec *prsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	CDistributionSpec *PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CDistributionSpec *> pdsRequired, ULONG child_index,
+		gpos::pointer<CDrvdPropArray *> pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
-	CEnfdDistribution *Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   CReqdPropPlan *prppInput, ULONG child_index,
-						   CDrvdPropArray *pdrgpdpCtxt,
-						   ULONG ulDistrReq) override;
+	gpos::owner<CEnfdDistribution *> Ped(CMemoryPool *mp,
+										 CExpressionHandle &exprhdl,
+										 CReqdPropPlan *prppInput,
+										 ULONG child_index,
+										 CDrvdPropArray *pdrgpdpCtxt,
+										 ULONG ulDistrReq) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties

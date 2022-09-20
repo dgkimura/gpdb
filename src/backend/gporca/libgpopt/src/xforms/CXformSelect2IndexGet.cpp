@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformSelect2IndexGet.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalGet.h"
 #include "gpopt/operators/CLogicalSelect.h"
@@ -93,7 +94,7 @@ CXformSelect2IndexGet::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// array of expressions in the scalar expression
-	CExpressionArray *pdrgpexpr =
+	gpos::owner<CExpressionArray *> pdrgpexpr =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 	GPOS_ASSERT(pdrgpexpr->Size() > 0);
 
@@ -101,19 +102,20 @@ CXformSelect2IndexGet::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CColRefSet *pcrsOutput = pexpr->DeriveOutputColumns();
 	CColRefSet *pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
 
-	CColRefSet *pcrsReqd = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsReqd = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsReqd->Include(pcrsOutput);
 	pcrsReqd->Include(pcrsScalarExpr);
 
 	// find the indexes whose included columns meet the required columns
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel =
+	gpos::pointer<const IMDRelation *> pmdrel =
 		md_accessor->RetrieveRel(popGet->Ptabdesc()->MDId());
 
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
 		IMDId *pmdidIndex = pmdrel->IndexMDidAt(ul);
-		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdidIndex);
+		gpos::pointer<const IMDIndex *> pmdindex =
+			md_accessor->RetrieveIndex(pmdidIndex);
 		CExpression *pexprIndexGet = CXformUtils::PexprLogicalIndexGet(
 			mp, md_accessor, pexprRelational, pexpr->Pop()->UlOpId(), pdrgpexpr,
 			pcrsReqd, pcrsScalarExpr, nullptr /*outer_refs*/, pmdindex, pmdrel);

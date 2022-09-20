@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalLeftOuterApply.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 
@@ -87,7 +88,7 @@ CLogicalLeftOuterApply::DeriveMaxCard(CMemoryPool *,  // mp
 CXformSet *
 CLogicalLeftOuterApply::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfLeftOuterApply2LeftOuterJoin);
 	(void) xform_set->ExchangeSet(
@@ -105,7 +106,7 @@ CLogicalLeftOuterApply::PxfsCandidates(CMemoryPool *mp) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalLeftOuterApply::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {

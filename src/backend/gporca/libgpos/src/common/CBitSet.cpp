@@ -17,6 +17,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CAutoRef.h"
 #include "gpos/common/CBitSetIter.h"
+#include "gpos/common/owner.h"
 
 #ifdef GPOS_DEBUG
 #include "gpos/error/CAutoTrace.h"
@@ -345,7 +346,7 @@ CBitSet::ExchangeClear(ULONG pos)
 //
 //---------------------------------------------------------------------------
 void
-CBitSet::Union(const CBitSet *pbsOther)
+CBitSet::Union(gpos::pointer<const CBitSet *> pbsOther)
 {
 	CBitSetLink *bsl = nullptr;
 	CBitSetLink *bsl_other = nullptr;
@@ -418,7 +419,7 @@ CBitSet::Union(const CBitSet *pbsOther)
 //
 //---------------------------------------------------------------------------
 void
-CBitSet::Intersection(const CBitSet *pbsOther)
+CBitSet::Intersection(gpos::pointer<const CBitSet *> pbsOther)
 {
 	if (nullptr == pbsOther)
 	{
@@ -462,7 +463,7 @@ CBitSet::Intersection(const CBitSet *pbsOther)
 //
 //---------------------------------------------------------------------------
 void
-CBitSet::Difference(const CBitSet *pbs)
+CBitSet::Difference(gpos::pointer<const CBitSet *> pbs)
 {
 	if (IsDisjoint(pbs))
 	{
@@ -486,7 +487,7 @@ CBitSet::Difference(const CBitSet *pbs)
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitSet::ContainsAll(const CBitSet *bs) const
+CBitSet::ContainsAll(gpos::pointer<const CBitSet *> bs) const
 {
 	// skip iterating if we can already tell by the sizes
 	if (Size() < bs->Size())
@@ -523,7 +524,7 @@ CBitSet::ContainsAll(const CBitSet *bs) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitSet::Equals(const CBitSet *bs) const
+CBitSet::Equals(gpos::pointer<const CBitSet *> bs) const
 {
 	// check pointer equality first
 	if (this == bs)
@@ -568,7 +569,7 @@ CBitSet::Equals(const CBitSet *bs) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitSet::IsDisjoint(const CBitSet *bs) const
+CBitSet::IsDisjoint(gpos::pointer<const CBitSet *> bs) const
 {
 	CBitSetLink *bsl = nullptr;
 	CBitSetLink *bsl_other = nullptr;

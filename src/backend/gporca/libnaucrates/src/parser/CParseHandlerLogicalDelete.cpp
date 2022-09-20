@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalDelete.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLLogicalDelete.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -127,7 +129,8 @@ CParseHandlerLogicalDelete::EndElement(const XMLCh *const,	// element_uri,
 	GPOS_ASSERT(nullptr != table_descr_parse_handler->GetDXLTableDescr());
 	GPOS_ASSERT(nullptr != logical_op_parse_handler->CreateDXLNode());
 
-	CDXLTableDescr *table_descr = table_descr_parse_handler->GetDXLTableDescr();
+	gpos::owner<CDXLTableDescr *> table_descr =
+		table_descr_parse_handler->GetDXLTableDescr();
 	table_descr->AddRef();
 
 	m_dxl_node = GPOS_NEW(m_mp)

@@ -11,6 +11,8 @@
 #ifndef GPOPT_CCastUtils_H
 #define GPOPT_CCastUtils_H
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CColRef.h"
 #include "gpopt/operators/CExpression.h"
 
@@ -28,12 +30,13 @@ class CCastUtils
 {
 public:
 	// is the given expression a binary coercible cast of a scalar identifier for the given column
-	static BOOL FBinaryCoercibleCastedScId(CExpression *pexpr, CColRef *colref);
+	static BOOL FBinaryCoercibleCastedScId(gpos::pointer<CExpression *> pexpr,
+										   CColRef *colref);
 
 	// is the given expression a binary coercible cast of a scalar identifier
-	static BOOL FBinaryCoercibleCastedScId(CExpression *pexpr);
+	static BOOL FBinaryCoercibleCastedScId(gpos::pointer<CExpression *> pexpr);
 
-	static BOOL FBinaryCoercibleCastedConst(CExpression *pexpr);
+	static BOOL FBinaryCoercibleCastedConst(gpos::pointer<CExpression *> pexpr);
 
 	// extract the column reference if the given expression a scalar identifier
 	// or a cast of a scalar identifier or a function that casts a scalar identifier.
@@ -45,10 +48,10 @@ public:
 								  const CColRef *colref, IMDId *mdid_dest);
 
 	// check whether the given expression is a binary coercible cast of something
-	static BOOL FBinaryCoercibleCast(CExpression *pexpr);
+	static BOOL FBinaryCoercibleCast(gpos::pointer<CExpression *> pexpr);
 
 	// check whether the given expression is a cast of something
-	static BOOL FScalarCast(CExpression *pexpr);
+	static BOOL FScalarCast(gpos::pointer<CExpression *> pexpr);
 
 	// return the given expression without any binary coercible casts
 	// that exist on the top

@@ -10,6 +10,7 @@
 #define GPOPT_CXformJoin2IndexApplyGeneric_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalJoin.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -27,11 +28,11 @@ private:
 	BOOL m_generateBitmapPlans;
 
 	// Can we transform left outer join to left outer index apply?
-	static BOOL FCanLeftOuterIndexApply(CMemoryPool *mp,
-										CExpression *pexprInner,
-										CExpression *pexprScalar,
-										CTableDescriptor *ptabDesc,
-										const CColRefSet *pcrsDist);
+	static BOOL FCanLeftOuterIndexApply(
+		CMemoryPool *mp, gpos::pointer<CExpression *> pexprInner,
+		gpos::pointer<CExpression *> pexprScalar,
+		gpos::pointer<CTableDescriptor *> ptabDesc,
+		gpos::pointer<const CColRefSet *> pcrsDist);
 
 public:
 	CXformJoin2IndexApplyGeneric(const CXformJoin2IndexApplyGeneric &) = delete;

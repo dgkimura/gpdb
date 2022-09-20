@@ -12,6 +12,7 @@
 #define GPOS_CLogicalNAryJoin_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalJoin.h"
 
@@ -40,7 +41,7 @@ private:
 	// of an LOJ, the corresponding index indicates the child index of the
 	// CScalarNAryJoinPredList expression that contains the ON predicate for the
 	// LOJ.
-	ULongPtrArray *m_lojChildPredIndexes;
+	gpos::owner<ULongPtrArray *> m_lojChildPredIndexes;
 
 public:
 	CLogicalNAryJoin(const CLogicalNAryJoin &) = delete;
@@ -83,7 +84,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive constraint property
-	CPropConstraint *DerivePropertyConstraint(
+	gpos::owner<CPropConstraint *> DerivePropertyConstraint(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -111,7 +112,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalNAryJoin *
+	static gpos::cast_func<CLogicalNAryJoin *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -135,7 +136,7 @@ public:
 				*((*m_lojChildPredIndexes)[child_num]) == 0);
 	}
 
-	ULongPtrArray *
+	gpos::pointer<ULongPtrArray *>
 	GetLojChildPredIndexes() const
 	{
 		return m_lojChildPredIndexes;
@@ -169,12 +170,12 @@ public:
 
 	// get the true inner join predicates, excluding predicates that use ColRefs
 	// coming from non-inner joins
-	CExpression *GetTrueInnerJoinPreds(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl) const;
+	gpos::owner<CExpression *> GetTrueInnerJoinPreds(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const;
 
 	// given an existing scalar child of an NAry join, make a new copy, replacing
 	// only the inner join predicates and leaving the LOJ ON predicates the same
-	CExpression *ReplaceInnerJoinPredicates(
+	gpos::owner<CExpression *> ReplaceInnerJoinPredicates(
 		CMemoryPool *mp, CExpression *old_nary_join_scalar_expr,
 		CExpression *new_inner_join_preds);
 

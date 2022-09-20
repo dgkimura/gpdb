@@ -19,6 +19,7 @@
 #define GPOPT_CScalarCoerceToDomain_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalarCoerceBase.h"
 
@@ -77,7 +78,7 @@ public:
 	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
 
 	// conversion function
-	static CScalarCoerceToDomain *
+	static gpos::cast_func<CScalarCoerceToDomain *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

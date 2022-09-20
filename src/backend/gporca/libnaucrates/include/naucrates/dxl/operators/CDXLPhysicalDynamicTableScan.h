@@ -43,11 +43,11 @@ class CDXLPhysicalDynamicTableScan : public CDXLPhysical
 {
 private:
 	// table descriptor for the scanned table
-	CDXLTableDescr *m_dxl_table_descr;
+	gpos::owner<CDXLTableDescr *> m_dxl_table_descr;
 
 	gpos::Ref<IMdIdArray> m_part_mdids;
 
-	ULongPtrArray *m_selector_ids = nullptr;
+	gpos::owner<ULongPtrArray *> m_selector_ids = nullptr;
 
 public:
 	CDXLPhysicalDynamicTableScan(CDXLPhysicalDynamicTableScan &) = delete;

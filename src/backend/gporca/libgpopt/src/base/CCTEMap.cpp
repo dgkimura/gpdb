@@ -12,6 +12,7 @@
 #include "gpopt/base/CCTEMap.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CCTEReq.h"
 
@@ -66,7 +67,8 @@ CCTEMap::Insert(ULONG ulCteId, ECteType ect, CDrvdPropPlan *pdpplan)
 		pdpplan->AddRef();
 	}
 
-	CCTEMapEntry *pcme = GPOS_NEW(m_mp) CCTEMapEntry(ulCteId, ect, pdpplan);
+	gpos::owner<CCTEMapEntry *> pcme =
+		GPOS_NEW(m_mp) CCTEMapEntry(ulCteId, ect, pdpplan);
 	BOOL fSuccess GPOS_ASSERTS_ONLY =
 		m_phmcm->Insert(GPOS_NEW(m_mp) ULONG(ulCteId), pcme);
 	GPOS_ASSERT(fSuccess);
@@ -99,7 +101,7 @@ CCTEMap::PdpplanProducer(
 	UlongToCTEMapEntryMapIter hmcmi(m_phmcm);
 	while (nullptr == pdpplanProducer && hmcmi.Advance())
 	{
-		const CCTEMapEntry *pcme = hmcmi.Value();
+		gpos::pointer<const CCTEMapEntry *> pcme = hmcmi.Value();
 		CCTEMap::ECteType ect = pcme->Ect();
 		CDrvdPropPlan *pdpplan = pcme->Pdpplan();
 		if (CCTEMap::EctProducer == ect)
@@ -142,7 +144,7 @@ CCTEMap::AddUnresolved(const CCTEMap &cmFirst, const CCTEMap &cmSecond,
 	UlongToCTEMapEntryMapIter hmcmi(cmFirst.m_phmcm);
 	while (hmcmi.Advance())
 	{
-		const CCTEMapEntry *pcme = hmcmi.Value();
+		gpos::pointer<const CCTEMapEntry *> pcme = hmcmi.Value();
 		ULONG id = pcme->Id();
 		ECteType ectFirst = pcme->Ect();
 		CDrvdPropPlan *pdpplanFirst = pcme->Pdpplan();
@@ -173,7 +175,7 @@ CCTEMap::AddUnresolved(const CCTEMap &cmFirst, const CCTEMap &cmSecond,
 //		Lookup info for given cte id
 //
 //---------------------------------------------------------------------------
-CCTEMap::CCTEMapEntry *
+gpos::pointer<CCTEMap::CCTEMapEntry *>
 CCTEMap::PcmeLookup(ULONG ulCteId) const
 {
 	return m_phmcm->Find(&ulCteId);
@@ -188,7 +190,7 @@ CCTEMap::PcmeLookup(ULONG ulCteId) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CCTEMap::FSubset(const CCTEMap *pcm) const
+CCTEMap::FSubset(gpos::pointer<const CCTEMap *> pcm) const
 {
 	GPOS_ASSERT(nullptr != pcm);
 
@@ -200,7 +202,7 @@ CCTEMap::FSubset(const CCTEMap *pcm) const
 	UlongToCTEMapEntryMapIter hmcmi(m_phmcm);
 	while (hmcmi.Advance())
 	{
-		const CCTEMapEntry *pcme = hmcmi.Value();
+		gpos::pointer<const CCTEMapEntry *> pcme = hmcmi.Value();
 		CCTEMapEntry *pcmeOther = pcm->PcmeLookup(pcme->Id());
 		if (nullptr == pcmeOther || pcmeOther->Ect() != pcme->Ect())
 		{
@@ -231,7 +233,7 @@ CCTEMap::HashValue() const
 	UlongToCTEMapEntryMapIter hmcmi(m_phmcm);
 	while (hmcmi.Advance() && ul < ulMaxEntries)
 	{
-		const CCTEMapEntry *pcme = hmcmi.Value();
+		gpos::pointer<const CCTEMapEntry *> pcme = hmcmi.Value();
 		ulHash = gpos::CombineHashes(ulHash, pcme->HashValue());
 		ul++;
 	}
@@ -271,7 +273,7 @@ CCTEMap *
 CCTEMap::PcmCombine(CMemoryPool *mp, const CCTEMap &cmFirst,
 					const CCTEMap &cmSecond)
 {
-	CCTEMap *pcmResult = GPOS_NEW(mp) CCTEMap(mp);
+	gpos::owner<CCTEMap *> pcmResult = GPOS_NEW(mp) CCTEMap(mp);
 
 	// add entries from first map that are not resolvable based on second map
 	AddUnresolved(cmFirst, cmSecond, pcmResult);
@@ -291,7 +293,7 @@ CCTEMap::PcmCombine(CMemoryPool *mp, const CCTEMap &cmFirst,
 //
 //---------------------------------------------------------------------------
 BOOL
-CCTEMap::FSatisfies(const CCTEReq *pcter) const
+CCTEMap::FSatisfies(gpos::pointer<const CCTEReq *> pcter) const
 {
 	GPOS_ASSERT(nullptr != pcter);
 	// every CTE marked as "Required" must be in the current map
@@ -314,7 +316,7 @@ CCTEMap::FSatisfies(const CCTEReq *pcter) const
 	UlongToCTEMapEntryMapIter hmcmi(m_phmcm);
 	while (hmcmi.Advance())
 	{
-		const CCTEMapEntry *pcme = hmcmi.Value();
+		gpos::pointer<const CCTEMapEntry *> pcme = hmcmi.Value();
 		ECteType ect = pcme->Ect();
 		if (CCTEMap::EctConsumer == ect &&
 			!pcter->FContainsRequirement(pcme->Id(), ect))
@@ -335,15 +337,16 @@ CCTEMap::FSatisfies(const CCTEReq *pcter) const
 //
 //---------------------------------------------------------------------------
 ULongPtrArray *
-CCTEMap::PdrgpulAdditionalProducers(CMemoryPool *mp, const CCTEReq *pcter) const
+CCTEMap::PdrgpulAdditionalProducers(CMemoryPool *mp,
+									gpos::pointer<const CCTEReq *> pcter) const
 {
 	GPOS_ASSERT(nullptr != pcter);
-	ULongPtrArray *pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 
 	UlongToCTEMapEntryMapIter hmcmi(m_phmcm);
 	while (hmcmi.Advance())
 	{
-		const CCTEMapEntry *pcme = hmcmi.Value();
+		gpos::pointer<const CCTEMapEntry *> pcme = hmcmi.Value();
 		ULONG id = pcme->Id();
 		ECteType ect = pcme->Ect();
 

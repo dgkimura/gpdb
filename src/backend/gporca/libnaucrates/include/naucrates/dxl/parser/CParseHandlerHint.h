@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerHint_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/engine/CHint.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -35,7 +36,7 @@ class CParseHandlerHint : public CParseHandlerBase
 {
 private:
 	// hint configuration
-	CHint *m_hint;
+	gpos::owner<CHint *> m_hint;
 
 	// process the start of an element
 	void StartElement(
@@ -66,7 +67,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// hint configuration
-	CHint *GetHint() const;
+	gpos::pointer<CHint *> GetHint() const;
 };
 }  // namespace gpdxl
 

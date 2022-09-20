@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalConstTableGet_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogical.h"
 
@@ -32,13 +33,13 @@ class CLogicalConstTableGet : public CLogical
 {
 private:
 	// array of column descriptors: the schema of the const table
-	CColumnDescriptorArray *m_pdrgpcoldesc;
+	gpos::owner<CColumnDescriptorArray *> m_pdrgpcoldesc;
 
 	// array of datum arrays
-	IDatum2dArray *m_pdrgpdrgpdatum;
+	gpos::owner<IDatum2dArray *> m_pdrgpdrgpdatum;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::owner<CColRefArray *> m_pdrgpcrOutput;
 
 	// construct column descriptors from column references
 	static CColumnDescriptorArray *PdrgpcoldescMapping(
@@ -74,21 +75,21 @@ public:
 	}
 
 	// col descr accessor
-	CColumnDescriptorArray *
+	gpos::pointer<CColumnDescriptorArray *>
 	Pdrgpcoldesc() const
 	{
 		return m_pdrgpcoldesc;
 	}
 
 	// const table values accessor
-	IDatum2dArray *
+	gpos::pointer<IDatum2dArray *>
 	Pdrgpdrgpdatum() const
 	{
 		return m_pdrgpdrgpdatum;
 	}
 
 	// accessors
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput;
@@ -104,9 +105,9 @@ public:
 	BOOL Matches(COperator *pop) const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -121,7 +122,7 @@ public:
 						   CExpressionHandle &exprhdl) const override;
 
 	// derive partition consumer info
-	CPartInfo *
+	gpos::owner<CPartInfo *>
 	DerivePartitionInfo(CMemoryPool *mp,
 						CExpressionHandle &	 //exprhdl
 	) const override
@@ -130,7 +131,7 @@ public:
 	}
 
 	// derive constraint property
-	CPropConstraint *
+	gpos::owner<CPropConstraint *>
 	DerivePropertyConstraint(CMemoryPool *mp,
 							 CExpressionHandle &  // exprhdl
 	) const override
@@ -147,10 +148,10 @@ public:
 
 	// compute required stat columns of the n-th child
 	CColRefSet *
-	PcrsStat(CMemoryPool *,		   // mp
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   // pcrsInput
-			 ULONG				   // child_index
+	PcrsStat(CMemoryPool *,				   // mp
+			 CExpressionHandle &,		   // exprhdl
+			 gpos::pointer<CColRefSet *>,  // pcrsInput
+			 ULONG						   // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalConstTableGet has no children");
@@ -180,7 +181,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalConstTableGet *
+	static gpos::cast_func<CLogicalConstTableGet *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

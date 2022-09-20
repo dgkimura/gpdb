@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
 
@@ -58,9 +59,9 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	virtual void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 CReqdPropPlan *prpp,
-								 CExpressionArray *pdrgpexpr,
-								 CExpression *pexpr) = 0;
+								 gpos::pointer<CReqdPropPlan *> prpp,
+								 gpos::pointer<CExpressionArray *> pdrgpexpr,
+								 gpos::pointer<CExpression *> pexpr) = 0;
 
 	// hash function
 	virtual ULONG HashValue() const = 0;

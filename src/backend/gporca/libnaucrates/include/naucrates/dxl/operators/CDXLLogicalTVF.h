@@ -44,7 +44,7 @@ private:
 	CMDName *m_mdname;
 
 	// list of column descriptors
-	CDXLColDescrArray *m_dxl_col_descr_array;
+	gpos::owner<CDXLColDescrArray *> m_dxl_col_descr_array;
 
 public:
 	CDXLLogicalTVF(const CDXLLogicalTVF &) = delete;

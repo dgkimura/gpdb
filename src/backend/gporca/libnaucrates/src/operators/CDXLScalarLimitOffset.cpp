@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarLimitOffset.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -69,8 +71,8 @@ CDXLScalarLimitOffset::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarLimitOffset::SerializeToDXL(CXMLSerializer *xml_serializer,
-									  const CDXLNode *node) const
+CDXLScalarLimitOffset::SerializeToDXL(
+	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

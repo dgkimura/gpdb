@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalGet.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLLogicalExternalGet.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -115,7 +117,8 @@ CParseHandlerLogicalGet::EndElement(const XMLCh *const element_local_name,
 
 	GPOS_ASSERT(nullptr != table_descr_parse_handler->GetDXLTableDescr());
 
-	CDXLTableDescr *table_descr = table_descr_parse_handler->GetDXLTableDescr();
+	gpos::owner<CDXLTableDescr *> table_descr =
+		table_descr_parse_handler->GetDXLTableDescr();
 	table_descr->AddRef();
 
 	if (EdxltokenLogicalGet == token_type)

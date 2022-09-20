@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalNLJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CRewindabilitySpec.h"
@@ -65,11 +66,11 @@ CPhysicalNLJoin::~CPhysicalNLJoin() = default;
 //		Compute required sort order of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalNLJoin::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 COrderSpec *posInput, ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::pointer<CDrvdPropArray *>,  // pdrgpdpCtxt
+							 ULONG							   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(
@@ -93,7 +94,7 @@ CPhysicalNLJoin::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Compute required rewindability of the n-th child
 //
 //---------------------------------------------------------------------------
-CRewindabilitySpec *
+gpos::owner<CRewindabilitySpec *>
 CPhysicalNLJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 CRewindabilitySpec *prsRequired, ULONG child_index,
 							 CDrvdPropArray *pdrgpdpCtxt,
@@ -143,15 +144,15 @@ CPhysicalNLJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 CColRefSet *
 CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							  CColRefSet *pcrsRequired, ULONG child_index,
-							  CDrvdPropArray *,	 // pdrgpdpCtxt
-							  ULONG				 // ulOptReq
+							  gpos::pointer<CDrvdPropArray *>,	// pdrgpdpCtxt
+							  ULONG								// ulOptReq
 )
 {
 	GPOS_ASSERT(
 		child_index < 2 &&
 		"Required properties can only be computed on the relational child");
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pcrsRequired);
 
 	// For subqueries in the projection list, the required columns from the outer child
@@ -187,7 +188,7 @@ CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalNLJoin::EpetOrder(CExpressionHandle &exprhdl,
-						   const CEnfdOrder *peo) const
+						   gpos::pointer<const CEnfdOrder *> peo) const
 {
 	GPOS_ASSERT(nullptr != peo);
 	GPOS_ASSERT(!peo->PosRequired()->IsEmpty());

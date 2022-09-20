@@ -17,6 +17,8 @@
 
 #include "gpopt/operators/CLogicalBitmapTableGet.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/xforms/CXform.h"
@@ -126,7 +128,7 @@ CLogicalBitmapTableGet::Matches(COperator *pop) const
 //		Derive output columns
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::owner<CColRefSet *>
 CLogicalBitmapTableGet::DeriveOutputColumns(CMemoryPool *mp, CExpressionHandle &
 #ifdef GPOS_DEBUG
 																 exprhdl
@@ -217,7 +219,7 @@ CLogicalBitmapTableGet::OsPrint(IOstream &os) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalBitmapTableGet::PopCopyWithRemappedColumns(
 	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
@@ -251,7 +253,7 @@ CLogicalBitmapTableGet::PopCopyWithRemappedColumns(
 CXformSet *
 CLogicalBitmapTableGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementBitmapTableGet);
 
 	return xform_set;

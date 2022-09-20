@@ -12,6 +12,7 @@
 #include "gpopt/base/CColRef.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #ifdef GPOS_DEBUG
 #include "gpos/error/CAutoTrace.h"
@@ -33,8 +34,8 @@ const ULONG CColRef::m_ulInvalid = gpos::ulong_max;
 //		takes ownership of string; verify string is properly formatted
 //
 //---------------------------------------------------------------------------
-CColRef::CColRef(const IMDType *pmdtype, const INT type_modifier, ULONG id,
-				 const CName *pname)
+CColRef::CColRef(gpos::pointer<const IMDType *> pmdtype,
+				 const INT type_modifier, ULONG id, const CName *pname)
 	: m_pmdtype(pmdtype),
 	  m_type_modifier(type_modifier),
 	  m_pname(pname),
@@ -123,7 +124,7 @@ CColRef::OsPrint(IOstream &os) const
 ULongPtrArray *
 CColRef::Pdrgpul(CMemoryPool *mp, CColRefArray *colref_array)
 {
-	ULongPtrArray *pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
+	gpos::owner<ULongPtrArray *> pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 	const ULONG length = colref_array->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -143,7 +144,8 @@ CColRef::Pdrgpul(CMemoryPool *mp, CColRefArray *colref_array)
 //
 //---------------------------------------------------------------------------
 BOOL
-CColRef::Equals(const CColRefArray *pdrgpcr1, const CColRefArray *pdrgpcr2)
+CColRef::Equals(gpos::pointer<const CColRefArray *> pdrgpcr1,
+				gpos::pointer<const CColRefArray *> pdrgpcr2)
 {
 	if (nullptr == pdrgpcr1 || nullptr == pdrgpcr2)
 	{
@@ -156,8 +158,8 @@ CColRef::Equals(const CColRefArray *pdrgpcr1, const CColRefArray *pdrgpcr2)
 // check if the the array of column references are equal. Note that since we have unique
 // copy of the column references, we can compare pointers.
 BOOL
-CColRef::Equals(const CColRef2dArray *pdrgdrgpcr1,
-				const CColRef2dArray *pdrgdrgpcr2)
+CColRef::Equals(gpos::pointer<const CColRef2dArray *> pdrgdrgpcr1,
+				gpos::pointer<const CColRef2dArray *> pdrgdrgpcr2)
 {
 	ULONG ulLen1 = (pdrgdrgpcr1 == nullptr) ? 0 : pdrgdrgpcr1->Size();
 	ULONG ulLen2 = (pdrgdrgpcr2 == nullptr) ? 0 : pdrgdrgpcr2->Size();

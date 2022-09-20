@@ -12,6 +12,7 @@
 #define GPOPT_COrderedAggPreprocessor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COrderSpec.h"
 #include "gpopt/base/CWindowFrame.h"
@@ -51,11 +52,11 @@ private:
 						  CExpression **ppexprSecondConsumer);
 
 	// create an expression for final agg function
-	static CExpression *PexprFinalAgg(CMemoryPool *mp,
-									  CExpression *pexprAggFunc,
-									  CColRef *arg_col_ref,
-									  CColRef *total_count_colref,
-									  CColRef *peer_count_colref);
+	static gpos::owner<CExpression *> PexprFinalAgg(CMemoryPool *mp,
+													CExpression *pexprAggFunc,
+													CColRef *arg_col_ref,
+													CColRef *total_count_colref,
+													CColRef *peer_count_colref);
 
 	// transform sequence project expression into an inner join expression
 	static CExpression *PexprInputAggPrj2Join(CMemoryPool *mp,
@@ -65,7 +66,8 @@ public:
 	COrderedAggPreprocessor(const COrderedAggPreprocessor &) = delete;
 
 	// main driver
-	static CExpression *PexprPreprocess(CMemoryPool *mp, CExpression *pexpr);
+	static gpos::owner<CExpression *> PexprPreprocess(CMemoryPool *mp,
+													  CExpression *pexpr);
 
 };	// class COrderedAggPreprocessor
 }  // namespace gpopt

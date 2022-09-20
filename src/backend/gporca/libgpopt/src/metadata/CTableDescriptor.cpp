@@ -12,6 +12,7 @@
 #include "gpopt/metadata/CTableDescriptor.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/base/CColumnFactory.h"
@@ -111,8 +112,9 @@ CTableDescriptor::ColumnCount() const
 //
 //---------------------------------------------------------------------------
 ULONG
-CTableDescriptor::UlPos(const CColumnDescriptor *pcoldesc,
-						const CColumnDescriptorArray *pdrgpcoldesc)
+CTableDescriptor::UlPos(
+	gpos::pointer<const CColumnDescriptor *> pcoldesc,
+	gpos::pointer<const CColumnDescriptorArray *> pdrgpcoldesc)
 {
 	GPOS_ASSERT(nullptr != pcoldesc);
 	GPOS_ASSERT(nullptr != pdrgpcoldesc);
@@ -185,7 +187,7 @@ CTableDescriptor::AddColumn(CColumnDescriptor *pcoldesc)
 void
 CTableDescriptor::AddDistributionColumn(ULONG ulPos, IMDId *opfamily)
 {
-	CColumnDescriptor *pcoldesc = (*m_pdrgpcoldesc)[ulPos];
+	gpos::owner<CColumnDescriptor *> pcoldesc = (*m_pdrgpcoldesc)[ulPos];
 	pcoldesc->AddRef();
 	m_pdrgpcoldescDist->Append(pcoldesc);
 	pcoldesc->SetAsDistCol();
@@ -253,7 +255,7 @@ CTableDescriptor::FAddKeySet(CBitSet *pbs)
 //		Get n-th column descriptor
 //
 //---------------------------------------------------------------------------
-const CColumnDescriptor *
+gpos::pointer<const CColumnDescriptor *>
 CTableDescriptor::Pcoldesc(ULONG ulCol) const
 {
 	GPOS_ASSERT(ulCol < ColumnCount());
@@ -296,7 +298,8 @@ CTableDescriptor::IndexCount()
 	GPOS_ASSERT(nullptr != m_mdid.get());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_mdid.get());
+	gpos::pointer<const IMDRelation *> pmdrel =
+		md_accessor->RetrieveRel(m_mdid.get());
 	const ULONG ulIndices = pmdrel->IndexCount();
 
 	return ulIndices;
@@ -317,7 +320,8 @@ CTableDescriptor::PartitionCount() const
 	GPOS_ASSERT(nullptr != m_mdid.get());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_mdid.get());
+	gpos::pointer<const IMDRelation *> pmdrel =
+		md_accessor->RetrieveRel(m_mdid.get());
 	const ULONG ulPartitions = pmdrel->PartitionCount();
 
 	return ulPartitions;

@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerProperties_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalProperties.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -37,10 +38,10 @@ class CParseHandlerProperties : public CParseHandlerBase
 {
 private:
 	// physical properties container
-	CDXLPhysicalProperties *m_dxl_properties;
+	gpos::owner<CDXLPhysicalProperties *> m_dxl_properties;
 
 	// statistics of the physical plan
-	CDXLStatsDerivedRelation *m_dxl_stats_derived_relation;
+	gpos::owner<CDXLStatsDerivedRelation *> m_dxl_stats_derived_relation;
 
 	// process the start of an element
 	void StartElement(
@@ -70,10 +71,10 @@ public:
 	~CParseHandlerProperties() override;
 
 	// returns the constructed properties container
-	CDXLPhysicalProperties *GetProperties() const;
+	gpos::pointer<CDXLPhysicalProperties *> GetProperties() const;
 
 	// return the derived relation statistics
-	CDXLStatsDerivedRelation *
+	gpos::pointer<CDXLStatsDerivedRelation *>
 	GetDxlStatsDrvdRelation() const
 	{
 		return m_dxl_stats_derived_relation;

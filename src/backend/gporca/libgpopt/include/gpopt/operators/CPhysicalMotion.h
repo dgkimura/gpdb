@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalMotion_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CPhysical.h"
@@ -64,40 +65,42 @@ public:
 						  ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	CDistributionSpec *PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsRequired,
-								   ULONG child_index,
-								   CDrvdPropArray *pdrgpdpCtxt,
-								   ULONG ulOptReq) const override;
+	gpos::owner<CDistributionSpec *> PdsRequired(CMemoryPool *mp,
+												 CExpressionHandle &exprhdl,
+												 CDistributionSpec *pdsRequired,
+												 ULONG child_index,
+												 CDrvdPropArray *pdrgpdpCtxt,
+												 ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
-	CRewindabilitySpec *PrsRequired(CMemoryPool *mp,
-									CExpressionHandle &,   // exprhdl
-									CRewindabilitySpec *,  // prsRequired
-									ULONG,				   // child_index
-									CDrvdPropArray *pdrgpdpCtxt,
-									ULONG ulOptReq) const override;
+	gpos::owner<CRewindabilitySpec *> PrsRequired(
+		CMemoryPool *mp,
+		CExpressionHandle &,				  // exprhdl
+		gpos::pointer<CRewindabilitySpec *>,  // prsRequired
+		ULONG,								  // child_index
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required partition propoagation spec of the n-th child
-	CPartitionPropagationSpec *PppsRequired(
+	gpos::owner<CPartitionPropagationSpec *> PppsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CPartitionPropagationSpec *pppsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::pointer<CPartitionPropagationSpec *> pppsRequired,
+		ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+		ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
 	//-------------------------------------------------------------------------------------
 
 	// derive distribution
-	CDistributionSpec *PdsDerive(CMemoryPool *mp,
-								 CExpressionHandle &exprhdl) const override;
+	gpos::owner<CDistributionSpec *> PdsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive rewindability
-	CRewindabilitySpec *PrsDerive(CMemoryPool *mp,
-								  CExpressionHandle &exprhdl) const override;
+	gpos::owner<CRewindabilitySpec *> PrsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derived properties: derive partition propagation spec
-	CPartitionPropagationSpec *PppsDerive(
+	gpos::owner<CPartitionPropagationSpec *> PppsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -107,12 +110,12 @@ public:
 	// return distribution property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetDistribution(
 		CExpressionHandle &exprhdl,
-		const CEnfdDistribution *ped) const override;
+		gpos::pointer<const CEnfdDistribution *> ped) const override;
 
 	// return rewindability property enforcing type for this operator
 	CEnfdProp::EPropEnforcingType EpetRewindability(
-		CExpressionHandle &,		// exprhdl
-		const CEnfdRewindability *	// per
+		CExpressionHandle &,					   // exprhdl
+		gpos::pointer<const CEnfdRewindability *>  // per
 	) const override;
 
 	// return true if operator passes through stats obtained from children,
@@ -124,7 +127,7 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalMotion *
+	static gpos::cast_func<CPhysicalMotion *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(CUtils::FPhysicalMotion(pop));

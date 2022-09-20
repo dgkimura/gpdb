@@ -13,6 +13,7 @@
 #define GPOPT_CDistributionSpecReplicated_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpec.h"
 
@@ -48,11 +49,13 @@ public:
 	}
 
 	// does this distribution satisfy the given one
-	BOOL FSatisfies(const CDistributionSpec *pds) const override;
+	BOOL FSatisfies(
+		gpos::pointer<const CDistributionSpec *> pds) const override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 gpos::pointer<CReqdPropPlan *> prpp,
+						 CExpressionArray *pdrgpexpr,
 						 CExpression *pexpr) override;
 
 	// return distribution partitioning type
@@ -85,7 +88,7 @@ public:
 	}
 
 	// conversion function
-	static CDistributionSpecReplicated *
+	static gpos::cast_func<CDistributionSpecReplicated *>
 	PdsConvert(CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(nullptr != pds);

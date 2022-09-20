@@ -12,6 +12,7 @@
 #define GPNAUCRATES_CDatumGenericGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/base/IDatumGeneric.h"
 #include "naucrates/md/CMDTypeGenericGPDB.h"
@@ -49,7 +50,7 @@ private:
 	INT m_type_modifier;
 
 	// cached type information (can be set from const methods)
-	mutable const IMDType *m_cached_type;
+	mutable gpos::pointer<const IMDType *> m_cached_type;
 
 	// long int value used for statistic computation
 	LINT m_stats_comp_val_int;
@@ -86,10 +87,10 @@ public:
 	ULONG HashValue() const override;
 
 	// match function for datums
-	BOOL Matches(const IDatum *datum) const override;
+	BOOL Matches(gpos::pointer<const IDatum *> datum) const override;
 
 	// copy datum
-	IDatum *MakeCopy(CMemoryPool *mp) const override;
+	gpos::owner<IDatum *> MakeCopy(CMemoryPool *mp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;
@@ -127,7 +128,7 @@ public:
 	const BYTE *GetByteArrayValue() const override;
 
 	// stats equality
-	BOOL StatsAreEqual(const IDatum *datum) const override;
+	BOOL StatsAreEqual(gpos::pointer<const IDatum *> datum) const override;
 
 	// does the datum need to be padded before statistical derivation
 	BOOL NeedsPadding() const override;

@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLScalarBoolExpr.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 #include "naucrates/dxl/xml/dxltokens.h"
@@ -96,8 +98,9 @@ CDXLScalarBoolExpr::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBoolExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+CDXLScalarBoolExpr::SerializeToDXL(
+	CXMLSerializer *xml_serializer,
+	gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 

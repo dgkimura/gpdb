@@ -12,6 +12,7 @@
 #include "gpopt/search/CBinding.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPattern.h"
 #include "gpopt/search/CGroupProxy.h"
@@ -105,10 +106,10 @@ CExpression *
 CBinding::PexprFinalize(CMemoryPool *mp, CGroupExpression *pgexpr,
 						CExpressionArray *pdrgpexpr)
 {
-	COperator *pop = pgexpr->Pop();
+	gpos::owner<COperator *> pop = pgexpr->Pop();
 
 	pop->AddRef();
-	CExpression *pexpr =
+	gpos::owner<CExpression *> pexpr =
 		GPOS_NEW(mp) CExpression(mp, pop, pgexpr, pdrgpexpr, nullptr /* prpp */,
 								 nullptr /*input_stats*/, GPOPT_INVALID_COST);
 
@@ -125,7 +126,7 @@ CBinding::PexprFinalize(CMemoryPool *mp, CGroupExpression *pgexpr,
 //		Keep root node fixed;
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CBinding::PexprExtract(CMemoryPool *mp, CGroupExpression *pgexpr,
 					   CExpression *pexprPattern, CExpression *pexprLast)
 {
@@ -166,7 +167,7 @@ CBinding::PexprExtract(CMemoryPool *mp, CGroupExpression *pgexpr,
 		return nullptr;
 	}
 
-	CExpressionArray *pdrgpexpr = nullptr;
+	gpos::owner<CExpressionArray *> pdrgpexpr = nullptr;
 	ULONG arity = pgexpr->Arity();
 	if (0 == arity && nullptr != pexprLast)
 	{

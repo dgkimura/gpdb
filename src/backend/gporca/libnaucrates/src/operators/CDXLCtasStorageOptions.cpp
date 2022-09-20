@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLCtasStorageOptions.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpos;
@@ -85,7 +87,7 @@ CDXLCtasStorageOptions::GetOnCommitAction() const
 //		Returns array of storage options
 //
 //---------------------------------------------------------------------------
-CDXLCtasStorageOptions::CDXLCtasOptionArray *
+gpos::pointer<CDXLCtasStorageOptions::CDXLCtasOptionArray *>
 CDXLCtasStorageOptions::GetDXLCtasOptionArray() const
 {
 	return m_ctas_storage_option_array;

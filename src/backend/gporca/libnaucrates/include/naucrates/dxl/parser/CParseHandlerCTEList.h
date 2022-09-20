@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerCTEList_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 
@@ -34,7 +35,7 @@ class CParseHandlerCTEList : public CParseHandlerBase
 {
 private:
 	// CTE list
-	CDXLNodeArray *m_dxl_array;
+	gpos::owner<CDXLNodeArray *> m_dxl_array;
 
 	// process the start of an element
 	void StartElement(
@@ -63,7 +64,7 @@ public:
 	~CParseHandlerCTEList() override;
 
 	// CTE list
-	CDXLNodeArray *
+	gpos::pointer<CDXLNodeArray *>
 	GetDxlCteArray() const
 	{
 		return m_dxl_array;

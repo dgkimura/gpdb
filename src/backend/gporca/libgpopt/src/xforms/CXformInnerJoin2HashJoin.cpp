@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformInnerJoin2HashJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalInnerJoin.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -71,8 +72,9 @@ CXformInnerJoin2HashJoin::Exfp(CExpressionHandle &) const
 //
 //---------------------------------------------------------------------------
 void
-CXformInnerJoin2HashJoin::Transform(CXformContext *, CXformResult *,
-									CExpression *) const
+CXformInnerJoin2HashJoin::Transform(gpos::pointer<CXformContext *>,
+									gpos::pointer<CXformResult *>,
+									gpos::pointer<CExpression *>) const
 {
 }
 

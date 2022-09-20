@@ -69,13 +69,13 @@ private:
 	Ereldistrpolicy m_rel_distr_policy;
 
 	// columns
-	CMDColumnArray *m_md_col_array;
+	gpos::owner<CMDColumnArray *> m_md_col_array;
 
 	// number of dropped columns
 	ULONG m_dropped_cols;
 
 	// indices of distribution columns
-	ULongPtrArray *m_distr_col_array;
+	gpos::owner<ULongPtrArray *> m_distr_col_array;
 
 	gpos::Ref<IMdIdArray> m_distr_opfamilies;
 
@@ -83,10 +83,10 @@ private:
 	BOOL m_convert_hash_to_random;
 
 	// indices of partition columns
-	ULongPtrArray *m_partition_cols_array;
+	gpos::owner<ULongPtrArray *> m_partition_cols_array;
 
 	// partition types
-	CharPtrArray *m_str_part_types_array;
+	gpos::owner<CharPtrArray *> m_str_part_types_array;
 
 	// number of partition
 	ULONG m_num_of_partitions;
@@ -95,10 +95,10 @@ private:
 	gpos::Ref<IMdIdArray> m_partition_oids;
 
 	// array of key sets
-	ULongPtr2dArray *m_keyset_array;
+	gpos::owner<ULongPtr2dArray *> m_keyset_array;
 
 	// array of index info
-	CMDIndexInfoArray *m_mdindex_info_array;
+	gpos::owner<CMDIndexInfoArray *> m_mdindex_info_array;
 
 	// array of trigger ids
 	gpos::Ref<IMdIdArray> m_mdid_trigger_array;
@@ -107,23 +107,23 @@ private:
 	gpos::Ref<IMdIdArray> m_mdid_check_constraint_array;
 
 	// partition constraint
-	CDXLNode *m_mdpart_constraint;
+	gpos::owner<CDXLNode *> m_mdpart_constraint;
 
 	// number of system columns
 	ULONG m_system_columns;
 
 	// mapping of column position to positions excluding dropped columns
-	UlongToUlongMap *m_colpos_nondrop_colpos_map;
+	gpos::owner<UlongToUlongMap *> m_colpos_nondrop_colpos_map;
 
 	// mapping of attribute number in the system catalog to the positions of
 	// the non dropped column in the metadata object
-	IntToUlongMap *m_attrno_nondrop_col_pos_map;
+	gpos::owner<IntToUlongMap *> m_attrno_nondrop_col_pos_map;
 
 	// the original positions of all the non-dropped columns
-	ULongPtrArray *m_nondrop_col_pos_array;
+	gpos::owner<ULongPtrArray *> m_nondrop_col_pos_array;
 
 	// array of column widths including dropped columns
-	CDoubleArray *m_col_width_array;
+	gpos::owner<CDoubleArray *> m_col_width_array;
 
 public:
 	CMDRelationGPDB(const CMDRelationGPDB &) = delete;
@@ -187,7 +187,7 @@ public:
 	ULONG GetPosFromAttno(INT attno) const override;
 
 	// return the original positions of all the non-dropped columns
-	ULongPtrArray *NonDroppedColsArray() const override;
+	gpos::pointer<ULongPtrArray *> NonDroppedColsArray() const override;
 
 	// number of system columns
 	ULONG SystemColumnsCount() const override;
@@ -225,7 +225,7 @@ public:
 	gpos::pointer<const IMDColumn *> PartColAt(ULONG pos) const override;
 
 	// retrieve list of partition types
-	CharPtrArray *GetPartitionTypes() const override;
+	gpos::pointer<CharPtrArray *> GetPartitionTypes() const override;
 
 	// retrieve the partition type of the given level
 	CHAR PartTypeAtLevel(ULONG ulLevel) const override;
@@ -252,7 +252,7 @@ public:
 	IMDId *CheckConstraintMDidAt(ULONG pos) const override;
 
 	// part constraint
-	CDXLNode *MDPartConstraint() const override;
+	gpos::pointer<CDXLNode *> MDPartConstraint() const override;
 
 	// child partition oids
 	IMdIdArray *ChildPartitionMdids() const override;

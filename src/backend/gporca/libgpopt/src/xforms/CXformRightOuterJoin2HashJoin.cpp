@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformRightOuterJoin2HashJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalRightOuterJoin.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -78,8 +79,8 @@ CXformRightOuterJoin2HashJoin::Transform(CXformContext *pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	const IStatistics *outerStats = (*pexpr)[0]->Pstats();
-	const IStatistics *innerStats = (*pexpr)[1]->Pstats();
+	gpos::pointer<const IStatistics *> outerStats = (*pexpr)[0]->Pstats();
+	gpos::pointer<const IStatistics *> innerStats = (*pexpr)[1]->Pstats();
 
 	if (nullptr == outerStats || nullptr == innerStats)
 	{

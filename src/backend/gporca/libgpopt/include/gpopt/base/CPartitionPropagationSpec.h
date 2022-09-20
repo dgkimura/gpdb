@@ -119,10 +119,10 @@ private:
 					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
 					 CleanupRelease<SPartPropSpecInfo>>;
 
-	UlongToSPartPropSpecInfoMap *m_part_prop_spec_infos = nullptr;
+	gpos::owner<UlongToSPartPropSpecInfoMap *> m_part_prop_spec_infos = nullptr;
 
 	// Present scanids (for easy lookup)
-	CBitSet *m_scan_ids = nullptr;
+	gpos::owner<CBitSet *> m_scan_ids = nullptr;
 
 public:
 	CPartitionPropagationSpec(const CPartitionPropagationSpec &) = delete;
@@ -135,7 +135,8 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 gpos::pointer<CReqdPropPlan *> prpp,
+						 CExpressionArray *pdrgpexpr,
 						 CExpression *pexpr) override;
 
 	// hash function

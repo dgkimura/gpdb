@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CBitSetIter.h"
+#include "gpos/common/owner.h"
 #include "gpos/task/CAutoTraceFlag.h"
 
 using namespace gpos;
@@ -29,7 +30,8 @@ using namespace gpos;
 void
 SetTraceflags(
 	CMemoryPool *mp,
-	const CBitSet *pbsInput,  // set of trace flags to be enabled
+	gpos::pointer<const CBitSet *>
+		pbsInput,  // set of trace flags to be enabled
 	CBitSet *
 		*ppbsEnabled,  // output: enabled trace flags before function is called
 	CBitSet *

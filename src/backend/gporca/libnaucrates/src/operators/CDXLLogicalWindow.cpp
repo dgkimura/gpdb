@@ -17,6 +17,7 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalWindow.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -92,7 +93,7 @@ CDXLLogicalWindow::GetOpNameStr() const
 //		Return the window specification at a given position
 //
 //---------------------------------------------------------------------------
-CDXLWindowSpec *
+gpos::pointer<CDXLWindowSpec *>
 CDXLLogicalWindow::GetWindowKeyAt(ULONG idx) const
 {
 	GPOS_ASSERT(idx <= m_window_spec_array->Size());
@@ -109,7 +110,7 @@ CDXLLogicalWindow::GetWindowKeyAt(ULONG idx) const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  const CDXLNode *node) const
+								  gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

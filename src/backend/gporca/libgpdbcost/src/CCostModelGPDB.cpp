@@ -14,6 +14,7 @@
 #include <limits>
 
 #include "gpos/common/Ref.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/COptCtxt.h"
@@ -157,7 +158,7 @@ CCost
 CCostModelGPDB::CostComputeScalar(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								  const SCostingInfo *pci,
 								  ICostModelParams *pcp,
-								  const CCostModelGPDB *pcmgpdb)
+								  gpos::pointer<const CCostModelGPDB *> pcmgpdb)
 {
 	GPOS_ASSERT(nullptr != pci);
 	GPOS_ASSERT(nullptr != pcp);
@@ -364,7 +365,8 @@ CCostModelGPDB::CostChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 CCost
 CCostModelGPDB::CostMaxChild(CMemoryPool *, CExpressionHandle &,
-							 const SCostingInfo *pci, ICostModelParams *)
+							 const SCostingInfo *pci,
+							 gpos::pointer<ICostModelParams *>)
 {
 	GPOS_ASSERT(nullptr != pci);
 
@@ -393,7 +395,7 @@ CCostModelGPDB::CostMaxChild(CMemoryPool *, CExpressionHandle &,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostCTEProducer(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								const CCostModelGPDB *pcmgpdb,
+								gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 								const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -451,7 +453,7 @@ CCostModelGPDB::CostCTEConsumer(CMemoryPool *,	// mp
 									exprhdl
 #endif	// GPOS_DEBUG
 								,
-								const CCostModelGPDB *pcmgpdb,
+								gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 								const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -494,7 +496,7 @@ CCostModelGPDB::CostConstTableGet(CMemoryPool *,  // mp
 									  exprhdl
 #endif	// GPOS_DEBUG
 								  ,
-								  const CCostModelGPDB *pcmgpdb,
+								  gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 								  const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -518,7 +520,8 @@ CCostModelGPDB::CostConstTableGet(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostDML(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						const CCostModelGPDB *pcmgpdb, const SCostingInfo *pci)
+						gpos::pointer<const CCostModelGPDB *> pcmgpdb,
+						const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
 	GPOS_ASSERT(nullptr != pci);
@@ -552,7 +555,7 @@ CCostModelGPDB::CostDML(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostScalarAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const CCostModelGPDB *pcmgpdb,
+							  gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							  const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -596,7 +599,7 @@ CCostModelGPDB::CostScalarAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostStreamAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const CCostModelGPDB *pcmgpdb,
+							  gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							  const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -643,7 +646,7 @@ CCostModelGPDB::CostStreamAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostSequence(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 const CCostModelGPDB *pcmgpdb,
+							 gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							 const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -671,7 +674,8 @@ CCostModelGPDB::CostSequence(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostSort(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 const CCostModelGPDB *pcmgpdb, const SCostingInfo *pci)
+						 gpos::pointer<const CCostModelGPDB *> pcmgpdb,
+						 const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
 	GPOS_ASSERT(nullptr != pci);
@@ -713,7 +717,8 @@ CCostModelGPDB::CostTVF(CMemoryPool *,	// mp
 							exprhdl
 #endif	// GPOS_DEBUG
 						,
-						const CCostModelGPDB *pcmgpdb, const SCostingInfo *pci)
+						gpos::pointer<const CCostModelGPDB *> pcmgpdb,
+						const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
 	GPOS_ASSERT(nullptr != pci);
@@ -736,7 +741,7 @@ CCostModelGPDB::CostTVF(CMemoryPool *,	// mp
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostUnionAll(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 const CCostModelGPDB *pcmgpdb,
+							 gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							 const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -769,7 +774,7 @@ CCostModelGPDB::CostUnionAll(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostHashAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							const CCostModelGPDB *pcmgpdb,
+							gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -850,7 +855,7 @@ CCostModelGPDB::CostHashAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostHashJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 const CCostModelGPDB *pcmgpdb,
+							 gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							 const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -1045,7 +1050,7 @@ CCostModelGPDB::CostHashJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostMergeJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const CCostModelGPDB *pcmgpdb,
+							  gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							  const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -1123,7 +1128,7 @@ CCostModelGPDB::CostMergeJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostIndexNLJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								const CCostModelGPDB *pcmgpdb,
+								gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 								const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -1205,7 +1210,7 @@ CCostModelGPDB::CostIndexNLJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostNLJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   const CCostModelGPDB *pcmgpdb,
+						   gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 						   const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -1329,7 +1334,7 @@ CCostModelGPDB::CostNLJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostMotion(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   const CCostModelGPDB *pcmgpdb,
+						   gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 						   const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -1457,9 +1462,9 @@ CCostModelGPDB::CostMotion(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 CCost
-CCostModelGPDB::CostSequenceProject(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									const CCostModelGPDB *pcmgpdb,
-									const SCostingInfo *pci)
+CCostModelGPDB::CostSequenceProject(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<const CCostModelGPDB *> pcmgpdb, const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
 	GPOS_ASSERT(nullptr != pci);
@@ -1507,7 +1512,7 @@ CCostModelGPDB::CostSequenceProject(CMemoryPool *mp, CExpressionHandle &exprhdl,
 CCost
 CCostModelGPDB::CostIndexScan(CMemoryPool *,  // mp
 							  CExpressionHandle &exprhdl,
-							  const CCostModelGPDB *pcmgpdb,
+							  gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 							  const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -1568,10 +1573,11 @@ CCostModelGPDB::CostIndexScan(CMemoryPool *,  // mp
 
 
 CCost
-CCostModelGPDB::CostIndexOnlyScan(CMemoryPool *mp GPOS_UNUSED,	  // mp
-								  CExpressionHandle &exprhdl,	  //exprhdl
-								  const CCostModelGPDB *pcmgpdb,  // pcmgpdb
-								  const SCostingInfo *pci		  //pci
+CCostModelGPDB::CostIndexOnlyScan(
+	CMemoryPool *mp GPOS_UNUSED,					// mp
+	CExpressionHandle &exprhdl,						//exprhdl
+	gpos::pointer<const CCostModelGPDB *> pcmgpdb,	// pcmgpdb
+	const SCostingInfo *pci							//pci
 )
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
@@ -1625,9 +1631,9 @@ CCostModelGPDB::CostIndexOnlyScan(CMemoryPool *mp GPOS_UNUSED,	  // mp
 }
 
 CCost
-CCostModelGPDB::CostBitmapTableScan(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									const CCostModelGPDB *pcmgpdb,
-									const SCostingInfo *pci)
+CCostModelGPDB::CostBitmapTableScan(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<const CCostModelGPDB *> pcmgpdb, const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
 	GPOS_ASSERT(nullptr != pci);
@@ -1827,8 +1833,9 @@ CCostModelGPDB::CostBitmapTableScan(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 
 CCost
-CCostModelGPDB::CostBitmapSmallNDV(const CCostModelGPDB *pcmgpdb,
-								   const SCostingInfo *pci, CDouble dNDV)
+CCostModelGPDB::CostBitmapSmallNDV(
+	gpos::pointer<const CCostModelGPDB *> pcmgpdb, const SCostingInfo *pci,
+	CDouble dNDV)
 {
 	const DOUBLE rows = pci->Rows();
 	const DOUBLE width = pci->Width();
@@ -1857,8 +1864,9 @@ CCostModelGPDB::CostBitmapSmallNDV(const CCostModelGPDB *pcmgpdb,
 
 
 CCost
-CCostModelGPDB::CostBitmapLargeNDV(const CCostModelGPDB *pcmgpdb,
-								   const SCostingInfo *pci, CDouble dNDV)
+CCostModelGPDB::CostBitmapLargeNDV(
+	gpos::pointer<const CCostModelGPDB *> pcmgpdb, const SCostingInfo *pci,
+	CDouble dNDV)
 {
 	const DOUBLE rows = pci->Rows();
 	const DOUBLE width = pci->Width();
@@ -1888,7 +1896,8 @@ CCostModelGPDB::CostBitmapLargeNDV(const CCostModelGPDB *pcmgpdb,
 CCost
 CCostModelGPDB::CostScan(CMemoryPool *,	 // mp
 						 CExpressionHandle &exprhdl,
-						 const CCostModelGPDB *pcmgpdb, const SCostingInfo *pci)
+						 gpos::pointer<const CCostModelGPDB *> pcmgpdb,
+						 const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);
 	GPOS_ASSERT(nullptr != pci);
@@ -1942,7 +1951,7 @@ CCostModelGPDB::CostScan(CMemoryPool *,	 // mp
 //---------------------------------------------------------------------------
 CCost
 CCostModelGPDB::CostFilter(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   const CCostModelGPDB *pcmgpdb,
+						   gpos::pointer<const CCostModelGPDB *> pcmgpdb,
 						   const SCostingInfo *pci)
 {
 	GPOS_ASSERT(nullptr != pcmgpdb);

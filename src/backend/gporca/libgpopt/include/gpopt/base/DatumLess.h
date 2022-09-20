@@ -6,6 +6,7 @@
 #define GPOPT_DatumLess_H
 
 #include "gpos/common/Ref.h"
+#include "gpos/common/owner.h"
 
 namespace gpnaucrates
 {
@@ -16,8 +17,8 @@ namespace gpopt
 {
 struct DatumLess
 {
-	bool operator()(const gpnaucrates::IDatum *a,
-					const gpnaucrates::IDatum *b) const;
+	bool operator()(gpos::pointer<const gpnaucrates::IDatum *> a,
+					gpos::pointer<const gpnaucrates::IDatum *> b) const;
 
 	bool operator()(const gpos::Ref<gpnaucrates::IDatum> &a,
 					const gpos::Ref<gpnaucrates::IDatum> &b) const;

@@ -8,6 +8,7 @@
 #include "gpopt/operators/CLogicalIndexApply.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/statistics/CJoinStatsProcessor.h"
 
@@ -61,7 +62,7 @@ CLogicalIndexApply::DeriveMaxCard(CMemoryPool *,  // mp
 CXformSet *
 CLogicalIndexApply::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfImplementIndexApply);
 	return xform_set;
 }
@@ -82,8 +83,9 @@ CLogicalIndexApply::Matches(COperator *pop) const
 
 
 IStatistics *
-CLogicalIndexApply::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 IStatisticsArray *	 // stats_ctxt
+CLogicalIndexApply::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::pointer<IStatisticsArray *>  // stats_ctxt
 ) const
 {
 	GPOS_ASSERT(EspNone < Esp(exprhdl));
@@ -93,7 +95,8 @@ CLogicalIndexApply::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(2 /*child_index*/);
 
 	// join stats of the children
-	IStatisticsArray *statistics_array = GPOS_NEW(mp) IStatisticsArray(mp);
+	gpos::owner<IStatisticsArray *> statistics_array =
+		GPOS_NEW(mp) IStatisticsArray(mp);
 	outer_stats->AddRef();
 	statistics_array->Append(outer_stats);
 	inner_side_stats->AddRef();
@@ -112,10 +115,10 @@ CLogicalIndexApply::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											   UlongToColRefMap *colref_mapping,
 											   BOOL must_exist)
 {
-	COperator *result = nullptr;
+	gpos::owner<COperator *> result = nullptr;
 	CColRefArray *colref_array = CUtils::PdrgpcrRemap(
 		mp, m_pdrgpcrOuterRefs, colref_mapping, must_exist);
-	CExpression *remapped_orig_join_pred = nullptr;
+	gpos::owner<CExpression *> remapped_orig_join_pred = nullptr;
 
 	if (nullptr != m_origJoinPred)
 	{

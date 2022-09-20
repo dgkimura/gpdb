@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalLimit.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CUtils.h"
@@ -61,7 +62,7 @@ CLogicalLimit::CLogicalLimit(CMemoryPool *mp, COrderSpec *pos, BOOL fGlobal,
 	  m_top_limit_under_dml(fTopLimitUnderDML)
 {
 	GPOS_ASSERT(nullptr != m_pos);
-	CColRefSet *pcrsSort = m_pos->PcrsUsed(mp);
+	gpos::owner<CColRefSet *> pcrsSort = m_pos->PcrsUsed(mp);
 	m_pcrsLocalUsed->Include(pcrsSort);
 	pcrsSort->Release();
 }
@@ -134,7 +135,7 @@ CLogicalLimit::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalLimit::PopCopyWithRemappedColumns(CMemoryPool *mp,
 										  UlongToColRefMap *colref_mapping,
 										  BOOL must_exist)
@@ -174,7 +175,7 @@ CColRefSet *
 CLogicalLimit::DeriveOuterReferences(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl)
 {
-	CColRefSet *pcrsSort = m_pos->PcrsUsed(mp);
+	gpos::owner<CColRefSet *> pcrsSort = m_pos->PcrsUsed(mp);
 	CColRefSet *outer_refs =
 		CLogical::DeriveOuterReferences(mp, exprhdl, pcrsSort);
 	pcrsSort->Release();
@@ -225,7 +226,7 @@ CLogicalLimit::DeriveMaxCard(CMemoryPool *,	 // mp
 CXformSet *
 CLogicalLimit::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfImplementLimit);
 	(void) xform_set->ExchangeSet(CXform::ExfSplitLimit);
@@ -248,7 +249,7 @@ CLogicalLimit::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrsUsed = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsUsed = GPOS_NEW(mp) CColRefSet(mp);
 	// add columns used by number of rows and offset scalar children
 	pcrsUsed->Union(exprhdl.DeriveUsedColumns(1));
 	pcrsUsed->Union(exprhdl.DeriveUsedColumns(2));
@@ -301,13 +302,13 @@ CLogicalLimit::OsPrint(IOstream &os) const
 //		Derive statistics based on limit
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalLimit::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							IStatisticsArray *	// not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *child_stats = exprhdl.Pstats(0);
+	gpos::pointer<IStatistics *> child_stats = exprhdl.Pstats(0);
 	CMaxCard maxcard = this->DeriveMaxCard(mp, exprhdl);
 	CDouble dRowsMax = CDouble(maxcard.Ull());
 

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalCTEAnchor.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CExpression.h"
@@ -161,7 +162,7 @@ CLogicalCTEAnchor::HashValue() const
 CXformSet *
 CLogicalCTEAnchor::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfCTEAnchor2Sequence);
 	(void) xform_set->ExchangeSet(CXform::ExfCTEAnchor2TrivialSelect);
 	return xform_set;

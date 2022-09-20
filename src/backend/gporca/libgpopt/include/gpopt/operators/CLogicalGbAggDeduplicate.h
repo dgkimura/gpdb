@@ -24,6 +24,7 @@
 #define GPOS_CLogicalGbAggDeduplicate_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalGbAgg.h"
@@ -42,7 +43,7 @@ class CLogicalGbAggDeduplicate : public CLogicalGbAgg
 {
 private:
 	// array of keys from the join's child
-	CColRefArray *m_pdrgpcrKeys;
+	gpos::owner<CColRefArray *> m_pdrgpcrKeys;
 
 public:
 	CLogicalGbAggDeduplicate(const CLogicalGbAggDeduplicate &) = delete;
@@ -79,7 +80,7 @@ public:
 	}
 
 	// array of keys from the join's child that needs to be deduped
-	CColRefArray *
+	gpos::pointer<CColRefArray *>
 	PdrgpcrKeys() const
 	{
 		return m_pdrgpcrKeys;
@@ -92,9 +93,9 @@ public:
 	ULONG HashValue() const override;
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -130,7 +131,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalGbAggDeduplicate *
+	static gpos::cast_func<CLogicalGbAggDeduplicate *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

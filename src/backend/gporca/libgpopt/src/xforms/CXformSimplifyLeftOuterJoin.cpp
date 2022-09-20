@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformSimplifyLeftOuterJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CLogicalConstTableGet.h"
@@ -96,7 +97,7 @@ CXformSimplifyLeftOuterJoin::Transform(CXformContext *pxfctxt,
 
 	pexprOuter->AddRef();
 	pexprScalar->AddRef();
-	CExpression *pexprResult = nullptr;
+	gpos::owner<CExpression *> pexprResult = nullptr;
 
 	// inner child of LOJ can be replaced with empty table
 	GPOS_ASSERT(CUtils::FScalarConstFalse(pexprScalar));
@@ -105,7 +106,7 @@ CXformSimplifyLeftOuterJoin::Transform(CXformContext *pxfctxt,
 	CColRefArray *colref_array = pexprInner->DeriveOutputColumns()->Pdrgpcr(mp);
 
 	// generate empty constant table with the same columns
-	COperator *popCTG = GPOS_NEW(mp)
+	gpos::owner<COperator *> popCTG = GPOS_NEW(mp)
 		CLogicalConstTableGet(mp, colref_array, GPOS_NEW(mp) IDatum2dArray(mp));
 	pexprResult = GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) CLogicalLeftOuterJoin(mp), pexprOuter,

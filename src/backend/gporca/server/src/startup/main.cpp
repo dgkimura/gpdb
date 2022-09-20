@@ -11,6 +11,7 @@
 
 #include "gpos/_api.h"
 #include "gpos/common/CMainArgs.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/test/CUnittest.h"
 #include "gpos/types.h"
@@ -330,7 +331,8 @@ PvExec(void *pv)
 		CDXLMinidump *pdxlmd = CMinidumperUtils::PdxlmdLoad(mp, file_name);
 		GPOS_CHECK_ABORT;
 
-		COptimizerConfig *optimizer_config = pdxlmd->GetOptimizerConfig();
+		gpos::owner<COptimizerConfig *> optimizer_config =
+			pdxlmd->GetOptimizerConfig();
 
 		if (nullptr == optimizer_config)
 		{
@@ -348,10 +350,11 @@ PvExec(void *pv)
 
 		ULONG ulSegments = CTestUtils::UlSegments(optimizer_config);
 
-		CDXLNode *pdxlnPlan = CMinidumperUtils::PdxlnExecuteMinidump(
-			mp, file_name, ulSegments, 1 /*ulSessionId*/, 1 /*ulCmdId*/,
-			optimizer_config, nullptr /*pceeval*/
-		);
+		gpos::owner<CDXLNode *> pdxlnPlan =
+			CMinidumperUtils::PdxlnExecuteMinidump(
+				mp, file_name, ulSegments, 1 /*ulSessionId*/, 1 /*ulCmdId*/,
+				optimizer_config, nullptr /*pceeval*/
+			);
 
 		if (fPrintDXLPlan)
 		{

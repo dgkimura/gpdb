@@ -11,9 +11,8 @@
 
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
+#include "gpos/common/owner.h"
 #endif
-
-#include "unittest/dxl/statistics/CBucketTest.h"
 
 #include <stdint.h>
 
@@ -31,6 +30,7 @@
 #include "naucrates/statistics/CStatisticsUtils.h"
 
 #include "unittest/base.h"
+#include "unittest/dxl/statistics/CBucketTest.h"
 #include "unittest/dxl/statistics/CCardinalityTestUtils.h"
 #include "unittest/gpopt/CTestUtils.h"
 
@@ -69,7 +69,7 @@ CBucketTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -90,11 +90,11 @@ CBucketTest::EresUnittest_CBucketInt4()
 	CMemoryPool *mp = amp.Pmp();
 
 	// generate integer points
-	CPoint *point1 = CTestUtils::PpointInt4(mp, 1);
-	CPoint *point2 = CTestUtils::PpointInt4(mp, 2);
-	CPoint *point3 = CTestUtils::PpointInt4(mp, 3);
-	CPoint *point4 = CTestUtils::PpointInt4(mp, 4);
-	CPoint *point10 = CTestUtils::PpointInt4(mp, 10);
+	gpos::owner<CPoint *> point1 = CTestUtils::PpointInt4(mp, 1);
+	gpos::owner<CPoint *> point2 = CTestUtils::PpointInt4(mp, 2);
+	gpos::owner<CPoint *> point3 = CTestUtils::PpointInt4(mp, 3);
+	gpos::owner<CPoint *> point4 = CTestUtils::PpointInt4(mp, 4);
+	gpos::owner<CPoint *> point10 = CTestUtils::PpointInt4(mp, 10);
 
 	// bucket [1,1]
 	CBucket *bucket1 = CCardinalityTestUtils::PbucketIntegerClosedLowerBound(
@@ -204,8 +204,8 @@ CBucketTest::EresUnittest_CBucketBool()
 	CMemoryPool *mp = amp.Pmp();
 
 	// generate boolean points
-	CPoint *p1 = CTestUtils::PpointBool(mp, true);
-	CPoint *p2 = CTestUtils::PpointBool(mp, false);
+	gpos::owner<CPoint *> p1 = CTestUtils::PpointBool(mp, true);
+	gpos::owner<CPoint *> p2 = CTestUtils::PpointBool(mp, false);
 
 	// bucket for true
 	CBucket *bucket =
@@ -237,7 +237,7 @@ CBucketTest::EresUnittest_CBucketScale()
 	CMemoryPool *mp = amp.Pmp();
 
 	// generate integer point
-	CPoint *point1 = CTestUtils::PpointInt4(mp, 10);
+	gpos::owner<CPoint *> point1 = CTestUtils::PpointInt4(mp, 10);
 
 	// bucket [1,100)
 	CBucket *bucket1 = CCardinalityTestUtils::PbucketIntegerClosedLowerBound(
@@ -250,7 +250,7 @@ CBucketTest::EresUnittest_CBucketScale()
 	GPOS_RTL_ASSERT(!bucket2->Contains(point1));
 
 	// new bucket [1, 10) must contain 9
-	CPoint *point2 = CTestUtils::PpointInt4(mp, 9);
+	gpos::owner<CPoint *> point2 = CTestUtils::PpointInt4(mp, 9);
 	GPOS_RTL_ASSERT(bucket2->Contains(point2));
 	point2->Release();
 

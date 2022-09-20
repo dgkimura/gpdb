@@ -47,8 +47,8 @@ CPhysicalLeftAntiSemiHashJoinNotIn::CPhysicalLeftAntiSemiHashJoinNotIn(
 CDistributionSpec *
 CPhysicalLeftAntiSemiHashJoinNotIn::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
-	CDistributionSpec *pdsInput GPOS_UNUSED, ULONG child_index GPOS_UNUSED,
-	CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+	gpos::pointer<CDistributionSpec *> pdsInput GPOS_UNUSED,
+	ULONG child_index GPOS_UNUSED, CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
 	ULONG ulOptReq
 		GPOS_UNUSED	 // identifies which optimization request should be created
 ) const
@@ -60,7 +60,7 @@ CPhysicalLeftAntiSemiHashJoinNotIn::PdsRequired(
 	return nullptr;
 }
 
-CEnfdDistribution *
+gpos::owner<CEnfdDistribution *>
 CPhysicalLeftAntiSemiHashJoinNotIn::Ped(
 	CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
 	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)

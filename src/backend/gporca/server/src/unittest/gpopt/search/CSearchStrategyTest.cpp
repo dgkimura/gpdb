@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 #include "unittest/gpopt/search/CSearchStrategyTest.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 #include "gpos/task/CAutoTraceFlag.h"
 
@@ -68,7 +69,7 @@ CSearchStrategyTest::Optimize(CMemoryPool *mp, Pfpexpr pfnGenerator,
 							  PfnOptimize pfnOptimize)
 {
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -77,7 +78,7 @@ CSearchStrategyTest::Optimize(CMemoryPool *mp, Pfpexpr pfnGenerator,
 	{
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 						 CTestUtils::GetCostModel(mp));
-		CExpression *pexpr = pfnGenerator(mp);
+		gpos::owner<CExpression *> pexpr = pfnGenerator(mp);
 		pfnOptimize(mp, pexpr, search_stage_array);
 		pexpr->Release();
 	}
@@ -175,7 +176,8 @@ CSearchStrategyTest::EresUnittest_Timeout()
 	CAutoTraceFlag atf(EopttracePrintOptimizationStatistics, true);
 	CParseHandlerDXL *pphDXL = CDXLUtils::GetParseHandlerForDXLFile(
 		mp, "../data/dxl/search/timeout-strategy.xml", nullptr);
-	CSearchStageArray *search_stage_array = pphDXL->GetSearchStageArray();
+	gpos::owner<CSearchStageArray *> search_stage_array =
+		pphDXL->GetSearchStageArray();
 	search_stage_array->AddRef();
 	Optimize(mp, CTestUtils::PexprLogicalNAryJoin, search_stage_array,
 			 BuildMemo);
@@ -218,9 +220,10 @@ CSearchStrategyTest::EresUnittest_ParsingWithException()
 CSearchStageArray *
 CSearchStrategyTest::PdrgpssRandom(CMemoryPool *mp)
 {
-	CSearchStageArray *search_stage_array = GPOS_NEW(mp) CSearchStageArray(mp);
-	CXformSet *pxfsFst = GPOS_NEW(mp) CXformSet(mp);
-	CXformSet *pxfsSnd = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CSearchStageArray *> search_stage_array =
+		GPOS_NEW(mp) CSearchStageArray(mp);
+	gpos::owner<CXformSet *> pxfsFst = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> pxfsSnd = GPOS_NEW(mp) CXformSet(mp);
 
 	// first xforms set contains essential rules to produce simple equality join plan
 	(void) pxfsFst->ExchangeSet(CXform::ExfGet2TableScan);
@@ -268,7 +271,7 @@ CSearchStrategyTest::BuildMemo(CMemoryPool *mp, CExpression *pexprInput,
 	eng.Init(pqc, search_stage_array);
 	eng.Optimize();
 
-	CExpression *pexprPlan = eng.PexprExtractPlan();
+	gpos::owner<CExpression *> pexprPlan = eng.PexprExtractPlan();
 
 	oss << std::endl << "OUTPUT PLAN:" << std::endl;
 	(void) pexprPlan->OsPrint(oss);

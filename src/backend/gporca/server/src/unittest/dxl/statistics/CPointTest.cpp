@@ -11,9 +11,8 @@
 
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
+#include "gpos/common/owner.h"
 #endif
-
-#include "unittest/dxl/statistics/CPointTest.h"
 
 #include <stdint.h>
 
@@ -23,6 +22,7 @@
 #include "naucrates/statistics/CPoint.h"
 
 #include "unittest/base.h"
+#include "unittest/dxl/statistics/CPointTest.h"
 #include "unittest/gpopt/CTestUtils.h"
 
 using namespace gpopt;
@@ -41,7 +41,7 @@ CPointTest::EresUnittest()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -62,8 +62,8 @@ CPointTest::EresUnittest_CPointInt4()
 	CMemoryPool *mp = amp.Pmp();
 
 	// generate integer points
-	CPoint *point1 = CTestUtils::PpointInt4(mp, 1);
-	CPoint *point2 = CTestUtils::PpointInt4(mp, 2);
+	gpos::owner<CPoint *> point1 = CTestUtils::PpointInt4(mp, 1);
+	gpos::owner<CPoint *> point2 = CTestUtils::PpointInt4(mp, 2);
 
 	GPOS_RTL_ASSERT_MSG(point1->Equals(point1), "1 == 1");
 	GPOS_RTL_ASSERT_MSG(point1->IsLessThan(point2), "1 < 2");
@@ -92,8 +92,8 @@ CPointTest::EresUnittest_CPointBool()
 	CMemoryPool *mp = amp.Pmp();
 
 	// generate boolean points
-	CPoint *point1 = CTestUtils::PpointBool(mp, true);
-	CPoint *point2 = CTestUtils::PpointBool(mp, false);
+	gpos::owner<CPoint *> point1 = CTestUtils::PpointBool(mp, true);
+	gpos::owner<CPoint *> point2 = CTestUtils::PpointBool(mp, false);
 
 	// true == true
 	GPOS_RTL_ASSERT_MSG(point1->Equals(point1), "true must be equal to true");

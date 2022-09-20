@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerNLJoin.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFilter.h"
@@ -181,7 +183,7 @@ CParseHandlerNLJoin::EndElement(const XMLCh *const,	 // element_uri,
 			dynamic_cast<CParseHandlerNLJIndexParamList *>(
 				(*this)[EdxlParseHandlerNLJIndexNestLoopParams]);
 		GPOS_ASSERT(nest_params_parse_handler);
-		CDXLColRefArray *nest_params_colrefs =
+		gpos::owner<CDXLColRefArray *> nest_params_colrefs =
 			nest_params_parse_handler->GetNLParamsColRefs();
 		nest_params_colrefs->AddRef();
 		m_dxl_op->SetNestLoopParamsColRefs(nest_params_colrefs);

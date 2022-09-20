@@ -12,6 +12,7 @@
 #include "gpopt/operators/CPhysicalRowTrigger.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/COptCtxt.h"
@@ -80,10 +81,10 @@ CPhysicalRowTrigger::~CPhysicalRowTrigger()
 //		Compute required sort columns of the n-th child
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalRowTrigger::PosRequired(CMemoryPool *mp,
-								 CExpressionHandle &,  //exprhdl,
-								 COrderSpec *,		   //posRequired,
+								 CExpressionHandle &,		   //exprhdl,
+								 gpos::pointer<COrderSpec *>,  //posRequired,
 								 ULONG
 #ifdef GPOS_DEBUG
 									 child_index
@@ -106,7 +107,7 @@ CPhysicalRowTrigger::PosRequired(CMemoryPool *mp,
 //		Derive sort order
 //
 //---------------------------------------------------------------------------
-COrderSpec *
+gpos::owner<COrderSpec *>
 CPhysicalRowTrigger::PosDerive(CMemoryPool *mp,
 							   CExpressionHandle &	//exprhdl
 ) const
@@ -124,7 +125,7 @@ CPhysicalRowTrigger::PosDerive(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CPhysicalRowTrigger::EpetOrder(CExpressionHandle &,	 // exprhdl
-							   const CEnfdOrder *
+							   gpos::pointer<const CEnfdOrder *>
 #ifdef GPOS_DEBUG
 								   peo
 #endif	// GPOS_DEBUG
@@ -160,7 +161,8 @@ CPhysicalRowTrigger::PcrsRequired(CMemoryPool *mp,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
+	gpos::owner<CColRefSet *> pcrs =
+		GPOS_NEW(mp) CColRefSet(mp, *m_pcrsRequiredLocal);
 	pcrs->Union(pcrsRequired);
 
 	return pcrs;
@@ -174,7 +176,7 @@ CPhysicalRowTrigger::PcrsRequired(CMemoryPool *mp,
 //		Compute required distribution of the n-th child
 //
 //---------------------------------------------------------------------------
-CDistributionSpec *
+gpos::owner<CDistributionSpec *>
 CPhysicalRowTrigger::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 CDistributionSpec *pdsInput, ULONG child_index,
 								 CDrvdPropArray *,	// pdrgpdpCtxt
@@ -352,8 +354,9 @@ CPhysicalRowTrigger::Matches(COperator *pop) const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CPhysicalRowTrigger::EpetRewindability(CExpressionHandle &exprhdl,
-									   const CEnfdRewindability *per) const
+CPhysicalRowTrigger::EpetRewindability(
+	CExpressionHandle &exprhdl,
+	gpos::pointer<const CEnfdRewindability *> per) const
 {
 	CRewindabilitySpec *prs = CDrvdPropPlan::Pdpplan(exprhdl.Pdp())->Prs();
 	if (per->FCompatible(prs))

@@ -13,6 +13,8 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalLimit.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -79,7 +81,7 @@ CDXLLogicalLimit::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalLimit::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *node) const
+								 gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

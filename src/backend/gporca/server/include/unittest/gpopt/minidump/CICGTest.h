@@ -12,6 +12,7 @@
 #define GPOPT_CICGTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLNode.h"
 
@@ -53,17 +54,18 @@ private:
 	static ULONG m_ulTestCounterNoAdditionTraceFlag;
 
 	// check if all the operators in the given dxl fragment satisfy the given predicate
-	static BOOL FDXLOpSatisfiesPredicate(CDXLNode *pdxl, FnDXLOpPredicate fdop);
+	static BOOL FDXLOpSatisfiesPredicate(gpos::pointer<CDXLNode *> pdxl,
+										 FnDXLOpPredicate fdop);
 
 	// check if the given dxl fragment does not contains Index Join
-	static BOOL FIsNotIndexJoin(CDXLOperator *dxl_op);
+	static BOOL FIsNotIndexJoin(gpos::pointer<CDXLOperator *> dxl_op);
 
 	// check that the given dxl fragment does not contain an Index Join
-	static BOOL FHasNoIndexJoin(CDXLNode *pdxl);
+	static BOOL FHasNoIndexJoin(gpos::pointer<CDXLNode *> pdxl);
 
 	// check that the given dxl fragment contains an Index Join
 	static BOOL
-	FHasIndexJoin(CDXLNode *pdxl)
+	FHasIndexJoin(gpos::pointer<CDXLNode *> pdxl)
 	{
 		return !FHasNoIndexJoin(pdxl);
 	}

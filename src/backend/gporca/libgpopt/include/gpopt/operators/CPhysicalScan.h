@@ -40,17 +40,17 @@ protected:
 	const CName *m_pnameAlias;
 
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::owner<CTableDescriptor *> m_ptabdesc;
 
 	// output columns
-	CColRefArray *m_pdrgpcrOutput;
+	gpos::owner<CColRefArray *> m_pdrgpcrOutput;
 
 	// distribution
-	CDistributionSpec *m_pds;
+	gpos::owner<CDistributionSpec *> m_pds;
 
 	// stats of base table -- used for costing
 	// if operator is index scan, this is the stats of table on which index is created
-	IStatistics *m_pstatsBaseTable;
+	gpos::owner<IStatistics *> m_pstatsBaseTable;
 
 private:
 	// compute stats of underlying table
@@ -185,8 +185,8 @@ public:
 	}
 
 	// derive distribution
-	CDistributionSpec *PdsDerive(CMemoryPool *mp,
-								 CExpressionHandle &exprhdl) const override;
+	gpos::owner<CDistributionSpec *> PdsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive cte map
 	gpos::owner<CCTEMap *>
@@ -258,11 +258,12 @@ public:
 
 	// statistics derivation during costing
 	virtual IStatistics *PstatsDerive(
-		CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan,
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::pointer<CReqdPropPlan *> prpplan,
 		gpos::pointer<IStatisticsArray *> stats_ctxt) const = 0;
 
 	// conversion function
-	static CPhysicalScan *PopConvert(COperator *pop);
+	static gpos::cast_func<CPhysicalScan *> PopConvert(COperator *pop);
 
 };	// class CPhysicalScan
 

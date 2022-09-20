@@ -20,6 +20,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CHashSet.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/test/CUnittest.h"
 
@@ -68,7 +69,7 @@ CHashSetTest::EresUnittest_Basic()
 	using UlongPtrHashSet = CHashSet<ULONG_PTR, HashPtr<ULONG_PTR>,
 									 Equals<ULONG_PTR>, CleanupNULL<ULONG_PTR>>;
 
-	UlongPtrHashSet *phs = GPOS_NEW(mp) UlongPtrHashSet(mp, 128);
+	gpos::owner<UlongPtrHashSet *> phs = GPOS_NEW(mp) UlongPtrHashSet(mp, 128);
 	for (ULONG ul = 0; ul < ulCnt; ul++)
 	{
 		BOOL fSuccess GPOS_ASSERTS_ONLY = phs->Insert(&rgul[ul]);
@@ -108,7 +109,7 @@ CHashSetTest::EresUnittest_Ownership()
 		CHashSet<ULONG_PTR, HashPtr<ULONG_PTR>, Equals<ULONG_PTR>,
 				 CleanupDelete<ULONG_PTR>>;
 
-	UlongPtrHashSet *phs = GPOS_NEW(mp) UlongPtrHashSet(mp, 32);
+	gpos::owner<UlongPtrHashSet *> phs = GPOS_NEW(mp) UlongPtrHashSet(mp, 32);
 	for (ULONG ul = 0; ul < ulCnt; ul++)
 	{
 		ULONG_PTR *pulp = GPOS_NEW(mp) ULONG_PTR(ul);

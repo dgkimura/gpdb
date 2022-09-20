@@ -12,6 +12,7 @@
 #define GPOPT_CRangeTest_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CRange.h"
 
@@ -44,13 +45,13 @@ private:
 	static void PrintRange(CMemoryPool *mp, CColRef *colref, CRange *prange);
 
 	// int2 datum
-	static IDatum *CreateInt2Datum(CMemoryPool *mp, INT i);
+	static gpos::owner<IDatum *> CreateInt2Datum(CMemoryPool *mp, INT i);
 
 	// int4 datum
-	static IDatum *CreateInt4Datum(CMemoryPool *mp, INT i);
+	static gpos::owner<IDatum *> CreateInt4Datum(CMemoryPool *mp, INT i);
 
 	// int8 datum
-	static IDatum *CreateInt8Datum(CMemoryPool *mp, INT li);
+	static gpos::owner<IDatum *> CreateInt8Datum(CMemoryPool *mp, INT li);
 
 public:
 	// unittests

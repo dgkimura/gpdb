@@ -11,6 +11,8 @@
 
 #include "naucrates/md/CMDRelationCtasGPDB.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLCtasStorageOptions.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -243,7 +245,7 @@ CMDRelationCtasGPDB::DistrColumnCount() const
 //		Returns the column at the specified position
 //
 //---------------------------------------------------------------------------
-const IMDColumn *
+gpos::pointer<const IMDColumn *>
 CMDRelationCtasGPDB::GetMdCol(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_md_col_array->Size());
@@ -259,7 +261,7 @@ CMDRelationCtasGPDB::GetMdCol(ULONG pos) const
 //		Returns the distribution column at the specified position in the distribution column list
 //
 //---------------------------------------------------------------------------
-const IMDColumn *
+gpos::pointer<const IMDColumn *>
 CMDRelationCtasGPDB::GetDistrColAt(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_distr_col_array->Size());

@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPoolManager.h"
 
 #include "gpopt/xforms/xforms.h"
@@ -322,7 +323,7 @@ CXformFactory::Pxf(CXform::EXformId exfid) const
 //		Accessor by xform name
 //
 //---------------------------------------------------------------------------
-CXform *
+gpos::pointer<CXform *>
 CXformFactory::Pxf(const CHAR *szXformName) const
 {
 	return m_phmszxform->Find(szXformName);

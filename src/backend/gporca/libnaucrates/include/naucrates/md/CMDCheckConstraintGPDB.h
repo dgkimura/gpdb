@@ -13,6 +13,7 @@
 #define GPMD_CMDCheckConstraintGPDB_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/md/CMDName.h"
@@ -53,7 +54,7 @@ private:
 	gpos::Ref<IMDId> m_rel_mdid;
 
 	// the DXL representation of the check constraint
-	CDXLNode *m_dxl_node;
+	gpos::owner<CDXLNode *> m_dxl_node;
 
 	// DXL for object
 	const CWStringDynamic *m_dxl_str;

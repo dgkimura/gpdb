@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalInnerApply.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 using namespace gpopt;
 
@@ -87,7 +88,7 @@ CLogicalInnerApply::DeriveMaxCard(CMemoryPool *,  // mp
 CXformSet *
 CLogicalInnerApply::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfInnerApply2InnerJoin);
 	(void) xform_set->ExchangeSet(
@@ -106,7 +107,7 @@ CLogicalInnerApply::PxfsCandidates(CMemoryPool *mp) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalInnerApply::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											   UlongToColRefMap *colref_mapping,
 											   BOOL must_exist)

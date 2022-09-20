@@ -12,6 +12,7 @@
 #define GPOPT_CPhysicalDynamicTableScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CPhysicalDynamicScan.h"
 
@@ -62,7 +63,7 @@ public:
 							  IStatisticsArray *stats_ctxt) const override;
 
 	// conversion function
-	static CPhysicalDynamicTableScan *
+	static gpos::cast_func<CPhysicalDynamicTableScan *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

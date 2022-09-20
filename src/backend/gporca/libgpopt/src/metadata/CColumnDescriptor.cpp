@@ -12,6 +12,7 @@
 #include "gpopt/metadata/CColumnDescriptor.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/md/CMDIdGPDB.h"
 
@@ -28,7 +29,8 @@ FORCE_GENERATE_DBGSTR(CColumnDescriptor);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CColumnDescriptor::CColumnDescriptor(CMemoryPool *mp, const IMDType *pmdtype,
+CColumnDescriptor::CColumnDescriptor(CMemoryPool *mp,
+									 gpos::pointer<const IMDType *> pmdtype,
 									 INT type_modifier, const CName &name,
 									 INT attno, BOOL is_nullable, ULONG ulWidth)
 	: m_pmdtype(pmdtype),

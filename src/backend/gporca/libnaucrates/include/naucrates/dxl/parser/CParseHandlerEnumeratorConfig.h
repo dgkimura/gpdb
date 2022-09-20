@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerEnumeratorConfig_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 
@@ -34,7 +35,7 @@ class CParseHandlerEnumeratorConfig : public CParseHandlerBase
 {
 private:
 	// enumerator configuration
-	CEnumeratorConfig *m_enumerator_cfg;
+	gpos::owner<CEnumeratorConfig *> m_enumerator_cfg;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +68,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// enumerator configuration
-	CEnumeratorConfig *GetEnumeratorCfg() const;
+	gpos::pointer<CEnumeratorConfig *> GetEnumeratorCfg() const;
 };
 }  // namespace gpdxl
 

@@ -12,6 +12,7 @@
 #define GPOPT_CXformGbAgg2HashAgg_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/xforms/CXformImplementation.h"
 
@@ -32,7 +33,7 @@ class CXformGbAgg2HashAgg : public CXformImplementation
 private:
 protected:
 	// check if the transformation is applicable
-	static BOOL FApplicable(CExpression *pexpr);
+	static BOOL FApplicable(gpos::pointer<CExpression *> pexpr);
 
 public:
 	CXformGbAgg2HashAgg(const CXformGbAgg2HashAgg &) = delete;

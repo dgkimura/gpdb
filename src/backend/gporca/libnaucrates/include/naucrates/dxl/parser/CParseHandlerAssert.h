@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerAssert_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalAssert.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -35,7 +36,7 @@ class CParseHandlerAssert : public CParseHandlerPhysicalOp
 {
 private:
 	// physical assert operator
-	CDXLPhysicalAssert *m_dxl_op;
+	gpos::pointer<CDXLPhysicalAssert *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

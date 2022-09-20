@@ -11,6 +11,8 @@
 
 #include "naucrates/md/CMDRelationExternalGPDB.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -247,7 +249,7 @@ CMDRelationExternalGPDB::SystemColumnsCount() const
 //		Returns the original positions of all the non-dropped columns
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::pointer<ULongPtrArray *>
 CMDRelationExternalGPDB::NonDroppedColsArray() const
 {
 	return m_nondrop_col_pos_array;
@@ -384,7 +386,7 @@ CMDRelationExternalGPDB::KeySetCount() const
 //		Returns the key set at the specified position
 //
 //---------------------------------------------------------------------------
-const ULongPtrArray *
+gpos::pointer<const ULongPtrArray *>
 CMDRelationExternalGPDB::KeySetAt(ULONG pos) const
 {
 	GPOS_ASSERT(nullptr != m_keyset_array);
@@ -442,7 +444,7 @@ CMDRelationExternalGPDB::TriggerCount() const
 //		Returns the column at the specified position
 //
 //---------------------------------------------------------------------------
-const IMDColumn *
+gpos::pointer<const IMDColumn *>
 CMDRelationExternalGPDB::GetMdCol(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_md_col_array->Size());
@@ -458,7 +460,7 @@ CMDRelationExternalGPDB::GetMdCol(ULONG pos) const
 //		Returns the distribution column at the specified position in the distribution column list
 //
 //---------------------------------------------------------------------------
-const IMDColumn *
+gpos::pointer<const IMDColumn *>
 CMDRelationExternalGPDB::GetDistrColAt(ULONG pos) const
 {
 	GPOS_ASSERT(pos < m_distr_col_array->Size());

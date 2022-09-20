@@ -13,6 +13,7 @@
 #define GPOPT_CDistributionSpecRouted_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CDistributionSpec.h"
@@ -59,19 +60,21 @@ public:
 	}
 
 	// does this distribution satisfy the given one
-	BOOL Matches(const CDistributionSpec *pds) const override;
+	BOOL Matches(gpos::pointer<const CDistributionSpec *> pds) const override;
 
 	// does this distribution satisfy the given one
-	BOOL FSatisfies(const CDistributionSpec *pds) const override;
+	BOOL FSatisfies(
+		gpos::pointer<const CDistributionSpec *> pds) const override;
 
 	// return a copy of the distribution spec with remapped columns
-	CDistributionSpec *PdsCopyWithRemappedColumns(
+	gpos::owner<CDistributionSpec *> PdsCopyWithRemappedColumns(
 		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
 		BOOL must_exist) override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 gpos::pointer<CReqdPropPlan *> prpp,
+						 CExpressionArray *pdrgpexpr,
 						 CExpression *pexpr) override;
 
 	// hash function for routed distribution spec
@@ -91,7 +94,7 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CDistributionSpecRouted *
+	static gpos::cast_func<CDistributionSpecRouted *>
 	PdsConvert(CDistributionSpec *pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
@@ -101,8 +104,8 @@ public:
 	}
 
 	// conversion function - const argument
-	static const CDistributionSpecRouted *
-	PdsConvert(const CDistributionSpec *pds)
+	static gpos::pointer<const CDistributionSpecRouted *>
+	PdsConvert(gpos::pointer<const CDistributionSpec *> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtRouted == pds->Edt());

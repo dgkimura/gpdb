@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerWindowSpecList_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLWindowSpec.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -35,7 +36,7 @@ class CParseHandlerWindowSpecList : public CParseHandlerBase
 {
 private:
 	// list of window specifications
-	CDXLWindowSpecArray *m_window_spec_array;
+	gpos::pointer<CDXLWindowSpecArray *> m_window_spec_array;
 
 	// process the start of an element
 	void StartElement(
@@ -61,7 +62,7 @@ public:
 								CParseHandlerBase *pph);
 
 	// list of window keys
-	CDXLWindowSpecArray *
+	gpos::pointer<CDXLWindowSpecArray *>
 	GetDxlWindowSpecArray() const
 	{
 		return m_window_spec_array;

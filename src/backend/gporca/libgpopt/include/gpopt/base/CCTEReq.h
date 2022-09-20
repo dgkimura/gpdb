@@ -60,7 +60,7 @@ private:
 		BOOL m_fRequired;
 
 		// plan properties of corresponding producer
-		CDrvdPropPlan *m_pdpplan;
+		gpos::owner<CDrvdPropPlan *> m_pdpplan;
 
 	public:
 		CCTEReqEntry(const CCTEReqEntry &) = delete;
@@ -127,13 +127,13 @@ private:
 	CMemoryPool *m_mp;
 
 	// cte map
-	UlongToCTEReqEntryMap *m_phmcter;
+	gpos::owner<UlongToCTEReqEntryMap *> m_phmcter;
 
 	// required cte ids (not optional)
-	ULongPtrArray *m_pdrgpulRequired;
+	gpos::owner<ULongPtrArray *> m_pdrgpulRequired;
 
 	// lookup info for given cte id
-	CCTEReqEntry *PcreLookup(ULONG ulCteId) const;
+	gpos::pointer<CCTEReqEntry *> PcreLookup(ULONG ulCteId) const;
 
 public:
 	CCTEReq(const CCTEReq &) = delete;

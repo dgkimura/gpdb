@@ -13,6 +13,7 @@
 #include "gpopt/xforms/CXformExpandNAryJoinMinCard.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CLogicalNAryJoin.h"
@@ -84,10 +85,11 @@ CXformExpandNAryJoinMinCard::Transform(CXformContext *pxfctxt,
 	const ULONG arity = pexpr->Arity();
 	GPOS_ASSERT(arity >= 3);
 
-	CExpressionArray *pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexpr =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
-		CExpression *pexprChild = (*pexpr)[ul];
+		gpos::owner<CExpression *> pexprChild = (*pexpr)[ul];
 		pexprChild->AddRef();
 		pdrgpexpr->Append(pexprChild);
 	}
@@ -98,7 +100,7 @@ CXformExpandNAryJoinMinCard::Transform(CXformContext *pxfctxt,
 
 	// create a join order based on cardinality of intermediate results
 	CJoinOrderMinCard jomc(mp, pdrgpexpr, pdrgpexprPreds);
-	CExpression *pexprResult = jomc.PexprExpand();
+	gpos::owner<CExpression *> pexprResult = jomc.PexprExpand();
 
 	// normalize resulting expression
 	CExpression *pexprNormalized = CNormalizer::PexprNormalize(mp, pexprResult);

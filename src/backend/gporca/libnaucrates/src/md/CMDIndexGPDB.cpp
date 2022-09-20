@@ -12,6 +12,7 @@
 
 #include "naucrates/md/CMDIndexGPDB.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -274,7 +275,7 @@ CMDIndexGPDB::GetIncludedColPos(ULONG column) const
 //		Return the part constraint
 //
 //---------------------------------------------------------------------------
-IMDPartConstraint *
+gpos::pointer<IMDPartConstraint *>
 CMDIndexGPDB::MDPartConstraint() const
 {
 	return m_mdpart_constraint;
@@ -416,7 +417,8 @@ CMDIndexGPDB::GetIndexRetItemTypeMdid() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIndexGPDB::IsCompatible(const IMDScalarOp *md_scalar_op, ULONG key_pos) const
+CMDIndexGPDB::IsCompatible(gpos::pointer<const IMDScalarOp *> md_scalar_op,
+						   ULONG key_pos) const
 {
 	GPOS_ASSERT(nullptr != md_scalar_op);
 	GPOS_ASSERT(key_pos < m_mdid_opfamilies_array->Size());

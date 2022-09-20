@@ -12,6 +12,7 @@
 #define GPOPT_CScalarSortGroupClause_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CDrvdProp.h"
@@ -93,7 +94,7 @@ public:
 	BOOL Matches(COperator *op) const override;
 
 	// conversion function
-	static CScalarSortGroupClause *
+	static gpos::cast_func<CScalarSortGroupClause *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
@@ -112,13 +113,14 @@ public:
 	INT TypeModifier() const override;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *) const override;
+	EBoolEvalResult Eber(gpos::pointer<ULongPtrArray *>) const override;
 
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}

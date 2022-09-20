@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/operators/CDXLLogicalCTAS.h"
 
+#include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
 #include "naucrates/dxl/CDXLUtils.h"
@@ -153,7 +154,7 @@ CDXLLogicalCTAS::IsColDefined(ULONG colid) const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *dxlnode) const
+								gpos::pointer<const CDXLNode *> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

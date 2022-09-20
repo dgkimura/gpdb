@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalDynamicGet.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
@@ -138,7 +139,7 @@ CLogicalDynamicGet::Matches(COperator *pop) const
 //		Return a copy of the operator with remapped columns
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::owner<COperator *>
 CLogicalDynamicGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
 											   UlongToColRefMap *colref_mapping,
 											   BOOL must_exist)
@@ -206,7 +207,7 @@ CLogicalDynamicGet::DeriveMaxCard(CMemoryPool *mp,
 CXformSet *
 CLogicalDynamicGet::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 	(void) xform_set->ExchangeSet(CXform::ExfDynamicGet2DynamicTableScan);
 	return xform_set;
 }
@@ -264,7 +265,8 @@ CLogicalDynamicGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	IStatistics *stats =
 		PstatsDeriveFilter(mp, exprhdl, prprel->PexprPartPred());
 
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
+	gpos::owner<CColRefSet *> pcrs =
+		GPOS_NEW(mp) CColRefSet(mp, m_pdrgpcrOutput);
 	CUpperBoundNDVs *upper_bound_NDVs =
 		GPOS_NEW(mp) CUpperBoundNDVs(pcrs, stats->Rows());
 	CStatistics::CastStats(stats)->AddCardUpperBound(upper_bound_NDVs);
@@ -281,14 +283,14 @@ CLogicalDynamicGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 IStatistics *
-CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   CExpression *pexprFilter) const
+CLogicalDynamicGet::PstatsDeriveFilter(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::owner<CExpression *> pexprFilter) const
 {
 	GPOS_ASSERT(COperator::EopLogicalDynamicGet == exprhdl.Pop()->Eopid());
 	CLogicalDynamicGet *dyn_get = CLogicalDynamicGet::PopConvert(exprhdl.Pop());
 
-	CColRefSet *pcrsStat = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsStat = GPOS_NEW(mp) CColRefSet(mp);
 
 	if (nullptr != pexprFilter)
 	{
@@ -302,7 +304,7 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 		pcrsStat->Include(m_pcrsDist);
 	}
 
-	CStatistics *pstatsFullTable = dynamic_cast<CStatistics *>(
+	gpos::owner<CStatistics *> pstatsFullTable = dynamic_cast<CStatistics *>(
 		PstatsBaseTable(mp, exprhdl, m_ptabdesc, pcrsStat));
 
 	pcrsStat->Release();
@@ -312,7 +314,7 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 		return pstatsFullTable;
 	}
 
-	CExpression *pexprFilterNew;
+	gpos::owner<CExpression *> pexprFilterNew;
 	if (dyn_get->FStaticPruned())
 	{
 		// Static pruned Dynamic Table Scan uses the CExpression of
@@ -340,7 +342,7 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 		pexprFilterNew = pexprFilter;
 	}
 
-	CStatsPred *pred_stats = CStatsPredUtils::ExtractPredStats(
+	gpos::owner<CStatsPred *> pred_stats = CStatsPredUtils::ExtractPredStats(
 		mp, pexprFilterNew, nullptr /*outer_refs*/
 	);
 	pexprFilterNew->Release();

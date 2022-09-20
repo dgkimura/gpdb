@@ -20,6 +20,7 @@
 #define GPOPT_CScalarArrayCoerceExpr_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CScalarCoerceBase.h"
 
@@ -73,7 +74,7 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// conversion function
-	static CScalarArrayCoerceExpr *PopConvert(COperator *pop);
+	static gpos::cast_func<CScalarArrayCoerceExpr *> PopConvert(COperator *pop);
 
 };	// class CScalarArrayCoerceExpr
 

@@ -115,7 +115,7 @@ private:
 	CDouble m_dCostThreshold;
 
 	// sampled plans
-	SSamplePlanArray *m_pdrgpsp;
+	gpos::owner<SSamplePlanArray *> m_pdrgpsp;
 
 	// step value used in fitting cost distribution
 	CDouble m_dStep;

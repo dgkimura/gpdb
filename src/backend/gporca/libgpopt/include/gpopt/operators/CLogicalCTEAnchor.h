@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalCTEAnchor_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogical.h"
@@ -79,10 +80,11 @@ public:
 
 	// return a copy of the operator with remapped columns
 	COperator *
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
-							   ) override
+	PopCopyWithRemappedColumns(
+		CMemoryPool *,						//mp,
+		gpos::pointer<UlongToColRefMap *>,	//colref_mapping,
+		BOOL								//must_exist
+		) override
 	{
 		return PopCopyDefault();
 	}
@@ -153,7 +155,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalCTEAnchor *
+	static gpos::cast_func<CLogicalCTEAnchor *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

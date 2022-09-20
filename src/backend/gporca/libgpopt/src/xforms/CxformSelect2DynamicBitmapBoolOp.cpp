@@ -18,6 +18,8 @@
 
 #include "gpopt/xforms/CXformSelect2DynamicBitmapBoolOp.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/operators/CLogicalDynamicGet.h"
 #include "gpopt/operators/CLogicalSelect.h"
 #include "gpopt/xforms/CXformUtils.h"
@@ -78,7 +80,8 @@ CXformSelect2DynamicBitmapBoolOp::Transform(CXformContext *pxfctxt,
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CExpression *pexprResult = CXformUtils::PexprSelect2BitmapBoolOp(mp, pexpr);
+	gpos::owner<CExpression *> pexprResult =
+		CXformUtils::PexprSelect2BitmapBoolOp(mp, pexpr);
 
 	if (nullptr != pexprResult)
 	{

@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformInlineCTEConsumer.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalCTEConsumer.h"
@@ -67,7 +68,7 @@ CXformInlineCTEConsumer::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformInlineCTEConsumer::Transform(CXformContext *
+CXformInlineCTEConsumer::Transform(gpos::pointer<CXformContext *>
 #ifdef GPOS_DEBUG
 									   pxfctxt
 #endif
@@ -82,7 +83,7 @@ CXformInlineCTEConsumer::Transform(CXformContext *
 	// inline the consumer
 	CLogicalCTEConsumer *popConsumer =
 		CLogicalCTEConsumer::PopConvert(pexpr->Pop());
-	CExpression *pexprAlt = popConsumer->PexprInlined();
+	gpos::owner<CExpression *> pexprAlt = popConsumer->PexprInlined();
 	pexprAlt->AddRef();
 	// add alternative to xform result
 	pxfres->Add(pexprAlt);

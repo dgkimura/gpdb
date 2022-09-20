@@ -12,6 +12,7 @@
 #include "gpopt/operators/COperator.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CDrvdPropRelational.h"
 #include "gpopt/base/CReqdPropRelational.h"
@@ -107,7 +108,7 @@ COperator::EfsDeriveFromChildren(CExpressionHandle &exprhdl,
 //		Derive function properties from child expressions
 //
 //---------------------------------------------------------------------------
-CFunctionProp *
+gpos::owner<CFunctionProp *>
 COperator::PfpDeriveFromChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 IMDFunction::EFuncStbl efsDefault,
 								 BOOL fHasVolatileFunctionScan, BOOL fScan)

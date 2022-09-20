@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalIndexScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 #include "naucrates/md/IMDCacheObject.h"
@@ -89,7 +91,7 @@ CDXLPhysicalIndexScan::GetOpNameStr() const
 //		Index descriptor for the index scan
 //
 //---------------------------------------------------------------------------
-const CDXLIndexDescr *
+gpos::pointer<const CDXLIndexDescr *>
 CDXLPhysicalIndexScan::GetDXLIndexDescr() const
 {
 	return m_dxl_index_descr;
@@ -117,7 +119,7 @@ CDXLPhysicalIndexScan::GetIndexScanDir() const
 //		Return the associated table descriptor
 //
 //---------------------------------------------------------------------------
-const CDXLTableDescr *
+gpos::pointer<const CDXLTableDescr *>
 CDXLPhysicalIndexScan::GetDXLTableDescr() const
 {
 	return m_dxl_table_descr;
@@ -132,8 +134,8 @@ CDXLPhysicalIndexScan::GetDXLTableDescr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer,
-									  const CDXLNode *node) const
+CDXLPhysicalIndexScan::SerializeToDXL(
+	CXMLSerializer *xml_serializer, gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -150,7 +152,7 @@ CDXLPhysicalIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer,
 	node->SerializeChildrenToDXL(xml_serializer);
 
 	// serialize partition mdids (null in this case)
-	IMdIdArray *empty = GPOS_NEW(m_mp) IMdIdArray(m_mp);
+	gpos::owner<IMdIdArray *> empty = GPOS_NEW(m_mp) IMdIdArray(m_mp);
 	IMDCacheObject::SerializeMDIdList(
 		xml_serializer, empty, CDXLTokens::GetDXLTokenStr(EdxltokenPartitions),
 		CDXLTokens::GetDXLTokenStr(EdxltokenPartition));

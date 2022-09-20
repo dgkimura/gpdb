@@ -13,6 +13,7 @@
 #define GPDXL_CDXLPhysicalExternalScan_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalTableScan.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
@@ -45,7 +46,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLPhysicalExternalScan *
+	static gpos::cast_func<CDXLPhysicalExternalScan *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

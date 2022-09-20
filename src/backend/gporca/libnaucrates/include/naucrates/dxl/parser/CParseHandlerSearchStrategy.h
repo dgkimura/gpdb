@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerSearchStrategy_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/search/CSearchStage.h"
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
@@ -33,7 +34,7 @@ class CParseHandlerSearchStrategy : public CParseHandlerBase
 {
 private:
 	// search stages
-	CSearchStageArray *m_search_stage_array;
+	gpos::owner<CSearchStageArray *> m_search_stage_array;
 
 	// process the start of an element
 	void StartElement(
@@ -62,7 +63,7 @@ public:
 	~CParseHandlerSearchStrategy() override;
 
 	// returns the dxl representation of search stages
-	CSearchStageArray *
+	gpos::pointer<CSearchStageArray *>
 	GetSearchStageArray()
 	{
 		return m_search_stage_array;

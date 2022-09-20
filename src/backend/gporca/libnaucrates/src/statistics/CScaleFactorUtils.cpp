@@ -12,6 +12,7 @@
 #include "naucrates/statistics/CScaleFactorUtils.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/exception.h"
 #include "gpopt/operators/CExpressionUtils.h"
@@ -53,8 +54,8 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 
 	// create a hashmap of size 7 as we don't anticipate many join conditions here. Creating a larger map
 	// would be wasted memory.
-	CScaleFactorUtils::OIDPairToScaleFactorArrayMap *scale_factor_hashmap =
-		GPOS_NEW(mp) OIDPairToScaleFactorArrayMap(mp, 7);
+	gpos::owner<CScaleFactorUtils::OIDPairToScaleFactorArrayMap *>
+		scale_factor_hashmap = GPOS_NEW(mp) OIDPairToScaleFactorArrayMap(mp, 7);
 
 	// If a dist col = dist col predicate exists, it needs to be the first element in the scale factor array
 	// so that the predicate does not get damped, and any following predicate will be damped accordingly.
@@ -74,7 +75,7 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 			// the array of scale factors in the order of damping
 			// i.e. the scale_factor_array[0] is not damped, and any subsequent
 			// element in the array is damped by the nth_root.
-			CDoubleArray *scale_factor_array =
+			gpos::owner<CDoubleArray *> scale_factor_array =
 				scale_factor_hashmap->Find(oid_pair);
 
 			// no predicates have been added, so create the scale factor array
@@ -99,7 +100,7 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 					// it is a dist key pred and none exist yet in the scale_factor array
 					// so add it here as the first element in the scale factor array
 					GPOS_ASSERT(scale_factor_array);
-					CDoubleArray *new_scale_factor_array =
+					gpos::owner<CDoubleArray *> new_scale_factor_array =
 						GPOS_NEW(mp) CDoubleArray(mp);
 					// add the dist key pred as the first predicate
 					new_scale_factor_array->Append(
@@ -163,7 +164,7 @@ CScaleFactorUtils::CalcCumulativeScaleFactorSqrtAlg(
 	// calculate damping using new sqrt algorithm
 	while (iter.Advance())
 	{
-		const CDoubleArray *scale_factor_array = iter.Value();
+		gpos::pointer<const CDoubleArray *> scale_factor_array = iter.Value();
 
 		// damp the join preds if they are on the same tables (ex: t1.a = t2.a AND t1.b = t2.b)
 		for (ULONG ul = 0; ul < scale_factor_array->Size(); ul++)
@@ -199,7 +200,7 @@ CScaleFactorUtils::CalcCumulativeScaleFactorSqrtAlg(
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CumulativeJoinScaleFactor(
-	CMemoryPool *mp, const CStatisticsConfig *stats_config,
+	CMemoryPool *mp, gpos::pointer<const CStatisticsConfig *> stats_config,
 	SJoinConditionArray *join_conds_scale_factors,
 	CDouble limit_for_result_scale_factor)
 {
@@ -261,10 +262,11 @@ CScaleFactorUtils::CumulativeJoinScaleFactor(
 	else
 	{
 		// save the join preds that are not simple equalities in a different array
-		CDoubleArray *independent_join_preds = GPOS_NEW(mp) CDoubleArray(mp);
+		gpos::owner<CDoubleArray *> independent_join_preds =
+			GPOS_NEW(mp) CDoubleArray(mp);
 		// create the map of sorted join preds
-		CScaleFactorUtils::OIDPairToScaleFactorArrayMap *scale_factor_hashmap =
-			CScaleFactorUtils::GenerateScaleFactorMap(
+		gpos::owner<CScaleFactorUtils::OIDPairToScaleFactorArrayMap *>
+			scale_factor_hashmap = CScaleFactorUtils::GenerateScaleFactorMap(
 				mp, join_conds_scale_factors, independent_join_preds);
 
 		cumulative_scale_factor =
@@ -304,8 +306,8 @@ CScaleFactorUtils::CumulativeJoinScaleFactor(
 //
 //---------------------------------------------------------------------------
 CDouble
-CScaleFactorUtils::DampedJoinScaleFactor(const CStatisticsConfig *stats_config,
-										 ULONG num_columns)
+CScaleFactorUtils::DampedJoinScaleFactor(
+	gpos::pointer<const CStatisticsConfig *> stats_config, ULONG num_columns)
 {
 	if (1 >= num_columns)
 	{
@@ -326,7 +328,7 @@ CScaleFactorUtils::DampedJoinScaleFactor(const CStatisticsConfig *stats_config,
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::DampedFilterScaleFactor(
-	const CStatisticsConfig *stats_config, ULONG num_columns)
+	gpos::pointer<const CStatisticsConfig *> stats_config, ULONG num_columns)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 
@@ -349,7 +351,7 @@ CScaleFactorUtils::DampedFilterScaleFactor(
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::DampedGroupByScaleFactor(
-	const CStatisticsConfig *stats_config, ULONG num_columns)
+	gpos::pointer<const CStatisticsConfig *> stats_config, ULONG num_columns)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 
@@ -495,7 +497,8 @@ CScaleFactorUtils::DoubleCmpFunc(const CDouble *double_val1,
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CalcScaleFactorCumulativeConj(
-	const CStatisticsConfig *stats_config, CDoubleArray *scale_factors)
+	gpos::pointer<const CStatisticsConfig *> stats_config,
+	CDoubleArray *scale_factors)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 	GPOS_ASSERT(nullptr != scale_factors);
@@ -535,8 +538,8 @@ CScaleFactorUtils::CalcScaleFactorCumulativeConj(
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CalcScaleFactorCumulativeDisj(
-	const CStatisticsConfig *stats_config, CDoubleArray *scale_factors,
-	CDouble total_rows)
+	gpos::pointer<const CStatisticsConfig *> stats_config,
+	CDoubleArray *scale_factors, CDouble total_rows)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 	GPOS_ASSERT(nullptr != scale_factors);

@@ -19,6 +19,7 @@
 #define GPDXL_CDXLScalarRecheckCondFilter_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarFilter.h"
 
@@ -63,7 +64,7 @@ public:
 	}
 
 	// conversion function
-	static CDXLScalarRecheckCondFilter *
+	static gpos::cast_func<CDXLScalarRecheckCondFilter *>
 	Cast(CDXLOperator *dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);

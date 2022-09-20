@@ -17,6 +17,8 @@
 
 #include "gpopt/eval/CConstExprEvaluatorDXL.h"
 
+#include "gpos/common/owner.h"
+
 #include "gpopt/base/CDrvdPropScalar.h"
 #include "gpopt/eval/IConstDXLNodeEvaluator.h"
 #include "gpopt/exception.h"
@@ -76,8 +78,9 @@ CConstExprEvaluatorDXL::PexprEval(CExpression *pexpr)
 	{
 		GPOS_RAISE(gpopt::ExmaGPOPT, gpopt::ExmiEvalUnsupportedScalarExpr);
 	}
-	CDXLNode *pdxlnExpr = m_trexpr2dxl.PdxlnScalar(pexpr);
-	CDXLNode *pdxlnResult = m_pconstdxleval->EvaluateExpr(pdxlnExpr);
+	gpos::owner<CDXLNode *> pdxlnExpr = m_trexpr2dxl.PdxlnScalar(pexpr);
+	gpos::owner<CDXLNode *> pdxlnResult =
+		m_pconstdxleval->EvaluateExpr(pdxlnExpr);
 
 	GPOS_ASSERT(EdxloptypeScalar ==
 				pdxlnResult->GetOperator()->GetDXLOperatorType());

@@ -11,6 +11,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalMotion.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -45,7 +47,7 @@ CDXLPhysicalMotion::~CDXLPhysicalMotion()
 //
 //
 //---------------------------------------------------------------------------
-const IntPtrArray *
+gpos::pointer<const IntPtrArray *>
 CDXLPhysicalMotion::GetInputSegIdsArray() const
 {
 	return m_input_segids_array;
@@ -59,7 +61,7 @@ CDXLPhysicalMotion::GetInputSegIdsArray() const
 //
 //
 //---------------------------------------------------------------------------
-const IntPtrArray *
+gpos::pointer<const IntPtrArray *>
 CDXLPhysicalMotion::GetOutputSegIdsArray() const
 {
 	return m_output_segids_array;
@@ -128,7 +130,7 @@ CDXLPhysicalMotion::SetSegmentInfo(IntPtrArray *input_segids_array,
 //---------------------------------------------------------------------------
 CWStringDynamic *
 CDXLPhysicalMotion::GetSegIdsCommaSeparatedStr(
-	const IntPtrArray *segment_ids_array) const
+	gpos::pointer<const IntPtrArray *> segment_ids_array) const
 {
 	GPOS_ASSERT(segment_ids_array != nullptr && 0 < segment_ids_array->Size());
 

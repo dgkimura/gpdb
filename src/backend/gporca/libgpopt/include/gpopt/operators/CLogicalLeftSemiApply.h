@@ -12,6 +12,7 @@
 #define GPOPT_CLogicalLeftSemiApply_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalApply.h"
 
@@ -116,9 +117,9 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// return a copy of the operator with remapped columns
-	COperator *PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) override;
+	gpos::owner<COperator *> PopCopyWithRemappedColumns(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		BOOL must_exist) override;
 
 	// return true if operator is a left semi apply
 	BOOL
@@ -128,7 +129,7 @@ public:
 	}
 
 	// conversion function
-	static CLogicalLeftSemiApply *
+	static gpos::cast_func<CLogicalLeftSemiApply *>
 	PopConvert(COperator *pop)
 	{
 		GPOS_ASSERT(nullptr != pop);

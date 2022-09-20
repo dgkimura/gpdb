@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformExpandFullOuterJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalCTEAnchor.h"
@@ -131,12 +132,13 @@ CXformExpandFullOuterJoin::Transform(CXformContext *pxfctxt,
 	// 4. create the UNION ALL expression
 
 	// output columns of the union are the same as the outputs of the first child (LOJ)
-	CColRefArray *pdrgpcrOutput = GPOS_NEW(mp) CColRefArray(mp);
+	gpos::owner<CColRefArray *> pdrgpcrOutput = GPOS_NEW(mp) CColRefArray(mp);
 	pdrgpcrOutput->AppendArray(pdrgpcrOutA);
 	pdrgpcrOutput->AppendArray(pdrgpcrOutB);
 
 	// input columns of the union
-	CColRef2dArray *pdrgdrgpcrInput = GPOS_NEW(mp) CColRef2dArray(mp);
+	gpos::owner<CColRef2dArray *> pdrgdrgpcrInput =
+		GPOS_NEW(mp) CColRef2dArray(mp);
 
 	// inputs from the first child (LOJ)
 	pdrgpcrOutput->AddRef();
@@ -144,7 +146,7 @@ CXformExpandFullOuterJoin::Transform(CXformContext *pxfctxt,
 
 	// inputs from the second child have to be in the correct order
 	// a. add new computed columns from the project only
-	CColRefSet *pcrsProjOnly = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrsProjOnly = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsProjOnly->Include(pexprProject->DeriveOutputColumns());
 	pcrsProjOnly->Exclude(pdrgpcrRightB);
 	CColRefArray *pdrgpcrProj = pcrsProjOnly->Pdrgpcr(mp);
@@ -154,16 +156,16 @@ CXformExpandFullOuterJoin::Transform(CXformContext *pxfctxt,
 
 	pdrgdrgpcrInput->Append(pdrgpcrProj);
 
-	CExpression *pexprUnionAll = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprUnionAll = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalUnionAll(mp, pdrgpcrOutput, pdrgdrgpcrInput),
 		pexprLOJ, pexprProject);
 
 	// 5. Add CTE anchor for the B subtree
-	CExpression *pexprAnchorB = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAnchorB = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEIdB), pexprUnionAll);
 
 	// 6. Add CTE anchor for the A subtree
-	CExpression *pexprAnchorA = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAnchorA = GPOS_NEW(mp) CExpression(
 		mp, GPOS_NEW(mp) CLogicalCTEAnchor(mp, ulCTEIdA), pexprAnchorB);
 
 	// add alternative to xform result
@@ -187,17 +189,20 @@ CXformExpandFullOuterJoin::PexprLogicalJoinOverCTEs(
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 
-	CExpressionArray *pdrgpexprChildren = GPOS_NEW(mp) CExpressionArray(mp);
+	gpos::owner<CExpressionArray *> pdrgpexprChildren =
+		GPOS_NEW(mp) CExpressionArray(mp);
 	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 
-	CLogicalCTEConsumer *popConsumerLeft =
+	gpos::owner<CLogicalCTEConsumer *> popConsumerLeft =
 		GPOS_NEW(mp) CLogicalCTEConsumer(mp, ulLeftCTEId, pdrgpcrLeft);
-	CExpression *pexprLeft = GPOS_NEW(mp) CExpression(mp, popConsumerLeft);
+	gpos::owner<CExpression *> pexprLeft =
+		GPOS_NEW(mp) CExpression(mp, popConsumerLeft);
 	pcteinfo->IncrementConsumers(ulLeftCTEId);
 
-	CLogicalCTEConsumer *popConsumerRight =
+	gpos::owner<CLogicalCTEConsumer *> popConsumerRight =
 		GPOS_NEW(mp) CLogicalCTEConsumer(mp, ulRightCTEId, pdrgpcrRight);
-	CExpression *pexprRight = GPOS_NEW(mp) CExpression(mp, popConsumerRight);
+	gpos::owner<CExpression *> pexprRight =
+		GPOS_NEW(mp) CExpression(mp, popConsumerRight);
 	pcteinfo->IncrementConsumers(ulRightCTEId);
 
 	pdrgpexprChildren->Append(pexprLeft);

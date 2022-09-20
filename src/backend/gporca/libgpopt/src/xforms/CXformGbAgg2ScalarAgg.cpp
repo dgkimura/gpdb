@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformGbAgg2ScalarAgg.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CPatternLeaf.h"
@@ -82,7 +83,7 @@ CXformGbAgg2ScalarAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	CLogicalGbAgg *popAgg = CLogicalGbAgg::PopConvert(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CColRefArray *colref_array = popAgg->Pdrgpcr();
+	gpos::owner<CColRefArray *> colref_array = popAgg->Pdrgpcr();
 	colref_array->AddRef();
 
 	// extract components
@@ -100,7 +101,7 @@ CXformGbAgg2ScalarAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	// create alternative expression
-	CExpression *pexprAlt = GPOS_NEW(mp) CExpression(
+	gpos::owner<CExpression *> pexprAlt = GPOS_NEW(mp) CExpression(
 		mp,
 		GPOS_NEW(mp) CPhysicalScalarAgg(
 			mp, colref_array, popAgg->PdrgpcrMinimal(), popAgg->Egbaggtype(),

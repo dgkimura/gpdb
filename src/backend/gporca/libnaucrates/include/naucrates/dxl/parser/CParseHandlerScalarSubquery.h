@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerScalarSubquery_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLScalarSubquery.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
@@ -36,7 +37,7 @@ class CParseHandlerScalarSubquery : public CParseHandlerScalarOp
 {
 private:
 	// scalar subquery operator
-	CDXLScalarSubquery *m_dxl_op;
+	gpos::pointer<CDXLScalarSubquery *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

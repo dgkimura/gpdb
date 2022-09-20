@@ -13,6 +13,7 @@
 #define GPDXL_CParseHandlerLimit_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/operators/CDXLPhysicalLimit.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
@@ -34,7 +35,7 @@ XERCES_CPP_NAMESPACE_USE
 class CParseHandlerLimit : public CParseHandlerPhysicalOp
 {
 private:
-	CDXLPhysicalLimit *m_dxl_op;
+	gpos::pointer<CDXLPhysicalLimit *> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

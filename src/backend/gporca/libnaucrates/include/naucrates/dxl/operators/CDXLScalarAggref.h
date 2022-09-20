@@ -75,7 +75,7 @@ private:
 
 	EdxlAggrefKind m_aggkind;
 
-	ULongPtrArray *m_argtypes;
+	gpos::owner<ULongPtrArray *> m_argtypes;
 
 public:
 	CDXLScalarAggref(const CDXLScalarAggref &) = delete;

@@ -14,6 +14,7 @@
 #define GPDXL_CParseHandlerQueryOutput_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "naucrates/dxl/parser/CParseHandlerBase.h"
 
@@ -36,7 +37,7 @@ class CParseHandlerQueryOutput : public CParseHandlerBase
 {
 private:
 	// list of scalar ident nodes representing the query output
-	CDXLNodeArray *m_dxl_array;
+	gpos::owner<CDXLNodeArray *> m_dxl_array;
 
 	// process the start of an element
 	void StartElement(
@@ -65,7 +66,7 @@ public:
 
 
 	// return the list of output scalar ident nodes
-	CDXLNodeArray *GetOutputColumnsDXLArray();
+	gpos::pointer<CDXLNodeArray *> GetOutputColumnsDXLArray();
 };
 }  // namespace gpdxl
 

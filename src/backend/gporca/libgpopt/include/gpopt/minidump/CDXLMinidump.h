@@ -36,28 +36,28 @@ class CDXLMinidump
 {
 private:
 	// traceflags
-	CBitSet *m_pbs;
+	gpos::owner<CBitSet *> m_pbs;
 
 	// optimizer configuration
-	COptimizerConfig *m_optimizer_config;
+	gpos::owner<COptimizerConfig *> m_optimizer_config;
 
 	// DXL query tree
-	CDXLNode *m_query_dxl_root;
+	gpos::owner<CDXLNode *> m_query_dxl_root;
 
 	// Array of DXL nodes that represent the query output
-	CDXLNodeArray *m_query_output;
+	gpos::owner<CDXLNodeArray *> m_query_output;
 
 	// Array of DXL nodes that represent the CTE producers
-	CDXLNodeArray *m_cte_producers;
+	gpos::owner<CDXLNodeArray *> m_cte_producers;
 
 	// DXL plan
-	CDXLNode *m_plan_dxl_root;
+	gpos::owner<CDXLNode *> m_plan_dxl_root;
 
 	// metadata objects
-	IMDCacheObjectArray *m_mdid_cached_obj_array;
+	gpos::owner<IMDCacheObjectArray *> m_mdid_cached_obj_array;
 
 	// source system ids
-	CSystemIdArray *m_system_id_array;
+	gpos::owner<CSystemIdArray *> m_system_id_array;
 
 	// plan Id
 	ULLONG m_plan_id;
@@ -102,10 +102,10 @@ public:
 	gpos::pointer<const CDXLNode *> PdxlnPlan() const;
 
 	// metadata objects
-	const IMDCacheObjectArray *GetMdIdCachedObjArray() const;
+	gpos::pointer<const IMDCacheObjectArray *> GetMdIdCachedObjArray() const;
 
 	// source system ids
-	const CSystemIdArray *GetSysidPtrArray() const;
+	gpos::pointer<const CSystemIdArray *> GetSysidPtrArray() const;
 
 	// return plan id
 	ULLONG GetPlanId() const;

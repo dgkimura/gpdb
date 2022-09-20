@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/clibwrapper.h"
+#include "gpos/common/owner.h"
 #include "gpos/io/COstreamString.h"
 #include "gpos/string/CWStringDynamic.h"
 
@@ -72,7 +73,7 @@ CJoinOrderMinCard::~CJoinOrderMinCard()
 //		Create join order
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::owner<CExpression *>
 CJoinOrderMinCard::PexprExpand()
 {
 	GPOS_ASSERT(nullptr == m_pcompResult && "join order is already expanded");
@@ -84,7 +85,7 @@ CJoinOrderMinCard::PexprExpand()
 		CDouble dMinRows(0.0);
 		SComponent *pcompBest =
 			nullptr;  // best component to be added to current result
-		SComponent *pcompBestResult =
+		gpos::owner<SComponent *> pcompBestResult =
 			nullptr;  // result after adding best component
 
 		for (ULONG ul = 0; ul < m_ulComps; ul++)
@@ -102,7 +103,7 @@ CJoinOrderMinCard::PexprExpand()
 			}
 
 			// combine component with current result and derive stats
-			CJoinOrder::SComponent *pcompTemp =
+			gpos::owner<CJoinOrder::SComponent *> pcompTemp =
 				PcompCombine(m_pcompResult, pcompCurrent);
 			DeriveStats(pcompTemp->m_pexpr);
 			CDouble rows = pcompTemp->m_pexpr->Pstats()->Rows();
@@ -144,7 +145,7 @@ CJoinOrderMinCard::PexprExpand()
 	}
 	GPOS_ASSERT(nullptr != m_pcompResult->m_pexpr);
 
-	CExpression *pexprResult = m_pcompResult->m_pexpr;
+	gpos::owner<CExpression *> pexprResult = m_pcompResult->m_pexpr;
 	pexprResult->AddRef();
 
 	return pexprResult;

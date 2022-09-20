@@ -139,8 +139,9 @@ public:
 	CStatisticsUtils(const CStatisticsUtils &) = delete;
 
 	// get the next data point for generating new bucket boundary
-	static CPoint *NextPoint(CMemoryPool *mp, CMDAccessor *md_accessor,
-							 CPoint *point);
+	static gpos::owner<CPoint *> NextPoint(CMemoryPool *mp,
+										   CMDAccessor *md_accessor,
+										   CPoint *point);
 
 	// transform mcv information to optimizer's histogram structure
 	static CHistogram *TransformMCVToHist(CMemoryPool *mp,
@@ -210,7 +211,7 @@ public:
 		CBucketArray *dest_buckets, ULONG *start_val);
 
 	// generate a null datum with the type of passed colref
-	static IDatum *DatumNull(const CColRef *colref);
+	static gpos::owner<IDatum *> DatumNull(const CColRef *colref);
 
 #ifdef GPOS_DEBUG
 	// helper method to print the hash map of histograms
@@ -219,7 +220,7 @@ public:
 #endif	// GPOS_DEBUG
 
 	// derive statistics of dynamic scan based on part-selector stats in the given map
-	static IStatistics *DeriveStatsForDynamicScan(
+	static gpos::owner<IStatistics *> DeriveStatsForDynamicScan(
 		CMemoryPool *mp, CExpressionHandle &exprhdl, ULONG scan_id,
 		CPartitionPropagationSpec *pps_reqd);
 

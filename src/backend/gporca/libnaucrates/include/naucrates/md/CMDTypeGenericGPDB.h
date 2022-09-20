@@ -142,7 +142,7 @@ private:
 	INT m_gpdb_length;
 
 	// a null datum of this type (used for statistics comparison)
-	IDatum *m_datum_null;
+	gpos::owner<IDatum *> m_datum_null;
 
 public:
 	CMDTypeGenericGPDB(const CMDTypeGenericGPDB &) = delete;
@@ -255,11 +255,11 @@ public:
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;
 
 	// factory method for generating generic datum from CDXLScalarConstValue
-	IDatum *GetDatumForDXLConstVal(
+	gpos::owner<IDatum *> GetDatumForDXLConstVal(
 		gpos::pointer<const CDXLScalarConstValue *> dxl_op) const override;
 
 	// create typed datum from DXL datum
-	IDatum *GetDatumForDXLDatum(
+	gpos::owner<IDatum *> GetDatumForDXLDatum(
 		CMemoryPool *mp,
 		gpos::pointer<const CDXLDatum *> dxl_datum) const override;
 
@@ -284,8 +284,8 @@ public:
 	CDXLDatum *GetDXLDatumNull(CMemoryPool *mp) const override;
 
 	// generate the DXL scalar constant from IDatum
-	CDXLScalarConstValue *GetDXLOpScConst(CMemoryPool *mp,
-										  IDatum *datum) const override;
+	gpos::owner<CDXLScalarConstValue *> GetDXLOpScConst(
+		CMemoryPool *mp, IDatum *datum) const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the type in the provided stream
@@ -296,25 +296,24 @@ public:
 	BOOL IsAmbiguous() const override;
 
 	// create a dxl datum
-	static CDXLDatum *CreateDXLDatumVal(CMemoryPool *mp, IMDId *mdid,
-										gpos::pointer<const IMDType *> md_type,
-										INT type_modifier, BOOL is_null,
-										BYTE *byte_array, ULONG length,
-										LINT lint_Value, CDouble double_Value);
+	static gpos::owner<CDXLDatum *> CreateDXLDatumVal(
+		CMemoryPool *mp, IMDId *mdid, gpos::pointer<const IMDType *> md_type,
+		INT type_modifier, BOOL is_null, BYTE *byte_array, ULONG length,
+		LINT lint_Value, CDouble double_Value);
 
 	// create a dxl datum of types having double mapping
-	static CDXLDatum *CreateDXLDatumStatsDoubleMappable(
+	static gpos::owner<CDXLDatum *> CreateDXLDatumStatsDoubleMappable(
 		CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
 		BYTE *byte_array, ULONG length, LINT lint_Value, CDouble double_Value);
 
 	// create a dxl datum of types having lint mapping
-	static CDXLDatum *CreateDXLDatumStatsIntMappable(
+	static gpos::owner<CDXLDatum *> CreateDXLDatumStatsIntMappable(
 		CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
 		BYTE *byte_array, ULONG length, LINT lint_Value, CDouble double_Value);
 
 	// create a NULL constant for this type
-	IDatum *CreateGenericNullDatum(CMemoryPool *mp,
-								   INT type_modifier) const override;
+	gpos::owner<IDatum *> CreateGenericNullDatum(
+		CMemoryPool *mp, INT type_modifier) const override;
 
 	// does a datum of this type need bytea to Lint mapping for statistics computation
 	static BOOL HasByte2IntMapping(gpos::pointer<const IMDType *> mdtype);

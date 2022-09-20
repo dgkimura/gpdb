@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalAgg.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
 using namespace gpos;
@@ -130,7 +132,7 @@ CDXLPhysicalAgg::GetAggStrategyNameStr() const
 //		Grouping column indices
 //
 //---------------------------------------------------------------------------
-const ULongPtrArray *
+gpos::pointer<const ULongPtrArray *>
 CDXLPhysicalAgg::GetGroupingColidArray() const
 {
 	return m_grouping_colids_array;
@@ -206,7 +208,7 @@ CDXLPhysicalAgg::SerializeGroupingColsToDXL(
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalAgg::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *node) const
+								gpos::pointer<const CDXLNode *> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

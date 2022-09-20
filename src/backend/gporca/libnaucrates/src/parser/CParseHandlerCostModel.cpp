@@ -13,6 +13,7 @@
 #include "naucrates/dxl/parser/CParseHandlerCostModel.h"
 
 #include "gpos/common/CBitSet.h"
+#include "gpos/common/owner.h"
 
 #include "gpdbcost/CCostModelGPDB.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
@@ -174,7 +175,7 @@ CParseHandlerCostModel::EndElement(const XMLCh *const,	// element_uri,
 //		Returns the cost model config object
 //
 //---------------------------------------------------------------------------
-ICostModel *
+gpos::pointer<ICostModel *>
 CParseHandlerCostModel::GetCostModel() const
 {
 	return m_cost_model;

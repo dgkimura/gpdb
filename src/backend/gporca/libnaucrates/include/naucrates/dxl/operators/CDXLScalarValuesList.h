@@ -53,7 +53,7 @@ public:
 						const CHAR *attrname) const;
 
 	// conversion function
-	static CDXLScalarValuesList *Cast(CDXLOperator *dxl_op);
+	static gpos::cast_func<CDXLScalarValuesList *> Cast(CDXLOperator *dxl_op);
 
 	// does the operator return a boolean result
 	BOOL HasBoolResult(CMDAccessor * /*md_accessor*/) const override;

@@ -12,6 +12,7 @@
 #include "gpopt/xforms/CXformInlineCTEConsumerUnderSelect.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalCTEConsumer.h"
@@ -101,11 +102,12 @@ CXformInlineCTEConsumerUnderSelect::Transform(CXformContext *pxfctxt,
 
 	// inline consumer
 	GPOS_ASSERT(nullptr != popConsumer->Phmulcr());
-	CExpression *pexprInlinedConsumer = popConsumer->PexprInlined();
+	gpos::owner<CExpression *> pexprInlinedConsumer =
+		popConsumer->PexprInlined();
 	pexprInlinedConsumer->AddRef();
 	pexprScalar->AddRef();
 
-	CExpression *pexprSelect =
+	gpos::owner<CExpression *> pexprSelect =
 		CUtils::PexprLogicalSelect(mp, pexprInlinedConsumer, pexprScalar);
 
 	CExpression *pexprNormalized = CNormalizer::PexprNormalize(mp, pexprSelect);

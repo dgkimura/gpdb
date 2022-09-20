@@ -12,6 +12,7 @@
 #define GPOS_CSerializableOptimizerConfig_H
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 #include "gpos/error/CSerializable.h"
 #include "gpos/string/CWStringDynamic.h"
 
@@ -39,14 +40,15 @@ private:
 	CMemoryPool *m_mp;
 
 	// optimizer configurations
-	const COptimizerConfig *m_optimizer_config;
+	gpos::pointer<const COptimizerConfig *> m_optimizer_config;
 
 public:
 	CSerializableOptimizerConfig(const CSerializableOptimizerConfig &) = delete;
 
 	// ctor
-	CSerializableOptimizerConfig(CMemoryPool *mp,
-								 const COptimizerConfig *optimizer_config);
+	CSerializableOptimizerConfig(
+		CMemoryPool *mp,
+		gpos::pointer<const COptimizerConfig *> optimizer_config);
 
 	// dtor
 	~CSerializableOptimizerConfig() override;

@@ -12,6 +12,7 @@
 #include "gpopt/operators/CLogicalLeftSemiJoin.h"
 
 #include "gpos/base.h"
+#include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/operators/CExpression.h"
@@ -48,7 +49,7 @@ CLogicalLeftSemiJoin::CLogicalLeftSemiJoin(CMemoryPool *mp,
 CXformSet *
 CLogicalLeftSemiJoin::PxfsCandidates(CMemoryPool *mp) const
 {
-	CXformSet *xform_set = GPOS_NEW(mp) CXformSet(mp);
+	gpos::owner<CXformSet *> xform_set = GPOS_NEW(mp) CXformSet(mp);
 
 	(void) xform_set->ExchangeSet(CXform::ExfSemiJoinSemiJoinSwap);
 	(void) xform_set->ExchangeSet(CXform::ExfSemiJoinAntiSemiJoinSwap);
@@ -147,7 +148,7 @@ CLogicalLeftSemiJoin::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	IStatistics *outer_stats = exprhdl.Pstats(0);
 	IStatistics *inner_side_stats = exprhdl.Pstats(1);
-	CStatsPredJoinArray *join_preds_stats =
+	gpos::owner<CStatsPredJoinArray *> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExprHandle(mp, exprhdl,
 														true /*semi-join*/);
 	IStatistics *pstatsSemiJoin =
