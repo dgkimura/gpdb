@@ -1391,7 +1391,7 @@ CTranslatorQueryToDXL::IsLeadWindowFunc(CDXLOperator *dxlop)
 	{
 		CDXLScalarWindowRef *winref_dxlop = CDXLScalarWindowRef::Cast(dxlop);
 		const CMDIdGPDB *mdid_gpdb =
-			CMDIdGPDB::CastMdid(winref_dxlop->FuncMdId());
+			gpos::dyn_cast<CMDIdGPDB>(winref_dxlop->FuncMdId());
 		OID oid = mdid_gpdb->Oid();
 		is_lead_func =
 			OIDFound(oid, lead_func_oids, GPOS_ARRAY_SIZE(lead_func_oids));
@@ -1417,7 +1417,7 @@ CTranslatorQueryToDXL::IsLagWindowFunc(CDXLOperator *dxlop)
 	{
 		CDXLScalarWindowRef *winref_dxlop = CDXLScalarWindowRef::Cast(dxlop);
 		const CMDIdGPDB *mdid_gpdb =
-			CMDIdGPDB::CastMdid(winref_dxlop->FuncMdId());
+			gpos::dyn_cast<CMDIdGPDB>(winref_dxlop->FuncMdId());
 		OID oid = mdid_gpdb->Oid();
 		is_lag = OIDFound(oid, lag_func_oids, GPOS_ARRAY_SIZE(lag_func_oids));
 	}
@@ -2562,7 +2562,7 @@ CTranslatorQueryToDXL::DXLDummyConstTableGet() const
 
 	const CMDTypeBoolGPDB *md_type_bool = dynamic_cast<const CMDTypeBoolGPDB *>(
 		m_md_accessor->PtMDType<IMDTypeBool>(m_sysid));
-	const CMDIdGPDB *mdid = CMDIdGPDB::CastMdid(md_type_bool->MDId());
+	const CMDIdGPDB *mdid = gpos::dyn_cast<CMDIdGPDB>(md_type_bool->MDId());
 
 	// empty column name
 	CWStringConst str_unnamed_col(GPOS_WSZ_LIT(""));
@@ -2839,8 +2839,8 @@ CTranslatorQueryToDXL::SetOpNeedsCast(List *target_list,
 		OID expr_type_oid = gpdb::ExprType((Node *) target_entry->expr);
 		if (!target_entry->resjunk)
 		{
-			IMDId *mdid = (*input_col_mdids)[col_pos_idx];
-			if (CMDIdGPDB::CastMdid(mdid)->Oid() != expr_type_oid)
+			gpos::Ref<IMDId> mdid = (*input_col_mdids)[col_pos_idx];
+			if (gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid() != expr_type_oid)
 			{
 				return true;
 			}
@@ -3241,8 +3241,9 @@ CTranslatorQueryToDXL::TranslateRTEToDXLLogicalGet(const RangeTblEntry *rte,
 	IMdIdArray *partition_mdids = md_rel->ChildPartitionMdids();
 	for (ULONG ul = 0; partition_mdids && ul < partition_mdids->Size(); ++ul)
 	{
-		IMDId *part_mdid = (*partition_mdids)[ul];
-		const IMDRelation *partrel = m_md_accessor->RetrieveRel(part_mdid);
+		gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
+		const IMDRelation *partrel =
+			m_md_accessor->RetrieveRel(part_mdid.get());
 
 		if (partrel->RetrieveRelStorageType() ==
 			IMDRelation::ErelstorageExternal)
@@ -4522,7 +4523,7 @@ CTranslatorQueryToDXL::TranslateGroupingFuncToDXL(
 	}
 
 	const IMDType *md_type = m_md_accessor->PtMDType<IMDTypeInt4>(m_sysid);
-	CMDIdGPDB *mdid_cast = CMDIdGPDB::CastMdid(md_type->MDId());
+	CMDIdGPDB *mdid_cast = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
 	CMDIdGPDB *mdid = GPOS_NEW(m_mp) CMDIdGPDB(*mdid_cast);
 
 	CDXLDatum *datum_dxl =

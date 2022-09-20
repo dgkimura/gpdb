@@ -664,8 +664,9 @@ COptTasks::PrintMissingStatsWarning(CMemoryPool *mp, CMDAccessor *md_accessor,
 	const ULONG num_missing_col_stats = col_stats->Size();
 	for (ULONG ul = 0; ul < num_missing_col_stats; ul++)
 	{
-		IMDId *mdid = (*col_stats)[ul];
-		CMDIdColStats *mdid_col_stats = CMDIdColStats::CastMdid(mdid);
+		gpos::Ref<IMDId> mdid = (*col_stats)[ul];
+		gpos::Ref<CMDIdColStats> mdid_col_stats =
+			gpos::dyn_cast<CMDIdColStats>(mdid);
 
 		IMDId *rel_mdid = mdid_col_stats->GetRelMdId();
 		const ULONG pos = mdid_col_stats->Position();

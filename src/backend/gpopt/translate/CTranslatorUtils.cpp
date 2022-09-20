@@ -174,7 +174,7 @@ CTranslatorUtils::GetTableDescr(CMemoryPool *mp, CMDAccessor *md_accessor,
 		}
 
 		CMDName *col = GPOS_NEW(mp) CMDName(mp, md_col->Mdname().GetMDName());
-		CMDIdGPDB *col_type = CMDIdGPDB::CastMdid(md_col->MdidType());
+		CMDIdGPDB *col_type = gpos::dyn_cast<CMDIdGPDB>(md_col->MdidType());
 		col_type->AddRef();
 
 		// create a column descriptor for the column
@@ -405,8 +405,8 @@ CTranslatorUtils::ResolvePolymorphicTypes(CMemoryPool *mp,
 	// copy function return types
 	for (ULONG ul = 0; ul < num_return_args; ul++)
 	{
-		IMDId *mdid = (*return_arg_mdids)[ul];
-		arg_types[arg_index] = CMDIdGPDB::CastMdid(mdid)->Oid();
+		gpos::Ref<IMDId> mdid = (*return_arg_mdids)[ul];
+		arg_types[arg_index] = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
 		arg_modes[arg_index++] = PROARGMODE_TABLE;
 	}
 
@@ -449,8 +449,8 @@ CTranslatorUtils::ContainsPolymorphicTypes(IMdIdArray *mdid_array)
 	const ULONG len = mdid_array->Size();
 	for (ULONG ul = 0; ul < len; ul++)
 	{
-		IMDId *mdid_type = (*mdid_array)[ul];
-		if (IsPolymorphicType(CMDIdGPDB::CastMdid(mdid_type)->Oid()))
+		gpos::Ref<IMDId> mdid_type = (*mdid_array)[ul];
+		if (IsPolymorphicType(gpos::dyn_cast<CMDIdGPDB>(mdid_type)->Oid()))
 		{
 			return true;
 		}
@@ -539,8 +539,7 @@ CTranslatorUtils::GetColumnDescriptorsFromRecord(CMemoryPool *mp,
 		CMDName *col_mdname = GPOS_NEW(mp) CMDName(mp, column_name);
 		GPOS_DELETE(column_name);
 
-		IMDId *col_type = (*out_arg_types)[ul];
-		col_type->AddRef();
+		gpos::Ref<IMDId> col_type = (*out_arg_types)[ul];
 
 		// This function is only called to construct column descriptors for table-valued functions
 		// which won't have type modifiers for columns of the returned table
@@ -1166,8 +1165,8 @@ CTranslatorUtils::GenerateColIds(
 		if (!target_entry->resjunk)
 		{
 			ULONG colid = gpos::ulong_max;
-			IMDId *mdid = (*input_mdid_arr)[col_pos];
-			if (CMDIdGPDB::CastMdid(mdid)->Oid() != expr_type_oid ||
+			gpos::Ref<IMDId> mdid = (*input_mdid_arr)[col_pos];
+			if (gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid() != expr_type_oid ||
 				is_outer_ref[col_pos])
 			{
 				// generate a new column when:
@@ -1421,7 +1420,8 @@ CTranslatorUtils::CreateDummyProjectElem(CMemoryPool *mp, ULONG colid_input,
 										 ULONG colid_output,
 										 CDXLColDescr *dxl_col_descr)
 {
-	CMDIdGPDB *original_mdid = CMDIdGPDB::CastMdid(dxl_col_descr->MdidType());
+	CMDIdGPDB *original_mdid =
+		gpos::dyn_cast<CMDIdGPDB>(dxl_col_descr->MdidType());
 	CMDIdGPDB *copy_mdid = GPOS_NEW(mp)
 		CMDIdGPDB(original_mdid->Oid(), original_mdid->VersionMajor(),
 				  original_mdid->VersionMinor());
@@ -1516,7 +1516,7 @@ ULONG
 CTranslatorUtils::GetColId(ULONG query_level, INT varno, INT var_attno,
 						   IMDId *mdid, CMappingVarColId *var_colid_mapping)
 {
-	OID oid = CMDIdGPDB::CastMdid(mdid)->Oid();
+	OID oid = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
 	Var *var = gpdb::MakeVar(varno, var_attno, oid, -1, 0);
 	ULONG colid = var_colid_mapping->GetColId(query_level, var, EpspotNone);
 	gpdb::GPDBFree(var);
