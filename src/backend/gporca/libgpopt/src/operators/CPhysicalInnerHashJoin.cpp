@@ -264,7 +264,8 @@ CPhysicalInnerHashJoin::PdsDerive(CMemoryPool *mp,
 }
 
 gpos::owner<CExpression *>
-PexprJoinPredOnPartKeys(CMemoryPool *mp, CExpression *pexprScalar,
+PexprJoinPredOnPartKeys(CMemoryPool *mp,
+						gpos::pointer<CExpression *> pexprScalar,
 						gpos::pointer<CPartKeysArray *> pdrgppartkeys,
 						gpos::pointer<CColRefSet *> pcrsAllowedRefs)
 {
@@ -297,7 +298,8 @@ CPhysicalInnerHashJoin::PppsRequired(
 	GPOS_ASSERT(nullptr != pppsRequired);
 	GPOS_ASSERT(nullptr != pdrgpdpCtxt);
 
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(2 /*child_index*/);
+	gpos::pointer<CExpression *> pexprScalar =
+		exprhdl.PexprScalarExactChild(2 /*child_index*/);
 
 	// CColRefSet *pcrsOutputOuter = exprhdl.DeriveOutputColumns(0);
 	gpos::pointer<CColRefSet *> pcrsOutputInner =

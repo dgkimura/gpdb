@@ -153,7 +153,7 @@ CLogicalIntersectAll::PxfsCandidates(CMemoryPool *mp) const
 //		Derive statistics
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::owner<IStatistics *>
 CLogicalIntersectAll::PstatsDerive(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::pointer<CColRef2dArray *> pdrgpdrgpcrInput,
@@ -178,8 +178,9 @@ CLogicalIntersectAll::PstatsDerive(
 												  output_colrefsets, outer_refs,
 												  true	// is a semi-join
 		);
-	IStatistics *pstatsSemiJoin = CLogicalLeftSemiJoin::PstatsDerive(
-		mp, join_preds_stats, outer_stats, inner_side_stats);
+	gpos::owner<IStatistics *> pstatsSemiJoin =
+		CLogicalLeftSemiJoin::PstatsDerive(mp, join_preds_stats, outer_stats,
+										   inner_side_stats);
 
 	// clean up
 	pexprScCond->Release();
@@ -213,7 +214,7 @@ CLogicalIntersectAll::PstatsDerive(
 			GPOS_NEW(mp) CColRefSet(mp, (*m_pdrgpdrgpcrInput)[ul]);
 		output_colrefsets->Append(pcrs);
 	}
-	IStatistics *stats =
+	gpos::owner<IStatistics *> stats =
 		PstatsDerive(mp, exprhdl, m_pdrgpdrgpcrInput, output_colrefsets);
 
 	// clean up

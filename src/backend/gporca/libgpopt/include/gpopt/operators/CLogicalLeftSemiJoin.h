@@ -128,7 +128,7 @@ public:
 	}
 
 	// derive statistics
-	static IStatistics *PstatsDerive(
+	static gpos::owner<IStatistics *> PstatsDerive(
 		CMemoryPool *mp, gpos::pointer<CStatsPredJoinArray *> join_preds_stats,
 		gpos::pointer<IStatistics *> outer_stats,
 		gpos::pointer<IStatistics *> inner_side_stats);

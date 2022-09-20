@@ -237,7 +237,7 @@ public:
 	// LOJ with another stats structure
 	gpos::owner<IStatistics *> CalcLOJoinStats(
 		CMemoryPool *mp, gpos::pointer<const IStatistics *> other_stats,
-		CStatsPredJoinArray *join_preds_stats) const override;
+		gpos::pointer<CStatsPredJoinArray *> join_preds_stats) const override;
 
 	// left anti semi join with another stats structure
 	gpos::owner<IStatistics *> CalcLASJoinStats(

@@ -162,7 +162,7 @@ CLogicalDifferenceAll::PstatsDerive(
 												  output_colrefsets, outer_refs,
 												  true	// is an LASJ
 		);
-	IStatistics *LASJ_stats =
+	gpos::owner<IStatistics *> LASJ_stats =
 		outer_stats->CalcLASJoinStats(mp, inner_side_stats, join_preds_stats,
 									  true /* DoIgnoreLASJHistComputation*/
 		);
