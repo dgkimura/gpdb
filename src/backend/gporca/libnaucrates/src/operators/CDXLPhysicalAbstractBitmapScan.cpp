@@ -12,6 +12,8 @@
 
 #include "naucrates/dxl/operators/CDXLPhysicalAbstractBitmapScan.h"
 
+#include "gpos/common/owner.h"
+
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLTableDescr.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -43,8 +45,8 @@ CDXLPhysicalAbstractBitmapScan::~CDXLPhysicalAbstractBitmapScan()
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAbstractBitmapScan::AssertValid(const CDXLNode *node,
-											BOOL validate_children) const
+CDXLPhysicalAbstractBitmapScan::AssertValid(
+	gpos::pointer<const CDXLNode *> node, BOOL validate_children) const
 {
 	GPOS_ASSERT(4 == node->Arity());
 

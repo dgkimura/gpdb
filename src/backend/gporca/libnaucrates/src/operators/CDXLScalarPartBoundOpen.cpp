@@ -104,7 +104,7 @@ CDXLScalarPartBoundOpen::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarPartBoundOpen::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarPartBoundOpen::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 									 BOOL  // validate_children
 ) const
 {

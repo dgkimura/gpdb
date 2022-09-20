@@ -101,7 +101,7 @@ CDXLScalarBitmapIndexProbe::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBitmapIndexProbe::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarBitmapIndexProbe::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 										BOOL validate_children) const
 {
 	// bitmap index probe has 1 child: the index condition list

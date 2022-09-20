@@ -98,7 +98,8 @@ CXform::FCheckPattern(CExpression *pexpr) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CXform::FPromising(CMemoryPool *mp, const CXform *pxform, CExpression *pexpr)
+CXform::FPromising(CMemoryPool *mp, gpos::pointer<const CXform *> pxform,
+				   gpos::pointer<CExpression *> pexpr)
 {
 	GPOS_ASSERT(nullptr != pxform);
 	GPOS_ASSERT(nullptr != pexpr);

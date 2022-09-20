@@ -94,7 +94,7 @@ CDXLScalarLimitOffset::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarLimitOffset::AssertValid(const CDXLNode *node,
+CDXLScalarLimitOffset::AssertValid(gpos::pointer<const CDXLNode *> node,
 								   BOOL validate_children) const
 {
 	const ULONG arity = node->Arity();

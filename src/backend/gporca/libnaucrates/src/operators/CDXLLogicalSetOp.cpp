@@ -211,7 +211,7 @@ CDXLLogicalSetOp::IsColDefined(ULONG colid) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalSetOp::AssertValid(const CDXLNode *node,
+CDXLLogicalSetOp::AssertValid(gpos::pointer<const CDXLNode *> node,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(2 <= node->Arity());

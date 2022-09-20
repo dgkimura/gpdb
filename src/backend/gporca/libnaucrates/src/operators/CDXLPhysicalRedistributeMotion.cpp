@@ -111,8 +111,8 @@ CDXLPhysicalRedistributeMotion::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalRedistributeMotion::AssertValid(const CDXLNode *dxlnode,
-											BOOL validate_children) const
+CDXLPhysicalRedistributeMotion::AssertValid(
+	gpos::pointer<const CDXLNode *> dxlnode, BOOL validate_children) const
 {
 	// assert proj list and filter are valid
 	CDXLPhysical::AssertValid(dxlnode, validate_children);

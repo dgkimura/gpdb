@@ -525,7 +525,7 @@ CDistributionSpecTest::EresUnittest_NegativeAny()
 	CMemoryPool *mp = amp.Pmp();
 
 	// cannot add enforcers for ANY distribution
-	CDistributionSpecAny *pdsany =
+	gpos::owner<CDistributionSpecAny *> pdsany =
 		GPOS_NEW(mp) CDistributionSpecAny(COperator::EopSentinel);
 	CExpressionHandle *pexprhdl = GPOS_NEW(mp) CExpressionHandle(mp);
 	pdsany->AppendEnforcers(nullptr /*mp*/, *pexprhdl, nullptr /*prpp*/,
@@ -552,7 +552,7 @@ CDistributionSpecTest::EresUnittest_NegativeUniversal()
 	CMemoryPool *mp = amp.Pmp();
 
 	// cannot add enforcers for Universal distribution
-	CDistributionSpecUniversal *pdsuniversal =
+	gpos::owner<CDistributionSpecUniversal *> pdsuniversal =
 		GPOS_NEW(mp) CDistributionSpecUniversal();
 	CExpressionHandle *pexprhdl = GPOS_NEW(mp) CExpressionHandle(mp);
 
@@ -579,7 +579,7 @@ CDistributionSpecTest::EresUnittest_NegativeRandom()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -588,7 +588,8 @@ CDistributionSpecTest::EresUnittest_NegativeRandom()
 					 CTestUtils::GetCostModel(mp));
 
 	// cannot add enforcers for Random distribution
-	CDistributionSpecRandom *pdsrandom = GPOS_NEW(mp) CDistributionSpecRandom();
+	gpos::owner<CDistributionSpecRandom *> pdsrandom =
+		GPOS_NEW(mp) CDistributionSpecRandom();
 	CExpressionHandle *pexprhdl = GPOS_NEW(mp) CExpressionHandle(mp);
 
 	pdsrandom->AppendEnforcers(nullptr /*mp*/, *pexprhdl, nullptr /*prpp*/,

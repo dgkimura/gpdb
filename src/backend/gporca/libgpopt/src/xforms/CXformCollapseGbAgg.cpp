@@ -125,9 +125,9 @@ CXformCollapseGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 #ifdef GPOS_DEBUG
 	// for two cascaded GbAgg ops with no agg functions, top grouping
 	// columns must be a subset of bottom grouping columns
-	CColRefSet *pcrsTopGrpCols =
+	gpos::owner<CColRefSet *> pcrsTopGrpCols =
 		GPOS_NEW(mp) CColRefSet(mp, popTopGbAgg->Pdrgpcr());
-	CColRefSet *pcrsBottomGrpCols =
+	gpos::owner<CColRefSet *> pcrsBottomGrpCols =
 		GPOS_NEW(mp) CColRefSet(mp, popBottomGbAgg->Pdrgpcr());
 	GPOS_ASSERT(pcrsBottomGrpCols->ContainsAll(pcrsTopGrpCols));
 

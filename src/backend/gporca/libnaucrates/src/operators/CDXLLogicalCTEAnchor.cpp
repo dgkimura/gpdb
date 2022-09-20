@@ -97,7 +97,7 @@ CDXLLogicalCTEAnchor::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalCTEAnchor::AssertValid(const CDXLNode *dxlnode,
+CDXLLogicalCTEAnchor::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								  BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());

@@ -111,7 +111,7 @@ CDXLScalarDMLAction::HasBoolResult(CMDAccessor *  // md_accessor
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarDMLAction::AssertValid(const CDXLNode *node,
+CDXLScalarDMLAction::AssertValid(gpos::pointer<const CDXLNode *> node,
 								 BOOL  // validate_children
 ) const
 {

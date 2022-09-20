@@ -169,7 +169,7 @@ CExpressionPreprocessorTest::FHasSubqueryNotExists(
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::FHasNoOuterJoin(CExpression *pexpr)
+CExpressionPreprocessorTest::FHasNoOuterJoin(gpos::pointer<CExpression *> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopLogicalLeftOuterJoin,
@@ -188,7 +188,7 @@ CExpressionPreprocessorTest::FHasNoOuterJoin(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::HasOuterRefs(CExpression *pexpr)
+CExpressionPreprocessorTest::HasOuterRefs(gpos::pointer<CExpression *> pexpr)
 {
 	COperator *pop = pexpr->Pop();
 	BOOL fHasOuterRefs = (pop->FLogical() && CUtils::HasOuterRefs(pexpr));
@@ -217,7 +217,7 @@ CExpressionPreprocessorTest::HasOuterRefs(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::FHasSeqPrj(CExpression *pexpr)
+CExpressionPreprocessorTest::FHasSeqPrj(gpos::pointer<CExpression *> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopLogicalSequenceProject,
@@ -235,7 +235,7 @@ CExpressionPreprocessorTest::FHasSeqPrj(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::FHasIDF(CExpression *pexpr)
+CExpressionPreprocessorTest::FHasIDF(gpos::pointer<CExpression *> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopScalarIsDistinctFrom,

@@ -85,7 +85,7 @@ CDXLScalarPartListNullTest::HasBoolResult(CMDAccessor *	 //md_accessor
 #ifdef GPOS_DEBUG
 // Checks whether operator node is well-structured
 void
-CDXLScalarPartListNullTest::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarPartListNullTest::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 										BOOL  // validate_children
 ) const
 {

@@ -287,7 +287,7 @@ CDXLScalarAggref::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAggref::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarAggref::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							  BOOL validate_children) const
 {
 	EdxlAggrefStage aggrefstage =

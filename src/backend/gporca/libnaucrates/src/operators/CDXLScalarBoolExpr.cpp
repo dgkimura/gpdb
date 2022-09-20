@@ -128,7 +128,7 @@ CDXLScalarBoolExpr::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarBoolExpr::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarBoolExpr::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								BOOL validate_children) const
 {
 	EdxlBoolExprType dxl_bool_type =

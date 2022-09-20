@@ -728,7 +728,7 @@ CEngine::ApplyTransformations(CMemoryPool *pmpLocal, CXformSet *xform_set,
 		CXform *pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
 
 		// transform group expression, and insert results to memo
-		CXformResult *pxfres = GPOS_NEW(m_mp) CXformResult(m_mp);
+		gpos::owner<CXformResult *> pxfres = GPOS_NEW(m_mp) CXformResult(m_mp);
 		ULONG ulElapsedTime = 0;
 		ULONG ulNumberOfBindings = 0;
 		pgexpr->Transform(m_mp, pmpLocal, pxform, pxfres, &ulElapsedTime,
@@ -794,7 +794,8 @@ CEngine::TransitionGroupExpression(CMemoryPool *pmpLocal,
 
 	// get all applicable xforms
 	COperator *pop = pgexpr->Pop();
-	CXformSet *pxfsCandidates = CLogical::PopConvert(pop)->PxfsCandidates(m_mp);
+	gpos::owner<CXformSet *> pxfsCandidates =
+		CLogical::PopConvert(pop)->PxfsCandidates(m_mp);
 
 	// intersect them with the required set of xforms, then apply transformations
 	pxfsCandidates->Intersection(xform_set);
@@ -924,7 +925,8 @@ CEngine::PocChild(
 	exprhdlPlan.Prpp(child_index)->AddRef();
 
 	// use current stats for optimizing current child
-	IStatisticsArray *stats_ctxt = GPOS_NEW(m_mp) IStatisticsArray(m_mp);
+	gpos::owner<IStatisticsArray *> stats_ctxt =
+		GPOS_NEW(m_mp) IStatisticsArray(m_mp);
 	CUtils::AddRefAppend(stats_ctxt, pdrgpstatCurrentCtxt);
 
 	// compute required relational properties
@@ -942,7 +944,7 @@ CEngine::PocChild(
 	GPOS_ASSERT(nullptr != prprel);
 	prprel->AddRef();
 
-	COptimizationContext *pocChild = GPOS_NEW(m_mp)
+	gpos::owner<COptimizationContext *> pocChild = GPOS_NEW(m_mp)
 		COptimizationContext(m_mp, pgroupChild, exprhdlPlan.Prpp(child_index),
 							 prprel, stats_ctxt, m_ulCurrSearchStage);
 
@@ -970,7 +972,7 @@ CEngine::PccOptimizeChild(
 	CGroup *pgroupChild = (*exprhdl.Pgexpr())[child_index];
 
 	// create optimization context for child group
-	COptimizationContext *pocChild =
+	gpos::owner<COptimizationContext *> pocChild =
 		PocChild(pgexpr, pocOrigin, exprhdl, exprhdlRel, pdrgpdp,
 				 pdrgpstatCurrentCtxt, child_index, ulOptReq);
 
@@ -1024,7 +1026,7 @@ CEngine::PccOptimizeChild(
 //		Optimize child groups of a given group expression;
 //
 //---------------------------------------------------------------------------
-COptimizationContextArray *
+gpos::owner<COptimizationContextArray *>
 CEngine::PdrgpocOptimizeChildren(
 	CExpressionHandle &exprhdl,		  // initialized with required properties
 	COptimizationContext *pocOrigin,  // optimization context of parent operator
@@ -1041,10 +1043,10 @@ CEngine::PdrgpocOptimizeChildren(
 	}
 
 	// create array of child derived properties
-	CDrvdPropArray *pdrgpdp = GPOS_NEW(m_mp) CDrvdPropArray(m_mp);
+	gpos::owner<CDrvdPropArray *> pdrgpdp = GPOS_NEW(m_mp) CDrvdPropArray(m_mp);
 
 	// initialize current stats context with input stats context
-	IStatisticsArray *pdrgpstatCurrentCtxt =
+	gpos::owner<IStatisticsArray *> pdrgpstatCurrentCtxt =
 		GPOS_NEW(m_mp) IStatisticsArray(m_mp);
 	CUtils::AddRefAppend(pdrgpstatCurrentCtxt, pocOrigin->Pdrgpstat());
 
@@ -1088,7 +1090,7 @@ CEngine::PdrgpocOptimizeChildren(
 		pdrgpdp->Append(exprhdlChild.Pdp());
 
 		// copy stats of child's best cost context to current stats context
-		IStatistics *pstat = pccChildBest->Pstats();
+		gpos::owner<IStatistics *> pstat = pccChildBest->Pstats();
 		pstat->AddRef();
 		pdrgpstatCurrentCtxt->Append(pstat);
 
@@ -1144,7 +1146,7 @@ CEngine::OptimizeGroupExpression(CGroupExpression *pgexpr,
 			exprhdl.InitReqdProps(poc->Prpp());
 
 			// optimize child groups
-			COptimizationContextArray *pdrgpoc =
+			gpos::owner<COptimizationContextArray *> pdrgpoc =
 				PdrgpocOptimizeChildren(exprhdl, poc, ul);
 
 			if (nullptr != pdrgpoc &&
@@ -1311,13 +1313,14 @@ CEngine::RecursiveOptimize()
 
 		// optimize root group
 		m_pqc->Prpp()->AddRef();
-		COptimizationContext *poc = GPOS_NEW(m_mp) COptimizationContext(
-			m_mp, PgroupRoot(), m_pqc->Prpp(),
-			GPOS_NEW(m_mp) CReqdPropRelational(GPOS_NEW(m_mp) CColRefSet(
-				m_mp)),	 // pass empty required relational properties initially
-			GPOS_NEW(m_mp) IStatisticsArray(
-				m_mp),	// pass an empty stats context initially
-			m_ulCurrSearchStage);
+		gpos::owner<COptimizationContext *> poc =
+			GPOS_NEW(m_mp) COptimizationContext(
+				m_mp, PgroupRoot(), m_pqc->Prpp(),
+				GPOS_NEW(m_mp) CReqdPropRelational(GPOS_NEW(m_mp) CColRefSet(
+					m_mp)),	 // pass empty required relational properties initially
+				GPOS_NEW(m_mp) IStatisticsArray(
+					m_mp),	// pass an empty stats context initially
+				m_ulCurrSearchStage);
 		(void) PgexprOptimize(PgroupRoot(), poc, nullptr /*pgexprOrigin*/);
 		poc->Release();
 
@@ -1357,8 +1360,9 @@ CEngine::DbgPrintExpr(int group_no, int context_no)
 
 			if (nullptr != poc)
 			{
-				CExpression *extracted_expr = m_pmemo->PexprExtractPlan(
-					m_mp, top_group, poc->Prpp(), m_search_stage_array->Size());
+				gpos::owner<CExpression *> extracted_expr =
+					m_pmemo->PexprExtractPlan(m_mp, top_group, poc->Prpp(),
+											  m_search_stage_array->Size());
 				extracted_expr->OsPrint(at.Os());
 				extracted_expr->Release();
 			}

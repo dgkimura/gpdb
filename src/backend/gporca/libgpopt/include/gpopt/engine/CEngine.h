@@ -122,7 +122,7 @@ private:
 								   ULONG child_index, ULONG ulOptReq);
 
 	// optimize child groups of a given group expression
-	COptimizationContextArray *PdrgpocOptimizeChildren(
+	gpos::owner<COptimizationContextArray *> PdrgpocOptimizeChildren(
 		CExpressionHandle &exprhdl, COptimizationContext *pocOrigin,
 		ULONG ulOptReq);
 

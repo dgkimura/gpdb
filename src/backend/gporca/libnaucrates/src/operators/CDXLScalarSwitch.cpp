@@ -137,7 +137,7 @@ CDXLScalarSwitch::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSwitch::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarSwitch::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();

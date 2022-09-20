@@ -130,7 +130,7 @@ CDXLLogicalDelete::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalDelete::AssertValid(const CDXLNode *node,
+CDXLLogicalDelete::AssertValid(gpos::pointer<const CDXLNode *> node,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == node->Arity());

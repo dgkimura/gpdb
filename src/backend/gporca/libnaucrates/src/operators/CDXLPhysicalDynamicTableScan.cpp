@@ -150,7 +150,7 @@ CDXLPhysicalDynamicTableScan::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicTableScan::AssertValid(const CDXLNode *node,
+CDXLPhysicalDynamicTableScan::AssertValid(gpos::pointer<const CDXLNode *> node,
 										  BOOL	// validate_children
 ) const
 {

@@ -115,12 +115,12 @@ CMDAccessorTest::EresUnittest_Basic()
 							   12 /* version */, 1 /* minor version */);
 
 #ifdef GPOS_DEBUG
-	const IMDRelation *pimdrel1 =
+	gpos::pointer<const IMDRelation *> pimdrel1 =
 #endif
 		mda.RetrieveRel(pmdidObject1);
 
 #ifdef GPOS_DEBUG
-	const IMDRelation *pimdrel2 =
+	gpos::pointer<const IMDRelation *> pimdrel2 =
 #endif
 		mda.RetrieveRel(pmdidObject2);
 
@@ -129,7 +129,7 @@ CMDAccessorTest::EresUnittest_Basic()
 
 	// access an object again
 #ifdef GPOS_DEBUG
-	const IMDRelation *pimdrel3 =
+	gpos::pointer<const IMDRelation *> pimdrel3 =
 #endif
 		mda.RetrieveRel(pmdidObject1);
 
@@ -144,7 +144,7 @@ CMDAccessorTest::EresUnittest_Basic()
 		GPOS_NEW(mp) CMDIdGPDB(GPDB_AGG_AVG, 1, 0);
 
 #ifdef GPOS_DEBUG
-	const IMDType *pimdtype =
+	gpos::pointer<const IMDType *> pimdtype =
 #endif
 		mda.RetrieveType(mdid_type);
 
@@ -154,19 +154,19 @@ CMDAccessorTest::EresUnittest_Basic()
 	GPOS_ASSERT(IMDType::EcmptL == md_scalar_op->ParseCmpType());
 
 #ifdef GPOS_DEBUG
-	const IMDAggregate *pmdagg =
+	gpos::pointer<const IMDAggregate *> pmdagg =
 #endif
 		mda.RetrieveAgg(agg_mdid);
 
 
 	// access types by type info
 #ifdef GPOS_DEBUG
-	const IMDTypeInt4 *pmdtypeint4 =
+	gpos::pointer<const IMDTypeInt4 *> pmdtypeint4 =
 #endif
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
 #ifdef GPOS_DEBUG
-	const IMDTypeBool *pmdtypebool =
+	gpos::pointer<const IMDTypeBool *> pmdtypebool =
 #endif
 		mda.PtMDType<IMDTypeBool>(CTestUtils::m_sysidDefault);
 
@@ -431,7 +431,7 @@ CMDAccessorTest::EresUnittest_Indexes()
 		ULONG ulKeyColumn = pmdindex->KeyAt(ul);
 
 #ifdef GPOS_DEBUG
-		const IMDColumn *pmdcol =
+		gpos::pointer<const IMDColumn *> pmdcol =
 #endif	// GPOS_DEBUG
 			pmdrel->GetMdCol(ulKeyColumn);
 
@@ -558,7 +558,7 @@ CMDAccessorTest::EresUnittest_Cast()
 		mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 
 #ifdef GPOS_DEBUG
-	const IMDCast *pmdcastInt2BigInt =
+	gpos::pointer<const IMDCast *> pmdcastInt2BigInt =
 #endif	// GPOS_DEBUG
 		mda.Pmdcast(pmdtypeInt->MDId(), pmdtypeBigInt->MDId());
 
@@ -568,7 +568,7 @@ CMDAccessorTest::EresUnittest_Cast()
 	GPOS_ASSERT(pmdcastInt2BigInt->MdidDest()->Equals(pmdtypeBigInt->MDId()));
 
 #ifdef GPOS_DEBUG
-	const IMDCast *pmdcastInt2Oid =
+	gpos::pointer<const IMDCast *> pmdcastInt2Oid =
 #endif	// GPOS_DEBUG
 		mda.Pmdcast(pmdtypeInt->MDId(), pmdtypeOid->MDId());
 
@@ -576,7 +576,7 @@ CMDAccessorTest::EresUnittest_Cast()
 	GPOS_ASSERT(!pmdcastInt2Oid->GetCastFuncMdId()->IsValid());
 
 #ifdef GPOS_DEBUG
-	const IMDCast *pmdcastOid2Int =
+	gpos::pointer<const IMDCast *> pmdcastOid2Int =
 #endif	// GPOS_DEBUG
 		mda.Pmdcast(pmdtypeOid->MDId(), pmdtypeInt->MDId());
 
@@ -617,7 +617,7 @@ CMDAccessorTest::EresUnittest_ScCmp()
 		mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 
 #ifdef GPOS_DEBUG
-	const IMDScCmp *pmdScEqIntBigInt =
+	gpos::pointer<const IMDScCmp *> pmdScEqIntBigInt =
 #endif	// GPOS_DEBUG
 		mda.Pmdsccmp(pmdtypeInt->MDId(), pmdtypeBigInt->MDId(),
 					 IMDType::EcmptEq);

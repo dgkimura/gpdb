@@ -93,7 +93,7 @@ CDXLScalarLimitCount::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarLimitCount::AssertValid(const CDXLNode *node,
+CDXLScalarLimitCount::AssertValid(gpos::pointer<const CDXLNode *> node,
 								  BOOL validate_children) const
 {
 	const ULONG arity = node->Arity();

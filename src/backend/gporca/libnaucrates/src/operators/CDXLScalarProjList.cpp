@@ -91,7 +91,7 @@ CDXLScalarProjList::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarProjList::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarProjList::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();

@@ -110,7 +110,7 @@ CDXLPhysicalLimit::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalLimit::AssertValid(const CDXLNode *node,
+CDXLPhysicalLimit::AssertValid(gpos::pointer<const CDXLNode *> node,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(4 == node->Arity());

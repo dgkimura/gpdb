@@ -145,7 +145,7 @@ private:
 #ifdef GPOS_DEBUG
 	// check if the columns used by the operator are a subset of its input columns
 	static BOOL FLocalColsSubsetOfInputCols(CMemoryPool *mp,
-											CExpression *pexpr);
+											gpos::pointer<CExpression *> pexpr);
 #endif	//GPOS_DEBUG
 
 public:

@@ -219,7 +219,7 @@ CDXLLogicalConstTable::IsColDefined(ULONG colid) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalConstTable::AssertValid(const CDXLNode *node,
+CDXLLogicalConstTable::AssertValid(gpos::pointer<const CDXLNode *> node,
 								   BOOL	 //validate_children
 ) const
 {

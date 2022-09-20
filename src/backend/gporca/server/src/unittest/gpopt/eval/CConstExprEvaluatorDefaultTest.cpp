@@ -65,7 +65,8 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 		gpos::owner<CExpression *> pexprUl =
 			CUtils::PexprScalarConstInt4(mp, ulVal);
 #ifdef GPOS_DEBUG
-		CExpression *pexprUlResult = pceevaldefault->PexprEval(pexprUl);
+		gpos::owner<CExpression *> pexprUlResult =
+			pceevaldefault->PexprEval(pexprUl);
 		CScalarConst *pscalarconstUl = CScalarConst::PopConvert(pexprUl->Pop());
 		CScalarConst *pscalarconstUlResult =
 			CScalarConst::PopConvert(pexprUlResult->Pop());
@@ -82,7 +83,8 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 		gpos::owner<CExpression *> pexprIsNull =
 			CUtils::PexprIsNull(mp, pexprUl);
 #ifdef GPOS_DEBUG
-		CExpression *pexprResult = pceevaldefault->PexprEval(pexprIsNull);
+		gpos::owner<CExpression *> pexprResult =
+			pceevaldefault->PexprEval(pexprIsNull);
 		gpopt::CScalarNullTest *pscalarnulltest =
 			CScalarNullTest::PopConvert(pexprIsNull->Pop());
 		GPOS_ASSERT(pscalarnulltest->Matches(pexprResult->Pop()));

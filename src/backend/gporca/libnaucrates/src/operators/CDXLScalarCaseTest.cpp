@@ -138,7 +138,7 @@ CDXLScalarCaseTest::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCaseTest::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarCaseTest::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								BOOL  // validate_children
 ) const
 {

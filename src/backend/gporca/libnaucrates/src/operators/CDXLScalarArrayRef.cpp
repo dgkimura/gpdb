@@ -180,7 +180,7 @@ CDXLScalarArrayRef::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarArrayRef::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarArrayRef::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();

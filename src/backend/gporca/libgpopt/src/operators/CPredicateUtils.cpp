@@ -1431,7 +1431,8 @@ CPredicateUtils::PexprPartPruningPredicate(
 		 ExprsContainsOnlyStrictComparisons(pdrgpexprResult)))
 	{
 #ifdef GPOS_DEBUG
-		CColRefSet *pcrsUsed = CUtils::PcrsExtractColumns(mp, pdrgpexprResult);
+		gpos::owner<CColRefSet *> pcrsUsed =
+			CUtils::PcrsExtractColumns(mp, pdrgpexprResult);
 		GPOS_ASSERT_IMP(pdrgpexprResult->Size() > 0,
 						pcrsUsed->FMember(pcrPartKey));
 		CRefCount::SafeRelease(pcrsUsed);

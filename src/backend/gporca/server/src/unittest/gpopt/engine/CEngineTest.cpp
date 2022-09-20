@@ -225,7 +225,7 @@ CEngineTest::EresUnittest_BuildMemo()
 		GPOPT_TEST_REL_OID4, GPOPT_TEST_REL_OID5,
 	};
 
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp);
+	gpos::owner<CBitSet *> pbs = GPOS_NEW(mp) CBitSet(mp);
 	const ULONG ulRels = GPOS_ARRAY_SIZE(rgscRel);
 	for (ULONG ul = 0; ul < ulRels; ul++)
 	{
@@ -257,7 +257,7 @@ CEngineTest::EresUnittest_AppendStats()
 	CAutoTraceFlag atf(EopttracePrintGroupProperties, true);
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault, pmdp);
 
@@ -268,7 +268,8 @@ CEngineTest::EresUnittest_AppendStats()
 	CEngine eng(mp);
 
 	// generate  join expression
-	CExpression *pexpr = CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
+	gpos::owner<CExpression *> pexpr =
+		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
 
 	// generate query context
 	CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexpr);
@@ -296,7 +297,7 @@ CEngineTest::EresUnittest_AppendStats()
 
 	// create a non-empty set of output columns as requirements for stats derivation
 	ULONG ulIndex = 0;
-	CColRefSet *pcrs = GPOS_NEW(mp) CColRefSet(mp);
+	gpos::owner<CColRefSet *> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	CColRefSetIter crsi(*pexpr->DeriveOutputColumns());
 	while (crsi.Advance() && ulIndex < 3)
 	{
@@ -308,7 +309,8 @@ CEngineTest::EresUnittest_AppendStats()
 		ulIndex++;
 	}
 
-	CReqdPropRelational *prprel = GPOS_NEW(mp) CReqdPropRelational(pcrs);
+	gpos::owner<CReqdPropRelational *> prprel =
+		GPOS_NEW(mp) CReqdPropRelational(pcrs);
 
 	// derive stats with non-empty requirements
 	// missing stats should be appended to the already derived ones
@@ -358,7 +360,7 @@ CEngineTest::EresUnittest_BuildMemoLargeJoins()
 	};
 
 	// only optimize the last join expression
-	CBitSet *pbs = GPOS_NEW(mp) CBitSet(mp);
+	gpos::owner<CBitSet *> pbs = GPOS_NEW(mp) CBitSet(mp);
 	const ULONG ulRels = GPOS_ARRAY_SIZE(rgscRel);
 	(void) pbs->ExchangeSet(ulRels - 1);
 
@@ -402,7 +404,7 @@ CEngineTest::BuildMemoRecursive(CMemoryPool *mp, CExpression *pexprInput,
 	eng.RecursiveOptimize();
 	GPOS_CHECK_ABORT;
 
-	CExpression *pexprPlan = eng.PexprExtractPlan();
+	gpos::owner<CExpression *> pexprPlan = eng.PexprExtractPlan();
 	GPOS_ASSERT(nullptr != pexprPlan);
 
 	os << std::endl << std::endl;
@@ -433,7 +435,7 @@ CEngineTest::EresTestEngine(Pfpexpr rgpf[], ULONG size)
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -444,7 +446,7 @@ CEngineTest::EresTestEngine(Pfpexpr rgpf[], ULONG size)
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 						 CTestUtils::GetCostModel(mp));
 
-		CExpression *pexpr = rgpf[ul](mp);
+		gpos::owner<CExpression *> pexpr = rgpf[ul](mp);
 		BuildMemoRecursive(mp, pexpr, nullptr /*search_stage_array*/);
 		pexpr->Release();
 
@@ -516,7 +518,7 @@ CEngineTest::EresUnittest_BuildMemoWithSubqueries()
 		CMemoryPool *mp = amp.Pmp();
 
 		// setup a file-based provider
-		CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+		gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 		pmdp->AddRef();
 		CMDAccessor mda(mp, CMDCache::Pcache());
 		mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -527,7 +529,7 @@ CEngineTest::EresUnittest_BuildMemoWithSubqueries()
 							 CTestUtils::GetCostModel(mp));
 
 			ULONG ulIndex = ul / 2;
-			CExpression *pexpr = rgpf[ulIndex](mp, fCorrelated);
+			gpos::owner<CExpression *> pexpr = rgpf[ulIndex](mp, fCorrelated);
 			BuildMemoRecursive(mp, pexpr, nullptr /*search_stage_array*/);
 			pexpr->Release();
 		}
@@ -639,7 +641,7 @@ CEngineTest::EresUnittest_BuildMemoWithCTE()
 	CMemoryPool *mp = amp.Pmp();
 
 	// setup a file-based provider
-	CMDProviderMemory *pmdp = CTestUtils::m_pmdpf;
+	gpos::owner<CMDProviderMemory *> pmdp = CTestUtils::m_pmdpf;
 	pmdp->AddRef();
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, pmdp);
@@ -659,7 +661,7 @@ CEngineTest::EresUnittest_BuildMemoWithCTE()
 
 	CExpression *pexprScalar = CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrRight);
 
-	CExpression *pexpr =
+	gpos::owner<CExpression *> pexpr =
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CLogicalInnerJoin(mp),
 								 pexprCTE, pexprGet, pexprScalar);
 

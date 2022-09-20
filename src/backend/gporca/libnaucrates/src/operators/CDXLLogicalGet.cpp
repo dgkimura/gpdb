@@ -149,8 +149,8 @@ CDXLLogicalGet::IsColDefined(ULONG colid) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalGet::AssertValid(const CDXLNode *,  //dxlnode
-							BOOL			   // validate_children
+CDXLLogicalGet::AssertValid(gpos::pointer<const CDXLNode *>,  //dxlnode
+							BOOL  // validate_children
 ) const
 {
 	// assert validity of table descriptor

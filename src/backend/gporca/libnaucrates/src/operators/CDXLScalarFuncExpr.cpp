@@ -196,7 +196,7 @@ CDXLScalarFuncExpr::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarFuncExpr::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarFuncExpr::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 								BOOL validate_children) const
 {
 	for (ULONG ul = 0; ul < dxlnode->Arity(); ++ul)

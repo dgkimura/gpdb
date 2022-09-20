@@ -179,7 +179,7 @@ CDXLScalarIdent::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarIdent::AssertValid(const CDXLNode *node,
+CDXLScalarIdent::AssertValid(gpos::pointer<const CDXLNode *> node,
 							 BOOL  // validate_children
 ) const
 {

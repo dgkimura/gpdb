@@ -195,7 +195,7 @@ CDXLPhysicalDynamicIndexScan::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicIndexScan::AssertValid(const CDXLNode *node,
+CDXLPhysicalDynamicIndexScan::AssertValid(gpos::pointer<const CDXLNode *> node,
 										  BOOL validate_children) const
 {
 	// assert proj list and filter are valid

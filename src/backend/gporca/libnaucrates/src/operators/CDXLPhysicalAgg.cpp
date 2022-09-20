@@ -242,7 +242,8 @@ CDXLPhysicalAgg::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAgg::AssertValid(const CDXLNode *node, BOOL validate_children) const
+CDXLPhysicalAgg::AssertValid(gpos::pointer<const CDXLNode *> node,
+							 BOOL validate_children) const
 {
 	// assert proj list and filter are valid
 	CDXLPhysical::AssertValid(node, validate_children);

@@ -133,7 +133,7 @@ CDXLScalarMinMax::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarMinMax::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarMinMax::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(0 < dxlnode->Arity());

@@ -109,7 +109,7 @@ CDXLPhysicalRandomMotion::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalRandomMotion::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalRandomMotion::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 									  BOOL validate_children) const
 {
 	// assert proj list and filter are valid

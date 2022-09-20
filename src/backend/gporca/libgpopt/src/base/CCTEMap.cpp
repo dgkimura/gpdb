@@ -115,7 +115,7 @@ CCTEMap::PdpplanProducer(
 #ifdef GPOS_DEBUG
 	while (hmcmi.Advance())
 	{
-		const CCTEMapEntry *pcme = hmcmi.Value();
+		gpos::pointer<const CCTEMapEntry *> pcme = hmcmi.Value();
 		CCTEMap::ECteType ect = pcme->Ect();
 		GPOS_ASSERT(CCTEMap::EctConsumer == ect &&
 					"CTE map has properties of more than one producer");

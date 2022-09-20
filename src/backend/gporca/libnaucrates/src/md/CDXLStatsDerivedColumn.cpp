@@ -137,7 +137,8 @@ CDXLStatsDerivedColumn::DebugPrint(IOstream &os) const
 	const ULONG num_of_buckets = m_dxl_stats_bucket_array->Size();
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
 	{
-		const CDXLBucket *dxl_bucket = (*m_dxl_stats_bucket_array)[ul];
+		gpos::pointer<const CDXLBucket *> dxl_bucket =
+			(*m_dxl_stats_bucket_array)[ul];
 		dxl_bucket->DebugPrint(os);
 	}
 }

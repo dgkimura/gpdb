@@ -90,7 +90,7 @@ CDXLScalarHashCondList::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarHashCondList::AssertValid(const CDXLNode *node,
+CDXLScalarHashCondList::AssertValid(gpos::pointer<const CDXLNode *> node,
 									BOOL validate_children) const
 {
 	GPOS_ASSERT(nullptr != node);

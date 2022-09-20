@@ -144,7 +144,7 @@ CDXLLogicalCTEConsumer::SerializeToDXL(
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalCTEConsumer::AssertValid(const CDXLNode *dxlnode,
+CDXLLogicalCTEConsumer::AssertValid(gpos::pointer<const CDXLNode *> dxlnode,
 									BOOL  // validate_children
 ) const
 {
