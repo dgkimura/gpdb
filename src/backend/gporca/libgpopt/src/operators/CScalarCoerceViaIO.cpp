@@ -31,7 +31,8 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CScalarCoerceViaIO::CScalarCoerceViaIO(CMemoryPool *mp, IMDId *mdid_type,
+CScalarCoerceViaIO::CScalarCoerceViaIO(CMemoryPool *mp,
+									   gpos::Ref<IMDId> mdid_type,
 									   INT type_modifier, ECoercionForm ecf,
 									   INT location)
 	: CScalarCoerceBase(mp, mdid_type, type_modifier, ecf, location)
