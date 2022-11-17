@@ -63,7 +63,7 @@ ndistinct:
 	;
 
 ndistinct_item_list:
-	ndistinct_item_list ':' ndistinct_item
+	ndistinct_item_list ',' ndistinct_item
 		{
 			$$ = lappend($1, $3);
 		}
