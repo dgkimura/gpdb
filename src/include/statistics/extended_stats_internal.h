@@ -118,5 +118,6 @@ extern void statistic_scanner_init(const char *query_string);
 extern void statistic_scanner_finish(void);
 
 extern MVNDistinct *mvndistinct_parse_result;
+extern MVDependencies *mvdependencies_parse_result;
 
 #endif							/* EXTENDED_STATS_INTERNAL_H */

@@ -25,6 +25,7 @@ digit			[0-9]+
 ","			{ return ','; }
 "\""		{ return '"'; }
 ":"			{ return ':'; }
+"=>"		{ return ARROW; }
 
 {digit}+		{
 					yylval.uintval = strtoul(yytext, NULL, 10);

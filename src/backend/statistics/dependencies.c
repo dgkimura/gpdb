@@ -656,6 +656,8 @@ statext_dependencies_load(Oid mvoid)
 	return result;
 }
 
+extern void statistics_scanner_init(const char *query_string);
+
 /*
  * pg_dependencies_in		- input routine for type pg_dependencies.
  *
@@ -665,15 +667,23 @@ statext_dependencies_load(Oid mvoid)
 Datum
 pg_dependencies_in(PG_FUNCTION_ARGS)
 {
-	/*
-	 * pg_node_list stores the data in binary form and parsing text input is
-	 * not needed, so disallow this.
-	 */
-	ereport(ERROR,
-			(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
-			 errmsg("cannot accept a value of type %s", "pg_dependencies")));
+	char		   *str = PG_GETARG_CSTRING(0);
+	MVDependencies	   *mvdependencies;
+	int				parse_rc;
 
-	PG_RETURN_VOID();			/* keep compiler quiet */
+	statistics_scanner_init(str);
+	parse_rc = statistic_yyparse();
+	if (parse_rc != 0)
+		ereport(ERROR,
+				(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+				 errmsg("cannot accept a value of type %s", "pg_dependencies")));
+	statistic_scanner_finish();
+	mvdependencies = mvdependencies_parse_result;
+
+	if (mvdependencies == NULL)
+		PG_RETURN_VOID();
+
+	PG_RETURN_BYTEA_P(statext_dependencies_serialize(mvdependencies));
 }
 
 /*

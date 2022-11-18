@@ -5,6 +5,7 @@
 #include "statistics/statistics.h"
 
 MVNDistinct *mvndistinct_parse_result;
+MVDependencies *mvdependencies_parse_result;
 
 /*
  * Bison doesn't allocate anything that needs to live across parser calls,
@@ -16,6 +17,7 @@ MVNDistinct *mvndistinct_parse_result;
  */
 #define YYMALLOC palloc
 #define YYFREE   pfree
+#define YYDEBUG 1
 
 %}
 
@@ -25,22 +27,37 @@ MVNDistinct *mvndistinct_parse_result;
 
 %union {
 		uint32					uintval;
-
+		double					doubleval;
 		MVNDistinct				*ndistinct;
 		MVNDistinctItem			*ndistinct_item;
+
+		MVDependencies			*dependencies;
+		MVDependency			*dependency;
+
 		Bitmapset				*bitmap;
 		List					*list;
 }
 
 /* Non-keyword tokens */
 %token <uintval> UCONST
+%token <doubleval> DOUBLE
+%token ARROW
 
 %type <ndistinct>	ndistinct
 %type <ndistinct_item>	ndistinct_item
 %type <bitmap>	ndistinct_attrs
 %type <list>	ndistinct_item_list
 
+%type <dependencies>	dependencies
+%type <list>	dependency_item_list
+%type <dependency>	dependency_item
+
 %%
+
+extended_statistic:
+	ndistinct { } |
+	dependencies { }
+	;
 
 ndistinct:
 	'{' ndistinct_item_list '}'
@@ -91,7 +108,31 @@ ndistinct_attrs:
 		}
 	;
 
+dependencies:
+	'{' dependency_item_list '}'
+		{
+			$$ = palloc0(sizeof(MVDependencies));
+			mvdependencies_parse_result = $$;
+		}
+	;
+
+dependency_item_list:
+	dependency_item_list ',' dependency_item
+		{
+			$$ = lappend($1, $3);
+		}
+	| dependency_item { $$ = lappend(NIL, $1);}
+	;
+
+dependency_item:
+	'"' UCONST ARROW UCONST '"' ':' UCONST
+		{
+			// TODO:...
+			$$ = (MVDependency *)palloc0(sizeof(MVDependency));
+		}
+	;
 
 %%
+
 
 #include "statistics_scanner.c"
