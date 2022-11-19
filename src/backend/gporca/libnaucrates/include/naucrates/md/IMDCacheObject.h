@@ -70,6 +70,7 @@ public:
 		EmdtCheckConstraint,
 		EmdtRelStats,
 		EmdtColStats,
+		EmdtExtStats,
 		EmdtCastFunc,
 		EmdtScCmp,
 		EmdtSentinel

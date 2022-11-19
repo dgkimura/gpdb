@@ -27,6 +27,7 @@
 #include "naucrates/exception.h"
 #include "naucrates/md/CMDIdCast.h"
 #include "naucrates/md/CMDIdColStats.h"
+#include "naucrates/md/CMDIdExtStats.h"
 #include "naucrates/md/CMDIdRelStats.h"
 #include "naucrates/md/CMDIdScCmp.h"
 #include "naucrates/md/CMDProviderGeneric.h"
@@ -35,6 +36,7 @@
 #include "naucrates/md/IMDCast.h"
 #include "naucrates/md/IMDCheckConstraint.h"
 #include "naucrates/md/IMDColStats.h"
+#include "naucrates/md/IMDExtStats.h"
 #include "naucrates/md/IMDFunction.h"
 #include "naucrates/md/IMDIndex.h"
 #include "naucrates/md/IMDProvider.h"
@@ -872,6 +874,20 @@ CMDAccessor::Pmdcolstats(IMDId *mdid)
 	return dynamic_cast<const IMDColStats *>(pmdobj);
 }
 
+const IMDExtStats *
+CMDAccessor::Pmdextstats(IMDId *mdid)
+{
+	const IMDCacheObject *pmdobj =
+		GetImdObj(mdid, IMDCacheObject::EmdtExtStats);
+	if (IMDCacheObject::EmdtExtStats != pmdobj->MDType())
+	{
+		GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryNotFound,
+				   mdid->GetBuffer());
+	}
+
+	return dynamic_cast<const IMDExtStats *>(pmdobj);
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CMDAccessor::Pmdrelstats
@@ -1015,6 +1031,17 @@ CMDAccessor::RecordColumnStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
 	}
 }
 
+void
+CMDAccessor::RecordExtendedStats(
+	CMemoryPool *mp GPOS_UNUSED, IMDId *rel_mdid, ULONG colid GPOS_UNUSED,
+	ULONG ulPos, BOOL isSystemCol GPOS_UNUSED, BOOL isEmptyTable GPOS_UNUSED,
+	UlongToHistogramMap *col_histogram_mapping GPOS_UNUSED,
+	UlongToDoubleMap *colid_width_mapping GPOS_UNUSED,
+	CStatisticsConfig *stats_config GPOS_UNUSED)
+{
+	const IMDExtStats *GPOS_UNUSED pmdextstats =
+		Pmdextstats(mp, rel_mdid, ulPos);
+}
 
 // Return the column statistics meta data object for a given column of a table
 const IMDColStats *
@@ -1024,6 +1051,18 @@ CMDAccessor::Pmdcolstats(CMemoryPool *mp, IMDId *rel_mdid, ULONG ulPos)
 	CMDIdColStats *mdid_col_stats =
 		GPOS_NEW(mp) CMDIdColStats(CMDIdGPDB::CastMdid(rel_mdid), ulPos);
 	const IMDColStats *pmdcolstats = Pmdcolstats(mdid_col_stats);
+	mdid_col_stats->Release();
+
+	return pmdcolstats;
+}
+
+const IMDExtStats *
+CMDAccessor::Pmdextstats(CMemoryPool *mp, IMDId *rel_mdid, ULONG ulPos)
+{
+	rel_mdid->AddRef();
+	CMDIdExtStats *mdid_col_stats =
+		GPOS_NEW(mp) CMDIdExtStats(CMDIdGPDB::CastMdid(rel_mdid), ulPos);
+	const IMDExtStats *pmdcolstats = Pmdextstats(mdid_col_stats);
 	mdid_col_stats->Release();
 
 	return pmdcolstats;
@@ -1075,6 +1114,10 @@ CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
 		RecordColumnStats(mp, rel_mdid, colid, ulPos, pcrtable->IsSystemCol(),
 						  fEmptyTable, col_histogram_mapping,
 						  colid_width_mapping, stats_config);
+
+		RecordExtendedStats(mp, rel_mdid, colid, ulPos, pcrtable->IsSystemCol(),
+							fEmptyTable, col_histogram_mapping,
+							colid_width_mapping, stats_config);
 	}
 
 	// extract column widths

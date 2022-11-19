@@ -45,6 +45,7 @@ class IMDCheckConstraint;
 class IMDProvider;
 class CMDProviderGeneric;
 class IMDColStats;
+class IMDExtStats;
 class IMDRelStats;
 class CDXLBucket;
 class IMDCast;
@@ -247,12 +248,21 @@ private:
 	const IMDColStats *Pmdcolstats(CMemoryPool *mp, IMDId *rel_mdid,
 								   ULONG ulPos);
 
+	const IMDExtStats *Pmdextstats(CMemoryPool *mp, IMDId *rel_mdid,
+								   ULONG ulPos);
+
 	// record histogram and width information for a given column of a table
 	void RecordColumnStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
 						   ULONG ulPos, BOOL isSystemCol, BOOL isEmptyTable,
 						   UlongToHistogramMap *col_histogram_mapping,
 						   UlongToDoubleMap *colid_width_mapping,
 						   CStatisticsConfig *stats_config);
+
+	void RecordExtendedStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
+							 ULONG ulPos, BOOL isSystemCol, BOOL isEmptyTable,
+							 UlongToHistogramMap *col_histogram_mapping,
+							 UlongToDoubleMap *colid_width_mapping,
+							 CStatisticsConfig *stats_config);
 
 	// construct a stats histogram from an MD column stats object
 	CHistogram *GetHistogram(CMemoryPool *mp, IMDId *mdid_type,
@@ -340,6 +350,8 @@ public:
 
 	// retrieve a column stats object from the cache
 	const IMDColStats *Pmdcolstats(IMDId *mdid);
+
+	const IMDExtStats *Pmdextstats(IMDId *mdid);
 
 	// retrieve a relation stats object from the cache
 	const IMDRelStats *Pmdrelstats(IMDId *mdid);

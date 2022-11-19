@@ -191,6 +191,10 @@ private:
 											CMDAccessor *md_accessor,
 											IMDId *mdid);
 
+	static IMDCacheObject *RetrieveExtStats(CMemoryPool *mp,
+											CMDAccessor *md_accessor,
+											IMDId *mdid);
+
 	// retrieve cast object from the relcache
 	static IMDCacheObject *RetrieveCast(CMemoryPool *mp, IMDId *mdid);
 

@@ -464,6 +464,7 @@ enum Edxltoken
 	EdxltokenRelationStats,
 	EdxltokenColumnStats,
 	EdxltokenColumnStatsBucket,
+	EdxltokenExtendedStats,
 	EdxltokenEmptyRelation,
 	EdxltokenIsNull,
 	EdxltokenLintValue,

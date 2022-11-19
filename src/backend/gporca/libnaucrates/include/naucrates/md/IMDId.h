@@ -77,6 +77,7 @@ public:
 		EmdidRel = 6,
 		EmdidInd = 7,
 		EmdidCheckConstraint = 8,
+		EmdidExtStats = 9,
 		EmdidSentinel
 	};
 

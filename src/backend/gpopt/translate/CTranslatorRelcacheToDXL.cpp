@@ -53,6 +53,7 @@ extern "C" {
 #include "naucrates/dxl/xml/dxltokens.h"
 #include "naucrates/exception.h"
 #include "naucrates/md/CDXLColStats.h"
+#include "naucrates/md/CDXLExtStats.h"
 #include "naucrates/md/CDXLRelStats.h"
 #include "naucrates/md/CMDArrayCoerceCastGPDB.h"
 #include "naucrates/md/CMDCastGPDB.h"
@@ -111,6 +112,10 @@ CTranslatorRelcacheToDXL::RetrieveObject(CMemoryPool *mp,
 
 		case IMDId::EmdidColStats:
 			md_obj = RetrieveColStats(mp, md_accessor, mdid);
+			break;
+
+		case IMDId::EmdidExtStats:
+			md_obj = RetrieveExtStats(mp, md_accessor, mdid);
 			break;
 
 		case IMDId::EmdidCastFunc:
@@ -1917,6 +1922,22 @@ CTranslatorRelcacheToDXL::RetrieveColStats(CMemoryPool *mp,
 	);
 
 	return dxl_col_stats;
+}
+
+IMDCacheObject *
+CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
+										   CMDAccessor *md_accessor,
+										   IMDId *mdid)
+{
+	CMDIdExtStats *mdid_ext_stats = CMDIdExtStats::CastMdid(mdid);
+	IMDId *mdid_rel = mdid_ext_stats->GetRelMdId();
+
+	const IMDRelation *md_rel = md_accessor->RetrieveRel(mdid_rel);
+	CMDName *md_relname = GPOS_NEW(mp) CMDName(md_rel->Mdname());
+
+	CDXLExtStats *dxl_ext_stats =
+		GPOS_NEW(mp) CDXLExtStats(mp, mdid_ext_stats, md_relname);
+	return dxl_ext_stats;
 }
 
 
