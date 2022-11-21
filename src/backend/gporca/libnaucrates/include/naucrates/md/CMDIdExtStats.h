@@ -18,6 +18,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/string/CWStringConst.h"
 
+#include "gpopt/base/CColRefSet.h"
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/md/CMDIdGPDB.h"
 #include "naucrates/md/CSystemId.h"
@@ -42,7 +43,7 @@ private:
 	CMDIdGPDB *m_rel_mdid;
 
 	// position of the attribute in the base relation
-	ULONG m_attr_pos;
+	CColRefSet *m_pcrs;
 
 	// buffer for the serialized mdid
 	WCHAR m_mdid_buffer[GPDXL_MDID_LENGTH];
@@ -57,7 +58,7 @@ public:
 	CMDIdExtStats(const CMDIdExtStats &) = delete;
 
 	// ctor
-	CMDIdExtStats(CMDIdGPDB *rel_mdid, ULONG attno);
+	CMDIdExtStats(CMDIdGPDB *rel_mdid, CColRefSet *pcrs);
 
 	// dtor
 	~CMDIdExtStats() override;
@@ -89,7 +90,7 @@ public:
 	HashValue() const override
 	{
 		return gpos::CombineHashes(m_rel_mdid->HashValue(),
-								   gpos::HashValue(&m_attr_pos));
+								   m_pcrs->HashValue());
 	}
 
 	// is the mdid valid
@@ -129,7 +130,7 @@ public:
 	Copy(CMemoryPool *mp) const override
 	{
 		CMDIdGPDB *mdid_rel = CMDIdGPDB::CastMdid(m_rel_mdid->Copy(mp));
-		return GPOS_NEW(mp) CMDIdExtStats(mdid_rel, m_attr_pos);
+		return GPOS_NEW(mp) CMDIdExtStats(mdid_rel, m_pcrs);
 	}
 };
 

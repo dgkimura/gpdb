@@ -25,9 +25,9 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdExtStats::CMDIdExtStats(CMDIdGPDB *rel_mdid, ULONG pos)
+CMDIdExtStats::CMDIdExtStats(CMDIdGPDB *rel_mdid, CColRefSet *pcrs)
 	: m_rel_mdid(rel_mdid),
-	  m_attr_pos(pos),
+	  m_pcrs(pcrs),
 	  m_str(m_mdid_buffer, GPOS_ARRAY_SIZE(m_mdid_buffer))
 {
 	GPOS_ASSERT(rel_mdid->IsValid());
@@ -61,9 +61,10 @@ void
 CMDIdExtStats::Serialize()
 {
 	// serialize mdid as SystemType.Oid.Major.Minor.Attno
-	m_str.AppendFormat(GPOS_WSZ_LIT("%d.%d.%d.%d.%d"), MdidType(),
-					   m_rel_mdid->Oid(), m_rel_mdid->VersionMajor(),
-					   m_rel_mdid->VersionMinor(), m_attr_pos);
+	m_str.AppendFormat(
+		GPOS_WSZ_LIT("%d.%d.%d.%d.%d"), MdidType(), m_rel_mdid->Oid(),
+		m_rel_mdid->VersionMajor(), m_rel_mdid->VersionMinor(),
+		m_pcrs->HashValue());  // FIXME:KIMURA m_pcrs->HashValue().
 }
 
 //---------------------------------------------------------------------------

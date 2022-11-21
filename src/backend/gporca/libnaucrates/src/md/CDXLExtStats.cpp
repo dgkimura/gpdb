@@ -29,10 +29,9 @@ using namespace gpmd;
 //		Constructor
 //
 //---------------------------------------------------------------------------
-CDXLExtStats::CDXLExtStats(CMemoryPool *mp, CMDIdExtStats *mdid_ext_stats, CMDName *mdname)
-	: m_mp(mp),
-	  m_mdid_ext_stats(mdid_ext_stats),
-	  m_mdname(mdname)
+CDXLExtStats::CDXLExtStats(CMemoryPool *mp, CMDIdExtStats *mdid_ext_stats,
+						   CMDName *mdname)
+	: m_mp(mp), m_mdid_ext_stats(mdid_ext_stats), m_mdname(mdname)
 {
 	GPOS_ASSERT(mdid_ext_stats->IsValid());
 	m_dxl_str = CDXLUtils::SerializeMDObj(

@@ -58,7 +58,8 @@ public:
 	CDXLExtStats(const CDXLExtStats &) = delete;
 
 	// ctor
-	CDXLExtStats(CMemoryPool *mp, CMDIdExtStats *mdid_ext_stats, CMDName *mdname);
+	CDXLExtStats(CMemoryPool *mp, CMDIdExtStats *mdid_ext_stats,
+				 CMDName *mdname);
 
 	// dtor
 	~CDXLExtStats() override;

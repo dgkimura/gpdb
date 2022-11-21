@@ -249,7 +249,7 @@ private:
 								   ULONG ulPos);
 
 	const IMDExtStats *Pmdextstats(CMemoryPool *mp, IMDId *rel_mdid,
-								   ULONG ulPos);
+								   CColRefSet *pcrs);
 
 	// record histogram and width information for a given column of a table
 	void RecordColumnStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
@@ -258,8 +258,8 @@ private:
 						   UlongToDoubleMap *colid_width_mapping,
 						   CStatisticsConfig *stats_config);
 
-	void RecordExtendedStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
-							 ULONG ulPos, BOOL isSystemCol, BOOL isEmptyTable,
+	void RecordExtendedStats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrs,
+							 BOOL isEmptyTable,
 							 UlongToHistogramMap *col_histogram_mapping,
 							 UlongToDoubleMap *colid_width_mapping,
 							 CStatisticsConfig *stats_config);

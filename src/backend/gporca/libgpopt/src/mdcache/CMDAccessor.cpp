@@ -1033,14 +1033,14 @@ CMDAccessor::RecordColumnStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
 
 void
 CMDAccessor::RecordExtendedStats(
-	CMemoryPool *mp GPOS_UNUSED, IMDId *rel_mdid, ULONG colid GPOS_UNUSED,
-	ULONG ulPos, BOOL isSystemCol GPOS_UNUSED, BOOL isEmptyTable GPOS_UNUSED,
+	CMemoryPool *mp GPOS_UNUSED, IMDId *rel_mdid, CColRefSet *pcrs,
+	BOOL isEmptyTable GPOS_UNUSED,
 	UlongToHistogramMap *col_histogram_mapping GPOS_UNUSED,
 	UlongToDoubleMap *colid_width_mapping GPOS_UNUSED,
 	CStatisticsConfig *stats_config GPOS_UNUSED)
 {
 	const IMDExtStats *GPOS_UNUSED pmdextstats =
-		Pmdextstats(mp, rel_mdid, ulPos);
+		Pmdextstats(mp, rel_mdid, pcrs);
 }
 
 // Return the column statistics meta data object for a given column of a table
@@ -1057,11 +1057,11 @@ CMDAccessor::Pmdcolstats(CMemoryPool *mp, IMDId *rel_mdid, ULONG ulPos)
 }
 
 const IMDExtStats *
-CMDAccessor::Pmdextstats(CMemoryPool *mp, IMDId *rel_mdid, ULONG ulPos)
+CMDAccessor::Pmdextstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrs)
 {
 	rel_mdid->AddRef();
 	CMDIdExtStats *mdid_col_stats =
-		GPOS_NEW(mp) CMDIdExtStats(CMDIdGPDB::CastMdid(rel_mdid), ulPos);
+		GPOS_NEW(mp) CMDIdExtStats(CMDIdGPDB::CastMdid(rel_mdid), pcrs);
 	const IMDExtStats *pmdcolstats = Pmdextstats(mdid_col_stats);
 	mdid_col_stats->Release();
 
@@ -1114,11 +1114,11 @@ CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
 		RecordColumnStats(mp, rel_mdid, colid, ulPos, pcrtable->IsSystemCol(),
 						  fEmptyTable, col_histogram_mapping,
 						  colid_width_mapping, stats_config);
-
-		RecordExtendedStats(mp, rel_mdid, colid, ulPos, pcrtable->IsSystemCol(),
-							fEmptyTable, col_histogram_mapping,
-							colid_width_mapping, stats_config);
 	}
+
+	RecordExtendedStats(mp, rel_mdid, pcrsHist, fEmptyTable,
+						col_histogram_mapping, colid_width_mapping,
+						stats_config);
 
 	// extract column widths
 	CColRefSetIter crsiWidth(*pcrsWidth);
