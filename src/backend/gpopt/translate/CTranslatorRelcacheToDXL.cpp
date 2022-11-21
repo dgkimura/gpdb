@@ -42,6 +42,7 @@ extern "C" {
 #include "gpos/error/CException.h"
 #include "gpos/io/COstreamString.h"
 
+#include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/gpdbwrappers.h"
 #include "gpopt/mdcache/CMDAccessor.h"
@@ -1934,6 +1935,15 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 
 	const IMDRelation *md_rel = md_accessor->RetrieveRel(mdid_rel);
 	CMDName *md_relname = GPOS_NEW(mp) CMDName(md_rel->Mdname());
+
+	Bitmapset *bms = nullptr;
+
+	CColRefSetIter crsi(*mdid_ext_stats->Pcrs());
+	while (crsi.Advance())
+	{
+		CColRef *pcr = crsi.Pcr();
+		bms = gpdb::BmsAddMember(bms, pcr->Id());
+	}
 
 	CDXLExtStats *dxl_ext_stats =
 		GPOS_NEW(mp) CDXLExtStats(mp, mdid_ext_stats, md_relname);

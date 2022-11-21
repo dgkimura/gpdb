@@ -132,6 +132,12 @@ public:
 		CMDIdGPDB *mdid_rel = CMDIdGPDB::CastMdid(m_rel_mdid->Copy(mp));
 		return GPOS_NEW(mp) CMDIdExtStats(mdid_rel, m_pcrs);
 	}
+
+	CColRefSet *
+	Pcrs()
+	{
+		return m_pcrs;
+	}
 };
 
 }  // namespace gpmd
