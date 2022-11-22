@@ -89,8 +89,10 @@ public:
 	ULONG
 	HashValue() const override
 	{
-		return gpos::CombineHashes(m_rel_mdid->HashValue(),
-								   m_pcrs->HashValue());
+		return m_rel_mdid->HashValue();
+		// FIXME: SIGSEGV at m_pcrs
+		//return gpos::CombineHashes(m_rel_mdid->HashValue(),
+		//						   m_pcrs->HashValue());
 	}
 
 	// is the mdid valid
