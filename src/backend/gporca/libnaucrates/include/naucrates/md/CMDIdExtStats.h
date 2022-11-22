@@ -45,6 +45,8 @@ private:
 	// position of the attribute in the base relation
 	CColRefSet *m_pcrs;
 
+	CBitSet *m_attno_bms;
+
 	// buffer for the serialized mdid
 	WCHAR m_mdid_buffer[GPDXL_MDID_LENGTH];
 
@@ -58,7 +60,7 @@ public:
 	CMDIdExtStats(const CMDIdExtStats &) = delete;
 
 	// ctor
-	CMDIdExtStats(CMDIdGPDB *rel_mdid, CColRefSet *pcrs);
+	CMDIdExtStats(CMDIdGPDB *rel_mdid, CColRefSet *pcrs, CBitSet *m_attno_bms);
 
 	// dtor
 	~CMDIdExtStats() override;
@@ -132,13 +134,19 @@ public:
 	Copy(CMemoryPool *mp) const override
 	{
 		CMDIdGPDB *mdid_rel = CMDIdGPDB::CastMdid(m_rel_mdid->Copy(mp));
-		return GPOS_NEW(mp) CMDIdExtStats(mdid_rel, m_pcrs);
+		return GPOS_NEW(mp) CMDIdExtStats(mdid_rel, m_pcrs, m_attno_bms);
 	}
 
 	CColRefSet *
 	Pcrs()
 	{
 		return m_pcrs;
+	}
+
+	CBitSet *
+	Pbms()
+	{
+		return m_attno_bms;
 	}
 };
 

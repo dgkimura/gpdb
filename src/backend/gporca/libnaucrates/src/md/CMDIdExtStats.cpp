@@ -25,9 +25,11 @@ using namespace gpmd;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CMDIdExtStats::CMDIdExtStats(CMDIdGPDB *rel_mdid, CColRefSet *pcrs)
+CMDIdExtStats::CMDIdExtStats(CMDIdGPDB *rel_mdid, CColRefSet *pcrs,
+							 CBitSet *attno_bms)
 	: m_rel_mdid(rel_mdid),
 	  m_pcrs(pcrs),
+	  m_attno_bms(attno_bms),
 	  m_str(m_mdid_buffer, GPOS_ARRAY_SIZE(m_mdid_buffer))
 {
 	GPOS_ASSERT(rel_mdid->IsValid());

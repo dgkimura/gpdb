@@ -1069,7 +1069,7 @@ CMDAccessor::Pmdextstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrs,
 	}
 
 	CMDIdExtStats *mdid_col_stats =
-		GPOS_NEW(mp) CMDIdExtStats(CMDIdGPDB::CastMdid(rel_mdid), pcrs);
+		GPOS_NEW(mp) CMDIdExtStats(CMDIdGPDB::CastMdid(rel_mdid), pcrs, bset);
 	const IMDExtStats *pmdcolstats = Pmdextstats(mdid_col_stats);
 	mdid_col_stats->Release();
 
