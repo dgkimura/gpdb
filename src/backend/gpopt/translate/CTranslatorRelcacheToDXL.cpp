@@ -23,8 +23,10 @@ extern "C" {
 #include "catalog/pg_am.h"
 #include "catalog/pg_proc.h"
 #include "catalog/pg_statistic.h"
+#include "catalog/pg_statistic_ext.h"
 #include "cdb/cdbhash.h"
 #include "partitioning/partdesc.h"
+#include "statistics/statistics.h"
 #include "utils/array.h"
 #include "utils/datum.h"
 #include "utils/elog.h"
@@ -74,7 +76,6 @@ extern "C" {
 
 using namespace gpdxl;
 using namespace gpopt;
-
 
 static const ULONG cmp_type_mappings[][2] = {
 	{IMDType::EcmptEq, CmptEq},	  {IMDType::EcmptNEq, CmptNEq},
@@ -1932,6 +1933,7 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 {
 	CMDIdExtStats *mdid_ext_stats = CMDIdExtStats::CastMdid(mdid);
 	IMDId *mdid_rel = mdid_ext_stats->GetRelMdId();
+	OID rel_oid = CMDIdGPDB::CastMdid(mdid_rel)->Oid();
 
 	const IMDRelation *md_rel = md_accessor->RetrieveRel(mdid_rel);
 	CMDName *md_relname = GPOS_NEW(mp) CMDName(md_rel->Mdname());
@@ -1943,6 +1945,25 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 	{
 		CColRef *pcr = crsi.Pcr();
 		bms = gpdb::BmsAddMember(bms, pcr->Id());
+	}
+
+	gpdb::RelationWrapper rel = gpdb::GetRelation(rel_oid);
+
+	List *extstats = gpdb::GetExtStats(rel.get());
+	ListCell *lc;
+	ForEach(lc, extstats)
+	{
+		StatisticExtInfo *stat = (StatisticExtInfo *) lfirst(lc);
+
+		if (stat->kind == STATS_EXT_DEPENDENCIES)
+		{
+			MVDependencies *deps = statext_dependencies_load(stat->statOid);
+		}
+
+		//if (!bms_is_subset(stat->columns, bms))
+		//{
+		//	continue;
+		//}
 	}
 
 	CDXLExtStats *dxl_ext_stats =

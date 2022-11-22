@@ -39,6 +39,7 @@ extern "C" {
 #include "optimizer/plancat.h"
 #include "parser/parse_agg.h"
 #include "partitioning/partdesc.h"
+#include "statistics/statistics.h"
 #include "storage/lmgr.h"
 #include "utils/fmgroids.h"
 #include "utils/memutils.h"
@@ -742,6 +743,18 @@ gpdb::GetAttStats(Oid relid, AttrNumber attnum)
 	{
 		/* catalog tables: pg_statistic */
 		return get_att_stats(relid, attnum);
+	}
+	GP_WRAP_END;
+	return nullptr;
+}
+
+List *
+gpdb::GetExtStats(Relation rel)
+{
+	GP_WRAP_START;
+	{
+		/* catalog tables: pg_statistic_ext */
+		return GetRelationExtStatistics(rel);
 	}
 	GP_WRAP_END;
 	return nullptr;

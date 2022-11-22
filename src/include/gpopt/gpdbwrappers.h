@@ -205,6 +205,8 @@ void FreeAttrStatsSlot(AttStatsSlot *sslot);
 // attribute statistics
 HeapTuple GetAttStats(Oid relid, AttrNumber attnum);
 
+List *GetExtStats(Relation rel);
+
 // does a function exist with the given oid
 bool FunctionExists(Oid oid);
 

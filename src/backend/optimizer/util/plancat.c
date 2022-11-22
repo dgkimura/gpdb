@@ -1517,6 +1517,12 @@ get_relation_constraints(PlannerInfo *root,
 	return result;
 }
 
+List *
+GetRelationExtStatistics(Relation relation)
+{
+	return get_relation_statistics(NULL, relation);
+}
+
 /*
  * get_relation_statistics
  *		Retrieve extended statistics defined on the table.
