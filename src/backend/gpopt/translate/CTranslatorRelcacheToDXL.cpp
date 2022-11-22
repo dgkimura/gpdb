@@ -1940,11 +1940,10 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 
 	Bitmapset *bms = nullptr;
 
-	CColRefSetIter crsi(*mdid_ext_stats->Pcrs());
-	while (crsi.Advance())
+	CBitSetIter cbsi(*mdid_ext_stats->Pbms());
+	while (cbsi.Advance())
 	{
-		CColRef *pcr = crsi.Pcr();
-		bms = gpdb::BmsAddMember(bms, pcr->Id());
+		bms = gpdb::BmsAddMember(bms, cbsi.Bit());
 	}
 
 	gpdb::RelationWrapper rel = gpdb::GetRelation(rel_oid);
@@ -1955,15 +1954,17 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 	{
 		StatisticExtInfo *stat = (StatisticExtInfo *) lfirst(lc);
 
+		// If extended statistic keys do not cover the query keys then no point
+		// in considering the extended statistic
+		if (!bms_is_subset(stat->keys, bms))
+		{
+			continue;
+		}
+
 		if (stat->kind == STATS_EXT_DEPENDENCIES)
 		{
 			MVDependencies *deps = statext_dependencies_load(stat->statOid);
 		}
-
-		//if (!bms_is_subset(stat->columns, bms))
-		//{
-		//	continue;
-		//}
 	}
 
 	CDXLExtStats *dxl_ext_stats =
