@@ -1032,15 +1032,14 @@ CMDAccessor::RecordColumnStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
 }
 
 void
-CMDAccessor::RecordExtendedStats(
-	CMemoryPool *mp GPOS_UNUSED, IMDId *rel_mdid, CColRefSet *pcrs,
-	BOOL isEmptyTable GPOS_UNUSED,
-	UlongToHistogramMap *col_histogram_mapping GPOS_UNUSED,
-	UlongToDoubleMap *colid_width_mapping GPOS_UNUSED,
-	CStatisticsConfig *stats_config GPOS_UNUSED)
+CMDAccessor::RecordExtendedStats(CMemoryPool *mp GPOS_UNUSED, IMDId *rel_mdid,
+								 CColRefSet *pcrs,
+								 BOOL isEmptyTable GPOS_UNUSED,
+								 UlongToIntMap *col_mapping,
+								 CStatisticsConfig *stats_config GPOS_UNUSED)
 {
 	const IMDExtStats *GPOS_UNUSED pmdextstats =
-		Pmdextstats(mp, rel_mdid, pcrs);
+		Pmdextstats(mp, rel_mdid, pcrs, col_mapping);
 }
 
 // Return the column statistics meta data object for a given column of a table
@@ -1057,9 +1056,18 @@ CMDAccessor::Pmdcolstats(CMemoryPool *mp, IMDId *rel_mdid, ULONG ulPos)
 }
 
 const IMDExtStats *
-CMDAccessor::Pmdextstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrs)
+CMDAccessor::Pmdextstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrs,
+						 UlongToIntMap *col_mapping)
 {
 	rel_mdid->AddRef();
+	CBitSet *bset = GPOS_NEW(mp) CBitSet(mp);
+	CColRefSetIter crsi(*pcrs);
+	while (crsi.Advance())
+	{
+		CColRef *pcr = crsi.Pcr();
+		bset->ExchangeSet(*col_mapping->Find(GPOS_NEW(mp) ULONG(pcr->Id())));
+	}
+
 	CMDIdExtStats *mdid_col_stats =
 		GPOS_NEW(mp) CMDIdExtStats(CMDIdGPDB::CastMdid(rel_mdid), pcrs);
 	const IMDExtStats *pmdcolstats = Pmdextstats(mdid_col_stats);
@@ -1098,6 +1106,8 @@ CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
 	UlongToDoubleMap *colid_width_mapping = GPOS_NEW(mp) UlongToDoubleMap(mp);
 
+	UlongToIntMap *attno_to_colid_mapping = GPOS_NEW(m_mp) UlongToIntMap(m_mp);
+
 	CColRefSetIter crsiHist(*pcrsHist);
 	while (crsiHist.Advance())
 	{
@@ -1114,11 +1124,13 @@ CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
 		RecordColumnStats(mp, rel_mdid, colid, ulPos, pcrtable->IsSystemCol(),
 						  fEmptyTable, col_histogram_mapping,
 						  colid_width_mapping, stats_config);
+
+		attno_to_colid_mapping->Insert(GPOS_NEW(m_mp) ULONG(colid),
+									   GPOS_NEW(m_mp) INT(attno));
 	}
 
 	RecordExtendedStats(mp, rel_mdid, pcrsHist, fEmptyTable,
-						col_histogram_mapping, colid_width_mapping,
-						stats_config);
+						attno_to_colid_mapping, stats_config);
 
 	// extract column widths
 	CColRefSetIter crsiWidth(*pcrsWidth);

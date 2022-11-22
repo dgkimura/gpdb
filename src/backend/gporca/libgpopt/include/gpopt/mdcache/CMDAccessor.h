@@ -15,6 +15,7 @@
 #define GPOPT_CMDAccessor_H
 
 #include "gpos/base.h"
+#include "gpos/common/CHashMap.h"
 #include "gpos/memory/CCache.h"
 #include "gpos/memory/CCacheAccessor.h"
 
@@ -66,6 +67,10 @@ using namespace gpmd;
 
 
 using MdidPtr = IMDId *;
+
+using UlongToIntMap =
+	CHashMap<ULONG, INT, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+			 CleanupDelete<ULONG>, CleanupDelete<INT>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -249,7 +254,8 @@ private:
 								   ULONG ulPos);
 
 	const IMDExtStats *Pmdextstats(CMemoryPool *mp, IMDId *rel_mdid,
-								   CColRefSet *pcrs);
+								   CColRefSet *pcrs,
+								   UlongToIntMap *col_mapping);
 
 	// record histogram and width information for a given column of a table
 	void RecordColumnStats(CMemoryPool *mp, IMDId *rel_mdid, ULONG colid,
@@ -260,8 +266,7 @@ private:
 
 	void RecordExtendedStats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrs,
 							 BOOL isEmptyTable,
-							 UlongToHistogramMap *col_histogram_mapping,
-							 UlongToDoubleMap *colid_width_mapping,
+							 UlongToIntMap *col_histogram_mapping,
 							 CStatisticsConfig *stats_config);
 
 	// construct a stats histogram from an MD column stats object
