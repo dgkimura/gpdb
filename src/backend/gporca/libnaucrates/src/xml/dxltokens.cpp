@@ -511,6 +511,10 @@ CDXLTokens::Init(CMemoryPool *mp)
 		{EdxltokenColumnStats, GPOS_WSZ_LIT("ColumnStatistics")},
 		{EdxltokenColumnStatsBucket, GPOS_WSZ_LIT("StatsBucket")},
 		{EdxltokenExtendedStats, GPOS_WSZ_LIT("ExtendedStatistics")},
+		{EdxltokenStatsDependencies, GPOS_WSZ_LIT("StatsDependencies")},
+		{EdxltokenStatsDependency, GPOS_WSZ_LIT("StatsDependency")},
+		{EdxltokenRelationship, GPOS_WSZ_LIT("Relationship")},
+		{EdxltokenDegree, GPOS_WSZ_LIT("Degree")},
 		{EdxltokenEmptyRelation, GPOS_WSZ_LIT("EmptyRelation")},
 
 		{EdxltokenIsNull, GPOS_WSZ_LIT("IsNull")},

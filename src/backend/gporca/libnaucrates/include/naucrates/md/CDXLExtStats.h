@@ -17,7 +17,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/string/CWStringDynamic.h"
 
-#include "naucrates/md/CDXLBucket.h"
+#include "naucrates/md/CDXLStatsDependency.h"
 #include "naucrates/md/CMDIdExtStats.h"
 #include "naucrates/md/IMDExtStats.h"
 
@@ -54,12 +54,14 @@ private:
 	// DXL string for object
 	CWStringDynamic *m_dxl_str;
 
+	CDXLStatsDependencyArray *m_dependencies;
+
 public:
 	CDXLExtStats(const CDXLExtStats &) = delete;
 
 	// ctor
 	CDXLExtStats(CMemoryPool *mp, CMDIdExtStats *mdid_ext_stats,
-				 CMDName *mdname);
+				 CMDName *mdname, CDXLStatsDependencyArray *dependencies);
 
 	// dtor
 	~CDXLExtStats() override;

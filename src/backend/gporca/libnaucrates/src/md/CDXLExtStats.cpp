@@ -30,8 +30,12 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CDXLExtStats::CDXLExtStats(CMemoryPool *mp, CMDIdExtStats *mdid_ext_stats,
-						   CMDName *mdname)
-	: m_mp(mp), m_mdid_ext_stats(mdid_ext_stats), m_mdname(mdname)
+						   CMDName *mdname,
+						   CDXLStatsDependencyArray *dependencies)
+	: m_mp(mp),
+	  m_mdid_ext_stats(mdid_ext_stats),
+	  m_mdname(mdname),
+	  m_dependencies(dependencies)
 {
 	GPOS_ASSERT(mdid_ext_stats->IsValid());
 	m_dxl_str = CDXLUtils::SerializeMDObj(
@@ -109,6 +113,17 @@ CDXLExtStats::Serialize(CXMLSerializer *xml_serializer) const
 	xml_serializer->OpenElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 		CDXLTokens::GetDXLTokenStr(EdxltokenExtendedStats));
+
+	xml_serializer->OpenElement(
+		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+		CDXLTokens::GetDXLTokenStr(EdxltokenStatsDependencies));
+	for (ULONG i = 0; i < m_dependencies->Size(); i++)
+	{
+		(*m_dependencies)[i]->Serialize(xml_serializer);
+	}
+	xml_serializer->CloseElement(
+		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
+		CDXLTokens::GetDXLTokenStr(EdxltokenStatsDependencies));
 
 	xml_serializer->CloseElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),

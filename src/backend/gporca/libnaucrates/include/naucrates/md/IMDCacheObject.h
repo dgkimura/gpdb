@@ -71,6 +71,7 @@ public:
 		EmdtRelStats,
 		EmdtColStats,
 		EmdtExtStats,
+		EmdtExtStatsDependency,
 		EmdtCastFunc,
 		EmdtScCmp,
 		EmdtSentinel

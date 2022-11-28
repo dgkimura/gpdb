@@ -58,6 +58,7 @@ extern "C" {
 #include "naucrates/md/CDXLColStats.h"
 #include "naucrates/md/CDXLExtStats.h"
 #include "naucrates/md/CDXLRelStats.h"
+#include "naucrates/md/CDXLStatsDependency.h"
 #include "naucrates/md/CMDArrayCoerceCastGPDB.h"
 #include "naucrates/md/CMDCastGPDB.h"
 #include "naucrates/md/CMDIdCast.h"
@@ -1949,6 +1950,9 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 	gpdb::RelationWrapper rel = gpdb::GetRelation(rel_oid);
 
 	List *extstats = gpdb::GetExtStats(rel.get());
+
+	CDXLStatsDependencyArray *dependencies =
+		GPOS_NEW(mp) CDXLStatsDependencyArray(mp);
 	ListCell *lc;
 	ForEach(lc, extstats)
 	{
@@ -1964,11 +1968,25 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 		if (stat->kind == STATS_EXT_DEPENDENCIES)
 		{
 			MVDependencies *deps = statext_dependencies_load(stat->statOid);
+
+			for (ULONG i = 0; i < deps->ndeps; i++)
+			{
+				MVDependency *d = deps->deps[i];
+
+				std::vector<ULONG> from_attnos;
+				for (ULONG j = 0; j < d->nattributes - 1; j++)
+				{
+					from_attnos.push_back(d->attributes[j]);
+				}
+				dependencies->Append(GPOS_NEW(mp) CDXLStatsDependency(
+					mp, from_attnos, d->attributes[d->nattributes - 1],
+					d->degree));
+			}
 		}
 	}
 
 	CDXLExtStats *dxl_ext_stats =
-		GPOS_NEW(mp) CDXLExtStats(mp, mdid_ext_stats, md_relname);
+		GPOS_NEW(mp) CDXLExtStats(mp, mdid_ext_stats, md_relname, dependencies);
 	return dxl_ext_stats;
 }
 
