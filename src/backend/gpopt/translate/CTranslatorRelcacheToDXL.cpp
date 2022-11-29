@@ -1975,9 +1975,6 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 
 		std::vector<INT> stxkeys = get_stxkeys(stat->keys);
 
-		CDXLStatsDependencyArray *dependencies =
-			GPOS_NEW(mp) CDXLStatsDependencyArray(mp);
-
 		// If extended statistic keys do not cover the query keys then no point
 		// in considering the extended statistic
 		if (!bms_is_subset(stat->keys, bms))
@@ -1987,6 +1984,9 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 
 		if (stat->kind == STATS_EXT_DEPENDENCIES)
 		{
+			CDXLStatsDependencyArray *dependencies =
+				GPOS_NEW(mp) CDXLStatsDependencyArray(mp);
+
 			MVDependencies *deps = statext_dependencies_load(stat->statOid);
 
 			for (ULONG i = 0; i < deps->ndeps; i++)
@@ -2002,9 +2002,9 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 					mp, from_attnos, d->attributes[d->nattributes - 1],
 					d->degree));
 			}
+			ext_stats->Append(GPOS_NEW(mp) CDXLExtStat(mp, md_relname, stxkeys,
+													   dependencies));
 		}
-		ext_stats->Append(
-			GPOS_NEW(mp) CDXLExtStat(mp, md_relname, stxkeys, dependencies));
 	}
 
 	CDXLExtStats *dxl_ext_stats =

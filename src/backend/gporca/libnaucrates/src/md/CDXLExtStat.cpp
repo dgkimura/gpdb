@@ -107,7 +107,11 @@ CDXLExtStat::Serialize(CXMLSerializer *xml_serializer) const
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 		CDXLTokens::GetDXLTokenStr(EdxltokenExtendedStat));
 
-	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenName),
+	// TODO:KIMURA actual statistic object name...
+	//xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenName),
+	//							 Mdname().GetMDName());
+
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenRelation),
 								 Mdname().GetMDName());
 
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenKeys),

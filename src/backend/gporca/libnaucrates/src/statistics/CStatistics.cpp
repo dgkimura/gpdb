@@ -71,7 +71,8 @@ CStatistics::CStatistics(CMemoryPool *mp,
 	  m_num_rebinds(
 		  1.0),	 // by default, a stats object is rebound to parameters only once
 	  m_num_predicates(num_predicates),
-	  m_src_upper_bound_NDVs(nullptr)
+	  m_src_upper_bound_NDVs(nullptr),
+	  m_ext_stats(nullptr)
 {
 	GPOS_ASSERT(nullptr != m_colid_histogram_mapping);
 	GPOS_ASSERT(nullptr != m_colid_width_mapping);
@@ -88,7 +89,8 @@ CStatistics::CStatistics(CMemoryPool *mp,
 						 UlongToHistogramMap *col_histogram_mapping,
 						 UlongToDoubleMap *colid_width_mapping, CDouble rows,
 						 BOOL is_empty, ULONG relpages, ULONG relallvisible,
-						 CDouble rebinds, ULONG num_predicates)
+						 CDouble rebinds, ULONG num_predicates,
+						 const IMDExtStats *ext_stats)
 	: m_colid_histogram_mapping(col_histogram_mapping),
 	  m_colid_width_mapping(colid_width_mapping),
 	  m_rows(rows),
@@ -98,7 +100,8 @@ CStatistics::CStatistics(CMemoryPool *mp,
 	  m_relallvisible(relallvisible),
 	  m_num_rebinds(rebinds),
 	  m_num_predicates(num_predicates),
-	  m_src_upper_bound_NDVs(nullptr)
+	  m_src_upper_bound_NDVs(nullptr),
+	  m_ext_stats(ext_stats)
 {
 	GPOS_ASSERT(nullptr != m_colid_histogram_mapping);
 	GPOS_ASSERT(nullptr != m_colid_width_mapping);
@@ -572,7 +575,7 @@ CStatistics::ScaleStats(CMemoryPool *mp, CDouble factor) const
 	// create a scaled stats object
 	CStatistics *scaled_stats = GPOS_NEW(mp) CStatistics(
 		mp, histograms_new, widths_new, scaled_num_rows, IsEmpty(), RelPages(),
-		RelAllVisible(), NumRebinds(), m_num_predicates);
+		RelAllVisible(), NumRebinds(), m_num_predicates, m_ext_stats);
 
 	// In the output statistics object, the upper bound source cardinality of the scaled column
 	// cannot be greater than the the upper bound source cardinality information maintained in the input
@@ -606,7 +609,7 @@ CStatistics::CopyStatsWithRemap(CMemoryPool *mp,
 	// create a copy of the stats object
 	CStatistics *stats_copy = GPOS_NEW(mp) CStatistics(
 		mp, histograms_new, widths_new, m_rows, IsEmpty(), RelPages(),
-		RelAllVisible(), NumRebinds(), m_num_predicates);
+		RelAllVisible(), NumRebinds(), m_num_predicates, m_ext_stats);
 
 	// In the output statistics object, the upper bound source cardinality of the join column
 	// cannot be greater than the the upper bound source cardinality information maintained in the input

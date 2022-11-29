@@ -1129,8 +1129,8 @@ CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
 									   GPOS_NEW(m_mp) INT(attno));
 	}
 
-	RecordExtendedStats(mp, rel_mdid, pcrsHist, fEmptyTable,
-						attno_to_colid_mapping, stats_config);
+	const IMDExtStats *extstats =
+		Pmdextstats(mp, rel_mdid, pcrsHist, attno_to_colid_mapping);
 
 	// extract column widths
 	CColRefSetIter crsiWidth(*pcrsWidth);
@@ -1156,7 +1156,7 @@ CMDAccessor::Pstats(CMemoryPool *mp, IMDId *rel_mdid, CColRefSet *pcrsHist,
 	return GPOS_NEW(mp) CStatistics(
 		mp, col_histogram_mapping, colid_width_mapping, rows, fEmptyTable,
 		pmdRelStats->RelPages(), pmdRelStats->RelAllVisible(),
-		1.0 /* default rebinds */, 0 /* default predicates*/);
+		1.0 /* default rebinds */, 0 /* default predicates*/, extstats);
 }
 
 

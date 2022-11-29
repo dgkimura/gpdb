@@ -57,6 +57,13 @@ private:
 	CWStringDynamic *SerializeStxKeys() const;
 
 public:
+	enum EExtType
+	{
+		EextDependencies,
+		EextNDistinct,
+		EextMCV
+	};
+
 	CDXLExtStat(const CDXLExtStat &) = delete;
 
 	// ctor
