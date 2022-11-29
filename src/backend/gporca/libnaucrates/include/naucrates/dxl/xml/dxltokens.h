@@ -465,6 +465,7 @@ enum Edxltoken
 	EdxltokenColumnStats,
 	EdxltokenColumnStatsBucket,
 	EdxltokenExtendedStats,
+	EdxltokenExtendedStat,
 	EdxltokenStatsDependencies,
 	EdxltokenStatsDependency,
 	EdxltokenRelationship,

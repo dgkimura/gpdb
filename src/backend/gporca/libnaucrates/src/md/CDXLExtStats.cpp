@@ -30,12 +30,8 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CDXLExtStats::CDXLExtStats(CMemoryPool *mp, CMDIdExtStats *mdid_ext_stats,
-						   CMDName *mdname,
-						   CDXLStatsDependencyArray *dependencies)
-	: m_mp(mp),
-	  m_mdid_ext_stats(mdid_ext_stats),
-	  m_mdname(mdname),
-	  m_dependencies(dependencies)
+						   CDXLExtStatArray *ext_stats)
+	: m_mp(mp), m_mdid_ext_stats(mdid_ext_stats), m_ext_stats(ext_stats)
 {
 	GPOS_ASSERT(mdid_ext_stats->IsValid());
 	m_dxl_str = CDXLUtils::SerializeMDObj(
@@ -52,7 +48,6 @@ CDXLExtStats::CDXLExtStats(CMemoryPool *mp, CMDIdExtStats *mdid_ext_stats,
 //---------------------------------------------------------------------------
 CDXLExtStats::~CDXLExtStats()
 {
-	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }
 
@@ -81,7 +76,7 @@ CDXLExtStats::MDId() const
 CMDName
 CDXLExtStats::Mdname() const
 {
-	return *m_mdname;
+	return CMDName(GPOS_NEW(m_mp) CWStringConst(GPOS_WSZ_LIT("ExtStat")));
 }
 
 //---------------------------------------------------------------------------
@@ -114,16 +109,10 @@ CDXLExtStats::Serialize(CXMLSerializer *xml_serializer) const
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
 		CDXLTokens::GetDXLTokenStr(EdxltokenExtendedStats));
 
-	xml_serializer->OpenElement(
-		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
-		CDXLTokens::GetDXLTokenStr(EdxltokenStatsDependencies));
-	for (ULONG i = 0; i < m_dependencies->Size(); i++)
+	for (ULONG i = 0; i < m_ext_stats->Size(); i++)
 	{
-		(*m_dependencies)[i]->Serialize(xml_serializer);
+		(*m_ext_stats)[i]->Serialize(xml_serializer);
 	}
-	xml_serializer->CloseElement(
-		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
-		CDXLTokens::GetDXLTokenStr(EdxltokenStatsDependencies));
 
 	xml_serializer->CloseElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
@@ -144,11 +133,9 @@ CDXLExtStats::Serialize(CXMLSerializer *xml_serializer) const
 void
 CDXLExtStats::DebugPrint(IOstream &os) const
 {
-	os << "Column id: ";
+	os << "Extended stats id: ";
 	MDId()->OsPrint(os);
 	os << std::endl;
-
-	os << "Column name: " << (Mdname()).GetMDName()->GetBuffer() << std::endl;
 }
 
 #endif	// GPOS_DEBUG

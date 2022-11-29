@@ -17,6 +17,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/string/CWStringDynamic.h"
 
+#include "naucrates/md/CDXLExtStat.h"
 #include "naucrates/md/CDXLStatsDependency.h"
 #include "naucrates/md/CMDIdExtStats.h"
 #include "naucrates/md/IMDExtStats.h"
@@ -48,20 +49,17 @@ private:
 	// metadata id of the object
 	CMDIdExtStats *m_mdid_ext_stats;
 
-	// column name
-	CMDName *m_mdname;
-
 	// DXL string for object
 	CWStringDynamic *m_dxl_str;
 
-	CDXLStatsDependencyArray *m_dependencies;
+	CDXLExtStatArray *m_ext_stats;
 
 public:
 	CDXLExtStats(const CDXLExtStats &) = delete;
 
 	// ctor
 	CDXLExtStats(CMemoryPool *mp, CMDIdExtStats *mdid_ext_stats,
-				 CMDName *mdname, CDXLStatsDependencyArray *dependencies);
+				 CDXLExtStatArray *ext_stats);
 
 	// dtor
 	~CDXLExtStats() override;
@@ -83,9 +81,6 @@ public:
 	void DebugPrint(IOstream &os) const override;
 #endif
 };
-
-// array of dxl column stats
-using CDXLExtStatsArray = CDynamicPtrArray<CDXLExtStats, CleanupRelease>;
 }  // namespace gpmd
 
 

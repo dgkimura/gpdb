@@ -13,6 +13,7 @@ include $(top_srcdir)/src/backend/gporca/gporca.mk
 OBJS        = CDXLBucket.o \
               CDXLColStats.o \
               CDXLExtStats.o \
+              CDXLExtStat.o \
               CDXLStatsDependency.o \
               CDXLRelStats.o \
               CDXLStatsDerivedColumn.o \

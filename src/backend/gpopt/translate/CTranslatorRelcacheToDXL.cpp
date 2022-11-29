@@ -1951,12 +1951,14 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 
 	List *extstats = gpdb::GetExtStats(rel.get());
 
-	CDXLStatsDependencyArray *dependencies =
-		GPOS_NEW(mp) CDXLStatsDependencyArray(mp);
+	CDXLExtStatArray *ext_stats = GPOS_NEW(mp) CDXLExtStatArray(mp);
 	ListCell *lc;
 	ForEach(lc, extstats)
 	{
 		StatisticExtInfo *stat = (StatisticExtInfo *) lfirst(lc);
+
+		CDXLStatsDependencyArray *dependencies =
+			GPOS_NEW(mp) CDXLStatsDependencyArray(mp);
 
 		// If extended statistic keys do not cover the query keys then no point
 		// in considering the extended statistic
@@ -1983,10 +1985,12 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 					d->degree));
 			}
 		}
+		ext_stats->Append(GPOS_NEW(mp)
+							  CDXLExtStat(mp, md_relname, dependencies));
 	}
 
 	CDXLExtStats *dxl_ext_stats =
-		GPOS_NEW(mp) CDXLExtStats(mp, mdid_ext_stats, md_relname, dependencies);
+		GPOS_NEW(mp) CDXLExtStats(mp, mdid_ext_stats, ext_stats);
 	return dxl_ext_stats;
 }
 
