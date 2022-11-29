@@ -2003,8 +2003,8 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 					d->degree));
 			}
 		}
-		ext_stats->Append(GPOS_NEW(mp)
-							  CDXLExtStat(mp, md_relname, dependencies));
+		ext_stats->Append(
+			GPOS_NEW(mp) CDXLExtStat(mp, md_relname, stxkeys, dependencies));
 	}
 
 	CDXLExtStats *dxl_ext_stats =

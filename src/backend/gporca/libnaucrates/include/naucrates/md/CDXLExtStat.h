@@ -12,6 +12,8 @@
 #ifndef GPMD_CDXLExtStat_H
 #define GPMD_CDXLExtStat_H
 
+#include <vector>
+
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
 #include "gpos/common/CDynamicPtrArray.h"
@@ -48,13 +50,17 @@ private:
 	// column name
 	CMDName *m_mdname;
 
+	std::vector<INT> m_stxkeys;
+
 	CDXLStatsDependencyArray *m_dependencies;
+
+	CWStringDynamic *SerializeStxKeys() const;
 
 public:
 	CDXLExtStat(const CDXLExtStat &) = delete;
 
 	// ctor
-	CDXLExtStat(CMemoryPool *mp, CMDName *mdname,
+	CDXLExtStat(CMemoryPool *mp, CMDName *mdname, std::vector<INT> stxkeys,
 				CDXLStatsDependencyArray *dependencies);
 
 	// dtor

@@ -30,8 +30,12 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 CDXLExtStat::CDXLExtStat(CMemoryPool *mp, CMDName *mdname,
+						 std::vector<INT> stxkeys,
 						 CDXLStatsDependencyArray *dependencies)
-	: m_mp(mp), m_mdname(mdname), m_dependencies(dependencies)
+	: m_mp(mp),
+	  m_mdname(mdname),
+	  m_stxkeys(stxkeys),
+	  m_dependencies(dependencies)
 {
 }
 
@@ -63,6 +67,31 @@ CDXLExtStat::Mdname() const
 }
 
 
+CWStringDynamic *
+CDXLExtStat::SerializeStxKeys() const
+{
+	CWStringDynamic *str = GPOS_NEW(m_mp) CWStringDynamic(m_mp);
+
+	const ULONG len = m_stxkeys.size();
+	for (ULONG ul = 0; ul < len; ul++)
+	{
+		if (ul == len - 1)
+		{
+			// last element: do not print a comma
+			str->AppendFormat(GPOS_WSZ_LIT("%d"), m_stxkeys[ul]);
+		}
+		else
+		{
+			str->AppendFormat(
+				GPOS_WSZ_LIT("%d%ls"), m_stxkeys[ul],
+				CDXLTokens::GetDXLTokenStr(EdxltokenComma)->GetBuffer());
+		}
+	}
+
+	return str;
+}
+
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CDXLExtStat::Serialize
@@ -80,6 +109,9 @@ CDXLExtStat::Serialize(CXMLSerializer *xml_serializer) const
 
 	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenName),
 								 Mdname().GetMDName());
+
+	xml_serializer->AddAttribute(CDXLTokens::GetDXLTokenStr(EdxltokenKeys),
+								 SerializeStxKeys());
 
 	xml_serializer->OpenElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix),
