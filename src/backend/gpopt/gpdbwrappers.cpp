@@ -363,6 +363,17 @@ gpdb::BmsAddMember(Bitmapset *a, int x)
 	return nullptr;
 }
 
+int
+gpdb::BmsNextMember(Bitmapset *a, int x)
+{
+	GP_WRAP_START;
+	{
+		return bms_next_member(a, x);
+	}
+	GP_WRAP_END;
+	return -2;
+}
+
 void *
 gpdb::CopyObject(void *from)
 {

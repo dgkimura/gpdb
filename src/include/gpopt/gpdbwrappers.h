@@ -142,6 +142,8 @@ bool AggregateExists(Oid oid);
 // add member to Bitmapset
 Bitmapset *BmsAddMember(Bitmapset *a, int x);
 
+int BmsNextMember(Bitmapset *a, int x);
+
 // create a copy of an object
 void *CopyObject(void *from);
 

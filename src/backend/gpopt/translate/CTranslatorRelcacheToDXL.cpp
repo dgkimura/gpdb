@@ -1927,6 +1927,22 @@ CTranslatorRelcacheToDXL::RetrieveColStats(CMemoryPool *mp,
 	return dxl_col_stats;
 }
 
+static std::vector<INT>
+get_stxkeys(Bitmapset *bms)
+{
+	std::vector<INT> stxkeys;
+
+	int x;
+
+	x = -1;
+	while ((x = gpdb::BmsNextMember(bms, x)) >= 0)
+	{
+		stxkeys.push_back(x);
+	}
+
+	return stxkeys;
+}
+
 IMDCacheObject *
 CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 										   CMDAccessor *md_accessor,
@@ -1956,6 +1972,8 @@ CTranslatorRelcacheToDXL::RetrieveExtStats(CMemoryPool *mp,
 	ForEach(lc, extstats)
 	{
 		StatisticExtInfo *stat = (StatisticExtInfo *) lfirst(lc);
+
+		std::vector<INT> stxkeys = get_stxkeys(stat->keys);
 
 		CDXLStatsDependencyArray *dependencies =
 			GPOS_NEW(mp) CDXLStatsDependencyArray(mp);
