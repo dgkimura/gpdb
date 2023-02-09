@@ -193,13 +193,13 @@ protected:
 	CMemoryPool *m_mp;
 
 	// edges
-	SEdge **m_rgpedge;
+	gpos::Ref<SEdge> *m_rgpedge;
 
 	// number of edges
 	ULONG m_ulEdges;
 
 	// components
-	SComponent **m_rgpcomp;
+	gpos::Ref<SComponent> *m_rgpcomp;
 
 	// number of components
 	ULONG m_ulComps;
@@ -212,16 +212,17 @@ protected:
 	void ComputeEdgeCover();
 
 	// combine the two given components using applicable edges
-	gpos::Ref<SComponent> PcompCombine(SComponent *comp1, SComponent *comp2);
+	gpos::Ref<SComponent> PcompCombine(gpos::Ref<SComponent> comp1,
+									   gpos::Ref<SComponent> comp2);
 
 	// derive stats on a given component
-	virtual void DeriveStats(CExpression *pexpr);
+	virtual void DeriveStats(gpos::Ref<CExpression> pexpr);
 
 	// mark edges used by expression
-	void MarkUsedEdges(SComponent *comp);
+	void MarkUsedEdges(gpos::Ref<SComponent> comp);
 
 	// add component to to component array
-	void AddComponent(CMemoryPool *mp, CExpression *expr, INT loj_id,
+	void AddComponent(CMemoryPool *mp, gpos::Ref<CExpression> expr, INT loj_id,
 					  EPosition position, INT comp_num);
 
 private:
@@ -245,10 +246,12 @@ public:
 	IOstream &OsPrint(IOstream &) const;
 
 	// is this a valid join combination
-	static BOOL IsValidJoinCombination(SComponent *comp1, SComponent *comp2);
+	static BOOL IsValidJoinCombination(gpos::Ref<SComponent> comp1,
+									   gpos::Ref<SComponent> comp2);
 
 	// are these childs of the same LOJ
-	static BOOL IsChildOfSameLOJ(SComponent *comp1, SComponent *comp2);
+	static BOOL IsChildOfSameLOJ(gpos::Ref<SComponent> comp1,
+								 gpos::Ref<SComponent> comp2);
 
 	virtual CXform::EXformId
 	EOriginXForm() const

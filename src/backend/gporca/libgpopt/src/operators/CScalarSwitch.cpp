@@ -76,7 +76,7 @@ CScalarSwitch::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSwitch::Matches(COperator *pop) const
+CScalarSwitch::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

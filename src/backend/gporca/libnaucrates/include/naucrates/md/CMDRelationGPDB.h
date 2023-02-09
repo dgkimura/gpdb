@@ -255,7 +255,7 @@ public:
 	gpos::Ref<IMDId> CheckConstraintMDidAt(ULONG pos) const override;
 
 	// part constraint
-	CDXLNode *MDPartConstraint() const override;
+	gpos::Ref<CDXLNode> MDPartConstraint() const override;
 
 	// child partition oids
 	IMdIdArray *ChildPartitionMdids() const override;

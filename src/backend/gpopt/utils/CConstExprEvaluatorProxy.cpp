@@ -62,7 +62,7 @@ CConstExprEvaluatorProxy::CEmptyMappingColIdVar::VarFromDXLNodeScId(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
-CConstExprEvaluatorProxy::EvaluateExpr(const CDXLNode *dxl_expr)
+CConstExprEvaluatorProxy::EvaluateExpr(const gpos::Ref<CDXLNode> dxl_expr)
 {
 	// Translate DXL -> GPDB Expr
 	Expr *expr = m_dxl2scalar_translator.TranslateDXLToScalar(

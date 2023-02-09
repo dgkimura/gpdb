@@ -160,9 +160,9 @@ public:
 	IOstream &OsPrint(IOstream &) const;
 
 	// combine two part info objects
-	static gpos::Ref<CPartInfo> PpartinfoCombine(CMemoryPool *mp,
-												 CPartInfo *ppartinfoFst,
-												 CPartInfo *ppartinfoSnd);
+	static gpos::Ref<CPartInfo> PpartinfoCombine(
+		CMemoryPool *mp, gpos::Ref<CPartInfo> ppartinfoFst,
+		gpos::Ref<CPartInfo> ppartinfoSnd);
 
 };	// CPartInfo
 

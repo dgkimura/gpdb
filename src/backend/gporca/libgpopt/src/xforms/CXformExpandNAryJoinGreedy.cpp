@@ -73,9 +73,9 @@ CXformExpandNAryJoinGreedy::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformExpandNAryJoinGreedy::Transform(CXformContext *pxfctxt,
-									  CXformResult *pxfres,
-									  CExpression *pexpr) const
+CXformExpandNAryJoinGreedy::Transform(gpos::Ref<CXformContext> pxfctxt,
+									  gpos::Ref<CXformResult> pxfres,
+									  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -95,7 +95,7 @@ CXformExpandNAryJoinGreedy::Transform(CXformContext *pxfctxt,
 		pdrgpexpr->Append(pexprChild);
 	}
 
-	CExpression *pexprScalar = (*pexpr)[ulArity - 1];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[ulArity - 1];
 	gpos::Ref<CExpressionArray> pdrgpexprPreds =
 		CPredicateUtils::PdrgpexprConjuncts(pmp, pexprScalar);
 

@@ -100,9 +100,9 @@ private:
 		IOstream &OsPrint(IOstream &os) const;
 
 		// used for determining equality in memo (e.g in optimization contexts)
-		BOOL Equals(const SPartPropSpecInfo *) const;
+		BOOL Equals(const gpos::Ref<SPartPropSpecInfo>) const;
 
-		BOOL FSatisfies(const SPartPropSpecInfo *) const;
+		BOOL FSatisfies(const gpos::Ref<SPartPropSpecInfo>) const;
 
 		// used for sorting SPartPropSpecInfo in an array
 		static INT CmpFunc(const void *val1, const void *val2);
@@ -136,7 +136,7 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::Ref<CExpression> pexpr) override;
 
 	// hash function
 	ULONG
@@ -147,7 +147,7 @@ public:
 		UlongToSPartPropSpecInfoMapIter hmulpi(m_part_prop_spec_infos.get());
 		while (hmulpi.Advance())
 		{
-			const SPartPropSpecInfo *info = hmulpi.Value();
+			const gpos::Ref<SPartPropSpecInfo> info = hmulpi.Value();
 			ulHash = gpos::CombineHashes(ulHash, info->HashValue());
 		}
 
@@ -184,22 +184,22 @@ public:
 	BOOL FSatisfies(const CPartitionPropagationSpec *pps_reqd) const;
 
 
-	SPartPropSpecInfo *FindPartPropSpecInfo(ULONG scan_id) const;
+	gpos::Ref<SPartPropSpecInfo> FindPartPropSpecInfo(ULONG scan_id) const;
 
 	void Insert(ULONG scan_id, EPartPropSpecInfoType type,
-				gpos::Ref<IMDId> rool_rel_mdid, CBitSet *selector_ids,
-				CExpression *expr);
+				gpos::Ref<IMDId> rool_rel_mdid, gpos::Ref<CBitSet> selector_ids,
+				gpos::Ref<CExpression> expr);
 
-	void Insert(SPartPropSpecInfo *other);
+	void Insert(gpos::Ref<SPartPropSpecInfo> other);
 
 	void InsertAll(CPartitionPropagationSpec *pps);
 
 	void InsertAllowedConsumers(CPartitionPropagationSpec *pps,
-								CBitSet *allowed_scan_ids);
+								gpos::Ref<CBitSet> allowed_scan_ids);
 
 	void InsertAllExcept(CPartitionPropagationSpec *pps, ULONG scan_id);
 
-	const CBitSet *SelectorIds(ULONG scan_id) const;
+	const gpos::Ref<CBitSet> SelectorIds(ULONG scan_id) const;
 
 	// is partition propagation required
 	BOOL

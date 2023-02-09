@@ -87,9 +87,9 @@ CXformExpandFullOuterJoin::Exfp(CExpressionHandle &	 //exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformExpandFullOuterJoin::Transform(CXformContext *pxfctxt,
-									 CXformResult *pxfres,
-									 CExpression *pexpr) const
+CXformExpandFullOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+									 gpos::Ref<CXformResult> pxfres,
+									 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -97,9 +97,9 @@ CXformExpandFullOuterJoin::Transform(CXformContext *pxfctxt,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	CExpression *pexprA = (*pexpr)[0];
-	CExpression *pexprB = (*pexpr)[1];
-	CExpression *pexprScalar = (*pexpr)[2];
+	gpos::Ref<CExpression> pexprA = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprB = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
 	// 1. create the CTE producers
 	const ULONG ulCTEIdA = COptCtxt::PoctxtFromTLS()->Pcteinfo()->next_id();
@@ -200,7 +200,7 @@ CXformExpandFullOuterJoin::PexprLogicalJoinOverCTEs(
 
 	gpos::Ref<CExpressionArray> pdrgpexprChildren =
 		GPOS_NEW(mp) CExpressionArray(mp);
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 
 	gpos::Ref<CLogicalCTEConsumer> popConsumerLeft = GPOS_NEW(mp)
 		CLogicalCTEConsumer(mp, ulLeftCTEId, std::move(pdrgpcrLeft));

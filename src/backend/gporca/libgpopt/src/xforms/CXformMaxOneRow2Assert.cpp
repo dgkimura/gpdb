@@ -63,8 +63,9 @@ CXformMaxOneRow2Assert::Exfp(CExpressionHandle &  // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformMaxOneRow2Assert::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								  CExpression *pexpr) const
+CXformMaxOneRow2Assert::Transform(gpos::Ref<CXformContext> pxfctxt,
+								  gpos::Ref<CXformResult> pxfres,
+								  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

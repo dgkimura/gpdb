@@ -34,11 +34,13 @@ private:
 protected:
 	// helper for subquery unnesting
 	static gpos::Ref<CExpression> PexprSubqueryUnnest(
-		CMemoryPool *mp, CExpression *pexpr, BOOL fEnforceCorrelatedApply);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		BOOL fEnforceCorrelatedApply);
 
 	// actual transform
-	virtual void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-						   CExpression *pexpr,
+	virtual void Transform(gpos::Ref<CXformContext> pxfctxt,
+						   gpos::Ref<CXformResult> pxfres,
+						   gpos::Ref<CExpression> pexpr,
 						   BOOL fEnforceCorrelatedApply) const;
 
 public:
@@ -57,8 +59,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::Ref<CXformContext> pxfctxt,
+				   gpos::Ref<CXformResult> pxfres,
+				   gpos::Ref<CExpression> pexpr) const override;
 
 	// is transformation a subquery unnesting (Subquery To Apply) xform?
 	BOOL

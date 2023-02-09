@@ -70,8 +70,9 @@ CXformImplementDynamicBitmapTableGet::Exfp(CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 void
 CXformImplementDynamicBitmapTableGet::Transform(
-	CXformContext *pxfctxt GPOS_ASSERTS_ONLY, CXformResult *pxfres GPOS_UNUSED,
-	CExpression *pexpr GPOS_ASSERTS_ONLY) const
+	gpos::Ref<CXformContext> pxfctxt GPOS_ASSERTS_ONLY,
+	gpos::Ref<CXformResult> pxfres GPOS_UNUSED,
+	gpos::Ref<CExpression> pexpr GPOS_ASSERTS_ONLY) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -104,8 +105,8 @@ CXformImplementDynamicBitmapTableGet::Transform(
 			popLogical->GetPartitionMdids(),
 			popLogical->GetRootColMappingPerPart());
 
-	CExpression *pexprCondition = (*pexpr)[0];
-	CExpression *pexprIndexPath = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprCondition = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprIndexPath = (*pexpr)[1];
 	;
 	;
 

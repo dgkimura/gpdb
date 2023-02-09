@@ -63,7 +63,7 @@ public:
 	~CParseHandlerCostParams() override;
 
 	// returns the dxl representation of cost parameters
-	ICostModelParams *
+	gpos::Ref<ICostModelParams>
 	GetCostModelParams()
 	{
 		return m_cost_model_params.get();

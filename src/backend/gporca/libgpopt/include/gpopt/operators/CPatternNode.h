@@ -51,7 +51,7 @@ public:
 
 	// match function
 	BOOL
-	Matches(COperator *pop) const override
+	Matches(gpos::Ref<COperator> pop) const override
 	{
 		return Eopid() == pop->Eopid() &&
 			   m_match == static_cast<CPatternNode *>(pop)->m_match;
@@ -66,7 +66,7 @@ public:
 
 	// conversion function
 	static CPatternNode *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(COperator::EopPatternNode == pop->Eopid());

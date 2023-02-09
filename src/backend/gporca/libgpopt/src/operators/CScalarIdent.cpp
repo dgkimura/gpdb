@@ -48,7 +48,7 @@ CScalarIdent::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIdent::Matches(COperator *pop) const
+CScalarIdent::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -143,7 +143,7 @@ CScalarIdent::TypeModifier() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIdent::FCastedScId(CExpression *pexpr)
+CScalarIdent::FCastedScId(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -160,7 +160,7 @@ CScalarIdent::FCastedScId(CExpression *pexpr)
 }
 
 BOOL
-CScalarIdent::FCastedScId(CExpression *pexpr, CColRef *colref)
+CScalarIdent::FCastedScId(gpos::Ref<CExpression> pexpr, CColRef *colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != colref);
@@ -185,7 +185,7 @@ CScalarIdent::FCastedScId(CExpression *pexpr, CColRef *colref)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarIdent::FAllowedFuncScId(CExpression *pexpr)
+CScalarIdent::FAllowedFuncScId(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -202,7 +202,7 @@ CScalarIdent::FAllowedFuncScId(CExpression *pexpr)
 }
 
 BOOL
-CScalarIdent::FAllowedFuncScId(CExpression *pexpr, CColRef *colref)
+CScalarIdent::FAllowedFuncScId(gpos::Ref<CExpression> pexpr, CColRef *colref)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != colref);

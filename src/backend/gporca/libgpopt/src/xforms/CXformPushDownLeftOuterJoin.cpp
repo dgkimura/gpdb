@@ -67,7 +67,7 @@ CXformPushDownLeftOuterJoin::CXformPushDownLeftOuterJoin(CMemoryPool *mp)
 CXform::EXformPromise
 CXformPushDownLeftOuterJoin::Exfp(CExpressionHandle &exprhdl) const
 {
-	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(2);
+	gpos::Ref<CExpression> pexprScalar = exprhdl.PexprScalarRepChild(2);
 	if (COperator::EopScalarConst == pexprScalar->Pop()->Eopid())
 	{
 		return CXform::ExfpNone;
@@ -101,9 +101,9 @@ CXformPushDownLeftOuterJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformPushDownLeftOuterJoin::Transform(CXformContext *pxfctxt,
-									   CXformResult *pxfres,
-									   CExpression *pexpr) const
+CXformPushDownLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+									   gpos::Ref<CXformResult> pxfres,
+									   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -112,9 +112,9 @@ CXformPushDownLeftOuterJoin::Transform(CXformContext *pxfctxt,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	CExpression *pexprNAryJoin = (*pexpr)[0];
-	CExpression *pexprLOJInnerChild = (*pexpr)[1];
-	CExpression *pexprLOJScalarChild = (*pexpr)[2];
+	gpos::Ref<CExpression> pexprNAryJoin = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprLOJInnerChild = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLOJScalarChild = (*pexpr)[2];
 
 	CColRefSet *pcrsLOJUsed = pexprLOJScalarChild->DeriveUsedColumns();
 	gpos::Ref<CExpressionArray> pdrgpexprLOJChildren =
@@ -123,10 +123,11 @@ CXformPushDownLeftOuterJoin::Transform(CXformContext *pxfctxt,
 		GPOS_NEW(mp) CExpressionArray(mp);
 
 	const ULONG arity = pexprNAryJoin->Arity();
-	CExpression *pexprNAryJoinScalarChild = (*pexprNAryJoin)[arity - 1];
+	gpos::Ref<CExpression> pexprNAryJoinScalarChild =
+		(*pexprNAryJoin)[arity - 1];
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
-		CExpression *pexprChild = (*pexprNAryJoin)[ul];
+		gpos::Ref<CExpression> pexprChild = (*pexprNAryJoin)[ul];
 		CColRefSet *pcrsOutput = pexprChild->DeriveOutputColumns();
 		;
 		if (!pcrsOutput->IsDisjoint(pcrsLOJUsed))

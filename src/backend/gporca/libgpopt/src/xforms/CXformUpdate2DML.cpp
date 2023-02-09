@@ -70,8 +70,9 @@ CXformUpdate2DML::Exfp(CExpressionHandle &	// exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							CExpression *pexpr) const
+CXformUpdate2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
+							gpos::Ref<CXformResult> pxfres,
+							gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -82,7 +83,7 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	// extract components for alternative
 
-	CTableDescriptor *ptabdesc = popUpdate->Ptabdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = popUpdate->Ptabdesc();
 	CColRefArray *pdrgpcrDelete = popUpdate->PdrgpcrDelete();
 	CColRefArray *pdrgpcrInsert = popUpdate->PdrgpcrInsert();
 	CColRef *pcrCtid = popUpdate->PcrCtid();
@@ -137,7 +138,7 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 
 	// add assert checking that no NULL values are inserted for nullable columns or no check constraints are violated
-	COptimizerConfig *optimizer_config =
+	gpos::Ref<COptimizerConfig> optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 	gpos::Ref<CExpression> pexprAssertConstraints;
 	if (optimizer_config->GetHint()->FEnforceConstraintsOnDML())
@@ -174,7 +175,7 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		pexprProject =
 			CUtils::PexprAddProjection(mp, pexprAssertConstraints, pexprOid);
 
-		CExpression *pexprPrL = (*pexprProject)[1];
+		gpos::Ref<CExpression> pexprPrL = (*pexprProject)[1];
 		pcrTableOid = CUtils::PcrFromProjElem((*pexprPrL)[0]);
 	}
 

@@ -75,10 +75,10 @@ CXformResult::Add(gpos::Ref<CExpression> pexpr)
 //		retrieve next alternative
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CXformResult::PexprNext()
 {
-	CExpression *pexpr = nullptr;
+	gpos::Ref<CExpression> pexpr = nullptr;
 	if (m_ulExpr < m_pdrgpexpr->Size())
 	{
 		pexpr = (*m_pdrgpexpr)[m_ulExpr];

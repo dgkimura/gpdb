@@ -101,8 +101,8 @@ CDXLPhysicalSubqueryScan::MdName()
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSubqueryScan::SerializeToDXL(CXMLSerializer *xml_serializer,
-										 const CDXLNode *dxlnode) const
+CDXLPhysicalSubqueryScan::SerializeToDXL(
+	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -131,7 +131,7 @@ CDXLPhysicalSubqueryScan::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSubqueryScan::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalSubqueryScan::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 									  BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -140,7 +140,7 @@ CDXLPhysicalSubqueryScan::AssertValid(const CDXLNode *dxlnode,
 	// subquery scan has 3 children
 	GPOS_ASSERT(EdxlsubqscanIndexSentinel == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlsubqscanIndexChild];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[EdxlsubqscanIndexChild];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

@@ -77,7 +77,7 @@ public:
 
 	// conversion function
 	static CDXLPhysicalMotion *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(

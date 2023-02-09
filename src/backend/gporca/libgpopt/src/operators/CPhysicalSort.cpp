@@ -64,7 +64,7 @@ CPhysicalSort::~CPhysicalSort()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalSort::Matches(COperator *pop) const
+CPhysicalSort::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
@@ -206,7 +206,7 @@ CPhysicalSort::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalSort::PcteRequired(CMemoryPool *,		  //mp,
 							CExpressionHandle &,  //exprhdl,
-							CCTEReq *pcter,
+							gpos::Ref<CCTEReq> pcter,
 							ULONG
 #ifdef GPOS_DEBUG
 								child_index

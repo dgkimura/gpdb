@@ -78,7 +78,7 @@ CDrvdPropScalar::~CDrvdPropScalar()
 //---------------------------------------------------------------------------
 void
 CDrvdPropScalar::Derive(CMemoryPool *, CExpressionHandle &exprhdl,
-						CDrvdPropCtxt *	 // pdpctxt
+						gpos::Ref<CDrvdPropCtxt>  // pdpctxt
 )
 {
 	// call derivation functions on the operator
@@ -121,7 +121,7 @@ CDrvdPropScalar::Derive(CMemoryPool *, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 CDrvdPropScalar *
-CDrvdPropScalar::GetDrvdScalarProps(CDrvdProp *pdp)
+CDrvdPropScalar::GetDrvdScalarProps(gpos::Ref<CDrvdProp> pdp)
 {
 	GPOS_ASSERT(nullptr != pdp);
 	GPOS_ASSERT(EptScalar == pdp->Ept() &&
@@ -277,14 +277,14 @@ CDrvdPropScalar::DeriveHasSubquery(CExpressionHandle &exprhdl)
 }
 
 // derived partition consumers
-CPartInfo *
+gpos::Ref<CPartInfo>
 CDrvdPropScalar::GetPartitionInfo() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
 	return m_ppartinfo.get();
 }
 
-CPartInfo *
+gpos::Ref<CPartInfo>
 CDrvdPropScalar::DerivePartitionInfo(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPPartInfo))
@@ -303,14 +303,14 @@ CDrvdPropScalar::DerivePartitionInfo(CExpressionHandle &exprhdl)
 }
 
 // function properties
-CFunctionProp *
+gpos::Ref<CFunctionProp>
 CDrvdPropScalar::GetFunctionProperties() const
 {
 	GPOS_RTL_ASSERT(IsComplete());
 	return m_pfp.get();
 }
 
-CFunctionProp *
+gpos::Ref<CFunctionProp>
 CDrvdPropScalar::DeriveFunctionProperties(CExpressionHandle &exprhdl)
 {
 	if (!m_is_prop_derived->ExchangeSet(EdptPfp))

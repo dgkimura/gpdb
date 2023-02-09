@@ -91,7 +91,7 @@ CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 void
-CDrvdPropCtxtPlan::AddProps(CDrvdProp *pdp)
+CDrvdPropCtxtPlan::AddProps(gpos::Ref<CDrvdProp> pdp)
 {
 	if (CDrvdProp::EptPlan != pdp->Ept())
 	{

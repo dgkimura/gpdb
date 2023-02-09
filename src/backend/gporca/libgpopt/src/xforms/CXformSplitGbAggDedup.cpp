@@ -57,8 +57,9 @@ CXformSplitGbAggDedup::CXformSplitGbAggDedup(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformSplitGbAggDedup::Transform(gpos::Ref<CXformContext> pxfctxt,
+								 gpos::Ref<CXformResult> pxfres,
+								 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -70,8 +71,8 @@ CXformSplitGbAggDedup::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		gpos::dyn_cast<CLogicalGbAggDeduplicate>(pexpr->Pop());
 
 	// extract components
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprProjectList = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 
 	// check if the transformation is applicable
 	if (!FApplicable(pexprProjectList))

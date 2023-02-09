@@ -133,7 +133,7 @@ CLogicalCTEProducer::DeriveMaxCard(CMemoryPool *,  // mp
 	return exprhdl.DeriveMaxCard(0);
 }
 
-CTableDescriptor *
+gpos::Ref<CTableDescriptor>
 CLogicalCTEProducer::DeriveTableDescriptor(CMemoryPool *,  // mp
 										   CExpressionHandle &exprhdl) const
 {
@@ -150,7 +150,7 @@ CLogicalCTEProducer::DeriveTableDescriptor(CMemoryPool *,  // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalCTEProducer::Matches(COperator *pop) const
+CLogicalCTEProducer::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

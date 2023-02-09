@@ -93,7 +93,7 @@ public:
 	}
 
 	// part constraint
-	CDXLNode *
+	gpos::Ref<CDXLNode>
 	MDPartConstraint() const override
 	{
 		return nullptr;

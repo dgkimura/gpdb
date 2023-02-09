@@ -78,7 +78,7 @@ CPartInfo::CPartInfoEntry::PpartinfoentryAddRemappedKeys(
 	const ULONG size = m_pdrgppartkeys->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CPartKeys *ppartkeys = (*m_pdrgppartkeys)[ul].get();
+		gpos::Ref<CPartKeys> ppartkeys = (*m_pdrgppartkeys)[ul].get();
 
 		if (ppartkeys->FOverlap(pcrs))
 		{
@@ -211,7 +211,8 @@ CPartInfo::FContainsScanId(ULONG scan_id) const
 
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul].get();
+		gpos::Ref<CPartInfoEntry> ppartinfoentry =
+			(*m_pdrgppartentries)[ul].get();
 		if (scan_id == ppartinfoentry->ScanId())
 		{
 			return true;
@@ -278,7 +279,8 @@ CPartInfo::PdrgppartkeysByScanId(ULONG scan_id) const
 
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul].get();
+		gpos::Ref<CPartInfoEntry> ppartinfoentry =
+			(*m_pdrgppartentries)[ul].get();
 		if (scan_id == ppartinfoentry->ScanId())
 		{
 			return ppartinfoentry->Pdrgppartkeys();
@@ -313,7 +315,8 @@ CPartInfo::PpartinfoWithRemappedKeys(CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
 	const ULONG size = m_pdrgppartentries->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul].get();
+		gpos::Ref<CPartInfoEntry> ppartinfoentry =
+			(*m_pdrgppartentries)[ul].get();
 
 		// if this entry has keys that overlap with the source columns then
 		// add another set of keys to it using the destination columns
@@ -338,8 +341,8 @@ CPartInfo::PpartinfoWithRemappedKeys(CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CPartInfo>
-CPartInfo::PpartinfoCombine(CMemoryPool *mp, CPartInfo *ppartinfoFst,
-							CPartInfo *ppartinfoSnd)
+CPartInfo::PpartinfoCombine(CMemoryPool *mp, gpos::Ref<CPartInfo> ppartinfoFst,
+							gpos::Ref<CPartInfo> ppartinfoSnd)
 {
 	GPOS_ASSERT(nullptr != ppartinfoFst);
 	GPOS_ASSERT(nullptr != ppartinfoSnd);
@@ -355,7 +358,7 @@ CPartInfo::PpartinfoCombine(CMemoryPool *mp, CPartInfo *ppartinfoFst,
 	const ULONG length = ppartinfoSnd->m_pdrgppartentries->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CPartInfoEntry *ppartinfoentry =
+		gpos::Ref<CPartInfoEntry> ppartinfoentry =
 			(*(ppartinfoSnd->m_pdrgppartentries))[ul].get();
 		CPartKeysArray *pdrgppartkeys =
 			ppartinfoFst->PdrgppartkeysByScanId(ppartinfoentry->ScanId());
@@ -396,7 +399,8 @@ CPartInfo::OsPrint(IOstream &os) const
 	os << "Part Consumers: ";
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CPartInfoEntry *ppartinfoentry = (*m_pdrgppartentries)[ul].get();
+		gpos::Ref<CPartInfoEntry> ppartinfoentry =
+			(*m_pdrgppartentries)[ul].get();
 		ppartinfoentry->OsPrint(os);
 
 		// separator

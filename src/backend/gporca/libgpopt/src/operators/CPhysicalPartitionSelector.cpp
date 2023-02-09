@@ -65,7 +65,7 @@ CPhysicalPartitionSelector::~CPhysicalPartitionSelector()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalPartitionSelector::Matches(COperator *pop) const
+CPhysicalPartitionSelector::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
@@ -166,7 +166,7 @@ CPhysicalPartitionSelector::PdsRequired(CMemoryPool *mp,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CPartInfo *ppartinfo = exprhdl.DerivePartitionInfo();
+	gpos::Ref<CPartInfo> ppartinfo = exprhdl.DerivePartitionInfo();
 	BOOL fCovered = ppartinfo->FContainsScanId(m_scan_id);
 
 	if (fCovered)
@@ -213,7 +213,7 @@ CPhysicalPartitionSelector::PrsRequired(CMemoryPool *mp,
 gpos::Ref<CCTEReq>
 CPhysicalPartitionSelector::PcteRequired(CMemoryPool *,		   //mp,
 										 CExpressionHandle &,  //exprhdl,
-										 CCTEReq *pcter,
+										 gpos::Ref<CCTEReq> pcter,
 										 ULONG
 #ifdef GPOS_DEBUG
 											 child_index

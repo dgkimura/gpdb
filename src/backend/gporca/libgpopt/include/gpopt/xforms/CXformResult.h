@@ -57,7 +57,7 @@ public:
 	void Add(gpos::Ref<CExpression> pexpr);
 
 	// retrieve next alternative
-	CExpression *PexprNext();
+	gpos::Ref<CExpression> PexprNext();
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;

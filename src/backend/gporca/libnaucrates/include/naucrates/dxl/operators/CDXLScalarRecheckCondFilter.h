@@ -65,7 +65,7 @@ public:
 
 	// conversion function
 	static CDXLScalarRecheckCondFilter *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarRecheckCondFilter == dxl_op->GetDXLOperator());

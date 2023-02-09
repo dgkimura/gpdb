@@ -120,7 +120,7 @@ public:
 
 	// create an index descriptor
 	static gpos::Ref<CIndexDescriptor> Pindexdesc(
-		CMemoryPool *mp, const CTableDescriptor *ptabdesc,
+		CMemoryPool *mp, const gpos::Ref<CTableDescriptor> ptabdesc,
 		const IMDIndex *pmdindex);
 
 	IOstream &OsPrint(IOstream &os) const;

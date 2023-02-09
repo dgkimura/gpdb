@@ -65,7 +65,7 @@ public:
 
 	~CParseHandlerTableDescr() override;
 
-	CDXLTableDescr *GetDXLTableDescr();
+	gpos::Ref<CDXLTableDescr> GetDXLTableDescr();
 };
 }  // namespace gpdxl
 

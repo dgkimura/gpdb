@@ -91,7 +91,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
@@ -126,7 +126,7 @@ public:
 
 	// conversion function
 	static CScalarCmp *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCmp == pop->Eopid());
@@ -143,7 +143,7 @@ public:
 
 	// get metadata id of the commuted operator
 	static gpos::Ref<IMDId> PmdidCommuteOp(CMDAccessor *md_accessor,
-										   COperator *pop);
+										   gpos::Ref<COperator> pop);
 
 
 

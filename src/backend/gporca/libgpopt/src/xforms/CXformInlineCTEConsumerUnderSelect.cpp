@@ -68,21 +68,21 @@ CXformInlineCTEConsumerUnderSelect::Exfp(CExpressionHandle &  //exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformInlineCTEConsumerUnderSelect::Transform(CXformContext *pxfctxt,
-											  CXformResult *pxfres,
-											  CExpression *pexpr) const
+CXformInlineCTEConsumerUnderSelect::Transform(
+	gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CExpression *pexprConsumer = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprConsumer = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	CLogicalCTEConsumer *popConsumer =
 		gpos::dyn_cast<CLogicalCTEConsumer>(pexprConsumer->Pop());
 	ULONG id = popConsumer->UlCTEId();
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	// only continue if inlining is enabled or if this CTE has only 1 consumer
 	if (!pcteinfo->FEnableInlining() && 1 < pcteinfo->UlConsumers(id))
 	{

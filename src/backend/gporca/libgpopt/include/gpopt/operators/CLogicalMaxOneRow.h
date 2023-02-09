@@ -58,7 +58,7 @@ public:
 
 	// match function;
 	BOOL
-	Matches(COperator *pop) const override
+	Matches(gpos::Ref<COperator> pop) const override
 	{
 		return (Eopid() == pop->Eopid());
 	}
@@ -157,7 +157,7 @@ public:
 
 	// conversion function
 	static CLogicalMaxOneRow *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalMaxOneRow == pop->Eopid());

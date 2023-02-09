@@ -87,7 +87,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// statistics derivation during costing
 	gpos::Ref<IStatistics>
@@ -108,7 +108,7 @@ public:
 
 	// conversion function
 	static CPhysicalBitmapTableScan *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalBitmapTableScan == pop->Eopid());

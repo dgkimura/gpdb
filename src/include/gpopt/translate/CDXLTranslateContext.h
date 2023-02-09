@@ -103,7 +103,7 @@ public:
 	const TargetEntry *GetTargetEntry(ULONG colid) const;
 
 	// return the param id corresponding to the given ColId
-	const CMappingElementColIdParamId *GetParamIdMappingElement(
+	const gpos::Ref<CMappingElementColIdParamId> GetParamIdMappingElement(
 		ULONG colid) const;
 
 	// store the mapping of the given column id and target entry

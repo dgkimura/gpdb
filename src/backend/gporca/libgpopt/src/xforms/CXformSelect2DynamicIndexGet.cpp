@@ -76,9 +76,9 @@ CXformSelect2DynamicIndexGet::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformSelect2DynamicIndexGet::Transform(CXformContext *pxfctxt,
-										CXformResult *pxfres,
-										CExpression *pexpr) const
+CXformSelect2DynamicIndexGet::Transform(gpos::Ref<CXformContext> pxfctxt,
+										gpos::Ref<CXformResult> pxfres,
+										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -87,8 +87,8 @@ CXformSelect2DynamicIndexGet::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// get the indexes on this relation
 	CLogicalDynamicGet *popDynamicGet =

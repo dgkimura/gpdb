@@ -227,8 +227,8 @@ CMDAccessorUtils::GetScCmpMdIdConsiderCasts(CMDAccessor *md_accessor,
 
 gpos::Ref<IMDId>
 CMDAccessorUtils::GetScCmpMdIdConsiderCasts(CMDAccessor *md_accessor,
-											CExpression *pexprLeft,
-											CExpression *pexprRight,
+											gpos::Ref<CExpression> pexprLeft,
+											gpos::Ref<CExpression> pexprRight,
 											IMDType::ECmpType cmp_type)
 {
 	gpos::Ref<IMDId> left_mdid =
@@ -241,10 +241,10 @@ CMDAccessorUtils::GetScCmpMdIdConsiderCasts(CMDAccessor *md_accessor,
 }
 
 void
-CMDAccessorUtils::ApplyCastsForScCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
-									 gpos::owner<CExpression *> &pexprLeft,
-									 gpos::owner<CExpression *> &pexprRight,
-									 gpos::Ref<IMDId> op_mdid)
+CMDAccessorUtils::ApplyCastsForScCmp(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	gpos::owner<gpos::Ref<CExpression> > &pexprLeft,
+	gpos::owner<gpos::Ref<CExpression> > &pexprRight, gpos::Ref<IMDId> op_mdid)
 {
 	gpos::Ref<IMDId> left_mdid =
 		gpos::dyn_cast<CScalar>(pexprLeft->Pop())->MdidType();

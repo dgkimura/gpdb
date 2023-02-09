@@ -82,7 +82,7 @@ public:
 
 	// conversion function
 	static CLogicalLeftSemiApplyIn *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftSemiApplyIn == pop->Eopid());

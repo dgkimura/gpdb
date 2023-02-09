@@ -90,7 +90,7 @@ CDXLStatsDerivedRelation::Serialize(CXMLSerializer *xml_serializer) const
 	{
 		GPOS_CHECK_ABORT;
 
-		CDXLStatsDerivedColumn *derived_col_stats_dxl =
+		gpos::Ref<CDXLStatsDerivedColumn> derived_col_stats_dxl =
 			(*m_dxl_stats_derived_col_array)[ul].get();
 		derived_col_stats_dxl->Serialize(xml_serializer);
 

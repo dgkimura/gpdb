@@ -72,7 +72,7 @@ CDXLScalarLimitOffset::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarLimitOffset::SerializeToDXL(CXMLSerializer *xml_serializer,
-									  const CDXLNode *node) const
+									  const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -94,7 +94,7 @@ CDXLScalarLimitOffset::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarLimitOffset::AssertValid(const CDXLNode *node,
+CDXLScalarLimitOffset::AssertValid(const gpos::Ref<CDXLNode> node,
 								   BOOL validate_children) const
 {
 	const ULONG arity = node->Arity();
@@ -102,7 +102,7 @@ CDXLScalarLimitOffset::AssertValid(const CDXLNode *node,
 
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*node)[ul];
+		gpos::Ref<CDXLNode> dxlnode_arg = (*node)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

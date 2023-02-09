@@ -68,7 +68,7 @@ CDXLBucket::~CDXLBucket()
 //		Returns the lower bound for the bucket
 //
 //---------------------------------------------------------------------------
-const CDXLDatum *
+const gpos::Ref<CDXLDatum>
 CDXLBucket::GetDXLDatumLower() const
 {
 	return m_lower_bound_dxl_datum.get();
@@ -82,7 +82,7 @@ CDXLBucket::GetDXLDatumLower() const
 //		Returns the upper bound for the bucket
 //
 //---------------------------------------------------------------------------
-const CDXLDatum *
+const gpos::Ref<CDXLDatum>
 CDXLBucket::GetDXLDatumUpper() const
 {
 	return m_upper_bound_dxl_datum.get();
@@ -166,7 +166,8 @@ CDXLBucket::Serialize(CXMLSerializer *xml_serializer) const
 void
 CDXLBucket::SerializeBoundaryValue(CXMLSerializer *xml_serializer,
 								   const CWStringConst *elem_str,
-								   CDXLDatum *dxl_datum, BOOL is_bound_closed)
+								   gpos::Ref<CDXLDatum> dxl_datum,
+								   BOOL is_bound_closed)
 {
 	xml_serializer->OpenElement(
 		CDXLTokens::GetDXLTokenStr(EdxltokenNamespacePrefix), elem_str);

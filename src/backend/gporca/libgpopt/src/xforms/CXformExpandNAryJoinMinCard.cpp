@@ -71,9 +71,9 @@ CXformExpandNAryJoinMinCard::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformExpandNAryJoinMinCard::Transform(CXformContext *pxfctxt,
-									   CXformResult *pxfres,
-									   CExpression *pexpr) const
+CXformExpandNAryJoinMinCard::Transform(gpos::Ref<CXformContext> pxfctxt,
+									   gpos::Ref<CXformResult> pxfres,
+									   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -93,7 +93,7 @@ CXformExpandNAryJoinMinCard::Transform(CXformContext *pxfctxt,
 		pdrgpexpr->Append(pexprChild);
 	}
 
-	CExpression *pexprScalar = (*pexpr)[arity - 1];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[arity - 1];
 	gpos::Ref<CExpressionArray> pdrgpexprPreds =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprScalar);
 

@@ -78,7 +78,7 @@ public:
 	}
 
 	// constraint
-	CConstraint *
+	gpos::Ref<CConstraint>
 	Pcnstr() const
 	{
 		return m_pcnstr.get();
@@ -91,7 +91,7 @@ public:
 	// on its equivalent columns
 	gpos::Ref<CExpression> PexprScalarMappedFromEquivCols(
 		CMemoryPool *mp, CColRef *colref,
-		CPropConstraint *constraintsForOuterRefs) const;
+		gpos::Ref<CPropConstraint> constraintsForOuterRefs) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;

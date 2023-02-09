@@ -230,7 +230,7 @@ gpos::Ref<IDatum>
 CMDTypeOidGPDB::GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) const
 {
 	CDXLDatumOid *dxl_datum = gpos::dyn_cast<CDXLDatumOid>(
-		const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
+		const_cast<gpos::Ref<CDXLDatum> >(dxl_op->GetDatumVal()));
 
 	return GPOS_NEW(m_mp) CDatumOidGPDB(m_mdid->Sysid(), dxl_datum->OidValue(),
 										dxl_datum->IsNull());
@@ -246,10 +246,10 @@ CMDTypeOidGPDB::GetDatumForDXLConstVal(const CDXLScalarConstValue *dxl_op) const
 //---------------------------------------------------------------------------
 gpos::Ref<IDatum>
 CMDTypeOidGPDB::GetDatumForDXLDatum(CMemoryPool *mp,
-									const CDXLDatum *dxl_datum) const
+									const gpos::Ref<CDXLDatum> dxl_datum) const
 {
-	CDXLDatumOid *dxl_datumOid =
-		gpos::dyn_cast<CDXLDatumOid>(const_cast<CDXLDatum *>(dxl_datum));
+	CDXLDatumOid *dxl_datumOid = gpos::dyn_cast<CDXLDatumOid>(
+		const_cast<gpos::Ref<CDXLDatum> >(dxl_datum));
 	OID oid_value = dxl_datumOid->OidValue();
 	BOOL is_null = dxl_datumOid->IsNull();
 
@@ -265,7 +265,7 @@ CMDTypeOidGPDB::GetDatumForDXLDatum(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
-CMDTypeOidGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
+CMDTypeOidGPDB::GetDatumVal(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 {
 	;
 	CDatumOidGPDB *oid_datum = dynamic_cast<CDatumOidGPDB *>(datum);
@@ -283,7 +283,7 @@ CMDTypeOidGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLScalarConstValue>
-CMDTypeOidGPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
+CMDTypeOidGPDB::GetDXLOpScConst(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 {
 	CDatumOidGPDB *datum_oidGPDB = dynamic_cast<CDatumOidGPDB *>(datum);
 

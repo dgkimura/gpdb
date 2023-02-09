@@ -88,7 +88,7 @@ CScalarMinMax::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarMinMax::Matches(COperator *pop) const
+CScalarMinMax::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

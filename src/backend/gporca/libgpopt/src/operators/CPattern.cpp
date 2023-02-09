@@ -62,7 +62,7 @@ CPattern::PrpCreate(CMemoryPool *  // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CPattern::Matches(COperator *pop) const
+CPattern::Matches(gpos::Ref<COperator> pop) const
 {
 	return Eopid() == pop->Eopid();
 }

@@ -173,7 +173,7 @@ public:
 		IStatisticsArray *stats_ctxt) const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	ULONG HashValue() const override;
 
@@ -189,7 +189,7 @@ public:
 
 	// conversion function
 	static CLogicalSequenceProject *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalSequenceProject == pop->Eopid());

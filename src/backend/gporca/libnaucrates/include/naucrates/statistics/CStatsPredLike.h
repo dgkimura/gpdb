@@ -66,14 +66,14 @@ public:
 	}
 
 	// left hand side of the LIKE expression
-	virtual CExpression *
+	virtual gpos::Ref<CExpression>
 	GetExprOnLeft() const
 	{
 		return m_expr_left.get();
 	}
 
 	// right hand side of the LIKE expression
-	virtual CExpression *
+	virtual gpos::Ref<CExpression>
 	GetExprOnRight() const
 	{
 		return m_expr_right.get();
@@ -84,7 +84,7 @@ public:
 
 	// conversion function
 	static CStatsPredLike *
-	ConvertPredStats(CStatsPred *pred_stats)
+	ConvertPredStats(gpos::Ref<CStatsPred> pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptLike == pred_stats->GetPredStatsType());

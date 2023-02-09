@@ -30,7 +30,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroup::Init(CGroup *pgroup)
+CJobGroup::Init(gpos::Ref<CGroup> pgroup)
 {
 	GPOS_ASSERT(!FInit());
 	GPOS_ASSERT(nullptr != pgroup);
@@ -48,10 +48,10 @@ CJobGroup::Init(CGroup *pgroup)
 //		Get first non-logical group expression with an unscheduled job
 //
 //---------------------------------------------------------------------------
-CGroupExpression *
+gpos::Ref<CGroupExpression>
 CJobGroup::PgexprFirstUnschedNonLogical()
 {
-	CGroupExpression *pgexpr = nullptr;
+	gpos::Ref<CGroupExpression> pgexpr = nullptr;
 	{
 		CGroupProxy gp(m_pgroup);
 		if (nullptr == m_pgexprLastScheduled)
@@ -78,10 +78,10 @@ CJobGroup::PgexprFirstUnschedNonLogical()
 //		Get first logical group expression with an unscheduled job
 //
 //---------------------------------------------------------------------------
-CGroupExpression *
+gpos::Ref<CGroupExpression>
 CJobGroup::PgexprFirstUnschedLogical()
 {
-	CGroupExpression *pgexpr = nullptr;
+	gpos::Ref<CGroupExpression> pgexpr = nullptr;
 	{
 		CGroupProxy gp(m_pgroup);
 		if (nullptr == m_pgexprLastScheduled)

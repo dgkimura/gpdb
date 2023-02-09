@@ -41,7 +41,7 @@ private:
 
 	// generate an expression with multi-level aggregation
 	static gpos::Ref<CExpression> PexprMultiLevelAggregation(
-		CMemoryPool *mp, CExpression *pexprRelational,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprRelational,
 		gpos::Ref<CExpressionArray> pdrgpexprPrElFirstStage,
 		CExpressionArray *pdrgpexprPrElSecondStage,
 		gpos::Ref<CExpressionArray> pdrgpexprPrElThirdStage,
@@ -52,14 +52,14 @@ private:
 	// split DQA into a local DQA and global non-DQA aggregate function
 	static gpos::Ref<CExpression> PexprSplitIntoLocalDQAGlobalAgg(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-		CExpression *pexpr, CExpression *pexprRelational,
+		gpos::Ref<CExpression> pexpr, gpos::Ref<CExpression> pexprRelational,
 		ExprToColRefMap *phmexprcr, CColRefArray *pdrgpcrArgDQA,
 		CLogicalGbAgg::EAggStage aggStage);
 
 	// helper function to split DQA
 	static gpos::Ref<CExpression> PexprSplitHelper(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-		CExpression *pexpr, CExpression *pexprRelational,
+		gpos::Ref<CExpression> pexpr, gpos::Ref<CExpression> pexprRelational,
 		ExprToColRefMap *phmexprcr, CColRefArray *pdrgpcrArgDQA,
 		CLogicalGbAgg::EAggStage aggStage);
 
@@ -69,28 +69,28 @@ private:
 	// aggregation
 	static void PopulatePrLMultiPhaseAgg(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-		CExpression *pexprPrEl, CExpressionArray *pdrgpexprPrElFirstStage,
+		gpos::Ref<CExpression> pexprPrEl,
+		CExpressionArray *pdrgpexprPrElFirstStage,
 		CExpressionArray *pdrgpexprPrElSecondStage,
 		CExpressionArray *pdrgpexprPrElLastStage, BOOL fSplit2LevelsOnly);
 
 	// create project element for the aggregate function of a particular level
-	static gpos::Ref<CExpression> PexprPrElAgg(CMemoryPool *mp,
-											   CExpression *pexprAggFunc,
-											   EAggfuncStage eaggfuncstage,
-											   CColRef *pcrPreviousStage,
-											   CColRef *pcrGlobal);
+	static gpos::Ref<CExpression> PexprPrElAgg(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprAggFunc,
+		EAggfuncStage eaggfuncstage, CColRef *pcrPreviousStage,
+		CColRef *pcrGlobal);
 
 	// extract arguments of distinct aggs
 	static void ExtractDistinctCols(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-		CExpression *pexpr, CExpressionArray *pdrgpexprChildPrEl,
+		gpos::Ref<CExpression> pexpr, CExpressionArray *pdrgpexprChildPrEl,
 		ExprToColRefMap *phmexprcr, gpos::Ref<CColRefArray> *ppdrgpcrArgDQA);
 
 	// return the column reference of the argument to the aggregate function
 	static CColRef *PcrAggFuncArgument(CMemoryPool *mp,
 									   CMDAccessor *md_accessor,
 									   CColumnFactory *col_factory,
-									   CExpression *pexprArg,
+									   gpos::Ref<CExpression> pexprArg,
 									   CExpressionArray *pdrgpexprChildPrEl);
 
 public:
@@ -128,8 +128,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *, CXformResult *,
-				   CExpression *) const override;
+	void Transform(gpos::Ref<CXformContext>, gpos::Ref<CXformResult>,
+				   gpos::Ref<CExpression>) const override;
 
 };	// class CXformSplitDQA
 

@@ -87,7 +87,7 @@ CDXLPhysicalAssert::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalAssert::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+								   const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -113,20 +113,21 @@ CDXLPhysicalAssert::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAssert::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalAssert::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(3 == dxlnode->Arity());
 
-	CDXLNode *proj_list_dxlnode = (*dxlnode)[EdxlassertIndexProjList];
+	gpos::Ref<CDXLNode> proj_list_dxlnode = (*dxlnode)[EdxlassertIndexProjList];
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list_dxlnode->GetOperator()->GetDXLOperator());
 
-	CDXLNode *predicate_dxlnode = (*dxlnode)[EdxlassertIndexFilter];
+	gpos::Ref<CDXLNode> predicate_dxlnode = (*dxlnode)[EdxlassertIndexFilter];
 	GPOS_ASSERT(EdxlopScalarAssertConstraintList ==
 				predicate_dxlnode->GetOperator()->GetDXLOperator());
 
-	CDXLNode *physical_child_dxlnode = (*dxlnode)[EdxlassertIndexChild];
+	gpos::Ref<CDXLNode> physical_child_dxlnode =
+		(*dxlnode)[EdxlassertIndexChild];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				physical_child_dxlnode->GetOperator()->GetDXLOperatorType());
 
@@ -135,7 +136,7 @@ CDXLPhysicalAssert::AssertValid(const CDXLNode *dxlnode,
 	{
 		for (ULONG ul = 0; ul < 3; ul++)
 		{
-			CDXLNode *child_dxlnode = (*dxlnode)[ul];
+			gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[ul];
 			child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
 													  validate_children);
 		}

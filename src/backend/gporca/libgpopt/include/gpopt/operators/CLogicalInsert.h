@@ -73,7 +73,7 @@ public:
 	}
 
 	// return table's descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	Ptabdesc() const
 	{
 		return m_ptabdesc.get();
@@ -83,7 +83,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -166,7 +166,7 @@ public:
 
 	// conversion function
 	static CLogicalInsert *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInsert == pop->Eopid());

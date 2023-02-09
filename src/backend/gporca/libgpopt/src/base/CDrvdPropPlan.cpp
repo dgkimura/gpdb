@@ -63,7 +63,7 @@ CDrvdPropPlan::~CDrvdPropPlan()
 //
 //---------------------------------------------------------------------------
 CDrvdPropPlan *
-CDrvdPropPlan::Pdpplan(CDrvdProp *pdp)
+CDrvdPropPlan::Pdpplan(gpos::Ref<CDrvdProp> pdp)
 {
 	GPOS_ASSERT(nullptr != pdp);
 	GPOS_ASSERT(EptPlan == pdp->Ept() &&
@@ -83,7 +83,7 @@ CDrvdPropPlan::Pdpplan(CDrvdProp *pdp)
 //---------------------------------------------------------------------------
 void
 CDrvdPropPlan::Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					  CDrvdPropCtxt *pdpctxt)
+					  gpos::Ref<CDrvdPropCtxt> pdpctxt)
 {
 	CPhysical *popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 	if (nullptr != pdpctxt &&
@@ -116,8 +116,9 @@ CDrvdPropPlan::Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 void
-CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
-										COperator *pop)
+CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp,
+										gpos::Ref<CDrvdPropCtxt> pdpctxt,
+										gpos::Ref<COperator> pop)
 {
 	CDrvdPropCtxtPlan *pdpctxtplan = gpos::dyn_cast<CDrvdPropCtxtPlan>(pdpctxt);
 	CPhysicalCTEConsumer *popCTEConsumer =

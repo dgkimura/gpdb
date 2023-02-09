@@ -58,7 +58,7 @@ CParseHandlerScalarExpr::~CParseHandlerScalarExpr()
 //		Root of constructed DXL expression
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CParseHandlerScalarExpr::CreateDXLNode() const
 {
 	return m_dxl_node.get();

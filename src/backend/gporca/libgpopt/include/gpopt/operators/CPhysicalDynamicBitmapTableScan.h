@@ -68,7 +68,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// statistics derivation during costing
 	gpos::Ref<IStatistics> PstatsDerive(
@@ -77,7 +77,7 @@ public:
 
 	// conversion function
 	static CPhysicalDynamicBitmapTableScan *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalDynamicBitmapTableScan == pop->Eopid());

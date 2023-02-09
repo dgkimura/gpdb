@@ -68,7 +68,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// enumerator configuration
-	CEnumeratorConfig *GetEnumeratorCfg() const;
+	gpos::Ref<CEnumeratorConfig> GetEnumeratorCfg() const;
 };
 }  // namespace gpdxl
 

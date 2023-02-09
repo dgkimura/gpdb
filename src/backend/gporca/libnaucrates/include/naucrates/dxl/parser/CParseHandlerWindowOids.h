@@ -68,7 +68,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// return system specific window oids
-	CWindowOids *GetWindowOids() const;
+	gpos::Ref<CWindowOids> GetWindowOids() const;
 };
 }  // namespace gpdxl
 

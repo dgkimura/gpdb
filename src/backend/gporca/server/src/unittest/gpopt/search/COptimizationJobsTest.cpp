@@ -88,7 +88,7 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 		// Initialize engine
 		eng.Init(pqc, nullptr /*search_stage_array*/);
 
-		CGroup *pgroup = eng.PgroupRoot();
+		gpos::Ref<CGroup> pgroup = eng.PgroupRoot();
 		;
 		gpos::Ref<COptimizationContext> poc = GPOS_NEW(mp) COptimizationContext(
 			mp, pgroup, pqc->Prpp(),
@@ -128,8 +128,8 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 			GPOS_DELETE_ARRAY(pestate);
 		}
 
-		CGroupExpression *pgexprLogical = nullptr;
-		CGroupExpression *pgexprPhysical = nullptr;
+		gpos::Ref<CGroupExpression> pgexprLogical = nullptr;
+		gpos::Ref<CGroupExpression> pgexprPhysical = nullptr;
 		{
 			CGroupProxy gp(pgroup);
 			pgexprLogical = gp.PgexprNextLogical(nullptr /*pgexpr*/);
@@ -259,7 +259,8 @@ COptimizationJobsTest::EresUnittest_StateMachine()
 			CXformSetIter xsi(*(xform_set));
 			while (xsi.Advance())
 			{
-				CXform *pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
+				gpos::Ref<CXform> pxform =
+					CXformFactory::Pxff()->Pxf(xsi.TBit());
 				CJobTransformation jt;
 				jt.Init(pgexprLogical, pxform);
 				at.Os() << std::endl

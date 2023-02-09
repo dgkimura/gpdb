@@ -75,7 +75,7 @@ CPhysicalSequence::~CPhysicalSequence()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalSequence::Matches(COperator *pop) const
+CPhysicalSequence::Matches(gpos::Ref<COperator> pop) const
 {
 	return Eopid() == pop->Eopid();
 }
@@ -119,7 +119,7 @@ CPhysicalSequence::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEReq>
 CPhysicalSequence::PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								CCTEReq *pcter, ULONG child_index,
+								gpos::Ref<CCTEReq> pcter, ULONG child_index,
 								CDrvdPropArray *pdrgpdpCtxt,
 								ULONG  //ulOptReq
 ) const

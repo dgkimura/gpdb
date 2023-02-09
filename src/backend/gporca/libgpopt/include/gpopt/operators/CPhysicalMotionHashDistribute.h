@@ -76,7 +76,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
@@ -124,7 +124,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalMotionHashDistribute *PopConvert(COperator *pop);
+	static CPhysicalMotionHashDistribute *PopConvert(gpos::Ref<COperator> pop);
 
 	gpos::Ref<CDistributionSpec> PdsRequired(CMemoryPool *mp,
 											 CExpressionHandle &exprhdl,

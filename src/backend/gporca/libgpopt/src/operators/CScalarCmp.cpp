@@ -105,7 +105,7 @@ CScalarCmp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCmp::Matches(COperator *pop) const
+CScalarCmp::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -170,7 +170,7 @@ CScalarCmp::Eber(ULongPtrArray *pdrgpulChildren) const
 
 // get metadata id of the commuted operator
 gpos::Ref<IMDId>
-CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor, COperator *pop)
+CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor, gpos::Ref<COperator> pop)
 {
 	CScalarCmp *popScalarCmp = dynamic_cast<CScalarCmp *>(pop);
 	const IMDScalarOp *pmdScalarCmpOp =

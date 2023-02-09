@@ -41,7 +41,7 @@ private:
 	gpos::Ref<CDXLColDescrArray> m_dxl_column_descr_array;
 
 	// current column descriptor being parsed
-	CDXLColDescr *m_current_column_descr;
+	gpos::Ref<CDXLColDescr> m_current_column_descr;
 
 	// process the start of an element
 	void StartElement(

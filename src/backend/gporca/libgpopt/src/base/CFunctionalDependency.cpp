@@ -94,7 +94,7 @@ CFunctionalDependency::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CFunctionalDependency::Equals(const CFunctionalDependency *pfd) const
+CFunctionalDependency::Equals(const gpos::Ref<CFunctionalDependency> pfd) const
 {
 	if (nullptr == pfd)
 	{
@@ -181,11 +181,13 @@ CFunctionalDependency::Equals(const CFunctionalDependencyArray *pdrgpfdFst,
 	BOOL fEqual = true;
 	for (ULONG ulFst = 0; fEqual && ulFst < ulLenFst; ulFst++)
 	{
-		const CFunctionalDependency *pfdFst = (*pdrgpfdFst)[ulFst].get();
+		const gpos::Ref<CFunctionalDependency> pfdFst =
+			(*pdrgpfdFst)[ulFst].get();
 		BOOL fMatch = false;
 		for (ULONG ulSnd = 0; !fMatch && ulSnd < ulLenSnd; ulSnd++)
 		{
-			const CFunctionalDependency *pfdSnd = (*pdrgpfdSnd)[ulSnd].get();
+			const gpos::Ref<CFunctionalDependency> pfdSnd =
+				(*pdrgpfdSnd)[ulSnd].get();
 			fMatch = pfdFst->Equals(pfdSnd);
 		}
 		fEqual = fMatch;

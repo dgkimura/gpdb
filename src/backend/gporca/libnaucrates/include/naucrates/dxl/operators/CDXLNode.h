@@ -85,11 +85,11 @@ public:
 	~CDXLNode() override;
 
 	// shorthand to access children
-	inline CDXLNode *
+	inline gpos::Ref<CDXLNode>
 	operator[](ULONG idx) const
 	{
 		GPOS_ASSERT(nullptr != m_dxl_array);
-		CDXLNode *dxl_node = (*m_dxl_array)[idx];
+		gpos::Ref<CDXLNode> dxl_node = (*m_dxl_array)[idx];
 		GPOS_ASSERT(nullptr != dxl_node);
 		return dxl_node;
 	};
@@ -102,14 +102,14 @@ public:
 	}
 
 	// accessor for operator
-	inline CDXLOperator *
+	inline gpos::Ref<CDXLOperator>
 	GetOperator() const
 	{
 		return m_dxl_op.get();
 	}
 
 	// return properties
-	CDXLProperties *
+	gpos::Ref<CDXLProperties>
 	GetProperties() const
 	{
 		return m_dxl_properties.get();
@@ -123,7 +123,7 @@ public:
 	}
 
 	// accessor to direct dispatch info
-	CDXLDirectDispatchInfo *
+	gpos::Ref<CDXLDirectDispatchInfo>
 	GetDXLDirectDispatchInfo() const
 	{
 		return m_direct_dispatch_info.get();

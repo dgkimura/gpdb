@@ -108,7 +108,7 @@ CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalApply::Matches(COperator *pop) const
+CLogicalApply::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

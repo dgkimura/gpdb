@@ -43,7 +43,7 @@ CPhysicalLeftOuterIndexNLJoin::~CPhysicalLeftOuterIndexNLJoin()
 
 
 BOOL
-CPhysicalLeftOuterIndexNLJoin::Matches(COperator *pop) const
+CPhysicalLeftOuterIndexNLJoin::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

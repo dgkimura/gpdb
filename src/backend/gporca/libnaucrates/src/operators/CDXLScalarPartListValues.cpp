@@ -83,7 +83,7 @@ CDXLScalarPartListValues::HasBoolResult(CMDAccessor *  //md_accessor
 // Serialize operator in DXL format
 void
 CDXLScalarPartListValues::SerializeToDXL(CXMLSerializer *xml_serializer,
-										 const CDXLNode *  // dxlnode
+										 const gpos::Ref<CDXLNode>	// dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -104,7 +104,7 @@ CDXLScalarPartListValues::SerializeToDXL(CXMLSerializer *xml_serializer,
 #ifdef GPOS_DEBUG
 // Checks whether operator node is well-structured
 void
-CDXLScalarPartListValues::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarPartListValues::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 									  BOOL	// validate_children
 ) const
 {
@@ -114,7 +114,7 @@ CDXLScalarPartListValues::AssertValid(const CDXLNode *dxlnode,
 
 // conversion function
 CDXLScalarPartListValues *
-CDXLScalarPartListValues::Cast(CDXLOperator *dxl_op)
+CDXLScalarPartListValues::Cast(gpos::Ref<CDXLOperator> dxl_op)
 {
 	GPOS_ASSERT(nullptr != dxl_op);
 	GPOS_ASSERT(EdxlopScalarPartListValues == dxl_op->GetDXLOperator());

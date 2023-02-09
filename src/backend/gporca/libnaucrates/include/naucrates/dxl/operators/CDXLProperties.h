@@ -60,7 +60,8 @@ public:
 		gpos::Ref<CDXLStatsDerivedRelation> dxl_stats_derived_relation);
 
 	// statistical information
-	virtual const CDXLStatsDerivedRelation *GetDxlStatsDrvdRelation() const;
+	virtual const gpos::Ref<CDXLStatsDerivedRelation> GetDxlStatsDrvdRelation()
+		const;
 
 	virtual Edxlproperty
 	GetDXLPropertyType() const

@@ -45,9 +45,9 @@ CXformImplementConstTableGet::CXformImplementConstTableGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementConstTableGet::Transform(CXformContext *pxfctxt,
-										CXformResult *pxfres,
-										CExpression *pexpr) const
+CXformImplementConstTableGet::Transform(gpos::Ref<CXformContext> pxfctxt,
+										gpos::Ref<CXformResult> pxfres,
+										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

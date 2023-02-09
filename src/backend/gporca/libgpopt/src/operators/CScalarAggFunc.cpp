@@ -164,7 +164,7 @@ CScalarAggFunc::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarAggFunc::Matches(COperator *pop) const
+CScalarAggFunc::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

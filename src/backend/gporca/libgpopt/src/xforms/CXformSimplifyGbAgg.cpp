@@ -83,12 +83,12 @@ CXformSimplifyGbAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
-								CXformResult *pxfres)
+CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+								gpos::Ref<CXformResult> pxfres)
 {
 	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprProjectList = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 
 	if (0 < pexprProjectList->Arity())
 	{
@@ -96,7 +96,7 @@ CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
 		return false;
 	}
 
-	CKeyCollection *pkc = pexprRelational->DeriveKeyCollection();
+	gpos::Ref<CKeyCollection> pkc = pexprRelational->DeriveKeyCollection();
 	if (nullptr == pkc)
 	{
 		// relational child does not have key
@@ -143,8 +143,9 @@ CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
 //
 //---------------------------------------------------------------------------
 void
-CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							   CExpression *pexpr) const
+CXformSimplifyGbAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
+							   gpos::Ref<CXformResult> pxfres,
+							   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -161,8 +162,8 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	// extract components
 	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprProjectList = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 
 	CColRefArray *colref_array = popAgg->Pdrgpcr();
 	gpos::Ref<CColRefSet> pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
@@ -178,7 +179,7 @@ CXformSimplifyGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	const ULONG size = (pdrgpfd == nullptr) ? 0 : pdrgpfd->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CFunctionalDependency *pfd = (*pdrgpfd)[ul].get();
+		gpos::Ref<CFunctionalDependency> pfd = (*pdrgpfd)[ul].get();
 		if (pfd->FIncluded(pcrsGrpCols.get()))
 		{
 			pcrsCovered->Include(pfd->PcrsDetermined());

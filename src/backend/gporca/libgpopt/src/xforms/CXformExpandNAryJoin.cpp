@@ -97,8 +97,9 @@ CXformExpandNAryJoin::Exfp(CExpressionHandle &exprhdl) const
 //			 |--CScalarIdent "a" (0)
 //			 +--CScalarIdent "a" (18)
 void
-CXformExpandNAryJoin::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformExpandNAryJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+								gpos::Ref<CXformResult> pxfres,
+								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);

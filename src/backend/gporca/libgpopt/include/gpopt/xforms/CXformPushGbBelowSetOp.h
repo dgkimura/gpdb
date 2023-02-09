@@ -74,25 +74,25 @@ public:
 
 	// actual transform
 	void
-	Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-			  CExpression *pexpr) const override
+	Transform(gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+			  gpos::Ref<CExpression> pexpr) const override
 	{
 		GPOS_ASSERT(nullptr != pxfctxt);
 		GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 		GPOS_ASSERT(FCheckPattern(pexpr));
 
 		CMemoryPool *mp = pxfctxt->Pmp();
-		COptimizerConfig *optconfig =
+		gpos::Ref<COptimizerConfig> optconfig =
 			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 
-		CExpression *pexprSetOp = (*pexpr)[0];
+		gpos::Ref<CExpression> pexprSetOp = (*pexpr)[0];
 		if (pexprSetOp->Arity() >
 			optconfig->GetHint()->UlPushGroupByBelowSetopThreshold())
 		{
 			// bail-out if set op has many children
 			return;
 		}
-		CExpression *pexprPrjList = (*pexpr)[1];
+		gpos::Ref<CExpression> pexprPrjList = (*pexpr)[1];
 		if (0 < pexprPrjList->Arity())
 		{
 			// bail-out if group-by has any aggregate functions
@@ -118,7 +118,7 @@ public:
 
 		for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 		{
-			CExpression *pexprChild = (*pexprSetOp)[ulChild];
+			gpos::Ref<CExpression> pexprChild = (*pexprSetOp)[ulChild];
 			CColRefArray *pdrgpcrChild = (*pdrgpdrgpcrInput)[ulChild].get();
 			gpos::Ref<CColRefSet> pcrsChild =
 				GPOS_NEW(mp) CColRefSet(mp, pdrgpcrChild);
@@ -145,7 +145,7 @@ public:
 
 			// if child of setop is already an Agg with the same grouping columns
 			// that we want to use, there is no need to add another agg on top of it
-			COperator *popChild = pexprChild->Pop();
+			gpos::Ref<COperator> popChild = pexprChild->Pop();
 			if (COperator::EopLogicalGbAgg == popChild->Eopid())
 			{
 				CLogicalGbAgg *popGbAgg =

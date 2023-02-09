@@ -152,13 +152,13 @@ public:
 
 	// translate DXL operator node into a Plan node
 	Plan *TranslateDXLOperatorToPlan(
-		const CDXLNode *dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> dxlnode, CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// main translation routine for DXL tree -> PlannedStmt
-	PlannedStmt *GetPlannedStmtFromDXL(const CDXLNode *dxlnode,
+	PlannedStmt *GetPlannedStmtFromDXL(const gpos::Ref<CDXLNode> dxlnode,
 									   const Query *orig_query,
 									   bool can_set_tag);
 
@@ -171,14 +171,15 @@ private:
 
 	// translate DXL table scan node into a SeqScan node
 	Plan *TranslateDXLTblScan(
-		const CDXLNode *tbl_scan_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> tbl_scan_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate DXL index scan node into a IndexScan node
 	Plan *TranslateDXLIndexScan(
-		const CDXLNode *index_scan_dxlnode,
+		const gpos::Ref<CDXLNode> index_scan_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -186,7 +187,7 @@ private:
 
 	// translates a DXL index scan node into a IndexScan node
 	Plan *TranslateDXLIndexScan(
-		const CDXLNode *index_scan_dxlnode,
+		const gpos::Ref<CDXLNode> index_scan_dxlnode,
 		gpdxl::CDXLPhysicalIndexScan *dxl_physical_idx_scan_op,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
@@ -195,7 +196,7 @@ private:
 
 	// translate DXL index scan node into a IndexOnlyScan node
 	Plan *TranslateDXLIndexOnlyScan(
-		const CDXLNode *index_scan_dxlnode,
+		const gpos::Ref<CDXLNode> index_scan_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -203,7 +204,7 @@ private:
 
 	// translate DXL hash join into a HashJoin node
 	Plan *TranslateDXLHashJoin(
-		const CDXLNode *TranslateDXLHashJoin,
+		const gpos::Ref<CDXLNode> TranslateDXLHashJoin,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -211,14 +212,15 @@ private:
 
 	// translate DXL nested loop join into a NestLoop node
 	Plan *TranslateDXLNLJoin(
-		const CDXLNode *nl_join_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> nl_join_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate DXL merge join into a MergeJoin node
 	Plan *TranslateDXLMergeJoin(
-		const CDXLNode *merge_join_dxlnode,
+		const gpos::Ref<CDXLNode> merge_join_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -226,14 +228,16 @@ private:
 
 	// translate DXL motion node into GPDB Motion plan node
 	Plan *TranslateDXLMotion(
-		const CDXLNode *motion_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> motion_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate DXL motion node
 	Plan *TranslateDXLDuplicateSensitiveMotion(
-		const CDXLNode *motion_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> motion_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
@@ -241,87 +245,96 @@ private:
 	// translate DXL duplicate sensitive redistribute motion node into
 	// GPDB result node with hash filters
 	Plan *TranslateDXLRedistributeMotionToResultHashFilters(
-		const CDXLNode *motion_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> motion_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate DXL aggregate node into GPDB Agg plan node
 	Plan *TranslateDXLAgg(
-		const CDXLNode *motion_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> motion_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate DXL window node into GPDB window node
 	Plan *TranslateDXLWindow(
-		const CDXLNode *motion_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> motion_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate DXL sort node into GPDB Sort plan node
 	Plan *TranslateDXLSort(
-		const CDXLNode *sort_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> sort_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate a DXL node into a Hash node
 	Plan *TranslateDXLHash(
-		const CDXLNode *dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> dxlnode, CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate DXL Limit node into a Limit node
 	Plan *TranslateDXLLimit(
-		const CDXLNode *limit_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> limit_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate DXL TVF into a GPDB Function Scan node
 	Plan *TranslateDXLTvf(
-		const CDXLNode *tvf_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> tvf_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	Plan *TranslateDXLSubQueryScan(
-		const CDXLNode *subquery_scan_dxlnode,
+		const gpos::Ref<CDXLNode> subquery_scan_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	Plan *TranslateDXLProjectSet(
-		const CDXLNode *result_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> result_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	Plan *TranslateDXLResult(
-		const CDXLNode *result_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> result_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	Plan *TranslateDXLAppend(
-		const CDXLNode *append_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> append_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	Plan *TranslateDXLMaterialize(
-		const CDXLNode *materialize_dxlnode,
+		const gpos::Ref<CDXLNode> materialize_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	Plan *TranslateDXLSharedScan(
-		const CDXLNode *shared_scan_dxlnode,
+		const gpos::Ref<CDXLNode> shared_scan_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -329,14 +342,15 @@ private:
 
 	// translate a sequence operator
 	Plan *TranslateDXLSequence(
-		const CDXLNode *sequence_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> sequence_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate a dynamic table scan operator
 	Plan *TranslateDXLDynTblScan(
-		const CDXLNode *dyn_tbl_scan_dxlnode,
+		const gpos::Ref<CDXLNode> dyn_tbl_scan_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -344,7 +358,7 @@ private:
 
 	// translate a dynamic index scan operator
 	Plan *TranslateDXLDynIdxScan(
-		const CDXLNode *dyn_idx_scan_dxlnode,
+		const gpos::Ref<CDXLNode> dyn_idx_scan_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -352,28 +366,31 @@ private:
 
 	// translate a DML operator
 	Plan *TranslateDXLDml(
-		const CDXLNode *dml_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> dml_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate a Split operator
 	Plan *TranslateDXLSplit(
-		const CDXLNode *split_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> split_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate an Assert operator
 	Plan *TranslateDXLAssert(
-		const CDXLNode *assert_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> assert_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
 	);
 
 	// translate a CTE producer into a GPDB share input scan
 	Plan *TranslateDXLCTEProducerToSharedScan(
-		const CDXLNode *cte_producer_dxlnode,
+		const gpos::Ref<CDXLNode> cte_producer_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -381,7 +398,7 @@ private:
 
 	// translate a CTE consumer into a GPDB share input scan
 	Plan *TranslateDXLCTEConsumerToSharedScan(
-		const CDXLNode *cte_consumer_dxlnode,
+		const gpos::Ref<CDXLNode> cte_consumer_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -389,7 +406,7 @@ private:
 
 	// translate a (dynamic) bitmap table scan operator
 	Plan *TranslateDXLBitmapTblScan(
-		const CDXLNode *bitmapscan_dxlnode,
+		const gpos::Ref<CDXLNode> bitmapscan_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -397,7 +414,7 @@ private:
 
 	// translate a DXL PartitionSelector into a GPDB PartitionSelector
 	Plan *TranslateDXLPartSelector(
-		const CDXLNode *partition_selector_dxlnode,
+		const gpos::Ref<CDXLNode> partition_selector_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -405,36 +422,37 @@ private:
 
 	// translate a DXL Value Scan into GPDB Value Scan
 	Plan *TranslateDXLValueScan(
-		const CDXLNode *value_scan_dxlnode,
+		const gpos::Ref<CDXLNode> value_scan_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *ctxt_translation_prev_siblings);
 
 	// translate DXL filter list into GPDB filter list
 	List *TranslateDXLFilterList(
-		const CDXLNode *filter_list_dxlnode,
+		const gpos::Ref<CDXLNode> filter_list_dxlnode,
 		const CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *child_contexts,
 		CDXLTranslateContext *output_context);
 
 	// create range table entry from a CDXLPhysicalTVF node
 	RangeTblEntry *TranslateDXLTvfToRangeTblEntry(
-		const CDXLNode *tvf_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> tvf_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslateContextBaseTable *base_table_context);
 
 	// create range table entry from a CDXLPhysicalValueScan node
 	RangeTblEntry *TranslateDXLValueScanToRangeTblEntry(
-		const CDXLNode *value_scan_dxlnode,
+		const gpos::Ref<CDXLNode> value_scan_dxlnode,
 		CDXLTranslateContext *output_context,
 		CDXLTranslateContextBaseTable *base_table_context);
 
 	// create range table entry from a table descriptor
 	RangeTblEntry *TranslateDXLTblDescrToRangeTblEntry(
-		const CDXLTableDescr *table_descr, Index index,
+		const gpos::Ref<CDXLTableDescr> table_descr, Index index,
 		CDXLTranslateContextBaseTable *base_table_context);
 
 	// translate DXL projection list into a target list
 	List *TranslateDXLProjList(
-		const CDXLNode *project_list_dxlnode,
+		const gpos::Ref<CDXLNode> project_list_dxlnode,
 		const CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *child_contexts,
 		CDXLTranslateContext *output_context);
@@ -446,12 +464,12 @@ private:
 	// create a target list containing column references for a hash node from the
 	// project list of its child node
 	static List *TranslateDXLProjectListToHashTargetList(
-		const CDXLNode *project_list_dxlnode,
+		const gpos::Ref<CDXLNode> project_list_dxlnode,
 		CDXLTranslateContext *child_context,
 		CDXLTranslateContext *output_context);
 
 	List *TranslateDXLFilterToQual(
-		const CDXLNode *filter_dxlnode,
+		const gpos::Ref<CDXLNode> filter_dxlnode,
 		const CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *child_contexts,
 		CDXLTranslateContext *output_context);
@@ -459,17 +477,18 @@ private:
 
 	// translate operator costs from the DXL cost structure into a Plan
 	// struct used by GPDB
-	void TranslatePlanCosts(const CDXLNode *dxlnode, Plan *plan);
+	void TranslatePlanCosts(const gpos::Ref<CDXLNode> dxlnode, Plan *plan);
 
 	// shortcut for translating both the projection list and the filter
 	void TranslateProjListAndFilter(
-		const CDXLNode *project_list_dxlnode, const CDXLNode *filter_dxlnode,
+		const gpos::Ref<CDXLNode> project_list_dxlnode,
+		const gpos::Ref<CDXLNode> filter_dxlnode,
 		const CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *child_contexts, List **targetlist_out,
 		List **qual_out, CDXLTranslateContext *output_context);
 
 	// translate the hash expr list of a redistribute motion node
-	void TranslateHashExprList(const CDXLNode *hash_expr_list_dxlnode,
+	void TranslateHashExprList(const gpos::Ref<CDXLNode> hash_expr_list_dxlnode,
 							   const CDXLTranslateContext *child_context,
 							   List **hash_expr_out_list,
 							   List **hash_expr_types_out_list,
@@ -477,39 +496,39 @@ private:
 
 	// translate the tree of bitmap index operators that are under a (dynamic) bitmap table scan
 	Plan *TranslateDXLBitmapAccessPath(
-		const CDXLNode *bitmap_access_path_dxlnode,
+		const gpos::Ref<CDXLNode> bitmap_access_path_dxlnode,
 		CDXLTranslateContext *output_context, const IMDRelation *md_rel,
-		const CDXLTableDescr *table_descr,
+		const gpos::Ref<CDXLTableDescr> table_descr,
 		CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *ctxt_translation_prev_siblings,
 		BitmapHeapScan *bitmap_tbl_scan);
 
 	// translate a bitmap bool op expression
 	Plan *TranslateDXLBitmapBoolOp(
-		const CDXLNode *bitmap_boolop_dxlnode,
+		const gpos::Ref<CDXLNode> bitmap_boolop_dxlnode,
 		CDXLTranslateContext *output_context, const IMDRelation *md_rel,
-		const CDXLTableDescr *table_descr,
+		const gpos::Ref<CDXLTableDescr> table_descr,
 		CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *ctxt_translation_prev_siblings,
 		BitmapHeapScan *bitmap_tbl_scan);
 
 	// translate CDXLScalarBitmapIndexProbe into BitmapIndexScan or DynamicBitmapIndexScan
 	Plan *TranslateDXLBitmapIndexProbe(
-		const CDXLNode *bitmap_index_probe_dxlnode,
+		const gpos::Ref<CDXLNode> bitmap_index_probe_dxlnode,
 		CDXLTranslateContext *output_context, const IMDRelation *md_rel,
-		const CDXLTableDescr *table_descr,
+		const gpos::Ref<CDXLTableDescr> table_descr,
 		CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *ctxt_translation_prev_siblings,
 		BitmapHeapScan *bitmap_tbl_scan);
 
-	static void TranslateSortCols(const CDXLNode *sort_col_list_dxl,
+	static void TranslateSortCols(const gpos::Ref<CDXLNode> sort_col_list_dxl,
 								  const CDXLTranslateContext *child_context,
 								  AttrNumber *att_no_sort_colids,
 								  Oid *sort_op_oids, Oid *sort_collations_oids,
 								  bool *is_nulls_first);
 
 	List *TranslateDXLScCondToQual(
-		const CDXLNode *filter_dxlnode,
+		const gpos::Ref<CDXLNode> filter_dxlnode,
 		const CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *child_contexts,
 		CDXLTranslateContext *output_context);
@@ -518,7 +537,7 @@ private:
 	static Cost CostFromStr(const CWStringBase *str);
 
 	// check if the given operator is a DML operator on a distributed table
-	BOOL IsTgtTblDistributed(CDXLOperator *dxlop);
+	BOOL IsTgtTblDistributed(gpos::Ref<CDXLOperator> dxlop);
 
 	// add a target entry for a junk column with given colid to the target list
 	static void AddJunkTargetEntryForColId(
@@ -527,7 +546,8 @@ private:
 
 	// translate the index condition list in an Index scan
 	void TranslateIndexConditions(
-		CDXLNode *index_cond_list_dxlnode, const CDXLTableDescr *dxl_tbl_descr,
+		gpos::Ref<CDXLNode> index_cond_list_dxlnode,
+		const gpos::Ref<CDXLTableDescr> dxl_tbl_descr,
 		BOOL is_bitmap_index_probe, const IMDIndex *index,
 		const IMDRelation *md_rel, CDXLTranslateContext *output_context,
 		CDXLTranslateContextBaseTable *base_table_context,
@@ -537,18 +557,21 @@ private:
 
 	// translate the index filters
 	List *TranslateDXLIndexFilter(
-		CDXLNode *filter_dxlnode, CDXLTranslateContext *output_context,
+		gpos::Ref<CDXLNode> filter_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *ctxt_translation_prev_siblings);
 
 	// translate the assert constraints
 	List *TranslateDXLAssertConstraints(
-		CDXLNode *filter_dxlnode, CDXLTranslateContext *output_context,
+		gpos::Ref<CDXLNode> filter_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *child_contexts);
 
 	// translate a CTAS operator
 	Plan *TranslateDXLCtas(
-		const CDXLNode *dml_dxlnode, CDXLTranslateContext *output_context,
+		const gpos::Ref<CDXLNode> dml_dxlnode,
+		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *ctxt_translation_prev_siblings =
 			nullptr	 // translation contexts of previous siblings
 	);
@@ -571,7 +594,7 @@ private:
 
 	// compute directed dispatch segment ids
 	List *TranslateDXLDirectDispatchInfo(
-		CDXLDirectDispatchInfo *dxl_direct_dispatch_info);
+		gpos::Ref<CDXLDirectDispatchInfo> dxl_direct_dispatch_info);
 
 	// hash a DXL datum with GPDB's hash function
 	ULONG GetDXLDatumGPDBHash(CDXLDatumArray *dxl_datum_array);

@@ -213,7 +213,7 @@ CDatumGenericGPDB::GetStrRepr(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumGenericGPDB::Matches(const IDatum *datum) const
+CDatumGenericGPDB::Matches(const gpos::Ref<IDatum> datum) const
 {
 	if (!datum->MDId()->Equals(m_mdid.get()) || (datum->Size() != Size()))
 	{
@@ -332,7 +332,7 @@ CDatumGenericGPDB::GetByteArrayValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumGenericGPDB::StatsAreEqual(const IDatum *datum) const
+CDatumGenericGPDB::StatsAreEqual(const gpos::Ref<IDatum> datum) const
 {
 	// if mapping exists, use that to compute equality
 	if (IsDatumMappableToLINT() || IsDatumMappableToDouble())

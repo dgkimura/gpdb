@@ -352,7 +352,8 @@ CBitSet::Union(const CBitSet *pbsOther)
 	CBitSetLink *bsl_other = nullptr;
 
 	// dynamic array of CBitSetLink
-	using CBitSetLinkArray = CDynamicPtrArray<CBitSetLink, CleanupNULL>;
+	//using CBitSetLinkArray = CDynamicPtrArray<CBitSetLink, CleanupNULL>;
+	using CBitSetLinkArray = gpos::Vector<gpos::Ref<CBitSetLink>>;
 
 	gpos::Ref<CBitSetLinkArray> a_drgpbsl;
 	a_drgpbsl = GPOS_NEW(m_mp) CBitSetLinkArray(m_mp);
@@ -419,7 +420,7 @@ CBitSet::Union(const CBitSet *pbsOther)
 //
 //---------------------------------------------------------------------------
 void
-CBitSet::Intersection(const CBitSet *pbsOther)
+CBitSet::Intersection(const gpos::Ref<CBitSet> pbsOther)
 {
 	if (nullptr == pbsOther)
 	{
@@ -463,7 +464,7 @@ CBitSet::Intersection(const CBitSet *pbsOther)
 //
 //---------------------------------------------------------------------------
 void
-CBitSet::Difference(const CBitSet *pbs)
+CBitSet::Difference(const gpos::Ref<CBitSet> pbs)
 {
 	if (IsDisjoint(pbs))
 	{
@@ -487,7 +488,7 @@ CBitSet::Difference(const CBitSet *pbs)
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitSet::ContainsAll(const CBitSet *bs) const
+CBitSet::ContainsAll(const gpos::Ref<CBitSet> bs) const
 {
 	// skip iterating if we can already tell by the sizes
 	if (Size() < bs->Size())
@@ -524,7 +525,7 @@ CBitSet::ContainsAll(const CBitSet *bs) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitSet::Equals(const CBitSet *bs) const
+CBitSet::Equals(const gpos::Ref<CBitSet> bs) const
 {
 	// check pointer equality first
 	if (this == bs)
@@ -569,7 +570,7 @@ CBitSet::Equals(const CBitSet *bs) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CBitSet::IsDisjoint(const CBitSet *bs) const
+CBitSet::IsDisjoint(const gpos::Ref<CBitSet> bs) const
 {
 	CBitSetLink *bsl = nullptr;
 	CBitSetLink *bsl_other = nullptr;

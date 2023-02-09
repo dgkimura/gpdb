@@ -45,7 +45,7 @@ CScalarProjectElement::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarProjectElement::Matches(COperator *pop) const
+CScalarProjectElement::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

@@ -58,7 +58,7 @@ CScalarAssertConstraint::~CScalarAssertConstraint()
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarAssertConstraint::Matches(COperator *pop) const
+CScalarAssertConstraint::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

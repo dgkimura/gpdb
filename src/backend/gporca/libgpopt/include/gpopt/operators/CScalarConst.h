@@ -62,7 +62,7 @@ public:
 	}
 
 	// accessor of contained constant
-	IDatum *
+	gpos::Ref<IDatum>
 	GetDatum() const
 	{
 		return m_pdatum.get();
@@ -72,7 +72,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -93,7 +93,7 @@ public:
 
 	// conversion function
 	static CScalarConst *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarConst == pop->Eopid());
@@ -113,11 +113,12 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// is the given expression a scalar cast of a constant
-	static BOOL FCastedConst(CExpression *pexpr);
+	static BOOL FCastedConst(gpos::Ref<CExpression> pexpr);
 
 	// extract the constant from the given constant expression or a casted constant expression.
 	// Else return NULL.
-	static CScalarConst *PopExtractFromConstOrCastConst(CExpression *pexpr);
+	static CScalarConst *PopExtractFromConstOrCastConst(
+		gpos::Ref<CExpression> pexpr);
 
 };	// class CScalarConst
 

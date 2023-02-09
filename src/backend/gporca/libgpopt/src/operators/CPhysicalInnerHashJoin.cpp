@@ -262,7 +262,7 @@ CPhysicalInnerHashJoin::PdsDerive(CMemoryPool *mp,
 }
 
 gpos::Ref<CExpression>
-PexprJoinPredOnPartKeys(CMemoryPool *mp, CExpression *pexprScalar,
+PexprJoinPredOnPartKeys(CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
 						CPartKeysArray *pdrgppartkeys,
 						CColRefSet *pcrsAllowedRefs)
 {
@@ -297,20 +297,21 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != pppsRequired);
 	GPOS_ASSERT(nullptr != pdrgpdpCtxt);
 
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(2 /*child_index*/);
+	gpos::Ref<CExpression> pexprScalar =
+		exprhdl.PexprScalarExactChild(2 /*child_index*/);
 
 	// CColRefSet *pcrsOutputOuter = exprhdl.DeriveOutputColumns(0);
 	CColRefSet *pcrsOutputInner = exprhdl.DeriveOutputColumns(1);
 
-	// CPartInfo *part_info_outer = exprhdl.DerivePartitionInfo(0);
-	// CPartInfo *part_info_inner = exprhdl.DerivePartitionInfo(1);
+	// gpos::Ref<CPartInfo> part_info_outer = exprhdl.DerivePartitionInfo(0);
+	// gpos::Ref<CPartInfo> part_info_inner = exprhdl.DerivePartitionInfo(1);
 
 	gpos::Ref<CPartitionPropagationSpec> pps_result;
 	if (ulOptReq == 0)
 	{
 		// DPE: create a new request
 		pps_result = GPOS_NEW(mp) CPartitionPropagationSpec(mp);
-		CPartInfo *part_info_outer = exprhdl.DerivePartitionInfo(0);
+		gpos::Ref<CPartInfo> part_info_outer = exprhdl.DerivePartitionInfo(0);
 		for (ULONG ul = 0; ul < part_info_outer->UlConsumers(); ++ul)
 		{
 			ULONG scan_id = part_info_outer->ScanId(ul);
@@ -348,7 +349,8 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 		}
 
 		gpos::Ref<CBitSet> allowed_scan_ids = GPOS_NEW(mp) CBitSet(mp);
-		CPartInfo *part_info = exprhdl.DerivePartitionInfo(child_index);
+		gpos::Ref<CPartInfo> part_info =
+			exprhdl.DerivePartitionInfo(child_index);
 		for (ULONG ul = 0; ul < part_info->UlConsumers(); ++ul)
 		{
 			ULONG scan_id = part_info->ScanId(ul);

@@ -95,7 +95,7 @@ CDXLPhysicalDynamicTableScan::GetOpNameStr() const
 //		Table descriptor for the table scan
 //
 //---------------------------------------------------------------------------
-const CDXLTableDescr *
+const gpos::Ref<CDXLTableDescr>
 CDXLPhysicalDynamicTableScan::GetDXLTableDescr() const
 {
 	return m_dxl_table_descr.get();
@@ -116,8 +116,8 @@ CDXLPhysicalDynamicTableScan::GetParts() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
-											 const CDXLNode *node) const
+CDXLPhysicalDynamicTableScan::SerializeToDXL(
+	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -150,7 +150,7 @@ CDXLPhysicalDynamicTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicTableScan::AssertValid(const CDXLNode *node,
+CDXLPhysicalDynamicTableScan::AssertValid(const gpos::Ref<CDXLNode> node,
 										  BOOL	// validate_children
 ) const
 {

@@ -93,7 +93,7 @@ CDXLLogicalWindow::GetOpNameStr() const
 //		Return the window specification at a given position
 //
 //---------------------------------------------------------------------------
-CDXLWindowSpec *
+gpos::Ref<CDXLWindowSpec>
 CDXLLogicalWindow::GetWindowKeyAt(ULONG idx) const
 {
 	GPOS_ASSERT(idx <= m_window_spec_array->Size());
@@ -110,7 +110,7 @@ CDXLLogicalWindow::GetWindowKeyAt(ULONG idx) const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  const CDXLNode *node) const
+								  const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -126,7 +126,8 @@ CDXLLogicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer,
 	const ULONG size = m_window_spec_array->Size();
 	for (ULONG idx = 0; idx < size; idx++)
 	{
-		CDXLWindowSpec *window_spec = (*m_window_spec_array)[idx].get();
+		gpos::Ref<CDXLWindowSpec> window_spec =
+			(*m_window_spec_array)[idx].get();
 		window_spec->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -150,13 +151,13 @@ CDXLLogicalWindow::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalWindow::AssertValid(const CDXLNode *node,
+CDXLLogicalWindow::AssertValid(const gpos::Ref<CDXLNode> node,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == node->Arity());
 
-	CDXLNode *proj_list_dxlnode = (*node)[0];
-	CDXLNode *child_dxlnode = (*node)[1];
+	gpos::Ref<CDXLNode> proj_list_dxlnode = (*node)[0];
+	gpos::Ref<CDXLNode> child_dxlnode = (*node)[1];
 
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list_dxlnode->GetOperator()->GetDXLOperator());
@@ -174,7 +175,7 @@ CDXLLogicalWindow::AssertValid(const CDXLNode *node,
 	const ULONG arity = proj_list_dxlnode->Arity();
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *proj_elem = (*proj_list_dxlnode)[idx];
+		gpos::Ref<CDXLNode> proj_elem = (*proj_list_dxlnode)[idx];
 		GPOS_ASSERT(EdxlopScalarIdent !=
 					proj_elem->GetOperator()->GetDXLOperator());
 	}

@@ -69,7 +69,7 @@ CLogicalSequenceProject::CLogicalSequenceProject(
 	const ULONG ulFrames = m_pdrgpwf->Size();
 	for (ULONG ul = 0; ul < ulFrames; ul++)
 	{
-		CWindowFrame *pwf = (*m_pdrgpwf)[ul].get();
+		gpos::Ref<CWindowFrame> pwf = (*m_pdrgpwf)[ul].get();
 		if (!CWindowFrame::IsEmpty(pwf))
 		{
 			m_pcrsLocalUsed->Include(pwf->PcrsUsed());
@@ -199,7 +199,7 @@ CLogicalSequenceProject::SetHasFrameSpecs(CMemoryPool *	 // mp
 	{
 		// if no frame specs are given, we add one empty frame
 		gpos::Ref<CWindowFrame> pwf =
-			const_cast<CWindowFrame *>(CWindowFrame::PwfEmpty());
+			const_cast<gpos::Ref<CWindowFrame> >(CWindowFrame::PwfEmpty());
 		;
 		m_pdrgpwf->Append(pwf);
 	}
@@ -312,7 +312,7 @@ CLogicalSequenceProject::DeriveMaxCard(CMemoryPool *,  // mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalSequenceProject::Matches(COperator *pop) const
+CLogicalSequenceProject::Matches(gpos::Ref<COperator> pop) const
 {
 	GPOS_ASSERT(nullptr != pop);
 	if (Eopid() == pop->Eopid())

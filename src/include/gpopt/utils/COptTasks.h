@@ -133,7 +133,7 @@ private:
 	// translate a DXL tree into a planned statement
 	static PlannedStmt *ConvertToPlanStmtFromDXL(
 		CMemoryPool *mp, CMDAccessor *md_accessor, const Query *orig_query,
-		const CDXLNode *dxlnode, bool can_set_tag,
+		const gpos::Ref<CDXLNode> dxlnode, bool can_set_tag,
 		DistributionHashOpsKind distribution_hashops);
 
 	// load search strategy from given path
@@ -143,7 +143,7 @@ private:
 	static CHAR *CreateMultiByteCharStringFromWCString(const WCHAR *wcstr);
 
 	// set cost model parameters
-	static void SetCostModelParams(ICostModel *cost_model);
+	static void SetCostModelParams(gpos::Ref<ICostModel> cost_model);
 
 	// generate an instance of optimizer cost model
 	static gpos::Ref<ICostModel> GetCostModel(CMemoryPool *mp,

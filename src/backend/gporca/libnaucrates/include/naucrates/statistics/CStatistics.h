@@ -73,7 +73,7 @@ public:
 
 	// helper method to copy stats on columns that are not excluded by bitset
 	void AddNotExcludedHistograms(
-		CMemoryPool *mp, CBitSet *excluded_cols,
+		CMemoryPool *mp, gpos::Ref<CBitSet> excluded_cols,
 		UlongToHistogramMap *col_histogram_mapping) const;
 
 private:
@@ -108,7 +108,7 @@ private:
 	ULONG m_num_predicates;
 
 	// statistics configuration
-	CStatisticsConfig *m_stats_conf;
+	gpos::Ref<CStatisticsConfig> m_stats_conf;
 
 	// array of upper bound of ndv per source;
 	// source can be one of the following operators: like Get, Group By, and Project
@@ -231,17 +231,17 @@ public:
 
 	// inner join with another stats structure
 	gpos::Ref<IStatistics> CalcInnerJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const override;
 
 	// LOJ with another stats structure
 	gpos::Ref<IStatistics> CalcLOJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const override;
 
 	// left anti semi join with another stats structure
 	gpos::Ref<IStatistics> CalcLASJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats,
 		BOOL
 			DoIgnoreLASJHistComputation	 // except for the case of LOJ cardinality estimation this flag is always
@@ -250,7 +250,7 @@ public:
 
 	// semi join stats computation
 	gpos::Ref<IStatistics> CalcLSJoinStats(
-		CMemoryPool *mp, const IStatistics *inner_side_stats,
+		CMemoryPool *mp, const gpos::Ref<IStatistics> inner_side_stats,
 		CStatsPredJoinArray *join_preds_stats) const override;
 
 	// return required props associated with stats object
@@ -258,7 +258,7 @@ public:
 		CMemoryPool *mp) const override;
 
 	// append given stats to current object
-	void AppendStats(CMemoryPool *mp, IStatistics *stats) override;
+	void AppendStats(CMemoryPool *mp, gpos::Ref<IStatistics> stats) override;
 
 	// set number of rebinds
 	void
@@ -309,7 +309,7 @@ public:
 		return m_num_predicates;
 	}
 
-	CStatisticsConfig *
+	gpos::Ref<CStatisticsConfig>
 	GetStatsConfig() const
 	{
 		return m_stats_conf;
@@ -336,7 +336,7 @@ public:
 
 	// conversion function
 	static CStatistics *
-	CastStats(IStatistics *pstats)
+	CastStats(gpos::Ref<IStatistics> pstats)
 	{
 		GPOS_ASSERT(nullptr != pstats);
 		return dynamic_cast<CStatistics *>(pstats);

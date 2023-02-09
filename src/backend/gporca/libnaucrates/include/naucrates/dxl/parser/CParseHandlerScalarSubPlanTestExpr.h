@@ -65,7 +65,7 @@ public:
 	~CParseHandlerScalarSubPlanTestExpr() override;
 
 	// return test expression
-	CDXLNode *
+	gpos::Ref<CDXLNode>
 	GetDXLTestExpr() const
 	{
 		return m_dxl_test_expr.get();

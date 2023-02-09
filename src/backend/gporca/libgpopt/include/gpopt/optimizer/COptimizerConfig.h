@@ -77,42 +77,42 @@ public:
 
 
 	// plan enumeration configuration
-	CEnumeratorConfig *
+	gpos::Ref<CEnumeratorConfig>
 	GetEnumeratorCfg() const
 	{
 		return m_enumerator_cfg.get();
 	}
 
 	// statistics configuration
-	CStatisticsConfig *
+	gpos::Ref<CStatisticsConfig>
 	GetStatsConf() const
 	{
 		return m_stats_conf.get();
 	}
 
 	// CTE configuration
-	CCTEConfig *
+	gpos::Ref<CCTEConfig>
 	GetCteConf() const
 	{
 		return m_cte_conf.get();
 	}
 
 	// cost model configuration
-	ICostModel *
+	gpos::Ref<ICostModel>
 	GetCostModel() const
 	{
 		return m_cost_model.get();
 	}
 
 	// default window oids
-	CWindowOids *
+	gpos::Ref<CWindowOids>
 	GetWindowOids() const
 	{
 		return m_window_oids.get();
 	}
 
 	// hint configuration
-	CHint *
+	gpos::Ref<CHint>
 	GetHint() const
 	{
 		return m_hint.get();
@@ -126,7 +126,7 @@ public:
 													 gpos::Ref<ICostModel> pcm);
 
 	void Serialize(CMemoryPool *mp, CXMLSerializer *xml_serializer,
-				   CBitSet *pbsTrace) const;
+				   gpos::Ref<CBitSet> pbsTrace) const;
 
 };	// class COptimizerConfig
 

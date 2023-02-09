@@ -52,7 +52,7 @@ public:
 	~CQueryToDXLResult();
 
 	// return the DXL representation of the query
-	const CDXLNode *CreateDXLNode() const;
+	const gpos::Ref<CDXLNode> CreateDXLNode() const;
 
 	// return the array of output columns
 	const CDXLNodeArray *GetOutputColumnsDXLArray() const;

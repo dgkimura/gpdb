@@ -137,7 +137,7 @@ CDXLLogicalSetOp::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalSetOp::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *node) const
+								 const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -163,7 +163,7 @@ CDXLLogicalSetOp::SerializeToDXL(CXMLSerializer *xml_serializer,
 	const ULONG length = m_col_descr_array->Size();
 	for (ULONG idx = 0; idx < length; idx++)
 	{
-		CDXLColDescr *col_descr_dxl = (*m_col_descr_array)[idx].get();
+		gpos::Ref<CDXLColDescr> col_descr_dxl = (*m_col_descr_array)[idx].get();
 		col_descr_dxl->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -211,7 +211,7 @@ CDXLLogicalSetOp::IsColDefined(ULONG colid) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalSetOp::AssertValid(const CDXLNode *node,
+CDXLLogicalSetOp::AssertValid(const gpos::Ref<CDXLNode> node,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(2 <= node->Arity());
@@ -225,7 +225,7 @@ CDXLLogicalSetOp::AssertValid(const CDXLNode *node,
 	const ULONG num_of_child = node->Arity();
 	for (ULONG idx = 0; idx < num_of_child; ++idx)
 	{
-		CDXLNode *child_dxlnode = (*node)[idx];
+		gpos::Ref<CDXLNode> child_dxlnode = (*node)[idx];
 		GPOS_ASSERT(EdxloptypeLogical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

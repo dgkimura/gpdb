@@ -72,7 +72,7 @@ CScalarSubqueryExistential::MdidType() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSubqueryExistential::Matches(COperator *pop) const
+CScalarSubqueryExistential::Matches(gpos::Ref<COperator> pop) const
 {
 	GPOS_ASSERT(nullptr != pop);
 
@@ -92,7 +92,7 @@ gpos::Ref<CPartInfo>
 CScalarSubqueryExistential::PpartinfoDerive(CMemoryPool *,	// mp,
 											CExpressionHandle &exprhdl) const
 {
-	CPartInfo *ppartinfoChild = exprhdl.DerivePartitionInfo(0);
+	gpos::Ref<CPartInfo> ppartinfoChild = exprhdl.DerivePartitionInfo(0);
 	GPOS_ASSERT(nullptr != ppartinfoChild);
 	;
 	return ppartinfoChild;

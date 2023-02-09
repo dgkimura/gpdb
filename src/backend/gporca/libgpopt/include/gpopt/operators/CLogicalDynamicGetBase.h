@@ -109,7 +109,7 @@ public:
 	}
 
 	// return table's descriptor
-	virtual CTableDescriptor *
+	virtual gpos::Ref<CTableDescriptor>
 	Ptabdesc() const
 	{
 		return m_ptabdesc.get();
@@ -159,7 +159,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	DeriveTableDescriptor(CMemoryPool *,	   // mp
 						  CExpressionHandle &  // exprhdl
 	) const override

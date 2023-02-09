@@ -69,7 +69,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
@@ -117,7 +117,8 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalMotionRoutedDistribute *PopConvert(COperator *pop);
+	static CPhysicalMotionRoutedDistribute *PopConvert(
+		gpos::Ref<COperator> pop);
 
 };	// class CPhysicalMotionRoutedDistribute
 

@@ -274,11 +274,12 @@ public:
 	}
 
 	// actual transformation
-	virtual void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-						   CExpression *pexpr) const = 0;
+	virtual void Transform(gpos::Ref<CXformContext> pxfctxt,
+						   gpos::Ref<CXformResult> pxfres,
+						   gpos::Ref<CExpression> pexpr) const = 0;
 
 	// accessor
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprPattern() const
 	{
 		return m_pexpr.get();
@@ -299,11 +300,11 @@ public:
 #ifdef GPOS_DEBUG
 
 	// verify pattern against given expression
-	BOOL FCheckPattern(CExpression *pexpr) const;
+	BOOL FCheckPattern(gpos::Ref<CExpression> pexpr) const;
 
 	// verify xform promise on the given expression
-	static BOOL FPromising(CMemoryPool *mp, const CXform *pxform,
-						   CExpression *pexpr);
+	static BOOL FPromising(CMemoryPool *mp, const gpos::Ref<CXform> pxform,
+						   gpos::Ref<CExpression> pexpr);
 
 #endif	// GPOS_DEBUG
 

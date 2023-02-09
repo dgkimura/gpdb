@@ -53,8 +53,9 @@ public:
 	explicit CLogicalDynamicIndexGet(CMemoryPool *mp);
 
 	CLogicalDynamicIndexGet(CMemoryPool *mp, const IMDIndex *pmdindex,
-							CTableDescriptor *ptabdesc, ULONG ulOriginOpId,
-							const CName *pnameAlias, ULONG ulPartIndex,
+							gpos::Ref<CTableDescriptor> ptabdesc,
+							ULONG ulOriginOpId, const CName *pnameAlias,
+							ULONG ulPartIndex,
 							gpos::Ref<CColRefArray> pdrgpcrOutput,
 							gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
 							gpos::Ref<IMdIdArray> partition_mdids);
@@ -98,7 +99,7 @@ public:
 	}
 
 	// index descriptor
-	CIndexDescriptor *
+	gpos::Ref<CIndexDescriptor>
 	Pindexdesc() const
 	{
 		return m_pindexdesc.get();
@@ -115,7 +116,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// derive outer references
 	gpos::Ref<CColRefSet> DeriveOuterReferences(
@@ -169,7 +170,7 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	static CLogicalDynamicIndexGet *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDynamicIndexGet == pop->Eopid());

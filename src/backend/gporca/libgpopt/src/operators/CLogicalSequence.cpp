@@ -43,7 +43,7 @@ CLogicalSequence::CLogicalSequence(CMemoryPool *mp) : CLogical(mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalSequence::Matches(COperator *pop) const
+CLogicalSequence::Matches(gpos::Ref<COperator> pop) const
 {
 	return pop->Eopid() == Eopid();
 }

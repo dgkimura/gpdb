@@ -91,10 +91,10 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// index descriptor
-	CIndexDescriptor *
+	gpos::Ref<CIndexDescriptor>
 	Pindexdesc() const
 	{
 		return m_pindexdesc.get();
@@ -142,7 +142,7 @@ public:
 
 	// conversion function
 	static CPhysicalIndexScan *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalIndexScan == pop->Eopid());

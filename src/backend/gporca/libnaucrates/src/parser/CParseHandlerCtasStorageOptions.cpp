@@ -166,7 +166,7 @@ CParseHandlerCtasStorageOptions::EndElement(
 //		Return parsed storage options
 //
 //---------------------------------------------------------------------------
-CDXLCtasStorageOptions *
+gpos::Ref<CDXLCtasStorageOptions>
 CParseHandlerCtasStorageOptions::GetDxlCtasStorageOption() const
 {
 	return m_dxl_ctas_storage_option.get();

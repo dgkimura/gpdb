@@ -77,7 +77,7 @@ public:
 
 	// conversion function
 	static CLogicalLeftSemiCorrelatedApply *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftSemiCorrelatedApply == pop->Eopid());

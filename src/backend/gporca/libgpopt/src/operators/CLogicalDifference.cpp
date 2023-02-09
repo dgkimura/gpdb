@@ -148,8 +148,8 @@ CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		output_colrefsets->Append(pcrs);
 	}
 
-	IStatistics *outer_stats = exprhdl.Pstats(0);
-	IStatistics *inner_side_stats = exprhdl.Pstats(1);
+	gpos::Ref<IStatistics> outer_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> inner_side_stats = exprhdl.Pstats(1);
 
 	// construct the scalar condition for the LASJ
 	gpos::Ref<CExpression> pexprScCond =

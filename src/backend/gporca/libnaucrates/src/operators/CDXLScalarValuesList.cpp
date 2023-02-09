@@ -47,7 +47,7 @@ CDXLScalarValuesList::GetOpNameStr() const
 // serialize operator in DXL format
 void
 CDXLScalarValuesList::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 const CDXLNode *dxlnode) const
+									 const gpos::Ref<CDXLNode> dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 
@@ -65,7 +65,7 @@ CDXLScalarValuesList::SerializeToDXL(CXMLSerializer *xml_serializer,
 // serialize operator in DXL format
 void
 CDXLScalarValuesList::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 const CDXLNode *dxlnode,
+									 const gpos::Ref<CDXLNode> dxlnode,
 									 const CHAR *attrname) const
 {
 	GPOS_CHECK_ABORT;
@@ -86,7 +86,7 @@ CDXLScalarValuesList::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 // conversion function
 CDXLScalarValuesList *
-CDXLScalarValuesList::Cast(CDXLOperator *dxl_op)
+CDXLScalarValuesList::Cast(gpos::Ref<CDXLOperator> dxl_op)
 {
 	GPOS_ASSERT(nullptr != dxl_op);
 	GPOS_ASSERT(EdxlopScalarValuesList == dxl_op->GetDXLOperator());
@@ -106,14 +106,14 @@ CDXLScalarValuesList::HasBoolResult(CMDAccessor *  //md_accessor
 
 // checks whether operator node is well-structured
 void
-CDXLScalarValuesList::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarValuesList::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
 
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *pdxlnConstVal = (*dxlnode)[idx];
+		gpos::Ref<CDXLNode> pdxlnConstVal = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					pdxlnConstVal->GetOperator()->GetDXLOperatorType());
 

@@ -89,7 +89,8 @@ CJobTransformation::~CJobTransformation() = default;
 //
 //---------------------------------------------------------------------------
 void
-CJobTransformation::Init(CGroupExpression *pgexpr, CXform *pxform)
+CJobTransformation::Init(gpos::Ref<CGroupExpression> pgexpr,
+						 gpos::Ref<CXform> pxform)
 {
 	GPOS_ASSERT(!FInit());
 	GPOS_ASSERT(nullptr != pgexpr);
@@ -128,8 +129,8 @@ CJobTransformation::EevtTransform(CSchedulerContext *psc, CJob *pjOwner)
 	CJobTransformation *pjt = PjConvert(pjOwner);
 	CMemoryPool *pmpGlobal = psc->GetGlobalMemoryPool();
 	CMemoryPool *pmpLocal = psc->PmpLocal();
-	CGroupExpression *pgexpr = pjt->m_pgexpr;
-	CXform *pxform = pjt->m_xform;
+	gpos::Ref<CGroupExpression> pgexpr = pjt->m_pgexpr;
+	gpos::Ref<CXform> pxform = pjt->m_xform;
 
 	// insert transformation results to memo
 	gpos::Ref<CXformResult> pxfres =
@@ -174,8 +175,8 @@ CJobTransformation::FExecute(CSchedulerContext *psc)
 //---------------------------------------------------------------------------
 void
 CJobTransformation::ScheduleJob(CSchedulerContext *psc,
-								CGroupExpression *pgexpr, CXform *pxform,
-								CJob *pjParent)
+								gpos::Ref<CGroupExpression> pgexpr,
+								gpos::Ref<CXform> pxform, CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtTransformation);
 

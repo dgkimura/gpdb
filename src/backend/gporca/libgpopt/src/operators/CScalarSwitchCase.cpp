@@ -40,7 +40,7 @@ CScalarSwitchCase::CScalarSwitchCase(CMemoryPool *mp) : CScalar(mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSwitchCase::Matches(COperator *pop) const
+CScalarSwitchCase::Matches(gpos::Ref<COperator> pop) const
 {
 	return (pop->Eopid() == Eopid());
 }

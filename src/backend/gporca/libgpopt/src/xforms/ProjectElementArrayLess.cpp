@@ -16,8 +16,8 @@ bool
 ProjectElementArrayLess::operator()(const CExpressionArray *a,
 									const CExpressionArray *b) const
 {
-	CExpression *pexprPrjElemFst = (*a)[0].get();
-	CExpression *pexprPrjElemSnd = (*b)[0].get();
+	gpos::Ref<CExpression> pexprPrjElemFst = (*a)[0].get();
+	gpos::Ref<CExpression> pexprPrjElemSnd = (*b)[0].get();
 	ULONG ulIdFst =
 		gpos::cast<CScalarProjectElement>(pexprPrjElemFst->Pop())->Pcr()->Id();
 	ULONG ulIdSnd =

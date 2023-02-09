@@ -191,7 +191,7 @@ CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
 	gpos::Ref<CColRefSet> pcrs = pos->PcrsUsed(mp);
 
 	// get key collection of the relational child
-	CKeyCollection *pkc = exprhdl.DeriveKeyCollection(0);
+	gpos::Ref<CKeyCollection> pkc = exprhdl.DeriveKeyCollection(0);
 
 	if (nullptr != pkc && pkc->FKey(pcrs.get(), false /*fExactMatch*/))
 	{

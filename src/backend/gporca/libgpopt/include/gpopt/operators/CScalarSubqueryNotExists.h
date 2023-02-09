@@ -58,7 +58,7 @@ public:
 
 	// conversion function
 	static CScalarSubqueryNotExists *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubqueryNotExists == pop->Eopid());

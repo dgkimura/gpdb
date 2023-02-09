@@ -69,7 +69,7 @@ CCostContext::CCostContext(CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
 	if (!m_pgexpr->Pop()->FScalar() &&
 		!gpos::dyn_cast<CPhysical>(m_pgexpr->Pop())->FPassThruStats())
 	{
-		CGroupExpression *pgexprForStats =
+		gpos::Ref<CGroupExpression> pgexprForStats =
 			m_pgexpr->Pgroup()->PgexprBestPromise(m_mp, m_pgexpr.get());
 		if (nullptr != pgexprForStats)
 		{
@@ -132,7 +132,7 @@ CCostContext::FOwnsStats() const
 BOOL
 CCostContext::FNeedsNewStats() const
 {
-	COperator *pop = m_pgexpr->Pop();
+	gpos::Ref<COperator> pop = m_pgexpr->Pop();
 	if (pop->FScalar())
 	{
 		// return false if scalar operator
@@ -160,8 +160,8 @@ CCostContext::FNeedsNewStats() const
 	const ULONG arity = Pdrgpoc()->Size();
 	for (ULONG ul = 0; !fDeriveStats && ul < arity; ul++)
 	{
-		COptimizationContext *pocChild = (*Pdrgpoc())[ul].get();
-		CCostContext *pccChild = pocChild->PccBest();
+		gpos::Ref<COptimizationContext> pocChild = (*Pdrgpoc())[ul].get();
+		gpos::Ref<CCostContext> pccChild = pocChild->PccBest();
 		GPOS_ASSERT(nullptr != pccChild);
 
 		fDeriveStats = pccChild->FOwnsStats();
@@ -320,7 +320,7 @@ CCostContext::IsValid(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 void
 CCostContext::BreakCostTiesForJoinPlans(
-	const CCostContext *pccFst, const CCostContext *pccSnd,
+	const gpos::Ref<CCostContext> pccFst, const gpos::Ref<CCostContext> pccSnd,
 	CONST_COSTCTXT_PTR *ppccPrefered,  // output: preferred cost context
 	BOOL *pfTiesResolved  // output: if true, tie resolution has succeeded
 )
@@ -400,7 +400,7 @@ CCostContext::BreakCostTiesForJoinPlans(
 //
 //---------------------------------------------------------------------------
 BOOL
-CCostContext::FBetterThan(const CCostContext *pcc) const
+CCostContext::FBetterThan(const gpos::Ref<CCostContext> pcc) const
 {
 	GPOS_ASSERT(nullptr != pcc);
 	GPOS_ASSERT(*m_poc == *(pcc->Poc()));
@@ -507,7 +507,7 @@ CCostContext::FBetterThan(const CCostContext *pcc) const
 }
 
 BOOL
-CCostContext::IsTwoStageScalarDQACostCtxt(const CCostContext *pcc)
+CCostContext::IsTwoStageScalarDQACostCtxt(const gpos::Ref<CCostContext> pcc)
 {
 	if (CUtils::FPhysicalAgg(pcc->Pgexpr()->Pop()))
 	{
@@ -523,7 +523,7 @@ CCostContext::IsTwoStageScalarDQACostCtxt(const CCostContext *pcc)
 }
 
 BOOL
-CCostContext::IsThreeStageScalarDQACostCtxt(const CCostContext *pcc)
+CCostContext::IsThreeStageScalarDQACostCtxt(const gpos::Ref<CCostContext> pcc)
 {
 	if (CUtils::FPhysicalAgg(pcc->Pgexpr()->Pop()))
 	{
@@ -583,7 +583,7 @@ CCostContext::CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren)
 	ICostModel::SCostingInfo ci(
 		mp, arity, GPOS_NEW(mp) ICostModel::CCostingStats(m_pstats));
 
-	ICostModel *pcm = COptCtxt::PoctxtFromTLS()->GetCostModel();
+	gpos::Ref<ICostModel> pcm = COptCtxt::PoctxtFromTLS()->GetCostModel();
 
 	CExpressionHandle exprhdl(mp);
 	exprhdl.Attach(this);
@@ -610,8 +610,8 @@ CCostContext::CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren)
 	// extract children costing info
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		COptimizationContext *pocChild = (*m_pdrgpoc)[ul].get();
-		CCostContext *pccChild = pocChild->PccBest();
+		gpos::Ref<COptimizationContext> pocChild = (*m_pdrgpoc)[ul].get();
+		gpos::Ref<CCostContext> pccChild = pocChild->PccBest();
 		GPOS_ASSERT(nullptr != pccChild);
 
 		gpos::Ref<IStatistics> child_stats = pccChild->Pstats();
@@ -688,7 +688,7 @@ CCostContext::DRowsPerHost() const
 		pcrsUsed->ExtractColIds(m_mp, pdrgpul.get());
 		;
 
-		CStatisticsConfig *stats_config =
+		gpos::Ref<CStatisticsConfig> stats_config =
 			poptctxt->GetOptimizerConfig()->GetStatsConf();
 		CDouble dNDVs = CStatisticsUtils::Groups(
 			m_mp, Pstats(), stats_config, pdrgpul.get(), nullptr /*keys*/);

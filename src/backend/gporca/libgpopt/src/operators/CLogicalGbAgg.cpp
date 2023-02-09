@@ -563,7 +563,7 @@ CLogicalGbAgg::DeriveMaxCard(CMemoryPool *,	 //mp
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalGbAgg::Matches(COperator *pop) const
+CLogicalGbAgg::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
@@ -621,9 +621,10 @@ CLogicalGbAgg::PxfsCandidates(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, IStatistics *child_stats,
+CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
 							CColRefArray *pdrgpcrGroupingCols,
-							ULongPtrArray *pdrgpulComputedCols, CBitSet *keys)
+							ULongPtrArray *pdrgpulComputedCols,
+							gpos::Ref<CBitSet> keys)
 {
 	const ULONG ulGroupingCols = pdrgpcrGroupingCols->Size();
 
@@ -661,7 +662,7 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *child_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
 
 	// extract computed columns
 	gpos::Ref<ULongPtrArray> pdrgpulComputedCols =

@@ -156,7 +156,7 @@ public:
 	}
 
 	// CTAS storage options
-	CDXLCtasStorageOptions *
+	gpos::Ref<CDXLCtasStorageOptions>
 	GetDxlCtasStorageOption() const override
 	{
 		return m_dxl_ctas_storage_option.get();

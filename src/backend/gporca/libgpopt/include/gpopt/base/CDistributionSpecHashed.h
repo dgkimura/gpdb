@@ -170,7 +170,7 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::Ref<CExpression> pexpr) override;
 
 	// hash function for hashed distribution spec
 	ULONG HashValue() const override;
@@ -242,7 +242,7 @@ public:
 	// use given predicates to complete an incomplete spec, if possible
 	static gpos::Ref<CDistributionSpecHashed> TryToCompleteEquivSpec(
 		CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
-		CExpression *pexprPred, CColRefSet *outerRefs);
+		gpos::Ref<CExpression> pexprPred, CColRefSet *outerRefs);
 };	// class CDistributionSpecHashed
 
 }  // namespace gpopt

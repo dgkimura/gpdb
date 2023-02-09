@@ -101,7 +101,7 @@ CLogicalUpdate::~CLogicalUpdate()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalUpdate::Matches(COperator *pop) const
+CLogicalUpdate::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

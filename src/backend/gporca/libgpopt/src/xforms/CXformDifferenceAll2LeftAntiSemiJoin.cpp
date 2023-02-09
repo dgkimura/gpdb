@@ -49,9 +49,9 @@ CXformDifferenceAll2LeftAntiSemiJoin::CXformDifferenceAll2LeftAntiSemiJoin(
 //
 //---------------------------------------------------------------------------
 void
-CXformDifferenceAll2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
-												CXformResult *pxfres,
-												CExpression *pexpr) const
+CXformDifferenceAll2LeftAntiSemiJoin::Transform(
+	gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -64,8 +64,8 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
 	GPOS_ASSERT(2 == pexpr->Arity());
 
 	// extract components
-	CExpression *pexprLeftChild = (*pexpr)[0];
-	CExpression *pexprRightChild = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeftChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRightChild = (*pexpr)[1];
 
 	CLogicalDifferenceAll *popDifferenceAll =
 		gpos::dyn_cast<CLogicalDifferenceAll>(pexpr->Pop());

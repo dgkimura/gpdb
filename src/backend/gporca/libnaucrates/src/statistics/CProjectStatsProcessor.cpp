@@ -54,7 +54,7 @@ CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
 			BOOL is_well_defined = false;
 			if (nullptr != datum_map)
 			{
-				IDatum *datum = datum_map->Find(&colid);
+				gpos::Ref<IDatum> datum = datum_map->Find(&colid);
 				if (nullptr != datum)
 				{
 					is_well_defined = true;

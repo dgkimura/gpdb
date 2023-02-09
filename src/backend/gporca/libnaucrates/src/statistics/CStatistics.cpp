@@ -402,7 +402,8 @@ CStatistics::IsEmptyJoin(const CStatistics *outer_stats,
 
 //	return statistics object after performing LOJ operation with another statistics structure
 gpos::Ref<IStatistics>
-CStatistics::CalcLOJoinStats(CMemoryPool *mp, const IStatistics *other_stats,
+CStatistics::CalcLOJoinStats(CMemoryPool *mp,
+							 const gpos::Ref<IStatistics> other_stats,
 							 CStatsPredJoinArray *join_preds_stats) const
 {
 	return CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
@@ -414,7 +415,7 @@ CStatistics::CalcLOJoinStats(CMemoryPool *mp, const IStatistics *other_stats,
 //	return statistics object after performing semi-join with another statistics structure
 gpos::Ref<IStatistics>
 CStatistics::CalcLSJoinStats(CMemoryPool *mp,
-							 const IStatistics *inner_side_stats,
+							 const gpos::Ref<IStatistics> inner_side_stats,
 							 CStatsPredJoinArray *join_preds_stats) const
 {
 	return CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
@@ -425,7 +426,8 @@ CStatistics::CalcLSJoinStats(CMemoryPool *mp,
 
 // return statistics object after performing inner join
 gpos::Ref<IStatistics>
-CStatistics::CalcInnerJoinStats(CMemoryPool *mp, const IStatistics *other_stats,
+CStatistics::CalcInnerJoinStats(CMemoryPool *mp,
+								const gpos::Ref<IStatistics> other_stats,
 								CStatsPredJoinArray *join_preds_stats) const
 {
 	return CInnerJoinStatsProcessor::CalcInnerJoinStatsStatic(
@@ -434,7 +436,8 @@ CStatistics::CalcInnerJoinStats(CMemoryPool *mp, const IStatistics *other_stats,
 
 // return statistics object after performing LASJ
 gpos::Ref<IStatistics>
-CStatistics::CalcLASJoinStats(CMemoryPool *mp, const IStatistics *other_stats,
+CStatistics::CalcLASJoinStats(CMemoryPool *mp,
+							  const gpos::Ref<IStatistics> other_stats,
 							  CStatsPredJoinArray *join_preds_stats,
 							  BOOL DoIgnoreLASJHistComputation) const
 {
@@ -445,7 +448,7 @@ CStatistics::CalcLASJoinStats(CMemoryPool *mp, const IStatistics *other_stats,
 //	helper method to copy statistics on columns that are not excluded by bitset
 void
 CStatistics::AddNotExcludedHistograms(
-	CMemoryPool *mp, CBitSet *excluded_cols,
+	CMemoryPool *mp, gpos::Ref<CBitSet> excluded_cols,
 	UlongToHistogramMap *col_histogram_mapping) const
 {
 	GPOS_ASSERT(nullptr != excluded_cols);
@@ -542,7 +545,7 @@ CStatistics::GetReqdRelationalProps(CMemoryPool *mp) const
 
 // append given statistics to current object
 void
-CStatistics::AppendStats(CMemoryPool *mp, IStatistics *input_stats)
+CStatistics::AppendStats(CMemoryPool *mp, gpos::Ref<IStatistics> input_stats)
 {
 	CStatistics *stats = gpos::dyn_cast<CStatistics>(input_stats);
 

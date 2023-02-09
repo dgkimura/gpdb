@@ -67,16 +67,17 @@ CXformJoinAssociativity::CXformJoinAssociativity(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp, CExpression *pexpr,
+CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp,
+										  gpos::Ref<CExpression> pexpr,
 										  CExpressionArray *pdrgpexprLower,
 										  CExpressionArray *pdrgpexprUpper)
 {
 	GPOS_CHECK_ABORT;
 
 	// bind operators
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprLeftLeft = (*pexprLeft)[0];
-	CExpression *pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprLeftLeft = (*pexprLeft)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 	gpos::Ref<CExpressionArray> pdrgpexprJoins =
 		GPOS_NEW(mp) CExpressionArray(mp);
@@ -115,7 +116,7 @@ CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp, CExpression *pexpr,
 	ULONG ulConj = pdrgpexprOrig->Size();
 	for (ULONG ul = 0; ul < ulConj; ul++)
 	{
-		CExpression *pexprPred = (*pdrgpexprOrig)[ul];
+		gpos::Ref<CExpression> pexprPred = (*pdrgpexprOrig)[ul];
 		CColRefSet *pcrs = pexprPred->DeriveUsedColumns();
 
 		;
@@ -211,8 +212,9 @@ CXformJoinAssociativity::Exfp(CExpressionHandle &exprhdl) const
 //				+--CScalarIdent "b" (9) ==> from t2
 
 void
-CXformJoinAssociativity::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								   CExpression *pexpr) const
+CXformJoinAssociativity::Transform(gpos::Ref<CXformContext> pxfctxt,
+								   gpos::Ref<CXformResult> pxfres,
+								   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -271,10 +273,10 @@ CXformJoinAssociativity::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	if (!fOutputLeftIsCrossJoin || fInputLeftIsCrossJoin)
 	{
 		// bind operators
-		CExpression *pexprLeft = (*pexpr)[0];
-		CExpression *pexprLeftLeft = (*pexprLeft)[0];
-		CExpression *pexprLeftRight = (*pexprLeft)[1];
-		CExpression *pexprRight = (*pexpr)[1];
+		gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+		gpos::Ref<CExpression> pexprLeftLeft = (*pexprLeft)[0];
+		gpos::Ref<CExpression> pexprLeftRight = (*pexprLeft)[1];
+		gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 
 		// add-ref all components for re-use
 		;

@@ -71,14 +71,15 @@ public:
 		gpos::Ref<IMDId> right_mdid, IMDType::ECmpType cmp_type);
 
 	static gpos::Ref<IMDId> GetScCmpMdIdConsiderCasts(
-		CMDAccessor *md_accessor, CExpression *pexprLeft,
-		CExpression *pexprRight, IMDType::ECmpType cmp_type);
+		CMDAccessor *md_accessor, gpos::Ref<CExpression> pexprLeft,
+		gpos::Ref<CExpression> pexprRight, IMDType::ECmpType cmp_type);
 
 	// similar to GetScCmpMdIdConsiderCasts() but also add the appropriate casts
-	static void ApplyCastsForScCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
-								   gpos::owner<CExpression *> &pexprLeft,
-								   gpos::owner<CExpression *> &pexprRight,
-								   gpos::Ref<IMDId> op_mdid);
+	static void ApplyCastsForScCmp(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		gpos::owner<gpos::Ref<CExpression> > &pexprLeft,
+		gpos::owner<gpos::Ref<CExpression> > &pexprRight,
+		gpos::Ref<IMDId> op_mdid);
 
 	// is scalar operator commutative? this can be used with ScalarOp and ScalarCmp
 	static BOOL FCommutativeScalarOp(CMDAccessor *md_accessor,

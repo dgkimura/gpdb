@@ -98,7 +98,7 @@ public:
 	}
 
 	static CDXLScalarSortGroupClause *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSortGroupClause == dxl_op->GetDXLOperator());
@@ -115,7 +115,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	void
-	AssertValid(const CDXLNode *, BOOL) const override
+	AssertValid(const gpos::Ref<CDXLNode>, BOOL) const override
 	{
 	}
 #endif	// GPOS_DEBUG
@@ -134,7 +134,7 @@ public:
 
 	void
 	SerializeToDXL(CXMLSerializer *xml_serializer,
-				   const CDXLNode *) const override
+				   const gpos::Ref<CDXLNode>) const override
 	{
 		const CWStringConst *element_name = GetOpNameStr();
 

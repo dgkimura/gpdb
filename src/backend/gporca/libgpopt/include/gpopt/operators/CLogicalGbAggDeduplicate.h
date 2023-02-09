@@ -89,7 +89,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
@@ -135,7 +135,7 @@ public:
 
 	// conversion function
 	static CLogicalGbAggDeduplicate *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalGbAggDeduplicate == pop->Eopid());

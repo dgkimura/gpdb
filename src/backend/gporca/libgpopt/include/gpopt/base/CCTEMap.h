@@ -166,11 +166,11 @@ private:
 	gpos::Ref<UlongToCTEMapEntryMap> m_phmcm;
 
 	// lookup info for given cte id
-	CCTEMapEntry *PcmeLookup(ULONG ulCteId) const;
+	gpos::Ref<CCTEMapEntry> PcmeLookup(ULONG ulCteId) const;
 
 	// helper to add entries found in first map and are unresolved based on second map
 	static void AddUnresolved(const CCTEMap &cmFirst, const CCTEMap &cmSecond,
-							  CCTEMap *pcmResult);
+							  gpos::Ref<CCTEMap> pcmResult);
 
 public:
 	CCTEMap(const CCTEMap &) = delete;
@@ -192,7 +192,7 @@ public:
 
 	// check if two cte maps are equal
 	BOOL
-	Equals(const CCTEMap *pcm) const
+	Equals(const gpos::Ref<CCTEMap> pcm) const
 	{
 		return (m_phmcm->Size() == pcm->m_phmcm->Size()) && this->FSubset(pcm);
 	}
@@ -201,14 +201,14 @@ public:
 	CDrvdPropPlan *PdpplanProducer(ULONG *ulpId) const;
 
 	// check if current  map is a subset of the given one
-	BOOL FSubset(const CCTEMap *pcm) const;
+	BOOL FSubset(const gpos::Ref<CCTEMap> pcm) const;
 
 	// check whether the current CTE map satisfies the given CTE requirements
-	BOOL FSatisfies(const CCTEReq *pcter) const;
+	BOOL FSatisfies(const gpos::Ref<CCTEReq> pcter) const;
 
 	// return producer ids that are in this map but not in the given requirement
 	gpos::Ref<ULongPtrArray> PdrgpulAdditionalProducers(
-		CMemoryPool *mp, const CCTEReq *pcter) const;
+		CMemoryPool *mp, const gpos::Ref<CCTEReq> pcter) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;

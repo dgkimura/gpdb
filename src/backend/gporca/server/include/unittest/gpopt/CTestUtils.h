@@ -89,7 +89,7 @@ class IConstExprEvaluator;
 
 using CExpressionJoinsArray = CDynamicPtrArray<CExpression, CleanupNULL>;
 
-using FnDXLPlanChecker = BOOL(CDXLNode *);
+using FnDXLPlanChecker = BOOL(gpos::Ref<CDXLNode>);
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -505,20 +505,22 @@ public:
 		BOOL fCrossProduct);
 
 	// generate a query context from an array of required column references
-	static CQueryContext *PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
+	static CQueryContext *PqcGenerate(CMemoryPool *mp,
+									  gpos::Ref<CExpression> pexpr,
 									  CColRefArray *colref_array);
 
 	// generate a dummy query context for testing
-	static CQueryContext *PqcGenerate(CMemoryPool *mp, CExpression *pexpr);
+	static CQueryContext *PqcGenerate(CMemoryPool *mp,
+									  gpos::Ref<CExpression> pexpr);
 
 	// generate a nested AND/OR tree
 	static gpos::Ref<CExpression> PexprScalarNestedPreds(
-		CMemoryPool *mp, CExpression *pexpr,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 		CScalarBoolOp::EBoolOperator eboolop);
 
 	// find the first child expression with the given operator id
-	static CExpression *PexprFindFirstExpressionWithOpId(
-		CExpression *pexpr, COperator::EOperatorId op_id);
+	static gpos::Ref<CExpression> PexprFindFirstExpressionWithOpId(
+		gpos::Ref<CExpression> pexpr, COperator::EOperatorId op_id);
 
 	// equality predicate shortcut
 	static void EqualityPredicate(CMemoryPool *mp, CColRefSet *pcrsLeft,
@@ -565,43 +567,44 @@ public:
 
 	// match given two plans using string comparison
 	static BOOL FPlanMatch(CMemoryPool *mp, IOstream &os,
-						   const CDXLNode *first_child_dxlnode,
+						   const gpos::Ref<CDXLNode> first_child_dxlnode,
 						   ULLONG ullPlanIdFst, ULLONG ullPlanSpaceSizeFst,
-						   const CDXLNode *second_child_dxlnode,
+						   const gpos::Ref<CDXLNode> second_child_dxlnode,
 						   ULLONG ullPlanIdSnd, ULLONG ullPlanSpaceSizeSnd,
 						   const CHAR *file_name);
 
 	// compare given DXL plans
 	static BOOL FPlanCompare(CMemoryPool *mp, IOstream &os,
-							 const CDXLNode *first_child_dxlnode,
+							 const gpos::Ref<CDXLNode> first_child_dxlnode,
 							 ULLONG ullPlanIdFst, ULLONG ullPlanSpaceSizeFst,
-							 const CDXLNode *second_child_dxlnode,
+							 const gpos::Ref<CDXLNode> second_child_dxlnode,
 							 ULLONG ullPlanIdSnd, ULLONG ullPlanSpaceSizeSnd,
 							 BOOL fMatchPlans, INT iCmpSpaceSize,
 							 const CHAR *file_name);
 
 	// run minidumps while loading metadata from passed file
-	static GPOS_RESULT EresRunMinidumps(CMemoryPool *mp,
-										const CHAR *rgszFileNames[],
-										ULONG ulTests, ULONG *pulTestCounter,
-										ULONG ulSessionId, ULONG ulCmdId,
-										BOOL fMatchPlans,
-										BOOL fTestSpacePruning,
-										const CHAR *szMDFilePath = nullptr,
-										IConstExprEvaluator *pceeval = nullptr);
+	static GPOS_RESULT EresRunMinidumps(
+		CMemoryPool *mp, const CHAR *rgszFileNames[], ULONG ulTests,
+		ULONG *pulTestCounter, ULONG ulSessionId, ULONG ulCmdId,
+		BOOL fMatchPlans, BOOL fTestSpacePruning,
+		const CHAR *szMDFilePath = nullptr,
+		gpos::Ref<IConstExprEvaluator> pceeval = nullptr);
 
 	// run all minidumps based on one metadata file
 	static GPOS_RESULT EresRunMinidumpsUsingOneMDFile(
 		CMemoryPool *mp, const CHAR *szMDFilePath, const CHAR *rgszFileNames[],
 		ULONG *pulTestCounter, ULONG ulSessionId, ULONG ulCmdId,
 		BOOL fMatchPlans, INT iCmpSpaceSize,
-		IConstExprEvaluator *pceeval = nullptr);
+		gpos::Ref<IConstExprEvaluator> pceeval = nullptr);
 
 	// run one minidump-based test using passed MD Accessor
-	static GPOS_RESULT EresRunMinidump(
-		CMemoryPool *mp, CMDAccessor *md_accessor, const CHAR *rgszFileName,
-		ULONG *pulTestCounter, ULONG ulSessionId, ULONG ulCmdId,
-		BOOL fMatchPlans, INT iCmpSpaceSize, IConstExprEvaluator *pceeval);
+	static GPOS_RESULT EresRunMinidump(CMemoryPool *mp,
+									   CMDAccessor *md_accessor,
+									   const CHAR *rgszFileName,
+									   ULONG *pulTestCounter, ULONG ulSessionId,
+									   ULONG ulCmdId, BOOL fMatchPlans,
+									   INT iCmpSpaceSize,
+									   gpos::Ref<IConstExprEvaluator> pceeval);
 
 	// test plan sampling
 	static GPOS_RESULT EresSamplePlans(const CHAR *rgszFileNames[],
@@ -651,38 +654,38 @@ public:
 
 	// helper for generating a scalar compare ident to constant
 	static gpos::Ref<CExpression> PexprScalarCmpIdentToConstant(
-		CMemoryPool *mp, CExpression *pexpr);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 
 	// helper for generating an exists subquery
-	static gpos::Ref<CExpression> PexprExistsSubquery(CMemoryPool *mp,
-													  CExpression *pexprOuter);
+	static gpos::Ref<CExpression> PexprExistsSubquery(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter);
 
 	// helper for generating a not exists subquery
 	static gpos::Ref<CExpression> PexprNotExistsSubquery(
-		CMemoryPool *mp, CExpression *pexprOuter);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter);
 
 	// helper for generating an ANY subquery
-	static gpos::Ref<CExpression> PexpSubqueryAny(CMemoryPool *mp,
-												  CExpression *pexprOuter);
+	static gpos::Ref<CExpression> PexpSubqueryAny(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter);
 
 	// helper for generating an ALL subquery
-	static gpos::Ref<CExpression> PexpSubqueryAll(CMemoryPool *mp,
-												  CExpression *pexprOuter);
+	static gpos::Ref<CExpression> PexpSubqueryAll(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter);
 
 	// recursively traverses the subtree rooted at the given expression, and return
 	// the first subexpression it encounters that has the given id
-	static const CExpression *PexprFirst(const CExpression *pexpr,
-										 const COperator::EOperatorId op_id);
+	static const gpos::Ref<CExpression> PexprFirst(
+		const gpos::Ref<CExpression> pexpr, const COperator::EOperatorId op_id);
 
 	// generate a scalar expression comparing scalar identifier to a constant
 	static gpos::Ref<CExpression> PexprScIdentCmpConst(
-		CMemoryPool *mp, CExpression *pexprRelational,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprRelational,
 		IMDType::ECmpType cmp_type, ULONG ulVal);
 
 	// generate a scalar expression comparing scalar identifiers
 	static gpos::Ref<CExpression> PexprScIdentCmpScIdent(
-		CMemoryPool *mp, CExpression *pexprLeft, CExpression *pexprRight,
-		IMDType::ECmpType cmp_type);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
+		gpos::Ref<CExpression> pexprRight, IMDType::ECmpType cmp_type);
 
 	// generate a scalar AND expression
 	static gpos::Ref<CExpression> PexprAnd(CMemoryPool *mp,
@@ -716,7 +719,7 @@ public:
 		BOOL fMatchPlans, BOOL fTestSpacePruning);
 
 	// return the number of segments, default return GPOPT_TEST_SEGMENTS
-	static ULONG UlSegments(COptimizerConfig *optimizer_config);
+	static ULONG UlSegments(gpos::Ref<COptimizerConfig> optimizer_config);
 
 	// create Equivalence Class based on the breakpoints
 	static gpos::Ref<CColRefSetArray> createEquivalenceClasses(

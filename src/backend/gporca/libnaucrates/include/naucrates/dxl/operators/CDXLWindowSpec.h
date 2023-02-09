@@ -69,10 +69,10 @@ public:
 	virtual void SerializeToDXL(CXMLSerializer *) const;
 
 	// set window frame definition
-	void SetWindowFrame(CDXLWindowFrame *window_frame);
+	void SetWindowFrame(gpos::Ref<CDXLWindowFrame> window_frame);
 
 	// return window frame
-	CDXLWindowFrame *
+	gpos::Ref<CDXLWindowFrame>
 	GetWindowFrame() const
 	{
 		return m_window_frame.get();
@@ -86,7 +86,7 @@ public:
 	}
 
 	// sort columns
-	CDXLNode *
+	gpos::Ref<CDXLNode>
 	GetSortColListDXL() const
 	{
 		return m_sort_col_list_dxlnode.get();

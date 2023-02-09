@@ -71,7 +71,7 @@ public:
 	void Sort() const;
 
 	// return the point filter at a particular position
-	CStatsPred *GetPredStats(ULONG pos) const;
+	gpos::Ref<CStatsPred> GetPredStats(ULONG pos) const;
 
 	// filter type id
 	EStatsPredType
@@ -85,7 +85,7 @@ public:
 
 	// conversion function
 	static CStatsPredDisj *
-	ConvertPredStats(CStatsPred *pred_stats)
+	ConvertPredStats(gpos::Ref<CStatsPred> pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptDisj == pred_stats->GetPredStatsType());

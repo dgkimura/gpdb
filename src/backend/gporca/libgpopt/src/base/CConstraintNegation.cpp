@@ -138,7 +138,7 @@ CConstraintNegation::PcnstrRemapForColumn(CMemoryPool *mp,
 //		Scalar expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CConstraintNegation::PexprScalar(CMemoryPool *mp)
 {
 	if (nullptr == m_pexprScalar)

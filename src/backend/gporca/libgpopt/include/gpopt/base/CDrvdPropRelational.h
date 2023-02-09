@@ -110,7 +110,7 @@ private:
 	// function properties
 	gpos::Ref<CFunctionProp> m_pfp;
 
-	CTableDescriptor *m_table_descriptor;
+	gpos::Ref<CTableDescriptor> m_table_descriptor;
 
 	// helper for getting applicable FDs from child
 	static gpos::Ref<CFunctionalDependencyArray>
@@ -149,7 +149,7 @@ protected:
 	CColRefSet *DeriveCorrelatedApplyColumns(CExpressionHandle &);
 
 	// key collection
-	CKeyCollection *DeriveKeyCollection(CExpressionHandle &);
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(CExpressionHandle &);
 
 	// functional dependencies
 	CFunctionalDependencyArray *DeriveFunctionalDependencies(
@@ -162,15 +162,15 @@ protected:
 	ULONG DeriveJoinDepth(CExpressionHandle &);
 
 	// partition consumers
-	CPartInfo *DerivePartitionInfo(CExpressionHandle &);
+	gpos::Ref<CPartInfo> DerivePartitionInfo(CExpressionHandle &);
 
 	// constraint property
-	CPropConstraint *DerivePropertyConstraint(CExpressionHandle &);
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(CExpressionHandle &);
 
 	// function properties
-	CFunctionProp *DeriveFunctionProperties(CExpressionHandle &);
+	gpos::Ref<CFunctionProp> DeriveFunctionProperties(CExpressionHandle &);
 
-	CTableDescriptor *DeriveTableDescriptor(CExpressionHandle &);
+	gpos::Ref<CTableDescriptor> DeriveTableDescriptor(CExpressionHandle &);
 
 public:
 	CDrvdPropRelational(const CDrvdPropRelational &) = delete;
@@ -196,7 +196,7 @@ public:
 
 	// derivation function
 	void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDrvdPropCtxt *pdpctxt) override;
+				gpos::Ref<CDrvdPropCtxt> pdpctxt) override;
 
 	// output columns
 	CColRefSet *GetOutputColumns() const;
@@ -211,7 +211,7 @@ public:
 	CColRefSet *GetCorrelatedApplyColumns() const;
 
 	// key collection
-	CKeyCollection *GetKeyCollection() const;
+	gpos::Ref<CKeyCollection> GetKeyCollection() const;
 
 	// functional dependencies
 	CFunctionalDependencyArray *GetFunctionalDependencies() const;
@@ -223,18 +223,19 @@ public:
 	ULONG GetJoinDepth() const;
 
 	// partition consumers
-	CPartInfo *GetPartitionInfo() const;
+	gpos::Ref<CPartInfo> GetPartitionInfo() const;
 
 	// constraint property
-	CPropConstraint *GetPropertyConstraint() const;
+	gpos::Ref<CPropConstraint> GetPropertyConstraint() const;
 
 	// function properties
-	CFunctionProp *GetFunctionProperties() const;
+	gpos::Ref<CFunctionProp> GetFunctionProperties() const;
 
-	CTableDescriptor *GetTableDescriptor() const;
+	gpos::Ref<CTableDescriptor> GetTableDescriptor() const;
 
 	// shorthand for conversion
-	static CDrvdPropRelational *GetRelationalProperties(CDrvdProp *pdp);
+	static CDrvdPropRelational *GetRelationalProperties(
+		gpos::Ref<CDrvdProp> pdp);
 
 	// check for satisfying required plan properties
 	BOOL FSatisfies(const CReqdPropPlan *prpp) const override;

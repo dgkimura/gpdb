@@ -169,7 +169,7 @@ CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier, ULONG id,
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(const CColumnDescriptor *pcoldesc, ULONG id,
+CColumnFactory::PcrCreate(const gpos::Ref<CColumnDescriptor> pcoldesc, ULONG id,
 						  const CName &name, ULONG ulOpSource,
 						  BOOL mark_as_used, gpos::Ref<IMDId> mdid_table)
 {
@@ -240,9 +240,9 @@ CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier,
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(const CColumnDescriptor *pcoldesc, const CName &name,
-						  ULONG ulOpSource, BOOL mark_as_used,
-						  gpos::Ref<IMDId> mdid_table)
+CColumnFactory::PcrCreate(const gpos::Ref<CColumnDescriptor> pcoldesc,
+						  const CName &name, ULONG ulOpSource,
+						  BOOL mark_as_used, gpos::Ref<IMDId> mdid_table)
 {
 	ULONG id = m_aul++;
 
@@ -356,7 +356,7 @@ CColumnFactory::PcrsUsedInComputedCol(const CColRef *colref)
 //
 //---------------------------------------------------------------------------
 void
-CColumnFactory::AddComputedToUsedColsMap(CExpression *pexpr)
+CColumnFactory::AddComputedToUsedColsMap(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != m_phmcrcrs);

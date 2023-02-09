@@ -63,7 +63,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// target table descriptor
-	CDXLTableDescr *
+	gpos::Ref<CDXLTableDescr>
 	GetDXLTableDescr() const
 	{
 		return m_dxl_table_descr.get();
@@ -93,17 +93,17 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(const gpos::Ref<CDXLNode> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 
 	// conversion function
 	static CDXLLogicalDelete *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalDelete == dxl_op->GetDXLOperator());

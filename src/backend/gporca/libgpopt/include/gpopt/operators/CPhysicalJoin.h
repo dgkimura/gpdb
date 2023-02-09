@@ -86,19 +86,19 @@ protected:
 
 	// Do each of the given predicate children use columns from a different
 	// join child?
-	static BOOL FPredKeysSeparated(CExpression *pexprOuter,
-								   CExpression *pexprInner,
-								   CExpression *pexprPredOuter,
-								   CExpression *pexprPredInner);
+	static BOOL FPredKeysSeparated(gpos::Ref<CExpression> pexprOuter,
+								   gpos::Ref<CExpression> pexprInner,
+								   gpos::Ref<CExpression> pexprPredOuter,
+								   gpos::Ref<CExpression> pexprPredInner);
 
 	static gpos::Ref<CEnfdDistribution> PedInnerHashedFromOuterHashed(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CEnfdDistribution::EDistributionMatching dmatch,
-		CDrvdProp *outerDrvdProp);
+		gpos::Ref<CDrvdProp> outerDrvdProp);
 
 public:
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -121,7 +121,7 @@ public:
 
 	// compute required ctes of the n-th child
 	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CCTEReq *pcter, ULONG child_index,
+									gpos::Ref<CCTEReq> pcter, ULONG child_index,
 									CDrvdPropArray *pdrgpdpCtxt,
 									ULONG ulOptReq) const override;
 
@@ -198,23 +198,23 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// is given predicate hash-join compatible
-	static BOOL FHashJoinCompatible(CExpression *pexprPred,
-									CExpression *pexprOuter,
-									CExpression *pexprInner);
+	static BOOL FHashJoinCompatible(gpos::Ref<CExpression> pexprPred,
+									gpos::Ref<CExpression> pexprOuter,
+									gpos::Ref<CExpression> pexprInner);
 
 	// is given predicate merge-join compatible
-	static BOOL FMergeJoinCompatible(CExpression *pexprPred,
-									 CExpression *pexprOuter,
-									 CExpression *pexprInner);
+	static BOOL FMergeJoinCompatible(gpos::Ref<CExpression> pexprPred,
+									 gpos::Ref<CExpression> pexprOuter,
+									 gpos::Ref<CExpression> pexprInner);
 
 	// return number of distribution requests for correlated join
 	static ULONG UlDistrRequestsForCorrelatedJoin();
 
-	static void AlignJoinKeyOuterInner(CExpression *pexprConjunct,
-									   CExpression *pexprOuter,
-									   CExpression *pexprInner,
-									   CExpression **ppexprKeyOuter,
-									   CExpression **ppexprKeyInner,
+	static void AlignJoinKeyOuterInner(gpos::Ref<CExpression> pexprConjunct,
+									   gpos::Ref<CExpression> pexprOuter,
+									   gpos::Ref<CExpression> pexprInner,
+									   gpos::Ref<CExpression> *ppexprKeyOuter,
+									   gpos::Ref<CExpression> *ppexprKeyInner,
 									   gpos::Ref<IMDId> *mdid_scop);
 
 	static CRewindabilitySpec *PrsRequiredForNLJoinOuterChild(

@@ -89,17 +89,17 @@ public:
 
 	// required properties computation function
 	void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 CReqdProp *prpInput, ULONG child_index,
+				 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
 				 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// required columns computation function
 	void ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdProp *prpInput, ULONG child_index,
+						 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
 						 CDrvdPropArray *pdrgpdpCtxt);
 
 	// required ctes computation function
 	void ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdProp *prpInput, ULONG child_index,
+						 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
 						 CDrvdPropArray *pdrgpdpCtxt);
 
 	// required columns accessor
@@ -138,14 +138,14 @@ public:
 	}
 
 	// required cte accessor
-	CCTEReq *
+	gpos::Ref<CCTEReq>
 	Pcter() const
 	{
 		return m_pcter.get();
 	}
 
 	// given a property spec type, return the corresponding property spec member
-	CPropSpec *Pps(ULONG ul) const;
+	gpos::Ref<CPropSpec> Pps(ULONG ul) const;
 
 	// equality function
 	BOOL Equals(const CReqdPropPlan *prpp) const;
@@ -168,7 +168,7 @@ public:
 
 	// shorthand for conversion
 	static CReqdPropPlan *
-	Prpp(CReqdProp *prp)
+	Prpp(gpos::Ref<CReqdProp> prp)
 	{
 		GPOS_ASSERT(nullptr != prp);
 

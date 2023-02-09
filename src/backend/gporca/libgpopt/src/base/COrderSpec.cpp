@@ -203,7 +203,8 @@ COrderSpec::AppendEnforcers(CMemoryPool *mp,
 								prpp
 #endif	// GPOS_DEBUG
 							,
-							CExpressionArray *pdrgpexpr, CExpression *pexpr)
+							CExpressionArray *pdrgpexpr,
+							gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != prpp);
 	GPOS_ASSERT(nullptr != mp);

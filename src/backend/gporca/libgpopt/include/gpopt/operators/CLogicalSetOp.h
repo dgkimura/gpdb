@@ -117,7 +117,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	IOstream &OsPrint(IOstream &os) const override;
 
@@ -150,7 +150,7 @@ public:
 
 	// conversion function
 	static CLogicalSetOp *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FLogicalSetOp(pop));

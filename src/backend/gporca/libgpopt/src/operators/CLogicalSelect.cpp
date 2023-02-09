@@ -40,7 +40,8 @@ CLogicalSelect::CLogicalSelect(CMemoryPool *mp)
 	m_phmPexprPartPred = GPOS_NEW(mp) ExprPredToExprPredPartMap(mp);
 }
 
-CLogicalSelect::CLogicalSelect(CMemoryPool *mp, CTableDescriptor *ptabdesc)
+CLogicalSelect::CLogicalSelect(CMemoryPool *mp,
+							   gpos::Ref<CTableDescriptor> ptabdesc)
 	: CLogicalUnary(mp), m_ptabdesc(ptabdesc)
 {
 	m_phmPexprPartPred = GPOS_NEW(mp) ExprPredToExprPredPartMap(mp);
@@ -122,7 +123,7 @@ CLogicalSelect::DeriveMaxCard(CMemoryPool *,  // mp
 							  CExpressionHandle &exprhdl) const
 {
 	// in case of a false condition or a contradiction, maxcard should be zero
-	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(1);
+	gpos::Ref<CExpression> pexprScalar = exprhdl.PexprScalarRepChild(1);
 	if ((nullptr != pexprScalar &&
 		 (CUtils::FScalarConstFalse(pexprScalar) ||
 		  CUtils::FScalarConstBoolNull(pexprScalar))) ||
@@ -149,7 +150,7 @@ CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 IStatisticsArray *stats_ctxt) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *child_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
 
 	if (exprhdl.DeriveHasSubquery(1))
 	{
@@ -159,7 +160,8 @@ CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// remove implied predicates from selection condition to avoid cardinality under-estimation
-	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(1 /*child_index*/);
+	gpos::Ref<CExpression> pexprScalar =
+		exprhdl.PexprScalarRepChild(1 /*child_index*/);
 	gpos::Ref<CExpression> pexprPredicate =
 		CPredicateUtils::PexprRemoveImpliedConjuncts(mp, pexprScalar, exprhdl);
 
@@ -175,9 +177,10 @@ CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									   &local_expr, &expr_with_outer_refs);
 	;
 
-	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
-		mp, exprhdl, child_stats, local_expr.get(), expr_with_outer_refs,
-		stats_ctxt);
+	gpos::Ref<IStatistics> stats =
+		CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
+			mp, exprhdl, child_stats, local_expr.get(), expr_with_outer_refs,
+			stats_ctxt);
 	;
 	;
 
@@ -207,7 +210,7 @@ CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 // clang-format on
 gpos::Ref<CExpression>
 CLogicalSelect::PexprPartPred(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CExpression *,  //pexprInput
+							  gpos::Ref<CExpression>,  //pexprInput
 							  ULONG
 #ifdef GPOS_DEBUG
 								  child_index
@@ -216,7 +219,8 @@ CLogicalSelect::PexprPartPred(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(1 /*child_index*/);
+	gpos::Ref<CExpression> pexprScalar =
+		exprhdl.PexprScalarExactChild(1 /*child_index*/);
 
 	if (nullptr == pexprScalar)
 	{
@@ -225,7 +229,7 @@ CLogicalSelect::PexprPartPred(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// get partition keys
-	CPartInfo *ppartinfo = exprhdl.DerivePartitionInfo();
+	gpos::Ref<CPartInfo> ppartinfo = exprhdl.DerivePartitionInfo();
 	GPOS_ASSERT(nullptr != ppartinfo);
 
 	// we assume that the select is right on top of the dynamic get, so there

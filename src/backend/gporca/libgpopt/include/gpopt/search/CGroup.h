@@ -202,7 +202,7 @@ private:
 
 	// pointer to group containing the group expressions
 	// of all duplicate groups
-	CGroup *m_pgroupDuplicate;
+	gpos::Ref<CGroup> m_pgroupDuplicate;
 
 	// map of processed links
 	gpos::Ref<LinkMap> m_plinkmap;
@@ -267,33 +267,33 @@ private:
 					 IMdIdArray *join_opfamilies);
 
 	// insert new group expression
-	void Insert(CGroupExpression *pgexpr);
+	void Insert(gpos::Ref<CGroupExpression> pgexpr);
 
 	// move duplicate group expression to duplicates list
-	void MoveDuplicateGExpr(CGroupExpression *pgexpr);
+	void MoveDuplicateGExpr(gpos::Ref<CGroupExpression> pgexpr);
 
 	// initialize group's properties
-	void InitProperties(CDrvdProp *pdp);
+	void InitProperties(gpos::Ref<CDrvdProp> pdp);
 
 	// initialize group's stats
 	void InitStats(gpos::Ref<IStatistics> stats);
 
 	// retrieve first group expression
-	CGroupExpression *PgexprFirst();
+	gpos::Ref<CGroupExpression> PgexprFirst();
 
 	// retrieve next group expression
-	CGroupExpression *PgexprNext(CGroupExpression *pgexpr);
+	gpos::Ref<CGroupExpression> PgexprNext(gpos::Ref<CGroupExpression> pgexpr);
 
 	// return true if first promise is better than second promise
 	static BOOL FBetterPromise(CMemoryPool *mp, CLogical::EStatPromise espFst,
-							   CGroupExpression *pgexprFst,
+							   gpos::Ref<CGroupExpression> pgexprFst,
 							   CLogical::EStatPromise espSnd,
-							   CGroupExpression *pgexprSnd);
+							   gpos::Ref<CGroupExpression> pgexprSnd);
 
 	// derive stats recursively on child groups
 	static CLogical::EStatPromise EspDerive(CMemoryPool *pmpLocal,
 											CMemoryPool *pmpGlobal,
-											CGroupExpression *pgexpr,
+											gpos::Ref<CGroupExpression> pgexpr,
 											CReqdPropRelational *prprel,
 											IStatisticsArray *stats_ctxt,
 											BOOL fDeriveChildStats);
@@ -303,8 +303,9 @@ private:
 
 	// helper function to add links in child groups
 	static void RecursiveBuildTreeMap(
-		CMemoryPool *mp, COptimizationContext *poc, CCostContext *pccParent,
-		CGroupExpression *pgexprCurrent, ULONG child_index,
+		CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
+		gpos::Ref<CCostContext> pccParent,
+		gpos::Ref<CGroupExpression> pgexprCurrent, ULONG child_index,
 		CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan,
 				 CCostContext::HashValue, CCostContext::Equals> *ptmap);
 
@@ -318,13 +319,12 @@ private:
 	IOstream &OsPrintGrpOptCtxts(IOstream &os, const CHAR *szPrefix) const;
 
 	// initialize and return empty stats for this group
-	IStatistics *PstatsInitEmpty(CMemoryPool *pmpGlobal);
+	gpos::Ref<IStatistics> PstatsInitEmpty(CMemoryPool *pmpGlobal);
 
 	// find the group expression having the best stats promise
-	CGroupExpression *PgexprBestPromise(CMemoryPool *pmpLocal,
-										CMemoryPool *pmpGlobal,
-										CReqdPropRelational *prprelInput,
-										IStatisticsArray *stats_ctxt);
+	gpos::Ref<CGroupExpression> PgexprBestPromise(
+		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
+		CReqdPropRelational *prprelInput, IStatisticsArray *stats_ctxt);
 
 public:
 	CGroup(const CGroup &) = delete;
@@ -343,20 +343,20 @@ public:
 	}
 
 	// group properties accessor
-	CDrvdProp *
+	gpos::Ref<CDrvdProp>
 	Pdp() const
 	{
 		return m_pdp.get();
 	}
 
 	// group stats accessor
-	IStatistics *Pstats() const;
+	gpos::Ref<IStatistics> Pstats() const;
 
 	// attempt initializing stats with the given stat object
 	BOOL FInitStats(gpos::Ref<IStatistics> stats);
 
 	// append given stats object to group stats
-	void AppendStats(CMemoryPool *mp, IStatistics *stats);
+	void AppendStats(CMemoryPool *mp, gpos::Ref<IStatistics> stats);
 
 	// accessor of maximum optimization level of member group expressions
 	EOptimizationLevel
@@ -394,7 +394,7 @@ public:
 	}
 
 	// return a representative cached scalar expression usable for stat derivation etc.
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprScalarRep() const
 	{
 		return m_pexprScalarRep.get();
@@ -408,7 +408,7 @@ public:
 	}
 
 	// return dummy cost context for scalar group
-	CCostContext *
+	gpos::Ref<CCostContext>
 	PccDummy() const
 	{
 		GPOS_ASSERT(FScalar());
@@ -502,7 +502,7 @@ public:
 	}
 
 	// duplicate group accessor
-	CGroup *
+	gpos::Ref<CGroup>
 	PgroupDuplicate() const
 	{
 		return m_pgroupDuplicate;
@@ -513,30 +513,34 @@ public:
 	void ResolveDuplicateMaster();
 
 	// add duplicate group
-	void AddDuplicateGrp(CGroup *pgroup);
+	void AddDuplicateGrp(gpos::Ref<CGroup> pgroup);
 
 	// merge group with its duplicate - not thread-safe
 	void MergeGroup();
 
 	// lookup a given context in contexts hash table
-	COptimizationContext *PocLookup(CMemoryPool *mp, CReqdPropPlan *prpp,
-									ULONG ulSearchStageIndex);
+	gpos::Ref<COptimizationContext> PocLookup(CMemoryPool *mp,
+											  CReqdPropPlan *prpp,
+											  ULONG ulSearchStageIndex);
 
 	// lookup the best context across all stages for the given required properties
-	COptimizationContext *PocLookupBest(CMemoryPool *mp, ULONG ulSearchStages,
-										CReqdPropPlan *prpp);
+	gpos::Ref<COptimizationContext> PocLookupBest(CMemoryPool *mp,
+												  ULONG ulSearchStages,
+												  CReqdPropPlan *prpp);
 
 	// find a context by id
-	COptimizationContext *Ppoc(ULONG id) const;
+	gpos::Ref<COptimizationContext> Ppoc(ULONG id) const;
 
 	// insert given context into contexts hash table
-	COptimizationContext *PocInsert(COptimizationContext *poc);
+	gpos::Ref<COptimizationContext> PocInsert(
+		gpos::Ref<COptimizationContext> poc);
 
 	// update the best group cost under the given optimization context
-	void UpdateBestCost(COptimizationContext *poc, CCostContext *pcc);
+	void UpdateBestCost(gpos::Ref<COptimizationContext> poc,
+						gpos::Ref<CCostContext> pcc);
 
 	// lookup best expression under given optimization context
-	CGroupExpression *PgexprBest(COptimizationContext *poc);
+	gpos::Ref<CGroupExpression> PgexprBest(gpos::Ref<COptimizationContext> poc);
 
 	// materialize a scalar expression for stat derivation if this is a scalar group
 	void CreateScalarExpression();
@@ -566,19 +570,19 @@ public:
 	}
 
 	// derive statistics recursively on group
-	IStatistics *PstatsRecursiveDerive(CMemoryPool *pmpLocal,
-									   CMemoryPool *pmpGlobal,
-									   CReqdPropRelational *prprel,
-									   IStatisticsArray *stats_ctxt);
+	gpos::Ref<IStatistics> PstatsRecursiveDerive(CMemoryPool *pmpLocal,
+												 CMemoryPool *pmpGlobal,
+												 CReqdPropRelational *prprel,
+												 IStatisticsArray *stats_ctxt);
 
 	// find group expression with best stats promise and the same given children
-	CGroupExpression *PgexprBestPromise(CMemoryPool *mp,
-										CGroupExpression *pgexprToMatch);
+	gpos::Ref<CGroupExpression> PgexprBestPromise(
+		CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexprToMatch);
 
 	// link parent group expression to group members
 	void BuildTreeMap(
-		CMemoryPool *mp, COptimizationContext *poc, CCostContext *pccParent,
-		ULONG child_index,
+		CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
+		gpos::Ref<CCostContext> pccParent, ULONG child_index,
 		CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan,
 				 CCostContext::HashValue, CCostContext::Equals> *ptmap);
 
@@ -586,12 +590,12 @@ public:
 	void ResetLinkMap();
 
 	// retrieve the group expression containing a CTE Consumer operator
-	CGroupExpression *PgexprAnyCTEConsumer();
+	gpos::Ref<CGroupExpression> PgexprAnyCTEConsumer();
 
 	// compute stats during costing
-	IStatistics *PstatsCompute(COptimizationContext *poc,
-							   CExpressionHandle &exprhdl,
-							   CGroupExpression *pgexpr);
+	gpos::Ref<IStatistics> PstatsCompute(gpos::Ref<COptimizationContext> poc,
+										 CExpressionHandle &exprhdl,
+										 gpos::Ref<CGroupExpression> pgexpr);
 
 	// compute cost lower bound for the plan satisfying given required properties
 	CCost CostLowerBound(CMemoryPool *mp, CReqdPropPlan *prppInput);
@@ -605,7 +609,8 @@ public:
 									  CGroupArray *pdrgpgroupSnd);
 
 	// determine if a pair of groups are duplicates
-	static BOOL FDuplicateGroups(CGroup *pgroupFst, CGroup *pgroupSnd);
+	static BOOL FDuplicateGroups(gpos::Ref<CGroup> pgroupFst,
+								 gpos::Ref<CGroup> pgroupSnd);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;

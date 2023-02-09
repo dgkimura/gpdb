@@ -71,7 +71,7 @@ public:
 
 	// conversion function
 	static CXformExploration *
-	Pxformexp(CXform *pxform)
+	Pxformexp(gpos::Ref<CXform> pxform)
 	{
 		GPOS_ASSERT(nullptr != pxform);
 		GPOS_ASSERT(pxform->FExploration());

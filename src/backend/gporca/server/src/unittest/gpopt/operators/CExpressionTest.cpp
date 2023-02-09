@@ -272,7 +272,7 @@ CExpressionTest::EresUnittest_SimpleOps()
 			GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp));
 		gpos::Ref<IStatisticsArray> stats_ctxt =
 			GPOS_NEW(mp) IStatisticsArray(mp);
-		IStatistics *stats = pexpr->PstatsDerive(prprel, stats_ctxt);
+		gpos::Ref<IStatistics> stats = pexpr->PstatsDerive(prprel, stats_ctxt);
 		GPOS_ASSERT(nullptr != stats);
 
 		oss << "Expected risk: " << rgulRisk[i] << std::endl;
@@ -332,7 +332,7 @@ CExpressionTest::EresUnittest_Union()
 	gpos::Ref<CReqdPropRelational> prprel =
 		GPOS_NEW(mp) CReqdPropRelational(GPOS_NEW(mp) CColRefSet(mp));
 	gpos::Ref<IStatisticsArray> stats_ctxt = GPOS_NEW(mp) IStatisticsArray(mp);
-	IStatistics *stats = pexpr->PstatsDerive(prprel, stats_ctxt);
+	gpos::Ref<IStatistics> stats = pexpr->PstatsDerive(prprel, stats_ctxt);
 	GPOS_ASSERT(nullptr != stats);
 
 	// We expect a risk of 3 because every Union increments the risk.
@@ -1136,7 +1136,8 @@ CExpressionTest::EresUnittest_FValidPlanError()
 //
 //---------------------------------------------------------------------------
 GPOS_RESULT
-CExpressionTest::EresCheckCachedReqdCols(CMemoryPool *mp, CExpression *pexpr,
+CExpressionTest::EresCheckCachedReqdCols(CMemoryPool *mp,
+										 gpos::Ref<CExpression> pexpr,
 										 CReqdPropPlan *prppInput)
 {
 	if (pexpr->Pop()->FScalar())
@@ -1162,7 +1163,7 @@ CExpressionTest::EresCheckCachedReqdCols(CMemoryPool *mp, CExpression *pexpr,
 	const ULONG arity = pexpr->Arity();
 	for (ULONG ul = 0; GPOS_OK == eres && ul < arity; ul++)
 	{
-		CExpression *pexprChild = (*pexpr)[ul];
+		gpos::Ref<CExpression> pexprChild = (*pexpr)[ul];
 		if (pexprChild->Pop()->FScalar())
 		{
 			continue;

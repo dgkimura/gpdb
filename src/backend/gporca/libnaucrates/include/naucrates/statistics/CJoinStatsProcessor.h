@@ -29,8 +29,8 @@ class CJoinStatsProcessor
 protected:
 	// return join cardinality based on scaling factor and join type
 	static CDouble CalcJoinCardinality(
-		CMemoryPool *mp, CStatisticsConfig *stats_config, CDouble left_num_rows,
-		CDouble right_num_rows,
+		CMemoryPool *mp, gpos::Ref<CStatisticsConfig> stats_config,
+		CDouble left_num_rows, CDouble right_num_rows,
 		CScaleFactorUtils::SJoinConditionArray *join_conds_scale_factors,
 		IStatistics::EStatsJoinType join_type);
 
@@ -46,7 +46,7 @@ protected:
 	// helper for joining histograms
 	static void JoinHistograms(
 		CMemoryPool *mp, const CHistogram *histogram1,
-		const CHistogram *histogram2, CStatsPredJoin *join_pred_stats,
+		const CHistogram *histogram2, gpos::Ref<CStatsPredJoin> join_pred_stats,
 		CDouble num_rows1, CDouble num_rows2,
 		CHistogram **result_hist1,	// output: histogram 1 after join
 		CHistogram **result_hist2,	// output: histogram 2 after join
@@ -58,16 +58,16 @@ protected:
 public:
 	// main driver to generate join stats
 	static gpos::Ref<CStatistics> SetResultingJoinStats(
-		CMemoryPool *mp, CStatisticsConfig *stats_config,
-		const IStatistics *outer_stats_input,
-		const IStatistics *inner_stats_input,
+		CMemoryPool *mp, gpos::Ref<CStatisticsConfig> stats_config,
+		const gpos::Ref<IStatistics> outer_stats_input,
+		const gpos::Ref<IStatistics> inner_stats_input,
 		CStatsPredJoinArray *join_preds_stats,
 		IStatistics::EStatsJoinType join_type,
 		BOOL DoIgnoreLASJHistComputation);
 
 	static gpos::Ref<IStatistics> CalcAllJoinStats(
-		CMemoryPool *mp, IStatisticsArray *statistics_array, CExpression *expr,
-		COperator *pop);
+		CMemoryPool *mp, IStatisticsArray *statistics_array,
+		gpos::Ref<CExpression> expr, gpos::Ref<COperator> pop);
 
 	// derive statistics for join operation given array of statistics object
 	static gpos::Ref<IStatistics> DeriveJoinStats(CMemoryPool *mp,
@@ -79,8 +79,10 @@ public:
 		CMemoryPool *mp,
 		CExpressionHandle &
 			exprhdl,  // handle attached to the logical expression we want to derive stats for
-		CExpression *expr,	 // scalar condition used for stats derivation
-		IStatistics *stats,	 // statistics object of attached expression
+		gpos::Ref<CExpression>
+			expr,  // scalar condition used for stats derivation
+		gpos::Ref<IStatistics>
+			stats,	// statistics object of attached expression
 		IStatisticsArray *
 			all_outer_stats	 // array of stats objects where outer references are defined
 	);

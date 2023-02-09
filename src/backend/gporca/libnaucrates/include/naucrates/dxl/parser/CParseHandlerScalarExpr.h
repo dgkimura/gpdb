@@ -67,7 +67,7 @@ public:
 	~CParseHandlerScalarExpr() override;
 
 	// root of constructed DXL expression
-	CDXLNode *CreateDXLNode() const;
+	gpos::Ref<CDXLNode> CreateDXLNode() const;
 };
 }  // namespace gpdxl
 

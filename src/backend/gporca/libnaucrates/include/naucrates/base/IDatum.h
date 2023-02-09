@@ -78,14 +78,14 @@ public:
 	virtual ULONG HashValue() const = 0;
 
 	// Match function on datums
-	virtual BOOL Matches(const IDatum *) const = 0;
+	virtual BOOL Matches(const gpos::Ref<IDatum>) const = 0;
 
 	// create a copy of the datum
 	virtual gpos::Ref<IDatum> MakeCopy(CMemoryPool *mp) const = 0;
 
 	// stats greater than
 	virtual BOOL
-	StatsAreGreaterThan(const IDatum *datum) const
+	StatsAreGreaterThan(const gpos::Ref<IDatum> datum) const
 	{
 		BOOL stats_are_comparable = datum->StatsAreComparable(this);
 		GPOS_ASSERT(stats_are_comparable &&
@@ -129,19 +129,19 @@ public:
 	virtual LINT GetLINTMapping() const = 0;
 
 	// equality based on mapping to LINT or CDouble
-	virtual BOOL StatsAreEqual(const IDatum *datum) const;
+	virtual BOOL StatsAreEqual(const gpos::Ref<IDatum> datum) const;
 
 	// stats less than
-	virtual BOOL StatsAreLessThan(const IDatum *datum) const;
+	virtual BOOL StatsAreLessThan(const gpos::Ref<IDatum> datum) const;
 
 	// distance function
-	virtual CDouble GetStatsDistanceFrom(const IDatum *datum) const;
+	virtual CDouble GetStatsDistanceFrom(const gpos::Ref<IDatum> datum) const;
 
 	// return double representation of mapping value
 	CDouble GetValAsDouble() const;
 
 	// check if the given pair of datums are stats comparable
-	virtual BOOL StatsAreComparable(const IDatum *datum) const;
+	virtual BOOL StatsAreComparable(const gpos::Ref<IDatum> datum) const;
 
 	virtual gpos::IOstream &OsPrint(gpos::IOstream &os) const = 0;
 };	// class IDatum

@@ -120,7 +120,7 @@ CLogicalDML::~CLogicalDML()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalDML::Matches(COperator *pop) const
+CLogicalDML::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

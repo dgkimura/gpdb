@@ -68,7 +68,7 @@ public:
 	void Sort() const;
 
 	// return the filter at a particular position
-	CStatsPred *GetPredStats(ULONG pos) const;
+	gpos::Ref<CStatsPred> GetPredStats(ULONG pos) const;
 
 	// filter type id
 	EStatsPredType
@@ -79,7 +79,7 @@ public:
 
 	// conversion function
 	static CStatsPredConj *
-	ConvertPredStats(CStatsPred *pred_stats)
+	ConvertPredStats(gpos::Ref<CStatsPred> pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptConj == pred_stats->GetPredStatsType());

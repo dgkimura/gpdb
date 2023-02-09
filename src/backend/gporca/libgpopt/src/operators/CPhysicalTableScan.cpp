@@ -70,7 +70,7 @@ CPhysicalTableScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalTableScan::Matches(COperator *pop) const
+CPhysicalTableScan::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{

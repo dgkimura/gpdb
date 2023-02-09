@@ -150,7 +150,7 @@ public:
 	}
 
 	// CTAS storage options
-	CDXLCtasStorageOptions *
+	gpos::Ref<CDXLCtasStorageOptions>
 	GetDxlCtasStorageOption() const
 	{
 		return m_dxl_ctas_storage_option.get();
@@ -163,18 +163,18 @@ public:
 	}
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 
 	// conversion function
 	static CDXLPhysicalCTAS *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalCTAS == dxl_op->GetDXLOperator());

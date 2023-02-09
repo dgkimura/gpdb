@@ -79,7 +79,7 @@ public:
 	virtual ULONG HashValue() const;
 
 	// equality function
-	BOOL Equals(const CFunctionalDependency *pfd) const;
+	BOOL Equals(const gpos::Ref<CFunctionalDependency> pfd) const;
 
 	// do the given arguments form a functional dependency
 	BOOL

@@ -73,7 +73,7 @@ public:
 	}
 
 	// index descriptor
-	CIndexDescriptor *
+	gpos::Ref<CIndexDescriptor>
 	Pindexdesc() const
 	{
 		return m_pindexdesc.get();
@@ -83,7 +83,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
@@ -109,7 +109,7 @@ public:
 
 	// conversion function
 	static CPhysicalDynamicIndexScan *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalDynamicIndexScan == pop->Eopid());

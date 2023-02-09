@@ -89,7 +89,7 @@ CPhysicalSequenceProject::CreateOrderSpec(CMemoryPool *mp)
 		const ULONG size = pdrgpexpr->Size();
 		for (ULONG ul = 0; ul < size; ul++)
 		{
-			CExpression *pexpr = (*pdrgpexpr)[ul].get();
+			gpos::Ref<CExpression> pexpr = (*pdrgpexpr)[ul].get();
 			// we assume partition-by keys are always scalar idents
 			CScalarIdent *popScId = gpos::dyn_cast<CScalarIdent>(pexpr->Pop());
 			const CColRef *colref = popScId->Pcr();
@@ -162,7 +162,7 @@ CPhysicalSequenceProject::ComputeRequiredLocalColumns(CMemoryPool *mp)
 	const ULONG size = m_pdrgpwf->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CWindowFrame *pwf = (*m_pdrgpwf)[ul].get();
+		gpos::Ref<CWindowFrame> pwf = (*m_pdrgpwf)[ul].get();
 		if (nullptr != pwf->PexprLeading())
 		{
 			m_pcrsRequiredLocal->Union(
@@ -202,7 +202,7 @@ CPhysicalSequenceProject::~CPhysicalSequenceProject()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalSequenceProject::Matches(COperator *pop) const
+CPhysicalSequenceProject::Matches(gpos::Ref<COperator> pop) const
 {
 	GPOS_ASSERT(nullptr != pop);
 	if (Eopid() == pop->Eopid())
@@ -387,7 +387,7 @@ CPhysicalSequenceProject::PrsRequired(CMemoryPool *mp,
 gpos::Ref<CCTEReq>
 CPhysicalSequenceProject::PcteRequired(CMemoryPool *,		 //mp,
 									   CExpressionHandle &,	 //exprhdl,
-									   CCTEReq *pcter,
+									   gpos::Ref<CCTEReq> pcter,
 									   ULONG
 #ifdef GPOS_DEBUG
 										   child_index

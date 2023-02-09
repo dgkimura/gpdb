@@ -89,7 +89,7 @@ CDXLScalarIdent::GetOpNameStr() const
 //		Return column reference of the identifier operator
 //
 //---------------------------------------------------------------------------
-const CDXLColRef *
+const gpos::Ref<CDXLColRef>
 CDXLScalarIdent::GetDXLColRef() const
 {
 	return m_dxl_colref.get();
@@ -125,7 +125,7 @@ CDXLScalarIdent::TypeModifier() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarIdent::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *node) const
+								const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -180,7 +180,7 @@ CDXLScalarIdent::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarIdent::AssertValid(const CDXLNode *node,
+CDXLScalarIdent::AssertValid(const gpos::Ref<CDXLNode> node,
 							 BOOL  // validate_children
 ) const
 {

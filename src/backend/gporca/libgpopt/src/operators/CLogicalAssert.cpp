@@ -61,7 +61,7 @@ CLogicalAssert::CLogicalAssert(CMemoryPool *mp, CException *pexc)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalAssert::Matches(COperator *pop) const
+CLogicalAssert::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
@@ -133,7 +133,7 @@ CLogicalAssert::DeriveMaxCard(CMemoryPool *,  // mp
 							  CExpressionHandle &exprhdl) const
 {
 	// in case of a false condition or a contradiction, maxcard should be 1
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(1);
+	gpos::Ref<CExpression> pexprScalar = exprhdl.PexprScalarExactChild(1);
 
 	if ((nullptr != pexprScalar && CUtils::FScalarConstFalse(pexprScalar)) ||
 		exprhdl.DerivePropertyConstraint()->FContradiction())
@@ -172,7 +172,7 @@ CLogicalAssert::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (1 == maxcard.Ull())
 	{
 		// a max card of one requires re-scaling stats
-		IStatistics *stats = exprhdl.Pstats(0);
+		gpos::Ref<IStatistics> stats = exprhdl.Pstats(0);
 		return stats->ScaleStats(mp, CDouble(1.0 / stats->Rows()));
 	}
 

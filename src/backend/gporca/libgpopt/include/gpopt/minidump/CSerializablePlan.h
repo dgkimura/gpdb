@@ -37,7 +37,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// plan DXL node
-	const CDXLNode *m_plan_dxl_root;
+	const gpos::Ref<CDXLNode> m_plan_dxl_root;
 
 	// serialized plan
 	CWStringDynamic *m_pstrPlan;
@@ -53,7 +53,7 @@ public:
 	CSerializablePlan(const CSerializablePlan &) = delete;
 
 	// ctor
-	CSerializablePlan(CMemoryPool *mp, const CDXLNode *pdxlnPlan,
+	CSerializablePlan(CMemoryPool *mp, const gpos::Ref<CDXLNode> pdxlnPlan,
 					  ULLONG plan_id, ULLONG plan_space_size);
 
 	// dtor

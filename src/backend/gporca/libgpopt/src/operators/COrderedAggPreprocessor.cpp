@@ -45,7 +45,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 void
 COrderedAggPreprocessor::SplitPrjList(
-	CMemoryPool *mp, CExpression *pexprInputAggPrj,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprInputAggPrj,
 	gpos::Ref<CExpressionArray> *
 		ppdrgpexprOrderedAggsPrEl,	// output: list of project elements with Ordered Aggs
 	gpos::Ref<CExpressionArray> *
@@ -56,7 +56,7 @@ COrderedAggPreprocessor::SplitPrjList(
 	GPOS_ASSERT(nullptr != ppdrgpexprOrderedAggsPrEl);
 	GPOS_ASSERT(nullptr != ppdrgpexprOtherPrEl);
 
-	CExpression *pexprPrjList = (*pexprInputAggPrj)[1];
+	gpos::Ref<CExpression> pexprPrjList = (*pexprInputAggPrj)[1];
 
 	gpos::Ref<CExpressionArray> pdrgpexprOrderedAggsPrEl =
 		GPOS_NEW(mp) CExpressionArray(mp);
@@ -72,17 +72,17 @@ COrderedAggPreprocessor::SplitPrjList(
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprPrjEl = (*pexprPrjList)[ul];
-		CExpression *pexprAggFunc = (*pexprPrjEl)[0];
+		gpos::Ref<CExpression> pexprPrjEl = (*pexprPrjList)[ul];
+		gpos::Ref<CExpression> pexprAggFunc = (*pexprPrjEl)[0];
 		CScalarProjectElement *popScPrjElem =
 			gpos::dyn_cast<CScalarProjectElement>(pexprPrjEl->Pop());
 		CColRef *pcrPrjElem = popScPrjElem->Pcr();
 
 		if (CUtils::FHasOrderedAggToSplit(pexprAggFunc))
 		{
-			CExpression *pexprSortCol =
+			gpos::Ref<CExpression> pexprSortCol =
 				(*(*pexprAggFunc)[EAggfuncChildIndices::EaggfuncIndexArgs])[0];
-			CExpression *pexprSortGroupClause =
+			gpos::Ref<CExpression> pexprSortGroupClause =
 				(*(*pexprAggFunc)[EAggfuncChildIndices::EaggfuncIndexOrder])[0];
 			CScalarSortGroupClause *curr_sort_clause =
 				gpos::dyn_cast<CScalarSortGroupClause>(
@@ -131,9 +131,9 @@ COrderedAggPreprocessor::SplitPrjList(
 						//       |  |--CScalarConst (0.2500)
 						//       |  +--CScalarIdent \"ColRef_0041\" (41)
 						//       ...
-						CExpression *pCurrExprProjList =
+						gpos::Ref<CExpression> pCurrExprProjList =
 							(*(*pdrgpexprOrderedAggsPrEl)[uidx])[1];
-						CExpression *pCurrExprAggFunc =
+						gpos::Ref<CExpression> pCurrExprAggFunc =
 							(*(*pCurrExprProjList)[0])[0];
 						const CColRef *total_count_colref =
 							CCastUtils::PcrExtractFromScIdOrCastScId((*(
@@ -389,7 +389,7 @@ COrderedAggPreprocessor::SplitPrjList(
 //---------------------------------------------------------------------------
 void
 COrderedAggPreprocessor::SplitOrderedAggsPrj(
-	CMemoryPool *mp, CExpression *pexprInputAggPrj,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprInputAggPrj,
 	gpos::Ref<CExpression> *
 		ppexprOrderedGbAgg,	 // output: GbAgg expression containing ordered aggs split to normal agg
 	gpos::Ref<CExpression> *
@@ -406,7 +406,7 @@ COrderedAggPreprocessor::SplitOrderedAggsPrj(
 	SplitPrjList(mp, pexprInputAggPrj, &ppdrgpexprOrderedAggsPrEl,
 				 &pdrgpexprOtherPrEl);
 
-	CExpression *pexprInputAggPrjChild = (*pexprInputAggPrj)[0];
+	gpos::Ref<CExpression> pexprInputAggPrjChild = (*pexprInputAggPrj)[0];
 
 	gpos::Ref<CExpression> pexpr = (*ppdrgpexprOrderedAggsPrEl)[0];
 	;
@@ -414,7 +414,8 @@ COrderedAggPreprocessor::SplitOrderedAggsPrj(
 	// into a join expression where leaves carry split ordered aggs
 	for (ULONG ul = 1; ul < ppdrgpexprOrderedAggsPrEl->Size(); ul++)
 	{
-		CExpression *pexprWindowConsumer = (*ppdrgpexprOrderedAggsPrEl)[ul];
+		gpos::Ref<CExpression> pexprWindowConsumer =
+			(*ppdrgpexprOrderedAggsPrEl)[ul];
 		gpos::Ref<CExpression> pexprJoinCondition =
 			CUtils::PexprScalarConstBool(mp, true /*value*/);
 
@@ -463,7 +464,8 @@ COrderedAggPreprocessor::SplitOrderedAggsPrj(
 //
 //---------------------------------------------------------------------------
 void
-COrderedAggPreprocessor::CreateCTE(CMemoryPool *mp, CExpression *pexprChild,
+COrderedAggPreprocessor::CreateCTE(CMemoryPool *mp,
+								   gpos::Ref<CExpression> pexprChild,
 								   gpos::Ref<CExpression> *ppexprFirstConsumer,
 								   gpos::Ref<CExpression> *ppexprSecondConsumer)
 {
@@ -475,9 +477,9 @@ COrderedAggPreprocessor::CreateCTE(CMemoryPool *mp, CExpression *pexprChild,
 	gpos::Ref<CColRefArray> pdrgpcrChildOutput = pcrsChildOutput->Pdrgpcr(mp);
 
 	// create a CTE producer based on SeqPrj child expression
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	const ULONG ulCTEId = pcteinfo->next_id();
-	CExpression *pexprCTEProd = CXformUtils::PexprAddCTEProducer(
+	gpos::Ref<CExpression> pexprCTEProd = CXformUtils::PexprAddCTEProducer(
 		mp, ulCTEId, pdrgpcrChildOutput.get(), pexprChild);
 	gpos::Ref<CColRefArray> pdrgpcrProducerOutput =
 		pexprCTEProd->DeriveOutputColumns()->Pdrgpcr(mp);
@@ -513,7 +515,7 @@ COrderedAggPreprocessor::CreateCTE(CMemoryPool *mp, CExpression *pexprChild,
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 COrderedAggPreprocessor::PexprFinalAgg(CMemoryPool *mp,
-									   CExpression *pexprAggFunc,
+									   gpos::Ref<CExpression> pexprAggFunc,
 									   CColRef *arg_col_ref,
 									   CColRef *total_count_colref,
 									   CColRef *peer_count_colref)
@@ -612,9 +614,9 @@ COrderedAggPreprocessor::PexprFinalAgg(CMemoryPool *mp,
 //		original input expression
 //
 //---------------------------------------------------------------------------
-CExpression *
-COrderedAggPreprocessor::PexprInputAggPrj2Join(CMemoryPool *mp,
-											   CExpression *pexprInputAggPrj)
+gpos::Ref<CExpression>
+COrderedAggPreprocessor::PexprInputAggPrj2Join(
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprInputAggPrj)
 {
 	GPOS_ASSERT(nullptr != pexprInputAggPrj);
 	GPOS_ASSERT(COperator::EopLogicalGbAgg == pexprInputAggPrj->Pop()->Eopid());
@@ -641,7 +643,7 @@ COrderedAggPreprocessor::PexprInputAggPrj2Join(CMemoryPool *mp,
 	ULONG arity = pexprOrderedAgg->Arity();
 	BOOL has_nlj_ontop =
 		(COperator::EopLogicalInnerJoin == pexprOrderedAgg->Pop()->Eopid());
-	CExpression *pexprTopmostCTE = pexprOrderedAgg.get();
+	gpos::Ref<CExpression> pexprTopmostCTE = pexprOrderedAgg.get();
 	while (COperator::EopLogicalGbAgg != pexprTopmostCTE->Pop()->Eopid())
 	{
 		pexprTopmostCTE = (*pexprTopmostCTE)[0];
@@ -678,14 +680,15 @@ COrderedAggPreprocessor::PexprInputAggPrj2Join(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-COrderedAggPreprocessor::PexprPreprocess(CMemoryPool *mp, CExpression *pexpr)
+COrderedAggPreprocessor::PexprPreprocess(CMemoryPool *mp,
+										 gpos::Ref<CExpression> pexpr)
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexpr);
 
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (COperator::EopLogicalGbAgg == pop->Eopid() &&
 		0 == gpos::dyn_cast<CLogicalGbAgg>(pop)->Pdrgpcr()->Size() &&
 		0 < (*pexpr)[1]->DeriveTotalOrderedAggs())

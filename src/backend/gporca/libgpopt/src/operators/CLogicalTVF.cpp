@@ -167,7 +167,7 @@ CLogicalTVF::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalTVF::Matches(COperator *pop) const
+CLogicalTVF::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

@@ -200,7 +200,7 @@ CScaleFactorUtils::CalcCumulativeScaleFactorSqrtAlg(
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CumulativeJoinScaleFactor(
-	CMemoryPool *mp, const CStatisticsConfig *stats_config,
+	CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
 	SJoinConditionArray *join_conds_scale_factors,
 	CDouble limit_for_result_scale_factor)
 {
@@ -306,8 +306,8 @@ CScaleFactorUtils::CumulativeJoinScaleFactor(
 //
 //---------------------------------------------------------------------------
 CDouble
-CScaleFactorUtils::DampedJoinScaleFactor(const CStatisticsConfig *stats_config,
-										 ULONG num_columns)
+CScaleFactorUtils::DampedJoinScaleFactor(
+	const gpos::Ref<CStatisticsConfig> stats_config, ULONG num_columns)
 {
 	if (1 >= num_columns)
 	{
@@ -328,7 +328,7 @@ CScaleFactorUtils::DampedJoinScaleFactor(const CStatisticsConfig *stats_config,
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::DampedFilterScaleFactor(
-	const CStatisticsConfig *stats_config, ULONG num_columns)
+	const gpos::Ref<CStatisticsConfig> stats_config, ULONG num_columns)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 
@@ -351,7 +351,7 @@ CScaleFactorUtils::DampedFilterScaleFactor(
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::DampedGroupByScaleFactor(
-	const CStatisticsConfig *stats_config, ULONG num_columns)
+	const gpos::Ref<CStatisticsConfig> stats_config, ULONG num_columns)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 
@@ -497,7 +497,8 @@ CScaleFactorUtils::DoubleCmpFunc(const CDouble *double_val1,
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CalcScaleFactorCumulativeConj(
-	const CStatisticsConfig *stats_config, CDoubleArray *scale_factors)
+	const gpos::Ref<CStatisticsConfig> stats_config,
+	CDoubleArray *scale_factors)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 	GPOS_ASSERT(nullptr != scale_factors);
@@ -537,8 +538,8 @@ CScaleFactorUtils::CalcScaleFactorCumulativeConj(
 //---------------------------------------------------------------------------
 CDouble
 CScaleFactorUtils::CalcScaleFactorCumulativeDisj(
-	const CStatisticsConfig *stats_config, CDoubleArray *scale_factors,
-	CDouble total_rows)
+	const gpos::Ref<CStatisticsConfig> stats_config,
+	CDoubleArray *scale_factors, CDouble total_rows)
 {
 	GPOS_ASSERT(nullptr != stats_config);
 	GPOS_ASSERT(nullptr != scale_factors);

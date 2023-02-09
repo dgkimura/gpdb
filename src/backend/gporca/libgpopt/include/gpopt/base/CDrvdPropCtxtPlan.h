@@ -47,7 +47,7 @@ protected:
 	gpos::Ref<CDrvdPropCtxt> PdpctxtCopy(CMemoryPool *mp) const override;
 
 	// add props to context
-	void AddProps(CDrvdProp *pdp) override;
+	void AddProps(gpos::Ref<CDrvdProp> pdp) override;
 
 public:
 	CDrvdPropCtxtPlan(const CDrvdPropCtxtPlan &) = delete;
@@ -80,7 +80,7 @@ public:
 
 	// conversion function
 	static CDrvdPropCtxtPlan *
-	PdpctxtplanConvert(CDrvdPropCtxt *pdpctxt)
+	PdpctxtplanConvert(gpos::Ref<CDrvdPropCtxt> pdpctxt)
 	{
 		GPOS_ASSERT(nullptr != pdpctxt);
 

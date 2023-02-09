@@ -90,14 +90,14 @@ public:
 	}
 
 	// filter expression for a given level
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprPartFilter(ULONG ulLevel) const
 	{
 		return (*m_pdrgpexprFilters)[ulLevel].get();
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
@@ -193,7 +193,7 @@ public:
 
 	// conversion function
 	static CLogicalPartitionSelector *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalPartitionSelector == pop->Eopid());

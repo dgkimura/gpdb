@@ -53,11 +53,11 @@ public:
 	BOOL Matches(const CDistributionSpec *pds) const override;
 
 	// append enforcers to dynamic array for the given plan properties
-	void AppendEnforcers(CMemoryPool *,		   //mp,
-						 CExpressionHandle &,  // exprhdl
-						 CReqdPropPlan *,	   //prpp,
-						 CExpressionArray *,   // pdrgpexpr,
-						 CExpression *		   // pexpr
+	void AppendEnforcers(CMemoryPool *,			 //mp,
+						 CExpressionHandle &,	 // exprhdl
+						 CReqdPropPlan *,		 //prpp,
+						 CExpressionArray *,	 // pdrgpexpr,
+						 gpos::Ref<CExpression>	 // pexpr
 						 ) override;
 
 	// print

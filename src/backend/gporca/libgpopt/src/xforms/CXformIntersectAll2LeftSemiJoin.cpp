@@ -59,9 +59,9 @@ CXformIntersectAll2LeftSemiJoin::CXformIntersectAll2LeftSemiJoin(
 //
 //---------------------------------------------------------------------------
 void
-CXformIntersectAll2LeftSemiJoin::Transform(CXformContext *pxfctxt,
-										   CXformResult *pxfres,
-										   CExpression *pexpr) const
+CXformIntersectAll2LeftSemiJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+										   gpos::Ref<CXformResult> pxfres,
+										   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -75,8 +75,8 @@ CXformIntersectAll2LeftSemiJoin::Transform(CXformContext *pxfctxt,
 	GPOS_ASSERT(2 == pexpr->Arity());
 
 	// extract components
-	CExpression *pexprLeftChild = (*pexpr)[0];
-	CExpression *pexprRightChild = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeftChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRightChild = (*pexpr)[1];
 
 	CLogicalIntersectAll *popIntersectAll =
 		gpos::dyn_cast<CLogicalIntersectAll>(pexpr->Pop());

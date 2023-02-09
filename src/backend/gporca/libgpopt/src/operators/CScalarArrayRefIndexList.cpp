@@ -41,7 +41,7 @@ CScalarArrayRefIndexList::CScalarArrayRefIndexList(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayRefIndexList::Matches(COperator *pop) const
+CScalarArrayRefIndexList::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

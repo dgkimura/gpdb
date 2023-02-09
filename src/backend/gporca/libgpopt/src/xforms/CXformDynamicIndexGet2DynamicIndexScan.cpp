@@ -63,8 +63,9 @@ CXformDynamicIndexGet2DynamicIndexScan::Exfp(CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 void
 CXformDynamicIndexGet2DynamicIndexScan::Transform(
-	CXformContext *pxfctxt GPOS_ASSERTS_ONLY, CXformResult *pxfres GPOS_UNUSED,
-	CExpression *pexpr GPOS_ASSERTS_ONLY) const
+	gpos::Ref<CXformContext> pxfctxt GPOS_ASSERTS_ONLY,
+	gpos::Ref<CXformResult> pxfres GPOS_UNUSED,
+	gpos::Ref<CExpression> pexpr GPOS_ASSERTS_ONLY) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

@@ -67,7 +67,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// hint configuration
-	CHint *GetHint() const;
+	gpos::Ref<CHint> GetHint() const;
 };
 }  // namespace gpdxl
 

@@ -84,7 +84,7 @@ private:
 	// from either a plain GROUP BY or one set in a list of grouping sets
 	static gpos::Ref<CBitSet> CreateAttnoSetForGroupingSet(
 		CMemoryPool *mp, List *group_elems, ULONG num_cols,
-		UlongToUlongMap *group_col_pos, CBitSet *group_cols,
+		UlongToUlongMap *group_col_pos, gpos::Ref<CBitSet> group_cols,
 		bool use_group_clause);
 
 	// check if the given mdid array contains any of the polymorphic
@@ -100,17 +100,18 @@ private:
 	// update grouping col position mappings
 	static void UpdateGrpColMapping(CMemoryPool *mp,
 									UlongToUlongMap *grouping_col_to_pos_map,
-									CBitSet *group_cols, ULONG sort_group_ref);
+									gpos::Ref<CBitSet> group_cols,
+									ULONG sort_group_ref);
 
 	// create a set of grouping sets for a rollup
 	static gpos::Ref<CBitSetArray> CreateGroupingSetsForRollup(
 		CMemoryPool *mp, const GroupingSet *grouping_set, ULONG num_cols,
-		CBitSet *group_cols, UlongToUlongMap *group_col_pos);
+		gpos::Ref<CBitSet> group_cols, UlongToUlongMap *group_col_pos);
 
 	// create a set of grouping sets for a grouping sets subclause
 	static gpos::Ref<CBitSetArray> CreateGroupingSetsForSets(
 		CMemoryPool *mp, const GroupingSet *grouping_set_node, ULONG num_cols,
-		CBitSet *group_cols, UlongToUlongMap *group_col_pos);
+		gpos::Ref<CBitSet> group_cols, UlongToUlongMap *group_col_pos);
 
 public:
 	struct SCmptypeStrategy
@@ -130,8 +131,8 @@ public:
 	static OID GetOpFamilyForIndexQual(INT attno, OID oid_index);
 
 	// find the n-th column descriptor in the table descriptor
-	static const CDXLColDescr *GetColumnDescrAt(
-		const CDXLTableDescr *table_descr, ULONG pos);
+	static const gpos::Ref<CDXLColDescr> GetColumnDescrAt(
+		const gpos::Ref<CDXLTableDescr> table_descr, ULONG pos);
 
 	// translate the join type from its GPDB representation into the DXL one
 	static EdxlJoinType ConvertToDXLJoinType(JoinType jt);
@@ -186,7 +187,8 @@ public:
 	// to the group by clause
 	static gpos::Ref<CBitSetArray> GetColumnAttnosForGroupBy(
 		CMemoryPool *mp, List *group_clause, List *grouping_set_list,
-		ULONG num_cols, UlongToUlongMap *group_col_pos, CBitSet *group_cold);
+		ULONG num_cols, UlongToUlongMap *group_col_pos,
+		gpos::Ref<CBitSet> group_cold);
 
 	// return a copy of the query with constant of unknown type being coerced
 	// to the common data type of the output target list
@@ -220,7 +222,7 @@ public:
 	// create a dummy project element to rename the input column identifier
 	static gpos::Ref<CDXLNode> CreateDummyProjectElem(
 		CMemoryPool *mp, ULONG colid_input, ULONG colid_output,
-		CDXLColDescr *dxl_col_descr);
+		gpos::Ref<CDXLColDescr> dxl_col_descr);
 
 	// construct a list of colids corresponding to the given target list
 	// using the given attno->colid map
@@ -229,7 +231,7 @@ public:
 
 	// construct an array of column ids for the given group by set
 	static gpos::Ref<ULongPtrArray> GetGroupingColidArray(
-		CMemoryPool *mp, CBitSet *group_by_cols,
+		CMemoryPool *mp, gpos::Ref<CBitSet> group_by_cols,
 		IntToUlongMap *sort_group_cols_to_colid_map);
 
 	// return the Colid of column with given index
@@ -248,7 +250,8 @@ public:
 										 List *window_clause_list);
 
 	// check if the project list contains AggRef with ORDER BY
-	static BOOL HasOrderedAggRefInProjList(CDXLNode *proj_list_dxlnode);
+	static BOOL HasOrderedAggRefInProjList(
+		gpos::Ref<CDXLNode> proj_list_dxlnode);
 
 	// extract a matching target entry that is a window spec
 	static TargetEntry *GetWindowSpecTargetEntry(Node *node,
@@ -289,7 +292,8 @@ public:
 
 	// check whether the given project list has a project element of the given
 	// operator type
-	static BOOL HasProjElem(CDXLNode *project_list_dxlnode, Edxlopid dxl_op_id);
+	static BOOL HasProjElem(gpos::Ref<CDXLNode> project_list_dxlnode,
+							Edxlopid dxl_op_id);
 
 	// create a multi-byte character string from a wide character string
 	static CHAR *CreateMultiByteCharStringFromWCString(const WCHAR *wcstr);
@@ -330,7 +334,7 @@ public:
 
 	// check if given column ids are outer references in the tree rooted by given node
 	static void MarkOuterRefs(ULONG *colid, BOOL *is_outer_ref,
-							  ULONG num_columns, CDXLNode *node);
+							  ULONG num_columns, gpos::Ref<CDXLNode> node);
 
 	// map DXL Subplan type to GPDB SubLinkType
 	static SubLinkType MapDXLSubplanToSublinkType(
@@ -354,7 +358,7 @@ public:
 	static BOOL RelHasConstraints(const IMDRelation *rel);
 
 	// translate the list of error messages from an assert constraint list
-	static List *GetAssertErrorMsgs(CDXLNode *assert_constraint_list);
+	static List *GetAssertErrorMsgs(gpos::Ref<CDXLNode> assert_constraint_list);
 
 	// return the count of non-system columns in the relation
 	static ULONG GetNumNonSystemColumns(const IMDRelation *mdrel);

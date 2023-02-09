@@ -51,9 +51,9 @@ CXformLeftAntiSemiApply2LeftAntiSemiJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftAntiSemiApply2LeftAntiSemiJoin::Transform(CXformContext *pxfctxt,
-													CXformResult *pxfres,
-													CExpression *pexpr) const
+CXformLeftAntiSemiApply2LeftAntiSemiJoin::Transform(
+	gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

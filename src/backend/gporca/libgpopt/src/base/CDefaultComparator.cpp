@@ -43,7 +43,7 @@ using gpnaucrates::IDatum;
 //		Does not take ownership of the constant expression evaluator
 //
 //---------------------------------------------------------------------------
-CDefaultComparator::CDefaultComparator(IConstExprEvaluator *pceeval)
+CDefaultComparator::CDefaultComparator(gpos::Ref<IConstExprEvaluator> pceeval)
 	: m_pceeval(pceeval)
 {
 	GPOS_ASSERT(nullptr != pceeval);
@@ -59,8 +59,9 @@ CDefaultComparator::CDefaultComparator(IConstExprEvaluator *pceeval)
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::FEvalComparison(CMemoryPool *mp, const IDatum *datum1,
-									const IDatum *datum2,
+CDefaultComparator::FEvalComparison(CMemoryPool *mp,
+									const gpos::Ref<IDatum> datum1,
+									const gpos::Ref<IDatum> datum2,
 									IMDType::ECmpType cmp_type) const
 {
 	GPOS_ASSERT(m_pceeval->FCanEvalExpressions());
@@ -78,7 +79,7 @@ CDefaultComparator::FEvalComparison(CMemoryPool *mp, const IDatum *datum1,
 	;
 	CScalarConst *popScalarConst =
 		gpos::dyn_cast<CScalarConst>(pexprResult->Pop());
-	IDatum *datum = popScalarConst->GetDatum();
+	gpos::Ref<IDatum> datum = popScalarConst->GetDatum();
 
 	GPOS_ASSERT(IMDType::EtiBool == datum->GetDatumType());
 	IDatumBool *pdatumBool = dynamic_cast<IDatumBool *>(datum);
@@ -89,8 +90,8 @@ CDefaultComparator::FEvalComparison(CMemoryPool *mp, const IDatum *datum1,
 }
 
 BOOL
-CDefaultComparator::FUseInternalEvaluator(const IDatum *datum1,
-										  const IDatum *datum2,
+CDefaultComparator::FUseInternalEvaluator(const gpos::Ref<IDatum> datum1,
+										  const gpos::Ref<IDatum> datum2,
 										  BOOL *can_use_external_evaluator)
 {
 	gpos::Ref<IMDId> mdid1 = datum1->MDId().get();
@@ -142,7 +143,8 @@ CDefaultComparator::FUseInternalEvaluator(const IDatum *datum1,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::Equals(const IDatum *datum1, const IDatum *datum2) const
+CDefaultComparator::Equals(const gpos::Ref<IDatum> datum1,
+						   const gpos::Ref<IDatum> datum2) const
 {
 	BOOL can_use_external_evaluator = false;
 
@@ -179,7 +181,8 @@ CDefaultComparator::Equals(const IDatum *datum1, const IDatum *datum2) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::IsLessThan(const IDatum *datum1, const IDatum *datum2) const
+CDefaultComparator::IsLessThan(const gpos::Ref<IDatum> datum1,
+							   const gpos::Ref<IDatum> datum2) const
 {
 	BOOL can_use_external_evaluator = false;
 
@@ -216,8 +219,8 @@ CDefaultComparator::IsLessThan(const IDatum *datum1, const IDatum *datum2) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::IsLessThanOrEqual(const IDatum *datum1,
-									  const IDatum *datum2) const
+CDefaultComparator::IsLessThanOrEqual(const gpos::Ref<IDatum> datum1,
+									  const gpos::Ref<IDatum> datum2) const
 {
 	BOOL can_use_external_evaluator = false;
 
@@ -262,8 +265,8 @@ CDefaultComparator::IsLessThanOrEqual(const IDatum *datum1,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::IsGreaterThan(const IDatum *datum1,
-								  const IDatum *datum2) const
+CDefaultComparator::IsGreaterThan(const gpos::Ref<IDatum> datum1,
+								  const gpos::Ref<IDatum> datum2) const
 {
 	BOOL can_use_external_evaluator = false;
 
@@ -300,8 +303,8 @@ CDefaultComparator::IsGreaterThan(const IDatum *datum1,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDefaultComparator::IsGreaterThanOrEqual(const IDatum *datum1,
-										 const IDatum *datum2) const
+CDefaultComparator::IsGreaterThanOrEqual(const gpos::Ref<IDatum> datum1,
+										 const gpos::Ref<IDatum> datum2) const
 {
 	BOOL can_use_external_evaluator = false;
 

@@ -49,7 +49,7 @@ protected:
 	virtual gpos::Ref<CDrvdPropCtxt> PdpctxtCopy(CMemoryPool *mp) const = 0;
 
 	// add props to context
-	virtual void AddProps(CDrvdProp *pdp) = 0;
+	virtual void AddProps(gpos::Ref<CDrvdProp> pdp) = 0;
 
 public:
 	CDrvdPropCtxt(const CDrvdPropCtxt &) = delete;
@@ -89,7 +89,7 @@ public:
 
 	// copy function
 	static gpos::Ref<CDrvdPropCtxt>
-	PdpctxtCopy(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt)
+	PdpctxtCopy(CMemoryPool *mp, gpos::Ref<CDrvdPropCtxt> pdpctxt)
 	{
 		if (nullptr == pdpctxt)
 		{
@@ -101,7 +101,7 @@ public:
 
 	// add derived props to context
 	static void
-	AddDerivedProps(CDrvdProp *pdp, CDrvdPropCtxt *pdpctxt)
+	AddDerivedProps(gpos::Ref<CDrvdProp> pdp, gpos::Ref<CDrvdPropCtxt> pdpctxt)
 	{
 		if (nullptr != pdpctxt)
 		{

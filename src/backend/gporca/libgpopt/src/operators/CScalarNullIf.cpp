@@ -90,7 +90,7 @@ CScalarNullIf::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarNullIf::Matches(COperator *pop) const
+CScalarNullIf::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

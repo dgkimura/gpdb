@@ -70,9 +70,9 @@ CXformInnerJoin2NLJoin::Exfp(CExpressionHandle &) const
 //		Deprecated in favor of CXformImplementInnerJoin.
 //
 //---------------------------------------------------------------------------
-void
-CXformInnerJoin2NLJoin::Transform(CXformContext *, CXformResult *,
-								  CExpression *) const
+void CXformInnerJoin2NLJoin::Transform(gpos::Ref<CXformContext>,
+									   gpos::Ref<CXformResult>,
+									   gpos::Ref<CExpression>) const
 {
 }
 

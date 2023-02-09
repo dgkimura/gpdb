@@ -25,7 +25,8 @@ gpos::Ref<CStatistics>
 CGroupByStatsProcessor::CalcGroupByStats(CMemoryPool *mp,
 										 const CStatistics *input_stats,
 										 ULongPtrArray *GCs,
-										 ULongPtrArray *aggs, CBitSet *keys)
+										 ULongPtrArray *aggs,
+										 gpos::Ref<CBitSet> keys)
 {
 	// create hash map from colid -> histogram for resultant structure
 	gpos::Ref<UlongToHistogramMap> col_histogram_mapping =
@@ -75,7 +76,8 @@ CGroupByStatsProcessor::CalcGroupByStats(CMemoryPool *mp,
 			mp, input_stats, computed_groupby_cols.get(),
 			col_histogram_mapping.get(), col_width_mapping.get());
 
-		const CStatisticsConfig *stats_config = input_stats->GetStatsConfig();
+		const gpos::Ref<CStatisticsConfig> stats_config =
+			input_stats->GetStatsConfig();
 
 		gpos::Ref<CDoubleArray> NDVs = CStatisticsUtils::ExtractNDVForGrpCols(
 			mp, stats_config, input_stats, groupby_cols_for_stats.get(), keys);

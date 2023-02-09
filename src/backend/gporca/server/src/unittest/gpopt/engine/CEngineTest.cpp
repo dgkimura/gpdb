@@ -137,7 +137,7 @@ CEngineTest::EresOptimize(
 	CWStringConst *str,	 // array of relation names
 	ULONG *pul,			 // array of relation OIDs
 	ULONG ulRels,		 // number of array entries
-	CBitSet *
+	gpos::Ref<CBitSet>
 		pbs	 // if a bit is set, the corresponding join expression will be optimized
 )
 {
@@ -277,7 +277,7 @@ CEngineTest::EresUnittest_AppendStats()
 	// Initialize engine
 	eng.Init(pqc, nullptr /*search_stage_array*/);
 
-	CGroupExpression *pgexpr = nullptr;
+	gpos::Ref<CGroupExpression> pgexpr = nullptr;
 	{
 		CGroupProxy gp(eng.PgroupRoot());
 		pgexpr = gp.PgexprFirst();
@@ -381,7 +381,8 @@ CEngineTest::EresUnittest_BuildMemoLargeJoins()
 //
 //---------------------------------------------------------------------------
 void
-CEngineTest::BuildMemoRecursive(CMemoryPool *mp, CExpression *pexprInput,
+CEngineTest::BuildMemoRecursive(CMemoryPool *mp,
+								gpos::Ref<CExpression> pexprInput,
 								gpos::Ref<CSearchStageArray> search_stage_array)
 {
 	CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexprInput);

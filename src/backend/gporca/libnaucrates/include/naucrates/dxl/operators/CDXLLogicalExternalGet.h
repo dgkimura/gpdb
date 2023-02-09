@@ -46,7 +46,7 @@ public:
 
 	// conversion function
 	static CDXLLogicalExternalGet *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalExternalGet == dxl_op->GetDXLOperator());

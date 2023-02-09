@@ -40,7 +40,7 @@ class CAutoMDAccessor : public CStackObject
 {
 private:
 	// metadata provider
-	IMDProvider *m_pimdp;
+	gpos::Ref<IMDProvider> m_pimdp;
 
 	// do we own cache object?
 	BOOL m_fOwnCache;
@@ -112,7 +112,7 @@ public:
 	}
 
 	// accessor of metadata provider
-	IMDProvider *
+	gpos::Ref<IMDProvider>
 	Pimdp() const
 	{
 		return m_pimdp;

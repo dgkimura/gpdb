@@ -61,7 +61,7 @@ CParseHandlerTableDescr::~CParseHandlerTableDescr()
 //		Returns the table descriptor constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CDXLTableDescr *
+gpos::Ref<CDXLTableDescr>
 CParseHandlerTableDescr::GetDXLTableDescr()
 {
 	return m_dxl_table_descr.get();

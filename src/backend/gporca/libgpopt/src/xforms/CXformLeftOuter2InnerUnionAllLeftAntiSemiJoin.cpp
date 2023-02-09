@@ -92,7 +92,8 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Exfp(
 	CExpressionHandle &exprhdl) const
 {
 	CColRefSet *pcrsInner = exprhdl.DeriveOutputColumns(1 /*child_index*/);
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(2 /*child_index*/);
+	gpos::Ref<CExpression> pexprScalar =
+		exprhdl.PexprScalarExactChild(2 /*child_index*/);
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
 
@@ -114,7 +115,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Exfp(
 	const ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CGroup *pgroupChild = (*exprhdl.Pgexpr())[ul];
+		gpos::Ref<CGroup> pgroupChild = (*exprhdl.Pgexpr())[ul];
 		if (!pgroupChild->FScalar() && !pgroupChild->FStatsDerivable(mp))
 		{
 			// stats must be derivable on every child
@@ -135,7 +136,8 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Exfp(
 //---------------------------------------------------------------------------
 BOOL
 CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::FApplyXformUsingStatsInfo(
-	const IStatistics *outer_stats, const IStatistics *inner_side_stats)
+	const gpos::Ref<IStatistics> outer_stats,
+	const gpos::Ref<IStatistics> inner_side_stats)
 {
 	if (GPOS_FTRACE(
 			gpos::
@@ -202,7 +204,8 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::FApplyXformUsingStatsInfo(
 // clang-format on
 void
 CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Transform(
-	CXformContext *pxfctxt, CXformResult *pxfres, CExpression *pexpr) const
+	gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -210,9 +213,9 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Transform(
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 	// extract components
-	CExpression *pexprOuter = (*pexpr)[0];
-	CExpression *pexprInner = (*pexpr)[1];
-	CExpression *pexprScalar = (*pexpr)[2];
+	gpos::Ref<CExpression> pexprOuter = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
 	if (!FValidInnerExpr(pexprInner))
 	{
@@ -291,7 +294,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Transform(
 //---------------------------------------------------------------------------
 BOOL
 CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::FValidInnerExpr(
-	CExpression *pexprInner)
+	gpos::Ref<CExpression> pexprInner)
 {
 	GPOS_ASSERT(nullptr != pexprInner);
 

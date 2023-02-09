@@ -60,7 +60,7 @@ public:
 	~CEnfdPartitionPropagation() override;
 
 	// partition spec accessor
-	CPropSpec *
+	gpos::Ref<CPropSpec>
 	Pps() const override
 	{
 		return m_ppps.get();

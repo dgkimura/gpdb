@@ -116,8 +116,9 @@ CTranslatorExprToDXLUtils::PdxlnBoolConst(CMemoryPool *mp,
 // construct a DXL node for the part key portion of the list partition filter
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnListFilterPartKey(
-	CMemoryPool *mp, CMDAccessor *md_accessor, CExpression *pexprPartKey,
-	gpos::Ref<IMDId> pmdidTypePartKey, ULONG ulPartLevel)
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	gpos::Ref<CExpression> pexprPartKey, gpos::Ref<IMDId> pmdidTypePartKey,
+	ULONG ulPartLevel)
 {
 	GPOS_ASSERT(nullptr != pexprPartKey);
 	GPOS_ASSERT(nullptr != pmdidTypePartKey);
@@ -192,8 +193,8 @@ CTranslatorExprToDXLUtils::PdxlnListFilterPartKey(
 // Construct a predicate node for a list partition filter
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnListFilterScCmp(
-	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnPartKey,
-	CDXLNode *pdxlnOther, gpos::Ref<IMDId> pmdidTypePartKey,
+	CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CDXLNode> pdxlnPartKey,
+	gpos::Ref<CDXLNode> pdxlnOther, gpos::Ref<IMDId> pmdidTypePartKey,
 	gpos::Ref<IMDId> pmdidTypeOther, IMDType::ECmpType cmp_type,
 	ULONG ulPartLevel, BOOL fHasDefaultPart)
 {
@@ -238,7 +239,7 @@ CTranslatorExprToDXLUtils::PdxlnListFilterScCmp(
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnRangeFilterScCmp(
-	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnScalar,
+	CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CDXLNode> pdxlnScalar,
 	gpos::Ref<IMDId> pmdidTypePartKey, gpos::Ref<IMDId> pmdidTypeOther,
 	gpos::Ref<IMDId> pmdidTypeCastExpr, gpos::Ref<IMDId> mdid_cast_func,
 	IMDType::ECmpType cmp_type, ULONG ulPartLevel)
@@ -327,7 +328,7 @@ CTranslatorExprToDXLUtils::PdxlnRangeFilterScCmp(
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnRangeFilterEqCmp(
-	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnScalar,
+	CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CDXLNode> pdxlnScalar,
 	gpos::Ref<IMDId> pmdidTypePartKey, gpos::Ref<IMDId> pmdidTypeOther,
 	gpos::Ref<IMDId> pmdidTypeCastExpr, gpos::Ref<IMDId> mdid_cast_func,
 	ULONG ulPartLevel)
@@ -360,7 +361,7 @@ CTranslatorExprToDXLUtils::PdxlnRangeFilterEqCmp(
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnRangeFilterPartBound(
-	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnScalar,
+	CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CDXLNode> pdxlnScalar,
 	gpos::Ref<IMDId> pmdidTypePartKey, gpos::Ref<IMDId> pmdidTypeOther,
 	gpos::Ref<IMDId> pmdidTypeCastExpr, gpos::Ref<IMDId> mdid_cast_func,
 	ULONG ulPartLevel, ULONG fLowerBound, IMDType::ECmpType cmp_type)
@@ -483,7 +484,8 @@ CTranslatorExprToDXLUtils::PdxlnRangeFilterDefaultAndOpenEnded(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLPhysicalProperties>
-CTranslatorExprToDXLUtils::PdxlpropCopy(CMemoryPool *mp, CDXLNode *dxlnode)
+CTranslatorExprToDXLUtils::PdxlpropCopy(CMemoryPool *mp,
+										gpos::Ref<CDXLNode> dxlnode)
 {
 	GPOS_ASSERT(nullptr != dxlnode);
 
@@ -630,7 +632,7 @@ CTranslatorExprToDXLUtils::GetProperties(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 BOOL
 CTranslatorExprToDXLUtils::FScalarConstTrue(CMDAccessor *md_accessor,
-											CDXLNode *dxlnode)
+											gpos::Ref<CDXLNode> dxlnode)
 {
 	GPOS_ASSERT(nullptr != dxlnode);
 	if (EdxlopScalarConstValue == dxlnode->GetOperator()->GetDXLOperator())
@@ -643,7 +645,7 @@ CTranslatorExprToDXLUtils::FScalarConstTrue(CMDAccessor *md_accessor,
 		if (IMDType::EtiBool == pmdtype->GetDatumType())
 		{
 			CDXLDatumBool *dxl_datum = gpos::dyn_cast<CDXLDatumBool>(
-				const_cast<CDXLDatum *>(pdxlopConst->GetDatumVal()));
+				const_cast<gpos::Ref<CDXLDatum> >(pdxlopConst->GetDatumVal()));
 
 			return (!dxl_datum->IsNull() && dxl_datum->GetValue());
 		}
@@ -662,7 +664,7 @@ CTranslatorExprToDXLUtils::FScalarConstTrue(CMDAccessor *md_accessor,
 //---------------------------------------------------------------------------
 BOOL
 CTranslatorExprToDXLUtils::FScalarConstFalse(CMDAccessor *md_accessor,
-											 CDXLNode *dxlnode)
+											 gpos::Ref<CDXLNode> dxlnode)
 {
 	GPOS_ASSERT(nullptr != dxlnode);
 	if (EdxlopScalarConstValue == dxlnode->GetOperator()->GetDXLOperator())
@@ -675,7 +677,7 @@ CTranslatorExprToDXLUtils::FScalarConstFalse(CMDAccessor *md_accessor,
 		if (IMDType::EtiBool == pmdtype->GetDatumType())
 		{
 			CDXLDatumBool *dxl_datum = gpos::dyn_cast<CDXLDatumBool>(
-				const_cast<CDXLDatum *>(pdxlopConst->GetDatumVal()));
+				const_cast<gpos::Ref<CDXLDatum> >(pdxlopConst->GetDatumVal()));
 			return (!dxl_datum->IsNull() && !dxl_datum->GetValue());
 		}
 	}
@@ -695,7 +697,7 @@ CTranslatorExprToDXLUtils::FScalarConstFalse(CMDAccessor *md_accessor,
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnProjListFromChildProjList(
 	CMemoryPool *mp, CColumnFactory *col_factory, ColRefToDXLNodeMap *phmcrdxln,
-	const CDXLNode *pdxlnProjListChild)
+	const gpos::Ref<CDXLNode> pdxlnProjListChild)
 {
 	GPOS_ASSERT(nullptr != pdxlnProjListChild);
 
@@ -708,7 +710,7 @@ CTranslatorExprToDXLUtils::PdxlnProjListFromChildProjList(
 	const ULONG arity = pdxlnProjListChild->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDXLNode *pdxlnProjElemChild = (*pdxlnProjListChild)[ul];
+		gpos::Ref<CDXLNode> pdxlnProjElemChild = (*pdxlnProjListChild)[ul];
 
 		// translate proj elem
 		gpos::Ref<CDXLNode> pdxlnProjElem =
@@ -731,7 +733,7 @@ gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnPrLPartitionSelector(
 	CMemoryPool *mp, CMDAccessor *md_accessor, CColumnFactory *col_factory,
 	ColRefToDXLNodeMap *phmcrdxln, BOOL fUseChildProjList,
-	CDXLNode *pdxlnPrLChild, CColRef *pcrOid, ULONG ulPartLevels,
+	gpos::Ref<CDXLNode> pdxlnPrLChild, CColRef *pcrOid, ULONG ulPartLevels,
 	BOOL fGeneratePartOid)
 {
 	GPOS_ASSERT_IMP(fUseChildProjList, nullptr != pdxlnPrLChild);
@@ -780,10 +782,9 @@ CTranslatorExprToDXLUtils::PdxlnPrLPartitionSelector(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
-CTranslatorExprToDXLUtils::PdxlnProjElem(CMemoryPool *mp,
-										 CColumnFactory *col_factory,
-										 ColRefToDXLNodeMap *phmcrdxln,
-										 const CDXLNode *pdxlnChildProjElem)
+CTranslatorExprToDXLUtils::PdxlnProjElem(
+	CMemoryPool *mp, CColumnFactory *col_factory, ColRefToDXLNodeMap *phmcrdxln,
+	const gpos::Ref<CDXLNode> pdxlnChildProjElem)
 {
 	GPOS_ASSERT(nullptr != pdxlnChildProjElem &&
 				1 == pdxlnChildProjElem->Arity());
@@ -909,7 +910,7 @@ CTranslatorExprToDXLUtils::PdxlnIdent(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != colref);
 	GPOS_ASSERT(nullptr != phmcrdxlnSubplans);
 
-	CDXLNode *dxlnode = phmcrdxlnSubplans->Find(colref);
+	gpos::Ref<CDXLNode> dxlnode = phmcrdxlnSubplans->Find(colref);
 
 	if (nullptr != dxlnode)
 	{
@@ -927,7 +928,7 @@ CTranslatorExprToDXLUtils::PdxlnIdent(CMemoryPool *mp,
 		ULONG *pul = phmcrulPartColId->Find(colref);
 		if (nullptr == pul)
 		{
-			CDXLNode *pdxlnIdent = phmcrdxlnIndexLookup->Find(colref);
+			gpos::Ref<CDXLNode> pdxlnIdent = phmcrdxlnIndexLookup->Find(colref);
 			GPOS_ASSERT(nullptr != pdxlnIdent);
 			;
 			return pdxlnIdent;
@@ -943,7 +944,7 @@ CTranslatorExprToDXLUtils::PdxlnIdent(CMemoryPool *mp,
 		// directly in index outer-ref mapping
 		if (nullptr != phmcrdxlnIndexLookup)
 		{
-			CDXLNode *pdxlnIdent = phmcrdxlnIndexLookup->Find(colref);
+			gpos::Ref<CDXLNode> pdxlnIdent = phmcrdxlnIndexLookup->Find(colref);
 			if (nullptr != pdxlnIdent)
 			{
 				;
@@ -1002,7 +1003,7 @@ CTranslatorExprToDXLUtils::PdrgpdatumNulls(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorExprToDXLUtils::FProjectListMatch(CDXLNode *pdxlnPrL,
+CTranslatorExprToDXLUtils::FProjectListMatch(gpos::Ref<CDXLNode> pdxlnPrL,
 											 CColRefArray *colref_array)
 {
 	GPOS_ASSERT(nullptr != pdxlnPrL);
@@ -1020,7 +1021,7 @@ CTranslatorExprToDXLUtils::FProjectListMatch(CDXLNode *pdxlnPrL,
 	{
 		CColRef *colref = (*colref_array)[ul];
 
-		CDXLNode *pdxlnPrEl = (*pdxlnPrL)[ul];
+		gpos::Ref<CDXLNode> pdxlnPrEl = (*pdxlnPrL)[ul];
 		CDXLScalarProjElem *pdxlopPrEl =
 			gpos::dyn_cast<CDXLScalarProjElem>(pdxlnPrEl->GetOperator());
 
@@ -1114,7 +1115,7 @@ CTranslatorExprToDXLUtils::PdxlnResult(
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnValuesScan(
 	CMemoryPool *mp, gpos::Ref<CDXLPhysicalProperties> dxl_properties,
-	CDXLNode *pdxlnPrL, IDatum2dArray *pdrgpdrgdatum)
+	gpos::Ref<CDXLNode> pdxlnPrL, IDatum2dArray *pdrgpdrgdatum)
 {
 	gpos::Ref<CDXLPhysicalValuesScan> dxl_op =
 		GPOS_NEW(mp) CDXLPhysicalValuesScan(mp);
@@ -1137,7 +1138,7 @@ CTranslatorExprToDXLUtils::PdxlnValuesScan(
 
 		for (ULONG ulColPos = 0; ulColPos < num_cols; ulColPos++)
 		{
-			IDatum *datum = (*pdrgpdatum)[ulColPos].get();
+			gpos::Ref<IDatum> datum = (*pdrgpdatum)[ulColPos].get();
 			CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 			const IMDType *pmdtype =
 				md_accessor->RetrieveType(datum->MDId().get());
@@ -1228,7 +1229,8 @@ CTranslatorExprToDXLUtils::PhmcrulColIndex(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 void
 CTranslatorExprToDXLUtils::SetStats(CMemoryPool *mp, CMDAccessor *md_accessor,
-									CDXLNode *dxlnode, const IStatistics *stats,
+									gpos::Ref<CDXLNode> dxlnode,
+									const gpos::Ref<IStatistics> stats,
 									BOOL fRoot)
 {
 	if (nullptr != stats && GPOS_FTRACE(EopttraceExtractDXLStats) &&
@@ -1250,8 +1252,8 @@ CTranslatorExprToDXLUtils::SetStats(CMemoryPool *mp, CMDAccessor *md_accessor,
 //---------------------------------------------------------------------------
 void
 CTranslatorExprToDXLUtils::SetDirectDispatchInfo(
-	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *dxlnode,
-	CExpression *pexpr, CDistributionSpecArray *pdrgpdsBaseTables)
+	CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CDXLNode> dxlnode,
+	gpos::Ref<CExpression> pexpr, CDistributionSpecArray *pdrgpdsBaseTables)
 {
 	GPOS_ASSERT(nullptr != dxlnode);
 	GPOS_ASSERT(nullptr != pexpr);
@@ -1304,8 +1306,9 @@ CTranslatorExprToDXLUtils::SetDirectDispatchInfo(
 		// direct dispatch only supported for scans over hash distributed tables
 		for (ULONG i = 0; i < size; i++)
 		{
-			CExpression *pexprFilter = (*pexprFilterArray)[i].get();
-			CPropConstraint *ppc = pexprFilter->DerivePropertyConstraint();
+			gpos::Ref<CExpression> pexprFilter = (*pexprFilterArray)[i].get();
+			gpos::Ref<CPropConstraint> ppc =
+				pexprFilter->DerivePropertyConstraint();
 
 			if (nullptr != ppc->Pcnstr())
 			{
@@ -1342,7 +1345,7 @@ CTranslatorExprToDXLUtils::SetDirectDispatchInfo(
 gpos::Ref<CDXLDirectDispatchInfo>
 CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfo(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	CExpressionArray *pdrgpexprHashed, CConstraint *pcnstr)
+	CExpressionArray *pdrgpexprHashed, gpos::Ref<CConstraint> pcnstr)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprHashed);
 	GPOS_ASSERT(nullptr != pcnstr);
@@ -1352,7 +1355,7 @@ CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfo(
 
 	if (1 == ulHashExpr)
 	{
-		CExpression *pexprHashed = (*pdrgpexprHashed)[0].get();
+		gpos::Ref<CExpression> pexprHashed = (*pdrgpexprHashed)[0].get();
 		return PdxlddinfoSingleDistrKey(mp, md_accessor, pexprHashed, pcnstr);
 	}
 
@@ -1361,7 +1364,7 @@ CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfo(
 
 	for (ULONG ul = 0; ul < ulHashExpr && fSuccess; ul++)
 	{
-		CExpression *pexpr = (*pdrgpexprHashed)[ul].get();
+		gpos::Ref<CExpression> pexpr = (*pdrgpexprHashed)[ul].get();
 		if (!CUtils::FScalarIdent(pexpr))
 		{
 			fSuccess = false;
@@ -1415,10 +1418,9 @@ CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfo(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDirectDispatchInfo>
-CTranslatorExprToDXLUtils::PdxlddinfoSingleDistrKey(CMemoryPool *mp,
-													CMDAccessor *md_accessor,
-													CExpression *pexprHashed,
-													CConstraint *pcnstr)
+CTranslatorExprToDXLUtils::PdxlddinfoSingleDistrKey(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	gpos::Ref<CExpression> pexprHashed, gpos::Ref<CConstraint> pcnstr)
 {
 	GPOS_ASSERT(nullptr != pexprHashed);
 	if (!CUtils::FScalarIdent(pexprHashed))
@@ -1497,8 +1499,8 @@ CTranslatorExprToDXLUtils::PdxlddinfoSingleDistrKey(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorExprToDXLUtils::FDirectDispatchable(const CColRef *pcrDistrCol,
-											   const CDXLDatum *dxl_datum)
+CTranslatorExprToDXLUtils::FDirectDispatchable(
+	const CColRef *pcrDistrCol, const gpos::Ref<CDXLDatum> dxl_datum)
 {
 	GPOS_ASSERT(nullptr != pcrDistrCol);
 	GPOS_ASSERT(nullptr != dxl_datum);
@@ -1528,7 +1530,7 @@ CTranslatorExprToDXLUtils::FDirectDispatchable(const CColRef *pcrDistrCol,
 gpos::Ref<CDXLDatum>
 CTranslatorExprToDXLUtils::PdxldatumFromPointConstraint(
 	CMemoryPool *mp, CMDAccessor *md_accessor, const CColRef *pcrDistrCol,
-	CConstraint *pcnstrDistrCol)
+	gpos::Ref<CConstraint> pcnstrDistrCol)
 {
 	if (!CPredicateUtils::FConstColumn(pcnstrDistrCol, pcrDistrCol))
 	{
@@ -1545,7 +1547,7 @@ CTranslatorExprToDXLUtils::PdxldatumFromPointConstraint(
 
 	if (1 == pci->Pdrgprng()->Size())
 	{
-		const CRange *prng = (*pci->Pdrgprng())[0].get();
+		const gpos::Ref<CRange> prng = (*pci->Pdrgprng())[0].get();
 		dxl_datum = CTranslatorExprToDXLUtils::GetDatumVal(mp, md_accessor,
 														   prng->PdatumLeft());
 	}
@@ -1570,7 +1572,7 @@ CTranslatorExprToDXLUtils::PdxldatumFromPointConstraint(
 gpos::Ref<CDXLDatum2dArray>
 CTranslatorExprToDXLUtils::PdrgpdrgpdxldatumFromDisjPointConstraint(
 	CMemoryPool *mp, CMDAccessor *md_accessor, const CColRef *pcrDistrCol,
-	CConstraint *pcnstrDistrCol)
+	gpos::Ref<CConstraint> pcnstrDistrCol)
 {
 	GPOS_ASSERT(nullptr != pcnstrDistrCol);
 	if (CPredicateUtils::FConstColumn(pcnstrDistrCol, pcrDistrCol))
@@ -1611,7 +1613,7 @@ CTranslatorExprToDXLUtils::PdrgpdrgpdxldatumFromDisjPointConstraint(
 
 	for (ULONG ul = 0; ul < ulRanges; ul++)
 	{
-		CRange *prng = (*pdrgprng)[ul].get();
+		gpos::Ref<CRange> prng = (*pdrgprng)[ul].get();
 		GPOS_ASSERT(prng->FPoint());
 		gpos::Ref<CDXLDatum> dxl_datum = CTranslatorExprToDXLUtils::GetDatumVal(
 			mp, md_accessor, prng->PdatumLeft());
@@ -1672,7 +1674,8 @@ CTranslatorExprToDXLUtils::PdrgpdrgpdxldatumFromDisjPointConstraint(
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorExprToDXLUtils::FLocalHashAggStreamSafe(CExpression *pexprAgg)
+CTranslatorExprToDXLUtils::FLocalHashAggStreamSafe(
+	gpos::Ref<CExpression> pexprAgg)
 {
 	GPOS_ASSERT(nullptr != pexprAgg);
 
@@ -1702,7 +1705,7 @@ CTranslatorExprToDXLUtils::FLocalHashAggStreamSafe(CExpression *pexprAgg)
 //---------------------------------------------------------------------------
 void
 CTranslatorExprToDXLUtils::ExtractCastFuncMdids(
-	COperator *pop, gpos::Ref<IMDId> *ppmdidType,
+	gpos::Ref<COperator> pop, gpos::Ref<IMDId> *ppmdidType,
 	gpos::Ref<IMDId> *ppmdidCastFunc)
 {
 	GPOS_ASSERT(nullptr != pop);
@@ -1731,7 +1734,7 @@ CTranslatorExprToDXLUtils::ExtractCastFuncMdids(
 }
 
 BOOL
-CTranslatorExprToDXLUtils::FDXLOpExists(const CDXLOperator *pop,
+CTranslatorExprToDXLUtils::FDXLOpExists(const gpos::Ref<CDXLOperator> pop,
 										const gpdxl::Edxlopid *peopid,
 										ULONG ulOps)
 {
@@ -1751,7 +1754,7 @@ CTranslatorExprToDXLUtils::FDXLOpExists(const CDXLOperator *pop,
 }
 
 BOOL
-CTranslatorExprToDXLUtils::FHasDXLOp(const CDXLNode *dxlnode,
+CTranslatorExprToDXLUtils::FHasDXLOp(const gpos::Ref<CDXLNode> dxlnode,
 									 const gpdxl::Edxlopid *peopid, ULONG ulOps)
 {
 	GPOS_CHECK_STACK_SIZE;
@@ -1779,7 +1782,7 @@ CTranslatorExprToDXLUtils::FHasDXLOp(const CDXLNode *dxlnode,
 
 BOOL
 CTranslatorExprToDXLUtils::FProjListContainsSubplanWithBroadCast(
-	CDXLNode *pdxlnPrjList)
+	gpos::Ref<CDXLNode> pdxlnPrjList)
 {
 	if (pdxlnPrjList->GetOperator()->GetDXLOperator() == EdxlopScalarSubPlan)
 	{
@@ -1802,11 +1805,12 @@ CTranslatorExprToDXLUtils::FProjListContainsSubplanWithBroadCast(
 }
 
 void
-CTranslatorExprToDXLUtils::ExtractIdentColIds(CDXLNode *dxlnode, CBitSet *pbs)
+CTranslatorExprToDXLUtils::ExtractIdentColIds(gpos::Ref<CDXLNode> dxlnode,
+											  gpos::Ref<CBitSet> pbs)
 {
 	if (dxlnode->GetOperator()->GetDXLOperator() == EdxlopScalarIdent)
 	{
-		const CDXLColRef *dxl_colref =
+		const gpos::Ref<CDXLColRef> dxl_colref =
 			gpos::dyn_cast<CDXLScalarIdent>(dxlnode->GetOperator())
 				->GetDXLColRef();
 		pbs->ExchangeSet(dxl_colref->Id());
@@ -1820,9 +1824,11 @@ CTranslatorExprToDXLUtils::ExtractIdentColIds(CDXLNode *dxlnode, CBitSet *pbs)
 }
 
 BOOL
-CTranslatorExprToDXLUtils::FMotionHazard(CMemoryPool *mp, CDXLNode *dxlnode,
+CTranslatorExprToDXLUtils::FMotionHazard(CMemoryPool *mp,
+										 gpos::Ref<CDXLNode> dxlnode,
 										 const gpdxl::Edxlopid *peopid,
-										 ULONG ulOps, CBitSet *pbsPrjCols)
+										 ULONG ulOps,
+										 gpos::Ref<CBitSet> pbsPrjCols)
 {
 	GPOS_ASSERT(pbsPrjCols);
 
@@ -1874,7 +1880,7 @@ CTranslatorExprToDXLUtils::FMotionHazard(CMemoryPool *mp, CDXLNode *dxlnode,
 }
 
 BOOL
-CTranslatorExprToDXLUtils::FMotionHazardSafeOp(CDXLNode *dxlnode)
+CTranslatorExprToDXLUtils::FMotionHazardSafeOp(gpos::Ref<CDXLNode> dxlnode)
 {
 	BOOL fMotionHazardSafeOp = false;
 	Edxlopid edxlop = dxlnode->GetOperator()->GetDXLOperator();
@@ -1906,12 +1912,13 @@ CTranslatorExprToDXLUtils::FMotionHazardSafeOp(CDXLNode *dxlnode)
 }
 
 BOOL
-CTranslatorExprToDXLUtils::FDirectDispatchableFilter(CExpression *pexprFilter)
+CTranslatorExprToDXLUtils::FDirectDispatchableFilter(
+	gpos::Ref<CExpression> pexprFilter)
 {
 	GPOS_ASSERT(nullptr != pexprFilter);
 
-	CExpression *pexprChild = (*pexprFilter)[0];
-	COperator *pop = pexprChild->Pop();
+	gpos::Ref<CExpression> pexprChild = (*pexprFilter)[0];
+	gpos::Ref<COperator> pop = pexprChild->Pop();
 
 	// find the first child or grandchild of filter which is not
 	// a Project, Filter or PhysicalComputeScalar (result node)

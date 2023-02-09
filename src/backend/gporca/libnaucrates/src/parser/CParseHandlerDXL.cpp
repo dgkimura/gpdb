@@ -98,7 +98,7 @@ CParseHandlerDXL::~CParseHandlerDXL()
 //		Returns the bitset of traceflags
 //
 //---------------------------------------------------------------------------
-CBitSet *
+gpos::Ref<CBitSet>
 CParseHandlerDXL::Pbs() const
 {
 	return m_trace_flags_bitset.get();
@@ -112,7 +112,7 @@ CParseHandlerDXL::Pbs() const
 //		Returns the optimizer config object
 //
 //---------------------------------------------------------------------------
-COptimizerConfig *
+gpos::Ref<COptimizerConfig>
 CParseHandlerDXL::GetOptimizerConfig() const
 {
 	return m_optimizer_config.get();
@@ -126,7 +126,7 @@ CParseHandlerDXL::GetOptimizerConfig() const
 //		Returns the root of the DXL query constructed by this parser
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CParseHandlerDXL::GetQueryDXLRoot() const
 {
 	return m_query_dxl_root.get();
@@ -168,7 +168,7 @@ CParseHandlerDXL::GetCTEProducerDXLArray() const
 //		Returns the root of the DXL plan constructed by this parser
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CParseHandlerDXL::PdxlnPlan() const
 {
 	return m_plan_dxl_root.get();
@@ -210,7 +210,7 @@ CParseHandlerDXL::GetMdIdArray() const
 //		Return the md request
 //
 //---------------------------------------------------------------------------
-CMDRequest *
+gpos::Ref<CMDRequest>
 CParseHandlerDXL::GetMiniDumper() const
 {
 	return m_mdrequest.get();
@@ -224,7 +224,7 @@ CParseHandlerDXL::GetMiniDumper() const
 //		Returns the DXL node representing the parsed scalar expression
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CParseHandlerDXL::GetScalarExprDXLRoot() const
 {
 	return m_scalar_expr_dxl.get();
@@ -313,7 +313,7 @@ CParseHandlerDXL::GetPlanSpaceSize() const
 //		Returns cost params
 //
 //---------------------------------------------------------------------------
-ICostModelParams *
+gpos::Ref<ICostModelParams>
 CParseHandlerDXL::GetCostModelParams() const
 {
 	return m_cost_model_params.get();

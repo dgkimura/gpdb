@@ -34,7 +34,7 @@ private:
 	// iterate over project elements and split elements between Ordered Aggs
 	// list, and Others list
 	static void SplitPrjList(
-		CMemoryPool *mp, CExpression *pexprInputAggPrj,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprInputAggPrj,
 		gpos::Ref<CExpressionArray> *ppdrgpexprOrderedAggsPrEl,
 		gpos::Ref<CExpressionArray> *ppdrgpexprOtherPrjElems);
 
@@ -42,33 +42,33 @@ private:
 	//	- A GbAgg expression containing ordered aggs split to gp_percentile agg, and
 	//	- A GbAgg expression containing all other non-ordered agg functions
 	static void SplitOrderedAggsPrj(CMemoryPool *mp,
-									CExpression *pexprInputAggPrj,
+									gpos::Ref<CExpression> pexprInputAggPrj,
 									gpos::Ref<CExpression> *ppexprGbAgg,
 									gpos::Ref<CExpression> *ppexprOutputSeqPrj);
 
 	// create a CTE with two consumers using the child expression of Sequence
 	// Project
-	static void CreateCTE(CMemoryPool *mp, CExpression *pexprInputAggPrj,
+	static void CreateCTE(CMemoryPool *mp,
+						  gpos::Ref<CExpression> pexprInputAggPrj,
 						  gpos::Ref<CExpression> *ppexprFirstConsumer,
 						  gpos::Ref<CExpression> *ppexprSecondConsumer);
 
 	// create an expression for final agg function
-	static gpos::Ref<CExpression> PexprFinalAgg(CMemoryPool *mp,
-												CExpression *pexprAggFunc,
-												CColRef *arg_col_ref,
-												CColRef *total_count_colref,
-												CColRef *peer_count_colref);
+	static gpos::Ref<CExpression> PexprFinalAgg(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprAggFunc,
+		CColRef *arg_col_ref, CColRef *total_count_colref,
+		CColRef *peer_count_colref);
 
 	// transform sequence project expression into an inner join expression
-	static CExpression *PexprInputAggPrj2Join(CMemoryPool *mp,
-											  CExpression *pexprInputAggPrj);
+	static gpos::Ref<CExpression> PexprInputAggPrj2Join(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprInputAggPrj);
 
 public:
 	COrderedAggPreprocessor(const COrderedAggPreprocessor &) = delete;
 
 	// main driver
 	static gpos::Ref<CExpression> PexprPreprocess(CMemoryPool *mp,
-												  CExpression *pexpr);
+												  gpos::Ref<CExpression> pexpr);
 
 };	// class COrderedAggPreprocessor
 }  // namespace gpopt

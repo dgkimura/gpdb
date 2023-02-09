@@ -152,7 +152,7 @@ private:
 	BOOL HasSirvFunctions(Node *node) const;
 
 	// translate FromExpr (in the GPDB query) into a CDXLLogicalJoin or CDXLLogicalGet
-	CDXLNode *TranslateFromExprToDXL(FromExpr *from_expr);
+	gpos::Ref<CDXLNode> TranslateFromExprToDXL(FromExpr *from_expr);
 
 	// translate set operations
 	gpos::Ref<CDXLNode> TranslateSetOpToDXL(
@@ -178,16 +178,16 @@ private:
 	// translate window spec
 	gpos::Ref<CDXLWindowSpecArray> TranslateWindowSpecToDXL(
 		List *window_clause, IntToUlongMap *sort_col_attno_to_colid_mapping,
-		CDXLNode *project_list_dxlnode_node);
+		gpos::Ref<CDXLNode> project_list_dxlnode_node);
 
 	// update window spec positions of LEAD/LAG functions
 	void UpdateLeadLagWinSpecPos(
-		CDXLNode *project_list_dxlnode,
+		gpos::Ref<CDXLNode> project_list_dxlnode,
 		CDXLWindowSpecArray *window_specs_dxlnode) const;
 
 	// manufacture window frame for lead/lag functions
 	gpos::Ref<CDXLWindowFrame> CreateWindowFramForLeadLag(
-		BOOL is_lead_func, CDXLNode *dxl_offset) const;
+		BOOL is_lead_func, gpos::Ref<CDXLNode> dxl_offset) const;
 
 	// translate the child of a set operation
 	gpos::Ref<CDXLNode> TranslateSetOpChild(Node *child_node,
@@ -206,7 +206,8 @@ private:
 
 	// construct a group by node for a set of grouping columns
 	gpos::Ref<CDXLNode> CreateSimpleGroupBy(
-		List *target_list, List *group_clause, CBitSet *bitset, BOOL has_aggs,
+		List *target_list, List *group_clause, gpos::Ref<CBitSet> bitset,
+		BOOL has_aggs,
 		BOOL has_grouping_sets,	 // is this GB part of a GS query
 		gpos::Ref<CDXLNode> child_dxlnode,
 		IntToUlongMap *phmiulSortGrpColsColId,	// mapping sortgroupref -> ColId
@@ -238,15 +239,15 @@ private:
 
 	// construct a project node with NULL values for columns not included in the grouping set
 	gpos::Ref<CDXLNode> CreateDXLProjectNullsForGroupingSets(
-		List *target_list, gpos::Ref<CDXLNode> child_dxlnode, CBitSet *bitset,
-		IntToUlongMap *sort_grouping_col_mapping,
+		List *target_list, gpos::Ref<CDXLNode> child_dxlnode,
+		gpos::Ref<CBitSet> bitset, IntToUlongMap *sort_grouping_col_mapping,
 		IntToUlongMap *output_attno_to_colid_mapping,
 		UlongToUlongMap *grpcol_index_to_colid_mapping) const;
 
 	// construct a project node with appropriate values for the grouping funcs in the given target list
 	gpos::Ref<CDXLNode> CreateDXLProjectGroupingFuncs(
-		List *target_list, gpos::Ref<CDXLNode> child_dxlnode, CBitSet *bitset,
-		IntToUlongMap *output_attno_to_colid_mapping,
+		List *target_list, gpos::Ref<CDXLNode> child_dxlnode,
+		gpos::Ref<CBitSet> bitset, IntToUlongMap *output_attno_to_colid_mapping,
 		UlongToUlongMap *grpcol_index_to_colid_mapping,
 		IntToUlongMap *sort_grpref_to_colid_mapping) const;
 
@@ -280,7 +281,7 @@ private:
 
 	// translate the target list entries of the query into a logical project
 	gpos::Ref<CDXLNode> TranslateTargetListToDXLProject(
-		List *target_list, CDXLNode *child_dxlnode,
+		List *target_list, gpos::Ref<CDXLNode> child_dxlnode,
 		IntToUlongMap *group_col_to_colid_mapping,
 		IntToUlongMap *output_attno_to_colid_mapping, List *group_clause,
 		BOOL is_aggref_expanded = false);
@@ -320,8 +321,9 @@ private:
 	);
 
 	// translate a derived table into a DXL logical operator
-	CDXLNode *TranslateDerivedTablesToDXL(const RangeTblEntry *rte, ULONG rti,
-										  ULONG current_query_level);
+	gpos::Ref<CDXLNode> TranslateDerivedTablesToDXL(const RangeTblEntry *rte,
+													ULONG rti,
+													ULONG current_query_level);
 
 	// create a DXL node representing the scalar constant "true"
 	gpos::Ref<CDXLNode> CreateDXLConstValueTrue();
@@ -357,10 +359,10 @@ private:
 	static BOOL OIDFound(OID oid, const OID oids[], ULONG size);
 
 	// check if given operator is lead() window function
-	static BOOL IsLeadWindowFunc(CDXLOperator *dxlop);
+	static BOOL IsLeadWindowFunc(gpos::Ref<CDXLOperator> dxlop);
 
 	// check if given operator is lag() window function
-	static BOOL IsLagWindowFunc(CDXLOperator *dxlop);
+	static BOOL IsLagWindowFunc(gpos::Ref<CDXLOperator> dxlop);
 
 	// translate an insert query
 	gpos::Ref<CDXLNode> TranslateInsertQueryToDXL();
@@ -390,7 +392,7 @@ private:
 
 	// translate a grouping func expression
 	gpos::Ref<CDXLNode> TranslateGroupingFuncToDXL(
-		const Expr *expr, CBitSet *bitset,
+		const Expr *expr, gpos::Ref<CBitSet> bitset,
 		UlongToUlongMap *grpcol_index_to_colid_mapping) const;
 
 	// construct a list of CTE producers from the query's CTE list
@@ -398,7 +400,7 @@ private:
 
 	// construct a stack of CTE anchors for each CTE producer in the given array
 	void ConstructCTEAnchors(CDXLNodeArray *dxlnodes,
-							 CDXLNode **dxl_cte_anchor_top,
+							 gpos::Ref<CDXLNode> *dxl_cte_anchor_top,
 							 gpos::Ref<CDXLNode> *dxl_cte_anchor_bottom);
 
 	// generate an array of new column ids of the given size
@@ -445,7 +447,7 @@ public:
 	}
 
 	// main translation routine for Query -> DXL tree
-	CDXLNode *TranslateSelectQueryToDXL();
+	gpos::Ref<CDXLNode> TranslateSelectQueryToDXL();
 
 	// main driver
 	gpos::Ref<CDXLNode> TranslateQueryToDXL();

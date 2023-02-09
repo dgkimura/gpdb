@@ -100,7 +100,7 @@ CDXLLogicalConstTable::GetOpNameStr() const
 //		Type of const table element at given position
 //
 //---------------------------------------------------------------------------
-CDXLColDescr *
+gpos::Ref<CDXLColDescr>
 CDXLLogicalConstTable::GetColumnDescrAt(ULONG idx) const
 {
 	GPOS_ASSERT(m_col_descr_array->Size() > idx);
@@ -132,7 +132,7 @@ CDXLLogicalConstTable::Arity() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalConstTable::SerializeToDXL(CXMLSerializer *xml_serializer,
-									  const CDXLNode *	//dxlnode
+									  const gpos::Ref<CDXLNode>	 //dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -147,7 +147,7 @@ CDXLLogicalConstTable::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	for (ULONG idx = 0; idx < Arity(); idx++)
 	{
-		CDXLColDescr *col_descr = (*m_col_descr_array)[idx].get();
+		gpos::Ref<CDXLColDescr> col_descr = (*m_col_descr_array)[idx].get();
 		col_descr->SerializeToDXL(xml_serializer);
 	}
 
@@ -173,7 +173,7 @@ CDXLLogicalConstTable::SerializeToDXL(CXMLSerializer *xml_serializer,
 		const ULONG num_of_cols = pdrgpdxldatum->Size();
 		for (ULONG idx = 0; idx < num_of_cols; idx++)
 		{
-			CDXLDatum *dxl_datum = (*pdrgpdxldatum)[idx].get();
+			gpos::Ref<CDXLDatum> dxl_datum = (*pdrgpdxldatum)[idx].get();
 			dxl_datum->Serialize(xml_serializer, pstrElemNameDatum);
 		}
 
@@ -220,7 +220,7 @@ CDXLLogicalConstTable::IsColDefined(ULONG colid) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalConstTable::AssertValid(const CDXLNode *node,
+CDXLLogicalConstTable::AssertValid(const gpos::Ref<CDXLNode> node,
 								   BOOL	 //validate_children
 ) const
 {

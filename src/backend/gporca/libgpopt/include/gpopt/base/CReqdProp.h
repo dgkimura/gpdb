@@ -104,7 +104,7 @@ public:
 
 	// required properties computation function
 	virtual void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdProp *prpInput, ULONG child_index,
+						 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
 						 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) = 0;
 
 	virtual gpos::IOstream &OsPrint(gpos::IOstream &os) const = 0;

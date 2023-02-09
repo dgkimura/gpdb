@@ -111,7 +111,7 @@ CScalarArrayCmp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayCmp::Matches(COperator *pop) const
+CScalarArrayCmp::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -189,17 +189,19 @@ CScalarArrayCmp::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CScalarArrayCmp::PexprExpand(CMemoryPool *mp, CExpression *pexprArrayCmp)
+CScalarArrayCmp::PexprExpand(CMemoryPool *mp,
+							 gpos::Ref<CExpression> pexprArrayCmp)
 {
 	GPOS_ASSERT(nullptr != pexprArrayCmp);
 	GPOS_ASSERT(EopScalarArrayCmp == pexprArrayCmp->Pop()->Eopid());
 
-	COptimizerConfig *optimizer_config =
+	gpos::Ref<COptimizerConfig> optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 	ULONG array_expansion_threshold =
 		optimizer_config->GetHint()->UlArrayExpansionThreshold();
-	CExpression *pexprIdent = (*pexprArrayCmp)[0];
-	CExpression *pexprArray = CUtils::PexprScalarArrayChild(pexprArrayCmp);
+	gpos::Ref<CExpression> pexprIdent = (*pexprArrayCmp)[0];
+	gpos::Ref<CExpression> pexprArray =
+		CUtils::PexprScalarArrayChild(pexprArrayCmp);
 	CScalarArrayCmp *popArrayCmp =
 		gpos::dyn_cast<CScalarArrayCmp>(pexprArrayCmp->Pop());
 	ULONG ulArrayElems = 0;

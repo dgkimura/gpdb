@@ -65,7 +65,7 @@ public:
 	//dtor
 	~CParseHandlerIndexDescr() override;
 
-	CDXLIndexDescr *GetDXLIndexDescr();
+	gpos::Ref<CDXLIndexDescr> GetDXLIndexDescr();
 };
 }  // namespace gpdxl
 

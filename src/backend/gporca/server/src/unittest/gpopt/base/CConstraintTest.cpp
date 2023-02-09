@@ -752,7 +752,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 
 	gpos::Ref<CRangeArray> pdrgprng = nullptr;
 	gpos::Ref<CConstraintInterval> pcnstin = nullptr;
-	CExpression *pexpr = nullptr;
+	gpos::Ref<CExpression> pexpr = nullptr;
 	gpos::Ref<CConstraintInterval> pcnstNotIn = nullptr;
 
 	// IN CONSTRAINT FOR SIMPLE INTERVAL (WITHOUT NULL)
@@ -881,7 +881,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 	CColRef *colref = pexpr->DeriveOutputColumns()->PcrAny();
 
 	// remove the array child
-	CExpression *pexprArrayComp = (*pexpr->PdrgPexpr())[1].get();
+	gpos::Ref<CExpression> pexprArrayComp = (*pexpr->PdrgPexpr())[1].get();
 	GPOS_ASSERT(CUtils::FScalarArrayCmp(pexprArrayComp));
 
 	gpos::Ref<CConstraintInterval> pcnstIn =
@@ -899,7 +899,8 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 
 	gpos::Ref<CExpression> pexprNotIn = CTestUtils::PexprLogicalSelectArrayCmp(
 		mp, CScalarArrayCmp::EarrcmpAll, IMDType::EcmptNEq);
-	CExpression *pexprArrayNotInComp = (*pexprNotIn->PdrgPexpr())[1].get();
+	gpos::Ref<CExpression> pexprArrayNotInComp =
+		(*pexprNotIn->PdrgPexpr())[1].get();
 	CColRef *pcrNot = pexprNotIn->DeriveOutputColumns()->PcrAny();
 	gpos::Ref<CConstraintInterval> pcnstNotIn =
 		CConstraintInterval::PciIntervalFromScalarExpr(mp, pexprArrayNotInComp,
@@ -926,7 +927,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 											   IMDType::EcmptEq, pdrgpi.get());
 	CColRef *pcrInRepeats =
 		pexprInRepeatsSelect->DeriveOutputColumns()->PcrAny();
-	CExpression *pexprArrayCmpRepeats =
+	gpos::Ref<CExpression> pexprArrayCmpRepeats =
 		(*pexprInRepeatsSelect->PdrgPexpr())[1].get();
 	// add 2 repeated values and one unique
 	gpos::Ref<CConstraintInterval> pcnstInRepeats =
@@ -942,7 +943,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalFromArrayExpr()
 											   IMDType::EcmptNEq, pdrgpi.get());
 	CColRef *pcrNotInRepeats =
 		pexprNotInRepeatsSelect->DeriveOutputColumns()->PcrAny();
-	CExpression *pexprNotInArrayCmpRepeats =
+	gpos::Ref<CExpression> pexprNotInArrayCmpRepeats =
 		(*pexprNotInRepeatsSelect->PdrgPexpr())[1].get();
 	gpos::Ref<CConstraintInterval> pcnstNotInRepeats =
 		CConstraintInterval::PciIntervalFromScalarExpr(
@@ -999,14 +1000,14 @@ EresUnittest_CConstraintIntervalFromArrayExprIncludesNull()
 	gpos::Ref<CExpression> pexprIn = CTestUtils::PexprLogicalSelectArrayCmp(
 		mp, CScalarArrayCmp::EarrcmpAny, IMDType::EcmptEq, pdrgpi.get());
 
-	CExpression *pexprArrayChild = (*(*pexprIn)[1])[1];
+	gpos::Ref<CExpression> pexprArrayChild = (*(*pexprIn)[1])[1];
 	// create a int4 datum
 	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 	gpos::Ref<IDatumInt4> pdatumNull =
 		pmdtypeint4->CreateInt4Datum(mp, 0, true);
 
-	gpos::Ref<CExpression> pexprConstNull = GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) CScalarConst(mp, (IDatum *) pdatumNull));
+	gpos::Ref<CExpression> pexprConstNull = GPOS_NEW(mp) CExpression(
+		mp, GPOS_NEW(mp) CScalarConst(mp, (gpos::Ref<IDatum>) pdatumNull));
 	pexprArrayChild->PdrgPexpr()->Append(pexprConstNull);
 
 	CColRef *colref = pexprIn->DeriveOutputColumns()->PcrAny();
@@ -1245,9 +1246,9 @@ CConstraintTest::Pdrgprng(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 //
 //---------------------------------------------------------------------------
 void
-CConstraintTest::PrintConstraint(CMemoryPool *mp, CConstraint *pcnstr)
+CConstraintTest::PrintConstraint(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr)
 {
-	CExpression *pexpr = pcnstr->PexprScalar(mp);
+	gpos::Ref<CExpression> pexpr = pcnstr->PexprScalar(mp);
 
 	// debug print
 	CAutoTrace at(mp);

@@ -69,7 +69,7 @@ public:
 
 	// conversion function
 	static CDXLDatumInt4 *
-	Cast(CDXLDatum *dxl_datum)
+	Cast(gpos::Ref<CDXLDatum> dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);
 		GPOS_ASSERT(CDXLDatum::EdxldatumInt4 == dxl_datum->GetDatumType());

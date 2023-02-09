@@ -112,7 +112,7 @@ CTableDescriptor::ColumnCount() const
 //
 //---------------------------------------------------------------------------
 ULONG
-CTableDescriptor::UlPos(const CColumnDescriptor *pcoldesc,
+CTableDescriptor::UlPos(const gpos::Ref<CColumnDescriptor> pcoldesc,
 						const CColumnDescriptorArray *pdrgpcoldesc)
 {
 	GPOS_ASSERT(nullptr != pcoldesc);
@@ -147,7 +147,7 @@ CTableDescriptor::GetAttributePosition(INT attno) const
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CColumnDescriptor *pcoldesc = (*m_pdrgpcoldesc)[ul].get();
+		gpos::Ref<CColumnDescriptor> pcoldesc = (*m_pdrgpcoldesc)[ul].get();
 		if (pcoldesc->AttrNum() == attno)
 		{
 			ulPos = ul;
@@ -234,7 +234,7 @@ CTableDescriptor::FAddKeySet(gpos::Ref<CBitSet> pbs)
 	BOOL fFound = false;
 	for (ULONG ul = 0; !fFound && ul < size; ul++)
 	{
-		CBitSet *pbsCurrent = (*m_pdrgpbsKeys)[ul].get();
+		gpos::Ref<CBitSet> pbsCurrent = (*m_pdrgpbsKeys)[ul].get();
 		fFound = pbsCurrent->Equals(pbs.get());
 	}
 
@@ -254,7 +254,7 @@ CTableDescriptor::FAddKeySet(gpos::Ref<CBitSet> pbs)
 //		Get n-th column descriptor
 //
 //---------------------------------------------------------------------------
-const CColumnDescriptor *
+const gpos::Ref<CColumnDescriptor>
 CTableDescriptor::Pcoldesc(ULONG ulCol) const
 {
 	GPOS_ASSERT(ulCol < ColumnCount());

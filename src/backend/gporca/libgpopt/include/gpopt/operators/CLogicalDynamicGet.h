@@ -74,7 +74,7 @@ public:
 	}
 
 	// return disjunctive constraint of selected partitions
-	CConstraint *
+	gpos::Ref<CConstraint>
 	GetPartitionConstraintsDisj() const
 	{
 		return m_partition_cnstrs_disj.get();
@@ -91,7 +91,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
@@ -116,7 +116,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	DeriveTableDescriptor(CMemoryPool *,	   // mp
 						  CExpressionHandle &  // exprhdl
 	) const override
@@ -179,7 +179,7 @@ public:
 
 	// conversion function
 	static CLogicalDynamicGet *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDynamicGet == pop->Eopid());

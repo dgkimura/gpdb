@@ -69,8 +69,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *expr) const override;
+	void Transform(gpos::Ref<CXformContext> pxfctxt,
+				   gpos::Ref<CXformResult> pxfres,
+				   gpos::Ref<CExpression> expr) const override;
 
 	// return true if xform should be applied only once
 	BOOL
@@ -81,16 +82,18 @@ public:
 
 private:
 	// check if transform can be applied
-	static BOOL CanApplyTransform(CExpression *agg_expr);
+	static BOOL CanApplyTransform(gpos::Ref<CExpression> agg_expr);
 
 	// is this aggregate supported for push down?
-	static BOOL CanPushAggBelowJoin(CExpression *scalar_agg_func_expr);
+	static BOOL CanPushAggBelowJoin(
+		gpos::Ref<CExpression> scalar_agg_func_expr);
 
 	// generate project lists for the lower and upper aggregates
 	// from all the original aggregates
 	static void PopulateLowerUpperProjectList(
-		CMemoryPool *mp,			  // memory pool
-		CExpression *orig_proj_list,  // project list of the original aggregate
+		CMemoryPool *mp,  // memory pool
+		gpos::Ref<CExpression>
+			orig_proj_list,	 // project list of the original aggregate
 		gpos::Ref<CExpression>
 			*lower_proj_list,  // output project list of the new lower aggregate
 		gpos::Ref<CExpression>

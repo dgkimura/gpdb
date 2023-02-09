@@ -87,7 +87,7 @@ CQueryToDXLResult::GetCTEProducerDXLArray() const
 //		Return the DXL node representing the query
 //
 //---------------------------------------------------------------------------
-const CDXLNode *
+const gpos::Ref<CDXLNode>
 CQueryToDXLResult::CreateDXLNode() const
 {
 	return m_query_dxl.get();

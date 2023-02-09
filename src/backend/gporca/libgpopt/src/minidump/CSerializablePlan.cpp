@@ -30,7 +30,8 @@ using namespace gpdxl;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CSerializablePlan::CSerializablePlan(CMemoryPool *mp, const CDXLNode *pdxlnPlan,
+CSerializablePlan::CSerializablePlan(CMemoryPool *mp,
+									 const gpos::Ref<CDXLNode> pdxlnPlan,
 									 ULLONG plan_id, ULLONG plan_space_size)
 	: CSerializable(),
 	  m_mp(mp),

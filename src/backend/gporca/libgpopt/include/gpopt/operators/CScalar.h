@@ -161,11 +161,11 @@ public:
 
 	// perform boolean evaluation of the given expression tree
 	static EBoolEvalResult EberEvaluate(CMemoryPool *mp,
-										CExpression *pexprScalar);
+										gpos::Ref<CExpression> pexprScalar);
 
 	// conversion function
 	static CScalar *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(pop->FScalar());

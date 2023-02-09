@@ -68,7 +68,7 @@ public:
 
 	// conversion function
 	static CDXLScalarCoerceToDomain *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarCoerceToDomain == dxl_op->GetDXLOperator());

@@ -125,7 +125,7 @@ CScalarArrayCoerceExpr::SzId() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArrayCoerceExpr::Matches(COperator *pop) const
+CScalarArrayCoerceExpr::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
@@ -167,7 +167,7 @@ CScalarArrayCoerceExpr::FInputOrderSensitive() const
 //
 //---------------------------------------------------------------------------
 CScalarArrayCoerceExpr *
-CScalarArrayCoerceExpr::PopConvert(COperator *pop)
+CScalarArrayCoerceExpr::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopScalarArrayCoerceExpr == pop->Eopid());

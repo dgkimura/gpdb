@@ -164,7 +164,7 @@ CPhysicalAssert::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalAssert::PcteRequired(CMemoryPool *,		//mp,
 							  CExpressionHandle &,	//exprhdl,
-							  CCTEReq *pcter,
+							  gpos::Ref<CCTEReq> pcter,
 							  ULONG
 #ifdef GPOS_DEBUG
 								  child_index
@@ -234,7 +234,7 @@ CPhysicalAssert::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalAssert::Matches(COperator *pop) const
+CPhysicalAssert::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{

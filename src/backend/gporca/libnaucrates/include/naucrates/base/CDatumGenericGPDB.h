@@ -87,7 +87,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function for datums
-	BOOL Matches(const IDatum *datum) const override;
+	BOOL Matches(const gpos::Ref<IDatum> datum) const override;
 
 	// copy datum
 	gpos::Ref<IDatum> MakeCopy(CMemoryPool *mp) const override;
@@ -128,7 +128,7 @@ public:
 	const BYTE *GetByteArrayValue() const override;
 
 	// stats equality
-	BOOL StatsAreEqual(const IDatum *datum) const override;
+	BOOL StatsAreEqual(const gpos::Ref<IDatum> datum) const override;
 
 	// does the datum need to be padded before statistical derivation
 	BOOL NeedsPadding() const override;

@@ -75,7 +75,7 @@ protected:
 	ULongPtr2dArray *m_key_sets_arrays;
 
 	// part constraint
-	CDXLNode *m_part_constraint;
+	gpos::Ref<CDXLNode> m_part_constraint;
 
 	// distribution opfamilies parse handler
 	CParseHandlerBase *m_opfamilies_parse_handler;

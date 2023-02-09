@@ -54,7 +54,7 @@ public:
 	~CParseHandlerOp() override;
 
 	// returns constructed DXL node
-	CDXLNode *CreateDXLNode() const;
+	gpos::Ref<CDXLNode> CreateDXLNode() const;
 };
 }  // namespace gpdxl
 

@@ -125,7 +125,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
@@ -207,7 +207,7 @@ public:
 
 	// conversion function
 	static CLogicalTVF *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalTVF == pop->Eopid());

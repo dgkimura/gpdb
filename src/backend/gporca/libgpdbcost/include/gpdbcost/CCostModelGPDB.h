@@ -52,27 +52,32 @@ private:
 
 	// return cost of processing the given number of rows
 	static CCost CostTupleProcessing(DOUBLE rows, DOUBLE width,
-									 ICostModelParams *pcp);
+									 gpos::Ref<ICostModelParams> pcp);
 
 	// helper function to return cost of producing output tuples from Scan operator
 	static CCost CostScanOutput(CMemoryPool *mp, DOUBLE rows, DOUBLE width,
-								DOUBLE num_rebinds, ICostModelParams *pcp);
+								DOUBLE num_rebinds,
+								gpos::Ref<ICostModelParams> pcp);
 
 	// helper function to return cost of a plan rooted by unary operator
 	static CCost CostUnary(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   const SCostingInfo *pci, ICostModelParams *pcp);
+						   const SCostingInfo *pci,
+						   gpos::Ref<ICostModelParams> pcp);
 
 	// cost of spooling
 	static CCost CostSpooling(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const SCostingInfo *pci, ICostModelParams *pcp);
+							  const SCostingInfo *pci,
+							  gpos::Ref<ICostModelParams> pcp);
 
 	// add up children cost
 	static CCost CostChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const SCostingInfo *pci, ICostModelParams *pcp);
+							  const SCostingInfo *pci,
+							  gpos::Ref<ICostModelParams> pcp);
 
 	// returns cost of highest costed child
 	static CCost CostMaxChild(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  const SCostingInfo *pci, ICostModelParams *pcp);
+							  const SCostingInfo *pci,
+							  gpos::Ref<ICostModelParams> pcp);
 
 	// check if given operator is unary
 	static BOOL FUnary(COperator::EOperatorId op_id);
@@ -200,7 +205,7 @@ private:
 	// cost of compute scalar
 	static CCost CostComputeScalar(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   const SCostingInfo *pci,
-								   ICostModelParams *pcp,
+								   gpos::Ref<ICostModelParams> pcp,
 								   const CCostModelGPDB *pcmgpdb);
 
 public:
@@ -222,7 +227,7 @@ public:
 	CDouble DRowsPerHost(CDouble dRowsTotal) const override;
 
 	// return cost model parameters
-	ICostModelParams *
+	gpos::Ref<ICostModelParams>
 	GetCostModelParams() const override
 	{
 		return m_cost_model_params.get();

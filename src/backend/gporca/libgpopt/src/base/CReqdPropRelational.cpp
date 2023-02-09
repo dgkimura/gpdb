@@ -91,7 +91,7 @@ CReqdPropRelational::~CReqdPropRelational()
 //---------------------------------------------------------------------------
 void
 CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CReqdProp *prpInput, ULONG child_index,
+							 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG				// ulOptReq
 )
@@ -119,7 +119,7 @@ CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 CReqdPropRelational *
-CReqdPropRelational::GetReqdRelationalProps(CReqdProp *prp)
+CReqdPropRelational::GetReqdRelationalProps(gpos::Ref<CReqdProp> prp)
 {
 	return dynamic_cast<CReqdPropRelational *>(prp);
 }

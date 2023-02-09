@@ -95,7 +95,7 @@ public:
 		return m_phmulcr.get();
 	}
 
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprInlined() const
 	{
 		return m_pexprInlined.get();
@@ -105,7 +105,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
@@ -148,7 +148,7 @@ public:
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// derive table descriptor
-	CTableDescriptor *DeriveTableDescriptor(
+	gpos::Ref<CTableDescriptor> DeriveTableDescriptor(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// compute required stats columns of the n-th child
@@ -186,7 +186,7 @@ public:
 
 	// conversion function
 	static CLogicalCTEConsumer *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalCTEConsumer == pop->Eopid());

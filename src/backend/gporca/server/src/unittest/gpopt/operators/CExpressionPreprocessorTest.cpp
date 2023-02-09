@@ -83,7 +83,7 @@ CExpressionPreprocessorTest::EresUnittest()
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::FHasSubqueryAll(CExpression *pexpr)
+CExpressionPreprocessorTest::FHasSubqueryAll(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -104,7 +104,7 @@ CExpressionPreprocessorTest::FHasSubqueryAll(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::FHasSubqueryAny(CExpression *pexpr)
+CExpressionPreprocessorTest::FHasSubqueryAny(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -125,7 +125,7 @@ CExpressionPreprocessorTest::FHasSubqueryAny(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::FHasSubqueryExists(CExpression *pexpr)
+CExpressionPreprocessorTest::FHasSubqueryExists(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -145,7 +145,7 @@ CExpressionPreprocessorTest::FHasSubqueryExists(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::FHasSubqueryNotExists(CExpression *pexpr)
+CExpressionPreprocessorTest::FHasSubqueryNotExists(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -167,7 +167,7 @@ CExpressionPreprocessorTest::FHasSubqueryNotExists(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::FHasNoOuterJoin(CExpression *pexpr)
+CExpressionPreprocessorTest::FHasNoOuterJoin(gpos::Ref<CExpression> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopLogicalLeftOuterJoin,
@@ -186,9 +186,9 @@ CExpressionPreprocessorTest::FHasNoOuterJoin(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::HasOuterRefs(CExpression *pexpr)
+CExpressionPreprocessorTest::HasOuterRefs(gpos::Ref<CExpression> pexpr)
 {
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 	BOOL fHasOuterRefs = (pop->FLogical() && CUtils::HasOuterRefs(pexpr));
 	if (fHasOuterRefs)
 	{
@@ -215,7 +215,7 @@ CExpressionPreprocessorTest::HasOuterRefs(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::FHasSeqPrj(CExpression *pexpr)
+CExpressionPreprocessorTest::FHasSeqPrj(gpos::Ref<CExpression> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopLogicalSequenceProject,
@@ -233,7 +233,7 @@ CExpressionPreprocessorTest::FHasSeqPrj(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpressionPreprocessorTest::FHasIDF(CExpression *pexpr)
+CExpressionPreprocessorTest::FHasIDF(gpos::Ref<CExpression> pexpr)
 {
 	COperator::EOperatorId rgeopid[] = {
 		COperator::EopScalarIsDistinctFrom,
@@ -387,7 +387,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessWindowFunc()
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CExpressionPreprocessorTest::PexprJoinHelper(CMemoryPool *mp,
-											 CExpression *pexprLOJ,
+											 gpos::Ref<CExpression> pexprLOJ,
 											 BOOL fCascadedLOJ,
 											 BOOL fIntermediateInnerjoin)
 {
@@ -1158,13 +1158,13 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessWindowFuncWithDistinctAggs()
 //
 //---------------------------------------------------------------------------
 ULONG
-CExpressionPreprocessorTest::UlScalarSubqs(CExpression *pexpr)
+CExpressionPreprocessorTest::UlScalarSubqs(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexpr);
 
 	ULONG ulSubqs = 0;
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (COperator::EopScalarSubquery == pop->Eopid())
 	{
 		ulSubqs = 1;
@@ -1338,7 +1338,7 @@ CExpressionPreprocessorTest::EresUnittest_UnnestSubqueries()
 					<< *pexprProcessed << std::endl;
 		}
 
-		const CExpression *pexprFirst = CTestUtils::PexprFirst(
+		const gpos::Ref<CExpression> pexprFirst = CTestUtils::PexprFirst(
 			pexprProcessed.get(), COperator::EopScalarBoolOp);
 		if (nullptr == pexprFirst ||
 			(eboolop ==
@@ -1369,7 +1369,7 @@ CExpressionPreprocessorTest::EresUnittest_UnnestSubqueries()
 //---------------------------------------------------------------------------
 GPOS_RESULT
 CExpressionPreprocessorTest::EresCheckExistsSubqueryType(
-	CExpression *pexpr, COperator::EOperatorId eopidPresent)
+	gpos::Ref<CExpression> pexpr, COperator::EOperatorId eopidPresent)
 {
 	if (COperator::EopScalarSubqueryNotExists == eopidPresent &&
 		(FHasSubqueryExists(pexpr) || !FHasSubqueryNotExists(pexpr)))
@@ -1397,7 +1397,7 @@ CExpressionPreprocessorTest::EresCheckExistsSubqueryType(
 //---------------------------------------------------------------------------
 GPOS_RESULT
 CExpressionPreprocessorTest::EresCheckQuantifiedSubqueryType(
-	CExpression *pexpr, COperator::EOperatorId eopidPresent)
+	gpos::Ref<CExpression> pexpr, COperator::EOperatorId eopidPresent)
 {
 	if (COperator::EopScalarSubqueryAny == eopidPresent &&
 		!FHasSubqueryAny(pexpr))
@@ -1425,7 +1425,7 @@ CExpressionPreprocessorTest::EresCheckQuantifiedSubqueryType(
 //---------------------------------------------------------------------------
 GPOS_RESULT
 CExpressionPreprocessorTest::EresCheckSubqueryType(
-	CExpression *pexpr, COperator::EOperatorId eopidPresent)
+	gpos::Ref<CExpression> pexpr, COperator::EOperatorId eopidPresent)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -2122,8 +2122,8 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOrPrefiltersPartialPush()
 //---------------------------------------------------------------------------
 GPOS_RESULT
 CExpressionPreprocessorTest::EresUnittest_CollapseInnerJoinHelper(
-	CMemoryPool *mp, COperator *popJoin, CExpression *rgpexpr[],
-	CDrvdPropRelational *rgpdprel[])
+	CMemoryPool *mp, gpos::Ref<COperator> popJoin,
+	gpos::Ref<CExpression> rgpexpr[], CDrvdPropRelational *rgpdprel[])
 {
 	GPOS_ASSERT(nullptr != popJoin);
 
@@ -2219,7 +2219,7 @@ CExpressionPreprocessorTest::EresUnittest_CollapseInnerJoinHelper(
 	const ULONG arity = pexprPreprocessed->Arity();
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
-		CExpression *pexprChild = (*pexprPreprocessed)[ul];
+		gpos::Ref<CExpression> pexprChild = (*pexprPreprocessed)[ul];
 		GPOS_ASSERT(
 			1 == gpos::dyn_cast<CDrvdPropRelational>(pexprChild->PdpDerive())
 					 ->GetJoinDepth() &&
@@ -2280,7 +2280,7 @@ CExpressionPreprocessorTest::EresUnittest_CollapseInnerJoin()
 	CAutoOptCtxt aoc(mp, &mda, nullptr /*pceeval*/,
 					 CTestUtils::GetCostModel(mp));
 
-	CExpression *rgpexpr[GPOS_ARRAY_SIZE(rgscRel)];
+	gpos::Ref<CExpression> rgpexpr[GPOS_ARRAY_SIZE(rgscRel)];
 	CDrvdPropRelational *rgpdprel[GPOS_ARRAY_SIZE(rgscRel)];
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(rgscRel); ul++)
 	{
@@ -2463,7 +2463,7 @@ CExpressionPreprocessorTest::PexprCreateConvertableArray(
 	CColRef *pcrLeft = pexpr->DeriveOutputColumns()->PcrAny();
 
 	// remove the array child and then make an OR node with two equality comparisons
-	CExpression *pexprArrayComp = (*pexpr->PdrgPexpr())[1];
+	gpos::Ref<CExpression> pexprArrayComp = (*pexpr->PdrgPexpr())[1];
 	GPOS_ASSERT(CUtils::FScalarArrayCmp(pexprArrayComp));
 
 	gpos::Ref<CExpressionArray> pdrgexprDisjChildren =
@@ -2529,8 +2529,9 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessConvertArrayWithEquals()
 	GPOS_RTL_ASSERT(1 == CUtils::UlCountOperator(apexprInConverted.get(),
 												 COperator::EopScalarArrayCmp));
 
-	CExpression *pexprArrayInCmp = CTestUtils::PexprFindFirstExpressionWithOpId(
-		apexprInConverted.get(), COperator::EopScalarArrayCmp);
+	gpos::Ref<CExpression> pexprArrayInCmp =
+		CTestUtils::PexprFindFirstExpressionWithOpId(
+			apexprInConverted.get(), COperator::EopScalarArrayCmp);
 	GPOS_ASSERT(nullptr != pexprArrayInCmp);
 	CScalarArrayCmp *popCmpInArray =
 		gpos::dyn_cast<CScalarArrayCmp>(pexprArrayInCmp->Pop());
@@ -2550,7 +2551,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessConvertArrayWithEquals()
 	GPOS_RTL_ASSERT(1 == CUtils::UlCountOperator(apexprNotInConverted.get(),
 												 COperator::EopScalarArrayCmp));
 
-	CExpression *pexprArrayCmpNotIn =
+	gpos::Ref<CExpression> pexprArrayCmpNotIn =
 		CTestUtils::PexprFindFirstExpressionWithOpId(
 			apexprNotInConverted.get(), COperator::EopScalarArrayCmp);
 	GPOS_ASSERT(nullptr != pexprArrayCmpNotIn);

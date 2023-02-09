@@ -43,7 +43,7 @@ CScalarAssertConstraintList::CScalarAssertConstraintList(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarAssertConstraintList::Matches(COperator *pop) const
+CScalarAssertConstraintList::Matches(gpos::Ref<COperator> pop) const
 {
 	return pop->Eopid() == Eopid();
 }

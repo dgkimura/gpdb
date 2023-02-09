@@ -62,8 +62,9 @@ private:
 	gpos::Ref<CCTEMap> m_pcm{nullptr};
 
 	// copy CTE producer plan properties from given context to current object
-	void CopyCTEProducerPlanProps(CMemoryPool *mp, CDrvdPropCtxt *pdpctxt,
-								  COperator *pop);
+	void CopyCTEProducerPlanProps(CMemoryPool *mp,
+								  gpos::Ref<CDrvdPropCtxt> pdpctxt,
+								  gpos::Ref<COperator> pop);
 
 public:
 	CDrvdPropPlan(const CDrvdPropPlan &) = delete;
@@ -83,10 +84,10 @@ public:
 
 	// derivation function
 	void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDrvdPropCtxt *pdpctxt) override;
+				gpos::Ref<CDrvdPropCtxt> pdpctxt) override;
 
 	// short hand for conversion
-	static CDrvdPropPlan *Pdpplan(CDrvdProp *pdp);
+	static CDrvdPropPlan *Pdpplan(gpos::Ref<CDrvdProp> pdp);
 
 	// sort order accessor
 	COrderSpec *
@@ -116,7 +117,7 @@ public:
 	}
 
 	// cte map
-	CCTEMap *
+	gpos::Ref<CCTEMap>
 	GetCostModel() const
 	{
 		return m_pcm.get();

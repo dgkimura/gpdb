@@ -139,7 +139,7 @@ private:
 		~CCTEInfoEntry() override;
 
 		// CTE expression
-		CExpression *
+		gpos::Ref<CExpression>
 		Pexpr() const
 		{
 			return m_pexprCTEProducer.get();
@@ -198,17 +198,18 @@ private:
 	gpos::Ref<UlongToProducerConsumerMap> m_phmulprodconsmap;
 
 	// initialize default statistics for a given CTE Producer
-	void InitDefaultStats(CExpression *pexprCTEProducer);
+	void InitDefaultStats(gpos::Ref<CExpression> pexprCTEProducer);
 
 	// preprocess CTE producer expression
 	gpos::Ref<CExpression> PexprPreprocessCTEProducer(
-		const CExpression *pexprCTEProducer);
+		const gpos::Ref<CExpression> pexprCTEProducer);
 
 	// number of consumers of given CTE inside a given parent
 	ULONG UlConsumersInParent(ULONG ulConsumerId, ULONG ulParentId) const;
 
 	// find all CTE consumers inside given parent, and push them to the given stack
-	void FindConsumersInParent(ULONG ulParentId, CBitSet *pbsUnusedConsumers,
+	void FindConsumersInParent(ULONG ulParentId,
+							   gpos::Ref<CBitSet> pbsUnusedConsumers,
 							   CStack<ULONG> *pstack);
 
 public:
@@ -221,7 +222,7 @@ public:
 	~CCTEInfo() override;
 
 	// logical cte producer with given id
-	CExpression *PexprCTEProducer(ULONG ulCTEId) const;
+	gpos::Ref<CExpression> PexprCTEProducer(ULONG ulCTEId) const;
 
 	// number of CTE consumers of given CTE
 	ULONG UlConsumers(ULONG ulCTEId) const;
@@ -234,10 +235,10 @@ public:
 							ULONG ulParentCTEId = gpos::ulong_max);
 
 	// add cte producer to hashmap
-	void AddCTEProducer(CExpression *pexprCTEProducer);
+	void AddCTEProducer(gpos::Ref<CExpression> pexprCTEProducer);
 
 	// replace cte producer with given expression
-	void ReplaceCTEProducer(CExpression *pexprCTEProducer);
+	void ReplaceCTEProducer(gpos::Ref<CExpression> pexprCTEProducer);
 
 	// next available CTE id
 	ULONG

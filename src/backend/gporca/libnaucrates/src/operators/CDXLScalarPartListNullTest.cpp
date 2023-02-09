@@ -44,7 +44,7 @@ CDXLScalarPartListNullTest::GetOpNameStr() const
 // Serialize operator in DXL format
 void
 CDXLScalarPartListNullTest::SerializeToDXL(CXMLSerializer *xml_serializer,
-										   const CDXLNode *	 // dxlnode
+										   const gpos::Ref<CDXLNode>  // dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -84,7 +84,7 @@ CDXLScalarPartListNullTest::HasBoolResult(CMDAccessor *	 //md_accessor
 #ifdef GPOS_DEBUG
 // Checks whether operator node is well-structured
 void
-CDXLScalarPartListNullTest::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarPartListNullTest::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 										BOOL  // validate_children
 ) const
 {
@@ -94,7 +94,7 @@ CDXLScalarPartListNullTest::AssertValid(const CDXLNode *dxlnode,
 
 // conversion function
 CDXLScalarPartListNullTest *
-CDXLScalarPartListNullTest::Cast(CDXLOperator *dxl_op)
+CDXLScalarPartListNullTest::Cast(gpos::Ref<CDXLOperator> dxl_op)
 {
 	GPOS_ASSERT(nullptr != dxl_op);
 	GPOS_ASSERT(EdxlopScalarPartListNullTest == dxl_op->GetDXLOperator());

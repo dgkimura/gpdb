@@ -51,7 +51,7 @@ public:
 
 	// accessors
 	// the cost estimates for the operator node
-	CDXLOperatorCost *GetDXLOperatorCost() const;
+	gpos::Ref<CDXLOperatorCost> GetDXLOperatorCost() const;
 
 	Edxlproperty
 	GetDXLPropertyType() const override
@@ -61,7 +61,7 @@ public:
 
 	// conversion function
 	static CDXLPhysicalProperties *
-	PdxlpropConvert(CDXLProperties *dxl_properties)
+	PdxlpropConvert(gpos::Ref<CDXLProperties> dxl_properties)
 	{
 		GPOS_ASSERT(nullptr != dxl_properties);
 		GPOS_ASSERT(EdxlpropertyPhysical ==

@@ -52,7 +52,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// accessors
-	const CDXLColRef *GetDXLColRef() const;
+	const gpos::Ref<CDXLColRef> GetDXLColRef() const;
 
 	gpos::Ref<IMDId> MdidType() const;
 
@@ -60,11 +60,11 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 
 	// conversion function
 	static CDXLScalarIdent *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarIdent == dxl_op->GetDXLOperator());
@@ -77,7 +77,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(const gpos::Ref<CDXLNode> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

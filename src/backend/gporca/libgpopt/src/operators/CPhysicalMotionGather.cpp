@@ -87,7 +87,7 @@ CPhysicalMotionGather::~CPhysicalMotionGather()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionGather::Matches(COperator *pop) const
+CPhysicalMotionGather::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
@@ -251,7 +251,7 @@ CPhysicalMotionGather::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CPhysicalMotionGather *
-CPhysicalMotionGather::PopConvert(COperator *pop)
+CPhysicalMotionGather::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionGather == pop->Eopid());

@@ -85,7 +85,7 @@ const BYTE CScalarBooleanTest::m_rgBoolEvalMap[][3] = {
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBooleanTest::Matches(COperator *pop) const
+CScalarBooleanTest::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

@@ -80,7 +80,7 @@ public:
 	~CParseHandlerStatsDerivedRelation() override;
 
 	// the derived relation stats
-	CDXLStatsDerivedRelation *
+	gpos::Ref<CDXLStatsDerivedRelation>
 	GetDxlStatsDrvdRelation() const
 	{
 		return m_dxl_stats_derived_relation.get();

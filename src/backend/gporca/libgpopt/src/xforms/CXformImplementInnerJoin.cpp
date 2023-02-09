@@ -71,9 +71,9 @@ CXformImplementInnerJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementInnerJoin::Transform(CXformContext *pxfctxt,
-									CXformResult *pxfres,
-									CExpression *pexpr) const
+CXformImplementInnerJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+									gpos::Ref<CXformResult> pxfres,
+									gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

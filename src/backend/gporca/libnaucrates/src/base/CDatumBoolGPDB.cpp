@@ -194,7 +194,7 @@ CDatumBoolGPDB::GetStrRepr(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDatumBoolGPDB::Matches(const IDatum *other) const
+CDatumBoolGPDB::Matches(const gpos::Ref<IDatum> other) const
 {
 	if (!other->MDId()->Equals(m_mdid.get()))
 	{

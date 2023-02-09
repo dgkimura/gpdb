@@ -64,7 +64,7 @@ public:
 
 	// conversion function
 	static CScalarSubqueryAny *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubqueryAny == pop->Eopid());

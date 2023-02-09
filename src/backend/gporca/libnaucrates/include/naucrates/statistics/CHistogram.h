@@ -97,31 +97,34 @@ private:
 	BOOL m_is_col_stats_missing;
 
 	// return an array buckets after applying equality filter on the histogram buckets
-	gpos::Ref<CBucketArray> MakeBucketsWithEqualityFilter(CPoint *point) const;
+	gpos::Ref<CBucketArray> MakeBucketsWithEqualityFilter(
+		gpos::Ref<CPoint> point) const;
 
 	// return an array buckets after applying non equality filter on the histogram buckets
 	gpos::Ref<CBucketArray> MakeBucketsWithInequalityFilter(
-		CPoint *point) const;
+		gpos::Ref<CPoint> point) const;
 
 	// less than or less than equal filter
 	CHistogram *MakeHistogramLessThanOrLessThanEqualFilter(
-		CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point) const;
+		CStatsPred::EStatsCmpType stats_cmp_type,
+		gpos::Ref<CPoint> point) const;
 
 	// greater than or greater than equal filter
 	CHistogram *MakeHistogramGreaterThanOrGreaterThanEqualFilter(
-		CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point) const;
+		CStatsPred::EStatsCmpType stats_cmp_type,
+		gpos::Ref<CPoint> point) const;
 
 	// equal filter
-	CHistogram *MakeHistogramEqualFilter(CPoint *point) const;
+	CHistogram *MakeHistogramEqualFilter(gpos::Ref<CPoint> point) const;
 
 	// not equal filter
-	CHistogram *MakeHistogramInequalityFilter(CPoint *point) const;
+	CHistogram *MakeHistogramInequalityFilter(gpos::Ref<CPoint> point) const;
 
 	// IDF filter
-	CHistogram *MakeHistogramIDFFilter(CPoint *point) const;
+	CHistogram *MakeHistogramIDFFilter(gpos::Ref<CPoint> point) const;
 
 	// INDF filter
-	CHistogram *MakeHistogramINDFFilter(CPoint *point) const;
+	CHistogram *MakeHistogramINDFFilter(gpos::Ref<CPoint> point) const;
 
 	// equality join
 	CHistogram *MakeJoinHistogramEqualityFilter(
@@ -253,11 +256,11 @@ public:
 
 	// filter by comparing with point
 	CHistogram *MakeHistogramFilter(CStatsPred::EStatsCmpType stats_cmp_type,
-									CPoint *point) const;
+									gpos::Ref<CPoint> point) const;
 
 	// filter by comparing with point and normalize
 	CHistogram *MakeHistogramFilterNormalize(
-		CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point,
+		CStatsPred::EStatsCmpType stats_cmp_type, gpos::Ref<CPoint> point,
 		CDouble *scale_factor) const;
 
 	// join with another histogram

@@ -64,7 +64,7 @@ private:
 	CMDAccessor *m_pmda;
 
 	// cost model
-	ICostModel *m_cost_model;
+	gpos::Ref<ICostModel> m_cost_model;
 
 	// constant expression evaluator
 	gpos::Ref<IConstExprEvaluator> m_pceeval;
@@ -141,7 +141,7 @@ public:
 	}
 
 	// optimizer configurations
-	COptimizerConfig *
+	gpos::Ref<COptimizerConfig>
 	GetOptimizerConfig() const
 	{
 		return m_optimizer_config.get();
@@ -180,7 +180,8 @@ public:
 	}
 
 	void
-	AddDirectDispatchableFilterCandidate(CExpression *filter_expression)
+	AddDirectDispatchableFilterCandidate(
+		gpos::Ref<CExpression> filter_expression)
 	{
 		;
 		m_direct_dispatchable_filters->Append(filter_expression);
@@ -237,14 +238,14 @@ public:
 	}
 
 	// cost model accessor
-	ICostModel *
+	gpos::Ref<ICostModel>
 	GetCostModel() const
 	{
 		return m_cost_model;
 	}
 
 	// constant expression evaluator
-	IConstExprEvaluator *
+	gpos::Ref<IConstExprEvaluator>
 	Pceeval()
 	{
 		return m_pceeval.get();
@@ -258,7 +259,7 @@ public:
 	}
 
 	// cte info
-	CCTEInfo *
+	Cgpos::Ref<CCTEInfo>
 	Pcteinfo()
 	{
 		return m_pcteinfo.get();
@@ -286,7 +287,7 @@ public:
 
 	void AddPartForScanId(ULONG scanid, ULONG index);
 
-	CBitSet *
+	gpos::Ref<CBitSet>
 	GetPartitionsForScanId(ULONG scanid)
 	{
 		return m_scanid_to_part_map->Find(&scanid);

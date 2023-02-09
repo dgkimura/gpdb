@@ -52,7 +52,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -75,7 +75,7 @@ public:
 
 	// compute required ctes of the n-th child
 	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CCTEReq *pcter, ULONG child_index,
+									gpos::Ref<CCTEReq> pcter, ULONG child_index,
 									CDrvdPropArray *pdrgpdpCtxt,
 									ULONG ulOptReq) const override;
 
@@ -151,7 +151,7 @@ public:
 
 	// conversion function
 	static CPhysicalFilter *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalFilter == pop->Eopid());

@@ -226,7 +226,7 @@ CPhysicalSplit::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalSplit::PcteRequired(CMemoryPool *,		   //mp,
 							 CExpressionHandle &,  //exprhdl,
-							 CCTEReq *pcter,
+							 gpos::Ref<CCTEReq> pcter,
 							 ULONG
 #ifdef GPOS_DEBUG
 								 child_index
@@ -412,7 +412,7 @@ CPhysicalSplit::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalSplit::Matches(COperator *pop) const
+CPhysicalSplit::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

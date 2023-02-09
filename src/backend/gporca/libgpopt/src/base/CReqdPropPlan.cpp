@@ -94,7 +94,7 @@ CReqdPropPlan::~CReqdPropPlan()
 //---------------------------------------------------------------------------
 void
 CReqdPropPlan::ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   CReqdProp *prpInput, ULONG child_index,
+							   gpos::Ref<CReqdProp> prpInput, ULONG child_index,
 							   CDrvdPropArray *pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr == m_pcrs);
@@ -116,7 +116,7 @@ CReqdPropPlan::ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 void
 CReqdPropPlan::ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   CReqdProp *prpInput, ULONG child_index,
+							   gpos::Ref<CReqdProp> prpInput, ULONG child_index,
 							   CDrvdPropArray *pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr == m_pcter);
@@ -138,7 +138,7 @@ CReqdPropPlan::ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 void
 CReqdPropPlan::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					   CReqdProp *prpInput, ULONG child_index,
+					   gpos::Ref<CReqdProp> prpInput, ULONG child_index,
 					   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_CHECK_ABORT;
@@ -188,7 +188,7 @@ CReqdPropPlan::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		member
 //
 //---------------------------------------------------------------------------
-CPropSpec *
+gpos::Ref<CPropSpec>
 CReqdPropPlan::Pps(ULONG ul) const
 {
 	CPropSpec::EPropSpecType epst = (CPropSpec::EPropSpecType) ul;
@@ -241,7 +241,7 @@ CReqdPropPlan::FProvidesReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	BOOL fProvidesReqdCols = true;
 	for (ULONG ul = 0; fProvidesReqdCols && ul < CPropSpec::EpstSentinel; ul++)
 	{
-		CPropSpec *pps = Pps(ul);
+		gpos::Ref<CPropSpec> pps = Pps(ul);
 		if (nullptr == pps)
 		{
 			continue;

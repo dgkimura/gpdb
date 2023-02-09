@@ -97,7 +97,7 @@ CLogicalMaxOneRow::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 ) const
 {
 	// no more than one row can be produced by operator, scale down input statistics accordingly
-	IStatistics *stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> stats = exprhdl.Pstats(0);
 	return stats->ScaleStats(mp, CDouble(1.0 / stats->Rows()));
 }
 

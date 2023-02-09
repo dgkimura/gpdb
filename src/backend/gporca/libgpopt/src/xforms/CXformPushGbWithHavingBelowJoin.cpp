@@ -84,9 +84,9 @@ CXformPushGbWithHavingBelowJoin::Exfp(CExpressionHandle &  // exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformPushGbWithHavingBelowJoin::Transform(CXformContext *pxfctxt,
-										   CXformResult *pxfres,
-										   CExpression *pexpr) const
+CXformPushGbWithHavingBelowJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+										   gpos::Ref<CXformResult> pxfres,
+										   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -94,7 +94,7 @@ CXformPushGbWithHavingBelowJoin::Transform(CXformContext *pxfctxt,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 
-	CExpression *pexprGb = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprGb = (*pexpr)[0];
 	CLogicalGbAgg *popGbAgg = gpos::dyn_cast<CLogicalGbAgg>(pexprGb->Pop());
 	if (!popGbAgg->FGlobal())
 	{

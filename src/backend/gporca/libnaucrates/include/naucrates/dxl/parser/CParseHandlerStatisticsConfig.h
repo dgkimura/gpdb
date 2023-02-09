@@ -68,7 +68,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// enumerator configuration
-	CStatisticsConfig *GetStatsConf() const;
+	gpos::Ref<CStatisticsConfig> GetStatsConf() const;
 };
 }  // namespace gpdxl
 

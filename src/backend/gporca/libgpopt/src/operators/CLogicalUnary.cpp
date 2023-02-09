@@ -28,7 +28,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalUnary::Matches(COperator *pop) const
+CLogicalUnary::Matches(gpos::Ref<COperator> pop) const
 {
 	return (pop->Eopid() == Eopid());
 }
@@ -69,7 +69,7 @@ CLogicalUnary::PstatsDeriveProject(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   UlongToIDatumMap *phmuldatum) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *child_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
 	CReqdPropRelational *prprel =
 		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
 	CColRefSet *pcrs = prprel->PcrsStat();

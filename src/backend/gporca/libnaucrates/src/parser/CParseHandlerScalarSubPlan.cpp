@@ -195,7 +195,7 @@ CParseHandlerScalarSubPlan::EndElement(const XMLCh *const,	// element_uri,
 		parse_handler_subplan_param_list->GetDXLColRefArray();
 	;
 
-	CDXLNode *dxl_subplan_test_expr =
+	gpos::Ref<CDXLNode> dxl_subplan_test_expr =
 		parse_handler_subplan_test_expr->GetDXLTestExpr();
 	if (nullptr != dxl_subplan_test_expr)
 	{

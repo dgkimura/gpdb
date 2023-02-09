@@ -57,7 +57,7 @@ CParseHandlerOp::~CParseHandlerOp()
 //		Returns the constructed DXL node and passes ownership over it.
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CParseHandlerOp::CreateDXLNode() const
 {
 	return m_dxl_node.get();
@@ -82,7 +82,7 @@ CParseHandlerOp::AddChildFromParseHandler(
 	GPOS_ASSERT(nullptr != parse_handler_op);
 
 	// extract constructed element
-	CDXLNode *child_dxlnode = parse_handler_op->CreateDXLNode();
+	gpos::Ref<CDXLNode> child_dxlnode = parse_handler_op->CreateDXLNode();
 	GPOS_ASSERT(nullptr != child_dxlnode);
 
 	;

@@ -115,7 +115,7 @@ CLogicalLeftOuterCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalLeftOuterCorrelatedApply::Matches(COperator *pop) const
+CLogicalLeftOuterCorrelatedApply::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

@@ -210,7 +210,7 @@ CParseHandlerOptimizerConfig::EndElement(const XMLCh *const,  // element_uri,
 
 	CParseHandlerWindowOids *pphDefoidsGPDB =
 		dynamic_cast<CParseHandlerWindowOids *>((*this)[3]);
-	CWindowOids *pwindowoidsGPDB = pphDefoidsGPDB->GetWindowOids();
+	gpos::Ref<CWindowOids> pwindowoidsGPDB = pphDefoidsGPDB->GetWindowOids();
 	GPOS_ASSERT(nullptr != pwindowoidsGPDB);
 	;
 
@@ -279,7 +279,7 @@ CParseHandlerOptimizerConfig::GetParseHandlerType() const
 //		Returns the bitset for the trace flags
 //
 //---------------------------------------------------------------------------
-CBitSet *
+gpos::Ref<CBitSet>
 CParseHandlerOptimizerConfig::Pbs() const
 {
 	return m_pbs.get();
@@ -293,7 +293,7 @@ CParseHandlerOptimizerConfig::Pbs() const
 //		Returns the optimizer config
 //
 //---------------------------------------------------------------------------
-COptimizerConfig *
+gpos::Ref<COptimizerConfig>
 CParseHandlerOptimizerConfig::GetOptimizerConfig() const
 {
 	return m_optimizer_config.get();

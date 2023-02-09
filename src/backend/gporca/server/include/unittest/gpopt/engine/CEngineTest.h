@@ -51,7 +51,7 @@ private:
 
 public:
 	// type definition of optimizer test function
-	using FnOptimize = void(CMemoryPool *, CExpression *,
+	using FnOptimize = void(CMemoryPool *, gpos::Ref<CExpression>,
 							gpos::Ref<CSearchStageArray>);
 
 	// main driver
@@ -66,7 +66,7 @@ public:
 		CWStringConst *str,	 // array of relation names
 		ULONG *pul,			 // array of relation OIDs
 		ULONG ulRels,		 // number of array entries
-		CBitSet *
+		gpos::Ref<CBitSet>
 			pbs	 // if a bit is set, the corresponding join expression will be optimized
 	);
 
@@ -74,7 +74,7 @@ public:
 
 	// build memo by recursive optimization
 	static void BuildMemoRecursive(
-		CMemoryPool *mp, CExpression *pexprInput,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprInput,
 		gpos::Ref<CSearchStageArray> search_stage_array);
 
 	// test of recursive memo building

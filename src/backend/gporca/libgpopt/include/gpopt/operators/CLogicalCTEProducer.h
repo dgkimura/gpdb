@@ -90,7 +90,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -140,7 +140,7 @@ public:
 		return PpartinfoPassThruOuter(exprhdl);
 	}
 
-	CTableDescriptor *DeriveTableDescriptor(
+	gpos::Ref<CTableDescriptor> DeriveTableDescriptor(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 	// compute required stats columns of the n-th child
 	gpos::Ref<CColRefSet>
@@ -181,7 +181,7 @@ public:
 
 	// conversion function
 	static CLogicalCTEProducer *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalCTEProducer == pop->Eopid());

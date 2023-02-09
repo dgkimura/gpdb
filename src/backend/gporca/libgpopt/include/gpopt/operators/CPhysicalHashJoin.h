@@ -209,7 +209,7 @@ public:
 
 	// conversion function
 	static CPhysicalHashJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(CUtils::FHashJoin(pop));
 

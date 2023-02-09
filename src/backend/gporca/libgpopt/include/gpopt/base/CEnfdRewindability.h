@@ -84,7 +84,7 @@ public:
 							BOOL fRewindabilityReqd) const;
 
 	// property spec accessor
-	CPropSpec *
+	gpos::Ref<CPropSpec>
 	Pps() const override
 	{
 		return m_prs.get();

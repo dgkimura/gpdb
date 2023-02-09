@@ -69,7 +69,7 @@ public:
 	~CParseHandlerCostModel() override;
 
 	// cost model
-	ICostModel *GetCostModel() const;
+	gpos::Ref<ICostModel> GetCostModel() const;
 };
 }  // namespace gpdxl
 

@@ -717,7 +717,7 @@ CSubqueryTestUtils::PexprSelectWithNestedCmpSubquery(CMemoryPool *mp,
 	gpos::Ref<CExpression> pexprSelectWithSubquery =
 		PexprSelectWithAggSubquery(mp, fCorrelated);
 
-	CExpression *pexprLogical = (*pexprSelectWithSubquery)[0];
+	gpos::Ref<CExpression> pexprLogical = (*pexprSelectWithSubquery)[0];
 	gpos::Ref<CExpression> pexprSubqueryPred = (*pexprSelectWithSubquery)[1];
 
 	// generate a parent equality predicate
@@ -918,9 +918,10 @@ CSubqueryTestUtils::PexprSelectWith2LevelsCorrSubquery(CMemoryPool *mp,
 	if (fCorrelated)
 	{
 		// add a 2-level correlation
-		CExpression *pexprOuterSubq = (*(*pexpr)[1])[1];
-		CExpression *pexprInnerSubq = (*(*(*pexprOuterSubq)[0])[1])[1];
-		CExpression *pexprInnerSelect = (*(*pexprInnerSubq)[0])[0];
+		gpos::Ref<CExpression> pexprOuterSubq = (*(*pexpr)[1])[1];
+		gpos::Ref<CExpression> pexprInnerSubq =
+			(*(*(*pexprOuterSubq)[0])[1])[1];
+		gpos::Ref<CExpression> pexprInnerSelect = (*(*pexprInnerSubq)[0])[0];
 		CExpressionArray *pdrgpexpr = (*pexprInnerSelect)[1]->PdrgPexpr();
 
 		CColRef *pcrOuter = pexpr->DeriveOutputColumns()->PcrAny();
@@ -996,7 +997,8 @@ CSubqueryTestUtils::PexprProjectWithSubqueries(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubquery(
-	CMemoryPool *mp, CExpression *pexprOuter, gpos::Ref<CExpression> pexprInner,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+	gpos::Ref<CExpression> pexprInner,
 	BOOL
 		fCorrelated	 // add a predicate to inner expression correlated with outer expression?
 )
@@ -1051,8 +1053,8 @@ CSubqueryTestUtils::PexprSubquery(
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubqueryQuantified(
-	CMemoryPool *mp, COperator::EOperatorId op_id, CExpression *pexprOuter,
-	gpos::Ref<CExpression> pexprInner,
+	CMemoryPool *mp, COperator::EOperatorId op_id,
+	gpos::Ref<CExpression> pexprOuter, gpos::Ref<CExpression> pexprInner,
 	BOOL
 		fCorrelated	 // add a predicate to inner expression correlated with outer expression?
 )
@@ -1270,8 +1272,8 @@ CSubqueryTestUtils::PexprUndecorrelatableScalarSubquery(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubqueryExistential(
-	CMemoryPool *mp, COperator::EOperatorId op_id, CExpression *pexprOuter,
-	gpos::Ref<CExpression> pexprInner,
+	CMemoryPool *mp, COperator::EOperatorId op_id,
+	gpos::Ref<CExpression> pexprOuter, gpos::Ref<CExpression> pexprInner,
 	BOOL
 		fCorrelated	 // add a predicate to inner expression correlated with outer expression?
 )
@@ -1312,7 +1314,8 @@ CSubqueryTestUtils::PexprSubqueryExistential(
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CSubqueryTestUtils::PexprSubqueryAgg(
-	CMemoryPool *mp, CExpression *pexprOuter, gpos::Ref<CExpression> pexprInner,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+	gpos::Ref<CExpression> pexprInner,
 	BOOL
 		fCorrelated	 // add a predicate to inner expression correlated with outer expression?
 )

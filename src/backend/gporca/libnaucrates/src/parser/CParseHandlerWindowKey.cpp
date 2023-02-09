@@ -135,7 +135,7 @@ CParseHandlerWindowKey::EndElement(const XMLCh *const,	// element_uri,
 	{
 		CParseHandlerWindowFrame *window_frame_parse_handler_base =
 			dynamic_cast<CParseHandlerWindowFrame *>((*this)[1]);
-		CDXLWindowFrame *window_frame =
+		gpos::Ref<CDXLWindowFrame> window_frame =
 			window_frame_parse_handler_base->GetWindowFrame();
 		m_dxl_window_key_gen->SetWindowFrame(window_frame);
 	}

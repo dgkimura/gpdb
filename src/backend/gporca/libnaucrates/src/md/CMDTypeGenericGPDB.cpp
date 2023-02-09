@@ -232,7 +232,7 @@ CMDTypeGenericGPDB::GetDatumForDXLConstVal(
 	const CDXLScalarConstValue *dxl_op) const
 {
 	CDXLDatumGeneric *dxl_datum = gpos::dyn_cast<CDXLDatumGeneric>(
-		const_cast<CDXLDatum *>(dxl_op->GetDatumVal()));
+		const_cast<gpos::Ref<CDXLDatum> >(dxl_op->GetDatumVal()));
 	GPOS_ASSERT(nullptr != dxl_op);
 
 	LINT lint_value = 0;
@@ -262,12 +262,12 @@ CMDTypeGenericGPDB::GetDatumForDXLConstVal(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IDatum>
-CMDTypeGenericGPDB::GetDatumForDXLDatum(CMemoryPool *mp,
-										const CDXLDatum *dxl_datum) const
+CMDTypeGenericGPDB::GetDatumForDXLDatum(
+	CMemoryPool *mp, const gpos::Ref<CDXLDatum> dxl_datum) const
 {
 	;
-	CDXLDatumGeneric *dxl_datum_generic =
-		gpos::dyn_cast<CDXLDatumGeneric>(const_cast<CDXLDatum *>(dxl_datum));
+	CDXLDatumGeneric *dxl_datum_generic = gpos::dyn_cast<CDXLDatumGeneric>(
+		const_cast<gpos::Ref<CDXLDatum> >(dxl_datum));
 
 	LINT lint_value = 0;
 	if (dxl_datum_generic->IsDatumMappableToLINT())
@@ -296,7 +296,7 @@ CMDTypeGenericGPDB::GetDatumForDXLDatum(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
-CMDTypeGenericGPDB::GetDatumVal(CMemoryPool *mp, IDatum *datum) const
+CMDTypeGenericGPDB::GetDatumVal(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 {
 	;
 	CDatumGenericGPDB *datum_generic = dynamic_cast<CDatumGenericGPDB *>(datum);
@@ -423,7 +423,8 @@ CMDTypeGenericGPDB::CreateDXLDatumStatsIntMappable(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLScalarConstValue>
-CMDTypeGenericGPDB::GetDXLOpScConst(CMemoryPool *mp, IDatum *datum) const
+CMDTypeGenericGPDB::GetDXLOpScConst(CMemoryPool *mp,
+									gpos::Ref<IDatum> datum) const
 {
 	gpos::Ref<CDXLDatum> dxl_datum = GetDatumVal(mp, datum);
 

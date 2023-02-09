@@ -59,8 +59,9 @@ CXformIntersect2Join::CXformIntersect2Join(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformIntersect2Join::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformIntersect2Join::Transform(gpos::Ref<CXformContext> pxfctxt,
+								gpos::Ref<CXformResult> pxfres,
+								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -72,8 +73,8 @@ CXformIntersect2Join::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	GPOS_ASSERT(2 == pexpr->Arity());
 
 	// extract components
-	CExpression *pexprLeftChild = (*pexpr)[0];
-	CExpression *pexprRightChild = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLeftChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRightChild = (*pexpr)[1];
 
 	CLogicalIntersect *popIntersect =
 		gpos::dyn_cast<CLogicalIntersect>(pexpr->Pop());

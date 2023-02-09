@@ -72,7 +72,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
@@ -120,7 +120,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalMotionRandom *PopConvert(COperator *pop);
+	static CPhysicalMotionRandom *PopConvert(gpos::Ref<COperator> pop);
 
 };	// class CPhysicalMotionRandom
 

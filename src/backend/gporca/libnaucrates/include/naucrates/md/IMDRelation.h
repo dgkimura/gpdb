@@ -179,7 +179,7 @@ public:
 	virtual gpos::Ref<IMDId> CheckConstraintMDidAt(ULONG pos) const = 0;
 
 	// part constraint
-	virtual CDXLNode *MDPartConstraint() const = 0;
+	virtual gpos::Ref<CDXLNode> MDPartConstraint() const = 0;
 
 	// child partition oids
 	virtual IMdIdArray *

@@ -71,9 +71,9 @@ CXformInnerJoin2HashJoin::Exfp(CExpressionHandle &) const
 //		Deprecated in favor of CXformImplementInnerJoin.
 //
 //---------------------------------------------------------------------------
-void
-CXformInnerJoin2HashJoin::Transform(CXformContext *, CXformResult *,
-									CExpression *) const
+void CXformInnerJoin2HashJoin::Transform(gpos::Ref<CXformContext>,
+										 gpos::Ref<CXformResult>,
+										 gpos::Ref<CExpression>) const
 {
 }
 

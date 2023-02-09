@@ -83,7 +83,7 @@ CDXLMinidump::~CDXLMinidump()
 //		Traceflags
 //
 //---------------------------------------------------------------------------
-const CBitSet *
+const gpos::Ref<CBitSet>
 CDXLMinidump::Pbs() const
 {
 	return m_pbs.get();
@@ -97,7 +97,7 @@ CDXLMinidump::Pbs() const
 //		Query object
 //
 //---------------------------------------------------------------------------
-const CDXLNode *
+const gpos::Ref<CDXLNode>
 CDXLMinidump::GetQueryDXLRoot() const
 {
 	return m_query_dxl_root.get();
@@ -139,7 +139,7 @@ CDXLMinidump::GetCTEProducerDXLArray() const
 //		Query object
 //
 //---------------------------------------------------------------------------
-const CDXLNode *
+const gpos::Ref<CDXLNode>
 CDXLMinidump::PdxlnPlan() const
 {
 	return m_plan_dxl_root.get();

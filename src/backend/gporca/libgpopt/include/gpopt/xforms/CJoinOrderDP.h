@@ -61,16 +61,16 @@ private:
 		~SComponentPair() override;
 
 		// hashing function
-		static ULONG HashValue(const SComponentPair *pcomppair);
+		static ULONG HashValue(const gpos::Ref<SComponentPair> pcomppair);
 
 		// equality function
-		static BOOL Equals(const SComponentPair *pcomppairFst,
-						   const SComponentPair *pcomppairSnd);
+		static BOOL Equals(const gpos::Ref<SComponentPair> pcomppairFst,
+						   const gpos::Ref<SComponentPair> pcomppairSnd);
 	};
 
 	// hashing function
 	static ULONG
-	UlHashBitSet(const CBitSet *pbs)
+	UlHashBitSet(const gpos::Ref<CBitSet> pbs)
 	{
 		GPOS_ASSERT(nullptr != pbs);
 
@@ -79,7 +79,8 @@ private:
 
 	// equality function
 	static BOOL
-	FEqualBitSet(const CBitSet *pbsFst, const CBitSet *pbsSnd)
+	FEqualBitSet(const gpos::Ref<CBitSet> pbsFst,
+				 const gpos::Ref<CBitSet> pbsSnd)
 	{
 		GPOS_ASSERT(nullptr != pbsFst);
 		GPOS_ASSERT(nullptr != pbsSnd);
@@ -120,47 +121,51 @@ private:
 	gpos::Ref<CExpression> m_pexprDummy;
 
 	// build expression linking given components
-	gpos::Ref<CExpression> PexprBuildPred(CBitSet *pbsFst, CBitSet *pbsSnd);
+	gpos::Ref<CExpression> PexprBuildPred(gpos::Ref<CBitSet> pbsFst,
+										  gpos::Ref<CBitSet> pbsSnd);
 
 	// lookup best join order for given set
-	CExpression *PexprLookup(CBitSet *pbs);
+	gpos::Ref<CExpression> PexprLookup(gpos::Ref<CBitSet> pbs);
 
 	// extract predicate joining the two given sets
-	CExpression *PexprPred(CBitSet *pbsFst, CBitSet *pbsSnd);
+	gpos::Ref<CExpression> PexprPred(gpos::Ref<CBitSet> pbsFst,
+									 gpos::Ref<CBitSet> pbsSnd);
 
 	// join expressions in the given two sets
-	gpos::Ref<CExpression> PexprJoin(CBitSet *pbsFst, CBitSet *pbsSnd);
+	gpos::Ref<CExpression> PexprJoin(gpos::Ref<CBitSet> pbsFst,
+									 gpos::Ref<CBitSet> pbsSnd);
 
 	// join expressions in the given set
-	CExpression *PexprJoin(CBitSet *pbs);
+	gpos::Ref<CExpression> PexprJoin(gpos::Ref<CBitSet> pbs);
 
 	// find best join order for given component using dynamic programming
-	CExpression *PexprBestJoinOrderDP(CBitSet *pbs);
+	gpos::Ref<CExpression> PexprBestJoinOrderDP(gpos::Ref<CBitSet> pbs);
 
 	// find best join order for given component
-	CExpression *PexprBestJoinOrder(CBitSet *pbs);
+	gpos::Ref<CExpression> PexprBestJoinOrder(gpos::Ref<CBitSet> pbs);
 
 	// generate cross product for the given components
-	CExpression *PexprCross(CBitSet *pbs);
+	gpos::Ref<CExpression> PexprCross(gpos::Ref<CBitSet> pbs);
 
 	// join a covered subset with uncovered subset
-	CExpression *PexprJoinCoveredSubsetWithUncoveredSubset(
-		CBitSet *pbs, CBitSet *pbsCovered, CBitSet *pbsUncovered);
+	gpos::Ref<CExpression> PexprJoinCoveredSubsetWithUncoveredSubset(
+		gpos::Ref<CBitSet> pbs, gpos::Ref<CBitSet> pbsCovered,
+		gpos::Ref<CBitSet> pbsUncovered);
 
 	// return a subset of the given set covered by one or more edges
-	gpos::Ref<CBitSet> PbsCovered(CBitSet *pbsInput);
+	gpos::Ref<CBitSet> PbsCovered(gpos::Ref<CBitSet> pbsInput);
 
 	// add given join order to best results
-	void AddJoinOrder(CExpression *pexprJoin, CDouble dCost);
+	void AddJoinOrder(gpos::Ref<CExpression> pexprJoin, CDouble dCost);
 
 	// compute cost of given join expression
-	CDouble DCost(CExpression *pexpr);
+	CDouble DCost(gpos::Ref<CExpression> pexpr);
 
 	// derive stats on given expression
-	void DeriveStats(CExpression *pexpr) override;
+	void DeriveStats(gpos::Ref<CExpression> pexpr) override;
 
 	// add expression to cost map
-	void InsertExpressionCost(CExpression *pexpr, CDouble dCost,
+	void InsertExpressionCost(gpos::Ref<CExpression> pexpr, CDouble dCost,
 							  BOOL fValidateInsert);
 
 	// generate all subsets of the given array of elements
@@ -170,7 +175,7 @@ private:
 
 	// driver of subset generation
 	static gpos::Ref<CBitSetArray> PdrgpbsSubsets(CMemoryPool *mp,
-												  CBitSet *pbs);
+												  gpos::Ref<CBitSet> pbs);
 
 public:
 	// ctor
@@ -182,7 +187,7 @@ public:
 	~CJoinOrderDP() override;
 
 	// main handler
-	virtual CExpression *PexprExpand();
+	virtual gpos::Ref<CExpression> PexprExpand();
 
 	// best join orders
 	CExpressionArray *

@@ -113,7 +113,7 @@ public:
 
 	// conversion function
 	static CLogicalNAryJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 
@@ -121,7 +121,7 @@ public:
 	}
 
 	// conversion function, only if the NAryJoin has LOJ children
-	static CLogicalNAryJoin *PopConvertNAryLOJ(COperator *pop);
+	static CLogicalNAryJoin *PopConvertNAryLOJ(gpos::Ref<COperator> pop);
 
 	BOOL
 	HasOuterJoinChildren() const
@@ -142,8 +142,8 @@ public:
 		return m_lojChildPredIndexes.get();
 	}
 
-	CExpression *
-	GetInnerJoinPreds(CExpression *nary_join_expr) const
+	gpos::Ref<CExpression>
+	GetInnerJoinPreds(gpos::Ref<CExpression> nary_join_expr) const
 	{
 		GPOS_ASSERT(nary_join_expr->Pop() == this);
 		if (HasOuterJoinChildren())
@@ -154,8 +154,8 @@ public:
 		return (*nary_join_expr)[nary_join_expr->Arity() - 1];
 	}
 
-	CExpression *
-	GetOnPredicateForLOJChild(CExpression *nary_join_expr,
+	gpos::Ref<CExpression>
+	GetOnPredicateForLOJChild(gpos::Ref<CExpression> nary_join_expr,
 							  ULONG child_num) const
 	{
 		GPOS_ASSERT(nary_join_expr->Pop() == this);
@@ -176,7 +176,7 @@ public:
 	// given an existing scalar child of an NAry join, make a new copy, replacing
 	// only the inner join predicates and leaving the LOJ ON predicates the same
 	gpos::Ref<CExpression> ReplaceInnerJoinPredicates(
-		CMemoryPool *mp, CExpression *old_nary_join_scalar_expr,
+		CMemoryPool *mp, gpos::Ref<CExpression> old_nary_join_scalar_expr,
 		gpos::Ref<CExpression> new_inner_join_preds);
 
 	IOstream &OsPrint(IOstream &os) const override;

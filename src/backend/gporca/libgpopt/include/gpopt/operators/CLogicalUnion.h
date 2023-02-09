@@ -113,7 +113,7 @@ public:
 
 	// conversion function
 	static CLogicalUnion *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalUnion == pop->Eopid());

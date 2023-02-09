@@ -164,7 +164,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
@@ -190,7 +190,7 @@ public:
 
 	// compute required ctes of the n-th child
 	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CCTEReq *pcter, ULONG child_index,
+									gpos::Ref<CCTEReq> pcter, ULONG child_index,
 									CDrvdPropArray *pdrgpdpCtxt,
 									ULONG ulOptReq) const override;
 
@@ -259,7 +259,7 @@ public:
 
 	// conversion function
 	static CPhysicalAgg *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(CUtils::FPhysicalAgg(pop));
 

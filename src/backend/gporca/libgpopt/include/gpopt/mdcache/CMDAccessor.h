@@ -188,7 +188,7 @@ private:
 		~SMDProviderElem();
 
 		// return the MD provider
-		IMDProvider *Pmdp();
+		gpos::Ref<IMDProvider> Pmdp();
 
 		// return the system id
 		CSystemId Sysid() const;
@@ -240,7 +240,7 @@ private:
 	static void DestroyProviderElement(SMDProviderElem *pmdpelem);
 
 	// lookup an MD provider by system id
-	IMDProvider *Pmdp(CSystemId sysid);
+	gpos::Ref<IMDProvider> Pmdp(CSystemId sysid);
 
 	// initialize hash tables
 	void InitHashtables(CMemoryPool *mp);
@@ -255,7 +255,7 @@ private:
 						   BOOL isEmptyTable,
 						   UlongToHistogramMap *col_histogram_mapping,
 						   UlongToDoubleMap *colid_width_mapping,
-						   CStatisticsConfig *stats_config);
+						   gpos::Ref<CStatisticsConfig> stats_config);
 
 	// construct a stats histogram from an MD column stats object
 	CHistogram *GetHistogram(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
@@ -263,11 +263,11 @@ private:
 
 	// construct a typed bucket from a DXL bucket
 	CBucket *Pbucket(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
-					 const CDXLBucket *dxl_bucket);
+					 const gpos::Ref<CDXLBucket> dxl_bucket);
 
 	// construct a typed datum from a DXL bucket
 	gpos::Ref<IDatum> GetDatum(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
-							   const CDXLDatum *dxl_datum);
+							   const gpos::Ref<CDXLDatum> dxl_datum);
 
 public:
 	CMDAccessor(const CMDAccessor &) = delete;
@@ -366,7 +366,7 @@ public:
 			*pcrsHist,	// set of column references for which stats are needed
 		CColRefSet *
 			pcrsWidth,	// set of column references for which the widths are needed
-		CStatisticsConfig *stats_config = nullptr);
+		gpos::Ref<CStatisticsConfig> stats_config = nullptr);
 
 	// serialize object to passed stream
 	void Serialize(COstream &oos);

@@ -58,8 +58,8 @@ private:
 
 	// search the given array of predicates for an equality predicate that has
 	// one side equal to given expression
-	static CExpression *PexprMatchEqualitySide(
-		CExpression *pexprToMatch,
+	static gpos::Ref<CExpression> PexprMatchEqualitySide(
+		gpos::Ref<CExpression> pexprToMatch,
 		CExpressionArray *pdrgpexpr	 // array of predicates to inspect
 	);
 
@@ -76,7 +76,7 @@ public:
 	~CPhysicalScan() override;
 
 	// return table descriptor
-	virtual CTableDescriptor *
+	virtual gpos::Ref<CTableDescriptor>
 	Ptabdesc() const
 	{
 		return m_ptabdesc.get();
@@ -114,7 +114,7 @@ public:
 	gpos::Ref<CCTEReq>
 	PcteRequired(CMemoryPool *,		   //mp,
 				 CExpressionHandle &,  //exprhdl,
-				 CCTEReq *,			   //pcter,
+				 gpos::Ref<CCTEReq>,   //pcter,
 				 ULONG,				   //child_index,
 				 CDrvdPropArray *,	   //pdrgpdpCtxt,
 				 ULONG				   //ulOptReq
@@ -250,7 +250,7 @@ public:
 	}
 
 	// stats of underlying table
-	IStatistics *
+	gpos::Ref<IStatistics>
 	PstatsBaseTable() const
 	{
 		return m_pstatsBaseTable.get();
@@ -262,7 +262,7 @@ public:
 		IStatisticsArray *stats_ctxt) const = 0;
 
 	// conversion function
-	static CPhysicalScan *PopConvert(COperator *pop);
+	static CPhysicalScan *PopConvert(gpos::Ref<COperator> pop);
 
 };	// class CPhysicalScan
 

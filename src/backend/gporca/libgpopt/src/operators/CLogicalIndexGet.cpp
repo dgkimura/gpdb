@@ -139,7 +139,7 @@ CLogicalIndexGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalIndexGet::Matches(COperator *pop) const
+CLogicalIndexGet::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchIndex(this, pop);
 }

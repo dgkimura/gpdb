@@ -75,7 +75,7 @@ public:
 
 	// conversion function
 	static CStatsPredArrayCmp *
-	ConvertPredStats(CStatsPred *pred_stats)
+	ConvertPredStats(gpos::Ref<CStatsPred> pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptArrayCmp == pred_stats->GetPredStatsType());

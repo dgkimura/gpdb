@@ -79,7 +79,7 @@ public:
 
 	// conversion function
 	static CPhysicalInnerHashJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalInnerHashJoin == pop->Eopid());
 

@@ -63,7 +63,7 @@ CPhysicalMotionHashDistribute::~CPhysicalMotionHashDistribute()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionHashDistribute::Matches(COperator *pop) const
+CPhysicalMotionHashDistribute::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
@@ -211,7 +211,7 @@ CPhysicalMotionHashDistribute::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CPhysicalMotionHashDistribute *
-CPhysicalMotionHashDistribute::PopConvert(COperator *pop)
+CPhysicalMotionHashDistribute::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionHashDistribute == pop->Eopid());

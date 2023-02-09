@@ -32,14 +32,15 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotion::FValidContext(CMemoryPool *, COptimizationContext *poc,
+CPhysicalMotion::FValidContext(CMemoryPool *,
+							   gpos::Ref<COptimizationContext> poc,
 							   COptimizationContextArray *pdrgpocChild) const
 {
 	GPOS_ASSERT(nullptr != pdrgpocChild);
 	GPOS_ASSERT(1 == pdrgpocChild->Size());
 
-	COptimizationContext *pocChild = (*pdrgpocChild)[0].get();
-	CCostContext *pccBest = pocChild->PccBest();
+	gpos::Ref<COptimizationContext> pocChild = (*pdrgpocChild)[0].get();
+	gpos::Ref<CCostContext> pccBest = pocChild->PccBest();
 	GPOS_ASSERT(nullptr != pccBest);
 
 	CDrvdPropPlan *pdpplanChild = pccBest->Pdpplan();
@@ -198,7 +199,7 @@ CPhysicalMotion::PppsRequired(CMemoryPool *mp, CExpressionHandle &,
 gpos::Ref<CCTEReq>
 CPhysicalMotion::PcteRequired(CMemoryPool *,		//mp,
 							  CExpressionHandle &,	//exprhdl,
-							  CCTEReq *pcter,
+							  gpos::Ref<CCTEReq> pcter,
 							  ULONG
 #ifdef GPOS_DEBUG
 								  child_index

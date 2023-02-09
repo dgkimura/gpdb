@@ -82,8 +82,9 @@ CXformSplitLimit::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformSplitLimit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							CExpression *pexpr) const
+CXformSplitLimit::Transform(gpos::Ref<CXformContext> pxfctxt,
+							gpos::Ref<CXformResult> pxfres,
+							gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -93,9 +94,9 @@ CXformSplitLimit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 	// extract components
 	CLogicalLimit *popLimit = gpos::dyn_cast<CLogicalLimit>(pexpr->Pop());
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprScalarStart = (*pexpr)[1];
-	CExpression *pexprScalarRows = (*pexpr)[2];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalarStart = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprScalarRows = (*pexpr)[2];
 	COrderSpec *pos = popLimit->Pos();
 
 	// TODO: , Feb 20, 2012, we currently only split limit with offset 0.
@@ -135,9 +136,9 @@ CXformSplitLimit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 gpos::Ref<CExpression>
 CXformSplitLimit::PexprLimit(CMemoryPool *mp,
 							 gpos::Ref<CExpression> pexprRelational,
-							 CExpression *pexprScalarStart,
-							 CExpression *pexprScalarRows, COrderSpec *pos,
-							 BOOL fGlobal, BOOL fHasCount,
+							 gpos::Ref<CExpression> pexprScalarStart,
+							 gpos::Ref<CExpression> pexprScalarRows,
+							 COrderSpec *pos, BOOL fGlobal, BOOL fHasCount,
 							 BOOL fTopLimitUnderDML)
 {
 	;

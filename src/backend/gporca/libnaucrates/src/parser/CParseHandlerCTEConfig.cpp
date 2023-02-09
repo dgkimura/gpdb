@@ -140,7 +140,7 @@ CParseHandlerCTEConfig::GetParseHandlerType() const
 //		Returns the CTE configuration
 //
 //---------------------------------------------------------------------------
-CCTEConfig *
+gpos::Ref<CCTEConfig>
 CParseHandlerCTEConfig::GetCteConf() const
 {
 	return m_cte_conf.get();

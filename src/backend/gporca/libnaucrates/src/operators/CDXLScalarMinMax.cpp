@@ -95,7 +95,7 @@ CDXLScalarMinMax::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarMinMax::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *dxlnode) const
+								 const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -133,7 +133,7 @@ CDXLScalarMinMax::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarMinMax::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarMinMax::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(0 < dxlnode->Arity());
@@ -141,7 +141,7 @@ CDXLScalarMinMax::AssertValid(const CDXLNode *dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[idx];
+		gpos::Ref<CDXLNode> dxlnode_arg = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

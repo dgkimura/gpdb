@@ -68,9 +68,9 @@ CXformImplementBitmapTableGet::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementBitmapTableGet::Transform(CXformContext *pxfctxt,
-										 CXformResult *pxfres,
-										 CExpression *pexpr) const
+CXformImplementBitmapTableGet::Transform(gpos::Ref<CXformContext> pxfctxt,
+										 gpos::Ref<CXformResult> pxfres,
+										 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -92,8 +92,8 @@ CXformImplementBitmapTableGet::Transform(CXformContext *pxfctxt,
 			GPOS_NEW(mp) CName(mp, *popLogical->PnameTableAlias()),
 			std::move(pdrgpcrOutput));
 
-	CExpression *pexprCondition = (*pexpr)[0];
-	CExpression *pexprIndexPath = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprCondition = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprIndexPath = (*pexpr)[1];
 	;
 	;
 

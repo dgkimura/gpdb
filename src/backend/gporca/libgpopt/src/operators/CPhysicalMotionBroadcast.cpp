@@ -60,7 +60,7 @@ CPhysicalMotionBroadcast::~CPhysicalMotionBroadcast()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionBroadcast::Matches(COperator *pop) const
+CPhysicalMotionBroadcast::Matches(gpos::Ref<COperator> pop) const
 {
 	return Eopid() == pop->Eopid();
 }
@@ -198,7 +198,7 @@ CPhysicalMotionBroadcast::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CPhysicalMotionBroadcast *
-CPhysicalMotionBroadcast::PopConvert(COperator *pop)
+CPhysicalMotionBroadcast::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionBroadcast == pop->Eopid());

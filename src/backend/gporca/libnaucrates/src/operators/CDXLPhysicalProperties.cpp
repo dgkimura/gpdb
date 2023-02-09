@@ -75,7 +75,7 @@ CDXLPhysicalProperties::SerializePropertiesToDXL(
 //		Return cost of operator
 //
 //---------------------------------------------------------------------------
-CDXLOperatorCost *
+gpos::Ref<CDXLOperatorCost>
 CDXLPhysicalProperties::GetDXLOperatorCost() const
 {
 	return m_operator_cost_dxl.get();

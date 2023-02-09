@@ -69,7 +69,7 @@ CPhysicalConstTableGet::~CPhysicalConstTableGet()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalConstTableGet::Matches(COperator *pop) const
+CPhysicalConstTableGet::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() == pop->Eopid())
 	{
@@ -182,7 +182,7 @@ CPhysicalConstTableGet::PrsRequired(CMemoryPool *,		   // mp,
 gpos::Ref<CCTEReq>
 CPhysicalConstTableGet::PcteRequired(CMemoryPool *,		   //mp,
 									 CExpressionHandle &,  //exprhdl,
-									 CCTEReq *,			   //pcter,
+									 gpos::Ref<CCTEReq>,   //pcter,
 									 ULONG,				   //child_index,
 									 CDrvdPropArray *,	   //pdrgpdpCtxt,
 									 ULONG				   //ulOptReq
@@ -354,7 +354,7 @@ CPhysicalConstTableGet::OsPrint(IOstream &os) const
 			const ULONG length = pdrgpdatum->Size();
 			for (ULONG ulB = 0; ulB < length; ulB++)
 			{
-				IDatum *datum = (*pdrgpdatum)[ulB].get();
+				gpos::Ref<IDatum> datum = (*pdrgpdatum)[ulB].get();
 				datum->OsPrint(os);
 
 				if (ulB < length - 1)

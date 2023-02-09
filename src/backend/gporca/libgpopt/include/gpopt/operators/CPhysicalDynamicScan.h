@@ -126,7 +126,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalDynamicScan *PopConvert(COperator *pop);
+	static CPhysicalDynamicScan *PopConvert(gpos::Ref<COperator> pop);
 };
 }  // namespace gpopt
 

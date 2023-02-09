@@ -132,7 +132,7 @@ CDXLColStats::Buckets() const
 //		Returns the bucket at the given position
 //
 //---------------------------------------------------------------------------
-const CDXLBucket *
+const gpos::Ref<CDXLBucket>
 CDXLColStats::GetDXLBucketAt(ULONG pos) const
 {
 	return (*m_dxl_stats_bucket_array)[pos].get();
@@ -176,7 +176,7 @@ CDXLColStats::Serialize(CXMLSerializer *xml_serializer) const
 	ULONG num_of_buckets = Buckets();
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
 	{
-		const CDXLBucket *dxl_bucket = GetDXLBucketAt(ul);
+		const gpos::Ref<CDXLBucket> dxl_bucket = GetDXLBucketAt(ul);
 		dxl_bucket->Serialize(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -209,7 +209,7 @@ CDXLColStats::DebugPrint(IOstream &os) const
 
 	for (ULONG ul = 0; ul < Buckets(); ul++)
 	{
-		const CDXLBucket *dxl_bucket = GetDXLBucketAt(ul);
+		const gpos::Ref<CDXLBucket> dxl_bucket = GetDXLBucketAt(ul);
 		dxl_bucket->DebugPrint(os);
 	}
 }

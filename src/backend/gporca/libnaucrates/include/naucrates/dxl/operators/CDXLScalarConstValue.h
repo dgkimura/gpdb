@@ -49,7 +49,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// return the datum value
-	const CDXLDatum *
+	const gpos::Ref<CDXLDatum>
 	GetDatumVal() const
 	{
 		return m_dxl_datum.get();
@@ -60,11 +60,11 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *node) const override;
+						const gpos::Ref<CDXLNode> node) const override;
 
 	// conversion function
 	static CDXLScalarConstValue *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarConstValue == dxl_op->GetDXLOperator());
@@ -77,7 +77,7 @@ public:
 
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure
-	void AssertValid(const CDXLNode *dxlnode,
+	void AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };

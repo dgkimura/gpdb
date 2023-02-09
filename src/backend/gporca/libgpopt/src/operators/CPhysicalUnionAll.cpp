@@ -152,7 +152,7 @@ CPhysicalUnionAll::PdrgpdrgpcrInput() const
 }
 
 CPhysicalUnionAll *
-CPhysicalUnionAll::PopConvert(COperator *pop)
+CPhysicalUnionAll::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 
@@ -172,7 +172,7 @@ CPhysicalUnionAll::PopConvert(COperator *pop)
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalUnionAll::Matches(COperator *pop) const
+CPhysicalUnionAll::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() == pop->Eopid())
 	{
@@ -263,7 +263,7 @@ CPhysicalUnionAll::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEReq>
 CPhysicalUnionAll::PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								CCTEReq *pcter, ULONG child_index,
+								gpos::Ref<CCTEReq> pcter, ULONG child_index,
 								CDrvdPropArray *pdrgpdpCtxt,
 								ULONG  //ulOptReq
 ) const
@@ -630,7 +630,7 @@ CPhysicalUnionAll::PdshashedPassThru(CMemoryPool *mp,
 		GPOS_NEW(mp) CExpressionArray(mp);
 	for (ULONG ulExpr = 0; ulExpr < ulExprs; ulExpr++)
 	{
-		CExpression *pexpr = (*pdrgpexprRequired)[ulExpr].get();
+		gpos::Ref<CExpression> pexpr = (*pdrgpexprRequired)[ulExpr].get();
 		if (COperator::EopScalarIdent != pexpr->Pop()->Eopid())
 		{
 			// skip expressions that are not in form of scalar identifiers
@@ -777,7 +777,7 @@ CPhysicalUnionAll::PdrgpulMap(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
 	gpos::Ref<ULongPtrArray> pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 	for (ULONG ulExpr = 0; ulExpr < ulExprs; ulExpr++)
 	{
-		CExpression *pexpr = (*pdrgpexpr)[ulExpr].get();
+		gpos::Ref<CExpression> pexpr = (*pdrgpexpr)[ulExpr].get();
 		if (COperator::EopScalarIdent != pexpr->Pop()->Eopid())
 		{
 			continue;

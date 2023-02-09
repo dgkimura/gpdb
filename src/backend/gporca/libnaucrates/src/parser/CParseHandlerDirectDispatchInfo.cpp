@@ -168,7 +168,7 @@ CParseHandlerDirectDispatchInfo::EndElement(
 //		Return parsed DXL datum array
 //
 //---------------------------------------------------------------------------
-CDXLDirectDispatchInfo *
+gpos::Ref<CDXLDirectDispatchInfo>
 CParseHandlerDirectDispatchInfo::GetDXLDirectDispatchInfo() const
 {
 	return m_direct_dispatch_info.get();

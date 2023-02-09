@@ -126,7 +126,7 @@ public:
 
 	// construct a datum from a DXL datum
 	virtual gpos::Ref<IDatum> GetDatumForDXLDatum(
-		CMemoryPool *mp, const CDXLDatum *dxl_datum) const = 0;
+		CMemoryPool *mp, const gpos::Ref<CDXLDatum> dxl_datum) const = 0;
 
 	// is type fixed length
 	virtual BOOL IsFixedLength() const = 0;
@@ -150,15 +150,15 @@ public:
 	virtual BOOL IsPassedByValue() const = 0;
 
 	// return the null constant for this type
-	virtual IDatum *DatumNull() const = 0;
+	virtual gpos::Ref<IDatum> DatumNull() const = 0;
 
 	// generate the DXL scalar constant from IDatum
 	virtual gpos::Ref<CDXLScalarConstValue> GetDXLOpScConst(
-		CMemoryPool *mp, IDatum *datum) const = 0;
+		CMemoryPool *mp, gpos::Ref<IDatum> datum) const = 0;
 
 	// generate the DXL datum from IDatum
 	virtual gpos::Ref<CDXLDatum> GetDatumVal(CMemoryPool *mp,
-											 IDatum *datum) const = 0;
+											 gpos::Ref<IDatum> datum) const = 0;
 
 	// generate the DXL datum representing null value
 	virtual gpos::Ref<CDXLDatum> GetDXLDatumNull(CMemoryPool *mp) const = 0;
@@ -179,7 +179,7 @@ public:
 
 	// return true if we can perform statistical comparison between datum of the given type and a given datum; else return false
 	static BOOL StatsAreComparable(const IMDType *mdtype_first,
-								   const IDatum *datum_second);
+								   const gpos::Ref<IDatum> datum_second);
 };
 }  // namespace gpmd
 

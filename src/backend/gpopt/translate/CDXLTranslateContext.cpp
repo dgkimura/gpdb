@@ -98,8 +98,9 @@ CDXLTranslateContext::CopyParamHashmap(ULongToColParamMap *original)
 	ULongToColParamMapIter hashmapiter(original);
 	while (hashmapiter.Advance())
 	{
-		CMappingElementColIdParamId *colidparamid =
-			const_cast<CMappingElementColIdParamId *>(hashmapiter.Value());
+		gpos::Ref<CMappingElementColIdParamId> colidparamid =
+			const_cast<gpos::Ref<CMappingElementColIdParamId> >(
+				hashmapiter.Value());
 
 		const ULONG colid = colidparamid->GetColId();
 		ULONG *key = GPOS_NEW(m_mp) ULONG(colid);
@@ -130,7 +131,7 @@ CDXLTranslateContext::GetTargetEntry(ULONG colid) const
 //		Lookup col->param mapping associated with a given col id
 //
 //---------------------------------------------------------------------------
-const CMappingElementColIdParamId *
+const gpos::Ref<CMappingElementColIdParamId>
 CDXLTranslateContext::GetParamIdMappingElement(ULONG colid) const
 {
 	return m_colid_to_paramid_map->Find(&colid);

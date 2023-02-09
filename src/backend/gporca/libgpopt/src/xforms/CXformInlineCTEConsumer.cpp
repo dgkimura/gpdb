@@ -49,7 +49,7 @@ CXformInlineCTEConsumer::Exfp(CExpressionHandle &exprhdl) const
 {
 	const ULONG id =
 		gpos::dyn_cast<CLogicalCTEConsumer>(exprhdl.Pop())->UlCTEId();
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 
 	if ((pcteinfo->FEnableInlining() || 1 == pcteinfo->UlConsumers(id)) &&
 		CXformUtils::FInlinableCTE(id))
@@ -69,13 +69,13 @@ CXformInlineCTEConsumer::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformInlineCTEConsumer::Transform(CXformContext *
+CXformInlineCTEConsumer::Transform(gpos::Ref<CXformContext>
 #ifdef GPOS_DEBUG
 									   pxfctxt
 #endif
 								   ,
-								   CXformResult *pxfres,
-								   CExpression *pexpr) const
+								   gpos::Ref<CXformResult> pxfres,
+								   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

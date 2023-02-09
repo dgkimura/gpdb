@@ -51,7 +51,7 @@ const CGroupExpression CGroupExpression::m_gexprInvalid{};
 CGroupExpression::CGroupExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
 								   gpos::Ref<CGroupArray> pdrgpgroup,
 								   CXform::EXformId exfid,
-								   CGroupExpression *pgexprOrigin,
+								   gpos::Ref<CGroupExpression> pgexprOrigin,
 								   BOOL fIntermediate)
 	: m_pgexprDuplicate(nullptr),
 	  m_pop(pop),
@@ -157,7 +157,7 @@ CGroupExpression::CleanupContexts()
 //
 //---------------------------------------------------------------------------
 void
-CGroupExpression::Init(CGroup *pgroup, ULONG id)
+CGroupExpression::Init(gpos::Ref<CGroup> pgroup, ULONG id)
 {
 	SetGroup(pgroup);
 	SetId(id);
@@ -182,7 +182,7 @@ CGroupExpression::SetOptimizationLevel()
 	// producer gets optimized before its consumers
 	if (COperator::EopPhysicalSequence == m_pop->Eopid())
 	{
-		CGroup *pgroupFirst = (*this)[0];
+		gpos::Ref<CGroup> pgroupFirst = (*this)[0];
 		if (pgroupFirst->FHasCTEProducer())
 		{
 			m_eol = EolHigh;
@@ -241,7 +241,8 @@ CGroupExpression::SetOptimizationLevel()
 //
 //---------------------------------------------------------------------------
 BOOL
-CGroupExpression::FValidContext(CMemoryPool *mp, COptimizationContext *poc,
+CGroupExpression::FValidContext(CMemoryPool *mp,
+								gpos::Ref<COptimizationContext> poc,
 								COptimizationContextArray *pdrgpocChild)
 {
 	GPOS_ASSERT(m_pop->FPhysical());
@@ -277,7 +278,7 @@ CGroupExpression::SetId(ULONG id)
 //
 //---------------------------------------------------------------------------
 void
-CGroupExpression::SetGroup(CGroup *pgroup)
+CGroupExpression::SetGroup(gpos::Ref<CGroup> pgroup)
 {
 	GPOS_ASSERT(nullptr == m_pgroup);
 	GPOS_ASSERT(nullptr != pgroup);
@@ -294,13 +295,13 @@ CGroupExpression::SetGroup(CGroup *pgroup)
 //
 //---------------------------------------------------------------------------
 BOOL
-CGroupExpression::FCostContextExists(COptimizationContext *poc,
+CGroupExpression::FCostContextExists(gpos::Ref<COptimizationContext> poc,
 									 COptimizationContextArray *pdrgpoc)
 {
 	GPOS_ASSERT(nullptr != poc);
 
 	// lookup context based on required properties
-	CCostContext *pccFound = nullptr;
+	gpos::Ref<CCostContext> pccFound = nullptr;
 	{
 		ShtAcc shta(Sht(), poc);
 		pccFound = shta.Find();
@@ -333,12 +334,12 @@ CGroupExpression::FCostContextExists(COptimizationContext *poc,
 //			Remove cost context in hash table;
 //
 //---------------------------------------------------------------------------
-CCostContext *
-CGroupExpression::PccRemove(COptimizationContext *poc, ULONG ulOptReq)
+gpos::Ref<CCostContext>
+CGroupExpression::PccRemove(gpos::Ref<COptimizationContext> poc, ULONG ulOptReq)
 {
 	GPOS_ASSERT(nullptr != poc);
 	ShtAcc shta(Sht(), poc);
-	CCostContext *pccFound = shta.Find();
+	gpos::Ref<CCostContext> pccFound = shta.Find();
 	while (nullptr != pccFound)
 	{
 		if (ulOptReq == pccFound->UlOptReq())
@@ -364,17 +365,17 @@ CGroupExpression::PccRemove(COptimizationContext *poc, ULONG ulOptReq)
 //			return the context that is kept in hash table
 //
 //---------------------------------------------------------------------------
-CCostContext *
+gpos::Ref<CCostContext>
 CGroupExpression::PccInsertBest(gpos::Ref<CCostContext> pcc)
 {
 	GPOS_ASSERT(nullptr != pcc);
 
-	COptimizationContext *poc = pcc->Poc();
+	gpos::Ref<COptimizationContext> poc = pcc->Poc();
 	const ULONG ulOptReq = pcc->UlOptReq();
 
 	// remove existing cost context, if any
 	gpos::Ref<CCostContext> pccExisting = PccRemove(poc, ulOptReq);
-	CCostContext *pccKept = nullptr;
+	gpos::Ref<CCostContext> pccKept = nullptr;
 
 	// compare existing context with given context
 	if (nullptr == pccExisting || pcc->FBetterThan(pccExisting.get()))
@@ -413,9 +414,9 @@ CGroupExpression::PccInsertBest(gpos::Ref<CCostContext> pcc)
 //		the function returns the cost context containing the computed cost
 //
 //---------------------------------------------------------------------------
-CCostContext *
+gpos::Ref<CCostContext>
 CGroupExpression::PccComputeCost(
-	CMemoryPool *mp, COptimizationContext *poc, ULONG ulOptReq,
+	CMemoryPool *mp, gpos::Ref<COptimizationContext> poc, ULONG ulOptReq,
 	COptimizationContextArray *pdrgpoc,	 // array of child contexts
 	BOOL fPruned,  // is created cost context pruned based on cost bound
 	CCost
@@ -492,7 +493,8 @@ CGroupExpression::PccComputeCost(
 //---------------------------------------------------------------------------
 CCost
 CGroupExpression::CostLowerBound(CMemoryPool *mp, CReqdPropPlan *prppInput,
-								 CCostContext *pccChild, ULONG child_index)
+								 gpos::Ref<CCostContext> pccChild,
+								 ULONG child_index)
 {
 	GPOS_ASSERT(nullptr != prppInput);
 	GPOS_ASSERT(Pop()->FPhysical());
@@ -563,7 +565,7 @@ CGroupExpression::ResetState()
 //
 //---------------------------------------------------------------------------
 CCost
-CGroupExpression::CostCompute(CMemoryPool *mp, CCostContext *pcc)
+CGroupExpression::CostCompute(CMemoryPool *mp, gpos::Ref<CCostContext> pcc)
 {
 	GPOS_ASSERT(nullptr != pcc);
 
@@ -573,7 +575,7 @@ CGroupExpression::CostCompute(CMemoryPool *mp, CCostContext *pcc)
 	const ULONG length = pdrgpoc->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		COptimizationContext *pocChild = (*pdrgpoc)[ul].get();
+		gpos::Ref<COptimizationContext> pocChild = (*pdrgpoc)[ul].get();
 		pdrgpcostChildren->Append(GPOS_NEW(mp)
 									  CCost(pocChild->PccBest()->Cost()));
 	}
@@ -611,13 +613,13 @@ CGroupExpression::FTransitioned(EState estate) const
 //		Lookup cost context in hash table;
 //
 //---------------------------------------------------------------------------
-CCostContext *
-CGroupExpression::PccLookup(COptimizationContext *poc, ULONG ulOptReq)
+gpos::Ref<CCostContext>
+CGroupExpression::PccLookup(gpos::Ref<COptimizationContext> poc, ULONG ulOptReq)
 {
 	GPOS_ASSERT(nullptr != poc);
 
 	ShtAcc shta(Sht(), poc);
-	CCostContext *pccFound = shta.Find();
+	gpos::Ref<CCostContext> pccFound = shta.Find();
 	while (nullptr != pccFound)
 	{
 		if (ulOptReq == pccFound->UlOptReq())
@@ -641,12 +643,13 @@ CGroupExpression::PccLookup(COptimizationContext *poc, ULONG ulOptReq)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CCostContextArray>
-CGroupExpression::PdrgpccLookupAll(CMemoryPool *mp, COptimizationContext *poc)
+CGroupExpression::PdrgpccLookupAll(CMemoryPool *mp,
+								   gpos::Ref<COptimizationContext> poc)
 {
 	GPOS_ASSERT(nullptr != poc);
 	gpos::Ref<CCostContextArray> pdrgpcc = GPOS_NEW(mp) CCostContextArray(mp);
 
-	CCostContext *pccFound = nullptr;
+	gpos::Ref<CCostContext> pccFound = nullptr;
 	BOOL fValid = false;
 	{
 		ShtAcc shta(Sht(), poc);
@@ -685,15 +688,15 @@ CGroupExpression::PdrgpccLookupAll(CMemoryPool *mp, COptimizationContext *poc)
 //		Insert a cost context in hash table;
 //
 //---------------------------------------------------------------------------
-CCostContext *
-CGroupExpression::PccInsert(CCostContext *pcc)
+gpos::Ref<CCostContext>
+CGroupExpression::PccInsert(gpos::Ref<CCostContext> pcc)
 {
 	// HERE BE DRAGONS
 	// See comment in CCache::InsertEntry
-	COptimizationContext *const poc = pcc->Poc();
+	gpos::Ref<COptimizationContext> const poc = pcc->Poc();
 	ShtAcc shta(Sht(), poc);
 
-	CCostContext *pccFound = shta.Find();
+	gpos::Ref<CCostContext> pccFound = shta.Find();
 	while (nullptr != pccFound)
 	{
 		if (CCostContext::Equals(*pcc, *pccFound))
@@ -719,7 +722,8 @@ CGroupExpression::PccInsert(CCostContext *pcc)
 //---------------------------------------------------------------------------
 void
 CGroupExpression::PreprocessTransform(CMemoryPool *pmpLocal,
-									  CMemoryPool *pmpGlobal, CXform *pxform)
+									  CMemoryPool *pmpGlobal,
+									  gpos::Ref<CXform> pxform)
 {
 	if (CXformUtils::FDeriveStatsBeforeXform(pxform) &&
 		nullptr == Pgroup()->Pstats())
@@ -746,7 +750,7 @@ CGroupExpression::PreprocessTransform(CMemoryPool *pmpLocal,
 void
 CGroupExpression::PostprocessTransform(CMemoryPool *,  // pmpLocal
 									   CMemoryPool *,  // pmpGlobal
-									   CXform *pxform) const
+									   gpos::Ref<CXform> pxform) const
 {
 	if (CXformUtils::FDeriveStatsBeforeXform(pxform))
 	{
@@ -765,8 +769,8 @@ CGroupExpression::PostprocessTransform(CMemoryPool *,  // pmpLocal
 //---------------------------------------------------------------------------
 void
 CGroupExpression::Transform(
-	CMemoryPool *mp, CMemoryPool *pmpLocal, CXform *pxform,
-	CXformResult *pxfres,
+	CMemoryPool *mp, CMemoryPool *pmpLocal, gpos::Ref<CXform> pxform,
+	gpos::Ref<CXformResult> pxfres,
 	ULONG *pulElapsedTime,	// output: elapsed time in millisecond
 	ULONG *pulNumberOfBindings)
 {
@@ -812,10 +816,10 @@ CGroupExpression::Transform(
 	CBinding binding;
 	gpos::Ref<CXformContext> pxfctxt = GPOS_NEW(mp) CXformContext(mp);
 
-	COptimizerConfig *optconfig =
+	gpos::Ref<COptimizerConfig> optconfig =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 	ULONG bindThreshold = optconfig->GetHint()->UlXformBindThreshold();
-	CExpression *pexprPattern = pxform->PexprPattern();
+	gpos::Ref<CExpression> pexprPattern = pxform->PexprPattern();
 	gpos::Ref<CExpression> pexpr =
 		binding.PexprExtract(mp, this, pexprPattern, nullptr);
 	while (nullptr != pexpr)
@@ -865,7 +869,8 @@ CGroupExpression::Transform(
 //
 //---------------------------------------------------------------------------
 BOOL
-CGroupExpression::FMatchNonScalarChildren(const CGroupExpression *pgexpr) const
+CGroupExpression::FMatchNonScalarChildren(
+	const gpos::Ref<CGroupExpression> pgexpr) const
 {
 	GPOS_ASSERT(nullptr != pgexpr);
 
@@ -888,7 +893,7 @@ CGroupExpression::FMatchNonScalarChildren(const CGroupExpression *pgexpr) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CGroupExpression::Matches(const CGroupExpression *pgexpr) const
+CGroupExpression::Matches(const gpos::Ref<CGroupExpression> pgexpr) const
 {
 	GPOS_ASSERT(nullptr != pgexpr);
 
@@ -946,7 +951,7 @@ CGroupExpression::Matches(const CGroupExpression *pgexpr) const
 //
 //---------------------------------------------------------------------------
 ULONG
-CGroupExpression::HashValue(COperator *pop, CGroupArray *pdrgpgroup)
+CGroupExpression::HashValue(gpos::Ref<COperator> pop, CGroupArray *pdrgpgroup)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(nullptr != pdrgpgroup);
@@ -986,7 +991,7 @@ CGroupExpression::HashValue(const CGroupExpression &gexpr)
 //		Derive stats recursively on group expression
 //
 //---------------------------------------------------------------------------
-IStatistics *
+gpos::Ref<IStatistics>
 CGroupExpression::PstatsRecursiveDerive(CMemoryPool *,	// pmpLocal
 										CMemoryPool *pmpGlobal,
 										CReqdPropRelational *prprel,
@@ -1008,7 +1013,7 @@ CGroupExpression::PstatsRecursiveDerive(CMemoryPool *,	// pmpLocal
 
 	// trigger recursive stat derivation
 	exprhdl.DeriveStats(stats_ctxt, fComputeRootStats);
-	IStatistics *stats = exprhdl.Pstats();
+	gpos::Ref<IStatistics> stats = exprhdl.Pstats();
 	if (nullptr != stats)
 	{
 		;
@@ -1027,9 +1032,9 @@ CGroupExpression::PstatsRecursiveDerive(CMemoryPool *,	// pmpLocal
 //
 //---------------------------------------------------------------------------
 void
-CGroupExpression::PrintXform(CMemoryPool *mp, CXform *pxform,
-							 CExpression *pexpr, CXformResult *pxfres,
-							 ULONG ulNumResults)
+CGroupExpression::PrintXform(CMemoryPool *mp, gpos::Ref<CXform> pxform,
+							 gpos::Ref<CExpression> pexpr,
+							 gpos::Ref<CXformResult> pxfres, ULONG ulNumResults)
 {
 	if (nullptr != pexpr && GPOS_FTRACE(EopttracePrintXform) &&
 		GPOS_FTRACE(EopttracePrintXformResults))
@@ -1068,8 +1073,8 @@ CGroupExpression::OsPrintCostContexts(IOstream &os, const CHAR *szPrefix) const
 	{
 		// print cost contexts
 		os << szPrefix << szPrefix << "Cost Ctxts:" << std::endl;
-		CCostContext *pcc = nullptr;
-		ShtIter shtit(const_cast<CGroupExpression *>(this)->Sht());
+		gpos::Ref<CCostContext> pcc = nullptr;
+		ShtIter shtit(const_cast<gpos::Ref<CGroupExpression> >(this)->Sht());
 		while (shtit.Advance())
 		{
 			{
@@ -1119,12 +1124,13 @@ CGroupExpression::ContainsCircularDependencies()
 	CGroupArray *child_groups = Pdrgpgroup();
 	for (ULONG ul = 0; ul < child_groups->Size(); ul++)
 	{
-		CGroup *child_group = (*child_groups)[ul];
+		gpos::Ref<CGroup> child_group = (*child_groups)[ul];
 		if (child_group->FScalar())
 		{
 			continue;
 		}
-		CGroup *child_duplicate_group = child_group->PgroupDuplicate();
+		gpos::Ref<CGroup> child_duplicate_group =
+			child_group->PgroupDuplicate();
 		if (child_duplicate_group != nullptr)
 		{
 			ULONG child_duplicate_group_id = child_duplicate_group->Id();

@@ -170,13 +170,14 @@ public:
 
 	// generate a randomized Select expression to be used for building subquery examples
 	static gpos::Ref<CExpression> PexprSubquery(
-		CMemoryPool *mp, CExpression *pexprOuter,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
 		gpos::Ref<CExpression> pexprInner, BOOL fCorrelated);
 
 	// generate a quantified subquery expression
 	static gpos::Ref<CExpression> PexprSubqueryQuantified(
-		CMemoryPool *mp, COperator::EOperatorId op_id, CExpression *pexprOuter,
-		gpos::Ref<CExpression> pexprInner, BOOL fCorrelated);
+		CMemoryPool *mp, COperator::EOperatorId op_id,
+		gpos::Ref<CExpression> pexprOuter, gpos::Ref<CExpression> pexprInner,
+		BOOL fCorrelated);
 
 	// generate quantified subquery expression over window operations
 	static gpos::Ref<CExpression> PexprSelectWithSubqueryQuantifiedOverWindow(
@@ -184,12 +185,13 @@ public:
 
 	// generate existential subquery expression
 	static gpos::Ref<CExpression> PexprSubqueryExistential(
-		CMemoryPool *mp, COperator::EOperatorId op_id, CExpression *pexprOuter,
-		gpos::Ref<CExpression> pexprInner, BOOL fCorrelated);
+		CMemoryPool *mp, COperator::EOperatorId op_id,
+		gpos::Ref<CExpression> pexprOuter, gpos::Ref<CExpression> pexprInner,
+		BOOL fCorrelated);
 
 	// generate a ScalarSubquery aggregate expression
 	static gpos::Ref<CExpression> PexprSubqueryAgg(
-		CMemoryPool *mp, CExpression *pexprOuter,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
 		gpos::Ref<CExpression> pexprInner, BOOL fCorrelated);
 
 	// generate a random select expression with nested quantified subqueries

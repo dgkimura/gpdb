@@ -83,17 +83,17 @@ public:
 	~CDXLMinidump();
 
 	// traceflags
-	const CBitSet *Pbs() const;
+	const gpos::Ref<CBitSet> Pbs() const;
 
 	// optimizer configuration
-	COptimizerConfig *
+	gpos::Ref<COptimizerConfig>
 	GetOptimizerConfig() const
 	{
 		return m_optimizer_config.get();
 	}
 
 	// query object
-	const CDXLNode *GetQueryDXLRoot() const;
+	const gpos::Ref<CDXLNode> GetQueryDXLRoot() const;
 
 	// query output columns
 	const CDXLNodeArray *PdrgpdxlnQueryOutput() const;
@@ -102,7 +102,7 @@ public:
 	const CDXLNodeArray *GetCTEProducerDXLArray() const;
 
 	// plan
-	const CDXLNode *PdxlnPlan() const;
+	const gpos::Ref<CDXLNode> PdxlnPlan() const;
 
 	// metadata objects
 	const IMDCacheObjectArray *GetMdIdCachedObjArray() const;

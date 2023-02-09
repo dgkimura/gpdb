@@ -75,7 +75,7 @@ public:
 	~CParseHandlerCtasStorageOptions() override;
 
 	// parsed storage options
-	CDXLCtasStorageOptions *GetDxlCtasStorageOption() const;
+	gpos::Ref<CDXLCtasStorageOptions> GetDxlCtasStorageOption() const;
 };
 }  // namespace gpdxl
 

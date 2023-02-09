@@ -208,7 +208,7 @@ CDXLPhysicalAgg::SerializeGroupingColsToDXL(
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalAgg::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *node) const
+								const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -242,7 +242,8 @@ CDXLPhysicalAgg::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAgg::AssertValid(const CDXLNode *node, BOOL validate_children) const
+CDXLPhysicalAgg::AssertValid(const gpos::Ref<CDXLNode> node,
+							 BOOL validate_children) const
 {
 	// assert proj list and filter are valid
 	CDXLPhysical::AssertValid(node, validate_children);
@@ -253,7 +254,7 @@ CDXLPhysicalAgg::AssertValid(const CDXLNode *node, BOOL validate_children) const
 	GPOS_ASSERT(EdxlaggIndexSentinel == node->Arity());
 	GPOS_ASSERT(nullptr != m_grouping_colids_array);
 
-	CDXLNode *child_dxlnode = (*node)[EdxlaggIndexChild];
+	gpos::Ref<CDXLNode> child_dxlnode = (*node)[EdxlaggIndexChild];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

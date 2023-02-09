@@ -159,7 +159,7 @@ CLogicalRowTrigger::ITriggerType(const IMDTrigger *pmdtrigger)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalRowTrigger::Matches(COperator *pop) const
+CLogicalRowTrigger::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

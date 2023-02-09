@@ -37,15 +37,15 @@ class CGroupProxy
 {
 private:
 	// group we're operating on
-	CGroup *m_pgroup;
+	gpos::Ref<CGroup> m_pgroup;
 
 	// skip group expressions starting from the given expression;
-	CGroupExpression *PgexprSkip(CGroupExpression *pgexprStart,
-								 BOOL fSkipLogical);
+	gpos::Ref<CGroupExpression> PgexprSkip(
+		gpos::Ref<CGroupExpression> pgexprStart, BOOL fSkipLogical);
 
 public:
 	// ctor
-	explicit CGroupProxy(CGroup *pgroup);
+	explicit CGroupProxy(gpos::Ref<CGroup> pgroup);
 
 	// dtor
 	~CGroupProxy();
@@ -73,31 +73,34 @@ public:
 	}
 
 	// insert group expression
-	void Insert(CGroupExpression *pgexpr);
+	void Insert(gpos::Ref<CGroupExpression> pgexpr);
 
 	// move duplicate group expression to duplicates list
-	void MoveDuplicateGExpr(CGroupExpression *pgexpr);
+	void MoveDuplicateGExpr(gpos::Ref<CGroupExpression> pgexpr);
 
 	// initialize group's properties;
-	void InitProperties(CDrvdProp *pdp);
+	void InitProperties(gpos::Ref<CDrvdProp> pdp);
 
 	// initialize group's stat;
 	void InitStats(gpos::Ref<IStatistics> stats);
 
 	// retrieve first group expression
-	CGroupExpression *PgexprFirst();
+	gpos::Ref<CGroupExpression> PgexprFirst();
 
 	// retrieve next group expression
-	CGroupExpression *PgexprNext(CGroupExpression *pgexpr);
+	gpos::Ref<CGroupExpression> PgexprNext(gpos::Ref<CGroupExpression> pgexpr);
 
 	// get the first non-logical group expression following the given expression
-	CGroupExpression *PgexprSkipLogical(CGroupExpression *pgexpr);
+	gpos::Ref<CGroupExpression> PgexprSkipLogical(
+		gpos::Ref<CGroupExpression> pgexpr);
 
 	// get the next logical group expression following the given expression
-	CGroupExpression *PgexprNextLogical(CGroupExpression *pgexpr);
+	gpos::Ref<CGroupExpression> PgexprNextLogical(
+		gpos::Ref<CGroupExpression> pgexpr);
 
 	// lookup best expression under optimization context
-	CGroupExpression *PgexprLookup(COptimizationContext *poc) const;
+	gpos::Ref<CGroupExpression> PgexprLookup(
+		gpos::Ref<COptimizationContext> poc) const;
 
 
 #ifdef GPOS_DEBUG

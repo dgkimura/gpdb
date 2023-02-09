@@ -59,7 +59,7 @@ CPhysicalExternalScan::CPhysicalExternalScan(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalExternalScan::Matches(COperator *pop) const
+CPhysicalExternalScan::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{

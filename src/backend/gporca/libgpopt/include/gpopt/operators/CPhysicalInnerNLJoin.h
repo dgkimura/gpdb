@@ -69,7 +69,7 @@ public:
 
 	// conversion function
 	static CPhysicalInnerNLJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalInnerNLJoin == pop->Eopid());
 

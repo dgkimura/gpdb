@@ -139,7 +139,7 @@ CCostTest::TestParams(CMemoryPool *mp)
 	CAutoTrace at(mp);
 	IOstream &os(at.Os());
 
-	ICostModelParams *pcp =
+	gpos::Ref<ICostModelParams> pcp =
 		(gpos::cast<CCostModelGPDB>(COptCtxt::PoctxtFromTLS()->GetCostModel()))
 			->GetCostModelParams();
 
@@ -245,7 +245,7 @@ CCostTest::EresUnittest_Parsing()
 	CMemoryPool *mp = amp.Pmp();
 	CParseHandlerDXL *pphDXL = CDXLUtils::GetParseHandlerForDXLFile(
 		mp, "../data/dxl/cost/cost0.xml", nullptr);
-	ICostModelParams *pcp = pphDXL->GetCostModelParams();
+	gpos::Ref<ICostModelParams> pcp = pphDXL->GetCostModelParams();
 
 	{
 		CAutoTrace at(mp);

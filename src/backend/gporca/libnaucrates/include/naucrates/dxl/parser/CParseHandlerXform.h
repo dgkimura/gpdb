@@ -39,7 +39,7 @@ class CParseHandlerXform : public CParseHandlerBase
 {
 private:
 	// xform referred to by XML node
-	CXform *m_xform;
+	gpos::Ref<CXform> m_xform;
 
 	// process the start of an element
 	void StartElement(
@@ -67,7 +67,7 @@ public:
 	~CParseHandlerXform() override;
 
 	// returns the root of constructed DXL plan
-	CXform *
+	gpos::Ref<CXform>
 	GetXform()
 	{
 		return m_xform;

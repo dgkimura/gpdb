@@ -63,7 +63,7 @@ private:
 	gpos::Ref<CGroupExpression> m_pgexpr;
 
 	// attached cost context
-	CCostContext *m_pcc;
+	gpos::Ref<CCostContext> m_pcc;
 
 	// derived plan properties of the gexpr attached by a CostContext under
 	// the default CDrvdPropCtxtPlan. See DerivePlanPropsForCostContext()
@@ -110,16 +110,16 @@ public:
 	~CExpressionHandle();
 
 	// attach handle to a given expression
-	void Attach(CExpression *pexpr);
+	void Attach(gpos::Ref<CExpression> pexpr);
 
 	// attach handle to a given group expression
-	void Attach(CGroupExpression *pgexpr);
+	void Attach(gpos::Ref<CGroupExpression> pgexpr);
 
 	// attach handle to a given cost context
-	void Attach(CCostContext *pcc);
+	void Attach(gpos::Ref<CCostContext> pcc);
 
 	// recursive property derivation,
-	void DeriveProps(CDrvdPropCtxt *pdpctxt);
+	void DeriveProps(gpos::Ref<CDrvdPropCtxt> pdpctxt);
 
 	// recursive stats derivation
 	void DeriveStats(IStatisticsArray *stats_ctxt,
@@ -138,7 +138,7 @@ public:
 	void DerivePlanPropsForCostContext();
 
 	// initialize required properties container
-	void InitReqdProps(CReqdProp *prpInput);
+	void InitReqdProps(gpos::Ref<CReqdProp> prpInput);
 
 	// compute required properties of the n-th child
 	void ComputeChildReqdProps(ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
@@ -151,13 +151,13 @@ public:
 	void ComputeChildReqdCols(ULONG child_index, CDrvdPropArray *pdrgpdpCtxt);
 
 	// required properties computation of all children
-	void ComputeReqdProps(CReqdProp *prpInput, ULONG ulOptReq);
+	void ComputeReqdProps(gpos::Ref<CReqdProp> prpInput, ULONG ulOptReq);
 
 	// derived relational props of n-th child
 	CDrvdPropRelational *GetRelationalProperties(ULONG child_index) const;
 
 	// derived stats of n-th child
-	IStatistics *Pstats(ULONG child_index) const;
+	gpos::Ref<IStatistics> Pstats(ULONG child_index) const;
 
 	// derived plan props of n-th child
 	CDrvdPropPlan *Pdpplan(ULONG child_index) const;
@@ -166,16 +166,16 @@ public:
 	CDrvdPropScalar *GetDrvdScalarProps(ULONG child_index) const;
 
 	// derived properties of attached expr/gexpr
-	CDrvdProp *Pdp() const;
+	gpos::Ref<CDrvdProp> Pdp() const;
 
 	// derived relational properties of attached expr/gexpr
 	CDrvdPropRelational *GetRelationalProperties() const;
 
 	// stats of attached expr/gexpr
-	IStatistics *Pstats();
+	gpos::Ref<IStatistics> Pstats();
 
 	// required properties of attached expr/gexpr
-	CReqdProp *
+	gpos::Ref<CReqdProp>
 	Prp() const
 	{
 		return m_prp.get();
@@ -203,24 +203,25 @@ public:
 	ULONG UlNonScalarChildren() const;
 
 	// accessor for operator
-	COperator *Pop() const;
+	gpos::Ref<COperator> Pop() const;
 
 	// accessor for child operator
-	COperator *Pop(ULONG child_index) const;
+	gpos::Ref<COperator> Pop(ULONG child_index) const;
 
 	// accessor for grandchild operator
-	COperator *PopGrandchild(ULONG child_index, ULONG grandchild_index,
-							 CCostContext **grandchildContext) const;
+	gpos::Ref<COperator> PopGrandchild(
+		ULONG child_index, ULONG grandchild_index,
+		gpos::Ref<CCostContext> *grandchildContext) const;
 
 	// accessor for expression
-	CExpression *
+	gpos::Ref<CExpression>
 	Pexpr() const
 	{
 		return m_pexpr.get();
 	}
 
 	// accessor for group expression
-	CGroupExpression *
+	gpos::Ref<CGroupExpression>
 	Pgexpr() const
 	{
 		return m_pgexpr.get();
@@ -264,7 +265,7 @@ public:
 	ULONG UlPreviousOptimizedChildIndex(ULONG child_index) const;
 
 	// get the function properties of a child
-	CFunctionProp *PfpChild(ULONG child_index) const;
+	gpos::Ref<CFunctionProp> PfpChild(ULONG child_index) const;
 
 	// check whether an expression's children have a volatile function scan
 	BOOL FChildrenHaveVolatileFuncScan() const;
@@ -273,17 +274,17 @@ public:
 	BOOL FChildrenHaveVolatileFunc() const;
 
 	// return a representative (inexact) scalar child at given index
-	CExpression *PexprScalarRepChild(ULONG child_index) const;
+	gpos::Ref<CExpression> PexprScalarRepChild(ULONG child_index) const;
 
 	// return a representative (inexact) scalar expression attached to handle
-	CExpression *PexprScalarRep() const;
+	gpos::Ref<CExpression> PexprScalarRep() const;
 
 	// return an exact scalar child at given index or return null if not possible
-	CExpression *PexprScalarExactChild(ULONG child_index,
-									   BOOL error_on_null_return = false) const;
+	gpos::Ref<CExpression> PexprScalarExactChild(
+		ULONG child_index, BOOL error_on_null_return = false) const;
 
 	// return an exact scalar expression attached to handle or null if not possible
-	CExpression *PexprScalarExact() const;
+	gpos::Ref<CExpression> PexprScalarExact() const;
 
 	void DeriveProducerStats(ULONG child_index, CColRefSet *pcrsStat) const;
 
@@ -306,34 +307,36 @@ public:
 	CMaxCard DeriveMaxCard() const;
 	CMaxCard DeriveMaxCard(ULONG child_index) const;
 
-	CKeyCollection *DeriveKeyCollection() const;
-	CKeyCollection *DeriveKeyCollection(ULONG child_index) const;
+	gpos::Ref<CKeyCollection> DeriveKeyCollection() const;
+	gpos::Ref<CKeyCollection> DeriveKeyCollection(ULONG child_index) const;
 
-	CPropConstraint *DerivePropertyConstraint() const;
-	CPropConstraint *DerivePropertyConstraint(ULONG child_index) const;
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint() const;
+	gpos::Ref<CPropConstraint> DerivePropertyConstraint(
+		ULONG child_index) const;
 
 	ULONG DeriveJoinDepth() const;
 	ULONG DeriveJoinDepth(ULONG child_index) const;
 
-	CFunctionProp *DeriveFunctionProperties() const;
-	CFunctionProp *DeriveFunctionProperties(ULONG child_index) const;
+	gpos::Ref<CFunctionProp> DeriveFunctionProperties() const;
+	gpos::Ref<CFunctionProp> DeriveFunctionProperties(ULONG child_index) const;
 
 	CFunctionalDependencyArray *Pdrgpfd() const;
 	CFunctionalDependencyArray *Pdrgpfd(ULONG child_index) const;
 
-	CPartInfo *DerivePartitionInfo() const;
-	CPartInfo *DerivePartitionInfo(ULONG child_index) const;
+	gpos::Ref<CPartInfo> DerivePartitionInfo() const;
+	gpos::Ref<CPartInfo> DerivePartitionInfo(ULONG child_index) const;
 
-	CTableDescriptor *DeriveTableDescriptor() const;
-	CTableDescriptor *DeriveTableDescriptor(ULONG child_index) const;
+	gpos::Ref<CTableDescriptor> DeriveTableDescriptor() const;
+	gpos::Ref<CTableDescriptor> DeriveTableDescriptor(ULONG child_index) const;
 
 	// Scalar property accessors
 	CColRefSet *DeriveDefinedColumns(ULONG child_index) const;
 	CColRefSet *DeriveUsedColumns(ULONG child_index) const;
 	CColRefSet *DeriveSetReturningFunctionColumns(ULONG child_index) const;
 	BOOL DeriveHasSubquery(ULONG child_index) const;
-	CPartInfo *DeriveScalarPartitionInfo(ULONG child_index) const;
-	CFunctionProp *DeriveScalarFunctionProperties(ULONG child_index) const;
+	gpos::Ref<CPartInfo> DeriveScalarPartitionInfo(ULONG child_index) const;
+	gpos::Ref<CFunctionProp> DeriveScalarFunctionProperties(
+		ULONG child_index) const;
 	BOOL DeriveHasNonScalarFunction(ULONG child_index) const;
 	ULONG DeriveTotalDistinctAggs(ULONG child_index) const;
 	BOOL DeriveHasMultipleDistinctAggs(ULONG child_index) const;

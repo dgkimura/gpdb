@@ -59,7 +59,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 void
-COptimizer::PrintQuery(CMemoryPool *mp, CExpression *pexprTranslated,
+COptimizer::PrintQuery(CMemoryPool *mp, gpos::Ref<CExpression> pexprTranslated,
 					   CQueryContext *pqc)
 {
 	CAutoTrace at(mp);
@@ -79,7 +79,7 @@ COptimizer::PrintQuery(CMemoryPool *mp, CExpression *pexprTranslated,
 		}
 	};
 
-	CExpression *pexprPreprocessed = pqc->Pexpr();
+	gpos::Ref<CExpression> pexprPreprocessed = pqc->Pexpr();
 	(void) pexprPreprocessed->PdpDerive();
 	at.Os() << std::endl
 			<< "Algebrized preprocessed query: " << std::endl
@@ -96,7 +96,7 @@ COptimizer::PrintQuery(CMemoryPool *mp, CExpression *pexprTranslated,
 //
 //---------------------------------------------------------------------------
 void
-COptimizer::PrintPlan(CMemoryPool *mp, CExpression *pexprPlan)
+COptimizer::PrintPlan(CMemoryPool *mp, gpos::Ref<CExpression> pexprPlan)
 {
 	CAutoTrace at(mp);
 	at.Os() << std::endl << "Physical plan: " << std::endl << *pexprPlan;
@@ -112,7 +112,7 @@ COptimizer::PrintPlan(CMemoryPool *mp, CExpression *pexprPlan)
 //
 //---------------------------------------------------------------------------
 void
-COptimizer::DumpSamples(CMemoryPool *mp, CEnumeratorConfig *pec,
+COptimizer::DumpSamples(CMemoryPool *mp, gpos::Ref<CEnumeratorConfig> pec,
 						ULONG ulSessionId, ULONG ulCmdId)
 {
 	GPOS_ASSERT(nullptr != pec);
@@ -138,7 +138,7 @@ COptimizer::DumpSamples(CMemoryPool *mp, CEnumeratorConfig *pec,
 //
 //---------------------------------------------------------------------------
 void
-COptimizer::PrintQueryOrPlan(CMemoryPool *mp, CExpression *pexpr,
+COptimizer::PrintQueryOrPlan(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							 CQueryContext *pqc)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -168,7 +168,7 @@ COptimizer::PrintQueryOrPlan(CMemoryPool *mp, CExpression *pexpr,
 			1 == (*pexpr)[1]->Arity())
 		{
 			// the query is of the form select <const>, now look at the <const>
-			COperator *pop = (*((*((*pexpr)[1]))[0]))[0]->Pop();
+			gpos::Ref<COperator> pop = (*((*((*pexpr)[1]))[0]))[0]->Pop();
 
 			if (COperator::EopScalarConst == pop->Eopid())
 			{
@@ -228,12 +228,12 @@ COptimizer::PrintQueryOrPlan(CMemoryPool *mp, CExpression *pexpr,
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
 COptimizer::PdxlnOptimize(
-	CMemoryPool *mp, CMDAccessor *md_accessor, const CDXLNode *query,
+	CMemoryPool *mp, CMDAccessor *md_accessor, const gpos::Ref<CDXLNode> query,
 	const CDXLNodeArray *query_output_dxlnode_array,
-	const CDXLNodeArray *cte_producers, IConstExprEvaluator *pceeval,
+	const CDXLNodeArray *cte_producers, gpos::Ref<IConstExprEvaluator> pceeval,
 	ULONG ulHosts,	// actual number of data nodes in the system
 	ULONG ulSessionId, ULONG ulCmdId, CSearchStageArray *search_stage_array,
-	COptimizerConfig *optimizer_config,
+	gpos::Ref<COptimizerConfig> optimizer_config,
 	const CHAR *szMinidumpFileName	// name of minidump file to be created
 )
 {
@@ -395,7 +395,7 @@ COptimizer::HandleExceptionAfterFinalizingMinidump(CException &ex)
 // To be able to enter the recursive logic, the execution locality of root
 // is determined before the recursive call.
 void
-COptimizer::CheckCTEConsistency(CMemoryPool *mp, CExpression *pexpr)
+COptimizer::CheckCTEConsistency(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 {
 	gpos::Ref<UlongToUlongMap> phmulul = GPOS_NEW(mp) UlongToUlongMap(mp);
 	CDrvdPropPlan *pdpplanChild =
@@ -451,8 +451,9 @@ COptimizer::PexprOptimize(CMemoryPool *mp, CQueryContext *pqc,
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
 COptimizer::CreateDXLNode(CMemoryPool *mp, CMDAccessor *md_accessor,
-						  CExpression *pexpr, CColRefArray *colref_array,
-						  CMDNameArray *pdrgpmdname, ULONG ulHosts)
+						  gpos::Ref<CExpression> pexpr,
+						  CColRefArray *colref_array, CMDNameArray *pdrgpmdname,
+						  ULONG ulHosts)
 {
 	GPOS_ASSERT(0 < ulHosts);
 	gpos::Ref<IntPtrArray> pdrgpiHosts = GPOS_NEW(mp) IntPtrArray(mp);

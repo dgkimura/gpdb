@@ -132,7 +132,7 @@ CDXLScalarWindowRef::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarWindowRef::SerializeToDXL(CXMLSerializer *xml_serializer,
-									const CDXLNode *dxlnode) const
+									const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -189,7 +189,7 @@ CDXLScalarWindowRef::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowRef::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarWindowRef::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								 BOOL validate_children) const
 {
 	EdxlWinStage edxlwinrefstage =
@@ -201,7 +201,7 @@ CDXLScalarWindowRef::AssertValid(const CDXLNode *dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_winref_arg = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> dxlnode_winref_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_winref_arg->GetOperator()->GetDXLOperatorType());
 

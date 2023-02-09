@@ -119,7 +119,7 @@ CPhysicalDynamicIndexScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDynamicIndexScan::Matches(COperator *pop) const
+CPhysicalDynamicIndexScan::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchDynamicIndex(this, pop);
 }
@@ -178,7 +178,8 @@ CPhysicalDynamicIndexScan::PstatsDerive(CMemoryPool *mp,
 			mp, exprhdl, ScanId(), prpplan->Pepp()->PppsRequired());
 
 	// create a conjunction of index condition and additional filters
-	CExpression *pexprScalar = exprhdl.PexprScalarRepChild(0 /*ulChidIndex*/);
+	gpos::Ref<CExpression> pexprScalar =
+		exprhdl.PexprScalarRepChild(0 /*ulChidIndex*/);
 	gpos::Ref<CExpression> local_expr = nullptr;
 	gpos::Ref<CExpression> expr_with_outer_refs = nullptr;
 
@@ -188,9 +189,10 @@ CPhysicalDynamicIndexScan::PstatsDerive(CMemoryPool *mp,
 	CPredicateUtils::SeparateOuterRefs(mp, pexprScalar, outer_refs, &local_expr,
 									   &expr_with_outer_refs);
 
-	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
-		mp, exprhdl, pstatsBaseTable.get(), local_expr.get(),
-		expr_with_outer_refs, stats_ctxt);
+	gpos::Ref<IStatistics> stats =
+		CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
+			mp, exprhdl, pstatsBaseTable.get(), local_expr.get(),
+			expr_with_outer_refs, stats_ctxt);
 
 	;
 	;

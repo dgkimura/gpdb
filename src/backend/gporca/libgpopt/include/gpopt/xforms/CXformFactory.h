@@ -33,7 +33,7 @@ class CXformFactory
 private:
 	// definition of hash map to maintain mappings
 	using XformNameToXformMap =
-		gpos::UnorderedMap<const CHAR *, CXform *,
+		gpos::UnorderedMap<const CHAR *, gpos::Ref<CXform>,
 						   gpos::PtrHash<CHAR, gpos::HashValue<CHAR>>,
 						   gpos::PtrEqual<CHAR, CXform::FEqualIds>>;
 
@@ -41,7 +41,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// range of all xforms
-	CXform *m_rgpxf[CXform::ExfSentinel];
+	gpos::Ref<CXform> m_rgpxf[CXform::ExfSentinel];
 
 	// name -> xform map
 	gpos::Ref<XformNameToXformMap> m_phmszxform;
@@ -82,10 +82,10 @@ public:
 	void Instantiate();
 
 	// accessor by xform id
-	CXform *Pxf(CXform::EXformId exfid) const;
+	gpos::Ref<CXform> Pxf(CXform::EXformId exfid) const;
 
 	// accessor by xform name
-	CXform *Pxf(const CHAR *szXformName) const;
+	gpos::Ref<CXform> Pxf(const CHAR *szXformName) const;
 
 	// accessor of exploration xforms
 	CXformSet *

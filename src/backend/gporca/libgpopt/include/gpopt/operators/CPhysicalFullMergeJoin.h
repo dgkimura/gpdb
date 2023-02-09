@@ -47,7 +47,7 @@ public:
 
 	// conversion function
 	static CPhysicalFullMergeJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalFullMergeJoin == pop->Eopid());
 

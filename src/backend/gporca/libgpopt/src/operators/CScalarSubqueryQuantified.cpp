@@ -135,7 +135,7 @@ CScalarSubqueryQuantified::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSubqueryQuantified::Matches(COperator *pop) const
+CScalarSubqueryQuantified::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
@@ -188,7 +188,7 @@ gpos::Ref<CPartInfo>
 CScalarSubqueryQuantified::PpartinfoDerive(CMemoryPool *,  // mp,
 										   CExpressionHandle &exprhdl) const
 {
-	CPartInfo *ppartinfoChild = exprhdl.DerivePartitionInfo(0);
+	gpos::Ref<CPartInfo> ppartinfoChild = exprhdl.DerivePartitionInfo(0);
 	GPOS_ASSERT(nullptr != ppartinfoChild);
 	;
 	return ppartinfoChild;

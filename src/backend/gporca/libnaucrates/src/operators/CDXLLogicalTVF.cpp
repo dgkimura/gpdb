@@ -105,7 +105,7 @@ CDXLLogicalTVF::Arity() const
 //		Get the column descriptor at the given position
 //
 //---------------------------------------------------------------------------
-const CDXLColDescr *
+const gpos::Ref<CDXLColDescr>
 CDXLLogicalTVF::GetColumnDescrAt(ULONG ul) const
 {
 	return (*m_dxl_col_descr_array)[ul].get();
@@ -145,7 +145,7 @@ CDXLLogicalTVF::IsColDefined(ULONG colid) const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   const CDXLNode *dxlnode) const
+							   const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -165,7 +165,7 @@ CDXLLogicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
 
 	for (ULONG ul = 0; ul < Arity(); ul++)
 	{
-		CDXLColDescr *pdxlcd = (*m_dxl_col_descr_array)[ul].get();
+		gpos::Ref<CDXLColDescr> pdxlcd = (*m_dxl_col_descr_array)[ul].get();
 		pdxlcd->SerializeToDXL(xml_serializer);
 	}
 
@@ -190,7 +190,7 @@ CDXLLogicalTVF::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalTVF::AssertValid(const CDXLNode *dxlnode,
+CDXLLogicalTVF::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 							BOOL validate_children) const
 {
 	// assert validity of function id and return type
@@ -200,7 +200,7 @@ CDXLLogicalTVF::AssertValid(const CDXLNode *dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *dxlnode_arg = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> dxlnode_arg = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_arg->GetOperator()->GetDXLOperatorType());
 

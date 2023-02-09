@@ -22,7 +22,7 @@ using namespace gpmd;
 
 // conversion function
 CScalarIsDistinctFrom *
-CScalarIsDistinctFrom::PopConvert(COperator *pop)
+CScalarIsDistinctFrom::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopScalarIsDistinctFrom == pop->Eopid());
@@ -54,7 +54,7 @@ CScalarIsDistinctFrom::Eber(ULongPtrArray *pdrgpulChildren) const
 }
 
 BOOL
-CScalarIsDistinctFrom::Matches(COperator *pop) const
+CScalarIsDistinctFrom::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

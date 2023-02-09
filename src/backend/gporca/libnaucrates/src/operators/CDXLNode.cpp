@@ -252,7 +252,7 @@ CDXLNode::SerializeChildrenToDXL(CXMLSerializer *xml_serializer) const
 	{
 		GPOS_CHECK_ABORT;
 
-		CDXLNode *child_dxlnode = (*m_dxl_array)[idx].get();
+		gpos::Ref<CDXLNode> child_dxlnode = (*m_dxl_array)[idx].get();
 		child_dxlnode->SerializeToDXL(xml_serializer);
 
 		GPOS_CHECK_ABORT;
@@ -328,7 +328,7 @@ CDXLNode::AssertValid(BOOL validate_children) const
 	const ULONG arity = Arity();
 	for (ULONG idx = 0; idx < arity; idx++)
 	{
-		CDXLNode *child_dxlnode = (*this)[idx];
+		gpos::Ref<CDXLNode> child_dxlnode = (*this)[idx];
 		child_dxlnode->GetOperator()->AssertValid(child_dxlnode,
 												  validate_children);
 	}

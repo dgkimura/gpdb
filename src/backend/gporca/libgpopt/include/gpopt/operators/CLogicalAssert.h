@@ -70,7 +70,7 @@ public:
 	}
 
 	// match function;
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Relational Properties
@@ -109,7 +109,7 @@ public:
 
 	// conversion function
 	static CLogicalAssert *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalAssert == pop->Eopid());

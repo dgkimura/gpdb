@@ -109,7 +109,7 @@ CMDProviderTest::EresUnittest_Basic()
 //
 //---------------------------------------------------------------------------
 void
-CMDProviderTest::TestMDLookup(CMemoryPool *mp, IMDProvider *pmdp)
+CMDProviderTest::TestMDLookup(CMemoryPool *mp, gpos::Ref<IMDProvider> pmdp)
 {
 	CAutoMDAccessor amda(mp, pmdp, CTestUtils::m_sysidDefault,
 						 CMDCache::Pcache());

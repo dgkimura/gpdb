@@ -53,7 +53,7 @@ CScalarSortGroupClause::CScalarSortGroupClause(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarSortGroupClause::Matches(COperator *other) const
+CScalarSortGroupClause::Matches(gpos::Ref<COperator> other) const
 {
 	if (Eopid() != other->Eopid())
 	{

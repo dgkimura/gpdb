@@ -70,7 +70,7 @@ CDXLScalarHashExprList::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarHashExprList::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const CDXLNode *node) const
+									   const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -90,7 +90,7 @@ CDXLScalarHashExprList::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarHashExprList::AssertValid(const CDXLNode *node,
+CDXLScalarHashExprList::AssertValid(const gpos::Ref<CDXLNode> node,
 									BOOL validate_children) const
 {
 	const ULONG arity = node->Arity();
@@ -98,7 +98,7 @@ CDXLScalarHashExprList::AssertValid(const CDXLNode *node,
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDXLNode *child_dxlnode = (*node)[ul];
+		gpos::Ref<CDXLNode> child_dxlnode = (*node)[ul];
 		GPOS_ASSERT(EdxlopScalarHashExpr ==
 					child_dxlnode->GetOperator()->GetDXLOperator());
 

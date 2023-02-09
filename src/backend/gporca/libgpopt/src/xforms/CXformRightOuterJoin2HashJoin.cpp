@@ -71,16 +71,16 @@ CXformRightOuterJoin2HashJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformRightOuterJoin2HashJoin::Transform(CXformContext *pxfctxt,
-										 CXformResult *pxfres,
-										 CExpression *pexpr) const
+CXformRightOuterJoin2HashJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+										 gpos::Ref<CXformResult> pxfres,
+										 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	const IStatistics *outerStats = (*pexpr)[0]->Pstats();
-	const IStatistics *innerStats = (*pexpr)[1]->Pstats();
+	const gpos::Ref<IStatistics> outerStats = (*pexpr)[0]->Pstats();
+	const gpos::Ref<IStatistics> innerStats = (*pexpr)[1]->Pstats();
 
 	if (nullptr == outerStats || nullptr == innerStats)
 	{

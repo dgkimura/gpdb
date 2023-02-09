@@ -43,7 +43,7 @@ public:
 
 	// conversion function
 	static CDXLScalarOneTimeFilter *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarOneTimeFilter == dxl_op->GetDXLOperator());
@@ -52,7 +52,8 @@ public:
 	}
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
+	void SerializeToDXL(CXMLSerializer *,
+						const gpos::Ref<CDXLNode>) const override;
 
 	// does the operator return a boolean result
 	BOOL

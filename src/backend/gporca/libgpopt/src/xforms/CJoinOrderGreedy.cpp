@@ -80,8 +80,8 @@ CJoinOrderGreedy::GetStartingJoins()
 	{
 		for (ULONG ul2 = ul1 + 1; ul2 < m_ulComps; ul2++)
 		{
-			SComponent *comp1 = m_rgpcomp[ul1];
-			SComponent *comp2 = m_rgpcomp[ul2];
+			gpos::Ref<SComponent> comp1 = m_rgpcomp[ul1];
+			gpos::Ref<SComponent> comp2 = m_rgpcomp[ul2];
 
 			if (!IsValidJoinCombination(comp1, comp2))
 			{
@@ -117,9 +117,9 @@ CJoinOrderGreedy::GetStartingJoins()
 		return nullptr;
 	}
 
-	SComponent *comp1 = m_rgpcomp[ul1Counter];
+	gpos::Ref<SComponent> comp1 = m_rgpcomp[ul1Counter];
 	comp1->m_fUsed = true;
-	SComponent *comp2 = m_rgpcomp[ul2Counter];
+	gpos::Ref<SComponent> comp2 = m_rgpcomp[ul2Counter];
 	comp2->m_fUsed = true;
 	pcompBest->m_fUsed = true;
 
@@ -219,9 +219,9 @@ CJoinOrderGreedy::PexprExpand()
  * the component which was picked
  */
 ULONG
-CJoinOrderGreedy::PickBestJoin(CBitSet *candidate_comp_set)
+CJoinOrderGreedy::PickBestJoin(gpos::Ref<CBitSet> candidate_comp_set)
 {
-	SComponent *pcompBestComponent =
+	gpos::Ref<SComponent> pcompBestComponent =
 		nullptr;  // component which gives minimum cardinality when joined with m_pcompResult
 	gpos::Ref<SComponent> pcompBest =
 		nullptr;  // resulting join component using pcompBestComponent and original m_pcompResult which gives minimum cardinality
@@ -231,7 +231,7 @@ CJoinOrderGreedy::PickBestJoin(CBitSet *candidate_comp_set)
 	CBitSetIter iter(*candidate_comp_set);
 	while (iter.Advance())
 	{
-		SComponent *pcompCurrent = m_rgpcomp[iter.Bit()];
+		gpos::Ref<SComponent> pcompCurrent = m_rgpcomp[iter.Bit()];
 		if (!IsValidJoinCombination(m_pcompResult.get(), pcompCurrent))
 		{
 			continue;
@@ -283,7 +283,7 @@ CJoinOrderGreedy::GetAdjacentComponentsToJoinCandidate()
 
 	while (edges_iter.Advance())
 	{
-		SEdge *edge = m_rgpedge[edges_iter.Bit()];
+		gpos::Ref<SEdge> edge = m_rgpedge[edges_iter.Bit()];
 		if (!edge->m_fUsed)
 		{
 			// components connected via the edges

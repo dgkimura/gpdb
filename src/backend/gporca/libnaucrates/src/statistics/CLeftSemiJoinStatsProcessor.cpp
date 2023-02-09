@@ -20,8 +20,9 @@ using namespace gpopt;
 // return statistics object after performing LSJ operation
 gpos::Ref<CStatistics>
 CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
-	CMemoryPool *mp, const IStatistics *outer_stats_input,
-	const IStatistics *inner_stats_input, CStatsPredJoinArray *join_preds_stats)
+	CMemoryPool *mp, const gpos::Ref<IStatistics> outer_stats_input,
+	const gpos::Ref<IStatistics> inner_stats_input,
+	CStatsPredJoinArray *join_preds_stats)
 {
 	GPOS_ASSERT(nullptr != outer_stats_input);
 	GPOS_ASSERT(nullptr != inner_stats_input);

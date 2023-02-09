@@ -964,7 +964,8 @@ CTranslatorScalarToDXL::TranslateMinMaxExprToDXL(
 //---------------------------------------------------------------------------
 void
 CTranslatorScalarToDXL::TranslateScalarChildren(
-	CDXLNode *dxlnode, List *list, const CMappingVarColId *var_colid_mapping)
+	gpos::Ref<CDXLNode> dxlnode, List *list,
+	const CMappingVarColId *var_colid_mapping)
 {
 	ListCell *lc = nullptr;
 	ForEach(lc, list)
@@ -1101,15 +1102,15 @@ CTranslatorScalarToDXL::TranslateCaseTestExprToDXL(
 //	@doc:
 //		Create a DXL If node from a GPDB CaseExpr
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CTranslatorScalarToDXL::CreateScalarIfStmtFromCaseExpr(
 	const CaseExpr *case_expr, const CMappingVarColId *var_colid_mapping)
 {
 	GPOS_ASSERT(nullptr == case_expr->arg);
 	const ULONG when_clause_count = gpdb::ListLength(case_expr->args);
 
-	CDXLNode *root_if_tree_node = nullptr;
-	CDXLNode *cur_node = nullptr;
+	gpos::Ref<CDXLNode> root_if_tree_node = nullptr;
+	gpos::Ref<CDXLNode> cur_node = nullptr;
 
 	for (ULONG ul = 0; ul < when_clause_count; ul++)
 	{
@@ -1543,7 +1544,8 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 gpos::Ref<CDXLWindowFrame>
 CTranslatorScalarToDXL::TranslateWindowFrameToDXL(
 	int frame_options, const Node *start_offset, const Node *end_offset,
-	const CMappingVarColId *var_colid_mapping, CDXLNode *new_scalar_proj_list)
+	const CMappingVarColId *var_colid_mapping,
+	gpos::Ref<CDXLNode> new_scalar_proj_list)
 {
 	EdxlFrameSpec frame_spec;
 
@@ -1687,10 +1689,10 @@ CTranslatorScalarToDXL::TranslateWindowFrameToDXL(
 //		Translate the window frame edge, if the column used in the edge is a
 // 		computed column then add it to the project list
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CTranslatorScalarToDXL::TranslateWindowFrameEdgeToDXL(
 	const Node *node, const CMappingVarColId *var_colid_mapping,
-	CDXLNode *new_scalar_proj_list)
+	gpos::Ref<CDXLNode> new_scalar_proj_list)
 {
 	gpos::Ref<CDXLNode> val_node =
 		TranslateScalarToDXL((Expr *) node, var_colid_mapping);
@@ -1941,7 +1943,7 @@ CTranslatorScalarToDXL::CreateQuantifiedSubqueryFromSublink(
 				   GPOS_WSZ_LIT("Non-Scalar Subquery"));
 	}
 
-	CDXLNode *dxl_sc_ident = (*query_output_dxlnode_array)[0].get();
+	gpos::Ref<CDXLNode> dxl_sc_ident = (*query_output_dxlnode_array)[0].get();
 	GPOS_ASSERT(nullptr != dxl_sc_ident);
 
 	// get dxl scalar identifier
@@ -1949,7 +1951,7 @@ CTranslatorScalarToDXL::CreateQuantifiedSubqueryFromSublink(
 		dynamic_cast<CDXLScalarIdent *>(dxl_sc_ident->GetOperator());
 
 	// get the dxl column reference
-	const CDXLColRef *dxl_colref = scalar_ident->GetDXLColRef();
+	const gpos::Ref<CDXLColRef> dxl_colref = scalar_ident->GetDXLColRef();
 	const ULONG colid = dxl_colref->Id();
 
 	// get the test expression
@@ -2024,14 +2026,14 @@ CTranslatorScalarToDXL::CreateScalarSubqueryFromSublink(
 	CUtils::AddRefAppend(m_cte_producers, cte_dxlnode_array);
 
 	// get dxl scalar identifier
-	CDXLNode *dxl_sc_ident = (*query_output_dxlnode_array)[0].get();
+	gpos::Ref<CDXLNode> dxl_sc_ident = (*query_output_dxlnode_array)[0].get();
 	GPOS_ASSERT(nullptr != dxl_sc_ident);
 
 	CDXLScalarIdent *scalar_ident =
 		gpos::dyn_cast<CDXLScalarIdent>(dxl_sc_ident->GetOperator());
 
 	// get the dxl column reference
-	const CDXLColRef *dxl_colref = scalar_ident->GetDXLColRef();
+	const gpos::Ref<CDXLColRef> dxl_colref = scalar_ident->GetDXLColRef();
 	const ULONG colid = dxl_colref->Id();
 
 	gpos::Ref<CDXLNode> dxlnode = GPOS_NEW(m_mp)
@@ -2179,7 +2181,7 @@ CTranslatorScalarToDXL::TranslateSortGroupClauseToDXL(
 //---------------------------------------------------------------------------
 void
 CTranslatorScalarToDXL::AddArrayIndexList(
-	CDXLNode *dxlnode, List *list,
+	gpos::Ref<CDXLNode> dxlnode, List *list,
 	CDXLScalarArrayRefIndexList::EIndexListBound index_list_bound,
 	const CMappingVarColId *var_colid_mapping)
 {

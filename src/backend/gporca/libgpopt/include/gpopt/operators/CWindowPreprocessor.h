@@ -34,7 +34,7 @@ private:
 	// iterate over project elements and split them elements between Distinct Aggs
 	// list, and Others list
 	static void SplitPrjList(
-		CMemoryPool *mp, CExpression *pexprSeqPrj,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprSeqPrj,
 		gpos::Ref<CExpressionArray> *ppdrgpexprDistinctAggsPrjElems,
 		gpos::Ref<CExpressionArray> *ppdrgpexprOtherPrjElems,
 		gpos::Ref<gpopt::COrderSpecArray> *ppdrgposOther,
@@ -43,29 +43,29 @@ private:
 	// split given SeqPrj expression into:
 	//	- A GbAgg expression containing distinct Aggs, and
 	//	- A SeqPrj expression containing all other window functions
-	static void SplitSeqPrj(CMemoryPool *mp, CExpression *pexprSeqPrj,
+	static void SplitSeqPrj(CMemoryPool *mp, gpos::Ref<CExpression> pexprSeqPrj,
 							gpos::Ref<CExpression> *ppexprGbAgg,
 							gpos::Ref<CExpression> *ppexprOutputSeqPrj);
 
 	// create a CTE with two consumers using the child expression of Sequence
 	// Project
-	static void CreateCTE(CMemoryPool *mp, CExpression *pexprSeqPrj,
+	static void CreateCTE(CMemoryPool *mp, gpos::Ref<CExpression> pexprSeqPrj,
 						  gpos::Ref<CExpression> *ppexprFirstConsumer,
 						  gpos::Ref<CExpression> *ppexprSecondConsumer);
 
 	// extract grouping columns from given expression
-	static CColRefArray *PdrgpcrGrpCols(CExpression *pexprJoinDQAs);
+	static CColRefArray *PdrgpcrGrpCols(gpos::Ref<CExpression> pexprJoinDQAs);
 
 	// transform sequence project expression into an inner join expression
-	static gpos::Ref<CExpression> PexprSeqPrj2Join(CMemoryPool *mp,
-												   CExpression *pexprSeqPrj);
+	static gpos::Ref<CExpression> PexprSeqPrj2Join(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprSeqPrj);
 
 public:
 	CWindowPreprocessor(const CWindowPreprocessor &) = delete;
 
 	// main driver
 	static gpos::Ref<CExpression> PexprPreprocess(CMemoryPool *mp,
-												  CExpression *pexpr);
+												  gpos::Ref<CExpression> pexpr);
 
 };	// class CWindowPreprocessor
 }  // namespace gpopt

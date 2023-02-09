@@ -161,7 +161,7 @@ CLogicalGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalGet::Matches(COperator *pop) const
+CLogicalGet::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
@@ -379,7 +379,7 @@ CLogicalGet::OsPrint(IOstream &os) const
 		const CBitSetArray *pdrgpbsKeys = m_ptabdesc->PdrgpbsKeys();
 		for (ULONG ul = 0; ul < pdrgpbsKeys->Size(); ul++)
 		{
-			CBitSet *pbs = (*pdrgpbsKeys)[ul].get();
+			gpos::Ref<CBitSet> pbs = (*pdrgpbsKeys)[ul].get();
 			if (0 < ul)
 			{
 				os << ", ";

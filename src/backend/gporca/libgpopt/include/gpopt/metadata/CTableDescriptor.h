@@ -115,7 +115,7 @@ public:
 
 	// accessors
 	ULONG ColumnCount() const;
-	const CColumnDescriptor *Pcoldesc(ULONG) const;
+	const gpos::Ref<CColumnDescriptor> Pcoldesc(ULONG) const;
 
 	// mdid accessor
 	gpos::Ref<IMDId>
@@ -216,7 +216,7 @@ public:
 
 	// helper function for finding the index of a column descriptor in
 	// an array of column descriptors
-	static ULONG UlPos(const CColumnDescriptor *,
+	static ULONG UlPos(const gpos::Ref<CColumnDescriptor>,
 					   const CColumnDescriptorArray *);
 
 	IOstream &OsPrint(IOstream &os) const;

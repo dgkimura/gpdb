@@ -80,7 +80,7 @@ CLogicalInsert::~CLogicalInsert()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalInsert::Matches(COperator *pop) const
+CLogicalInsert::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

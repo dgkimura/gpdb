@@ -608,7 +608,7 @@ CMDRelationGPDB::CheckConstraintMDidAt(ULONG pos) const
 //		Return the part constraint
 //
 //---------------------------------------------------------------------------
-CDXLNode *
+gpos::Ref<CDXLNode>
 CMDRelationGPDB::MDPartConstraint() const
 {
 	return m_mdpart_constraint.get();

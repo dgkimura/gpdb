@@ -91,7 +91,7 @@ public:
 	// evaluate given constant expressionand return the DXL representation of the result.
 	// if the expression has variables, an error is thrown.
 	// caller keeps ownership of 'expr_dxlnode' and takes ownership of the returned pointer
-	gpos::Ref<CDXLNode> EvaluateExpr(const CDXLNode *expr) override;
+	gpos::Ref<CDXLNode> EvaluateExpr(const gpos::Ref<CDXLNode> expr) override;
 
 	// returns true iff the evaluator can evaluate constant expressions without subqueries
 	BOOL

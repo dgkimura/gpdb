@@ -33,7 +33,7 @@ FORCE_GENERATE_DBGSTR(CQueryContext);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CQueryContext::CQueryContext(CMemoryPool *mp, CExpression *pexpr,
+CQueryContext::CQueryContext(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							 gpos::Ref<CReqdPropPlan> prpp,
 							 gpos::Ref<CColRefArray> colref_array,
 							 gpos::Ref<CMDNameArray> pdrgpmdname,
@@ -55,7 +55,7 @@ CQueryContext::CQueryContext(CMemoryPool *mp, CExpression *pexpr,
 #endif	//GPOS_DEBUG
 
 	// mark unused CTEs
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	pcteinfo->MarkUnusedCTEs();
 
 	gpos::Ref<CColRefSet> pcrsOutputAndOrderingCols =
@@ -114,13 +114,13 @@ CQueryContext::~CQueryContext()
 // 		 Return top level operator in the given expression
 //
 //---------------------------------------------------------------------------
-COperator *
-CQueryContext::PopTop(CExpression *pexpr)
+gpos::Ref<COperator>
+CQueryContext::PopTop(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
 	// skip CTE anchors if any
-	CExpression *pexprCurr = pexpr;
+	gpos::Ref<CExpression> pexprCurr = pexpr;
 	while (COperator::EopLogicalCTEAnchor == pexprCurr->Pop()->Eopid())
 	{
 		pexprCurr = (*pexprCurr)[0];
@@ -167,7 +167,7 @@ CQueryContext::SetSystemCols(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CQueryContext *
-CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
+CQueryContext::PqcGenerate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 						   ULongPtrArray *pdrgpulQueryOutputColRefId,
 						   CMDNameArray *pdrgpmdname, BOOL fDeriveStats)
 {
@@ -200,8 +200,8 @@ CQueryContext::PqcGenerate(CMemoryPool *mp, CExpression *pexpr,
 	// the input logical expression is a LIMIT. This is because Orca always
 	// attaches top level Sort to a LIMIT node.
 	gpos::Ref<COrderSpec> pos = nullptr;
-	CExpression *pexprResult = pexpr;
-	COperator *popTop = PopTop(pexpr);
+	gpos::Ref<CExpression> pexprResult = pexpr;
+	gpos::Ref<COperator> popTop = PopTop(pexpr);
 	if (COperator::EopLogicalLimit == popTop->Eopid())
 	{
 		// top level operator is a limit, copy order spec to query context
@@ -297,18 +297,18 @@ CQueryContext::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 void
 CQueryContext::MapComputedToUsedCols(CColumnFactory *col_factory,
-									 CExpression *pexpr)
+									 gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
 	if (COperator::EopLogicalProject == pexpr->Pop()->Eopid())
 	{
-		CExpression *pexprPrL = (*pexpr)[1];
+		gpos::Ref<CExpression> pexprPrL = (*pexpr)[1];
 
 		const ULONG arity = pexprPrL->Arity();
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			CExpression *pexprPrEl = (*pexprPrL)[ul];
+			gpos::Ref<CExpression> pexprPrEl = (*pexprPrL)[ul];
 			col_factory->AddComputedToUsedColsMap(pexprPrEl);
 		}
 	}

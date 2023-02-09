@@ -100,7 +100,7 @@ CMappingColIdVarPlStmt::ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop)
 	Param *param = nullptr;
 
 	const ULONG colid = dxlop->GetDXLColRef()->Id();
-	const CMappingElementColIdParamId *elem =
+	const gpos::Ref<CMappingElementColIdParamId> elem =
 		m_output_context->GetParamIdMappingElement(colid);
 
 	if (nullptr != elem)

@@ -128,10 +128,10 @@ public:
 	}
 
 	// set best plan found at the end of search stage
-	void SetBestExpr(CExpression *pexpr);
+	void SetBestExpr(gpos::Ref<CExpression> pexpr);
 
 	// best plan found accessor
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprBest() const
 	{
 		return m_pexprBest.get();

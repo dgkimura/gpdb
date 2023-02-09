@@ -88,9 +88,9 @@ CXformInnerApplyWithOuterKey2InnerJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformInnerApplyWithOuterKey2InnerJoin::Transform(CXformContext *pxfctxt,
-												  CXformResult *pxfres,
-												  CExpression *pexpr) const
+CXformInnerApplyWithOuterKey2InnerJoin::Transform(
+	gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -99,9 +99,9 @@ CXformInnerApplyWithOuterKey2InnerJoin::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CExpression *pexprOuter = (*pexpr)[0];
-	CExpression *pexprGb = (*pexpr)[1];
-	CExpression *pexprScalar = (*pexpr)[2];
+	gpos::Ref<CExpression> pexprOuter = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprGb = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
 	if (0 < gpos::dyn_cast<CLogicalGbAgg>(pexprGb->Pop())->Pdrgpcr()->Size())
 	{

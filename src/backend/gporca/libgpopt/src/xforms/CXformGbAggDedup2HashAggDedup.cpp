@@ -49,9 +49,9 @@ CXformGbAggDedup2HashAggDedup::CXformGbAggDedup2HashAggDedup(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CXformGbAggDedup2HashAggDedup::Transform(CXformContext *pxfctxt,
-										 CXformResult *pxfres,
-										 CExpression *pexpr) const
+CXformGbAggDedup2HashAggDedup::Transform(gpos::Ref<CXformContext> pxfctxt,
+										 gpos::Ref<CXformResult> pxfres,
+										 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -67,8 +67,8 @@ CXformGbAggDedup2HashAggDedup::Transform(CXformContext *pxfctxt,
 	;
 
 	// extract components
-	CExpression *pexprRel = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRel = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 	GPOS_ASSERT(0 == pexprScalar->Arity());
 
 	// addref children

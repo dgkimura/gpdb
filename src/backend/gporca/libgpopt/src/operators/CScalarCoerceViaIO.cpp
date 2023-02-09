@@ -50,7 +50,7 @@ CScalarCoerceViaIO::CScalarCoerceViaIO(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCoerceViaIO::Matches(COperator *pop) const
+CScalarCoerceViaIO::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

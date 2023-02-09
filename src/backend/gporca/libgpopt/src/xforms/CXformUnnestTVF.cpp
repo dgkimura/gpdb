@@ -83,10 +83,11 @@ CXformUnnestTVF::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefArray>
-CXformUnnestTVF::PdrgpcrSubqueries(CMemoryPool *mp, CExpression *pexprCTEProd,
-								   CExpression *pexprCTECons)
+CXformUnnestTVF::PdrgpcrSubqueries(CMemoryPool *mp,
+								   gpos::Ref<CExpression> pexprCTEProd,
+								   gpos::Ref<CExpression> pexprCTECons)
 {
-	CExpression *pexprProject = (*pexprCTEProd)[0];
+	gpos::Ref<CExpression> pexprProject = (*pexprCTEProd)[0];
 	GPOS_ASSERT(COperator::EopLogicalProject == pexprProject->Pop()->Eopid());
 
 	gpos::Ref<CColRefArray> pdrgpcrProdOutput =
@@ -99,7 +100,7 @@ CXformUnnestTVF::PdrgpcrSubqueries(CMemoryPool *mp, CExpression *pexprCTEProd,
 	const ULONG ulPrjElems = (*pexprProject)[1]->Arity();
 	for (ULONG ulOuter = 0; ulOuter < ulPrjElems; ulOuter++)
 	{
-		CExpression *pexprPrjElem = (*(*pexprProject)[1])[ulOuter];
+		gpos::Ref<CExpression> pexprPrjElem = (*(*pexprProject)[1])[ulOuter];
 		if ((*pexprPrjElem)[0]->DeriveHasSubquery())
 		{
 			CColRef *pcrProducer =
@@ -130,7 +131,8 @@ CXformUnnestTVF::PdrgpcrSubqueries(CMemoryPool *mp, CExpression *pexprCTEProd,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CXformUnnestTVF::PexprProjectSubqueries(CMemoryPool *mp, CExpression *pexprTVF)
+CXformUnnestTVF::PexprProjectSubqueries(CMemoryPool *mp,
+										gpos::Ref<CExpression> pexprTVF)
 {
 	GPOS_ASSERT(COperator::EopLogicalTVF == pexprTVF->Pop()->Eopid());
 
@@ -140,7 +142,7 @@ CXformUnnestTVF::PexprProjectSubqueries(CMemoryPool *mp, CExpression *pexprTVF)
 	const ULONG arity = pexprTVF->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprScalarChild = (*pexprTVF)[ul];
+		gpos::Ref<CExpression> pexprScalarChild = (*pexprTVF)[ul];
 		if (pexprScalarChild->DeriveHasSubquery())
 		{
 			;
@@ -181,8 +183,9 @@ CXformUnnestTVF::PexprProjectSubqueries(CMemoryPool *mp, CExpression *pexprTVF)
 //
 //---------------------------------------------------------------------------
 void
-CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-						   CExpression *pexpr) const
+CXformUnnestTVF::Transform(gpos::Ref<CXformContext> pxfctxt,
+						   gpos::Ref<CXformResult> pxfres,
+						   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -194,7 +197,7 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	gpos::Ref<CExpression> pexprProject = PexprProjectSubqueries(mp, pexpr);
 
 	// create a CTE producer on top of the project
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	const ULONG ulCTEId = pcteinfo->next_id();
 
 	// construct CTE producer output from subquery columns
@@ -202,7 +205,7 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	const ULONG ulPrjElems = (*pexprProject)[1]->Arity();
 	for (ULONG ulOuter = 0; ulOuter < ulPrjElems; ulOuter++)
 	{
-		CExpression *pexprPrjElem = (*(*pexprProject)[1])[ulOuter];
+		gpos::Ref<CExpression> pexprPrjElem = (*(*pexprProject)[1])[ulOuter];
 		if ((*pexprPrjElem)[0]->DeriveHasSubquery())
 		{
 			CColRef *pcrSubq =
@@ -212,7 +215,7 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 		}
 	}
 
-	CExpression *pexprCTEProd = CXformUtils::PexprAddCTEProducer(
+	gpos::Ref<CExpression> pexprCTEProd = CXformUtils::PexprAddCTEProducer(
 		mp, ulCTEId, pdrgpcrOutput.get(), pexprProject.get());
 	;
 	;
@@ -240,7 +243,7 @@ CXformUnnestTVF::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	const ULONG arity = pexpr->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprScalarChild = (*pexpr)[ul];
+		gpos::Ref<CExpression> pexprScalarChild = (*pexpr)[ul];
 		if (pexprScalarChild->DeriveHasSubquery())
 		{
 			CColRef *colref = (*pdrgpcrSubqueries)[ulIndex];

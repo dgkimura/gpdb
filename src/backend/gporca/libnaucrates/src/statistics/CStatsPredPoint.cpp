@@ -49,7 +49,7 @@ CStatsPredPoint::CStatsPredPoint(ULONG colid,
 //---------------------------------------------------------------------------
 CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
 								 CStatsPred::EStatsCmpType stats_cmp_type,
-								 IDatum *datum)
+								 gpos::Ref<IDatum> datum)
 	: CStatsPred(gpos::ulong_max),
 	  m_stats_cmp_type(stats_cmp_type),
 	  m_pred_point(nullptr)
@@ -71,7 +71,7 @@ CStatsPredPoint::CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
 //---------------------------------------------------------------------------
 gpos::Ref<IDatum>
 CStatsPredPoint::PreprocessDatum(CMemoryPool *mp, const CColRef *colref,
-								 IDatum *datum)
+								 gpos::Ref<IDatum> datum)
 {
 	GPOS_ASSERT(nullptr != colref);
 	GPOS_ASSERT(nullptr != datum);

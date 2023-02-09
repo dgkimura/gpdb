@@ -151,7 +151,7 @@ CPhysicalCTEConsumer::PrsRequired(CMemoryPool *,		 // mp,
 gpos::Ref<CCTEReq>
 CPhysicalCTEConsumer::PcteRequired(CMemoryPool *,		 //mp,
 								   CExpressionHandle &,	 //exprhdl,
-								   CCTEReq *,			 //pcter,
+								   gpos::Ref<CCTEReq>,	 //pcter,
 								   ULONG,				 //child_index,
 								   CDrvdPropArray *,	 //pdrgpdpCtxt,
 								   ULONG				 //ulOptReq
@@ -323,7 +323,7 @@ CPhysicalCTEConsumer::EpetRewindability(CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalCTEConsumer::Matches(COperator *pop) const
+CPhysicalCTEConsumer::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

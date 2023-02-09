@@ -128,7 +128,7 @@ CDistributionSpecRouted::AppendEnforcers(CMemoryPool *mp,
 #endif	// GPOS_DEBUG
 										 ,
 										 CExpressionArray *pdrgpexpr,
-										 CExpression *pexpr)
+										 gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);

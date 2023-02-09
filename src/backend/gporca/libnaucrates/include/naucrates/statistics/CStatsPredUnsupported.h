@@ -72,7 +72,7 @@ public:
 
 	// conversion function
 	static CStatsPredUnsupported *
-	ConvertPredStats(CStatsPred *pred_stats)
+	ConvertPredStats(gpos::Ref<CStatsPred> pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptUnsupported ==

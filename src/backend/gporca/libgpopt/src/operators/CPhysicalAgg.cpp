@@ -415,7 +415,7 @@ CPhysicalAgg::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalAgg::PcteRequired(CMemoryPool *,		 //mp,
 						   CExpressionHandle &,	 //exprhdl,
-						   CCTEReq *pcter,
+						   gpos::Ref<CCTEReq> pcter,
 						   ULONG
 #ifdef GPOS_DEBUG
 							   child_index
@@ -555,7 +555,7 @@ CPhysicalAgg::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalAgg::Matches(COperator *pop) const
+CPhysicalAgg::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

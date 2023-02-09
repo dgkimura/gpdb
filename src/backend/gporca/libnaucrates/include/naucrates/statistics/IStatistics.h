@@ -140,22 +140,22 @@ public:
 
 	// inner join with another stats structure
 	virtual gpos::Ref<IStatistics> CalcInnerJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const = 0;
 
 	// LOJ with another stats structure
 	virtual gpos::Ref<IStatistics> CalcLOJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats) const = 0;
 
 	// semi join stats computation
 	virtual gpos::Ref<IStatistics> CalcLSJoinStats(
-		CMemoryPool *mp, const IStatistics *inner_side_stats,
+		CMemoryPool *mp, const gpos::Ref<IStatistics> inner_side_stats,
 		CStatsPredJoinArray *join_preds_stats) const = 0;
 
 	// anti semi join
 	virtual gpos::Ref<IStatistics> CalcLASJoinStats(
-		CMemoryPool *mp, const IStatistics *other_stats,
+		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats,
 		BOOL DoIgnoreLASJHistComputation) const = 0;
 
@@ -164,7 +164,7 @@ public:
 		CMemoryPool *mp) const = 0;
 
 	// append given stats to current object
-	virtual void AppendStats(CMemoryPool *mp, IStatistics *stats) = 0;
+	virtual void AppendStats(CMemoryPool *mp, gpos::Ref<IStatistics> stats) = 0;
 
 	// set number of rebinds
 	virtual void SetRebinds(CDouble num_rebinds) = 0;

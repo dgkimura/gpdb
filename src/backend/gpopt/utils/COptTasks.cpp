@@ -268,7 +268,7 @@ COptTasks::LogExceptionMessageAndDelete(CHAR *err_buf)
 PlannedStmt *
 COptTasks::ConvertToPlanStmtFromDXL(
 	CMemoryPool *mp, CMDAccessor *md_accessor, const Query *orig_query,
-	const CDXLNode *dxlnode, bool can_set_tag,
+	const gpos::Ref<CDXLNode> dxlnode, bool can_set_tag,
 	DistributionHashOpsKind distribution_hashops)
 {
 	GPOS_ASSERT(nullptr != md_accessor);
@@ -398,7 +398,7 @@ COptTasks::CreateOptimizerConfig(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 void
-COptTasks::SetCostModelParams(ICostModel *cost_model)
+COptTasks::SetCostModelParams(gpos::Ref<ICostModel> cost_model)
 {
 	GPOS_ASSERT(nullptr != cost_model);
 
@@ -595,7 +595,8 @@ COptTasks::OptimizeTask(void *ptr)
 						query_to_dxl_translator->GetDistributionHashOpsKind()));
 			}
 
-			CStatisticsConfig *stats_conf = optimizer_config->GetStatsConf();
+			gpos::Ref<CStatisticsConfig> stats_conf =
+				optimizer_config->GetStatsConf();
 			col_stats = GPOS_NEW(mp) IMdIdArray(mp);
 			stats_conf->CollectMissingStatsColumns(col_stats.get());
 
@@ -778,7 +779,7 @@ COptTasks::GPOPTOptimizedPlan(Query *query, SOptContext *gpopt_context)
 bool
 COptTasks::SetXform(char *xform_str, bool should_disable)
 {
-	CXform *xform = CXformFactory::Pxff()->Pxf(xform_str);
+	gpos::Ref<CXform> xform = CXformFactory::Pxff()->Pxf(xform_str);
 	if (nullptr != xform)
 	{
 		optimizer_xforms[xform->Exfid()] = should_disable;

@@ -117,7 +117,7 @@ public:
 
 	// conversion function
 	static CLogicalIntersectAll *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalIntersectAll == pop->Eopid());

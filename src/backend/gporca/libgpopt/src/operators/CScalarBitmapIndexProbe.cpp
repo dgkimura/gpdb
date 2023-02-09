@@ -88,7 +88,7 @@ CScalarBitmapIndexProbe::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBitmapIndexProbe::Matches(COperator *pop) const
+CScalarBitmapIndexProbe::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

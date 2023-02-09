@@ -56,7 +56,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
@@ -73,7 +73,7 @@ public:
 
 	// conversion function
 	static CScalarNAryJoinPredList *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		return dynamic_cast<CScalarNAryJoinPredList *>(pop);
 	}

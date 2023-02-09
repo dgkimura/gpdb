@@ -44,7 +44,7 @@ CStatsPredDisj::CStatsPredDisj(
 //		Return the point filter at a particular position
 //
 //---------------------------------------------------------------------------
-CStatsPred *
+gpos::Ref<CStatsPred>
 CStatsPredDisj::GetPredStats(ULONG pos) const
 {
 	return (*m_disj_pred_stats_array)[pos].get();

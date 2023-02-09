@@ -47,7 +47,7 @@ private:
 
 	// application of different xforms for the given expression
 	static void ApplyExprXforms(CMemoryPool *mp, IOstream &os,
-								CExpression *pexpr);
+								gpos::Ref<CExpression> pexpr);
 
 public:
 	// test driver

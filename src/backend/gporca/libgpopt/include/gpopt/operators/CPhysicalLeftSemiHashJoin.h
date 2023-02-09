@@ -62,7 +62,7 @@ public:
 
 	// conversion function
 	static CPhysicalLeftSemiHashJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftSemiHashJoin == pop->Eopid());
 

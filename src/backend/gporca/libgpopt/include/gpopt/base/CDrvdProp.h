@@ -93,7 +93,7 @@ public:
 
 	// derivation function
 	virtual void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						CDrvdPropCtxt *pdppropctxt) = 0;
+						gpos::Ref<CDrvdPropCtxt> pdppropctxt) = 0;
 
 	// check for satisfying required plan properties
 	virtual BOOL FSatisfies(const CReqdPropPlan *prpp) const = 0;

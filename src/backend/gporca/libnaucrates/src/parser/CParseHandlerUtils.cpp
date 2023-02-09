@@ -29,7 +29,7 @@ using namespace gpnaucrates;
 //
 //---------------------------------------------------------------------------
 void
-CParseHandlerUtils::SetProperties(CDXLNode *dxlnode,
+CParseHandlerUtils::SetProperties(gpos::Ref<CDXLNode> dxlnode,
 								  CParseHandlerProperties *prop_parse_handler)
 {
 	GPOS_ASSERT(nullptr != prop_parse_handler->GetProperties());
@@ -40,7 +40,7 @@ CParseHandlerUtils::SetProperties(CDXLNode *dxlnode,
 	dxlnode->SetProperties(dxl_properties);
 
 	// set the statistical information
-	CDXLStatsDerivedRelation *dxl_stats_derived_relation =
+	gpos::Ref<CDXLStatsDerivedRelation> dxl_stats_derived_relation =
 		prop_parse_handler->GetDxlStatsDrvdRelation();
 	if (nullptr != dxl_stats_derived_relation)
 	{

@@ -65,12 +65,13 @@ public:
 											 const CDXLDatumArray *pdrgpdatum);
 
 	// update table descriptor's key sets info from the MD cache object
-	static void AddKeySets(CMemoryPool *mp, CTableDescriptor *ptabdesc,
+	static void AddKeySets(CMemoryPool *mp,
+						   gpos::Ref<CTableDescriptor> ptabdesc,
 						   const IMDRelation *pmdrel,
 						   UlongToUlongMap *phmululColMapping);
 
 	// check if a dxl node is a boolean expression of the given type
-	static BOOL FScalarBool(const CDXLNode *dxlnode,
+	static BOOL FScalarBool(const gpos::Ref<CDXLNode> dxlnode,
 							EdxlBoolExprType edxlboolexprtype);
 
 	// returns the equivalent bool expression type in the optimizer for
@@ -84,7 +85,8 @@ public:
 										   const ULongPtrArray *colids);
 
 	// is the given expression is a scalar function that casts
-	static BOOL FCastFunc(CMDAccessor *md_accessor, const CDXLNode *dxlnode,
+	static BOOL FCastFunc(CMDAccessor *md_accessor,
+						  const gpos::Ref<CDXLNode> dxlnode,
 						  gpos::Ref<IMDId> pmdidInput);
 };
 }  // namespace gpopt

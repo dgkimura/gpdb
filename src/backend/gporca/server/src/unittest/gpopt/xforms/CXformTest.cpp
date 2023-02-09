@@ -209,7 +209,8 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 //
 //---------------------------------------------------------------------------
 void
-CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os, CExpression *pexpr)
+CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os,
+							gpos::Ref<CExpression> pexpr)
 {
 	os << std::endl << "EXPR:" << std::endl;
 	(void) pexpr->OsPrint(os);
@@ -218,7 +219,7 @@ CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os, CExpression *pexpr)
 	{
 		if (CXformFactory::Pxff()->IsXformIdUsed((CXform::EXformId) ulXformId))
 		{
-			CXform *pxform =
+			gpos::Ref<CXform> pxform =
 				CXformFactory::Pxff()->Pxf((CXform::EXformId) ulXformId);
 			os << std::endl << "XFORM " << pxform->SzId() << ":" << std::endl;
 
@@ -243,7 +244,7 @@ CXformTest::ApplyExprXforms(CMemoryPool *mp, IOstream &os, CExpression *pexpr)
 
 				pxform->Transform(pxfctxt.get(), pxfres.get(), pexpr);
 
-				CExpression *pexprResult = pxfres->PexprNext();
+				gpos::Ref<CExpression> pexprResult = pxfres->PexprNext();
 				while (nullptr != pexprResult)
 				{
 					GPOS_ASSERT(pexprResult->FMatchDebug(pexprResult));
@@ -321,8 +322,9 @@ CXformTest::EresUnittest_Mapping()
 		if (CXformFactory::Pxff()->IsXformIdUsed((CXform::EXformId) ul))
 		{
 			CXform::EXformId exfid = (CXform::EXformId) ul;
-			CXform *pxform = CXformFactory::Pxff()->Pxf(exfid);
-			CXform *pxformMapped = CXformFactory::Pxff()->Pxf(pxform->SzId());
+			gpos::Ref<CXform> pxform = CXformFactory::Pxff()->Pxf(exfid);
+			gpos::Ref<CXform> pxformMapped =
+				CXformFactory::Pxff()->Pxf(pxform->SzId());
 			GPOS_ASSERT(pxform == pxformMapped);
 		}
 	}

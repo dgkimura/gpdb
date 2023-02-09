@@ -146,7 +146,7 @@ CParseHandlerTraceFlags::GetParseHandlerType() const
 //		Returns the bitset for the trace flags
 //
 //---------------------------------------------------------------------------
-CBitSet *
+gpos::Ref<CBitSet>
 CParseHandlerTraceFlags::GetTraceFlagBitSet()
 {
 	return m_trace_flags_bitset.get();

@@ -75,7 +75,7 @@ public:
 	}
 
 	// partition predicate accessor
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprPartPred() const
 	{
 		return m_pexprPartPred.get();
@@ -83,7 +83,7 @@ public:
 
 	// required properties computation function
 	void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 CReqdProp *prpInput, ULONG child_index,
+				 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
 				 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	// return difference from given properties
@@ -94,7 +94,8 @@ public:
 	BOOL IsEmpty() const;
 
 	// shorthand for conversion
-	static CReqdPropRelational *GetReqdRelationalProps(CReqdProp *prp);
+	static CReqdPropRelational *GetReqdRelationalProps(
+		gpos::Ref<CReqdProp> prp);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

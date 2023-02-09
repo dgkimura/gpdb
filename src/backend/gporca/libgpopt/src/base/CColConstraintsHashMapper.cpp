@@ -27,7 +27,7 @@ PhmcolconstrSingleColConstr(CMemoryPool *mp, const CConstraintArray *drgPcnstr)
 
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CConstraint *pcnstrChild = (*drgPcnstr)[ul];
+		gpos::Ref<CConstraint> pcnstrChild = (*drgPcnstr)[ul];
 		CColRefSet *pcrs = pcnstrChild->PcrsUsed();
 
 		if (1 == pcrs->Size())

@@ -73,7 +73,7 @@ public:
 		return m_fOuterJoin;
 	}
 
-	CExpression *
+	gpos::Ref<CExpression>
 	OrigJoinPred()
 	{
 		return m_origJoinPred.get();
@@ -116,7 +116,7 @@ public:
 	gpos::Ref<CXformSet> PxfsCandidates(CMemoryPool *mp) const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Stats
@@ -142,7 +142,7 @@ public:
 
 	// conversion function
 	static CLogicalIndexApply *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalIndexApply == pop->Eopid());

@@ -84,7 +84,7 @@ public:
 	INT LockMode() const;
 
 	// get the column descriptor at the given position
-	const CDXLColDescr *GetColumnDescrAt(ULONG idx) const;
+	const gpos::Ref<CDXLColDescr> GetColumnDescrAt(ULONG idx) const;
 
 	// serialize to dxl format
 	void SerializeToDXL(CXMLSerializer *xml_serializer) const;

@@ -34,8 +34,8 @@ class CXformSimplifyGbAgg : public CXformExploration
 {
 private:
 	// helper to check if GbAgg can be transformed to a Select
-	static BOOL FDropGbAgg(CMemoryPool *mp, CExpression *pexpr,
-						   CXformResult *pxfres);
+	static BOOL FDropGbAgg(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+						   gpos::Ref<CXformResult> pxfres);
 
 public:
 	CXformSimplifyGbAgg(const CXformSimplifyGbAgg &) = delete;
@@ -74,8 +74,8 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *, CXformResult *,
-				   CExpression *) const override;
+	void Transform(gpos::Ref<CXformContext>, gpos::Ref<CXformResult>,
+				   gpos::Ref<CExpression>) const override;
 
 };	// class CXformSimplifyGbAgg
 

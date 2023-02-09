@@ -95,7 +95,7 @@ private:
 		Query *subquery, const CMappingVarColId *var_colid_mapping);
 
 	// translate list elements and add them as children of the DXL node
-	void TranslateScalarChildren(CDXLNode *dxlnode, List *list,
+	void TranslateScalarChildren(gpos::Ref<CDXLNode> dxlnode, List *list,
 								 const CMappingVarColId *var_colid_mapping);
 
 	// create a DXL scalar distinct comparison node from a GPDB DistinctExpr
@@ -147,7 +147,7 @@ private:
 		const Expr *expr, const CMappingVarColId *var_colid_mapping);
 
 	// create a DXL scalar if statement node from a GPDB case expression
-	CDXLNode *CreateScalarIfStmtFromCaseExpr(
+	gpos::Ref<CDXLNode> CreateScalarIfStmtFromCaseExpr(
 		const CaseExpr *case_expr, const CMappingVarColId *var_colid_mapping);
 
 	// create a DXL scalar switch node from a GPDB case expression
@@ -197,14 +197,14 @@ private:
 	gpos::Ref<CDXLNode> TranslateVarToDXL(
 		const Expr *expr, const CMappingVarColId *var_colid_mapping);
 
-	CDXLNode *CreateInitPlanFromParam(const Param *param) const;
+	gpos::Ref<CDXLNode> CreateInitPlanFromParam(const Param *param) const;
 
 	// create a DXL SubPlan node for a from a GPDB SubPlan
-	CDXLNode *TranslateSubplanToDXL(const Expr *expr,
-									const CMappingVarColId *var_colid_mapping);
+	gpos::Ref<CDXLNode> TranslateSubplanToDXL(
+		const Expr *expr, const CMappingVarColId *var_colid_mapping);
 
-	CDXLNode *CreatePlanFromParam(const Expr *expr,
-								  const CMappingVarColId *var_colid_mapping);
+	gpos::Ref<CDXLNode> CreatePlanFromParam(
+		const Expr *expr, const CMappingVarColId *var_colid_mapping);
 
 	gpos::Ref<CDXLNode> TranslateSubLinkToDXL(
 		const Expr *expr, const CMappingVarColId *var_colid_mapping);
@@ -231,7 +231,7 @@ private:
 
 	// add an indexlist to the given DXL arrayref node
 	void AddArrayIndexList(
-		CDXLNode *dxlnode, List *list,
+		gpos::Ref<CDXLNode> dxlnode, List *list,
 		gpdxl::CDXLScalarArrayRefIndexList::EIndexListBound index_list_bound,
 		const CMappingVarColId *var_colid_mapping);
 
@@ -240,9 +240,9 @@ private:
 
 	// translate the window frame edge, if the column used in the edge is a
 	// computed column then add it to the project list
-	CDXLNode *TranslateWindowFrameEdgeToDXL(
+	gpos::Ref<CDXLNode> TranslateWindowFrameEdgeToDXL(
 		const Node *node, const CMappingVarColId *var_colid_mapping,
-		CDXLNode *new_scalar_proj_list);
+		gpos::Ref<CDXLNode> new_scalar_proj_list);
 
 public:
 	// ctor
@@ -281,7 +281,7 @@ public:
 	gpos::Ref<CDXLWindowFrame> TranslateWindowFrameToDXL(
 		int frame_options, const Node *start_offset, const Node *end_offset,
 		const CMappingVarColId *var_colid_mapping,
-		CDXLNode *new_scalar_proj_list);
+		gpos::Ref<CDXLNode> new_scalar_proj_list);
 
 	// translate stand-alone expression that's not part of a query
 	static gpos::Ref<CDXLNode> TranslateStandaloneExprToDXL(

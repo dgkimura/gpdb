@@ -101,7 +101,7 @@ public:
 
 	// conversion function
 	static CLogicalUnionAll *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalUnionAll == pop->Eopid());

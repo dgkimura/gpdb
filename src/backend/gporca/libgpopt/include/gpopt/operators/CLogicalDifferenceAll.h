@@ -112,7 +112,7 @@ public:
 
 	// conversion function
 	static CLogicalDifferenceAll *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDifferenceAll == pop->Eopid());

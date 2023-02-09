@@ -54,7 +54,7 @@ CScalarBoolOp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarBoolOp::Matches(COperator *pop) const
+CScalarBoolOp::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

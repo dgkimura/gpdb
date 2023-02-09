@@ -37,10 +37,10 @@ class CJobGroup : public CJob
 private:
 protected:
 	// target group
-	CGroup *m_pgroup{nullptr};
+	gpos::Ref<CGroup> m_pgroup{nullptr};
 
 	// last scheduled group expression
-	CGroupExpression *m_pgexprLastScheduled;
+	gpos::Ref<CGroupExpression> m_pgexprLastScheduled;
 
 	// ctor
 	CJobGroup() = default;
@@ -49,16 +49,16 @@ protected:
 	~CJobGroup() override = default;
 
 	// initialize job
-	void Init(CGroup *pgroup);
+	void Init(gpos::Ref<CGroup> pgroup);
 
 	// get first unscheduled logical expression
-	virtual CGroupExpression *PgexprFirstUnschedLogical();
+	virtual gpos::Ref<CGroupExpression> PgexprFirstUnschedLogical();
 
 	// get first unscheduled non-logical expression
-	virtual CGroupExpression *PgexprFirstUnschedNonLogical();
+	virtual gpos::Ref<CGroupExpression> PgexprFirstUnschedNonLogical();
 
 	// get first unscheduled expression
-	virtual CGroupExpression *PgexprFirstUnsched() = 0;
+	virtual gpos::Ref<CGroupExpression> PgexprFirstUnsched() = 0;
 
 	// schedule jobs for of all new group expressions
 	virtual BOOL FScheduleGroupExpressions(CSchedulerContext *psc) = 0;

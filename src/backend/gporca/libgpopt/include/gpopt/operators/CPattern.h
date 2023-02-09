@@ -57,7 +57,7 @@ public:
 	gpos::Ref<CReqdProp> PrpCreate(CMemoryPool *mp) const override;
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
@@ -72,7 +72,7 @@ public:
 
 	// conversion function
 	static CPattern *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(pop->FPattern());
@@ -82,7 +82,7 @@ public:
 
 	// helper to check multi-node pattern
 	static BOOL
-	FMultiNode(COperator *pop)
+	FMultiNode(gpos::Ref<COperator> pop)
 	{
 		return COperator::EopPatternMultiLeaf == pop->Eopid() ||
 			   COperator::EopPatternMultiTree == pop->Eopid();

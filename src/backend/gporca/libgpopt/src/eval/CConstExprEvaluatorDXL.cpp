@@ -70,7 +70,7 @@ CConstExprEvaluatorDXL::~CConstExprEvaluatorDXL() = default;
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CConstExprEvaluatorDXL::PexprEval(CExpression *pexpr)
+CConstExprEvaluatorDXL::PexprEval(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 

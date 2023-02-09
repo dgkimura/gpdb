@@ -89,14 +89,14 @@ public:
 	}
 
 	// return window boundary trailing
-	CDXLNode *
+	gpos::Ref<CDXLNode>
 	PdxlnTrailing() const
 	{
 		return m_dxlnode_trailing.get();
 	}
 
 	// return window boundary leading
-	CDXLNode *
+	gpos::Ref<CDXLNode>
 	PdxlnLeading() const
 	{
 		return m_dxlnode_leading.get();

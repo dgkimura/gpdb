@@ -36,8 +36,8 @@ private:
 
 public:
 	static gpos::Ref<CStatistics> CalcLOJoinStatsStatic(
-		CMemoryPool *mp, const IStatistics *outer_stats,
-		const IStatistics *inner_side_stats,
+		CMemoryPool *mp, const gpos::Ref<IStatistics> outer_stats,
+		const gpos::Ref<IStatistics> inner_side_stats,
 		CStatsPredJoinArray *join_preds_stats);
 };
 }  // namespace gpnaucrates

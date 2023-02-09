@@ -96,7 +96,7 @@ CDXLPhysicalRowTrigger::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalRowTrigger::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const CDXLNode *dxlnode) const
+									   const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -146,11 +146,11 @@ CDXLPhysicalRowTrigger::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalRowTrigger::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalRowTrigger::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 									BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
-	CDXLNode *child_dxlnode = (*dxlnode)[1];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[1];
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

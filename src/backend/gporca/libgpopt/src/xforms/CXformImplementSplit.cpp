@@ -68,8 +68,9 @@ CXformImplementSplit::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementSplit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformImplementSplit::Transform(gpos::Ref<CXformContext> pxfctxt,
+								gpos::Ref<CXformResult> pxfres,
+								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -90,8 +91,8 @@ CXformImplementSplit::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CColRef *pcrSegmentId = popSplit->PcrSegmentId();
 
 	// child of Split operator
-	CExpression *pexprChild = (*pexpr)[0];
-	CExpression *pexprProjList = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprProjList = (*pexpr)[1];
 	;
 	;
 

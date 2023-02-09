@@ -63,14 +63,14 @@ public:
 	}
 
 	// accessor
-	const CGPDBAttInfo *
+	const gpos::Ref<CGPDBAttInfo>
 	GetGPDBAttInfo() const
 	{
 		return m_gpdb_att_info.get();
 	}
 
 	// accessor
-	const COptColInfo *
+	const gpos::Ref<COptColInfo>
 	GetOptColInfo() const
 	{
 		return m_opt_col_info.get();

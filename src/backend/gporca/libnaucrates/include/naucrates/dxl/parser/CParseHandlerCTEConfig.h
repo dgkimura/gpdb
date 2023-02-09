@@ -68,7 +68,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// enumerator configuration
-	CCTEConfig *GetCteConf() const;
+	gpos::Ref<CCTEConfig> GetCteConf() const;
 };
 }  // namespace gpdxl
 

@@ -335,7 +335,7 @@ CPhysicalHashJoin::PdshashedMatching(
 
 	for (ULONG ulDlvrdIdx = 0; ulDlvrdIdx < ulDlvrdSize; ulDlvrdIdx++)
 	{
-		CExpression *pexprDlvrd = (*pdrgpexprDist)[ulDlvrdIdx].get();
+		gpos::Ref<CExpression> pexprDlvrd = (*pdrgpexprDist)[ulDlvrdIdx].get();
 		CExpressionArray *equiv_distribution_exprs = nullptr;
 		if (nullptr != all_equiv_exprs && all_equiv_exprs->Size() > 0)
 		{
@@ -344,7 +344,7 @@ CPhysicalHashJoin::PdshashedMatching(
 		for (ULONG idx = 0; idx < ulSourceSize; idx++)
 		{
 			BOOL fSuccess = false;
-			CExpression *source_expr = (*pdrgpexprSource)[idx].get();
+			gpos::Ref<CExpression> source_expr = (*pdrgpexprSource)[idx].get();
 			fSuccess = CUtils::Equals(pexprDlvrd, source_expr);
 			if (!fSuccess)
 			{
@@ -574,7 +574,7 @@ CPhysicalHashJoin::PdshashedPassThru(CMemoryPool *mp,
 		const ULONG size = pdrgpexprIncomingRequest->Size();
 		for (ULONG ul = 0; ul < size; ul++)
 		{
-			CExpression *pexpr = (*pdrgpexprIncomingRequest)[ul];
+			gpos::Ref<CExpression> pexpr = (*pdrgpexprIncomingRequest)[ul];
 			CColRefSet *pcrsUsed = pexpr->DeriveUsedColumns();
 			if (pcrsOuterOutput->ContainsAll(pcrsUsed))
 			{
@@ -868,7 +868,7 @@ BOOL
 CPhysicalHashJoin::FNullableHashKey(ULONG ulKey, CColRefSet *pcrsNotNull,
 									BOOL fInner) const
 {
-	COperator *pop = nullptr;
+	gpos::Ref<COperator> pop = nullptr;
 	if (fInner)
 	{
 		pop = (*m_pdrgpexprInnerKeys)[ulKey]->Pop();

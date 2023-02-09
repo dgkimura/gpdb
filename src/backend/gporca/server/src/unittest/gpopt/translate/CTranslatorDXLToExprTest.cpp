@@ -211,7 +211,7 @@ CTranslatorDXLToExprTest::EresTranslateAndCheck(
 //
 //---------------------------------------------------------------------------
 CWStringDynamic *
-CTranslatorDXLToExprTest::Pstr(CMemoryPool *mp, CExpression *pexpr)
+CTranslatorDXLToExprTest::Pstr(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -235,7 +235,7 @@ namespace
 class GetBuilder
 {
 	CMemoryPool *m_mp;
-	CTableDescriptor *m_ptabdesc;
+	gpos::Ref<CTableDescriptor> m_ptabdesc;
 	CWStringConst m_strTableName;
 	const IMDTypeInt4 *m_pmdtypeint4;
 
@@ -828,7 +828,7 @@ CTranslatorDXLToExprTest::EresUnittest_MetadataColumnMapping()
 	CLogicalGet *pActualGet = gpos::cast<CLogicalGet>(apExpr->Pop());
 	CColumnDescriptorArray *pDrgColDesc =
 		pActualGet->Ptabdesc()->Pdrgpcoldesc();
-	CColumnDescriptor *pColDesc = (*pDrgColDesc)[0].get();
+	gpos::Ref<CColumnDescriptor> pColDesc = (*pDrgColDesc)[0].get();
 	bool actualNullable = pColDesc->IsNullable();
 	GPOS_RTL_ASSERT(actualNullable == false);
 

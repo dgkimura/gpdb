@@ -28,7 +28,7 @@ public:
 
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
-						 CExpression *pexpr) override;
+						 gpos::Ref<CExpression> pexpr) override;
 };
 }  // namespace gpopt
 

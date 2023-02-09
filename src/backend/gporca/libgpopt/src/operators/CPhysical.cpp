@@ -211,7 +211,7 @@ CPhysical::PrpCreate(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 ULONG
-CPhysical::CReqdColsRequest::HashValue(const CReqdColsRequest *prcr)
+CPhysical::CReqdColsRequest::HashValue(const gpos::Ref<CReqdColsRequest> prcr)
 {
 	GPOS_ASSERT(nullptr != prcr);
 
@@ -231,8 +231,8 @@ CPhysical::CReqdColsRequest::HashValue(const CReqdColsRequest *prcr)
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysical::CReqdColsRequest::Equals(const CReqdColsRequest *prcrFst,
-									const CReqdColsRequest *prcrSnd)
+CPhysical::CReqdColsRequest::Equals(const gpos::Ref<CReqdColsRequest> prcrFst,
+									const gpos::Ref<CReqdColsRequest> prcrSnd)
 {
 	GPOS_ASSERT(nullptr != prcrFst);
 	GPOS_ASSERT(nullptr != prcrSnd);
@@ -251,7 +251,8 @@ CPhysical::CReqdColsRequest::Equals(const CReqdColsRequest *prcrFst,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysical::PdsCompute(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
+CPhysical::PdsCompute(CMemoryPool *mp,
+					  const gpos::Ref<CTableDescriptor> ptabdesc,
 					  CColRefArray *pdrgpcrOutput, CColRef *pcr_segment_id)
 {
 	gpos::Ref<CDistributionSpec> pds = nullptr;
@@ -293,7 +294,8 @@ CPhysical::PdsCompute(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
 			const ULONG size = pdrgpcoldesc->Size();
 			for (ULONG ul = 0; ul < size; ul++)
 			{
-				CColumnDescriptor *pcoldesc = (*pdrgpcoldesc)[ul].get();
+				gpos::Ref<CColumnDescriptor> pcoldesc =
+					(*pdrgpcoldesc)[ul].get();
 				ULONG ulPos = gpopt::CTableDescriptor::UlPos(
 					pcoldesc, ptabdesc->Pdrgpcoldesc());
 
@@ -641,7 +643,7 @@ CPhysical::PdssMatching(CMemoryPool *mp, CDistributionSpecSingleton *pdss)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEReq>
-CPhysical::PcterPushThru(CCTEReq *pcter)
+CPhysical::PcterPushThru(gpos::Ref<CCTEReq> pcter)
 {
 	GPOS_ASSERT(nullptr != pcter);
 	;
@@ -666,7 +668,7 @@ CPhysical::PcmCombine(CMemoryPool *mp, CDrvdPropArray *pdrgpdpCtxt)
 	gpos::Ref<CCTEMap> pcmCombined = GPOS_NEW(mp) CCTEMap(mp);
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CCTEMap *pcmChild =
+		gpos::Ref<CCTEMap> pcmChild =
 			gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[ul])->GetCostModel();
 
 		// get the remaining requirements that have not been met by child
@@ -690,7 +692,7 @@ CPhysical::PcmCombine(CMemoryPool *mp, CDrvdPropArray *pdrgpdpCtxt)
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEReq>
 CPhysical::PcterNAry(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					 CCTEReq *pcter, ULONG child_index,
+					 gpos::Ref<CCTEReq> pcter, ULONG child_index,
 					 CDrvdPropArray *pdrgpdpCtxt) const
 {
 	GPOS_ASSERT(nullptr != pcter);
@@ -737,7 +739,8 @@ CPhysical::PcterNAry(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysical::FCanPushPartReqToChild(CBitSet *pbsPartConsumer, ULONG child_index)
+CPhysical::FCanPushPartReqToChild(gpos::Ref<CBitSet> pbsPartConsumer,
+								  ULONG child_index)
 {
 	GPOS_ASSERT(nullptr != pbsPartConsumer);
 
@@ -771,7 +774,7 @@ CPhysical::PcmDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	{
 		if (!exprhdl.FScalarChild(ul))
 		{
-			CCTEMap *pcmChild = exprhdl.Pdpplan(ul)->GetCostModel();
+			gpos::Ref<CCTEMap> pcmChild = exprhdl.Pdpplan(ul)->GetCostModel();
 			GPOS_ASSERT(nullptr != pcmChild);
 
 			gpos::Ref<CCTEMap> pcmCombined =
@@ -794,9 +797,9 @@ CPhysical::PcmDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 BOOL
 CPhysical::FProvidesReqdCTEs(CExpressionHandle &exprhdl,
-							 const CCTEReq *pcter) const
+							 const gpos::Ref<CCTEReq> pcter) const
 {
-	CCTEMap *pcmDrvd =
+	gpos::Ref<CCTEMap> pcmDrvd =
 		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->GetCostModel();
 	GPOS_ASSERT(nullptr != pcmDrvd);
 	return pcmDrvd->FSatisfies(pcter);
@@ -846,7 +849,7 @@ CPhysical::PdsRequireSingleton(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 CDouble
-CPhysical::GetSkew(IStatistics *stats, CDistributionSpec *pds)
+CPhysical::GetSkew(gpos::Ref<IStatistics> stats, CDistributionSpec *pds)
 {
 	CDouble dSkew = 1.0;
 	if (CDistributionSpec::EdtHashed == pds->Edt())
@@ -857,7 +860,7 @@ CPhysical::GetSkew(IStatistics *stats, CDistributionSpec *pds)
 		const ULONG size = pdrgpexpr->Size();
 		for (ULONG ul = 0; ul < size; ul++)
 		{
-			CExpression *pexpr = (*pdrgpexpr)[ul].get();
+			gpos::Ref<CExpression> pexpr = (*pdrgpexpr)[ul].get();
 			if (COperator::EopScalarIdent == pexpr->Pop()->Eopid())
 			{
 				// consider only hashed distribution direct columns for now
@@ -996,7 +999,7 @@ CPhysical::PppsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		GPOS_NEW(mp) CPartitionPropagationSpec(mp);
 
 	gpos::Ref<CBitSet> allowed_scan_ids = GPOS_NEW(mp) CBitSet(mp);
-	CPartInfo *part_info = exprhdl.DerivePartitionInfo(child_index);
+	gpos::Ref<CPartInfo> part_info = exprhdl.DerivePartitionInfo(child_index);
 	for (ULONG ul = 0; ul < part_info->UlConsumers(); ++ul)
 	{
 		ULONG scan_id = part_info->ScanId(ul);

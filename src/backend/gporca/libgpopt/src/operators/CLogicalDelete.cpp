@@ -91,7 +91,7 @@ CLogicalDelete::~CLogicalDelete()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalDelete::Matches(COperator *pop) const
+CLogicalDelete::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

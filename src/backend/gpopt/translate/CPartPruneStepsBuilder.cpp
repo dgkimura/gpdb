@@ -44,7 +44,7 @@ CPartPruneStepsBuilder::CPartPruneStepsBuilder(
 
 List *
 CPartPruneStepsBuilder::CreatePartPruneInfos(
-	CDXLNode *filterNode, Relation relation, Index rtindex,
+	gpos::Ref<CDXLNode> filterNode, Relation relation, Index rtindex,
 	ULongPtrArray *part_indexes, CMappingColIdVarPlStmt *colid_var_mapping,
 	CTranslatorDXLToScalar *translator_dxl_to_scalar)
 {
@@ -67,7 +67,8 @@ CPartPruneStepsBuilder::CreatePartPruneInfos(
 }
 
 PartitionedRelPruneInfo *
-CPartPruneStepsBuilder::CreatePartPruneInfoForOneLevel(CDXLNode *filterNode)
+CPartPruneStepsBuilder::CreatePartPruneInfoForOneLevel(
+	gpos::Ref<CDXLNode> filterNode)
 {
 	PartitionedRelPruneInfo *pinfo = MakeNode(PartitionedRelPruneInfo);
 	pinfo->rtindex = m_rtindex;
@@ -109,7 +110,8 @@ CPartPruneStepsBuilder::CreatePartPruneInfoForOneLevel(CDXLNode *filterNode)
 }
 
 List *
-CPartPruneStepsBuilder::PartPruneStepFromScalarCmp(CDXLNode *node, int *step_id,
+CPartPruneStepsBuilder::PartPruneStepFromScalarCmp(gpos::Ref<CDXLNode> node,
+												   int *step_id,
 												   List *steps_list)
 {
 	GPOS_ASSERT(nullptr != node);
@@ -152,9 +154,8 @@ CPartPruneStepsBuilder::PartPruneStepFromScalarCmp(CDXLNode *node, int *step_id,
 }
 
 List *
-CPartPruneStepsBuilder::PartPruneStepFromScalarBoolExpr(CDXLNode *node,
-														int *step_id,
-														List *steps_list)
+CPartPruneStepsBuilder::PartPruneStepFromScalarBoolExpr(
+	gpos::Ref<CDXLNode> node, int *step_id, List *steps_list)
 {
 	GPOS_ASSERT(nullptr != node);
 	CDXLScalarBoolExpr *dxlop =
@@ -191,7 +192,7 @@ CPartPruneStepsBuilder::PartPruneStepFromScalarBoolExpr(CDXLNode *node,
 	List *stepids = NIL;
 	for (ULONG ul = 0; ul < node->Arity(); ul++)
 	{
-		CDXLNode *child_node = (*node)[ul];
+		gpos::Ref<CDXLNode> child_node = (*node)[ul];
 		steps_list = PartPruneStepsFromFilter(child_node, step_id, steps_list);
 
 		PartitionPruneStep *last_step =
@@ -208,8 +209,8 @@ CPartPruneStepsBuilder::PartPruneStepFromScalarBoolExpr(CDXLNode *node,
 }
 
 List *
-CPartPruneStepsBuilder::PartPruneStepsFromFilter(CDXLNode *node, INT *step_id,
-												 List *steps_list)
+CPartPruneStepsBuilder::PartPruneStepsFromFilter(gpos::Ref<CDXLNode> node,
+												 INT *step_id, List *steps_list)
 {
 	GPOS_ASSERT(nullptr != node);
 	Edxlopid eopid = node->GetOperator()->GetDXLOperator();

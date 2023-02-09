@@ -38,7 +38,7 @@ private:
 	gpos::Ref<ExprPredToExprPredPartMap> m_phmPexprPartPred;
 
 	// table descriptor
-	CTableDescriptor *m_ptabdesc;
+	gpos::Ref<CTableDescriptor> m_ptabdesc;
 
 public:
 	CLogicalSelect(const CLogicalSelect &) = delete;
@@ -47,7 +47,7 @@ public:
 	explicit CLogicalSelect(CMemoryPool *mp);
 
 	// ctor
-	CLogicalSelect(CMemoryPool *mp, CTableDescriptor *ptabdesc);
+	CLogicalSelect(CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc);
 
 	// dtor
 	~CLogicalSelect() override;
@@ -66,7 +66,7 @@ public:
 	}
 
 	// return table's descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	Ptabdesc() const
 	{
 		return m_ptabdesc;
@@ -97,7 +97,7 @@ public:
 	}
 
 	// derive table descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	DeriveTableDescriptor(CMemoryPool *,  // mp
 						  CExpressionHandle &exprhdl) const override
 	{
@@ -107,7 +107,7 @@ public:
 	// compute partition predicate to pass down to n-th child
 	gpos::Ref<CExpression> PexprPartPred(CMemoryPool *mp,
 										 CExpressionHandle &exprhdl,
-										 CExpression *pexprInput,
+										 gpos::Ref<CExpression> pexprInput,
 										 ULONG child_index) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -130,7 +130,7 @@ public:
 
 	// conversion function
 	static CLogicalSelect *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalSelect == pop->Eopid());

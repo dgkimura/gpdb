@@ -180,7 +180,7 @@ CMDAccessor::SMDProviderElem::~SMDProviderElem()
 //		Returns the MD provider for this hash table element
 //
 //---------------------------------------------------------------------------
-IMDProvider *
+gpos::Ref<IMDProvider>
 CMDAccessor::SMDProviderElem::Pmdp()
 {
 	return m_pmdp.get();
@@ -442,7 +442,7 @@ CMDAccessor::RegisterProviders(const CSystemIdArray *pdrgpsysid,
 //		Retrieve the MD provider for the given source system id
 //
 //---------------------------------------------------------------------------
-IMDProvider *
+gpos::Ref<IMDProvider>
 CMDAccessor::Pmdp(CSystemId sysid)
 {
 	SMDProviderElem *pmdpelem = nullptr;
@@ -501,7 +501,7 @@ CMDAccessor::GetImdObj(gpos::Ref<IMDId> mdid)
 		// object not in local hashtable, try lookup in the MD cache
 
 		// construct a key for cache lookup
-		IMDProvider *pmdp = Pmdp(mdid->Sysid());
+		gpos::Ref<IMDProvider> pmdp = Pmdp(mdid->Sysid());
 
 		CMDKey mdkey(mdid);
 
@@ -672,7 +672,7 @@ const IMDType *
 CMDAccessor::RetrieveType(CSystemId sysid, IMDType::ETypeInfo type_info)
 {
 	GPOS_ASSERT(IMDType::EtiGeneric != type_info);
-	IMDProvider *pmdp = Pmdp(sysid);
+	gpos::Ref<IMDProvider> pmdp = Pmdp(sysid);
 	gpos::Ref<IMDId> a_pmdid;
 	a_pmdid = pmdp->MDId(m_mp, sysid, type_info);
 	const IMDCacheObject *pmdobj = GetImdObj(a_pmdid.get());
@@ -996,7 +996,7 @@ CMDAccessor::RecordColumnStats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
 							   BOOL isEmptyTable,
 							   UlongToHistogramMap *col_histogram_mapping,
 							   UlongToDoubleMap *colid_width_mapping,
-							   CStatisticsConfig *stats_config)
+							   gpos::Ref<CStatisticsConfig> stats_config)
 {
 	GPOS_ASSERT(nullptr != rel_mdid);
 	GPOS_ASSERT(nullptr != col_histogram_mapping);
@@ -1058,7 +1058,7 @@ CMDAccessor::Pmdcolstats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
 gpos::Ref<IStatistics>
 CMDAccessor::Pstats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
 					CColRefSet *pcrsHist, CColRefSet *pcrsWidth,
-					CStatisticsConfig *stats_config)
+					gpos::Ref<CStatisticsConfig> stats_config)
 {
 	GPOS_ASSERT(nullptr != rel_mdid);
 	GPOS_ASSERT(nullptr != pcrsHist);
@@ -1154,7 +1154,8 @@ CMDAccessor::GetHistogram(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 	gpos::Ref<CBucketArray> buckets = GPOS_NEW(mp) CBucketArray(mp);
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
 	{
-		const CDXLBucket *dxl_bucket = pmdcolstats->GetDXLBucketAt(ul);
+		const gpos::Ref<CDXLBucket> dxl_bucket =
+			pmdcolstats->GetDXLBucketAt(ul);
 		CBucket *bucket = Pbucket(mp, mdid_type, dxl_bucket);
 		buckets->Append(bucket);
 	}
@@ -1182,7 +1183,7 @@ CMDAccessor::GetHistogram(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 //---------------------------------------------------------------------------
 CBucket *
 CMDAccessor::Pbucket(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
-					 const CDXLBucket *dxl_bucket)
+					 const gpos::Ref<CDXLBucket> dxl_bucket)
 {
 	gpos::Ref<IDatum> pdatumLower =
 		GetDatum(mp, mdid_type, dxl_bucket->GetDXLDatumLower());
@@ -1210,7 +1211,7 @@ CMDAccessor::Pbucket(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 //---------------------------------------------------------------------------
 gpos::Ref<IDatum>
 CMDAccessor::GetDatum(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
-					  const CDXLDatum *dxl_datum)
+					  const gpos::Ref<CDXLDatum> dxl_datum)
 {
 	const IMDType *pmdtype = RetrieveType(mdid_type);
 

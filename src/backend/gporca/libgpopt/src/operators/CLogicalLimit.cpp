@@ -110,7 +110,7 @@ CLogicalLimit::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalLimit::Matches(COperator *pop) const
+CLogicalLimit::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -197,7 +197,8 @@ CLogicalLimit::DeriveMaxCard(CMemoryPool *,	 // mp
 							 CExpressionHandle &exprhdl) const
 {
 	// max card is a precise property, so we need an exact scalar expr to derive it
-	CExpression *pexprCount = exprhdl.PexprScalarExactChild(2 /*child_index*/);
+	gpos::Ref<CExpression> pexprCount =
+		exprhdl.PexprScalarExactChild(2 /*child_index*/);
 
 	if (nullptr != pexprCount &&
 		CUtils::FScalarConstInt<IMDTypeInt8>(pexprCount) &&
@@ -309,7 +310,7 @@ CLogicalLimit::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *child_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
 	CMaxCard maxcard = this->DeriveMaxCard(mp, exprhdl);
 	CDouble dRowsMax = CDouble(maxcard.Ull());
 

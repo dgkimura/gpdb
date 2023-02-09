@@ -117,7 +117,7 @@ CDXLScalarCast::FuncMdId() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarCast::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   const CDXLNode *dxlnode) const
+							   const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -159,12 +159,12 @@ CDXLScalarCast::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarCast::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarCast::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 							BOOL validate_children) const
 {
 	GPOS_ASSERT(1 == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[0];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[0];
 	GPOS_ASSERT(EdxloptypeScalar ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());
 

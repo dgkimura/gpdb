@@ -297,12 +297,12 @@ CScalar::EberNullOnAllNullChildren(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberEvaluate(CMemoryPool *mp, CExpression *pexprScalar)
+CScalar::EberEvaluate(CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexprScalar);
 
-	COperator *pop = pexprScalar->Pop();
+	gpos::Ref<COperator> pop = pexprScalar->Pop();
 	GPOS_ASSERT(pop->FScalar());
 
 	const ULONG arity = pexprScalar->Arity();
@@ -313,7 +313,7 @@ CScalar::EberEvaluate(CMemoryPool *mp, CExpression *pexprScalar)
 		// do not recurse into subqueries
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			CExpression *pexprChild = (*pexprScalar)[ul];
+			gpos::Ref<CExpression> pexprChild = (*pexprScalar)[ul];
 			EBoolEvalResult eberChild = EberEvaluate(mp, pexprChild);
 			pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(eberChild));
 		}
@@ -382,7 +382,8 @@ CScalar::PpartinfoDeriveCombineScalar(CMemoryPool *mp,
 	{
 		if (exprhdl.FScalarChild(ul))
 		{
-			CPartInfo *ppartinfoChild = exprhdl.DeriveScalarPartitionInfo(ul);
+			gpos::Ref<CPartInfo> ppartinfoChild =
+				exprhdl.DeriveScalarPartitionInfo(ul);
 			GPOS_ASSERT(nullptr != ppartinfoChild);
 			gpos::Ref<CPartInfo> ppartinfoCombined =
 				CPartInfo::PpartinfoCombine(mp, ppartinfo.get(),

@@ -69,7 +69,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function for datums
-	BOOL Matches(const IDatum *) const override;
+	BOOL Matches(const gpos::Ref<IDatum>) const override;
 
 	// copy datum
 	gpos::Ref<IDatum> MakeCopy(CMemoryPool *mp) const override;

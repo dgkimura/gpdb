@@ -164,7 +164,7 @@ CDXLTableDescr::AddColumnDescr(gpos::Ref<CDXLColDescr> column_descr_dxl)
 //		Get the column descriptor at the specified position from the col descr list
 //
 //---------------------------------------------------------------------------
-const CDXLColDescr *
+const gpos::Ref<CDXLColDescr>
 CDXLTableDescr::GetColumnDescrAt(ULONG idx) const
 {
 	GPOS_ASSERT(idx < Arity());
@@ -229,7 +229,7 @@ CDXLTableDescr::SerializeToDXL(CXMLSerializer *xml_serializer) const
 	const ULONG arity = Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDXLColDescr *pdxlcd = (*m_dxl_column_descr_array)[ul].get();
+		gpos::Ref<CDXLColDescr> pdxlcd = (*m_dxl_column_descr_array)[ul].get();
 		pdxlcd->SerializeToDXL(xml_serializer);
 	}
 

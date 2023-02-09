@@ -82,7 +82,7 @@ public:
 	~CParseHandlerStatsDerivedColumn() override;
 
 	// derived column stats
-	CDXLStatsDerivedColumn *
+	gpos::Ref<CDXLStatsDerivedColumn>
 	GetDxlStatsDerivedCol() const
 	{
 		return m_dxl_stats_derived_col.get();

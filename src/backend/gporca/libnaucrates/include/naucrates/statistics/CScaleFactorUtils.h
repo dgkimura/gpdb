@@ -100,21 +100,21 @@ public:
 
 	// calculate the cumulative join scaling factor
 	static CDouble CumulativeJoinScaleFactor(
-		CMemoryPool *mp, const CStatisticsConfig *stats_config,
+		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
 		SJoinConditionArray *join_conds_scale_factors,
 		CDouble limit_for_result_scale_factor);
 
 	// return scaling factor of the join predicate after apply damping
-	static CDouble DampedJoinScaleFactor(const CStatisticsConfig *stats_config,
-										 ULONG num_columns);
+	static CDouble DampedJoinScaleFactor(
+		const gpos::Ref<CStatisticsConfig> stats_config, ULONG num_columns);
 
 	// return scaling factor of the filter after apply damping
 	static CDouble DampedFilterScaleFactor(
-		const CStatisticsConfig *stats_config, ULONG num_columns);
+		const gpos::Ref<CStatisticsConfig> stats_config, ULONG num_columns);
 
 	// return scaling factor of the group by predicate after apply damping
 	static CDouble DampedGroupByScaleFactor(
-		const CStatisticsConfig *stats_config, ULONG num_columns);
+		const gpos::Ref<CStatisticsConfig> stats_config, ULONG num_columns);
 
 	// sort the array of scaling factor
 	static void SortScalingFactor(CDoubleArray *scale_factors,
@@ -122,12 +122,13 @@ public:
 
 	// calculate the cumulative scaling factor for conjunction after applying damping multiplier
 	static CDouble CalcScaleFactorCumulativeConj(
-		const CStatisticsConfig *stats_config, CDoubleArray *scale_factors);
+		const gpos::Ref<CStatisticsConfig> stats_config,
+		CDoubleArray *scale_factors);
 
 	// calculate the cumulative scaling factor for disjunction after applying damping multiplier
 	static CDouble CalcScaleFactorCumulativeDisj(
-		const CStatisticsConfig *stats_config, CDoubleArray *scale_factors,
-		CDouble tota_rows);
+		const gpos::Ref<CStatisticsConfig> stats_config,
+		CDoubleArray *scale_factors, CDouble tota_rows);
 
 	// comparison function in descending order
 	static INT DescendingOrderCmpFunc(const void *val1, const void *val2);

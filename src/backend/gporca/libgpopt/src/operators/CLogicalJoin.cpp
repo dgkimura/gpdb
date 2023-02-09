@@ -48,7 +48,7 @@ CLogicalJoin::CLogicalJoin(CMemoryPool *mp, CXform::EXformId origin_xform)
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalJoin::Matches(COperator *pop) const
+CLogicalJoin::Matches(gpos::Ref<COperator> pop) const
 {
 	return (pop->Eopid() == Eopid());
 }

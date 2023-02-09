@@ -95,7 +95,7 @@ public:
 
 	// conversion function
 	static CPhysicalNLJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(CUtils::FNLJoin(pop));
 

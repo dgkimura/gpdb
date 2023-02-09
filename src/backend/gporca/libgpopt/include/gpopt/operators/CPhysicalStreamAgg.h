@@ -124,7 +124,7 @@ public:
 
 	// conversion function
 	static CPhysicalStreamAgg *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalStreamAgg == pop->Eopid() ||

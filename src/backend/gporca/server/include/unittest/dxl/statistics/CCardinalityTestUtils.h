@@ -73,7 +73,7 @@ public:
 										  CDouble value);
 
 	// helper method to print statistics object
-	static void PrintStats(CMemoryPool *mp, const IStatistics *stats);
+	static void PrintStats(CMemoryPool *mp, const gpos::Ref<IStatistics> stats);
 
 	// helper method to print histogram object
 	static void PrintHist(CMemoryPool *mp, const char *pcPrefix,

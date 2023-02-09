@@ -133,7 +133,7 @@ public:
 
 	// conversion function
 	static CLogicalLeftAntiSemiApply *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FLeftAntiSemiApply(pop));

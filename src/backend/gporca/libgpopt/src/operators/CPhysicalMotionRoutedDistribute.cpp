@@ -64,7 +64,7 @@ CPhysicalMotionRoutedDistribute::~CPhysicalMotionRoutedDistribute()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionRoutedDistribute::Matches(COperator *pop) const
+CPhysicalMotionRoutedDistribute::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{
@@ -210,7 +210,7 @@ CPhysicalMotionRoutedDistribute::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CPhysicalMotionRoutedDistribute *
-CPhysicalMotionRoutedDistribute::PopConvert(COperator *pop)
+CPhysicalMotionRoutedDistribute::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionRoutedDistribute == pop->Eopid());

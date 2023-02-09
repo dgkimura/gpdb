@@ -39,10 +39,10 @@ class CCostContext;
 using CCostContextArray = gpos::Vector<gpos::Ref<CCostContext>>;
 
 // cost context pointer definition
-using COSTCTXT_PTR = CCostContext *;
+using COSTCTXT_PTR = gpos::Ref<CCostContext>;
 
 // cost context pointer definition
-using CONST_COSTCTXT_PTR = const CCostContext *;
+using CONST_COSTCTXT_PTR = const gpos::Ref<CCostContext>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -107,8 +107,8 @@ private:
 
 	// for two cost contexts with join plans of the same cost, break the tie based on join depth,
 	// if tie-resolution succeeded, store a pointer to preferred cost context in output argument
-	static void BreakCostTiesForJoinPlans(const CCostContext *pccFst,
-										  const CCostContext *pccSnd,
+	static void BreakCostTiesForJoinPlans(const gpos::Ref<CCostContext> pccFst,
+										  const gpos::Ref<CCostContext> pccSnd,
 										  CONST_COSTCTXT_PTR *ppccPrefered,
 										  BOOL *pfTiesResolved);
 
@@ -129,7 +129,7 @@ public:
 	~CCostContext() override;
 
 	// main optimization context accessor
-	COptimizationContext *
+	gpos::Ref<COptimizationContext>
 	Poc() const
 	{
 		return m_poc.get();
@@ -180,21 +180,21 @@ public:
 	}
 
 	// owner group expression accessor
-	CGroupExpression *
+	gpos::Ref<CGroupExpression>
 	Pgexpr() const
 	{
 		return m_pgexpr.get();
 	}
 
 	// group expression for stats derivation
-	CGroupExpression *
+	gpos::Ref<CGroupExpression>
 	PgexprForStats() const
 	{
 		return m_pgexprForStats.get();
 	}
 
 	// return stats of owner group expression
-	IStatistics *
+	gpos::Ref<IStatistics>
 	Pstats() const
 	{
 		return m_pstats.get();
@@ -254,13 +254,14 @@ public:
 	CCost CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren);
 
 	// is current context better than the given equivalent context based on cost?
-	BOOL FBetterThan(const CCostContext *pcc) const;
+	BOOL FBetterThan(const gpos::Ref<CCostContext> pcc) const;
 
 	// is this cost context of a two stage scalar DQA created by CXformSplitDQA
-	static BOOL IsTwoStageScalarDQACostCtxt(const CCostContext *pcc);
+	static BOOL IsTwoStageScalarDQACostCtxt(const gpos::Ref<CCostContext> pcc);
 
 	// is this cost context of a three stage scalar DQA created by CXformSplitDQA
-	static BOOL IsThreeStageScalarDQACostCtxt(const CCostContext *pcc);
+	static BOOL IsThreeStageScalarDQACostCtxt(
+		const gpos::Ref<CCostContext> pcc);
 
 	// equality function
 	static BOOL
@@ -279,7 +280,8 @@ public:
 
 	// equality function
 	static BOOL
-	Equals(const CCostContext *pccLeft, const CCostContext *pccRight)
+	Equals(const gpos::Ref<CCostContext> pccLeft,
+		   const gpos::Ref<CCostContext> pccRight)
 	{
 		return Equals(*pccLeft, *pccRight);
 	}
@@ -293,7 +295,7 @@ public:
 
 	// hash function
 	static ULONG
-	HashValue(const CCostContext *pcc)
+	HashValue(const gpos::Ref<CCostContext> pcc)
 	{
 		return HashValue(*pcc);
 	}

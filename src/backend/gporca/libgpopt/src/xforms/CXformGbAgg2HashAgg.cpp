@@ -92,8 +92,9 @@ CXformGbAgg2HashAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformGbAgg2HashAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							   CExpression *pexpr) const
+CXformGbAgg2HashAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
+							   gpos::Ref<CXformResult> pxfres,
+							   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -114,8 +115,8 @@ CXformGbAgg2HashAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	;
 
 	// extract components
-	CExpression *pexprRel = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRel = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// addref children
 	;
@@ -152,16 +153,16 @@ CXformGbAgg2HashAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 //
 //---------------------------------------------------------------------------
 BOOL
-CXformGbAgg2HashAgg::FApplicable(CExpression *pexpr)
+CXformGbAgg2HashAgg::FApplicable(gpos::Ref<CExpression> pexpr)
 {
-	CExpression *pexprPrjList = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprPrjList = (*pexpr)[1];
 	ULONG arity = pexprPrjList->Arity();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CExpression *pexprPrjEl = (*pexprPrjList)[ul];
-		CExpression *pexprAggFunc = (*pexprPrjEl)[0];
+		gpos::Ref<CExpression> pexprPrjEl = (*pexprPrjList)[ul];
+		gpos::Ref<CExpression> pexprAggFunc = (*pexprPrjEl)[0];
 		CScalarAggFunc *popScAggFunc =
 			gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 

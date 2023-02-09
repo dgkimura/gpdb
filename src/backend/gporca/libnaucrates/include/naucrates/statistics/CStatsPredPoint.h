@@ -49,7 +49,7 @@ private:
 	// add padding to datums when needed
 	static gpos::Ref<IDatum> PreprocessDatum(CMemoryPool *mp,
 											 const CColRef *colref,
-											 IDatum *datum);
+											 gpos::Ref<IDatum> datum);
 
 public:
 	CStatsPredPoint &operator=(CStatsPredPoint &) = delete;
@@ -62,7 +62,8 @@ public:
 
 	// ctor
 	CStatsPredPoint(CMemoryPool *mp, const CColRef *colref,
-					CStatsPred::EStatsCmpType stats_cmp_type, IDatum *datum);
+					CStatsPred::EStatsCmpType stats_cmp_type,
+					gpos::Ref<IDatum> datum);
 
 	// dtor
 	~CStatsPredPoint() override
@@ -78,7 +79,7 @@ public:
 	}
 
 	// filter point
-	virtual CPoint *
+	virtual gpos::Ref<CPoint>
 	GetPredPoint() const
 	{
 		return m_pred_point.get();
@@ -93,7 +94,7 @@ public:
 
 	// conversion function
 	static CStatsPredPoint *
-	ConvertPredStats(CStatsPred *pred_stats)
+	ConvertPredStats(gpos::Ref<CStatsPred> pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptPoint == pred_stats->GetPredStatsType());

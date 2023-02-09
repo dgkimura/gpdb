@@ -72,7 +72,7 @@ public:
 
 	// evaluate the given expression and return the result as a new expression
 	// caller takes ownership of returned expression
-	gpos::Ref<CExpression> PexprEval(CExpression *pexpr) override;
+	gpos::Ref<CExpression> PexprEval(gpos::Ref<CExpression> pexpr) override;
 
 	// Returns true iff the evaluator can evaluate expressions
 	BOOL FCanEvalExpressions() override;

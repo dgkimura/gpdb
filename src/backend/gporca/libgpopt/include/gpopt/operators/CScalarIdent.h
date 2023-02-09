@@ -73,7 +73,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL FInputOrderSensitive() const override;
@@ -99,7 +99,7 @@ public:
 
 	// conversion function
 	static CScalarIdent *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarIdent == pop->Eopid());
@@ -117,16 +117,16 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// is the given expression a scalar cast of a scalar identifier
-	static BOOL FCastedScId(CExpression *pexpr);
+	static BOOL FCastedScId(gpos::Ref<CExpression> pexpr);
 
 	// is the given expression a scalar cast of given scalar identifier
-	static BOOL FCastedScId(CExpression *pexpr, CColRef *colref);
+	static BOOL FCastedScId(gpos::Ref<CExpression> pexpr, CColRef *colref);
 
 	// is the given expression a scalar func allowed for Partition selection of given scalar identifier
-	static BOOL FAllowedFuncScId(CExpression *pexpr);
+	static BOOL FAllowedFuncScId(gpos::Ref<CExpression> pexpr);
 
 	// is the given expression a scalar func allowed for Partition selection of given scalar identifier
-	static BOOL FAllowedFuncScId(CExpression *pexpr, CColRef *colref);
+	static BOOL FAllowedFuncScId(gpos::Ref<CExpression> pexpr, CColRef *colref);
 
 };	// class CScalarIdent
 

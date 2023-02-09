@@ -99,7 +99,7 @@ private:
 		CMemoryPool *mp, CMDAccessor *md_accessor, CColRef *colref);
 
 	// debug print
-	static void PrintConstraint(CMemoryPool *mp, CConstraint *pcnstr);
+	static void PrintConstraint(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr);
 
 	// build a conjunction
 	static gpos::Ref<CConstraintConjunction> Pcstconjunction(

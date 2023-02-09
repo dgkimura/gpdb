@@ -60,7 +60,7 @@ private:
 	// implementation of factory methods
 	CColRef *PcrCreate(const IMDType *pmdtype, INT type_modifier, ULONG id,
 					   const CName &name);
-	CColRef *PcrCreate(const CColumnDescriptor *pcoldesc, ULONG id,
+	CColRef *PcrCreate(const gpos::Ref<CColumnDescriptor> pcoldesc, ULONG id,
 					   const CName &name, ULONG ulOpSource,
 					   BOOL mark_as_used = true,
 					   gpos::Ref<IMDId> mdid_table = nullptr);
@@ -85,8 +85,8 @@ public:
 					   const CName &name);
 
 	// create a column reference given its descriptor and name
-	CColRef *PcrCreate(const CColumnDescriptor *pcoldescr, const CName &name,
-					   ULONG ulOpSource, BOOL mark_as_used,
+	CColRef *PcrCreate(const gpos::Ref<CColumnDescriptor> pcoldescr,
+					   const CName &name, ULONG ulOpSource, BOOL mark_as_used,
 					   gpos::Ref<IMDId> mdid_table);
 
 	// create a column reference given its type, attno, nullability and name
@@ -103,7 +103,7 @@ public:
 	}
 
 	// add mapping between computed column to its used columns
-	void AddComputedToUsedColsMap(CExpression *pexpr);
+	void AddComputedToUsedColsMap(gpos::Ref<CExpression> pexpr);
 
 	// lookup the set of used column references (if any) based on id of computed column
 	const CColRefSet *PcrsUsedInComputedCol(const CColRef *pcrComputedCol);

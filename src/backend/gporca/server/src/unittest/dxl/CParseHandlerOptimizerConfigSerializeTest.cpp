@@ -57,7 +57,8 @@ public:
 }  // namespace
 
 static void
-SerializeOptimizerConfig(CMemoryPool *mp, COptimizerConfig *optimizer_config,
+SerializeOptimizerConfig(CMemoryPool *mp,
+						 gpos::Ref<COptimizerConfig> optimizer_config,
 						 COstream &oos, BOOL indentation)
 {
 	GPOS_ASSERT(nullptr != mp);

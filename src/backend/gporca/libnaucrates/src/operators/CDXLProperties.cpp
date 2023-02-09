@@ -66,7 +66,7 @@ CDXLProperties::SetStats(
 //		Return operator's statistical information
 //
 //---------------------------------------------------------------------------
-const CDXLStatsDerivedRelation *
+const gpos::Ref<CDXLStatsDerivedRelation>
 CDXLProperties::GetDxlStatsDrvdRelation() const
 {
 	return m_dxl_stats_derived_relation.get();

@@ -48,7 +48,7 @@ private:
 
 	// helper for checking cached required columns
 	static GPOS_RESULT EresCheckCachedReqdCols(CMemoryPool *mp,
-											   CExpression *pexpr,
+											   gpos::Ref<CExpression> pexpr,
 											   CReqdPropPlan *prppInput);
 
 	// helper function for the FValidPlan tests

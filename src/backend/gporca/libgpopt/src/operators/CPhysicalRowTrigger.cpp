@@ -226,7 +226,7 @@ CPhysicalRowTrigger::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalRowTrigger::PcteRequired(CMemoryPool *,		//mp,
 								  CExpressionHandle &,	//exprhdl,
-								  CCTEReq *pcter,
+								  gpos::Ref<CCTEReq> pcter,
 								  ULONG
 #ifdef GPOS_DEBUG
 									  child_index
@@ -326,7 +326,7 @@ CPhysicalRowTrigger::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalRowTrigger::Matches(COperator *pop) const
+CPhysicalRowTrigger::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

@@ -50,7 +50,7 @@ CXformGet2TableScan::Exfp(CExpressionHandle &exprhdl) const
 {
 	CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(exprhdl.Pop());
 
-	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = popGet->Ptabdesc();
 	if (ptabdesc->IsPartitioned())
 	{
 		return CXform::ExfpNone;
@@ -69,8 +69,9 @@ CXformGet2TableScan::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformGet2TableScan::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							   CExpression *pexpr) const
+CXformGet2TableScan::Transform(gpos::Ref<CXformContext> pxfctxt,
+							   gpos::Ref<CXformResult> pxfres,
+							   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

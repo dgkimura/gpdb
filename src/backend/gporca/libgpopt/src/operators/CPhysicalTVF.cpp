@@ -85,7 +85,7 @@ CPhysicalTVF::~CPhysicalTVF()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalTVF::Matches(COperator *pop) const
+CPhysicalTVF::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -210,7 +210,7 @@ CPhysicalTVF::PrsRequired(CMemoryPool *,		 // mp,
 gpos::Ref<CCTEReq>
 CPhysicalTVF::PcteRequired(CMemoryPool *,		 //mp,
 						   CExpressionHandle &,	 //exprhdl,
-						   CCTEReq *,			 //pcter,
+						   gpos::Ref<CCTEReq>,	 //pcter,
 						   ULONG,				 //child_index,
 						   CDrvdPropArray *,	 //pdrgpdpCtxt,
 						   ULONG				 //ulOptReq

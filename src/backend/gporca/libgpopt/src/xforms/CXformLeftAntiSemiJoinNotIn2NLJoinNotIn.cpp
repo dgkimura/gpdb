@@ -69,9 +69,9 @@ CXformLeftAntiSemiJoinNotIn2NLJoinNotIn::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftAntiSemiJoinNotIn2NLJoinNotIn::Transform(CXformContext *pxfctxt,
-												   CXformResult *pxfres,
-												   CExpression *pexpr) const
+CXformLeftAntiSemiJoinNotIn2NLJoinNotIn::Transform(
+	gpos::Ref<CXformContext> pxfctxt, gpos::Ref<CXformResult> pxfres,
+	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

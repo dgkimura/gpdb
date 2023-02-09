@@ -75,10 +75,10 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// trace flags
-	CBitSet *Pbs() const;
+	gpos::Ref<CBitSet> Pbs() const;
 
 	// optimizer config
-	COptimizerConfig *GetOptimizerConfig() const;
+	gpos::Ref<COptimizerConfig> GetOptimizerConfig() const;
 };
 }  // namespace gpdxl
 

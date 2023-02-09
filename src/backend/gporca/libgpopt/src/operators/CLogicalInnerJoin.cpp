@@ -95,8 +95,9 @@ CLogicalInnerJoin::PxfsCandidates(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalInnerJoin::FFewerConj(CMemoryPool *mp, CGroupExpression *pgexprFst,
-							  CGroupExpression *pgexprSnd)
+CLogicalInnerJoin::FFewerConj(CMemoryPool *mp,
+							  gpos::Ref<CGroupExpression> pgexprFst,
+							  gpos::Ref<CGroupExpression> pgexprSnd)
 {
 	if (nullptr == pgexprFst || nullptr == pgexprSnd)
 	{
@@ -110,8 +111,8 @@ CLogicalInnerJoin::FFewerConj(CMemoryPool *mp, CGroupExpression *pgexprFst,
 	}
 
 	// third child must be the group for join conditions
-	CGroup *pgroupScalarFst = (*pgexprFst)[2];
-	CGroup *pgroupScalarSnd = (*pgexprSnd)[2];
+	gpos::Ref<CGroup> pgroupScalarFst = (*pgexprFst)[2];
+	gpos::Ref<CGroup> pgroupScalarSnd = (*pgexprSnd)[2];
 	GPOS_ASSERT(pgroupScalarFst->FScalar());
 	GPOS_ASSERT(pgroupScalarSnd->FScalar());
 

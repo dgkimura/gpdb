@@ -140,7 +140,7 @@ public:
 		DOUBLE *m_pdCostChildren;
 
 		// stats of the children
-		CCostingStats **m_pdrgstatsChildren;
+		gpos::Ref<CCostingStats> *m_pdrgstatsChildren;
 
 	public:
 		// ctor
@@ -165,7 +165,7 @@ public:
 				m_pdRebindsChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);
 				m_pdCostChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);
 				m_pdrgstatsChildren =
-					GPOS_NEW_ARRAY(mp, CCostingStats *, ulChildren);
+					GPOS_NEW_ARRAY(mp, gpos::Ref<CCostingStats>, ulChildren);
 
 				for (ULONG ul = 0; ul < m_ulChildren; ul++)
 				{
@@ -322,14 +322,14 @@ public:
 		}
 
 		// return additional cost statistics
-		CCostingStats *
+		gpos::Ref<CCostingStats>
 		Pcstats() const
 		{
 			return m_pcstats.get();
 		}
 
 		// return additional child statistics
-		CCostingStats *
+		gpos::Ref<CCostingStats>
 		Pcstats(ULONG child_index) const
 		{
 			return m_pdrgstatsChildren[child_index];
@@ -344,7 +344,7 @@ public:
 	virtual CDouble DRowsPerHost(CDouble dRowsTotal) const = 0;
 
 	// return cost model parameters
-	virtual ICostModelParams *GetCostModelParams() const = 0;
+	virtual gpos::Ref<ICostModelParams> GetCostModelParams() const = 0;
 
 	// main driver for cost computation
 	virtual CCost Cost(CExpressionHandle &exprhdl,

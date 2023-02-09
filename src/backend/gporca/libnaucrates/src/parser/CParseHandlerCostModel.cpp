@@ -175,7 +175,7 @@ CParseHandlerCostModel::EndElement(const XMLCh *const,	// element_uri,
 //		Returns the cost model config object
 //
 //---------------------------------------------------------------------------
-ICostModel *
+gpos::Ref<ICostModel>
 CParseHandlerCostModel::GetCostModel() const
 {
 	return m_cost_model.get();

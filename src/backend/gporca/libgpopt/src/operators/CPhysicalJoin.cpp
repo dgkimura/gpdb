@@ -52,7 +52,7 @@ CPhysicalJoin::CPhysicalJoin(CMemoryPool *mp, CXform::EXformId origin_xform)
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalJoin::Matches(COperator *pop) const
+CPhysicalJoin::Matches(gpos::Ref<COperator> pop) const
 {
 	return Eopid() == pop->Eopid();
 }
@@ -118,7 +118,7 @@ CPhysicalJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEReq>
 CPhysicalJoin::PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							CCTEReq *pcter, ULONG child_index,
+							gpos::Ref<CCTEReq> pcter, ULONG child_index,
 							CDrvdPropArray *pdrgpdpCtxt,
 							ULONG  //ulOptReq
 ) const
@@ -317,7 +317,8 @@ CPhysicalJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CEnfdDistribution>
 CPhysicalJoin::PedInnerHashedFromOuterHashed(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	CEnfdDistribution::EDistributionMatching dmatch, CDrvdProp *outerDrvdProp)
+	CEnfdDistribution::EDistributionMatching dmatch,
+	gpos::Ref<CDrvdProp> outerDrvdProp)
 {
 	// compute a matching distribution based on derived distribution of outer child
 	CDistributionSpec *pdsOuter =
@@ -325,7 +326,7 @@ CPhysicalJoin::PedInnerHashedFromOuterHashed(
 	if (CDistributionSpec::EdtHashed == pdsOuter->Edt())
 	{
 		// require inner child to have matching hashed distribution
-		CExpression *pexprScPredicate =
+		gpos::Ref<CExpression> pexprScPredicate =
 			exprhdl.PexprScalarExactChild(2, true /*error_on_null_return*/);
 
 		gpos::Ref<CExpressionArray> pdrgpexpr =
@@ -341,10 +342,10 @@ CPhysicalJoin::PedInnerHashedFromOuterHashed(
 		BOOL fSuccess = true;
 		for (ULONG ul = 0; fSuccess && ul < ulSize; ul++)
 		{
-			CExpression *pexpr = (*pdrgpexprHashed)[ul];
+			gpos::Ref<CExpression> pexpr = (*pdrgpexprHashed)[ul];
 			// get matching expression from predicate for the corresponding outer child
 			// to create CDistributionSpecHashed for inner child
-			CExpression *pexprMatching =
+			gpos::Ref<CExpression> pexprMatching =
 				CUtils::PexprMatchEqualityOrINDF(pexpr, pdrgpexpr.get());
 			fSuccess = (nullptr != pexprMatching &&
 						CUtils::FScalarIdent(pexprMatching));
@@ -532,10 +533,10 @@ CPhysicalJoin::EpetRewindability(CExpressionHandle &exprhdl,
 //   - pexprPredInner uses columns from pexprOuter and pexprPredOuter uses
 //     columns from pexprInner
 BOOL
-CPhysicalJoin::FPredKeysSeparated(CExpression *pexprInner,
-								  CExpression *pexprOuter,
-								  CExpression *pexprPredInner,
-								  CExpression *pexprPredOuter)
+CPhysicalJoin::FPredKeysSeparated(gpos::Ref<CExpression> pexprInner,
+								  gpos::Ref<CExpression> pexprOuter,
+								  gpos::Ref<CExpression> pexprPredInner,
+								  gpos::Ref<CExpression> pexprPredOuter)
 {
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
@@ -580,9 +581,9 @@ CPhysicalJoin::FPredKeysSeparated(CExpression *pexprInner,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalJoin::FHashJoinCompatible(
-	CExpression *pexprPred,	  // predicate in question
-	CExpression *pexprOuter,  // outer child of the join
-	CExpression *pexprInner	  // inner child of the join
+	gpos::Ref<CExpression> pexprPred,	// predicate in question
+	gpos::Ref<CExpression> pexprOuter,	// outer child of the join
+	gpos::Ref<CExpression> pexprInner	// inner child of the join
 )
 {
 	GPOS_ASSERT(nullptr != pexprPred);
@@ -590,8 +591,8 @@ CPhysicalJoin::FHashJoinCompatible(
 	GPOS_ASSERT(nullptr != pexprInner);
 	GPOS_ASSERT(pexprOuter != pexprInner);
 
-	CExpression *pexprPredOuter = nullptr;
-	CExpression *pexprPredInner = nullptr;
+	gpos::Ref<CExpression> pexprPredOuter = nullptr;
+	gpos::Ref<CExpression> pexprPredInner = nullptr;
 	gpos::Ref<IMDId> mdid_scop = nullptr;
 	if (CPredicateUtils::IsEqualityOp(pexprPred))
 	{
@@ -601,7 +602,7 @@ CPhysicalJoin::FHashJoinCompatible(
 	}
 	else if (CPredicateUtils::FINDF(pexprPred))
 	{
-		CExpression *pexpr = (*pexprPred)[0];
+		gpos::Ref<CExpression> pexpr = (*pexprPred)[0];
 		pexprPredOuter = (*pexpr)[0];
 		pexprPredInner = (*pexpr)[1];
 		mdid_scop =
@@ -638,9 +639,9 @@ CPhysicalJoin::FHashJoinCompatible(
 
 BOOL
 CPhysicalJoin::FMergeJoinCompatible(
-	CExpression *pexprPred,	  // predicate in question
-	CExpression *pexprOuter,  // outer child of the join
-	CExpression *pexprInner	  // inner child of the join
+	gpos::Ref<CExpression> pexprPred,	// predicate in question
+	gpos::Ref<CExpression> pexprOuter,	// outer child of the join
+	gpos::Ref<CExpression> pexprInner	// inner child of the join
 )
 {
 	GPOS_ASSERT(nullptr != pexprPred);
@@ -648,8 +649,8 @@ CPhysicalJoin::FMergeJoinCompatible(
 	GPOS_ASSERT(nullptr != pexprInner);
 	GPOS_ASSERT(pexprOuter != pexprInner);
 
-	CExpression *pexprPredOuter = nullptr;
-	CExpression *pexprPredInner = nullptr;
+	gpos::Ref<CExpression> pexprPredOuter = nullptr;
+	gpos::Ref<CExpression> pexprPredInner = nullptr;
 	gpos::Ref<IMDId> mdid_scop = nullptr;
 
 	// Only merge join between ScalarIdents of the same types is currently supported
@@ -712,23 +713,23 @@ CPhysicalJoin::FMergeJoinCompatible(
 // Check for equality and INDFs in the predicates, and also aligns the expressions inner and outer keys with the predicates
 // For example foo (a int, b int) and bar (c int, d int), will need to be aligned properly if the predicate is d = a)
 void
-CPhysicalJoin::AlignJoinKeyOuterInner(CExpression *pexprPred,
-									  CExpression *pexprOuter,
+CPhysicalJoin::AlignJoinKeyOuterInner(gpos::Ref<CExpression> pexprPred,
+									  gpos::Ref<CExpression> pexprOuter,
 #ifdef GPOS_DEBUG
-									  CExpression *pexprInner,
+									  gpos::Ref<CExpression> pexprInner,
 #else
-									  gpos::pointer<CExpression *>,
+									  gpos::pointer<gpos::Ref<CExpression> >,
 #endif	// GPOS_DEBUG
-									  CExpression **ppexprKeyOuter,
-									  CExpression **ppexprKeyInner,
+									  gpos::Ref<CExpression> *ppexprKeyOuter,
+									  gpos::Ref<CExpression> *ppexprKeyInner,
 									  gpos::Ref<IMDId> *mdid_scop)
 {
 	// we should not be here if there are outer references
 	GPOS_ASSERT(nullptr != ppexprKeyOuter);
 	GPOS_ASSERT(nullptr != ppexprKeyInner);
 
-	CExpression *pexprPredOuter = nullptr;
-	CExpression *pexprPredInner = nullptr;
+	gpos::Ref<CExpression> pexprPredOuter = nullptr;
+	gpos::Ref<CExpression> pexprPredInner = nullptr;
 
 	// extract left & right children from pexprPred for all supported ops
 	if (CPredicateUtils::IsEqualityOp(pexprPred))
@@ -739,7 +740,7 @@ CPhysicalJoin::AlignJoinKeyOuterInner(CExpression *pexprPred,
 	}
 	else if (CPredicateUtils::FINDF(pexprPred))
 	{
-		CExpression *pexpr = (*pexprPred)[0];
+		gpos::Ref<CExpression> pexpr = (*pexprPred)[0];
 		pexprPredOuter = (*pexpr)[0];
 		pexprPredInner = (*pexpr)[1];
 		*mdid_scop =
@@ -763,9 +764,9 @@ CPhysicalJoin::AlignJoinKeyOuterInner(CExpression *pexprPred,
 	CColRefSet *pcrsPredInner = pexprPredInner->DeriveUsedColumns();
 #endif	// GPOS_DEBUG
 
-	CExpression *pexprOuterKeyWithoutBCC =
+	gpos::Ref<CExpression> pexprOuterKeyWithoutBCC =
 		CCastUtils::PexprWithoutBinaryCoercibleCasts(pexprPredOuter);
-	CExpression *pexprInnerKeyWithoutBCC =
+	gpos::Ref<CExpression> pexprInnerKeyWithoutBCC =
 		CCastUtils::PexprWithoutBinaryCoercibleCasts(pexprPredInner);
 
 	if (pcrsOuter->ContainsAll(pcrsPredOuter))

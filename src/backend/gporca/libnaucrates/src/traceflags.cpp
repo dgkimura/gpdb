@@ -30,7 +30,7 @@ using namespace gpos;
 void
 SetTraceflags(
 	CMemoryPool *mp,
-	const CBitSet *pbsInput,  // set of trace flags to be enabled
+	const gpos::Ref<CBitSet> pbsInput,	// set of trace flags to be enabled
 	gpos::Ref<CBitSet>
 		*ppbsEnabled,  // output: enabled trace flags before function is called
 	gpos::Ref<CBitSet>
@@ -82,7 +82,7 @@ SetTraceflags(
 //
 //---------------------------------------------------------------------------
 void
-ResetTraceflags(CBitSet *pbsEnabled, CBitSet *pbsDisabled)
+ResetTraceflags(gpos::Ref<CBitSet> pbsEnabled, gpos::Ref<CBitSet> pbsDisabled)
 {
 	if (nullptr == pbsEnabled || nullptr == pbsDisabled)
 	{

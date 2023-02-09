@@ -58,7 +58,7 @@ public:
 
 	// conversion function
 	static CPhysicalLeftAntiSemiNLJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftAntiSemiNLJoin == pop->Eopid());
 

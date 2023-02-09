@@ -92,20 +92,21 @@ CXformGbAggWithMDQA2Join::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CXformGbAggWithMDQA2Join::PexprMDQAs2Join(CMemoryPool *mp, CExpression *pexpr)
+CXformGbAggWithMDQA2Join::PexprMDQAs2Join(CMemoryPool *mp,
+										  gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(COperator::EopLogicalGbAgg == pexpr->Pop()->Eopid());
 	GPOS_ASSERT((*pexpr)[1]->DeriveHasMultipleDistinctAggs());
 
 	// extract components
-	CExpression *pexprChild = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 
 	CColRefSet *pcrsChildOutput = pexprChild->DeriveOutputColumns();
 	gpos::Ref<CColRefArray> pdrgpcrChildOutput = pcrsChildOutput->Pdrgpcr(mp);
 
 	// create a CTE producer based on child expression
-	CCTEInfo *pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	const ULONG ulCTEId = pcteinfo->next_id();
 	(void) CXformUtils::PexprAddCTEProducer(
 		mp, ulCTEId, pdrgpcrChildOutput.get(), pexprChild);
@@ -146,12 +147,13 @@ CXformGbAggWithMDQA2Join::PexprMDQAs2Join(CMemoryPool *mp, CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CXformGbAggWithMDQA2Join::PexprExpandMDQAs(CMemoryPool *mp, CExpression *pexpr)
+CXformGbAggWithMDQA2Join::PexprExpandMDQAs(CMemoryPool *mp,
+										   gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(COperator::EopLogicalGbAgg == pexpr->Pop()->Eopid());
 
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (gpos::dyn_cast<CLogicalGbAgg>(pop)->FGlobal())
 	{
 		BOOL fHasMultipleDistinctAggs =
@@ -182,14 +184,15 @@ CXformGbAggWithMDQA2Join::PexprExpandMDQAs(CMemoryPool *mp, CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CXformGbAggWithMDQA2Join::PexprTransform(CMemoryPool *mp, CExpression *pexpr)
+CXformGbAggWithMDQA2Join::PexprTransform(CMemoryPool *mp,
+										 gpos::Ref<CExpression> pexpr)
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexpr);
 
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (COperator::EopLogicalGbAgg == pop->Eopid())
 	{
 		gpos::Ref<CExpression> pexprResult = PexprExpandMDQAs(mp, pexpr);
@@ -224,9 +227,9 @@ CXformGbAggWithMDQA2Join::PexprTransform(CMemoryPool *mp, CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 void
-CXformGbAggWithMDQA2Join::Transform(CXformContext *pxfctxt,
-									CXformResult *pxfres,
-									CExpression *pexpr) const
+CXformGbAggWithMDQA2Join::Transform(gpos::Ref<CXformContext> pxfctxt,
+									gpos::Ref<CXformResult> pxfres,
+									gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);

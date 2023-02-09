@@ -60,7 +60,7 @@ protected:
 	BOOL m_fPattern;
 
 	// return an addref'ed copy of the operator
-	virtual COperator *PopCopyDefault();
+	virtual gpos::Ref<COperator> PopCopyDefault();
 
 	// derive stability function property from children
 	static IMDFunction::EFuncStbl EfsDeriveFromChildren(
@@ -335,7 +335,7 @@ public:
 
 	// match function;
 	// abstract to enforce an implementation for each new operator
-	virtual BOOL Matches(COperator *pop) const = 0;
+	virtual BOOL Matches(gpos::Ref<COperator> pop) const = 0;
 
 	// create container for derived properties
 	virtual gpos::Ref<CDrvdProp> PdpCreate(CMemoryPool *mp) const = 0;

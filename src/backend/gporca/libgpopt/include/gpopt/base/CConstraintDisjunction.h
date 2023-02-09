@@ -72,7 +72,7 @@ public:
 		BOOL must_exist) override;
 
 	// scalar expression
-	CExpression *PexprScalar(CMemoryPool *mp) override;
+	gpos::Ref<CExpression> PexprScalar(CMemoryPool *mp) override;
 
 	// check if there is a constraint on the given column
 	BOOL FConstraint(const CColRef *colref) const override;

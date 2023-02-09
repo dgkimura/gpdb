@@ -92,7 +92,7 @@ public:
 
 	// conversion function
 	static CLogicalInnerJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInnerJoin == pop->Eopid());
@@ -102,8 +102,9 @@ public:
 
 	// determine if an innerJoin group expression has
 	// less conjuncts than another
-	static BOOL FFewerConj(CMemoryPool *mp, CGroupExpression *pgexprFst,
-						   CGroupExpression *pgexprSnd);
+	static BOOL FFewerConj(CMemoryPool *mp,
+						   gpos::Ref<CGroupExpression> pgexprFst,
+						   gpos::Ref<CGroupExpression> pgexprSnd);
 
 
 };	// class CLogicalInnerJoin

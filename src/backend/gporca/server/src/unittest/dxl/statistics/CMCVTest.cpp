@@ -81,9 +81,9 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 	gpos::Ref<CPoint> point2 = CTestUtils::PpointInt4(mp, 1);
 	gpos::Ref<CPoint> point3 = CTestUtils::PpointInt4(mp, 10);
 	gpos::Ref<IDatumArray> pdrgpdatumMCV = GPOS_NEW(mp) IDatumArray(mp);
-	IDatum *datum1 = point1->GetDatum();
-	IDatum *datum2 = point2->GetDatum();
-	IDatum *datum3 = point3->GetDatum();
+	gpos::Ref<IDatum> datum1 = point1->GetDatum();
+	gpos::Ref<IDatum> datum2 = point2->GetDatum();
+	gpos::Ref<IDatum> datum3 = point3->GetDatum();
 	;
 	;
 	;
@@ -198,22 +198,22 @@ CMCVTest::EresUnittest_MergeHistMCV()
 
 		GPOS_CHECK_ABORT;
 
-		CDXLStatsDerivedRelation *pdxlstatsderrelMCV =
+		gpos::Ref<CDXLStatsDerivedRelation> pdxlstatsderrelMCV =
 			(*pdrgpdxlstatsderrelMCV)[0].get();
 		const CDXLStatsDerivedColumnArray *pdrgpdxlstatsdercolMCV =
 			pdxlstatsderrelMCV->GetDXLStatsDerivedColArray();
-		CDXLStatsDerivedColumn *pdxlstatsdercolMCV =
+		gpos::Ref<CDXLStatsDerivedColumn> pdxlstatsdercolMCV =
 			(*pdrgpdxlstatsdercolMCV)[0].get();
 		gpos::Ref<CBucketArray> pdrgppbucketMCV =
 			CDXLUtils::ParseDXLToBucketsArray(mp, md_accessor,
 											  pdxlstatsdercolMCV);
 		CHistogram *phistMCV = GPOS_NEW(mp) CHistogram(mp, pdrgppbucketMCV);
 
-		CDXLStatsDerivedRelation *pdxlstatsderrelHist =
+		gpos::Ref<CDXLStatsDerivedRelation> pdxlstatsderrelHist =
 			(*pdrgpdxlstatsderrelHist)[0].get();
 		const CDXLStatsDerivedColumnArray *pdrgpdxlstatsdercolHist =
 			pdxlstatsderrelHist->GetDXLStatsDerivedColArray();
-		CDXLStatsDerivedColumn *pdxlstatsdercolHist =
+		gpos::Ref<CDXLStatsDerivedColumn> pdxlstatsdercolHist =
 			(*pdrgpdxlstatsdercolHist)[0].get();
 		gpos::Ref<CBucketArray> pdrgppbucketHist =
 			CDXLUtils::ParseDXLToBucketsArray(mp, md_accessor,

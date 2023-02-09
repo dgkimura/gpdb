@@ -83,7 +83,7 @@ CScalarCaseTest::FInputOrderSensitive() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCaseTest::Matches(COperator *pop) const
+CScalarCaseTest::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

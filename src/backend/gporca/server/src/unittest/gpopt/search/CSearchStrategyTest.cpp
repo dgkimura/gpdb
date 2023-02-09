@@ -253,7 +253,8 @@ CSearchStrategyTest::PdrgpssRandom(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CSearchStrategyTest::BuildMemo(CMemoryPool *mp, CExpression *pexprInput,
+CSearchStrategyTest::BuildMemo(CMemoryPool *mp,
+							   gpos::Ref<CExpression> pexprInput,
 							   gpos::Ref<CSearchStageArray> search_stage_array)
 {
 	CQueryContext *pqc = CTestUtils::PqcGenerate(mp, pexprInput);

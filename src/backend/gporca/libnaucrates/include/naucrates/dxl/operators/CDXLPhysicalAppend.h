@@ -80,14 +80,14 @@ public:
 	BOOL IsUsedInUpdDel() const;
 	BOOL IsZapped() const;
 
-	CDXLTableDescr *
+	gpos::Ref<CDXLTableDescr>
 	GetDXLTableDesc() const
 	{
 		return m_dxl_table_descr.get();
 	}
 
 	void
-	SetDXLTableDesc(CDXLTableDescr *dxl_table_desc)
+	SetDXLTableDesc(gpos::Ref<CDXLTableDescr> dxl_table_desc)
 	{
 		m_dxl_table_descr = dxl_table_desc;
 	}
@@ -106,11 +106,11 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const CDXLNode *dxlnode) const override;
+						const gpos::Ref<CDXLNode> dxlnode) const override;
 
 	// conversion function
 	static CDXLPhysicalAppend *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalAppend == dxl_op->GetDXLOperator());
@@ -121,7 +121,8 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *, BOOL validate_children) const override;
+	void AssertValid(const gpos::Ref<CDXLNode>,
+					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };
 }  // namespace gpdxl

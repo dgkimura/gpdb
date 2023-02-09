@@ -111,7 +111,7 @@ CJobGroupExploration::~CJobGroupExploration() = default;
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExploration::Init(CGroup *pgroup)
+CJobGroupExploration::Init(gpos::Ref<CGroup> pgroup)
 {
 	CJobGroup::Init(pgroup);
 
@@ -145,10 +145,10 @@ CJobGroupExploration::Init(CGroup *pgroup)
 BOOL
 CJobGroupExploration::FScheduleGroupExpressions(CSchedulerContext *psc)
 {
-	CGroupExpression *pgexprLast = m_pgexprLastScheduled;
+	gpos::Ref<CGroupExpression> pgexprLast = m_pgexprLastScheduled;
 
 	// iterate on expressions and schedule them as needed
-	CGroupExpression *pgexpr = PgexprFirstUnsched();
+	gpos::Ref<CGroupExpression> pgexpr = PgexprFirstUnsched();
 	while (nullptr != pgexpr)
 	{
 		if (!pgexpr->FTransitioned(CGroupExpression::estExplored))
@@ -187,7 +187,7 @@ CJobGroupExploration::EevtStartExploration(CSchedulerContext *,	 //psc
 {
 	// get a job pointer
 	CJobGroupExploration *pjge = PjConvert(pjOwner);
-	CGroup *pgroup = pjge->m_pgroup;
+	gpos::Ref<CGroup> pgroup = pjge->m_pgroup;
 
 	// move group to exploration state
 	{
@@ -262,8 +262,8 @@ CJobGroupExploration::FExecute(CSchedulerContext *psc)
 //
 //---------------------------------------------------------------------------
 void
-CJobGroupExploration::ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
-								  CJob *pjParent)
+CJobGroupExploration::ScheduleJob(CSchedulerContext *psc,
+								  gpos::Ref<CGroup> pgroup, CJob *pjParent)
 {
 	CJob *pj = psc->Pjf()->PjCreate(CJob::EjtGroupExploration);
 

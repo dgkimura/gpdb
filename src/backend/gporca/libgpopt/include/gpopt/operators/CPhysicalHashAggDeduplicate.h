@@ -104,7 +104,7 @@ public:
 
 	// conversion function
 	static CPhysicalHashAggDeduplicate *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalHashAggDeduplicate == pop->Eopid());

@@ -73,7 +73,7 @@ public:
 	EDxlParseHandlerType GetParseHandlerType() const override;
 
 	// accessor
-	CBitSet *GetTraceFlagBitSet();
+	gpos::Ref<CBitSet> GetTraceFlagBitSet();
 };
 }  // namespace gpdxl
 

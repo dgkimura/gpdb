@@ -50,7 +50,7 @@ public:
 
 	// conversion function
 	static CDXLScalarSubqueryAny *
-	Cast(CDXLOperator *dxl_op)
+	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSubqueryAny == dxl_op->GetDXLOperator());

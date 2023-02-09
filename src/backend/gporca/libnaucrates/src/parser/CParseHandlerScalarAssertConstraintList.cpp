@@ -143,7 +143,8 @@ CParseHandlerScalarAssertConstraintList::EndElement(
 
 		CParseHandlerScalarOp *child_parse_handler =
 			dynamic_cast<CParseHandlerScalarOp *>((*this)[this->Length() - 1]);
-		CDXLNode *child_dxlnode = child_parse_handler->CreateDXLNode();
+		gpos::Ref<CDXLNode> child_dxlnode =
+			child_parse_handler->CreateDXLNode();
 		GPOS_ASSERT(nullptr != child_dxlnode);
 		;
 

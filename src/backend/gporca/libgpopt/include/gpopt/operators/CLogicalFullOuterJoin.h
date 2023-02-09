@@ -114,7 +114,7 @@ public:
 
 	// conversion function
 	static CLogicalFullOuterJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalFullOuterJoin == pop->Eopid());

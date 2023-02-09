@@ -83,7 +83,7 @@ CTranslatorDXLToExprUtils::Pdrgpdatum(CMemoryPool *mp, CMDAccessor *md_accessor,
 	const ULONG length = pdrgpdxldatum->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CDXLDatum *dxl_datum = (*pdrgpdxldatum)[ul].get();
+		gpos::Ref<CDXLDatum> dxl_datum = (*pdrgpdxldatum)[ul].get();
 		gpos::Ref<IMDId> mdid = dxl_datum->MDId();
 		gpos::Ref<IDatum> datum =
 			md_accessor->RetrieveType(mdid)->GetDatumForDXLDatum(mp, dxl_datum);
@@ -126,7 +126,7 @@ CTranslatorDXLToExprUtils::PexprConstInt8(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 void
 CTranslatorDXLToExprUtils::AddKeySets(CMemoryPool *mp,
-									  CTableDescriptor *ptabdesc,
+									  gpos::Ref<CTableDescriptor> ptabdesc,
 									  const IMDRelation *pmdrel,
 									  UlongToUlongMap *phmululColMapping)
 {
@@ -167,12 +167,12 @@ CTranslatorDXLToExprUtils::AddKeySets(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorDXLToExprUtils::FScalarBool(const CDXLNode *dxlnode,
+CTranslatorDXLToExprUtils::FScalarBool(const gpos::Ref<CDXLNode> dxlnode,
 									   EdxlBoolExprType edxlboolexprtype)
 {
 	GPOS_ASSERT(nullptr != dxlnode);
 
-	CDXLOperator *dxl_op = dxlnode->GetOperator();
+	gpos::Ref<CDXLOperator> dxl_op = dxlnode->GetOperator();
 	if (EdxlopScalarBoolExpr == dxl_op->GetDXLOperator())
 	{
 		EdxlBoolExprType edxlboolexprtypeNode =
@@ -259,7 +259,7 @@ CTranslatorDXLToExprUtils::Pdrgpcr(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 BOOL
 CTranslatorDXLToExprUtils::FCastFunc(CMDAccessor *md_accessor,
-									 const CDXLNode *dxlnode,
+									 const gpos::Ref<CDXLNode> dxlnode,
 									 gpos::Ref<IMDId> pmdidInput)
 {
 	GPOS_ASSERT(nullptr != dxlnode);

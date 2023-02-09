@@ -73,7 +73,7 @@ CPhysicalInnerIndexNLJoin::~CPhysicalInnerIndexNLJoin()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalInnerIndexNLJoin::Matches(COperator *pop) const
+CPhysicalInnerIndexNLJoin::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

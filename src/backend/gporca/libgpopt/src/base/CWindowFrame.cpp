@@ -127,7 +127,7 @@ CWindowFrame::~CWindowFrame()
 //
 //---------------------------------------------------------------------------
 BOOL
-CWindowFrame::Matches(const CWindowFrame *pwf) const
+CWindowFrame::Matches(const gpos::Ref<CWindowFrame> pwf) const
 {
 	return m_efs == pwf->Efs() && m_efbLeading == pwf->EfbLeading() &&
 		   m_efbTrailing == pwf->EfbTrailing() && m_efes == pwf->Efes() &&

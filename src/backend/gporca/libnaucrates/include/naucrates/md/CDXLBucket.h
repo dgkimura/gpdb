@@ -63,7 +63,7 @@ private:
 	// serialize the bucket boundary
 	static void SerializeBoundaryValue(CXMLSerializer *xml_serializer,
 									   const CWStringConst *elem_str,
-									   CDXLDatum *dxl_datum,
+									   gpos::Ref<CDXLDatum> dxl_datum,
 									   BOOL is_bound_closed);
 
 public:
@@ -92,10 +92,10 @@ public:
 	}
 
 	// min value for the bucket
-	const CDXLDatum *GetDXLDatumLower() const;
+	const gpos::Ref<CDXLDatum> GetDXLDatumLower() const;
 
 	// max value for the bucket
-	const CDXLDatum *GetDXLDatumUpper() const;
+	const gpos::Ref<CDXLDatum> GetDXLDatumUpper() const;
 
 	// frequency
 	CDouble GetFrequency() const;

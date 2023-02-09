@@ -33,11 +33,12 @@ class CLogicalProject : public CLogicalUnary
 private:
 	// return equivalence class from scalar ident project element
 	static gpos::Ref<CColRefSetArray> PdrgpcrsEquivClassFromScIdent(
-		CMemoryPool *mp, CExpression *pexprPrEl, CColRefSet *not_null_columns);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprPrEl,
+		CColRefSet *not_null_columns);
 
 	// extract constraint from scalar constant project element
 	static void ExtractConstraintFromScConst(CMemoryPool *mp,
-											 CExpression *pexprPrEl,
+											 gpos::Ref<CExpression> pexprPrEl,
 											 CConstraintArray *pdrgpcnstr,
 											 CColRefSetArray *pdrgpcrs);
 
@@ -101,7 +102,7 @@ public:
 
 	// conversion function
 	static CLogicalProject *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalProject == pop->Eopid());

@@ -41,7 +41,7 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CConstExprEvaluatorForDates::PexprEval(CExpression *pexpr)
+CConstExprEvaluatorForDates::PexprEval(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(COperator::EopScalarCmp == pexpr->Pop()->Eopid());
 	GPOS_ASSERT(COperator::EopScalarConst == (*pexpr)[0]->Pop()->Eopid());

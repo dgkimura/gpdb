@@ -104,7 +104,7 @@ CLogicalDynamicBitmapTableGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalDynamicBitmapTableGet::Matches(COperator *pop) const
+CLogicalDynamicBitmapTableGet::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchDynamicBitmapScan(this, pop);
 }

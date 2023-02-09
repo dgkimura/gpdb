@@ -98,7 +98,7 @@ CLogicalSplit::~CLogicalSplit()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalSplit::Matches(COperator *pop) const
+CLogicalSplit::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -246,7 +246,7 @@ CLogicalSplit::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 ) const
 {
 	// split returns double the number of tuples coming from its child
-	IStatistics *stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> stats = exprhdl.Pstats(0);
 
 	return stats->ScaleStats(mp, CDouble(2.0) /*factor*/);
 }

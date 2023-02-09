@@ -153,7 +153,7 @@ CDXLScalarSubPlan::GetSubplanTypeStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarSubPlan::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  const CDXLNode *dxlnode) const
+								  const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -229,14 +229,14 @@ CDXLScalarSubPlan::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubPlan::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarSubPlan::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 							   BOOL validate_children) const
 {
 	GPOS_ASSERT(EdxlSubPlanIndexSentinel == dxlnode->Arity());
 
 	// assert child plan is a physical plan and is valid
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlSubPlanIndexChildPlan];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[EdxlSubPlanIndexChildPlan];
 	GPOS_ASSERT(nullptr != child_dxlnode);
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());

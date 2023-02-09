@@ -75,33 +75,34 @@ private:
 		gpos::PtrEqual<CColRef, gpos::EqualPtr<CColRef>>>::LegacyIterator;
 
 	using PexprProcessDisj = gpos::Ref<CExpression> (*)(CMemoryPool *,
-														CExpression *,
-														CExpression *);
+														gpos::Ref<CExpression>,
+														gpos::Ref<CExpression>);
 
 	// helper for determining if given expression factor should be added to factors array
-	static void AddFactor(CMemoryPool *mp, CExpression *pexpr,
+	static void AddFactor(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 						  CExpressionArray *pdrgpexprFactors,
 						  CExpressionArray *pdrgpexprResidual,
 						  ExprMap *pexprmap, ULONG ulDisjuncts);
 
 	// helper for building a factors map
 	static gpos::Ref<ExprMap> PexprmapFactors(CMemoryPool *mp,
-											  CExpression *pexpr);
+											  gpos::Ref<CExpression> pexpr);
 
 	// factorize common expressions in Or tree
 	static gpos::Ref<CExpression> PexprFactorizeDisj(
-		CMemoryPool *mp, CExpression *pexpr,
-		CExpression *  // pexprLowestLogicalAncestor
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CExpression>	// pexprLowestLogicalAncestor
 	);
 
 	// visitor-like function to process descendents that are OR operators
 	static gpos::Ref<CExpression> PexprProcessDisjDescendents(
-		CMemoryPool *mp, CExpression *pexpr,
-		CExpression *pexprLowestLogicalAncestor, PexprProcessDisj pexprorfun);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CExpression> pexprLowestLogicalAncestor,
+		PexprProcessDisj pexprorfun);
 
 	// discover common factors in scalar expression
-	static gpos::Ref<CExpression> PexprDiscoverFactors(CMemoryPool *mp,
-													   CExpression *pexpr);
+	static gpos::Ref<CExpression> PexprDiscoverFactors(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 
 	// if the given expression is a non volatile scalar expression using table
 	// columns created by the same operator
@@ -111,13 +112,13 @@ private:
 	// only one computed column
 	// return true and set ppcrComputedColumn to that computed column,
 	// otherwise return false
-	static BOOL FOpSourceIdOrComputedColumn(CExpression *pexpr,
+	static BOOL FOpSourceIdOrComputedColumn(gpos::Ref<CExpression> pexpr,
 											ULONG *ulOpSourceId,
 											CColRef **ppcrComputedColumn);
 
 	// if the given expression is a scalar that can be pushed, it returns
 	// the set of used columns
-	static CColRefSet *PcrsUsedByPushableScalar(CExpression *pexpr);
+	static CColRefSet *PcrsUsedByPushableScalar(gpos::Ref<CExpression> pexpr);
 
 	// find the array of expression arrays corresponding to the given
 	// operator source id in the given source to array position map
@@ -136,8 +137,8 @@ private:
 	// if the given expression is a table column to constant comparison,
 	// record it in the map
 	static void StoreBaseOpToColumnExpr(
-		CMemoryPool *mp, CExpression *pexpr, SourceToArrayPosMap *psrc2array,
-		ColumnToArrayPosMap *pcol2array,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		SourceToArrayPosMap *psrc2array, ColumnToArrayPosMap *pcol2array,
 		const CColRefSet *pcrsProducedByChildren, BOOL fAllowNewSources,
 		ULONG ulPosition);
 
@@ -150,27 +151,27 @@ private:
 	// create a conjunction of the given expression and inferred filters constructed out
 	// of the given maps
 	static gpos::Ref<CExpression> PexprAddInferredFilters(
-		CMemoryPool *mp, CExpression *pexpr, SourceToArrayPosMap *psrc2array,
-		ColumnToArrayPosMap *pcol2array);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		SourceToArrayPosMap *psrc2array, ColumnToArrayPosMap *pcol2array);
 
 	//	returns the set of columns produced by the scalar children of the given
 	//	expression
 	static gpos::Ref<CColRefSet> PcrsColumnsProducedByChildren(
-		CMemoryPool *mp, CExpression *pexpr);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 
 	// compute disjunctive pre-filters that can be pushed to the column creators
 	static gpos::Ref<CExpression> PexprExtractInferredFiltersFromDisj(
-		CMemoryPool *mp, CExpression *pexpr,
-		CExpression *pexprLowestLogicalAncestor);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CExpression> pexprLowestLogicalAncestor);
 
 public:
 	// factorize common expressions
 	static gpos::Ref<CExpression> PexprFactorize(CMemoryPool *mp,
-												 CExpression *pexpr);
+												 gpos::Ref<CExpression> pexpr);
 
 	// compute disjunctive pre-filters that can be pushed to the column creators
 	static gpos::Ref<CExpression> PexprExtractInferredFilters(
-		CMemoryPool *mp, CExpression *pexpr);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 };
 }  // namespace gpopt
 

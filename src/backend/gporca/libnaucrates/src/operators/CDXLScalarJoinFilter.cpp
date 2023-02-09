@@ -74,7 +74,7 @@ CDXLScalarJoinFilter::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarJoinFilter::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 const CDXLNode *node) const
+									 const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -99,14 +99,14 @@ CDXLScalarJoinFilter::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarJoinFilter::AssertValid(const CDXLNode *node,
+CDXLScalarJoinFilter::AssertValid(const gpos::Ref<CDXLNode> node,
 								  BOOL validate_children) const
 {
 	GPOS_ASSERT(1 >= node->Arity());
 
 	if (1 == node->Arity())
 	{
-		CDXLNode *dxlnode_condition = (*node)[0];
+		gpos::Ref<CDXLNode> dxlnode_condition = (*node)[0];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					dxlnode_condition->GetOperator()->GetDXLOperatorType());
 

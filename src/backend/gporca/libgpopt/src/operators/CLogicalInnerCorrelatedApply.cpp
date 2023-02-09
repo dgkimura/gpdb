@@ -70,7 +70,7 @@ CLogicalInnerCorrelatedApply::PxfsCandidates(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalInnerCorrelatedApply::Matches(COperator *pop) const
+CLogicalInnerCorrelatedApply::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

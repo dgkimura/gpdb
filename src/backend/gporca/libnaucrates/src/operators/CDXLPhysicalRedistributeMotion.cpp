@@ -73,8 +73,8 @@ CDXLPhysicalRedistributeMotion::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalRedistributeMotion::SerializeToDXL(CXMLSerializer *xml_serializer,
-											   const CDXLNode *dxlnode) const
+CDXLPhysicalRedistributeMotion::SerializeToDXL(
+	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -110,7 +110,7 @@ CDXLPhysicalRedistributeMotion::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalRedistributeMotion::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalRedistributeMotion::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 											BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -123,8 +123,8 @@ CDXLPhysicalRedistributeMotion::AssertValid(const CDXLNode *dxlnode,
 
 	GPOS_ASSERT(EdxlrmIndexSentinel == dxlnode->Arity());
 
-	CDXLNode *child_dxlnode = (*dxlnode)[EdxlrmIndexChild];
-	CDXLNode *hash_expr_list = (*dxlnode)[EdxlrmIndexHashExprList];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[EdxlrmIndexChild];
+	gpos::Ref<CDXLNode> hash_expr_list = (*dxlnode)[EdxlrmIndexHashExprList];
 
 	GPOS_ASSERT(EdxloptypePhysical ==
 				child_dxlnode->GetOperator()->GetDXLOperatorType());

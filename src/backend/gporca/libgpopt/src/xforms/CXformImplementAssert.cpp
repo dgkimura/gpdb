@@ -71,8 +71,9 @@ CXformImplementAssert::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformImplementAssert::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								 CExpression *pexpr) const
+CXformImplementAssert::Transform(gpos::Ref<CXformContext> pxfctxt,
+								 gpos::Ref<CXformResult> pxfres,
+								 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -82,8 +83,8 @@ CXformImplementAssert::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 	// extract components
 	CLogicalAssert *popAssert = gpos::dyn_cast<CLogicalAssert>(pexpr->Pop());
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 	CException *pexc = popAssert->Pexc();
 
 	// addref all children

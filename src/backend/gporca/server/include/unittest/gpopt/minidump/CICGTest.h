@@ -33,7 +33,7 @@ class CICGTest
 {
 private:
 	// function pointer type for checking predicates over DXL fragments
-	using FnDXLOpPredicate = BOOL(CDXLOperator *);
+	using FnDXLOpPredicate = BOOL(gpos::Ref<CDXLOperator>);
 
 	// counter used to mark last successful test
 	static ULONG m_ulTestCounter;
@@ -54,17 +54,18 @@ private:
 	static ULONG m_ulTestCounterNoAdditionTraceFlag;
 
 	// check if all the operators in the given dxl fragment satisfy the given predicate
-	static BOOL FDXLOpSatisfiesPredicate(CDXLNode *pdxl, FnDXLOpPredicate fdop);
+	static BOOL FDXLOpSatisfiesPredicate(gpos::Ref<CDXLNode> pdxl,
+										 FnDXLOpPredicate fdop);
 
 	// check if the given dxl fragment does not contains Index Join
-	static BOOL FIsNotIndexJoin(CDXLOperator *dxl_op);
+	static BOOL FIsNotIndexJoin(gpos::Ref<CDXLOperator> dxl_op);
 
 	// check that the given dxl fragment does not contain an Index Join
-	static BOOL FHasNoIndexJoin(CDXLNode *pdxl);
+	static BOOL FHasNoIndexJoin(gpos::Ref<CDXLNode> pdxl);
 
 	// check that the given dxl fragment contains an Index Join
 	static BOOL
-	FHasIndexJoin(CDXLNode *pdxl)
+	FHasIndexJoin(gpos::Ref<CDXLNode> pdxl)
 	{
 		return !FHasNoIndexJoin(pdxl);
 	}

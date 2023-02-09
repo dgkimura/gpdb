@@ -93,7 +93,7 @@ public:
 
 	// conversion function
 	static CPhysicalScalarAgg *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalScalarAgg == pop->Eopid());

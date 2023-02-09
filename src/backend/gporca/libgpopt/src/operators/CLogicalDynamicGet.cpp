@@ -129,7 +129,7 @@ CLogicalDynamicGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalDynamicGet::Matches(COperator *pop) const
+CLogicalDynamicGet::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchDynamicScan(this, pop);
 }
@@ -326,7 +326,8 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 		// selected partitions' combined constraints as the filter to
 		// derive stats
 		;
-		CConstraint *cnstrDisj = dyn_get->GetPartitionConstraintsDisj();
+		gpos::Ref<CConstraint> cnstrDisj =
+			dyn_get->GetPartitionConstraintsDisj();
 		if (cnstrDisj)
 		{
 			pexprFilterNew = cnstrDisj->PexprScalar(mp);

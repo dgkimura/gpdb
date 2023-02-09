@@ -72,10 +72,10 @@ private:
 	JSM m_jsm;
 
 	// group expression that triggered group optimization
-	CGroupExpression *m_pgexprOrigin;
+	gpos::Ref<CGroupExpression> m_pgexprOrigin;
 
 	// optimization context of the job
-	COptimizationContext *m_poc;
+	gpos::Ref<COptimizationContext> m_poc;
 
 	// current optimization level of group expressions
 	EOptimizationLevel m_eolCurrent;
@@ -99,8 +99,9 @@ public:
 	~CJobGroupOptimization() override;
 
 	// initialize job
-	void Init(CGroup *pgroup, CGroupExpression *pgexprOrigin,
-			  COptimizationContext *poc);
+	void Init(gpos::Ref<CGroup> pgroup,
+			  gpos::Ref<CGroupExpression> pgexprOrigin,
+			  gpos::Ref<COptimizationContext> poc);
 
 	// current optimization level accessor
 	EOptimizationLevel
@@ -117,7 +118,7 @@ public:
 	}
 
 	// get first unscheduled expression
-	CGroupExpression *
+	gpos::Ref<CGroupExpression>
 	PgexprFirstUnsched() override
 	{
 		return CJobGroup::PgexprFirstUnschedNonLogical();
@@ -127,9 +128,10 @@ public:
 	BOOL FScheduleGroupExpressions(CSchedulerContext *psc) override;
 
 	// schedule a new group optimization job
-	static void ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
-							CGroupExpression *pgexprOrigin,
-							COptimizationContext *poc, CJob *pjParent);
+	static void ScheduleJob(CSchedulerContext *psc, gpos::Ref<CGroup> pgroup,
+							gpos::Ref<CGroupExpression> pgexprOrigin,
+							gpos::Ref<COptimizationContext> poc,
+							CJob *pjParent);
 
 	// job's function
 	BOOL FExecute(CSchedulerContext *psc) override;

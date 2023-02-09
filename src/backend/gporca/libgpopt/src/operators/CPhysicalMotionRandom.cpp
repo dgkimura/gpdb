@@ -57,7 +57,7 @@ CPhysicalMotionRandom::~CPhysicalMotionRandom()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionRandom::Matches(COperator *pop) const
+CPhysicalMotionRandom::Matches(gpos::Ref<COperator> pop) const
 {
 	return Eopid() == pop->Eopid();
 }
@@ -192,7 +192,7 @@ CPhysicalMotionRandom::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CPhysicalMotionRandom *
-CPhysicalMotionRandom::PopConvert(COperator *pop)
+CPhysicalMotionRandom::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionRandom == pop->Eopid());

@@ -157,7 +157,7 @@ CPhysicalCTEProducer::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalCTEProducer::PcteRequired(CMemoryPool *,		 //mp,
 								   CExpressionHandle &,	 //exprhdl,
-								   CCTEReq *pcter,
+								   gpos::Ref<CCTEReq> pcter,
 								   ULONG
 #ifdef GPOS_DEBUG
 									   child_index
@@ -231,7 +231,7 @@ CPhysicalCTEProducer::PcmDerive(CMemoryPool *mp,
 {
 	GPOS_ASSERT(1 == exprhdl.Arity());
 
-	CCTEMap *pcmChild = exprhdl.Pdpplan(0)->GetCostModel();
+	gpos::Ref<CCTEMap> pcmChild = exprhdl.Pdpplan(0)->GetCostModel();
 
 	gpos::Ref<CCTEMap> pcmProducer = GPOS_NEW(mp) CCTEMap(mp);
 	// store plan properties of the child in producer's CTE map
@@ -320,7 +320,7 @@ CPhysicalCTEProducer::EpetRewindability(CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalCTEProducer::Matches(COperator *pop) const
+CPhysicalCTEProducer::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

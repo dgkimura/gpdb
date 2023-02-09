@@ -74,7 +74,7 @@ public:
 	CDXLPhysicalProperties *GetProperties() const;
 
 	// return the derived relation statistics
-	CDXLStatsDerivedRelation *
+	gpos::Ref<CDXLStatsDerivedRelation>
 	GetDxlStatsDrvdRelation() const
 	{
 		return m_dxl_stats_derived_relation.get();

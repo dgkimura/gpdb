@@ -45,7 +45,7 @@ CScalarCoerceToDomain::CScalarCoerceToDomain(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCoerceToDomain::Matches(COperator *pop) const
+CScalarCoerceToDomain::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

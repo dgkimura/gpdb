@@ -44,7 +44,7 @@ class CXformApply2Join : public CXformExploration
 private:
 	// check if we can create a correlated apply expression from the given expression
 	static BOOL
-	FCanCreateCorrelatedApply(CMemoryPool *, CExpression *pexprApply)
+	FCanCreateCorrelatedApply(CMemoryPool *, gpos::Ref<CExpression> pexprApply)
 	{
 		GPOS_ASSERT(nullptr != pexprApply);
 
@@ -61,17 +61,17 @@ private:
 
 	// create correlated apply expression
 	static void
-	CreateCorrelatedApply(CMemoryPool *mp, CExpression *pexprApply,
-						  CXformResult *pxfres)
+	CreateCorrelatedApply(CMemoryPool *mp, gpos::Ref<CExpression> pexprApply,
+						  gpos::Ref<CXformResult> pxfres)
 	{
 		if (!FCanCreateCorrelatedApply(mp, pexprApply))
 		{
 			return;
 		}
 
-		CExpression *pexprInner = (*pexprApply)[1];
-		CExpression *pexprOuter = (*pexprApply)[0];
-		CExpression *pexprScalar = (*pexprApply)[2];
+		gpos::Ref<CExpression> pexprInner = (*pexprApply)[1];
+		gpos::Ref<CExpression> pexprOuter = (*pexprApply)[0];
+		gpos::Ref<CExpression> pexprScalar = (*pexprApply)[2];
 
 		;
 		;
@@ -134,7 +134,7 @@ private:
 protected:
 	// helper function to attempt decorrelating Apply's inner child
 	static BOOL
-	FDecorrelate(CMemoryPool *mp, CExpression *pexprApply,
+	FDecorrelate(CMemoryPool *mp, gpos::Ref<CExpression> pexprApply,
 				 gpos::Ref<CExpression> *ppexprInner,
 				 gpos::Ref<CExpressionArray> *ppdrgpexpr)
 	{
@@ -183,8 +183,9 @@ protected:
 
 	// helper function to decorrelate apply expression and insert alternative into results container
 	static void
-	Decorrelate(CXformContext *pxfctxt, CXformResult *pxfres,
-				CExpression *pexprApply)
+	Decorrelate(gpos::Ref<CXformContext> pxfctxt,
+				gpos::Ref<CXformResult> pxfres,
+				gpos::Ref<CExpression> pexprApply)
 	{
 		GPOS_ASSERT(CUtils::HasOuterRefs((*pexprApply)[1]) &&
 					"Apply's inner child must have outer references");
@@ -228,8 +229,9 @@ protected:
 
 	// helper function to create a join expression from an apply expression and insert alternative into results container
 	static void
-	CreateJoinAlternative(CXformContext *pxfctxt, CXformResult *pxfres,
-						  CExpression *pexprApply)
+	CreateJoinAlternative(gpos::Ref<CXformContext> pxfctxt,
+						  gpos::Ref<CXformResult> pxfres,
+						  gpos::Ref<CExpression> pexprApply)
 	{
 #ifdef GPOS_DEBUG
 		CExpressionHandle exprhdl(pxfctxt->Pmp());
@@ -242,9 +244,9 @@ protected:
 #endif	// GPOS_DEBUG
 
 		CMemoryPool *mp = pxfctxt->Pmp();
-		CExpression *pexprOuter = (*pexprApply)[0];
-		CExpression *pexprInner = (*pexprApply)[1];
-		CExpression *pexprPred = (*pexprApply)[2];
+		gpos::Ref<CExpression> pexprOuter = (*pexprApply)[0];
+		gpos::Ref<CExpression> pexprInner = (*pexprApply)[1];
+		gpos::Ref<CExpression> pexprPred = (*pexprApply)[2];
 		;
 		;
 		;

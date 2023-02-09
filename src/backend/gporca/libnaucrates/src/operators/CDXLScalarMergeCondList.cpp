@@ -71,7 +71,7 @@ CDXLScalarMergeCondList::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarMergeCondList::SerializeToDXL(CXMLSerializer *xml_serializer,
-										const CDXLNode *node) const
+										const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -91,7 +91,7 @@ CDXLScalarMergeCondList::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarMergeCondList::AssertValid(const CDXLNode *node,
+CDXLScalarMergeCondList::AssertValid(const gpos::Ref<CDXLNode> node,
 									 BOOL validate_children) const
 {
 	GPOS_ASSERT(nullptr != node);
@@ -99,7 +99,7 @@ CDXLScalarMergeCondList::AssertValid(const CDXLNode *node,
 	const ULONG arity = node->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDXLNode *child_dxlnode = (*node)[ul];
+		gpos::Ref<CDXLNode> child_dxlnode = (*node)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

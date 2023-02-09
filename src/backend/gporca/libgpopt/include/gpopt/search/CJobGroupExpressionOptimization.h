@@ -77,7 +77,7 @@ private:
 	JSM m_jsm;
 
 	// optimization context of the job
-	COptimizationContext *m_poc;
+	gpos::Ref<COptimizationContext> m_poc;
 
 	// optimization request number
 	ULONG m_ulOptReq;
@@ -144,8 +144,8 @@ private:
 
 	// schedule a new group expression optimization job for CTE optimization
 	static BOOL FScheduleCTEOptimization(CSchedulerContext *psc,
-										 CGroupExpression *pgexpr,
-										 COptimizationContext *poc,
+										 gpos::Ref<CGroupExpression> pgexpr,
+										 gpos::Ref<COptimizationContext> poc,
 										 ULONG ulOptReq, CJob *pjParent);
 
 protected:
@@ -171,15 +171,17 @@ public:
 	~CJobGroupExpressionOptimization() override;
 
 	// initialize job
-	void Init(CGroupExpression *pgexpr, COptimizationContext *poc,
-			  ULONG ulOptReq, CReqdPropPlan *prppCTEProducer = nullptr);
+	void Init(gpos::Ref<CGroupExpression> pgexpr,
+			  gpos::Ref<COptimizationContext> poc, ULONG ulOptReq,
+			  CReqdPropPlan *prppCTEProducer = nullptr);
 
 	// cleanup internal state
 	void Cleanup() override;
 
 	// schedule a new group expression optimization job
-	static void ScheduleJob(CSchedulerContext *psc, CGroupExpression *pgexpr,
-							COptimizationContext *poc, ULONG ulOptReq,
+	static void ScheduleJob(CSchedulerContext *psc,
+							gpos::Ref<CGroupExpression> pgexpr,
+							gpos::Ref<COptimizationContext> poc, ULONG ulOptReq,
 							CJob *pjParent);
 
 	// job's function

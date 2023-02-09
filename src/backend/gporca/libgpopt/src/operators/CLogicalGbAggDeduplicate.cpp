@@ -191,7 +191,7 @@ CLogicalGbAggDeduplicate::DeriveKeyCollection(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalGbAggDeduplicate::Matches(COperator *pop) const
+CLogicalGbAggDeduplicate::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
@@ -246,7 +246,7 @@ CLogicalGbAggDeduplicate::PstatsDerive(CMemoryPool *mp,
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	IStatistics *child_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
 
 	// extract computed columns
 	gpos::Ref<ULongPtrArray> pdrgpulComputedCols =

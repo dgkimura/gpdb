@@ -166,7 +166,7 @@ CPhysicalFullMergeJoin::PosRequired(CMemoryPool *mp,
 
 	for (ULONG ul = 0; ul < clauses->Size(); ++ul)
 	{
-		CExpression *expr = (*clauses)[ul].get();
+		gpos::Ref<CExpression> expr = (*clauses)[ul].get();
 
 		GPOS_ASSERT(CUtils::FScalarIdent(expr));
 		const CColRef *colref = CCastUtils::PcrExtractFromScIdOrCastScId(expr);

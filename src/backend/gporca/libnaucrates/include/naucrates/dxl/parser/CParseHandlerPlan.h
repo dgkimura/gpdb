@@ -70,7 +70,7 @@ public:
 	~CParseHandlerPlan() override;
 
 	// returns the root of constructed DXL plan
-	CDXLNode *CreateDXLNode();
+	gpos::Ref<CDXLNode> CreateDXLNode();
 
 	// return plan id
 	ULLONG

@@ -104,7 +104,7 @@ private:
 		ULONG HashValue() const;
 
 		// equality function
-		BOOL Equals(CCTEReqEntry *pcre) const;
+		BOOL Equals(gpos::Ref<CCTEReqEntry> pcre) const;
 
 		// print function
 		IOstream &OsPrint(IOstream &os) const;
@@ -133,7 +133,7 @@ private:
 	gpos::Ref<ULongPtrArray> m_pdrgpulRequired;
 
 	// lookup info for given cte id
-	CCTEReqEntry *PcreLookup(ULONG ulCteId) const;
+	gpos::Ref<CCTEReqEntry> PcreLookup(ULONG ulCteId) const;
 
 public:
 	CCTEReq(const CCTEReq &) = delete;
@@ -164,7 +164,7 @@ public:
 
 	// check if two cte requirements are equal
 	BOOL
-	Equals(const CCTEReq *pcter) const
+	Equals(const gpos::Ref<CCTEReq> pcter) const
 	{
 		GPOS_ASSERT(nullptr != pcter);
 		return (m_phmcter->Size() == pcter->m_phmcter->Size()) &&
@@ -172,7 +172,7 @@ public:
 	}
 
 	// check if current requirement is a subset of the given one
-	BOOL FSubset(const CCTEReq *pcter) const;
+	BOOL FSubset(const gpos::Ref<CCTEReq> pcter) const;
 
 	// check if the given CTE is in the requirements
 	BOOL FContainsRequirement(const ULONG id,
@@ -182,11 +182,12 @@ public:
 	ULONG HashValue() const;
 
 	// returns a new requirement containing unresolved CTE requirements given a derived CTE map
-	gpos::Ref<CCTEReq> PcterUnresolved(CMemoryPool *mp, CCTEMap *pcm);
+	gpos::Ref<CCTEReq> PcterUnresolved(CMemoryPool *mp, gpos::Ref<CCTEMap> pcm);
 
 	// unresolved CTE requirements given a derived CTE map for a sequence
 	// operator
-	gpos::Ref<CCTEReq> PcterUnresolvedSequence(CMemoryPool *mp, CCTEMap *pcm,
+	gpos::Ref<CCTEReq> PcterUnresolvedSequence(CMemoryPool *mp,
+											   gpos::Ref<CCTEMap> pcm,
 											   CDrvdPropArray *pdrgpdpCtxt);
 
 	// create a copy of the current requirement where all the entries are marked optional

@@ -134,7 +134,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
@@ -242,7 +242,7 @@ public:
 
 	// conversion function
 	static CLogicalGbAgg *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalGbAgg == pop->Eopid() ||
@@ -256,9 +256,9 @@ public:
 
 	// derive statistics
 	static gpos::Ref<IStatistics> PstatsDerive(
-		CMemoryPool *mp, IStatistics *child_stats,
+		CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
 		CColRefArray *pdrgpcrGroupingCols, ULongPtrArray *pdrgpulComputedCols,
-		CBitSet *keys);
+		gpos::Ref<CBitSet> keys);
 
 	// print group by aggregate type
 	static IOstream &OsPrintGbAggType(IOstream &os,

@@ -40,20 +40,20 @@ class CXformLeftSemiApplyWithExternalCorrs2InnerJoin
 private:
 	// helper for splitting correlations into external and residual
 	static BOOL FSplitCorrelations(
-		CMemoryPool *mp, CExpression *pexprOuter, CExpression *pexprInner,
-		CExpressionArray *pdrgpexprAllCorr,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
+		gpos::Ref<CExpression> pexprInner, CExpressionArray *pdrgpexprAllCorr,
 		gpos::Ref<CExpressionArray> *ppdrgpexprExternal,
 		gpos::Ref<CExpressionArray> *ppdrgpexprResidual,
 		gpos::Ref<CColRefSet> *ppcrsInnerUsed);
 
 	// helper for collecting correlations
-	static BOOL FDecorrelate(CMemoryPool *mp, CExpression *pexpr,
+	static BOOL FDecorrelate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							 gpos::Ref<CExpression> *ppexprInnerNew,
 							 gpos::Ref<CExpressionArray> *ppdrgpexprCorr);
 
 	// decorrelate semi apply with external correlations
-	static gpos::Ref<CExpression> PexprDecorrelate(CMemoryPool *mp,
-												   CExpression *pexpr);
+	static gpos::Ref<CExpression> PexprDecorrelate(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 
 public:
 	CXformLeftSemiApplyWithExternalCorrs2InnerJoin(
@@ -94,8 +94,9 @@ public:
 	EXformPromise Exfp(CExpressionHandle &exprhdl) const override;
 
 	// actual transform
-	void Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-				   CExpression *pexpr) const override;
+	void Transform(gpos::Ref<CXformContext> pxfctxt,
+				   gpos::Ref<CXformResult> pxfres,
+				   gpos::Ref<CExpression> pexpr) const override;
 
 };	// class CXformLeftSemiApplyWithExternalCorrs2InnerJoin
 

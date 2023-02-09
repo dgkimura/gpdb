@@ -94,11 +94,11 @@ public:
 	~CJobGroupExpressionExploration() override;
 
 	// initialize job
-	void Init(CGroupExpression *pgexpr);
+	void Init(gpos::Ref<CGroupExpression> pgexpr);
 
 	// schedule a new group expression exploration job
-	static void ScheduleJob(CSchedulerContext *psc, CGroupExpression *pgexpr,
-							CJob *pjParent);
+	static void ScheduleJob(CSchedulerContext *psc,
+							gpos::Ref<CGroupExpression> pgexpr, CJob *pjParent);
 
 	// job's main function
 	BOOL FExecute(CSchedulerContext *psc) override;

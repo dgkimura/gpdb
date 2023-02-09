@@ -61,7 +61,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// outer column references accessor
 	CColRefArray *
@@ -95,14 +95,14 @@ public:
 
 	// conversion function
 	static CPhysicalInnerIndexNLJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalInnerIndexNLJoin == pop->Eopid());
 
 		return dynamic_cast<CPhysicalInnerIndexNLJoin *>(pop);
 	}
 
-	CExpression *
+	gpos::Ref<CExpression>
 	OrigJoinPred()
 	{
 		return m_origJoinPred.get();

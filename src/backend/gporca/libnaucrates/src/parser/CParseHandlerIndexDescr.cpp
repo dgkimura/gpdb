@@ -66,7 +66,7 @@ CParseHandlerIndexDescr::~CParseHandlerIndexDescr()
 //		Returns the index descriptor constructed by the parse handler
 //
 //---------------------------------------------------------------------------
-CDXLIndexDescr *
+gpos::Ref<CDXLIndexDescr>
 CParseHandlerIndexDescr::GetDXLIndexDescr()
 {
 	return m_dxl_index_descr.get();

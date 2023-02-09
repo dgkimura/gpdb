@@ -71,9 +71,9 @@ CXformSelect2DynamicBitmapBoolOp::Exfp(CExpressionHandle &	// exprhdl
 //
 //---------------------------------------------------------------------------
 void
-CXformSelect2DynamicBitmapBoolOp::Transform(CXformContext *pxfctxt,
-											CXformResult *pxfres,
-											CExpression *pexpr) const
+CXformSelect2DynamicBitmapBoolOp::Transform(gpos::Ref<CXformContext> pxfctxt,
+											gpos::Ref<CXformResult> pxfres,
+											gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

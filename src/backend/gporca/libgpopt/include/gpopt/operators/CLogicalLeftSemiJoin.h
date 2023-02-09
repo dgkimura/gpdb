@@ -119,7 +119,7 @@ public:
 
 	// conversion function
 	static CLogicalLeftSemiJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftSemiJoin == pop->Eopid());
@@ -130,7 +130,8 @@ public:
 	// derive statistics
 	static gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CStatsPredJoinArray *join_preds_stats,
-		IStatistics *outer_stats, IStatistics *inner_side_stats);
+		gpos::Ref<IStatistics> outer_stats,
+		gpos::Ref<IStatistics> inner_side_stats);
 
 };	// class CLogicalLeftSemiJoin
 

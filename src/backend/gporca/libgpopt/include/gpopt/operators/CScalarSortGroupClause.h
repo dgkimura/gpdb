@@ -91,11 +91,11 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *op) const override;
+	BOOL Matches(gpos::Ref<COperator> op) const override;
 
 	// conversion function
 	static CScalarSortGroupClause *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSortGroupClause == pop->Eopid());

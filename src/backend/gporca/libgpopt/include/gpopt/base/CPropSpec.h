@@ -61,7 +61,7 @@ public:
 	virtual void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 CReqdPropPlan *prpp,
 								 CExpressionArray *pdrgpexpr,
-								 CExpression *pexpr) = 0;
+								 gpos::Ref<CExpression> pexpr) = 0;
 
 	// hash function
 	virtual ULONG HashValue() const = 0;

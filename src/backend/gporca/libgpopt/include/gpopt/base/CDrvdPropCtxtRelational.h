@@ -44,9 +44,8 @@ protected:
 	}
 
 	// add props to context
-	void
-	AddProps(CDrvdProp *  // pdp
-			 ) override
+	void AddProps(gpos::Ref<CDrvdProp>	// pdp
+				  ) override
 	{
 		// derived relational context is currently empty
 	}
@@ -76,7 +75,7 @@ public:
 
 	// conversion function
 	static CDrvdPropCtxtRelational *
-	PdpctxtrelConvert(CDrvdPropCtxt *pdpctxt)
+	PdpctxtrelConvert(gpos::Ref<CDrvdPropCtxt> pdpctxt)
 	{
 		GPOS_ASSERT(nullptr != pdpctxt);
 

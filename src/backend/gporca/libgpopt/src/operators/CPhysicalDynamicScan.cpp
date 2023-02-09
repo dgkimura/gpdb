@@ -142,7 +142,7 @@ CPhysicalDynamicScan::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CPhysicalDynamicScan *
-CPhysicalDynamicScan::PopConvert(COperator *pop)
+CPhysicalDynamicScan::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(CUtils::FPhysicalScan(pop) &&

@@ -161,8 +161,8 @@ CLogicalIntersectAll::PstatsDerive(
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
 
-	IStatistics *outer_stats = exprhdl.Pstats(0);
-	IStatistics *inner_side_stats = exprhdl.Pstats(1);
+	gpos::Ref<IStatistics> outer_stats = exprhdl.Pstats(0);
+	gpos::Ref<IStatistics> inner_side_stats = exprhdl.Pstats(1);
 
 	// construct the scalar condition similar to transform that turns an "intersect all" into a "left semi join"
 	// over a window operation on the individual input (for row_number)

@@ -102,7 +102,7 @@ CDXLLogicalProject::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalProject::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+								   const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -134,13 +134,13 @@ CDXLLogicalProject::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalProject::AssertValid(const CDXLNode *dxlnode,
+CDXLLogicalProject::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
 
-	CDXLNode *proj_list_dxlnode = (*dxlnode)[0];
-	CDXLNode *child_dxlnode = (*dxlnode)[1];
+	gpos::Ref<CDXLNode> proj_list_dxlnode = (*dxlnode)[0];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[1];
 
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list_dxlnode->GetOperator()->GetDXLOperator());
@@ -158,7 +158,7 @@ CDXLLogicalProject::AssertValid(const CDXLNode *dxlnode,
 	const ULONG arity = proj_list_dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *pdxlnPrEl = (*proj_list_dxlnode)[ul];
+		gpos::Ref<CDXLNode> pdxlnPrEl = (*proj_list_dxlnode)[ul];
 		GPOS_ASSERT(EdxlopScalarIdent !=
 					pdxlnPrEl->GetOperator()->GetDXLOperator());
 	}

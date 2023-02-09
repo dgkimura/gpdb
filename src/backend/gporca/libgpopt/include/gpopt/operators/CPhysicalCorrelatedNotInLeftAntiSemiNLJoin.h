@@ -79,7 +79,7 @@ public:
 
 	// match function
 	BOOL
-	Matches(COperator *pop) const override
+	Matches(gpos::Ref<COperator> pop) const override
 	{
 		if (pop->Eopid() == Eopid())
 		{
@@ -139,7 +139,7 @@ public:
 
 	// conversion function
 	static CPhysicalCorrelatedNotInLeftAntiSemiNLJoin *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalCorrelatedNotInLeftAntiSemiNLJoin ==

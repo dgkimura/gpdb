@@ -64,7 +64,7 @@ CScalarCast::CScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> return_type_mdid,
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCast::Matches(COperator *pop) const
+CScalarCast::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

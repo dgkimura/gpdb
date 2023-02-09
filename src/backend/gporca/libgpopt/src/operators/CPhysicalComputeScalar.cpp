@@ -73,7 +73,7 @@ CPhysicalComputeScalar::~CPhysicalComputeScalar() = default;
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalComputeScalar::Matches(COperator *pop) const
+CPhysicalComputeScalar::Matches(gpos::Ref<COperator> pop) const
 {
 	// ComputeScalar doesn't contain any members as of now
 	return Eopid() == pop->Eopid();
@@ -278,7 +278,7 @@ CPhysicalComputeScalar::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalComputeScalar::PcteRequired(CMemoryPool *,		   //mp,
 									 CExpressionHandle &,  //exprhdl,
-									 CCTEReq *pcter,
+									 gpos::Ref<CCTEReq> pcter,
 									 ULONG
 #ifdef GPOS_DEBUG
 										 child_index

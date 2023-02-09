@@ -112,7 +112,7 @@ CLogicalBitmapTableGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalBitmapTableGet::Matches(COperator *pop) const
+CLogicalBitmapTableGet::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchBitmapScan(this, pop);
 }

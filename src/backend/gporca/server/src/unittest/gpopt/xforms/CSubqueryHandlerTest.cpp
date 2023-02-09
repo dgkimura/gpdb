@@ -152,7 +152,7 @@ CSubqueryHandlerTest::EresUnittest_Subquery2Apply()
 		CXformSetIter xsi(*pxfsCand);
 		while (xsi.Advance())
 		{
-			CXform *pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
+			gpos::Ref<CXform> pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
 			GPOS_ASSERT(nullptr != pxform);
 
 			CWStringDynamic str(mp);
@@ -165,7 +165,7 @@ CSubqueryHandlerTest::EresUnittest_Subquery2Apply()
 
 			// calling the xform to perform subquery to Apply transformation
 			pxform->Transform(pxfctxt.get(), pxfres.get(), pexpr.get());
-			CExpression *pexprResult = pxfres->PexprNext();
+			gpos::Ref<CExpression> pexprResult = pxfres->PexprNext();
 
 			oss << std::endl << "OUTPUT:" << std::endl;
 			if (nullptr != pexprResult)
@@ -230,15 +230,16 @@ CSubqueryHandlerTest::EresUnittest_SubqueryWithDisjunction()
 			mp, std::move(pexprOuter), std::move(pexprInner),
 			true /*fCorrelated*/, CScalarBoolOp::EboolopOr);
 
-	CXform *pxform = CXformFactory::Pxff()->Pxf(CXform::ExfSelect2Apply);
+	gpos::Ref<CXform> pxform =
+		CXformFactory::Pxff()->Pxf(CXform::ExfSelect2Apply);
 
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
 	oss << std::endl << "EXPRESSION:" << std::endl << *pexpr << std::endl;
 
-	CExpression *pexprLogical = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprLogical = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 	oss << std::endl << "LOGICAL:" << std::endl << *pexprLogical << std::endl;
 	oss << std::endl << "SCALAR:" << std::endl << *pexprScalar << std::endl;
 
@@ -250,7 +251,7 @@ CSubqueryHandlerTest::EresUnittest_SubqueryWithDisjunction()
 
 	// calling the xform to perform subquery to Apply transformation
 	pxform->Transform(pxfctxt.get(), pxfres.get(), pexpr.get());
-	CExpression *pexprResult = pxfres->PexprNext();
+	gpos::Ref<CExpression> pexprResult = pxfres->PexprNext();
 
 	oss << std::endl
 		<< "NEW LOGICAL:" << std::endl

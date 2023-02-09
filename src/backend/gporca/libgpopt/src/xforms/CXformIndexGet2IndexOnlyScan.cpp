@@ -52,8 +52,8 @@ CXformIndexGet2IndexOnlyScan::Exfp(CExpressionHandle &exprhdl) const
 {
 	CLogicalIndexGet *popGet = gpos::dyn_cast<CLogicalIndexGet>(exprhdl.Pop());
 
-	CTableDescriptor *ptabdesc = popGet->Ptabdesc();
-	CIndexDescriptor *pindexdesc = popGet->Pindexdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = popGet->Ptabdesc();
+	gpos::Ref<CIndexDescriptor> pindexdesc = popGet->Pindexdesc();
 	BOOL possible_ao_table = ptabdesc->IsAORowOrColTable() ||
 							 ptabdesc->RetrieveRelStorageType() ==
 								 IMDRelation::ErelstorageMixedPartitioned;
@@ -84,9 +84,9 @@ CXformIndexGet2IndexOnlyScan::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformIndexGet2IndexOnlyScan::Transform(CXformContext *pxfctxt,
-										CXformResult *pxfres,
-										CExpression *pexpr) const
+CXformIndexGet2IndexOnlyScan::Transform(gpos::Ref<CXformContext> pxfctxt,
+										gpos::Ref<CXformResult> pxfres,
+										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -94,11 +94,11 @@ CXformIndexGet2IndexOnlyScan::Transform(CXformContext *pxfctxt,
 
 	CLogicalIndexGet *pop = gpos::dyn_cast<CLogicalIndexGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CIndexDescriptor *pindexdesc = pop->Pindexdesc();
-	CTableDescriptor *ptabdesc = pop->Ptabdesc();
+	gpos::Ref<CIndexDescriptor> pindexdesc = pop->Pindexdesc();
+	gpos::Ref<CTableDescriptor> ptabdesc = pop->Ptabdesc();
 
 	// extract components
-	CExpression *pexprIndexCond = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprIndexCond = (*pexpr)[0];
 	if (pexprIndexCond->DeriveHasSubquery())
 	{
 		return;

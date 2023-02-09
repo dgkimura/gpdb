@@ -83,7 +83,7 @@ CXform::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CXform::FCheckPattern(CExpression *pexpr) const
+CXform::FCheckPattern(gpos::Ref<CExpression> pexpr) const
 {
 	return pexpr->FMatchPattern(PexprPattern());
 }
@@ -98,7 +98,8 @@ CXform::FCheckPattern(CExpression *pexpr) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CXform::FPromising(CMemoryPool *mp, const CXform *pxform, CExpression *pexpr)
+CXform::FPromising(CMemoryPool *mp, const gpos::Ref<CXform> pxform,
+				   gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pxform);
 	GPOS_ASSERT(nullptr != pexpr);

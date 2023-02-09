@@ -116,7 +116,7 @@ CPhysicalIndexScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalIndexScan::Matches(COperator *pop) const
+CPhysicalIndexScan::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchIndex(this, pop);
 }

@@ -206,10 +206,9 @@ CDXLScalarAggref::IsDistinct() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAggref::SerializeValuesListChildToDXL(CXMLSerializer *xml_serializer,
-												const CDXLNode *dxlnode,
-												ULONG index,
-												const CHAR *attr_name) const
+CDXLScalarAggref::SerializeValuesListChildToDXL(
+	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode,
+	ULONG index, const CHAR *attr_name) const
 {
 	CDXLScalarValuesList *child = gpos::dyn_cast<CDXLScalarValuesList>(
 		((*dxlnode)[index])->GetOperator());
@@ -226,7 +225,7 @@ CDXLScalarAggref::SerializeValuesListChildToDXL(CXMLSerializer *xml_serializer,
 //---------------------------------------------------------------------------
 void
 CDXLScalarAggref::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *dxlnode) const
+								 const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -288,7 +287,7 @@ CDXLScalarAggref::HasBoolResult(CMDAccessor *md_accessor) const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAggref::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarAggref::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 							  BOOL validate_children) const
 {
 	EdxlAggrefStage aggrefstage =
@@ -301,7 +300,7 @@ CDXLScalarAggref::AssertValid(const CDXLNode *dxlnode,
 	const ULONG arity = dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ++ul)
 	{
-		CDXLNode *aggref_child_dxl = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> aggref_child_dxl = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					aggref_child_dxl->GetOperator()->GetDXLOperatorType());
 

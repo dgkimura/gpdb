@@ -117,7 +117,7 @@ CDXLPhysicalTableScan::GetOpNameStr() const
 //		Table descriptor for the table scan
 //
 //---------------------------------------------------------------------------
-const CDXLTableDescr *
+const gpos::Ref<CDXLTableDescr>
 CDXLPhysicalTableScan::GetDXLTableDescr()
 {
 	return m_dxl_table_descr.get();
@@ -134,7 +134,7 @@ CDXLPhysicalTableScan::GetDXLTableDescr()
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
-									  const CDXLNode *dxlnode) const
+									  const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -164,7 +164,7 @@ CDXLPhysicalTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalTableScan::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalTableScan::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								   BOOL validate_children) const
 {
 	// assert proj list and filter are valid

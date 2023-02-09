@@ -70,7 +70,7 @@ public:
 	~CParseHandlerQuery() override;
 
 	// returns the root of constructed DXL plan
-	CDXLNode *CreateDXLNode() const;
+	gpos::Ref<CDXLNode> CreateDXLNode() const;
 
 	// returns the dxl representation of the query output
 	CDXLNodeArray *GetOutputColumnsDXLArray() const;

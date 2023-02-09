@@ -117,7 +117,7 @@ COptimizerConfig::PoconfDefault(CMemoryPool *mp, gpos::Ref<ICostModel> pcm)
 //---------------------------------------------------------------------------
 void
 COptimizerConfig::Serialize(CMemoryPool *mp, CXMLSerializer *xml_serializer,
-							CBitSet *pbsTrace) const
+							gpos::Ref<CBitSet> pbsTrace) const
 {
 	GPOS_ASSERT(nullptr != xml_serializer);
 	GPOS_ASSERT(nullptr != pbsTrace);

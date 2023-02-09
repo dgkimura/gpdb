@@ -88,20 +88,20 @@ private:
 
 	// apply xforms to group expression and insert results to memo
 	void ApplyTransformations(CMemoryPool *pmpLocal, CXformSet *xform_set,
-							  CGroupExpression *pgexpr);
+							  gpos::Ref<CGroupExpression> pgexpr);
 
 	// transition a given group to a target state
-	void TransitionGroup(CMemoryPool *pmpLocal, CGroup *pgroup,
+	void TransitionGroup(CMemoryPool *pmpLocal, gpos::Ref<CGroup> pgroup,
 						 CGroup::EState estTarget);
 
 	// transition a given group expression to a target state
 	void TransitionGroupExpression(CMemoryPool *pmpLocal,
-								   CGroupExpression *pgexpr,
+								   gpos::Ref<CGroupExpression> pgexpr,
 								   CGroupExpression::EState estTarget);
 
 	// create optimization context for child group
 	gpos::Ref<COptimizationContext> PocChild(
-		CGroupExpression *pgexpr,  // parent expression
+		gpos::Ref<CGroupExpression> pgexpr,	 // parent expression
 		COptimizationContext
 			*pocOrigin,	 // optimization context of parent operator
 		CExpressionHandle
@@ -114,42 +114,42 @@ private:
 		ULONG ulOptReq);
 
 	// optimize child group and return best cost context satisfying required properties
-	CCostContext *PccOptimizeChild(CExpressionHandle &exprhdl,
-								   CExpressionHandle &exprhdlRel,
-								   COptimizationContext *pocOrigin,
-								   CDrvdPropArray *pdrgpdp,
-								   IStatisticsArray *pdrgpstatCurrentCtxt,
-								   ULONG child_index, ULONG ulOptReq);
+	gpos::Ref<CCostContext> PccOptimizeChild(
+		CExpressionHandle &exprhdl, CExpressionHandle &exprhdlRel,
+		gpos::Ref<COptimizationContext> pocOrigin, CDrvdPropArray *pdrgpdp,
+		IStatisticsArray *pdrgpstatCurrentCtxt, ULONG child_index,
+		ULONG ulOptReq);
 
 	// optimize child groups of a given group expression
 	gpos::Ref<COptimizationContextArray> PdrgpocOptimizeChildren(
-		CExpressionHandle &exprhdl, COptimizationContext *pocOrigin,
+		CExpressionHandle &exprhdl, gpos::Ref<COptimizationContext> pocOrigin,
 		ULONG ulOptReq);
 
 	// optimize group expression under a given context
-	void OptimizeGroupExpression(CGroupExpression *pgexpr,
-								 COptimizationContext *poc);
+	void OptimizeGroupExpression(gpos::Ref<CGroupExpression> pgexpr,
+								 gpos::Ref<COptimizationContext> poc);
 
 	// optimize group under a given context
-	CGroupExpression *PgexprOptimize(CGroup *pgroup, COptimizationContext *poc,
-									 CGroupExpression *pgexprOrigin);
+	gpos::Ref<CGroupExpression> PgexprOptimize(
+		gpos::Ref<CGroup> pgroup, gpos::Ref<COptimizationContext> poc,
+		gpos::Ref<CGroupExpression> pgexprOrigin);
 
 	void DbgPrintExpr(int group_no, int context_no);
 #endif	// GPOS_DEBUG
 
 	// initialize query logical expression
-	void InitLogicalExpression(CExpression *pexpr);
+	void InitLogicalExpression(gpos::Ref<CExpression> pexpr);
 
 	// insert children of the given expression to memo, and
 	// copy the resulting groups to the given group array
-	void InsertExpressionChildren(CExpression *pexpr,
+	void InsertExpressionChildren(gpos::Ref<CExpression> pexpr,
 								  CGroupArray *pdrgpgroupChildren,
 								  CXform::EXformId exfidOrigin,
-								  CGroupExpression *pgexprOrigin);
+								  gpos::Ref<CGroupExpression> pgexprOrigin);
 
 	// create and schedule the main optimization job
 	void ScheduleMainJob(CSchedulerContext *psc,
-						 COptimizationContext *poc) const;
+						 gpos::Ref<COptimizationContext> poc) const;
 
 	// print activated xform
 	void PrintActivatedXforms(IOstream &os) const;
@@ -169,7 +169,7 @@ private:
 	ULLONG UllRandomPlanId(ULONG *seed);
 
 	// extract a plan sample and handle exceptions according to enumerator configurations
-	BOOL FValidPlanSample(CEnumeratorConfig *pec, ULLONG plan_id,
+	BOOL FValidPlanSample(gpos::Ref<CEnumeratorConfig> pec, ULLONG plan_id,
 						  gpos::Ref<CExpression> *ppexpr);
 
 	// sample possible plans uniformly
@@ -186,7 +186,8 @@ private:
 
 	// check whether the given memo groups can be marked as duplicates. This is
 	// true only if they have the same logical properties
-	static BOOL FPossibleDuplicateGroups(CGroup *pgroupFst, CGroup *pgroupSnd);
+	static BOOL FPossibleDuplicateGroups(gpos::Ref<CGroup> pgroupFst,
+										 gpos::Ref<CGroup> pgroupSnd);
 
 	// check if optimization is possible under the given property enforcing types
 	static BOOL FOptimize(CEnfdProp::EPropEnforcingType epetOrder,
@@ -204,8 +205,10 @@ private:
 
 	// determine if a plan, rooted by given group expression, can be safely pruned based on cost bounds
 	// when stats for Dynamic Partition Elimination are derived
-	BOOL FSafeToPruneWithDPEStats(CGroupExpression *pgexpr, CReqdPropPlan *prpp,
-								  CCostContext *pccChild, ULONG child_index);
+	BOOL FSafeToPruneWithDPEStats(gpos::Ref<CGroupExpression> pgexpr,
+								  CReqdPropPlan *prpp,
+								  gpos::Ref<CCostContext> pccChild,
+								  ULONG child_index);
 
 	// print current memory consumption
 	IOstream &OsPrintMemoryConsumption(IOstream &os,
@@ -225,7 +228,7 @@ public:
 			  gpos::Ref<CSearchStageArray> search_stage_array);
 
 	// accessor of memo's root group
-	CGroup *
+	gpos::Ref<CGroup>
 	PgroupRoot() const
 	{
 		GPOS_ASSERT(nullptr != m_pmemo);
@@ -235,24 +238,27 @@ public:
 
 	// check if a group is the root one
 	BOOL
-	FRoot(CGroup *pgroup) const
+	FRoot(gpos::Ref<CGroup> pgroup) const
 	{
 		return (PgroupRoot() == pgroup);
 	}
 
 	// insert expression tree to memo
-	CGroup *PgroupInsert(CGroup *pgroupTarget, CExpression *pexpr,
-						 CXform::EXformId exfidOrigin,
-						 CGroupExpression *pgexprOrigin, BOOL fIntermediate);
+	gpos::Ref<CGroup> PgroupInsert(gpos::Ref<CGroup> pgroupTarget,
+								   gpos::Ref<CExpression> pexpr,
+								   CXform::EXformId exfidOrigin,
+								   gpos::Ref<CGroupExpression> pgexprOrigin,
+								   BOOL fIntermediate);
 
 	// insert a set of xform results into the memo
-	void InsertXformResult(CGroup *pgroupOrigin, CXformResult *pxfres,
+	void InsertXformResult(gpos::Ref<CGroup> pgroupOrigin,
+						   gpos::Ref<CXformResult> pxfres,
 						   CXform::EXformId exfidOrigin,
-						   CGroupExpression *pgexprOrigin, ULONG ulXformTime,
-						   ULONG ulNumberOfBindings);
+						   gpos::Ref<CGroupExpression> pgexprOrigin,
+						   ULONG ulXformTime, ULONG ulNumberOfBindings);
 
 	// add enforcers to the memo
-	void AddEnforcers(CGroupExpression *pgexprChild,
+	void AddEnforcers(gpos::Ref<CGroupExpression> pgexprChild,
 					  CExpressionArray *pdrgpexprEnforcers);
 
 	// extract a physical plan from the memo
@@ -265,8 +271,8 @@ public:
 
 	// check enforceable properties;
 	// return false if it's impossible for the operator to satisfy one or more
-	BOOL FCheckEnfdProps(CMemoryPool *mp, CGroupExpression *pgexpr,
-						 COptimizationContext *poc, ULONG ulOptReq,
+	BOOL FCheckEnfdProps(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
+						 gpos::Ref<COptimizationContext> poc, ULONG ulOptReq,
 						 COptimizationContextArray *pdrgpoc);
 
 #ifdef GPOS_DEBUG
@@ -371,13 +377,14 @@ public:
 	}
 
 	// check if parent group expression can optimize child group expression
-	BOOL FOptimizeChild(CGroupExpression *pgexprParent,
-						CGroupExpression *pgexprChild,
-						COptimizationContext *pocChild, EOptimizationLevel eol);
+	BOOL FOptimizeChild(gpos::Ref<CGroupExpression> pgexprParent,
+						gpos::Ref<CGroupExpression> pgexprChild,
+						gpos::Ref<COptimizationContext> pocChild,
+						EOptimizationLevel eol);
 
 	// determine if a plan, rooted by given group expression, can be safely pruned based on cost bounds
-	BOOL FSafeToPrune(CGroupExpression *pgexpr, CReqdPropPlan *prpp,
-					  CCostContext *pccChild, ULONG child_index,
+	BOOL FSafeToPrune(gpos::Ref<CGroupExpression> pgexpr, CReqdPropPlan *prpp,
+					  gpos::Ref<CCostContext> pccChild, ULONG child_index,
 					  CCost *pcostLowerBound);
 
 	// print
@@ -397,10 +404,11 @@ public:
 
 	// derive statistics
 	static void DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-							CGroup *pgroup, CReqdPropRelational *prprel);
+							gpos::Ref<CGroup> pgroup,
+							CReqdPropRelational *prprel);
 
 	// return the first group expression in a given group
-	static CGroupExpression *PgexprFirst(CGroup *pgroup);
+	static gpos::Ref<CGroupExpression> PgexprFirst(gpos::Ref<CGroup> pgroup);
 
 	UlongPtrArray *GetNumberOfBindings();
 

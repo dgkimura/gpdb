@@ -75,7 +75,7 @@ CXformSimplifySubquery::Exfp(CExpressionHandle &exprhdl) const
 //---------------------------------------------------------------------------
 BOOL
 CXformSimplifySubquery::FSimplifyQuantified(
-	CMemoryPool *mp, CExpression *pexprScalar,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
 	gpos::Ref<CExpression> *ppexprNewScalar)
 {
 	GPOS_ASSERT(CUtils::FQuantifiedSubquery(pexprScalar->Pop()));
@@ -110,7 +110,7 @@ CXformSimplifySubquery::FSimplifyQuantified(
 //---------------------------------------------------------------------------
 BOOL
 CXformSimplifySubquery::FSimplifyExistential(
-	CMemoryPool *mp, CExpression *pexprScalar,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
 	gpos::Ref<CExpression> *ppexprNewScalar)
 {
 	GPOS_ASSERT(CUtils::FExistentialSubquery(pexprScalar->Pop()));
@@ -146,7 +146,7 @@ CXformSimplifySubquery::FSimplifyExistential(
 //---------------------------------------------------------------------------
 BOOL
 CXformSimplifySubquery::FSimplifySubqueryRecursive(
-	CMemoryPool *mp, CExpression *pexprScalar,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
 	gpos::Ref<CExpression> *ppexprNewScalar, FnSimplify *pfnsimplify,
 	FnMatch *pfnmatch)
 {
@@ -215,8 +215,9 @@ CXformSimplifySubquery::FSimplifySubqueryRecursive(
 //
 //---------------------------------------------------------------------------
 void
-CXformSimplifySubquery::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								  CExpression *pexpr) const
+CXformSimplifySubquery::Transform(gpos::Ref<CXformContext> pxfctxt,
+								  gpos::Ref<CXformResult> pxfres,
+								  gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -253,12 +254,12 @@ CXformSimplifySubquery::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 
 gpos::Ref<CExpression>
 CXformSimplifySubquery::FSimplifySubquery(CMemoryPool *mp,
-										  CExpression *pexprInput,
+										  gpos::Ref<CExpression> pexprInput,
 										  FnSimplify *pfnsimplify,
 										  FnMatch *pfnmatch)
 {
-	CExpression *pexprOuter = (*pexprInput)[0];
-	CExpression *pexprScalar = (*pexprInput)[1];
+	gpos::Ref<CExpression> pexprOuter = (*pexprInput)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexprInput)[1];
 	gpos::Ref<CExpression> pexprNewScalar = nullptr;
 
 	if (!FSimplifySubqueryRecursive(mp, pexprScalar, &pexprNewScalar,

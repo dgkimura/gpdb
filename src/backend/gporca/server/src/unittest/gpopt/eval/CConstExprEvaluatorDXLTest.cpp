@@ -50,7 +50,7 @@ const INT CConstExprEvaluatorDXLTest::m_iDefaultEvalValue = 300;
 //---------------------------------------------------------------------------
 gpos::Ref<gpdxl::CDXLNode>
 CConstExprEvaluatorDXLTest::CDummyConstDXLNodeEvaluator::EvaluateExpr(
-	const gpdxl::CDXLNode * /*pdxlnExpr*/
+	const gpdxl::gpos::Ref<CDXLNode> /*pdxlnExpr*/
 )
 {
 	const IMDTypeInt4 *pmdtypeint4 = m_pmda->PtMDType<IMDTypeInt4>();
@@ -143,7 +143,7 @@ CConstExprEvaluatorDXLTest::EresUnittest_NestedSubquery()
 
 	gpos::Ref<CExpression> pexprSelect =
 		CTestUtils::PexprLogicalSelectWithConstAnySubquery(testsetup.Pmp());
-	CExpression *pexprPredicate = (*pexprSelect)[1];
+	gpos::Ref<CExpression> pexprPredicate = (*pexprSelect)[1];
 	GPOS_ASSERT(COperator::EopScalarSubqueryAny ==
 				pexprPredicate->Pop()->Eopid());
 

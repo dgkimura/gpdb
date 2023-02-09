@@ -23,8 +23,8 @@ class CInnerJoinStatsProcessor : public CJoinStatsProcessor
 public:
 	// inner join with another stats structure
 	static gpos::Ref<CStatistics> CalcInnerJoinStatsStatic(
-		CMemoryPool *mp, const IStatistics *outer_stats_input,
-		const IStatistics *inner_stats_input,
+		CMemoryPool *mp, const gpos::Ref<IStatistics> outer_stats_input,
+		const gpos::Ref<IStatistics> inner_stats_input,
 		CStatsPredJoinArray *join_preds_stats);
 };
 }  // namespace gpnaucrates

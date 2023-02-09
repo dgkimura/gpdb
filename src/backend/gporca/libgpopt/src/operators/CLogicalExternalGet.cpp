@@ -78,7 +78,7 @@ CLogicalExternalGet::CLogicalExternalGet(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalExternalGet::Matches(COperator *pop) const
+CLogicalExternalGet::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{

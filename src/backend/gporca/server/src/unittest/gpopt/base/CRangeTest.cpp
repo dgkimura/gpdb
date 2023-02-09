@@ -295,9 +295,11 @@ CRangeTest::EresInitAndCheckRanges(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 //
 //---------------------------------------------------------------------------
 void
-CRangeTest::TestRangeRelationship(CMemoryPool *mp, CRange *prange1,
-								  CRange *prange2, CRange *prange3,
-								  CRange *prange4, CRange *prange5)
+CRangeTest::TestRangeRelationship(CMemoryPool *mp, gpos::Ref<CRange> prange1,
+								  gpos::Ref<CRange> prange2,
+								  gpos::Ref<CRange> prange3,
+								  gpos::Ref<CRange> prange4,
+								  gpos::Ref<CRange> prange5)
 {
 	GPOS_ASSERT_MSG(!prange4->FDisjointLeft(prange5),
 					"[-10, 10) does not end before [0, 0]");
@@ -346,7 +348,8 @@ CRangeTest::TestRangeRelationship(CMemoryPool *mp, CRange *prange1,
 //
 //---------------------------------------------------------------------------
 void
-CRangeTest::PrintRange(CMemoryPool *mp, CColRef *colref, CRange *prange)
+CRangeTest::PrintRange(CMemoryPool *mp, CColRef *colref,
+					   gpos::Ref<CRange> prange)
 {
 	gpos::Ref<CExpression> pexpr = prange->PexprScalar(mp, colref);
 

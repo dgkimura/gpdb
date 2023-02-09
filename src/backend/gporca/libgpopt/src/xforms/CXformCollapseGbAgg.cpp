@@ -87,8 +87,9 @@ CXformCollapseGbAgg::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformCollapseGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-							   CExpression *pexpr) const
+CXformCollapseGbAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
+							   gpos::Ref<CXformResult> pxfres,
+							   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -102,13 +103,13 @@ CXformCollapseGbAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	GPOS_ASSERT(0 < popTopGbAgg->Pdrgpcr()->Size());
 	GPOS_ASSERT(popTopGbAgg->FGlobal());
 
-	CExpression *pexprRelational = (*pexpr)[0];
-	CExpression *pexprTopProjectList = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprTopProjectList = (*pexpr)[1];
 
 	CLogicalGbAgg *popBottomGbAgg =
 		gpos::dyn_cast<CLogicalGbAgg>(pexprRelational->Pop());
-	CExpression *pexprChild = (*pexprRelational)[0];
-	CExpression *pexprBottomProjectList = (*pexprRelational)[1];
+	gpos::Ref<CExpression> pexprChild = (*pexprRelational)[0];
+	gpos::Ref<CExpression> pexprBottomProjectList = (*pexprRelational)[1];
 
 	if (!popBottomGbAgg->FGlobal())
 	{

@@ -131,11 +131,11 @@ private:
 		}
 
 		// hash function
-		static ULONG HashValue(const CReqdColsRequest *prcr);
+		static ULONG HashValue(const gpos::Ref<CReqdColsRequest> prcr);
 
 		// equality function
-		static BOOL Equals(const CReqdColsRequest *prcrFst,
-						   const CReqdColsRequest *prcrSnd);
+		static BOOL Equals(const gpos::Ref<CReqdColsRequest> prcrFst,
+						   const gpos::Ref<CReqdColsRequest> prcrSnd);
 
 	};	// class CReqdColsRequest
 
@@ -165,7 +165,7 @@ private:
 
 	// check whether we can push a part table requirement to a given child, given
 	// the knowledge of where the part index id is defined
-	static BOOL FCanPushPartReqToChild(CBitSet *pbsPartConsumer,
+	static BOOL FCanPushPartReqToChild(gpos::Ref<CBitSet> pbsPartConsumer,
 									   ULONG child_index);
 
 protected:
@@ -199,7 +199,7 @@ protected:
 
 	// pass cte requirement to the n-th child
 	gpos::Ref<CCTEReq> PcterNAry(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 CCTEReq *pcter, ULONG child_index,
+								 gpos::Ref<CCTEReq> pcter, ULONG child_index,
 								 CDrvdPropArray *pdrgpdpCtxt) const;
 
 	// helper for computing required columns of the n-th child by including used
@@ -242,7 +242,7 @@ protected:
 		CRewindabilitySpec *prsRequired, ULONG child_index);
 
 	// pass cte requirement to the child
-	static gpos::Ref<CCTEReq> PcterPushThru(CCTEReq *pcter);
+	static gpos::Ref<CCTEReq> PcterPushThru(gpos::Ref<CCTEReq> pcter);
 
 	// combine the derived CTE maps of the first n children
 	// of the given expression handle
@@ -272,7 +272,8 @@ protected:
 		ULONG child_index);
 
 	// helper to compute skew estimate based on given stats and distribution spec
-	static CDouble GetSkew(IStatistics *stats, CDistributionSpec *pds);
+	static CDouble GetSkew(gpos::Ref<IStatistics> stats,
+						   CDistributionSpec *pds);
 
 
 	// return true if the given column set includes any of the columns defined by
@@ -330,13 +331,14 @@ public:
 	// compute required ctes of the n-th child
 	virtual gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp,
 											CExpressionHandle &exprhdl,
-											CCTEReq *pcter, ULONG child_index,
+											gpos::Ref<CCTEReq> pcter,
+											ULONG child_index,
 											CDrvdPropArray *pdrgpdpCtxt,
 											ULONG ulOptReq) const = 0;
 
 	// compute distribution spec from the table descriptor
 	static gpos::Ref<CDistributionSpec> PdsCompute(
-		CMemoryPool *mp, const CTableDescriptor *ptabdesc,
+		CMemoryPool *mp, const gpos::Ref<CTableDescriptor> ptabdesc,
 		CColRefArray *pdrgpcrOutput, CColRef *gp_segment_id);
 
 	// compute required sort order of the n-th child
@@ -367,7 +369,7 @@ public:
 
 	// required properties: check if required CTEs are included in derived CTE map
 	virtual BOOL FProvidesReqdCTEs(CExpressionHandle &exprhdl,
-								   const CCTEReq *pcter) const;
+								   const gpos::Ref<CCTEReq> pcter) const;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
@@ -427,9 +429,9 @@ public:
 
 	// check if optimization contexts is valid
 	virtual BOOL
-	FValidContext(CMemoryPool *,				  // mp
-				  gpopt::COptimizationContext *,  // poc,
-				  COptimizationContextArray *	  // pdrgpocChild
+	FValidContext(CMemoryPool *,						   // mp
+				  gpopt::gpos::Ref<COptimizationContext>,  // poc,
+				  COptimizationContextArray *			   // pdrgpocChild
 	) const
 	{
 		return true;
@@ -507,7 +509,7 @@ public:
 
 	// conversion function
 	static CPhysical *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(pop->FPhysical());

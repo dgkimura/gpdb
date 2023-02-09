@@ -61,7 +61,7 @@ CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDynamicBitmapTableScan::Matches(COperator *pop) const
+CPhysicalDynamicBitmapTableScan::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchDynamicBitmapScan(this, pop);
 }
@@ -85,7 +85,7 @@ CPhysicalDynamicBitmapTableScan::PstatsDerive(
 		CStatisticsUtils::DeriveStatsForDynamicScan(
 			mp, exprhdl, ScanId(), prpplan->Pepp()->PppsRequired());
 
-	CExpression *pexprCondChild =
+	gpos::Ref<CExpression> pexprCondChild =
 		exprhdl.PexprScalarRepChild(0 /*ulChidIndex*/);
 	gpos::Ref<CExpression> local_expr = nullptr;
 	gpos::Ref<CExpression> expr_with_outer_refs = nullptr;
@@ -96,9 +96,10 @@ CPhysicalDynamicBitmapTableScan::PstatsDerive(
 	CPredicateUtils::SeparateOuterRefs(mp, pexprCondChild, outer_refs,
 									   &local_expr, &expr_with_outer_refs);
 
-	IStatistics *stats = CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
-		mp, exprhdl, pstatsBaseTable.get(), local_expr.get(),
-		expr_with_outer_refs, stats_ctxt);
+	gpos::Ref<IStatistics> stats =
+		CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
+			mp, exprhdl, pstatsBaseTable.get(), local_expr.get(),
+			expr_with_outer_refs, stats_ctxt);
 
 	;
 	;

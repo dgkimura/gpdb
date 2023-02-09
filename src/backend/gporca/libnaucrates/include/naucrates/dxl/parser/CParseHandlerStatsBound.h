@@ -70,7 +70,7 @@ public:
 	~CParseHandlerStatsBound() override;
 
 	// return the dxl datum representing the bound point
-	CDXLDatum *
+	gpos::Ref<CDXLDatum>
 	GetDatumVal() const
 	{
 		return m_dxl_datum.get();

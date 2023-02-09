@@ -99,7 +99,8 @@ CMissingStatsTest::EresUnittest_RunTests()
 			optimizer_config.get(), nullptr /*pceeval*/
 		);
 
-		CStatisticsConfig *stats_config = optimizer_config->GetStatsConf();
+		gpos::Ref<CStatisticsConfig> stats_config =
+			optimizer_config->GetStatsConf();
 
 		gpos::Ref<IMdIdArray> pdrgmdidCol = GPOS_NEW(mp) IMdIdArray(mp);
 		stats_config->CollectMissingStatsColumns(pdrgmdidCol.get());

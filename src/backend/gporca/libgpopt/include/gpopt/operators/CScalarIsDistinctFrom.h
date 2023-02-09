@@ -63,10 +63,10 @@ public:
 		return "CScalarIsDistinctFrom";
 	}
 
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// conversion function
-	static CScalarIsDistinctFrom *PopConvert(COperator *pop);
+	static CScalarIsDistinctFrom *PopConvert(gpos::Ref<COperator> pop);
 
 	// get commuted scalar IDF operator
 	gpos::Ref<CScalarCmp> PopCommutedOp(CMemoryPool *mp) override;

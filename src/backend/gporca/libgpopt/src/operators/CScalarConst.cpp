@@ -76,7 +76,7 @@ CScalarConst::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarConst::Matches(COperator *pop) const
+CScalarConst::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -131,7 +131,7 @@ CScalarConst::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarConst::FCastedConst(CExpression *pexpr)
+CScalarConst::FCastedConst(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -158,7 +158,7 @@ CScalarConst::FCastedConst(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 CScalarConst *
-CScalarConst::PopExtractFromConstOrCastConst(CExpression *pexpr)
+CScalarConst::PopExtractFromConstOrCastConst(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 

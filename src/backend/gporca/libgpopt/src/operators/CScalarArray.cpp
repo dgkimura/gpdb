@@ -127,7 +127,7 @@ CScalarArray::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarArray::Matches(COperator *pop) const
+CScalarArray::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

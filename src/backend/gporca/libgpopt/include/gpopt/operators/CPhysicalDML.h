@@ -75,11 +75,11 @@ private:
 	BOOL m_fSplit;
 
 	// do we need to sort on insert
-	BOOL FInsertSortOnRows(COptimizerConfig *optimizer_config);
+	BOOL FInsertSortOnRows(gpos::Ref<COptimizerConfig> optimizer_config);
 
 	// compute required order spec
-	gpos::Ref<COrderSpec> PosComputeRequired(CMemoryPool *mp,
-											 CTableDescriptor *ptabdesc);
+	gpos::Ref<COrderSpec> PosComputeRequired(
+		CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc);
 
 	// compute local required columns
 	void ComputeRequiredLocalColumns(CMemoryPool *mp);
@@ -120,7 +120,7 @@ public:
 	}
 
 	// table descriptor
-	CTableDescriptor *
+	gpos::Ref<CTableDescriptor>
 	Ptabdesc() const
 	{
 		return m_ptabdesc.get();
@@ -169,7 +169,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// hash function
 	ULONG HashValue() const override;
@@ -226,7 +226,7 @@ public:
 
 	// compute required ctes of the n-th child
 	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CCTEReq *pcter, ULONG child_index,
+									gpos::Ref<CCTEReq> pcter, ULONG child_index,
 									CDrvdPropArray *pdrgpdpCtxt,
 									ULONG ulOptReq) const override;
 
@@ -306,7 +306,7 @@ public:
 
 	// conversion function
 	static CPhysicalDML *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(COperator::EopPhysicalDML == pop->Eopid());
 

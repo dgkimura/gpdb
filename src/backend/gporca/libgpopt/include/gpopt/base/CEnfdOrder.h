@@ -83,7 +83,7 @@ public:
 							BOOL fOrderReqd) const;
 
 	// property spec accessor
-	CPropSpec *
+	gpos::Ref<CPropSpec>
 	Pps() const override
 	{
 		return m_pos.get();

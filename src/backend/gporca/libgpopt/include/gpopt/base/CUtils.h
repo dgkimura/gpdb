@@ -58,15 +58,16 @@ class CUtils
 {
 private:
 	// check if the expression is a scalar boolean const
-	static BOOL FScalarConstBool(CExpression *pexpr, BOOL value);
+	static BOOL FScalarConstBool(gpos::Ref<CExpression> pexpr, BOOL value);
 
 	// check if two expressions have the same children in any order
-	static BOOL FMatchChildrenUnordered(const CExpression *pexprLeft,
-										const CExpression *pexprRight);
+	static BOOL FMatchChildrenUnordered(
+		const gpos::Ref<CExpression> pexprLeft,
+		const gpos::Ref<CExpression> pexprRight);
 
 	// check if two expressions have the same children in the same order
-	static BOOL FMatchChildrenOrdered(const CExpression *pexprLeft,
-									  const CExpression *pexprRight);
+	static BOOL FMatchChildrenOrdered(const gpos::Ref<CExpression> pexprLeft,
+									  const gpos::Ref<CExpression> pexprRight);
 
 	// checks that the given type has all the comparisons: Eq, NEq, L, LEq, G, GEq
 	static BOOL FHasAllDefaultComparisons(const IMDType *pmdtype);
@@ -86,7 +87,7 @@ public:
 #ifdef GPOS_DEBUG
 
 	// print given expression to debug trace
-	static void PrintExpression(CExpression *pexpr);
+	static void PrintExpression(gpos::Ref<CExpression> pexpr);
 
 	// print memo to debug trace
 	static void PrintMemo(CMemo *pmemo);
@@ -104,7 +105,7 @@ public:
 	// recursively check for a plan with CTE, if both CTEProducer and CTEConsumer are executed on the same locality.
 	// raises an exception if CTE Producer and CTE Consumer does not have the same locality
 	static void ValidateCTEProducerConsumerLocality(
-		CMemoryPool *mp, CExpression *pexpr, EExecLocalityType edt,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr, EExecLocalityType edt,
 		gpos::Ref<UlongToUlongMap> phmulul);
 
 	// generate a comparison expression for two column references
@@ -132,10 +133,9 @@ public:
 		gpos::Ref<IMDId> mdid_op);
 
 	// generate a comparison expression for two expressions
-	static gpos::Ref<CExpression> PexprScalarCmp(CMemoryPool *mp,
-												 CExpression *pexprLeft,
-												 CExpression *pexprRight,
-												 gpos::Ref<IMDId> mdid_scop);
+	static gpos::Ref<CExpression> PexprScalarCmp(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
+		gpos::Ref<CExpression> pexprRight, gpos::Ref<IMDId> mdid_scop);
 
 	// generate a comparison expression for a column reference and an expression
 	static gpos::Ref<CExpression> PexprScalarCmp(
@@ -195,8 +195,8 @@ public:
 										   gpos::Ref<CExpression> pexprRight);
 
 	static gpos::Ref<CExpression> PexprIDF(CMemoryPool *mp,
-										   CExpression *pexprLeft,
-										   CExpression *pexprRight,
+										   gpos::Ref<CExpression> pexprLeft,
+										   gpos::Ref<CExpression> pexprRight,
 										   gpos::Ref<IMDId> mdid_scop);
 
 	// generate an Is NOT Distinct From expression for two column references
@@ -210,8 +210,8 @@ public:
 											gpos::Ref<CExpression> pexprRight);
 
 	static gpos::Ref<CExpression> PexprINDF(CMemoryPool *mp,
-											CExpression *pexprLeft,
-											CExpression *pexprRight,
+											gpos::Ref<CExpression> pexprLeft,
+											gpos::Ref<CExpression> pexprRight,
 											gpos::Ref<IMDId> mdid_scop);
 
 	// generate an Is NULL expression
@@ -227,8 +227,9 @@ public:
 												  gpos::Ref<CExpression> pexpr);
 
 	// find if a scalar expression uses a nullable columns from the output of a logical expression
-	static BOOL FUsesNullableCol(CMemoryPool *mp, CExpression *pexprScalar,
-								 CExpression *pexprLogical);
+	static BOOL FUsesNullableCol(CMemoryPool *mp,
+								 gpos::Ref<CExpression> pexprScalar,
+								 gpos::Ref<CExpression> pexprLogical);
 
 	// generate a scalar op expression for a column reference and an expression
 	static gpos::Ref<CExpression> PexprScalarOp(
@@ -276,14 +277,14 @@ public:
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprLogical);
 
 	// return True if passed expression is a Project Element defined on count(*)/count(any) agg
-	static BOOL FCountAggProjElem(CExpression *pexprPrjElem,
+	static BOOL FCountAggProjElem(gpos::Ref<CExpression> pexprPrjElem,
 								  CColRef **ppcrCount);
 
 	// check if given expression has a count(*)/count(Any) agg
-	static BOOL FHasCountAgg(CExpression *pexpr, CColRef **ppcrCount);
+	static BOOL FHasCountAgg(gpos::Ref<CExpression> pexpr, CColRef **ppcrCount);
 
 	// check if given expression has count matching the given column, returns the Logical GroupBy Agg above
-	static BOOL FHasCountAggMatchingColumn(const CExpression *pexpr,
+	static BOOL FHasCountAggMatchingColumn(const gpos::Ref<CExpression> pexpr,
 										   const CColRef *colref,
 										   const CLogicalGbAgg **ppgbAgg);
 
@@ -330,7 +331,8 @@ public:
 
 	// generate a select expression, if child is another Select expression collapse both Selects into one expression
 	static gpos::Ref<CExpression> PexprCollapseSelect(
-		CMemoryPool *mp, CExpression *pexpr, CExpression *pexprPredicate);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CExpression> pexprPredicate);
 
 	// generate a project expression
 	static gpos::Ref<CExpression> PexprLogicalProject(
@@ -379,12 +381,12 @@ public:
 		COperator::EGbAggType egbaggtype);
 
 	// check if the aggregate is local or global
-	static BOOL FHasGlobalAggFunc(const CExpression *pexprProjList);
+	static BOOL FHasGlobalAggFunc(const gpos::Ref<CExpression> pexprProjList);
 
 	// check if given project list has only aggregate functions
 	// that can be safely executed on replicated slices
 	static BOOL FContainsOnlyReplicationSafeAggFuncs(
-		const CExpression *pexprProjList);
+		const gpos::Ref<CExpression> pexprProjList);
 
 	// generate a bool expression
 	static gpos::Ref<CExpression> PexprScalarConstBool(CMemoryPool *mp,
@@ -427,8 +429,9 @@ public:
 	// generate an apply expression
 	template <class T>
 	static gpos::Ref<CExpression> PexprLogicalApply(
-		CMemoryPool *mp, CExpression *pexprLeft, CExpression *pexprRight,
-		CExpression *pexprPred = nullptr);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
+		gpos::Ref<CExpression> pexprRight,
+		gpos::Ref<CExpression> pexprPred = nullptr);
 
 	// generate an apply expression with a known inner column
 	template <class T>
@@ -436,7 +439,7 @@ public:
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 		gpos::Ref<CExpression> pexprRight, const CColRef *pcrInner,
 		COperator::EOperatorId eopidOriginSubq,
-		CExpression *pexprPred = nullptr);
+		gpos::Ref<CExpression> pexprPred = nullptr);
 
 	// generate an apply expression with a known array of inner columns
 	template <class T>
@@ -444,7 +447,7 @@ public:
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 		gpos::Ref<CExpression> pexprRight, gpos::Ref<CColRefArray> pdrgpcrInner,
 		COperator::EOperatorId eopidOriginSubq,
-		CExpression *pexprPred = nullptr);
+		gpos::Ref<CExpression> pexprPred = nullptr);
 
 	// generate a correlated apply for quantified subquery with a known array of inner columns
 	template <class T>
@@ -452,7 +455,7 @@ public:
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 		gpos::Ref<CExpression> pexprRight, gpos::Ref<CColRefArray> pdrgpcrInner,
 		COperator::EOperatorId eopidOriginSubq,
-		CExpression *pexprPred = nullptr);
+		gpos::Ref<CExpression> pexprPred = nullptr);
 
 	//-------------------------------------------------------------------
 	// Helpers for partitioning
@@ -471,11 +474,11 @@ public:
 		CMemoryPool *mp, CExpressionArray *pdrgpexpr);
 
 	// deep equality of expression trees
-	static BOOL Equals(const CExpression *pexprLeft,
-					   const CExpression *pexprRight);
+	static BOOL Equals(const gpos::Ref<CExpression> pexprLeft,
+					   const gpos::Ref<CExpression> pexprRight);
 
 	// compare expression against an array of expressions
-	static BOOL FEqualAny(const CExpression *pexpr,
+	static BOOL FEqualAny(const gpos::Ref<CExpression> pexpr,
 						  const CExpressionArray *pdrgpexpr);
 
 	// deep equality of expression arrays
@@ -488,7 +491,7 @@ public:
 
 	// return the number of occurrences of the given expression in the given
 	// array of expressions
-	static ULONG UlOccurrences(const CExpression *pexpr,
+	static ULONG UlOccurrences(const gpos::Ref<CExpression> pexpr,
 							   CExpressionArray *pdrgpexpr);
 
 	//-------------------------------------------------------------------
@@ -496,14 +499,14 @@ public:
 	//-------------------------------------------------------------------
 
 	// check to see if the expression is a scalar const TRUE
-	static BOOL FScalarConstTrue(CExpression *pexpr);
+	static BOOL FScalarConstTrue(gpos::Ref<CExpression> pexpr);
 
 	// check to see if the expression is a scalar const FALSE
-	static BOOL FScalarConstFalse(CExpression *pexpr);
+	static BOOL FScalarConstFalse(gpos::Ref<CExpression> pexpr);
 
 	// check if the given expression is an INT, the template parameter is an INT type
 	template <class T>
-	static BOOL FScalarConstInt(CExpression *pexpr);
+	static BOOL FScalarConstInt(gpos::Ref<CExpression> pexpr);
 
 	//-------------------------------------------------------------------
 	// Helpers for printing
@@ -520,7 +523,7 @@ public:
 
 	// create an array of output columns including a key for grouping
 	static gpos::Ref<CColRefArray> PdrgpcrGroupingKey(
-		CMemoryPool *mp, CExpression *pexpr,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 		gpos::Ref<CColRefArray> *ppdrgpcrKey);
 
 	// add an equivalence class (col ref set) to the array. If the new equiv
@@ -564,212 +567,220 @@ public:
 							 const Vector<Ref<T>> *input, ULONG start = 0);
 
 	// check for existence of subqueries
-	static BOOL FHasSubquery(CExpression *pexpr);
+	static BOOL FHasSubquery(gpos::Ref<CExpression> pexpr);
 
 	// check existence of subqueries or Apply operators in deep expression tree
-	static BOOL FHasSubqueryOrApply(CExpression *pexpr, BOOL fCheckRoot = true);
+	static BOOL FHasSubqueryOrApply(gpos::Ref<CExpression> pexpr,
+									BOOL fCheckRoot = true);
 
 	// check existence of correlated apply operators in deep expression tree
-	static BOOL FHasCorrelatedApply(CExpression *pexpr, BOOL fCheckRoot = true);
+	static BOOL FHasCorrelatedApply(gpos::Ref<CExpression> pexpr,
+									BOOL fCheckRoot = true);
 
 	// check for existence of CTE anchor
-	static BOOL FHasCTEAnchor(CExpression *pexpr);
+	static BOOL FHasCTEAnchor(gpos::Ref<CExpression> pexpr);
 
 	// check for existence of outer references
-	static BOOL HasOuterRefs(CExpression *pexpr);
+	static BOOL HasOuterRefs(gpos::Ref<CExpression> pexpr);
 
 	// check if a given operator is a logical join
-	static BOOL FLogicalJoin(COperator *pop);
+	static BOOL FLogicalJoin(gpos::Ref<COperator> pop);
 
 	// check if a given operator is a logical set operation
-	static BOOL FLogicalSetOp(COperator *pop);
+	static BOOL FLogicalSetOp(gpos::Ref<COperator> pop);
 
 	// check if a given operator is a logical unary operator
-	static BOOL FLogicalUnary(COperator *pop);
+	static BOOL FLogicalUnary(gpos::Ref<COperator> pop);
 
 	// check if a given operator is a physical join
-	static BOOL FPhysicalJoin(COperator *pop);
+	static BOOL FPhysicalJoin(gpos::Ref<COperator> pop);
 
 	// check if a given operator is a physical left outer join
-	static BOOL FPhysicalLeftOuterJoin(COperator *pop);
+	static BOOL FPhysicalLeftOuterJoin(gpos::Ref<COperator> pop);
 
 	// check if a given operator is a physical scan
-	static BOOL FPhysicalScan(COperator *pop);
+	static BOOL FPhysicalScan(gpos::Ref<COperator> pop);
 
 	// check if a given operator is a physical agg
-	static BOOL FPhysicalAgg(COperator *pop);
+	static BOOL FPhysicalAgg(gpos::Ref<COperator> pop);
 
 	// check if given expression has any one stage agg nodes
-	static BOOL FHasOneStagePhysicalAgg(const CExpression *pexpr);
+	static BOOL FHasOneStagePhysicalAgg(const gpos::Ref<CExpression> pexpr);
 
 	// check if a given operator is a physical motion
-	static BOOL FPhysicalMotion(COperator *pop);
+	static BOOL FPhysicalMotion(gpos::Ref<COperator> pop);
 
 	// check if duplicate values can be generated by the given distribution spec
 	static BOOL FDuplicateHazardDistributionSpec(CDistributionSpec *pds);
 
 	// check if duplicate values can be generated by the given Motion expression
-	static BOOL FDuplicateHazardMotion(CExpression *pexprMotion);
+	static BOOL FDuplicateHazardMotion(gpos::Ref<CExpression> pexprMotion);
 
 	// check if a given operator is an enforcer
-	static BOOL FEnforcer(COperator *pop);
+	static BOOL FEnforcer(gpos::Ref<COperator> pop);
 
 	// check if a given operator is a hash join
-	static BOOL FHashJoin(COperator *pop);
+	static BOOL FHashJoin(gpos::Ref<COperator> pop);
 
 	// check if a given operator is a correlated nested loops join
-	static BOOL FCorrelatedNLJoin(COperator *pop);
+	static BOOL FCorrelatedNLJoin(gpos::Ref<COperator> pop);
 
 	// check if a given operator is a nested loops join
-	static BOOL FNLJoin(COperator *pop);
+	static BOOL FNLJoin(gpos::Ref<COperator> pop);
 
 	// check if a given operator is an Apply
-	static BOOL FApply(COperator *pop);
+	static BOOL FApply(gpos::Ref<COperator> pop);
 
 	// check if a given operator is a correlated Apply
-	static BOOL FCorrelatedApply(COperator *pop);
+	static BOOL FCorrelatedApply(gpos::Ref<COperator> pop);
 
 	// check if a given operator is left semi apply
-	static BOOL FLeftSemiApply(COperator *pop);
+	static BOOL FLeftSemiApply(gpos::Ref<COperator> pop);
 
 	// check if a given operator is left anti semi apply
-	static BOOL FLeftAntiSemiApply(COperator *pop);
+	static BOOL FLeftAntiSemiApply(gpos::Ref<COperator> pop);
 
 	// check if a given operator is a subquery
-	static BOOL FSubquery(COperator *pop);
+	static BOOL FSubquery(gpos::Ref<COperator> pop);
 
 	// check if a given operator is existential subquery
-	static BOOL FExistentialSubquery(COperator *pop);
+	static BOOL FExistentialSubquery(gpos::Ref<COperator> pop);
 
 	// check if a given operator is quantified subquery
-	static BOOL FQuantifiedSubquery(COperator *pop);
+	static BOOL FQuantifiedSubquery(gpos::Ref<COperator> pop);
 
 	// check if given expression is a Project Element with scalar subquery
-	static BOOL FProjElemWithScalarSubq(CExpression *pexpr);
+	static BOOL FProjElemWithScalarSubq(gpos::Ref<CExpression> pexpr);
 
 	// check if given expression is a scalar subquery with a ConstTableGet as the only child
-	static BOOL FScalarSubqWithConstTblGet(CExpression *pexpr);
+	static BOOL FScalarSubqWithConstTblGet(gpos::Ref<CExpression> pexpr);
 
 	// check if given expression is a Project on ConstTable with one scalar subquery in Project List
-	static BOOL FProjectConstTableWithOneScalarSubq(CExpression *pexpr);
+	static BOOL FProjectConstTableWithOneScalarSubq(
+		gpos::Ref<CExpression> pexpr);
 
 	// check if an expression is a 0 offset
-	static BOOL FScalarConstIntZero(CExpression *pexprOffset);
+	static BOOL FScalarConstIntZero(gpos::Ref<CExpression> pexprOffset);
 
 	// check if a limit expression has 0 offset
-	static BOOL FHasZeroOffset(CExpression *pexpr);
+	static BOOL FHasZeroOffset(gpos::Ref<CExpression> pexpr);
 
 	// check if expression is scalar comparison
-	static BOOL FScalarCmp(CExpression *pexpr);
+	static BOOL FScalarCmp(gpos::Ref<CExpression> pexpr);
 
 	// check if expression is scalar array comparison
-	static BOOL FScalarArrayCmp(CExpression *pexpr);
+	static BOOL FScalarArrayCmp(gpos::Ref<CExpression> pexpr);
 
 	// check if given operator exists in the given list
-	static BOOL FOpExists(const COperator *pop,
+	static BOOL FOpExists(const gpos::Ref<COperator> pop,
 						  const COperator::EOperatorId *peopid, ULONG ulOps);
 
 	// check if given expression has any operator in the given list
-	static BOOL FHasOp(const CExpression *pexpr,
+	static BOOL FHasOp(const gpos::Ref<CExpression> pexpr,
 					   const COperator::EOperatorId *peopid, ULONG ulOps);
 
 	// return number of inlinable CTEs in the given expression
-	static ULONG UlInlinableCTEs(CExpression *pexpr, ULONG ulDepth = 1);
+	static ULONG UlInlinableCTEs(gpos::Ref<CExpression> pexpr,
+								 ULONG ulDepth = 1);
 
 	// return number of joins in the given expression
-	static ULONG UlJoins(CExpression *pexpr);
+	static ULONG UlJoins(gpos::Ref<CExpression> pexpr);
 
 	// return number of subqueries in the given expression
-	static ULONG UlSubqueries(CExpression *pexpr);
+	static ULONG UlSubqueries(gpos::Ref<CExpression> pexpr);
 
 	// check if expression is scalar bool op
-	static BOOL FScalarBoolOp(CExpression *pexpr);
+	static BOOL FScalarBoolOp(gpos::Ref<CExpression> pexpr);
 
 	// is the given expression a scalar bool op of the passed type?
-	static BOOL FScalarBoolOp(CExpression *pexpr,
+	static BOOL FScalarBoolOp(gpos::Ref<CExpression> pexpr,
 							  CScalarBoolOp::EBoolOperator eboolop);
 
 	// check if expression is scalar null test
-	static BOOL FScalarNullTest(CExpression *pexpr);
+	static BOOL FScalarNullTest(gpos::Ref<CExpression> pexpr);
 
 	// check if given expression is a NOT NULL predicate
-	static BOOL FScalarNotNull(CExpression *pexpr);
+	static BOOL FScalarNotNull(gpos::Ref<CExpression> pexpr);
 
 	// check if expression is scalar identifier
-	static BOOL FScalarIdent(CExpression *pexpr);
+	static BOOL FScalarIdent(gpos::Ref<CExpression> pexpr);
 
 	// check if expression is scalar identifier (with or without a cast)
-	static BOOL FScalarIdentIgnoreCast(CExpression *pexpr);
+	static BOOL FScalarIdentIgnoreCast(gpos::Ref<CExpression> pexpr);
 
-	static BOOL FScalarConstAndScalarIdentArray(CExpression *pexprArray);
+	static BOOL FScalarConstAndScalarIdentArray(
+		gpos::Ref<CExpression> pexprArray);
 
 	// check if expression is scalar identifier of boolean type
-	static BOOL FScalarIdentBoolType(CExpression *pexpr);
+	static BOOL FScalarIdentBoolType(gpos::Ref<CExpression> pexpr);
 
 	// check if expression is scalar array
-	static BOOL FScalarArray(CExpression *pexpr);
+	static BOOL FScalarArray(gpos::Ref<CExpression> pexpr);
 
 	// returns number of children or constants of it is all constants
-	static ULONG UlScalarArrayArity(CExpression *pexpr);
+	static ULONG UlScalarArrayArity(gpos::Ref<CExpression> pexpr);
 
 	// returns constant operator of a scalar array expression
-	static CScalarConst *PScalarArrayConstChildAt(CExpression *pexprArray,
-												  ULONG ul);
+	static CScalarConst *PScalarArrayConstChildAt(
+		gpos::Ref<CExpression> pexprArray, ULONG ul);
 
 	// returns constant expression of a scalar array expression
 	static gpos::Ref<CExpression> PScalarArrayExprChildAt(
-		CMemoryPool *mp, CExpression *pexprArray, ULONG ul);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprArray, ULONG ul);
 
 	// returns the scalar array expression child of CScalarArrayComp
-	static CExpression *PexprScalarArrayChild(CExpression *pexpr);
+	static gpos::Ref<CExpression> PexprScalarArrayChild(
+		gpos::Ref<CExpression> pexpr);
 
 	// returns if the scalar array has all constant elements or children
-	static BOOL FScalarConstArray(CExpression *pexpr);
+	static BOOL FScalarConstArray(gpos::Ref<CExpression> pexpr);
 
 	// returns if the scalar constant is an array
-	static BOOL FIsConstArray(CExpression *pexpr);
+	static BOOL FIsConstArray(gpos::Ref<CExpression> pexpr);
 
 	// returns MDId for gp_percentile based on return type
-	static gpos::Ref<CMDIdGPDB> GetPercentileAggMDId(CMemoryPool *mp,
-													 CExpression *pexprAggFn);
+	static gpos::Ref<CMDIdGPDB> GetPercentileAggMDId(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprAggFn);
 
 	// returns if the scalar constant array has already been collapased
-	static BOOL FScalarArrayCollapsed(CExpression *pexprArray);
+	static BOOL FScalarArrayCollapsed(gpos::Ref<CExpression> pexprArray);
 
 	// returns true if the subquery is a ScalarSubqueryAny
-	static BOOL FAnySubquery(COperator *pop);
+	static BOOL FAnySubquery(gpos::Ref<COperator> pop);
 
-	static CScalarProjectElement *PNthProjectElement(CExpression *pexpr,
-													 ULONG ul);
+	static CScalarProjectElement *PNthProjectElement(
+		gpos::Ref<CExpression> pexpr, ULONG ul);
 
 	// returns the expression under the Nth project element of a CLogicalProject
-	static CExpression *PNthProjectElementExpr(CExpression *pexpr, ULONG ul);
+	static gpos::Ref<CExpression> PNthProjectElementExpr(
+		gpos::Ref<CExpression> pexpr, ULONG ul);
 
 	// check if the Project list has an inner reference assuming project list has one projecet element
-	static BOOL FInnerRefInProjectList(CExpression *pexpr);
+	static BOOL FInnerRefInProjectList(gpos::Ref<CExpression> pexpr);
 
 	// Check if expression tree has a col being referenced in the CColRefSet passed as input
-	static BOOL FExprHasAnyCrFromCrs(CExpression *pexpr, CColRefSet *pcrs);
+	static BOOL FExprHasAnyCrFromCrs(gpos::Ref<CExpression> pexpr,
+									 CColRefSet *pcrs);
 
 	// If it's a scalar array of all CScalarConst, collapse it into a single
 	// expression but keep the constants in the operator.
 	static gpos::Ref<CExpression> PexprCollapseConstArray(
-		CMemoryPool *mp, CExpression *pexprArray);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprArray);
 
 	// check if expression is scalar array coerce
-	static BOOL FScalarArrayCoerce(CExpression *pexpr);
+	static BOOL FScalarArrayCoerce(gpos::Ref<CExpression> pexpr);
 
 	// is the given expression a scalar identifier with the given column reference
-	static BOOL FScalarIdent(CExpression *pexpr, CColRef *colref);
+	static BOOL FScalarIdent(gpos::Ref<CExpression> pexpr, CColRef *colref);
 
 	// check if expression is scalar const
-	static BOOL FScalarConst(CExpression *pexpr);
+	static BOOL FScalarConst(gpos::Ref<CExpression> pexpr);
 
 	// check if this is a variable-free expression
-	static BOOL FVarFreeExpr(CExpression *pexpr);
+	static BOOL FVarFreeExpr(gpos::Ref<CExpression> pexpr);
 
 	// check if expression is a predicate
-	static BOOL FPredicate(CExpression *pexpr);
+	static BOOL FPredicate(gpos::Ref<CExpression> pexpr);
 
 	// is this type supported in contradiction detection using stats logic
 	static BOOL FIntType(gpos::Ref<IMDId> mdid_type);
@@ -790,7 +801,7 @@ public:
 	static BOOL FComparisonPossible(CColRefArray *colref_array,
 									IMDType::ECmpType cmp_type);
 
-	static ULONG UlCountOperator(const CExpression *pexpr,
+	static ULONG UlCountOperator(const gpos::Ref<CExpression> pexpr,
 								 COperator::EOperatorId op_id);
 
 	// return the max subset of redistributable columns for the given columns
@@ -801,14 +812,14 @@ public:
 	static BOOL IsHashable(CColRefArray *colref_array);
 
 	// check if the given operator is a logical DML operator
-	static BOOL FLogicalDML(COperator *pop);
+	static BOOL FLogicalDML(gpos::Ref<COperator> pop);
 
 	// return regular string from wide-character string
 	static CHAR *CreateMultiByteCharStringFromWCString(CMemoryPool *mp,
 													   WCHAR *wsz);
 
 	// return column reference defined by project element
-	static CColRef *PcrFromProjElem(CExpression *pexprPrEl);
+	static CColRef *PcrFromProjElem(gpos::Ref<CExpression> pexprPrEl);
 
 	// construct an array of colids from the given array of column references
 	static gpos::Ref<ULongPtrArray> Pdrgpul(CMemoryPool *mp,
@@ -899,7 +910,7 @@ public:
 	// cast the input expression to the destination mdid
 	static gpos::Ref<CExpression> PexprCast(CMemoryPool *mp,
 											CMDAccessor *md_accessor,
-											CExpression *pexpr,
+											gpos::Ref<CExpression> pexpr,
 											gpos::Ref<IMDId> mdid_dest);
 
 	// construct a logical join expression of the given type, with the given children
@@ -934,28 +945,28 @@ public:
 										 const CColRef *colref);
 
 	// collapse the top two project nodes, if unable return NULL
-	static gpos::Ref<CExpression> PexprCollapseProjects(CMemoryPool *mp,
-														CExpression *pexpr);
+	static gpos::Ref<CExpression> PexprCollapseProjects(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 
 	// match function between index get/scan operators
 	template <class T>
-	static BOOL FMatchIndex(T *pop1, COperator *pop2);
+	static BOOL FMatchIndex(T *pop1, gpos::Ref<COperator> pop2);
 
 	// match function between dynamic index get/scan operators
 	template <class T>
-	static BOOL FMatchDynamicIndex(T *pop1, COperator *pop2);
+	static BOOL FMatchDynamicIndex(T *pop1, gpos::Ref<COperator> pop2);
 
 	// match function between dynamic get/scan operators
 	template <class T>
-	static BOOL FMatchDynamicScan(T *pop1, COperator *pop2);
+	static BOOL FMatchDynamicScan(T *pop1, gpos::Ref<COperator> pop2);
 
 	// match function between dynamic bitmap get/scan operators
 	template <class T>
-	static BOOL FMatchDynamicBitmapScan(T *pop1, COperator *pop2);
+	static BOOL FMatchDynamicBitmapScan(T *pop1, gpos::Ref<COperator> pop2);
 
 	// match function between bitmap get/scan operators
 	template <class T>
-	static BOOL FMatchBitmapScan(T *pop1, COperator *pop2);
+	static BOOL FMatchBitmapScan(T *pop1, gpos::Ref<COperator> pop2);
 
 	// compares two Idatums, useful for sorting functions
 	static INT IDatumCmp(const void *val1, const void *val2);
@@ -984,33 +995,34 @@ public:
 	static BOOL FGeneratePartOid(gpos::Ref<IMDId> mdid);
 
 	// return true if given expression contains window aggregate function
-	static BOOL FHasAggWindowFunc(CExpression *pexpr);
+	static BOOL FHasAggWindowFunc(gpos::Ref<CExpression> pexpr);
 
 	// return true if given expression contains ordered aggregate function
-	static BOOL FHasOrderedAggToSplit(CExpression *pexpr);
+	static BOOL FHasOrderedAggToSplit(gpos::Ref<CExpression> pexpr);
 
 	// return true if the given expression is a cross join
-	static BOOL FCrossJoin(CExpression *pexpr);
+	static BOOL FCrossJoin(gpos::Ref<CExpression> pexpr);
 
 	// return true if can create hash join for the expression
-	static BOOL IsHashJoinPossible(CMemoryPool *mp, CExpression *pexpr);
+	static BOOL IsHashJoinPossible(CMemoryPool *mp,
+								   gpos::Ref<CExpression> pexpr);
 
 	// is this scalar expression an NDV-preserving function (used for join stats derivation)
-	static BOOL IsExprNDVPreserving(CExpression *pexpr,
+	static BOOL IsExprNDVPreserving(gpos::Ref<CExpression> pexpr,
 									const CColRef **underlying_colref);
 
 	// search the given array of predicates for predicates with equality or IS NOT
 	// DISTINCT FROM operators that has one side equal to the given expression
-	static CExpression *PexprMatchEqualityOrINDF(
-		CExpression *pexprToMatch,
+	static gpos::Ref<CExpression> PexprMatchEqualityOrINDF(
+		gpos::Ref<CExpression> pexprToMatch,
 		CExpressionArray *pdrgpexpr	 // array of predicates to inspect
 	);
 
 	static gpos::Ref<CExpression> MakeJoinWithoutInferredPreds(
-		CMemoryPool *mp, CExpression *join_expr);
+		CMemoryPool *mp, gpos::Ref<CExpression> join_expr);
 
 	static BOOL Contains(const CExpressionArray *exprs,
-						 CExpression *expr_to_match);
+						 gpos::Ref<CExpression> expr_to_match);
 
 	static BOOL Equals(const CExpressionArrays *exprs_arr,
 					   const CExpressionArrays *other_exprs_arr);
@@ -1029,7 +1041,7 @@ public:
 	static void AddExprs(CExpressionArrays *results_exprs,
 						 CExpressionArrays *input_exprs);
 
-	static BOOL FScalarConstBoolNull(CExpression *pexpr);
+	static BOOL FScalarConstBoolNull(gpos::Ref<CExpression> pexpr);
 };	// class CUtils
 
 // hash set from expressions
@@ -1073,8 +1085,9 @@ CUtils::PexprLogicalJoin(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 //---------------------------------------------------------------------------
 template <class T>
 gpos::Ref<CExpression>
-CUtils::PexprLogicalApply(CMemoryPool *mp, CExpression *pexprLeft,
-						  CExpression *pexprRight, CExpression *pexprPred)
+CUtils::PexprLogicalApply(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
+						  gpos::Ref<CExpression> pexprRight,
+						  gpos::Ref<CExpression> pexprPred)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
 	GPOS_ASSERT(nullptr != pexprRight);
@@ -1104,7 +1117,7 @@ CUtils::PexprLogicalApply(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 						  gpos::Ref<CExpression> pexprRight,
 						  const CColRef *pcrInner,
 						  COperator::EOperatorId eopidOriginSubq,
-						  CExpression *pexprPred)
+						  gpos::Ref<CExpression> pexprPred)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
 	GPOS_ASSERT(nullptr != pexprRight);
@@ -1137,7 +1150,7 @@ CUtils::PexprLogicalApply(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 						  gpos::Ref<CExpression> pexprRight,
 						  gpos::Ref<CColRefArray> pdrgpcrInner,
 						  COperator::EOperatorId eopidOriginSubq,
-						  CExpression *pexprPred)
+						  gpos::Ref<CExpression> pexprPred)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
 	GPOS_ASSERT(nullptr != pexprRight);
@@ -1168,7 +1181,7 @@ gpos::Ref<CExpression>
 CUtils::PexprLogicalCorrelatedQuantifiedApply(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 	gpos::Ref<CExpression> pexprRight, gpos::Ref<CColRefArray> pdrgpcrInner,
-	COperator::EOperatorId eopidOriginSubq, CExpression *pexprPred)
+	COperator::EOperatorId eopidOriginSubq, gpos::Ref<CExpression> pexprPred)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
 	GPOS_ASSERT(nullptr != pexprRight);
@@ -1194,12 +1207,12 @@ CUtils::PexprLogicalCorrelatedQuantifiedApply(
 	{
 		// quantified comparison is now on top of inner expression, skip to child
 		;
-		CExpression *pexprNewPredicate = (*pexprRight)[1];
+		gpos::Ref<CExpression> pexprNewPredicate = (*pexprRight)[1];
 		;
 		pexprScalar = pexprNewPredicate;
 
 		;
-		CExpression *pexprChild = (*pexprRight)[0];
+		gpos::Ref<CExpression> pexprChild = (*pexprRight)[0];
 		;
 		pexprRight = pexprChild;
 	}
@@ -1263,7 +1276,7 @@ CUtils::AddRefAppend(Vector<Ref<T>> *output, const Vector<Ref<T>> *input,
 //---------------------------------------------------------------------------
 template <class T>
 BOOL
-CUtils::FScalarConstInt(CExpression *pexpr)
+CUtils::FScalarConstInt(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -1271,7 +1284,7 @@ CUtils::FScalarConstInt(CExpression *pexpr)
 	GPOS_ASSERT(IMDType::EtiInt2 == type_info ||
 				IMDType::EtiInt4 == type_info || IMDType::EtiInt8 == type_info);
 
-	COperator *pop = pexpr->Pop();
+	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (COperator::EopScalarConst == pop->Eopid())
 	{
 		CScalarConst *popScalarConst = gpos::dyn_cast<CScalarConst>(pop);
@@ -1294,7 +1307,7 @@ CUtils::FScalarConstInt(CExpression *pexpr)
 //---------------------------------------------------------------------------
 template <class T>
 BOOL
-CUtils::FMatchIndex(T *pop1, COperator *pop2)
+CUtils::FMatchIndex(T *pop1, gpos::Ref<COperator> pop2)
 {
 	if (pop1->Eopid() != pop2->Eopid())
 	{
@@ -1319,7 +1332,7 @@ CUtils::FMatchIndex(T *pop1, COperator *pop2)
 //---------------------------------------------------------------------------
 template <class T>
 BOOL
-CUtils::FMatchDynamicIndex(T *pop1, COperator *pop2)
+CUtils::FMatchDynamicIndex(T *pop1, gpos::Ref<COperator> pop2)
 {
 	if (pop1->Eopid() != pop2->Eopid())
 	{
@@ -1354,7 +1367,7 @@ CUtils::FMatchDynamicIndex(T *pop1, COperator *pop2)
 //---------------------------------------------------------------------------
 template <class T>
 BOOL
-CUtils::FMatchDynamicScan(T *pop1, COperator *pop2)
+CUtils::FMatchDynamicScan(T *pop1, gpos::Ref<COperator> pop2)
 {
 	if (pop1->Eopid() != pop2->Eopid())
 	{
@@ -1384,7 +1397,7 @@ CUtils::FMatchDynamicScan(T *pop1, COperator *pop2)
 //---------------------------------------------------------------------------
 template <class T>
 BOOL
-CUtils::FMatchDynamicBitmapScan(T *pop1, COperator *pop2)
+CUtils::FMatchDynamicBitmapScan(T *pop1, gpos::Ref<COperator> pop2)
 {
 	if (pop1->Eopid() != pop2->Eopid())
 	{
@@ -1410,7 +1423,7 @@ CUtils::FMatchDynamicBitmapScan(T *pop1, COperator *pop2)
 //---------------------------------------------------------------------------
 template <class T>
 BOOL
-CUtils::FMatchBitmapScan(T *pop1, COperator *pop2)
+CUtils::FMatchBitmapScan(T *pop1, gpos::Ref<COperator> pop2)
 {
 	if (pop1->Eopid() != pop2->Eopid())
 	{

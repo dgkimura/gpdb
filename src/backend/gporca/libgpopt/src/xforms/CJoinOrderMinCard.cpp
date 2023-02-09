@@ -84,14 +84,14 @@ CJoinOrderMinCard::PexprExpand()
 	while (ulCoveredComps < m_ulComps)
 	{
 		CDouble dMinRows(0.0);
-		SComponent *pcompBest =
+		gpos::Ref<SComponent> pcompBest =
 			nullptr;  // best component to be added to current result
 		gpos::Ref<SComponent> pcompBestResult =
 			nullptr;  // result after adding best component
 
 		for (ULONG ul = 0; ul < m_ulComps; ul++)
 		{
-			SComponent *pcompCurrent = m_rgpcomp[ul];
+			gpos::Ref<SComponent> pcompCurrent = m_rgpcomp[ul];
 			if (pcompCurrent->m_fUsed)
 			{
 				// used components are already included in current result

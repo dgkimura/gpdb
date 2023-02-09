@@ -65,7 +65,7 @@ public:
 	~CParseHandlerNLJIndexParam() override;
 
 	// return column reference
-	CDXLColRef *
+	gpos::Ref<CDXLColRef>
 	GetNestParamColRefDxl(void) const
 	{
 		return m_nest_param_colref_dxl.get();

@@ -311,7 +311,7 @@ CPhysicalDML::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalDML::PcteRequired(CMemoryPool *,		 //mp,
 						   CExpressionHandle &,	 //exprhdl,
-						   CCTEReq *pcter,
+						   gpos::Ref<CCTEReq> pcter,
 						   ULONG
 #ifdef GPOS_DEBUG
 							   child_index
@@ -409,7 +409,7 @@ CPhysicalDML::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDML::Matches(COperator *pop) const
+CPhysicalDML::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -472,7 +472,8 @@ CPhysicalDML::EpetRewindability(CExpressionHandle &,		// exprhdl,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-CPhysicalDML::PosComputeRequired(CMemoryPool *mp, CTableDescriptor *ptabdesc)
+CPhysicalDML::PosComputeRequired(CMemoryPool *mp,
+								 gpos::Ref<CTableDescriptor> ptabdesc)
 {
 	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
 
@@ -485,7 +486,7 @@ CPhysicalDML::PosComputeRequired(CMemoryPool *mp, CTableDescriptor *ptabdesc)
 		BOOL fNeedsSort = false;
 		for (ULONG ul = 0; ul < ulKeySets && !fNeedsSort; ul++)
 		{
-			CBitSet *pbs = (*pdrgpbsKeys)[ul].get();
+			gpos::Ref<CBitSet> pbs = (*pdrgpbsKeys)[ul].get();
 			if (!pbs->IsDisjoint(m_pbsModified.get()))
 			{
 				fNeedsSort = true;
@@ -503,7 +504,7 @@ CPhysicalDML::PosComputeRequired(CMemoryPool *mp, CTableDescriptor *ptabdesc)
 	}
 	else if (m_ptabdesc->IsPartitioned())
 	{
-		COptimizerConfig *optimizer_config =
+		gpos::Ref<COptimizerConfig> optimizer_config =
 			COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
 
 		BOOL fInsertSortOnRows = FInsertSortOnRows(optimizer_config);
@@ -534,7 +535,7 @@ CPhysicalDML::PosComputeRequired(CMemoryPool *mp, CTableDescriptor *ptabdesc)
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalDML::FInsertSortOnRows(COptimizerConfig *optimizer_config)
+CPhysicalDML::FInsertSortOnRows(gpos::Ref<COptimizerConfig> optimizer_config)
 {
 	GPOS_ASSERT(nullptr != optimizer_config);
 

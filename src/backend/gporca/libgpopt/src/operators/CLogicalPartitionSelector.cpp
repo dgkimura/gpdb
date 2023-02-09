@@ -82,7 +82,7 @@ CLogicalPartitionSelector::~CLogicalPartitionSelector()
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalPartitionSelector::Matches(COperator *pop) const
+CLogicalPartitionSelector::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() != pop->Eopid())
 	{

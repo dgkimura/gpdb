@@ -33,9 +33,9 @@ CDistributionSpecHashedNoOp::AppendEnforcers(CMemoryPool *mp,
 											 CExpressionHandle &exprhdl,
 											 CReqdPropPlan *,
 											 CExpressionArray *pdrgpexpr,
-											 CExpression *pexpr)
+											 gpos::Ref<CExpression> pexpr)
 {
-	CDrvdProp *pdp = exprhdl.Pdp();
+	gpos::Ref<CDrvdProp> pdp = exprhdl.Pdp();
 	CDistributionSpec *pdsChild = gpos::dyn_cast<CDrvdPropPlan>(pdp)->Pds();
 	CDistributionSpecHashed *pdsChildHashed =
 		dynamic_cast<CDistributionSpecHashed *>(pdsChild);

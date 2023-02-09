@@ -51,7 +51,7 @@ public:
 	virtual gpos::Ref<CExpression> PexprExpand();
 
 	ULONG
-	PickBestJoin(CBitSet *candidate_nodes);
+	PickBestJoin(gpos::Ref<CBitSet> candidate_nodes);
 
 	gpos::Ref<CBitSet> GetAdjacentComponentsToJoinCandidate();
 

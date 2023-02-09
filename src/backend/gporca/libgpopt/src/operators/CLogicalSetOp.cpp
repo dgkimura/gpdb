@@ -214,7 +214,7 @@ CLogicalSetOp::DerivePartitionInfo(CMemoryPool *mp,
 
 	for (ULONG ul = 1; ul < arity; ul++)
 	{
-		CPartInfo *ppartinfoChild = exprhdl.DerivePartitionInfo(ul);
+		gpos::Ref<CPartInfo> ppartinfoChild = exprhdl.DerivePartitionInfo(ul);
 		GPOS_ASSERT(nullptr != ppartinfoChild);
 
 		CColRefArray *pdrgpcrInput = (*m_pdrgpdrgpcrInput)[ul].get();
@@ -243,7 +243,7 @@ CLogicalSetOp::DerivePartitionInfo(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalSetOp::Matches(COperator *pop) const
+CLogicalSetOp::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
@@ -406,7 +406,7 @@ CLogicalSetOp::PcnstrColumn(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	GPOS_ASSERT(ulChild < exprhdl.Arity());
 
 	// constraint from child
-	CConstraint *pcnstrChild =
+	gpos::Ref<CConstraint> pcnstrChild =
 		exprhdl.DerivePropertyConstraint(ulChild)->Pcnstr();
 	if (nullptr == pcnstrChild)
 	{

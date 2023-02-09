@@ -84,7 +84,7 @@ public:
 
 	// conversion function
 	static CLogicalLeftAntiSemiApplyNotIn *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftAntiSemiApplyNotIn == pop->Eopid());

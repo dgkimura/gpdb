@@ -79,7 +79,7 @@ CGroupTest::EresUnittest_FResetStatsOnCGroupWithDuplicateGroup()
 	gpos::Ref<CExpression> pexprGet1 = InsertGroupIntoMemo(pmemo, mp);
 	gpos::Ref<CExpression> pexprGet2 = InsertGroupIntoMemo(pmemo, mp);
 
-	CGroupExpression *pgexprFirst = nullptr;
+	gpos::Ref<CGroupExpression> pgexprFirst = nullptr;
 	{
 		CGroupProxy gp(pmemo->Pgroup(0));
 		pgexprFirst = gp.PgexprFirst();

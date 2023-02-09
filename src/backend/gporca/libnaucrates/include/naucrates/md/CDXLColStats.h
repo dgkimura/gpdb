@@ -134,7 +134,7 @@ public:
 	}
 
 	// get the bucket at the given position
-	const CDXLBucket *GetDXLBucketAt(ULONG ul) const override;
+	const gpos::Ref<CDXLBucket> GetDXLBucketAt(ULONG ul) const override;
 
 	// serialize column stats in DXL format
 	void Serialize(gpdxl::CXMLSerializer *) const override;

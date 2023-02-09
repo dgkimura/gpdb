@@ -97,7 +97,7 @@ CDXLPhysicalDynamicIndexScan::GetOpNameStr() const
 //		Index descriptor for the index scan
 //
 //---------------------------------------------------------------------------
-const CDXLIndexDescr *
+const gpos::Ref<CDXLIndexDescr>
 CDXLPhysicalDynamicIndexScan::GetDXLIndexDescr() const
 {
 	return m_dxl_index_descr.get();
@@ -125,7 +125,7 @@ CDXLPhysicalDynamicIndexScan::GetIndexScanDir() const
 //		Return the associated table descriptor
 //
 //---------------------------------------------------------------------------
-const CDXLTableDescr *
+const gpos::Ref<CDXLTableDescr>
 CDXLPhysicalDynamicIndexScan::GetDXLTableDescr() const
 {
 	return m_dxl_table_descr.get();
@@ -146,8 +146,8 @@ CDXLPhysicalDynamicIndexScan::GetParts() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer,
-											 const CDXLNode *node) const
+CDXLPhysicalDynamicIndexScan::SerializeToDXL(
+	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -196,7 +196,7 @@ CDXLPhysicalDynamicIndexScan::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicIndexScan::AssertValid(const CDXLNode *node,
+CDXLPhysicalDynamicIndexScan::AssertValid(const gpos::Ref<CDXLNode> node,
 										  BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -215,8 +215,8 @@ CDXLPhysicalDynamicIndexScan::AssertValid(const CDXLNode *node,
 	GPOS_ASSERT(nullptr != m_dxl_table_descr->MdName());
 	GPOS_ASSERT(m_dxl_table_descr->MdName()->GetMDName()->IsValid());
 
-	CDXLNode *index_filter_dxlnode = (*node)[EdxldisIndexFilter];
-	CDXLNode *index_cond_dxlnode = (*node)[EdxldisIndexCondition];
+	gpos::Ref<CDXLNode> index_filter_dxlnode = (*node)[EdxldisIndexFilter];
+	gpos::Ref<CDXLNode> index_cond_dxlnode = (*node)[EdxldisIndexCondition];
 
 	// assert children are of right type (physical/scalar)
 	GPOS_ASSERT(EdxlopScalarIndexCondList ==

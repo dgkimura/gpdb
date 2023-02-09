@@ -80,8 +80,9 @@ CXformJoinCommutativity::FCompatible(CXform::EXformId exfid)
 //
 //---------------------------------------------------------------------------
 void
-CXformJoinCommutativity::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								   CExpression *pexpr) const
+CXformJoinCommutativity::Transform(gpos::Ref<CXformContext> pxfctxt,
+								   gpos::Ref<CXformResult> pxfres,
+								   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -90,9 +91,9 @@ CXformJoinCommutativity::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CExpression *pexprLeft = (*pexpr)[0];
-	CExpression *pexprRight = (*pexpr)[1];
-	CExpression *pexprScalar = (*pexpr)[2];
+	gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
 	// addref children
 	;

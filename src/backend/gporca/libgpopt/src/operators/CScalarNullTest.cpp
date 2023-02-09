@@ -33,7 +33,7 @@ using namespace gpmd;
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarNullTest::Matches(COperator *pop) const
+CScalarNullTest::Matches(gpos::Ref<COperator> pop) const
 {
 	return pop->Eopid() == Eopid();
 }

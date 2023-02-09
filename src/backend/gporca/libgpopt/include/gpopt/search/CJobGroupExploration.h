@@ -81,10 +81,10 @@ public:
 	~CJobGroupExploration() override;
 
 	// initialize job
-	void Init(CGroup *pgroup);
+	void Init(gpos::Ref<CGroup> pgroup);
 
 	// get first unscheduled expression
-	CGroupExpression *
+	gpos::Ref<CGroupExpression>
 	PgexprFirstUnsched() override
 	{
 		return CJobGroup::PgexprFirstUnschedLogical();
@@ -94,7 +94,7 @@ public:
 	BOOL FScheduleGroupExpressions(CSchedulerContext *psc) override;
 
 	// schedule a new group exploration job
-	static void ScheduleJob(CSchedulerContext *psc, CGroup *pgroup,
+	static void ScheduleJob(CSchedulerContext *psc, gpos::Ref<CGroup> pgroup,
 							CJob *pjParent);
 
 	// job's function

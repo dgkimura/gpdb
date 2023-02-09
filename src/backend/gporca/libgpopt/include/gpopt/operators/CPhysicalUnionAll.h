@@ -75,7 +75,7 @@ public:
 	~CPhysicalUnionAll() override;
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	// ident accessors
 	EOperatorId Eopid() const override = 0;
@@ -109,7 +109,7 @@ public:
 
 	// compute required ctes of the n-th child
 	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CCTEReq *pcter, ULONG child_index,
+									gpos::Ref<CCTEReq> pcter, ULONG child_index,
 									CDrvdPropArray *pdrgpdpCtxt,
 									ULONG ulOptReq) const override;
 
@@ -130,7 +130,7 @@ public:
 											  ULONG ulOptReq) const override;
 
 	// conversion function
-	static CPhysicalUnionAll *PopConvert(COperator *pop);
+	static CPhysicalUnionAll *PopConvert(gpos::Ref<COperator> pop);
 
 
 	// check if required columns are included in output columns

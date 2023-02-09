@@ -73,7 +73,7 @@ CPhysicalLimit::~CPhysicalLimit()
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalLimit::Matches(COperator *pop) const
+CPhysicalLimit::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
@@ -184,7 +184,7 @@ CPhysicalLimit::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				CEnfdDistribution::EdmSatisfy);
 		}
 
-		CExpression *pexprOffset = exprhdl.PexprScalarExactChild(
+		gpos::Ref<CExpression> pexprOffset = exprhdl.PexprScalarExactChild(
 			1 /*child_index*/, true /*error_on_null_return*/);
 		if (!m_fHasCount && CUtils::FScalarConstIntZero(pexprOffset))
 		{
@@ -279,7 +279,7 @@ CPhysicalLimit::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalLimit::PcteRequired(CMemoryPool *,		   //mp,
 							 CExpressionHandle &,  //exprhdl,
-							 CCTEReq *pcter,
+							 gpos::Ref<CCTEReq> pcter,
 							 ULONG
 #ifdef GPOS_DEBUG
 								 child_index

@@ -123,7 +123,7 @@ CDXLPhysicalCTAS::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *dxlnode) const
+								 const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -200,7 +200,7 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 	const ULONG arity = m_col_descr_array->Size();
 	for (ULONG idx = 0; idx < arity; idx++)
 	{
-		CDXLColDescr *dxl_col_descr = (*m_col_descr_array)[idx].get();
+		gpos::Ref<CDXLColDescr> dxl_col_descr = (*m_col_descr_array)[idx].get();
 		dxl_col_descr->SerializeToDXL(xml_serializer);
 	}
 	xml_serializer->CloseElement(
@@ -226,13 +226,13 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalCTAS::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalCTAS::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());
 
-	CDXLNode *proj_list_dxlnode = (*dxlnode)[0];
-	CDXLNode *child_dxlnode = (*dxlnode)[1];
+	gpos::Ref<CDXLNode> proj_list_dxlnode = (*dxlnode)[0];
+	gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[1];
 	GPOS_ASSERT(EdxlopScalarProjectList ==
 				proj_list_dxlnode->GetOperator()->GetDXLOperator());
 	GPOS_ASSERT(EdxloptypePhysical ==

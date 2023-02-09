@@ -109,7 +109,7 @@ CConstraintConjunction::PcnstrCopyWithRemappedColumns(
 	const ULONG length = m_pdrgpcnstr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CConstraint *pcnstr = (*m_pdrgpcnstr)[ul].get();
+		gpos::Ref<CConstraint> pcnstr = (*m_pdrgpcnstr)[ul].get();
 		gpos::Ref<CConstraint> pcnstrCopy =
 			pcnstr->PcnstrCopyWithRemappedColumns(mp, colref_mapping,
 												  must_exist);
@@ -172,7 +172,7 @@ CConstraintConjunction::Pcnstr(CMemoryPool *mp, CColRefSet *pcrs)
 
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CConstraint *pcnstr = (*m_pdrgpcnstr)[ul].get();
+		gpos::Ref<CConstraint> pcnstr = (*m_pdrgpcnstr)[ul].get();
 		if (pcnstr->PcrsUsed()->IsDisjoint(pcrs))
 		{
 			continue;
@@ -213,7 +213,7 @@ CConstraintConjunction::PcnstrRemapForColumn(CMemoryPool *mp,
 //		Scalar expression
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CConstraintConjunction::PexprScalar(CMemoryPool *mp)
 {
 	if (nullptr == m_pexprScalar)

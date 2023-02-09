@@ -38,41 +38,45 @@ class CBinding
 {
 private:
 	// initialize cursors of child expressions
-	BOOL FInitChildCursors(CMemoryPool *mp, CGroupExpression *pgexpr,
-						   CExpression *pexprPattern,
+	BOOL FInitChildCursors(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
+						   gpos::Ref<CExpression> pexprPattern,
 						   CExpressionArray *pdrgpexpr);
 
 	// advance cursors of child expressions
-	BOOL FAdvanceChildCursors(CMemoryPool *mp, CGroupExpression *pgexpr,
-							  CExpression *pexprPattern, CExpression *pexprLast,
+	BOOL FAdvanceChildCursors(CMemoryPool *mp,
+							  gpos::Ref<CGroupExpression> pgexpr,
+							  gpos::Ref<CExpression> pexprPattern,
+							  gpos::Ref<CExpression> pexprLast,
 							  CExpressionArray *pdrgpexpr);
 
 	// extraction of child expressions
-	BOOL FExtractChildren(CMemoryPool *mp, CExpression *pexprPattern,
-						  CGroupExpression *pgexprCursor,
+	BOOL FExtractChildren(CMemoryPool *mp, gpos::Ref<CExpression> pexprPattern,
+						  gpos::Ref<CGroupExpression> pgexprCursor,
 						  CExpressionArray *pdrgpexpr);
 
 	// move cursor
-	static CGroupExpression *PgexprNext(CGroup *pgroup,
-										CGroupExpression *pgexpr);
+	static gpos::Ref<CGroupExpression> PgexprNext(
+		gpos::Ref<CGroup> pgroup, gpos::Ref<CGroupExpression> pgexpr);
 
 	// expand n-th child of pattern
-	static CExpression *PexprExpandPattern(CExpression *pexpr, ULONG ulPos,
-										   ULONG arity);
+	static gpos::Ref<CExpression> PexprExpandPattern(
+		gpos::Ref<CExpression> pexpr, ULONG ulPos, ULONG arity);
 
 	// get binding for children
-	BOOL FExtractChildren(CMemoryPool *mp, CGroupExpression *pgexpr,
-						  CExpression *pexprPattern, CExpression *pexprLast,
+	BOOL FExtractChildren(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
+						  gpos::Ref<CExpression> pexprPattern,
+						  gpos::Ref<CExpression> pexprLast,
 						  CExpressionArray *pdrgpexprChildren);
 
 	// extract binding from a group
-	gpos::Ref<CExpression> PexprExtract(CMemoryPool *mp, CGroup *pgroup,
-										CExpression *pexprPattern,
-										CExpression *pexprLast);
+	gpos::Ref<CExpression> PexprExtract(CMemoryPool *mp,
+										gpos::Ref<CGroup> pgroup,
+										gpos::Ref<CExpression> pexprPattern,
+										gpos::Ref<CExpression> pexprLast);
 
 	// build expression
 	static gpos::Ref<CExpression> PexprFinalize(
-		CMemoryPool *mp, CGroupExpression *pgexpr,
+		CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
 		gpos::Ref<CExpressionArray> pdrgpexprChildren);
 
 	// private copy ctor
@@ -87,9 +91,9 @@ public:
 
 	// extract binding from group expression
 	gpos::Ref<CExpression> PexprExtract(CMemoryPool *mp,
-										CGroupExpression *pgexpr,
-										CExpression *pexprPatetrn,
-										CExpression *pexprLast);
+										gpos::Ref<CGroupExpression> pgexpr,
+										gpos::Ref<CExpression> pexprPatetrn,
+										gpos::Ref<CExpression> pexprLast);
 
 };	// class CBinding
 

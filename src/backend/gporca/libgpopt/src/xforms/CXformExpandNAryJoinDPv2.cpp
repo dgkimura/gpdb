@@ -75,9 +75,9 @@ CXformExpandNAryJoinDPv2::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformExpandNAryJoinDPv2::Transform(CXformContext *pxfctxt,
-									CXformResult *pxfres,
-									CExpression *pexpr) const
+CXformExpandNAryJoinDPv2::Transform(gpos::Ref<CXformContext> pxfctxt,
+									gpos::Ref<CXformResult> pxfres,
+									gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
@@ -103,7 +103,7 @@ CXformExpandNAryJoinDPv2::Transform(CXformContext *pxfctxt,
 	// plus an array of all the non-inner join predicates, together with
 	// a lookup table for each child whether it is a non-inner join
 	CLogicalNAryJoin *naryJoin = gpos::dyn_cast<CLogicalNAryJoin>(pexpr->Pop());
-	CExpression *pexprScalar = (*pexpr)[arity - 1];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[arity - 1];
 	gpos::Ref<CExpressionArray> innerJoinPreds = nullptr;
 	gpos::Ref<CExpressionArray> onPreds = GPOS_NEW(mp) CExpressionArray(mp);
 	ULongPtrArray *childPredIndexes = nullptr;

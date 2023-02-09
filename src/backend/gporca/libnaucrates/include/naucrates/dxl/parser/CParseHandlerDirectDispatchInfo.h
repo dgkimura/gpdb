@@ -76,7 +76,7 @@ public:
 	~CParseHandlerDirectDispatchInfo() override;
 
 	// accessor to the parsed direct dispatch spec
-	CDXLDirectDispatchInfo *GetDXLDirectDispatchInfo() const;
+	gpos::Ref<CDXLDirectDispatchInfo> GetDXLDirectDispatchInfo() const;
 };
 }  // namespace gpdxl
 

@@ -103,7 +103,7 @@ CScalarWindowFunc::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarWindowFunc::Matches(COperator *pop) const
+CScalarWindowFunc::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

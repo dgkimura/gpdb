@@ -764,8 +764,9 @@ CTranslatorUtils::ConvertToDXLIndexScanDirection(ScanDirection sd)
 //		Find the n-th col descr entry
 //
 //---------------------------------------------------------------------------
-const CDXLColDescr *
-CTranslatorUtils::GetColumnDescrAt(const CDXLTableDescr *table_descr, ULONG pos)
+const gpos::Ref<CDXLColDescr>
+CTranslatorUtils::GetColumnDescrAt(const gpos::Ref<CDXLTableDescr> table_descr,
+								   ULONG pos)
 {
 	GPOS_ASSERT(0 != pos);
 	GPOS_ASSERT(pos < table_descr->Arity());
@@ -907,7 +908,7 @@ CTranslatorUtils::GetSetOpType(SetOperation setop, BOOL is_all)
 //---------------------------------------------------------------------------
 gpos::Ref<ULongPtrArray>
 CTranslatorUtils::GetGroupingColidArray(
-	CMemoryPool *mp, CBitSet *group_by_cols,
+	CMemoryPool *mp, gpos::Ref<CBitSet> group_by_cols,
 	IntToUlongMap *sort_group_cols_to_colid_map)
 {
 	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(mp) ULongPtrArray(mp);
@@ -942,7 +943,7 @@ CTranslatorUtils::GetColumnAttnosForGroupBy(
 	ULONG num_cols,
 	UlongToUlongMap *
 		group_col_pos,	// mapping of grouping col positions to SortGroupRef ids
-	CBitSet *group_cols	 // existing uniqueue grouping columns
+	gpos::Ref<CBitSet> group_cols  // existing uniqueue grouping columns
 )
 {
 	GPOS_ASSERT(nullptr != group_col_pos);
@@ -1021,7 +1022,8 @@ CTranslatorUtils::GetColumnAttnosForGroupBy(
 gpos::Ref<CBitSetArray>
 CTranslatorUtils::CreateGroupingSetsForSets(CMemoryPool *mp,
 											const GroupingSet *grouping_set,
-											ULONG num_cols, CBitSet *group_cols,
+											ULONG num_cols,
+											gpos::Ref<CBitSet> group_cols,
 											UlongToUlongMap *group_col_pos)
 {
 	GPOS_ASSERT(nullptr != grouping_set);
@@ -1067,7 +1069,7 @@ gpos::Ref<CBitSetArray>
 CTranslatorUtils::CreateGroupingSetsForRollup(CMemoryPool *mp,
 											  const GroupingSet *grouping_set,
 											  ULONG num_cols,
-											  CBitSet *group_cols,
+											  gpos::Ref<CBitSet> group_cols,
 											  UlongToUlongMap *group_col_pos)
 {
 	GPOS_ASSERT(nullptr != grouping_set);
@@ -1107,7 +1109,7 @@ CTranslatorUtils::CreateAttnoSetForGroupingSet(
 	CMemoryPool *mp, List *group_elems, ULONG num_cols,
 	UlongToUlongMap *
 		group_col_pos,	// mapping of grouping col positions to SortGroupRef ids
-	CBitSet *group_cols,  // existing grouping columns
+	gpos::Ref<CBitSet> group_cols,	// existing grouping columns
 	bool use_group_clause)
 {
 	GPOS_ASSERT(NIL != group_elems);
@@ -1428,7 +1430,7 @@ CTranslatorUtils::GetColumnDescrAt(CMemoryPool *mp, TargetEntry *target_entry,
 gpos::Ref<CDXLNode>
 CTranslatorUtils::CreateDummyProjectElem(CMemoryPool *mp, ULONG colid_input,
 										 ULONG colid_output,
-										 CDXLColDescr *dxl_col_descr)
+										 gpos::Ref<CDXLColDescr> dxl_col_descr)
 {
 	CMDIdGPDB *original_mdid =
 		gpos::dyn_cast<CMDIdGPDB>(dxl_col_descr->MdidType());
@@ -1656,7 +1658,8 @@ CTranslatorUtils::IsSortingColumn(const TargetEntry *target_entry,
 //		check if the project list contains AggRef with ORDER BY
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorUtils::HasOrderedAggRefInProjList(CDXLNode *proj_list_dxlnode)
+CTranslatorUtils::HasOrderedAggRefInProjList(
+	gpos::Ref<CDXLNode> proj_list_dxlnode)
 {
 	GPOS_ASSERT(nullptr != proj_list_dxlnode &&
 				EdxlopScalarProjectList ==
@@ -1664,8 +1667,8 @@ CTranslatorUtils::HasOrderedAggRefInProjList(CDXLNode *proj_list_dxlnode)
 	const ULONG arity = proj_list_dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDXLNode *proj_elem_dxlnode = (*proj_list_dxlnode)[ul];
-		CDXLNode *dxlnode = (*proj_elem_dxlnode)[0];
+		gpos::Ref<CDXLNode> proj_elem_dxlnode = (*proj_list_dxlnode)[ul];
+		gpos::Ref<CDXLNode> dxlnode = (*proj_elem_dxlnode)[0];
 		if (dxlnode->GetOperator()->GetDXLOperator() == EdxlopScalarAggref &&
 			(*dxlnode)[EdxlscalaraggrefIndexAggOrder]->Arity() > 0)
 		{
@@ -1934,7 +1937,8 @@ CTranslatorUtils::IsDuplicateSensitiveMotion(CDXLPhysicalMotion *dxl_motion)
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorUtils::HasProjElem(CDXLNode *project_list_dxlnode, Edxlopid dxl_opid)
+CTranslatorUtils::HasProjElem(gpos::Ref<CDXLNode> project_list_dxlnode,
+							  Edxlopid dxl_opid)
 {
 	GPOS_ASSERT(nullptr != project_list_dxlnode);
 	GPOS_ASSERT(EdxlopScalarProjectList ==
@@ -1944,11 +1948,11 @@ CTranslatorUtils::HasProjElem(CDXLNode *project_list_dxlnode, Edxlopid dxl_opid)
 	const ULONG arity = project_list_dxlnode->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CDXLNode *dxl_project_element = (*project_list_dxlnode)[ul];
+		gpos::Ref<CDXLNode> dxl_project_element = (*project_list_dxlnode)[ul];
 		GPOS_ASSERT(EdxlopScalarProjectElem ==
 					dxl_project_element->GetOperator()->GetDXLOperator());
 
-		CDXLNode *dxl_child_node = (*dxl_project_element)[0];
+		gpos::Ref<CDXLNode> dxl_child_node = (*dxl_project_element)[0];
 		if (dxl_opid == dxl_child_node->GetOperator()->GetDXLOperator())
 		{
 			return true;
@@ -2108,7 +2112,8 @@ CTranslatorUtils::CheckRTEPermissions(List *range_table_list)
 void
 CTranslatorUtils::UpdateGrpColMapping(CMemoryPool *mp,
 									  UlongToUlongMap *group_col_pos,
-									  CBitSet *group_cols, ULONG sort_group_ref)
+									  gpos::Ref<CBitSet> group_cols,
+									  ULONG sort_group_ref)
 {
 	GPOS_ASSERT(nullptr != group_col_pos);
 	GPOS_ASSERT(nullptr != group_cols);
@@ -2137,13 +2142,13 @@ CTranslatorUtils::MarkOuterRefs(
 	BOOL *
 		is_outer_ref,  // array of outer ref indicators, initially all set to true by caller
 	ULONG num_columns,	// number of columns
-	CDXLNode *dxlnode)
+	gpos::Ref<CDXLNode> dxlnode)
 {
 	GPOS_ASSERT(nullptr != colids);
 	GPOS_ASSERT(nullptr != is_outer_ref);
 	GPOS_ASSERT(nullptr != dxlnode);
 
-	const CDXLOperator *dxl_op = dxlnode->GetOperator();
+	const gpos::Ref<CDXLOperator> dxl_op = dxlnode->GetOperator();
 	for (ULONG ulCol = 0; ulCol < num_columns; ulCol++)
 	{
 		ULONG colid = colids[ulCol];
@@ -2275,7 +2280,7 @@ CTranslatorUtils::RelHasConstraints(const IMDRelation *rel)
 //
 //---------------------------------------------------------------------------
 List *
-CTranslatorUtils::GetAssertErrorMsgs(CDXLNode *assert_constraint_list)
+CTranslatorUtils::GetAssertErrorMsgs(gpos::Ref<CDXLNode> assert_constraint_list)
 {
 	GPOS_ASSERT(nullptr != assert_constraint_list);
 	GPOS_ASSERT(EdxlopScalarAssertConstraintList ==
@@ -2286,7 +2291,7 @@ CTranslatorUtils::GetAssertErrorMsgs(CDXLNode *assert_constraint_list)
 
 	for (ULONG ul = 0; ul < num_constraints; ul++)
 	{
-		CDXLNode *dxl_constraint_node = (*assert_constraint_list)[ul];
+		gpos::Ref<CDXLNode> dxl_constraint_node = (*assert_constraint_list)[ul];
 		CDXLScalarAssertConstraint *dxl_constraint_op =
 			gpos::dyn_cast<CDXLScalarAssertConstraint>(
 				dxl_constraint_node->GetOperator());

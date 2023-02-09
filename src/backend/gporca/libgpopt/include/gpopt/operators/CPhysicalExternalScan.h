@@ -51,7 +51,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties
@@ -83,7 +83,7 @@ public:
 
 	// conversion function
 	static CPhysicalExternalScan *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalExternalScan == pop->Eopid());

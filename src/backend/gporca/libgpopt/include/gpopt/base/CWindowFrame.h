@@ -136,14 +136,14 @@ public:
 	}
 
 	// scalar value of leading edge
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprLeading() const
 	{
 		return m_pexprLeading.get();
 	}
 
 	// scalar value of trailing edge
-	CExpression *
+	gpos::Ref<CExpression>
 	PexprTrailing() const
 	{
 		return m_pexprTrailing.get();
@@ -157,7 +157,7 @@ public:
 	}
 
 	// matching function
-	BOOL Matches(const CWindowFrame *pwf) const;
+	BOOL Matches(const gpos::Ref<CWindowFrame> pwf) const;
 
 	// hash function
 	virtual ULONG HashValue() const;
@@ -189,13 +189,13 @@ public:
 
 	// check if a given window frame is empty
 	static BOOL
-	IsEmpty(CWindowFrame *pwf)
+	IsEmpty(gpos::Ref<CWindowFrame> pwf)
 	{
 		return pwf == &m_wfEmpty;
 	}
 
 	// return pointer to singleton empty window frame
-	static const CWindowFrame *
+	static const gpos::Ref<CWindowFrame>
 	PwfEmpty()
 	{
 		return &m_wfEmpty;

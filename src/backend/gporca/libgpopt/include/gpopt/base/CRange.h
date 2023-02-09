@@ -80,7 +80,7 @@ private:
 
 	// construct a scalar comparison expression from one of the ends
 	static gpos::Ref<CExpression> PexprScalarCompEnd(
-		CMemoryPool *mp, IDatum *datum, ERangeInclusion eri,
+		CMemoryPool *mp, gpos::Ref<IDatum> datum, ERangeInclusion eri,
 		IMDType::ECmpType ecmptIncl, IMDType::ECmpType ecmptExcl,
 		const CColRef *colref);
 
@@ -96,7 +96,7 @@ private:
 	}
 
 	// print a bound
-	static IOstream &OsPrintBound(IOstream &os, IDatum *datum,
+	static IOstream &OsPrintBound(IOstream &os, gpos::Ref<IDatum> datum,
 								  const CHAR *szInfinity);
 
 public:
@@ -108,7 +108,8 @@ public:
 		   gpos::Ref<IDatum> pdatumRight, ERangeInclusion eriRight);
 
 	// ctor
-	CRange(const IComparator *pcomp, IMDType::ECmpType cmp_type, IDatum *datum);
+	CRange(const IComparator *pcomp, IMDType::ECmpType cmp_type,
+		   gpos::Ref<IDatum> datum);
 
 	// dtor
 	~CRange() override;
@@ -121,14 +122,14 @@ public:
 	}
 
 	// range beginning
-	IDatum *
+	gpos::Ref<IDatum>
 	PdatumLeft() const
 	{
 		return m_pdatumLeft.get();
 	}
 
 	// range end
-	IDatum *
+	gpos::Ref<IDatum>
 	PdatumRight() const
 	{
 		return m_pdatumRight.get();
@@ -149,47 +150,49 @@ public:
 	}
 
 	// is this range disjoint from the given range and to its left
-	BOOL FDisjointLeft(CRange *prange);
+	BOOL FDisjointLeft(gpos::Ref<CRange> prange);
 
 	// does this range contain the given range
-	BOOL Contains(CRange *prange);
+	BOOL Contains(gpos::Ref<CRange> prange);
 
 	// does this range overlap only the left end of the given range
-	BOOL FOverlapsLeft(CRange *prange);
+	BOOL FOverlapsLeft(gpos::Ref<CRange> prange);
 
 	// does this range overlap only the right end of the given range
-	BOOL FOverlapsRight(CRange *prange);
+	BOOL FOverlapsRight(gpos::Ref<CRange> prange);
 
 	// does this range's upper bound equal the given range's lower bound
-	BOOL FUpperBoundEqualsLowerBound(CRange *prange);
+	BOOL FUpperBoundEqualsLowerBound(gpos::Ref<CRange> prange);
 
 	// does this range start before the given range starts
-	BOOL FStartsBefore(CRange *prange);
+	BOOL FStartsBefore(gpos::Ref<CRange> prange);
 
 	// does this range start with or before the given range
-	BOOL FStartsWithOrBefore(CRange *prange);
+	BOOL FStartsWithOrBefore(gpos::Ref<CRange> prange);
 
 	// does this range end after the given range ends
-	BOOL FEndsAfter(CRange *prange);
+	BOOL FEndsAfter(gpos::Ref<CRange> prange);
 
 	// does this range end with or after the given range
-	BOOL FEndsWithOrAfter(CRange *prange);
+	BOOL FEndsWithOrAfter(gpos::Ref<CRange> prange);
 
 	// check if range represents a point
 	BOOL FPoint() const;
 
 	// intersection with another range
-	gpos::Ref<CRange> PrngIntersect(CMemoryPool *mp, CRange *prange);
+	gpos::Ref<CRange> PrngIntersect(CMemoryPool *mp, gpos::Ref<CRange> prange);
 
 	// difference between this range and a given range on the left side only
-	gpos::Ref<CRange> PrngDifferenceLeft(CMemoryPool *mp, CRange *prange);
+	gpos::Ref<CRange> PrngDifferenceLeft(CMemoryPool *mp,
+										 gpos::Ref<CRange> prange);
 
 	// difference between this range and a given range on the right side only
-	gpos::Ref<CRange> PrngDifferenceRight(CMemoryPool *mp, CRange *prange);
+	gpos::Ref<CRange> PrngDifferenceRight(CMemoryPool *mp,
+										  gpos::Ref<CRange> prange);
 
 	// return the extension of this range with the given range. The given
 	// range must start right after this range, otherwise NULL is returned
-	gpos::Ref<CRange> PrngExtend(CMemoryPool *mp, CRange *prange);
+	gpos::Ref<CRange> PrngExtend(CMemoryPool *mp, gpos::Ref<CRange> prange);
 
 	// construct scalar expression
 	gpos::Ref<CExpression> PexprScalar(CMemoryPool *mp, const CColRef *colref);

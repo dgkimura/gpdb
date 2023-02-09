@@ -1104,7 +1104,7 @@ CFilterCardinalityTest::EresUnittest_CStatisticsBasicsFromDXL()
 GPOS_RESULT
 CFilterCardinalityTest::EresUnittest_CStatisticsCompare(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	CStatisticsArray *pdrgpstatBefore, CStatsPred *pred_stats,
+	CStatisticsArray *pdrgpstatBefore, gpos::Ref<CStatsPred> pred_stats,
 	const CHAR *szDXLOutput, BOOL fApplyTwice)
 {
 	CWStringDynamic str(mp);

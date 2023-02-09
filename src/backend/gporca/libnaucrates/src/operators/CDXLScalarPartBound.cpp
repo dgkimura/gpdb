@@ -107,7 +107,7 @@ CDXLScalarPartBound::HasBoolResult(CMDAccessor *md_accessor) const
 //---------------------------------------------------------------------------
 void
 CDXLScalarPartBound::SerializeToDXL(CXMLSerializer *xml_serializer,
-									const CDXLNode *  // dxlnode
+									const gpos::Ref<CDXLNode>  // dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
@@ -135,7 +135,7 @@ CDXLScalarPartBound::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarPartBound::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarPartBound::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								 BOOL  // validate_children
 ) const
 {

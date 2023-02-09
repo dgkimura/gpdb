@@ -86,7 +86,7 @@ CDXLLogicalJoin::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalJoin::SerializeToDXL(CXMLSerializer *xml_serializer,
-								const CDXLNode *node) const
+								const gpos::Ref<CDXLNode> node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -127,14 +127,15 @@ CDXLLogicalJoin::GetJoinTypeNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLLogicalJoin::AssertValid(const CDXLNode *node, BOOL validate_children) const
+CDXLLogicalJoin::AssertValid(const gpos::Ref<CDXLNode> node,
+							 BOOL validate_children) const
 {
 	const ULONG num_of_child = node->Arity();
 	GPOS_ASSERT(2 < num_of_child);
 
 	for (ULONG idx = 0; idx < num_of_child - 1; ++idx)
 	{
-		CDXLNode *child_dxlnode = (*node)[idx];
+		gpos::Ref<CDXLNode> child_dxlnode = (*node)[idx];
 		GPOS_ASSERT(EdxloptypeLogical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 
@@ -145,7 +146,7 @@ CDXLLogicalJoin::AssertValid(const CDXLNode *node, BOOL validate_children) const
 		}
 	}
 
-	CDXLNode *node_last_child = (*node)[num_of_child - 1];
+	gpos::Ref<CDXLNode> node_last_child = (*node)[num_of_child - 1];
 	GPOS_ASSERT(nullptr != node_last_child);
 
 	//The last child is a CDXLScalar operator representing the join qual

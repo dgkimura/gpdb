@@ -57,7 +57,7 @@ private:
 	BOOL m_is_dropped;
 
 	// default value expression if one exists
-	CDXLNode *m_dxl_default_val;
+	gpos::Ref<CDXLNode> m_dxl_default_val;
 
 	// width of the column
 	ULONG m_width;

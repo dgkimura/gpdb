@@ -129,7 +129,7 @@ COperator::PfpDeriveFromChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Return an addref'ed copy of the operator
 //
 //---------------------------------------------------------------------------
-COperator *
+gpos::Ref<COperator>
 COperator::PopCopyDefault()
 {
 	;

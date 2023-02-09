@@ -52,7 +52,7 @@ public:
 	}
 
 	// child constraint
-	CConstraint *
+	gpos::Ref<CConstraint>
 	PcnstrChild() const
 	{
 		return m_pcnstr.get();
@@ -73,7 +73,7 @@ public:
 	}
 
 	// scalar expression
-	CExpression *PexprScalar(CMemoryPool *mp) override;
+	gpos::Ref<CExpression> PexprScalar(CMemoryPool *mp) override;
 
 	// check if there is a constraint on the given column
 	BOOL

@@ -34,7 +34,7 @@ private:
 	using Pfpexpr = gpos::Ref<CExpression> (*)(CMemoryPool *);
 
 	// type definition for of optimize function
-	using PfnOptimize = void (*)(CMemoryPool *, CExpression *,
+	using PfnOptimize = void (*)(CMemoryPool *, gpos::Ref<CExpression>,
 								 gpos::Ref<CSearchStageArray>);
 
 	// generate random search strategy
@@ -45,7 +45,7 @@ private:
 						 gpos::Ref<CSearchStageArray> search_stage_array,
 						 PfnOptimize pfnOptimize);
 
-	static void BuildMemo(CMemoryPool *mp, CExpression *pexprInput,
+	static void BuildMemo(CMemoryPool *mp, gpos::Ref<CExpression> pexprInput,
 						  gpos::Ref<CSearchStageArray> search_stage_array);
 
 public:

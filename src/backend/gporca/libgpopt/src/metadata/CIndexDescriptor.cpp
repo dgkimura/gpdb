@@ -103,7 +103,8 @@ CIndexDescriptor::UlIncludedColumns() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CIndexDescriptor>
-CIndexDescriptor::Pindexdesc(CMemoryPool *mp, const CTableDescriptor *ptabdesc,
+CIndexDescriptor::Pindexdesc(CMemoryPool *mp,
+							 const gpos::Ref<CTableDescriptor> ptabdesc,
 							 const IMDIndex *pmdindex)
 {
 	CWStringConst strIndexName(mp, pmdindex->Mdname().GetMDName()->GetBuffer());

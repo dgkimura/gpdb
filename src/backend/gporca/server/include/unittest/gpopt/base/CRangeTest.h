@@ -39,11 +39,15 @@ private:
 											  gpos::Ref<IMDId> mdid,
 											  PfPdatum pf);
 
-	static void TestRangeRelationship(CMemoryPool *mp, CRange *prange1,
-									  CRange *prange2, CRange *prange3,
-									  CRange *prange4, CRange *prange5);
+	static void TestRangeRelationship(CMemoryPool *mp,
+									  gpos::Ref<CRange> prange1,
+									  gpos::Ref<CRange> prange2,
+									  gpos::Ref<CRange> prange3,
+									  gpos::Ref<CRange> prange4,
+									  gpos::Ref<CRange> prange5);
 
-	static void PrintRange(CMemoryPool *mp, CColRef *colref, CRange *prange);
+	static void PrintRange(CMemoryPool *mp, CColRef *colref,
+						   gpos::Ref<CRange> prange);
 
 	// int2 datum
 	static gpos::Ref<IDatum> CreateInt2Datum(CMemoryPool *mp, INT i);

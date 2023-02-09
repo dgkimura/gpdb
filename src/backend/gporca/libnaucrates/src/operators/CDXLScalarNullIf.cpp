@@ -131,7 +131,7 @@ CDXLScalarNullIf::HasBoolResult(CMDAccessor *md_accessor) const
 //---------------------------------------------------------------------------
 void
 CDXLScalarNullIf::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const CDXLNode *dxlnode) const
+								 const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -158,7 +158,7 @@ CDXLScalarNullIf::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarNullIf::AssertValid(const CDXLNode *dxlnode,
+CDXLScalarNullIf::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 							  BOOL validate_children) const
 {
 	const ULONG arity = dxlnode->Arity();
@@ -166,7 +166,7 @@ CDXLScalarNullIf::AssertValid(const CDXLNode *dxlnode,
 
 	for (ULONG idx = 0; idx < arity; ++idx)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[idx];
+		gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[idx];
 		GPOS_ASSERT(EdxloptypeScalar ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

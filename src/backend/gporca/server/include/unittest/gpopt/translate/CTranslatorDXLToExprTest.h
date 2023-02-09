@@ -59,7 +59,7 @@ private:
 	);
 
 	// generate a string representation of a given Expr tree
-	static CWStringDynamic *Pstr(CMemoryPool *mp, CExpression *pexpr);
+	static CWStringDynamic *Pstr(CMemoryPool *mp, gpos::Ref<CExpression> pexpr);
 
 	// create a get expression for a table (r) with two integer columns
 	static gpos::Ref<CExpression> PexprGet(CMemoryPool *mp);

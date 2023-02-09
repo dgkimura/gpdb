@@ -212,7 +212,7 @@ public:
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;
 
 	// return the null constant for this type
-	IDatum *
+	gpos::Ref<IDatum>
 	DatumNull() const override
 	{
 		return m_datum_null.get();
@@ -224,18 +224,18 @@ public:
 
 	// create typed datum from DXL datum
 	gpos::Ref<IDatum> GetDatumForDXLDatum(
-		CMemoryPool *mp, const CDXLDatum *dxl_datum) const override;
+		CMemoryPool *mp, const gpos::Ref<CDXLDatum> dxl_datum) const override;
 
 	// generate the DXL datum from IDatum
 	gpos::Ref<CDXLDatum> GetDatumVal(CMemoryPool *mp,
-									 IDatum *datum) const override;
+									 gpos::Ref<IDatum> datum) const override;
 
 	// generate the DXL datum representing null value
 	gpos::Ref<CDXLDatum> GetDXLDatumNull(CMemoryPool *mp) const override;
 
 	// generate the DXL scalar constant from IDatum
 	gpos::Ref<CDXLScalarConstValue> GetDXLOpScConst(
-		CMemoryPool *mp, IDatum *datum) const override;
+		CMemoryPool *mp, gpos::Ref<IDatum> datum) const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the type in the provided stream

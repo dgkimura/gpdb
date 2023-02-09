@@ -1899,7 +1899,7 @@ CTranslatorRelcacheToDXL::RetrieveColStats(CMemoryPool *mp,
 	const ULONG num_buckets = dxl_stats_bucket_array_transformed->Size();
 	for (ULONG ul = 0; ul < num_buckets; ul++)
 	{
-		CDXLBucket *dxl_bucket =
+		gpos::Ref<CDXLBucket> dxl_bucket =
 			(*dxl_stats_bucket_array_transformed)[ul].get();
 		num_ndv_buckets = num_ndv_buckets + dxl_bucket->GetNumDistinct();
 		num_freq_buckets = num_freq_buckets + dxl_bucket->GetFrequency();
@@ -2432,9 +2432,9 @@ CTranslatorRelcacheToDXL::TransformHistogramToDXLBucketArray(
 	for (ULONG ul = 0; ul < num_buckets; ul++)
 	{
 		CBucket *bucket = (*buckets)[ul];
-		IDatum *datum_lower = bucket->GetLowerBound()->GetDatum();
+		gpos::Ref<IDatum> datum_lower = bucket->GetLowerBound()->GetDatum();
 		gpos::Ref<CDXLDatum> dxl_lower = md_type->GetDatumVal(mp, datum_lower);
-		IDatum *datum_upper = bucket->GetUpperBound()->GetDatum();
+		gpos::Ref<IDatum> datum_upper = bucket->GetUpperBound()->GetDatum();
 		gpos::Ref<CDXLDatum> dxl_upper = md_type->GetDatumVal(mp, datum_upper);
 		gpos::Ref<CDXLBucket> dxl_bucket = GPOS_NEW(mp)
 			CDXLBucket(dxl_lower, dxl_upper, bucket->IsLowerClosed(),

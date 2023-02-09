@@ -164,7 +164,7 @@ CLogicalUnionAll::PstatsDeriveUnionAll(CMemoryPool *mp,
 	const ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 1; ul < arity; ul++)
 	{
-		IStatistics *child_stats = exprhdl.Pstats(ul);
+		gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(ul);
 		gpos::Ref<CStatistics> stats =
 			CUnionAllStatsProcessor::CreateStatsForUnionAll(
 				mp, gpos::dyn_cast<CStatistics>(result_stats.get()),

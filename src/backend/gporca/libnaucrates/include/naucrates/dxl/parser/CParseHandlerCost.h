@@ -63,7 +63,7 @@ public:
 	~CParseHandlerCost() override;
 
 	// returns operator cost constructed by the handler
-	CDXLOperatorCost *GetDXLOperatorCost();
+	gpos::Ref<CDXLOperatorCost> GetDXLOperatorCost();
 };
 }  // namespace gpdxl
 

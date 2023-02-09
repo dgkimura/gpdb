@@ -20,8 +20,9 @@ using namespace gpmd;
 // return statistics object after performing LOJ operation with another statistics structure
 gpos::Ref<CStatistics>
 CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
-	CMemoryPool *mp, const IStatistics *outer_side_stats,
-	const IStatistics *inner_side_stats, CStatsPredJoinArray *join_preds_stats)
+	CMemoryPool *mp, const gpos::Ref<IStatistics> outer_side_stats,
+	const gpos::Ref<IStatistics> inner_side_stats,
+	CStatsPredJoinArray *join_preds_stats)
 {
 	GPOS_ASSERT(nullptr != outer_side_stats);
 	GPOS_ASSERT(nullptr != inner_side_stats);
@@ -93,7 +94,7 @@ CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
 	gpos::Ref<CBitSet> outer_side_join_cols = GPOS_NEW(mp) CBitSet(mp);
 	for (ULONG j = 0; j < join_preds_stats->Size(); j++)
 	{
-		CStatsPredJoin *join_stats = (*join_preds_stats)[j].get();
+		gpos::Ref<CStatsPredJoin> join_stats = (*join_preds_stats)[j].get();
 		if (join_stats->HasValidColIdOuter())
 		{
 			(void) outer_side_join_cols->ExchangeSet(join_stats->ColIdOuter());

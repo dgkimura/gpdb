@@ -42,7 +42,7 @@ using ColRefToConstraintArrayMap =
 // we use pointer equality here for fast map lookup -- since we do shallow comparison, we do not take ownership
 // of pointer values
 using ConstraintContainmentMap = gpos::UnorderedMap<
-	const CConstraint *, BOOL *,
+	const gpos::Ref<CConstraint>, BOOL *,
 	gpos::PtrHash<CConstraint, gpos::HashPtr<CConstraint>>,
 	gpos::PtrEqual<CConstraint, gpos::EqualPtr<CConstraint>>>;
 
@@ -99,12 +99,12 @@ private:
 
 	// create constraint from scalar comparison
 	static gpos::Ref<CConstraint> PcnstrFromScalarCmp(
-		CMemoryPool *mp, CExpression *pexpr,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 		gpos::Ref<CColRefSetArray> *ppdrgpcrs, BOOL infer_nulls_as = false);
 
 	// create constraint from scalar boolean expression
 	static gpos::Ref<CConstraint> PcnstrFromScalarBoolOp(
-		CMemoryPool *mp, CExpression *pexpr,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 		gpos::Ref<CColRefSetArray> *ppdrgpcrs, BOOL infer_nulls_as = false);
 
 	// create conjunction/disjunction from array of constraints
@@ -152,7 +152,7 @@ protected:
 	// create constraint from scalar array comparison expression originally generated for
 	// "scalar op ANY/ALL (array)" construct
 	static gpos::Ref<CConstraint> PcnstrFromScalarArrayCmp(
-		CMemoryPool *mp, CExpression *pexpr, CColRef *colref,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRef *colref,
 		BOOL infer_nulls_as = false);
 
 	static gpos::Ref<CColRefSet> PcrsFromConstraints(
@@ -181,10 +181,10 @@ public:
 	}
 
 	// does the current constraint contain the given one
-	virtual BOOL Contains(CConstraint *pcnstr);
+	virtual BOOL Contains(gpos::Ref<CConstraint> pcnstr);
 
 	// equality function
-	virtual BOOL Equals(CConstraint *pcnstr);
+	virtual BOOL Equals(gpos::Ref<CConstraint> pcnstr);
 
 	// columns in this constraint
 	virtual CColRefSet *
@@ -194,7 +194,7 @@ public:
 	}
 
 	// scalar expression
-	virtual CExpression *PexprScalar(CMemoryPool *mp) = 0;
+	virtual gpos::Ref<CExpression> PexprScalar(CMemoryPool *mp) = 0;
 
 	// check if there is a constraint on the given column
 	virtual BOOL FConstraint(const CColRef *colref) const = 0;
@@ -234,7 +234,7 @@ public:
 	// create constraint from scalar expression and pass back any discovered
 	// equivalence classes
 	static gpos::Ref<CConstraint> PcnstrFromScalarExpr(
-		CMemoryPool *mp, CExpression *pexpr,
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 		gpos::Ref<CColRefSetArray> *ppdrgpcrs, BOOL infer_nulls_as = false);
 
 	// create conjunction from array of constraints
@@ -247,8 +247,8 @@ public:
 
 	// merge equivalence classes coming from children of a bool op
 	static gpos::Ref<CColRefSetArray> PdrgpcrsMergeFromBoolOp(
-		CMemoryPool *mp, CExpression *pexpr, CColRefSetArray *pdrgpcrsFst,
-		CColRefSetArray *pdrgpcrsSnd);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		CColRefSetArray *pdrgpcrsFst, CColRefSetArray *pdrgpcrsSnd);
 
 	// subset of the given constraints, which reference the given column
 	static gpos::Ref<CConstraintArray> PdrgpcnstrOnColumn(
@@ -260,7 +260,7 @@ public:
 
 // shorthand for printing, pointer.
 inline IOstream &
-operator<<(IOstream &os, const CConstraint *cnstr)
+operator<<(IOstream &os, const gpos::Ref<CConstraint> cnstr)
 {
 	return cnstr->OsPrint(os);
 }

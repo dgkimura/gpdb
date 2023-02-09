@@ -64,7 +64,7 @@ public:
 	}
 
 	// match function
-	BOOL Matches(COperator *) const override;
+	BOOL Matches(gpos::Ref<COperator>) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
@@ -113,7 +113,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalMotionBroadcast *PopConvert(COperator *pop);
+	static CPhysicalMotionBroadcast *PopConvert(gpos::Ref<COperator> pop);
 
 };	// class CPhysicalMotionBroadcast
 

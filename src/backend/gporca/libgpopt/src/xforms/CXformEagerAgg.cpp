@@ -77,8 +77,9 @@ CXformEagerAgg::Exfp(CExpressionHandle &exprhdl) const
 
 // actual transformation
 void
-CXformEagerAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-						  CExpression *agg_expr) const
+CXformEagerAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
+						  gpos::Ref<CXformResult> pxfres,
+						  gpos::Ref<CExpression> agg_expr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, agg_expr));
@@ -91,11 +92,11 @@ CXformEagerAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	}
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CExpression *join_expr = (*agg_expr)[0];
-	CExpression *join_outer_child_expr = (*join_expr)[0];
-	CExpression *join_inner_child_expr = (*join_expr)[1];
-	CExpression *join_condition_expr = (*join_expr)[2];
-	CExpression *agg_proj_list_expr = (*agg_expr)[1];
+	gpos::Ref<CExpression> join_expr = (*agg_expr)[0];
+	gpos::Ref<CExpression> join_outer_child_expr = (*join_expr)[0];
+	gpos::Ref<CExpression> join_inner_child_expr = (*join_expr)[1];
+	gpos::Ref<CExpression> join_condition_expr = (*join_expr)[2];
+	gpos::Ref<CExpression> agg_proj_list_expr = (*agg_expr)[1];
 
 	//	'push_down_gb_crs' represents the column references that are used for
 	//	grouping in the pushed-down aggregate. This is the union of the original
@@ -162,7 +163,7 @@ CXformEagerAgg::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 // Only following aggregates are supported:
 // 	min, max, sum, count, avg
 BOOL
-CXformEagerAgg::CanPushAggBelowJoin(CExpression *scalar_agg_func_expr)
+CXformEagerAgg::CanPushAggBelowJoin(gpos::Ref<CExpression> scalar_agg_func_expr)
 {
 	CScalarAggFunc *scalar_agg_func =
 		gpos::dyn_cast<CScalarAggFunc>(scalar_agg_func_expr->Pop());
@@ -182,7 +183,7 @@ CXformEagerAgg::CanPushAggBelowJoin(CExpression *scalar_agg_func_expr)
 	CMDAccessor *md_accessor = poctxt->Pmda();
 	gpos::Ref<IMDId> agg_mdid =
 		scalar_agg_func->MDId();  // oid of the original aggregate function
-	CExpression *agg_child_expr = (*(*scalar_agg_func_expr)[0])[0];
+	gpos::Ref<CExpression> agg_child_expr = (*(*scalar_agg_func_expr)[0])[0];
 	gpos::Ref<IMDId> agg_child_mdid =
 		gpos::dyn_cast<CScalar>(agg_child_expr->Pop())->MdidType();
 	const IMDType *agg_child_type = md_accessor->RetrieveType(agg_child_mdid);
@@ -212,11 +213,11 @@ CXformEagerAgg::CanPushAggBelowJoin(CExpression *scalar_agg_func_expr)
 //		- Single expression input in the agg
 //		- Input expression only part of outer child
 BOOL
-CXformEagerAgg::CanApplyTransform(CExpression *gb_agg_expr)
+CXformEagerAgg::CanApplyTransform(gpos::Ref<CExpression> gb_agg_expr)
 {
-	CExpression *join_expr = (*gb_agg_expr)[0];
-	CExpression *agg_proj_list_expr = (*gb_agg_expr)[1];
-	CExpression *join_outer_child_expr = (*join_expr)[0];
+	gpos::Ref<CExpression> join_expr = (*gb_agg_expr)[0];
+	gpos::Ref<CExpression> agg_proj_list_expr = (*gb_agg_expr)[1];
+	gpos::Ref<CExpression> join_outer_child_expr = (*join_expr)[0];
 
 	// currently only supporting aggregate column references from outer child
 	CColRefSet *join_outer_child_cols =
@@ -237,7 +238,8 @@ CXformEagerAgg::CanApplyTransform(CExpression *gb_agg_expr)
 	}
 	for (ULONG agg_index = 0; agg_index < num_aggregates; agg_index++)
 	{
-		CExpression *scalar_agg_proj_expr = (*agg_proj_list_expr)[agg_index];
+		gpos::Ref<CExpression> scalar_agg_proj_expr =
+			(*agg_proj_list_expr)[agg_index];
 		if (!CanPushAggBelowJoin((*scalar_agg_proj_expr)[0]))
 		{
 			// No aggregate is pushed below join if an unsupported aggregate is
@@ -271,11 +273,11 @@ CXformEagerAgg::PopulateLowerUpperProjectList(
 	// loop over each project element
 	for (ULONG ul = 0; ul < num_proj_elements; ul++)
 	{
-		CExpression *orig_proj_elem_expr = (*orig_proj_list)[ul];
+		gpos::Ref<CExpression> orig_proj_elem_expr = (*orig_proj_list)[ul];
 		CScalarProjectElement *orig_proj_elem =
 			gpos::dyn_cast<CScalarProjectElement>(orig_proj_elem_expr->Pop());
 
-		CExpression *orig_agg_expr = (*orig_proj_elem_expr)[0];
+		gpos::Ref<CExpression> orig_agg_expr = (*orig_proj_elem_expr)[0];
 		CScalarAggFunc *orig_agg_func =
 			gpos::dyn_cast<CScalarAggFunc>(orig_agg_expr->Pop());
 		gpos::Ref<IMDId> orig_agg_mdid = orig_agg_func->MDId();

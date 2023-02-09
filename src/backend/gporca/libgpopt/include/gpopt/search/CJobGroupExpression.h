@@ -45,7 +45,7 @@ private:
 
 protected:
 	// target group expression
-	CGroupExpression *m_pgexpr{nullptr};
+	gpos::Ref<CGroupExpression> m_pgexpr{nullptr};
 
 	// ctor
 	CJobGroupExpression() = default;
@@ -82,7 +82,7 @@ protected:
 	}
 
 	// initialize job
-	void Init(CGroupExpression *pgexpr);
+	void Init(gpos::Ref<CGroupExpression> pgexpr);
 
 	// schedule transformation jobs for applicable xforms
 	virtual void ScheduleApplicableTransformations(CSchedulerContext *psc) = 0;

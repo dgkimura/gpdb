@@ -67,7 +67,7 @@ CCostModelConfigSerializer::Serialize(CXMLSerializer &xml_serializer) const
 }
 
 CCostModelConfigSerializer::CCostModelConfigSerializer(
-	const gpopt::ICostModel *cost_model)
+	const gpopt::gpos::Ref<ICostModel> cost_model)
 	: m_cost_model(cost_model)
 {
 }

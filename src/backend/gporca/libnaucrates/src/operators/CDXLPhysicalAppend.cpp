@@ -121,7 +121,7 @@ CDXLPhysicalAppend::IsZapped() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalAppend::SerializeToDXL(CXMLSerializer *xml_serializer,
-								   const CDXLNode *dxlnode) const
+								   const gpos::Ref<CDXLNode> dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 
@@ -173,7 +173,7 @@ CDXLPhysicalAppend::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalAppend::AssertValid(const CDXLNode *dxlnode,
+CDXLPhysicalAppend::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 								BOOL validate_children) const
 {
 	// assert proj list and filter are valid
@@ -182,7 +182,7 @@ CDXLPhysicalAppend::AssertValid(const CDXLNode *dxlnode,
 	const ULONG ulChildren = dxlnode->Arity();
 	for (ULONG ul = EdxlappendIndexFirstChild; ul < ulChildren; ul++)
 	{
-		CDXLNode *child_dxlnode = (*dxlnode)[ul];
+		gpos::Ref<CDXLNode> child_dxlnode = (*dxlnode)[ul];
 		GPOS_ASSERT(EdxloptypePhysical ==
 					child_dxlnode->GetOperator()->GetDXLOperatorType());
 

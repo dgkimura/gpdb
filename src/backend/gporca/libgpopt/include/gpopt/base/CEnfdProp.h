@@ -89,9 +89,9 @@ public:
 	void
 	AppendEnforcers(
 		CMemoryPool *mp, CReqdPropPlan *prpp,
-		CExpressionArray *pdrgpexpr,  // array of enforcer expressions
-		CExpression *pexprChild,	  // leaf in the target group where
-									  // enforcers will be added
+		CExpressionArray *pdrgpexpr,		// array of enforcer expressions
+		gpos::Ref<CExpression> pexprChild,	// leaf in the target group where
+											// enforcers will be added
 		CEnfdProp::EPropEnforcingType epet, CExpressionHandle &exprhdl) const
 	{
 		if (FEnforce(epet))
@@ -101,7 +101,7 @@ public:
 	}
 
 	// property spec accessor
-	virtual CPropSpec *Pps() const = 0;
+	virtual gpos::Ref<CPropSpec> Pps() const = 0;
 
 	// hash function
 	virtual ULONG HashValue() const = 0;

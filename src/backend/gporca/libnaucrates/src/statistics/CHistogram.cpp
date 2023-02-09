@@ -171,7 +171,7 @@ CHistogram::IsEmpty() const
 // construct new histogram with less than or less than equal to filter
 CHistogram *
 CHistogram::MakeHistogramLessThanOrLessThanEqualFilter(
-	CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point) const
+	CStatsPred::EStatsCmpType stats_cmp_type, gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(CStatsPred::EstatscmptL == stats_cmp_type ||
 				CStatsPred::EstatscmptLEq == stats_cmp_type);
@@ -220,7 +220,7 @@ CHistogram::MakeHistogramLessThanOrLessThanEqualFilter(
 
 // return an array buckets after applying non equality filter on the histogram buckets
 gpos::Ref<CBucketArray>
-CHistogram::MakeBucketsWithInequalityFilter(CPoint *point) const
+CHistogram::MakeBucketsWithInequalityFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 	gpos::Ref<CBucketArray> new_buckets = GPOS_NEW(m_mp) CBucketArray(m_mp);
@@ -257,7 +257,7 @@ CHistogram::MakeBucketsWithInequalityFilter(CPoint *point) const
 
 // construct new histogram with not equal filter
 CHistogram *
-CHistogram::MakeHistogramInequalityFilter(CPoint *point) const
+CHistogram::MakeHistogramInequalityFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -272,7 +272,7 @@ CHistogram::MakeHistogramInequalityFilter(CPoint *point) const
 
 // construct new histogram with IDF filter
 CHistogram *
-CHistogram::MakeHistogramIDFFilter(CPoint *point) const
+CHistogram::MakeHistogramIDFFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -292,7 +292,7 @@ CHistogram::MakeHistogramIDFFilter(CPoint *point) const
 
 // return an array buckets after applying equality filter on the histogram buckets
 gpos::Ref<CBucketArray>
-CHistogram::MakeBucketsWithEqualityFilter(CPoint *point) const
+CHistogram::MakeBucketsWithEqualityFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -333,7 +333,7 @@ CHistogram::MakeBucketsWithEqualityFilter(CPoint *point) const
 
 // construct new histogram with equality filter
 CHistogram *
-CHistogram::MakeHistogramEqualFilter(CPoint *point) const
+CHistogram::MakeHistogramEqualFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -365,7 +365,7 @@ CHistogram::MakeHistogramEqualFilter(CPoint *point) const
 
 // construct new histogram with INDF filter
 CHistogram *
-CHistogram::MakeHistogramINDFFilter(CPoint *point) const
+CHistogram::MakeHistogramINDFFilter(gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(nullptr != point);
 
@@ -402,7 +402,7 @@ CHistogram::MakeHistogramINDFFilter(CPoint *point) const
 // construct new histogram with greater than or greater than equal filter
 CHistogram *
 CHistogram::MakeHistogramGreaterThanOrGreaterThanEqualFilter(
-	CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point) const
+	CStatsPred::EStatsCmpType stats_cmp_type, gpos::Ref<CPoint> point) const
 {
 	GPOS_ASSERT(CStatsPred::EstatscmptGEq == stats_cmp_type ||
 				CStatsPred::EstatscmptG == stats_cmp_type);
@@ -608,7 +608,7 @@ CHistogram::IsValid() const
 // construct new histogram with filter and normalize output histogram
 CHistogram *
 CHistogram::MakeHistogramFilterNormalize(
-	CStatsPred::EStatsCmpType stats_cmp_type, CPoint *point,
+	CStatsPred::EStatsCmpType stats_cmp_type, gpos::Ref<CPoint> point,
 	CDouble *scale_factor) const
 {
 	// if histogram is not well-defined, then result is not well defined
@@ -807,7 +807,7 @@ CHistogram::MakeLASJHistogramNormalize(CStatsPred::EStatsCmpType stats_cmp_type,
 // construct new histogram after applying the filter (no normalization)
 CHistogram *
 CHistogram::MakeHistogramFilter(CStatsPred::EStatsCmpType stats_cmp_type,
-								CPoint *point) const
+								gpos::Ref<CPoint> point) const
 {
 	CHistogram *result_histogram = nullptr;
 	GPOS_ASSERT(IsOpSupportedForFilter(stats_cmp_type));
@@ -1388,8 +1388,8 @@ CHistogram::MakeGroupByHistogramNormalize(CDouble,	// rows,
 	for (ULONG ul = 0; ul < num_of_buckets; ul++)
 	{
 		CBucket *bucket = (*m_histogram_buckets)[ul];
-		CPoint *lower_bound = bucket->GetLowerBound();
-		CPoint *upper_bound = bucket->GetUpperBound();
+		gpos::Ref<CPoint> lower_bound = bucket->GetLowerBound();
+		gpos::Ref<CPoint> upper_bound = bucket->GetUpperBound();
 		;
 		;
 
@@ -2186,7 +2186,7 @@ CHistogram::NeedsNDVBasedCardEstimationForEq(const CHistogram *histogram)
 
 	const IBucket *bucket = (*histogram->GetBuckets())[0];
 
-	IDatum *datum = bucket->GetLowerBound()->GetDatum();
+	gpos::Ref<IDatum> datum = bucket->GetLowerBound()->GetDatum();
 
 	IMDType::ETypeInfo type_info = datum->GetDatumType();
 	if (IMDType::EtiInt2 == type_info || IMDType::EtiInt4 == type_info ||

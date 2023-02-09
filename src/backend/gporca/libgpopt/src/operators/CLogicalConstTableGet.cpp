@@ -150,7 +150,7 @@ CLogicalConstTableGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalConstTableGet::Matches(COperator *pop) const
+CLogicalConstTableGet::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() != Eopid())
 	{
@@ -367,7 +367,7 @@ CLogicalConstTableGet::OsPrint(IOstream &os) const
 			const ULONG length = pdrgpdatum->Size();
 			for (ULONG ulB = 0; ulB < length; ulB++)
 			{
-				IDatum *datum = (*pdrgpdatum)[ulB].get();
+				gpos::Ref<IDatum> datum = (*pdrgpdatum)[ulB].get();
 				datum->OsPrint(os);
 
 				if (ulB < length - 1)

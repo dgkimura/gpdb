@@ -99,7 +99,7 @@ public:
 	ULONG HashValue() const override;
 
 	// match function
-	BOOL Matches(COperator *pop) const override;
+	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// sensitivity to order of inputs
 	BOOL
@@ -120,7 +120,7 @@ public:
 
 	// conversion function
 	static CScalarArrayCmp *
-	PopConvert(COperator *pop)
+	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarArrayCmp == pop->Eopid());
@@ -144,8 +144,8 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// expand array comparison expression into a conjunctive/disjunctive expression
-	static gpos::Ref<CExpression> PexprExpand(CMemoryPool *mp,
-											  CExpression *pexprArrayCmp);
+	static gpos::Ref<CExpression> PexprExpand(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprArrayCmp);
 
 };	// class CScalarArrayCmp
 

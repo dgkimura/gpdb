@@ -71,7 +71,8 @@ CXformLeftSemiJoin2InnerJoin::Exfp(CExpressionHandle &exprhdl) const
 
 	CColRefSet *pcrsInnerOutput =
 		exprhdl.DeriveOutputColumns(1 /*child_index*/);
-	CExpression *pexprScalar = exprhdl.PexprScalarExactChild(2 /*child_index*/);
+	gpos::Ref<CExpression> pexprScalar =
+		exprhdl.PexprScalarExactChild(2 /*child_index*/);
 	CAutoMemoryPool amp;
 
 	// examine join predicate to determine xform applicability
@@ -94,9 +95,9 @@ CXformLeftSemiJoin2InnerJoin::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 void
-CXformLeftSemiJoin2InnerJoin::Transform(CXformContext *pxfctxt,
-										CXformResult *pxfres,
-										CExpression *pexpr) const
+CXformLeftSemiJoin2InnerJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
+										gpos::Ref<CXformResult> pxfres,
+										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
@@ -105,9 +106,9 @@ CXformLeftSemiJoin2InnerJoin::Transform(CXformContext *pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CExpression *pexprOuter = (*pexpr)[0];
-	CExpression *pexprInner = (*pexpr)[1];
-	CExpression *pexprScalar = (*pexpr)[2];
+	gpos::Ref<CExpression> pexprOuter = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
 
 	;
 	;
@@ -122,7 +123,7 @@ CXformLeftSemiJoin2InnerJoin::Transform(CXformContext *pxfctxt,
 	pcrsGb->Difference(pcrsOuterOutput);
 	GPOS_ASSERT(0 < pcrsGb->Size());
 
-	CKeyCollection *pkc = pexprInner->DeriveKeyCollection();
+	gpos::Ref<CKeyCollection> pkc = pexprInner->DeriveKeyCollection();
 	if (nullptr == pkc ||
 		(nullptr != pkc && !pkc->FKey(pcrsGb.get(), false /*fExactMatch*/)))
 	{

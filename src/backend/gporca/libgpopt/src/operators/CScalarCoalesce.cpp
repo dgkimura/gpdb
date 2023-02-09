@@ -79,7 +79,7 @@ CScalarCoalesce::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CScalarCoalesce::Matches(COperator *pop) const
+CScalarCoalesce::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{

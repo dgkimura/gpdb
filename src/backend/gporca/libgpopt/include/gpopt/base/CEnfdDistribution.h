@@ -65,7 +65,7 @@ public:
 	~CEnfdDistribution() override;
 
 	// distribution spec accessor
-	CPropSpec *
+	gpos::Ref<CPropSpec>
 	Pps() const override
 	{
 		return m_pds.get();

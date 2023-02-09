@@ -161,7 +161,7 @@ CPhysicalFilter::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalFilter::PcteRequired(CMemoryPool *,		//mp,
 							  CExpressionHandle &,	//exprhdl,
-							  CCTEReq *pcter,
+							  gpos::Ref<CCTEReq> pcter,
 							  ULONG
 #ifdef GPOS_DEBUG
 								  child_index
@@ -216,7 +216,7 @@ CPhysicalFilter::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 	if (CDistributionSpec::EdtHashed == pdsChild->Edt() &&
 		exprhdl.HasOuterRefs())
 	{
-		CExpression *pexprFilterPred =
+		gpos::Ref<CExpression> pexprFilterPred =
 			exprhdl.PexprScalarExactChild(1, true /*error_on_null_return*/);
 
 		CDistributionSpecHashed *pdshashedOriginal =
@@ -313,7 +313,7 @@ CPhysicalFilter::PrsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalFilter::Matches(COperator *pop) const
+CPhysicalFilter::Matches(gpos::Ref<COperator> pop) const
 {
 	// filter doesn't contain any members as of now
 	return Eopid() == pop->Eopid();

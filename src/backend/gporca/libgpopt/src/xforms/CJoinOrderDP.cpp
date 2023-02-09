@@ -57,7 +57,8 @@ CJoinOrderDP::SComponentPair::SComponentPair(gpos::Ref<CBitSet> pbsFst,
 //
 //---------------------------------------------------------------------------
 ULONG
-CJoinOrderDP::SComponentPair::HashValue(const SComponentPair *pcomppair)
+CJoinOrderDP::SComponentPair::HashValue(
+	const gpos::Ref<SComponentPair> pcomppair)
 {
 	GPOS_ASSERT(nullptr != pcomppair);
 
@@ -75,8 +76,9 @@ CJoinOrderDP::SComponentPair::HashValue(const SComponentPair *pcomppair)
 //
 //---------------------------------------------------------------------------
 BOOL
-CJoinOrderDP::SComponentPair::Equals(const SComponentPair *pcomppairFst,
-									 const SComponentPair *pcomppairSnd)
+CJoinOrderDP::SComponentPair::Equals(
+	const gpos::Ref<SComponentPair> pcomppairFst,
+	const gpos::Ref<SComponentPair> pcomppairSnd)
 {
 	GPOS_ASSERT(nullptr != pcomppairFst);
 	GPOS_ASSERT(nullptr != pcomppairSnd);
@@ -162,7 +164,7 @@ CJoinOrderDP::~CJoinOrderDP()
 //
 //---------------------------------------------------------------------------
 void
-CJoinOrderDP::AddJoinOrder(CExpression *pexprJoin, CDouble dCost)
+CJoinOrderDP::AddJoinOrder(gpos::Ref<CExpression> pexprJoin, CDouble dCost)
 {
 	GPOS_ASSERT(nullptr != pexprJoin);
 	GPOS_ASSERT(nullptr != m_pdrgpexprTopKOrders);
@@ -182,7 +184,7 @@ CJoinOrderDP::AddJoinOrder(CExpression *pexprJoin, CDouble dCost)
 		// we have stored K expressions, evict worst expression
 		for (INT ul = 0; ul < ulResults; ul++)
 		{
-			CExpression *pexpr = (*m_pdrgpexprTopKOrders)[ul].get();
+			gpos::Ref<CExpression> pexpr = (*m_pdrgpexprTopKOrders)[ul].get();
 			CDouble *pd = m_phmexprcost->Find(pexpr);
 			GPOS_ASSERT(nullptr != pd);
 
@@ -221,8 +223,8 @@ CJoinOrderDP::AddJoinOrder(CExpression *pexprJoin, CDouble dCost)
 //		Lookup best join order for given set
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprLookup(CBitSet *pbs)
+gpos::Ref<CExpression>
+CJoinOrderDP::PexprLookup(gpos::Ref<CBitSet> pbs)
 {
 	// if set has size 1, return expression directly
 	if (1 == pbs->Size())
@@ -246,8 +248,8 @@ CJoinOrderDP::PexprLookup(CBitSet *pbs)
 //		Extract predicate joining the two given sets
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprPred(CBitSet *pbsFst, CBitSet *pbsSnd)
+gpos::Ref<CExpression>
+CJoinOrderDP::PexprPred(gpos::Ref<CBitSet> pbsFst, gpos::Ref<CBitSet> pbsSnd)
 {
 	GPOS_ASSERT(nullptr != pbsFst);
 	GPOS_ASSERT(nullptr != pbsSnd);
@@ -318,18 +320,18 @@ CJoinOrderDP::PexprPred(CBitSet *pbsFst, CBitSet *pbsSnd)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CJoinOrderDP::PexprJoin(CBitSet *pbsFst, CBitSet *pbsSnd)
+CJoinOrderDP::PexprJoin(gpos::Ref<CBitSet> pbsFst, gpos::Ref<CBitSet> pbsSnd)
 {
 	GPOS_ASSERT(nullptr != pbsFst);
 	GPOS_ASSERT(nullptr != pbsSnd);
 
-	CExpression *pexprFst = PexprLookup(pbsFst);
+	gpos::Ref<CExpression> pexprFst = PexprLookup(pbsFst);
 	GPOS_ASSERT(nullptr != pexprFst);
 
-	CExpression *pexprSnd = PexprLookup(pbsSnd);
+	gpos::Ref<CExpression> pexprSnd = PexprLookup(pbsSnd);
 	GPOS_ASSERT(nullptr != pexprSnd);
 
-	CExpression *pexprScalar = PexprPred(pbsFst, pbsSnd);
+	gpos::Ref<CExpression> pexprScalar = PexprPred(pbsFst, pbsSnd);
 	GPOS_ASSERT(nullptr != pexprScalar);
 
 	;
@@ -350,7 +352,7 @@ CJoinOrderDP::PexprJoin(CBitSet *pbsFst, CBitSet *pbsSnd)
 //
 //---------------------------------------------------------------------------
 void
-CJoinOrderDP::DeriveStats(CExpression *pexpr)
+CJoinOrderDP::DeriveStats(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -373,7 +375,7 @@ CJoinOrderDP::DeriveStats(CExpression *pexpr)
 //---------------------------------------------------------------------------
 void
 CJoinOrderDP::InsertExpressionCost(
-	CExpression *pexpr, CDouble dCost,
+	gpos::Ref<CExpression> pexpr, CDouble dCost,
 	BOOL fValidateInsert  // if true, insertion must succeed
 )
 {
@@ -406,8 +408,8 @@ CJoinOrderDP::InsertExpressionCost(
 //		Join expressions in the given set
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprJoin(CBitSet *pbs)
+gpos::Ref<CExpression>
+CJoinOrderDP::PexprJoin(gpos::Ref<CBitSet> pbs)
 {
 	GPOS_ASSERT(2 == pbs->Size());
 
@@ -422,7 +424,7 @@ CJoinOrderDP::PexprJoin(CBitSet *pbs)
 	(void) pbsFst->ExchangeSet(ulCompFst);
 	gpos::Ref<CBitSet> pbsSnd = GPOS_NEW(m_mp) CBitSet(m_mp);
 	(void) pbsSnd->ExchangeSet(ulCompSnd);
-	CExpression *pexprScalar = PexprPred(pbsFst.get(), pbsSnd.get());
+	gpos::Ref<CExpression> pexprScalar = PexprPred(pbsFst.get(), pbsSnd.get());
 	;
 	;
 
@@ -431,8 +433,8 @@ CJoinOrderDP::PexprJoin(CBitSet *pbs)
 		return nullptr;
 	}
 
-	CExpression *pexprLeft = m_rgpcomp[ulCompFst]->m_pexpr;
-	CExpression *pexprRight = m_rgpcomp[ulCompSnd]->m_pexpr;
+	gpos::Ref<CExpression> pexprLeft = m_rgpcomp[ulCompFst]->m_pexpr;
+	gpos::Ref<CExpression> pexprRight = m_rgpcomp[ulCompSnd]->m_pexpr;
 	;
 	;
 	;
@@ -467,8 +469,9 @@ CJoinOrderDP::PexprJoin(CBitSet *pbs)
 //
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprBestJoinOrderDP(CBitSet *pbs	 // set of elements to be joined
+gpos::Ref<CExpression>
+CJoinOrderDP::PexprBestJoinOrderDP(
+	gpos::Ref<CBitSet> pbs	// set of elements to be joined
 )
 {
 	CDouble dMinCost(0.0);
@@ -478,17 +481,19 @@ CJoinOrderDP::PexprBestJoinOrderDP(CBitSet *pbs	 // set of elements to be joined
 	const ULONG ulSubsets = pdrgpbsSubsets->Size();
 	for (ULONG ul = 0; ul < ulSubsets; ul++)
 	{
-		CBitSet *pbsCurrent = (*pdrgpbsSubsets)[ul].get();
+		gpos::Ref<CBitSet> pbsCurrent = (*pdrgpbsSubsets)[ul].get();
 		gpos::Ref<CBitSet> pbsRemaining = GPOS_NEW(m_mp) CBitSet(m_mp, *pbs);
 		pbsRemaining->Difference(pbsCurrent);
 
 		// check if subsets are connected with one or more edges
-		CExpression *pexprPred = PexprPred(pbsCurrent, pbsRemaining.get());
+		gpos::Ref<CExpression> pexprPred =
+			PexprPred(pbsCurrent, pbsRemaining.get());
 		if (nullptr != pexprPred)
 		{
 			// compute solutions of left and right subsets recursively
-			CExpression *pexprLeft = PexprBestJoinOrder(pbsCurrent);
-			CExpression *pexprRight = PexprBestJoinOrder(pbsRemaining.get());
+			gpos::Ref<CExpression> pexprLeft = PexprBestJoinOrder(pbsCurrent);
+			gpos::Ref<CExpression> pexprRight =
+				PexprBestJoinOrder(pbsRemaining.get());
 
 			if (nullptr != pexprLeft && nullptr != pexprRight)
 			{
@@ -582,7 +587,7 @@ CJoinOrderDP::GenerateSubsets(CMemoryPool *mp, gpos::Ref<CBitSet> pbsCurrent,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CBitSetArray>
-CJoinOrderDP::PdrgpbsSubsets(CMemoryPool *mp, CBitSet *pbs)
+CJoinOrderDP::PdrgpbsSubsets(CMemoryPool *mp, gpos::Ref<CBitSet> pbs)
 {
 	const ULONG size = pbs->Size();
 	ULONG *pulElems = GPOS_NEW_ARRAY(mp, ULONG, size);
@@ -614,7 +619,7 @@ CJoinOrderDP::PdrgpbsSubsets(CMemoryPool *mp, CBitSet *pbs)
 //
 //---------------------------------------------------------------------------
 CDouble
-CJoinOrderDP::DCost(CExpression *pexpr)
+CJoinOrderDP::DCost(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexpr);
@@ -646,7 +651,7 @@ CJoinOrderDP::DCost(CExpression *pexpr)
 		DOUBLE rgdRows[2] = {0.0, 0.0};
 		for (ULONG ul = 0; ul < arity - 1; ul++)
 		{
-			CExpression *pexprChild = (*pexpr)[ul];
+			gpos::Ref<CExpression> pexprChild = (*pexpr)[ul];
 
 			// call function recursively to find child cost
 			dCost = dCost + DCost(pexprChild);
@@ -671,14 +676,14 @@ CJoinOrderDP::DCost(CExpression *pexpr)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CBitSet>
-CJoinOrderDP::PbsCovered(CBitSet *pbsInput)
+CJoinOrderDP::PbsCovered(gpos::Ref<CBitSet> pbsInput)
 {
 	GPOS_ASSERT(nullptr != pbsInput);
 	gpos::Ref<CBitSet> pbs = GPOS_NEW(m_mp) CBitSet(m_mp);
 
 	for (ULONG ul = 0; ul < m_ulEdges; ul++)
 	{
-		SEdge *pedge = m_rgpedge[ul];
+		gpos::Ref<SEdge> pedge = m_rgpedge[ul];
 		if (pbsInput->ContainsAll(pedge->m_pbs.get()))
 		{
 			pbs->Union(pedge->m_pbs.get());
@@ -697,12 +702,12 @@ CJoinOrderDP::PbsCovered(CBitSet *pbsInput)
 //		Generate cross product for the given components
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprCross(CBitSet *pbs)
+gpos::Ref<CExpression>
+CJoinOrderDP::PexprCross(gpos::Ref<CBitSet> pbs)
 {
 	GPOS_ASSERT(nullptr != pbs);
 
-	CExpression *pexpr = PexprLookup(pbs);
+	gpos::Ref<CExpression> pexpr = PexprLookup(pbs);
 	if (nullptr != pexpr)
 	{
 		// join order is already created
@@ -739,10 +744,10 @@ CJoinOrderDP::PexprCross(CBitSet *pbs)
 //		Join a covered subset with uncovered subset
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprJoinCoveredSubsetWithUncoveredSubset(CBitSet *pbs,
-														CBitSet *pbsCovered,
-														CBitSet *pbsUncovered)
+gpos::Ref<CExpression>
+CJoinOrderDP::PexprJoinCoveredSubsetWithUncoveredSubset(
+	gpos::Ref<CBitSet> pbs, gpos::Ref<CBitSet> pbsCovered,
+	gpos::Ref<CBitSet> pbsUncovered)
 {
 	GPOS_ASSERT(nullptr != pbs);
 	GPOS_ASSERT(nullptr != pbsCovered);
@@ -752,14 +757,14 @@ CJoinOrderDP::PexprJoinCoveredSubsetWithUncoveredSubset(CBitSet *pbs,
 	GPOS_ASSERT(pbs->ContainsAll(pbsUncovered));
 
 	// find best join order for covered subset
-	CExpression *pexprJoin = PexprBestJoinOrder(pbsCovered);
+	gpos::Ref<CExpression> pexprJoin = PexprBestJoinOrder(pbsCovered);
 	if (nullptr == pexprJoin)
 	{
 		return nullptr;
 	}
 
 	// create a cross product for uncovered subset
-	CExpression *pexprCross = PexprCross(pbsUncovered);
+	gpos::Ref<CExpression> pexprCross = PexprCross(pbsUncovered);
 
 	// join the results with a cross product
 	;
@@ -784,8 +789,8 @@ CJoinOrderDP::PexprJoinCoveredSubsetWithUncoveredSubset(CBitSet *pbs,
 //		find best join order for a given set of elements;
 //
 //---------------------------------------------------------------------------
-CExpression *
-CJoinOrderDP::PexprBestJoinOrder(CBitSet *pbs)
+gpos::Ref<CExpression>
+CJoinOrderDP::PexprBestJoinOrder(gpos::Ref<CBitSet> pbs)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_CHECK_ABORT;
@@ -793,7 +798,7 @@ CJoinOrderDP::PexprBestJoinOrder(CBitSet *pbs)
 	GPOS_ASSERT(nullptr != pbs);
 
 	// start by looking-up cost in the DP map
-	CExpression *pexpr = PexprLookup(pbs);
+	gpos::Ref<CExpression> pexpr = PexprLookup(pbs);
 
 	if (pexpr == m_pexprDummy)
 	{
@@ -822,8 +827,9 @@ CJoinOrderDP::PexprBestJoinOrder(CBitSet *pbs)
 		// create a cross product for uncovered subset
 		gpos::Ref<CBitSet> pbsUncovered = GPOS_NEW(m_mp) CBitSet(m_mp, *pbs);
 		pbsUncovered->Difference(pbsCovered.get());
-		CExpression *pexprResult = PexprJoinCoveredSubsetWithUncoveredSubset(
-			pbs, pbsCovered.get(), pbsUncovered.get());
+		gpos::Ref<CExpression> pexprResult =
+			PexprJoinCoveredSubsetWithUncoveredSubset(pbs, pbsCovered.get(),
+													  pbsUncovered.get());
 		;
 		;
 
@@ -837,7 +843,7 @@ CJoinOrderDP::PexprBestJoinOrder(CBitSet *pbs)
 	}
 
 	// otherwise, compute best join order using dynamic programming
-	CExpression *pexprBestJoinOrder = PexprBestJoinOrderDP(pbs);
+	gpos::Ref<CExpression> pexprBestJoinOrder = PexprBestJoinOrderDP(pbs);
 	if (pexprBestJoinOrder == m_pexprDummy)
 	{
 		// no join order could be created
@@ -857,7 +863,8 @@ CJoinOrderDP::PexprBestJoinOrder(CBitSet *pbs)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CJoinOrderDP::PexprBuildPred(CBitSet *pbsFst, CBitSet *pbsSnd)
+CJoinOrderDP::PexprBuildPred(gpos::Ref<CBitSet> pbsFst,
+							 gpos::Ref<CBitSet> pbsSnd)
 {
 	// collect edges connecting the given sets
 	gpos::Ref<CBitSet> pbsEdges = GPOS_NEW(m_mp) CBitSet(m_mp);
@@ -866,7 +873,7 @@ CJoinOrderDP::PexprBuildPred(CBitSet *pbsFst, CBitSet *pbsSnd)
 
 	for (ULONG ul = 0; ul < m_ulEdges; ul++)
 	{
-		SEdge *pedge = m_rgpedge[ul];
+		gpos::Ref<SEdge> pedge = m_rgpedge[ul];
 		if (pbs->ContainsAll(pedge->m_pbs.get()) &&
 			!pbsFst->IsDisjoint(pedge->m_pbs.get()) &&
 			!pbsSnd->IsDisjoint(pedge->m_pbs.get()))
@@ -885,7 +892,7 @@ CJoinOrderDP::PexprBuildPred(CBitSet *pbsFst, CBitSet *pbsSnd)
 		while (bsi.Advance())
 		{
 			ULONG ul = bsi.Bit();
-			SEdge *pedge = m_rgpedge[ul];
+			gpos::Ref<SEdge> pedge = m_rgpedge[ul];
 			;
 			pdrgpexpr->Append(pedge->m_pexpr);
 		}
@@ -906,7 +913,7 @@ CJoinOrderDP::PexprBuildPred(CBitSet *pbsFst, CBitSet *pbsSnd)
 //		Create join order
 //
 //---------------------------------------------------------------------------
-CExpression *
+gpos::Ref<CExpression>
 CJoinOrderDP::PexprExpand()
 {
 	gpos::Ref<CBitSet> pbs = GPOS_NEW(m_mp) CBitSet(m_mp);
@@ -915,7 +922,7 @@ CJoinOrderDP::PexprExpand()
 		(void) pbs->ExchangeSet(ul);
 	}
 
-	CExpression *pexprResult = PexprBestJoinOrder(pbs.get());
+	gpos::Ref<CExpression> pexprResult = PexprBestJoinOrder(pbs.get());
 	if (nullptr != pexprResult)
 	{
 		;

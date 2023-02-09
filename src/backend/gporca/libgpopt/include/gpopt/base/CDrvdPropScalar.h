@@ -126,9 +126,9 @@ protected:
 
 	BOOL DeriveHasSubquery(CExpressionHandle &);
 
-	CPartInfo *DerivePartitionInfo(CExpressionHandle &);
+	gpos::Ref<CPartInfo> DerivePartitionInfo(CExpressionHandle &);
 
-	CFunctionProp *DeriveFunctionProperties(CExpressionHandle &);
+	gpos::Ref<CFunctionProp> DeriveFunctionProperties(CExpressionHandle &);
 
 	BOOL DeriveHasNonScalarFunction(CExpressionHandle &);
 
@@ -167,7 +167,7 @@ public:
 
 	// derivation function
 	void Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDrvdPropCtxt *pdpctxt) override;
+				gpos::Ref<CDrvdPropCtxt> pdpctxt) override;
 
 	// check for satisfying required plan properties
 	BOOL FSatisfies(const CReqdPropPlan *prpp) const override;
@@ -185,10 +185,10 @@ public:
 	BOOL HasSubquery() const;
 
 	// derived partition consumers
-	CPartInfo *GetPartitionInfo() const;
+	gpos::Ref<CPartInfo> GetPartitionInfo() const;
 
 	// function properties
-	CFunctionProp *GetFunctionProperties() const;
+	gpos::Ref<CFunctionProp> GetFunctionProperties() const;
 
 	// scalar expression contains non-scalar function?
 	virtual BOOL HasNonScalarFunction() const;
@@ -206,7 +206,7 @@ public:
 	BOOL ContainsOnlyReplicationSafeAggFuncs() const;
 
 	// short hand for conversion
-	static CDrvdPropScalar *GetDrvdScalarProps(CDrvdProp *pdp);
+	static CDrvdPropScalar *GetDrvdScalarProps(gpos::Ref<CDrvdProp> pdp);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

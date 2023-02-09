@@ -67,7 +67,7 @@ public:
 	~CDXLPhysicalAbstractBitmapScan() override;
 
 	// table descriptor
-	const CDXLTableDescr *
+	const gpos::Ref<CDXLTableDescr>
 	GetDXLTableDescr()
 	{
 		return m_dxl_table_descr.get();
@@ -76,7 +76,7 @@ public:
 #ifdef GPOS_DEBUG
 	// checks whether the operator has valid structure, i.e. number and
 	// types of child nodes
-	void AssertValid(const CDXLNode *node,
+	void AssertValid(const gpos::Ref<CDXLNode> node,
 					 BOOL validate_children) const override;
 #endif	// GPOS_DEBUG
 };		// class CDXLPhysicalAbstractBitmapScan

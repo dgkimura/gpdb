@@ -210,7 +210,7 @@ CCacheTest::EresUnittest_Basic()
 
 		gpos::Ref<SSimpleObject> pso = GPOS_NEW(ca.Pmp()) SSimpleObject(1, 2);
 
-		SSimpleObject *psoReturned GPOS_ASSERTS_ONLY =
+		gpos::Ref<SSimpleObject> psoReturned GPOS_ASSERTS_ONLY =
 			ca.Insert(&(pso->m_ulKey), pso).get();
 
 		//release the ownership from pso, but ccacheentry still has the ownership
@@ -226,7 +226,7 @@ CCacheTest::EresUnittest_Basic()
 			gpos::Ref<SSimpleObject> psoDuplicate =
 				GPOS_NEW(ca.Pmp()) SSimpleObject(1, 5);
 
-			SSimpleObject *psoReturned GPOS_ASSERTS_ONLY =
+			gpos::Ref<SSimpleObject> psoReturned GPOS_ASSERTS_ONLY =
 				ca.Insert(&(psoDuplicate->m_ulKey), psoDuplicate).get();
 
 			GPOS_ASSERT(psoReturned == pso && "Duplicate insertion must fail");
@@ -321,7 +321,7 @@ CCacheTest::EresUnittest_Refcount()
 		GPOS_ASSERT(1 == pso->RefCount());
 
 #ifdef GPOS_DEBUG
-		SSimpleObject *psoReturned =
+		gpos::Ref<SSimpleObject> psoReturned =
 #endif	// GPOS_DEBUG
 			ca.Insert(&(pso->m_ulKey), pso).get();
 
@@ -665,7 +665,7 @@ CCacheTest::EresInsertDuplicates(
 			gpos::Ref<SSimpleObject> pso =
 				GPOS_NEW(ca.Pmp()) SSimpleObject(i, j);
 
-			SSimpleObject *psoReturned GPOS_ASSERTS_ONLY =
+			gpos::Ref<SSimpleObject> psoReturned GPOS_ASSERTS_ONLY =
 				ca.Insert(&(pso->m_ulKey), pso).get();
 
 			GPOS_ASSERT(nullptr != psoReturned);
@@ -779,7 +779,7 @@ CCacheTest::EresUnittest_DeepObject()
 		pdo->AddEntry(mp, 1, 1);
 		pdo->AddEntry(mp, 2, 2);
 
-		CDeepObject *pdoReturned GPOS_ASSERTS_ONLY =
+		gpos::Ref<CDeepObject> pdoReturned GPOS_ASSERTS_ONLY =
 			ca.Insert(pdo->Key(), pdo).get();
 		;
 
@@ -795,7 +795,7 @@ CCacheTest::EresUnittest_DeepObject()
 			pdoDuplicate->AddEntry(mp, 1, 5);
 			pdoDuplicate->AddEntry(mp, 2, 5);
 
-			CDeepObject *pdoReturned GPOS_ASSERTS_ONLY =
+			gpos::Ref<CDeepObject> pdoReturned GPOS_ASSERTS_ONLY =
 				ca.Insert(pdoDuplicate->Key(), pdoDuplicate).get();
 
 			GPOS_ASSERT(pdoReturned == pdo && "Duplicate insertion must fail");

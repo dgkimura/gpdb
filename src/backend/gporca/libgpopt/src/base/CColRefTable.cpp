@@ -28,8 +28,8 @@ using namespace gpmd;
 //		takes ownership of string; verify string is properly formatted
 //
 //---------------------------------------------------------------------------
-CColRefTable::CColRefTable(const CColumnDescriptor *pcoldesc, ULONG id,
-						   const CName *pname, ULONG ulOpSource)
+CColRefTable::CColRefTable(const gpos::Ref<CColumnDescriptor> pcoldesc,
+						   ULONG id, const CName *pname, ULONG ulOpSource)
 	: CColRef(pcoldesc->RetrieveType(), pcoldesc->TypeModifier(), id, pname),
 	  m_iAttno(0),
 	  m_ulSourceOpId(ulOpSource),

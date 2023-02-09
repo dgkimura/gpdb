@@ -56,7 +56,8 @@ CXformSubqueryUnnest::Exfp(CExpressionHandle &exprhdl) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
+CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp,
+										  gpos::Ref<CExpression> pexpr,
 										  BOOL fEnforceCorrelatedApply)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -70,8 +71,8 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
 	}
 
 	// extract components
-	CExpression *pexprOuter = (*pexpr)[0];
-	CExpression *pexprScalar = (*pexpr)[1];
+	gpos::Ref<CExpression> pexprOuter = (*pexpr)[0];
+	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// we add-ref the logical child since the resulting expression must re-use it
 	;
@@ -152,8 +153,9 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
 }
 
 void
-CXformSubqueryUnnest::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr,
+CXformSubqueryUnnest::Transform(gpos::Ref<CXformContext> pxfctxt,
+								gpos::Ref<CXformResult> pxfres,
+								gpos::Ref<CExpression> pexpr,
 								BOOL fEnforceCorrelatedApply) const
 {
 	CMemoryPool *pmp = pxfctxt->Pmp();
@@ -178,8 +180,9 @@ CXformSubqueryUnnest::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 //
 //---------------------------------------------------------------------------
 void
-CXformSubqueryUnnest::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
-								CExpression *pexpr) const
+CXformSubqueryUnnest::Transform(gpos::Ref<CXformContext> pxfctxt,
+								gpos::Ref<CXformResult> pxfres,
+								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));

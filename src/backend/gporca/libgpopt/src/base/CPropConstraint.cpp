@@ -116,7 +116,7 @@ CPropConstraint::FContradiction() const
 gpos::Ref<CExpression>
 CPropConstraint::PexprScalarMappedFromEquivCols(
 	CMemoryPool *mp, CColRef *colref,
-	CPropConstraint *constraintsForOuterRefs) const
+	gpos::Ref<CPropConstraint> constraintsForOuterRefs) const
 {
 	if (nullptr == m_pcnstr || nullptr == m_phmcrcrs)
 	{

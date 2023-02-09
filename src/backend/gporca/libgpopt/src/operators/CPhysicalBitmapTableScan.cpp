@@ -74,7 +74,7 @@ CPhysicalBitmapTableScan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalBitmapTableScan::Matches(COperator *pop) const
+CPhysicalBitmapTableScan::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchBitmapScan(this, pop);
 }

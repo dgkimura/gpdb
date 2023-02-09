@@ -54,8 +54,9 @@ CLogicalDynamicIndexGet::CLogicalDynamicIndexGet(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 CLogicalDynamicIndexGet::CLogicalDynamicIndexGet(
-	CMemoryPool *mp, const IMDIndex *pmdindex, CTableDescriptor *ptabdesc,
-	ULONG ulOriginOpId, const CName *pnameAlias, ULONG part_idx_id,
+	CMemoryPool *mp, const IMDIndex *pmdindex,
+	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
+	const CName *pnameAlias, ULONG part_idx_id,
 	gpos::Ref<CColRefArray> pdrgpcrOutput,
 	gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
 	gpos::Ref<IMdIdArray> partition_mdids)
@@ -115,7 +116,7 @@ CLogicalDynamicIndexGet::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CLogicalDynamicIndexGet::Matches(COperator *pop) const
+CLogicalDynamicIndexGet::Matches(gpos::Ref<COperator> pop) const
 {
 	return CUtils::FMatchDynamicIndex(this, pop);
 }
