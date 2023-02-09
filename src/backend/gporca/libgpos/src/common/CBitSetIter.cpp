@@ -57,7 +57,7 @@ CBitSetIter::Advance()
 			break;
 		}
 
-		m_bsl = m_bs.m_bsllist.Next(m_bsl);
+		m_bsl = m_bs.m_bsllist.Next(m_bsl.get());
 		m_cursor = (ULONG) -1;
 	}
 

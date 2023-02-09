@@ -16,6 +16,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CList.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/Ref.h"
 #include "gpos/common/owner.h"
 
 
@@ -34,7 +35,7 @@ class CBitSet : public CRefCount, public DbgPrintMixin<CBitSet>
 	// bitset iter needs to access internals
 	friend class CBitSetIter;
 
-protected:
+public:
 	//---------------------------------------------------------------------------
 	//	@class:
 	//		CBitSetLink
@@ -98,7 +99,8 @@ protected:
 	CBitSet(const CBitSet &);
 
 	// find link with offset less or equal to given value
-	CBitSetLink *FindLinkByOffset(ULONG, CBitSetLink * = nullptr) const;
+	gpos::Ref<CBitSetLink> FindLinkByOffset(
+		ULONG, gpos::Ref<CBitSetLink> = nullptr) const;
 
 	// reset set
 	void Clear();
