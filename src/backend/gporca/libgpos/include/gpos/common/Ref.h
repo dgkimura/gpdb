@@ -186,25 +186,25 @@ RefFromNew(T *p) noexcept
 
 // Adapter to turn a legacy hash function for CHashMap into a functor for
 // std::unordered_map
-template <class K, ULONG (*HashFn)(const K *)>
+template <class K, ULONG (*HashFn)(const Ref<K>)>
 struct RefHash
 {
 	ULONG
 	operator()(const Ref<K> &k) const noexcept
 	{
-		return HashFn(k.get());
+		return HashFn(k);
 	}
 };
 
 // Adapter to turn a legacy equal function for CHashMap into a functor for the
 // KeyEqual parameter for std::unordered_map
-template <class K, BOOL (*EqFn)(const K *, const K *)>
+template <class K, BOOL (*EqFn)(const gpos::Ref<K>, const gpos::Ref<K>)>
 struct RefEq
 {
 	BOOL
 	operator()(const Ref<K> &lhs, const Ref<K> &rhs) const noexcept
 	{
-		return EqFn(lhs.get(), rhs.get());
+		return EqFn(lhs, rhs);
 	}
 };
 
