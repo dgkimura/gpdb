@@ -23,13 +23,13 @@ struct RefPtrInfo
 	static void
 	AddRef(T *t) noexcept
 	{
-		;
+		t->AddRef();
 	}
 
 	static void
-	Release(gpos::Ref<T> t) noexcept(std::is_nothrow_destructible<T>::value)
+	Release(gpos::owner<T *> t) noexcept(std::is_nothrow_destructible<T>::value)
 	{
-		;
+		t->Release();
 	}
 };
 
@@ -86,7 +86,7 @@ public:
 
 	Ref(const Ref &other) noexcept : p_(other.get())
 	{
-		;
+		AddRef();
 	}
 
 	template <class U,
