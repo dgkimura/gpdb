@@ -107,7 +107,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// boolean expression evaluation
 	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;

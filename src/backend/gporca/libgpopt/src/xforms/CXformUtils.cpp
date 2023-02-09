@@ -1267,8 +1267,8 @@ CXformUtils::PexprInversePred(CMemoryPool *mp, CExpression *pexprSubquery)
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// get mdid and name of the inverse of the comparison operator used by subquery
-	IMDId *mdid_op = popSqAll->MdIdOp();
-	IMDId *pmdidInverseOp =
+	gpos::Ref<IMDId> mdid_op = popSqAll->MdIdOp();
+	gpos::Ref<IMDId> pmdidInverseOp =
 		md_accessor->RetrieveScOp(mdid_op)->GetInverseOpMdid();
 	const CWStringConst *pstrFirst =
 		md_accessor->RetrieveScOp(pmdidInverseOp)->Mdname().GetMDName();
@@ -1368,7 +1368,7 @@ CXformUtils::PexprLogicalDMLOverProject(CMemoryPool *mp,
 	}
 
 	// new expressions to project
-	IMDId *rel_mdid = ptabdesc->MDId();
+	gpos::Ref<IMDId> rel_mdid = ptabdesc->MDId();
 	gpos::Ref<CExpression> pexprProject = nullptr;
 	CColRef *pcrAction = nullptr;
 	CColRef *pcrOid = nullptr;
@@ -1521,8 +1521,9 @@ CXformUtils::FTriggerApplies(CLogicalDML::EDMLOperator edmlop,
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CXformUtils::PexprRowTrigger(CMemoryPool *mp, gpos::Ref<CExpression> pexprChild,
-							 CLogicalDML::EDMLOperator edmlop, IMDId *rel_mdid,
-							 BOOL fBefore, CColRefArray *colref_array)
+							 CLogicalDML::EDMLOperator edmlop,
+							 gpos::Ref<IMDId> rel_mdid, BOOL fBefore,
+							 CColRefArray *colref_array)
 {
 	GPOS_ASSERT(CLogicalDML::EdmlInsert == edmlop ||
 				CLogicalDML::EdmlDelete == edmlop);
@@ -1623,8 +1624,9 @@ CXformUtils::PexprAssertNotNull(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CXformUtils::PexprRowTrigger(CMemoryPool *mp, gpos::Ref<CExpression> pexprChild,
-							 CLogicalDML::EDMLOperator edmlop, IMDId *rel_mdid,
-							 BOOL fBefore, gpos::Ref<CColRefArray> pdrgpcrOld,
+							 CLogicalDML::EDMLOperator edmlop,
+							 gpos::Ref<IMDId> rel_mdid, BOOL fBefore,
+							 gpos::Ref<CColRefArray> pdrgpcrOld,
 							 gpos::Ref<CColRefArray> pdrgpcrNew)
 {
 	INT type = GPMD_TRIGGER_ROW;
@@ -1735,7 +1737,8 @@ CXformUtils::PexprAssertCheckConstraints(CMemoryPool *mp,
 
 		for (ULONG ul = 0; ul < ulCheckConstraint; ul++)
 		{
-			IMDId *pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(ul);
+			gpos::Ref<IMDId> pmdidCheckConstraint =
+				pmdrel->CheckConstraintMDidAt(ul);
 			const IMDCheckConstraint *pmdCheckConstraint =
 				md_accessor->RetrieveCheckConstraints(pmdidCheckConstraint);
 
@@ -2958,7 +2961,8 @@ CXformUtils::ComputeBitmapTableScanResidualPredicate(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CXformUtils::PexprBitmapBoolOp(CMemoryPool *mp, IMDId *pmdidBitmapType,
+CXformUtils::PexprBitmapBoolOp(CMemoryPool *mp,
+							   gpos::Ref<IMDId> pmdidBitmapType,
 							   gpos::Ref<CExpression> pexprLeft,
 							   gpos::Ref<CExpression> pexprRight,
 							   BOOL fConjunction)
@@ -3489,7 +3493,7 @@ CXformUtils::JoinBitmapIndexProbes(CMemoryPool *pmp,
 	const ULONG ulBitmapExpr = pdrgpexprBitmap->Size();
 	gpos::Ref<CExpression> pexprBitmapBoolOp = (*pdrgpexprBitmap)[0];
 	;
-	IMDId *pmdidBitmap =
+	gpos::Ref<IMDId> pmdidBitmap =
 		gpos::dyn_cast<CScalar>(pexprBitmapBoolOp->Pop())->MdidType();
 
 	for (ULONG ul = 1; ul < ulBitmapExpr; ul++)
@@ -3543,7 +3547,7 @@ CXformUtils::FHasAmbiguousType(CExpression *pexpr, CMDAccessor *md_accessor)
 				break;	// these operators do not have valid return type
 
 			default:
-				IMDId *mdid = popScalar->MdidType();
+				gpos::Ref<IMDId> mdid = popScalar->MdidType();
 				if (nullptr != mdid)
 				{
 					// check MD type of scalar node

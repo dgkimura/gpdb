@@ -72,7 +72,7 @@ public:
 	}
 
 	// bitmap type id
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_pmdidBitmapType.get();

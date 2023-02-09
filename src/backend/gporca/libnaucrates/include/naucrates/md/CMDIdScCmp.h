@@ -79,10 +79,10 @@ public:
 	}
 
 	// left type id
-	IMDId *GetLeftMdid() const;
+	gpos::Ref<IMDId> GetLeftMdid() const;
 
 	// right type id
-	IMDId *GetRightMdid() const;
+	gpos::Ref<IMDId> GetRightMdid() const;
 
 	IMDType::ECmpType
 	ParseCmpType() const
@@ -91,7 +91,7 @@ public:
 	}
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(const gpos::Ref<IMDId> mdid) const override;
 
 	// computes the hash value for the metadata id
 	ULONG HashValue() const override;
@@ -114,7 +114,7 @@ public:
 
 	// const converter
 	static const CMDIdScCmp *
-	CastMdid(const IMDId *mdid)
+	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidScCmp == mdid->MdidType());
 
@@ -123,7 +123,7 @@ public:
 
 	// non-const converter
 	static CMDIdScCmp *
-	CastMdid(IMDId *mdid)
+	CastMdid(gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidScCmp == mdid->MdidType());
 

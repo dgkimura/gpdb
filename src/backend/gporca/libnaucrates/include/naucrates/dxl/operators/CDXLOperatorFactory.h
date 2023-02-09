@@ -459,7 +459,7 @@ public:
 	static gpos::Ref<IMDId> ExtractConvertAttrValueToMdId(
 		CDXLMemoryManager *dxl_memory_manager, const Attributes &attr,
 		Edxltoken target_attr, Edxltoken target_elem, BOOL is_optional = false,
-		IMDId *default_val = nullptr);
+		gpos::Ref<IMDId> default_val = nullptr);
 
 	// parse an mdid object from an XMLCh
 	static gpos::Ref<IMDId> MakeMdIdFromStr(

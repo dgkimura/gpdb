@@ -62,7 +62,7 @@ public:
 	~CDXLScalarCoerceBase() override;
 
 	// return result type
-	IMDId *
+	gpos::Ref<IMDId>
 	GetResultTypeMdId() const
 	{
 		return m_result_type_mdid.get();

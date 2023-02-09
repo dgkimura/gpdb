@@ -136,8 +136,8 @@ CPartitionPropagationSpec::SelectorIds(ULONG scan_id) const
 
 void
 CPartitionPropagationSpec::Insert(ULONG scan_id, EPartPropSpecInfoType type,
-								  IMDId *rool_rel_mdid, CBitSet *selector_ids,
-								  CExpression *expr)
+								  gpos::Ref<IMDId> rool_rel_mdid,
+								  CBitSet *selector_ids, CExpression *expr)
 {
 	GPOS_RTL_ASSERT(!Contains(scan_id));
 

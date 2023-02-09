@@ -84,16 +84,16 @@ public:
 	}
 
 	// aggregate id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// aggregate name
 	CMDName Mdname() const override;
 
 	// result id
-	IMDId *GetResultTypeMdid() const override;
+	gpos::Ref<IMDId> GetResultTypeMdid() const override;
 
 	// intermediate result id
-	IMDId *GetIntermediateResultTypeMdid() const override;
+	gpos::Ref<IMDId> GetIntermediateResultTypeMdid() const override;
 
 	// serialize object in DXL format
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;

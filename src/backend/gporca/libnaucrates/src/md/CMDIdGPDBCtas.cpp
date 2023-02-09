@@ -64,7 +64,7 @@ CMDIdGPDBCtas::CMDIdGPDBCtas(const CMDIdGPDBCtas &mdid_source)
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdGPDBCtas::Equals(const IMDId *mdid) const
+CMDIdGPDBCtas::Equals(const gpos::Ref<IMDId> mdid) const
 {
 	if (nullptr == mdid || EmdidGPDBCtas != mdid->MdidType())
 	{
@@ -72,7 +72,7 @@ CMDIdGPDBCtas::Equals(const IMDId *mdid) const
 	}
 
 	const CMDIdGPDBCtas *mdidGPDBCTAS =
-		gpos::dyn_cast<CMDIdGPDBCtas>(const_cast<IMDId *>(mdid));
+		gpos::dyn_cast<CMDIdGPDBCtas>(const_cast<gpos::Ref<IMDId> >(mdid));
 
 	return m_oid == mdidGPDBCTAS->Oid();
 }

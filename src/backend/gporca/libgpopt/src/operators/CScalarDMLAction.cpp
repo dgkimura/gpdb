@@ -46,7 +46,7 @@ CScalarDMLAction::Matches(COperator *pop) const
 //		Operator type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarDMLAction::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

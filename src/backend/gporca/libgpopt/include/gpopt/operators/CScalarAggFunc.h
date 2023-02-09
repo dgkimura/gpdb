@@ -158,7 +158,7 @@ public:
 	const CWStringConst *PstrAggFunc() const;
 
 	// aggregate func id
-	IMDId *MDId() const;
+	gpos::Ref<IMDId> MDId() const;
 
 	// ident accessors
 	BOOL
@@ -207,7 +207,7 @@ public:
 	}
 
 	// type of expression's result
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		if (nullptr == m_pmdidResolvedRetType)
@@ -238,9 +238,9 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// lookup mdid of return type for given Agg function
-	static IMDId *PmdidLookupReturnType(gpos::Ref<IMDId> pmdidAggFunc,
-										BOOL fGlobal,
-										CMDAccessor *pmdaInput = nullptr);
+	static gpos::Ref<IMDId> PmdidLookupReturnType(
+		gpos::Ref<IMDId> pmdidAggFunc, BOOL fGlobal,
+		CMDAccessor *pmdaInput = nullptr);
 
 };	// class CScalarAggFunc
 

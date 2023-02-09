@@ -52,7 +52,7 @@ public:
 	// ident accessors
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	EOperatorId
 	Eopid() const override

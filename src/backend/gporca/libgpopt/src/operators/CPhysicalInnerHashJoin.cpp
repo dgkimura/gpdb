@@ -314,7 +314,7 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 		for (ULONG ul = 0; ul < part_info_outer->UlConsumers(); ++ul)
 		{
 			ULONG scan_id = part_info_outer->ScanId(ul);
-			IMDId *rel_mdid = part_info_outer->GetRelMdId(ul);
+			gpos::Ref<IMDId> rel_mdid = part_info_outer->GetRelMdId(ul);
 			CPartKeysArray *part_keys_array =
 				part_info_outer->Pdrgppartkeys(ul);
 

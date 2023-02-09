@@ -61,7 +61,7 @@ public:
 	~CMDProviderGeneric();
 
 	// return the mdid for the requested type
-	IMDId *MDId(IMDType::ETypeInfo type_info) const;
+	gpos::Ref<IMDId> MDId(IMDType::ETypeInfo type_info) const;
 
 	// default system id
 	static CSystemId SysidDefault();

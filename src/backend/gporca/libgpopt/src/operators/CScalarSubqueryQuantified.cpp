@@ -81,7 +81,7 @@ CScalarSubqueryQuantified::PstrOp() const
 //		Scalar operator metadata id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarSubqueryQuantified::MdIdOp() const
 {
 	return m_scalar_op_mdid.get();
@@ -95,11 +95,11 @@ CScalarSubqueryQuantified::MdIdOp() const
 //		Type of scalar's value
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarSubqueryQuantified::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	IMDId *mdid_type =
+	gpos::Ref<IMDId> mdid_type =
 		md_accessor->RetrieveScOp(m_scalar_op_mdid.get())->GetResultTypeMdid();
 
 	GPOS_ASSERT(

@@ -77,7 +77,7 @@ private:
 	EUsedStatus m_used;
 
 	// table info
-	IMDId *m_mdid_table;
+	gpos::Ref<IMDId> m_mdid_table;
 
 public:
 	CColRef(const CColRef &) = delete;
@@ -217,14 +217,14 @@ public:
 		return m_used;
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	GetMdidTable() const
 	{
 		return m_mdid_table;
 	};
 
 	void
-	SetMdidTable(IMDId *mdid_table)
+	SetMdidTable(gpos::Ref<IMDId> mdid_table)
 	{
 		m_mdid_table = mdid_table;
 	}

@@ -2995,7 +2995,7 @@ CTranslatorQueryToDXL::TranslateSetOpChild(Node *child_node,
 					ULONG(dxl_scalar_ident->GetDXLColRef()->Id());
 				colids->Append(colid);
 
-				IMDId *mdid_col = dxl_scalar_ident->MdidType();
+				gpos::Ref<IMDId> mdid_col = dxl_scalar_ident->MdidType();
 				GPOS_ASSERT(nullptr != mdid_col);
 				;
 				input_col_mdids->Append(mdid_col);
@@ -3026,7 +3026,7 @@ CTranslatorQueryToDXL::TranslateSetOpChild(Node *child_node,
 			ULONG *colid = GPOS_NEW(m_mp) ULONG(dxl_col_descr->Id());
 			colids->Append(colid);
 
-			IMDId *mdid_col = dxl_col_descr->MdidType();
+			gpos::Ref<IMDId> mdid_col = dxl_col_descr->MdidType();
 			GPOS_ASSERT(nullptr != mdid_col);
 			;
 			input_col_mdids->Append(mdid_col);

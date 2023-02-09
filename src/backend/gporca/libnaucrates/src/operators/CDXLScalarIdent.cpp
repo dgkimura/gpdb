@@ -103,7 +103,7 @@ CDXLScalarIdent::GetDXLColRef() const
 //		Return the id of the column type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarIdent::MdidType() const
 {
 	return m_dxl_colref->MdidType();

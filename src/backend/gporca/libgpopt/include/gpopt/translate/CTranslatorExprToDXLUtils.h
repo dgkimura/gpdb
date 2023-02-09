@@ -59,14 +59,16 @@ private:
 	static gpos::Ref<CDXLNode> PdxlnCmp(
 		CMemoryPool *mp, CMDAccessor *md_accessor, ULONG ulPartLevel,
 		BOOL fLowerBound, gpos::Ref<CDXLNode> pdxlnScalar,
-		IMDType::ECmpType cmp_type, IMDId *pmdidTypePartKey,
-		IMDId *pmdidTypeExpr, IMDId *pmdidTypeCastExpr, IMDId *mdid_cast_func);
+		IMDType::ECmpType cmp_type, gpos::Ref<IMDId> pmdidTypePartKey,
+		gpos::Ref<IMDId> pmdidTypeExpr, gpos::Ref<IMDId> pmdidTypeCastExpr,
+		gpos::Ref<IMDId> mdid_cast_func);
 
 
 	// create a column reference
 	static CColRef *PcrCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
-							  CColumnFactory *col_factory, IMDId *mdid,
-							  INT type_modifier, const WCHAR *wszName);
+							  CColumnFactory *col_factory,
+							  gpos::Ref<IMDId> mdid, INT type_modifier,
+							  const WCHAR *wszName);
 
 
 	// compute a DXL datum from a point constraint
@@ -113,35 +115,35 @@ public:
 	// construct a filter node for a list partition predicate
 	static gpos::Ref<CDXLNode> PdxlnListFilterScCmp(
 		CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnPartKey,
-		CDXLNode *pdxlnScalar, IMDId *pmdidTypePartKey, IMDId *pmdidTypeOther,
-		IMDType::ECmpType cmp_type, ULONG ulPartLevel, BOOL fHasDefaultPart);
+		CDXLNode *pdxlnScalar, gpos::Ref<IMDId> pmdidTypePartKey,
+		gpos::Ref<IMDId> pmdidTypeOther, IMDType::ECmpType cmp_type,
+		ULONG ulPartLevel, BOOL fHasDefaultPart);
 
 	// construct a DXL node for the part key portion of the list partition filter
-	static gpos::Ref<CDXLNode> PdxlnListFilterPartKey(CMemoryPool *mp,
-													  CMDAccessor *md_accessor,
-													  CExpression *pexprPartKey,
-													  IMDId *pmdidTypePartKey,
-													  ULONG ulPartLevel);
+	static gpos::Ref<CDXLNode> PdxlnListFilterPartKey(
+		CMemoryPool *mp, CMDAccessor *md_accessor, CExpression *pexprPartKey,
+		gpos::Ref<IMDId> pmdidTypePartKey, ULONG ulPartLevel);
 
 	// construct a filter node for a range predicate
 	static gpos::Ref<CDXLNode> PdxlnRangeFilterScCmp(
 		CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnScalar,
-		IMDId *pmdidTypePartKey, IMDId *pmdidTypeOther,
-		IMDId *pmdidTypeCastExpr, IMDId *mdid_cast_func,
+		gpos::Ref<IMDId> pmdidTypePartKey, gpos::Ref<IMDId> pmdidTypeOther,
+		gpos::Ref<IMDId> pmdidTypeCastExpr, gpos::Ref<IMDId> mdid_cast_func,
 		IMDType::ECmpType cmp_type, ULONG ulPartLevel);
 
 	// construct a range filter for an equality comparison
 	static gpos::Ref<CDXLNode> PdxlnRangeFilterEqCmp(
 		CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnScalar,
-		IMDId *pmdidTypePartKey, IMDId *pmdidTypeOther,
-		IMDId *pmdidTypeCastExpr, IMDId *mdid_cast_func, ULONG ulPartLevel);
+		gpos::Ref<IMDId> pmdidTypePartKey, gpos::Ref<IMDId> pmdidTypeOther,
+		gpos::Ref<IMDId> pmdidTypeCastExpr, gpos::Ref<IMDId> mdid_cast_func,
+		ULONG ulPartLevel);
 
 	// construct a predicate for the lower or upper bound of a partition
 	static gpos::Ref<CDXLNode> PdxlnRangeFilterPartBound(
 		CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnScalar,
-		IMDId *pmdidTypePartKey, IMDId *pmdidTypeOther,
-		IMDId *pmdidTypeCastExpr, IMDId *mdid_cast_func, ULONG ulPartLevel,
-		ULONG fLowerBound, IMDType::ECmpType cmp_type);
+		gpos::Ref<IMDId> pmdidTypePartKey, gpos::Ref<IMDId> pmdidTypeOther,
+		gpos::Ref<IMDId> pmdidTypeCastExpr, gpos::Ref<IMDId> mdid_cast_func,
+		ULONG ulPartLevel, ULONG fLowerBound, IMDType::ECmpType cmp_type);
 
 	// construct predicates to cover the cases of default partition and
 	// open-ended partitions if necessary
@@ -241,8 +243,9 @@ public:
 	static BOOL FLocalHashAggStreamSafe(CExpression *pexprAgg);
 
 	// if operator is a scalar cast or func allowed for Partition selection, extract type and function
-	static void ExtractCastFuncMdids(COperator *pop, IMDId **ppmdidType,
-									 IMDId **ppmdidCastFunc);
+	static void ExtractCastFuncMdids(COperator *pop,
+									 gpos::Ref<IMDId> *ppmdidType,
+									 gpos::Ref<IMDId> *ppmdidCastFunc);
 
 	// produce DXL representation of a datum
 	static gpos::Ref<CDXLDatum>

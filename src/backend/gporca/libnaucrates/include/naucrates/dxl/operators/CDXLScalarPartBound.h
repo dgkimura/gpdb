@@ -64,7 +64,7 @@ public:
 	}
 
 	// boundary type
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const
 	{
 		return m_mdid_type.get();

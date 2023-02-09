@@ -105,7 +105,7 @@ public:
 	void AddColumn(gpos::Ref<CColumnDescriptor>);
 
 	// add the column at the specified position to the list of distribution columns
-	void AddDistributionColumn(ULONG ulPos, IMDId *opfamily);
+	void AddDistributionColumn(ULONG ulPos, gpos::Ref<IMDId> opfamily);
 
 	// add the column at the specified position to the list of partition columns
 	void AddPartitionColumn(ULONG ulPos);
@@ -118,7 +118,7 @@ public:
 	const CColumnDescriptor *Pcoldesc(ULONG) const;
 
 	// mdid accessor
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_mdid.get();

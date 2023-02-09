@@ -85,7 +85,7 @@ public:
 	BOOL IsDropped() const;
 
 	// column type
-	IMDId *MdidType() const;
+	gpos::Ref<IMDId> MdidType() const;
 
 	INT TypeModifier() const;
 

@@ -41,7 +41,7 @@ public:
 	virtual CMDName Mdname() const = 0;
 
 	// id of attribute type
-	virtual IMDId *MdidType() const = 0;
+	virtual gpos::Ref<IMDId> MdidType() const = 0;
 
 	virtual INT TypeModifier() const = 0;
 

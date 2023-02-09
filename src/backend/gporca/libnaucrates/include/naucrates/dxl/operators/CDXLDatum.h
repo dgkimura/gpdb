@@ -78,7 +78,7 @@ public:
 	}
 
 	// mdid type of the datum
-	virtual IMDId *
+	virtual gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_mdid_type.get();

@@ -93,8 +93,8 @@ CDefaultComparator::FUseInternalEvaluator(const IDatum *datum1,
 										  const IDatum *datum2,
 										  BOOL *can_use_external_evaluator)
 {
-	IMDId *mdid1 = datum1->MDId().get();
-	IMDId *mdid2 = datum2->MDId().get();
+	gpos::Ref<IMDId> mdid1 = datum1->MDId().get();
+	gpos::Ref<IMDId> mdid2 = datum2->MDId().get();
 
 	// be conservative for now and require this extra condition that
 	// has been in place for a while (might be relaxed in the future)

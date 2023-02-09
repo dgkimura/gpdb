@@ -448,11 +448,11 @@ CConstraint::PcnstrFromScalarCmp(
 			CScalarCmp *sc_cmp = gpos::dyn_cast<CScalarCmp>(pexpr->Pop());
 			const IMDScalarOp *op = mda->RetrieveScOp(sc_cmp->MdIdOp());
 
-			IMDId *left_mdid =
+			gpos::Ref<IMDId> left_mdid =
 				gpos::dyn_cast<CScalar>(pexprLeft->Pop())->MdidType();
 			const IMDType *left_type = mda->RetrieveType(left_mdid);
 
-			IMDId *right_mdid =
+			gpos::Ref<IMDId> right_mdid =
 				gpos::dyn_cast<CScalar>(pexprRight->Pop())->MdidType();
 			const IMDType *right_type = mda->RetrieveType(right_mdid);
 

@@ -771,7 +771,8 @@ CTranslatorDXLToExpr::PexprLogicalSetOp(const CDXLNode *dxlnode)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CTranslatorDXLToExpr::PexprCastPrjElem(IMDId *pmdidSource, IMDId *mdid_dest,
+CTranslatorDXLToExpr::PexprCastPrjElem(gpos::Ref<IMDId> pmdidSource,
+									   gpos::Ref<IMDId> mdid_dest,
 									   const CColRef *pcrToCast,
 									   CColRef *pcrToReturn)
 {
@@ -863,8 +864,8 @@ CTranslatorDXLToExpr::BuildSetOpChild(
 		const CDXLColDescr *pdxlcdOutput = dxl_op->GetColumnDescrAt(ulColPos);
 
 		// check if a cast function needs to be introduced
-		IMDId *pmdidSource = colref->RetrieveType()->MDId();
-		IMDId *mdid_dest = pdxlcdOutput->MdidType();
+		gpos::Ref<IMDId> pmdidSource = colref->RetrieveType()->MDId();
+		gpos::Ref<IMDId> mdid_dest = pdxlcdOutput->MdidType();
 
 		if (FCastingUnknownType(pmdidSource, mdid_dest))
 		{
@@ -1008,7 +1009,8 @@ CTranslatorDXLToExpr::PdrgpexprPreprocessSetOpInputs(
 //		Check if we currently support the casting of such column types
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorDXLToExpr::FCastingUnknownType(IMDId *pmdidSource, IMDId *mdid_dest)
+CTranslatorDXLToExpr::FCastingUnknownType(gpos::Ref<IMDId> pmdidSource,
+										  gpos::Ref<IMDId> mdid_dest)
 {
 	return ((pmdidSource->Equals(&CMDIdGPDB::m_mdid_unknown) ||
 			 mdid_dest->Equals(&CMDIdGPDB::m_mdid_unknown)));
@@ -1088,7 +1090,7 @@ CTranslatorDXLToExpr::Pdrgpcr(const CDXLColDescrArray *dxl_col_descr_array)
 	for (ULONG ul = 0; ul < ulOutputCols; ul++)
 	{
 		CDXLColDescr *pdxlcd = (*dxl_col_descr_array)[ul].get();
-		IMDId *mdid = pdxlcd->MdidType();
+		gpos::Ref<IMDId> mdid = pdxlcd->MdidType();
 		const IMDType *pmdtype = m_pmda->RetrieveType(mdid);
 
 		CName name(pdxlcd->MdName()->GetMDName());
@@ -1729,7 +1731,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const CDXLNode *dxlnode)
 
 			CScalar *popScalar =
 				gpos::dyn_cast<CScalar>(pexprScWindowFunc->Pop());
-			IMDId *mdid = popScalar->MdidType();
+			gpos::Ref<IMDId> mdid = popScalar->MdidType();
 			const IMDType *pmdtype = m_pmda->RetrieveType(mdid);
 
 			CName name(pdxlopPrEl->GetMdNameAlias()->GetMDName());
@@ -2093,7 +2095,7 @@ CTranslatorDXLToExpr::Ptabdesc(CDXLTableDescr *table_descr)
 	CWStringConst strName(m_mp,
 						  table_descr->MdName()->GetMDName()->GetBuffer());
 
-	IMDId *mdid = table_descr->MDId();
+	gpos::Ref<IMDId> mdid = table_descr->MDId();
 
 	// get the relation information from the cache
 	const IMDRelation *pmdrel = m_pmda->RetrieveRel(mdid);
@@ -2299,7 +2301,7 @@ CTranslatorDXLToExpr::PtabdescFromCTAS(CDXLLogicalCTAS *pdxlopCTAS)
 {
 	CWStringConst strName(m_mp, pdxlopCTAS->MdName()->GetMDName()->GetBuffer());
 
-	IMDId *mdid = pdxlopCTAS->MDId();
+	gpos::Ref<IMDId> mdid = pdxlopCTAS->MDId();
 
 	// get the relation information from the cache
 	const IMDRelation *pmdrel = m_pmda->RetrieveRel(mdid);
@@ -2716,8 +2718,8 @@ CTranslatorDXLToExpr::PexprCollapseNot(const CDXLNode *pdxlnNotExpr)
 								   : EdxlopScalarSubqueryAny;
 
 		// get mdid and name of the inverse of the comparison operator used by quantified subquery
-		IMDId *mdid_op = pdxlopSubqueryQuantified->GetScalarOpMdId();
-		IMDId *pmdidInverseOp =
+		gpos::Ref<IMDId> mdid_op = pdxlopSubqueryQuantified->GetScalarOpMdId();
+		gpos::Ref<IMDId> pmdidInverseOp =
 			m_pmda->RetrieveScOp(mdid_op)->GetInverseOpMdid();
 
 		// if inverse operator cannot be found in metadata, the optimizer won't collapse NOT node
@@ -2811,7 +2813,7 @@ CTranslatorDXLToExpr::PexprScalarOp(const CDXLNode *pdxlnOpExpr)
 	gpos::Ref<IMDId> mdid = dxl_op->MDId();
 	;
 
-	IMDId *return_type_mdid = dxl_op->GetReturnTypeMdId();
+	gpos::Ref<IMDId> return_type_mdid = dxl_op->GetReturnTypeMdId();
 	if (nullptr != return_type_mdid)
 	{
 		;
@@ -2966,7 +2968,7 @@ CTranslatorDXLToExpr::PexprScalarFunc(const CDXLNode *pdxlnFunc)
 	;
 
 	gpos::Ref<CExpressionArray> pdrgpexprArgs = nullptr;
-	IMDId *pmdidInput = nullptr;
+	gpos::Ref<IMDId> pmdidInput = nullptr;
 	if (0 < length)
 	{
 		// translate function arguments
@@ -3220,7 +3222,8 @@ CTranslatorDXLToExpr::PexprAggFunc(const CDXLNode *pdxlnAggref)
 		}
 	}
 
-	IMDId *resolved_return_type_mdid = dxl_op->GetDXLResolvedRetTypeMDid();
+	gpos::Ref<IMDId> resolved_return_type_mdid =
+		dxl_op->GetDXLResolvedRetTypeMDid();
 	if (nullptr != resolved_return_type_mdid)
 	{
 		// use the resolved type provided in DXL
@@ -3702,13 +3705,13 @@ CTranslatorDXLToExpr::PexprScalarCast(const CDXLNode *pdxlnCast)
 	CDXLNode *child_dxlnode = (*pdxlnCast)[0];
 	gpos::Ref<CExpression> pexprChild = Pexpr(child_dxlnode);
 
-	IMDId *mdid_type = dxl_op->MdidType();
-	IMDId *mdid_func = dxl_op->FuncMdId();
+	gpos::Ref<IMDId> mdid_type = dxl_op->MdidType();
+	gpos::Ref<IMDId> mdid_func = dxl_op->FuncMdId();
 	;
 	;
 
 	COperator *popChild = pexprChild->Pop();
-	IMDId *pmdidInput = gpos::dyn_cast<CScalar>(popChild)->MdidType();
+	gpos::Ref<IMDId> pmdidInput = gpos::dyn_cast<CScalar>(popChild)->MdidType();
 	const IMDCast *pmdcast = m_pmda->Pmdcast(pmdidInput, mdid_type);
 	BOOL fRelabel = pmdcast->IsBinaryCoercible();
 
@@ -3952,7 +3955,7 @@ CTranslatorDXLToExpr::PexprScalarProjElem(const CDXLNode *pdxlnPrEl)
 
 	CScalar *popScalar = gpos::dyn_cast<CScalar>(pexprChild->Pop());
 
-	IMDId *mdid = popScalar->MdidType();
+	gpos::Ref<IMDId> mdid = popScalar->MdidType();
 	const IMDType *pmdtype = m_pmda->RetrieveType(mdid);
 
 	CName name(pdxlopPrEl->GetMdNameAlias()->GetMDName());
@@ -4083,7 +4086,7 @@ CTranslatorDXLToExpr::AddDistributionColumns(
 		ULONG *pulPos = phmiulAttnoColMapping->Find(&attno);
 		GPOS_ASSERT(nullptr != pulPos);
 
-		IMDId *opfamily = nullptr;
+		gpos::Ref<IMDId> opfamily = nullptr;
 		if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 		{
 			opfamily = pmdrel->GetDistrOpfamilyAt(ul);

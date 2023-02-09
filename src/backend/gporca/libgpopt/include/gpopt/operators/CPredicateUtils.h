@@ -434,7 +434,7 @@ public:
 								  gpos::Ref<CExpression> *ppexprOuterRef);
 
 	// is the condition a LIKE predicate
-	static BOOL FLikePredicate(IMDId *mdid);
+	static BOOL FLikePredicate(gpos::Ref<IMDId> mdid);
 
 	// is the condition a LIKE predicate
 	static BOOL FLikePredicate(CExpression *pexprPred);
@@ -473,7 +473,7 @@ public:
 	// (NULL operands result in NULL result) and that it never produces a NULL result on
 	// non-null operands. Note that this check may return false negatives (some operators
 	// may have very strict behavior, yet this method returns false).
-	static BOOL FBuiltInComparisonIsVeryStrict(IMDId *mdid);
+	static BOOL FBuiltInComparisonIsVeryStrict(gpos::Ref<IMDId> mdid);
 
 	// Check if the given expr only contains conjuncts of strict comparison operators
 	// NB: This does NOT recurse into Boolean AND/OR operations

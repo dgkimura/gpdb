@@ -72,7 +72,7 @@ public:
 	const CMDName *MdName() const;
 
 	// table mdid
-	IMDId *MDId() const;
+	gpos::Ref<IMDId> MDId() const;
 
 	// table arity
 	ULONG Arity() const;

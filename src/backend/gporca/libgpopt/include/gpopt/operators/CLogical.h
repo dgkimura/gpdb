@@ -69,7 +69,7 @@ protected:
 	// output column generation given a list of column descriptors
 	static gpos::Ref<CColRefArray> PdrgpcrCreateMapping(
 		CMemoryPool *mp, const CColumnDescriptorArray *pdrgpcoldesc,
-		ULONG ulOpSourceId, IMDId *mdid_table = nullptr);
+		ULONG ulOpSourceId, gpos::Ref<IMDId> mdid_table = nullptr);
 
 	// initialize the array of partition columns
 	static gpos::Ref<CColRef2dArray> PdrgpdrgpcrCreatePartCols(
@@ -310,8 +310,7 @@ public:
 	}
 
 	// return true if we can pull projections up past this operator from its given child
-	virtual BOOL
-	FCanPullProjectionsUp(ULONG	 //child_index
+	virtual BOOL FCanPullProjectionsUp(ULONG  //child_index
 	) const
 	{
 		return true;

@@ -65,12 +65,12 @@ public:
 
 	// returns the DXL string of the requested metadata object
 	CWStringBase *GetMDObjDXLStr(CMemoryPool *mp, CMDAccessor *md_accessor,
-								 IMDId *mdid) const override;
+								 gpos::Ref<IMDId> mdid) const override;
 
 	// returns the requested metadata object
 	gpos::Ref<IMDCacheObject> GetMDObj(CMemoryPool *mp,
 									   CMDAccessor *md_accessor,
-									   IMDId *mdid) const override;
+									   gpos::Ref<IMDId> mdid) const override;
 
 	// return the mdid for the specified system id and type
 	gpos::Ref<IMDId> MDId(CMemoryPool *mp, CSystemId sysid,

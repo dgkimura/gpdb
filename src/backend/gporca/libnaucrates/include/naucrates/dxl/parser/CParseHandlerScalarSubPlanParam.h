@@ -73,7 +73,7 @@ public:
 	}
 
 	// return param type
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId(void) const
 	{
 		return m_dxl_colref->MdidType();

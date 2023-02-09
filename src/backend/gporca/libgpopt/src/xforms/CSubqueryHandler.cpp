@@ -232,7 +232,7 @@ CSubqueryHandler::PexprSubqueryPred(CExpression *pexprOuter,
 		gpos::dyn_cast<CScalarSubqueryQuantified>(pexprSubquery->Pop());
 
 	const CColRef *colref = popSqQuantified->Pcr();
-	IMDId *mdid_op = popSqQuantified->MdIdOp();
+	gpos::Ref<IMDId> mdid_op = popSqQuantified->MdIdOp();
 	const CWStringConst *str = popSqQuantified->PstrOp();
 
 	;
@@ -1796,7 +1796,7 @@ CSubqueryHandler::PexprScalarIf(CMemoryPool *mp, CColRef *pcrBool,
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	const IMDTypeBool *pmdtypebool = md_accessor->PtMDType<IMDTypeBool>();
-	IMDId *mdid = pmdtypebool->MDId();
+	gpos::Ref<IMDId> mdid = pmdtypebool->MDId();
 
 	BOOL value = true;
 	if (COperator::EopScalarSubqueryNotExists == op_id ||

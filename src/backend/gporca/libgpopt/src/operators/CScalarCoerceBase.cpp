@@ -68,7 +68,7 @@ CScalarCoerceBase::~CScalarCoerceBase()
 //		Return type of the scalar expression
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarCoerceBase::MdidType() const
 {
 	return m_result_type_mdid.get();

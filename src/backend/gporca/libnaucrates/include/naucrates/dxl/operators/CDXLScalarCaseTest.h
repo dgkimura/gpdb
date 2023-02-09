@@ -51,7 +51,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// expression type
-	virtual IMDId *MdidType() const;
+	virtual gpos::Ref<IMDId> MdidType() const;
 
 	// DXL Operator ID
 	Edxlopid GetDXLOperator() const override;

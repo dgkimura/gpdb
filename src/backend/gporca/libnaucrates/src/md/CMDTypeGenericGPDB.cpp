@@ -125,7 +125,7 @@ CMDTypeGenericGPDB::~CMDTypeGenericGPDB()
 //		Return mdid of specified aggregate type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeGenericGPDB::GetMdidForAggType(EAggType agg_type) const
 {
 	switch (agg_type)
@@ -154,7 +154,7 @@ CMDTypeGenericGPDB::GetMdidForAggType(EAggType agg_type) const
 //		Returns the metadata id of this type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeGenericGPDB::MDId() const
 {
 	return m_mdid.get();
@@ -182,7 +182,7 @@ CMDTypeGenericGPDB::Mdname() const
 //		Return mdid of specified comparison operator type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeGenericGPDB::GetMdidForCmpType(ECmpType cmp_type) const
 {
 	switch (cmp_type)
@@ -386,7 +386,7 @@ CMDTypeGenericGPDB::CreateDXLDatumVal(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
 CMDTypeGenericGPDB::CreateDXLDatumStatsDoubleMappable(
-	CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, INT type_modifier, BOOL is_null,
 	BYTE *byte_array, ULONG length, LINT, CDouble double_value)
 {
 	GPOS_ASSERT(CMDTypeGenericGPDB::HasByte2DoubleMapping(mdid));
@@ -405,7 +405,7 @@ CMDTypeGenericGPDB::CreateDXLDatumStatsDoubleMappable(
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
 CMDTypeGenericGPDB::CreateDXLDatumStatsIntMappable(
-	CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid, INT type_modifier, BOOL is_null,
 	BYTE *byte_array, ULONG length, LINT lint_value,
 	CDouble	 // double_value
 )
@@ -461,7 +461,7 @@ CMDTypeGenericGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 BOOL
 CMDTypeGenericGPDB::HasByte2IntMapping(const IMDType *mdtype)
 {
-	IMDId *mdid = mdtype->MDId();
+	gpos::Ref<IMDId> mdid = mdtype->MDId();
 	return mdtype->IsTextRelated() || mdid->Equals(&CMDIdGPDB::m_mdid_uuid) ||
 		   mdid->Equals(&CMDIdGPDB::m_mdid_cash) ||
 		   IsTimeRelatedTypeMappableToLint(mdid);
@@ -488,7 +488,7 @@ CMDTypeGenericGPDB::CreateGenericNullDatum(CMemoryPool *mp,
 //		statistics computation
 //---------------------------------------------------------------------------
 BOOL
-CMDTypeGenericGPDB::HasByte2DoubleMapping(const IMDId *mdid)
+CMDTypeGenericGPDB::HasByte2DoubleMapping(const gpos::Ref<IMDId> mdid)
 {
 	return mdid->Equals(&CMDIdGPDB::m_mdid_numeric) ||
 		   mdid->Equals(&CMDIdGPDB::m_mdid_float4) ||
@@ -505,7 +505,7 @@ CMDTypeGenericGPDB::HasByte2DoubleMapping(const IMDId *mdid)
 //		is this a time-related type
 //---------------------------------------------------------------------------
 BOOL
-CMDTypeGenericGPDB::IsTimeRelatedType(const IMDId *mdid)
+CMDTypeGenericGPDB::IsTimeRelatedType(const gpos::Ref<IMDId> mdid)
 {
 	return mdid->Equals(&CMDIdGPDB::m_mdid_date) ||
 		   mdid->Equals(&CMDIdGPDB::m_mdid_time) ||
@@ -526,14 +526,14 @@ CMDTypeGenericGPDB::IsTimeRelatedType(const IMDId *mdid)
 //		is this a network-related type
 //---------------------------------------------------------------------------
 BOOL
-CMDTypeGenericGPDB::IsNetworkRelatedType(const IMDId *mdid)
+CMDTypeGenericGPDB::IsNetworkRelatedType(const gpos::Ref<IMDId> mdid)
 {
 	return mdid->Equals(&CMDIdGPDB::m_mdid_inet) ||
 		   mdid->Equals(&CMDIdGPDB::m_mdid_cidr) ||
 		   mdid->Equals(&CMDIdGPDB::m_mdid_macaddr);
 }
 
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeGenericGPDB::GetDistrOpfamilyMdid() const
 {
 	if (GPOS_FTRACE(EopttraceUseLegacyOpfamilies))

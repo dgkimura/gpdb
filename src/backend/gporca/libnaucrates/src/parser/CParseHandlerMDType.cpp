@@ -345,7 +345,7 @@ CParseHandlerMDType::ParseMdid(const XMLCh *element_local_name,
 //
 //---------------------------------------------------------------------------
 BOOL
-CParseHandlerMDType::IsBuiltInType(const IMDId *mdid)
+CParseHandlerMDType::IsBuiltInType(const gpos::Ref<IMDId> mdid)
 {
 	if (IMDId::EmdidGPDB != mdid->MdidType())
 	{

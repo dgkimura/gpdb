@@ -80,7 +80,7 @@ public:
 	}
 
 	// trigger id
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const override
 	{
 		return m_mdid.get();
@@ -94,14 +94,14 @@ public:
 	}
 
 	// relation mdid
-	IMDId *
+	gpos::Ref<IMDId>
 	GetRelMdId() const override
 	{
 		return m_rel_mdid.get();
 	}
 
 	// function mdid
-	IMDId *
+	gpos::Ref<IMDId>
 	FuncMdId() const override
 	{
 		return m_func_mdid.get();

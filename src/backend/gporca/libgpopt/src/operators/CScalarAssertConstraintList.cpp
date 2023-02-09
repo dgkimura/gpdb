@@ -57,7 +57,7 @@ CScalarAssertConstraintList::Matches(COperator *pop) const
 //		Type of expression's result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarAssertConstraintList::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

@@ -72,7 +72,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// operator specific hash function
 	ULONG HashValue() const override;

@@ -140,7 +140,7 @@ public:
 	ULONG ScanId(ULONG ulPos) const;
 
 	// relation mdid of the entry at the given position
-	IMDId *GetRelMdId(ULONG ulPos) const;
+	gpos::Ref<IMDId> GetRelMdId(ULONG ulPos) const;
 
 	// part keys of the entry at the given position
 	CPartKeysArray *Pdrgppartkeys(ULONG ulPos) const;

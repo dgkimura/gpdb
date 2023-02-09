@@ -71,8 +71,7 @@ public:
 	}
 
 	// retrieve the partition column at the given position
-	const IMDColumn *
-	PartColAt(ULONG /*pos*/) const override
+	const IMDColumn *PartColAt(ULONG /*pos*/) const override
 	{
 		GPOS_ASSERT(!"External tables have no partition columns");
 		return nullptr;
@@ -87,8 +86,7 @@ public:
 	}
 
 	// retrieve the partition type at the given position
-	CHAR
-	PartTypeAtLevel(ULONG /*pos*/) const override
+	CHAR PartTypeAtLevel(ULONG /*pos*/) const override
 	{
 		GPOS_ASSERT(!"External tables have no partition types");
 		return (CHAR) 0;
@@ -108,7 +106,7 @@ public:
 	virtual BOOL IsRejectLimitInRows() const = 0;
 
 	// format error table mdid
-	virtual IMDId *GetFormatErrTableMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetFormatErrTableMdid() const = 0;
 };
 }  // namespace gpmd
 

@@ -55,7 +55,7 @@ CScalarSubqueryExistential::~CScalarSubqueryExistential() = default;
 //		Type of scalar's value
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarSubqueryExistential::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

@@ -69,7 +69,7 @@ public:
 	}
 
 	// partitioned table mdid
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_mdid.get();

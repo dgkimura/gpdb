@@ -71,7 +71,7 @@ CDXLScalarNullIf::GetDXLOperator() const
 //		Operator id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarNullIf::MdIdOp() const
 {
 	return m_mdid_op.get();
@@ -85,7 +85,7 @@ CDXLScalarNullIf::MdIdOp() const
 //		Return type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarNullIf::MdidType() const
 {
 	return m_mdid_type.get();

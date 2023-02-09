@@ -64,7 +64,7 @@ CScalarArrayCoerceExpr::~CScalarArrayCoerceExpr()
 //		Return metadata id of element coerce function
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArrayCoerceExpr::PmdidElementFunc() const
 {
 	return m_pmdidElementFunc.get();

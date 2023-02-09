@@ -48,7 +48,7 @@ private:
 	};
 
 	// return the comparison type of an operator for the purpose of statistics computation
-	static CStatsPred::EStatsCmpType StatsCmpType(IMDId *mdid);
+	static CStatsPred::EStatsCmpType StatsCmpType(gpos::Ref<IMDId> mdid);
 
 	// return the comparison type of an operator for the purpose of statistics computation
 	static CStatsPred::EStatsCmpType StatsCmpType(
@@ -126,7 +126,7 @@ private:
 											  CExpression *expr);
 
 	// return the statistics predicate comparison type based on the md identifier
-	static CStatsPred::EStatsCmpType GetStatsCmpType(IMDId *mdid);
+	static CStatsPred::EStatsCmpType GetStatsCmpType(gpos::Ref<IMDId> mdid);
 
 	// helper function to extract statistics join filter from a given join predicate
 	static gpos::Ref<CStatsPredJoin> ExtractJoinStatsFromJoinPred(

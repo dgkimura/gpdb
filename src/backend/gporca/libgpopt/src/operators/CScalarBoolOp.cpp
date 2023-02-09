@@ -100,7 +100,7 @@ CScalarBoolOp::FCommutative(EBoolOperator eboolop)
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarBoolOp::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

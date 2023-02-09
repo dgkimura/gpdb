@@ -1807,7 +1807,7 @@ CTranslatorDXLToPlStmt::TranslateDXLNLJoin(
 		for (ULONG ul = 0; ul < ulLen; ul++)
 		{
 			CDXLColRef *pdxlcr = (*pdrgdxlcrOuterRefs)[ul].get();
-			IMDId *pmdid = pdxlcr->MdidType();
+			gpos::Ref<IMDId> pmdid = pdxlcr->MdidType();
 			ULONG ulColid = pdxlcr->Id();
 			INT iTypeModifier = pdxlcr->TypeModifier();
 			OID iTypeOid = gpos::dyn_cast<CMDIdGPDB>(pmdid)->Oid();
@@ -3652,7 +3652,7 @@ CTranslatorDXLToPlStmt::TranslateDXLAppend(
 			gpos::dyn_cast<CDXLScalarIdent>(expr_dxlnode->GetOperator());
 
 		Index idxVarno = OUTER_VAR;
-		AttrNumber attno = (AttrNumber) (ul + 1);
+		AttrNumber attno = (AttrNumber)(ul + 1);
 
 		Var *var = gpdb::MakeVar(
 			idxVarno, attno,
@@ -3869,13 +3869,13 @@ CTranslatorDXLToPlStmt::TranslateDXLCTEConsumerToSharedScan(
 			gpos::dyn_cast<CMDIdGPDB>(sc_ident_dxlop->MdidType())->Oid();
 
 		Var *var =
-			gpdb::MakeVar(OUTER_VAR, (AttrNumber) (ul + 1), oid_type,
+			gpdb::MakeVar(OUTER_VAR, (AttrNumber)(ul + 1), oid_type,
 						  sc_ident_dxlop->TypeModifier(), 0 /* varlevelsup */);
 
 		CHAR *resname = CTranslatorUtils::CreateMultiByteCharStringFromWCString(
 			sc_proj_elem_dxlop->GetMdNameAlias()->GetMDName()->GetBuffer());
 		TargetEntry *target_entry = gpdb::MakeTargetEntry(
-			(Expr *) var, (AttrNumber) (ul + 1), resname, false /* resjunk */);
+			(Expr *) var, (AttrNumber)(ul + 1), resname, false /* resjunk */);
 		plan->targetlist = gpdb::LAppend(plan->targetlist, target_entry);
 
 		output_context->InsertMapping(colid, target_entry);
@@ -4216,7 +4216,8 @@ CTranslatorDXLToPlStmt::TranslateDXLDml(
 		}
 	}
 
-	IMDId *mdid_target_table = phy_dml_dxlop->GetDXLTableDescr()->MDId();
+	gpos::Ref<IMDId> mdid_target_table =
+		phy_dml_dxlop->GetDXLTableDescr()->MDId();
 	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(mdid_target_table);
 
 	if (IMDRelation::EreldistrMasterOnly != md_rel->GetRelDistribution())
@@ -4780,7 +4781,7 @@ CTranslatorDXLToPlStmt::TranslateDXLProjList(
 		target_entry->resname =
 			CTranslatorUtils::CreateMultiByteCharStringFromWCString(
 				sc_proj_elem_dxlop->GetMdNameAlias()->GetMDName()->GetBuffer());
-		target_entry->resno = (AttrNumber) (ul + 1);
+		target_entry->resno = (AttrNumber)(ul + 1);
 
 		if (IsA(expr, Var))
 		{
@@ -4971,7 +4972,7 @@ CTranslatorDXLToPlStmt::TranslateDXLProjectListToHashTargetList(
 			sc_proj_elem_dxlop->GetMdNameAlias()->GetMDName()->GetBuffer());
 
 		TargetEntry *target_entry =
-			gpdb::MakeTargetEntry((Expr *) var, (AttrNumber) (ul + 1), resname,
+			gpdb::MakeTargetEntry((Expr *) var, (AttrNumber)(ul + 1), resname,
 								  false	 // resjunk
 			);
 
@@ -5156,7 +5157,7 @@ CTranslatorDXLToPlStmt::TranslateHashExprList(
 			CDXLScalarHashExpr *hash_expr_dxlop =
 				gpos::dyn_cast<CDXLScalarHashExpr>(
 					hash_expr_dxlnode->GetOperator());
-			const IMDId *opfamily = hash_expr_dxlop->MdidOpfamily();
+			const gpos::Ref<IMDId> opfamily = hash_expr_dxlop->MdidOpfamily();
 			hash_expr_opfamilies =
 				gpdb::LAppendOid(hash_expr_opfamilies,
 								 gpos::dyn_cast<CMDIdGPDB>(opfamily)->Oid());
@@ -5249,7 +5250,7 @@ CTranslatorDXLToPlStmt::IsTgtTblDistributed(CDXLOperator *dxlop)
 	}
 
 	CDXLPhysicalDML *phy_dml_dxlop = gpos::dyn_cast<CDXLPhysicalDML>(dxlop);
-	IMDId *mdid = phy_dml_dxlop->GetDXLTableDescr()->MDId();
+	gpos::Ref<IMDId> mdid = phy_dml_dxlop->GetDXLTableDescr()->MDId();
 
 	return IMDRelation::EreldistrMasterOnly !=
 		   m_md_accessor->RetrieveRel(mdid)->GetRelDistribution();

@@ -90,7 +90,8 @@ static const ULONG cmp_type_mappings[][2] = {
 //---------------------------------------------------------------------------
 gpos::Ref<IMDCacheObject>
 CTranslatorRelcacheToDXL::RetrieveObject(CMemoryPool *mp,
-										 CMDAccessor *md_accessor, IMDId *mdid)
+										 CMDAccessor *md_accessor,
+										 gpos::Ref<IMDId> mdid)
 {
 	gpos::Ref<IMDCacheObject> md_obj = nullptr;
 	GPOS_ASSERT(nullptr != md_accessor);
@@ -146,7 +147,7 @@ CTranslatorRelcacheToDXL::RetrieveObject(CMemoryPool *mp,
 gpos::Ref<IMDCacheObject>
 CTranslatorRelcacheToDXL::RetrieveObjectGPDB(CMemoryPool *mp,
 											 CMDAccessor *md_accessor,
-											 IMDId *mdid)
+											 gpos::Ref<IMDId> mdid)
 {
 	GPOS_ASSERT(mdid->MdidType() == CMDIdGPDB::EmdidGPDB);
 
@@ -322,7 +323,7 @@ CTranslatorRelcacheToDXL::CheckUnsupportedRelation(OID rel_oid)
 //---------------------------------------------------------------------------
 gpos::Ref<IMDRelation>
 CTranslatorRelcacheToDXL::RetrieveRel(CMemoryPool *mp, CMDAccessor *md_accessor,
-									  IMDId *mdid)
+									  gpos::Ref<IMDId> mdid)
 {
 	OID oid = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
 	GPOS_ASSERT(InvalidOid != oid);
@@ -699,7 +700,7 @@ CTranslatorRelcacheToDXL::RetrieveRelDistributionCols(
 		const IMDColumn *md_col = (*mdcol_array)[ul].get();
 		INT attno = md_col->AttrNum();
 
-		ULONG idx = (ULONG) (GPDXL_SYSTEM_COLUMNS + attno);
+		ULONG idx = (ULONG)(GPDXL_SYSTEM_COLUMNS + attno);
 		attno_mapping[idx] = ul;
 	}
 
@@ -787,7 +788,7 @@ CTranslatorRelcacheToDXL::AddSystemColumns(CMemoryPool *mp,
 gpos::Ref<IMDIndex>
 CTranslatorRelcacheToDXL::RetrieveIndex(CMemoryPool *mp,
 										CMDAccessor *md_accessor,
-										IMDId *mdid_index)
+										gpos::Ref<IMDId> mdid_index)
 {
 	OID index_oid = gpos::dyn_cast<CMDIdGPDB>(mdid_index)->Oid();
 	GPOS_ASSERT(0 != index_oid);
@@ -976,7 +977,7 @@ ULONG
 CTranslatorRelcacheToDXL::GetAttributePosition(
 	INT attno, const ULONG *GetAttributePosition)
 {
-	ULONG idx = (ULONG) (GPDXL_SYSTEM_COLUMNS + attno);
+	ULONG idx = (ULONG)(GPDXL_SYSTEM_COLUMNS + attno);
 	ULONG pos = GetAttributePosition[idx];
 	GPOS_ASSERT(gpos::ulong_max != pos);
 
@@ -1013,7 +1014,7 @@ CTranslatorRelcacheToDXL::PopulateAttnoPositionMap(CMemoryPool *mp,
 
 		INT attno = md_col->AttrNum();
 
-		ULONG idx = (ULONG) (GPDXL_SYSTEM_COLUMNS + attno);
+		ULONG idx = (ULONG)(GPDXL_SYSTEM_COLUMNS + attno);
 		GPOS_ASSERT(size > idx);
 		attno_mapping[idx] = ul;
 	}
@@ -1031,7 +1032,7 @@ CTranslatorRelcacheToDXL::PopulateAttnoPositionMap(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IMDType>
-CTranslatorRelcacheToDXL::RetrieveType(CMemoryPool *mp, IMDId *mdid)
+CTranslatorRelcacheToDXL::RetrieveType(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
 	OID oid_type = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
 	GPOS_ASSERT(InvalidOid != oid_type);
@@ -1157,7 +1158,7 @@ CTranslatorRelcacheToDXL::RetrieveType(CMemoryPool *mp, IMDId *mdid)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CMDScalarOpGPDB>
-CTranslatorRelcacheToDXL::RetrieveScOp(CMemoryPool *mp, IMDId *mdid)
+CTranslatorRelcacheToDXL::RetrieveScOp(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
 	OID op_oid = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
 
@@ -1310,7 +1311,7 @@ CTranslatorRelcacheToDXL::LookupFuncProps(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CMDFunctionGPDB>
-CTranslatorRelcacheToDXL::RetrieveFunc(CMemoryPool *mp, IMDId *mdid)
+CTranslatorRelcacheToDXL::RetrieveFunc(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
 	OID func_oid = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
 
@@ -1387,7 +1388,7 @@ CTranslatorRelcacheToDXL::RetrieveFunc(CMemoryPool *mp, IMDId *mdid)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CMDAggregateGPDB>
-CTranslatorRelcacheToDXL::RetrieveAgg(CMemoryPool *mp, IMDId *mdid)
+CTranslatorRelcacheToDXL::RetrieveAgg(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
 	OID agg_oid = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
 
@@ -1449,7 +1450,7 @@ CTranslatorRelcacheToDXL::RetrieveAgg(CMemoryPool *mp, IMDId *mdid)
 gpos::Ref<CMDCheckConstraintGPDB>
 CTranslatorRelcacheToDXL::RetrieveCheckConstraints(CMemoryPool *mp,
 												   CMDAccessor *md_accessor,
-												   IMDId *mdid)
+												   gpos::Ref<IMDId> mdid)
 {
 	OID check_constraint_oid = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
 	GPOS_ASSERT(InvalidOid != check_constraint_oid);
@@ -1526,7 +1527,7 @@ CTranslatorRelcacheToDXL::RetrieveCheckConstraints(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 CMDName *
-CTranslatorRelcacheToDXL::GetTypeName(CMemoryPool *mp, IMDId *mdid)
+CTranslatorRelcacheToDXL::GetTypeName(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
 	OID oid_type = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
 
@@ -1621,8 +1622,8 @@ CTranslatorRelcacheToDXL::GetEFuncDataAccess(CHAR c)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IMDId>
-CTranslatorRelcacheToDXL::RetrieveAggIntermediateResultType(CMemoryPool *mp,
-															IMDId *mdid)
+CTranslatorRelcacheToDXL::RetrieveAggIntermediateResultType(
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
 	OID agg_oid = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
 	OID intermediate_type_oid;
@@ -1654,10 +1655,11 @@ CTranslatorRelcacheToDXL::RetrieveAggIntermediateResultType(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IMDCacheObject>
-CTranslatorRelcacheToDXL::RetrieveRelStats(CMemoryPool *mp, IMDId *mdid)
+CTranslatorRelcacheToDXL::RetrieveRelStats(CMemoryPool *mp,
+										   gpos::Ref<IMDId> mdid)
 {
 	CMDIdRelStats *m_rel_stats_mdid = gpos::dyn_cast<CMDIdRelStats>(mdid);
-	IMDId *mdid_rel = m_rel_stats_mdid->GetRelMdId();
+	gpos::Ref<IMDId> mdid_rel = m_rel_stats_mdid->GetRelMdId();
 	OID rel_oid = gpos::dyn_cast<CMDIdGPDB>(mdid_rel)->Oid();
 
 	gpdb::RelationWrapper rel = gpdb::GetRelation(rel_oid);
@@ -1710,10 +1712,10 @@ CTranslatorRelcacheToDXL::RetrieveRelStats(CMemoryPool *mp, IMDId *mdid)
 gpos::Ref<IMDCacheObject>
 CTranslatorRelcacheToDXL::RetrieveColStats(CMemoryPool *mp,
 										   CMDAccessor *md_accessor,
-										   IMDId *mdid)
+										   gpos::Ref<IMDId> mdid)
 {
 	CMDIdColStats *mdid_col_stats = gpos::dyn_cast<CMDIdColStats>(mdid);
-	IMDId *mdid_rel = mdid_col_stats->GetRelMdId();
+	gpos::Ref<IMDId> mdid_rel = mdid_col_stats->GetRelMdId();
 	ULONG pos = mdid_col_stats->Position();
 	OID rel_oid = gpos::dyn_cast<CMDIdGPDB>(mdid_rel)->Oid();
 
@@ -2054,11 +2056,11 @@ CTranslatorRelcacheToDXL::RetrieveNumChildPartitions(OID rel_oid)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IMDCacheObject>
-CTranslatorRelcacheToDXL::RetrieveCast(CMemoryPool *mp, IMDId *mdid)
+CTranslatorRelcacheToDXL::RetrieveCast(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
 	CMDIdCast *mdid_cast = gpos::dyn_cast<CMDIdCast>(mdid);
-	IMDId *mdid_src = mdid_cast->MdidSrc();
-	IMDId *mdid_dest = mdid_cast->MdidDest();
+	gpos::Ref<IMDId> mdid_src = mdid_cast->MdidSrc();
+	gpos::Ref<IMDId> mdid_dest = mdid_cast->MdidDest();
 
 	OID src_oid = gpos::dyn_cast<CMDIdGPDB>(mdid_src)->Oid();
 	OID dest_oid = gpos::dyn_cast<CMDIdGPDB>(mdid_dest)->Oid();
@@ -2147,11 +2149,11 @@ CTranslatorRelcacheToDXL::RetrieveCast(CMemoryPool *mp, IMDId *mdid)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IMDCacheObject>
-CTranslatorRelcacheToDXL::RetrieveScCmp(CMemoryPool *mp, IMDId *mdid)
+CTranslatorRelcacheToDXL::RetrieveScCmp(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
 	CMDIdScCmp *mdid_scalar_cmp = gpos::dyn_cast<CMDIdScCmp>(mdid);
-	IMDId *mdid_left = mdid_scalar_cmp->GetLeftMdid();
-	IMDId *mdid_right = mdid_scalar_cmp->GetRightMdid();
+	gpos::Ref<IMDId> mdid_left = mdid_scalar_cmp->GetLeftMdid();
+	gpos::Ref<IMDId> mdid_right = mdid_scalar_cmp->GetRightMdid();
 
 	IMDType::ECmpType cmp_type = mdid_scalar_cmp->ParseCmpType();
 
@@ -2587,7 +2589,7 @@ CTranslatorRelcacheToDXL::ConstructAttnoMapping(CMemoryPool *mp,
 		const IMDColumn *md_col = (*mdcol_array)[ul].get();
 		INT attno = md_col->AttrNum();
 
-		ULONG idx = (ULONG) (GPDXL_SYSTEM_COLUMNS + attno);
+		ULONG idx = (ULONG)(GPDXL_SYSTEM_COLUMNS + attno);
 		attno_mapping[idx] = ul;
 	}
 
@@ -2682,7 +2684,7 @@ CTranslatorRelcacheToDXL::NormalizeFrequencies(float4 *freqs, ULONG length,
 
 	if (total > CDouble(1.0))
 	{
-		float4 denom = (float4) (total + CStatistics::Epsilon).Get();
+		float4 denom = (float4)(total + CStatistics::Epsilon).Get();
 
 		// divide all values by the total
 		for (ULONG ul = 0; ul < length; ul++)
@@ -2956,7 +2958,7 @@ CTranslatorRelcacheToDXL::GetComparisonType(IMDType::ECmpType cmp_type)
 //---------------------------------------------------------------------------
 gpos::Ref<IMdIdArray>
 CTranslatorRelcacheToDXL::RetrieveIndexOpFamilies(CMemoryPool *mp,
-												  IMDId *mdid_index)
+												  gpos::Ref<IMDId> mdid_index)
 {
 	List *op_families =
 		gpdb::GetIndexOpFamilies(gpos::dyn_cast<CMDIdGPDB>(mdid_index)->Oid());
@@ -2982,8 +2984,8 @@ CTranslatorRelcacheToDXL::RetrieveIndexOpFamilies(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IMdIdArray>
-CTranslatorRelcacheToDXL::RetrieveScOpOpFamilies(CMemoryPool *mp,
-												 IMDId *mdid_scalar_op)
+CTranslatorRelcacheToDXL::RetrieveScOpOpFamilies(
+	CMemoryPool *mp, gpos::Ref<IMDId> mdid_scalar_op)
 {
 	List *op_families = gpdb::GetOpFamiliesForScOp(
 		gpos::dyn_cast<CMDIdGPDB>(mdid_scalar_op)->Oid());

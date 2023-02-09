@@ -84,7 +84,7 @@ CDXLScalarCaseTest::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarCaseTest::MdidType() const
 {
 	return m_mdid_type.get();

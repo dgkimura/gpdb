@@ -285,8 +285,7 @@ public:
 	}
 
 	// check compatibility with another xform
-	virtual BOOL
-	FCompatible(CXform::EXformId)
+	virtual BOOL FCompatible(CXform::EXformId)
 	{
 		return true;
 	}

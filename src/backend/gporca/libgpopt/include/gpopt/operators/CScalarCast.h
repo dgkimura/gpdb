@@ -63,14 +63,14 @@ public:
 	// ident accessors
 
 	// the type of the scalar expression
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_return_type_mdid.get();
 	}
 
 	// func that casts
-	IMDId *
+	gpos::Ref<IMDId>
 	FuncMdId() const
 	{
 		return m_func_mdid.get();

@@ -68,7 +68,7 @@ public:
 	// accessors
 	const CMDName *MdName() const;
 
-	IMDId *MdidType() const;
+	gpos::Ref<IMDId> MdidType() const;
 
 	INT TypeModifier() const;
 

@@ -95,7 +95,7 @@ CScalarAssertConstraint::OsPrint(IOstream &os) const
 //		Type of expression's result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarAssertConstraint::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

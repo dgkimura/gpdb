@@ -57,7 +57,7 @@ CDXLIndexDescr::~CDXLIndexDescr()
 //		Return the metadata id for the index
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLIndexDescr::MDId() const
 {
 	return m_mdid.get();

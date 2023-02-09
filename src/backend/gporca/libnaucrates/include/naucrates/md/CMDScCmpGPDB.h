@@ -76,22 +76,22 @@ public:
 	}
 
 	// copmarison object id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// cast object name
 	CMDName Mdname() const override;
 
 	// left type
-	IMDId *GetLeftMdid() const override;
+	gpos::Ref<IMDId> GetLeftMdid() const override;
 
 	// right type
-	IMDId *GetRightMdid() const override;
+	gpos::Ref<IMDId> GetRightMdid() const override;
 
 	// comparison type
 	IMDType::ECmpType ParseCmpType() const override;
 
 	// comparison operator id
-	IMDId *MdIdOp() const override;
+	gpos::Ref<IMDId> MdIdOp() const override;
 
 	// serialize object in DXL format
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;

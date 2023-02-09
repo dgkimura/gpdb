@@ -84,7 +84,7 @@ CDXLScalarSubPlan::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarSubPlan::GetFirstColTypeMdId() const
 {
 	return m_first_col_type_mdid.get();
@@ -193,7 +193,8 @@ CDXLScalarSubPlan::SerializeToDXL(CXMLSerializer *xml_serializer,
 									 ulid);
 
 		const CMDName *mdname = (*m_dxl_colref_array)[ul]->MdName();
-		const IMDId *mdid_type = (*m_dxl_colref_array)[ul]->MdidType();
+		const gpos::Ref<IMDId> mdid_type =
+			(*m_dxl_colref_array)[ul]->MdidType();
 		xml_serializer->AddAttribute(
 			CDXLTokens::GetDXLTokenStr(EdxltokenColName), mdname->GetMDName());
 		mdid_type->Serialize(xml_serializer,

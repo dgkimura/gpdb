@@ -58,8 +58,8 @@ public:
 	// ident accessors
 	Edxlopid GetDXLOperator() const override;
 
-	IMDId *MdidType() const;
-	IMDId *FuncMdId() const;
+	gpos::Ref<IMDId> MdidType() const;
+	gpos::Ref<IMDId> FuncMdId() const;
 
 	// name of the DXL operator name
 	const CWStringConst *GetOpNameStr() const override;

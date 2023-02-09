@@ -99,7 +99,7 @@ CMDIdScCmp::GetBuffer() const
 //		Returns the source type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIdScCmp::GetLeftMdid() const
 {
 	return m_mdid_left.get();
@@ -113,7 +113,7 @@ CMDIdScCmp::GetLeftMdid() const
 //		Returns the destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIdScCmp::GetRightMdid() const
 {
 	return m_mdid_right.get();
@@ -144,7 +144,7 @@ CMDIdScCmp::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdScCmp::Equals(const IMDId *mdid) const
+CMDIdScCmp::Equals(const gpos::Ref<IMDId> mdid) const
 {
 	if (nullptr == mdid || EmdidScCmp != mdid->MdidType())
 	{

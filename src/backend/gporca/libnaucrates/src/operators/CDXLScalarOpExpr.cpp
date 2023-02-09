@@ -105,7 +105,7 @@ CDXLScalarOpExpr::GetOpNameStr() const
 //		Operator id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarOpExpr::MDId() const
 {
 	return m_mdid.get();
@@ -119,7 +119,7 @@ CDXLScalarOpExpr::MDId() const
 //		Operator return type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarOpExpr::GetReturnTypeMdId() const
 {
 	return m_return_type_mdid.get();
@@ -137,8 +137,8 @@ BOOL
 CDXLScalarOpExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
 	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(m_mdid.get());
-	IMDId *mdid = md_accessor->RetrieveFunc(md_scalar_op->FuncMdId())
-					  ->GetResultTypeMdid();
+	gpos::Ref<IMDId> mdid = md_accessor->RetrieveFunc(md_scalar_op->FuncMdId())
+								->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());
 }

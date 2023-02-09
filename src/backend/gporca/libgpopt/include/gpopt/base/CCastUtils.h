@@ -46,7 +46,7 @@ public:
 	static gpos::Ref<CExpression> PexprCast(CMemoryPool *mp,
 											CMDAccessor *md_accessor,
 											const CColRef *colref,
-											IMDId *mdid_dest);
+											gpos::Ref<IMDId> mdid_dest);
 
 	// check whether the given expression is a binary coercible cast of something
 	static BOOL FBinaryCoercibleCast(CExpression *pexpr);
@@ -70,7 +70,7 @@ public:
 	static gpos::Ref<CExpression> PexprCast(CMemoryPool *mp,
 											CMDAccessor *md_accessor,
 											CExpression *pexpr,
-											IMDId *mdid_dest);
+											gpos::Ref<IMDId> mdid_dest);
 };	// class CCastUtils
 
 }  // namespace gpopt

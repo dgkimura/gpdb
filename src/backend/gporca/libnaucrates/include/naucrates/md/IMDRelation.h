@@ -137,7 +137,7 @@ public:
 	// retrieve the column at the given position in the distribution key for the relation
 	virtual const IMDColumn *GetDistrColAt(ULONG pos) const = 0;
 
-	virtual IMDId *GetDistrOpfamilyAt(ULONG pos) const = 0;
+	virtual gpos::Ref<IMDId> GetDistrOpfamilyAt(ULONG pos) const = 0;
 
 	// return true if a hash distributed table needs to be considered as random
 	virtual BOOL ConvertHashToRandom() const = 0;
@@ -167,16 +167,16 @@ public:
 	virtual ULONG TriggerCount() const = 0;
 
 	// retrieve the id of the metadata cache index at the given position
-	virtual IMDId *IndexMDidAt(ULONG pos) const = 0;
+	virtual gpos::Ref<IMDId> IndexMDidAt(ULONG pos) const = 0;
 
 	// retrieve the id of the metadata cache trigger at the given position
-	virtual IMDId *TriggerMDidAt(ULONG pos) const = 0;
+	virtual gpos::Ref<IMDId> TriggerMDidAt(ULONG pos) const = 0;
 
 	// number of check constraints
 	virtual ULONG CheckConstraintCount() const = 0;
 
 	// retrieve the id of the check constraint cache at the given position
-	virtual IMDId *CheckConstraintMDidAt(ULONG pos) const = 0;
+	virtual gpos::Ref<IMDId> CheckConstraintMDidAt(ULONG pos) const = 0;
 
 	// part constraint
 	virtual CDXLNode *MDPartConstraint() const = 0;

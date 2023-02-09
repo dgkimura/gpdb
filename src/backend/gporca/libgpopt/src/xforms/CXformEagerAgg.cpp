@@ -180,10 +180,10 @@ CXformEagerAgg::CanPushAggBelowJoin(CExpression *scalar_agg_func_expr)
 
 	COptCtxt *poctxt = COptCtxt::PoctxtFromTLS();
 	CMDAccessor *md_accessor = poctxt->Pmda();
-	IMDId *agg_mdid =
+	gpos::Ref<IMDId> agg_mdid =
 		scalar_agg_func->MDId();  // oid of the original aggregate function
 	CExpression *agg_child_expr = (*(*scalar_agg_func_expr)[0])[0];
-	IMDId *agg_child_mdid =
+	gpos::Ref<IMDId> agg_child_mdid =
 		gpos::dyn_cast<CScalar>(agg_child_expr->Pop())->MdidType();
 	const IMDType *agg_child_type = md_accessor->RetrieveType(agg_child_mdid);
 	// if agg_mdid is not one of the supported aggregates (min, max, sum, count, avg)
@@ -278,7 +278,7 @@ CXformEagerAgg::PopulateLowerUpperProjectList(
 		CExpression *orig_agg_expr = (*orig_proj_elem_expr)[0];
 		CScalarAggFunc *orig_agg_func =
 			gpos::dyn_cast<CScalarAggFunc>(orig_agg_expr->Pop());
-		IMDId *orig_agg_mdid = orig_agg_func->MDId();
+		gpos::Ref<IMDId> orig_agg_mdid = orig_agg_func->MDId();
 		// min and max
 		gpos::Ref<CExpression> lower_proj_elem_expr = nullptr;
 		PopulateLowerProjectElement(
@@ -315,8 +315,8 @@ CXformEagerAgg::PopulateLowerUpperProjectList(
 // splitting and pushing down a single aggregate.
 void
 CXformEagerAgg::PopulateLowerProjectElement(
-	CMemoryPool *mp,  // memory pool
-	IMDId *agg_mdid,  // original global aggregate function
+	CMemoryPool *mp,			// memory pool
+	gpos::Ref<IMDId> agg_mdid,	// original global aggregate function
 	CWStringConst *agg_name, CExpressionArray *agg_arg_array, BOOL is_distinct,
 	gpos::Ref<CExpression> *
 		lower_proj_elem_expr  // output project element of the new lower aggregate
@@ -337,7 +337,7 @@ CXformEagerAgg::PopulateLowerProjectElement(
 
 	/* 2. create new aggregate function for the upper aggregate operator */
 	// determine the return type of the lower aggregate function
-	IMDId *lower_agg_ret_mdid =
+	gpos::Ref<IMDId> lower_agg_ret_mdid =
 		md_accessor->RetrieveAgg(agg_mdid)->GetIntermediateResultTypeMdid();
 	const IMDType *lower_agg_ret_type =
 		md_accessor->RetrieveType(lower_agg_ret_mdid);
@@ -353,8 +353,8 @@ CXformEagerAgg::PopulateLowerProjectElement(
 // corresponding to a single aggregate.
 void
 CXformEagerAgg::PopulateUpperProjectElement(
-	CMemoryPool *mp,  // memory pool
-	IMDId *agg_mdid,  // original global aggregate function
+	CMemoryPool *mp,			// memory pool
+	gpos::Ref<IMDId> agg_mdid,	// original global aggregate function
 	CWStringConst *agg_name, CColRef *lower_colref, CColRef *output_colref,
 	BOOL is_distinct,
 	gpos::Ref<CExpression> *

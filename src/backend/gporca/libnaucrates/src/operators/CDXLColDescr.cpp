@@ -105,7 +105,7 @@ CDXLColDescr::AttrNum() const
 //		Returns the type id for this column
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLColDescr::MdidType() const
 {
 	return m_column_mdid_type.get();

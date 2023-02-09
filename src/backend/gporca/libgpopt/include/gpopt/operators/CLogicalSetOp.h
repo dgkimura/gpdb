@@ -110,8 +110,7 @@ public:
 	}
 
 	// return true if we can pull projections up past this operator from its given child
-	BOOL
-	FCanPullProjectionsUp(ULONG	 //child_index
+	BOOL FCanPullProjectionsUp(ULONG  //child_index
 	) const override
 	{
 		return false;

@@ -56,7 +56,7 @@ public:
 	}
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(const gpos::Ref<IMDId> mdid) const override;
 
 	// is the mdid valid
 	BOOL IsValid() const override;
@@ -69,7 +69,7 @@ public:
 
 	// const converter
 	static const CMDIdGPDBCtas *
-	CastMdid(const IMDId *mdid)
+	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidGPDBCtas == mdid->MdidType());
 
@@ -78,7 +78,7 @@ public:
 
 	// non-const converter
 	static CMDIdGPDBCtas *
-	CastMdid(IMDId *mdid)
+	CastMdid(gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidGPDBCtas == mdid->MdidType());
 

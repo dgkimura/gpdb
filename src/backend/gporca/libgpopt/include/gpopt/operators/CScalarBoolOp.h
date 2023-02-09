@@ -123,7 +123,7 @@ public:
 	static BOOL FCommutative(EBoolOperator eboolop);
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

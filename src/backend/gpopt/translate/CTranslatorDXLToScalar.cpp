@@ -406,7 +406,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarOpExprToScalar(
 	op_expr->opfuncid =
 		gpos::dyn_cast<CMDIdGPDB>(md_scalar_op->FuncMdId())->Oid();
 
-	IMDId *return_type_mdid = scalar_op_expr_dxl->GetReturnTypeMdId();
+	gpos::Ref<IMDId> return_type_mdid = scalar_op_expr_dxl->GetReturnTypeMdId();
 	if (nullptr != return_type_mdid)
 	{
 		op_expr->opresulttype =
@@ -830,7 +830,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 	for (ULONG ul = 0; ul < len; ul++)
 	{
 		CDXLColRef *dxl_colref = (*outer_refs)[ul].get();
-		IMDId *mdid = dxl_colref->MdidType();
+		gpos::Ref<IMDId> mdid = dxl_colref->MdidType();
 		ULONG colid = dxl_colref->Id();
 		INT type_modifier = dxl_colref->TypeModifier();
 		OID type_oid = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
@@ -2278,7 +2278,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarSortGroupClauseToScalar(
 //
 //---------------------------------------------------------------------------
 Oid
-CTranslatorDXLToScalar::GetFunctionReturnTypeOid(IMDId *mdid) const
+CTranslatorDXLToScalar::GetFunctionReturnTypeOid(gpos::Ref<IMDId> mdid) const
 {
 	return gpos::dyn_cast<CMDIdGPDB>(
 			   m_md_accessor->RetrieveFunc(mdid)->GetResultTypeMdid())

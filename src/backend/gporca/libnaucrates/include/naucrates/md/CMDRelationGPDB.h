@@ -157,7 +157,7 @@ public:
 	}
 
 	// the metadata id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// relation name
 	CMDName Mdname() const override;
@@ -210,7 +210,7 @@ public:
 	// retrieve the column at the given position in the distribution columns list for the relation
 	const IMDColumn *GetDistrColAt(ULONG pos) const override;
 
-	IMDId *GetDistrOpfamilyAt(ULONG pos) const override;
+	gpos::Ref<IMDId> GetDistrOpfamilyAt(ULONG pos) const override;
 
 	// return true if a hash distributed table needs to be considered as random
 	BOOL ConvertHashToRandom() const override;
@@ -240,10 +240,10 @@ public:
 	ULONG TriggerCount() const override;
 
 	// retrieve the id of the metadata cache index at the given position
-	IMDId *IndexMDidAt(ULONG pos) const override;
+	gpos::Ref<IMDId> IndexMDidAt(ULONG pos) const override;
 
 	// retrieve the id of the metadata cache trigger at the given position
-	IMDId *TriggerMDidAt(ULONG pos) const override;
+	gpos::Ref<IMDId> TriggerMDidAt(ULONG pos) const override;
 
 	// serialize metadata relation in DXL format given a serializer object
 	void Serialize(gpdxl::CXMLSerializer *) const override;
@@ -252,7 +252,7 @@ public:
 	ULONG CheckConstraintCount() const override;
 
 	// retrieve the id of the check constraint cache at the given position
-	IMDId *CheckConstraintMDidAt(ULONG pos) const override;
+	gpos::Ref<IMDId> CheckConstraintMDidAt(ULONG pos) const override;
 
 	// part constraint
 	CDXLNode *MDPartConstraint() const override;

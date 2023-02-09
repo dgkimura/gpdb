@@ -76,7 +76,7 @@ CDXLColStats::~CDXLColStats()
 //		Returns the metadata id of this column stats object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLColStats::MDId() const
 {
 	return m_mdid_col_stats.get();
@@ -225,7 +225,7 @@ CDXLColStats::DebugPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLColStats>
-CDXLColStats::CreateDXLDummyColStats(CMemoryPool *mp, IMDId *mdid,
+CDXLColStats::CreateDXLDummyColStats(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 									 CMDName *mdname, CDouble width)
 {
 	CMDIdColStats *mdid_col_stats = gpos::dyn_cast<CMDIdColStats>(mdid);

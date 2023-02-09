@@ -86,7 +86,7 @@ CScalarAggFunc::PstrAggFunc() const
 //		Aggregate function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarAggFunc::MDId() const
 {
 	return m_pmdidAggFunc.get();
@@ -189,7 +189,7 @@ CScalarAggFunc::Matches(COperator *pop) const
 //		Lookup mdid of return type for given Agg function
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarAggFunc::PmdidLookupReturnType(gpos::Ref<IMDId> pmdidAggFunc,
 									  BOOL fGlobal, CMDAccessor *pmdaInput)
 {

@@ -130,7 +130,7 @@ public:
 	}
 
 	// the metadata id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// schema name
 	CMDName *GetMdNameSchema() const override;
@@ -201,7 +201,7 @@ public:
 	// retrieve the column at the given position in the distribution columns list for the relation
 	const IMDColumn *GetDistrColAt(ULONG pos) const override;
 
-	IMDId *GetDistrOpfamilyAt(ULONG pos) const override;
+	gpos::Ref<IMDId> GetDistrOpfamilyAt(ULONG pos) const override;
 
 	// number of indices
 	ULONG
@@ -234,8 +234,7 @@ public:
 	}
 
 	// retrieve the id of the metadata cache index at the given position
-	IMDId *
-	IndexMDidAt(ULONG  // pos
+	gpos::Ref<IMDId> IndexMDidAt(ULONG	// pos
 	) const override
 	{
 		GPOS_ASSERT("CTAS tables have no indexes");
@@ -243,8 +242,7 @@ public:
 	}
 
 	// retrieve the id of the metadata cache trigger at the given position
-	IMDId *
-	TriggerMDidAt(ULONG	 // pos
+	gpos::Ref<IMDId> TriggerMDidAt(ULONG  // pos
 	) const override
 	{
 		GPOS_ASSERT("CTAS tables have no triggers");
@@ -262,8 +260,7 @@ public:
 	}
 
 	// retrieve the id of the check constraint cache at the given position
-	IMDId *
-	CheckConstraintMDidAt(ULONG	 // pos
+	gpos::Ref<IMDId> CheckConstraintMDidAt(ULONG  // pos
 	) const override
 	{
 		GPOS_ASSERT("CTAS tables have no constraints");

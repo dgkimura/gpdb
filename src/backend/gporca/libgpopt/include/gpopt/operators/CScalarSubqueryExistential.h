@@ -41,7 +41,7 @@ public:
 	~CScalarSubqueryExistential() override;
 
 	// return the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// match function
 	BOOL Matches(COperator *pop) const override;

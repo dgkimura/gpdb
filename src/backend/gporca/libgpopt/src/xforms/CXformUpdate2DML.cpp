@@ -93,7 +93,7 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 	;
 
-	IMDId *rel_mdid = ptabdesc->MDId();
+	gpos::Ref<IMDId> rel_mdid = ptabdesc->MDId();
 	if (CXformUtils::FTriggersExist(CLogicalDML::EdmlUpdate, ptabdesc,
 									true /*fBefore*/))
 	{
@@ -165,7 +165,7 @@ CXformUpdate2DML::Transform(CXformContext *pxfctxt, CXformResult *pxfres,
 	else
 	{
 		// generate a project operator
-		IMDId *pmdidTable = ptabdesc->MDId();
+		gpos::Ref<IMDId> pmdidTable = ptabdesc->MDId();
 
 		OID oidTable = gpos::dyn_cast<CMDIdGPDB>(pmdidTable)->Oid();
 		gpos::Ref<CExpression> pexprOid =

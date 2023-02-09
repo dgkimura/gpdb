@@ -63,10 +63,10 @@ public:
 	const CWStringConst *GetScalarOpNameStr() const;
 
 	// operator id
-	IMDId *MDId() const;
+	gpos::Ref<IMDId> MDId() const;
 
 	// operator return type
-	IMDId *GetReturnTypeMdId() const;
+	gpos::Ref<IMDId> GetReturnTypeMdId() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;

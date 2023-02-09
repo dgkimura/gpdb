@@ -79,7 +79,7 @@ CScalarOp::Pstr() const
 //		Scalar operator metadata id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarOp::MdIdOp() const
 {
 	return m_mdid_op.get();
@@ -131,7 +131,7 @@ CScalarOp::Matches(COperator *pop) const
 //		Accessor to the return type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarOp::GetReturnTypeMdId() const
 {
 	return m_return_type_mdid.get();
@@ -145,7 +145,7 @@ CScalarOp::GetReturnTypeMdId() const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarOp::MdidType() const
 {
 	if (nullptr != m_return_type_mdid.get())

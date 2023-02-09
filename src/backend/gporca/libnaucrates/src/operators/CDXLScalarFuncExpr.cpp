@@ -93,7 +93,7 @@ CDXLScalarFuncExpr::GetOpNameStr() const
 //		Returns function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarFuncExpr::FuncMdId() const
 {
 	return m_func_mdid.get();
@@ -107,7 +107,7 @@ CDXLScalarFuncExpr::FuncMdId() const
 //		Return type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarFuncExpr::ReturnTypeMdId() const
 {
 	return m_return_type_mdid.get();
@@ -179,7 +179,7 @@ CDXLScalarFuncExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarFuncExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	IMDId *mdid =
+	gpos::Ref<IMDId> mdid =
 		md_accessor->RetrieveFunc(m_func_mdid.get())->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());

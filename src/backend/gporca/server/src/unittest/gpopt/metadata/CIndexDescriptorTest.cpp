@@ -78,7 +78,8 @@ CIndexDescriptorTest::EresUnittest_Basic()
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 
 	// create an index descriptor
-	IMDId *pmdidIndex = pmdrel->IndexMDidAt(0);	 // get the first index
+	gpos::Ref<IMDId> pmdidIndex =
+		pmdrel->IndexMDidAt(0);	 // get the first index
 	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
 	gpos::Ref<CIndexDescriptor> pindexdesc =
 		CIndexDescriptor::Pindexdesc(mp, ptabdesc.get(), pmdindex);

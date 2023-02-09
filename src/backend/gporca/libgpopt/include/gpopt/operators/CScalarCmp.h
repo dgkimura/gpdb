@@ -116,10 +116,10 @@ public:
 	const CWStringConst *Pstr() const;
 
 	// metadata id
-	IMDId *MdIdOp() const;
+	gpos::Ref<IMDId> MdIdOp() const;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
@@ -139,10 +139,11 @@ public:
 
 	// get the string representation of a metadata object
 	static CWStringConst *Pstr(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   IMDId *mdid);
+							   gpos::Ref<IMDId> mdid);
 
 	// get metadata id of the commuted operator
-	static IMDId *PmdidCommuteOp(CMDAccessor *md_accessor, COperator *pop);
+	static gpos::Ref<IMDId> PmdidCommuteOp(CMDAccessor *md_accessor,
+										   COperator *pop);
 
 
 

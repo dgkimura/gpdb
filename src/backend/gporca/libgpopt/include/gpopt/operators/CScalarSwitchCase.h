@@ -75,7 +75,7 @@ public:
 		return PopCopyDefault();
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		GPOS_ASSERT(!"Invalid function call: CScalarSwitchCase::MdidType()");

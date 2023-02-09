@@ -2221,7 +2221,7 @@ gpos::Ref<IMDId>
 CDXLOperatorFactory::ExtractConvertAttrValueToMdId(
 	CDXLMemoryManager *dxl_memory_manager, const Attributes &attrs,
 	Edxltoken target_attr, Edxltoken target_elem, BOOL is_optional,
-	IMDId *default_val)
+	gpos::Ref<IMDId> default_val)
 {
 	// extract mdid
 	const XMLCh *mdid_xml =

@@ -254,7 +254,7 @@ CExpressionPreprocessor::PexprSimplifyQuantifiedSubqueries(CMemoryPool *mp,
 				pexprInner);
 
 			CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-			IMDId *mdid = popSubqQuantified->MdIdOp();
+			gpos::Ref<IMDId> mdid = popSubqQuantified->MdIdOp();
 			const CWStringConst *str =
 				md_accessor->RetrieveScOp(mdid)->Mdname().GetMDName();
 			;
@@ -463,7 +463,7 @@ CExpressionPreprocessor::PexprRemoveSuperfluousDistinctInDQA(CMemoryPool *mp,
 			{
 				CScalarAggFunc *popAggFunc =
 					gpos::dyn_cast<CScalarAggFunc>((*pexprPrjElem)[0]->Pop());
-				IMDId *agg_child_mdid =
+				gpos::Ref<IMDId> agg_child_mdid =
 					gpos::dyn_cast<CScalar>((*pexprPrjElem)[0]->Pop())
 						->MdidType();
 				const IMDType *agg_child_type =
@@ -2501,7 +2501,7 @@ CExpressionPreprocessor::ConvertInToSimpleExists(CMemoryPool *mp,
 	}
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	IMDId *mdid = gpos::dyn_cast<CScalarSubqueryAny>(pop)->MdIdOp();
+	gpos::Ref<IMDId> mdid = gpos::dyn_cast<CScalarSubqueryAny>(pop)->MdIdOp();
 	const CWStringConst *str =
 		md_accessor->RetrieveScOp(mdid)->Mdname().GetMDName();
 

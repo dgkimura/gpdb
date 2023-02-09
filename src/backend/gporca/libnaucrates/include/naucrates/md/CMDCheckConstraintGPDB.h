@@ -69,7 +69,7 @@ public:
 	~CMDCheckConstraintGPDB() override;
 
 	// check constraint mdid
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const override
 	{
 		return m_mdid.get();
@@ -83,7 +83,7 @@ public:
 	}
 
 	// mdid of the relation
-	IMDId *
+	gpos::Ref<IMDId>
 	GetRelMdId() const override
 	{
 		return m_rel_mdid.get();

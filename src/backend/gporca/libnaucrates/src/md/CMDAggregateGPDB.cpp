@@ -71,7 +71,7 @@ CMDAggregateGPDB::~CMDAggregateGPDB()
 //		Agg id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDAggregateGPDB::MDId() const
 {
 	return m_mdid.get();
@@ -100,7 +100,7 @@ CMDAggregateGPDB::Mdname() const
 //		Type id of result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDAggregateGPDB::GetResultTypeMdid() const
 {
 	return m_mdid_type_result.get();
@@ -114,7 +114,7 @@ CMDAggregateGPDB::GetResultTypeMdid() const
 //		Type id of intermediate result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDAggregateGPDB::GetIntermediateResultTypeMdid() const
 {
 	return m_mdid_type_intermediate.get();

@@ -89,7 +89,7 @@ public:
 	}
 
 	// type of expression's result
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// conversion function
 	static CScalarAssertConstraintList *

@@ -117,7 +117,7 @@ CScalarFunc::PstrFunc() const
 //		Func id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarFunc::FuncMdId() const
 {
 	return m_func_mdid.get();
@@ -186,7 +186,7 @@ CScalarFunc::Matches(COperator *pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarFunc::MdidType() const
 {
 	return m_return_type_mdid.get();

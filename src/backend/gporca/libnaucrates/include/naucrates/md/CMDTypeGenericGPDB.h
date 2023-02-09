@@ -173,7 +173,7 @@ public:
 		return m_dxl_str;
 	}
 
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	CMDName Mdname() const override;
 
@@ -205,12 +205,12 @@ public:
 	}
 
 	// id of specified comparison operator type
-	IMDId *GetMdidForCmpType(ECmpType ecmpt) const override;
+	gpos::Ref<IMDId> GetMdidForCmpType(ECmpType ecmpt) const override;
 
 	// id of specified specified aggregate type
-	IMDId *GetMdidForAggType(EAggType agg_type) const override;
+	gpos::Ref<IMDId> GetMdidForAggType(EAggType agg_type) const override;
 
-	const IMDId *
+	const gpos::Ref<IMDId>
 	CmpOpMdid() const override
 	{
 		return m_mdid_op_cmp.get();
@@ -237,19 +237,19 @@ public:
 	}
 
 	// id of the relation corresponding to a composite type
-	IMDId *
+	gpos::Ref<IMDId>
 	GetBaseRelMdid() const override
 	{
 		return m_mdid_base_relation.get();
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	GetArrayTypeMdid() const override
 	{
 		return m_mdid_type_array.get();
 	}
 
-	IMDId *GetDistrOpfamilyMdid() const override;
+	gpos::Ref<IMDId> GetDistrOpfamilyMdid() const override;
 
 	// serialize object in DXL format
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;
@@ -303,12 +303,12 @@ public:
 
 	// create a dxl datum of types having double mapping
 	static gpos::Ref<CDXLDatum> CreateDXLDatumStatsDoubleMappable(
-		CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, INT type_modifier, BOOL is_null,
 		BYTE *byte_array, ULONG length, LINT lint_Value, CDouble double_Value);
 
 	// create a dxl datum of types having lint mapping
 	static gpos::Ref<CDXLDatum> CreateDXLDatumStatsIntMappable(
-		CMemoryPool *mp, IMDId *mdid, INT type_modifier, BOOL is_null,
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, INT type_modifier, BOOL is_null,
 		BYTE *byte_array, ULONG length, LINT lint_Value, CDouble double_Value);
 
 	// create a NULL constant for this type
@@ -319,14 +319,14 @@ public:
 	static BOOL HasByte2IntMapping(const IMDType *mdtype);
 
 	// does a datum of this type need bytea to double mapping for statistics computation
-	static BOOL HasByte2DoubleMapping(const IMDId *mdid);
+	static BOOL HasByte2DoubleMapping(const gpos::Ref<IMDId> mdid);
 
 	// is this a time-related type
-	static BOOL IsTimeRelatedType(const IMDId *mdid);
+	static BOOL IsTimeRelatedType(const gpos::Ref<IMDId> mdid);
 
 	// is this a time-related type mappable to DOUBLE
 	static BOOL
-	IsTimeRelatedTypeMappableToDouble(const IMDId *mdid)
+	IsTimeRelatedTypeMappableToDouble(const gpos::Ref<IMDId> mdid)
 	{
 		return IsTimeRelatedType(mdid) &&
 			   !IsTimeRelatedTypeMappableToLint(mdid);
@@ -334,13 +334,13 @@ public:
 
 	// is this a time-related type mappable to LINT
 	static inline BOOL
-	IsTimeRelatedTypeMappableToLint(const IMDId *mdid)
+	IsTimeRelatedTypeMappableToLint(const gpos::Ref<IMDId> mdid)
 	{
 		return mdid->Equals(&CMDIdGPDB::m_mdid_date);
 	}
 
 	// is this a network-related type
-	static BOOL IsNetworkRelatedType(const IMDId *mdid);
+	static BOOL IsNetworkRelatedType(const gpos::Ref<IMDId> mdid);
 };
 }  // namespace gpmd
 

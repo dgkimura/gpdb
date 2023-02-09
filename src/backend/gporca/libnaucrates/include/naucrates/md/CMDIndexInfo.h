@@ -40,7 +40,7 @@ public:
 	~CMDIndexInfo() override;
 
 	// index mdid
-	IMDId *MDId() const;
+	gpos::Ref<IMDId> MDId() const;
 
 	// is the index partial
 	BOOL IsPartial() const;

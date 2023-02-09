@@ -65,7 +65,7 @@ public:
 	~CDXLScalarSubqueryQuantified() override;
 
 	// scalar operator id
-	IMDId *
+	gpos::Ref<IMDId>
 	GetScalarOpMdId() const
 	{
 		return m_scalar_op_mdid.get();

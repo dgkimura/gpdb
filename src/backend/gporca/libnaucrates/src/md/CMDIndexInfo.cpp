@@ -29,7 +29,7 @@ CMDIndexInfo::~CMDIndexInfo()
 }
 
 // returns the metadata id of this index
-IMDId *
+gpos::Ref<IMDId>
 CMDIndexInfo::MDId() const
 {
 	return m_mdid.get();

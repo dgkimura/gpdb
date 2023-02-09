@@ -84,7 +84,7 @@ CDXLScalarIfStmt::GetOpNameStr() const
 //		Return type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarIfStmt::GetResultTypeMdId() const
 {
 	return m_result_type_mdid.get();

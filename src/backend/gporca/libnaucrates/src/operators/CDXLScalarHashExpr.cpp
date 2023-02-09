@@ -84,7 +84,7 @@ CDXLScalarHashExpr::GetOpNameStr() const
 //		Hash expression type from the catalog
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarHashExpr::MdidOpfamily() const
 {
 	return m_mdid_opfamily.get();

@@ -135,7 +135,7 @@ public:
 	static gpos::Ref<CExpression> PexprScalarCmp(CMemoryPool *mp,
 												 CExpression *pexprLeft,
 												 CExpression *pexprRight,
-												 IMDId *mdid_scop);
+												 gpos::Ref<IMDId> mdid_scop);
 
 	// generate a comparison expression for a column reference and an expression
 	static gpos::Ref<CExpression> PexprScalarCmp(
@@ -161,7 +161,7 @@ public:
 	// generate a comparison against Zero
 	static gpos::Ref<CExpression> PexprCmpWithZero(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
-		IMDId *mdid_type_left, IMDType::ECmpType ecmptype);
+		gpos::Ref<IMDId> mdid_type_left, IMDType::ECmpType ecmptype);
 
 	// generate an equality comparison expression for column references
 	static gpos::Ref<CExpression> PexprScalarEqCmp(CMemoryPool *mp,
@@ -197,7 +197,7 @@ public:
 	static gpos::Ref<CExpression> PexprIDF(CMemoryPool *mp,
 										   CExpression *pexprLeft,
 										   CExpression *pexprRight,
-										   IMDId *mdid_scop);
+										   gpos::Ref<IMDId> mdid_scop);
 
 	// generate an Is NOT Distinct From expression for two column references
 	static gpos::Ref<CExpression> PexprINDF(CMemoryPool *mp,
@@ -212,7 +212,7 @@ public:
 	static gpos::Ref<CExpression> PexprINDF(CMemoryPool *mp,
 											CExpression *pexprLeft,
 											CExpression *pexprRight,
-											IMDId *mdid_scop);
+											gpos::Ref<IMDId> mdid_scop);
 
 	// generate an Is NULL expression
 	static gpos::Ref<CExpression> PexprIsNull(CMemoryPool *mp,
@@ -234,7 +234,7 @@ public:
 	static gpos::Ref<CExpression> PexprScalarOp(
 		CMemoryPool *mp, const CColRef *pcrLeft, gpos::Ref<CExpression> pexpr,
 		CWStringConst strOp, gpos::Ref<IMDId> mdid_op,
-		IMDId *return_type_mdid = nullptr);
+		gpos::Ref<IMDId> return_type_mdid = nullptr);
 
 	// generate a scalar bool op expression
 	static gpos::Ref<CExpression> PexprScalarBoolOp(
@@ -258,7 +258,7 @@ public:
 		CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
 		const CWStringConst *pstrAggFunc, BOOL is_distinct,
 		EAggfuncStage eaggfuncstage, BOOL fSplit,
-		IMDId *
+		gpos::Ref<IMDId>
 			pmdidResolvedReturnType,  // return type to be used if original return type is ambiguous
 		EAggfuncKind aggkind, gpos::Ref<ULongPtrArray> argtypes);
 
@@ -410,11 +410,11 @@ public:
 													   INT type_modifier);
 
 	// comparison operator type
-	static IMDType::ECmpType ParseCmpType(IMDId *mdid);
+	static IMDType::ECmpType ParseCmpType(gpos::Ref<IMDId> mdid);
 
 	// comparison operator type
 	static IMDType::ECmpType ParseCmpType(CMDAccessor *md_accessor,
-										  IMDId *mdid);
+										  gpos::Ref<IMDId> mdid);
 
 	// generate a binary join expression
 	template <class T>
@@ -772,10 +772,10 @@ public:
 	static BOOL FPredicate(CExpression *pexpr);
 
 	// is this type supported in contradiction detection using stats logic
-	static BOOL FIntType(IMDId *mdid_type);
+	static BOOL FIntType(gpos::Ref<IMDId> mdid_type);
 
 	// is this type supported in contradiction detection
-	static BOOL FConstrainableType(IMDId *mdid_type);
+	static BOOL FConstrainableType(gpos::Ref<IMDId> mdid_type);
 
 	// check if a binary operator uses only columns produced by its children
 	static BOOL FUsesChildColsOnly(CExpressionHandle &exprhdl);
@@ -900,7 +900,7 @@ public:
 	static gpos::Ref<CExpression> PexprCast(CMemoryPool *mp,
 											CMDAccessor *md_accessor,
 											CExpression *pexpr,
-											IMDId *mdid_dest);
+											gpos::Ref<IMDId> mdid_dest);
 
 	// construct a logical join expression of the given type, with the given children
 	static gpos::Ref<CExpression> PexprLogicalJoin(
@@ -981,7 +981,7 @@ public:
 											 ULONG ulOffSet, ULONG count);
 
 	// generate part oid
-	static BOOL FGeneratePartOid(IMDId *mdid);
+	static BOOL FGeneratePartOid(gpos::Ref<IMDId> mdid);
 
 	// return true if given expression contains window aggregate function
 	static BOOL FHasAggWindowFunc(CExpression *pexpr);
@@ -1017,7 +1017,8 @@ public:
 
 	static BOOL Equals(const IMdIdArray *mdids, const IMdIdArray *other_mdids);
 
-	static BOOL Equals(const IMDId *mdid, const IMDId *other_mdid);
+	static BOOL Equals(const gpos::Ref<IMDId> mdid,
+					   const gpos::Ref<IMDId> other_mdid);
 
 	static BOOL CanRemoveInferredPredicates(COperator::EOperatorId op_id);
 

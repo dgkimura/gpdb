@@ -295,7 +295,7 @@ CMDIdGPDB::VersionMinor() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdGPDB::Equals(const IMDId *mdid) const
+CMDIdGPDB::Equals(const gpos::Ref<IMDId> mdid) const
 {
 	if (nullptr == mdid || EmdidGPDB != mdid->MdidType())
 	{
@@ -303,7 +303,7 @@ CMDIdGPDB::Equals(const IMDId *mdid) const
 	}
 
 	const CMDIdGPDB *mdidGPDB =
-		static_cast<CMDIdGPDB *>(const_cast<IMDId *>(mdid));
+		static_cast<CMDIdGPDB *>(const_cast<gpos::Ref<IMDId> >(mdid));
 
 	return (m_oid == mdidGPDB->Oid() &&
 			m_major_version == mdidGPDB->VersionMajor() &&

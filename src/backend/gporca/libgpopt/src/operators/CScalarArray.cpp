@@ -67,7 +67,7 @@ CScalarArray::~CScalarArray()
 //		Element type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArray::PmdidElem() const
 {
 	return m_pmdidElem.get();
@@ -81,7 +81,7 @@ CScalarArray::PmdidElem() const
 //		Array type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArray::PmdidArray() const
 {
 	return m_pmdidArray.get();
@@ -163,7 +163,7 @@ CScalarArray::Matches(COperator *pop) const
 //		Type of expression's result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArray::MdidType() const
 {
 	return m_pmdidArray.get();

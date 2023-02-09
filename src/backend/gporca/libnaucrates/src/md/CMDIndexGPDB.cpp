@@ -99,7 +99,7 @@ CMDIndexGPDB::~CMDIndexGPDB()
 //		Returns the metadata id of this index
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIndexGPDB::MDId() const
 {
 	return m_mdid.get();
@@ -401,7 +401,7 @@ CMDIndexGPDB::DebugPrint(IOstream &os) const
 //		Type of items returned by the index
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIndexGPDB::GetIndexRetItemTypeMdid() const
 {
 	return m_mdid_item_type.get();

@@ -112,16 +112,16 @@ public:
 	}
 
 	// element type id
-	IMDId *PmdidElem() const;
+	gpos::Ref<IMDId> PmdidElem() const;
 
 	// array type id
-	IMDId *PmdidArray() const;
+	gpos::Ref<IMDId> PmdidArray() const;
 
 	// is array multi-dimensional
 	BOOL FMultiDimensional() const;
 
 	// type of expression's result
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// CScalarConst array
 	CScalarConstArray *PdrgPconst() const;

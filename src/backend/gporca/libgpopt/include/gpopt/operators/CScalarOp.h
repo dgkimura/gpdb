@@ -83,10 +83,10 @@ public:
 	}
 
 	// accessor to the return type field
-	IMDId *GetReturnTypeMdId() const;
+	gpos::Ref<IMDId> GetReturnTypeMdId() const;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// operator specific hash function
 	ULONG HashValue() const override;
@@ -118,7 +118,7 @@ public:
 	}
 
 	// helper function
-	static BOOL FCommutative(const IMDId *pcmdidOtherOp);
+	static BOOL FCommutative(const gpos::Ref<IMDId> pcmdidOtherOp);
 
 	// boolean expression evaluation
 	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
@@ -127,7 +127,7 @@ public:
 	const CWStringConst *Pstr() const;
 
 	// metadata id
-	IMDId *MdIdOp() const;
+	gpos::Ref<IMDId> MdIdOp() const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

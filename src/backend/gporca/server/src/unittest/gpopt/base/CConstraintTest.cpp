@@ -138,7 +138,7 @@ CConstraintTest::EresUnittest_CInterval()
 
 	IMDTypeInt8 *pmdtypeint8 =
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
-	IMDId *mdid = pmdtypeint8->MDId();
+	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
@@ -241,7 +241,7 @@ CConstraintTest::EresUnittest_CConjunction()
 
 	IMDTypeInt8 *pmdtypeint8 =
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
-	IMDId *mdid = pmdtypeint8->MDId();
+	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet1 = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs1 = pexprGet1->DeriveOutputColumns();
@@ -300,7 +300,8 @@ CConstraintTest::EresUnittest_CConjunction()
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraintConjunction>
-CConstraintTest::Pcstconjunction(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
+CConstraintTest::Pcstconjunction(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+								 CColRef *colref)
 {
 	// first interval
 	gpos::Ref<CConstraintInterval> pciFirst =
@@ -326,7 +327,8 @@ CConstraintTest::Pcstconjunction(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraintDisjunction>
-CConstraintTest::Pcstdisjunction(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
+CConstraintTest::Pcstdisjunction(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+								 CColRef *colref)
 {
 	// first interval
 	gpos::Ref<CConstraintInterval> pciFirst =
@@ -374,7 +376,7 @@ CConstraintTest::EresUnittest_CDisjunction()
 
 	IMDTypeInt8 *pmdtypeint8 =
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
-	IMDId *mdid = pmdtypeint8->MDId();
+	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet1 = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs1 = pexprGet1->DeriveOutputColumns();
@@ -454,7 +456,7 @@ CConstraintTest::EresUnittest_CNegation()
 
 	IMDTypeInt8 *pmdtypeint8 =
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
-	IMDId *mdid = pmdtypeint8->MDId();
+	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
 	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
@@ -670,7 +672,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalConvertsTo()
 	// metadata id
 	IMDTypeInt8 *pmdtypeint8 =
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
-	IMDId *mdid = pmdtypeint8->MDId();
+	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	// get a column ref
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
@@ -741,7 +743,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 	// metadata id
 	IMDTypeInt8 *pmdtypeint8 =
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
-	IMDId *mdid = pmdtypeint8->MDId();
+	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	// get a column ref
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
@@ -1158,7 +1160,8 @@ CConstraintTest::PexprScalarCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraintInterval>
-CConstraintTest::PciFirstInterval(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
+CConstraintTest::PciFirstInterval(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+								  CColRef *colref)
 {
 	const SRangeInfo rgRangeInfo[] = {
 		{CRange::EriExcluded, -1000, CRange::EriIncluded, -20},
@@ -1184,7 +1187,7 @@ CConstraintTest::PciFirstInterval(CMemoryPool *mp, IMDId *mdid, CColRef *colref)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraintInterval>
-CConstraintTest::PciSecondInterval(CMemoryPool *mp, IMDId *mdid,
+CConstraintTest::PciSecondInterval(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 								   CColRef *colref)
 {
 	const SRangeInfo rgRangeInfo[] = {
@@ -1209,7 +1212,7 @@ CConstraintTest::PciSecondInterval(CMemoryPool *mp, IMDId *mdid,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CRangeArray>
-CConstraintTest::Pdrgprng(CMemoryPool *mp, IMDId *mdid,
+CConstraintTest::Pdrgprng(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 						  const SRangeInfo rgRangeInfo[], ULONG ulRanges)
 {
 	gpos::Ref<CRangeArray> pdrgprng = GPOS_NEW(mp) CRangeArray(mp);

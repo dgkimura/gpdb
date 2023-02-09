@@ -383,7 +383,7 @@ CExpressionTest::EresUnittest_BitmapGet()
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 
 	// create an index descriptor
-	IMDId *pmdidIndex = pmdrel->IndexMDidAt(0 /*pos*/);
+	gpos::Ref<IMDId> pmdidIndex = pmdrel->IndexMDidAt(0 /*pos*/);
 	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();

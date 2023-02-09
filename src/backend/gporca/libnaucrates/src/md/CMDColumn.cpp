@@ -94,7 +94,7 @@ CMDColumn::AttrNum() const
 //		Attribute type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDColumn::MdidType() const
 {
 	return m_mdid_type.get();

@@ -97,7 +97,7 @@ CScalarConst::Matches(COperator *pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarConst::MdidType() const
 {
 	return m_pdatum->MDId().get();

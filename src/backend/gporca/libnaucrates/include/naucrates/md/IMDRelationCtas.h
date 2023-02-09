@@ -63,8 +63,7 @@ public:
 	}
 
 	// retrieve the partition column at the given position
-	const IMDColumn *
-	PartColAt(ULONG	 // pos
+	const IMDColumn *PartColAt(ULONG  // pos
 	) const override
 	{
 		GPOS_ASSERT(!"CTAS tables have no partition columns");
@@ -80,8 +79,7 @@ public:
 	}
 
 	// retrieve the partition column at the given position
-	CHAR
-	PartTypeAtLevel(ULONG /*pos*/) const override
+	CHAR PartTypeAtLevel(ULONG /*pos*/) const override
 	{
 		GPOS_ASSERT(!"CTAS tables have no partition types");
 		return (CHAR) 0;
@@ -102,8 +100,7 @@ public:
 	}
 
 	// returns the key set at the specified position
-	const ULongPtrArray *
-	KeySetAt(ULONG	// pos
+	const ULongPtrArray *KeySetAt(ULONG	 // pos
 	) const override
 	{
 		GPOS_ASSERT(!"CTAS tables have no keys");

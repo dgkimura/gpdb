@@ -129,18 +129,18 @@ public:
 	}
 
 	// accessor of metadata id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
-	IMDId *GetDistrOpfamilyMdid() const override;
+	gpos::Ref<IMDId> GetDistrOpfamilyMdid() const override;
 
 	// accessor of type name
 	CMDName Mdname() const override;
 
 	// id of specified comparison operator type
-	IMDId *GetMdidForCmpType(ECmpType cmp_type) const override;
+	gpos::Ref<IMDId> GetMdidForCmpType(ECmpType cmp_type) const override;
 
 	// id of specified aggregate type
-	IMDId *GetMdidForAggType(EAggType agg_type) const override;
+	gpos::Ref<IMDId> GetMdidForAggType(EAggType agg_type) const override;
 
 	// is type redistributable
 	BOOL
@@ -185,7 +185,7 @@ public:
 	}
 
 	// metadata id of b-tree lookup operator
-	const IMDId *
+	const gpos::Ref<IMDId>
 	CmpOpMdid() const override
 	{
 		return m_mdid_op_cmp.get();
@@ -206,14 +206,14 @@ public:
 	}
 
 	// metadata id of array type
-	IMDId *
+	gpos::Ref<IMDId>
 	GetArrayTypeMdid() const override
 	{
 		return m_mdid_type_array.get();
 	}
 
 	// id of the relation corresponding to a composite type
-	IMDId *
+	gpos::Ref<IMDId>
 	GetBaseRelMdid() const override
 	{
 		return nullptr;

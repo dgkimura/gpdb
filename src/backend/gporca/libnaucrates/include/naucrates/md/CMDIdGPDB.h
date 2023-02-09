@@ -99,7 +99,7 @@ public:
 	virtual ULONG VersionMinor() const;
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(const gpos::Ref<IMDId> mdid) const override;
 
 	// computes the hash value for the metadata id
 	ULONG
@@ -125,7 +125,7 @@ public:
 
 	// const converter
 	static const CMDIdGPDB *
-	CastMdid(const IMDId *mdid)
+	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidGPDB == mdid->MdidType());
 
@@ -134,7 +134,7 @@ public:
 
 	// non-const converter
 	static CMDIdGPDB *
-	CastMdid(IMDId *mdid)
+	CastMdid(gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && (EmdidGPDB == mdid->MdidType() ||
 										EmdidGPDBCtas == mdid->MdidType()));

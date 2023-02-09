@@ -243,7 +243,7 @@ CPartInfo::ScanId(ULONG ulPos) const
 //		Return relation mdid of the entry at the given position
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CPartInfo::GetRelMdId(ULONG ulPos) const
 {
 	return (*m_pdrgppartentries)[ulPos]->MDId().get();

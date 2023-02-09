@@ -1417,7 +1417,7 @@ CTranslatorScalarToDXL::TranslateAggrefToDXL(
 				   GPOS_WSZ_LIT("Aggregate functions with FILTER"));
 	}
 
-	IMDId *mdid_return_type = CScalarAggFunc::PmdidLookupReturnType(
+	gpos::Ref<IMDId> mdid_return_type = CScalarAggFunc::PmdidLookupReturnType(
 		agg_mdid, (EdxlaggstageNormal == agg_stage), m_md_accessor);
 	gpos::Ref<IMDId> resolved_ret_type = nullptr;
 	if (m_md_accessor->RetrieveType(mdid_return_type)->IsAmbiguous())
@@ -2205,7 +2205,7 @@ CTranslatorScalarToDXL::AddArrayIndexList(
 //
 //---------------------------------------------------------------------------
 const CWStringConst *
-CTranslatorScalarToDXL::GetDXLArrayCmpType(IMDId *mdid) const
+CTranslatorScalarToDXL::GetDXLArrayCmpType(gpos::Ref<IMDId> mdid) const
 {
 	// get operator name
 	const IMDScalarOp *md_scalar_op = m_md_accessor->RetrieveScOp(mdid);
@@ -2460,8 +2460,9 @@ CTranslatorScalarToDXL::TranslateInt8DatumToDXL(CMemoryPool *mp,
 //		Extract the double value of the datum
 //---------------------------------------------------------------------------
 CDouble
-CTranslatorScalarToDXL::ExtractDoubleValueFromDatum(IMDId *mdid, BOOL is_null,
-													BYTE *bytes, Datum datum)
+CTranslatorScalarToDXL::ExtractDoubleValueFromDatum(gpos::Ref<IMDId> mdid,
+													BOOL is_null, BYTE *bytes,
+													Datum datum)
 {
 	GPOS_ASSERT(CMDTypeGenericGPDB::HasByte2DoubleMapping(mdid));
 
@@ -2474,7 +2475,7 @@ CTranslatorScalarToDXL::ExtractDoubleValueFromDatum(IMDId *mdid, BOOL is_null,
 
 	if (mdid->Equals(&CMDIdGPDB::m_mdid_numeric))
 	{
-		Numeric num = (Numeric) (bytes);
+		Numeric num = (Numeric)(bytes);
 
 		if (gpdb::NumericIsNan(num))
 		{
@@ -2573,7 +2574,7 @@ CTranslatorScalarToDXL::ExtractLintValueFromDatum(const IMDType *md_type,
 												  BOOL is_null, BYTE *bytes,
 												  ULONG length)
 {
-	IMDId *mdid = md_type->MDId();
+	gpos::Ref<IMDId> mdid = md_type->MDId();
 	GPOS_ASSERT(CMDTypeGenericGPDB::HasByte2IntMapping(md_type));
 
 	LINT lint_value = 0;
@@ -2589,7 +2590,7 @@ CTranslatorScalarToDXL::ExtractLintValueFromDatum(const IMDType *md_type,
 		Datum datumConstVal = (Datum) 0;
 		clib::Memcpy(&datumConstVal, bytes, length);
 		// Date is internally represented as an int32
-		lint_value = (LINT) (gpdb::Int32FromDatum(datumConstVal));
+		lint_value = (LINT)(gpdb::Int32FromDatum(datumConstVal));
 	}
 	else
 	{

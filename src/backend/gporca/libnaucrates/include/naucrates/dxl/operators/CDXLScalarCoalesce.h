@@ -50,7 +50,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// return type
-	virtual IMDId *
+	virtual gpos::Ref<IMDId>
 	MdidType() const
 	{
 		return m_mdid_type.get();

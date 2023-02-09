@@ -168,7 +168,7 @@ private:
 	static void CheckUnsupportedRelation(OID rel_oid);
 
 	// get type name from the relcache
-	static CMDName *GetTypeName(CMemoryPool *mp, IMDId *mdid);
+	static CMDName *GetTypeName(CMemoryPool *mp, gpos::Ref<IMDId> mdid);
 
 	// get function stability property from the GPDB character representation
 	static CMDFunctionGPDB::EFuncStbl GetFuncStability(CHAR c);
@@ -177,28 +177,29 @@ private:
 	static CMDFunctionGPDB::EFuncDataAcc GetEFuncDataAccess(CHAR c);
 
 	// get type of aggregate's intermediate result from the relcache
-	static gpos::Ref<IMDId> RetrieveAggIntermediateResultType(CMemoryPool *mp,
-															  IMDId *mdid);
+	static gpos::Ref<IMDId> RetrieveAggIntermediateResultType(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid);
 
 	// retrieve a GPDB metadata object from the relcache
 	static gpos::Ref<IMDCacheObject> RetrieveObjectGPDB(
-		CMemoryPool *mp, CMDAccessor *md_accessor, IMDId *mdid);
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<IMDId> mdid);
 
 	// retrieve relstats object from the relcache
 	static gpos::Ref<IMDCacheObject> RetrieveRelStats(CMemoryPool *mp,
-													  IMDId *mdid);
+													  gpos::Ref<IMDId> mdid);
 
 	// retrieve column stats object from the relcache
 	static gpos::Ref<IMDCacheObject> RetrieveColStats(CMemoryPool *mp,
 													  CMDAccessor *md_accessor,
-													  IMDId *mdid);
+													  gpos::Ref<IMDId> mdid);
 
 	// retrieve cast object from the relcache
-	static gpos::Ref<IMDCacheObject> RetrieveCast(CMemoryPool *mp, IMDId *mdid);
+	static gpos::Ref<IMDCacheObject> RetrieveCast(CMemoryPool *mp,
+												  gpos::Ref<IMDId> mdid);
 
 	// retrieve scalar comparison object from the relcache
 	static gpos::Ref<IMDCacheObject> RetrieveScCmp(CMemoryPool *mp,
-												   IMDId *mdid);
+												   gpos::Ref<IMDId> mdid);
 
 	// transform GPDB's MCV information to optimizer's histogram structure
 	static CHistogram *TransformMcvToOrcaHistogram(
@@ -303,12 +304,12 @@ private:
 	static ULONG GetComparisonType(IMDType::ECmpType cmp_type);
 
 	// retrieve the opfamilies mdids for the given scalar op
-	static gpos::Ref<IMdIdArray> RetrieveScOpOpFamilies(CMemoryPool *mp,
-														IMDId *mdid_scalar_op);
+	static gpos::Ref<IMdIdArray> RetrieveScOpOpFamilies(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid_scalar_op);
 
 	// retrieve the opfamilies mdids for the given index
-	static gpos::Ref<IMdIdArray> RetrieveIndexOpFamilies(CMemoryPool *mp,
-														 IMDId *mdid_index);
+	static gpos::Ref<IMdIdArray> RetrieveIndexOpFamilies(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid_index);
 
 	static gpos::Ref<IMdIdArray> RetrieveRelDistributionOpFamilies(
 		CMemoryPool *mp, GpPolicy *policy);
@@ -333,12 +334,12 @@ public:
 	// retrieve a metadata object from the relcache
 	static gpos::Ref<IMDCacheObject> RetrieveObject(CMemoryPool *mp,
 													CMDAccessor *md_accessor,
-													IMDId *mdid);
+													gpos::Ref<IMDId> mdid);
 
 	// retrieve a relation from the relcache
 	static gpos::Ref<IMDRelation> RetrieveRel(CMemoryPool *mp,
 											  CMDAccessor *md_accessor,
-											  IMDId *mdid);
+											  gpos::Ref<IMDId> mdid);
 
 	// add system columns (oid, tid, xmin, etc) in table descriptors
 	static void AddSystemColumns(CMemoryPool *mp, CMDColumnArray *mdcol_array,
@@ -347,11 +348,11 @@ public:
 	// retrieve an index from the relcache
 	static gpos::Ref<IMDIndex> RetrieveIndex(CMemoryPool *mp,
 											 CMDAccessor *md_accessor,
-											 IMDId *mdid_index);
+											 gpos::Ref<IMDId> mdid_index);
 
 	// retrieve a check constraint from the relcache
 	static gpos::Ref<CMDCheckConstraintGPDB> RetrieveCheckConstraints(
-		CMemoryPool *mp, CMDAccessor *md_accessor, IMDId *mdid);
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<IMDId> mdid);
 
 	// populate the attribute number to position mapping
 	static ULONG *PopulateAttnoPositionMap(CMemoryPool *mp,
@@ -362,19 +363,20 @@ public:
 	static ULONG GetAttributePosition(INT attno, const ULONG *attno_mapping);
 
 	// retrieve a type from the relcache
-	static gpos::Ref<IMDType> RetrieveType(CMemoryPool *mp, IMDId *mdid);
+	static gpos::Ref<IMDType> RetrieveType(CMemoryPool *mp,
+										   gpos::Ref<IMDId> mdid);
 
 	// retrieve a scalar operator from the relcache
 	static gpos::Ref<CMDScalarOpGPDB> RetrieveScOp(CMemoryPool *mp,
-												   IMDId *mdid);
+												   gpos::Ref<IMDId> mdid);
 
 	// retrieve a function from the relcache
 	static gpos::Ref<CMDFunctionGPDB> RetrieveFunc(CMemoryPool *mp,
-												   IMDId *mdid);
+												   gpos::Ref<IMDId> mdid);
 
 	// retrieve an aggregate from the relcache
 	static gpos::Ref<CMDAggregateGPDB> RetrieveAgg(CMemoryPool *mp,
-												   IMDId *mdid);
+												   gpos::Ref<IMDId> mdid);
 
 	// translate GPDB comparison type
 	static IMDType::ECmpType ParseCmpType(ULONG cmpt);

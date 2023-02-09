@@ -63,7 +63,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// element type id
-	IMDId *
+	gpos::Ref<IMDId>
 	ElementTypeMDid() const
 	{
 		return m_elem_type_mdid.get();
@@ -73,14 +73,14 @@ public:
 	INT TypeModifier() const;
 
 	// array type id
-	IMDId *
+	gpos::Ref<IMDId>
 	ArrayTypeMDid() const
 	{
 		return m_array_type_mdid.get();
 	}
 
 	// return type id
-	IMDId *
+	gpos::Ref<IMDId>
 	ReturnTypeMDid() const
 	{
 		return m_return_type_mdid.get();

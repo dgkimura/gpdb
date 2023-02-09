@@ -35,7 +35,8 @@ class CRangeTest
 	using PfPdatum = gpos::Ref<IDatum> (*)(CMemoryPool *, INT);
 
 private:
-	static GPOS_RESULT EresInitAndCheckRanges(CMemoryPool *mp, IMDId *mdid,
+	static GPOS_RESULT EresInitAndCheckRanges(CMemoryPool *mp,
+											  gpos::Ref<IMDId> mdid,
 											  PfPdatum pf);
 
 	static void TestRangeRelationship(CMemoryPool *mp, CRange *prange1,

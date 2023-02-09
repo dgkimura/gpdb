@@ -532,7 +532,7 @@ CPredicateUtils::EcmptReverse(IMDType::ECmpType cmp_type)
 
 // is the condition a LIKE predicate
 BOOL
-CPredicateUtils::FLikePredicate(IMDId *mdid)
+CPredicateUtils::FLikePredicate(gpos::Ref<IMDId> mdid)
 {
 	GPOS_ASSERT(nullptr != mdid);
 
@@ -563,7 +563,7 @@ CPredicateUtils::FLikePredicate(CExpression *pexpr)
 	}
 
 	CScalarCmp *popScCmp = gpos::dyn_cast<CScalarCmp>(pop);
-	IMDId *mdid = popScCmp->MdIdOp();
+	gpos::Ref<IMDId> mdid = popScCmp->MdIdOp();
 
 	return FLikePredicate(mdid);
 }
@@ -2184,8 +2184,9 @@ CPredicateUtils::PexprInverseComparison(CMemoryPool *mp, CExpression *pexprCmp)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	IMDId *mdid_op = gpos::dyn_cast<CScalarCmp>(pexprCmp->Pop())->MdIdOp();
-	IMDId *pmdidInverseOp =
+	gpos::Ref<IMDId> mdid_op =
+		gpos::dyn_cast<CScalarCmp>(pexprCmp->Pop())->MdIdOp();
+	gpos::Ref<IMDId> pmdidInverseOp =
 		md_accessor->RetrieveScOp(mdid_op)->GetInverseOpMdid();
 	const CWStringConst *pstrFirst =
 		md_accessor->RetrieveScOp(pmdidInverseOp)->Mdname().GetMDName();
@@ -2865,7 +2866,7 @@ CPredicateUtils::FBitmapLookupSupportedPredicateOrConjunct(
 }
 
 BOOL
-CPredicateUtils::FBuiltInComparisonIsVeryStrict(IMDId *mdid)
+CPredicateUtils::FBuiltInComparisonIsVeryStrict(gpos::Ref<IMDId> mdid)
 {
 	const CMDIdGPDB *const pmdidGPDB = gpos::dyn_cast<CMDIdGPDB>(mdid);
 

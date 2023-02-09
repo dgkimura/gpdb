@@ -215,7 +215,7 @@ public:
 									   CExpression *pexprInner,
 									   CExpression **ppexprKeyOuter,
 									   CExpression **ppexprKeyInner,
-									   IMDId **mdid_scop);
+									   gpos::Ref<IMDId> *mdid_scop);
 
 	static CRewindabilitySpec *PrsRequiredForNLJoinOuterChild(
 		CMemoryPool *pmp, CExpressionHandle &exprhdl,

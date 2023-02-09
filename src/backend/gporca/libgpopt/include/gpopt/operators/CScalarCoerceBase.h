@@ -61,7 +61,7 @@ public:
 	~CScalarCoerceBase() override;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// return type modifier
 	INT TypeModifier() const override;

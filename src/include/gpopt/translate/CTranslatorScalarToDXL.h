@@ -236,7 +236,7 @@ private:
 		const CMappingVarColId *var_colid_mapping);
 
 	// get the operator name
-	const CWStringConst *GetDXLArrayCmpType(IMDId *mdid) const;
+	const CWStringConst *GetDXLArrayCmpType(gpos::Ref<IMDId> mdid) const;
 
 	// translate the window frame edge, if the column used in the edge is a
 	// computed column then add it to the project list
@@ -311,8 +311,9 @@ public:
 										   const IMDType *md_type, BOOL is_null,
 										   ULONG len, Datum datum);
 
-	static CDouble ExtractDoubleValueFromDatum(IMDId *mdid, BOOL is_null,
-											   BYTE *bytes, Datum datum);
+	static CDouble ExtractDoubleValueFromDatum(gpos::Ref<IMDId> mdid,
+											   BOOL is_null, BYTE *bytes,
+											   Datum datum);
 
 	// extract the long int value of a datum
 	static LINT ExtractLintValueFromDatum(const IMDType *md_type, BOOL is_null,

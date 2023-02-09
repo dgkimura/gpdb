@@ -74,7 +74,7 @@ public:
 	}
 
 	// element type id
-	IMDId *
+	gpos::Ref<IMDId>
 	PmdidElem() const
 	{
 		return m_pmdidElem.get();
@@ -84,7 +84,7 @@ public:
 	INT TypeModifier() const override;
 
 	// array type id
-	IMDId *
+	gpos::Ref<IMDId>
 	PmdidArray() const
 	{
 		return m_pmdidArray.get();
@@ -114,7 +114,7 @@ public:
 	}
 
 	// type of expression's result
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_mdid_type.get();

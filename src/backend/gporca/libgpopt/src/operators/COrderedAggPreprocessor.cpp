@@ -326,7 +326,7 @@ COrderedAggPreprocessor::SplitPrjList(
 				CUtils::ParseCmpType(mdid_curr_sortop.get());
 			// Instead of using the SortOp directly, we use the colref's operator for the comparison type
 			// to avoid incorret results for cast related columns
-			IMDId *mdid_pos =
+			gpos::Ref<IMDId> mdid_pos =
 				colref->RetrieveType()->GetMdidForCmpType(curr_cmp_type);
 			;
 			COrderSpec::ENullTreatment ent = COrderSpec::EntLast;
@@ -579,7 +579,7 @@ COrderedAggPreprocessor::PexprFinalAgg(CMemoryPool *mp,
 						  CExpression(mp, GPOS_NEW(mp) CScalarValuesList(mp),
 									  GPOS_NEW(mp) CExpressionArray(mp)));
 
-	IMDId *ret_type = nullptr;
+	gpos::Ref<IMDId> ret_type = nullptr;
 	if (popScAggFunc->FHasAmbiguousReturnType())
 	{
 		;

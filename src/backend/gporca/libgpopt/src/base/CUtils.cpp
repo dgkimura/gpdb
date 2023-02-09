@@ -206,8 +206,8 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
 	IMDType::ECmpType cmp_type = ParseCmpType(mdid_op.get());
 	if (IMDType::EcmptOther != cmp_type)
 	{
-		IMDId *left_mdid = pcrLeft->RetrieveType()->MDId();
-		IMDId *right_mdid = pcrRight->RetrieveType()->MDId();
+		gpos::Ref<IMDId> left_mdid = pcrLeft->RetrieveType()->MDId();
+		gpos::Ref<IMDId> right_mdid = pcrRight->RetrieveType()->MDId();
 
 		if (CMDAccessorUtils::FCmpOrCastedCmpExists(left_mdid, right_mdid,
 													cmp_type))
@@ -240,8 +240,8 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, const CColRef *pcrLeft,
 	IMDType::ECmpType cmp_type = ParseCmpType(mdid_op.get());
 	if (IMDType::EcmptOther != cmp_type)
 	{
-		IMDId *left_mdid = pcrLeft->RetrieveType()->MDId();
-		IMDId *right_mdid =
+		gpos::Ref<IMDId> left_mdid = pcrLeft->RetrieveType()->MDId();
+		gpos::Ref<IMDId> right_mdid =
 			gpos::dyn_cast<CScalar>(pexprRight->Pop())->MdidType();
 
 		if (CMDAccessorUtils::FCmpOrCastedCmpExists(left_mdid, right_mdid,
@@ -322,9 +322,9 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 	IMDType::ECmpType cmp_type = ParseCmpType(mdid_op.get());
 	if (IMDType::EcmptOther != cmp_type)
 	{
-		IMDId *left_mdid =
+		gpos::Ref<IMDId> left_mdid =
 			gpos::dyn_cast<CScalar>(pexprLeft->Pop())->MdidType();
-		IMDId *right_mdid = pcrRight->RetrieveType()->MDId();
+		gpos::Ref<IMDId> right_mdid = pcrRight->RetrieveType()->MDId();
 
 		if (CMDAccessorUtils::FCmpOrCastedCmpExists(left_mdid, right_mdid,
 													cmp_type))
@@ -357,9 +357,9 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 	IMDType::ECmpType cmp_type = ParseCmpType(mdid_op.get());
 	if (IMDType::EcmptOther != cmp_type)
 	{
-		IMDId *left_mdid =
+		gpos::Ref<IMDId> left_mdid =
 			gpos::dyn_cast<CScalar>(pexprLeft->Pop())->MdidType();
-		IMDId *right_mdid =
+		gpos::Ref<IMDId> right_mdid =
 			gpos::dyn_cast<CScalar>(pexprRight->Pop())->MdidType();
 
 		if (CMDAccessorUtils::FCmpOrCastedCmpExists(left_mdid, right_mdid,
@@ -384,7 +384,7 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 // Generate a comparison expression over two expressions
 gpos::Ref<CExpression>
 CUtils::PexprScalarCmp(CMemoryPool *mp, CExpression *pexprLeft,
-					   CExpression *pexprRight, IMDId *mdid_scop)
+					   CExpression *pexprRight, gpos::Ref<IMDId> mdid_scop)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
 	GPOS_ASSERT(nullptr != pexprRight);
@@ -432,7 +432,7 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 	gpos::Ref<CExpression> pexprNewLeft = pexprLeft;
 	gpos::Ref<CExpression> pexprNewRight = pexprRight;
 
-	IMDId *op_mdid = CMDAccessorUtils::GetScCmpMdIdConsiderCasts(
+	gpos::Ref<IMDId> op_mdid = CMDAccessorUtils::GetScCmpMdIdConsiderCasts(
 		md_accessor, pexprNewLeft.get(), pexprNewRight.get(), cmp_type);
 	CMDAccessorUtils::ApplyCastsForScCmp(mp, md_accessor, pexprNewLeft,
 										 pexprNewRight, op_mdid);
@@ -625,7 +625,7 @@ CUtils::GetPercentileAggMDId(CMemoryPool *mp, CExpression *pexprAggFn)
 
 	CScalarAggFunc *popScAggFunc =
 		gpos::dyn_cast<CScalarAggFunc>(pexprAggFn->Pop());
-	IMDId *arg_mdid =
+	gpos::Ref<IMDId> arg_mdid =
 		gpos::dyn_cast<CScalar>((*(*pexprAggFn)[0])[0]->Pop())->MdidType();
 
 	OID oid_arg_type = gpos::dyn_cast<CMDIdGPDB>(arg_mdid)->Oid();
@@ -697,8 +697,8 @@ CUtils::PexprCollapseConstArray(CMemoryPool *mp, CExpression *pexprArray)
 		}
 
 		CScalarArray *psArray = gpos::dyn_cast<CScalarArray>(pexprArray->Pop());
-		IMDId *elem_type_mdid = psArray->PmdidElem();
-		IMDId *array_type_mdid = psArray->PmdidArray();
+		gpos::Ref<IMDId> elem_type_mdid = psArray->PmdidElem();
+		gpos::Ref<IMDId> array_type_mdid = psArray->PmdidArray();
 		;
 		;
 
@@ -737,9 +737,10 @@ CUtils::PexprScalarArrayCmp(CMemoryPool *mp,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// get column type mdid and mdid of the array type corresponding to that type
-	IMDId *pmdidColType = colref->RetrieveType()->MDId();
-	IMDId *pmdidArrType = colref->RetrieveType()->GetArrayTypeMdid();
-	IMDId *pmdidCmpOp = colref->RetrieveType()->GetMdidForCmpType(ecmptype);
+	gpos::Ref<IMDId> pmdidColType = colref->RetrieveType()->MDId();
+	gpos::Ref<IMDId> pmdidArrType = colref->RetrieveType()->GetArrayTypeMdid();
+	gpos::Ref<IMDId> pmdidCmpOp =
+		colref->RetrieveType()->GetMdidForCmpType(ecmptype);
 
 	if (!IMDId::IsValid(pmdidColType) || !IMDId::IsValid(pmdidArrType) ||
 		!IMDId::IsValid(pmdidCmpOp))
@@ -772,7 +773,8 @@ CUtils::PexprScalarArrayCmp(CMemoryPool *mp,
 // generate a comparison against Zero
 gpos::Ref<CExpression>
 CUtils::PexprCmpWithZero(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
-						 IMDId *mdid_type_left, IMDType::ECmpType ecmptype)
+						 gpos::Ref<IMDId> mdid_type_left,
+						 IMDType::ECmpType ecmptype)
 {
 	GPOS_ASSERT(pexprLeft->Pop()->FScalar());
 
@@ -807,7 +809,7 @@ CUtils::PexprIDF(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 	gpos::Ref<CExpression> pexprNewLeft = pexprLeft;
 	gpos::Ref<CExpression> pexprNewRight = pexprRight;
 
-	IMDId *pmdidEqOp = CMDAccessorUtils::GetScCmpMdIdConsiderCasts(
+	gpos::Ref<IMDId> pmdidEqOp = CMDAccessorUtils::GetScCmpMdIdConsiderCasts(
 		md_accessor, pexprNewLeft.get(), pexprNewRight.get(), IMDType::EcmptEq);
 	CMDAccessorUtils::ApplyCastsForScCmp(mp, md_accessor, pexprNewLeft,
 										 pexprNewRight, pmdidEqOp);
@@ -826,7 +828,7 @@ CUtils::PexprIDF(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 // generate an Is Distinct From expression
 gpos::Ref<CExpression>
 CUtils::PexprIDF(CMemoryPool *mp, CExpression *pexprLeft,
-				 CExpression *pexprRight, IMDId *mdid_scop)
+				 CExpression *pexprRight, gpos::Ref<IMDId> mdid_scop)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
 	GPOS_ASSERT(nullptr != pexprRight);
@@ -877,7 +879,7 @@ CUtils::PexprINDF(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 
 gpos::Ref<CExpression>
 CUtils::PexprINDF(CMemoryPool *mp, CExpression *pexprLeft,
-				  CExpression *pexprRight, IMDId *mdid_scop)
+				  CExpression *pexprRight, gpos::Ref<IMDId> mdid_scop)
 {
 	GPOS_ASSERT(nullptr != pexprLeft);
 	GPOS_ASSERT(nullptr != pexprRight);
@@ -1661,7 +1663,7 @@ gpos::Ref<CExpression>
 CUtils::PexprScalarOp(CMemoryPool *mp, const CColRef *pcrLeft,
 					  gpos::Ref<CExpression> pexprRight,
 					  const CWStringConst strOp, gpos::Ref<IMDId> mdid_op,
-					  IMDId *return_type_mdid)
+					  gpos::Ref<IMDId> return_type_mdid)
 {
 	GPOS_ASSERT(nullptr != pcrLeft);
 	GPOS_ASSERT(nullptr != pexprRight);
@@ -1833,7 +1835,7 @@ CUtils::PopAggFunc(
 	CMemoryPool *mp, gpos::Ref<IMDId> pmdidAggFunc,
 	const CWStringConst *pstrAggFunc, BOOL is_distinct,
 	EAggfuncStage eaggfuncstage, BOOL fSplit,
-	IMDId *
+	gpos::Ref<IMDId>
 		pmdidResolvedReturnType,  // return type to be used if original return type is ambiguous
 	EAggfuncKind aggkind, gpos::Ref<ULongPtrArray> argtypes)
 {
@@ -1948,7 +1950,7 @@ CUtils::PexprCountStar(CMemoryPool *mp, gpos::Ref<CExpression> pexprLogical)
 	// generate a computed column with count(*) type
 	CScalarAggFunc *popScalarAggFunc =
 		gpos::dyn_cast<CScalarAggFunc>(pexprCountStar->Pop());
-	IMDId *mdid_type = popScalarAggFunc->MdidType();
+	gpos::Ref<IMDId> mdid_type = popScalarAggFunc->MdidType();
 	INT type_modifier = popScalarAggFunc->TypeModifier();
 	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
 	CColRef *pcrComputed = col_factory->PcrCreate(pmdtype, type_modifier);
@@ -1980,7 +1982,7 @@ CUtils::PexprCountStarAndSum(CMemoryPool *mp, const CColRef *colref,
 	// generate a computed column with count(*) type
 	CScalarAggFunc *popScalarAggFunc =
 		gpos::dyn_cast<CScalarAggFunc>(pexprCountStar->Pop());
-	IMDId *mdid_type = popScalarAggFunc->MdidType();
+	gpos::Ref<IMDId> mdid_type = popScalarAggFunc->MdidType();
 	INT type_modifier = popScalarAggFunc->TypeModifier();
 	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
 	CColRef *pcrComputed = col_factory->PcrCreate(pmdtype, type_modifier);
@@ -2515,7 +2517,7 @@ CUtils::FHasGlobalAggFunc(const CExpression *pexprAggProjList)
 
 // return the comparison type for the given mdid
 IMDType::ECmpType
-CUtils::ParseCmpType(IMDId *mdid)
+CUtils::ParseCmpType(gpos::Ref<IMDId> mdid)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
@@ -2524,7 +2526,7 @@ CUtils::ParseCmpType(IMDId *mdid)
 
 // return the comparison type for the given mdid
 IMDType::ECmpType
-CUtils::ParseCmpType(CMDAccessor *md_accessor, IMDId *mdid)
+CUtils::ParseCmpType(CMDAccessor *md_accessor, gpos::Ref<IMDId> mdid)
 {
 	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
 	return md_scalar_op->ParseCmpType();
@@ -3189,7 +3191,7 @@ CUtils::FHasAllDefaultComparisons(const IMDType *pmdtype)
 // determine whether a type is supported for use in contradiction detection.
 // The assumption is that we only compare data of the same type.
 BOOL
-CUtils::FConstrainableType(IMDId *mdid_type)
+CUtils::FConstrainableType(gpos::Ref<IMDId> mdid_type)
 {
 	if (FIntType(mdid_type))
 	{
@@ -3218,7 +3220,7 @@ CUtils::FConstrainableType(IMDId *mdid_type)
 
 // determine whether a type is an integer type
 BOOL
-CUtils::FIntType(IMDId *mdid_type)
+CUtils::FIntType(gpos::Ref<IMDId> mdid_type)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	IMDType::ETypeInfo type_info =
@@ -3809,10 +3811,11 @@ CUtils::UlPcrIndexContainingSet(CColRefSetArray *pdrgpcrs,
 // cast the input expression to the destination mdid
 gpos::Ref<CExpression>
 CUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor, CExpression *pexpr,
-				  IMDId *mdid_dest)
+				  gpos::Ref<IMDId> mdid_dest)
 {
 	GPOS_ASSERT(nullptr != mdid_dest);
-	IMDId *mdid_src = gpos::dyn_cast<CScalar>(pexpr->Pop())->MdidType();
+	gpos::Ref<IMDId> mdid_src =
+		gpos::dyn_cast<CScalar>(pexpr->Pop())->MdidType();
 	GPOS_ASSERT(
 		CMDAccessorUtils::FCastExists(md_accessor, mdid_src, mdid_dest));
 
@@ -4486,7 +4489,7 @@ CUtils::PexprLimit(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 
 // generate part oid
 BOOL
-CUtils::FGeneratePartOid(IMDId *mdid)
+CUtils::FGeneratePartOid(gpos::Ref<IMDId> mdid)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	const IMDRelation *pmdrel = md_accessor->RetrieveRel(mdid);
@@ -4833,9 +4836,9 @@ CUtils::PexprMatchEqualityOrINDF(
 			continue;
 		}
 
-		IMDId *pmdidTypeOuter =
+		gpos::Ref<IMDId> pmdidTypeOuter =
 			gpos::dyn_cast<CScalar>(pexprPredOuter->Pop())->MdidType();
-		IMDId *pmdidTypeInner =
+		gpos::Ref<IMDId> pmdidTypeInner =
 			gpos::dyn_cast<CScalar>(pexprPredInner->Pop())->MdidType();
 		if (!pmdidTypeOuter->Equals(pmdidTypeInner))
 		{
@@ -4983,7 +4986,7 @@ CUtils::Equals(const IMdIdArray *mdids, const IMdIdArray *other_mdids)
 }
 
 BOOL
-CUtils::Equals(const IMDId *mdid, const IMDId *other_mdid)
+CUtils::Equals(const gpos::Ref<IMDId> mdid, const gpos::Ref<IMDId> other_mdid)
 {
 	if ((mdid == nullptr) ^ (other_mdid == nullptr))
 	{

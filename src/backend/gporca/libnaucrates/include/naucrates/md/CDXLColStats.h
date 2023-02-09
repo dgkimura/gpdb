@@ -87,7 +87,7 @@ public:
 	~CDXLColStats() override;
 
 	// the metadata id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// relation name
 	CMDName Mdname() const override;
@@ -146,7 +146,7 @@ public:
 
 	// dummy colstats
 	static gpos::Ref<CDXLColStats> CreateDXLDummyColStats(CMemoryPool *mp,
-														  IMDId *mdid,
+														  gpos::Ref<IMDId> mdid,
 														  CMDName *mdname,
 														  CDouble width);
 };

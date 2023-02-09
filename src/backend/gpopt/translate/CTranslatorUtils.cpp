@@ -94,7 +94,7 @@ extern bool optimizer_multilevel_partitioning;
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLIndexDescr>
 CTranslatorUtils::GetIndexDescr(CMemoryPool *mp, CMDAccessor *md_accessor,
-								IMDId *mdid)
+								gpos::Ref<IMDId> mdid)
 {
 	const IMDIndex *index = md_accessor->RetrieveIndex(mdid);
 	const CWStringConst *index_name = index->Mdname().GetMDName();
@@ -569,11 +569,9 @@ CTranslatorUtils::GetColumnDescriptorsFromRecord(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLColDescrArray>
-CTranslatorUtils::GetColumnDescriptorsFromBase(CMemoryPool *mp,
-											   CIdGenerator *id_generator,
-											   IMDId *mdid_return_type,
-											   INT type_modifier,
-											   CMDName *pmdName)
+CTranslatorUtils::GetColumnDescriptorsFromBase(
+	CMemoryPool *mp, CIdGenerator *id_generator,
+	gpos::Ref<IMDId> mdid_return_type, INT type_modifier, CMDName *pmdName)
 {
 	gpos::Ref<CDXLColDescrArray> column_descrs =
 		GPOS_NEW(mp) CDXLColDescrArray(mp);
@@ -649,7 +647,7 @@ CTranslatorUtils::ExpandCompositeType(CMemoryPool *mp, CMDAccessor *md_accessor,
 	GPOS_ASSERT(nullptr != type);
 	GPOS_ASSERT(type->IsComposite());
 
-	IMDId *rel_mdid = type->GetBaseRelMdid();
+	gpos::Ref<IMDId> rel_mdid = type->GetBaseRelMdid();
 	const IMDRelation *rel = md_accessor->RetrieveRel(rel_mdid);
 	GPOS_ASSERT(nullptr != rel);
 
@@ -1527,7 +1525,8 @@ CTranslatorUtils::GetColId(INT index, IntToUlongMap *colid_map)
 //---------------------------------------------------------------------------
 ULONG
 CTranslatorUtils::GetColId(ULONG query_level, INT varno, INT var_attno,
-						   IMDId *mdid, CMappingVarColId *var_colid_mapping)
+						   gpos::Ref<IMDId> mdid,
+						   CMappingVarColId *var_colid_mapping)
 {
 	OID oid = gpos::dyn_cast<CMDIdGPDB>(mdid)->Oid();
 	Var *var = gpdb::MakeVar(varno, var_attno, oid, -1, 0);
@@ -1995,7 +1994,7 @@ CTranslatorUtils::CreateDXLProjElemConstNULL(CMemoryPool *mp,
 gpos::Ref<CDXLNode>
 CTranslatorUtils::CreateDXLProjElemConstNULL(CMemoryPool *mp,
 											 CMDAccessor *md_accessor,
-											 IMDId *mdid, ULONG colid,
+											 gpos::Ref<IMDId> mdid, ULONG colid,
 											 const WCHAR *col_name)
 {
 	CHAR *column_name =
@@ -2018,7 +2017,7 @@ CTranslatorUtils::CreateDXLProjElemConstNULL(CMemoryPool *mp,
 gpos::Ref<CDXLNode>
 CTranslatorUtils::CreateDXLProjElemConstNULL(CMemoryPool *mp,
 											 CMDAccessor *md_accessor,
-											 IMDId *mdid, ULONG colid,
+											 gpos::Ref<IMDId> mdid, ULONG colid,
 											 CHAR *alias_name)
 {
 	// get the id and alias for the proj elem

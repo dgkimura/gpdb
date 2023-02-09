@@ -160,7 +160,7 @@ CDXLScalarAggref::GetOpNameStr() const
 //		Returns function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarAggref::GetDXLAggFuncMDid() const
 {
 	return m_agg_func_mdid.get();
@@ -175,7 +175,7 @@ CDXLScalarAggref::GetDXLAggFuncMDid() const
 //		Returns resolved type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarAggref::GetDXLResolvedRetTypeMDid() const
 {
 	return m_resolved_rettype_mdid.get();

@@ -137,8 +137,8 @@ private:
 	gpos::Ref<CExpression> PexprLogicalSetOp(const CDXLNode *pdxlnLgProject);
 
 	// return a project element on a cast expression
-	gpos::Ref<CExpression> PexprCastPrjElem(IMDId *pmdidSource,
-											IMDId *mdid_dest,
+	gpos::Ref<CExpression> PexprCastPrjElem(gpos::Ref<IMDId> pmdidSource,
+											gpos::Ref<IMDId> mdid_dest,
 											const CColRef *pcrToCast,
 											CColRef *pcrToReturn);
 
@@ -164,7 +164,8 @@ private:
 					   INT type_modifier, BOOL fStoreMapping, ULONG colid);
 
 	// check if we currently support the casting of such column types
-	static BOOL FCastingUnknownType(IMDId *pmdidSource, IMDId *mdid_dest);
+	static BOOL FCastingUnknownType(gpos::Ref<IMDId> pmdidSource,
+									gpos::Ref<IMDId> mdid_dest);
 
 	// translate a DXL logical get into an expr logical get
 	gpos::Ref<CExpression> PexprLogicalGet(const CDXLNode *pdxlnLgGet);

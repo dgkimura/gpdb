@@ -55,10 +55,10 @@ public:
 	virtual BOOL IsUpdate() const = 0;
 
 	// relation mdid
-	virtual IMDId *GetRelMdId() const = 0;
+	virtual gpos::Ref<IMDId> GetRelMdId() const = 0;
 
 	// function mdid
-	virtual IMDId *FuncMdId() const = 0;
+	virtual gpos::Ref<IMDId> FuncMdId() const = 0;
 
 	// is trigger enabled
 	virtual BOOL IsEnabled() const = 0;

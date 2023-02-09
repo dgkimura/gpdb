@@ -171,7 +171,7 @@ CXformJoin2IndexApply::CreateHomogeneousBtreeIndexApplyAlternatives(
 
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
-		IMDId *pmdidIndex = pmdrel->IndexMDidAt(ul);
+		gpos::Ref<IMDId> pmdidIndex = pmdrel->IndexMDidAt(ul);
 		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdidIndex);
 
 		CreateAlternativesForBtreeIndex(

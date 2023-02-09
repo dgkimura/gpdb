@@ -48,7 +48,7 @@ public:
 	}
 
 	// mdid of the relation
-	virtual IMDId *GetRelMdId() const = 0;
+	virtual gpos::Ref<IMDId> GetRelMdId() const = 0;
 
 	// the scalar expression of the check constraint
 	virtual gpos::Ref<CExpression> GetCheckConstraintExpr(

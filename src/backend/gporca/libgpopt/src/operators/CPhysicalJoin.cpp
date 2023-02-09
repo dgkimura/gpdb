@@ -350,7 +350,7 @@ CPhysicalJoin::PedInnerHashedFromOuterHashed(
 						CUtils::FScalarIdent(pexprMatching));
 			if (fSuccess)
 			{
-				IMDId *pmdidTypeInner =
+				gpos::Ref<IMDId> pmdidTypeInner =
 					gpos::dyn_cast<CScalar>(pexprMatching->Pop())->MdidType();
 				CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 				if (md_accessor->RetrieveType(pmdidTypeInner)->IsHashable())
@@ -592,7 +592,7 @@ CPhysicalJoin::FHashJoinCompatible(
 
 	CExpression *pexprPredOuter = nullptr;
 	CExpression *pexprPredInner = nullptr;
-	IMDId *mdid_scop = nullptr;
+	gpos::Ref<IMDId> mdid_scop = nullptr;
 	if (CPredicateUtils::IsEqualityOp(pexprPred))
 	{
 		pexprPredOuter = (*pexprPred)[0];
@@ -612,9 +612,9 @@ CPhysicalJoin::FHashJoinCompatible(
 		return false;
 	}
 
-	IMDId *pmdidTypeOuter =
+	gpos::Ref<IMDId> pmdidTypeOuter =
 		gpos::dyn_cast<CScalar>(pexprPredOuter->Pop())->MdidType();
-	IMDId *pmdidTypeInner =
+	gpos::Ref<IMDId> pmdidTypeInner =
 		gpos::dyn_cast<CScalar>(pexprPredInner->Pop())->MdidType();
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -650,7 +650,7 @@ CPhysicalJoin::FMergeJoinCompatible(
 
 	CExpression *pexprPredOuter = nullptr;
 	CExpression *pexprPredInner = nullptr;
-	IMDId *mdid_scop = nullptr;
+	gpos::Ref<IMDId> mdid_scop = nullptr;
 
 	// Only merge join between ScalarIdents of the same types is currently supported
 	if (CPredicateUtils::FEqIdentsOfSameType(pexprPred))
@@ -666,9 +666,9 @@ CPhysicalJoin::FMergeJoinCompatible(
 		return false;
 	}
 
-	IMDId *pmdidTypeOuter =
+	gpos::Ref<IMDId> pmdidTypeOuter =
 		gpos::dyn_cast<CScalar>(pexprPredOuter->Pop())->MdidType();
-	IMDId *pmdidTypeInner =
+	gpos::Ref<IMDId> pmdidTypeInner =
 		gpos::dyn_cast<CScalar>(pexprPredInner->Pop())->MdidType();
 
 	CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -721,7 +721,7 @@ CPhysicalJoin::AlignJoinKeyOuterInner(CExpression *pexprPred,
 #endif	// GPOS_DEBUG
 									  CExpression **ppexprKeyOuter,
 									  CExpression **ppexprKeyInner,
-									  IMDId **mdid_scop)
+									  gpos::Ref<IMDId> *mdid_scop)
 {
 	// we should not be here if there are outer references
 	GPOS_ASSERT(nullptr != ppexprKeyOuter);

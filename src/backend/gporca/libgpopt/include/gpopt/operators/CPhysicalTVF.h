@@ -75,14 +75,14 @@ public:
 	}
 
 	// function mdid
-	IMDId *
+	gpos::Ref<IMDId>
 	FuncMdId() const
 	{
 		return m_func_mdid.get();
 	}
 
 	// return type
-	IMDId *
+	gpos::Ref<IMDId>
 	ReturnTypeMdId() const
 	{
 		return m_return_type_mdid.get();

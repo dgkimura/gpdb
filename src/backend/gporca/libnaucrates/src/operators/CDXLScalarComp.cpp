@@ -73,7 +73,7 @@ CDXLScalarComp::GetComparisonOpName() const
 //		Comparison operator id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarComp::MDId() const
 {
 	return m_mdid.get();

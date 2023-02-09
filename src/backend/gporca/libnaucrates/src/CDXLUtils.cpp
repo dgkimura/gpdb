@@ -703,7 +703,7 @@ gpos::Ref<IDatum>
 CDXLUtils::GetDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
 					const CDXLDatum *dxl_datum)
 {
-	IMDId *mdid = dxl_datum->MDId();
+	gpos::Ref<IMDId> mdid = dxl_datum->MDId();
 	return md_accessor->RetrieveType(mdid)->GetDatumForDXLDatum(mp, dxl_datum);
 }
 
@@ -981,7 +981,7 @@ CDXLUtils::SerializeMetadata(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 CWStringDynamic *
-CDXLUtils::SerializeMetadata(CMemoryPool *mp, const IMDId *mdid,
+CDXLUtils::SerializeMetadata(CMemoryPool *mp, const gpos::Ref<IMDId> mdid,
 							 BOOL serialize_header_footer, BOOL indentation)
 {
 	GPOS_ASSERT(nullptr != mp);

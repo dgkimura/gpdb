@@ -79,13 +79,13 @@ public:
 	}
 
 	// source type id
-	IMDId *MdidSrc() const;
+	gpos::Ref<IMDId> MdidSrc() const;
 
 	// destination type id
-	IMDId *MdidDest() const;
+	gpos::Ref<IMDId> MdidDest() const;
 
 	// equality check
-	BOOL Equals(const IMDId *mdid) const override;
+	BOOL Equals(const gpos::Ref<IMDId> mdid) const override;
 
 	// computes the hash value for the metadata id
 	ULONG
@@ -113,7 +113,7 @@ public:
 
 	// const converter
 	static const CMDIdCast *
-	CastMdid(const IMDId *mdid)
+	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidCastFunc == mdid->MdidType());
 
@@ -122,7 +122,7 @@ public:
 
 	// non-const converter
 	static CMDIdCast *
-	CastMdid(IMDId *mdid)
+	CastMdid(gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidCastFunc == mdid->MdidType());
 

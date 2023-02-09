@@ -61,14 +61,14 @@ public:
 	}
 
 	// operator id
-	virtual IMDId *
+	virtual gpos::Ref<IMDId>
 	MdIdOp() const
 	{
 		return m_mdid_op.get();
 	}
 
 	// return type
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return m_mdid_type.get();

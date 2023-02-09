@@ -173,7 +173,7 @@ CDXLScalarWindowRef::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarWindowRef::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	IMDId *mdid =
+	gpos::Ref<IMDId> mdid =
 		md_accessor->RetrieveFunc(m_func_mdid.get())->GetResultTypeMdid();
 	return (IMDType::EtiBool ==
 			md_accessor->RetrieveType(mdid)->GetDatumType());

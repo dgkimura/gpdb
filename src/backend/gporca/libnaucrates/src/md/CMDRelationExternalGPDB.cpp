@@ -143,7 +143,7 @@ CMDRelationExternalGPDB::~CMDRelationExternalGPDB()
 //		Returns the metadata id of this relation
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationExternalGPDB::MDId() const
 {
 	return m_mdid.get();
@@ -281,7 +281,7 @@ CMDRelationExternalGPDB::NonDroppedColAt(ULONG pos) const
 	return *pul;
 }
 
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationExternalGPDB::GetDistrOpfamilyAt(ULONG pos) const
 {
 	if (m_distr_opfamilies == nullptr)
@@ -359,7 +359,7 @@ CMDRelationExternalGPDB::IsRejectLimitInRows() const
 //		Format error table mdid
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationExternalGPDB::GetFormatErrTableMdid() const
 {
 	return m_mdid_fmt_err_table.get();
@@ -479,7 +479,7 @@ CMDRelationExternalGPDB::GetDistrColAt(ULONG pos) const
 //		Returns the id of the index at the specified position of the index array
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationExternalGPDB::IndexMDidAt(ULONG pos) const
 {
 	return (*m_mdindex_info_array)[pos]->MDId();
@@ -493,7 +493,7 @@ CMDRelationExternalGPDB::IndexMDidAt(ULONG pos) const
 //		Returns the id of the trigger at the specified position of the trigger array
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationExternalGPDB::TriggerMDidAt(ULONG pos) const
 {
 	return (*m_mdid_trigger_array)[pos].get();
@@ -522,7 +522,7 @@ CMDRelationExternalGPDB::CheckConstraintCount() const
 //		the check constraint array
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationExternalGPDB::CheckConstraintMDidAt(ULONG pos) const
 {
 	return (*m_mdid_check_constraint_array)[pos].get();

@@ -113,11 +113,11 @@ CCastUtils::PcrExtractFromScIdOrCastScId(CExpression *pexpr)
 // cast the input column reference to the destination mdid
 gpos::Ref<CExpression>
 CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
-					  const CColRef *colref, IMDId *mdid_dest)
+					  const CColRef *colref, gpos::Ref<IMDId> mdid_dest)
 {
 	GPOS_ASSERT(nullptr != mdid_dest);
 
-	IMDId *mdid_src = colref->RetrieveType()->MDId();
+	gpos::Ref<IMDId> mdid_src = colref->RetrieveType()->MDId();
 	GPOS_ASSERT(
 		CMDAccessorUtils::FCastExists(md_accessor, mdid_src, mdid_dest));
 
@@ -249,9 +249,9 @@ CCastUtils::PexprAddCast(CMemoryPool *mp, CExpression *pexprPred)
 	CExpression *pexprLeft = (*pexprChild)[0];
 	CExpression *pexprRight = (*pexprChild)[1];
 
-	IMDId *mdid_type_left =
+	gpos::Ref<IMDId> mdid_type_left =
 		gpos::dyn_cast<CScalar>(pexprLeft->Pop())->MdidType();
-	IMDId *mdid_type_right =
+	gpos::Ref<IMDId> mdid_type_right =
 		gpos::dyn_cast<CScalar>(pexprRight->Pop())->MdidType();
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -304,9 +304,10 @@ CCastUtils::PexprAddCast(CMemoryPool *mp, CExpression *pexprPred)
 // add explicit casting on the input expression to the destination type
 gpos::Ref<CExpression>
 CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
-					  CExpression *pexpr, IMDId *mdid_dest)
+					  CExpression *pexpr, gpos::Ref<IMDId> mdid_dest)
 {
-	IMDId *mdid_src = gpos::dyn_cast<CScalar>(pexpr->Pop())->MdidType();
+	gpos::Ref<IMDId> mdid_src =
+		gpos::dyn_cast<CScalar>(pexpr->Pop())->MdidType();
 	const IMDCast *pmdcast = md_accessor->Pmdcast(mdid_src, mdid_dest);
 
 	;

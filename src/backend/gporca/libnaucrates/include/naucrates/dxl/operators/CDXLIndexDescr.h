@@ -49,7 +49,7 @@ public:
 
 	// accessors
 	const CMDName *MdName() const;
-	IMDId *MDId() const;
+	gpos::Ref<IMDId> MDId() const;
 
 	// serialize the operator to a DXL document
 	void SerializeToDXL(CXMLSerializer *) const;

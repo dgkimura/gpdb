@@ -123,7 +123,7 @@ CMDRelationCtasGPDB::~CMDRelationCtasGPDB()
 //		Returns the metadata id of this relation
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationCtasGPDB::MDId() const
 {
 	return m_mdid.get();
@@ -272,7 +272,7 @@ CMDRelationCtasGPDB::GetDistrColAt(ULONG pos) const
 	return GetMdCol(distr_key_pos);
 }
 
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationCtasGPDB::GetDistrOpfamilyAt(ULONG pos) const
 {
 	if (m_distr_opfamilies == nullptr)

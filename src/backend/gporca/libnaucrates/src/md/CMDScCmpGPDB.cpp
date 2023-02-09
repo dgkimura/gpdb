@@ -74,7 +74,7 @@ CMDScCmpGPDB::~CMDScCmpGPDB()
 //		Mdid of comparison object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScCmpGPDB::MDId() const
 {
 	return m_mdid.get();
@@ -102,7 +102,7 @@ CMDScCmpGPDB::Mdname() const
 //		Left type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScCmpGPDB::GetLeftMdid() const
 {
 	return m_mdid_left.get();
@@ -116,7 +116,7 @@ CMDScCmpGPDB::GetLeftMdid() const
 //		Destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScCmpGPDB::GetRightMdid() const
 {
 	return m_mdid_right.get();
@@ -130,7 +130,7 @@ CMDScCmpGPDB::GetRightMdid() const
 //		Cast function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDScCmpGPDB::MdIdOp() const
 {
 	return m_mdid_op.get();

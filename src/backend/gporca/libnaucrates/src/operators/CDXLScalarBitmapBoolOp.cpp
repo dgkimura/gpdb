@@ -74,7 +74,7 @@ CDXLScalarBitmapBoolOp::GetDXLOperator() const
 //		Return type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarBitmapBoolOp::MdidType() const
 {
 	return m_mdid_type.get();

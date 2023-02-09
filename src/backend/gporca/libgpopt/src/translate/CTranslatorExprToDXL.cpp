@@ -1302,10 +1302,10 @@ CTranslatorExprToDXL::PdxlnIndexDescForPart(CMemoryPool *m_mp,
 											const CWStringConst *index_name)
 {
 	// iterate over each index in the child to find the matching index
-	IMDId *found_index = nullptr;
+	gpos::Ref<IMDId> found_index = nullptr;
 	for (ULONG j = 0; j < part->IndexCount(); ++j)
 	{
-		IMDId *pmdidPartIndex = part->IndexMDidAt(j);
+		gpos::Ref<IMDId> pmdidPartIndex = part->IndexMDidAt(j);
 		if (child_index_mdids_set->Contains(pmdidPartIndex))
 		{
 			found_index = pmdidPartIndex;
@@ -4516,7 +4516,7 @@ CTranslatorExprToDXL::PdxlnHashJoin(CExpression *pexprHJ,
 		{
 			CExpression *pexprPredOuter;
 			CExpression *pexprPredInner;
-			IMDId *mdid_scop;
+			gpos::Ref<IMDId> mdid_scop;
 			CPhysicalJoin::AlignJoinKeyOuterInner(
 				pexprPred.get(), pexprOuterChild, pexprInnerChild,
 				&pexprPredOuter, &pexprPredInner, &mdid_scop);
@@ -5546,7 +5546,7 @@ CTranslatorExprToDXL::PdxlnScOp(CExpression *pexprOp)
 	gpos::Ref<IMDId> mdid_op = pscop->MdIdOp();
 	;
 
-	IMDId *return_type_mdid = pscop->GetReturnTypeMdId();
+	gpos::Ref<IMDId> return_type_mdid = pscop->GetReturnTypeMdId();
 	if (nullptr != return_type_mdid)
 	{
 		;
@@ -5776,7 +5776,7 @@ CTranslatorExprToDXL::PdxlnScAggref(CExpression *pexprAggFunc)
 	gpos::Ref<IMDId> pmdidAggFunc = popScAggFunc->MDId();
 	;
 
-	IMDId *resolved_rettype = nullptr;
+	gpos::Ref<IMDId> resolved_rettype = nullptr;
 	if (popScAggFunc->FHasAmbiguousReturnType())
 	{
 		// Agg has an ambiguous return type, use the resolved type instead
@@ -6026,7 +6026,7 @@ CTranslatorExprToDXL::PdxlnScBooleanTest(CExpression *pexprScBooleanTest)
 	CScalarBooleanTest *popBoolTest =
 		gpos::dyn_cast<CScalarBooleanTest>(pexprScBooleanTest->Pop());
 	EdxlBooleanTestType edxlbooltest =
-		(EdxlBooleanTestType) (rgulBoolTestMapping[popBoolTest->Ebt()][1]);
+		(EdxlBooleanTestType)(rgulBoolTestMapping[popBoolTest->Ebt()][1]);
 	gpos::Ref<CDXLNode> pdxlnScBooleanTest = GPOS_NEW(m_mp) CDXLNode(
 		m_mp, GPOS_NEW(m_mp) CDXLScalarBooleanTest(m_mp, edxlbooltest));
 
@@ -6311,14 +6311,14 @@ CTranslatorExprToDXL::GetWindowFrame(CWindowFrame *pwf)
 		{CWindowFrame::EfseMatchingOthers, EdxlfesGroup},
 		{CWindowFrame::EfesTies, EdxlfesTies}};
 
-	EdxlFrameSpec edxlfs = (EdxlFrameSpec) (rgulSpecMapping[pwf->Efs()][1]);
+	EdxlFrameSpec edxlfs = (EdxlFrameSpec)(rgulSpecMapping[pwf->Efs()][1]);
 	EdxlFrameBoundary edxlfbLeading =
-		(EdxlFrameBoundary) (rgulBoundaryMapping[pwf->EfbLeading()][1]);
+		(EdxlFrameBoundary)(rgulBoundaryMapping[pwf->EfbLeading()][1]);
 	EdxlFrameBoundary edxlfbTrailing =
-		(EdxlFrameBoundary) (rgulBoundaryMapping[pwf->EfbTrailing()][1]);
+		(EdxlFrameBoundary)(rgulBoundaryMapping[pwf->EfbTrailing()][1]);
 	EdxlFrameExclusionStrategy frame_exc_strategy =
-		(EdxlFrameExclusionStrategy) (rgulExclusionStrategyMapping[pwf->Efes()]
-																  [1]);
+		(EdxlFrameExclusionStrategy)(
+			rgulExclusionStrategyMapping[pwf->Efes()][1]);
 
 	// translate scalar expressions representing leading and trailing frame edges
 	gpos::Ref<CDXLNode> pdxlnLeading = GPOS_NEW(m_mp)

@@ -119,7 +119,7 @@ CXformSelect2DynamicIndexGet::Transform(CXformContext *pxfctxt,
 
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
-		IMDId *pmdidIndex = pmdrel->IndexMDidAt(ul);
+		gpos::Ref<IMDId> pmdidIndex = pmdrel->IndexMDidAt(ul);
 		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdidIndex);
 		gpos::Ref<CExpression> pexprDynamicIndexGet =
 			CXformUtils::PexprLogicalIndexGet(

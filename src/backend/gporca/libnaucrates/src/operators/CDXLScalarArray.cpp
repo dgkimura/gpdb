@@ -89,7 +89,7 @@ CDXLScalarArray::GetOpNameStr() const
 //		Id of base element type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarArray::ElementTypeMDid() const
 {
 	return m_elem_type_mdid.get();
@@ -103,7 +103,7 @@ CDXLScalarArray::ElementTypeMDid() const
 //		Id of array type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarArray::ArrayTypeMDid() const
 {
 	return m_array_type_mdid.get();

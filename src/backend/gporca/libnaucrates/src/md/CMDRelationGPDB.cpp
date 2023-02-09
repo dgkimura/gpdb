@@ -155,7 +155,7 @@ CMDRelationGPDB::~CMDRelationGPDB()
 //		Returns the metadata id of this relation
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationGPDB::MDId() const
 {
 	return m_mdid.get();
@@ -517,7 +517,7 @@ CMDRelationGPDB::GetDistrColAt(ULONG pos) const
 	return GetMdCol(distr_key_pos);
 }
 
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationGPDB::GetDistrOpfamilyAt(ULONG pos) const
 {
 	if (m_distr_opfamilies == nullptr)
@@ -551,7 +551,7 @@ CMDRelationGPDB::ConvertHashToRandom() const
 //		Returns the id of the index at the specified position of the index array
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationGPDB::IndexMDidAt(ULONG pos) const
 {
 	return (*m_mdindex_info_array)[pos]->MDId();
@@ -565,7 +565,7 @@ CMDRelationGPDB::IndexMDidAt(ULONG pos) const
 //		Returns the id of the trigger at the specified position of the trigger array
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationGPDB::TriggerMDidAt(ULONG pos) const
 {
 	return (*m_mdid_trigger_array)[pos].get();
@@ -594,7 +594,7 @@ CMDRelationGPDB::CheckConstraintCount() const
 //		the check constraint array
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDRelationGPDB::CheckConstraintMDidAt(ULONG pos) const
 {
 	return (*m_mdid_check_constraint_array)[pos].get();

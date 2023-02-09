@@ -119,13 +119,13 @@ CMDTypeInt8GPDB::CreateInt8Datum(CMemoryPool *mp, LINT value,
 //		Returns the metadata id of this type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeInt8GPDB::MDId() const
 {
 	return m_mdid.get();
 }
 
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeInt8GPDB::GetDistrOpfamilyMdid() const
 {
 	if (GPOS_FTRACE(EopttraceUseLegacyOpfamilies))
@@ -160,7 +160,7 @@ CMDTypeInt8GPDB::Mdname() const
 //		Return mdid of specified comparison operator type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeInt8GPDB::GetMdidForCmpType(ECmpType cmp_type) const
 {
 	switch (cmp_type)
@@ -191,7 +191,7 @@ CMDTypeInt8GPDB::GetMdidForCmpType(ECmpType cmp_type) const
 //		Return mdid of specified aggregate type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeInt8GPDB::GetMdidForAggType(EAggType agg_type) const
 {
 	switch (agg_type)

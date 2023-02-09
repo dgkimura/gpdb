@@ -136,12 +136,12 @@ public:
 	const CWStringConst *PstrFunc() const;
 
 	// func id
-	IMDId *FuncMdId() const;
+	gpos::Ref<IMDId> FuncMdId() const;
 
 	INT TypeModifier() const override;
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// function stability
 	IMDFunction::EFuncStbl EfsGetFunctionStability() const;

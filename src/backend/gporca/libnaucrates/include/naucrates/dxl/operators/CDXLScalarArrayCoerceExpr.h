@@ -66,7 +66,7 @@ public:
 	}
 
 	// return metadata id of element coerce function
-	IMDId *
+	gpos::Ref<IMDId>
 	GetCoerceFuncMDid() const
 	{
 		return m_coerce_func_mdid.get();

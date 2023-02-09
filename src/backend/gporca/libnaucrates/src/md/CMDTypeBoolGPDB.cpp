@@ -97,7 +97,7 @@ CMDTypeBoolGPDB::~CMDTypeBoolGPDB()
 //		Return mdid of specified comparison operator type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeBoolGPDB::GetMdidForCmpType(ECmpType cmp_type) const
 {
 	switch (cmp_type)
@@ -128,7 +128,7 @@ CMDTypeBoolGPDB::GetMdidForCmpType(ECmpType cmp_type) const
 //		Return mdid of specified aggregate type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeBoolGPDB::GetMdidForAggType(EAggType agg_type) const
 {
 	switch (agg_type)
@@ -172,13 +172,13 @@ CMDTypeBoolGPDB::CreateBoolDatum(CMemoryPool *mp, BOOL bool_val,
 //		Returns the metadata id of this type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeBoolGPDB::MDId() const
 {
 	return m_mdid.get();
 }
 
-IMDId *
+gpos::Ref<IMDId>
 CMDTypeBoolGPDB::GetDistrOpfamilyMdid() const
 {
 	if (GPOS_FTRACE(EopttraceUseLegacyOpfamilies))

@@ -103,7 +103,7 @@ CMDFunctionGPDB::InitDXLTokenArrays()
 //		Func id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDFunctionGPDB::MDId() const
 {
 	return m_mdid.get();
@@ -132,7 +132,7 @@ CMDFunctionGPDB::Mdname() const
 //		Type id of result
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDFunctionGPDB::GetResultTypeMdid() const
 {
 	return m_mdid_type_result.get();

@@ -84,7 +84,7 @@ CLogical::~CLogical()
 gpos::Ref<CColRefArray>
 CLogical::PdrgpcrCreateMapping(CMemoryPool *mp,
 							   const CColumnDescriptorArray *pdrgpcoldesc,
-							   ULONG ulOpSourceId, IMDId *mdid_table)
+							   ULONG ulOpSourceId, gpos::Ref<IMDId> mdid_table)
 {
 	// get column factory from optimizer context object
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
@@ -731,7 +731,8 @@ CLogical::PpcDeriveConstraintFromTable(CMemoryPool *mp,
 	const ULONG ulCheckConstraint = pmdrel->CheckConstraintCount();
 	for (ULONG ul = 0; ul < ulCheckConstraint; ul++)
 	{
-		IMDId *pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(ul);
+		gpos::Ref<IMDId> pmdidCheckConstraint =
+			pmdrel->CheckConstraintMDidAt(ul);
 
 		const IMDCheckConstraint *pmdCheckConstraint =
 			md_accessor->RetrieveCheckConstraints(pmdidCheckConstraint);

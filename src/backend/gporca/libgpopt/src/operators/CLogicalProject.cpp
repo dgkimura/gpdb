@@ -165,7 +165,7 @@ CLogicalProject::ExtractConstraintFromScConst(
 	CColRef *colref = popPrEl->Pcr();
 	CExpression *pexprScalar = (*pexprPrEl)[0];
 
-	IMDId *mdid_type = colref->RetrieveType()->MDId();
+	gpos::Ref<IMDId> mdid_type = colref->RetrieveType()->MDId();
 
 	if (EopScalarConst != pexprScalar->Pop()->Eopid() ||
 		!CUtils::FConstrainableType(mdid_type))

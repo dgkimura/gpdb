@@ -87,7 +87,7 @@ CMDIdRelStats::GetBuffer() const
 //		Returns the base relation id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIdRelStats::GetRelMdId() const
 {
 	return m_rel_mdid.get();
@@ -102,7 +102,7 @@ CMDIdRelStats::GetRelMdId() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdRelStats::Equals(const IMDId *mdid) const
+CMDIdRelStats::Equals(const gpos::Ref<IMDId> mdid) const
 {
 	if (nullptr == mdid || EmdidRelStats != mdid->MdidType())
 	{

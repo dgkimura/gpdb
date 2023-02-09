@@ -93,9 +93,9 @@ public:
 
 	const CWStringConst *GetOpNameStr() const override;
 
-	IMDId *GetDXLAggFuncMDid() const;
+	gpos::Ref<IMDId> GetDXLAggFuncMDid() const;
 
-	IMDId *GetDXLResolvedRetTypeMDid() const;
+	gpos::Ref<IMDId> GetDXLResolvedRetTypeMDid() const;
 
 	const CWStringConst *GetDXLStrAggStage() const;
 

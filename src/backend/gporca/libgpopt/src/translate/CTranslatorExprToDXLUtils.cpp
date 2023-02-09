@@ -115,11 +115,9 @@ CTranslatorExprToDXLUtils::PdxlnBoolConst(CMemoryPool *mp,
 
 // construct a DXL node for the part key portion of the list partition filter
 gpos::Ref<CDXLNode>
-CTranslatorExprToDXLUtils::PdxlnListFilterPartKey(CMemoryPool *mp,
-												  CMDAccessor *md_accessor,
-												  CExpression *pexprPartKey,
-												  IMDId *pmdidTypePartKey,
-												  ULONG ulPartLevel)
+CTranslatorExprToDXLUtils::PdxlnListFilterPartKey(
+	CMemoryPool *mp, CMDAccessor *md_accessor, CExpression *pexprPartKey,
+	gpos::Ref<IMDId> pmdidTypePartKey, ULONG ulPartLevel)
 {
 	GPOS_ASSERT(nullptr != pexprPartKey);
 	GPOS_ASSERT(nullptr != pmdidTypePartKey);
@@ -144,16 +142,16 @@ CTranslatorExprToDXLUtils::PdxlnListFilterPartKey(CMemoryPool *mp,
 	else if (CScalarIdent::FCastedScId(pexprPartKey) ||
 			 CScalarIdent::FAllowedFuncScId(pexprPartKey))
 	{
-		IMDId *pmdidDestElem = nullptr;
-		IMDId *pmdidArrayCastFunc = nullptr;
+		gpos::Ref<IMDId> pmdidDestElem = nullptr;
+		gpos::Ref<IMDId> pmdidArrayCastFunc = nullptr;
 		ExtractCastFuncMdids(pexprPartKey->Pop(), &pmdidDestElem,
 							 &pmdidArrayCastFunc);
-		IMDId *pmdidDestArray =
+		gpos::Ref<IMDId> pmdidDestArray =
 			md_accessor->RetrieveType(pmdidDestElem)->GetArrayTypeMdid();
 
 		CScalarIdent *pexprScalarIdent =
 			gpos::dyn_cast<CScalarIdent>((*pexprPartKey)[0]->Pop());
-		IMDId *pmdidSrcElem = pexprScalarIdent->MdidType();
+		gpos::Ref<IMDId> pmdidSrcElem = pexprScalarIdent->MdidType();
 		gpos::Ref<IMDId> pmdidSrcArray =
 			md_accessor->RetrieveType(pmdidSrcElem)->GetArrayTypeMdid();
 		;
@@ -195,10 +193,11 @@ CTranslatorExprToDXLUtils::PdxlnListFilterPartKey(CMemoryPool *mp,
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnListFilterScCmp(
 	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnPartKey,
-	CDXLNode *pdxlnOther, IMDId *pmdidTypePartKey, IMDId *pmdidTypeOther,
-	IMDType::ECmpType cmp_type, ULONG ulPartLevel, BOOL fHasDefaultPart)
+	CDXLNode *pdxlnOther, gpos::Ref<IMDId> pmdidTypePartKey,
+	gpos::Ref<IMDId> pmdidTypeOther, IMDType::ECmpType cmp_type,
+	ULONG ulPartLevel, BOOL fHasDefaultPart)
 {
-	IMDId *pmdidScCmp = nullptr;
+	gpos::Ref<IMDId> pmdidScCmp = nullptr;
 
 	pmdidScCmp = CMDAccessorUtils::GetScCmpMdIdConsiderCasts(
 		md_accessor, pmdidTypeOther, pmdidTypePartKey, cmp_type);
@@ -240,8 +239,9 @@ CTranslatorExprToDXLUtils::PdxlnListFilterScCmp(
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnRangeFilterScCmp(
 	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnScalar,
-	IMDId *pmdidTypePartKey, IMDId *pmdidTypeOther, IMDId *pmdidTypeCastExpr,
-	IMDId *mdid_cast_func, IMDType::ECmpType cmp_type, ULONG ulPartLevel)
+	gpos::Ref<IMDId> pmdidTypePartKey, gpos::Ref<IMDId> pmdidTypeOther,
+	gpos::Ref<IMDId> pmdidTypeCastExpr, gpos::Ref<IMDId> mdid_cast_func,
+	IMDType::ECmpType cmp_type, ULONG ulPartLevel)
 {
 	if (IMDType::EcmptEq == cmp_type)
 	{
@@ -328,8 +328,9 @@ CTranslatorExprToDXLUtils::PdxlnRangeFilterScCmp(
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnRangeFilterEqCmp(
 	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnScalar,
-	IMDId *pmdidTypePartKey, IMDId *pmdidTypeOther, IMDId *pmdidTypeCastExpr,
-	IMDId *mdid_cast_func, ULONG ulPartLevel)
+	gpos::Ref<IMDId> pmdidTypePartKey, gpos::Ref<IMDId> pmdidTypeOther,
+	gpos::Ref<IMDId> pmdidTypeCastExpr, gpos::Ref<IMDId> mdid_cast_func,
+	ULONG ulPartLevel)
 {
 	gpos::Ref<CDXLNode> pdxlnPredicateMin = PdxlnRangeFilterPartBound(
 		mp, md_accessor, pdxlnScalar, pmdidTypePartKey, pmdidTypeOther,
@@ -360,9 +361,9 @@ CTranslatorExprToDXLUtils::PdxlnRangeFilterEqCmp(
 gpos::Ref<CDXLNode>
 CTranslatorExprToDXLUtils::PdxlnRangeFilterPartBound(
 	CMemoryPool *mp, CMDAccessor *md_accessor, CDXLNode *pdxlnScalar,
-	IMDId *pmdidTypePartKey, IMDId *pmdidTypeOther, IMDId *pmdidTypeCastExpr,
-	IMDId *mdid_cast_func, ULONG ulPartLevel, ULONG fLowerBound,
-	IMDType::ECmpType cmp_type)
+	gpos::Ref<IMDId> pmdidTypePartKey, gpos::Ref<IMDId> pmdidTypeOther,
+	gpos::Ref<IMDId> pmdidTypeCastExpr, gpos::Ref<IMDId> mdid_cast_func,
+	ULONG ulPartLevel, ULONG fLowerBound, IMDType::ECmpType cmp_type)
 {
 	GPOS_ASSERT(IMDType::EcmptL == cmp_type || IMDType::EcmptG == cmp_type);
 
@@ -516,13 +517,16 @@ CTranslatorExprToDXLUtils::PdxlpropCopy(CMemoryPool *mp, CDXLNode *dxlnode)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
-CTranslatorExprToDXLUtils::PdxlnCmp(
-	CMemoryPool *mp, CMDAccessor *md_accessor, ULONG ulPartLevel,
-	BOOL fLowerBound, gpos::Ref<CDXLNode> pdxlnScalar,
-	IMDType::ECmpType cmp_type, IMDId *pmdidTypePartKey, IMDId *pmdidTypeExpr,
-	IMDId *pmdidTypeCastExpr, IMDId *mdid_cast_func)
+CTranslatorExprToDXLUtils::PdxlnCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
+									ULONG ulPartLevel, BOOL fLowerBound,
+									gpos::Ref<CDXLNode> pdxlnScalar,
+									IMDType::ECmpType cmp_type,
+									gpos::Ref<IMDId> pmdidTypePartKey,
+									gpos::Ref<IMDId> pmdidTypeExpr,
+									gpos::Ref<IMDId> pmdidTypeCastExpr,
+									gpos::Ref<IMDId> mdid_cast_func)
 {
-	IMDId *pmdidScCmp = nullptr;
+	gpos::Ref<IMDId> pmdidScCmp = nullptr;
 
 	if (IMDId::IsValid(pmdidTypeCastExpr))
 	{
@@ -577,8 +581,8 @@ CTranslatorExprToDXLUtils::PdxlnCmp(
 CColRef *
 CTranslatorExprToDXLUtils::PcrCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
 									 CColumnFactory *col_factory,
-									 IMDId *mdid_type, INT type_modifier,
-									 const WCHAR *wszName)
+									 gpos::Ref<IMDId> mdid_type,
+									 INT type_modifier, const WCHAR *wszName)
 {
 	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
 
@@ -1499,8 +1503,8 @@ CTranslatorExprToDXLUtils::FDirectDispatchable(const CColRef *pcrDistrCol,
 	GPOS_ASSERT(nullptr != pcrDistrCol);
 	GPOS_ASSERT(nullptr != dxl_datum);
 
-	IMDId *pmdidDatum = dxl_datum->MDId();
-	IMDId *pmdidDistrCol = pcrDistrCol->RetrieveType()->MDId();
+	gpos::Ref<IMDId> pmdidDatum = dxl_datum->MDId();
+	gpos::Ref<IMDId> pmdidDistrCol = pcrDistrCol->RetrieveType()->MDId();
 
 	// since all integer values are up-casted to int64, the hash value will be
 	// consistent. If either the constant or the distribution column are
@@ -1697,9 +1701,9 @@ CTranslatorExprToDXLUtils::FLocalHashAggStreamSafe(CExpression *pexprAgg)
 //
 //---------------------------------------------------------------------------
 void
-CTranslatorExprToDXLUtils::ExtractCastFuncMdids(COperator *pop,
-												IMDId **ppmdidType,
-												IMDId **ppmdidCastFunc)
+CTranslatorExprToDXLUtils::ExtractCastFuncMdids(
+	COperator *pop, gpos::Ref<IMDId> *ppmdidType,
+	gpos::Ref<IMDId> *ppmdidCastFunc)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(nullptr != ppmdidType);

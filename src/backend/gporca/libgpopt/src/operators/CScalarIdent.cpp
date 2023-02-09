@@ -122,7 +122,7 @@ CScalarIdent::PopCopyWithRemappedColumns(CMemoryPool *mp,
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarIdent::MdidType() const
 {
 	return m_pcr->RetrieveType()->MDId();

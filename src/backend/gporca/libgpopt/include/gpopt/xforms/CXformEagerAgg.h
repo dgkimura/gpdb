@@ -99,8 +99,8 @@ private:
 
 	// generate project element for lower aggregate for a single original aggregate
 	static void PopulateLowerProjectElement(
-		CMemoryPool *mp,  // memory pool
-		IMDId *agg_mdid,  // original global aggregate function
+		CMemoryPool *mp,			// memory pool
+		gpos::Ref<IMDId> agg_mdid,	// original global aggregate function
 		CWStringConst *agg_name, CExpressionArray *agg_arg_array,
 		BOOL is_distinct,
 		gpos::Ref<CExpression>
@@ -110,8 +110,8 @@ private:
 
 	// generate project element for upper aggregate
 	static void PopulateUpperProjectElement(
-		CMemoryPool *mp,  // memory pool
-		IMDId *agg_mdid,  // aggregate mdid to create
+		CMemoryPool *mp,			// memory pool
+		gpos::Ref<IMDId> agg_mdid,	// aggregate mdid to create
 		CWStringConst *agg_name, CColRef *lower_colref, CColRef *output_colref,
 		BOOL is_distinct,
 		gpos::Ref<CExpression>

@@ -56,10 +56,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// operator id
-	virtual IMDId *MdIdOp() const;
+	virtual gpos::Ref<IMDId> MdIdOp() const;
 
 	// return type
-	virtual IMDId *MdidType() const;
+	virtual gpos::Ref<IMDId> MdidType() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

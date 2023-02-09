@@ -65,7 +65,7 @@ public:
 	EdxlBitmapBoolOp GetDXLBitmapOpType() const;
 
 	// return type
-	IMDId *MdidType() const;
+	gpos::Ref<IMDId> MdidType() const;
 
 	// name of the DXL operator name
 	const CWStringConst *GetOpNameStr() const override;

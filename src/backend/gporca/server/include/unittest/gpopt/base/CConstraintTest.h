@@ -72,17 +72,16 @@ private:
 	static const WCHAR *wszInternalRepresentationFor2012_01_22;
 
 	// construct an array of ranges to be used to create an interval
-	static gpos::Ref<CRangeArray> Pdrgprng(CMemoryPool *mp, IMDId *mdid,
+	static gpos::Ref<CRangeArray> Pdrgprng(CMemoryPool *mp,
+										   gpos::Ref<IMDId> mdid,
 										   const SRangeInfo rgRangeInfo[],
 										   ULONG ulRanges);
 
-	static gpos::Ref<CConstraintInterval> PciFirstInterval(CMemoryPool *mp,
-														   IMDId *mdid,
-														   CColRef *colref);
+	static gpos::Ref<CConstraintInterval> PciFirstInterval(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CColRef *colref);
 
-	static gpos::Ref<CConstraintInterval> PciSecondInterval(CMemoryPool *mp,
-															IMDId *mdid,
-															CColRef *colref);
+	static gpos::Ref<CConstraintInterval> PciSecondInterval(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CColRef *colref);
 
 	// interval from scalar comparison
 	static GPOS_RESULT EresUnittest_CIntervalFromScalarCmp(
@@ -103,14 +102,12 @@ private:
 	static void PrintConstraint(CMemoryPool *mp, CConstraint *pcnstr);
 
 	// build a conjunction
-	static gpos::Ref<CConstraintConjunction> Pcstconjunction(CMemoryPool *mp,
-															 IMDId *mdid,
-															 CColRef *colref);
+	static gpos::Ref<CConstraintConjunction> Pcstconjunction(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CColRef *colref);
 
 	// build a disjunction
-	static gpos::Ref<CConstraintDisjunction> Pcstdisjunction(CMemoryPool *mp,
-															 IMDId *mdid,
-															 CColRef *colref);
+	static gpos::Ref<CConstraintDisjunction> Pcstdisjunction(
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid, CColRef *colref);
 
 public:
 	// unittests

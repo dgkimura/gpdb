@@ -51,7 +51,7 @@ public:
 	// name of the operator
 	const CWStringConst *GetOpNameStr() const override;
 
-	IMDId *MdidOpfamily() const;
+	gpos::Ref<IMDId> MdidOpfamily() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

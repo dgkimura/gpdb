@@ -112,8 +112,9 @@ CDistributionSpecHashed::PopulateDefaultOpfamilies()
 	for (ULONG ul = 0; ul < m_pdrgpexpr->Size(); ++ul)
 	{
 		CExpression *expr = (*m_pdrgpexpr)[ul].get();
-		IMDId *mdid_type = gpos::dyn_cast<CScalar>(expr->Pop())->MdidType();
-		IMDId *mdid_opfamily =
+		gpos::Ref<IMDId> mdid_type =
+			gpos::dyn_cast<CScalar>(expr->Pop())->MdidType();
+		gpos::Ref<IMDId> mdid_opfamily =
 			mda->RetrieveType(mdid_type)->GetDistrOpfamilyMdid();
 		GPOS_ASSERT(nullptr != mdid_opfamily && mdid_opfamily->IsValid());
 		;
@@ -296,7 +297,7 @@ CDistributionSpecHashed::FMatchSubset(
 			if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 			{
 				CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
-				IMDId *expr_type_mdid =
+				gpos::Ref<IMDId> expr_type_mdid =
 					gpos::dyn_cast<CScalar>(pexprOwn->Pop())->MdidType();
 				const IMDType *expr_type = mda->RetrieveType(expr_type_mdid);
 
@@ -1067,8 +1068,9 @@ CDistributionSpecHashed::MakeHashedDistrSpec(
 		for (ULONG ul = 0; ul < pdrgpexpr->Size(); ++ul)
 		{
 			CExpression *expr = (*pdrgpexpr)[ul].get();
-			IMDId *mdid_type = gpos::dyn_cast<CScalar>(expr->Pop())->MdidType();
-			IMDId *mdid_opfamily =
+			gpos::Ref<IMDId> mdid_type =
+				gpos::dyn_cast<CScalar>(expr->Pop())->MdidType();
+			gpos::Ref<IMDId> mdid_opfamily =
 				mda->RetrieveType(mdid_type)->GetDistrOpfamilyMdid();
 			if (nullptr == mdid_opfamily)
 			{

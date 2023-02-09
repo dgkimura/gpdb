@@ -102,7 +102,7 @@ CStatsPredUtils::StatsCmpType(const CWStringConst *str_opname)
 //
 //---------------------------------------------------------------------------
 CStatsPred::EStatsCmpType
-CStatsPredUtils::StatsCmpType(IMDId *mdid)
+CStatsPredUtils::StatsCmpType(gpos::Ref<IMDId> mdid)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
@@ -209,7 +209,7 @@ CStatsPredUtils::GetStatsPredPoint(CMemoryPool *mp, CExpression *predicate_expr,
 // 		Return the statistics predicate comparison type
 //---------------------------------------------------------------------------
 CStatsPred::EStatsCmpType
-CStatsPredUtils::GetStatsCmpType(IMDId *mdid)
+CStatsPredUtils::GetStatsCmpType(gpos::Ref<IMDId> mdid)
 {
 	GPOS_ASSERT(nullptr != mdid);
 	CStatsPred::EStatsCmpType stats_cmp_type = StatsCmpType(mdid);

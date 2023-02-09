@@ -51,7 +51,7 @@ CMDProviderRelcache::CMDProviderRelcache(CMemoryPool *mp) : m_mp(mp)
 //---------------------------------------------------------------------------
 CWStringBase *
 CMDProviderRelcache::GetMDObjDXLStr(CMemoryPool *mp, CMDAccessor *md_accessor,
-									IMDId *md_id) const
+									gpos::Ref<IMDId> md_id) const
 {
 	gpos::Ref<IMDCacheObject> md_obj =
 		CTranslatorRelcacheToDXL::RetrieveObject(mp, md_accessor, md_id);
@@ -70,7 +70,7 @@ CMDProviderRelcache::GetMDObjDXLStr(CMemoryPool *mp, CMDAccessor *md_accessor,
 // return the requested metadata object
 gpos::Ref<IMDCacheObject>
 CMDProviderRelcache::GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
-							  IMDId *mdid) const
+							  gpos::Ref<IMDId> mdid) const
 {
 	gpos::Ref<IMDCacheObject> md_obj =
 		CTranslatorRelcacheToDXL::RetrieveObject(mp, md_accessor, mdid);

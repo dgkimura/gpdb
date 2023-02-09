@@ -70,7 +70,7 @@ public:
 	const CWStringConst *GetComparisonOpName() const;
 
 	// operator id
-	IMDId *MDId() const;
+	gpos::Ref<IMDId> MDId() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

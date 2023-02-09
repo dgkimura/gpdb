@@ -58,7 +58,7 @@ public:
 	~CScalarArrayCoerceExpr() override;
 
 	// return metadata id of element coerce function
-	IMDId *PmdidElementFunc() const;
+	gpos::Ref<IMDId> PmdidElementFunc() const;
 
 	BOOL IsExplicit() const;
 

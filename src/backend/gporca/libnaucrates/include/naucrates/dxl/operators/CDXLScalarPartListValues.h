@@ -49,10 +49,10 @@ public:
 	ULONG GetPartitioningLevel() const;
 
 	// result type
-	IMDId *GetResultTypeMdId() const;
+	gpos::Ref<IMDId> GetResultTypeMdId() const;
 
 	// element type
-	IMDId *GetElemTypeMdId() const;
+	gpos::Ref<IMDId> GetElemTypeMdId() const;
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,

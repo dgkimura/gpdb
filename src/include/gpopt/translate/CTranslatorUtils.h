@@ -143,7 +143,7 @@ public:
 	// create a DXL index descriptor from an index MD id
 	static gpos::Ref<CDXLIndexDescr> GetIndexDescr(CMemoryPool *mp,
 												   CMDAccessor *md_accessor,
-												   IMDId *mdid);
+												   gpos::Ref<IMDId> mdid);
 
 	// translate a RangeTableEntry into a CDXLTableDescr
 	static gpos::Ref<CDXLTableDescr> GetTableDescr(
@@ -167,8 +167,8 @@ public:
 
 	// get column descriptor from a base type
 	static gpos::Ref<CDXLColDescrArray> GetColumnDescriptorsFromBase(
-		CMemoryPool *mp, CIdGenerator *id_generator, IMDId *mdid_return_type,
-		INT type_modifier, CMDName *md_name);
+		CMemoryPool *mp, CIdGenerator *id_generator,
+		gpos::Ref<IMDId> mdid_return_type, INT type_modifier, CMDName *md_name);
 
 	// get column descriptors from a composite type
 	static gpos::Ref<CDXLColDescrArray> GetColumnDescriptorsFromComposite(
@@ -237,7 +237,8 @@ public:
 
 	// return the corresponding ColId for the given varno, varattno and querylevel
 	static ULONG GetColId(ULONG query_level, INT varno, INT var_attno,
-						  IMDId *mdid, CMappingVarColId *var_colid_mapping);
+						  gpos::Ref<IMDId> mdid,
+						  CMappingVarColId *var_colid_mapping);
 
 	// check to see if the target list entry is a sorting column
 	static BOOL IsSortingColumn(const TargetEntry *target_entry,
@@ -310,13 +311,13 @@ public:
 
 	// construct a project element with a const NULL expression
 	static gpos::Ref<CDXLNode> CreateDXLProjElemConstNULL(
-		CMemoryPool *mp, CMDAccessor *md_accessor, IMDId *mdid, ULONG colid,
-		const WCHAR *col_name);
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<IMDId> mdid,
+		ULONG colid, const WCHAR *col_name);
 
 	// construct a project element with a const NULL expression
 	static gpos::Ref<CDXLNode> CreateDXLProjElemConstNULL(
-		CMemoryPool *mp, CMDAccessor *md_accessor, IMDId *mdid, ULONG colid,
-		CHAR *alias_name);
+		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<IMDId> mdid,
+		ULONG colid, CHAR *alias_name);
 
 	// create a DXL project element node with a Const NULL of type provided
 	// by the column descriptor
@@ -346,7 +347,7 @@ public:
 
 	// check whether the given trigger is applicable to the given DML operation
 	static BOOL IsApplicableTrigger(CMDAccessor *md_accessor,
-									IMDId *trigger_mdid,
+									gpos::Ref<IMDId> trigger_mdid,
 									const gpdxl::EdxlDmlType dml_type_dxl);
 
 	// check whether there are NOT NULL or CHECK constraints for the given relation

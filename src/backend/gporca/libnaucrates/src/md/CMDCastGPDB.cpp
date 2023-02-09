@@ -76,7 +76,7 @@ CMDCastGPDB::~CMDCastGPDB()
 //		Mdid of cast object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDCastGPDB::MDId() const
 {
 	return m_mdid.get();
@@ -104,7 +104,7 @@ CMDCastGPDB::Mdname() const
 //		Source type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDCastGPDB::MdidSrc() const
 {
 	return m_mdid_src.get();
@@ -118,7 +118,7 @@ CMDCastGPDB::MdidSrc() const
 //		Destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDCastGPDB::MdidDest() const
 {
 	return m_mdid_dest.get();
@@ -132,7 +132,7 @@ CMDCastGPDB::MdidDest() const
 //		Cast function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDCastGPDB::GetCastFuncMdId() const
 {
 	return m_mdid_cast_func.get();

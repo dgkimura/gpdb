@@ -138,7 +138,7 @@ CMDProviderMemory::~CMDProviderMemory()
 CWStringBase *
 CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 								  CMDAccessor *,  //md_accessor
-								  IMDId *mdid) const
+								  gpos::Ref<IMDId> mdid) const
 {
 	GPOS_ASSERT(nullptr != m_mdmap);
 
@@ -220,7 +220,7 @@ CMDProviderMemory::MDId(CMemoryPool *mp, CSystemId sysid,
 // return the requested metadata object
 gpos::Ref<IMDCacheObject>
 CMDProviderMemory::GetMDObj(CMemoryPool *mp, CMDAccessor *md_accessor,
-							IMDId *mdid) const
+							gpos::Ref<IMDId> mdid) const
 {
 	CAutoP<CWStringBase> a_pstr;
 	a_pstr = GetMDObjDXLStr(mp, md_accessor, mdid);

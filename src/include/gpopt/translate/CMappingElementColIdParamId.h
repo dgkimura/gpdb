@@ -69,7 +69,7 @@ public:
 	}
 
 	// return the type
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const
 	{
 		return m_mdid.get();

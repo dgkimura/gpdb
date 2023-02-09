@@ -353,14 +353,15 @@ public:
 	// construct a trigger expression on top of the given expression
 	static gpos::Ref<CExpression> PexprRowTrigger(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprChild,
-		CLogicalDML::EDMLOperator edmlop, IMDId *rel_mdid, BOOL fBefore,
-		CColRefArray *colref_array);
+		CLogicalDML::EDMLOperator edmlop, gpos::Ref<IMDId> rel_mdid,
+		BOOL fBefore, CColRefArray *colref_array);
 
 	// construct a trigger expression on top of the given expression
 	static gpos::Ref<CExpression> PexprRowTrigger(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprChild,
-		CLogicalDML::EDMLOperator edmlop, IMDId *rel_mdid, BOOL fBefore,
-		gpos::Ref<CColRefArray> pdrgpcrOld, gpos::Ref<CColRefArray> pdrgpcrNew);
+		CLogicalDML::EDMLOperator edmlop, gpos::Ref<IMDId> rel_mdid,
+		BOOL fBefore, gpos::Ref<CColRefArray> pdrgpcrOld,
+		gpos::Ref<CColRefArray> pdrgpcrNew);
 
 	// construct a logical partition selector for the given table descriptor on top
 	// of the given child expression. The partition selection filters use columns
@@ -497,7 +498,7 @@ public:
 	// construct a bitmap bool op given the left and right bitmap access
 	// path expressions
 	static gpos::Ref<CExpression> PexprBitmapBoolOp(
-		CMemoryPool *mp, IMDId *pmdidBitmapType,
+		CMemoryPool *mp, gpos::Ref<IMDId> pmdidBitmapType,
 		gpos::Ref<CExpression> pexprLeft, gpos::Ref<CExpression> pexprRight,
 		BOOL fConjunction);
 
@@ -758,7 +759,7 @@ CXformUtils::ImplementHashJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 		{
 			CExpression *pexprPredInner;
 			CExpression *pexprPredOuter;
-			IMDId *mdid_scop;
+			gpos::Ref<IMDId> mdid_scop;
 			CPhysicalJoin::AlignJoinKeyOuterInner(pexprPred, pexprOuter,
 												  pexprInner, &pexprPredOuter,
 												  &pexprPredInner, &mdid_scop);
@@ -771,7 +772,7 @@ CXformUtils::ImplementHashJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 			if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 			{
 				CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
-				IMDId *hash_opfamily =
+				gpos::Ref<IMDId> hash_opfamily =
 					mda->RetrieveScOp(mdid_scop)->HashOpfamilyMdid();
 				GPOS_ASSERT(nullptr != hash_opfamily &&
 							hash_opfamily->IsValid());
@@ -884,7 +885,7 @@ CXformUtils::ImplementMergeJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 		{
 			CExpression *pexprPredInner;
 			CExpression *pexprPredOuter;
-			IMDId *mdid_scop;
+			gpos::Ref<IMDId> mdid_scop;
 			CPhysicalJoin::AlignJoinKeyOuterInner(pexprPred, pexprOuter,
 												  pexprInner, &pexprPredOuter,
 												  &pexprPredInner, &mdid_scop);
@@ -897,7 +898,7 @@ CXformUtils::ImplementMergeJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 			if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 			{
 				CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
-				IMDId *hash_opfamily =
+				gpos::Ref<IMDId> hash_opfamily =
 					mda->RetrieveScOp(mdid_scop)->HashOpfamilyMdid();
 				GPOS_ASSERT(nullptr != hash_opfamily &&
 							hash_opfamily->IsValid());

@@ -78,7 +78,7 @@ public:
 		return dynamic_cast<CScalarNAryJoinPredList *>(pop);
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		GPOS_ASSERT(

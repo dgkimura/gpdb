@@ -87,7 +87,7 @@ CDXLScalarCast::GetOpNameStr() const
 //		Return the oid of the type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarCast::MdidType() const
 {
 	return m_mdid_type.get();
@@ -101,7 +101,7 @@ CDXLScalarCast::MdidType() const
 //		Casting function id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarCast::FuncMdId() const
 {
 	return m_func_mdid.get();

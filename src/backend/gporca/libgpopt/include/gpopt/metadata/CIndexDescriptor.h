@@ -76,7 +76,7 @@ public:
 	ULONG UlIncludedColumns() const;
 
 	// index mdid accessor
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_pmdidIndex.get();

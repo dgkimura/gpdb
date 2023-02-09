@@ -108,7 +108,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// the type modifier of the scalar expression
 	INT TypeModifier() const override;

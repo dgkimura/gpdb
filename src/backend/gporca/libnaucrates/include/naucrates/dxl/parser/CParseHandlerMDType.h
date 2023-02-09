@@ -43,7 +43,7 @@ private:
 		Edxltoken m_edxltoken;
 
 		// address of the member variable for that name
-		gpos::owner<IMDId *> *m_token_mdid;
+		gpos::owner<gpos::Ref<IMDId> > *m_token_mdid;
 	};
 
 	// id and version of the type
@@ -142,7 +142,7 @@ private:
 	// parse the value for the given mdid variable name from the attributes
 	void ParseMdid(const XMLCh *element_local_name, const Attributes &attrs);
 
-	static BOOL IsBuiltInType(const IMDId *mdid);
+	static BOOL IsBuiltInType(const gpos::Ref<IMDId> mdid);
 
 public:
 	CParseHandlerMDType(const CParseHandlerMDType &) = delete;

@@ -78,7 +78,7 @@ CScalarArrayCmp::Pstr() const
 //		Comparison operator mdid
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArrayCmp::MdIdOp() const
 {
 	return m_mdid_op.get();
@@ -133,7 +133,7 @@ CScalarArrayCmp::Matches(COperator *pop) const
 //		Expression type
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarArrayCmp::MdidType() const
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -225,7 +225,7 @@ CScalarArrayCmp::PexprExpand(CMemoryPool *mp, CExpression *pexprArrayCmp)
 			CUtils::PScalarArrayExprChildAt(mp, pexprArray, ul);
 		;
 		const CWStringConst *str_opname = popArrayCmp->Pstr();
-		IMDId *mdid_op = popArrayCmp->MdIdOp();
+		gpos::Ref<IMDId> mdid_op = popArrayCmp->MdIdOp();
 		GPOS_ASSERT(IMDId::IsValid(mdid_op));
 
 		;

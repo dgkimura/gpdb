@@ -295,7 +295,7 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(CMemoryPool *mp,
 			}
 
 			// add the last datum, making range (last, inf)
-			IMDId *mdid = pprevdatum->MDId().get();
+			gpos::Ref<IMDId> mdid = pprevdatum->MDId().get();
 			;
 			;
 			gpos::Ref<CRange> prng = GPOS_NEW(mp)
@@ -1253,7 +1253,7 @@ gpos::Ref<CConstraintInterval>
 CConstraintInterval::PciUnbounded(CMemoryPool *mp, const CColRef *colref,
 								  BOOL fIncludesNull)
 {
-	IMDId *mdid = colref->RetrieveType()->MDId();
+	gpos::Ref<IMDId> mdid = colref->RetrieveType()->MDId();
 	if (!CUtils::FConstrainableType(mdid))
 	{
 		return nullptr;
@@ -1307,7 +1307,7 @@ CConstraintInterval::PciUnbounded(CMemoryPool *mp, const CColRefSet *pcrs,
 //		Type of this interval
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CConstraintInterval::MdidType()
 {
 	// if there is at least one range, return range type

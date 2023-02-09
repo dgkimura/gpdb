@@ -59,7 +59,7 @@ CScalarSubquery::~CScalarSubquery() = default;
 //		Type of scalar's value
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CScalarSubquery::MdidType() const
 {
 	return m_pcr->RetrieveType()->MDId();

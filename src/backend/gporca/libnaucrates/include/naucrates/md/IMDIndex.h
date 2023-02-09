@@ -87,7 +87,7 @@ public:
 	virtual IMDPartConstraint *MDPartConstraint() const = 0;
 
 	// type id of items returned by the index
-	virtual IMDId *GetIndexRetItemTypeMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetIndexRetItemTypeMdid() const = 0;
 
 	// check if given scalar comparison can be used with the index key
 	// at the specified position

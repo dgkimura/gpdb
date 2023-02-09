@@ -95,7 +95,7 @@ CMDIdCast::GetBuffer() const
 //		Returns the source type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIdCast::MdidSrc() const
 {
 	return m_mdid_src.get();
@@ -109,7 +109,7 @@ CMDIdCast::MdidSrc() const
 //		Returns the destination type id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CMDIdCast::MdidDest() const
 {
 	return m_mdid_dest.get();
@@ -124,7 +124,7 @@ CMDIdCast::MdidDest() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIdCast::Equals(const IMDId *mdid) const
+CMDIdCast::Equals(const gpos::Ref<IMDId> mdid) const
 {
 	if (nullptr == mdid || EmdidCastFunc != mdid->MdidType())
 	{

@@ -70,7 +70,7 @@ CDXLColRef::MdName() const
 //		Returns column's type md id
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLColRef::MdidType() const
 {
 	return m_mdid_type.get();

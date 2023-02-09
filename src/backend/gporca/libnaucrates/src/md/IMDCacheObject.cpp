@@ -31,7 +31,7 @@ using namespace gpmd;
 void
 IMDCacheObject::SerializeMDIdAsElem(CXMLSerializer *xml_serializer,
 									const CWStringConst *element_name,
-									const IMDId *mdid) const
+									const gpos::Ref<IMDId> mdid) const
 {
 	if (nullptr == mdid)
 	{

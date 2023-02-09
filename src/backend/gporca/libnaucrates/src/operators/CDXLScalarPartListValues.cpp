@@ -59,14 +59,14 @@ CDXLScalarPartListValues::GetPartitioningLevel() const
 }
 
 // result type
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarPartListValues::GetResultTypeMdId() const
 {
 	return m_result_type_mdid.get();
 }
 
 // element type
-IMDId *
+gpos::Ref<IMDId>
 CDXLScalarPartListValues::GetElemTypeMdId() const
 {
 	return m_elem_type_mdid.get();

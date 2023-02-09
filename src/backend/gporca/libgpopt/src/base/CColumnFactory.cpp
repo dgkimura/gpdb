@@ -171,7 +171,7 @@ CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier, ULONG id,
 CColRef *
 CColumnFactory::PcrCreate(const CColumnDescriptor *pcoldesc, ULONG id,
 						  const CName &name, ULONG ulOpSource,
-						  BOOL mark_as_used, IMDId *mdid_table)
+						  BOOL mark_as_used, gpos::Ref<IMDId> mdid_table)
 {
 	CName *pnameCopy = GPOS_NEW(m_mp) CName(m_mp, name);
 	CAutoP<CName> a_pnameCopy(pnameCopy);
@@ -209,9 +209,9 @@ CColumnFactory::PcrCreate(const CColumnDescriptor *pcoldesc, ULONG id,
 //---------------------------------------------------------------------------
 CColRef *
 CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier,
-						  IMDId *mdid_table, INT attno, BOOL is_nullable,
-						  ULONG id, const CName &name, ULONG ulOpSource,
-						  BOOL isDistCol, ULONG ulWidth)
+						  gpos::Ref<IMDId> mdid_table, INT attno,
+						  BOOL is_nullable, ULONG id, const CName &name,
+						  ULONG ulOpSource, BOOL isDistCol, ULONG ulWidth)
 {
 	CName *pnameCopy = GPOS_NEW(m_mp) CName(m_mp, name);
 	CAutoP<CName> a_pnameCopy(pnameCopy);
@@ -242,7 +242,7 @@ CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier,
 CColRef *
 CColumnFactory::PcrCreate(const CColumnDescriptor *pcoldesc, const CName &name,
 						  ULONG ulOpSource, BOOL mark_as_used,
-						  IMDId *mdid_table)
+						  gpos::Ref<IMDId> mdid_table)
 {
 	ULONG id = m_aul++;
 

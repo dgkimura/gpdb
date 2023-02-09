@@ -109,13 +109,13 @@ public:
 	}
 
 	// function id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// function name
 	CMDName Mdname() const override;
 
 	// result type
-	IMDId *GetResultTypeMdid() const override;
+	gpos::Ref<IMDId> GetResultTypeMdid() const override;
 
 	// output argument types
 	IMdIdArray *OutputArgTypesMdidArray() const override;

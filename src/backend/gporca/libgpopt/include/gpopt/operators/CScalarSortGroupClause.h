@@ -104,7 +104,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		return nullptr;

@@ -91,19 +91,19 @@ public:
 		return EmdtType;
 	}
 
-	virtual IMDId *GetDistrOpfamilyMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetDistrOpfamilyMdid() const = 0;
 
 	// md id of cache object
-	IMDId *MDId() const override = 0;
+	gpos::Ref<IMDId> MDId() const override = 0;
 
 	// id of specified specified comparison operator type
-	virtual IMDId *GetMdidForCmpType(ECmpType cmp_type) const = 0;
+	virtual gpos::Ref<IMDId> GetMdidForCmpType(ECmpType cmp_type) const = 0;
 
 	// id of specified specified aggregate type
-	virtual IMDId *GetMdidForAggType(EAggType agg_type) const = 0;
+	virtual gpos::Ref<IMDId> GetMdidForAggType(EAggType agg_type) const = 0;
 
 	// id of comparison operator for type used in btree lookups
-	virtual const IMDId *CmpOpMdid() const = 0;
+	virtual const gpos::Ref<IMDId> CmpOpMdid() const = 0;
 
 	// id of hash operator for type
 	virtual BOOL IsHashable() const = 0;
@@ -115,7 +115,7 @@ public:
 	virtual BOOL IsRedistributable() const = 0;
 
 	// id of the array type for the type
-	virtual IMDId *GetArrayTypeMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetArrayTypeMdid() const = 0;
 
 	// type id
 	virtual ETypeInfo GetDatumType() const = 0;
@@ -141,7 +141,7 @@ public:
 	}
 
 	// id of the relation corresponding to a composite type
-	virtual IMDId *GetBaseRelMdid() const = 0;
+	virtual gpos::Ref<IMDId> GetBaseRelMdid() const = 0;
 
 	// type length
 	virtual ULONG Length() const = 0;

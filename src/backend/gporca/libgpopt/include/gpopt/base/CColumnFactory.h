@@ -62,7 +62,8 @@ private:
 					   const CName &name);
 	CColRef *PcrCreate(const CColumnDescriptor *pcoldesc, ULONG id,
 					   const CName &name, ULONG ulOpSource,
-					   BOOL mark_as_used = true, IMDId *mdid_table = nullptr);
+					   BOOL mark_as_used = true,
+					   gpos::Ref<IMDId> mdid_table = nullptr);
 
 public:
 	CColumnFactory(const CColumnFactory &) = delete;
@@ -85,13 +86,14 @@ public:
 
 	// create a column reference given its descriptor and name
 	CColRef *PcrCreate(const CColumnDescriptor *pcoldescr, const CName &name,
-					   ULONG ulOpSource, BOOL mark_as_used, IMDId *mdid_table);
+					   ULONG ulOpSource, BOOL mark_as_used,
+					   gpos::Ref<IMDId> mdid_table);
 
 	// create a column reference given its type, attno, nullability and name
 	CColRef *PcrCreate(const IMDType *pmdtype, INT type_modifier,
-					   IMDId *mdid_table, INT attno, BOOL is_nullable, ULONG id,
-					   const CName &name, ULONG ulOpSource, BOOL isDistCol,
-					   ULONG ulWidth = gpos::ulong_max);
+					   gpos::Ref<IMDId> mdid_table, INT attno, BOOL is_nullable,
+					   ULONG id, const CName &name, ULONG ulOpSource,
+					   BOOL isDistCol, ULONG ulWidth = gpos::ulong_max);
 
 	// create a column reference with the same type as passed column reference
 	CColRef *

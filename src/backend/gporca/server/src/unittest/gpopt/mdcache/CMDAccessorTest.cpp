@@ -340,11 +340,11 @@ CMDAccessorTest::EresUnittest_Navigate()
 	const IMDFunction *pmdfunc = mda.RetrieveFunc(mdid_func.get());
 
 	// lookup function return type
-	IMDId *pmdidFuncReturnType = pmdfunc->GetResultTypeMdid();
+	gpos::Ref<IMDId> pmdidFuncReturnType = pmdfunc->GetResultTypeMdid();
 	const IMDType *pimdtype = mda.RetrieveType(pmdidFuncReturnType);
 
 	// lookup equality operator for function return type
-	IMDId *pmdidEqOp = pimdtype->GetMdidForCmpType(IMDType::EcmptEq);
+	gpos::Ref<IMDId> pmdidEqOp = pimdtype->GetMdidForCmpType(IMDType::EcmptEq);
 
 	const IMDScalarOp *md_scalar_op GPOS_ASSERTS_ONLY =
 		mda.RetrieveScOp(pmdidEqOp);
@@ -413,7 +413,7 @@ CMDAccessorTest::EresUnittest_Indexes()
 
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 
-	IMDId *pmdidIndex = pmdrel->IndexMDidAt(0);
+	gpos::Ref<IMDId> pmdidIndex = pmdrel->IndexMDidAt(0);
 	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
 
 	ULONG ulKeys = pmdindex->Keys();
@@ -497,7 +497,7 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 	}
 
 	// get one of its check constraint
-	IMDId *pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(0);
+	gpos::Ref<IMDId> pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(0);
 	const IMDCheckConstraint *pmdCheckConstraint =
 		mda.RetrieveCheckConstraints(pmdidCheckConstraint);
 

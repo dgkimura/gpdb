@@ -212,7 +212,7 @@ private:
 								  CMappingColIdVar *colid_var);
 
 	// return the operator return type oid for the given func id.
-	OID GetFunctionReturnTypeOid(IMDId *mdid) const;
+	OID GetFunctionReturnTypeOid(gpos::Ref<IMDId> mdid) const;
 
 	// translate dxldatum to GPDB Const
 	static Const *ConvertDXLDatumToConstOid(CDXLDatum *datum_dxl);

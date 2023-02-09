@@ -68,7 +68,7 @@ CDXLTableDescr::~CDXLTableDescr()
 //		Return the metadata id for the table
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLTableDescr::MDId() const
 {
 	return m_mdid.get();

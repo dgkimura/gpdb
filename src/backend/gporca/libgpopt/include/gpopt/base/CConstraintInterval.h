@@ -72,7 +72,7 @@ private:
 		CRange **pprangeResidual, CRangeArray *pdrgprngResidual);
 
 	// type of this interval
-	IMDId *MdidType();
+	gpos::Ref<IMDId> MdidType();
 
 	// construct scalar expression
 	virtual gpos::Ref<CExpression> PexprConstructScalar(CMemoryPool *mp) const;

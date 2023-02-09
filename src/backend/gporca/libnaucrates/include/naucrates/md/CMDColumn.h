@@ -80,7 +80,7 @@ public:
 	CMDName Mdname() const override;
 
 	// column type
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	INT TypeModifier() const override;
 

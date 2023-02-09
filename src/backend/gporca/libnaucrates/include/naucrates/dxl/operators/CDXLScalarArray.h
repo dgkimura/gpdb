@@ -60,10 +60,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// element type id
-	IMDId *ElementTypeMDid() const;
+	gpos::Ref<IMDId> ElementTypeMDid() const;
 
 	// array type id
-	IMDId *ArrayTypeMDid() const;
+	gpos::Ref<IMDId> ArrayTypeMDid() const;
 
 	// is array multi-dimensional
 	BOOL IsMultiDimensional() const;

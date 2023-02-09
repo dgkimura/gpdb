@@ -107,28 +107,28 @@ public:
 	}
 
 	// operator id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// operator name
 	CMDName Mdname() const override;
 
 	// left operand type id
-	IMDId *GetLeftMdid() const override;
+	gpos::Ref<IMDId> GetLeftMdid() const override;
 
 	// right operand type id
-	IMDId *GetRightMdid() const override;
+	gpos::Ref<IMDId> GetRightMdid() const override;
 
 	// resulttype id
-	IMDId *GetResultTypeMdid() const override;
+	gpos::Ref<IMDId> GetResultTypeMdid() const override;
 
 	// implementer function id
-	IMDId *FuncMdId() const override;
+	gpos::Ref<IMDId> FuncMdId() const override;
 
 	// commutor id
-	IMDId *GetCommuteOpMdid() const override;
+	gpos::Ref<IMDId> GetCommuteOpMdid() const override;
 
 	// inverse operator id
-	IMDId *GetInverseOpMdid() const override;
+	gpos::Ref<IMDId> GetInverseOpMdid() const override;
 
 	// is this an equality operator
 	BOOL IsEqualityOp() const override;
@@ -151,10 +151,10 @@ public:
 	ULONG OpfamiliesCount() const override;
 
 	// operator class at given position
-	IMDId *OpfamilyMdidAt(ULONG pos) const override;
+	gpos::Ref<IMDId> OpfamilyMdidAt(ULONG pos) const override;
 
 	// compatible hash opfamily
-	IMDId *HashOpfamilyMdid() const override;
+	gpos::Ref<IMDId> HashOpfamilyMdid() const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the type in the provided stream

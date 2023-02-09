@@ -39,17 +39,17 @@ class CMDKey
 {
 private:
 	// id of the object in the underlying source
-	const IMDId *m_mdid;
+	const gpos::Ref<IMDId> m_mdid;
 
 public:
 	// ctors
-	explicit CMDKey(const IMDId *mdid);
+	explicit CMDKey(const gpos::Ref<IMDId> mdid);
 
 	// dtor
 	~CMDKey() = default;
 
 
-	const IMDId *
+	const gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_mdid;

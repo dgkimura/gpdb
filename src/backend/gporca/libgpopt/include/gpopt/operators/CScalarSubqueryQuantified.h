@@ -65,7 +65,7 @@ public:
 	CScalarSubqueryQuantified(const CScalarSubqueryQuantified &) = delete;
 
 	// operator mdid accessor
-	IMDId *MdIdOp() const;
+	gpos::Ref<IMDId> MdIdOp() const;
 
 	// operator name accessor
 	const CWStringConst *PstrOp() const;
@@ -78,7 +78,7 @@ public:
 	}
 
 	// return the type of the scalar expression
-	IMDId *MdidType() const override;
+	gpos::Ref<IMDId> MdidType() const override;
 
 	// operator specific hash function
 	ULONG HashValue() const override;

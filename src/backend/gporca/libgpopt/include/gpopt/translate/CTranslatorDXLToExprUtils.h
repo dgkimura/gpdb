@@ -85,7 +85,7 @@ public:
 
 	// is the given expression is a scalar function that casts
 	static BOOL FCastFunc(CMDAccessor *md_accessor, const CDXLNode *dxlnode,
-						  IMDId *pmdidInput);
+						  gpos::Ref<IMDId> pmdidInput);
 };
 }  // namespace gpopt
 

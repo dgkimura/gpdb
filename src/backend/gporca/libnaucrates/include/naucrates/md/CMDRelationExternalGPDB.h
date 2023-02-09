@@ -142,7 +142,7 @@ public:
 	}
 
 	// the metadata id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// relation name
 	CMDName Mdname() const override;
@@ -178,7 +178,7 @@ public:
 	BOOL IsRejectLimitInRows() const override;
 
 	// format error table mdid
-	IMDId *GetFormatErrTableMdid() const override;
+	gpos::Ref<IMDId> GetFormatErrTableMdid() const override;
 
 	// retrieve the column at the given position
 	const IMDColumn *GetMdCol(ULONG pos) const override;
@@ -195,7 +195,7 @@ public:
 	// retrieve the column at the given position in the distribution columns list for the relation
 	const IMDColumn *GetDistrColAt(ULONG pos) const override;
 
-	IMDId *GetDistrOpfamilyAt(ULONG pos) const override;
+	gpos::Ref<IMDId> GetDistrOpfamilyAt(ULONG pos) const override;
 
 	// number of indices
 	ULONG IndexCount() const override;
@@ -210,10 +210,10 @@ public:
 	ULONG GetPosFromAttno(INT attno) const override;
 
 	// retrieve the id of the metadata cache index at the given position
-	IMDId *IndexMDidAt(ULONG pos) const override;
+	gpos::Ref<IMDId> IndexMDidAt(ULONG pos) const override;
 
 	// retrieve the id of the metadata cache trigger at the given position
-	IMDId *TriggerMDidAt(ULONG pos) const override;
+	gpos::Ref<IMDId> TriggerMDidAt(ULONG pos) const override;
 
 	// serialize metadata relation in DXL format given a serializer object
 	void Serialize(gpdxl::CXMLSerializer *) const override;
@@ -222,7 +222,7 @@ public:
 	ULONG CheckConstraintCount() const override;
 
 	// retrieve the id of the check constraint cache at the given position
-	IMDId *CheckConstraintMDidAt(ULONG pos) const override;
+	gpos::Ref<IMDId> CheckConstraintMDidAt(ULONG pos) const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the metadata relation

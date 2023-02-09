@@ -123,7 +123,7 @@ CRangeTest::EresUnittest_CRangeInt2()
 
 	IMDTypeInt2 *pmdtypeint2 =
 		(IMDTypeInt2 *) mda.PtMDType<IMDTypeInt2>(CTestUtils::m_sysidDefault);
-	IMDId *mdid = pmdtypeint2->MDId();
+	gpos::Ref<IMDId> mdid = pmdtypeint2->MDId();
 
 	return EresInitAndCheckRanges(mp, mdid, &CreateInt2Datum);
 }
@@ -151,7 +151,7 @@ CRangeTest::EresUnittest_CRangeInt4()
 
 	IMDTypeInt4 *pmdtypeint4 =
 		(IMDTypeInt4 *) mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
-	IMDId *mdid = pmdtypeint4->MDId();
+	gpos::Ref<IMDId> mdid = pmdtypeint4->MDId();
 
 	return EresInitAndCheckRanges(mp, mdid, &CreateInt4Datum);
 }
@@ -179,7 +179,7 @@ CRangeTest::EresUnittest_CRangeInt8()
 
 	IMDTypeInt8 *pmdtypeint8 =
 		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
-	IMDId *mdid = pmdtypeint8->MDId();
+	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	return EresInitAndCheckRanges(mp, mdid, &CreateInt8Datum);
 }
@@ -240,7 +240,8 @@ CRangeTest::EresUnittest_CRangeFromScalar()
 //
 //---------------------------------------------------------------------------
 GPOS_RESULT
-CRangeTest::EresInitAndCheckRanges(CMemoryPool *mp, IMDId *mdid, PfPdatum pf)
+CRangeTest::EresInitAndCheckRanges(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+								   PfPdatum pf)
 {
 	gpos::Ref<CConstExprEvaluatorDefault> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorDefault();

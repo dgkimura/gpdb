@@ -186,8 +186,9 @@ public:
 
 	SPartPropSpecInfo *FindPartPropSpecInfo(ULONG scan_id) const;
 
-	void Insert(ULONG scan_id, EPartPropSpecInfoType type, IMDId *rool_rel_mdid,
-				CBitSet *selector_ids, CExpression *expr);
+	void Insert(ULONG scan_id, EPartPropSpecInfoType type,
+				gpos::Ref<IMDId> rool_rel_mdid, CBitSet *selector_ids,
+				CExpression *expr);
 
 	void Insert(SPartPropSpecInfo *other);
 

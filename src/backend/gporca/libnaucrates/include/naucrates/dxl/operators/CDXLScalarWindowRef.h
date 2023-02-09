@@ -83,14 +83,14 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// catalog id of the function
-	IMDId *
+	gpos::Ref<IMDId>
 	FuncMdId() const
 	{
 		return m_func_mdid.get();
 	}
 
 	// return type of the function
-	IMDId *
+	gpos::Ref<IMDId>
 	ReturnTypeMdId() const
 	{
 		return m_return_type_mdid.get();

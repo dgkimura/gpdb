@@ -675,7 +675,7 @@ COptTasks::PrintMissingStatsWarning(CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CMDIdColStats> mdid_col_stats =
 			gpos::dyn_cast<CMDIdColStats>(mdid);
 
-		IMDId *rel_mdid = mdid_col_stats->GetRelMdId();
+		gpos::Ref<IMDId> rel_mdid = mdid_col_stats->GetRelMdId();
 		const ULONG pos = mdid_col_stats->Position();
 		const IMDRelation *rel = md_accessor->RetrieveRel(rel_mdid);
 

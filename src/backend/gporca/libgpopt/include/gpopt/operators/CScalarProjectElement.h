@@ -107,7 +107,7 @@ public:
 		return dynamic_cast<CScalarProjectElement *>(pop);
 	}
 
-	IMDId *
+	gpos::Ref<IMDId>
 	MdidType() const override
 	{
 		GPOS_ASSERT(!"Invalid function call: CScalarProjectElemet::MdidType()");

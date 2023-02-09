@@ -174,7 +174,7 @@ public:
 	}
 
 	// the type of the scalar expression
-	virtual IMDId *MdidType() const = 0;
+	virtual gpos::Ref<IMDId> MdidType() const = 0;
 
 	// the type modifier of the scalar expression
 	virtual INT

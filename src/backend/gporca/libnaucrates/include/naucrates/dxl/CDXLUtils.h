@@ -200,7 +200,7 @@ public:
 
 	// serialize a metadata id into DXL
 	static CWStringDynamic *SerializeMetadata(
-		CMemoryPool *mp, const IMDId *mdid,
+		CMemoryPool *mp, const gpos::Ref<IMDId> mdid,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// serialize sample plans

@@ -70,7 +70,7 @@ CDXLRelStats::~CDXLRelStats()
 //		Returns the metadata id of this relation stats object
 //
 //---------------------------------------------------------------------------
-IMDId *
+gpos::Ref<IMDId>
 CDXLRelStats::MDId() const
 {
 	return m_rel_stats_mdid.get();
@@ -193,7 +193,7 @@ CDXLRelStats::DebugPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLRelStats>
-CDXLRelStats::CreateDXLDummyRelStats(CMemoryPool *mp, IMDId *mdid)
+CDXLRelStats::CreateDXLDummyRelStats(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
 	CMDIdRelStats *rel_stats_mdid = gpos::dyn_cast<CMDIdRelStats>(mdid);
 	CAutoP<CWStringDynamic> str;

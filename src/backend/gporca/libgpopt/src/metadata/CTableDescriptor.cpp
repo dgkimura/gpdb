@@ -184,7 +184,7 @@ CTableDescriptor::AddColumn(gpos::Ref<CColumnDescriptor> pcoldesc)
 //
 //---------------------------------------------------------------------------
 void
-CTableDescriptor::AddDistributionColumn(ULONG ulPos, IMDId *opfamily)
+CTableDescriptor::AddDistributionColumn(ULONG ulPos, gpos::Ref<IMDId> opfamily)
 {
 	gpos::Ref<CColumnDescriptor> pcoldesc = (*m_pdrgpcoldesc)[ulPos];
 	;

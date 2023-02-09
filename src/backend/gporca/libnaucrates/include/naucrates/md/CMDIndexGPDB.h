@@ -94,7 +94,7 @@ public:
 	~CMDIndexGPDB() override;
 
 	// index mdid
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// index name
 	CMDName Mdname() const override;
@@ -140,7 +140,7 @@ public:
 	void Serialize(gpdxl::CXMLSerializer *) const override;
 
 	// type id of items returned by the index
-	IMDId *GetIndexRetItemTypeMdid() const override;
+	gpos::Ref<IMDId> GetIndexRetItemTypeMdid() const override;
 
 	// check if given scalar comparison can be used with the index key
 	// at the specified position

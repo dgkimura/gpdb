@@ -50,7 +50,7 @@ public:
 	// name of the operator
 	const CWStringConst *GetOpNameStr() const override;
 
-	IMDId *GetResultTypeMdId() const;
+	gpos::Ref<IMDId> GetResultTypeMdId() const;
 
 	// DXL Operator ID
 	Edxlopid GetDXLOperator() const override;

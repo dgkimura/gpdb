@@ -90,7 +90,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// type of first output column
-	IMDId *GetFirstColTypeMdId() const;
+	gpos::Ref<IMDId> GetFirstColTypeMdId() const;
 
 	// outer references
 	const CDXLColRefArray *

@@ -246,8 +246,7 @@ public:
 	virtual void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const = 0;
 
 	// check if given column is defined by operator
-	virtual BOOL
-	IsColDefined(ULONG	// colid
+	virtual BOOL IsColDefined(ULONG	 // colid
 	) const
 	{
 		// by default, operator does not define columns

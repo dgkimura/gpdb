@@ -70,7 +70,7 @@ public:
 	}
 
 	// relation id
-	IMDId *
+	gpos::Ref<IMDId>
 	GetRelMdId() const
 	{
 		return m_rel_mdid.get();

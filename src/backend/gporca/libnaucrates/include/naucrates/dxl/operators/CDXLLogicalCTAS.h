@@ -104,7 +104,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// mdid of table to create
-	IMDId *
+	gpos::Ref<IMDId>
 	MDId() const
 	{
 		return m_mdid.get();

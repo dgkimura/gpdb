@@ -392,8 +392,8 @@ CJoinStatsProcessor::SetResultingJoinStats(
 		GPOS_ASSERT(colref_outer != nullptr);
 		GPOS_ASSERT(colref_inner != nullptr);
 
-		IMDId *mdid_outer = colref_outer->GetMdidTable();
-		IMDId *mdid_inner = colref_inner->GetMdidTable();
+		gpos::Ref<IMDId> mdid_outer = colref_outer->GetMdidTable();
+		gpos::Ref<IMDId> mdid_inner = colref_inner->GetMdidTable();
 		gpos::Ref<IMdIdArray> mdid_pair = nullptr;
 		BOOL both_dist_keys = false;
 		if ((mdid_outer != nullptr) && (mdid_inner != nullptr))

@@ -63,10 +63,10 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// function id
-	IMDId *FuncMdId() const;
+	gpos::Ref<IMDId> FuncMdId() const;
 
 	// return type
-	IMDId *ReturnTypeMdId() const;
+	gpos::Ref<IMDId> ReturnTypeMdId() const;
 
 	INT TypeModifier() const;
 

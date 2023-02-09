@@ -80,16 +80,16 @@ public:
 	}
 
 	// cast object id
-	IMDId *MDId() const override;
+	gpos::Ref<IMDId> MDId() const override;
 
 	// cast object name
 	CMDName Mdname() const override;
 
 	// source type
-	IMDId *MdidSrc() const override;
+	gpos::Ref<IMDId> MdidSrc() const override;
 
 	// destination type
-	IMDId *MdidDest() const override;
+	gpos::Ref<IMDId> MdidDest() const override;
 
 	// is this a cast between binary coeercible types, i.e. the types are binary compatible
 	BOOL IsBinaryCoercible() const override;
@@ -98,7 +98,7 @@ public:
 	EmdCoercepathType GetMDPathType() const override;
 
 	// cast function id
-	IMDId *GetCastFuncMdId() const override;
+	gpos::Ref<IMDId> GetCastFuncMdId() const override;
 
 	// serialize object in DXL format
 	void Serialize(gpdxl::CXMLSerializer *xml_serializer) const override;
