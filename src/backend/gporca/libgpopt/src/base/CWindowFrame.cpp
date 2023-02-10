@@ -58,13 +58,14 @@ CWindowFrame::CWindowFrame(CMemoryPool *mp, EFrameSpec efs,
 						   EFrameBoundary efbTrailing,
 						   gpos::Ref<CExpression> pexprLeading,
 						   gpos::Ref<CExpression> pexprTrailing,
-						   EFrameExclusionStrategy efes)
+						   EFrameExclusionStrategy efes, BOOL wfEmpty)
 	: m_efs(efs),
 	  m_efbLeading(efbLeading),
 	  m_efbTrailing(efbTrailing),
 	  m_pexprLeading(pexprLeading),
 	  m_pexprTrailing(pexprTrailing),
-	  m_efes(efes)
+	  m_efes(efes),
+	  m_wfEmpty(wfEmpty)
 {
 	GPOS_ASSERT_IMP(EfbBoundedPreceding == m_efbLeading ||
 						EfbBoundedFollowing == m_efbLeading,

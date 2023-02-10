@@ -1838,8 +1838,8 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const gpos::Ref<CDXLNode> dxlnode)
 		else
 		{
 			// create an empty frame
-			pwf =
-				const_cast<gpos::Ref<CWindowFrame> >(CWindowFrame::PwfEmpty());
+			pwf = const_cast<gpos::Ref<CWindowFrame> >(
+				CWindowFrame::PwfEmpty(m_mp));
 			;
 		}
 		pdrgpwf->Append(pwf);

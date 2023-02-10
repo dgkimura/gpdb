@@ -189,8 +189,7 @@ CLogicalSequenceProject::SetHasOrderSpecs(CMemoryPool *mp)
 //
 //---------------------------------------------------------------------------
 void
-CLogicalSequenceProject::SetHasFrameSpecs(CMemoryPool *	 // mp
-)
+CLogicalSequenceProject::SetHasFrameSpecs(CMemoryPool *mp)
 {
 	GPOS_ASSERT(nullptr != m_pdrgpwf);
 
@@ -199,7 +198,7 @@ CLogicalSequenceProject::SetHasFrameSpecs(CMemoryPool *	 // mp
 	{
 		// if no frame specs are given, we add one empty frame
 		gpos::Ref<CWindowFrame> pwf =
-			const_cast<gpos::Ref<CWindowFrame> >(CWindowFrame::PwfEmpty());
+			const_cast<gpos::Ref<CWindowFrame> >(CWindowFrame::PwfEmpty(mp));
 		;
 		m_pdrgpwf->Append(pwf);
 	}
