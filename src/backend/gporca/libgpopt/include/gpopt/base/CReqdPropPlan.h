@@ -186,6 +186,8 @@ public:
 	// equality function used for cost bounding
 	static BOOL FEqualForCostBounding(const gpos::Ref<CReqdPropPlan> prppFst,
 									  const gpos::Ref<CReqdPropPlan> prppSnd);
+	static BOOL FEqualForCostBounding(const CReqdPropPlan *prppFst,
+									  const CReqdPropPlan *prppSnd);
 
 	// map input required and derived plan properties into new required plan properties
 	static gpos::Ref<CReqdPropPlan> PrppRemapForCTE(

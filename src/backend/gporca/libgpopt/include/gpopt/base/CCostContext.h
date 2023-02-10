@@ -275,7 +275,7 @@ public:
 
 		return ccLeft.UlOptReq() == ccRight.UlOptReq() &&
 			   ccLeft.Pgexpr() == ccRight.Pgexpr() &&
-			   ccLeft.Poc()->Matches(ccRight.Poc());
+			   ccLeft.Poc()->Matches(ccRight.Poc().get());
 	}
 
 	// equality function

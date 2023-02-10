@@ -165,7 +165,7 @@ public:
 	gpos::Ref<CGroupExpression> PgexprBest() const;
 
 	// match optimization contexts
-	BOOL Matches(const gpos::Ref<COptimizationContext> poc) const;
+	BOOL Matches(const COptimizationContext *poc) const;
 
 	// get id
 	ULONG

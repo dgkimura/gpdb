@@ -520,6 +520,12 @@ BOOL
 CReqdPropPlan::FEqualForCostBounding(const gpos::Ref<CReqdPropPlan> prppFst,
 									 const gpos::Ref<CReqdPropPlan> prppSnd)
 {
+	return FEqualForCostBounding(prppFst.get(), prppSnd.get());
+}
+BOOL
+CReqdPropPlan::FEqualForCostBounding(const CReqdPropPlan *prppFst,
+									 const CReqdPropPlan *prppSnd)
+{
 	GPOS_ASSERT(nullptr != prppFst);
 	GPOS_ASSERT(nullptr != prppSnd);
 
