@@ -278,8 +278,7 @@ public:
 	}
 
 	// hash function for optimization context
-	static ULONG
-	HashValue(const COptimizationContext &oc);
+	static ULONG HashValue(const COptimizationContext &oc);
 
 	// equality function for cost contexts hash table
 	static BOOL

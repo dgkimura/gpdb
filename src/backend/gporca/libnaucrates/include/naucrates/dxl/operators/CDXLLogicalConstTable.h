@@ -93,13 +93,13 @@ public:
 	BOOL IsColDefined(ULONG colid) const override;
 
 	// conversion function
-	static CDXLLogicalConstTable *
+	static gpos::Ref<CDXLLogicalConstTable>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalConstTable == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalConstTable *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalConstTable>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

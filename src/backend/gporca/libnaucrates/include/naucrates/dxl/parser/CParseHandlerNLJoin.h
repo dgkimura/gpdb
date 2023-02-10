@@ -49,7 +49,7 @@ class CParseHandlerNLJoin : public CParseHandlerPhysicalOp
 {
 private:
 	// the nested loop join operator
-	CDXLPhysicalNLJoin *m_dxl_op;
+	gpos::Ref<CDXLPhysicalNLJoin> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

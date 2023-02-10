@@ -122,13 +122,13 @@ public:
 	BOOL FHasNonScalarFunction(CExpressionHandle &exprhdl) override;
 
 	// conversion function
-	static CScalarFunc *
+	static gpos::Ref<CScalarFunc>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarFunc == pop->Eopid());
 
-		return dynamic_cast<CScalarFunc *>(pop);
+		return gpos::dyn_cast<CScalarFunc>(pop);
 	}
 
 

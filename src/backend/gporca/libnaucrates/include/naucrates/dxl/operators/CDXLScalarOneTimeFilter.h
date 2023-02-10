@@ -42,13 +42,13 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLScalarOneTimeFilter *
+	static gpos::Ref<CDXLScalarOneTimeFilter>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarOneTimeFilter == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarOneTimeFilter *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarOneTimeFilter>(dxl_op);
 	}
 
 	// serialize operator in DXL format

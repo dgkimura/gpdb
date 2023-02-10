@@ -689,7 +689,8 @@ CSubqueryHandler::PexprInnerSelect(CMemoryPool *mp, const CColRef *pcrInner,
 								   BOOL *useNotNullableInnerOpt)
 {
 	gpos::Ref<CExpression> predToUse = nullptr;
-	CScalarCmp *pscalarCmp = gpos::dyn_cast<CScalarCmp>(pexprPredicate->Pop());
+	gpos::Ref<CScalarCmp> pscalarCmp =
+		gpos::dyn_cast<CScalarCmp>(pexprPredicate->Pop());
 	BOOL innerIsNullable =
 		!pexprInner->DeriveNotNullColumns()->FMember(pcrInner);
 
@@ -1699,7 +1700,7 @@ CSubqueryHandler::FRemoveAllSubquery(
 	if (EsqctxtValue == esqctxt)
 	{
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		CScalarCmp *scalarComp =
+		gpos::Ref<CScalarCmp> scalarComp =
 			gpos::dyn_cast<CScalarCmp>(pexprPredicate->Pop());
 
 		if (nullptr != scalarComp)

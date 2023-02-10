@@ -61,13 +61,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLLogicalGroupBy *
+	static gpos::Ref<CDXLLogicalGroupBy>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalGrpBy == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalGroupBy *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalGroupBy>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

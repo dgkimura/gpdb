@@ -69,7 +69,8 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarPartListValues *Cast(gpos::Ref<CDXLOperator> dxl_op);
+	static gpos::Ref<CDXLScalarPartListValues> Cast(
+		gpos::Ref<CDXLOperator> dxl_op);
 };
 }  // namespace gpdxl
 

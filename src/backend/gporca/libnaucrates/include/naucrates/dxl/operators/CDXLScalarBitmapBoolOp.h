@@ -86,13 +86,13 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarBitmapBoolOp *
+	static gpos::Ref<CDXLScalarBitmapBoolOp>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarBitmapBoolOp == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarBitmapBoolOp *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarBitmapBoolOp>(dxl_op);
 	}
 };
 }  // namespace gpdxl

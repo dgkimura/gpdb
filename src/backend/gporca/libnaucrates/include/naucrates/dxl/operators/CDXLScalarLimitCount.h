@@ -50,13 +50,13 @@ public:
 	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// conversion function
-	static CDXLScalarLimitCount *
+	static gpos::Ref<CDXLScalarLimitCount>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarLimitCount == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarLimitCount *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarLimitCount>(dxl_op);
 	}
 
 	// does the operator return a boolean result

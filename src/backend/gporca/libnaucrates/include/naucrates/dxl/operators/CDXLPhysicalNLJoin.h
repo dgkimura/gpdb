@@ -90,13 +90,13 @@ public:
 	CDXLColRefArray *GetNestLoopParamsColRefs() const;
 
 	// conversion function
-	static CDXLPhysicalNLJoin *
+	static gpos::Ref<CDXLPhysicalNLJoin>
 	PdxlConvert(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalNLJoin == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalNLJoin *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalNLJoin>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

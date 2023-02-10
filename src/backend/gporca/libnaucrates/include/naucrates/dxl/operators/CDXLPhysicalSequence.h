@@ -50,13 +50,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalSequence *
+	static gpos::Ref<CDXLPhysicalSequence>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalSequence == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalSequence *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalSequence>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

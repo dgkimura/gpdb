@@ -265,7 +265,7 @@ CTranslatorDXLToPlStmt::GetPlannedStmtFromDXL(const gpos::Ref<CDXLNode> dxlnode,
 		planned_stmt->numSlices == 1 &&
 		dxlnode->GetOperator()->GetDXLOperator() == EdxlopPhysicalDML)
 	{
-		CDXLPhysicalDML *phy_dml_dxlop =
+		gpos::Ref<CDXLPhysicalDML> phy_dml_dxlop =
 			gpos::dyn_cast<CDXLPhysicalDML>(dxlnode->GetOperator());
 
 		List *direct_dispatch_segids = TranslateDXLDirectDispatchInfo(
@@ -553,7 +553,7 @@ CTranslatorDXLToPlStmt::TranslateDXLTblScan(
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
 	// translate table descriptor into a range table entry
-	CDXLPhysicalTableScan *phy_tbl_scan_dxlop =
+	gpos::Ref<CDXLPhysicalTableScan> phy_tbl_scan_dxlop =
 		gpos::dyn_cast<CDXLPhysicalTableScan>(tbl_scan_dxlnode->GetOperator());
 
 	// translation context for column mappings in the base relation
@@ -700,7 +700,7 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexScan(
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
 	// translate table descriptor into a range table entry
-	CDXLPhysicalIndexScan *physical_idx_scan_dxlop =
+	gpos::Ref<CDXLPhysicalIndexScan> physical_idx_scan_dxlop =
 		gpos::dyn_cast<CDXLPhysicalIndexScan>(
 			index_scan_dxlnode->GetOperator());
 
@@ -720,7 +720,7 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexScan(
 Plan *
 CTranslatorDXLToPlStmt::TranslateDXLIndexScan(
 	const gpos::Ref<CDXLNode> index_scan_dxlnode,
-	CDXLPhysicalIndexScan *physical_idx_scan_dxlop,
+	gpos::Ref<CDXLPhysicalIndexScan> physical_idx_scan_dxlop,
 	CDXLTranslateContext *output_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
@@ -871,7 +871,7 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexOnlyScan(
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
 	// translate table descriptor into a range table entry
-	CDXLPhysicalIndexOnlyScan *physical_idx_scan_dxlop =
+	gpos::Ref<CDXLPhysicalIndexOnlyScan> physical_idx_scan_dxlop =
 		gpos::dyn_cast<CDXLPhysicalIndexOnlyScan>(
 			index_scan_dxlnode->GetOperator());
 	const gpos::Ref<CDXLTableDescr> table_desc =
@@ -1297,7 +1297,7 @@ CTranslatorDXLToPlStmt::TranslateDXLHashJoin(
 	Plan *plan = &(join->plan);
 	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
 
-	CDXLPhysicalHashJoin *hashjoin_dxlop =
+	gpos::Ref<CDXLPhysicalHashJoin> hashjoin_dxlop =
 		gpos::dyn_cast<CDXLPhysicalHashJoin>(hj_dxlnode->GetOperator());
 
 	// set join type
@@ -1549,7 +1549,7 @@ CTranslatorDXLToPlStmt::TranslateDXLTvfToRangeTblEntry(
 	const gpos::Ref<CDXLNode> tvf_dxlnode, CDXLTranslateContext *output_context,
 	CDXLTranslateContextBaseTable *base_table_context)
 {
-	CDXLPhysicalTVF *dxlop =
+	gpos::Ref<CDXLPhysicalTVF> dxlop =
 		gpos::dyn_cast<CDXLPhysicalTVF>(tvf_dxlnode->GetOperator());
 
 	RangeTblEntry *rte = MakeNode(RangeTblEntry);
@@ -1570,8 +1570,9 @@ CTranslatorDXLToPlStmt::TranslateDXLTvfToRangeTblEntry(
 	for (ULONG ul = 0; ul < num_of_cols; ul++)
 	{
 		gpos::Ref<CDXLNode> proj_elem_dxlnode = (*project_list_dxlnode)[ul];
-		CDXLScalarProjElem *dxl_proj_elem = gpos::dyn_cast<CDXLScalarProjElem>(
-			proj_elem_dxlnode->GetOperator());
+		gpos::Ref<CDXLScalarProjElem> dxl_proj_elem =
+			gpos::dyn_cast<CDXLScalarProjElem>(
+				proj_elem_dxlnode->GetOperator());
 
 		CHAR *col_name_char_array =
 			CTranslatorUtils::CreateMultiByteCharStringFromWCString(
@@ -1601,8 +1602,9 @@ CTranslatorDXLToPlStmt::TranslateDXLTvfToRangeTblEntry(
 		gpos::Ref<CDXLScalarConstValue> constValue =
 			gpos::dyn_cast<CDXLScalarConstValue>(constVa->GetOperator());
 		const gpos::Ref<CDXLDatum> datum_dxl = constValue->GetDatumVal();
-		CDXLDatumGeneric *datum_generic_dxl = gpos::dyn_cast<CDXLDatumGeneric>(
-			const_cast<gpdxl::gpos::Ref<CDXLDatum> >(datum_dxl));
+		gpos::Ref<CDXLDatumGeneric> datum_generic_dxl =
+			gpos::dyn_cast<CDXLDatumGeneric>(
+				const_cast<gpdxl::gpos::Ref<CDXLDatum> >(datum_dxl));
 		const IMDType *type =
 			m_md_accessor->RetrieveType(datum_generic_dxl->MDId());
 		const_expr->constlen = type->Length();
@@ -1681,7 +1683,7 @@ CTranslatorDXLToPlStmt::TranslateDXLValueScanToRangeTblEntry(
 	CDXLTranslateContext *output_context,
 	CDXLTranslateContextBaseTable *base_table_context)
 {
-	CDXLPhysicalValuesScan *phy_values_scan_dxlop =
+	gpos::Ref<CDXLPhysicalValuesScan> phy_values_scan_dxlop =
 		gpos::dyn_cast<CDXLPhysicalValuesScan>(
 			value_scan_dxlnode->GetOperator());
 
@@ -1711,8 +1713,9 @@ CTranslatorDXLToPlStmt::TranslateDXLValueScanToRangeTblEntry(
 	for (ULONG ul = 0; ul < num_of_cols; ul++)
 	{
 		gpos::Ref<CDXLNode> proj_elem_dxlnode = (*project_list_dxlnode)[ul];
-		CDXLScalarProjElem *dxl_proj_elem = gpos::dyn_cast<CDXLScalarProjElem>(
-			proj_elem_dxlnode->GetOperator());
+		gpos::Ref<CDXLScalarProjElem> dxl_proj_elem =
+			gpos::dyn_cast<CDXLScalarProjElem>(
+				proj_elem_dxlnode->GetOperator());
 
 		CHAR *col_name_char_array =
 			CTranslatorUtils::CreateMultiByteCharStringFromWCString(
@@ -1792,7 +1795,7 @@ CTranslatorDXLToPlStmt::TranslateDXLNLJoin(
 	Plan *plan = &(join->plan);
 	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
 
-	CDXLPhysicalNLJoin *dxl_nlj =
+	gpos::Ref<CDXLPhysicalNLJoin> dxl_nlj =
 		gpos::dyn_cast<CDXLPhysicalNLJoin>(nl_join_dxlnode->GetOperator());
 
 	// set join type
@@ -1949,7 +1952,7 @@ CTranslatorDXLToPlStmt::TranslateDXLMergeJoin(
 	Plan *plan = &(join->plan);
 	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
 
-	CDXLPhysicalMergeJoin *merge_join_dxlop =
+	gpos::Ref<CDXLPhysicalMergeJoin> merge_join_dxlop =
 		gpos::dyn_cast<CDXLPhysicalMergeJoin>(
 			merge_join_dxlnode->GetOperator());
 
@@ -2162,7 +2165,7 @@ CTranslatorDXLToPlStmt::TranslateDXLDuplicateSensitiveMotion(
 	CDXLTranslateContext *output_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
-	CDXLPhysicalMotion *motion_dxlop =
+	gpos::Ref<CDXLPhysicalMotion> motion_dxlop =
 		gpos::dyn_cast<CDXLPhysicalMotion>(motion_dxlnode->GetOperator());
 	if (CTranslatorUtils::IsDuplicateSensitiveMotion(motion_dxlop))
 	{
@@ -2188,7 +2191,7 @@ CTranslatorDXLToPlStmt::TranslateDXLMotion(
 	CDXLTranslateContext *output_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
-	CDXLPhysicalMotion *motion_dxlop =
+	gpos::Ref<CDXLPhysicalMotion> motion_dxlop =
 		gpos::dyn_cast<CDXLPhysicalMotion>(motion_dxlnode->GetOperator());
 	const IntPtrArray *input_segids_array = motion_dxlop->GetInputSegIdsArray();
 	PlanSlice *recvslice = m_dxl_to_plstmt_context->GetCurrentSlice();
@@ -2440,7 +2443,7 @@ CTranslatorDXLToPlStmt::TranslateDXLRedistributeMotionToResultHashFilters(
 	Plan *plan = &(result->plan);
 	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
 
-	CDXLPhysicalMotion *motion_dxlop =
+	gpos::Ref<CDXLPhysicalMotion> motion_dxlop =
 		gpos::dyn_cast<CDXLPhysicalMotion>(motion_dxlnode->GetOperator());
 
 	// translate operator costs
@@ -2631,7 +2634,7 @@ CTranslatorDXLToPlStmt::TranslateDXLAgg(
 	Plan *plan = &(agg->plan);
 	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
 
-	CDXLPhysicalAgg *dxl_phy_agg_dxlop =
+	gpos::Ref<CDXLPhysicalAgg> dxl_phy_agg_dxlop =
 		gpos::dyn_cast<CDXLPhysicalAgg>(agg_dxlnode->GetOperator());
 
 	// translate operator costs
@@ -2770,7 +2773,7 @@ CTranslatorDXLToPlStmt::TranslateDXLWindow(
 	Plan *plan = &(window->plan);
 	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
 
-	CDXLPhysicalWindow *window_dxlop =
+	gpos::Ref<CDXLPhysicalWindow> window_dxlop =
 		gpos::dyn_cast<CDXLPhysicalWindow>(window_dxlnode->GetOperator());
 
 	// translate the operator costs
@@ -3063,7 +3066,7 @@ CTranslatorDXLToPlStmt::TranslateDXLSort(
 	Plan *plan = &(sort->plan);
 	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
 
-	CDXLPhysicalSort *sort_dxlop =
+	gpos::Ref<CDXLPhysicalSort> sort_dxlop =
 		gpos::dyn_cast<CDXLPhysicalSort>(sort_dxlnode->GetOperator());
 
 	// translate operator costs
@@ -3140,7 +3143,7 @@ CTranslatorDXLToPlStmt::TranslateDXLSubQueryScan(
 	Plan *plan = &(subquery_scan->scan.plan);
 	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
 
-	CDXLPhysicalSubqueryScan *subquery_scan_dxlop =
+	gpos::Ref<CDXLPhysicalSubqueryScan> subquery_scan_dxlop =
 		gpos::dyn_cast<CDXLPhysicalSubqueryScan>(
 			subquery_scan_dxlnode->GetOperator());
 
@@ -3196,7 +3199,7 @@ CTranslatorDXLToPlStmt::TranslateDXLSubQueryScan(
 		alias->colnames = gpdb::LAppend(alias->colnames, val_colname);
 
 		// get corresponding child project element
-		CDXLScalarProjElem *sc_proj_elem_dxlop =
+		gpos::Ref<CDXLScalarProjElem> sc_proj_elem_dxlop =
 			gpos::dyn_cast<CDXLScalarProjElem>(
 				(*child_proj_list_dxlnode)[ul]->GetOperator());
 
@@ -3497,7 +3500,7 @@ CTranslatorDXLToPlStmt::TranslateDXLPartSelector(
 
 	Plan *plan = &(partition_selector->plan);
 	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
-	CDXLPhysicalPartitionSelector *partition_selector_dxlop =
+	gpos::Ref<CDXLPhysicalPartitionSelector> partition_selector_dxlop =
 		gpos::dyn_cast<CDXLPhysicalPartitionSelector>(
 			partition_selector_dxlnode->GetOperator());
 
@@ -3637,7 +3640,7 @@ CTranslatorDXLToPlStmt::TranslateDXLAppend(
 	append->appendplans = NIL;
 
 	// translate table descriptor into a range table entry
-	CDXLPhysicalAppend *phy_append_dxlop =
+	gpos::Ref<CDXLPhysicalAppend> phy_append_dxlop =
 		gpos::dyn_cast<CDXLPhysicalAppend>(append_dxlnode->GetOperator());
 
 	// If this append was create from a DynamicTableScan node in ORCA, it will
@@ -3703,14 +3706,14 @@ CTranslatorDXLToPlStmt::TranslateDXLAppend(
 		GPOS_ASSERT(EdxlopScalarProjectElem ==
 					proj_elem_dxlnode->GetOperator()->GetDXLOperator());
 
-		CDXLScalarProjElem *sc_proj_elem_dxlop =
+		gpos::Ref<CDXLScalarProjElem> sc_proj_elem_dxlop =
 			gpos::dyn_cast<CDXLScalarProjElem>(
 				proj_elem_dxlnode->GetOperator());
 		GPOS_ASSERT(1 == proj_elem_dxlnode->Arity());
 
 		// translate proj element expression
 		gpos::Ref<CDXLNode> expr_dxlnode = (*proj_elem_dxlnode)[0];
-		CDXLScalarIdent *sc_ident_dxlop =
+		gpos::Ref<CDXLScalarIdent> sc_ident_dxlop =
 			gpos::dyn_cast<CDXLScalarIdent>(expr_dxlnode->GetOperator());
 
 		Index idxVarno = OUTER_VAR;
@@ -3774,7 +3777,7 @@ CTranslatorDXLToPlStmt::TranslateDXLMaterialize(
 	Plan *plan = &(materialize->plan);
 	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
 
-	CDXLPhysicalMaterialize *materialize_dxlop =
+	gpos::Ref<CDXLPhysicalMaterialize> materialize_dxlop =
 		gpos::dyn_cast<CDXLPhysicalMaterialize>(
 			materialize_dxlnode->GetOperator());
 
@@ -3834,7 +3837,7 @@ CTranslatorDXLToPlStmt::TranslateDXLCTEProducerToSharedScan(
 	CDXLTranslateContext *output_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
-	CDXLPhysicalCTEProducer *cte_prod_dxlop =
+	gpos::Ref<CDXLPhysicalCTEProducer> cte_prod_dxlop =
 		gpos::dyn_cast<CDXLPhysicalCTEProducer>(
 			cte_producer_dxlnode->GetOperator());
 	ULONG cte_id = cte_prod_dxlop->Id();
@@ -3895,7 +3898,7 @@ CTranslatorDXLToPlStmt::TranslateDXLCTEConsumerToSharedScan(
 	CDXLTranslateContext *output_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
-	CDXLPhysicalCTEConsumer *cte_consumer_dxlop =
+	gpos::Ref<CDXLPhysicalCTEConsumer> cte_consumer_dxlop =
 		gpos::dyn_cast<CDXLPhysicalCTEConsumer>(
 			cte_consumer_dxlnode->GetOperator());
 	ULONG cte_id = cte_consumer_dxlop->Id();
@@ -3923,14 +3926,14 @@ CTranslatorDXLToPlStmt::TranslateDXLCTEConsumerToSharedScan(
 	for (ULONG ul = 0; ul < num_of_proj_list_elem; ul++)
 	{
 		gpos::Ref<CDXLNode> proj_elem_dxlnode = (*project_list_dxlnode)[ul];
-		CDXLScalarProjElem *sc_proj_elem_dxlop =
+		gpos::Ref<CDXLScalarProjElem> sc_proj_elem_dxlop =
 			gpos::dyn_cast<CDXLScalarProjElem>(
 				proj_elem_dxlnode->GetOperator());
 		ULONG colid = sc_proj_elem_dxlop->Id();
 		GPOS_ASSERT(colid == *(*output_colids_array)[ul]);
 
 		gpos::Ref<CDXLNode> sc_ident_dxlnode = (*proj_elem_dxlnode)[0];
-		CDXLScalarIdent *sc_ident_dxlop =
+		gpos::Ref<CDXLScalarIdent> sc_ident_dxlop =
 			gpos::dyn_cast<CDXLScalarIdent>(sc_ident_dxlnode->GetOperator());
 		OID oid_type =
 			gpos::dyn_cast<CMDIdGPDB>(sc_ident_dxlop->MdidType())->Oid();
@@ -4032,7 +4035,7 @@ CTranslatorDXLToPlStmt::TranslateDXLDynTblScan(
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
 	// translate table descriptor into a range table entry
-	CDXLPhysicalDynamicTableScan *dyn_tbl_scan_dxlop =
+	gpos::Ref<CDXLPhysicalDynamicTableScan> dyn_tbl_scan_dxlop =
 		gpos::dyn_cast<CDXLPhysicalDynamicTableScan>(
 			dyn_tbl_scan_dxlnode->GetOperator());
 
@@ -4125,7 +4128,7 @@ CTranslatorDXLToPlStmt::TranslateDXLDynIdxScan(
 	CDXLTranslateContext *output_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
-	CDXLPhysicalDynamicIndexScan *dyn_index_scan_dxlop =
+	gpos::Ref<CDXLPhysicalDynamicIndexScan> dyn_index_scan_dxlop =
 		gpos::dyn_cast<CDXLPhysicalDynamicIndexScan>(
 			dyn_idx_scan_dxlnode->GetOperator());
 
@@ -4248,7 +4251,7 @@ CTranslatorDXLToPlStmt::TranslateDXLDml(
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
 	// translate table descriptor into a range table entry
-	CDXLPhysicalDML *phy_dml_dxlop =
+	gpos::Ref<CDXLPhysicalDML> phy_dml_dxlop =
 		gpos::dyn_cast<CDXLPhysicalDML>(dml_dxlnode->GetOperator());
 
 	// create ModifyTable node
@@ -4559,7 +4562,7 @@ CTranslatorDXLToPlStmt::TranslateDXLSplit(
 	CDXLTranslateContext *output_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
-	CDXLPhysicalSplit *phy_split_dxlop =
+	gpos::Ref<CDXLPhysicalSplit> phy_split_dxlop =
 		gpos::dyn_cast<CDXLPhysicalSplit>(split_dxlnode->GetOperator());
 
 	// create SplitUpdate node
@@ -4643,7 +4646,7 @@ CTranslatorDXLToPlStmt::TranslateDXLAssert(
 	Plan *plan = &(assert_node->plan);
 	plan->plan_node_id = m_dxl_to_plstmt_context->GetNextPlanId();
 
-	CDXLPhysicalAssert *assert_dxlop =
+	gpos::Ref<CDXLPhysicalAssert> assert_dxlop =
 		gpos::dyn_cast<CDXLPhysicalAssert>(assert_dxlnode->GetOperator());
 
 	// translate error code into the its internal GPDB representation
@@ -4833,7 +4836,7 @@ CTranslatorDXLToPlStmt::TranslateDXLProjList(
 		gpos::Ref<CDXLNode> proj_elem_dxlnode = (*project_list_dxlnode)[ul];
 		GPOS_ASSERT(EdxlopScalarProjectElem ==
 					proj_elem_dxlnode->GetOperator()->GetDXLOperator());
-		CDXLScalarProjElem *sc_proj_elem_dxlop =
+		gpos::Ref<CDXLScalarProjElem> sc_proj_elem_dxlop =
 			gpos::dyn_cast<CDXLScalarProjElem>(
 				proj_elem_dxlnode->GetOperator());
 		GPOS_ASSERT(1 == proj_elem_dxlnode->Arity());
@@ -4997,7 +5000,7 @@ CTranslatorDXLToPlStmt::TranslateDXLProjectListToHashTargetList(
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		gpos::Ref<CDXLNode> proj_elem_dxlnode = (*project_list_dxlnode)[ul];
-		CDXLScalarProjElem *sc_proj_elem_dxlop =
+		gpos::Ref<CDXLScalarProjElem> sc_proj_elem_dxlop =
 			gpos::dyn_cast<CDXLScalarProjElem>(
 				proj_elem_dxlnode->GetOperator());
 
@@ -5231,7 +5234,7 @@ CTranslatorDXLToPlStmt::TranslateHashExprList(
 		{
 			gpos::Ref<CDXLNode> hash_expr_dxlnode =
 				(*hash_expr_list_dxlnode)[ul];
-			CDXLScalarHashExpr *hash_expr_dxlop =
+			gpos::Ref<CDXLScalarHashExpr> hash_expr_dxlop =
 				gpos::dyn_cast<CDXLScalarHashExpr>(
 					hash_expr_dxlnode->GetOperator());
 			const gpos::Ref<IMDId> opfamily = hash_expr_dxlop->MdidOpfamily();
@@ -5268,7 +5271,7 @@ CTranslatorDXLToPlStmt::TranslateSortCols(
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		gpos::Ref<CDXLNode> sort_col_dxlnode = (*sort_col_list_dxl)[ul];
-		CDXLScalarSortCol *sc_sort_col_dxlop =
+		gpos::Ref<CDXLScalarSortCol> sc_sort_col_dxlop =
 			gpos::dyn_cast<CDXLScalarSortCol>(sort_col_dxlnode->GetOperator());
 
 		ULONG sort_colid = sc_sort_col_dxlop->GetColId();
@@ -5326,7 +5329,8 @@ CTranslatorDXLToPlStmt::IsTgtTblDistributed(gpos::Ref<CDXLOperator> dxlop)
 		return false;
 	}
 
-	CDXLPhysicalDML *phy_dml_dxlop = gpos::dyn_cast<CDXLPhysicalDML>(dxlop);
+	gpos::Ref<CDXLPhysicalDML> phy_dml_dxlop =
+		gpos::dyn_cast<CDXLPhysicalDML>(dxlop);
 	gpos::Ref<IMDId> mdid = phy_dml_dxlop->GetDXLTableDescr()->MDId();
 
 	return IMDRelation::EreldistrMasterOnly !=
@@ -5426,8 +5430,8 @@ CTranslatorDXLToPlStmt::GetGPDBJoinTypeFromDXLJoinType(EdxlJoinType join_type)
 //
 //---------------------------------------------------------------------------
 void
-CTranslatorDXLToPlStmt::SetVarTypMod(const CDXLPhysicalCTAS *phy_ctas_dxlop,
-									 List *target_list)
+CTranslatorDXLToPlStmt::SetVarTypMod(
+	const gpos::Ref<CDXLPhysicalCTAS> phy_ctas_dxlop, List *target_list)
 {
 	GPOS_ASSERT(nullptr != target_list);
 
@@ -5464,7 +5468,7 @@ CTranslatorDXLToPlStmt::TranslateDXLCtas(
 	CDXLTranslateContext *output_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings)
 {
-	CDXLPhysicalCTAS *phy_ctas_dxlop =
+	gpos::Ref<CDXLPhysicalCTAS> phy_ctas_dxlop =
 		gpos::dyn_cast<CDXLPhysicalCTAS>(ctas_dxlnode->GetOperator());
 	gpos::Ref<CDXLNode> project_list_dxlnode = (*ctas_dxlnode)[0];
 	gpos::Ref<CDXLNode> child_dxlnode = (*ctas_dxlnode)[1];
@@ -5534,7 +5538,7 @@ CTranslatorDXLToPlStmt::TranslateDXLCtas(
 //---------------------------------------------------------------------------
 IntoClause *
 CTranslatorDXLToPlStmt::TranslateDXLPhyCtasToIntoClause(
-	const CDXLPhysicalCTAS *phy_ctas_dxlop)
+	const gpos::Ref<CDXLPhysicalCTAS> phy_ctas_dxlop)
 {
 	IntoClause *into_clause = MakeNode(IntoClause);
 	into_clause->rel = MakeNode(RangeVar);
@@ -5608,7 +5612,7 @@ CTranslatorDXLToPlStmt::TranslateDXLPhyCtasToIntoClause(
 //---------------------------------------------------------------------------
 GpPolicy *
 CTranslatorDXLToPlStmt::TranslateDXLPhyCtasToDistrPolicy(
-	const CDXLPhysicalCTAS *dxlop, List *target_list)
+	const gpos::Ref<CDXLPhysicalCTAS> dxlop, List *target_list)
 {
 	ULongPtrArray *distr_col_pos_array = dxlop->GetDistrColPosArray();
 
@@ -5740,8 +5744,10 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapTblScan(
 	{
 		GPOS_ASSERT(EdxlopPhysicalDynamicBitmapTableScan ==
 					dxl_operator->GetDXLOperator());
-		CDXLPhysicalDynamicBitmapTableScan *phy_dyn_bitmap_tblscan_dxlop =
-			gpos::dyn_cast<CDXLPhysicalDynamicBitmapTableScan>(dxl_operator);
+		gpos::Ref<CDXLPhysicalDynamicBitmapTableScan>
+			phy_dyn_bitmap_tblscan_dxlop =
+				gpos::dyn_cast<CDXLPhysicalDynamicBitmapTableScan>(
+					dxl_operator);
 		table_descr = phy_dyn_bitmap_tblscan_dxlop->GetDXLTableDescr();
 
 		is_dynamic = true;
@@ -5777,8 +5783,10 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapTblScan(
 	{
 		bitmap_tbl_scan = &dscan->bitmapheapscan;
 
-		CDXLPhysicalDynamicBitmapTableScan *phy_dyn_bitmap_tblscan_dxlop =
-			gpos::dyn_cast<CDXLPhysicalDynamicBitmapTableScan>(dxl_operator);
+		gpos::Ref<CDXLPhysicalDynamicBitmapTableScan>
+			phy_dyn_bitmap_tblscan_dxlop =
+				gpos::dyn_cast<CDXLPhysicalDynamicBitmapTableScan>(
+					dxl_operator);
 
 		IMdIdArray *parts = phy_dyn_bitmap_tblscan_dxlop->GetParts();
 
@@ -5909,7 +5917,7 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapBoolOp(
 	GPOS_ASSERT(EdxlopScalarBitmapBoolOp ==
 				bitmap_boolop_dxlnode->GetOperator()->GetDXLOperator());
 
-	CDXLScalarBitmapBoolOp *sc_bitmap_boolop_dxlop =
+	gpos::Ref<CDXLScalarBitmapBoolOp> sc_bitmap_boolop_dxlop =
 		gpos::dyn_cast<CDXLScalarBitmapBoolOp>(
 			bitmap_boolop_dxlnode->GetOperator());
 
@@ -5968,7 +5976,7 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapIndexProbe(
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings,
 	BitmapHeapScan *bitmap_tbl_scan)
 {
-	CDXLScalarBitmapIndexProbe *sc_bitmap_idx_probe_dxlop =
+	gpos::Ref<CDXLScalarBitmapIndexProbe> sc_bitmap_idx_probe_dxlop =
 		gpos::dyn_cast<CDXLScalarBitmapIndexProbe>(
 			bitmap_index_probe_dxlnode->GetOperator());
 

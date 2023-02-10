@@ -174,8 +174,9 @@ COptimizer::PrintQueryOrPlan(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 			{
 				gpos::Ref<CScalarConst> popScalarConst =
 					CScalarConst::PopConvert(pop);
-				CDatumGenericGPDB *datum = dynamic_cast<CDatumGenericGPDB *>(
-					popScalarConst->GetDatum());
+				gpos::Ref<CDatumGenericGPDB> datum =
+					gpos::dyn_cast<CDatumGenericGPDB>(
+						popScalarConst->GetDatum());
 
 				if (NULL != datum && !datum->IsNull())
 				{

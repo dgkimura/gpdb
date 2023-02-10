@@ -83,13 +83,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalTVF *
+	static gpos::Ref<CDXLPhysicalTVF>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalTVF == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalTVF *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalTVF>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

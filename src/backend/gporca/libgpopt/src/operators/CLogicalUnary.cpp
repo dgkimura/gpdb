@@ -77,8 +77,7 @@ CLogicalUnary::PstatsDeriveProject(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	pcrs->ExtractColIds(mp, colids.get());
 
 	gpos::Ref<IStatistics> stats = CProjectStatsProcessor::CalcProjStats(
-		mp, dynamic_cast<gpos::Ref<CStatistics> >(child_stats), colids.get(),
-		phmuldatum);
+		mp, gpos::dyn_cast<CStatistics>(child_stats), colids.get(), phmuldatum);
 
 	// clean up
 	;

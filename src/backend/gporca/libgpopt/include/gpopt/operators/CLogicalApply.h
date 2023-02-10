@@ -173,13 +173,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CLogicalApply *
+	static gpos::Ref<CLogicalApply>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FApply(pop));
 
-		return dynamic_cast<CLogicalApply *>(pop);
+		return gpos::dyn_cast<CLogicalApply>(pop);
 	}
 
 };	// class CLogicalApply

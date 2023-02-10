@@ -108,13 +108,13 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarWindowFrameEdge *
+	static gpos::Ref<CDXLScalarWindowFrameEdge>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarWindowFrameEdge == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarWindowFrameEdge *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarWindowFrameEdge>(dxl_op);
 	}
 };
 }  // namespace gpdxl

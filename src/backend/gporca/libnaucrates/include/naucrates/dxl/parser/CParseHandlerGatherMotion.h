@@ -36,7 +36,7 @@ class CParseHandlerGatherMotion : public CParseHandlerPhysicalOp
 {
 private:
 	// the gather motion operator
-	CDXLPhysicalGatherMotion *m_dxl_op;
+	gpos::Ref<CDXLPhysicalGatherMotion> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

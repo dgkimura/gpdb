@@ -447,7 +447,8 @@ CConstraint::PcnstrFromScalarCmp(
 		if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 		{
 			CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
-			CScalarCmp *sc_cmp = gpos::dyn_cast<CScalarCmp>(pexpr->Pop());
+			gpos::Ref<CScalarCmp> sc_cmp =
+				gpos::dyn_cast<CScalarCmp>(pexpr->Pop());
 			const IMDScalarOp *op = mda->RetrieveScOp(sc_cmp->MdIdOp());
 
 			gpos::Ref<IMDId> left_mdid =

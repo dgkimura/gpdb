@@ -1947,8 +1947,8 @@ CTranslatorScalarToDXL::CreateQuantifiedSubqueryFromSublink(
 	GPOS_ASSERT(nullptr != dxl_sc_ident);
 
 	// get dxl scalar identifier
-	CDXLScalarIdent *scalar_ident =
-		dynamic_cast<CDXLScalarIdent *>(dxl_sc_ident->GetOperator());
+	gpos::Ref<CDXLScalarIdent> scalar_ident =
+		gpos::dyn_cast<CDXLScalarIdent>(dxl_sc_ident->GetOperator());
 
 	// get the dxl column reference
 	const gpos::Ref<CDXLColRef> dxl_colref = scalar_ident->GetDXLColRef();
@@ -2029,7 +2029,7 @@ CTranslatorScalarToDXL::CreateScalarSubqueryFromSublink(
 	gpos::Ref<CDXLNode> dxl_sc_ident = (*query_output_dxlnode_array)[0].get();
 	GPOS_ASSERT(nullptr != dxl_sc_ident);
 
-	CDXLScalarIdent *scalar_ident =
+	gpos::Ref<CDXLScalarIdent> scalar_ident =
 		gpos::dyn_cast<CDXLScalarIdent>(dxl_sc_ident->GetOperator());
 
 	// get the dxl column reference

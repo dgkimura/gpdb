@@ -45,13 +45,13 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLLogicalExternalGet *
+	static gpos::Ref<CDXLLogicalExternalGet>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalExternalGet == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalExternalGet *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalExternalGet>(dxl_op);
 	}
 };
 }  // namespace gpdxl

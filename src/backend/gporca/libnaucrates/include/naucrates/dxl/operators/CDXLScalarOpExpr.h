@@ -72,13 +72,13 @@ public:
 	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// conversion function
-	static CDXLScalarOpExpr *
+	static gpos::Ref<CDXLScalarOpExpr>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarOpExpr == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarOpExpr *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarOpExpr>(dxl_op);
 	}
 
 	// does the operator return a boolean result

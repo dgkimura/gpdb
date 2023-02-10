@@ -272,7 +272,8 @@ CStatsPredUtils::GetPredStats(CMemoryPool *mp, gpos::Ref<CExpression> expr)
 			expr, COperator::EopScalarCmp));
 
 		gpos::Ref<COperator> expr_operator = expr->Pop();
-		CScalarCmp *scalar_cmp_op = gpos::dyn_cast<CScalarCmp>(expr_operator);
+		gpos::Ref<CScalarCmp> scalar_cmp_op =
+			gpos::dyn_cast<CScalarCmp>(expr_operator);
 
 		// Comparison semantics for statistics purposes is looser
 		// than regular comparison
@@ -397,7 +398,7 @@ CStatsPredUtils::IsJoinPredSupportedForStatsEstimation(
 	{
 		GPOS_ASSERT(is_scalar_cmp);
 
-		CScalarCmp *sc_cmp_op = gpos::dyn_cast<CScalarCmp>(expr_op);
+		gpos::Ref<CScalarCmp> sc_cmp_op = gpos::dyn_cast<CScalarCmp>(expr_op);
 
 		// Comparison semantics for stats purposes is looser
 		// than regular comparison.

@@ -59,12 +59,12 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalHashJoin *
+	static gpos::Ref<CDXLPhysicalHashJoin>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalHashJoin == dxl_op->GetDXLOperator());
-		return dynamic_cast<CDXLPhysicalHashJoin *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalHashJoin>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

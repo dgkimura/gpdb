@@ -221,8 +221,8 @@ CDatumGenericGPDB::Matches(const gpos::Ref<IDatum> datum) const
 		return false;
 	}
 
-	const CDatumGenericGPDB *datum_generic =
-		dynamic_cast<const CDatumGenericGPDB *>(datum);
+	const gpos::Ref<CDatumGenericGPDB> datum_generic =
+		gpos::dyn_cast<CDatumGenericGPDB>(datum);
 
 	if (datum_generic->IsNull() && IsNull())
 	{
@@ -348,8 +348,8 @@ CDatumGenericGPDB::StatsAreEqual(const gpos::Ref<IDatum> datum) const
 	}
 
 	// fall back to memcmp
-	const CDatumGenericGPDB *datum_generic_gpdb =
-		dynamic_cast<const CDatumGenericGPDB *>(datum);
+	const gpos::Ref<CDatumGenericGPDB> datum_generic_gpdb =
+		gpos::dyn_cast<CDatumGenericGPDB>(datum);
 
 	ULONG size = this->Size();
 	if (size == datum_generic_gpdb->Size())

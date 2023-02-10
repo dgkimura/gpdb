@@ -36,7 +36,7 @@ class CParseHandlerProjElem : public CParseHandlerScalarOp
 {
 private:
 	// project elem operator
-	CDXLScalarProjElem *m_dxl_op;
+	gpos::Ref<CDXLScalarProjElem> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

@@ -64,13 +64,13 @@ public:
 	BOOL HasBoolResult(CMDAccessor *md_accessor) const override;
 
 	// conversion function
-	static CDXLScalarCaseTest *
+	static gpos::Ref<CDXLScalarCaseTest>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarCaseTest == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarCaseTest *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarCaseTest>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

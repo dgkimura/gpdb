@@ -1658,7 +1658,8 @@ gpos::Ref<IMDCacheObject>
 CTranslatorRelcacheToDXL::RetrieveRelStats(CMemoryPool *mp,
 										   gpos::Ref<IMDId> mdid)
 {
-	CMDIdRelStats *m_rel_stats_mdid = gpos::dyn_cast<CMDIdRelStats>(mdid);
+	gpos::Ref<CMDIdRelStats> m_rel_stats_mdid =
+		gpos::dyn_cast<CMDIdRelStats>(mdid);
 	gpos::Ref<IMDId> mdid_rel = m_rel_stats_mdid->GetRelMdId();
 	OID rel_oid = gpos::dyn_cast<CMDIdGPDB>(mdid_rel)->Oid();
 
@@ -2059,7 +2060,7 @@ CTranslatorRelcacheToDXL::RetrieveNumChildPartitions(OID rel_oid)
 gpos::Ref<IMDCacheObject>
 CTranslatorRelcacheToDXL::RetrieveCast(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
-	CMDIdCast *mdid_cast = gpos::dyn_cast<CMDIdCast>(mdid);
+	gpos::Ref<CMDIdCast> mdid_cast = gpos::dyn_cast<CMDIdCast>(mdid);
 	gpos::Ref<IMDId> mdid_src = mdid_cast->MdidSrc();
 	gpos::Ref<IMDId> mdid_dest = mdid_cast->MdidDest();
 
@@ -2152,7 +2153,7 @@ CTranslatorRelcacheToDXL::RetrieveCast(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 gpos::Ref<IMDCacheObject>
 CTranslatorRelcacheToDXL::RetrieveScCmp(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
-	CMDIdScCmp *mdid_scalar_cmp = gpos::dyn_cast<CMDIdScCmp>(mdid);
+	gpos::Ref<CMDIdScCmp> mdid_scalar_cmp = gpos::dyn_cast<CMDIdScCmp>(mdid);
 	gpos::Ref<IMDId> mdid_left = mdid_scalar_cmp->GetLeftMdid();
 	gpos::Ref<IMDId> mdid_right = mdid_scalar_cmp->GetRightMdid();
 

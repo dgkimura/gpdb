@@ -171,7 +171,7 @@ CScalarFunc::Matches(gpos::Ref<COperator> pop) const
 	{
 		return false;
 	}
-	CScalarFunc *popScFunc = gpos::dyn_cast<CScalarFunc>(pop);
+	gpos::Ref<CScalarFunc> popScFunc = gpos::dyn_cast<CScalarFunc>(pop);
 
 	// match if func ids are identical
 	return popScFunc->FuncMdId()->Equals(m_func_mdid.get()) &&

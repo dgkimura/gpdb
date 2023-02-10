@@ -84,7 +84,7 @@ CWindowPreprocessor::SplitPrjList(
 	{
 		gpos::Ref<CExpression> pexprPrjEl = (*pexprPrjList)[ul];
 		gpos::Ref<CExpression> pexprWinFunc = (*pexprPrjEl)[0];
-		CScalarWindowFunc *popScWinFunc =
+		gpos::Ref<CScalarWindowFunc> popScWinFunc =
 			gpos::dyn_cast<CScalarWindowFunc>(pexprWinFunc->Pop());
 		gpos::Ref<CScalarProjectElement> popScPrjElem =
 			gpos::dyn_cast<CScalarProjectElement>(pexprPrjEl->Pop());

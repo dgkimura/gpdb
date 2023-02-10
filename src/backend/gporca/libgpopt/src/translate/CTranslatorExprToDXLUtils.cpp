@@ -490,7 +490,7 @@ CTranslatorExprToDXLUtils::PdxlpropCopy(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != dxlnode);
 
 	GPOS_ASSERT(nullptr != dxlnode->GetProperties());
-	CDXLPhysicalProperties *dxl_properties =
+	gpos::Ref<CDXLPhysicalProperties> dxl_properties =
 		gpos::dyn_cast<CDXLPhysicalProperties>(dxlnode->GetProperties());
 
 	CWStringDynamic *pstrStartupcost = GPOS_NEW(mp) CWStringDynamic(
@@ -644,7 +644,7 @@ CTranslatorExprToDXLUtils::FScalarConstTrue(CMDAccessor *md_accessor,
 			md_accessor->RetrieveType(pdxlopConst->GetDatumVal()->MDId());
 		if (IMDType::EtiBool == pmdtype->GetDatumType())
 		{
-			CDXLDatumBool *dxl_datum = gpos::dyn_cast<CDXLDatumBool>(
+			gpos::Ref<CDXLDatumBool> dxl_datum = gpos::dyn_cast<CDXLDatumBool>(
 				const_cast<gpos::Ref<CDXLDatum> >(pdxlopConst->GetDatumVal()));
 
 			return (!dxl_datum->IsNull() && dxl_datum->GetValue());
@@ -676,7 +676,7 @@ CTranslatorExprToDXLUtils::FScalarConstFalse(CMDAccessor *md_accessor,
 			md_accessor->RetrieveType(pdxlopConst->GetDatumVal()->MDId());
 		if (IMDType::EtiBool == pmdtype->GetDatumType())
 		{
-			CDXLDatumBool *dxl_datum = gpos::dyn_cast<CDXLDatumBool>(
+			gpos::Ref<CDXLDatumBool> dxl_datum = gpos::dyn_cast<CDXLDatumBool>(
 				const_cast<gpos::Ref<CDXLDatum> >(pdxlopConst->GetDatumVal()));
 			return (!dxl_datum->IsNull() && !dxl_datum->GetValue());
 		}
@@ -789,8 +789,8 @@ CTranslatorExprToDXLUtils::PdxlnProjElem(
 	GPOS_ASSERT(nullptr != pdxlnChildProjElem &&
 				1 == pdxlnChildProjElem->Arity());
 
-	CDXLScalarProjElem *pdxlopPrElChild =
-		dynamic_cast<CDXLScalarProjElem *>(pdxlnChildProjElem->GetOperator());
+	gpos::Ref<CDXLScalarProjElem> pdxlopPrElChild =
+		gpos::dyn_cast<CDXLScalarProjElem>(pdxlnChildProjElem->GetOperator());
 
 	// find the col ref corresponding to this element's id through column factory
 	CColRef *colref = col_factory->LookupColRef(pdxlopPrElChild->Id());
@@ -819,7 +819,7 @@ CTranslatorExprToDXLUtils::ReplaceSubplan(
 	CMemoryPool *mp,
 	ColRefToDXLNodeMap *phmcrdxlnSubplans,	// map of col ref to subplan
 	const CColRef *colref,					// key of entry in the passed map
-	CDXLScalarProjElem *
+	gpos::Ref<CDXLScalarProjElem>
 		pdxlopPrEl	// project element to use for creating DXL col ref to replace subplan
 )
 {
@@ -1022,7 +1022,7 @@ CTranslatorExprToDXLUtils::FProjectListMatch(gpos::Ref<CDXLNode> pdxlnPrL,
 		CColRef *colref = (*colref_array)[ul];
 
 		gpos::Ref<CDXLNode> pdxlnPrEl = (*pdxlnPrL)[ul];
-		CDXLScalarProjElem *pdxlopPrEl =
+		gpos::Ref<CDXLScalarProjElem> pdxlopPrEl =
 			gpos::dyn_cast<CDXLScalarProjElem>(pdxlnPrEl->GetOperator());
 
 		if (colref->Id() != pdxlopPrEl->Id())
@@ -1728,7 +1728,7 @@ CTranslatorExprToDXLUtils::ExtractCastFuncMdids(
 	else
 	{
 		GPOS_ASSERT(COperator::EopScalarFunc == pop->Eopid());
-		CScalarFunc *popFunc = gpos::dyn_cast<CScalarFunc>(pop);
+		gpos::Ref<CScalarFunc> popFunc = gpos::dyn_cast<CScalarFunc>(pop);
 		*ppmdidType = popFunc->MdidType();
 		*ppmdidCastFunc = popFunc->FuncMdId();
 	}
@@ -1896,7 +1896,7 @@ CTranslatorExprToDXLUtils::FMotionHazardSafeOp(gpos::Ref<CDXLNode> dxlnode)
 
 		case EdxlopPhysicalAgg:
 		{
-			CDXLPhysicalAgg *pdxlnPhysicalAgg =
+			gpos::Ref<CDXLPhysicalAgg> pdxlnPhysicalAgg =
 				gpos::dyn_cast<CDXLPhysicalAgg>(dxlnode->GetOperator());
 			if (pdxlnPhysicalAgg->GetAggStrategy() == EdxlaggstrategyHashed)
 			{

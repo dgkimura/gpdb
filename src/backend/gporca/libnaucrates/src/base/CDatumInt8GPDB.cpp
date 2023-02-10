@@ -38,7 +38,7 @@ CDatumInt8GPDB::CDatumInt8GPDB(CSystemId sysid, LINT val, BOOL is_null)
 	: m_mdid(nullptr), m_val(val), m_is_null(is_null)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	gpos::Ref<IMDId> mdid = dynamic_cast<const CMDTypeInt8GPDB *>(
+	gpos::Ref<IMDId> mdid = gpos::dyn_cast<CMDTypeInt8GPDB>(
 								md_accessor->PtMDType<IMDTypeInt8>(sysid))
 								->MDId();
 	;
@@ -202,8 +202,8 @@ CDatumInt8GPDB::Matches(const gpos::Ref<IDatum> datum) const
 		return false;
 	}
 
-	const CDatumInt8GPDB *datum_cast =
-		dynamic_cast<const CDatumInt8GPDB *>(datum);
+	const gpos::Ref<CDatumInt8GPDB> datum_cast =
+		gpos::dyn_cast<CDatumInt8GPDB>(datum);
 
 	if (!datum_cast->IsNull() && !IsNull())
 	{

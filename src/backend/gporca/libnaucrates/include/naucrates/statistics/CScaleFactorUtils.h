@@ -62,14 +62,15 @@ public:
 		// For example, when performing a self join, the underlying tables will have different IMdId pointers, but the same contents.
 		// We treat them as different instances and assume independence to calculate the correct join cardinality.
 		static ULONG
-		HashValue(const IMdIdArray *oid_pair)
+		HashValue(const gpos::Ref<IMdIdArray> oid_pair)
 		{
 			return CombineHashes(gpos::HashPtr<IMDId>((*oid_pair)[0].get()),
 								 gpos::HashPtr<IMDId>((*oid_pair)[1].get()));
 		}
 
 		static BOOL
-		Equals(const IMdIdArray *first, const IMdIdArray *second)
+		Equals(const gpos::Ref<IMdIdArray> first,
+			   const gpos::Ref<IMdIdArray> second)
 		{
 			return ((*first)[0] == (*second)[0]) &&
 				   ((*first)[1] == (*second)[1]);

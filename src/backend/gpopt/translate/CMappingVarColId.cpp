@@ -310,7 +310,7 @@ CMappingVarColId::LoadDerivedTblColumns(
 			gpos::Ref<CDXLNode> dxlnode =
 				(*derived_columns_dxl)[drvd_tbl_col_counter].get();
 			GPOS_ASSERT(nullptr != dxlnode);
-			CDXLScalarIdent *dxl_sc_ident =
+			gpos::Ref<CDXLScalarIdent> dxl_sc_ident =
 				gpos::dyn_cast<CDXLScalarIdent>(dxlnode->GetOperator());
 			const gpos::Ref<CDXLColRef> dxl_colref =
 				dxl_sc_ident->GetDXLColRef();
@@ -377,7 +377,7 @@ CMappingVarColId::LoadProjectElements(
 	for (ULONG i = 0; i < size; i++)
 	{
 		gpos::Ref<CDXLNode> dxlnode = (*project_list_dxlnode)[i];
-		CDXLScalarProjElem *dxl_proj_elem =
+		gpos::Ref<CDXLScalarProjElem> dxl_proj_elem =
 			gpos::dyn_cast<CDXLScalarProjElem>(dxlnode->GetOperator());
 		this->Insert(query_level, RTE_index, INT(i + 1), dxl_proj_elem->Id(),
 					 dxl_proj_elem->GetMdNameAlias()->GetMDName()->Copy(m_mp));

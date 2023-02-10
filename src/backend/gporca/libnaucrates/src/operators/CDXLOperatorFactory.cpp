@@ -3097,7 +3097,7 @@ CDXLOperatorFactory::ExtractConvertStrsToArray(
 //---------------------------------------------------------------------------
 void
 CDXLOperatorFactory::SetSegmentInfo(CDXLMemoryManager *dxl_memory_manager,
-									CDXLPhysicalMotion *motion,
+									gpos::Ref<CDXLPhysicalMotion> motion,
 									const Attributes &attrs,
 									Edxltoken target_elem)
 {

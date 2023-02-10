@@ -107,7 +107,8 @@ CScalarWindowFunc::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarWindowFunc *popFunc = gpos::dyn_cast<CScalarWindowFunc>(pop);
+		gpos::Ref<CScalarWindowFunc> popFunc =
+			gpos::dyn_cast<CScalarWindowFunc>(pop);
 
 		// match if the func id, and properties are identical
 		return ((popFunc->IsDistinct() == m_is_distinct) &&

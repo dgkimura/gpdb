@@ -58,14 +58,14 @@ public:
 	BOOL IsColDefined(ULONG colid) const override;
 
 	// conversion function
-	static CDXLLogicalGet *
+	static gpos::Ref<CDXLLogicalGet>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalGet == dxl_op->GetDXLOperator() ||
 					EdxlopLogicalExternalGet == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalGet *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalGet>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

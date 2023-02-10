@@ -67,13 +67,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLScalarArrayComp *
+	static gpos::Ref<CDXLScalarArrayComp>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarArrayComp == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarArrayComp *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarArrayComp>(dxl_op);
 	}
 
 	// does the operator return a boolean result

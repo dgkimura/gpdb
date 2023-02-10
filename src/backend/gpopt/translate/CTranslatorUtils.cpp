@@ -1907,7 +1907,8 @@ CTranslatorUtils::MakeNewToOldColMapping(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorUtils::IsDuplicateSensitiveMotion(CDXLPhysicalMotion *dxl_motion)
+CTranslatorUtils::IsDuplicateSensitiveMotion(
+	gpos::Ref<CDXLPhysicalMotion> dxl_motion)
 {
 	Edxlopid dxl_opid = dxl_motion->GetDXLOperator();
 
@@ -2292,7 +2293,7 @@ CTranslatorUtils::GetAssertErrorMsgs(gpos::Ref<CDXLNode> assert_constraint_list)
 	for (ULONG ul = 0; ul < num_constraints; ul++)
 	{
 		gpos::Ref<CDXLNode> dxl_constraint_node = (*assert_constraint_list)[ul];
-		CDXLScalarAssertConstraint *dxl_constraint_op =
+		gpos::Ref<CDXLScalarAssertConstraint> dxl_constraint_op =
 			gpos::dyn_cast<CDXLScalarAssertConstraint>(
 				dxl_constraint_node->GetOperator());
 		CWStringBase *error_msg = dxl_constraint_op->GetErrorMsgStr();

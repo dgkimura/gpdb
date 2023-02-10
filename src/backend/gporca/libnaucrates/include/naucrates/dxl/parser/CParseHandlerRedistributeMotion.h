@@ -36,7 +36,7 @@ class CParseHandlerRedistributeMotion : public CParseHandlerPhysicalOp
 {
 private:
 	// the redistribute motion operator
-	CDXLPhysicalRedistributeMotion *m_dxl_op;
+	gpos::Ref<CDXLPhysicalRedistributeMotion> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

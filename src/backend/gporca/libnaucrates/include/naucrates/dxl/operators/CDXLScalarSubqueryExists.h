@@ -49,13 +49,13 @@ public:
 	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// conversion function
-	static CDXLScalarSubqueryExists *
+	static gpos::Ref<CDXLScalarSubqueryExists>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSubqueryExists == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarSubqueryExists *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarSubqueryExists>(dxl_op);
 	}
 
 	// does the operator return a boolean result

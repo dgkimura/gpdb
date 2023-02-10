@@ -76,7 +76,7 @@ public:
 	virtual ULONG GetRelationChildIdx() const = 0;
 
 	// conversion function
-	static CDXLPhysicalMotion *
+	static gpos::Ref<CDXLPhysicalMotion>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
@@ -87,7 +87,7 @@ public:
 			EdxlopPhysicalMotionRoutedDistribute == dxl_op->GetDXLOperator() ||
 			EdxlopPhysicalMotionRandom == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalMotion *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalMotion>(dxl_op);
 	}
 };
 }  // namespace gpdxl

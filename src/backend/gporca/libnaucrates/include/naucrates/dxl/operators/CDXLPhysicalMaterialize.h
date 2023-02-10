@@ -85,13 +85,13 @@ public:
 						const CDXLNode *node) const override;
 
 	// conversion function
-	static CDXLPhysicalMaterialize *
+	static gpos::Ref<CDXLPhysicalMaterialize>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalMaterialize == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalMaterialize *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalMaterialize>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

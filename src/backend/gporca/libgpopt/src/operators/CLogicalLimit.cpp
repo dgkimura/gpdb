@@ -322,7 +322,7 @@ CLogicalLimit::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	return CLimitStatsProcessor::CalcLimitStats(
-		mp, dynamic_cast<gpos::Ref<CStatistics> >(child_stats), dRowsMax);
+		mp, gpos::dyn_cast<CStatistics>(child_stats), dRowsMax);
 }
 
 // EOF

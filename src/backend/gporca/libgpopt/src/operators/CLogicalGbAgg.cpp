@@ -571,8 +571,7 @@ CLogicalGbAgg::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	gpos::Ref<CLogicalGbAgg> popAgg =
-		dynamic_cast<gpos::Ref<CLogicalGbAgg> >(pop);
+	gpos::Ref<CLogicalGbAgg> popAgg = gpos::dyn_cast<CLogicalGbAgg>(pop);
 
 	return FGeneratesDuplicates() == popAgg->FGeneratesDuplicates() &&
 		   popAgg->Egbaggtype() == m_egbaggtype &&
@@ -640,8 +639,8 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
 	}
 
 	gpos::Ref<IStatistics> stats = CGroupByStatsProcessor::CalcGroupByStats(
-		mp, dynamic_cast<gpos::Ref<CStatistics> >(child_stats),
-		pdrgpulGroupingCols.get(), pdrgpulComputedCols, keys);
+		mp, gpos::dyn_cast<CStatistics>(child_stats), pdrgpulGroupingCols.get(),
+		pdrgpulComputedCols, keys);
 
 	// clean up
 	;

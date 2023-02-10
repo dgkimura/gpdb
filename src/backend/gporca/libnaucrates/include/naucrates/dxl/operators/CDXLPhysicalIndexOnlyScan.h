@@ -52,13 +52,13 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLPhysicalIndexOnlyScan *
+	static gpos::Ref<CDXLPhysicalIndexOnlyScan>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalIndexOnlyScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalIndexOnlyScan *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalIndexOnlyScan>(dxl_op);
 	}
 };
 }  // namespace gpdxl

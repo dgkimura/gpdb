@@ -76,12 +76,12 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLLogicalCTEProducer *
+	static gpos::Ref<CDXLLogicalCTEProducer>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalCTEProducer == dxl_op->GetDXLOperator());
-		return dynamic_cast<CDXLLogicalCTEProducer *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalCTEProducer>(dxl_op);
 	}
 };
 }  // namespace gpdxl

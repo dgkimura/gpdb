@@ -67,14 +67,14 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumStatsLintMappable *
+	static gpos::Ref<CDXLDatumStatsLintMappable>
 	Cast(gpos::Ref<CDXLDatum> dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);
 		GPOS_ASSERT(CDXLDatum::EdxldatumStatsLintMappable ==
 					dxl_datum->GetDatumType());
 
-		return dynamic_cast<CDXLDatumStatsLintMappable *>(dxl_datum);
+		return gpos::dyn_cast<CDXLDatumStatsLintMappable>(dxl_datum);
 	}
 
 	// statistics related APIs

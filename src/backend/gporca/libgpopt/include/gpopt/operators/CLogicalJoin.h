@@ -66,12 +66,12 @@ public:
 	}
 
 	// conversion function
-	static CLogicalJoin *
+	static gpos::Ref<CLogicalJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 
-		return dynamic_cast<CLogicalJoin *>(pop);
+		return gpos::dyn_cast<CLogicalJoin>(pop);
 	}
 
 	//-------------------------------------------------------------------------------------

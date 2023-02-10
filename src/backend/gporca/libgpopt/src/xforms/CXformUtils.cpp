@@ -863,7 +863,8 @@ CXformUtils::SubqueryAnyToAgg(
 	gpos::Ref<CExpression> pexprSubqPred =
 		sh.PexprSubqueryPred(pexprInner, pexprSubquery, &pexprResult,
 							 CSubqueryHandler::EsqctxtFilter);
-	CScalarCmp *scalarCmp = gpos::dyn_cast<CScalarCmp>(pexprSubqPred->Pop());
+	gpos::Ref<CScalarCmp> scalarCmp =
+		gpos::dyn_cast<CScalarCmp>(pexprSubqPred->Pop());
 
 	GPOS_ASSERT(nullptr != scalarCmp);
 
@@ -2293,7 +2294,7 @@ CXformUtils::PexprWindowWithRowNumber(CMemoryPool *mp,
 	gpos::Ref<CExpression> pexprScWindowFunc = PexprRowNumber(mp);
 
 	// generate a new column reference
-	CScalarWindowFunc *popScWindowFunc =
+	gpos::Ref<CScalarWindowFunc> popScWindowFunc =
 		gpos::dyn_cast<CScalarWindowFunc>(pexprScWindowFunc->Pop());
 	const IMDType *pmdtype = COptCtxt::PoctxtFromTLS()->Pmda()->RetrieveType(
 		popScWindowFunc->MdidType());
@@ -3908,7 +3909,7 @@ CXformUtils::PexprWinFuncAgg2ScalarAgg(CMemoryPool *mp,
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarValuesList(mp),
 								 GPOS_NEW(mp) CExpressionArray(mp)));
 
-	CScalarWindowFunc *popScWinFunc =
+	gpos::Ref<CScalarWindowFunc> popScWinFunc =
 		gpos::dyn_cast<CScalarWindowFunc>(pexprWinFunc->Pop());
 	gpos::Ref<IMDId> mdid_func = popScWinFunc->FuncMdId();
 

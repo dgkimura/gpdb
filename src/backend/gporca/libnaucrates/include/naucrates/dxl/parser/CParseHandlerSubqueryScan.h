@@ -37,7 +37,7 @@ class CParseHandlerSubqueryScan : public CParseHandlerPhysicalOp
 {
 private:
 	// the subquery scan operator
-	CDXLPhysicalSubqueryScan *m_dxl_op;
+	gpos::Ref<CDXLPhysicalSubqueryScan> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

@@ -70,7 +70,7 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumGeneric *
+	static gpos::Ref<CDXLDatumGeneric>
 	Cast(gpos::Ref<CDXLDatum> dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);
@@ -80,7 +80,7 @@ public:
 					CDXLDatum::EdxldatumStatsLintMappable ==
 						dxl_datum->GetDatumType());
 
-		return dynamic_cast<CDXLDatumGeneric *>(dxl_datum);
+		return gpos::dyn_cast<CDXLDatumGeneric>(dxl_datum);
 	}
 
 	// statistics related APIs

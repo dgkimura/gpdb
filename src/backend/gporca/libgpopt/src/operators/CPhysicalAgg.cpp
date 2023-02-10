@@ -563,8 +563,7 @@ CPhysicalAgg::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	gpos::Ref<CPhysicalAgg> popAgg =
-		dynamic_cast<gpos::Ref<CPhysicalAgg> >(pop);
+	gpos::Ref<CPhysicalAgg> popAgg = gpos::dyn_cast<CPhysicalAgg>(pop);
 
 	if (FGeneratesDuplicates() != popAgg->FGeneratesDuplicates())
 	{

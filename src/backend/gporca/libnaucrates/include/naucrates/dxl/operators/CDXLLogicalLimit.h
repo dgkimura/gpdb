@@ -68,13 +68,13 @@ public:
 						const CDXLNode *node) const override;
 
 	// conversion function
-	static CDXLLogicalLimit *
+	static gpos::Ref<CDXLLogicalLimit>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalLimit == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalLimit *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalLimit>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

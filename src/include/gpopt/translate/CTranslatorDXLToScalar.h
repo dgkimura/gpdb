@@ -174,10 +174,9 @@ private:
 								CMappingColIdVar *colid_var);
 
 	// translate subplan test expression parameters
-	void TranslateDXLTestExprScalarIdentToExpr(gpos::Ref<CDXLNode> child_node,
-											   Param *param,
-											   CDXLScalarIdent **ident,
-											   Expr **expr);
+	void TranslateDXLTestExprScalarIdentToExpr(
+		gpos::Ref<CDXLNode> child_node, Param *param,
+		gpos::Ref<CDXLScalarIdent> *ident, Expr **expr);
 
 	CHAR *GetSubplanAlias(ULONG plan_id);
 
@@ -239,10 +238,11 @@ private:
 	static Const *ConvertDXLDatumToConstInt8(gpos::Ref<CDXLDatum> datum_dxl);
 	static Const *ConvertDXLDatumToConstBool(gpos::Ref<CDXLDatum> datum_dxl);
 	Const *TranslateDXLDatumGenericToScalar(gpos::Ref<CDXLDatum> datum_dxl);
-	Expr *TranslateDXLScalarCastWithChildExpr(const CDXLScalarCast *scalar_cast,
-											  Expr *child_expr);
+	Expr *TranslateDXLScalarCastWithChildExpr(
+		const gpos::Ref<CDXLScalarCast> scalar_cast, Expr *child_expr);
 	Expr *TranslateDXLScalarCoerceViaIOWithChildExpr(
-		const CDXLScalarCoerceViaIO *dxl_coerce_via_io, Expr *child_expr);
+		const gpos::Ref<CDXLScalarCoerceViaIO> dxl_coerce_via_io,
+		Expr *child_expr);
 
 public:
 	CTranslatorDXLToScalar(const CTranslatorDXLToScalar &) = delete;

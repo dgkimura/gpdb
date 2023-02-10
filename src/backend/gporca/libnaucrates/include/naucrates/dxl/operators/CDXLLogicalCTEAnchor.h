@@ -64,12 +64,12 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLLogicalCTEAnchor *
+	static gpos::Ref<CDXLLogicalCTEAnchor>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalCTEAnchor == dxl_op->GetDXLOperator());
-		return dynamic_cast<CDXLLogicalCTEAnchor *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalCTEAnchor>(dxl_op);
 	}
 };
 }  // namespace gpdxl

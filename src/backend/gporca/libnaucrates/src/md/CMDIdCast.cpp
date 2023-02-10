@@ -131,7 +131,7 @@ CMDIdCast::Equals(const gpos::Ref<IMDId> mdid) const
 		return false;
 	}
 
-	const CMDIdCast *mdid_cast_func = CMDIdCast::CastMdid(mdid);
+	const gpos::Ref<CMDIdCast> mdid_cast_func = CMDIdCast::CastMdid(mdid);
 
 	return m_mdid_src->Equals(mdid_cast_func->MdidSrc()) &&
 		   m_mdid_dest->Equals(mdid_cast_func->MdidDest());

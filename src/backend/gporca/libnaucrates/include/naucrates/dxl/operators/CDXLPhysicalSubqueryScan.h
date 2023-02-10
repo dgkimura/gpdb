@@ -65,13 +65,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalSubqueryScan *
+	static gpos::Ref<CDXLPhysicalSubqueryScan>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalSubqueryScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalSubqueryScan *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalSubqueryScan>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

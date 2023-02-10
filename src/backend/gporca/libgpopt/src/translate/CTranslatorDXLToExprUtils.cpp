@@ -280,7 +280,7 @@ CTranslatorDXLToExprUtils::FCastFunc(CMDAccessor *md_accessor,
 		return false;
 	}
 
-	CDXLScalarFuncExpr *pdxlopScFunc =
+	gpos::Ref<CDXLScalarFuncExpr> pdxlopScFunc =
 		gpos::dyn_cast<CDXLScalarFuncExpr>(dxlnode->GetOperator());
 
 	gpos::Ref<IMDId> mdid_dest = pdxlopScFunc->ReturnTypeMdId();

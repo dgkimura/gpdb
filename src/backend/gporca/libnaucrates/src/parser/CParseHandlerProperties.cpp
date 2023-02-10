@@ -62,7 +62,7 @@ CParseHandlerProperties::~CParseHandlerProperties()
 //		Destructor
 //
 //---------------------------------------------------------------------------
-CDXLPhysicalProperties *
+gpos::Ref<CDXLPhysicalProperties>
 CParseHandlerProperties::GetProperties() const
 {
 	GPOS_ASSERT(nullptr != m_dxl_properties);

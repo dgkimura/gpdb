@@ -399,10 +399,11 @@ private:
 	gpos::Ref<CTableDescriptor> Ptabdesc(gpos::Ref<CDXLTableDescr> table_descr);
 
 	// construct a table descriptor for a CTAS operator
-	gpos::Ref<CTableDescriptor> PtabdescFromCTAS(CDXLLogicalCTAS *pdxlopCTAS);
+	gpos::Ref<CTableDescriptor> PtabdescFromCTAS(
+		gpos::Ref<CDXLLogicalCTAS> pdxlopCTAS);
 
 	// register MD provider for serving MD relation entry for CTAS
-	void RegisterMDRelationCtas(CDXLLogicalCTAS *pdxlopCTAS);
+	void RegisterMDRelationCtas(gpos::Ref<CDXLLogicalCTAS> pdxlopCTAS);
 
 	// create an array of column references from an array of dxl column references
 	gpos::Ref<CColRefArray> Pdrgpcr(

@@ -2401,7 +2401,7 @@ CExpressionPreprocessor::PexprReorderScalarCmpChildren(
 		if (CUtils::FScalarConst(pexprLeft) && CUtils::FScalarIdent(pexprRight))
 		{
 			gpos::Ref<CScalarCmp> popScalarCmpCommuted =
-				(dynamic_cast<CScalarCmp *>(pop))->PopCommutedOp(mp);
+				(gpos::dyn_cast<CScalarCmp>(pop))->PopCommutedOp(mp);
 			if (popScalarCmpCommuted)
 			{
 				;

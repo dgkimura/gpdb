@@ -232,8 +232,8 @@ gpos::Ref<IDatum>
 CMDTypeGenericGPDB::GetDatumForDXLConstVal(
 	const gpos::Ref<CDXLScalarConstValue> dxl_op) const
 {
-	CDXLDatumGeneric *dxl_datum = gpos::dyn_cast<CDXLDatumGeneric>(
-		const_cast<gpos::Ref<CDXLDatum> >(dxl_op->GetDatumVal()));
+	gpos::Ref<CDXLDatumGeneric> dxl_datum =
+		gpos::dyn_cast<CDXLDatumGeneric>(dxl_op->GetDatumVal());
 	GPOS_ASSERT(nullptr != dxl_op);
 
 	LINT lint_value = 0;
@@ -267,8 +267,8 @@ CMDTypeGenericGPDB::GetDatumForDXLDatum(
 	CMemoryPool *mp, const gpos::Ref<CDXLDatum> dxl_datum) const
 {
 	;
-	CDXLDatumGeneric *dxl_datum_generic = gpos::dyn_cast<CDXLDatumGeneric>(
-		const_cast<gpos::Ref<CDXLDatum> >(dxl_datum));
+	gpos::Ref<CDXLDatumGeneric> dxl_datum_generic =
+		gpos::dyn_cast<CDXLDatumGeneric>(dxl_datum);
 
 	LINT lint_value = 0;
 	if (dxl_datum_generic->IsDatumMappableToLINT())
@@ -300,7 +300,8 @@ gpos::Ref<CDXLDatum>
 CMDTypeGenericGPDB::GetDatumVal(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 {
 	;
-	CDatumGenericGPDB *datum_generic = dynamic_cast<CDatumGenericGPDB *>(datum);
+	gpos::Ref<CDatumGenericGPDB> datum_generic =
+		gpos::dyn_cast<CDatumGenericGPDB>(datum);
 	ULONG length = 0;
 	BYTE *pba = nullptr;
 	if (!datum_generic->IsNull())

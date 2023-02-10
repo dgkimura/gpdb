@@ -89,14 +89,14 @@ public:
 	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// conversion function
-	static CDXLScalarSubqueryQuantified *
+	static gpos::Ref<CDXLScalarSubqueryQuantified>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSubqueryAll == dxl_op->GetDXLOperator() ||
 					EdxlopScalarSubqueryAny == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarSubqueryQuantified *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarSubqueryQuantified>(dxl_op);
 	}
 
 	// does the operator return a boolean result

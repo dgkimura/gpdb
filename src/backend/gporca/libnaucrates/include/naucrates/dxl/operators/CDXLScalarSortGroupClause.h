@@ -97,13 +97,13 @@ public:
 		return m_hashable;
 	}
 
-	static CDXLScalarSortGroupClause *
+	static gpos::Ref<CDXLScalarSortGroupClause>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSortGroupClause == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarSortGroupClause *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarSortGroupClause>(dxl_op);
 	}
 
 	// does the operator return a boolean result

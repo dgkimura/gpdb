@@ -109,7 +109,8 @@ CMDIdRelStats::Equals(const gpos::Ref<IMDId> mdid) const
 		return false;
 	}
 
-	const CMDIdRelStats *rel_stats_mdid = CMDIdRelStats::CastMdid(mdid);
+	const gpos::Ref<CMDIdRelStats> rel_stats_mdid =
+		CMDIdRelStats::CastMdid(mdid);
 
 	return m_rel_mdid->Equals(rel_stats_mdid->GetRelMdId());
 }

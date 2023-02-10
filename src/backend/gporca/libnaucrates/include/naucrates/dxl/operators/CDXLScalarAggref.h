@@ -126,13 +126,13 @@ public:
 									   const CHAR *attr_name) const;
 
 	// conversion function
-	static CDXLScalarAggref *
+	static gpos::Ref<CDXLScalarAggref>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarAggref == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarAggref *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarAggref>(dxl_op);
 	}
 
 	// does the operator return a boolean result

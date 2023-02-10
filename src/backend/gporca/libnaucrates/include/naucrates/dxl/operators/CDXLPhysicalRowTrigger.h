@@ -103,13 +103,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalRowTrigger *
+	static gpos::Ref<CDXLPhysicalRowTrigger>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalRowTrigger == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalRowTrigger *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalRowTrigger>(dxl_op);
 	}
 };
 }  // namespace gpdxl

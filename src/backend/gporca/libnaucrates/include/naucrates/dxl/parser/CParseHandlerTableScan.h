@@ -38,7 +38,7 @@ class CParseHandlerTableScan : public CParseHandlerPhysicalOp
 {
 private:
 	// the table scan operator
-	CDXLPhysicalTableScan *m_dxl_op;
+	gpos::Ref<CDXLPhysicalTableScan> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

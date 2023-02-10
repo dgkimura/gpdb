@@ -37,7 +37,7 @@ class CParseHandlerDistinctComp : public CParseHandlerScalarOp
 {
 private:
 	// the distinct comparison operator
-	CDXLScalarDistinctComp *m_dxl_op;
+	gpos::Ref<CDXLScalarDistinctComp> m_dxl_op;
 
 	// process the start of an element
 	void StartElement(

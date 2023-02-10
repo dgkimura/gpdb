@@ -111,14 +111,14 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLPhysicalPartitionSelector *
+	static gpos::Ref<CDXLPhysicalPartitionSelector>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalPartitionSelector ==
 					dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalPartitionSelector *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalPartitionSelector>(dxl_op);
 	}
 };
 }  // namespace gpdxl

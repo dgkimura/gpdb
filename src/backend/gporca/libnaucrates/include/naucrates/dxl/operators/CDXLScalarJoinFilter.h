@@ -45,13 +45,13 @@ public:
 	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// conversion function
-	static CDXLScalarJoinFilter *
+	static gpos::Ref<CDXLScalarJoinFilter>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarJoinFilter == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarJoinFilter *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarJoinFilter>(dxl_op);
 	}
 
 	// does the operator return a boolean result

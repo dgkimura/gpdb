@@ -66,10 +66,10 @@ public:
 		CContextDXLToPlStmt *dxl_to_plstmt_context);
 
 	// translate DXL ScalarIdent node into GPDB Var node
-	Var *VarFromDXLNodeScId(const CDXLScalarIdent *dxlop) override;
+	Var *VarFromDXLNodeScId(const gpos::Ref<CDXLScalarIdent> dxlop) override;
 
 	// translate DXL ScalarIdent node into GPDB Param node
-	Param *ParamFromDXLNodeScId(const CDXLScalarIdent *dxlop);
+	Param *ParamFromDXLNodeScId(const gpos::Ref<CDXLScalarIdent> dxlop);
 
 	// get the output translator context
 	CDXLTranslateContext *GetOutputContext();

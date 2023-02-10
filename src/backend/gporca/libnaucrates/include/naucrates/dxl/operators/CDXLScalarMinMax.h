@@ -94,13 +94,13 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarMinMax *
+	static gpos::Ref<CDXLScalarMinMax>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarMinMax == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarMinMax *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarMinMax>(dxl_op);
 	}
 };
 }  // namespace gpdxl

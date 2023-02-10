@@ -174,13 +174,13 @@ public:
 						const CDXLNode *node) const override;
 
 	// conversion function
-	static CDXLPhysicalDML *
+	static gpos::Ref<CDXLPhysicalDML>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalDML == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalDML *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalDML>(dxl_op);
 	}
 };
 }  // namespace gpdxl

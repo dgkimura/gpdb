@@ -142,8 +142,8 @@ CParseHandlerLogicalGroupBy::EndElement(const XMLCh *const,	 // element_uri,
 	AddChildFromParseHandler(proj_list_parse_handler);
 	AddChildFromParseHandler(lg_op_parse_handler);
 
-	CDXLLogicalGroupBy *lg_group_by_dxl =
-		static_cast<CDXLLogicalGroupBy *>(m_dxl_node->GetOperator());
+	gpos::Ref<CDXLLogicalGroupBy> lg_group_by_dxl =
+		gpos::dyn_cast<CDXLLogicalGroupBy>(m_dxl_node->GetOperator());
 
 	// set grouping cols list
 	GPOS_ASSERT(nullptr != grouping_col_parse_handler->GetGroupingColidArray());

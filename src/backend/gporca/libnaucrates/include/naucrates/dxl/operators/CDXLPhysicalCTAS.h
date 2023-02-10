@@ -173,12 +173,12 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLPhysicalCTAS *
+	static gpos::Ref<CDXLPhysicalCTAS>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalCTAS == dxl_op->GetDXLOperator());
-		return dynamic_cast<CDXLPhysicalCTAS *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalCTAS>(dxl_op);
 	}
 };
 }  // namespace gpdxl

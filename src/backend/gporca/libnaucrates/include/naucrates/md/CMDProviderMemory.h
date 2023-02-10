@@ -40,8 +40,9 @@ class CMDProviderMemory : public IMDProvider
 protected:
 	// hash map of serialized MD objects indexed by their MD id
 	using MDIdToSerializedMDIdMap =
-		CHashMap<IMDId, CWStringDynamic, IMDId::MDIdHash, IMDId::MDIdCompare,
-				 CleanupRelease, CleanupDelete>;
+		gpos::UnorderedMap<gpos::Ref<IMDId>, CWStringDynamic *,
+						   gpos::RefHash<IMDId, IMDId::MDIdHash>,
+						   gpos::RefEq<IMDId, IMDId::MDIdCompare>>;
 
 	// metadata objects indexed by their metadata id
 	gpos::Ref<MDIdToSerializedMDIdMap> m_mdmap;

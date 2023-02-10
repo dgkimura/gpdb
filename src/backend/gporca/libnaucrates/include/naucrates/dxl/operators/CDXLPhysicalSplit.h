@@ -111,13 +111,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalSplit *
+	static gpos::Ref<CDXLPhysicalSplit>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalSplit == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalSplit *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalSplit>(dxl_op);
 	}
 };
 }  // namespace gpdxl

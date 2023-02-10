@@ -60,7 +60,8 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarPartListNullTest *Cast(gpos::Ref<CDXLOperator> dxl_op);
+	static gpos::Ref<CDXLScalarPartListNullTest> Cast(
+		gpos::Ref<CDXLOperator> dxl_op);
 };
 }  // namespace gpdxl
 

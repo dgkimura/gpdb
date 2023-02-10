@@ -80,13 +80,13 @@ public:
 						const CDXLNode *node) const override;
 
 	// conversion function
-	static CDXLLogicalInsert *
+	static gpos::Ref<CDXLLogicalInsert>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalInsert == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalInsert *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalInsert>(dxl_op);
 	}
 };
 }  // namespace gpdxl

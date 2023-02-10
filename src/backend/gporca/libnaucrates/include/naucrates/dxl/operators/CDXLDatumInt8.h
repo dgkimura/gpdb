@@ -68,13 +68,13 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumInt8 *
+	static gpos::Ref<CDXLDatumInt8>
 	Cast(gpos::Ref<CDXLDatum> dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);
 		GPOS_ASSERT(CDXLDatum::EdxldatumInt8 == dxl_datum->GetDatumType());
 
-		return dynamic_cast<CDXLDatumInt8 *>(dxl_datum);
+		return gpos::dyn_cast<CDXLDatumInt8>(dxl_datum);
 	}
 };
 }  // namespace gpdxl

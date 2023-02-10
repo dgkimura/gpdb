@@ -148,7 +148,7 @@ CPhysicalDynamicScan::PopConvert(gpos::Ref<COperator> pop)
 	GPOS_ASSERT(CUtils::FPhysicalScan(pop) &&
 				gpos::dyn_cast<CPhysicalScan>(pop)->FDynamicScan());
 
-	return dynamic_cast<gpos::Ref<CPhysicalDynamicScan> >(pop);
+	return gpos::dyn_cast<CPhysicalDynamicScan>(pop);
 }
 
 

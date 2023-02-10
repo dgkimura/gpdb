@@ -61,13 +61,13 @@ public:
 						const CDXLNode *node) const override;
 
 	// conversion function
-	static CDXLLogicalWindow *
+	static gpos::Ref<CDXLLogicalWindow>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalWindow == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalWindow *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalWindow>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

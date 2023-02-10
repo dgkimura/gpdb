@@ -52,13 +52,13 @@ public:
 	void SetAliasName(CMDName *);
 
 	// conversion function
-	static CDXLLogicalProject *
+	static gpos::Ref<CDXLLogicalProject>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalProject == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalProject *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalProject>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

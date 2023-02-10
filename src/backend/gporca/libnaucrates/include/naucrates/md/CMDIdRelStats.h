@@ -104,21 +104,12 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// const converter
-	static const CMDIdRelStats *
+	static const gpos::Ref<CMDIdRelStats>
 	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidRelStats == mdid->MdidType());
 
-		return dynamic_cast<const CMDIdRelStats *>(mdid);
-	}
-
-	// non-const converter
-	static CMDIdRelStats *
-	CastMdid(gpos::Ref<IMDId> mdid)
-	{
-		GPOS_ASSERT(nullptr != mdid && EmdidRelStats == mdid->MdidType());
-
-		return dynamic_cast<CMDIdRelStats *>(mdid);
+		return gpos::dyn_cast<CMDIdRelStats>(mdid);
 	}
 
 	// make a copy in the given memory pool

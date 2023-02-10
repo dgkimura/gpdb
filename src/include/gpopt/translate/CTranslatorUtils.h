@@ -311,7 +311,7 @@ public:
 
 	// is this a motion sensitive to duplicates
 	static BOOL IsDuplicateSensitiveMotion(
-		gpdxl::CDXLPhysicalMotion *dxl_motion);
+		gpdxl::gpos::Ref<CDXLPhysicalMotion> dxl_motion);
 
 	// construct a project element with a const NULL expression
 	static gpos::Ref<CDXLNode> CreateDXLProjElemConstNULL(

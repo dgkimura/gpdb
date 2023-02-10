@@ -68,21 +68,12 @@ public:
 	static CMDIdGPDBCtas m_mdid_invalid_key;
 
 	// const converter
-	static const CMDIdGPDBCtas *
+	static const gpos::Ref<CMDIdGPDBCtas>
 	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidGPDBCtas == mdid->MdidType());
 
-		return dynamic_cast<const CMDIdGPDBCtas *>(mdid);
-	}
-
-	// non-const converter
-	static CMDIdGPDBCtas *
-	CastMdid(gpos::Ref<IMDId> mdid)
-	{
-		GPOS_ASSERT(nullptr != mdid && EmdidGPDBCtas == mdid->MdidType());
-
-		return dynamic_cast<CMDIdGPDBCtas *>(mdid);
+		return gpos::dyn_cast<CMDIdGPDBCtas>(mdid);
 	}
 };
 

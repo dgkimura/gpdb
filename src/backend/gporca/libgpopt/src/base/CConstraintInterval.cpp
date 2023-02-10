@@ -468,7 +468,8 @@ CConstraintInterval::PciIntervalFromScalarCmp(CMemoryPool *mp,
 			GPOS_ASSERT(CCastUtils::FBinaryCoercibleCastedConst(pexprRight));
 			popScConst = gpos::dyn_cast<CScalarConst>((*pexprRight)[0]->Pop());
 		}
-		CScalarCmp *popScCmp = gpos::dyn_cast<CScalarCmp>(pexpr->Pop());
+		gpos::Ref<CScalarCmp> popScCmp =
+			gpos::dyn_cast<CScalarCmp>(pexpr->Pop());
 
 		return PciIntervalFromColConstCmp(mp, colref, popScCmp->ParseCmpType(),
 										  popScConst, infer_nulls_as);

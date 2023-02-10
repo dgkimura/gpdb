@@ -88,13 +88,13 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarArrayRefIndexList *
+	static gpos::Ref<CDXLScalarArrayRefIndexList>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarArrayRefIndexList == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarArrayRefIndexList *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarArrayRefIndexList>(dxl_op);
 	}
 };
 }  // namespace gpdxl

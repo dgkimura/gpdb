@@ -151,7 +151,7 @@ CMDIdScCmp::Equals(const gpos::Ref<IMDId> mdid) const
 		return false;
 	}
 
-	const CMDIdScCmp *pmdidScCmp = CMDIdScCmp::CastMdid(mdid);
+	const gpos::Ref<CMDIdScCmp> pmdidScCmp = CMDIdScCmp::CastMdid(mdid);
 
 	return m_mdid_left->Equals(pmdidScCmp->GetLeftMdid()) &&
 		   m_mdid_right->Equals(pmdidScCmp->GetRightMdid()) &&

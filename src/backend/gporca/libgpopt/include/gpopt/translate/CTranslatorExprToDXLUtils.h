@@ -199,7 +199,7 @@ public:
 	static void ReplaceSubplan(CMemoryPool *mp,
 							   ColRefToDXLNodeMap *phmcrdxlnSubplans,
 							   const CColRef *colref,
-							   CDXLScalarProjElem *pdxlopPrEl);
+							   gpos::Ref<CDXLScalarProjElem> pdxlopPrEl);
 
 	// create a project elem from a given col ref
 	static gpos::Ref<CDXLNode> PdxlnProjElem(

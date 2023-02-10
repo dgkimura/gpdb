@@ -73,13 +73,13 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarPartOid *
+	static gpos::Ref<CDXLScalarPartOid>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarPartOid == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarPartOid *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarPartOid>(dxl_op);
 	}
 };
 }  // namespace gpdxl

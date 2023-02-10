@@ -60,13 +60,13 @@ public:
 	}
 
 	// conversion function
-	static CDXLPhysicalProperties *
+	static gpos::Ref<CDXLPhysicalProperties>
 	PdxlpropConvert(gpos::Ref<CDXLProperties> dxl_properties)
 	{
 		GPOS_ASSERT(nullptr != dxl_properties);
 		GPOS_ASSERT(EdxlpropertyPhysical ==
 					dxl_properties->GetDXLPropertyType());
-		return dynamic_cast<CDXLPhysicalProperties *>(dxl_properties);
+		return gpos::dyn_cast<CDXLPhysicalProperties>(dxl_properties);
 	}
 };
 

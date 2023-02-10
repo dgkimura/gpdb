@@ -74,13 +74,13 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarAssertConstraint *
+	static gpos::Ref<CDXLScalarAssertConstraint>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarAssertConstraint == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarAssertConstraint *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarAssertConstraint>(dxl_op);
 	}
 };
 }  // namespace gpdxl

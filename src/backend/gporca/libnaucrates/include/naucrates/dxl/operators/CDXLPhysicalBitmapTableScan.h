@@ -64,13 +64,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLPhysicalBitmapTableScan *
+	static gpos::Ref<CDXLPhysicalBitmapTableScan>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalBitmapTableScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalBitmapTableScan *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalBitmapTableScan>(dxl_op);
 	}
 
 };	// class CDXLPhysicalBitmapTableScan

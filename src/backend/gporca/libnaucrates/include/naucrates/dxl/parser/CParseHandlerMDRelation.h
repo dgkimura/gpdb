@@ -66,7 +66,7 @@ protected:
 	ULongPtrArray *m_partition_cols_array;
 
 	// partition types
-	CharPtrArray *m_str_part_types_array;
+	gpos::Ref<CharPtrArray> m_str_part_types_array;
 
 	// number of partitions
 	ULONG m_num_of_partitions;

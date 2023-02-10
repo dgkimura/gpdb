@@ -294,7 +294,7 @@ CTranslatorExprToDXL::PdxlnTranslate(gpos::Ref<CExpression> pexpr,
 
 		// get the old project element for the ColId
 		gpos::Ref<CDXLNode> pdxlnPrElOld = (*pdxlnPrL)[ul];
-		CDXLScalarProjElem *pdxlopPrElOld =
+		gpos::Ref<CDXLScalarProjElem> pdxlopPrElOld =
 			gpos::dyn_cast<CDXLScalarProjElem>(pdxlnPrElOld->GetOperator());
 		GPOS_ASSERT(1 == pdxlnPrElOld->Arity());
 		gpos::Ref<CDXLNode> child_dxlnode = (*pdxlnPrElOld)[0];
@@ -1918,11 +1918,10 @@ CTranslatorExprToDXL::PdxlnIndexScanWithInlinedCondition(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
-CTranslatorExprToDXL::PdxlnFromFilter(gpos::Ref<CExpression> pexprFilter,
-									  CColRefArray *colref_array,
-									  CDistributionSpecArray *pdrgpdsBaseTables,
-									  ULONG *pulNonGatherMotions, BOOL *pfDML,
-									  CDXLPhysicalProperties *dxl_properties)
+CTranslatorExprToDXL::PdxlnFromFilter(
+	gpos::Ref<CExpression> pexprFilter, CColRefArray *colref_array,
+	CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
+	BOOL *pfDML, gpos::Ref<CDXLPhysicalProperties> dxl_properties)
 {
 	GPOS_ASSERT(nullptr != pexprFilter);
 	GPOS_ASSERT(nullptr != dxl_properties);
@@ -3310,7 +3309,7 @@ CTranslatorExprToDXL::PdxlnRestrictResult(gpos::Ref<CDXLNode> dxlnode,
 		for (ULONG ul = 0; ul < ulPrjElems; ul++)
 		{
 			gpos::Ref<CDXLNode> child_dxlnode = (*pdxlnProjListOld)[ul];
-			CDXLScalarProjElem *pdxlPrjElem =
+			gpos::Ref<CDXLScalarProjElem> pdxlPrjElem =
 				gpos::dyn_cast<CDXLScalarProjElem>(
 					child_dxlnode->GetOperator());
 
@@ -3975,7 +3974,7 @@ CTranslatorExprToDXL::PdxlnTblScanFromNLJoinOuter(
 	gpos::Ref<CExpression> pexprRelational, gpos::Ref<CDXLNode> pdxlnCond,
 	CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
 	ULONG *,  // pulNonGatherMotions,
-	CDXLPhysicalProperties *dxl_properties)
+	gpos::Ref<CDXLPhysicalProperties> dxl_properties)
 {
 	// create a table scan over the input expression, without a filter
 	gpos::Ref<CDXLNode> pdxlnTblScan =
@@ -5475,7 +5474,8 @@ CTranslatorExprToDXL::PdxlnScCmp(gpos::Ref<CExpression> pexprScCmp)
 	gpos::Ref<CDXLNode> dxlnode_left = PdxlnScalar(pexprLeft);
 	gpos::Ref<CDXLNode> dxlnode_right = PdxlnScalar(pexprRight);
 
-	CScalarCmp *popScCmp = gpos::dyn_cast<CScalarCmp>(pexprScCmp->Pop());
+	gpos::Ref<CScalarCmp> popScCmp =
+		gpos::dyn_cast<CScalarCmp>(pexprScCmp->Pop());
 
 	GPOS_ASSERT(nullptr != popScCmp);
 	GPOS_ASSERT(nullptr != popScCmp->Pstr());
@@ -5692,7 +5692,8 @@ CTranslatorExprToDXL::PdxlnScFuncExpr(gpos::Ref<CExpression> pexprFunc)
 {
 	GPOS_ASSERT(nullptr != pexprFunc);
 
-	CScalarFunc *popScFunc = gpos::dyn_cast<CScalarFunc>(pexprFunc->Pop());
+	gpos::Ref<CScalarFunc> popScFunc =
+		gpos::dyn_cast<CScalarFunc>(pexprFunc->Pop());
 
 	gpos::Ref<IMDId> mdid_func = popScFunc->FuncMdId();
 	;
@@ -5728,7 +5729,7 @@ CTranslatorExprToDXL::PdxlnScWindowFuncExpr(
 {
 	GPOS_ASSERT(nullptr != pexprWindowFunc);
 
-	CScalarWindowFunc *popScWindowFunc =
+	gpos::Ref<CScalarWindowFunc> popScWindowFunc =
 		gpos::dyn_cast<CScalarWindowFunc>(pexprWindowFunc->Pop());
 
 	gpos::Ref<IMDId> mdid_func = popScWindowFunc->FuncMdId();
@@ -6593,7 +6594,7 @@ gpos::Ref<CDXLNode>
 CTranslatorExprToDXL::PdxlnArrayRefIndexList(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
-	CScalarArrayRefIndexList *pop =
+	gpos::Ref<CScalarArrayRefIndexList> pop =
 		gpos::dyn_cast<CScalarArrayRefIndexList>(pexpr->Pop());
 
 	gpos::Ref<CDXLNode> pdxlnIndexlist = GPOS_NEW(m_mp) CDXLNode(

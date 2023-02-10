@@ -78,7 +78,7 @@ public:
 		GPOS_ASSERT(FCheckPattern(pexpr));
 
 		CMemoryPool *mp = pxfctxt->Pmp();
-		CLogicalIndexApply *indexApply =
+		gpos::Ref<CLogicalIndexApply> indexApply =
 			gpos::dyn_cast<CLogicalIndexApply>(pexpr->Pop());
 
 		// extract components

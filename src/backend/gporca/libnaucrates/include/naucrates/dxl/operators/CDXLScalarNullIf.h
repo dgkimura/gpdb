@@ -69,13 +69,13 @@ public:
 	BOOL HasBoolResult(CMDAccessor *md_accessor) const override;
 
 	// conversion function
-	static CDXLScalarNullIf *
+	static gpos::Ref<CDXLScalarNullIf>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarNullIf == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarNullIf *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarNullIf>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

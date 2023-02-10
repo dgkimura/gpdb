@@ -83,14 +83,14 @@ public:
 	}
 
 	// conversion function
-	static CDXLDatumStatsDoubleMappable *
+	static gpos::Ref<CDXLDatumStatsDoubleMappable>
 	Cast(gpos::Ref<CDXLDatum> dxl_datum)
 	{
 		GPOS_ASSERT(nullptr != dxl_datum);
 		GPOS_ASSERT(CDXLDatum::EdxldatumStatsDoubleMappable ==
 					dxl_datum->GetDatumType());
 
-		return dynamic_cast<CDXLDatumStatsDoubleMappable *>(dxl_datum);
+		return gpos::dyn_cast<CDXLDatumStatsDoubleMappable>(dxl_datum);
 	}
 };
 }  // namespace gpdxl

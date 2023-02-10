@@ -196,7 +196,8 @@ CDXLRelStats::DebugPrint(IOstream &os) const
 gpos::Ref<CDXLRelStats>
 CDXLRelStats::CreateDXLDummyRelStats(CMemoryPool *mp, gpos::Ref<IMDId> mdid)
 {
-	CMDIdRelStats *rel_stats_mdid = gpos::dyn_cast<CMDIdRelStats>(mdid);
+	gpos::Ref<CMDIdRelStats> rel_stats_mdid =
+		gpos::dyn_cast<CMDIdRelStats>(mdid);
 	CAutoP<CWStringDynamic> str;
 	str = GPOS_NEW(mp) CWStringDynamic(mp, rel_stats_mdid->GetBuffer());
 	CAutoP<CMDName> mdname;

@@ -45,13 +45,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLLogicalSelect *
+	static gpos::Ref<CDXLLogicalSelect>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalSelect == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalSelect *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalSelect>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

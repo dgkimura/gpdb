@@ -204,8 +204,8 @@ CDatumInt4GPDB::Matches(const gpos::Ref<IDatum> datum) const
 		return false;
 	}
 
-	const CDatumInt4GPDB *datum_cast =
-		dynamic_cast<const CDatumInt4GPDB *>(datum);
+	const gpos::Ref<CDatumInt4GPDB> datum_cast =
+		gpos::dyn_cast<CDatumInt4GPDB>(datum);
 
 	if (!datum_cast->IsNull() && !IsNull())
 	{

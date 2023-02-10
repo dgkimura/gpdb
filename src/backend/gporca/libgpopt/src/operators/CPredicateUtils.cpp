@@ -111,7 +111,7 @@ CPredicateUtils::FComparison(gpos::Ref<CExpression> pexpr,
 		return false;
 	}
 
-	CScalarCmp *popScCmp = gpos::dyn_cast<CScalarCmp>(pop);
+	gpos::Ref<CScalarCmp> popScCmp = gpos::dyn_cast<CScalarCmp>(pop);
 	GPOS_ASSERT(nullptr != popScCmp);
 
 	return cmp_type == popScCmp->ParseCmpType();
@@ -565,7 +565,7 @@ CPredicateUtils::FLikePredicate(gpos::Ref<CExpression> pexpr)
 		return false;
 	}
 
-	CScalarCmp *popScCmp = gpos::dyn_cast<CScalarCmp>(pop);
+	gpos::Ref<CScalarCmp> popScCmp = gpos::dyn_cast<CScalarCmp>(pop);
 	gpos::Ref<IMDId> mdid = popScCmp->MdIdOp();
 
 	return FLikePredicate(mdid);
@@ -1322,7 +1322,7 @@ CPredicateUtils::ValidatePartPruningExpr(CMemoryPool *mp,
 		return nullptr;
 	}
 
-	CScalarCmp *sc_cmp = gpos::dyn_cast<CScalarCmp>(expr->Pop());
+	gpos::Ref<CScalarCmp> sc_cmp = gpos::dyn_cast<CScalarCmp>(expr->Pop());
 
 	if (!allow_not_equals_preds && sc_cmp->ParseCmpType() == IMDType::EcmptNEq)
 	{
@@ -1934,7 +1934,8 @@ CPredicateUtils::PexprIndexLookupKeyOnRight(CMemoryPool *mp,
 	gpos::Ref<CExpression> pexprRight = (*pexprScalar)[1];
 	if (CUtils::FScalarCmp(pexprScalar))
 	{
-		CScalarCmp *popScCmp = gpos::dyn_cast<CScalarCmp>(pexprScalar->Pop());
+		gpos::Ref<CScalarCmp> popScCmp =
+			gpos::dyn_cast<CScalarCmp>(pexprScalar->Pop());
 		gpos::Ref<CScalarCmp> popScCmpCommute = popScCmp->PopCommutedOp(mp);
 
 		if (popScCmpCommute)
@@ -2607,7 +2608,8 @@ CPredicateUtils::FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
 	const IMDScalarOp *pmdobjScCmp = nullptr;
 	if (COperator::EopScalarCmp == pexprPred->Pop()->Eopid())
 	{
-		CScalarCmp *popScCmp = gpos::dyn_cast<CScalarCmp>(pexprPred->Pop());
+		gpos::Ref<CScalarCmp> popScCmp =
+			gpos::dyn_cast<CScalarCmp>(pexprPred->Pop());
 		pmdobjScCmp = md_accessor->RetrieveScOp(popScCmp->MdIdOp());
 	}
 	else if (COperator::EopScalarArrayCmp == pexprPred->Pop()->Eopid())
@@ -2665,7 +2667,8 @@ CPredicateUtils::FContainsVolatileFunction(gpos::Ref<CExpression> pexpr)
 
 	if (COperator::EopScalarFunc == popCurrent->Eopid())
 	{
-		CScalarFunc *pCurrentFunction = gpos::dyn_cast<CScalarFunc>(popCurrent);
+		gpos::Ref<CScalarFunc> pCurrentFunction =
+			gpos::dyn_cast<CScalarFunc>(popCurrent);
 		return IMDFunction::EfsVolatile ==
 			   pCurrentFunction->EfsGetFunctionStability();
 	}
@@ -2957,7 +2960,7 @@ CPredicateUtils::ExprsContainsOnlyStrictComparisons(CExpressionArray *conjuncts)
 		gpos::Ref<CExpression> conjunct = (*conjuncts)[ul].get();
 		if (FComparison(conjunct))
 		{
-			CScalarCmp *pscalarCmp =
+			gpos::Ref<CScalarCmp> pscalarCmp =
 				gpos::dyn_cast<CScalarCmp>(conjunct->Pop());
 			if (!CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(
 					mda, pscalarCmp->MdIdOp()))

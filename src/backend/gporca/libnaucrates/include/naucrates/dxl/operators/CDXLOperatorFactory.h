@@ -569,7 +569,7 @@ public:
 	// stores them in the provided DXL Motion operator
 	// will raise an exception if lists are not well-formed
 	static void SetSegmentInfo(CDXLMemoryManager *mp,
-							   CDXLPhysicalMotion *motion,
+							   gpos::Ref<CDXLPhysicalMotion> motion,
 							   const Attributes &attrs, Edxltoken target_elem);
 
 	static EdxlJoinType ParseJoinType(const XMLCh *xmlszJoinType,

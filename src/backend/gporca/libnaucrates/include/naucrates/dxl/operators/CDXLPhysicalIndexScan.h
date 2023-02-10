@@ -83,13 +83,13 @@ public:
 						const CDXLNode *node) const override;
 
 	// conversion function
-	static CDXLPhysicalIndexScan *
+	static gpos::Ref<CDXLPhysicalIndexScan>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalIndexScan == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalIndexScan *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalIndexScan>(dxl_op);
 	}
 
 #ifdef GPOS_DEBUG

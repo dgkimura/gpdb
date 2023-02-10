@@ -141,13 +141,13 @@ public:
 		BOOL must_exist) override;
 
 	// conversion function
-	static CLogicalIndexApply *
+	static gpos::Ref<CLogicalIndexApply>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalIndexApply == pop->Eopid());
 
-		return dynamic_cast<CLogicalIndexApply *>(pop);
+		return gpos::dyn_cast<CLogicalIndexApply>(pop);
 	}
 
 };	// class CLogicalIndexApply

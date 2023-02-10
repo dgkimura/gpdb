@@ -48,7 +48,7 @@ CScalarArrayRefIndexList::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CScalarArrayRefIndexList *popIndexList =
+	gpos::Ref<CScalarArrayRefIndexList> popIndexList =
 		gpos::dyn_cast<CScalarArrayRefIndexList>(pop);
 
 	return m_eilt == popIndexList->Eilt();

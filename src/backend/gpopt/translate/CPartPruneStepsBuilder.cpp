@@ -115,7 +115,8 @@ CPartPruneStepsBuilder::PartPruneStepFromScalarCmp(gpos::Ref<CDXLNode> node,
 												   List *steps_list)
 {
 	GPOS_ASSERT(nullptr != node);
-	CDXLScalarComp *dxlop = gpos::dyn_cast<CDXLScalarComp>(node->GetOperator());
+	gpos::Ref<CDXLScalarComp> dxlop =
+		gpos::dyn_cast<CDXLScalarComp>(node->GetOperator());
 	Oid opno = gpos::dyn_cast<CMDIdGPDB>(dxlop->MDId())->Oid();
 	Oid opfamily = m_relation->rd_partkey->partopfamily[0 /* col */];
 
@@ -158,7 +159,7 @@ CPartPruneStepsBuilder::PartPruneStepFromScalarBoolExpr(
 	gpos::Ref<CDXLNode> node, int *step_id, List *steps_list)
 {
 	GPOS_ASSERT(nullptr != node);
-	CDXLScalarBoolExpr *dxlop =
+	gpos::Ref<CDXLScalarBoolExpr> dxlop =
 		gpos::dyn_cast<CDXLScalarBoolExpr>(node->GetOperator());
 
 	PartitionPruneCombineOp combineOp;

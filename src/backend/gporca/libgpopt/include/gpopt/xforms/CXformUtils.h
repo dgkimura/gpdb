@@ -687,7 +687,7 @@ CXformUtils::AddHashOrMergeJoinAlternative(
 	{
 		;
 	}
-	CLogicalJoin *popLogicalJoin =
+	gpos::Ref<CLogicalJoin> popLogicalJoin =
 		gpos::dyn_cast<CLogicalJoin>(pexprJoin->Pop());
 	gpos::Ref<T> op =
 		GPOS_NEW(mp) T(mp, std::move(pdrgpexprOuter), std::move(pdrgpexprInner),

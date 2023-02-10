@@ -63,13 +63,13 @@ public:
 						const CDXLNode *node) const override;
 
 	// conversion function
-	static CDXLScalarIdent *
+	static gpos::Ref<CDXLScalarIdent>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarIdent == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarIdent *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarIdent>(dxl_op);
 	}
 
 	// does the operator return a boolean result

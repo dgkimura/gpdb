@@ -86,13 +86,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLScalarArrayCoerceExpr *
+	static gpos::Ref<CDXLScalarArrayCoerceExpr>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarArrayCoerceExpr == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarArrayCoerceExpr *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarArrayCoerceExpr>(dxl_op);
 	}
 };
 }  // namespace gpdxl

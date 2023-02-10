@@ -102,13 +102,13 @@ public:
 						const CDXLNode *node) const override;
 
 	// conversion function
-	static CDXLLogicalDelete *
+	static gpos::Ref<CDXLLogicalDelete>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalDelete == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalDelete *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalDelete>(dxl_op);
 	}
 };
 }  // namespace gpdxl

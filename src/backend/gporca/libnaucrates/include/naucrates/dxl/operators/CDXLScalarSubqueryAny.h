@@ -49,13 +49,13 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLScalarSubqueryAny *
+	static gpos::Ref<CDXLScalarSubqueryAny>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarSubqueryAny == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarSubqueryAny *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarSubqueryAny>(dxl_op);
 	}
 
 	// does the operator return a boolean result

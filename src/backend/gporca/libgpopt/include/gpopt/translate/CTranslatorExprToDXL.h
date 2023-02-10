@@ -205,7 +205,7 @@ private:
 	gpos::Ref<CDXLNode> PdxlnFromFilter(
 		gpos::Ref<CExpression> pexprFilter, CColRefArray *colref_array,
 		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
-		BOOL *pfDML, CDXLPhysicalProperties *dxl_properties);
+		BOOL *pfDML, gpos::Ref<CDXLPhysicalProperties> dxl_properties);
 
 	gpos::Ref<CDXLNode> PdxlnResult(
 		gpos::Ref<CExpression> pexprRelational, CColRefArray *colref_array,
@@ -306,7 +306,8 @@ private:
 	gpos::Ref<CDXLNode> PdxlnTblScanFromNLJoinOuter(
 		gpos::Ref<CExpression> pexprRelational, gpos::Ref<CDXLNode> pdxlnScalar,
 		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
-		ULONG *pulNonGatherMotions, CDXLPhysicalProperties *dxl_properties);
+		ULONG *pulNonGatherMotions,
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties);
 
 	gpos::Ref<CDXLNode> PdxlnResultFromNLJoinOuter(
 		gpos::Ref<CExpression> pexprRelational, gpos::Ref<CDXLNode> pdxlnScalar,

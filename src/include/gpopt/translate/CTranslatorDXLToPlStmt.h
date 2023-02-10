@@ -188,7 +188,7 @@ private:
 	// translates a DXL index scan node into a IndexScan node
 	Plan *TranslateDXLIndexScan(
 		const gpos::Ref<CDXLNode> index_scan_dxlnode,
-		gpdxl::CDXLPhysicalIndexScan *dxl_physical_idx_scan_op,
+		gpdxl::gpos::Ref<CDXLPhysicalIndexScan> dxl_physical_idx_scan_op,
 		CDXLTranslateContext *output_context,
 		CDXLTranslationContextArray *
 			ctxt_translation_prev_siblings	// translation contexts of previous siblings
@@ -577,15 +577,16 @@ private:
 	);
 
 	// sets the vartypmod fields in the target entries of the given target list
-	static void SetVarTypMod(const CDXLPhysicalCTAS *dxlop, List *target_list);
+	static void SetVarTypMod(const gpos::Ref<CDXLPhysicalCTAS> dxlop,
+							 List *target_list);
 
 	// translate the into clause for a DXL physical CTAS operator
 	static IntoClause *TranslateDXLPhyCtasToIntoClause(
-		const CDXLPhysicalCTAS *dxlop);
+		const gpos::Ref<CDXLPhysicalCTAS> dxlop);
 
 	// translate the distribution policy for a DXL physical CTAS operator
 	static GpPolicy *TranslateDXLPhyCtasToDistrPolicy(
-		const CDXLPhysicalCTAS *dxlop, List *target_list);
+		const gpos::Ref<CDXLPhysicalCTAS> dxlop, List *target_list);
 
 	// translate CTAS storage options
 	static List *TranslateDXLCtasStorageOptions(

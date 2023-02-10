@@ -193,7 +193,7 @@ CScalarIdent::FAllowedFuncScId(gpos::Ref<CExpression> pexpr)
 		pexpr->Arity() > 0 &&
 		COperator::EopScalarIdent == (*pexpr)[0]->Pop()->Eopid())
 	{
-		CScalarFunc *func = gpos::dyn_cast<CScalarFunc>(pexpr->Pop());
+		gpos::Ref<CScalarFunc> func = gpos::dyn_cast<CScalarFunc>(pexpr->Pop());
 		gpos::Ref<CMDIdGPDB> funcmdid =
 			gpos::dyn_cast<CMDIdGPDB>(func->FuncMdId());
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

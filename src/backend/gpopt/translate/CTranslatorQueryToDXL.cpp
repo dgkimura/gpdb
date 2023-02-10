@@ -568,7 +568,7 @@ CTranslatorQueryToDXL::TranslateSelectQueryToDXL()
 			TranslateSetOpToDXL(m_query->setOperations, target_list,
 								output_attno_to_colid_mapping.get());
 
-		CDXLLogicalSetOp *dxlop =
+		gpos::Ref<CDXLLogicalSetOp> dxlop =
 			gpos::dyn_cast<CDXLLogicalSetOp>(child_dxlnode->GetOperator());
 		const CDXLColDescrArray *dxl_col_descr_array =
 			dxlop->GetDXLColumnDescrArray();
@@ -810,7 +810,7 @@ CTranslatorQueryToDXL::TranslateInsertQueryToDXL()
 			{
 				gpos::Ref<CDXLNode> dxl_column =
 					(*m_dxl_query_output_cols)[target_list_pos].get();
-				CDXLScalarIdent *dxl_ident =
+				gpos::Ref<CDXLScalarIdent> dxl_ident =
 					gpos::dyn_cast<CDXLScalarIdent>(dxl_column->GetOperator());
 				source_array->Append(
 					GPOS_NEW(m_mp) ULONG(dxl_ident->GetDXLColRef()->Id()));
@@ -897,7 +897,7 @@ CTranslatorQueryToDXL::TranslateCTASToDXL()
 		var_typmods->Append(GPOS_NEW(m_mp) INT(var_typmod));
 
 		gpos::Ref<CDXLNode> dxl_column = (*m_dxl_query_output_cols)[ul].get();
-		CDXLScalarIdent *dxl_ident =
+		gpos::Ref<CDXLScalarIdent> dxl_ident =
 			gpos::dyn_cast<CDXLScalarIdent>(dxl_column->GetOperator());
 		source_array->Append(GPOS_NEW(m_mp)
 								 ULONG(dxl_ident->GetDXLColRef()->Id()));
@@ -1360,7 +1360,7 @@ CTranslatorQueryToDXL::UpdatedColumnMapping()
 		{
 			gpos::Ref<CDXLNode> dxl_column =
 				(*m_dxl_query_output_cols)[ul].get();
-			CDXLScalarIdent *dxl_ident =
+			gpos::Ref<CDXLScalarIdent> dxl_ident =
 				gpos::dyn_cast<CDXLScalarIdent>(dxl_column->GetOperator());
 			ULONG colid = dxl_ident->GetDXLColRef()->Id();
 
@@ -1409,7 +1409,7 @@ CTranslatorQueryToDXL::IsLeadWindowFunc(gpos::Ref<CDXLOperator> dxlop)
 	BOOL is_lead_func = false;
 	if (EdxlopScalarWindowRef == dxlop->GetDXLOperator())
 	{
-		CDXLScalarWindowRef *winref_dxlop =
+		gpos::Ref<CDXLScalarWindowRef> winref_dxlop =
 			gpos::dyn_cast<CDXLScalarWindowRef>(dxlop);
 		const gpos::Ref<CMDIdGPDB> mdid_gpdb =
 			gpos::dyn_cast<CMDIdGPDB>(winref_dxlop->FuncMdId());
@@ -1436,7 +1436,7 @@ CTranslatorQueryToDXL::IsLagWindowFunc(gpos::Ref<CDXLOperator> dxlop)
 	BOOL is_lag = false;
 	if (EdxlopScalarWindowRef == dxlop->GetDXLOperator())
 	{
-		CDXLScalarWindowRef *winref_dxlop =
+		gpos::Ref<CDXLScalarWindowRef> winref_dxlop =
 			gpos::dyn_cast<CDXLScalarWindowRef>(dxlop);
 		const gpos::Ref<CMDIdGPDB> mdid_gpdb =
 			gpos::dyn_cast<CMDIdGPDB>(winref_dxlop->FuncMdId());
@@ -1556,7 +1556,7 @@ CTranslatorQueryToDXL::UpdateLeadLagWinSpecPos(
 		BOOL is_lag = IsLagWindowFunc(dxlop);
 		if (is_lead_func || is_lag)
 		{
-			CDXLScalarWindowRef *winref_dxlop =
+			gpos::Ref<CDXLScalarWindowRef> winref_dxlop =
 				gpos::dyn_cast<CDXLScalarWindowRef>(dxlop);
 			gpos::Ref<CDXLWindowSpec> window_spec_dxlnode =
 				(*window_spec_array)[winref_dxlop->GetWindSpecPos()].get();
@@ -2552,7 +2552,7 @@ CTranslatorQueryToDXL::CreateDXLUnionAllForGroupingSets(
 	;
 
 	// compute output columns
-	CDXLLogicalSetOp *union_dxlop =
+	gpos::Ref<CDXLLogicalSetOp> union_dxlop =
 		gpos::dyn_cast<CDXLLogicalSetOp>(unionall_dxlnode->GetOperator());
 
 	ListCell *lc = nullptr;
@@ -2718,7 +2718,7 @@ CTranslatorQueryToDXL::TranslateSetOpToDXL(
 		children_dxlnodes, is_cast_across_input, false /* keep_res_junked */
 	);
 
-	CDXLLogicalSetOp *dxlop =
+	gpos::Ref<CDXLLogicalSetOp> dxlop =
 		gpos::dyn_cast<CDXLLogicalSetOp>(dxlnode->GetOperator());
 	const CDXLColDescrArray *dxl_col_descr_array =
 		dxlop->GetDXLColumnDescrArray();
@@ -2994,7 +2994,7 @@ CTranslatorQueryToDXL::TranslateSetOpChild(Node *child_node,
 			for (ULONG ul = 0; ul < length; ul++)
 			{
 				gpos::Ref<CDXLNode> current_dxlnode = (*dxlnodes)[ul].get();
-				CDXLScalarIdent *dxl_scalar_ident =
+				gpos::Ref<CDXLScalarIdent> dxl_scalar_ident =
 					gpos::dyn_cast<CDXLScalarIdent>(
 						current_dxlnode->GetOperator());
 				ULONG *colid = GPOS_NEW(m_mp)
@@ -3871,7 +3871,7 @@ CTranslatorQueryToDXL::TranslateCTEToDXL(const RangeTblEntry *rte,
 
 	GPOS_ASSERT(nullptr != cte_producer_dxlnode);
 
-	CDXLLogicalCTEProducer *cte_producer_dxlop =
+	gpos::Ref<CDXLLogicalCTEProducer> cte_producer_dxlop =
 		gpos::dyn_cast<CDXLLogicalCTEProducer>(
 			cte_producer_dxlnode->GetOperator());
 	ULONG cte_id = cte_producer_dxlop->Id();
@@ -4538,7 +4538,7 @@ CTranslatorQueryToDXL::TranslateExprToDXLProject(Expr *expr,
 		// project elem is a reference to a column - use the colref id
 		GPOS_ASSERT(EdxlopScalarIdent ==
 					child_dxlnode->GetOperator()->GetDXLOperator());
-		CDXLScalarIdent *dxl_ident =
+		gpos::Ref<CDXLScalarIdent> dxl_ident =
 			gpos::cast<CDXLScalarIdent>(child_dxlnode->GetOperator());
 		project_elem_id = dxl_ident->GetDXLColRef()->Id();
 	}
@@ -4686,8 +4686,9 @@ CTranslatorQueryToDXL::ConstructCTEProducerList(List *cte_list,
 		{
 			gpos::Ref<CDXLNode> output_col_dxlnode =
 				(*cte_query_output_colds_dxlnode_array)[ul].get();
-			CDXLScalarIdent *dxl_scalar_ident = gpos::dyn_cast<CDXLScalarIdent>(
-				output_col_dxlnode->GetOperator());
+			gpos::Ref<CDXLScalarIdent> dxl_scalar_ident =
+				gpos::dyn_cast<CDXLScalarIdent>(
+					output_col_dxlnode->GetOperator());
 			colid_array->Append(
 				GPOS_NEW(m_mp) ULONG(dxl_scalar_ident->GetDXLColRef()->Id()));
 		}
@@ -4751,7 +4752,7 @@ CTranslatorQueryToDXL::ConstructCTEAnchors(
 	{
 		// construct a new CTE anchor on top of the previous one
 		gpos::Ref<CDXLNode> cte_producer_dxlnode = (*dxlnodes)[ul - 1].get();
-		CDXLLogicalCTEProducer *cte_prod_dxlop =
+		gpos::Ref<CDXLLogicalCTEProducer> cte_prod_dxlop =
 			gpos::dyn_cast<CDXLLogicalCTEProducer>(
 				cte_producer_dxlnode->GetOperator());
 		ULONG cte_producer_id = cte_prod_dxlop->Id();

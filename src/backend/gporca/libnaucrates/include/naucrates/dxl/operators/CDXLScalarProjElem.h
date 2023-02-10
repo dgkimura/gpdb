@@ -73,13 +73,13 @@ public:
 	}
 
 	// conversion function
-	static CDXLScalarProjElem *
+	static gpos::Ref<CDXLScalarProjElem>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarProjectElem == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarProjElem *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarProjElem>(dxl_op);
 	}
 
 	// does the operator return a boolean result

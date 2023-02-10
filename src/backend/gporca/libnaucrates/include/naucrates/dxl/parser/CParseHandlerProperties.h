@@ -71,7 +71,7 @@ public:
 	~CParseHandlerProperties() override;
 
 	// returns the constructed properties container
-	CDXLPhysicalProperties *GetProperties() const;
+	gpos::Ref<CDXLPhysicalProperties> GetProperties() const;
 
 	// return the derived relation statistics
 	gpos::Ref<CDXLStatsDerivedRelation>

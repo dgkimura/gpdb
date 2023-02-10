@@ -144,13 +144,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLScalarWindowRef *
+	static gpos::Ref<CDXLScalarWindowRef>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarWindowRef == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarWindowRef *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarWindowRef>(dxl_op);
 	}
 
 	// does the operator return a boolean result

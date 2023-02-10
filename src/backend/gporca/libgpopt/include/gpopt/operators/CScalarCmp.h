@@ -125,13 +125,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CScalarCmp *
+	static gpos::Ref<CScalarCmp>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCmp == pop->Eopid());
 
-		return dynamic_cast<CScalarCmp *>(pop);
+		return gpos::dyn_cast<CScalarCmp>(pop);
 	}
 
 	// get commuted scalar comparision operator

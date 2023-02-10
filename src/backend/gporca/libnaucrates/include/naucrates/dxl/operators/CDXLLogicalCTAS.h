@@ -209,13 +209,13 @@ public:
 						const CDXLNode *dxlnode) const override;
 
 	// conversion function
-	static CDXLLogicalCTAS *
+	static gpos::Ref<CDXLLogicalCTAS>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopLogicalCTAS == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLLogicalCTAS *>(dxl_op);
+		return gpos::dyn_cast<CDXLLogicalCTAS>(dxl_op);
 	}
 };
 }  // namespace gpdxl

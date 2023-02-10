@@ -108,7 +108,7 @@ CScalarProjectList::UlDistinctAggs(CExpressionHandle &exprhdl)
 		}
 		else if (COperator::EopScalarWindowFunc == eopidChild)
 		{
-			CScalarWindowFunc *popScWinFunc =
+			gpos::Ref<CScalarWindowFunc> popScWinFunc =
 				gpos::dyn_cast<CScalarWindowFunc>(pexprChild->Pop());
 			if (popScWinFunc->IsDistinct() && popScWinFunc->FAgg())
 			{

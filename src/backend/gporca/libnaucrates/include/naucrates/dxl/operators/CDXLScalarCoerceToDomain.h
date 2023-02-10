@@ -67,13 +67,13 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 
 	// conversion function
-	static CDXLScalarCoerceToDomain *
+	static gpos::Ref<CDXLScalarCoerceToDomain>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarCoerceToDomain == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarCoerceToDomain *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarCoerceToDomain>(dxl_op);
 	}
 };
 }  // namespace gpdxl

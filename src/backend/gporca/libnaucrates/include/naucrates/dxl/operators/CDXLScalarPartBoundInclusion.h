@@ -86,13 +86,13 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarPartBoundInclusion *
+	static gpos::Ref<CDXLScalarPartBoundInclusion>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarPartBoundInclusion == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarPartBoundInclusion *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarPartBoundInclusion>(dxl_op);
 	}
 };
 }  // namespace gpdxl

@@ -109,7 +109,7 @@ CScalarCmp::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCmp *popScCmp = gpos::dyn_cast<CScalarCmp>(pop);
+		gpos::Ref<CScalarCmp> popScCmp = gpos::dyn_cast<CScalarCmp>(pop);
 
 		// match if operator oid are identical
 		return m_mdid_op->Equals(popScCmp->MdIdOp());
@@ -172,7 +172,7 @@ CScalarCmp::Eber(ULongPtrArray *pdrgpulChildren) const
 gpos::Ref<IMDId>
 CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor, gpos::Ref<COperator> pop)
 {
-	CScalarCmp *popScalarCmp = dynamic_cast<CScalarCmp *>(pop);
+	gpos::Ref<CScalarCmp> popScalarCmp = gpos::dyn_cast<CScalarCmp>(pop);
 	const IMDScalarOp *pmdScalarCmpOp =
 		md_accessor->RetrieveScOp(popScalarCmp->MdIdOp());
 

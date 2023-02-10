@@ -40,9 +40,9 @@ CDatumOidGPDB::CDatumOidGPDB(CSystemId sysid, OID oid_val, BOOL is_null)
 	: m_mdid(nullptr), m_val(oid_val), m_is_null(is_null)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	gpos::Ref<IMDId> mdid = dynamic_cast<const CMDTypeOidGPDB *>(
-								md_accessor->PtMDType<IMDTypeOid>(sysid))
-								->MDId();
+	gpos::Ref<IMDId> mdid =
+		gpos::dyn_cast<CMDTypeOidGPDB>(md_accessor->PtMDType<IMDTypeOid>(sysid))
+			->MDId();
 	;
 
 	m_mdid = mdid;
@@ -198,8 +198,8 @@ CDatumOidGPDB::Matches(const gpos::Ref<IDatum> datum) const
 		return false;
 	}
 
-	const CDatumOidGPDB *datum_cast =
-		dynamic_cast<const CDatumOidGPDB *>(datum);
+	const gpos::Ref<CDatumOidGPDB> datum_cast =
+		gpos::dyn_cast<CDatumOidGPDB>(datum);
 
 	if (!datum_cast->IsNull() && !IsNull())
 	{

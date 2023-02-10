@@ -1072,12 +1072,12 @@ CUtils::FLogicalJoin(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 
-	CLogicalJoin *popJoin = nullptr;
+	gpos::Ref<CLogicalJoin> popJoin = nullptr;
 	if (pop->FLogical())
 	{
 		// attempt casting to logical join,
 		// dynamic cast returns NULL if operator is not join
-		popJoin = dynamic_cast<CLogicalJoin *>(pop);
+		popJoin = dynamic_cast<gpos::Ref<CLogicalJoin> >(pop);
 	}
 
 	return (nullptr != popJoin);
@@ -1111,7 +1111,7 @@ CUtils::FLogicalUnary(gpos::Ref<COperator> pop)
 	{
 		// attempt casting to logical unary,
 		// dynamic cast returns NULL if operator is not unary
-		popUnary = dynamic_cast<gpos::Ref<CLogicalUnary> >(pop);
+		popUnary = gpos::dyn_cast<CLogicalUnary>(pop);
 	}
 
 	return (nullptr != popUnary);
@@ -1194,7 +1194,7 @@ CUtils::FPhysicalScan(gpos::Ref<COperator> pop)
 	{
 		// attempt casting to physical scan,
 		// dynamic cast returns NULL if operator is not a scan
-		popScan = dynamic_cast<gpos::Ref<CPhysicalScan> >(pop);
+		popScan = gpos::dyn_cast<CPhysicalScan>(pop);
 	}
 
 	return (nullptr != popScan);
@@ -1211,7 +1211,7 @@ CUtils::FPhysicalAgg(gpos::Ref<COperator> pop)
 	{
 		// attempt casting to physical agg,
 		// dynamic cast returns NULL if operator is not an agg
-		popAgg = dynamic_cast<gpos::Ref<CPhysicalAgg> >(pop);
+		popAgg = gpos::dyn_cast<CPhysicalAgg>(pop);
 	}
 
 	return (nullptr != popAgg);
@@ -1228,7 +1228,7 @@ CUtils::FPhysicalMotion(gpos::Ref<COperator> pop)
 	{
 		// attempt casting to physical motion,
 		// dynamic cast returns NULL if operator is not a motion
-		popMotion = dynamic_cast<gpos::Ref<CPhysicalMotion> >(pop);
+		popMotion = gpos::dyn_cast<CPhysicalMotion>(pop);
 	}
 
 	return (nullptr != popMotion);
@@ -1253,12 +1253,12 @@ CUtils::FApply(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 
-	CLogicalApply *popApply = nullptr;
+	gpos::Ref<CLogicalApply> popApply = nullptr;
 	if (pop->FLogical())
 	{
 		// attempt casting to logical apply,
 		// dynamic cast returns NULL if operator is not an Apply operator
-		popApply = dynamic_cast<CLogicalApply *>(pop);
+		popApply = dynamic_cast<gpos::Ref<CLogicalApply> >(pop);
 	}
 
 	return (nullptr != popApply);
@@ -4644,7 +4644,7 @@ CUtils::FHasAggWindowFunc(gpos::Ref<CExpression> pexpr)
 
 	if (COperator::EopScalarWindowFunc == pexpr->Pop()->Eopid())
 	{
-		CScalarWindowFunc *popScWindowFunc =
+		gpos::Ref<CScalarWindowFunc> popScWindowFunc =
 			gpos::dyn_cast<CScalarWindowFunc>(pexpr->Pop());
 		return popScWindowFunc->FAgg();
 	}
@@ -4769,7 +4769,7 @@ CUtils::IsExprNDVPreserving(gpos::Ref<CExpression> pexpr,
 			{
 				// check whether the function is NDV-preserving
 				CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-				CScalarFunc *sf = gpos::dyn_cast<CScalarFunc>(pop);
+				gpos::Ref<CScalarFunc> sf = gpos::dyn_cast<CScalarFunc>(pop);
 				const IMDFunction *pmdfunc =
 					md_accessor->RetrieveFunc(sf->FuncMdId());
 

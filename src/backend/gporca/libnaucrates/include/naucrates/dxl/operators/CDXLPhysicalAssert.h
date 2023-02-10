@@ -78,13 +78,13 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLPhysicalAssert *
+	static gpos::Ref<CDXLPhysicalAssert>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopPhysicalAssert == dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLPhysicalAssert *>(dxl_op);
+		return gpos::dyn_cast<CDXLPhysicalAssert>(dxl_op);
 	}
 };
 }  // namespace gpdxl

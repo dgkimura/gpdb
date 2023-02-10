@@ -113,13 +113,13 @@ CDXLScalarPartListValues::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
 #endif	// GPOS_DEBUG
 
 // conversion function
-CDXLScalarPartListValues *
+gpos::Ref<CDXLScalarPartListValues>
 CDXLScalarPartListValues::Cast(gpos::Ref<CDXLOperator> dxl_op)
 {
 	GPOS_ASSERT(nullptr != dxl_op);
 	GPOS_ASSERT(EdxlopScalarPartListValues == dxl_op->GetDXLOperator());
 
-	return dynamic_cast<CDXLScalarPartListValues *>(dxl_op);
+	return gpos::dyn_cast<CDXLScalarPartListValues>(dxl_op);
 }
 
 // EOF

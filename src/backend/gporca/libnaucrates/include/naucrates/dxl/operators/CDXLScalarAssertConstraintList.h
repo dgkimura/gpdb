@@ -66,14 +66,14 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDXLScalarAssertConstraintList *
+	static gpos::Ref<CDXLScalarAssertConstraintList>
 	Cast(gpos::Ref<CDXLOperator> dxl_op)
 	{
 		GPOS_ASSERT(nullptr != dxl_op);
 		GPOS_ASSERT(EdxlopScalarAssertConstraintList ==
 					dxl_op->GetDXLOperator());
 
-		return dynamic_cast<CDXLScalarAssertConstraintList *>(dxl_op);
+		return gpos::dyn_cast<CDXLScalarAssertConstraintList>(dxl_op);
 	}
 };
 }  // namespace gpdxl

@@ -60,7 +60,8 @@ private:
 
 		~CEmptyMappingColIdVar() override = default;
 
-		Var *VarFromDXLNodeScId(const CDXLScalarIdent *scalar_ident) override;
+		Var *VarFromDXLNodeScId(
+			const gpos::Ref<CDXLScalarIdent> scalar_ident) override;
 	};
 
 	// memory pool, not owned

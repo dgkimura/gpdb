@@ -56,8 +56,8 @@ CFilterStatsProcessor::MakeStatsFilterForScalarExpr(
 	// derive stats based on local filter
 	gpos::Ref<IStatistics> result_stats =
 		CFilterStatsProcessor::MakeStatsFilter(
-			mp, dynamic_cast<gpos::Ref<CStatistics> >(child_stats),
-			pred_stats.get(), do_cap_NDVs);
+			mp, gpos::dyn_cast<CStatistics>(child_stats), pred_stats.get(),
+			do_cap_NDVs);
 	;
 
 	if (exprhdl.HasOuterRefs() && 0 < all_outer_stats->Size())
@@ -146,7 +146,8 @@ CFilterStatsProcessor::SelectivityOfPredicate(
 			if (CPredicateUtils::FIdentCompareOuterRefExprIgnoreCast(
 					pexpr, outer_refs, &local_col_ref))
 			{
-				CScalarCmp *sc_cmp = gpos::dyn_cast<CScalarCmp>(pexpr->Pop());
+				gpos::Ref<CScalarCmp> sc_cmp =
+					gpos::dyn_cast<CScalarCmp>(pexpr->Pop());
 				// Use more accurate NDV calculation if the comparison is an equality type
 				if (IMDType::EcmptEq == sc_cmp->ParseCmpType())
 				{
