@@ -549,14 +549,15 @@ CExpressionTest::EresUnittest_Const()
 	pexprUlOne->OsPrint(oss);
 
 #ifdef GPOS_DEBUG
-	CScalarConst *pscalarconstTrue =
+	gpos::Ref<CScalarConst> pscalarconstTrue =
 		gpos::dyn_cast<CScalarConst>(pexprTrue->Pop());
-	CScalarConst *pscalarconstFalse =
+	gpos::Ref<CScalarConst> pscalarconstFalse =
 		gpos::dyn_cast<CScalarConst>(pexprFalse->Pop());
-	CScalarConst *pscalarconstUl = gpos::dyn_cast<CScalarConst>(pexprUl->Pop());
-	CScalarConst *pscalarconstUl2nd =
+	gpos::Ref<CScalarConst> pscalarconstUl =
+		gpos::dyn_cast<CScalarConst>(pexprUl->Pop());
+	gpos::Ref<CScalarConst> pscalarconstUl2nd =
 		gpos::dyn_cast<CScalarConst>(pexprUl2nd->Pop());
-	CScalarConst *pscalarconstUlOne =
+	gpos::Ref<CScalarConst> pscalarconstUlOne =
 		gpos::dyn_cast<CScalarConst>(pexprUlOne->Pop());
 #endif	// GPOS_DEBUG
 
@@ -642,7 +643,7 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 void
 CExpressionTest::SetupPlanForFValidPlanTest(CMemoryPool *mp,
 											gpos::Ref<CExpression> *ppexprGby,
-											CColRefSet **ppcrs,
+											gpos::Ref<CColRefSet> *ppcrs,
 											gpos::Ref<CExpression> *ppexprPlan,
 											gpos::Ref<CReqdPropPlan> *pprpp)
 {
@@ -650,7 +651,7 @@ CExpressionTest::SetupPlanForFValidPlanTest(CMemoryPool *mp,
 		PexprCreateGbyWithColumnFormat(mp, GPOS_WSZ_LIT("Test Column%d"));
 
 	// Create a column requirement using the first output column of the group by.
-	CColRefSet *pcrsGby = (*ppexprGby)->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsGby = (*ppexprGby)->DeriveOutputColumns();
 	*ppcrs = GPOS_NEW(mp) CColRefSet(mp);
 	(*ppcrs)->Include(pcrsGby->PcrFirst());
 
@@ -699,7 +700,7 @@ CExpressionTest::EresUnittest_FValidPlan()
 	// Test that the plan is valid.
 	{
 		gpos::Ref<CExpression> pexprGby = nullptr;
-		CColRefSet *pcrs = nullptr;
+		gpos::Ref<CColRefSet> pcrs = nullptr;
 		gpos::Ref<CExpression> pexprPlan = nullptr;
 		gpos::Ref<CReqdPropPlan> prpp = nullptr;
 
@@ -782,7 +783,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidOrder()
 					 CTestUtils::GetCostModel(mp));
 
 	gpos::Ref<CExpression> pexprGby = nullptr;
-	CColRefSet *pcrs = nullptr;
+	gpos::Ref<CColRefSet> pcrs = nullptr;
 	gpos::Ref<CExpression> pexprPlan = nullptr;
 	gpos::Ref<CReqdPropPlan> prpp = nullptr;
 
@@ -793,7 +794,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidOrder()
 	// Create similar requirements, but
 	// add an order requirement using a couple of output columns of a Get
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrsGet = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsGet = pexprGet->DeriveOutputColumns();
 	gpos::Ref<CColRefSet> pcrsGetCopy = GPOS_NEW(mp) CColRefSet(mp, *pcrsGet);
 
 	gpos::Ref<CColRefArray> pdrgpcrGet = pcrsGetCopy->Pdrgpcr(mp);
@@ -866,7 +867,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidDistribution()
 					 CTestUtils::GetCostModel(mp));
 
 	gpos::Ref<CExpression> pexprGby = nullptr;
-	CColRefSet *pcrs = nullptr;
+	gpos::Ref<CColRefSet> pcrs = nullptr;
 	gpos::Ref<CExpression> pexprPlan = nullptr;
 	gpos::Ref<CReqdPropPlan> prpp = nullptr;
 
@@ -931,7 +932,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidRewindability()
 					 CTestUtils::GetCostModel(mp));
 
 	gpos::Ref<CExpression> pexprGby = nullptr;
-	CColRefSet *pcrs = nullptr;
+	gpos::Ref<CColRefSet> pcrs = nullptr;
 	gpos::Ref<CExpression> pexprPlan = nullptr;
 	gpos::Ref<CReqdPropPlan> prpp = nullptr;
 
@@ -998,7 +999,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidCTEs()
 					 CTestUtils::GetCostModel(mp));
 
 	gpos::Ref<CExpression> pexprGby = nullptr;
-	CColRefSet *pcrs = nullptr;
+	gpos::Ref<CColRefSet> pcrs = nullptr;
 	gpos::Ref<CExpression> pexprPlan = nullptr;
 	gpos::Ref<CReqdPropPlan> prpp = nullptr;
 
@@ -1138,7 +1139,7 @@ CExpressionTest::EresUnittest_FValidPlanError()
 GPOS_RESULT
 CExpressionTest::EresCheckCachedReqdCols(CMemoryPool *mp,
 										 gpos::Ref<CExpression> pexpr,
-										 CReqdPropPlan *prppInput)
+										 gpos::Ref<CReqdPropPlan> prppInput)
 {
 	if (pexpr->Pop()->FScalar())
 	{
@@ -1171,7 +1172,8 @@ CExpressionTest::EresCheckCachedReqdCols(CMemoryPool *mp,
 		GPOS_ASSERT(nullptr != pexprChild->Prpp());
 
 		// extract cached required columns of the n-th child
-		CColRefSet *pcrsChildReqd = pexprChild->Prpp()->PcrsRequired();
+		gpos::Ref<CColRefSet> pcrsChildReqd =
+			pexprChild->Prpp()->PcrsRequired();
 
 		// compute required columns of the n-th child
 		exprhdl.ComputeChildReqdCols(ul, pdrgpdp);
@@ -1349,7 +1351,7 @@ CExpressionTest::EresUnittest_InvalidSetOp()
 		CWStringConst strAlias1(GPOS_WSZ_LIT("T1Alias"));
 		gpos::Ref<CExpression> pexprGet1 =
 			CTestUtils::PexprLogicalGet(mp, std::move(ptabdesc1), &strAlias1);
-		CColRefSet *pcrsOutput1 = pexprGet1->DeriveOutputColumns();
+		gpos::Ref<CColRefSet> pcrsOutput1 = pexprGet1->DeriveOutputColumns();
 
 		CWStringConst strName2(GPOS_WSZ_LIT("T2"));
 		gpos::Ref<CMDIdGPDB> pmdid2 =

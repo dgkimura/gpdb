@@ -39,6 +39,13 @@ using namespace gpopt;
 // fwd declarations
 class IStatistics;
 
+template <class T>
+inline ULONG
+HashValue(const gpos::Ref<T> pt)
+{
+	return HashByteArray((BYTE *) pt.get(), GPOS_SIZEOF(T));
+}
+
 // hash map from column id to a histogram
 using UlongToHistogramMap =
 	CHashMap<ULONG, CHistogram, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
@@ -125,7 +132,8 @@ public:
 	virtual CDouble Width(ULongPtrArray *colids) const = 0;
 
 	// what is the width in bytes of set of column references
-	virtual CDouble Width(CMemoryPool *mp, CColRefSet *colrefs) const = 0;
+	virtual CDouble Width(CMemoryPool *mp,
+						  gpos::Ref<CColRefSet> colrefs) const = 0;
 
 	// the risk of errors in cardinality estimation
 	virtual ULONG StatsEstimationRisk() const = 0;

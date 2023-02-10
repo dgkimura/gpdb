@@ -117,7 +117,7 @@ CXformJoinAssociativity::CreatePredicates(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < ulConj; ul++)
 	{
 		gpos::Ref<CExpression> pexprPred = (*pdrgpexprOrig)[ul];
-		CColRefSet *pcrs = pexprPred->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrs = pexprPred->DeriveUsedColumns();
 
 		;
 		if (pcrsLower->ContainsAll(pcrs))

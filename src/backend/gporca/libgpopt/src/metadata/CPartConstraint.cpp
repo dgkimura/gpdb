@@ -74,7 +74,7 @@ CPartConstraint::CPartConstraint(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr,
 		m_phmulcnstr->Insert(GPOS_NEW(mp) ULONG(0 /*ulLevel*/), pcnstr);
 	GPOS_ASSERT(result);
 
-	CColRefSet *pcrsUsed = pcnstr->PcrsUsed();
+	gpos::Ref<CColRefSet> pcrsUsed = pcnstr->PcrsUsed();
 	GPOS_ASSERT(1 == pcrsUsed->Size());
 	CColRef *pcrPartKey = pcrsUsed->PcrFirst();
 

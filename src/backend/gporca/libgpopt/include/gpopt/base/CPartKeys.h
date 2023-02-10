@@ -74,7 +74,7 @@ public:
 	gpos::Ref<CPartKeys> PpartkeysCopy(CMemoryPool *mp);
 
 	// check whether the key columns overlap the given column
-	BOOL FOverlap(CColRefSet *pcrs) const;
+	BOOL FOverlap(gpos::Ref<CColRefSet> pcrs) const;
 
 	// create a new PartKeys object from the current one by remapping the
 	// keys using the given hashmap

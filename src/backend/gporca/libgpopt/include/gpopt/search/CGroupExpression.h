@@ -217,7 +217,7 @@ public:
 										   BOOL fPruned, CCost costLowerBound);
 
 	// compute a cost lower bound for plans, rooted by current group expression, and satisfying the given required properties
-	CCost CostLowerBound(CMemoryPool *mp, CReqdPropPlan *prppInput,
+	CCost CostLowerBound(CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput,
 						 gpos::Ref<CCostContext> pccChild, ULONG child_index);
 
 	// initialize group expression
@@ -323,6 +323,7 @@ public:
 
 	// match group expression against given operator and its children
 	BOOL Matches(const gpos::Ref<CGroupExpression>) const;
+	BOOL Matches(const CGroupExpression *) const;
 
 	// match non-scalar children of group expression against given children of passed expression
 	BOOL FMatchNonScalarChildren(

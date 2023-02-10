@@ -125,7 +125,7 @@ gpos::Ref<CStatsPred>
 CStatsPredUtils::CreateStatsPredUnsupported(
 	CMemoryPool *mp,
 	gpos::Ref<CExpression>,	 // predicate_expr,
-	CColRefSet *			 //outer_refs
+	gpos::Ref<CColRefSet>	 //outer_refs
 )
 {
 	return GPOS_NEW(mp)
@@ -142,7 +142,7 @@ CStatsPredUtils::CreateStatsPredUnsupported(
 gpos::Ref<CStatsPred>
 CStatsPredUtils::GetStatsPredNullTest(CMemoryPool *mp,
 									  gpos::Ref<CExpression> predicate_expr,
-									  CColRefSet *	//outer_refs
+									  gpos::Ref<CColRefSet>	 //outer_refs
 )
 {
 	GPOS_ASSERT(nullptr != predicate_expr);
@@ -191,7 +191,7 @@ CStatsPredUtils::GetStatsPredNullTest(CMemoryPool *mp,
 gpos::Ref<CStatsPred>
 CStatsPredUtils::GetStatsPredPoint(CMemoryPool *mp,
 								   gpos::Ref<CExpression> predicate_expr,
-								   CColRefSet *	 //outer_refs,
+								   gpos::Ref<CColRefSet>  //outer_refs,
 )
 {
 	GPOS_ASSERT(nullptr != predicate_expr);
@@ -286,7 +286,7 @@ CStatsPredUtils::GetPredStats(CMemoryPool *mp, gpos::Ref<CExpression> expr)
 
 	const CColRef *col_ref =
 		CCastUtils::PcrExtractFromScIdOrCastScId(expr_left);
-	CScalarConst *scalar_const_op =
+	gpos::Ref<CScalarConst> scalar_const_op =
 		CScalarConst::PopExtractFromConstOrCastConst(expr_right);
 	GPOS_ASSERT(nullptr != scalar_const_op);
 
@@ -488,8 +488,8 @@ CStatsPredUtils::AssignExprsToOuterAndInner(
 	gpos::Ref<CExpression> *outer_expr, gpos::Ref<CExpression> *inner_expr)
 {
 	// see also CPhysicalJoin::FPredKeysSeparated(), which returns similar info
-	CColRefSet *used_cols_1 = expr_1->DeriveUsedColumns();
-	CColRefSet *used_cols_2 = expr_2->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> used_cols_1 = expr_1->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> used_cols_2 = expr_2->DeriveUsedColumns();
 	ULONG child_index_1 = 0;
 	ULONG child_index_2 = 0;
 
@@ -554,7 +554,7 @@ CStatsPredUtils::AssignExprsToOuterAndInner(
 gpos::Ref<CStatsPred>
 CStatsPredUtils::ExtractPredStats(CMemoryPool *mp,
 								  gpos::Ref<CExpression> scalar_expr,
-								  CColRefSet *outer_refs)
+								  gpos::Ref<CColRefSet> outer_refs)
 {
 	GPOS_ASSERT(nullptr != scalar_expr);
 	if (CPredicateUtils::FOr(scalar_expr))
@@ -591,7 +591,7 @@ CStatsPredUtils::ExtractPredStats(CMemoryPool *mp,
 gpos::Ref<CStatsPred>
 CStatsPredUtils::CreateStatsPredConj(CMemoryPool *mp,
 									 gpos::Ref<CExpression> scalar_expr,
-									 CColRefSet *outer_refs)
+									 gpos::Ref<CColRefSet> outer_refs)
 {
 	GPOS_ASSERT(nullptr != scalar_expr);
 	gpos::Ref<CExpressionArray> pred_expr_conjuncts =
@@ -604,7 +604,8 @@ CStatsPredUtils::CreateStatsPredConj(CMemoryPool *mp,
 	{
 		gpos::Ref<CExpression> predicate_expr =
 			(*pred_expr_conjuncts)[ul].get();
-		CColRefSet *col_refset_used = predicate_expr->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> col_refset_used =
+			predicate_expr->DeriveUsedColumns();
 		if (nullptr != outer_refs && outer_refs->ContainsAll(col_refset_used))
 		{
 			// skip predicate with outer references
@@ -651,7 +652,7 @@ CStatsPredUtils::CreateStatsPredConj(CMemoryPool *mp,
 gpos::Ref<CStatsPred>
 CStatsPredUtils::CreateStatsPredDisj(CMemoryPool *mp,
 									 gpos::Ref<CExpression> predicate_expr,
-									 CColRefSet *outer_refs)
+									 gpos::Ref<CColRefSet> outer_refs)
 {
 	GPOS_ASSERT(nullptr != predicate_expr);
 	GPOS_ASSERT(CPredicateUtils::FOr(predicate_expr));
@@ -670,7 +671,7 @@ CStatsPredUtils::CreateStatsPredDisj(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		gpos::Ref<CExpression> expr = (*disjunct_expr)[ul].get();
-		CColRefSet *col_refset_used = expr->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> col_refset_used = expr->DeriveUsedColumns();
 		if (nullptr != outer_refs && outer_refs->ContainsAll(col_refset_used))
 		{
 			// skip predicate with outer references
@@ -719,12 +720,12 @@ void
 CStatsPredUtils::AddSupportedStatsFilters(CMemoryPool *mp,
 										  CStatsPredPtrArry *pred_stats_array,
 										  gpos::Ref<CExpression> predicate_expr,
-										  CColRefSet *outer_refs)
+										  gpos::Ref<CColRefSet> outer_refs)
 {
 	GPOS_ASSERT(nullptr != predicate_expr);
 	GPOS_ASSERT(nullptr != pred_stats_array);
 
-	CColRefSet *col_refset_used = predicate_expr->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> col_refset_used = predicate_expr->DeriveUsedColumns();
 	if (nullptr != outer_refs && outer_refs->ContainsAll(col_refset_used))
 	{
 		// skip predicates with outer references
@@ -994,7 +995,7 @@ CStatsPredUtils::IsPredScalarIdentIsNotNull(
 gpos::Ref<CStatsPred>
 CStatsPredUtils::GetStatsPredLike(CMemoryPool *mp,
 								  gpos::Ref<CExpression> predicate_expr,
-								  CColRefSet *	//outer_refs,
+								  gpos::Ref<CColRefSet>	 //outer_refs,
 )
 {
 	GPOS_ASSERT(nullptr != predicate_expr);
@@ -1029,7 +1030,7 @@ CStatsPredUtils::GetStatsPredLike(CMemoryPool *mp,
 		gpos::dyn_cast<CScalarIdent>(expr_scalar_ident->Pop());
 	ULONG colid = scalar_ident_op->Pcr()->Id();
 
-	CScalarConst *scalar_const_op =
+	gpos::Ref<CScalarConst> scalar_const_op =
 		gpos::dyn_cast<CScalarConst>(expr_scalar_const->Pop());
 	gpos::Ref<IDatum> datum_literal = scalar_const_op->GetDatum();
 
@@ -1071,7 +1072,7 @@ CStatsPredUtils::ProcessArrayCmp(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != predicate_expr);
 	GPOS_ASSERT(2 == predicate_expr->Arity());
 
-	CScalarArrayCmp *scalar_array_cmp_op =
+	gpos::Ref<CScalarArrayCmp> scalar_array_cmp_op =
 		gpos::dyn_cast<CScalarArrayCmp>(predicate_expr->Pop());
 	gpos::Ref<CExpression> expr_scalar_array =
 		CUtils::PexprScalarArrayChild(predicate_expr);
@@ -1219,7 +1220,7 @@ CStatsPredUtils::ProcessArrayCmp(CMemoryPool *mp,
 gpos::Ref<CStatsPred>
 CStatsPredUtils::GetStatsPredFromBoolExpr(CMemoryPool *mp,
 										  gpos::Ref<CExpression> predicate_expr,
-										  CColRefSet *	//outer_refs
+										  gpos::Ref<CColRefSet>	 //outer_refs
 )
 {
 	GPOS_ASSERT(nullptr != predicate_expr);
@@ -1278,14 +1279,14 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPred(
 	CMemoryPool *mp, gpos::Ref<CExpression> join_pred_expr,
 	CColRefSetArray *
 		output_col_refsets,	 // array of output columns of join's relational inputs
-	CColRefSet *outer_refs, BOOL is_semi_or_anti_join,
+	gpos::Ref<CColRefSet> outer_refs, BOOL is_semi_or_anti_join,
 	CExpressionArray *unsupported_expr_array)
 {
 	GPOS_ASSERT(nullptr != join_pred_expr);
 	GPOS_ASSERT(nullptr != output_col_refsets);
 	GPOS_ASSERT(nullptr != unsupported_expr_array);
 
-	CColRefSet *col_refset_used = join_pred_expr->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> col_refset_used = join_pred_expr->DeriveUsedColumns();
 
 	if (outer_refs->ContainsAll(col_refset_used))
 	{
@@ -1345,7 +1346,7 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPredArray(
 	CMemoryPool *mp, gpos::Ref<CExpression> scalar_expr,
 	CColRefSetArray *
 		output_col_refsets,	 // array of output columns of join's relational inputs
-	CColRefSet *outer_refs, BOOL is_semi_or_antijoin,
+	gpos::Ref<CColRefSet> outer_refs, BOOL is_semi_or_antijoin,
 	gpos::Ref<CStatsPred> *unsupported_stats_pred_array)
 {
 	GPOS_ASSERT(nullptr != scalar_expr);
@@ -1411,7 +1412,7 @@ CStatsPredUtils::ExtractJoinStatsFromExpr(
 	gpos::Ref<CExpression> pexprScalarInput,
 	CColRefSetArray *
 		output_col_refsets,	 // array of output columns of join's relational inputs
-	CColRefSet *outer_refs, BOOL is_semi_or_anti_join)
+	gpos::Ref<CColRefSet> outer_refs, BOOL is_semi_or_anti_join)
 {
 	GPOS_ASSERT(nullptr != output_col_refsets);
 
@@ -1469,7 +1470,7 @@ CStatsPredUtils::ExtractJoinStatsFromExprHandle(CMemoryPool *mp,
 	// TODO:  02/29/2012 replace with constraint property info once available
 	gpos::Ref<CExpression> scalar_expr =
 		expr_handle.PexprScalarRepChild(expr_handle.Arity() - 1);
-	CColRefSet *outer_refs = expr_handle.DeriveOuterReferences();
+	gpos::Ref<CColRefSet> outer_refs = expr_handle.DeriveOuterReferences();
 
 	gpos::Ref<CStatsPredJoinArray> join_pred_stats = ExtractJoinStatsFromExpr(
 		mp, expr_handle, scalar_expr, output_col_refsets.get(), outer_refs,

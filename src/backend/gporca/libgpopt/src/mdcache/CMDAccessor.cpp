@@ -1057,7 +1057,8 @@ CMDAccessor::Pmdcolstats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CMDAccessor::Pstats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
-					CColRefSet *pcrsHist, CColRefSet *pcrsWidth,
+					gpos::Ref<CColRefSet> pcrsHist,
+					gpos::Ref<CColRefSet> pcrsWidth,
 					gpos::Ref<CStatisticsConfig> stats_config)
 {
 	GPOS_ASSERT(nullptr != rel_mdid);

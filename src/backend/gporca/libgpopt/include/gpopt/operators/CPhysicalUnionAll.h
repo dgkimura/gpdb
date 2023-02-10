@@ -40,9 +40,8 @@ private:
 	// map given ColRefSet, expressed in terms of outputs,
 	// into an equivalent ColRefSet, expressed in terms
 	// of input number n
-	gpos::Ref<CColRefSet> MapOutputColRefsToInput(CMemoryPool *mp,
-												  CColRefSet *out_col_refs,
-												  ULONG child_index);
+	gpos::Ref<CColRefSet> MapOutputColRefsToInput(
+		CMemoryPool *mp, gpos::Ref<CColRefSet> out_col_refs, ULONG child_index);
 
 	// derive hashed distribution from child operators
 	gpos::Ref<CDistributionSpecHashed> PdshashedDerive(
@@ -102,7 +101,7 @@ public:
 	// compute required output columns of the n-th child
 	gpos::Ref<CColRefSet> PcrsRequired(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired,
+									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG child_index,
 									   CDrvdPropArray *pdrgpdpCtxt,
 									   ULONG ulOptReq) override;
@@ -134,7 +133,8 @@ public:
 
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------

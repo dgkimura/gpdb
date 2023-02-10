@@ -330,7 +330,7 @@ CExpressionHandle::PdrgpstatOuterRefs(IStatisticsArray *statistics_array,
 
 	gpos::Ref<IStatisticsArray> pdrgpstatResult =
 		GPOS_NEW(m_mp) IStatisticsArray(m_mp);
-	CColRefSet *outer_refs = DeriveOuterReferences(child_index);
+	gpos::Ref<CColRefSet> outer_refs = DeriveOuterReferences(child_index);
 	GPOS_ASSERT(0 < outer_refs->Size());
 
 	const ULONG size = statistics_array->Size();
@@ -386,7 +386,7 @@ CExpressionHandle::DeriveRootStats(IStatisticsArray *stats_ctxt)
 {
 	GPOS_ASSERT(nullptr == m_pstats);
 
-	CLogical *popLogical = gpos::dyn_cast<CLogical>(Pop());
+	gpos::Ref<CLogical> popLogical = gpos::dyn_cast<CLogical>(Pop());
 	gpos::Ref<IStatistics> pstatsRoot = nullptr;
 	if (FAttachedToLeafPattern())
 	{
@@ -478,7 +478,7 @@ CExpressionHandle::DeriveStats(IStatisticsArray *stats_ctxt,
 		DeriveRootStats(stats_ctxt);
 		GPOS_ASSERT(nullptr != m_pstats);
 
-		CLogical *popLogical = gpos::dyn_cast<CLogical>(Pop());
+		gpos::Ref<CLogical> popLogical = gpos::dyn_cast<CLogical>(Pop());
 		ULONG risk = ulMaxChildRisk;
 		if (CStatisticsUtils::IncreasesRisk(popLogical))
 		{
@@ -527,7 +527,8 @@ CExpressionHandle::DeriveCostContextStats()
 		pepp->PppsRequired()->ContainsAnyConsumers())
 	{
 		// derive stats on dynamic table scan using stats of part selector
-		CPhysicalScan *popScan = gpos::dyn_cast<CPhysicalScan>(m_pgexpr->Pop());
+		gpos::Ref<CPhysicalScan> popScan =
+			gpos::dyn_cast<CPhysicalScan>(m_pgexpr->Pop());
 		gpos::Ref<IStatistics> pstatsDS = popScan->PstatsDerive(
 			m_mp, *this, m_pcc->Poc()->Prpp(), m_pcc->Poc()->Pdrgpstat());
 
@@ -1167,7 +1168,7 @@ CExpressionHandle::GetReqdRelationalProps(ULONG child_index) const
 //		Assumes caller knows what properties to ask for;
 //
 //---------------------------------------------------------------------------
-CReqdPropPlan *
+gpos::Ref<CReqdPropPlan>
 CExpressionHandle::Prpp(ULONG child_index) const
 {
 	GPOS_ASSERT(child_index < m_pdrgprp->Size());
@@ -1308,7 +1309,7 @@ CExpressionHandle::PopGrandchild(
 //---------------------------------------------------------------------------
 void
 CExpressionHandle::DeriveProducerStats(ULONG child_index,
-									   CColRefSet *pcrsStats) const
+									   gpos::Ref<CColRefSet> pcrsStats) const
 {
 	// check to see if there are any CTE consumers in the group whose properties have
 	// to be pushed to its corresponding CTE producer
@@ -1753,7 +1754,7 @@ CExpressionHandle::Pstats()
 // only if there is an expression associated with the expression handle.
 // If there is only a group expression or a cost context assoicated with the handle,
 // all properties must have already been derived as we can't derive anything.
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionHandle::DeriveOuterReferences(ULONG child_index) const
 {
 	if (nullptr != Pexpr())
@@ -1764,7 +1765,7 @@ CExpressionHandle::DeriveOuterReferences(ULONG child_index) const
 	return GetRelationalProperties(child_index)->GetOuterReferences();
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionHandle::DeriveOuterReferences() const
 {
 	if (nullptr != Pexpr())
@@ -1775,7 +1776,7 @@ CExpressionHandle::DeriveOuterReferences() const
 	return GetRelationalProperties()->GetOuterReferences();
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionHandle::DeriveOutputColumns(ULONG child_index) const
 {
 	if (nullptr != Pexpr())
@@ -1786,7 +1787,7 @@ CExpressionHandle::DeriveOutputColumns(ULONG child_index) const
 	return GetRelationalProperties(child_index)->GetOutputColumns();
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionHandle::DeriveOutputColumns() const
 {
 	if (nullptr != Pexpr())
@@ -1797,7 +1798,7 @@ CExpressionHandle::DeriveOutputColumns() const
 	return GetRelationalProperties()->GetOutputColumns();
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionHandle::DeriveNotNullColumns(ULONG child_index) const
 {
 	if (nullptr != Pexpr())
@@ -1808,7 +1809,7 @@ CExpressionHandle::DeriveNotNullColumns(ULONG child_index) const
 	return GetRelationalProperties(child_index)->GetNotNullColumns();
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionHandle::DeriveNotNullColumns() const
 {
 	if (nullptr != Pexpr())
@@ -1841,7 +1842,7 @@ CExpressionHandle::DeriveMaxCard() const
 	return GetRelationalProperties()->GetMaxCard();
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionHandle::DeriveCorrelatedApplyColumns(ULONG child_index) const
 {
 	if (nullptr != Pexpr())
@@ -1852,7 +1853,7 @@ CExpressionHandle::DeriveCorrelatedApplyColumns(ULONG child_index) const
 	return GetRelationalProperties(child_index)->GetCorrelatedApplyColumns();
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionHandle::DeriveCorrelatedApplyColumns() const
 {
 	if (nullptr != Pexpr())
@@ -2018,7 +2019,7 @@ CExpressionHandle::DeriveTableDescriptor(ULONG child_index) const
 }
 // Scalar property accessors
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionHandle::DeriveDefinedColumns(ULONG child_index) const
 {
 	if (nullptr != Pexpr())
@@ -2029,7 +2030,7 @@ CExpressionHandle::DeriveDefinedColumns(ULONG child_index) const
 	return GetDrvdScalarProps(child_index)->GetDefinedColumns();
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionHandle::DeriveUsedColumns(ULONG child_index) const
 {
 	if (nullptr != Pexpr())
@@ -2040,7 +2041,7 @@ CExpressionHandle::DeriveUsedColumns(ULONG child_index) const
 	return GetDrvdScalarProps(child_index)->GetUsedColumns();
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionHandle::DeriveSetReturningFunctionColumns(ULONG child_index) const
 {
 	if (nullptr != Pexpr())

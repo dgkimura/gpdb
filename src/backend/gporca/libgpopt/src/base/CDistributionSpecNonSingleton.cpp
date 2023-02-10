@@ -79,7 +79,7 @@ CDistributionSpecNonSingleton::FSatisfies(const CDistributionSpec *	 // pds
 void
 CDistributionSpecNonSingleton::AppendEnforcers(CMemoryPool *mp,
 											   CExpressionHandle &,	 // exprhdl
-											   CReqdPropPlan *
+											   gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
 												   prpp
 #endif	// GPOS_DEBUG

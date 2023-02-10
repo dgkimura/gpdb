@@ -519,7 +519,7 @@ CUtils::UlScalarArrayArity(gpos::Ref<CExpression> pexprArray)
 }
 
 // returns constant operator of a scalar array expression
-CScalarConst *
+gpos::Ref<CScalarConst>
 CUtils::PScalarArrayConstChildAt(gpos::Ref<CExpression> pexprArray, ULONG ul)
 {
 	// if the CScalarArray is already collapsed and the consts are stored in the
@@ -529,7 +529,7 @@ CUtils::PScalarArrayConstChildAt(gpos::Ref<CExpression> pexprArray, ULONG ul)
 		CScalarArray *popScalarArray =
 			gpos::dyn_cast<CScalarArray>(pexprArray->Pop());
 		CScalarConstArray *pdrgPconst = popScalarArray->PdrgPconst();
-		CScalarConst *pScalarConst = (*pdrgPconst)[ul];
+		gpos::Ref<CScalarConst> pScalarConst = (*pdrgPconst)[ul];
 		return pScalarConst;
 	}
 	// otherwise, we convert the child expression's operator if that's possible.
@@ -612,7 +612,8 @@ CUtils::FScalarConstArray(gpos::Ref<CExpression> pexprArray)
 BOOL
 CUtils::FIsConstArray(gpos::Ref<CExpression> pexpr)
 {
-	CScalarConst *popScalarConst = gpos::dyn_cast<CScalarConst>(pexpr->Pop());
+	gpos::Ref<CScalarConst> popScalarConst =
+		gpos::dyn_cast<CScalarConst>(pexpr->Pop());
 	CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
 	const IMDType *expr_type = mda->RetrieveType(popScalarConst->MdidType());
 	return !IMDId::IsValid(expr_type->GetArrayTypeMdid());
@@ -624,7 +625,7 @@ CUtils::GetPercentileAggMDId(CMemoryPool *mp, gpos::Ref<CExpression> pexprAggFn)
 {
 	GPOS_ASSERT(COperator::EopScalarAggFunc == pexprAggFn->Pop()->Eopid());
 
-	CScalarAggFunc *popScAggFunc =
+	gpos::Ref<CScalarAggFunc> popScAggFunc =
 		gpos::dyn_cast<CScalarAggFunc>(pexprAggFn->Pop());
 	gpos::Ref<IMDId> arg_mdid =
 		gpos::dyn_cast<CScalar>((*(*pexprAggFn)[0])[0]->Pop())->MdidType();
@@ -927,7 +928,7 @@ CUtils::FUsesNullableCol(CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
 	GPOS_ASSERT(pexprScalar->Pop()->FScalar());
 	GPOS_ASSERT(pexprLogical->Pop()->FLogical());
 
-	CColRefSet *pcrsNotNull = pexprLogical->DeriveNotNullColumns();
+	gpos::Ref<CColRefSet> pcrsNotNull = pexprLogical->DeriveNotNullColumns();
 	gpos::Ref<CColRefSet> pcrsUsed = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsUsed->Include(pexprScalar->DeriveUsedColumns());
 	pcrsUsed->Intersection(pexprLogical->DeriveOutputColumns());
@@ -1105,12 +1106,12 @@ CUtils::FLogicalUnary(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 
-	CLogicalUnary *popUnary = nullptr;
+	gpos::Ref<CLogicalUnary> popUnary = nullptr;
 	if (pop->FLogical())
 	{
 		// attempt casting to logical unary,
 		// dynamic cast returns NULL if operator is not unary
-		popUnary = dynamic_cast<CLogicalUnary *>(pop);
+		popUnary = dynamic_cast<gpos::Ref<CLogicalUnary> >(pop);
 	}
 
 	return (nullptr != popUnary);
@@ -1188,12 +1189,12 @@ CUtils::FPhysicalScan(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 
-	CPhysicalScan *popScan = nullptr;
+	gpos::Ref<CPhysicalScan> popScan = nullptr;
 	if (pop->FPhysical())
 	{
 		// attempt casting to physical scan,
 		// dynamic cast returns NULL if operator is not a scan
-		popScan = dynamic_cast<CPhysicalScan *>(pop);
+		popScan = dynamic_cast<gpos::Ref<CPhysicalScan> >(pop);
 	}
 
 	return (nullptr != popScan);
@@ -1205,12 +1206,12 @@ CUtils::FPhysicalAgg(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 
-	CPhysicalAgg *popAgg = nullptr;
+	gpos::Ref<CPhysicalAgg> popAgg = nullptr;
 	if (pop->FPhysical())
 	{
 		// attempt casting to physical agg,
 		// dynamic cast returns NULL if operator is not an agg
-		popAgg = dynamic_cast<CPhysicalAgg *>(pop);
+		popAgg = dynamic_cast<gpos::Ref<CPhysicalAgg> >(pop);
 	}
 
 	return (nullptr != popAgg);
@@ -1222,12 +1223,12 @@ CUtils::FPhysicalMotion(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 
-	CPhysicalMotion *popMotion = nullptr;
+	gpos::Ref<CPhysicalMotion> popMotion = nullptr;
 	if (pop->FPhysical())
 	{
 		// attempt casting to physical motion,
 		// dynamic cast returns NULL if operator is not a motion
-		popMotion = dynamic_cast<CPhysicalMotion *>(pop);
+		popMotion = dynamic_cast<gpos::Ref<CPhysicalMotion> >(pop);
 	}
 
 	return (nullptr != popMotion);
@@ -1414,7 +1415,7 @@ CUtils::FScalarConstIntZero(gpos::Ref<CExpression> pexprOffset)
 		return false;
 	}
 
-	CScalarConst *popScalarConst =
+	gpos::Ref<CScalarConst> popScalarConst =
 		gpos::dyn_cast<CScalarConst>(pexprOffset->Pop());
 	gpos::Ref<IDatum> datum = popScalarConst->GetDatum();
 
@@ -1957,7 +1958,7 @@ CUtils::PexprCountStar(CMemoryPool *mp, gpos::Ref<CExpression> pexprLogical)
 	gpos::Ref<CExpression> pexprCountStar = PexprCountStar(mp);
 
 	// generate a computed column with count(*) type
-	CScalarAggFunc *popScalarAggFunc =
+	gpos::Ref<CScalarAggFunc> popScalarAggFunc =
 		gpos::dyn_cast<CScalarAggFunc>(pexprCountStar->Pop());
 	gpos::Ref<IMDId> mdid_type = popScalarAggFunc->MdidType();
 	INT type_modifier = popScalarAggFunc->TypeModifier();
@@ -1989,7 +1990,7 @@ CUtils::PexprCountStarAndSum(CMemoryPool *mp, const CColRef *colref,
 	gpos::Ref<CExpression> pexprCountStar = PexprCountStar(mp);
 
 	// generate a computed column with count(*) type
-	CScalarAggFunc *popScalarAggFunc =
+	gpos::Ref<CScalarAggFunc> popScalarAggFunc =
 		gpos::dyn_cast<CScalarAggFunc>(pexprCountStar->Pop());
 	gpos::Ref<IMDId> mdid_type = popScalarAggFunc->MdidType();
 	INT type_modifier = popScalarAggFunc->TypeModifier();
@@ -2000,7 +2001,7 @@ CUtils::PexprCountStarAndSum(CMemoryPool *mp, const CColRef *colref,
 
 	// generate sum(col) expression
 	gpos::Ref<CExpression> pexprSum = PexprSum(mp, colref);
-	CScalarAggFunc *popScalarSumFunc =
+	gpos::Ref<CScalarAggFunc> popScalarSumFunc =
 		gpos::dyn_cast<CScalarAggFunc>(pexprSum->Pop());
 	const IMDType *pmdtypeSum =
 		md_accessor->RetrieveType(popScalarSumFunc->MdidType());
@@ -2037,7 +2038,7 @@ CUtils::FCountAggProjElem(
 
 	if (COperator::EopScalarAggFunc == (*pexprPrjElem)[0]->Pop()->Eopid())
 	{
-		CScalarAggFunc *popAggFunc =
+		gpos::Ref<CScalarAggFunc> popAggFunc =
 			gpos::dyn_cast<CScalarAggFunc>((*pexprPrjElem)[0]->Pop());
 		if (popAggFunc->FCountStar() || popAggFunc->FCountAny())
 		{
@@ -2089,7 +2090,7 @@ FCountAggMatchingColumn(gpos::Ref<CExpression> pexprPrjElem,
 BOOL
 CUtils::FHasCountAggMatchingColumn(const gpos::Ref<CExpression> pexpr,
 								   const CColRef *colref,
-								   const CLogicalGbAgg **ppgbAgg)
+								   const gpos::Ref<CLogicalGbAgg> *ppgbAgg)
 {
 	gpos::Ref<COperator> pop = pexpr->Pop();
 	// base case, we have a logical agg operator
@@ -2104,7 +2105,7 @@ CUtils::FHasCountAggMatchingColumn(const gpos::Ref<CExpression> pexpr,
 			gpos::Ref<CExpression> const pexprPrjElem = (*pexprProjectList)[ul];
 			if (FCountAggMatchingColumn(pexprPrjElem, colref))
 			{
-				const CLogicalGbAgg *pgbAgg =
+				const gpos::Ref<CLogicalGbAgg> pgbAgg =
 					gpos::dyn_cast<CLogicalGbAgg>(pop);
 				*ppgbAgg = pgbAgg;
 				return true;
@@ -2151,7 +2152,7 @@ CUtils::PexprGbAggSum(CMemoryPool *mp, gpos::Ref<CExpression> pexprLogical,
 	{
 		CColRef *colref = (*pdrgpcrSum)[ul];
 		gpos::Ref<CExpression> pexprSum = PexprSum(mp, colref);
-		CScalarAggFunc *popScalarAggFunc =
+		gpos::Ref<CScalarAggFunc> popScalarAggFunc =
 			gpos::dyn_cast<CScalarAggFunc>(pexprSum->Pop());
 		const IMDType *pmdtypeSum =
 			md_accessor->RetrieveType(popScalarAggFunc->MdidType());
@@ -2451,7 +2452,8 @@ CUtils::PexprAddProjection(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 		GPOS_ASSERT(pexprProjected->Pop()->FScalar());
 
 		// generate a computed column with scalar expression type
-		CScalar *popScalar = gpos::dyn_cast<CScalar>(pexprProjected->Pop());
+		gpos::Ref<CScalar> popScalar =
+			gpos::dyn_cast<CScalar>(pexprProjected->Pop());
 		const IMDType *pmdtype =
 			md_accessor->RetrieveType(popScalar->MdidType());
 		CColRef *colref =
@@ -2517,7 +2519,7 @@ CUtils::FHasGlobalAggFunc(const gpos::Ref<CExpression> pexprAggProjList)
 					pexprPrEl->Pop()->Eopid());
 		// get the scalar child of the project element
 		gpos::Ref<CExpression> pexprAggFunc = (*pexprPrEl)[0];
-		CScalarAggFunc *popScAggFunc =
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
 			gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 		fGlobal = popScAggFunc->FGlobal();
 	}
@@ -2551,7 +2553,8 @@ CUtils::FScalarConstBool(gpos::Ref<CExpression> pexpr, BOOL value)
 	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (COperator::EopScalarConst == pop->Eopid())
 	{
-		CScalarConst *popScalarConst = gpos::dyn_cast<CScalarConst>(pop);
+		gpos::Ref<CScalarConst> popScalarConst =
+			gpos::dyn_cast<CScalarConst>(pop);
 		if (IMDType::EtiBool == popScalarConst->GetDatum()->GetDatumType())
 		{
 			IDatumBool *datum =
@@ -2571,7 +2574,8 @@ CUtils::FScalarConstBoolNull(gpos::Ref<CExpression> pexpr)
 	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (COperator::EopScalarConst == pop->Eopid())
 	{
-		CScalarConst *popScalarConst = gpos::dyn_cast<CScalarConst>(pop);
+		gpos::Ref<CScalarConst> popScalarConst =
+			gpos::dyn_cast<CScalarConst>(pop);
 		if (IMDType::EtiBool == popScalarConst->GetDatum()->GetDatumType())
 		{
 			return popScalarConst->GetDatum()->IsNull();
@@ -2609,7 +2613,7 @@ CUtils::PdrgpcrGroupingKey(
 	gpos::Ref<CKeyCollection> pkc = pexpr->DeriveKeyCollection();
 	GPOS_ASSERT(nullptr != pkc);
 
-	CColRefSet *pcrsOutput = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOutput = pexpr->DeriveOutputColumns();
 	gpos::Ref<CColRefSet> pcrsUsedOuter = GPOS_NEW(mp) CColRefSet(mp);
 
 	// remove any columns that are not referenced in the query from pcrsOuterOutput
@@ -2652,7 +2656,8 @@ CUtils::PdrgpcrGroupingKey(
 // columns from separate equiv classes, then these are merged. Returns a new
 // array of equivalence classes
 gpos::Ref<CColRefSetArray>
-CUtils::AddEquivClassToArray(CMemoryPool *mp, const CColRefSet *pcrsNew,
+CUtils::AddEquivClassToArray(CMemoryPool *mp,
+							 const gpos::Ref<CColRefSet> pcrsNew,
 							 const CColRefSetArray *pdrgpcrs)
 {
 	gpos::Ref<CColRefSetArray> pdrgpcrsNew = GPOS_NEW(mp) CColRefSetArray(mp);
@@ -2661,7 +2666,7 @@ CUtils::AddEquivClassToArray(CMemoryPool *mp, const CColRefSet *pcrsNew,
 	const ULONG length = pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRefSet *pcrs = (*pdrgpcrs)[ul];
+		gpos::Ref<CColRefSet> pcrs = (*pdrgpcrs)[ul];
 		if (pcrsCopy->IsDisjoint(pcrs))
 		{
 			;
@@ -2689,7 +2694,7 @@ CUtils::PdrgpcrsMergeEquivClasses(CMemoryPool *mp, CColRefSetArray *pdrgpcrsFst,
 	const ULONG length = pdrgpcrsSnd->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRefSet *pcrs = (*pdrgpcrsSnd)[ul].get();
+		gpos::Ref<CColRefSet> pcrs = (*pdrgpcrsSnd)[ul].get();
 
 		gpos::Ref<CColRefSetArray> pdrgpcrs =
 			AddEquivClassToArray(mp, pcrs, pdrgpcrsMerged.get());
@@ -2729,7 +2734,7 @@ CUtils::PdrgpcrsIntersectEquivClasses(CMemoryPool *mp,
 	// populate a hashmap in this loop
 	for (ULONG ulFst = 0; ulFst < ulLenFst; ulFst++)
 	{
-		CColRefSet *pcrsFst = (*pdrgpcrsFst)[ulFst];
+		gpos::Ref<CColRefSet> pcrsFst = (*pdrgpcrsFst)[ulFst];
 
 		// because the equivalence classes are disjoint, a single column will only be a member
 		// of one equivalence class. therefore, we create a hash map keyed on one column
@@ -2745,7 +2750,7 @@ CUtils::PdrgpcrsIntersectEquivClasses(CMemoryPool *mp,
 	// probe the hashmap with the equivalence classes
 	for (ULONG ulSnd = 0; ulSnd < ulLenSnd; ulSnd++)
 	{
-		CColRefSet *pcrsSnd = (*pdrgpcrsSnd)[ulSnd].get();
+		gpos::Ref<CColRefSet> pcrsSnd = (*pdrgpcrsSnd)[ulSnd].get();
 
 		// iterate on column references in the equivalence class
 		CColRefSetIter crsi(*pcrsSnd);
@@ -2753,7 +2758,7 @@ CUtils::PdrgpcrsIntersectEquivClasses(CMemoryPool *mp,
 		{
 			// lookup a column in the hashmap
 			CColRef *colref = crsi.Pcr();
-			CColRefSet *pcrs = phmcscrs->Find(colref);
+			gpos::Ref<CColRefSet> pcrs = phmcscrs->Find(colref);
 			CColRef *pcrDone = phmcscrDone->Find(colref);
 
 			// continue if we don't find this column or if that column
@@ -2822,7 +2827,7 @@ CUtils::PdrgpcrsCopyChildEquivClasses(CMemoryPool *mp,
 // return a copy of the given array of columns, excluding the columns in the given colrefset
 gpos::Ref<CColRefArray>
 CUtils::PdrgpcrExcludeColumns(CMemoryPool *mp, CColRefArray *pdrgpcrOriginal,
-							  CColRefSet *pcrsExcluded)
+							  gpos::Ref<CColRefSet> pcrsExcluded)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrOriginal);
 	GPOS_ASSERT(nullptr != pcrsExcluded);
@@ -3167,7 +3172,7 @@ CUtils::FVarFreeExpr(gpos::Ref<CExpression> pexpr)
 	}
 
 	GPOS_ASSERT(0 == pexpr->DeriveDefinedColumns()->Size());
-	CColRefSet *pcrsUsed = pexpr->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexpr->DeriveUsedColumns();
 
 	// no variables in expression
 	return 0 == pcrsUsed->Size();
@@ -3249,7 +3254,7 @@ CUtils::FUsesChildColsOnly(CExpressionHandle &exprhdl)
 
 	CAutoMemoryPool amp;
 	CMemoryPool *mp = amp.Pmp();
-	CColRefSet *pcrsUsed = exprhdl.DeriveUsedColumns(2);
+	gpos::Ref<CColRefSet> pcrsUsed = exprhdl.DeriveUsedColumns(2);
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(exprhdl.DeriveOutputColumns(0 /*child_index*/));
 	pcrs->Include(exprhdl.DeriveOutputColumns(1 /*child_index*/));
@@ -3265,12 +3270,14 @@ CUtils::FInnerUsesExternalCols(CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(3 == exprhdl.Arity());
 
-	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences(1 /*child_index*/);
+	gpos::Ref<CColRefSet> outer_refs =
+		exprhdl.DeriveOuterReferences(1 /*child_index*/);
 	if (0 == outer_refs->Size())
 	{
 		return false;
 	}
-	CColRefSet *pcrsOutput = exprhdl.DeriveOutputColumns(0 /*child_index*/);
+	gpos::Ref<CColRefSet> pcrsOutput =
+		exprhdl.DeriveOutputColumns(0 /*child_index*/);
 
 	return !pcrsOutput->ContainsAll(outer_refs);
 }
@@ -3478,7 +3485,7 @@ CUtils::PcrRemap(const CColRef *colref, UlongToColRefMap *colref_mapping,
 
 // create a new colrefset corresponding to the given colrefset and based on the given mapping
 gpos::Ref<CColRefSet>
-CUtils::PcrsRemap(CMemoryPool *mp, CColRefSet *pcrs,
+CUtils::PcrsRemap(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
 				  UlongToColRefMap *colref_mapping, BOOL must_exist)
 {
 	GPOS_ASSERT(nullptr != pcrs);
@@ -3741,7 +3748,7 @@ CUtils::UlHashColArray(const CColRefArray *colref_array, const ULONG ulMaxCols)
 // Return the set of column reference from the CTE Producer corresponding to the
 // subset of input columns from the CTE Consumer
 gpos::Ref<CColRefSet>
-CUtils::PcrsCTEProducerColumns(CMemoryPool *mp, CColRefSet *pcrsInput,
+CUtils::PcrsCTEProducerColumns(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrsInput,
 							   CLogicalCTEConsumer *popCTEConsumer)
 {
 	gpos::Ref<CExpression> pexprProducer =
@@ -3810,7 +3817,7 @@ CUtils::UlPcrIndexContainingSet(CColRefSetArray *pdrgpcrs,
 	const ULONG size = pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs = (*pdrgpcrs)[ul].get();
+		gpos::Ref<CColRefSet> pcrs = (*pdrgpcrs)[ul].get();
 		if (pcrs->FMember(colref))
 		{
 			return ul;
@@ -4347,7 +4354,7 @@ CUtils::FEquivalanceClassesEqual(CMemoryPool *mp, CColRefSetArray *pdrgpcrsFst,
 		GPOS_NEW(mp) ColRefToColRefSetMap(mp);
 	for (ULONG ulFst = 0; ulFst < ulLenFrst; ulFst++)
 	{
-		CColRefSet *pcrsFst = (*pdrgpcrsFst)[ulFst];
+		gpos::Ref<CColRefSet> pcrsFst = (*pdrgpcrsFst)[ulFst];
 		CColRefSetIter crsi(*pcrsFst);
 		while (crsi.Advance())
 		{
@@ -4359,9 +4366,9 @@ CUtils::FEquivalanceClassesEqual(CMemoryPool *mp, CColRefSetArray *pdrgpcrsFst,
 
 	for (ULONG ulSnd = 0; ulSnd < ulLenSecond; ulSnd++)
 	{
-		CColRefSet *pcrsSnd = (*pdrgpcrsSnd)[ulSnd].get();
+		gpos::Ref<CColRefSet> pcrsSnd = (*pdrgpcrsSnd)[ulSnd].get();
 		CColRef *colref = pcrsSnd->PcrAny();
-		CColRefSet *pcrs = phmcscrs->Find(colref);
+		gpos::Ref<CColRefSet> pcrs = phmcscrs->Find(colref);
 		if (!pcrsSnd->Equals(pcrs))
 		{
 			;
@@ -4533,7 +4540,7 @@ CUtils::FAnySubquery(gpos::Ref<COperator> pop)
 	return fInSubquery;
 }
 
-CScalarProjectElement *
+gpos::Ref<CScalarProjectElement>
 CUtils::PNthProjectElement(gpos::Ref<CExpression> pexpr, ULONG ul)
 {
 	GPOS_ASSERT(pexpr->Pop()->Eopid() == COperator::EopLogicalProject);
@@ -4565,7 +4572,7 @@ CUtils::FInnerRefInProjectList(gpos::Ref<CExpression> pexpr)
 	GPOS_ASSERT(COperator::EopLogicalProject == pexpr->Pop()->Eopid());
 
 	// extract output columns of the relational child
-	CColRefSet *pcrsOuterOutput = (*pexpr)[0]->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOuterOutput = (*pexpr)[0]->DeriveOutputColumns();
 
 	// Project List with one project element
 	gpos::Ref<CExpression> pexprInner = (*pexpr)[1];
@@ -4578,7 +4585,8 @@ CUtils::FInnerRefInProjectList(gpos::Ref<CExpression> pexpr)
 
 // Check if expression tree has a col being referenced in the CColRefSet passed as input
 BOOL
-CUtils::FExprHasAnyCrFromCrs(gpos::Ref<CExpression> pexpr, CColRefSet *pcrs)
+CUtils::FExprHasAnyCrFromCrs(gpos::Ref<CExpression> pexpr,
+							 gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != pcrs);
@@ -4590,7 +4598,7 @@ CUtils::FExprHasAnyCrFromCrs(gpos::Ref<CExpression> pexpr, CColRefSet *pcrs)
 		case COperator::EopScalarProjectElement:
 		{
 			// check project elements
-			CScalarProjectElement *popScalarProjectElement =
+			gpos::Ref<CScalarProjectElement> popScalarProjectElement =
 				gpos::dyn_cast<CScalarProjectElement>(pexpr->Pop());
 			colref = (CColRef *) popScalarProjectElement->Pcr();
 			if (pcrs->FMember(colref))
@@ -4658,7 +4666,8 @@ CUtils::FHasOrderedAggToSplit(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
-	CScalarAggFunc *popScAggFunc = gpos::dyn_cast<CScalarAggFunc>(pexpr->Pop());
+	gpos::Ref<CScalarAggFunc> popScAggFunc =
+		gpos::dyn_cast<CScalarAggFunc>(pexpr->Pop());
 	return popScAggFunc->AggKind() == EaggfunckindOrderedSet &&
 		   (!FScalarConst((*(*pexpr)[1])[0]) ||
 			!FIsConstArray((*(*pexpr)[1])[0])) &&

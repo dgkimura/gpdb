@@ -141,7 +141,7 @@ CConstraintTest::EresUnittest_CInterval()
 	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	// first interval
@@ -244,11 +244,11 @@ CConstraintTest::EresUnittest_CConjunction()
 	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet1 = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs1 = pexprGet1->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs1 = pexprGet1->DeriveOutputColumns();
 	CColRef *pcr1 = pcrs1->PcrAny();
 
 	gpos::Ref<CExpression> pexprGet2 = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs2 = pexprGet2->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs2 = pexprGet2->DeriveOutputColumns();
 	CColRef *pcr2 = pcrs2->PcrAny();
 
 	gpos::Ref<CConstraintConjunction> pcconj1 = Pcstconjunction(mp, mdid, pcr1);
@@ -379,11 +379,11 @@ CConstraintTest::EresUnittest_CDisjunction()
 	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet1 = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs1 = pexprGet1->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs1 = pexprGet1->DeriveOutputColumns();
 	CColRef *pcr1 = pcrs1->PcrAny();
 
 	gpos::Ref<CExpression> pexprGet2 = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs2 = pexprGet2->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs2 = pexprGet2->DeriveOutputColumns();
 	CColRef *pcr2 = pcrs2->PcrAny();
 
 	gpos::Ref<CConstraintDisjunction> pcdisj1 = Pcstdisjunction(mp, mdid, pcr1);
@@ -459,7 +459,7 @@ CConstraintTest::EresUnittest_CNegation()
 	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	gpos::Ref<CConstraintInterval> pci = PciFirstInterval(mp, mdid, colref);
@@ -525,7 +525,7 @@ CConstraintTest::EresUnittest_CIntervalFromScalarExpr()
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	// from ScalarCmp
@@ -574,11 +574,11 @@ CConstraintTest::EresUnittest_CConstraintFromScalarExpr()
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
 	gpos::Ref<CExpression> pexprGet1 = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs1 = pexprGet1->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs1 = pexprGet1->DeriveOutputColumns();
 	CColRef *pcr1 = pcrs1->PcrAny();
 
 	gpos::Ref<CExpression> pexprGet2 = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs2 = pexprGet2->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs2 = pexprGet2->DeriveOutputColumns();
 	CColRef *pcr2 = pcrs2->PcrAny();
 
 	gpos::Ref<CColRefSetArray> pdrgpcrs = nullptr;
@@ -676,7 +676,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalConvertsTo()
 
 	// get a column ref
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	// create constraint
@@ -747,7 +747,7 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 
 	// get a column ref
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	gpos::Ref<CRangeArray> pdrgprng = nullptr;

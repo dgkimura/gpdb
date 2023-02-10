@@ -197,7 +197,7 @@ private:
 
 	// check if partition propagation resolver is passed an empty part
 	// propagation spec
-	static BOOL FCheckReqdPartPropagation(CPhysical *pop,
+	static BOOL FCheckReqdPartPropagation(gpos::Ref<CPhysical> pop,
 										  CEnfdPartitionPropagation *pepp);
 
 	// unrank the plan with the given 'plan_id' from the memo
@@ -206,7 +206,7 @@ private:
 	// determine if a plan, rooted by given group expression, can be safely pruned based on cost bounds
 	// when stats for Dynamic Partition Elimination are derived
 	BOOL FSafeToPruneWithDPEStats(gpos::Ref<CGroupExpression> pgexpr,
-								  CReqdPropPlan *prpp,
+								  gpos::Ref<CReqdPropPlan> prpp,
 								  gpos::Ref<CCostContext> pccChild,
 								  ULONG child_index);
 
@@ -266,8 +266,8 @@ public:
 
 	// check required properties;
 	// return false if it's impossible for the operator to satisfy one or more
-	BOOL FCheckReqdProps(CExpressionHandle &exprhdl, CReqdPropPlan *prpp,
-						 ULONG ulOptReq);
+	BOOL FCheckReqdProps(CExpressionHandle &exprhdl,
+						 gpos::Ref<CReqdPropPlan> prpp, ULONG ulOptReq);
 
 	// check enforceable properties;
 	// return false if it's impossible for the operator to satisfy one or more
@@ -383,7 +383,8 @@ public:
 						EOptimizationLevel eol);
 
 	// determine if a plan, rooted by given group expression, can be safely pruned based on cost bounds
-	BOOL FSafeToPrune(gpos::Ref<CGroupExpression> pgexpr, CReqdPropPlan *prpp,
+	BOOL FSafeToPrune(gpos::Ref<CGroupExpression> pgexpr,
+					  gpos::Ref<CReqdPropPlan> prpp,
 					  gpos::Ref<CCostContext> pccChild, ULONG child_index,
 					  CCost *pcostLowerBound);
 

@@ -141,8 +141,9 @@ CScalarArray::Matches(gpos::Ref<COperator> pop) const
 		{
 			for (ULONG ul = 0; ul < m_pdrgPconst->Size(); ul++)
 			{
-				CScalarConst *popConst1 = (*m_pdrgPconst)[ul].get();
-				CScalarConst *popConst2 = (*popArray->PdrgPconst())[ul].get();
+				gpos::Ref<CScalarConst> popConst1 = (*m_pdrgPconst)[ul].get();
+				gpos::Ref<CScalarConst> popConst2 =
+					(*popArray->PdrgPconst())[ul].get();
 				if (!popConst1->Matches(popConst2))
 				{
 					return false;

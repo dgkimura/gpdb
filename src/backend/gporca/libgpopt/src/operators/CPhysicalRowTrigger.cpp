@@ -149,7 +149,7 @@ CPhysicalRowTrigger::EpetOrder(CExpressionHandle &,	 // exprhdl
 gpos::Ref<CColRefSet>
 CPhysicalRowTrigger::PcrsRequired(CMemoryPool *mp,
 								  CExpressionHandle &,	// exprhdl,
-								  CColRefSet *pcrsRequired,
+								  gpos::Ref<CColRefSet> pcrsRequired,
 								  ULONG
 #ifdef GPOS_DEBUG
 									  child_index
@@ -250,7 +250,7 @@ CPhysicalRowTrigger::PcteRequired(CMemoryPool *,		//mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalRowTrigger::FProvidesReqdCols(CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired,
+									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG  // ulOptReq
 ) const
 {

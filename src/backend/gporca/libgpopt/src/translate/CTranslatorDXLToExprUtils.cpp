@@ -38,8 +38,9 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CScalarConst>
-CTranslatorDXLToExprUtils::PopConst(CMemoryPool *mp, CMDAccessor *md_accessor,
-									const CDXLScalarConstValue *dxl_op)
+CTranslatorDXLToExprUtils::PopConst(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	const gpos::Ref<CDXLScalarConstValue> dxl_op)
 {
 	gpos::Ref<IDatum> datum =
 		CTranslatorDXLToExprUtils::GetDatum(md_accessor, dxl_op);
@@ -55,8 +56,8 @@ CTranslatorDXLToExprUtils::PopConst(CMemoryPool *mp, CMDAccessor *md_accessor,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IDatum>
-CTranslatorDXLToExprUtils::GetDatum(CMDAccessor *md_accessor,
-									const CDXLScalarConstValue *dxl_op)
+CTranslatorDXLToExprUtils::GetDatum(
+	CMDAccessor *md_accessor, const gpos::Ref<CDXLScalarConstValue> dxl_op)
 {
 	gpos::Ref<IMDId> mdid = dxl_op->GetDatumVal()->MDId();
 	gpos::Ref<IDatum> datum =

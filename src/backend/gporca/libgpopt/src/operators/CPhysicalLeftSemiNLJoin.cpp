@@ -53,7 +53,7 @@ CPhysicalLeftSemiNLJoin::~CPhysicalLeftSemiNLJoin() = default;
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalLeftSemiNLJoin::FProvidesReqdCols(CExpressionHandle &exprhdl,
-										   CColRefSet *pcrsRequired,
+										   gpos::Ref<CColRefSet> pcrsRequired,
 										   ULONG  // ulOptReq
 ) const
 {

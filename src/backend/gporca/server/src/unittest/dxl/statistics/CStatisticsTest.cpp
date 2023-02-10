@@ -135,8 +135,8 @@ CStatisticsTest::EresUnittest_UnionAll()
 
 		GPOS_ASSERT(nullptr != pdrgpstatBefore);
 		GPOS_ASSERT(2 == pdrgpstatBefore->Size());
-		CStatistics *pstats1 = (*pdrgpstatBefore)[0].get();
-		CStatistics *pstats2 = (*pdrgpstatBefore)[1].get();
+		gpos::Ref<CStatistics> pstats1 = (*pdrgpstatBefore)[0].get();
+		gpos::Ref<CStatistics> pstats2 = (*pdrgpstatBefore)[1].get();
 
 		GPOS_CHECK_ABORT;
 
@@ -216,7 +216,7 @@ CStatisticsTest::EresUnittest_GbAggWithRepeatedGbCols()
 
 	gpos::Ref<CExpression> pexpr =
 		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
-	CColRefSet *colrefs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> colrefs = pexpr->DeriveOutputColumns();
 
 	// create first GbAgg expression: GbAgg on top of given expression
 	gpos::Ref<CColRefArray> pdrgpcr1 = GPOS_NEW(mp) CColRefArray(mp);

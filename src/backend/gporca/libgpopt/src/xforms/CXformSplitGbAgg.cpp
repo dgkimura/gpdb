@@ -113,7 +113,8 @@ CXformSplitGbAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 
 	// extract components
 	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
@@ -195,12 +196,12 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		gpos::Ref<CExpression> pexprProgElem = (*pexprProjList)[ul];
-		CScalarProjectElement *popScPrEl =
+		gpos::Ref<CScalarProjectElement> popScPrEl =
 			gpos::dyn_cast<CScalarProjectElement>(pexprProgElem->Pop());
 
 		// get the scalar agg func
 		gpos::Ref<CExpression> pexprAggFunc = (*pexprProgElem)[0];
-		CScalarAggFunc *popScAggFunc =
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
 			gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 
 		;
@@ -314,7 +315,7 @@ CXformSplitGbAgg::FApplicable(gpos::Ref<CExpression> pexpr)
 
 		// get the scalar child of the project element
 		gpos::Ref<CExpression> pexprAggFunc = (*pexprPrEl)[0];
-		CScalarAggFunc *popScAggFunc =
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
 			gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 
 		if (popScAggFunc->IsDistinct() ||

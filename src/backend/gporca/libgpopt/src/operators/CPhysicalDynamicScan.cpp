@@ -141,14 +141,14 @@ CPhysicalDynamicScan::OsPrint(IOstream &os) const
 //		conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalDynamicScan *
+gpos::Ref<CPhysicalDynamicScan>
 CPhysicalDynamicScan::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(CUtils::FPhysicalScan(pop) &&
 				gpos::dyn_cast<CPhysicalScan>(pop)->FDynamicScan());
 
-	return dynamic_cast<CPhysicalDynamicScan *>(pop);
+	return dynamic_cast<gpos::Ref<CPhysicalDynamicScan> >(pop);
 }
 
 

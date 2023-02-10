@@ -116,13 +116,13 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion
-	static CScalarBitmapIndexProbe *
+	static gpos::Ref<CScalarBitmapIndexProbe>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarBitmapIndexProbe == pop->Eopid());
 
-		return dynamic_cast<CScalarBitmapIndexProbe *>(pop);
+		return gpos::dyn_cast<CScalarBitmapIndexProbe>(pop);
 	}
 
 };	// class CScalarBitmapIndexProbe

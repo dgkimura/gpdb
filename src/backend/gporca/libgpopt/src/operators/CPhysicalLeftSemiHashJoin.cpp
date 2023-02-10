@@ -61,7 +61,7 @@ CPhysicalLeftSemiHashJoin::~CPhysicalLeftSemiHashJoin() = default;
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalLeftSemiHashJoin::FProvidesReqdCols(CExpressionHandle &exprhdl,
-											 CColRefSet *pcrsRequired,
+											 gpos::Ref<CColRefSet> pcrsRequired,
 											 ULONG	// ulOptReq
 ) const
 {

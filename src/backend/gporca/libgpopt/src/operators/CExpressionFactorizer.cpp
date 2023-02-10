@@ -349,7 +349,7 @@ CExpressionFactorizer::PexprFactorize(CMemoryPool *mp,
 //		the set of used columns.
 //
 //---------------------------------------------------------------------------
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpressionFactorizer::PcrsUsedByPushableScalar(gpos::Ref<CExpression> pexpr)
 {
 	if (!pexpr->Pop()->FScalar())
@@ -392,7 +392,7 @@ CExpressionFactorizer::FOpSourceIdOrComputedColumn(gpos::Ref<CExpression> pexpr,
 	*ulOpSourceId = gpos::ulong_max;
 	*ppcrComputedColumn = nullptr;
 
-	CColRefSet *pcrsUsed = PcrsUsedByPushableScalar(pexpr);
+	gpos::Ref<CColRefSet> pcrsUsed = PcrsUsedByPushableScalar(pexpr);
 	if (nullptr == pcrsUsed || 0 == pcrsUsed->Size())
 	{
 		return false;
@@ -535,7 +535,7 @@ void
 CExpressionFactorizer::StoreBaseOpToColumnExpr(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 	SourceToArrayPosMap *psrc2array, ColumnToArrayPosMap *pcol2array,
-	const CColRefSet *pcrsProducedByChildren, BOOL fAllowNewSources,
+	const gpos::Ref<CColRefSet> pcrsProducedByChildren, BOOL fAllowNewSources,
 	ULONG ulPosition)
 {
 	ULONG ulOpSourceId;
@@ -703,7 +703,7 @@ CExpressionFactorizer::PcrsColumnsProducedByChildren(
 				(*pexprChild)[ulBelowChild];
 			if (pexprGrandChild->Pop()->FScalar())
 			{
-				CColRefSet *pcrsChildDefined =
+				gpos::Ref<CColRefSet> pcrsChildDefined =
 					pexprGrandChild->DeriveDefinedColumns();
 				pcrs->Include(pcrsChildDefined);
 			}

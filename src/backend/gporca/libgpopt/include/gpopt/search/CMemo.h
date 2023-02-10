@@ -146,7 +146,7 @@ public:
 	// extract a plan that delivers the given required properties
 	gpos::Ref<CExpression> PexprExtractPlan(CMemoryPool *mp,
 											gpos::Ref<CGroup> pgroupRoot,
-											CReqdPropPlan *prppInput,
+											gpos::Ref<CReqdPropPlan> prppInput,
 											ULONG ulSearchStages);
 
 	// merge duplicate groups

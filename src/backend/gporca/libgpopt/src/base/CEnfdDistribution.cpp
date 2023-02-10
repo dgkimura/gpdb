@@ -127,7 +127,8 @@ CEnfdDistribution::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdDistribution::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+CEnfdDistribution::Epet(CExpressionHandle &exprhdl,
+						gpos::Ref<CPhysical> popPhysical,
 						BOOL fDistribReqd) const
 {
 	if (fDistribReqd)

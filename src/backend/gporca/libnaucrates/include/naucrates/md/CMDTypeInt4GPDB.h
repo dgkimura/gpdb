@@ -223,7 +223,7 @@ public:
 
 	// transformation method for generating datum from CDXLScalarConstValue
 	gpos::Ref<IDatum> GetDatumForDXLConstVal(
-		const CDXLScalarConstValue *dxl_op) const override;
+		const gpos::Ref<CDXLScalarConstValue> dxl_op) const override;
 
 	// create typed datum from DXL datum
 	gpos::Ref<IDatum> GetDatumForDXLDatum(

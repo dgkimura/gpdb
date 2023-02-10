@@ -79,10 +79,10 @@ public:
 
 	// statistics derivation during costing
 	gpos::Ref<IStatistics>
-	PstatsDerive(CMemoryPool *,		   // mp
-				 CExpressionHandle &,  // exprhdl
-				 CReqdPropPlan *,	   // prpplan
-				 IStatisticsArray *	   //stats_ctxt
+	PstatsDerive(CMemoryPool *,				// mp
+				 CExpressionHandle &,		// exprhdl
+				 gpos::Ref<CReqdPropPlan>,	// prpplan
+				 IStatisticsArray *			//stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(

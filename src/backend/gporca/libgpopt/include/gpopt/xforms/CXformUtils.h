@@ -89,8 +89,8 @@ private:
 	// helper for extracting foreign key
 	static gpos::Ref<CColRefSet> PcrsFKey(CMemoryPool *mp,
 										  CExpressionArray *pdrgpexpr,
-										  CColRefSet *prcsOutput,
-										  CColRefSet *pcrsKey);
+										  gpos::Ref<CColRefSet> prcsOutput,
+										  gpos::Ref<CColRefSet> pcrsKey);
 
 	// return the set of columns from the given array of columns which appear
 	// in the index included / key columns
@@ -165,24 +165,24 @@ private:
 
 	// create the Gb operator to be pushed below a join
 	static gpos::Ref<CLogicalGbAgg> PopGbAggPushableBelowJoin(
-		CMemoryPool *mp, CLogicalGbAgg *popGbAggOld, CColRefSet *prcsOutput,
-		CColRefSet *pcrsGrpCols);
+		CMemoryPool *mp, gpos::Ref<CLogicalGbAgg> popGbAggOld,
+		gpos::Ref<CColRefSet> prcsOutput, gpos::Ref<CColRefSet> pcrsGrpCols);
 
 	// check if the preconditions for pushing down Group by through join are satisfied
-	static BOOL FCanPushGbAggBelowJoin(CColRefSet *pcrsGrpCols,
-									   CColRefSet *pcrsJoinOuterChildOutput,
-									   CColRefSet *pcrsJoinScalarUsedFromOuter,
-									   CColRefSet *pcrsGrpByOutput,
-									   CColRefSet *pcrsGrpByUsed,
-									   CColRefSet *pcrsFKey);
+	static BOOL FCanPushGbAggBelowJoin(
+		gpos::Ref<CColRefSet> pcrsGrpCols,
+		gpos::Ref<CColRefSet> pcrsJoinOuterChildOutput,
+		gpos::Ref<CColRefSet> pcrsJoinScalarUsedFromOuter,
+		gpos::Ref<CColRefSet> pcrsGrpByOutput,
+		gpos::Ref<CColRefSet> pcrsGrpByUsed, gpos::Ref<CColRefSet> pcrsFKey);
 
 	// construct an expression representing a new access path using the given functors for
 	// operator constructors and rewritten access path
 	static gpos::Ref<CExpression> PexprBuildBtreeIndexPlan(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprGet, ULONG ulOriginOpId,
-		CExpressionArray *pdrgpexprConds, CColRefSet *pcrsReqd,
-		CColRefSet *pcrsScalarExpr, CColRefSet *outer_refs,
+		CExpressionArray *pdrgpexprConds, gpos::Ref<CColRefSet> pcrsReqd,
+		gpos::Ref<CColRefSet> pcrsScalarExpr, gpos::Ref<CColRefSet> outer_refs,
 		const IMDIndex *pmdindex, const IMDRelation *pmdrel);
 
 	// create a dynamic operator for a btree index plan
@@ -237,7 +237,7 @@ private:
 		gpos::Ref<CExpression> pexprOriginalPred,
 		gpos::Ref<CExpression> pexprPred, gpos::Ref<CTableDescriptor> ptabdesc,
 		const IMDRelation *pmdrel, CColRefArray *pdrgpcrOutput,
-		CColRefSet *outer_refs, CColRefSet *pcrsReqd,
+		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
 		gpos::Ref<CExpression> *ppexprRecheck,
 		gpos::Ref<CExpression> *ppexprResidual);
 
@@ -254,7 +254,7 @@ private:
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprPred, gpos::Ref<CTableDescriptor> ptabdesc,
 		const IMDRelation *pmdrel, CColRefArray *pdrgpcrOutput,
-		CColRefSet *pcrsReqd, CColRefSet *pcrsOuterRefs,
+		gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CColRefSet> pcrsOuterRefs,
 		gpos::Ref<CExpression> *ppexprRecheck,
 		gpos::Ref<CExpression> *ppexprResidual, BOOL alsoConsiderBTreeIndexes);
 
@@ -441,8 +441,8 @@ public:
 	// expression columns
 	static BOOL FIndexApplicable(
 		CMemoryPool *mp, const IMDIndex *pmdindex, const IMDRelation *pmdrel,
-		CColRefArray *pdrgpcrOutput, CColRefSet *pcrsReqd,
-		CColRefSet *pcrsScalar, IMDIndex::EmdindexType emdindtype,
+		CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> pcrsReqd,
+		gpos::Ref<CColRefSet> pcrsScalar, IMDIndex::EmdindexType emdindtype,
 		IMDIndex::EmdindexType altindtype = IMDIndex::EmdindSentinel);
 
 	// check whether a CTE should be inlined
@@ -485,8 +485,10 @@ public:
 	static gpos::Ref<CExpression>
 	PexprLogicalIndexGet(CMemoryPool *mp, CMDAccessor *md_accessor,
 						 gpos::Ref<CExpression> pexprGet, ULONG ulOriginOpId,
-						 CExpressionArray *pdrgpexprConds, CColRefSet *pcrsReqd,
-						 CColRefSet *pcrsScalarExpr, CColRefSet *outer_refs,
+						 CExpressionArray *pdrgpexprConds,
+						 gpos::Ref<CColRefSet> pcrsReqd,
+						 gpos::Ref<CColRefSet> pcrsScalarExpr,
+						 gpos::Ref<CColRefSet> outer_refs,
 						 const IMDIndex *pmdindex, const IMDRelation *pmdrel)
 	{
 		return PexprBuildBtreeIndexPlan(
@@ -499,8 +501,8 @@ public:
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprOriginalPred, CExpressionArray *pdrgpexpr,
 		gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
-		CColRefArray *pdrgpcrOutput, CColRefSet *outer_refs,
-		CColRefSet *pcrsReqd, BOOL fConjunction,
+		CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
+		gpos::Ref<CColRefSet> pcrsReqd, BOOL fConjunction,
 		gpos::Ref<CExpression> *ppexprRecheck,
 		gpos::Ref<CExpression> *ppexprResidual, BOOL isAPartialPredicate);
 
@@ -518,16 +520,17 @@ public:
 		gpos::Ref<CExpression> pexprOriginalPred,
 		CExpressionArray *pdrgpexprPreds, gpos::Ref<CTableDescriptor> ptabdesc,
 		const IMDRelation *pmdrel, CColRefArray *pdrgpcrOutput,
-		CColRefSet *outer_refs, CColRefSet *pcrsReqd, BOOL fConjunction,
-		CExpressionArray *pdrgpexprBitmap, CExpressionArray *pdrgpexprRecheck,
-		CExpressionArray *pdrgpexprResidual, BOOL isAPartialPredicate);
+		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
+		BOOL fConjunction, CExpressionArray *pdrgpexprBitmap,
+		CExpressionArray *pdrgpexprRecheck, CExpressionArray *pdrgpexprResidual,
+		BOOL isAPartialPredicate);
 
 	static void CreateBitmapIndexProbesWithOrWithoutPredBreakdown(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprOriginalPred,
 		gpos::Ref<CExpression> pexprPred, gpos::Ref<CTableDescriptor> ptabdesc,
 		const IMDRelation *pmdrel, CColRefArray *pdrgpcrOutput,
-		CColRefSet *outer_refs, CColRefSet *pcrsReqd,
+		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
 		gpos::Ref<CExpression> *pexprBitmapResult,
 		gpos::Ref<CExpression> *pexprRecheckResult,
 		CExpressionArray *pdrgpexprResidualResult, BOOL isAPartialPredicate);
@@ -539,10 +542,10 @@ public:
 	// construct a Bitmap(Dynamic)TableGet over BitmapBoolOp for the given
 	// logical operator if bitmap indexes exist
 	static gpos::Ref<CExpression> PexprBitmapTableGet(
-		CMemoryPool *mp, CLogical *popGet, ULONG ulOriginOpId,
+		CMemoryPool *mp, gpos::Ref<CLogical> popGet, ULONG ulOriginOpId,
 		gpos::Ref<CTableDescriptor> ptabdesc,
-		gpos::Ref<CExpression> pexprScalar, CColRefSet *outer_refs,
-		CColRefSet *pcrsReqd);
+		gpos::Ref<CExpression> pexprScalar, gpos::Ref<CColRefSet> outer_refs,
+		gpos::Ref<CColRefSet> pcrsReqd);
 
 	// transform a Select over a (dynamic) table get into a bitmap table scan
 	// over bitmap bool op

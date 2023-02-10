@@ -49,18 +49,18 @@ private:
 					 CleanupRelease<CExpressionArray>>;
 
 	// generate a conjunction of equality predicates between the columns in the given set
-	static gpos::Ref<CExpression> PexprConjEqualityPredicates(CMemoryPool *mp,
-															  CColRefSet *pcrs);
+	static gpos::Ref<CExpression> PexprConjEqualityPredicates(
+		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs);
 
 	// additional equality predicates are generated based on the equivalence
 	// classes in the constraint properties of the expression
 	static gpos::Ref<CExpression> PexprAddEqualityPreds(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CColRefSet *pcrsProcessed);
+		gpos::Ref<CColRefSet> pcrsProcessed);
 
 	// check if all columns in the given equivalence class come from one of the
 	// children of the given expression
-	static BOOL FEquivClassFromChild(CColRefSet *pcrs,
+	static BOOL FEquivClassFromChild(gpos::Ref<CColRefSet> pcrs,
 									 gpos::Ref<CExpression> pexpr);
 
 	// generate predicates for the given set of columns based on the given
@@ -68,7 +68,8 @@ private:
 	static gpos::Ref<CExpression> PexprScalarPredicates(
 		CMemoryPool *mp, gpos::Ref<CPropConstraint> ppc,
 		gpos::Ref<CPropConstraint> constraintsForOuterRefs,
-		CColRefSet *pcrsNotNull, CColRefSet *pcrs, CColRefSet *pcrsProcessed);
+		gpos::Ref<CColRefSet> pcrsNotNull, gpos::Ref<CColRefSet> pcrs,
+		gpos::Ref<CColRefSet> pcrsProcessed);
 
 	// eliminate self comparisons
 	static gpos::Ref<CExpression> PexprEliminateSelfComparison(
@@ -109,7 +110,7 @@ private:
 	// generate predicates based on derived constraint properties
 	static gpos::Ref<CExpression> PexprFromConstraints(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CColRefSet *pcrsProcessed,
+		gpos::Ref<CColRefSet> pcrsProcessed,
 		gpos::Ref<CPropConstraint> constraintsForOuterRefs);
 
 	// generate predicates based on derived constraint properties under scalar expressions
@@ -180,16 +181,19 @@ private:
 
 	// entry for pruning unused computed columns
 	static gpos::Ref<CExpression> PexprPruneUnusedComputedCols(
-		CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRefSet *pcrsReqd);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CColRefSet> pcrsReqd);
 
 	// driver for pruning unused computed columns
 	static gpos::Ref<CExpression> PexprPruneUnusedComputedColsRecursive(
-		CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRefSet *pcrsReqd);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CColRefSet> pcrsReqd);
 
 	// prune unused project elements from the project list of Project or GbAgg
 	static gpos::Ref<CExpression> PexprPruneProjListProjectOrGbAgg(
-		CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRefSet *pcrsUnused,
-		CColRefSet *pcrsDefined, const CColRefSet *pcrsReqd);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CColRefSet> pcrsUnused, gpos::Ref<CColRefSet> pcrsDefined,
+		const gpos::Ref<CColRefSet> pcrsReqd);
 
 	// generate a scalar bool op expression or return the only child expression in array
 	static gpos::Ref<CExpression> PexprScalarBoolOpConvert2In(
@@ -231,7 +235,7 @@ public:
 	// main driver
 	static gpos::Ref<CExpression> PexprPreprocess(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CColRefSet *pcrsOutputAndOrderCols = nullptr);
+		gpos::Ref<CColRefSet> pcrsOutputAndOrderCols = nullptr);
 
 	// add predicates collected from CTE consumers to producer expressions
 	static void AddPredsToCTEProducers(CMemoryPool *mp,

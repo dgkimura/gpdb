@@ -51,13 +51,13 @@ public:
 												 CSystemId sysid, LINT liValue);
 
 	// create a scalar const operator from a DXL scalar const operator
-	static gpos::Ref<CScalarConst> PopConst(CMemoryPool *mp,
-											CMDAccessor *md_accessor,
-											const CDXLScalarConstValue *dxl_op);
+	static gpos::Ref<CScalarConst> PopConst(
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		const gpos::Ref<CDXLScalarConstValue> dxl_op);
 
 	// create a datum from a DXL scalar const operator
-	static gpos::Ref<IDatum> GetDatum(CMDAccessor *md_accessor,
-									  const CDXLScalarConstValue *dxl_op);
+	static gpos::Ref<IDatum> GetDatum(
+		CMDAccessor *md_accessor, const gpos::Ref<CDXLScalarConstValue> dxl_op);
 
 	// create a datum array from a dxl datum array
 	static gpos::Ref<IDatumArray> Pdrgpdatum(CMemoryPool *mp,

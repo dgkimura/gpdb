@@ -168,7 +168,7 @@ CPhysicalDynamicIndexScan::OsPrint(IOstream &os) const
 gpos::Ref<IStatistics>
 CPhysicalDynamicIndexScan::PstatsDerive(CMemoryPool *mp,
 										CExpressionHandle &exprhdl,
-										CReqdPropPlan *prpplan,
+										gpos::Ref<CReqdPropPlan> prpplan,
 										IStatisticsArray *stats_ctxt) const
 {
 	GPOS_ASSERT(nullptr != prpplan);
@@ -184,7 +184,7 @@ CPhysicalDynamicIndexScan::PstatsDerive(CMemoryPool *mp,
 	gpos::Ref<CExpression> expr_with_outer_refs = nullptr;
 
 	// get outer references from expression handle
-	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
+	gpos::Ref<CColRefSet> outer_refs = exprhdl.DeriveOuterReferences();
 
 	CPredicateUtils::SeparateOuterRefs(mp, pexprScalar, outer_refs, &local_expr,
 									   &expr_with_outer_refs);

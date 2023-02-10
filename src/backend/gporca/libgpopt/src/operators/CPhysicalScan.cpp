@@ -107,7 +107,7 @@ CPhysicalScan::FInputOrderSensitive() const
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalScan::FProvidesReqdCols(CExpressionHandle &,  // exprhdl
-								 CColRefSet *pcrsRequired,
+								 gpos::Ref<CColRefSet> pcrsRequired,
 								 ULONG	// ulOptReq
 ) const
 {
@@ -278,13 +278,13 @@ CPhysicalScan::ComputeTableStats(CMemoryPool *mp)
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalScan *
+gpos::Ref<CPhysicalScan>
 CPhysicalScan::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(CUtils::FPhysicalScan(pop));
 
-	return dynamic_cast<CPhysicalScan *>(pop);
+	return dynamic_cast<gpos::Ref<CPhysicalScan> >(pop);
 }
 
 

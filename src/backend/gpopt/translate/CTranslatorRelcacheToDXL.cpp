@@ -1714,7 +1714,8 @@ CTranslatorRelcacheToDXL::RetrieveColStats(CMemoryPool *mp,
 										   CMDAccessor *md_accessor,
 										   gpos::Ref<IMDId> mdid)
 {
-	CMDIdColStats *mdid_col_stats = gpos::dyn_cast<CMDIdColStats>(mdid);
+	gpos::Ref<CMDIdColStats> mdid_col_stats =
+		gpos::dyn_cast<CMDIdColStats>(mdid);
 	gpos::Ref<IMDId> mdid_rel = mdid_col_stats->GetRelMdId();
 	ULONG pos = mdid_col_stats->Position();
 	OID rel_oid = gpos::dyn_cast<CMDIdGPDB>(mdid_rel)->Oid();
@@ -1948,7 +1949,7 @@ CTranslatorRelcacheToDXL::RetrieveColStats(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLColStats>
 CTranslatorRelcacheToDXL::GenerateStatsForSystemCols(
-	CMemoryPool *mp, OID rel_oid, CMDIdColStats *mdid_col_stats,
+	CMemoryPool *mp, OID rel_oid, gpos::Ref<CMDIdColStats> mdid_col_stats,
 	CMDName *md_colname, OID att_type, AttrNumber attno,
 	gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array, CDouble num_rows)
 {

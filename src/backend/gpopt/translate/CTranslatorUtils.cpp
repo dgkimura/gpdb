@@ -1432,7 +1432,7 @@ CTranslatorUtils::CreateDummyProjectElem(CMemoryPool *mp, ULONG colid_input,
 										 ULONG colid_output,
 										 gpos::Ref<CDXLColDescr> dxl_col_descr)
 {
-	CMDIdGPDB *original_mdid =
+	gpos::Ref<CMDIdGPDB> original_mdid =
 		gpos::dyn_cast<CMDIdGPDB>(dxl_col_descr->MdidType());
 	gpos::Ref<CMDIdGPDB> copy_mdid = GPOS_NEW(mp)
 		CMDIdGPDB(original_mdid->Oid(), original_mdid->VersionMajor(),

@@ -555,7 +555,7 @@ CPhysical::PrsDerivePassThruOuter(CMemoryPool *mp, CExpressionHandle &exprhdl)
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CPhysical::PcrsChildReqd(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CColRefSet *pcrsRequired, ULONG child_index,
+						 gpos::Ref<CColRefSet> pcrsRequired, ULONG child_index,
 						 ULONG ulScalarIndex)
 {
 	;
@@ -604,11 +604,12 @@ CPhysical::PcrsChildReqd(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 BOOL
 CPhysical::FUnaryProvidesReqdCols(CExpressionHandle &exprhdl,
-								  CColRefSet *pcrsRequired)
+								  gpos::Ref<CColRefSet> pcrsRequired)
 {
 	GPOS_ASSERT(nullptr != pcrsRequired);
 
-	CColRefSet *pcrsOutput = exprhdl.DeriveOutputColumns(0 /*child_index*/);
+	gpos::Ref<CColRefSet> pcrsOutput =
+		exprhdl.DeriveOutputColumns(0 /*child_index*/);
 
 	return pcrsOutput->ContainsAll(pcrsRequired);
 }
@@ -941,7 +942,7 @@ CPhysical::FCompatibleChildrenDistributions(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysical::FUnaryUsesDefinedColumns(CColRefSet *pcrs,
+CPhysical::FUnaryUsesDefinedColumns(gpos::Ref<CColRefSet> pcrs,
 									CExpressionHandle &exprhdl)
 {
 	GPOS_ASSERT(nullptr != pcrs);
@@ -956,21 +957,21 @@ CPhysical::FUnaryUsesDefinedColumns(CColRefSet *pcrs,
 }
 
 CEnfdDistribution::EDistributionMatching
-CPhysical::Edm(CReqdPropPlan *, ULONG, CDrvdPropArray *, ULONG)
+CPhysical::Edm(gpos::Ref<CReqdPropPlan>, ULONG, CDrvdPropArray *, ULONG)
 {
 	// by default, request distribution satisfaction
 	return CEnfdDistribution::EdmSatisfy;
 }
 
 CEnfdOrder::EOrderMatching
-CPhysical::Eom(CReqdPropPlan *, ULONG, CDrvdPropArray *, ULONG)
+CPhysical::Eom(gpos::Ref<CReqdPropPlan>, ULONG, CDrvdPropArray *, ULONG)
 {
 	// request satisfaction by default
 	return CEnfdOrder::EomSatisfy;
 }
 
 CEnfdRewindability::ERewindabilityMatching
-CPhysical::Erm(CReqdPropPlan *, ULONG, CDrvdPropArray *, ULONG)
+CPhysical::Erm(gpos::Ref<CReqdPropPlan>, ULONG, CDrvdPropArray *, ULONG)
 {
 	// request satisfaction by default
 	return CEnfdRewindability::ErmSatisfy;
@@ -978,7 +979,7 @@ CPhysical::Erm(CReqdPropPlan *, ULONG, CDrvdPropArray *, ULONG)
 
 gpos::Ref<CEnfdDistribution>
 CPhysical::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-			   CReqdPropPlan *prppInput, ULONG child_index,
+			   gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
 			   CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq)
 {
 	return GPOS_NEW(mp) CEnfdDistribution(

@@ -85,7 +85,7 @@ void
 CDrvdPropPlan::Derive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 					  gpos::Ref<CDrvdPropCtxt> pdpctxt)
 {
-	CPhysical *popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
+	gpos::Ref<CPhysical> popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 	if (nullptr != pdpctxt &&
 		COperator::EopPhysicalCTEConsumer == popPhysical->Eopid())
 	{
@@ -157,7 +157,7 @@ CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CDrvdPropPlan::FSatisfies(const CReqdPropPlan *prpp) const
+CDrvdPropPlan::FSatisfies(const gpos::Ref<CReqdPropPlan> prpp) const
 {
 	GPOS_ASSERT(nullptr != prpp);
 	GPOS_ASSERT(nullptr != prpp->Peo());

@@ -22,11 +22,9 @@ using namespace gpopt;
 
 // return statistics object after Group by computation
 gpos::Ref<CStatistics>
-CGroupByStatsProcessor::CalcGroupByStats(CMemoryPool *mp,
-										 const CStatistics *input_stats,
-										 ULongPtrArray *GCs,
-										 ULongPtrArray *aggs,
-										 gpos::Ref<CBitSet> keys)
+CGroupByStatsProcessor::CalcGroupByStats(
+	CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
+	ULongPtrArray *GCs, ULongPtrArray *aggs, gpos::Ref<CBitSet> keys)
 {
 	// create hash map from colid -> histogram for resultant structure
 	gpos::Ref<UlongToHistogramMap> col_histogram_mapping =

@@ -317,7 +317,7 @@ CLogicalConstTableGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	CReqdPropRelational *prprel =
 		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
-	CColRefSet *pcrs = prprel->PcrsStat();
+	gpos::Ref<CColRefSet> pcrs = prprel->PcrsStat();
 	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	pcrs->ExtractColIds(mp, colids.get());
 	gpos::Ref<ULongPtrArray> pdrgpulColWidth =

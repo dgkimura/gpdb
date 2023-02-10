@@ -137,16 +137,16 @@ private:
 
 protected:
 	// output columns
-	CColRefSet *DeriveOutputColumns(CExpressionHandle &);
+	gpos::Ref<CColRefSet> DeriveOutputColumns(CExpressionHandle &);
 
 	// outer references
-	CColRefSet *DeriveOuterReferences(CExpressionHandle &);
+	gpos::Ref<CColRefSet> DeriveOuterReferences(CExpressionHandle &);
 
 	// nullable columns
-	CColRefSet *DeriveNotNullColumns(CExpressionHandle &);
+	gpos::Ref<CColRefSet> DeriveNotNullColumns(CExpressionHandle &);
 
 	// columns from the inner child of a correlated-apply expression that can be used above the apply expression
-	CColRefSet *DeriveCorrelatedApplyColumns(CExpressionHandle &);
+	gpos::Ref<CColRefSet> DeriveCorrelatedApplyColumns(CExpressionHandle &);
 
 	// key collection
 	gpos::Ref<CKeyCollection> DeriveKeyCollection(CExpressionHandle &);
@@ -199,16 +199,16 @@ public:
 				gpos::Ref<CDrvdPropCtxt> pdpctxt) override;
 
 	// output columns
-	CColRefSet *GetOutputColumns() const;
+	gpos::Ref<CColRefSet> GetOutputColumns() const;
 
 	// outer references
-	CColRefSet *GetOuterReferences() const;
+	gpos::Ref<CColRefSet> GetOuterReferences() const;
 
 	// nullable columns
-	CColRefSet *GetNotNullColumns() const;
+	gpos::Ref<CColRefSet> GetNotNullColumns() const;
 
 	// columns from the inner child of a correlated-apply expression that can be used above the apply expression
-	CColRefSet *GetCorrelatedApplyColumns() const;
+	gpos::Ref<CColRefSet> GetCorrelatedApplyColumns() const;
 
 	// key collection
 	gpos::Ref<CKeyCollection> GetKeyCollection() const;
@@ -238,7 +238,7 @@ public:
 		gpos::Ref<CDrvdProp> pdp);
 
 	// check for satisfying required plan properties
-	BOOL FSatisfies(const CReqdPropPlan *prpp) const override;
+	BOOL FSatisfies(const gpos::Ref<CReqdPropPlan> prpp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

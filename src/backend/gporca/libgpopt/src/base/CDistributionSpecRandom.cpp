@@ -139,7 +139,7 @@ CDistributionSpecRandom::FSatisfies(const CDistributionSpec *pds) const
 void
 CDistributionSpecRandom::AppendEnforcers(CMemoryPool *mp,
 										 CExpressionHandle &exprhdl,
-										 CReqdPropPlan *
+										 gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
 											 prpp
 #endif	// GPOS_DEBUG

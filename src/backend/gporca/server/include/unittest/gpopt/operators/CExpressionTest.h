@@ -47,14 +47,14 @@ private:
 	static GPOS_RESULT EresComputeReqdCols(const CHAR *szFilePath);
 
 	// helper for checking cached required columns
-	static GPOS_RESULT EresCheckCachedReqdCols(CMemoryPool *mp,
-											   gpos::Ref<CExpression> pexpr,
-											   CReqdPropPlan *prppInput);
+	static GPOS_RESULT EresCheckCachedReqdCols(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CReqdPropPlan> prppInput);
 
 	// helper function for the FValidPlan tests
 	static void SetupPlanForFValidPlanTest(CMemoryPool *mp,
 										   gpos::Ref<CExpression> *ppexprGby,
-										   CColRefSet **ppcrs,
+										   gpos::Ref<CColRefSet> *ppcrs,
 										   gpos::Ref<CExpression> *ppexprPlan,
 										   gpos::Ref<CReqdPropPlan> *pprpp);
 

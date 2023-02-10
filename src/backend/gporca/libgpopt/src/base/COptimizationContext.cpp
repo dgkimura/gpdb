@@ -118,8 +118,8 @@ COptimizationContext::Matches(const gpos::Ref<COptimizationContext> poc) const
 		return false;
 	}
 
-	CReqdPropPlan *prppFst = this->Prpp();
-	CReqdPropPlan *prppSnd = poc->Prpp();
+	gpos::Ref<CReqdPropPlan> prppFst = this->Prpp();
+	gpos::Ref<CReqdPropPlan> prppSnd = poc->Prpp();
 
 	// make sure we are not comparing to invalid context
 	if (nullptr == prppFst || nullptr == prppSnd)
@@ -253,7 +253,8 @@ COptimizationContext::FOptimizeMotion(
 	GPOS_ASSERT(nullptr != poc);
 	GPOS_ASSERT(CUtils::FPhysicalMotion(pgexprMotion->Pop()));
 
-	CPhysicalMotion *pop = gpos::dyn_cast<CPhysicalMotion>(pgexprMotion->Pop());
+	gpos::Ref<CPhysicalMotion> pop =
+		gpos::dyn_cast<CPhysicalMotion>(pgexprMotion->Pop());
 
 	return poc->Prpp()->Ped()->FCompatible(pop->Pds());
 }
@@ -369,7 +370,7 @@ COptimizationContext::FOptimizeNLJoin(
 	CPhysicalNLJoin *popNLJoin = gpos::dyn_cast<CPhysicalNLJoin>(pop);
 	gpos::Ref<CColRefSet> pcrs =
 		GPOS_NEW(mp) CColRefSet(mp, popNLJoin->PdrgPcrInner());
-	CColRefSet *pcrsOuterChild =
+	gpos::Ref<CColRefSet> pcrsOuterChild =
 		gpos::dyn_cast<CDrvdPropRelational>((*pgexprJoin)[0]->Pdp())
 			->GetOutputColumns();
 	pcrs->Include(pcrsOuterChild);
@@ -434,7 +435,7 @@ COptimizationContext::PrppCTEProducer(CMemoryPool *mp,
 		return nullptr;
 	}
 
-	CColRefSet *pcrsInnerOutput =
+	gpos::Ref<CColRefSet> pcrsInnerOutput =
 		gpos::dyn_cast<CDrvdPropRelational>((*pgexpr)[1]->Pdp())
 			->GetOutputColumns();
 	CPhysicalCTEProducer *popProducer =

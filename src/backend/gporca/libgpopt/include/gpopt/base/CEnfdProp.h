@@ -88,7 +88,7 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void
 	AppendEnforcers(
-		CMemoryPool *mp, CReqdPropPlan *prpp,
+		CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prpp,
 		CExpressionArray *pdrgpexpr,		// array of enforcer expressions
 		gpos::Ref<CExpression> pexprChild,	// leaf in the target group where
 											// enforcers will be added

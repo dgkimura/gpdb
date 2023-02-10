@@ -118,11 +118,12 @@ private:
 	BOOL m_is_complete;
 
 protected:
-	CColRefSet *DeriveDefinedColumns(CExpressionHandle &);
+	gpos::Ref<CColRefSet> DeriveDefinedColumns(CExpressionHandle &);
 
-	CColRefSet *DeriveUsedColumns(CExpressionHandle &);
+	gpos::Ref<CColRefSet> DeriveUsedColumns(CExpressionHandle &);
 
-	CColRefSet *DeriveSetReturningFunctionColumns(CExpressionHandle &);
+	gpos::Ref<CColRefSet> DeriveSetReturningFunctionColumns(
+		CExpressionHandle &);
 
 	BOOL DeriveHasSubquery(CExpressionHandle &);
 
@@ -170,16 +171,16 @@ public:
 				gpos::Ref<CDrvdPropCtxt> pdpctxt) override;
 
 	// check for satisfying required plan properties
-	BOOL FSatisfies(const CReqdPropPlan *prpp) const override;
+	BOOL FSatisfies(const gpos::Ref<CReqdPropPlan> prpp) const override;
 
 	// defined columns
-	CColRefSet *GetDefinedColumns() const;
+	gpos::Ref<CColRefSet> GetDefinedColumns() const;
 
 	// used columns
-	CColRefSet *GetUsedColumns() const;
+	gpos::Ref<CColRefSet> GetUsedColumns() const;
 
 	// columns containing set-returning function
-	CColRefSet *GetSetReturningFunctionColumns() const;
+	gpos::Ref<CColRefSet> GetSetReturningFunctionColumns() const;
 
 	// do subqueries appear in the operator's tree?
 	BOOL HasSubquery() const;

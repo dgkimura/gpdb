@@ -328,9 +328,9 @@ CExpressionPreprocessor::PexprUnnestScalarSubqueries(
 
 			// make sure that inner subquery has no outer references to Const Table
 			// since Const Table will be eliminated in output expression
-			CColRefSet *pcrsConstTableOutput =
+			gpos::Ref<CColRefSet> pcrsConstTableOutput =
 				pexprConstTable->DeriveOutputColumns();
-			CColRefSet *outer_refs =
+			gpos::Ref<CColRefSet> outer_refs =
 				(*pexprInnerSubq)[0]->DeriveOuterReferences();
 			if (0 == outer_refs->Size() ||
 				outer_refs->IsDisjoint(pcrsConstTableOutput))
@@ -358,7 +358,8 @@ CExpressionPreprocessor::PexprUnnestScalarSubqueries(
 	{
 		const CColRef *pcrSubq =
 			gpos::dyn_cast<CScalarSubquery>(pexpr->Pop())->Pcr();
-		CColRefSet *pcrsConstTableOutput = (*pexpr)[0]->DeriveOutputColumns();
+		gpos::Ref<CColRefSet> pcrsConstTableOutput =
+			(*pexpr)[0]->DeriveOutputColumns();
 
 		// if the subquery has outer ref, we do not make use of the output columns of constant table get.
 		// In this scenairo, we replace the entire scalar subquery with a CScalarIdent with the outer reference.
@@ -461,7 +462,7 @@ CExpressionPreprocessor::PexprRemoveSuperfluousDistinctInDQA(
 			if (COperator::EopScalarAggFunc ==
 				(*pexprPrjElem)[0]->Pop()->Eopid())
 			{
-				CScalarAggFunc *popAggFunc =
+				gpos::Ref<CScalarAggFunc> popAggFunc =
 					gpos::dyn_cast<CScalarAggFunc>((*pexprPrjElem)[0]->Pop());
 				gpos::Ref<IMDId> agg_child_mdid =
 					gpos::dyn_cast<CScalar>((*pexprPrjElem)[0]->Pop())
@@ -541,7 +542,7 @@ CExpressionPreprocessor::PexprRemoveSuperfluousOuterRefs(
 		// special handling for three operator types: Limit, GrbyAgg, Sequence
 		if (COperator::EopLogicalLimit == op_id)
 		{
-			CColRefSet *outer_refs = pexpr->DeriveOuterReferences();
+			gpos::Ref<CColRefSet> outer_refs = pexpr->DeriveOuterReferences();
 
 			CLogicalLimit *popLimit = gpos::dyn_cast<CLogicalLimit>(pop.get());
 			COrderSpec *pos = popLimit->Pos();
@@ -555,7 +556,7 @@ CExpressionPreprocessor::PexprRemoveSuperfluousOuterRefs(
 		}
 		else if (COperator::EopLogicalGbAgg == op_id)
 		{
-			CColRefSet *outer_refs = pexpr->DeriveOuterReferences();
+			gpos::Ref<CColRefSet> outer_refs = pexpr->DeriveOuterReferences();
 
 			gpos::Ref<CLogicalGbAgg> popAgg =
 				gpos::dyn_cast<CLogicalGbAgg>(pop);
@@ -1215,7 +1216,8 @@ CExpressionPreprocessor::PexprProjBelowSubquery(CMemoryPool *mp,
 		gpos::Ref<CExpression> pexprRelNew =
 			PexprProjBelowSubquery(mp, pexprRel, false /* fUnderPrList */);
 
-		const CColRefSet *prcsOutput = pexprRelNew->DeriveOutputColumns();
+		const gpos::Ref<CColRefSet> prcsOutput =
+			pexprRelNew->DeriveOutputColumns();
 		const CColRef *pcrSubquery =
 			gpos::dyn_cast<CScalarSubquery>(pop)->Pcr();
 		if (nullptr != prcsOutput && !prcsOutput->FMember(pcrSubquery))
@@ -1394,7 +1396,7 @@ CExpressionPreprocessor::PexprOuterJoinToInnerJoin(CMemoryPool *mp,
 			if (COperator::EopLogicalLeftOuterJoin ==
 				pexprChild->Pop()->Eopid())
 			{
-				CColRefSet *pcrsLOJInnerOutput =
+				gpos::Ref<CColRefSet> pcrsLOJInnerOutput =
 					(*pexprChild)[1]->DeriveOutputColumns();
 				if (!GPOS_FTRACE(EopttraceDisableOuterJoin2InnerJoinRewrite) &&
 					CPredicateUtils::FNullRejecting(mp, pexprScalar,
@@ -1467,7 +1469,7 @@ CExpressionPreprocessor::PexprOuterJoinToInnerJoin(CMemoryPool *mp,
 // the n columns in the given equivalence class (set),
 gpos::Ref<CExpression>
 CExpressionPreprocessor::PexprConjEqualityPredicates(CMemoryPool *mp,
-													 CColRefSet *pcrs)
+													 gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(nullptr != pcrs);
 
@@ -1498,7 +1500,7 @@ CExpressionPreprocessor::PexprConjEqualityPredicates(CMemoryPool *mp,
 // check if all columns in the given equivalent class come from one of the
 // children of the given expression
 BOOL
-CExpressionPreprocessor::FEquivClassFromChild(CColRefSet *pcrs,
+CExpressionPreprocessor::FEquivClassFromChild(gpos::Ref<CColRefSet> pcrs,
 											  gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pcrs);
@@ -1526,9 +1528,9 @@ CExpressionPreprocessor::FEquivClassFromChild(CColRefSet *pcrs,
 // additional equality predicates are generated based on the equivalence
 // classes in the constraint properties of the expression.
 gpos::Ref<CExpression>
-CExpressionPreprocessor::PexprAddEqualityPreds(CMemoryPool *mp,
-											   gpos::Ref<CExpression> pexpr,
-											   CColRefSet *pcrsProcessed)
+CExpressionPreprocessor::PexprAddEqualityPreds(
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	gpos::Ref<CColRefSet> pcrsProcessed)
 {
 	GPOS_ASSERT(nullptr != pcrsProcessed);
 	GPOS_ASSERT(nullptr != pexpr);
@@ -1552,7 +1554,7 @@ CExpressionPreprocessor::PexprAddEqualityPreds(CMemoryPool *mp,
 		const ULONG ulEquivClasses = pdrgpcrs->Size();
 		for (ULONG ul = 0; ul < ulEquivClasses; ul++)
 		{
-			CColRefSet *pcrsEquivClass = (*pdrgpcrs)[ul].get();
+			gpos::Ref<CColRefSet> pcrsEquivClass = (*pdrgpcrs)[ul].get();
 
 			gpos::Ref<CColRefSet> pcrsEquality = GPOS_NEW(mp) CColRefSet(mp);
 			pcrsEquality->Include(pcrsEquivClass);
@@ -1606,8 +1608,9 @@ CExpressionPreprocessor::PexprAddEqualityPreds(CMemoryPool *mp,
 gpos::Ref<CExpression>
 CExpressionPreprocessor::PexprScalarPredicates(
 	CMemoryPool *mp, gpos::Ref<CPropConstraint> ppc,
-	gpos::Ref<CPropConstraint> constraintsForOuterRefs, CColRefSet *pcrsNotNull,
-	CColRefSet *pcrs, CColRefSet *pcrsProcessed)
+	gpos::Ref<CPropConstraint> constraintsForOuterRefs,
+	gpos::Ref<CColRefSet> pcrsNotNull, gpos::Ref<CColRefSet> pcrs,
+	gpos::Ref<CColRefSet> pcrsProcessed)
 {
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 
@@ -1718,8 +1721,8 @@ CExpressionPreprocessor::PexprWithImpliedPredsOnLOJInnerChild(
 		CLogical::PpcDeriveConstraintFromPredicates(mp, exprhdl);
 
 	// use the computed constraint to derive a scalar predicate on the inner child
-	CColRefSet *pcrsInnerOutput = pexprInner->DeriveOutputColumns();
-	CColRefSet *pcrsInnerNotNull = pexprInner->DeriveNotNullColumns();
+	gpos::Ref<CColRefSet> pcrsInnerOutput = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsInnerNotNull = pexprInner->DeriveNotNullColumns();
 
 	// generate a scalar predicate from the computed constraint, restricted to LOJ inner child
 	gpos::Ref<CColRefSet> pcrsProcessed = GPOS_NEW(mp) CColRefSet(mp);
@@ -1836,7 +1839,8 @@ CExpressionPreprocessor::PexprOuterJoinInferPredsFromOuterChildToInnerChild(
 // that get processed along the way
 gpos::Ref<CExpression>
 CExpressionPreprocessor::PexprFromConstraints(
-	CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRefSet *pcrsProcessed,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	gpos::Ref<CColRefSet> pcrsProcessed,
 	gpos::Ref<CPropConstraint> constraintsForOuterRefs)
 {
 	GPOS_ASSERT(nullptr != pcrsProcessed);
@@ -1845,7 +1849,7 @@ CExpressionPreprocessor::PexprFromConstraints(
 
 	const ULONG ulChildren = pexpr->Arity();
 	gpos::Ref<CPropConstraint> ppc = pexpr->DerivePropertyConstraint();
-	CColRefSet *pcrsNotNull = pexpr->DeriveNotNullColumns();
+	gpos::Ref<CColRefSet> pcrsNotNull = pexpr->DeriveNotNullColumns();
 
 	gpos::Ref<CExpressionArray> pdrgpexprChildren =
 		GPOS_NEW(mp) CExpressionArray(mp);
@@ -2184,7 +2188,8 @@ CExpressionPreprocessor::PexprInferPredicates(CMemoryPool *mp,
 // on the overall result.
 gpos::Ref<CExpression>
 CExpressionPreprocessor::PexprPruneUnusedComputedCols(
-	CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRefSet *pcrsReqd)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	gpos::Ref<CColRefSet> pcrsReqd)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -2206,7 +2211,8 @@ CExpressionPreprocessor::PexprPruneUnusedComputedCols(
 // Workhorse for pruning unused computed columns
 gpos::Ref<CExpression>
 CExpressionPreprocessor::PexprPruneUnusedComputedColsRecursive(
-	CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRefSet *pcrsReqd)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	gpos::Ref<CColRefSet> pcrsReqd)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -2223,8 +2229,9 @@ CExpressionPreprocessor::PexprPruneUnusedComputedColsRecursive(
 		COperator::EopLogicalGbAgg == pop->Eopid())
 	{
 		gpos::Ref<CExpression> pexprProjList = (*pexpr)[1];
-		CColRefSet *pcrsDefined = pexprProjList->DeriveDefinedColumns();
-		CColRefSet *pcrsSetReturningFunction =
+		gpos::Ref<CColRefSet> pcrsDefined =
+			pexprProjList->DeriveDefinedColumns();
+		gpos::Ref<CColRefSet> pcrsSetReturningFunction =
 			pexprProjList->DeriveSetReturningFunctionColumns();
 
 		pcrsReqd->Include(gpos::dyn_cast<CLogical>(pop)->PcrsLocalUsed());
@@ -2277,8 +2284,9 @@ CExpressionPreprocessor::PexprPruneUnusedComputedColsRecursive(
 // columns as project elements
 gpos::Ref<CExpression>
 CExpressionPreprocessor::PexprPruneProjListProjectOrGbAgg(
-	CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRefSet *pcrsUnused,
-	CColRefSet *pcrsDefined, const CColRefSet *pcrsReqd)
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	gpos::Ref<CColRefSet> pcrsUnused, gpos::Ref<CColRefSet> pcrsDefined,
+	const gpos::Ref<CColRefSet> pcrsReqd)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != pcrsUnused);
@@ -2351,7 +2359,7 @@ CExpressionPreprocessor::PexprPruneProjListProjectOrGbAgg(
 		for (ULONG ul = 0; ul < ulPrjEls; ul++)
 		{
 			gpos::Ref<CExpression> pexprPrEl = (*pexprProjList)[ul];
-			CScalarProjectElement *popPrEl =
+			gpos::Ref<CScalarProjectElement> popPrEl =
 				gpos::dyn_cast<CScalarProjectElement>(pexprPrEl->Pop());
 			if (!pcrsUnused->FMember(popPrEl->Pcr()))
 			{
@@ -2576,7 +2584,7 @@ CExpressionPreprocessor::PexprExistWithPredFromINSubq(
 			// perform conversion if subquery does not output any of the columns from relational child
 			const CColRef *pcrSubquery =
 				gpos::dyn_cast<CScalarSubqueryAny>(pop)->Pcr();
-			CColRefSet *pcrsRelationalChild =
+			gpos::Ref<CColRefSet> pcrsRelationalChild =
 				(*pexpr)[0]->DeriveOutputColumns();
 			if (pcrsRelationalChild->FMember(pcrSubquery))
 			{
@@ -3066,7 +3074,7 @@ CExpressionPreprocessor::ConvertSplitUpdateToInPlaceUpdate(
 gpos::Ref<CExpression>
 CExpressionPreprocessor::PexprPreprocess(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 		pcrsOutputAndOrderCols	// query output cols and cols used in the order specs
 )
 {

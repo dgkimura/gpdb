@@ -101,7 +101,8 @@ CPhysicalLimit::Matches(gpos::Ref<COperator> pop) const
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CPhysicalLimit::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsRequired, ULONG child_index,
+							 gpos::Ref<CColRefSet> pcrsRequired,
+							 ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG				// ulOptReq
 )
@@ -165,7 +166,7 @@ CPhysicalLimit::PdsRequired(CMemoryPool *, CExpressionHandle &,
 
 gpos::Ref<CEnfdDistribution>
 CPhysicalLimit::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					CReqdPropPlan *prppInput, ULONG child_index,
+					gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
 					CDrvdPropArray *,  // pdrgpdpCtxt
 					ULONG			   // ulDistrReq
 )
@@ -303,7 +304,7 @@ CPhysicalLimit::PcteRequired(CMemoryPool *,		   //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalLimit::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								  CColRefSet *pcrsRequired,
+								  gpos::Ref<CColRefSet> pcrsRequired,
 								  ULONG	 // ulOptReq
 ) const
 {

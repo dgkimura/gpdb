@@ -34,7 +34,7 @@ private:
 	// return equivalence class from scalar ident project element
 	static gpos::Ref<CColRefSetArray> PdrgpcrsEquivClassFromScIdent(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprPrEl,
-		CColRefSet *not_null_columns);
+		gpos::Ref<CColRefSet> not_null_columns);
 
 	// extract constraint from scalar constant project element
 	static void ExtractConstraintFromScConst(CMemoryPool *mp,

@@ -126,7 +126,8 @@ CMDIdColStats::Equals(const gpos::Ref<IMDId> mdid) const
 		return false;
 	}
 
-	const CMDIdColStats *mdid_col_stats = CMDIdColStats::CastMdid(mdid);
+	const gpos::Ref<CMDIdColStats> mdid_col_stats =
+		CMDIdColStats::CastMdid(mdid);
 
 	return m_rel_mdid->Equals(mdid_col_stats->GetRelMdId()) &&
 		   m_attr_pos == mdid_col_stats->Position();

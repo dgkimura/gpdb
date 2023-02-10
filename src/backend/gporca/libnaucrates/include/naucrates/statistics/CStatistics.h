@@ -190,7 +190,8 @@ public:
 	CDouble Width(ULongPtrArray *colids) const override;
 
 	// what is the width in bytes of set of column references
-	CDouble Width(CMemoryPool *mp, CColRefSet *colrefs) const override;
+	CDouble Width(CMemoryPool *mp,
+				  gpos::Ref<CColRefSet> colrefs) const override;
 
 	// what is the width in bytes
 	CDouble Width() const override;
@@ -335,11 +336,11 @@ public:
 	}
 
 	// conversion function
-	static CStatistics *
+	static gpos::Ref<CStatistics>
 	CastStats(gpos::Ref<IStatistics> pstats)
 	{
 		GPOS_ASSERT(nullptr != pstats);
-		return dynamic_cast<CStatistics *>(pstats);
+		return gpos::dyn_cast<CStatistics>(pstats);
 	}
 
 	// create a dummy statistics object
@@ -368,12 +369,13 @@ public:
 	static const CDouble DefaultDistinctValues;
 
 	// check if the input statistics from join statistics computation empty
-	static BOOL IsEmptyJoin(const CStatistics *outer_stats,
-							const CStatistics *inner_side_stats, BOOL IsLASJ);
+	static BOOL IsEmptyJoin(const gpos::Ref<CStatistics> outer_stats,
+							const gpos::Ref<CStatistics> inner_side_stats,
+							BOOL IsLASJ);
 
 	// add upper bound ndvs information for a given set of columns
 	static void CreateAndInsertUpperBoundNDVs(CMemoryPool *mp,
-											  CStatistics *stats,
+											  gpos::Ref<CStatistics> stats,
 											  ULongPtrArray *colids,
 											  CDouble rows);
 

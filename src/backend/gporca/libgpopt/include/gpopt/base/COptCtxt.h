@@ -259,7 +259,7 @@ public:
 	}
 
 	// cte info
-	Cgpos::Ref<CCTEInfo>
+	gpos::Ref<CCTEInfo>
 	Pcteinfo()
 	{
 		return m_pcteinfo.get();

@@ -65,12 +65,12 @@ CPhysicalCTEConsumer::~CPhysicalCTEConsumer()
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CPhysicalCTEConsumer::PcrsRequired(CMemoryPool *,		 // mp,
-								   CExpressionHandle &,	 // exprhdl,
-								   CColRefSet *,		 // pcrsRequired,
-								   ULONG,				 // child_index,
-								   CDrvdPropArray *,	 // pdrgpdpCtxt
-								   ULONG				 // ulOptReq
+CPhysicalCTEConsumer::PcrsRequired(CMemoryPool *,		   // mp,
+								   CExpressionHandle &,	   // exprhdl,
+								   gpos::Ref<CColRefSet>,  // pcrsRequired,
+								   ULONG,				   // child_index,
+								   CDrvdPropArray *,	   // pdrgpdpCtxt
+								   ULONG				   // ulOptReq
 )
 {
 	GPOS_ASSERT(!"CPhysicalCTEConsumer has no relational children");
@@ -254,13 +254,13 @@ CPhysicalCTEConsumer::PcmDerive(CMemoryPool *mp, CExpressionHandle &
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalCTEConsumer::FProvidesReqdCols(CExpressionHandle &exprhdl,
-										CColRefSet *pcrsRequired,
+										gpos::Ref<CColRefSet> pcrsRequired,
 										ULONG  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(nullptr != pcrsRequired);
 
-	CColRefSet *pcrsOutput = exprhdl.DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOutput = exprhdl.DeriveOutputColumns();
 	return pcrsOutput->ContainsAll(pcrsRequired);
 }
 

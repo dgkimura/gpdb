@@ -102,7 +102,7 @@ CConstraintNegation::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraint>
-CConstraintNegation::Pcnstr(CMemoryPool *mp, CColRefSet *pcrs)
+CConstraintNegation::Pcnstr(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs)
 {
 	if (!m_pcrsUsed->Equals(pcrs))
 	{

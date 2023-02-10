@@ -67,7 +67,8 @@ CPartInfo::CPartInfoEntry::~CPartInfoEntry()
 //---------------------------------------------------------------------------
 gpos::Ref<CPartInfo::CPartInfoEntry>
 CPartInfo::CPartInfoEntry::PpartinfoentryAddRemappedKeys(
-	CMemoryPool *mp, CColRefSet *pcrs, UlongToColRefMap *colref_mapping)
+	CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
+	UlongToColRefMap *colref_mapping)
 {
 	GPOS_ASSERT(nullptr != pcrs);
 	GPOS_ASSERT(nullptr != colref_mapping);

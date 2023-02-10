@@ -64,7 +64,8 @@ CXformCollapseGbAgg::CXformCollapseGbAgg(CMemoryPool *mp)
 CXform::EXformPromise
 CXformCollapseGbAgg::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 	if (!popAgg->FGlobal() || 0 == popAgg->Pdrgpcr()->Size())
 	{
 		return CXform::ExfpNone;
@@ -99,14 +100,15 @@ CXformCollapseGbAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CLogicalGbAgg *popTopGbAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popTopGbAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	GPOS_ASSERT(0 < popTopGbAgg->Pdrgpcr()->Size());
 	GPOS_ASSERT(popTopGbAgg->FGlobal());
 
 	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprTopProjectList = (*pexpr)[1];
 
-	CLogicalGbAgg *popBottomGbAgg =
+	gpos::Ref<CLogicalGbAgg> popBottomGbAgg =
 		gpos::dyn_cast<CLogicalGbAgg>(pexprRelational->Pop());
 	gpos::Ref<CExpression> pexprChild = (*pexprRelational)[0];
 	gpos::Ref<CExpression> pexprBottomProjectList = (*pexprRelational)[1];

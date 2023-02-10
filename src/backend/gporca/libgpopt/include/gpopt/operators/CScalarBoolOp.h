@@ -107,13 +107,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarBoolOp *
+	static gpos::Ref<CScalarBoolOp>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarBoolOp == pop->Eopid());
 
-		return dynamic_cast<CScalarBoolOp *>(pop);
+		return gpos::dyn_cast<CScalarBoolOp>(pop);
 	}
 
 	// boolean expression evaluation

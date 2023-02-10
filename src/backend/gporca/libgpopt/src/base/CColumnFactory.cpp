@@ -334,14 +334,14 @@ CColumnFactory::Destroy(CColRef *colref)
 //		Lookup the set of used column references (if any) based on id of
 //		computed column
 //---------------------------------------------------------------------------
-const CColRefSet *
+const gpos::Ref<CColRefSet>
 CColumnFactory::PcrsUsedInComputedCol(const CColRef *colref)
 {
 	GPOS_ASSERT(nullptr != colref);
 	GPOS_ASSERT(nullptr != m_phmcrcrs);
 
 	// get its column reference set from the hash map
-	const CColRefSet *pcrs = m_phmcrcrs->Find(colref);
+	const gpos::Ref<CColRefSet> pcrs = m_phmcrcrs->Find(colref);
 
 	return pcrs;
 }
@@ -361,11 +361,11 @@ CColumnFactory::AddComputedToUsedColsMap(gpos::Ref<CExpression> pexpr)
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(nullptr != m_phmcrcrs);
 
-	const CScalarProjectElement *popScPrEl =
+	const gpos::Ref<CScalarProjectElement> popScPrEl =
 		gpos::dyn_cast<CScalarProjectElement>(pexpr->Pop());
 	CColRef *pcrComputedCol = popScPrEl->Pcr();
 
-	CColRefSet *pcrsUsed = pexpr->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexpr->DeriveUsedColumns();
 	if (nullptr != pcrsUsed && 0 < pcrsUsed->Size())
 	{
 		BOOL fres GPOS_ASSERTS_ONLY = m_phmcrcrs->Insert(

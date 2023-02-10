@@ -43,8 +43,8 @@ using namespace gpos;
 //		rehydrate function of type PrFn.
 //
 //---------------------------------------------------------------------------
-template <class T, class R, class U, ULONG (*HashFn)(const T *),
-		  BOOL (*EqFn)(const T *, const T *)>
+template <class T, class R, class U, ULONG (*HashFn)(const gpos::Ref<T>),
+		  BOOL (*EqFn)(const gpos::Ref<T>, const gpos::Ref<T>)>
 class CTreeMap
 {
 	// array of source pointers (sources owned by 3rd party)

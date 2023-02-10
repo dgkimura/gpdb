@@ -110,7 +110,8 @@ CPhysicalMotionGather::Matches(gpos::Ref<COperator> pop) const
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CPhysicalMotionGather::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CColRefSet *pcrsRequired, ULONG child_index,
+									gpos::Ref<CColRefSet> pcrsRequired,
+									ULONG child_index,
 									CDrvdPropArray *,  // pdrgpdpCtxt
 									ULONG			   // ulOptReq
 )
@@ -137,7 +138,7 @@ CPhysicalMotionGather::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalMotionGather::FProvidesReqdCols(CExpressionHandle &exprhdl,
-										 CColRefSet *pcrsRequired,
+										 gpos::Ref<CColRefSet> pcrsRequired,
 										 ULONG	// ulOptReq
 ) const
 {

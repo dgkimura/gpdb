@@ -92,7 +92,8 @@ public:
 								  const CColRef *colref) override;
 
 	// return constraint on a given column set
-	gpos::Ref<CConstraint> Pcnstr(CMemoryPool *mp, CColRefSet *pcrs) override;
+	gpos::Ref<CConstraint> Pcnstr(CMemoryPool *mp,
+								  gpos::Ref<CColRefSet> pcrs) override;
 
 	// return a clone of the constraint for a different column
 	gpos::Ref<CConstraint> PcnstrRemapForColumn(CMemoryPool *mp,

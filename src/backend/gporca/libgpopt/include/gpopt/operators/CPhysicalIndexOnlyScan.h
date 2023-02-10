@@ -140,21 +140,21 @@ public:
 		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
 
 	// conversion function
-	static CPhysicalIndexOnlyScan *
+	static gpos::Ref<CPhysicalIndexOnlyScan>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalIndexOnlyScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalIndexOnlyScan *>(pop);
+		return gpos::dyn_cast<CPhysicalIndexOnlyScan>(pop);
 	}
 
 	// statistics derivation during costing
 	gpos::Ref<IStatistics>
-	PstatsDerive(CMemoryPool *,		   // mp
-				 CExpressionHandle &,  // exprhdl
-				 CReqdPropPlan *,	   // prpplan
-				 IStatisticsArray *	   //stats_ctxt
+	PstatsDerive(CMemoryPool *,				// mp
+				 CExpressionHandle &,		// exprhdl
+				 gpos::Ref<CReqdPropPlan>,	// prpplan
+				 IStatisticsArray *			//stats_ctxt
 	) const override
 	{
 		GPOS_ASSERT(

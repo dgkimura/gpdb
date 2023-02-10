@@ -264,7 +264,7 @@ CLogicalSequenceProject::DeriveOuterReferences(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 BOOL
 CLogicalSequenceProject::FHasLocalReferencesTo(
-	const CColRefSet *outerRefsToCheck) const
+	const gpos::Ref<CColRefSet> outerRefsToCheck) const
 {
 	return !outerRefsToCheck->IsDisjoint(m_pcrsLocalUsed.get());
 }
@@ -427,7 +427,7 @@ CLogicalSequenceProject::PopRemoveLocalOuterRefs(CMemoryPool *mp,
 {
 	GPOS_ASSERT(this == exprhdl.Pop());
 
-	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
+	gpos::Ref<CColRefSet> outer_refs = exprhdl.DeriveOuterReferences();
 	gpos::Ref<CDistributionSpec> pds = m_pds;
 	if (CDistributionSpec::EdtHashed == m_pds->Edt())
 	{

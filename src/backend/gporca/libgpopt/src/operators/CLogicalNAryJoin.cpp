@@ -115,7 +115,7 @@ CLogicalNAryJoin::DeriveNotNullColumns(CMemoryPool *mp,
 	{
 		if (IsInnerJoinChild(ul))
 		{
-			CColRefSet *pcrsChild = exprhdl.DeriveNotNullColumns(ul);
+			gpos::Ref<CColRefSet> pcrsChild = exprhdl.DeriveNotNullColumns(ul);
 			GPOS_ASSERT(pcrs->IsDisjoint(pcrsChild) &&
 						"Input columns are not disjoint");
 
@@ -286,7 +286,7 @@ CLogicalNAryJoin::GetTrueInnerJoinPreds(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < predArray->Size(); ul++)
 	{
 		gpos::Ref<CExpression> pred = (*predArray)[ul];
-		CColRefSet *predCols = pred->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> predCols = pred->DeriveUsedColumns();
 		BOOL addToPredArray = true;
 
 		// check whether the predicate uses any ColRefs that come from a non-inner join child
@@ -295,7 +295,8 @@ CLogicalNAryJoin::GetTrueInnerJoinPreds(CMemoryPool *mp,
 			if (0 < *(*m_lojChildPredIndexes)[c])
 			{
 				// this is a right child of a non-inner join
-				CColRefSet *nijOutputCols = exprhdl.DeriveOutputColumns(c);
+				gpos::Ref<CColRefSet> nijOutputCols =
+					exprhdl.DeriveOutputColumns(c);
 
 				if (predCols->FIntersects(nijOutputCols))
 				{

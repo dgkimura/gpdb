@@ -361,7 +361,7 @@ CPartitionPropagationSpec::FSatisfies(
 void
 CPartitionPropagationSpec::AppendEnforcers(CMemoryPool *mp,
 										   CExpressionHandle &exprhdl,
-										   CReqdPropPlan *,
+										   gpos::Ref<CReqdPropPlan>,
 										   CExpressionArray *pdrgpexpr,
 										   gpos::Ref<CExpression> expr)
 {

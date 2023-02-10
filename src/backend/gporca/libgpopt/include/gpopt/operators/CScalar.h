@@ -164,13 +164,13 @@ public:
 										gpos::Ref<CExpression> pexprScalar);
 
 	// conversion function
-	static CScalar *
+	static gpos::Ref<CScalar>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(pop->FScalar());
 
-		return dynamic_cast<CScalar *>(pop);
+		return gpos::dyn_cast<CScalar>(pop);
 	}
 
 	// the type of the scalar expression

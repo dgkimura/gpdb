@@ -59,8 +59,9 @@ protected:
 
 	// helper to compute required distribution of correlated join's children
 	gpos::Ref<CEnfdDistribution> PedCorrelatedJoin(
-		CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
-		ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
 
 	// helper to compute required rewindability of correlated join's children
 	static gpos::Ref<CRewindabilitySpec> PrsRequiredCorrelatedJoin(
@@ -81,7 +82,7 @@ protected:
 	// helper for checking if the outer input of a binary join operator
 	// includes the required columns
 	static BOOL FOuterProvidesReqdCols(CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired);
+									   gpos::Ref<CColRefSet> pcrsRequired);
 
 
 	// Do each of the given predicate children use columns from a different
@@ -114,7 +115,7 @@ public:
 	// compute required output columns of the n-th child
 	gpos::Ref<CColRefSet> PcrsRequired(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired,
+									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG child_index,
 									   CDrvdPropArray *pdrgpdpCtxt,
 									   ULONG ulOptReq) override;
@@ -135,20 +136,20 @@ public:
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
-									 CReqdPropPlan *prppInput,
+									 gpos::Ref<CReqdPropPlan> prppInput,
 									 ULONG child_index,
 									 CDrvdPropArray *pdrgpdpCtxt,
 									 ULONG ulDistrReq) override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	// distribution matching type
-	CEnfdDistribution::EDistributionMatching Edm(CReqdPropPlan *prppInput,
-												 ULONG child_index,
-												 CDrvdPropArray *pdrgpdpCtxt,
-												 ULONG ulOptReq) override;
+	CEnfdDistribution::EDistributionMatching Edm(
+		gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties

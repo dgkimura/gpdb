@@ -76,7 +76,8 @@ CXformPushGbBelowJoin::CXformPushGbBelowJoin(
 CXform::EXformPromise
 CXformPushGbBelowJoin::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popGbAgg = gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
+	gpos::Ref<CLogicalGbAgg> popGbAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 	if (!popGbAgg->FGlobal())
 	{
 		return CXform::ExfpNone;

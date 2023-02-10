@@ -86,12 +86,11 @@ CPhysicalMotionRoutedDistribute::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CPhysicalMotionRoutedDistribute::PcrsRequired(CMemoryPool *mp,
-											  CExpressionHandle &exprhdl,
-											  CColRefSet *pcrsRequired,
-											  ULONG child_index,
-											  CDrvdPropArray *,	 // pdrgpdpCtxt
-											  ULONG				 // ulOptReq
+CPhysicalMotionRoutedDistribute::PcrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CColRefSet> pcrsRequired, ULONG child_index,
+	CDrvdPropArray *,  // pdrgpdpCtxt
+	ULONG			   // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -116,9 +115,9 @@ CPhysicalMotionRoutedDistribute::PcrsRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionRoutedDistribute::FProvidesReqdCols(CExpressionHandle &exprhdl,
-												   CColRefSet *pcrsRequired,
-												   ULONG  // ulOptReq
+CPhysicalMotionRoutedDistribute::FProvidesReqdCols(
+	CExpressionHandle &exprhdl, gpos::Ref<CColRefSet> pcrsRequired,
+	ULONG  // ulOptReq
 ) const
 {
 	return FUnaryProvidesReqdCols(exprhdl, pcrsRequired);

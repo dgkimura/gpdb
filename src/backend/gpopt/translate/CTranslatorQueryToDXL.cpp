@@ -1411,7 +1411,7 @@ CTranslatorQueryToDXL::IsLeadWindowFunc(gpos::Ref<CDXLOperator> dxlop)
 	{
 		CDXLScalarWindowRef *winref_dxlop =
 			gpos::dyn_cast<CDXLScalarWindowRef>(dxlop);
-		const CMDIdGPDB *mdid_gpdb =
+		const gpos::Ref<CMDIdGPDB> mdid_gpdb =
 			gpos::dyn_cast<CMDIdGPDB>(winref_dxlop->FuncMdId());
 		OID oid = mdid_gpdb->Oid();
 		is_lead_func =
@@ -1438,7 +1438,7 @@ CTranslatorQueryToDXL::IsLagWindowFunc(gpos::Ref<CDXLOperator> dxlop)
 	{
 		CDXLScalarWindowRef *winref_dxlop =
 			gpos::dyn_cast<CDXLScalarWindowRef>(dxlop);
-		const CMDIdGPDB *mdid_gpdb =
+		const gpos::Ref<CMDIdGPDB> mdid_gpdb =
 			gpos::dyn_cast<CMDIdGPDB>(winref_dxlop->FuncMdId());
 		OID oid = mdid_gpdb->Oid();
 		is_lag = OIDFound(oid, lag_func_oids, GPOS_ARRAY_SIZE(lag_func_oids));
@@ -2604,7 +2604,8 @@ CTranslatorQueryToDXL::DXLDummyConstTableGet() const
 
 	const CMDTypeBoolGPDB *md_type_bool = dynamic_cast<const CMDTypeBoolGPDB *>(
 		m_md_accessor->PtMDType<IMDTypeBool>(m_sysid));
-	const CMDIdGPDB *mdid = gpos::dyn_cast<CMDIdGPDB>(md_type_bool->MDId());
+	const gpos::Ref<CMDIdGPDB> mdid =
+		gpos::dyn_cast<CMDIdGPDB>(md_type_bool->MDId());
 
 	// empty column name
 	CWStringConst str_unnamed_col(GPOS_WSZ_LIT(""));
@@ -4606,7 +4607,7 @@ CTranslatorQueryToDXL::TranslateGroupingFuncToDXL(
 	}
 
 	const IMDType *md_type = m_md_accessor->PtMDType<IMDTypeInt4>(m_sysid);
-	CMDIdGPDB *mdid_cast = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
+	gpos::Ref<CMDIdGPDB> mdid_cast = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(m_mp) CMDIdGPDB(*mdid_cast);
 
 	gpos::Ref<CDXLDatum> datum_dxl = GPOS_NEW(m_mp)

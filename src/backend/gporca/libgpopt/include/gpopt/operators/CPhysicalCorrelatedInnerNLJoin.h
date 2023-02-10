@@ -89,18 +89,19 @@ public:
 
 	// distribution matching type
 	CEnfdDistribution::EDistributionMatching
-	Edm(CReqdPropPlan *,   // prppInput
-		ULONG,			   // child_index
-		CDrvdPropArray *,  //pdrgpdpCtxt
-		ULONG			   // ulOptReq
+	Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
+		ULONG,					   // child_index
+		CDrvdPropArray *,		   //pdrgpdpCtxt
+		ULONG					   // ulOptReq
 		) override
 	{
 		return CEnfdDistribution::EdmSatisfy;
 	}
 
 	gpos::Ref<CEnfdDistribution>
-	Ped(CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
-		ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override
+	Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override
 	{
 		return PedCorrelatedJoin(mp, exprhdl, prppInput, child_index,
 								 pdrgpdpCtxt, ulOptReq);

@@ -80,7 +80,8 @@ public:
 	}
 
 	// get rewindability enforcing type for the given operator
-	EPropEnforcingType Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+	EPropEnforcingType Epet(CExpressionHandle &exprhdl,
+							gpos::Ref<CPhysical> popPhysical,
 							BOOL fRewindabilityReqd) const;
 
 	// property spec accessor

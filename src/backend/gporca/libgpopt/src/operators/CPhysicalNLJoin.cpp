@@ -144,7 +144,8 @@ CPhysicalNLJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CColRefSet *pcrsRequired, ULONG child_index,
+							  gpos::Ref<CColRefSet> pcrsRequired,
+							  ULONG child_index,
 							  CDrvdPropArray *,	 // pdrgpdpCtxt
 							  ULONG				 // ulOptReq
 )
@@ -161,7 +162,7 @@ CPhysicalNLJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// so we can use the outer refs of the inner child as required from outer child
 	if (0 == child_index)
 	{
-		CColRefSet *outer_refs = exprhdl.DeriveOuterReferences(1);
+		gpos::Ref<CColRefSet> outer_refs = exprhdl.DeriveOuterReferences(1);
 		pcrs->Include(outer_refs);
 	}
 

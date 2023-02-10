@@ -68,7 +68,7 @@ public:
 	}
 
 	// stat columns accessor
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsStat() const
 	{
 		return m_pcrsStat.get();

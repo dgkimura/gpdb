@@ -93,13 +93,13 @@ public:
 	}
 
 	// conversion function
-	static CStatsPredPoint *
+	static gpos::Ref<CStatsPredPoint>
 	ConvertPredStats(gpos::Ref<CStatsPred> pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptPoint == pred_stats->GetPredStatsType());
 
-		return dynamic_cast<CStatsPredPoint *>(pred_stats);
+		return gpos::dyn_cast<CStatsPredPoint>(pred_stats);
 	}
 
 };	// class CStatsPredPoint

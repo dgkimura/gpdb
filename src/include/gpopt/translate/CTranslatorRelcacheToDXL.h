@@ -320,7 +320,7 @@ private:
 
 	// generate statistics for the system level columns
 	static gpos::Ref<CDXLColStats> GenerateStatsForSystemCols(
-		CMemoryPool *mp, OID rel_oid, CMDIdColStats *mdid_col_stats,
+		CMemoryPool *mp, OID rel_oid, gpos::Ref<CMDIdColStats> mdid_col_stats,
 		CMDName *md_colname, OID att_type, AttrNumber attrnum,
 		gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array, CDouble rows);
 

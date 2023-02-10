@@ -83,13 +83,13 @@ public:
 	virtual CDouble DefaultScaleFactor() const;
 
 	// conversion function
-	static CStatsPredLike *
+	static gpos::Ref<CStatsPredLike>
 	ConvertPredStats(gpos::Ref<CStatsPred> pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptLike == pred_stats->GetPredStatsType());
 
-		return dynamic_cast<CStatsPredLike *>(pred_stats);
+		return gpos::dyn_cast<CStatsPredLike>(pred_stats);
 	}
 
 };	// class CStatsPredLike

@@ -2521,7 +2521,7 @@ CDXLOperatorFactory::GetDatumVal(CDXLMemoryManager *dxl_memory_manager,
 	gpos::Ref<IMDId> mdid = ExtractConvertAttrValueToMdId(
 		dxl_memory_manager, attrs, EdxltokenTypeId, target_elem);
 	GPOS_ASSERT(IMDId::EmdidGPDB == mdid->MdidType());
-	CMDIdGPDB *gpdb_mdid = gpos::dyn_cast<CMDIdGPDB>(mdid.get());
+	gpos::Ref<CMDIdGPDB> gpdb_mdid = gpos::dyn_cast<CMDIdGPDB>(mdid.get());
 
 	// get the type id from string
 	BOOL is_const_null = ExtractConvertAttrValueToBool(

@@ -63,7 +63,8 @@ public:
 	EXformPromise
 	Exfp(CExpressionHandle &exprhdl) const override
 	{
-		CLogicalGbAgg *popGbAgg = gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
+		gpos::Ref<CLogicalGbAgg> popGbAgg =
+			gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 		if (popGbAgg->FGlobal())
 		{
 			return ExfpHigh;
@@ -99,7 +100,8 @@ public:
 			return;
 		}
 
-		CLogicalGbAgg *popGbAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+		gpos::Ref<CLogicalGbAgg> popGbAgg =
+			gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 		CLogicalSetOp *popSetOp =
 			gpos::dyn_cast<CLogicalSetOp>(pexprSetOp->Pop());
 
@@ -148,7 +150,7 @@ public:
 			gpos::Ref<COperator> popChild = pexprChild->Pop();
 			if (COperator::EopLogicalGbAgg == popChild->Eopid())
 			{
-				CLogicalGbAgg *popGbAgg =
+				gpos::Ref<CLogicalGbAgg> popGbAgg =
 					gpos::dyn_cast<CLogicalGbAgg>(popChild);
 				if (CColRef::Equals(popGbAgg->Pdrgpcr(), pdrgpcrChildGb.get()))
 				{

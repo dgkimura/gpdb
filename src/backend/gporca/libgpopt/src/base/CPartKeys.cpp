@@ -75,7 +75,7 @@ CPartKeys::PcrKey(ULONG ulLevel) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPartKeys::FOverlap(CColRefSet *pcrs) const
+CPartKeys::FOverlap(gpos::Ref<CColRefSet> pcrs) const
 {
 	for (ULONG ul = 0; ul < m_num_of_part_levels; ul++)
 	{

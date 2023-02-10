@@ -207,7 +207,7 @@ CPhysicalSequenceProject::Matches(gpos::Ref<COperator> pop) const
 	GPOS_ASSERT(nullptr != pop);
 	if (Eopid() == pop->Eopid())
 	{
-		CPhysicalSequenceProject *popPhysicalSequenceProject =
+		gpos::Ref<CPhysicalSequenceProject> popPhysicalSequenceProject =
 			gpos::dyn_cast<CPhysicalSequenceProject>(pop);
 		return m_pds->Matches(popPhysicalSequenceProject->Pds()) &&
 			   CWindowFrame::Equals(m_pdrgpwf.get(),
@@ -254,7 +254,7 @@ CPhysicalSequenceProject::HashValue() const
 gpos::Ref<CColRefSet>
 CPhysicalSequenceProject::PcrsRequired(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired,
+									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG child_index,
 									   CDrvdPropArray *,  // pdrgpdpCtxt
 									   ULONG			  // ulOptReq
@@ -411,7 +411,7 @@ CPhysicalSequenceProject::PcteRequired(CMemoryPool *,		 //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalSequenceProject::FProvidesReqdCols(CExpressionHandle &exprhdl,
-											CColRefSet *pcrsRequired,
+											gpos::Ref<CColRefSet> pcrsRequired,
 											ULONG  // ulOptReq
 ) const
 {

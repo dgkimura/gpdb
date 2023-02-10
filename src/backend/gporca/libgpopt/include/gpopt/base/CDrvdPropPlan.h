@@ -130,7 +130,7 @@ public:
 	virtual ULONG Equals(const CDrvdPropPlan *pdpplan) const;
 
 	// check for satisfying required plan properties
-	BOOL FSatisfies(const CReqdPropPlan *prpp) const override;
+	BOOL FSatisfies(const gpos::Ref<CReqdPropPlan> prpp) const override;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

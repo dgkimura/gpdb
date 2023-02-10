@@ -117,7 +117,7 @@ CSubqueryTestUtils::PexprSelectWithAggSubquery(
 	GPOS_ASSERT(nullptr != pexprInner);
 
 	// get any column
-	CColRefSet *pcrs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprOuter->DeriveOutputColumns();
 	CColRef *pcrLeft = pcrs->PcrAny();
 
 	// generate agg subquery
@@ -1068,7 +1068,7 @@ CSubqueryTestUtils::PexprSubqueryQuantified(
 		PexprSubquery(mp, pexprOuter, pexprInner, fCorrelated);
 
 	// get random columns from inner expression
-	CColRefSet *pcrs = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprInner->DeriveOutputColumns();
 	const CColRef *pcrInner = pcrs->PcrAny();
 
 	// get random columns from outer expression
@@ -1244,7 +1244,7 @@ CSubqueryTestUtils::PexprUndecorrelatableScalarSubquery(CMemoryPool *mp,
 		PexprSubquery(mp, pexprOuter.get(), pexprInner, fCorrelated);
 
 	// get a random column from inner expression
-	CColRefSet *pcrs = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprInner->DeriveOutputColumns();
 	CColRef *pcrInner = pcrs->PcrAny();
 
 	gpos::Ref<CExpression> pexprSubquery = GPOS_NEW(mp) CExpression(
@@ -1328,7 +1328,7 @@ CSubqueryTestUtils::PexprSubqueryAgg(
 		PexprSubquery(mp, pexprOuter, pexprInner, fCorrelated);
 
 	// get a random column from inner expression
-	CColRefSet *pcrs = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprInner->DeriveOutputColumns();
 	CColRef *pcrInner = pcrs->PcrAny();
 
 	// generate a SUM expression
@@ -1380,7 +1380,7 @@ CSubqueryTestUtils::PexprSelectWithSubqueryBoolOp(
 				CScalarBoolOp::EboolopOr == eboolop);
 
 	// get any two columns
-	CColRefSet *pcrs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprOuter->DeriveOutputColumns();
 	CColRef *pcrLeft = pcrs->PcrAny();
 
 	// generate agg subquery
@@ -1687,7 +1687,7 @@ CSubqueryTestUtils::PexprSelectWithTrimmableExistentialSubquery(
 	}
 
 	// generate a regular predicate
-	CColRefSet *pcrs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprOuter->DeriveOutputColumns();
 	gpos::Ref<CExpression> pexprEqPred = CUtils::PexprScalarEqCmp(
 		mp, pcrs->PcrAny(), CUtils::PexprScalarConstInt4(mp, 5 /*val*/));
 
@@ -1776,7 +1776,7 @@ CSubqueryTestUtils::PexprSubqueryWithConstTableGet(CMemoryPool *mp,
 		CTestUtils::PexprConstTableGet(mp, 3 /* ulElements */);
 
 	// get random columns from inner expression
-	CColRefSet *pcrs = pexprConstTableGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprConstTableGet->DeriveOutputColumns();
 	const CColRef *pcrInner = pcrs->PcrAny();
 
 	// get random columns from outer expression
@@ -1840,7 +1840,7 @@ CSubqueryTestUtils::PexprSubqueryWithDisjunction(CMemoryPool *mp)
 		gpos::Ref<CExpression> pexprConstTableGet =
 			CTestUtils::PexprConstTableGet(mp, 3 /* ulElements */);
 		// get random columns from inner expression
-		CColRefSet *pcrs = pexprConstTableGet->DeriveOutputColumns();
+		gpos::Ref<CColRefSet> pcrs = pexprConstTableGet->DeriveOutputColumns();
 		const CColRef *pcrInner = pcrs->PcrAny();
 
 		// get random columns from outer expression

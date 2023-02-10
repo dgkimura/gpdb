@@ -36,10 +36,10 @@ public:
 											 ULONG ulOptReq) const override;
 
 	CEnfdDistribution::EDistributionMatching Edm(
-		CReqdPropPlan *,   // prppInput
-		ULONG,			   // child_index
-		CDrvdPropArray *,  //pdrgpdpCtxt
-		ULONG			   // ulOptReq
+		gpos::Ref<CReqdPropPlan>,  // prppInput
+		ULONG,					   // child_index
+		CDrvdPropArray *,		   //pdrgpdpCtxt
+		ULONG					   // ulOptReq
 		) override;
 
 	~CPhysicalParallelUnionAll() override;

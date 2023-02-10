@@ -36,9 +36,9 @@ private:
 	CXformSelect2IndexGet(const CXformSelect2IndexGet &);
 
 	// return the column reference set of included / key columns
-	CColRefSet *GetColRefSet(CMemoryPool *mp, CLogicalGet *popGet,
-							 const IMDIndex *pmdindex,
-							 BOOL fIncludedColumns) const;
+	gpos::Ref<CColRefSet> GetColRefSet(CMemoryPool *mp, CLogicalGet *popGet,
+									   const IMDIndex *pmdindex,
+									   BOOL fIncludedColumns) const;
 
 public:
 	// ctor

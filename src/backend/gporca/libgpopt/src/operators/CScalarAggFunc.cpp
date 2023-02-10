@@ -168,7 +168,8 @@ CScalarAggFunc::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarAggFunc *popScAggFunc = gpos::dyn_cast<CScalarAggFunc>(pop);
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
+			gpos::dyn_cast<CScalarAggFunc>(pop);
 
 		// match if func ids are identical
 		return ((popScAggFunc->IsDistinct() == m_is_distinct) &&

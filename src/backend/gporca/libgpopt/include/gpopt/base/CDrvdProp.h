@@ -96,7 +96,7 @@ public:
 						gpos::Ref<CDrvdPropCtxt> pdppropctxt) = 0;
 
 	// check for satisfying required plan properties
-	virtual BOOL FSatisfies(const CReqdPropPlan *prpp) const = 0;
+	virtual BOOL FSatisfies(const gpos::Ref<CReqdPropPlan> prpp) const = 0;
 
 	virtual BOOL
 	IsComplete() const

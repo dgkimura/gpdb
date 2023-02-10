@@ -118,7 +118,8 @@ private:
 
 	// if the given expression is a scalar that can be pushed, it returns
 	// the set of used columns
-	static CColRefSet *PcrsUsedByPushableScalar(gpos::Ref<CExpression> pexpr);
+	static gpos::Ref<CColRefSet> PcrsUsedByPushableScalar(
+		gpos::Ref<CExpression> pexpr);
 
 	// find the array of expression arrays corresponding to the given
 	// operator source id in the given source to array position map
@@ -139,8 +140,8 @@ private:
 	static void StoreBaseOpToColumnExpr(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 		SourceToArrayPosMap *psrc2array, ColumnToArrayPosMap *pcol2array,
-		const CColRefSet *pcrsProducedByChildren, BOOL fAllowNewSources,
-		ULONG ulPosition);
+		const gpos::Ref<CColRefSet> pcrsProducedByChildren,
+		BOOL fAllowNewSources, ULONG ulPosition);
 
 	// construct a filter based on the expressions from 'pdrgpdrgpexpr'
 	// and add to the array 'pdrgpexprPrefilters'

@@ -155,7 +155,8 @@ CPhysicalAgg::~CPhysicalAgg()
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CPhysicalAgg::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   CColRefSet *pcrsRequired, ULONG child_index,
+						   gpos::Ref<CColRefSet> pcrsRequired,
+						   ULONG child_index,
 						   CDrvdPropArray *,  // pdrgpdpCtxt
 						   ULONG			  // ulOptReq
 )
@@ -176,8 +177,8 @@ CPhysicalAgg::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CPhysicalAgg::PcrsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CColRefSet *pcrsRequired, ULONG child_index,
-							  CColRefArray *pdrgpcrGrp)
+							  gpos::Ref<CColRefSet> pcrsRequired,
+							  ULONG child_index, CColRefArray *pdrgpcrGrp)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrGrp);
 	GPOS_ASSERT(
@@ -439,7 +440,7 @@ CPhysicalAgg::PcteRequired(CMemoryPool *,		 //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalAgg::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								CColRefSet *pcrsRequired,
+								gpos::Ref<CColRefSet> pcrsRequired,
 								ULONG  // ulOptReq
 ) const
 {
@@ -562,7 +563,8 @@ CPhysicalAgg::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalAgg *popAgg = dynamic_cast<CPhysicalAgg *>(pop);
+	gpos::Ref<CPhysicalAgg> popAgg =
+		dynamic_cast<gpos::Ref<CPhysicalAgg> >(pop);
 
 	if (FGeneratesDuplicates() != popAgg->FGeneratesDuplicates())
 	{

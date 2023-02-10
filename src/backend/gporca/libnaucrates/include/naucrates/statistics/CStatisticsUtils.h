@@ -108,7 +108,7 @@ private:
 
 	// add the NDVs for all of the grouping columns
 	static void AddNdvForAllGrpCols(
-		CMemoryPool *mp, const CStatistics *input_stats,
+		CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
 		const ULongPtrArray *grouping_columns,
 		CDoubleArray *output_ndvs  // output array of NDV
 	);
@@ -116,14 +116,15 @@ private:
 	// compute max number of groups when grouping on columns from the given source
 	static CDouble MaxNumGroupsForGivenSrcGprCols(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
-		CStatistics *input_stats, const ULongPtrArray *src_grouping_cols);
+		gpos::Ref<CStatistics> input_stats,
+		const ULongPtrArray *src_grouping_cols);
 
 	// check to see if any one of the grouping columns has been capped
-	static BOOL CappedGrpColExists(const CStatistics *stats,
+	static BOOL CappedGrpColExists(const gpos::Ref<CStatistics> stats,
 								   const ULongPtrArray *grouping_columns);
 
 	// return the maximum NDV given an array of grouping columns
-	static CDouble MaxNdv(const CStatistics *stats,
+	static CDouble MaxNdv(const gpos::Ref<CStatistics> stats,
 						  const ULongPtrArray *grouping_columns);
 
 public:
@@ -179,7 +180,7 @@ public:
 	// histogram buckets cannot be changed by applying the predicates in the
 	// disjunction
 	static gpos::Ref<CBitSet> GetColsNonUpdatableHistForDisj(
-		CMemoryPool *mp, CStatsPredDisj *pred_stats);
+		CMemoryPool *mp, gpos::Ref<CStatsPredDisj> pred_stats);
 
 	// helper method to add a histogram to a map
 	static void AddHistogram(CMemoryPool *mp, ULONG colid,
@@ -241,15 +242,16 @@ public:
 	// return the mapping between the table column used for grouping to the logical operator id where it was defined.
 	// If the grouping column is not a table column then the logical op id is initialized to gpos::ulong_max
 	static gpos::Ref<UlongToUlongPtrArrayMap> GetGrpColIdToUpperBoundNDVIdxMap(
-		CMemoryPool *mp, CStatistics *stats,
-		const CColRefSet *grouping_cols_refset, gpos::Ref<CBitSet> keys);
+		CMemoryPool *mp, gpos::Ref<CStatistics> stats,
+		const gpos::Ref<CColRefSet> grouping_cols_refset,
+		gpos::Ref<CBitSet> keys);
 
 	// extract NDVs for the given array of grouping columns
 	static gpos::Ref<CDoubleArray> ExtractNDVForGrpCols(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
 		const gpos::Ref<IStatistics> stats,
-		CColRefSet *grp_cols_refset,  // grouping columns
-		gpos::Ref<CBitSet> keys		  // keys derived during optimization
+		gpos::Ref<CColRefSet> grp_cols_refset,	// grouping columns
+		gpos::Ref<CBitSet> keys	 // keys derived during optimization
 	);
 
 	// compute the cumulative number of groups for the given set of grouping columns
@@ -266,15 +268,16 @@ public:
 	}
 
 	// add the statistics (histogram and width) of the grouping columns
-	static void AddGrpColStats(CMemoryPool *mp, const CStatistics *input_stats,
-							   CColRefSet *grp_cols_refset,
+	static void AddGrpColStats(CMemoryPool *mp,
+							   const gpos::Ref<CStatistics> input_stats,
+							   gpos::Ref<CColRefSet> grp_cols_refset,
 							   UlongToHistogramMap *output_histograms,
 							   UlongToDoubleMap *output_col_widths);
 
 	// return the set of grouping columns for statistics computation;
 	static gpos::Ref<CColRefSet> MakeGroupByColsForStats(
 		CMemoryPool *mp, const ULongPtrArray *grouping_columns,
-		CColRefSet *
+		gpos::Ref<CColRefSet>
 			computed_groupby_cols  // output set of grouping columns that are computed attributes
 	);
 
@@ -287,7 +290,7 @@ public:
 	static CDouble GetFrequency(const CBucketArray *histogram_buckets);
 
 	// true if the given operator increases risk of cardinality misestimation
-	static BOOL IncreasesRisk(CLogical *logical_op);
+	static BOOL IncreasesRisk(gpos::Ref<CLogical> logical_op);
 
 	// return the default column width
 	static CDouble DefaultColumnWidth(const IMDType *mdtype);
@@ -301,7 +304,7 @@ public:
 	// estimated output cardinality and information maintained in the current stats object
 	static void ComputeCardUpperBounds(
 		CMemoryPool *mp,  // memory pool
-		const CStatistics *input_stats,
+		const gpos::Ref<CStatistics> input_stats,
 		CStatistics
 			*output_stats,	  // output statistics object that is to be updated
 		CDouble rows_output,  // estimated output cardinality of the operator

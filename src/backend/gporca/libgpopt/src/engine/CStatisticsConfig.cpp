@@ -75,7 +75,7 @@ CStatisticsConfig::~CStatisticsConfig()
 //
 //---------------------------------------------------------------------------
 void
-CStatisticsConfig::AddMissingStatsColumn(CMDIdColStats *pmdidCol)
+CStatisticsConfig::AddMissingStatsColumn(gpos::Ref<CMDIdColStats> pmdidCol)
 {
 	GPOS_ASSERT(nullptr != pmdidCol);
 

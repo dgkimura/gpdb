@@ -124,8 +124,9 @@ CDecorrelator::FDelayable(
 		COperator::EopLogicalLeftAntiSemiJoin == op_id)
 	{
 		// for semi-joins, we disallow predicates referring to inner child to be pulled above the join
-		CColRefSet *pcrsUsed = pexprScalar->DeriveUsedColumns();
-		CColRefSet *pcrsInner = (*pexprLogical)[1]->DeriveOutputColumns();
+		gpos::Ref<CColRefSet> pcrsUsed = pexprScalar->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrsInner =
+			(*pexprLogical)[1]->DeriveOutputColumns();
 		if (!pcrsUsed->IsDisjoint(pcrsInner))
 		{
 			// predicate uses a column produced by semi-join inner child
@@ -164,7 +165,7 @@ CDecorrelator::FProcess(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 						BOOL fEqualityOnly,
 						gpos::Ref<CExpression> *ppexprDecorrelated,
 						CExpressionArray *pdrgpexprCorrelations,
-						CColRefSet *outerRefsToRemove)
+						gpos::Ref<CColRefSet> outerRefsToRemove)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -207,7 +208,7 @@ CDecorrelator::FProcessOperator(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 								BOOL fEqualityOnly,
 								gpos::Ref<CExpression> *ppexprDecorrelated,
 								CExpressionArray *pdrgpexprCorrelations,
-								CColRefSet *outerRefsToRemove)
+								gpos::Ref<CColRefSet> outerRefsToRemove)
 {
 	BOOL result = false;
 
@@ -293,7 +294,8 @@ CDecorrelator::FProcessPredicate(
 	gpos::Ref<CExpression> pexprLogical,  // logical parent of predicate tree
 	gpos::Ref<CExpression> pexprScalar, BOOL fEqualityOnly,
 	gpos::Ref<CExpression> *ppexprDecorrelated,
-	CExpressionArray *pdrgpexprCorrelations, CColRefSet *outerRefsToRemove)
+	CExpressionArray *pdrgpexprCorrelations,
+	gpos::Ref<CColRefSet> outerRefsToRemove)
 {
 	GPOS_ASSERT(pexprLogical->Pop()->FLogical());
 	GPOS_ASSERT(pexprScalar->Pop()->FScalar());
@@ -311,7 +313,7 @@ CDecorrelator::FProcessPredicate(
 	for (ULONG ul = 0; ul < length && fSuccess; ul++)
 	{
 		gpos::Ref<CExpression> pexprConj = (*pdrgpexprConj)[ul];
-		CColRefSet *pcrsUsed = pexprConj->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrsUsed = pexprConj->DeriveUsedColumns();
 
 		if (outerRefsToRemove->IsDisjoint(pcrsUsed))
 		{
@@ -362,7 +364,7 @@ CDecorrelator::FProcessSelect(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							  BOOL fEqualityOnly,
 							  gpos::Ref<CExpression> *ppexprDecorrelated,
 							  CExpressionArray *pdrgpexprCorrelations,
-							  CColRefSet *outerRefsToRemove)
+							  gpos::Ref<CColRefSet> outerRefsToRemove)
 {
 	GPOS_ASSERT(COperator::EopLogicalSelect == pexpr->Pop()->Eopid());
 
@@ -420,9 +422,10 @@ CDecorrelator::FProcessGbAgg(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							 BOOL,	// fEqualityOnly
 							 gpos::Ref<CExpression> *ppexprDecorrelated,
 							 CExpressionArray *pdrgpexprCorrelations,
-							 CColRefSet *outerRefsToRemove)
+							 gpos::Ref<CColRefSet> outerRefsToRemove)
 {
-	CLogicalGbAgg *popAggOriginal = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAggOriginal =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 
 	// fail if agg has outer references
 	if (!outerRefsToRemove->IsDisjoint((*pexpr)[1]->DeriveUsedColumns()))
@@ -442,7 +445,7 @@ CDecorrelator::FProcessGbAgg(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 	}
 
 	// get the output columns of decorrelated child
-	CColRefSet *pcrsOutput = pexprRelational->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOutput = pexprRelational->DeriveOutputColumns();
 
 	// create temp expression of correlations to determine inner columns
 	;
@@ -508,7 +511,7 @@ CDecorrelator::FProcessJoin(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							BOOL fEqualityOnly,
 							gpos::Ref<CExpression> *ppexprDecorrelated,
 							CExpressionArray *pdrgpexprCorrelations,
-							CColRefSet *outerRefsToRemove)
+							gpos::Ref<CColRefSet> outerRefsToRemove)
 {
 	GPOS_ASSERT(CUtils::FLogicalJoin(pexpr->Pop()) ||
 				CUtils::FApply(pexpr->Pop()));
@@ -640,7 +643,7 @@ CDecorrelator::FProcessAssert(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							  BOOL fEqualityOnly,
 							  gpos::Ref<CExpression> *ppexprDecorrelated,
 							  CExpressionArray *pdrgpexprCorrelations,
-							  CColRefSet *outerRefsToRemove)
+							  gpos::Ref<CColRefSet> outerRefsToRemove)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -650,7 +653,7 @@ CDecorrelator::FProcessAssert(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// fail if assert expression has outer references
-	CColRefSet *pcrsUsed = pexprScalar->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprScalar->DeriveUsedColumns();
 	if (!outerRefsToRemove->IsDisjoint(pcrsUsed))
 	{
 		return false;
@@ -688,7 +691,7 @@ CDecorrelator::FProcessMaxOneRow(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 								 BOOL fEqualityOnly,
 								 gpos::Ref<CExpression> *ppexprDecorrelated,
 								 CExpressionArray *pdrgpexprCorrelations,
-								 CColRefSet *outerRefsToRemove)
+								 gpos::Ref<CColRefSet> outerRefsToRemove)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -753,7 +756,7 @@ CDecorrelator::FProcessProject(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							   BOOL fEqualityOnly,
 							   gpos::Ref<CExpression> *ppexprDecorrelated,
 							   CExpressionArray *pdrgpexprCorrelations,
-							   CColRefSet *outerRefsToRemove)
+							   gpos::Ref<CColRefSet> outerRefsToRemove)
 {
 	COperator::EOperatorId op_id = pexpr->Pop()->Eopid();
 
@@ -763,7 +766,7 @@ CDecorrelator::FProcessProject(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 	gpos::Ref<CExpression> pexprPrjList = (*pexpr)[1];
 
 	// fail if project elements have outer references
-	CColRefSet *pcrsUsed = pexprPrjList->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprPrjList->DeriveUsedColumns();
 	if (!outerRefsToRemove->IsDisjoint(pcrsUsed))
 	{
 		return false;
@@ -828,7 +831,7 @@ CDecorrelator::FProcessLimit(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							 BOOL fEqualityOnly,
 							 gpos::Ref<CExpression> *ppexprDecorrelated,
 							 CExpressionArray *pdrgpexprCorrelations,
-							 CColRefSet *outerRefsToRemove)
+							 gpos::Ref<CColRefSet> outerRefsToRemove)
 {
 	GPOS_ASSERT(COperator::EopLogicalLimit == pexpr->Pop()->Eopid());
 

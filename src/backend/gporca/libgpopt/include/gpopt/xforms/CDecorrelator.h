@@ -34,7 +34,7 @@ private:
 	// definition of operator processor
 	using FnProcessor = BOOL(CMemoryPool *, gpos::Ref<CExpression>, BOOL,
 							 gpos::Ref<CExpression> *, CExpressionArray *,
-							 CColRefSet *);
+							 gpos::Ref<CColRefSet>);
 
 	//---------------------------------------------------------------------------
 	//	@struct:
@@ -73,7 +73,7 @@ private:
 								 BOOL fEqualityOnly,
 								 gpos::Ref<CExpression> *ppexprDecorrelated,
 								 CExpressionArray *pdrgpexprCorrelations,
-								 CColRefSet *outerRefsToRemove);
+								 gpos::Ref<CColRefSet> outerRefsToRemove);
 
 	// processor for predicates
 	static BOOL FProcessPredicate(CMemoryPool *mp,
@@ -82,14 +82,14 @@ private:
 								  BOOL fEqualityOnly,
 								  gpos::Ref<CExpression> *ppexprDecorrelated,
 								  CExpressionArray *pdrgpexprCorrelations,
-								  CColRefSet *outerRefsToRemove);
+								  gpos::Ref<CColRefSet> outerRefsToRemove);
 
 	// processor for select operators
 	static BOOL FProcessSelect(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							   BOOL fEqualityOnly,
 							   gpos::Ref<CExpression> *ppexprDecorrelated,
 							   CExpressionArray *pdrgpexprCorrelations,
-							   CColRefSet *outerRefsToRemove);
+							   gpos::Ref<CColRefSet> outerRefsToRemove);
 
 
 	// processor for aggregates
@@ -97,14 +97,14 @@ private:
 							  BOOL fEqualityOnly,
 							  gpos::Ref<CExpression> *ppexprDecorrelated,
 							  CExpressionArray *pdrgpexprCorrelations,
-							  CColRefSet *outerRefsToRemove);
+							  gpos::Ref<CColRefSet> outerRefsToRemove);
 
 	// processor for joins (inner/n-ary)
 	static BOOL FProcessJoin(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							 BOOL fEqualityOnly,
 							 gpos::Ref<CExpression> *ppexprDecorrelated,
 							 CExpressionArray *pdrgpexprCorrelations,
-							 CColRefSet *outerRefsToRemove);
+							 gpos::Ref<CColRefSet> outerRefsToRemove);
 
 
 	// processor for projects
@@ -112,28 +112,28 @@ private:
 								BOOL fEqualityOnly,
 								gpos::Ref<CExpression> *ppexprDecorrelated,
 								CExpressionArray *pdrgpexprCorrelations,
-								CColRefSet *outerRefsToRemove);
+								gpos::Ref<CColRefSet> outerRefsToRemove);
 
 	// processor for assert
 	static BOOL FProcessAssert(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							   BOOL fEqualityOnly,
 							   gpos::Ref<CExpression> *ppexprDecorrelated,
 							   CExpressionArray *pdrgpexprCorrelations,
-							   CColRefSet *outerRefsToRemove);
+							   gpos::Ref<CColRefSet> outerRefsToRemove);
 
 	// processor for MaxOneRow
 	static BOOL FProcessMaxOneRow(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 								  BOOL fEqualityOnly,
 								  gpos::Ref<CExpression> *ppexprDecorrelated,
 								  CExpressionArray *pdrgpexprCorrelations,
-								  CColRefSet *outerRefsToRemove);
+								  gpos::Ref<CColRefSet> outerRefsToRemove);
 
 	// processor for limits
 	static BOOL FProcessLimit(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							  BOOL fEqualityOnly,
 							  gpos::Ref<CExpression> *ppexprDecorrelated,
 							  CExpressionArray *pdrgpexprCorrelations,
-							  CColRefSet *outerRefsToRemove);
+							  gpos::Ref<CColRefSet> outerRefsToRemove);
 
 public:
 	// private dtor
@@ -149,7 +149,7 @@ public:
 						 BOOL fEqualityOnly,
 						 gpos::Ref<CExpression> *ppexprDecorrelated,
 						 CExpressionArray *pdrgpexprCorrelations,
-						 CColRefSet *outerRefsToRemove);
+						 gpos::Ref<CColRefSet> outerRefsToRemove);
 
 };	// class CDecorrelator
 

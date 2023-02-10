@@ -412,12 +412,12 @@ CJoinOrder::ComputeEdgeCover()
 	for (ULONG ulEdge = 0; ulEdge < m_ulEdges; ulEdge++)
 	{
 		gpos::Ref<CExpression> pexpr = m_rgpedge[ulEdge]->m_pexpr.get();
-		CColRefSet *pcrsUsed = pexpr->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrsUsed = pexpr->DeriveUsedColumns();
 
 		for (ULONG ulComp = 0; ulComp < m_ulComps; ulComp++)
 		{
 			gpos::Ref<CExpression> pexprComp = m_rgpcomp[ulComp]->m_pexpr.get();
-			CColRefSet *pcrsOutput = pexprComp->DeriveOutputColumns();
+			gpos::Ref<CColRefSet> pcrsOutput = pexprComp->DeriveOutputColumns();
 
 			if (!pcrsUsed->IsDisjoint(pcrsOutput))
 			{

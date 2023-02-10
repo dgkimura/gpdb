@@ -74,7 +74,7 @@ COrderedAggPreprocessor::SplitPrjList(
 	{
 		gpos::Ref<CExpression> pexprPrjEl = (*pexprPrjList)[ul];
 		gpos::Ref<CExpression> pexprAggFunc = (*pexprPrjEl)[0];
-		CScalarProjectElement *popScPrjElem =
+		gpos::Ref<CScalarProjectElement> popScPrjElem =
 			gpos::dyn_cast<CScalarProjectElement>(pexprPrjEl->Pop());
 		CColRef *pcrPrjElem = popScPrjElem->Pcr();
 
@@ -473,7 +473,7 @@ COrderedAggPreprocessor::CreateCTE(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != ppexprFirstConsumer);
 	GPOS_ASSERT(nullptr != ppexprSecondConsumer);
 
-	CColRefSet *pcrsChildOutput = pexprChild->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsChildOutput = pexprChild->DeriveOutputColumns();
 	gpos::Ref<CColRefArray> pdrgpcrChildOutput = pcrsChildOutput->Pdrgpcr(mp);
 
 	// create a CTE producer based on SeqPrj child expression
@@ -525,7 +525,7 @@ COrderedAggPreprocessor::PexprFinalAgg(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != total_count_colref);
 	GPOS_ASSERT(nullptr != peer_count_colref);
 
-	CScalarAggFunc *popScAggFunc =
+	gpos::Ref<CScalarAggFunc> popScAggFunc =
 		gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	gpos::Ref<CMDIdGPDB> mdid = CUtils::GetPercentileAggMDId(mp, pexprAggFunc);

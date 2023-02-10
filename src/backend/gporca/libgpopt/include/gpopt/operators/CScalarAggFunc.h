@@ -144,13 +144,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarAggFunc *
+	static gpos::Ref<CScalarAggFunc>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarAggFunc == pop->Eopid());
 
-		return dynamic_cast<CScalarAggFunc *>(pop);
+		return gpos::dyn_cast<CScalarAggFunc>(pop);
 	}
 
 

@@ -301,7 +301,8 @@ CMemo::PgroupInsert(gpos::Ref<CGroup> pgroupTarget,
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CMemo::PexprExtractPlan(CMemoryPool *mp, gpos::Ref<CGroup> pgroupRoot,
-						CReqdPropPlan *prppInput, ULONG ulSearchStages)
+						gpos::Ref<CReqdPropPlan> prppInput,
+						ULONG ulSearchStages)
 {
 	// check stack size
 	GPOS_CHECK_STACK_SIZE;
@@ -354,7 +355,7 @@ CMemo::PexprExtractPlan(CMemoryPool *mp, gpos::Ref<CGroup> pgroupRoot,
 	for (ULONG i = 0; i < arity; i++)
 	{
 		gpos::Ref<CGroup> pgroupChild = (*pgexprBest)[i];
-		CReqdPropPlan *prppChild = nullptr;
+		gpos::Ref<CReqdPropPlan> prppChild = nullptr;
 
 		// If the child group doesn't have scalar expression, we get the optimization
 		// context for that child group as well as the required plan properties.
@@ -397,7 +398,7 @@ CMemo::PexprExtractPlan(CMemoryPool *mp, gpos::Ref<CGroup> pgroupRoot,
 
 	;
 
-	CReqdPropPlan *prpp = nullptr;
+	gpos::Ref<CReqdPropPlan> prpp = nullptr;
 	if (poc != nullptr)
 	{
 		GPOS_ASSERT(!pgroupRoot->FScalar());

@@ -111,7 +111,7 @@ private:
 	// creates a range like [x,x] where x is a constant
 	static gpos::Ref<CRangeArray> PciRangeFromColConstCmp(
 		CMemoryPool *mp, IMDType::ECmpType cmp_type,
-		const CScalarConst *popScConst);
+		const gpos::Ref<CScalarConst> popScConst);
 
 	// create an array IN or NOT IN expression
 	gpos::Ref<CExpression> PexprConstructArrayScalar(CMemoryPool *mp,
@@ -212,7 +212,8 @@ public:
 								  const CColRef *colref) override;
 
 	// return constraint on a given column set
-	gpos::Ref<CConstraint> Pcnstr(CMemoryPool *mp, CColRefSet *pcrs) override;
+	gpos::Ref<CConstraint> Pcnstr(CMemoryPool *mp,
+								  gpos::Ref<CColRefSet> pcrs) override;
 
 	// return a clone of the constraint for a different column
 	gpos::Ref<CConstraint> PcnstrRemapForColumn(CMemoryPool *mp,
@@ -233,14 +234,13 @@ public:
 													   BOOL fIncludesNull);
 
 	// create an unbounded interval on any column from the given set
-	static gpos::Ref<CConstraintInterval> PciUnbounded(CMemoryPool *mp,
-													   const CColRefSet *pcrs,
-													   BOOL fIncludesNull);
+	static gpos::Ref<CConstraintInterval> PciUnbounded(
+		CMemoryPool *mp, const gpos::Ref<CColRefSet> pcrs, BOOL fIncludesNull);
 
 	// helper for create interval from comparison between a column and a constant
 	static gpos::Ref<CConstraintInterval> PciIntervalFromColConstCmp(
 		CMemoryPool *mp, CColRef *colref, IMDType::ECmpType cmp_type,
-		CScalarConst *popScConst, BOOL infer_nulls_as = false);
+		gpos::Ref<CScalarConst> popScConst, BOOL infer_nulls_as = false);
 
 	// create interval from scalar expression
 	static gpos::Ref<CConstraintInterval> PciIntervalFromScalarExpr(

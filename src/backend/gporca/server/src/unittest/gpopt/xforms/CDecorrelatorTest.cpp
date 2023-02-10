@@ -87,7 +87,7 @@ CDecorrelatorTest::EresUnittest_Decorrelate()
 		gpos::Ref<CExpression> pexprResult = nullptr;
 		gpos::Ref<CExpressionArray> pdrgpexpr =
 			GPOS_NEW(mp) CExpressionArray(mp);
-		CColRefSet *outerRefs = pexpr->DeriveOuterReferences();
+		gpos::Ref<CColRefSet> outerRefs = pexpr->DeriveOuterReferences();
 #ifdef GPOS_DEBUG
 		BOOL fSuccess =
 #endif	// GPOS_DEBUG

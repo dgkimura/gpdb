@@ -492,7 +492,8 @@ CGroupExpression::PccComputeCost(
 //
 //---------------------------------------------------------------------------
 CCost
-CGroupExpression::CostLowerBound(CMemoryPool *mp, CReqdPropPlan *prppInput,
+CGroupExpression::CostLowerBound(CMemoryPool *mp,
+								 gpos::Ref<CReqdPropPlan> prppInput,
 								 gpos::Ref<CCostContext> pccChild,
 								 ULONG child_index)
 {
@@ -894,6 +895,11 @@ CGroupExpression::FMatchNonScalarChildren(
 //---------------------------------------------------------------------------
 BOOL
 CGroupExpression::Matches(const gpos::Ref<CGroupExpression> pgexpr) const
+{
+	return Matches(pgexpr.get());
+}
+BOOL
+CGroupExpression::Matches(const CGroupExpression *pgexpr) const
 {
 	GPOS_ASSERT(nullptr != pgexpr);
 

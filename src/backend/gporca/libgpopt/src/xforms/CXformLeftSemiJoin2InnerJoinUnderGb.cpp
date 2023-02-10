@@ -61,7 +61,7 @@ CXformLeftSemiJoin2InnerJoinUnderGb::CXformLeftSemiJoin2InnerJoinUnderGb(
 CXform::EXformPromise
 CXformLeftSemiJoin2InnerJoinUnderGb::Exfp(CExpressionHandle &exprhdl) const
 {
-	CColRefSet *pcrsInnerOutput = exprhdl.DeriveOutputColumns(1);
+	gpos::Ref<CColRefSet> pcrsInnerOutput = exprhdl.DeriveOutputColumns(1);
 	gpos::Ref<CExpression> pexprScalar = exprhdl.PexprScalarExactChild(2);
 	CAutoMemoryPool amp;
 	if (exprhdl.HasOuterRefs() || nullptr == exprhdl.DeriveKeyCollection(0) ||

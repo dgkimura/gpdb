@@ -344,7 +344,7 @@ CDistributionSpecHashed::FMatchSubset(
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpecHashed>
 CDistributionSpecHashed::PdshashedExcludeColumns(CMemoryPool *mp,
-												 CColRefSet *pcrs)
+												 gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(nullptr != pcrs);
 
@@ -392,7 +392,7 @@ CDistributionSpecHashed::PdshashedExcludeColumns(CMemoryPool *mp,
 void
 CDistributionSpecHashed::AppendEnforcers(CMemoryPool *mp,
 										 CExpressionHandle &,  // exprhdl
-										 CReqdPropPlan *
+										 gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
 											 prpp
 #endif	// GPOS_DEBUG
@@ -719,7 +719,7 @@ CDistributionSpecHashed::ComputeEquivHashExprs(
 
 			gpos::Ref<CExpression> distribution_expr =
 				(*distribution_exprs)[distribution_key_idx];
-			CColRefSet *distribution_expr_cols =
+			gpos::Ref<CColRefSet> distribution_expr_cols =
 				distribution_expr->DeriveUsedColumns();
 			// the input expr is always equivalent to itself, so add it to the equivalent expr array
 			;
@@ -737,7 +737,7 @@ CDistributionSpecHashed::ComputeEquivHashExprs(
 			const CColRef *distribution_colref =
 				distribution_expr_cols->PcrAny();
 			GPOS_ASSERT(nullptr != distribution_colref);
-			CColRefSet *equiv_cols =
+			gpos::Ref<CColRefSet> equiv_cols =
 				expression_handle.DerivePropertyConstraint()->PcrsEquivClass(
 					distribution_colref);
 			// if there are equivalent columns, then we have a chance to create equivalent distribution exprs
@@ -1009,7 +1009,7 @@ CDistributionSpecHashed::HasCompleteEquivSpec(CMemoryPool *mp) const
 gpos::Ref<CDistributionSpecHashed>
 CDistributionSpecHashed::TryToCompleteEquivSpec(
 	CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
-	gpos::Ref<CExpression> pexprPred, CColRefSet *outerRefs)
+	gpos::Ref<CExpression> pexprPred, gpos::Ref<CColRefSet> outerRefs)
 {
 	gpos::Ref<CExpressionArray> pdrgpexprPred =
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprPred);

@@ -230,7 +230,7 @@ CMDTypeInt2GPDB::Serialize(CXMLSerializer *xml_serializer) const
 //---------------------------------------------------------------------------
 gpos::Ref<IDatum>
 CMDTypeInt2GPDB::GetDatumForDXLConstVal(
-	const CDXLScalarConstValue *dxl_op) const
+	const gpos::Ref<CDXLScalarConstValue> dxl_op) const
 {
 	CDXLDatumInt2 *dxl_datum = gpos::dyn_cast<CDXLDatumInt2>(
 		const_cast<gpos::Ref<CDXLDatum> >(dxl_op->GetDatumVal()));

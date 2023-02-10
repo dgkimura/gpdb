@@ -113,7 +113,7 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
 void
 CDistributionSpecReplicated::AppendEnforcers(CMemoryPool *mp,
 											 CExpressionHandle &,  // exprhdl
-											 CReqdPropPlan *
+											 gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
 												 prpp
 #endif	// GPOS_DEBUG

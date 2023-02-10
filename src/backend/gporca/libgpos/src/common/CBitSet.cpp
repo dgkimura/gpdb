@@ -355,7 +355,8 @@ CBitSet::Union(const CBitSet *pbsOther)
 	//using CBitSetLinkArray = CDynamicPtrArray<CBitSetLink, CleanupNULL>;
 	using CBitSetLinkArray = gpos::Vector<gpos::Ref<CBitSetLink>>;
 
-	gpos::Ref<CBitSetLinkArray> a_drgpbsl = GPOS_NEW(m_mp) CBitSetLinkArray(m_mp);
+	gpos::Ref<CBitSetLinkArray> a_drgpbsl =
+		GPOS_NEW(m_mp) CBitSetLinkArray(m_mp);
 
 	// iterate through other's links and copy missing links to array
 	for (bsl_other = pbsOther->m_bsllist.First(); bsl_other != nullptr;

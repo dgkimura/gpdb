@@ -160,8 +160,8 @@ CLogicalSetOp::DeriveOutputColumns(CMemoryPool *,  // mp
 	const ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		CColRefSet *pcrsChildOutput = exprhdl.DeriveOutputColumns(ul);
-		CColRefSet *pcrsInput = (*m_pdrgpcrsInput)[ul].get();
+		gpos::Ref<CColRefSet> pcrsChildOutput = exprhdl.DeriveOutputColumns(ul);
+		gpos::Ref<CColRefSet> pcrsInput = (*m_pdrgpcrsInput)[ul].get();
 		GPOS_ASSERT(pcrsChildOutput->ContainsAll(pcrsInput) &&
 					"Unexpected outer references in SetOp input");
 	}
@@ -330,7 +330,7 @@ CLogicalSetOp::PdrgpcrsInputMapped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		exprhdl.DerivePropertyConstraint(ulChild)->PdrgpcrsEquivClasses();
 	const ULONG length = pdrgpcrsInput->Size();
 
-	CColRefSet *pcrsChildInput = (*m_pdrgpcrsInput)[ulChild].get();
+	gpos::Ref<CColRefSet> pcrsChildInput = (*m_pdrgpcrsInput)[ulChild].get();
 	gpos::Ref<CColRefSetArray> pdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -486,9 +486,9 @@ CLogicalSetOp::PpcDeriveConstraintSetop(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CLogicalSetOp::PcrsStat(CMemoryPool *,		  // mp
-						CExpressionHandle &,  //exprhdl,
-						CColRefSet *,		  //pcrsInput
+CLogicalSetOp::PcrsStat(CMemoryPool *,			// mp
+						CExpressionHandle &,	//exprhdl,
+						gpos::Ref<CColRefSet>,	//pcrsInput
 						ULONG child_index) const
 {
 	gpos::Ref<CColRefSet> pcrs = (*m_pdrgpcrsInput)[child_index];

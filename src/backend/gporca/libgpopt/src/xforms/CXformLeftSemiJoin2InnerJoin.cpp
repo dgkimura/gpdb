@@ -69,7 +69,7 @@ CXformLeftSemiJoin2InnerJoin::Exfp(CExpressionHandle &exprhdl) const
 		return ExfpNone;
 	}
 
-	CColRefSet *pcrsInnerOutput =
+	gpos::Ref<CColRefSet> pcrsInnerOutput =
 		exprhdl.DeriveOutputColumns(1 /*child_index*/);
 	gpos::Ref<CExpression> pexprScalar =
 		exprhdl.PexprScalarExactChild(2 /*child_index*/);
@@ -116,8 +116,8 @@ CXformLeftSemiJoin2InnerJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	// construct grouping columns by collecting used columns in the join predicate
 	// that come from join's inner child
-	CColRefSet *pcrsOuterOutput = pexprOuter->DeriveOutputColumns();
-	CColRefSet *pcrsUsed = pexprScalar->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsOuterOutput = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprScalar->DeriveUsedColumns();
 	gpos::Ref<CColRefSet> pcrsGb = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGb->Include(pcrsUsed);
 	pcrsGb->Difference(pcrsOuterOutput);

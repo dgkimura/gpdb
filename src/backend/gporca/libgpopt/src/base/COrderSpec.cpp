@@ -198,7 +198,7 @@ COrderSpec::FSatisfies(const COrderSpec *pos) const
 void
 COrderSpec::AppendEnforcers(CMemoryPool *mp,
 							CExpressionHandle &,  // exprhdl
-							CReqdPropPlan *
+							gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
 								prpp
 #endif	// GPOS_DEBUG
@@ -304,7 +304,7 @@ COrderSpec::PosCopyWithRemappedColumns(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-COrderSpec::PosExcludeColumns(CMemoryPool *mp, CColRefSet *pcrs)
+COrderSpec::PosExcludeColumns(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(nullptr != pcrs);
 
@@ -338,7 +338,7 @@ COrderSpec::PosExcludeColumns(CMemoryPool *mp, CColRefSet *pcrs)
 //
 //---------------------------------------------------------------------------
 void
-COrderSpec::ExtractCols(CColRefSet *pcrs) const
+COrderSpec::ExtractCols(gpos::Ref<CColRefSet> pcrs) const
 {
 	GPOS_ASSERT(nullptr != pcrs);
 
@@ -403,7 +403,7 @@ COrderSpec::GetColRefSet(CMemoryPool *mp, COrderSpecArray *pdrgpos)
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpecArray>
 COrderSpec::PdrgposExclude(CMemoryPool *mp, COrderSpecArray *pdrgpos,
-						   CColRefSet *pcrsToExclude)
+						   gpos::Ref<CColRefSet> pcrsToExclude)
 {
 	GPOS_ASSERT(nullptr != pdrgpos);
 	GPOS_ASSERT(nullptr != pcrsToExclude);

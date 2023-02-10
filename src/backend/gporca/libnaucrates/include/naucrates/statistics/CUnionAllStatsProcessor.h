@@ -22,8 +22,8 @@ class CUnionAllStatsProcessor
 {
 public:
 	static gpos::Ref<CStatistics> CreateStatsForUnionAll(
-		CMemoryPool *mp, const CStatistics *stats_first_child,
-		const CStatistics *stats_second_child,
+		CMemoryPool *mp, const gpos::Ref<CStatistics> stats_first_child,
+		const gpos::Ref<CStatistics> stats_second_child,
 		gpos::Ref<ULongPtrArray> output_colids,
 		gpos::Ref<ULongPtrArray> first_child_colids,
 		gpos::Ref<ULongPtrArray> second_child_colids);

@@ -196,7 +196,8 @@ CPhysicalUnionAll::Matches(gpos::Ref<COperator> pop) const
 gpos::Ref<CColRefSet>
 CPhysicalUnionAll::PcrsRequired(CMemoryPool *mp,
 								CExpressionHandle &,  //exprhdl,
-								CColRefSet *pcrsRequired, ULONG child_index,
+								gpos::Ref<CColRefSet> pcrsRequired,
+								ULONG child_index,
 								CDrvdPropArray *,  // pdrgpdpCtxt
 								ULONG			   // ulOptReq
 )
@@ -286,7 +287,7 @@ CPhysicalUnionAll::FProvidesReqdCols(CExpressionHandle &
 										 exprhdl
 #endif	// GPOS_DEBUG
 									 ,
-									 CColRefSet *pcrsRequired,
+									 gpos::Ref<CColRefSet> pcrsRequired,
 									 ULONG	// ulOptReq
 ) const
 {
@@ -805,7 +806,7 @@ CPhysicalUnionAll::PdrgpulMap(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
 
 gpos::Ref<CColRefSet>
 CPhysicalUnionAll::MapOutputColRefsToInput(CMemoryPool *mp,
-										   CColRefSet *out_col_refs,
+										   gpos::Ref<CColRefSet> out_col_refs,
 										   ULONG child_index)
 {
 	gpos::Ref<CColRefSet> result = GPOS_NEW(mp) CColRefSet(mp);

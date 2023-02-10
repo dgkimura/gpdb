@@ -18,7 +18,7 @@ using namespace gpopt;
 //	compute the statistics of a limit operation
 gpos::Ref<CStatistics>
 CLimitStatsProcessor::CalcLimitStats(CMemoryPool *mp,
-									 const CStatistics *input_stats,
+									 const gpos::Ref<CStatistics> input_stats,
 									 CDouble input_limit_rows)
 {
 	GPOS_ASSERT(nullptr != input_stats);

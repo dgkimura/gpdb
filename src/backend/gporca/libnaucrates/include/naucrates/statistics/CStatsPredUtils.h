@@ -57,7 +57,7 @@ private:
 	// extract statistics filtering information from boolean expression
 	static gpos::Ref<CStatsPred> GetStatsPredFromBoolExpr(
 		CMemoryPool *mp, gpos::Ref<CExpression> predicate_expr,
-		CColRefSet *outer_refs);
+		gpos::Ref<CColRefSet> outer_refs);
 
 	// extract statistics filtering information from a scalar array compare operator
 	static void ProcessArrayCmp(CMemoryPool *mp,
@@ -68,17 +68,17 @@ private:
 	static void AddSupportedStatsFilters(CMemoryPool *mp,
 										 CStatsPredPtrArry *pdrgpstatspred,
 										 gpos::Ref<CExpression> predicate_expr,
-										 CColRefSet *outer_refs);
+										 gpos::Ref<CColRefSet> outer_refs);
 
 	// create a conjunctive statistics filter composed of the extracted components of the conjunction
 	static gpos::Ref<CStatsPred> CreateStatsPredConj(
 		CMemoryPool *mp, gpos::Ref<CExpression> scalar_expr,
-		CColRefSet *outer_refs);
+		gpos::Ref<CColRefSet> outer_refs);
 
 	// create a disjunction statistics filter composed of the extracted components of the disjunction
 	static gpos::Ref<CStatsPred> CreateStatsPredDisj(
 		CMemoryPool *mp, gpos::Ref<CExpression> predicate_expr,
-		CColRefSet *outer_refs);
+		gpos::Ref<CColRefSet> outer_refs);
 
 	// return statistics filter type for the given expression
 	static CStatsPredUtils::EPredicateType GetPredTypeForExpr(
@@ -110,22 +110,22 @@ private:
 	// extract statistics filtering information from a point comparison
 	static gpos::Ref<CStatsPred> GetStatsPredPoint(
 		CMemoryPool *mp, gpos::Ref<CExpression> predicate_expr,
-		CColRefSet *outer_refs);
+		gpos::Ref<CColRefSet> outer_refs);
 
 	// extract statistics filtering information from a LIKE comparison
 	static gpos::Ref<CStatsPred> GetStatsPredLike(
 		CMemoryPool *mp, gpos::Ref<CExpression> predicate_expr,
-		CColRefSet *outer_refs);
+		gpos::Ref<CColRefSet> outer_refs);
 
 	// extract statistics filtering information from a null test
 	static gpos::Ref<CStatsPred> GetStatsPredNullTest(
 		CMemoryPool *mp, gpos::Ref<CExpression> predicate_expr,
-		CColRefSet *outer_refs);
+		gpos::Ref<CColRefSet> outer_refs);
 
 	// create an unsupported statistics predicate
 	static gpos::Ref<CStatsPred> CreateStatsPredUnsupported(
 		CMemoryPool *mp, gpos::Ref<CExpression> predicate_expr,
-		CColRefSet *outer_refs);
+		gpos::Ref<CColRefSet> outer_refs);
 
 	// generate a point predicate for expressions of the form colid CMP constant for which we support stats calculation;
 	// else return an unsupported stats predicate
@@ -140,7 +140,7 @@ private:
 		CMemoryPool *mp, gpos::Ref<CExpression> join_predicate_expr,
 		CColRefSetArray *
 			join_output_col_refset,	 // array of output columns of join's relational inputs
-		CColRefSet *outer_refs, BOOL is_semi_or_anti_join,
+		gpos::Ref<CColRefSet> outer_refs, BOOL is_semi_or_anti_join,
 		CExpressionArray *unsupported_predicates_expr);
 
 	// Is the expression a comparison of scalar idents (or casted scalar idents),
@@ -165,14 +165,14 @@ public:
 	// extract statistics filter from scalar expression
 	static gpos::Ref<CStatsPred> ExtractPredStats(
 		CMemoryPool *mp, gpos::Ref<CExpression> scalar_expr,
-		CColRefSet *outer_refs);
+		gpos::Ref<CColRefSet> outer_refs);
 
 	// helper function to extract array of statistics join filter from an array of join predicates
 	static gpos::Ref<CStatsPredJoinArray> ExtractJoinStatsFromJoinPredArray(
 		CMemoryPool *mp, gpos::Ref<CExpression> scalar_expr,
 		CColRefSetArray *
 			output_col_refset,	// array of output columns of join's relational inputs
-		CColRefSet *outer_refs, BOOL is_semi_or_anti_join,
+		gpos::Ref<CColRefSet> outer_refs, BOOL is_semi_or_anti_join,
 		gpos::Ref<CStatsPred> *unsupported_pred_stats);
 
 	// helper function to extract array of statistics join filter from an expression handle
@@ -184,7 +184,7 @@ public:
 	static gpos::Ref<CStatsPredJoinArray> ExtractJoinStatsFromExpr(
 		CMemoryPool *mp, CExpressionHandle &expr_handle,
 		gpos::Ref<CExpression> scalar_expression,
-		CColRefSetArray *output_col_refset, CColRefSet *outer_refs,
+		CColRefSetArray *output_col_refset, gpos::Ref<CColRefSet> outer_refs,
 		BOOL is_semi_or_anti_join);
 
 	// is the predicate a conjunctive or disjunctive predicate

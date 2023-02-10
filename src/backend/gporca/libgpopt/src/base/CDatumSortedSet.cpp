@@ -26,7 +26,7 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp,
 	gpos::Ref<IDatumArray> aprngdatum(GPOS_NEW(mp) IDatumArray(mp));
 	for (ULONG ul = 0; ul < ulArrayExprArity; ul++)
 	{
-		CScalarConst *popScConst =
+		gpos::Ref<CScalarConst> popScConst =
 			CUtils::PScalarArrayConstChildAt(pexprArray, ul);
 		gpos::Ref<IDatum> datum = popScConst->GetDatum();
 		if (datum->IsNull())

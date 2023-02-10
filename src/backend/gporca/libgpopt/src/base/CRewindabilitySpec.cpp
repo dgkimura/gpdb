@@ -164,7 +164,7 @@ CRewindabilitySpec::HashValue() const
 //---------------------------------------------------------------------------
 void
 CRewindabilitySpec::AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CReqdPropPlan *prpp,
+									gpos::Ref<CReqdPropPlan> prpp,
 									CExpressionArray *pdrgpexpr,
 									gpos::Ref<CExpression> pexpr)
 {

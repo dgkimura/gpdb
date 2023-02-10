@@ -44,7 +44,7 @@ protected:
 	// compute required stats columns for a GbAgg
 	gpos::Ref<CColRefSet> PcrsStatGbAgg(CMemoryPool *mp,
 										CExpressionHandle &exprhdl,
-										CColRefSet *pcrsInput,
+										gpos::Ref<CColRefSet> pcrsInput,
 										ULONG child_index,
 										CColRefArray *pdrgpcrGrp) const;
 
@@ -214,7 +214,7 @@ public:
 
 	// compute required stat columns of the n-th child
 	gpos::Ref<CColRefSet> PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CColRefSet *pcrsInput,
+								   gpos::Ref<CColRefSet> pcrsInput,
 								   ULONG child_index) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -241,14 +241,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalGbAgg *
+	static gpos::Ref<CLogicalGbAgg>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalGbAgg == pop->Eopid() ||
 					EopLogicalGbAggDeduplicate == pop->Eopid());
 
-		return dynamic_cast<CLogicalGbAgg *>(pop);
+		return gpos::dyn_cast<CLogicalGbAgg>(pop);
 	}
 
 	// debug print

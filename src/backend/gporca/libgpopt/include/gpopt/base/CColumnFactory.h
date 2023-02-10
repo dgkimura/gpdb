@@ -106,7 +106,8 @@ public:
 	void AddComputedToUsedColsMap(gpos::Ref<CExpression> pexpr);
 
 	// lookup the set of used column references (if any) based on id of computed column
-	const CColRefSet *PcrsUsedInComputedCol(const CColRef *pcrComputedCol);
+	const gpos::Ref<CColRefSet> PcrsUsedInComputedCol(
+		const CColRef *pcrComputedCol);
 
 	// create a copy of the given colref
 	CColRef *PcrCopy(const CColRef *colref);

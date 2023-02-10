@@ -98,12 +98,12 @@ public:
 
 	// compute required output columns of the n-th child
 	gpos::Ref<CColRefSet>
-	PcrsRequired(CMemoryPool *,		   // mp
-				 CExpressionHandle &,  // exprhdl
-				 CColRefSet *,		   // pcrsRequired
-				 ULONG,				   // child_index
-				 CDrvdPropArray *,	   // pdrgpdpCtxt
-				 ULONG				   // ulOptReq
+	PcrsRequired(CMemoryPool *,			 // mp
+				 CExpressionHandle &,	 // exprhdl
+				 gpos::Ref<CColRefSet>,	 // pcrsRequired
+				 ULONG,					 // child_index
+				 CDrvdPropArray *,		 // pdrgpdpCtxt
+				 ULONG					 // ulOptReq
 				 ) override
 	{
 		GPOS_ASSERT(!"CPhysicalScan has no children");
@@ -168,7 +168,8 @@ public:
 
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -258,11 +259,12 @@ public:
 
 	// statistics derivation during costing
 	virtual gpos::Ref<IStatistics> PstatsDerive(
-		CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan,
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CReqdPropPlan> prpplan,
 		IStatisticsArray *stats_ctxt) const = 0;
 
 	// conversion function
-	static CPhysicalScan *PopConvert(gpos::Ref<COperator> pop);
+	static gpos::Ref<CPhysicalScan> PopConvert(gpos::Ref<COperator> pop);
 
 };	// class CPhysicalScan
 

@@ -133,6 +133,7 @@ public:
 
 	// stats less than
 	virtual BOOL StatsAreLessThan(const gpos::Ref<IDatum> datum) const;
+	virtual BOOL StatsAreLessThan(const IDatum *datum) const;
 
 	// distance function
 	virtual CDouble GetStatsDistanceFrom(const gpos::Ref<IDatum> datum) const;
@@ -142,6 +143,7 @@ public:
 
 	// check if the given pair of datums are stats comparable
 	virtual BOOL StatsAreComparable(const gpos::Ref<IDatum> datum) const;
+	virtual BOOL StatsAreComparable(const IDatum *datum) const;
 
 	virtual gpos::IOstream &OsPrint(gpos::IOstream &os) const = 0;
 };	// class IDatum

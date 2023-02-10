@@ -167,7 +167,7 @@ public:
 		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 	// return columns used by frame edges
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsUsed() const
 	{
 		return m_pcrsUsed.get();
@@ -191,7 +191,7 @@ public:
 	static BOOL
 	IsEmpty(gpos::Ref<CWindowFrame> pwf)
 	{
-		return pwf == &m_wfEmpty;
+		return pwf.get() == &m_wfEmpty;
 	}
 
 	// return pointer to singleton empty window frame

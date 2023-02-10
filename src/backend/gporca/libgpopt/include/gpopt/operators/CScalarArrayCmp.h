@@ -119,13 +119,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarArrayCmp *
+	static gpos::Ref<CScalarArrayCmp>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarArrayCmp == pop->Eopid());
 
-		return dynamic_cast<CScalarArrayCmp *>(pop);
+		return gpos::dyn_cast<CScalarArrayCmp>(pop);
 	}
 
 	// name of the comparison operator

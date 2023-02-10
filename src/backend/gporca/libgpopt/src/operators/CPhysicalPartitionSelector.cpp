@@ -72,7 +72,7 @@ CPhysicalPartitionSelector::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalPartitionSelector *popPartSelector =
+	gpos::Ref<CPhysicalPartitionSelector> popPartSelector =
 		gpos::dyn_cast<CPhysicalPartitionSelector>(pop);
 
 	BOOL fScanIdCmp = popPartSelector->ScanId() == m_scan_id;
@@ -108,7 +108,7 @@ CPhysicalPartitionSelector::HashValue() const
 gpos::Ref<CColRefSet>
 CPhysicalPartitionSelector::PcrsRequired(CMemoryPool *mp,
 										 CExpressionHandle &exprhdl,
-										 CColRefSet *pcrsInput,
+										 gpos::Ref<CColRefSet> pcrsInput,
 										 ULONG child_index,
 										 CDrvdPropArray *,	// pdrgpdpCtxt
 										 ULONG				// ulOptReq
@@ -250,9 +250,9 @@ CPhysicalPartitionSelector::PppsRequired(
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalPartitionSelector::FProvidesReqdCols(CExpressionHandle &exprhdl,
-											  CColRefSet *pcrsRequired,
-											  ULONG	 // ulOptReq
+CPhysicalPartitionSelector::FProvidesReqdCols(
+	CExpressionHandle &exprhdl, gpos::Ref<CColRefSet> pcrsRequired,
+	ULONG  // ulOptReq
 ) const
 {
 	return FUnaryProvidesReqdCols(exprhdl, pcrsRequired);

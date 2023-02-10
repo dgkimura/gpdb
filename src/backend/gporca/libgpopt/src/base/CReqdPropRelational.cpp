@@ -100,7 +100,7 @@ CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	CReqdPropRelational *prprelInput =
 		gpos::dyn_cast<CReqdPropRelational>(prpInput);
-	CLogical *popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
+	gpos::Ref<CLogical> popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 
 	m_pcrsStat =
 		popLogical->PcrsStat(mp, exprhdl, prprelInput->PcrsStat(), child_index);

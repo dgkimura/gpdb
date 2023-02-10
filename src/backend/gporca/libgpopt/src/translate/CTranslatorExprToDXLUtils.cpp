@@ -637,7 +637,7 @@ CTranslatorExprToDXLUtils::FScalarConstTrue(CMDAccessor *md_accessor,
 	GPOS_ASSERT(nullptr != dxlnode);
 	if (EdxlopScalarConstValue == dxlnode->GetOperator()->GetDXLOperator())
 	{
-		CDXLScalarConstValue *pdxlopConst =
+		gpos::Ref<CDXLScalarConstValue> pdxlopConst =
 			gpos::dyn_cast<CDXLScalarConstValue>(dxlnode->GetOperator());
 
 		const IMDType *pmdtype =
@@ -669,7 +669,7 @@ CTranslatorExprToDXLUtils::FScalarConstFalse(CMDAccessor *md_accessor,
 	GPOS_ASSERT(nullptr != dxlnode);
 	if (EdxlopScalarConstValue == dxlnode->GetOperator()->GetDXLOperator())
 	{
-		CDXLScalarConstValue *pdxlopConst =
+		gpos::Ref<CDXLScalarConstValue> pdxlopConst =
 			gpos::dyn_cast<CDXLScalarConstValue>(dxlnode->GetOperator());
 
 		const IMDType *pmdtype =
@@ -1688,7 +1688,8 @@ CTranslatorExprToDXLUtils::FLocalHashAggStreamSafe(
 		return false;
 	}
 
-	CPhysicalAgg *popAgg = gpos::dyn_cast<CPhysicalAgg>(pexprAgg->Pop());
+	gpos::Ref<CPhysicalAgg> popAgg =
+		gpos::dyn_cast<CPhysicalAgg>(pexprAgg->Pop());
 
 	// is a local hash aggregate and it generates duplicates (therefore safe to stream)
 	return (COperator::EgbaggtypeLocal == popAgg->Egbaggtype()) &&

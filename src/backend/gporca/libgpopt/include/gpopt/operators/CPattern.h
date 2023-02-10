@@ -71,13 +71,13 @@ public:
 		BOOL must_exist) override;
 
 	// conversion function
-	static CPattern *
+	static gpos::Ref<CPattern>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(pop->FPattern());
 
-		return dynamic_cast<CPattern *>(pop);
+		return gpos::dyn_cast<CPattern>(pop);
 	}
 
 	// helper to check multi-node pattern

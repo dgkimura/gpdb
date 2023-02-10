@@ -60,7 +60,8 @@ CXformSimplifyGbAgg::CXformSimplifyGbAgg(CMemoryPool *mp)
 CXform::EXformPromise
 CXformSimplifyGbAgg::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 
 	GPOS_ASSERT(COperator::EgbaggtypeGlobal == popAgg->Egbaggtype());
 
@@ -86,7 +87,8 @@ BOOL
 CXformSimplifyGbAgg::FDropGbAgg(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 								gpos::Ref<CXformResult> pxfres)
 {
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 
@@ -161,7 +163,8 @@ CXformSimplifyGbAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 	}
 
 	// extract components
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 

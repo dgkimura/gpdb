@@ -308,16 +308,16 @@ CCostModelGPDB::CostChildren(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 			if (fFilterParent)
 			{
-				CPhysicalPartitionSelector *ps =
-					dynamic_cast<CPhysicalPartitionSelector *>(popChild);
+				gpos::Ref<CPhysicalPartitionSelector> ps =
+					gpos::dyn_cast<CPhysicalPartitionSelector>(popChild);
 
 				if (ps)
 				{
 					gpos::Ref<CCostContext> grandchildContext = nullptr;
 
 					scanOp = exprhdl.PopGrandchild(ul, 0, &grandchildContext);
-					CPhysicalDynamicScan *scan =
-						dynamic_cast<CPhysicalDynamicScan *>(scanOp);
+					gpos::Ref<CPhysicalDynamicScan> scan =
+						gpos::dyn_cast<CPhysicalDynamicScan>(scanOp);
 
 					if (scan && scan->ScanId() == ps->ScanId() &&
 						grandchildContext)
@@ -800,7 +800,8 @@ CCostModelGPDB::CostHashAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// the cardinality out as (rows + num_rows_outer)/2 to increase the local hash agg cost
 	DOUBLE rows = pci->Rows();
-	CPhysicalHashAgg *popAgg = gpos::dyn_cast<CPhysicalHashAgg>(exprhdl.Pop());
+	gpos::Ref<CPhysicalHashAgg> popAgg =
+		gpos::dyn_cast<CPhysicalHashAgg>(exprhdl.Pop());
 	if ((COperator::EgbaggtypeLocal == popAgg->Egbaggtype()) &&
 		popAgg->FGeneratesDuplicates())
 	{
@@ -941,7 +942,7 @@ CCostModelGPDB::CostHashJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// get the number of columns used in join condition
 	gpos::Ref<CExpression> pexprJoinCond = exprhdl.PexprScalarRepChild(2);
-	CColRefSet *pcrsUsed = pexprJoinCond->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprJoinCond->DeriveUsedColumns();
 	const ULONG ulColsUsed = pcrsUsed->Size();
 
 	// TODO 2014-03-14
@@ -1008,7 +1009,8 @@ CCostModelGPDB::CostHashJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				continue;
 			}
 
-			CPhysicalMotion *motion = gpos::dyn_cast<CPhysicalMotion>(popChild);
+			gpos::Ref<CPhysicalMotion> motion =
+				gpos::dyn_cast<CPhysicalMotion>(popChild);
 			gpos::Ref<CColRefSet> columns(motion->Pds()->PcrsUsed(mp));
 
 			// we decide if there is a skew by calculating the NDVs of the HashRedistribute
@@ -1093,7 +1095,7 @@ CCostModelGPDB::CostMergeJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// get the number of columns used in join condition
 	gpos::Ref<CExpression> pexprJoinCond = exprhdl.PexprScalarRepChild(2);
-	CColRefSet *pcrsUsed = pexprJoinCond->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprJoinCond->DeriveUsedColumns();
 	const ULONG ulColsUsed = pcrsUsed->Size();
 
 	// We assume for costing, that the outer tuples are unique. This means that
@@ -1158,7 +1160,7 @@ CCostModelGPDB::CostIndexNLJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// get the number of columns used in join condition
 	gpos::Ref<CExpression> pexprJoinCond = exprhdl.PexprScalarRepChild(2);
-	CColRefSet *pcrsUsed = pexprJoinCond->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprJoinCond->DeriveUsedColumns();
 	const ULONG ulColsUsed = pcrsUsed->Size();
 
 	// cost of Index apply contains three parts:
@@ -1266,7 +1268,7 @@ CCostModelGPDB::CostNLJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	// get the number of columns used in join condition
 	gpos::Ref<CExpression> pexprJoinCond = exprhdl.PexprScalarRepChild(2);
-	CColRefSet *pcrsUsed = pexprJoinCond->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprJoinCond->DeriveUsedColumns();
 	const ULONG ulColsUsed = pcrsUsed->Size();
 
 	// cost of nested loop join contains three parts:
@@ -1391,7 +1393,7 @@ CCostModelGPDB::CostMotion(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				->Get();
 
 		// Adjust the cost of no-op hashed distribution to correctly reflect that no tuple movement is needed
-		CPhysicalMotion *pMotion =
+		gpos::Ref<CPhysicalMotion> pMotion =
 			gpos::dyn_cast<CPhysicalMotion>(exprhdl.Pop());
 		CDistributionSpec *pds = pMotion->Pds();
 		if (CDistributionSpec::EdtHashedNoOp == pds->Edt())
@@ -1646,8 +1648,8 @@ CCostModelGPDB::CostBitmapTableScan(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	CCost result(0.0);
 	gpos::Ref<CExpression> pexprIndexCond =
 		exprhdl.PexprScalarRepChild(1 /*child_index*/);
-	CColRefSet *pcrsUsed = pexprIndexCond->DeriveUsedColumns();
-	CColRefSet *outerRefs = exprhdl.DeriveOuterReferences();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprIndexCond->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> outerRefs = exprhdl.DeriveOuterReferences();
 	gpos::Ref<CColRefSet> pcrsLocalUsed =
 		GPOS_NEW(mp) CColRefSet(mp, *pcrsUsed);
 	IMDIndex::EmdindexType indexType = IMDIndex::EmdindSentinel;

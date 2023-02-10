@@ -185,7 +185,8 @@ public:
 		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// check for outer references in Partition/Order, or window frame edges
-	BOOL FHasLocalReferencesTo(const CColRefSet *outerRefsToCheck) const;
+	BOOL FHasLocalReferencesTo(
+		const gpos::Ref<CColRefSet> outerRefsToCheck) const;
 
 	// conversion function
 	static CLogicalSequenceProject *

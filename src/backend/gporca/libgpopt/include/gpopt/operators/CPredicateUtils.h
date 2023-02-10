@@ -53,13 +53,13 @@ private:
 
 	// check if given expression is a comparison over the given column
 	static BOOL FComparison(gpos::Ref<CExpression> pexpr, CColRef *colref,
-							CColRefSet *pcrsAllowedRefs);
+							gpos::Ref<CColRefSet> pcrsAllowedRefs);
 
 	// check whether the given expression contains references to only the given
 	// columns. If pcrsAllowedRefs is NULL, then check whether the expression has
 	// no column references and no volatile functions
 	static BOOL FValidRefsOnly(gpos::Ref<CExpression> pexprScalar,
-							   CColRefSet *pcrsAllowedRefs);
+							   gpos::Ref<CColRefSet> pcrsAllowedRefs);
 
 	// determine which predicates we should test implication for
 	static BOOL FCheckPredicateImplication(gpos::Ref<CExpression> pexprPred);
@@ -72,18 +72,19 @@ private:
 	static gpos::Ref<CExpression> PexprIndexLookupKeyOnLeft(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprScalar, const IMDIndex *pmdindex,
-		CColRefArray *pdrgpcrIndex, CColRefSet *outer_refs);
+		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
 
 	// helper to create index lookup comparison predicate with index key on right side
 	static gpos::Ref<CExpression> PexprIndexLookupKeyOnRight(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprScalar, const IMDIndex *pmdindex,
-		CColRefArray *pdrgpcrIndex, CColRefSet *outer_refs);
+		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
 
 	// for all columns that appear in the given expression and are members
 	// of the given set, replace these columns with NULL constants
 	static gpos::Ref<CExpression> PexprReplaceColsWithNulls(
-		CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar, CColRefSet *pcrs);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
+		gpos::Ref<CColRefSet> pcrs);
 
 public:
 	// private dtor
@@ -166,7 +167,7 @@ public:
 	// using only constants and one or more outer references from a given ColRefSet,
 	// it optionally returns the colref of the local table
 	static BOOL FIdentCompareOuterRefExprIgnoreCast(
-		gpos::Ref<CExpression> pexpr, CColRefSet *pcrsOuterRefs,
+		gpos::Ref<CExpression> pexpr, gpos::Ref<CColRefSet> pcrsOuterRefs,
 		CColRef **localColRef = nullptr);
 
 	// is the given expression a comparison between scalar ident and a const array
@@ -330,16 +331,14 @@ public:
 
 	// check if the given expression is a disjunction of scalar cmp
 	// expressions on the given column
-	static BOOL IsDisjunctionOfRangeComparison(CMemoryPool *mp,
-											   gpos::Ref<CExpression> pexpr,
-											   CColRef *colref,
-											   CColRefSet *pcrsAllowedRefs,
-											   BOOL allowNotEqualPreds);
+	static BOOL IsDisjunctionOfRangeComparison(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRef *colref,
+		gpos::Ref<CColRefSet> pcrsAllowedRefs, BOOL allowNotEqualPreds);
 
 	// check if the given comparison type is one of the range comparisons, i.e.
 	// LT, GT, LEq, GEq, Eq
 	static BOOL FRangeComparison(gpos::Ref<CExpression> expr, CColRef *colref,
-								 CColRefSet *pcrsAllowedRefs,
+								 gpos::Ref<CColRefSet> pcrsAllowedRefs,
 								 BOOL allowNotEqualPreds);
 
 	// create disjunction
@@ -348,12 +347,12 @@ public:
 
 	static gpos::Ref<CExpression> ValidatePartPruningExpr(
 		CMemoryPool *mp, gpos::Ref<CExpression> expr, CColRef *pcrPartKey,
-		CColRefSet *pcrsAllowedRefs, BOOL allow_not_equals_preds);
+		gpos::Ref<CColRefSet> pcrsAllowedRefs, BOOL allow_not_equals_preds);
 
 	// find a predicate that can be used for partition pruning with the given part key
 	static gpos::Ref<CExpression> PexprPartPruningPredicate(
 		CMemoryPool *mp, const CExpressionArray *pdrgpexpr, CColRef *pcrPartKey,
-		gpos::Ref<CExpression> pexprCol, CColRefSet *pcrsAllowedRefs,
+		gpos::Ref<CExpression> pexprCol, gpos::Ref<CColRefSet> pcrsAllowedRefs,
 		BOOL allowNotEqualPreds);
 
 	// append the conjuncts from the given expression to the given array, removing
@@ -365,8 +364,9 @@ public:
 	// extract interesting conditions involving the partitioning keys
 	static gpos::Ref<CExpression> PexprExtractPredicatesOnPartKeys(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
-		CColRef2dArray *pdrgpdrgpcrPartKeys, CColRefSet *pcrsAllowedRefs,
-		BOOL fUseConstraints, const IMDRelation *pmdrel = nullptr);
+		CColRef2dArray *pdrgpdrgpcrPartKeys,
+		gpos::Ref<CColRefSet> pcrsAllowedRefs, BOOL fUseConstraints,
+		const IMDRelation *pmdrel = nullptr);
 
 	// extract the constraint on the given column and return the corresponding
 	// scalar expression
@@ -403,7 +403,7 @@ public:
 		CExpressionArray *pdrgpexprPredicate, const IMDIndex *pmdindex,
 		CColRefArray *pdrgpcrIndex, CExpressionArray *pdrgpexprIndex,
 		CExpressionArray *pdrgpexprResidual,
-		CColRefSet *pcrsAcceptedOuterRefs =
+		gpos::Ref<CColRefSet> pcrsAcceptedOuterRefs =
 			nullptr,  // outer refs that are acceptable in an index predicate
 		BOOL allowArrayCmpForBTreeIndexes = false);
 
@@ -429,20 +429,20 @@ public:
 	// check if given expression is composed of simple column equalities that use columns from given column set
 	static BOOL FSimpleEqualityUsingCols(CMemoryPool *mp,
 										 gpos::Ref<CExpression> pexprScalar,
-										 CColRefSet *pcrs);
+										 gpos::Ref<CColRefSet> pcrs);
 
 	// check if given expression is a valid index lookup predicate
 	// return (modified) predicate suited for index lookup
 	static gpos::Ref<CExpression> PexprIndexLookup(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexpPred, const IMDIndex *pmdindex,
-		CColRefArray *pdrgpcrIndex, CColRefSet *outer_refs,
+		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs,
 		BOOL allowArrayCmpForBTreeIndexes);
 
 	// split given scalar expression into two conjunctions; without and with outer references
 	static void SeparateOuterRefs(CMemoryPool *mp,
 								  gpos::Ref<CExpression> pexprScalar,
-								  CColRefSet *outer_refs,
+								  gpos::Ref<CColRefSet> outer_refs,
 								  gpos::Ref<CExpression> *ppexprLocal,
 								  gpos::Ref<CExpression> *ppexprOuterRef);
 
@@ -460,7 +460,7 @@ public:
 	// check if scalar expression is null-rejecting and uses columns from given column set
 	static BOOL FNullRejecting(CMemoryPool *mp,
 							   gpos::Ref<CExpression> pexprScalar,
-							   CColRefSet *pcrs);
+							   gpos::Ref<CColRefSet> pcrs);
 
 	// returns true iff the given predicate pexprPred is compatible with the given index pmdindex
 	static BOOL FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
@@ -482,7 +482,7 @@ public:
 	// check if the predicate is a simple scalar cmp or a simple conjuct that can be used directly
 	// for bitmap index looup without breaking it down.
 	static BOOL FBitmapLookupSupportedPredicateOrConjunct(
-		gpos::Ref<CExpression> pexpr, CColRefSet *outer_refs);
+		gpos::Ref<CExpression> pexpr, gpos::Ref<CColRefSet> outer_refs);
 
 	// Check if a given comparison operator is "very strict", meaning that it is strict
 	// (NULL operands result in NULL result) and that it never produces a NULL result on

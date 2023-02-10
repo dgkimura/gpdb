@@ -98,14 +98,14 @@ protected:
 		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 	// helper for common case of stat columns computation
-	static gpos::Ref<CColRefSet> PcrsReqdChildStats(CMemoryPool *mp,
-													CExpressionHandle &exprhdl,
-													CColRefSet *pcrsInput,
-													CColRefSet *pcrsUsed,
-													ULONG child_index);
+	static gpos::Ref<CColRefSet> PcrsReqdChildStats(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CColRefSet> pcrsInput, gpos::Ref<CColRefSet> pcrsUsed,
+		ULONG child_index);
 
 	// helper for common case of passing through required stat columns
-	static gpos::Ref<CColRefSet> PcrsStatsPassThru(CColRefSet *pcrsInput);
+	static gpos::Ref<CColRefSet> PcrsStatsPassThru(
+		gpos::Ref<CColRefSet> pcrsInput);
 
 	// helper for common case of passing through derived stats
 	static gpos::Ref<IStatistics> PstatsPassThruOuter(
@@ -150,7 +150,8 @@ protected:
 
 	// derive constraint property only on the given columns
 	static gpos::Ref<CPropConstraint> PpcDeriveConstraintRestrict(
-		CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsOutput);
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CColRefSet> pcrsOutput);
 
 	// default max card for join and apply operators
 	static CMaxCard MaxcardDef(CExpressionHandle &exprhdl);
@@ -171,7 +172,7 @@ protected:
 	// derive outer references
 	static gpos::Ref<CColRefSet> DeriveOuterReferences(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CColRefSet *pcrsUsedAdditional);
+		gpos::Ref<CColRefSet> pcrsUsedAdditional);
 
 public:
 	// ctor
@@ -189,7 +190,7 @@ public:
 	}
 
 	// return the locally used columns
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsLocalUsed() const
 	{
 		return m_pcrsLocalUsed.get();
@@ -281,7 +282,7 @@ public:
 	// compute required stat columns of the n-th child
 	virtual gpos::Ref<CColRefSet> PcrsStat(CMemoryPool *mp,
 										   CExpressionHandle &exprhdl,
-										   CColRefSet *pcrsInput,
+										   gpos::Ref<CColRefSet> pcrsInput,
 										   ULONG child_index) const = 0;
 
 	// compute partition predicate to pass down to n-th child
@@ -319,16 +320,16 @@ public:
 	static gpos::Ref<IStatistics> PstatsBaseTable(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CTableDescriptor> ptabdesc,
-		CColRefSet *pcrsStatExtra = nullptr);
+		gpos::Ref<CColRefSet> pcrsStatExtra = nullptr);
 
 	// conversion function
-	static CLogical *
+	static gpos::Ref<CLogical>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(pop->FLogical());
 
-		return dynamic_cast<CLogical *>(pop);
+		return gpos::dyn_cast<CLogical>(pop);
 	}
 
 	// returns the table descriptor for (Dynamic)(BitmapTable)Get operators
@@ -339,10 +340,10 @@ public:
 	static CColRefArray *PoutputColsFromTableGet(gpos::Ref<COperator> pop);
 
 	// extract the output columns descriptor from a logical get or dynamic get operator
-	static CColRefArray *PdrgpcrOutputFromLogicalGet(CLogical *pop);
+	static CColRefArray *PdrgpcrOutputFromLogicalGet(gpos::Ref<CLogical> pop);
 
 	// extract the table name from a logical get or dynamic get operator
-	static const CName &NameFromLogicalGet(CLogical *pop);
+	static const CName &NameFromLogicalGet(gpos::Ref<CLogical> pop);
 
 	// return the set of distribution columns
 	static gpos::Ref<CColRefSet> PcrsDist(

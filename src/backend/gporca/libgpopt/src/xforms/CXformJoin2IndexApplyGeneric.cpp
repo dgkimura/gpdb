@@ -30,7 +30,7 @@ BOOL
 CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexprInner,
 	gpos::Ref<CExpression> pexprScalar, gpos::Ref<CTableDescriptor> ptabDesc,
-	const CColRefSet *pcrsDist)
+	const gpos::Ref<CColRefSet> pcrsDist)
 {
 	IMDRelation::Ereldistrpolicy ereldist = ptabDesc->GetRelDistribution();
 
@@ -44,8 +44,8 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 	}
 
 	// now consider hash distributed table
-	CColRefSet *pcrsInnerOutput = pexprInner->DeriveOutputColumns();
-	CColRefSet *pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsInnerOutput = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsScalarExpr = pexprScalar->DeriveUsedColumns();
 	gpos::Ref<CColRefSet> pcrsInnerRefs =
 		GPOS_NEW(mp) CColRefSet(mp, *pcrsScalarExpr);
 	pcrsInnerRefs->Intersection(pcrsInnerOutput);
@@ -63,7 +63,7 @@ CXformJoin2IndexApplyGeneric::FCanLeftOuterIndexApply(
 		for (ULONG ul = 0; ul < pdrgpexpr->Size(); ul++)
 		{
 			gpos::Ref<CExpression> pexprPred = (*pdrgpexpr)[ul].get();
-			CColRefSet *pcrsPred = pexprPred->DeriveUsedColumns();
+			gpos::Ref<CColRefSet> pcrsPred = pexprPred->DeriveUsedColumns();
 
 			// if it doesn't have equi-join predicate on the distribution key,
 			// we can't transform to left outer index apply, because only
@@ -167,7 +167,7 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	// info on the get node (a get node or a dynamic get)
 	gpos::Ref<CTableDescriptor> ptabdescInner = nullptr;
-	const CColRefSet *distributionCols = nullptr;
+	const gpos::Ref<CColRefSet> distributionCols = nullptr;
 	CLogicalDynamicGet *popDynamicGet = nullptr;
 	CAutoRef<CColRefSet> groupingColsToCheck;
 
@@ -225,7 +225,7 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 					if (COperator::EopLogicalGbAgg ==
 						pexprCurrInnerChild->Pop()->Eopid())
 					{
-						CLogicalGbAgg *grbyAggOp =
+						gpos::Ref<CLogicalGbAgg> grbyAggOp =
 							gpos::dyn_cast<CLogicalGbAgg>(
 								pexprCurrInnerChild->Pop());
 

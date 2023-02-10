@@ -140,7 +140,7 @@ public:
 		DOUBLE *m_pdCostChildren;
 
 		// stats of the children
-		gpos::Ref<CCostingStats> *m_pdrgstatsChildren;
+		std::vector<gpos::Ref<CCostingStats>> m_pdrgstatsChildren;
 
 	public:
 		// ctor
@@ -155,7 +155,7 @@ public:
 			  m_pdWidthChildren(nullptr),
 			  m_pdRebindsChildren(nullptr),
 			  m_pdCostChildren(nullptr),
-			  m_pdrgstatsChildren(nullptr)
+			  m_pdrgstatsChildren(ulChildren, nullptr)
 		{
 			GPOS_ASSERT(nullptr != m_pcstats);
 			if (0 < ulChildren)
@@ -164,13 +164,6 @@ public:
 				m_pdWidthChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);
 				m_pdRebindsChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);
 				m_pdCostChildren = GPOS_NEW_ARRAY(mp, DOUBLE, ulChildren);
-				m_pdrgstatsChildren =
-					GPOS_NEW_ARRAY(mp, gpos::Ref<CCostingStats>, ulChildren);
-
-				for (ULONG ul = 0; ul < m_ulChildren; ul++)
-				{
-					m_pdrgstatsChildren[ul] = nullptr;
-				}
 			}
 		}
 
@@ -181,14 +174,6 @@ public:
 			GPOS_DELETE_ARRAY(m_pdWidthChildren);
 			GPOS_DELETE_ARRAY(m_pdRebindsChildren);
 			GPOS_DELETE_ARRAY(m_pdCostChildren);
-
-			for (ULONG ul = 0; ul < m_ulChildren; ul++)
-			{
-				CRefCount::SafeRelease(m_pdrgstatsChildren[ul]);
-			}
-
-			GPOS_DELETE_ARRAY(m_pdrgstatsChildren);
-			;
 		}
 
 		// children accessor
@@ -325,7 +310,7 @@ public:
 		gpos::Ref<CCostingStats>
 		Pcstats() const
 		{
-			return m_pcstats.get();
+			return m_pcstats;
 		}
 
 		// return additional child statistics

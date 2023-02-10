@@ -164,7 +164,7 @@ CConstraintConjunction::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraint>
-CConstraintConjunction::Pcnstr(CMemoryPool *mp, CColRefSet *pcrs)
+CConstraintConjunction::Pcnstr(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs)
 {
 	const ULONG length = m_pdrgpcnstr->Size();
 

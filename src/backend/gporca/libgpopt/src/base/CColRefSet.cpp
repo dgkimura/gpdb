@@ -168,7 +168,7 @@ CColRefSet::Include(const CColRefArray *colref_array)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Include(const CColRefSet *pcrs)
+CColRefSet::Include(const gpos::Ref<CColRefSet> pcrs)
 {
 	CColRefSetIter crsi(*pcrs);
 	while (crsi.Advance())
@@ -202,7 +202,7 @@ CColRefSet::Exclude(const CColRef *colref)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Exclude(const CColRefSet *pcrs)
+CColRefSet::Exclude(const gpos::Ref<CColRefSet> pcrs)
 {
 	CColRefSetIter crsi(*pcrs);
 	while (crsi.Advance())
@@ -433,7 +433,7 @@ CColRefSet::FContained(const CColRefSetArray *pdrgpcrs)
 }
 
 BOOL
-CColRefSet::FIntersects(const CColRefSet *pcrs)
+CColRefSet::FIntersects(const gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(nullptr != pcrs);
 	gpos::Ref<CColRefSet> intersecting_colrefset =
@@ -455,7 +455,7 @@ CColRefSet::FIntersects(const CColRefSet *pcrs)
 //		column ref sets
 //---------------------------------------------------------------------------
 BOOL
-CColRefSet::FCovered(CColRefSetArray *pdrgpcrs, CColRefSet *pcrs)
+CColRefSet::FCovered(CColRefSetArray *pdrgpcrs, gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrs);
 	GPOS_ASSERT(nullptr != pcrs);
@@ -474,7 +474,7 @@ CColRefSet::FCovered(CColRefSetArray *pdrgpcrs, CColRefSet *pcrs)
 		const ULONG length = pdrgpcrs->Size();
 		for (ULONG ul = 0; ul < length && !fFound; ul++)
 		{
-			CColRefSet *pcrs = (*pdrgpcrs)[ul].get();
+			gpos::Ref<CColRefSet> pcrs = (*pdrgpcrs)[ul].get();
 			if (pcrs->FMember(colref))
 			{
 				fFound = true;

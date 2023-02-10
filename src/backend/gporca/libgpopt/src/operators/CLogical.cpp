@@ -262,7 +262,7 @@ CLogical::PcrsDeriveOutputCombineLogical(CMemoryPool *mp,
 	ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
-		CColRefSet *pcrsChild = exprhdl.DeriveOutputColumns(ul);
+		gpos::Ref<CColRefSet> pcrsChild = exprhdl.DeriveOutputColumns(ul);
 		GPOS_ASSERT(pcrs->IsDisjoint(pcrsChild) &&
 					"Input columns are not disjoint");
 
@@ -292,7 +292,7 @@ CLogical::PcrsDeriveNotNullCombineLogical(CMemoryPool *mp,
 	ULONG arity = exprhdl.Arity();
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
-		CColRefSet *pcrsChild = exprhdl.DeriveNotNullColumns(ul);
+		gpos::Ref<CColRefSet> pcrsChild = exprhdl.DeriveNotNullColumns(ul);
 		GPOS_ASSERT(pcrs->IsDisjoint(pcrsChild) &&
 					"Input columns are not disjoint");
 
@@ -437,7 +437,7 @@ CLogical::PpartinfoDeriveCombine(CMemoryPool *mp, CExpressionHandle &exprhdl)
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CLogical::DeriveOuterReferences(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								CColRefSet *pcrsUsedAdditional)
+								gpos::Ref<CColRefSet> pcrsUsedAdditional)
 {
 	ULONG arity = exprhdl.Arity();
 	gpos::Ref<CColRefSet> outer_refs = GPOS_NEW(mp) CColRefSet(mp);
@@ -861,7 +861,7 @@ CLogical::PpcDeriveConstraintPassThru(CExpressionHandle &exprhdl, ULONG ulChild)
 gpos::Ref<CPropConstraint>
 CLogical::PpcDeriveConstraintRestrict(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl,
-									  CColRefSet *pcrsOutput)
+									  gpos::Ref<CColRefSet> pcrsOutput)
 {
 	// constraint property from relational child
 	gpos::Ref<CPropConstraint> ppc = exprhdl.DerivePropertyConstraint(0);
@@ -1097,8 +1097,9 @@ CLogical::Maxcard(CExpressionHandle &exprhdl, ULONG ulScalarIndex,
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CLogical::PcrsReqdChildStats(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput,
-	CColRefSet *pcrsUsed,  // columns used by scalar child(ren)
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CColRefSet> pcrsInput,
+	gpos::Ref<CColRefSet> pcrsUsed,	 // columns used by scalar child(ren)
 	ULONG child_index)
 {
 	GPOS_ASSERT(child_index < exprhdl.Arity() - 1);
@@ -1124,7 +1125,7 @@ CLogical::PcrsReqdChildStats(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CLogical::PcrsStatsPassThru(CColRefSet *pcrsInput)
+CLogical::PcrsStatsPassThru(gpos::Ref<CColRefSet> pcrsInput)
 {
 	GPOS_ASSERT(nullptr != pcrsInput);
 	GPOS_CHECK_ABORT;
@@ -1165,7 +1166,7 @@ gpos::Ref<IStatistics>
 CLogical::PstatsBaseTable(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::Ref<CTableDescriptor> ptabdesc,
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 		pcrsHistExtra  // additional columns required for stats, not required by parent
 )
 {
@@ -1178,7 +1179,7 @@ CLogical::PstatsBaseTable(
 		pcrsHist->Include(pcrsHistExtra);
 	}
 
-	CColRefSet *pcrsOutput = exprhdl.DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOutput = exprhdl.DeriveOutputColumns();
 	gpos::Ref<CColRefSet> pcrsWidth = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsWidth->Include(pcrsOutput);
 	pcrsWidth->Exclude(pcrsHist.get());
@@ -1217,7 +1218,7 @@ CLogical::PstatsDeriveDummy(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	CReqdPropRelational *prprel =
 		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
-	CColRefSet *pcrs = prprel->PcrsStat();
+	gpos::Ref<CColRefSet> pcrs = prprel->PcrsStat();
 	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	pcrs->ExtractColIds(mp, colids.get());
 
@@ -1321,7 +1322,7 @@ CLogical::PtabdescFromTableGet(gpos::Ref<COperator> pop)
 //
 //---------------------------------------------------------------------------
 CColRefArray *
-CLogical::PdrgpcrOutputFromLogicalGet(CLogical *pop)
+CLogical::PdrgpcrOutputFromLogicalGet(gpos::Ref<CLogical> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(COperator::EopLogicalGet == pop->Eopid() ||
@@ -1344,7 +1345,7 @@ CLogical::PdrgpcrOutputFromLogicalGet(CLogical *pop)
 //
 //---------------------------------------------------------------------------
 const CName &
-CLogical::NameFromLogicalGet(CLogical *pop)
+CLogical::NameFromLogicalGet(gpos::Ref<CLogical> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(COperator::EopLogicalGet == pop->Eopid() ||

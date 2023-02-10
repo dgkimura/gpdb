@@ -98,7 +98,7 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp,
 	if (COperator::EopScalarProjectList == pexprScalar->Pop()->Eopid())
 	{
 		CLogicalSequenceProject *popSeqPrj = nullptr;
-		CLogicalGbAgg *popGbAgg = nullptr;
+		gpos::Ref<CLogicalGbAgg> popGbAgg = nullptr;
 		COperator::EOperatorId op_id = pexpr->Pop()->Eopid();
 
 		switch (op_id)

@@ -76,7 +76,7 @@ public:
 	// compute required distribution of the n-th child
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
-									 CReqdPropPlan *prppInput,
+									 gpos::Ref<CReqdPropPlan> prppInput,
 									 ULONG child_index,
 									 CDrvdPropArray *pdrgpdpCtxt,
 									 ULONG ulOptReq) override;

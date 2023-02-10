@@ -466,7 +466,7 @@ gpos::Ref<CDistributionSpec>
 CPhysicalHashJoin::PdsRequiredReplicate(
 	CMemoryPool *mp, CExpressionHandle &exprhdl, CDistributionSpec *pdsInput,
 	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq,
-	CReqdPropPlan *prppInput)
+	gpos::Ref<CReqdPropPlan> prppInput)
 {
 	EChildExecOrder eceo = Eceo();
 	if (EceoLeftToRight == eceo)
@@ -548,7 +548,7 @@ CPhysicalHashJoin::PdshashedPassThru(CMemoryPool *mp,
 	}
 
 	// since incoming request is hashed, we attempt here to propagate this request to outer child
-	CColRefSet *pcrsOuterOutput =
+	gpos::Ref<CColRefSet> pcrsOuterOutput =
 		exprhdl.DeriveOutputColumns(0 /*child_index*/);
 	CExpressionArray *pdrgpexprIncomingRequest = pdshashedInput->Pdrgpexpr();
 	gpos::Ref<CColRefSet> pcrsAllUsed =
@@ -575,7 +575,7 @@ CPhysicalHashJoin::PdshashedPassThru(CMemoryPool *mp,
 		for (ULONG ul = 0; ul < size; ul++)
 		{
 			gpos::Ref<CExpression> pexpr = (*pdrgpexprIncomingRequest)[ul];
-			CColRefSet *pcrsUsed = pexpr->DeriveUsedColumns();
+			gpos::Ref<CColRefSet> pcrsUsed = pexpr->DeriveUsedColumns();
 			if (pcrsOuterOutput->ContainsAll(pcrsUsed))
 			{
 				// hashed expression uses columns from outer child only, add it to request
@@ -702,7 +702,7 @@ CPhysicalHashJoin::PdsRequired(
 
 gpos::Ref<CEnfdDistribution>
 CPhysicalHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					   CReqdPropPlan *prppInput, ULONG child_index,
+					   gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
 					   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
@@ -833,7 +833,8 @@ CPhysicalHashJoin::EpetOrder(CExpressionHandle &,  // exprhdl
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalHashJoin::FNullableHashKeys(CColRefSet *pcrsNotNull, BOOL fInner) const
+CPhysicalHashJoin::FNullableHashKeys(gpos::Ref<CColRefSet> pcrsNotNull,
+									 BOOL fInner) const
 {
 	ULONG ulHashKeys = 0;
 	if (fInner)
@@ -865,7 +866,8 @@ CPhysicalHashJoin::FNullableHashKeys(CColRefSet *pcrsNotNull, BOOL fInner) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalHashJoin::FNullableHashKey(ULONG ulKey, CColRefSet *pcrsNotNull,
+CPhysicalHashJoin::FNullableHashKey(ULONG ulKey,
+									gpos::Ref<CColRefSet> pcrsNotNull,
 									BOOL fInner) const
 {
 	gpos::Ref<COperator> pop = nullptr;

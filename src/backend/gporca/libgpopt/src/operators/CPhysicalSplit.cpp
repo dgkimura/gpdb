@@ -149,7 +149,7 @@ CPhysicalSplit::EpetOrder(CExpressionHandle &,	// exprhdl
 gpos::Ref<CColRefSet>
 CPhysicalSplit::PcrsRequired(CMemoryPool *mp,
 							 CExpressionHandle &,  // exprhdl,
-							 CColRefSet *pcrsRequired,
+							 gpos::Ref<CColRefSet> pcrsRequired,
 							 ULONG
 #ifdef GPOS_DEBUG
 								 child_index
@@ -250,7 +250,7 @@ CPhysicalSplit::PcteRequired(CMemoryPool *,		   //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalSplit::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								  CColRefSet *pcrsRequired,
+								  gpos::Ref<CColRefSet> pcrsRequired,
 								  ULONG	 // ulOptReq
 ) const
 {

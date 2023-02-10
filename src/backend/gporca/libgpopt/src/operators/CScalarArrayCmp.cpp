@@ -115,7 +115,8 @@ CScalarArrayCmp::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarArrayCmp *popCmp = gpos::dyn_cast<CScalarArrayCmp>(pop);
+		gpos::Ref<CScalarArrayCmp> popCmp =
+			gpos::dyn_cast<CScalarArrayCmp>(pop);
 
 		// match if operator oid are identical
 		return m_earrccmpt == popCmp->Earrcmpt() &&
@@ -202,7 +203,7 @@ CScalarArrayCmp::PexprExpand(CMemoryPool *mp,
 	gpos::Ref<CExpression> pexprIdent = (*pexprArrayCmp)[0];
 	gpos::Ref<CExpression> pexprArray =
 		CUtils::PexprScalarArrayChild(pexprArrayCmp);
-	CScalarArrayCmp *popArrayCmp =
+	gpos::Ref<CScalarArrayCmp> popArrayCmp =
 		gpos::dyn_cast<CScalarArrayCmp>(pexprArrayCmp->Pop());
 	ULONG ulArrayElems = 0;
 

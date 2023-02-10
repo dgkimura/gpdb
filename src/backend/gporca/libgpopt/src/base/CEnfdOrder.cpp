@@ -106,7 +106,7 @@ CEnfdOrder::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdOrder::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+CEnfdOrder::Epet(CExpressionHandle &exprhdl, gpos::Ref<CPhysical> popPhysical,
 				 BOOL fOrderReqd) const
 {
 	if (fOrderReqd)

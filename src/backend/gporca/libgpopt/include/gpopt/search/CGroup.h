@@ -520,13 +520,12 @@ public:
 
 	// lookup a given context in contexts hash table
 	gpos::Ref<COptimizationContext> PocLookup(CMemoryPool *mp,
-											  CReqdPropPlan *prpp,
+											  gpos::Ref<CReqdPropPlan> prpp,
 											  ULONG ulSearchStageIndex);
 
 	// lookup the best context across all stages for the given required properties
-	gpos::Ref<COptimizationContext> PocLookupBest(CMemoryPool *mp,
-												  ULONG ulSearchStages,
-												  CReqdPropPlan *prpp);
+	gpos::Ref<COptimizationContext> PocLookupBest(
+		CMemoryPool *mp, ULONG ulSearchStages, gpos::Ref<CReqdPropPlan> prpp);
 
 	// find a context by id
 	gpos::Ref<COptimizationContext> Ppoc(ULONG id) const;
@@ -598,7 +597,7 @@ public:
 										 gpos::Ref<CGroupExpression> pgexpr);
 
 	// compute cost lower bound for the plan satisfying given required properties
-	CCost CostLowerBound(CMemoryPool *mp, CReqdPropPlan *prppInput);
+	CCost CostLowerBound(CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput);
 
 	// matching of pairs of arrays of groups
 	static BOOL FMatchGroups(CGroupArray *pdrgpgroupFst,

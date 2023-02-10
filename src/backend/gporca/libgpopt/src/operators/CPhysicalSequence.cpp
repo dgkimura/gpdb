@@ -90,7 +90,8 @@ CPhysicalSequence::Matches(gpos::Ref<COperator> pop) const
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CPhysicalSequence::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								CColRefSet *pcrsRequired, ULONG child_index,
+								gpos::Ref<CColRefSet> pcrsRequired,
+								ULONG child_index,
 								CDrvdPropArray *,  // pdrgpdpCtxt
 								ULONG			   // ulOptReq
 )
@@ -151,7 +152,7 @@ CPhysicalSequence::PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalSequence::FProvidesReqdCols(CExpressionHandle &exprhdl,
-									 CColRefSet *pcrsRequired,
+									 gpos::Ref<CColRefSet> pcrsRequired,
 									 ULONG	// ulOptReq
 ) const
 {
@@ -161,7 +162,7 @@ CPhysicalSequence::FProvidesReqdCols(CExpressionHandle &exprhdl,
 	ULONG arity = exprhdl.Arity();
 	GPOS_ASSERT(0 < arity);
 
-	CColRefSet *pcrsChild = exprhdl.DeriveOutputColumns(arity - 1);
+	gpos::Ref<CColRefSet> pcrsChild = exprhdl.DeriveOutputColumns(arity - 1);
 
 	return pcrsChild->ContainsAll(pcrsRequired);
 }

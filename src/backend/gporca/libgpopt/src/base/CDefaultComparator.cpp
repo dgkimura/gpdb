@@ -77,7 +77,7 @@ CDefaultComparator::FEvalComparison(CMemoryPool *mp,
 
 	gpos::Ref<CExpression> pexprResult = m_pceeval->PexprEval(pexprComp.get());
 	;
-	CScalarConst *popScalarConst =
+	gpos::Ref<CScalarConst> popScalarConst =
 		gpos::dyn_cast<CScalarConst>(pexprResult->Pop());
 	gpos::Ref<IDatum> datum = popScalarConst->GetDatum();
 

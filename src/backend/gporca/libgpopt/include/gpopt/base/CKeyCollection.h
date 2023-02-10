@@ -52,7 +52,7 @@ public:
 	void Add(gpos::Ref<CColRefSet> pcrs);
 
 	// check if set forms a key
-	BOOL FKey(const CColRefSet *pcrs, BOOL fExactMatch = true) const;
+	BOOL FKey(const gpos::Ref<CColRefSet> pcrs, BOOL fExactMatch = true) const;
 
 	// check if an array of columns constitutes a key
 	BOOL FKey(CMemoryPool *mp, const CColRefArray *colref_array) const;

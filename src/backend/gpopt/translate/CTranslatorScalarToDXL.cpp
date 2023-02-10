@@ -2309,7 +2309,7 @@ CTranslatorScalarToDXL::TranslateGenericDatumToDXL(CMemoryPool *mp,
 												   BOOL is_null, ULONG len,
 												   Datum datum)
 {
-	CMDIdGPDB *mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
+	gpos::Ref<CMDIdGPDB> mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(*mdid_old);
 
 	BYTE *bytes = ExtractByteArrayFromDatum(mp, md_type, is_null, len, datum);
@@ -2354,7 +2354,7 @@ CTranslatorScalarToDXL::TranslateBoolDatumToDXL(CMemoryPool *mp,
 												Datum datum)
 {
 	GPOS_ASSERT(md_type->IsPassedByValue());
-	CMDIdGPDB *mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
+	gpos::Ref<CMDIdGPDB> mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(*mdid_old);
 
 	return GPOS_NEW(mp)
@@ -2377,7 +2377,7 @@ CTranslatorScalarToDXL::TranslateOidDatumToDXL(CMemoryPool *mp,
 											   Datum datum)
 {
 	GPOS_ASSERT(md_type->IsPassedByValue());
-	CMDIdGPDB *mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
+	gpos::Ref<CMDIdGPDB> mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(*mdid_old);
 
 	return GPOS_NEW(mp)
@@ -2400,7 +2400,7 @@ CTranslatorScalarToDXL::TranslateInt2DatumToDXL(CMemoryPool *mp,
 												Datum datum)
 {
 	GPOS_ASSERT(md_type->IsPassedByValue());
-	CMDIdGPDB *mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
+	gpos::Ref<CMDIdGPDB> mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(*mdid_old);
 
 	return GPOS_NEW(mp) CDXLDatumInt2(mp, std::move(mdid), is_null,
@@ -2423,7 +2423,7 @@ CTranslatorScalarToDXL::TranslateInt4DatumToDXL(CMemoryPool *mp,
 												Datum datum)
 {
 	GPOS_ASSERT(md_type->IsPassedByValue());
-	CMDIdGPDB *mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
+	gpos::Ref<CMDIdGPDB> mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(*mdid_old);
 
 	return GPOS_NEW(mp) CDXLDatumInt4(mp, std::move(mdid), is_null,
@@ -2446,7 +2446,7 @@ CTranslatorScalarToDXL::TranslateInt8DatumToDXL(CMemoryPool *mp,
 												Datum datum)
 {
 	GPOS_ASSERT(md_type->IsPassedByValue());
-	CMDIdGPDB *mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
+	gpos::Ref<CMDIdGPDB> mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(*mdid_old);
 
 	return GPOS_NEW(mp) CDXLDatumInt8(mp, std::move(mdid), is_null,

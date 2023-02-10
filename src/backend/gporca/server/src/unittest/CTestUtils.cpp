@@ -482,7 +482,7 @@ CTestUtils::PexprLogicalSelect(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 	GPOS_ASSERT(nullptr != pexpr);
 
 	// get any two columns
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
 	CColRef *pcrLeft = pcrs->PcrAny();
 	CColRef *pcrRight = pcrs->PcrAny();
 	gpos::Ref<CExpression> pexprPredicate =
@@ -536,7 +536,7 @@ CTestUtils::PexprLogicalSelectWithContradiction(CMemoryPool *mp)
 {
 	gpos::Ref<CExpression> pexpr = PexprLogicalSelect(mp, PexprLogicalGet(mp));
 	// get any column
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	gpos::Ref<CExpression> pexprConstFirst =
@@ -605,7 +605,7 @@ CTestUtils::PexprLogicalAssert(CMemoryPool *mp)
 	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp);
 
 	// get any two columns
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *pcrLeft = pcrs->PcrAny();
 	CColRef *pcrRight = pcrs->PcrAny();
 	gpos::Ref<CExpression> pexprPredicate =
@@ -743,10 +743,10 @@ CTestUtils::PexprScIdentCmpScIdent(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != pexprRight);
 	GPOS_ASSERT(cmp_type <= IMDType::EcmptOther);
 
-	CColRefSet *pcrsLeft = pexprLeft->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsLeft = pexprLeft->DeriveOutputColumns();
 	CColRef *pcrLeft = pcrsLeft->PcrAny();
 
-	CColRefSet *pcrsRight = pexprRight->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsRight = pexprRight->DeriveOutputColumns();
 	CColRef *pcrRight = pcrsRight->PcrAny();
 
 	gpos::Ref<CExpression> pexprPred =
@@ -770,7 +770,7 @@ CTestUtils::PexprScIdentCmpConst(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
 	CColRef *pcrLeft = pcrs->PcrAny();
 	gpos::Ref<CExpression> pexprUl = CUtils::PexprScalarConstInt4(mp, ulVal);
 
@@ -869,7 +869,7 @@ CTestUtils::PexprLogicalSelectArrayCmp(CMemoryPool *mp,
 	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp);
 
 	// get the first column
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	// construct an array of integers
@@ -979,7 +979,7 @@ CTestUtils::PexprLogicalSubqueryWithConstTableGet(CMemoryPool *mp,
 		PexprConstTableGet(mp, 3 /* ulElements */);
 
 	// get random columns from inner expression
-	CColRefSet *pcrs = pexprConstTableGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprConstTableGet->DeriveOutputColumns();
 	const CColRef *pcrInner = pcrs->PcrAny();
 
 	// get random columns from outer expression
@@ -1054,7 +1054,7 @@ gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectCorrelated(CMemoryPool *mp)
 {
 	gpos::Ref<CExpression> pexprOuter = PexprLogicalGet(mp);
-	CColRefSet *outer_refs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_refs = pexprOuter->DeriveOutputColumns();
 
 	gpos::Ref<CExpression> pexpr =
 		PexprLogicalSelectCorrelated(mp, outer_refs, 8);
@@ -1107,7 +1107,8 @@ CTestUtils::PexprLogicalSelectOnOuterJoin(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CTestUtils::PexprLogicalSelectCorrelated(CMemoryPool *mp,
-										 CColRefSet *outer_refs, ULONG ulLevel)
+										 gpos::Ref<CColRefSet> outer_refs,
+										 ULONG ulLevel)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -1119,7 +1120,7 @@ CTestUtils::PexprLogicalSelectCorrelated(CMemoryPool *mp,
 	gpos::Ref<CExpression> pexpr =
 		PexprLogicalSelectCorrelated(mp, outer_refs, ulLevel - 1);
 
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
 	GPOS_ASSERT(outer_refs->IsDisjoint(pcrs));
 
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
@@ -1213,7 +1214,7 @@ CTestUtils::PexprLogicalProject(CMemoryPool *mp)
 	gpos::Ref<CExpression> pexpr = PexprLogicalGet(mp);
 
 	// get output columns
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 	CColRef *colref = pcrs->PcrAny();
@@ -1265,8 +1266,8 @@ CTestUtils::PexprLogicalJoinCorrelated(CMemoryPool *mp)
 	pdrgpexpr->Append(pexprLeft);
 	pdrgpexpr->Append(pexprRight);
 
-	CColRefSet *pcrsLeft = pexprLeft->DeriveOutputColumns();
-	CColRefSet *pcrsRight = pexprRight->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsLeft = pexprLeft->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsRight = pexprRight->DeriveOutputColumns();
 
 	EqualityPredicate(mp, pcrsLeft, pcrsRight, pdrgpexpr.get());
 
@@ -1293,8 +1294,8 @@ CTestUtils::PexprLogicalJoinWithPartitionedAndIndexedInnerChild(CMemoryPool *mp)
 	pdrgpexpr->Append(pexprLeft);
 	pdrgpexpr->Append(pexprRight);
 
-	CColRefSet *pcrsLeft = pexprLeft->DeriveOutputColumns();
-	CColRefSet *pcrsRight = pexprRight->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsLeft = pexprLeft->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsRight = pexprRight->DeriveOutputColumns();
 
 	EqualityPredicate(mp, pcrsLeft, pcrsRight, pdrgpexpr.get());
 
@@ -1575,7 +1576,7 @@ CTestUtils::PexprLogicalGbAggWithInput(CMemoryPool *mp,
 									   gpos::Ref<CExpression> pexprInput)
 {
 	// get the first few columns
-	CColRefSet *pcrs = pexprInput->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprInput->DeriveOutputColumns();
 
 	ULONG num_cols = std::min(3u, pcrs->Size());
 
@@ -1632,7 +1633,7 @@ CTestUtils::PexprPrjElemWithSum(CMemoryPool *mp, CColRef *colref)
 	);
 
 	// map a computed column to SUM expression
-	CScalar *pop = gpos::dyn_cast<CScalar>(pexprScalarAgg->Pop());
+	gpos::Ref<CScalar> pop = gpos::dyn_cast<CScalar>(pexprScalarAgg->Pop());
 	gpos::Ref<IMDId> mdid_type = pop->MdidType();
 	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
 	CWStringConst str(GPOS_WSZ_LIT("sum_col"));
@@ -1685,7 +1686,7 @@ CTestUtils::PexprLogicalGbAggDedupOverInnerJoin(CMemoryPool *mp)
 
 	// get join's outer child
 	gpos::Ref<CExpression> pexprOuter = (*pexprJoin)[0];
-	CColRefSet *pcrs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprOuter->DeriveOutputColumns();
 
 	// grouping columns: all columns from outer child
 	gpos::Ref<CColRefArray> pdrgpcrGrp = pcrs->Pdrgpcr(mp);
@@ -1805,7 +1806,7 @@ CTestUtils::PexprLogicalInsert(CMemoryPool *mp)
 	gpos::Ref<CExpression> pexprCTG =
 		PexprConstTableGet(mp, 1 /* ulElements */);
 
-	CColRefSet *pcrs = pexprCTG->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprCTG->DeriveOutputColumns();
 	gpos::Ref<CColRefArray> colref_array = pcrs->Pdrgpcr(mp);
 
 	CWStringConst strName(GPOS_WSZ_LIT("BaseTable"));
@@ -1841,7 +1842,7 @@ CTestUtils::PexprLogicalDelete(CMemoryPool *mp)
 
 	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp, ptabdesc, &strAlias);
 
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	gpos::Ref<CColRefArray> colref_array = pcrs->Pdrgpcr(mp);
 
 	CColRef *colref = pcrs->PcrFirst();
@@ -1875,7 +1876,7 @@ CTestUtils::PexprLogicalUpdate(CMemoryPool *mp)
 
 	gpos::Ref<CExpression> pexprGet = PexprLogicalGet(mp, ptabdesc, &strAlias);
 
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	gpos::Ref<CColRefArray> pdrgpcrDelete = pcrs->Pdrgpcr(mp);
 	gpos::Ref<CColRefArray> pdrgpcrInsert = pcrs->Pdrgpcr(mp);
 
@@ -2687,7 +2688,7 @@ CTestUtils::PexprScalarNestedPreds(CMemoryPool *mp,
 				CScalarBoolOp::EboolopOr == eboolop ||
 				CScalarBoolOp::EboolopNot == eboolop);
 
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
 	CColRef *pcrLeft = pcrs->PcrAny();
 	gpos::Ref<CExpression> pexprConstActual =
 		CUtils::PexprScalarConstInt4(mp, 3 /*val*/);
@@ -2770,8 +2771,8 @@ CTestUtils::PexprFindFirstExpressionWithOpId(gpos::Ref<CExpression> pexpr,
 //
 //---------------------------------------------------------------------------
 void
-CTestUtils::EqualityPredicate(CMemoryPool *mp, CColRefSet *pcrsLeft,
-							  CColRefSet *pcrsRight,
+CTestUtils::EqualityPredicate(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrsLeft,
+							  gpos::Ref<CColRefSet> pcrsRight,
 							  CExpressionArray *pdrgpexpr)
 {
 	CColRef *pcrLeft = pcrsLeft->PcrAny();
@@ -4080,7 +4081,7 @@ CTestUtils::PexprScalarCmpIdentToConstant(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexpr);
 
-	CColRefSet *pcrs = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveOutputColumns();
 	CColRef *pcrAny = pcrs->PcrAny();
 	gpos::Ref<CExpression> pexprConst =
 		CUtils::PexprScalarConstInt4(mp, 10 /* val */);
@@ -4127,12 +4128,12 @@ CTestUtils::PexpSubqueryAll(CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter)
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexprOuter);
 
-	CColRefSet *outer_refs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_refs = pexprOuter->DeriveOutputColumns();
 	const CColRef *pcrOuter = outer_refs->PcrAny();
 
 
 	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrsInner = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsInner = pexprInner->DeriveOutputColumns();
 	const CColRef *pcrInner = pcrsInner->PcrAny();
 
 	return GPOS_NEW(mp) CExpression(
@@ -4158,12 +4159,12 @@ CTestUtils::PexpSubqueryAny(CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter)
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexprOuter);
 
-	CColRefSet *outer_refs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_refs = pexprOuter->DeriveOutputColumns();
 	const CColRef *pcrOuter = outer_refs->PcrAny();
 
 
 	gpos::Ref<CExpression> pexprInner = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrsInner = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsInner = pexprInner->DeriveOutputColumns();
 	const CColRef *pcrInner = pcrsInner->PcrAny();
 
 	return GPOS_NEW(mp) CExpression(
@@ -4339,7 +4340,8 @@ CTestUtils::EresUnittest_RunTestsWithoutAdditionalTraceFlags(
 
 // Create Equivalence Class based on the breakpoints
 gpos::Ref<CColRefSetArray>
-CTestUtils::createEquivalenceClasses(CMemoryPool *mp, CColRefSet *pcrs,
+CTestUtils::createEquivalenceClasses(CMemoryPool *mp,
+									 gpos::Ref<CColRefSet> pcrs,
 									 const INT setBoundary[])
 {
 	INT i = 0;

@@ -80,7 +80,7 @@ public:
 	}
 
 	// plan properties accessor
-	CReqdPropPlan *
+	gpos::Ref<CReqdPropPlan>
 	Prpp() const
 	{
 		return m_prpp.get();
@@ -105,10 +105,12 @@ public:
 
 	// hash function used for cost bounding
 	static ULONG HashValue(const gpos::Ref<CPartialPlan> ppp);
+	static ULONG HashValue(const CPartialPlan *ppp);
 
 	// equality function used for for cost bounding
 	static BOOL Equals(const gpos::Ref<CPartialPlan> pppFst,
 					   const gpos::Ref<CPartialPlan> pppSnd);
+	static BOOL Equals(const CPartialPlan *pppFst, const CPartialPlan *pppSnd);
 
 };	// class CPartialPlan
 }  // namespace gpopt

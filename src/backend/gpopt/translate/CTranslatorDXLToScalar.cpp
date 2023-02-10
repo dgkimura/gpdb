@@ -1729,7 +1729,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarConstToScalar(
 )
 {
 	GPOS_ASSERT(nullptr != const_node);
-	CDXLScalarConstValue *dxlop =
+	gpos::Ref<CDXLScalarConstValue> dxlop =
 		gpos::dyn_cast<CDXLScalarConstValue>(const_node->GetOperator());
 	gpos::Ref<CDXLDatum> datum_dxl =
 		const_cast<gpos::Ref<CDXLDatum> >(dxlop->GetDatumVal());
@@ -2348,7 +2348,7 @@ CTranslatorDXLToScalar::HasConstTrue(gpos::Ref<CDXLNode> dxlnode,
 		return false;
 	}
 
-	CDXLScalarConstValue *dxlop =
+	gpos::Ref<CDXLScalarConstValue> dxlop =
 		gpos::dyn_cast<CDXLScalarConstValue>(dxlnode->GetOperator());
 	CDXLDatumBool *datum_bool_dxl = gpos::dyn_cast<CDXLDatumBool>(
 		const_cast<gpos::Ref<CDXLDatum> >(dxlop->GetDatumVal()));
@@ -2373,7 +2373,7 @@ CTranslatorDXLToScalar::HasConstNull(gpos::Ref<CDXLNode> dxlnode)
 		return false;
 	}
 
-	CDXLScalarConstValue *dxlop =
+	gpos::Ref<CDXLScalarConstValue> dxlop =
 		gpos::dyn_cast<CDXLScalarConstValue>(dxlnode->GetOperator());
 
 	return dxlop->GetDatumVal()->IsNull();

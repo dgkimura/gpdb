@@ -23,7 +23,7 @@ class CProjectStatsProcessor
 public:
 	// project
 	static gpos::Ref<CStatistics> CalcProjStats(
-		CMemoryPool *mp, const CStatistics *input_stats,
+		CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
 		ULongPtrArray *projection_colids, UlongToIDatumMap *datum_map);
 };
 }  // namespace gpnaucrates

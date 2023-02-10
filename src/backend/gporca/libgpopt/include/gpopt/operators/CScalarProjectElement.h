@@ -98,13 +98,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarProjectElement *
+	static gpos::Ref<CScalarProjectElement>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarProjectElement == pop->Eopid());
 
-		return dynamic_cast<CScalarProjectElement *>(pop);
+		return gpos::dyn_cast<CScalarProjectElement>(pop);
 	}
 
 	gpos::Ref<IMDId>

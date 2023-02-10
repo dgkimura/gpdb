@@ -184,7 +184,7 @@ CWindowFrame::PwfCopyWithRemappedColumns(CMemoryPool *mp,
 	if (this == &m_wfEmpty)
 	{
 		;
-		return this;
+		return gpos::Ref<CWindowFrame> me(this);
 	}
 
 	gpos::Ref<CExpression> pexprLeading = nullptr;

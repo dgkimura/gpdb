@@ -79,7 +79,8 @@ public:
 	}
 
 	// get order enforcing type for the given operator
-	EPropEnforcingType Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+	EPropEnforcingType Epet(CExpressionHandle &exprhdl,
+							gpos::Ref<CPhysical> popPhysical,
 							BOOL fOrderReqd) const;
 
 	// property spec accessor

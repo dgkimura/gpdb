@@ -78,7 +78,8 @@ CLogicalApply::~CLogicalApply()
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CLogicalApply::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						CColRefSet *pcrsInput, ULONG child_index) const
+						gpos::Ref<CColRefSet> pcrsInput,
+						ULONG child_index) const
 {
 	GPOS_ASSERT(3 == exprhdl.Arity());
 

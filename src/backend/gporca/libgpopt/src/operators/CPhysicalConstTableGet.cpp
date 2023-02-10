@@ -94,12 +94,12 @@ CPhysicalConstTableGet::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CPhysicalConstTableGet::PcrsRequired(CMemoryPool *,		   // mp,
-									 CExpressionHandle &,  // exprhdl,
-									 CColRefSet *,		   // pcrsRequired,
-									 ULONG,				   // child_index,
-									 CDrvdPropArray *,	   // pdrgpdpCtxt
-									 ULONG				   // ulOptReq
+CPhysicalConstTableGet::PcrsRequired(CMemoryPool *,			 // mp,
+									 CExpressionHandle &,	 // exprhdl,
+									 gpos::Ref<CColRefSet>,	 // pcrsRequired,
+									 ULONG,					 // child_index,
+									 CDrvdPropArray *,		 // pdrgpdpCtxt
+									 ULONG					 // ulOptReq
 )
 {
 	GPOS_ASSERT(!"CPhysicalConstTableGet has no children");
@@ -202,7 +202,7 @@ CPhysicalConstTableGet::PcteRequired(CMemoryPool *,		   //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalConstTableGet::FProvidesReqdCols(CExpressionHandle &,	// exprhdl,
-										  CColRefSet *pcrsRequired,
+										  gpos::Ref<CColRefSet> pcrsRequired,
 										  ULONG	 // ulOptReq
 ) const
 {

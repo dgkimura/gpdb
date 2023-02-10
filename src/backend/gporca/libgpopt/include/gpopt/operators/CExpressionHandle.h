@@ -188,7 +188,7 @@ public:
 	CReqdPropRelational *GetReqdRelationalProps(ULONG child_index) const;
 
 	// required plan props of n-th child
-	CReqdPropPlan *Prpp(ULONG child_index) const;
+	gpos::Ref<CReqdPropPlan> Prpp(ULONG child_index) const;
 
 	// arity function
 	ULONG Arity() const;
@@ -286,23 +286,24 @@ public:
 	// return an exact scalar expression attached to handle or null if not possible
 	gpos::Ref<CExpression> PexprScalarExact() const;
 
-	void DeriveProducerStats(ULONG child_index, CColRefSet *pcrsStat) const;
+	void DeriveProducerStats(ULONG child_index,
+							 gpos::Ref<CColRefSet> pcrsStat) const;
 
 	// return the columns used by a logical operator internally as well
 	// as columns used by all its scalar children
 	gpos::Ref<CColRefSet> PcrsUsedColumns(CMemoryPool *mp) const;
 
-	CColRefSet *DeriveOuterReferences() const;
-	CColRefSet *DeriveOuterReferences(ULONG child_index) const;
+	gpos::Ref<CColRefSet> DeriveOuterReferences() const;
+	gpos::Ref<CColRefSet> DeriveOuterReferences(ULONG child_index) const;
 
-	CColRefSet *DeriveOutputColumns() const;
-	CColRefSet *DeriveOutputColumns(ULONG child_index) const;
+	gpos::Ref<CColRefSet> DeriveOutputColumns() const;
+	gpos::Ref<CColRefSet> DeriveOutputColumns(ULONG child_index) const;
 
-	CColRefSet *DeriveNotNullColumns() const;
-	CColRefSet *DeriveNotNullColumns(ULONG child_index) const;
+	gpos::Ref<CColRefSet> DeriveNotNullColumns() const;
+	gpos::Ref<CColRefSet> DeriveNotNullColumns(ULONG child_index) const;
 
-	CColRefSet *DeriveCorrelatedApplyColumns() const;
-	CColRefSet *DeriveCorrelatedApplyColumns(ULONG child_index) const;
+	gpos::Ref<CColRefSet> DeriveCorrelatedApplyColumns() const;
+	gpos::Ref<CColRefSet> DeriveCorrelatedApplyColumns(ULONG child_index) const;
 
 	CMaxCard DeriveMaxCard() const;
 	CMaxCard DeriveMaxCard(ULONG child_index) const;
@@ -330,9 +331,10 @@ public:
 	gpos::Ref<CTableDescriptor> DeriveTableDescriptor(ULONG child_index) const;
 
 	// Scalar property accessors
-	CColRefSet *DeriveDefinedColumns(ULONG child_index) const;
-	CColRefSet *DeriveUsedColumns(ULONG child_index) const;
-	CColRefSet *DeriveSetReturningFunctionColumns(ULONG child_index) const;
+	gpos::Ref<CColRefSet> DeriveDefinedColumns(ULONG child_index) const;
+	gpos::Ref<CColRefSet> DeriveUsedColumns(ULONG child_index) const;
+	gpos::Ref<CColRefSet> DeriveSetReturningFunctionColumns(
+		ULONG child_index) const;
 	BOOL DeriveHasSubquery(ULONG child_index) const;
 	gpos::Ref<CPartInfo> DeriveScalarPartitionInfo(ULONG child_index) const;
 	gpos::Ref<CFunctionProp> DeriveScalarFunctionProperties(

@@ -49,7 +49,7 @@ CScalarProjectElement::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarProjectElement *popScPrEl =
+		gpos::Ref<CScalarProjectElement> popScPrEl =
 			gpos::dyn_cast<CScalarProjectElement>(pop);
 
 		// match if column reference is same

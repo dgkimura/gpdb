@@ -68,9 +68,9 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 #ifdef GPOS_DEBUG
 		gpos::Ref<CExpression> pexprUlResult =
 			pceevaldefault->PexprEval(pexprUl.get());
-		CScalarConst *pscalarconstUl =
+		gpos::Ref<CScalarConst> pscalarconstUl =
 			gpos::dyn_cast<CScalarConst>(pexprUl->Pop());
-		CScalarConst *pscalarconstUlResult =
+		gpos::Ref<CScalarConst> pscalarconstUlResult =
 			gpos::dyn_cast<CScalarConst>(pexprUlResult->Pop());
 		GPOS_ASSERT(pscalarconstUl->Matches(pscalarconstUlResult));
 		;

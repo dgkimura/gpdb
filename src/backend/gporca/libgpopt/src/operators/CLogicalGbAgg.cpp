@@ -370,7 +370,8 @@ CLogicalGbAgg::DerivePropertyConstraint(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CLogicalGbAgg::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						CColRefSet *pcrsInput, ULONG child_index) const
+						gpos::Ref<CColRefSet> pcrsInput,
+						ULONG child_index) const
 {
 	return PcrsStatGbAgg(mp, exprhdl, pcrsInput, child_index, m_pdrgpcr.get());
 }
@@ -386,7 +387,7 @@ CLogicalGbAgg::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CLogicalGbAgg::PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CColRefSet *pcrsInput, ULONG child_index,
+							 gpos::Ref<CColRefSet> pcrsInput, ULONG child_index,
 							 CColRefArray *pdrgpcrGrp) const
 {
 	GPOS_ASSERT(nullptr != pdrgpcrGrp);
@@ -405,7 +406,7 @@ CLogicalGbAgg::PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	for (ULONG ul = 0; ul < ulGrpCols; ul++)
 	{
 		CColRef *pcrGrpCol = (*m_pdrgpcr)[ul];
-		const CColRefSet *pcrsUsed =
+		const gpos::Ref<CColRefSet> pcrsUsed =
 			col_factory->PcrsUsedInComputedCol(pcrGrpCol);
 		if (nullptr != pcrsUsed)
 		{
@@ -509,7 +510,7 @@ CLogicalGbAgg::DeriveKeyCollection(CMemoryPool *mp,
 		else
 		{
 			// scalar and single-group aggs produce one row that constitutes a key
-			CColRefSet *pcrs = exprhdl.DeriveDefinedColumns(1);
+			gpos::Ref<CColRefSet> pcrs = exprhdl.DeriveDefinedColumns(1);
 
 			if (0 == pcrs->Size())
 			{
@@ -570,7 +571,8 @@ CLogicalGbAgg::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalGbAgg *popAgg = dynamic_cast<CLogicalGbAgg *>(pop);
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		dynamic_cast<gpos::Ref<CLogicalGbAgg> >(pop);
 
 	return FGeneratesDuplicates() == popAgg->FGeneratesDuplicates() &&
 		   popAgg->Egbaggtype() == m_egbaggtype &&
@@ -638,8 +640,8 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
 	}
 
 	gpos::Ref<IStatistics> stats = CGroupByStatsProcessor::CalcGroupByStats(
-		mp, dynamic_cast<CStatistics *>(child_stats), pdrgpulGroupingCols.get(),
-		pdrgpulComputedCols, keys);
+		mp, dynamic_cast<gpos::Ref<CStatistics> >(child_stats),
+		pdrgpulGroupingCols.get(), pdrgpulComputedCols, keys);
 
 	// clean up
 	;

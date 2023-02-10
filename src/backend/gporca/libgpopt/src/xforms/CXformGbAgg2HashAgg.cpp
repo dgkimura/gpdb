@@ -69,7 +69,8 @@ CXformGbAgg2HashAgg::CXformGbAgg2HashAgg(gpos::Ref<CExpression> pexprPattern)
 CXform::EXformPromise
 CXformGbAgg2HashAgg::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 	CColRefArray *colref_array = popAgg->Pdrgpcr();
 	if (0 == colref_array->Size() || exprhdl.DeriveHasSubquery(1) ||
 		!CUtils::FComparisonPossible(colref_array, IMDType::EcmptEq) ||
@@ -110,7 +111,8 @@ CXformGbAgg2HashAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 	}
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	gpos::Ref<CColRefArray> colref_array = popAgg->Pdrgpcr();
 	;
 
@@ -163,7 +165,7 @@ CXformGbAgg2HashAgg::FApplicable(gpos::Ref<CExpression> pexpr)
 	{
 		gpos::Ref<CExpression> pexprPrjEl = (*pexprPrjList)[ul];
 		gpos::Ref<CExpression> pexprAggFunc = (*pexprPrjEl)[0];
-		CScalarAggFunc *popScAggFunc =
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
 			gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 
 		if (popScAggFunc->IsDistinct() ||

@@ -82,7 +82,8 @@ CXformGbAgg2ScalarAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 	gpos::Ref<CColRefArray> colref_array = popAgg->Pdrgpcr();
 	;

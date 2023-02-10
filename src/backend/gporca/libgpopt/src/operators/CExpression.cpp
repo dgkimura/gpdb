@@ -1266,7 +1266,7 @@ CExpression::PexprRehydrate(CMemoryPool *mp, gpos::Ref<CCostContext> pcc,
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpression::FValidPlan(const CReqdPropPlan *prpp,
+CExpression::FValidPlan(const gpos::Ref<CReqdPropPlan> prpp,
 						CDrvdPropCtxtPlan *pdpctxtplan)
 {
 	GPOS_ASSERT(Pop()->FPhysical());
@@ -1306,7 +1306,7 @@ CExpression::FValidChildrenDistribution(CDrvdPropCtxtPlan *pdpctxtplan)
 {
 	GPOS_ASSERT(Pop()->FPhysical());
 
-	CPhysical *pop = gpos::dyn_cast<CPhysical>(Pop());
+	gpos::Ref<CPhysical> pop = gpos::dyn_cast<CPhysical>(Pop());
 	CExpressionHandle exprhdl(m_mp);
 	exprhdl.Attach(this);
 	exprhdl.DeriveProps(pdpctxtplan);
@@ -1369,7 +1369,7 @@ CExpression::FValidPartEnforcers(CDrvdPropCtxtPlan *pdpctxtplan)
 }
 #endif
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpression::DeriveOuterReferences()
 {
 	CExpressionHandle exprhdl(m_mp);
@@ -1377,7 +1377,7 @@ CExpression::DeriveOuterReferences()
 	return m_pdprel->DeriveOuterReferences(exprhdl);
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpression::DeriveOutputColumns()
 {
 	CExpressionHandle exprhdl(m_mp);
@@ -1385,7 +1385,7 @@ CExpression::DeriveOutputColumns()
 	return m_pdprel->DeriveOutputColumns(exprhdl);
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpression::DeriveNotNullColumns()
 {
 	CExpressionHandle exprhdl(m_mp);
@@ -1393,7 +1393,7 @@ CExpression::DeriveNotNullColumns()
 	return m_pdprel->DeriveNotNullColumns(exprhdl);
 }
 
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpression::DeriveCorrelatedApplyColumns()
 {
 	CExpressionHandle exprhdl(m_mp);
@@ -1466,21 +1466,21 @@ CExpression::DeriveTableDescriptor()
 }
 
 // Scalar property accessors - derived as needed
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpression::DeriveDefinedColumns()
 {
 	CExpressionHandle exprhdl(m_mp);
 	exprhdl.Attach(this);
 	return m_pdpscalar->DeriveDefinedColumns(exprhdl);
 }
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpression::DeriveUsedColumns()
 {
 	CExpressionHandle exprhdl(m_mp);
 	exprhdl.Attach(this);
 	return m_pdpscalar->DeriveUsedColumns(exprhdl);
 }
-CColRefSet *
+gpos::Ref<CColRefSet>
 CExpression::DeriveSetReturningFunctionColumns()
 {
 	CExpressionHandle exprhdl(m_mp);

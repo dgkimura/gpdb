@@ -235,7 +235,8 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 {
 	gpos::Ref<CExpression> pexprPrL = (*pexpr)[1];
 
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	CColRefArray *pdrgpcrGlobal = popAgg->Pdrgpcr();
 
 	// array of project elements for the local, intermediate and global aggregate operator
@@ -248,12 +249,12 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		gpos::Ref<CExpression> pexprPrEl = (*pexprPrL)[ul];
-		CScalarProjectElement *popScPrEl =
+		gpos::Ref<CScalarProjectElement> popScPrEl =
 			gpos::dyn_cast<CScalarProjectElement>(pexprPrEl->Pop());
 
 		// get the scalar aggregate function
 		gpos::Ref<CExpression> pexprAggFunc = (*pexprPrEl)[0];
-		CScalarAggFunc *popScAggFunc =
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
 			gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 
 		if (popScAggFunc->IsDistinct())
@@ -393,7 +394,8 @@ CXformSplitDQA::PexprSplitHelper(CMemoryPool *mp, CColumnFactory *col_factory,
 {
 	gpos::Ref<CExpression> pexprPrL = (*pexpr)[1];
 
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	CColRefArray *pdrgpcrGlobal = popAgg->Pdrgpcr();
 
 	// array of project elements for the local (first), intermediate
@@ -412,12 +414,12 @@ CXformSplitDQA::PexprSplitHelper(CMemoryPool *mp, CColumnFactory *col_factory,
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		gpos::Ref<CExpression> pexprPrEl = (*pexprPrL)[ul];
-		CScalarProjectElement *popScPrEl =
+		gpos::Ref<CScalarProjectElement> popScPrEl =
 			gpos::dyn_cast<CScalarProjectElement>(pexprPrEl->Pop());
 
 		// get the scalar aggregate function
 		gpos::Ref<CExpression> pexprAggFunc = (*pexprPrEl)[0];
-		CScalarAggFunc *popScAggFunc =
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
 			gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 
 		if (popScAggFunc->IsDistinct())
@@ -528,7 +530,7 @@ CXformSplitDQA::PexprPrElAgg(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != pcrCurrStage);
 	GPOS_ASSERT(EaggfuncstageSentinel != eaggfuncstage);
 
-	CScalarAggFunc *popScAggFunc =
+	gpos::Ref<CScalarAggFunc> popScAggFunc =
 		gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 	GPOS_ASSERT(!popScAggFunc->IsDistinct());
 
@@ -607,10 +609,10 @@ CXformSplitDQA::PopulatePrLMultiPhaseAgg(
 	GPOS_ASSERT(nullptr != pdrgpexprPrElLastStage);
 
 	// get the components of the project element (agg func)
-	CScalarProjectElement *popScPrEl =
+	gpos::Ref<CScalarProjectElement> popScPrEl =
 		gpos::dyn_cast<CScalarProjectElement>(pexprPrEl->Pop());
 	gpos::Ref<CExpression> pexprAggFunc = (*pexprPrEl)[0];
-	CScalarAggFunc *popScAggFunc =
+	gpos::Ref<CScalarAggFunc> popScAggFunc =
 		gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 
 	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(popScAggFunc->MDId());
@@ -683,7 +685,7 @@ CXformSplitDQA::PcrAggFuncArgument(CMemoryPool *mp, CMDAccessor *md_accessor,
 			gpos::dyn_cast<CScalarIdent>(pexprArg->Pop())->Pcr()));
 	}
 
-	CScalar *popScalar = gpos::dyn_cast<CScalar>(pexprArg->Pop());
+	gpos::Ref<CScalar> popScalar = gpos::dyn_cast<CScalar>(pexprArg->Pop());
 	// computed argument to the input
 	const IMDType *pmdtype = md_accessor->RetrieveType(popScalar->MdidType());
 	CColRef *pcrAdditionalGrpCol =
@@ -837,7 +839,7 @@ CXformSplitDQA::ExtractDistinctCols(
 
 		// get the scalar child of the project element
 		gpos::Ref<CExpression> pexprAggFunc = (*pexprPrEl)[0];
-		CScalarAggFunc *popScAggFunc =
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
 			gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 		hasNonSplittableAgg =
 			!md_accessor->RetrieveAgg(popScAggFunc->MDId())->IsSplittable();

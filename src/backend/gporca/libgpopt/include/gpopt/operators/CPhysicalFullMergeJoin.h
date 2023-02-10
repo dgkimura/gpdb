@@ -63,7 +63,7 @@ public:
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
-									 CReqdPropPlan *prppInput,
+									 gpos::Ref<CReqdPropPlan> prppInput,
 									 ULONG child_index,
 									 CDrvdPropArray *pdrgpdpCtxt,
 									 ULONG ulDistrReq) override;
@@ -87,10 +87,10 @@ public:
 		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
 
 	CEnfdDistribution::EDistributionMatching Edm(
-		CReqdPropPlan *,   // prppInput
-		ULONG,			   //child_index,
-		CDrvdPropArray *,  // pdrgpdpCtxt,
-		ULONG			   // ulOptReq
+		gpos::Ref<CReqdPropPlan>,  // prppInput
+		ULONG,					   //child_index,
+		CDrvdPropArray *,		   // pdrgpdpCtxt,
+		ULONG					   // ulOptReq
 		) override;
 
 	gpos::Ref<CDistributionSpec> PdsDerive(

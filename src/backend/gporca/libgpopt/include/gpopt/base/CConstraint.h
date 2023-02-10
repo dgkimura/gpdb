@@ -142,7 +142,8 @@ protected:
 
 	// mapping between columns and arrays of constraints
 	static gpos::Ref<ColRefToConstraintArrayMap> Phmcolconstr(
-		CMemoryPool *mp, CColRefSet *pcrs, CConstraintArray *pdrgpcnstr);
+		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
+		CConstraintArray *pdrgpcnstr);
 
 	// return a copy of the conjunction/disjunction constraint for a different column
 	static gpos::Ref<CConstraint> PcnstrConjDisjRemapForColumn(
@@ -187,7 +188,7 @@ public:
 	virtual BOOL Equals(gpos::Ref<CConstraint> pcnstr);
 
 	// columns in this constraint
-	virtual CColRefSet *
+	virtual gpos::Ref<CColRefSet>
 	PcrsUsed() const
 	{
 		return m_pcrsUsed.get();
@@ -220,8 +221,8 @@ public:
 
 	// return constraint on a given set of columns
 	virtual gpos::Ref<CConstraint>
-	Pcnstr(CMemoryPool *,  //mp,
-		   CColRefSet *	   //pcrs
+	Pcnstr(CMemoryPool *,		  //mp,
+		   gpos::Ref<CColRefSet>  //pcrs
 	)
 	{
 		return nullptr;

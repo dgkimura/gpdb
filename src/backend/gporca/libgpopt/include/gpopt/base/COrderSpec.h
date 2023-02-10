@@ -126,7 +126,7 @@ private:
 	gpos::Ref<COrderExpressionArray> m_pdrgpoe;
 
 	// extract columns from order spec into the given column set
-	void ExtractCols(CColRefSet *pcrs) const;
+	void ExtractCols(gpos::Ref<CColRefSet> pcrs) const;
 
 public:
 	COrderSpec(const COrderSpec &) = delete;
@@ -197,7 +197,8 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 gpos::Ref<CReqdPropPlan> prpp,
+						 CExpressionArray *pdrgpexpr,
 						 gpos::Ref<CExpression> pexpr) override;
 
 	// hash function
@@ -209,7 +210,7 @@ public:
 
 	// return a copy of the order spec after excluding the given columns
 	virtual gpos::Ref<COrderSpec> PosExcludeColumns(CMemoryPool *mp,
-													CColRefSet *pcrs);
+													gpos::Ref<CColRefSet> pcrs);
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;
@@ -229,9 +230,9 @@ public:
 											  COrderSpecArray *pdrgpos);
 
 	// filter out array of order specs from order expressions using the passed columns
-	static gpos::Ref<COrderSpecArray> PdrgposExclude(CMemoryPool *mp,
-													 COrderSpecArray *pdrgpos,
-													 CColRefSet *pcrsToExclude);
+	static gpos::Ref<COrderSpecArray> PdrgposExclude(
+		CMemoryPool *mp, COrderSpecArray *pdrgpos,
+		gpos::Ref<CColRefSet> pcrsToExclude);
 
 
 };	// class COrderSpec

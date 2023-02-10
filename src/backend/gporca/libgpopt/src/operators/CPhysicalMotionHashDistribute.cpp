@@ -87,7 +87,7 @@ CPhysicalMotionHashDistribute::Matches(gpos::Ref<COperator> pop) const
 gpos::Ref<CColRefSet>
 CPhysicalMotionHashDistribute::PcrsRequired(CMemoryPool *mp,
 											CExpressionHandle &exprhdl,
-											CColRefSet *pcrsRequired,
+											gpos::Ref<CColRefSet> pcrsRequired,
 											ULONG child_index,
 											CDrvdPropArray *,  // pdrgpdpCtxt
 											ULONG			   // ulOptReq
@@ -114,9 +114,9 @@ CPhysicalMotionHashDistribute::PcrsRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotionHashDistribute::FProvidesReqdCols(CExpressionHandle &exprhdl,
-												 CColRefSet *pcrsRequired,
-												 ULONG	// ulOptReq
+CPhysicalMotionHashDistribute::FProvidesReqdCols(
+	CExpressionHandle &exprhdl, gpos::Ref<CColRefSet> pcrsRequired,
+	ULONG  // ulOptReq
 ) const
 {
 	return FUnaryProvidesReqdCols(exprhdl, pcrsRequired);

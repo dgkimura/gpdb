@@ -81,6 +81,11 @@ IDatum::StatsAreEqual(const gpos::Ref<IDatum> datum) const
 BOOL
 IDatum::StatsAreLessThan(const gpos::Ref<IDatum> datum) const
 {
+	return StatsAreLessThan(datum.get());
+}
+BOOL
+IDatum::StatsAreLessThan(const IDatum *datum) const
+{
 	GPOS_ASSERT(nullptr != datum);
 
 	// datums can be compared based on either LINT or Doubles or BYTEA values
@@ -202,6 +207,11 @@ IDatum::GetValAsDouble() const
 //---------------------------------------------------------------------------
 BOOL
 IDatum::StatsAreComparable(const gpos::Ref<IDatum> datum) const
+{
+	return StatsAreComparable(datum.get());
+}
+BOOL
+IDatum::StatsAreComparable(const IDatum *datum) const
 {
 	GPOS_ASSERT(nullptr != datum);
 

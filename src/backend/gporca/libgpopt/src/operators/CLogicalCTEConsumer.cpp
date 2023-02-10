@@ -145,7 +145,8 @@ CLogicalCTEConsumer::DeriveNotNullColumns(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != pexprProducer);
 
 	// find producer's not null columns
-	CColRefSet *pcrsProducerNotNull = pexprProducer->DeriveNotNullColumns();
+	gpos::Ref<CColRefSet> pcrsProducerNotNull =
+		pexprProducer->DeriveNotNullColumns();
 
 	// map producer's not null columns to consumer's output columns
 	gpos::Ref<CColRefSet> pcrsConsumerNotNull = CUtils::PcrsRemap(
@@ -376,7 +377,7 @@ CLogicalCTEConsumer::DerivePropertyConstraint(CMemoryPool *mp,
 	const ULONG length = pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRefSet *pcrs = (*pdrgpcrs)[ul].get();
+		gpos::Ref<CColRefSet> pcrs = (*pdrgpcrs)[ul].get();
 		gpos::Ref<CColRefSet> pcrsMapped =
 			CUtils::PcrsRemap(mp, pcrs, m_phmulcr.get(), true /*must_exist*/);
 		pdrgpcrsMapped->Append(pcrsMapped);

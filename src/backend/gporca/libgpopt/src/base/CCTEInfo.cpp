@@ -202,7 +202,7 @@ CCTEInfo::PexprPreprocessCTEProducer(
 	gpos::Ref<CExpression> pexprProducerChild = (*pexprCTEProducer)[0];
 
 	// get cte output cols for preprocessing use
-	CColRefSet *pcrsOutput =
+	gpos::Ref<CColRefSet> pcrsOutput =
 		gpos::dyn_cast<CLogicalCTEProducer>(pexprCTEProducer->Pop())
 			->DeriveOutputColumns();
 
@@ -316,7 +316,7 @@ CCTEInfo::InitDefaultStats(gpos::Ref<CExpression> pexprCTEProducer)
 //---------------------------------------------------------------------------
 void
 CCTEInfo::DeriveProducerStats(CLogicalCTEConsumer *popConsumer,
-							  CColRefSet *pcrsStat)
+							  gpos::Ref<CColRefSet> pcrsStat)
 {
 	const ULONG ulCTEId = popConsumer->UlCTEId();
 
@@ -687,7 +687,7 @@ CCTEInfo::MarkUnusedCTEs()
 gpos::Ref<UlongToColRefMap>
 CCTEInfo::PhmulcrConsumerToProducer(
 	CMemoryPool *mp, ULONG ulCTEId,
-	CColRefSet *pcrs,			   // set of columns to check
+	gpos::Ref<CColRefSet> pcrs,	   // set of columns to check
 	CColRefArray *pdrgpcrProducer  // producer columns
 )
 {

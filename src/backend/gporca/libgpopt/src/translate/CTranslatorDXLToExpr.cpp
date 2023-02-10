@@ -857,7 +857,8 @@ CTranslatorDXLToExpr::BuildSetOpChild(
 	const ULongPtrArray *pdrgpulInput =
 		dxl_op->GetInputColIdArrayAt(child_index);
 	const ULONG ulInputCols = pdrgpulInput->Size();
-	CColRefSet *pcrsChildOutput = (*ppexprChild)->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsChildOutput =
+		(*ppexprChild)->DeriveOutputColumns();
 	for (ULONG ulColPos = 0; ulColPos < ulInputCols; ulColPos++)
 	{
 		// column identifier of the input column
@@ -1233,7 +1234,8 @@ CTranslatorDXLToExpr::PexprLogicalCTEAnchor(const gpos::Ref<CDXLNode> dxlnode)
 	GPOS_ASSERT(nullptr != pexprProducer);
 	m_ulCTEId = ulCTEPrevious;
 
-	CColRefSet *pcrsProducerOuter = pexprProducer->DeriveOuterReferences();
+	gpos::Ref<CColRefSet> pcrsProducerOuter =
+		pexprProducer->DeriveOuterReferences();
 	if (0 < pcrsProducerOuter->Size())
 	{
 		GPOS_RAISE(gpopt::ExmaGPOPT, gpopt::ExmiUnsupportedOp,
@@ -1738,7 +1740,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const gpos::Ref<CDXLNode> dxlnode)
 					pdxlnPrElChild->GetOperator());
 			gpos::Ref<CExpression> pexprScWindowFunc = Pexpr(pdxlnPrElChild);
 
-			CScalar *popScalar =
+			gpos::Ref<CScalar> popScalar =
 				gpos::dyn_cast<CScalar>(pexprScWindowFunc->Pop());
 			gpos::Ref<IMDId> mdid = popScalar->MdidType();
 			const IMDType *pmdtype = m_pmda->RetrieveType(mdid);
@@ -3894,7 +3896,7 @@ CTranslatorDXLToExpr::PexprScalarConst(const gpos::Ref<CDXLNode> pdxlnConstVal)
 	GPOS_ASSERT(nullptr != pdxlnConstVal);
 
 	// translate the dxl scalar const value
-	CDXLScalarConstValue *dxl_op =
+	gpos::Ref<CDXLScalarConstValue> dxl_op =
 		gpos::dyn_cast<CDXLScalarConstValue>(pdxlnConstVal->GetOperator());
 	gpos::Ref<CScalarConst> popConst =
 		CTranslatorDXLToExprUtils::PopConst(m_mp, m_pmda, dxl_op);
@@ -3977,7 +3979,7 @@ CTranslatorDXLToExpr::PexprScalarProjElem(const gpos::Ref<CDXLNode> pdxlnPrEl)
 	gpos::Ref<CDXLNode> child_dxlnode = (*pdxlnPrEl)[0];
 	gpos::Ref<CExpression> pexprChild = Pexpr(child_dxlnode);
 
-	CScalar *popScalar = gpos::dyn_cast<CScalar>(pexprChild->Pop());
+	gpos::Ref<CScalar> popScalar = gpos::dyn_cast<CScalar>(pexprChild->Pop());
 
 	gpos::Ref<IMDId> mdid = popScalar->MdidType();
 	const IMDType *pmdtype = m_pmda->RetrieveType(mdid);

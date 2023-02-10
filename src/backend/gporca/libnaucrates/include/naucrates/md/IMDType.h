@@ -122,7 +122,7 @@ public:
 
 	// transformation function for datums
 	virtual gpos::Ref<IDatum> GetDatumForDXLConstVal(
-		const CDXLScalarConstValue *dxl_op) const = 0;
+		const gpos::Ref<CDXLScalarConstValue> dxl_op) const = 0;
 
 	// construct a datum from a DXL datum
 	virtual gpos::Ref<IDatum> GetDatumForDXLDatum(

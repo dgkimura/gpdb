@@ -116,7 +116,8 @@ CXformPushDownLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprLOJInnerChild = (*pexpr)[1];
 	gpos::Ref<CExpression> pexprLOJScalarChild = (*pexpr)[2];
 
-	CColRefSet *pcrsLOJUsed = pexprLOJScalarChild->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsLOJUsed =
+		pexprLOJScalarChild->DeriveUsedColumns();
 	gpos::Ref<CExpressionArray> pdrgpexprLOJChildren =
 		GPOS_NEW(mp) CExpressionArray(mp);
 	gpos::Ref<CExpressionArray> pdrgpexprNAryJoinChildren =
@@ -128,7 +129,7 @@ CXformPushDownLeftOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	for (ULONG ul = 0; ul < arity - 1; ul++)
 	{
 		gpos::Ref<CExpression> pexprChild = (*pexprNAryJoin)[ul];
-		CColRefSet *pcrsOutput = pexprChild->DeriveOutputColumns();
+		gpos::Ref<CColRefSet> pcrsOutput = pexprChild->DeriveOutputColumns();
 		;
 		if (!pcrsOutput->IsDisjoint(pcrsLOJUsed))
 		{

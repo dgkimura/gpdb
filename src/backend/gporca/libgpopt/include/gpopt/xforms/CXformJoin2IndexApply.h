@@ -31,8 +31,9 @@ private:
 		gpos::Ref<CExpression> pexprScalar, gpos::Ref<CExpression> origJoinPred,
 		gpos::Ref<CExpression> nodesToInsertAboveIndexGet,
 		gpos::Ref<CExpression> endOfNodesToInsertAboveIndexGet,
-		gpos::Ref<CTableDescriptor> ptabdescInner, CColRefSet *pcrsScalarExpr,
-		CColRefSet *outer_refs, CColRefSet *pcrsReqd, ULONG ulIndices,
+		gpos::Ref<CTableDescriptor> ptabdescInner,
+		gpos::Ref<CColRefSet> pcrsScalarExpr, gpos::Ref<CColRefSet> outer_refs,
+		gpos::Ref<CColRefSet> pcrsReqd, ULONG ulIndices,
 		gpos::Ref<CXformResult> pxfres);
 
 	// helper to add IndexApply expression to given xform results container
@@ -44,8 +45,8 @@ private:
 		gpos::Ref<CExpression> nodesToInsertAboveIndexGet,
 		gpos::Ref<CExpression> endOfNodesToInsertAboveIndexGet,
 		CMDAccessor *md_accessor, CExpressionArray *pdrgpexprConjuncts,
-		CColRefSet *pcrsScalarExpr, CColRefSet *outer_refs,
-		CColRefSet *pcrsReqd, const IMDRelation *pmdrel,
+		gpos::Ref<CColRefSet> pcrsScalarExpr, gpos::Ref<CColRefSet> outer_refs,
+		gpos::Ref<CColRefSet> pcrsReqd, const IMDRelation *pmdrel,
 		const IMDIndex *pmdindex, gpos::Ref<CXformResult> pxfres);
 
 	// helper to add IndexApply expression to given xform results container
@@ -56,15 +57,16 @@ private:
 		gpos::Ref<CExpression> pexprScalar, gpos::Ref<CExpression> origJoinPred,
 		gpos::Ref<CExpression> nodesToInsertAboveIndexGet,
 		gpos::Ref<CExpression> endOfNodesToInsertAboveIndexGet,
-		gpos::Ref<CTableDescriptor> ptabdescInner, CColRefSet *outer_refs,
-		CColRefSet *pcrsReqd, gpos::Ref<CXformResult> pxfres);
+		gpos::Ref<CTableDescriptor> ptabdescInner,
+		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
+		gpos::Ref<CXformResult> pxfres);
 
 	// based on the inner and the scalar expression, it computes scalar expression
 	// columns, outer references and required columns
 	static void ComputeColumnSets(CMemoryPool *mp,
 								  gpos::Ref<CExpression> pexprInner,
 								  gpos::Ref<CExpression> pexprScalar,
-								  CColRefSet **ppcrsScalarExpr,
+								  gpos::Ref<CColRefSet> *ppcrsScalarExpr,
 								  gpos::Ref<CColRefSet> *ppcrsOuterRefs,
 								  gpos::Ref<CColRefSet> *ppcrsReqd);
 

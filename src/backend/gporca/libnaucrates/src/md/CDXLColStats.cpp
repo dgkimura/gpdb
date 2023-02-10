@@ -228,7 +228,8 @@ gpos::Ref<CDXLColStats>
 CDXLColStats::CreateDXLDummyColStats(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 									 CMDName *mdname, CDouble width)
 {
-	CMDIdColStats *mdid_col_stats = gpos::dyn_cast<CMDIdColStats>(mdid);
+	gpos::Ref<CMDIdColStats> mdid_col_stats =
+		gpos::dyn_cast<CMDIdColStats>(mdid);
 
 	gpos::Ref<CDXLBucketArray> dxl_bucket_array;
 	dxl_bucket_array = GPOS_NEW(mp) CDXLBucketArray(mp);

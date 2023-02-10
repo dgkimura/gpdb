@@ -58,7 +58,7 @@ CScalarBoolOp::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarBoolOp *popLog = gpos::dyn_cast<CScalarBoolOp>(pop);
+		gpos::Ref<CScalarBoolOp> popLog = gpos::dyn_cast<CScalarBoolOp>(pop);
 
 		// match if operators are identical
 		return Eboolop() == popLog->Eboolop();

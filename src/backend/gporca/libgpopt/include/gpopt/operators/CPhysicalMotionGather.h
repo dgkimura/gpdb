@@ -109,7 +109,8 @@ public:
 	// compute required output columns of the n-th child
 	gpos::Ref<CColRefSet> PcrsRequired(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsInput, ULONG child_index,
+									   gpos::Ref<CColRefSet> pcrsInput,
+									   ULONG child_index,
 									   CDrvdPropArray *pdrgpdpCtxt,
 									   ULONG ulOptReq) override;
 
@@ -121,7 +122,8 @@ public:
 									  ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------

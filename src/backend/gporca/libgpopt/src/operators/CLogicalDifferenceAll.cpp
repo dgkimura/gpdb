@@ -154,7 +154,7 @@ CLogicalDifferenceAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CUtils::PexprConjINDFCond(mp, m_pdrgpdrgpcrInput.get());
 
 	// compute the statistics for LASJ
-	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
+	gpos::Ref<CColRefSet> outer_refs = exprhdl.DeriveOuterReferences();
 	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExpr(
 			mp, exprhdl, pexprScCond.get(), output_colrefsets.get(), outer_refs,

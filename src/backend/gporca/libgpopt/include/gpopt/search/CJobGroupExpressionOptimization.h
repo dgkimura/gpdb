@@ -173,7 +173,7 @@ public:
 	// initialize job
 	void Init(gpos::Ref<CGroupExpression> pgexpr,
 			  gpos::Ref<COptimizationContext> poc, ULONG ulOptReq,
-			  CReqdPropPlan *prppCTEProducer = nullptr);
+			  gpos::Ref<CReqdPropPlan> prppCTEProducer = nullptr);
 
 	// cleanup internal state
 	void Cleanup() override;

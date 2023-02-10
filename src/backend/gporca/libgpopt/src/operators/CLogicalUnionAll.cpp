@@ -168,7 +168,7 @@ CLogicalUnionAll::PstatsDeriveUnionAll(CMemoryPool *mp,
 		gpos::Ref<CStatistics> stats =
 			CUnionAllStatsProcessor::CreateStatsForUnionAll(
 				mp, gpos::dyn_cast<CStatistics>(result_stats.get()),
-				dynamic_cast<CStatistics *>(child_stats),
+				dynamic_cast<gpos::Ref<CStatistics> >(child_stats),
 				CColRef::Pdrgpul(mp, pdrgpcrOutput),
 				CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[0].get()),
 				CColRef::Pdrgpul(mp, (*pdrgpdrgpcrInput)[ul].get()));

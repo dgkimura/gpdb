@@ -76,7 +76,7 @@ CPhysicalMotionBroadcast::Matches(gpos::Ref<COperator> pop) const
 gpos::Ref<CColRefSet>
 CPhysicalMotionBroadcast::PcrsRequired(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired,
+									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG child_index,
 									   CDrvdPropArray *,  // pdrgpdpCtxt
 									   ULONG			  // ulOptReq
@@ -103,7 +103,7 @@ CPhysicalMotionBroadcast::PcrsRequired(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalMotionBroadcast::FProvidesReqdCols(CExpressionHandle &exprhdl,
-											CColRefSet *pcrsRequired,
+											gpos::Ref<CColRefSet> pcrsRequired,
 											ULONG  // ulOptReq
 ) const
 {

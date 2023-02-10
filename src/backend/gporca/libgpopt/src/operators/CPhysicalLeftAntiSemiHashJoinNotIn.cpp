@@ -62,9 +62,12 @@ CPhysicalLeftAntiSemiHashJoinNotIn::PdsRequired(
 }
 
 gpos::Ref<CEnfdDistribution>
-CPhysicalLeftAntiSemiHashJoinNotIn::Ped(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prppInput,
-	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+CPhysicalLeftAntiSemiHashJoinNotIn::Ped(CMemoryPool *mp,
+										CExpressionHandle &exprhdl,
+										gpos::Ref<CReqdPropPlan> prppInput,
+										ULONG child_index,
+										CDrvdPropArray *pdrgpdpCtxt,
+										ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());

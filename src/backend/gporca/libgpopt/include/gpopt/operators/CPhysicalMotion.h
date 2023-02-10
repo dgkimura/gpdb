@@ -126,12 +126,12 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalMotion *
+	static gpos::Ref<CPhysicalMotion>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(CUtils::FPhysicalMotion(pop));
 
-		return dynamic_cast<CPhysicalMotion *>(pop);
+		return gpos::dyn_cast<CPhysicalMotion>(pop);
 	}
 
 };	// class CPhysicalMotion

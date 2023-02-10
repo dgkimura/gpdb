@@ -65,7 +65,8 @@ CPhysicalCTEProducer::~CPhysicalCTEProducer()
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CPhysicalCTEProducer::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CColRefSet *pcrsRequired, ULONG child_index,
+								   gpos::Ref<CColRefSet> pcrsRequired,
+								   ULONG child_index,
 								   CDrvdPropArray *,  // pdrgpdpCtxt
 								   ULONG			  // ulOptReq
 )
@@ -254,7 +255,7 @@ CPhysicalCTEProducer::PcmDerive(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalCTEProducer::FProvidesReqdCols(CExpressionHandle &exprhdl,
-										CColRefSet *pcrsRequired,
+										gpos::Ref<CColRefSet> pcrsRequired,
 										ULONG  // ulOptReq
 ) const
 {

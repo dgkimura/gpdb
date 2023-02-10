@@ -124,22 +124,12 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// const converter
-	static const CMDIdGPDB *
+	static const gpos::Ref<CMDIdGPDB>
 	CastMdid(const gpos::Ref<IMDId> mdid)
 	{
 		GPOS_ASSERT(nullptr != mdid && EmdidGPDB == mdid->MdidType());
 
-		return dynamic_cast<const CMDIdGPDB *>(mdid);
-	}
-
-	// non-const converter
-	static CMDIdGPDB *
-	CastMdid(gpos::Ref<IMDId> mdid)
-	{
-		GPOS_ASSERT(nullptr != mdid && (EmdidGPDB == mdid->MdidType() ||
-										EmdidGPDBCtas == mdid->MdidType()));
-
-		return dynamic_cast<CMDIdGPDB *>(mdid);
+		return gpos::dyn_cast<CMDIdGPDB>(mdid);
 	}
 
 	gpos::Ref<IMDId>

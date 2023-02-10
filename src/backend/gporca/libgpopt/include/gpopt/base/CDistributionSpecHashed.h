@@ -144,7 +144,7 @@ public:
 
 	// return a copy of the distribution spec after excluding the given columns
 	virtual gpos::Ref<CDistributionSpecHashed> PdshashedExcludeColumns(
-		CMemoryPool *mp, CColRefSet *pcrs);
+		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs);
 
 	// does this distribution match the given one
 	BOOL Matches(const CDistributionSpec *pds) const override;
@@ -169,7 +169,8 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 gpos::Ref<CReqdPropPlan> prpp,
+						 CExpressionArray *pdrgpexpr,
 						 gpos::Ref<CExpression> pexpr) override;
 
 	// hash function for hashed distribution spec
@@ -242,7 +243,7 @@ public:
 	// use given predicates to complete an incomplete spec, if possible
 	static gpos::Ref<CDistributionSpecHashed> TryToCompleteEquivSpec(
 		CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
-		gpos::Ref<CExpression> pexprPred, CColRefSet *outerRefs);
+		gpos::Ref<CExpression> pexprPred, gpos::Ref<CColRefSet> outerRefs);
 };	// class CDistributionSpecHashed
 
 }  // namespace gpopt

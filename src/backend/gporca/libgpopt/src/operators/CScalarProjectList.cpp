@@ -99,7 +99,7 @@ CScalarProjectList::UlDistinctAggs(CExpressionHandle &exprhdl)
 
 		if (COperator::EopScalarAggFunc == eopidChild)
 		{
-			CScalarAggFunc *popScAggFunc =
+			gpos::Ref<CScalarAggFunc> popScAggFunc =
 				gpos::dyn_cast<CScalarAggFunc>(pexprChild->Pop());
 			if (popScAggFunc->IsDistinct())
 			{
@@ -258,7 +258,7 @@ CScalarProjectList::FContainsOnlyReplicationSafeAggFuncs(
 		{
 			continue;
 		}
-		CScalarAggFunc *popScAggFunc =
+		gpos::Ref<CScalarAggFunc> popScAggFunc =
 			gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 		OID safe_oid = gpos::dyn_cast<CMDIdGPDB>(popScAggFunc->MDId())->Oid();
 

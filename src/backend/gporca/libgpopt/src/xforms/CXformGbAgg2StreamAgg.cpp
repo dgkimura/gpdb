@@ -67,7 +67,8 @@ CXformGbAgg2StreamAgg::CXformGbAgg2StreamAgg(
 CXform::EXformPromise
 CXformGbAgg2StreamAgg::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 	if (0 == popAgg->Pdrgpcr()->Size() ||
 		!CUtils::FComparisonPossible(popAgg->Pdrgpcr(), IMDType::EcmptL) ||
 		exprhdl.DeriveHasSubquery(1))
@@ -97,7 +98,8 @@ CXformGbAgg2StreamAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 	gpos::Ref<CColRefArray> colref_array = popAgg->Pdrgpcr();
 	;

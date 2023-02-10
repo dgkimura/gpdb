@@ -108,13 +108,13 @@ public:
 		CExpressionHandle &exprhdl, const CEnfdOrder *peo) const override;
 
 	// conversion function
-	static CPhysicalDynamicIndexScan *
+	static gpos::Ref<CPhysicalDynamicIndexScan>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalDynamicIndexScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalDynamicIndexScan *>(pop);
+		return gpos::dyn_cast<CPhysicalDynamicIndexScan>(pop);
 	}
 
 	// debug print
@@ -122,7 +122,8 @@ public:
 
 	// statistics derivation during costing
 	gpos::Ref<IStatistics> PstatsDerive(
-		CMemoryPool *mp, CExpressionHandle &exprhdl, CReqdPropPlan *prpplan,
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CReqdPropPlan> prpplan,
 		IStatisticsArray *stats_ctxt) const override;
 
 };	// class CPhysicalDynamicIndexScan

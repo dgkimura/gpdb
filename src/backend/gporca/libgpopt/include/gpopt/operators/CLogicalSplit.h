@@ -160,8 +160,8 @@ public:
 
 	// compute required stats columns of the n-th child
 	gpos::Ref<CColRefSet>
-	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl, CColRefSet *pcrsInput,
-			 ULONG child_index) const override
+	PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
+			 gpos::Ref<CColRefSet> pcrsInput, ULONG child_index) const override
 	{
 		return PcrsReqdChildStats(mp, exprhdl, pcrsInput,
 								  exprhdl.DeriveUsedColumns(1), child_index);

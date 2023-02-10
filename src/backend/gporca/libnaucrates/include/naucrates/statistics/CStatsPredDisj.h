@@ -84,13 +84,13 @@ public:
 	static ULONG GetColId(const CStatsPredPtrArry *pdrgpstatspred);
 
 	// conversion function
-	static CStatsPredDisj *
+	static gpos::Ref<CStatsPredDisj>
 	ConvertPredStats(gpos::Ref<CStatsPred> pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptDisj == pred_stats->GetPredStatsType());
 
-		return dynamic_cast<CStatsPredDisj *>(pred_stats);
+		return gpos::dyn_cast<CStatsPredDisj>(pred_stats);
 	}
 
 };	// class CStatsPredDisj

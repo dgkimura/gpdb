@@ -102,7 +102,7 @@ CPredicateUtilsTest::EresUnittest_Conjunctions()
 
 	// conjunction on scalar comparisons
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *pcr1 = pcrs->PcrAny();
 	CColRef *pcr2 = pcrs->PcrFirst();
 	gpos::Ref<CExpression> pexprCmp1 =
@@ -181,7 +181,7 @@ CPredicateUtilsTest::EresUnittest_Disjunctions()
 
 	// disjunction on scalar comparisons
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRefSetIter crsi(*pcrs);
 
 	BOOL fAdvance GPOS_ASSERTS_ONLY = crsi.Advance();
@@ -282,8 +282,8 @@ CPredicateUtilsTest::EresUnittest_PlainEqualities()
 	gpos::Ref<CExpressionArray> pdrgpexprOriginal =
 		GPOS_NEW(mp) CExpressionArray(mp);
 
-	CColRefSet *pcrsLeft = pexprLeft->DeriveOutputColumns();
-	CColRefSet *pcrsRight = pexprRight->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsLeft = pexprLeft->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsRight = pexprRight->DeriveOutputColumns();
 
 	CColRef *pcrLeft = pcrsLeft->PcrAny();
 	CColRef *pcrRight = pcrsRight->PcrAny();

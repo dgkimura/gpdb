@@ -197,8 +197,8 @@ CPredicateUtils::FIdentCompareOuterRefExprIgnoreCast(
 
 	BOOL leftIsACol = CUtils::FScalarIdentIgnoreCast(pexprLeft);
 	BOOL rightIsACol = CUtils::FScalarIdentIgnoreCast(pexprRight);
-	CColRefSet *pcrsUsedLeft = pexprLeft->DeriveUsedColumns();
-	CColRefSet *pcrsUsedRight = pexprRight->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsedLeft = pexprLeft->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsedRight = pexprRight->DeriveUsedColumns();
 
 	// allow any expressions of the form
 	//  col = expr(outer refs)
@@ -237,7 +237,7 @@ CPredicateUtils::FIdentCompareOuterRefExprIgnoreCast(
 // no column references and no volatile functions
 BOOL
 CPredicateUtils::FValidRefsOnly(gpos::Ref<CExpression> pexprScalar,
-								CColRefSet *pcrsAllowedRefs)
+								gpos::Ref<CColRefSet> pcrsAllowedRefs)
 {
 	if (nullptr != pcrsAllowedRefs)
 	{
@@ -1311,7 +1311,7 @@ gpos::Ref<CExpression>
 CPredicateUtils::ValidatePartPruningExpr(CMemoryPool *mp,
 										 gpos::Ref<CExpression> expr,
 										 CColRef *pcrPartKey,
-										 CColRefSet *pcrsAllowedRefs,
+										 gpos::Ref<CColRefSet> pcrsAllowedRefs,
 										 BOOL allow_not_equals_preds)
 {
 	GPOS_ASSERT(nullptr != expr);
@@ -1365,7 +1365,7 @@ CPredicateUtils::PexprPartPruningPredicate(
 	CMemoryPool *mp, const CExpressionArray *pdrgpexpr, CColRef *pcrPartKey,
 	gpos::Ref<CExpression>
 		pexprCol,  // predicate on pcrPartKey obtained from pcnstr
-	CColRefSet *pcrsAllowedRefs, BOOL allow_not_equals_preds)
+	gpos::Ref<CColRefSet> pcrsAllowedRefs, BOOL allow_not_equals_preds)
 {
 	gpos::Ref<CExpressionArray> pdrgpexprResult =
 		GPOS_NEW(mp) CExpressionArray(mp);
@@ -1579,11 +1579,9 @@ CPredicateUtils::FScArrayCmpOnColumn(gpos::Ref<CExpression> pexpr,
 // check if the given expression is a disjunction of scalar cmp expression
 // on the given column
 BOOL
-CPredicateUtils::IsDisjunctionOfRangeComparison(CMemoryPool *mp,
-												gpos::Ref<CExpression> pexpr,
-												CColRef *colref,
-												CColRefSet *pcrsAllowedRefs,
-												BOOL allowNotEqualPreds)
+CPredicateUtils::IsDisjunctionOfRangeComparison(
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRef *colref,
+	gpos::Ref<CColRefSet> pcrsAllowedRefs, BOOL allowNotEqualPreds)
 {
 	if (!FOr(pexpr))
 	{
@@ -1616,7 +1614,7 @@ CPredicateUtils::IsDisjunctionOfRangeComparison(CMemoryPool *mp,
 gpos::Ref<CExpression>
 CPredicateUtils::PexprExtractPredicatesOnPartKeys(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
-	CColRef2dArray *pdrgpdrgpcrPartKeys, CColRefSet *pcrsAllowedRefs,
+	CColRef2dArray *pdrgpdrgpcrPartKeys, gpos::Ref<CColRefSet> pcrsAllowedRefs,
 	BOOL fUseConstraints, const IMDRelation *pmdrel)
 {
 	GPOS_ASSERT(nullptr != pdrgpdrgpcrPartKeys);
@@ -1868,7 +1866,7 @@ CPredicateUtils::PexprIndexLookupKeyOnLeft(CMemoryPool *mp,
 										   gpos::Ref<CExpression> pexprScalar,
 										   const IMDIndex *pmdindex,
 										   CColRefArray *pdrgpcrIndex,
-										   CColRefSet *outer_refs)
+										   gpos::Ref<CColRefSet> outer_refs)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 
@@ -1885,7 +1883,7 @@ CPredicateUtils::PexprIndexLookupKeyOnLeft(CMemoryPool *mp,
 			 gpos::dyn_cast<CScalarIdent>((*pexprLeft)[0]->Pop())->Pcr())))
 	{
 		// left expression is a scalar identifier or casted scalar identifier on an index key
-		CColRefSet *pcrsUsedRight = pexprRight->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrsUsedRight = pexprRight->DeriveUsedColumns();
 		BOOL fSuccess = true;
 
 		if (0 < pcrsUsedRight->Size())
@@ -1928,7 +1926,7 @@ CPredicateUtils::PexprIndexLookupKeyOnRight(CMemoryPool *mp,
 											gpos::Ref<CExpression> pexprScalar,
 											const IMDIndex *pmdindex,
 											CColRefArray *pdrgpcrIndex,
-											CColRefSet *outer_refs)
+											gpos::Ref<CColRefSet> outer_refs)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 
@@ -1971,7 +1969,7 @@ CPredicateUtils::PexprIndexLookup(CMemoryPool *mp, CMDAccessor *md_accessor,
 								  gpos::Ref<CExpression> pexprScalar,
 								  const IMDIndex *pmdindex,
 								  CColRefArray *pdrgpcrIndex,
-								  CColRefSet *outer_refs,
+								  gpos::Ref<CColRefSet> outer_refs,
 								  BOOL allowArrayCmpForBTreeIndexes)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
@@ -2034,7 +2032,7 @@ CPredicateUtils::ExtractIndexPredicates(
 	CExpressionArray *pdrgpexprPredicate, const IMDIndex *pmdindex,
 	CColRefArray *pdrgpcrIndex, CExpressionArray *pdrgpexprIndex,
 	CExpressionArray *pdrgpexprResidual,
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 		pcrsAcceptedOuterRefs,	// outer refs that are acceptable in an index predicate
 	BOOL allowArrayCmpForBTreeIndexes)
 {
@@ -2117,7 +2115,7 @@ CPredicateUtils::ExtractIndexPredicates(
 void
 CPredicateUtils::SeparateOuterRefs(CMemoryPool *mp,
 								   gpos::Ref<CExpression> pexprScalar,
-								   CColRefSet *outer_refs,
+								   gpos::Ref<CColRefSet> outer_refs,
 								   gpos::Ref<CExpression> *ppexprLocal,
 								   gpos::Ref<CExpression> *ppexprOuterRef)
 {
@@ -2126,7 +2124,7 @@ CPredicateUtils::SeparateOuterRefs(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != ppexprLocal);
 	GPOS_ASSERT(nullptr != ppexprOuterRef);
 
-	CColRefSet *pcrsUsed = pexprScalar->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprScalar->DeriveUsedColumns();
 	if (pcrsUsed->IsDisjoint(outer_refs))
 	{
 		// if used columns are disjoint from outer references, return input expression
@@ -2179,7 +2177,7 @@ CPredicateUtils::SeparateOuterRefs(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		gpos::Ref<CExpression> pexprPred = (*pdrgpexpr)[ul];
-		CColRefSet *pcrsPredUsed = pexprPred->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrsPredUsed = pexprPred->DeriveUsedColumns();
 		;
 		if (0 == pcrsPredUsed->Size() || outer_refs->IsDisjoint(pcrsPredUsed))
 		{
@@ -2327,11 +2325,11 @@ CPredicateUtils::FImpliedPredicate(gpos::Ref<CExpression> pexprPred,
 	GPOS_ASSERT(pexprPred->Pop()->FScalar());
 	GPOS_ASSERT(FCheckPredicateImplication(pexprPred));
 
-	CColRefSet *pcrsUsed = pexprPred->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprPred->DeriveUsedColumns();
 	const ULONG size = pdrgpcrsEquivClasses->Size();
 	for (ULONG ul = 0; ul < size; ul++)
 	{
-		CColRefSet *pcrs = (*pdrgpcrsEquivClasses)[ul].get();
+		gpos::Ref<CColRefSet> pcrs = (*pdrgpcrsEquivClasses)[ul].get();
 		if (pcrs->ContainsAll(pcrsUsed))
 		{
 			// predicate is implied by given equivalence classes
@@ -2431,8 +2429,8 @@ CPredicateUtils::FValidSemiJoinCorrelations(
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
 
-	CColRefSet *pcrsOuterOuput = pexprOuter->DeriveOutputColumns();
-	CColRefSet *pcrsInnerOuput = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOuterOuput = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsInnerOuput = pexprInner->DeriveOutputColumns();
 
 	// collect output columns of both children
 	gpos::Ref<CColRefSet> pcrsChildren =
@@ -2444,7 +2442,7 @@ CPredicateUtils::FValidSemiJoinCorrelations(
 	for (ULONG ul = 0; fValid && ul < ulCorrs; ul++)
 	{
 		gpos::Ref<CExpression> pexprPred = (*pdrgpexprCorrelations)[ul].get();
-		CColRefSet *pcrsUsed = pexprPred->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrsUsed = pexprPred->DeriveUsedColumns();
 		if (0 < pcrsUsed->Size() && !pcrsChildren->ContainsAll(pcrsUsed) &&
 			!pcrsUsed->IsDisjoint(pcrsInnerOuput))
 		{
@@ -2461,7 +2459,7 @@ CPredicateUtils::FValidSemiJoinCorrelations(
 BOOL
 CPredicateUtils::FSimpleEqualityUsingCols(CMemoryPool *mp,
 										  gpos::Ref<CExpression> pexprScalar,
-										  CColRefSet *pcrs)
+										  gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 	GPOS_ASSERT(pexprScalar->Pop()->FScalar());
@@ -2476,7 +2474,7 @@ CPredicateUtils::FSimpleEqualityUsingCols(CMemoryPool *mp,
 	{
 		// join predicate must be an equality of scalar idents and uses columns from given set
 		gpos::Ref<CExpression> pexprConj = (*pdrgpexpr)[ul].get();
-		CColRefSet *pcrsUsed = pexprConj->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrsUsed = pexprConj->DeriveUsedColumns();
 		fSuccess = IsEqualityOp(pexprConj) &&
 				   CUtils::FScalarIdent((*pexprConj)[0]) &&
 				   CUtils::FScalarIdent((*pexprConj)[1]) &&
@@ -2490,7 +2488,7 @@ CPredicateUtils::FSimpleEqualityUsingCols(CMemoryPool *mp,
 gpos::Ref<CExpression>
 CPredicateUtils::PexprReplaceColsWithNulls(CMemoryPool *mp,
 										   gpos::Ref<CExpression> pexprScalar,
-										   CColRefSet *pcrs)
+										   gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexprScalar);
@@ -2533,7 +2531,7 @@ CPredicateUtils::PexprReplaceColsWithNulls(CMemoryPool *mp,
 BOOL
 CPredicateUtils::FNullRejecting(CMemoryPool *mp,
 								gpos::Ref<CExpression> pexprScalar,
-								CColRefSet *pcrs)
+								gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexprScalar);
@@ -2614,7 +2612,7 @@ CPredicateUtils::FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
 	}
 	else if (COperator::EopScalarArrayCmp == pexprPred->Pop()->Eopid())
 	{
-		CScalarArrayCmp *popScArrCmp =
+		gpos::Ref<CScalarArrayCmp> popScArrCmp =
 			gpos::dyn_cast<CScalarArrayCmp>(pexprPred->Pop());
 		pmdobjScCmp = md_accessor->RetrieveScOp(popScArrCmp->MdIdOp());
 	}
@@ -2624,7 +2622,7 @@ CPredicateUtils::FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
 	}
 
 	gpos::Ref<CExpression> pexprLeft = (*pexprPred)[0];
-	CColRefSet *pcrsUsed = pexprLeft->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprLeft->DeriveUsedColumns();
 	GPOS_ASSERT(1 == pcrsUsed->Size());
 
 	CColRef *pcrIndexKey = pcrsUsed->PcrFirst();
@@ -2855,7 +2853,7 @@ CPredicateUtils::FCollapsibleChildUnionUnionAll(gpos::Ref<CExpression> pexpr,
 //		+--CScalarConstArray
 BOOL
 CPredicateUtils::FBitmapLookupSupportedPredicateOrConjunct(
-	gpos::Ref<CExpression> pexpr, CColRefSet *outer_refs)
+	gpos::Ref<CExpression> pexpr, gpos::Ref<CColRefSet> outer_refs)
 {
 	if (CPredicateUtils::FAnd(pexpr))
 	{
@@ -2890,7 +2888,8 @@ CPredicateUtils::FBitmapLookupSupportedPredicateOrConjunct(
 BOOL
 CPredicateUtils::FBuiltInComparisonIsVeryStrict(gpos::Ref<IMDId> mdid)
 {
-	const CMDIdGPDB *const pmdidGPDB = gpos::dyn_cast<CMDIdGPDB>(mdid);
+	const gpos::Ref<CMDIdGPDB> const pmdidGPDB =
+		gpos::dyn_cast<CMDIdGPDB>(mdid);
 
 	GPOS_ASSERT(nullptr != pmdidGPDB);
 

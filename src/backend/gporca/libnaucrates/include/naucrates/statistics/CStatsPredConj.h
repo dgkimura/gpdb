@@ -78,13 +78,13 @@ public:
 	}
 
 	// conversion function
-	static CStatsPredConj *
+	static gpos::Ref<CStatsPredConj>
 	ConvertPredStats(gpos::Ref<CStatsPred> pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptConj == pred_stats->GetPredStatsType());
 
-		return dynamic_cast<CStatsPredConj *>(pred_stats);
+		return gpos::dyn_cast<CStatsPredConj>(pred_stats);
 	}
 
 };	// class CStatsPredConj

@@ -570,7 +570,7 @@ CTranslatorDXLToPlStmt::TranslateDXLTblScan(
 
 	// Lock any table we are to scan, since it may not have been properly locked
 	// by the parser (e.g in case of generated scans for partitioned tables)
-	CMDIdGPDB *mdid = gpos::dyn_cast<CMDIdGPDB>(md_rel->MDId());
+	gpos::Ref<CMDIdGPDB> mdid = gpos::dyn_cast<CMDIdGPDB>(md_rel->MDId());
 	GPOS_RTL_ASSERT(dxl_table_descr->LockMode() != -1);
 	gpdb::GPDBLockRelationOid(mdid->Oid(), dxl_table_descr->LockMode());
 
@@ -737,7 +737,7 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexScan(
 
 	// Lock any table we are to scan, since it may not have been properly locked
 	// by the parser (e.g in case of generated scans for partitioned tables)
-	CMDIdGPDB *mdid = gpos::dyn_cast<CMDIdGPDB>(md_rel->MDId());
+	gpos::Ref<CMDIdGPDB> mdid = gpos::dyn_cast<CMDIdGPDB>(md_rel->MDId());
 	GPOS_RTL_ASSERT(dxl_table_descr->LockMode() != -1);
 	gpdb::GPDBLockRelationOid(mdid->Oid(), dxl_table_descr->LockMode());
 
@@ -752,7 +752,7 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexScan(
 	index_scan = MakeNode(IndexScan);
 	index_scan->scan.scanrelid = index;
 
-	CMDIdGPDB *mdid_index = gpos::dyn_cast<CMDIdGPDB>(
+	gpos::Ref<CMDIdGPDB> mdid_index = gpos::dyn_cast<CMDIdGPDB>(
 		physical_idx_scan_dxlop->GetDXLIndexDescr()->MDId());
 	const IMDIndex *md_index = m_md_accessor->RetrieveIndex(mdid_index);
 	Oid index_oid = mdid_index->Oid();
@@ -896,7 +896,7 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexOnlyScan(
 	IndexOnlyScan *index_scan = MakeNode(IndexOnlyScan);
 	index_scan->scan.scanrelid = index;
 
-	CMDIdGPDB *mdid_index = gpos::dyn_cast<CMDIdGPDB>(
+	gpos::Ref<CMDIdGPDB> mdid_index = gpos::dyn_cast<CMDIdGPDB>(
 		physical_idx_scan_dxlop->GetDXLIndexDescr()->MDId());
 	const IMDIndex *md_index = m_md_accessor->RetrieveIndex(mdid_index);
 	Oid index_oid = mdid_index->Oid();
@@ -1598,7 +1598,7 @@ CTranslatorDXLToPlStmt::TranslateDXLTvfToRangeTblEntry(
 		const_expr->consttypmod = -1;
 
 		gpos::Ref<CDXLNode> constVa = (*tvf_dxlnode)[1];
-		CDXLScalarConstValue *constValue =
+		gpos::Ref<CDXLScalarConstValue> constValue =
 			gpos::dyn_cast<CDXLScalarConstValue>(constVa->GetOperator());
 		const gpos::Ref<CDXLDatum> datum_dxl = constValue->GetDatumVal();
 		CDXLDatumGeneric *datum_generic_dxl = gpos::dyn_cast<CDXLDatumGeneric>(
@@ -3526,7 +3526,7 @@ CTranslatorDXLToPlStmt::TranslateDXLPartSelector(
 		project_list_dxlnode, nullptr /*base_table_context*/,
 		child_contexts.get(), output_context);
 
-	CMDIdGPDB *mdid =
+	gpos::Ref<CMDIdGPDB> mdid =
 		gpos::dyn_cast<CMDIdGPDB>(partition_selector_dxlop->GetRelMdId());
 	gpdb::RelationWrapper relation = gpdb::GetRelation(mdid->Oid());
 
@@ -4175,7 +4175,7 @@ CTranslatorDXLToPlStmt::TranslateDXLDynIdxScan(
 			gpdb::LAppendInt(dyn_idx_scan->join_prune_paramids, param_id);
 	}
 
-	CMDIdGPDB *mdid_index = gpos::dyn_cast<CMDIdGPDB>(
+	gpos::Ref<CMDIdGPDB> mdid_index = gpos::dyn_cast<CMDIdGPDB>(
 		dyn_index_scan_dxlop->GetDXLIndexDescr()->MDId());
 	const IMDIndex *md_index = m_md_accessor->RetrieveIndex(mdid_index);
 	Oid index_oid = mdid_index->Oid();
@@ -5758,7 +5758,7 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapTblScan(
 
 	// Lock any table we are to scan, since it may not have been properly locked
 	// by the parser (e.g in case of generated scans for partitioned tables)
-	CMDIdGPDB *mdid = gpos::dyn_cast<CMDIdGPDB>(md_rel->MDId());
+	gpos::Ref<CMDIdGPDB> mdid = gpos::dyn_cast<CMDIdGPDB>(md_rel->MDId());
 	GPOS_RTL_ASSERT(table_descr->LockMode() != -1);
 	gpdb::GPDBLockRelationOid(mdid->Oid(), table_descr->LockMode());
 
@@ -5988,7 +5988,7 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapIndexProbe(
 	}
 	bitmap_idx_scan->scan.scanrelid = bitmap_tbl_scan->scan.scanrelid;
 
-	CMDIdGPDB *mdid_index = gpos::dyn_cast<CMDIdGPDB>(
+	gpos::Ref<CMDIdGPDB> mdid_index = gpos::dyn_cast<CMDIdGPDB>(
 		sc_bitmap_idx_probe_dxlop->GetDXLIndexDescr()->MDId());
 	const IMDIndex *index = m_md_accessor->RetrieveIndex(mdid_index);
 	Oid index_oid = mdid_index->Oid();

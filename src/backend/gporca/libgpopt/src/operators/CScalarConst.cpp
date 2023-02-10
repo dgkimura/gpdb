@@ -80,7 +80,7 @@ CScalarConst::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarConst *psconst = gpos::dyn_cast<CScalarConst>(pop);
+		gpos::Ref<CScalarConst> psconst = gpos::dyn_cast<CScalarConst>(pop);
 
 		// match if constant values are the same
 		return GetDatum()->Matches(psconst->GetDatum());
@@ -157,7 +157,7 @@ CScalarConst::FCastedConst(gpos::Ref<CExpression> pexpr)
 // 		Else return NULL.
 //
 //---------------------------------------------------------------------------
-CScalarConst *
+gpos::Ref<CScalarConst>
 CScalarConst::PopExtractFromConstOrCastConst(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);

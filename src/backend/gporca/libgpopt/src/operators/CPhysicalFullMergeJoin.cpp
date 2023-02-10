@@ -73,7 +73,8 @@ CPhysicalFullMergeJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 
 gpos::Ref<CEnfdDistribution>
 CPhysicalFullMergeJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							CReqdPropPlan *prppInput, ULONG child_index,
+							gpos::Ref<CReqdPropPlan> prppInput,
+							ULONG child_index,
 							CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
 							ULONG ulOptReq)
 {
@@ -234,10 +235,10 @@ CPhysicalFullMergeJoin::EpetOrder(CExpressionHandle &, const CEnfdOrder *
 }
 
 CEnfdDistribution::EDistributionMatching
-CPhysicalFullMergeJoin::Edm(CReqdPropPlan *,   // prppInput
-							ULONG,			   // child_index,
-							CDrvdPropArray *,  // pdrgpdpCtxt,
-							ULONG			   // ulOptReq
+CPhysicalFullMergeJoin::Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
+							ULONG,					   // child_index,
+							CDrvdPropArray *,		   // pdrgpdpCtxt,
+							ULONG					   // ulOptReq
 )
 {
 	return CEnfdDistribution::EdmExact;

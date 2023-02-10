@@ -95,7 +95,7 @@ public:
 	void Include(const CColRefArray *colref_array);
 
 	// include column set
-	void Include(const CColRefSet *pcrs);
+	void Include(const gpos::Ref<CColRefSet> pcrs);
 
 	// remove column
 	void Exclude(const CColRef *colref);
@@ -104,7 +104,7 @@ public:
 	void Exclude(const CColRefArray *colref_array);
 
 	// remove column set
-	void Exclude(const CColRefSet *pcrs);
+	void Exclude(const gpos::Ref<CColRefSet> pcrs);
 
 	// replace column with another column
 	void Replace(const CColRef *pcrOut, const CColRef *pcrIn);
@@ -117,7 +117,7 @@ public:
 	BOOL FContained(const CColRefSetArray *pdrgpcrs);
 
 	// check if current colrefset intersects with the given colrefset
-	BOOL FIntersects(const CColRefSet *pcrs);
+	BOOL FIntersects(const gpos::Ref<CColRefSet> pcrs);
 
 	// convert to array
 	gpos::Ref<CColRefArray> Pdrgpcr(CMemoryPool *mp) const;
@@ -136,7 +136,7 @@ public:
 	void ExtractColIds(CMemoryPool *mp, ULongPtrArray *colids) const;
 
 	// are the columns in the column reference set covered by the array of column ref sets
-	static BOOL FCovered(CColRefSetArray *pdrgpcrs, CColRefSet *pcrs);
+	static BOOL FCovered(CColRefSetArray *pdrgpcrs, gpos::Ref<CColRefSet> pcrs);
 
 };	// class CColRefSet
 

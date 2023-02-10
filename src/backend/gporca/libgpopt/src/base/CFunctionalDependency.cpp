@@ -62,7 +62,7 @@ CFunctionalDependency::~CFunctionalDependency()
 //
 //---------------------------------------------------------------------------
 BOOL
-CFunctionalDependency::FIncluded(CColRefSet *pcrs) const
+CFunctionalDependency::FIncluded(gpos::Ref<CColRefSet> pcrs) const
 {
 	return pcrs->ContainsAll(m_pcrsKey.get()) &&
 		   pcrs->ContainsAll(m_pcrsDetermined.get());

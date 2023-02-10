@@ -54,7 +54,7 @@ protected:
 	CLogicalDynamicGetBase(const CLogicalDynamicGetBase &);
 
 	// given a colrefset from a table, get colids and attno
-	void ExtractColIdsAttno(CMemoryPool *mp, CColRefSet *pcrs,
+	void ExtractColIdsAttno(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
 							ULongPtrArray *colids,
 							ULongPtrArray *pdrgpulPos) const;
 
@@ -102,7 +102,7 @@ public:
 	}
 
 	// distribution columns
-	virtual const CColRefSet *
+	virtual const gpos::Ref<CColRefSet>
 	PcrsDist() const
 	{
 		return m_pcrsDist.get();

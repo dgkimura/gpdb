@@ -32,7 +32,7 @@ private:
 										gpos::Ref<CExpression> pexprInner,
 										gpos::Ref<CExpression> pexprScalar,
 										gpos::Ref<CTableDescriptor> ptabDesc,
-										const CColRefSet *pcrsDist);
+										const gpos::Ref<CColRefSet> pcrsDist);
 
 public:
 	CXformJoin2IndexApplyGeneric(const CXformJoin2IndexApplyGeneric &) = delete;

@@ -64,16 +64,16 @@ private:
 	// and a group by as inner
 	static gpos::Ref<CExpression> PexprLeftAntiSemiJoinWithInnerGroupBy(
 		CMemoryPool *mp, CColRefArray *pdrgpcrOuter,
-		gpos::Ref<CColRefArray> pdrgpcrOuterCopy, CColRefSet *pcrsScalar,
-		CColRefSet *pcrsInner, CColRefArray *pdrgpcrJoinOutput,
-		ULONG ulCTEJoinId, ULONG ulCTEOuterId);
+		gpos::Ref<CColRefArray> pdrgpcrOuterCopy,
+		gpos::Ref<CColRefSet> pcrsScalar, gpos::Ref<CColRefSet> pcrsInner,
+		CColRefArray *pdrgpcrJoinOutput, ULONG ulCTEJoinId, ULONG ulCTEOuterId);
 
 	// return a project over a left anti semi join that appends nulls for all
 	// columns in the original inner child
 	static gpos::Ref<CExpression> PexprProjectOverLeftAntiSemiJoin(
-		CMemoryPool *mp, CColRefArray *pdrgpcrOuter, CColRefSet *pcrsScalar,
-		CColRefSet *pcrsInner, CColRefArray *pdrgpcrJoinOutput,
-		ULONG ulCTEJoinId, ULONG ulCTEOuterId,
+		CMemoryPool *mp, CColRefArray *pdrgpcrOuter,
+		gpos::Ref<CColRefSet> pcrsScalar, gpos::Ref<CColRefSet> pcrsInner,
+		CColRefArray *pdrgpcrJoinOutput, ULONG ulCTEJoinId, ULONG ulCTEOuterId,
 		gpos::Ref<CColRefArray> *ppdrgpcrProjectOutput);
 
 public:

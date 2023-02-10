@@ -47,13 +47,13 @@ CConstExprEvaluatorForDates::PexprEval(gpos::Ref<CExpression> pexpr)
 	GPOS_ASSERT(COperator::EopScalarConst == (*pexpr)[0]->Pop()->Eopid());
 	GPOS_ASSERT(COperator::EopScalarConst == (*pexpr)[1]->Pop()->Eopid());
 
-	CScalarConst *popScalarLeft =
-		dynamic_cast<CScalarConst *>((*pexpr)[0]->Pop());
+	gpos::Ref<CScalarConst> popScalarLeft =
+		dynamic_cast<gpos::Ref<CScalarConst> >((*pexpr)[0]->Pop());
 
 	GPOS_ASSERT(
 		CMDIdGPDB::m_mdid_date.Equals(popScalarLeft->GetDatum()->MDId().get()));
-	CScalarConst *popScalarRight =
-		dynamic_cast<CScalarConst *>((*pexpr)[1]->Pop());
+	gpos::Ref<CScalarConst> popScalarRight =
+		dynamic_cast<gpos::Ref<CScalarConst> >((*pexpr)[1]->Pop());
 
 	GPOS_ASSERT(CMDIdGPDB::m_mdid_date.Equals(
 		popScalarRight->GetDatum()->MDId().get()));

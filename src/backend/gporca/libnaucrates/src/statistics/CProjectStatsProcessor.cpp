@@ -22,7 +22,7 @@ using namespace gpopt;
 //  return a statistics object for a project operation
 gpos::Ref<CStatistics>
 CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
-									  const CStatistics *input_stats,
+									  const gpos::Ref<CStatistics> input_stats,
 									  ULongPtrArray *projection_colids,
 									  UlongToIDatumMap *datum_map)
 {

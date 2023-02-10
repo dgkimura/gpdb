@@ -70,7 +70,8 @@ private:
 	gpos::Ref<CDistributionSpec> PdsRequiredReplicate(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CDistributionSpec *pdsInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq, CReqdPropPlan *prppInput);
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq,
+		gpos::Ref<CReqdPropPlan> prppInput);
 
 	// create a child hashed distribution request based on input hashed distribution,
 	// return NULL if no such request can be created
@@ -80,7 +81,7 @@ private:
 		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
 
 	// check whether a hash key is nullable
-	BOOL FNullableHashKey(ULONG ulKey, CColRefSet *pcrsNotNullInner,
+	BOOL FNullableHashKey(ULONG ulKey, gpos::Ref<CColRefSet> pcrsNotNullInner,
 						  BOOL fInner) const;
 
 protected:
@@ -96,7 +97,8 @@ protected:
 		CDrvdPropArray *pdrgpdpCtxt) const;
 
 	// check whether the hash keys from one child are nullable
-	BOOL FNullableHashKeys(CColRefSet *pcrsNotNullInner, BOOL fInner) const;
+	BOOL FNullableHashKeys(gpos::Ref<CColRefSet> pcrsNotNullInner,
+						   BOOL fInner) const;
 
 	ULONG
 	NumDistrReq() const
@@ -163,7 +165,7 @@ public:
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
-									 CReqdPropPlan *prppInput,
+									 gpos::Ref<CReqdPropPlan> prppInput,
 									 ULONG child_index,
 									 CDrvdPropArray *pdrgpdpCtxt,
 									 ULONG ulDistrReq) override;

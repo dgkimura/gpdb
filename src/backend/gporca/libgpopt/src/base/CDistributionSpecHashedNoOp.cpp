@@ -31,7 +31,7 @@ CDistributionSpecHashedNoOp::Matches(const CDistributionSpec *pds) const
 void
 CDistributionSpecHashedNoOp::AppendEnforcers(CMemoryPool *mp,
 											 CExpressionHandle &exprhdl,
-											 CReqdPropPlan *,
+											 gpos::Ref<CReqdPropPlan>,
 											 CExpressionArray *pdrgpexpr,
 											 gpos::Ref<CExpression> pexpr)
 {

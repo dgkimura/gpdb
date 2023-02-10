@@ -118,7 +118,7 @@ public:
 	// compute required output columns of the n-th child
 	gpos::Ref<CColRefSet> PcrsRequired(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired,
+									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG child_index,
 									   CDrvdPropArray *pdrgpdpCtxt,
 									   ULONG ulOptReq) override;
@@ -154,7 +154,8 @@ public:
 											  ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
@@ -203,13 +204,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CPhysicalSequenceProject *
+	static gpos::Ref<CPhysicalSequenceProject>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalSequenceProject == pop->Eopid());
 
-		return dynamic_cast<CPhysicalSequenceProject *>(pop);
+		return gpos::dyn_cast<CPhysicalSequenceProject>(pop);
 	}
 
 };	// class CPhysicalSequenceProject

@@ -234,7 +234,7 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(
 	}
 #endif	// GPOS_DEBUG
 
-	CScalarArrayCmp *popScArrayCmp =
+	gpos::Ref<CScalarArrayCmp> popScArrayCmp =
 		gpos::dyn_cast<CScalarArrayCmp>(pexpr->Pop());
 	IMDType::ECmpType cmp_type = CUtils::ParseCmpType(popScArrayCmp->MdIdOp());
 
@@ -342,7 +342,7 @@ CConstraintInterval::PciIntervalFromConstraint(CMemoryPool *mp,
 		return dynamic_cast<CConstraintInterval *>(pcnstr);
 	}
 
-	CColRefSet *pcrsUsed = pcnstr->PcrsUsed();
+	gpos::Ref<CColRefSet> pcrsUsed = pcnstr->PcrsUsed();
 	GPOS_ASSERT(1 == pcrsUsed->Size());
 
 	CColRef *pcrFirst = pcrsUsed->PcrFirst();
@@ -399,11 +399,9 @@ CConstraintInterval::PciIntervalFromScalarNullTest(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraintInterval>
-CConstraintInterval::PciIntervalFromColConstCmp(CMemoryPool *mp,
-												CColRef *colref,
-												IMDType::ECmpType cmp_type,
-												CScalarConst *popScConst,
-												BOOL infer_nulls_as)
+CConstraintInterval::PciIntervalFromColConstCmp(
+	CMemoryPool *mp, CColRef *colref, IMDType::ECmpType cmp_type,
+	gpos::Ref<CScalarConst> popScConst, BOOL infer_nulls_as)
 {
 	gpos::Ref<CConstraintInterval> pcri = nullptr;
 	gpos::Ref<CRangeArray> pdrngprng =
@@ -460,7 +458,7 @@ CConstraintInterval::PciIntervalFromScalarCmp(CMemoryPool *mp,
 
 		// constant
 		gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
-		CScalarConst *popScConst;
+		gpos::Ref<CScalarConst> popScConst;
 		if (CUtils::FScalarConst(pexprRight))
 		{
 			popScConst = gpos::dyn_cast<CScalarConst>(pexprRight->Pop());
@@ -498,7 +496,7 @@ CConstraintInterval::PciIntervalFromScalarIDF(CMemoryPool *mp,
 #endif	// GPOS_DEBUG
 
 		// constant
-		CScalarConst *popScConst =
+		gpos::Ref<CScalarConst> popScConst =
 			gpos::dyn_cast<CScalarConst>((*pexpr)[1]->Pop());
 		// operator
 		CScalarIsDistinctFrom *popScCmp =
@@ -553,7 +551,8 @@ CConstraintInterval::PciIntervalFromScalarBoolOp(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(CUtils::FScalarBoolOp(pexpr));
 
-	CScalarBoolOp *popScBool = gpos::dyn_cast<CScalarBoolOp>(pexpr->Pop());
+	gpos::Ref<CScalarBoolOp> popScBool =
+		gpos::dyn_cast<CScalarBoolOp>(pexpr->Pop());
 	CScalarBoolOp::EBoolOperator eboolop = popScBool->Eboolop();
 
 	switch (eboolop)
@@ -1010,7 +1009,7 @@ CConstraintInterval::Pcnstr(CMemoryPool *,	//mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraint>
 CConstraintInterval::Pcnstr(CMemoryPool *,	//mp,
-							CColRefSet *pcrs)
+							gpos::Ref<CColRefSet> pcrs)
 {
 	if (pcrs->FMember(m_pcr))
 	{
@@ -1279,7 +1278,8 @@ CConstraintInterval::PciUnbounded(CMemoryPool *mp, const CColRef *colref,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraintInterval>
-CConstraintInterval::PciUnbounded(CMemoryPool *mp, const CColRefSet *pcrs,
+CConstraintInterval::PciUnbounded(CMemoryPool *mp,
+								  const gpos::Ref<CColRefSet> pcrs,
 								  BOOL fIncludesNull)
 {
 	// find the first constrainable column
@@ -1488,9 +1488,9 @@ CConstraintInterval::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CRangeArray>
-CConstraintInterval::PciRangeFromColConstCmp(CMemoryPool *mp,
-											 IMDType::ECmpType cmp_type,
-											 const CScalarConst *popsccnst)
+CConstraintInterval::PciRangeFromColConstCmp(
+	CMemoryPool *mp, IMDType::ECmpType cmp_type,
+	const gpos::Ref<CScalarConst> popsccnst)
 {
 	GPOS_ASSERT(CScalar::EopScalarConst == popsccnst->Eopid());
 

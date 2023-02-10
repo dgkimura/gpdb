@@ -72,12 +72,13 @@ CLogicalUnary::PstatsDeriveProject(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
 	CReqdPropRelational *prprel =
 		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
-	CColRefSet *pcrs = prprel->PcrsStat();
+	gpos::Ref<CColRefSet> pcrs = prprel->PcrsStat();
 	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(mp) ULongPtrArray(mp);
 	pcrs->ExtractColIds(mp, colids.get());
 
 	gpos::Ref<IStatistics> stats = CProjectStatsProcessor::CalcProjStats(
-		mp, dynamic_cast<CStatistics *>(child_stats), colids.get(), phmuldatum);
+		mp, dynamic_cast<gpos::Ref<CStatistics> >(child_stats), colids.get(),
+		phmuldatum);
 
 	// clean up
 	;

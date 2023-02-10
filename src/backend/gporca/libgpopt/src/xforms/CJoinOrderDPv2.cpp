@@ -881,7 +881,7 @@ CJoinOrderDPv2::PopulateDPEInfo(gpos::Ref<SExpressionInfo> join_expr_info,
 		gpos::Ref<CExpression> scalar_expr =
 			(*join_expr)[join_expr->Arity() - 1];
 
-		CColRefSet *join_expr_cols = scalar_expr->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> join_expr_cols = scalar_expr->DeriveUsedColumns();
 		for (ULONG i = 0; i < partition_keys->Size(); i++)
 		{
 			gpos::Ref<CPartKeys> part_keys = (*partition_keys)[i].get();

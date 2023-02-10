@@ -102,7 +102,7 @@ public:
 	}
 
 	// required plan properties accessor
-	CReqdPropPlan *
+	gpos::Ref<CReqdPropPlan>
 	Prpp() const
 	{
 		return m_prpp.get();

@@ -141,8 +141,9 @@ private:
 	// pull up project elements from the given projection expression that do not
 	// exist in the given used columns set
 	static gpos::Ref<CExpression> PexprPullUpProjectElements(
-		CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRefSet *pcrsUsed,
-		CColRefSet *pcrsOutput, CExpressionArray *pdrgpexprPrElPullUp);
+		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CColRefSet> pcrsUsed, gpos::Ref<CColRefSet> pcrsOutput,
+		CExpressionArray *pdrgpexprPrElPullUp);
 
 #ifdef GPOS_DEBUG
 	// check if the columns used by the operator are a subset of its input columns

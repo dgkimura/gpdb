@@ -78,7 +78,7 @@ CPropConstraint::InitHashMap(CMemoryPool *mp)
 	}
 	for (ULONG ul = 0; ul < ulEquiv; ul++)
 	{
-		CColRefSet *pcrs = (*m_pdrgpcrs)[ul];
+		gpos::Ref<CColRefSet> pcrs = (*m_pdrgpcrs)[ul];
 
 		CColRefSetIter crsi(*pcrs);
 		while (crsi.Advance())
@@ -122,7 +122,7 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 	{
 		return nullptr;
 	}
-	CColRefSet *pcrs = m_phmcrcrs->Find(colref);
+	gpos::Ref<CColRefSet> pcrs = m_phmcrcrs->Find(colref);
 	gpos::Ref<CColRefSet> equivOuterRefs = nullptr;
 
 	if (nullptr != constraintsForOuterRefs &&
@@ -218,7 +218,7 @@ CPropConstraint::OsPrint(IOstream &os) const
 
 		for (ULONG ul = 0; ul < length; ul++)
 		{
-			CColRefSet *pcrs = (*m_pdrgpcrs)[ul].get();
+			gpos::Ref<CColRefSet> pcrs = (*m_pdrgpcrs)[ul].get();
 			os << "(" << *pcrs << ") ";
 		}
 

@@ -279,10 +279,10 @@ CJoinStatsProcessor::SetResultingJoinStats(
 	// However, currently only CStatistics implements IStatistics
 	// Until this changes, the interfaces have been designed to take IStatistics as parameters
 	// In the future, IStatistics should be removed, as it is not being utilized as designed
-	const CStatistics *outer_stats =
-		dynamic_cast<const CStatistics *>(outer_stats_input);
-	const CStatistics *inner_side_stats =
-		dynamic_cast<const CStatistics *>(inner_stats_input);
+	const gpos::Ref<CStatistics> outer_stats =
+		dynamic_cast<const gpos::Ref<CStatistics> >(outer_stats_input);
+	const gpos::Ref<CStatistics> inner_side_stats =
+		dynamic_cast<const gpos::Ref<CStatistics> >(inner_stats_input);
 
 	// create hash map from colid -> histogram for resultant structure
 	gpos::Ref<UlongToHistogramMap> result_col_hist_mapping =
@@ -563,7 +563,7 @@ CJoinStatsProcessor::DeriveJoinStats(CMemoryPool *mp,
 	gpos::Ref<CExpression> expr_with_outer_refs = nullptr;
 
 	// get outer references from expression handle
-	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
+	gpos::Ref<CColRefSet> outer_refs = exprhdl.DeriveOuterReferences();
 
 	CPredicateUtils::SeparateOuterRefs(mp, join_pred_expr, outer_refs,
 									   &local_expr, &expr_with_outer_refs);

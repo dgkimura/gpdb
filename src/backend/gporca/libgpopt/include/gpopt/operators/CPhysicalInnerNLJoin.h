@@ -62,7 +62,7 @@ public:
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
-									 CReqdPropPlan *prppInput,
+									 gpos::Ref<CReqdPropPlan> prppInput,
 									 ULONG child_index,
 									 CDrvdPropArray *pdrgpdpCtxt,
 									 ULONG ulDistrReq) override;

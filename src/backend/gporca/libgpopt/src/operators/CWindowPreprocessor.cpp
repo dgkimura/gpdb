@@ -86,7 +86,7 @@ CWindowPreprocessor::SplitPrjList(
 		gpos::Ref<CExpression> pexprWinFunc = (*pexprPrjEl)[0];
 		CScalarWindowFunc *popScWinFunc =
 			gpos::dyn_cast<CScalarWindowFunc>(pexprWinFunc->Pop());
-		CScalarProjectElement *popScPrjElem =
+		gpos::Ref<CScalarProjectElement> popScPrjElem =
 			gpos::dyn_cast<CScalarProjectElement>(pexprPrjEl->Pop());
 		CColRef *pcrPrjElem = popScPrjElem->Pcr();
 
@@ -233,7 +233,7 @@ CWindowPreprocessor::CreateCTE(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != ppexprSecondConsumer);
 
 	gpos::Ref<CExpression> pexprChild = (*pexprSeqPrj)[0];
-	CColRefSet *pcrsChildOutput = pexprChild->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsChildOutput = pexprChild->DeriveOutputColumns();
 	gpos::Ref<CColRefArray> pdrgpcrChildOutput = pcrsChildOutput->Pdrgpcr(mp);
 
 	// create a CTE producer based on SeqPrj child expression

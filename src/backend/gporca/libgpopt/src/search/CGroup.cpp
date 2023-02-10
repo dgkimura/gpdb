@@ -328,7 +328,7 @@ CGroup::UpdateBestCost(gpos::Ref<COptimizationContext> poc,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COptimizationContext>
-CGroup::PocLookup(CMemoryPool *mp, CReqdPropPlan *prpp,
+CGroup::PocLookup(CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prpp,
 				  ULONG ulSearchStageIndex)
 {
 	;
@@ -362,7 +362,7 @@ CGroup::PocLookup(CMemoryPool *mp, CReqdPropPlan *prpp,
 //---------------------------------------------------------------------------
 gpos::Ref<COptimizationContext>
 CGroup::PocLookupBest(CMemoryPool *mp, ULONG ulSearchStages,
-					  CReqdPropPlan *prpp)
+					  gpos::Ref<CReqdPropPlan> prpp)
 {
 	gpos::Ref<COptimizationContext> pocBest = nullptr;
 	gpos::Ref<CCostContext> pccBest = nullptr;
@@ -1330,7 +1330,8 @@ CGroup::FStatsDerivable(CMemoryPool *mp)
 		exprhdl.DeriveProps(pdpctxtrel);
 		;
 
-		CLogical *popLogical = gpos::dyn_cast<CLogical>(pgexprCurrent->Pop());
+		gpos::Ref<CLogical> popLogical =
+			gpos::dyn_cast<CLogical>(pgexprCurrent->Pop());
 		CLogical::EStatPromise esp = popLogical->Esp(exprhdl);
 
 		if (esp > espBest)
@@ -1412,7 +1413,7 @@ CGroup::EspDerive(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 	;
 
 	// compute stat promise for gexpr
-	CLogical *popLogical = gpos::dyn_cast<CLogical>(pgexpr->Pop());
+	gpos::Ref<CLogical> popLogical = gpos::dyn_cast<CLogical>(pgexpr->Pop());
 	CLogical::EStatPromise esp = popLogical->Esp(exprhdl);
 
 	// override promise if outer child references columns of inner children
@@ -2086,7 +2087,7 @@ CGroup::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CCost
-CGroup::CostLowerBound(CMemoryPool *mp, CReqdPropPlan *prppInput)
+CGroup::CostLowerBound(CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput)
 {
 	GPOS_ASSERT(nullptr != prppInput);
 	GPOS_ASSERT(!FScalar());

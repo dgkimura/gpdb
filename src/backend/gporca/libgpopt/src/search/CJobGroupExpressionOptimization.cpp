@@ -185,7 +185,7 @@ void
 CJobGroupExpressionOptimization::Init(gpos::Ref<CGroupExpression> pgexpr,
 									  gpos::Ref<COptimizationContext> poc,
 									  ULONG ulOptReq,
-									  CReqdPropPlan *prppCTEProducer)
+									  gpos::Ref<CReqdPropPlan> prppCTEProducer)
 {
 	GPOS_ASSERT(nullptr != poc);
 

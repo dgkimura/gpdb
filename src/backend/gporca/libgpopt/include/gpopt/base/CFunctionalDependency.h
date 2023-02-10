@@ -59,21 +59,21 @@ public:
 	~CFunctionalDependency() override;
 
 	// key set accessor
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsKey() const
 	{
 		return m_pcrsKey.get();
 	}
 
 	// determined set accessor
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsDetermined() const
 	{
 		return m_pcrsDetermined.get();
 	}
 
 	// determine if all FD columns are included in the given column set
-	BOOL FIncluded(CColRefSet *pcrs) const;
+	BOOL FIncluded(gpos::Ref<CColRefSet> pcrs) const;
 
 	// hash function
 	virtual ULONG HashValue() const;
@@ -83,7 +83,7 @@ public:
 
 	// do the given arguments form a functional dependency
 	BOOL
-	FFunctionallyDependent(CColRefSet *pcrsKey, CColRef *colref)
+	FFunctionallyDependent(gpos::Ref<CColRefSet> pcrsKey, CColRef *colref)
 	{
 		GPOS_ASSERT(nullptr != pcrsKey);
 		GPOS_ASSERT(nullptr != colref);

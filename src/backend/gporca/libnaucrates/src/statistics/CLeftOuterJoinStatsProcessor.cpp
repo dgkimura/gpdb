@@ -28,10 +28,10 @@ CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
 	GPOS_ASSERT(nullptr != inner_side_stats);
 	GPOS_ASSERT(nullptr != join_preds_stats);
 
-	const CStatistics *result_stats_outer_side =
-		dynamic_cast<const CStatistics *>(outer_side_stats);
-	const CStatistics *result_stats_inner_side =
-		dynamic_cast<const CStatistics *>(inner_side_stats);
+	const gpos::Ref<CStatistics> result_stats_outer_side =
+		dynamic_cast<const gpos::Ref<CStatistics> >(outer_side_stats);
+	const gpos::Ref<CStatistics> result_stats_inner_side =
+		dynamic_cast<const gpos::Ref<CStatistics> >(inner_side_stats);
 
 	gpos::Ref<CStatistics> inner_join_stats =
 		gpos::dyn_cast<CStatistics>(result_stats_outer_side->CalcInnerJoinStats(
@@ -80,8 +80,9 @@ CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
 // of the outer child and the histograms of the inner join
 gpos::Ref<UlongToHistogramMap>
 CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
-	CMemoryPool *mp, const CStatistics *outer_side_stats,
-	const CStatistics *inner_side_stats, CStatistics *inner_join_stats,
+	CMemoryPool *mp, const gpos::Ref<CStatistics> outer_side_stats,
+	const gpos::Ref<CStatistics> inner_side_stats,
+	gpos::Ref<CStatistics> inner_join_stats,
 	CStatsPredJoinArray *join_preds_stats, CDouble num_rows_inner_join,
 	CDouble *result_rows_LASJ)
 {
@@ -183,7 +184,7 @@ CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
 // helper function to add histograms of the inner side of a LOJ
 void
 CLeftOuterJoinStatsProcessor::AddHistogramsLOJInner(
-	CMemoryPool *mp, const CStatistics *inner_join_stats,
+	CMemoryPool *mp, const gpos::Ref<CStatistics> inner_join_stats,
 	ULongPtrArray *inner_colids_with_stats, CDouble num_rows_LASJ,
 	CDouble num_rows_inner_join, UlongToHistogramMap *LOJ_histograms)
 {

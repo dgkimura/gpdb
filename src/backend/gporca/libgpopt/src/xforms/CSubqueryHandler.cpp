@@ -291,14 +291,14 @@ CSubqueryHandler::FProjectCountSubquery(gpos::Ref<CExpression> pexprSubquery,
 		return false;
 	}
 
-	CColRefSet *pcrsOutput = pexprPrjChild->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOutput = pexprPrjChild->DeriveOutputColumns();
 	if (1 < pcrsOutput->Size())
 	{
 		// fail if GbAgg has more than one output column
 		return false;
 	}
 
-	CColRefSet *pcrsUsed = pexprPrjList->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprPrjList->DeriveUsedColumns();
 	BOOL fPrjUsesCount = (0 == pcrsUsed->Size()) ||
 						 (1 == pcrsUsed->Size() && pcrsUsed->FMember(pcrCount));
 	if (!fPrjUsesCount)
@@ -349,9 +349,11 @@ CSubqueryHandler::Psd(CMemoryPool *mp, gpos::Ref<CExpression> pexprSubquery,
 	GPOS_ASSERT(nullptr != pexprOuter);
 
 	gpos::Ref<CExpression> pexprInner = (*pexprSubquery)[0];
-	CColRefSet *subqueryOutputCols = (*pexprSubquery)[0]->DeriveOutputColumns();
-	CColRefSet *outer_refs = (*pexprSubquery)[0]->DeriveOuterReferences();
-	CColRefSet *pcrsOuterOutput = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> subqueryOutputCols =
+		(*pexprSubquery)[0]->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_refs =
+		(*pexprSubquery)[0]->DeriveOuterReferences();
+	gpos::Ref<CColRefSet> pcrsOuterOutput = pexprOuter->DeriveOutputColumns();
 
 	SSubqueryDesc *psd = GPOS_NEW(mp) SSubqueryDesc();
 	psd->m_returns_set = (1 < pexprInner->DeriveMaxCard().Ull());
@@ -743,7 +745,7 @@ CSubqueryHandler::FCreateOuterApplyForScalarSubquery(
 		CUtils::PexprLogicalApply<CLogicalLeftOuterApply>(
 			mp, pexprOuter, pexprInner, colref, popSubquery->Eopid());
 
-	const CLogicalGbAgg *pgbAgg = nullptr;
+	const gpos::Ref<CLogicalGbAgg> pgbAgg = nullptr;
 	BOOL fHasCountAggMatchingColumn = CUtils::FHasCountAggMatchingColumn(
 		(*pexprSubquery)[0], colref, &pgbAgg);
 
@@ -830,8 +832,8 @@ CSubqueryHandler::FCreateGrpCols(
 	GPOS_ASSERT(nullptr != ppdrgpcr);
 	GPOS_ASSERT(nullptr != pfGbOnInner);
 
-	CColRefSet *pcrsOuterOutput = pexprOuter->DeriveOutputColumns();
-	CColRefSet *pcrsInnerOutput = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOuterOutput = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsInnerOutput = pexprInner->DeriveOutputColumns();
 	gpos::Ref<CColRefSet> pcrsUsedOuter = GPOS_NEW(mp) CColRefSet(mp);
 
 	BOOL fGbOnInner = false;
@@ -862,7 +864,7 @@ CSubqueryHandler::FCreateGrpCols(
 	gpos::Ref<CColRefArray> colref_array = nullptr;
 	if (fGbOnInner)
 	{
-		CColRefSet *pcrsUsed = pexprScalar->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrsUsed = pexprScalar->DeriveUsedColumns();
 		gpos::Ref<CColRefSet> pcrsGb = GPOS_NEW(mp) CColRefSet(mp);
 		pcrsGb->Include(pcrsUsed);
 		pcrsGb->Difference(pcrsUsedOuter.get());
@@ -966,7 +968,7 @@ CSubqueryHandler::CreateGroupByNode(CMemoryPool *mp,
 
 		gpos::Ref<CExpression> pexprCount =
 			CUtils::PexprCount(mp, colref, false /* is_distinct */);
-		CScalarAggFunc *popCount =
+		gpos::Ref<CScalarAggFunc> popCount =
 			gpos::dyn_cast<CScalarAggFunc>(pexprCount->Pop());
 		const IMDType *pmdtypeCount =
 			md_accessor->RetrieveType(popCount->MdidType());
@@ -985,7 +987,7 @@ CSubqueryHandler::CreateGroupByNode(CMemoryPool *mp,
 									(*pexprPrjListForSum)[0]->Pop())
 									->Pcr();
 		gpos::Ref<CExpression> pexprSum = CUtils::PexprSum(mp, colrefForSum);
-		CScalarAggFunc *popSum =
+		gpos::Ref<CScalarAggFunc> popSum =
 			gpos::dyn_cast<CScalarAggFunc>(pexprSum->Pop());
 		const IMDType *pmdtypeSum =
 			md_accessor->RetrieveType(popSum->MdidType());
@@ -1355,7 +1357,8 @@ CSubqueryHandler::FCreateCorrelatedApplyForExistentialSubquery(
 		// we can use correlated semi/anti-semi apply here since the subquery is used in filtering context
 		if (COperator::EopScalarSubqueryExists == eopidSubq)
 		{
-			CColRefSet *outer_refs = pexprInner->DeriveOuterReferences();
+			gpos::Ref<CColRefSet> outer_refs =
+				pexprInner->DeriveOuterReferences();
 			if (0 == outer_refs->Size())
 			{
 				// add a limit operator on top of the inner child if the subquery does not have
@@ -1970,7 +1973,8 @@ CSubqueryHandler::FRemoveExistentialSubquery(
 
 		if (COperator::EopScalarSubqueryExists == op_id)
 		{
-			CColRefSet *outer_refs = pexprInner->DeriveOuterReferences();
+			gpos::Ref<CColRefSet> outer_refs =
+				pexprInner->DeriveOuterReferences();
 
 			if (0 == outer_refs->Size())
 			{

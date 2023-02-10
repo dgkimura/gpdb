@@ -113,12 +113,13 @@ CXformEagerAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 	//		GROUP BY t1.g1;
 	gpos::Ref<CColRefSet> push_down_gb_cols = GPOS_NEW(mp)
 		CColRefSet(mp, *(join_condition_expr->DeriveUsedColumns()));
-	CColRefSet *grouping_cols =
+	gpos::Ref<CColRefSet> grouping_cols =
 		(gpos::dyn_cast<CLogicalGbAgg>(agg_expr->Pop()))->PcrsLocalUsed();
 	push_down_gb_cols->Union(grouping_cols);
 
 	/* only keep columns from outer child in the new grouping col set */
-	CColRefSet *outer_child_cols = join_outer_child_expr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_child_cols =
+		join_outer_child_expr->DeriveOutputColumns();
 	push_down_gb_cols->Intersection(outer_child_cols);
 
 	/* create new project lists for the two new Gb aggregates */
@@ -165,7 +166,7 @@ CXformEagerAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 BOOL
 CXformEagerAgg::CanPushAggBelowJoin(gpos::Ref<CExpression> scalar_agg_func_expr)
 {
-	CScalarAggFunc *scalar_agg_func =
+	gpos::Ref<CScalarAggFunc> scalar_agg_func =
 		gpos::dyn_cast<CScalarAggFunc>(scalar_agg_func_expr->Pop());
 	if ((*scalar_agg_func_expr)[0]->Arity() != 1)
 	{
@@ -220,9 +221,10 @@ CXformEagerAgg::CanApplyTransform(gpos::Ref<CExpression> gb_agg_expr)
 	gpos::Ref<CExpression> join_outer_child_expr = (*join_expr)[0];
 
 	// currently only supporting aggregate column references from outer child
-	CColRefSet *join_outer_child_cols =
+	gpos::Ref<CColRefSet> join_outer_child_cols =
 		join_outer_child_expr->DeriveOutputColumns();
-	CColRefSet *agg_proj_list_cols = agg_proj_list_expr->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> agg_proj_list_cols =
+		agg_proj_list_expr->DeriveUsedColumns();
 	if (!join_outer_child_cols->ContainsAll(agg_proj_list_cols))
 	{
 		// all columns used by the Gb aggregate should only be present in outer
@@ -274,11 +276,11 @@ CXformEagerAgg::PopulateLowerUpperProjectList(
 	for (ULONG ul = 0; ul < num_proj_elements; ul++)
 	{
 		gpos::Ref<CExpression> orig_proj_elem_expr = (*orig_proj_list)[ul];
-		CScalarProjectElement *orig_proj_elem =
+		gpos::Ref<CScalarProjectElement> orig_proj_elem =
 			gpos::dyn_cast<CScalarProjectElement>(orig_proj_elem_expr->Pop());
 
 		gpos::Ref<CExpression> orig_agg_expr = (*orig_proj_elem_expr)[0];
-		CScalarAggFunc *orig_agg_func =
+		gpos::Ref<CScalarAggFunc> orig_agg_func =
 			gpos::dyn_cast<CScalarAggFunc>(orig_agg_expr->Pop());
 		gpos::Ref<IMDId> orig_agg_mdid = orig_agg_func->MDId();
 		// min and max

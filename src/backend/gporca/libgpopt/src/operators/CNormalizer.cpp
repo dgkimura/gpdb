@@ -87,7 +87,7 @@ CNormalizer::FPushableThruSeqPrjChild(gpos::Ref<CExpression> pexprSeqPrj,
 			gpos::dyn_cast<CDistributionSpecHashed>(pds)->PdshashedEquiv());
 		CAutoMemoryPool amp;
 		CMemoryPool *mp = amp.Pmp();
-		CColRefSet *pcrsUsed = pexprPred->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrsUsed = pexprPred->DeriveUsedColumns();
 		gpos::Ref<CColRefSet> pcrsPartCols = CUtils::PcrsExtractColumns(
 			mp, gpos::dyn_cast<CDistributionSpecHashed>(pds)->Pdrgpexpr());
 		if (pcrsPartCols->ContainsAll(pcrsUsed))
@@ -128,8 +128,8 @@ CNormalizer::FPushable(gpos::Ref<CExpression> pexprLogical,
 	}
 
 
-	CColRefSet *pcrsUsed = pexprPred->DeriveUsedColumns();
-	CColRefSet *pcrsOutput = pexprLogical->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprPred->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsOutput = pexprLogical->DeriveOutputColumns();
 
 	//	In case of a Union or UnionAll the predicate might get pushed
 	//	to multiple children In such cases we will end up with duplicate
@@ -355,7 +355,8 @@ CNormalizer::FSimplifySelectOnOuterJoin(
 	gpos::Ref<CExpression> pexprOuterJoinInnerChild = (*pexprOuterJoin)[1];
 	gpos::Ref<CExpression> pexprOuterJoinPred = (*pexprOuterJoin)[2];
 
-	CColRefSet *pcrsOutput = pexprOuterJoinInnerChild->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOutput =
+		pexprOuterJoinInnerChild->DeriveOutputColumns();
 	if (!GPOS_FTRACE(EopttraceDisableOuterJoin2InnerJoinRewrite) &&
 		CPredicateUtils::FNullRejecting(mp, pexprPred, pcrsOutput))
 	{
@@ -408,7 +409,8 @@ CNormalizer::FSimplifySelectOnFullJoin(
 	gpos::Ref<CExpression> pexprRightChild = (*pexprFullJoin)[1];
 	gpos::Ref<CExpression> pexprJoinPred = (*pexprFullJoin)[2];
 
-	CColRefSet *pcrsOutputLeftChild = pexprLeftChild->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOutputLeftChild =
+		pexprLeftChild->DeriveOutputColumns();
 
 	if (CPredicateUtils::FNullRejecting(mp, pexprPred, pcrsOutputLeftChild))
 	{
@@ -1290,7 +1292,7 @@ CNormalizer::PexprPullUpAndCombineProjects(
 	CExpressionHandle exprhdl(mp);
 	exprhdl.Attach(pexpr);
 
-	CColRefSet *pcrsOutput = pexpr->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOutput = pexpr->DeriveOutputColumns();
 
 	// extract the columns used by the scalar expression and the operator itself (for grouping, sorting, etc.)
 	gpos::Ref<CColRefSet> pcrsUsed = exprhdl.PcrsUsedColumns(mp);
@@ -1387,8 +1389,8 @@ CNormalizer::PexprPullUpAndCombineProjects(
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CNormalizer::PexprPullUpProjectElements(
-	CMemoryPool *mp, gpos::Ref<CExpression> pexpr, CColRefSet *pcrsUsed,
-	CColRefSet *pcrsOutput,
+	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
+	gpos::Ref<CColRefSet> pcrsUsed, gpos::Ref<CColRefSet> pcrsOutput,
 	CExpressionArray
 		*pdrgpexprPrElPullUp  // output: the pulled-up project elements
 )
@@ -1414,10 +1416,11 @@ CNormalizer::PexprPullUpProjectElements(
 	for (ULONG ul = 0; ul < ulProjElements; ul++)
 	{
 		gpos::Ref<CExpression> pexprPrEl = (*pexprPrL)[ul];
-		CScalarProjectElement *popPrEl =
+		gpos::Ref<CScalarProjectElement> popPrEl =
 			gpos::dyn_cast<CScalarProjectElement>(pexprPrEl->Pop());
 		CColRef *pcrDefined = popPrEl->Pcr();
-		CColRefSet *pcrsUsedByProjElem = pexprPrEl->DeriveUsedColumns();
+		gpos::Ref<CColRefSet> pcrsUsedByProjElem =
+			pexprPrEl->DeriveUsedColumns();
 
 		// a proj elem can be pulled up only if the defined column is not in
 		// pcrsUsed and its used columns are in pcrOutput

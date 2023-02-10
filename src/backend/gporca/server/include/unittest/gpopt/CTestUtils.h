@@ -311,7 +311,7 @@ public:
 
 	// generate a correlated select expression
 	static gpos::Ref<CExpression> PexprLogicalSelectCorrelated(
-		CMemoryPool *mp, CColRefSet *outer_refs, ULONG ulLevel);
+		CMemoryPool *mp, gpos::Ref<CColRefSet> outer_refs, ULONG ulLevel);
 
 	// generate a select on top of outer join expression
 	static gpos::Ref<CExpression> PexprLogicalSelectOnOuterJoin(
@@ -523,8 +523,9 @@ public:
 		gpos::Ref<CExpression> pexpr, COperator::EOperatorId op_id);
 
 	// equality predicate shortcut
-	static void EqualityPredicate(CMemoryPool *mp, CColRefSet *pcrsLeft,
-								  CColRefSet *pcrsRight,
+	static void EqualityPredicate(CMemoryPool *mp,
+								  gpos::Ref<CColRefSet> pcrsLeft,
+								  gpos::Ref<CColRefSet> pcrsRight,
 								  CExpressionArray *pdrgpexpr);
 
 	// int2 point
@@ -723,7 +724,7 @@ public:
 
 	// create Equivalence Class based on the breakpoints
 	static gpos::Ref<CColRefSetArray> createEquivalenceClasses(
-		CMemoryPool *mp, CColRefSet *pcrs, const INT setBoundary[]);
+		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs, const INT setBoundary[]);
 };	// class CTestUtils
 
 
@@ -862,7 +863,7 @@ gpos::Ref<CExpression>
 CTestUtils::PexprLogicalApply(CMemoryPool *mp)
 {
 	gpos::Ref<CExpression> pexprOuter = PexprLogicalGet(mp);
-	CColRefSet *outer_refs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_refs = pexprOuter->DeriveOutputColumns();
 
 	gpos::Ref<CExpression> pexprInner =
 		PexprLogicalSelectCorrelated(mp, outer_refs, 3);
@@ -888,14 +889,14 @@ gpos::Ref<CExpression>
 CTestUtils::PexprLogicalApplyWithOuterRef(CMemoryPool *mp)
 {
 	gpos::Ref<CExpression> pexprOuter = PexprLogicalGet(mp);
-	CColRefSet *outer_refs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_refs = pexprOuter->DeriveOutputColumns();
 
 	gpos::Ref<CExpression> pexprInner =
 		PexprLogicalSelectCorrelated(mp, outer_refs, 3);
 	gpos::Ref<CExpression> pexprPredicate =
 		CUtils::PexprScalarConstBool(mp, true /*value*/);
 
-	CColRefSet *pcrsOuterRef = pexprInner->DeriveOuterReferences();
+	gpos::Ref<CColRefSet> pcrsOuterRef = pexprInner->DeriveOuterReferences();
 	GPOS_ASSERT(1 == pcrsOuterRef->Size());
 	CColRef *colref = pcrsOuterRef->PcrFirst();
 

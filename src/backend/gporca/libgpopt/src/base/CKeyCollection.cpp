@@ -122,7 +122,7 @@ CKeyCollection::Add(gpos::Ref<CColRefSet> pcrs)
 //
 //---------------------------------------------------------------------------
 BOOL
-CKeyCollection::FKey(const CColRefSet *pcrs,
+CKeyCollection::FKey(const gpos::Ref<CColRefSet> pcrs,
 					 BOOL fExactMatch  // true: match keys exactly,
 									   //  false: match keys by inclusion
 ) const
@@ -193,7 +193,7 @@ CKeyCollection::PdrgpcrTrim(CMemoryPool *mp,
 	const ULONG ulSets = m_pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < ulSets; ul++)
 	{
-		CColRefSet *pcrsKey = (*m_pdrgpcrs)[ul].get();
+		gpos::Ref<CColRefSet> pcrsKey = (*m_pdrgpcrs)[ul].get();
 		if (pcrs->ContainsAll(pcrsKey))
 		{
 			pdrgpcrTrim = pcrsKey->Pdrgpcr(mp);
@@ -294,7 +294,7 @@ CKeyCollection::PcrsKey(CMemoryPool *mp, ULONG ulIndex) const
 
 	GPOS_ASSERT(nullptr != (*m_pdrgpcrs)[ulIndex]);
 
-	CColRefSet *pcrsKey = (*m_pdrgpcrs)[ulIndex].get();
+	gpos::Ref<CColRefSet> pcrsKey = (*m_pdrgpcrs)[ulIndex].get();
 	return GPOS_NEW(mp) CColRefSet(mp, *pcrsKey);
 }
 

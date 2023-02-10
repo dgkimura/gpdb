@@ -67,7 +67,8 @@ CPhysicalAssert::~CPhysicalAssert()
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CPhysicalAssert::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  CColRefSet *pcrsRequired, ULONG child_index,
+							  gpos::Ref<CColRefSet> pcrsRequired,
+							  ULONG child_index,
 							  CDrvdPropArray *,	 // pdrgpdpCtxt
 							  ULONG				 // ulOptReq
 )
@@ -256,7 +257,7 @@ CPhysicalAssert::Matches(gpos::Ref<COperator> pop) const
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalAssert::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								   CColRefSet *pcrsRequired,
+								   gpos::Ref<CColRefSet> pcrsRequired,
 								   ULONG  // ulOptReq
 ) const
 {

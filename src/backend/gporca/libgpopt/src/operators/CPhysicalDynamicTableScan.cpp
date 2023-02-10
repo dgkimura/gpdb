@@ -72,7 +72,7 @@ CPhysicalDynamicTableScan::Matches(gpos::Ref<COperator> pop) const
 gpos::Ref<IStatistics>
 CPhysicalDynamicTableScan::PstatsDerive(CMemoryPool *mp,
 										CExpressionHandle &exprhdl,
-										CReqdPropPlan *prpplan,
+										gpos::Ref<CReqdPropPlan> prpplan,
 										IStatisticsArray *	// stats_ctxt
 ) const
 {

@@ -284,9 +284,9 @@ public:
 	static BOOL FHasCountAgg(gpos::Ref<CExpression> pexpr, CColRef **ppcrCount);
 
 	// check if given expression has count matching the given column, returns the Logical GroupBy Agg above
-	static BOOL FHasCountAggMatchingColumn(const gpos::Ref<CExpression> pexpr,
-										   const CColRef *colref,
-										   const CLogicalGbAgg **ppgbAgg);
+	static BOOL FHasCountAggMatchingColumn(
+		const gpos::Ref<CExpression> pexpr, const CColRef *colref,
+		const gpos::Ref<CLogicalGbAgg> *ppgbAgg);
 
 	// generate a GbAgg with count(*) and sum(col) over the given expression
 	static gpos::Ref<CExpression> PexprCountStarAndSum(
@@ -529,7 +529,7 @@ public:
 	// add an equivalence class (col ref set) to the array. If the new equiv
 	// class contains columns from existing equiv classes, then these are merged
 	static gpos::Ref<CColRefSetArray> AddEquivClassToArray(
-		CMemoryPool *mp, const CColRefSet *pcrsNew,
+		CMemoryPool *mp, const gpos::Ref<CColRefSet> pcrsNew,
 		const CColRefSetArray *pdrgpcrs);
 
 	// merge 2 arrays of equivalence classes
@@ -550,7 +550,7 @@ public:
 	// in the given colrefset
 	static gpos::Ref<CColRefArray> PdrgpcrExcludeColumns(
 		CMemoryPool *mp, CColRefArray *pdrgpcrOriginal,
-		CColRefSet *pcrsExcluded);
+		gpos::Ref<CColRefSet> pcrsExcluded);
 
 	//-------------------------------------------------------------------
 	// General helpers
@@ -721,7 +721,7 @@ public:
 	static ULONG UlScalarArrayArity(gpos::Ref<CExpression> pexpr);
 
 	// returns constant operator of a scalar array expression
-	static CScalarConst *PScalarArrayConstChildAt(
+	static gpos::Ref<CScalarConst> PScalarArrayConstChildAt(
 		gpos::Ref<CExpression> pexprArray, ULONG ul);
 
 	// returns constant expression of a scalar array expression
@@ -748,7 +748,7 @@ public:
 	// returns true if the subquery is a ScalarSubqueryAny
 	static BOOL FAnySubquery(gpos::Ref<COperator> pop);
 
-	static CScalarProjectElement *PNthProjectElement(
+	static gpos::Ref<CScalarProjectElement> PNthProjectElement(
 		gpos::Ref<CExpression> pexpr, ULONG ul);
 
 	// returns the expression under the Nth project element of a CLogicalProject
@@ -760,7 +760,7 @@ public:
 
 	// Check if expression tree has a col being referenced in the CColRefSet passed as input
 	static BOOL FExprHasAnyCrFromCrs(gpos::Ref<CExpression> pexpr,
-									 CColRefSet *pcrs);
+									 gpos::Ref<CColRefSet> pcrs);
 
 	// If it's a scalar array of all CScalarConst, collapse it into a single
 	// expression but keep the constants in the operator.
@@ -836,7 +836,8 @@ public:
 
 	// create a new colrefset corresponding to the given colrefset
 	// and based on the given mapping
-	static gpos::Ref<CColRefSet> PcrsRemap(CMemoryPool *mp, CColRefSet *pcrs,
+	static gpos::Ref<CColRefSet> PcrsRemap(CMemoryPool *mp,
+										   gpos::Ref<CColRefSet> pcrs,
 										   UlongToColRefMap *colref_mapping,
 										   BOOL must_exist);
 
@@ -896,7 +897,7 @@ public:
 	// return the set of column reference from the CTE Producer corresponding to the
 	// subset of input columns from the CTE Consumer
 	static gpos::Ref<CColRefSet> PcrsCTEProducerColumns(
-		CMemoryPool *mp, CColRefSet *pcrsInput,
+		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrsInput,
 		CLogicalCTEConsumer *popCTEConsumer);
 
 	// construct the join condition (AND-tree of INDF operators)
@@ -1287,7 +1288,8 @@ CUtils::FScalarConstInt(gpos::Ref<CExpression> pexpr)
 	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (COperator::EopScalarConst == pop->Eopid())
 	{
-		CScalarConst *popScalarConst = gpos::dyn_cast<CScalarConst>(pop);
+		gpos::Ref<CScalarConst> popScalarConst =
+			gpos::dyn_cast<CScalarConst>(pop);
 		if (type_info == popScalarConst->GetDatum()->GetDatumType())
 		{
 			return true;

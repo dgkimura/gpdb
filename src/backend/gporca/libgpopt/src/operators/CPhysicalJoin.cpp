@@ -95,7 +95,8 @@ CPhysicalJoin::PosPropagateToOuter(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CPhysicalJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							CColRefSet *pcrsRequired, ULONG child_index,
+							gpos::Ref<CColRefSet> pcrsRequired,
+							ULONG child_index,
 							CDrvdPropArray *,  // pdrgpdpCtxt
 							ULONG			   // ulOptReq
 )
@@ -138,7 +139,7 @@ CPhysicalJoin::PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalJoin::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								 CColRefSet *pcrsRequired,
+								 gpos::Ref<CColRefSet> pcrsRequired,
 								 ULONG	// ulOptReq
 ) const
 {
@@ -150,7 +151,7 @@ CPhysicalJoin::FProvidesReqdCols(CExpressionHandle &exprhdl,
 	ULONG arity = exprhdl.Arity();
 	for (ULONG i = 0; i < arity - 1; i++)
 	{
-		CColRefSet *pcrsChild = exprhdl.DeriveOutputColumns(i);
+		gpos::Ref<CColRefSet> pcrsChild = exprhdl.DeriveOutputColumns(i);
 		pcrs->Union(pcrsChild);
 	}
 
@@ -177,7 +178,8 @@ CPhysicalJoin::FSortColsInOuterChild(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != pos);
 
 	gpos::Ref<CColRefSet> pcrsSort = pos->PcrsUsed(mp);
-	CColRefSet *pcrsOuterChild = exprhdl.DeriveOutputColumns(0 /*child_index*/);
+	gpos::Ref<CColRefSet> pcrsOuterChild =
+		exprhdl.DeriveOutputColumns(0 /*child_index*/);
 	BOOL fSortColsInOuter = pcrsOuterChild->ContainsAll(pcrsSort.get());
 	;
 
@@ -196,12 +198,13 @@ CPhysicalJoin::FSortColsInOuterChild(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalJoin::FOuterProvidesReqdCols(CExpressionHandle &exprhdl,
-									  CColRefSet *pcrsRequired)
+									  gpos::Ref<CColRefSet> pcrsRequired)
 {
 	GPOS_ASSERT(nullptr != pcrsRequired);
 	GPOS_ASSERT(3 == exprhdl.Arity() && "expected binary join");
 
-	CColRefSet *pcrsOutput = exprhdl.DeriveOutputColumns(0 /*child_index*/);
+	gpos::Ref<CColRefSet> pcrsOutput =
+		exprhdl.DeriveOutputColumns(0 /*child_index*/);
 
 	return pcrsOutput->ContainsAll(pcrsRequired);
 }
@@ -236,7 +239,7 @@ CPhysicalJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 
 gpos::Ref<CEnfdDistribution>
 CPhysicalJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				   CReqdPropPlan *prppInput, ULONG child_index,
+				   gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
 				   CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq)
 {
 	GPOS_ASSERT(2 > child_index);
@@ -543,11 +546,13 @@ CPhysicalJoin::FPredKeysSeparated(gpos::Ref<CExpression> pexprInner,
 	GPOS_ASSERT(nullptr != pexprPredOuter);
 	GPOS_ASSERT(nullptr != pexprPredInner);
 
-	CColRefSet *pcrsUsedPredOuter = pexprPredOuter->DeriveUsedColumns();
-	CColRefSet *pcrsUsedPredInner = pexprPredInner->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsedPredOuter =
+		pexprPredOuter->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsUsedPredInner =
+		pexprPredInner->DeriveUsedColumns();
 
-	CColRefSet *outer_refs = pexprOuter->DeriveOutputColumns();
-	CColRefSet *pcrsInner = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_refs = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsInner = pexprInner->DeriveOutputColumns();
 
 	// make sure that each predicate child uses columns from a different join child
 	// in order to reject predicates of the form 'X Join Y on f(X.a, Y.b) = 5'
@@ -756,12 +761,12 @@ CPhysicalJoin::AlignJoinKeyOuterInner(gpos::Ref<CExpression> pexprPred,
 	GPOS_ASSERT(nullptr != pexprPredOuter);
 	GPOS_ASSERT(nullptr != pexprPredInner);
 
-	CColRefSet *pcrsOuter = pexprOuter->DeriveOutputColumns();
-	CColRefSet *pcrsPredOuter = pexprPredOuter->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsOuter = pexprOuter->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsPredOuter = pexprPredOuter->DeriveUsedColumns();
 
 #ifdef GPOS_DEBUG
-	CColRefSet *pcrsInner = pexprInner->DeriveOutputColumns();
-	CColRefSet *pcrsPredInner = pexprPredInner->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsInner = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsPredInner = pexprPredInner->DeriveUsedColumns();
 #endif	// GPOS_DEBUG
 
 	gpos::Ref<CExpression> pexprOuterKeyWithoutBCC =
@@ -890,8 +895,9 @@ CPhysicalJoin::PrsRequiredCorrelatedJoin(CMemoryPool *mp,
 
 gpos::Ref<CEnfdDistribution>
 CPhysicalJoin::PedCorrelatedJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 CReqdPropPlan *prppInput, ULONG child_index,
-								 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+								 gpos::Ref<CReqdPropPlan> prppInput,
+								 ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+								 ULONG ulOptReq)
 {
 	GPOS_ASSERT(3 == exprhdl.Arity());
 	GPOS_ASSERT(2 > child_index);
@@ -947,7 +953,7 @@ CPhysicalJoin::PedCorrelatedJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 CEnfdDistribution::EDistributionMatching
-CPhysicalJoin::Edm(CReqdPropPlan *,	 // prppInput
+CPhysicalJoin::Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
 				   ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
 				   ULONG  // ulOptReq
 )

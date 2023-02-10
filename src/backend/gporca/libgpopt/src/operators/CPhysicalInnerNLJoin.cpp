@@ -91,7 +91,7 @@ CPhysicalInnerNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 
 gpos::Ref<CEnfdDistribution>
 CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  CReqdPropPlan *prppInput, ULONG child_index,
+						  gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
 						  CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);

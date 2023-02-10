@@ -200,7 +200,7 @@ CRangeTest::EresUnittest_CRangeFromScalar()
 	CMemoryPool *mp = amp.Pmp();
 
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	gpos::Ref<CDatumInt4GPDB> pdatumint4 =
@@ -327,7 +327,7 @@ CRangeTest::TestRangeRelationship(CMemoryPool *mp, gpos::Ref<CRange> prange1,
 					"[-10, 10) overlaps end (-20, 0]");
 
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
-	CColRefSet *pcrs = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrs = pexprGet->DeriveOutputColumns();
 	CColRef *colref = pcrs->PcrAny();
 
 	PrintRange(mp, colref, prange1);

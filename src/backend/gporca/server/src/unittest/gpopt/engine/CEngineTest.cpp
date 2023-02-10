@@ -654,10 +654,10 @@ CEngineTest::EresUnittest_BuildMemoWithCTE()
 	gpos::Ref<CExpression> pexprCTE = CTestUtils::PexprCTETree(mp);
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
 
-	CColRefSet *pcrsLeft = pexprCTE->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsLeft = pexprCTE->DeriveOutputColumns();
 	CColRef *pcrLeft = pcrsLeft->PcrAny();
 
-	CColRefSet *pcrsRight = pexprGet->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsRight = pexprGet->DeriveOutputColumns();
 	CColRef *pcrRight = pcrsRight->PcrAny();
 
 	gpos::Ref<CExpression> pexprScalar =

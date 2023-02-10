@@ -67,11 +67,11 @@ void
 CXformJoin2IndexApply::ComputeColumnSets(CMemoryPool *mp,
 										 gpos::Ref<CExpression> pexprInner,
 										 gpos::Ref<CExpression> pexprScalar,
-										 CColRefSet **ppcrsScalarExpr,
+										 gpos::Ref<CColRefSet> *ppcrsScalarExpr,
 										 gpos::Ref<CColRefSet> *ppcrsOuterRefs,
 										 gpos::Ref<CColRefSet> *ppcrsReqd)
 {
-	CColRefSet *pcrsInnerOutput = pexprInner->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsInnerOutput = pexprInner->DeriveOutputColumns();
 	*ppcrsScalarExpr = pexprScalar->DeriveUsedColumns();
 	*ppcrsOuterRefs = GPOS_NEW(mp) CColRefSet(mp, **ppcrsScalarExpr);
 	(*ppcrsOuterRefs)->Difference(pcrsInnerOutput);
@@ -115,7 +115,7 @@ CXformJoin2IndexApply::CreateHomogeneousIndexApplyAlternatives(
 	}
 
 	// derive the scalar and relational properties to build set of required columns
-	CColRefSet *pcrsScalarExpr = nullptr;
+	gpos::Ref<CColRefSet> pcrsScalarExpr = nullptr;
 	gpos::Ref<CColRefSet> outer_refs = nullptr;
 	gpos::Ref<CColRefSet> pcrsReqd = nullptr;
 	ComputeColumnSets(mp, pexprInner, pexprScalar, &pcrsScalarExpr, &outer_refs,
@@ -158,8 +158,9 @@ CXformJoin2IndexApply::CreateHomogeneousBtreeIndexApplyAlternatives(
 	gpos::Ref<CExpression> pexprScalar, gpos::Ref<CExpression> origJoinPred,
 	gpos::Ref<CExpression> nodesToInsertAboveIndexGet,
 	gpos::Ref<CExpression> endOfNodesToInsertAboveIndexGet,
-	gpos::Ref<CTableDescriptor> ptabdescInner, CColRefSet *pcrsScalarExpr,
-	CColRefSet *outer_refs, CColRefSet *pcrsReqd, ULONG ulIndices,
+	gpos::Ref<CTableDescriptor> ptabdescInner,
+	gpos::Ref<CColRefSet> pcrsScalarExpr, gpos::Ref<CColRefSet> outer_refs,
+	gpos::Ref<CColRefSet> pcrsReqd, ULONG ulIndices,
 	gpos::Ref<CXformResult> pxfres)
 {
 	// array of expressions in the scalar expression
@@ -204,9 +205,9 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 	gpos::Ref<CExpression> nodesToInsertAboveIndexGet,
 	gpos::Ref<CExpression> endOfNodesToInsertAboveIndexGet,
 	CMDAccessor *md_accessor, CExpressionArray *pdrgpexprConjuncts,
-	CColRefSet *pcrsScalarExpr, CColRefSet *outer_refs, CColRefSet *pcrsReqd,
-	const IMDRelation *pmdrel, const IMDIndex *pmdindex,
-	gpos::Ref<CXformResult> pxfres)
+	gpos::Ref<CColRefSet> pcrsScalarExpr, gpos::Ref<CColRefSet> outer_refs,
+	gpos::Ref<CColRefSet> pcrsReqd, const IMDRelation *pmdrel,
+	const IMDIndex *pmdindex, gpos::Ref<CXformResult> pxfres)
 {
 	gpos::Ref<CExpression> pexprLogicalIndexGet =
 		CXformUtils::PexprLogicalIndexGet(
@@ -277,10 +278,10 @@ CXformJoin2IndexApply::CreateHomogeneousBitmapIndexApplyAlternatives(
 	gpos::Ref<CExpression> pexprScalar, gpos::Ref<CExpression> origJoinPred,
 	gpos::Ref<CExpression> nodesToInsertAboveIndexGet,
 	gpos::Ref<CExpression> endOfNodesToInsertAboveIndexGet,
-	gpos::Ref<CTableDescriptor> ptabdescInner, CColRefSet *outer_refs,
-	CColRefSet *pcrsReqd, gpos::Ref<CXformResult> pxfres)
+	gpos::Ref<CTableDescriptor> ptabdescInner, gpos::Ref<CColRefSet> outer_refs,
+	gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CXformResult> pxfres)
 {
-	CLogical *popGet = gpos::dyn_cast<CLogical>(pexprInner->Pop());
+	gpos::Ref<CLogical> popGet = gpos::dyn_cast<CLogical>(pexprInner->Pop());
 	gpos::Ref<CExpression> pexprLogicalIndexGet =
 		CXformUtils::PexprBitmapTableGet(mp, popGet, joinOp->UlOpId(),
 										 ptabdescInner, pexprScalar, outer_refs,

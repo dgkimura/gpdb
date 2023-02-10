@@ -248,7 +248,7 @@ CStatistics::Width(ULongPtrArray *colids) const
 
 // return width in bytes of a set of columns
 CDouble
-CStatistics::Width(CMemoryPool *mp, CColRefSet *colrefs) const
+CStatistics::Width(CMemoryPool *mp, gpos::Ref<CColRefSet> colrefs) const
 {
 	GPOS_ASSERT(nullptr != colrefs);
 
@@ -293,7 +293,8 @@ CStatistics::MakeDummyStats(CMemoryPool *mp, ULongPtrArray *colids,
 
 // add upper bound ndvs information for a given set of columns
 void
-CStatistics::CreateAndInsertUpperBoundNDVs(CMemoryPool *mp, CStatistics *stats,
+CStatistics::CreateAndInsertUpperBoundNDVs(CMemoryPool *mp,
+										   gpos::Ref<CStatistics> stats,
 										   ULongPtrArray *colids, CDouble rows)
 {
 	GPOS_ASSERT(nullptr != stats);
@@ -383,8 +384,9 @@ CStatistics::MakeDummyStats(CMemoryPool *mp,
 
 //	check if the input statistics from join statistics computation empty
 BOOL
-CStatistics::IsEmptyJoin(const CStatistics *outer_stats,
-						 const CStatistics *inner_side_stats, BOOL IsLASJ)
+CStatistics::IsEmptyJoin(const gpos::Ref<CStatistics> outer_stats,
+						 const gpos::Ref<CStatistics> inner_side_stats,
+						 BOOL IsLASJ)
 {
 	GPOS_ASSERT(nullptr != outer_stats);
 	GPOS_ASSERT(nullptr != inner_side_stats);
@@ -547,7 +549,7 @@ CStatistics::GetReqdRelationalProps(CMemoryPool *mp) const
 void
 CStatistics::AppendStats(CMemoryPool *mp, gpos::Ref<IStatistics> input_stats)
 {
-	CStatistics *stats = gpos::dyn_cast<CStatistics>(input_stats);
+	gpos::Ref<CStatistics> stats = gpos::dyn_cast<CStatistics>(input_stats);
 
 	CHistogram::AddHistograms(mp, stats->m_colid_histogram_mapping.get(),
 							  m_colid_histogram_mapping.get());

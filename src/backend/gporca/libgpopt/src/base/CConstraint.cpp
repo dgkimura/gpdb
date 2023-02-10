@@ -95,7 +95,7 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(CUtils::FScalarArrayCmp(pexpr));
 
-	CScalarArrayCmp *popScArrayCmp =
+	gpos::Ref<CScalarArrayCmp> popScArrayCmp =
 		gpos::dyn_cast<CScalarArrayCmp>(pexpr->Pop());
 	CScalarArrayCmp::EArrCmpType earrccmpt = popScArrayCmp->Earrcmpt();
 
@@ -171,7 +171,7 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp,
 
 		for (ULONG ul = 0; ul < arity; ul++)
 		{
-			CScalarConst *popScConst =
+			gpos::Ref<CScalarConst> popScConst =
 				CUtils::PScalarArrayConstChildAt(pexprArray, ul);
 			gpos::Ref<CConstraintInterval> pci =
 				CConstraintInterval::PciIntervalFromColConstCmp(
@@ -215,7 +215,7 @@ CConstraint::PcnstrFromScalarExpr(
 	GPOS_ASSERT(nullptr != ppdrgpcrs);
 	GPOS_ASSERT(nullptr == *ppdrgpcrs);
 
-	CColRefSet *pcrs = pexpr->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrs = pexpr->DeriveUsedColumns();
 	ULONG num_cols = pcrs->Size();
 
 	if (0 == num_cols)
@@ -368,7 +368,7 @@ CConstraint::AddColumnToEquivClasses(CMemoryPool *mp, const CColRef *colref,
 	const ULONG length = pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRefSet *pcrs = (*pdrgpcrs)[ul].get();
+		gpos::Ref<CColRefSet> pcrs = (*pdrgpcrs)[ul].get();
 		if (pcrs->FMember(colref))
 		{
 			return;
@@ -670,7 +670,7 @@ CConstraint::PdrgpcnstrOnColumn(
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		gpos::Ref<CConstraint> pcnstr = (*pdrgpcnstr)[ul];
-		CColRefSet *pcrs = pcnstr->PcrsUsed();
+		gpos::Ref<CColRefSet> pcrs = pcnstr->PcrsUsed();
 
 		// if the fExclusive flag is true, then colref must be the only column
 		if (pcrs->FMember(colref) && (!fExclusive || 1 == pcrs->Size()))
@@ -797,7 +797,7 @@ CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		gpos::Ref<CConstraint> pcnstrChild = (*pdrgpcnstr)[ul];
-		CColRefSet *pcrs = pcnstrChild->PcrsUsed();
+		gpos::Ref<CColRefSet> pcrs = pcnstrChild->PcrsUsed();
 
 		GPOS_ASSERT(0 != pcrs->Size());
 		// we only simplify constraints that reference a single column, otherwise
@@ -879,7 +879,7 @@ CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<ColRefToConstraintArrayMap>
-CConstraint::Phmcolconstr(CMemoryPool *mp, CColRefSet *pcrs,
+CConstraint::Phmcolconstr(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
 						  CConstraintArray *pdrgpcnstr)
 {
 	gpos::Ref<ColRefToConstraintArrayMap> phmcolconstr =

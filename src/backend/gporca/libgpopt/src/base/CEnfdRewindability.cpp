@@ -109,7 +109,8 @@ CEnfdRewindability::HashValue() const
 //
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
-CEnfdRewindability::Epet(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+CEnfdRewindability::Epet(CExpressionHandle &exprhdl,
+						 gpos::Ref<CPhysical> popPhysical,
 						 BOOL fRewindabilityReqd) const
 {
 	if (fRewindabilityReqd)

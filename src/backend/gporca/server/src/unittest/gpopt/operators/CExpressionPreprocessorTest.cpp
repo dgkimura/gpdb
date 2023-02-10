@@ -1551,7 +1551,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOuterJoin()
 
 	gpos::Ref<CExpression> pexprLOJ =
 		CTestUtils::PexprLogicalJoin<CLogicalLeftOuterJoin>(mp);
-	CColRefSet *pcrsInner = (*pexprLOJ)[1]->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsInner = (*pexprLOJ)[1]->DeriveOutputColumns();
 
 	// test case 1: generate a single comparison predicate between an inner column and const
 	CColRef *pcrInner = pcrsInner->PcrAny();
@@ -1575,7 +1575,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOuterJoin()
 
 
 	// test case 2: generate a conjunction of predicates involving inner columns
-	CColRefSet *outer_refs = (*pexprLOJ)[0]->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_refs = (*pexprLOJ)[0]->DeriveOutputColumns();
 	CColRef *pcrOuter = outer_refs->PcrAny();
 	gpos::Ref<CExpression> pexprCmp1 =
 		CUtils::PexprScalarEqCmp(mp, pcrInner, pcrOuter);
@@ -1768,12 +1768,12 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOrPrefilters()
 	gpos::Ref<CExpression> pexprJoin =
 		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
 
-	CColRefSet *pcrsInner = (*pexprJoin)[1]->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsInner = (*pexprJoin)[1]->DeriveOutputColumns();
 	gpos::Ref<CColRefArray> pdrgpcrInner = pcrsInner->Pdrgpcr(mp);
 	GPOS_ASSERT(pdrgpcrInner != nullptr);
 	GPOS_ASSERT(3 <= pdrgpcrInner->Size());
 
-	CColRefSet *outer_refs = (*pexprJoin)[0]->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_refs = (*pexprJoin)[0]->DeriveOutputColumns();
 	gpos::Ref<CColRefArray> pdrgpcrOuter = outer_refs->Pdrgpcr(mp);
 	GPOS_ASSERT(pdrgpcrOuter != nullptr);
 	GPOS_ASSERT(3 <= pdrgpcrOuter->Size());
@@ -1993,12 +1993,12 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOrPrefiltersPartialPush()
 	gpos::Ref<CExpression> pexprJoin =
 		CTestUtils::PexprLogicalJoin<CLogicalInnerJoin>(mp);
 
-	CColRefSet *pcrsInner = (*pexprJoin)[1]->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsInner = (*pexprJoin)[1]->DeriveOutputColumns();
 	gpos::Ref<CColRefArray> pdrgpcrInner = pcrsInner->Pdrgpcr(mp);
 	GPOS_ASSERT(nullptr != pdrgpcrInner);
 	GPOS_ASSERT(3 <= pdrgpcrInner->Size());
 
-	CColRefSet *outer_refs = (*pexprJoin)[0]->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> outer_refs = (*pexprJoin)[0]->DeriveOutputColumns();
 	gpos::Ref<CColRefArray> pdrgpcrOuter = outer_refs->Pdrgpcr(mp);
 	GPOS_ASSERT(nullptr != pdrgpcrOuter);
 	GPOS_ASSERT(3 <= pdrgpcrOuter->Size());
@@ -2533,7 +2533,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessConvertArrayWithEquals()
 		CTestUtils::PexprFindFirstExpressionWithOpId(
 			apexprInConverted.get(), COperator::EopScalarArrayCmp);
 	GPOS_ASSERT(nullptr != pexprArrayInCmp);
-	CScalarArrayCmp *popCmpInArray =
+	gpos::Ref<CScalarArrayCmp> popCmpInArray =
 		gpos::dyn_cast<CScalarArrayCmp>(pexprArrayInCmp->Pop());
 	GPOS_RTL_ASSERT(CScalarArrayCmp::EarrcmpAny == popCmpInArray->Earrcmpt());
 
@@ -2555,7 +2555,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessConvertArrayWithEquals()
 		CTestUtils::PexprFindFirstExpressionWithOpId(
 			apexprNotInConverted.get(), COperator::EopScalarArrayCmp);
 	GPOS_ASSERT(nullptr != pexprArrayCmpNotIn);
-	CScalarArrayCmp *popCmpNotInArray =
+	gpos::Ref<CScalarArrayCmp> popCmpNotInArray =
 		gpos::dyn_cast<CScalarArrayCmp>(pexprArrayCmpNotIn->Pop());
 	GPOS_RTL_ASSERT(CScalarArrayCmp::EarrcmpAll ==
 					popCmpNotInArray->Earrcmpt());

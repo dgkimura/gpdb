@@ -150,10 +150,10 @@ public:
 
 	// compute required stat columns of the n-th child
 	gpos::Ref<CColRefSet>
-	PcrsStat(CMemoryPool *,		   // mp
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   // pcrsInput
-			 ULONG				   // child_index
+	PcrsStat(CMemoryPool *,			 // mp
+			 CExpressionHandle &,	 // exprhdl
+			 gpos::Ref<CColRefSet>,	 // pcrsInput
+			 ULONG					 // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalConstTableGet has no children");

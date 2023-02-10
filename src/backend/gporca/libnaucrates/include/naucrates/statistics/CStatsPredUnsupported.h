@@ -71,14 +71,14 @@ public:
 	}
 
 	// conversion function
-	static CStatsPredUnsupported *
+	static gpos::Ref<CStatsPredUnsupported>
 	ConvertPredStats(gpos::Ref<CStatsPred> pred_stats)
 	{
 		GPOS_ASSERT(nullptr != pred_stats);
 		GPOS_ASSERT(CStatsPred::EsptUnsupported ==
 					pred_stats->GetPredStatsType());
 
-		return dynamic_cast<CStatsPredUnsupported *>(pred_stats);
+		return gpos::dyn_cast<CStatsPredUnsupported>(pred_stats);
 	}
 
 };	// class CStatsPredUnsupported

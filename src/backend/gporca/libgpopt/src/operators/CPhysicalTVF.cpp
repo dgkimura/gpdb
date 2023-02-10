@@ -124,12 +124,12 @@ CPhysicalTVF::FInputOrderSensitive() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CPhysicalTVF::PcrsRequired(CMemoryPool *,		 // mp,
-						   CExpressionHandle &,	 // exprhdl,
-						   CColRefSet *,		 // pcrsRequired,
-						   ULONG,				 // child_index,
-						   CDrvdPropArray *,	 // pdrgpdpCtxt
-						   ULONG				 // ulOptReq
+CPhysicalTVF::PcrsRequired(CMemoryPool *,		   // mp,
+						   CExpressionHandle &,	   // exprhdl,
+						   gpos::Ref<CColRefSet>,  // pcrsRequired,
+						   ULONG,				   // child_index,
+						   CDrvdPropArray *,	   // pdrgpdpCtxt
+						   ULONG				   // ulOptReq
 )
 {
 	GPOS_ASSERT(!"CPhysicalTVF has no relational children");
@@ -230,7 +230,7 @@ CPhysicalTVF::PcteRequired(CMemoryPool *,		 //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalTVF::FProvidesReqdCols(CExpressionHandle &,  // exprhdl,
-								CColRefSet *pcrsRequired,
+								gpos::Ref<CColRefSet> pcrsRequired,
 								ULONG  // ulOptReq
 ) const
 {

@@ -83,7 +83,7 @@ private:
 		// create a copy of the current object, and add a set of remapped
 		// part keys to this entry, using the existing keys and the given hashmap
 		gpos::Ref<CPartInfoEntry> PpartinfoentryAddRemappedKeys(
-			CMemoryPool *mp, CColRefSet *pcrs,
+			CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
 			UlongToColRefMap *colref_mapping);
 
 		// mdid of partition table

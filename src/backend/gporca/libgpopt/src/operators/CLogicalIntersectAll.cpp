@@ -170,7 +170,7 @@ CLogicalIntersectAll::PstatsDerive(
 	// TODO:  Jan 8th 2012, add the stats for window operation
 	gpos::Ref<CExpression> pexprScCond =
 		CUtils::PexprConjINDFCond(mp, pdrgpdrgpcrInput);
-	CColRefSet *outer_refs = exprhdl.DeriveOuterReferences();
+	gpos::Ref<CColRefSet> outer_refs = exprhdl.DeriveOuterReferences();
 	gpos::Ref<CStatsPredJoinArray> join_preds_stats =
 		CStatsPredUtils::ExtractJoinStatsFromExpr(
 			mp, exprhdl, pexprScCond.get(), output_colrefsets, outer_refs,

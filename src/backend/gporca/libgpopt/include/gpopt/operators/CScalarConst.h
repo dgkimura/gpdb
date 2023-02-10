@@ -65,7 +65,7 @@ public:
 	gpos::Ref<IDatum>
 	GetDatum() const
 	{
-		return m_pdatum.get();
+		return m_pdatum;
 	}
 
 	// operator specific hash function
@@ -92,13 +92,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarConst *
+	static gpos::Ref<CScalarConst>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarConst == pop->Eopid());
 
-		return dynamic_cast<CScalarConst *>(pop);
+		return gpos::dyn_cast<CScalarConst>(pop);
 	}
 
 	// the type of the scalar expression
@@ -117,7 +117,7 @@ public:
 
 	// extract the constant from the given constant expression or a casted constant expression.
 	// Else return NULL.
-	static CScalarConst *PopExtractFromConstOrCastConst(
+	static gpos::Ref<CScalarConst> PopExtractFromConstOrCastConst(
 		gpos::Ref<CExpression> pexpr);
 
 };	// class CScalarConst

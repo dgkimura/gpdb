@@ -218,7 +218,7 @@ CPhysicalDML::EpetOrder(CExpressionHandle &exprhdl, const CEnfdOrder *peo) const
 gpos::Ref<CColRefSet>
 CPhysicalDML::PcrsRequired(CMemoryPool *mp,
 						   CExpressionHandle &,	 // exprhdl,
-						   CColRefSet *pcrsRequired,
+						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG
 #ifdef GPOS_DEBUG
 							   child_index
@@ -335,7 +335,7 @@ CPhysicalDML::PcteRequired(CMemoryPool *,		 //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalDML::FProvidesReqdCols(CExpressionHandle &exprhdl,
-								CColRefSet *pcrsRequired,
+								gpos::Ref<CColRefSet> pcrsRequired,
 								ULONG  // ulOptReq
 ) const
 {

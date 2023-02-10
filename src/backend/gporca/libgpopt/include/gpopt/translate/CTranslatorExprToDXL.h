@@ -113,14 +113,14 @@ private:
 	static EdxlDmlType Edxldmloptype(const CLogicalDML::EDMLOperator edmlop);
 
 	// return outer refs in correlated join inner child
-	static CColRefSet *PcrsOuterRefsForCorrelatedNLJoin(
+	static gpos::Ref<CColRefSet> PcrsOuterRefsForCorrelatedNLJoin(
 		gpos::Ref<CExpression> pexpr);
 
 	// functions translating different optimizer expressions into their
 	// DXL counterparts
 
 	gpos::Ref<CDXLNode> PdxlnTblScan(
-		gpos::Ref<CExpression> pexprTblScan, CColRefSet *pcrsOutput,
+		gpos::Ref<CExpression> pexprTblScan, gpos::Ref<CColRefSet> pcrsOutput,
 		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
 		gpos::Ref<CExpression> pexprScalarCond,
 		gpos::Ref<CDXLPhysicalProperties> dxl_properties);
@@ -135,7 +135,8 @@ private:
 	// translate index scan based on passed properties
 	gpos::Ref<CDXLNode> PdxlnIndexScan(
 		gpos::Ref<CExpression> pexprIndexScan, CColRefArray *colref_array,
-		gpos::Ref<CDXLPhysicalProperties> dxl_properties, CReqdPropPlan *prpp);
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties,
+		gpos::Ref<CReqdPropPlan> prpp);
 
 	// translate index scan
 	gpos::Ref<CDXLNode> PdxlnIndexScan(
@@ -150,7 +151,8 @@ private:
 
 	gpos::Ref<CDXLNode> PdxlnIndexOnlyScan(
 		gpos::Ref<CExpression> pexprIndexScan, CColRefArray *colref_array,
-		gpos::Ref<CDXLPhysicalProperties> dxl_properties, CReqdPropPlan *prpp);
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties,
+		gpos::Ref<CReqdPropPlan> prpp);
 
 	// translate a bitmap index probe expression to DXL
 	gpos::Ref<CDXLNode> PdxlnBitmapIndexProbe(
@@ -168,8 +170,9 @@ private:
 
 	// translate a bitmap table scan expression to DXL
 	gpos::Ref<CDXLNode> PdxlnBitmapTableScan(
-		gpos::Ref<CExpression> pexprBitmapTableScan, CColRefSet *pcrsOutput,
-		CColRefArray *colref_array, CDistributionSpecArray *pdrgpdsBaseTables,
+		gpos::Ref<CExpression> pexprBitmapTableScan,
+		gpos::Ref<CColRefSet> pcrsOutput, CColRefArray *colref_array,
+		CDistributionSpecArray *pdrgpdsBaseTables,
 		gpos::Ref<CExpression> pexprScalar,
 		gpos::Ref<CDXLPhysicalProperties> dxl_properties);
 
@@ -197,7 +200,7 @@ private:
 		gpos::Ref<CDXLNode> pdxlnRelationalChild,
 		gpos::Ref<CDXLNode> pdxlnScalarChild,
 		gpos::Ref<CDXLPhysicalProperties> dxl_properties,
-		CColRefSet *pcrsOutput, CColRefArray *pdrgpcrOrder);
+		gpos::Ref<CColRefSet> pcrsOutput, CColRefArray *pdrgpcrOrder);
 
 	gpos::Ref<CDXLNode> PdxlnFromFilter(
 		gpos::Ref<CExpression> pexprFilter, CColRefArray *colref_array,
@@ -235,7 +238,8 @@ private:
 		gpos::Ref<CExpression> pexprAgg, CColRefArray *colref_array,
 		CDistributionSpecArray *pdrgpdsBaseTables, ULONG *pulNonGatherMotions,
 		BOOL *pfDML, EdxlAggStrategy dxl_agg_strategy,
-		const CColRefArray *pdrgpcrGroupingCols, CColRefSet *pcrsKeys);
+		const CColRefArray *pdrgpcrGroupingCols,
+		gpos::Ref<CColRefSet> pcrsKeys);
 
 	gpos::Ref<CDXLNode> PdxlnSort(gpos::Ref<CExpression> pexprSort,
 								  CColRefArray *colref_array,
@@ -283,7 +287,7 @@ private:
 		BOOL *pfDML);
 
 	// store outer references in index NLJ inner child into global map
-	void StoreIndexNLJOuterRefs(CPhysical *pop);
+	void StoreIndexNLJOuterRefs(gpos::Ref<CPhysical> pop);
 
 	// build a scalar DXL subplan node
 	void BuildDxlnSubPlan(gpos::Ref<CDXLNode> pdxlnRelChild,
@@ -364,7 +368,8 @@ private:
 	// translate a dynamic index scan based on passed properties
 	gpos::Ref<CDXLNode> PdxlnDynamicIndexScan(
 		gpos::Ref<CExpression> pexprDIS, CColRefArray *colref_array,
-		gpos::Ref<CDXLPhysicalProperties> dxl_properties, CReqdPropPlan *prpp);
+		gpos::Ref<CDXLPhysicalProperties> dxl_properties,
+		gpos::Ref<CReqdPropPlan> prpp);
 
 	// translate a dynamic index scan
 	gpos::Ref<CDXLNode> PdxlnDynamicIndexScan(
@@ -542,20 +547,21 @@ private:
 	gpos::Ref<CDXLTableDescr> MakeDXLTableDescr(
 		const gpos::Ref<CTableDescriptor> ptabdesc,
 		const CColRefArray *pdrgpcrOutput,
-		const CReqdPropPlan *requiredProperties);
+		const gpos::Ref<CReqdPropPlan> requiredProperties);
 
 	// compute physical properties like operator cost from the expression
 	gpos::Ref<CDXLPhysicalProperties> GetProperties(
 		const gpos::Ref<CExpression> pexpr);
 
 	// translate a colref set of output col into a dxl proj list
-	gpos::Ref<CDXLNode> PdxlnProjList(const CColRefSet *pcrsOutput,
+	gpos::Ref<CDXLNode> PdxlnProjList(const gpos::Ref<CColRefSet> pcrsOutput,
 									  CColRefArray *colref_array);
 
 	// Construct a project list for a child partition
 	gpos::Ref<CDXLNode> PdxlnProjListForChildPart(
 		const ColRefToUlongMap *root_col_mapping,
-		const CColRefArray *part_colrefs, const CColRefSet *reqd_colrefs,
+		const CColRefArray *part_colrefs,
+		const gpos::Ref<CColRefSet> reqd_colrefs,
 		const CColRefArray *colref_array);
 
 	// translate a filter expr on the root for a child partition
@@ -568,12 +574,12 @@ private:
 	// according to the order specified in the dynamic array
 	gpos::Ref<CDXLNode> PdxlnProjList(
 		const gpos::Ref<CExpression> pexprProjList,
-		const CColRefSet *pcrsOutput, CColRefArray *colref_array);
+		const gpos::Ref<CColRefSet> pcrsOutput, CColRefArray *colref_array);
 
 	// translate a project list expression into a DXL proj list node
 	gpos::Ref<CDXLNode> PdxlnProjList(
 		const gpos::Ref<CExpression> pexprProjList,
-		const CColRefSet *pcrsOutput);
+		const gpos::Ref<CColRefSet> pcrsOutput);
 
 	// create a project list for a result node from a tuple of a
 	// const table get operator
@@ -657,8 +663,8 @@ private:
 											const CColRef *colref);
 
 	// helper to build a Result expression with project list restricted to required columns
-	gpos::Ref<CDXLNode> PdxlnRestrictResult(gpos::Ref<CDXLNode> dxlnode,
-											const CColRefSet *colrefs);
+	gpos::Ref<CDXLNode> PdxlnRestrictResult(
+		gpos::Ref<CDXLNode> dxlnode, const gpos::Ref<CColRefSet> colrefs);
 
 	//	helper to build subplans from correlated LOJ
 	void BuildSubplansForCorrelatedLOJ(
@@ -723,10 +729,11 @@ private:
 	// add used columns in the bitmap re-check and the remaining scalar filter condition to the
 	// required output column
 	static void AddBitmapFilterColumns(
-		CMemoryPool *mp, CPhysicalScan *pop,
+		CMemoryPool *mp, gpos::Ref<CPhysicalScan> pop,
 		gpos::Ref<CExpression> pexprRecheckCond,
 		gpos::Ref<CExpression> pexprScalar,
-		CColRefSet *pcrsReqdOutput	// append the required column reference
+		gpos::Ref<CColRefSet>
+			pcrsReqdOutput	// append the required column reference
 	);
 
 public:

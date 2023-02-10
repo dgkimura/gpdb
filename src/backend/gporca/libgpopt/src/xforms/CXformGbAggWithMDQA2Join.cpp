@@ -64,7 +64,8 @@ CXformGbAggWithMDQA2Join::Exfp(CExpressionHandle &exprhdl) const
 {
 	CAutoMemoryPool amp;
 
-	CLogicalGbAgg *popAgg = gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
+	gpos::Ref<CLogicalGbAgg> popAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
 
 	if (COperator::EgbaggtypeGlobal == popAgg->Egbaggtype() &&
 		exprhdl.DeriveHasMultipleDistinctAggs(1))
@@ -102,7 +103,7 @@ CXformGbAggWithMDQA2Join::PexprMDQAs2Join(CMemoryPool *mp,
 	// extract components
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 
-	CColRefSet *pcrsChildOutput = pexprChild->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsChildOutput = pexprChild->DeriveOutputColumns();
 	gpos::Ref<CColRefArray> pdrgpcrChildOutput = pcrsChildOutput->Pdrgpcr(mp);
 
 	// create a CTE producer based on child expression

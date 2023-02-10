@@ -79,7 +79,7 @@ CEnfdPartitionPropagation::HashValue() const
 //---------------------------------------------------------------------------
 CEnfdProp::EPropEnforcingType
 CEnfdPartitionPropagation::Epet(CExpressionHandle &exprhdl,
-								CPhysical *popPhysical,
+								gpos::Ref<CPhysical> popPhysical,
 								BOOL fPropagationReqd) const
 {
 	if (fPropagationReqd)

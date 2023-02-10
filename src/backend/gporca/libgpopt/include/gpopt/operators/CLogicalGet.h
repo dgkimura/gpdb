@@ -76,7 +76,7 @@ public:
 	}
 
 	// distribution columns
-	virtual const CColRefSet *
+	virtual const gpos::Ref<CColRefSet>
 	PcrsDist() const
 	{
 		return m_pcrsDist.get();
@@ -186,10 +186,10 @@ public:
 
 	// compute required stat columns of the n-th child
 	gpos::Ref<CColRefSet>
-	PcrsStat(CMemoryPool *,		   // mp,
-			 CExpressionHandle &,  // exprhdl
-			 CColRefSet *,		   // pcrsInput
-			 ULONG				   // child_index
+	PcrsStat(CMemoryPool *,			 // mp,
+			 CExpressionHandle &,	 // exprhdl
+			 gpos::Ref<CColRefSet>,	 // pcrsInput
+			 ULONG					 // child_index
 	) const override
 	{
 		GPOS_ASSERT(!"CLogicalGet has no children");

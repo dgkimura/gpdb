@@ -204,7 +204,7 @@ CLogicalLimit::DeriveMaxCard(CMemoryPool *,	 // mp
 		CUtils::FScalarConstInt<IMDTypeInt8>(pexprCount) &&
 		!pexprCount->DeriveHasSubquery())
 	{
-		CScalarConst *popScalarConst =
+		gpos::Ref<CScalarConst> popScalarConst =
 			gpos::dyn_cast<CScalarConst>(pexprCount->Pop());
 		IDatumInt8 *pdatumInt8 =
 			dynamic_cast<IDatumInt8 *>(popScalarConst->GetDatum());
@@ -247,7 +247,8 @@ CLogicalLimit::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CLogicalLimit::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						CColRefSet *pcrsInput, ULONG child_index) const
+						gpos::Ref<CColRefSet> pcrsInput,
+						ULONG child_index) const
 {
 	GPOS_ASSERT(0 == child_index);
 
@@ -321,7 +322,7 @@ CLogicalLimit::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	return CLimitStatsProcessor::CalcLimitStats(
-		mp, dynamic_cast<CStatistics *>(child_stats), dRowsMax);
+		mp, dynamic_cast<gpos::Ref<CStatistics> >(child_stats), dRowsMax);
 }
 
 // EOF

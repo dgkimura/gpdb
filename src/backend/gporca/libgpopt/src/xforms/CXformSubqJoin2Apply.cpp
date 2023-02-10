@@ -106,7 +106,7 @@ CXformSubqJoin2Apply::CollectSubqueries(
 		const ULONG size = pdrgpcrs->Size();
 		for (ULONG ul = 0; ul < size; ul++)
 		{
-			CColRefSet *pcrsOutput = (*pdrgpcrs)[ul].get();
+			gpos::Ref<CColRefSet> pcrsOutput = (*pdrgpcrs)[ul].get();
 			if (pcrsOutput->ContainsAll(outer_refs.get()))
 			{
 				// outer columns all come from the same join child, break here
@@ -344,8 +344,8 @@ CXformSubqJoin2Apply::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprJoin = (*pexprSubqsPushedDown)[0];
 	gpos::Ref<CExpression> pexprJoinCondition =
 		(*pexprJoin)[pexprJoin->Arity() - 1];
-	CColRefSet *pcrsUsed = pexprJoinCondition->DeriveUsedColumns();
-	CColRefSet *pcrsJoinOutput = pexprJoin->DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = pexprJoinCondition->DeriveUsedColumns();
+	gpos::Ref<CColRefSet> pcrsJoinOutput = pexprJoin->DeriveOutputColumns();
 	if (!pcrsJoinOutput->ContainsAll(pcrsUsed))
 	{
 		// discard expression after subquery push down

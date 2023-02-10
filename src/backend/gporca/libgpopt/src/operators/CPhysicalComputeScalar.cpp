@@ -92,7 +92,7 @@ CPhysicalComputeScalar::Matches(gpos::Ref<COperator> pop) const
 gpos::Ref<CColRefSet>
 CPhysicalComputeScalar::PcrsRequired(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
-									 CColRefSet *pcrsRequired,
+									 gpos::Ref<CColRefSet> pcrsRequired,
 									 ULONG child_index,
 									 CDrvdPropArray *,	// pdrgpdpCtxt
 									 ULONG				// ulOptReq
@@ -302,7 +302,7 @@ CPhysicalComputeScalar::PcteRequired(CMemoryPool *,		   //mp,
 //---------------------------------------------------------------------------
 BOOL
 CPhysicalComputeScalar::FProvidesReqdCols(CExpressionHandle &exprhdl,
-										  CColRefSet *pcrsRequired,
+										  gpos::Ref<CColRefSet> pcrsRequired,
 										  ULONG	 // ulOptReq
 ) const
 {
@@ -457,8 +457,9 @@ CEnfdProp::EPropEnforcingType
 CPhysicalComputeScalar::EpetRewindability(CExpressionHandle &exprhdl,
 										  const CEnfdRewindability *per) const
 {
-	CColRefSet *pcrsUsed = exprhdl.DeriveUsedColumns(1);
-	CColRefSet *pcrsCorrelatedApply = exprhdl.DeriveCorrelatedApplyColumns();
+	gpos::Ref<CColRefSet> pcrsUsed = exprhdl.DeriveUsedColumns(1);
+	gpos::Ref<CColRefSet> pcrsCorrelatedApply =
+		exprhdl.DeriveCorrelatedApplyColumns();
 	if (!pcrsUsed->IsDisjoint(pcrsCorrelatedApply))
 	{
 		// columns are used from inner children of correlated-apply expressions,

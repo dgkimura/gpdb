@@ -91,7 +91,7 @@ CPartialPlan::ExtractChildrenCostingInfo(CMemoryPool *mp,
 			continue;
 		}
 
-		CReqdPropPlan *prppChild = exprhdl.Prpp(ul);
+		gpos::Ref<CReqdPropPlan> prppChild = exprhdl.Prpp(ul);
 		gpos::Ref<IStatistics> child_stats = pgroupChild->Pstats();
 		if (nullptr == child_stats)
 		{
@@ -258,6 +258,11 @@ CPartialPlan::CostCompute(CMemoryPool *mp)
 ULONG
 CPartialPlan::HashValue(const gpos::Ref<CPartialPlan> ppp)
 {
+	return HashValue(ppp.get());
+}
+ULONG
+CPartialPlan::HashValue(const CPartialPlan *ppp)
+{
 	GPOS_ASSERT(nullptr != ppp);
 
 	ULONG ulHash = ppp->Pgexpr()->HashValue();
@@ -277,6 +282,11 @@ CPartialPlan::HashValue(const gpos::Ref<CPartialPlan> ppp)
 BOOL
 CPartialPlan::Equals(const gpos::Ref<CPartialPlan> pppFst,
 					 const gpos::Ref<CPartialPlan> pppSnd)
+{
+	return Equals(pppFst.get(), pppSnd.get());
+}
+BOOL
+CPartialPlan::Equals(const CPartialPlan *pppFst, const CPartialPlan *pppSnd)
 {
 	GPOS_ASSERT(nullptr != pppFst);
 	GPOS_ASSERT(nullptr != pppSnd);

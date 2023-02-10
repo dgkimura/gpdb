@@ -578,7 +578,7 @@ CEngine::FOptimizeChild(
 //---------------------------------------------------------------------------
 BOOL
 CEngine::FSafeToPruneWithDPEStats(gpos::Ref<CGroupExpression> pgexpr,
-								  CReqdPropPlan *,	// prpp
+								  gpos::Ref<CReqdPropPlan>,	 // prpp
 								  gpos::Ref<CCostContext> pccChild,
 								  ULONG child_index)
 {
@@ -627,7 +627,7 @@ CEngine::FSafeToPruneWithDPEStats(gpos::Ref<CGroupExpression> pgexpr,
 //---------------------------------------------------------------------------
 BOOL
 CEngine::FSafeToPrune(
-	gpos::Ref<CGroupExpression> pgexpr, CReqdPropPlan *prpp,
+	gpos::Ref<CGroupExpression> pgexpr, gpos::Ref<CReqdPropPlan> prpp,
 	gpos::Ref<CCostContext> pccChild, ULONG child_index,
 	CCost *pcostLowerBound	// output: a lower bound on plan's cost
 )
@@ -2095,8 +2095,8 @@ CEngine::FCheckEnfdProps(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
 	exprhdl.DerivePlanPropsForCostContext();
 
 
-	CPhysical *popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
-	CReqdPropPlan *prpp = poc->Prpp();
+	gpos::Ref<CPhysical> popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
+	gpos::Ref<CReqdPropPlan> prpp = poc->Prpp();
 
 	// check whether the current physical operator satisfies the CTE requirements
 	// and whether it is a motion over unresolved part consumers
@@ -2285,8 +2285,8 @@ CEngine::FProhibited(CEnfdProp::EPropEnforcingType epetOrder,
 //		decision.
 //---------------------------------------------------------------------------
 BOOL
-CEngine::FCheckReqdProps(CExpressionHandle &exprhdl, CReqdPropPlan *prpp,
-						 ULONG ulOptReq)
+CEngine::FCheckReqdProps(CExpressionHandle &exprhdl,
+						 gpos::Ref<CReqdPropPlan> prpp, ULONG ulOptReq)
 {
 	GPOS_CHECK_ABORT;
 
@@ -2306,7 +2306,7 @@ CEngine::FCheckReqdProps(CExpressionHandle &exprhdl, CReqdPropPlan *prpp,
 		return false;
 	}
 
-	CPhysical *popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
+	gpos::Ref<CPhysical> popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 	COperator::EOperatorId op_id = popPhysical->Eopid();
 
 	// check if sort operator is passed an empty order spec;
@@ -2347,7 +2347,7 @@ CEngine::FCheckReqdProps(CExpressionHandle &exprhdl, CReqdPropPlan *prpp,
 	CPartitionPropagationSpec *pps = prpp->Pepp()->PppsRequired();
 	if (COperator::EopPhysicalPartitionSelector == popPhysical->Eopid())
 	{
-		CPhysicalPartitionSelector *part_selector =
+		gpos::Ref<CPhysicalPartitionSelector> part_selector =
 			gpos::dyn_cast<CPhysicalPartitionSelector>(popPhysical);
 		if (!pps->Contains(part_selector->ScanId()))
 		{

@@ -684,7 +684,7 @@ CParseHandlerTest::EresParseAndSerializeStatistics(CMemoryPool *mp,
 
 	GPOS_ASSERT(nullptr != statistics_array);
 
-	CStatistics *stats = (*statistics_array)[0].get();
+	gpos::Ref<CStatistics> stats = (*statistics_array)[0].get();
 	GPOS_ASSERT(stats);
 
 	stats->Rows();

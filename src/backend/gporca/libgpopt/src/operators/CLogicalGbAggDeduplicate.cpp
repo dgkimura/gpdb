@@ -125,7 +125,7 @@ CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns(
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CLogicalGbAggDeduplicate::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CColRefSet *pcrsInput,
+								   gpos::Ref<CColRefSet> pcrsInput,
 								   ULONG child_index) const
 {
 	return PcrsStatGbAgg(mp, exprhdl, pcrsInput, child_index,

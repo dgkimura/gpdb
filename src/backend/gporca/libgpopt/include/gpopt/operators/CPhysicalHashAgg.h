@@ -97,14 +97,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalHashAgg *
+	static gpos::Ref<CPhysicalHashAgg>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalHashAgg == pop->Eopid() ||
 					EopPhysicalHashAggDeduplicate == pop->Eopid());
 
-		return dynamic_cast<CPhysicalHashAgg *>(pop);
+		return gpos::dyn_cast<CPhysicalHashAgg>(pop);
 	}
 
 };	// class CPhysicalHashAgg

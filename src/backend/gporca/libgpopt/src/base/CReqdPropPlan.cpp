@@ -99,8 +99,9 @@ CReqdPropPlan::ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(nullptr == m_pcrs);
 
-	CReqdPropPlan *prppInput = gpos::dyn_cast<CReqdPropPlan>(prpInput);
-	CPhysical *popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
+	gpos::Ref<CReqdPropPlan> prppInput =
+		gpos::dyn_cast<CReqdPropPlan>(prpInput);
+	gpos::Ref<CPhysical> popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 	m_pcrs =
 		popPhysical->PcrsRequired(mp, exprhdl, prppInput->PcrsRequired(),
 								  child_index, pdrgpdpCtxt, 0 /*ulOptReq*/);
@@ -121,8 +122,9 @@ CReqdPropPlan::ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(nullptr == m_pcter);
 
-	CReqdPropPlan *prppInput = gpos::dyn_cast<CReqdPropPlan>(prpInput);
-	CPhysical *popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
+	gpos::Ref<CReqdPropPlan> prppInput =
+		gpos::dyn_cast<CReqdPropPlan>(prpInput);
+	gpos::Ref<CPhysical> popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 	m_pcter =
 		popPhysical->PcteRequired(mp, exprhdl, prppInput->Pcter(), child_index,
 								  pdrgpdpCtxt, 0 /*ulOptReq*/);
@@ -143,8 +145,9 @@ CReqdPropPlan::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_CHECK_ABORT;
 
-	CReqdPropPlan *prppInput = gpos::dyn_cast<CReqdPropPlan>(prpInput);
-	CPhysical *popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
+	gpos::Ref<CReqdPropPlan> prppInput =
+		gpos::dyn_cast<CReqdPropPlan>(prpInput);
+	gpos::Ref<CPhysical> popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 	ComputeReqdCols(mp, exprhdl, prpInput, child_index, pdrgpdpCtxt);
 	ComputeReqdCTEs(mp, exprhdl, prpInput, child_index, pdrgpdpCtxt);
 
@@ -227,7 +230,7 @@ BOOL
 CReqdPropPlan::FProvidesReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 ULONG ulOptReq) const
 {
-	CPhysical *popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
+	gpos::Ref<CPhysical> popPhysical = gpos::dyn_cast<CPhysical>(exprhdl.Pop());
 
 	// check if operator provides required columns
 	if (!popPhysical->FProvidesReqdCols(exprhdl, m_pcrs.get(), ulOptReq))
@@ -235,7 +238,7 @@ CReqdPropPlan::FProvidesReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		return false;
 	}
 
-	CColRefSet *pcrsOutput = exprhdl.DeriveOutputColumns();
+	gpos::Ref<CColRefSet> pcrsOutput = exprhdl.DeriveOutputColumns();
 
 	// check if property spec members use columns from operator output
 	BOOL fProvidesReqdCols = true;
@@ -265,7 +268,7 @@ CReqdPropPlan::FProvidesReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 BOOL
-CReqdPropPlan::Equals(const CReqdPropPlan *prpp) const
+CReqdPropPlan::Equals(const gpos::Ref<CReqdPropPlan> prpp) const
 {
 	GPOS_ASSERT(nullptr != prpp);
 
@@ -365,7 +368,8 @@ CReqdPropPlan::FSatisfied(const CDrvdPropRelational *pdprel,
 //
 //---------------------------------------------------------------------------
 BOOL
-CReqdPropPlan::FCompatible(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+CReqdPropPlan::FCompatible(CExpressionHandle &exprhdl,
+						   gpos::Ref<CPhysical> popPhysical,
 						   const CDrvdPropRelational *pdprel,
 						   const CDrvdPropPlan *pdpplan) const
 {
@@ -484,6 +488,11 @@ CReqdPropPlan::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 ULONG
+CReqdPropPlan::UlHashForCostBounding(const gpos::Ref<CReqdPropPlan> prpp)
+{
+	return UlHashForCostBounding(prpp.get());
+}
+ULONG
 CReqdPropPlan::UlHashForCostBounding(const CReqdPropPlan *prpp)
 {
 	GPOS_ASSERT(nullptr != prpp);
@@ -508,8 +517,8 @@ CReqdPropPlan::UlHashForCostBounding(const CReqdPropPlan *prpp)
 //
 //---------------------------------------------------------------------------
 BOOL
-CReqdPropPlan::FEqualForCostBounding(const CReqdPropPlan *prppFst,
-									 const CReqdPropPlan *prppSnd)
+CReqdPropPlan::FEqualForCostBounding(const gpos::Ref<CReqdPropPlan> prppFst,
+									 const gpos::Ref<CReqdPropPlan> prppSnd)
 {
 	GPOS_ASSERT(nullptr != prppFst);
 	GPOS_ASSERT(nullptr != prppSnd);
@@ -535,7 +544,8 @@ CReqdPropPlan::FEqualForCostBounding(const CReqdPropPlan *prppFst,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CReqdPropPlan>
-CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp, CReqdPropPlan *prppInput,
+CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp,
+							   gpos::Ref<CReqdPropPlan> prppInput,
 							   CDrvdPropPlan *pdpplanInput,
 							   UlongToColRefMap *colref_mapping)
 {

@@ -1228,7 +1228,7 @@ CDXLUtils::SerializeStatistics(CMemoryPool *mp, CMDAccessor *md_accessor,
 
 	for (ULONG ul = 0; ul < statistics_array->Size(); ul++)
 	{
-		CStatistics *stats = (*statistics_array)[ul].get();
+		gpos::Ref<CStatistics> stats = (*statistics_array)[ul].get();
 		gpos::Ref<CDXLStatsDerivedRelation> stats_derived_relation_dxl =
 			stats->GetDxlStatsDrvdRelation(mp, md_accessor);
 		stats_derived_relation_dxl->Serialize(&xml_serializer);

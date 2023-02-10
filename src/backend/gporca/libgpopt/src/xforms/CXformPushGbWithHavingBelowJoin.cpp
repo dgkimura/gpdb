@@ -95,7 +95,8 @@ CXformPushGbWithHavingBelowJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	gpos::Ref<CExpression> pexprGb = (*pexpr)[0];
-	CLogicalGbAgg *popGbAgg = gpos::dyn_cast<CLogicalGbAgg>(pexprGb->Pop());
+	gpos::Ref<CLogicalGbAgg> popGbAgg =
+		gpos::dyn_cast<CLogicalGbAgg>(pexprGb->Pop());
 	if (!popGbAgg->FGlobal())
 	{
 		// xform only applies to global aggs

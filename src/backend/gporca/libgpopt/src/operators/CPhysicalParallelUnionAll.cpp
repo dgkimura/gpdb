@@ -71,10 +71,10 @@ CPhysicalParallelUnionAll::PdsRequired(CMemoryPool *mp, CExpressionHandle &,
 }
 
 CEnfdDistribution::EDistributionMatching
-CPhysicalParallelUnionAll::Edm(CReqdPropPlan *,	  // prppInput
-							   ULONG,			  // child_index
-							   CDrvdPropArray *,  //pdrgpdpCtxt
-							   ULONG			  // ulOptReq
+CPhysicalParallelUnionAll::Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
+							   ULONG,					  // child_index
+							   CDrvdPropArray *,		  //pdrgpdpCtxt
+							   ULONG					  // ulOptReq
 )
 {
 	return CEnfdDistribution::EdmExact;

@@ -61,11 +61,11 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	void
-	AppendEnforcers(CMemoryPool *,			// mp
-					CExpressionHandle &,	// exprhdl
-					CReqdPropPlan *,		// prpp
-					CExpressionArray *,		// pdrgpexpr
-					gpos::Ref<CExpression>	// pexpr
+	AppendEnforcers(CMemoryPool *,			   // mp
+					CExpressionHandle &,	   // exprhdl
+					gpos::Ref<CReqdPropPlan>,  // prpp
+					CExpressionArray *,		   // pdrgpexpr
+					gpos::Ref<CExpression>	   // pexpr
 					) override
 	{
 		GPOS_ASSERT(!"attempt to enforce strict SINGLETON distribution");

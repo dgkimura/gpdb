@@ -84,7 +84,7 @@ public:
 	// compute required output columns of the n-th child
 	gpos::Ref<CColRefSet> PcrsRequired(CMemoryPool *mp,
 									   CExpressionHandle &exprhdl,
-									   CColRefSet *pcrsRequired,
+									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG child_index,
 									   CDrvdPropArray *pdrgpdpCtxt,
 									   ULONG ulOptReq) override;
@@ -120,13 +120,14 @@ public:
 											  ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns
-	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl, CColRefSet *pcrsRequired,
+	BOOL FProvidesReqdCols(CExpressionHandle &exprhdl,
+						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG ulOptReq) const override;
 
 
 	// distribution matching type
 	CEnfdDistribution::EDistributionMatching
-	Edm(CReqdPropPlan *prppInput,
+	Edm(gpos::Ref<CReqdPropPlan> prppInput,
 		ULONG,			   // child_index
 		CDrvdPropArray *,  //pdrgpdpCtxt
 		ULONG			   // ulOptReq

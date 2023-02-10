@@ -196,7 +196,7 @@ public:
 	}
 
 	// accessor for computed required plan props
-	CReqdPropPlan *
+	gpos::Ref<CReqdPropPlan>
 	Prpp() const
 	{
 		return m_prpp.get();
@@ -280,7 +280,8 @@ public:
 #endif	// GPOS_DEBUG
 
 	// check if the expression satisfies given required properties
-	BOOL FValidPlan(const CReqdPropPlan *prpp, CDrvdPropCtxtPlan *pdpctxtplan);
+	BOOL FValidPlan(const gpos::Ref<CReqdPropPlan> prpp,
+					CDrvdPropCtxtPlan *pdpctxtplan);
 
 	// static hash function
 	static ULONG HashValue(const gpos::Ref<CExpression> pexpr);
@@ -294,10 +295,10 @@ public:
 		gpos::Ref<CExpressionArray> pdrgpexpr, CDrvdPropCtxtPlan *pdpctxtplan);
 
 	// Relational property accessors - derived as needed
-	CColRefSet *DeriveOuterReferences();
-	CColRefSet *DeriveOutputColumns();
-	CColRefSet *DeriveNotNullColumns();
-	CColRefSet *DeriveCorrelatedApplyColumns();
+	gpos::Ref<CColRefSet> DeriveOuterReferences();
+	gpos::Ref<CColRefSet> DeriveOutputColumns();
+	gpos::Ref<CColRefSet> DeriveNotNullColumns();
+	gpos::Ref<CColRefSet> DeriveCorrelatedApplyColumns();
 	gpos::Ref<CKeyCollection> DeriveKeyCollection();
 	gpos::Ref<CPropConstraint> DerivePropertyConstraint();
 	CMaxCard DeriveMaxCard();
@@ -308,9 +309,9 @@ public:
 	gpos::Ref<CTableDescriptor> DeriveTableDescriptor();
 
 	// Scalar property accessors - derived as needed
-	CColRefSet *DeriveDefinedColumns();
-	CColRefSet *DeriveUsedColumns();
-	CColRefSet *DeriveSetReturningFunctionColumns();
+	gpos::Ref<CColRefSet> DeriveDefinedColumns();
+	gpos::Ref<CColRefSet> DeriveUsedColumns();
+	gpos::Ref<CColRefSet> DeriveSetReturningFunctionColumns();
 	BOOL DeriveHasSubquery();
 	gpos::Ref<CPartInfo> DeriveScalarPartitionInfo();
 	gpos::Ref<CFunctionProp> DeriveScalarFunctionProperties();

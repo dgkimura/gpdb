@@ -250,7 +250,8 @@ public:
 	// derive the statistics on the CTE producer
 	void DeriveProducerStats(
 		CLogicalCTEConsumer *popConsumer,  // CTE Consumer operator
-		CColRefSet *pcrsStat  // required stat columns on the CTE Consumer
+		gpos::Ref<CColRefSet>
+			pcrsStat  // required stat columns on the CTE Consumer
 	);
 
 	// return a CTE requirement with all the producers as optional
@@ -288,7 +289,7 @@ public:
 
 	// return a map from Id's of consumer columns in the given column set to their corresponding producer columns
 	gpos::Ref<UlongToColRefMap> PhmulcrConsumerToProducer(
-		CMemoryPool *mp, ULONG ulCTEId, CColRefSet *pcrs,
+		CMemoryPool *mp, ULONG ulCTEId, gpos::Ref<CColRefSet> pcrs,
 		CColRefArray *pdrgpcrProducer);
 
 };	// CCTEInfo

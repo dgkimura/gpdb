@@ -94,7 +94,7 @@ CScalarBitmapIndexProbe::Matches(gpos::Ref<COperator> pop) const
 	{
 		return false;
 	}
-	CScalarBitmapIndexProbe *popIndexProbe =
+	gpos::Ref<CScalarBitmapIndexProbe> popIndexProbe =
 		gpos::dyn_cast<CScalarBitmapIndexProbe>(pop);
 
 	return m_pindexdesc->MDId()->Equals(popIndexProbe->Pindexdesc()->MDId());

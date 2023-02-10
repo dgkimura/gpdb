@@ -59,7 +59,7 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	virtual void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 CReqdPropPlan *prpp,
+								 gpos::Ref<CReqdPropPlan> prpp,
 								 CExpressionArray *pdrgpexpr,
 								 gpos::Ref<CExpression> pexpr) = 0;
 

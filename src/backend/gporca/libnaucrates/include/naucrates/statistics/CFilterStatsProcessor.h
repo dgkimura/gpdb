@@ -34,14 +34,13 @@ private:
 											ULONG *target_last_colid);
 
 	// create a new histogram after applying a point filter
-	static CHistogram *MakeHistPointFilter(CStatsPredPoint *pred_stats,
-										   gpos::Ref<CBitSet> filter_colids,
-										   CHistogram *hist_before,
-										   CDouble *last_scale_factor,
-										   ULONG *target_last_colid);
+	static CHistogram *MakeHistPointFilter(
+		gpos::Ref<CStatsPredPoint> pred_stats, gpos::Ref<CBitSet> filter_colids,
+		CHistogram *hist_before, CDouble *last_scale_factor,
+		ULONG *target_last_colid);
 
 	// create a new histogram after applying a LIKE filter
-	static CHistogram *MakeHistLikeFilter(CStatsPredLike *pred_stats,
+	static CHistogram *MakeHistLikeFilter(gpos::Ref<CStatsPredLike> pred_stats,
 										  gpos::Ref<CBitSet> filter_colids,
 										  CHistogram *hist_before,
 										  CDouble *last_scale_factor,
@@ -49,13 +48,13 @@ private:
 
 	// create a new histogram for an unsupported predicate
 	static CHistogram *MakeHistUnsupportedPred(
-		CStatsPredUnsupported *pred_stats, gpos::Ref<CBitSet> filter_colids,
-		CHistogram *hist_before, CDouble *last_scale_factor,
-		ULONG *target_last_colid);
+		gpos::Ref<CStatsPredUnsupported> pred_stats,
+		gpos::Ref<CBitSet> filter_colids, CHistogram *hist_before,
+		CDouble *last_scale_factor, ULONG *target_last_colid);
 
 	// create a new histogram after applying a pred op ANY(ARRAY[...]) filter
 	static CHistogram *MakeHistArrayCmpAnyFilter(
-		CMemoryPool *mp, CStatsPredArrayCmp *pred_stats,
+		CMemoryPool *mp, gpos::Ref<CStatsPredArrayCmp> pred_stats,
 		gpos::Ref<CBitSet> filter_colids, CHistogram *hist_before,
 		CDouble *last_scale_factor, ULONG *target_last_colid);
 
@@ -69,13 +68,14 @@ private:
 	static gpos::Ref<UlongToHistogramMap> MakeHistHashMapConjFilter(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
 		UlongToHistogramMap *intermediate_histograms, CDouble input_rows,
-		CStatsPredConj *conjunctive_pred_stats, CDouble *scale_factor);
+		gpos::Ref<CStatsPredConj> conjunctive_pred_stats,
+		CDouble *scale_factor);
 
 	// create new hash map of histograms after applying the disjunctive predicate
 	static gpos::Ref<UlongToHistogramMap> MakeHistHashMapDisjFilter(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
 		UlongToHistogramMap *input_histograms, CDouble input_rows,
-		CStatsPredDisj *pred_stats, CDouble *scale_factor);
+		gpos::Ref<CStatsPredDisj> pred_stats, CDouble *scale_factor);
 
 	// check if the column is a new column for statistic calculation
 	static BOOL IsNewStatsColumn(ULONG colid, ULONG last_colid);
@@ -83,7 +83,7 @@ private:
 public:
 	// filter
 	static gpos::Ref<CStatistics> MakeStatsFilter(
-		CMemoryPool *mp, const CStatistics *input_stats,
+		CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
 		gpos::Ref<CStatsPred> base_pred_stats, BOOL do_cap_NDVs);
 
 	// derive statistics for filter operation based on given scalar expression
@@ -99,7 +99,7 @@ public:
 	static CDouble SelectivityOfPredicate(CMemoryPool *mp,
 										  gpos::Ref<CExpression> pred,
 										  gpos::Ref<CTableDescriptor> ptabdesc,
-										  CColRefSet *pcrsOuterRefs);
+										  gpos::Ref<CColRefSet> pcrsOuterRefs);
 };
 }  // namespace gpnaucrates
 

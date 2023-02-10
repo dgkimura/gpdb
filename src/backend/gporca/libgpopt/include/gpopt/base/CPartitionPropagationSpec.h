@@ -135,7 +135,8 @@ public:
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						 CReqdPropPlan *prpp, CExpressionArray *pdrgpexpr,
+						 gpos::Ref<CReqdPropPlan> prpp,
+						 CExpressionArray *pdrgpexpr,
 						 gpos::Ref<CExpression> pexpr) override;
 
 	// hash function
@@ -147,7 +148,7 @@ public:
 		UlongToSPartPropSpecInfoMapIter hmulpi(m_part_prop_spec_infos.get());
 		while (hmulpi.Advance())
 		{
-			const gpos::Ref<SPartPropSpecInfo> info = hmulpi.Value();
+			const SPartPropSpecInfo *info = hmulpi.Value();
 			ulHash = gpos::CombineHashes(ulHash, info->HashValue());
 		}
 

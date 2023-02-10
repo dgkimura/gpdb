@@ -51,7 +51,7 @@ public:
 
 	// distribution matching type
 	CEnfdDistribution::EDistributionMatching
-	Edm(CReqdPropPlan *prppInput,
+	Edm(gpos::Ref<CReqdPropPlan> prppInput,
 		ULONG,			   // child_index
 		CDrvdPropArray *,  //pdrgpdpCtxt
 		ULONG ulOptReq) override

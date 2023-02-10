@@ -1110,7 +1110,7 @@ CFilterCardinalityTest::EresUnittest_CStatisticsCompare(
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
 
-	CStatistics *input_stats = (*pdrgpstatBefore)[0].get();
+	gpos::Ref<CStatistics> input_stats = (*pdrgpstatBefore)[0].get();
 
 	GPOS_TRACE(GPOS_WSZ_LIT("Statistics before"));
 	CCardinalityTestUtils::PrintStats(mp, input_stats);

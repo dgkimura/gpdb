@@ -75,7 +75,7 @@ public:
 	// compute required output columns of the n-th child
 	gpos::Ref<CColRefSet>
 	PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 CColRefSet *pcrsRequired, ULONG child_index,
+				 gpos::Ref<CColRefSet> pcrsRequired, ULONG child_index,
 				 CDrvdPropArray *,	//pdrgpdpCtxt,
 				 ULONG				//ulOptReq
 				 ) override

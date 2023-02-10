@@ -81,11 +81,11 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void
 	AppendEnforcers(
-		CMemoryPool *,			// mp
-		CExpressionHandle &,	// exprhdl: gives access to child properties
-		CReqdPropPlan *,		// prpp
-		CExpressionArray *,		// pdrgpexpr
-		gpos::Ref<CExpression>	// pexpr
+		CMemoryPool *,			   // mp
+		CExpressionHandle &,	   // exprhdl: gives access to child properties
+		gpos::Ref<CReqdPropPlan>,  // prpp
+		CExpressionArray *,		   // pdrgpexpr
+		gpos::Ref<CExpression>	   // pexpr
 		) override
 	{
 		GPOS_ASSERT(!"attempt to enforce ANY distribution");

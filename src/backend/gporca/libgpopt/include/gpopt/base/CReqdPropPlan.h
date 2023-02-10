@@ -103,7 +103,7 @@ public:
 						 CDrvdPropArray *pdrgpdpCtxt);
 
 	// required columns accessor
-	CColRefSet *
+	gpos::Ref<CColRefSet>
 	PcrsRequired() const
 	{
 		return m_pcrs.get();
@@ -148,7 +148,7 @@ public:
 	gpos::Ref<CPropSpec> Pps(ULONG ul) const;
 
 	// equality function
-	BOOL Equals(const CReqdPropPlan *prpp) const;
+	BOOL Equals(const gpos::Ref<CReqdPropPlan> prpp) const;
 
 	// hash function
 	ULONG HashValue() const;
@@ -158,7 +158,8 @@ public:
 					const CDrvdPropPlan *pdpplan) const;
 
 	// check if plan properties are compatible with the given derived properties
-	BOOL FCompatible(CExpressionHandle &exprhdl, CPhysical *popPhysical,
+	BOOL FCompatible(CExpressionHandle &exprhdl,
+					 gpos::Ref<CPhysical> popPhysical,
 					 const CDrvdPropRelational *pdprel,
 					 const CDrvdPropPlan *pdpplan) const;
 
@@ -167,28 +168,29 @@ public:
 						   ULONG ulOptReq) const;
 
 	// shorthand for conversion
-	static CReqdPropPlan *
+	static gpos::Ref<CReqdPropPlan>
 	Prpp(gpos::Ref<CReqdProp> prp)
 	{
 		GPOS_ASSERT(nullptr != prp);
 
-		return dynamic_cast<CReqdPropPlan *>(prp);
+		return gpos::dyn_cast<CReqdPropPlan>(prp);
 	}
 
 	//generate empty required properties
 	static gpos::Ref<CReqdPropPlan> PrppEmpty(CMemoryPool *mp);
 
 	// hash function used for cost bounding
+	static ULONG UlHashForCostBounding(const gpos::Ref<CReqdPropPlan> prpp);
 	static ULONG UlHashForCostBounding(const CReqdPropPlan *prpp);
 
 	// equality function used for cost bounding
-	static BOOL FEqualForCostBounding(const CReqdPropPlan *prppFst,
-									  const CReqdPropPlan *prppSnd);
+	static BOOL FEqualForCostBounding(const gpos::Ref<CReqdPropPlan> prppFst,
+									  const gpos::Ref<CReqdPropPlan> prppSnd);
 
 	// map input required and derived plan properties into new required plan properties
 	static gpos::Ref<CReqdPropPlan> PrppRemapForCTE(
-		CMemoryPool *mp, CReqdPropPlan *prppInput, CDrvdPropPlan *pdpplanInput,
-		UlongToColRefMap *colref_mapping);
+		CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput,
+		CDrvdPropPlan *pdpplanInput, UlongToColRefMap *colref_mapping);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

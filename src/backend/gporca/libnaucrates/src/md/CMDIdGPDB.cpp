@@ -302,8 +302,8 @@ CMDIdGPDB::Equals(const gpos::Ref<IMDId> mdid) const
 		return false;
 	}
 
-	const CMDIdGPDB *mdidGPDB =
-		static_cast<CMDIdGPDB *>(const_cast<gpos::Ref<IMDId> >(mdid));
+	const gpos::Ref<CMDIdGPDB> mdidGPDB =
+		static_cast<gpos::Ref<CMDIdGPDB> >(const_cast<gpos::Ref<IMDId> >(mdid));
 
 	return (m_oid == mdidGPDB->Oid() &&
 			m_major_version == mdidGPDB->VersionMajor() &&

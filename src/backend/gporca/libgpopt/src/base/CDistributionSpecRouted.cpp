@@ -122,7 +122,7 @@ CDistributionSpecRouted::PdsCopyWithRemappedColumns(
 void
 CDistributionSpecRouted::AppendEnforcers(CMemoryPool *mp,
 										 CExpressionHandle &,  // exprhdl
-										 CReqdPropPlan *
+										 gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
 											 prpp
 #endif	// GPOS_DEBUG
