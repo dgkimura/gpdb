@@ -2602,8 +2602,9 @@ CTranslatorQueryToDXL::DXLDummyConstTableGet() const
 	gpos::Ref<CDXLColDescrArray> dxl_col_descr_array =
 		GPOS_NEW(m_mp) CDXLColDescrArray(m_mp);
 
-	const CMDTypeBoolGPDB *md_type_bool = dynamic_cast<const CMDTypeBoolGPDB *>(
-		m_md_accessor->PtMDType<IMDTypeBool>(m_sysid));
+	const gpos::Ref<CMDTypeBoolGPDB> md_type_bool =
+		dynamic_cast<const gpos::Ref<CMDTypeBoolGPDB> >(
+			m_md_accessor->PtMDType<IMDTypeBool>(m_sysid));
 	const gpos::Ref<CMDIdGPDB> mdid =
 		gpos::dyn_cast<CMDIdGPDB>(md_type_bool->MDId());
 

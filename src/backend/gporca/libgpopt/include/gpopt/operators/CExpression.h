@@ -199,7 +199,7 @@ public:
 	gpos::Ref<CReqdPropPlan>
 	Prpp() const
 	{
-		return m_prpp.get();
+		return m_prpp;
 	}
 
 	CDrvdPropRelational *GetDrvdPropRelational() const;
@@ -212,7 +212,7 @@ public:
 	const gpos::Ref<IStatistics>
 	Pstats() const
 	{
-		return m_pstats.get();
+		return m_pstats;
 	}
 
 	// cost accessor

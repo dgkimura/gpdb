@@ -142,7 +142,7 @@ CParseHandlerCostModel::EndElement(const XMLCh *const,	// element_uri,
 		case ICostModel::EcmtGPDBLegacy:
 		case ICostModel::EcmtGPDBExperimental:
 		case ICostModel::EcmtGPDBCalibrated:
-			CCostModelParamsGPDB *pcp;
+			gpos::Ref<CCostModelParamsGPDB> pcp;
 
 			if (nullptr == m_parse_handler_cost_params)
 			{
@@ -150,7 +150,7 @@ CParseHandlerCostModel::EndElement(const XMLCh *const,	// element_uri,
 			}
 			else
 			{
-				pcp = dynamic_cast<CCostModelParamsGPDB *>(
+				pcp = dynamic_cast<gpos::Ref<CCostModelParamsGPDB> >(
 					m_parse_handler_cost_params->GetCostModelParams());
 				GPOS_ASSERT(nullptr != pcp);
 				;

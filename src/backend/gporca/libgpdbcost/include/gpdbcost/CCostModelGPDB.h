@@ -211,7 +211,7 @@ private:
 public:
 	// ctor
 	CCostModelGPDB(CMemoryPool *mp, ULONG ulSegments,
-				   CCostModelParamsGPDB *pcp = nullptr);
+				   gpos::Ref<CCostModelParamsGPDB> pcp = nullptr);
 
 	// dtor
 	~CCostModelGPDB() override;

@@ -52,7 +52,7 @@ using namespace gpdbcost;
 //
 //---------------------------------------------------------------------------
 CCostModelGPDB::CCostModelGPDB(CMemoryPool *mp, ULONG ulSegments,
-							   CCostModelParamsGPDB *pcp)
+							   gpos::Ref<CCostModelParamsGPDB> pcp)
 	: m_mp(mp), m_num_of_segments(ulSegments)
 {
 	GPOS_ASSERT(0 < ulSegments);
