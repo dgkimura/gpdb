@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 
 

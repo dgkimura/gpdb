@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/xml/CDXLMemoryManager.h"
 
 using namespace gpdxl;

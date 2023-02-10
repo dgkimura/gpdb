@@ -279,12 +279,7 @@ public:
 
 	// hash function for optimization context
 	static ULONG
-	HashValue(const COptimizationContext &oc)
-	{
-		GPOS_ASSERT(nullptr != oc.Prpp());
-
-		return oc.Prpp()->HashValue();
-	}
+	HashValue(const COptimizationContext &oc);
 
 	// equality function for cost contexts hash table
 	static BOOL

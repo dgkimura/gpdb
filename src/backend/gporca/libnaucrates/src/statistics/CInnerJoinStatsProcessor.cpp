@@ -13,6 +13,8 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/search/CGroupExpression.h"
+
 using namespace gpmd;
 
 // return statistics object after performing inner join

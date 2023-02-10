@@ -13,6 +13,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerStacktrace.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
 

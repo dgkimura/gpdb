@@ -17,6 +17,8 @@
 
 #include "naucrates/dxl/parser/CParseHandlerIndexOnlyScan.h"
 
+#include "gpopt/search/CGroupExpression.h"
+
 using namespace gpdxl;
 
 XERCES_CPP_NAMESPACE_USE

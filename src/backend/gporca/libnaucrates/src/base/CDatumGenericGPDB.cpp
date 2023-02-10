@@ -18,6 +18,7 @@
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/mdcache/CMDAccessor.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/CMDIdGPDB.h"
 #include "naucrates/md/IMDType.h"
 #include "naucrates/statistics/CScaleFactorUtils.h"

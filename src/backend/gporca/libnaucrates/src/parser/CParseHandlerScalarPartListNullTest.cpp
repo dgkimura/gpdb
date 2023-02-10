@@ -8,6 +8,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarPartListNullTest.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarPartListNullTest.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"

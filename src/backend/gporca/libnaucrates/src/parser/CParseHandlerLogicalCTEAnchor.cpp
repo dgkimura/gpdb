@@ -12,6 +12,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalCTEAnchor.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLLogicalCTEAnchor.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"

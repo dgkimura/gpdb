@@ -13,12 +13,12 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarSubPlanParam.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerPhysicalOp.h"
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
-
 using namespace gpdxl;
 
 

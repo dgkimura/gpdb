@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarPartBoundOpen.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarPartBoundOpen.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"

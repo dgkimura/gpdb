@@ -18,6 +18,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarOpList.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarOpList.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"

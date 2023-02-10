@@ -13,6 +13,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarMinMax.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"

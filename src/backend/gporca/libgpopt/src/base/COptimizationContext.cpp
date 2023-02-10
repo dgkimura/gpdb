@@ -488,4 +488,12 @@ COptimizationContext::OsPrintWithPrefix(IOstream &os,
 	return os;
 }
 
+ULONG
+COptimizationContext::HashValue(const COptimizationContext &oc)
+{
+	GPOS_ASSERT(nullptr != oc.Prpp());
+
+	return oc.Prpp()->HashValue();
+}
+
 // EOF

@@ -21,6 +21,7 @@
 #include "gpos/task/CWorker.h"
 
 #include "gpopt/mdcache/CMDAccessor.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/exception.h"
 #include "naucrates/md/CDXLColStats.h"

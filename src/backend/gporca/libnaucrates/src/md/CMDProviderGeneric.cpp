@@ -15,6 +15,7 @@
 #include "gpos/io/COstreamString.h"
 #include "gpos/memory/CMemoryPool.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/exception.h"
 #include "naucrates/md/CDXLColStats.h"

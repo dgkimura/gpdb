@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerPhysicalDynamicBitmapTableScan.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/xml/dxltokens.h"
 
 using namespace gpdxl;

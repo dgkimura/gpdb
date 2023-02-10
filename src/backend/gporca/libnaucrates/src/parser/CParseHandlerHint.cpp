@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/engine/CHint.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerManager.h"
