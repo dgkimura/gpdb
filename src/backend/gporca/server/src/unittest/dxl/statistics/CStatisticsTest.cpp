@@ -288,7 +288,7 @@ CStatisticsTest::EresUnittest_GbAggWithRepeatedGbCols()
 }
 
 // generates example int histogram corresponding to dimension table
-CHistogram *
+gpos::Ref<CHistogram>
 CStatisticsTest::PhistExampleInt4Dim(CMemoryPool *mp)
 {
 	// generate histogram of the form [0, 10), [10, 20), [20, 30) ... [80, 90)

@@ -39,18 +39,26 @@ using CDoubleArray = CDynamicPtrArray<CDouble, CleanupDelete>;
 //	@doc:
 //
 //---------------------------------------------------------------------------
-class CHistogram : public gpos::DbgPrintMixin<CHistogram>
+class CHistogram : public CRefCount, public gpos::DbgPrintMixin<CHistogram>
 {
 	// hash map from column id to a histogram
 	using UlongToHistogramMap =
-		CHashMap<ULONG, CHistogram, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-				 CleanupDelete<ULONG>, CleanupDelete<CHistogram>>;
+		//CHashMap<ULONG, CHistogram, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+		//		 CleanupDelete<ULONG>, CleanupDelete<CHistogram>>;
+		gpos::UnorderedMap<const ULONG *, gpos::Ref<CHistogram>,
+						   gpos::PtrHash<ULONG, gpos::HashValue<ULONG>>,
+						   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
+
 
 	// iterator
 	using UlongToHistogramMapIter =
-		CHashMapIter<ULONG, CHistogram, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupDelete<CHistogram>>;
+		//CHashMapIter<ULONG, CHistogram, gpos::HashValue<ULONG>,
+		//			 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//			 CleanupDelete<CHistogram>>;
+		gpos::UnorderedMap<
+			const ULONG *, gpos::Ref<CHistogram>,
+			gpos::PtrHash<ULONG, gpos::HashValue<ULONG>>,
+			gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 	// hash map from column ULONG to CDouble
 	using UlongToDoubleMap =
@@ -105,37 +113,41 @@ private:
 		gpos::Ref<CPoint> point) const;
 
 	// less than or less than equal filter
-	CHistogram *MakeHistogramLessThanOrLessThanEqualFilter(
+	gpos::Ref<CHistogram> MakeHistogramLessThanOrLessThanEqualFilter(
 		CStatsPred::EStatsCmpType stats_cmp_type,
 		gpos::Ref<CPoint> point) const;
 
 	// greater than or greater than equal filter
-	CHistogram *MakeHistogramGreaterThanOrGreaterThanEqualFilter(
+	gpos::Ref<CHistogram> MakeHistogramGreaterThanOrGreaterThanEqualFilter(
 		CStatsPred::EStatsCmpType stats_cmp_type,
 		gpos::Ref<CPoint> point) const;
 
 	// equal filter
-	CHistogram *MakeHistogramEqualFilter(gpos::Ref<CPoint> point) const;
+	gpos::Ref<CHistogram> MakeHistogramEqualFilter(
+		gpos::Ref<CPoint> point) const;
 
 	// not equal filter
-	CHistogram *MakeHistogramInequalityFilter(gpos::Ref<CPoint> point) const;
+	gpos::Ref<CHistogram> MakeHistogramInequalityFilter(
+		gpos::Ref<CPoint> point) const;
 
 	// IDF filter
-	CHistogram *MakeHistogramIDFFilter(gpos::Ref<CPoint> point) const;
+	gpos::Ref<CHistogram> MakeHistogramIDFFilter(gpos::Ref<CPoint> point) const;
 
 	// INDF filter
-	CHistogram *MakeHistogramINDFFilter(gpos::Ref<CPoint> point) const;
+	gpos::Ref<CHistogram> MakeHistogramINDFFilter(
+		gpos::Ref<CPoint> point) const;
 
 	// equality join
-	CHistogram *MakeJoinHistogramEqualityFilter(
-		const CHistogram *histogram) const;
+	gpos::Ref<CHistogram> MakeJoinHistogramEqualityFilter(
+		const gpos::Ref<CHistogram> histogram) const;
 
 	// generate histogram based on NDV
-	CHistogram *MakeNDVBasedJoinHistogramEqualityFilter(
-		const CHistogram *histogram) const;
+	gpos::Ref<CHistogram> MakeNDVBasedJoinHistogramEqualityFilter(
+		const gpos::Ref<CHistogram> histogram) const;
 
 	// construct a new histogram for an INDF join predicate
-	CHistogram *MakeJoinHistogramINDFFilter(const CHistogram *histogram) const;
+	gpos::Ref<CHistogram> MakeJoinHistogramINDFFilter(
+		const gpos::Ref<CHistogram> histogram) const;
 
 	// accessor for n-th bucket
 	CBucket *operator[](ULONG) const;
@@ -159,13 +171,14 @@ private:
 												  ULONG desired_num_buckets);
 
 	// check if we can compute NDVRemain for JOIN histogram for the given input histograms
-	static BOOL CanComputeJoinNDVRemain(const CHistogram *histogram1,
-										const CHistogram *histogram2);
+	static BOOL CanComputeJoinNDVRemain(const gpos::Ref<CHistogram> histogram1,
+										const gpos::Ref<CHistogram> histogram2);
 
 	// compute the effects of the NDV and frequency of the tuples not captured
 	// by the histogram
 	static void ComputeJoinNDVRemainInfo(
-		const CHistogram *histogram1, const CHistogram *histogram2,
+		const gpos::Ref<CHistogram> histogram1,
+		const gpos::Ref<CHistogram> histogram2,
 		const CBucketArray *join_buckets,  // join buckets
 		CDouble
 			hist1_buckets_freq,	 // frequency of the buckets in input1 that contributed to the join
@@ -175,7 +188,8 @@ private:
 
 
 	// check if the cardinality estimation should be done only via NDVs
-	static BOOL NeedsNDVBasedCardEstimationForEq(const CHistogram *histogram);
+	static BOOL NeedsNDVBasedCardEstimationForEq(
+		const gpos::Ref<CHistogram> histogram);
 
 	BOOL IsHistogramForTextRelatedTypes() const;
 
@@ -255,63 +269,65 @@ public:
 	}
 
 	// filter by comparing with point
-	CHistogram *MakeHistogramFilter(CStatsPred::EStatsCmpType stats_cmp_type,
-									gpos::Ref<CPoint> point) const;
+	gpos::Ref<CHistogram> MakeHistogramFilter(
+		CStatsPred::EStatsCmpType stats_cmp_type,
+		gpos::Ref<CPoint> point) const;
 
 	// filter by comparing with point and normalize
-	CHistogram *MakeHistogramFilterNormalize(
+	gpos::Ref<CHistogram> MakeHistogramFilterNormalize(
 		CStatsPred::EStatsCmpType stats_cmp_type, gpos::Ref<CPoint> point,
 		CDouble *scale_factor) const;
 
 	// join with another histogram
-	CHistogram *MakeJoinHistogram(CStatsPred::EStatsCmpType stats_cmp_type,
-								  const CHistogram *histogram) const;
+	gpos::Ref<CHistogram> MakeJoinHistogram(
+		CStatsPred::EStatsCmpType stats_cmp_type,
+		const gpos::Ref<CHistogram> histogram) const;
 
 	// LASJ with another histogram
-	CHistogram *MakeLASJHistogram(CStatsPred::EStatsCmpType stats_cmp_type,
-								  const CHistogram *histogram) const;
+	gpos::Ref<CHistogram> MakeLASJHistogram(
+		CStatsPred::EStatsCmpType stats_cmp_type,
+		const gpos::Ref<CHistogram> histogram) const;
 
 	// join with another histogram and normalize it.
 	// If the join is not an equality join the function returns an empty histogram
-	CHistogram *MakeJoinHistogramNormalize(
+	gpos::Ref<CHistogram> MakeJoinHistogramNormalize(
 		CStatsPred::EStatsCmpType stats_cmp_type, CDouble rows,
-		const CHistogram *other_histogram, CDouble rows_other,
+		const gpos::Ref<CHistogram> other_histogram, CDouble rows_other,
 		CDouble *scale_factor) const;
 
 	// scale factor of inequality (!=) join
-	CDouble GetInequalityJoinScaleFactor(CDouble rows,
-										 const CHistogram *other_histogram,
-										 CDouble rows_other) const;
+	CDouble GetInequalityJoinScaleFactor(
+		CDouble rows, const gpos::Ref<CHistogram> other_histogram,
+		CDouble rows_other) const;
 
 	// left anti semi join with another histogram and normalize
-	CHistogram *MakeLASJHistogramNormalize(
+	gpos::Ref<CHistogram> MakeLASJHistogramNormalize(
 		CStatsPred::EStatsCmpType stats_cmp_type, CDouble rows,
-		const CHistogram *other_histogram, CDouble *scale_factor,
+		const gpos::Ref<CHistogram> other_histogram, CDouble *scale_factor,
 		BOOL
 			DoIgnoreLASJHistComputation	 // except for the case of LOJ cardinality estimation this flag is always
 		// "true" since LASJ stats computation is very aggressive
 	) const;
 
 	// group by and normalize
-	CHistogram *MakeGroupByHistogramNormalize(CDouble rows,
-											  CDouble *scale_factor) const;
+	gpos::Ref<CHistogram> MakeGroupByHistogramNormalize(
+		CDouble rows, CDouble *scale_factor) const;
 
 	// union all and normalize
-	CHistogram *MakeUnionAllHistogramNormalize(
-		CDouble rows, const CHistogram *other_histogram,
+	gpos::Ref<CHistogram> MakeUnionAllHistogramNormalize(
+		CDouble rows, const gpos::Ref<CHistogram> other_histogram,
 		CDouble rows_other) const;
 
 	// union and normalize
-	CHistogram *MakeUnionHistogramNormalize(CDouble rows,
-											const CHistogram *other_histogram,
-											CDouble rows_other,
-											CDouble *num_output_rows) const;
+	gpos::Ref<CHistogram> MakeUnionHistogramNormalize(
+		CDouble rows, const gpos::Ref<CHistogram> other_histogram,
+		CDouble rows_other, CDouble *num_output_rows) const;
 
 	// cleanup residual buckets
 	static void CleanupResidualBucket(CBucket *bucket, BOOL bucket_is_residual);
 
 	// get the next bucket for union / union all
-	static CBucket *GetNextBucket(const CHistogram *histogram,
+	static CBucket *GetNextBucket(const gpos::Ref<CHistogram> histogram,
 								  CBucket *new_bucket,
 								  BOOL *target_bucket_is_residual,
 								  ULONG *current_bucket_index);
@@ -360,7 +376,7 @@ public:
 	BOOL IsValid() const;
 
 	// return copy of histogram
-	CHistogram *CopyHistogram() const;
+	gpos::Ref<CHistogram> CopyHistogram() const;
 
 	// destructor
 	virtual ~CHistogram()
@@ -433,28 +449,29 @@ public:
 		CStatsPred::EStatsCmpType stats_cmp_type);
 
 	// create the default histogram for a given column reference
-	static CHistogram *MakeDefaultHistogram(CMemoryPool *mp, CColRef *col_ref,
-											BOOL is_empty);
+	static gpos::Ref<CHistogram> MakeDefaultHistogram(CMemoryPool *mp,
+													  CColRef *col_ref,
+													  BOOL is_empty);
 
 	// create the default non empty histogram for a boolean column
-	static CHistogram *MakeDefaultBoolHistogram(CMemoryPool *mp);
+	static gpos::Ref<CHistogram> MakeDefaultBoolHistogram(CMemoryPool *mp);
 
 	// helper method to append histograms from one map to the other
 	static void AddHistograms(CMemoryPool *mp,
-							  UlongToHistogramMap *src_histograms,
-							  UlongToHistogramMap *dest_histograms);
+							  gpos::Ref<UlongToHistogramMap> src_histograms,
+							  gpos::Ref<UlongToHistogramMap> dest_histograms);
 
 	// add dummy histogram buckets and column width for the array of columns
 	static void AddDummyHistogramAndWidthInfo(
 		CMemoryPool *mp, CColumnFactory *col_factory,
-		UlongToHistogramMap *output_histograms,
+		gpos::Ref<UlongToHistogramMap> output_histograms,
 		UlongToDoubleMap *output_col_widths, const ULongPtrArray *columns,
 		BOOL is_empty);
 
 	// add dummy histogram buckets for the columns in the input histogram
-	static void AddEmptyHistogram(CMemoryPool *mp,
-								  UlongToHistogramMap *output_histograms,
-								  UlongToHistogramMap *input_histograms);
+	static void AddEmptyHistogram(
+		CMemoryPool *mp, gpos::Ref<UlongToHistogramMap> output_histograms,
+		gpos::Ref<UlongToHistogramMap> input_histograms);
 
 	// create a deep copy of m_histogram_buckets
 	static gpos::Ref<CBucketArray> DeepCopyHistogramBuckets(

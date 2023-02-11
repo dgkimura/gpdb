@@ -48,13 +48,20 @@ HashValue(const gpos::Ref<T> pt)
 
 // hash map from column id to a histogram
 using UlongToHistogramMap =
-	CHashMap<ULONG, CHistogram, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupDelete<CHistogram>>;
+	//CHashMap<ULONG, CHistogram, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	//		 CleanupDelete<ULONG>, CleanupDelete<CHistogram>>;
+	gpos::UnorderedMap<const ULONG *, gpos::Ref<CHistogram>,
+					   gpos::PtrHash<ULONG, gpos::HashValue<ULONG>>,
+					   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 // iterator
 using UlongToHistogramMapIter =
-	CHashMapIter<ULONG, CHistogram, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-				 CleanupDelete<ULONG>, CleanupDelete<CHistogram>>;
+	//CHashMapIter<ULONG, CHistogram, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	//			 CleanupDelete<ULONG>, CleanupDelete<CHistogram>>;
+	gpos::UnorderedMap<
+		const ULONG *, gpos::Ref<CHistogram>,
+		gpos::PtrHash<ULONG, gpos::HashValue<ULONG>>,
+		gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 // hash map from column ULONG to CDouble
 using UlongToDoubleMap =

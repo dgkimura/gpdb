@@ -99,7 +99,7 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 	pdrgpdFreq->Append(GPOS_NEW(mp) CDouble(0.1));
 
 	// exercise MCV sorting function
-	CHistogram *phistMCV = CStatisticsUtils::TransformMCVToHist(
+	gpos::Ref<CHistogram> phistMCV = CStatisticsUtils::TransformMCVToHist(
 		mp, pmdtype, pdrgpdatumMCV.get(), pdrgpdFreq.get(),
 		pdrgpdatumMCV->Size());
 
@@ -207,7 +207,8 @@ CMCVTest::EresUnittest_MergeHistMCV()
 		gpos::Ref<CBucketArray> pdrgppbucketMCV =
 			CDXLUtils::ParseDXLToBucketsArray(mp, md_accessor,
 											  pdxlstatsdercolMCV);
-		CHistogram *phistMCV = GPOS_NEW(mp) CHistogram(mp, pdrgppbucketMCV);
+		gpos::Ref<CHistogram> phistMCV =
+			GPOS_NEW(mp) CHistogram(mp, pdrgppbucketMCV);
 
 		gpos::Ref<CDXLStatsDerivedRelation> pdxlstatsderrelHist =
 			(*pdrgpdxlstatsderrelHist)[0].get();
@@ -218,12 +219,13 @@ CMCVTest::EresUnittest_MergeHistMCV()
 		gpos::Ref<CBucketArray> pdrgppbucketHist =
 			CDXLUtils::ParseDXLToBucketsArray(mp, md_accessor,
 											  pdxlstatsdercolHist);
-		CHistogram *phistHist = GPOS_NEW(mp) CHistogram(mp, pdrgppbucketHist);
+		gpos::Ref<CHistogram> phistHist =
+			GPOS_NEW(mp) CHistogram(mp, pdrgppbucketHist);
 
 		GPOS_CHECK_ABORT;
 
 		// exercise the merge
-		CHistogram *phistMerged =
+		gpos::Ref<CHistogram> phistMerged =
 			CStatisticsUtils::MergeMCVHist(mp, phistMCV, phistHist);
 
 		// create hash map from colid -> histogram

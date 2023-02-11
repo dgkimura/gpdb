@@ -125,20 +125,21 @@ CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
 	for (ULONG i = 0; i < num_outer_cols; i++)
 	{
 		ULONG colid = *(*outer_colids_with_stats)[i];
-		const CHistogram *inner_join_histogram =
+		const gpos::Ref<CHistogram> inner_join_histogram =
 			inner_join_stats->GetHistogram(colid);
 		GPOS_ASSERT(nullptr != inner_join_histogram);
 
 		if (outer_side_join_cols->Get(colid))
 		{
 			// add buckets from the outer histogram that do not contribute to the inner join
-			const CHistogram *LASJ_histogram = LASJ_stats->GetHistogram(colid);
+			const gpos::Ref<CHistogram> LASJ_histogram =
+				LASJ_stats->GetHistogram(colid);
 			GPOS_ASSERT(nullptr != LASJ_histogram);
 
 			if (LASJ_histogram->IsWellDefined() && !LASJ_histogram->IsEmpty())
 			{
 				// union the buckets from the inner join and LASJ to get the LOJ buckets
-				CHistogram *LOJ_histogram =
+				gpos::Ref<CHistogram> LOJ_histogram =
 					LASJ_histogram->MakeUnionAllHistogramNormalize(
 						num_rows_LASJ, inner_join_histogram,
 						num_rows_inner_join);
@@ -187,7 +188,7 @@ void
 CLeftOuterJoinStatsProcessor::AddHistogramsLOJInner(
 	CMemoryPool *mp, const gpos::Ref<CStatistics> inner_join_stats,
 	ULongPtrArray *inner_colids_with_stats, CDouble num_rows_LASJ,
-	CDouble num_rows_inner_join, UlongToHistogramMap *LOJ_histograms)
+	CDouble num_rows_inner_join, gpos::Ref<UlongToHistogramMap> LOJ_histograms)
 {
 	GPOS_ASSERT(nullptr != inner_join_stats);
 	GPOS_ASSERT(nullptr != inner_colids_with_stats);
@@ -199,16 +200,16 @@ CLeftOuterJoinStatsProcessor::AddHistogramsLOJInner(
 	{
 		ULONG colid = *(*inner_colids_with_stats)[ul];
 
-		const CHistogram *inner_join_histogram =
+		const gpos::Ref<CHistogram> inner_join_histogram =
 			inner_join_stats->GetHistogram(colid);
 		GPOS_ASSERT(nullptr != inner_join_histogram);
 
 		// the number of nulls added to the inner side should be the number of rows of the LASJ on the outer side.
-		CHistogram *null_histogram = GPOS_NEW(mp) CHistogram(
+		gpos::Ref<CHistogram> null_histogram = GPOS_NEW(mp) CHistogram(
 			mp, GPOS_NEW(mp) CBucketArray(mp), true /*is_well_defined*/,
 			1.0 /*null_freq*/, CHistogram::DefaultNDVRemain,
 			CHistogram::DefaultNDVFreqRemain);
-		CHistogram *LOJ_histogram =
+		gpos::Ref<CHistogram> LOJ_histogram =
 			inner_join_histogram->MakeUnionAllHistogramNormalize(
 				num_rows_inner_join, null_histogram, num_rows_LASJ);
 		CStatisticsUtils::AddHistogram(mp, colid, LOJ_histogram,

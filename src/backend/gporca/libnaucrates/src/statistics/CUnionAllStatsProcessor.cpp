@@ -61,17 +61,17 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 			ULONG first_child_colid = *(*first_child_colids)[ul];
 			ULONG second_child_colid = *(*second_child_colids)[ul];
 
-			const CHistogram *first_child_histogram =
+			const gpos::Ref<CHistogram> first_child_histogram =
 				stats_first_child->GetHistogram(first_child_colid);
 			GPOS_ASSERT(nullptr != first_child_histogram);
-			const CHistogram *second_child_histogram =
+			const gpos::Ref<CHistogram> second_child_histogram =
 				stats_second_child->GetHistogram(second_child_colid);
 			GPOS_ASSERT(nullptr != second_child_histogram);
 
 			if (first_child_histogram->IsWellDefined() ||
 				second_child_histogram->IsWellDefined())
 			{
-				CHistogram *output_histogram =
+				gpos::Ref<CHistogram> output_histogram =
 					first_child_histogram->MakeUnionAllHistogramNormalize(
 						stats_first_child->Rows(), second_child_histogram,
 						stats_second_child->Rows());
@@ -84,8 +84,9 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 				CColRef *column_ref = col_factory->LookupColRef(output_colid);
 				GPOS_ASSERT(nullptr != column_ref);
 
-				CHistogram *dummy_histogram = CHistogram::MakeDefaultHistogram(
-					mp, column_ref, false /* is_empty*/);
+				gpos::Ref<CHistogram> dummy_histogram =
+					CHistogram::MakeDefaultHistogram(mp, column_ref,
+													 false /* is_empty*/);
 				histograms_new->Insert(GPOS_NEW(mp) ULONG(output_colid),
 									   dummy_histogram);
 			}

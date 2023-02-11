@@ -16,9 +16,6 @@ struct PointLess
 {
 	bool operator()(const gpos::Ref<gpnaucrates::CPoint> a,
 					const gpos::Ref<gpnaucrates::CPoint> b) const;
-
-	bool operator()(const gpos::Ref<gpnaucrates::CPoint> &a,
-					const gpos::Ref<gpnaucrates::CPoint> &b) const;
 };
 }  // namespace gpnaucrates
 

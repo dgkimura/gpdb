@@ -71,32 +71,33 @@ CHistogramTest::EresUnittest_CHistogramInt4()
 	CMemoryPool *mp = amp.Pmp();
 
 	// original histogram
-	CHistogram *histogram = CCardinalityTestUtils::PhistExampleInt4(mp);
+	gpos::Ref<CHistogram> histogram =
+		CCardinalityTestUtils::PhistExampleInt4(mp);
 	CCardinalityTestUtils::PrintHist(mp, "histogram", histogram);
 
 	// test edge case of MakeBucketGreaterThan
 	gpos::Ref<CPoint> ppoint0 = CTestUtils::PpointInt4(mp, 9);
-	CHistogram *phist0 =
+	gpos::Ref<CHistogram> phist0 =
 		histogram->MakeHistogramFilter(CStatsPred::EstatscmptG, ppoint0);
 	CCardinalityTestUtils::PrintHist(mp, "phist0", phist0);
 	GPOS_RTL_ASSERT(phist0->GetNumBuckets() == 9);
 
 	gpos::Ref<CPoint> point1 = CTestUtils::PpointInt4(mp, 35);
-	CHistogram *histogram1 =
+	gpos::Ref<CHistogram> histogram1 =
 		histogram->MakeHistogramFilter(CStatsPred::EstatscmptL, point1);
 	CCardinalityTestUtils::PrintHist(mp, "histogram1", histogram1);
 	GPOS_RTL_ASSERT(histogram1->GetNumBuckets() == 4);
 
 	// edge case where point is equal to upper bound
 	gpos::Ref<CPoint> point2 = CTestUtils::PpointInt4(mp, 50);
-	CHistogram *histogram2 =
+	gpos::Ref<CHistogram> histogram2 =
 		histogram->MakeHistogramFilter(CStatsPred::EstatscmptL, point2);
 	CCardinalityTestUtils::PrintHist(mp, "histogram2", histogram2);
 	GPOS_RTL_ASSERT(histogram2->GetNumBuckets() == 5);
 
 	// equality check
 	gpos::Ref<CPoint> point3 = CTestUtils::PpointInt4(mp, 100);
-	CHistogram *phist3 =
+	gpos::Ref<CHistogram> phist3 =
 		histogram->MakeHistogramFilter(CStatsPred::EstatscmptEq, point3);
 	CCardinalityTestUtils::PrintHist(mp, "phist3", phist3);
 	GPOS_RTL_ASSERT(phist3->GetNumBuckets() == 1);
@@ -104,30 +105,30 @@ CHistogramTest::EresUnittest_CHistogramInt4()
 	// normalized output after filter
 	gpos::Ref<CPoint> ppoint4 = CTestUtils::PpointInt4(mp, 100);
 	CDouble scale_factor(0.0);
-	CHistogram *phist4 = histogram->MakeHistogramFilterNormalize(
+	gpos::Ref<CHistogram> phist4 = histogram->MakeHistogramFilterNormalize(
 		CStatsPred::EstatscmptEq, ppoint4, &scale_factor);
 	CCardinalityTestUtils::PrintHist(mp, "phist4", phist4);
 	GPOS_RTL_ASSERT(phist4->IsValid());
 
 	// lasj
-	CHistogram *phist5 =
+	gpos::Ref<CHistogram> phist5 =
 		histogram->MakeLASJHistogram(CStatsPred::EstatscmptEq, histogram2);
 	CCardinalityTestUtils::PrintHist(mp, "phist5", phist5);
 	GPOS_RTL_ASSERT(phist5->GetNumBuckets() == 5);
 
 	// inequality check
-	CHistogram *phist6 =
+	gpos::Ref<CHistogram> phist6 =
 		histogram->MakeHistogramFilter(CStatsPred::EstatscmptNEq, point2);
 	CCardinalityTestUtils::PrintHist(mp, "phist6", phist6);
 	GPOS_RTL_ASSERT(phist6->GetNumBuckets() == 10);
 
 	// histogram with null fraction and remaining tuples
-	CHistogram *phist7 = PhistExampleInt4Remain(mp);
+	gpos::Ref<CHistogram> phist7 = PhistExampleInt4Remain(mp);
 	CCardinalityTestUtils::PrintHist(mp, "phist7", phist7);
 	gpos::Ref<CPoint> ppoint5 = CTestUtils::PpointInt4(mp, 20);
 
 	// equality check, hitting remaining tuples
-	CHistogram *phist8 =
+	gpos::Ref<CHistogram> phist8 =
 		phist7->MakeHistogramFilter(CStatsPred::EstatscmptEq, point3);
 	GPOS_RTL_ASSERT(fabs((phist8->GetFrequency() - 0.2).Get()) <
 					CStatistics::Epsilon);
@@ -135,7 +136,7 @@ CHistogramTest::EresUnittest_CHistogramInt4()
 					CStatistics::Epsilon);
 
 	// greater than, hitting remaining tuples
-	CHistogram *phist9 =
+	gpos::Ref<CHistogram> phist9 =
 		phist7->MakeHistogramFilter(CStatsPred::EstatscmptG, point1);
 	CCardinalityTestUtils::PrintHist(mp, "phist9", phist9);
 	GPOS_RTL_ASSERT(fabs((phist9->GetFrequency() - 0.26).Get()) <
@@ -144,7 +145,7 @@ CHistogramTest::EresUnittest_CHistogramInt4()
 					CStatistics::Epsilon);
 
 	// equality join, hitting remaining tuples
-	CHistogram *phist10 =
+	gpos::Ref<CHistogram> phist10 =
 		phist7->MakeJoinHistogram(CStatsPred::EstatscmptEq, phist7);
 	GPOS_RTL_ASSERT(phist10->GetNumBuckets() == 5);
 	GPOS_RTL_ASSERT(fabs((phist10->GetDistinctRemain() - 2.0).Get()) <
@@ -191,12 +192,13 @@ CHistogramTest::EresUnittest_CHistogramBool()
 		CCardinalityTestUtils::PbucketSingletonBoolVal(mp, false, 0.9);
 	histogram_buckets->Append(pbucketFalse);
 	histogram_buckets->Append(pbucketTrue);
-	CHistogram *histogram = GPOS_NEW(mp) CHistogram(mp, histogram_buckets);
+	gpos::Ref<CHistogram> histogram =
+		GPOS_NEW(mp) CHistogram(mp, histogram_buckets);
 
 	// equality check
 	gpos::Ref<CPoint> point1 = CTestUtils::PpointBool(mp, false);
 	CDouble scale_factor(0.0);
-	CHistogram *histogram1 = histogram->MakeHistogramFilterNormalize(
+	gpos::Ref<CHistogram> histogram1 = histogram->MakeHistogramFilterNormalize(
 		CStatsPred::EstatscmptEq, point1, &scale_factor);
 	CCardinalityTestUtils::PrintHist(mp, "histogram1", histogram1);
 	GPOS_RTL_ASSERT(histogram1->GetNumBuckets() == 1);
@@ -229,7 +231,8 @@ CHistogramTest::EresUnittest_CHistogramValid()
 	histogram_buckets->Append(bucket2);
 
 	// original histogram
-	CHistogram *histogram = GPOS_NEW(mp) CHistogram(mp, histogram_buckets);
+	gpos::Ref<CHistogram> histogram =
+		GPOS_NEW(mp) CHistogram(mp, histogram_buckets);
 
 	// create an auto object
 	CAutoP<CHistogram> ahist;
@@ -251,7 +254,7 @@ CHistogramTest::EresUnittest_CHistogramValid()
 
 // generates example int histogram having tuples not covered by buckets,
 // including null fraction and nDistinctRemain
-CHistogram *
+gpos::Ref<CHistogram>
 CHistogramTest::PhistExampleInt4Remain(CMemoryPool *mp)
 {
 	// generate histogram of the form [0, 0], [10, 10], [20, 20] ...
@@ -301,7 +304,7 @@ CHistogramTest::EresUnittest_Skew()
 	pdrgppbucket1->Append(bucket1);
 	pdrgppbucket1->Append(bucket2);
 	pdrgppbucket1->Append(pbucket3);
-	CHistogram *histogram1 =
+	gpos::Ref<CHistogram> histogram1 =
 		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket1));
 
 	gpos::Ref<CBucketArray> pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
@@ -310,7 +313,7 @@ CHistogramTest::EresUnittest_Skew()
 	pdrgppbucket2->Append(pbucket6);
 	pdrgppbucket2->Append(pbucket7);
 	pdrgppbucket2->Append(pbucket8);
-	CHistogram *histogram2 =
+	gpos::Ref<CHistogram> histogram2 =
 		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket2));
 	GPOS_ASSERT(histogram1->GetSkew() > histogram2->GetSkew());
 
@@ -349,22 +352,22 @@ CHistogramTest::EresUnittest_MergeUnion()
 	gpos::Ref<CBucketArray> pdrgppbucket1 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket1->Append(bucket1);
 	pdrgppbucket1->Append(bucket2);
-	CHistogram *histogram1 =
+	gpos::Ref<CHistogram> histogram1 =
 		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket1));
 
 	gpos::Ref<CBucketArray> pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket2->Append(pbucket3);
 	pdrgppbucket2->Append(pbucket4);
-	CHistogram *histogram2 =
+	gpos::Ref<CHistogram> histogram2 =
 		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket2));
 
 	CDouble output_rows1(0.0);
-	CHistogram *result1 = histogram1->MakeUnionHistogramNormalize(
+	gpos::Ref<CHistogram> result1 = histogram1->MakeUnionHistogramNormalize(
 		1000, histogram2, 600, &output_rows1);
 
 
 	CDouble output_rows2(0.0);
-	CHistogram *result2 = histogram2->MakeUnionHistogramNormalize(
+	gpos::Ref<CHistogram> result2 = histogram2->MakeUnionHistogramNormalize(
 		600, histogram1, 1000, &output_rows2);
 
 	{
@@ -413,16 +416,16 @@ CHistogramTest::EresUnittest_MergeUnionDoubleLessThanEpsilon()
 
 	gpos::Ref<CBucketArray> pdrgppbucket1 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket1->Append(bucket1);
-	CHistogram *histogram1 =
+	gpos::Ref<CHistogram> histogram1 =
 		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket1));
 
 	gpos::Ref<CBucketArray> pdrgppbucket2 = GPOS_NEW(mp) CBucketArray(mp);
 	pdrgppbucket2->Append(bucket2);
-	CHistogram *histogram2 =
+	gpos::Ref<CHistogram> histogram2 =
 		GPOS_NEW(mp) CHistogram(mp, std::move(pdrgppbucket2));
 
 	CDouble output_rows1(0.0);
-	CHistogram *result1 = histogram1->MakeUnionHistogramNormalize(
+	gpos::Ref<CHistogram> result1 = histogram1->MakeUnionHistogramNormalize(
 		1000, histogram2, 600, &output_rows1);
 
 

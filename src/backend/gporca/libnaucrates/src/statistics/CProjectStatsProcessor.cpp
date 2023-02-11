@@ -42,7 +42,8 @@ CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		ULONG colid = *(*projection_colids)[ul];
-		const CHistogram *histogram = input_stats->GetHistogram(colid);
+		const gpos::Ref<CHistogram> histogram =
+			input_stats->GetHistogram(colid);
 
 		if (nullptr == histogram)
 		{
@@ -70,7 +71,7 @@ CProjectStatsProcessor::CalcProjStats(CMemoryPool *mp,
 				}
 			}
 
-			CHistogram *proj_col_histogram = nullptr;
+			gpos::Ref<CHistogram> proj_col_histogram = nullptr;
 			CColRef *colref = col_factory->LookupColRef(colid);
 			GPOS_ASSERT(nullptr != colref);
 

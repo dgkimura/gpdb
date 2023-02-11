@@ -991,12 +991,12 @@ CMDAccessor::Pmdsccmp(gpos::Ref<IMDId> left_mdid, gpos::Ref<IMDId> right_mdid,
 //
 //---------------------------------------------------------------------------
 void
-CMDAccessor::RecordColumnStats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
-							   ULONG colid, ULONG ulPos, BOOL isSystemCol,
-							   BOOL isEmptyTable,
-							   UlongToHistogramMap *col_histogram_mapping,
-							   UlongToDoubleMap *colid_width_mapping,
-							   gpos::Ref<CStatisticsConfig> stats_config)
+CMDAccessor::RecordColumnStats(
+	CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid, ULONG colid, ULONG ulPos,
+	BOOL isSystemCol, BOOL isEmptyTable,
+	gpos::Ref<UlongToHistogramMap> col_histogram_mapping,
+	UlongToDoubleMap *colid_width_mapping,
+	gpos::Ref<CStatisticsConfig> stats_config)
 {
 	GPOS_ASSERT(nullptr != rel_mdid);
 	GPOS_ASSERT(nullptr != col_histogram_mapping);
@@ -1013,7 +1013,7 @@ CMDAccessor::RecordColumnStats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
 	// extract the the histogram and insert it into the hashmap
 	const IMDRelation *pmdrel = RetrieveRel(rel_mdid);
 	gpos::Ref<IMDId> mdid_type = pmdrel->GetMdCol(ulPos)->MdidType();
-	CHistogram *histogram = GetHistogram(mp, mdid_type, pmdcolstats);
+	gpos::Ref<CHistogram> histogram = GetHistogram(mp, mdid_type, pmdcolstats);
 	GPOS_ASSERT(nullptr != histogram);
 	col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(colid), histogram);
 
@@ -1135,7 +1135,7 @@ CMDAccessor::Pstats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
 //		Construct a histogram from the given MD column stats object
 //
 //---------------------------------------------------------------------------
-CHistogram *
+gpos::Ref<CHistogram>
 CMDAccessor::GetHistogram(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 						  const IMDColStats *pmdcolstats)
 {
@@ -1165,7 +1165,7 @@ CMDAccessor::GetHistogram(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 	CDouble distinct_remaining = pmdcolstats->GetDistinctRemain();
 	CDouble freq_remaining = pmdcolstats->GetFreqRemain();
 
-	CHistogram *histogram = GPOS_NEW(mp)
+	gpos::Ref<CHistogram> histogram = GPOS_NEW(mp)
 		CHistogram(mp, std::move(buckets), true /*is_well_defined*/, null_freq,
 				   distinct_remaining, freq_remaining, is_col_stats_missing);
 	GPOS_ASSERT_IMP(fBoolType,

@@ -74,7 +74,7 @@ public:
 	// helper method to copy stats on columns that are not excluded by bitset
 	void AddNotExcludedHistograms(
 		CMemoryPool *mp, gpos::Ref<CBitSet> excluded_cols,
-		UlongToHistogramMap *col_histogram_mapping) const;
+		gpos::Ref<UlongToHistogramMap> col_histogram_mapping) const;
 
 private:
 	// hashmap from column ids to histograms
@@ -118,11 +118,10 @@ private:
 	static const ULONG no_card_est_risk_default_val;
 
 	// helper method to add histograms where the column ids have been remapped
-	static void AddHistogramsWithRemap(CMemoryPool *mp,
-									   UlongToHistogramMap *src_histograms,
-									   UlongToHistogramMap *dest_histograms,
-									   UlongToColRefMap *colref_mapping,
-									   BOOL must_exist);
+	static void AddHistogramsWithRemap(
+		CMemoryPool *mp, gpos::Ref<UlongToHistogramMap> src_histograms,
+		gpos::Ref<UlongToHistogramMap> dest_histograms,
+		UlongToColRefMap *colref_mapping, BOOL must_exist);
 
 	// helper method to add width information where the column ids have been
 	// remapped
@@ -204,7 +203,7 @@ public:
 	}
 
 	// look up the histogram of a particular column
-	virtual const CHistogram *
+	virtual const gpos::Ref<CHistogram>
 	GetHistogram(ULONG colid) const
 	{
 		return m_colid_histogram_mapping->Find(&colid);
@@ -381,7 +380,7 @@ public:
 
 	// cap the total number of distinct values (NDV) in buckets to the number of rows
 	static void CapNDVs(CDouble rows,
-						UlongToHistogramMap *col_histogram_mapping);
+						gpos::Ref<UlongToHistogramMap> col_histogram_mapping);
 };	// class CStatistics
 
 }  // namespace gpnaucrates

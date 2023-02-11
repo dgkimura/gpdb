@@ -48,15 +48,17 @@ public:
 								   CDouble frequency, CDouble distinct);
 
 	// helper function to generate integer histogram based on the NDV and bucket information provided
-	static CHistogram *PhistInt4Remain(CMemoryPool *mp, ULONG num_of_buckets,
-									   CDouble dNDVPerBucket, BOOL fNullFreq,
-									   CDouble num_NDV_remain);
+	static gpos::Ref<CHistogram> PhistInt4Remain(CMemoryPool *mp,
+												 ULONG num_of_buckets,
+												 CDouble dNDVPerBucket,
+												 BOOL fNullFreq,
+												 CDouble num_NDV_remain);
 
 	// helper function to generate an example integer histogram
-	static CHistogram *PhistExampleInt4(CMemoryPool *mp);
+	static gpos::Ref<CHistogram> PhistExampleInt4(CMemoryPool *mp);
 
 	// helper function to generate an example boolean histogram
-	static CHistogram *PhistExampleBool(CMemoryPool *mp);
+	static gpos::Ref<CHistogram> PhistExampleBool(CMemoryPool *mp);
 
 	// helper function to generate a point from an encoded value of specific datatype
 	static gpos::Ref<CPoint> PpointGeneric(CMemoryPool *mp, OID oid,
@@ -77,7 +79,7 @@ public:
 
 	// helper method to print histogram object
 	static void PrintHist(CMemoryPool *mp, const char *pcPrefix,
-						  const CHistogram *histogram);
+						  const gpos::Ref<CHistogram> histogram);
 
 	// helper method to print bucket object
 	static void PrintBucket(CMemoryPool *mp, const char *pcPrefix,

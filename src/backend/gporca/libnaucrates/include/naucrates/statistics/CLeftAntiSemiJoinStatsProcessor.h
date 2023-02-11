@@ -24,13 +24,14 @@ class CLeftAntiSemiJoinStatsProcessor : public CJoinStatsProcessor
 public:
 	// helper for LAS-joining histograms
 	static void JoinHistogramsLASJ(
-		const CHistogram *histogram1, const CHistogram *histogram2,
+		const gpos::Ref<CHistogram> histogram1,
+		const gpos::Ref<CHistogram> histogram2,
 		gpos::Ref<CStatsPredJoin> join_stats, CDouble num_rows1,
 		CDouble num_rows2,
-		CHistogram **result_hist1,	// output: histogram 1 after join
-		CHistogram **result_hist2,	// output: histogram 2 after join
-		CDouble *scale_factor,		// output: scale factor based on the join
-		BOOL is_input_empty,		// if true, one of the inputs is empty
+		gpos::Ref<CHistogram> *result_hist1,  // output: histogram 1 after join
+		gpos::Ref<CHistogram> *result_hist2,  // output: histogram 2 after join
+		CDouble *scale_factor,	// output: scale factor based on the join
+		BOOL is_input_empty,	// if true, one of the inputs is empty
 		IStatistics::EStatsJoinType join_type,
 		BOOL DoIgnoreLASJHistComputation);
 	// left anti semi join with another stats structure
@@ -44,8 +45,8 @@ public:
 	);
 	// compute the null frequency for LASJ
 	static CDouble NullFreqLASJ(CStatsPred::EStatsCmpType stats_cmp_type,
-								const CHistogram *outer_histogram,
-								const CHistogram *inner_histogram);
+								const gpos::Ref<CHistogram> outer_histogram,
+								const gpos::Ref<CHistogram> inner_histogram);
 };
 }  // namespace gpnaucrates
 

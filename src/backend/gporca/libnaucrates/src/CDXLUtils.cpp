@@ -626,7 +626,7 @@ CDXLUtils::ParseDXLToOptimizerStatisticObjArray(
 			gpos::Ref<CBucketArray> stats_buckets_array =
 				CDXLUtils::ParseDXLToBucketsArray(mp, md_accessor,
 												  dxl_derived_col_stats);
-			CHistogram *histogram = GPOS_NEW(mp)
+			gpos::Ref<CHistogram> histogram = GPOS_NEW(mp)
 				CHistogram(mp, stats_buckets_array, true /*is_well_defined*/,
 						   null_freq, distinct_remaining, freq_remaining);
 

@@ -31,7 +31,8 @@ private:
 	static void AddHistogramsLOJInner(
 		CMemoryPool *mp, const gpos::Ref<CStatistics> inner_join_stats,
 		ULongPtrArray *inner_colids_with_stats, CDouble num_rows_LASJ,
-		CDouble num_rows_inner_join, UlongToHistogramMap *LOJ_histograms);
+		CDouble num_rows_inner_join,
+		gpos::Ref<UlongToHistogramMap> LOJ_histograms);
 
 public:
 	static gpos::Ref<CStatistics> CalcLOJoinStatsStatic(

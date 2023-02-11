@@ -30,7 +30,7 @@ class CHistogramTest
 private:
 	// generate int histogram having tuples not covered by buckets,
 	// including null fraction and nDistinctRemain
-	static CHistogram *PhistExampleInt4Remain(CMemoryPool *mp);
+	static gpos::Ref<CHistogram> PhistExampleInt4Remain(CMemoryPool *mp);
 
 public:
 	// unittests

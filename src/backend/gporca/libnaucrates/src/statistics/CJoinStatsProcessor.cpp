@@ -31,12 +31,13 @@ BOOL CJoinStatsProcessor::m_compute_scale_factor_from_histogram_buckets = false;
 // helper for joining histograms
 void
 CJoinStatsProcessor::JoinHistograms(
-	CMemoryPool *mp, const CHistogram *histogram1, const CHistogram *histogram2,
+	CMemoryPool *mp, const gpos::Ref<CHistogram> histogram1,
+	const gpos::Ref<CHistogram> histogram2,
 	gpos::Ref<CStatsPredJoin> join_pred_stats, CDouble num_rows1,
 	CDouble num_rows2,
-	CHistogram **result_hist1,	// output: histogram 1 after join
-	CHistogram **result_hist2,	// output: histogram 2 after join
-	CDouble *scale_factor,		// output: scale factor based on the join
+	gpos::Ref<CHistogram> *result_hist1,  // output: histogram 1 after join
+	gpos::Ref<CHistogram> *result_hist2,  // output: histogram 2 after join
+	CDouble *scale_factor,	// output: scale factor based on the join
 	BOOL is_input_empty, IStatistics::EStatsJoinType join_type,
 	BOOL DoIgnoreLASJHistComputation)
 {
@@ -83,8 +84,9 @@ CJoinStatsProcessor::JoinHistograms(
 	}
 	else if (CHistogram::JoinPredCmpTypeIsSupported(stats_cmp_type))
 	{
-		CHistogram *join_histogram = histogram1->MakeJoinHistogramNormalize(
-			stats_cmp_type, num_rows1, histogram2, num_rows2, scale_factor);
+		gpos::Ref<CHistogram> join_histogram =
+			histogram1->MakeJoinHistogramNormalize(
+				stats_cmp_type, num_rows1, histogram2, num_rows2, scale_factor);
 
 		if (CStatsPred::EstatscmptEq == stats_cmp_type ||
 			CStatsPred::EstatscmptINDF == stats_cmp_type ||
@@ -327,13 +329,13 @@ CJoinStatsProcessor::SetResultingJoinStats(
 		ULONG colid1 = pred_info->ColIdOuter();
 		ULONG colid2 = pred_info->ColIdInner();
 		GPOS_ASSERT(colid1 != colid2);
-		const CHistogram *outer_histogram = nullptr;
-		const CHistogram *inner_histogram = nullptr;
+		const gpos::Ref<CHistogram> outer_histogram = nullptr;
+		const gpos::Ref<CHistogram> inner_histogram = nullptr;
 		BOOL is_input_empty =
 			CStatistics::IsEmptyJoin(outer_stats, inner_side_stats, IsLASJ);
 		CDouble local_scale_factor(1.0);
-		CHistogram *outer_histogram_after = nullptr;
-		CHistogram *inner_histogram_after = nullptr;
+		gpos::Ref<CHistogram> outer_histogram_after = nullptr;
+		gpos::Ref<CHistogram> inner_histogram_after = nullptr;
 
 
 		// find the histograms corresponding to the two columns
@@ -517,12 +519,11 @@ CJoinStatsProcessor::CalcJoinCardinality(
 // check if the join statistics object is empty output based on the input
 // histograms and the join histograms
 BOOL
-CJoinStatsProcessor::JoinStatsAreEmpty(BOOL outer_is_empty,
-									   BOOL output_is_empty,
-									   const CHistogram *outer_histogram,
-									   const CHistogram *inner_histogram,
-									   CHistogram *join_histogram,
-									   IStatistics::EStatsJoinType join_type)
+CJoinStatsProcessor::JoinStatsAreEmpty(
+	BOOL outer_is_empty, BOOL output_is_empty,
+	const gpos::Ref<CHistogram> outer_histogram,
+	const gpos::Ref<CHistogram> inner_histogram,
+	gpos::Ref<CHistogram> join_histogram, IStatistics::EStatsJoinType join_type)
 {
 	GPOS_ASSERT(nullptr != outer_histogram);
 	GPOS_ASSERT(nullptr != inner_histogram);

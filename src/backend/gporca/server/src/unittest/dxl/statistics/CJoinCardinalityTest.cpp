@@ -89,8 +89,9 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 		BOOL fNullFreq = elem.m_fNullFreq;
 		CDouble num_NDV_remain = elem.m_dNDVRemain;
 
-		CHistogram *histogram = CCardinalityTestUtils::PhistInt4Remain(
-			mp, num_of_buckets, dNDVPerBucket, fNullFreq, num_NDV_remain);
+		gpos::Ref<CHistogram> histogram =
+			CCardinalityTestUtils::PhistInt4Remain(
+				mp, num_of_buckets, dNDVPerBucket, fNullFreq, num_NDV_remain);
 		BOOL result GPOS_ASSERTS_ONLY =
 			col_histogram_mapping->Insert(GPOS_NEW(mp) ULONG(ul1), histogram);
 		GPOS_ASSERT(result);
@@ -131,10 +132,10 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 		SStatsJoinNDVRemainTestCase elem = rgjoinndvrtc[ul2];
 		ULONG colid1 = elem.m_ulCol1;
 		ULONG colid2 = elem.m_ulCol2;
-		CHistogram *histogram1 = col_histogram_mapping->Find(&colid1);
-		CHistogram *histogram2 = col_histogram_mapping->Find(&colid2);
+		gpos::Ref<CHistogram> histogram1 = col_histogram_mapping->Find(&colid1);
+		gpos::Ref<CHistogram> histogram2 = col_histogram_mapping->Find(&colid2);
 
-		CHistogram *join_histogram =
+		gpos::Ref<CHistogram> join_histogram =
 			histogram1->MakeJoinHistogram(CStatsPred::EstatscmptEq, histogram2);
 
 		{

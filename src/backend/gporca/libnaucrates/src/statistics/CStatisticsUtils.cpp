@@ -123,7 +123,7 @@ CStatisticsUtils::NextPoint(CMemoryPool *mp, CMDAccessor *md_accessor,
 //		Given MCVs and their frequencies, construct a CHistogram
 //		containing MCV singleton buckets
 //---------------------------------------------------------------------------
-CHistogram *
+gpos::Ref<CHistogram>
 CStatisticsUtils::TransformMCVToHist(CMemoryPool *mp,
 									 const IMDType *,  // mdtype,
 									 IDatumArray *mcv_datums,
@@ -165,7 +165,8 @@ CStatisticsUtils::TransformMCVToHist(CMemoryPool *mp,
 					bucket_freq, CDouble(1.0));
 		mcv_buckets->Append(bucket);
 	}
-	CHistogram *histogram = GPOS_NEW(mp) CHistogram(mp, std::move(mcv_buckets));
+	gpos::Ref<CHistogram> histogram =
+		GPOS_NEW(mp) CHistogram(mp, std::move(mcv_buckets));
 	GPOS_ASSERT(histogram->IsValid());
 	;
 
@@ -181,9 +182,10 @@ CStatisticsUtils::TransformMCVToHist(CMemoryPool *mp,
 //		CHistogram
 //
 //---------------------------------------------------------------------------
-CHistogram *
-CStatisticsUtils::MergeMCVHist(CMemoryPool *mp, const CHistogram *mcv_histogram,
-							   const CHistogram *histogram)
+gpos::Ref<CHistogram>
+CStatisticsUtils::MergeMCVHist(CMemoryPool *mp,
+							   const gpos::Ref<CHistogram> mcv_histogram,
+							   const gpos::Ref<CHistogram> histogram)
 {
 	GPOS_ASSERT(nullptr != mcv_histogram);
 	GPOS_ASSERT(nullptr != histogram);
@@ -218,7 +220,7 @@ CStatisticsUtils::MergeMCVHist(CMemoryPool *mp, const CHistogram *mcv_histogram,
 	gpos::Ref<CBucketArray> merged_buckets =
 		MergeMcvHistBucket(mp, mcv_buckets, histogram_buckets);
 
-	CHistogram *merged_histogram =
+	gpos::Ref<CHistogram> merged_histogram =
 		GPOS_NEW(mp) CHistogram(mp, std::move(merged_buckets));
 	GPOS_ASSERT(merged_histogram->IsValid());
 
@@ -574,7 +576,8 @@ CStatisticsUtils::DistributeBucketProperties(CMemoryPool *mp,
 void
 CStatisticsUtils::PrintColStats(CMemoryPool *mp,
 								gpos::Ref<CStatsPred> pred_stats,
-								ULONG cond_colid, CHistogram *histogram,
+								ULONG cond_colid,
+								gpos::Ref<CHistogram> histogram,
 								CDouble last_scale_factor,
 								BOOL is_filter_applied_before)
 {
@@ -688,8 +691,8 @@ void
 CStatisticsUtils::UpdateDisjStatistics(
 	CMemoryPool *mp, gpos::Ref<CBitSet> dont_update_stats_bitset,
 	CDouble input_disjunct_rows, CDouble local_rows,
-	CHistogram *previous_histogram,
-	UlongToHistogramMap *disjunctive_result_histograms, ULONG colid)
+	gpos::Ref<CHistogram> previous_histogram,
+	gpos::Ref<UlongToHistogramMap> disjunctive_result_histograms, ULONG colid)
 {
 	GPOS_ASSERT(nullptr != dont_update_stats_bitset);
 	GPOS_ASSERT(nullptr != disjunctive_result_histograms);
@@ -699,7 +702,7 @@ CStatisticsUtils::UpdateDisjStatistics(
 	{
 		// 1. the filter is on the same column because gpos::ulong_max != colid
 		// 2. the histogram of the column can be updated
-		CHistogram *result_histogram =
+		gpos::Ref<CHistogram> result_histogram =
 			disjunctive_result_histograms->Find(&colid);
 		if (nullptr != result_histogram)
 		{
@@ -707,7 +710,7 @@ CStatisticsUtils::UpdateDisjStatistics(
 			// union the previously generated histogram with the newly generated
 			// histogram for this column
 			CDouble output_rows(0.0);
-			CHistogram *new_histogram =
+			gpos::Ref<CHistogram> new_histogram =
 				previous_histogram->MakeUnionHistogramNormalize(
 					input_disjunct_rows, result_histogram, local_rows,
 					&output_rows);
@@ -814,10 +817,9 @@ CStatisticsUtils::GetColsNonUpdatableHistForDisj(
 //
 //---------------------------------------------------------------------------
 void
-CStatisticsUtils::AddHistogram(CMemoryPool *mp, ULONG colid,
-							   const CHistogram *histogram,
-							   UlongToHistogramMap *col_histogram_mapping,
-							   BOOL replace_old)
+CStatisticsUtils::AddHistogram(
+	CMemoryPool *mp, ULONG colid, const gpos::Ref<CHistogram> histogram,
+	gpos::Ref<UlongToHistogramMap> col_histogram_mapping, BOOL replace_old)
 {
 	GPOS_ASSERT(nullptr != histogram);
 
@@ -846,8 +848,8 @@ CStatisticsUtils::AddHistogram(CMemoryPool *mp, ULONG colid,
 //
 //---------------------------------------------------------------------------
 void
-CStatisticsUtils::PrintHistogramMap(IOstream &os,
-									UlongToHistogramMap *col_histogram_mapping)
+CStatisticsUtils::PrintHistogramMap(
+	IOstream &os, gpos::Ref<UlongToHistogramMap> col_histogram_mapping)
 {
 	GPOS_ASSERT(nullptr != col_histogram_mapping);
 
@@ -857,7 +859,7 @@ CStatisticsUtils::PrintHistogramMap(IOstream &os,
 		ULONG column = *(col_hist_mapping.Key());
 
 		os << "Column Id: " << column << std::endl;
-		const CHistogram *histogram = col_hist_mapping.Value();
+		const gpos::Ref<CHistogram> histogram = col_hist_mapping.Value();
 		histogram->OsPrint(os);
 	}
 }
@@ -875,8 +877,8 @@ CStatisticsUtils::PrintHistogramMap(IOstream &os,
 gpos::Ref<UlongToHistogramMap>
 CStatisticsUtils::MergeHistogramMapsForDisjPreds(
 	CMemoryPool *mp, gpos::Ref<CBitSet> non_updatable_cols,
-	UlongToHistogramMap *hmap1, UlongToHistogramMap *hmap2, CDouble rows1,
-	CDouble rows2)
+	gpos::Ref<UlongToHistogramMap> hmap1, gpos::Ref<UlongToHistogramMap> hmap2,
+	CDouble rows1, CDouble rows2)
 {
 	GPOS_ASSERT(nullptr != non_updatable_cols);
 	GPOS_ASSERT(nullptr != hmap1);
@@ -895,7 +897,7 @@ CStatisticsUtils::MergeHistogramMapsForDisjPreds(
 		while (hmap2_iter.Advance())
 		{
 			ULONG colid = *(hmap2_iter.Key());
-			const CHistogram *histogram = hmap2_iter.Value();
+			const gpos::Ref<CHistogram> histogram = hmap2_iter.Value();
 			if (!non_updatable_cols->Get(colid))
 			{
 				AddHistogram(mp, colid, histogram, merged_hmap.get());
@@ -912,14 +914,15 @@ CStatisticsUtils::MergeHistogramMapsForDisjPreds(
 		while (hmap1_iter.Advance())
 		{
 			ULONG colid = *(hmap1_iter.Key());
-			const CHistogram *histogram1 = hmap1_iter.Value();
+			const gpos::Ref<CHistogram> histogram1 = hmap1_iter.Value();
 			if (nullptr != histogram1 && !non_updatable_cols->Get(colid))
 			{
 				// merge with viable histograms that were added to merged_hmap
-				const CHistogram *histogram2 = merged_hmap->Find(&colid);
+				const gpos::Ref<CHistogram> histogram2 =
+					merged_hmap->Find(&colid);
 				if (nullptr != histogram2)
 				{
-					CHistogram *normalized_union_histogram =
+					gpos::Ref<CHistogram> normalized_union_histogram =
 						histogram1->MakeUnionHistogramNormalize(
 							rows1, histogram2, rows2, &output_rows);
 
@@ -951,8 +954,8 @@ CStatisticsUtils::MergeHistogramMapsForDisjPreds(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<UlongToHistogramMap>
-CStatisticsUtils::CopyHistHashMap(CMemoryPool *mp,
-								  UlongToHistogramMap *col_histogram_mapping)
+CStatisticsUtils::CopyHistHashMap(
+	CMemoryPool *mp, gpos::Ref<UlongToHistogramMap> col_histogram_mapping)
 {
 	GPOS_ASSERT(nullptr != col_histogram_mapping);
 
@@ -963,7 +966,7 @@ CStatisticsUtils::CopyHistHashMap(CMemoryPool *mp,
 	while (col_hist_mapping_iter.Advance())
 	{
 		ULONG colid = *(col_hist_mapping_iter.Key());
-		const CHistogram *histogram = col_hist_mapping_iter.Value();
+		const gpos::Ref<CHistogram> histogram = col_hist_mapping_iter.Value();
 		AddHistogram(mp, colid, histogram, histograms_copy.get());
 		GPOS_CHECK_ABORT;
 	}
@@ -1359,7 +1362,8 @@ CStatisticsUtils::AddNdvForAllGrpCols(
 
 		CDouble distinct_vals =
 			CStatisticsUtils::DefaultDistinctVals(input_stats->Rows());
-		const CHistogram *histogram = input_stats->GetHistogram(colid);
+		const gpos::Ref<CHistogram> histogram =
+			input_stats->GetHistogram(colid);
 		if (nullptr != histogram)
 		{
 			distinct_vals = histogram->GetNumDistinct();
@@ -1449,7 +1453,7 @@ CStatisticsUtils::CappedGrpColExists(const gpos::Ref<CStatistics> stats,
 	for (ULONG i = 0; i < num_cols; i++)
 	{
 		ULONG colid = (*(*grouping_columns)[i]);
-		const CHistogram *histogram = stats->GetHistogram(colid);
+		const gpos::Ref<CHistogram> histogram = stats->GetHistogram(colid);
 
 		if (nullptr != histogram && histogram->WereNDVsScaled())
 		{
@@ -1483,7 +1487,7 @@ CStatisticsUtils::MaxNdv(const gpos::Ref<CStatistics> stats,
 		CDouble ndv = CStatisticsUtils::DefaultDistinctVals(stats->Rows());
 
 		ULONG colid = (*(*grouping_columns)[i]);
-		const CHistogram *histogram = stats->GetHistogram(colid);
+		const gpos::Ref<CHistogram> histogram = stats->GetHistogram(colid);
 		if (nullptr != histogram)
 		{
 			ndv = histogram->GetNumDistinct();
@@ -1632,11 +1636,11 @@ CStatisticsUtils::GetCumulativeNDVs(
 //		Add the statistics (histogram and width) of the grouping columns
 //---------------------------------------------------------------------------
 void
-CStatisticsUtils::AddGrpColStats(CMemoryPool *mp,
-								 const gpos::Ref<CStatistics> input_stats,
-								 gpos::Ref<CColRefSet> grp_cols_refset,
-								 UlongToHistogramMap *output_histograms,
-								 UlongToDoubleMap *output_col_widths)
+CStatisticsUtils::AddGrpColStats(
+	CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
+	gpos::Ref<CColRefSet> grp_cols_refset,
+	gpos::Ref<UlongToHistogramMap> output_histograms,
+	UlongToDoubleMap *output_col_widths)
 {
 	GPOS_ASSERT(nullptr != input_stats);
 	GPOS_ASSERT(nullptr != grp_cols_refset);
@@ -1651,10 +1655,11 @@ CStatisticsUtils::AddGrpColStats(CMemoryPool *mp,
 		ULONG grp_colid = colref->Id();
 
 		CDouble num_distinct_vals(CHistogram::MinDistinct);
-		const CHistogram *histogram = input_stats->GetHistogram(grp_colid);
+		const gpos::Ref<CHistogram> histogram =
+			input_stats->GetHistogram(grp_colid);
 		if (nullptr != histogram)
 		{
-			CHistogram *result_histogram =
+			gpos::Ref<CHistogram> result_histogram =
 				histogram->MakeGroupByHistogramNormalize(input_stats->Rows(),
 														 &num_distinct_vals);
 			if (histogram->WereNDVsScaled())

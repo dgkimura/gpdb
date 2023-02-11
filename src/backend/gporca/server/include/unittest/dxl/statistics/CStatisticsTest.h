@@ -75,7 +75,7 @@ private:
 								   LINT lValLower, LINT lValUpper,
 								   CStatsPredPtrArry *pgrgpstatspred);
 
-	static CHistogram *PhistExampleInt4Dim(CMemoryPool *mp);
+	static gpos::Ref<CHistogram> PhistExampleInt4Dim(CMemoryPool *mp);
 
 	// helper function that generates an array of ULONG pointers
 	static gpos::Ref<ULongPtrArray>

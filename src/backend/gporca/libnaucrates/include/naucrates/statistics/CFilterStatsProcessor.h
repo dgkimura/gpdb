@@ -26,55 +26,52 @@ class CFilterStatsProcessor
 {
 private:
 	// create a new histogram after applying the filter that is not an AND/OR predicate
-	static CHistogram *MakeHistSimpleFilter(CMemoryPool *mp,
-											gpos::Ref<CStatsPred> pred_stats,
-											gpos::Ref<CBitSet> filter_colids,
-											CHistogram *hist_before,
-											CDouble *last_scale_factor,
-											ULONG *target_last_colid);
+	static gpos::Ref<CHistogram> MakeHistSimpleFilter(
+		CMemoryPool *mp, gpos::Ref<CStatsPred> pred_stats,
+		gpos::Ref<CBitSet> filter_colids, gpos::Ref<CHistogram> hist_before,
+		CDouble *last_scale_factor, ULONG *target_last_colid);
 
 	// create a new histogram after applying a point filter
-	static CHistogram *MakeHistPointFilter(
+	static gpos::Ref<CHistogram> MakeHistPointFilter(
 		gpos::Ref<CStatsPredPoint> pred_stats, gpos::Ref<CBitSet> filter_colids,
-		CHistogram *hist_before, CDouble *last_scale_factor,
+		gpos::Ref<CHistogram> hist_before, CDouble *last_scale_factor,
 		ULONG *target_last_colid);
 
 	// create a new histogram after applying a LIKE filter
-	static CHistogram *MakeHistLikeFilter(gpos::Ref<CStatsPredLike> pred_stats,
-										  gpos::Ref<CBitSet> filter_colids,
-										  CHistogram *hist_before,
-										  CDouble *last_scale_factor,
-										  ULONG *target_last_colid);
+	static gpos::Ref<CHistogram> MakeHistLikeFilter(
+		gpos::Ref<CStatsPredLike> pred_stats, gpos::Ref<CBitSet> filter_colids,
+		gpos::Ref<CHistogram> hist_before, CDouble *last_scale_factor,
+		ULONG *target_last_colid);
 
 	// create a new histogram for an unsupported predicate
-	static CHistogram *MakeHistUnsupportedPred(
+	static gpos::Ref<CHistogram> MakeHistUnsupportedPred(
 		gpos::Ref<CStatsPredUnsupported> pred_stats,
-		gpos::Ref<CBitSet> filter_colids, CHistogram *hist_before,
+		gpos::Ref<CBitSet> filter_colids, gpos::Ref<CHistogram> hist_before,
 		CDouble *last_scale_factor, ULONG *target_last_colid);
 
 	// create a new histogram after applying a pred op ANY(ARRAY[...]) filter
-	static CHistogram *MakeHistArrayCmpAnyFilter(
+	static gpos::Ref<CHistogram> MakeHistArrayCmpAnyFilter(
 		CMemoryPool *mp, gpos::Ref<CStatsPredArrayCmp> pred_stats,
-		gpos::Ref<CBitSet> filter_colids, CHistogram *hist_before,
+		gpos::Ref<CBitSet> filter_colids, gpos::Ref<CHistogram> hist_before,
 		CDouble *last_scale_factor, ULONG *target_last_colid);
 
 	// create a new hash map of histograms after applying a conjunctive or disjunctive filter
 	static gpos::Ref<UlongToHistogramMap> MakeHistHashMapConjOrDisjFilter(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
-		UlongToHistogramMap *input_histograms, CDouble input_rows,
+		gpos::Ref<UlongToHistogramMap> input_histograms, CDouble input_rows,
 		gpos::Ref<CStatsPred> pred_stats, CDouble *scale_factor);
 
 	// create new hash map of histograms after applying the conjunction predicate
 	static gpos::Ref<UlongToHistogramMap> MakeHistHashMapConjFilter(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
-		UlongToHistogramMap *intermediate_histograms, CDouble input_rows,
-		gpos::Ref<CStatsPredConj> conjunctive_pred_stats,
+		gpos::Ref<UlongToHistogramMap> intermediate_histograms,
+		CDouble input_rows, gpos::Ref<CStatsPredConj> conjunctive_pred_stats,
 		CDouble *scale_factor);
 
 	// create new hash map of histograms after applying the disjunctive predicate
 	static gpos::Ref<UlongToHistogramMap> MakeHistHashMapDisjFilter(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
-		UlongToHistogramMap *input_histograms, CDouble input_rows,
+		gpos::Ref<UlongToHistogramMap> input_histograms, CDouble input_rows,
 		gpos::Ref<CStatsPredDisj> pred_stats, CDouble *scale_factor);
 
 	// check if the column is a new column for statistic calculation

@@ -253,13 +253,14 @@ private:
 	void RecordColumnStats(CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
 						   ULONG colid, ULONG ulPos, BOOL isSystemCol,
 						   BOOL isEmptyTable,
-						   UlongToHistogramMap *col_histogram_mapping,
+						   gpos::Ref<UlongToHistogramMap> col_histogram_mapping,
 						   UlongToDoubleMap *colid_width_mapping,
 						   gpos::Ref<CStatisticsConfig> stats_config);
 
 	// construct a stats histogram from an MD column stats object
-	CHistogram *GetHistogram(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
-							 const IMDColStats *pmdcolstats);
+	gpos::Ref<CHistogram> GetHistogram(CMemoryPool *mp,
+									   gpos::Ref<IMDId> mdid_type,
+									   const IMDColStats *pmdcolstats);
 
 	// construct a typed bucket from a DXL bucket
 	CBucket *Pbucket(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,

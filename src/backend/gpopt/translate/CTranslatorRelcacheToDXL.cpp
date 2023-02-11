@@ -2208,7 +2208,7 @@ CTranslatorRelcacheToDXL::TransformStatsToDXLBucketArray(
 	gpos::Ref<IMDType> md_type = RetrieveType(mp, mdid_atttype.get());
 
 	// translate MCVs to Orca histogram. Create an empty histogram if there are no MCVs.
-	CHistogram *gpdb_mcv_hist = TransformMcvToOrcaHistogram(
+	gpos::Ref<CHistogram> gpdb_mcv_hist = TransformMcvToOrcaHistogram(
 		mp, md_type.get(), mcv_values, mcv_frequencies, num_mcv_values);
 
 	GPOS_ASSERT(gpdb_mcv_hist->IsValid());
@@ -2228,7 +2228,7 @@ CTranslatorRelcacheToDXL::TransformStatsToDXLBucketArray(
 	BOOL has_hist = !is_text_type && 1 < num_hist_values &&
 					CStatistics::Epsilon < hist_freq;
 
-	CHistogram *histogram = nullptr;
+	gpos::Ref<CHistogram> histogram = nullptr;
 
 	// if histogram has any significant information, then extract it
 	if (has_hist)
@@ -2260,7 +2260,7 @@ CTranslatorRelcacheToDXL::TransformStatsToDXLBucketArray(
 	else if (has_hist && has_mcv)
 	{
 		// both histogram and MCVs exist and have significant info, merge MCV and histogram buckets
-		CHistogram *merged_hist =
+		gpos::Ref<CHistogram> merged_hist =
 			CStatisticsUtils::MergeMCVHist(mp, gpdb_mcv_hist, histogram);
 		dxl_stats_bucket_array =
 			TransformHistogramToDXLBucketArray(mp, md_type.get(), merged_hist);
@@ -2294,7 +2294,7 @@ CTranslatorRelcacheToDXL::TransformStatsToDXLBucketArray(
 //		Transform gpdb's mcv info to optimizer histogram
 //
 //---------------------------------------------------------------------------
-CHistogram *
+gpos::Ref<CHistogram>
 CTranslatorRelcacheToDXL::TransformMcvToOrcaHistogram(
 	CMemoryPool *mp, const IMDType *md_type, const Datum *mcv_values,
 	const float4 *mcv_frequencies, ULONG num_mcv_values)
@@ -2321,7 +2321,7 @@ CTranslatorRelcacheToDXL::TransformMcvToOrcaHistogram(
 		}
 	}
 
-	CHistogram *hist = CStatisticsUtils::TransformMCVToHist(
+	gpos::Ref<CHistogram> hist = CStatisticsUtils::TransformMCVToHist(
 		mp, md_type, datums.get(), freqs.get(), num_mcv_values);
 
 	;
@@ -2337,7 +2337,7 @@ CTranslatorRelcacheToDXL::TransformMcvToOrcaHistogram(
 //		Transform GPDB's hist info to optimizer's histogram
 //
 //---------------------------------------------------------------------------
-CHistogram *
+gpos::Ref<CHistogram>
 CTranslatorRelcacheToDXL::TransformHistToOrcaHistogram(
 	CMemoryPool *mp, const IMDType *md_type, const Datum *hist_values,
 	ULONG num_hist_values, CDouble num_distinct, CDouble hist_freq)
@@ -2410,7 +2410,8 @@ CTranslatorRelcacheToDXL::TransformHistToOrcaHistogram(
 		}
 	}
 
-	CHistogram *hist = GPOS_NEW(mp) CHistogram(mp, std::move(buckets));
+	gpos::Ref<CHistogram> hist =
+		GPOS_NEW(mp) CHistogram(mp, std::move(buckets));
 	return hist;
 }
 
@@ -2425,7 +2426,7 @@ CTranslatorRelcacheToDXL::TransformHistToOrcaHistogram(
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLBucketArray>
 CTranslatorRelcacheToDXL::TransformHistogramToDXLBucketArray(
-	CMemoryPool *mp, const IMDType *md_type, const CHistogram *hist)
+	CMemoryPool *mp, const IMDType *md_type, const gpos::Ref<CHistogram> hist)
 {
 	gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array =
 		GPOS_NEW(mp) CDXLBucketArray(mp);

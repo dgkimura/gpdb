@@ -80,7 +80,7 @@ CCardinalityTestUtils::PbucketSingletonBoolVal(CMemoryPool *mp, BOOL fValue,
 }
 
 // helper function to generate integer histogram based on the NDV and bucket information provided
-CHistogram *
+gpos::Ref<CHistogram>
 CCardinalityTestUtils::PhistInt4Remain(CMemoryPool *mp, ULONG num_of_buckets,
 									   CDouble dNDVPerBucket, BOOL fNullFreq,
 									   CDouble num_NDV_remain)
@@ -118,7 +118,7 @@ CCardinalityTestUtils::PhistInt4Remain(CMemoryPool *mp, ULONG num_of_buckets,
 }
 
 // helper function to generate an example int histogram
-CHistogram *
+gpos::Ref<CHistogram>
 CCardinalityTestUtils::PhistExampleInt4(CMemoryPool *mp)
 {
 	// generate histogram of the form [0, 10), [10, 20), [20, 30) ... [80, 90)
@@ -143,7 +143,7 @@ CCardinalityTestUtils::PhistExampleInt4(CMemoryPool *mp)
 }
 
 // helper function to generates example bool histogram
-CHistogram *
+gpos::Ref<CHistogram>
 CCardinalityTestUtils::PhistExampleBool(CMemoryPool *mp)
 {
 	gpos::Ref<CBucketArray> histogram_buckets = GPOS_NEW(mp) CBucketArray(mp);
@@ -230,7 +230,7 @@ CCardinalityTestUtils::PrintBucket(CMemoryPool *mp, const char *pcPrefix,
 // helper function to print histogram object
 void
 CCardinalityTestUtils::PrintHist(CMemoryPool *mp, const char *pcPrefix,
-								 const CHistogram *histogram)
+								 const gpos::Ref<CHistogram> histogram)
 {
 	CWStringDynamic str(mp);
 	COstreamString oss(&str);
