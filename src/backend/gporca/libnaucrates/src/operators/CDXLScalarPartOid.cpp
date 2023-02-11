@@ -73,7 +73,7 @@ CDXLScalarPartOid::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarPartOid::SerializeToDXL(CXMLSerializer *xml_serializer,
-								  const gpos::Ref<CDXLNode>	 // dxlnode
+								  const CDXLNode *	// dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();

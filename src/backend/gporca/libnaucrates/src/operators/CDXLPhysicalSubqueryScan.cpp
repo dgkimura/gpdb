@@ -101,8 +101,8 @@ CDXLPhysicalSubqueryScan::MdName()
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalSubqueryScan::SerializeToDXL(
-	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
+CDXLPhysicalSubqueryScan::SerializeToDXL(CXMLSerializer *xml_serializer,
+										 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

@@ -45,11 +45,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const gpos::Ref<CDXLNode> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const gpos::Ref<CDXLNode> dxlnode,
+	void SerializeToDXL(CXMLSerializer *xml_serializer, const CDXLNode *dxlnode,
 						const CHAR *attrname) const;
 
 	// conversion function

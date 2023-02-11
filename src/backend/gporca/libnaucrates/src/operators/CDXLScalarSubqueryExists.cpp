@@ -81,8 +81,8 @@ CDXLScalarSubqueryExists::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarSubqueryExists::SerializeToDXL(
-	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
+CDXLScalarSubqueryExists::SerializeToDXL(CXMLSerializer *xml_serializer,
+										 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

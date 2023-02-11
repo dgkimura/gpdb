@@ -153,7 +153,7 @@ CDXLScalarOpExpr::HasBoolResult(CMDAccessor *md_accessor) const
 //---------------------------------------------------------------------------
 void
 CDXLScalarOpExpr::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const gpos::Ref<CDXLNode> dxlnode) const
+								 const CDXLNode *dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 

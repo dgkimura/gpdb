@@ -72,8 +72,8 @@ CDXLPhysicalRandomMotion::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalRandomMotion::SerializeToDXL(
-	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
+CDXLPhysicalRandomMotion::SerializeToDXL(CXMLSerializer *xml_serializer,
+										 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

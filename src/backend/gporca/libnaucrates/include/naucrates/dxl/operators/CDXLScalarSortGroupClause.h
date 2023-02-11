@@ -134,7 +134,7 @@ public:
 
 	void
 	SerializeToDXL(CXMLSerializer *xml_serializer,
-				   const gpos::Ref<CDXLNode>) const override
+				   const CDXLNode *) const override
 	{
 		const CWStringConst *element_name = GetOpNameStr();
 

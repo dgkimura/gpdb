@@ -131,7 +131,7 @@ CDXLScalarNullIf::HasBoolResult(CMDAccessor *md_accessor) const
 //---------------------------------------------------------------------------
 void
 CDXLScalarNullIf::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const gpos::Ref<CDXLNode> dxlnode) const
+								 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

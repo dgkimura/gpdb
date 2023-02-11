@@ -118,8 +118,8 @@ CDXLScalarWindowFrameEdge::GetFrameBoundaryStr(EdxlFrameBoundary frame_boundary)
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarWindowFrameEdge::SerializeToDXL(
-	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
+CDXLScalarWindowFrameEdge::SerializeToDXL(CXMLSerializer *xml_serializer,
+										  const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

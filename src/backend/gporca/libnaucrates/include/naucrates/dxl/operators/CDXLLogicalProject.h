@@ -46,7 +46,7 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const gpos::Ref<CDXLNode> dxl_node) const override;
+						const CDXLNode *dxl_node) const override;
 
 	// set alias name
 	void SetAliasName(CMDName *);

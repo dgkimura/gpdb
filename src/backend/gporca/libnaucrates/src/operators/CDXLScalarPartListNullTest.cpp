@@ -44,7 +44,7 @@ CDXLScalarPartListNullTest::GetOpNameStr() const
 // Serialize operator in DXL format
 void
 CDXLScalarPartListNullTest::SerializeToDXL(CXMLSerializer *xml_serializer,
-										   const gpos::Ref<CDXLNode>  // dxlnode
+										   const CDXLNode *	 // dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();

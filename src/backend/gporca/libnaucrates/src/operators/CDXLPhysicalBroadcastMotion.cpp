@@ -71,8 +71,8 @@ CDXLPhysicalBroadcastMotion::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalBroadcastMotion::SerializeToDXL(
-	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
+CDXLPhysicalBroadcastMotion::SerializeToDXL(CXMLSerializer *xml_serializer,
+											const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

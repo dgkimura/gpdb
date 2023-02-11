@@ -47,7 +47,7 @@ CDXLScalarValuesList::GetOpNameStr() const
 // serialize operator in DXL format
 void
 CDXLScalarValuesList::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 const gpos::Ref<CDXLNode> dxlnode) const
+									 const CDXLNode *dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 
@@ -65,7 +65,7 @@ CDXLScalarValuesList::SerializeToDXL(CXMLSerializer *xml_serializer,
 // serialize operator in DXL format
 void
 CDXLScalarValuesList::SerializeToDXL(CXMLSerializer *xml_serializer,
-									 const gpos::Ref<CDXLNode> dxlnode,
+									 const CDXLNode *dxlnode,
 									 const CHAR *attrname) const
 {
 	GPOS_CHECK_ABORT;

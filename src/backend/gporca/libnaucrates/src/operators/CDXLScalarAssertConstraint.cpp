@@ -99,8 +99,8 @@ CDXLScalarAssertConstraint::GetErrorMsgStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAssertConstraint::SerializeToDXL(
-	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
+CDXLScalarAssertConstraint::SerializeToDXL(CXMLSerializer *xml_serializer,
+										   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

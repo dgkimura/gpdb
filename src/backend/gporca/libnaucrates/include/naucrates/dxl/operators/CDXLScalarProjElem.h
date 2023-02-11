@@ -63,8 +63,7 @@ public:
 	const CMDName *GetMdNameAlias() const;
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *,
-						const gpos::Ref<CDXLNode>) const override;
+	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// check if given column is defined by operator
 	BOOL

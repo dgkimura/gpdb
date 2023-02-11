@@ -96,7 +96,7 @@ CDXLPhysicalRowTrigger::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalRowTrigger::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const gpos::Ref<CDXLNode> dxlnode) const
+									   const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(

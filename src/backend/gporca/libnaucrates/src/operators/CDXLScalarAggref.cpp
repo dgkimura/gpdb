@@ -206,9 +206,10 @@ CDXLScalarAggref::IsDistinct() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarAggref::SerializeValuesListChildToDXL(
-	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode,
-	ULONG index, const CHAR *attr_name) const
+CDXLScalarAggref::SerializeValuesListChildToDXL(CXMLSerializer *xml_serializer,
+												const CDXLNode *dxlnode,
+												ULONG index,
+												const CHAR *attr_name) const
 {
 	CDXLScalarValuesList *child = gpos::dyn_cast<CDXLScalarValuesList>(
 		((*dxlnode)[index])->GetOperator());
@@ -225,7 +226,7 @@ CDXLScalarAggref::SerializeValuesListChildToDXL(
 //---------------------------------------------------------------------------
 void
 CDXLScalarAggref::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const gpos::Ref<CDXLNode> dxlnode) const
+								 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

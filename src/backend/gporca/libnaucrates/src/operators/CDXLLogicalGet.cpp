@@ -101,7 +101,7 @@ CDXLLogicalGet::GetDXLTableDescr() const
 //---------------------------------------------------------------------------
 void
 CDXLLogicalGet::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   const gpos::Ref<CDXLNode>  //dxlnode
+							   const CDXLNode *	 //dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();

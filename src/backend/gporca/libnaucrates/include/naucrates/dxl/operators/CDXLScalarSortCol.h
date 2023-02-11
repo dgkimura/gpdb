@@ -72,8 +72,7 @@ public:
 	BOOL IsSortedNullsFirst() const;
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *,
-						const gpos::Ref<CDXLNode>) const override;
+	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// conversion function
 	static CDXLScalarSortCol *

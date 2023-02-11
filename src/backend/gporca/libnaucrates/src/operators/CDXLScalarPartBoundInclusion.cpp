@@ -75,9 +75,8 @@ CDXLScalarPartBoundInclusion::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLScalarPartBoundInclusion::SerializeToDXL(
-	CXMLSerializer *xml_serializer,
-	const gpos::Ref<CDXLNode>  // dxlnode
+CDXLScalarPartBoundInclusion::SerializeToDXL(CXMLSerializer *xml_serializer,
+											 const CDXLNode *  // dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();

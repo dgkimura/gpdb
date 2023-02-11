@@ -52,7 +52,7 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const gpos::Ref<CDXLNode> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// check if given column is defined by operator
 	BOOL IsColDefined(ULONG colid) const override;

@@ -116,8 +116,8 @@ CDXLPhysicalDynamicTableScan::GetParts() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalDynamicTableScan::SerializeToDXL(
-	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> node) const
+CDXLPhysicalDynamicTableScan::SerializeToDXL(CXMLSerializer *xml_serializer,
+											 const CDXLNode *node) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

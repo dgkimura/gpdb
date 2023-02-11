@@ -74,7 +74,7 @@ CDXLPhysicalRoutedDistributeMotion::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalRoutedDistributeMotion::SerializeToDXL(
-	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
+	CXMLSerializer *xml_serializer, const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

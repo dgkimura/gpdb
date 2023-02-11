@@ -52,8 +52,7 @@ public:
 	}
 
 	// serialize operator in DXL format
-	void SerializeToDXL(CXMLSerializer *,
-						const gpos::Ref<CDXLNode>) const override;
+	void SerializeToDXL(CXMLSerializer *, const CDXLNode *) const override;
 
 	// does the operator return a boolean result
 	BOOL

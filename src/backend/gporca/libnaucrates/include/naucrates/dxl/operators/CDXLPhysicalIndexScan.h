@@ -80,7 +80,7 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const gpos::Ref<CDXLNode> node) const override;
+						const CDXLNode *node) const override;
 
 	// conversion function
 	static CDXLPhysicalIndexScan *

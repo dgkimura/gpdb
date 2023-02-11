@@ -47,7 +47,7 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const gpos::Ref<CDXLNode> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	// conversion function
 	static CDXLPhysicalValuesScan *Cast(gpos::Ref<CDXLOperator> dxl_op);

@@ -118,7 +118,7 @@ CDXLScalarComp::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarComp::SerializeToDXL(CXMLSerializer *xml_serializer,
-							   const gpos::Ref<CDXLNode> node) const
+							   const CDXLNode *node) const
 {
 	GPOS_CHECK_ABORT;
 

@@ -123,7 +123,7 @@ CDXLPhysicalCTAS::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
-								 const gpos::Ref<CDXLNode> dxlnode) const
+								 const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 	xml_serializer->OpenElement(
@@ -226,7 +226,7 @@ CDXLPhysicalCTAS::SerializeToDXL(CXMLSerializer *xml_serializer,
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalCTAS::AssertValid(const gpos::Ref<CDXLNode> dxlnode,
+CDXLPhysicalCTAS::AssertValid(const CDXLNode *dxlnode,
 							  BOOL validate_children) const
 {
 	GPOS_ASSERT(2 == dxlnode->Arity());

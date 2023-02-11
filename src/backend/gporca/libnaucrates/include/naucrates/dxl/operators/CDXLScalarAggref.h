@@ -119,11 +119,10 @@ public:
 
 	// serialize operator in DXL format
 	void SerializeToDXL(CXMLSerializer *xml_serializer,
-						const gpos::Ref<CDXLNode> dxlnode) const override;
+						const CDXLNode *dxlnode) const override;
 
 	void SerializeValuesListChildToDXL(CXMLSerializer *xml_serializer,
-									   const gpos::Ref<CDXLNode> dxlnode,
-									   ULONG index,
+									   const CDXLNode *dxlnode, ULONG index,
 									   const CHAR *attr_name) const;
 
 	// conversion function

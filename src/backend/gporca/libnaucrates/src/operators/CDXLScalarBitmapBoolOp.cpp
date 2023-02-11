@@ -138,7 +138,7 @@ CDXLScalarBitmapBoolOp::GetOpNameStr() const
 //---------------------------------------------------------------------------
 void
 CDXLScalarBitmapBoolOp::SerializeToDXL(CXMLSerializer *xml_serializer,
-									   const gpos::Ref<CDXLNode> dxlnode) const
+									   const CDXLNode *dxlnode) const
 {
 	GPOS_CHECK_ABORT;
 

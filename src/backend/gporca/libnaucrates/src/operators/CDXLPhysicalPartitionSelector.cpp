@@ -90,8 +90,8 @@ CDXLPhysicalPartitionSelector::GetOpNameStr() const
 //
 //---------------------------------------------------------------------------
 void
-CDXLPhysicalPartitionSelector::SerializeToDXL(
-	CXMLSerializer *xml_serializer, const gpos::Ref<CDXLNode> dxlnode) const
+CDXLPhysicalPartitionSelector::SerializeToDXL(CXMLSerializer *xml_serializer,
+											  const CDXLNode *dxlnode) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
 

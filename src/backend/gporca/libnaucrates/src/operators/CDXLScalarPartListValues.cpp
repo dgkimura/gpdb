@@ -83,7 +83,7 @@ CDXLScalarPartListValues::HasBoolResult(CMDAccessor *  //md_accessor
 // Serialize operator in DXL format
 void
 CDXLScalarPartListValues::SerializeToDXL(CXMLSerializer *xml_serializer,
-										 const gpos::Ref<CDXLNode>	// dxlnode
+										 const CDXLNode *  // dxlnode
 ) const
 {
 	const CWStringConst *element_name = GetOpNameStr();
