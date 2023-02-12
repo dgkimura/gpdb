@@ -59,7 +59,8 @@ using UlongToConstraintMap =
 //		Base class for representing constraints
 //
 //---------------------------------------------------------------------------
-class CConstraint : public CRefCount, public DbgPrintMixin<CConstraint>
+class CConstraint : public CRefCount<CConstraint>,
+					public DbgPrintMixin<CConstraint>
 {
 public:
 	enum EConstraintType

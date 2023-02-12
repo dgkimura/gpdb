@@ -34,7 +34,7 @@ using namespace gpos;
 //		Hint configurations
 //
 //---------------------------------------------------------------------------
-class CHint : public CRefCount
+class CHint : public CRefCount<CHint>
 {
 private:
 	ULONG m_ulMinNumOfPartsToRequireSortOnInsert;

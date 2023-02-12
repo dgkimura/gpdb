@@ -30,7 +30,7 @@ using namespace gpmd;
 //	@doc:
 //		Join predicate used for join cardinality estimation
 //---------------------------------------------------------------------------
-class CStatsPredJoin : public CRefCount
+class CStatsPredJoin : public CRefCount<CStatsPredJoin>
 {
 private:
 	// column id

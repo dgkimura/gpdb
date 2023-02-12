@@ -36,7 +36,7 @@ class CXMLSerializer;
 //		Class for representing CTAS storage options
 //
 //---------------------------------------------------------------------------
-class CDXLCtasStorageOptions : public CRefCount
+class CDXLCtasStorageOptions : public CRefCount<CDXLCtasStorageOptions>
 {
 public:
 	struct CDXLCtasOption

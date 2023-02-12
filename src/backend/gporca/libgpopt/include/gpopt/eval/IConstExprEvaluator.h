@@ -38,7 +38,7 @@ class CExpression;	// forward declaration
 //		database)
 //
 //---------------------------------------------------------------------------
-class IConstExprEvaluator : public CRefCount
+class IConstExprEvaluator : public CRefCount<IConstExprEvaluator>
 {
 public:
 	// dtor

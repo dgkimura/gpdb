@@ -29,7 +29,7 @@ using namespace gpos;
 //		CTE configurations
 //
 //---------------------------------------------------------------------------
-class CCTEConfig : public CRefCount
+class CCTEConfig : public CRefCount<CCTEConfig>
 {
 private:
 	// CTE inlining cut-off

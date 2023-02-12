@@ -41,7 +41,7 @@ using UlongToIDatumMap =
 //		Base abstract class for datum representation inside optimizer
 //
 //---------------------------------------------------------------------------
-class IDatum : public CRefCount, public DbgPrintMixin<IDatum>
+class IDatum : public CRefCount<IDatum>, public DbgPrintMixin<IDatum>
 {
 private:
 public:

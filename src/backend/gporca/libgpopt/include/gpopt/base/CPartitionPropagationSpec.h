@@ -42,7 +42,7 @@ public:
 	};
 
 private:
-	struct SPartPropSpecInfo : public CRefCount
+	struct SPartPropSpecInfo : public CRefCount<CPartitionPropagationSpec>
 	{
 		// scan id of the DynamicScan
 		ULONG m_scan_id;

@@ -34,7 +34,8 @@ class CExpression;
 //		Representation of constraint property
 //
 //---------------------------------------------------------------------------
-class CPropConstraint : public CRefCount, public DbgPrintMixin<CPropConstraint>
+class CPropConstraint : public CRefCount<CPropConstraint>,
+						public DbgPrintMixin<CPropConstraint>
 {
 private:
 	// array of equivalence classes

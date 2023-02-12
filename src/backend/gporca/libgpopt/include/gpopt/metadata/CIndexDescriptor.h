@@ -34,7 +34,7 @@ using namespace gpmd;
 //		Base class for index descriptor
 //
 //---------------------------------------------------------------------------
-class CIndexDescriptor : public CRefCount,
+class CIndexDescriptor : public CRefCount<CIndexDescriptor>,
 						 public DbgPrintMixin<CIndexDescriptor>
 {
 private:

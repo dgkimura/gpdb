@@ -44,7 +44,7 @@ using FnPlanChecker = BOOL(gpos::Ref<CExpression>);
 //		Configurations of plan enumerator
 //
 //---------------------------------------------------------------------------
-class CEnumeratorConfig : public CRefCount
+class CEnumeratorConfig : public CRefCount<CEnumeratorConfig>
 {
 private:
 	//---------------------------------------------------------------------------

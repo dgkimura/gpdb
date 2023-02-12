@@ -41,7 +41,7 @@ using CBitSetArray = gpos::Vector<gpos::Ref<CBitSet>>;
 //		metadata abstraction for tables
 //
 //---------------------------------------------------------------------------
-class CTableDescriptor : public CRefCount,
+class CTableDescriptor : public CRefCount<CTableDescriptor>,
 						 public DbgPrintMixin<CTableDescriptor>
 {
 private:

@@ -27,7 +27,7 @@ using namespace gpos;
 //	@doc:
 //		Filter on statistics
 //---------------------------------------------------------------------------
-class CStatsPred : public CRefCount
+class CStatsPred : public CRefCount<CStatsPred>
 {
 public:
 	enum EStatsPredType

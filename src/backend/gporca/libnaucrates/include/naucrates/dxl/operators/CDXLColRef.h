@@ -41,7 +41,7 @@ using CDXLColRefArray = gpos::Vector<gpos::Ref<CDXLColRef>>;
 //		Class for representing references to columns in DXL trees
 //
 //---------------------------------------------------------------------------
-class CDXLColRef : public CRefCount
+class CDXLColRef : public CRefCount<CDXLColRef>
 {
 private:
 	// name

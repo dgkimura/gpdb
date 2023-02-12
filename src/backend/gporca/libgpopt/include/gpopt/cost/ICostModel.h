@@ -48,7 +48,7 @@ using ICostModelParamsArray =
 //		Interface for the underlying cost model
 //
 //---------------------------------------------------------------------------
-class ICostModel : public CRefCount
+class ICostModel : public CRefCount<ICostModel>
 {
 public:
 	enum ECostModelType
@@ -67,7 +67,7 @@ public:
 	//		Stast information used during cost computation
 	//
 	//---------------------------------------------------------------------------
-	class CCostingStats : public CRefCount
+	class CCostingStats : public CRefCount<CCostingStats>
 	{
 	private:
 		// stats of the root

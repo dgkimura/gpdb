@@ -30,7 +30,7 @@ namespace gpopt
 //		GPDB specific oids
 //
 //---------------------------------------------------------------------------
-class CWindowOids : public CRefCount
+class CWindowOids : public CRefCount<CWindowOids>
 {
 private:
 	// oid of window operation "row_number" function

@@ -30,7 +30,7 @@ namespace gpos
 //		Linked list of CBitSetLink's
 //
 //---------------------------------------------------------------------------
-class CBitSet : public CRefCount, public DbgPrintMixin<CBitSet>
+class CBitSet : public CRefCount<CBitSet>, public DbgPrintMixin<CBitSet>
 {
 	// bitset iter needs to access internals
 	friend class CBitSetIter;
@@ -44,7 +44,7 @@ public:
 	//		bit vector + offset + link
 	//
 	//---------------------------------------------------------------------------
-	class CBitSetLink : public CRefCount
+	class CBitSetLink : public CRefCount<CBitSetLink>
 	{
 	private:
 		// offset

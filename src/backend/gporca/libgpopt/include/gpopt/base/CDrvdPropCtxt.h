@@ -38,7 +38,7 @@ using CDrvdPropCtxtArray = gpos::Vector<gpos::Ref<CDrvdPropCtxt>>;
 //		property derivation
 //
 //---------------------------------------------------------------------------
-class CDrvdPropCtxt : public CRefCount
+class CDrvdPropCtxt : public CRefCount<CDrvdPropCtxt>
 {
 private:
 protected:

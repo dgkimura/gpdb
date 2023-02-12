@@ -17,7 +17,7 @@ namespace gpos
 {
 template <class K, class T, class Hash = std::hash<K>,
 		  class KeyEqual = std::equal_to<>>
-class UnorderedMap : public CRefCount
+class UnorderedMap : public CRefCount<UnorderedMap<K, T, Hash, KeyEqual>>
 {
 	gpos::unordered_map<K, T, Hash, KeyEqual> unordered_map_;
 

@@ -33,7 +33,8 @@ using namespace gpmd;
 //		ColId and ParamId during DXL->PlStmt translation
 //
 //---------------------------------------------------------------------------
-class CMappingElementColIdParamId : public CRefCount
+class CMappingElementColIdParamId
+	: public CRefCount<CMappingElementColIdParamId>
 {
 private:
 	// column identifier that is used as the key

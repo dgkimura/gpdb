@@ -66,7 +66,7 @@ using CReqdPropArray = gpos::Vector<gpos::Ref<CReqdProp>>;
 //		children.
 //
 //---------------------------------------------------------------------------
-class CReqdProp : public CRefCount, public DbgPrintMixin<CReqdProp>
+class CReqdProp : public CRefCount<CReqdProp>, public DbgPrintMixin<CReqdProp>
 {
 public:
 	// types of required properties

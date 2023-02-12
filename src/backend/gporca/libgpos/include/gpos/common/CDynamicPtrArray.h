@@ -56,7 +56,7 @@ template <class T>
 inline void
 CleanupRelease(T *elem)
 {
-	(dynamic_cast<CRefCount *>(elem))->Release();
+	(gpos::dyn_cast<CRefCount<T>>(elem))->Release();
 }
 
 // commonly used array types
@@ -84,7 +84,7 @@ using CharPtrArray = CDynamicPtrArray<CHAR, CleanupDelete>;
 //
 //---------------------------------------------------------------------------
 template <class T, void (*CleanupFn)(T *)>
-class CDynamicPtrArray : public CRefCount
+class CDynamicPtrArray : public CRefCount<CDynamicPtrArray<T, CleanupFn>>
 {
 private:
 	// memory pool

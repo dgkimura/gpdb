@@ -78,7 +78,7 @@ private:
 	//		Representation of incoming column requests during optimization
 	//
 	//---------------------------------------------------------------------------
-	class CReqdColsRequest : public CRefCount
+	class CReqdColsRequest : public CRefCount<CReqdColsRequest>
 	{
 	private:
 		// incoming required columns

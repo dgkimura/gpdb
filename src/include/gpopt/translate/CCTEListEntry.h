@@ -57,7 +57,7 @@ StrEqual(const CHAR *str_a, const CHAR *str_b)
 //		query level
 //
 //---------------------------------------------------------------------------
-class CCTEListEntry : public CRefCount
+class CCTEListEntry : public CRefCount<CCTEListEntry>
 {
 private:
 	// pair of DXL CTE producer and target list of the original CTE query

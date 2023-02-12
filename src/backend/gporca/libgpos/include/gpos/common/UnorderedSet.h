@@ -13,7 +13,7 @@ namespace gpos
 {
 template <class Key, class Hash = std::hash<Key>,
 		  class KeyEqual = std::equal_to<>>
-class UnorderedSet : public CRefCount
+class UnorderedSet : public CRefCount<UnorderedSet<Key, Hash, KeyEqual>>
 {
 	using Set = gpos::unordered_set<Key, Hash, KeyEqual>;
 	Set unordered_set_;

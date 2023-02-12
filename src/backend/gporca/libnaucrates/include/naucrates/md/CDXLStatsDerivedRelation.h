@@ -37,7 +37,7 @@ using namespace gpmd;
 //		Class representing DXL derived relation statistics
 //
 //---------------------------------------------------------------------------
-class CDXLStatsDerivedRelation : public CRefCount
+class CDXLStatsDerivedRelation : public CRefCount<CDXLStatsDerivedRelation>
 {
 private:
 	// number of rows

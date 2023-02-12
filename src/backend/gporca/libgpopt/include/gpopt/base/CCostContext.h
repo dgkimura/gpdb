@@ -52,7 +52,8 @@ using CONST_COSTCTXT_PTR = const gpos::Ref<CCostContext>;
 //		Cost context
 //
 //---------------------------------------------------------------------------
-class CCostContext : public CRefCount, public DbgPrintMixin<CCostContext>
+class CCostContext : public CRefCount<CCostContext>,
+					 public DbgPrintMixin<CCostContext>
 {
 public:
 	// states of cost context

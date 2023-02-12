@@ -34,7 +34,7 @@ class CXMLSerializer;
 //		Class for representing DXL datums
 //
 //---------------------------------------------------------------------------
-class CDXLDatum : public CRefCount
+class CDXLDatum : public CRefCount<CDXLDatum>
 {
 private:
 protected:

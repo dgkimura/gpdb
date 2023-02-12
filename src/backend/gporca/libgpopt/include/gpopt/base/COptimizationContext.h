@@ -49,7 +49,7 @@ using COptimizationContextArray = gpos::Vector<gpos::Ref<COptimizationContext>>;
 //		Optimization context
 //
 //---------------------------------------------------------------------------
-class COptimizationContext : public CRefCount,
+class COptimizationContext : public CRefCount<COptimizationContext>,
 							 public DbgPrintMixin<COptimizationContext>
 {
 public:

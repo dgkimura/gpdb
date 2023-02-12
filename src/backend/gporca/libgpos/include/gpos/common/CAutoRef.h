@@ -67,7 +67,7 @@ CAutoRef<T>::~CAutoRef()
 {
 	if (nullptr != CAutoP<T>::m_object)
 	{
-		reinterpret_cast<CRefCount *>(CAutoP<T>::m_object)->Release();
+		gpos::dyn_cast<CRefCount>(CAutoP<T>::m_object)->Release();
 	}
 
 	// null out pointer before ~CAutoP() gets called

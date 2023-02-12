@@ -25,7 +25,7 @@ using namespace gpos;
 // See https://en.wikipedia.org/wiki/Binary_heap for details
 // (with the added feature of returning only the top k).
 template <class A, class E>
-class CKHeap : public CRefCount
+class CKHeap : public CRefCount<CKHeap<A, E>>
 {
 private:
 	gpos::Ref<A> m_topk;

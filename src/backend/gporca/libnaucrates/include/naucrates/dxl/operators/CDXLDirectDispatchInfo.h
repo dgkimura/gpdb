@@ -38,7 +38,7 @@ class CXMLSerializer;
 //		Class for representing the specification of directly dispatchable plans
 //
 //---------------------------------------------------------------------------
-class CDXLDirectDispatchInfo : public CRefCount
+class CDXLDirectDispatchInfo : public CRefCount<CDXLDirectDispatchInfo>
 {
 private:
 	// constants for determining segments to dispatch to

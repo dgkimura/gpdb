@@ -209,7 +209,7 @@ private:
 	// description of an expression in the DP environment
 	// left and right child of join expressions point to
 	// child groups + expressions
-	struct SExpressionInfo : public CRefCount
+	struct SExpressionInfo : public CRefCount<SExpressionInfo>
 	{
 		// the expression
 		gpos::Ref<CExpression> m_expr;
@@ -314,7 +314,7 @@ private:
 	//		Struct containing a bitset, representing a group, its best expression, and cost
 	//
 	//---------------------------------------------------------------------------
-	struct SGroupInfo : public CRefCount
+	struct SGroupInfo : public CRefCount<SGroupInfo>
 	{
 		// the set of atoms, this uniquely identifies the group
 		gpos::Ref<CBitSet> m_atoms;
@@ -354,7 +354,7 @@ private:
 	using SGroupInfoArray = gpos::Vector<gpos::Ref<SGroupInfo>>;
 
 	// info for a join level, the set of all groups representing <m_level>-way joins
-	struct SLevelInfo : public CRefCount
+	struct SLevelInfo : public CRefCount<SLevelInfo>
 	{
 		ULONG m_level;
 		gpos::Ref<SGroupInfoArray> m_groups;

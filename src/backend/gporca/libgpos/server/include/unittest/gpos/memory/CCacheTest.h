@@ -30,7 +30,7 @@ class CCacheTest
 {
 private:
 	// A simple object (no deep structures)
-	struct SSimpleObject : public CRefCount
+	struct SSimpleObject : public CRefCount<SSimpleObject>
 	{
 		ULONG m_ulKey;
 
@@ -88,7 +88,7 @@ private:
 
 
 	// An object with a deep structure
-	class CDeepObject : public CRefCount
+	class CDeepObject : public CRefCount<CDeepObject>
 	{
 	private:
 		// linked list entry

@@ -48,7 +48,7 @@ enum EdxlFrameExclusionStrategy
 //		Class for representing DXL window frame
 //
 //---------------------------------------------------------------------------
-class CDXLWindowFrame : public CRefCount
+class CDXLWindowFrame : public CRefCount<CDXLWindowFrame>
 {
 private:
 	// row or range based window specification method

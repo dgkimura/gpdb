@@ -45,7 +45,7 @@ class IComparator;
 //		Representation of a range of values
 //
 //---------------------------------------------------------------------------
-class CRange : public CRefCount, public DbgPrintMixin<CRange>
+class CRange : public CRefCount<CRange>, public DbgPrintMixin<CRange>
 {
 public:
 	enum ERangeInclusion

@@ -64,7 +64,7 @@ using CDrvdPropArray = gpos::Vector<gpos::Ref<CDrvdProp>>;
 //		CExpressionHandle::DeriveProps().
 //
 //---------------------------------------------------------------------------
-class CDrvdProp : public CRefCount, public DbgPrintMixin<CDrvdProp>
+class CDrvdProp : public CRefCount<CDrvdProp>, public DbgPrintMixin<CDrvdProp>
 {
 public:
 	// types of derived properties

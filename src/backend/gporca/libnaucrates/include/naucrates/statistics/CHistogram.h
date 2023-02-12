@@ -39,7 +39,8 @@ using CDoubleArray = CDynamicPtrArray<CDouble, CleanupDelete>;
 //	@doc:
 //
 //---------------------------------------------------------------------------
-class CHistogram : public CRefCount, public gpos::DbgPrintMixin<CHistogram>
+class CHistogram : public CRefCount<CHistogram>,
+				   public gpos::DbgPrintMixin<CHistogram>
 {
 	// hash map from column id to a histogram
 	using UlongToHistogramMap =
@@ -139,7 +140,7 @@ private:
 
 	// equality join
 	gpos::Ref<CHistogram> MakeJoinHistogramEqualityFilter(
-		const gpos::Ref<CHistogram> histogram) const;
+		const gpos::Ref<CHistogram> histogram);
 
 	// generate histogram based on NDV
 	gpos::Ref<CHistogram> MakeNDVBasedJoinHistogramEqualityFilter(
@@ -147,7 +148,7 @@ private:
 
 	// construct a new histogram for an INDF join predicate
 	gpos::Ref<CHistogram> MakeJoinHistogramINDFFilter(
-		const gpos::Ref<CHistogram> histogram) const;
+		const gpos::Ref<CHistogram> histogram);
 
 	// accessor for n-th bucket
 	CBucket *operator[](ULONG) const;
@@ -281,24 +282,24 @@ public:
 	// join with another histogram
 	gpos::Ref<CHistogram> MakeJoinHistogram(
 		CStatsPred::EStatsCmpType stats_cmp_type,
-		const gpos::Ref<CHistogram> histogram) const;
+		const gpos::Ref<CHistogram> histogram);
 
 	// LASJ with another histogram
 	gpos::Ref<CHistogram> MakeLASJHistogram(
 		CStatsPred::EStatsCmpType stats_cmp_type,
-		const gpos::Ref<CHistogram> histogram) const;
+		const gpos::Ref<CHistogram> histogram);
 
 	// join with another histogram and normalize it.
 	// If the join is not an equality join the function returns an empty histogram
 	gpos::Ref<CHistogram> MakeJoinHistogramNormalize(
 		CStatsPred::EStatsCmpType stats_cmp_type, CDouble rows,
 		const gpos::Ref<CHistogram> other_histogram, CDouble rows_other,
-		CDouble *scale_factor) const;
+		CDouble *scale_factor);
 
 	// scale factor of inequality (!=) join
 	CDouble GetInequalityJoinScaleFactor(
 		CDouble rows, const gpos::Ref<CHistogram> other_histogram,
-		CDouble rows_other) const;
+		CDouble rows_other);
 
 	// left anti semi join with another histogram and normalize
 	gpos::Ref<CHistogram> MakeLASJHistogramNormalize(
@@ -307,7 +308,7 @@ public:
 		BOOL
 			DoIgnoreLASJHistComputation	 // except for the case of LOJ cardinality estimation this flag is always
 		// "true" since LASJ stats computation is very aggressive
-	) const;
+	);
 
 	// group by and normalize
 	gpos::Ref<CHistogram> MakeGroupByHistogramNormalize(
@@ -316,12 +317,12 @@ public:
 	// union all and normalize
 	gpos::Ref<CHistogram> MakeUnionAllHistogramNormalize(
 		CDouble rows, const gpos::Ref<CHistogram> other_histogram,
-		CDouble rows_other) const;
+		CDouble rows_other);
 
 	// union and normalize
 	gpos::Ref<CHistogram> MakeUnionHistogramNormalize(
 		CDouble rows, const gpos::Ref<CHistogram> other_histogram,
-		CDouble rows_other, CDouble *num_output_rows) const;
+		CDouble rows_other, CDouble *num_output_rows);
 
 	// cleanup residual buckets
 	static void CleanupResidualBucket(CBucket *bucket, BOOL bucket_is_residual);

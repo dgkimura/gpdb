@@ -33,7 +33,7 @@ using namespace gpmd;
 //		Class for representing table descriptors in a DXL tablescan node.
 //
 //---------------------------------------------------------------------------
-class CDXLTableDescr : public CRefCount
+class CDXLTableDescr : public CRefCount<CDXLTableDescr>
 {
 private:
 	// id and version information for the table

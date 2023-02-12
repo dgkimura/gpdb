@@ -15,7 +15,7 @@
 namespace gpos
 {
 template <class T>
-class Vector : public gpos::CRefCount
+class Vector : public gpos::CRefCount<Vector<T>>
 {
 	gpos::vector<T> v_;
 

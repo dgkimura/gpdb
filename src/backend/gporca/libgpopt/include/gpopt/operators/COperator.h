@@ -45,7 +45,7 @@ using ColRefToColRefMap =
 //		base class for all operators
 //
 //---------------------------------------------------------------------------
-class COperator : public CRefCount, public DbgPrintMixin<COperator>
+class COperator : public CRefCount<COperator>, public DbgPrintMixin<COperator>
 {
 private:
 protected:

@@ -55,7 +55,8 @@ using namespace gpnaucrates;
 //		Simply dynamic array for pointer types
 //
 //---------------------------------------------------------------------------
-class CExpression : public CRefCount, public gpos::DbgPrintMixin<CExpression>
+class CExpression : public CRefCount<CExpression>,
+					public gpos::DbgPrintMixin<CExpression>
 {
 	friend class CExpressionHandle;
 

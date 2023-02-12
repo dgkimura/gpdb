@@ -19,6 +19,7 @@
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/COptCtxt.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLScalarConstValue.h"
 #include "naucrates/statistics/CLeftAntiSemiJoinStatsProcessor.h"
@@ -635,7 +636,7 @@ gpos::Ref<CHistogram>
 CHistogram::MakeJoinHistogramNormalize(
 	CStatsPred::EStatsCmpType stats_cmp_type, CDouble rows,
 	const gpos::Ref<CHistogram> other_histogram, CDouble rows_other,
-	CDouble *scale_factor) const
+	CDouble *scale_factor)
 {
 	GPOS_ASSERT(nullptr != other_histogram);
 
@@ -728,7 +729,7 @@ CHistogram::MakeJoinHistogramNormalize(
 CDouble
 CHistogram::GetInequalityJoinScaleFactor(
 	CDouble rows, const gpos::Ref<CHistogram> other_histogram,
-	CDouble rows_other) const
+	CDouble rows_other)
 {
 	GPOS_ASSERT(nullptr != other_histogram);
 
@@ -761,7 +762,7 @@ gpos::Ref<CHistogram>
 CHistogram::MakeLASJHistogramNormalize(
 	CStatsPred::EStatsCmpType stats_cmp_type, CDouble rows,
 	const gpos::Ref<CHistogram> other_histogram, CDouble *scale_factor,
-	BOOL DoIgnoreLASJHistComputation) const
+	BOOL DoIgnoreLASJHistComputation)
 {
 	// if either histogram is not well-defined, the result is not well defined
 	if (!IsWellDefined() || !other_histogram->IsWellDefined())
@@ -858,7 +859,7 @@ CHistogram::MakeHistogramFilter(CStatsPred::EStatsCmpType stats_cmp_type,
 // construct new histogram by joining with another histogram, no normalization
 gpos::Ref<CHistogram>
 CHistogram::MakeJoinHistogram(CStatsPred::EStatsCmpType stats_cmp_type,
-							  const gpos::Ref<CHistogram> histogram) const
+							  const gpos::Ref<CHistogram> histogram)
 {
 	GPOS_ASSERT(JoinPredCmpTypeIsSupported(stats_cmp_type));
 
@@ -879,7 +880,7 @@ CHistogram::MakeJoinHistogram(CStatsPred::EStatsCmpType stats_cmp_type,
 // construct new histogram by LASJ with another histogram, no normalization
 gpos::Ref<CHistogram>
 CHistogram::MakeLASJHistogram(CStatsPred::EStatsCmpType stats_cmp_type,
-							  const gpos::Ref<CHistogram> histogram) const
+							  const gpos::Ref<CHistogram> histogram)
 {
 	GPOS_ASSERT(nullptr != histogram);
 
@@ -962,7 +963,7 @@ CHistogram::MakeLASJHistogram(CStatsPred::EStatsCmpType stats_cmp_type,
 	}
 
 	CDouble null_freq = CLeftAntiSemiJoinStatsProcessor::NullFreqLASJ(
-		stats_cmp_type, this, histogram);
+		stats_cmp_type, SharedFromThis(), histogram);
 
 	return GPOS_NEW(m_mp)
 		CHistogram(m_mp, std::move(new_buckets), true /*is_well_defined*/,
@@ -1092,7 +1093,7 @@ CHistogram::JoinPredCmpTypeIsSupported(CStatsPred::EStatsCmpType stats_cmp_type)
 // construct a new histogram with equality join
 gpos::Ref<CHistogram>
 CHistogram::MakeJoinHistogramEqualityFilter(
-	const gpos::Ref<CHistogram> histogram) const
+	const gpos::Ref<CHistogram> histogram)
 {
 	ULONG idx1 = 0;	 // index on buckets from this histogram
 	ULONG idx2 = 0;	 // index on buckets from other histogram
@@ -1106,7 +1107,7 @@ CHistogram::MakeJoinHistogramEqualityFilter(
 	CDouble distinct_remaining(0.0);
 	CDouble freq_remaining(0.0);
 
-	if (NeedsNDVBasedCardEstimationForEq(this) ||
+	if (NeedsNDVBasedCardEstimationForEq(SharedFromThis()) ||
 		NeedsNDVBasedCardEstimationForEq(histogram))
 	{
 		return MakeNDVBasedJoinHistogramEqualityFilter(histogram);
@@ -1159,7 +1160,7 @@ CHistogram::MakeJoinHistogramEqualityFilter(
 		}
 	}
 
-	ComputeJoinNDVRemainInfo(this, histogram, join_buckets.get(),
+	ComputeJoinNDVRemainInfo(SharedFromThis(), histogram, join_buckets.get(),
 							 hist1_buckets_freq, hist2_buckets_freq,
 							 &distinct_remaining, &freq_remaining);
 
@@ -1221,8 +1222,7 @@ CHistogram::MakeNDVBasedJoinHistogramEqualityFilter(
 
 // construct a new histogram for an INDF join predicate
 gpos::Ref<CHistogram>
-CHistogram::MakeJoinHistogramINDFFilter(
-	const gpos::Ref<CHistogram> histogram) const
+CHistogram::MakeJoinHistogramINDFFilter(const gpos::Ref<CHistogram> histogram)
 {
 	gpos::Ref<CHistogram> join_histogram =
 		MakeJoinHistogramEqualityFilter(histogram);
@@ -1432,8 +1432,7 @@ CHistogram::MakeGroupByHistogramNormalize(CDouble,	// rows,
 // construct new histogram based on union all operation
 gpos::Ref<CHistogram>
 CHistogram::MakeUnionAllHistogramNormalize(
-	CDouble rows, const gpos::Ref<CHistogram> histogram,
-	CDouble rows_other) const
+	CDouble rows, const gpos::Ref<CHistogram> histogram, CDouble rows_other)
 {
 	GPOS_ASSERT(nullptr != histogram);
 	GPOS_ASSERT(this->IsValid());
@@ -1484,8 +1483,8 @@ CHistogram::MakeUnionAllHistogramNormalize(
 			CleanupResidualBucket(bucket1, bucket1_is_residual);
 			CleanupResidualBucket(bucket2, bucket2_is_residual);
 
-			bucket1 =
-				GetNextBucket(this, bucket1_new, &bucket1_is_residual, &idx1);
+			bucket1 = GetNextBucket(SharedFromThis(), bucket1_new,
+									&bucket1_is_residual, &idx1);
 			bucket2 = GetNextBucket(histogram, bucket2_new,
 									&bucket2_is_residual, &idx2);
 		}
@@ -1804,7 +1803,7 @@ CHistogram::GetNextBucket(const gpos::Ref<CHistogram> histogram,
 gpos::Ref<CHistogram>
 CHistogram::MakeUnionHistogramNormalize(
 	CDouble rows, const gpos::Ref<CHistogram> other_histogram,
-	CDouble rows_other, CDouble *num_output_rows) const
+	CDouble rows_other, CDouble *num_output_rows)
 {
 	GPOS_ASSERT(nullptr != other_histogram);
 	GPOS_ASSERT(this->IsValid());
@@ -1878,8 +1877,8 @@ CHistogram::MakeUnionHistogramNormalize(
 			CleanupResidualBucket(bucket1, bucket1_is_residual);
 			CleanupResidualBucket(bucket2, bucket2_is_residual);
 
-			bucket1 =
-				GetNextBucket(this, bucket1_new, &bucket1_is_residual, &idx1);
+			bucket1 = GetNextBucket(SharedFromThis(), bucket1_new,
+									&bucket1_is_residual, &idx1);
 			bucket2 = GetNextBucket(other_histogram, bucket2_new,
 									&bucket2_is_residual, &idx2);
 		}

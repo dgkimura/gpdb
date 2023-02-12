@@ -35,7 +35,7 @@ using namespace gpmd;
 //		Interface for the parameters of the underlying cost model
 //
 //---------------------------------------------------------------------------
-class ICostModelParams : public CRefCount
+class ICostModelParams : public CRefCount<ICostModelParams>
 {
 public:
 	//---------------------------------------------------------------------------

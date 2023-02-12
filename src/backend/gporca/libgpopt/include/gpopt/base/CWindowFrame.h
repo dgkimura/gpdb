@@ -35,7 +35,8 @@ using namespace gpos;
 //		Description of window frame
 //
 //---------------------------------------------------------------------------
-class CWindowFrame : public CRefCount, public DbgPrintMixin<CWindowFrame>
+class CWindowFrame : public CRefCount<CWindowFrame>,
+					 public DbgPrintMixin<CWindowFrame>
 {
 public:
 	// specification method

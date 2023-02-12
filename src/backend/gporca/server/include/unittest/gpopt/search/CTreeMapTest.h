@@ -33,7 +33,7 @@ class CTreeMapTest
 	using CNodeArray = gpos::Vector<gpos::Ref<CNode>>;
 
 	// struct for resulting trees
-	class CNode : public CRefCount
+	class CNode : public CRefCount<CNode>
 	{
 	private:
 		// element number
