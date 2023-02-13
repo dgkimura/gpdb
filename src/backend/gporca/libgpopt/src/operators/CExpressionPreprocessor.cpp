@@ -1006,7 +1006,8 @@ CExpressionPreprocessor::PexprCollapseJoins(CMemoryPool *mp,
 void
 CExpressionPreprocessor::CollectJoinChildrenRecursively(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-	CExpressionArray *logicalLeafNodes, ULongPtrArray *lojChildPredIndexes,
+	CExpressionArray *logicalLeafNodes,
+	gpos::Ref<ULongPtrArray> lojChildPredIndexes,
 	CExpressionArray *innerJoinPredicates, CExpressionArray *lojPredicates)
 {
 	// protect against stack overflow during recursion
@@ -1036,7 +1037,7 @@ CExpressionPreprocessor::CollectJoinChildrenRecursively(
 			// merge the existing and new lists
 			gpos::Ref<CLogicalNAryJoin> naryJoin =
 				gpos::dyn_cast<CLogicalNAryJoin>(pexpr->Pop());
-			ULongPtrArray *naryJoinPredIndexes =
+			gpos::Ref<ULongPtrArray> naryJoinPredIndexes =
 				naryJoin->GetLojChildPredIndexes();
 
 			// add all the inner join predicates
@@ -3028,7 +3029,7 @@ CExpressionPreprocessor::ConvertSplitUpdateToInPlaceUpdate(
 	const ULONG num_cols = pdrgpcrInsert->Size();
 	BOOL split_update = false;
 	gpos::Ref<CColRefArray> ppartColRefs = GPOS_NEW(mp) CColRefArray(mp);
-	const ULongPtrArray *pdrgpulPart = tabdesc->PdrgpulPart();
+	const gpos::Ref<ULongPtrArray> pdrgpulPart = tabdesc->PdrgpulPart();
 	const ULONG ulPartKeys = pdrgpulPart->Size();
 
 	// Uses split update if any of the modified columns are either

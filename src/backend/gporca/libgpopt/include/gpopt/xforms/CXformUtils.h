@@ -569,7 +569,7 @@ public:
 	// the result will be {col3, col2}
 	static gpos::Ref<CColRefArray> PdrgpcrReorderedSubsequence(
 		CMemoryPool *mp, CColRefArray *colref_array,
-		ULongPtrArray *pdrgpulIndexesOfRefs);
+		gpos::Ref<ULongPtrArray> pdrgpulIndexesOfRefs);
 
 	// check if given xform is an Agg splitting xform
 	static BOOL FSplitAggXform(CXform::EXformId exfid);

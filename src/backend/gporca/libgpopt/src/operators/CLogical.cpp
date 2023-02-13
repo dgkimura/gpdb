@@ -115,7 +115,7 @@ CLogical::PdrgpcrCreateMapping(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CColRef2dArray>
 CLogical::PdrgpdrgpcrCreatePartCols(CMemoryPool *mp, CColRefArray *colref_array,
-									const ULongPtrArray *pdrgpulPart)
+									const gpos::Ref<ULongPtrArray> pdrgpulPart)
 {
 	GPOS_ASSERT(nullptr != colref_array && "Output columns cannot be NULL");
 	GPOS_ASSERT(nullptr != pdrgpulPart);

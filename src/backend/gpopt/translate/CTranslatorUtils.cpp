@@ -1148,7 +1148,7 @@ CTranslatorUtils::CreateAttnoSetForGroupingSet(
 gpos::Ref<ULongPtrArray>
 CTranslatorUtils::GenerateColIds(
 	CMemoryPool *mp, List *target_list, gpos::Ref<IMdIdArray> input_mdid_arr,
-	ULongPtrArray *input_colids,
+	gpos::Ref<ULongPtrArray> input_colids,
 	const BOOL *
 		is_outer_ref,  // array of flags indicating if input columns are outer references
 	CIdGenerator *colid_generator)
@@ -1312,7 +1312,7 @@ CTranslatorUtils::GetTargetListReturnTypeOid(List *target_list, ULONG col_pos)
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLColDescrArray>
 CTranslatorUtils::GetDXLColumnDescrArray(CMemoryPool *mp, List *target_list,
-										 ULongPtrArray *colids,
+										 gpos::Ref<ULongPtrArray> colids,
 										 BOOL keep_res_junked)
 {
 	GPOS_ASSERT(nullptr != colids);
@@ -1785,7 +1785,7 @@ CTranslatorUtils::IsGroupingColumn(const TargetEntry *target_entry,
 //		the mappings in the provided context
 //---------------------------------------------------------------------------
 List *
-CTranslatorUtils::ConvertColidToAttnos(ULongPtrArray *colids,
+CTranslatorUtils::ConvertColidToAttnos(gpos::Ref<ULongPtrArray> colids,
 									   CDXLTranslateContext *translate_ctxt)
 {
 	GPOS_ASSERT(nullptr != colids);
@@ -1871,8 +1871,8 @@ CTranslatorUtils::CreateMultiByteCharStringFromWCString(const WCHAR *wcstr)
 //---------------------------------------------------------------------------
 gpos::Ref<UlongToUlongMap>
 CTranslatorUtils::MakeNewToOldColMapping(CMemoryPool *mp,
-										 ULongPtrArray *old_colids,
-										 ULongPtrArray *new_colids)
+										 gpos::Ref<ULongPtrArray> old_colids,
+										 gpos::Ref<ULongPtrArray> new_colids)
 {
 	GPOS_ASSERT(nullptr != old_colids);
 	GPOS_ASSERT(nullptr != new_colids);

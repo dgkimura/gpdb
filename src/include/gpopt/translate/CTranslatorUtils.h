@@ -200,13 +200,13 @@ public:
 	// construct an array of DXL column identifiers for a target list
 	static gpos::Ref<ULongPtrArray> GenerateColIds(
 		CMemoryPool *mp, List *target_list, gpos::Ref<IMdIdArray> input_mdids,
-		ULongPtrArray *input_nums, const BOOL *is_outer_ref,
+		gpos::Ref<ULongPtrArray> input_nums, const BOOL *is_outer_ref,
 		CIdGenerator *colid_generator);
 
 	// construct an array of DXL column descriptors for a target list
 	// using the column ids in the given array
 	static gpos::Ref<CDXLColDescrArray> GetDXLColumnDescrArray(
-		CMemoryPool *mp, List *target_list, ULongPtrArray *colids,
+		CMemoryPool *mp, List *target_list, gpos::Ref<ULongPtrArray> colids,
 		BOOL keep_res_junked);
 
 	// return the positions of the target list entries included in the output
@@ -281,7 +281,7 @@ public:
 
 	// convert a list of column ids to a list of attribute numbers using
 	// the provided context with mappings
-	static List *ConvertColidToAttnos(ULongPtrArray *pdrgpul,
+	static List *ConvertColidToAttnos(gpos::Ref<ULongPtrArray> pdrgpul,
 									  CDXLTranslateContext *dxl_translate_ctxt);
 
 	// parse string value into a Long Integer
@@ -299,7 +299,8 @@ public:
 	static CHAR *CreateMultiByteCharStringFromWCString(const WCHAR *wcstr);
 
 	static gpos::Ref<UlongToUlongMap> MakeNewToOldColMapping(
-		CMemoryPool *mp, ULongPtrArray *old_colids, ULongPtrArray *new_colids);
+		CMemoryPool *mp, gpos::Ref<ULongPtrArray> old_colids,
+		gpos::Ref<ULongPtrArray> new_colids);
 
 	// check if the given tree contains a subquery
 	static BOOL HasSubquery(Node *node);

@@ -689,7 +689,7 @@ CTranslatorDXLToScalar::TranslateDXLScalarAggrefToScalar(
 		}
 	}
 
-	ULongPtrArray *argtypes = dxlop->GetArgTypes();
+	gpos::Ref<ULongPtrArray> argtypes = dxlop->GetArgTypes();
 	for (ULONG ul = 0; ul < argtypes->Size(); ul++)
 	{
 		aggref->aggargtypes =

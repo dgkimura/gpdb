@@ -82,7 +82,7 @@ CMDPartConstraintGPDB::GetPartConstraintExpr(CMemoryPool *mp,
 //		Included default partitions
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::Ref<ULongPtrArray>
 CMDPartConstraintGPDB::GetDefaultPartsArray() const
 {
 	return m_level_with_default_part_array.get();

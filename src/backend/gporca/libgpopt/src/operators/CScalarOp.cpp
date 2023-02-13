@@ -199,7 +199,7 @@ CScalarOp::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarOp::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarOp::Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

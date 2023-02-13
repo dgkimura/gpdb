@@ -93,7 +93,7 @@ public:
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(ULongPtrArray *pdrgpulChildren) const override
+	Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const override
 	{
 		// Coalesce returns the first not-null child,
 		// if all children are Null, then Coalesce must return Null

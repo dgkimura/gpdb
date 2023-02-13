@@ -294,7 +294,7 @@ CJoinOrder::CJoinOrder(CMemoryPool *mp,
 					   gpos::Ref<CExpressionArray> all_components,
 					   gpos::Ref<CExpressionArray> innerJoinPredConjuncts,
 					   CExpressionArray *onPreds,
-					   ULongPtrArray *childPredIndexes)
+					   gpos::Ref<ULongPtrArray> childPredIndexes)
 	: m_mp(mp),
 	  m_rgpedge(nullptr),
 	  m_ulEdges(0),

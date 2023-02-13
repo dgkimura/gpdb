@@ -137,7 +137,7 @@ public:
 				*((*m_lojChildPredIndexes)[child_num]) == 0);
 	}
 
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetLojChildPredIndexes() const
 	{
 		return m_lojChildPredIndexes.get();

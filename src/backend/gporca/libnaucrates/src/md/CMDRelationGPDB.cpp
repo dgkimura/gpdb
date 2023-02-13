@@ -319,7 +319,7 @@ CMDRelationGPDB::GetPosFromAttno(INT attno) const
 //		Returns the original positions of all the non-dropped columns
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::Ref<ULongPtrArray>
 CMDRelationGPDB::NonDroppedColsArray() const
 {
 	return m_nondrop_col_pos_array.get();
@@ -361,7 +361,7 @@ CMDRelationGPDB::KeySetCount() const
 //		Returns the key set at the specified position
 //
 //---------------------------------------------------------------------------
-const ULongPtrArray *
+const gpos::Ref<ULongPtrArray>
 CMDRelationGPDB::KeySetAt(ULONG pos) const
 {
 	GPOS_ASSERT(nullptr != m_keyset_array);

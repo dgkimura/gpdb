@@ -79,7 +79,7 @@ public:
 	const CWStringConst *GetOpNameStr() const override;
 	const CWStringConst *GetAggStrategyNameStr() const;
 	const CWStringConst *PstrAggLevel() const;
-	const ULongPtrArray *GetGroupingColidArray() const;
+	const gpos::Ref<ULongPtrArray> GetGroupingColidArray() const;
 
 	// set grouping column indices
 	void SetGroupingCols(gpos::Ref<ULongPtrArray>);

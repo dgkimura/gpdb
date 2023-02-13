@@ -186,7 +186,7 @@ CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
 void
 CLeftOuterJoinStatsProcessor::AddHistogramsLOJInner(
 	CMemoryPool *mp, const gpos::Ref<CStatistics> inner_join_stats,
-	ULongPtrArray *inner_colids_with_stats, CDouble num_rows_LASJ,
+	gpos::Ref<ULongPtrArray> inner_colids_with_stats, CDouble num_rows_LASJ,
 	CDouble num_rows_inner_join, gpos::Ref<UlongToHistogramMap> LOJ_histograms)
 {
 	GPOS_ASSERT(nullptr != inner_join_stats);

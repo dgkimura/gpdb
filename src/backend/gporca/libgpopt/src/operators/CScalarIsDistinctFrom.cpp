@@ -32,7 +32,7 @@ CScalarIsDistinctFrom::PopConvert(gpos::Ref<COperator> pop)
 
 // perform boolean expression evaluation
 CScalar::EBoolEvalResult
-CScalarIsDistinctFrom::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarIsDistinctFrom::Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const
 {
 	GPOS_ASSERT(2 == pdrgpulChildren->Size());
 

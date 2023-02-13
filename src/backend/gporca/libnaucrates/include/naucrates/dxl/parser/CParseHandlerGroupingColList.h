@@ -65,7 +65,7 @@ public:
 	~CParseHandlerGroupingColList() override;
 
 	// accessor
-	ULongPtrArray *GetGroupingColidArray();
+	gpos::Ref<ULongPtrArray> GetGroupingColidArray();
 };
 }  // namespace gpdxl
 

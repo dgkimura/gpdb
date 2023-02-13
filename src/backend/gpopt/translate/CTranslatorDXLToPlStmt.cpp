@@ -2704,7 +2704,7 @@ CTranslatorDXLToPlStmt::TranslateDXLAgg(
 	agg->streaming = dxl_phy_agg_dxlop->IsStreamSafe();
 
 	// translate grouping cols
-	const ULongPtrArray *grouping_colid_array =
+	const gpos::Ref<ULongPtrArray> grouping_colid_array =
 		dxl_phy_agg_dxlop->GetGroupingColidArray();
 	agg->numCols = grouping_colid_array->Size();
 	if (agg->numCols > 0)
@@ -2817,7 +2817,7 @@ CTranslatorDXLToPlStmt::TranslateDXLWindow(
 	plan->lefttree = child_plan;
 
 	// translate partition columns
-	const ULongPtrArray *part_by_cols_array =
+	const gpos::Ref<ULongPtrArray> part_by_cols_array =
 		window_dxlop->GetPartByColsArray();
 	window->partNumCols = part_by_cols_array->Size();
 	window->partColIdx = nullptr;
@@ -3554,7 +3554,8 @@ CTranslatorDXLToPlStmt::TranslateDXLPartSelector(
 	// part_prune_info
 	gpos::Ref<CDXLNode> filterNode = (*partition_selector_dxlnode)[1];
 
-	ULongPtrArray *part_indexes = partition_selector_dxlop->Partitions();
+	gpos::Ref<ULongPtrArray> part_indexes =
+		partition_selector_dxlop->Partitions();
 	List *prune_infos = CPartPruneStepsBuilder::CreatePartPruneInfos(
 		filterNode, relation.get(), rtindex, part_indexes, &colid_var_mapping,
 		m_translator_dxl_to_scalar);
@@ -3664,7 +3665,8 @@ CTranslatorDXLToPlStmt::TranslateDXLAppend(
 		m_dxl_to_plstmt_context->AddRTE(rte);
 
 		append->join_prune_paramids = NIL;
-		const ULongPtrArray *selector_ids = phy_append_dxlop->GetSelectorIds();
+		const gpos::Ref<ULongPtrArray> selector_ids =
+			phy_append_dxlop->GetSelectorIds();
 		OID oid_type = gpos::dyn_cast<CMDIdGPDB>(
 						   m_md_accessor->PtMDType<IMDTypeInt4>()->MDId())
 						   ->Oid();
@@ -3914,7 +3916,7 @@ CTranslatorDXLToPlStmt::TranslateDXLCTEConsumerToSharedScan(
 	TranslatePlanCosts(cte_consumer_dxlnode, plan);
 
 #ifdef GPOS_DEBUG
-	ULongPtrArray *output_colids_array =
+	gpos::Ref<ULongPtrArray> output_colids_array =
 		cte_consumer_dxlop->GetOutputColIdsArray();
 #endif
 
@@ -4076,7 +4078,8 @@ CTranslatorDXLToPlStmt::TranslateDXLDynTblScan(
 					   m_md_accessor->PtMDType<IMDTypeInt4>()->MDId())
 					   ->Oid();
 
-	const ULongPtrArray *selector_ids = dyn_tbl_scan_dxlop->GetSelectorIds();
+	const gpos::Ref<ULongPtrArray> selector_ids =
+		dyn_tbl_scan_dxlop->GetSelectorIds();
 
 	for (ULONG ul = 0; ul < selector_ids->Size(); ++ul)
 	{
@@ -4167,7 +4170,8 @@ CTranslatorDXLToPlStmt::TranslateDXLDynIdxScan(
 	OID oid_type = gpos::dyn_cast<CMDIdGPDB>(
 					   m_md_accessor->PtMDType<IMDTypeInt4>()->MDId())
 					   ->Oid();
-	const ULongPtrArray *selector_ids = dyn_index_scan_dxlop->GetSelectorIds();
+	const gpos::Ref<ULongPtrArray> selector_ids =
+		dyn_index_scan_dxlop->GetSelectorIds();
 
 	for (ULONG ul = 0; ul < selector_ids->Size(); ++ul)
 	{
@@ -4589,9 +4593,9 @@ CTranslatorDXLToPlStmt::TranslateDXLSplit(
 							 child_contexts.get(), output_context);
 
 	// translate delete and insert columns
-	ULongPtrArray *deletion_colid_array =
+	gpos::Ref<ULongPtrArray> deletion_colid_array =
 		phy_split_dxlop->GetDeletionColIdArray();
-	ULongPtrArray *insertion_colid_array =
+	gpos::Ref<ULongPtrArray> insertion_colid_array =
 		phy_split_dxlop->GetInsertionColIdArray();
 
 	GPOS_ASSERT(insertion_colid_array->Size() == deletion_colid_array->Size());
@@ -5614,7 +5618,7 @@ GpPolicy *
 CTranslatorDXLToPlStmt::TranslateDXLPhyCtasToDistrPolicy(
 	const gpos::Ref<CDXLPhysicalCTAS> dxlop, List *target_list)
 {
-	ULongPtrArray *distr_col_pos_array = dxlop->GetDistrColPosArray();
+	gpos::Ref<ULongPtrArray> distr_col_pos_array = dxlop->GetDistrColPosArray();
 
 	const ULONG num_of_distr_cols =
 		(distr_col_pos_array == nullptr) ? 0 : distr_col_pos_array->Size();
@@ -5806,7 +5810,7 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapTblScan(
 						   m_md_accessor->PtMDType<IMDTypeInt4>()->MDId())
 						   ->Oid();
 
-		const ULongPtrArray *selector_ids =
+		const gpos::Ref<ULongPtrArray> selector_ids =
 			phy_dyn_bitmap_tblscan_dxlop->GetSelectorIds();
 
 		for (ULONG ul = 0; ul < selector_ids->Size(); ++ul)

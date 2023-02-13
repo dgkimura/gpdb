@@ -62,7 +62,7 @@ public:
 	}
 
 	// source column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetSrcColIdsArray() const
 	{
 		return m_src_colids_array.get();

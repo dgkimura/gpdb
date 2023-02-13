@@ -183,7 +183,7 @@ public:
 	}
 
 	// return the original positions of all the non-dropped columns
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	NonDroppedColsArray() const override
 	{
 		return m_nondrop_col_pos_array.get();

@@ -56,7 +56,8 @@ CDXLLogicalSetOp::CDXLLogicalSetOp(
 	const ULONG length = m_input_colids_arrays->Size();
 	for (ULONG idx = 0; idx < length; idx++)
 	{
-		ULongPtrArray *input_colids_array = (*m_input_colids_arrays)[idx].get();
+		gpos::Ref<ULongPtrArray> input_colids_array =
+			(*m_input_colids_arrays)[idx].get();
 		GPOS_ASSERT(num_of_cols == input_colids_array->Size());
 	}
 

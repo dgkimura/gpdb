@@ -933,7 +933,8 @@ public:
 	static gpos::Ref<CBitSet> PbsAllSet(CMemoryPool *mp, ULONG size);
 
 	// return a new bitset, setting the bits in the given array
-	static gpos::Ref<CBitSet> Pbs(CMemoryPool *mp, ULongPtrArray *pdrgpul);
+	static gpos::Ref<CBitSet> Pbs(CMemoryPool *mp,
+								  gpos::Ref<ULongPtrArray> pdrgpul);
 
 	// helper to create a dummy constant table expression
 	static gpos::Ref<CExpression> PexprLogicalCTGDummy(CMemoryPool *mp);

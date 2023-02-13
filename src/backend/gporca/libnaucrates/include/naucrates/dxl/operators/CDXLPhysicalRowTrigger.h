@@ -78,14 +78,14 @@ public:
 	}
 
 	// old column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetColIdsOld() const
 	{
 		return m_colids_old.get();
 	}
 
 	// new column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetColIdsNew() const
 	{
 		return m_colids_new.get();

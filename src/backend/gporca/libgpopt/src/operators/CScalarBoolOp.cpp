@@ -117,7 +117,7 @@ CScalarBoolOp::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarBoolOp::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarBoolOp::Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const
 {
 	if (EboolopAnd == m_eboolop)
 	{

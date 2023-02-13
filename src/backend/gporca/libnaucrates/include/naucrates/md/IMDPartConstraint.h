@@ -49,7 +49,7 @@ public:
 		CColRefArray *colref_array) const = 0;
 
 	// included default partitions
-	virtual ULongPtrArray *GetDefaultPartsArray() const = 0;
+	virtual gpos::Ref<ULongPtrArray> GetDefaultPartsArray() const = 0;
 
 	// is constraint unbounded
 	virtual BOOL IsConstraintUnbounded() const = 0;

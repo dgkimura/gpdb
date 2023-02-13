@@ -109,7 +109,7 @@ private:
 	// add the NDVs for all of the grouping columns
 	static void AddNdvForAllGrpCols(
 		CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
-		const ULongPtrArray *grouping_columns,
+		const gpos::Ref<ULongPtrArray> grouping_columns,
 		CDoubleArray *output_ndvs  // output array of NDV
 	);
 
@@ -117,15 +117,16 @@ private:
 	static CDouble MaxNumGroupsForGivenSrcGprCols(
 		CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
 		gpos::Ref<CStatistics> input_stats,
-		const ULongPtrArray *src_grouping_cols);
+		const gpos::Ref<ULongPtrArray> src_grouping_cols);
 
 	// check to see if any one of the grouping columns has been capped
-	static BOOL CappedGrpColExists(const gpos::Ref<CStatistics> stats,
-								   const ULongPtrArray *grouping_columns);
+	static BOOL CappedGrpColExists(
+		const gpos::Ref<CStatistics> stats,
+		const gpos::Ref<ULongPtrArray> grouping_columns);
 
 	// return the maximum NDV given an array of grouping columns
 	static CDouble MaxNdv(const gpos::Ref<CStatistics> stats,
-						  const ULongPtrArray *grouping_columns);
+						  const gpos::Ref<ULongPtrArray> grouping_columns);
 
 public:
 	// private dtor
@@ -166,7 +167,7 @@ public:
 	static void ExtractUsedColIds(CMemoryPool *mp,
 								  gpos::Ref<CBitSet> colids_bitset,
 								  gpos::Ref<CStatsPred> pred_stats,
-								  ULongPtrArray *colids);
+								  gpos::Ref<ULongPtrArray> colids);
 
 	// given the previously generated histogram, update the intermediate
 	// result of the disjunction
@@ -258,7 +259,7 @@ public:
 	// compute the cumulative number of groups for the given set of grouping columns
 	static CDouble Groups(CMemoryPool *mp, gpos::Ref<IStatistics> stats,
 						  const gpos::Ref<CStatisticsConfig> stats_config,
-						  ULongPtrArray *grouping_cols,
+						  gpos::Ref<ULongPtrArray> grouping_cols,
 						  gpos::Ref<CBitSet> keys);
 
 	// return the default number of distinct values
@@ -277,7 +278,7 @@ public:
 
 	// return the set of grouping columns for statistics computation;
 	static gpos::Ref<CColRefSet> MakeGroupByColsForStats(
-		CMemoryPool *mp, const ULongPtrArray *grouping_columns,
+		CMemoryPool *mp, const gpos::Ref<ULongPtrArray> grouping_columns,
 		gpos::Ref<CColRefSet>
 			computed_groupby_cols  // output set of grouping columns that are computed attributes
 	);

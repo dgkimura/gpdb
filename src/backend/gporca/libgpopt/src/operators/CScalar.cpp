@@ -97,7 +97,7 @@ CScalar::FHasSubquery(CExpressionHandle &exprhdl)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberConjunction(ULongPtrArray *pdrgpulChildren)
+CScalar::EberConjunction(gpos::Ref<ULongPtrArray> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 	GPOS_ASSERT(1 < pdrgpulChildren->Size());
@@ -158,7 +158,7 @@ CScalar::EberConjunction(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberDisjunction(ULongPtrArray *pdrgpulChildren)
+CScalar::EberDisjunction(gpos::Ref<ULongPtrArray> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 	GPOS_ASSERT(1 < pdrgpulChildren->Size());
@@ -243,7 +243,7 @@ CScalar::EberDisjunction(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberNullOnAnyNullChild(ULongPtrArray *pdrgpulChildren)
+CScalar::EberNullOnAnyNullChild(gpos::Ref<ULongPtrArray> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 
@@ -270,7 +270,7 @@ CScalar::EberNullOnAnyNullChild(ULongPtrArray *pdrgpulChildren)
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalar::EberNullOnAllNullChildren(ULongPtrArray *pdrgpulChildren)
+CScalar::EberNullOnAllNullChildren(gpos::Ref<ULongPtrArray> pdrgpulChildren)
 {
 	GPOS_ASSERT(nullptr != pdrgpulChildren);
 

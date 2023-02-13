@@ -162,7 +162,8 @@ private:
 	// create the set operation given its children, input and output columns
 	gpos::Ref<CDXLNode> CreateDXLSetOpFromColumns(
 		EdxlSetOpType setop_type, List *output_target_list,
-		ULongPtrArray *output_colids, gpos::Ref<ULongPtr2dArray> input_colids,
+		gpos::Ref<ULongPtrArray> output_colids,
+		gpos::Ref<ULongPtr2dArray> input_colids,
 		gpos::Ref<CDXLNodeArray> children_dxlnodes, BOOL is_cast_across_input,
 		BOOL keep_res_junked) const;
 
@@ -192,7 +193,7 @@ private:
 
 	// translate the child of a set operation
 	gpos::Ref<CDXLNode> TranslateSetOpChild(
-		Node *child_node, ULongPtrArray *pdrgpul,
+		Node *child_node, gpos::Ref<ULongPtrArray> pdrgpul,
 		gpos::Ref<IMdIdArray> input_col_mdids, List *target_list);
 
 	// return a dummy const table get
@@ -414,7 +415,8 @@ private:
 	// with the colid at the same position in the "To" list
 	static gpos::Ref<IntToUlongMap> RemapColIds(
 		CMemoryPool *mp, IntToUlongMap *attno_to_colid_mapping,
-		ULongPtrArray *from_list_colids, ULongPtrArray *to_list_colids);
+		gpos::Ref<ULongPtrArray> from_list_colids,
+		gpos::Ref<ULongPtrArray> to_list_colids);
 
 	// true iff this query or one of its ancestors is a DML query
 	BOOL IsDMLQuery();

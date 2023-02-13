@@ -163,7 +163,7 @@ public:
 	ULONG NonDroppedColsCount() const override;
 
 	// return the original positions of all the non-dropped columns
-	ULongPtrArray *NonDroppedColsArray() const override;
+	gpos::Ref<ULongPtrArray> NonDroppedColsArray() const override;
 
 	// number of system columns
 	ULONG SystemColumnsCount() const override;
@@ -187,7 +187,7 @@ public:
 	ULONG KeySetCount() const override;
 
 	// key set at given position
-	const ULongPtrArray *KeySetAt(ULONG pos) const override;
+	const gpos::Ref<ULongPtrArray> KeySetAt(ULONG pos) const override;
 
 	// number of distribution columns
 	ULONG DistrColumnCount() const override;

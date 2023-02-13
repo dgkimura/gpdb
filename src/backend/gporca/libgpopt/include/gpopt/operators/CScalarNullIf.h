@@ -105,7 +105,8 @@ public:
 	}
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren) const override;
 
 	// conversion function
 	static gpos::Ref<CScalarNullIf>

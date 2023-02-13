@@ -112,7 +112,7 @@ CDXLLogicalGroupBy::SetGroupingColumns(
 //		Grouping column indices
 //
 //---------------------------------------------------------------------------
-const ULongPtrArray *
+const gpos::Ref<ULongPtrArray>
 CDXLLogicalGroupBy::GetGroupingColidArray() const
 {
 	return m_grouping_colid_array.get();

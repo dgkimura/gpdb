@@ -168,7 +168,7 @@ CQueryContext::SetSystemCols(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CQueryContext *
 CQueryContext::PqcGenerate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-						   ULongPtrArray *pdrgpulQueryOutputColRefId,
+						   gpos::Ref<ULongPtrArray> pdrgpulQueryOutputColRefId,
 						   CMDNameArray *pdrgpmdname, BOOL fDeriveStats)
 {
 	GPOS_ASSERT(nullptr != pexpr && nullptr != pdrgpulQueryOutputColRefId);

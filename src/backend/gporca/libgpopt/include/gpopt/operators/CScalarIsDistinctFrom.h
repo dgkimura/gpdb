@@ -54,7 +54,8 @@ public:
 	}
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren) const override;
 
 	// return a string for operator name
 	const CHAR *

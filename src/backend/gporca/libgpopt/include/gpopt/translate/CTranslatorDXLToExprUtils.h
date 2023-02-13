@@ -80,9 +80,9 @@ public:
 		EdxlBoolExprType edxlbooltype);
 
 	// construct a dynamic array of col refs corresponding to the given col ids
-	static gpos::Ref<CColRefArray> Pdrgpcr(CMemoryPool *mp,
-										   UlongToColRefMap *colref_mapping,
-										   const ULongPtrArray *colids);
+	static gpos::Ref<CColRefArray> Pdrgpcr(
+		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		const gpos::Ref<ULongPtrArray> colids);
 
 	// is the given expression is a scalar function that casts
 	static BOOL FCastFunc(CMDAccessor *md_accessor,

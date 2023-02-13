@@ -1681,7 +1681,7 @@ CXformUtils::PdrgpexprPartEqFilters(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != ptabdesc);
 	GPOS_ASSERT(nullptr != pdrgpcrSource);
 
-	const ULongPtrArray *pdrgpulPart = ptabdesc->PdrgpulPart();
+	const gpos::Ref<ULongPtrArray> pdrgpulPart = ptabdesc->PdrgpulPart();
 
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 
@@ -3846,9 +3846,9 @@ CXformUtils::PexprCTEConsumer(CMemoryPool *mp, ULONG ulCTEId,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefArray>
-CXformUtils::PdrgpcrReorderedSubsequence(CMemoryPool *mp,
-										 CColRefArray *colref_array,
-										 ULongPtrArray *pdrgpulIndexesOfRefs)
+CXformUtils::PdrgpcrReorderedSubsequence(
+	CMemoryPool *mp, CColRefArray *colref_array,
+	gpos::Ref<ULongPtrArray> pdrgpulIndexesOfRefs)
 {
 	GPOS_ASSERT(nullptr != colref_array);
 	GPOS_ASSERT(nullptr != pdrgpulIndexesOfRefs);

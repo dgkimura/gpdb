@@ -1670,7 +1670,7 @@ CDXLUtils::Serialize(CMemoryPool *mp, const ULongPtr2dArray *array_2D)
 	CWStringDynamic *keys_buffer = GPOS_NEW(mp) CWStringDynamic(mp);
 	for (ULONG ul = 0; ul < len; ul++)
 	{
-		ULongPtrArray *pdrgpul = (*array_2D)[ul].get();
+		gpos::Ref<ULongPtrArray> pdrgpul = (*array_2D)[ul].get();
 		CWStringDynamic *key_set_string = CDXLUtils::Serialize(mp, pdrgpul);
 
 		keys_buffer->Append(key_set_string);

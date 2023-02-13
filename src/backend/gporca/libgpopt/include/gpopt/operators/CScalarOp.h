@@ -121,7 +121,8 @@ public:
 	static BOOL FCommutative(const gpos::Ref<IMDId> pcmdidOtherOp);
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren) const override;
 
 	// name of the scalar operator
 	const CWStringConst *Pstr() const;

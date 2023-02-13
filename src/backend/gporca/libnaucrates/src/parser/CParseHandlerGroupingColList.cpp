@@ -139,7 +139,7 @@ CParseHandlerGroupingColList::EndElement(const XMLCh *const,  // element_uri,
 //		Returns the array of parsed grouping column ids
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::Ref<ULongPtrArray>
 CParseHandlerGroupingColList::GetGroupingColidArray()
 {
 	return m_grouping_colids_array.get();

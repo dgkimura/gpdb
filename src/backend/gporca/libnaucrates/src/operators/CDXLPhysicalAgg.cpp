@@ -132,7 +132,7 @@ CDXLPhysicalAgg::GetAggStrategyNameStr() const
 //		Grouping column indices
 //
 //---------------------------------------------------------------------------
-const ULongPtrArray *
+const gpos::Ref<ULongPtrArray>
 CDXLPhysicalAgg::GetGroupingColidArray() const
 {
 	return m_grouping_colids_array.get();

@@ -58,7 +58,7 @@ public:
 		return m_id;
 	}
 
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetOutputColIdsArray() const
 	{
 		return m_output_colids_array.get();

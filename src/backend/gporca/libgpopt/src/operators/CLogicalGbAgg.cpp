@@ -624,7 +624,7 @@ CLogicalGbAgg::PxfsCandidates(CMemoryPool *mp) const
 gpos::Ref<IStatistics>
 CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
 							CColRefArray *pdrgpcrGroupingCols,
-							ULongPtrArray *pdrgpulComputedCols,
+							gpos::Ref<ULongPtrArray> pdrgpulComputedCols,
 							gpos::Ref<CBitSet> keys)
 {
 	const ULONG ulGroupingCols = pdrgpcrGroupingCols->Size();

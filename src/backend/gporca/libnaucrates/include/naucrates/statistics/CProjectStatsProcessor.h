@@ -24,7 +24,8 @@ public:
 	// project
 	static gpos::Ref<CStatistics> CalcProjStats(
 		CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
-		ULongPtrArray *projection_colids, UlongToIDatumMap *datum_map);
+		gpos::Ref<ULongPtrArray> projection_colids,
+		UlongToIDatumMap *datum_map);
 };
 }  // namespace gpnaucrates
 

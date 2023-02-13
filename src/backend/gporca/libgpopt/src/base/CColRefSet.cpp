@@ -395,7 +395,8 @@ CColRefSet::OsPrint(IOstream &os, ULONG ulLenMax) const
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::ExtractColIds(CMemoryPool *mp, ULongPtrArray *colids) const
+CColRefSet::ExtractColIds(CMemoryPool *mp,
+						  gpos::Ref<ULongPtrArray> colids) const
 {
 	CColRefSetIter crsi(*this);
 	while (crsi.Advance())

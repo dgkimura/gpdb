@@ -129,7 +129,7 @@ CParseHandlerPhysicalAbstractBitmapScan::StartElementHelper(
 void
 CParseHandlerPhysicalAbstractBitmapScan::EndElementHelper(
 	const XMLCh *const element_local_name, Edxltoken token_type,
-	ULongPtrArray *selector_ids)
+	gpos::Ref<ULongPtrArray> selector_ids)
 {
 	if (0 != XMLString::compareString(CDXLTokens::XmlstrToken(token_type),
 									  element_local_name))

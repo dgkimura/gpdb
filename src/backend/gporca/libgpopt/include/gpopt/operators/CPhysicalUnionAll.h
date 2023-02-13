@@ -55,7 +55,7 @@ private:
 
 	// compute output hashed distribution matching the outer child's hashed distribution
 	gpos::Ref<CDistributionSpecHashed> PdsMatching(
-		CMemoryPool *mp, const ULongPtrArray *pdrgpulOuter) const;
+		CMemoryPool *mp, const gpos::Ref<ULongPtrArray> pdrgpulOuter) const;
 
 	// derive output distribution based on child distribution
 	static gpos::Ref<CDistributionSpec> PdsDeriveFromChildren(

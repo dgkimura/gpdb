@@ -207,11 +207,11 @@ CBitSet::CBitSet(CMemoryPool *mp, ULONG vector_size)
 //		copy ctor;
 //
 //---------------------------------------------------------------------------
-CBitSet::CBitSet(CMemoryPool *mp, const CBitSet &bs)
+CBitSet::CBitSet(CMemoryPool *mp, CBitSet &bs)
 	: m_mp(mp), m_vector_size(bs.m_vector_size), m_size(0)
 {
 	m_bsllist.Init(GPOS_OFFSET(CBitSetLink, m_link));
-	Union(&bs);
+	Union(bs.SharedFromThis());
 }
 
 
@@ -346,7 +346,7 @@ CBitSet::ExchangeClear(ULONG pos)
 //
 //---------------------------------------------------------------------------
 void
-CBitSet::Union(const CBitSet *pbsOther)
+CBitSet::Union(const gpos::Ref<CBitSet> pbsOther)
 {
 	gpos::Ref<CBitSetLink> bsl = nullptr;
 	gpos::Ref<CBitSetLink> bsl_other = nullptr;

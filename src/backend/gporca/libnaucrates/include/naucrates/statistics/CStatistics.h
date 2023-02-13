@@ -186,7 +186,7 @@ public:
 	CDouble GetSkew(ULONG colid) const override;
 
 	// what is the width in bytes of set of column id's
-	CDouble Width(ULongPtrArray *colids) const override;
+	CDouble Width(gpos::Ref<ULongPtrArray> colids) const override;
 
 	// what is the width in bytes of set of column references
 	CDouble Width(CMemoryPool *mp,
@@ -342,14 +342,13 @@ public:
 	}
 
 	// create a dummy statistics object
-	static gpos::Ref<CStatistics> MakeDummyStats(CMemoryPool *mp,
-												 ULongPtrArray *colids,
-												 CDouble rows);
+	static gpos::Ref<CStatistics> MakeDummyStats(
+		CMemoryPool *mp, gpos::Ref<ULongPtrArray> colids, CDouble rows);
 
 	// create a dummy statistics object
 	static gpos::Ref<CStatistics> MakeDummyStats(
-		CMemoryPool *mp, ULongPtrArray *col_histogram_mapping,
-		ULongPtrArray *colid_width_mapping, CDouble rows);
+		CMemoryPool *mp, gpos::Ref<ULongPtrArray> col_histogram_mapping,
+		gpos::Ref<ULongPtrArray> colid_width_mapping, CDouble rows);
 
 	// default column width
 	static const CDouble DefaultColumnWidth;
@@ -374,7 +373,7 @@ public:
 	// add upper bound ndvs information for a given set of columns
 	static void CreateAndInsertUpperBoundNDVs(CMemoryPool *mp,
 											  gpos::Ref<CStatistics> stats,
-											  ULongPtrArray *colids,
+											  gpos::Ref<ULongPtrArray> colids,
 											  CDouble rows);
 
 	// cap the total number of distinct values (NDV) in buckets to the number of rows

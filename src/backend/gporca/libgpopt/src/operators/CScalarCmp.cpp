@@ -158,7 +158,7 @@ CScalarCmp::MdidType() const
 //
 //---------------------------------------------------------------------------
 CScalar::EBoolEvalResult
-CScalarCmp::Eber(ULongPtrArray *pdrgpulChildren) const
+CScalarCmp::Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const
 {
 	if (m_returns_null_on_null_input)
 	{

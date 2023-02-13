@@ -129,7 +129,8 @@ private:
 	// helper method for PexprCollapseJoins, collect children and make recursive calls
 	static void CollectJoinChildrenRecursively(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CExpressionArray *logicalLeafNodes, ULongPtrArray *lojChildPredIndexes,
+		CExpressionArray *logicalLeafNodes,
+		gpos::Ref<ULongPtrArray> lojChildPredIndexes,
 		CExpressionArray *innerJoinPredicates, CExpressionArray *lojPredicates);
 
 	// collapse cascaded logical project operators

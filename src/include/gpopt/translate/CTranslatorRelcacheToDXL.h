@@ -273,7 +273,8 @@ private:
 	// retrieve part constraint for index
 	static gpos::Ref<CMDPartConstraintGPDB> RetrievePartConstraintForIndex(
 		CMemoryPool *mp, CMDAccessor *md_accessor, const IMDRelation *md_rel,
-		Node *part_constraint, ULongPtrArray *level_with_default_part_array,
+		Node *part_constraint,
+		gpos::Ref<ULongPtrArray> level_with_default_part_array,
 		BOOL is_unbounded);
 
 	// retrieve part constraint for relation
@@ -285,7 +286,8 @@ private:
 	static gpos::Ref<CMDPartConstraintGPDB> RetrievePartConstraintFromNode(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		CDXLColDescrArray *dxl_col_descr_array, Node *part_constraint,
-		ULongPtrArray *level_with_default_part_array, BOOL is_unbounded);
+		gpos::Ref<ULongPtrArray> level_with_default_part_array,
+		BOOL is_unbounded);
 
 	// return relation name
 	static CMDName *GetRelName(CMemoryPool *mp, Relation rel);

@@ -133,7 +133,7 @@ private:
 	// create the array of column reference used in the partition by column
 	// list of a window specification
 	gpos::Ref<CColRefArray> PdrgpcrPartitionByCol(
-		const ULongPtrArray *partition_by_colid_array);
+		const gpos::Ref<ULongPtrArray> partition_by_colid_array);
 
 	// translate a DXL logical window into an expr logical project
 	gpos::Ref<CExpression> PexprCreateWindow(
@@ -163,7 +163,7 @@ private:
 	// preprocess inputs to the set operator (adding casts to columns  when needed)
 	gpos::Ref<CExpressionArray> PdrgpexprPreprocessSetOpInputs(
 		const gpos::Ref<CDXLNode> dxlnode, CColRef2dArray *pdrgdrgpcrInput,
-		ULongPtrArray *pdrgpulOutput);
+		gpos::Ref<ULongPtrArray> pdrgpulOutput);
 
 	// create new column reference and add to the hashmap maintaining
 	// the mapping between DXL ColIds and column reference.
@@ -437,10 +437,10 @@ public:
 	// translate a dxl scalar expression
 	gpos::Ref<CExpression> PexprTranslateScalar(
 		const gpos::Ref<CDXLNode> dxlnode, CColRefArray *colref_array,
-		ULongPtrArray *colids = nullptr);
+		gpos::Ref<ULongPtrArray> colids = nullptr);
 
 	// return the array of query output column reference id
-	ULongPtrArray *PdrgpulOutputColRefs();
+	gpos::Ref<ULongPtrArray> PdrgpulOutputColRefs();
 
 	// return the array of output column names
 	CMDNameArray *

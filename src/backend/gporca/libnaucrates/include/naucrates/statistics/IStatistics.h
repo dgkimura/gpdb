@@ -136,7 +136,7 @@ public:
 	virtual CDouble Width() const = 0;
 
 	// what is the width in bytes of set of column id's
-	virtual CDouble Width(ULongPtrArray *colids) const = 0;
+	virtual CDouble Width(gpos::Ref<ULongPtrArray> colids) const = 0;
 
 	// what is the width in bytes of set of column references
 	virtual CDouble Width(CMemoryPool *mp,

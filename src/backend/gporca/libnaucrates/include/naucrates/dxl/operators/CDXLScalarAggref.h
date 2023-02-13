@@ -111,7 +111,7 @@ public:
 		return m_aggkind;
 	}
 
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetArgTypes() const
 	{
 		return m_argtypes.get();

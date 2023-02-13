@@ -117,7 +117,7 @@ public:
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(ULongPtrArray *pdrgpulChildren) const override
+	Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const override
 	{
 		// MinMax returns Null only if all children are Null
 		return EberNullOnAllNullChildren(pdrgpulChildren);

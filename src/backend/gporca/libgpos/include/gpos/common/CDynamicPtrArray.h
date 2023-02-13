@@ -385,7 +385,7 @@ public:
 
 	// Eliminate members from an array that are not contained in a given list of indexes
 	gpos::Ref<CDynamicPtrArray<T, CleanupFn>>
-	CreateReducedArray(ULongPtrArray *indexes_to_choose)
+	CreateReducedArray(gpos::Ref<ULongPtrArray> indexes_to_choose)
 	{
 		gpos::Ref<CDynamicPtrArray<T, CleanupFn>> result =
 			GPOS_NEW(m_mp) CDynamicPtrArray<T, CleanupFn>(m_mp, m_min_size,

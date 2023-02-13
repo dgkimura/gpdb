@@ -113,7 +113,7 @@ public:
 	INT TypeModifier() const override;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *) const override;
+	EBoolEvalResult Eber(gpos::Ref<ULongPtrArray>) const override;
 
 	gpos::Ref<COperator>
 	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,

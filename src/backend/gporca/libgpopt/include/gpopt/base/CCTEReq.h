@@ -146,7 +146,7 @@ public:
 	~CCTEReq() override;
 
 	// required cte ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	PdrgpulRequired() const
 	{
 		return m_pdrgpulRequired.get();

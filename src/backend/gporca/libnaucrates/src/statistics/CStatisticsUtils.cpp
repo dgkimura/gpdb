@@ -616,7 +616,7 @@ void
 CStatisticsUtils::ExtractUsedColIds(CMemoryPool *mp,
 									gpos::Ref<CBitSet> colids_bitset,
 									gpos::Ref<CStatsPred> pred_stats,
-									ULongPtrArray *colids)
+									gpos::Ref<ULongPtrArray> colids)
 {
 	GPOS_ASSERT(nullptr != colids_bitset);
 	GPOS_ASSERT(nullptr != pred_stats);
@@ -716,7 +716,6 @@ CStatisticsUtils::UpdateDisjStatistics(
 					input_disjunct_rows, result_histogram, local_rows,
 					&output_rows);
 
-			GPOS_DELETE(previous_histogram);
 			previous_histogram = new_histogram;
 		}
 
@@ -724,8 +723,6 @@ CStatisticsUtils::UpdateDisjStatistics(
 					 disjunctive_result_histograms, true /*fReplaceOldEntries*/
 		);
 	}
-
-	GPOS_DELETE(previous_histogram);
 }
 
 //---------------------------------------------------------------------------
@@ -929,8 +926,6 @@ CStatisticsUtils::MergeHistogramMapsForDisjPreds(
 
 					AddHistogram(mp, colid, normalized_union_histogram,
 								 merged_hmap.get(), true /* fReplaceOld */);
-
-					GPOS_DELETE(normalized_union_histogram);
 				}
 				else
 				{
@@ -1312,7 +1307,7 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 			const CColRef *grouping_colref = col_factory->LookupColRef(colid);
 			const ULONG upper_bound_ndv_idx =
 				stats->GetIndexUpperBoundNDVs(grouping_colref);
-			const ULongPtrArray *ndv_colid =
+			const gpos::Ref<ULongPtrArray> ndv_colid =
 				grp_colid_upper_bound_ndv_idx_map->Find(&upper_bound_ndv_idx);
 			if (nullptr == ndv_colid)
 			{
@@ -1326,7 +1321,7 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 			}
 			else
 			{
-				(const_cast<ULongPtrArray *>(ndv_colid))
+				(const_cast<gpos::Ref<ULongPtrArray> >(ndv_colid))
 					->Append(GPOS_NEW(mp) ULONG(colid));
 			}
 		}
@@ -1413,7 +1408,7 @@ CStatisticsUtils::ExtractNDVForGrpCols(
 	while (map_iter.Advance())
 	{
 		ULONG source_id = *(map_iter.Key());
-		const ULongPtrArray *src_grouping_cols = map_iter.Value();
+		const gpos::Ref<ULongPtrArray> src_grouping_cols = map_iter.Value();
 
 		if (gpos::ulong_max == source_id)
 		{
@@ -1444,8 +1439,9 @@ CStatisticsUtils::ExtractNDVForGrpCols(
 //       Check to see if any one of the grouping columns has been capped
 //---------------------------------------------------------------------------
 BOOL
-CStatisticsUtils::CappedGrpColExists(const gpos::Ref<CStatistics> stats,
-									 const ULongPtrArray *grouping_columns)
+CStatisticsUtils::CappedGrpColExists(
+	const gpos::Ref<CStatistics> stats,
+	const gpos::Ref<ULongPtrArray> grouping_columns)
 {
 	GPOS_ASSERT(nullptr != stats);
 	GPOS_ASSERT(nullptr != grouping_columns);
@@ -1475,7 +1471,7 @@ CStatisticsUtils::CappedGrpColExists(const gpos::Ref<CStatistics> stats,
 //---------------------------------------------------------------------------
 CDouble
 CStatisticsUtils::MaxNdv(const gpos::Ref<CStatistics> stats,
-						 const ULongPtrArray *grouping_columns)
+						 const gpos::Ref<ULongPtrArray> grouping_columns)
 {
 	GPOS_ASSERT(nullptr != stats);
 	GPOS_ASSERT(nullptr != grouping_columns);
@@ -1518,7 +1514,8 @@ CStatisticsUtils::MaxNdv(const gpos::Ref<CStatistics> stats,
 CDouble
 CStatisticsUtils::MaxNumGroupsForGivenSrcGprCols(
 	CMemoryPool *mp, const gpos::Ref<CStatisticsConfig> stats_config,
-	gpos::Ref<CStatistics> input_stats, const ULongPtrArray *src_grouping_cols)
+	gpos::Ref<CStatistics> input_stats,
+	const gpos::Ref<ULongPtrArray> src_grouping_cols)
 {
 	GPOS_ASSERT(nullptr != input_stats);
 	GPOS_ASSERT(nullptr != src_grouping_cols);
@@ -1562,7 +1559,7 @@ CDouble
 CStatisticsUtils::Groups(
 	CMemoryPool *mp, gpos::Ref<IStatistics> stats,
 	const gpos::Ref<CStatisticsConfig> stats_config,
-	ULongPtrArray *grouping_cols,
+	gpos::Ref<ULongPtrArray> grouping_cols,
 	gpos::Ref<CBitSet> keys	 // keys derived during optimization
 )
 {
@@ -1668,7 +1665,6 @@ CStatisticsUtils::AddGrpColStats(
 				result_histogram->SetNDVScaled();
 			}
 			AddHistogram(mp, grp_colid, result_histogram, output_histograms);
-			GPOS_DELETE(result_histogram);
 		}
 
 		const CDouble *width = input_stats->GetWidth(grp_colid);
@@ -1692,7 +1688,7 @@ CStatisticsUtils::AddGrpColStats(
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CStatisticsUtils::MakeGroupByColsForStats(
-	CMemoryPool *mp, const ULongPtrArray *grouping_columns,
+	CMemoryPool *mp, const gpos::Ref<ULongPtrArray> grouping_columns,
 	gpos::Ref<CColRefSet> computed_groupby_cols)
 {
 	GPOS_ASSERT(nullptr != grouping_columns);

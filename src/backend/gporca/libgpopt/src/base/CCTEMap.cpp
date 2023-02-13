@@ -297,7 +297,7 @@ CCTEMap::FSatisfies(const gpos::Ref<CCTEReq> pcter) const
 {
 	GPOS_ASSERT(nullptr != pcter);
 	// every CTE marked as "Required" must be in the current map
-	ULongPtrArray *pdrgpul = pcter->PdrgpulRequired();
+	gpos::Ref<ULongPtrArray> pdrgpul = pcter->PdrgpulRequired();
 	const ULONG ulReqd = pdrgpul->Size();
 	for (ULONG ul = 0; ul < ulReqd; ul++)
 	{

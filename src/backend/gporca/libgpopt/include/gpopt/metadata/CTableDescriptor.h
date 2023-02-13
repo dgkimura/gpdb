@@ -169,7 +169,7 @@ public:
 	}
 
 	// partition column indexes accessor
-	const ULongPtrArray *
+	const gpos::Ref<ULongPtrArray>
 	PdrgpulPart() const
 	{
 		return m_pdrgpulPart.get();

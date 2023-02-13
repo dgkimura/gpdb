@@ -98,7 +98,7 @@ public:
 		return m_scan_id;
 	}
 
-	const ULongPtrArray *
+	const gpos::Ref<ULongPtrArray>
 	GetSelectorIds() const
 	{
 		return m_selector_ids.get();

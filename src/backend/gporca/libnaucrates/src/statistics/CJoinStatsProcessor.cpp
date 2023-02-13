@@ -143,7 +143,7 @@ CJoinStatsProcessor::CalcAllJoinStats(CMemoryPool *mp,
 	gpos::Ref<IStatistics> stats = (*statistics_array)[0]->CopyStats(mp);
 	CDouble num_rows_outer = stats->Rows();
 	// predicate indexes, if we have a mix of inner and LOJs
-	ULongPtrArray *predIndexes = nullptr;
+	gpos::Ref<ULongPtrArray> predIndexes = nullptr;
 	gpos::Ref<CExpression> inner_or_simple_2_way_loj_preds = expr;
 
 	switch (pop->Eopid())

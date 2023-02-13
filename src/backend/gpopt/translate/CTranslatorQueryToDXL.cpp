@@ -2760,7 +2760,8 @@ CTranslatorQueryToDXL::TranslateSetOpToDXL(
 gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::CreateDXLSetOpFromColumns(
 	EdxlSetOpType setop_type, List *output_target_list,
-	ULongPtrArray *output_colids, gpos::Ref<ULongPtr2dArray> input_colids,
+	gpos::Ref<ULongPtrArray> output_colids,
+	gpos::Ref<ULongPtr2dArray> input_colids,
 	gpos::Ref<CDXLNodeArray> children_dxlnodes, BOOL is_cast_across_input,
 	BOOL keep_res_junked) const
 {
@@ -2777,7 +2778,7 @@ CTranslatorQueryToDXL::CreateDXLSetOpFromColumns(
 											 keep_res_junked);
 
 	const ULONG num_of_cols = output_colids->Size();
-	ULongPtrArray *input_first_child_array = (*input_colids)[0].get();
+	gpos::Ref<ULongPtrArray> input_first_child_array = (*input_colids)[0].get();
 	GPOS_ASSERT(num_of_cols == input_first_child_array->Size());
 	GPOS_ASSERT(num_of_cols == output_colids->Size());
 
@@ -2919,7 +2920,7 @@ CTranslatorQueryToDXL::SetOpNeedsCast(List *target_list,
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
 CTranslatorQueryToDXL::TranslateSetOpChild(
-	Node *child_node, ULongPtrArray *colids,
+	Node *child_node, gpos::Ref<ULongPtrArray> colids,
 	gpos::Ref<IMdIdArray> input_col_mdids, List *target_list)
 {
 	GPOS_ASSERT(nullptr != colids);
@@ -3874,7 +3875,7 @@ CTranslatorQueryToDXL::TranslateCTEToDXL(const RangeTblEntry *rte,
 		gpos::dyn_cast<CDXLLogicalCTEProducer>(
 			cte_producer_dxlnode->GetOperator());
 	ULONG cte_id = cte_producer_dxlop->Id();
-	ULongPtrArray *op_colid_array_cte_producer =
+	gpos::Ref<ULongPtrArray> op_colid_array_cte_producer =
 		cte_producer_dxlop->GetOutputColIdsArray();
 
 	// construct output column array
@@ -4848,8 +4849,8 @@ CTranslatorQueryToDXL::ExtractColIds(
 gpos::Ref<IntToUlongMap>
 CTranslatorQueryToDXL::RemapColIds(CMemoryPool *mp,
 								   IntToUlongMap *attno_to_colid_mapping,
-								   ULongPtrArray *from_list_colids,
-								   ULongPtrArray *to_list_colids)
+								   gpos::Ref<ULongPtrArray> from_list_colids,
+								   gpos::Ref<ULongPtrArray> to_list_colids)
 {
 	GPOS_ASSERT(nullptr != attno_to_colid_mapping);
 	GPOS_ASSERT(nullptr != from_list_colids && nullptr != to_list_colids);

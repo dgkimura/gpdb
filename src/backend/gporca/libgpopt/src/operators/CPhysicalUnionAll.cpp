@@ -13,7 +13,8 @@
 
 using namespace gpopt;
 
-static BOOL Equals(ULongPtrArray *pdrgpulFst, ULongPtrArray *pdrgpulSnd);
+static BOOL Equals(gpos::Ref<ULongPtrArray> pdrgpulFst,
+				   gpos::Ref<ULongPtrArray> pdrgpulSnd);
 
 #ifdef GPOS_DEBUG
 
@@ -34,7 +35,7 @@ static void CheckChildDistributions(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 // helper to do value equality check of arrays of ULONG pointers
 BOOL
-Equals(ULongPtrArray *pdrgpulFst, ULongPtrArray *pdrgpulSnd)
+Equals(gpos::Ref<ULongPtrArray> pdrgpulFst, gpos::Ref<ULongPtrArray> pdrgpulSnd)
 {
 	GPOS_ASSERT(nullptr != pdrgpulFst);
 	GPOS_ASSERT(nullptr != pdrgpulSnd);
@@ -585,8 +586,8 @@ CPhysicalUnionAll::PdshashedDerive(CMemoryPool *mp,
 //		hashed distribution
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpecHashed>
-CPhysicalUnionAll::PdsMatching(CMemoryPool *mp,
-							   const ULongPtrArray *pdrgpulOuter) const
+CPhysicalUnionAll::PdsMatching(
+	CMemoryPool *mp, const gpos::Ref<ULongPtrArray> pdrgpulOuter) const
 {
 	GPOS_ASSERT(nullptr != pdrgpulOuter);
 

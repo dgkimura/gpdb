@@ -97,8 +97,8 @@ CScalarSortGroupClause::OsPrint(IOstream &os) const
 //		Perform boolean expression evaluation
 //
 //---------------------------------------------------------------------------
-CScalar::EBoolEvalResult
-CScalarSortGroupClause::Eber(ULongPtrArray *  //pdrgpulChildren
+CScalar::EBoolEvalResult CScalarSortGroupClause::Eber(
+	gpos::Ref<ULongPtrArray>  //pdrgpulChildren
 ) const
 {
 	return EberAny;

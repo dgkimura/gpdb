@@ -110,7 +110,8 @@ public:
 	BOOL FCommutative() const;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren) const override;
 
 	// name of the comparison operator
 	const CWStringConst *Pstr() const;

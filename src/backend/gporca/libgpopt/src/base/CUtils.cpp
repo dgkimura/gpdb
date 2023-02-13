@@ -3989,7 +3989,7 @@ CUtils::PbsAllSet(CMemoryPool *mp, ULONG size)
 
 // returns a new bitset, setting the bits in the given array
 gpos::Ref<CBitSet>
-CUtils::Pbs(CMemoryPool *mp, ULongPtrArray *pdrgpul)
+CUtils::Pbs(CMemoryPool *mp, gpos::Ref<ULongPtrArray> pdrgpul)
 {
 	GPOS_ASSERT(nullptr != pdrgpul);
 	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp);

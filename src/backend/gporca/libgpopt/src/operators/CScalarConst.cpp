@@ -189,8 +189,8 @@ CScalarConst::PopExtractFromConstOrCastConst(gpos::Ref<CExpression> pexpr)
 //		Perform boolean expression evaluation
 //
 //---------------------------------------------------------------------------
-CScalar::EBoolEvalResult
-CScalarConst::Eber(ULongPtrArray *	//pdrgpulChildren
+CScalar::EBoolEvalResult CScalarConst::Eber(
+	gpos::Ref<ULongPtrArray>  //pdrgpulChildren
 ) const
 {
 	if (m_pdatum->IsNull())

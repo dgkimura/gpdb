@@ -66,7 +66,7 @@ public:
 	ULONG PartByColsCount() const;
 
 	// return partition columns
-	const ULongPtrArray *
+	const gpos::Ref<ULongPtrArray>
 	GetPartByColsArray() const
 	{
 		return m_part_by_colid_array.get();

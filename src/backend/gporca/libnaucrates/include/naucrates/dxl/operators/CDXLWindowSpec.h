@@ -79,7 +79,7 @@ public:
 	}
 
 	// partition-by column identifiers
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetPartitionByColIdArray() const
 	{
 		return m_partition_by_colid_array.get();

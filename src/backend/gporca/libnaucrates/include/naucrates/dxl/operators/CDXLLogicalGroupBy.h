@@ -51,7 +51,7 @@ public:
 	// accessors
 	Edxlopid GetDXLOperator() const override;
 	const CWStringConst *GetOpNameStr() const override;
-	const ULongPtrArray *GetGroupingColidArray() const;
+	const gpos::Ref<ULongPtrArray> GetGroupingColidArray() const;
 
 	// set grouping column indices
 	void SetGroupingColumns(gpos::Ref<ULongPtrArray>);

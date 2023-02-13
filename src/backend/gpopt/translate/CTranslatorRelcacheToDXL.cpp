@@ -2749,8 +2749,8 @@ CTranslatorRelcacheToDXL::IsIndexSupported(Relation index_rel)
 gpos::Ref<CMDPartConstraintGPDB>
 CTranslatorRelcacheToDXL::RetrievePartConstraintForIndex(
 	CMemoryPool *mp, CMDAccessor *md_accessor, const IMDRelation *md_rel,
-	Node *part_constraint, ULongPtrArray *level_with_default_part_array,
-	BOOL is_unbounded)
+	Node *part_constraint,
+	gpos::Ref<ULongPtrArray> level_with_default_part_array, BOOL is_unbounded)
 {
 	gpos::Ref<CDXLColDescrArray> dxl_col_descr_array =
 		GPOS_NEW(mp) CDXLColDescrArray(mp);
@@ -2859,7 +2859,7 @@ gpos::Ref<CMDPartConstraintGPDB>
 CTranslatorRelcacheToDXL::RetrievePartConstraintFromNode(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
 	CDXLColDescrArray *dxl_col_descr_array, Node *part_constraints,
-	ULongPtrArray *level_with_default_part_array, BOOL is_unbounded)
+	gpos::Ref<ULongPtrArray> level_with_default_part_array, BOOL is_unbounded)
 {
 	if (nullptr == part_constraints)
 	{

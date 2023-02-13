@@ -105,7 +105,7 @@ public:
 
 	// boolean expression evaluation
 	EBoolEvalResult
-	Eber(ULongPtrArray *pdrgpulChildren) const override
+	Eber(gpos::Ref<ULongPtrArray> pdrgpulChildren) const override
 	{
 		return EberNullOnAllNullChildren(pdrgpulChildren);
 	}

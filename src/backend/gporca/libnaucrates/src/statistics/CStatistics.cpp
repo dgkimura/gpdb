@@ -220,7 +220,7 @@ CStatistics::Width() const
 
 // return the width in bytes of a set of columns
 CDouble
-CStatistics::Width(ULongPtrArray *colids) const
+CStatistics::Width(gpos::Ref<ULongPtrArray> colids) const
 {
 	GPOS_ASSERT(nullptr != colids);
 
@@ -264,7 +264,7 @@ CStatistics::Width(CMemoryPool *mp, gpos::Ref<CColRefSet> colrefs) const
 
 // return dummy statistics object
 gpos::Ref<CStatistics>
-CStatistics::MakeDummyStats(CMemoryPool *mp, ULongPtrArray *colids,
+CStatistics::MakeDummyStats(CMemoryPool *mp, gpos::Ref<ULongPtrArray> colids,
 							CDouble rows)
 {
 	GPOS_ASSERT(nullptr != colids);
@@ -296,7 +296,8 @@ CStatistics::MakeDummyStats(CMemoryPool *mp, ULongPtrArray *colids,
 void
 CStatistics::CreateAndInsertUpperBoundNDVs(CMemoryPool *mp,
 										   gpos::Ref<CStatistics> stats,
-										   ULongPtrArray *colids, CDouble rows)
+										   gpos::Ref<ULongPtrArray> colids,
+										   CDouble rows)
 {
 	GPOS_ASSERT(nullptr != stats);
 	GPOS_ASSERT(nullptr != colids);
@@ -328,8 +329,9 @@ CStatistics::CreateAndInsertUpperBoundNDVs(CMemoryPool *mp,
 //	return dummy statistics object
 gpos::Ref<CStatistics>
 CStatistics::MakeDummyStats(CMemoryPool *mp,
-							ULongPtrArray *col_histogram_mapping,
-							ULongPtrArray *col_width_mapping, CDouble rows)
+							gpos::Ref<ULongPtrArray> col_histogram_mapping,
+							gpos::Ref<ULongPtrArray> col_width_mapping,
+							CDouble rows)
 {
 	GPOS_ASSERT(nullptr != col_histogram_mapping);
 	GPOS_ASSERT(nullptr != col_width_mapping);
@@ -724,7 +726,7 @@ CStatistics::AddWidthInfoWithRemap(CMemoryPool *mp,
 								   UlongToColRefMap *colref_mapping,
 								   BOOL must_exist)
 {
-	UlongToDoubleMapIter col_width_map_iterator(src_width);
+	UlongToDoubleMapIter col_width_map_iterator(src_width.get());
 	while (col_width_map_iterator.Advance())
 	{
 		ULONG colid = *(col_width_map_iterator.Key());

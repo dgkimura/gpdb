@@ -74,7 +74,7 @@ protected:
 	// initialize the array of partition columns
 	static gpos::Ref<CColRef2dArray> PdrgpdrgpcrCreatePartCols(
 		CMemoryPool *mp, CColRefArray *colref_array,
-		const ULongPtrArray *pdrgpulPart);
+		const gpos::Ref<ULongPtrArray> pdrgpulPart);
 
 	// derive dummy statistics
 	gpos::Ref<IStatistics> PstatsDeriveDummy(CMemoryPool *mp,

@@ -147,7 +147,8 @@ public:
 	IMDFunction::EFuncStbl EfsGetFunctionStability() const;
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren) const override;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

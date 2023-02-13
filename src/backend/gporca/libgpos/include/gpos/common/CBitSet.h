@@ -114,7 +114,7 @@ public:
 public:
 	// ctor
 	CBitSet(CMemoryPool *mp, ULONG vector_size = 256);
-	CBitSet(CMemoryPool *mp, const CBitSet &);
+	CBitSet(CMemoryPool *mp, CBitSet &);
 
 	// dtor
 	~CBitSet() override;
@@ -129,7 +129,7 @@ public:
 	BOOL ExchangeClear(ULONG pos);
 
 	// union sets
-	void Union(const CBitSet *);
+	void Union(const gpos::Ref<CBitSet>);
 
 	// intersect sets
 	void Intersection(const gpos::Ref<CBitSet>);

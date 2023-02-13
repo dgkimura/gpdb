@@ -107,7 +107,7 @@ CXformExpandNAryJoinDPv2::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[arity - 1];
 	gpos::Ref<CExpressionArray> innerJoinPreds = nullptr;
 	gpos::Ref<CExpressionArray> onPreds = GPOS_NEW(mp) CExpressionArray(mp);
-	ULongPtrArray *childPredIndexes = nullptr;
+	gpos::Ref<ULongPtrArray> childPredIndexes = nullptr;
 
 	if (nullptr != gpos::dyn_cast<CScalarNAryJoinPredList>(pexprScalar->Pop()))
 	{

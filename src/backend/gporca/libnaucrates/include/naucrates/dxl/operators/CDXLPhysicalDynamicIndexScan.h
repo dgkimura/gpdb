@@ -86,7 +86,7 @@ public:
 
 	gpos::Ref<IMdIdArray> GetParts() const;
 
-	const ULongPtrArray *
+	const gpos::Ref<ULongPtrArray>
 	GetSelectorIds() const
 	{
 		return m_selector_ids.get();

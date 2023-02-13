@@ -84,7 +84,7 @@ public:
 	}
 
 	// deletion column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetDeletionColIdArray() const
 	{
 		return m_deletion_colid_array.get();

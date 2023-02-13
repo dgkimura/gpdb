@@ -93,7 +93,7 @@ public:
 		return m_scan_id;
 	}
 
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	Partitions() const
 	{
 		return m_parts.get();

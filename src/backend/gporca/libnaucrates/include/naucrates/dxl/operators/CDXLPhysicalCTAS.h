@@ -108,14 +108,14 @@ public:
 	}
 
 	// distribution column positions
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetDistrColPosArray() const
 	{
 		return m_distr_column_pos_array.get();
 	}
 
 	// source column ids
-	ULongPtrArray *
+	gpos::Ref<ULongPtrArray>
 	GetSrcColidsArray() const
 	{
 		return m_src_colids_array.get();

@@ -77,7 +77,7 @@ public:
 		CColRefArray *colref_array) const override;
 
 	// included default partitions
-	ULongPtrArray *GetDefaultPartsArray() const override;
+	gpos::Ref<ULongPtrArray> GetDefaultPartsArray() const override;
 
 	// is constraint unbounded
 	BOOL IsConstraintUnbounded() const override;

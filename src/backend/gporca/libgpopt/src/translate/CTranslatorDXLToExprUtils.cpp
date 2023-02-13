@@ -139,7 +139,7 @@ CTranslatorDXLToExprUtils::AddKeySets(CMemoryPool *mp,
 	{
 		gpos::Ref<CBitSet> pbs =
 			GPOS_NEW(mp) CBitSet(mp, ptabdesc->ColumnCount());
-		const ULongPtrArray *pdrgpulKeys = pmdrel->KeySetAt(ul);
+		const gpos::Ref<ULongPtrArray> pdrgpulKeys = pmdrel->KeySetAt(ul);
 		const ULONG ulKeys = pdrgpulKeys->Size();
 
 		for (ULONG ulKey = 0; ulKey < ulKeys; ulKey++)
@@ -230,7 +230,7 @@ CTranslatorDXLToExprUtils::EBoolOperator(EdxlBoolExprType edxlbooltype)
 gpos::Ref<CColRefArray>
 CTranslatorDXLToExprUtils::Pdrgpcr(CMemoryPool *mp,
 								   UlongToColRefMap *colref_mapping,
-								   const ULongPtrArray *colids)
+								   const gpos::Ref<ULongPtrArray> colids)
 {
 	GPOS_ASSERT(nullptr != colids);
 

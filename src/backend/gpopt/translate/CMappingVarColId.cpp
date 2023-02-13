@@ -332,7 +332,7 @@ CMappingVarColId::LoadDerivedTblColumns(
 //---------------------------------------------------------------------------
 void
 CMappingVarColId::LoadCTEColumns(ULONG query_level, ULONG RTE_index,
-								 const ULongPtrArray *CTE_columns,
+								 const gpos::Ref<ULongPtrArray> CTE_columns,
 								 List *target_list)
 {
 	GPOS_ASSERT(nullptr != CTE_columns);
@@ -491,8 +491,9 @@ CMappingVarColId::CopyMapColId(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 CMappingVarColId *
-CMappingVarColId::CopyRemapColId(CMemoryPool *mp, ULongPtrArray *old_colids,
-								 ULongPtrArray *new_colids) const
+CMappingVarColId::CopyRemapColId(CMemoryPool *mp,
+								 gpos::Ref<ULongPtrArray> old_colids,
+								 gpos::Ref<ULongPtrArray> new_colids) const
 {
 	GPOS_ASSERT(nullptr != old_colids);
 	GPOS_ASSERT(nullptr != new_colids);

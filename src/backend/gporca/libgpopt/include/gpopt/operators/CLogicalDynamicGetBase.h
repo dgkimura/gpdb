@@ -55,8 +55,8 @@ protected:
 
 	// given a colrefset from a table, get colids and attno
 	void ExtractColIdsAttno(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
-							ULongPtrArray *colids,
-							ULongPtrArray *pdrgpulPos) const;
+							gpos::Ref<ULongPtrArray> colids,
+							gpos::Ref<ULongPtrArray> pdrgpulPos) const;
 
 	// Child partitions
 	gpos::Ref<IMdIdArray> m_partition_mdids = nullptr;

@@ -207,7 +207,7 @@ CTranslatorDXLToExpr::~CTranslatorDXLToExpr()
 // 		Return the array of query output column reference id
 //
 //---------------------------------------------------------------------------
-ULongPtrArray *
+gpos::Ref<ULongPtrArray>
 CTranslatorDXLToExpr::PdrgpulOutputColRefs()
 {
 	GPOS_ASSERT(nullptr != m_pdrgpulOutputColRefs);
@@ -371,7 +371,7 @@ CTranslatorDXLToExpr::PexprTranslateQuery(
 gpos::Ref<CExpression>
 CTranslatorDXLToExpr::PexprTranslateScalar(const gpos::Ref<CDXLNode> dxlnode,
 										   CColRefArray *colref_array,
-										   ULongPtrArray *pdrgpul)
+										   gpos::Ref<ULongPtrArray> pdrgpul)
 {
 	GPOS_ASSERT_IMP(nullptr != pdrgpul, nullptr != colref_array);
 	GPOS_ASSERT_IMP(nullptr != pdrgpul,
@@ -854,7 +854,7 @@ CTranslatorDXLToExpr::BuildSetOpChild(
 	// translate child
 	*ppexprChild = PexprLogical(child_dxlnode);
 
-	const ULongPtrArray *pdrgpulInput =
+	const gpos::Ref<ULongPtrArray> pdrgpulInput =
 		dxl_op->GetInputColIdArrayAt(child_index);
 	const ULONG ulInputCols = pdrgpulInput->Size();
 	gpos::Ref<CColRefSet> pcrsChildOutput =
@@ -947,7 +947,7 @@ CTranslatorDXLToExpr::BuildSetOpChild(
 gpos::Ref<CExpressionArray>
 CTranslatorDXLToExpr::PdrgpexprPreprocessSetOpInputs(
 	const gpos::Ref<CDXLNode> dxlnode, CColRef2dArray *pdrgdrgpcrInput,
-	ULongPtrArray *pdrgpulOutput)
+	gpos::Ref<ULongPtrArray> pdrgpulOutput)
 {
 	GPOS_ASSERT(nullptr != dxlnode);
 	GPOS_ASSERT(nullptr != pdrgdrgpcrInput);
@@ -1282,7 +1282,8 @@ CTranslatorDXLToExpr::PexprLogicalCTEProducer(const gpos::Ref<CDXLNode> dxlnode)
 	gpos::Ref<CColRefSet> pcrsProducer = GPOS_NEW(m_mp) CColRefSet(m_mp);
 	gpos::Ref<CColRefArray> colref_array = GPOS_NEW(m_mp) CColRefArray(m_mp);
 
-	ULongPtrArray *pdrgpulCols = pdxlopCTEProducer->GetOutputColIdsArray();
+	gpos::Ref<ULongPtrArray> pdrgpulCols =
+		pdxlopCTEProducer->GetOutputColIdsArray();
 	const ULONG length = pdrgpulCols->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -1347,7 +1348,8 @@ CTranslatorDXLToExpr::PexprLogicalCTEConsumer(const gpos::Ref<CDXLNode> dxlnode)
 		gpos::dyn_cast<CDXLLogicalCTEConsumer>(dxlnode->GetOperator());
 	ULONG id = UlMapCTEId(pdxlopCTEConsumer->Id());
 
-	ULongPtrArray *pdrgpulCols = pdxlopCTEConsumer->GetOutputColIdsArray();
+	gpos::Ref<ULongPtrArray> pdrgpulCols =
+		pdxlopCTEConsumer->GetOutputColIdsArray();
 
 	// create new col refs
 	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
@@ -1425,7 +1427,8 @@ CTranslatorDXLToExpr::PexprLogicalInsert(const gpos::Ref<CDXLNode> dxlnode)
 	gpos::Ref<CTableDescriptor> ptabdesc =
 		Ptabdesc(pdxlopInsert->GetDXLTableDescr());
 
-	ULongPtrArray *pdrgpulSourceCols = pdxlopInsert->GetSrcColIdsArray();
+	gpos::Ref<ULongPtrArray> pdrgpulSourceCols =
+		pdxlopInsert->GetSrcColIdsArray();
 	gpos::Ref<CColRefArray> colref_array = CTranslatorDXLToExprUtils::Pdrgpcr(
 		m_mp, m_phmulcr.get(), pdrgpulSourceCols);
 
@@ -1470,7 +1473,8 @@ CTranslatorDXLToExpr::PexprLogicalDelete(const gpos::Ref<CDXLNode> dxlnode)
 	CColRef *pcrCtid = LookupColRef(m_phmulcr.get(), ctid_colid);
 	CColRef *pcrSegmentId = LookupColRef(m_phmulcr.get(), segid_colid);
 
-	ULongPtrArray *pdrgpulCols = pdxlopDelete->GetDeletionColIdArray();
+	gpos::Ref<ULongPtrArray> pdrgpulCols =
+		pdxlopDelete->GetDeletionColIdArray();
 	gpos::Ref<CColRefArray> colref_array =
 		CTranslatorDXLToExprUtils::Pdrgpcr(m_mp, m_phmulcr.get(), pdrgpulCols);
 
@@ -1516,11 +1520,13 @@ CTranslatorDXLToExpr::PexprLogicalUpdate(const gpos::Ref<CDXLNode> dxlnode)
 	CColRef *pcrCtid = LookupColRef(m_phmulcr.get(), ctid_colid);
 	CColRef *pcrSegmentId = LookupColRef(m_phmulcr.get(), segid_colid);
 
-	ULongPtrArray *pdrgpulInsertCols = pdxlopUpdate->GetInsertionColIdArray();
+	gpos::Ref<ULongPtrArray> pdrgpulInsertCols =
+		pdxlopUpdate->GetInsertionColIdArray();
 	gpos::Ref<CColRefArray> pdrgpcrInsert = CTranslatorDXLToExprUtils::Pdrgpcr(
 		m_mp, m_phmulcr.get(), pdrgpulInsertCols);
 
-	ULongPtrArray *pdrgpulDeleteCols = pdxlopUpdate->GetDeletionColIdArray();
+	gpos::Ref<ULongPtrArray> pdrgpulDeleteCols =
+		pdxlopUpdate->GetDeletionColIdArray();
 	gpos::Ref<CColRefArray> pdrgpcrDelete = CTranslatorDXLToExprUtils::Pdrgpcr(
 		m_mp, m_phmulcr.get(), pdrgpulDeleteCols);
 
@@ -1554,7 +1560,8 @@ CTranslatorDXLToExpr::PexprLogicalCTAS(const gpos::Ref<CDXLNode> dxlnode)
 	RegisterMDRelationCtas(pdxlopCTAS);
 	gpos::Ref<CTableDescriptor> ptabdesc = PtabdescFromCTAS(pdxlopCTAS);
 
-	ULongPtrArray *pdrgpulSourceCols = pdxlopCTAS->GetSrcColidsArray();
+	gpos::Ref<ULongPtrArray> pdrgpulSourceCols =
+		pdxlopCTAS->GetSrcColidsArray();
 	gpos::Ref<CColRefArray> colref_array = CTranslatorDXLToExprUtils::Pdrgpcr(
 		m_mp, m_phmulcr.get(), pdrgpulSourceCols);
 
@@ -1882,7 +1889,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const gpos::Ref<CDXLNode> dxlnode)
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefArray>
 CTranslatorDXLToExpr::PdrgpcrPartitionByCol(
-	const ULongPtrArray *partition_by_colid_array)
+	const gpos::Ref<ULongPtrArray> partition_by_colid_array)
 {
 	const ULONG size = partition_by_colid_array->Size();
 	gpos::Ref<CColRefArray> colref_array = GPOS_NEW(m_mp) CColRefArray(m_mp);

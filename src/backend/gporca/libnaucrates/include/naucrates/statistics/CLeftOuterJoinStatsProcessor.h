@@ -30,7 +30,7 @@ private:
 	// helper method to add histograms of the inner side of a LOJ
 	static void AddHistogramsLOJInner(
 		CMemoryPool *mp, const gpos::Ref<CStatistics> inner_join_stats,
-		ULongPtrArray *inner_colids_with_stats, CDouble num_rows_LASJ,
+		gpos::Ref<ULongPtrArray> inner_colids_with_stats, CDouble num_rows_LASJ,
 		CDouble num_rows_inner_join,
 		gpos::Ref<UlongToHistogramMap> LOJ_histograms);
 

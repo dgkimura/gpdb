@@ -257,8 +257,8 @@ public:
 	// derive statistics
 	static gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
-		CColRefArray *pdrgpcrGroupingCols, ULongPtrArray *pdrgpulComputedCols,
-		gpos::Ref<CBitSet> keys);
+		CColRefArray *pdrgpcrGroupingCols,
+		gpos::Ref<ULongPtrArray> pdrgpulComputedCols, gpos::Ref<CBitSet> keys);
 
 	// print group by aggregate type
 	static IOstream &OsPrintGbAggType(IOstream &os,

@@ -49,7 +49,8 @@ private:
 	// distribution columns (empty for master only tables)
 	gpos::Ref<CColRefSet> m_pcrsDist;
 
-	void CreatePartCols(CMemoryPool *mp, const ULongPtrArray *pdrgpulPart);
+	void CreatePartCols(CMemoryPool *mp,
+						const gpos::Ref<ULongPtrArray> pdrgpulPart);
 
 	// private copy ctor
 	CLogicalGet(const CLogicalGet &);

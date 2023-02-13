@@ -145,7 +145,8 @@ public:
 
 	// load information from CTE columns
 	void LoadCTEColumns(ULONG query_level, ULONG RTE_index,
-						const ULongPtrArray *pdrgpulCTE, List *target_list);
+						const gpos::Ref<ULongPtrArray> pdrgpulCTE,
+						List *target_list);
 
 	// load up mapping information from scalar projection list
 	void LoadProjectElements(ULONG query_level, ULONG RTE_index,
@@ -162,8 +163,9 @@ public:
 	CMappingVarColId *CopyMapColId(ULONG query_level) const;
 
 	// create a copy of the mapping replacing old col ids with new ones
-	CMappingVarColId *CopyRemapColId(CMemoryPool *mp, ULongPtrArray *old_colids,
-									 ULongPtrArray *new_colids) const;
+	CMappingVarColId *CopyRemapColId(CMemoryPool *mp,
+									 gpos::Ref<ULongPtrArray> old_colids,
+									 gpos::Ref<ULongPtrArray> new_colids) const;
 };
 }  // namespace gpdxl
 

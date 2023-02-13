@@ -42,10 +42,10 @@ private:
 	ULONG m_segid_colid;
 
 	// delete col ids
-	ULongPtrArray *m_deletion_colid_array;
+	gpos::Ref<ULongPtrArray> m_deletion_colid_array;
 
 	// insert col ids
-	ULongPtrArray *m_insert_colid_array;
+	gpos::Ref<ULongPtrArray> m_insert_colid_array;
 
 	// process the start of an element
 	void StartElement(

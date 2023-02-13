@@ -113,7 +113,7 @@ public:
 	}
 
 	// column array of the input at a given position
-	const ULongPtrArray *
+	const gpos::Ref<ULongPtrArray>
 	GetInputColIdArrayAt(ULONG idx) const
 	{
 		GPOS_ASSERT(idx < ChildCount());

@@ -117,7 +117,8 @@ public:
 	}
 
 	// boolean expression evaluation
-	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
+	EBoolEvalResult Eber(
+		gpos::Ref<ULongPtrArray> pdrgpulChildren) const override;
 
 	// decide boolean operator commutativity
 	static BOOL FCommutative(EBoolOperator eboolop);
