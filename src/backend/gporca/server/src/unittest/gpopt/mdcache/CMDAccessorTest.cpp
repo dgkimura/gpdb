@@ -160,7 +160,7 @@ CMDAccessorTest::EresUnittest_Basic()
 
 	// access types by type info
 #ifdef GPOS_DEBUG
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 #endif
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
@@ -234,7 +234,7 @@ CMDAccessorTest::EresUnittest_Datum()
 					 CTestUtils::GetCostModel(mp));
 
 	// create an INT4 datum
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 	gpos::Ref<IDatumInt4> pdatumInt4 =
 		pmdtypeint4->CreateInt4Datum(mp, 5, false /* is_null */);
@@ -248,7 +248,7 @@ CMDAccessorTest::EresUnittest_Datum()
 	GPOS_ASSERT(false == pdatumBool->GetValue());
 
 	// create an OID datum
-	const IMDTypeOid *pmdtypeoid =
+	const gpos::Ref<IMDTypeOi> pmdtypeoid =
 		mda.PtMDType<IMDTypeOid>(CTestUtils::m_sysidDefault);
 	gpos::Ref<IDatumOid> pdatumOid =
 		pmdtypeoid->CreateOidDatum(mp, 20, false /* is_null */);

@@ -53,7 +53,7 @@ CConstExprEvaluatorDXLTest::CDummyConstDXLNodeEvaluator::EvaluateExpr(
 	const gpdxl::gpos::Ref<CDXLNode> /*pdxlnExpr*/
 )
 {
-	const IMDTypeInt4 *pmdtypeint4 = m_pmda->PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = m_pmda->PtMDType<IMDTypeInt4>();
 	;
 
 	gpos::Ref<CDXLDatumInt4> dxl_datum = GPOS_NEW(m_mp) CDXLDatumInt4(
@@ -174,7 +174,8 @@ CConstExprEvaluatorDXLTest::EresUnittest_ScalarContainingVariables()
 	gpos::Ref<CConstExprEvaluatorDXL> pceeval =
 		GPOS_NEW(mp) CConstExprEvaluatorDXL(mp, testsetup.Pmda(), &consteval);
 
-	const IMDTypeInt4 *pmdtypeint4 = testsetup.Pmda()->PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
+		testsetup.Pmda()->PtMDType<IMDTypeInt4>();
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 	CColRef *pcrComputed =
 		col_factory->PcrCreate(pmdtypeint4, default_type_modifier);

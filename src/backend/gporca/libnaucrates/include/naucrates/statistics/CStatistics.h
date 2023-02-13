@@ -40,14 +40,22 @@ using namespace gpopt;
 
 // hash maps ULONG -> array of ULONGs
 using UlongToUlongPtrArrayMap =
-	CHashMap<ULONG, ULongPtrArray, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<ULongPtrArray>>;
+	//CHashMap<ULONG, ULongPtrArray, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	//		 CleanupDelete<ULONG>, CleanupRelease<ULongPtrArray>>;
+	gpos::UnorderedMap<const ULONG *, gpos::Ref<ULongPtrArray>,
+					   gpos::PtrHash<ULONG, gpos::HashValue<ULONG>>,
+					   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
+
 
 // iterator
 using UlongToUlongPtrArrayMapIter =
-	CHashMapIter<ULONG, ULongPtrArray, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<ULongPtrArray>>;
+	//CHashMapIter<ULONG, ULongPtrArray, gpos::HashValue<ULONG>,
+	//			 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+	//			 CleanupRelease<ULongPtrArray>>;
+	gpos::UnorderedMap<
+		const ULONG *, gpos::Ref<ULongPtrArray>,
+		gpos::PtrHash<ULONG, gpos::HashValue<ULONG>>,
+		gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 //---------------------------------------------------------------------------
 //	@class:

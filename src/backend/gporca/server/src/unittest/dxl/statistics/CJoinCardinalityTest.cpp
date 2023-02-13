@@ -214,7 +214,7 @@ CJoinCardinalityTest::EresUnittest_Join()
 	};
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		COptCtxt::PoctxtFromTLS()->Pmda()->PtMDType<IMDTypeInt4>();
 
 	gpos::Ref<ULongPtrArray> cols = GPOS_NEW(mp) ULongPtrArray(mp);

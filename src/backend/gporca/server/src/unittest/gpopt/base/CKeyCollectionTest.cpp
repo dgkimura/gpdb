@@ -77,7 +77,7 @@ CKeyCollectionTest::EresUnittest_Basics()
 	// create test set
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	gpos::Ref<CKeyCollection> pkc = GPOS_NEW(mp) CKeyCollection(mp);
 
@@ -136,7 +136,7 @@ CKeyCollectionTest::EresUnittest_Subsumes()
 	// create test set
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	gpos::Ref<CKeyCollection> pkc = GPOS_NEW(mp) CKeyCollection(mp);
 

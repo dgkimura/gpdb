@@ -311,7 +311,7 @@ CStatisticsTest::PhistExampleInt4Dim(CMemoryPool *mp)
 gpos::Ref<CTableDescriptor>
 CStatisticsTest::PtabdescTwoColumnSource(CMemoryPool *mp,
 										 const CName &nameTable,
-										 const IMDTypeInt4 *pmdtype,
+										 const gpos::Ref<IMDTypeInt4> pmdtype,
 										 const CWStringConst &strColA,
 										 const CWStringConst &strColB)
 {
@@ -383,7 +383,7 @@ CStatisticsTest::EresUnittest_CStatisticsBasic()
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		COptCtxt::PoctxtFromTLS()->Pmda()->PtMDType<IMDTypeInt4>();
 
 	CWStringConst strRelAlias(GPOS_WSZ_LIT("Rel1"));

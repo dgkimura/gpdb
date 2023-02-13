@@ -75,7 +75,8 @@ CTranslatorExprToDXLUtils::PdxlnInt4Const(CMemoryPool *mp,
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	const IMDTypeInt4 *pmdtypeint4 = md_accessor->PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
+		md_accessor->PtMDType<IMDTypeInt4>();
 	;
 
 	gpos::Ref<CDXLDatumInt4> dxl_datum = GPOS_NEW(mp)
@@ -755,7 +756,8 @@ CTranslatorExprToDXLUtils::PdxlnPrLPartitionSelector(
 		// add to it the Oid column
 		if (nullptr == pcrOid)
 		{
-			const IMDTypeOid *pmdtype = md_accessor->PtMDType<IMDTypeOid>();
+			const gpos::Ref<IMDTypeOi> pmdtype =
+				md_accessor->PtMDType<IMDTypeOid>();
 			pcrOid = col_factory->PcrCreate(pmdtype, default_type_modifier);
 		}
 

@@ -70,7 +70,7 @@ CColumnDescriptorTest::EresUnittest_Basic()
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
 	CWStringConst strName(GPOS_WSZ_LIT("column desc test"));

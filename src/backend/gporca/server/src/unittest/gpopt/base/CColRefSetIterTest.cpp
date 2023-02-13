@@ -75,7 +75,7 @@ CColRefSetIterTest::EresUnittest_Basics()
 	CName name(&strName);
 
 	// create a int4 datum
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 
 	ULONG num_cols = 10;

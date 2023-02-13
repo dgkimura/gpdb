@@ -70,7 +70,7 @@ COrderSpecTest::EresUnittest_Basics()
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
 	CColRef *pcr1 =

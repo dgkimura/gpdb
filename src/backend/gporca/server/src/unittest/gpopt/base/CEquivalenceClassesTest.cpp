@@ -58,7 +58,7 @@ CEquivalenceClassesTest::EresUnittest_NotDisjointEquivalanceClasses()
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	ULONG num_cols = 10;
 	for (ULONG i = 0; i < num_cols; i++)
@@ -130,7 +130,7 @@ CEquivalenceClassesTest::EresUnittest_IntersectEquivalanceClasses()
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	ULONG num_cols = 10;
 	for (ULONG i = 0; i < num_cols; i++)

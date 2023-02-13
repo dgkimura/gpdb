@@ -924,7 +924,8 @@ CXformUtils::SubqueryAnyToAgg(
 			CUtils::PexprScalarEqCmp(mp, pcrCount, pcrSum);
 
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		const IMDTypeInt8 *pmdtypeint8 = md_accessor->PtMDType<IMDTypeInt8>();
+		const gpos::Ref<IMDTypeInt8> pmdtypeint8 =
+			md_accessor->PtMDType<IMDTypeInt8>();
 		gpos::Ref<IMDId> pmdidInt8 = pmdtypeint8->MDId();
 		;
 		;
@@ -1023,7 +1024,8 @@ CXformUtils::SubqueryAllToAgg(
 	gpos::Ref<CExpression> pexprSubqPred = PexprInversePred(mp, pexprSubquery);
 
 	// generate subquery test expression
-	const IMDTypeInt4 *pmdtypeint4 = md_accessor->PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
+		md_accessor->PtMDType<IMDTypeInt4>();
 	gpos::Ref<IMDId> pmdidInt4 = pmdtypeint4->MDId();
 	;
 	gpos::Ref<CExpression> pexprSubqTest = GPOS_NEW(mp) CExpression(
@@ -1306,7 +1308,8 @@ CXformUtils::PexprNullIndicator(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 
 	gpos::Ref<CExpression> pexprIsNull =
 		CUtils::PexprIsNull(mp, std::move(pexpr));
-	const IMDTypeInt4 *pmdtypeint4 = md_accessor->PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
+		md_accessor->PtMDType<IMDTypeInt4>();
 	gpos::Ref<IMDId> mdid = pmdtypeint4->MDId();
 	;
 	return GPOS_NEW(mp) CExpression(
@@ -1337,7 +1340,7 @@ CXformUtils::PexprLogicalPartitionSelector(CMemoryPool *mp,
 	// create an oid column
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDTypeOid *pmdtype = md_accessor->PtMDType<IMDTypeOid>();
+	const gpos::Ref<IMDTypeOi> pmdtype = md_accessor->PtMDType<IMDTypeOid>();
 	CColRef *pcrOid = col_factory->PcrCreate(pmdtype, default_type_modifier);
 	gpos::Ref<CExpressionArray> pdrgpexprFilters =
 		PdrgpexprPartEqFilters(mp, ptabdesc, colref_array);

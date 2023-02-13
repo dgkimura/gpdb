@@ -771,7 +771,8 @@ CSubqueryHandler::FCreateOuterApplyForScalarSubquery(
 		(fHasCountAggMatchingColumn && 0 == pgbAgg->Pdrgpcr()->Size()))
 	{
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		const IMDTypeInt8 *pmdtypeint8 = md_accessor->PtMDType<IMDTypeInt8>();
+		const gpos::Ref<IMDTypeInt8> pmdtypeint8 =
+			md_accessor->PtMDType<IMDTypeInt8>();
 		gpos::Ref<IMDId> pmdidInt8 = pmdtypeint8->MDId();
 		;
 		gpos::Ref<CExpression> pexprCoalesce = GPOS_NEW(mp)

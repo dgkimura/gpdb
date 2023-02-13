@@ -215,7 +215,7 @@ CTestUtils::PtabdescPlainWithColNameFormat(
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		md_accessor->PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 	CWStringDynamic *str_name = GPOS_NEW(mp) CWStringDynamic(mp);
 	gpos::Ref<CTableDescriptor> ptabdesc = GPOS_NEW(mp) CTableDescriptor(
@@ -1746,7 +1746,7 @@ CTestUtils::PexprConstTableGet(CMemoryPool *mp, ULONG ulElements)
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		md_accessor->PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
 	// create an integer column descriptor
@@ -2078,7 +2078,7 @@ CTestUtils::PexprLogicalTVF(CMemoryPool *mp, ULONG ulArgs)
 	gpos::Ref<IMDId> mdid = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT8_GENERATE_SERIES);
 	CWStringConst *str_func_name = GPOS_NEW(mp) CWStringConst(mp, wszFuncName);
 
-	const IMDTypeInt8 *pmdtypeint8 =
+	const gpos::Ref<IMDTypeInt8> pmdtypeint8 =
 		md_accessor->PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 
 	// create an integer column descriptor

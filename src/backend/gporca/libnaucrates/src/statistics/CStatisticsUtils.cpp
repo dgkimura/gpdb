@@ -83,30 +83,26 @@ CStatisticsUtils::NextPoint(CMemoryPool *mp, CMDAccessor *md_accessor,
 		{
 			SINT sValue =
 				(SINT)(gpos::dyn_cast<IDatumInt2>(datum_old)->Value() + 1);
-			datum_new =
-				dynamic_cast<const IMDTypeInt2 *>(mdtype)->CreateInt2Datum(
-					mp, sValue, false);
+			datum_new = gpos::dyn_cast<IMDTypeInt2>(mdtype)->CreateInt2Datum(
+				mp, sValue, false);
 		}
 		else if (mdtype->GetDatumType() == IMDType::EtiInt4)
 		{
 			INT iValue = gpos::dyn_cast<IDatumInt4>(datum_old)->Value() + 1;
-			datum_new =
-				dynamic_cast<const IMDTypeInt4 *>(mdtype)->CreateInt4Datum(
-					mp, iValue, false);
+			datum_new = gpos::dyn_cast<IMDTypeInt4>(mdtype)->CreateInt4Datum(
+				mp, iValue, false);
 		}
 		else if (mdtype->GetDatumType() == IMDType::EtiInt8)
 		{
 			LINT value = gpos::dyn_cast<IDatumInt8>(datum_old)->Value() + 1;
-			datum_new =
-				dynamic_cast<const IMDTypeInt8 *>(mdtype)->CreateInt8Datum(
-					mp, value, false);
+			datum_new = gpos::dyn_cast<IMDTypeInt8>(mdtype)->CreateInt8Datum(
+				mp, value, false);
 		}
 		else
 		{
 			OID oidValue = gpos::dyn_cast<IDatumOid>(datum_old)->OidValue() + 1;
-			datum_new =
-				dynamic_cast<const IMDTypeOid *>(mdtype)->CreateOidDatum(
-					mp, oidValue, false);
+			datum_new = gpos::dyn_cast<IMDTypeOid>(mdtype)->CreateOidDatum(
+				mp, oidValue, false);
 		}
 
 		return GPOS_NEW(mp) CPoint(std::move(datum_new));
@@ -1321,8 +1317,7 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 			}
 			else
 			{
-				(const_cast<gpos::Ref<ULongPtrArray> >(ndv_colid))
-					->Append(GPOS_NEW(mp) ULONG(colid));
+				ndv_colid->Append(GPOS_NEW(mp) ULONG(colid));
 			}
 		}
 	}
@@ -1341,8 +1336,8 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 void
 CStatisticsUtils::AddNdvForAllGrpCols(
 	CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
-	const ULongPtrArray
-		*grouping_columns,	   // array of grouping column ids from a source
+	const gpos::Ref<ULongPtrArray>
+		grouping_columns,	   // array of grouping column ids from a source
 	CDoubleArray *output_ndvs  // output array of ndvs
 )
 {
@@ -1395,8 +1390,7 @@ CStatisticsUtils::ExtractNDVForGrpCols(
 	GPOS_ASSERT(nullptr != stats);
 	GPOS_ASSERT(nullptr != grp_cols_refset);
 
-	gpos::Ref<CStatistics> input_stats =
-		gpos::dyn_cast<CStatistics>(const_cast<gpos::Ref<IStatistics> >(stats));
+	gpos::Ref<CStatistics> input_stats = gpos::dyn_cast<CStatistics>(stats);
 
 	gpos::Ref<CDoubleArray> ndvs = GPOS_NEW(mp) CDoubleArray(mp);
 
@@ -1844,7 +1838,7 @@ CStatisticsUtils::AddWidthInfo(CMemoryPool *mp,
 							   gpos::Ref<UlongToDoubleMap> src_width,
 							   gpos::Ref<UlongToDoubleMap> dest_width)
 {
-	UlongToDoubleMapIter col_width_map_iterator(src_width);
+	UlongToDoubleMapIter col_width_map_iterator(src_width.get());
 	while (col_width_map_iterator.Advance())
 	{
 		ULONG colid = *(col_width_map_iterator.Key());

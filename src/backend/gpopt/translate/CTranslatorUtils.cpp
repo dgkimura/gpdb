@@ -1609,7 +1609,8 @@ CTranslatorUtils::CreateDXLProjElemFromInt8Const(CMemoryPool *mp,
 												 INT val)
 {
 	GPOS_ASSERT(nullptr != mp);
-	const IMDTypeInt8 *md_type_int8 = md_accessor->PtMDType<IMDTypeInt8>();
+	const gpos::Ref<IMDTypeInt8> md_type_int8 =
+		md_accessor->PtMDType<IMDTypeInt8>();
 	;
 
 	gpos::Ref<CDXLDatumInt8> datum_dxl = GPOS_NEW(mp)

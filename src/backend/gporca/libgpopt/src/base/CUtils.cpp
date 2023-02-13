@@ -1720,7 +1720,8 @@ CUtils::PexprScalarConstInt4(CMemoryPool *mp, INT val)
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// create a int4 datum
-	const IMDTypeInt4 *pmdtypeint4 = md_accessor->PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
+		md_accessor->PtMDType<IMDTypeInt4>();
 	gpos::Ref<IDatumInt4> datum = pmdtypeint4->CreateInt4Datum(mp, val, false);
 
 	gpos::Ref<CExpression> pexpr = GPOS_NEW(mp) CExpression(
@@ -1737,7 +1738,8 @@ CUtils::PexprScalarConstInt8(CMemoryPool *mp, LINT val, BOOL is_null)
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// create a int8 datum
-	const IMDTypeInt8 *pmdtypeint8 = md_accessor->PtMDType<IMDTypeInt8>();
+	const gpos::Ref<IMDTypeInt8> pmdtypeint8 =
+		md_accessor->PtMDType<IMDTypeInt8>();
 	gpos::Ref<IDatumInt8> datum =
 		pmdtypeint8->CreateInt8Datum(mp, val, is_null);
 
@@ -1755,7 +1757,7 @@ CUtils::PexprScalarConstOid(CMemoryPool *mp, OID oid_val)
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// create a oid datum
-	const IMDTypeOid *pmdtype = md_accessor->PtMDType<IMDTypeOid>();
+	const gpos::Ref<IMDTypeOi> pmdtype = md_accessor->PtMDType<IMDTypeOid>();
 	gpos::Ref<IDatumOid> datum =
 		pmdtype->CreateOidDatum(mp, oid_val, false /*is_null*/);
 
@@ -1779,24 +1781,24 @@ CUtils::PexprScalarConstNull(CMemoryPool *mp, const IMDType *typ,
 	{
 		case IMDType::EtiInt2:
 		{
-			const IMDTypeInt2 *pmdtypeint2 =
-				static_cast<const IMDTypeInt2 *>(typ);
+			const gpos::Ref<IMDTypeInt2> pmdtypeint2 =
+				static_cast<const gpos::Ref<IMDTypeInt2> >(typ);
 			datum = pmdtypeint2->CreateInt2Datum(mp, 0, true);
 		}
 		break;
 
 		case IMDType::EtiInt4:
 		{
-			const IMDTypeInt4 *pmdtypeint4 =
-				static_cast<const IMDTypeInt4 *>(typ);
+			const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
+				static_cast<const gpos::Ref<IMDTypeInt4> >(typ);
 			datum = pmdtypeint4->CreateInt4Datum(mp, 0, true);
 		}
 		break;
 
 		case IMDType::EtiInt8:
 		{
-			const IMDTypeInt8 *pmdtypeint8 =
-				static_cast<const IMDTypeInt8 *>(typ);
+			const gpos::Ref<IMDTypeInt8> pmdtypeint8 =
+				static_cast<const gpos::Ref<IMDTypeInt8> >(typ);
 			datum = pmdtypeint8->CreateInt8Datum(mp, 0, true);
 		}
 		break;
@@ -1811,7 +1813,8 @@ CUtils::PexprScalarConstNull(CMemoryPool *mp, const IMDType *typ,
 
 		case IMDType::EtiOid:
 		{
-			const IMDTypeOid *pmdtypeoid = static_cast<const IMDTypeOid *>(typ);
+			const gpos::Ref<IMDTypeOi> pmdtypeoid =
+				static_cast<const gpos::Ref<IMDTypeOi> >(typ);
 			datum = pmdtypeoid->CreateOidDatum(mp, 0, true);
 		}
 		break;

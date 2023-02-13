@@ -237,7 +237,7 @@ class GetBuilder
 	CMemoryPool *m_mp;
 	gpos::Ref<CTableDescriptor> m_ptabdesc;
 	CWStringConst m_strTableName;
-	const IMDTypeInt4 *m_pmdtypeint4;
+	const gpos::Ref<IMDTypeInt4> m_pmdtypeint4;
 
 public:
 	GetBuilder(CMemoryPool *mp, CWStringConst strTableName, OID oidTableOid)

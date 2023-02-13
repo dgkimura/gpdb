@@ -66,7 +66,7 @@ CColumnFactoryTest::EresUnittest_Basic()
 	CMDAccessor mda(mp, CMDCache::Pcache());
 	mda.RegisterProvider(CTestUtils::m_sysidDefault, std::move(pmdp));
 
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	CColumnFactory cf;
 

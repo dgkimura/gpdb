@@ -136,8 +136,9 @@ CConstraintTest::EresUnittest_CInterval()
 					 CTestUtils::GetCostModel(mp));
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	IMDTypeInt8 *pmdtypeint8 =
-		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
+	gpos::Ref<IMDTypeInt8> pmdtypeint8 =
+		(gpos::Ref<IMDTypeInt8>) mda.PtMDType<IMDTypeInt8>(
+			CTestUtils::m_sysidDefault);
 	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
@@ -239,8 +240,9 @@ CConstraintTest::EresUnittest_CConjunction()
 					 CTestUtils::GetCostModel(mp));
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	IMDTypeInt8 *pmdtypeint8 =
-		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
+	gpos::Ref<IMDTypeInt8> pmdtypeint8 =
+		(gpos::Ref<IMDTypeInt8>) mda.PtMDType<IMDTypeInt8>(
+			CTestUtils::m_sysidDefault);
 	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet1 = CTestUtils::PexprLogicalGet(mp);
@@ -374,8 +376,9 @@ CConstraintTest::EresUnittest_CDisjunction()
 					 CTestUtils::GetCostModel(mp));
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	IMDTypeInt8 *pmdtypeint8 =
-		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
+	gpos::Ref<IMDTypeInt8> pmdtypeint8 =
+		(gpos::Ref<IMDTypeInt8>) mda.PtMDType<IMDTypeInt8>(
+			CTestUtils::m_sysidDefault);
 	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet1 = CTestUtils::PexprLogicalGet(mp);
@@ -454,8 +457,9 @@ CConstraintTest::EresUnittest_CNegation()
 					 CTestUtils::GetCostModel(mp));
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	IMDTypeInt8 *pmdtypeint8 =
-		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
+	gpos::Ref<IMDTypeInt8> pmdtypeint8 =
+		(gpos::Ref<IMDTypeInt8>) mda.PtMDType<IMDTypeInt8>(
+			CTestUtils::m_sysidDefault);
 	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
@@ -670,8 +674,9 @@ CConstraintTest::EresUnittest_CConstraintIntervalConvertsTo()
 		{CRange::EriIncluded, 0, CRange::EriIncluded, 0}};
 
 	// metadata id
-	IMDTypeInt8 *pmdtypeint8 =
-		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
+	gpos::Ref<IMDTypeInt8> pmdtypeint8 =
+		(gpos::Ref<IMDTypeInt8>) mda.PtMDType<IMDTypeInt8>(
+			CTestUtils::m_sysidDefault);
 	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	// get a column ref
@@ -741,8 +746,9 @@ CConstraintTest::EresUnittest_CConstraintIntervalPexpr()
 		{CRange::EriIncluded, 0, CRange::EriIncluded, 0}};
 
 	// metadata id
-	IMDTypeInt8 *pmdtypeint8 =
-		(IMDTypeInt8 *) mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
+	gpos::Ref<IMDTypeInt8> pmdtypeint8 =
+		(gpos::Ref<IMDTypeInt8>) mda.PtMDType<IMDTypeInt8>(
+			CTestUtils::m_sysidDefault);
 	gpos::Ref<IMDId> mdid = pmdtypeint8->MDId();
 
 	// get a column ref
@@ -1002,7 +1008,7 @@ EresUnittest_CConstraintIntervalFromArrayExprIncludesNull()
 
 	gpos::Ref<CExpression> pexprArrayChild = (*(*pexprIn)[1])[1];
 	// create a int4 datum
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 	gpos::Ref<IDatumInt4> pdatumNull =
 		pmdtypeint4->CreateInt4Datum(mp, 0, true);
 
@@ -1138,7 +1144,8 @@ CConstraintTest::PexprScalarCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 {
 	gpos::Ref<CExpression> pexprConst = CUtils::PexprScalarConstInt8(mp, val);
 
-	const IMDTypeInt8 *pmdtypeint8 = md_accessor->PtMDType<IMDTypeInt8>();
+	const gpos::Ref<IMDTypeInt8> pmdtypeint8 =
+		md_accessor->PtMDType<IMDTypeInt8>();
 	gpos::Ref<IMDId> mdid_op = pmdtypeint8->GetMdidForCmpType(cmp_type);
 	;
 

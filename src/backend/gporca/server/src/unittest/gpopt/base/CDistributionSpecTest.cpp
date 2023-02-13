@@ -401,7 +401,7 @@ CDistributionSpecTest::EresUnittest_Hashed()
 	CName nameA(&strA);
 	CName nameB(&strB);
 
-	const IMDTypeInt4 *pmdtypeint4 =
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
 	CColRef *pcrA =

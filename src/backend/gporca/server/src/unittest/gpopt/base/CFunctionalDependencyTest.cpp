@@ -67,7 +67,7 @@ CFunctionalDependencyTest::EresUnittest_Basics()
 	CWStringConst strName(GPOS_WSZ_LIT("Test Column"));
 	CName name(&strName);
 
-	const IMDTypeInt4 *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
 	const ULONG num_cols = 3;
 	gpos::Ref<CColRefSet> pcrsLeft = GPOS_NEW(mp) CColRefSet(mp);
