@@ -110,7 +110,8 @@ CPhysicalFilter::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysicalFilter::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CDistributionSpec *pdsRequired, ULONG child_index,
+							 gpos::Ref<CDistributionSpec> pdsRequired,
+							 ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG ulOptReq) const
 {
@@ -220,9 +221,9 @@ CPhysicalFilter::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		gpos::Ref<CExpression> pexprFilterPred =
 			exprhdl.PexprScalarExactChild(1, true /*error_on_null_return*/);
 
-		CDistributionSpecHashed *pdshashedOriginal =
+		gpos::Ref<CDistributionSpecHashed> pdshashedOriginal =
 			gpos::dyn_cast<CDistributionSpecHashed>(pdsChild);
-		CDistributionSpecHashed *pdshashedEquiv =
+		gpos::Ref<CDistributionSpecHashed> pdshashedEquiv =
 			pdshashedOriginal->PdshashedEquiv();
 
 		// If the child op is an IndexScan on multi-key distributed table, the
@@ -235,7 +236,7 @@ CPhysicalFilter::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		if (nullptr == pdshashedEquiv ||
 			!pdshashedOriginal->HasCompleteEquivSpec(mp))
 		{
-			CDistributionSpecHashed *pdshashed;
+			gpos::Ref<CDistributionSpecHashed> pdshashed;
 
 			// use the original preds if no equivalent spec exists
 			if (nullptr == pdshashedEquiv)
@@ -257,7 +258,8 @@ CPhysicalFilter::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 			gpos::Ref<CExpressionArray> pdrgpexprOriginal =
 				pdshashedOriginal->Pdrgpexpr();
 			;
-			IMdIdArray *opfamiliesOriginal = pdshashedOriginal->Opfamilies();
+			gpos::Ref<IMdIdArray> opfamiliesOriginal =
+				pdshashedOriginal->Opfamilies();
 			if (nullptr != opfamiliesOriginal)
 			{
 				;

@@ -79,7 +79,7 @@ CXformImplementDynamicBitmapTableGet::Transform(
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalDynamicBitmapTableGet *popLogical =
+	gpos::Ref<CLogicalDynamicBitmapTableGet> popLogical =
 		gpos::dyn_cast<CLogicalDynamicBitmapTableGet>(pexpr->Pop());
 
 	gpos::Ref<CTableDescriptor> ptabdesc = popLogical->Ptabdesc();

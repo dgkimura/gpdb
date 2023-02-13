@@ -107,12 +107,12 @@ CPhysicalCTEConsumer::PosRequired(CMemoryPool *,		// mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysicalCTEConsumer::PdsRequired(CMemoryPool *,		// mp,
-								  CExpressionHandle &,	// exprhdl,
-								  CDistributionSpec *,	// pdsRequired,
-								  ULONG,				//child_index
-								  CDrvdPropArray *,		// pdrgpdpCtxt
-								  ULONG					// ulOptReq
+CPhysicalCTEConsumer::PdsRequired(CMemoryPool *,				 // mp,
+								  CExpressionHandle &,			 // exprhdl,
+								  gpos::Ref<CDistributionSpec>,	 // pdsRequired,
+								  ULONG,						 //child_index
+								  CDrvdPropArray *,				 // pdrgpdpCtxt
+								  ULONG							 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalCTEConsumer has no relational children");
@@ -330,7 +330,7 @@ CPhysicalCTEConsumer::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalCTEConsumer *popCTEConsumer =
+	gpos::Ref<CPhysicalCTEConsumer> popCTEConsumer =
 		gpos::dyn_cast<CPhysicalCTEConsumer>(pop);
 
 	return m_id == popCTEConsumer->UlCTEId() &&

@@ -126,8 +126,8 @@ private:
 	// helper method to add width information where the column ids have been
 	// remapped
 	static void AddWidthInfoWithRemap(CMemoryPool *mp,
-									  UlongToDoubleMap *src_width,
-									  UlongToDoubleMap *dest_width,
+									  gpos::Ref<UlongToDoubleMap> src_width,
+									  gpos::Ref<UlongToDoubleMap> dest_width,
 									  UlongToColRefMap *colref_mapping,
 									  BOOL must_exist);
 
@@ -154,8 +154,8 @@ public:
 
 	virtual gpos::Ref<UlongToDoubleMap> CopyWidths(CMemoryPool *mp) const;
 
-	virtual void CopyWidthsInto(CMemoryPool *mp,
-								UlongToDoubleMap *colid_width_mapping) const;
+	virtual void CopyWidthsInto(
+		CMemoryPool *mp, gpos::Ref<UlongToDoubleMap> colid_width_mapping) const;
 
 	virtual gpos::Ref<UlongToHistogramMap> CopyHistograms(
 		CMemoryPool *mp) const;
@@ -232,12 +232,12 @@ public:
 	// inner join with another stats structure
 	gpos::Ref<IStatistics> CalcInnerJoinStats(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
-		CStatsPredJoinArray *join_preds_stats) const override;
+		CStatsPredJoinArray *join_preds_stats) override;
 
 	// LOJ with another stats structure
 	gpos::Ref<IStatistics> CalcLOJoinStats(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
-		CStatsPredJoinArray *join_preds_stats) const override;
+		CStatsPredJoinArray *join_preds_stats) override;
 
 	// left anti semi join with another stats structure
 	gpos::Ref<IStatistics> CalcLASJoinStats(
@@ -246,12 +246,12 @@ public:
 		BOOL
 			DoIgnoreLASJHistComputation	 // except for the case of LOJ cardinality estimation this flag is always
 		// "true" since LASJ stats computation is very aggressive
-	) const override;
+		) override;
 
 	// semi join stats computation
 	gpos::Ref<IStatistics> CalcLSJoinStats(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> inner_side_stats,
-		CStatsPredJoinArray *join_preds_stats) const override;
+		CStatsPredJoinArray *join_preds_stats) override;
 
 	// return required props associated with stats object
 	gpos::Ref<CReqdPropRelational> GetReqdRelationalProps(
@@ -270,11 +270,10 @@ public:
 	}
 
 	// copy stats
-	gpos::Ref<IStatistics> CopyStats(CMemoryPool *mp) const override;
+	gpos::Ref<IStatistics> CopyStats(CMemoryPool *mp) override;
 
 	// return a copy of this stats object scaled by a given factor
-	gpos::Ref<IStatistics> ScaleStats(CMemoryPool *mp,
-									  CDouble factor) const override;
+	gpos::Ref<IStatistics> ScaleStats(CMemoryPool *mp, CDouble factor) override;
 
 	// copy stats with remapped column id
 	gpos::Ref<IStatistics> CopyStatsWithRemap(CMemoryPool *mp,

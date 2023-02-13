@@ -68,7 +68,7 @@ CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 	{
 		ULONG id = *(hmulpdpiter.Key());
 		gpos::Ref<CDrvdPropPlan> pdpplan =
-			const_cast<CDrvdPropPlan *>(hmulpdpiter.Value());
+			const_cast<gpos::Ref<CDrvdPropPlan> >(hmulpdpiter.Value());
 		;
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
@@ -99,10 +99,10 @@ CDrvdPropCtxtPlan::AddProps(gpos::Ref<CDrvdProp> pdp)
 		return;
 	}
 
-	CDrvdPropPlan *pdpplan = gpos::dyn_cast<CDrvdPropPlan>(pdp);
+	gpos::Ref<CDrvdPropPlan> pdpplan = gpos::dyn_cast<CDrvdPropPlan>(pdp);
 
 	ULONG ulProducerId = gpos::ulong_max;
-	CDrvdPropPlan *pdpplanProducer =
+	gpos::Ref<CDrvdPropPlan> pdpplanProducer =
 		pdpplan->GetCostModel()->PdpplanProducer(&ulProducerId);
 	if (nullptr == pdpplanProducer)
 	{
@@ -135,8 +135,8 @@ CDrvdPropCtxtPlan::OsPrint(IOstream &os) const
 	while (hmulpdpiter.Advance())
 	{
 		ULONG id = *(hmulpdpiter.Key());
-		CDrvdPropPlan *pdpplan =
-			const_cast<CDrvdPropPlan *>(hmulpdpiter.Value());
+		gpos::Ref<CDrvdPropPlan> pdpplan =
+			const_cast<gpos::Ref<CDrvdPropPlan> >(hmulpdpiter.Value());
 
 		os << id << "-->" << *pdpplan << std::endl;
 	}
@@ -153,7 +153,7 @@ CDrvdPropCtxtPlan::OsPrint(IOstream &os) const
 //		Return the plan properties of cte producer with given id
 //
 //---------------------------------------------------------------------------
-CDrvdPropPlan *
+gpos::Ref<CDrvdPropPlan>
 CDrvdPropCtxtPlan::PdpplanCTEProducer(ULONG ulCTEId) const
 {
 	GPOS_ASSERT(nullptr != m_phmulpdpCTEs);
@@ -171,7 +171,8 @@ CDrvdPropCtxtPlan::PdpplanCTEProducer(ULONG ulCTEId) const
 //
 //---------------------------------------------------------------------------
 void
-CDrvdPropCtxtPlan::CopyCTEProducerProps(CDrvdPropPlan *pdpplan, ULONG ulCTEId)
+CDrvdPropCtxtPlan::CopyCTEProducerProps(gpos::Ref<CDrvdPropPlan> pdpplan,
+										ULONG ulCTEId)
 {
 	GPOS_ASSERT(nullptr != pdpplan);
 

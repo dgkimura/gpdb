@@ -62,7 +62,7 @@ public:
 	}
 
 	// output distribution accessor
-	CDistributionSpec *
+	gpos::Ref<CDistributionSpec>
 	Pds() const override
 	{
 		return m_pdsRouted.get();
@@ -119,7 +119,7 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalMotionRoutedDistribute *PopConvert(
+	static gpos::Ref<CPhysicalMotionRoutedDistribute> PopConvert(
 		gpos::Ref<COperator> pop);
 
 };	// class CPhysicalMotionRoutedDistribute

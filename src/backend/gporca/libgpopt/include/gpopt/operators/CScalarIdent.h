@@ -98,13 +98,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarIdent *
+	static gpos::Ref<CScalarIdent>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarIdent == pop->Eopid());
 
-		return dynamic_cast<CScalarIdent *>(pop);
+		return gpos::dyn_cast<CScalarIdent>(pop);
 	}
 
 	// the type of the scalar expression

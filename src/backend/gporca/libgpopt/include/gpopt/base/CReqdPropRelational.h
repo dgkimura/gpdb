@@ -88,13 +88,13 @@ public:
 
 	// return difference from given properties
 	gpos::Ref<CReqdPropRelational> PrprelDifference(
-		CMemoryPool *mp, CReqdPropRelational *prprel);
+		CMemoryPool *mp, gpos::Ref<CReqdPropRelational> prprel);
 
 	// return true if property container is empty
 	BOOL IsEmpty() const;
 
 	// shorthand for conversion
-	static CReqdPropRelational *GetReqdRelationalProps(
+	static gpos::Ref<CReqdPropRelational> GetReqdRelationalProps(
 		gpos::Ref<CReqdProp> prp);
 
 	// print function

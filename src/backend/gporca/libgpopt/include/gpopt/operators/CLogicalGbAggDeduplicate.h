@@ -134,13 +134,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalGbAggDeduplicate *
+	static gpos::Ref<CLogicalGbAggDeduplicate>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalGbAggDeduplicate == pop->Eopid());
 
-		return dynamic_cast<CLogicalGbAggDeduplicate *>(pop);
+		return gpos::dyn_cast<CLogicalGbAggDeduplicate>(pop);
 	}
 
 

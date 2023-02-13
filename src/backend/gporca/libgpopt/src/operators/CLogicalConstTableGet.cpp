@@ -157,7 +157,8 @@ CLogicalConstTableGet::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalConstTableGet *popCTG = gpos::dyn_cast<CLogicalConstTableGet>(pop);
+	gpos::Ref<CLogicalConstTableGet> popCTG =
+		gpos::dyn_cast<CLogicalConstTableGet>(pop);
 
 	// match if column descriptors, const values and output columns are identical
 	return m_pdrgpcoldesc->Equals(popCTG->Pdrgpcoldesc()) &&
@@ -315,7 +316,7 @@ CLogicalConstTableGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	CReqdPropRelational *prprel =
+	gpos::Ref<CReqdPropRelational> prprel =
 		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
 	gpos::Ref<CColRefSet> pcrs = prprel->PcrsStat();
 	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(mp) ULongPtrArray(mp);

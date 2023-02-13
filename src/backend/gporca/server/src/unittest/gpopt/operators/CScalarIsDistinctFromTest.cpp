@@ -51,7 +51,7 @@ public:
 		return m_amp.Pmp();
 	}
 
-	CScalarIsDistinctFrom *
+	gpos::Ref<CScalarIsDistinctFrom>
 	PScalarIDF() const
 	{
 		return m_pScalarIDF.get();
@@ -68,7 +68,7 @@ EresUnittest_Eber_WhenBothInputsAreNull()
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberNull));
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberNull));
 
-	CScalarIsDistinctFrom *pScalarIDF = fixture.PScalarIDF();
+	gpos::Ref<CScalarIsDistinctFrom> pScalarIDF = fixture.PScalarIDF();
 
 	CScalar::EBoolEvalResult eberResult =
 		pScalarIDF->Eber(pdrgpulChildren.get());
@@ -89,7 +89,7 @@ EresUnittest_Eber_WhenFirstInputIsUnknown()
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberAny));
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberNull));
 
-	CScalarIsDistinctFrom *pScalarIDF = fixture.PScalarIDF();
+	gpos::Ref<CScalarIsDistinctFrom> pScalarIDF = fixture.PScalarIDF();
 
 	CScalar::EBoolEvalResult eberResult =
 		pScalarIDF->Eber(pdrgpulChildren.get());
@@ -110,7 +110,7 @@ EresUnittest_Eber_WhenSecondInputIsUnknown()
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberNull));
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberAny));
 
-	CScalarIsDistinctFrom *pScalarIDF = fixture.PScalarIDF();
+	gpos::Ref<CScalarIsDistinctFrom> pScalarIDF = fixture.PScalarIDF();
 
 	CScalar::EBoolEvalResult eberResult =
 		pScalarIDF->Eber(pdrgpulChildren.get());
@@ -131,7 +131,7 @@ EresUnittest_Eber_WhenFirstInputDiffersFromSecondInput()
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberNull));
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberTrue));
 
-	CScalarIsDistinctFrom *pScalarIDF = fixture.PScalarIDF();
+	gpos::Ref<CScalarIsDistinctFrom> pScalarIDF = fixture.PScalarIDF();
 
 	CScalar::EBoolEvalResult eberResult =
 		pScalarIDF->Eber(pdrgpulChildren.get());
@@ -152,7 +152,7 @@ EresUnittest_Eber_WhenBothInputsAreSameAndNotNull()
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberTrue));
 	pdrgpulChildren->Append(GPOS_NEW(mp) ULONG(CScalar::EberTrue));
 
-	CScalarIsDistinctFrom *pScalarIDF = fixture.PScalarIDF();
+	gpos::Ref<CScalarIsDistinctFrom> pScalarIDF = fixture.PScalarIDF();
 
 	CScalar::EBoolEvalResult eberResult =
 		pScalarIDF->Eber(pdrgpulChildren.get());

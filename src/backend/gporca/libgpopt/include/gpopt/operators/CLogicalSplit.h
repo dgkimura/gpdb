@@ -195,13 +195,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalSplit *
+	static gpos::Ref<CLogicalSplit>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalSplit == pop->Eopid());
 
-		return dynamic_cast<CLogicalSplit *>(pop);
+		return gpos::dyn_cast<CLogicalSplit>(pop);
 	}
 
 	// debug print

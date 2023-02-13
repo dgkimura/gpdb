@@ -120,7 +120,8 @@ private:
 	// helper function for testing collapse of Inner Joins
 	static GPOS_RESULT EresUnittest_CollapseInnerJoinHelper(
 		CMemoryPool *mp, gpos::Ref<COperator> popJoin,
-		gpos::Ref<CExpression> rgpexpr[], CDrvdPropRelational *rgpdprel[]);
+		gpos::Ref<CExpression> rgpexpr[],
+		gpos::Ref<CDrvdPropRelational> rgpdprel[]);
 
 	// helper function for testing cascaded inner/outer joins
 	static gpos::Ref<CExpression> PexprJoinHelper(

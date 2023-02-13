@@ -207,7 +207,8 @@ public:
 	BOOL ContainsOnlyReplicationSafeAggFuncs() const;
 
 	// short hand for conversion
-	static CDrvdPropScalar *GetDrvdScalarProps(gpos::Ref<CDrvdProp> pdp);
+	static gpos::Ref<CDrvdPropScalar> GetDrvdScalarProps(
+		gpos::Ref<CDrvdProp> pdp);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

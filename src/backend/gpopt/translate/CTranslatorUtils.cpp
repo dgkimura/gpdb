@@ -378,10 +378,9 @@ CTranslatorUtils::ConvertToCDXLLogicalTVF(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IMdIdArray>
-CTranslatorUtils::ResolvePolymorphicTypes(CMemoryPool *mp,
-										  IMdIdArray *return_arg_mdids,
-										  List *input_arg_types,
-										  FuncExpr *funcexpr)
+CTranslatorUtils::ResolvePolymorphicTypes(
+	CMemoryPool *mp, gpos::Ref<IMdIdArray> return_arg_mdids,
+	List *input_arg_types, FuncExpr *funcexpr)
 {
 	ULONG arg_index = 0;
 
@@ -447,7 +446,7 @@ CTranslatorUtils::ResolvePolymorphicTypes(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorUtils::ContainsPolymorphicTypes(IMdIdArray *mdid_array)
+CTranslatorUtils::ContainsPolymorphicTypes(gpos::Ref<IMdIdArray> mdid_array)
 {
 	GPOS_ASSERT(nullptr != mdid_array);
 	const ULONG len = mdid_array->Size();
@@ -522,10 +521,9 @@ CTranslatorUtils::GetColumnDescriptorsFromRecord(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLColDescrArray>
-CTranslatorUtils::GetColumnDescriptorsFromRecord(CMemoryPool *mp,
-												 CIdGenerator *id_generator,
-												 List *col_names,
-												 IMdIdArray *out_arg_types)
+CTranslatorUtils::GetColumnDescriptorsFromRecord(
+	CMemoryPool *mp, CIdGenerator *id_generator, List *col_names,
+	gpos::Ref<IMdIdArray> out_arg_types)
 {
 	GPOS_ASSERT(out_arg_types->Size() == (ULONG) gpdb::ListLength(col_names));
 	ListCell *col_name = nullptr;
@@ -1149,7 +1147,7 @@ CTranslatorUtils::CreateAttnoSetForGroupingSet(
 //---------------------------------------------------------------------------
 gpos::Ref<ULongPtrArray>
 CTranslatorUtils::GenerateColIds(
-	CMemoryPool *mp, List *target_list, IMdIdArray *input_mdid_arr,
+	CMemoryPool *mp, List *target_list, gpos::Ref<IMdIdArray> input_mdid_arr,
 	ULongPtrArray *input_colids,
 	const BOOL *
 		is_outer_ref,  // array of flags indicating if input columns are outer references

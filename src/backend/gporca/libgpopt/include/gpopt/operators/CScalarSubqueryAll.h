@@ -63,13 +63,13 @@ public:
 		BOOL must_exist) override;
 
 	// conversion function
-	static CScalarSubqueryAll *
+	static gpos::Ref<CScalarSubqueryAll>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubqueryAll == pop->Eopid());
 
-		return dynamic_cast<CScalarSubqueryAll *>(pop);
+		return gpos::dyn_cast<CScalarSubqueryAll>(pop);
 	}
 
 };	// class CScalarSubqueryAll

@@ -54,12 +54,12 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalLeftAntiSemiNLJoinNotIn *
+	static gpos::Ref<CPhysicalLeftAntiSemiNLJoinNotIn>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftAntiSemiNLJoinNotIn == pop->Eopid());
 
-		return dynamic_cast<CPhysicalLeftAntiSemiNLJoinNotIn *>(pop);
+		return gpos::dyn_cast<CPhysicalLeftAntiSemiNLJoinNotIn>(pop);
 	}
 
 };	// class CPhysicalLeftAntiSemiNLJoinNotIn

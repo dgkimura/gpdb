@@ -69,9 +69,12 @@ CPhysicalSerialUnionAll::~CPhysicalSerialUnionAll() = default;
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysicalSerialUnionAll::PdsRequired(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CDistributionSpec *pdsRequired,
-	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const
+CPhysicalSerialUnionAll::PdsRequired(CMemoryPool *mp,
+									 CExpressionHandle &exprhdl,
+									 gpos::Ref<CDistributionSpec> pdsRequired,
+									 ULONG child_index,
+									 CDrvdPropArray *pdrgpdpCtxt,
+									 ULONG ulOptReq) const
 {
 	GPOS_ASSERT(nullptr != PdrgpdrgpcrInput());
 	GPOS_ASSERT(child_index < PdrgpdrgpcrInput()->Size());
@@ -103,7 +106,7 @@ CPhysicalSerialUnionAll::PdsRequired(
 	}
 
 	// inspect distribution delivered by outer child
-	CDistributionSpec *pdsOuter =
+	gpos::Ref<CDistributionSpec> pdsOuter =
 		gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Pds();
 
 	if (CDistributionSpec::EdtSingleton == pdsOuter->Edt() ||

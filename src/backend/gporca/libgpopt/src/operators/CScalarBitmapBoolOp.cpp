@@ -97,7 +97,7 @@ CScalarBitmapBoolOp::Matches(gpos::Ref<COperator> pop) const
 	{
 		return false;
 	}
-	CScalarBitmapBoolOp *popBitmapBoolOp =
+	gpos::Ref<CScalarBitmapBoolOp> popBitmapBoolOp =
 		gpos::dyn_cast<CScalarBitmapBoolOp>(pop);
 
 	return popBitmapBoolOp->Ebitmapboolop() == Ebitmapboolop() &&

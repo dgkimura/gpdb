@@ -18,6 +18,7 @@
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/operators/CScalarCmp.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CBucket.h"
 #include "naucrates/statistics/CJoinStatsProcessor.h"
 #include "naucrates/statistics/CScaleFactorUtils.h"

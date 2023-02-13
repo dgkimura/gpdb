@@ -77,7 +77,8 @@ CPhysicalLimit::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CPhysicalLimit *popLimit = gpos::dyn_cast<CPhysicalLimit>(pop);
+		gpos::Ref<CPhysicalLimit> popLimit =
+			gpos::dyn_cast<CPhysicalLimit>(pop);
 
 		if (popLimit->FGlobal() == m_fGlobal &&
 			popLimit->FHasCount() == m_fHasCount)
@@ -153,8 +154,8 @@ CPhysicalLimit::PosRequired(CMemoryPool *,		  // mp
 
 gpos::Ref<CDistributionSpec>
 CPhysicalLimit::PdsRequired(CMemoryPool *, CExpressionHandle &,
-							CDistributionSpec *, ULONG, CDrvdPropArray *,
-							ULONG) const
+							gpos::Ref<CDistributionSpec>, ULONG,
+							CDrvdPropArray *, ULONG) const
 {
 	// FIXME: this method will (and should) _never_ be called
 	// sweep through all 38 overrides of PdsRequired and switch to Ped()
@@ -173,7 +174,8 @@ CPhysicalLimit::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(0 == child_index);
 
-	CDistributionSpec *const pdsInput = prppInput->Ped()->PdsRequired();
+	gpos::Ref<CDistributionSpec> const pdsInput =
+		prppInput->Ped()->PdsRequired();
 
 	if (FGlobal())
 	{
@@ -342,7 +344,7 @@ CPhysicalLimit::PosDerive(CMemoryPool *,	   // mp
 gpos::Ref<CDistributionSpec>
 CPhysicalLimit::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0)->Pds();
+	gpos::Ref<CDistributionSpec> pdsOuter = exprhdl.Pdpplan(0)->Pds();
 
 	if (CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt())
 	{
@@ -420,7 +422,7 @@ CPhysicalLimit::EpetDistribution(CExpressionHandle &exprhdl,
 	GPOS_ASSERT(nullptr != ped);
 
 	// get distribution delivered by the limit node
-	CDistributionSpec *pds =
+	gpos::Ref<CDistributionSpec> pds =
 		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pds();
 
 	if (ped->FCompatible(pds))

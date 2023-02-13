@@ -82,7 +82,7 @@ public:
 	}
 
 	// distribution spec
-	CDistributionSpec *
+	gpos::Ref<CDistributionSpec>
 	Pds() const
 	{
 		return m_pds.get();
@@ -189,13 +189,13 @@ public:
 		const gpos::Ref<CColRefSet> outerRefsToCheck) const;
 
 	// conversion function
-	static CLogicalSequenceProject *
+	static gpos::Ref<CLogicalSequenceProject>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalSequenceProject == pop->Eopid());
 
-		return dynamic_cast<CLogicalSequenceProject *>(pop);
+		return gpos::dyn_cast<CLogicalSequenceProject>(pop);
 	}
 
 };	// class CLogicalSequenceProject

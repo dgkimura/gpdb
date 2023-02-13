@@ -79,7 +79,7 @@ public:
 	virtual EDistributionType Edt() const = 0;
 
 	// does this distribution satisfy the given one
-	virtual BOOL FSatisfies(const CDistributionSpec *pds) const = 0;
+	virtual BOOL FSatisfies(const gpos::Ref<CDistributionSpec> pds) const = 0;
 
 	// default hash function for distribution spec
 	ULONG
@@ -120,7 +120,7 @@ public:
 
 	// default match function for distribution specs
 	virtual BOOL
-	Matches(const CDistributionSpec *pds) const
+	Matches(const gpos::Ref<CDistributionSpec> pds) const
 	{
 		return Edt() == pds->Edt();
 	}
@@ -129,7 +129,7 @@ public:
 	// CDistributionSpec, if any class requires special Equals
 	// handling, they should override it.
 	virtual BOOL
-	Equals(const CDistributionSpec *pds) const
+	Equals(const gpos::Ref<CDistributionSpec> pds) const
 	{
 		return Matches(pds);
 	}

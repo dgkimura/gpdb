@@ -94,12 +94,12 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalNLJoin *
+	static gpos::Ref<CPhysicalNLJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(CUtils::FNLJoin(pop));
 
-		return dynamic_cast<CPhysicalNLJoin *>(pop);
+		return gpos::dyn_cast<CPhysicalNLJoin>(pop);
 	}
 
 

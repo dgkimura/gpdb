@@ -100,7 +100,7 @@ CLogicalCTEConsumer::CreateInlinedExpr(CMemoryPool *mp)
 	// the actual definition of the CTE is the first child of the producer
 	gpos::Ref<CExpression> pexprCTEDef = (*pexprProducer)[0];
 
-	CLogicalCTEProducer *popProducer =
+	gpos::Ref<CLogicalCTEProducer> popProducer =
 		gpos::dyn_cast<CLogicalCTEProducer>(pexprProducer->Pop());
 
 	m_phmulcr =
@@ -268,7 +268,7 @@ CLogicalCTEConsumer::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalCTEConsumer *popCTEConsumer =
+	gpos::Ref<CLogicalCTEConsumer> popCTEConsumer =
 		gpos::dyn_cast<CLogicalCTEConsumer>(pop);
 
 	return m_id == popCTEConsumer->UlCTEId() &&

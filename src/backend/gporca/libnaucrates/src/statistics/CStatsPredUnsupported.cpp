@@ -11,6 +11,7 @@
 
 #include "naucrates/statistics/CStatsPredUnsupported.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CHistogram.h"
 #include "naucrates/statistics/CStatistics.h"
 

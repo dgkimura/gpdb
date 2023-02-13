@@ -137,13 +137,13 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion
-	static CLogicalDynamicBitmapTableGet *
+	static gpos::Ref<CLogicalDynamicBitmapTableGet>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDynamicBitmapTableGet == pop->Eopid());
 
-		return dynamic_cast<CLogicalDynamicBitmapTableGet *>(pop);
+		return gpos::dyn_cast<CLogicalDynamicBitmapTableGet>(pop);
 	}
 
 };	// class CLogicalDynamicBitmapTableGet

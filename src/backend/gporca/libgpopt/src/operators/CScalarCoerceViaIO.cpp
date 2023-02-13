@@ -54,7 +54,8 @@ CScalarCoerceViaIO::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCoerceViaIO *popCoerce = gpos::dyn_cast<CScalarCoerceViaIO>(pop);
+		gpos::Ref<CScalarCoerceViaIO> popCoerce =
+			gpos::dyn_cast<CScalarCoerceViaIO>(pop);
 
 		return popCoerce->MdidType()->Equals(MdidType()) &&
 			   popCoerce->TypeModifier() == TypeModifier() &&

@@ -1160,7 +1160,7 @@ CXformUtils::PexprSeparateSubqueryPreds(CMemoryPool *mp,
 	// subqueries
 	const ULONG arity = pexpr->Arity();
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[arity - 1];
-	CLogicalNAryJoin *naryLOJOp =
+	gpos::Ref<CLogicalNAryJoin> naryLOJOp =
 		CLogicalNAryJoin::PopConvertNAryLOJ(pexpr->Pop());
 	gpos::Ref<CExpression> innerJoinPreds = pexprScalar;
 	if (nullptr != naryLOJOp)
@@ -1267,7 +1267,7 @@ CXformUtils::PexprInversePred(CMemoryPool *mp,
 							  gpos::Ref<CExpression> pexprSubquery)
 {
 	// get the scalar child of subquery
-	CScalarSubqueryAll *popSqAll =
+	gpos::Ref<CScalarSubqueryAll> popSqAll =
 		gpos::dyn_cast<CScalarSubqueryAll>(pexprSubquery->Pop());
 	gpos::Ref<CExpression> pexprScalar = (*pexprSubquery)[1];
 	const CColRef *colref = popSqAll->Pcr();
@@ -2427,7 +2427,7 @@ CXformUtils::LookupJoinKeys(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 
 	GPOS_ASSERT(nullptr != pgroupScalar->PdrgpexprJoinKeysInner());
 
-	if (IMdIdArray *opfamilies = pgroupScalar->JoinOpfamilies())
+	if (gpos::Ref<IMdIdArray> opfamilies = pgroupScalar->JoinOpfamilies())
 	{
 		;
 		*join_opfamilies = opfamilies;
@@ -2481,7 +2481,7 @@ void
 CXformUtils::CacheJoinKeys(gpos::Ref<CExpression> pexpr,
 						   CExpressionArray *pdrgpexprOuter,
 						   CExpressionArray *pdrgpexprInner,
-						   IMdIdArray *join_opfamilies)
+						   gpos::Ref<IMdIdArray> join_opfamilies)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprOuter);
 	GPOS_ASSERT(nullptr != pdrgpexprInner);
@@ -2706,7 +2706,7 @@ CXformUtils::PexprBuildBtreeIndexPlan(
 	CWStringConst *alias = nullptr;
 	ULONG ulPartIndex = gpos::ulong_max;
 	CColRef2dArray *pdrgpdrgpcrPart = nullptr;
-	IMdIdArray *partition_mdids = nullptr;
+	gpos::Ref<IMdIdArray> partition_mdids = nullptr;
 
 	if (ptabdesc->RetrieveRelStorageType() != IMDRelation::ErelstorageHeap &&
 		pmdindex->IndexType() == IMDIndex::EmdindGist)
@@ -2717,7 +2717,7 @@ CXformUtils::PexprBuildBtreeIndexPlan(
 
 	if (fDynamicGet)
 	{
-		CLogicalDynamicGet *popDynamicGet =
+		gpos::Ref<CLogicalDynamicGet> popDynamicGet =
 			gpos::dyn_cast<CLogicalDynamicGet>(pexprGet->Pop());
 
 		ulPartIndex = popDynamicGet->ScanId();
@@ -2730,7 +2730,8 @@ CXformUtils::PexprBuildBtreeIndexPlan(
 	}
 	else
 	{
-		CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(pexprGet->Pop());
+		gpos::Ref<CLogicalGet> popGet =
+			gpos::dyn_cast<CLogicalGet>(pexprGet->Pop());
 		pdrgpcrOutput = popGet->PdrgpcrOutput();
 		GPOS_ASSERT(nullptr != pdrgpcrOutput);
 		alias =
@@ -3701,7 +3702,7 @@ CXformUtils::PexprBitmapTableGet(CMemoryPool *mp, gpos::Ref<CLogical> popGet,
 
 		if (fDynamicGet)
 		{
-			CLogicalDynamicGet *popDynamicGet =
+			gpos::Ref<CLogicalDynamicGet> popDynamicGet =
 				gpos::dyn_cast<CLogicalDynamicGet>(popGet);
 			;
 			;
@@ -4178,7 +4179,7 @@ CXformUtils::PexprGbAggOnCTEConsumer2Join(CMemoryPool *mp,
 	}
 
 	gpos::Ref<CExpression> pexprCTEConsumer = (*pexprGbAgg)[0];
-	CLogicalCTEConsumer *popConsumer =
+	gpos::Ref<CLogicalCTEConsumer> popConsumer =
 		gpos::dyn_cast<CLogicalCTEConsumer>(pexprCTEConsumer->Pop());
 	const ULONG ulCTEId = popConsumer->UlCTEId();
 	CColRefArray *pdrgpcrConsumerOutput = popConsumer->Pdrgpcr();

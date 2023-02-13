@@ -95,7 +95,7 @@ CXformImplementTVF::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalTVF *popTVF = gpos::dyn_cast<CLogicalTVF>(pexpr->Pop());
+	gpos::Ref<CLogicalTVF> popTVF = gpos::dyn_cast<CLogicalTVF>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative

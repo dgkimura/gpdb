@@ -1395,7 +1395,7 @@ CCostModelGPDB::CostMotion(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		// Adjust the cost of no-op hashed distribution to correctly reflect that no tuple movement is needed
 		gpos::Ref<CPhysicalMotion> pMotion =
 			gpos::dyn_cast<CPhysicalMotion>(exprhdl.Pop());
-		CDistributionSpec *pds = pMotion->Pds();
+		gpos::Ref<CDistributionSpec> pds = pMotion->Pds();
 		if (CDistributionSpec::EdtHashedNoOp == pds->Edt())
 		{
 			// promote the plan with redistribution on same distributed columns of base table for parallel append

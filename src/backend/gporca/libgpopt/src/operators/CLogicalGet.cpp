@@ -167,7 +167,7 @@ CLogicalGet::Matches(gpos::Ref<COperator> pop) const
 	{
 		return false;
 	}
-	CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(pop);
+	gpos::Ref<CLogicalGet> popGet = gpos::dyn_cast<CLogicalGet>(pop);
 
 	return m_ptabdesc->MDId()->Equals(popGet->m_ptabdesc->MDId()) &&
 		   m_pdrgpcrOutput->Equals(popGet->PdrgpcrOutput());

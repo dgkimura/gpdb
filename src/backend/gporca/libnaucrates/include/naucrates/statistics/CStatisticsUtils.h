@@ -273,7 +273,7 @@ public:
 							   const gpos::Ref<CStatistics> input_stats,
 							   gpos::Ref<CColRefSet> grp_cols_refset,
 							   gpos::Ref<UlongToHistogramMap> output_histograms,
-							   UlongToDoubleMap *output_col_widths);
+							   gpos::Ref<UlongToDoubleMap> output_col_widths);
 
 	// return the set of grouping columns for statistics computation;
 	static gpos::Ref<CColRefSet> MakeGroupByColsForStats(
@@ -297,8 +297,9 @@ public:
 	static CDouble DefaultColumnWidth(const IMDType *mdtype);
 
 	// helper method to add width information
-	static void AddWidthInfo(CMemoryPool *mp, UlongToDoubleMap *src_width,
-							 UlongToDoubleMap *dest_width);
+	static void AddWidthInfo(CMemoryPool *mp,
+							 gpos::Ref<UlongToDoubleMap> src_width,
+							 gpos::Ref<UlongToDoubleMap> dest_width);
 
 
 	// for the output stats object, compute its upper bound cardinality mapping based on the bounding method

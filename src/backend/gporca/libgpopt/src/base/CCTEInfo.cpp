@@ -315,7 +315,7 @@ CCTEInfo::InitDefaultStats(gpos::Ref<CExpression> pexprCTEProducer)
 //
 //---------------------------------------------------------------------------
 void
-CCTEInfo::DeriveProducerStats(CLogicalCTEConsumer *popConsumer,
+CCTEInfo::DeriveProducerStats(gpos::Ref<CLogicalCTEConsumer> popConsumer,
 							  gpos::Ref<CColRefSet> pcrsStat)
 {
 	const ULONG ulCTEId = popConsumer->UlCTEId();

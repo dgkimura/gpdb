@@ -74,12 +74,12 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDrvdPropCtxtRelational *
+	static gpos::Ref<CDrvdPropCtxtRelational>
 	PdpctxtrelConvert(gpos::Ref<CDrvdPropCtxt> pdpctxt)
 	{
 		GPOS_ASSERT(nullptr != pdpctxt);
 
-		return dynamic_cast<CDrvdPropCtxtRelational *>(pdpctxt);
+		return gpos::dyn_cast<CDrvdPropCtxtRelational>(pdpctxt);
 	}
 
 };	// class CDrvdPropCtxtRelational

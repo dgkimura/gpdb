@@ -224,14 +224,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalGet *
+	static gpos::Ref<CLogicalGet>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalGet == pop->Eopid() ||
 					EopLogicalExternalGet == pop->Eopid());
 
-		return dynamic_cast<CLogicalGet *>(pop);
+		return gpos::dyn_cast<CLogicalGet>(pop);
 	}
 
 	// debug print

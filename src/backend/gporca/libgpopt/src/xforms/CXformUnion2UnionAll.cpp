@@ -59,7 +59,8 @@ CXformUnion2UnionAll::Transform(gpos::Ref<CXformContext> pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CLogicalUnion *popUnion = gpos::dyn_cast<CLogicalUnion>(pexpr->Pop());
+	gpos::Ref<CLogicalUnion> popUnion =
+		gpos::dyn_cast<CLogicalUnion>(pexpr->Pop());
 	CColRefArray *pdrgpcrOutput = popUnion->PdrgpcrOutput();
 	CColRef2dArray *pdrgpdrgpcrInput = popUnion->PdrgpdrgpcrInput();
 

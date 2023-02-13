@@ -73,7 +73,7 @@ CScalarIf::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarIf *popScIf = gpos::dyn_cast<CScalarIf>(pop);
+		gpos::Ref<CScalarIf> popScIf = gpos::dyn_cast<CScalarIf>(pop);
 
 		// match if return types are identical
 		return popScIf->MdidType()->Equals(m_mdid_type.get());

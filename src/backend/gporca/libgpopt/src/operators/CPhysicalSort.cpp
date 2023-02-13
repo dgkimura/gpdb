@@ -71,7 +71,7 @@ CPhysicalSort::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalSort *popSort = gpos::dyn_cast<CPhysicalSort>(pop);
+	gpos::Ref<CPhysicalSort> popSort = gpos::dyn_cast<CPhysicalSort>(pop);
 	return m_pos->Matches(popSort->Pos());
 }
 
@@ -143,7 +143,8 @@ CPhysicalSort::PosRequired(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysicalSort::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						   CDistributionSpec *pdsRequired, ULONG child_index,
+						   gpos::Ref<CDistributionSpec> pdsRequired,
+						   ULONG child_index,
 						   CDrvdPropArray *,  // pdrgpdpCtxt
 						   ULONG			  // ulOptReq
 ) const

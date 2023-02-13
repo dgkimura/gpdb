@@ -49,7 +49,7 @@ public:
 	}
 
 	// does this distribution satisfy the given one
-	BOOL FSatisfies(const CDistributionSpec *pds) const override;
+	BOOL FSatisfies(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -87,15 +87,15 @@ public:
 	}
 
 	// conversion function
-	static CDistributionSpecReplicated *
-	PdsConvert(CDistributionSpec *pds)
+	static gpos::Ref<CDistributionSpecReplicated>
+	PdsConvert(gpos::Ref<CDistributionSpec> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtStrictReplicated == pds->Edt() ||
 					EdtReplicated == pds->Edt() ||
 					EdtTaintedReplicated == pds->Edt());
 
-		return dynamic_cast<CDistributionSpecReplicated *>(pds);
+		return gpos::dyn_cast<CDistributionSpecReplicated>(pds);
 	}
 
 };	// class CDistributionSpecReplicated

@@ -71,9 +71,9 @@ CXformImplementSequenceProject::Transform(gpos::Ref<CXformContext> pxfctxt,
 	;
 
 	// extract members of logical sequence project operator
-	CLogicalSequenceProject *popLogicalSequenceProject =
+	gpos::Ref<CLogicalSequenceProject> popLogicalSequenceProject =
 		gpos::dyn_cast<CLogicalSequenceProject>(pexpr->Pop());
-	CDistributionSpec *pds = popLogicalSequenceProject->Pds();
+	gpos::Ref<CDistributionSpec> pds = popLogicalSequenceProject->Pds();
 	COrderSpecArray *pdrgpos = popLogicalSequenceProject->Pdrgpos();
 	CWindowFrameArray *pdrgpwf = popLogicalSequenceProject->Pdrgpwf();
 	;

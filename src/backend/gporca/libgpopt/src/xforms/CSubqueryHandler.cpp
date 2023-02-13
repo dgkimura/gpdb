@@ -230,7 +230,7 @@ CSubqueryHandler::PexprSubqueryPred(gpos::Ref<CExpression> pexprOuter,
 
 	GPOS_ASSERT(nullptr != pexprNewScalar);
 
-	CScalarSubqueryQuantified *popSqQuantified =
+	gpos::Ref<CScalarSubqueryQuantified> popSqQuantified =
 		gpos::dyn_cast<CScalarSubqueryQuantified>(pexprSubquery->Pop());
 
 	const CColRef *colref = popSqQuantified->Pcr();
@@ -268,7 +268,7 @@ CSubqueryHandler::FProjectCountSubquery(gpos::Ref<CExpression> pexprSubquery,
 	GPOS_ASSERT(colref == pcrCount);
 #endif	// GPOS_DEBUG
 
-	CScalarSubquery *popScalarSubquery =
+	gpos::Ref<CScalarSubquery> popScalarSubquery =
 		gpos::dyn_cast<CScalarSubquery>(pexprSubquery->Pop());
 	const CColRef *pcrSubquery = popScalarSubquery->Pcr();
 
@@ -417,7 +417,7 @@ CSubqueryHandler::FRemoveScalarSubquery(
 						 ppexprResidualScalar);
 #endif	// GPOS_DEBUG
 
-	CScalarSubquery *popScalarSubquery =
+	gpos::Ref<CScalarSubquery> popScalarSubquery =
 		gpos::dyn_cast<CScalarSubquery>(pexprSubquery->Pop());
 	const CColRef *pcrSubquery = popScalarSubquery->Pcr();
 
@@ -525,7 +525,7 @@ CSubqueryHandler::FGenerateCorrelatedApplyForScalarSubquery(
 	GPOS_ASSERT(nullptr != psd);
 	GPOS_ASSERT(psd->m_fCorrelatedExecution || fEnforceCorrelatedApply);
 
-	CScalarSubquery *popScalarSubquery =
+	gpos::Ref<CScalarSubquery> popScalarSubquery =
 		gpos::dyn_cast<CScalarSubquery>(pexprSubquery->Pop());
 	const CColRef *colref = popScalarSubquery->Pcr();
 	COperator::EOperatorId eopidSubq = popScalarSubquery->Eopid();
@@ -630,7 +630,7 @@ CSubqueryHandler::FRemoveScalarSubqueryInternal(
 			fEnforceCorrelatedApply, ppexprNewOuter, ppexprResidualScalar);
 	}
 
-	CScalarSubquery *popScalarSubquery =
+	gpos::Ref<CScalarSubquery> popScalarSubquery =
 		gpos::dyn_cast<CScalarSubquery>(pexprSubquery->Pop());
 	const CColRef *colref = popScalarSubquery->Pcr();
 
@@ -736,7 +736,7 @@ CSubqueryHandler::FCreateOuterApplyForScalarSubquery(
 	gpos::Ref<CExpression> *ppexprNewOuter,
 	gpos::Ref<CExpression> *ppexprResidualScalar)
 {
-	CScalarSubquery *popSubquery =
+	gpos::Ref<CScalarSubquery> popSubquery =
 		gpos::dyn_cast<CScalarSubquery>(pexprSubquery->Pop());
 	const CColRef *colref = popSubquery->Pcr();
 	BOOL fSuccess = true;
@@ -1241,7 +1241,7 @@ CSubqueryHandler::FCreateCorrelatedApplyForQuantifiedSubquery(
 
 	// get the logical child of subquery
 	gpos::Ref<CExpression> pexprInner = (*pexprSubquery)[0];
-	CScalarSubqueryQuantified *popSubquery =
+	gpos::Ref<CScalarSubqueryQuantified> popSubquery =
 		gpos::dyn_cast<CScalarSubqueryQuantified>(pexprSubquery->Pop());
 	CColRef *colref = const_cast<CColRef *>(popSubquery->Pcr());
 
@@ -1482,7 +1482,7 @@ CSubqueryHandler::FRemoveAnySubquery(
 						 ppexprResidualScalar);
 #endif	// GPOS_DEBUG
 
-	CScalarSubqueryAny *pScalarSubqAny =
+	gpos::Ref<CScalarSubqueryAny> pScalarSubqAny =
 		gpos::dyn_cast<CScalarSubqueryAny>(pexprSubquery->Pop());
 
 	if (m_fEnforceCorrelatedApply)

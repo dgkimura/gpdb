@@ -91,13 +91,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalInnerJoin *
+	static gpos::Ref<CLogicalInnerJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInnerJoin == pop->Eopid());
 
-		return dynamic_cast<CLogicalInnerJoin *>(pop);
+		return gpos::dyn_cast<CLogicalInnerJoin>(pop);
 	}
 
 	// determine if an innerJoin group expression has

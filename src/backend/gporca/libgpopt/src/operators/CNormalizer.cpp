@@ -76,7 +76,7 @@ CNormalizer::FPushableThruSeqPrjChild(gpos::Ref<CExpression> pexprSeqPrj,
 	GPOS_ASSERT(CLogical::EopLogicalSequenceProject ==
 				pexprSeqPrj->Pop()->Eopid());
 
-	CDistributionSpec *pds =
+	gpos::Ref<CDistributionSpec> pds =
 		gpos::dyn_cast<CLogicalSequenceProject>(pexprSeqPrj->Pop())->Pds();
 
 	BOOL fPushable = false;
@@ -787,7 +787,8 @@ CNormalizer::PushThruSetOp(CMemoryPool *mp, gpos::Ref<CExpression> pexprSetOp,
 	GPOS_ASSERT(nullptr != pexprConj);
 	GPOS_ASSERT(nullptr != ppexprResult);
 
-	CLogicalSetOp *popSetOp = gpos::dyn_cast<CLogicalSetOp>(pexprSetOp->Pop());
+	gpos::Ref<CLogicalSetOp> popSetOp =
+		gpos::dyn_cast<CLogicalSetOp>(pexprSetOp->Pop());
 	CColRefArray *pdrgpcrOutput = popSetOp->PdrgpcrOutput();
 	gpos::Ref<CColRefSet> pcrsOutput =
 		GPOS_NEW(mp) CColRefSet(mp, pdrgpcrOutput);
@@ -859,7 +860,8 @@ CNormalizer::PushThruJoin(CMemoryPool *mp, gpos::Ref<CExpression> pexprJoin,
 	GPOS_ASSERT(nullptr != ppexprResult);
 
 	gpos::Ref<COperator> pop = pexprJoin->Pop();
-	CLogicalNAryJoin *popNAryJoin = gpos::dyn_cast<CLogicalNAryJoin>(pop);
+	gpos::Ref<CLogicalNAryJoin> popNAryJoin =
+		gpos::dyn_cast<CLogicalNAryJoin>(pop);
 	const ULONG arity = pexprJoin->Arity();
 	BOOL fLASApply = CUtils::FLeftAntiSemiApply(pop);
 	COperator::EOperatorId op_id = pop->Eopid();

@@ -123,14 +123,14 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalStreamAgg *
+	static gpos::Ref<CPhysicalStreamAgg>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalStreamAgg == pop->Eopid() ||
 					EopPhysicalStreamAggDeduplicate == pop->Eopid());
 
-		return dynamic_cast<CPhysicalStreamAgg *>(pop);
+		return gpos::dyn_cast<CPhysicalStreamAgg>(pop);
 	}
 
 };	// class CPhysicalStreamAgg

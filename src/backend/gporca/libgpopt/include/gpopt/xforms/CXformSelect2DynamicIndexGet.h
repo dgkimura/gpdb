@@ -36,7 +36,8 @@ private:
 	CXformSelect2DynamicIndexGet(const CXformSelect2DynamicIndexGet &);
 
 	// return the column reference set of included / key columns
-	gpos::Ref<CColRefSet> GetColRefSet(CMemoryPool *mp, CLogicalGet *popGet,
+	gpos::Ref<CColRefSet> GetColRefSet(CMemoryPool *mp,
+									   gpos::Ref<CLogicalGet> popGet,
 									   const IMDIndex *pmdindex,
 									   BOOL fIncludedColumns) const;
 

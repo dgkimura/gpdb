@@ -316,7 +316,7 @@ CLogicalSequenceProject::Matches(gpos::Ref<COperator> pop) const
 	GPOS_ASSERT(nullptr != pop);
 	if (Eopid() == pop->Eopid())
 	{
-		CLogicalSequenceProject *popLogicalSequenceProject =
+		gpos::Ref<CLogicalSequenceProject> popLogicalSequenceProject =
 			gpos::dyn_cast<CLogicalSequenceProject>(pop);
 		return m_pds->Matches(popLogicalSequenceProject->Pds()) &&
 			   CWindowFrame::Equals(m_pdrgpwf.get(),

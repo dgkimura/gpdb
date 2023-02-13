@@ -71,7 +71,7 @@ CPhysicalMotionRoutedDistribute::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalMotionRoutedDistribute *popRoutedDistribute =
+	gpos::Ref<CPhysicalMotionRoutedDistribute> popRoutedDistribute =
 		gpos::dyn_cast<CPhysicalMotionRoutedDistribute>(pop);
 
 	return m_pdsRouted->Matches(popRoutedDistribute->m_pdsRouted.get());
@@ -208,13 +208,13 @@ CPhysicalMotionRoutedDistribute::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalMotionRoutedDistribute *
+gpos::Ref<CPhysicalMotionRoutedDistribute>
 CPhysicalMotionRoutedDistribute::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionRoutedDistribute == pop->Eopid());
 
-	return dynamic_cast<CPhysicalMotionRoutedDistribute *>(pop);
+	return gpos::dyn_cast<CPhysicalMotionRoutedDistribute>(pop);
 }
 
 // EOF

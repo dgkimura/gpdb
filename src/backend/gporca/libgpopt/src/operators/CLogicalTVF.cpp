@@ -174,7 +174,7 @@ CLogicalTVF::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalTVF *popTVF = gpos::dyn_cast<CLogicalTVF>(pop);
+	gpos::Ref<CLogicalTVF> popTVF = gpos::dyn_cast<CLogicalTVF>(pop);
 
 	return m_func_mdid->Equals(popTVF->FuncMdId()) &&
 		   m_return_type_mdid->Equals(popTVF->ReturnTypeMdId()) &&

@@ -24,6 +24,7 @@
 #include "gpopt/engine/CStatisticsConfig.h"
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/statistics/CInnerJoinStatsProcessor.h"
 #include "naucrates/statistics/CJoinStatsProcessor.h"
@@ -138,8 +139,7 @@ CStatistics::CapNDVs(CDouble rows,
 	UlongToHistogramMapIter col_hist_mapping(col_histogram_mapping);
 	while (col_hist_mapping.Advance())
 	{
-		gpos::Ref<CHistogram> histogram =
-			const_cast<gpos::Ref<CHistogram> >(col_hist_mapping.Value());
+		gpos::Ref<CHistogram> histogram = col_hist_mapping.Value();
 		histogram->CapNDVs(rows);
 	}
 }
@@ -407,10 +407,10 @@ CStatistics::IsEmptyJoin(const gpos::Ref<CStatistics> outer_stats,
 gpos::Ref<IStatistics>
 CStatistics::CalcLOJoinStats(CMemoryPool *mp,
 							 const gpos::Ref<IStatistics> other_stats,
-							 CStatsPredJoinArray *join_preds_stats) const
+							 CStatsPredJoinArray *join_preds_stats)
 {
 	return CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
-		mp, this, other_stats, join_preds_stats);
+		mp, SharedFromThis(), other_stats, join_preds_stats);
 }
 
 
@@ -419,10 +419,10 @@ CStatistics::CalcLOJoinStats(CMemoryPool *mp,
 gpos::Ref<IStatistics>
 CStatistics::CalcLSJoinStats(CMemoryPool *mp,
 							 const gpos::Ref<IStatistics> inner_side_stats,
-							 CStatsPredJoinArray *join_preds_stats) const
+							 CStatsPredJoinArray *join_preds_stats)
 {
 	return CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
-		mp, this, inner_side_stats, join_preds_stats);
+		mp, SharedFromThis(), inner_side_stats, join_preds_stats);
 }
 
 
@@ -431,10 +431,10 @@ CStatistics::CalcLSJoinStats(CMemoryPool *mp,
 gpos::Ref<IStatistics>
 CStatistics::CalcInnerJoinStats(CMemoryPool *mp,
 								const gpos::Ref<IStatistics> other_stats,
-								CStatsPredJoinArray *join_preds_stats) const
+								CStatsPredJoinArray *join_preds_stats)
 {
 	return CInnerJoinStatsProcessor::CalcInnerJoinStatsStatic(
-		mp, this, other_stats, join_preds_stats);
+		mp, SharedFromThis(), other_stats, join_preds_stats);
 }
 
 // return statistics object after performing LASJ
@@ -442,10 +442,11 @@ gpos::Ref<IStatistics>
 CStatistics::CalcLASJoinStats(CMemoryPool *mp,
 							  const gpos::Ref<IStatistics> other_stats,
 							  CStatsPredJoinArray *join_preds_stats,
-							  BOOL DoIgnoreLASJHistComputation) const
+							  BOOL DoIgnoreLASJHistComputation)
 {
 	return CLeftAntiSemiJoinStatsProcessor::CalcLASJoinStatsStatic(
-		mp, this, other_stats, join_preds_stats, DoIgnoreLASJHistComputation);
+		mp, SharedFromThis(), other_stats, join_preds_stats,
+		DoIgnoreLASJHistComputation);
 }
 
 //	helper method to copy statistics on columns that are not excluded by bitset
@@ -483,8 +484,8 @@ CStatistics::CopyWidths(CMemoryPool *mp) const
 }
 
 void
-CStatistics::CopyWidthsInto(CMemoryPool *mp,
-							UlongToDoubleMap *colid_width_mapping) const
+CStatistics::CopyWidthsInto(
+	CMemoryPool *mp, gpos::Ref<UlongToDoubleMap> colid_width_mapping) const
 {
 	CStatisticsUtils::AddWidthInfo(mp, m_colid_width_mapping.get(),
 								   colid_width_mapping);
@@ -563,14 +564,14 @@ CStatistics::AppendStats(CMemoryPool *mp, gpos::Ref<IStatistics> input_stats)
 
 // copy statistics object
 gpos::Ref<IStatistics>
-CStatistics::CopyStats(CMemoryPool *mp) const
+CStatistics::CopyStats(CMemoryPool *mp)
 {
 	return ScaleStats(mp, CDouble(1.0) /*factor*/);
 }
 
 // return a copy of this statistics object scaled by a given factor
 gpos::Ref<IStatistics>
-CStatistics::ScaleStats(CMemoryPool *mp, CDouble factor) const
+CStatistics::ScaleStats(CMemoryPool *mp, CDouble factor)
 {
 	gpos::Ref<UlongToHistogramMap> histograms_new =
 		GPOS_NEW(mp) UlongToHistogramMap(mp);
@@ -599,8 +600,8 @@ CStatistics::ScaleStats(CMemoryPool *mp, CDouble factor) const
 
 	// modify source id to upper bound card information
 	CStatisticsUtils::ComputeCardUpperBounds(
-		mp, this, scaled_stats.get(), scaled_num_rows,
-		CStatistics::EcbmMin /* card_bounding_method */);
+		mp, gpos::dyn_cast<CStatistics>(SharedFromThis()), scaled_stats.get(),
+		scaled_num_rows, CStatistics::EcbmMin /* card_bounding_method */);
 
 	return scaled_stats;
 }
@@ -717,8 +718,9 @@ CStatistics::AddHistogramsWithRemap(
 
 // add width information where the column ids have been re-mapped
 void
-CStatistics::AddWidthInfoWithRemap(CMemoryPool *mp, UlongToDoubleMap *src_width,
-								   UlongToDoubleMap *dest_width,
+CStatistics::AddWidthInfoWithRemap(CMemoryPool *mp,
+								   gpos::Ref<UlongToDoubleMap> src_width,
+								   gpos::Ref<UlongToDoubleMap> dest_width,
 								   UlongToColRefMap *colref_mapping,
 								   BOOL must_exist)
 {

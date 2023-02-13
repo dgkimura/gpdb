@@ -71,7 +71,8 @@ CXformInsert2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalInsert *popInsert = gpos::dyn_cast<CLogicalInsert>(pexpr->Pop());
+	gpos::Ref<CLogicalInsert> popInsert =
+		gpos::dyn_cast<CLogicalInsert>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative

@@ -189,7 +189,7 @@ public:
 	}
 
 	// required relatoinal properties accessor
-	CReqdPropRelational *
+	gpos::Ref<CReqdPropRelational>
 	GetReqdRelationalProps() const
 	{
 		return m_prprel.get();

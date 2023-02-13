@@ -196,13 +196,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalRowTrigger *
+	static gpos::Ref<CLogicalRowTrigger>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalRowTrigger == pop->Eopid());
 
-		return dynamic_cast<CLogicalRowTrigger *>(pop);
+		return gpos::dyn_cast<CLogicalRowTrigger>(pop);
 	}
 
 	// debug print

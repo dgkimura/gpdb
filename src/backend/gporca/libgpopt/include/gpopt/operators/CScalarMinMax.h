@@ -127,13 +127,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CScalarMinMax *
+	static gpos::Ref<CScalarMinMax>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarMinMax == pop->Eopid());
 
-		return dynamic_cast<CScalarMinMax *>(pop);
+		return gpos::dyn_cast<CScalarMinMax>(pop);
 	}
 
 };	// class CScalarMinMax

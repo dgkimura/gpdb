@@ -190,7 +190,7 @@ CSubqueryTestUtils::PexprProjectWithAggSubquery(
 		mp, pexprOuter.get(), std::move(pexprInner), fCorrelated);
 
 	// generate a computed column
-	CScalarSubquery *popSubquery =
+	gpos::Ref<CScalarSubquery> popSubquery =
 		gpos::dyn_cast<CScalarSubquery>(pexprSubq->Pop());
 	const IMDType *pmdtype = md_accessor->RetrieveType(popSubquery->MdidType());
 	CColRef *pcrComputed =
@@ -1596,8 +1596,9 @@ CSubqueryTestUtils::PexprProjectWithSubqueryQuantified(
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// generate a computed column
-	CScalarSubqueryQuantified *pop = gpos::dyn_cast<CScalarSubqueryQuantified>(
-		pexprSubqueryQuantified->Pop());
+	gpos::Ref<CScalarSubqueryQuantified> pop =
+		gpos::dyn_cast<CScalarSubqueryQuantified>(
+			pexprSubqueryQuantified->Pop());
 	const IMDType *pmdtype = md_accessor->RetrieveType(pop->MdidType());
 	CColRef *pcrComputed = col_factory->PcrCreate(pmdtype, pop->TypeModifier());
 
@@ -1729,7 +1730,7 @@ CSubqueryTestUtils::PexprProjectWithSubqueryExistential(
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
 	// generate a computed column
-	CScalarSubqueryExistential *pop =
+	gpos::Ref<CScalarSubqueryExistential> pop =
 		gpos::dyn_cast<CScalarSubqueryExistential>(
 			pexprSubqueryExistential->Pop());
 	const IMDType *pmdtype = md_accessor->RetrieveType(pop->MdidType());

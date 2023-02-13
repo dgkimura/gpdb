@@ -153,14 +153,14 @@ public:
 	}
 
 	// distribution column opfamilies
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	GetDistrOpfamilies() const
 	{
 		return m_distr_opfamilies.get();
 	}
 
 	// distribution column opclasses
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	GetDistrOpclasses() const
 	{
 		return m_distr_opclasses.get();

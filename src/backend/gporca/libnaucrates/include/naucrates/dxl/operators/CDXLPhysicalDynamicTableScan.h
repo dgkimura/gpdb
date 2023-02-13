@@ -70,7 +70,7 @@ public:
 	// table descriptor
 	const gpos::Ref<CDXLTableDescr> GetDXLTableDescr() const;
 
-	IMdIdArray *GetParts() const;
+	gpos::Ref<IMdIdArray> GetParts() const;
 
 	const ULongPtrArray *
 	GetSelectorIds() const

@@ -167,7 +167,8 @@ private:
 		BOOL keep_res_junked) const;
 
 	// check if the set operation need to cast any of its input columns
-	static BOOL SetOpNeedsCast(List *target_list, IMdIdArray *input_col_mdids);
+	static BOOL SetOpNeedsCast(List *target_list,
+							   gpos::Ref<IMdIdArray> input_col_mdids);
 	// translate a window operator
 	gpos::Ref<CDXLNode> TranslateWindowToDXL(
 		gpos::Ref<CDXLNode> child_dxlnode, List *target_list,
@@ -190,10 +191,9 @@ private:
 		BOOL is_lead_func, gpos::Ref<CDXLNode> dxl_offset) const;
 
 	// translate the child of a set operation
-	gpos::Ref<CDXLNode> TranslateSetOpChild(Node *child_node,
-											ULongPtrArray *pdrgpul,
-											IMdIdArray *input_col_mdids,
-											List *target_list);
+	gpos::Ref<CDXLNode> TranslateSetOpChild(
+		Node *child_node, ULongPtrArray *pdrgpul,
+		gpos::Ref<IMdIdArray> input_col_mdids, List *target_list);
 
 	// return a dummy const table get
 	gpos::Ref<CDXLNode> DXLDummyConstTableGet() const;

@@ -158,7 +158,7 @@ CPhysicalPartitionSelector::PosRequired(CMemoryPool *mp,
 gpos::Ref<CDistributionSpec>
 CPhysicalPartitionSelector::PdsRequired(CMemoryPool *mp,
 										CExpressionHandle &exprhdl,
-										CDistributionSpec *pdsInput,
+										gpos::Ref<CDistributionSpec> pdsInput,
 										ULONG child_index,
 										CDrvdPropArray *,  // pdrgpdpCtxt
 										ULONG			   // ulOptReq
@@ -335,7 +335,7 @@ CEnfdProp::EPropEnforcingType
 CPhysicalPartitionSelector::EpetDistribution(CExpressionHandle &exprhdl,
 											 const CEnfdDistribution *ped) const
 {
-	CDrvdPropPlan *pdpplan = exprhdl.Pdpplan(0 /* child_index */);
+	gpos::Ref<CDrvdPropPlan> pdpplan = exprhdl.Pdpplan(0 /* child_index */);
 
 	if (ped->FCompatible(pdpplan->Pds()))
 	{

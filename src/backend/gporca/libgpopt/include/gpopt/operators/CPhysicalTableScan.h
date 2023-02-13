@@ -67,14 +67,14 @@ public:
 
 
 	// conversion function
-	static CPhysicalTableScan *
+	static gpos::Ref<CPhysicalTableScan>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalTableScan == pop->Eopid() ||
 					EopPhysicalExternalScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalTableScan *>(pop);
+		return gpos::dyn_cast<CPhysicalTableScan>(pop);
 	}
 
 	// statistics derivation during costing

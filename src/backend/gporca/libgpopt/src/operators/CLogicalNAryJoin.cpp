@@ -227,10 +227,11 @@ CLogicalNAryJoin::PxfsCandidates(CMemoryPool *mp) const
 	return xform_set;
 }
 
-CLogicalNAryJoin *
+gpos::Ref<CLogicalNAryJoin>
 CLogicalNAryJoin::PopConvertNAryLOJ(gpos::Ref<COperator> pop)
 {
-	CLogicalNAryJoin *naryJoin = gpos::dyn_cast<CLogicalNAryJoin>(pop);
+	gpos::Ref<CLogicalNAryJoin> naryJoin =
+		gpos::dyn_cast<CLogicalNAryJoin>(pop);
 
 	if (nullptr != naryJoin && naryJoin->HasOuterJoinChildren())
 	{

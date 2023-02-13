@@ -58,12 +58,12 @@ public:
 						   ULONG ulOptReq) const override;
 
 	// conversion function
-	static CPhysicalLeftAntiSemiNLJoin *
+	static gpos::Ref<CPhysicalLeftAntiSemiNLJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftAntiSemiNLJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalLeftAntiSemiNLJoin *>(pop);
+		return gpos::dyn_cast<CPhysicalLeftAntiSemiNLJoin>(pop);
 	}
 
 

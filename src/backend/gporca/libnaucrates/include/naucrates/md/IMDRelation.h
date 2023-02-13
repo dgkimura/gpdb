@@ -182,7 +182,7 @@ public:
 	virtual gpos::Ref<CDXLNode> MDPartConstraint() const = 0;
 
 	// child partition oids
-	virtual IMdIdArray *
+	virtual gpos::Ref<IMdIdArray>
 	ChildPartitionMdids() const
 	{
 		return nullptr;

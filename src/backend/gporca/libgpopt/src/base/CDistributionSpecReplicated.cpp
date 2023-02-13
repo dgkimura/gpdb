@@ -39,7 +39,8 @@ using namespace gpopt;
 //	| others not Singleton    | T                |(default) F        |
 //	+-------------------------+------------------+-------------------+
 BOOL
-CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
+CDistributionSpecReplicated::FSatisfies(
+	const gpos::Ref<CDistributionSpec> pdss) const
 {
 	GPOS_ASSERT(Edt() != CDistributionSpec::EdtReplicated);
 
@@ -84,7 +85,7 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
 			// a replicated distribution satisfies the non-singleton
 			// distribution, only if allowed by non-singleton distribution object
 			return gpos::dyn_cast<CDistributionSpecNonSingleton>(
-					   const_cast<CDistributionSpec *>(pdss))
+					   const_cast<gpos::Ref<CDistributionSpec> >(pdss))
 				->FAllowReplicated();
 		}
 
@@ -102,9 +103,10 @@ CDistributionSpecReplicated::FSatisfies(const CDistributionSpec *pdss) const
 
 		// a replicated distribution satisfies any non-singleton one,
 		// as well as singleton distributions that are not master-only
-		return !(EdtSingleton == pdss->Edt() &&
-				 (dynamic_cast<const CDistributionSpecSingleton *>(pdss))
-					 ->FOnMaster());
+		return !(
+			EdtSingleton == pdss->Edt() &&
+			(dynamic_cast<const gpos::Ref<CDistributionSpecSingleton> >(pdss))
+				->FOnMaster());
 	}
 
 	return false;

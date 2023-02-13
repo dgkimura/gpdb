@@ -50,7 +50,8 @@ public:
 		CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
 		ULONG ulOriginOpId, const CName *pnameAlias, ULONG scan_id,
 		gpos::Ref<CColRefArray> pdrgpcrOutput,
-		gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
+		gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
+		gpos::Ref<IMdIdArray> partition_mdids,
 		gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part);
 
 	// ident accessors
@@ -77,13 +78,13 @@ public:
 		IStatisticsArray *stats_ctxt) const override;
 
 	// conversion function
-	static CPhysicalDynamicBitmapTableScan *
+	static gpos::Ref<CPhysicalDynamicBitmapTableScan>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalDynamicBitmapTableScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalDynamicBitmapTableScan *>(pop);
+		return gpos::dyn_cast<CPhysicalDynamicBitmapTableScan>(pop);
 	}
 };
 }  // namespace gpopt

@@ -76,7 +76,7 @@ CXformIntersect2Join::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprLeftChild = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprRightChild = (*pexpr)[1];
 
-	CLogicalIntersect *popIntersect =
+	gpos::Ref<CLogicalIntersect> popIntersect =
 		gpos::dyn_cast<CLogicalIntersect>(pexpr->Pop());
 	CColRef2dArray *pdrgpdrgpcrInput = popIntersect->PdrgpdrgpcrInput();
 

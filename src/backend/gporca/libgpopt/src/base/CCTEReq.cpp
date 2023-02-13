@@ -96,7 +96,7 @@ CCTEReq::CCTEReqEntry::Equals(gpos::Ref<CCTEReqEntry> pcre) const
 		return false;
 	}
 
-	CDrvdPropPlan *pdpplan = pcre->PdpplanProducer();
+	gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 	if (nullptr == m_pdpplan && nullptr == pdpplan)
 	{
 		return true;
@@ -199,9 +199,10 @@ void
 CCTEReq::InsertConsumer(ULONG id, CDrvdPropArray *pdrgpdpCtxt)
 {
 	ULONG ulProducerId = gpos::ulong_max;
-	CDrvdPropPlan *pdpplan = gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])
-								 ->GetCostModel()
-								 ->PdpplanProducer(&ulProducerId);
+	gpos::Ref<CDrvdPropPlan> pdpplan =
+		gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])
+			->GetCostModel()
+			->PdpplanProducer(&ulProducerId);
 	GPOS_ASSERT(nullptr != pdpplan);
 	GPOS_ASSERT(ulProducerId == id &&
 				"unexpected CTE producer plan properties");
@@ -346,7 +347,7 @@ CCTEReq::PcterUnresolved(CMemoryPool *mp, gpos::Ref<CCTEMap> pcm)
 		ULONG id = pcre->Id();
 		BOOL fRequired =
 			pcre->FRequired() && CCTEMap::EctSentinel == pcm->Ect(id);
-		CDrvdPropPlan *pdpplan = pcre->PdpplanProducer();
+		gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 		if (nullptr != pdpplan)
 		{
 			;
@@ -392,7 +393,7 @@ CCTEReq::PcterUnresolvedSequence(
 			GPOS_ASSERT(CCTEMap::EctConsumer == ect);
 			GPOS_ASSERT(CCTEMap::EctConsumer == ectDrvd);
 			// already found, so mark it as optional
-			CDrvdPropPlan *pdpplan = pcre->PdpplanProducer();
+			gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 			GPOS_ASSERT(nullptr != pdpplan);
 			;
 			pcterUnresolved->Insert(id, ect, false /*fReqiored*/, pdpplan);
@@ -410,7 +411,7 @@ CCTEReq::PcterUnresolvedSequence(
 		{
 			// either required and not found yet, or optional
 			// in both cases, pass it down as is
-			CDrvdPropPlan *pdpplan = pcre->PdpplanProducer();
+			gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 			GPOS_ASSERT_IMP(nullptr == pdpplan, CCTEMap::EctProducer == ect);
 			if (nullptr != pdpplan)
 			{
@@ -451,7 +452,7 @@ CCTEReq::PcterAllOptional(CMemoryPool *mp)
 	while (hmcri.Advance())
 	{
 		const gpos::Ref<CCTEReqEntry> pcre = hmcri.Value();
-		CDrvdPropPlan *pdpplan = pcre->PdpplanProducer();
+		gpos::Ref<CDrvdPropPlan> pdpplan = pcre->PdpplanProducer();
 		if (nullptr != pdpplan)
 		{
 			;
@@ -471,7 +472,7 @@ CCTEReq::PcterAllOptional(CMemoryPool *mp)
 //		Lookup plan properties for given cte id
 //
 //---------------------------------------------------------------------------
-CDrvdPropPlan *
+gpos::Ref<CDrvdPropPlan>
 CCTEReq::Pdpplan(ULONG ulCteId) const
 {
 	const gpos::Ref<CCTEReqEntry> pcre = PcreLookup(ulCteId);

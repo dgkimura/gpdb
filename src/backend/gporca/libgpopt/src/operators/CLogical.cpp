@@ -539,7 +539,8 @@ CLogical::DeriveCorrelatedApplyColumns(CMemoryPool *mp,
 	{
 		if (!exprhdl.FScalarChild(ul))
 		{
-			CDrvdPropRelational *pdprel = exprhdl.GetRelationalProperties(ul);
+			gpos::Ref<CDrvdPropRelational> pdprel =
+				exprhdl.GetRelationalProperties(ul);
 			pcrs->Union(pdprel->GetCorrelatedApplyColumns());
 		}
 	}
@@ -1170,7 +1171,7 @@ CLogical::PstatsBaseTable(
 		pcrsHistExtra  // additional columns required for stats, not required by parent
 )
 {
-	CReqdPropRelational *prprel =
+	gpos::Ref<CReqdPropRelational> prprel =
 		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
 	gpos::Ref<CColRefSet> pcrsHist = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsHist->Include(prprel->PcrsStat());
@@ -1216,7 +1217,7 @@ CLogical::PstatsDeriveDummy(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// return a dummy stats object that has a histogram for every
 	// required-stats column
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
-	CReqdPropRelational *prprel =
+	gpos::Ref<CReqdPropRelational> prprel =
 		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
 	gpos::Ref<CColRefSet> pcrs = prprel->PcrsStat();
 	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(mp) ULongPtrArray(mp);

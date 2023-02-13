@@ -116,7 +116,7 @@ private:
 	static void CacheJoinKeys(gpos::Ref<CExpression> pexpr,
 							  CExpressionArray *pdrgpexprOuter,
 							  CExpressionArray *pdrgpexprInner,
-							  IMdIdArray *join_opfamilies);
+							  gpos::Ref<IMdIdArray> join_opfamilies);
 
 	// helper to extract equality from a given expression
 	static BOOL FExtractEquality(
@@ -193,7 +193,7 @@ private:
 									  ULONG ulPartIndex,
 									  gpos::Ref<CColRefArray> pdrgpcrOutput,
 									  gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
-									  IMdIdArray *partition_mdids)
+									  gpos::Ref<IMdIdArray> partition_mdids)
 	{
 		return GPOS_NEW(mp) CLogicalDynamicIndexGet(
 			mp, pmdindex, ptabdesc, ulOriginOpId, pname, ulPartIndex,

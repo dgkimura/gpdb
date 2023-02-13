@@ -94,7 +94,7 @@ CPhysicalMotionGather::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalMotionGather *popGather =
+	gpos::Ref<CPhysicalMotionGather> popGather =
 		gpos::dyn_cast<CPhysicalMotionGather>(pop);
 
 	return Est() == popGather->Est() && m_pos->Matches(popGather->Pos());
@@ -251,13 +251,13 @@ CPhysicalMotionGather::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalMotionGather *
+gpos::Ref<CPhysicalMotionGather>
 CPhysicalMotionGather::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionGather == pop->Eopid());
 
-	return dynamic_cast<CPhysicalMotionGather *>(pop);
+	return gpos::dyn_cast<CPhysicalMotionGather>(pop);
 }
 
 // EOF

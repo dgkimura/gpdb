@@ -147,7 +147,7 @@ CMDFunctionGPDB::GetResultTypeMdid() const
 //		Output argument types
 //
 //---------------------------------------------------------------------------
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CMDFunctionGPDB::OutputArgTypesMdidArray() const
 {
 	return m_mdid_types_array.get();

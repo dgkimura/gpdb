@@ -95,7 +95,7 @@ private:
 		}
 
 		// plan properties
-		CDrvdPropPlan *
+		gpos::Ref<CDrvdPropPlan>
 		PdpplanProducer() const
 		{
 			return m_pdpplan.get();
@@ -195,7 +195,7 @@ public:
 	gpos::Ref<CCTEReq> PcterAllOptional(CMemoryPool *mp);
 
 	// lookup plan properties for given cte id
-	CDrvdPropPlan *Pdpplan(ULONG ulCteId) const;
+	gpos::Ref<CDrvdPropPlan> Pdpplan(ULONG ulCteId) const;
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const;

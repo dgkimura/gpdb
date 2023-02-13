@@ -14,6 +14,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
 using namespace gpopt;

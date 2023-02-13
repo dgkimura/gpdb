@@ -66,7 +66,7 @@ CPhysicalExternalScan::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalExternalScan *popExternalScan =
+	gpos::Ref<CPhysicalExternalScan> popExternalScan =
 		gpos::dyn_cast<CPhysicalExternalScan>(pop);
 	return m_ptabdesc == popExternalScan->Ptabdesc() &&
 		   m_pdrgpcrOutput->Equals(popExternalScan->PdrgpcrOutput());

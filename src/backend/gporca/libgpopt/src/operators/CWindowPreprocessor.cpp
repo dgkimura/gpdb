@@ -58,7 +58,7 @@ CWindowPreprocessor::SplitPrjList(
 	GPOS_ASSERT(nullptr != ppdrgposOther);
 	GPOS_ASSERT(nullptr != ppdrgpwfOther);
 
-	CLogicalSequenceProject *popSeqPrj =
+	gpos::Ref<CLogicalSequenceProject> popSeqPrj =
 		gpos::dyn_cast<CLogicalSequenceProject>(pexprSeqPrj->Pop());
 	gpos::Ref<CExpression> pexprPrjList = (*pexprSeqPrj)[1];
 
@@ -159,9 +159,9 @@ CWindowPreprocessor::SplitSeqPrj(
 
 	// check distribution spec of original SeqPrj and extract grouping columns
 	// from window (PARTITION BY) clause
-	CLogicalSequenceProject *popSeqPrj =
+	gpos::Ref<CLogicalSequenceProject> popSeqPrj =
 		gpos::dyn_cast<CLogicalSequenceProject>(pexprSeqPrj->Pop());
-	CDistributionSpec *pds = popSeqPrj->Pds();
+	gpos::Ref<CDistributionSpec> pds = popSeqPrj->Pds();
 	gpos::Ref<CColRefArray> pdrgpcrGrpCols = nullptr;
 	if (CDistributionSpec::EdtHashed == pds->Edt())
 	{
@@ -394,9 +394,9 @@ CWindowPreprocessor::PexprSeqPrj2Join(CMemoryPool *mp,
 	if (nullptr != pdrgpcrGrpCols && 0 < pdrgpcrGrpCols->Size())
 	{
 		// extract PARTITION BY columns from original SeqPrj expression
-		CLogicalSequenceProject *popSeqPrj =
+		gpos::Ref<CLogicalSequenceProject> popSeqPrj =
 			gpos::dyn_cast<CLogicalSequenceProject>(pexprSeqPrj->Pop());
-		CDistributionSpec *pds = popSeqPrj->Pds();
+		gpos::Ref<CDistributionSpec> pds = popSeqPrj->Pds();
 		gpos::Ref<CColRefSet> pcrs = CUtils::PcrsExtractColumns(
 			mp, gpos::dyn_cast<CDistributionSpecHashed>(pds)->Pdrgpexpr());
 		gpos::Ref<CColRefArray> pdrgpcrPartitionBy = pcrs->Pdrgpcr(mp);

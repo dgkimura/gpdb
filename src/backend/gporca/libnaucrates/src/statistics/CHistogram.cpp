@@ -2237,7 +2237,7 @@ void
 CHistogram::AddDummyHistogramAndWidthInfo(
 	CMemoryPool *mp, CColumnFactory *col_factory,
 	gpos::Ref<UlongToHistogramMap> output_histograms,
-	UlongToDoubleMap *output_col_widths, const ULongPtrArray *columns,
+	gpos::Ref<UlongToDoubleMap> output_col_widths, const ULongPtrArray *columns,
 	BOOL is_empty)
 {
 	GPOS_ASSERT(nullptr != col_factory);

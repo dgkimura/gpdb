@@ -82,13 +82,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalExternalScan *
+	static gpos::Ref<CPhysicalExternalScan>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalExternalScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalExternalScan *>(pop);
+		return gpos::dyn_cast<CPhysicalExternalScan>(pop);
 	}
 
 };	// class CPhysicalExternalScan

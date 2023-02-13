@@ -115,7 +115,7 @@ CPhysicalCTEProducer::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysicalCTEProducer::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								  CDistributionSpec *pdsRequired,
+								  gpos::Ref<CDistributionSpec> pdsRequired,
 								  ULONG child_index,
 								  CDrvdPropArray *,	 // pdrgpdpCtxt
 								  ULONG				 // ulOptReq
@@ -328,7 +328,7 @@ CPhysicalCTEProducer::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalCTEProducer *popCTEProducer =
+	gpos::Ref<CPhysicalCTEProducer> popCTEProducer =
 		gpos::dyn_cast<CPhysicalCTEProducer>(pop);
 
 	return m_id == popCTEProducer->UlCTEId() &&

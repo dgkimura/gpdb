@@ -121,13 +121,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarArrayRef *
+	static gpos::Ref<CScalarArrayRef>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarArrayRef == pop->Eopid());
 
-		return dynamic_cast<CScalarArrayRef *>(pop);
+		return gpos::dyn_cast<CScalarArrayRef>(pop);
 	}
 
 };	// class CScalarArrayRef

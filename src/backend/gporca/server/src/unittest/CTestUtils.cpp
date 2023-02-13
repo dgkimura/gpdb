@@ -572,7 +572,8 @@ CTestUtils::PexprLogicalSelectPartitioned(CMemoryPool *mp)
 	gpos::Ref<CExpression> pexprGet = PexprLogicalGetPartitioned(mp);
 
 	// extract first partition key
-	CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(pexprGet->Pop());
+	gpos::Ref<CLogicalGet> popGet =
+		gpos::dyn_cast<CLogicalGet>(pexprGet->Pop());
 	const CColRef2dArray *pdrgpdrgpcr = popGet->PdrgpdrgpcrPartColumns();
 
 	GPOS_ASSERT(pdrgpdrgpcr != nullptr);
@@ -1961,7 +1962,7 @@ CTestUtils::PexprLogicalSelectWithEqPredicateOverDynamicGet(CMemoryPool *mp)
 		mp, std::move(ptabdesc), &strAlias, GPOPT_TEST_PART_INDEX);
 
 	// construct scalar comparison
-	CLogicalDynamicGet *popDynamicGet =
+	gpos::Ref<CLogicalDynamicGet> popDynamicGet =
 		gpos::dyn_cast<CLogicalDynamicGet>(pexprDynamicGet->Pop());
 	CColRef2dArray *pdrgpdrgpcr = popDynamicGet->PdrgpdrgpcrPart();
 	CColRef *colref = CUtils::PcrExtractPartKey(pdrgpdrgpcr, 0 /*ulLevel*/);
@@ -2000,7 +2001,7 @@ CTestUtils::PexprLogicalSelectWithLTPredicateOverDynamicGet(CMemoryPool *mp)
 		mp, std::move(ptabdesc), &strAlias, GPOPT_TEST_PART_INDEX);
 
 	// construct scalar comparison
-	CLogicalDynamicGet *popDynamicGet =
+	gpos::Ref<CLogicalDynamicGet> popDynamicGet =
 		gpos::dyn_cast<CLogicalDynamicGet>(pexprDynamicGet->Pop());
 	CColRef2dArray *pdrgpdrgpcr = popDynamicGet->PdrgpdrgpcrPart();
 	CColRef *colref = CUtils::PcrExtractPartKey(pdrgpdrgpcr, 0 /*ulLevel*/);
@@ -2277,13 +2278,15 @@ CTestUtils::PexprLogicalUnion(CMemoryPool *mp, ULONG ulDepth)
 
 			if (pop->Eopid() == COperator::EopLogicalGet)
 			{
-				CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(pop);
+				gpos::Ref<CLogicalGet> popGet =
+					gpos::dyn_cast<CLogicalGet>(pop);
 				colref_array = popGet->PdrgpcrOutput();
 			}
 			else
 			{
 				GPOS_ASSERT(COperator::EopLogicalUnion == pop->Eopid());
-				CLogicalUnion *popUnion = gpos::dyn_cast<CLogicalUnion>(pop);
+				gpos::Ref<CLogicalUnion> popUnion =
+					gpos::dyn_cast<CLogicalUnion>(pop);
 				colref_array = popUnion->PdrgpcrOutput();
 			}
 			pdrgpexprInput->Append(pexprInput);

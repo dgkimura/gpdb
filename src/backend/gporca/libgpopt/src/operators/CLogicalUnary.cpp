@@ -70,7 +70,7 @@ CLogicalUnary::PstatsDeriveProject(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);
-	CReqdPropRelational *prprel =
+	gpos::Ref<CReqdPropRelational> prprel =
 		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
 	gpos::Ref<CColRefSet> pcrs = prprel->PcrsStat();
 	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(mp) ULongPtrArray(mp);

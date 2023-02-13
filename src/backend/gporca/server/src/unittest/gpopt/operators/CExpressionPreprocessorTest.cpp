@@ -2123,7 +2123,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOrPrefiltersPartialPush()
 GPOS_RESULT
 CExpressionPreprocessorTest::EresUnittest_CollapseInnerJoinHelper(
 	CMemoryPool *mp, gpos::Ref<COperator> popJoin,
-	gpos::Ref<CExpression> rgpexpr[], CDrvdPropRelational *rgpdprel[])
+	gpos::Ref<CExpression> rgpexpr[], gpos::Ref<CDrvdPropRelational> rgpdprel[])
 {
 	GPOS_ASSERT(nullptr != popJoin);
 
@@ -2281,7 +2281,7 @@ CExpressionPreprocessorTest::EresUnittest_CollapseInnerJoin()
 					 CTestUtils::GetCostModel(mp));
 
 	gpos::Ref<CExpression> rgpexpr[GPOS_ARRAY_SIZE(rgscRel)];
-	CDrvdPropRelational *rgpdprel[GPOS_ARRAY_SIZE(rgscRel)];
+	gpos::Ref<CDrvdPropRelational> rgpdprel[GPOS_ARRAY_SIZE(rgscRel)];
 	for (ULONG ul = 0; ul < GPOS_ARRAY_SIZE(rgscRel); ul++)
 	{
 		rgpexpr[ul] = CTestUtils::PexprLogicalGet(mp, &rgscRel[ul],

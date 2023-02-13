@@ -143,7 +143,7 @@ CScalarSubqueryQuantified::Matches(gpos::Ref<COperator> pop) const
 	}
 
 	// match if contents are identical
-	CScalarSubqueryQuantified *popSsq =
+	gpos::Ref<CScalarSubqueryQuantified> popSsq =
 		gpos::dyn_cast<CScalarSubqueryQuantified>(pop);
 	return popSsq->Pcr() == m_pcr &&
 		   popSsq->MdIdOp()->Equals(m_scalar_op_mdid.get());

@@ -112,13 +112,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalUnion *
+	static gpos::Ref<CLogicalUnion>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalUnion == pop->Eopid());
 
-		return dynamic_cast<CLogicalUnion *>(pop);
+		return gpos::dyn_cast<CLogicalUnion>(pop);
 	}
 
 };	// class CLogicalUnion

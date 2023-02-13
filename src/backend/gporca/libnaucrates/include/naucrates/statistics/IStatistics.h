@@ -156,23 +156,23 @@ public:
 	// inner join with another stats structure
 	virtual gpos::Ref<IStatistics> CalcInnerJoinStats(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
-		CStatsPredJoinArray *join_preds_stats) const = 0;
+		CStatsPredJoinArray *join_preds_stats) = 0;
 
 	// LOJ with another stats structure
 	virtual gpos::Ref<IStatistics> CalcLOJoinStats(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
-		CStatsPredJoinArray *join_preds_stats) const = 0;
+		CStatsPredJoinArray *join_preds_stats) = 0;
 
 	// semi join stats computation
 	virtual gpos::Ref<IStatistics> CalcLSJoinStats(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> inner_side_stats,
-		CStatsPredJoinArray *join_preds_stats) const = 0;
+		CStatsPredJoinArray *join_preds_stats) = 0;
 
 	// anti semi join
 	virtual gpos::Ref<IStatistics> CalcLASJoinStats(
 		CMemoryPool *mp, const gpos::Ref<IStatistics> other_stats,
 		CStatsPredJoinArray *join_preds_stats,
-		BOOL DoIgnoreLASJHistComputation) const = 0;
+		BOOL DoIgnoreLASJHistComputation) = 0;
 
 	// return required props associated with stats object
 	virtual gpos::Ref<CReqdPropRelational> GetReqdRelationalProps(
@@ -185,11 +185,11 @@ public:
 	virtual void SetRebinds(CDouble num_rebinds) = 0;
 
 	// copy stats
-	virtual gpos::Ref<IStatistics> CopyStats(CMemoryPool *mp) const = 0;
+	virtual gpos::Ref<IStatistics> CopyStats(CMemoryPool *mp) = 0;
 
 	// return a copy of this stats object scaled by a given factor
 	virtual gpos::Ref<IStatistics> ScaleStats(CMemoryPool *mp,
-											  CDouble factor) const = 0;
+											  CDouble factor) = 0;
 
 	// copy stats with remapped column ids
 	virtual gpos::Ref<IStatistics> CopyStatsWithRemap(

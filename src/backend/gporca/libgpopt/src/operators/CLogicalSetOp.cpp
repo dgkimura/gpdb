@@ -250,7 +250,7 @@ CLogicalSetOp::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalSetOp *popSetOp = gpos::dyn_cast<CLogicalSetOp>(pop);
+	gpos::Ref<CLogicalSetOp> popSetOp = gpos::dyn_cast<CLogicalSetOp>(pop);
 	CColRef2dArray *pdrgpdrgpcrInput = popSetOp->PdrgpdrgpcrInput();
 	const ULONG arity = pdrgpdrgpcrInput->Size();
 

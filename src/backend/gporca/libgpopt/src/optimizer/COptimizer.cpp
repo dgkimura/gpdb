@@ -400,9 +400,9 @@ void
 COptimizer::CheckCTEConsistency(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 {
 	gpos::Ref<UlongToUlongMap> phmulul = GPOS_NEW(mp) UlongToUlongMap(mp);
-	CDrvdPropPlan *pdpplanChild =
+	gpos::Ref<CDrvdPropPlan> pdpplanChild =
 		gpos::dyn_cast<CDrvdPropPlan>(pexpr->PdpDerive());
-	CDistributionSpec *pdsChild = pdpplanChild->Pds();
+	gpos::Ref<CDistributionSpec> pdsChild = pdpplanChild->Pds();
 
 	CUtils::EExecLocalityType eelt = CUtils::ExecLocalityType(pdsChild);
 	CUtils::ValidateCTEProducerConsumerLocality(mp, pexpr, eelt, phmulul);

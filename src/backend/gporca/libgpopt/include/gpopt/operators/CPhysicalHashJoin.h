@@ -49,7 +49,7 @@ private:
 
 	// compute a distribution matching the distribution delivered by given child
 	gpos::Ref<CDistributionSpec> PdsMatch(CMemoryPool *mp,
-										  CDistributionSpec *pds,
+										  gpos::Ref<CDistributionSpec> pds,
 										  ULONG ulSourceChildIndex) const;
 
 protected:
@@ -59,7 +59,7 @@ protected:
 	// create (redistribute, redistribute) optimization request
 	gpos::Ref<CDistributionSpec> PdsRequiredRedistribute(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CDistributionSpec *pdsInput, ULONG child_index,
+		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
 		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const;
 
 	// create the set of redistribute requests to send to first hash join child
@@ -69,7 +69,7 @@ private:
 	// create (non-singleton, replicate) optimization request
 	gpos::Ref<CDistributionSpec> PdsRequiredReplicate(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CDistributionSpec *pdsInput, ULONG child_index,
+		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
 		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq,
 		gpos::Ref<CReqdPropPlan> prppInput);
 
@@ -77,7 +77,7 @@ private:
 	// return NULL if no such request can be created
 	static gpos::Ref<CDistributionSpecHashed> PdshashedPassThru(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CDistributionSpecHashed *pdshashedInput, ULONG child_index,
+		gpos::Ref<CDistributionSpecHashed> pdshashedInput, ULONG child_index,
 		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
 
 	// check whether a hash key is nullable
@@ -87,13 +87,13 @@ private:
 protected:
 	// helper for computing a hashed distribution matching the given distribution
 	gpos::Ref<CDistributionSpecHashed> PdshashedMatching(
-		CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
+		CMemoryPool *mp, gpos::Ref<CDistributionSpecHashed> pdshashed,
 		ULONG ulSourceChild) const;
 
 	// create (singleton, singleton) optimization request
 	gpos::Ref<CDistributionSpec> PdsRequiredSingleton(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CDistributionSpec *pdsInput, ULONG child_index,
+		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
 		CDrvdPropArray *pdrgpdpCtxt) const;
 
 	// check whether the hash keys from one child are nullable
@@ -156,12 +156,10 @@ public:
 											  ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	gpos::Ref<CDistributionSpec> PdsRequired(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl,
-											 CDistributionSpec *pdsRequired,
-											 ULONG child_index,
-											 CDrvdPropArray *pdrgpdpCtxt,
-											 ULONG ulOptReq) const override;
+	gpos::Ref<CDistributionSpec> PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
@@ -210,12 +208,12 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalHashJoin *
+	static gpos::Ref<CPhysicalHashJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(CUtils::FHashJoin(pop));
 
-		return dynamic_cast<CPhysicalHashJoin *>(pop);
+		return gpos::dyn_cast<CPhysicalHashJoin>(pop);
 	}
 
 };	// class CPhysicalHashJoin

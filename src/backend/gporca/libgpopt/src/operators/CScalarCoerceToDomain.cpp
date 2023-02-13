@@ -49,7 +49,7 @@ CScalarCoerceToDomain::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarCoerceToDomain *popCoerce =
+		gpos::Ref<CScalarCoerceToDomain> popCoerce =
 			gpos::dyn_cast<CScalarCoerceToDomain>(pop);
 
 		return popCoerce->MdidType()->Equals(MdidType()) &&

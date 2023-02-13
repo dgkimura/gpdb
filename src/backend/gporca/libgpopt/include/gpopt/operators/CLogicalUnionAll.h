@@ -100,13 +100,13 @@ public:
 
 
 	// conversion function
-	static CLogicalUnionAll *
+	static gpos::Ref<CLogicalUnionAll>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalUnionAll == pop->Eopid());
 
-		return dynamic_cast<CLogicalUnionAll *>(pop);
+		return gpos::dyn_cast<CLogicalUnionAll>(pop);
 	}
 
 	// derive statistics based on union all semantics

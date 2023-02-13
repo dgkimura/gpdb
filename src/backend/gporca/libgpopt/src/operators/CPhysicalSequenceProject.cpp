@@ -82,7 +82,7 @@ CPhysicalSequenceProject::CreateOrderSpec(CMemoryPool *mp)
 	// add partition by keys to order spec
 	if (CDistributionSpec::EdtHashed == m_pds->Edt())
 	{
-		CDistributionSpecHashed *pdshashed =
+		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(m_pds.get());
 
 		const CExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
@@ -91,7 +91,8 @@ CPhysicalSequenceProject::CreateOrderSpec(CMemoryPool *mp)
 		{
 			gpos::Ref<CExpression> pexpr = (*pdrgpexpr)[ul].get();
 			// we assume partition-by keys are always scalar idents
-			CScalarIdent *popScId = gpos::dyn_cast<CScalarIdent>(pexpr->Pop());
+			gpos::Ref<CScalarIdent> popScId =
+				gpos::dyn_cast<CScalarIdent>(pexpr->Pop());
 			const CColRef *colref = popScId->Pcr();
 
 			gpos::Ref<gpmd::IMDId> mdid =
@@ -315,7 +316,7 @@ CPhysicalSequenceProject::PosRequired(CMemoryPool *,		// mp
 gpos::Ref<CDistributionSpec>
 CPhysicalSequenceProject::PdsRequired(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl,
-									  CDistributionSpec *pdsRequired,
+									  gpos::Ref<CDistributionSpec> pdsRequired,
 									  ULONG child_index,
 									  CDrvdPropArray *,	 // pdrgpdpCtxt
 									  ULONG				 // ulOptReq
@@ -460,7 +461,8 @@ gpos::Ref<CDistributionSpec>
 CPhysicalSequenceProject::PdsDerive(CMemoryPool *mp,
 									CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pds = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	gpos::Ref<CDistributionSpec> pds =
+		exprhdl.Pdpplan(0 /*child_index*/)->Pds();
 	if (CDistributionSpec::EdtStrictReplicated == pds->Edt())
 	{
 		// Sequence project (i.e. window functions) cannot guarantee replicated

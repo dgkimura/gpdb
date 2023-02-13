@@ -542,7 +542,7 @@ CGroup::SetState(EState estNewState)
 void
 CGroup::SetJoinKeys(CExpressionArray *pdrgpexprOuter,
 					CExpressionArray *pdrgpexprInner,
-					IMdIdArray *join_opfamilies)
+					gpos::Ref<IMdIdArray> join_opfamilies)
 {
 	GPOS_ASSERT(m_fScalar);
 	GPOS_ASSERT(nullptr != pdrgpexprOuter);
@@ -1016,7 +1016,7 @@ CGroup::CreateScalarExpression()
 	{
 		if (COperator::EopScalarSubquery == pop->Eopid())
 		{
-			CScalarSubquery *subquery_pop =
+			gpos::Ref<CScalarSubquery> subquery_pop =
 				gpos::dyn_cast<CScalarSubquery>(pop);
 			const CColRef *subquery_colref = subquery_pop->Pcr();
 
@@ -1400,8 +1400,8 @@ CGroup::FBetterPromise(CMemoryPool *mp, CLogical::EStatPromise espFst,
 CLogical::EStatPromise
 CGroup::EspDerive(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 				  gpos::Ref<CGroupExpression> pgexpr,
-				  CReqdPropRelational *prprel, IStatisticsArray *stats_ctxt,
-				  BOOL fDeriveChildStats)
+				  gpos::Ref<CReqdPropRelational> prprel,
+				  IStatisticsArray *stats_ctxt, BOOL fDeriveChildStats)
 {
 	GPOS_ASSERT(pgexpr->Pop()->FLogical());
 
@@ -1449,7 +1449,7 @@ CGroup::EspDerive(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CGroup::PstatsRecursiveDerive(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-							  CReqdPropRelational *prprel,
+							  gpos::Ref<CReqdPropRelational> prprel,
 							  IStatisticsArray *stats_ctxt)
 {
 	GPOS_CHECK_STACK_SIZE;
@@ -1598,7 +1598,7 @@ CGroup::PgexprBestPromise(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CGroupExpression>
 CGroup::PgexprBestPromise(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-						  CReqdPropRelational *prprelInput,
+						  gpos::Ref<CReqdPropRelational> prprelInput,
 						  IStatisticsArray *stats_ctxt)
 {
 	gpos::Ref<CGroupExpression> pgexprBest = nullptr;

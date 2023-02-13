@@ -157,7 +157,7 @@ CLogicalCTEProducer::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalCTEProducer *popCTEProducer =
+	gpos::Ref<CLogicalCTEProducer> popCTEProducer =
 		gpos::dyn_cast<CLogicalCTEProducer>(pop);
 
 	return m_id == popCTEProducer->UlCTEId() &&

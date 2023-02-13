@@ -95,7 +95,7 @@ public:
 							  ULONG key_pos) const = 0;
 
 	// child index oids
-	virtual IMdIdArray *ChildIndexMdids() const = 0;
+	virtual gpos::Ref<IMdIdArray> ChildIndexMdids() const = 0;
 
 	// index type as a string value
 	static const CWStringConst *GetDXLStr(EmdindexType index_type);

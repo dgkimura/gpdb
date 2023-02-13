@@ -68,7 +68,7 @@ CLogicalAssert::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalAssert *popAssert = gpos::dyn_cast<CLogicalAssert>(pop);
+	gpos::Ref<CLogicalAssert> popAssert = gpos::dyn_cast<CLogicalAssert>(pop);
 	return CException::Equals(*(popAssert->Pexc()), *m_pexc);
 }
 

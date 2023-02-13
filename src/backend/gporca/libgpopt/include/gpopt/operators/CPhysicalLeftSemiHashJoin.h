@@ -62,12 +62,12 @@ public:
 						   ULONG ulOptReq) const override;
 
 	// conversion function
-	static CPhysicalLeftSemiHashJoin *
+	static gpos::Ref<CPhysicalLeftSemiHashJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftSemiHashJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalLeftSemiHashJoin *>(pop);
+		return gpos::dyn_cast<CPhysicalLeftSemiHashJoin>(pop);
 	}
 
 

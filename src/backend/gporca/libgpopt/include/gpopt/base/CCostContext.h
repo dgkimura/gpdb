@@ -208,7 +208,7 @@ public:
 	BOOL FOwnsStats() const;
 
 	// derived plan properties accessor
-	CDrvdPropPlan *
+	gpos::Ref<CDrvdPropPlan>
 	Pdpplan() const
 	{
 		return m_pdpplan.get();

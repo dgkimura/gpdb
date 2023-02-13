@@ -258,7 +258,7 @@ public:
 	gpos::Ref<CDXLNode> MDPartConstraint() const override;
 
 	// child partition oids
-	IMdIdArray *ChildPartitionMdids() const override;
+	gpos::Ref<IMdIdArray> ChildPartitionMdids() const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the metadata relation

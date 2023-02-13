@@ -112,13 +112,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalIntersect *
+	static gpos::Ref<CLogicalIntersect>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalIntersect == pop->Eopid());
 
-		return dynamic_cast<CLogicalIntersect *>(pop);
+		return gpos::dyn_cast<CLogicalIntersect>(pop);
 	}
 
 };	// class CLogicalIntersect

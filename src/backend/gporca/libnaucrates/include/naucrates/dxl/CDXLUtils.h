@@ -283,7 +283,8 @@ public:
 
 #ifdef GPOS_DEBUG
 	// debug print of the metadata relation
-	static void DebugPrintMDIdArray(IOstream &os, IMdIdArray *mdid_array);
+	static void DebugPrintMDIdArray(IOstream &os,
+									gpos::Ref<IMdIdArray> mdid_array);
 #endif
 };
 

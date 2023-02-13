@@ -14,6 +14,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpression.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpnaucrates;
 using namespace gpopt;

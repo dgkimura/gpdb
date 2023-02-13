@@ -58,7 +58,8 @@ CDistributionSpecNonSingleton::CDistributionSpecNonSingleton(
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecNonSingleton::FSatisfies(const CDistributionSpec *	 // pds
+CDistributionSpecNonSingleton::FSatisfies(
+	const gpos::Ref<CDistributionSpec>	// pds
 ) const
 {
 	GPOS_ASSERT(!"Non-Singleton distribution cannot be derived");

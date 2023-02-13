@@ -67,7 +67,7 @@ CXformDifferenceAll2LeftAntiSemiJoin::Transform(
 	gpos::Ref<CExpression> pexprLeftChild = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprRightChild = (*pexpr)[1];
 
-	CLogicalDifferenceAll *popDifferenceAll =
+	gpos::Ref<CLogicalDifferenceAll> popDifferenceAll =
 		gpos::dyn_cast<CLogicalDifferenceAll>(pexpr->Pop());
 	CColRef2dArray *pdrgpdrgpcrInput = popDifferenceAll->PdrgpdrgpcrInput();
 

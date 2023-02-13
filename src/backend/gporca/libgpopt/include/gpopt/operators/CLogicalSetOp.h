@@ -149,13 +149,13 @@ public:
 	) const override;
 
 	// conversion function
-	static CLogicalSetOp *
+	static gpos::Ref<CLogicalSetOp>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FLogicalSetOp(pop));
 
-		return dynamic_cast<CLogicalSetOp *>(pop);
+		return gpos::dyn_cast<CLogicalSetOp>(pop);
 	}
 
 };	// class CLogicalSetOp

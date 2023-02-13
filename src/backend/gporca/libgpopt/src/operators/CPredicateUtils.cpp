@@ -69,7 +69,7 @@ CPredicateUtils::FBooleanScalarIdent(gpos::Ref<CExpression> pexprPred)
 
 	if (COperator::EopScalarIdent == pexprPred->Pop()->Eopid())
 	{
-		CScalarIdent *popScIdent =
+		gpos::Ref<CScalarIdent> popScIdent =
 			gpos::dyn_cast<CScalarIdent>(pexprPred->Pop());
 		if (IMDType::EtiBool ==
 			popScIdent->Pcr()->RetrieveType()->GetDatumType())
@@ -1111,8 +1111,10 @@ CPredicateUtils::FEqIdentsOfSameType(gpos::Ref<CExpression> pexpr)
 		return false;
 	}
 
-	CScalarIdent *left_ident = gpos::dyn_cast<CScalarIdent>(pexprLeft->Pop());
-	CScalarIdent *right_ident = gpos::dyn_cast<CScalarIdent>(pexprRight->Pop());
+	gpos::Ref<CScalarIdent> left_ident =
+		gpos::dyn_cast<CScalarIdent>(pexprLeft->Pop());
+	gpos::Ref<CScalarIdent> right_ident =
+		gpos::dyn_cast<CScalarIdent>(pexprRight->Pop());
 	if (!left_ident->MdidType()->Equals(right_ident->MdidType()))
 	{
 		return false;
@@ -1780,8 +1782,8 @@ CPredicateUtils::FConstColumn(gpos::Ref<CConstraint> pcnstr, const CColRef *
 
 	GPOS_ASSERT(pcnstr->FConstraint(colref));
 
-	CConstraintInterval *pcnstrInterval =
-		dynamic_cast<CConstraintInterval *>(pcnstr);
+	gpos::Ref<CConstraintInterval> pcnstrInterval =
+		gpos::dyn_cast<CConstraintInterval>(pcnstr);
 	CRangeArray *pdrgprng = pcnstrInterval->Pdrgprng();
 	if (1 < pdrgprng->Size())
 	{
@@ -1820,17 +1822,17 @@ CPredicateUtils::FColumnDisjunctionOfConst(gpos::Ref<CConstraint> pcnstr,
 
 	GPOS_ASSERT(CConstraint::EctInterval == pcnstr->Ect());
 
-	CConstraintInterval *pcnstrInterval =
-		dynamic_cast<CConstraintInterval *>(pcnstr);
+	gpos::Ref<CConstraintInterval> pcnstrInterval =
+		gpos::dyn_cast<CConstraintInterval>(pcnstr);
 	return FColumnDisjunctionOfConst(pcnstrInterval, colref);
 }
 
 // checks if the given constraint specifies a set of constants for a column
 BOOL
-CPredicateUtils::FColumnDisjunctionOfConst(CConstraintInterval *pcnstrInterval,
-										   const CColRef *
+CPredicateUtils::FColumnDisjunctionOfConst(
+	gpos::Ref<CConstraintInterval> pcnstrInterval, const CColRef *
 #ifdef GPOS_DEBUG
-											   colref
+													   colref
 #endif
 )
 {
@@ -2761,8 +2763,9 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll(
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[child_index];
 	GPOS_ASSERT(nullptr != pexprChild);
 
-	CLogicalSetOp *pop = gpos::dyn_cast<CLogicalSetOp>(pexpr->Pop());
-	CLogicalSetOp *popChild = gpos::dyn_cast<CLogicalSetOp>(pexprChild->Pop());
+	gpos::Ref<CLogicalSetOp> pop = gpos::dyn_cast<CLogicalSetOp>(pexpr->Pop());
+	gpos::Ref<CLogicalSetOp> popChild =
+		gpos::dyn_cast<CLogicalSetOp>(pexprChild->Pop());
 
 	// the parent setop's expected input columns and the child setop's output columns
 	// may have different size or order or both. We need to ensure that the new

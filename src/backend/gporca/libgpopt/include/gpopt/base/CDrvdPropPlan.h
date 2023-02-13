@@ -87,7 +87,7 @@ public:
 				gpos::Ref<CDrvdPropCtxt> pdpctxt) override;
 
 	// short hand for conversion
-	static CDrvdPropPlan *Pdpplan(gpos::Ref<CDrvdProp> pdp);
+	static gpos::Ref<CDrvdPropPlan> Pdpplan(gpos::Ref<CDrvdProp> pdp);
 
 	// sort order accessor
 	COrderSpec *
@@ -97,7 +97,7 @@ public:
 	}
 
 	// distribution accessor
-	CDistributionSpec *
+	gpos::Ref<CDistributionSpec>
 	Pds() const
 	{
 		return m_pds.get();
@@ -127,7 +127,7 @@ public:
 	virtual ULONG HashValue() const;
 
 	// equality function
-	virtual ULONG Equals(const CDrvdPropPlan *pdpplan) const;
+	virtual ULONG Equals(const gpos::Ref<CDrvdPropPlan> pdpplan) const;
 
 	// check for satisfying required plan properties
 	BOOL FSatisfies(const gpos::Ref<CReqdPropPlan> prpp) const override;

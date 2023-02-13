@@ -70,13 +70,13 @@ public:
 	}
 
 	// conversion function
-	static CXformExploration *
+	static gpos::Ref<CXformExploration>
 	Pxformexp(gpos::Ref<CXform> pxform)
 	{
 		GPOS_ASSERT(nullptr != pxform);
 		GPOS_ASSERT(pxform->FExploration());
 
-		return dynamic_cast<CXformExploration *>(pxform);
+		return gpos::dyn_cast<CXformExploration>(pxform);
 	}
 
 };	// class CXformExploration

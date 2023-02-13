@@ -619,7 +619,7 @@ CExpressionHandle::DeriveCostContextStats()
 //---------------------------------------------------------------------------
 void
 CExpressionHandle::DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-							   CReqdPropRelational *prprel,
+							   gpos::Ref<CReqdPropRelational> prprel,
 							   IStatisticsArray *stats_ctxt) const
 {
 	gpos::Ref<CReqdPropRelational> prprelNew = prprel;
@@ -685,7 +685,7 @@ CExpressionHandle::DerivePlanPropsForCostContext()
 	{
 		// copy producer plan properties to passed derived plan properties context
 		ULONG ulCTEId = gpos::dyn_cast<CPhysicalCTEConsumer>(pop)->UlCTEId();
-		CDrvdPropPlan *pdpplan =
+		gpos::Ref<CDrvdPropPlan> pdpplan =
 			m_pcc->Poc()->Prpp()->Pcter()->Pdpplan(ulCTEId);
 		if (nullptr != pdpplan)
 		{
@@ -1005,7 +1005,7 @@ CExpressionHandle::UlNonScalarChildren() const
 //		Assumes caller knows what properties to ask for;
 //
 //---------------------------------------------------------------------------
-CDrvdPropRelational *
+gpos::Ref<CDrvdPropRelational>
 CExpressionHandle::GetRelationalProperties(ULONG child_index) const
 {
 	if (nullptr != Pexpr())
@@ -1025,7 +1025,7 @@ CExpressionHandle::GetRelationalProperties(ULONG child_index) const
 	GPOS_ASSERT(nullptr != m_pcc || nullptr != m_pgexpr);
 
 	// handle is used for deriving plan properties, get relational props from child group
-	CDrvdPropRelational *drvdProps =
+	gpos::Ref<CDrvdPropRelational> drvdProps =
 		gpos::dyn_cast<CDrvdPropRelational>((*Pgexpr())[child_index]->Pdp());
 	GPOS_ASSERT(drvdProps->IsComplete());
 
@@ -1040,7 +1040,7 @@ CExpressionHandle::GetRelationalProperties(ULONG child_index) const
 //		Retrieve relational properties of attached expr/gexpr;
 //
 //---------------------------------------------------------------------------
-CDrvdPropRelational *
+gpos::Ref<CDrvdPropRelational>
 CExpressionHandle::GetRelationalProperties() const
 {
 	if (nullptr != Pexpr())
@@ -1048,7 +1048,8 @@ CExpressionHandle::GetRelationalProperties() const
 		if (Pexpr()->Pop()->FPhysical())
 		{
 			// relational props were copied from memo, return props directly
-			CDrvdPropRelational *drvdProps = Pexpr()->GetDrvdPropRelational();
+			gpos::Ref<CDrvdPropRelational> drvdProps =
+				Pexpr()->GetDrvdPropRelational();
 			GPOS_ASSERT(drvdProps->IsComplete());
 			return drvdProps;
 		}
@@ -1059,7 +1060,7 @@ CExpressionHandle::GetRelationalProperties() const
 	GPOS_ASSERT(nullptr != m_pcc || nullptr != m_pgexpr);
 
 	// get relational props from group
-	CDrvdPropRelational *drvdProps =
+	gpos::Ref<CDrvdPropRelational> drvdProps =
 		gpos::dyn_cast<CDrvdPropRelational>(Pgexpr()->Pgroup()->Pdp());
 	GPOS_ASSERT(drvdProps->IsComplete());
 
@@ -1093,7 +1094,7 @@ CExpressionHandle::Pstats(ULONG child_index) const
 //		Assumes caller knows what properties to ask for;
 //
 //---------------------------------------------------------------------------
-CDrvdPropPlan *
+gpos::Ref<CDrvdPropPlan>
 CExpressionHandle::Pdpplan(ULONG child_index) const
 {
 	if (nullptr != m_pexpr)
@@ -1106,7 +1107,7 @@ CExpressionHandle::Pdpplan(ULONG child_index) const
 
 	gpos::Ref<COptimizationContext> pocChild =
 		(*m_pcc->Pdrgpoc())[child_index].get();
-	CDrvdPropPlan *pdpplan = pocChild->PccBest()->Pdpplan();
+	gpos::Ref<CDrvdPropPlan> pdpplan = pocChild->PccBest()->Pdpplan();
 
 	return pdpplan;
 }
@@ -1121,7 +1122,7 @@ CExpressionHandle::Pdpplan(ULONG child_index) const
 //		Assumes caller knows what properties to ask for;
 //
 //---------------------------------------------------------------------------
-CDrvdPropScalar *
+gpos::Ref<CDrvdPropScalar>
 CExpressionHandle::GetDrvdScalarProps(ULONG child_index) const
 {
 	if (nullptr != Pexpr())
@@ -1147,7 +1148,7 @@ CExpressionHandle::GetDrvdScalarProps(ULONG child_index) const
 //		Assumes caller knows what properties to ask for;
 //
 //---------------------------------------------------------------------------
-CReqdPropRelational *
+gpos::Ref<CReqdPropRelational>
 CExpressionHandle::GetReqdRelationalProps(ULONG child_index) const
 {
 	GPOS_ASSERT(child_index < m_pdrgprp->Size());
@@ -1321,7 +1322,7 @@ CExpressionHandle::DeriveProducerStats(ULONG child_index,
 		{
 			gpos::Ref<CGroupExpression> pgexprCTEConsumer =
 				pgroupChild->PgexprAnyCTEConsumer();
-			CLogicalCTEConsumer *popConsumer =
+			gpos::Ref<CLogicalCTEConsumer> popConsumer =
 				gpos::dyn_cast<CLogicalCTEConsumer>(pgexprCTEConsumer->Pop());
 			COptCtxt::PoctxtFromTLS()->Pcteinfo()->DeriveProducerStats(
 				popConsumer, pcrsStats);
@@ -1339,7 +1340,7 @@ CExpressionHandle::DeriveProducerStats(ULONG child_index,
 		gpos::Ref<CExpression> pexprChild = (*pexpr)[child_index];
 		if (COperator::EopLogicalCTEConsumer == pexprChild->Pop()->Eopid())
 		{
-			CLogicalCTEConsumer *popConsumer =
+			gpos::Ref<CLogicalCTEConsumer> popConsumer =
 				gpos::dyn_cast<CLogicalCTEConsumer>(pexprChild->Pop());
 			COptCtxt::PoctxtFromTLS()->Pcteinfo()->DeriveProducerStats(
 				popConsumer, pcrsStats);

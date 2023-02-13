@@ -56,7 +56,7 @@ CXformDynamicGet2DynamicTableScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDynamicGet *popGet =
+	gpos::Ref<CLogicalDynamicGet> popGet =
 		gpos::dyn_cast<CLogicalDynamicGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 

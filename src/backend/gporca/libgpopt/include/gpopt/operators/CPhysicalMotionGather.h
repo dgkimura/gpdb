@@ -74,7 +74,7 @@ public:
 	}
 
 	// output distribution accessor
-	CDistributionSpec *
+	gpos::Ref<CDistributionSpec>
 	Pds() const override
 	{
 		return m_pdssSingeton.get();
@@ -150,7 +150,8 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalMotionGather *PopConvert(gpos::Ref<COperator> pop);
+	static gpos::Ref<CPhysicalMotionGather> PopConvert(
+		gpos::Ref<COperator> pop);
 
 };	// class CPhysicalMotionGather
 

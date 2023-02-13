@@ -97,7 +97,7 @@ CCastUtils::PcrExtractFromScIdOrCastScId(gpos::Ref<CExpression> pexpr)
 		return nullptr;
 	}
 
-	CScalarIdent *popScIdent = nullptr;
+	gpos::Ref<CScalarIdent> popScIdent = nullptr;
 	if (fScIdent)
 	{
 		popScIdent = gpos::dyn_cast<CScalarIdent>(pexpr->Pop());

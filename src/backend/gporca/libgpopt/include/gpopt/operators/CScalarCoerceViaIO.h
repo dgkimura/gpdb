@@ -75,13 +75,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarCoerceViaIO *
+	static gpos::Ref<CScalarCoerceViaIO>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCoerceViaIO == pop->Eopid());
 
-		return dynamic_cast<CScalarCoerceViaIO *>(pop);
+		return gpos::dyn_cast<CScalarCoerceViaIO>(pop);
 	}
 
 };	// class CScalarCoerceViaIO

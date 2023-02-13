@@ -90,7 +90,7 @@ CLeftAntiSemiJoinStatsProcessor::CalcLASJoinStatsStatic(
 	GPOS_ASSERT(nullptr != outer_stats_input);
 	GPOS_ASSERT(nullptr != join_preds_stats);
 	const gpos::Ref<CStatistics> outer_stats =
-		dynamic_cast<const gpos::Ref<CStatistics> >(outer_stats_input);
+		gpos::dyn_cast<CStatistics>(outer_stats_input);
 
 	return CJoinStatsProcessor::SetResultingJoinStats(
 		mp, outer_stats->GetStatsConfig(), outer_stats_input, inner_stats_input,

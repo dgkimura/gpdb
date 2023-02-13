@@ -184,13 +184,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalConstTableGet *
+	static gpos::Ref<CLogicalConstTableGet>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalConstTableGet == pop->Eopid());
 
-		return dynamic_cast<CLogicalConstTableGet *>(pop);
+		return gpos::dyn_cast<CLogicalConstTableGet>(pop);
 	}
 
 

@@ -66,7 +66,7 @@ public:
 
 	// does current distribution satisfy the given one
 	BOOL
-	FSatisfies(const CDistributionSpec *pds) const override
+	FSatisfies(const gpos::Ref<CDistributionSpec> pds) const override
 	{
 		return EdtAny == pds->Edt();
 	}
@@ -114,13 +114,13 @@ public:
 	}
 
 	// conversion function
-	static CDistributionSpecAny *
-	PdsConvert(CDistributionSpec *pds)
+	static gpos::Ref<CDistributionSpecAny>
+	PdsConvert(gpos::Ref<CDistributionSpec> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtAny == pds->Edt());
 
-		return dynamic_cast<CDistributionSpecAny *>(pds);
+		return gpos::dyn_cast<CDistributionSpecAny>(pds);
 	}
 
 	// retrieve the physical operator requesting this distribution spec

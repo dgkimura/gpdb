@@ -73,7 +73,7 @@ CPhysicalConstTableGet::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() == pop->Eopid())
 	{
-		CPhysicalConstTableGet *popCTG =
+		gpos::Ref<CPhysicalConstTableGet> popCTG =
 			gpos::dyn_cast<CPhysicalConstTableGet>(pop);
 		return m_pdrgpcoldesc == popCTG->Pdrgpcoldesc() &&
 			   m_pdrgpdrgpdatum == popCTG->Pdrgpdrgpdatum() &&
@@ -137,12 +137,13 @@ CPhysicalConstTableGet::PosRequired(CMemoryPool *,		  // mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysicalConstTableGet::PdsRequired(CMemoryPool *,		  // mp,
-									CExpressionHandle &,  // exprhdl,
-									CDistributionSpec *,  // pdsRequired,
-									ULONG,				  //child_index
-									CDrvdPropArray *,	  // pdrgpdpCtxt
-									ULONG				  // ulOptReq
+CPhysicalConstTableGet::PdsRequired(
+	CMemoryPool *,				   // mp,
+	CExpressionHandle &,		   // exprhdl,
+	gpos::Ref<CDistributionSpec>,  // pdsRequired,
+	ULONG,						   //child_index
+	CDrvdPropArray *,			   // pdrgpdpCtxt
+	ULONG						   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalConstTableGet has no children");

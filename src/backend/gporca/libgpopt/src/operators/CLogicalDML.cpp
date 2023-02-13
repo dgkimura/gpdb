@@ -127,7 +127,7 @@ CLogicalDML::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalDML *popDML = gpos::dyn_cast<CLogicalDML>(pop);
+	gpos::Ref<CLogicalDML> popDML = gpos::dyn_cast<CLogicalDML>(pop);
 
 	return m_pcrAction == popDML->PcrAction() &&
 		   m_pcrTableOid == popDML->PcrTableOid() &&

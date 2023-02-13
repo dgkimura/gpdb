@@ -164,13 +164,13 @@ CDrvdPropRelational::FSatisfies(const gpos::Ref<CReqdPropPlan> prpp) const
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-CDrvdPropRelational *
+gpos::Ref<CDrvdPropRelational>
 CDrvdPropRelational::GetRelationalProperties(gpos::Ref<CDrvdProp> pdp)
 {
 	GPOS_ASSERT(nullptr != pdp);
 	GPOS_ASSERT(EptRelational == pdp->Ept() &&
 				"This is not a relational properties container");
-	return dynamic_cast<CDrvdPropRelational *>(pdp);
+	return gpos::dyn_cast<CDrvdPropRelational>(pdp);
 }
 
 

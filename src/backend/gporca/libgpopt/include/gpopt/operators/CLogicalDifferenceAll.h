@@ -111,13 +111,13 @@ public:
 		IStatisticsArray *stats_ctxt) const override;
 
 	// conversion function
-	static CLogicalDifferenceAll *
+	static gpos::Ref<CLogicalDifferenceAll>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDifferenceAll == pop->Eopid());
 
-		return dynamic_cast<CLogicalDifferenceAll *>(pop);
+		return gpos::dyn_cast<CLogicalDifferenceAll>(pop);
 	}
 
 };	// class CLogicalDifferenceAll

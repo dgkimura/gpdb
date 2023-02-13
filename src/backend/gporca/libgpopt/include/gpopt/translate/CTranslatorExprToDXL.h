@@ -604,8 +604,9 @@ private:
 	gpos::Ref<CDXLNode> GetSortColListDXL(gpos::Ref<CExpression> pexprMotion);
 
 	// create a DXL hash expr list from an array of hash columns
-	gpos::Ref<CDXLNode> PdxlnHashExprList(const CExpressionArray *pdrgpexpr,
-										  const IMdIdArray *opfamilies);
+	gpos::Ref<CDXLNode> PdxlnHashExprList(
+		const CExpressionArray *pdrgpexpr,
+		const gpos::Ref<IMdIdArray> opfamilies);
 
 	// create a DXL filter node with the given scalar expression
 	gpos::Ref<CDXLNode> PdxlnFilter(gpos::Ref<CDXLNode> pdxlnCond);
@@ -623,7 +624,7 @@ private:
 							  const CColRefArray *colref_array);
 
 	// return hash join type
-	static EdxlJoinType EdxljtHashJoin(CPhysicalHashJoin *popHJ);
+	static EdxlJoinType EdxljtHashJoin(gpos::Ref<CPhysicalHashJoin> popHJ);
 
 	// main translation routine for Expr tree -> DXL tree
 	gpos::Ref<CDXLNode> CreateDXLNode(gpos::Ref<CExpression> pexpr,

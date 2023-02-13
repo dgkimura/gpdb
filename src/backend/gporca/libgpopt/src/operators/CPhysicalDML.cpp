@@ -88,7 +88,7 @@ CPhysicalDML::CPhysicalDML(CMemoryPool *mp, CLogicalDML::EDMLOperator edmlop,
 
 		if (CLogicalDML::EdmlUpdate == edmlop)
 		{
-			CDistributionSpecHashed *hashDistSpec =
+			gpos::Ref<CDistributionSpecHashed> hashDistSpec =
 				gpos::dyn_cast<CDistributionSpecHashed>(m_pds.get());
 			gpos::Ref<CColRefSet> updatedCols = GPOS_NEW(mp) CColRefSet(mp);
 			gpos::Ref<CColRefSet> distributionCols = hashDistSpec->PcrsUsed(mp);
@@ -249,8 +249,8 @@ CPhysicalDML::PcrsRequired(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysicalDML::PdsRequired(CMemoryPool *mp,
-						  CExpressionHandle &,	// exprhdl,
-						  CDistributionSpec *,	// pdsInput,
+						  CExpressionHandle &,			 // exprhdl,
+						  gpos::Ref<CDistributionSpec>,	 // pdsInput,
 						  ULONG
 #ifdef GPOS_DEBUG
 							  child_index
@@ -413,7 +413,7 @@ CPhysicalDML::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CPhysicalDML *popDML = gpos::dyn_cast<CPhysicalDML>(pop);
+		gpos::Ref<CPhysicalDML> popDML = gpos::dyn_cast<CPhysicalDML>(pop);
 
 		return m_pcrAction == popDML->PcrAction() &&
 			   m_pcrTableOid == popDML->PcrTableOid() &&

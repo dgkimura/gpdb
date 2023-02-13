@@ -107,13 +107,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalInnerApply *
+	static gpos::Ref<CLogicalInnerApply>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInnerApply == pop->Eopid());
 
-		return dynamic_cast<CLogicalInnerApply *>(pop);
+		return gpos::dyn_cast<CLogicalInnerApply>(pop);
 	}
 
 };	// class CLogicalInnerApply

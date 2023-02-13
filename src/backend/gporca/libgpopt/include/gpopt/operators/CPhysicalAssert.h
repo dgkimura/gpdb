@@ -123,12 +123,10 @@ public:
 									  ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	gpos::Ref<CDistributionSpec> PdsRequired(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl,
-											 CDistributionSpec *pdsRequired,
-											 ULONG child_index,
-											 CDrvdPropArray *pdrgpdpCtxt,
-											 ULONG ulOptReq) const override;
+	gpos::Ref<CDistributionSpec> PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	gpos::Ref<CRewindabilitySpec> PrsRequired(CMemoryPool *mp,
@@ -185,13 +183,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalAssert *
+	static gpos::Ref<CPhysicalAssert>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalAssert == pop->Eopid());
 
-		return dynamic_cast<CPhysicalAssert *>(pop);
+		return gpos::dyn_cast<CPhysicalAssert>(pop);
 	}
 
 	// debug print

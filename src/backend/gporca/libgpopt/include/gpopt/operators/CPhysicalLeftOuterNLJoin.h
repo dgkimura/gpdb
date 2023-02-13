@@ -54,12 +54,12 @@ public:
 
 
 	// conversion function
-	static CPhysicalLeftOuterNLJoin *
+	static gpos::Ref<CPhysicalLeftOuterNLJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftOuterNLJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalLeftOuterNLJoin *>(pop);
+		return gpos::dyn_cast<CPhysicalLeftOuterNLJoin>(pop);
 	}
 
 

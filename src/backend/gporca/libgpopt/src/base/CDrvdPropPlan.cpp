@@ -62,14 +62,14 @@ CDrvdPropPlan::~CDrvdPropPlan()
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-CDrvdPropPlan *
+gpos::Ref<CDrvdPropPlan>
 CDrvdPropPlan::Pdpplan(gpos::Ref<CDrvdProp> pdp)
 {
 	GPOS_ASSERT(nullptr != pdp);
 	GPOS_ASSERT(EptPlan == pdp->Ept() &&
 				"This is not a plan properties container");
 
-	return dynamic_cast<CDrvdPropPlan *>(pdp);
+	return gpos::dyn_cast<CDrvdPropPlan>(pdp);
 }
 
 
@@ -120,12 +120,13 @@ CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp,
 										gpos::Ref<CDrvdPropCtxt> pdpctxt,
 										gpos::Ref<COperator> pop)
 {
-	CDrvdPropCtxtPlan *pdpctxtplan = gpos::dyn_cast<CDrvdPropCtxtPlan>(pdpctxt);
-	CPhysicalCTEConsumer *popCTEConsumer =
+	gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
+		gpos::dyn_cast<CDrvdPropCtxtPlan>(pdpctxt);
+	gpos::Ref<CPhysicalCTEConsumer> popCTEConsumer =
 		gpos::dyn_cast<CPhysicalCTEConsumer>(pop);
 	ULONG ulCTEId = popCTEConsumer->UlCTEId();
 	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
-	CDrvdPropPlan *pdpplan = pdpctxtplan->PdpplanCTEProducer(ulCTEId);
+	gpos::Ref<CDrvdPropPlan> pdpplan = pdpctxtplan->PdpplanCTEProducer(ulCTEId);
 	if (nullptr != pdpplan)
 	{
 		// copy producer plan properties after remapping columns
@@ -200,7 +201,7 @@ CDrvdPropPlan::HashValue() const
 //
 //---------------------------------------------------------------------------
 ULONG
-CDrvdPropPlan::Equals(const CDrvdPropPlan *pdpplan) const
+CDrvdPropPlan::Equals(const gpos::Ref<CDrvdPropPlan> pdpplan) const
 {
 	return m_pos->Matches(pdpplan->Pos()) && m_pds->Equals(pdpplan->Pds()) &&
 		   m_prs->Matches(pdpplan->Prs()) && m_ppps->Equals(pdpplan->Ppps()) &&

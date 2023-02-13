@@ -406,7 +406,7 @@ public:
 	// derive statistics
 	static void DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 							gpos::Ref<CGroup> pgroup,
-							CReqdPropRelational *prprel);
+							gpos::Ref<CReqdPropRelational> prprel);
 
 	// return the first group expression in a given group
 	static gpos::Ref<CGroupExpression> PgexprFirst(gpos::Ref<CGroup> pgroup);

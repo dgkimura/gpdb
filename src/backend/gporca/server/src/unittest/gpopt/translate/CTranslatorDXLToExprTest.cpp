@@ -404,7 +404,8 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQuery()
 
 		gpos::Ref<CExpression> pexprLgGet = PexprGet(mp);
 
-		CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
+		gpos::Ref<CLogicalGet> popGet =
+			gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
 
 
 		// the output column references from the logical get
@@ -459,7 +460,8 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithConst()
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 						 CTestUtils::GetCostModel(mp));
 		gpos::Ref<CExpression> pexprLgGet = PexprGet(mp);
-		CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
+		gpos::Ref<CLogicalGet> popGet =
+			gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
 
 		// the output column references from the logical get
 		CColRefArray *colref_array = popGet->PdrgpcrOutput();
@@ -506,7 +508,8 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithConstInList()
 		CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 						 CTestUtils::GetCostModel(mp));
 		gpos::Ref<CExpression> pexprLgGet = PexprGet(mp);
-		CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
+		gpos::Ref<CLogicalGet> popGet =
+			gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
 
 		// the output column references from the logical get
 		CColRefArray *colref_array = popGet->PdrgpcrOutput();
@@ -578,7 +581,8 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithBoolExpr()
 
 		gpos::Ref<CExpression> pexprLgGet = PexprGet(mp);
 
-		CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
+		gpos::Ref<CLogicalGet> popGet =
+			gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
 
 		// the output column references from the logical get
 		CColRefArray *colref_array = popGet->PdrgpcrOutput();
@@ -648,7 +652,8 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithScalarOp()
 
 		gpos::Ref<CExpression> pexprLgGet = PexprGet(mp);
 
-		CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
+		gpos::Ref<CLogicalGet> popGet =
+			gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
 
 		// the output column references from the logical get
 		CColRefArray *colref_array = popGet->PdrgpcrOutput();
@@ -825,7 +830,7 @@ CTranslatorDXLToExprTest::EresUnittest_MetadataColumnMapping()
 	gpos::Ref<CExpression> apExpr(
 		CTranslatorDXLToExprTest::Pexpr(mp, szQueryDroppedColumn));
 
-	CLogicalGet *pActualGet = gpos::cast<CLogicalGet>(apExpr->Pop());
+	gpos::Ref<CLogicalGet> pActualGet = gpos::cast<CLogicalGet>(apExpr->Pop());
 	CColumnDescriptorArray *pDrgColDesc =
 		pActualGet->Ptabdesc()->Pdrgpcoldesc();
 	gpos::Ref<CColumnDescriptor> pColDesc = (*pDrgColDesc)[0].get();

@@ -187,7 +187,7 @@ CPhysicalScan::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		gpos::Ref<CExpression> pexprIndexPred = exprhdl.PexprScalarExactChild(
 			0 /*child_index*/, true /*error_on_null_return*/);
 
-		CDistributionSpecHashed *pdshashed =
+		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(m_pds.get());
 		gpos::Ref<CDistributionSpecHashed> pdshashedEquiv =
 			CDistributionSpecHashed::TryToCompleteEquivSpec(

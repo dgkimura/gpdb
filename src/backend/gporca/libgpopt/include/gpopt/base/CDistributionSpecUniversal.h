@@ -44,13 +44,13 @@ public:
 	EDistributionType Edt() const override;
 
 	// does current distribution satisfy the given one
-	BOOL FSatisfies(const CDistributionSpec *pds) const override;
+	BOOL FSatisfies(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	// return true if distribution spec can be required
 	BOOL FRequirable() const override;
 
 	// does this distribution match the given one
-	BOOL Matches(const CDistributionSpec *pds) const override;
+	BOOL Matches(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *,				//mp,
@@ -67,7 +67,8 @@ public:
 	EDistributionPartitioningType Edpt() const override;
 
 	// conversion function
-	static CDistributionSpecUniversal *PdsConvert(CDistributionSpec *pds);
+	static gpos::Ref<CDistributionSpecUniversal> PdsConvert(
+		gpos::Ref<CDistributionSpec> pds);
 
 };	// class CDistributionSpecUniversal
 

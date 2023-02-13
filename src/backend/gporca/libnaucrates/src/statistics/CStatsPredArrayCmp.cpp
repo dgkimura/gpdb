@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CColRefTable.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/CMDIdGPDB.h"
 
 using namespace gpnaucrates;

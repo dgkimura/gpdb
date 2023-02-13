@@ -48,7 +48,7 @@ CXformGet2TableScan::CXformGet2TableScan(CMemoryPool *mp)
 CXform::EXformPromise
 CXformGet2TableScan::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(exprhdl.Pop());
+	gpos::Ref<CLogicalGet> popGet = gpos::dyn_cast<CLogicalGet>(exprhdl.Pop());
 
 	gpos::Ref<CTableDescriptor> ptabdesc = popGet->Ptabdesc();
 	if (ptabdesc->IsPartitioned())
@@ -77,7 +77,7 @@ CXformGet2TableScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalGet *popGet = gpos::dyn_cast<CLogicalGet>(pexpr->Pop());
+	gpos::Ref<CLogicalGet> popGet = gpos::dyn_cast<CLogicalGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// create/extract components for alternative

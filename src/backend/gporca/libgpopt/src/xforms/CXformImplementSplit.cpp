@@ -76,7 +76,8 @@ CXformImplementSplit::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalSplit *popSplit = gpos::dyn_cast<CLogicalSplit>(pexpr->Pop());
+	gpos::Ref<CLogicalSplit> popSplit =
+		gpos::dyn_cast<CLogicalSplit>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative

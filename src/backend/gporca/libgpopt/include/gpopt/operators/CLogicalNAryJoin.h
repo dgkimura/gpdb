@@ -112,16 +112,17 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalNAryJoin *
+	static gpos::Ref<CLogicalNAryJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 
-		return dynamic_cast<CLogicalNAryJoin *>(pop);
+		return gpos::dyn_cast<CLogicalNAryJoin>(pop);
 	}
 
 	// conversion function, only if the NAryJoin has LOJ children
-	static CLogicalNAryJoin *PopConvertNAryLOJ(gpos::Ref<COperator> pop);
+	static gpos::Ref<CLogicalNAryJoin> PopConvertNAryLOJ(
+		gpos::Ref<COperator> pop);
 
 	BOOL
 	HasOuterJoinChildren() const

@@ -69,7 +69,7 @@ public:
 	// operator name
 	const CWStringConst *GetOpNameStr() const override;
 
-	IMdIdArray *GetParts() const;
+	gpos::Ref<IMdIdArray> GetParts() const;
 
 	const ULongPtrArray *
 	GetSelectorIds() const

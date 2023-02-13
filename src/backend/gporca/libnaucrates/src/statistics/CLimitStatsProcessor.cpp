@@ -13,6 +13,8 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/search/CGroupExpression.h"
+
 using namespace gpopt;
 
 //	compute the statistics of a limit operation

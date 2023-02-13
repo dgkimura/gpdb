@@ -85,13 +85,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarCaseTest *
+	static gpos::Ref<CScalarCaseTest>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarCaseTest == pop->Eopid());
 
-		return dynamic_cast<CScalarCaseTest *>(pop);
+		return gpos::dyn_cast<CScalarCaseTest>(pop);
 	}
 
 };	// class CScalarCaseTest

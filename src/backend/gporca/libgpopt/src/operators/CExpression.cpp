@@ -381,21 +381,21 @@ CExpression::Pdp(const CDrvdProp::EPropType ept) const
 	return nullptr;
 }
 
-CDrvdPropRelational *
+gpos::Ref<CDrvdPropRelational>
 CExpression::GetDrvdPropRelational() const
 {
 	GPOS_RTL_ASSERT(m_pdprel->IsComplete());
 	return m_pdprel.get();
 }
 
-CDrvdPropPlan *
+gpos::Ref<CDrvdPropPlan>
 CExpression::GetDrvdPropPlan() const
 {
 	GPOS_RTL_ASSERT(m_pdpplan->IsComplete());
 	return m_pdpplan.get();
 }
 
-CDrvdPropScalar *
+gpos::Ref<CDrvdPropScalar>
 CExpression::GetDrvdPropScalar() const
 {
 	GPOS_RTL_ASSERT(m_pdpscalar->IsComplete());
@@ -536,7 +536,7 @@ CExpression::PdpDerive(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CExpression::PstatsDerive(CReqdPropRelational *prprel,
+CExpression::PstatsDerive(gpos::Ref<CReqdPropRelational> prprel,
 						  IStatisticsArray *stats_ctxt)
 {
 	GPOS_CHECK_STACK_SIZE;
@@ -1207,7 +1207,7 @@ CExpression::UlHashDedup(const gpos::Ref<CExpression> pexpr)
 gpos::Ref<CExpression>
 CExpression::PexprRehydrate(CMemoryPool *mp, gpos::Ref<CCostContext> pcc,
 							gpos::Ref<CExpressionArray> pdrgpexpr,
-							CDrvdPropCtxtPlan *pdpctxtplan)
+							gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan)
 {
 	GPOS_ASSERT(nullptr != pcc);
 	GPOS_ASSERT(nullptr != pdpctxtplan);
@@ -1267,7 +1267,7 @@ CExpression::PexprRehydrate(CMemoryPool *mp, gpos::Ref<CCostContext> pcc,
 //---------------------------------------------------------------------------
 BOOL
 CExpression::FValidPlan(const gpos::Ref<CReqdPropPlan> prpp,
-						CDrvdPropCtxtPlan *pdpctxtplan)
+						gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan)
 {
 	GPOS_ASSERT(Pop()->FPhysical());
 	GPOS_ASSERT(nullptr != prpp);
@@ -1276,7 +1276,8 @@ CExpression::FValidPlan(const gpos::Ref<CReqdPropPlan> prpp,
 	CExpressionHandle exprhdl(m_mp);
 	exprhdl.Attach(this);
 	exprhdl.DeriveProps(pdpctxtplan);
-	CDrvdPropPlan *pdpplan = gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp());
+	gpos::Ref<CDrvdPropPlan> pdpplan =
+		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp());
 
 
 	if (COperator::EopPhysicalCTEProducer == m_pop->Eopid())
@@ -1285,7 +1286,7 @@ CExpression::FValidPlan(const gpos::Ref<CReqdPropPlan> prpp,
 		pdpctxtplan->CopyCTEProducerProps(pdpplan, ulCTEId);
 	}
 
-	CDrvdPropRelational *pdprel = GetDrvdPropRelational();
+	gpos::Ref<CDrvdPropRelational> pdprel = GetDrvdPropRelational();
 
 	// GPDB_12_MERGE_FIXME: Also check FValidPartEnforcers()
 	return prpp->FCompatible(exprhdl, gpos::dyn_cast<CPhysical>(m_pop.get()),
@@ -1302,7 +1303,8 @@ CExpression::FValidPlan(const gpos::Ref<CReqdPropPlan> prpp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpression::FValidChildrenDistribution(CDrvdPropCtxtPlan *pdpctxtplan)
+CExpression::FValidChildrenDistribution(
+	gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan)
 {
 	GPOS_ASSERT(Pop()->FPhysical());
 
@@ -1320,7 +1322,7 @@ CExpression::FValidChildrenDistribution(CDrvdPropCtxtPlan *pdpctxtplan)
 	if (COperator::EopPhysicalMotionGather == Pop()->Eopid())
 	{
 		gpos::Ref<CExpression> pexprChild = (*this)[0];
-		CDrvdPropPlan *pdpplanChild =
+		gpos::Ref<CDrvdPropPlan> pdpplanChild =
 			gpos::dyn_cast<CDrvdPropPlan>(pexprChild->PdpDerive(pdpctxtplan));
 		if (CDistributionSpec::EdtSingleton == pdpplanChild->Pds()->Edt() ||
 			CDistributionSpec::EdtStrictSingleton == pdpplanChild->Pds()->Edt())
@@ -1342,7 +1344,7 @@ CExpression::FValidChildrenDistribution(CDrvdPropCtxtPlan *pdpctxtplan)
 //
 //---------------------------------------------------------------------------
 BOOL
-CExpression::FValidPartEnforcers(CDrvdPropCtxtPlan *pdpctxtplan)
+CExpression::FValidPartEnforcers(gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan)
 {
 	GPOS_ASSERT(Pop()->FPhysical());
 
@@ -1356,7 +1358,7 @@ CExpression::FValidPartEnforcers(CDrvdPropCtxtPlan *pdpctxtplan)
 	}
 
 	// retrieve plan properties
-	CDrvdPropPlan *pdpplan = CDrvdPropPlan::Pdpplan(PdpDerive(pdpctxtplan));
+	gpos::Ref<CDrvdPropPlan> pdpplan = CDrvdPropPlan::Pdpplan(PdpDerive(pdpctxtplan));
 
 	if (CUtils::FPhysicalMotion(Pop()) &&
 		pdpplan->Ppim()->FContainsUnresolved())

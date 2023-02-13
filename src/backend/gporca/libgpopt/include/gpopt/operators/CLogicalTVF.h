@@ -206,13 +206,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalTVF *
+	static gpos::Ref<CLogicalTVF>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalTVF == pop->Eopid());
 
-		return dynamic_cast<CLogicalTVF *>(pop);
+		return gpos::dyn_cast<CLogicalTVF>(pop);
 	}
 
 

@@ -154,14 +154,14 @@ public:
 	ULONG HashValue() const;
 
 	// check if plan properties are satisfied by the given derived properties
-	BOOL FSatisfied(const CDrvdPropRelational *pdprel,
-					const CDrvdPropPlan *pdpplan) const;
+	BOOL FSatisfied(const gpos::Ref<CDrvdPropRelational> pdprel,
+					const gpos::Ref<CDrvdPropPlan> pdpplan) const;
 
 	// check if plan properties are compatible with the given derived properties
 	BOOL FCompatible(CExpressionHandle &exprhdl,
 					 gpos::Ref<CPhysical> popPhysical,
-					 const CDrvdPropRelational *pdprel,
-					 const CDrvdPropPlan *pdpplan) const;
+					 const gpos::Ref<CDrvdPropRelational> pdprel,
+					 const gpos::Ref<CDrvdPropPlan> pdpplan) const;
 
 	// check if expression attached to handle provides required columns by all plan properties
 	BOOL FProvidesReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -192,7 +192,8 @@ public:
 	// map input required and derived plan properties into new required plan properties
 	static gpos::Ref<CReqdPropPlan> PrppRemapForCTE(
 		CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput,
-		CDrvdPropPlan *pdpplanInput, UlongToColRefMap *colref_mapping);
+		gpos::Ref<CDrvdPropPlan> pdpplanInput,
+		UlongToColRefMap *colref_mapping);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

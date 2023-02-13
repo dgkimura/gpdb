@@ -165,13 +165,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalInsert *
+	static gpos::Ref<CLogicalInsert>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInsert == pop->Eopid());
 
-		return dynamic_cast<CLogicalInsert *>(pop);
+		return gpos::dyn_cast<CLogicalInsert>(pop);
 	}
 
 	// debug print

@@ -440,7 +440,7 @@ CMDIndexGPDB::IsCompatible(const IMDScalarOp *md_scalar_op, ULONG key_pos) const
 	return false;
 }
 
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CMDIndexGPDB::ChildIndexMdids() const
 {
 	return m_child_index_oids.get();

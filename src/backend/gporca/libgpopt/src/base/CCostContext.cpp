@@ -230,7 +230,8 @@ CCostContext::DerivePlanProps(CMemoryPool *mp)
 		CExpressionHandle exprhdl(mp);
 		exprhdl.Attach(this);
 		exprhdl.DerivePlanPropsForCostContext();
-		CDrvdPropPlan *pdpplan = gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp());
+		gpos::Ref<CDrvdPropPlan> pdpplan =
+			gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp());
 		GPOS_ASSERT(nullptr != pdpplan);
 
 		// set derived plan properties
@@ -271,7 +272,7 @@ CCostContext::IsValid(CMemoryPool *mp)
 	GPOS_ASSERT(nullptr != m_pdrgpoc);
 
 	// obtain relational properties from group
-	CDrvdPropRelational *pdprel =
+	gpos::Ref<CDrvdPropRelational> pdprel =
 		gpos::dyn_cast<CDrvdPropRelational>(Pgexpr()->Pgroup()->Pdp());
 	GPOS_ASSERT(nullptr != pdprel);
 
@@ -487,9 +488,9 @@ CCostContext::FBetterThan(const gpos::Ref<CCostContext> pcc) const
 	if (COperator::EopPhysicalSpool == pcc->Pgexpr()->Pop()->Eopid() &&
 		COperator::EopPhysicalSpool == Pgexpr()->Pop()->Eopid())
 	{
-		CPhysicalSpool *current_best_ctxt =
+		gpos::Ref<CPhysicalSpool> current_best_ctxt =
 			gpos::dyn_cast<CPhysicalSpool>(Pgexpr()->Pop());
-		CPhysicalSpool *new_ctxt =
+		gpos::Ref<CPhysicalSpool> new_ctxt =
 			gpos::dyn_cast<CPhysicalSpool>(pcc->Pgexpr()->Pop());
 
 		// if the request does not need to be conscious of motion, then always prefer a
@@ -663,10 +664,10 @@ CCostContext::DRowsPerHost() const
 	COptCtxt *poptctxt = COptCtxt::PoctxtFromTLS();
 	const ULONG ulHosts = poptctxt->GetCostModel()->UlHosts();
 
-	CDistributionSpec *pds = Pdpplan()->Pds();
+	gpos::Ref<CDistributionSpec> pds = Pdpplan()->Pds();
 	if (CDistributionSpec::EdtHashed == pds->Edt())
 	{
-		CDistributionSpecHashed *pdshashed =
+		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(pds);
 		CExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
 		gpos::Ref<CColRefSet> pcrsUsed =

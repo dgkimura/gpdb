@@ -57,12 +57,12 @@ CPhysicalFullMergeJoin::~CPhysicalFullMergeJoin()
 }
 
 gpos::Ref<CDistributionSpec>
-CPhysicalFullMergeJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
-									CExpressionHandle &exprhdl GPOS_UNUSED,
-									CDistributionSpec *pdsRequired GPOS_UNUSED,
-									ULONG child_index GPOS_UNUSED,
-									CDrvdPropArray *,  //pdrgpdpCtxt,
-									ULONG ulOptReq GPOS_UNUSED) const
+CPhysicalFullMergeJoin::PdsRequired(
+	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
+	gpos::Ref<CDistributionSpec> pdsRequired GPOS_UNUSED,
+	ULONG child_index GPOS_UNUSED,
+	CDrvdPropArray *,  //pdrgpdpCtxt,
+	ULONG ulOptReq GPOS_UNUSED) const
 {
 	GPOS_RAISE(
 		CException::ExmaInvalid, CException::ExmiInvalid,
@@ -80,7 +80,8 @@ CPhysicalFullMergeJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_ASSERT(2 > child_index);
 
-	CDistributionSpec *const pdsRequired = prppInput->Ped()->PdsRequired();
+	gpos::Ref<CDistributionSpec> const pdsRequired =
+		prppInput->Ped()->PdsRequired();
 
 	// if expression has to execute on a single host then we need a gather
 	if (exprhdl.NeedsSingletonExecution() || exprhdl.HasOuterRefs())
@@ -248,16 +249,18 @@ gpos::Ref<CDistributionSpec>
 CPhysicalFullMergeJoin::PdsDerive(CMemoryPool *mp,
 								  CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
-	CDistributionSpec *pdsInner = exprhdl.Pdpplan(1 /*child_index*/)->Pds();
+	gpos::Ref<CDistributionSpec> pdsOuter =
+		exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	gpos::Ref<CDistributionSpec> pdsInner =
+		exprhdl.Pdpplan(1 /*child_index*/)->Pds();
 
 	if (CDistributionSpec::EdtHashed == pdsOuter->Edt() &&
 		CDistributionSpec::EdtHashed == pdsInner->Edt())
 	{
 		// Merge join requires either both sides to be hashed ...
-		CDistributionSpecHashed *pdshashedOuter =
+		gpos::Ref<CDistributionSpecHashed> pdshashedOuter =
 			gpos::dyn_cast<CDistributionSpecHashed>(pdsOuter);
-		CDistributionSpecHashed *pdshashedInner =
+		gpos::Ref<CDistributionSpecHashed> pdshashedInner =
 			gpos::dyn_cast<CDistributionSpecHashed>(pdsInner);
 
 		// Create a hash spec similar to the outer spec, but with fNullsColocated = false because

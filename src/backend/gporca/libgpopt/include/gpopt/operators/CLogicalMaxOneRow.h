@@ -156,13 +156,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalMaxOneRow *
+	static gpos::Ref<CLogicalMaxOneRow>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalMaxOneRow == pop->Eopid());
 
-		return dynamic_cast<CLogicalMaxOneRow *>(pop);
+		return gpos::dyn_cast<CLogicalMaxOneRow>(pop);
 	}
 
 	// derive statistics

@@ -62,10 +62,10 @@ public:
 	IOstream &OsPrint(IOstream &os) const;
 
 	// return the plan properties of CTE producer with given id
-	CDrvdPropPlan *PdpplanCTEProducer(ULONG ulCTEId) const;
+	gpos::Ref<CDrvdPropPlan> PdpplanCTEProducer(ULONG ulCTEId) const;
 
 	// copy plan properties of given CTE prdoucer
-	void CopyCTEProducerProps(CDrvdPropPlan *pdpplan, ULONG ulCTEId);
+	void CopyCTEProducerProps(gpos::Ref<CDrvdPropPlan> pdpplan, ULONG ulCTEId);
 
 #ifdef GPOS_DEBUG
 
@@ -79,12 +79,12 @@ public:
 #endif	// GPOS_DEBUG
 
 	// conversion function
-	static CDrvdPropCtxtPlan *
+	static gpos::Ref<CDrvdPropCtxtPlan>
 	PdpctxtplanConvert(gpos::Ref<CDrvdPropCtxt> pdpctxt)
 	{
 		GPOS_ASSERT(nullptr != pdpctxt);
 
-		return dynamic_cast<CDrvdPropCtxtPlan *>(pdpctxt);
+		return gpos::dyn_cast<CDrvdPropCtxtPlan>(pdpctxt);
 	}
 
 };	// class CDrvdPropCtxtPlan

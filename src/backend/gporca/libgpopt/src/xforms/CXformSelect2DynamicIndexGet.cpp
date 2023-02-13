@@ -91,7 +91,7 @@ CXformSelect2DynamicIndexGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
 	// get the indexes on this relation
-	CLogicalDynamicGet *popDynamicGet =
+	gpos::Ref<CLogicalDynamicGet> popDynamicGet =
 		gpos::dyn_cast<CLogicalDynamicGet>(pexprRelational->Pop());
 	const ULONG ulIndices = popDynamicGet->Ptabdesc()->IndexCount();
 	if (0 == ulIndices)

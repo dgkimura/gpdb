@@ -16,7 +16,8 @@ CDistributionSpecUniversal::Edt() const
 }
 
 BOOL
-CDistributionSpecUniversal::FSatisfies(const CDistributionSpec *pds) const
+CDistributionSpecUniversal::FSatisfies(
+	const gpos::Ref<CDistributionSpec> pds) const
 {
 	// universal distribution does not satisfy duplicate-sensitive
 	// hash distributions
@@ -50,7 +51,8 @@ CDistributionSpecUniversal::FRequirable() const
 }
 
 BOOL
-CDistributionSpecUniversal::Matches(const CDistributionSpec *pds) const
+CDistributionSpecUniversal::Matches(
+	const gpos::Ref<CDistributionSpec> pds) const
 {
 	// universal distribution needs to match replicated / singleton requests
 	// to avoid generating duplicates
@@ -82,12 +84,12 @@ CDistributionSpecUniversal::Edpt() const
 	return EdptNonPartitioned;
 }
 
-CDistributionSpecUniversal *
-CDistributionSpecUniversal::PdsConvert(CDistributionSpec *pds)
+gpos::Ref<CDistributionSpecUniversal>
+CDistributionSpecUniversal::PdsConvert(gpos::Ref<CDistributionSpec> pds)
 {
 	GPOS_ASSERT(nullptr != pds);
 	GPOS_ASSERT(EdtAny == pds->Edt());
 
-	return dynamic_cast<CDistributionSpecUniversal *>(pds);
+	return gpos::dyn_cast<CDistributionSpecUniversal>(pds);
 }
 }  // namespace gpopt

@@ -78,13 +78,13 @@ public:
 	}
 
 	// conversion function
-	static CLogicalInnerCorrelatedApply *
+	static gpos::Ref<CLogicalInnerCorrelatedApply>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalInnerCorrelatedApply == pop->Eopid());
 
-		return dynamic_cast<CLogicalInnerCorrelatedApply *>(pop);
+		return gpos::dyn_cast<CLogicalInnerCorrelatedApply>(pop);
 	}
 
 };	// class CLogicalInnerCorrelatedApply

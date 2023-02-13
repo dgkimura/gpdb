@@ -106,7 +106,7 @@ CConstraint::PcnstrFromScalarArrayCmp(CMemoryPool *mp,
 	{
 #ifdef GPOS_DEBUG
 		// verify column in expr is the same as column which was passed in
-		CScalarIdent *popScId = nullptr;
+		gpos::Ref<CScalarIdent> popScId = nullptr;
 		if (CUtils::FScalarIdent((*pexpr)[0]))
 		{
 			popScId = gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
@@ -409,7 +409,7 @@ CConstraint::PcnstrFromScalarCmp(
 		(CUtils::FScalarIdent(pexprRight) ||
 		 CCastUtils::FBinaryCoercibleCastedScId(pexprRight)))
 	{
-		CScalarIdent *popScIdLeft, *popScIdRight;
+		gpos::Ref<CScalarIdent> popScIdLeft, *popScIdRight;
 		if (CUtils::FScalarIdent(pexprLeft))
 		{
 			// col1 = ...

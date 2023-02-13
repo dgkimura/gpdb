@@ -179,8 +179,8 @@ CPhysicalSplit::PcrsRequired(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysicalSplit::PdsRequired(CMemoryPool *mp,
-							CExpressionHandle &,  // exprhdl,
-							CDistributionSpec *,  // pdsInput,
+							CExpressionHandle &,		   // exprhdl,
+							gpos::Ref<CDistributionSpec>,  // pdsInput,
 							ULONG
 #ifdef GPOS_DEBUG
 								child_index
@@ -281,7 +281,8 @@ CPhysicalSplit::FProvidesReqdCols(CExpressionHandle &exprhdl,
 gpos::Ref<CDistributionSpec>
 CPhysicalSplit::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	gpos::Ref<CDistributionSpec> pdsOuter =
+		exprhdl.Pdpplan(0 /*child_index*/)->Pds();
 
 	if (CDistributionSpec::EdtHashed != pdsOuter->Edt())
 	{
@@ -325,7 +326,7 @@ CPhysicalSplit::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		}
 	}
 
-	CDistributionSpecHashed *pdsHashed =
+	gpos::Ref<CDistributionSpecHashed> pdsHashed =
 		gpos::dyn_cast<CDistributionSpecHashed>(pdsOuter);
 
 	// Consider the below case for updating the same table.:
@@ -416,7 +417,8 @@ CPhysicalSplit::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CPhysicalSplit *popSplit = gpos::dyn_cast<CPhysicalSplit>(pop);
+		gpos::Ref<CPhysicalSplit> popSplit =
+			gpos::dyn_cast<CPhysicalSplit>(pop);
 
 		return m_pcrCtid == popSplit->PcrCtid() &&
 			   m_pcrSegmentId == popSplit->PcrSegmentId() &&

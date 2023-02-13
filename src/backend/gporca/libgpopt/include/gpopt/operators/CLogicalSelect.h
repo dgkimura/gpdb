@@ -129,13 +129,13 @@ public:
 	}
 
 	// conversion function
-	static CLogicalSelect *
+	static gpos::Ref<CLogicalSelect>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalSelect == pop->Eopid());
 
-		return dynamic_cast<CLogicalSelect *>(pop);
+		return gpos::dyn_cast<CLogicalSelect>(pop);
 	}
 
 	// derive statistics

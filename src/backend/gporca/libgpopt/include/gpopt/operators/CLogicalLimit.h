@@ -186,13 +186,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalLimit *
+	static gpos::Ref<CLogicalLimit>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLimit == pop->Eopid());
 
-		return dynamic_cast<CLogicalLimit *>(pop);
+		return gpos::dyn_cast<CLogicalLimit>(pop);
 	}
 
 };	// class CLogicalLimit

@@ -132,7 +132,7 @@ CDXLPhysicalDynamicIndexScan::GetDXLTableDescr() const
 	return m_dxl_table_descr.get();
 }
 
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CDXLPhysicalDynamicIndexScan::GetParts() const
 {
 	return m_part_mdids.get();

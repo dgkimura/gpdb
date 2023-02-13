@@ -66,7 +66,8 @@ public:
 	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// conversion function
-	static CScalarIsDistinctFrom *PopConvert(gpos::Ref<COperator> pop);
+	static gpos::Ref<CScalarIsDistinctFrom> PopConvert(
+		gpos::Ref<COperator> pop);
 
 	// get commuted scalar IDF operator
 	gpos::Ref<CScalarCmp> PopCommutedOp(CMemoryPool *mp) override;

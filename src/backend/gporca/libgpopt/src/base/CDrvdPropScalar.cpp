@@ -120,14 +120,14 @@ CDrvdPropScalar::Derive(CMemoryPool *, CExpressionHandle &exprhdl,
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-CDrvdPropScalar *
+gpos::Ref<CDrvdPropScalar>
 CDrvdPropScalar::GetDrvdScalarProps(gpos::Ref<CDrvdProp> pdp)
 {
 	GPOS_ASSERT(nullptr != pdp);
 	GPOS_ASSERT(EptScalar == pdp->Ept() &&
 				"This is not a scalar properties container");
 
-	return dynamic_cast<CDrvdPropScalar *>(pdp);
+	return gpos::dyn_cast<CDrvdPropScalar>(pdp);
 }
 
 

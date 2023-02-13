@@ -40,7 +40,7 @@ CPhysicalDynamicIndexScan::CPhysicalDynamicIndexScan(
 	gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
 	const CName *pnameAlias, gpos::Ref<CColRefArray> pdrgpcrOutput,
 	ULONG scan_id, gpos::Ref<CColRef2dArray> pdrgpdrgpcrPart,
-	gpos::Ref<COrderSpec> pos, IMdIdArray *partition_mdids,
+	gpos::Ref<COrderSpec> pos, gpos::Ref<IMdIdArray> partition_mdids,
 	gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part)
 	: CPhysicalDynamicScan(mp, std::move(ptabdesc), ulOriginOpId, pnameAlias,
 						   scan_id, std::move(pdrgpcrOutput),

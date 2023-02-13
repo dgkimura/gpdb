@@ -50,7 +50,7 @@ private:
 	// compute required distribution of the n-th child of a global aggregate
 	gpos::Ref<CDistributionSpec> PdsRequiredGlobalAgg(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CDistributionSpec *pdsInput, ULONG child_index,
+		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
 		CColRefArray *pdrgpcrGrp, CColRefArray *pdrgpcrGrpMinimal,
 		ULONG ulOptReq) const;
 
@@ -96,8 +96,9 @@ protected:
 	// compute required distribution of the n-th child
 	gpos::Ref<CDistributionSpec> PdsRequiredAgg(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CDistributionSpec *pdsInput, ULONG child_index, ULONG ulOptReq,
-		CColRefArray *pdrgpcgGrp, CColRefArray *pdrgpcrGrpMinimal) const;
+		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
+		ULONG ulOptReq, CColRefArray *pdrgpcgGrp,
+		CColRefArray *pdrgpcrGrpMinimal) const;
 
 public:
 	CPhysicalAgg(const CPhysicalAgg &) = delete;
@@ -197,7 +198,7 @@ public:
 	// compute required distribution of the n-th child
 	gpos::Ref<CDistributionSpec>
 	PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDistributionSpec *pdsRequired, ULONG child_index,
+				gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
 				CDrvdPropArray *,  //pdrgpdpCtxt,
 				ULONG ulOptReq) const override
 	{

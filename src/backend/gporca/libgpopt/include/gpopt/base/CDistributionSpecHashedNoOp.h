@@ -18,7 +18,7 @@ public:
 
 	EDistributionType Edt() const override;
 
-	BOOL Matches(const CDistributionSpec *pds) const override;
+	BOOL Matches(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	const CHAR *
 	SzId() const override

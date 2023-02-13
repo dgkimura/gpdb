@@ -61,13 +61,13 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalRightOuterHashJoin *
+	static gpos::Ref<CPhysicalRightOuterHashJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalRightOuterHashJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalRightOuterHashJoin *>(pop);
+		return gpos::dyn_cast<CPhysicalRightOuterHashJoin>(pop);
 	}
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties

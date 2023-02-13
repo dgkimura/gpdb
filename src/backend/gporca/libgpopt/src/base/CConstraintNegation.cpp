@@ -153,7 +153,7 @@ CConstraintNegation::PexprScalar(CMemoryPool *mp)
 		}
 		else if (EctInterval == ect)
 		{
-			CConstraintInterval *pci =
+			gpos::Ref<CConstraintInterval> pci =
 				gpos::cast<CConstraintInterval>(m_pcnstr.get());
 			gpos::Ref<CConstraintInterval> pciComp = pci->PciComplement(mp);
 			m_pexprScalar = pciComp->PexprScalar(mp);

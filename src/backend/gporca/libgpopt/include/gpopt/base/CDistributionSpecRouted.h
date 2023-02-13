@@ -60,10 +60,10 @@ public:
 	}
 
 	// does this distribution satisfy the given one
-	BOOL Matches(const CDistributionSpec *pds) const override;
+	BOOL Matches(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	// does this distribution satisfy the given one
-	BOOL FSatisfies(const CDistributionSpec *pds) const override;
+	BOOL FSatisfies(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	// return a copy of the distribution spec with remapped columns
 	gpos::Ref<CDistributionSpec> PdsCopyWithRemappedColumns(
@@ -93,23 +93,23 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CDistributionSpecRouted *
-	PdsConvert(CDistributionSpec *pds)
+	static gpos::Ref<CDistributionSpecRouted>
+	PdsConvert(gpos::Ref<CDistributionSpec> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtRouted == pds->Edt());
 
-		return dynamic_cast<CDistributionSpecRouted *>(pds);
+		return gpos::dyn_cast<CDistributionSpecRouted>(pds);
 	}
 
 	// conversion function - const argument
-	static const CDistributionSpecRouted *
-	PdsConvert(const CDistributionSpec *pds)
+	static const gpos::Ref<CDistributionSpecRouted>
+	PdsConvert(const gpos::Ref<CDistributionSpec> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtRouted == pds->Edt());
 
-		return dynamic_cast<const CDistributionSpecRouted *>(pds);
+		return dynamic_cast<const gpos::Ref<CDistributionSpecRouted> >(pds);
 	}
 
 };	// class CDistributionSpecRouted

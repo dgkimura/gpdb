@@ -84,7 +84,7 @@ public:
 	// scan direction
 	EdxlIndexScanDirection GetIndexScanDir() const;
 
-	IMdIdArray *GetParts() const;
+	gpos::Ref<IMdIdArray> GetParts() const;
 
 	const ULongPtrArray *
 	GetSelectorIds() const

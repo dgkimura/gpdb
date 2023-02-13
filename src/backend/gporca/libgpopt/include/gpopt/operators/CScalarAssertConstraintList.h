@@ -92,13 +92,13 @@ public:
 	gpos::Ref<IMDId> MdidType() const override;
 
 	// conversion function
-	static CScalarAssertConstraintList *
+	static gpos::Ref<CScalarAssertConstraintList>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarAssertConstraintList == pop->Eopid());
 
-		return dynamic_cast<CScalarAssertConstraintList *>(pop);
+		return gpos::dyn_cast<CScalarAssertConstraintList>(pop);
 	}
 
 };	// class CScalarAssertConstraintList

@@ -52,7 +52,7 @@ CScalarIdent::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarIdent *popIdent = gpos::dyn_cast<CScalarIdent>(pop);
+		gpos::Ref<CScalarIdent> popIdent = gpos::dyn_cast<CScalarIdent>(pop);
 
 		// match if column reference is same
 		return Pcr() == popIdent->Pcr();
@@ -170,7 +170,8 @@ CScalarIdent::FCastedScId(gpos::Ref<CExpression> pexpr, CColRef *colref)
 		return false;
 	}
 
-	CScalarIdent *pScIdent = gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
+	gpos::Ref<CScalarIdent> pScIdent =
+		gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
 
 	return colref == pScIdent->Pcr();
 }
@@ -213,7 +214,8 @@ CScalarIdent::FAllowedFuncScId(gpos::Ref<CExpression> pexpr, CColRef *colref)
 		return false;
 	}
 
-	CScalarIdent *pScIdent = gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
+	gpos::Ref<CScalarIdent> pScIdent =
+		gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
 
 	return colref == pScIdent->Pcr();
 }

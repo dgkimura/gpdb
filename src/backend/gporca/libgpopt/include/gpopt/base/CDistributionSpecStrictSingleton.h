@@ -57,7 +57,7 @@ public:
 	}
 
 	// does this distribution satisfy the given one
-	BOOL FSatisfies(const CDistributionSpec *pds) const override;
+	BOOL FSatisfies(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void
@@ -75,13 +75,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CDistributionSpecStrictSingleton *
-	PdssConvert(CDistributionSpec *pds)
+	static gpos::Ref<CDistributionSpecStrictSingleton>
+	PdssConvert(gpos::Ref<CDistributionSpec> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtStrictSingleton == pds->Edt());
 
-		return dynamic_cast<CDistributionSpecStrictSingleton *>(pds);
+		return gpos::dyn_cast<CDistributionSpecStrictSingleton>(pds);
 	}
 
 };	// class CDistributionSpecStrictSingleton

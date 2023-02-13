@@ -73,13 +73,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalLeftAntiSemiJoinNotIn *
+	static gpos::Ref<CLogicalLeftAntiSemiJoinNotIn>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftAntiSemiJoinNotIn == pop->Eopid());
 
-		return dynamic_cast<CLogicalLeftAntiSemiJoinNotIn *>(pop);
+		return gpos::dyn_cast<CLogicalLeftAntiSemiJoinNotIn>(pop);
 	}
 
 };	// class CLogicalLeftAntiSemiJoinNotIn

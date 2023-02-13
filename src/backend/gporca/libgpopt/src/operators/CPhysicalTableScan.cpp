@@ -77,7 +77,8 @@ CPhysicalTableScan::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalTableScan *popTableScan = gpos::dyn_cast<CPhysicalTableScan>(pop);
+	gpos::Ref<CPhysicalTableScan> popTableScan =
+		gpos::dyn_cast<CPhysicalTableScan>(pop);
 	return m_ptabdesc->MDId()->Equals(popTableScan->Ptabdesc()->MDId()) &&
 		   m_pdrgpcrOutput->Equals(popTableScan->PdrgpcrOutput());
 }

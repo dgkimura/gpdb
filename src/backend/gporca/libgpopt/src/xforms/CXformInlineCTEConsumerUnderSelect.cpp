@@ -79,7 +79,7 @@ CXformInlineCTEConsumerUnderSelect::Transform(
 	gpos::Ref<CExpression> pexprConsumer = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 
-	CLogicalCTEConsumer *popConsumer =
+	gpos::Ref<CLogicalCTEConsumer> popConsumer =
 		gpos::dyn_cast<CLogicalCTEConsumer>(pexprConsumer->Pop());
 	ULONG id = popConsumer->UlCTEId();
 	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();

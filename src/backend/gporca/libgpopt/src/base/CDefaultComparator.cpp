@@ -82,7 +82,7 @@ CDefaultComparator::FEvalComparison(CMemoryPool *mp,
 	gpos::Ref<IDatum> datum = popScalarConst->GetDatum();
 
 	GPOS_ASSERT(IMDType::EtiBool == datum->GetDatumType());
-	IDatumBool *pdatumBool = dynamic_cast<IDatumBool *>(datum);
+	gpos::Ref<IDatumBool> pdatumBool = gpos::dyn_cast<IDatumBool>(datum);
 	BOOL result = pdatumBool->GetValue();
 	;
 

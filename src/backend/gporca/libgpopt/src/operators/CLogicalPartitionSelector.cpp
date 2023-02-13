@@ -89,7 +89,7 @@ CLogicalPartitionSelector::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalPartitionSelector *popPartSelector =
+	gpos::Ref<CLogicalPartitionSelector> popPartSelector =
 		gpos::dyn_cast<CLogicalPartitionSelector>(pop);
 
 	return popPartSelector->PcrOid() == m_pcrOid &&

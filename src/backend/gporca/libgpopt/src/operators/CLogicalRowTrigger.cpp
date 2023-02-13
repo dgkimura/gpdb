@@ -166,7 +166,8 @@ CLogicalRowTrigger::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalRowTrigger *popRowTrigger = gpos::dyn_cast<CLogicalRowTrigger>(pop);
+	gpos::Ref<CLogicalRowTrigger> popRowTrigger =
+		gpos::dyn_cast<CLogicalRowTrigger>(pop);
 
 	return m_rel_mdid->Equals(popRowTrigger->GetRelMdId()) &&
 		   m_type == popRowTrigger->GetType() &&

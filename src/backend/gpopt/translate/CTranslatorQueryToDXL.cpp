@@ -2881,7 +2881,7 @@ CTranslatorQueryToDXL::CreateDXLSetOpFromColumns(
 //---------------------------------------------------------------------------
 BOOL
 CTranslatorQueryToDXL::SetOpNeedsCast(List *target_list,
-									  IMdIdArray *input_col_mdids)
+									  gpos::Ref<IMdIdArray> input_col_mdids)
 {
 	GPOS_ASSERT(nullptr != input_col_mdids);
 	GPOS_ASSERT(nullptr != target_list);
@@ -2918,10 +2918,9 @@ CTranslatorQueryToDXL::SetOpNeedsCast(List *target_list,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
-CTranslatorQueryToDXL::TranslateSetOpChild(Node *child_node,
-										   ULongPtrArray *colids,
-										   IMdIdArray *input_col_mdids,
-										   List *target_list)
+CTranslatorQueryToDXL::TranslateSetOpChild(
+	Node *child_node, ULongPtrArray *colids,
+	gpos::Ref<IMdIdArray> input_col_mdids, List *target_list)
 {
 	GPOS_ASSERT(nullptr != colids);
 	GPOS_ASSERT(nullptr != input_col_mdids);
@@ -3300,7 +3299,7 @@ CTranslatorQueryToDXL::TranslateRTEToDXLLogicalGet(const RangeTblEntry *rte,
 	// make note of the operator classes used in the distribution key
 	NoteDistributionPolicyOpclasses(rte);
 
-	IMdIdArray *partition_mdids = md_rel->ChildPartitionMdids();
+	gpos::Ref<IMdIdArray> partition_mdids = md_rel->ChildPartitionMdids();
 	for (ULONG ul = 0; partition_mdids && ul < partition_mdids->Size(); ++ul)
 	{
 		gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];

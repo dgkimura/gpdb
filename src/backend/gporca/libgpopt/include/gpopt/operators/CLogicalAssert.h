@@ -108,13 +108,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalAssert *
+	static gpos::Ref<CLogicalAssert>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalAssert == pop->Eopid());
 
-		return dynamic_cast<CLogicalAssert *>(pop);
+		return gpos::dyn_cast<CLogicalAssert>(pop);
 	}
 
 	// derive statistics

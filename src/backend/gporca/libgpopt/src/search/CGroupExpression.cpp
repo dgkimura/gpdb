@@ -1000,7 +1000,7 @@ CGroupExpression::HashValue(const CGroupExpression &gexpr)
 gpos::Ref<IStatistics>
 CGroupExpression::PstatsRecursiveDerive(CMemoryPool *,	// pmpLocal
 										CMemoryPool *pmpGlobal,
-										CReqdPropRelational *prprel,
+										gpos::Ref<CReqdPropRelational> prprel,
 										IStatisticsArray *stats_ctxt,
 										BOOL fComputeRootStats)
 {

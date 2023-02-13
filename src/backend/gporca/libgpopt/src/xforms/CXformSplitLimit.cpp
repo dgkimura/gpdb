@@ -63,7 +63,8 @@ CXformSplitLimit::Exfp(CExpressionHandle &exprhdl) const
 		return CXform::ExfpNone;
 	}
 
-	CLogicalLimit *popLimit = gpos::dyn_cast<CLogicalLimit>(exprhdl.Pop());
+	gpos::Ref<CLogicalLimit> popLimit =
+		gpos::dyn_cast<CLogicalLimit>(exprhdl.Pop());
 	if (!popLimit->FGlobal() || !popLimit->FHasCount())
 	{
 		return CXform::ExfpNone;
@@ -93,7 +94,8 @@ CXformSplitLimit::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	CMemoryPool *mp = pxfctxt->Pmp();
 	// extract components
-	CLogicalLimit *popLimit = gpos::dyn_cast<CLogicalLimit>(pexpr->Pop());
+	gpos::Ref<CLogicalLimit> popLimit =
+		gpos::dyn_cast<CLogicalLimit>(pexpr->Pop());
 	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprScalarStart = (*pexpr)[1];
 	gpos::Ref<CExpression> pexprScalarRows = (*pexpr)[2];

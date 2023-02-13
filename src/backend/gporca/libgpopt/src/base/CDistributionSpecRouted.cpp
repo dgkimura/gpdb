@@ -59,7 +59,8 @@ CDistributionSpecRouted::~CDistributionSpecRouted() = default;
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecRouted::FSatisfies(const CDistributionSpec *pds) const
+CDistributionSpecRouted::FSatisfies(
+	const gpos::Ref<CDistributionSpec> pds) const
 {
 	if (Matches(pds))
 	{
@@ -197,14 +198,14 @@ CDistributionSpecRouted::PcrsUsed(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecRouted::Matches(const CDistributionSpec *pds) const
+CDistributionSpecRouted::Matches(const gpos::Ref<CDistributionSpec> pds) const
 {
 	if (Edt() != pds->Edt())
 	{
 		return false;
 	}
 
-	const CDistributionSpecRouted *pdsRouted =
+	const gpos::Ref<CDistributionSpecRouted> pdsRouted =
 		CDistributionSpecRouted::PdsConvert(pds);
 	return m_pcrSegmentId == pdsRouted->Pcr();
 }

@@ -67,7 +67,7 @@ CXformSplitGbAggDedup::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalGbAggDeduplicate *popAggDedup =
+	gpos::Ref<CLogicalGbAggDeduplicate> popAggDedup =
 		gpos::dyn_cast<CLogicalGbAggDeduplicate>(pexpr->Pop());
 
 	// extract components

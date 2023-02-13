@@ -68,7 +68,7 @@ CXformImplementCTEConsumer::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalCTEConsumer *popCTEConsumer =
+	gpos::Ref<CLogicalCTEConsumer> popCTEConsumer =
 		gpos::dyn_cast<CLogicalCTEConsumer>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 

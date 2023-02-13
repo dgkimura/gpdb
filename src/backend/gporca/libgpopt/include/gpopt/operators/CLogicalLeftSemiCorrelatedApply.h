@@ -76,13 +76,13 @@ public:
 		BOOL must_exist) override;
 
 	// conversion function
-	static CLogicalLeftSemiCorrelatedApply *
+	static gpos::Ref<CLogicalLeftSemiCorrelatedApply>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftSemiCorrelatedApply == pop->Eopid());
 
-		return dynamic_cast<CLogicalLeftSemiCorrelatedApply *>(pop);
+		return gpos::dyn_cast<CLogicalLeftSemiCorrelatedApply>(pop);
 	}
 
 };	// class CLogicalLeftSemiCorrelatedApply

@@ -68,7 +68,7 @@ CXformDifference2LeftAntiSemiJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprLeftChild = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprRightChild = (*pexpr)[1];
 
-	CLogicalDifference *popDifference =
+	gpos::Ref<CLogicalDifference> popDifference =
 		gpos::dyn_cast<CLogicalDifference>(pexpr->Pop());
 	CColRefArray *pdrgpcrOutput = popDifference->PdrgpcrOutput();
 	CColRef2dArray *pdrgpdrgpcrInput = popDifference->PdrgpdrgpcrInput();

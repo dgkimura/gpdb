@@ -72,7 +72,7 @@ CXformImplementDML::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDML *popDML = gpos::dyn_cast<CLogicalDML>(pexpr->Pop());
+	gpos::Ref<CLogicalDML> popDML = gpos::dyn_cast<CLogicalDML>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative

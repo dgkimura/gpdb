@@ -200,7 +200,8 @@ CScalarConst::Eber(ULongPtrArray *	//pdrgpulChildren
 
 	if (IMDType::EtiBool == m_pdatum->GetDatumType())
 	{
-		IDatumBool *pdatumBool = gpos::dyn_cast<IDatumBool>(m_pdatum.get());
+		gpos::Ref<IDatumBool> pdatumBool =
+			gpos::dyn_cast<IDatumBool>(m_pdatum.get());
 		if (pdatumBool->GetValue())
 		{
 			return EberTrue;

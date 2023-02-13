@@ -198,7 +198,7 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown(CMemoryPool *mp,
 	const ULONG arity = pexprJoin->Arity();
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 	gpos::Ref<CExpression> join_pred_expr = (*pexprJoin)[arity - 1];
-	CLogicalNAryJoin *naryLOJOp =
+	gpos::Ref<CLogicalNAryJoin> naryLOJOp =
 		CLogicalNAryJoin::PopConvertNAryLOJ(pexprJoin->Pop());
 
 	// collect output columns of all logical children

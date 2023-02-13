@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/mdcache/CMDAccessor.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CStatistics.h"
 
 using namespace gpnaucrates;

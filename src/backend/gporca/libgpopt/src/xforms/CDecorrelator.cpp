@@ -521,7 +521,8 @@ CDecorrelator::FProcessJoin(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 		GPOS_NEW(mp) CExpressionArray(mp, arity);
 
 	COperator::EOperatorId opId = pexpr->Pop()->Eopid();
-	CLogicalNAryJoin *naryJoin = gpos::dyn_cast<CLogicalNAryJoin>(pexpr->Pop());
+	gpos::Ref<CLogicalNAryJoin> naryJoin =
+		gpos::dyn_cast<CLogicalNAryJoin>(pexpr->Pop());
 	BOOL isLeftJoin =
 		(COperator::EopLogicalLeftOuterJoin == opId);  // TODO: LOJ Apply??
 	BOOL isFullJoin = (COperator::EopLogicalFullOuterJoin == opId);

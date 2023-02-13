@@ -31,23 +31,23 @@ class CPhysicalInnerHashJoin : public CPhysicalHashJoin
 private:
 	// helper for computing a hashed distribution matching the given distribution
 	gpos::Ref<CDistributionSpecHashed> PdshashedCreateMatching(
-		CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
+		CMemoryPool *mp, gpos::Ref<CDistributionSpecHashed> pdshashed,
 		ULONG ulSourceChild) const;
 
 	// helper for deriving hash join distribution from hashed children
 	gpos::Ref<CDistributionSpec> PdsDeriveFromHashedChildren(
-		CMemoryPool *mp, CDistributionSpec *pdsOuter,
-		CDistributionSpec *pdsInner) const;
+		CMemoryPool *mp, gpos::Ref<CDistributionSpec> pdsOuter,
+		gpos::Ref<CDistributionSpec> pdsInner) const;
 
 	// helper for deriving hash join distribution from replicated outer child
 	gpos::Ref<CDistributionSpec> PdsDeriveFromReplicatedOuter(
-		CMemoryPool *mp, CDistributionSpec *pdsOuter,
-		CDistributionSpec *pdsInner) const;
+		CMemoryPool *mp, gpos::Ref<CDistributionSpec> pdsOuter,
+		gpos::Ref<CDistributionSpec> pdsInner) const;
 
 	// helper for deriving hash join distribution from hashed outer child
 	gpos::Ref<CDistributionSpec> PdsDeriveFromHashedOuter(
-		CMemoryPool *mp, CDistributionSpec *pdsOuter,
-		CDistributionSpec *pdsInner) const;
+		CMemoryPool *mp, gpos::Ref<CDistributionSpec> pdsOuter,
+		gpos::Ref<CDistributionSpec> pdsInner) const;
 
 public:
 	CPhysicalInnerHashJoin(const CPhysicalInnerHashJoin &) = delete;
@@ -78,12 +78,12 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalInnerHashJoin *
+	static gpos::Ref<CPhysicalInnerHashJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalInnerHashJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalInnerHashJoin *>(pop);
+		return gpos::dyn_cast<CPhysicalInnerHashJoin>(pop);
 	}
 
 	// derive distribution

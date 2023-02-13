@@ -82,7 +82,7 @@ CXformInlineCTEConsumer::Transform(gpos::Ref<CXformContext>
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	// inline the consumer
-	CLogicalCTEConsumer *popConsumer =
+	gpos::Ref<CLogicalCTEConsumer> popConsumer =
 		gpos::dyn_cast<CLogicalCTEConsumer>(pexpr->Pop());
 	gpos::Ref<CExpression> pexprAlt = popConsumer->PexprInlined();
 	;

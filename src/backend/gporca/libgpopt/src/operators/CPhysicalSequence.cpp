@@ -182,7 +182,7 @@ CPhysicalSequence::PdsRequired(CMemoryPool *mp,
 								   exprhdl
 #endif	// GPOS_DEBUG
 							   ,
-							   CDistributionSpec *pdsRequired,
+							   gpos::Ref<CDistributionSpec> pdsRequired,
 							   ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
 							   ULONG ulOptReq) const
 {
@@ -196,7 +196,7 @@ CPhysicalSequence::PdsRequired(CMemoryPool *mp,
 			CDistributionSpec::EdtStrictSingleton == pdsRequired->Edt())
 		{
 			// incoming request is a singleton, request singleton on all children
-			CDistributionSpecSingleton *pdss =
+			gpos::Ref<CDistributionSpecSingleton> pdss =
 				gpos::dyn_cast<CDistributionSpecSingleton>(pdsRequired);
 			return GPOS_NEW(mp) CDistributionSpecSingleton(pdss->Est());
 		}
@@ -213,14 +213,14 @@ CPhysicalSequence::PdsRequired(CMemoryPool *mp,
 	}
 
 	// get derived plan properties of first child
-	CDrvdPropPlan *pdpplan =
+	gpos::Ref<CDrvdPropPlan> pdpplan =
 		gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0].get());
-	CDistributionSpec *pds = pdpplan->Pds();
+	gpos::Ref<CDistributionSpec> pds = pdpplan->Pds();
 
 	if (pds->FSingletonOrStrictSingleton())
 	{
 		// first child is singleton, request singleton distribution on second child
-		CDistributionSpecSingleton *pdss =
+		gpos::Ref<CDistributionSpecSingleton> pdss =
 			gpos::dyn_cast<CDistributionSpecSingleton>(pds);
 		return GPOS_NEW(mp) CDistributionSpecSingleton(pdss->Est());
 	}

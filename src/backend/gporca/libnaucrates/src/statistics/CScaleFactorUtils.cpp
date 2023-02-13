@@ -17,6 +17,7 @@
 #include "gpopt/exception.h"
 #include "gpopt/operators/CExpressionUtils.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CStatistics.h"
 
 using namespace gpopt;
@@ -67,7 +68,8 @@ CScaleFactorUtils::GenerateScaleFactorMap(
 	{
 		CDouble local_scale_factor =
 			(*(*join_conds_scale_factors)[ul]).m_scale_factor;
-		IMdIdArray *oid_pair = (*(*join_conds_scale_factors)[ul]).m_oid_pair;
+		gpos::Ref<IMdIdArray> oid_pair =
+			(*(*join_conds_scale_factors)[ul]).m_oid_pair;
 		BOOL both_dist_keys = (*(*join_conds_scale_factors)[ul]).m_dist_keys;
 
 		if (oid_pair != nullptr && oid_pair->Size() == 2)

@@ -89,7 +89,7 @@ CPhysicalTVF::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CPhysicalTVF *popTVF = gpos::dyn_cast<CPhysicalTVF>(pop);
+		gpos::Ref<CPhysicalTVF> popTVF = gpos::dyn_cast<CPhysicalTVF>(pop);
 
 		return m_func_mdid->Equals(popTVF->FuncMdId()) &&
 			   m_return_type_mdid->Equals(popTVF->ReturnTypeMdId()) &&
@@ -166,12 +166,12 @@ CPhysicalTVF::PosRequired(CMemoryPool *,		// mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysicalTVF::PdsRequired(CMemoryPool *,		// mp,
-						  CExpressionHandle &,	// exprhdl,
-						  CDistributionSpec *,	// pdsRequired,
-						  ULONG,				//child_index
-						  CDrvdPropArray *,		// pdrgpdpCtxt
-						  ULONG					// ulOptReq
+CPhysicalTVF::PdsRequired(CMemoryPool *,				 // mp,
+						  CExpressionHandle &,			 // exprhdl,
+						  gpos::Ref<CDistributionSpec>,	 // pdsRequired,
+						  ULONG,						 //child_index
+						  CDrvdPropArray *,				 // pdrgpdpCtxt
+						  ULONG							 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalTVF has no relational children");

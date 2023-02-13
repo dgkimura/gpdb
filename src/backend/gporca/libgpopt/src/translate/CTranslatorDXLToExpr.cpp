@@ -600,7 +600,7 @@ CTranslatorDXLToExpr::PexprLogicalGet(const gpos::Ref<CDXLNode> dxlnode)
 	{
 		GPOS_ASSERT(EdxlopLogicalGet == edxlopid);
 
-		IMdIdArray *partition_mdids = pmdrel->ChildPartitionMdids();
+		gpos::Ref<IMdIdArray> partition_mdids = pmdrel->ChildPartitionMdids();
 		for (ULONG ul = 0; ul < partition_mdids->Size(); ++ul)
 		{
 			gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
@@ -619,7 +619,7 @@ CTranslatorDXLToExpr::PexprLogicalGet(const gpos::Ref<CDXLNode> dxlnode)
 		;
 		popGet = GPOS_NEW(m_mp) CLogicalDynamicGet(
 			m_mp, pname, ptabdesc, part_idx_id, partition_mdids);
-		CLogicalDynamicGet *popDynamicGet =
+		gpos::Ref<CLogicalDynamicGet> popDynamicGet =
 			gpos::dyn_cast<CLogicalDynamicGet>(popGet.get());
 
 		// get the output column references from the dynamic get

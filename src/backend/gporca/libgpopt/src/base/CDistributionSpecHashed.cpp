@@ -193,7 +193,8 @@ CDistributionSpecHashed::FDistributionSpecHashedOnlyOnGpSegmentId() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecHashed::FSatisfies(const CDistributionSpec *pds) const
+CDistributionSpecHashed::FSatisfies(
+	const gpos::Ref<CDistributionSpec> pds) const
 {
 	if (nullptr != m_pdshashedEquiv && m_pdshashedEquiv->FSatisfies(pds))
 	{
@@ -219,8 +220,8 @@ CDistributionSpecHashed::FSatisfies(const CDistributionSpec *pds) const
 
 	GPOS_ASSERT(EdtHashed == pds->Edt());
 
-	const CDistributionSpecHashed *pdsHashed =
-		dynamic_cast<const CDistributionSpecHashed *>(pds);
+	const gpos::Ref<CDistributionSpecHashed> pdsHashed =
+		dynamic_cast<const gpos::Ref<CDistributionSpecHashed> >(pds);
 
 	// Assumes that 'this' distribution spec is based on the underlying table
 	// structure, whereas 'pds' distribution spec is based on the query
@@ -255,7 +256,7 @@ CDistributionSpecHashed::FSatisfies(const CDistributionSpec *pds) const
 //---------------------------------------------------------------------------
 BOOL
 CDistributionSpecHashed::FMatchSubset(
-	const CDistributionSpecHashed *pdsHashed) const
+	const gpos::Ref<CDistributionSpecHashed> pdsHashed) const
 {
 	const ULONG ulOwnExprs = m_pdrgpexpr->Size();
 	const ULONG ulOtherExprs = pdsHashed->m_pdrgpexpr->Size();
@@ -435,7 +436,7 @@ CDistributionSpecHashed::AppendEnforcers(CMemoryPool *mp,
 ULONG
 CDistributionSpecHashed::HashValue() const
 {
-	CDistributionSpecHashed *equiv_spec = this->PdshashedEquiv();
+	gpos::Ref<CDistributionSpecHashed> equiv_spec = this->PdshashedEquiv();
 	if (nullptr != equiv_spec)
 	{
 		return equiv_spec->HashValue();
@@ -505,7 +506,7 @@ CDistributionSpecHashed::PcrsUsed(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 BOOL
 CDistributionSpecHashed::FMatchHashedDistribution(
-	const CDistributionSpecHashed *pdshashed) const
+	const gpos::Ref<CDistributionSpecHashed> pdshashed) const
 {
 	GPOS_ASSERT(nullptr != pdshashed);
 
@@ -559,7 +560,7 @@ CDistributionSpecHashed::FMatchHashedDistribution(
 //
 //---------------------------------------------------------------------------
 BOOL
-CDistributionSpecHashed::Matches(const CDistributionSpec *pds) const
+CDistributionSpecHashed::Matches(const gpos::Ref<CDistributionSpec> pds) const
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -568,7 +569,7 @@ CDistributionSpecHashed::Matches(const CDistributionSpec *pds) const
 		return false;
 	}
 
-	const CDistributionSpecHashed *pdshashed =
+	const gpos::Ref<CDistributionSpecHashed> pdshashed =
 		CDistributionSpecHashed::PdsConvert(pds);
 
 	if (nullptr != m_pdshashedEquiv && m_pdshashedEquiv->Matches(pdshashed))
@@ -586,7 +587,8 @@ CDistributionSpecHashed::Matches(const CDistributionSpec *pds) const
 }
 
 BOOL
-CDistributionSpecHashed::Equals(const CDistributionSpec *input_spec) const
+CDistributionSpecHashed::Equals(
+	const gpos::Ref<CDistributionSpec> input_spec) const
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -595,11 +597,12 @@ CDistributionSpecHashed::Equals(const CDistributionSpec *input_spec) const
 		return false;
 	}
 
-	const CDistributionSpecHashed *other_spec =
+	const gpos::Ref<CDistributionSpecHashed> other_spec =
 		CDistributionSpecHashed::PdsConvert(input_spec);
 
-	CDistributionSpecHashed *spec_equiv = this->PdshashedEquiv();
-	CDistributionSpecHashed *other_spec_equiv = other_spec->PdshashedEquiv();
+	gpos::Ref<CDistributionSpecHashed> spec_equiv = this->PdshashedEquiv();
+	gpos::Ref<CDistributionSpecHashed> other_spec_equiv =
+		other_spec->PdshashedEquiv();
 	// if one of the spec has equivalent spec and other doesn't, they are not equal
 	if ((spec_equiv != nullptr && other_spec_equiv == nullptr) ||
 		(spec_equiv == nullptr && other_spec_equiv != nullptr))
@@ -682,7 +685,7 @@ CDistributionSpecHashed::IsCoveredBy(
 	const CExpressionArray *dist_cols_expr_array) const
 {
 	BOOL covers = false;
-	const CDistributionSpecHashed *pds = this;
+	const gpos::Ref<CDistributionSpecHashed> pds = this;
 	while (pds && !covers)
 	{
 		covers = CUtils::Contains(dist_cols_expr_array, pds->Pdrgpexpr());
@@ -810,7 +813,7 @@ CDistributionSpecHashed::Copy(CMemoryPool *mp)
 	CExpressionArray *distribution_exprs = this->Pdrgpexpr();
 	gpos::Ref<CExpressionArrays> equiv_distribution_exprs =
 		GPOS_NEW(mp) CExpressionArrays(mp);
-	CDistributionSpecHashed *pds = this;
+	gpos::Ref<CDistributionSpecHashed> pds = this;
 	while (pds)
 	{
 		gpos::Ref<CExpressionArray> distribution_exprs = pds->Pdrgpexpr();
@@ -938,7 +941,7 @@ CDistributionSpecHashed::GetAllDistributionExprs(CMemoryPool *mp)
 {
 	gpos::Ref<CExpressionArrays> all_distribution_exprs =
 		GPOS_NEW(mp) CExpressionArrays(mp);
-	CDistributionSpecHashed *spec = this;
+	gpos::Ref<CDistributionSpecHashed> spec = this;
 	while (spec)
 	{
 		gpos::Ref<CExpressionArray> distribution_exprs = spec->Pdrgpexpr();
@@ -954,7 +957,7 @@ CDistributionSpecHashed::GetAllDistributionExprs(CMemoryPool *mp)
 // as equivalent
 gpos::Ref<CDistributionSpecHashed>
 CDistributionSpecHashed::Combine(CMemoryPool *mp,
-								 CDistributionSpecHashed *other_spec)
+								 gpos::Ref<CDistributionSpecHashed> other_spec)
 {
 	gpos::Ref<CExpressionArrays> distribution_exprs =
 		this->GetAllDistributionExprs(mp);
@@ -986,7 +989,7 @@ CDistributionSpecHashed::Combine(CMemoryPool *mp,
 BOOL
 CDistributionSpecHashed::HasCompleteEquivSpec(CMemoryPool *mp) const
 {
-	CDistributionSpecHashed *pdshashedEquiv = this->PdshashedEquiv();
+	gpos::Ref<CDistributionSpecHashed> pdshashedEquiv = this->PdshashedEquiv();
 
 	if (nullptr != pdshashedEquiv)
 	{
@@ -1008,7 +1011,7 @@ CDistributionSpecHashed::HasCompleteEquivSpec(CMemoryPool *mp) const
 // use given predicates to complete an incomplete spec, if possible
 gpos::Ref<CDistributionSpecHashed>
 CDistributionSpecHashed::TryToCompleteEquivSpec(
-	CMemoryPool *mp, CDistributionSpecHashed *pdshashed,
+	CMemoryPool *mp, gpos::Ref<CDistributionSpecHashed> pdshashed,
 	gpos::Ref<CExpression> pexprPred, gpos::Ref<CColRefSet> outerRefs)
 {
 	gpos::Ref<CExpressionArray> pdrgpexprPred =

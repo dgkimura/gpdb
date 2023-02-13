@@ -155,13 +155,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalSequence *
+	static gpos::Ref<CLogicalSequence>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalSequence == pop->Eopid());
 
-		return dynamic_cast<CLogicalSequence *>(pop);
+		return gpos::dyn_cast<CLogicalSequence>(pop);
 	}
 
 };	// class CLogicalSequence

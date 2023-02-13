@@ -130,7 +130,7 @@ public:
 
 	// stats derivation using given properties and context
 	void DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-					 CReqdPropRelational *prprel,
+					 gpos::Ref<CReqdPropRelational> prprel,
 					 IStatisticsArray *stats_ctxt) const;
 
 	// derive the properties of the plan carried by attached cost context,
@@ -154,22 +154,23 @@ public:
 	void ComputeReqdProps(gpos::Ref<CReqdProp> prpInput, ULONG ulOptReq);
 
 	// derived relational props of n-th child
-	CDrvdPropRelational *GetRelationalProperties(ULONG child_index) const;
+	gpos::Ref<CDrvdPropRelational> GetRelationalProperties(
+		ULONG child_index) const;
 
 	// derived stats of n-th child
 	gpos::Ref<IStatistics> Pstats(ULONG child_index) const;
 
 	// derived plan props of n-th child
-	CDrvdPropPlan *Pdpplan(ULONG child_index) const;
+	gpos::Ref<CDrvdPropPlan> Pdpplan(ULONG child_index) const;
 
 	// derived scalar props of n-th child
-	CDrvdPropScalar *GetDrvdScalarProps(ULONG child_index) const;
+	gpos::Ref<CDrvdPropScalar> GetDrvdScalarProps(ULONG child_index) const;
 
 	// derived properties of attached expr/gexpr
 	gpos::Ref<CDrvdProp> Pdp() const;
 
 	// derived relational properties of attached expr/gexpr
-	CDrvdPropRelational *GetRelationalProperties() const;
+	gpos::Ref<CDrvdPropRelational> GetRelationalProperties() const;
 
 	// stats of attached expr/gexpr
 	gpos::Ref<IStatistics> Pstats();
@@ -185,7 +186,8 @@ public:
 	BOOL FScalarChild(ULONG child_index) const;
 
 	// required relational props of n-th child
-	CReqdPropRelational *GetReqdRelationalProps(ULONG child_index) const;
+	gpos::Ref<CReqdPropRelational> GetReqdRelationalProps(
+		ULONG child_index) const;
 
 	// required plan props of n-th child
 	gpos::Ref<CReqdPropPlan> Prpp(ULONG child_index) const;

@@ -85,13 +85,13 @@ public:
 	EBoolEvalResult Eber(ULongPtrArray *pdrgpulChildren) const override;
 
 	// conversion function
-	static CScalarNullTest *
+	static gpos::Ref<CScalarNullTest>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarNullTest == pop->Eopid());
 
-		return dynamic_cast<CScalarNullTest *>(pop);
+		return gpos::dyn_cast<CScalarNullTest>(pop);
 	}
 
 };	// class CScalarNullTest

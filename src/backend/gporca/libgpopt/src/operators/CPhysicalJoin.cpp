@@ -225,7 +225,7 @@ CPhysicalJoin::FOuterProvidesReqdCols(CExpressionHandle &exprhdl,
 gpos::Ref<CDistributionSpec>
 CPhysicalJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 						   CExpressionHandle &exprhdl GPOS_UNUSED,
-						   CDistributionSpec *,	 //pdsRequired,
+						   gpos::Ref<CDistributionSpec>,  //pdsRequired,
 						   ULONG child_index GPOS_UNUSED,
 						   CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
 						   ULONG  // ulOptReq
@@ -246,7 +246,8 @@ CPhysicalJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	CEnfdDistribution::EDistributionMatching dmatch =
 		Edm(prppInput, child_index, pdrgpdpCtxt, ulDistrReq);
-	CDistributionSpec *const pdsRequired = prppInput->Ped()->PdsRequired();
+	gpos::Ref<CDistributionSpec> const pdsRequired =
+		prppInput->Ped()->PdsRequired();
 
 	// if expression has to execute on a single host then we need a gather
 	if (exprhdl.NeedsSingletonExecution())
@@ -272,7 +273,7 @@ CPhysicalJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (1 == child_index)
 	{
 		// compute a matching distribution based on derived distribution of outer child
-		CDistributionSpec *pdsOuter =
+		gpos::Ref<CDistributionSpec> pdsOuter =
 			gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Pds();
 
 		if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
@@ -324,7 +325,7 @@ CPhysicalJoin::PedInnerHashedFromOuterHashed(
 	gpos::Ref<CDrvdProp> outerDrvdProp)
 {
 	// compute a matching distribution based on derived distribution of outer child
-	CDistributionSpec *pdsOuter =
+	gpos::Ref<CDistributionSpec> pdsOuter =
 		gpos::dyn_cast<CDrvdPropPlan>(outerDrvdProp)->Pds();
 	if (CDistributionSpec::EdtHashed == pdsOuter->Edt())
 	{
@@ -337,7 +338,7 @@ CPhysicalJoin::PedInnerHashedFromOuterHashed(
 
 		gpos::Ref<CExpressionArray> pdrgpexprMatching =
 			GPOS_NEW(mp) CExpressionArray(mp);
-		CDistributionSpecHashed *pdshashed =
+		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(pdsOuter);
 		CExpressionArray *pdrgpexprHashed = pdshashed->Pdrgpexpr();
 		const ULONG ulSize = pdrgpexprHashed->Size();
@@ -399,8 +400,10 @@ CPhysicalJoin::PedInnerHashedFromOuterHashed(
 gpos::Ref<CDistributionSpec>
 CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pdsOuter = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
-	CDistributionSpec *pdsInner = exprhdl.Pdpplan(1 /*child_index*/)->Pds();
+	gpos::Ref<CDistributionSpec> pdsOuter =
+		exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	gpos::Ref<CDistributionSpec> pdsInner =
+		exprhdl.Pdpplan(1 /*child_index*/)->Pds();
 
 	// We must use the non-nullable side for the distribution spec for outer joins.
 	// For right join, the hash side is the non-nullable side, so we swap the inner/outer
@@ -411,7 +414,7 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		pdsInner = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
 	}
 
-	CDistributionSpec *pds;
+	gpos::Ref<CDistributionSpec> pds;
 
 	if (CDistributionSpec::EdtStrictReplicated == pdsOuter->Edt() ||
 		CDistributionSpec::EdtTaintedReplicated == pdsOuter->Edt() ||
@@ -428,7 +431,7 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 
 	if (CDistributionSpec::EdtHashed == pds->Edt())
 	{
-		CDistributionSpecHashed *pdsHashed =
+		gpos::Ref<CDistributionSpecHashed> pdsHashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(pds);
 
 		// Clean up any incomplete distribution specs since they can no longer be completed above
@@ -436,7 +439,7 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		if (!pdsHashed->HasCompleteEquivSpec(mp))
 		{
 			CExpressionArray *pdrgpexpr = pdsHashed->Pdrgpexpr();
-			IMdIdArray *opfamilies = pdsHashed->Opfamilies();
+			gpos::Ref<IMdIdArray> opfamilies = pdsHashed->Opfamilies();
 
 			if (nullptr != opfamilies)
 			{
@@ -903,7 +906,8 @@ CPhysicalJoin::PedCorrelatedJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(CUtils::FCorrelatedNLJoin(exprhdl.Pop()));
 
-	CDistributionSpec *const pdsRequired = prppInput->Ped()->PdsRequired();
+	gpos::Ref<CDistributionSpec> const pdsRequired =
+		prppInput->Ped()->PdsRequired();
 
 	if (0 == ulOptReq && pdsRequired->FSingletonOrStrictSingleton())
 	{
@@ -926,7 +930,7 @@ CPhysicalJoin::PedCorrelatedJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	if (1 == child_index)
 	{
-		CDistributionSpec *pdsOuter =
+		gpos::Ref<CDistributionSpec> pdsOuter =
 			gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Pds();
 		if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 		{

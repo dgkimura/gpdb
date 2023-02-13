@@ -102,7 +102,7 @@ public:
 
 		gpos::Ref<CLogicalGbAgg> popGbAgg =
 			gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
-		CLogicalSetOp *popSetOp =
+		gpos::Ref<CLogicalSetOp> popSetOp =
 			gpos::dyn_cast<CLogicalSetOp>(pexprSetOp->Pop());
 
 		CColRefArray *pdrgpcrGb = popGbAgg->Pdrgpcr();

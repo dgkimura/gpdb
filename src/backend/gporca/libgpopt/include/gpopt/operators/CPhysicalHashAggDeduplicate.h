@@ -87,7 +87,7 @@ public:
 	// compute required distribution of the n-th child
 	gpos::Ref<CDistributionSpec>
 	PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				CDistributionSpec *pdsRequired, ULONG child_index,
+				gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
 				CDrvdPropArray *,  //pdrgpdpCtxt,
 				ULONG ulOptReq) const override
 	{
@@ -103,13 +103,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CPhysicalHashAggDeduplicate *
+	static gpos::Ref<CPhysicalHashAggDeduplicate>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalHashAggDeduplicate == pop->Eopid());
 
-		return dynamic_cast<CPhysicalHashAggDeduplicate *>(pop);
+		return gpos::dyn_cast<CPhysicalHashAggDeduplicate>(pop);
 	}
 
 };	// class CPhysicalHashAggDeduplicate

@@ -92,10 +92,10 @@ public:
 
 	// check if the given distribution specification is compatible with the
 	// distribution specification of this object for the specified matching type
-	BOOL FCompatible(CDistributionSpec *pds) const;
+	BOOL FCompatible(gpos::Ref<CDistributionSpec> pds) const;
 
 	// required distribution accessor
-	CDistributionSpec *
+	gpos::Ref<CDistributionSpec>
 	PdsRequired() const
 	{
 		return m_pds.get();

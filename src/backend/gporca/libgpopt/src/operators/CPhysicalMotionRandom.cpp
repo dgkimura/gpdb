@@ -192,13 +192,13 @@ CPhysicalMotionRandom::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalMotionRandom *
+gpos::Ref<CPhysicalMotionRandom>
 CPhysicalMotionRandom::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionRandom == pop->Eopid());
 
-	return dynamic_cast<CPhysicalMotionRandom *>(pop);
+	return gpos::dyn_cast<CPhysicalMotionRandom>(pop);
 }
 
 // EOF

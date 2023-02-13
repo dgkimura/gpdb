@@ -25,7 +25,7 @@ public:
 	explicit CPhysicalFullMergeJoin(
 		CMemoryPool *mp, gpos::Ref<CExpressionArray> outer_merge_clauses,
 		gpos::Ref<CExpressionArray> inner_merge_clauses,
-		IMdIdArray *hash_opfamilies,
+		gpos::Ref<IMdIdArray> hash_opfamilies,
 		CXform::EXformId origin_xform = CXform::ExfSentinel);
 
 	// dtor
@@ -46,20 +46,18 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalFullMergeJoin *
+	static gpos::Ref<CPhysicalFullMergeJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalFullMergeJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalFullMergeJoin *>(pop);
+		return gpos::dyn_cast<CPhysicalFullMergeJoin>(pop);
 	}
 
-	gpos::Ref<CDistributionSpec> PdsRequired(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl,
-											 CDistributionSpec *pdsRequired,
-											 ULONG child_index,
-											 CDrvdPropArray *pdrgpdpCtxt,
-											 ULONG ulOptReq) const override;
+	gpos::Ref<CDistributionSpec> PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,

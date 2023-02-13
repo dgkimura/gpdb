@@ -108,7 +108,8 @@ CLogicalProject::PdrgpcrsEquivClassFromScIdent(
 		return nullptr;
 	}
 
-	CScalarIdent *popScIdent = gpos::dyn_cast<CScalarIdent>(pexprScalar->Pop());
+	gpos::Ref<CScalarIdent> popScIdent =
+		gpos::dyn_cast<CScalarIdent>(pexprScalar->Pop());
 	const CColRef *pcrScIdent = popScIdent->Pcr();
 	GPOS_ASSERT(pcrPrEl->Id() != pcrScIdent->Id());
 	GPOS_ASSERT(pcrPrEl->RetrieveType()->MDId()->Equals(

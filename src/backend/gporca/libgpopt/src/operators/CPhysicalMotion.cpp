@@ -43,7 +43,7 @@ CPhysicalMotion::FValidContext(CMemoryPool *,
 	gpos::Ref<CCostContext> pccBest = pocChild->PccBest();
 	GPOS_ASSERT(nullptr != pccBest);
 
-	CDrvdPropPlan *pdpplanChild = pccBest->Pdpplan();
+	gpos::Ref<CDrvdPropPlan> pdpplanChild = pccBest->Pdpplan();
 	// GPDB_12_MERGE_FIXME: Check partition propagation spec
 #if 0
 	if (pdpplanChild->Ppim()->FContainsUnresolved())
@@ -75,7 +75,7 @@ CPhysicalMotion::FValidContext(CMemoryPool *,
 gpos::Ref<CDistributionSpec>
 CPhysicalMotion::PdsRequired(CMemoryPool *mp,
 							 CExpressionHandle &,  // exprhdl
-							 CDistributionSpec *pdsRequired,
+							 gpos::Ref<CDistributionSpec> pdsRequired,
 							 ULONG
 #ifdef GPOS_DEBUG
 								 child_index

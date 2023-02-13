@@ -118,7 +118,7 @@ public:
 	gpos::Ref<IMDId> GetResultTypeMdid() const override;
 
 	// output argument types
-	IMdIdArray *OutputArgTypesMdidArray() const override;
+	gpos::Ref<IMdIdArray> OutputArgTypesMdidArray() const override;
 
 	// does function return NULL on NULL input
 	BOOL

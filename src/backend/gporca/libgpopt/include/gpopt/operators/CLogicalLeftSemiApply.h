@@ -129,13 +129,13 @@ public:
 	}
 
 	// conversion function
-	static CLogicalLeftSemiApply *
+	static gpos::Ref<CLogicalLeftSemiApply>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FLeftSemiApply(pop));
 
-		return dynamic_cast<CLogicalLeftSemiApply *>(pop);
+		return gpos::dyn_cast<CLogicalLeftSemiApply>(pop);
 	}
 
 };	// class CLogicalLeftSemiApply

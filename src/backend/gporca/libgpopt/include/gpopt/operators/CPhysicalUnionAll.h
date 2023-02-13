@@ -58,13 +58,13 @@ private:
 		CMemoryPool *mp, const ULongPtrArray *pdrgpulOuter) const;
 
 	// derive output distribution based on child distribution
-	static CDistributionSpec *PdsDeriveFromChildren(CMemoryPool *mp,
-													CExpressionHandle &exprhdl);
+	static gpos::Ref<CDistributionSpec> PdsDeriveFromChildren(
+		CMemoryPool *mp, CExpressionHandle &exprhdl);
 
 protected:
 	// compute required hashed distribution of the n-th child
 	gpos::Ref<CDistributionSpecHashed> PdshashedPassThru(
-		CMemoryPool *mp, CDistributionSpecHashed *pdshashedRequired,
+		CMemoryPool *mp, gpos::Ref<CDistributionSpecHashed> pdshashedRequired,
 		ULONG child_index) const;
 
 public:
@@ -129,7 +129,7 @@ public:
 											  ULONG ulOptReq) const override;
 
 	// conversion function
-	static CPhysicalUnionAll *PopConvert(gpos::Ref<COperator> pop);
+	static gpos::Ref<CPhysicalUnionAll> PopConvert(gpos::Ref<COperator> pop);
 
 
 	// check if required columns are included in output columns

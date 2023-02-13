@@ -156,7 +156,7 @@ CPhysicalComputeScalar::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysicalComputeScalar::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									CDistributionSpec *pdsRequired,
+									gpos::Ref<CDistributionSpec> pdsRequired,
 									ULONG child_index,
 									CDrvdPropArray *,  // pdrgpdpCtxt
 									ULONG ulOptReq) const
@@ -195,7 +195,7 @@ CPhysicalComputeScalar::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// in this case, we request Any distribution from the child
 	if (CDistributionSpec::EdtHashed == edtRequired)
 	{
-		CDistributionSpecHashed *pdshashed =
+		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(pdsRequired);
 		gpos::Ref<CColRefSet> pcrs = pdshashed->PcrsUsed(m_mp);
 		BOOL fUsesDefinedCols = FUnaryUsesDefinedColumns(pcrs.get(), exprhdl);
@@ -208,7 +208,7 @@ CPhysicalComputeScalar::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	if (CDistributionSpec::EdtRouted == edtRequired)
 	{
-		CDistributionSpecRouted *pdsrouted =
+		gpos::Ref<CDistributionSpecRouted> pdsrouted =
 			gpos::dyn_cast<CDistributionSpecRouted>(pdsRequired);
 		gpos::Ref<CColRefSet> pcrs = GPOS_NEW(m_mp) CColRefSet(m_mp);
 		pcrs->Include(pdsrouted->Pcr());
@@ -351,7 +351,8 @@ gpos::Ref<CDistributionSpec>
 CPhysicalComputeScalar::PdsDerive(CMemoryPool *mp,
 								  CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pds = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	gpos::Ref<CDistributionSpec> pds =
+		exprhdl.Pdpplan(0 /*child_index*/)->Pds();
 
 	if (CDistributionSpec::EdtStrictReplicated == pds->Edt() &&
 		IMDFunction::EfsVolatile ==

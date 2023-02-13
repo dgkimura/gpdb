@@ -198,7 +198,7 @@ CLogicalGbAggDeduplicate::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalGbAggDeduplicate *popAgg =
+	gpos::Ref<CLogicalGbAggDeduplicate> popAgg =
 		gpos::dyn_cast<CLogicalGbAggDeduplicate>(pop);
 
 	if (FGeneratesDuplicates() != popAgg->FGeneratesDuplicates())

@@ -60,7 +60,8 @@ CScalarSortGroupClause::Matches(gpos::Ref<COperator> other) const
 		return false;
 	}
 
-	CScalarSortGroupClause *op = gpos::dyn_cast<CScalarSortGroupClause>(other);
+	gpos::Ref<CScalarSortGroupClause> op =
+		gpos::dyn_cast<CScalarSortGroupClause>(other);
 
 	return Index() == op->Index() && EqOp() == op->EqOp() &&
 		   SortOp() == op->SortOp() && NullsFirst() == op->NullsFirst() &&

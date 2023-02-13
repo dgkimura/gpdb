@@ -74,7 +74,8 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// conversion function
-	static CScalarArrayCoerceExpr *PopConvert(gpos::Ref<COperator> pop);
+	static gpos::Ref<CScalarArrayCoerceExpr> PopConvert(
+		gpos::Ref<COperator> pop);
 
 };	// class CScalarArrayCoerceExpr
 

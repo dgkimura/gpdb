@@ -71,7 +71,7 @@ CXformDynamicIndexGet2DynamicIndexScan::Transform(
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDynamicIndexGet *popIndexGet =
+	gpos::Ref<CLogicalDynamicIndexGet> popIndexGet =
 		gpos::dyn_cast<CLogicalDynamicIndexGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 

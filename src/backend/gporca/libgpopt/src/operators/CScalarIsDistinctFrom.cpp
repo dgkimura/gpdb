@@ -21,13 +21,13 @@ using namespace gpmd;
 
 
 // conversion function
-CScalarIsDistinctFrom *
+gpos::Ref<CScalarIsDistinctFrom>
 CScalarIsDistinctFrom::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopScalarIsDistinctFrom == pop->Eopid());
 
-	return dynamic_cast<CScalarIsDistinctFrom *>(pop);
+	return gpos::dyn_cast<CScalarIsDistinctFrom>(pop);
 }
 
 // perform boolean expression evaluation
@@ -58,7 +58,7 @@ CScalarIsDistinctFrom::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarIsDistinctFrom *popIDF =
+		gpos::Ref<CScalarIsDistinctFrom> popIDF =
 			gpos::dyn_cast<CScalarIsDistinctFrom>(pop);
 
 		// match if operator mdids are identical

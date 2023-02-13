@@ -37,7 +37,8 @@ public:
 		CMemoryPool *mp, const CName *pnameAlias,
 		gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId, ULONG scan_id,
 		gpos::Ref<CColRefArray> pdrgpcrOutput,
-		gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
+		gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
+		gpos::Ref<IMdIdArray> partition_mdids,
 		gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part);
 
 	// ident accessors
@@ -64,13 +65,13 @@ public:
 		IStatisticsArray *stats_ctxt) const override;
 
 	// conversion function
-	static CPhysicalDynamicTableScan *
+	static gpos::Ref<CPhysicalDynamicTableScan>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalDynamicTableScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalDynamicTableScan *>(pop);
+		return gpos::dyn_cast<CPhysicalDynamicTableScan>(pop);
 	}
 
 	gpos::Ref<CPartitionPropagationSpec> PppsDerive(

@@ -50,7 +50,8 @@ CXformIndexGet2IndexOnlyScan::CXformIndexGet2IndexOnlyScan(CMemoryPool *mp)
 CXform::EXformPromise
 CXformIndexGet2IndexOnlyScan::Exfp(CExpressionHandle &exprhdl) const
 {
-	CLogicalIndexGet *popGet = gpos::dyn_cast<CLogicalIndexGet>(exprhdl.Pop());
+	gpos::Ref<CLogicalIndexGet> popGet =
+		gpos::dyn_cast<CLogicalIndexGet>(exprhdl.Pop());
 
 	gpos::Ref<CTableDescriptor> ptabdesc = popGet->Ptabdesc();
 	gpos::Ref<CIndexDescriptor> pindexdesc = popGet->Pindexdesc();
@@ -92,7 +93,8 @@ CXformIndexGet2IndexOnlyScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalIndexGet *pop = gpos::dyn_cast<CLogicalIndexGet>(pexpr->Pop());
+	gpos::Ref<CLogicalIndexGet> pop =
+		gpos::dyn_cast<CLogicalIndexGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 	gpos::Ref<CIndexDescriptor> pindexdesc = pop->Pindexdesc();
 	gpos::Ref<CTableDescriptor> ptabdesc = pop->Ptabdesc();

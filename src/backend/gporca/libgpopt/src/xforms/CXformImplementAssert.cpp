@@ -82,7 +82,8 @@ CXformImplementAssert::Transform(gpos::Ref<CXformContext> pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CLogicalAssert *popAssert = gpos::dyn_cast<CLogicalAssert>(pexpr->Pop());
+	gpos::Ref<CLogicalAssert> popAssert =
+		gpos::dyn_cast<CLogicalAssert>(pexpr->Pop());
 	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
 	CException *pexc = popAssert->Pexc();

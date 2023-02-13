@@ -102,14 +102,14 @@ public:
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// conversion function
-	static CScalarSubqueryQuantified *
+	static gpos::Ref<CScalarSubqueryQuantified>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubqueryAny == pop->Eopid() ||
 					EopScalarSubqueryAll == pop->Eopid());
 
-		return dynamic_cast<CScalarSubqueryQuantified *>(pop);
+		return gpos::dyn_cast<CScalarSubqueryQuantified>(pop);
 	}
 
 	// print

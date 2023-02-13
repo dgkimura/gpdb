@@ -192,13 +192,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalPartitionSelector *
+	static gpos::Ref<CLogicalPartitionSelector>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalPartitionSelector == pop->Eopid());
 
-		return dynamic_cast<CLogicalPartitionSelector *>(pop);
+		return gpos::dyn_cast<CLogicalPartitionSelector>(pop);
 	}
 
 	// debug print

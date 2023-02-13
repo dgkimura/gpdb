@@ -132,13 +132,13 @@ public:
 		BOOL must_exist) override;
 
 	// conversion function
-	static CLogicalLeftAntiSemiApply *
+	static gpos::Ref<CLogicalLeftAntiSemiApply>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(CUtils::FLeftAntiSemiApply(pop));
 
-		return dynamic_cast<CLogicalLeftAntiSemiApply *>(pop);
+		return gpos::dyn_cast<CLogicalLeftAntiSemiApply>(pop);
 	}
 
 };	// class CLogicalLeftAntiSemiApply

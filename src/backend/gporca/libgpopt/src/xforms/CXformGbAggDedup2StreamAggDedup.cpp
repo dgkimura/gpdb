@@ -68,7 +68,7 @@ CXformGbAggDedup2StreamAggDedup::Transform(gpos::Ref<CXformContext> pxfctxt,
 	;
 	;
 
-	CLogicalGbAggDeduplicate *popAggDedup =
+	gpos::Ref<CLogicalGbAggDeduplicate> popAggDedup =
 		gpos::dyn_cast<CLogicalGbAggDeduplicate>(pexpr->Pop());
 	gpos::Ref<CColRefArray> colref_array = popAggDedup->Pdrgpcr();
 	;

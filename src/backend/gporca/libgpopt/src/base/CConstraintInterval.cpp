@@ -220,7 +220,7 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(
 	else
 	{
 		// verify column in expr is the same as column which was passed in
-		CScalarIdent *popScId = nullptr;
+		gpos::Ref<CScalarIdent> popScId = nullptr;
 		if (CUtils::FScalarIdent((*pexpr)[0]))
 		{
 			popScId = gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
@@ -339,7 +339,7 @@ CConstraintInterval::PciIntervalFromConstraint(CMemoryPool *mp,
 	if (CConstraint::EctInterval == pcnstr->Ect())
 	{
 		;
-		return dynamic_cast<CConstraintInterval *>(pcnstr);
+		return gpos::dyn_cast<CConstraintInterval>(pcnstr);
 	}
 
 	gpos::Ref<CColRefSet> pcrsUsed = pcnstr->PcrsUsed();
@@ -378,7 +378,8 @@ CConstraintInterval::PciIntervalFromScalarNullTest(CMemoryPool *mp,
 	if (CUtils::FScalarIdent(pexprChild))
 	{
 #ifdef GPOS_DEBUG
-		CScalarIdent *popScId = gpos::dyn_cast<CScalarIdent>(pexprChild->Pop());
+		gpos::Ref<CScalarIdent> popScId =
+			gpos::dyn_cast<CScalarIdent>(pexprChild->Pop());
 		GPOS_ASSERT(colref == (CColRef *) popScId->Pcr());
 #endif	// GPOS_DEBUG
 		return GPOS_NEW(mp) CConstraintInterval(
@@ -442,7 +443,7 @@ CConstraintInterval::PciIntervalFromScalarCmp(CMemoryPool *mp,
 	{
 		// column
 #ifdef GPOS_DEBUG
-		CScalarIdent *popScId;
+		gpos::Ref<CScalarIdent> popScId;
 		gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
 		if (CUtils::FScalarIdent((*pexpr)[0]))
 		{
@@ -491,7 +492,7 @@ CConstraintInterval::PciIntervalFromScalarIDF(CMemoryPool *mp,
 	{
 		// column
 #ifdef GPOS_DEBUG
-		CScalarIdent *popScId =
+		gpos::Ref<CScalarIdent> popScId =
 			gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
 		GPOS_ASSERT(colref == (CColRef *) popScId->Pcr());
 #endif	// GPOS_DEBUG
@@ -500,7 +501,7 @@ CConstraintInterval::PciIntervalFromScalarIDF(CMemoryPool *mp,
 		gpos::Ref<CScalarConst> popScConst =
 			gpos::dyn_cast<CScalarConst>((*pexpr)[1]->Pop());
 		// operator
-		CScalarIsDistinctFrom *popScCmp =
+		gpos::Ref<CScalarIsDistinctFrom> popScCmp =
 			gpos::dyn_cast<CScalarIsDistinctFrom>(pexpr->Pop());
 
 		GPOS_ASSERT(CScalar::EopScalarConst == popScConst->Eopid());
@@ -637,8 +638,10 @@ CConstraintInterval::PciIntervalFromScalarBoolOr(CMemoryPool *mp,
 
 		for (ul = 0; ul < length - 1; ul += 2)
 		{
-			CConstraintInterval *pci1 = (*child_constraints)[ul].get();
-			CConstraintInterval *pci2 = (*child_constraints)[ul + 1].get();
+			gpos::Ref<CConstraintInterval> pci1 =
+				(*child_constraints)[ul].get();
+			gpos::Ref<CConstraintInterval> pci2 =
+				(*child_constraints)[ul + 1].get();
 
 			gpos::Ref<CConstraintInterval> pciOr = pci1->PciUnion(mp, pci2);
 			constraints->Append(pciOr);
@@ -1048,7 +1051,8 @@ CConstraintInterval::PcnstrRemapForColumn(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraintInterval>
-CConstraintInterval::PciIntersect(CMemoryPool *mp, CConstraintInterval *pci)
+CConstraintInterval::PciIntersect(CMemoryPool *mp,
+								  gpos::Ref<CConstraintInterval> pci)
 {
 	GPOS_ASSERT(nullptr != pci);
 	GPOS_ASSERT(m_pcr == pci->Pcr());
@@ -1098,7 +1102,8 @@ CConstraintInterval::PciIntersect(CMemoryPool *mp, CConstraintInterval *pci)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraintInterval>
-CConstraintInterval::PciUnion(CMemoryPool *mp, CConstraintInterval *pci)
+CConstraintInterval::PciUnion(CMemoryPool *mp,
+							  gpos::Ref<CConstraintInterval> pci)
 {
 	GPOS_ASSERT(nullptr != pci);
 	GPOS_ASSERT(m_pcr == pci->Pcr());
@@ -1148,7 +1153,8 @@ CConstraintInterval::PciUnion(CMemoryPool *mp, CConstraintInterval *pci)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraintInterval>
-CConstraintInterval::PciDifference(CMemoryPool *mp, CConstraintInterval *pci)
+CConstraintInterval::PciDifference(CMemoryPool *mp,
+								   gpos::Ref<CConstraintInterval> pci)
 {
 	GPOS_ASSERT(nullptr != pci);
 	GPOS_ASSERT(m_pcr == pci->Pcr());
@@ -1215,7 +1221,7 @@ CConstraintInterval::PciDifference(CMemoryPool *mp, CConstraintInterval *pci)
 //---------------------------------------------------------------------------
 BOOL
 CConstraintInterval::FContainsInterval(CMemoryPool *mp,
-									   CConstraintInterval *pci)
+									   gpos::Ref<CConstraintInterval> pci)
 {
 	GPOS_ASSERT(nullptr != pci);
 	GPOS_ASSERT(m_pcr == pci->Pcr());

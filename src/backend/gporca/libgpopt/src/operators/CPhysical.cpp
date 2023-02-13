@@ -373,7 +373,7 @@ CPhysical::PosPassThru(CMemoryPool *,		 // mp
 gpos::Ref<CDistributionSpec>
 CPhysical::PdsPassThru(CMemoryPool *,		 // mp
 					   CExpressionHandle &,	 // exprhdl
-					   CDistributionSpec *pdsRequired,
+					   gpos::Ref<CDistributionSpec> pdsRequired,
 					   ULONG  // child_index
 )
 {
@@ -395,10 +395,9 @@ CPhysical::PdsPassThru(CMemoryPool *,		 // mp
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysical::PdsRequireSingletonOrReplicated(CMemoryPool *mp,
-										   CExpressionHandle &exprhdl,
-										   CDistributionSpec *pdsRequired,
-										   ULONG child_index, ULONG ulOptReq)
+CPhysical::PdsRequireSingletonOrReplicated(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index, ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > ulOptReq);
 
@@ -435,7 +434,7 @@ CPhysical::PdsRequireSingletonOrReplicated(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysical::PdsUnary(CMemoryPool *mp, CExpressionHandle &exprhdl,
-					CDistributionSpec *pdsRequired, ULONG child_index,
+					gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
 					ULONG ulOptReq)
 {
 	GPOS_ASSERT(0 == child_index);
@@ -623,7 +622,8 @@ CPhysical::FUnaryProvidesReqdCols(CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpecSingleton>
-CPhysical::PdssMatching(CMemoryPool *mp, CDistributionSpecSingleton *pdss)
+CPhysical::PdssMatching(CMemoryPool *mp,
+						gpos::Ref<CDistributionSpecSingleton> pdss)
 {
 	CDistributionSpecSingleton::ESegmentType est =
 		CDistributionSpecSingleton::EstSegment;
@@ -814,7 +814,7 @@ CPhysical::EpetDistribution(CExpressionHandle &exprhdl,
 	GPOS_ASSERT(nullptr != ped);
 
 	// get distribution delivered by the physical node
-	CDistributionSpec *pds =
+	gpos::Ref<CDistributionSpec> pds =
 		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pds();
 	if (ped->FCompatible(pds))
 	{
@@ -830,7 +830,8 @@ CPhysical::EpetDistribution(CExpressionHandle &exprhdl,
 // Generate a singleton distribution spec request
 gpos::Ref<CDistributionSpec>
 CPhysical::PdsRequireSingleton(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   CDistributionSpec *pds, ULONG child_index)
+							   gpos::Ref<CDistributionSpec> pds,
+							   ULONG child_index)
 {
 	if (CDistributionSpec::EdtSingleton == pds->Edt())
 	{
@@ -850,12 +851,13 @@ CPhysical::PdsRequireSingleton(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 CDouble
-CPhysical::GetSkew(gpos::Ref<IStatistics> stats, CDistributionSpec *pds)
+CPhysical::GetSkew(gpos::Ref<IStatistics> stats,
+				   gpos::Ref<CDistributionSpec> pds)
 {
 	CDouble dSkew = 1.0;
 	if (CDistributionSpec::EdtHashed == pds->Edt())
 	{
-		CDistributionSpecHashed *pdshashed =
+		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(pds);
 		const CExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
 		const ULONG size = pdrgpexpr->Size();
@@ -865,7 +867,7 @@ CPhysical::GetSkew(gpos::Ref<IStatistics> stats, CDistributionSpec *pds)
 			if (COperator::EopScalarIdent == pexpr->Pop()->Eopid())
 			{
 				// consider only hashed distribution direct columns for now
-				CScalarIdent *popScId =
+				gpos::Ref<CScalarIdent> popScId =
 					gpos::dyn_cast<CScalarIdent>(pexpr->Pop());
 				ULONG colid = popScId->Pcr()->Id();
 				CDouble dSkewCol = stats->GetSkew(colid);
@@ -901,7 +903,7 @@ CPhysical::FCompatibleChildrenDistributions(
 	{
 		if (!exprhdl.FScalarChild(ul))
 		{
-			CDrvdPropPlan *pdpplanChild = exprhdl.Pdpplan(ul);
+			gpos::Ref<CDrvdPropPlan> pdpplanChild = exprhdl.Pdpplan(ul);
 
 			// an operator cannot have a singleton or universal distributed child
 			// and one distributed on multiple nodes

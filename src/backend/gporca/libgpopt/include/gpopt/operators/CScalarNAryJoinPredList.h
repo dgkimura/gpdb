@@ -72,10 +72,10 @@ public:
 	}
 
 	// conversion function
-	static CScalarNAryJoinPredList *
+	static gpos::Ref<CScalarNAryJoinPredList>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
-		return dynamic_cast<CScalarNAryJoinPredList *>(pop);
+		return gpos::dyn_cast<CScalarNAryJoinPredList>(pop);
 	}
 
 	gpos::Ref<IMDId>

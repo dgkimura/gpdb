@@ -7,6 +7,7 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CPoint.h"
 
 namespace gpnaucrates

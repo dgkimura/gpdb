@@ -329,8 +329,8 @@ CReqdPropPlan::HashValue() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CReqdPropPlan::FSatisfied(const CDrvdPropRelational *pdprel,
-						  const CDrvdPropPlan *pdpplan) const
+CReqdPropPlan::FSatisfied(const gpos::Ref<CDrvdPropRelational> pdprel,
+						  const gpos::Ref<CDrvdPropPlan> pdpplan) const
 {
 	GPOS_ASSERT(nullptr != pdprel);
 	GPOS_ASSERT(nullptr != pdpplan);
@@ -370,8 +370,8 @@ CReqdPropPlan::FSatisfied(const CDrvdPropRelational *pdprel,
 BOOL
 CReqdPropPlan::FCompatible(CExpressionHandle &exprhdl,
 						   gpos::Ref<CPhysical> popPhysical,
-						   const CDrvdPropRelational *pdprel,
-						   const CDrvdPropPlan *pdpplan) const
+						   const gpos::Ref<CDrvdPropRelational> pdprel,
+						   const gpos::Ref<CDrvdPropPlan> pdpplan) const
 {
 	GPOS_ASSERT(nullptr != pdpplan);
 	GPOS_ASSERT(nullptr != pdprel);
@@ -552,7 +552,7 @@ CReqdPropPlan::FEqualForCostBounding(const CReqdPropPlan *prppFst,
 gpos::Ref<CReqdPropPlan>
 CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp,
 							   gpos::Ref<CReqdPropPlan> prppInput,
-							   CDrvdPropPlan *pdpplanInput,
+							   gpos::Ref<CDrvdPropPlan> pdpplanInput,
 							   UlongToColRefMap *colref_mapping)
 {
 	GPOS_ASSERT(nullptr != colref_mapping);
@@ -574,7 +574,7 @@ CReqdPropPlan::PrppRemapForCTE(CMemoryPool *mp,
 	// On the query side, columns x1.a and x2.b are equivalent, but we should NOT
 	// treat columns a and b of the producer as equivalent.
 
-	CDistributionSpec *pdsDerived = pdpplanInput->Pds();
+	gpos::Ref<CDistributionSpec> pdsDerived = pdpplanInput->Pds();
 	gpos::Ref<CEnfdDistribution> ped = nullptr;
 	if (pdsDerived->FRequirable())
 	{

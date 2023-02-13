@@ -206,9 +206,10 @@ CExpressionTest::EresUnittest_SimpleOps()
 		// generate simple expression
 		gpos::Ref<CExpression> pexpr = rgpf[i](mp);
 
-		CLogicalGet *popGet = dynamic_cast<CLogicalGet *>(pexpr->Pop());
-		CLogicalDynamicGetBase *popDynGet =
-			dynamic_cast<CLogicalDynamicGetBase *>(pexpr->Pop());
+		gpos::Ref<CLogicalGet> popGet =
+			gpos::dyn_cast<CLogicalGet>(pexpr->Pop());
+		gpos::Ref<CLogicalDynamicGetBase> popDynGet =
+			gpos::dyn_cast<CLogicalDynamicGetBase>(pexpr->Pop());
 		CColRefArray *colrefs = nullptr;
 
 		if (nullptr != popGet)

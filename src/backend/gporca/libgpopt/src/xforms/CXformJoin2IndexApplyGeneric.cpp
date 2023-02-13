@@ -168,7 +168,7 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// info on the get node (a get node or a dynamic get)
 	gpos::Ref<CTableDescriptor> ptabdescInner = nullptr;
 	const gpos::Ref<CColRefSet> distributionCols = nullptr;
-	CLogicalDynamicGet *popDynamicGet = nullptr;
+	gpos::Ref<CLogicalDynamicGet> popDynamicGet = nullptr;
 	CAutoRef<CColRefSet> groupingColsToCheck;
 
 	// walk down the right child tree, accepting some unary operators
@@ -266,7 +266,7 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 			case COperator::EopLogicalGet:
 			{
-				CLogicalGet *popGet =
+				gpos::Ref<CLogicalGet> popGet =
 					gpos::dyn_cast<CLogicalGet>(pexprCurrInnerChild->Pop());
 
 				ptabdescInner = popGet->Ptabdesc();

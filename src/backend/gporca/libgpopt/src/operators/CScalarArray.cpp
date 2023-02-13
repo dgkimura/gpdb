@@ -131,7 +131,7 @@ CScalarArray::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarArray *popArray = gpos::dyn_cast<CScalarArray>(pop);
+		gpos::Ref<CScalarArray> popArray = gpos::dyn_cast<CScalarArray>(pop);
 
 		// match if components are identical
 		if (popArray->FMultiDimensional() == FMultiDimensional() &&

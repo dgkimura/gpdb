@@ -140,12 +140,12 @@ public:
 
 	// compute required distribution of the n-th child
 	gpos::Ref<CDistributionSpec>
-	PdsRequired(CMemoryPool *,		  // mp
-				CExpressionHandle &,  // exprhdl
-				CDistributionSpec *,  // pdsRequired
-				ULONG,				  // child_index
-				CDrvdPropArray *,	  // pdrgpdpCtxt
-				ULONG				  // ulOptReq
+	PdsRequired(CMemoryPool *,				   // mp
+				CExpressionHandle &,		   // exprhdl
+				gpos::Ref<CDistributionSpec>,  // pdsRequired
+				ULONG,						   // child_index
+				CDrvdPropArray *,			   // pdrgpdpCtxt
+				ULONG						   // ulOptReq
 	) const override
 	{
 		GPOS_ASSERT(!"CPhysicalScan has no children");

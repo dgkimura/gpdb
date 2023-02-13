@@ -99,10 +99,10 @@ public:
 	}
 
 	// does this distribution match the given one
-	BOOL Matches(const CDistributionSpec *pds) const override;
+	BOOL Matches(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	// does current distribution satisfy the given one
-	BOOL FSatisfies(const CDistributionSpec *pds) const override;
+	BOOL FSatisfies(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -121,23 +121,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CDistributionSpecRandom *
-	PdsConvert(CDistributionSpec *pds)
+	static gpos::Ref<CDistributionSpecRandom>
+	PdsConvert(gpos::Ref<CDistributionSpec> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtRandom == pds->Edt());
 
-		return dynamic_cast<CDistributionSpecRandom *>(pds);
-	}
-
-	// conversion function: const argument
-	static const CDistributionSpecRandom *
-	PdsConvert(const CDistributionSpec *pds)
-	{
-		GPOS_ASSERT(nullptr != pds);
-		GPOS_ASSERT(EdtRandom == pds->Edt());
-
-		return dynamic_cast<const CDistributionSpecRandom *>(pds);
+		return gpos::dyn_cast<CDistributionSpecRandom>(pds);
 	}
 
 };	// class CDistributionSpecRandom

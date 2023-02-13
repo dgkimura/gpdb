@@ -185,13 +185,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalCTEConsumer *
+	static gpos::Ref<CLogicalCTEConsumer>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalCTEConsumer == pop->Eopid());
 
-		return dynamic_cast<CLogicalCTEConsumer *>(pop);
+		return gpos::dyn_cast<CLogicalCTEConsumer>(pop);
 	}
 
 	// debug print

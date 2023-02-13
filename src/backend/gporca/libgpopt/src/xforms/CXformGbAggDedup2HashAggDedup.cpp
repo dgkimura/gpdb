@@ -58,7 +58,7 @@ CXformGbAggDedup2HashAggDedup::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
-	CLogicalGbAggDeduplicate *popAggDedup =
+	gpos::Ref<CLogicalGbAggDeduplicate> popAggDedup =
 		gpos::dyn_cast<CLogicalGbAggDeduplicate>(pexpr->Pop());
 	gpos::Ref<CColRefArray> colref_array = popAggDedup->Pdrgpcr();
 	;

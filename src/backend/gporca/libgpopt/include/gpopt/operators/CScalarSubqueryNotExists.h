@@ -57,13 +57,13 @@ public:
 	}
 
 	// conversion function
-	static CScalarSubqueryNotExists *
+	static gpos::Ref<CScalarSubqueryNotExists>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubqueryNotExists == pop->Eopid());
 
-		return dynamic_cast<CScalarSubqueryNotExists *>(pop);
+		return gpos::dyn_cast<CScalarSubqueryNotExists>(pop);
 	}
 
 };	// class CScalarSubqueryNotExists

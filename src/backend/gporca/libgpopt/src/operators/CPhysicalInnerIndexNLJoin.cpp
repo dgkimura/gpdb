@@ -94,12 +94,11 @@ CPhysicalInnerIndexNLJoin::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysicalInnerIndexNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
-									   CExpressionHandle &exprhdl GPOS_UNUSED,
-									   CDistributionSpec *,	 //pdsRequired,
-									   ULONG child_index GPOS_UNUSED,
-									   CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
-									   ULONG  // ulOptReq
+CPhysicalInnerIndexNLJoin::PdsRequired(
+	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
+	gpos::Ref<CDistributionSpec>,  //pdsRequired,
+	ULONG child_index GPOS_UNUSED, CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+	ULONG  // ulOptReq
 ) const
 {
 	GPOS_RAISE(
@@ -132,7 +131,7 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// we need to match distribution of inner
-	CDistributionSpec *pdsInner =
+	gpos::Ref<CDistributionSpec> pdsInner =
 		gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Pds();
 	CDistributionSpec::EDistributionType edtInner = pdsInner->Edt();
 	if (CDistributionSpec::EdtSingleton == edtInner ||
@@ -147,9 +146,10 @@ CPhysicalInnerIndexNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	if (CDistributionSpec::EdtHashed == edtInner)
 	{
 		// check if we could create an equivalent hashed distribution request to the inner child
-		CDistributionSpecHashed *pdshashed =
+		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(pdsInner);
-		CDistributionSpecHashed *pdshashedEquiv = pdshashed->PdshashedEquiv();
+		gpos::Ref<CDistributionSpecHashed> pdshashedEquiv =
+			pdshashed->PdshashedEquiv();
 
 		// If the inner child is a IndexScan on a multi-key distributed index, it
 		// may derive an incomplete equiv spec (see CPhysicalScan::PdsDerive()).

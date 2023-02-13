@@ -249,7 +249,7 @@ public:
 
 	// derive the statistics on the CTE producer
 	void DeriveProducerStats(
-		CLogicalCTEConsumer *popConsumer,  // CTE Consumer operator
+		gpos::Ref<CLogicalCTEConsumer> popConsumer,	 // CTE Consumer operator
 		gpos::Ref<CColRefSet>
 			pcrsStat  // required stat columns on the CTE Consumer
 	);

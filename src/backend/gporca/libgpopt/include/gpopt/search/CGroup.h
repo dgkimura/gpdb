@@ -264,7 +264,7 @@ private:
 	// set hash join keys
 	void SetJoinKeys(CExpressionArray *pdrgpexprOuter,
 					 CExpressionArray *pdrgpexprInner,
-					 IMdIdArray *join_opfamilies);
+					 gpos::Ref<IMdIdArray> join_opfamilies);
 
 	// insert new group expression
 	void Insert(gpos::Ref<CGroupExpression> pgexpr);
@@ -291,12 +291,11 @@ private:
 							   gpos::Ref<CGroupExpression> pgexprSnd);
 
 	// derive stats recursively on child groups
-	static CLogical::EStatPromise EspDerive(CMemoryPool *pmpLocal,
-											CMemoryPool *pmpGlobal,
-											gpos::Ref<CGroupExpression> pgexpr,
-											CReqdPropRelational *prprel,
-											IStatisticsArray *stats_ctxt,
-											BOOL fDeriveChildStats);
+	static CLogical::EStatPromise EspDerive(
+		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
+		gpos::Ref<CGroupExpression> pgexpr,
+		gpos::Ref<CReqdPropRelational> prprel, IStatisticsArray *stats_ctxt,
+		BOOL fDeriveChildStats);
 
 	// reset computed stats
 	void ResetStats();
@@ -324,7 +323,8 @@ private:
 	// find the group expression having the best stats promise
 	gpos::Ref<CGroupExpression> PgexprBestPromise(
 		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-		CReqdPropRelational *prprelInput, IStatisticsArray *stats_ctxt);
+		gpos::Ref<CReqdPropRelational> prprelInput,
+		IStatisticsArray *stats_ctxt);
 
 public:
 	CGroup(const CGroup &) = delete;
@@ -387,7 +387,7 @@ public:
 	}
 
 	// join op families
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	JoinOpfamilies() const
 	{
 		return m_join_opfamilies.get();
@@ -569,10 +569,9 @@ public:
 	}
 
 	// derive statistics recursively on group
-	gpos::Ref<IStatistics> PstatsRecursiveDerive(CMemoryPool *pmpLocal,
-												 CMemoryPool *pmpGlobal,
-												 CReqdPropRelational *prprel,
-												 IStatisticsArray *stats_ctxt);
+	gpos::Ref<IStatistics> PstatsRecursiveDerive(
+		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
+		gpos::Ref<CReqdPropRelational> prprel, IStatisticsArray *stats_ctxt);
 
 	// find group expression with best stats promise and the same given children
 	gpos::Ref<CGroupExpression> PgexprBestPromise(

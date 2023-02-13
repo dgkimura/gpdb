@@ -53,7 +53,7 @@ CXformImplementConstTableGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalConstTableGet *popConstTableGet =
+	gpos::Ref<CLogicalConstTableGet> popConstTableGet =
 		gpos::dyn_cast<CLogicalConstTableGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 

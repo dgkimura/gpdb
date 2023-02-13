@@ -23,7 +23,8 @@ CDistributionSpecHashedNoOp::Edt() const
 }
 
 BOOL
-CDistributionSpecHashedNoOp::Matches(const CDistributionSpec *pds) const
+CDistributionSpecHashedNoOp::Matches(
+	const gpos::Ref<CDistributionSpec> pds) const
 {
 	return pds->Edt() == Edt();
 }
@@ -36,9 +37,10 @@ CDistributionSpecHashedNoOp::AppendEnforcers(CMemoryPool *mp,
 											 gpos::Ref<CExpression> pexpr)
 {
 	gpos::Ref<CDrvdProp> pdp = exprhdl.Pdp();
-	CDistributionSpec *pdsChild = gpos::dyn_cast<CDrvdPropPlan>(pdp)->Pds();
-	CDistributionSpecHashed *pdsChildHashed =
-		dynamic_cast<CDistributionSpecHashed *>(pdsChild);
+	gpos::Ref<CDistributionSpec> pdsChild =
+		gpos::dyn_cast<CDrvdPropPlan>(pdp)->Pds();
+	gpos::Ref<CDistributionSpecHashed> pdsChildHashed =
+		gpos::dyn_cast<CDistributionSpecHashed>(pdsChild);
 
 	if (nullptr == pdsChildHashed)
 	{

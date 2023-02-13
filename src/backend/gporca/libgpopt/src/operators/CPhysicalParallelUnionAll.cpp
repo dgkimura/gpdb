@@ -44,8 +44,9 @@ CPhysicalParallelUnionAll::SzId() const
 
 gpos::Ref<CDistributionSpec>
 CPhysicalParallelUnionAll::PdsRequired(CMemoryPool *mp, CExpressionHandle &,
-									   CDistributionSpec *, ULONG child_index,
-									   CDrvdPropArray *, ULONG ulOptReq) const
+									   gpos::Ref<CDistributionSpec>,
+									   ULONG child_index, CDrvdPropArray *,
+									   ULONG ulOptReq) const
 {
 	if (0 == ulOptReq)
 	{

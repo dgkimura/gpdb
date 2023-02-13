@@ -114,7 +114,7 @@ CLogicalLimit::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CLogicalLimit *popLimit = gpos::dyn_cast<CLogicalLimit>(pop);
+		gpos::Ref<CLogicalLimit> popLimit = gpos::dyn_cast<CLogicalLimit>(pop);
 
 		if (popLimit->FGlobal() == m_fGlobal &&
 			popLimit->FHasCount() == m_fHasCount)
@@ -206,8 +206,8 @@ CLogicalLimit::DeriveMaxCard(CMemoryPool *,	 // mp
 	{
 		gpos::Ref<CScalarConst> popScalarConst =
 			gpos::dyn_cast<CScalarConst>(pexprCount->Pop());
-		IDatumInt8 *pdatumInt8 =
-			dynamic_cast<IDatumInt8 *>(popScalarConst->GetDatum());
+		gpos::Ref<IDatumInt8> pdatumInt8 =
+			gpos::dyn_cast<IDatumInt8>(popScalarConst->GetDatum());
 
 		return CMaxCard(pdatumInt8->Value());
 	}

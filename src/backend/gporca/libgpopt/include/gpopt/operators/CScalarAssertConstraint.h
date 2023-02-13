@@ -103,13 +103,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CScalarAssertConstraint *
+	static gpos::Ref<CScalarAssertConstraint>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarAssertConstraint == pop->Eopid());
 
-		return dynamic_cast<CScalarAssertConstraint *>(pop);
+		return gpos::dyn_cast<CScalarAssertConstraint>(pop);
 	}
 
 };	// class CScalarAssertConstraint

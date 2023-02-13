@@ -29,10 +29,10 @@ CLeftOuterJoinStatsProcessor::CalcLOJoinStatsStatic(
 	GPOS_ASSERT(nullptr != inner_side_stats);
 	GPOS_ASSERT(nullptr != join_preds_stats);
 
-	const gpos::Ref<CStatistics> result_stats_outer_side =
-		dynamic_cast<const gpos::Ref<CStatistics> >(outer_side_stats);
-	const gpos::Ref<CStatistics> result_stats_inner_side =
-		dynamic_cast<const gpos::Ref<CStatistics> >(inner_side_stats);
+	gpos::Ref<CStatistics> result_stats_outer_side =
+		gpos::dyn_cast<CStatistics>(outer_side_stats);
+	gpos::Ref<CStatistics> result_stats_inner_side =
+		gpos::dyn_cast<CStatistics>(inner_side_stats);
 
 	gpos::Ref<CStatistics> inner_join_stats =
 		gpos::dyn_cast<CStatistics>(result_stats_outer_side->CalcInnerJoinStats(
@@ -145,7 +145,6 @@ CLeftOuterJoinStatsProcessor::MakeLOJHistogram(
 						num_rows_inner_join);
 				CStatisticsUtils::AddHistogram(mp, colid, LOJ_histogram,
 											   LOJ_histograms.get());
-				GPOS_DELETE(LOJ_histogram);
 			}
 			else
 			{
@@ -214,9 +213,6 @@ CLeftOuterJoinStatsProcessor::AddHistogramsLOJInner(
 				num_rows_inner_join, null_histogram, num_rows_LASJ);
 		CStatisticsUtils::AddHistogram(mp, colid, LOJ_histogram,
 									   LOJ_histograms);
-
-		GPOS_DELETE(null_histogram);
-		GPOS_DELETE(LOJ_histogram);
 	}
 }
 

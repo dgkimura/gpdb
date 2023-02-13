@@ -70,7 +70,7 @@ CPhysicalMotionHashDistribute::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalMotionHashDistribute *popHashDistribute =
+	gpos::Ref<CPhysicalMotionHashDistribute> popHashDistribute =
 		gpos::dyn_cast<CPhysicalMotionHashDistribute>(pop);
 
 	return m_pdsHashed->Equals(popHashDistribute->m_pdsHashed.get());
@@ -210,19 +210,20 @@ CPhysicalMotionHashDistribute::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalMotionHashDistribute *
+gpos::Ref<CPhysicalMotionHashDistribute>
 CPhysicalMotionHashDistribute::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionHashDistribute == pop->Eopid());
 
-	return dynamic_cast<CPhysicalMotionHashDistribute *>(pop);
+	return gpos::dyn_cast<CPhysicalMotionHashDistribute>(pop);
 }
 
 gpos::Ref<CDistributionSpec>
 CPhysicalMotionHashDistribute::PdsRequired(
-	CMemoryPool *mp, CExpressionHandle &exprhdl, CDistributionSpec *pdsRequired,
-	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
+	CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const
 {
 	CDistributionSpecHashedNoOp *pdsNoOp =
 		gpos::dyn_cast<CDistributionSpecHashedNoOp>(m_pdsHashed.get());

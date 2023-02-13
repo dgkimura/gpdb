@@ -64,12 +64,10 @@ public:
 	}
 
 	// compute required distribution of the n-th child
-	gpos::Ref<CDistributionSpec> PdsRequired(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl,
-											 CDistributionSpec *pdsRequired,
-											 ULONG child_index,
-											 CDrvdPropArray *pdrgpdpCtxt,
-											 ULONG ulOptReq) const override;
+	gpos::Ref<CDistributionSpec> PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
@@ -87,12 +85,12 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalLeftOuterIndexNLJoin *
+	static gpos::Ref<CPhysicalLeftOuterIndexNLJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(EopPhysicalLeftOuterIndexNLJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalLeftOuterIndexNLJoin *>(pop);
+		return gpos::dyn_cast<CPhysicalLeftOuterIndexNLJoin>(pop);
 	}
 
 	gpos::Ref<CExpression>

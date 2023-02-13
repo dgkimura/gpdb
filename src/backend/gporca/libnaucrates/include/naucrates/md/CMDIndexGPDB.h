@@ -148,7 +148,7 @@ public:
 					  ULONG key_pos) const override;
 
 	// child index oids
-	IMdIdArray *ChildIndexMdids() const override;
+	gpos::Ref<IMdIdArray> ChildIndexMdids() const override;
 
 #ifdef GPOS_DEBUG
 	// debug print of the MD index

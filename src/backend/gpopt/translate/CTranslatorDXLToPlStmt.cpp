@@ -4058,7 +4058,7 @@ CTranslatorDXLToPlStmt::TranslateDXLDynTblScan(
 
 	dyn_seq_scan->seqscan.scanrelid = index;
 
-	IMdIdArray *parts = dyn_tbl_scan_dxlop->GetParts();
+	gpos::Ref<IMdIdArray> parts = dyn_tbl_scan_dxlop->GetParts();
 
 	List *oids_list = NIL;
 
@@ -4150,7 +4150,7 @@ CTranslatorDXLToPlStmt::TranslateDXLDynIdxScan(
 
 	dyn_idx_scan->indexscan.scan.scanrelid = index;
 
-	IMdIdArray *parts = dyn_index_scan_dxlop->GetParts();
+	gpos::Ref<IMdIdArray> parts = dyn_index_scan_dxlop->GetParts();
 
 	List *oids_list = NIL;
 
@@ -5648,7 +5648,7 @@ CTranslatorDXLToPlStmt::TranslateDXLPhyCtasToDistrPolicy(
 	{
 		GPOS_ASSERT(0 < num_of_distr_cols);
 		distr_policy->nattrs = num_of_distr_cols;
-		IMdIdArray *opclasses = dxlop->GetDistrOpclasses();
+		gpos::Ref<IMdIdArray> opclasses = dxlop->GetDistrOpclasses();
 		GPOS_ASSERT(opclasses->Size() == num_of_distr_cols);
 		for (ULONG ul = 0; ul < num_of_distr_cols; ul++)
 		{
@@ -5788,7 +5788,7 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapTblScan(
 				gpos::dyn_cast<CDXLPhysicalDynamicBitmapTableScan>(
 					dxl_operator);
 
-		IMdIdArray *parts = phy_dyn_bitmap_tblscan_dxlop->GetParts();
+		gpos::Ref<IMdIdArray> parts = phy_dyn_bitmap_tblscan_dxlop->GetParts();
 
 		List *oids_list = NIL;
 

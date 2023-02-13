@@ -254,7 +254,7 @@ private:
 						   ULONG colid, ULONG ulPos, BOOL isSystemCol,
 						   BOOL isEmptyTable,
 						   gpos::Ref<UlongToHistogramMap> col_histogram_mapping,
-						   UlongToDoubleMap *colid_width_mapping,
+						   gpos::Ref<UlongToDoubleMap> colid_width_mapping,
 						   gpos::Ref<CStatisticsConfig> stats_config);
 
 	// construct a stats histogram from an MD column stats object

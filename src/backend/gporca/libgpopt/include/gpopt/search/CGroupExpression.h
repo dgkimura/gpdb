@@ -388,11 +388,10 @@ public:
 	gpos::Ref<CCostContext> PccInsert(gpos::Ref<CCostContext> pcc);
 
 	// derive statistics recursively on a given group expression
-	gpos::Ref<IStatistics> PstatsRecursiveDerive(CMemoryPool *pmpLocal,
-												 CMemoryPool *pmpGlobal,
-												 CReqdPropRelational *prprel,
-												 IStatisticsArray *stats_ctxt,
-												 BOOL fComputeRootStats = true);
+	gpos::Ref<IStatistics> PstatsRecursiveDerive(
+		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
+		gpos::Ref<CReqdPropRelational> prprel, IStatisticsArray *stats_ctxt,
+		BOOL fComputeRootStats = true);
 
 	// print driver
 	IOstream &OsPrint(IOstream &os) const;

@@ -208,8 +208,9 @@ CPhysicalAgg::PcrsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CDistributionSpec *pdsInput, ULONG child_index,
-							 ULONG ulOptReq, CColRefArray *pdrgpcgGrp,
+							 gpos::Ref<CDistributionSpec> pdsInput,
+							 ULONG child_index, ULONG ulOptReq,
+							 CColRefArray *pdrgpcgGrp,
 							 CColRefArray *pdrgpcrGrpMinimal) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -302,7 +303,7 @@ CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp, CColRefArray *colref_array)
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsRequiredGlobalAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   CDistributionSpec *pdsInput,
+								   gpos::Ref<CDistributionSpec> pdsInput,
 								   ULONG child_index, CColRefArray *pdrgpcrGrp,
 								   CColRefArray *pdrgpcrGrpMinimal,
 								   ULONG ulOptReq) const
@@ -472,7 +473,8 @@ CPhysicalAgg::FProvidesReqdCols(CExpressionHandle &exprhdl,
 gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 {
-	CDistributionSpec *pds = exprhdl.Pdpplan(0 /*child_index*/)->Pds();
+	gpos::Ref<CDistributionSpec> pds =
+		exprhdl.Pdpplan(0 /*child_index*/)->Pds();
 
 	if (CDistributionSpec::EdtUniversal == pds->Edt() &&
 		IMDFunction::EfsVolatile ==
@@ -602,7 +604,7 @@ CPhysicalAgg::EpetDistribution(CExpressionHandle &exprhdl,
 	GPOS_ASSERT(nullptr != ped);
 
 	// get distribution delivered by the aggregate node
-	CDistributionSpec *pds =
+	gpos::Ref<CDistributionSpec> pds =
 		gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pds();
 
 	if (ped->FCompatible(pds))

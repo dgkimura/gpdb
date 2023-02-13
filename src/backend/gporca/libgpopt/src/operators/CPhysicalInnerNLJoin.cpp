@@ -76,7 +76,7 @@ CPhysicalInnerNLJoin::~CPhysicalInnerNLJoin() = default;
 gpos::Ref<CDistributionSpec>
 CPhysicalInnerNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 								  CExpressionHandle &exprhdl GPOS_UNUSED,
-								  CDistributionSpec *,	//pdsRequired,
+								  gpos::Ref<CDistributionSpec>,	 //pdsRequired,
 								  ULONG child_index GPOS_UNUSED,
 								  CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
 								  ULONG	 // ulOptReq
@@ -99,7 +99,8 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 	CEnfdDistribution::EDistributionMatching dmatch =
 		Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
-	CDistributionSpec *const pdsRequired = prppInput->Ped()->PdsRequired();
+	gpos::Ref<CDistributionSpec> const pdsRequired =
+		prppInput->Ped()->PdsRequired();
 
 	// if expression has to execute on a single host then we need a gather
 	if (exprhdl.NeedsSingletonExecution())
@@ -149,7 +150,7 @@ CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	}
 
 	// compute a matching distribution based on derived distribution of outer child
-	CDistributionSpec *pdsOuter =
+	gpos::Ref<CDistributionSpec> pdsOuter =
 		gpos::dyn_cast<CDrvdPropPlan>((*pdrgpdpCtxt)[0])->Pds();
 	if (CDistributionSpec::EdtUniversal == pdsOuter->Edt())
 	{

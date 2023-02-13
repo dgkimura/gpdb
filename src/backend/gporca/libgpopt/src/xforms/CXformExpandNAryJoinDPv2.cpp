@@ -102,7 +102,8 @@ CXformExpandNAryJoinDPv2::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// every conjunct (ANDed condition),
 	// plus an array of all the non-inner join predicates, together with
 	// a lookup table for each child whether it is a non-inner join
-	CLogicalNAryJoin *naryJoin = gpos::dyn_cast<CLogicalNAryJoin>(pexpr->Pop());
+	gpos::Ref<CLogicalNAryJoin> naryJoin =
+		gpos::dyn_cast<CLogicalNAryJoin>(pexpr->Pop());
 	gpos::Ref<CExpression> pexprScalar = (*pexpr)[arity - 1];
 	gpos::Ref<CExpressionArray> innerJoinPreds = nullptr;
 	gpos::Ref<CExpressionArray> onPreds = GPOS_NEW(mp) CExpressionArray(mp);

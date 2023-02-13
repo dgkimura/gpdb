@@ -60,7 +60,7 @@ CXformImplementUnionAll::Transform(gpos::Ref<CXformContext> pxfctxt,
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components
-	CLogicalUnionAll *popUnionAll =
+	gpos::Ref<CLogicalUnionAll> popUnionAll =
 		gpos::dyn_cast<CLogicalUnionAll>(pexpr->Pop());
 	CPhysicalUnionAllFactory factory(popUnionAll);
 

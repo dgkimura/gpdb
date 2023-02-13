@@ -58,7 +58,7 @@ CCTEMap::~CCTEMap()
 //
 //---------------------------------------------------------------------------
 void
-CCTEMap::Insert(ULONG ulCteId, ECteType ect, CDrvdPropPlan *pdpplan)
+CCTEMap::Insert(ULONG ulCteId, ECteType ect, gpos::Ref<CDrvdPropPlan> pdpplan)
 {
 	GPOS_ASSERT(EctSentinel > ect);
 
@@ -88,7 +88,7 @@ CCTEMap::Insert(ULONG ulCteId, ECteType ect, CDrvdPropPlan *pdpplan)
 //
 //
 //---------------------------------------------------------------------------
-CDrvdPropPlan *
+gpos::Ref<CDrvdPropPlan>
 CCTEMap::PdpplanProducer(
 	ULONG *
 		pulId  // output: CTE producer Id, set to gpos::ulong_max if no producer found
@@ -96,14 +96,14 @@ CCTEMap::PdpplanProducer(
 {
 	GPOS_ASSERT(nullptr != pulId);
 
-	CDrvdPropPlan *pdpplanProducer = nullptr;
+	gpos::Ref<CDrvdPropPlan> pdpplanProducer = nullptr;
 	*pulId = gpos::ulong_max;
 	UlongToCTEMapEntryMapIter hmcmi(m_phmcm.get());
 	while (nullptr == pdpplanProducer && hmcmi.Advance())
 	{
 		const gpos::Ref<CCTEMapEntry> pcme = hmcmi.Value();
 		CCTEMap::ECteType ect = pcme->Ect();
-		CDrvdPropPlan *pdpplan = pcme->Pdpplan();
+		gpos::Ref<CDrvdPropPlan> pdpplan = pcme->Pdpplan();
 		if (CCTEMap::EctProducer == ect)
 		{
 			GPOS_ASSERT(nullptr != pdpplan);
@@ -147,7 +147,7 @@ CCTEMap::AddUnresolved(const CCTEMap &cmFirst, const CCTEMap &cmSecond,
 		const gpos::Ref<CCTEMapEntry> pcme = hmcmi.Value();
 		ULONG id = pcme->Id();
 		ECteType ectFirst = pcme->Ect();
-		CDrvdPropPlan *pdpplanFirst = pcme->Pdpplan();
+		gpos::Ref<CDrvdPropPlan> pdpplanFirst = pcme->Pdpplan();
 
 		if (nullptr != pcmResult->PcmeLookup(id))
 		{

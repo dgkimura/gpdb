@@ -13,6 +13,7 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CGroupByStatsProcessor.h"
 
 using namespace gpopt;
@@ -45,13 +46,13 @@ CLeftSemiJoinStatsProcessor::CalcLSJoinStatsStatic(
 	gpos::Ref<ULongPtrArray> aggs = GPOS_NEW(mp) ULongPtrArray(mp);
 	gpos::Ref<IStatistics> inner_stats =
 		CGroupByStatsProcessor::CalcGroupByStats(
-			mp, dynamic_cast<const gpos::Ref<CStatistics> >(inner_stats_input),
+			mp, gpos::dyn_cast<CStatistics>(inner_stats_input),
 			inner_colids.get(), aggs.get(),
 			nullptr	 // keys: no keys, use all grouping cols
 		);
 
 	const gpos::Ref<CStatistics> outer_stats =
-		dynamic_cast<const gpos::Ref<CStatistics> >(outer_stats_input);
+		gpos::dyn_cast<CStatistics>(outer_stats_input);
 	gpos::Ref<CStatistics> semi_join_stats =
 		CJoinStatsProcessor::SetResultingJoinStats(
 			mp, outer_stats->GetStatsConfig(), outer_stats, inner_stats.get(),

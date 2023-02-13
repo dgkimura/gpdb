@@ -116,13 +116,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalIntersectAll *
+	static gpos::Ref<CLogicalIntersectAll>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalIntersectAll == pop->Eopid());
 
-		return dynamic_cast<CLogicalIntersectAll *>(pop);
+		return gpos::dyn_cast<CLogicalIntersectAll>(pop);
 	}
 
 	// derive statistics

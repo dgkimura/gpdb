@@ -118,13 +118,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalLeftSemiJoin *
+	static gpos::Ref<CLogicalLeftSemiJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftSemiJoin == pop->Eopid());
 
-		return dynamic_cast<CLogicalLeftSemiJoin *>(pop);
+		return gpos::dyn_cast<CLogicalLeftSemiJoin>(pop);
 	}
 
 	// derive statistics

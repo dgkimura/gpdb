@@ -94,7 +94,7 @@ CScalarSubquery::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarSubquery *popScalarSubquery =
+		gpos::Ref<CScalarSubquery> popScalarSubquery =
 			gpos::dyn_cast<CScalarSubquery>(pop);
 
 		// match if computed columns are identical

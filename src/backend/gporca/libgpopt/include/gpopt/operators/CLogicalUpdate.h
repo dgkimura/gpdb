@@ -207,13 +207,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalUpdate *
+	static gpos::Ref<CLogicalUpdate>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalUpdate == pop->Eopid());
 
-		return dynamic_cast<CLogicalUpdate *>(pop);
+		return gpos::dyn_cast<CLogicalUpdate>(pop);
 	}
 
 	// debug print

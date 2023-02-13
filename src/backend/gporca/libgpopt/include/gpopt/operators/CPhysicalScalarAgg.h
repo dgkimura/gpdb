@@ -92,13 +92,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CPhysicalScalarAgg *
+	static gpos::Ref<CPhysicalScalarAgg>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalScalarAgg == pop->Eopid());
 
-		return dynamic_cast<CPhysicalScalarAgg *>(pop);
+		return gpos::dyn_cast<CPhysicalScalarAgg>(pop);
 	}
 
 };	// class CPhysicalScalarAgg

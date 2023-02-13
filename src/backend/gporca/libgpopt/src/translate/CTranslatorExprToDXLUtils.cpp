@@ -150,7 +150,7 @@ CTranslatorExprToDXLUtils::PdxlnListFilterPartKey(
 		gpos::Ref<IMDId> pmdidDestArray =
 			md_accessor->RetrieveType(pmdidDestElem)->GetArrayTypeMdid();
 
-		CScalarIdent *pexprScalarIdent =
+		gpos::Ref<CScalarIdent> pexprScalarIdent =
 			gpos::dyn_cast<CScalarIdent>((*pexprPartKey)[0]->Pop());
 		gpos::Ref<IMDId> pmdidSrcElem = pexprScalarIdent->MdidType();
 		gpos::Ref<IMDId> pmdidSrcArray =
@@ -1283,7 +1283,7 @@ CTranslatorExprToDXLUtils::SetDirectDispatchInfo(
 		return;
 	}
 
-	CDistributionSpec *pds = (*pdrgpdsBaseTables)[0].get();
+	gpos::Ref<CDistributionSpec> pds = (*pdrgpdsBaseTables)[0].get();
 
 	// go thru all the filters and see if we have one that can
 	// give us a direct dispatch.
@@ -1314,7 +1314,7 @@ CTranslatorExprToDXLUtils::SetDirectDispatchInfo(
 			{
 				GPOS_ASSERT(nullptr != ppc->Pcnstr());
 
-				CDistributionSpecHashed *pdsHashed =
+				gpos::Ref<CDistributionSpecHashed> pdsHashed =
 					gpos::dyn_cast<CDistributionSpecHashed>(pds);
 				CExpressionArray *pdrgpexprHashed = pdsHashed->Pdrgpexpr();
 
@@ -1433,9 +1433,9 @@ CTranslatorExprToDXLUtils::PdxlddinfoSingleDistrKey(
 
 	BOOL useRawValues = false;
 	gpos::Ref<CConstraint> pcnstrDistrCol = pcnstr->Pcnstr(mp, pcrDistrCol);
-	CConstraintInterval *pcnstrInterval;
+	gpos::Ref<CConstraintInterval> pcnstrInterval;
 	if (pcnstrDistrCol == nullptr &&
-		(pcnstrInterval = dynamic_cast<CConstraintInterval *>(pcnstr)))
+		(pcnstrInterval = gpos::dyn_cast<CConstraintInterval>(pcnstr)))
 	{
 		if (pcnstrInterval->FConstraintOnSegmentId())
 		{
@@ -1539,8 +1539,8 @@ CTranslatorExprToDXLUtils::PdxldatumFromPointConstraint(
 
 	GPOS_ASSERT(CConstraint::EctInterval == pcnstrDistrCol->Ect());
 
-	CConstraintInterval *pci =
-		dynamic_cast<CConstraintInterval *>(pcnstrDistrCol);
+	gpos::Ref<CConstraintInterval> pci =
+		gpos::dyn_cast<CConstraintInterval>(pcnstrDistrCol);
 	GPOS_ASSERT(1 >= pci->Pdrgprng()->Size());
 
 	gpos::Ref<CDXLDatum> dxl_datum = nullptr;
@@ -1602,8 +1602,8 @@ CTranslatorExprToDXLUtils::PdrgpdrgpdxldatumFromDisjPointConstraint(
 
 	GPOS_ASSERT(CConstraint::EctInterval == pcnstrDistrCol->Ect());
 
-	CConstraintInterval *pcnstrInterval =
-		dynamic_cast<CConstraintInterval *>(pcnstrDistrCol);
+	gpos::Ref<CConstraintInterval> pcnstrInterval =
+		gpos::dyn_cast<CConstraintInterval>(pcnstrDistrCol);
 
 	CRangeArray *pdrgprng = pcnstrInterval->Pdrgprng();
 
@@ -1721,7 +1721,7 @@ CTranslatorExprToDXLUtils::ExtractCastFuncMdids(
 	}
 	if (COperator::EopScalarCast == pop->Eopid())
 	{
-		CScalarCast *popCast = gpos::dyn_cast<CScalarCast>(pop);
+		gpos::Ref<CScalarCast> popCast = gpos::dyn_cast<CScalarCast>(pop);
 		*ppmdidType = popCast->MdidType();
 		*ppmdidCastFunc = popCast->FuncMdId();
 	}

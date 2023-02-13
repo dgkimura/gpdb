@@ -95,7 +95,7 @@ CXformCTEAnchor2Sequence::Transform(gpos::Ref<CXformContext> pxfctxt,
 		return;
 	}
 
-	CLogicalCTEAnchor *popCTEAnchor =
+	gpos::Ref<CLogicalCTEAnchor> popCTEAnchor =
 		gpos::dyn_cast<CLogicalCTEAnchor>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 

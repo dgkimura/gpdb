@@ -98,7 +98,7 @@ CLogicalDelete::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalDelete *popDelete = gpos::dyn_cast<CLogicalDelete>(pop);
+	gpos::Ref<CLogicalDelete> popDelete = gpos::dyn_cast<CLogicalDelete>(pop);
 
 	return m_pcrCtid == popDelete->PcrCtid() &&
 		   m_pcrSegmentId == popDelete->PcrSegmentId() &&

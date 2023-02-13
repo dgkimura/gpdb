@@ -94,13 +94,13 @@ public:
 	BOOL Matches(gpos::Ref<COperator> op) const override;
 
 	// conversion function
-	static CScalarSortGroupClause *
+	static gpos::Ref<CScalarSortGroupClause>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSortGroupClause == pop->Eopid());
 
-		return dynamic_cast<CScalarSortGroupClause *>(pop);
+		return gpos::dyn_cast<CScalarSortGroupClause>(pop);
 	}
 
 	// the type of the scalar expression

@@ -101,13 +101,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalProject *
+	static gpos::Ref<CLogicalProject>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalProject == pop->Eopid());
 
-		return dynamic_cast<CLogicalProject *>(pop);
+		return gpos::dyn_cast<CLogicalProject>(pop);
 	}
 
 };	// class CLogicalProject

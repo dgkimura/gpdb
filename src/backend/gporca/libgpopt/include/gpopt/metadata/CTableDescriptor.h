@@ -162,7 +162,7 @@ public:
 	}
 
 	// distribution column descriptors accessor
-	const IMdIdArray *
+	const gpos::Ref<IMdIdArray>
 	DistrOpfamilies() const
 	{
 		return m_distr_opfamilies.get();

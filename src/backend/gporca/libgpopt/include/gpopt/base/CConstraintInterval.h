@@ -183,22 +183,22 @@ public:
 		BOOL must_exist) override;
 
 	// interval intersection
-	gpos::Ref<CConstraintInterval> PciIntersect(CMemoryPool *mp,
-												CConstraintInterval *pci);
+	gpos::Ref<CConstraintInterval> PciIntersect(
+		CMemoryPool *mp, gpos::Ref<CConstraintInterval> pci);
 
 	// interval union
 	gpos::Ref<CConstraintInterval> PciUnion(CMemoryPool *mp,
-											CConstraintInterval *pci);
+											gpos::Ref<CConstraintInterval> pci);
 
 	// interval difference
-	gpos::Ref<CConstraintInterval> PciDifference(CMemoryPool *mp,
-												 CConstraintInterval *pci);
+	gpos::Ref<CConstraintInterval> PciDifference(
+		CMemoryPool *mp, gpos::Ref<CConstraintInterval> pci);
 
 	// interval complement
 	gpos::Ref<CConstraintInterval> PciComplement(CMemoryPool *mp);
 
 	// does the current interval contain the given interval?
-	BOOL FContainsInterval(CMemoryPool *mp, CConstraintInterval *pci);
+	BOOL FContainsInterval(CMemoryPool *mp, gpos::Ref<CConstraintInterval> pci);
 
 	// scalar expression
 	gpos::Ref<CExpression> PexprScalar(CMemoryPool *mp) override;
@@ -269,7 +269,7 @@ operator<<(IOstream &os, const CConstraintInterval &interval)
 
 // shorthand for printing, pointer
 inline IOstream &
-operator<<(IOstream &os, const CConstraintInterval *interval)
+operator<<(IOstream &os, const gpos::Ref<CConstraintInterval> interval)
 {
 	return interval->OsPrint(os);
 }

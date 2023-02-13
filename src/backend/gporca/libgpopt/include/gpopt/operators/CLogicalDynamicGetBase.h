@@ -167,7 +167,7 @@ public:
 		return m_ptabdesc.get();
 	}
 
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	GetPartitionMdids() const
 	{
 		return m_partition_mdids.get();

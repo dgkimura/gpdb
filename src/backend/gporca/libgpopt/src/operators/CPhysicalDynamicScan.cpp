@@ -57,7 +57,7 @@ CPhysicalDynamicScan::CPhysicalDynamicScan(
 
 	CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
 	const IMDRelation *root_rel = mda->RetrieveRel(ptabdesc->MDId());
-	IMdIdArray *all_partition_mdids = root_rel->ChildPartitionMdids();
+	gpos::Ref<IMdIdArray> all_partition_mdids = root_rel->ChildPartitionMdids();
 	ULONG part_ptr = 0;
 	for (ULONG ul = 0; ul < m_partition_mdids->Size(); ul++)
 	{

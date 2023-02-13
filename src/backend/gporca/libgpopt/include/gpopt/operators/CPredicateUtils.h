@@ -394,7 +394,7 @@ public:
 										  const CColRef *colref);
 
 	// check if given column is a disjunction of constants
-	static BOOL FColumnDisjunctionOfConst(CConstraintInterval *pcnstr,
+	static BOOL FColumnDisjunctionOfConst(gpos::Ref<CConstraintInterval> pcnstr,
 										  const CColRef *colref);
 
 	// split predicates into those that refer to an index key, and those that don't

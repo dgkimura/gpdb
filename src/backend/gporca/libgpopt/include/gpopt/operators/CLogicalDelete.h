@@ -186,13 +186,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalDelete *
+	static gpos::Ref<CLogicalDelete>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDelete == pop->Eopid());
 
-		return dynamic_cast<CLogicalDelete *>(pop);
+		return gpos::dyn_cast<CLogicalDelete>(pop);
 	}
 
 	// debug print

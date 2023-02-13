@@ -217,24 +217,23 @@ protected:
 											 ULONG child_index);
 
 	// helper for a simple case of computing child's required distribution
-	static gpos::Ref<CDistributionSpec> PdsPassThru(CMemoryPool *mp,
-													CExpressionHandle &exprhdl,
-													CDistributionSpec *pdsInput,
-													ULONG child_index);
+	static gpos::Ref<CDistributionSpec> PdsPassThru(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index);
 
 	// helper for computing child's required distribution when Singleton/Replicated
 	// distributions must be requested
 	static gpos::Ref<CDistributionSpec> PdsRequireSingletonOrReplicated(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CDistributionSpec *pdsInput, ULONG child_index, ULONG ulOptReq);
+		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
+		ULONG ulOptReq);
 
 	// helper for computing child's required distribution in unary operators
 	// with a single scalar child
-	static gpos::Ref<CDistributionSpec> PdsUnary(CMemoryPool *mp,
-												 CExpressionHandle &exprhdl,
-												 CDistributionSpec *pdsInput,
-												 ULONG child_index,
-												 ULONG ulOptReq);
+	static gpos::Ref<CDistributionSpec> PdsUnary(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
+		ULONG ulOptReq);
 
 	// helper for a simple case of computing child's required rewindability
 	static gpos::Ref<CRewindabilitySpec> PrsPassThru(
@@ -268,12 +267,12 @@ protected:
 
 	// Generate a singleton distribution spec request
 	static gpos::Ref<CDistributionSpec> PdsRequireSingleton(
-		CMemoryPool *mp, CExpressionHandle &exprhdl, CDistributionSpec *pds,
-		ULONG child_index);
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CDistributionSpec> pds, ULONG child_index);
 
 	// helper to compute skew estimate based on given stats and distribution spec
 	static CDouble GetSkew(gpos::Ref<IStatistics> stats,
-						   CDistributionSpec *pds);
+						   gpos::Ref<CDistributionSpec> pds);
 
 
 	// return true if the given column set includes any of the columns defined by
@@ -284,7 +283,7 @@ protected:
 	// compute required distribution of the n-th child
 	virtual gpos::Ref<CDistributionSpec> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CDistributionSpec *pdsRequired, ULONG child_index,
+		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
 		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const = 0;
 
 	// distribution matching type
@@ -520,7 +519,7 @@ public:
 
 	// helper for computing a singleton distribution matching the given distribution
 	static gpos::Ref<CDistributionSpecSingleton> PdssMatching(
-		CMemoryPool *mp, CDistributionSpecSingleton *pdss);
+		CMemoryPool *mp, gpos::Ref<CDistributionSpecSingleton> pdss);
 
 	virtual gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 											 CExpressionHandle &exprhdl,

@@ -87,7 +87,7 @@ CLogicalInsert::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalInsert *popInsert = gpos::dyn_cast<CLogicalInsert>(pop);
+	gpos::Ref<CLogicalInsert> popInsert = gpos::dyn_cast<CLogicalInsert>(pop);
 
 	return m_ptabdesc->MDId()->Equals(popInsert->Ptabdesc()->MDId()) &&
 		   m_pdrgpcrSource->Equals(popInsert->PdrgpcrSource());

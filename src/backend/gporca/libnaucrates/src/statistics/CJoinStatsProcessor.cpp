@@ -19,6 +19,7 @@
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/operators/CScalarNAryJoinPredList.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CFilterStatsProcessor.h"
 #include "naucrates/statistics/CLeftAntiSemiJoinStatsProcessor.h"
 #include "naucrates/statistics/CScaleFactorUtils.h"
@@ -109,7 +110,6 @@ CJoinStatsProcessor::JoinHistograms(
 		// just the scale factors.
 
 		GPOS_ASSERT(join_histogram->IsEmpty());
-		GPOS_DELETE(join_histogram);
 
 		// TODO:  Feb 21 2014, for all join condition except for "=" join predicate
 		// we currently do not compute new histograms for the join columns
@@ -282,9 +282,9 @@ CJoinStatsProcessor::SetResultingJoinStats(
 	// Until this changes, the interfaces have been designed to take IStatistics as parameters
 	// In the future, IStatistics should be removed, as it is not being utilized as designed
 	const gpos::Ref<CStatistics> outer_stats =
-		dynamic_cast<const gpos::Ref<CStatistics> >(outer_stats_input);
+		gpos::dyn_cast<CStatistics>(outer_stats_input);
 	const gpos::Ref<CStatistics> inner_side_stats =
-		dynamic_cast<const gpos::Ref<CStatistics> >(inner_stats_input);
+		gpos::dyn_cast<CStatistics>(inner_stats_input);
 
 	// create hash map from colid -> histogram for resultant structure
 	gpos::Ref<UlongToHistogramMap> result_col_hist_mapping =
@@ -329,8 +329,8 @@ CJoinStatsProcessor::SetResultingJoinStats(
 		ULONG colid1 = pred_info->ColIdOuter();
 		ULONG colid2 = pred_info->ColIdInner();
 		GPOS_ASSERT(colid1 != colid2);
-		const gpos::Ref<CHistogram> outer_histogram = nullptr;
-		const gpos::Ref<CHistogram> inner_histogram = nullptr;
+		gpos::Ref<CHistogram> outer_histogram = nullptr;
+		gpos::Ref<CHistogram> inner_histogram = nullptr;
 		BOOL is_input_empty =
 			CStatistics::IsEmptyJoin(outer_stats, inner_side_stats, IsLASJ);
 		CDouble local_scale_factor(1.0);
@@ -385,9 +385,6 @@ CJoinStatsProcessor::SetResultingJoinStats(
 										   result_col_hist_mapping.get());
 		}
 
-		GPOS_DELETE(outer_histogram_after);
-		GPOS_DELETE(inner_histogram_after);
-
 		// remember which tables the columns came from, this info is used to combine scale factors
 		CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
@@ -440,7 +437,8 @@ CJoinStatsProcessor::SetResultingJoinStats(
 	;
 	;
 
-	UlongToDoubleMap *col_width_mapping_result = outer_stats->CopyWidths(mp);
+	gpos::Ref<UlongToDoubleMap> col_width_mapping_result =
+		outer_stats->CopyWidths(mp);
 	if (!semi_join)
 	{
 		inner_side_stats->CopyWidthsInto(mp, col_width_mapping_result);

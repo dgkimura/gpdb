@@ -133,7 +133,8 @@ CLogicalCTEAnchor::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalCTEAnchor *popCTEAnchor = gpos::dyn_cast<CLogicalCTEAnchor>(pop);
+	gpos::Ref<CLogicalCTEAnchor> popCTEAnchor =
+		gpos::dyn_cast<CLogicalCTEAnchor>(pop);
 
 	return m_id == popCTEAnchor->Id();
 }

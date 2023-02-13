@@ -95,7 +95,7 @@ CScalarMinMax::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CScalarMinMax *popScMinMax = gpos::dyn_cast<CScalarMinMax>(pop);
+	gpos::Ref<CScalarMinMax> popScMinMax = gpos::dyn_cast<CScalarMinMax>(pop);
 
 	// match if return types are identical
 	return popScMinMax->Esmmt() == m_esmmt &&

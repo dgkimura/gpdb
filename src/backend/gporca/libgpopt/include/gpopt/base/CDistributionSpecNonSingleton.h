@@ -73,7 +73,7 @@ public:
 	}
 
 	// does current distribution satisfy the given one
-	BOOL FSatisfies(const CDistributionSpec *pds) const override;
+	BOOL FSatisfies(const gpos::Ref<CDistributionSpec> pds) const override;
 
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
@@ -100,23 +100,24 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CDistributionSpecNonSingleton *
-	PdsConvert(CDistributionSpec *pds)
+	static gpos::Ref<CDistributionSpecNonSingleton>
+	PdsConvert(gpos::Ref<CDistributionSpec> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtNonSingleton == pds->Edt());
 
-		return dynamic_cast<CDistributionSpecNonSingleton *>(pds);
+		return gpos::dyn_cast<CDistributionSpecNonSingleton>(pds);
 	}
 
 	// conversion function
-	static const CDistributionSpecNonSingleton *
-	PdsConvert(const CDistributionSpec *pds)
+	static const gpos::Ref<CDistributionSpecNonSingleton>
+	PdsConvert(const gpos::Ref<CDistributionSpec> pds)
 	{
 		GPOS_ASSERT(nullptr != pds);
 		GPOS_ASSERT(EdtNonSingleton == pds->Edt());
 
-		return dynamic_cast<const CDistributionSpecNonSingleton *>(pds);
+		return dynamic_cast<const gpos::Ref<CDistributionSpecNonSingleton> >(
+			pds);
 	}
 
 };	// class CDistributionSpecNonSingleton

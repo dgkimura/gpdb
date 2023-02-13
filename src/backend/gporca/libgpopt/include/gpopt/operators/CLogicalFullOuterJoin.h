@@ -113,13 +113,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalFullOuterJoin *
+	static gpos::Ref<CLogicalFullOuterJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalFullOuterJoin == pop->Eopid());
 
-		return dynamic_cast<CLogicalFullOuterJoin *>(pop);
+		return gpos::dyn_cast<CLogicalFullOuterJoin>(pop);
 	}
 
 };	// class CLogicalFullOuterJoin

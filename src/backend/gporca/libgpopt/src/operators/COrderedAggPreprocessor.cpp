@@ -84,7 +84,7 @@ COrderedAggPreprocessor::SplitPrjList(
 				(*(*pexprAggFunc)[EAggfuncChildIndices::EaggfuncIndexArgs])[0];
 			gpos::Ref<CExpression> pexprSortGroupClause =
 				(*(*pexprAggFunc)[EAggfuncChildIndices::EaggfuncIndexOrder])[0];
-			CScalarSortGroupClause *curr_sort_clause =
+			gpos::Ref<CScalarSortGroupClause> curr_sort_clause =
 				gpos::dyn_cast<CScalarSortGroupClause>(
 					pexprSortGroupClause->Pop());
 
@@ -111,7 +111,7 @@ COrderedAggPreprocessor::SplitPrjList(
 					// Currently, to check if colref's SORT ORDER Spec(Asc/Desc) is same, we match only the SortOp and NullFirst
 					// as that is what is used for creating the OrderSpec
 					// TO-DO: (enhancement) Instead of this loop, we can probably use a map (colref->SortGroupClause)
-					CScalarSortGroupClause *visited_sort_clause =
+					gpos::Ref<CScalarSortGroupClause> visited_sort_clause =
 						gpos::dyn_cast<CScalarSortGroupClause>(
 							(*pdrgpexprSortClauseArray)[uidx]->Pop());
 					if (colref == (*colref_array)[uidx] &&

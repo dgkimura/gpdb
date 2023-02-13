@@ -99,7 +99,8 @@ CPhysicalSpool::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysicalSpool::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							CDistributionSpec *pdsRequired, ULONG child_index,
+							gpos::Ref<CDistributionSpec> pdsRequired,
+							ULONG child_index,
 							CDrvdPropArray *,  // pdrgpdpCtxt
 							ULONG			   // ulOptReq
 ) const
@@ -249,7 +250,8 @@ CPhysicalSpool::Matches(gpos::Ref<COperator> pop) const
 {
 	if (Eopid() == pop->Eopid())
 	{
-		CPhysicalSpool *popSpool = gpos::dyn_cast<CPhysicalSpool>(pop);
+		gpos::Ref<CPhysicalSpool> popSpool =
+			gpos::dyn_cast<CPhysicalSpool>(pop);
 		return m_eager == popSpool->FEager();
 	}
 
@@ -358,7 +360,7 @@ CPhysicalSpool::FValidContext(CMemoryPool *,
 	gpos::Ref<COptimizationContext> pocChild = (*pdrgpocChild)[0].get();
 	gpos::Ref<CCostContext> pccBest = pocChild->PccBest();
 	GPOS_ASSERT(nullptr != pccBest);
-	CDrvdPropPlan *pdpplanChild = pccBest->Pdpplan();
+	gpos::Ref<CDrvdPropPlan> pdpplanChild = pccBest->Pdpplan();
 
 	// GPDB_12_MERGE_FIXME: Check part propagation spec
 #if 0

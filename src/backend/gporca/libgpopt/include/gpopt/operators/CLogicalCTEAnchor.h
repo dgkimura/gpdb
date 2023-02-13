@@ -154,13 +154,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalCTEAnchor *
+	static gpos::Ref<CLogicalCTEAnchor>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalCTEAnchor == pop->Eopid());
 
-		return dynamic_cast<CLogicalCTEAnchor *>(pop);
+		return gpos::dyn_cast<CLogicalCTEAnchor>(pop);
 	}
 
 	// debug print

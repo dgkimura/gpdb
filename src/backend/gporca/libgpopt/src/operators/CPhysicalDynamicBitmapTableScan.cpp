@@ -43,7 +43,8 @@ CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan(
 	CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
 	const CName *pnameAlias, ULONG scan_id,
 	gpos::Ref<CColRefArray> pdrgpcrOutput,
-	gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts, IMdIdArray *partition_mdids,
+	gpos::Ref<CColRef2dArray> pdrgpdrgpcrParts,
+	gpos::Ref<IMdIdArray> partition_mdids,
 	gpos::Ref<ColRefToUlongMapArray> root_col_mapping_per_part)
 	: CPhysicalDynamicScan(mp, std::move(ptabdesc), ulOriginOpId, pnameAlias,
 						   scan_id, std::move(pdrgpcrOutput),

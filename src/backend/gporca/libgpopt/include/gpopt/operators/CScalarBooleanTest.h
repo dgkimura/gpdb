@@ -116,13 +116,13 @@ public:
 	IOstream &OsPrint(IOstream &os) const override;
 
 	// conversion function
-	static CScalarBooleanTest *
+	static gpos::Ref<CScalarBooleanTest>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarBooleanTest == pop->Eopid());
 
-		return dynamic_cast<CScalarBooleanTest *>(pop);
+		return gpos::dyn_cast<CScalarBooleanTest>(pop);
 	}
 
 };	// class CScalarBooleanTest

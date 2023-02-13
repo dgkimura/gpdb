@@ -24,6 +24,7 @@
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/operators/CScalarCmp.h"
 #include "gpopt/operators/CScalarIdent.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/base/IDatumBool.h"
 #include "naucrates/md/IMDScalarOp.h"
 #include "naucrates/md/IMDType.h"
@@ -159,7 +160,7 @@ CStatsPredUtils::GetStatsPredNullTest(CMemoryPool *mp,
 		stats_cmp_type = CStatsPred::EstatscmptNEq;	 // 'is not null'
 	}
 
-	CScalarIdent *scalar_ident_op =
+	gpos::Ref<CScalarIdent> scalar_ident_op =
 		gpos::dyn_cast<CScalarIdent>((*expr_null_test)[0]->Pop());
 	const CColRef *col_ref = scalar_ident_op->Pcr();
 
@@ -1027,7 +1028,7 @@ CStatsPredUtils::GetStatsPredLike(CMemoryPool *mp,
 			CStatsPredUnsupported(gpos::ulong_max, CStatsPred::EstatscmptLike);
 	}
 
-	CScalarIdent *scalar_ident_op =
+	gpos::Ref<CScalarIdent> scalar_ident_op =
 		gpos::dyn_cast<CScalarIdent>(expr_scalar_ident->Pop());
 	ULONG colid = scalar_ident_op->Pcr()->Id();
 
@@ -1237,7 +1238,7 @@ CStatsPredUtils::GetStatsPredFromBoolExpr(CMemoryPool *mp,
 
 	if (CPredicateUtils::FBooleanScalarIdent(predicate_expr))
 	{
-		CScalarIdent *scalar_ident_op =
+		gpos::Ref<CScalarIdent> scalar_ident_op =
 			gpos::dyn_cast<CScalarIdent>(predicate_op);
 		datum = md_accessor->PtMDType<IMDTypeBool>()->CreateBoolDatum(
 			mp, true /* fValue */, false /* is_null */);

@@ -89,13 +89,13 @@ private:
 
 	// check if the given mdid array contains any of the polymorphic
 	// types (ANYELEMENT, ANYARRAY)
-	static BOOL ContainsPolymorphicTypes(IMdIdArray *mdid_array);
+	static BOOL ContainsPolymorphicTypes(gpos::Ref<IMdIdArray> mdid_array);
 
 	// resolve polymorphic types in the given array of type ids, replacing
 	// them with the actual types obtained from the query
 	static gpos::Ref<IMdIdArray> ResolvePolymorphicTypes(
-		CMemoryPool *mp, IMdIdArray *return_arg_mdids, List *input_arg_types,
-		FuncExpr *funcexpr);
+		CMemoryPool *mp, gpos::Ref<IMdIdArray> return_arg_mdids,
+		List *input_arg_types, FuncExpr *funcexpr);
 
 	// update grouping col position mappings
 	static void UpdateGrpColMapping(CMemoryPool *mp,
@@ -164,7 +164,7 @@ public:
 	// get column descriptors from a record type
 	static gpos::Ref<CDXLColDescrArray> GetColumnDescriptorsFromRecord(
 		CMemoryPool *mp, CIdGenerator *id_generator, List *col_names,
-		IMdIdArray *out_arg_types);
+		gpos::Ref<IMdIdArray> out_arg_types);
 
 	// get column descriptor from a base type
 	static gpos::Ref<CDXLColDescrArray> GetColumnDescriptorsFromBase(
@@ -199,7 +199,7 @@ public:
 
 	// construct an array of DXL column identifiers for a target list
 	static gpos::Ref<ULongPtrArray> GenerateColIds(
-		CMemoryPool *mp, List *target_list, IMdIdArray *input_mdids,
+		CMemoryPool *mp, List *target_list, gpos::Ref<IMdIdArray> input_mdids,
 		ULongPtrArray *input_nums, const BOOL *is_outer_ref,
 		CIdGenerator *colid_generator);
 

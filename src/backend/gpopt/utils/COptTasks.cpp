@@ -659,7 +659,7 @@ COptTasks::OptimizeTask(void *ptr)
 //---------------------------------------------------------------------------
 void
 COptTasks::PrintMissingStatsWarning(CMemoryPool *mp, CMDAccessor *md_accessor,
-									IMdIdArray *col_stats,
+									gpos::Ref<IMdIdArray> col_stats,
 									MdidHashSet *rel_stats)
 {
 	GPOS_ASSERT(nullptr != md_accessor);

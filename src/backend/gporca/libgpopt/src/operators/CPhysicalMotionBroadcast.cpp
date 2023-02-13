@@ -197,13 +197,13 @@ CPhysicalMotionBroadcast::OsPrint(IOstream &os) const
 //		Conversion function
 //
 //---------------------------------------------------------------------------
-CPhysicalMotionBroadcast *
+gpos::Ref<CPhysicalMotionBroadcast>
 CPhysicalMotionBroadcast::PopConvert(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 	GPOS_ASSERT(EopPhysicalMotionBroadcast == pop->Eopid());
 
-	return dynamic_cast<CPhysicalMotionBroadcast *>(pop);
+	return gpos::dyn_cast<CPhysicalMotionBroadcast>(pop);
 }
 
 // EOF

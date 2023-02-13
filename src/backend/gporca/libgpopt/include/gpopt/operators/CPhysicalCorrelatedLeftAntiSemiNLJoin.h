@@ -111,12 +111,12 @@ public:
 
 	// compute required distribution of the n-th child
 	gpos::Ref<CDistributionSpec>
-	PdsRequired(CMemoryPool *,		  // mp
-				CExpressionHandle &,  // exprhdl,
-				CDistributionSpec *,  // pdsRequired,
-				ULONG,				  // child_index,
-				CDrvdPropArray *,	  // pdrgpdpCtxt,
-				ULONG				  //ulOptReq
+	PdsRequired(CMemoryPool *,				   // mp
+				CExpressionHandle &,		   // exprhdl,
+				gpos::Ref<CDistributionSpec>,  // pdsRequired,
+				ULONG,						   // child_index,
+				CDrvdPropArray *,			   // pdrgpdpCtxt,
+				ULONG						   //ulOptReq
 	) const override
 	{
 		GPOS_RAISE(
@@ -169,13 +169,13 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalCorrelatedLeftAntiSemiNLJoin *
+	static gpos::Ref<CPhysicalCorrelatedLeftAntiSemiNLJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalCorrelatedLeftAntiSemiNLJoin == pop->Eopid());
 
-		return dynamic_cast<CPhysicalCorrelatedLeftAntiSemiNLJoin *>(pop);
+		return gpos::dyn_cast<CPhysicalCorrelatedLeftAntiSemiNLJoin>(pop);
 	}
 
 };	// class CPhysicalCorrelatedLeftAntiSemiNLJoin

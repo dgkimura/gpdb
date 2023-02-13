@@ -97,13 +97,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalExternalGet *
+	static gpos::Ref<CLogicalExternalGet>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalExternalGet == pop->Eopid());
 
-		return dynamic_cast<CLogicalExternalGet *>(pop);
+		return gpos::dyn_cast<CLogicalExternalGet>(pop);
 	}
 
 };	// class CLogicalExternalGet

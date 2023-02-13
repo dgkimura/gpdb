@@ -178,13 +178,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalDynamicGet *
+	static gpos::Ref<CLogicalDynamicGet>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDynamicGet == pop->Eopid());
 
-		return dynamic_cast<CLogicalDynamicGet *>(pop);
+		return gpos::dyn_cast<CLogicalDynamicGet>(pop);
 	}
 
 	// debug print

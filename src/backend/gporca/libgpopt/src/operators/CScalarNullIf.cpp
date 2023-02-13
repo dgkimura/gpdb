@@ -97,7 +97,7 @@ CScalarNullIf::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CScalarNullIf *popScNullIf = gpos::dyn_cast<CScalarNullIf>(pop);
+	gpos::Ref<CScalarNullIf> popScNullIf = gpos::dyn_cast<CScalarNullIf>(pop);
 
 	// match if operators and return types are identical
 	return m_mdid_op->Equals(popScNullIf->MdIdOp()) &&

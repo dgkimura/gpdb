@@ -68,14 +68,14 @@ public:
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;
 
 	// conversion function
-	static CScalarSubqueryExistential *
+	static gpos::Ref<CScalarSubqueryExistential>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopScalarSubqueryExists == pop->Eopid() ||
 					EopScalarSubqueryNotExists == pop->Eopid());
 
-		return dynamic_cast<CScalarSubqueryExistential *>(pop);
+		return gpos::dyn_cast<CScalarSubqueryExistential>(pop);
 	}
 
 };	// class CScalarSubqueryExistential

@@ -98,7 +98,7 @@ CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 {
 	GPOS_CHECK_ABORT;
 
-	CReqdPropRelational *prprelInput =
+	gpos::Ref<CReqdPropRelational> prprelInput =
 		gpos::dyn_cast<CReqdPropRelational>(prpInput);
 	gpos::Ref<CLogical> popLogical = gpos::dyn_cast<CLogical>(exprhdl.Pop());
 
@@ -118,10 +118,10 @@ CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //		Short hand for conversion
 //
 //---------------------------------------------------------------------------
-CReqdPropRelational *
+gpos::Ref<CReqdPropRelational>
 CReqdPropRelational::GetReqdRelationalProps(gpos::Ref<CReqdProp> prp)
 {
-	return dynamic_cast<CReqdPropRelational *>(prp);
+	return gpos::dyn_cast<CReqdPropRelational>(prp);
 }
 
 
@@ -135,7 +135,7 @@ CReqdPropRelational::GetReqdRelationalProps(gpos::Ref<CReqdProp> prp)
 //---------------------------------------------------------------------------
 gpos::Ref<CReqdPropRelational>
 CReqdPropRelational::PrprelDifference(CMemoryPool *mp,
-									  CReqdPropRelational *prprel)
+									  gpos::Ref<CReqdPropRelational> prprel)
 {
 	GPOS_ASSERT(nullptr != prprel);
 

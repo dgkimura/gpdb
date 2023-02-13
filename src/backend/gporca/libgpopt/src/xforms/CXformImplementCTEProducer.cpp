@@ -71,7 +71,7 @@ CXformImplementCTEProducer::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalCTEProducer *popCTEProducer =
+	gpos::Ref<CLogicalCTEProducer> popCTEProducer =
 		gpos::dyn_cast<CLogicalCTEProducer>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 

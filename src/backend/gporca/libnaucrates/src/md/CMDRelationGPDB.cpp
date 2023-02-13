@@ -793,7 +793,7 @@ CMDRelationGPDB::Serialize(CXMLSerializer *xml_serializer) const
 	GPOS_CHECK_ABORT;
 }
 
-IMdIdArray *
+gpos::Ref<IMdIdArray>
 CMDRelationGPDB::ChildPartitionMdids() const
 {
 	return m_partition_oids.get();

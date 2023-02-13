@@ -68,7 +68,7 @@ CXformExternalGet2ExternalScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalExternalGet *popGet =
+	gpos::Ref<CLogicalExternalGet> popGet =
 		gpos::dyn_cast<CLogicalExternalGet>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 

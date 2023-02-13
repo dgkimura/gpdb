@@ -242,7 +242,7 @@ CExpressionPreprocessor::PexprSimplifyQuantifiedSubqueries(
 		{
 			// quantified subquery with max card 1
 			gpos::Ref<CExpression> pexprScalar = (*pexpr)[1];
-			CScalarSubqueryQuantified *popSubqQuantified =
+			gpos::Ref<CScalarSubqueryQuantified> popSubqQuantified =
 				gpos::dyn_cast<CScalarSubqueryQuantified>(pexpr->Pop());
 			const CColRef *colref = popSubqQuantified->Pcr();
 			;
@@ -371,7 +371,7 @@ CExpressionPreprocessor::PexprUnnestScalarSubqueries(
 		//   +--CScalarIdent "b" (8)
 		if (!pcrsConstTableOutput->FMember(pcrSubq))
 		{
-			CScalarSubquery *pScalarSubquery =
+			gpos::Ref<CScalarSubquery> pScalarSubquery =
 				gpos::dyn_cast<CScalarSubquery>(pexpr->Pop());
 			return CUtils::PexprScalarIdent(mp, pScalarSubquery->Pcr());
 		}
@@ -409,7 +409,8 @@ CExpressionPreprocessor::PexprRemoveSuperfluousLimit(
 		CUtils::FHasZeroOffset(pexpr) &&
 		!gpos::dyn_cast<CLogicalLimit>(pop)->FHasCount())
 	{
-		CLogicalLimit *popLgLimit = gpos::dyn_cast<CLogicalLimit>(pop);
+		gpos::Ref<CLogicalLimit> popLgLimit =
+			gpos::dyn_cast<CLogicalLimit>(pop);
 		if (!popLgLimit->IsTopLimitUnderDMLorCTAS() ||
 			(popLgLimit->IsTopLimitUnderDMLorCTAS() &&
 			 GPOS_FTRACE(EopttraceRemoveOrderBelowDML)))
@@ -544,7 +545,8 @@ CExpressionPreprocessor::PexprRemoveSuperfluousOuterRefs(
 		{
 			gpos::Ref<CColRefSet> outer_refs = pexpr->DeriveOuterReferences();
 
-			CLogicalLimit *popLimit = gpos::dyn_cast<CLogicalLimit>(pop.get());
+			gpos::Ref<CLogicalLimit> popLimit =
+				gpos::dyn_cast<CLogicalLimit>(pop.get());
 			COrderSpec *pos = popLimit->Pos();
 			gpos::Ref<COrderSpec> posNew =
 				pos->PosExcludeColumns(mp, outer_refs);
@@ -675,7 +677,7 @@ CExpressionPreprocessor::PexprRemoveSuperfluousOuterRefs(
 			CExpressionHandle exprhdl(mp);
 			exprhdl.Attach(pexpr);
 			exprhdl.DeriveProps(nullptr /*pdpctxt*/);
-			CLogicalSequenceProject *popSequenceProject =
+			gpos::Ref<CLogicalSequenceProject> popSequenceProject =
 				gpos::dyn_cast<CLogicalSequenceProject>(pop.get());
 			if (popSequenceProject->FHasLocalReferencesTo(
 					exprhdl.DeriveOuterReferences()))
@@ -757,7 +759,7 @@ CExpressionPreprocessor::FConvert2InIsConvertable(
 	if (fConvertableExpression)
 	{
 		GPOS_ASSERT(0 < pexpr->Arity());
-		CScalarIdent *pscid = nullptr;
+		gpos::Ref<CScalarIdent> pscid = nullptr;
 		if (CUtils::FScalarIdent((*pexpr)[0]))
 		{
 			pscid = gpos::dyn_cast<CScalarIdent>((*pexpr)[0]->Pop());
@@ -1032,7 +1034,7 @@ CExpressionPreprocessor::CollectJoinChildrenRecursively(
 		{
 			// we have collapsed this join before and it already has some non-inner join info,
 			// merge the existing and new lists
-			CLogicalNAryJoin *naryJoin =
+			gpos::Ref<CLogicalNAryJoin> naryJoin =
 				gpos::dyn_cast<CLogicalNAryJoin>(pexpr->Pop());
 			ULongPtrArray *naryJoinPredIndexes =
 				naryJoin->GetLojChildPredIndexes();
@@ -1999,7 +2001,7 @@ CExpressionPreprocessor::CollectCTEPredicates(CMemoryPool *mp,
 		if (!pexprScalar->DeriveHasSubquery())
 		{
 			gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
-			CLogicalCTEConsumer *popConsumer =
+			gpos::Ref<CLogicalCTEConsumer> popConsumer =
 				gpos::dyn_cast<CLogicalCTEConsumer>(pexprChild->Pop());
 			ULONG ulCTEId = popConsumer->UlCTEId();
 			gpos::Ref<CExpression> pexprProducer =
@@ -2007,7 +2009,7 @@ CExpressionPreprocessor::CollectCTEPredicates(CMemoryPool *mp,
 					ulCTEId);
 			GPOS_ASSERT(nullptr != pexprProducer);
 
-			CLogicalCTEProducer *popProducer =
+			gpos::Ref<CLogicalCTEProducer> popProducer =
 				gpos::dyn_cast<CLogicalCTEProducer>(pexprProducer->Pop());
 			gpos::Ref<UlongToColRefMap> colref_mapping = CUtils::PhmulcrMapping(
 				mp, popConsumer->Pdrgpcr(), popProducer->Pdrgpcr());
@@ -2619,7 +2621,7 @@ CExpressionPreprocessor::PrunePartitions(CMemoryPool *mp,
 		(*expr)[0]->Pop()->Eopid() == COperator::EopLogicalDynamicGet)
 	{
 		gpos::Ref<CExpression> filter_pred = (*expr)[1];
-		CLogicalDynamicGet *dyn_get =
+		gpos::Ref<CLogicalDynamicGet> dyn_get =
 			gpos::dyn_cast<CLogicalDynamicGet>((*expr)[0]->Pop());
 
 		gpos::Ref<CColRefSetArray> pdrgpcrsChild = nullptr;
@@ -2634,7 +2636,8 @@ CExpressionPreprocessor::PrunePartitions(CMemoryPool *mp,
 		gpos::Ref<CConstraintArray> selected_partition_cnstrs =
 			GPOS_NEW(mp) CConstraintArray(mp);
 
-		IMdIdArray *all_partition_mdids = dyn_get->GetPartitionMdids();
+		gpos::Ref<IMdIdArray> all_partition_mdids =
+			dyn_get->GetPartitionMdids();
 		for (ULONG ul = 0; ul < all_partition_mdids->Size(); ++ul)
 		{
 			gpos::Ref<IMDId> part_mdid = (*all_partition_mdids)[ul];
@@ -3018,7 +3021,7 @@ CExpressionPreprocessor::ConvertSplitUpdateToInPlaceUpdate(
 		;
 		return pexpr;
 	}
-	CLogicalUpdate *popUpdate = gpos::dyn_cast<CLogicalUpdate>(pop);
+	gpos::Ref<CLogicalUpdate> popUpdate = gpos::dyn_cast<CLogicalUpdate>(pop);
 	gpos::Ref<CTableDescriptor> tabdesc = popUpdate->Ptabdesc();
 	CColRefArray *pdrgpcrInsert = popUpdate->PdrgpcrInsert();
 	CColRefArray *pdrgpcrDelete = popUpdate->PdrgpcrDelete();

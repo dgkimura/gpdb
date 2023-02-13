@@ -108,7 +108,7 @@ CLogicalUpdate::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CLogicalUpdate *popUpdate = gpos::dyn_cast<CLogicalUpdate>(pop);
+	gpos::Ref<CLogicalUpdate> popUpdate = gpos::dyn_cast<CLogicalUpdate>(pop);
 
 	return m_pcrCtid == popUpdate->PcrCtid() &&
 		   m_pcrSegmentId == popUpdate->PcrSegmentId() &&

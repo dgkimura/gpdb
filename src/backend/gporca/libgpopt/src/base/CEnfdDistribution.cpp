@@ -75,7 +75,7 @@ CEnfdDistribution::~CEnfdDistribution()
 //
 //---------------------------------------------------------------------------
 BOOL
-CEnfdDistribution::FCompatible(CDistributionSpec *pds) const
+CEnfdDistribution::FCompatible(gpos::Ref<CDistributionSpec> pds) const
 {
 	GPOS_ASSERT(nullptr != pds);
 
@@ -133,7 +133,7 @@ CEnfdDistribution::Epet(CExpressionHandle &exprhdl,
 {
 	if (fDistribReqd)
 	{
-		CDistributionSpec *pds =
+		gpos::Ref<CDistributionSpec> pds =
 			gpos::dyn_cast<CDrvdPropPlan>(exprhdl.Pdp())->Pds();
 
 		if (CDistributionSpec::EdtStrictReplicated == pds->Edt() &&

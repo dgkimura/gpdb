@@ -67,7 +67,8 @@ public:
 	// set hash join keys
 	void
 	SetJoinKeys(CExpressionArray *pdrgpexprOuter,
-				CExpressionArray *pdrgpexprInner, IMdIdArray *join_opfamilies)
+				CExpressionArray *pdrgpexprInner,
+				gpos::Ref<IMdIdArray> join_opfamilies)
 	{
 		m_pgroup->SetJoinKeys(pdrgpexprOuter, pdrgpexprInner, join_opfamilies);
 	}

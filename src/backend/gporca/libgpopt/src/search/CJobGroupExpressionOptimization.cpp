@@ -487,7 +487,7 @@ CJobGroupExpressionOptimization::ScheduleChildGroupsJobs(CSchedulerContext *psc)
 	CUtils::AddRefAppend(stats_ctxt.get(), m_pdrgpstatCurrentCtxt.get());
 
 	// compute required relational properties
-	CReqdPropRelational *prprel = nullptr;
+	gpos::Ref<CReqdPropRelational> prprel = nullptr;
 	if (gpos::dyn_cast<CPhysical>(m_pgexpr->Pop())->FPassThruStats())
 	{
 		// copy requirements from origin context

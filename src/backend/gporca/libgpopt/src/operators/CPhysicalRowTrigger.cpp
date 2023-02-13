@@ -178,7 +178,8 @@ CPhysicalRowTrigger::PcrsRequired(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysicalRowTrigger::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 CDistributionSpec *pdsInput, ULONG child_index,
+								 gpos::Ref<CDistributionSpec> pdsInput,
+								 ULONG child_index,
 								 CDrvdPropArray *,	// pdrgpdpCtxt
 								 ULONG				// ulOptReq
 ) const
@@ -333,7 +334,7 @@ CPhysicalRowTrigger::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalRowTrigger *popRowTrigger =
+	gpos::Ref<CPhysicalRowTrigger> popRowTrigger =
 		gpos::dyn_cast<CPhysicalRowTrigger>(pop);
 
 	CColRefArray *pdrgpcrOld = popRowTrigger->PdrgpcrOld();

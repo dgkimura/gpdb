@@ -152,7 +152,7 @@ private:
 	// print warning messages for columns with missing statistics
 	static void PrintMissingStatsWarning(CMemoryPool *mp,
 										 CMDAccessor *md_accessor,
-										 IMdIdArray *col_stats,
+										 gpos::Ref<IMdIdArray> col_stats,
 										 MdidHashSet *phsmdidRel);
 
 public:

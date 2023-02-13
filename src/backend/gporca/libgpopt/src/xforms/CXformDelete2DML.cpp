@@ -71,7 +71,8 @@ CXformDelete2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
-	CLogicalDelete *popDelete = gpos::dyn_cast<CLogicalDelete>(pexpr->Pop());
+	gpos::Ref<CLogicalDelete> popDelete =
+		gpos::dyn_cast<CLogicalDelete>(pexpr->Pop());
 	CMemoryPool *mp = pxfctxt->Pmp();
 
 	// extract components for alternative

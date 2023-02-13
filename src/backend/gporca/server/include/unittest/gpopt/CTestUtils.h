@@ -775,7 +775,7 @@ CTestUtils::PexprJoinPartitioned(CMemoryPool *mp, BOOL fOuterPartitioned)
 	gpos::Ref<CExpression> pexprGetPartitioned = PexprLogicalGetPartitioned(mp);
 
 	// extract first partition key
-	CLogicalGet *popGetPartitioned =
+	gpos::Ref<CLogicalGet> popGetPartitioned =
 		gpos::dyn_cast<CLogicalGet>(pexprGetPartitioned->Pop());
 	const CColRef2dArray *pdrgpdrgpcr =
 		popGetPartitioned->PdrgpdrgpcrPartColumns();

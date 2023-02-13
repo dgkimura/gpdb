@@ -114,7 +114,7 @@ CScalarOp::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarOp *pscop = gpos::dyn_cast<CScalarOp>(pop);
+		gpos::Ref<CScalarOp> pscop = gpos::dyn_cast<CScalarOp>(pop);
 
 		// match if operator oid are identical
 		return m_mdid_op->Equals(pscop->MdIdOp());

@@ -156,7 +156,7 @@ public:
 		return m_dxl_ctas_storage_option.get();
 	}
 
-	IMdIdArray *
+	gpos::Ref<IMdIdArray>
 	GetDistrOpclasses() const
 	{
 		return m_distr_opclasses.get();

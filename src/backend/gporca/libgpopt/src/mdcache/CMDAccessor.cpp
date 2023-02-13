@@ -995,7 +995,7 @@ CMDAccessor::RecordColumnStats(
 	CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid, ULONG colid, ULONG ulPos,
 	BOOL isSystemCol, BOOL isEmptyTable,
 	gpos::Ref<UlongToHistogramMap> col_histogram_mapping,
-	UlongToDoubleMap *colid_width_mapping,
+	gpos::Ref<UlongToDoubleMap> colid_width_mapping,
 	gpos::Ref<CStatisticsConfig> stats_config)
 {
 	GPOS_ASSERT(nullptr != rel_mdid);

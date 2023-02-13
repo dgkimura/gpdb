@@ -234,7 +234,7 @@ public:
 	gpos::Ref<CTableDescriptor> GetTableDescriptor() const;
 
 	// shorthand for conversion
-	static CDrvdPropRelational *GetRelationalProperties(
+	static gpos::Ref<CDrvdPropRelational> GetRelationalProperties(
 		gpos::Ref<CDrvdProp> pdp);
 
 	// check for satisfying required plan properties

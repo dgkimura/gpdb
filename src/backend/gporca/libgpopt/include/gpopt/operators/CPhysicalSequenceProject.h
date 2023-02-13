@@ -78,7 +78,7 @@ public:
 	}
 
 	// partition by keys
-	CDistributionSpec *
+	gpos::Ref<CDistributionSpec>
 	Pds() const
 	{
 		return m_pds.get();
@@ -138,12 +138,10 @@ public:
 									  ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
-	gpos::Ref<CDistributionSpec> PdsRequired(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl,
-											 CDistributionSpec *pdsRequired,
-											 ULONG child_index,
-											 CDrvdPropArray *pdrgpdpCtxt,
-											 ULONG ulOptReq) const override;
+	gpos::Ref<CDistributionSpec> PdsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
+		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	gpos::Ref<CRewindabilitySpec> PrsRequired(CMemoryPool *mp,

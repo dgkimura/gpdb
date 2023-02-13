@@ -466,8 +466,8 @@ public:
 	static void AddDummyHistogramAndWidthInfo(
 		CMemoryPool *mp, CColumnFactory *col_factory,
 		gpos::Ref<UlongToHistogramMap> output_histograms,
-		UlongToDoubleMap *output_col_widths, const ULongPtrArray *columns,
-		BOOL is_empty);
+		gpos::Ref<UlongToDoubleMap> output_col_widths,
+		const ULongPtrArray *columns, BOOL is_empty);
 
 	// add dummy histogram buckets for the columns in the input histogram
 	static void AddEmptyHistogram(

@@ -264,7 +264,7 @@ CLogicalDynamicGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 IStatisticsArray *	 // not used
 ) const
 {
-	CReqdPropRelational *prprel =
+	gpos::Ref<CReqdPropRelational> prprel =
 		gpos::dyn_cast<CReqdPropRelational>(exprhdl.Prp());
 	gpos::Ref<IStatistics> stats =
 		PstatsDeriveFilter(mp, exprhdl, prprel->PexprPartPred());
@@ -292,7 +292,7 @@ CLogicalDynamicGet::PstatsDeriveFilter(CMemoryPool *mp,
 									   gpos::Ref<CExpression> pexprFilter) const
 {
 	GPOS_ASSERT(COperator::EopLogicalDynamicGet == exprhdl.Pop()->Eopid());
-	CLogicalDynamicGet *dyn_get =
+	gpos::Ref<CLogicalDynamicGet> dyn_get =
 		gpos::dyn_cast<CLogicalDynamicGet>(exprhdl.Pop());
 
 	gpos::Ref<CColRefSet> pcrsStat = GPOS_NEW(mp) CColRefSet(mp);

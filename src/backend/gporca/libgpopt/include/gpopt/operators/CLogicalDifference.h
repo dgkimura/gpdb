@@ -112,13 +112,13 @@ public:
 	//-------------------------------------------------------------------------------------
 
 	// conversion function
-	static CLogicalDifference *
+	static gpos::Ref<CLogicalDifference>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalDifference == pop->Eopid());
 
-		return dynamic_cast<CLogicalDifference *>(pop);
+		return gpos::dyn_cast<CLogicalDifference>(pop);
 	}
 
 };	// class CLogicalDifference

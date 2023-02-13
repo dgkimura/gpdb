@@ -75,7 +75,8 @@ CPhysicalRightOuterHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 	// We also could create a replicated-hashed and replicated-non-singleton request, but that isn't a promising
 	// alternative as we would be broadcasting the outer side. In that case, an LOJ would be better.
 
-	CDistributionSpec *const pdsInput = prppInput->Ped()->PdsRequired();
+	gpos::Ref<CDistributionSpec> const pdsInput =
+		prppInput->Ped()->PdsRequired();
 	CEnfdDistribution::EDistributionMatching dmatch =
 		Edm(prppInput, child_index, pdrgpdpCtxt, ulOptReq);
 
@@ -94,7 +95,7 @@ CPhysicalRightOuterHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 			mp, exprhdl, pdsInput, child_index, pdrgpdpCtxt, ulOptReq);
 		if (CDistributionSpec::EdtHashed == pds->Edt())
 		{
-			CDistributionSpecHashed *pdsHashed =
+			gpos::Ref<CDistributionSpecHashed> pdsHashed =
 				gpos::dyn_cast<CDistributionSpecHashed>(pds.get());
 			pdsHashed->ComputeEquivHashExprs(mp, exprhdl);
 		}

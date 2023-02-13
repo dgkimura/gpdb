@@ -107,13 +107,13 @@ public:
 	IOstream &OsPrint(IOstream &) const override;
 
 	// conversion function
-	static CPhysicalBitmapTableScan *
+	static gpos::Ref<CPhysicalBitmapTableScan>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalBitmapTableScan == pop->Eopid());
 
-		return dynamic_cast<CPhysicalBitmapTableScan *>(pop);
+		return gpos::dyn_cast<CPhysicalBitmapTableScan>(pop);
 	}
 };
 }  // namespace gpopt

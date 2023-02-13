@@ -280,7 +280,8 @@ COptimizationContext::FOptimizeSort(
 	GPOS_ASSERT(nullptr != poc);
 	GPOS_ASSERT(COperator::EopPhysicalSort == pgexprSort->Pop()->Eopid());
 
-	CPhysicalSort *pop = gpos::dyn_cast<CPhysicalSort>(pgexprSort->Pop());
+	gpos::Ref<CPhysicalSort> pop =
+		gpos::dyn_cast<CPhysicalSort>(pgexprSort->Pop());
 
 	return poc->Prpp()->Peo()->FCompatible(
 		const_cast<COrderSpec *>(pop->Pos()));
@@ -367,7 +368,7 @@ COptimizationContext::FOptimizeNLJoin(
 
 	// for correlated join, the requested columns must be covered by outer child
 	// columns and columns to be generated from inner child
-	CPhysicalNLJoin *popNLJoin = gpos::dyn_cast<CPhysicalNLJoin>(pop);
+	gpos::Ref<CPhysicalNLJoin> popNLJoin = gpos::dyn_cast<CPhysicalNLJoin>(pop);
 	gpos::Ref<CColRefSet> pcrs =
 		GPOS_NEW(mp) CColRefSet(mp, popNLJoin->PdrgPcrInner());
 	gpos::Ref<CColRefSet> pcrsOuterChild =
@@ -438,7 +439,7 @@ COptimizationContext::PrppCTEProducer(CMemoryPool *mp,
 	gpos::Ref<CColRefSet> pcrsInnerOutput =
 		gpos::dyn_cast<CDrvdPropRelational>((*pgexpr)[1]->Pdp())
 			->GetOutputColumns();
-	CPhysicalCTEProducer *popProducer =
+	gpos::Ref<CPhysicalCTEProducer> popProducer =
 		gpos::dyn_cast<CPhysicalCTEProducer>(pccProducer->Pgexpr()->Pop());
 	gpos::Ref<UlongToColRefMap> colref_mapping =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PhmulcrConsumerToProducer(

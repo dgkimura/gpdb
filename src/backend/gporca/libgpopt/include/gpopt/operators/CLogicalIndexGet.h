@@ -241,13 +241,13 @@ public:
 	// conversion function
 	//-------------------------------------------------------------------------------------
 
-	static CLogicalIndexGet *
+	static gpos::Ref<CLogicalIndexGet>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalIndexGet == pop->Eopid());
 
-		return dynamic_cast<CLogicalIndexGet *>(pop);
+		return gpos::dyn_cast<CLogicalIndexGet>(pop);
 	}
 
 

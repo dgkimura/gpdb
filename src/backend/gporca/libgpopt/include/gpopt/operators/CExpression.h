@@ -112,11 +112,11 @@ private:
 
 #if 0
 	// check if the expression satisfies partition enforcer condition
-	BOOL FValidPartEnforcers(CDrvdPropCtxtPlan *pdpctxtplan);
+	BOOL FValidPartEnforcers(gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan);
 #endif
 
 	// check if the distributions of all children are compatible
-	BOOL FValidChildrenDistribution(CDrvdPropCtxtPlan *pdpctxtplan);
+	BOOL FValidChildrenDistribution(gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan);
 
 	// copy group properties and stats to expression
 	void CopyGroupPropsAndStats(gpos::Ref<IStatistics> input_stats);
@@ -203,11 +203,11 @@ public:
 		return m_prpp;
 	}
 
-	CDrvdPropRelational *GetDrvdPropRelational() const;
+	gpos::Ref<CDrvdPropRelational> GetDrvdPropRelational() const;
 
-	CDrvdPropPlan *GetDrvdPropPlan() const;
+	gpos::Ref<CDrvdPropPlan> GetDrvdPropPlan() const;
 
-	CDrvdPropScalar *GetDrvdPropScalar() const;
+	gpos::Ref<CDrvdPropScalar> GetDrvdPropScalar() const;
 
 	// get derived statistics object
 	const gpos::Ref<IStatistics>
@@ -232,7 +232,7 @@ public:
 	gpos::Ref<CDrvdProp> PdpDerive(gpos::Ref<CDrvdPropCtxt> pdpctxt = nullptr);
 
 	// derive statistics
-	gpos::Ref<IStatistics> PstatsDerive(CReqdPropRelational *prprel,
+	gpos::Ref<IStatistics> PstatsDerive(gpos::Ref<CReqdPropRelational> prprel,
 										IStatisticsArray *stats_ctxt);
 
 	// reset a derived property
@@ -282,7 +282,7 @@ public:
 
 	// check if the expression satisfies given required properties
 	BOOL FValidPlan(const gpos::Ref<CReqdPropPlan> prpp,
-					CDrvdPropCtxtPlan *pdpctxtplan);
+					gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan);
 
 	// static hash function
 	static ULONG HashValue(const gpos::Ref<CExpression> pexpr);
@@ -293,7 +293,8 @@ public:
 	// rehydrate expression from a given cost context and child expressions
 	static gpos::Ref<CExpression> PexprRehydrate(
 		CMemoryPool *mp, gpos::Ref<CCostContext> pcc,
-		gpos::Ref<CExpressionArray> pdrgpexpr, CDrvdPropCtxtPlan *pdpctxtplan);
+		gpos::Ref<CExpressionArray> pdrgpexpr,
+		gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan);
 
 	// Relational property accessors - derived as needed
 	gpos::Ref<CColRefSet> DeriveOuterReferences();

@@ -55,7 +55,7 @@ public:
 	//		<strTokenListItem .../>...
 	// </strTokenList>
 	static void SerializeMDIdList(CXMLSerializer *xml_serializer,
-								  const IMdIdArray *mdid_array,
+								  const gpos::Ref<IMdIdArray> mdid_array,
 								  const CWStringConst *strTokenList,
 								  const CWStringConst *strTokenListItem);
 

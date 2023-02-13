@@ -113,7 +113,8 @@ CPhysicalAssert::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CPhysicalAssert::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 CDistributionSpec *pdsRequired, ULONG child_index,
+							 gpos::Ref<CDistributionSpec> pdsRequired,
+							 ULONG child_index,
 							 CDrvdPropArray *,	// pdrgpdpCtxt
 							 ULONG ulOptReq) const
 {
@@ -242,7 +243,7 @@ CPhysicalAssert::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CPhysicalAssert *popAssert = gpos::dyn_cast<CPhysicalAssert>(pop);
+	gpos::Ref<CPhysicalAssert> popAssert = gpos::dyn_cast<CPhysicalAssert>(pop);
 	return CException::Equals(*(popAssert->Pexc()), *m_pexc);
 }
 

@@ -80,7 +80,8 @@ CScalarSwitch::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CScalarSwitch *popScSwitch = gpos::dyn_cast<CScalarSwitch>(pop);
+		gpos::Ref<CScalarSwitch> popScSwitch =
+			gpos::dyn_cast<CScalarSwitch>(pop);
 
 		// match if return types are identical
 		return popScSwitch->MdidType()->Equals(m_mdid_type.get());

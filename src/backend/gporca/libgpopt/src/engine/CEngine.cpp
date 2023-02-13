@@ -412,9 +412,9 @@ CEngine::FPossibleDuplicateGroups(gpos::Ref<CGroup> pgroupFst,
 	GPOS_ASSERT(nullptr != pgroupFst);
 	GPOS_ASSERT(nullptr != pgroupSnd);
 
-	CDrvdPropRelational *pdprelFst =
+	gpos::Ref<CDrvdPropRelational> pdprelFst =
 		gpos::dyn_cast<CDrvdPropRelational>(pgroupFst->Pdp());
-	CDrvdPropRelational *pdprelSnd =
+	gpos::Ref<CDrvdPropRelational> pdprelSnd =
 		gpos::dyn_cast<CDrvdPropRelational>(pgroupSnd->Pdp());
 
 	// right now we only check the output columns, but we may possibly need to
@@ -459,7 +459,8 @@ CEngine::DeriveStats(CMemoryPool *pmpLocal)
 //---------------------------------------------------------------------------
 void
 CEngine::DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-					 gpos::Ref<CGroup> pgroup, CReqdPropRelational *prprel)
+					 gpos::Ref<CGroup> pgroup,
+					 gpos::Ref<CReqdPropRelational> prprel)
 {
 	gpos::Ref<CGroupExpression> pgexprFirst = CEngine::PgexprFirst(pgroup);
 	CExpressionHandle exprhdl(pmpGlobal);
@@ -589,7 +590,7 @@ CEngine::FSafeToPruneWithDPEStats(gpos::Ref<CGroupExpression> pgexpr,
 	{
 		// group expression has not been optimized yet
 
-		CDrvdPropRelational *pdprel =
+		gpos::Ref<CDrvdPropRelational> pdprel =
 			gpos::dyn_cast<CDrvdPropRelational>(pgexpr->Pgroup()->Pdp());
 		if (0 < pdprel->GetPartitionInfo()->UlConsumers())
 		{
@@ -604,7 +605,7 @@ CEngine::FSafeToPruneWithDPEStats(gpos::Ref<CGroupExpression> pgexpr,
 	CExpressionHandle exprhdl(m_mp);
 	exprhdl.Attach(pgexpr);
 	ULONG ulNextChild = exprhdl.UlNextOptimizedChildIndex(child_index);
-	CDrvdPropRelational *pdprelChild =
+	gpos::Ref<CDrvdPropRelational> pdprelChild =
 		gpos::dyn_cast<CDrvdPropRelational>((*pgexpr)[ulNextChild]->Pdp());
 	if (0 < pdprelChild->GetPartitionInfo()->UlConsumers())
 	{
@@ -933,7 +934,7 @@ CEngine::PocChild(
 	CUtils::AddRefAppend(stats_ctxt.get(), pdrgpstatCurrentCtxt);
 
 	// compute required relational properties
-	CReqdPropRelational *prprel = nullptr;
+	gpos::Ref<CReqdPropRelational> prprel = nullptr;
 	if (gpos::dyn_cast<CPhysical>(pgexpr->Pop())->FPassThruStats())
 	{
 		// copy requirements from origin context

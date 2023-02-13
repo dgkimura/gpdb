@@ -102,7 +102,7 @@ CLogicalSplit::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CLogicalSplit *popSplit = gpos::dyn_cast<CLogicalSplit>(pop);
+		gpos::Ref<CLogicalSplit> popSplit = gpos::dyn_cast<CLogicalSplit>(pop);
 
 		return m_pcrCtid == popSplit->PcrCtid() &&
 			   m_pcrSegmentId == popSplit->PcrSegmentId() &&

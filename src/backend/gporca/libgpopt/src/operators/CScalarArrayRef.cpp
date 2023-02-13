@@ -94,7 +94,8 @@ CScalarArrayRef::Matches(gpos::Ref<COperator> pop) const
 		return false;
 	}
 
-	CScalarArrayRef *popArrayRef = gpos::dyn_cast<CScalarArrayRef>(pop);
+	gpos::Ref<CScalarArrayRef> popArrayRef =
+		gpos::dyn_cast<CScalarArrayRef>(pop);
 
 	return m_mdid_type->Equals(popArrayRef->MdidType()) &&
 		   m_pmdidElem->Equals(popArrayRef->PmdidElem()) &&

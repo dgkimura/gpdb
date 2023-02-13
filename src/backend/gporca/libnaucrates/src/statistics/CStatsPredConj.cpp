@@ -13,6 +13,7 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 #include "naucrates/statistics/StatsPredLess.h"
 

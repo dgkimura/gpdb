@@ -510,7 +510,7 @@ CUtils::UlScalarArrayArity(gpos::Ref<CExpression> pexprArray)
 	ULONG arity = pexprArray->Arity();
 	if (0 == arity)
 	{
-		CScalarArray *popScalarArray =
+		gpos::Ref<CScalarArray> popScalarArray =
 			gpos::dyn_cast<CScalarArray>(pexprArray->Pop());
 		CScalarConstArray *pdrgPconst = popScalarArray->PdrgPconst();
 		arity = pdrgPconst->Size();
@@ -526,7 +526,7 @@ CUtils::PScalarArrayConstChildAt(gpos::Ref<CExpression> pexprArray, ULONG ul)
 	// operator itself, we return the constant from the const array.
 	if (FScalarArrayCollapsed(pexprArray))
 	{
-		CScalarArray *popScalarArray =
+		gpos::Ref<CScalarArray> popScalarArray =
 			gpos::dyn_cast<CScalarArray>(pexprArray->Pop());
 		CScalarConstArray *pdrgPconst = popScalarArray->PdrgPconst();
 		gpos::Ref<CScalarConst> pScalarConst = (*pdrgPconst)[ul];
@@ -547,7 +547,7 @@ CUtils::PScalarArrayExprChildAt(CMemoryPool *mp,
 	ULONG arity = pexprArray->Arity();
 	if (0 == arity)
 	{
-		CScalarArray *popScalarArray =
+		gpos::Ref<CScalarArray> popScalarArray =
 			gpos::dyn_cast<CScalarArray>(pexprArray->Pop());
 		CScalarConstArray *pdrgPconst = popScalarArray->PdrgPconst();
 		gpos::Ref<CScalarConst> pScalarConst = (*pdrgPconst)[ul];
@@ -699,7 +699,8 @@ CUtils::PexprCollapseConstArray(CMemoryPool *mp,
 			pdrgPconst->Append(popConst);
 		}
 
-		CScalarArray *psArray = gpos::dyn_cast<CScalarArray>(pexprArray->Pop());
+		gpos::Ref<CScalarArray> psArray =
+			gpos::dyn_cast<CScalarArray>(pexprArray->Pop());
 		gpos::Ref<IMDId> elem_type_mdid = psArray->PmdidElem();
 		gpos::Ref<IMDId> array_type_mdid = psArray->PmdidArray();
 		;
@@ -1077,7 +1078,7 @@ CUtils::FLogicalJoin(gpos::Ref<COperator> pop)
 	{
 		// attempt casting to logical join,
 		// dynamic cast returns NULL if operator is not join
-		popJoin = dynamic_cast<gpos::Ref<CLogicalJoin> >(pop);
+		popJoin = gpos::dyn_cast<CLogicalJoin>(pop);
 	}
 
 	return (nullptr != popJoin);
@@ -1089,12 +1090,12 @@ CUtils::FLogicalSetOp(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 
-	CLogicalSetOp *popSetOp = nullptr;
+	gpos::Ref<CLogicalSetOp> popSetOp = nullptr;
 	if (pop->FLogical())
 	{
 		// attempt casting to logical SetOp,
 		// dynamic cast returns NULL if operator is not SetOp
-		popSetOp = dynamic_cast<CLogicalSetOp *>(pop);
+		popSetOp = gpos::dyn_cast<CLogicalSetOp>(pop);
 	}
 
 	return (nullptr != popSetOp);
@@ -1123,10 +1124,10 @@ CUtils::FHashJoin(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 
-	CPhysicalHashJoin *popHJN = nullptr;
+	gpos::Ref<CPhysicalHashJoin> popHJN = nullptr;
 	if (pop->FPhysical())
 	{
-		popHJN = dynamic_cast<CPhysicalHashJoin *>(pop);
+		popHJN = gpos::dyn_cast<CPhysicalHashJoin>(pop);
 	}
 
 	return (nullptr != popHJN);
@@ -1141,7 +1142,7 @@ CUtils::FCorrelatedNLJoin(gpos::Ref<COperator> pop)
 	BOOL fCorrelatedNLJ = false;
 	if (FNLJoin(pop))
 	{
-		fCorrelatedNLJ = dynamic_cast<CPhysicalNLJoin *>(pop)->FCorrelated();
+		fCorrelatedNLJ = gpos::dyn_cast<CPhysicalNLJoin>(pop)->FCorrelated();
 	}
 
 	return fCorrelatedNLJ;
@@ -1153,10 +1154,10 @@ CUtils::FNLJoin(gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
 
-	CPhysicalNLJoin *popNLJ = nullptr;
+	gpos::Ref<CPhysicalNLJoin> popNLJ = nullptr;
 	if (pop->FPhysical())
 	{
-		popNLJ = dynamic_cast<CPhysicalNLJoin *>(pop);
+		popNLJ = gpos::dyn_cast<CPhysicalNLJoin>(pop);
 	}
 
 	return (nullptr != popNLJ);
@@ -1258,7 +1259,7 @@ CUtils::FApply(gpos::Ref<COperator> pop)
 	{
 		// attempt casting to logical apply,
 		// dynamic cast returns NULL if operator is not an Apply operator
-		popApply = dynamic_cast<gpos::Ref<CLogicalApply> >(pop);
+		popApply = gpos::dyn_cast<CLogicalApply>(pop);
 	}
 
 	return (nullptr != popApply);
@@ -1422,11 +1423,11 @@ CUtils::FScalarConstIntZero(gpos::Ref<CExpression> pexprOffset)
 	switch (datum->GetDatumType())
 	{
 		case IMDType::EtiInt2:
-			return (0 == dynamic_cast<IDatumInt2 *>(datum)->Value());
+			return (0 == gpos::dyn_cast<IDatumInt2>(datum)->Value());
 		case IMDType::EtiInt4:
-			return (0 == dynamic_cast<IDatumInt4 *>(datum)->Value());
+			return (0 == gpos::dyn_cast<IDatumInt4>(datum)->Value());
 		case IMDType::EtiInt8:
-			return (0 == dynamic_cast<IDatumInt8 *>(datum)->Value());
+			return (0 == gpos::dyn_cast<IDatumInt8>(datum)->Value());
 		default:
 			return false;
 	}
@@ -2557,8 +2558,8 @@ CUtils::FScalarConstBool(gpos::Ref<CExpression> pexpr, BOOL value)
 			gpos::dyn_cast<CScalarConst>(pop);
 		if (IMDType::EtiBool == popScalarConst->GetDatum()->GetDatumType())
 		{
-			IDatumBool *datum =
-				dynamic_cast<IDatumBool *>(popScalarConst->GetDatum());
+			gpos::Ref<IDatumBool> datum =
+				gpos::dyn_cast<IDatumBool>(popScalarConst->GetDatum());
 			return !datum->IsNull() && datum->GetValue() == value;
 		}
 	}
@@ -2967,7 +2968,7 @@ CUtils::UlInlinableCTEs(gpos::Ref<CExpression> pexpr, ULONG ulDepth)
 
 	if (COperator::EopLogicalCTEConsumer == pop->Eopid())
 	{
-		CLogicalCTEConsumer *popConsumer =
+		gpos::Ref<CLogicalCTEConsumer> popConsumer =
 			gpos::dyn_cast<CLogicalCTEConsumer>(pop);
 		gpos::Ref<CExpression> pexprProducer =
 			COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(
@@ -2999,7 +3000,7 @@ CUtils::UlJoins(gpos::Ref<CExpression> pexpr)
 
 	if (COperator::EopLogicalCTEConsumer == pop->Eopid())
 	{
-		CLogicalCTEConsumer *popConsumer =
+		gpos::Ref<CLogicalCTEConsumer> popConsumer =
 			gpos::dyn_cast<CLogicalCTEConsumer>(pop);
 		gpos::Ref<CExpression> pexprProducer =
 			COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(
@@ -3040,7 +3041,7 @@ CUtils::UlSubqueries(gpos::Ref<CExpression> pexpr)
 
 	if (COperator::EopLogicalCTEConsumer == pop->Eopid())
 	{
-		CLogicalCTEConsumer *popConsumer =
+		gpos::Ref<CLogicalCTEConsumer> popConsumer =
 			gpos::dyn_cast<CLogicalCTEConsumer>(pop);
 		gpos::Ref<CExpression> pexprProducer =
 			COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(
@@ -3749,13 +3750,13 @@ CUtils::UlHashColArray(const CColRefArray *colref_array, const ULONG ulMaxCols)
 // subset of input columns from the CTE Consumer
 gpos::Ref<CColRefSet>
 CUtils::PcrsCTEProducerColumns(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrsInput,
-							   CLogicalCTEConsumer *popCTEConsumer)
+							   gpos::Ref<CLogicalCTEConsumer> popCTEConsumer)
 {
 	gpos::Ref<CExpression> pexprProducer =
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(
 			popCTEConsumer->UlCTEId());
 	GPOS_ASSERT(nullptr != pexprProducer);
-	CLogicalCTEProducer *popProducer =
+	gpos::Ref<CLogicalCTEProducer> popProducer =
 		gpos::dyn_cast<CLogicalCTEProducer>(pexprProducer->Pop());
 
 	gpos::Ref<CColRefArray> pdrgpcrInput = pcrsInput->Pdrgpcr(mp);
@@ -4052,7 +4053,7 @@ CUtils::PcrMap(CColRef *pcrSource, CColRefArray *pdrgpcrSource,
 }
 
 BOOL
-CUtils::FDuplicateHazardDistributionSpec(CDistributionSpec *pds)
+CUtils::FDuplicateHazardDistributionSpec(gpos::Ref<CDistributionSpec> pds)
 {
 	CDistributionSpec::EDistributionType edt = pds->Edt();
 
@@ -4071,9 +4072,9 @@ CUtils::FDuplicateHazardMotion(gpos::Ref<CExpression> pexprMotion)
 	GPOS_ASSERT(CUtils::FPhysicalMotion(pexprMotion->Pop()));
 
 	gpos::Ref<CExpression> pexprChild = (*pexprMotion)[0];
-	CDrvdPropPlan *pdpplanChild =
+	gpos::Ref<CDrvdPropPlan> pdpplanChild =
 		gpos::dyn_cast<CDrvdPropPlan>(pexprChild->PdpDerive());
-	CDistributionSpec *pdsChild = pdpplanChild->Pds();
+	gpos::Ref<CDistributionSpec> pdsChild = pdpplanChild->Pds();
 
 	return CUtils::FDuplicateHazardDistributionSpec(pdsChild);
 }
@@ -4440,9 +4441,9 @@ CUtils::ValidateCTEProducerConsumerLocality(
 	{
 		// For any of these physical motions, the outer child's execution needs to be
 		// tracked for depending upon the distribution spec
-		CDrvdPropPlan *pdpplanChild =
+		gpos::Ref<CDrvdPropPlan> pdpplanChild =
 			gpos::dyn_cast<CDrvdPropPlan>((*pexpr)[0]->PdpDerive());
-		CDistributionSpec *pdsChild = pdpplanChild->Pds();
+		gpos::Ref<CDistributionSpec> pdsChild = pdpplanChild->Pds();
 
 		eelt = CUtils::ExecLocalityType(pdsChild);
 	}
@@ -4461,13 +4462,13 @@ CUtils::ValidateCTEProducerConsumerLocality(
 
 // get execution locality type
 CUtils::EExecLocalityType
-CUtils::ExecLocalityType(CDistributionSpec *pds)
+CUtils::ExecLocalityType(gpos::Ref<CDistributionSpec> pds)
 {
 	EExecLocalityType eelt;
 	if (CDistributionSpec::EdtSingleton == pds->Edt() ||
 		CDistributionSpec::EdtStrictSingleton == pds->Edt())
 	{
-		CDistributionSpecSingleton *pdss =
+		gpos::Ref<CDistributionSpecSingleton> pdss =
 			gpos::dyn_cast<CDistributionSpecSingleton>(pds);
 		if (pdss->FOnMaster())
 		{
@@ -4610,7 +4611,7 @@ CUtils::FExprHasAnyCrFromCrs(gpos::Ref<CExpression> pexpr,
 		case COperator::EopScalarIdent:
 		{
 			// Check scalarIdents
-			CScalarIdent *popScalarOp =
+			gpos::Ref<CScalarIdent> popScalarOp =
 				gpos::dyn_cast<CScalarIdent>(pexpr->Pop());
 			colref = (CColRef *) popScalarOp->Pcr();
 			if (pcrs->FMember(colref))
@@ -4737,7 +4738,7 @@ CUtils::IsExprNDVPreserving(gpos::Ref<CExpression> pexpr,
 			case COperator::EopScalarIdent:
 			{
 				// we reached the bottom of the expression, return the ColRef
-				CScalarIdent *cr = gpos::dyn_cast<CScalarIdent>(pop);
+				gpos::Ref<CScalarIdent> cr = gpos::dyn_cast<CScalarIdent>(pop);
 
 				*underlying_colref = cr->Pcr();
 				GPOS_ASSERT(1 == pexpr->DeriveUsedColumns()->Size());
@@ -4783,7 +4784,7 @@ CUtils::IsExprNDVPreserving(gpos::Ref<CExpression> pexpr,
 			case COperator::EopScalarOp:
 			{
 				CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-				CScalarOp *so = gpos::dyn_cast<CScalarOp>(pop);
+				gpos::Ref<CScalarOp> so = gpos::dyn_cast<CScalarOp>(pop);
 				const IMDScalarOp *pmdscop =
 					md_accessor->RetrieveScOp(so->MdIdOp());
 
@@ -4976,7 +4977,8 @@ CUtils::Equals(const CExpressionArrays *exprs_arr,
 }
 
 BOOL
-CUtils::Equals(const IMdIdArray *mdids, const IMdIdArray *other_mdids)
+CUtils::Equals(const gpos::Ref<IMdIdArray> mdids,
+			   const gpos::Ref<IMdIdArray> other_mdids)
 {
 	GPOS_CHECK_STACK_SIZE;
 

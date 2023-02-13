@@ -118,7 +118,7 @@ private:
 		}
 
 		// plan properties
-		CDrvdPropPlan *
+		gpos::Ref<CDrvdPropPlan>
 		Pdpplan() const
 		{
 			return m_pdpplan.get();
@@ -186,7 +186,7 @@ public:
 	ECteType Ect(const ULONG id) const;
 
 	// inserting a new map entry, no entry with the same id can already exist
-	void Insert(ULONG ulCteId, ECteType ect, CDrvdPropPlan *pdpplan);
+	void Insert(ULONG ulCteId, ECteType ect, gpos::Ref<CDrvdPropPlan> pdpplan);
 
 	// hash function
 	ULONG HashValue() const;
@@ -199,7 +199,7 @@ public:
 	}
 
 	// extract plan properties of the only producer in the map, if any
-	CDrvdPropPlan *PdpplanProducer(ULONG *ulpId) const;
+	gpos::Ref<CDrvdPropPlan> PdpplanProducer(ULONG *ulpId) const;
 
 	// check if current  map is a subset of the given one
 	BOOL FSubset(const gpos::Ref<CCTEMap> pcm) const;

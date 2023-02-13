@@ -29,6 +29,7 @@
 #include "gpopt/operators/CPhysicalDynamicScan.h"
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/base/IDatumInt2.h"
 #include "naucrates/base/IDatumInt4.h"
 #include "naucrates/base/IDatumInt8.h"
@@ -81,28 +82,28 @@ CStatisticsUtils::NextPoint(CMemoryPool *mp, CMDAccessor *md_accessor,
 		if (mdtype->GetDatumType() == IMDType::EtiInt2)
 		{
 			SINT sValue =
-				(SINT)(dynamic_cast<IDatumInt2 *>(datum_old)->Value() + 1);
+				(SINT)(gpos::dyn_cast<IDatumInt2>(datum_old)->Value() + 1);
 			datum_new =
 				dynamic_cast<const IMDTypeInt2 *>(mdtype)->CreateInt2Datum(
 					mp, sValue, false);
 		}
 		else if (mdtype->GetDatumType() == IMDType::EtiInt4)
 		{
-			INT iValue = dynamic_cast<IDatumInt4 *>(datum_old)->Value() + 1;
+			INT iValue = gpos::dyn_cast<IDatumInt4>(datum_old)->Value() + 1;
 			datum_new =
 				dynamic_cast<const IMDTypeInt4 *>(mdtype)->CreateInt4Datum(
 					mp, iValue, false);
 		}
 		else if (mdtype->GetDatumType() == IMDType::EtiInt8)
 		{
-			LINT value = dynamic_cast<IDatumInt8 *>(datum_old)->Value() + 1;
+			LINT value = gpos::dyn_cast<IDatumInt8>(datum_old)->Value() + 1;
 			datum_new =
 				dynamic_cast<const IMDTypeInt8 *>(mdtype)->CreateInt8Datum(
 					mp, value, false);
 		}
 		else
 		{
-			OID oidValue = dynamic_cast<IDatumOid *>(datum_old)->OidValue() + 1;
+			OID oidValue = gpos::dyn_cast<IDatumOid>(datum_old)->OidValue() + 1;
 			datum_new =
 				dynamic_cast<const IMDTypeOid *>(mdtype)->CreateOidDatum(
 					mp, oidValue, false);
@@ -1169,7 +1170,7 @@ CStatisticsUtils::DeriveStatsForIndexGet(CMemoryPool *mp,
 	gpos::Ref<CTableDescriptor> table_descriptor = nullptr;
 	if (CLogical::EopLogicalIndexGet == operator_id)
 	{
-		CLogicalIndexGet *index_get_op =
+		gpos::Ref<CLogicalIndexGet> index_get_op =
 			gpos::dyn_cast<CLogicalIndexGet>(expr_handle.Pop());
 		table_descriptor = index_get_op->Ptabdesc();
 		if (nullptr != index_get_op->PcrsDist())
@@ -1179,7 +1180,7 @@ CStatisticsUtils::DeriveStatsForIndexGet(CMemoryPool *mp,
 	}
 	else
 	{
-		CLogicalDynamicIndexGet *dynamic_index_get_op =
+		gpos::Ref<CLogicalDynamicIndexGet> dynamic_index_get_op =
 			gpos::dyn_cast<CLogicalDynamicIndexGet>(expr_handle.Pop());
 		table_descriptor = dynamic_index_get_op->Ptabdesc();
 		if (nullptr != dynamic_index_get_op->PcrsDist())
@@ -1640,7 +1641,7 @@ CStatisticsUtils::AddGrpColStats(
 	CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
 	gpos::Ref<CColRefSet> grp_cols_refset,
 	gpos::Ref<UlongToHistogramMap> output_histograms,
-	UlongToDoubleMap *output_col_widths)
+	gpos::Ref<UlongToDoubleMap> output_col_widths)
 {
 	GPOS_ASSERT(nullptr != input_stats);
 	GPOS_ASSERT(nullptr != grp_cols_refset);
@@ -1843,8 +1844,9 @@ CStatisticsUtils::DefaultColumnWidth(const IMDType *mdtype)
 
 //	add width information
 void
-CStatisticsUtils::AddWidthInfo(CMemoryPool *mp, UlongToDoubleMap *src_width,
-							   UlongToDoubleMap *dest_width)
+CStatisticsUtils::AddWidthInfo(CMemoryPool *mp,
+							   gpos::Ref<UlongToDoubleMap> src_width,
+							   gpos::Ref<UlongToDoubleMap> dest_width)
 {
 	UlongToDoubleMapIter col_width_map_iterator(src_width);
 	while (col_width_map_iterator.Advance())
