@@ -50,7 +50,7 @@ private:
 	// 		a specific context (e.g. inside the main query, inside another CTE, etc.)
 	//
 	//-------------------------------------------------------------------
-	struct SConsumerCounter
+	struct SConsumerCounter : public CRefCount
 	{
 	private:
 		// consumer ID
@@ -90,21 +90,31 @@ private:
 
 	// hash map mapping ULONG -> SConsumerCounter
 	using UlongToConsumerCounterMap =
-		CHashMap<ULONG, SConsumerCounter, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupDelete<SConsumerCounter>>;
+		//CHashMap<ULONG, SConsumerCounter, gpos::HashValue<ULONG>,
+		//		 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//		 CleanupDelete<SConsumerCounter>>;
+		gpos::UnorderedMap<const ULONG *, gpos::Ref<SConsumerCounter>,
+						   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+						   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 	// map iterator
 	using UlongToConsumerCounterMapIter =
-		CHashMapIter<ULONG, SConsumerCounter, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupDelete<SConsumerCounter>>;
+		//CHashMapIter<ULONG, SConsumerCounter, gpos::HashValue<ULONG>,
+		//			 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//			 CleanupDelete<SConsumerCounter>>;
+		gpos::UnorderedMap<
+			const ULONG *, gpos::Ref<SConsumerCounter>,
+			gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+			gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 	// hash map mapping ULONG -> UlongToConsumerCounterMap: maps from CTE producer ID to all consumers inside this CTE
 	using UlongToProducerConsumerMap =
-		CHashMap<ULONG, UlongToConsumerCounterMap, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<UlongToConsumerCounterMap>>;
+		//CHashMap<ULONG, UlongToConsumerCounterMap, gpos::HashValue<ULONG>,
+		//		 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//		 CleanupRelease<UlongToConsumerCounterMap>>;
+		gpos::UnorderedMap<const ULONG *, gpos::Ref<UlongToConsumerCounterMap>,
+						   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+						   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 	//-------------------------------------------------------------------
 	//	@struct:
@@ -172,15 +182,22 @@ private:
 
 	// hash maps mapping ULONG -> CCTEInfoEntry
 	using UlongToCTEInfoEntryMap =
-		CHashMap<ULONG, CCTEInfoEntry, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CCTEInfoEntry>>;
+		//CHashMap<ULONG, CCTEInfoEntry, gpos::HashValue<ULONG>,
+		//		 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//		 CleanupRelease<CCTEInfoEntry>>;
+		gpos::UnorderedMap<const ULONG *, gpos::Ref<CCTEInfoEntry>,
+						   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+						   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 	// map iterator
 	using UlongToCTEInfoEntryMapIter =
-		CHashMapIter<ULONG, CCTEInfoEntry, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupRelease<CCTEInfoEntry>>;
+		//CHashMapIter<ULONG, CCTEInfoEntry, gpos::HashValue<ULONG>,
+		//			 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//			 CleanupRelease<CCTEInfoEntry>>;
+		gpos::UnorderedMap<
+			const ULONG *, gpos::Ref<CCTEInfoEntry>,
+			gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+			gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 	// memory pool
 	CMemoryPool *m_mp;

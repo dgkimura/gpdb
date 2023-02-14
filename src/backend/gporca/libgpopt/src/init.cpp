@@ -18,6 +18,7 @@
 
 #include "gpopt/exception.h"
 #include "gpopt/mdcache/CMDCache.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformFactory.h"
 #include "naucrates/init.h"
 

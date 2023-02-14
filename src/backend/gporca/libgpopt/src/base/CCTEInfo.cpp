@@ -371,7 +371,7 @@ ULONG
 CCTEInfo::UlConsumersInParent(ULONG ulConsumerId, ULONG ulParentId) const
 {
 	// get map of given parent
-	const UlongToConsumerCounterMap *phmulconsumermap =
+	const gpos::Ref<UlongToConsumerCounterMap> phmulconsumermap =
 		m_phmulprodconsmap->Find(&ulParentId);
 	if (nullptr == phmulconsumermap)
 	{
@@ -379,7 +379,7 @@ CCTEInfo::UlConsumersInParent(ULONG ulConsumerId, ULONG ulParentId) const
 	}
 
 	// find counter of given consumer inside this map
-	const SConsumerCounter *pconsumercounter =
+	const gpos::Ref<SConsumerCounter> pconsumercounter =
 		phmulconsumermap->Find(&ulConsumerId);
 	if (nullptr == pconsumercounter)
 	{
@@ -405,7 +405,7 @@ CCTEInfo::UlConsumers(ULONG ulCTEId) const
 	ULONG ulConsumers = UlConsumersInParent(ulCTEId, gpos::ulong_max);
 
 	// find consumers in other CTEs
-	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry.get());
+	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry);
 	while (hmulei.Advance())
 	{
 		const gpos::Ref<CCTEInfoEntry> pcteinfoentry = hmulei.Value();
@@ -461,7 +461,8 @@ CCTEInfo::IncrementConsumers(ULONG ulConsumerId, ULONG ulParentCTEId)
 	}
 
 	// find counter of given consumer inside this map
-	SConsumerCounter *pconsumercounter = phmulconsumermap->Find(&ulConsumerId);
+	gpos::Ref<SConsumerCounter> pconsumercounter =
+		phmulconsumermap->Find(&ulConsumerId);
 	if (nullptr == pconsumercounter)
 	{
 		// no existing counter - start a new one
@@ -491,7 +492,7 @@ CCTEInfo::PcterProducers(CMemoryPool *mp) const
 {
 	gpos::Ref<CCTEReq> pcter = GPOS_NEW(mp) CCTEReq(mp);
 
-	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry.get());
+	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry);
 	while (hmulei.Advance())
 	{
 		const gpos::Ref<CCTEInfoEntry> pcteinfoentry = hmulei.Value();
@@ -515,7 +516,7 @@ gpos::Ref<CExpressionArray>
 CCTEInfo::PdrgPexpr(CMemoryPool *mp) const
 {
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
-	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry.get());
+	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry);
 	while (hmulei.Advance())
 	{
 		gpos::Ref<CExpression> pexpr = hmulei.Value()->Pexpr();
@@ -539,7 +540,7 @@ CCTEInfo::PdrgPexpr(CMemoryPool *mp) const
 void
 CCTEInfo::MapComputedToUsedCols(CColumnFactory *col_factory) const
 {
-	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry.get());
+	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry);
 	while (hmulei.Advance())
 	{
 		gpos::Ref<CExpression> pexprProducer = hmulei.Value()->Pexpr();
@@ -604,7 +605,7 @@ CCTEInfo::FindConsumersInParent(ULONG ulParentId,
 								gpos::Ref<CBitSet> pbsUnusedConsumers,
 								CStack<ULONG> *pstack)
 {
-	UlongToConsumerCounterMap *phmulconsumermap =
+	gpos::Ref<UlongToConsumerCounterMap> phmulconsumermap =
 		m_phmulprodconsmap->Find(&ulParentId);
 	if (nullptr == phmulconsumermap)
 	{
@@ -615,7 +616,7 @@ CCTEInfo::FindConsumersInParent(ULONG ulParentId,
 	UlongToConsumerCounterMapIter hmulci(phmulconsumermap);
 	while (hmulci.Advance())
 	{
-		const SConsumerCounter *pconsumercounter = hmulci.Value();
+		const gpos::Ref<SConsumerCounter> pconsumercounter = hmulci.Value();
 		ULONG ulConsumerId = pconsumercounter->UlCTEId();
 		if (pbsUnusedConsumers->Get(ulConsumerId))
 		{
@@ -639,7 +640,7 @@ CCTEInfo::MarkUnusedCTEs()
 	gpos::Ref<CBitSet> pbsUnusedConsumers = GPOS_NEW(m_mp) CBitSet(m_mp);
 
 	// start with all CTEs
-	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry.get());
+	UlongToCTEInfoEntryMapIter hmulei(m_phmulcteinfoentry);
 	while (hmulei.Advance())
 	{
 		const gpos::Ref<CCTEInfoEntry> pcteinfoentry = hmulei.Value();
@@ -660,11 +661,10 @@ CCTEInfo::MarkUnusedCTEs()
 	}
 
 	// now the only CTEs remaining in the bitset are the unused ones. mark them as such
-	UlongToCTEInfoEntryMapIter hmulei2(m_phmulcteinfoentry.get());
+	UlongToCTEInfoEntryMapIter hmulei2(m_phmulcteinfoentry);
 	while (hmulei2.Advance())
 	{
-		gpos::Ref<CCTEInfoEntry> pcteinfoentry =
-			const_cast<gpos::Ref<CCTEInfoEntry> >(hmulei2.Value());
+		gpos::Ref<CCTEInfoEntry> pcteinfoentry = hmulei2.Value();
 		if (pbsUnusedConsumers->Get(pcteinfoentry->UlCTEId()))
 		{
 			pcteinfoentry->MarkUnused();

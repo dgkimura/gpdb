@@ -269,13 +269,14 @@ extern "C" {
 #endif	// __cplusplus
 
 // set trace flags based on given bit set, and return two output bit sets of old trace flags values
-void SetTraceflags(gpos::CMemoryPool *mp, const gpos::Ref<CBitSet> input_bitset,
+void SetTraceflags(gpos::CMemoryPool *mp,
+				   const gpos::Ref<gpos::CBitSet> input_bitset,
 				   gpos::Ref<gpos::CBitSet> *enable_bitset,
 				   gpos::Ref<gpos::CBitSet> *disabled_bitset);
 
 // restore trace flags values based on given bit sets
-void ResetTraceflags(gpos::Ref<CBitSet> enable_bitset,
-					 gpos::Ref<CBitSet> disabled_bitset);
+void ResetTraceflags(gpos::Ref<gpos::CBitSet> enable_bitset,
+					 gpos::Ref<gpos::CBitSet> disabled_bitset);
 
 #ifdef __cplusplus
 }

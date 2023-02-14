@@ -17,6 +17,7 @@
 #include "gpopt/cost/ICostModel.h"
 #include "gpopt/eval/CConstExprEvaluatorDefault.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
