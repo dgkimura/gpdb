@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CCTEReq.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -175,7 +176,7 @@ CCTEMap::AddUnresolved(const CCTEMap &cmFirst, const CCTEMap &cmSecond,
 //		Lookup info for given cte id
 //
 //---------------------------------------------------------------------------
-CCTEMap::gpos::Ref<CCTEMapEntry>
+gpos::Ref<CCTEMap::CCTEMapEntry>
 CCTEMap::PcmeLookup(ULONG ulCteId) const
 {
 	return m_phmcm->Find(&ulCteId);
@@ -374,8 +375,7 @@ CCTEMap::OsPrint(IOstream &os) const
 	UlongToCTEMapEntryMapIter hmcmi(m_phmcm.get());
 	while (hmcmi.Advance())
 	{
-		gpos::Ref<CCTEMapEntry> pcme =
-			const_cast<gpos::Ref<CCTEMapEntry> >(hmcmi.Value());
+		gpos::Ref<CCTEMapEntry> pcme = hmcmi.Value();
 		pcme->OsPrint(os);
 		os << " ";
 	}

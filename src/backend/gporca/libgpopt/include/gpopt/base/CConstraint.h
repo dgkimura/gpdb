@@ -38,18 +38,16 @@ using ColRefToConstraintArrayMap =
 					   gpos::PtrHash<CColRef, CColRef::HashValue>,
 					   gpos::PtrEqual<CColRef, CColRef::Equals>>;
 
+BOOL CConstraintEquals(const gpos::Ref<CConstraint> lhs,
+					   const gpos::Ref<CConstraint> rhs);
+
 // mapping CConstraint -> BOOL to cache previous containment queries,
 // we use pointer equality here for fast map lookup -- since we do shallow comparison, we do not take ownership
 // of pointer values
-using ConstraintContainmentMap = gpos::UnorderedMap<
-	const gpos::Ref<CConstraint>, BOOL *,
-	gpos::PtrHash<CConstraint, gpos::HashPtr<CConstraint>>,
-	gpos::PtrEqual<CConstraint, gpos::EqualPtr<CConstraint>>>;
-
-// hash map mapping ULONG -> CConstraint
-using UlongToConstraintMap =
-	CHashMap<ULONG, CConstraint, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<CConstraint>>;
+using ConstraintContainmentMap =
+	gpos::UnorderedMap<const gpos::Ref<CConstraint>, BOOL *,
+					   gpos::RefHash<CConstraint, gpos::HashRef<CConstraint>>,
+					   gpos::RefEq<CConstraint, CConstraintEquals>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -272,6 +270,11 @@ operator<<(IOstream &os, const CConstraint &cnstr)
 {
 	return cnstr.OsPrint(os);
 }
+
+// hash map mapping ULONG -> CConstraint
+using UlongToConstraintMap =
+	CHashMap<ULONG, CConstraint, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+			 CleanupDelete<ULONG>, CleanupRelease<CConstraint>>;
 }  // namespace gpopt
 
 #endif	// !GPOPT_CConstraint_H

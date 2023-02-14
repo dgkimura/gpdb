@@ -150,15 +150,22 @@ private:
 
 	// map CTE id to CTE map entry
 	using UlongToCTEMapEntryMap =
-		CHashMap<ULONG, CCTEMapEntry, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CCTEMapEntry>>;
+		//CHashMap<ULONG, CCTEMapEntry, gpos::HashValue<ULONG>,
+		//		 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//		 CleanupRelease<CCTEMapEntry>>;
+		gpos::UnorderedMap<const ULONG *, gpos::Ref<CCTEMapEntry>,
+						   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+						   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 	// map iterator
 	using UlongToCTEMapEntryMapIter =
-		CHashMapIter<ULONG, CCTEMapEntry, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupRelease<CCTEMapEntry>>;
+		//CHashMapIter<ULONG, CCTEMapEntry, gpos::HashValue<ULONG>,
+		//			 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//			 CleanupRelease<CCTEMapEntry>>;
+		gpos::UnorderedMap<
+			const ULONG *, gpos::Ref<CCTEMapEntry>,
+			gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+			gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 	// memory pool
 	CMemoryPool *m_mp;

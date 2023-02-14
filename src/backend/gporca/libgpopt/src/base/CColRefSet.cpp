@@ -17,6 +17,7 @@
 #include "gpopt/base/CAutoOptCtxt.h"
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CColumnFactory.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -44,7 +45,7 @@ CColRefSet::CColRefSet(CMemoryPool *mp, ULONG ulSizeBits)
 //		copy ctor;
 //
 //---------------------------------------------------------------------------
-CColRefSet::CColRefSet(CMemoryPool *mp, const CColRefSet &bs) : CBitSet(mp, bs)
+CColRefSet::CColRefSet(CMemoryPool *mp, CColRefSet &bs) : CBitSet(mp, bs)
 {
 }
 

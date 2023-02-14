@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/COptCtxt.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -219,7 +220,7 @@ CCTEReq::InsertConsumer(ULONG id, CDrvdPropArray *pdrgpdpCtxt)
 //		Lookup info for given cte id
 //
 //---------------------------------------------------------------------------
-CCTEReq::gpos::Ref<CCTEReqEntry>
+gpos::Ref<CCTEReq::CCTEReqEntry>
 CCTEReq::PcreLookup(ULONG ulCteId) const
 {
 	return m_phmcter->Find(&ulCteId);
@@ -499,8 +500,7 @@ CCTEReq::OsPrint(IOstream &os) const
 	UlongToCTEReqEntryMapIter hmcri(m_phmcter.get());
 	while (hmcri.Advance())
 	{
-		gpos::Ref<CCTEReqEntry> pcre =
-			const_cast<gpos::Ref<CCTEReqEntry> >(hmcri.Value());
+		gpos::Ref<CCTEReqEntry> pcre = hmcri.Value();
 		pcre->OsPrint(os);
 	}
 

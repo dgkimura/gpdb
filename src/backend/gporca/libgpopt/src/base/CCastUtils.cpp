@@ -21,6 +21,7 @@
 #include "gpopt/operators/CScalarArrayCoerceExpr.h"
 #include "gpopt/operators/CScalarCast.h"
 #include "gpopt/operators/CScalarIdent.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/CMDArrayCoerceCastGPDB.h"
 #include "naucrates/md/IMDCast.h"
 

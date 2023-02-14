@@ -22,6 +22,7 @@
 #include "gpopt/base/CColRefTable.h"
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CScalarProjectElement.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/CMDIdGPDB.h"
 
 using namespace gpopt;

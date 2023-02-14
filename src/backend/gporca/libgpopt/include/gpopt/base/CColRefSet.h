@@ -70,7 +70,7 @@ public:
 	explicit CColRefSet(CMemoryPool *mp,
 						ULONG ulSizeBits = GPOPT_COLREFSET_SIZE);
 
-	explicit CColRefSet(CMemoryPool *mp, const CColRefSet &);
+	explicit CColRefSet(CMemoryPool *mp, CColRefSet &);
 
 	// ctor, copy from col refs array
 	CColRefSet(CMemoryPool *mp, const CColRefArray *colref_array,

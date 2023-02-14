@@ -16,6 +16,7 @@
 
 #include "gpopt/base/CAutoOptCtxt.h"
 #include "gpopt/base/CColumnFactory.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 

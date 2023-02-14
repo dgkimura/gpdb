@@ -14,6 +14,8 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/search/CGroupExpression.h"
+
 #ifdef GPOS_DEBUG
 #include "gpos/error/CAutoTrace.h"
 

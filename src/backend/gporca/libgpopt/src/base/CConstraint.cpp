@@ -32,6 +32,7 @@
 #include "gpopt/operators/CScalarCmp.h"
 #include "gpopt/operators/CScalarIdent.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/IMDScalarOp.h"
 #include "naucrates/md/IMDType.h"
 
@@ -44,6 +45,13 @@ BOOL CConstraint::m_fTrue(true);
 
 // initialize constant false
 BOOL CConstraint::m_fFalse(false);
+
+BOOL
+CConstraintEquals(const gpos::Ref<CConstraint> lhs,
+				  const gpos::Ref<CConstraint> rhs)
+{
+	return lhs->Equals(rhs) && rhs->Equals(lhs);
+}
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -409,7 +417,7 @@ CConstraint::PcnstrFromScalarCmp(
 		(CUtils::FScalarIdent(pexprRight) ||
 		 CCastUtils::FBinaryCoercibleCastedScId(pexprRight)))
 	{
-		gpos::Ref<CScalarIdent> popScIdLeft, *popScIdRight;
+		gpos::Ref<CScalarIdent> popScIdLeft, popScIdRight;
 		if (CUtils::FScalarIdent(pexprLeft))
 		{
 			// col1 = ...
@@ -568,8 +576,8 @@ CConstraint::PcnstrFromScalarBoolOp(
 		GPOS_ASSERT(nullptr != pdrgpcrsChild);
 
 		pdrgpcnstr->Append(pcnstrChild);
-		gpos::Ref<CColRefSetArray> pdrgpcrsMerged =
-			PdrgpcrsMergeFromBoolOp(mp, pexpr, *ppdrgpcrs, pdrgpcrsChild.get());
+		gpos::Ref<CColRefSetArray> pdrgpcrsMerged = PdrgpcrsMergeFromBoolOp(
+			mp, pexpr, (*ppdrgpcrs).get(), pdrgpcrsChild.get());
 
 		;
 		*ppdrgpcrs = pdrgpcrsMerged;
@@ -741,14 +749,14 @@ CConstraint::PdrgpcnstrFlatten(CMemoryPool *mp,
 
 		if (EctConjunction == ectChild && EctConjunction == ect)
 		{
-			CConstraintConjunction *pcconj =
-				gpos::cast<CConstraintConjunction>(pcnstrChild);
+			gpos::Ref<CConstraintConjunction> pcconj =
+				gpos::dyn_cast<CConstraintConjunction>(pcnstrChild);
 			CUtils::AddRefAppend(pdrgpcnstrNew.get(), pcconj->Pdrgpcnstr());
 		}
 		else if (EctDisjunction == ectChild && EctDisjunction == ect)
 		{
-			CConstraintDisjunction *pcdisj =
-				gpos::cast<CConstraintDisjunction>(pcnstrChild);
+			gpos::Ref<CConstraintDisjunction> pcdisj =
+				gpos::dyn_cast<CConstraintDisjunction>(pcnstrChild);
 			CUtils::AddRefAppend(pdrgpcnstrNew.get(), pcdisj->Pdrgpcnstr());
 		}
 		else
@@ -781,7 +789,7 @@ CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
 		GPOS_NEW(mp) CConstraintArray(mp);
 
 	gpos::Ref<CColRefSet> pcrsDeduped(GPOS_NEW(mp) CColRefSet(mp));
-	CAutoRef<IColConstraintsMapper> arccm;
+	gpos::Ref<IColConstraintsMapper> arccm;
 
 	const ULONG length = pdrgpcnstr->Size();
 

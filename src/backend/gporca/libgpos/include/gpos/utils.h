@@ -63,6 +63,12 @@ HashPtr(const T *pt)
 {
 	return HashByteArray((BYTE *) &pt, GPOS_SIZEOF(void *));
 }
+template <class T>
+inline ULONG
+HashRef(const gpos::Ref<T> pt)
+{
+	return HashByteArray((BYTE *) pt.get(), GPOS_SIZEOF(void *));
+}
 
 // equality function on pointers
 template <class T>
