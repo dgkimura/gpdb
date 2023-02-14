@@ -632,7 +632,8 @@ CStatisticsTest::Pdrgpstatspred2(CMemoryPool *mp)
 // create a stats filter on integer range
 void
 CStatisticsTest::StatsFilterInt4(CMemoryPool *mp, ULONG colid, INT iLower,
-								 INT iUpper, CStatsPredPtrArry *pdrgpstatspred)
+								 INT iUpper,
+								 gpos::Ref<CStatsPredPtrArry> pdrgpstatspred)
 {
 	gpos::Ref<CStatsPredPoint> pstatspred1 = GPOS_NEW(mp) CStatsPredPoint(
 		colid, CStatsPred::EstatscmptGEq, CTestUtils::PpointInt4(mp, iLower));
@@ -647,7 +648,7 @@ CStatisticsTest::StatsFilterInt4(CMemoryPool *mp, ULONG colid, INT iLower,
 // create a stats filter on boolean
 void
 CStatisticsTest::StatsFilterBool(CMemoryPool *mp, ULONG colid, BOOL fValue,
-								 CStatsPredPtrArry *pdrgpstatspred)
+								 gpos::Ref<CStatsPredPtrArry> pdrgpstatspred)
 {
 	gpos::Ref<CStatsPredPoint> pstatspred1 = GPOS_NEW(mp) CStatsPredPoint(
 		colid, CStatsPred::EstatscmptEq, CTestUtils::PpointBool(mp, fValue));
@@ -661,7 +662,7 @@ CStatisticsTest::StatsFilterNumeric(CMemoryPool *mp, ULONG colid,
 									CWStringDynamic *pstrLowerEncoded,
 									CWStringDynamic *pstrUpperEncoded,
 									CDouble dValLower, CDouble dValUpper,
-									CStatsPredPtrArry *pdrgpstatspred)
+									gpos::Ref<CStatsPredPtrArry> pdrgpstatspred)
 {
 	gpos::Ref<CStatsPredPoint> pstatspred1 = GPOS_NEW(mp) CStatsPredPoint(
 		colid, CStatsPred::EstatscmptGEq,
@@ -681,7 +682,7 @@ CStatisticsTest::StatsFilterGeneric(CMemoryPool *mp, ULONG colid, OID oid,
 									CWStringDynamic *pstrLowerEncoded,
 									CWStringDynamic *pstrUpperEncoded,
 									LINT lValueLower, LINT lValueUpper,
-									CStatsPredPtrArry *pdrgpstatspred)
+									gpos::Ref<CStatsPredPtrArry> pdrgpstatspred)
 {
 	gpos::Ref<CStatsPredPoint> pstatspred1 = GPOS_NEW(mp)
 		CStatsPredPoint(colid, CStatsPred::EstatscmptGEq,

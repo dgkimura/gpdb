@@ -636,7 +636,7 @@ CStatisticsUtils::ExtractUsedColIds(CMemoryPool *mp,
 	GPOS_ASSERT(CStatsPred::EsptConj == pred_stats->GetPredStatsType() ||
 				CStatsPred::EsptDisj == pred_stats->GetPredStatsType());
 
-	CStatsPredPtrArry *stats_pred_array = nullptr;
+	gpos::Ref<CStatsPredPtrArry> stats_pred_array = nullptr;
 	if (CStatsPred::EsptConj == pred_stats->GetPredStatsType())
 	{
 		stats_pred_array =
@@ -977,7 +977,7 @@ CStatisticsUtils::CopyHistHashMap(
 //
 //---------------------------------------------------------------------------
 ULONG
-CStatisticsUtils::GetColId(const CStatsPredPtrArry *pred_stats_array)
+CStatisticsUtils::GetColId(const gpos::Ref<CStatsPredPtrArry> pred_stats_array)
 {
 	GPOS_ASSERT(nullptr != pred_stats_array);
 

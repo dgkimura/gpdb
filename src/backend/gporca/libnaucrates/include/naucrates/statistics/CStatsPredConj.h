@@ -58,7 +58,7 @@ public:
 		return m_conj_pred_stats_array->Size();
 	}
 
-	CStatsPredPtrArry *
+	gpos::Ref<CStatsPredPtrArry>
 	GetConjPredStatsArray() const
 	{
 		return m_conj_pred_stats_array.get();

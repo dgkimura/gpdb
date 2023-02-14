@@ -61,7 +61,7 @@ public:
 	}
 
 	// return the array of predicate filters
-	CStatsPredPtrArry *
+	gpos::Ref<CStatsPredPtrArry>
 	GetDisjPredStatsArray() const
 	{
 		return m_disj_pred_stats_array.get();
@@ -81,7 +81,7 @@ public:
 	}
 
 	// return the column id of the filter based on the column ids of its child filters
-	static ULONG GetColId(const CStatsPredPtrArry *pdrgpstatspred);
+	static ULONG GetColId(const gpos::Ref<CStatsPredPtrArry> pdrgpstatspred);
 
 	// conversion function
 	static gpos::Ref<CStatsPredDisj>

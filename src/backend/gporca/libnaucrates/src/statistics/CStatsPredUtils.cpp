@@ -719,10 +719,9 @@ CStatsPredUtils::CreateStatsPredDisj(CMemoryPool *mp,
 //		Add supported filter for statistics computation
 //---------------------------------------------------------------------------
 void
-CStatsPredUtils::AddSupportedStatsFilters(CMemoryPool *mp,
-										  CStatsPredPtrArry *pred_stats_array,
-										  gpos::Ref<CExpression> predicate_expr,
-										  gpos::Ref<CColRefSet> outer_refs)
+CStatsPredUtils::AddSupportedStatsFilters(
+	CMemoryPool *mp, gpos::Ref<CStatsPredPtrArry> pred_stats_array,
+	gpos::Ref<CExpression> predicate_expr, gpos::Ref<CColRefSet> outer_refs)
 {
 	GPOS_ASSERT(nullptr != predicate_expr);
 	GPOS_ASSERT(nullptr != pred_stats_array);
@@ -1068,7 +1067,7 @@ CStatsPredUtils::GetStatsPredLike(CMemoryPool *mp,
 void
 CStatsPredUtils::ProcessArrayCmp(CMemoryPool *mp,
 								 gpos::Ref<CExpression> predicate_expr,
-								 CStatsPredPtrArry *result_pred_stats)
+								 gpos::Ref<CStatsPredPtrArry> result_pred_stats)
 {
 	GPOS_ASSERT(nullptr != result_pred_stats);
 	GPOS_ASSERT(nullptr != predicate_expr);

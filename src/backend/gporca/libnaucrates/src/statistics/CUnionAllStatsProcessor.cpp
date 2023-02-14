@@ -78,7 +78,6 @@ CUnionAllStatsProcessor::CreateStatsForUnionAll(
 						stats_second_child->Rows());
 				CStatisticsUtils::AddHistogram(
 					mp, output_colid, output_histogram, histograms_new.get());
-				GPOS_DELETE(output_histogram);
 			}
 			else
 			{

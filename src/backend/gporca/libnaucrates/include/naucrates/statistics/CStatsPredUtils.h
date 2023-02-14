@@ -62,13 +62,13 @@ private:
 	// extract statistics filtering information from a scalar array compare operator
 	static void ProcessArrayCmp(CMemoryPool *mp,
 								gpos::Ref<CExpression> predicate_expr,
-								CStatsPredPtrArry *pdrgpstatspred);
+								gpos::Ref<CStatsPredPtrArry> pdrgpstatspred);
 
 	// create and add statistics filtering information for supported filters
-	static void AddSupportedStatsFilters(CMemoryPool *mp,
-										 CStatsPredPtrArry *pdrgpstatspred,
-										 gpos::Ref<CExpression> predicate_expr,
-										 gpos::Ref<CColRefSet> outer_refs);
+	static void AddSupportedStatsFilters(
+		CMemoryPool *mp, gpos::Ref<CStatsPredPtrArry> pdrgpstatspred,
+		gpos::Ref<CExpression> predicate_expr,
+		gpos::Ref<CColRefSet> outer_refs);
 
 	// create a conjunctive statistics filter composed of the extracted components of the conjunction
 	static gpos::Ref<CStatsPred> CreateStatsPredConj(

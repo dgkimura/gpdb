@@ -14,11 +14,8 @@ class CStatsPred;
 
 struct StatsPredColIdLess
 {
-	bool operator()(const gpnaucrates::gpos::Ref<CStatsPred> a,
-					const gpnaucrates::gpos::Ref<CStatsPred> b) const;
-
-	bool operator()(const gpos::Ref<gpnaucrates::CStatsPred> &a,
-					const gpos::Ref<gpnaucrates::CStatsPred> &b) const;
+	bool operator()(const gpos::Ref<gpnaucrates::CStatsPred> a,
+					const gpos::Ref<gpnaucrates::CStatsPred> b) const;
 };
 }  // namespace gpnaucrates
 

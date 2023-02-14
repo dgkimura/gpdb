@@ -203,7 +203,7 @@ public:
 
 	// return the column identifier of the filter if the predicate is
 	// on a single column else	return gpos::ulong_max
-	static ULONG GetColId(const CStatsPredPtrArry *stats_preds_array);
+	static ULONG GetColId(const gpos::Ref<CStatsPredPtrArry> stats_preds_array);
 
 	// add remaining buckets from one array of buckets to the other
 	static void AddRemainingBuckets(CMemoryPool *mp,

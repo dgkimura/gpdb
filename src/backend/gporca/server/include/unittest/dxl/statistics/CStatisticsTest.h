@@ -55,25 +55,26 @@ private:
 
 	// create filter on int4 types
 	static void StatsFilterInt4(CMemoryPool *mp, ULONG colid, INT iLower,
-								INT iUpper, CStatsPredPtrArry *pgrgpstatspred);
+								INT iUpper,
+								gpos::Ref<CStatsPredPtrArry> pgrgpstatspred);
 
 	// create filter on boolean types
 	static void StatsFilterBool(CMemoryPool *mp, ULONG colid, BOOL fValue,
-								CStatsPredPtrArry *pgrgpstatspred);
+								gpos::Ref<CStatsPredPtrArry> pgrgpstatspred);
 
 	// create filter on numeric types
 	static void StatsFilterNumeric(CMemoryPool *mp, ULONG colid,
 								   CWStringDynamic *pstrLowerEncoded,
 								   CWStringDynamic *pstrUpperEncoded,
 								   CDouble dValLower, CDouble dValUpper,
-								   CStatsPredPtrArry *pdrgpstatspred);
+								   gpos::Ref<CStatsPredPtrArry> pdrgpstatspred);
 
 	// create filter on generic types
 	static void StatsFilterGeneric(CMemoryPool *mp, ULONG colid, OID oid,
 								   CWStringDynamic *pstrLowerEncoded,
 								   CWStringDynamic *pstrUpperEncoded,
 								   LINT lValLower, LINT lValUpper,
-								   CStatsPredPtrArry *pgrgpstatspred);
+								   gpos::Ref<CStatsPredPtrArry> pgrgpstatspred);
 
 	static gpos::Ref<CHistogram> PhistExampleInt4Dim(CMemoryPool *mp);
 

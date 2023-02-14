@@ -13,16 +13,9 @@
 namespace gpnaucrates
 {
 bool
-PointLess::operator()(const gpnaucrates::gpos::Ref<CPoint> a,
-					  const gpnaucrates::gpos::Ref<CPoint> b) const
+PointLess::operator()(const gpos::Ref<gpnaucrates::CPoint> a,
+					  const gpos::Ref<gpnaucrates::CPoint> b) const
 {
 	return a->IsLessThan(b);
-}
-
-bool
-PointLess::operator()(const gpos::Ref<gpnaucrates::CPoint> &a,
-					  const gpos::Ref<gpnaucrates::CPoint> &b) const
-{
-	return operator()(a.get(), b.get());
 }
 }  // namespace gpnaucrates
