@@ -17,6 +17,7 @@
 #include "gpopt/base/CConstraintInterval.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -86,7 +87,7 @@ CConstraintConjunction::FContradiction() const
 BOOL
 CConstraintConjunction::FConstraint(const CColRef *colref) const
 {
-	CConstraintArray *pdrgpcnstrCol = m_phmcolconstr->Find(colref);
+	gpos::Ref<CConstraintArray> pdrgpcnstrCol = m_phmcolconstr->Find(colref);
 	return (nullptr != pdrgpcnstrCol && 0 < pdrgpcnstrCol->Size());
 }
 
@@ -130,7 +131,7 @@ gpos::Ref<CConstraint>
 CConstraintConjunction::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 {
 	// all children referencing given column
-	CConstraintArray *pdrgpcnstrCol = m_phmcolconstr->Find(colref);
+	gpos::Ref<CConstraintArray> pdrgpcnstrCol = m_phmcolconstr->Find(colref);
 	if (nullptr == pdrgpcnstrCol)
 	{
 		return nullptr;

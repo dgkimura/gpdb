@@ -667,7 +667,7 @@ CConstraint::PdrgpcrsMergeFromBoolOp(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraintArray>
 CConstraint::PdrgpcnstrOnColumn(
-	CMemoryPool *mp, CConstraintArray *pdrgpcnstr, CColRef *colref,
+	CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr, CColRef *colref,
 	BOOL fExclusive	 // returned constraints must reference ONLY the given col
 )
 {
@@ -702,7 +702,8 @@ CConstraint::PdrgpcnstrOnColumn(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CConstraint::PexprScalarConjDisj(CMemoryPool *mp, CConstraintArray *pdrgpcnstr,
+CConstraint::PexprScalarConjDisj(CMemoryPool *mp,
+								 gpos::Ref<CConstraintArray> pdrgpcnstr,
 								 BOOL fConj)
 {
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
@@ -751,13 +752,15 @@ CConstraint::PdrgpcnstrFlatten(CMemoryPool *mp,
 		{
 			gpos::Ref<CConstraintConjunction> pcconj =
 				gpos::dyn_cast<CConstraintConjunction>(pcnstrChild);
-			CUtils::AddRefAppend(pdrgpcnstrNew.get(), pcconj->Pdrgpcnstr());
+			CUtils::AddRefAppend(pdrgpcnstrNew.get(),
+								 pcconj->Pdrgpcnstr().get());
 		}
 		else if (EctDisjunction == ectChild && EctDisjunction == ect)
 		{
 			gpos::Ref<CConstraintDisjunction> pcdisj =
 				gpos::dyn_cast<CConstraintDisjunction>(pcnstrChild);
-			CUtils::AddRefAppend(pdrgpcnstrNew.get(), pcdisj->Pdrgpcnstr());
+			CUtils::AddRefAppend(pdrgpcnstrNew.get(),
+								 pcdisj->Pdrgpcnstr().get());
 		}
 		else
 		{
@@ -889,7 +892,7 @@ CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<ColRefToConstraintArrayMap>
 CConstraint::Phmcolconstr(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
-						  CConstraintArray *pdrgpcnstr)
+						  gpos::Ref<CConstraintArray> pdrgpcnstr)
 {
 	gpos::Ref<ColRefToConstraintArrayMap> phmcolconstr =
 		GPOS_NEW(mp) ColRefToConstraintArrayMap(mp);
@@ -918,9 +921,9 @@ CConstraint::Phmcolconstr(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraint>
-CConstraint::PcnstrConjDisjRemapForColumn(CMemoryPool *mp, CColRef *colref,
-										  CConstraintArray *pdrgpcnstr,
-										  BOOL fConj)
+CConstraint::PcnstrConjDisjRemapForColumn(
+	CMemoryPool *mp, CColRef *colref, gpos::Ref<CConstraintArray> pdrgpcnstr,
+	BOOL fConj)
 {
 	GPOS_ASSERT(nullptr != colref);
 
@@ -1048,8 +1051,8 @@ CConstraint::Equals(gpos::Ref<CConstraint> pcnstr)
 //
 //---------------------------------------------------------------------------
 IOstream &
-CConstraint::PrintConjunctionDisjunction(IOstream &os,
-										 CConstraintArray *pdrgpcnstr) const
+CConstraint::PrintConjunctionDisjunction(
+	IOstream &os, gpos::Ref<CConstraintArray> pdrgpcnstr) const
 {
 	EConstraintType ect = Ect();
 	GPOS_ASSERT(EctConjunction == ect || EctDisjunction == ect);
@@ -1076,7 +1079,8 @@ CConstraint::PrintConjunctionDisjunction(IOstream &os,
 }
 
 gpos::Ref<CColRefSet>
-CConstraint::PcrsFromConstraints(CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
+CConstraint::PcrsFromConstraints(CMemoryPool *mp,
+								 gpos::Ref<CConstraintArray> pdrgpcnstr)
 {
 	gpos::Ref<CColRefSet> crs = GPOS_NEW(mp) CColRefSet(mp);
 

@@ -57,7 +57,7 @@ public:
 	}
 
 	// all constraints in disjunction
-	CConstraintArray *
+	gpos::Ref<CConstraintArray>
 	Pdrgpcnstr() const
 	{
 		return m_pdrgpcnstr.get();

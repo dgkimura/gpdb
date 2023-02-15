@@ -563,6 +563,10 @@ public:
 							 ULONG ulStart = 0);
 
 	template <class T>
+	static void AddRefAppend(Vector<Ref<T>> output, const Vector<Ref<T>> input,
+							 ULONG start = 0);
+
+	template <class T>
 	static void AddRefAppend(Vector<Ref<T>> *output,
 							 const Vector<Ref<T>> *input, ULONG start = 0);
 
@@ -1259,12 +1263,23 @@ CUtils::AddRefAppend(CDynamicPtrArray<T, CleanupFn> *pdrgptOutput,
 
 template <class T>
 void
-CUtils::AddRefAppend(Vector<Ref<T>> *output, const Vector<Ref<T>> *input,
+CUtils::AddRefAppend(Vector<Ref<T>> output, const Vector<Ref<T>> input,
 					 ULONG start)
 {
 	for (const auto &t : gpos::subrange(*input).next(start))
 	{
 		output->Append(t);
+	}
+}
+
+template <class T>
+void
+CUtils::AddRefAppend(Vector<Ref<T>> *output, const Vector<Ref<T>> *input,
+					 ULONG start)
+{
+	for (ULONG ul = start; ul < input->Size(); ul++)
+	{
+		output->Append((*input)[ul]);
 	}
 }
 

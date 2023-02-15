@@ -18,7 +18,8 @@ CColConstraintsHashMapper::PdrgPcnstrLookup(CColRef *colref)
 
 // mapping between columns and single column constraints in array of constraints
 static gpos::Ref<ColRefToConstraintArrayMap>
-PhmcolconstrSingleColConstr(CMemoryPool *mp, const CConstraintArray *drgPcnstr)
+PhmcolconstrSingleColConstr(CMemoryPool *mp,
+							const gpos::Ref<CConstraintArray> drgPcnstr)
 {
 	gpos::Ref<ColRefToConstraintArrayMap> phmcolconstr =
 		GPOS_NEW(mp) ColRefToConstraintArrayMap(mp);
@@ -48,7 +49,7 @@ PhmcolconstrSingleColConstr(CMemoryPool *mp, const CConstraintArray *drgPcnstr)
 }
 
 CColConstraintsHashMapper::CColConstraintsHashMapper(
-	CMemoryPool *mp, CConstraintArray *pdrgpcnstr)
+	CMemoryPool *mp, gpos::Ref<CConstraintArray> pdrgpcnstr)
 	: m_phmColConstr(PhmcolconstrSingleColConstr(mp, pdrgpcnstr))
 {
 }

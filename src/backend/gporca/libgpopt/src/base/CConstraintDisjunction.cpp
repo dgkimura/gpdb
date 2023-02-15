@@ -86,7 +86,7 @@ CConstraintDisjunction::FContradiction() const
 BOOL
 CConstraintDisjunction::FConstraint(const CColRef *colref) const
 {
-	CConstraintArray *pdrgpcnstrCol = m_phmcolconstr->Find(colref);
+	gpos::Ref<CConstraintArray> pdrgpcnstrCol = m_phmcolconstr->Find(colref);
 	return (nullptr != pdrgpcnstrCol &&
 			m_pdrgpcnstr->Size() == pdrgpcnstrCol->Size());
 }
@@ -128,7 +128,7 @@ gpos::Ref<CConstraint>
 CConstraintDisjunction::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 {
 	// all children referencing given column
-	CConstraintArray *pdrgpcnstrCol = m_phmcolconstr->Find(colref);
+	gpos::Ref<CConstraintArray> pdrgpcnstrCol = m_phmcolconstr->Find(colref);
 	if (nullptr == pdrgpcnstrCol)
 	{
 		return nullptr;

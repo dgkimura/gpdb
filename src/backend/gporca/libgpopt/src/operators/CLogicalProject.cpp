@@ -153,8 +153,8 @@ CLogicalProject::PdrgpcrsEquivClassFromScIdent(
 void
 CLogicalProject::ExtractConstraintFromScConst(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexprPrEl,
-	CConstraintArray *pdrgpcnstr,  // array of range constraints
-	CColRefSetArray *pdrgpcrs	   // array of equivalence class
+	gpos::Ref<CConstraintArray> pdrgpcnstr,	 // array of range constraints
+	CColRefSetArray *pdrgpcrs				 // array of equivalence class
 )
 {
 	GPOS_ASSERT(nullptr != pexprPrEl);

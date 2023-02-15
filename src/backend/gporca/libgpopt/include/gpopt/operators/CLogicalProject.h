@@ -37,10 +37,9 @@ private:
 		gpos::Ref<CColRefSet> not_null_columns);
 
 	// extract constraint from scalar constant project element
-	static void ExtractConstraintFromScConst(CMemoryPool *mp,
-											 gpos::Ref<CExpression> pexprPrEl,
-											 CConstraintArray *pdrgpcnstr,
-											 CColRefSetArray *pdrgpcrs);
+	static void ExtractConstraintFromScConst(
+		CMemoryPool *mp, gpos::Ref<CExpression> pexprPrEl,
+		gpos::Ref<CConstraintArray> pdrgpcnstr, CColRefSetArray *pdrgpcrs);
 
 public:
 	CLogicalProject(const CLogicalProject &) = delete;
