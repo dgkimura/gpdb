@@ -42,7 +42,7 @@ using CCostContextArray = gpos::Vector<gpos::Ref<CCostContext>>;
 using COSTCTXT_PTR = gpos::Ref<CCostContext>;
 
 // cost context pointer definition
-using CONST_COSTCTXT_PTR = const gpos::Ref<CCostContext>;
+using CONST_COSTCTXT_PTR = gpos::Ref<CCostContext>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -110,7 +110,7 @@ private:
 	// if tie-resolution succeeded, store a pointer to preferred cost context in output argument
 	static void BreakCostTiesForJoinPlans(const gpos::Ref<CCostContext> pccFst,
 										  const gpos::Ref<CCostContext> pccSnd,
-										  CONST_COSTCTXT_PTR *ppccPrefered,
+										  CONST_COSTCTXT_PTR &ppccPrefered,
 										  BOOL *pfTiesResolved);
 
 public:
@@ -255,7 +255,7 @@ public:
 	CCost CostCompute(CMemoryPool *mp, CCostArray *pdrgpcostChildren);
 
 	// is current context better than the given equivalent context based on cost?
-	BOOL FBetterThan(const gpos::Ref<CCostContext> pcc) const;
+	BOOL FBetterThan(const gpos::Ref<CCostContext> pcc);
 
 	// is this cost context of a two stage scalar DQA created by CXformSplitDQA
 	static BOOL IsTwoStageScalarDQACostCtxt(const gpos::Ref<CCostContext> pcc);

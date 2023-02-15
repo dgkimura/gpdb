@@ -207,7 +207,7 @@ CBinding::PexprExtract(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
 BOOL
 CBinding::FInitChildCursors(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
 							gpos::Ref<CExpression> pexprPattern,
-							CExpressionArray *pdrgpexpr)
+							gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	GPOS_ASSERT(nullptr != pexprPattern);
 	GPOS_ASSERT(nullptr != pdrgpexpr);
@@ -250,7 +250,7 @@ CBinding::FAdvanceChildCursors(CMemoryPool *mp,
 							   gpos::Ref<CGroupExpression> pgexpr,
 							   gpos::Ref<CExpression> pexprPattern,
 							   gpos::Ref<CExpression> pexprLast,
-							   CExpressionArray *pdrgpexpr)
+							   gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	GPOS_ASSERT(nullptr != pexprPattern);
 	GPOS_ASSERT(nullptr != pdrgpexpr);
@@ -328,7 +328,7 @@ BOOL
 CBinding::FExtractChildren(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
 						   gpos::Ref<CExpression> pexprPattern,
 						   gpos::Ref<CExpression> pexprLast,
-						   CExpressionArray *pdrgpexpr)
+						   gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_CHECK_ABORT;

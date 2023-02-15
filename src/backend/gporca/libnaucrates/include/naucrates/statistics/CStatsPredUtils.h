@@ -141,7 +141,7 @@ private:
 		CColRefSetArray *
 			join_output_col_refset,	 // array of output columns of join's relational inputs
 		gpos::Ref<CColRefSet> outer_refs, BOOL is_semi_or_anti_join,
-		CExpressionArray *unsupported_predicates_expr);
+		gpos::Ref<CExpressionArray> unsupported_predicates_expr);
 
 	// Is the expression a comparison of scalar idents (or casted scalar idents),
 	// or of other supported expressions? If so, extract relevant info.

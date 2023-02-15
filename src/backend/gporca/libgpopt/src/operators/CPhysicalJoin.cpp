@@ -340,7 +340,7 @@ CPhysicalJoin::PedInnerHashedFromOuterHashed(
 			GPOS_NEW(mp) CExpressionArray(mp);
 		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(pdsOuter);
-		CExpressionArray *pdrgpexprHashed = pdshashed->Pdrgpexpr();
+		gpos::Ref<CExpressionArray> pdrgpexprHashed = pdshashed->Pdrgpexpr();
 		const ULONG ulSize = pdrgpexprHashed->Size();
 
 		BOOL fSuccess = true;
@@ -438,7 +438,7 @@ CPhysicalJoin::PdsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl) const
 		// Note that, since this is done at the lowest join, no relevant equivalent specs are lost.
 		if (!pdsHashed->HasCompleteEquivSpec(mp))
 		{
-			CExpressionArray *pdrgpexpr = pdsHashed->Pdrgpexpr();
+			gpos::Ref<CExpressionArray> pdrgpexpr = pdsHashed->Pdrgpexpr();
 			gpos::Ref<IMdIdArray> opfamilies = pdsHashed->Opfamilies();
 
 			if (nullptr != opfamilies)

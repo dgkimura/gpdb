@@ -98,7 +98,7 @@ CPhysicalHashJoin::CreateHashRedistributeRequests(CMemoryPool *mp)
 	GPOS_ASSERT(nullptr != m_pdrgpexprOuterKeys);
 	GPOS_ASSERT(nullptr != m_pdrgpexprInnerKeys);
 
-	CExpressionArray *pdrgpexpr = nullptr;
+	gpos::Ref<CExpressionArray> pdrgpexpr = nullptr;
 	if (EceoRightToLeft == Eceo())
 	{
 		pdrgpexpr = m_pdrgpexprInnerKeys;
@@ -311,21 +311,22 @@ CPhysicalHashJoin::PdshashedMatching(
 {
 	GPOS_ASSERT(2 > ulSourceChild);
 
-	CExpressionArray *pdrgpexprSource = m_pdrgpexprOuterKeys;
-	CExpressionArray *pdrgpexprTarget = m_pdrgpexprInnerKeys;
+	gpos::Ref<CExpressionArray> pdrgpexprSource = m_pdrgpexprOuterKeys;
+	gpos::Ref<CExpressionArray> pdrgpexprTarget = m_pdrgpexprInnerKeys;
 	if (1 == ulSourceChild)
 	{
 		pdrgpexprSource = m_pdrgpexprInnerKeys;
 		pdrgpexprTarget = m_pdrgpexprOuterKeys;
 	}
 
-	const CExpressionArray *pdrgpexprDist = pdshashed->Pdrgpexpr();
+	const gpos::Ref<CExpressionArray> pdrgpexprDist = pdshashed->Pdrgpexpr();
 	const ULONG ulDlvrdSize = pdrgpexprDist->Size();
 	const ULONG ulSourceSize = pdrgpexprSource->Size();
 
 	// construct an array of target key expressions matching source key expressions
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
-	CExpressionArrays *all_equiv_exprs = pdshashed->HashSpecEquivExprs();
+	gpos::Ref<CExpressionArrays> all_equiv_exprs =
+		pdshashed->HashSpecEquivExprs();
 	gpos::Ref<IMdIdArray> opfamilies = nullptr;
 
 	if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
@@ -336,7 +337,7 @@ CPhysicalHashJoin::PdshashedMatching(
 	for (ULONG ulDlvrdIdx = 0; ulDlvrdIdx < ulDlvrdSize; ulDlvrdIdx++)
 	{
 		gpos::Ref<CExpression> pexprDlvrd = (*pdrgpexprDist)[ulDlvrdIdx].get();
-		CExpressionArray *equiv_distribution_exprs = nullptr;
+		gpos::Ref<CExpressionArray> equiv_distribution_exprs = nullptr;
 		if (nullptr != all_equiv_exprs && all_equiv_exprs->Size() > 0)
 		{
 			equiv_distribution_exprs = (*all_equiv_exprs)[ulDlvrdIdx];
@@ -553,7 +554,8 @@ CPhysicalHashJoin::PdshashedPassThru(
 	// since incoming request is hashed, we attempt here to propagate this request to outer child
 	gpos::Ref<CColRefSet> pcrsOuterOutput =
 		exprhdl.DeriveOutputColumns(0 /*child_index*/);
-	CExpressionArray *pdrgpexprIncomingRequest = pdshashedInput->Pdrgpexpr();
+	gpos::Ref<CExpressionArray> pdrgpexprIncomingRequest =
+		pdshashedInput->Pdrgpexpr();
 	gpos::Ref<CColRefSet> pcrsAllUsed =
 		CUtils::PcrsExtractColumns(mp, pdrgpexprIncomingRequest);
 	BOOL fSubset = pcrsOuterOutput->ContainsAll(pcrsAllUsed.get());

@@ -205,7 +205,7 @@ public:
 		return m_has_replicated_tables;
 	}
 
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	GetDirectDispatchableFilters() const
 	{
 		return m_direct_dispatchable_filters.get();

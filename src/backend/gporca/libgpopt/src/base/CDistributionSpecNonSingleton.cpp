@@ -78,15 +78,15 @@ CDistributionSpecNonSingleton::FSatisfies(
 //
 //---------------------------------------------------------------------------
 void
-CDistributionSpecNonSingleton::AppendEnforcers(CMemoryPool *mp,
-											   CExpressionHandle &,	 // exprhdl
-											   gpos::Ref<CReqdPropPlan>
+CDistributionSpecNonSingleton::AppendEnforcers(
+	CMemoryPool *mp,
+	CExpressionHandle &,  // exprhdl
+	gpos::Ref<CReqdPropPlan>
 #ifdef GPOS_DEBUG
-												   prpp
+		prpp
 #endif	// GPOS_DEBUG
-											   ,
-											   CExpressionArray *pdrgpexpr,
-											   gpos::Ref<CExpression> pexpr)
+	,
+	gpos::Ref<CExpressionArray> pdrgpexpr, gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);

@@ -88,7 +88,7 @@ private:
 
 	// helper for extracting foreign key
 	static gpos::Ref<CColRefSet> PcrsFKey(CMemoryPool *mp,
-										  CExpressionArray *pdrgpexpr,
+										  gpos::Ref<CExpressionArray> pdrgpexpr,
 										  gpos::Ref<CColRefSet> prcsOutput,
 										  gpos::Ref<CColRefSet> pcrsKey);
 
@@ -114,8 +114,8 @@ private:
 
 	// cache join keys on scalar child group
 	static void CacheJoinKeys(gpos::Ref<CExpression> pexpr,
-							  CExpressionArray *pdrgpexprOuter,
-							  CExpressionArray *pdrgpexprInner,
+							  gpos::Ref<CExpressionArray> pdrgpexprOuter,
+							  gpos::Ref<CExpressionArray> pdrgpexprInner,
 							  gpos::Ref<IMdIdArray> join_opfamilies);
 
 	// helper to extract equality from a given expression
@@ -181,9 +181,10 @@ private:
 	static gpos::Ref<CExpression> PexprBuildBtreeIndexPlan(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprGet, ULONG ulOriginOpId,
-		CExpressionArray *pdrgpexprConds, gpos::Ref<CColRefSet> pcrsReqd,
-		gpos::Ref<CColRefSet> pcrsScalarExpr, gpos::Ref<CColRefSet> outer_refs,
-		const IMDIndex *pmdindex, const IMDRelation *pmdrel);
+		gpos::Ref<CExpressionArray> pdrgpexprConds,
+		gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CColRefSet> pcrsScalarExpr,
+		gpos::Ref<CColRefSet> outer_refs, const IMDIndex *pmdindex,
+		const IMDRelation *pmdrel);
 
 	// create a dynamic operator for a btree index plan
 	static gpos::Ref<CLogical>
@@ -246,7 +247,7 @@ private:
 		CMemoryPool *mp, BOOL fConjunction,
 		gpos::Ref<CExpression> pexprOriginalPred,
 		gpos::Ref<CExpression> *ppexprResidual,
-		CExpressionArray *pdrgpexprResidualNew);
+		gpos::Ref<CExpressionArray> pdrgpexprResidualNew);
 
 	// construct a bitmap index path expression for the given predicate coming
 	// from a condition without outer references
@@ -485,7 +486,7 @@ public:
 	static gpos::Ref<CExpression>
 	PexprLogicalIndexGet(CMemoryPool *mp, CMDAccessor *md_accessor,
 						 gpos::Ref<CExpression> pexprGet, ULONG ulOriginOpId,
-						 CExpressionArray *pdrgpexprConds,
+						 gpos::Ref<CExpressionArray> pdrgpexprConds,
 						 gpos::Ref<CColRefSet> pcrsReqd,
 						 gpos::Ref<CColRefSet> pcrsScalarExpr,
 						 gpos::Ref<CColRefSet> outer_refs,
@@ -499,7 +500,8 @@ public:
 	// helper for creating bitmap bool op expressions
 	static gpos::Ref<CExpression> PexprScalarBitmapBoolOp(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::Ref<CExpression> pexprOriginalPred, CExpressionArray *pdrgpexpr,
+		gpos::Ref<CExpression> pexprOriginalPred,
+		gpos::Ref<CExpressionArray> pdrgpexpr,
 		gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
 		CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
 		gpos::Ref<CColRefSet> pcrsReqd, BOOL fConjunction,
@@ -518,11 +520,13 @@ public:
 	static void CreateBitmapIndexProbeOps(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprOriginalPred,
-		CExpressionArray *pdrgpexprPreds, gpos::Ref<CTableDescriptor> ptabdesc,
-		const IMDRelation *pmdrel, CColRefArray *pdrgpcrOutput,
-		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
-		BOOL fConjunction, CExpressionArray *pdrgpexprBitmap,
-		CExpressionArray *pdrgpexprRecheck, CExpressionArray *pdrgpexprResidual,
+		gpos::Ref<CExpressionArray> pdrgpexprPreds,
+		gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
+		CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
+		gpos::Ref<CColRefSet> pcrsReqd, BOOL fConjunction,
+		gpos::Ref<CExpressionArray> pdrgpexprBitmap,
+		gpos::Ref<CExpressionArray> pdrgpexprRecheck,
+		gpos::Ref<CExpressionArray> pdrgpexprResidual,
 		BOOL isAPartialPredicate);
 
 	static void CreateBitmapIndexProbesWithOrWithoutPredBreakdown(
@@ -533,7 +537,8 @@ public:
 		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
 		gpos::Ref<CExpression> *pexprBitmapResult,
 		gpos::Ref<CExpression> *pexprRecheckResult,
-		CExpressionArray *pdrgpexprResidualResult, BOOL isAPartialPredicate);
+		gpos::Ref<CExpressionArray> pdrgpexprResidualResult,
+		BOOL isAPartialPredicate);
 
 	// check if expression has any scalar node with ambiguous return type
 	static BOOL FHasAmbiguousType(gpos::Ref<CExpression> pexpr,
@@ -607,12 +612,11 @@ public:
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprGbAgg);
 
 	// combine the individual bitmap access paths to form a bitmap bool op expression
-	static void JoinBitmapIndexProbes(CMemoryPool *pmp,
-									  CExpressionArray *pdrgpexprBitmapOld,
-									  CExpressionArray *pdrgpexprRecheckOld,
-									  BOOL fConjunction,
-									  gpos::Ref<CExpression> *ppexprBitmap,
-									  gpos::Ref<CExpression> *ppexprRecheck);
+	static void JoinBitmapIndexProbes(
+		CMemoryPool *pmp, gpos::Ref<CExpressionArray> pdrgpexprBitmapOld,
+		gpos::Ref<CExpressionArray> pdrgpexprRecheckOld, BOOL fConjunction,
+		gpos::Ref<CExpression> *ppexprBitmap,
+		gpos::Ref<CExpression> *ppexprRecheck);
 
 	static gpos::Ref<CExpression> AddALinearStackOfUnaryExpressions(
 		CMemoryPool *mp, gpos::Ref<CExpression> lowerPartOfExpr,

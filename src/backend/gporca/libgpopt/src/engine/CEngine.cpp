@@ -219,7 +219,7 @@ void
 CEngine::AddEnforcers(
 	CGroupExpression
 		*pgexpr,  // belongs to group where we need to add enforcers
-	CExpressionArray *pdrgpexprEnforcers)
+	gpos::Ref<CExpressionArray> pdrgpexprEnforcers)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprEnforcers);
 	GPOS_ASSERT(nullptr != pgexpr);

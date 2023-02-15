@@ -167,7 +167,7 @@ COrderedAggPreprocessor::SplitPrjList(
 						//          |  |--CScalarConst (0.500)
 						//          |  +--CScalarIdent \"ColRef_0041\" (41)
 						//          ...
-						CExpressionArray *pCurrProjList =
+						gpos::Ref<CExpressionArray> pCurrProjList =
 							pCurrExprProjList->PdrgPexpr();
 						pCurrProjList->Append(pexprAddPrjElem);
 						skip = true;

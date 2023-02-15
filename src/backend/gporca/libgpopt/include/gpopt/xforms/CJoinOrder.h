@@ -238,7 +238,7 @@ public:
 	// ctor used in CXformExpandNAryJoinDPv2
 	CJoinOrder(CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprComponents,
 			   gpos::Ref<CExpressionArray> innerJoinPredConjuncts,
-			   CExpressionArray *onPreds,
+			   gpos::Ref<CExpressionArray> onPreds,
 			   gpos::Ref<ULongPtrArray> childPredIndexes);
 
 	// dtor

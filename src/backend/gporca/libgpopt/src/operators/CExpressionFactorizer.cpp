@@ -95,8 +95,8 @@ CExpressionFactorizer::PexprProcessDisjDescendents(
 //---------------------------------------------------------------------------
 void
 CExpressionFactorizer::AddFactor(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-								 CExpressionArray *pdrgpexprFactors,
-								 CExpressionArray *pdrgpexprResidual,
+								 gpos::Ref<CExpressionArray> pdrgpexprFactors,
+								 gpos::Ref<CExpressionArray> pdrgpexprResidual,
 								 ExprMap *pexprmapFactors,
 								 ULONG
 #ifdef GPOS_DEBUG
@@ -448,7 +448,7 @@ CExpressionFactorizer::FOpSourceIdOrComputedColumn(gpos::Ref<CExpression> pexpr,
 //		or construct a new array and add it to the map.
 //
 //---------------------------------------------------------------------------
-CExpressionArrays *
+gpos::Ref<CExpressionArrays>
 CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId(
 	CMemoryPool *mp, SourceToArrayPosMap *psrc2array, BOOL fAllowNewSources,
 	ULONG ulOpSourceId)
@@ -489,7 +489,7 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId(
 // 		or construct a new array and add it to the map.
 //
 //---------------------------------------------------------------------------
-CExpressionArrays *
+gpos::Ref<CExpressionArrays>
 CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForColumn(
 	CMemoryPool *mp, ColumnToArrayPosMap *pcol2array, BOOL fAllowNewSources,
 	CColRef *colref)
@@ -545,7 +545,7 @@ CExpressionFactorizer::StoreBaseOpToColumnExpr(
 		return;
 	}
 
-	CExpressionArrays *pdrgpdrgpexpr = nullptr;
+	gpos::Ref<CExpressionArrays> pdrgpdrgpexpr = nullptr;
 
 	if (gpos::ulong_max != ulOpSourceId)
 	{
@@ -652,8 +652,9 @@ CExpressionFactorizer::PexprAddInferredFilters(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 void
 CExpressionFactorizer::AddInferredFiltersFromArray(
-	CMemoryPool *mp, const CExpressionArrays *pdrgpdrgpexpr,
-	ULONG ulDisjChildrenLength, CExpressionArray *pdrgpexprInferredFilters)
+	CMemoryPool *mp, const gpos::Ref<CExpressionArrays> pdrgpdrgpexpr,
+	ULONG ulDisjChildrenLength,
+	gpos::Ref<CExpressionArray> pdrgpexprInferredFilters)
 {
 	const ULONG ulEntryLength =
 		(pdrgpdrgpexpr == nullptr) ? 0 : pdrgpdrgpexpr->Size();

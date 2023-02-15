@@ -1281,7 +1281,7 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPred(
 	CColRefSetArray *
 		output_col_refsets,	 // array of output columns of join's relational inputs
 	gpos::Ref<CColRefSet> outer_refs, BOOL is_semi_or_anti_join,
-	CExpressionArray *unsupported_expr_array)
+	gpos::Ref<CExpressionArray> unsupported_expr_array)
 {
 	GPOS_ASSERT(nullptr != join_pred_expr);
 	GPOS_ASSERT(nullptr != output_col_refsets);

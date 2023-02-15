@@ -859,7 +859,7 @@ CPhysical::GetSkew(gpos::Ref<IStatistics> stats,
 	{
 		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(pds);
-		const CExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
+		const gpos::Ref<CExpressionArray> pdrgpexpr = pdshashed->Pdrgpexpr();
 		const ULONG size = pdrgpexpr->Size();
 		for (ULONG ul = 0; ul < size; ul++)
 		{

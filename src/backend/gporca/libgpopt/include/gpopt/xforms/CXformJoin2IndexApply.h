@@ -44,7 +44,8 @@ private:
 		gpos::Ref<CExpression> origJoinPred,
 		gpos::Ref<CExpression> nodesToInsertAboveIndexGet,
 		gpos::Ref<CExpression> endOfNodesToInsertAboveIndexGet,
-		CMDAccessor *md_accessor, CExpressionArray *pdrgpexprConjuncts,
+		CMDAccessor *md_accessor,
+		gpos::Ref<CExpressionArray> pdrgpexprConjuncts,
 		gpos::Ref<CColRefSet> pcrsScalarExpr, gpos::Ref<CColRefSet> outer_refs,
 		gpos::Ref<CColRefSet> pcrsReqd, const IMDRelation *pmdrel,
 		const IMDIndex *pmdindex, gpos::Ref<CXformResult> pxfres);

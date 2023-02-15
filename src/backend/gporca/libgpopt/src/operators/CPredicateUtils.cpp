@@ -300,7 +300,7 @@ CPredicateUtils::FHasNegatedChild(gpos::Ref<CExpression> pexpr)
 // recursively collect conjuncts
 void
 CPredicateUtils::CollectConjuncts(gpos::Ref<CExpression> pexpr,
-								  CExpressionArray *pdrgpexpr)
+								  gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -322,7 +322,7 @@ CPredicateUtils::CollectConjuncts(gpos::Ref<CExpression> pexpr,
 // recursively collect disjuncts
 void
 CPredicateUtils::CollectDisjuncts(gpos::Ref<CExpression> pexpr,
-								  CExpressionArray *pdrgpexpr)
+								  gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -367,8 +367,8 @@ CPredicateUtils::PdrgpexprDisjuncts(CMemoryPool *mp,
 // the function expands disjuncts in the given array by converting
 // ArrayComparison to AND/OR tree and deduplicating resulting disjuncts
 gpos::Ref<CExpressionArray>
-CPredicateUtils::PdrgpexprExpandDisjuncts(CMemoryPool *mp,
-										  CExpressionArray *pdrgpexprDisjuncts)
+CPredicateUtils::PdrgpexprExpandDisjuncts(
+	CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprDisjuncts)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprDisjuncts);
 
@@ -427,8 +427,8 @@ CPredicateUtils::PdrgpexprExpandDisjuncts(CMemoryPool *mp,
 // the function expands conjuncts in the given array by converting
 // ArrayComparison to AND/OR tree and deduplicating resulting conjuncts
 gpos::Ref<CExpressionArray>
-CPredicateUtils::PdrgpexprExpandConjuncts(CMemoryPool *mp,
-										  CExpressionArray *pdrgpexprConjuncts)
+CPredicateUtils::PdrgpexprExpandConjuncts(
+	CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexprConjuncts)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprConjuncts);
 
@@ -832,7 +832,7 @@ CPredicateUtils::PexprDisjunction(CMemoryPool *mp,
 // extract equality predicates over scalar identifiers
 gpos::Ref<CExpressionArray>
 CPredicateUtils::PdrgpexprPlainEqualities(CMemoryPool *mp,
-										  CExpressionArray *pdrgpexpr)
+										  gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	gpos::Ref<CExpressionArray> pdrgpexprEqualities =
 		GPOS_NEW(mp) CExpressionArray(mp);
@@ -1364,7 +1364,8 @@ CPredicateUtils::ValidatePartPruningExpr(CMemoryPool *mp,
 // constant comparisons.
 gpos::Ref<CExpression>
 CPredicateUtils::PexprPartPruningPredicate(
-	CMemoryPool *mp, const CExpressionArray *pdrgpexpr, CColRef *pcrPartKey,
+	CMemoryPool *mp, const gpos::Ref<CExpressionArray> pdrgpexpr,
+	CColRef *pcrPartKey,
 	gpos::Ref<CExpression>
 		pexprCol,  // predicate on pcrPartKey obtained from pcnstr
 	gpos::Ref<CColRefSet> pcrsAllowedRefs, BOOL allow_not_equals_preds)
@@ -1458,9 +1459,9 @@ CPredicateUtils::PexprPartPruningPredicate(
 // append the conjuncts from the given expression to the given array, removing
 // any duplicates, and return the resulting array
 gpos::Ref<CExpressionArray>
-CPredicateUtils::PdrgpexprAppendConjunctsDedup(CMemoryPool *mp,
-											   CExpressionArray *pdrgpexpr,
-											   gpos::Ref<CExpression> pexpr)
+CPredicateUtils::PdrgpexprAppendConjunctsDedup(
+	CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr,
+	gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pdrgpexpr);
 
@@ -2032,9 +2033,9 @@ CPredicateUtils::PexprIndexLookup(CMemoryPool *mp, CMDAccessor *md_accessor,
 void
 CPredicateUtils::ExtractIndexPredicates(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	CExpressionArray *pdrgpexprPredicate, const IMDIndex *pmdindex,
-	CColRefArray *pdrgpcrIndex, CExpressionArray *pdrgpexprIndex,
-	CExpressionArray *pdrgpexprResidual,
+	gpos::Ref<CExpressionArray> pdrgpexprPredicate, const IMDIndex *pmdindex,
+	CColRefArray *pdrgpcrIndex, gpos::Ref<CExpressionArray> pdrgpexprIndex,
+	gpos::Ref<CExpressionArray> pdrgpexprResidual,
 	gpos::Ref<CColRefSet>
 		pcrsAcceptedOuterRefs,	// outer refs that are acceptable in an index predicate
 	BOOL allowArrayCmpForBTreeIndexes)
@@ -2067,7 +2068,7 @@ CPredicateUtils::ExtractIndexPredicates(
 			continue;
 		}
 
-		CExpressionArray *pdrgpexprTarget = pdrgpexprIndex;
+		gpos::Ref<CExpressionArray> pdrgpexprTarget = pdrgpexprIndex;
 
 		if (CUtils::FScalarIdentBoolType(pexprCond.get()))
 		{
@@ -2427,7 +2428,8 @@ CPredicateUtils::PexprRemoveImpliedConjuncts(CMemoryPool *mp,
 BOOL
 CPredicateUtils::FValidSemiJoinCorrelations(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
-	gpos::Ref<CExpression> pexprInner, CExpressionArray *pdrgpexprCorrelations)
+	gpos::Ref<CExpression> pexprInner,
+	gpos::Ref<CExpressionArray> pdrgpexprCorrelations)
 {
 	GPOS_ASSERT(nullptr != pexprOuter);
 	GPOS_ASSERT(nullptr != pexprInner);
@@ -2576,10 +2578,9 @@ CPredicateUtils::FNotIdent(gpos::Ref<CExpression> pexpr)
 
 // returns true iff all predicates in the given array are compatible with the given index.
 BOOL
-CPredicateUtils::FCompatiblePredicates(CExpressionArray *pdrgpexprPred,
-									   const IMDIndex *pmdindex,
-									   CColRefArray *pdrgpcrIndex,
-									   CMDAccessor *md_accessor)
+CPredicateUtils::FCompatiblePredicates(
+	gpos::Ref<CExpressionArray> pdrgpexprPred, const IMDIndex *pmdindex,
+	CColRefArray *pdrgpcrIndex, CMDAccessor *md_accessor)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprPred);
 	GPOS_ASSERT(nullptr != pmdindex);
@@ -2638,7 +2639,8 @@ CPredicateUtils::FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
 
 // check if given array of expressions contain a volatile function like random().
 BOOL
-CPredicateUtils::FContainsVolatileFunction(CExpressionArray *pdrgpexprPred)
+CPredicateUtils::FContainsVolatileFunction(
+	gpos::Ref<CExpressionArray> pdrgpexprPred)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprPred);
 
@@ -2750,7 +2752,8 @@ CPredicateUtils::FConvertToCNF(gpos::Ref<CExpression> pexprOuter,
 void
 CPredicateUtils::CollectGrandChildrenUnionUnionAll(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexpr, ULONG child_index,
-	CExpressionArray *pdrgpexprResult, CColRef2dArray *pdrgdrgpcrResult)
+	gpos::Ref<CExpressionArray> pdrgpexprResult,
+	CColRef2dArray *pdrgdrgpcrResult)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(child_index < pexpr->Arity());
@@ -2953,7 +2956,8 @@ CPredicateUtils::ExprContainsOnlyStrictComparisons(CMemoryPool *mp,
 }
 
 BOOL
-CPredicateUtils::ExprsContainsOnlyStrictComparisons(CExpressionArray *conjuncts)
+CPredicateUtils::ExprsContainsOnlyStrictComparisons(
+	gpos::Ref<CExpressionArray> conjuncts)
 {
 	CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
 

@@ -66,7 +66,7 @@ CDistributionSpecUniversal::Matches(
 void
 CDistributionSpecUniversal::AppendEnforcers(CMemoryPool *, CExpressionHandle &,
 											gpos::Ref<CReqdPropPlan>,
-											CExpressionArray *,
+											gpos::Ref<CExpressionArray>,
 											gpos::Ref<CExpression>)
 {
 	GPOS_ASSERT(!"attempt to enforce UNIVERSAL distribution");

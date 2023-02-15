@@ -30,11 +30,9 @@ CDistributionSpecHashedNoOp::Matches(
 }
 
 void
-CDistributionSpecHashedNoOp::AppendEnforcers(CMemoryPool *mp,
-											 CExpressionHandle &exprhdl,
-											 gpos::Ref<CReqdPropPlan>,
-											 CExpressionArray *pdrgpexpr,
-											 gpos::Ref<CExpression> pexpr)
+CDistributionSpecHashedNoOp::AppendEnforcers(
+	CMemoryPool *mp, CExpressionHandle &exprhdl, gpos::Ref<CReqdPropPlan>,
+	gpos::Ref<CExpressionArray> pdrgpexpr, gpos::Ref<CExpression> pexpr)
 {
 	gpos::Ref<CDrvdProp> pdp = exprhdl.Pdp();
 	gpos::Ref<CDistributionSpec> pdsChild =

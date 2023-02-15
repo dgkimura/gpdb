@@ -262,8 +262,8 @@ private:
 	void SetState(EState estNewState);
 
 	// set hash join keys
-	void SetJoinKeys(CExpressionArray *pdrgpexprOuter,
-					 CExpressionArray *pdrgpexprInner,
+	void SetJoinKeys(gpos::Ref<CExpressionArray> pdrgpexprOuter,
+					 gpos::Ref<CExpressionArray> pdrgpexprInner,
 					 gpos::Ref<IMdIdArray> join_opfamilies);
 
 	// insert new group expression
@@ -373,14 +373,14 @@ public:
 	}
 
 	// join keys of outer child
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	PdrgpexprJoinKeysOuter() const
 	{
 		return m_pdrgpexprJoinKeysOuter.get();
 	}
 
 	// join keys of inner child
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	PdrgpexprJoinKeysInner() const
 	{
 		return m_pdrgpexprJoinKeysInner.get();

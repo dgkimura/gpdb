@@ -922,7 +922,8 @@ CSubqueryTestUtils::PexprSelectWith2LevelsCorrSubquery(CMemoryPool *mp,
 		gpos::Ref<CExpression> pexprInnerSubq =
 			(*(*(*pexprOuterSubq)[0])[1])[1];
 		gpos::Ref<CExpression> pexprInnerSelect = (*(*pexprInnerSubq)[0])[0];
-		CExpressionArray *pdrgpexpr = (*pexprInnerSelect)[1]->PdrgPexpr();
+		gpos::Ref<CExpressionArray> pdrgpexpr =
+			(*pexprInnerSelect)[1]->PdrgPexpr();
 
 		CColRef *pcrOuter = pexpr->DeriveOutputColumns()->PcrAny();
 		CColRef *pcrInner = pexprInnerSelect->DeriveOutputColumns()->PcrAny();

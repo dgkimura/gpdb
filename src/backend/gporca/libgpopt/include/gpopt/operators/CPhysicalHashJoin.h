@@ -123,14 +123,14 @@ public:
 	~CPhysicalHashJoin() override;
 
 	// inner keys
-	const CExpressionArray *
+	const gpos::Ref<CExpressionArray>
 	PdrgpexprInnerKeys() const
 	{
 		return m_pdrgpexprInnerKeys.get();
 	}
 
 	// outer keys
-	const CExpressionArray *
+	const gpos::Ref<CExpressionArray>
 	PdrgpexprOuterKeys() const
 	{
 		return m_pdrgpexprOuterKeys.get();

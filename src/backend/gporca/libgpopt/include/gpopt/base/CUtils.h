@@ -73,8 +73,8 @@ private:
 	static BOOL FHasAllDefaultComparisons(const IMDType *pmdtype);
 
 	//	append the expressions in the source array to destination array
-	static void AppendArrayExpr(CExpressionArray *pdrgpexprSrc,
-								CExpressionArray *pdrgpexprDest);
+	static void AppendArrayExpr(gpos::Ref<CExpressionArray> pdrgpexprSrc,
+								gpos::Ref<CExpressionArray> pdrgpexprDest);
 
 public:
 	enum EExecLocalityType
@@ -367,7 +367,8 @@ public:
 	// generate a project expression with one or more additional project elements
 	static gpos::Ref<CExpression> PexprAddProjection(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CExpressionArray *pdrgpexprProjected, BOOL fNewComputedCol = true);
+		gpos::Ref<CExpressionArray> pdrgpexprProjected,
+		BOOL fNewComputedCol = true);
 
 	// generate an aggregate expression
 	static gpos::Ref<CExpression> PexprLogicalGbAggGlobal(
@@ -471,7 +472,7 @@ public:
 
 	// deduplicate array of expressions
 	static gpos::Ref<CExpressionArray> PdrgpexprDedup(
-		CMemoryPool *mp, CExpressionArray *pdrgpexpr);
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// deep equality of expression trees
 	static BOOL Equals(const gpos::Ref<CExpression> pexprLeft,
@@ -479,20 +480,20 @@ public:
 
 	// compare expression against an array of expressions
 	static BOOL FEqualAny(const gpos::Ref<CExpression> pexpr,
-						  const CExpressionArray *pdrgpexpr);
+						  const gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// deep equality of expression arrays
-	static BOOL Equals(const CExpressionArray *pdrgpexprLeft,
-					   const CExpressionArray *pdrgpexprRight);
+	static BOOL Equals(const gpos::Ref<CExpressionArray> pdrgpexprLeft,
+					   const gpos::Ref<CExpressionArray> pdrgpexprRight);
 
 	// check if first expression array contains all expressions in second array
-	static BOOL Contains(const CExpressionArray *pdrgpexprFst,
-						 const CExpressionArray *pdrgpexprSnd);
+	static BOOL Contains(const gpos::Ref<CExpressionArray> pdrgpexprFst,
+						 const gpos::Ref<CExpressionArray> pdrgpexprSnd);
 
 	// return the number of occurrences of the given expression in the given
 	// array of expressions
 	static ULONG UlOccurrences(const gpos::Ref<CExpression> pexpr,
-							   CExpressionArray *pdrgpexpr);
+							   gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	//-------------------------------------------------------------------
 	// Helpers for datums
@@ -866,7 +867,7 @@ public:
 
 	// remap given array of expressions with provided column mappings
 	static gpos::Ref<CExpressionArray> PdrgpexprRemap(
-		CMemoryPool *mp, CExpressionArray *pdrgpexpr,
+		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr,
 		UlongToColRefMap *colref_mapping);
 
 	// create ColRef->ColRef mapping using the given ColRef arrays
@@ -931,7 +932,7 @@ public:
 
 	// return the columns from the scalar ident expressions in the given array
 	static gpos::Ref<CColRefSet> PcrsExtractColumns(
-		CMemoryPool *mp, const CExpressionArray *pdrgpexpr);
+		CMemoryPool *mp, const gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// create a new bitset of the given length, where all the bits are set
 	static gpos::Ref<CBitSet> PbsAllSet(CMemoryPool *mp, ULONG size);
@@ -1022,17 +1023,17 @@ public:
 	// DISTINCT FROM operators that has one side equal to the given expression
 	static gpos::Ref<CExpression> PexprMatchEqualityOrINDF(
 		gpos::Ref<CExpression> pexprToMatch,
-		CExpressionArray *pdrgpexpr	 // array of predicates to inspect
+		gpos::Ref<CExpressionArray> pdrgpexpr  // array of predicates to inspect
 	);
 
 	static gpos::Ref<CExpression> MakeJoinWithoutInferredPreds(
 		CMemoryPool *mp, gpos::Ref<CExpression> join_expr);
 
-	static BOOL Contains(const CExpressionArray *exprs,
+	static BOOL Contains(const gpos::Ref<CExpressionArray> exprs,
 						 gpos::Ref<CExpression> expr_to_match);
 
-	static BOOL Equals(const CExpressionArrays *exprs_arr,
-					   const CExpressionArrays *other_exprs_arr);
+	static BOOL Equals(const gpos::Ref<CExpressionArrays> exprs_arr,
+					   const gpos::Ref<CExpressionArrays> other_exprs_arr);
 
 	static BOOL Equals(const gpos::Ref<IMdIdArray> mdids,
 					   const gpos::Ref<IMdIdArray> other_mdids);
@@ -1043,11 +1044,11 @@ public:
 	static BOOL CanRemoveInferredPredicates(COperator::EOperatorId op_id);
 
 	static gpos::Ref<CExpressionArrays> GetCombinedExpressionArrays(
-		CMemoryPool *mp, CExpressionArrays *exprs_array,
-		CExpressionArrays *exprs_array_other);
+		CMemoryPool *mp, gpos::Ref<CExpressionArrays> exprs_array,
+		gpos::Ref<CExpressionArrays> exprs_array_other);
 
-	static void AddExprs(CExpressionArrays *results_exprs,
-						 CExpressionArrays *input_exprs);
+	static void AddExprs(gpos::Ref<CExpressionArrays> results_exprs,
+						 gpos::Ref<CExpressionArrays> input_exprs);
 
 	static BOOL FScalarConstBoolNull(gpos::Ref<CExpression> pexpr);
 };	// class CUtils

@@ -322,7 +322,7 @@ CCostContext::IsValid(CMemoryPool *mp)
 void
 CCostContext::BreakCostTiesForJoinPlans(
 	const gpos::Ref<CCostContext> pccFst, const gpos::Ref<CCostContext> pccSnd,
-	CONST_COSTCTXT_PTR *ppccPrefered,  // output: preferred cost context
+	CONST_COSTCTXT_PTR &ppccPrefered,  // output: preferred cost context
 	BOOL *pfTiesResolved  // output: if true, tie resolution has succeeded
 )
 {
@@ -345,7 +345,7 @@ CCostContext::BreakCostTiesForJoinPlans(
 	// to have more reliable statistics on this side
 
 	*pfTiesResolved = false;
-	*ppccPrefered = nullptr;
+	ppccPrefered = nullptr;
 	CDouble dRowsOuterFst =
 		(*pccFst->Pdrgpoc())[0]->PccBest()->Pstats()->Rows();
 	CDouble dRowsInnerFst =
@@ -382,11 +382,11 @@ CCostContext::BreakCostTiesForJoinPlans(
 			->GetJoinDepth();
 	if (ulInnerJoinDepthFst < ulOuterJoinDepthFst)
 	{
-		*ppccPrefered = pccFst;
+		ppccPrefered = pccFst;
 	}
 	else
 	{
-		*ppccPrefered = pccSnd;
+		ppccPrefered = pccSnd;
 	}
 }
 
@@ -401,7 +401,7 @@ CCostContext::BreakCostTiesForJoinPlans(
 //
 //---------------------------------------------------------------------------
 BOOL
-CCostContext::FBetterThan(const gpos::Ref<CCostContext> pcc) const
+CCostContext::FBetterThan(const gpos::Ref<CCostContext> pcc)
 {
 	GPOS_ASSERT(nullptr != pcc);
 	GPOS_ASSERT(*m_poc == *(pcc->Poc()));
@@ -423,7 +423,7 @@ CCostContext::FBetterThan(const gpos::Ref<CCostContext> pcc) const
 			// for 2-stage vs 2-stage or 3-stage vs 3-stage, we let costing decide.
 			// single stage agg do not get optimized when multi-stage aggs are present,
 			// refer to COptimizationContext::FOptimizeAgg.
-			if (IsTwoStageScalarDQACostCtxt(this) &&
+			if (IsTwoStageScalarDQACostCtxt(SharedFromThis()) &&
 				IsThreeStageScalarDQACostCtxt(pcc))
 			{
 				return false;
@@ -431,7 +431,7 @@ CCostContext::FBetterThan(const gpos::Ref<CCostContext> pcc) const
 			// if the comparison is between 3-stage agg and 2-stage scalar DQA aggs generated from CXformSplitDQA,
 			// always mark 3-stage agg as having the better cost context.
 			// note: CXformSplitDQA will never generate a mix of scalar and non-scalar DQAs.
-			if (IsThreeStageScalarDQACostCtxt(this) &&
+			if (IsThreeStageScalarDQACostCtxt(SharedFromThis()) &&
 				IsTwoStageScalarDQACostCtxt(pcc))
 			{
 				return true;
@@ -478,7 +478,7 @@ CCostContext::FBetterThan(const gpos::Ref<CCostContext> pcc) const
 	{
 		CONST_COSTCTXT_PTR pccPrefered = nullptr;
 		BOOL fSuccess = false;
-		BreakCostTiesForJoinPlans(this, pcc, &pccPrefered, &fSuccess);
+		BreakCostTiesForJoinPlans(this, pcc, pccPrefered, &fSuccess);
 		if (fSuccess)
 		{
 			return (this == pccPrefered);
@@ -669,7 +669,7 @@ CCostContext::DRowsPerHost() const
 	{
 		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(pds);
-		CExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
+		gpos::Ref<CExpressionArray> pdrgpexpr = pdshashed->Pdrgpexpr();
 		gpos::Ref<CColRefSet> pcrsUsed =
 			CUtils::PcrsExtractColumns(m_mp, pdrgpexpr);
 

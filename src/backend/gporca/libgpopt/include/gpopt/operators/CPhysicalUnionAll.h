@@ -34,7 +34,7 @@ private:
 
 	// map given array of scalar ident expressions to positions of UnionAll input columns in the given child;
 	gpos::Ref<ULongPtrArray> PdrgpulMap(CMemoryPool *mp,
-										CExpressionArray *pdrgpexpr,
+										gpos::Ref<CExpressionArray> pdrgpexpr,
 										ULONG child_index) const;
 
 	// map given ColRefSet, expressed in terms of outputs,

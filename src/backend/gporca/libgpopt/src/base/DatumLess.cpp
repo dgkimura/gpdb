@@ -12,17 +12,10 @@
 namespace gpopt
 {
 bool
-DatumLess::operator()(const gpnaucrates::gpos::Ref<IDatum> a,
-					  const gpnaucrates::gpos::Ref<IDatum> b) const
+DatumLess::operator()(const gpos::Ref<gpnaucrates::IDatum> a,
+					  const gpos::Ref<gpnaucrates::IDatum> b) const
 {
 	const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
 	return pcomp->IsLessThan(a, b);
-}
-
-bool
-DatumLess::operator()(const Ref<gpnaucrates::IDatum> &a,
-					  const Ref<gpnaucrates::IDatum> &b) const
-{
-	return operator()(a.get(), b.get());
 }
 }  // namespace gpopt

@@ -605,7 +605,7 @@ private:
 
 	// create a DXL hash expr list from an array of hash columns
 	gpos::Ref<CDXLNode> PdxlnHashExprList(
-		const CExpressionArray *pdrgpexpr,
+		const gpos::Ref<CExpressionArray> pdrgpexpr,
 		const gpos::Ref<IMdIdArray> opfamilies);
 
 	// create a DXL filter node with the given scalar expression

@@ -10,6 +10,7 @@
 #include "gpopt/base/DatumLess.h"
 #include "gpopt/operators/COperator.h"
 #include "gpopt/operators/CScalarConst.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

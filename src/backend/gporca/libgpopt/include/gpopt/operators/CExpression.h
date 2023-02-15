@@ -183,7 +183,7 @@ public:
 	}
 
 	// accessor of children array
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	PdrgPexpr() const
 	{
 		return m_pdrgpexpr.get();

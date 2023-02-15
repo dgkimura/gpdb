@@ -259,7 +259,7 @@ public:
 
 	// add enforcers to the memo
 	void AddEnforcers(gpos::Ref<CGroupExpression> pgexprChild,
-					  CExpressionArray *pdrgpexprEnforcers);
+					  gpos::Ref<CExpressionArray> pdrgpexprEnforcers);
 
 	// extract a physical plan from the memo
 	gpos::Ref<CExpression> PexprExtractPlan();

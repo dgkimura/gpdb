@@ -1771,7 +1771,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const gpos::Ref<CDXLNode> dxlnode)
 
 			// add the created project element to the project list of the window node
 			ULONG ulSpecPos = pdxlopWindowRef->GetWindSpecPos();
-			const CExpressionArray *pdrgpexpr =
+			const gpos::Ref<CExpressionArray> pdrgpexpr =
 				phmulpdrgpexpr->Find(&ulSpecPos);
 			if (nullptr == pdrgpexpr)
 			{
@@ -1784,7 +1784,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const gpos::Ref<CDXLNode> dxlnode)
 			}
 			else
 			{
-				const_cast<CExpressionArray *>(pdrgpexpr)->Append(
+				const_cast<gpos::Ref<CExpressionArray> >(pdrgpexpr)->Append(
 					pexprProjElem);
 			}
 		}
@@ -1799,12 +1799,12 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const gpos::Ref<CDXLNode> dxlnode)
 		ULONG ulPos = *(hmiterulpdrgexpr.Key());
 		gpos::Ref<CDXLWindowSpec> pdxlws = pdxlopWindow->GetWindowKeyAt(ulPos);
 
-		const CExpressionArray *pdrgpexpr = hmiterulpdrgexpr.Value();
+		const gpos::Ref<CExpressionArray> pdrgpexpr = hmiterulpdrgexpr.Value();
 		GPOS_ASSERT(nullptr != pdrgpexpr);
 		gpos::Ref<CScalarProjectList> popPrL =
 			GPOS_NEW(m_mp) CScalarProjectList(m_mp);
 		gpos::Ref<CExpression> pexprProjList = GPOS_NEW(m_mp) CExpression(
-			m_mp, popPrL, const_cast<CExpressionArray *>(pdrgpexpr));
+			m_mp, popPrL, const_cast<gpos::Ref<CExpressionArray> >(pdrgpexpr));
 
 		gpos::Ref<CColRefArray> colref_array =
 			PdrgpcrPartitionByCol(pdxlws->GetPartitionByColIdArray());

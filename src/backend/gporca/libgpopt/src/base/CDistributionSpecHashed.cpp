@@ -221,7 +221,7 @@ CDistributionSpecHashed::FSatisfies(
 	GPOS_ASSERT(EdtHashed == pds->Edt());
 
 	const gpos::Ref<CDistributionSpecHashed> pdsHashed =
-		dynamic_cast<const gpos::Ref<CDistributionSpecHashed> >(pds);
+		gpos::dyn_cast<CDistributionSpecHashed>(pds);
 
 	// Assumes that 'this' distribution spec is based on the underlying table
 	// structure, whereas 'pds' distribution spec is based on the query
@@ -275,7 +275,8 @@ CDistributionSpecHashed::FMatchSubset(
 		gpos::Ref<IMDId> opfamily_own = nullptr;
 
 		BOOL fFound = false;
-		CExpressionArrays *equiv_hash_exprs = pdsHashed->HashSpecEquivExprs();
+		gpos::Ref<CExpressionArrays> equiv_hash_exprs =
+			pdsHashed->HashSpecEquivExprs();
 		for (ULONG ulInner = 0; ulInner < ulOtherExprs; ulInner++)
 		{
 			gpos::Ref<CExpression> pexprOther =
@@ -314,7 +315,7 @@ CDistributionSpecHashed::FMatchSubset(
 			if (nullptr != equiv_hash_exprs && equiv_hash_exprs->Size() > 0)
 			{
 				GPOS_ASSERT(false == fFound);
-				CExpressionArray *equiv_distribution_exprs =
+				gpos::Ref<CExpressionArray> equiv_distribution_exprs =
 					(*equiv_hash_exprs)[ulInner].get();
 				if (CUtils::Contains(equiv_distribution_exprs, pexprOwn))
 				{
@@ -398,7 +399,7 @@ CDistributionSpecHashed::AppendEnforcers(CMemoryPool *mp,
 											 prpp
 #endif	// GPOS_DEBUG
 										 ,
-										 CExpressionArray *pdrgpexpr,
+										 gpos::Ref<CExpressionArray> pdrgpexpr,
 										 gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
@@ -466,7 +467,7 @@ CDistributionSpecHashed::HashValue() const
 	{
 		for (ULONG ul = 0; ul < m_equiv_hash_exprs->Size(); ul++)
 		{
-			CExpressionArray *equiv_distribution_exprs =
+			gpos::Ref<CExpressionArray> equiv_distribution_exprs =
 				(*m_equiv_hash_exprs)[ul].get();
 			for (ULONG id = 0; id < equiv_distribution_exprs->Size(); id++)
 			{
@@ -525,8 +526,9 @@ CDistributionSpecHashed::FMatchHashedDistribution(
 	const ULONG length = m_pdrgpexpr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CExpressionArrays *all_equiv_exprs = pdshashed->HashSpecEquivExprs();
-		CExpressionArray *equiv_distribution_exprs = nullptr;
+		gpos::Ref<CExpressionArrays> all_equiv_exprs =
+			pdshashed->HashSpecEquivExprs();
+		gpos::Ref<CExpressionArray> equiv_distribution_exprs = nullptr;
 		if (nullptr != all_equiv_exprs && all_equiv_exprs->Size() > 0)
 		{
 			equiv_distribution_exprs = (*all_equiv_exprs)[ul];
@@ -578,7 +580,7 @@ CDistributionSpecHashed::Matches(const gpos::Ref<CDistributionSpec> pds) const
 	}
 
 	if (nullptr != pdshashed->PdshashedEquiv() &&
-		pdshashed->PdshashedEquiv()->Matches(this))
+		pdshashed->PdshashedEquiv()->Matches(SharedFromThis()))
 	{
 		return true;
 	}
@@ -639,8 +641,8 @@ CDistributionSpecHashed::Equals(
 	}
 
 	// compare the equivalent expression arrays
-	CExpressionArrays *spec_equiv_exprs = m_equiv_hash_exprs.get();
-	CExpressionArrays *other_spec_equiv_exprs =
+	gpos::Ref<CExpressionArrays> spec_equiv_exprs = m_equiv_hash_exprs.get();
+	gpos::Ref<CExpressionArrays> other_spec_equiv_exprs =
 		other_spec->HashSpecEquivExprs();
 
 	return CUtils::Equals(spec_equiv_exprs, other_spec_equiv_exprs);
@@ -682,10 +684,11 @@ CDistributionSpecHashed::PdshashedMaximal(CMemoryPool *mp,
 // expression array
 BOOL
 CDistributionSpecHashed::IsCoveredBy(
-	const CExpressionArray *dist_cols_expr_array) const
+	const gpos::Ref<CExpressionArray> dist_cols_expr_array)
 {
 	BOOL covers = false;
-	const gpos::Ref<CDistributionSpecHashed> pds = this;
+	gpos::Ref<CDistributionSpecHashed> pds =
+		gpos::dyn_cast<CDistributionSpecHashed>(SharedFromThis());
 	while (pds && !covers)
 	{
 		covers = CUtils::Contains(dist_cols_expr_array, pds->Pdrgpexpr());
@@ -705,7 +708,7 @@ void
 CDistributionSpecHashed::ComputeEquivHashExprs(
 	CMemoryPool *mp, CExpressionHandle &expression_handle)
 {
-	CExpressionArray *distribution_exprs = m_pdrgpexpr.get();
+	gpos::Ref<CExpressionArray> distribution_exprs = m_pdrgpexpr.get();
 	gpos::Ref<CExpressionArrays> equiv_distribution_all_exprs =
 		m_equiv_hash_exprs;
 	if (nullptr == equiv_distribution_all_exprs)
@@ -810,7 +813,7 @@ CDistributionSpecHashed::ComputeEquivHashExprs(
 gpos::Ref<CDistributionSpecHashed>
 CDistributionSpecHashed::Copy(CMemoryPool *mp)
 {
-	CExpressionArray *distribution_exprs = this->Pdrgpexpr();
+	gpos::Ref<CExpressionArray> distribution_exprs = this->Pdrgpexpr();
 	gpos::Ref<CExpressionArrays> equiv_distribution_exprs =
 		GPOS_NEW(mp) CExpressionArrays(mp);
 	gpos::Ref<CDistributionSpecHashed> pds = this;
@@ -911,7 +914,7 @@ CDistributionSpecHashed::OsPrintWithPrefix(IOstream &os,
 		os << "," << std::endl;
 		for (ULONG ul = 0; ul < m_equiv_hash_exprs->Size(); ul++)
 		{
-			CExpressionArray *equiv_distribution_exprs =
+			gpos::Ref<CExpressionArray> equiv_distribution_exprs =
 				(*m_equiv_hash_exprs)[ul].get();
 			os << "equiv exprs: " << ul << ":";
 			for (ULONG id = 0; id < equiv_distribution_exprs->Size(); id++)
@@ -1018,7 +1021,7 @@ CDistributionSpecHashed::TryToCompleteEquivSpec(
 		CPredicateUtils::PdrgpexprConjuncts(mp, pexprPred);
 	gpos::Ref<CExpressionArray> pdrgpexprResult =
 		GPOS_NEW(mp) CExpressionArray(mp);
-	CExpressionArray *pdrgpexprHashed = pdshashed->Pdrgpexpr();
+	gpos::Ref<CExpressionArray> pdrgpexprHashed = pdshashed->Pdrgpexpr();
 	const ULONG size = pdrgpexprHashed->Size();
 
 	ULONG num_orig_exprs_used = 0;

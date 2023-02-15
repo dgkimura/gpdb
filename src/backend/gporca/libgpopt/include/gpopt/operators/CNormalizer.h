@@ -126,7 +126,7 @@ private:
 
 	// push an array of conjuncts through logical expression, and compute an array of remaining conjuncts
 	static void PushThru(CMemoryPool *mp, gpos::Ref<CExpression> pexprLogical,
-						 CExpressionArray *pdrgpexprConjuncts,
+						 gpos::Ref<CExpressionArray> pdrgpexprConjuncts,
 						 gpos::Ref<CExpression> *ppexprResult,
 						 gpos::Ref<CExpressionArray> *ppdrgpexprRemaining);
 
@@ -143,7 +143,7 @@ private:
 	static gpos::Ref<CExpression> PexprPullUpProjectElements(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 		gpos::Ref<CColRefSet> pcrsUsed, gpos::Ref<CColRefSet> pcrsOutput,
-		CExpressionArray *pdrgpexprPrElPullUp);
+		gpos::Ref<CExpressionArray> pdrgpexprPrElPullUp);
 
 #ifdef GPOS_DEBUG
 	// check if the columns used by the operator are a subset of its input columns

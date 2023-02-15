@@ -599,9 +599,10 @@ CXformSplitDQA::PexprPrElAgg(CMemoryPool *mp,
 void
 CXformSplitDQA::PopulatePrLMultiPhaseAgg(
 	CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-	gpos::Ref<CExpression> pexprPrEl, CExpressionArray *pdrgpexprPrElFirstStage,
-	CExpressionArray *pdrgpexprPrElSecondStage,
-	CExpressionArray *pdrgpexprPrElLastStage, BOOL fSplit2LevelsOnly)
+	gpos::Ref<CExpression> pexprPrEl,
+	gpos::Ref<CExpressionArray> pdrgpexprPrElFirstStage,
+	gpos::Ref<CExpressionArray> pdrgpexprPrElSecondStage,
+	gpos::Ref<CExpressionArray> pdrgpexprPrElLastStage, BOOL fSplit2LevelsOnly)
 {
 	GPOS_ASSERT(nullptr != pexprPrEl);
 	GPOS_ASSERT(nullptr != pdrgpexprPrElFirstStage);
@@ -671,10 +672,10 @@ CXformSplitDQA::PopulatePrLMultiPhaseAgg(
 //
 //---------------------------------------------------------------------------
 CColRef *
-CXformSplitDQA::PcrAggFuncArgument(CMemoryPool *mp, CMDAccessor *md_accessor,
-								   CColumnFactory *col_factory,
-								   gpos::Ref<CExpression> pexprArg,
-								   CExpressionArray *pdrgpexprChildPrEl)
+CXformSplitDQA::PcrAggFuncArgument(
+	CMemoryPool *mp, CMDAccessor *md_accessor, CColumnFactory *col_factory,
+	gpos::Ref<CExpression> pexprArg,
+	gpos::Ref<CExpressionArray> pdrgpexprChildPrEl)
 {
 	GPOS_ASSERT(nullptr != pexprArg);
 	GPOS_ASSERT(nullptr != pdrgpexprChildPrEl);
@@ -713,7 +714,7 @@ gpos::Ref<CExpression>
 CXformSplitDQA::PexprMultiLevelAggregation(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexprRelational,
 	gpos::Ref<CExpressionArray> pdrgpexprPrElFirstStage,
-	CExpressionArray *pdrgpexprPrElSecondStage,
+	gpos::Ref<CExpressionArray> pdrgpexprPrElSecondStage,
 	gpos::Ref<CExpressionArray> pdrgpexprPrElThirdStage,
 	CColRefArray *pdrgpcrArgDQA, CColRefArray *pdrgpcrLastStage,
 	BOOL fSplit2LevelsOnly, BOOL fAddDistinctColToLocalGb,
@@ -750,7 +751,7 @@ CXformSplitDQA::PexprMultiLevelAggregation(
 
 	gpos::Ref<CLogicalGbAgg> popFirstStage = nullptr;
 	gpos::Ref<CLogicalGbAgg> popSecondStage = nullptr;
-	CExpressionArray *pdrgpexprLastStage = pdrgpexprPrElSecondStage;
+	gpos::Ref<CExpressionArray> pdrgpexprLastStage = pdrgpexprPrElSecondStage;
 	if (fSplit2LevelsOnly)
 	{
 		// for scalar DQA the local aggregate is responsible for removing duplicates
@@ -817,8 +818,8 @@ CXformSplitDQA::PexprMultiLevelAggregation(
 void
 CXformSplitDQA::ExtractDistinctCols(
 	CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-	gpos::Ref<CExpression> pexpr, CExpressionArray *pdrgpexprChildPrEl,
-	ExprToColRefMap *phmexprcr,
+	gpos::Ref<CExpression> pexpr,
+	gpos::Ref<CExpressionArray> pdrgpexprChildPrEl, ExprToColRefMap *phmexprcr,
 	gpos::Ref<CColRefArray>
 		*ppdrgpcrArgDQA	 // output: array of distinct aggs arguments
 )

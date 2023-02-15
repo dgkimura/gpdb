@@ -17,6 +17,7 @@
 #include "gpopt/base/CConstraintInterval.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

@@ -102,7 +102,7 @@ CPhysicalFullMergeJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		nulls_collocated = false;
 	}
 
-	CExpressionArray *clauses =
+	gpos::Ref<CExpressionArray> clauses =
 		(child_index == 0) ? m_outer_merge_clauses : m_inner_merge_clauses;
 
 	// TODO: Handle matching/ equivalent distribution spec (e.g using pdsRequired)
@@ -155,7 +155,7 @@ CPhysicalFullMergeJoin::PosRequired(CMemoryPool *mp,
 
 	gpos::Ref<COrderSpec> os = GPOS_NEW(mp) COrderSpec(mp);
 
-	CExpressionArray *clauses;
+	gpos::Ref<CExpressionArray> clauses;
 	if (child_index == 0)
 	{
 		clauses = m_outer_merge_clauses;

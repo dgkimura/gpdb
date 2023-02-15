@@ -850,7 +850,7 @@ CExpressionPreprocessor::PexprConvert2In(
 	}
 
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
-	CExpressionArray *pdrgexprChildren = pexpr->PdrgPexpr();
+	gpos::Ref<CExpressionArray> pdrgexprChildren = pexpr->PdrgPexpr();
 	for (ULONG ul = 0; ul < pexpr->Arity(); ul++)
 	{
 		pdrgpexpr->Append(PexprConvert2In(mp, (*pdrgexprChildren)[ul].get()));
@@ -1006,9 +1006,10 @@ CExpressionPreprocessor::PexprCollapseJoins(CMemoryPool *mp,
 void
 CExpressionPreprocessor::CollectJoinChildrenRecursively(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-	CExpressionArray *logicalLeafNodes,
+	gpos::Ref<CExpressionArray> logicalLeafNodes,
 	gpos::Ref<ULongPtrArray> lojChildPredIndexes,
-	CExpressionArray *innerJoinPredicates, CExpressionArray *lojPredicates)
+	gpos::Ref<CExpressionArray> innerJoinPredicates,
+	gpos::Ref<CExpressionArray> lojPredicates)
 {
 	// protect against stack overflow during recursion
 	GPOS_CHECK_STACK_SIZE;
@@ -2057,8 +2058,8 @@ CExpressionPreprocessor::AddPredsToCTEProducers(CMemoryPool *mp,
 		GPOS_ASSERT(nullptr != pexprProducer);
 
 		ULONG ulConsumers = pcteinfo->UlConsumers(ulCTEId);
-		CExpressionArray *pdrgpexpr =
-			const_cast<CExpressionArray *>(mi.Value());
+		gpos::Ref<CExpressionArray> pdrgpexpr =
+			const_cast<gpos::Ref<CExpressionArray> >(mi.Value());
 
 		// skip the propagation of predicate contains volatile function e.g. random() (value change within a scan)
 		if (CPredicateUtils::FContainsVolatileFunction(pdrgpexpr))

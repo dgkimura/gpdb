@@ -1052,7 +1052,7 @@ CGroupExpression::PrintXform(CMemoryPool *mp, gpos::Ref<CXform> pxform,
 		   << "Input:" << std::endl
 		   << *pexpr << "Output:" << std::endl
 		   << "Alternatives:" << std::endl;
-		CExpressionArray *pdrgpexpr = pxfres->Pdrgpexpr();
+		gpos::Ref<CExpressionArray> pdrgpexpr = pxfres->Pdrgpexpr();
 		ULONG ulStart = pdrgpexpr->Size() - ulNumResults;
 		ULONG end = pdrgpexpr->Size();
 

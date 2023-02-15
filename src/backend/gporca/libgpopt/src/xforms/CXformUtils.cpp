@@ -233,7 +233,7 @@ CXformUtils::FInlinableCTE(ULONG ulCTEId)
 gpos::Ref<CColRefSet>
 CXformUtils::PcrsFKey(
 	CMemoryPool *mp,
-	CExpressionArray *pdrgpexpr,	   // array of scalar conjuncts
+	gpos::Ref<CExpressionArray> pdrgpexpr,	// array of scalar conjuncts
 	gpos::Ref<CColRefSet> prcsOutput,  // output columns of outer expression
 	gpos::Ref<CColRefSet> pcrsKey	   // a primary key of a inner expression
 )
@@ -2482,8 +2482,8 @@ CXformUtils::LookupJoinKeys(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 // Cache join keys on scalar child group
 void
 CXformUtils::CacheJoinKeys(gpos::Ref<CExpression> pexpr,
-						   CExpressionArray *pdrgpexprOuter,
-						   CExpressionArray *pdrgpexprInner,
+						   gpos::Ref<CExpressionArray> pdrgpexprOuter,
+						   gpos::Ref<CExpressionArray> pdrgpexprInner,
 						   gpos::Ref<IMdIdArray> join_opfamilies)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprOuter);
@@ -2685,7 +2685,7 @@ CXformUtils::FProcessGPDBAntiSemiHashJoin(
 gpos::Ref<CExpression>
 CXformUtils::PexprBuildBtreeIndexPlan(
 	CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CExpression> pexprGet,
-	ULONG ulOriginOpId, CExpressionArray *pdrgpexprConds,
+	ULONG ulOriginOpId, gpos::Ref<CExpressionArray> pdrgpexprConds,
 	gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CColRefSet> pcrsScalarExpr,
 	gpos::Ref<CColRefSet> outer_refs, const IMDIndex *pmdindex,
 	const IMDRelation *pmdrel)
@@ -2845,11 +2845,11 @@ CXformUtils::PexprBuildBtreeIndexPlan(
 gpos::Ref<CExpression>
 CXformUtils::PexprScalarBitmapBoolOp(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	gpos::Ref<CExpression> pexprOriginalPred, CExpressionArray *pdrgpexpr,
-	gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
-	CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
-	gpos::Ref<CColRefSet> pcrsReqd, BOOL fConjunction,
-	gpos::Ref<CExpression> *ppexprRecheck,
+	gpos::Ref<CExpression> pexprOriginalPred,
+	gpos::Ref<CExpressionArray> pdrgpexpr, gpos::Ref<CTableDescriptor> ptabdesc,
+	const IMDRelation *pmdrel, CColRefArray *pdrgpcrOutput,
+	gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
+	BOOL fConjunction, gpos::Ref<CExpression> *ppexprRecheck,
 	gpos::Ref<CExpression> *ppexprResidual, BOOL isAPartialPredicate)
 {
 	GPOS_ASSERT(nullptr != pdrgpexpr);
@@ -2937,7 +2937,7 @@ CXformUtils::ComputeBitmapTableScanResidualPredicate(
 	gpos::Ref<CExpression> pexprOriginalPred,
 	gpos::Ref<CExpression> *
 		ppexprResidual,	 // input-output argument: the residual predicate computed so-far, and resulting predicate
-	CExpressionArray *pdrgpexprResidualNew)
+	gpos::Ref<CExpressionArray> pdrgpexprResidualNew)
 {
 	GPOS_ASSERT(nullptr != pexprOriginalPred);
 	GPOS_ASSERT(0 < pdrgpexprResidualNew->Size());
@@ -3303,13 +3303,15 @@ CXformUtils::PexprBitmapSelectBestIndex(
 void
 CXformUtils::CreateBitmapIndexProbeOps(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	gpos::Ref<CExpression> pexprOriginalPred, CExpressionArray *pdrgpexprPreds,
+	gpos::Ref<CExpression> pexprOriginalPred,
+	gpos::Ref<CExpressionArray> pdrgpexprPreds,
 	gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
 	CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
 	gpos::Ref<CColRefSet> pcrsReqd,
 	BOOL,  // fConjunction
-	CExpressionArray *pdrgpexprBitmap, CExpressionArray *pdrgpexprRecheck,
-	CExpressionArray *pdrgpexprResidual, BOOL isAPartialPredicate)
+	gpos::Ref<CExpressionArray> pdrgpexprBitmap,
+	gpos::Ref<CExpressionArray> pdrgpexprRecheck,
+	gpos::Ref<CExpressionArray> pdrgpexprResidual, BOOL isAPartialPredicate)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprPreds);
 
@@ -3358,7 +3360,8 @@ CXformUtils::CreateBitmapIndexProbesWithOrWithoutPredBreakdown(
 	CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> pcrsOuterRefs,
 	gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CExpression> *pexprBitmapResult,
 	gpos::Ref<CExpression> *pexprRecheckResult,
-	CExpressionArray *pdrgpexprResidualResult, BOOL isAPartialPredicate)
+	gpos::Ref<CExpressionArray> pdrgpexprResidualResult,
+	BOOL isAPartialPredicate)
 {
 	gpos::Ref<CExpression> pexprRecheckLocal, pexprResidualLocal,
 		pexprBitmapLocal;
@@ -3508,8 +3511,8 @@ CXformUtils::CreateBitmapIndexProbesWithOrWithoutPredBreakdown(
 // combine the individual bitmap access paths to form a bitmap bool op expression
 void
 CXformUtils::JoinBitmapIndexProbes(CMemoryPool *pmp,
-								   CExpressionArray *pdrgpexprBitmap,
-								   CExpressionArray *pdrgpexprRecheck,
+								   gpos::Ref<CExpressionArray> pdrgpexprBitmap,
+								   gpos::Ref<CExpressionArray> pdrgpexprRecheck,
 								   BOOL fConjunction,
 								   gpos::Ref<CExpression> *ppexprBitmap,
 								   gpos::Ref<CExpression> *ppexprRecheck)
@@ -4053,8 +4056,10 @@ CXformUtils::ICmpPrjElemsArr(const void *pvFst, const void *pvSnd)
 	GPOS_ASSERT(nullptr != pvFst);
 	GPOS_ASSERT(nullptr != pvSnd);
 
-	const CExpressionArray *pdrgpexprFst = *(const CExpressionArray **) (pvFst);
-	const CExpressionArray *pdrgpexprSnd = *(const CExpressionArray **) (pvSnd);
+	const gpos::Ref<CExpressionArray> pdrgpexprFst =
+		*(const gpos::Ref<CExpressionArray> *) (pvFst);
+	const gpos::Ref<CExpressionArray> pdrgpexprSnd =
+		*(const gpos::Ref<CExpressionArray> *) (pvSnd);
 
 	gpos::Ref<CExpression> pexprPrjElemFst = (*pdrgpexprFst)[0].get();
 	gpos::Ref<CExpression> pexprPrjElemSnd = (*pdrgpexprSnd)[0].get();
@@ -4102,7 +4107,8 @@ CXformUtils::PdrgpdrgpexprSortedPrjElemsArray(
 	while (hmexprdrgpexpriter.Advance())
 	{
 		gpos::Ref<CExpressionArray> pdrgpexprPrjElems =
-			const_cast<CExpressionArray *>(hmexprdrgpexpriter.Value());
+			const_cast<gpos::Ref<CExpressionArray> >(
+				hmexprdrgpexpriter.Value());
 		;
 		pdrgpdrgpexprPrjElems->Append(pdrgpexprPrjElems);
 	}
@@ -4207,7 +4213,7 @@ CXformUtils::PexprGbAggOnCTEConsumer2Join(CMemoryPool *mp,
 	const ULONG size = pdrgpdrgpexprPrjElems->Size();
 	for (ULONG ulPrjElemsArr = 0; ulPrjElemsArr < size; ulPrjElemsArr++)
 	{
-		CExpressionArray *pdrgpexprPrjElems =
+		gpos::Ref<CExpressionArray> pdrgpexprPrjElems =
 			(*pdrgpdrgpexprPrjElems)[ulPrjElemsArr];
 
 		gpos::Ref<CExpression> pexprNewGbAgg = nullptr;

@@ -359,11 +359,9 @@ CPartitionPropagationSpec::FSatisfies(
 //
 //---------------------------------------------------------------------------
 void
-CPartitionPropagationSpec::AppendEnforcers(CMemoryPool *mp,
-										   CExpressionHandle &exprhdl,
-										   gpos::Ref<CReqdPropPlan>,
-										   CExpressionArray *pdrgpexpr,
-										   gpos::Ref<CExpression> expr)
+CPartitionPropagationSpec::AppendEnforcers(
+	CMemoryPool *mp, CExpressionHandle &exprhdl, gpos::Ref<CReqdPropPlan>,
+	gpos::Ref<CExpressionArray> pdrgpexpr, gpos::Ref<CExpression> expr)
 {
 	UlongToSPartPropSpecInfoMapIter hmulpi(m_part_prop_spec_infos.get());
 	while (hmulpi.Advance())

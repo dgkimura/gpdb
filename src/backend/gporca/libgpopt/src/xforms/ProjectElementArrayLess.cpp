@@ -13,8 +13,8 @@
 namespace gpopt
 {
 bool
-ProjectElementArrayLess::operator()(const CExpressionArray *a,
-									const CExpressionArray *b) const
+ProjectElementArrayLess::operator()(const gpos::Ref<CExpressionArray> a,
+									const gpos::Ref<CExpressionArray> b) const
 {
 	gpos::Ref<CExpression> pexprPrjElemFst = (*a)[0].get();
 	gpos::Ref<CExpression> pexprPrjElemSnd = (*b)[0].get();

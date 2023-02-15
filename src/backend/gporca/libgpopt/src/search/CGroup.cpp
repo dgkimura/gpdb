@@ -540,8 +540,8 @@ CGroup::SetState(EState estNewState)
 
 
 void
-CGroup::SetJoinKeys(CExpressionArray *pdrgpexprOuter,
-					CExpressionArray *pdrgpexprInner,
+CGroup::SetJoinKeys(gpos::Ref<CExpressionArray> pdrgpexprOuter,
+					gpos::Ref<CExpressionArray> pdrgpexprInner,
 					gpos::Ref<IMdIdArray> join_opfamilies)
 {
 	GPOS_ASSERT(m_fScalar);

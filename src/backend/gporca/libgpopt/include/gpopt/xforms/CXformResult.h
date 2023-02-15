@@ -48,7 +48,7 @@ public:
 	~CXformResult() override;
 
 	// accessor
-	inline CExpressionArray *
+	inline gpos::Ref<CExpressionArray>
 	Pdrgpexpr() const
 	{
 		return m_pdrgpexpr.get();

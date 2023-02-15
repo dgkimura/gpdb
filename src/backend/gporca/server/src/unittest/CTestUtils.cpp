@@ -2776,7 +2776,7 @@ CTestUtils::PexprFindFirstExpressionWithOpId(gpos::Ref<CExpression> pexpr,
 void
 CTestUtils::EqualityPredicate(CMemoryPool *mp, gpos::Ref<CColRefSet> pcrsLeft,
 							  gpos::Ref<CColRefSet> pcrsRight,
-							  CExpressionArray *pdrgpexpr)
+							  gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	CColRef *pcrLeft = pcrsLeft->PcrAny();
 	CColRef *pcrRight = pcrsRight->PcrAny();

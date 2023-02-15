@@ -52,7 +52,7 @@ CExpressionUtils::UnnestChild(
 	BOOL fAnd,					   // is expression an AND node?
 	BOOL fOr,					   // is expression an OR node?
 	BOOL fHasNegatedChild,		   // does expression have NOT child nodes?
-	CExpressionArray *pdrgpexpr	   // array to append results to
+	gpos::Ref<CExpressionArray> pdrgpexpr  // array to append results to
 )
 {
 	GPOS_ASSERT(nullptr != mp);
@@ -93,7 +93,7 @@ CExpressionUtils::UnnestChild(
 //---------------------------------------------------------------------------
 void
 CExpressionUtils::AppendChildren(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-								 CExpressionArray *pdrgpexpr)
+								 gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != pexpr);

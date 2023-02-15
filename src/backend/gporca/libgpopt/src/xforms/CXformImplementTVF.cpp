@@ -115,7 +115,7 @@ CXformImplementTVF::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pdrgpcrOutput);
 
-	CExpressionArray *pdrgpexpr = pexpr->PdrgPexpr();
+	gpos::Ref<CExpressionArray> pdrgpexpr = pexpr->PdrgPexpr();
 
 	gpos::Ref<CPhysicalTVF> pphTVF = GPOS_NEW(mp)
 		CPhysicalTVF(mp, mdid_func, mdid_return_type, str, pdrgpcoldesc, pcrs);

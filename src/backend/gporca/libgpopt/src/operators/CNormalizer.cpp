@@ -1147,7 +1147,7 @@ CNormalizer::PushThru(CMemoryPool *mp, gpos::Ref<CExpression> pexprLogical,
 //---------------------------------------------------------------------------
 void
 CNormalizer::PushThru(CMemoryPool *mp, gpos::Ref<CExpression> pexprLogical,
-					  CExpressionArray *pdrgpexprConjuncts,
+					  gpos::Ref<CExpressionArray> pdrgpexprConjuncts,
 					  gpos::Ref<CExpression> *ppexprResult,
 					  gpos::Ref<CExpressionArray> *ppdrgpexprRemaining)
 {

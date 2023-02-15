@@ -321,7 +321,8 @@ void
 CXformEagerAgg::PopulateLowerProjectElement(
 	CMemoryPool *mp,			// memory pool
 	gpos::Ref<IMDId> agg_mdid,	// original global aggregate function
-	CWStringConst *agg_name, CExpressionArray *agg_arg_array, BOOL is_distinct,
+	CWStringConst *agg_name, gpos::Ref<CExpressionArray> agg_arg_array,
+	BOOL is_distinct,
 	gpos::Ref<CExpression> *
 		lower_proj_elem_expr  // output project element of the new lower aggregate
 )

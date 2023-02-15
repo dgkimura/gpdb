@@ -41,7 +41,8 @@ private:
 	// helper for splitting correlations into external and residual
 	static BOOL FSplitCorrelations(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprOuter,
-		gpos::Ref<CExpression> pexprInner, CExpressionArray *pdrgpexprAllCorr,
+		gpos::Ref<CExpression> pexprInner,
+		gpos::Ref<CExpressionArray> pdrgpexprAllCorr,
 		gpos::Ref<CExpressionArray> *ppdrgpexprExternal,
 		gpos::Ref<CExpressionArray> *ppdrgpexprResidual,
 		gpos::Ref<CColRefSet> *ppcrsInnerUsed);

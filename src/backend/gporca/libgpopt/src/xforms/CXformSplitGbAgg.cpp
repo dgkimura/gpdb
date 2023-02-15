@@ -238,7 +238,7 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 		gpos::Ref<CExpressionArray> pdrgpexprAgg = pexprAggFunc->PdrgPexpr();
 
 		;
-		CExpressionArray *pdrgpexprLocal = pdrgpexprAgg;
+		gpos::Ref<CExpressionArray> pdrgpexprLocal = pdrgpexprAgg;
 
 		gpos::Ref<CExpression> pexprAggFuncLocal =
 			GPOS_NEW(mp) CExpression(mp, popScAggFuncLocal, pdrgpexprLocal);

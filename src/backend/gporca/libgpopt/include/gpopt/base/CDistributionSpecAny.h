@@ -84,8 +84,8 @@ public:
 		CMemoryPool *,			   // mp
 		CExpressionHandle &,	   // exprhdl: gives access to child properties
 		gpos::Ref<CReqdPropPlan>,  // prpp
-		CExpressionArray *,		   // pdrgpexpr
-		gpos::Ref<CExpression>	   // pexpr
+		gpos::Ref<CExpressionArray>,  // pdrgpexpr
+		gpos::Ref<CExpression>		  // pexpr
 		) override
 	{
 		GPOS_ASSERT(!"attempt to enforce ANY distribution");

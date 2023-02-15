@@ -190,7 +190,7 @@ public:
 	virtual gpos::Ref<CExpression> PexprExpand();
 
 	// best join orders
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	PdrgpexprTopK() const
 	{
 		return m_pdrgpexprTopKOrders.get();

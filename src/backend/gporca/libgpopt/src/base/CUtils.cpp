@@ -1435,7 +1435,7 @@ CUtils::FScalarConstIntZero(gpos::Ref<CExpression> pexprOffset)
 
 // deduplicate an array of expressions
 gpos::Ref<CExpressionArray>
-CUtils::PdrgpexprDedup(CMemoryPool *mp, CExpressionArray *pdrgpexpr)
+CUtils::PdrgpexprDedup(CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	const ULONG size = pdrgpexpr->Size();
 	gpos::Ref<CExpressionArray> pdrgpexprDedup =
@@ -1488,8 +1488,8 @@ CUtils::PdrgpexprDedup(CMemoryPool *mp, CExpressionArray *pdrgpexpr)
 
 // deep equality of expression arrays
 BOOL
-CUtils::Equals(const CExpressionArray *pdrgpexprLeft,
-			   const CExpressionArray *pdrgpexprRight)
+CUtils::Equals(const gpos::Ref<CExpressionArray> pdrgpexprLeft,
+			   const gpos::Ref<CExpressionArray> pdrgpexprRight)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -1592,7 +1592,7 @@ CUtils::FMatchChildrenOrdered(const gpos::Ref<CExpression> pexprLeft,
 // return the number of occurrences of the given expression in the given array of expressions
 ULONG
 CUtils::UlOccurrences(const gpos::Ref<CExpression> pexpr,
-					  CExpressionArray *pdrgpexpr)
+					  gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	ULONG count = 0;
@@ -1612,7 +1612,7 @@ CUtils::UlOccurrences(const gpos::Ref<CExpression> pexpr,
 // compare expression against an array of expressions
 BOOL
 CUtils::FEqualAny(const gpos::Ref<CExpression> pexpr,
-				  const CExpressionArray *pdrgpexpr)
+				  const gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 
@@ -1628,8 +1628,8 @@ CUtils::FEqualAny(const gpos::Ref<CExpression> pexpr,
 
 // check if first expression array contains all expressions in second array
 BOOL
-CUtils::Contains(const CExpressionArray *pdrgpexprFst,
-				 const CExpressionArray *pdrgpexprSnd)
+CUtils::Contains(const gpos::Ref<CExpressionArray> pdrgpexprFst,
+				 const gpos::Ref<CExpressionArray> pdrgpexprSnd)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprFst);
 	GPOS_ASSERT(nullptr != pdrgpexprSnd);
@@ -2432,7 +2432,7 @@ CUtils::PexprAddProjection(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 // generate a project expression with one or more additional project elements
 gpos::Ref<CExpression>
 CUtils::PexprAddProjection(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-						   CExpressionArray *pdrgpexprProjected,
+						   gpos::Ref<CExpressionArray> pdrgpexprProjected,
 						   BOOL fNewComputedCol)
 {
 	GPOS_ASSERT(pexpr->Pop()->FLogical());
@@ -3590,7 +3590,7 @@ CUtils::PdrgpdrgpcrRemap(CMemoryPool *mp, CColRef2dArray *pdrgpdrgpcr,
 
 // remap given array of expressions with provided column mappings
 gpos::Ref<CExpressionArray>
-CUtils::PdrgpexprRemap(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
+CUtils::PdrgpexprRemap(CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr,
 					   UlongToColRefMap *colref_mapping)
 {
 	GPOS_ASSERT(nullptr != pdrgpexpr);
@@ -3962,7 +3962,8 @@ CUtils::PdrgpexprScalarIdents(CMemoryPool *mp, CColRefArray *colref_array)
 
 // return used columns by expressions in the given array
 gpos::Ref<CColRefSet>
-CUtils::PcrsExtractColumns(CMemoryPool *mp, const CExpressionArray *pdrgpexpr)
+CUtils::PcrsExtractColumns(CMemoryPool *mp,
+						   const gpos::Ref<CExpressionArray> pdrgpexpr)
 {
 	GPOS_ASSERT(nullptr != pdrgpexpr);
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
@@ -4243,8 +4244,8 @@ CUtils::PexprCollapseProjects(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 
 // append expressions in the source array to destination array
 void
-CUtils::AppendArrayExpr(CExpressionArray *pdrgpexprSrc,
-						CExpressionArray *pdrgpexprDest)
+CUtils::AppendArrayExpr(gpos::Ref<CExpressionArray> pdrgpexprSrc,
+						gpos::Ref<CExpressionArray> pdrgpexprDest)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprSrc);
 	GPOS_ASSERT(nullptr != pdrgpexprDest);
@@ -4832,7 +4833,7 @@ CUtils::IsExprNDVPreserving(gpos::Ref<CExpression> pexpr,
 gpos::Ref<CExpression>
 CUtils::PexprMatchEqualityOrINDF(
 	gpos::Ref<CExpression> pexprToMatch,
-	CExpressionArray *pdrgpexpr	 // array of predicates to inspect
+	gpos::Ref<CExpressionArray> pdrgpexpr  // array of predicates to inspect
 )
 {
 	GPOS_ASSERT(nullptr != pexprToMatch);
@@ -4928,7 +4929,7 @@ CUtils::MakeJoinWithoutInferredPreds(CMemoryPool *mp,
 
 // check if the input expr array contains the expr
 BOOL
-CUtils::Contains(const CExpressionArray *exprs,
+CUtils::Contains(const gpos::Ref<CExpressionArray> exprs,
 				 gpos::Ref<CExpression> expr_to_match)
 {
 	if (nullptr == exprs)
@@ -4946,8 +4947,8 @@ CUtils::Contains(const CExpressionArray *exprs,
 }
 
 BOOL
-CUtils::Equals(const CExpressionArrays *exprs_arr,
-			   const CExpressionArrays *other_exprs_arr)
+CUtils::Equals(const gpos::Ref<CExpressionArrays> exprs_arr,
+			   const gpos::Ref<CExpressionArrays> other_exprs_arr)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -5034,9 +5035,9 @@ CUtils::CanRemoveInferredPredicates(COperator::EOperatorId op_id)
 }
 
 gpos::Ref<CExpressionArrays>
-CUtils::GetCombinedExpressionArrays(CMemoryPool *mp,
-									CExpressionArrays *exprs_array,
-									CExpressionArrays *exprs_array_other)
+CUtils::GetCombinedExpressionArrays(
+	CMemoryPool *mp, gpos::Ref<CExpressionArrays> exprs_array,
+	gpos::Ref<CExpressionArrays> exprs_array_other)
 {
 	gpos::Ref<CExpressionArrays> result_exprs =
 		GPOS_NEW(mp) CExpressionArrays(mp);
@@ -5047,8 +5048,8 @@ CUtils::GetCombinedExpressionArrays(CMemoryPool *mp,
 }
 
 void
-CUtils::AddExprs(CExpressionArrays *results_exprs,
-				 CExpressionArrays *input_exprs)
+CUtils::AddExprs(gpos::Ref<CExpressionArrays> results_exprs,
+				 gpos::Ref<CExpressionArrays> input_exprs)
 {
 	GPOS_ASSERT(nullptr != results_exprs);
 	GPOS_ASSERT(nullptr != input_exprs);

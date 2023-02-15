@@ -624,7 +624,8 @@ CPhysicalUnionAll::PdshashedPassThru(
 	CMemoryPool *mp, gpos::Ref<CDistributionSpecHashed> pdshashedRequired,
 	ULONG child_index) const
 {
-	CExpressionArray *pdrgpexprRequired = pdshashedRequired->Pdrgpexpr();
+	gpos::Ref<CExpressionArray> pdrgpexprRequired =
+		pdshashedRequired->Pdrgpexpr();
 	CColRefArray *pdrgpcrChild = (*PdrgpdrgpcrInput())[child_index].get();
 	const ULONG ulExprs = pdrgpexprRequired->Size();
 	const ULONG ulOutputCols = PdrgpcrOutput()->Size();
@@ -770,7 +771,8 @@ CPhysicalUnionAll::PdsDeriveFromChildren(CMemoryPool *
 //
 //---------------------------------------------------------------------------
 gpos::Ref<ULongPtrArray>
-CPhysicalUnionAll::PdrgpulMap(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
+CPhysicalUnionAll::PdrgpulMap(CMemoryPool *mp,
+							  gpos::Ref<CExpressionArray> pdrgpexpr,
 							  ULONG child_index) const
 {
 	GPOS_ASSERT(nullptr != pdrgpexpr);

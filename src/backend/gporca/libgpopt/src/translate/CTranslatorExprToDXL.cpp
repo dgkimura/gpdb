@@ -6401,7 +6401,7 @@ CTranslatorExprToDXL::PdxlnWindow(gpos::Ref<CExpression> pexprSeqPrj,
 		gpos::dyn_cast<CPhysicalSequenceProject>(pexprSeqPrj->Pop());
 	gpos::Ref<CDistributionSpec> pds = popSeqPrj->Pds();
 	gpos::Ref<ULongPtrArray> colids = GPOS_NEW(m_mp) ULongPtrArray(m_mp);
-	CExpressionArray *pdrgpexprPartCol = nullptr;
+	gpos::Ref<CExpressionArray> pdrgpexprPartCol = nullptr;
 	if (CDistributionSpec::EdtHashed == pds->Edt())
 	{
 		gpos::Ref<CDistributionSpecHashed> pdshashed =
@@ -7453,8 +7453,9 @@ CTranslatorExprToDXL::GetSortColListDXL(const COrderSpec *pos)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLNode>
-CTranslatorExprToDXL::PdxlnHashExprList(const CExpressionArray *pdrgpexpr,
-										const gpos::Ref<IMdIdArray> opfamilies)
+CTranslatorExprToDXL::PdxlnHashExprList(
+	const gpos::Ref<CExpressionArray> pdrgpexpr,
+	const gpos::Ref<IMdIdArray> opfamilies)
 {
 	GPOS_ASSERT(nullptr != pdrgpexpr);
 	GPOS_ASSERT_IMP(GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution),

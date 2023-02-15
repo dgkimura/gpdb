@@ -1276,7 +1276,7 @@ CTranslatorExprToDXLUtils::SetDirectDispatchInfo(
 		return;
 	}
 
-	CExpressionArray *pexprFilterArray =
+	gpos::Ref<CExpressionArray> pexprFilterArray =
 		COptCtxt::PoctxtFromTLS()->GetDirectDispatchableFilters();
 	ULONG size = pexprFilterArray->Size();
 
@@ -1318,7 +1318,8 @@ CTranslatorExprToDXLUtils::SetDirectDispatchInfo(
 
 				gpos::Ref<CDistributionSpecHashed> pdsHashed =
 					gpos::dyn_cast<CDistributionSpecHashed>(pds);
-				CExpressionArray *pdrgpexprHashed = pdsHashed->Pdrgpexpr();
+				gpos::Ref<CExpressionArray> pdrgpexprHashed =
+					pdsHashed->Pdrgpexpr();
 
 				gpos::Ref<CDXLDirectDispatchInfo> dxl_direct_dispatch_info =
 					GetDXLDirectDispatchInfo(mp, md_accessor, pdrgpexprHashed,
@@ -1347,7 +1348,7 @@ CTranslatorExprToDXLUtils::SetDirectDispatchInfo(
 gpos::Ref<CDXLDirectDispatchInfo>
 CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfo(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	CExpressionArray *pdrgpexprHashed, gpos::Ref<CConstraint> pcnstr)
+	gpos::Ref<CExpressionArray> pdrgpexprHashed, gpos::Ref<CConstraint> pcnstr)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprHashed);
 	GPOS_ASSERT(nullptr != pcnstr);

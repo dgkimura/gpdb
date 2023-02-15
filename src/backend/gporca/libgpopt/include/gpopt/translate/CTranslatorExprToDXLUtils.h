@@ -85,7 +85,8 @@ private:
 	// on the distribution keys
 	static gpos::Ref<CDXLDirectDispatchInfo> GetDXLDirectDispatchInfo(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CExpressionArray *pdrgpexprHashed, gpos::Ref<CConstraint> pcnstr);
+		gpos::Ref<CExpressionArray> pdrgpexprHashed,
+		gpos::Ref<CConstraint> pcnstr);
 
 	// compute the direct dispatch info for a single distribution key from the constraints
 	// on the distribution key

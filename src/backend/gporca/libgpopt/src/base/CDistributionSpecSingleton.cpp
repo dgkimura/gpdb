@@ -104,11 +104,11 @@ CDistributionSpecSingleton::FSatisfies(
 //
 //---------------------------------------------------------------------------
 void
-CDistributionSpecSingleton::AppendEnforcers(CMemoryPool *mp,
-											CExpressionHandle &,  // exprhdl
-											gpos::Ref<CReqdPropPlan> prpp,
-											CExpressionArray *pdrgpexpr,
-											gpos::Ref<CExpression> pexpr)
+CDistributionSpecSingleton::AppendEnforcers(
+	CMemoryPool *mp,
+	CExpressionHandle &,  // exprhdl
+	gpos::Ref<CReqdPropPlan> prpp, gpos::Ref<CExpressionArray> pdrgpexpr,
+	gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != mp);
 	GPOS_ASSERT(nullptr != prpp);

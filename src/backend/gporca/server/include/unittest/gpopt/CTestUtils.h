@@ -526,7 +526,7 @@ public:
 	static void EqualityPredicate(CMemoryPool *mp,
 								  gpos::Ref<CColRefSet> pcrsLeft,
 								  gpos::Ref<CColRefSet> pcrsRight,
-								  CExpressionArray *pdrgpexpr);
+								  gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// int2 point
 	static gpos::Ref<CPoint> PpointInt2(CMemoryPool *mp, INT i);

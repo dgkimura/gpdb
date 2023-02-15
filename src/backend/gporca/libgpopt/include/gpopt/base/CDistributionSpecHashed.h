@@ -115,7 +115,7 @@ public:
 	}
 
 	// expression array accessor
-	CExpressionArray *
+	gpos::Ref<CExpressionArray>
 	Pdrgpexpr() const
 	{
 		return m_pdrgpexpr.get();
@@ -172,7 +172,7 @@ public:
 	// append enforcers to dynamic array for the given plan properties
 	void AppendEnforcers(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::Ref<CReqdPropPlan> prpp,
-						 CExpressionArray *pdrgpexpr,
+						 gpos::Ref<CExpressionArray> pdrgpexpr,
 						 gpos::Ref<CExpression> pexpr) override;
 
 	// hash function for hashed distribution spec
@@ -205,17 +205,17 @@ public:
 		return pdsHashed;
 	}
 
-	CExpressionArrays *
+	gpos::Ref<CExpressionArrays>
 	HashSpecEquivExprs() const
 	{
-		return m_equiv_hash_exprs.get();
+		return m_equiv_hash_exprs;
 	}
 
 	void ComputeEquivHashExprs(CMemoryPool *mp,
 							   CExpressionHandle &expression_handle);
 
 	// does the current spec or equivalent spec cover the input expression array
-	BOOL IsCoveredBy(const CExpressionArray *dist_cols_expr_array) const;
+	BOOL IsCoveredBy(const gpos::Ref<CExpressionArray> dist_cols_expr_array);
 
 	// create a copy of the distribution spec
 	gpos::Ref<CDistributionSpecHashed> Copy(CMemoryPool *mp);

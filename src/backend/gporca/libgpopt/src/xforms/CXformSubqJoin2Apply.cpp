@@ -243,7 +243,8 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown(CMemoryPool *mp,
 		;
 		gpos::Ref<CExpression> pexprNewChild = pexprChild;
 
-		CExpressionArray *pdrgpexprSubqs = (*pdrgpdrgpexprSubqs)[ulChild].get();
+		gpos::Ref<CExpressionArray> pdrgpexprSubqs =
+			(*pdrgpdrgpexprSubqs)[ulChild].get();
 		const ULONG ulSubqs = pdrgpexprSubqs->Size();
 		if (0 < ulSubqs)
 		{

@@ -60,7 +60,7 @@ private:
 	// one side equal to given expression
 	static gpos::Ref<CExpression> PexprMatchEqualitySide(
 		gpos::Ref<CExpression> pexprToMatch,
-		CExpressionArray *pdrgpexpr	 // array of predicates to inspect
+		gpos::Ref<CExpressionArray> pdrgpexpr  // array of predicates to inspect
 	);
 
 	// private copy ctor

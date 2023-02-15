@@ -43,7 +43,7 @@ private:
 	static gpos::Ref<CExpression> PexprMultiLevelAggregation(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprRelational,
 		gpos::Ref<CExpressionArray> pdrgpexprPrElFirstStage,
-		CExpressionArray *pdrgpexprPrElSecondStage,
+		gpos::Ref<CExpressionArray> pdrgpexprPrElSecondStage,
 		gpos::Ref<CExpressionArray> pdrgpexprPrElThirdStage,
 		CColRefArray *pdrgpcrArgDQA, CColRefArray *pdrgpcrLastStage,
 		BOOL fSplit2LevelsOnly, BOOL fAddDistinctColToLocalGb,
@@ -70,9 +70,10 @@ private:
 	static void PopulatePrLMultiPhaseAgg(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprPrEl,
-		CExpressionArray *pdrgpexprPrElFirstStage,
-		CExpressionArray *pdrgpexprPrElSecondStage,
-		CExpressionArray *pdrgpexprPrElLastStage, BOOL fSplit2LevelsOnly);
+		gpos::Ref<CExpressionArray> pdrgpexprPrElFirstStage,
+		gpos::Ref<CExpressionArray> pdrgpexprPrElSecondStage,
+		gpos::Ref<CExpressionArray> pdrgpexprPrElLastStage,
+		BOOL fSplit2LevelsOnly);
 
 	// create project element for the aggregate function of a particular level
 	static gpos::Ref<CExpression> PexprPrElAgg(
@@ -83,15 +84,15 @@ private:
 	// extract arguments of distinct aggs
 	static void ExtractDistinctCols(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
-		gpos::Ref<CExpression> pexpr, CExpressionArray *pdrgpexprChildPrEl,
+		gpos::Ref<CExpression> pexpr,
+		gpos::Ref<CExpressionArray> pdrgpexprChildPrEl,
 		ExprToColRefMap *phmexprcr, gpos::Ref<CColRefArray> *ppdrgpcrArgDQA);
 
 	// return the column reference of the argument to the aggregate function
-	static CColRef *PcrAggFuncArgument(CMemoryPool *mp,
-									   CMDAccessor *md_accessor,
-									   CColumnFactory *col_factory,
-									   gpos::Ref<CExpression> pexprArg,
-									   CExpressionArray *pdrgpexprChildPrEl);
+	static CColRef *PcrAggFuncArgument(
+		CMemoryPool *mp, CMDAccessor *md_accessor, CColumnFactory *col_factory,
+		gpos::Ref<CExpression> pexprArg,
+		gpos::Ref<CExpressionArray> pdrgpexprChildPrEl);
 
 public:
 	CXformSplitDQA(const CXformSplitDQA &) = delete;

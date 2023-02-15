@@ -85,7 +85,7 @@ CPhysicalSequenceProject::CreateOrderSpec(CMemoryPool *mp)
 		gpos::Ref<CDistributionSpecHashed> pdshashed =
 			gpos::dyn_cast<CDistributionSpecHashed>(m_pds.get());
 
-		const CExpressionArray *pdrgpexpr = pdshashed->Pdrgpexpr();
+		const gpos::Ref<CExpressionArray> pdrgpexpr = pdshashed->Pdrgpexpr();
 		const ULONG size = pdrgpexpr->Size();
 		for (ULONG ul = 0; ul < size; ul++)
 		{

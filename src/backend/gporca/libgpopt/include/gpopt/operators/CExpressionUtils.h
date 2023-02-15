@@ -44,11 +44,12 @@ private:
 	// unnest a given expression's child and append unnested nodes to given array
 	static void UnnestChild(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 							ULONG UlChildIndex, BOOL fAnd, BOOL fOr,
-							BOOL fNotChildren, CExpressionArray *pdrgpexpr);
+							BOOL fNotChildren,
+							gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// append the unnested children of given expression to given array
 	static void AppendChildren(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-							   CExpressionArray *pdrgpexpr);
+							   gpos::Ref<CExpressionArray> pdrgpexpr);
 
 	// return an array of expression children after being unnested
 	static gpos::Ref<CExpressionArray> PdrgpexprUnnestChildren(
