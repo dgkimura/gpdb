@@ -580,7 +580,8 @@ CDistributionSpecHashed::Matches(const gpos::Ref<CDistributionSpec> pds) const
 	}
 
 	if (nullptr != pdshashed->PdshashedEquiv() &&
-		pdshashed->PdshashedEquiv()->Matches(SharedFromThis()))
+		pdshashed->PdshashedEquiv()->Matches(
+			gpos::dyn_cast<CDistributionSpec>(SharedFromThis())))
 	{
 		return true;
 	}

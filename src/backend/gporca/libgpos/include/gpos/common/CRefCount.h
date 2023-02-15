@@ -127,9 +127,9 @@ public:
 	}
 
 	Ref<T>
-	SharedFromThis()
+	SharedFromThis() const
 	{
-		Ref<T> ref(dynamic_cast<T *>(this));
+		Ref<T> ref(dynamic_cast<T *>(const_cast<CRefCount *>(this)));
 		return ref;
 	}
 
