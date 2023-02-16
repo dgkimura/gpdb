@@ -42,13 +42,18 @@ class CExpression;
 
 // type definitions
 // array of groups
-using CGroupArray = CDynamicPtrArray<CGroup, CleanupNULL>;
+//using CGroupArray = CDynamicPtrArray<CGroup, CleanupNULL>;
+using CGroupArray = gpos::Vector<gpos::Ref<CGroup>>;
 
 // map required plan props to cost lower bound of corresponding plan
 using ReqdPropPlanToCostMap =
-	CHashMap<CReqdPropPlan, CCost, CReqdPropPlan::UlHashForCostBounding,
-			 CReqdPropPlan::FEqualForCostBounding,
-			 CleanupRelease<CReqdPropPlan>, CleanupDelete<CCost>>;
+	//CHashMap<CReqdPropPlan, CCost, CReqdPropPlan::UlHashForCostBounding,
+	//		 CReqdPropPlan::FEqualForCostBounding,
+	//		 CleanupRelease<CReqdPropPlan>, CleanupDelete<CCost>>;
+	gpos::UnorderedMap<
+		const gpos::Ref<CReqdPropPlan>, CCost,
+		gpos::RefHash<CReqdPropPlan, CReqdPropPlan::UlHashForCostBounding>,
+		gpos::RefEq<CReqdPropPlan, CReqdPropPlan::FEqualForCostBounding>>;
 
 // optimization levels in ascending order,
 // under a given optimization context, group expressions in higher levels

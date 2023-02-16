@@ -137,9 +137,9 @@ CLogicalLimit::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalLimit::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist)
+CLogicalLimit::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<COrderSpec> pos =
 		m_pos->PosCopyWithRemappedColumns(mp, colref_mapping, must_exist);

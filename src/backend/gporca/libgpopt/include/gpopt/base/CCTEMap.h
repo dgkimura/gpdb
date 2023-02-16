@@ -30,14 +30,21 @@ using namespace gpos;
 
 // hash map from CTE id to corresponding producer plan properties
 using UlongToDrvdPropPlanMap =
-	CHashMap<ULONG, CDrvdPropPlan, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<CDrvdPropPlan>>;
+	//CHashMap<ULONG, CDrvdPropPlan, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	//		 CleanupDelete<ULONG>, CleanupRelease<CDrvdPropPlan>>;
+	gpos::UnorderedMap<const ULONG *, gpos::Ref<CDrvdPropPlan>,
+					   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+					   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 // iterator for plan properties map
 using UlongToDrvdPropPlanMapIter =
-	CHashMapIter<ULONG, CDrvdPropPlan, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CDrvdPropPlan>>;
+	//CHashMapIter<ULONG, CDrvdPropPlan, gpos::HashValue<ULONG>,
+	//			 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+	//			 CleanupRelease<CDrvdPropPlan>>;
+	gpos::UnorderedMap<
+		const ULONG *, gpos::Ref<CDrvdPropPlan>,
+		gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+		gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 // forward declaration
 class CCTEReq;

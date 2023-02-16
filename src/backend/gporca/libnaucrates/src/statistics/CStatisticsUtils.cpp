@@ -67,7 +67,7 @@ CStatisticsUtils::NextPoint(CMemoryPool *mp, CMDAccessor *md_accessor,
 							gpos::Ref<CPoint> point)
 {
 	gpos::Ref<IMDId> mdid = point->GetDatum()->MDId();
-	const IMDType *mdtype = md_accessor->RetrieveType(mdid.get());
+	const gpos::Ref<IMDType> mdtype = md_accessor->RetrieveType(mdid.get());
 
 	// type has integer mapping
 	if (mdtype->GetDatumType() == IMDType::EtiInt2 ||
@@ -122,7 +122,7 @@ CStatisticsUtils::NextPoint(CMemoryPool *mp, CMDAccessor *md_accessor,
 //---------------------------------------------------------------------------
 gpos::Ref<CHistogram>
 CStatisticsUtils::TransformMCVToHist(CMemoryPool *mp,
-									 const IMDType *,  // mdtype,
+									 const gpos::Ref<IMDType>,	// mdtype,
 									 IDatumArray *mcv_datums,
 									 CDoubleArray *freq_array,
 									 ULONG num_mcv_values)
@@ -1016,7 +1016,7 @@ CStatisticsUtils::GetColId(const gpos::Ref<CStatsPredPtrArry> pred_stats_array)
 gpos::Ref<IDatum>
 CStatisticsUtils::DatumNull(const CColRef *colref)
 {
-	const IMDType *mdtype = colref->RetrieveType();
+	const gpos::Ref<IMDType> mdtype = colref->RetrieveType();
 
 	gpos::Ref<IDatum> datum = mdtype->DatumNull();
 	;
@@ -1821,7 +1821,7 @@ CStatisticsUtils::IncreasesRisk(gpos::Ref<CLogical> logical_op)
 //
 //---------------------------------------------------------------------------
 CDouble
-CStatisticsUtils::DefaultColumnWidth(const IMDType *mdtype)
+CStatisticsUtils::DefaultColumnWidth(const gpos::Ref<IMDType> mdtype)
 {
 	CDouble width(CStatistics::DefaultColumnWidth);
 	if (mdtype->IsFixedLength())

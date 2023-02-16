@@ -121,9 +121,9 @@ CLogicalInsert::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalInsert::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										   UlongToColRefMap *colref_mapping,
-										   BOOL must_exist)
+CLogicalInsert::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> colref_array = CUtils::PdrgpcrRemap(
 		mp, m_pdrgpcrSource.get(), colref_mapping, must_exist);

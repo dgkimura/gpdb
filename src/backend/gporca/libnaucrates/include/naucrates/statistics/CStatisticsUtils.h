@@ -143,11 +143,10 @@ public:
 									   gpos::Ref<CPoint> point);
 
 	// transform mcv information to optimizer's histogram structure
-	static gpos::Ref<CHistogram> TransformMCVToHist(CMemoryPool *mp,
-													const IMDType *mdtype,
-													IDatumArray *mcv_datums,
-													CDoubleArray *freq_array,
-													ULONG num_mcv_values);
+	static gpos::Ref<CHistogram> TransformMCVToHist(
+		CMemoryPool *mp, const gpos::Ref<IMDType> mdtype,
+		IDatumArray *mcv_datums, CDoubleArray *freq_array,
+		ULONG num_mcv_values);
 
 	// merge MCVs and histogram
 	static gpos::Ref<CHistogram> MergeMCVHist(
@@ -295,7 +294,7 @@ public:
 	static BOOL IncreasesRisk(gpos::Ref<CLogical> logical_op);
 
 	// return the default column width
-	static CDouble DefaultColumnWidth(const IMDType *mdtype);
+	static CDouble DefaultColumnWidth(const gpos::Ref<IMDType> mdtype);
 
 	// helper method to add width information
 	static void AddWidthInfo(CMemoryPool *mp,

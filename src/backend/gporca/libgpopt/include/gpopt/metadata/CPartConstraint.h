@@ -174,7 +174,8 @@ public:
 
 	// return a copy of the part constraint with remapped columns
 	gpos::Ref<CPartConstraint> PpartcnstrCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		BOOL must_exist);
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;

@@ -611,7 +611,7 @@ CStatistics::ScaleStats(CMemoryPool *mp, CDouble factor)
 //	copy statistics object with re-mapped column ids
 gpos::Ref<IStatistics>
 CStatistics::CopyStatsWithRemap(CMemoryPool *mp,
-								UlongToColRefMap *colref_mapping,
+								gpos::Ref<UlongToColRefMap> colref_mapping,
 								BOOL must_exist) const
 {
 	GPOS_ASSERT(nullptr != colref_mapping);
@@ -692,7 +692,7 @@ void
 CStatistics::AddHistogramsWithRemap(
 	CMemoryPool *mp, gpos::Ref<UlongToHistogramMap> src_histograms,
 	gpos::Ref<UlongToHistogramMap> dest_histograms,
-	UlongToColRefMap *colref_mapping,
+	gpos::Ref<UlongToColRefMap> colref_mapping,
 	BOOL
 #ifdef GPOS_DEBUG
 		must_exist
@@ -723,7 +723,7 @@ void
 CStatistics::AddWidthInfoWithRemap(CMemoryPool *mp,
 								   gpos::Ref<UlongToDoubleMap> src_width,
 								   gpos::Ref<UlongToDoubleMap> dest_width,
-								   UlongToColRefMap *colref_mapping,
+								   gpos::Ref<UlongToColRefMap> colref_mapping,
 								   BOOL must_exist)
 {
 	UlongToDoubleMapIter col_width_map_iterator(src_width.get());

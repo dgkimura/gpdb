@@ -167,7 +167,7 @@ private:
 
 	// create new column reference and add to the hashmap maintaining
 	// the mapping between DXL ColIds and column reference.
-	CColRef *PcrCreate(const CColRef *colref, const IMDType *pmdtype,
+	CColRef *PcrCreate(const CColRef *colref, const gpos::Ref<IMDType> pmdtype,
 					   INT type_modifier, BOOL fStoreMapping, ULONG colid);
 
 	// check if we currently support the casting of such column types
@@ -418,7 +418,8 @@ private:
 
 	// look up the column reference in the hash map. We raise an exception if
 	// the column is not found
-	static CColRef *LookupColRef(UlongToColRefMap *colref_mapping, ULONG colid);
+	static CColRef *LookupColRef(gpos::Ref<UlongToColRefMap> colref_mapping,
+								 ULONG colid);
 
 public:
 	// ctor

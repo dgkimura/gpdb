@@ -176,7 +176,8 @@ CLogicalConstTableGet::Matches(gpos::Ref<COperator> pop) const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalConstTableGet::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> colref_array = nullptr;
 	if (must_exist)

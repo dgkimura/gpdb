@@ -133,9 +133,9 @@ public:
 	static CQueryContext *PqcGenerate(
 		CMemoryPool *mp,			   // memory pool
 		gpos::Ref<CExpression> pexpr,  // expression representing the query
-		ULongPtrArray
-			*pdrgpulQueryOutputColRefId,  // array of output column reference id
-		CMDNameArray *pdrgpmdname,		  // array of output column names
+		gpos::Ref<ULongPtrArray>
+			pdrgpulQueryOutputColRefId,	 // array of output column reference id
+		CMDNameArray *pdrgpmdname,		 // array of output column names
 		BOOL fDeriveStats);
 
 #ifdef GPOS_DEBUG

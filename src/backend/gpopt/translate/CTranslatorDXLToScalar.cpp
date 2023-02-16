@@ -1991,7 +1991,7 @@ CTranslatorDXLToScalar::TranslateDXLDatumGenericToScalar(
 {
 	gpos::Ref<CDXLDatumGeneric> datum_generic_dxl =
 		gpos::dyn_cast<CDXLDatumGeneric>(datum_dxl);
-	const IMDType *type =
+	const gpos::Ref<IMDType> type =
 		m_md_accessor->RetrieveType(datum_generic_dxl->MDId());
 
 	Const *constant = MakeNode(Const);

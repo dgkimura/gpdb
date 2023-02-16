@@ -132,7 +132,8 @@ CDistributionSpecHashed::PopulateDefaultOpfamilies()
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CDistributionSpecHashed::PdsCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	const ULONG length = m_pdrgpexpr->Size();
@@ -302,7 +303,8 @@ CDistributionSpecHashed::FMatchSubset(
 				CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
 				gpos::Ref<IMDId> expr_type_mdid =
 					gpos::dyn_cast<CScalar>(pexprOwn->Pop())->MdidType();
-				const IMDType *expr_type = mda->RetrieveType(expr_type_mdid);
+				const gpos::Ref<IMDType> expr_type =
+					mda->RetrieveType(expr_type_mdid);
 
 				if (expr_type->GetDistrOpfamilyMdid() != opfamily_own.get() ||
 					expr_type->GetDistrOpfamilyMdid() != opfamily_other.get())

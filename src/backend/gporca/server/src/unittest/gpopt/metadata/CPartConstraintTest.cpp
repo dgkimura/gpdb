@@ -244,7 +244,8 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	CMDAccessor mda(mp, CMDCache::Pcache(), CTestUtils::m_sysidDefault,
 					std::move(pmdp));
 
-	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
+	const gpos::Ref<IMDType> pmdtype =
+		mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
 	CWStringConst str(GPOS_WSZ_LIT("date_col"));
 	CName name(mp, &str);
 	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(

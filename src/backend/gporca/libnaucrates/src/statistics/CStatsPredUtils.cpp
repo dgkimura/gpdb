@@ -294,7 +294,8 @@ CStatsPredUtils::GetPredStats(CMemoryPool *mp, gpos::Ref<CExpression> expr)
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	gpos::Ref<IDatum> datum = scalar_const_op->GetDatum();
-	const IMDType *datum_type = md_accessor->RetrieveType(datum->MDId().get());
+	const gpos::Ref<IMDType> datum_type =
+		md_accessor->RetrieveType(datum->MDId().get());
 
 	BOOL is_text_related =
 		datum_type->IsTextRelated() && col_ref->RetrieveType()->IsTextRelated();
@@ -353,7 +354,7 @@ CStatsPredUtils::GetPredStats(CMemoryPool *mp, gpos::Ref<CExpression> expr)
 BOOL
 CStatsPredUtils::IsJoinPredSupportedForStatsEstimation(
 	gpos::Ref<CExpression> expr,
-	CColRefSetArray *
+	gpos::Ref<CColRefSetArray>
 		output_col_refsets,	 // array of output columns of join's relational inputs
 	BOOL is_semi_or_anti_join, CStatsPred::EStatsCmpType *stats_pred_cmp_type,
 	const CColRef **col_ref_outer, const CColRef **col_ref_inner)
@@ -484,7 +485,7 @@ CStatsPredUtils::IsJoinPredSupportedForStatsEstimation(
 
 BOOL
 CStatsPredUtils::AssignExprsToOuterAndInner(
-	CColRefSetArray *
+	gpos::Ref<CColRefSetArray>
 		output_col_refsets,	 // array of output columns of join's relational inputs
 	gpos::Ref<CExpression> expr_1, gpos::Ref<CExpression> expr_2,
 	gpos::Ref<CExpression> *outer_expr, gpos::Ref<CExpression> *inner_expr)
@@ -1278,7 +1279,7 @@ CStatsPredUtils::GetStatsPredFromBoolExpr(CMemoryPool *mp,
 gpos::Ref<CStatsPredJoin>
 CStatsPredUtils::ExtractJoinStatsFromJoinPred(
 	CMemoryPool *mp, gpos::Ref<CExpression> join_pred_expr,
-	CColRefSetArray *
+	gpos::Ref<CColRefSetArray>
 		output_col_refsets,	 // array of output columns of join's relational inputs
 	gpos::Ref<CColRefSet> outer_refs, BOOL is_semi_or_anti_join,
 	gpos::Ref<CExpressionArray> unsupported_expr_array)
@@ -1345,7 +1346,7 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPred(
 gpos::Ref<CStatsPredJoinArray>
 CStatsPredUtils::ExtractJoinStatsFromJoinPredArray(
 	CMemoryPool *mp, gpos::Ref<CExpression> scalar_expr,
-	CColRefSetArray *
+	gpos::Ref<CColRefSetArray>
 		output_col_refsets,	 // array of output columns of join's relational inputs
 	gpos::Ref<CColRefSet> outer_refs, BOOL is_semi_or_antijoin,
 	gpos::Ref<CStatsPred> *unsupported_stats_pred_array)
@@ -1411,7 +1412,7 @@ gpos::Ref<CStatsPredJoinArray>
 CStatsPredUtils::ExtractJoinStatsFromExpr(
 	CMemoryPool *mp, CExpressionHandle &expr_handle,
 	gpos::Ref<CExpression> pexprScalarInput,
-	CColRefSetArray *
+	gpos::Ref<CColRefSetArray>
 		output_col_refsets,	 // array of output columns of join's relational inputs
 	gpos::Ref<CColRefSet> outer_refs, BOOL is_semi_or_anti_join)
 {

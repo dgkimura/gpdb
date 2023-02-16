@@ -219,7 +219,8 @@ CLogicalBitmapTableGet::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalBitmapTableGet::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> pdrgpcrOutput = nullptr;
 	if (must_exist)

@@ -502,7 +502,8 @@ CTranslatorDXLToExpr::PexprLogicalTVF(const gpos::Ref<CDXLNode> dxlnode)
 			dxl_op->GetColumnDescrAt(ul);
 		GPOS_ASSERT(pdxlcoldesc->MdidType()->IsValid());
 
-		const IMDType *pmdtype = m_pmda->RetrieveType(pdxlcoldesc->MdidType());
+		const gpos::Ref<IMDType> pmdtype =
+			m_pmda->RetrieveType(pdxlcoldesc->MdidType());
 
 		GPOS_ASSERT(nullptr != pdxlcoldesc->MdName()->GetMDName()->GetBuffer());
 		CWStringConst strColName(
@@ -879,7 +880,7 @@ CTranslatorDXLToExpr::BuildSetOpChild(
 					   GPOS_WSZ_LIT("Casting of columns of unknown data type"));
 		}
 
-		const IMDType *pmdtype = m_pmda->RetrieveType(mdid_dest);
+		const gpos::Ref<IMDType> pmdtype = m_pmda->RetrieveType(mdid_dest);
 		INT type_modifier = pdxlcdOutput->TypeModifier();
 
 		BOOL fEqualTypes = IMDId::MDIdCompare(pmdidSource, mdid_dest);
@@ -1032,7 +1033,7 @@ CTranslatorDXLToExpr::FCastingUnknownType(gpos::Ref<IMDId> pmdidSource,
 //		the column is not found
 //---------------------------------------------------------------------------
 CColRef *
-CTranslatorDXLToExpr::LookupColRef(UlongToColRefMap *colref_mapping,
+CTranslatorDXLToExpr::LookupColRef(gpos::Ref<UlongToColRefMap> colref_mapping,
 								   ULONG colid)
 {
 	GPOS_ASSERT(nullptr != colref_mapping);
@@ -1060,7 +1061,8 @@ CTranslatorDXLToExpr::LookupColRef(UlongToColRefMap *colref_mapping,
 //
 //---------------------------------------------------------------------------
 CColRef *
-CTranslatorDXLToExpr::PcrCreate(const CColRef *colref, const IMDType *pmdtype,
+CTranslatorDXLToExpr::PcrCreate(const CColRef *colref,
+								const gpos::Ref<IMDType> pmdtype,
 								INT type_modifier, BOOL fStoreMapping,
 								ULONG colid)
 {
@@ -1097,7 +1099,7 @@ CTranslatorDXLToExpr::Pdrgpcr(const CDXLColDescrArray *dxl_col_descr_array)
 	{
 		gpos::Ref<CDXLColDescr> pdxlcd = (*dxl_col_descr_array)[ul].get();
 		gpos::Ref<IMDId> mdid = pdxlcd->MdidType();
-		const IMDType *pmdtype = m_pmda->RetrieveType(mdid);
+		const gpos::Ref<IMDType> pmdtype = m_pmda->RetrieveType(mdid);
 
 		CName name(pdxlcd->MdName()->GetMDName());
 		// generate a new column reference
@@ -1750,7 +1752,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const gpos::Ref<CDXLNode> dxlnode)
 			gpos::Ref<CScalar> popScalar =
 				gpos::dyn_cast<CScalar>(pexprScWindowFunc->Pop());
 			gpos::Ref<IMDId> mdid = popScalar->MdidType();
-			const IMDType *pmdtype = m_pmda->RetrieveType(mdid);
+			const gpos::Ref<IMDType> pmdtype = m_pmda->RetrieveType(mdid);
 
 			CName name(pdxlopPrEl->GetMdNameAlias()->GetMDName());
 
@@ -2175,7 +2177,8 @@ CTranslatorDXLToExpr::Ptabdesc(gpos::Ref<CDXLTableDescr> table_descr)
 		BOOL is_nullable = pmdcolNext->IsNullable();
 
 		GPOS_ASSERT(pdxlcoldesc->MdidType()->IsValid());
-		const IMDType *pmdtype = m_pmda->RetrieveType(pdxlcoldesc->MdidType());
+		const gpos::Ref<IMDType> pmdtype =
+			m_pmda->RetrieveType(pdxlcoldesc->MdidType());
 
 		GPOS_ASSERT(nullptr != pdxlcoldesc->MdName()->GetMDName()->GetBuffer());
 		CWStringConst strColName(
@@ -2383,7 +2386,8 @@ CTranslatorDXLToExpr::PtabdescFromCTAS(gpos::Ref<CDXLLogicalCTAS> pdxlopCTAS)
 			(*dxl_col_descr_array)[ul].get();
 
 		GPOS_ASSERT(pdxlcoldesc->MdidType()->IsValid());
-		const IMDType *pmdtype = m_pmda->RetrieveType(pdxlcoldesc->MdidType());
+		const gpos::Ref<IMDType> pmdtype =
+			m_pmda->RetrieveType(pdxlcoldesc->MdidType());
 
 		GPOS_ASSERT(nullptr != pdxlcoldesc->MdName()->GetMDName()->GetBuffer());
 		CWStringConst strColName(
@@ -2474,7 +2478,8 @@ CTranslatorDXLToExpr::PexprLogicalConstTableGet(
 	for (ULONG ulColIdx = 0; ulColIdx < ulColumns; ulColIdx++)
 	{
 		gpos::Ref<CDXLColDescr> pdxlcd = (*dxl_col_descr_array)[ulColIdx].get();
-		const IMDType *pmdtype = m_pmda->RetrieveType(pdxlcd->MdidType());
+		const gpos::Ref<IMDType> pmdtype =
+			m_pmda->RetrieveType(pdxlcd->MdidType());
 		CName name(m_mp, pdxlcd->MdName()->GetMDName());
 
 		const ULONG ulWidth = pdxlcd->Width();
@@ -3990,7 +3995,7 @@ CTranslatorDXLToExpr::PexprScalarProjElem(const gpos::Ref<CDXLNode> pdxlnPrEl)
 	gpos::Ref<CScalar> popScalar = gpos::dyn_cast<CScalar>(pexprChild->Pop());
 
 	gpos::Ref<IMDId> mdid = popScalar->MdidType();
-	const IMDType *pmdtype = m_pmda->RetrieveType(mdid);
+	const gpos::Ref<IMDType> pmdtype = m_pmda->RetrieveType(mdid);
 
 	CName name(pdxlopPrEl->GetMdNameAlias()->GetMDName());
 

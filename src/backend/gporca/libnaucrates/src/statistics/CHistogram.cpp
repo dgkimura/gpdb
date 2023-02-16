@@ -2294,7 +2294,7 @@ CHistogram::IsHistogramForTextRelatedTypes() const
 		gpos::Ref<IMDId> mdid =
 			(*m_histogram_buckets)[0]->GetLowerBound()->GetDatum()->MDId();
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		const IMDType *type = md_accessor->RetrieveType(mdid.get());
+		const gpos::Ref<IMDType> type = md_accessor->RetrieveType(mdid.get());
 
 		return type->IsTextRelated();
 	}

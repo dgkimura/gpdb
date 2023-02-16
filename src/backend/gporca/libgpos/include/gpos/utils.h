@@ -15,6 +15,7 @@
 #ifndef GPOS_utils_H
 #define GPOS_utils_H
 
+#include "gpos/common/owner.h"
 #include "gpos/error/CException.h"
 #include "gpos/io/COstreamBasic.h"
 #include "gpos/types.h"

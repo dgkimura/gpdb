@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CScalarIdent.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;
@@ -42,9 +43,6 @@ const CHAR rgszFrameExclusionStrategy[][20] = {"None", "Nulls", "Current",
 GPOS_CPL_ASSERT(CWindowFrame::EfesSentinel ==
 				GPOS_ARRAY_SIZE(rgszFrameExclusionStrategy));
 
-// empty window frame
-const CWindowFrame CWindowFrame::m_wfEmpty;
-
 //---------------------------------------------------------------------------
 //	@function:
 //		CWindowFrame::CWindowFrame
@@ -58,14 +56,13 @@ CWindowFrame::CWindowFrame(CMemoryPool *mp, EFrameSpec efs,
 						   EFrameBoundary efbTrailing,
 						   gpos::Ref<CExpression> pexprLeading,
 						   gpos::Ref<CExpression> pexprTrailing,
-						   EFrameExclusionStrategy efes, BOOL wfEmpty)
+						   EFrameExclusionStrategy efes)
 	: m_efs(efs),
 	  m_efbLeading(efbLeading),
 	  m_efbTrailing(efbTrailing),
 	  m_pexprLeading(pexprLeading),
 	  m_pexprTrailing(pexprTrailing),
-	  m_efes(efes),
-	  m_wfEmpty(wfEmpty)
+	  m_efes(efes)
 {
 	GPOS_ASSERT_IMP(EfbBoundedPreceding == m_efbLeading ||
 						EfbBoundedFollowing == m_efbLeading,
@@ -178,14 +175,13 @@ CWindowFrame::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CWindowFrame>
-CWindowFrame::PwfCopyWithRemappedColumns(CMemoryPool *mp,
-										 UlongToColRefMap *colref_mapping,
-										 BOOL must_exist)
+CWindowFrame::PwfCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
-	if (this == &m_wfEmpty)
+	if (m_wfEmpty)
 	{
-		;
-		return gpos::Ref<CWindowFrame> me(this);
+		return SharedFromThis();
 	}
 
 	gpos::Ref<CExpression> pexprLeading = nullptr;
@@ -218,7 +214,7 @@ CWindowFrame::PwfCopyWithRemappedColumns(CMemoryPool *mp,
 IOstream &
 CWindowFrame::OsPrint(IOstream &os) const
 {
-	if (this == &m_wfEmpty)
+	if (m_wfEmpty)
 	{
 		os << "EMPTY FRAME";
 		return os;

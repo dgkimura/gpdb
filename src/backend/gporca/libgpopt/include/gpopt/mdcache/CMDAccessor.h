@@ -228,10 +228,11 @@ private:
 	const IMDCacheObject *GetImdObj(gpos::Ref<IMDId> mdid);
 
 	// return the type corresponding to the given type info and source system id
-	const IMDType *RetrieveType(CSystemId sysid, IMDType::ETypeInfo type_info);
+	const gpos::Ref<IMDType> RetrieveType(CSystemId sysid,
+										  IMDType::ETypeInfo type_info);
 
 	// return the generic type corresponding to the given type info
-	const IMDType *RetrieveType(IMDType::ETypeInfo type_info);
+	const gpos::Ref<IMDType> RetrieveType(IMDType::ETypeInfo type_info);
 
 	// destroy accessor element when MDAccessor is destroyed
 	static void DestroyAccessorElement(SMDAccessorElem *pmdaccelem);
@@ -302,26 +303,26 @@ public:
 	const IMDRelation *RetrieveRel(gpos::Ref<IMDId> mdid);
 
 	// interface to type's from the MD cache given the type's mdid
-	const IMDType *RetrieveType(gpos::Ref<IMDId> mdid);
+	const gpos::Ref<IMDType> RetrieveType(gpos::Ref<IMDId> mdid);
 
 	// obtain the specified base type given by the template parameter
 	template <class T>
-	const T *
+	const gpos::Ref<T>
 	PtMDType()
 	{
 		IMDType::ETypeInfo type_info = T::GetTypeInfo();
 		GPOS_ASSERT(IMDType::EtiGeneric != type_info);
-		return dynamic_cast<const T *>(RetrieveType(type_info));
+		return gpos::dyn_cast<T>(RetrieveType(type_info));
 	}
 
 	// obtain the specified base type given by the template parameter
 	template <class T>
-	const T *
+	const gpos::Ref<T>
 	PtMDType(CSystemId sysid)
 	{
 		IMDType::ETypeInfo type_info = T::GetTypeInfo();
 		GPOS_ASSERT(IMDType::EtiGeneric != type_info);
-		return dynamic_cast<const T *>(RetrieveType(sysid, type_info));
+		return gpos::dyn_cast<T>(RetrieveType(sysid, type_info));
 	}
 
 	// interface to a scalar operator from the MD cache

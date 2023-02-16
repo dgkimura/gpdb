@@ -65,7 +65,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------
@@ -128,7 +128,8 @@ public:
 	// derive statistics
 	static gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		CColRef2dArray *pdrgpdrgpcrInput, CColRefSetArray *output_colrefsets);
+		CColRef2dArray *pdrgpdrgpcrInput,
+		gpos::Ref<CColRefSetArray> output_colrefsets);
 
 };	// class CLogicalIntersectAll
 

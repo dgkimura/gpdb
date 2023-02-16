@@ -187,7 +187,8 @@ CXformEagerAgg::CanPushAggBelowJoin(gpos::Ref<CExpression> scalar_agg_func_expr)
 	gpos::Ref<CExpression> agg_child_expr = (*(*scalar_agg_func_expr)[0])[0];
 	gpos::Ref<IMDId> agg_child_mdid =
 		gpos::dyn_cast<CScalar>(agg_child_expr->Pop())->MdidType();
-	const IMDType *agg_child_type = md_accessor->RetrieveType(agg_child_mdid);
+	const gpos::Ref<IMDType> agg_child_type =
+		md_accessor->RetrieveType(agg_child_mdid);
 	// if agg_mdid is not one of the supported aggregates (min, max, sum, count, avg)
 	// then don't push it down
 	if (!(agg_mdid->Equals(
@@ -344,7 +345,7 @@ CXformEagerAgg::PopulateLowerProjectElement(
 	// determine the return type of the lower aggregate function
 	gpos::Ref<IMDId> lower_agg_ret_mdid =
 		md_accessor->RetrieveAgg(agg_mdid)->GetIntermediateResultTypeMdid();
-	const IMDType *lower_agg_ret_type =
+	const gpos::Ref<IMDType> lower_agg_ret_type =
 		md_accessor->RetrieveType(lower_agg_ret_mdid);
 	// create a column reference for the new created aggregate function
 	CColRef *lower_colref =

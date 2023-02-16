@@ -91,9 +91,9 @@ CLogicalDifference::DeriveMaxCard(CMemoryPool *,  // mp
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalDifference::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+CLogicalDifference::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> pdrgpcrOutput = CUtils::PdrgpcrRemap(
 		mp, m_pdrgpcrOutput.get(), colref_mapping, must_exist);

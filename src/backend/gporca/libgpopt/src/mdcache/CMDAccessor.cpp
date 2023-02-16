@@ -645,7 +645,7 @@ CMDAccessor::RetrieveRel(gpos::Ref<IMDId> mdid)
 //		it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDType *
+const gpos::Ref<IMDType>
 CMDAccessor::RetrieveType(gpos::Ref<IMDId> mdid)
 {
 	const IMDCacheObject *pmdobj = GetImdObj(mdid);
@@ -655,7 +655,7 @@ CMDAccessor::RetrieveType(gpos::Ref<IMDId> mdid)
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDType *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDType> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -668,7 +668,7 @@ CMDAccessor::RetrieveType(gpos::Ref<IMDId> mdid)
 //		and storing it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDType *
+const gpos::Ref<IMDType>
 CMDAccessor::RetrieveType(CSystemId sysid, IMDType::ETypeInfo type_info)
 {
 	GPOS_ASSERT(IMDType::EtiGeneric != type_info);
@@ -682,7 +682,7 @@ CMDAccessor::RetrieveType(CSystemId sysid, IMDType::ETypeInfo type_info)
 				   a_pmdid.get()->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDType *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDType> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -695,7 +695,7 @@ CMDAccessor::RetrieveType(CSystemId sysid, IMDType::ETypeInfo type_info)
 //		and storing it in the cache first.
 //
 //---------------------------------------------------------------------------
-const IMDType *
+const gpos::Ref<IMDType>
 CMDAccessor::RetrieveType(IMDType::ETypeInfo type_info)
 {
 	GPOS_ASSERT(IMDType::EtiGeneric != type_info);
@@ -710,7 +710,7 @@ CMDAccessor::RetrieveType(IMDType::ETypeInfo type_info)
 				   mdid->GetBuffer());
 	}
 
-	return dynamic_cast<const IMDType *>(pmdobj);
+	return dynamic_cast<const gpos::Ref<IMDType> >(pmdobj);
 }
 
 //---------------------------------------------------------------------------
@@ -1214,7 +1214,7 @@ gpos::Ref<IDatum>
 CMDAccessor::GetDatum(CMemoryPool *mp, gpos::Ref<IMDId> mdid_type,
 					  const gpos::Ref<CDXLDatum> dxl_datum)
 {
-	const IMDType *pmdtype = RetrieveType(mdid_type);
+	const gpos::Ref<IMDType> pmdtype = RetrieveType(mdid_type);
 
 	return pmdtype->GetDatumForDXLDatum(mp, dxl_datum);
 }

@@ -16,6 +16,7 @@
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CPhysicalSort.h"
+#include "gpopt/search/CGroupExpression.h"
 
 #ifdef GPOS_DEBUG
 #include "gpos/error/CAutoTrace.h"
@@ -255,9 +256,9 @@ COrderSpec::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-COrderSpec::PosCopyWithRemappedColumns(CMemoryPool *mp,
-									   UlongToColRefMap *colref_mapping,
-									   BOOL must_exist)
+COrderSpec::PosCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
 

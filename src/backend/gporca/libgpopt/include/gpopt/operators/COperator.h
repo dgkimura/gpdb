@@ -345,7 +345,8 @@ public:
 
 	// return a copy of the operator with remapped columns
 	virtual gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist) = 0;
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		BOOL must_exist) = 0;
 
 	// print
 	virtual IOstream &OsPrint(IOstream &os) const;

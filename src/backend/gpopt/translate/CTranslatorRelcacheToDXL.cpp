@@ -2296,7 +2296,7 @@ CTranslatorRelcacheToDXL::TransformStatsToDXLBucketArray(
 //---------------------------------------------------------------------------
 gpos::Ref<CHistogram>
 CTranslatorRelcacheToDXL::TransformMcvToOrcaHistogram(
-	CMemoryPool *mp, const IMDType *md_type, const Datum *mcv_values,
+	CMemoryPool *mp, const gpos::Ref<IMDType> md_type, const Datum *mcv_values,
 	const float4 *mcv_frequencies, ULONG num_mcv_values)
 {
 	gpos::Ref<IDatumArray> datums = GPOS_NEW(mp) IDatumArray(mp);
@@ -2339,7 +2339,7 @@ CTranslatorRelcacheToDXL::TransformMcvToOrcaHistogram(
 //---------------------------------------------------------------------------
 gpos::Ref<CHistogram>
 CTranslatorRelcacheToDXL::TransformHistToOrcaHistogram(
-	CMemoryPool *mp, const IMDType *md_type, const Datum *hist_values,
+	CMemoryPool *mp, const gpos::Ref<IMDType> md_type, const Datum *hist_values,
 	ULONG num_hist_values, CDouble num_distinct, CDouble hist_freq)
 {
 	GPOS_ASSERT(1 < num_hist_values);
@@ -2426,7 +2426,8 @@ CTranslatorRelcacheToDXL::TransformHistToOrcaHistogram(
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLBucketArray>
 CTranslatorRelcacheToDXL::TransformHistogramToDXLBucketArray(
-	CMemoryPool *mp, const IMDType *md_type, const gpos::Ref<CHistogram> hist)
+	CMemoryPool *mp, const gpos::Ref<IMDType> md_type,
+	const gpos::Ref<CHistogram> hist)
 {
 	gpos::Ref<CDXLBucketArray> dxl_stats_bucket_array =
 		GPOS_NEW(mp) CDXLBucketArray(mp);

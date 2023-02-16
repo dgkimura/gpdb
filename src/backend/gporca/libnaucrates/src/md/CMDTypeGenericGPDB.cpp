@@ -322,7 +322,7 @@ CMDTypeGenericGPDB::GetDatumVal(CMemoryPool *mp, gpos::Ref<IDatum> datum) const
 	}
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDType *md_type = md_accessor->RetrieveType(m_mdid.get());
+	const gpos::Ref<IMDType> md_type = md_accessor->RetrieveType(m_mdid.get());
 	return CreateDXLDatumVal(
 		mp, m_mdid.get(), md_type, datum_generic->TypeModifier(),
 		datum_generic->IsNull(), pba, length, lValue, dValue);
@@ -355,9 +355,10 @@ CMDTypeGenericGPDB::IsAmbiguous() const
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
 CMDTypeGenericGPDB::CreateDXLDatumVal(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
-									  const IMDType *md_type, INT type_modifier,
-									  BOOL is_null, BYTE *pba, ULONG length,
-									  LINT lValue, CDouble dValue)
+									  const gpos::Ref<IMDType> md_type,
+									  INT type_modifier, BOOL is_null,
+									  BYTE *pba, ULONG length, LINT lValue,
+									  CDouble dValue)
 {
 	GPOS_ASSERT(IMDId::EmdidGPDB == mdid->MdidType());
 
@@ -446,7 +447,7 @@ CMDTypeGenericGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 {
 	;
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDType *md_type = md_accessor->RetrieveType(m_mdid.get());
+	const gpos::Ref<IMDType> md_type = md_accessor->RetrieveType(m_mdid.get());
 	return CreateDXLDatumVal(mp, m_mdid.get(), md_type, default_type_modifier,
 							 true /*fConstNull*/, nullptr /*byte_array*/,
 							 0 /*length*/, 0 /*lint_value */,
@@ -462,7 +463,7 @@ CMDTypeGenericGPDB::GetDXLDatumNull(CMemoryPool *mp) const
 //		statistics computation
 //---------------------------------------------------------------------------
 BOOL
-CMDTypeGenericGPDB::HasByte2IntMapping(const IMDType *mdtype)
+CMDTypeGenericGPDB::HasByte2IntMapping(const gpos::Ref<IMDType> mdtype)
 {
 	gpos::Ref<IMDId> mdid = mdtype->MDId();
 	return mdtype->IsTextRelated() || mdid->Equals(&CMDIdGPDB::m_mdid_uuid) ||

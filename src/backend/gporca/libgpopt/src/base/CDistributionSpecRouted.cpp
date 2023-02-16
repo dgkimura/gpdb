@@ -18,6 +18,7 @@
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CPhysicalMotionBroadcast.h"
 #include "gpopt/operators/CPhysicalMotionRoutedDistribute.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/traceflags/traceflags.h"
 
 
@@ -87,7 +88,8 @@ CDistributionSpecRouted::FSatisfies(
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
 CDistributionSpecRouted::PdsCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	ULONG id = m_pcrSegmentId->Id();
 	CColRef *pcrSegmentId = colref_mapping->Find(&id);

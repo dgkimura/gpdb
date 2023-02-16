@@ -178,9 +178,10 @@ CPhysical::PdpCreate(CMemoryPool *mp) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CPhysical::PopCopyWithRemappedColumns(CMemoryPool *,	   //mp,
-									  UlongToColRefMap *,  //colref_mapping,
-									  BOOL				   //must_exist
+CPhysical::PopCopyWithRemappedColumns(
+	CMemoryPool *,				  //mp,
+	gpos::Ref<UlongToColRefMap>,  //colref_mapping,
+	BOOL						  //must_exist
 )
 {
 	GPOS_ASSERT(!"Invalid call of CPhysical::PopCopyWithRemappedColumns");

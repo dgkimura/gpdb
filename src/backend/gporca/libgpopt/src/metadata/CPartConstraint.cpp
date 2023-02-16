@@ -534,7 +534,8 @@ CPartConstraint::PcnstrRemaining(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CPartConstraint>
 CPartConstraint::PpartcnstrCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	if (m_fUninterpreted)
 	{

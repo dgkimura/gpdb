@@ -2323,8 +2323,9 @@ CPredicateUtils::FCheckPredicateImplication(gpos::Ref<CExpression> pexprPred)
 // Given a predicate and a list of equivalence classes, return true if that predicate is
 // implied by given equivalence classes
 BOOL
-CPredicateUtils::FImpliedPredicate(gpos::Ref<CExpression> pexprPred,
-								   CColRefSetArray *pdrgpcrsEquivClasses)
+CPredicateUtils::FImpliedPredicate(
+	gpos::Ref<CExpression> pexprPred,
+	gpos::Ref<CColRefSetArray> pdrgpcrsEquivClasses)
 {
 	GPOS_ASSERT(pexprPred->Pop()->FScalar());
 	GPOS_ASSERT(FCheckPredicateImplication(pexprPred));

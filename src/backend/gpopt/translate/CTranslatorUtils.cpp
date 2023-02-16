@@ -280,7 +280,8 @@ CTranslatorUtils::ConvertToCDXLLogicalTVF(CMemoryPool *mp,
 		gpos::Ref<CMDIdGPDB> mdid_return_type =
 			GPOS_NEW(mp) CMDIdGPDB(constExpr->consttype);
 
-		const IMDType *type = md_accessor->RetrieveType(mdid_return_type.get());
+		const gpos::Ref<IMDType> type =
+			md_accessor->RetrieveType(mdid_return_type.get());
 		gpos::Ref<CDXLColDescrArray> column_descrs =
 			GetColumnDescriptorsFromComposite(mp, md_accessor, id_generator,
 											  type);
@@ -308,7 +309,8 @@ CTranslatorUtils::ConvertToCDXLLogicalTVF(CMemoryPool *mp,
 	gpos::Ref<CMDIdGPDB> mdid_func = GPOS_NEW(mp) CMDIdGPDB(funcexpr->funcid);
 	gpos::Ref<CMDIdGPDB> mdid_return_type =
 		GPOS_NEW(mp) CMDIdGPDB(funcexpr->funcresulttype);
-	const IMDType *type = md_accessor->RetrieveType(mdid_return_type.get());
+	const gpos::Ref<IMDType> type =
+		md_accessor->RetrieveType(mdid_return_type.get());
 
 	// get function from MDcache
 	const IMDFunction *func = md_accessor->RetrieveFunc(mdid_func.get());
@@ -597,10 +599,9 @@ CTranslatorUtils::GetColumnDescriptorsFromBase(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLColDescrArray>
-CTranslatorUtils::GetColumnDescriptorsFromComposite(CMemoryPool *mp,
-													CMDAccessor *md_accessor,
-													CIdGenerator *id_generator,
-													const IMDType *type)
+CTranslatorUtils::GetColumnDescriptorsFromComposite(
+	CMemoryPool *mp, CMDAccessor *md_accessor, CIdGenerator *id_generator,
+	const gpos::Ref<IMDType> type)
 {
 	gpos::Ref<CMDColumnArray> col_ptr_arr =
 		ExpandCompositeType(mp, md_accessor, type);
@@ -640,7 +641,7 @@ CTranslatorUtils::GetColumnDescriptorsFromComposite(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CMDColumnArray>
 CTranslatorUtils::ExpandCompositeType(CMemoryPool *mp, CMDAccessor *md_accessor,
-									  const IMDType *type)
+									  const gpos::Ref<IMDType> type)
 {
 	GPOS_ASSERT(nullptr != type);
 	GPOS_ASSERT(type->IsComposite());
@@ -2069,7 +2070,7 @@ CTranslatorUtils::CreateDXLProjElemConstNULL(CMemoryPool *mp,
 	}
 	else
 	{
-		const IMDType *md_type = md_accessor->RetrieveType(mdid);
+		const gpos::Ref<IMDType> md_type = md_accessor->RetrieveType(mdid);
 		datum_dxl = CMDTypeGenericGPDB::CreateDXLDatumVal(
 			mp, mdid, md_type, default_type_modifier, true /*fConstNull*/,
 			nullptr,					   /*pba */
@@ -2402,7 +2403,8 @@ CTranslatorUtils::IsCompositeConst(CMemoryPool *mp, CMDAccessor *md_accessor,
 	gpos::Ref<CMDIdGPDB> mdid_return_type =
 		GPOS_NEW(mp) CMDIdGPDB(constExpr->consttype);
 
-	const IMDType *type = md_accessor->RetrieveType(mdid_return_type.get());
+	const gpos::Ref<IMDType> type =
+		md_accessor->RetrieveType(mdid_return_type.get());
 
 	;
 

@@ -18,6 +18,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
+#include "gpopt/base/CDrvdPropCtxt.h"
 #include "gpopt/base/CDrvdPropRelational.h"
 #include "gpopt/base/CDrvdPropScalar.h"
 #include "gpopt/base/CKeyCollection.h"
@@ -39,7 +40,6 @@ using CExpressionArrays = gpos::Vector<gpos::Ref<CExpressionArray>>;
 
 class CGroupExpression;
 class CDrvdPropPlan;
-class CDrvdPropCtxt;
 class CDrvdPropCtxtPlan;
 class CPropConstraint;
 class CCostContext;
@@ -259,7 +259,7 @@ public:
 
 	// return a copy of the expression with remapped columns
 	gpos::Ref<CExpression> PexprCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) const;
 
 	// compare entire expression rooted here

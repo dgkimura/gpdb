@@ -747,8 +747,8 @@ CSubqueryHandler::FCreateOuterApplyForScalarSubquery(
 			mp, pexprOuter, pexprInner, colref, popSubquery->Eopid());
 
 	const gpos::Ref<CLogicalGbAgg> pgbAgg = nullptr;
-	BOOL fHasCountAggMatchingColumn = CUtils::FHasCountAggMatchingColumn(
-		(*pexprSubquery)[0], colref, &pgbAgg);
+	BOOL fHasCountAggMatchingColumn =
+		CUtils::FHasCountAggMatchingColumn((*pexprSubquery)[0], colref, pgbAgg);
 
 	if (!fHasCountAggMatchingColumn)
 	{
@@ -972,7 +972,7 @@ CSubqueryHandler::CreateGroupByNode(CMemoryPool *mp,
 			CUtils::PexprCount(mp, colref, false /* is_distinct */);
 		gpos::Ref<CScalarAggFunc> popCount =
 			gpos::dyn_cast<CScalarAggFunc>(pexprCount->Pop());
-		const IMDType *pmdtypeCount =
+		const gpos::Ref<IMDType> pmdtypeCount =
 			md_accessor->RetrieveType(popCount->MdidType());
 		*pcrCount =
 			col_factory->PcrCreate(pmdtypeCount, popCount->TypeModifier());
@@ -991,7 +991,7 @@ CSubqueryHandler::CreateGroupByNode(CMemoryPool *mp,
 		gpos::Ref<CExpression> pexprSum = CUtils::PexprSum(mp, colrefForSum);
 		gpos::Ref<CScalarAggFunc> popSum =
 			gpos::dyn_cast<CScalarAggFunc>(pexprSum->Pop());
-		const IMDType *pmdtypeSum =
+		const gpos::Ref<IMDType> pmdtypeSum =
 			md_accessor->RetrieveType(popSum->MdidType());
 		*pcrSum = col_factory->PcrCreate(pmdtypeSum, popSum->TypeModifier());
 		gpos::Ref<CExpression> pexprPrjElemSum =
@@ -1808,7 +1808,8 @@ CSubqueryHandler::PexprScalarIf(CMemoryPool *mp, CColRef *pcrBool,
 	GPOS_ASSERT_IMP(useNotNullableInnerOpt, !fExistential);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDTypeBool *pmdtypebool = md_accessor->PtMDType<IMDTypeBool>();
+	const gpos::Ref<IMDTypeBool> pmdtypebool =
+		md_accessor->PtMDType<IMDTypeBool>();
 	gpos::Ref<IMDId> mdid = pmdtypebool->MDId();
 
 	BOOL value = true;

@@ -129,15 +129,14 @@ private:
 	static void AddHistogramsWithRemap(
 		CMemoryPool *mp, gpos::Ref<UlongToHistogramMap> src_histograms,
 		gpos::Ref<UlongToHistogramMap> dest_histograms,
-		UlongToColRefMap *colref_mapping, BOOL must_exist);
+		gpos::Ref<UlongToColRefMap> colref_mapping, BOOL must_exist);
 
 	// helper method to add width information where the column ids have been
 	// remapped
-	static void AddWidthInfoWithRemap(CMemoryPool *mp,
-									  gpos::Ref<UlongToDoubleMap> src_width,
-									  gpos::Ref<UlongToDoubleMap> dest_width,
-									  UlongToColRefMap *colref_mapping,
-									  BOOL must_exist);
+	static void AddWidthInfoWithRemap(
+		CMemoryPool *mp, gpos::Ref<UlongToDoubleMap> src_width,
+		gpos::Ref<UlongToDoubleMap> dest_width,
+		gpos::Ref<UlongToColRefMap> colref_mapping, BOOL must_exist);
 
 public:
 	CStatistics &operator=(CStatistics &) = delete;
@@ -284,9 +283,9 @@ public:
 	gpos::Ref<IStatistics> ScaleStats(CMemoryPool *mp, CDouble factor) override;
 
 	// copy stats with remapped column id
-	gpos::Ref<IStatistics> CopyStatsWithRemap(CMemoryPool *mp,
-											  UlongToColRefMap *colref_mapping,
-											  BOOL must_exist) const override;
+	gpos::Ref<IStatistics> CopyStatsWithRemap(
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		BOOL must_exist) const override;
 
 	// return the set of column references we have stats for
 	gpos::Ref<CColRefSet> GetColRefSet(CMemoryPool *mp) const override;

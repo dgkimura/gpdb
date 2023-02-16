@@ -193,7 +193,7 @@ public:
 
 	// copy stats with remapped column ids
 	virtual gpos::Ref<IStatistics> CopyStatsWithRemap(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist = true) const = 0;
 
 	// return a set of column references we have stats for

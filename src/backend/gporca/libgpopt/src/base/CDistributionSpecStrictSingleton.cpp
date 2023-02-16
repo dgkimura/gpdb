@@ -13,6 +13,8 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/search/CGroupExpression.h"
+
 using namespace gpopt;
 
 
@@ -63,8 +65,7 @@ CDistributionSpecStrictSingleton::FSatisfies(
 
 	return (
 		(EdtSingleton == pdss->Edt() || EdtStrictSingleton == pdss->Edt()) &&
-		m_est == static_cast<const gpos::Ref<CDistributionSpecSingleton> >(pdss)
-					 ->Est());
+		m_est == gpos::dyn_cast<CDistributionSpecSingleton>(pdss)->Est());
 }
 
 

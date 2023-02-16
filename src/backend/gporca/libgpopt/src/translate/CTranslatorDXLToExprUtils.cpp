@@ -229,7 +229,7 @@ CTranslatorDXLToExprUtils::EBoolOperator(EdxlBoolExprType edxlbooltype)
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefArray>
 CTranslatorDXLToExprUtils::Pdrgpcr(CMemoryPool *mp,
-								   UlongToColRefMap *colref_mapping,
+								   gpos::Ref<UlongToColRefMap> colref_mapping,
 								   const gpos::Ref<ULongPtrArray> colids)
 {
 	GPOS_ASSERT(nullptr != colids);

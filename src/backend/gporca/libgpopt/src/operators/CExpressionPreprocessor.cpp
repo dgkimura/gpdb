@@ -468,7 +468,7 @@ CExpressionPreprocessor::PexprRemoveSuperfluousDistinctInDQA(
 				gpos::Ref<IMDId> agg_child_mdid =
 					gpos::dyn_cast<CScalar>((*pexprPrjElem)[0]->Pop())
 						->MdidType();
-				const IMDType *agg_child_type =
+				const gpos::Ref<IMDType> agg_child_type =
 					md_accessor->RetrieveType(agg_child_mdid);
 
 				if (popAggFunc->IsDistinct() &&
@@ -1518,7 +1518,7 @@ CExpressionPreprocessor::FEquivClassFromChild(gpos::Ref<CColRefSet> pcrs,
 		{
 			continue;
 		}
-		CColRefSetArray *pdrgpcrs =
+		gpos::Ref<CColRefSetArray> pdrgpcrs =
 			pexprChild->DerivePropertyConstraint()->PdrgpcrsEquivClasses();
 		if (pcrs->FContained(pdrgpcrs))
 		{
@@ -1553,7 +1553,7 @@ CExpressionPreprocessor::PexprAddEqualityPreds(
 	{
 		gpos::Ref<CExpressionArray> pdrgpexpr =
 			GPOS_NEW(mp) CExpressionArray(mp);
-		CColRefSetArray *pdrgpcrs = ppc->PdrgpcrsEquivClasses();
+		gpos::Ref<CColRefSetArray> pdrgpcrs = ppc->PdrgpcrsEquivClasses();
 		GPOS_ASSERT(nullptr != pdrgpcrs);
 		const ULONG ulEquivClasses = pdrgpcrs->Size();
 		for (ULONG ul = 0; ul < ulEquivClasses; ul++)

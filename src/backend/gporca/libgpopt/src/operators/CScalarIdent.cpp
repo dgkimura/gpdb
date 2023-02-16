@@ -86,9 +86,9 @@ CScalarIdent::FInputOrderSensitive() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CScalarIdent::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										 UlongToColRefMap *colref_mapping,
-										 BOOL must_exist)
+CScalarIdent::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	ULONG id = m_pcr->Id();
 	CColRef *colref = colref_mapping->Find(&id);

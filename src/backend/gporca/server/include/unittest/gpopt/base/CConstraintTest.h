@@ -131,7 +131,8 @@ public:
 	static GPOS_RESULT EresUnittest_ConstraintsOnDates();
 
 	// print equivalence classes
-	static void PrintEquivClasses(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
+	static void PrintEquivClasses(CMemoryPool *mp,
+								  gpos::Ref<CColRefSetArray> pdrgpcrs,
 								  BOOL fExpected = false);
 };	// class CConstraintTest
 }  // namespace gpopt

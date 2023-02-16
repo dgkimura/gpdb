@@ -117,9 +117,9 @@ CScalarSubquery::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CScalarSubquery::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											UlongToColRefMap *colref_mapping,
-											BOOL must_exist)
+CScalarSubquery::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	CColRef *colref = CUtils::PcrRemap(m_pcr, colref_mapping, must_exist);
 

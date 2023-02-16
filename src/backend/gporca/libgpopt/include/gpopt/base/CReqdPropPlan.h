@@ -193,7 +193,7 @@ public:
 	static gpos::Ref<CReqdPropPlan> PrppRemapForCTE(
 		CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput,
 		gpos::Ref<CDrvdPropPlan> pdpplanInput,
-		UlongToColRefMap *colref_mapping);
+		gpos::Ref<UlongToColRefMap> colref_mapping);
 
 	// print function
 	IOstream &OsPrint(IOstream &os) const override;

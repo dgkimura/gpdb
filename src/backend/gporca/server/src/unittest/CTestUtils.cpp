@@ -1636,7 +1636,7 @@ CTestUtils::PexprPrjElemWithSum(CMemoryPool *mp, CColRef *colref)
 	// map a computed column to SUM expression
 	gpos::Ref<CScalar> pop = gpos::dyn_cast<CScalar>(pexprScalarAgg->Pop());
 	gpos::Ref<IMDId> mdid_type = pop->MdidType();
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
+	const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(mdid_type);
 	CWStringConst str(GPOS_WSZ_LIT("sum_col"));
 	CName name(mp, &str);
 	CColRef *pcrComputed = COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
@@ -3968,7 +3968,8 @@ CTestUtils::CreateGenericDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
 	GPOS_ASSERT(nullptr != md_accessor);
 
 	GPOS_ASSERT(!mdid_type->Equals(&CMDIdGPDB::m_mdid_numeric));
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type.get());
+	const gpos::Ref<IMDType> pmdtype =
+		md_accessor->RetrieveType(mdid_type.get());
 	ULONG ulbaSize = 0;
 	BYTE *data =
 		CDXLUtils::DecodeByteArrayFromString(mp, pstrEncodedValue, &ulbaSize);
@@ -4016,7 +4017,8 @@ CTestUtils::CreateDoubleDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
 	GPOS_ASSERT(nullptr != md_accessor);
 
 	GPOS_ASSERT(!mdid_type->Equals(&CMDIdGPDB::m_mdid_numeric));
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type.get());
+	const gpos::Ref<IMDType> pmdtype =
+		md_accessor->RetrieveType(mdid_type.get());
 	ULONG ulbaSize = 0;
 	CWStringDynamic *pstrW =
 		GPOS_NEW(mp) CWStringDynamic(mp, GPOS_WSZ_LIT("AAAABXc="));

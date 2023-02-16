@@ -152,7 +152,8 @@ CLogicalNAryJoin::DerivePropertyConstraint(CMemoryPool *mp,
 				exprhdl.DerivePropertyConstraint(ul);
 
 			// equivalence classes coming from child
-			CColRefSetArray *pdrgpcrsChild = ppc->PdrgpcrsEquivClasses();
+			gpos::Ref<CColRefSetArray> pdrgpcrsChild =
+				ppc->PdrgpcrsEquivClasses();
 
 			// merge with the equivalence classes we have so far
 			gpos::Ref<CColRefSetArray> pdrgpcrsMerged =

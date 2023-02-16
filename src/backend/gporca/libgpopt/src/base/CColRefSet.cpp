@@ -418,7 +418,7 @@ CColRefSet::ExtractColIds(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CColRefSet::FContained(const CColRefSetArray *pdrgpcrs)
+CColRefSet::FContained(const gpos::Ref<CColRefSetArray> pdrgpcrs)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrs);
 
@@ -457,7 +457,8 @@ CColRefSet::FIntersects(const gpos::Ref<CColRefSet> pcrs)
 //		column ref sets
 //---------------------------------------------------------------------------
 BOOL
-CColRefSet::FCovered(CColRefSetArray *pdrgpcrs, gpos::Ref<CColRefSet> pcrs)
+CColRefSet::FCovered(gpos::Ref<CColRefSetArray> pdrgpcrs,
+					 gpos::Ref<CColRefSet> pcrs)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrs);
 	GPOS_ASSERT(nullptr != pcrs);

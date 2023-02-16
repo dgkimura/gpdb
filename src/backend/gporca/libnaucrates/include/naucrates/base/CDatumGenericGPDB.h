@@ -50,7 +50,7 @@ private:
 	INT m_type_modifier;
 
 	// cached type information (can be set from const methods)
-	mutable const IMDType *m_cached_type;
+	mutable gpos::Ref<IMDType> m_cached_type;
 
 	// long int value used for statistic computation
 	LINT m_stats_comp_val_int;

@@ -1605,7 +1605,7 @@ CTranslatorDXLToPlStmt::TranslateDXLTvfToRangeTblEntry(
 		gpos::Ref<CDXLDatumGeneric> datum_generic_dxl =
 			gpos::dyn_cast<CDXLDatumGeneric>(
 				const_cast<gpdxl::gpos::Ref<CDXLDatum> >(datum_dxl));
-		const IMDType *type =
+		const gpos::Ref<IMDType> type =
 			m_md_accessor->RetrieveType(datum_generic_dxl->MDId());
 		const_expr->constlen = type->Length();
 		Datum val = gpdb::DatumFromPointer(datum_generic_dxl->GetByteArray());

@@ -371,7 +371,7 @@ CConstraint::PcnstrConjDisj(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 void
 CConstraint::AddColumnToEquivClasses(CMemoryPool *mp, const CColRef *colref,
-									 CColRefSetArray *pdrgpcrs)
+									 gpos::Ref<CColRefSetArray> pdrgpcrs)
 {
 	const ULONG length = pdrgpcrs->Size();
 	for (ULONG ul = 0; ul < length; ul++)
@@ -461,11 +461,11 @@ CConstraint::PcnstrFromScalarCmp(
 
 			gpos::Ref<IMDId> left_mdid =
 				gpos::dyn_cast<CScalar>(pexprLeft->Pop())->MdidType();
-			const IMDType *left_type = mda->RetrieveType(left_mdid);
+			const gpos::Ref<IMDType> left_type = mda->RetrieveType(left_mdid);
 
 			gpos::Ref<IMDId> right_mdid =
 				gpos::dyn_cast<CScalar>(pexprRight->Pop())->MdidType();
-			const IMDType *right_type = mda->RetrieveType(right_mdid);
+			const gpos::Ref<IMDType> right_type = mda->RetrieveType(right_mdid);
 
 			// Build constraint (e.g for equivalent classes) only when the hash families
 			// of the operator and operands match.
@@ -630,8 +630,8 @@ CConstraint::PcnstrFromScalarBoolOp(
 gpos::Ref<CColRefSetArray>
 CConstraint::PdrgpcrsMergeFromBoolOp(CMemoryPool *mp,
 									 gpos::Ref<CExpression> pexpr,
-									 CColRefSetArray *pdrgpcrsFst,
-									 CColRefSetArray *pdrgpcrsSnd)
+									 gpos::Ref<CColRefSetArray> pdrgpcrsFst,
+									 gpos::Ref<CColRefSetArray> pdrgpcrsSnd)
 {
 	GPOS_ASSERT(nullptr != pexpr);
 	GPOS_ASSERT(CUtils::FScalarBoolOp(pexpr));

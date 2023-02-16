@@ -61,7 +61,7 @@ public:
 	~CPropConstraint() override;
 
 	// equivalence classes
-	CColRefSetArray *
+	gpos::Ref<CColRefSetArray>
 	PdrgpcrsEquivClasses() const
 	{
 		return m_pdrgpcrs.get();

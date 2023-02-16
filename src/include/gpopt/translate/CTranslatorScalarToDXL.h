@@ -294,64 +294,57 @@ public:
 													const Const *constant);
 
 	// translate GPDB datum to CDXLDatum
-	static gpos::Ref<CDXLDatum> TranslateDatumToDXL(CMemoryPool *mp,
-													const IMDType *md_type,
-													INT type_modifier,
-													BOOL is_null, ULONG len,
-													Datum datum);
+	static gpos::Ref<CDXLDatum> TranslateDatumToDXL(
+		CMemoryPool *mp, const gpos::Ref<IMDType> md_type, INT type_modifier,
+		BOOL is_null, ULONG len, Datum datum);
 
 	// translate GPDB datum to IDatum
-	static gpos::Ref<IDatum> CreateIDatumFromGpdbDatum(CMemoryPool *mp,
-													   const IMDType *md_type,
-													   BOOL is_null,
-													   Datum datum);
+	static gpos::Ref<IDatum> CreateIDatumFromGpdbDatum(
+		CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null,
+		Datum datum);
 
 	// extract the byte array value of the datum
 	static BYTE *ExtractByteArrayFromDatum(CMemoryPool *mp,
-										   const IMDType *md_type, BOOL is_null,
-										   ULONG len, Datum datum);
+										   const gpos::Ref<IMDType> md_type,
+										   BOOL is_null, ULONG len,
+										   Datum datum);
 
 	static CDouble ExtractDoubleValueFromDatum(gpos::Ref<IMDId> mdid,
 											   BOOL is_null, BYTE *bytes,
 											   Datum datum);
 
 	// extract the long int value of a datum
-	static LINT ExtractLintValueFromDatum(const IMDType *md_type, BOOL is_null,
-										  BYTE *bytes, ULONG len);
+	static LINT ExtractLintValueFromDatum(const gpos::Ref<IMDType> md_type,
+										  BOOL is_null, BYTE *bytes, ULONG len);
 
 	// datum to oid CDXLDatum
-	static gpos::Ref<CDXLDatum> TranslateOidDatumToDXL(CMemoryPool *mp,
-													   const IMDType *md_type,
-													   BOOL is_null, ULONG len,
-													   Datum datum);
+	static gpos::Ref<CDXLDatum> TranslateOidDatumToDXL(
+		CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null,
+		ULONG len, Datum datum);
 
 	// datum to int2 CDXLDatum
-	static gpos::Ref<CDXLDatum> TranslateInt2DatumToDXL(CMemoryPool *mp,
-														const IMDType *md_type,
-														BOOL is_null, ULONG len,
-														Datum datum);
+	static gpos::Ref<CDXLDatum> TranslateInt2DatumToDXL(
+		CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null,
+		ULONG len, Datum datum);
 
 	// datum to int4 CDXLDatum
-	static gpos::Ref<CDXLDatum> TranslateInt4DatumToDXL(CMemoryPool *mp,
-														const IMDType *md_type,
-														BOOL is_null, ULONG len,
-														Datum datum);
+	static gpos::Ref<CDXLDatum> TranslateInt4DatumToDXL(
+		CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null,
+		ULONG len, Datum datum);
 
 	// datum to int8 CDXLDatum
-	static gpos::Ref<CDXLDatum> TranslateInt8DatumToDXL(CMemoryPool *mp,
-														const IMDType *md_type,
-														BOOL is_null, ULONG len,
-														Datum datum);
+	static gpos::Ref<CDXLDatum> TranslateInt8DatumToDXL(
+		CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null,
+		ULONG len, Datum datum);
 
 	// datum to bool CDXLDatum
-	static gpos::Ref<CDXLDatum> TranslateBoolDatumToDXL(CMemoryPool *mp,
-														const IMDType *md_type,
-														BOOL is_null, ULONG len,
-														Datum datum);
+	static gpos::Ref<CDXLDatum> TranslateBoolDatumToDXL(
+		CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null,
+		ULONG len, Datum datum);
 
 	// datum to generic CDXLDatum
 	static gpos::Ref<CDXLDatum> TranslateGenericDatumToDXL(
-		CMemoryPool *mp, const IMDType *md_type, INT type_modifier,
+		CMemoryPool *mp, const gpos::Ref<IMDType> md_type, INT type_modifier,
 		BOOL is_null, ULONG len, Datum datum);
 };
 }  // namespace gpdxl

@@ -95,7 +95,8 @@ CLogicalGbAggDeduplicate::~CLogicalGbAggDeduplicate()
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalGbAggDeduplicate::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> colref_array =
 		CUtils::PdrgpcrRemap(mp, Pdrgpcr(), colref_mapping, must_exist);

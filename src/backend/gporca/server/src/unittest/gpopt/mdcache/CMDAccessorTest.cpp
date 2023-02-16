@@ -143,7 +143,7 @@ CMDAccessorTest::EresUnittest_Basic()
 	gpos::Ref<CMDIdGPDB> agg_mdid = GPOS_NEW(mp) CMDIdGPDB(GPDB_AGG_AVG, 1, 0);
 
 #ifdef GPOS_DEBUG
-	const IMDType *pimdtype =
+	const gpos::Ref<IMDType> pimdtype =
 #endif
 		mda.RetrieveType(mdid_type.get());
 
@@ -165,7 +165,7 @@ CMDAccessorTest::EresUnittest_Basic()
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
 
 #ifdef GPOS_DEBUG
-	const IMDTypeBool *pmdtypebool =
+	const gpos::Ref<IMDTypeBool> pmdtypebool =
 #endif
 		mda.PtMDType<IMDTypeBool>(CTestUtils::m_sysidDefault);
 
@@ -241,7 +241,7 @@ CMDAccessorTest::EresUnittest_Datum()
 	GPOS_ASSERT(5 == pdatumInt4->Value());
 
 	// create a BOOL datum
-	const IMDTypeBool *pmdtypebool =
+	const gpos::Ref<IMDTypeBool> pmdtypebool =
 		mda.PtMDType<IMDTypeBool>(CTestUtils::m_sysidDefault);
 	gpos::Ref<IDatumBool> pdatumBool =
 		pmdtypebool->CreateBoolDatum(mp, false, false /* is_null */);
@@ -341,7 +341,7 @@ CMDAccessorTest::EresUnittest_Navigate()
 
 	// lookup function return type
 	gpos::Ref<IMDId> pmdidFuncReturnType = pmdfunc->GetResultTypeMdid();
-	const IMDType *pimdtype = mda.RetrieveType(pmdidFuncReturnType);
+	const gpos::Ref<IMDType> pimdtype = mda.RetrieveType(pmdidFuncReturnType);
 
 	// lookup equality operator for function return type
 	gpos::Ref<IMDId> pmdidEqOp = pimdtype->GetMdidForCmpType(IMDType::EcmptEq);
@@ -490,7 +490,7 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 	for (ULONG ul = 0; ul < num_cols; ul++)
 	{
 		const IMDColumn *pmdcol = pmdrel->GetMdCol(ul);
-		const IMDType *pmdtype = mda.RetrieveType(pmdcol->MdidType());
+		const gpos::Ref<IMDType> pmdtype = mda.RetrieveType(pmdcol->MdidType());
 		CColRef *colref =
 			col_factory->PcrCreate(pmdtype, pmdcol->TypeModifier());
 		colref_array->Append(colref);
@@ -551,11 +551,11 @@ CMDAccessorTest::EresUnittest_Cast()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	const IMDType *pmdtypeInt =
+	const gpos::Ref<IMDType> pmdtypeInt =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
-	const IMDType *pmdtypeOid =
+	const gpos::Ref<IMDType> pmdtypeOid =
 		mda.PtMDType<IMDTypeOid>(CTestUtils::m_sysidDefault);
-	const IMDType *pmdtypeBigInt =
+	const gpos::Ref<IMDType> pmdtypeBigInt =
 		mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 
 #ifdef GPOS_DEBUG
@@ -613,9 +613,9 @@ CMDAccessorTest::EresUnittest_ScCmp()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	const IMDType *pmdtypeInt =
+	const gpos::Ref<IMDType> pmdtypeInt =
 		mda.PtMDType<IMDTypeInt4>(CTestUtils::m_sysidDefault);
-	const IMDType *pmdtypeBigInt =
+	const gpos::Ref<IMDType> pmdtypeBigInt =
 		mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 
 #ifdef GPOS_DEBUG

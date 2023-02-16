@@ -146,7 +146,8 @@ CLogicalDynamicIndexGet::DeriveOuterReferences(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalDynamicIndexGet::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(m_pindexdesc->MDId());

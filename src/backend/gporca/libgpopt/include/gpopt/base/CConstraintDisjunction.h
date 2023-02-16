@@ -68,7 +68,7 @@ public:
 
 	// return a copy of the constraint with remapped columns
 	gpos::Ref<CConstraint> PcnstrCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// scalar expression

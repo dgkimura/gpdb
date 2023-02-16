@@ -55,7 +55,7 @@ CQueryContext::CQueryContext(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 #endif	//GPOS_DEBUG
 
 	// mark unused CTEs
-	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	pcteinfo->MarkUnusedCTEs();
 
 	gpos::Ref<CColRefSet> pcrsOutputAndOrderingCols =

@@ -122,7 +122,8 @@ CLogicalPartitionSelector::HashValue() const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalPartitionSelector::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	CColRef *pcrOid = CUtils::PcrRemap(m_pcrOid, colref_mapping, must_exist);
 	gpos::Ref<CExpressionArray> pdrgpexpr =

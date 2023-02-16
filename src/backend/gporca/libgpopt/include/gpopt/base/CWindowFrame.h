@@ -166,7 +166,8 @@ public:
 
 	// return a copy of the window frame with remapped columns
 	virtual gpos::Ref<CWindowFrame> PwfCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		BOOL must_exist);
 
 	// return columns used by frame edges
 	gpos::Ref<CColRefSet>

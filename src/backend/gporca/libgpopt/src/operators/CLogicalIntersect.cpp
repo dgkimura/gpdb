@@ -98,9 +98,9 @@ CLogicalIntersect::DeriveMaxCard(CMemoryPool *,	 // mp
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalIntersect::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											  UlongToColRefMap *colref_mapping,
-											  BOOL must_exist)
+CLogicalIntersect::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> pdrgpcrOutput = CUtils::PdrgpcrRemap(
 		mp, m_pdrgpcrOutput.get(), colref_mapping, must_exist);

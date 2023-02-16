@@ -192,7 +192,8 @@ CSubqueryTestUtils::PexprProjectWithAggSubquery(
 	// generate a computed column
 	gpos::Ref<CScalarSubquery> popSubquery =
 		gpos::dyn_cast<CScalarSubquery>(pexprSubq->Pop());
-	const IMDType *pmdtype = md_accessor->RetrieveType(popSubquery->MdidType());
+	const gpos::Ref<IMDType> pmdtype =
+		md_accessor->RetrieveType(popSubquery->MdidType());
 	CColRef *pcrComputed =
 		col_factory->PcrCreate(pmdtype, popSubquery->TypeModifier());
 
@@ -1449,7 +1450,8 @@ CSubqueryTestUtils::PexprProjectWithSubqueries(
 	gpos::Ref<CExpression> pexprPrjElem = nullptr;
 	gpos::Ref<CExpression> pexprGet = nullptr;
 
-	const IMDTypeBool *pmdtypebool = md_accessor->PtMDType<IMDTypeBool>();
+	const gpos::Ref<IMDTypeBool> pmdtypebool =
+		md_accessor->PtMDType<IMDTypeBool>();
 
 	// generate agg subquery
 	gpos::Ref<CExpression> pexprAggSubquery = PexprSubqueryAgg(
@@ -1600,7 +1602,8 @@ CSubqueryTestUtils::PexprProjectWithSubqueryQuantified(
 	gpos::Ref<CScalarSubqueryQuantified> pop =
 		gpos::dyn_cast<CScalarSubqueryQuantified>(
 			pexprSubqueryQuantified->Pop());
-	const IMDType *pmdtype = md_accessor->RetrieveType(pop->MdidType());
+	const gpos::Ref<IMDType> pmdtype =
+		md_accessor->RetrieveType(pop->MdidType());
 	CColRef *pcrComputed = col_factory->PcrCreate(pmdtype, pop->TypeModifier());
 
 	// generate a scalar project list
@@ -1734,7 +1737,8 @@ CSubqueryTestUtils::PexprProjectWithSubqueryExistential(
 	gpos::Ref<CScalarSubqueryExistential> pop =
 		gpos::dyn_cast<CScalarSubqueryExistential>(
 			pexprSubqueryExistential->Pop());
-	const IMDType *pmdtype = md_accessor->RetrieveType(pop->MdidType());
+	const gpos::Ref<IMDType> pmdtype =
+		md_accessor->RetrieveType(pop->MdidType());
 	CColRef *pcrComputed = col_factory->PcrCreate(pmdtype, pop->TypeModifier());
 
 	// generate a scalar project list

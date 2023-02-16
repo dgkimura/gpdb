@@ -112,7 +112,7 @@ CXformUpdate2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 	CMDAccessor *md_accessor = poctxt->Pmda();
 	CColumnFactory *col_factory = poctxt->Pcf();
 
-	const IMDType *pmdtype = md_accessor->PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDType> pmdtype = md_accessor->PtMDType<IMDTypeInt4>();
 	CColRef *pcrAction = col_factory->PcrCreate(pmdtype, default_type_modifier);
 
 	gpos::Ref<CExpression> pexprSplit = nullptr;

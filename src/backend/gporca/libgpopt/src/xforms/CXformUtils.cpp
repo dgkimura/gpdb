@@ -1092,7 +1092,8 @@ CXformUtils::SubqueryAllToAgg(
 		CUtils::PexprIsNull(mp, pexprScalarOuter);
 
 	// generate the main scalar if that will produce subquery result
-	const IMDTypeBool *pmdtypebool = md_accessor->PtMDType<IMDTypeBool>();
+	const gpos::Ref<IMDTypeBool> pmdtypebool =
+		md_accessor->PtMDType<IMDTypeBool>();
 	gpos::Ref<IMDId> pmdidBool = pmdtypebool->MDId();
 	;
 	;
@@ -2299,8 +2300,9 @@ CXformUtils::PexprWindowWithRowNumber(CMemoryPool *mp,
 	// generate a new column reference
 	gpos::Ref<CScalarWindowFunc> popScWindowFunc =
 		gpos::dyn_cast<CScalarWindowFunc>(pexprScWindowFunc->Pop());
-	const IMDType *pmdtype = COptCtxt::PoctxtFromTLS()->Pmda()->RetrieveType(
-		popScWindowFunc->MdidType());
+	const gpos::Ref<IMDType> pmdtype =
+		COptCtxt::PoctxtFromTLS()->Pmda()->RetrieveType(
+			popScWindowFunc->MdidType());
 	CName name(popScWindowFunc->PstrFunc());
 	CColRef *colref = COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
 		pmdtype, popScWindowFunc->TypeModifier(), name);

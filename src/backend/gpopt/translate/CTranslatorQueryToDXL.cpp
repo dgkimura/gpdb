@@ -4607,7 +4607,8 @@ CTranslatorQueryToDXL::TranslateGroupingFuncToDXL(
 		l_value = 1;
 	}
 
-	const IMDType *md_type = m_md_accessor->PtMDType<IMDTypeInt4>(m_sysid);
+	const gpos::Ref<IMDType> md_type =
+		m_md_accessor->PtMDType<IMDTypeInt4>(m_sysid);
 	gpos::Ref<CMDIdGPDB> mdid_cast = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(m_mp) CMDIdGPDB(*mdid_cast);
 

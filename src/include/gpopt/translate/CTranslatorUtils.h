@@ -174,11 +174,12 @@ public:
 	// get column descriptors from a composite type
 	static gpos::Ref<CDXLColDescrArray> GetColumnDescriptorsFromComposite(
 		CMemoryPool *mp, CMDAccessor *md_accessor, CIdGenerator *id_generator,
-		const IMDType *md_type);
+		const gpos::Ref<IMDType> md_type);
 
 	// expand a composite type into an array of IMDColumns
 	static gpos::Ref<CMDColumnArray> ExpandCompositeType(
-		CMemoryPool *mp, CMDAccessor *md_accessor, const IMDType *md_type);
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		const gpos::Ref<IMDType> md_type);
 
 	// return the dxl representation of the set operation
 	static EdxlSetOpType GetSetOpType(SetOperation setop, BOOL is_all);

@@ -44,9 +44,9 @@ CScalarSubqueryAny::CScalarSubqueryAny(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CScalarSubqueryAny::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+CScalarSubqueryAny::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	CColRef *colref = CUtils::PcrRemap(Pcr(), colref_mapping, must_exist);
 

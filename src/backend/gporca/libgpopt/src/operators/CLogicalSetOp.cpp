@@ -326,7 +326,7 @@ gpos::Ref<CColRefSetArray>
 CLogicalSetOp::PdrgpcrsInputMapped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   ULONG ulChild) const
 {
-	CColRefSetArray *pdrgpcrsInput =
+	gpos::Ref<CColRefSetArray> pdrgpcrsInput =
 		exprhdl.DerivePropertyConstraint(ulChild)->PdrgpcrsEquivClasses();
 	const ULONG length = pdrgpcrsInput->Size();
 

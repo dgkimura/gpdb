@@ -104,7 +104,8 @@ CConstraintConjunction::FConstraint(const CColRef *colref) const
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraint>
 CConstraintConjunction::PcnstrCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CConstraintArray> pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
 	const ULONG length = m_pdrgpcnstr->Size();

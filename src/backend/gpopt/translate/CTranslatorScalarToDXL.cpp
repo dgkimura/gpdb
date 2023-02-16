@@ -542,7 +542,7 @@ CTranslatorScalarToDXL::TranslateOpExprToDXL(
 	// check if this is a scalar comparison
 	gpos::Ref<CMDIdGPDB> return_type_mdid =
 		GPOS_NEW(m_mp) CMDIdGPDB(((OpExpr *) expr)->opresulttype);
-	const IMDType *md_type =
+	const gpos::Ref<IMDType> md_type =
 		m_md_accessor->RetrieveType(return_type_mdid.get());
 
 	const ULONG num_args = gpdb::ListLength(op_expr->args);
@@ -720,7 +720,7 @@ CTranslatorScalarToDXL::TranslateConstToDXL(CMemoryPool *mp, CMDAccessor *mda,
 											const Const *constant)
 {
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(constant->consttype);
-	const IMDType *md_type = mda->RetrieveType(mdid.get());
+	const gpos::Ref<IMDType> md_type = mda->RetrieveType(mdid.get());
 	;
 
 	// translate gpdb datum into a DXL datum
@@ -2255,7 +2255,7 @@ CTranslatorScalarToDXL::CreateExistSubqueryFromSublink(
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
 CTranslatorScalarToDXL::TranslateDatumToDXL(CMemoryPool *mp,
-											const IMDType *md_type,
+											const gpos::Ref<IMDType> md_type,
 											INT type_modifier, BOOL is_null,
 											ULONG len, Datum datum)
 {
@@ -2303,11 +2303,9 @@ CTranslatorScalarToDXL::TranslateDatumToDXL(CMemoryPool *mp,
 //		Translate a datum of generic type
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
-CTranslatorScalarToDXL::TranslateGenericDatumToDXL(CMemoryPool *mp,
-												   const IMDType *md_type,
-												   INT type_modifier,
-												   BOOL is_null, ULONG len,
-												   Datum datum)
+CTranslatorScalarToDXL::TranslateGenericDatumToDXL(
+	CMemoryPool *mp, const gpos::Ref<IMDType> md_type, INT type_modifier,
+	BOOL is_null, ULONG len, Datum datum)
 {
 	gpos::Ref<CMDIdGPDB> mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(*mdid_old);
@@ -2347,11 +2345,10 @@ CTranslatorScalarToDXL::TranslateGenericDatumToDXL(CMemoryPool *mp,
 //		Translate a datum of type bool
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
-CTranslatorScalarToDXL::TranslateBoolDatumToDXL(CMemoryPool *mp,
-												const IMDType *md_type,
-												BOOL is_null,
-												ULONG,	//len,
-												Datum datum)
+CTranslatorScalarToDXL::TranslateBoolDatumToDXL(
+	CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null,
+	ULONG,	//len,
+	Datum datum)
 {
 	GPOS_ASSERT(md_type->IsPassedByValue());
 	gpos::Ref<CMDIdGPDB> mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
@@ -2371,7 +2368,7 @@ CTranslatorScalarToDXL::TranslateBoolDatumToDXL(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
 CTranslatorScalarToDXL::TranslateOidDatumToDXL(CMemoryPool *mp,
-											   const IMDType *md_type,
+											   const gpos::Ref<IMDType> md_type,
 											   BOOL is_null,
 											   ULONG,  //len,
 											   Datum datum)
@@ -2393,11 +2390,10 @@ CTranslatorScalarToDXL::TranslateOidDatumToDXL(CMemoryPool *mp,
 //		Translate a datum of type int2
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
-CTranslatorScalarToDXL::TranslateInt2DatumToDXL(CMemoryPool *mp,
-												const IMDType *md_type,
-												BOOL is_null,
-												ULONG,	//len,
-												Datum datum)
+CTranslatorScalarToDXL::TranslateInt2DatumToDXL(
+	CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null,
+	ULONG,	//len,
+	Datum datum)
 {
 	GPOS_ASSERT(md_type->IsPassedByValue());
 	gpos::Ref<CMDIdGPDB> mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
@@ -2416,11 +2412,10 @@ CTranslatorScalarToDXL::TranslateInt2DatumToDXL(CMemoryPool *mp,
 //		Translate a datum of type int4
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
-CTranslatorScalarToDXL::TranslateInt4DatumToDXL(CMemoryPool *mp,
-												const IMDType *md_type,
-												BOOL is_null,
-												ULONG,	//len,
-												Datum datum)
+CTranslatorScalarToDXL::TranslateInt4DatumToDXL(
+	CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null,
+	ULONG,	//len,
+	Datum datum)
 {
 	GPOS_ASSERT(md_type->IsPassedByValue());
 	gpos::Ref<CMDIdGPDB> mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
@@ -2439,11 +2434,10 @@ CTranslatorScalarToDXL::TranslateInt4DatumToDXL(CMemoryPool *mp,
 //		Translate a datum of type int8
 //---------------------------------------------------------------------------
 gpos::Ref<CDXLDatum>
-CTranslatorScalarToDXL::TranslateInt8DatumToDXL(CMemoryPool *mp,
-												const IMDType *md_type,
-												BOOL is_null,
-												ULONG,	//len,
-												Datum datum)
+CTranslatorScalarToDXL::TranslateInt8DatumToDXL(
+	CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null,
+	ULONG,	//len,
+	Datum datum)
 {
 	GPOS_ASSERT(md_type->IsPassedByValue());
 	gpos::Ref<CMDIdGPDB> mdid_old = gpos::dyn_cast<CMDIdGPDB>(md_type->MDId());
@@ -2532,10 +2526,9 @@ CTranslatorScalarToDXL::ExtractDoubleValueFromDatum(gpos::Ref<IMDId> mdid,
 //		Extract the byte array value of the datum. The result is NULL if datum is NULL
 //---------------------------------------------------------------------------
 BYTE *
-CTranslatorScalarToDXL::ExtractByteArrayFromDatum(CMemoryPool *mp,
-												  const IMDType *md_type,
-												  BOOL is_null, ULONG len,
-												  Datum datum)
+CTranslatorScalarToDXL::ExtractByteArrayFromDatum(
+	CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null, ULONG len,
+	Datum datum)
 {
 	ULONG length = 0;
 	BYTE *bytes = nullptr;
@@ -2572,9 +2565,8 @@ CTranslatorScalarToDXL::ExtractByteArrayFromDatum(CMemoryPool *mp,
 //		Extract the long int value of a datum
 //---------------------------------------------------------------------------
 LINT
-CTranslatorScalarToDXL::ExtractLintValueFromDatum(const IMDType *md_type,
-												  BOOL is_null, BYTE *bytes,
-												  ULONG length)
+CTranslatorScalarToDXL::ExtractLintValueFromDatum(
+	const gpos::Ref<IMDType> md_type, BOOL is_null, BYTE *bytes, ULONG length)
 {
 	gpos::Ref<IMDId> mdid = md_type->MDId();
 	GPOS_ASSERT(CMDTypeGenericGPDB::HasByte2IntMapping(md_type));
@@ -2641,10 +2633,9 @@ CTranslatorScalarToDXL::ExtractLintValueFromDatum(const IMDType *md_type,
 //		Create IDatum from GPDB datum
 //---------------------------------------------------------------------------
 gpos::Ref<IDatum>
-CTranslatorScalarToDXL::CreateIDatumFromGpdbDatum(CMemoryPool *mp,
-												  const IMDType *md_type,
-												  BOOL is_null,
-												  Datum gpdb_datum)
+CTranslatorScalarToDXL::CreateIDatumFromGpdbDatum(
+	CMemoryPool *mp, const gpos::Ref<IMDType> md_type, BOOL is_null,
+	Datum gpdb_datum)
 {
 	ULONG length = md_type->Length();
 	if (!md_type->IsPassedByValue() && !is_null)

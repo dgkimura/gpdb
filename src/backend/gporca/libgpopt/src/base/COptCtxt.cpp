@@ -19,6 +19,7 @@
 #include "gpopt/cost/ICostModel.h"
 #include "gpopt/eval/IConstExprEvaluator.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/traceflags/traceflags.h"
 
 

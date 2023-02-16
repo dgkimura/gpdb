@@ -394,7 +394,7 @@ CExpressionTest::EresUnittest_BitmapGet()
 
 	// create an index on the first column
 	const IMDColumn *pmdcol = pmdrel->GetMdCol(0);
-	const IMDType *pmdtype = mda.RetrieveType(pmdcol->MdidType());
+	const gpos::Ref<IMDType> pmdtype = mda.RetrieveType(pmdcol->MdidType());
 	CColRef *pcrFirst = col_factory->PcrCreate(pmdtype, pmdcol->TypeModifier());
 
 	gpos::Ref<CExpression> pexprIndexCond = CUtils::PexprScalarEqCmp(
@@ -412,7 +412,7 @@ CExpressionTest::EresUnittest_BitmapGet()
 	for (ULONG ul = 0; ul < num_cols; ++ul)
 	{
 		const IMDColumn *pmdcol = pmdrel->GetMdCol(ul);
-		const IMDType *pmdtype = mda.RetrieveType(pmdcol->MdidType());
+		const gpos::Ref<IMDType> pmdtype = mda.RetrieveType(pmdcol->MdidType());
 		CColRef *colref =
 			col_factory->PcrCreate(pmdtype, pmdcol->TypeModifier());
 		pdrgpcrTable->Append(colref);
@@ -603,7 +603,7 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
 
-	const IMDType *pmdtype = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDType> pmdtype = mda.PtMDType<IMDTypeInt4>();
 
 	GPOS_ASSERT(
 		IMDType::EcmptEq ==
@@ -695,7 +695,7 @@ CExpressionTest::EresUnittest_FValidPlan()
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
-	const IMDType *pmdtype = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDType> pmdtype = mda.PtMDType<IMDTypeInt4>();
 
 	// Create a group-by with a get child. Properties required contain one of the columns in the group by.
 	// Test that the plan is valid.
@@ -802,7 +802,7 @@ CExpressionTest::EresUnittest_FValidPlan_InvalidOrder()
 	GPOS_ASSERT(2 <= pdrgpcrGet->Size());
 
 	gpos::Ref<COrderSpec> pos = GPOS_NEW(mp) COrderSpec(mp);
-	const IMDType *pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDType> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 	gpos::Ref<IMDId> pmdidInt4LT =
 		pmdtypeint4->GetMdidForCmpType(IMDType::EcmptL);
 	;
@@ -1076,7 +1076,7 @@ CExpressionTest::EresUnittest_FValidPlanError()
 	// install opt context in TLS
 	CAutoOptCtxt aoc(mp, &mda, nullptr, /* pceeval */
 					 CTestUtils::GetCostModel(mp));
-	const IMDType *pmdtype = mda.PtMDType<IMDTypeInt4>();
+	const gpos::Ref<IMDType> pmdtype = mda.PtMDType<IMDTypeInt4>();
 
 	GPOS_RESULT eres = GPOS_OK;
 	// Test that in debug mode GPOS_ASSERT fails for non-physical expressions.

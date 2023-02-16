@@ -110,14 +110,21 @@ private:
 
 	// partition required/derived info, sorted by scanid
 	using UlongToSPartPropSpecInfoMap =
-		CHashMap<ULONG, SPartPropSpecInfo, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<SPartPropSpecInfo>>;
+		//CHashMap<ULONG, SPartPropSpecInfo, gpos::HashValue<ULONG>,
+		//		 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//		 CleanupRelease<SPartPropSpecInfo>>;
+		gpos::UnorderedMap<const ULONG *, gpos::Ref<SPartPropSpecInfo>,
+						   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+						   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 	using UlongToSPartPropSpecInfoMapIter =
-		CHashMapIter<ULONG, SPartPropSpecInfo, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupRelease<SPartPropSpecInfo>>;
+		//CHashMapIter<ULONG, SPartPropSpecInfo, gpos::HashValue<ULONG>,
+		//			 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//			 CleanupRelease<SPartPropSpecInfo>>;
+		gpos::UnorderedMap<
+			const ULONG *, gpos::Ref<SPartPropSpecInfo>,
+			gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+			gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 	gpos::Ref<UlongToSPartPropSpecInfoMap> m_part_prop_spec_infos = nullptr;
 
@@ -148,7 +155,7 @@ public:
 		UlongToSPartPropSpecInfoMapIter hmulpi(m_part_prop_spec_infos.get());
 		while (hmulpi.Advance())
 		{
-			const SPartPropSpecInfo *info = hmulpi.Value();
+			const gpos::Ref<SPartPropSpecInfo> info = hmulpi.Value();
 			ulHash = gpos::CombineHashes(ulHash, info->HashValue());
 		}
 

@@ -685,8 +685,8 @@ CPhysicalJoin::FMergeJoinCompatible(
 	if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 	{
 		const IMDScalarOp *op = mda->RetrieveScOp(mdid_scop);
-		const IMDType *left_type = mda->RetrieveType(pmdidTypeOuter);
-		const IMDType *right_type = mda->RetrieveType(pmdidTypeInner);
+		const gpos::Ref<IMDType> left_type = mda->RetrieveType(pmdidTypeOuter);
+		const gpos::Ref<IMDType> right_type = mda->RetrieveType(pmdidTypeInner);
 
 		// MJ sends Sort requests whose btree opclass must match that of the join
 		// clause. ORCA currently doesn't have support to retrive the information

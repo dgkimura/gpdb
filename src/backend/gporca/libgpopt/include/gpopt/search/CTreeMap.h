@@ -405,10 +405,15 @@ private:
 	CTreeNode *m_ptnRoot;
 
 	// map of all nodes
-	using TMap = gpos::CHashMap<T, CTreeNode, HashFn, EqFn, CleanupNULL,
-								CleanupDelete<CTreeNode>>;
-	using TMapIter = gpos::CHashMapIter<T, CTreeNode, HashFn, EqFn, CleanupNULL,
-										CleanupDelete<CTreeNode>>;
+	using TMap =  // gpos::CHashMap<T, CTreeNode, HashFn, EqFn, CleanupNULL,
+		//				CleanupDelete<CTreeNode>>;
+		gpos::UnorderedMap<const gpos::Ref<T>, CTreeNode,
+						   gpos::RefHash<T, HashFn>, gpos::RefEq<T, EqFn>>;
+	// gpos::CHashMapIter<T, CTreeNode, HashFn, EqFn, CleanupNULL,
+	//					CleanupDelete<CTreeNode>>;
+	using TMapIter = gpos::UnorderedMap<const gpos::Ref<T>, CTreeNode,
+										gpos::RefHash<T, HashFn>,
+										gpos::RefEq<T, EqFn>>::LegacyIterator;
 
 	// map of created links
 	using LinkMap =

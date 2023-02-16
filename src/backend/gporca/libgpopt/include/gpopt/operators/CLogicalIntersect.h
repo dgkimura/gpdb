@@ -65,7 +65,7 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator> PopCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	//-------------------------------------------------------------------------------------

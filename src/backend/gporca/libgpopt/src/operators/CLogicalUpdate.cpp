@@ -151,9 +151,9 @@ CLogicalUpdate::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalUpdate::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										   UlongToColRefMap *colref_mapping,
-										   BOOL must_exist)
+CLogicalUpdate::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> pdrgpcrDelete = CUtils::PdrgpcrRemap(
 		mp, m_pdrgpcrDelete.get(), colref_mapping, must_exist);

@@ -153,9 +153,9 @@ CLogicalIndexGet::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalIndexGet::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											 UlongToColRefMap *colref_mapping,
-											 BOOL must_exist)
+CLogicalIndexGet::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(m_pindexdesc->MDId());

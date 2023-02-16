@@ -17,6 +17,7 @@
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CPartConstraint.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -68,7 +69,7 @@ CPartInfo::CPartInfoEntry::~CPartInfoEntry()
 gpos::Ref<CPartInfo::CPartInfoEntry>
 CPartInfo::CPartInfoEntry::PpartinfoentryAddRemappedKeys(
 	CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
-	UlongToColRefMap *colref_mapping)
+	gpos::Ref<UlongToColRefMap> colref_mapping)
 {
 	GPOS_ASSERT(nullptr != pcrs);
 	GPOS_ASSERT(nullptr != colref_mapping);

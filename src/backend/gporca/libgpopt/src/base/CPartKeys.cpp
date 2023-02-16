@@ -17,6 +17,7 @@
 
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -154,7 +155,7 @@ CPartKeys::PdrgppartkeysCopy(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<CPartKeys>
 CPartKeys::PpartkeysRemap(CMemoryPool *mp,
-						  UlongToColRefMap *colref_mapping) const
+						  gpos::Ref<UlongToColRefMap> colref_mapping) const
 {
 	GPOS_ASSERT(nullptr != colref_mapping);
 	gpos::Ref<CColRef2dArray> pdrgpdrgpcr = GPOS_NEW(mp) CColRef2dArray(mp);

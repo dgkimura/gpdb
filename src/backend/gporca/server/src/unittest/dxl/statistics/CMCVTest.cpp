@@ -74,7 +74,7 @@ CMCVTest::EresUnittest_SortInt4MCVs()
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_int4);
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid.get());
+	const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(mdid.get());
 
 	// create three integer MCVs
 	gpos::Ref<CPoint> point1 = CTestUtils::PpointInt4(mp, 5);

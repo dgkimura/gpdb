@@ -84,7 +84,7 @@ private:
 		// part keys to this entry, using the existing keys and the given hashmap
 		gpos::Ref<CPartInfoEntry> PpartinfoentryAddRemappedKeys(
 			CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
-			UlongToColRefMap *colref_mapping);
+			gpos::Ref<UlongToColRefMap> colref_mapping);
 
 		// mdid of partition table
 		virtual gpos::Ref<IMDId>

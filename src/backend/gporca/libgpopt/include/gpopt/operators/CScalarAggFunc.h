@@ -135,9 +135,9 @@ public:
 
 	// return a copy of the operator with remapped columns
 	gpos::Ref<COperator>
-	PopCopyWithRemappedColumns(CMemoryPool *,		//mp,
-							   UlongToColRefMap *,	//colref_mapping,
-							   BOOL					//must_exist
+	PopCopyWithRemappedColumns(CMemoryPool *,				 //mp,
+							   gpos::Ref<UlongToColRefMap>,	 //colref_mapping,
+							   BOOL							 //must_exist
 							   ) override
 	{
 		return PopCopyDefault();
@@ -232,7 +232,7 @@ public:
 	BOOL FCountAny() const;
 
 	// is function either min() or max()?
-	BOOL IsMinMax(const IMDType *mdtype) const;
+	BOOL IsMinMax(const gpos::Ref<IMDType> mdtype) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const override;

@@ -101,7 +101,7 @@ CTranslatorExprToDXLUtils::PdxlnBoolConst(CMemoryPool *mp,
 {
 	GPOS_ASSERT(nullptr != mp);
 
-	const IMDTypeBool *pmdtype = md_accessor->PtMDType<IMDTypeBool>();
+	const gpos::Ref<IMDTypeBool> pmdtype = md_accessor->PtMDType<IMDTypeBool>();
 	;
 
 	gpos::Ref<CDXLDatumBool> dxl_datum = GPOS_NEW(mp)
@@ -587,7 +587,7 @@ CTranslatorExprToDXLUtils::PcrCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
 									 gpos::Ref<IMDId> mdid_type,
 									 INT type_modifier, const WCHAR *wszName)
 {
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid_type);
+	const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(mdid_type);
 
 	CName *pname = GPOS_NEW(mp)
 		CName(GPOS_NEW(mp) CWStringConst(wszName), true /*fOwnsMemory*/);
@@ -641,7 +641,7 @@ CTranslatorExprToDXLUtils::FScalarConstTrue(CMDAccessor *md_accessor,
 		gpos::Ref<CDXLScalarConstValue> pdxlopConst =
 			gpos::dyn_cast<CDXLScalarConstValue>(dxlnode->GetOperator());
 
-		const IMDType *pmdtype =
+		const gpos::Ref<IMDType> pmdtype =
 			md_accessor->RetrieveType(pdxlopConst->GetDatumVal()->MDId());
 		if (IMDType::EtiBool == pmdtype->GetDatumType())
 		{
@@ -673,7 +673,7 @@ CTranslatorExprToDXLUtils::FScalarConstFalse(CMDAccessor *md_accessor,
 		gpos::Ref<CDXLScalarConstValue> pdxlopConst =
 			gpos::dyn_cast<CDXLScalarConstValue>(dxlnode->GetOperator());
 
-		const IMDType *pmdtype =
+		const gpos::Ref<IMDType> pmdtype =
 			md_accessor->RetrieveType(pdxlopConst->GetDatumVal()->MDId());
 		if (IMDType::EtiBool == pmdtype->GetDatumType())
 		{
@@ -986,7 +986,7 @@ CTranslatorExprToDXLUtils::PdrgpdatumNulls(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < size; ul++)
 	{
 		CColRef *colref = (*colref_array)[ul];
-		const IMDType *pmdtype = colref->RetrieveType();
+		const gpos::Ref<IMDType> pmdtype = colref->RetrieveType();
 		gpos::Ref<IDatum> datum = pmdtype->DatumNull();
 		;
 		pdrgpdatum->Append(datum);
@@ -1142,7 +1142,7 @@ CTranslatorExprToDXLUtils::PdxlnValuesScan(
 		{
 			gpos::Ref<IDatum> datum = (*pdrgpdatum)[ulColPos].get();
 			CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-			const IMDType *pmdtype =
+			const gpos::Ref<IMDType> pmdtype =
 				md_accessor->RetrieveType(datum->MDId().get());
 
 			gpos::Ref<CDXLNode> pdxlnValue =

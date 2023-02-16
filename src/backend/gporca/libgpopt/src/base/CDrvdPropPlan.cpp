@@ -125,7 +125,7 @@ CDrvdPropPlan::CopyCTEProducerPlanProps(CMemoryPool *mp,
 	gpos::Ref<CPhysicalCTEConsumer> popCTEConsumer =
 		gpos::dyn_cast<CPhysicalCTEConsumer>(pop);
 	ULONG ulCTEId = popCTEConsumer->UlCTEId();
-	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
+	gpos::Ref<UlongToColRefMap> colref_mapping = popCTEConsumer->Phmulcr();
 	gpos::Ref<CDrvdPropPlan> pdpplan = pdpctxtplan->PdpplanCTEProducer(ulCTEId);
 	if (nullptr != pdpplan)
 	{

@@ -96,7 +96,7 @@ CColumnFactory::Initialize()
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier)
+CColumnFactory::PcrCreate(const gpos::Ref<IMDType> pmdtype, INT type_modifier)
 {
 	// increment atomic counter
 	ULONG id = m_aul++;
@@ -119,7 +119,7 @@ CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier)
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier,
+CColumnFactory::PcrCreate(const gpos::Ref<IMDType> pmdtype, INT type_modifier,
 						  const CName &name)
 {
 	ULONG id = m_aul++;
@@ -139,8 +139,8 @@ CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier,
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier, ULONG id,
-						  const CName &name)
+CColumnFactory::PcrCreate(const gpos::Ref<IMDType> pmdtype, INT type_modifier,
+						  ULONG id, const CName &name)
 {
 	CName *pnameCopy = GPOS_NEW(m_mp) CName(m_mp, name);
 	CAutoP<CName> a_pnameCopy(pnameCopy);
@@ -209,7 +209,7 @@ CColumnFactory::PcrCreate(const gpos::Ref<CColumnDescriptor> pcoldesc, ULONG id,
 //
 //---------------------------------------------------------------------------
 CColRef *
-CColumnFactory::PcrCreate(const IMDType *pmdtype, INT type_modifier,
+CColumnFactory::PcrCreate(const gpos::Ref<IMDType> pmdtype, INT type_modifier,
 						  gpos::Ref<IMDId> mdid_table, INT attno,
 						  BOOL is_nullable, ULONG id, const CName &name,
 						  ULONG ulOpSource, BOOL isDistCol, ULONG ulWidth)

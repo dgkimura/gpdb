@@ -163,7 +163,7 @@ public:
 
 	// return a copy of the distribution spec with remapped columns
 	gpos::Ref<CDistributionSpec> PdsCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// strip off any equivalent columns embedded in the distribution spec

@@ -297,9 +297,9 @@ public:
 
 	// create a dxl datum
 	static gpos::Ref<CDXLDatum> CreateDXLDatumVal(
-		CMemoryPool *mp, gpos::Ref<IMDId> mdid, const IMDType *md_type,
-		INT type_modifier, BOOL is_null, BYTE *byte_array, ULONG length,
-		LINT lint_Value, CDouble double_Value);
+		CMemoryPool *mp, gpos::Ref<IMDId> mdid,
+		const gpos::Ref<IMDType> md_type, INT type_modifier, BOOL is_null,
+		BYTE *byte_array, ULONG length, LINT lint_Value, CDouble double_Value);
 
 	// create a dxl datum of types having double mapping
 	static gpos::Ref<CDXLDatum> CreateDXLDatumStatsDoubleMappable(
@@ -316,7 +316,7 @@ public:
 											 INT type_modifier) const override;
 
 	// does a datum of this type need bytea to Lint mapping for statistics computation
-	static BOOL HasByte2IntMapping(const IMDType *mdtype);
+	static BOOL HasByte2IntMapping(const gpos::Ref<IMDType> mdtype);
 
 	// does a datum of this type need bytea to double mapping for statistics computation
 	static BOOL HasByte2DoubleMapping(const gpos::Ref<IMDId> mdid);

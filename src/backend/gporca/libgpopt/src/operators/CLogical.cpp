@@ -647,7 +647,8 @@ CLogical::PpcDeriveConstraintFromPredicates(CMemoryPool *mp,
 				exprhdl.DerivePropertyConstraint(ul);
 
 			// equivalence classes coming from child
-			CColRefSetArray *pdrgpcrsChild = ppc->PdrgpcrsEquivClasses();
+			gpos::Ref<CColRefSetArray> pdrgpcrsChild =
+				ppc->PdrgpcrsEquivClasses();
 
 			// merge with the equivalence classes we have so far
 			gpos::Ref<CColRefSetArray> pdrgpcrsMerged =
@@ -798,7 +799,7 @@ CLogical::PpcDeriveConstraintFromTableWithPredicates(
 		;
 		pdrgpcnstr->Append(pcnstrTable);
 	}
-	CColRefSetArray *pdrgpcrsEquivClassesTable =
+	gpos::Ref<CColRefSetArray> pdrgpcrsEquivClassesTable =
 		ppcTable->PdrgpcrsEquivClasses();
 
 	gpos::Ref<CPropConstraint> ppcnstrCond =
@@ -818,7 +819,8 @@ CLogical::PpcDeriveConstraintFromTableWithPredicates(
 		return ppcnstrCond;
 	}
 
-	CColRefSetArray *pdrgpcrsCond = ppcnstrCond->PdrgpcrsEquivClasses();
+	gpos::Ref<CColRefSetArray> pdrgpcrsCond =
+		ppcnstrCond->PdrgpcrsEquivClasses();
 	gpos::Ref<CColRefSetArray> pdrgpcrs = CUtils::PdrgpcrsMergeEquivClasses(
 		mp, pdrgpcrsEquivClassesTable, pdrgpcrsCond);
 	gpos::Ref<CPropConstraint> ppc = GPOS_NEW(mp) CPropConstraint(
@@ -866,7 +868,7 @@ CLogical::PpcDeriveConstraintRestrict(CMemoryPool *mp,
 {
 	// constraint property from relational child
 	gpos::Ref<CPropConstraint> ppc = exprhdl.DerivePropertyConstraint(0);
-	CColRefSetArray *pdrgpcrs = ppc->PdrgpcrsEquivClasses();
+	gpos::Ref<CColRefSetArray> pdrgpcrs = ppc->PdrgpcrsEquivClasses();
 
 	// construct new array of equivalence classes
 	gpos::Ref<CColRefSetArray> pdrgpcrsNew = GPOS_NEW(mp) CColRefSetArray(mp);

@@ -106,7 +106,8 @@ CConstraintInterval::IsConstraintUnbounded() const
 //---------------------------------------------------------------------------
 gpos::Ref<CConstraint>
 CConstraintInterval::PcnstrCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	CColRef *colref = CUtils::PcrRemap(m_pcr, colref_mapping, must_exist);
 	return PcnstrRemapForColumn(mp, colref);

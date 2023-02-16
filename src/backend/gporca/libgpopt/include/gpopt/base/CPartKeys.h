@@ -78,8 +78,8 @@ public:
 
 	// create a new PartKeys object from the current one by remapping the
 	// keys using the given hashmap
-	gpos::Ref<CPartKeys> PpartkeysRemap(CMemoryPool *mp,
-										UlongToColRefMap *colref_mapping) const;
+	gpos::Ref<CPartKeys> PpartkeysRemap(
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping) const;
 
 	// print
 	IOstream &OsPrint(IOstream &os) const;

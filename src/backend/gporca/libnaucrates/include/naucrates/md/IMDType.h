@@ -174,11 +174,11 @@ public:
 	static const CWStringConst *GetCmpTypeStr(IMDType::ECmpType cmp_type);
 
 	// return true if we can perform statistical comparison between datums of these two types; else return false
-	static BOOL StatsAreComparable(const IMDType *mdtype_first,
-								   const IMDType *mdtype_second);
+	static BOOL StatsAreComparable(const gpos::Ref<IMDType> mdtype_first,
+								   const gpos::Ref<IMDType> mdtype_second);
 
 	// return true if we can perform statistical comparison between datum of the given type and a given datum; else return false
-	static BOOL StatsAreComparable(const IMDType *mdtype_first,
+	static BOOL StatsAreComparable(const gpos::Ref<IMDType> mdtype_first,
 								   const gpos::Ref<IDatum> datum_second);
 };
 }  // namespace gpmd

@@ -17,6 +17,7 @@
 #include "gpopt/base/CReqdPropPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CPhysical.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

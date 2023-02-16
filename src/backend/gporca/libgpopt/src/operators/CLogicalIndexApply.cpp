@@ -111,9 +111,9 @@ CLogicalIndexApply::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
 
 // return a copy of the operator with remapped columns
 gpos::Ref<COperator>
-CLogicalIndexApply::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+CLogicalIndexApply::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<COperator> result = nullptr;
 	gpos::Ref<CColRefArray> colref_array = CUtils::PdrgpcrRemap(

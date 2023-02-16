@@ -94,7 +94,7 @@ private:
 	// add column as a new equivalence class, if it is not already in one of the
 	// existing equivalence classes
 	static void AddColumnToEquivClasses(CMemoryPool *mp, const CColRef *colref,
-										CColRefSetArray *pdrgpcrs);
+										gpos::Ref<CColRefSetArray> pdrgpcrs);
 
 	// create constraint from scalar comparison
 	static gpos::Ref<CConstraint> PcnstrFromScalarCmp(
@@ -207,7 +207,8 @@ public:
 
 	// return a copy of the constraint with remapped columns
 	virtual gpos::Ref<CConstraint> PcnstrCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist) = 0;
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		BOOL must_exist) = 0;
 
 	// return constraint on a given column
 	virtual gpos::Ref<CConstraint>
@@ -248,7 +249,8 @@ public:
 	// merge equivalence classes coming from children of a bool op
 	static gpos::Ref<CColRefSetArray> PdrgpcrsMergeFromBoolOp(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CColRefSetArray *pdrgpcrsFst, CColRefSetArray *pdrgpcrsSnd);
+		gpos::Ref<CColRefSetArray> pdrgpcrsFst,
+		gpos::Ref<CColRefSetArray> pdrgpcrsSnd);
 
 	// subset of the given constraints, which reference the given column
 	static gpos::Ref<CConstraintArray> PdrgpcnstrOnColumn(

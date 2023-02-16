@@ -642,7 +642,7 @@ CPhysicalUnionAll::PdshashedPassThru(
 		}
 		const CColRef *pcrHashed =
 			gpos::dyn_cast<CScalarIdent>(pexpr->Pop())->Pcr();
-		const IMDType *pmdtype = pcrHashed->RetrieveType();
+		const gpos::Ref<IMDType> pmdtype = pcrHashed->RetrieveType();
 		if (!pmdtype->IsHashable())
 		{
 			// skip non-hashable columns

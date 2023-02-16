@@ -1275,7 +1275,8 @@ CConstraintTest::PrintConstraint(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr)
 //
 //---------------------------------------------------------------------------
 void
-CConstraintTest::PrintEquivClasses(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
+CConstraintTest::PrintEquivClasses(CMemoryPool *mp,
+								   gpos::Ref<CColRefSetArray> pdrgpcrs,
 								   BOOL fExpected)
 {
 	// debug print
@@ -1346,7 +1347,8 @@ CConstraintTest::EresUnittest_NegativeTests()
 	CAutoOptCtxt aoc(mp, &mda, pceeval, CTestUtils::GetCostModel(mp));
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_text);
+	const gpos::Ref<IMDType> pmdtype =
+		mda.RetrieveType(&CMDIdGPDB::m_mdid_text);
 	CWStringConst str(GPOS_WSZ_LIT("text_col"));
 	CName name(mp, &str);
 	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
@@ -1403,7 +1405,8 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 					 CTestUtils::GetCostModel(mp));
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
-	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
+	const gpos::Ref<IMDType> pmdtype =
+		mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
 	CWStringConst str(GPOS_WSZ_LIT("date_col"));
 	CName name(mp, &str);
 	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(

@@ -264,9 +264,9 @@ CLogicalGbAgg::~CLogicalGbAgg()
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalGbAgg::PopCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist)
+CLogicalGbAgg::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> colref_array =
 		CUtils::PdrgpcrRemap(mp, m_pdrgpcr.get(), colref_mapping, must_exist);

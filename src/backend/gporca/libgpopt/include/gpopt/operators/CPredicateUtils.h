@@ -65,8 +65,9 @@ private:
 	static BOOL FCheckPredicateImplication(gpos::Ref<CExpression> pexprPred);
 
 	// check if predicate is implied by given equivalence classes
-	static BOOL FImpliedPredicate(gpos::Ref<CExpression> pexprPred,
-								  CColRefSetArray *pdrgpcrsEquivClasses);
+	static BOOL FImpliedPredicate(
+		gpos::Ref<CExpression> pexprPred,
+		gpos::Ref<CColRefSetArray> pdrgpcrsEquivClasses);
 
 	// helper to create index lookup comparison predicate with index key on left side
 	static gpos::Ref<CExpression> PexprIndexLookupKeyOnLeft(

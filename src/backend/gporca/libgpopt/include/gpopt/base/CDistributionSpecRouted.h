@@ -67,7 +67,7 @@ public:
 
 	// return a copy of the distribution spec with remapped columns
 	gpos::Ref<CDistributionSpec> PdsCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping,
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 		BOOL must_exist) override;
 
 	// append enforcers to dynamic array for the given plan properties
@@ -100,16 +100,6 @@ public:
 		GPOS_ASSERT(EdtRouted == pds->Edt());
 
 		return gpos::dyn_cast<CDistributionSpecRouted>(pds);
-	}
-
-	// conversion function - const argument
-	static const gpos::Ref<CDistributionSpecRouted>
-	PdsConvert(const gpos::Ref<CDistributionSpec> pds)
-	{
-		GPOS_ASSERT(nullptr != pds);
-		GPOS_ASSERT(EdtRouted == pds->Edt());
-
-		return dynamic_cast<const gpos::Ref<CDistributionSpecRouted> >(pds);
 	}
 
 };	// class CDistributionSpecRouted

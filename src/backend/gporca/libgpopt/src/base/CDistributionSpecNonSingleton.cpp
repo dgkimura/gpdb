@@ -18,6 +18,7 @@
 #include "gpopt/base/CDistributionSpecStrictRandom.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CPhysicalMotionRandom.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/traceflags/traceflags.h"
 
 using namespace gpopt;

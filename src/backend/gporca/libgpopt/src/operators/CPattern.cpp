@@ -92,9 +92,10 @@ CPattern::FInputOrderSensitive() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CPattern::PopCopyWithRemappedColumns(CMemoryPool *,		  //mp,
-									 UlongToColRefMap *,  //colref_mapping,
-									 BOOL				  //must_exist
+CPattern::PopCopyWithRemappedColumns(
+	CMemoryPool *,				  //mp,
+	gpos::Ref<UlongToColRefMap>,  //colref_mapping,
+	BOOL						  //must_exist
 )
 {
 	GPOS_ASSERT(

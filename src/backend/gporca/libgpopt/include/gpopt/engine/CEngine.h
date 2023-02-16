@@ -102,8 +102,8 @@ private:
 	// create optimization context for child group
 	gpos::Ref<COptimizationContext> PocChild(
 		gpos::Ref<CGroupExpression> pgexpr,	 // parent expression
-		COptimizationContext
-			*pocOrigin,	 // optimization context of parent operator
+		gpos::Ref<COptimizationContext>
+			pocOrigin,	// optimization context of parent operator
 		CExpressionHandle
 			&exprhdlPlan,  // handle to compute required plan properties
 		CExpressionHandle

@@ -77,7 +77,7 @@ public:
 	}
 
 	// column mapping
-	UlongToColRefMap *
+	gpos::Ref<UlongToColRefMap>
 	Phmulcr() const
 	{
 		return m_phmulcr.get();

@@ -54,8 +54,8 @@ IMDType::GetCmpTypeStr(IMDType::ECmpType cmp_type)
 //
 //---------------------------------------------------------------------------
 BOOL
-IMDType::StatsAreComparable(const IMDType *mdtype_first,
-							const IMDType *mdtype_second)
+IMDType::StatsAreComparable(const gpos::Ref<IMDType> mdtype_first,
+							const gpos::Ref<IMDType> mdtype_second)
 {
 	GPOS_ASSERT(nullptr != mdtype_first);
 	GPOS_ASSERT(nullptr != mdtype_second);
@@ -77,7 +77,7 @@ IMDType::StatsAreComparable(const IMDType *mdtype_first,
 //
 //---------------------------------------------------------------------------
 BOOL
-IMDType::StatsAreComparable(const IMDType *mdtype_first,
+IMDType::StatsAreComparable(const gpos::Ref<IMDType> mdtype_first,
 							const gpos::Ref<IDatum> datum_second)
 {
 	GPOS_ASSERT(nullptr != mdtype_first);

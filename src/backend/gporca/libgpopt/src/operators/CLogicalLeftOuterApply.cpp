@@ -108,7 +108,8 @@ CLogicalLeftOuterApply::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalLeftOuterApply::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> pdrgpcrInner = CUtils::PdrgpcrRemap(
 		mp, m_pdrgpcrInner.get(), colref_mapping, must_exist);

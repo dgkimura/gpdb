@@ -16,6 +16,7 @@
 
 #include "gpopt/base/CReqdPropPlan.h"
 #include "gpopt/operators/CPhysicalSort.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;

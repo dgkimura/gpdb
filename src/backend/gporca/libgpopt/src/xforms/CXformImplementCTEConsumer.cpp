@@ -78,7 +78,7 @@ CXformImplementCTEConsumer::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CColRefArray> colref_array = popCTEConsumer->Pdrgpcr();
 	;
 
-	UlongToColRefMap *colref_mapping = popCTEConsumer->Phmulcr();
+	gpos::Ref<UlongToColRefMap> colref_mapping = popCTEConsumer->Phmulcr();
 	GPOS_ASSERT(nullptr != colref_mapping);
 	;
 

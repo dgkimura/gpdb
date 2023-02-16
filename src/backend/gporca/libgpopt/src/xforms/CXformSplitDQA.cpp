@@ -293,7 +293,7 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 
 			const IMDAggregate *pmdagg =
 				md_accessor->RetrieveAgg(popScAggFunc->MDId());
-			const IMDType *pmdtype = md_accessor->RetrieveType(
+			const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(
 				pmdagg->GetIntermediateResultTypeMdid());
 			CColRef *pcrLocal =
 				col_factory->PcrCreate(pmdtype, default_type_modifier);
@@ -617,7 +617,7 @@ CXformSplitDQA::PopulatePrLMultiPhaseAgg(
 		gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 
 	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(popScAggFunc->MDId());
-	const IMDType *pmdtype =
+	const gpos::Ref<IMDType> pmdtype =
 		md_accessor->RetrieveType(pmdagg->GetIntermediateResultTypeMdid());
 
 	// create new column reference for the first stage (local) project element
@@ -688,7 +688,8 @@ CXformSplitDQA::PcrAggFuncArgument(
 
 	gpos::Ref<CScalar> popScalar = gpos::dyn_cast<CScalar>(pexprArg->Pop());
 	// computed argument to the input
-	const IMDType *pmdtype = md_accessor->RetrieveType(popScalar->MdidType());
+	const gpos::Ref<IMDType> pmdtype =
+		md_accessor->RetrieveType(popScalar->MdidType());
 	CColRef *pcrAdditionalGrpCol =
 		col_factory->PcrCreate(pmdtype, popScalar->TypeModifier());
 

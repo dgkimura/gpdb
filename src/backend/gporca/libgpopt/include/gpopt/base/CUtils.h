@@ -70,7 +70,7 @@ private:
 									  const gpos::Ref<CExpression> pexprRight);
 
 	// checks that the given type has all the comparisons: Eq, NEq, L, LEq, G, GEq
-	static BOOL FHasAllDefaultComparisons(const IMDType *pmdtype);
+	static BOOL FHasAllDefaultComparisons(const gpos::Ref<IMDType> pmdtype);
 
 	//	append the expressions in the source array to destination array
 	static void AppendArrayExpr(gpos::Ref<CExpressionArray> pdrgpexprSrc,
@@ -284,9 +284,9 @@ public:
 	static BOOL FHasCountAgg(gpos::Ref<CExpression> pexpr, CColRef **ppcrCount);
 
 	// check if given expression has count matching the given column, returns the Logical GroupBy Agg above
-	static BOOL FHasCountAggMatchingColumn(
-		const gpos::Ref<CExpression> pexpr, const CColRef *colref,
-		const gpos::Ref<CLogicalGbAgg> *ppgbAgg);
+	static BOOL FHasCountAggMatchingColumn(const gpos::Ref<CExpression> pexpr,
+										   const CColRef *colref,
+										   gpos::Ref<CLogicalGbAgg> &ppgbAgg);
 
 	// generate a GbAgg with count(*) and sum(col) over the given expression
 	static gpos::Ref<CExpression> PexprCountStarAndSum(
@@ -351,13 +351,13 @@ public:
 	static gpos::Ref<CExpression> PexprLogicalProjectNulls(
 		CMemoryPool *mp, CColRefArray *colref_array,
 		gpos::Ref<CExpression> pexpr,
-		UlongToColRefMap *colref_mapping = nullptr);
+		gpos::Ref<UlongToColRefMap> colref_mapping = nullptr);
 
 	// construct a project list using the given columns and datums
 	// store the mapping in the colref_mapping map if not NULL
 	static gpos::Ref<CExpression> PexprScalarProjListConst(
 		CMemoryPool *mp, CColRefArray *colref_array, IDatumArray *pdrgpdatum,
-		UlongToColRefMap *colref_mapping);
+		gpos::Ref<UlongToColRefMap> colref_mapping);
 
 	// generate a project expression
 	static gpos::Ref<CExpression> PexprAddProjection(
@@ -408,9 +408,8 @@ public:
 													  OID oid_val);
 
 	// generate a NULL constant of a given type
-	static gpos::Ref<CExpression> PexprScalarConstNull(CMemoryPool *mp,
-													   const IMDType *typ,
-													   INT type_modifier);
+	static gpos::Ref<CExpression> PexprScalarConstNull(
+		CMemoryPool *mp, const gpos::Ref<IMDType> typ, INT type_modifier);
 
 	// comparison operator type
 	static IMDType::ECmpType ParseCmpType(gpos::Ref<IMDId> mdid);
@@ -531,17 +530,17 @@ public:
 	// class contains columns from existing equiv classes, then these are merged
 	static gpos::Ref<CColRefSetArray> AddEquivClassToArray(
 		CMemoryPool *mp, const gpos::Ref<CColRefSet> pcrsNew,
-		const CColRefSetArray *pdrgpcrs);
+		const gpos::Ref<CColRefSetArray> pdrgpcrs);
 
 	// merge 2 arrays of equivalence classes
 	static gpos::Ref<CColRefSetArray> PdrgpcrsMergeEquivClasses(
-		CMemoryPool *mp, CColRefSetArray *pdrgpcrsFst,
-		CColRefSetArray *pdrgpcrsSnd);
+		CMemoryPool *mp, gpos::Ref<CColRefSetArray> pdrgpcrsFst,
+		gpos::Ref<CColRefSetArray> pdrgpcrsSnd);
 
 	// intersect 2 arrays of equivalence classes
 	static gpos::Ref<CColRefSetArray> PdrgpcrsIntersectEquivClasses(
-		CMemoryPool *mp, CColRefSetArray *pdrgpcrsFst,
-		CColRefSetArray *pdrgpcrsSnd);
+		CMemoryPool *mp, gpos::Ref<CColRefSetArray> pdrgpcrsFst,
+		gpos::Ref<CColRefSetArray> pdrgpcrsSnd);
 
 	// return a copy of equivalence classes from all children
 	static gpos::Ref<CColRefSetArray> PdrgpcrsCopyChildEquivClasses(
@@ -838,37 +837,37 @@ public:
 
 	// return the mapping of the given colref based on the given hashmap
 	static CColRef *PcrRemap(const CColRef *colref,
-							 UlongToColRefMap *colref_mapping, BOOL must_exist);
+							 gpos::Ref<UlongToColRefMap> colref_mapping,
+							 BOOL must_exist);
 
 	// create a new colrefset corresponding to the given colrefset
 	// and based on the given mapping
-	static gpos::Ref<CColRefSet> PcrsRemap(CMemoryPool *mp,
-										   gpos::Ref<CColRefSet> pcrs,
-										   UlongToColRefMap *colref_mapping,
-										   BOOL must_exist);
+	static gpos::Ref<CColRefSet> PcrsRemap(
+		CMemoryPool *mp, gpos::Ref<CColRefSet> pcrs,
+		gpos::Ref<UlongToColRefMap> colref_mapping, BOOL must_exist);
 
 	// create an array of column references corresponding to the given array
 	// and based on the given mapping
 	static gpos::Ref<CColRefArray> PdrgpcrRemap(
 		CMemoryPool *mp, CColRefArray *colref_array,
-		UlongToColRefMap *colref_mapping, BOOL must_exist);
+		gpos::Ref<UlongToColRefMap> colref_mapping, BOOL must_exist);
 
 	// create an array of column references corresponding to the given array
 	// and based on the given mapping and create new colrefs if necessary
 	static gpos::Ref<CColRefArray> PdrgpcrRemapAndCreate(
 		CMemoryPool *mp, CColRefArray *colref_array,
-		UlongToColRefMap *colref_mapping);
+		gpos::Ref<UlongToColRefMap> colref_mapping);
 
 	// create an array of column arrays corresponding to the given array
 	// and based on the given mapping
 	static gpos::Ref<CColRef2dArray> PdrgpdrgpcrRemap(
 		CMemoryPool *mp, CColRef2dArray *pdrgpdrgpcr,
-		UlongToColRefMap *colref_mapping, BOOL must_exist);
+		gpos::Ref<UlongToColRefMap> colref_mapping, BOOL must_exist);
 
 	// remap given array of expressions with provided column mappings
 	static gpos::Ref<CExpressionArray> PdrgpexprRemap(
 		CMemoryPool *mp, gpos::Ref<CExpressionArray> pdrgpexpr,
-		UlongToColRefMap *colref_mapping);
+		gpos::Ref<UlongToColRefMap> colref_mapping);
 
 	// create ColRef->ColRef mapping using the given ColRef arrays
 	static gpos::Ref<UlongToColRefMap> PhmulcrMapping(CMemoryPool *mp,
@@ -878,7 +877,7 @@ public:
 	// add col ID->ColRef mappings to the given hashmap based on the
 	// given ColRef arrays
 	static void AddColumnMapping(CMemoryPool *mp,
-								 UlongToColRefMap *colref_mapping,
+								 gpos::Ref<UlongToColRefMap> colref_mapping,
 								 CColRefArray *pdrgpcrFrom,
 								 CColRefArray *pdrgpcrTo);
 
@@ -891,7 +890,7 @@ public:
 	// if the passed map is not null, mappings from old to copied variables are added to it
 	static gpos::Ref<CColRefArray> PdrgpcrCopy(
 		CMemoryPool *mp, CColRefArray *colref_array, BOOL fAllComputed = false,
-		UlongToColRefMap *colref_mapping = nullptr);
+		gpos::Ref<UlongToColRefMap> colref_mapping = nullptr);
 
 	// equality check between two arrays of column refs. Inputs can be NULL
 	static BOOL Equals(CColRefArray *pdrgpcrFst, CColRefArray *pdrgpcrSnd);
@@ -949,7 +948,7 @@ public:
 						   CColRefArray *pdrgpcrTarget);
 
 	//	return index of the set containing given column
-	static ULONG UlPcrIndexContainingSet(CColRefSetArray *pdrgpcrs,
+	static ULONG UlPcrIndexContainingSet(gpos::Ref<CColRefSetArray> pdrgpcrs,
 										 const CColRef *colref);
 
 	// collapse the top two project nodes, if unable return NULL
@@ -983,13 +982,13 @@ public:
 	static INT CPointCmp(const void *val1, const void *val2);
 
 	// check if the equivalance classes are disjoint
-	static BOOL FEquivalanceClassesDisjoint(CMemoryPool *mp,
-											const CColRefSetArray *pdrgpcrs);
+	static BOOL FEquivalanceClassesDisjoint(
+		CMemoryPool *mp, const gpos::Ref<CColRefSetArray> pdrgpcrs);
 
 	// check if the equivalance classes are same
-	static BOOL FEquivalanceClassesEqual(CMemoryPool *mp,
-										 CColRefSetArray *pdrgpcrsFst,
-										 CColRefSetArray *pdrgpcrsSnd);
+	static BOOL FEquivalanceClassesEqual(
+		CMemoryPool *mp, gpos::Ref<CColRefSetArray> pdrgpcrsFst,
+		gpos::Ref<CColRefSetArray> pdrgpcrsSnd);
 
 	// get execution locality
 	static EExecLocalityType ExecLocalityType(gpos::Ref<CDistributionSpec> pds);

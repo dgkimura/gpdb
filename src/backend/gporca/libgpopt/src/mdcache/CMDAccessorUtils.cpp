@@ -130,7 +130,8 @@ CMDAccessorUtils::GetScCmpMdid(CMDAccessor *md_accessor,
 	// if the left & right are the same, first check the MDType
 	if (left_mdid->Equals(right_mdid))
 	{
-		const IMDType *pmdtypeLeft = md_accessor->RetrieveType(left_mdid);
+		const gpos::Ref<IMDType> pmdtypeLeft =
+			md_accessor->RetrieveType(left_mdid);
 		sc_cmp_mdid = pmdtypeLeft->GetMdidForCmpType(cmp_type);
 
 		if (IMDId::IsValid(sc_cmp_mdid))

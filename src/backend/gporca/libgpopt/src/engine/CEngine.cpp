@@ -217,8 +217,8 @@ CEngine::Init(CQueryContext *pqc,
 //---------------------------------------------------------------------------
 void
 CEngine::AddEnforcers(
-	CGroupExpression
-		*pgexpr,  // belongs to group where we need to add enforcers
+	gpos::Ref<CGroupExpression>
+		pgexpr,	 // belongs to group where we need to add enforcers
 	gpos::Ref<CExpressionArray> pdrgpexprEnforcers)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprEnforcers);

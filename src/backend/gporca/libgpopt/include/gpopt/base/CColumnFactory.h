@@ -58,8 +58,8 @@ private:
 	CSyncHashtable<CColRef, ULONG> m_sht;
 
 	// implementation of factory methods
-	CColRef *PcrCreate(const IMDType *pmdtype, INT type_modifier, ULONG id,
-					   const CName &name);
+	CColRef *PcrCreate(const gpos::Ref<IMDType> pmdtype, INT type_modifier,
+					   ULONG id, const CName &name);
 	CColRef *PcrCreate(const gpos::Ref<CColumnDescriptor> pcoldesc, ULONG id,
 					   const CName &name, ULONG ulOpSource,
 					   BOOL mark_as_used = true,
@@ -78,10 +78,10 @@ public:
 	void Initialize();
 
 	// create a column reference given only its type and type modifier, used for computed columns
-	CColRef *PcrCreate(const IMDType *pmdtype, INT type_modifier);
+	CColRef *PcrCreate(const gpos::Ref<IMDType> pmdtype, INT type_modifier);
 
 	// create column reference given its type, type modifier, and name
-	CColRef *PcrCreate(const IMDType *pmdtype, INT type_modifier,
+	CColRef *PcrCreate(const gpos::Ref<IMDType> pmdtype, INT type_modifier,
 					   const CName &name);
 
 	// create a column reference given its descriptor and name
@@ -90,7 +90,7 @@ public:
 					   gpos::Ref<IMDId> mdid_table);
 
 	// create a column reference given its type, attno, nullability and name
-	CColRef *PcrCreate(const IMDType *pmdtype, INT type_modifier,
+	CColRef *PcrCreate(const gpos::Ref<IMDType> pmdtype, INT type_modifier,
 					   gpos::Ref<IMDId> mdid_table, INT attno, BOOL is_nullable,
 					   ULONG id, const CName &name, ULONG ulOpSource,
 					   BOOL isDistCol, ULONG ulWidth = gpos::ulong_max);

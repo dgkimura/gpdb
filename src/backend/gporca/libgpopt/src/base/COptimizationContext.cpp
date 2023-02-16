@@ -108,7 +108,7 @@ COptimizationContext::SetBest(gpos::Ref<CCostContext> pcc)
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::Matches(const COptimizationContext *poc) const
+COptimizationContext::Matches(const gpos::Ref<COptimizationContext> poc) const
 {
 	GPOS_ASSERT(nullptr != poc);
 

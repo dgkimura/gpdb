@@ -35,12 +35,19 @@ using CColRef2dArray = gpos::Vector<gpos::Ref<CColRefArray>>;
 
 // hash map mapping ULONG -> CColRef
 using UlongToColRefMap =
-	CHashMap<ULONG, CColRef, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupNULL<CColRef>>;
+	//CHashMap<ULONG, CColRef, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	//		 CleanupDelete<ULONG>, CleanupNULL<CColRef>>;
+	gpos::UnorderedMap<const ULONG *, CColRef *,
+					   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+					   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
+
 // iterator
 using UlongToColRefMapIter =
-	CHashMapIter<ULONG, CColRef, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-				 CleanupDelete<ULONG>, CleanupNULL<CColRef>>;
+	//CHashMapIter<ULONG, CColRef, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	//			 CleanupDelete<ULONG>, CleanupNULL<CColRef>>;
+	gpos::UnorderedMap<
+		const ULONG *, CColRef *, gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+		gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -65,7 +72,7 @@ public:
 
 private:
 	// type information
-	const IMDType *m_pmdtype;
+	const gpos::Ref<IMDType> m_pmdtype;
 
 	// type modifier
 	const INT m_type_modifier;
@@ -91,14 +98,14 @@ public:
 	};
 
 	// ctor
-	CColRef(const IMDType *pmdtype, const INT type_modifier, ULONG id,
+	CColRef(const gpos::Ref<IMDType> pmdtype, const INT type_modifier, ULONG id,
 			const CName *pname);
 
 	// dtor
 	virtual ~CColRef();
 
 	// accessor to type info
-	const IMDType *
+	const gpos::Ref<IMDType>
 	RetrieveType() const
 	{
 		return m_pmdtype;

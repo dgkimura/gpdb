@@ -109,7 +109,7 @@ CPartitionPropagationSpec::Equals(const CPartitionPropagationSpec *pps) const
 	return hmulpi.Advance() == hmulpi_other.Advance();
 }
 
-CPartitionPropagationSpec::gpos::Ref<SPartPropSpecInfo>
+gpos::Ref<CPartitionPropagationSpec::SPartPropSpecInfo>
 CPartitionPropagationSpec::FindPartPropSpecInfo(ULONG scan_id) const
 {
 	if (!Contains(scan_id))
@@ -178,8 +178,7 @@ CPartitionPropagationSpec::InsertAll(CPartitionPropagationSpec *pps)
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos.get());
 	while (hmulpi.Advance())
 	{
-		gpos::Ref<SPartPropSpecInfo> other_info =
-			const_cast<gpos::Ref<SPartPropSpecInfo> >(hmulpi.Value());
+		gpos::Ref<SPartPropSpecInfo> other_info = hmulpi.Value();
 
 		gpos::Ref<SPartPropSpecInfo> found_info =
 			FindPartPropSpecInfo(other_info->m_scan_id);
@@ -209,8 +208,7 @@ CPartitionPropagationSpec::InsertAllowedConsumers(
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos.get());
 	while (hmulpi.Advance())
 	{
-		gpos::Ref<SPartPropSpecInfo> other_info =
-			const_cast<gpos::Ref<SPartPropSpecInfo> >(hmulpi.Value());
+		gpos::Ref<SPartPropSpecInfo> other_info = hmulpi.Value();
 
 		// only process allowed_scan_ids ...
 		if (allowed_scan_ids != nullptr &&
@@ -253,8 +251,7 @@ CPartitionPropagationSpec::InsertAllExcept(CPartitionPropagationSpec *pps,
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos.get());
 	while (hmulpi.Advance())
 	{
-		gpos::Ref<SPartPropSpecInfo> other_info =
-			const_cast<gpos::Ref<SPartPropSpecInfo> >(hmulpi.Value());
+		gpos::Ref<SPartPropSpecInfo> other_info = hmulpi.Value();
 
 		if (other_info->m_scan_id == scan_id)
 		{
@@ -288,8 +285,7 @@ CPartitionPropagationSpec::InsertAllResolve(CPartitionPropagationSpec *pps)
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos.get());
 	while (hmulpi.Advance())
 	{
-		gpos::Ref<SPartPropSpecInfo> other_info =
-			const_cast<gpos::Ref<SPartPropSpecInfo> >(hmulpi.Value());
+		gpos::Ref<SPartPropSpecInfo> other_info = hmulpi.Value();
 
 		gpos::Ref<SPartPropSpecInfo> found_info =
 			FindPartPropSpecInfo(other_info->m_scan_id);

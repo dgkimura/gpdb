@@ -824,9 +824,9 @@ CExpression::Matches(gpos::Ref<CExpression> pexpr) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CExpression::PexprCopyWithRemappedColumns(CMemoryPool *mp,
-										  UlongToColRefMap *colref_mapping,
-										  BOOL must_exist) const
+CExpression::PexprCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist) const
 {
 	GPOS_ASSERT(nullptr != m_pop);
 	// this is only valid for logical and scalar expressions

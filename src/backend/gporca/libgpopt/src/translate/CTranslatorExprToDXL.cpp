@@ -3430,7 +3430,7 @@ CTranslatorExprToDXL::PdxlnQuantifiedSubplan(
 	// translate test expression
 	gpos::Ref<CDXLNode> dxlnode_test_expr = PdxlnScalar(pexprScalar);
 
-	const IMDTypeBool *pmdtypebool = m_pmda->PtMDType<IMDTypeBool>();
+	const gpos::Ref<IMDTypeBool> pmdtypebool = m_pmda->PtMDType<IMDTypeBool>();
 	gpos::Ref<IMDId> mdid = pmdtypebool->MDId();
 	;
 
@@ -3464,7 +3464,7 @@ CTranslatorExprToDXL::PdxlnProjectBoolConst(gpos::Ref<CDXLNode> dxlnode,
 	GPOS_ASSERT(nullptr != dxlnode);
 
 	// create a new project element with bool value
-	const IMDTypeBool *pmdtypebool = m_pmda->PtMDType<IMDTypeBool>();
+	const gpos::Ref<IMDTypeBool> pmdtypebool = m_pmda->PtMDType<IMDTypeBool>();
 	gpos::Ref<IMDId> mdid = pmdtypebool->MDId();
 	;
 
@@ -3644,7 +3644,7 @@ CTranslatorExprToDXL::PdxlnExistentialSubplan(
 				"Outer references in the project list of a correlated subquery"));
 	}
 
-	const IMDTypeBool *pmdtypebool = m_pmda->PtMDType<IMDTypeBool>();
+	const gpos::Ref<IMDTypeBool> pmdtypebool = m_pmda->PtMDType<IMDTypeBool>();
 	gpos::Ref<IMDId> mdid = pmdtypebool->MDId();
 	;
 
@@ -3898,7 +3898,7 @@ CTranslatorExprToDXL::PdxlnBooleanScalarWithSubPlan(
 	gpos::Ref<CDXLColRefArray> dxl_colref_array)
 {
 	// create a new project element (const:true), and replace the first child with it
-	const IMDTypeBool *pmdtypebool = m_pmda->PtMDType<IMDTypeBool>();
+	const gpos::Ref<IMDTypeBool> pmdtypebool = m_pmda->PtMDType<IMDTypeBool>();
 	gpos::Ref<IMDId> mdid = pmdtypebool->MDId();
 	;
 
@@ -6766,7 +6766,8 @@ CTranslatorExprToDXL::PdxlnScConst(gpos::Ref<CExpression> pexprScConst)
 
 	gpos::Ref<IDatum> datum = popScConst->GetDatum();
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDType *pmdtype = md_accessor->RetrieveType(datum->MDId().get());
+	const gpos::Ref<IMDType> pmdtype =
+		md_accessor->RetrieveType(datum->MDId().get());
 
 	gpos::Ref<CDXLNode> dxlnode =
 		GPOS_NEW(m_mp) CDXLNode(m_mp, pmdtype->GetDXLOpScConst(m_mp, datum));

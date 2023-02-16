@@ -16,6 +16,7 @@
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CPhysicalMotionGather.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/traceflags/traceflags.h"
 
 
@@ -89,9 +90,7 @@ CDistributionSpecSingleton::FSatisfies(
 	}
 
 	return (EdtSingleton == pds->Edt() &&
-			m_est == (const_cast<gpos::Ref<CDistributionSpecSingleton> >(
-						  gpos::cast<CDistributionSpecSingleton>(pds)))
-						 ->Est());
+			m_est == gpos::cast<CDistributionSpecSingleton>(pds)->Est());
 }
 
 

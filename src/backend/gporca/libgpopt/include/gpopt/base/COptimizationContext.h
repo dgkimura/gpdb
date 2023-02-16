@@ -165,7 +165,7 @@ public:
 	gpos::Ref<CGroupExpression> PgexprBest() const;
 
 	// match optimization contexts
-	BOOL Matches(const COptimizationContext *poc) const;
+	BOOL Matches(const gpos::Ref<COptimizationContext> poc) const;
 
 	// get id
 	ULONG
@@ -262,7 +262,7 @@ public:
 	BOOL
 	operator==(const COptimizationContext &oc) const
 	{
-		return oc.Matches(this);
+		return oc.Matches(SharedFromThis());
 	}
 
 	// debug print

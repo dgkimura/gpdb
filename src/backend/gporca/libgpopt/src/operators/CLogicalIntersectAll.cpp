@@ -99,7 +99,8 @@ CLogicalIntersectAll::DeriveMaxCard(CMemoryPool *,	// mp
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalIntersectAll::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> pdrgpcrOutput = CUtils::PdrgpcrRemap(
 		mp, m_pdrgpcrOutput.get(), colref_mapping, must_exist);
@@ -156,7 +157,8 @@ gpos::Ref<IStatistics>
 CLogicalIntersectAll::PstatsDerive(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	CColRef2dArray *pdrgpdrgpcrInput,
-	CColRefSetArray *output_colrefsets	// output of relational children
+	gpos::Ref<CColRefSetArray>
+		output_colrefsets  // output of relational children
 )
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());

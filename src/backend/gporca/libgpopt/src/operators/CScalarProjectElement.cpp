@@ -83,7 +83,8 @@ CScalarProjectElement::FInputOrderSensitive() const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CScalarProjectElement::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	ULONG id = m_pcr->Id();
 	CColRef *colref = colref_mapping->Find(&id);

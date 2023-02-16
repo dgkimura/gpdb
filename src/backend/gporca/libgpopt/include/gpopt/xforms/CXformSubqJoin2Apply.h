@@ -45,7 +45,7 @@ private:
 	// collect subqueries that exclusively use outer/inner child
 	static void CollectSubqueries(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-		CColRefSetArray *pdrgpcrs,
+		gpos::Ref<CColRefSetArray> pdrgpcrs,
 		gpos::Ref<CExpressionArrays> pdrgpdrgpexprSubqs);
 
 	// replace subqueries with scalar identifier based on given map

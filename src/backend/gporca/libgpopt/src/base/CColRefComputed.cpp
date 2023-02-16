@@ -26,8 +26,9 @@ using namespace gpopt;
 //		takes ownership of string; verify string is properly formatted
 //
 //---------------------------------------------------------------------------
-CColRefComputed::CColRefComputed(const IMDType *pmdtype, INT type_modifier,
-								 ULONG id, const CName *pname)
+CColRefComputed::CColRefComputed(const gpos::Ref<IMDType> pmdtype,
+								 INT type_modifier, ULONG id,
+								 const CName *pname)
 	: CColRef(pmdtype, type_modifier, id, pname)
 {
 	GPOS_ASSERT(nullptr != pmdtype);

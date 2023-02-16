@@ -214,9 +214,9 @@ CLogicalRowTrigger::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
-CLogicalRowTrigger::PopCopyWithRemappedColumns(CMemoryPool *mp,
-											   UlongToColRefMap *colref_mapping,
-											   BOOL must_exist)
+CLogicalRowTrigger::PopCopyWithRemappedColumns(
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> pdrgpcrOld = nullptr;
 	if (nullptr != m_pdrgpcrOld)

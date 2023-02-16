@@ -114,7 +114,7 @@ public:
 
 	// check if the current colrefset is a subset of any of the colrefsets
 	// in the given array
-	BOOL FContained(const CColRefSetArray *pdrgpcrs);
+	BOOL FContained(const gpos::Ref<CColRefSetArray> pdrgpcrs);
 
 	// check if current colrefset intersects with the given colrefset
 	BOOL FIntersects(const gpos::Ref<CColRefSet> pcrs);
@@ -136,7 +136,8 @@ public:
 	void ExtractColIds(CMemoryPool *mp, gpos::Ref<ULongPtrArray> colids) const;
 
 	// are the columns in the column reference set covered by the array of column ref sets
-	static BOOL FCovered(CColRefSetArray *pdrgpcrs, gpos::Ref<CColRefSet> pcrs);
+	static BOOL FCovered(gpos::Ref<CColRefSetArray> pdrgpcrs,
+						 gpos::Ref<CColRefSet> pcrs);
 
 };	// class CColRefSet
 

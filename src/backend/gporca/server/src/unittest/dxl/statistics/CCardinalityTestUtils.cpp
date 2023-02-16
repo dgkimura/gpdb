@@ -181,7 +181,7 @@ CCardinalityTestUtils::PpointNumeric(CMemoryPool *mp,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	gpos::Ref<CMDIdGPDB> mdid =
 		GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_numeric);
-	const IMDType *pmdtype = md_accessor->RetrieveType(mdid.get());
+	const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(mdid.get());
 
 	ULONG ulbaSize = 0;
 	BYTE *data =

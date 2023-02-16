@@ -36,8 +36,8 @@ const ULONG CColRef::m_ulInvalid = gpos::ulong_max;
 //		takes ownership of string; verify string is properly formatted
 //
 //---------------------------------------------------------------------------
-CColRef::CColRef(const IMDType *pmdtype, const INT type_modifier, ULONG id,
-				 const CName *pname)
+CColRef::CColRef(const gpos::Ref<IMDType> pmdtype, const INT type_modifier,
+				 ULONG id, const CName *pname)
 	: m_pmdtype(pmdtype),
 	  m_type_modifier(type_modifier),
 	  m_pname(pname),

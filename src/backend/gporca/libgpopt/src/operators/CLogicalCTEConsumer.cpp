@@ -318,7 +318,8 @@ CLogicalCTEConsumer::FInputOrderSensitive() const
 //---------------------------------------------------------------------------
 gpos::Ref<COperator>
 CLogicalCTEConsumer::PopCopyWithRemappedColumns(
-	CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist)
+	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+	BOOL must_exist)
 {
 	gpos::Ref<CColRefArray> colref_array = nullptr;
 	if (must_exist)
@@ -368,7 +369,7 @@ CLogicalCTEConsumer::DerivePropertyConstraint(CMemoryPool *mp,
 		COptCtxt::PoctxtFromTLS()->Pcteinfo()->PexprCTEProducer(m_id);
 	GPOS_ASSERT(nullptr != pexprProducer);
 	gpos::Ref<CPropConstraint> ppc = pexprProducer->DerivePropertyConstraint();
-	CColRefSetArray *pdrgpcrs = ppc->PdrgpcrsEquivClasses();
+	gpos::Ref<CColRefSetArray> pdrgpcrs = ppc->PdrgpcrsEquivClasses();
 	gpos::Ref<CConstraint> pcnstr = ppc->Pcnstr();
 
 	// remap producer columns to consumer columns

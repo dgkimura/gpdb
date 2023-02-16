@@ -109,17 +109,6 @@ public:
 		return gpos::dyn_cast<CDistributionSpecNonSingleton>(pds);
 	}
 
-	// conversion function
-	static const gpos::Ref<CDistributionSpecNonSingleton>
-	PdsConvert(const gpos::Ref<CDistributionSpec> pds)
-	{
-		GPOS_ASSERT(nullptr != pds);
-		GPOS_ASSERT(EdtNonSingleton == pds->Edt());
-
-		return dynamic_cast<const gpos::Ref<CDistributionSpecNonSingleton> >(
-			pds);
-	}
-
 };	// class CDistributionSpecNonSingleton
 
 }  // namespace gpopt

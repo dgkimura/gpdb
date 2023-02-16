@@ -206,7 +206,8 @@ public:
 
 	// return a copy of the order spec with remapped columns
 	virtual gpos::Ref<COrderSpec> PosCopyWithRemappedColumns(
-		CMemoryPool *mp, UlongToColRefMap *colref_mapping, BOOL must_exist);
+		CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
+		BOOL must_exist);
 
 	// return a copy of the order spec after excluding the given columns
 	virtual gpos::Ref<COrderSpec> PosExcludeColumns(CMemoryPool *mp,

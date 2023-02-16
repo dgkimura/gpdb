@@ -29,7 +29,8 @@ FORCE_GENERATE_DBGSTR(CColumnDescriptor);
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CColumnDescriptor::CColumnDescriptor(CMemoryPool *mp, const IMDType *pmdtype,
+CColumnDescriptor::CColumnDescriptor(CMemoryPool *mp,
+									 const gpos::Ref<IMDType> pmdtype,
 									 INT type_modifier, const CName &name,
 									 INT attno, BOOL is_nullable, ULONG ulWidth)
 	: m_pmdtype(pmdtype),

@@ -32,8 +32,11 @@ using namespace gpos;
 
 // hash maps ULONG -> array of ULONGs
 using UlongToBitSetMap =
-	CHashMap<ULONG, CBitSet, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<CBitSet>>;
+	//CHashMap<ULONG, CBitSet, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	//		 CleanupDelete<ULONG>, CleanupRelease<CBitSet>>;
+	gpos::UnorderedMap<const ULONG *, gpos::Ref<CBitSet>,
+					   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+					   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 //---------------------------------------------------------------------------
 //	@class:

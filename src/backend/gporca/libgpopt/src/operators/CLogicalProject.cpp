@@ -154,7 +154,7 @@ void
 CLogicalProject::ExtractConstraintFromScConst(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexprPrEl,
 	gpos::Ref<CConstraintArray> pdrgpcnstr,	 // array of range constraints
-	CColRefSetArray *pdrgpcrs				 // array of equivalence class
+	gpos::Ref<CColRefSetArray> pdrgpcrs		 // array of equivalence class
 )
 {
 	GPOS_ASSERT(nullptr != pexprPrEl);
@@ -264,7 +264,7 @@ CLogicalProject::DerivePropertyConstraint(CMemoryPool *mp,
 		exprhdl.DerivePropertyConstraint(0 /* ulChild */);
 
 	// equivalence classes coming from child
-	CColRefSetArray *pdrgpcrsChild = ppcChild->PdrgpcrsEquivClasses();
+	gpos::Ref<CColRefSetArray> pdrgpcrsChild = ppcChild->PdrgpcrsEquivClasses();
 	if (nullptr != pdrgpcrsChild)
 	{
 		// merge with the equivalence classes we have so far
