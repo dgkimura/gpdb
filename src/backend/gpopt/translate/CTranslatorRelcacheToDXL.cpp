@@ -800,7 +800,7 @@ CTranslatorRelcacheToDXL::RetrieveIndex(CMemoryPool *mp,
 				   mdid_index->GetBuffer());
 	}
 
-	const IMDRelation *md_rel = nullptr;
+	const gpos::Ref<IMDRelation> md_rel = nullptr;
 	Form_pg_index form_pg_index = nullptr;
 	CMDName *mdname = nullptr;
 	IMDIndex::EmdindexType index_type = IMDIndex::EmdindSentinel;
@@ -945,8 +945,8 @@ CTranslatorRelcacheToDXL::LevelHasDefaultPartition
 //
 //---------------------------------------------------------------------------
 gpos::Ref<ULongPtrArray>
-CTranslatorRelcacheToDXL::ComputeIncludedCols(CMemoryPool *mp,
-											  const IMDRelation *md_rel)
+CTranslatorRelcacheToDXL::ComputeIncludedCols(
+	CMemoryPool *mp, const gpos::Ref<IMDRelation> md_rel)
 {
 	// TODO: 3/19/2012; currently we assume that all the columns
 	// in the table are available from the index.
@@ -993,9 +993,8 @@ CTranslatorRelcacheToDXL::GetAttributePosition(
 //
 //---------------------------------------------------------------------------
 ULONG *
-CTranslatorRelcacheToDXL::PopulateAttnoPositionMap(CMemoryPool *mp,
-												   const IMDRelation *md_rel,
-												   ULONG size)
+CTranslatorRelcacheToDXL::PopulateAttnoPositionMap(
+	CMemoryPool *mp, const gpos::Ref<IMDRelation> md_rel, ULONG size)
 {
 	GPOS_ASSERT(nullptr != md_rel);
 	const ULONG num_included_cols = md_rel->ColumnCount();
@@ -1480,7 +1479,8 @@ CTranslatorRelcacheToDXL::RetrieveCheckConstraints(CMemoryPool *mp,
 	CMappingVarColId *var_colid_mapping = GPOS_NEW(mp) CMappingVarColId(mp);
 	gpos::Ref<CDXLColDescrArray> dxl_col_descr_array =
 		GPOS_NEW(mp) CDXLColDescrArray(mp);
-	const IMDRelation *md_rel = md_accessor->RetrieveRel(mdid_rel.get());
+	const gpos::Ref<IMDRelation> md_rel =
+		md_accessor->RetrieveRel(mdid_rel.get());
 	const ULONG length = md_rel->ColumnCount();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -1721,7 +1721,7 @@ CTranslatorRelcacheToDXL::RetrieveColStats(CMemoryPool *mp,
 	ULONG pos = mdid_col_stats->Position();
 	OID rel_oid = gpos::dyn_cast<CMDIdGPDB>(mdid_rel)->Oid();
 
-	const IMDRelation *md_rel = md_accessor->RetrieveRel(mdid_rel);
+	const gpos::Ref<IMDRelation> md_rel = md_accessor->RetrieveRel(mdid_rel);
 	const IMDColumn *md_col = md_rel->GetMdCol(pos);
 	AttrNumber attno = (AttrNumber) md_col->AttrNum();
 
@@ -2749,8 +2749,8 @@ CTranslatorRelcacheToDXL::IsIndexSupported(Relation index_rel)
 //---------------------------------------------------------------------------
 gpos::Ref<CMDPartConstraintGPDB>
 CTranslatorRelcacheToDXL::RetrievePartConstraintForIndex(
-	CMemoryPool *mp, CMDAccessor *md_accessor, const IMDRelation *md_rel,
-	Node *part_constraint,
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	const gpos::Ref<IMDRelation> md_rel, Node *part_constraint,
 	gpos::Ref<ULongPtrArray> level_with_default_part_array, BOOL is_unbounded)
 {
 	gpos::Ref<CDXLColDescrArray> dxl_col_descr_array =

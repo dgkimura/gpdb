@@ -146,7 +146,7 @@ CLogical::PdrgpdrgpcrCreatePartCols(CMemoryPool *mp, CColRefArray *colref_array,
 //		Compute an order spec based on an index
 
 gpos::Ref<COrderSpec>
-CLogical::PosFromIndex(CMemoryPool *mp, const IMDIndex *pmdindex,
+CLogical::PosFromIndex(CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
 					   CColRefArray *colref_array,
 					   const gpos::Ref<CTableDescriptor> ptabdesc)
 {
@@ -172,7 +172,8 @@ CLogical::PosFromIndex(CMemoryPool *mp, const IMDIndex *pmdindex,
 
 	// get relation from the metadata accessor using metadata id
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
+	const gpos::Ref<IMDRelation> pmdrel =
+		md_accessor->RetrieveRel(ptabdesc->MDId());
 
 	for (ULONG ul = 0; ul < ulLenKeys; ul++)
 	{
@@ -730,7 +731,8 @@ CLogical::PpcDeriveConstraintFromTable(
 	}
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
+	const gpos::Ref<IMDRelation> pmdrel =
+		md_accessor->RetrieveRel(ptabdesc->MDId());
 
 	const ULONG ulCheckConstraint = pmdrel->CheckConstraintCount();
 	for (ULONG ul = 0; ul < ulCheckConstraint; ul++)
@@ -738,7 +740,7 @@ CLogical::PpcDeriveConstraintFromTable(
 		gpos::Ref<IMDId> pmdidCheckConstraint =
 			pmdrel->CheckConstraintMDidAt(ul);
 
-		const IMDCheckConstraint *pmdCheckConstraint =
+		const gpos::Ref<IMDCheckConstraint> pmdCheckConstraint =
 			md_accessor->RetrieveCheckConstraints(pmdidCheckConstraint);
 
 		// extract the check constraint expression

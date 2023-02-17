@@ -91,7 +91,7 @@ public:
 
 	// check if given scalar comparison can be used with the index key
 	// at the specified position
-	virtual BOOL IsCompatible(const IMDScalarOp *md_scalar_op,
+	virtual BOOL IsCompatible(const gpos::Ref<IMDScalarOp> md_scalar_op,
 							  ULONG key_pos) const = 0;
 
 	// child index oids

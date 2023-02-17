@@ -205,7 +205,7 @@ CMappingVarColId::LoadTblColumns(ULONG query_level, ULONG RTE_index,
 //---------------------------------------------------------------------------
 void
 CMappingVarColId::LoadIndexColumns(ULONG query_level, ULONG RTE_index,
-								   const IMDIndex *index,
+								   const gpos::Ref<IMDIndex> index,
 								   const gpos::Ref<CDXLTableDescr> table_descr)
 {
 	GPOS_ASSERT(nullptr != table_descr);

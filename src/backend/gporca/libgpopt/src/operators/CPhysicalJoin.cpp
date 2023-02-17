@@ -628,7 +628,7 @@ CPhysicalJoin::FHashJoinCompatible(
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 
-	const IMDScalarOp *scop = md_accessor->RetrieveScOp(mdid_scop);
+	const gpos::Ref<IMDScalarOp> scop = md_accessor->RetrieveScOp(mdid_scop);
 	if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution) &&
 		nullptr == scop->HashOpfamilyMdid())
 	{
@@ -684,7 +684,7 @@ CPhysicalJoin::FMergeJoinCompatible(
 
 	if (GPOS_FTRACE(EopttraceConsiderOpfamiliesForDistribution))
 	{
-		const IMDScalarOp *op = mda->RetrieveScOp(mdid_scop);
+		const gpos::Ref<IMDScalarOp> op = mda->RetrieveScOp(mdid_scop);
 		const gpos::Ref<IMDType> left_type = mda->RetrieveType(pmdidTypeOuter);
 		const gpos::Ref<IMDType> right_type = mda->RetrieveType(pmdidTypeInner);
 

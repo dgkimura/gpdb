@@ -173,7 +173,7 @@ gpos::Ref<IMDId>
 CScalarCmp::PmdidCommuteOp(CMDAccessor *md_accessor, gpos::Ref<COperator> pop)
 {
 	gpos::Ref<CScalarCmp> popScalarCmp = gpos::dyn_cast<CScalarCmp>(pop);
-	const IMDScalarOp *pmdScalarCmpOp =
+	const gpos::Ref<IMDScalarOp> pmdScalarCmpOp =
 		md_accessor->RetrieveScOp(popScalarCmp->MdIdOp());
 
 	gpos::Ref<IMDId> pmdidScalarCmpCommute = pmdScalarCmpOp->GetCommuteOpMdid();

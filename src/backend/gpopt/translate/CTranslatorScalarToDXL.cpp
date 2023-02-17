@@ -656,7 +656,7 @@ CTranslatorScalarToDXL::CreateScalarArrayCompFromExpr(
 	// get operator name
 	gpos::Ref<CMDIdGPDB> mdid_op =
 		GPOS_NEW(m_mp) CMDIdGPDB(scalar_array_op_expr->opno);
-	const IMDScalarOp *md_scalar_op =
+	const gpos::Ref<IMDScalarOp> md_scalar_op =
 		m_md_accessor->RetrieveScOp(mdid_op.get());
 	;
 
@@ -1353,7 +1353,8 @@ CTranslatorScalarToDXL::TranslateFuncExprToDXL(
 						   GPOS_NEW(m_mp) CMDIdGPDB(func_expr->funcresulttype),
 						   type_modifier, func_expr->funcretset));
 
-	const IMDFunction *md_func = m_md_accessor->RetrieveFunc(mdid_func.get());
+	const gpos::Ref<IMDFunction> md_func =
+		m_md_accessor->RetrieveFunc(mdid_func.get());
 	if (IMDFunction::EfsVolatile == md_func->GetFuncStability())
 	{
 		ListCell *lc = nullptr;
@@ -2210,7 +2211,8 @@ const CWStringConst *
 CTranslatorScalarToDXL::GetDXLArrayCmpType(gpos::Ref<IMDId> mdid) const
 {
 	// get operator name
-	const IMDScalarOp *md_scalar_op = m_md_accessor->RetrieveScOp(mdid);
+	const gpos::Ref<IMDScalarOp> md_scalar_op =
+		m_md_accessor->RetrieveScOp(mdid);
 
 	const CWStringConst *str = md_scalar_op->Mdname().GetMDName();
 

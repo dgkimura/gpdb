@@ -1406,7 +1406,7 @@ CJoinOrderDPv2::PexprExpand()
 			;
 			gpos::Ref<CMDIdRelStats> rel_stats_mdid = GPOS_NEW(m_mp)
 				CMDIdRelStats(gpos::dyn_cast<CMDIdGPDB>(rel_mdid));
-			const IMDRelStats *pmdRelStats =
+			const gpos::Ref<IMDRelStats> pmdRelStats =
 				md_accessor->Pmdrelstats(rel_stats_mdid.get());
 			;
 

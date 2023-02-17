@@ -1518,14 +1518,14 @@ CSubqueryHandler::FRemoveAnySubquery(
 		gpos::Ref<CExpression> pexprNewSelect = PexprInnerSelect(
 			mp, colref, pexprResult, pexprPredicate, &fUseNotNullableInnerOpt);
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		const IMDScalarOp *pmdOp =
+		const gpos::Ref<IMDScalarOp> pmdOp =
 			md_accessor->RetrieveScOp(pScalarSubqAny->MdIdOp());
 		// function attributes of the comparison operator itself
 		// TODO: Synthesize the function attibutes of general operators, like
 		//       CScalarSubqueryAny/All, CScalarCmp, CScalarOp by providing a
 		//       DeriveFunctionProperties() method in these classes.
 		//       Once we do that, we can remove the line below and related code.
-		const IMDFunction *pmdFunc =
+		const gpos::Ref<IMDFunction> pmdFunc =
 			md_accessor->RetrieveFunc(pmdOp->FuncMdId());
 
 		if (IMDFunction::EfsVolatile == pmdFunc->GetFuncStability() ||
@@ -1706,9 +1706,9 @@ CSubqueryHandler::FRemoveAllSubquery(
 
 		if (nullptr != scalarComp)
 		{
-			const IMDScalarOp *pmdOp =
+			const gpos::Ref<IMDScalarOp> pmdOp =
 				md_accessor->RetrieveScOp(scalarComp->MdIdOp());
-			const IMDFunction *pmdFunc =
+			const gpos::Ref<IMDFunction> pmdFunc =
 				md_accessor->RetrieveFunc(pmdOp->FuncMdId());
 			if (IMDFunction::EfsVolatile == pmdFunc->GetFuncStability())
 			{

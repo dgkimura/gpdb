@@ -216,7 +216,7 @@ public:
 
 	// serialize a metadata object into DXL
 	static CWStringDynamic *SerializeMDObj(
-		CMemoryPool *, const IMDCacheObject *,
+		CMemoryPool *, const gpos::Ref<IMDCacheObject>,
 		BOOL serialize_document_header_footer, BOOL indentation);
 
 	// serialize a scalar expression into DXL

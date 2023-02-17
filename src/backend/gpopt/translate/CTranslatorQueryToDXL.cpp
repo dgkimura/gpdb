@@ -755,7 +755,8 @@ CTranslatorQueryToDXL::TranslateInsertQueryToDXL()
 	gpos::Ref<CDXLTableDescr> table_descr = CTranslatorUtils::GetTableDescr(
 		m_mp, m_md_accessor, m_context->m_colid_counter, rte,
 		&m_context->m_has_distributed_tables);
-	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(table_descr->MDId());
+	const gpos::Ref<IMDRelation> md_rel =
+		m_md_accessor->RetrieveRel(table_descr->MDId());
 
 	BOOL rel_has_constraints = CTranslatorUtils::RelHasConstraints(md_rel);
 	if (!optimizer_enable_dml_constraints && rel_has_constraints)
@@ -1185,7 +1186,8 @@ CTranslatorQueryToDXL::TranslateDeleteQueryToDXL()
 	gpos::Ref<CDXLTableDescr> table_descr = CTranslatorUtils::GetTableDescr(
 		m_mp, m_md_accessor, m_context->m_colid_counter, rte,
 		&m_context->m_has_distributed_tables);
-	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(table_descr->MDId());
+	const gpos::Ref<IMDRelation> md_rel =
+		m_md_accessor->RetrieveRel(table_descr->MDId());
 
 	if (md_rel->IsPartitioned())
 	{
@@ -1255,7 +1257,8 @@ CTranslatorQueryToDXL::TranslateUpdateQueryToDXL()
 	gpos::Ref<CDXLTableDescr> table_descr = CTranslatorUtils::GetTableDescr(
 		m_mp, m_md_accessor, m_context->m_colid_counter, rte,
 		&m_context->m_has_distributed_tables);
-	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(table_descr->MDId());
+	const gpos::Ref<IMDRelation> md_rel =
+		m_md_accessor->RetrieveRel(table_descr->MDId());
 
 	if (md_rel->IsPartitioned())
 	{
@@ -1933,7 +1936,7 @@ CTranslatorQueryToDXL::TranslateSortColumsToDXL(
 
 		// get operator name
 		gpos::Ref<CMDIdGPDB> op_mdid = GPOS_NEW(m_mp) CMDIdGPDB(oid);
-		const IMDScalarOp *md_scalar_op =
+		const gpos::Ref<IMDScalarOp> md_scalar_op =
 			m_md_accessor->RetrieveScOp(op_mdid.get());
 
 		const CWStringConst *str = md_scalar_op->Mdname().GetMDName();
@@ -3280,7 +3283,7 @@ CTranslatorQueryToDXL::TranslateRTEToDXLLogicalGet(const RangeTblEntry *rte,
 		&m_context->m_has_distributed_tables);
 
 	gpos::Ref<CDXLLogicalGet> dxl_op = nullptr;
-	const IMDRelation *md_rel =
+	const gpos::Ref<IMDRelation> md_rel =
 		m_md_accessor->RetrieveRel(dxl_table_descr->MDId());
 	if (IMDRelation::ErelstorageExternal == md_rel->RetrieveRelStorageType())
 	{
@@ -3304,7 +3307,7 @@ CTranslatorQueryToDXL::TranslateRTEToDXLLogicalGet(const RangeTblEntry *rte,
 	for (ULONG ul = 0; partition_mdids && ul < partition_mdids->Size(); ++ul)
 	{
 		gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
-		const IMDRelation *partrel =
+		const gpos::Ref<IMDRelation> partrel =
 			m_md_accessor->RetrieveRel(part_mdid.get());
 
 		if (partrel->RetrieveRelStorageType() ==
@@ -3822,7 +3825,8 @@ CTranslatorQueryToDXL::TranslateTVFToDXL(const RangeTblEntry *rte,
 	}
 
 	gpos::Ref<CMDIdGPDB> mdid_func = GPOS_NEW(m_mp) CMDIdGPDB(funcexpr->funcid);
-	const IMDFunction *pmdfunc = m_md_accessor->RetrieveFunc(mdid_func.get());
+	const gpos::Ref<IMDFunction> pmdfunc =
+		m_md_accessor->RetrieveFunc(mdid_func.get());
 	if (is_subquery_in_args &&
 		IMDFunction::EfsVolatile == pmdfunc->GetFuncStability())
 	{

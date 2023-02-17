@@ -45,7 +45,7 @@ CScalarCast::CScalarCast(CMemoryPool *mp, gpos::Ref<IMDId> return_type_mdid,
 	if (nullptr != m_func_mdid && m_func_mdid->IsValid())
 	{
 		CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-		const IMDFunction *pmdfunc =
+		const gpos::Ref<IMDFunction> pmdfunc =
 			md_accessor->RetrieveFunc(m_func_mdid.get());
 
 		m_returns_null_on_null_input = pmdfunc->IsStrict();

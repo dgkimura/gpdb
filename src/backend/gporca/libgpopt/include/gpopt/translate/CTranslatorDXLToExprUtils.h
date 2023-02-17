@@ -67,7 +67,7 @@ public:
 	// update table descriptor's key sets info from the MD cache object
 	static void AddKeySets(CMemoryPool *mp,
 						   gpos::Ref<CTableDescriptor> ptabdesc,
-						   const IMDRelation *pmdrel,
+						   const gpos::Ref<IMDRelation> pmdrel,
 						   UlongToUlongMap *phmululColMapping);
 
 	// check if a dxl node is a boolean expression of the given type

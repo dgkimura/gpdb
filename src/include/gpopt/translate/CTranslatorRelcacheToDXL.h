@@ -267,15 +267,15 @@ private:
 
 	// compute the array of included columns
 	static gpos::Ref<ULongPtrArray> ComputeIncludedCols(
-		CMemoryPool *mp, const IMDRelation *md_rel);
+		CMemoryPool *mp, const gpos::Ref<IMDRelation> md_rel);
 
 	// is given level included in the default partitions
 	static BOOL LevelHasDefaultPartition(List *default_levels, ULONG level);
 
 	// retrieve part constraint for index
 	static gpos::Ref<CMDPartConstraintGPDB> RetrievePartConstraintForIndex(
-		CMemoryPool *mp, CMDAccessor *md_accessor, const IMDRelation *md_rel,
-		Node *part_constraint,
+		CMemoryPool *mp, CMDAccessor *md_accessor,
+		const gpos::Ref<IMDRelation> md_rel, Node *part_constraint,
 		gpos::Ref<ULongPtrArray> level_with_default_part_array,
 		BOOL is_unbounded);
 
@@ -361,7 +361,7 @@ public:
 
 	// populate the attribute number to position mapping
 	static ULONG *PopulateAttnoPositionMap(CMemoryPool *mp,
-										   const IMDRelation *md_rel,
+										   const gpos::Ref<IMDRelation> md_rel,
 										   ULONG size);
 
 	// return the position of a given attribute number

@@ -94,17 +94,17 @@ private:
 
 	// return the set of columns from the given array of columns which appear
 	// in the index included / key columns
-	static gpos::Ref<CColRefSet> PcrsIndexColumns(CMemoryPool *mp,
-												  CColRefArray *colref_array,
-												  const IMDIndex *pmdindex,
-												  const IMDRelation *pmdrel,
-												  EIndexCols eic);
+	static gpos::Ref<CColRefSet> PcrsIndexColumns(
+		CMemoryPool *mp, CColRefArray *colref_array,
+		const gpos::Ref<IMDIndex> pmdindex, const gpos::Ref<IMDRelation> pmdrel,
+		EIndexCols eic);
 
 	// return the ordered array of columns from the given array of columns which appear
 	// in the index included / key columns
 	static gpos::Ref<CColRefArray> PdrgpcrIndexColumns(
-		CMemoryPool *mp, CColRefArray *colref_array, const IMDIndex *pmdindex,
-		const IMDRelation *pmdrel, EIndexCols eic);
+		CMemoryPool *mp, CColRefArray *colref_array,
+		const gpos::Ref<IMDIndex> pmdindex, const gpos::Ref<IMDRelation> pmdrel,
+		EIndexCols eic);
 
 	// lookup join keys in scalar child group
 	static void LookupJoinKeys(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
@@ -183,12 +183,13 @@ private:
 		gpos::Ref<CExpression> pexprGet, ULONG ulOriginOpId,
 		gpos::Ref<CExpressionArray> pdrgpexprConds,
 		gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CColRefSet> pcrsScalarExpr,
-		gpos::Ref<CColRefSet> outer_refs, const IMDIndex *pmdindex,
-		const IMDRelation *pmdrel);
+		gpos::Ref<CColRefSet> outer_refs, const gpos::Ref<IMDIndex> pmdindex,
+		const gpos::Ref<IMDRelation> pmdrel);
 
 	// create a dynamic operator for a btree index plan
 	static gpos::Ref<CLogical>
-	PopDynamicBtreeIndexOpConstructor(CMemoryPool *mp, const IMDIndex *pmdindex,
+	PopDynamicBtreeIndexOpConstructor(CMemoryPool *mp,
+									  const gpos::Ref<IMDIndex> pmdindex,
 									  gpos::Ref<CTableDescriptor> ptabdesc,
 									  ULONG ulOriginOpId, CName *pname,
 									  ULONG ulPartIndex,
@@ -204,7 +205,8 @@ private:
 
 	//	create a static operator for a btree index plan
 	static gpos::Ref<CLogical>
-	PopStaticBtreeIndexOpConstructor(CMemoryPool *mp, const IMDIndex *pmdindex,
+	PopStaticBtreeIndexOpConstructor(CMemoryPool *mp,
+									 const gpos::Ref<IMDIndex> pmdindex,
 									 gpos::Ref<CTableDescriptor> ptabdesc,
 									 ULONG ulOriginOpId, CName *pname,
 									 gpos::Ref<CColRefArray> pdrgpcrOutput)
@@ -219,7 +221,7 @@ private:
 	PexprRewrittenBtreeIndexPath(CMemoryPool *mp,
 								 gpos::Ref<CExpression> pexprIndexCond,
 								 gpos::Ref<CExpression> pexprResidualCond,
-								 const IMDIndex *,			   // pmdindex
+								 const gpos::Ref<IMDIndex>,	   // pmdindex
 								 gpos::Ref<CTableDescriptor>,  // ptabdesc
 								 gpos::Ref<COperator> popLogical)
 	{
@@ -237,7 +239,7 @@ private:
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprOriginalPred,
 		gpos::Ref<CExpression> pexprPred, gpos::Ref<CTableDescriptor> ptabdesc,
-		const IMDRelation *pmdrel, CColRefArray *pdrgpcrOutput,
+		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
 		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
 		gpos::Ref<CExpression> *ppexprRecheck,
 		gpos::Ref<CExpression> *ppexprResidual);
@@ -254,7 +256,7 @@ private:
 	static gpos::Ref<CExpression> PexprBitmapSelectBestIndex(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprPred, gpos::Ref<CTableDescriptor> ptabdesc,
-		const IMDRelation *pmdrel, CColRefArray *pdrgpcrOutput,
+		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
 		gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CColRefSet> pcrsOuterRefs,
 		gpos::Ref<CExpression> *ppexprRecheck,
 		gpos::Ref<CExpression> *ppexprResidual, BOOL alsoConsiderBTreeIndexes);
@@ -356,7 +358,7 @@ public:
 
 	// does the given trigger type match the given logical DML type
 	static BOOL FTriggerApplies(CLogicalDML::EDMLOperator edmlop,
-								const IMDTrigger *pmdtrigger);
+								const gpos::Ref<IMDTrigger> pmdtrigger);
 
 	// construct a trigger expression on top of the given expression
 	static gpos::Ref<CExpression> PexprRowTrigger(
@@ -420,30 +422,32 @@ public:
 
 	// return the array of key columns from the given array of columns which appear
 	// in the index key columns
-	static gpos::Ref<CColRefArray> PdrgpcrIndexKeys(CMemoryPool *mp,
-													CColRefArray *colref_array,
-													const IMDIndex *pmdindex,
-													const IMDRelation *pmdrel);
+	static gpos::Ref<CColRefArray> PdrgpcrIndexKeys(
+		CMemoryPool *mp, CColRefArray *colref_array,
+		const gpos::Ref<IMDIndex> pmdindex,
+		const gpos::Ref<IMDRelation> pmdrel);
 
 	// return the set of key columns from the given array of columns which appear
 	// in the index key columns
-	static gpos::Ref<CColRefSet> PcrsIndexKeys(CMemoryPool *mp,
-											   CColRefArray *colref_array,
-											   const IMDIndex *pmdindex,
-											   const IMDRelation *pmdrel);
+	static gpos::Ref<CColRefSet> PcrsIndexKeys(
+		CMemoryPool *mp, CColRefArray *colref_array,
+		const gpos::Ref<IMDIndex> pmdindex,
+		const gpos::Ref<IMDRelation> pmdrel);
 
 	// return the set of key columns from the given array of columns which appear
 	// in the index included columns
 	static gpos::Ref<CColRefSet> PcrsIndexIncludedCols(
-		CMemoryPool *mp, CColRefArray *colref_array, const IMDIndex *pmdindex,
-		const IMDRelation *pmdrel);
+		CMemoryPool *mp, CColRefArray *colref_array,
+		const gpos::Ref<IMDIndex> pmdindex,
+		const gpos::Ref<IMDRelation> pmdrel);
 
 	// check if an index is applicable given the required, output and scalar
 	// expression columns
 	static BOOL FIndexApplicable(
-		CMemoryPool *mp, const IMDIndex *pmdindex, const IMDRelation *pmdrel,
-		CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> pcrsReqd,
-		gpos::Ref<CColRefSet> pcrsScalar, IMDIndex::EmdindexType emdindtype,
+		CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
+		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
+		gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CColRefSet> pcrsScalar,
+		IMDIndex::EmdindexType emdindtype,
 		IMDIndex::EmdindexType altindtype = IMDIndex::EmdindSentinel);
 
 	// check whether a CTE should be inlined
@@ -490,7 +494,8 @@ public:
 						 gpos::Ref<CColRefSet> pcrsReqd,
 						 gpos::Ref<CColRefSet> pcrsScalarExpr,
 						 gpos::Ref<CColRefSet> outer_refs,
-						 const IMDIndex *pmdindex, const IMDRelation *pmdrel)
+						 const gpos::Ref<IMDIndex> pmdindex,
+						 const gpos::Ref<IMDRelation> pmdrel)
 	{
 		return PexprBuildBtreeIndexPlan(
 			mp, md_accessor, pexprGet, ulOriginOpId, pdrgpexprConds, pcrsReqd,
@@ -502,10 +507,10 @@ public:
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprOriginalPred,
 		gpos::Ref<CExpressionArray> pdrgpexpr,
-		gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
-		CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
-		gpos::Ref<CColRefSet> pcrsReqd, BOOL fConjunction,
-		gpos::Ref<CExpression> *ppexprRecheck,
+		gpos::Ref<CTableDescriptor> ptabdesc,
+		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
+		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
+		BOOL fConjunction, gpos::Ref<CExpression> *ppexprRecheck,
 		gpos::Ref<CExpression> *ppexprResidual, BOOL isAPartialPredicate);
 
 	// construct a bitmap bool op given the left and right bitmap access
@@ -521,10 +526,10 @@ public:
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprOriginalPred,
 		gpos::Ref<CExpressionArray> pdrgpexprPreds,
-		gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
-		CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
-		gpos::Ref<CColRefSet> pcrsReqd, BOOL fConjunction,
-		gpos::Ref<CExpressionArray> pdrgpexprBitmap,
+		gpos::Ref<CTableDescriptor> ptabdesc,
+		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
+		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
+		BOOL fConjunction, gpos::Ref<CExpressionArray> pdrgpexprBitmap,
 		gpos::Ref<CExpressionArray> pdrgpexprRecheck,
 		gpos::Ref<CExpressionArray> pdrgpexprResidual,
 		BOOL isAPartialPredicate);
@@ -533,7 +538,7 @@ public:
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprOriginalPred,
 		gpos::Ref<CExpression> pexprPred, gpos::Ref<CTableDescriptor> ptabdesc,
-		const IMDRelation *pmdrel, CColRefArray *pdrgpcrOutput,
+		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
 		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
 		gpos::Ref<CExpression> *pexprBitmapResult,
 		gpos::Ref<CExpression> *pexprRecheckResult,

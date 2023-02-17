@@ -48,7 +48,7 @@ private:
 	void InitFunctionProperties();
 
 	// return the type of a given trigger as an integer
-	static INT ITriggerType(const IMDTrigger *pmdtrigger);
+	static INT ITriggerType(const gpos::Ref<IMDTrigger> pmdtrigger);
 
 public:
 	CLogicalRowTrigger(const CLogicalRowTrigger &) = delete;

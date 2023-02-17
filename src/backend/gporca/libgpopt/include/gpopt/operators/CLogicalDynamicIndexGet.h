@@ -52,7 +52,7 @@ public:
 	// ctors
 	explicit CLogicalDynamicIndexGet(CMemoryPool *mp);
 
-	CLogicalDynamicIndexGet(CMemoryPool *mp, const IMDIndex *pmdindex,
+	CLogicalDynamicIndexGet(CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
 							gpos::Ref<CTableDescriptor> ptabdesc,
 							ULONG ulOriginOpId, const CName *pnameAlias,
 							ULONG ulPartIndex,

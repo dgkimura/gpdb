@@ -294,7 +294,7 @@ COrderedAggPreprocessor::SplitPrjList(
 			// Since count() returns bigint, sum(count()) returns numeric and gp_percentile agg's
 			// expect the total_count as bigint, therefore adding an explicit cast on top
 			gpos::Ref<IMDId> mdid_func = GPOS_NEW(mp) CMDIdGPDB(GPDB_INT8_CAST);
-			const IMDFunction *cast_func =
+			const gpos::Ref<IMDFunction> cast_func =
 				md_accessor->RetrieveFunc(mdid_func.get());
 			const CWStringConst *pstrFunc = GPOS_NEW(mp) CWStringConst(
 				mp, (cast_func->Mdname().GetMDName())->GetBuffer());

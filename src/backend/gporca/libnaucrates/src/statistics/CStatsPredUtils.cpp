@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CCastUtils.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/exception.h"
@@ -106,7 +107,7 @@ CStatsPred::EStatsCmpType
 CStatsPredUtils::StatsCmpType(gpos::Ref<IMDId> mdid)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
+	const gpos::Ref<IMDScalarOp> md_scalar_op = md_accessor->RetrieveScOp(mdid);
 
 	// Simply go by operator name.
 	// If the name of the operator is "<", then it is a LessThan etc.

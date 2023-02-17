@@ -382,7 +382,7 @@ private:
 
 	// update table descriptor's distribution columns from the MD cache object
 	static void AddDistributionColumns(gpos::Ref<CTableDescriptor> ptabdesc,
-									   const IMDRelation *pmdrel,
+									   const gpos::Ref<IMDRelation> pmdrel,
 									   IntToUlongMap *phmiulAttnoColMapping);
 
 	// main translation routine for DXL tree -> Expr tree

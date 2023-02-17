@@ -91,12 +91,13 @@ void
 CLogicalRowTrigger::InitFunctionProperties()
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_rel_mdid.get());
+	const gpos::Ref<IMDRelation> pmdrel =
+		md_accessor->RetrieveRel(m_rel_mdid.get());
 	const ULONG ulTriggers = pmdrel->TriggerCount();
 
 	for (ULONG ul = 0; ul < ulTriggers; ul++)
 	{
-		const IMDTrigger *pmdtrigger =
+		const gpos::Ref<IMDTrigger> pmdtrigger =
 			md_accessor->RetrieveTrigger(pmdrel->TriggerMDidAt(ul));
 		if (!pmdtrigger->IsEnabled() || !pmdtrigger->ExecutesOnRowLevel() ||
 			(ITriggerType(pmdtrigger) & m_type) != m_type)
@@ -104,7 +105,7 @@ CLogicalRowTrigger::InitFunctionProperties()
 			continue;
 		}
 
-		const IMDFunction *pmdfunc =
+		const gpos::Ref<IMDFunction> pmdfunc =
 			md_accessor->RetrieveFunc(pmdtrigger->FuncMdId());
 		IMDFunction::EFuncStbl efs = pmdfunc->GetFuncStability();
 
@@ -124,7 +125,7 @@ CLogicalRowTrigger::InitFunctionProperties()
 //
 //---------------------------------------------------------------------------
 INT
-CLogicalRowTrigger::ITriggerType(const IMDTrigger *pmdtrigger)
+CLogicalRowTrigger::ITriggerType(const gpos::Ref<IMDTrigger> pmdtrigger)
 {
 	INT type = GPMD_TRIGGER_ROW;
 	if (pmdtrigger->IsBefore())

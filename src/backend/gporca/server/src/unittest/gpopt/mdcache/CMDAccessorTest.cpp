@@ -116,12 +116,12 @@ CMDAccessorTest::EresUnittest_Basic()
 							   12 /* version */, 1 /* minor version */);
 
 #ifdef GPOS_DEBUG
-	const IMDRelation *pimdrel1 =
+	const gpos::Ref<IMDRelation> pimdrel1 =
 #endif
 		mda.RetrieveRel(pmdidObject1.get());
 
 #ifdef GPOS_DEBUG
-	const IMDRelation *pimdrel2 =
+	const gpos::Ref<IMDRelation> pimdrel2 =
 #endif
 		mda.RetrieveRel(pmdidObject2.get());
 
@@ -130,7 +130,7 @@ CMDAccessorTest::EresUnittest_Basic()
 
 	// access an object again
 #ifdef GPOS_DEBUG
-	const IMDRelation *pimdrel3 =
+	const gpos::Ref<IMDRelation> pimdrel3 =
 #endif
 		mda.RetrieveRel(pmdidObject1.get());
 
@@ -147,13 +147,13 @@ CMDAccessorTest::EresUnittest_Basic()
 #endif
 		mda.RetrieveType(mdid_type.get());
 
-	const IMDScalarOp *md_scalar_op GPOS_ASSERTS_ONLY =
+	const gpos::Ref<IMDScalarOp> md_scalar_op GPOS_ASSERTS_ONLY =
 		mda.RetrieveScOp(mdid_op.get());
 
 	GPOS_ASSERT(IMDType::EcmptL == md_scalar_op->ParseCmpType());
 
 #ifdef GPOS_DEBUG
-	const IMDAggregate *pmdagg =
+	const gpos::Ref<IMDAggregate> pmdagg =
 #endif
 		mda.RetrieveAgg(agg_mdid.get());
 
@@ -337,7 +337,7 @@ CMDAccessorTest::EresUnittest_Navigate()
 		GPOS_NEW(mp) CMDIdGPDB(GPDB_FUNC_TIMEOFDAY /* OID */,
 							   1 /* major version */, 0 /* minor version */);
 
-	const IMDFunction *pmdfunc = mda.RetrieveFunc(mdid_func.get());
+	const gpos::Ref<IMDFunction> pmdfunc = mda.RetrieveFunc(mdid_func.get());
 
 	// lookup function return type
 	gpos::Ref<IMDId> pmdidFuncReturnType = pmdfunc->GetResultTypeMdid();
@@ -346,7 +346,7 @@ CMDAccessorTest::EresUnittest_Navigate()
 	// lookup equality operator for function return type
 	gpos::Ref<IMDId> pmdidEqOp = pimdtype->GetMdidForCmpType(IMDType::EcmptEq);
 
-	const IMDScalarOp *md_scalar_op GPOS_ASSERTS_ONLY =
+	const gpos::Ref<IMDScalarOp> md_scalar_op GPOS_ASSERTS_ONLY =
 		mda.RetrieveScOp(pmdidEqOp);
 
 #ifdef GPOS_DEBUG
@@ -409,12 +409,12 @@ CMDAccessorTest::EresUnittest_Indexes()
 	gpos::Ref<CMDIdGPDB> rel_mdid = GPOS_NEW(mp)
 		CMDIdGPDB(GPOPT_MDCACHE_TEST_OID, 1 /* major */, 1 /* minor version */);
 
-	const IMDRelation *pmdrel = mda.RetrieveRel(rel_mdid.get());
+	const gpos::Ref<IMDRelation> pmdrel = mda.RetrieveRel(rel_mdid.get());
 
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 
 	gpos::Ref<IMDId> pmdidIndex = pmdrel->IndexMDidAt(0);
-	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
+	const gpos::Ref<IMDIndex> pmdindex = mda.RetrieveIndex(pmdidIndex);
 
 	ULONG ulKeys = pmdindex->Keys();
 
@@ -480,7 +480,7 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 	gpos::Ref<CMDIdGPDB> rel_mdid = GPOS_NEW(mp)
 		CMDIdGPDB(GPOPT_TEST_REL_OID21, 1 /* major */, 1 /* minor version */);
 
-	const IMDRelation *pmdrel = mda.RetrieveRel(rel_mdid.get());
+	const gpos::Ref<IMDRelation> pmdrel = mda.RetrieveRel(rel_mdid.get());
 	GPOS_ASSERT(0 < pmdrel->CheckConstraintCount());
 
 	// create the array of column reference for the table columns
@@ -498,7 +498,7 @@ CMDAccessorTest::EresUnittest_CheckConstraint()
 
 	// get one of its check constraint
 	gpos::Ref<IMDId> pmdidCheckConstraint = pmdrel->CheckConstraintMDidAt(0);
-	const IMDCheckConstraint *pmdCheckConstraint =
+	const gpos::Ref<IMDCheckConstraint> pmdCheckConstraint =
 		mda.RetrieveCheckConstraints(pmdidCheckConstraint);
 
 #ifdef GPOS_DEBUG
@@ -559,7 +559,7 @@ CMDAccessorTest::EresUnittest_Cast()
 		mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 
 #ifdef GPOS_DEBUG
-	const IMDCast *pmdcastInt2BigInt =
+	const gpos::Ref<IMDCast> pmdcastInt2BigInt =
 #endif	// GPOS_DEBUG
 		mda.Pmdcast(pmdtypeInt->MDId(), pmdtypeBigInt->MDId());
 
@@ -569,7 +569,7 @@ CMDAccessorTest::EresUnittest_Cast()
 	GPOS_ASSERT(pmdcastInt2BigInt->MdidDest()->Equals(pmdtypeBigInt->MDId()));
 
 #ifdef GPOS_DEBUG
-	const IMDCast *pmdcastInt2Oid =
+	const gpos::Ref<IMDCast> pmdcastInt2Oid =
 #endif	// GPOS_DEBUG
 		mda.Pmdcast(pmdtypeInt->MDId(), pmdtypeOid->MDId());
 
@@ -577,7 +577,7 @@ CMDAccessorTest::EresUnittest_Cast()
 	GPOS_ASSERT(!pmdcastInt2Oid->GetCastFuncMdId()->IsValid());
 
 #ifdef GPOS_DEBUG
-	const IMDCast *pmdcastOid2Int =
+	const gpos::Ref<IMDCast> pmdcastOid2Int =
 #endif	// GPOS_DEBUG
 		mda.Pmdcast(pmdtypeOid->MDId(), pmdtypeInt->MDId());
 
@@ -619,7 +619,7 @@ CMDAccessorTest::EresUnittest_ScCmp()
 		mda.PtMDType<IMDTypeInt8>(CTestUtils::m_sysidDefault);
 
 #ifdef GPOS_DEBUG
-	const IMDScCmp *pmdScEqIntBigInt =
+	const gpos::Ref<IMDScCmp> pmdScEqIntBigInt =
 #endif	// GPOS_DEBUG
 		mda.Pmdsccmp(pmdtypeInt->MDId(), pmdtypeBigInt->MDId(),
 					 IMDType::EcmptEq);

@@ -348,7 +348,7 @@ public:
 	// check whether there are triggers for the given operation on
 	// the given relation
 	static BOOL RelHasTriggers(CMemoryPool *mp, CMDAccessor *md_accessor,
-							   const IMDRelation *mdrel,
+							   const gpos::Ref<IMDRelation> mdrel,
 							   const gpdxl::EdxlDmlType dml_type_dxl);
 
 	// check whether the given trigger is applicable to the given DML operation
@@ -357,13 +357,13 @@ public:
 									const gpdxl::EdxlDmlType dml_type_dxl);
 
 	// check whether there are NOT NULL or CHECK constraints for the given relation
-	static BOOL RelHasConstraints(const IMDRelation *rel);
+	static BOOL RelHasConstraints(const gpos::Ref<IMDRelation> rel);
 
 	// translate the list of error messages from an assert constraint list
 	static List *GetAssertErrorMsgs(gpos::Ref<CDXLNode> assert_constraint_list);
 
 	// return the count of non-system columns in the relation
-	static ULONG GetNumNonSystemColumns(const IMDRelation *mdrel);
+	static ULONG GetNumNonSystemColumns(const gpos::Ref<IMDRelation> mdrel);
 
 	// return agg kind as an EdxlAggrefKind
 	static EdxlAggrefKind GetAggKind(CHAR aggkind);

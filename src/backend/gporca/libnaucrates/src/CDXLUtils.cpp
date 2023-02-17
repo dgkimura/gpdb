@@ -29,6 +29,7 @@
 #include "gpos/task/CTraceFlagIter.h"
 #include "gpos/task/CWorker.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/engine/CEnumeratorConfig.h"
 #include "gpopt/engine/CStatisticsConfig.h"
@@ -960,7 +961,7 @@ CDXLUtils::SerializeMetadata(CMemoryPool *mp,
 
 	for (ULONG ul = 0; ul < imd_obj_array->Size(); ul++)
 	{
-		IMDCacheObject *imd_cache_obj = (*imd_obj_array)[ul].get();
+		gpos::Ref<IMDCacheObject> imd_cache_obj = (*imd_obj_array)[ul].get();
 		imd_cache_obj->Serialize(&xml_serializer);
 	}
 
@@ -1283,7 +1284,8 @@ CDXLUtils::SerializeMetadata(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 CWStringDynamic *
-CDXLUtils::SerializeMDObj(CMemoryPool *mp, const IMDCacheObject *imd_cache_obj,
+CDXLUtils::SerializeMDObj(CMemoryPool *mp,
+						  const gpos::Ref<IMDCacheObject> imd_cache_obj,
 						  BOOL serialize_header_footer, BOOL indentation)
 {
 	GPOS_ASSERT(nullptr != mp);

@@ -2643,7 +2643,8 @@ CExpressionPreprocessor::PrunePartitions(CMemoryPool *mp,
 		for (ULONG ul = 0; ul < all_partition_mdids->Size(); ++ul)
 		{
 			gpos::Ref<IMDId> part_mdid = (*all_partition_mdids)[ul];
-			const IMDRelation *partrel = mda->RetrieveRel(part_mdid.get());
+			const gpos::Ref<IMDRelation> partrel =
+				mda->RetrieveRel(part_mdid.get());
 
 			gpos::Ref<CConstraint> rel_cnstr = PcnstrFromChildPartition(
 				partrel, dyn_get->PdrgpcrOutput(),
@@ -2740,7 +2741,7 @@ CExpressionPreprocessor::PrunePartitions(CMemoryPool *mp,
 // partition.
 gpos::Ref<CConstraint>
 CExpressionPreprocessor::PcnstrFromChildPartition(
-	const IMDRelation *partrel, CColRefArray *pdrgpcrOutput,
+	const gpos::Ref<IMDRelation> partrel, CColRefArray *pdrgpcrOutput,
 	ColRefToUlongMap *root_col_mapping)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();

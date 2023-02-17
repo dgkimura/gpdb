@@ -291,7 +291,7 @@ CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 				pdrgpexprArgsLocal->Append(expr);
 			}
 
-			const IMDAggregate *pmdagg =
+			const gpos::Ref<IMDAggregate> pmdagg =
 				md_accessor->RetrieveAgg(popScAggFunc->MDId());
 			const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(
 				pmdagg->GetIntermediateResultTypeMdid());
@@ -616,7 +616,8 @@ CXformSplitDQA::PopulatePrLMultiPhaseAgg(
 	gpos::Ref<CScalarAggFunc> popScAggFunc =
 		gpos::dyn_cast<CScalarAggFunc>(pexprAggFunc->Pop());
 
-	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(popScAggFunc->MDId());
+	const gpos::Ref<IMDAggregate> pmdagg =
+		md_accessor->RetrieveAgg(popScAggFunc->MDId());
 	const gpos::Ref<IMDType> pmdtype =
 		md_accessor->RetrieveType(pmdagg->GetIntermediateResultTypeMdid());
 

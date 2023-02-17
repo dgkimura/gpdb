@@ -13,6 +13,7 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
@@ -273,7 +274,7 @@ CDXLScalarAggref::SerializeToDXL(CXMLSerializer *xml_serializer,
 BOOL
 CDXLScalarAggref::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	const IMDAggregate *pmdagg =
+	const gpos::Ref<IMDAggregate> pmdagg =
 		md_accessor->RetrieveAgg(m_agg_func_mdid.get());
 	return (
 		IMDType::EtiBool ==

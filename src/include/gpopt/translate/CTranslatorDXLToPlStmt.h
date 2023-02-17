@@ -93,14 +93,14 @@ private:
 	struct SContextIndexVarAttno
 	{
 		// MD relation
-		const IMDRelation *m_md_rel;
+		const gpos::Ref<IMDRelation> m_md_rel;
 
 		// MD index
-		const IMDIndex *m_md_index;
+		const gpos::Ref<IMDIndex> m_md_index;
 
 		// ctor
-		SContextIndexVarAttno(const IMDRelation *md_rel,
-							  const IMDIndex *md_index)
+		SContextIndexVarAttno(const gpos::Ref<IMDRelation> md_rel,
+							  const gpos::Ref<IMDIndex> md_index)
 			: m_md_rel(md_rel), m_md_index(md_index)
 		{
 			GPOS_ASSERT(nullptr != md_rel);
@@ -458,8 +458,8 @@ private:
 		CDXLTranslateContext *output_context);
 
 	// insert NULL values for dropped attributes to construct the target list for a DML statement
-	List *CreateTargetListWithNullsForDroppedCols(List *target_list,
-												  const IMDRelation *md_rel);
+	List *CreateTargetListWithNullsForDroppedCols(
+		List *target_list, const gpos::Ref<IMDRelation> md_rel);
 
 	// create a target list containing column references for a hash node from the
 	// project list of its child node
@@ -497,7 +497,8 @@ private:
 	// translate the tree of bitmap index operators that are under a (dynamic) bitmap table scan
 	Plan *TranslateDXLBitmapAccessPath(
 		const gpos::Ref<CDXLNode> bitmap_access_path_dxlnode,
-		CDXLTranslateContext *output_context, const IMDRelation *md_rel,
+		CDXLTranslateContext *output_context,
+		const gpos::Ref<IMDRelation> md_rel,
 		const gpos::Ref<CDXLTableDescr> table_descr,
 		CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *ctxt_translation_prev_siblings,
@@ -506,7 +507,8 @@ private:
 	// translate a bitmap bool op expression
 	Plan *TranslateDXLBitmapBoolOp(
 		const gpos::Ref<CDXLNode> bitmap_boolop_dxlnode,
-		CDXLTranslateContext *output_context, const IMDRelation *md_rel,
+		CDXLTranslateContext *output_context,
+		const gpos::Ref<IMDRelation> md_rel,
 		const gpos::Ref<CDXLTableDescr> table_descr,
 		CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *ctxt_translation_prev_siblings,
@@ -515,7 +517,8 @@ private:
 	// translate CDXLScalarBitmapIndexProbe into BitmapIndexScan or DynamicBitmapIndexScan
 	Plan *TranslateDXLBitmapIndexProbe(
 		const gpos::Ref<CDXLNode> bitmap_index_probe_dxlnode,
-		CDXLTranslateContext *output_context, const IMDRelation *md_rel,
+		CDXLTranslateContext *output_context,
+		const gpos::Ref<IMDRelation> md_rel,
 		const gpos::Ref<CDXLTableDescr> table_descr,
 		CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *ctxt_translation_prev_siblings,
@@ -548,8 +551,9 @@ private:
 	void TranslateIndexConditions(
 		gpos::Ref<CDXLNode> index_cond_list_dxlnode,
 		const gpos::Ref<CDXLTableDescr> dxl_tbl_descr,
-		BOOL is_bitmap_index_probe, const IMDIndex *index,
-		const IMDRelation *md_rel, CDXLTranslateContext *output_context,
+		BOOL is_bitmap_index_probe, const gpos::Ref<IMDIndex> index,
+		const gpos::Ref<IMDRelation> md_rel,
+		CDXLTranslateContext *output_context,
 		CDXLTranslateContextBaseTable *base_table_context,
 		CDXLTranslationContextArray *ctxt_translation_prev_siblings,
 		List **index_cond, List **index_orig_cond, List **index_strategy_list,

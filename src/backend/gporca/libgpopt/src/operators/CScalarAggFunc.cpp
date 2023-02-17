@@ -204,7 +204,8 @@ CScalarAggFunc::PmdidLookupReturnType(gpos::Ref<IMDId> pmdidAggFunc,
 	GPOS_ASSERT(nullptr != md_accessor);
 
 	// get aggregate function return type from the MD cache
-	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(pmdidAggFunc.get());
+	const gpos::Ref<IMDAggregate> pmdagg =
+		md_accessor->RetrieveAgg(pmdidAggFunc.get());
 	if (fGlobal)
 	{
 		return pmdagg->GetResultTypeMdid();

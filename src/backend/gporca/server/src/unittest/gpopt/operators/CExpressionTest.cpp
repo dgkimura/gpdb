@@ -380,12 +380,12 @@ CExpressionTest::EresUnittest_BitmapGet()
 			mp, 3, rel_mdid, wszColNameFormat, CName(&strRelName), false);
 
 	// get the index associated with the table
-	const IMDRelation *pmdrel = mda.RetrieveRel(ptabdesc->MDId());
+	const gpos::Ref<IMDRelation> pmdrel = mda.RetrieveRel(ptabdesc->MDId());
 	GPOS_ASSERT(0 < pmdrel->IndexCount());
 
 	// create an index descriptor
 	gpos::Ref<IMDId> pmdidIndex = pmdrel->IndexMDidAt(0 /*pos*/);
-	const IMDIndex *pmdindex = mda.RetrieveIndex(pmdidIndex);
+	const gpos::Ref<IMDIndex> pmdindex = mda.RetrieveIndex(pmdidIndex);
 
 	CColumnFactory *col_factory = COptCtxt::PoctxtFromTLS()->Pcf();
 
@@ -615,11 +615,11 @@ CExpressionTest::EresUnittest_ComparisonTypes()
 		IMDType::EcmptG ==
 		CUtils::ParseCmpType(pmdtype->GetMdidForCmpType(IMDType::EcmptG)));
 
-	const IMDScalarOp *pmdscopEq =
+	const gpos::Ref<IMDScalarOp> pmdscopEq =
 		mda.RetrieveScOp(pmdtype->GetMdidForCmpType(IMDType::EcmptEq));
-	const IMDScalarOp *pmdscopLT =
+	const gpos::Ref<IMDScalarOp> pmdscopLT =
 		mda.RetrieveScOp(pmdtype->GetMdidForCmpType(IMDType::EcmptL));
-	const IMDScalarOp *pmdscopGT =
+	const gpos::Ref<IMDScalarOp> pmdscopGT =
 		mda.RetrieveScOp(pmdtype->GetMdidForCmpType(IMDType::EcmptG));
 
 	GPOS_ASSERT(IMDType::EcmptNEq ==

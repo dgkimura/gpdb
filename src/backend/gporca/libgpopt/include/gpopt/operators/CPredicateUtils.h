@@ -72,13 +72,13 @@ private:
 	// helper to create index lookup comparison predicate with index key on left side
 	static gpos::Ref<CExpression> PexprIndexLookupKeyOnLeft(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::Ref<CExpression> pexprScalar, const IMDIndex *pmdindex,
+		gpos::Ref<CExpression> pexprScalar, const gpos::Ref<IMDIndex> pmdindex,
 		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
 
 	// helper to create index lookup comparison predicate with index key on right side
 	static gpos::Ref<CExpression> PexprIndexLookupKeyOnRight(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::Ref<CExpression> pexprScalar, const IMDIndex *pmdindex,
+		gpos::Ref<CExpression> pexprScalar, const gpos::Ref<IMDIndex> pmdindex,
 		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
 
 	// for all columns that appear in the given expression and are members
@@ -369,7 +369,7 @@ public:
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
 		CColRef2dArray *pdrgpdrgpcrPartKeys,
 		gpos::Ref<CColRefSet> pcrsAllowedRefs, BOOL fUseConstraints,
-		const IMDRelation *pmdrel = nullptr);
+		const gpos::Ref<IMDRelation> pmdrel = nullptr);
 
 	// extract the constraint on the given column and return the corresponding
 	// scalar expression
@@ -404,7 +404,7 @@ public:
 	static void ExtractIndexPredicates(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpressionArray> pdrgpexprPredicate,
-		const IMDIndex *pmdindex, CColRefArray *pdrgpcrIndex,
+		const gpos::Ref<IMDIndex> pmdindex, CColRefArray *pdrgpcrIndex,
 		gpos::Ref<CExpressionArray> pdrgpexprIndex,
 		gpos::Ref<CExpressionArray> pdrgpexprResidual,
 		gpos::Ref<CColRefSet> pcrsAcceptedOuterRefs =
@@ -439,7 +439,7 @@ public:
 	// return (modified) predicate suited for index lookup
 	static gpos::Ref<CExpression> PexprIndexLookup(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		gpos::Ref<CExpression> pexpPred, const IMDIndex *pmdindex,
+		gpos::Ref<CExpression> pexpPred, const gpos::Ref<IMDIndex> pmdindex,
 		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs,
 		BOOL allowArrayCmpForBTreeIndexes);
 
@@ -468,13 +468,13 @@ public:
 
 	// returns true iff the given predicate pexprPred is compatible with the given index pmdindex
 	static BOOL FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
-										  const IMDIndex *pmdindex,
+										  const gpos::Ref<IMDIndex> pmdindex,
 										  CColRefArray *pdrgpcrIndex,
 										  CMDAccessor *md_accessor);
 
 	// returns true iff all predicates in the given array are compatible with the given index
 	static BOOL FCompatiblePredicates(gpos::Ref<CExpressionArray> pdrgpexprPred,
-									  const IMDIndex *pmdindex,
+									  const gpos::Ref<IMDIndex> pmdindex,
 									  CColRefArray *pdrgpcrIndex,
 									  CMDAccessor *md_accessor);
 

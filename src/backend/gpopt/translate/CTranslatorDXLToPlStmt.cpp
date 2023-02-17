@@ -565,7 +565,7 @@ CTranslatorDXLToPlStmt::TranslateDXLTblScan(
 
 	const gpos::Ref<CDXLTableDescr> dxl_table_descr =
 		phy_tbl_scan_dxlop->GetDXLTableDescr();
-	const IMDRelation *md_rel =
+	const gpos::Ref<IMDRelation> md_rel =
 		m_md_accessor->RetrieveRel(dxl_table_descr->MDId());
 
 	// Lock any table we are to scan, since it may not have been properly locked
@@ -655,8 +655,10 @@ CTranslatorDXLToPlStmt::SetIndexVarAttnoWalker(
 	if (IsA(node, Var) && ((Var *) node)->varno != OUTER_VAR)
 	{
 		INT attno = ((Var *) node)->varattno;
-		const IMDRelation *md_rel = ctxt_index_var_attno_walker->m_md_rel;
-		const IMDIndex *index = ctxt_index_var_attno_walker->m_md_index;
+		const gpos::Ref<IMDRelation> md_rel =
+			ctxt_index_var_attno_walker->m_md_rel;
+		const gpos::Ref<IMDIndex> index =
+			ctxt_index_var_attno_walker->m_md_index;
 
 		ULONG index_col_pos_idx_max = gpos::ulong_max;
 		const ULONG arity = md_rel->ColumnCount();
@@ -732,7 +734,7 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexScan(
 
 	const gpos::Ref<CDXLTableDescr> dxl_table_descr =
 		physical_idx_scan_dxlop->GetDXLTableDescr();
-	const IMDRelation *md_rel =
+	const gpos::Ref<IMDRelation> md_rel =
 		m_md_accessor->RetrieveRel(dxl_table_descr->MDId());
 
 	// Lock any table we are to scan, since it may not have been properly locked
@@ -754,7 +756,8 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexScan(
 
 	gpos::Ref<CMDIdGPDB> mdid_index = gpos::dyn_cast<CMDIdGPDB>(
 		physical_idx_scan_dxlop->GetDXLIndexDescr()->MDId());
-	const IMDIndex *md_index = m_md_accessor->RetrieveIndex(mdid_index);
+	const gpos::Ref<IMDIndex> md_index =
+		m_md_accessor->RetrieveIndex(mdid_index);
 	Oid index_oid = mdid_index->Oid();
 
 	GPOS_ASSERT(InvalidOid != index_oid);
@@ -818,8 +821,8 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexScan(
 }
 
 static List *
-TranslateDXLIndexTList(const IMDRelation *md_rel, const IMDIndex *md_index,
-					   Index new_varno,
+TranslateDXLIndexTList(const gpos::Ref<IMDRelation> md_rel,
+					   const gpos::Ref<IMDIndex> md_index, Index new_varno,
 					   const gpos::Ref<CDXLTableDescr> table_descr,
 					   CDXLTranslateContextBaseTable *index_context)
 {
@@ -883,7 +886,7 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexOnlyScan(
 	Index index =
 		gpdb::ListLength(m_dxl_to_plstmt_context->GetRTableEntriesList()) + 1;
 
-	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(
+	const gpos::Ref<IMDRelation> md_rel = m_md_accessor->RetrieveRel(
 		physical_idx_scan_dxlop->GetDXLTableDescr()->MDId());
 
 	RangeTblEntry *rte = TranslateDXLTblDescrToRangeTblEntry(
@@ -898,7 +901,8 @@ CTranslatorDXLToPlStmt::TranslateDXLIndexOnlyScan(
 
 	gpos::Ref<CMDIdGPDB> mdid_index = gpos::dyn_cast<CMDIdGPDB>(
 		physical_idx_scan_dxlop->GetDXLIndexDescr()->MDId());
-	const IMDIndex *md_index = m_md_accessor->RetrieveIndex(mdid_index);
+	const gpos::Ref<IMDIndex> md_index =
+		m_md_accessor->RetrieveIndex(mdid_index);
 	Oid index_oid = mdid_index->Oid();
 
 	GPOS_ASSERT(InvalidOid != index_oid);
@@ -1007,7 +1011,7 @@ void
 CTranslatorDXLToPlStmt::TranslateIndexConditions(
 	gpos::Ref<CDXLNode> index_cond_list_dxlnode,
 	const gpos::Ref<CDXLTableDescr> dxl_tbl_descr, BOOL is_bitmap_index_probe,
-	const IMDIndex *index, const IMDRelation *md_rel,
+	const gpos::Ref<IMDIndex> index, const gpos::Ref<IMDRelation> md_rel,
 	CDXLTranslateContext *output_context,
 	CDXLTranslateContextBaseTable *base_table_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings,
@@ -3252,9 +3256,10 @@ ContainsSetReturningFuncOrOp(const gpos::Ref<CDXLNode> project_list_dxlnode,
 				break;
 			case EdxlopScalarOpExpr:
 			{
-				const IMDScalarOp *md_sclar_op = md_accessor->RetrieveScOp(
-					gpos::dyn_cast<CDXLScalarOpExpr>(op)->MDId());
-				const IMDFunction *md_func =
+				const gpos::Ref<IMDScalarOp> md_sclar_op =
+					md_accessor->RetrieveScOp(
+						gpos::dyn_cast<CDXLScalarOpExpr>(op)->MDId());
+				const gpos::Ref<IMDFunction> md_func =
 					md_accessor->RetrieveFunc(md_sclar_op->FuncMdId());
 				if (md_func->ReturnsSet())
 				{
@@ -4141,7 +4146,7 @@ CTranslatorDXLToPlStmt::TranslateDXLDynIdxScan(
 	Index index =
 		gpdb::ListLength(m_dxl_to_plstmt_context->GetRTableEntriesList()) + 1;
 
-	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(
+	const gpos::Ref<IMDRelation> md_rel = m_md_accessor->RetrieveRel(
 		dyn_index_scan_dxlop->GetDXLTableDescr()->MDId());
 	RangeTblEntry *rte = TranslateDXLTblDescrToRangeTblEntry(
 		dyn_index_scan_dxlop->GetDXLTableDescr(), index, &base_table_context);
@@ -4184,7 +4189,8 @@ CTranslatorDXLToPlStmt::TranslateDXLDynIdxScan(
 
 	gpos::Ref<CMDIdGPDB> mdid_index = gpos::dyn_cast<CMDIdGPDB>(
 		dyn_index_scan_dxlop->GetDXLIndexDescr()->MDId());
-	const IMDIndex *md_index = m_md_accessor->RetrieveIndex(mdid_index);
+	const gpos::Ref<IMDIndex> md_index =
+		m_md_accessor->RetrieveIndex(mdid_index);
 	Oid index_oid = mdid_index->Oid();
 
 	GPOS_ASSERT(InvalidOid != index_oid);
@@ -4296,7 +4302,8 @@ CTranslatorDXLToPlStmt::TranslateDXLDml(
 
 	gpos::Ref<IMDId> mdid_target_table =
 		phy_dml_dxlop->GetDXLTableDescr()->MDId();
-	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(mdid_target_table);
+	const gpos::Ref<IMDRelation> md_rel =
+		m_md_accessor->RetrieveRel(mdid_target_table);
 
 	if (IMDRelation::EreldistrMasterOnly != md_rel->GetRelDistribution())
 	{
@@ -4726,7 +4733,8 @@ CTranslatorDXLToPlStmt::TranslateDXLTblDescrToRangeTblEntry(
 {
 	GPOS_ASSERT(nullptr != table_descr);
 
-	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(table_descr->MDId());
+	const gpos::Ref<IMDRelation> md_rel =
+		m_md_accessor->RetrieveRel(table_descr->MDId());
 	const ULONG num_of_non_sys_cols =
 		CTranslatorUtils::GetNumNonSystemColumns(md_rel);
 
@@ -4935,7 +4943,7 @@ CTranslatorDXLToPlStmt::TranslateDXLProjList(
 //---------------------------------------------------------------------------
 List *
 CTranslatorDXLToPlStmt::CreateTargetListWithNullsForDroppedCols(
-	List *target_list, const IMDRelation *md_rel)
+	List *target_list, const gpos::Ref<IMDRelation> md_rel)
 {
 	GPOS_ASSERT(nullptr != target_list);
 	GPOS_ASSERT(gpdb::ListLength(target_list) <= md_rel->ColumnCount());
@@ -5764,7 +5772,8 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapTblScan(
 	Index index =
 		gpdb::ListLength(m_dxl_to_plstmt_context->GetRTableEntriesList()) + 1;
 
-	const IMDRelation *md_rel = m_md_accessor->RetrieveRel(table_descr->MDId());
+	const gpos::Ref<IMDRelation> md_rel =
+		m_md_accessor->RetrieveRel(table_descr->MDId());
 
 	// Lock any table we are to scan, since it may not have been properly locked
 	// by the parser (e.g in case of generated scans for partitioned tables)
@@ -5878,7 +5887,7 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapTblScan(
 Plan *
 CTranslatorDXLToPlStmt::TranslateDXLBitmapAccessPath(
 	const gpos::Ref<CDXLNode> bitmap_access_path_dxlnode,
-	CDXLTranslateContext *output_context, const IMDRelation *md_rel,
+	CDXLTranslateContext *output_context, const gpos::Ref<IMDRelation> md_rel,
 	const gpos::Ref<CDXLTableDescr> table_descr,
 	CDXLTranslateContextBaseTable *base_table_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings,
@@ -5911,7 +5920,7 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapAccessPath(
 Plan *
 CTranslatorDXLToPlStmt::TranslateDXLBitmapBoolOp(
 	const gpos::Ref<CDXLNode> bitmap_boolop_dxlnode,
-	CDXLTranslateContext *output_context, const IMDRelation *md_rel,
+	CDXLTranslateContext *output_context, const gpos::Ref<IMDRelation> md_rel,
 	const gpos::Ref<CDXLTableDescr> table_descr,
 	CDXLTranslateContextBaseTable *base_table_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings,
@@ -5974,7 +5983,7 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapBoolOp(
 Plan *
 CTranslatorDXLToPlStmt::TranslateDXLBitmapIndexProbe(
 	const gpos::Ref<CDXLNode> bitmap_index_probe_dxlnode,
-	CDXLTranslateContext *output_context, const IMDRelation *md_rel,
+	CDXLTranslateContext *output_context, const gpos::Ref<IMDRelation> md_rel,
 	const gpos::Ref<CDXLTableDescr> table_descr,
 	CDXLTranslateContextBaseTable *base_table_context,
 	CDXLTranslationContextArray *ctxt_translation_prev_siblings,
@@ -6002,7 +6011,7 @@ CTranslatorDXLToPlStmt::TranslateDXLBitmapIndexProbe(
 
 	gpos::Ref<CMDIdGPDB> mdid_index = gpos::dyn_cast<CMDIdGPDB>(
 		sc_bitmap_idx_probe_dxlop->GetDXLIndexDescr()->MDId());
-	const IMDIndex *index = m_md_accessor->RetrieveIndex(mdid_index);
+	const gpos::Ref<IMDIndex> index = m_md_accessor->RetrieveIndex(mdid_index);
 	Oid index_oid = mdid_index->Oid();
 	// Lock any index we are to scan, since it may not have been properly locked
 	// by the parser (e.g in case of generated scans for partitioned indexes)

@@ -14,6 +14,7 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/translate/CTranslatorDXLToExpr.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -80,7 +81,8 @@ CMDCheckConstraintGPDB::GetCheckConstraintExpr(CMemoryPool *mp,
 {
 	GPOS_ASSERT(nullptr != colref_array);
 
-	const IMDRelation *mdrel = md_accessor->RetrieveRel(m_rel_mdid.get());
+	const gpos::Ref<IMDRelation> mdrel =
+		md_accessor->RetrieveRel(m_rel_mdid.get());
 #ifdef GPOS_DEBUG
 	const ULONG len = colref_array->Size();
 	GPOS_ASSERT(len > 0);

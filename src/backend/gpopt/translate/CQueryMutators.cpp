@@ -578,7 +578,8 @@ CQueryMutators::GetTargetEntryForAggExpr(CMemoryPool *mp,
 
 		gpos::Ref<CMDIdGPDB> agg_mdid =
 			GPOS_NEW(mp) CMDIdGPDB(aggref->aggfnoid);
-		const IMDAggregate *md_agg = md_accessor->RetrieveAgg(agg_mdid.get());
+		const gpos::Ref<IMDAggregate> md_agg =
+			md_accessor->RetrieveAgg(agg_mdid.get());
 		;
 
 		const CWStringConst *str = md_agg->Mdname().GetMDName();

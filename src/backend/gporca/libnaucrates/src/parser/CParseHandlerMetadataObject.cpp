@@ -13,6 +13,7 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -59,7 +60,7 @@ CParseHandlerMetadataObject::~CParseHandlerMetadataObject()
 //		Returns the constructed metadata object.
 //
 //---------------------------------------------------------------------------
-IMDCacheObject *
+gpos::Ref<IMDCacheObject>
 CParseHandlerMetadataObject::GetImdObj() const
 {
 	return m_imd_obj.get();

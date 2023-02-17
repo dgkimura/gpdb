@@ -20,6 +20,7 @@
 #include "gpos/memory/CMemoryPool.h"
 #include "gpos/task/CWorker.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
@@ -96,7 +97,7 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 	{
 		GPOS_CHECK_ABORT;
 
-		IMDCacheObject *mdcache_obj = (*mdcache_obj_array)[ul].get();
+		gpos::Ref<IMDCacheObject> mdcache_obj = (*mdcache_obj_array)[ul].get();
 		gpos::Ref<IMDId> mdid_key = mdcache_obj->MDId();
 		;
 

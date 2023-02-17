@@ -170,12 +170,14 @@ CXformJoin2IndexApply::CreateHomogeneousBtreeIndexApplyAlternatives(
 
 	// find the indexes whose included columns meet the required columns
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdescInner->MDId());
+	const gpos::Ref<IMDRelation> pmdrel =
+		md_accessor->RetrieveRel(ptabdescInner->MDId());
 
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
 		gpos::Ref<IMDId> pmdidIndex = pmdrel->IndexMDidAt(ul);
-		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdidIndex);
+		const gpos::Ref<IMDIndex> pmdindex =
+			md_accessor->RetrieveIndex(pmdidIndex);
 
 		CreateAlternativesForBtreeIndex(
 			mp, joinOp, pexprOuter, pexprInner, origJoinPred,
@@ -206,8 +208,8 @@ CXformJoin2IndexApply::CreateAlternativesForBtreeIndex(
 	gpos::Ref<CExpression> endOfNodesToInsertAboveIndexGet,
 	CMDAccessor *md_accessor, gpos::Ref<CExpressionArray> pdrgpexprConjuncts,
 	gpos::Ref<CColRefSet> pcrsScalarExpr, gpos::Ref<CColRefSet> outer_refs,
-	gpos::Ref<CColRefSet> pcrsReqd, const IMDRelation *pmdrel,
-	const IMDIndex *pmdindex, gpos::Ref<CXformResult> pxfres)
+	gpos::Ref<CColRefSet> pcrsReqd, const gpos::Ref<IMDRelation> pmdrel,
+	const gpos::Ref<IMDIndex> pmdindex, gpos::Ref<CXformResult> pxfres)
 {
 	gpos::Ref<CExpression> pexprLogicalIndexGet =
 		CXformUtils::PexprLogicalIndexGet(

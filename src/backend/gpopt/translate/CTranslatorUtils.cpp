@@ -96,7 +96,7 @@ gpos::Ref<CDXLIndexDescr>
 CTranslatorUtils::GetIndexDescr(CMemoryPool *mp, CMDAccessor *md_accessor,
 								gpos::Ref<IMDId> mdid)
 {
-	const IMDIndex *index = md_accessor->RetrieveIndex(mdid);
+	const gpos::Ref<IMDIndex> index = md_accessor->RetrieveIndex(mdid);
 	const CWStringConst *index_name = index->Mdname().GetMDName();
 	CMDName *index_mdname = GPOS_NEW(mp) CMDName(mp, index_name);
 
@@ -132,7 +132,7 @@ CTranslatorUtils::GetTableDescr(CMemoryPool *mp, CMDAccessor *md_accessor,
 
 	gpos::Ref<CMDIdGPDB> mdid = GPOS_NEW(mp) CMDIdGPDB(rel_oid);
 
-	const IMDRelation *rel = md_accessor->RetrieveRel(mdid.get());
+	const gpos::Ref<IMDRelation> rel = md_accessor->RetrieveRel(mdid.get());
 
 	// look up table name
 	const CWStringConst *tablename = rel->Mdname().GetMDName();
@@ -213,7 +213,8 @@ CTranslatorUtils::IsSirvFunc(CMemoryPool *mp, CMDAccessor *md_accessor,
 	}
 
 	gpos::Ref<CMDIdGPDB> mdid_func = GPOS_NEW(mp) CMDIdGPDB(func_oid);
-	const IMDFunction *func = md_accessor->RetrieveFunc(mdid_func.get());
+	const gpos::Ref<IMDFunction> func =
+		md_accessor->RetrieveFunc(mdid_func.get());
 
 	BOOL is_sirv = (!func->ReturnsSet() &&
 					IMDFunction::EfsVolatile == func->GetFuncStability());
@@ -313,7 +314,8 @@ CTranslatorUtils::ConvertToCDXLLogicalTVF(CMemoryPool *mp,
 		md_accessor->RetrieveType(mdid_return_type.get());
 
 	// get function from MDcache
-	const IMDFunction *func = md_accessor->RetrieveFunc(mdid_func.get());
+	const gpos::Ref<IMDFunction> func =
+		md_accessor->RetrieveFunc(mdid_func.get());
 
 	gpos::Ref<IMdIdArray> out_arg_types = func->OutputArgTypesMdidArray();
 
@@ -647,7 +649,7 @@ CTranslatorUtils::ExpandCompositeType(CMemoryPool *mp, CMDAccessor *md_accessor,
 	GPOS_ASSERT(type->IsComposite());
 
 	gpos::Ref<IMDId> rel_mdid = type->GetBaseRelMdid();
-	const IMDRelation *rel = md_accessor->RetrieveRel(rel_mdid);
+	const gpos::Ref<IMDRelation> rel = md_accessor->RetrieveRel(rel_mdid);
 	GPOS_ASSERT(nullptr != rel);
 
 	gpos::Ref<CMDColumnArray> pdrgPmdcol = GPOS_NEW(mp) CMDColumnArray(mp);
@@ -2251,7 +2253,7 @@ CTranslatorUtils::MapSublinkTypeToDXLSubplan(SubLinkType slink)
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorUtils::RelHasConstraints(const IMDRelation *rel)
+CTranslatorUtils::RelHasConstraints(const gpos::Ref<IMDRelation> rel)
 {
 	if (0 < rel->CheckConstraintCount())
 	{
@@ -2315,7 +2317,7 @@ CTranslatorUtils::GetAssertErrorMsgs(gpos::Ref<CDXLNode> assert_constraint_list)
 //
 //---------------------------------------------------------------------------
 ULONG
-CTranslatorUtils::GetNumNonSystemColumns(const IMDRelation *rel)
+CTranslatorUtils::GetNumNonSystemColumns(const gpos::Ref<IMDRelation> rel)
 {
 	GPOS_ASSERT(nullptr != rel);
 

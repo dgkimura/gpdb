@@ -24,6 +24,7 @@
 #include "gpopt/base/CConstraintDisjunction.h"
 #include "gpopt/base/CConstraintInterval.h"
 #include "gpopt/base/CConstraintNegation.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/base/IColConstraintsMapper.h"
@@ -457,7 +458,8 @@ CConstraint::PcnstrFromScalarCmp(
 			CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();
 			gpos::Ref<CScalarCmp> sc_cmp =
 				gpos::dyn_cast<CScalarCmp>(pexpr->Pop());
-			const IMDScalarOp *op = mda->RetrieveScOp(sc_cmp->MdIdOp());
+			const gpos::Ref<IMDScalarOp> op =
+				mda->RetrieveScOp(sc_cmp->MdIdOp());
 
 			gpos::Ref<IMDId> left_mdid =
 				gpos::dyn_cast<CScalar>(pexprLeft->Pop())->MdidType();

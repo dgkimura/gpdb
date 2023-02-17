@@ -128,7 +128,7 @@ CTranslatorDXLToExprUtils::PexprConstInt8(CMemoryPool *mp,
 void
 CTranslatorDXLToExprUtils::AddKeySets(CMemoryPool *mp,
 									  gpos::Ref<CTableDescriptor> ptabdesc,
-									  const IMDRelation *pmdrel,
+									  const gpos::Ref<IMDRelation> pmdrel,
 									  UlongToUlongMap *phmululColMapping)
 {
 	GPOS_ASSERT(nullptr != ptabdesc);
@@ -290,7 +290,8 @@ CTranslatorDXLToExprUtils::FCastFunc(CMDAccessor *md_accessor,
 		return false;
 	}
 
-	const IMDCast *pmdcast = md_accessor->Pmdcast(pmdidInput, mdid_dest);
+	const gpos::Ref<IMDCast> pmdcast =
+		md_accessor->Pmdcast(pmdidInput, mdid_dest);
 
 	return (pmdcast->GetCastFuncMdId()->Equals(pdxlopScFunc->FuncMdId()));
 }

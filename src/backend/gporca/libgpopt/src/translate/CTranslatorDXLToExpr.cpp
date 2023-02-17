@@ -555,7 +555,8 @@ CTranslatorDXLToExpr::PexprLogicalTVF(const gpos::Ref<CDXLNode> dxlnode)
 		return pexpr;
 	}
 
-	const IMDFunction *pmdfunc = m_pmda->RetrieveFunc(mdid_func.get());
+	const gpos::Ref<IMDFunction> pmdfunc =
+		m_pmda->RetrieveFunc(mdid_func.get());
 
 	if (IMDFunction::EfsVolatile == pmdfunc->GetFuncStability())
 	{
@@ -596,7 +597,8 @@ CTranslatorDXLToExpr::PexprLogicalGet(const gpos::Ref<CDXLNode> dxlnode)
 	gpos::Ref<CLogical> popGet = nullptr;
 	CColRefArray *colref_array = nullptr;
 
-	const IMDRelation *pmdrel = m_pmda->RetrieveRel(table_descr->MDId());
+	const gpos::Ref<IMDRelation> pmdrel =
+		m_pmda->RetrieveRel(table_descr->MDId());
 	if (pmdrel->IsPartitioned())
 	{
 		GPOS_ASSERT(EdxlopLogicalGet == edxlopid);
@@ -605,7 +607,8 @@ CTranslatorDXLToExpr::PexprLogicalGet(const gpos::Ref<CDXLNode> dxlnode)
 		for (ULONG ul = 0; ul < partition_mdids->Size(); ++ul)
 		{
 			gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
-			const IMDRelation *partrel = m_pmda->RetrieveRel(part_mdid.get());
+			const gpos::Ref<IMDRelation> partrel =
+				m_pmda->RetrieveRel(part_mdid.get());
 
 			if (partrel->IsPartitioned())
 			{
@@ -781,15 +784,15 @@ CTranslatorDXLToExpr::PexprCastPrjElem(gpos::Ref<IMDId> pmdidSource,
 									   const CColRef *pcrToCast,
 									   CColRef *pcrToReturn)
 {
-	const IMDCast *pmdcast = m_pmda->Pmdcast(pmdidSource, mdid_dest);
+	const gpos::Ref<IMDCast> pmdcast = m_pmda->Pmdcast(pmdidSource, mdid_dest);
 	;
 	;
 	gpos::Ref<CExpression> pexprCast;
 
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
-		CMDArrayCoerceCastGPDB *parrayCoerceCast =
-			const_cast<CMDArrayCoerceCastGPDB *>(
+		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
+			const_cast<gpos::Ref<CMDArrayCoerceCastGPDB> >(
 				gpos::cast<CMDArrayCoerceCastGPDB>(pmdcast));
 		pexprCast = GPOS_NEW(m_mp) CExpression(
 			m_mp,
@@ -2119,7 +2122,7 @@ CTranslatorDXLToExpr::Ptabdesc(gpos::Ref<CDXLTableDescr> table_descr)
 	gpos::Ref<IMDId> mdid = table_descr->MDId();
 
 	// get the relation information from the cache
-	const IMDRelation *pmdrel = m_pmda->RetrieveRel(mdid);
+	const gpos::Ref<IMDRelation> pmdrel = m_pmda->RetrieveRel(mdid);
 
 	// construct mappings for columns that are not dropped
 	gpos::Ref<IntToUlongMap> phmiulAttnoColMapping =
@@ -2328,7 +2331,7 @@ CTranslatorDXLToExpr::PtabdescFromCTAS(gpos::Ref<CDXLLogicalCTAS> pdxlopCTAS)
 	gpos::Ref<IMDId> mdid = pdxlopCTAS->MDId();
 
 	// get the relation information from the cache
-	const IMDRelation *pmdrel = m_pmda->RetrieveRel(mdid);
+	const gpos::Ref<IMDRelation> pmdrel = m_pmda->RetrieveRel(mdid);
 
 	// construct mappings for columns that are not dropped
 	gpos::Ref<IntToUlongMap> phmiulAttnoColMapping =
@@ -2882,7 +2885,8 @@ CTranslatorDXLToExpr::PexprScalarIsDistinctFrom(
 
 	gpos::Ref<IMDId> mdid_op = pdxlopDistCmp->MDId();
 	;
-	const IMDScalarOp *md_scalar_op = m_pmda->RetrieveScOp(mdid_op.get());
+	const gpos::Ref<IMDScalarOp> md_scalar_op =
+		m_pmda->RetrieveScOp(mdid_op.get());
 
 	gpos::Ref<CScalarIsDistinctFrom> popScIDF =
 		GPOS_NEW(m_mp) CScalarIsDistinctFrom(
@@ -2991,7 +2995,8 @@ CTranslatorDXLToExpr::PexprScalarFunc(const gpos::Ref<CDXLNode> pdxlnFunc)
 
 	gpos::Ref<IMDId> mdid_func = pdxlopFuncExpr->FuncMdId();
 	;
-	const IMDFunction *pmdfunc = m_pmda->RetrieveFunc(mdid_func.get());
+	const gpos::Ref<IMDFunction> pmdfunc =
+		m_pmda->RetrieveFunc(mdid_func.get());
 
 	gpos::Ref<IMDId> mdid_return_type = pdxlopFuncExpr->ReturnTypeMdId();
 	;
@@ -3016,13 +3021,13 @@ CTranslatorDXLToExpr::PexprScalarFunc(const gpos::Ref<CDXLNode> pdxlnFunc)
 
 	if (CTranslatorDXLToExprUtils::FCastFunc(m_pmda, pdxlnFunc, pmdidInput))
 	{
-		const IMDCast *pmdcast =
+		const gpos::Ref<IMDCast> pmdcast =
 			m_pmda->Pmdcast(pmdidInput, mdid_return_type.get());
 
 		if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 		{
-			CMDArrayCoerceCastGPDB *parrayCoerceCast =
-				const_cast<CMDArrayCoerceCastGPDB *>(
+			gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
+				const_cast<gpos::Ref<CMDArrayCoerceCastGPDB> >(
 					gpos::cast<CMDArrayCoerceCastGPDB>(pmdcast));
 			pop = GPOS_NEW(m_mp) CScalarArrayCoerceExpr(
 				m_mp, parrayCoerceCast->GetCastFuncMdId(), mdid_return_type,
@@ -3223,7 +3228,8 @@ CTranslatorDXLToExpr::PexprAggFunc(const gpos::Ref<CDXLNode> pdxlnAggref)
 
 	gpos::Ref<IMDId> agg_func_mdid = dxl_op->GetDXLAggFuncMDid();
 	;
-	const IMDAggregate *pmdagg = m_pmda->RetrieveAgg(agg_func_mdid.get());
+	const gpos::Ref<IMDAggregate> pmdagg =
+		m_pmda->RetrieveAgg(agg_func_mdid.get());
 
 	EAggfuncStage agg_func_stage = EaggfuncstageLocal;
 	if (EdxlaggstagePartial != dxl_op->GetDXLAggStage())
@@ -3747,15 +3753,15 @@ CTranslatorDXLToExpr::PexprScalarCast(const gpos::Ref<CDXLNode> pdxlnCast)
 
 	gpos::Ref<COperator> popChild = pexprChild->Pop();
 	gpos::Ref<IMDId> pmdidInput = gpos::dyn_cast<CScalar>(popChild)->MdidType();
-	const IMDCast *pmdcast = m_pmda->Pmdcast(pmdidInput, mdid_type);
+	const gpos::Ref<IMDCast> pmdcast = m_pmda->Pmdcast(pmdidInput, mdid_type);
 	BOOL fRelabel = pmdcast->IsBinaryCoercible();
 
 	gpos::Ref<CExpression> pexpr;
 
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
-		CMDArrayCoerceCastGPDB *parrayCoerceCast =
-			const_cast<CMDArrayCoerceCastGPDB *>(
+		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
+			const_cast<gpos::Ref<CMDArrayCoerceCastGPDB> >(
 				gpos::cast<CMDArrayCoerceCastGPDB>(pmdcast));
 		pexpr = GPOS_NEW(m_mp) CExpression(
 			m_mp,
@@ -4110,7 +4116,7 @@ CTranslatorDXLToExpr::Pos(const gpos::Ref<CDXLNode> dxlnode)
 //---------------------------------------------------------------------------
 void
 CTranslatorDXLToExpr::AddDistributionColumns(
-	gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
+	gpos::Ref<CTableDescriptor> ptabdesc, const gpos::Ref<IMDRelation> pmdrel,
 	IntToUlongMap *phmiulAttnoColMapping)
 {
 	GPOS_ASSERT(nullptr != ptabdesc);

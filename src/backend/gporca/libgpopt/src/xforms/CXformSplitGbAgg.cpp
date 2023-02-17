@@ -225,7 +225,7 @@ CXformSplitGbAgg::PopulateLocalGlobalProjectList(
 			EaggfunckindNormal, popScAggFunc->GetArgTypes());
 
 		// determine column reference for the new project element
-		const IMDAggregate *pmdagg =
+		const gpos::Ref<IMDAggregate> pmdagg =
 			md_accessor->RetrieveAgg(popScAggFunc->MDId());
 		const gpos::Ref<IMDType> pmdtype =
 			md_accessor->RetrieveType(pmdagg->GetIntermediateResultTypeMdid());

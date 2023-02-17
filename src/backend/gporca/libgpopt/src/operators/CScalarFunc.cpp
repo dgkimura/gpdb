@@ -71,7 +71,8 @@ CScalarFunc::CScalarFunc(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 	GPOS_ASSERT(m_return_type_mdid->IsValid());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid.get());
+	const gpos::Ref<IMDFunction> pmdfunc =
+		md_accessor->RetrieveFunc(m_func_mdid.get());
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_returns_set = pmdfunc->ReturnsSet();

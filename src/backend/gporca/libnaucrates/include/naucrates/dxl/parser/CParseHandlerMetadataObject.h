@@ -52,7 +52,7 @@ public:
 	~CParseHandlerMetadataObject() override;
 
 	// returns constructed metadata object
-	IMDCacheObject *GetImdObj() const;
+	gpos::Ref<IMDCacheObject> GetImdObj() const;
 };
 }  // namespace gpdxl
 

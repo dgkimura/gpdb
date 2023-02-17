@@ -57,7 +57,7 @@ CScalarWindowFunc::CScalarWindowFunc(CMemoryPool *mp,
 	m_fAgg = md_accessor->FAggWindowFunc(m_func_mdid.get());
 	if (!m_fAgg)
 	{
-		const IMDFunction *pmdfunc =
+		const gpos::Ref<IMDFunction> pmdfunc =
 			md_accessor->RetrieveFunc(m_func_mdid.get());
 		m_efs = pmdfunc->GetFuncStability();
 	}

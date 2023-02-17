@@ -136,7 +136,8 @@ CDXLScalarOpExpr::GetReturnTypeMdId() const
 BOOL
 CDXLScalarOpExpr::HasBoolResult(CMDAccessor *md_accessor) const
 {
-	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(m_mdid.get());
+	const gpos::Ref<IMDScalarOp> md_scalar_op =
+		md_accessor->RetrieveScOp(m_mdid.get());
 	gpos::Ref<IMDId> mdid = md_accessor->RetrieveFunc(md_scalar_op->FuncMdId())
 								->GetResultTypeMdid();
 	return (IMDType::EtiBool ==

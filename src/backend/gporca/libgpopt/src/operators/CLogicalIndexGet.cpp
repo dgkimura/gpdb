@@ -59,7 +59,8 @@ CLogicalIndexGet::CLogicalIndexGet(CMemoryPool *mp)
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CLogicalIndexGet::CLogicalIndexGet(CMemoryPool *mp, const IMDIndex *pmdindex,
+CLogicalIndexGet::CLogicalIndexGet(CMemoryPool *mp,
+								   const gpos::Ref<IMDIndex> pmdindex,
 								   gpos::Ref<CTableDescriptor> ptabdesc,
 								   ULONG ulOriginOpId, const CName *pnameAlias,
 								   gpos::Ref<CColRefArray> pdrgpcrOutput)
@@ -158,7 +159,8 @@ CLogicalIndexGet::PopCopyWithRemappedColumns(
 	BOOL must_exist)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(m_pindexdesc->MDId());
+	const gpos::Ref<IMDIndex> pmdindex =
+		md_accessor->RetrieveIndex(m_pindexdesc->MDId());
 
 	gpos::Ref<CColRefArray> pdrgpcrOutput = nullptr;
 	if (must_exist)

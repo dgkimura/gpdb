@@ -127,7 +127,7 @@ public:
 
 	// load up mapping information from an index
 	void LoadIndexColumns(ULONG query_level, ULONG RTE_index,
-						  const gpmd::IMDIndex *index,
+						  const gpmd::gpos::Ref<IMDIndex> index,
 						  const gpdxl::gpos::Ref<CDXLTableDescr> table_descr);
 
 	// load up mapping information from table descriptor

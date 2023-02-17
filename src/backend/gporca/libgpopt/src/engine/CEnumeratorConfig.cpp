@@ -20,8 +20,10 @@
 #include "gpos/task/CWorker.h"
 
 #include "gpopt/base/CCostContext.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CIOUtils.h"
 #include "gpopt/base/CUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpos;
 using namespace gpopt;

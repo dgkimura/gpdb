@@ -19,7 +19,9 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/operators/CExpression.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

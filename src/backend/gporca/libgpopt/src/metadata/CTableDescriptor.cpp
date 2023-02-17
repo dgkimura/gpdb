@@ -298,7 +298,8 @@ CTableDescriptor::IndexCount()
 	GPOS_ASSERT(nullptr != m_mdid.get());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_mdid.get());
+	const gpos::Ref<IMDRelation> pmdrel =
+		md_accessor->RetrieveRel(m_mdid.get());
 	const ULONG ulIndices = pmdrel->IndexCount();
 
 	return ulIndices;
@@ -319,7 +320,8 @@ CTableDescriptor::PartitionCount() const
 	GPOS_ASSERT(nullptr != m_mdid.get());
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(m_mdid.get());
+	const gpos::Ref<IMDRelation> pmdrel =
+		md_accessor->RetrieveRel(m_mdid.get());
 	const ULONG ulPartitions = pmdrel->PartitionCount();
 
 	return ulPartitions;

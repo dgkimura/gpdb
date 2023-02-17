@@ -14,6 +14,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/mdcache/CMDAccessorUtils.h"
@@ -123,7 +124,8 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	GPOS_ASSERT(
 		CMDAccessorUtils::FCastExists(md_accessor, mdid_src, mdid_dest));
 
-	const IMDCast *pmdcast = md_accessor->Pmdcast(mdid_src, mdid_dest);
+	const gpos::Ref<IMDCast> pmdcast =
+		md_accessor->Pmdcast(mdid_src, mdid_dest);
 
 	;
 	;
@@ -131,9 +133,8 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
-		CMDArrayCoerceCastGPDB *parrayCoerceCast =
-			const_cast<CMDArrayCoerceCastGPDB *>(
-				gpos::cast<CMDArrayCoerceCastGPDB>(pmdcast));
+		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
+			gpos::dyn_cast<CMDArrayCoerceCastGPDB>(pmdcast);
 		pexpr = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CScalarArrayCoerceExpr(
@@ -310,7 +311,8 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 {
 	gpos::Ref<IMDId> mdid_src =
 		gpos::dyn_cast<CScalar>(pexpr->Pop())->MdidType();
-	const IMDCast *pmdcast = md_accessor->Pmdcast(mdid_src, mdid_dest);
+	const gpos::Ref<IMDCast> pmdcast =
+		md_accessor->Pmdcast(mdid_src, mdid_dest);
 
 	;
 	;
@@ -318,9 +320,8 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
-		CMDArrayCoerceCastGPDB *parrayCoerceCast =
-			const_cast<CMDArrayCoerceCastGPDB *>(
-				gpos::cast<CMDArrayCoerceCastGPDB>(pmdcast));
+		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
+			gpos::dyn_cast<CMDArrayCoerceCastGPDB>(pmdcast);
 		pexprCast = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CScalarArrayCoerceExpr(

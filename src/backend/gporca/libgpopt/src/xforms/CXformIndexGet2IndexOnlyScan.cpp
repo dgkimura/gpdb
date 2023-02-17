@@ -107,8 +107,10 @@ CXformIndexGet2IndexOnlyScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 	}
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
-	const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pindexdesc->MDId());
+	const gpos::Ref<IMDRelation> pmdrel =
+		md_accessor->RetrieveRel(ptabdesc->MDId());
+	const gpos::Ref<IMDIndex> pmdindex =
+		md_accessor->RetrieveIndex(pindexdesc->MDId());
 
 	gpos::Ref<CColRefArray> pdrgpcrOutput = pop->PdrgpcrOutput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);

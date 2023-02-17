@@ -540,7 +540,7 @@ CPredicateUtils::FLikePredicate(gpos::Ref<IMDId> mdid)
 	GPOS_ASSERT(nullptr != mdid);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
+	const gpos::Ref<IMDScalarOp> md_scalar_op = md_accessor->RetrieveScOp(mdid);
 
 	const CWStringConst *str_opname = md_scalar_op->Mdname().GetMDName();
 
@@ -1618,7 +1618,7 @@ gpos::Ref<CExpression>
 CPredicateUtils::PexprExtractPredicatesOnPartKeys(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
 	CColRef2dArray *pdrgpdrgpcrPartKeys, gpos::Ref<CColRefSet> pcrsAllowedRefs,
-	BOOL fUseConstraints, const IMDRelation *pmdrel)
+	BOOL fUseConstraints, const gpos::Ref<IMDRelation> pmdrel)
 {
 	GPOS_ASSERT(nullptr != pdrgpdrgpcrPartKeys);
 	if (GPOS_FTRACE(EopttraceDisablePartSelection))
@@ -1867,7 +1867,7 @@ gpos::Ref<CExpression>
 CPredicateUtils::PexprIndexLookupKeyOnLeft(CMemoryPool *mp,
 										   CMDAccessor *md_accessor,
 										   gpos::Ref<CExpression> pexprScalar,
-										   const IMDIndex *pmdindex,
+										   const gpos::Ref<IMDIndex> pmdindex,
 										   CColRefArray *pdrgpcrIndex,
 										   gpos::Ref<CColRefSet> outer_refs)
 {
@@ -1927,7 +1927,7 @@ gpos::Ref<CExpression>
 CPredicateUtils::PexprIndexLookupKeyOnRight(CMemoryPool *mp,
 											CMDAccessor *md_accessor,
 											gpos::Ref<CExpression> pexprScalar,
-											const IMDIndex *pmdindex,
+											const gpos::Ref<IMDIndex> pmdindex,
 											CColRefArray *pdrgpcrIndex,
 											gpos::Ref<CColRefSet> outer_refs)
 {
@@ -1971,7 +1971,7 @@ CPredicateUtils::PexprIndexLookupKeyOnRight(CMemoryPool *mp,
 gpos::Ref<CExpression>
 CPredicateUtils::PexprIndexLookup(CMemoryPool *mp, CMDAccessor *md_accessor,
 								  gpos::Ref<CExpression> pexprScalar,
-								  const IMDIndex *pmdindex,
+								  const gpos::Ref<IMDIndex> pmdindex,
 								  CColRefArray *pdrgpcrIndex,
 								  gpos::Ref<CColRefSet> outer_refs,
 								  BOOL allowArrayCmpForBTreeIndexes)
@@ -2033,8 +2033,9 @@ CPredicateUtils::PexprIndexLookup(CMemoryPool *mp, CMDAccessor *md_accessor,
 void
 CPredicateUtils::ExtractIndexPredicates(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
-	gpos::Ref<CExpressionArray> pdrgpexprPredicate, const IMDIndex *pmdindex,
-	CColRefArray *pdrgpcrIndex, gpos::Ref<CExpressionArray> pdrgpexprIndex,
+	gpos::Ref<CExpressionArray> pdrgpexprPredicate,
+	const gpos::Ref<IMDIndex> pmdindex, CColRefArray *pdrgpcrIndex,
+	gpos::Ref<CExpressionArray> pdrgpexprIndex,
 	gpos::Ref<CExpressionArray> pdrgpexprResidual,
 	gpos::Ref<CColRefSet>
 		pcrsAcceptedOuterRefs,	// outer refs that are acceptable in an index predicate
@@ -2580,8 +2581,9 @@ CPredicateUtils::FNotIdent(gpos::Ref<CExpression> pexpr)
 // returns true iff all predicates in the given array are compatible with the given index.
 BOOL
 CPredicateUtils::FCompatiblePredicates(
-	gpos::Ref<CExpressionArray> pdrgpexprPred, const IMDIndex *pmdindex,
-	CColRefArray *pdrgpcrIndex, CMDAccessor *md_accessor)
+	gpos::Ref<CExpressionArray> pdrgpexprPred,
+	const gpos::Ref<IMDIndex> pmdindex, CColRefArray *pdrgpcrIndex,
+	CMDAccessor *md_accessor)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprPred);
 	GPOS_ASSERT(nullptr != pmdindex);
@@ -2602,14 +2604,14 @@ CPredicateUtils::FCompatiblePredicates(
 // returns true iff the given predicate 'pexprPred' is compatible with the given index 'pmdindex'.
 BOOL
 CPredicateUtils::FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
-										   const IMDIndex *pmdindex,
+										   const gpos::Ref<IMDIndex> pmdindex,
 										   CColRefArray *pdrgpcrIndex,
 										   CMDAccessor *md_accessor)
 {
 	GPOS_ASSERT(nullptr != pexprPred);
 	GPOS_ASSERT(nullptr != pmdindex);
 
-	const IMDScalarOp *pmdobjScCmp = nullptr;
+	const gpos::Ref<IMDScalarOp> pmdobjScCmp = nullptr;
 	if (COperator::EopScalarCmp == pexprPred->Pop()->Eopid())
 	{
 		gpos::Ref<CScalarCmp> popScCmp =

@@ -49,12 +49,13 @@ CMDAccessorUtils::PstrWindowFuncName(CMDAccessor *md_accessor,
 {
 	if (md_accessor->FAggWindowFunc(mdid_func))
 	{
-		const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(mdid_func);
+		const gpos::Ref<IMDAggregate> pmdagg =
+			md_accessor->RetrieveAgg(mdid_func);
 
 		return pmdagg->Mdname().GetMDName();
 	}
 
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(mdid_func);
+	const gpos::Ref<IMDFunction> pmdfunc = md_accessor->RetrieveFunc(mdid_func);
 
 	return pmdfunc->Mdname().GetMDName();
 }
@@ -73,11 +74,12 @@ CMDAccessorUtils::PmdidWindowReturnType(CMDAccessor *md_accessor,
 {
 	if (md_accessor->FAggWindowFunc(mdid_func))
 	{
-		const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(mdid_func);
+		const gpos::Ref<IMDAggregate> pmdagg =
+			md_accessor->RetrieveAgg(mdid_func);
 		return pmdagg->GetResultTypeMdid();
 	}
 
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(mdid_func);
+	const gpos::Ref<IMDFunction> pmdfunc = md_accessor->RetrieveFunc(mdid_func);
 	return pmdfunc->GetResultTypeMdid();
 }
 
@@ -255,7 +257,7 @@ CMDAccessorUtils::ApplyCastsForScCmp(
 	gpos::Ref<IMDId> right_mdid =
 		gpos::dyn_cast<CScalar>(pexprRight->Pop())->MdidType();
 
-	const IMDScalarOp *op = md_accessor->RetrieveScOp(op_mdid);
+	const gpos::Ref<IMDScalarOp> op = md_accessor->RetrieveScOp(op_mdid);
 	gpos::Ref<IMDId> op_left_mdid = op->GetLeftMdid();
 	gpos::Ref<IMDId> op_right_mdid = op->GetRightMdid();
 
@@ -401,7 +403,8 @@ CMDAccessorUtils::FScalarOpReturnsNullOnNullInput(CMDAccessor *md_accessor,
 
 	GPOS_TRY
 	{
-		const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid_op);
+		const gpos::Ref<IMDScalarOp> md_scalar_op =
+			md_accessor->RetrieveScOp(mdid_op);
 
 		return md_scalar_op->ReturnsNullOnNullInput();
 	}
@@ -458,7 +461,8 @@ CMDAccessorUtils::FCommutativeScalarOp(CMDAccessor *md_accessor,
 	GPOS_ASSERT(nullptr != md_accessor);
 	GPOS_ASSERT(nullptr != mdid_op);
 
-	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid_op);
+	const gpos::Ref<IMDScalarOp> md_scalar_op =
+		md_accessor->RetrieveScOp(mdid_op);
 
 	return mdid_op->Equals(md_scalar_op->GetCommuteOpMdid());
 }

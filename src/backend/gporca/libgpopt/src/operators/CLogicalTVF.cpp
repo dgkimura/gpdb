@@ -74,7 +74,7 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	if (mdid_func->IsValid())
 	{
-		const IMDFunction *pmdfunc =
+		const gpos::Ref<IMDFunction> pmdfunc =
 			md_accessor->RetrieveFunc(m_func_mdid.get());
 
 		m_efs = pmdfunc->GetFuncStability();
@@ -113,7 +113,8 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 	GPOS_ASSERT(nullptr != m_pdrgpcrOutput);
 
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(m_func_mdid.get());
+	const gpos::Ref<IMDFunction> pmdfunc =
+		md_accessor->RetrieveFunc(m_func_mdid.get());
 
 	m_efs = pmdfunc->GetFuncStability();
 	m_returns_set = pmdfunc->ReturnsSet();

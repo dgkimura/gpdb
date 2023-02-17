@@ -1483,12 +1483,13 @@ CXformUtils::FTriggersExist(CLogicalDML::EDMLOperator edmlop,
 							gpos::Ref<CTableDescriptor> ptabdesc, BOOL fBefore)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
+	const gpos::Ref<IMDRelation> pmdrel =
+		md_accessor->RetrieveRel(ptabdesc->MDId());
 	const ULONG ulTriggers = pmdrel->TriggerCount();
 
 	for (ULONG ul = 0; ul < ulTriggers; ul++)
 	{
-		const IMDTrigger *pmdtrigger =
+		const gpos::Ref<IMDTrigger> pmdtrigger =
 			md_accessor->RetrieveTrigger(pmdrel->TriggerMDidAt(ul));
 		if (!pmdtrigger->IsEnabled() || !pmdtrigger->ExecutesOnRowLevel() ||
 			!FTriggerApplies(edmlop, pmdtrigger))
@@ -1515,7 +1516,7 @@ CXformUtils::FTriggersExist(CLogicalDML::EDMLOperator edmlop,
 //---------------------------------------------------------------------------
 BOOL
 CXformUtils::FTriggerApplies(CLogicalDML::EDMLOperator edmlop,
-							 const IMDTrigger *pmdtrigger)
+							 const gpos::Ref<IMDTrigger> pmdtrigger)
 {
 	return ((CLogicalDML::EdmlInsert == edmlop && pmdtrigger->IsInsert()) ||
 			(CLogicalDML::EdmlDelete == edmlop && pmdtrigger->IsDelete()) ||
@@ -1739,7 +1740,8 @@ CXformUtils::PexprAssertCheckConstraints(CMemoryPool *mp,
 										 CColRefArray *colref_array)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
+	const gpos::Ref<IMDRelation> pmdrel =
+		md_accessor->RetrieveRel(ptabdesc->MDId());
 
 	const ULONG ulCheckConstraint = pmdrel->CheckConstraintCount();
 	if (0 < ulCheckConstraint)
@@ -1751,7 +1753,7 @@ CXformUtils::PexprAssertCheckConstraints(CMemoryPool *mp,
 		{
 			gpos::Ref<IMDId> pmdidCheckConstraint =
 				pmdrel->CheckConstraintMDidAt(ul);
-			const IMDCheckConstraint *pmdCheckConstraint =
+			const gpos::Ref<IMDCheckConstraint> pmdCheckConstraint =
 				md_accessor->RetrieveCheckConstraints(pmdidCheckConstraint);
 
 			// extract the check constraint expression
@@ -2050,8 +2052,8 @@ CXformUtils::PstrErrorMessage(CMemoryPool *mp, ULONG major, ULONG minor, ...)
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefArray>
 CXformUtils::PdrgpcrIndexKeys(CMemoryPool *mp, CColRefArray *colref_array,
-							  const IMDIndex *pmdindex,
-							  const IMDRelation *pmdrel)
+							  const gpos::Ref<IMDIndex> pmdindex,
+							  const gpos::Ref<IMDRelation> pmdrel)
 {
 	return PdrgpcrIndexColumns(mp, colref_array, pmdindex, pmdrel, EicKey);
 }
@@ -2067,7 +2069,8 @@ CXformUtils::PdrgpcrIndexKeys(CMemoryPool *mp, CColRefArray *colref_array,
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CXformUtils::PcrsIndexKeys(CMemoryPool *mp, CColRefArray *colref_array,
-						   const IMDIndex *pmdindex, const IMDRelation *pmdrel)
+						   const gpos::Ref<IMDIndex> pmdindex,
+						   const gpos::Ref<IMDRelation> pmdrel)
 {
 	return PcrsIndexColumns(mp, colref_array, pmdindex, pmdrel, EicKey);
 }
@@ -2083,8 +2086,8 @@ CXformUtils::PcrsIndexKeys(CMemoryPool *mp, CColRefArray *colref_array,
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CXformUtils::PcrsIndexIncludedCols(CMemoryPool *mp, CColRefArray *colref_array,
-								   const IMDIndex *pmdindex,
-								   const IMDRelation *pmdrel)
+								   const gpos::Ref<IMDIndex> pmdindex,
+								   const gpos::Ref<IMDRelation> pmdrel)
 {
 	return PcrsIndexColumns(mp, colref_array, pmdindex, pmdrel, EicIncluded);
 }
@@ -2100,8 +2103,9 @@ CXformUtils::PcrsIndexIncludedCols(CMemoryPool *mp, CColRefArray *colref_array,
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CXformUtils::PcrsIndexColumns(CMemoryPool *mp, CColRefArray *colref_array,
-							  const IMDIndex *pmdindex,
-							  const IMDRelation *pmdrel, EIndexCols eic)
+							  const gpos::Ref<IMDIndex> pmdindex,
+							  const gpos::Ref<IMDRelation> pmdrel,
+							  EIndexCols eic)
 {
 	GPOS_ASSERT(EicKey == eic || EicIncluded == eic);
 	gpos::Ref<CColRefArray> pdrgpcrIndexColumns =
@@ -2125,8 +2129,9 @@ CXformUtils::PcrsIndexColumns(CMemoryPool *mp, CColRefArray *colref_array,
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefArray>
 CXformUtils::PdrgpcrIndexColumns(CMemoryPool *mp, CColRefArray *colref_array,
-								 const IMDIndex *pmdindex,
-								 const IMDRelation *pmdrel, EIndexCols eic)
+								 const gpos::Ref<IMDIndex> pmdindex,
+								 const gpos::Ref<IMDRelation> pmdrel,
+								 EIndexCols eic)
 {
 	GPOS_ASSERT(EicKey == eic || EicIncluded == eic);
 
@@ -2171,13 +2176,11 @@ CXformUtils::PdrgpcrIndexColumns(CMemoryPool *mp, CColRefArray *colref_array,
 //
 //---------------------------------------------------------------------------
 BOOL
-CXformUtils::FIndexApplicable(CMemoryPool *mp, const IMDIndex *pmdindex,
-							  const IMDRelation *pmdrel,
-							  CColRefArray *pdrgpcrOutput,
-							  gpos::Ref<CColRefSet> pcrsReqd,
-							  gpos::Ref<CColRefSet> pcrsScalar,
-							  IMDIndex::EmdindexType emdindtype,
-							  IMDIndex::EmdindexType altindtype)
+CXformUtils::FIndexApplicable(
+	CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
+	const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
+	gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CColRefSet> pcrsScalar,
+	IMDIndex::EmdindexType emdindtype, IMDIndex::EmdindexType altindtype)
 {
 	BOOL possible_ao_table = pmdrel->IsAORowOrColTable() ||
 							 pmdrel->RetrieveRelStorageType() ==
@@ -2689,8 +2692,8 @@ CXformUtils::PexprBuildBtreeIndexPlan(
 	CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CExpression> pexprGet,
 	ULONG ulOriginOpId, gpos::Ref<CExpressionArray> pdrgpexprConds,
 	gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CColRefSet> pcrsScalarExpr,
-	gpos::Ref<CColRefSet> outer_refs, const IMDIndex *pmdindex,
-	const IMDRelation *pmdrel)
+	gpos::Ref<CColRefSet> outer_refs, const gpos::Ref<IMDIndex> pmdindex,
+	const gpos::Ref<IMDRelation> pmdrel)
 {
 	GPOS_ASSERT(nullptr != pexprGet);
 	GPOS_ASSERT(nullptr != pdrgpexprConds);
@@ -2849,7 +2852,7 @@ CXformUtils::PexprScalarBitmapBoolOp(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
 	gpos::Ref<CExpression> pexprOriginalPred,
 	gpos::Ref<CExpressionArray> pdrgpexpr, gpos::Ref<CTableDescriptor> ptabdesc,
-	const IMDRelation *pmdrel, CColRefArray *pdrgpcrOutput,
+	const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
 	gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
 	BOOL fConjunction, gpos::Ref<CExpression> *ppexprRecheck,
 	gpos::Ref<CExpression> *ppexprResidual, BOOL isAPartialPredicate)
@@ -3022,7 +3025,7 @@ gpos::Ref<CExpression>
 CXformUtils::PexprBitmapLookupWithPredicateBreakDown(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
 	gpos::Ref<CExpression> pexprOriginalPred, gpos::Ref<CExpression> pexprPred,
-	gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
+	gpos::Ref<CTableDescriptor> ptabdesc, const gpos::Ref<IMDRelation> pmdrel,
 	CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
 	gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CExpression> *ppexprRecheck,
 	gpos::Ref<CExpression> *ppexprResidual)
@@ -3117,7 +3120,7 @@ CXformUtils::PexprBitmapLookupWithPredicateBreakDown(
 gpos::Ref<CExpression>
 CXformUtils::PexprBitmapSelectBestIndex(
 	CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CExpression> pexprPred,
-	gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
+	gpos::Ref<CTableDescriptor> ptabdesc, const gpos::Ref<IMDRelation> pmdrel,
 	CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> pcrsReqd,
 	gpos::Ref<CColRefSet> pcrsOuterRefs, gpos::Ref<CExpression> *ppexprRecheck,
 	gpos::Ref<CExpression> *ppexprResidual, BOOL alsoConsiderBTreeIndexes)
@@ -3139,7 +3142,7 @@ CXformUtils::PexprBitmapSelectBestIndex(
 	const ULONG ulIndexes = pmdrel->IndexCount();
 	for (ULONG ul = 0; ul < ulIndexes; ul++)
 	{
-		const IMDIndex *pmdindex =
+		const gpos::Ref<IMDIndex> pmdindex =
 			md_accessor->RetrieveIndex(pmdrel->IndexMDidAt(ul));
 
 		if (CXformUtils::FIndexApplicable(mp, pmdindex, pmdrel, pdrgpcrOutput,
@@ -3271,7 +3274,7 @@ CXformUtils::PexprBitmapSelectBestIndex(
 	// if the final best index was found, return the correct expression
 	if (nullptr != pexprIndexFinal)
 	{
-		const IMDIndex *pmdindex =
+		const gpos::Ref<IMDIndex> pmdindex =
 			md_accessor->RetrieveIndex(pmdrel->IndexMDidAt(ulBestIndex));
 		gpos::Ref<CIndexDescriptor> pindexdesc =
 			CIndexDescriptor::Pindexdesc(mp, ptabdesc, pmdindex);
@@ -3307,7 +3310,7 @@ CXformUtils::CreateBitmapIndexProbeOps(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
 	gpos::Ref<CExpression> pexprOriginalPred,
 	gpos::Ref<CExpressionArray> pdrgpexprPreds,
-	gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
+	gpos::Ref<CTableDescriptor> ptabdesc, const gpos::Ref<IMDRelation> pmdrel,
 	CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
 	gpos::Ref<CColRefSet> pcrsReqd,
 	BOOL,  // fConjunction
@@ -3358,7 +3361,7 @@ void
 CXformUtils::CreateBitmapIndexProbesWithOrWithoutPredBreakdown(
 	CMemoryPool *pmp, CMDAccessor *pmda,
 	gpos::Ref<CExpression> pexprOriginalPred, gpos::Ref<CExpression> pexprPred,
-	gpos::Ref<CTableDescriptor> ptabdesc, const IMDRelation *pmdrel,
+	gpos::Ref<CTableDescriptor> ptabdesc, const gpos::Ref<IMDRelation> pmdrel,
 	CColRefArray *pdrgpcrOutput, gpos::Ref<CColRefSet> pcrsOuterRefs,
 	gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CExpression> *pexprBitmapResult,
 	gpos::Ref<CExpression> *pexprRecheckResult,
@@ -3680,7 +3683,8 @@ CXformUtils::PexprBitmapTableGet(CMemoryPool *mp, gpos::Ref<CLogical> popGet,
 
 	// find the indexes whose included columns meet the required columns
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(ptabdesc->MDId());
+	const gpos::Ref<IMDRelation> pmdrel =
+		md_accessor->RetrieveRel(ptabdesc->MDId());
 
 	GPOS_ASSERT(0 < pdrgpexpr->Size());
 

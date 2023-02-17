@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
@@ -418,7 +419,8 @@ CMDIndexGPDB::GetIndexRetItemTypeMdid() const
 //
 //---------------------------------------------------------------------------
 BOOL
-CMDIndexGPDB::IsCompatible(const IMDScalarOp *md_scalar_op, ULONG key_pos) const
+CMDIndexGPDB::IsCompatible(const gpos::Ref<IMDScalarOp> md_scalar_op,
+						   ULONG key_pos) const
 {
 	GPOS_ASSERT(nullptr != md_scalar_op);
 	GPOS_ASSERT(key_pos < m_mdid_opfamilies_array->Size());

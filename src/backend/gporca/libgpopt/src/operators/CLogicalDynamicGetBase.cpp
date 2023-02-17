@@ -238,7 +238,8 @@ CLogicalDynamicGetBase::ConstructRootColMappingPerPart(
 	for (ULONG ul = 0; ul < partition_mdids->Size(); ++ul)
 	{
 		gpos::Ref<IMDId> part_mdid = (*partition_mdids)[ul];
-		const IMDRelation *partrel = mda->RetrieveRel(part_mdid.get());
+		const gpos::Ref<IMDRelation> partrel =
+			mda->RetrieveRel(part_mdid.get());
 
 		GPOS_ASSERT(nullptr != partrel);
 

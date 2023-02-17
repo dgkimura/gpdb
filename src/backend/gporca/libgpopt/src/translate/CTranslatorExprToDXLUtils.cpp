@@ -204,7 +204,8 @@ CTranslatorExprToDXLUtils::PdxlnListFilterScCmp(
 	pmdidScCmp = CMDAccessorUtils::GetScCmpMdIdConsiderCasts(
 		md_accessor, pmdidTypeOther, pmdidTypePartKey, cmp_type);
 
-	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(pmdidScCmp);
+	const gpos::Ref<IMDScalarOp> md_scalar_op =
+		md_accessor->RetrieveScOp(pmdidScCmp);
 	const CWStringConst *pstrScCmp = md_scalar_op->Mdname().GetMDName();
 
 	;
@@ -542,7 +543,8 @@ CTranslatorExprToDXLUtils::PdxlnCmp(CMemoryPool *mp, CMDAccessor *md_accessor,
 			md_accessor, pmdidTypePartKey, pmdidTypeExpr, cmp_type);
 	}
 
-	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(pmdidScCmp);
+	const gpos::Ref<IMDScalarOp> md_scalar_op =
+		md_accessor->RetrieveScOp(pmdidScCmp);
 	const CWStringConst *pstrScCmp = md_scalar_op->Mdname().GetMDName();
 
 	;

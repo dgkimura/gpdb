@@ -162,8 +162,8 @@ protected:
 
 	// compute order spec based on an index
 	static gpos::Ref<COrderSpec> PosFromIndex(
-		CMemoryPool *mp, const IMDIndex *pmdindex, CColRefArray *colref_array,
-		const gpos::Ref<CTableDescriptor> ptabdesc);
+		CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
+		CColRefArray *colref_array, const gpos::Ref<CTableDescriptor> ptabdesc);
 
 	// derive function properties using data access property of scalar child
 	static gpos::Ref<CFunctionProp> PfpDeriveFromScalar(

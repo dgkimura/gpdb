@@ -66,7 +66,7 @@ public:
 	// ctors
 	explicit CLogicalIndexGet(CMemoryPool *mp);
 
-	CLogicalIndexGet(CMemoryPool *mp, const IMDIndex *pmdindex,
+	CLogicalIndexGet(CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
 					 gpos::Ref<CTableDescriptor> ptabdesc, ULONG ulOriginOpId,
 					 const CName *pnameAlias,
 					 gpos::Ref<CColRefArray> pdrgpcrOutput);

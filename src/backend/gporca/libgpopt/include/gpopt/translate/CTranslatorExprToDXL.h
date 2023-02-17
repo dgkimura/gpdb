@@ -352,12 +352,13 @@ private:
 
 	// Construct a table descr for a child partition
 	gpos::Ref<CTableDescriptor> MakeTableDescForPart(
-		const IMDRelation *part, gpos::Ref<CTableDescriptor> root_table_desc);
+		const gpos::Ref<IMDRelation> part,
+		gpos::Ref<CTableDescriptor> root_table_desc);
 
 	// Construct a dxl index descriptor for a child partition
 	static gpos::Ref<CDXLIndexDescr> PdxlnIndexDescForPart(
 		CMemoryPool *m_mp, MdidHashSet *child_index_mdids_set,
-		const IMDRelation *part, const CWStringConst *index_name);
+		const gpos::Ref<IMDRelation> part, const CWStringConst *index_name);
 
 	// translate a dynamic bitmap table scan
 	gpos::Ref<CDXLNode> PdxlnDynamicBitmapTableScan(

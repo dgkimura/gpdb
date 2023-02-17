@@ -2344,7 +2344,8 @@ CTestUtils::PexprLogicalSequenceProject(CMemoryPool *mp, OID oidFunc,
 			std::move(pdrgpos), std::move(pdrgwf));
 
 	gpos::Ref<IMDId> mdid = GPOS_NEW(mp) CMDIdGPDB(oidFunc);
-	const IMDFunction *pmdfunc = md_accessor->RetrieveFunc(mdid.get());
+	const gpos::Ref<IMDFunction> pmdfunc =
+		md_accessor->RetrieveFunc(mdid.get());
 
 	gpos::Ref<IMDId> mdid_return_type = pmdfunc->GetResultTypeMdid();
 	;

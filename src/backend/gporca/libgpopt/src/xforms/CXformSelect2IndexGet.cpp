@@ -110,13 +110,14 @@ CXformSelect2IndexGet::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	// find the indexes whose included columns meet the required columns
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel =
+	const gpos::Ref<IMDRelation> pmdrel =
 		md_accessor->RetrieveRel(popGet->Ptabdesc()->MDId());
 
 	for (ULONG ul = 0; ul < ulIndices; ul++)
 	{
 		gpos::Ref<IMDId> pmdidIndex = pmdrel->IndexMDidAt(ul);
-		const IMDIndex *pmdindex = md_accessor->RetrieveIndex(pmdidIndex);
+		const gpos::Ref<IMDIndex> pmdindex =
+			md_accessor->RetrieveIndex(pmdidIndex);
 		gpos::Ref<CExpression> pexprIndexGet =
 			CXformUtils::PexprLogicalIndexGet(
 				mp, md_accessor, pexprRelational, pexpr->Pop()->UlOpId(),

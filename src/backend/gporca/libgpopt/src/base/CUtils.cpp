@@ -24,6 +24,7 @@
 #include "gpopt/base/CColRefTable.h"
 #include "gpopt/base/CConstraintInterval.h"
 #include "gpopt/base/CDistributionSpecRandom.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/exception.h"
@@ -405,7 +406,7 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 										 pexprNewRight, mdid_scop);
 
 	;
-	const IMDScalarOp *op = md_accessor->RetrieveScOp(mdid_scop);
+	const gpos::Ref<IMDScalarOp> op = md_accessor->RetrieveScOp(mdid_scop);
 	const CMDName mdname = op->Mdname();
 	CWStringConst strCmpOpName(mdname.GetMDName()->GetBuffer());
 
@@ -444,7 +445,7 @@ CUtils::PexprScalarCmp(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 	GPOS_ASSERT(pexprNewRight != nullptr);
 
 	;
-	const IMDScalarOp *op = md_accessor->RetrieveScOp(op_mdid);
+	const gpos::Ref<IMDScalarOp> op = md_accessor->RetrieveScOp(op_mdid);
 	const CMDName mdname = op->Mdname();
 	CWStringConst strCmpOpName(mdname.GetMDName()->GetBuffer());
 
@@ -2209,7 +2210,7 @@ CUtils::PexprAgg(CMemoryPool *mp, CMDAccessor *md_accessor,
 	GPOS_ASSERT(IMDType::EaggGeneric > agg_type);
 	GPOS_ASSERT(colref->RetrieveType()->GetMdidForAggType(agg_type)->IsValid());
 
-	const IMDAggregate *pmdagg = md_accessor->RetrieveAgg(
+	const gpos::Ref<IMDAggregate> pmdagg = md_accessor->RetrieveAgg(
 		colref->RetrieveType()->GetMdidForAggType(agg_type));
 
 	gpos::Ref<IMDId> agg_mdid = pmdagg->MDId();
@@ -2541,7 +2542,7 @@ IMDType::ECmpType
 CUtils::ParseCmpType(gpos::Ref<IMDId> mdid)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
+	const gpos::Ref<IMDScalarOp> md_scalar_op = md_accessor->RetrieveScOp(mdid);
 	return md_scalar_op->ParseCmpType();
 }
 
@@ -2549,7 +2550,7 @@ CUtils::ParseCmpType(gpos::Ref<IMDId> mdid)
 IMDType::ECmpType
 CUtils::ParseCmpType(CMDAccessor *md_accessor, gpos::Ref<IMDId> mdid)
 {
-	const IMDScalarOp *md_scalar_op = md_accessor->RetrieveScOp(mdid);
+	const gpos::Ref<IMDScalarOp> md_scalar_op = md_accessor->RetrieveScOp(mdid);
 	return md_scalar_op->ParseCmpType();
 }
 
@@ -3853,7 +3854,8 @@ CUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	GPOS_ASSERT(
 		CMDAccessorUtils::FCastExists(md_accessor, mdid_src, mdid_dest));
 
-	const IMDCast *pmdcast = md_accessor->Pmdcast(mdid_src, mdid_dest);
+	const gpos::Ref<IMDCast> pmdcast =
+		md_accessor->Pmdcast(mdid_src, mdid_dest);
 
 	;
 	;
@@ -3861,9 +3863,8 @@ CUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
-		CMDArrayCoerceCastGPDB *parrayCoerceCast =
-			const_cast<CMDArrayCoerceCastGPDB *>(
-				gpos::cast<CMDArrayCoerceCastGPDB>(pmdcast));
+		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
+			gpos::dyn_cast<CMDArrayCoerceCastGPDB>(pmdcast);
 		pexprCast = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CScalarArrayCoerceExpr(
@@ -4529,7 +4530,7 @@ BOOL
 CUtils::FGeneratePartOid(gpos::Ref<IMDId> mdid)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	const IMDRelation *pmdrel = md_accessor->RetrieveRel(mdid);
+	const gpos::Ref<IMDRelation> pmdrel = md_accessor->RetrieveRel(mdid);
 
 	gpos::Ref<COptimizerConfig> optimizer_config =
 		COptCtxt::PoctxtFromTLS()->GetOptimizerConfig();
@@ -4788,7 +4789,7 @@ CUtils::IsExprNDVPreserving(gpos::Ref<CExpression> pexpr,
 				// check whether the function is NDV-preserving
 				CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 				gpos::Ref<CScalarFunc> sf = gpos::dyn_cast<CScalarFunc>(pop);
-				const IMDFunction *pmdfunc =
+				const gpos::Ref<IMDFunction> pmdfunc =
 					md_accessor->RetrieveFunc(sf->FuncMdId());
 
 				if (!pmdfunc->IsNDVPreserving() || 1 != curr_expr->Arity())
@@ -4802,7 +4803,7 @@ CUtils::IsExprNDVPreserving(gpos::Ref<CExpression> pexpr,
 			{
 				CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 				gpos::Ref<CScalarOp> so = gpos::dyn_cast<CScalarOp>(pop);
-				const IMDScalarOp *pmdscop =
+				const gpos::Ref<IMDScalarOp> pmdscop =
 					md_accessor->RetrieveScOp(so->MdIdOp());
 
 				if (!pmdscop->IsNDVPreserving() || 2 != curr_expr->Arity())

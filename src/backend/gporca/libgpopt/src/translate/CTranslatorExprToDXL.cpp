@@ -1264,7 +1264,8 @@ CTranslatorExprToDXL::PdxlnDynamicTableScan(
 // Construct a dxl table descr for a child partition
 gpos::Ref<CTableDescriptor>
 CTranslatorExprToDXL::MakeTableDescForPart(
-	const IMDRelation *part, gpos::Ref<CTableDescriptor> root_table_desc)
+	const gpos::Ref<IMDRelation> part,
+	gpos::Ref<CTableDescriptor> root_table_desc)
 {
 	gpos::Ref<IMDId> part_mdid = part->MDId();
 	;
@@ -1306,7 +1307,7 @@ CTranslatorExprToDXL::MakeTableDescForPart(
 gpos::Ref<CDXLIndexDescr>
 CTranslatorExprToDXL::PdxlnIndexDescForPart(CMemoryPool *m_mp,
 											MdidHashSet *child_index_mdids_set,
-											const IMDRelation *part,
+											const gpos::Ref<IMDRelation> part,
 											const CWStringConst *index_name)
 {
 	// iterate over each index in the child to find the matching index
@@ -5708,7 +5709,8 @@ CTranslatorExprToDXL::PdxlnScFuncExpr(gpos::Ref<CExpression> pexprFunc)
 	gpos::Ref<IMDId> mdid_return_type = popScFunc->MdidType();
 	;
 
-	const IMDFunction *pmdfunc = m_pmda->RetrieveFunc(mdid_func.get());
+	const gpos::Ref<IMDFunction> pmdfunc =
+		m_pmda->RetrieveFunc(mdid_func.get());
 
 	gpos::Ref<CDXLNode> pdxlnFuncExpr = GPOS_NEW(m_mp) CDXLNode(
 		m_mp, GPOS_NEW(m_mp) CDXLScalarFuncExpr(
@@ -7421,7 +7423,7 @@ CTranslatorExprToDXL::GetSortColListDXL(const COrderSpec *pos)
 					COrderSpec::EntAuto == ent);
 
 		// get sort operator name
-		const IMDScalarOp *md_scalar_op =
+		const gpos::Ref<IMDScalarOp> md_scalar_op =
 			m_pmda->RetrieveScOp(sort_op_id.get());
 
 		CWStringConst *sort_op_name = GPOS_NEW(m_mp) CWStringConst(

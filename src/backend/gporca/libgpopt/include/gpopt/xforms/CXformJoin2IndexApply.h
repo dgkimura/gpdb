@@ -47,8 +47,8 @@ private:
 		CMDAccessor *md_accessor,
 		gpos::Ref<CExpressionArray> pdrgpexprConjuncts,
 		gpos::Ref<CColRefSet> pcrsScalarExpr, gpos::Ref<CColRefSet> outer_refs,
-		gpos::Ref<CColRefSet> pcrsReqd, const IMDRelation *pmdrel,
-		const IMDIndex *pmdindex, gpos::Ref<CXformResult> pxfres);
+		gpos::Ref<CColRefSet> pcrsReqd, const gpos::Ref<IMDRelation> pmdrel,
+		const gpos::Ref<IMDIndex> pmdindex, gpos::Ref<CXformResult> pxfres);
 
 	// helper to add IndexApply expression to given xform results container
 	// for homogeneous bitmap indexes
