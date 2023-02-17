@@ -45,7 +45,8 @@ CPhysicalParallelUnionAll::SzId() const
 gpos::Ref<CDistributionSpec>
 CPhysicalParallelUnionAll::PdsRequired(CMemoryPool *mp, CExpressionHandle &,
 									   gpos::Ref<CDistributionSpec>,
-									   ULONG child_index, CDrvdPropArray *,
+									   ULONG child_index,
+									   gpos::Ref<CDrvdPropArray>,
 									   ULONG ulOptReq) const
 {
 	if (0 == ulOptReq)
@@ -71,11 +72,11 @@ CPhysicalParallelUnionAll::PdsRequired(CMemoryPool *mp, CExpressionHandle &,
 	}
 }
 
-CEnfdDistribution::EDistributionMatching
-CPhysicalParallelUnionAll::Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
-							   ULONG,					  // child_index
-							   CDrvdPropArray *,		  //pdrgpdpCtxt
-							   ULONG					  // ulOptReq
+CEnfdDistribution::EDistributionMatching CPhysicalParallelUnionAll::Edm(
+	gpos::Ref<CReqdPropPlan>,	// prppInput
+	ULONG,						// child_index
+	gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt
+	ULONG						// ulOptReq
 )
 {
 	return CEnfdDistribution::EdmExact;

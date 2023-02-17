@@ -90,17 +90,18 @@ public:
 	// required properties computation function
 	void Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-				 CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override;
+				 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
+				 ULONG ulOptReq) override;
 
 	// required columns computation function
 	void ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-						 CDrvdPropArray *pdrgpdpCtxt);
+						 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt);
 
 	// required ctes computation function
 	void ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-						 CDrvdPropArray *pdrgpdpCtxt);
+						 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt);
 
 	// required columns accessor
 	gpos::Ref<CColRefSet>

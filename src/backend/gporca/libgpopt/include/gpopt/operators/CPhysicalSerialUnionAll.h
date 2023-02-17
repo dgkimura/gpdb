@@ -52,8 +52,8 @@ public:
 	// distribution matching type
 	CEnfdDistribution::EDistributionMatching
 	Edm(gpos::Ref<CReqdPropPlan> prppInput,
-		ULONG,			   // child_index
-		CDrvdPropArray *,  //pdrgpdpCtxt
+		ULONG,						// child_index
+		gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt
 		ULONG ulOptReq) override
 	{
 		if (0 == ulOptReq && CDistributionSpec::EdtHashed ==
@@ -72,7 +72,7 @@ public:
 	gpos::Ref<CDistributionSpec> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 };	// class CPhysicalSerialUnionAll
 

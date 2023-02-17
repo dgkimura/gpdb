@@ -141,14 +141,16 @@ public:
 	void InitReqdProps(gpos::Ref<CReqdProp> prpInput);
 
 	// compute required properties of the n-th child
-	void ComputeChildReqdProps(ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+	void ComputeChildReqdProps(ULONG child_index,
+							   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 							   ULONG ulOptReq);
 
 	// copy required properties of the n-th child
 	void CopyChildReqdProps(ULONG child_index, gpos::Ref<CReqdProp> prp);
 
 	// compute required columns of the n-th child
-	void ComputeChildReqdCols(ULONG child_index, CDrvdPropArray *pdrgpdpCtxt);
+	void ComputeChildReqdCols(ULONG child_index,
+							  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt);
 
 	// required properties computation of all children
 	void ComputeReqdProps(gpos::Ref<CReqdProp> prpInput, ULONG ulOptReq);

@@ -69,8 +69,8 @@ gpos::Ref<CColRefSet>
 CPhysicalAssert::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							  gpos::Ref<CColRefSet> pcrsRequired,
 							  ULONG child_index,
-							  CDrvdPropArray *,	 // pdrgpdpCtxt
-							  ULONG				 // ulOptReq
+							  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+							  ULONG						  // ulOptReq
 )
 {
 	GPOS_ASSERT(
@@ -93,8 +93,8 @@ CPhysicalAssert::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<COrderSpec>
 CPhysicalAssert::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 COrderSpec *posRequired, ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+							 ULONG						 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -115,7 +115,7 @@ gpos::Ref<CDistributionSpec>
 CPhysicalAssert::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::Ref<CDistributionSpec> pdsRequired,
 							 ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
 							 ULONG ulOptReq) const
 {
 	CDistributionSpec::EDistributionType edt = pdsRequired->Edt();
@@ -145,8 +145,8 @@ CPhysicalAssert::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CRewindabilitySpec>
 CPhysicalAssert::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 CRewindabilitySpec *prsRequired, ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+							 ULONG						 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -172,8 +172,8 @@ CPhysicalAssert::PcteRequired(CMemoryPool *,		//mp,
 								  child_index
 #endif
 							  ,
-							  CDrvdPropArray *,	 //pdrgpdpCtxt,
-							  ULONG				 //ulOptReq
+							  gpos::Ref<CDrvdPropArray>,  //pdrgpdpCtxt,
+							  ULONG						  //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

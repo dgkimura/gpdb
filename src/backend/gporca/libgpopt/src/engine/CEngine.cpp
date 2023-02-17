@@ -913,8 +913,8 @@ CEngine::PocChild(
 		&exprhdlPlan,  // handle to compute required plan properties
 	CExpressionHandle
 		&exprhdlRel,  // handle to compute required relational properties
-	CDrvdPropArray
-		*pdrgpdpChildren,  // derived plan properties of optimized children
+	gpos::Ref<CDrvdPropArray>
+		pdrgpdpChildren,  // derived plan properties of optimized children
 	IStatisticsArray *pdrgpstatCurrentCtxt, ULONG child_index, ULONG ulOptReq)
 {
 	GPOS_ASSERT(exprhdlPlan.Pgexpr() == pgexpr);
@@ -971,7 +971,7 @@ CEngine::PccOptimizeChild(
 	CExpressionHandle &exprhdlRel,
 	gpos::Ref<COptimizationContext>
 		pocOrigin,	// optimization context of parent operator
-	CDrvdPropArray *pdrgpdp, IStatisticsArray *pdrgpstatCurrentCtxt,
+	gpos::Ref<CDrvdPropArray> pdrgpdp, IStatisticsArray *pdrgpstatCurrentCtxt,
 	ULONG child_index, ULONG ulOptReq)
 {
 	gpos::Ref<CGroupExpression> pgexpr = exprhdl.Pgexpr();
@@ -2065,7 +2065,7 @@ CEngine::SamplePlans()
 BOOL
 CEngine::FCheckEnfdProps(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
 						 gpos::Ref<COptimizationContext> poc, ULONG ulOptReq,
-						 COptimizationContextArray *pdrgpoc)
+						 gpos::Ref<COptimizationContextArray> pdrgpoc)
 {
 	GPOS_CHECK_ABORT;
 
@@ -2210,7 +2210,7 @@ CEngine::FCheckEnfdProps(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
 //
 //---------------------------------------------------------------------------
 BOOL
-CEngine::FChildrenOptimized(COptimizationContextArray *pdrgpoc)
+CEngine::FChildrenOptimized(gpos::Ref<COptimizationContextArray> pdrgpoc)
 {
 	GPOS_ASSERT(nullptr != pdrgpoc);
 

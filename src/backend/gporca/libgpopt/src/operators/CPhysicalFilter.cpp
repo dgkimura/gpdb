@@ -66,8 +66,8 @@ gpos::Ref<CColRefSet>
 CPhysicalFilter::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							  gpos::Ref<CColRefSet> pcrsRequired,
 							  ULONG child_index,
-							  CDrvdPropArray *,	 // pdrgpdpCtxt
-							  ULONG				 // ulOptReq
+							  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+							  ULONG						  // ulOptReq
 )
 {
 	GPOS_ASSERT(
@@ -90,8 +90,8 @@ CPhysicalFilter::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<COrderSpec>
 CPhysicalFilter::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 COrderSpec *posRequired, ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+							 ULONG						 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -112,7 +112,7 @@ gpos::Ref<CDistributionSpec>
 CPhysicalFilter::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::Ref<CDistributionSpec> pdsRequired,
 							 ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
 							 ULONG ulOptReq) const
 {
 	if (CDistributionSpec::EdtAny == pdsRequired->Edt() &&
@@ -142,8 +142,8 @@ CPhysicalFilter::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CRewindabilitySpec>
 CPhysicalFilter::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 CRewindabilitySpec *prsRequired, ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+							 ULONG						 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -169,8 +169,8 @@ CPhysicalFilter::PcteRequired(CMemoryPool *,		//mp,
 								  child_index
 #endif
 							  ,
-							  CDrvdPropArray *,	 //pdrgpdpCtxt,
-							  ULONG				 //ulOptReq
+							  gpos::Ref<CDrvdPropArray>,  //pdrgpdpCtxt,
+							  ULONG						  //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

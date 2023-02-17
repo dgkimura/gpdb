@@ -61,7 +61,7 @@ CPhysicalFullMergeJoin::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
 	gpos::Ref<CDistributionSpec> pdsRequired GPOS_UNUSED,
 	ULONG child_index GPOS_UNUSED,
-	CDrvdPropArray *,  //pdrgpdpCtxt,
+	gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt,
 	ULONG ulOptReq GPOS_UNUSED) const
 {
 	GPOS_RAISE(
@@ -75,7 +75,7 @@ gpos::Ref<CEnfdDistribution>
 CPhysicalFullMergeJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							gpos::Ref<CReqdPropPlan> prppInput,
 							ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+							gpos::Ref<CDrvdPropArray> pdrgpdpCtxt GPOS_UNUSED,
 							ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
@@ -144,8 +144,8 @@ CPhysicalFullMergeJoin::PosRequired(CMemoryPool *mp,
 									CExpressionHandle &,  //exprhdl,
 									COrderSpec *,		  //posInput
 									ULONG child_index,
-									CDrvdPropArray *,  //pdrgpdpCtxt
-									ULONG			   //ulOptReq
+									gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt
+									ULONG						//ulOptReq
 ) const
 {
 	// Merge joins require their input to be sorted on corresponsing join clauses. Without
@@ -196,8 +196,8 @@ gpos::Ref<CRewindabilitySpec>
 CPhysicalFullMergeJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									CRewindabilitySpec *prsRequired,
 									ULONG child_index,
-									CDrvdPropArray *,  // pdrgpdpCtxt
-									ULONG			   // ulOptReq
+									gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+									ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(
@@ -235,11 +235,11 @@ CPhysicalFullMergeJoin::EpetOrder(CExpressionHandle &, const CEnfdOrder *
 	return CEnfdProp::EpetRequired;
 }
 
-CEnfdDistribution::EDistributionMatching
-CPhysicalFullMergeJoin::Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
-							ULONG,					   // child_index,
-							CDrvdPropArray *,		   // pdrgpdpCtxt,
-							ULONG					   // ulOptReq
+CEnfdDistribution::EDistributionMatching CPhysicalFullMergeJoin::Edm(
+	gpos::Ref<CReqdPropPlan>,	// prppInput
+	ULONG,						// child_index,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt,
+	ULONG						// ulOptReq
 )
 {
 	return CEnfdDistribution::EdmExact;

@@ -92,8 +92,8 @@ gpos::Ref<CColRefSet>
 CPhysicalSequence::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								gpos::Ref<CColRefSet> pcrsRequired,
 								ULONG child_index,
-								CDrvdPropArray *,  // pdrgpdpCtxt
-								ULONG			   // ulOptReq
+								gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+								ULONG						// ulOptReq
 )
 {
 	const ULONG arity = exprhdl.Arity();
@@ -121,7 +121,7 @@ CPhysicalSequence::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalSequence::PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								gpos::Ref<CCTEReq> pcter, ULONG child_index,
-								CDrvdPropArray *pdrgpdpCtxt,
+								gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 								ULONG  //ulOptReq
 ) const
 {
@@ -183,7 +183,8 @@ CPhysicalSequence::PdsRequired(CMemoryPool *mp,
 #endif	// GPOS_DEBUG
 							   ,
 							   gpos::Ref<CDistributionSpec> pdsRequired,
-							   ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+							   ULONG child_index,
+							   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 							   ULONG ulOptReq) const
 {
 	GPOS_ASSERT(2 == exprhdl.Arity());
@@ -277,11 +278,11 @@ CPhysicalSequence::PdsRequired(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
 CPhysicalSequence::PosRequired(CMemoryPool *mp,
-							   CExpressionHandle &,	 // exprhdl,
-							   COrderSpec *,		 // posRequired,
-							   ULONG,				 // child_index,
-							   CDrvdPropArray *,	 // pdrgpdpCtxt
-							   ULONG				 // ulOptReq
+							   CExpressionHandle &,		   // exprhdl,
+							   COrderSpec *,			   // posRequired,
+							   ULONG,					   // child_index,
+							   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+							   ULONG					   // ulOptReq
 ) const
 {
 	// no order requirement on the children
@@ -300,9 +301,9 @@ gpos::Ref<CRewindabilitySpec>
 CPhysicalSequence::PrsRequired(CMemoryPool *,		 // mp,
 							   CExpressionHandle &,	 // exprhdl,
 							   CRewindabilitySpec *prsRequired,
-							   ULONG,			  // child_index,
-							   CDrvdPropArray *,  // pdrgpdpCtxt
-							   ULONG			  // ulOptReq
+							   ULONG,					   // child_index,
+							   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+							   ULONG					   // ulOptReq
 ) const
 {
 	// TODO: shardikar; Handle outer refs in the subtree correctly, by passing

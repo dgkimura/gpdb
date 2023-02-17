@@ -157,8 +157,8 @@ gpos::Ref<CColRefSet>
 CPhysicalAgg::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						   gpos::Ref<CColRefSet> pcrsRequired,
 						   ULONG child_index,
-						   CDrvdPropArray *,  // pdrgpdpCtxt
-						   ULONG			  // ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						   ULONG					   // ulOptReq
 )
 {
 	return PcrsRequiredAgg(mp, exprhdl, pcrsRequired, child_index,
@@ -387,8 +387,8 @@ CPhysicalAgg::PdsRequiredIntermediateAgg(CMemoryPool *mp, ULONG ulOptReq) const
 gpos::Ref<CRewindabilitySpec>
 CPhysicalAgg::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						  CRewindabilitySpec *prsRequired, ULONG child_index,
-						  CDrvdPropArray *,	 // pdrgpdpCtxt
-						  ULONG				 // ulOptReq
+						  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -423,8 +423,8 @@ CPhysicalAgg::PcteRequired(CMemoryPool *,		 //mp,
 							   child_index
 #endif
 						   ,
-						   CDrvdPropArray *,  //pdrgpdpCtxt,
-						   ULONG			  //ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  //pdrgpdpCtxt,
+						   ULONG					   //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

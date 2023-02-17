@@ -68,7 +68,7 @@ public:
 									  CExpressionHandle &exprhdl,
 									  COrderSpec *posRequired,
 									  ULONG child_index,
-									  CDrvdPropArray *pdrgpdpCtxt,
+									  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									  ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------

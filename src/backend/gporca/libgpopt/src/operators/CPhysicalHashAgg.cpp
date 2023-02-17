@@ -71,8 +71,8 @@ CPhysicalHashAgg::PosRequired(CMemoryPool *mp,
 								  child_index
 #endif	// GPOS_DEBUG
 							  ,
-							  CDrvdPropArray *,	 // pdrgpdpCtxt
-							  ULONG				 // ulOptReq
+							  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+							  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

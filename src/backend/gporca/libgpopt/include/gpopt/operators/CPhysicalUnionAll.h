@@ -103,13 +103,13 @@ public:
 									   CExpressionHandle &exprhdl,
 									   gpos::Ref<CColRefSet> pcrsRequired,
 									   ULONG child_index,
-									   CDrvdPropArray *pdrgpdpCtxt,
+									   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									   ULONG ulOptReq) override;
 
 	// compute required ctes of the n-th child
 	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									gpos::Ref<CCTEReq> pcter, ULONG child_index,
-									CDrvdPropArray *pdrgpdpCtxt,
+									gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									ULONG ulOptReq) const override;
 
 	// compute required sort order of the n-th child
@@ -117,16 +117,14 @@ public:
 									  CExpressionHandle &exprhdl,
 									  COrderSpec *posRequired,
 									  ULONG child_index,
-									  CDrvdPropArray *pdrgpdpCtxt,
+									  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									  ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
-	gpos::Ref<CRewindabilitySpec> PrsRequired(CMemoryPool *mp,
-											  CExpressionHandle &exprhdl,
-											  CRewindabilitySpec *prsRequired,
-											  ULONG child_index,
-											  CDrvdPropArray *pdrgpdpCtxt,
-											  ULONG ulOptReq) const override;
+	gpos::Ref<CRewindabilitySpec> PrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		CRewindabilitySpec *prsRequired, ULONG child_index,
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// conversion function
 	static gpos::Ref<CPhysicalUnionAll> PopConvert(gpos::Ref<COperator> pop);

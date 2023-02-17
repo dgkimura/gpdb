@@ -51,8 +51,9 @@ public:
 	virtual gpos::Ref<CDistributionSpec> Pds() const = 0;
 
 	// check if optimization contexts is valid
-	BOOL FValidContext(CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
-					   COptimizationContextArray *pdrgpocChild) const override;
+	BOOL FValidContext(
+		CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
+		gpos::Ref<COptimizationContextArray> pdrgpocChild) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Required Plan Properties
@@ -61,14 +62,14 @@ public:
 	// compute required ctes of the n-th child
 	gpos::Ref<CCTEReq> PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									gpos::Ref<CCTEReq> pcter, ULONG child_index,
-									CDrvdPropArray *pdrgpdpCtxt,
+									gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
 	gpos::Ref<CDistributionSpec> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
 	gpos::Ref<CRewindabilitySpec> PrsRequired(
@@ -76,13 +77,13 @@ public:
 		CExpressionHandle &,   // exprhdl
 		CRewindabilitySpec *,  // prsRequired
 		ULONG,				   // child_index
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required partition propoagation spec of the n-th child
 	gpos::Ref<CPartitionPropagationSpec> PppsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CPartitionPropagationSpec *pppsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	//-------------------------------------------------------------------------------------
 	// Derived Plan Properties

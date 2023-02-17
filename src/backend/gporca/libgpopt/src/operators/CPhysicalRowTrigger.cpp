@@ -90,8 +90,8 @@ CPhysicalRowTrigger::PosRequired(CMemoryPool *mp,
 									 child_index
 #endif
 								 ,
-								 CDrvdPropArray *,	// pdrgpdpCtxt
-								 ULONG				// ulOptReq
+								 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+								 ULONG						 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -155,8 +155,8 @@ CPhysicalRowTrigger::PcrsRequired(CMemoryPool *mp,
 									  child_index
 #endif	// GPOS_DEBUG
 								  ,
-								  CDrvdPropArray *,	 // pdrgpdpCtxt
-								  ULONG				 // ulOptReq
+								  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+								  ULONG						  // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -180,8 +180,8 @@ gpos::Ref<CDistributionSpec>
 CPhysicalRowTrigger::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 gpos::Ref<CDistributionSpec> pdsInput,
 								 ULONG child_index,
-								 CDrvdPropArray *,	// pdrgpdpCtxt
-								 ULONG				// ulOptReq
+								 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+								 ULONG						 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -207,8 +207,8 @@ gpos::Ref<CRewindabilitySpec>
 CPhysicalRowTrigger::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 CRewindabilitySpec *prsRequired,
 								 ULONG child_index,
-								 CDrvdPropArray *,	// pdrgpdpCtxt
-								 ULONG				// ulOptReq
+								 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+								 ULONG						 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -233,8 +233,8 @@ CPhysicalRowTrigger::PcteRequired(CMemoryPool *,		//mp,
 									  child_index
 #endif
 								  ,
-								  CDrvdPropArray *,	 //pdrgpdpCtxt,
-								  ULONG				 //ulOptReq
+								  gpos::Ref<CDrvdPropArray>,  //pdrgpdpCtxt,
+								  ULONG						  //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

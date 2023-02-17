@@ -88,8 +88,8 @@ gpos::Ref<CColRefSet>
 CPhysicalSort::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							gpos::Ref<CColRefSet> pcrsRequired,
 							ULONG child_index,
-							CDrvdPropArray *,  // pdrgpdpCtxt
-							ULONG			   // ulOptReq
+							gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+							ULONG						// ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -121,8 +121,8 @@ CPhysicalSort::PosRequired(CMemoryPool *mp,
 							   child_index
 #endif	// GPOS_DEBUG
 						   ,
-						   CDrvdPropArray *,  // pdrgpdpCtxt
-						   ULONG			  // ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						   ULONG					   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -145,8 +145,8 @@ gpos::Ref<CDistributionSpec>
 CPhysicalSort::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						   gpos::Ref<CDistributionSpec> pdsRequired,
 						   ULONG child_index,
-						   CDrvdPropArray *,  // pdrgpdpCtxt
-						   ULONG			  // ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						   ULONG					   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -171,8 +171,8 @@ CPhysicalSort::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   child_index
 #endif	// GPOPS_DEBUG
 						   ,
-						   CDrvdPropArray *,  // pdrgpdpCtxt
-						   ULONG			  // ulOptReq
+						   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+						   ULONG					   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -214,8 +214,8 @@ CPhysicalSort::PcteRequired(CMemoryPool *,		  //mp,
 								child_index
 #endif
 							,
-							CDrvdPropArray *,  //pdrgpdpCtxt,
-							ULONG			   //ulOptReq
+							gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt,
+							ULONG						//ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

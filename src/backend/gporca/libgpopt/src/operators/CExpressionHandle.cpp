@@ -745,7 +745,7 @@ CExpressionHandle::InitReqdProps(gpos::Ref<CReqdProp> prpInput)
 //---------------------------------------------------------------------------
 void
 CExpressionHandle::ComputeChildReqdProps(ULONG child_index,
-										 CDrvdPropArray *pdrgpdpCtxt,
+										 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 										 ULONG ulOptReq)
 {
 	GPOS_ASSERT(nullptr != m_prp);
@@ -808,7 +808,7 @@ CExpressionHandle::CopyChildReqdProps(ULONG child_index,
 //---------------------------------------------------------------------------
 void
 CExpressionHandle::ComputeChildReqdCols(ULONG child_index,
-										CDrvdPropArray *pdrgpdpCtxt)
+										gpos::Ref<CDrvdPropArray> pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr != m_prp);
 	GPOS_ASSERT(nullptr != m_pdrgprp);

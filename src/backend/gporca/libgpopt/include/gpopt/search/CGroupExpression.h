@@ -158,7 +158,7 @@ private:
 
 	// check validity of group expression
 	BOOL FValidContext(CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
-					   COptimizationContextArray *pdrgpocChild);
+					   gpos::Ref<COptimizationContextArray> pdrgpocChild);
 
 	// remove cost context in hash table
 	gpos::Ref<CCostContext> PccRemove(gpos::Ref<COptimizationContext> poc,
@@ -207,14 +207,13 @@ public:
 
 	// check if cost context already exists in group expression hash table
 	BOOL FCostContextExists(gpos::Ref<COptimizationContext> poc,
-							COptimizationContextArray *pdrgpoc);
+							gpos::Ref<COptimizationContextArray> pdrgpoc);
 
 	// compute and store expression's cost under a given context
-	gpos::Ref<CCostContext> PccComputeCost(CMemoryPool *mp,
-										   gpos::Ref<COptimizationContext> poc,
-										   ULONG ulOptReq,
-										   COptimizationContextArray *pdrgpoc,
-										   BOOL fPruned, CCost costLowerBound);
+	gpos::Ref<CCostContext> PccComputeCost(
+		CMemoryPool *mp, gpos::Ref<COptimizationContext> poc, ULONG ulOptReq,
+		gpos::Ref<COptimizationContextArray> pdrgpoc, BOOL fPruned,
+		CCost costLowerBound);
 
 	// compute a cost lower bound for plans, rooted by current group expression, and satisfying the given required properties
 	CCost CostLowerBound(CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput,

@@ -629,7 +629,7 @@ CJobGroupExpressionOptimization::EevtOptimizeSelf(CSchedulerContext *psc,
 	// compute group expression cost under current context
 	gpos::Ref<COptimizationContext> poc = pjgeo->m_poc;
 	gpos::Ref<CGroupExpression> pgexpr = pjgeo->m_pgexpr;
-	COptimizationContextArray *pdrgpoc = pjgeo->m_pdrgpoc;
+	gpos::Ref<COptimizationContextArray> pdrgpoc = pjgeo->m_pdrgpoc;
 	ULONG ulOptReq = pjgeo->m_ulOptReq;
 
 	gpos::Ref<CCostContext> pcc =

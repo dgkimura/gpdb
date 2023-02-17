@@ -22,7 +22,6 @@
 #include "gpos/common/CHashMapIter.h"
 #include "gpos/common/owner.h"
 
-
 namespace gpopt
 {
 using namespace gpos;
@@ -34,34 +33,35 @@ using namespace gpos;
 //	@doc:
 //		Lookup table for counting/unranking of trees;
 //
-//		Enables client to associate objects of type T (e.g. CGroupExpression)
+//		Enables client to associate objects of type CCostContext (e.g. CGroupExpression)
 //		with a topology solely given by edges between the object. The
 //		unranking utilizes client provided function and generates results of
-//		type R (e.g., CExpression);
-//		U is a global context accessible to recursive rehydrate calls.
-//		Pointers to objects of type U are passed through PrUnrank calls to the
+//		type CExpression (e.g., CExpression);
+//		CDrvdPropCtxtPlan is a global context accessible to recursive rehydrate calls.
+//		Pointers to objects of type CDrvdPropCtxtPlan are passed through PrUnrank calls to the
 //		rehydrate function of type PrFn.
 //
 //---------------------------------------------------------------------------
-template <class T, class R, class U, ULONG (*HashFn)(const gpos::Ref<T>),
-		  BOOL (*EqFn)(const gpos::Ref<T>, const gpos::Ref<T>)>
 class CTreeMap
 {
 	// array of source pointers (sources owned by 3rd party)
-	using DrgPt = CDynamicPtrArray<T, CleanupNULL>;
+	using DrgPt = CDynamicPtrArray<CCostContext, CleanupNULL>;
 
 	// array of result pointers (results owned by the tree we unrank)
-	using DrgPr = gpos::Vector<gpos::Ref<R>>;
+	using DrgPr = gpos::Vector<gpos::Ref<CExpression>>;
 
 	// generic rehydrate function
-	using PrFn = gpos::Ref<R> (*)(CMemoryPool *, T *, gpos::Ref<DrgPr>, U *);
+	using PrFn = gpos::Ref<CExpression> (*)(CMemoryPool *,
+											gpos::Ref<CCostContext>,
+											gpos::Ref<DrgPr>,
+											gpos::Ref<CDrvdPropCtxtPlan>);
 
 private:
 	// fwd declaration
 	class CTreeNode;
 
 	// arrays of internal nodes
-	using CTreeNodeArray = CDynamicPtrArray<CTreeNode, CleanupNULL>;
+	using CTreeNodeArray = gpos::Vector<gpos::Ref<CTreeNode>>;
 	using CTreeNode2dArray = gpos::Vector<gpos::Ref<CTreeNodeArray>>;
 
 	//---------------------------------------------------------------------------
@@ -77,17 +77,18 @@ private:
 	{
 	private:
 		// parent node
-		const T *m_ptParent;
+		const gpos::Ref<CCostContext> m_ptParent;
 
 		// child index
 		ULONG m_ulChildIndex;
 
 		// child node
-		const T *m_ptChild;
+		const gpos::Ref<CCostContext> m_ptChild;
 
 	public:
 		// ctor
-		STreeLink(const T *ptParent, ULONG child_index, const T *ptChild)
+		STreeLink(const gpos::Ref<CCostContext> ptParent, ULONG child_index,
+				  const gpos::Ref<CCostContext> ptChild)
 			: m_ptParent(ptParent),
 			  m_ulChildIndex(child_index),
 			  m_ptChild(ptChild)
@@ -103,8 +104,8 @@ private:
 		static ULONG
 		HashValue(const STreeLink *ptlink)
 		{
-			ULONG ulHashParent = HashFn(ptlink->m_ptParent);
-			ULONG ulHashChild = HashFn(ptlink->m_ptChild);
+			ULONG ulHashParent = CCostContext::HashValue(ptlink->m_ptParent);
+			ULONG ulHashChild = CCostContext::HashValue(ptlink->m_ptChild);
 			ULONG ulHashChildIndex =
 				gpos::HashValue<ULONG>(&ptlink->m_ulChildIndex);
 
@@ -116,8 +117,10 @@ private:
 		static BOOL
 		Equals(const STreeLink *ptlink1, const STreeLink *ptlink2)
 		{
-			return EqFn(ptlink1->m_ptParent, ptlink2->m_ptParent) &&
-				   EqFn(ptlink1->m_ptChild, ptlink2->m_ptChild) &&
+			return CCostContext::Equals(ptlink1->m_ptParent,
+										ptlink2->m_ptParent) &&
+				   CCostContext::Equals(ptlink1->m_ptChild,
+										ptlink2->m_ptChild) &&
 				   ptlink1->m_ulChildIndex == ptlink2->m_ulChildIndex;
 		}
 	};	// struct STreeLink
@@ -130,7 +133,7 @@ private:
 	//		Internal structure to manage source objects and their topology
 	//
 	//---------------------------------------------------------------------------
-	class CTreeNode
+	class CTreeNode : public CRefCount<CTreeNode>
 	{
 	private:
 		// state of tree node during counting alternatives
@@ -150,7 +153,7 @@ private:
 		ULONG m_ul;
 
 		// element
-		const T *m_value;
+		const gpos::Ref<CCostContext> m_value;
 
 		// array of children arrays
 		gpos::Ref<CTreeNode2dArray> m_pdrgdrgptn;
@@ -175,7 +178,7 @@ private:
 			ULONG ulCandidates = (*m_pdrgdrgptn)[ulChild]->Size();
 			for (ULONG ulAlt = 0; ulAlt < ulCandidates; ulAlt++)
 			{
-				CTreeNode *ptn = (*(*m_pdrgdrgptn)[ulChild])[ulAlt];
+				gpos::Ref<CTreeNode> ptn = (*(*m_pdrgdrgptn)[ulChild])[ulAlt];
 				ULLONG ullCount = ptn->UllCount();
 				ull = gpos::Add(ull, ullCount);
 			}
@@ -184,17 +187,17 @@ private:
 		}
 
 		// rehydrate tree
-		gpos::Ref<R>
-		PrUnrank(CMemoryPool *mp, PrFn prfn, U *pU, ULONG ulChild,
-				 ULLONG ullRank)
+		gpos::Ref<CExpression>
+		PrUnrank(CMemoryPool *mp, PrFn prfn, gpos::Ref<CDrvdPropCtxtPlan> pU,
+				 ULONG ulChild, ULLONG ullRank)
 		{
 			GPOS_CHECK_STACK_SIZE;
 			GPOS_ASSERT(ullRank < UllCount(ulChild));
 
-			CTreeNodeArray *pdrgptn = (*m_pdrgdrgptn)[ulChild];
+			gpos::Ref<CTreeNodeArray> pdrgptn = (*m_pdrgdrgptn)[ulChild];
 			ULONG ulCandidates = pdrgptn->Size();
 
-			CTreeNode *ptn = nullptr;
+			gpos::Ref<CTreeNode> ptn = nullptr;
 
 			for (ULONG ul = 0; ul < ulCandidates; ul++)
 			{
@@ -216,7 +219,8 @@ private:
 
 	public:
 		// ctor
-		CTreeNode(CMemoryPool *mp, ULONG ul, const T *value)
+		CTreeNode(CMemoryPool *mp, ULONG ul,
+				  const gpos::Ref<CCostContext> value)
 			: m_mp(mp),
 			  m_ul(ul),
 			  m_value(value),
@@ -236,7 +240,7 @@ private:
 
 		// add child alternative
 		void
-		Add(ULONG ulPos, CTreeNode *ptn)
+		Add(ULONG ulPos, gpos::Ref<CTreeNode> ptn)
 		{
 			GPOS_ASSERT(!FCounted() &&
 						"Adding edges after counting not meaningful");
@@ -255,13 +259,13 @@ private:
 			ptn->m_ulIncoming++;
 
 			// insert to appropriate array
-			CTreeNodeArray *pdrg = (*m_pdrgdrgptn)[ulPos];
+			gpos::Ref<CTreeNodeArray> pdrg = (*m_pdrgdrgptn)[ulPos];
 			GPOS_ASSERT(nullptr != pdrg);
 			pdrg->Append(ptn);
 		}
 
 		// accessor
-		const T *
+		const gpos::Ref<CCostContext>
 		Value() const
 		{
 			return m_value;
@@ -320,12 +324,13 @@ private:
 		}
 
 		// unrank tree of a given rank with a given rehydrate function
-		gpos::Ref<R>
-		PrUnrank(CMemoryPool *mp, PrFn prfn, U *pU, ULLONG ullRank)
+		gpos::Ref<CExpression>
+		PrUnrank(CMemoryPool *mp, PrFn prfn, gpos::Ref<CDrvdPropCtxtPlan> pU,
+				 ULLONG ullRank)
 		{
 			GPOS_CHECK_STACK_SIZE;
 
-			gpos::Ref<R> pr = nullptr;
+			gpos::Ref<CExpression> pr = nullptr;
 
 			if (0 == this->m_ul)
 			{
@@ -350,8 +355,7 @@ private:
 					ullRankRem /= ullLocalCount;
 				}
 
-				pr = prfn(mp, const_cast<T *>(this->Value()), std::move(pdrg),
-						  pU);
+				pr = prfn(mp, this->Value(), std::move(pdrg), pU);
 			}
 
 			return pr;
@@ -365,10 +369,11 @@ private:
 		{
 			ULONG ulChildren = m_pdrgdrgptn->Size();
 
-			os << "=== Node " << m_ul << " [" << *Value()
-			   << "] ===" << std::endl
-			   << "# children: " << ulChildren << std::endl
-			   << "# count: " << this->UllCount() << std::endl;
+			// KIMURA: FIXME
+			//os << "=== Node " << m_ul << " [" << *Value()
+			//<< "] ===" << std::endl
+			//<< "# children: " << ulChildren << std::endl
+			//<< "# count: " << this->UllCount() << std::endl;
 
 			for (ULONG ul = 0; ul < ulChildren; ul++)
 			{
@@ -377,9 +382,10 @@ private:
 
 				for (ULONG ulChild = 0; ulChild < ulAlt; ulChild++)
 				{
-					CTreeNode *ptn = (*(*m_pdrgdrgptn)[ul])[ulChild];
-					os << "  -> " << ptn->m_ul << " [" << *ptn->Value() << "]"
-					   << std::endl;
+					gpos::Ref<CTreeNode> ptn = (*(*m_pdrgdrgptn)[ul])[ulChild];
+					// KIMURA: FIXME
+					//os << "  -> " << ptn->m_ul << " [" << *ptn->Value() << "]"
+					//   << std::endl;
 				}
 			}
 
@@ -402,18 +408,20 @@ private:
 	PrFn m_prfn;
 
 	// universal root (internally used only)
-	CTreeNode *m_ptnRoot;
+	gpos::Ref<CTreeNode> m_ptnRoot;
 
 	// map of all nodes
 	using TMap =  // gpos::CHashMap<T, CTreeNode, HashFn, EqFn, CleanupNULL,
 		//				CleanupDelete<CTreeNode>>;
-		gpos::UnorderedMap<const gpos::Ref<T>, CTreeNode,
-						   gpos::RefHash<T, HashFn>, gpos::RefEq<T, EqFn>>;
+		gpos::UnorderedMap<const gpos::Ref<CCostContext>, gpos::Ref<CTreeNode>,
+						   gpos::RefHash<CCostContext, CCostContext::HashValue>,
+						   gpos::RefEq<CCostContext, CCostContext::Equals>>;
 	// gpos::CHashMapIter<T, CTreeNode, HashFn, EqFn, CleanupNULL,
 	//					CleanupDelete<CTreeNode>>;
-	using TMapIter = gpos::UnorderedMap<const gpos::Ref<T>, CTreeNode,
-										gpos::RefHash<T, HashFn>,
-										gpos::RefEq<T, EqFn>>::LegacyIterator;
+	using TMapIter = gpos::UnorderedMap<
+		const gpos::Ref<CCostContext>, gpos::Ref<CTreeNode>,
+		gpos::RefHash<CCostContext, CCostContext::HashValue>,
+		gpos::RefEq<CCostContext, CCostContext::Equals>>::LegacyIterator;
 
 	// map of created links
 	using LinkMap =
@@ -426,19 +434,19 @@ private:
 	gpos::Ref<LinkMap> m_plinkmap;
 
 	// recursive count starting in given node
-	ULLONG UllCount(CTreeNode *ptn);
+	ULLONG UllCount(gpos::Ref<CTreeNode> ptn);
 
 	// Convert to corresponding treenode, create treenode as necessary
-	CTreeNode *
-	Ptn(const T *value)
+	gpos::Ref<CTreeNode>
+	Ptn(const gpos::Ref<CCostContext> value)
 	{
 		GPOS_ASSERT(nullptr != value);
-		CTreeNode *ptn = m_ptmap->Find(value);
+		gpos::Ref<CTreeNode> ptn = m_ptmap->Find(value);
 
 		if (nullptr == ptn)
 		{
 			ptn = GPOS_NEW(m_mp) CTreeNode(m_mp, ++m_ulCountNodes, value);
-			(void) m_ptmap->Insert(const_cast<T *>(value), ptn);
+			(void) m_ptmap->Insert(value, ptn);
 		}
 
 		return ptn;
@@ -474,13 +482,12 @@ public:
 	{
 		;
 		;
-
-		GPOS_DELETE(m_ptnRoot);
 	}
 
 	// insert edge as n-th child
 	void
-	Insert(const T *ptParent, ULONG ulPos, const T *ptChild)
+	Insert(const gpos::Ref<CCostContext> ptParent, ULONG ulPos,
+		   const gpos::Ref<CCostContext> ptChild)
 	{
 		GPOS_ASSERT(ptParent != ptChild);
 
@@ -492,8 +499,8 @@ public:
 			return;
 		}
 
-		CTreeNode *ptnParent = Ptn(ptParent);
-		CTreeNode *ptnChild = Ptn(ptChild);
+		gpos::Ref<CTreeNode> ptnParent = Ptn(ptParent);
+		gpos::Ref<CTreeNode> ptnChild = Ptn(ptChild);
 
 		ptnParent->Add(ulPos, ptnChild);
 		++m_ulCountLinks;
@@ -506,7 +513,7 @@ public:
 
 	// insert a root node
 	void
-	InsertRoot(const T *value)
+	InsertRoot(const gpos::Ref<CCostContext> value)
 	{
 		GPOS_ASSERT(NULL != value);
 		GPOS_ASSERT(NULL != m_ptnRoot);
@@ -524,7 +531,7 @@ public:
 		ULONG ulNodes = 0;
 		for (ulNodes = 0; mi.Advance(); ulNodes++)
 		{
-			CTreeNode *ptn = const_cast<CTreeNode *>(mi.Value());
+			gpos::Ref<CTreeNode> ptn = mi.Value();
 
 			if (0 == ptn->UlIncoming())
 			{
@@ -543,8 +550,9 @@ public:
 	}
 
 	// unrank a specific tree
-	gpos::Ref<R>
-	PrUnrank(CMemoryPool *mp, U *pU, ULLONG ullRank) const
+	gpos::Ref<CExpression>
+	PrUnrank(CMemoryPool *mp, gpos::Ref<CDrvdPropCtxtPlan> pU,
+			 ULLONG ullRank) const
 	{
 		return m_ptnRoot->PrUnrank(mp, m_prfn, pU, ullRank);
 	}
@@ -567,9 +575,9 @@ public:
 
 	// retrieve count for individual element
 	ULLONG
-	UllCount(const T *value)
+	UllCount(const gpos::Ref<CCostContext> value)
 	{
-		CTreeNode *ptn = m_ptmap->Find(value);
+		gpos::Ref<CTreeNode> ptn = m_ptmap->Find(value);
 		GPOS_ASSERT(nullptr != ptn);
 
 		return ptn->UllCount();
@@ -583,7 +591,7 @@ public:
 		ULONG ulNodes = 0;
 		for (ulNodes = 0; mi.Advance(); ulNodes++)
 		{
-			CTreeNode *ptn = const_cast<CTreeNode *>(mi.Value());
+			gpos::Ref<CTreeNode> ptn = mi.Value();
 			(void) ptn->OsPrint(os);
 		}
 

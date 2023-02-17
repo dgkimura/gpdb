@@ -21,6 +21,7 @@
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CDistributionSpecAny.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CEnfdDistribution.h"
 #include "gpopt/base/CEnfdOrder.h"
 #include "gpopt/base/CEnfdPartitionPropagation.h"
@@ -95,7 +96,7 @@ CReqdPropPlan::~CReqdPropPlan()
 void
 CReqdPropPlan::ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-							   CDrvdPropArray *pdrgpdpCtxt)
+							   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr == m_pcrs);
 
@@ -118,7 +119,7 @@ CReqdPropPlan::ComputeReqdCols(CMemoryPool *mp, CExpressionHandle &exprhdl,
 void
 CReqdPropPlan::ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-							   CDrvdPropArray *pdrgpdpCtxt)
+							   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr == m_pcter);
 
@@ -141,7 +142,7 @@ CReqdPropPlan::ComputeReqdCTEs(CMemoryPool *mp, CExpressionHandle &exprhdl,
 void
 CReqdPropPlan::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 					   gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-					   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+					   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_CHECK_ABORT;
 

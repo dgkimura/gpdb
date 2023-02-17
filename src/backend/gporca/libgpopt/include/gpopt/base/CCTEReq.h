@@ -168,7 +168,7 @@ public:
 
 	// insert a new consumer entry with the given id. The plan properties are
 	// taken from the given context
-	void InsertConsumer(ULONG id, CDrvdPropArray *pdrgpdpCtxt);
+	void InsertConsumer(ULONG id, gpos::Ref<CDrvdPropArray> pdrgpdpCtxt);
 
 	// check if two cte requirements are equal
 	BOOL
@@ -194,9 +194,9 @@ public:
 
 	// unresolved CTE requirements given a derived CTE map for a sequence
 	// operator
-	gpos::Ref<CCTEReq> PcterUnresolvedSequence(CMemoryPool *mp,
-											   gpos::Ref<CCTEMap> pcm,
-											   CDrvdPropArray *pdrgpdpCtxt);
+	gpos::Ref<CCTEReq> PcterUnresolvedSequence(
+		CMemoryPool *mp, gpos::Ref<CCTEMap> pcm,
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt);
 
 	// create a copy of the current requirement where all the entries are marked optional
 	gpos::Ref<CCTEReq> PcterAllOptional(CMemoryPool *mp);

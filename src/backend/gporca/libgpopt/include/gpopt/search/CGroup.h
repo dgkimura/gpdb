@@ -306,12 +306,11 @@ private:
 	void ResetStats();
 
 	// helper function to add links in child groups
-	static void RecursiveBuildTreeMap(
-		CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
-		gpos::Ref<CCostContext> pccParent,
-		gpos::Ref<CGroupExpression> pgexprCurrent, ULONG child_index,
-		CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan,
-				 CCostContext::HashValue, CCostContext::Equals> *ptmap);
+	static void RecursiveBuildTreeMap(CMemoryPool *mp,
+									  gpos::Ref<COptimizationContext> poc,
+									  gpos::Ref<CCostContext> pccParent,
+									  gpos::Ref<CGroupExpression> pgexprCurrent,
+									  ULONG child_index, CTreeMap *ptmap);
 
 	// print scalar group properties
 	IOstream &OsPrintGrpScalarProps(IOstream &os, const CHAR *szPrefix) const;
@@ -583,11 +582,9 @@ public:
 		CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexprToMatch);
 
 	// link parent group expression to group members
-	void BuildTreeMap(
-		CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
-		gpos::Ref<CCostContext> pccParent, ULONG child_index,
-		CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan,
-				 CCostContext::HashValue, CCostContext::Equals> *ptmap);
+	void BuildTreeMap(CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
+					  gpos::Ref<CCostContext> pccParent, ULONG child_index,
+					  CTreeMap *ptmap);
 
 	// reset link map used in plan enumeration
 	void ResetLinkMap();

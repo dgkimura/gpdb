@@ -200,8 +200,8 @@ CPhysicalUnionAll::PcrsRequired(CMemoryPool *mp,
 								CExpressionHandle &,  //exprhdl,
 								gpos::Ref<CColRefSet> pcrsRequired,
 								ULONG child_index,
-								CDrvdPropArray *,  // pdrgpdpCtxt
-								ULONG			   // ulOptReq
+								gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+								ULONG						// ulOptReq
 )
 {
 	return MapOutputColRefsToInput(mp, pcrsRequired, child_index);
@@ -224,8 +224,8 @@ CPhysicalUnionAll::PosRequired(CMemoryPool *mp,
 								   child_index
 #endif	// GPOS_DEBUG
 							   ,
-							   CDrvdPropArray *,  // pdrgpdpCtxt
-							   ULONG			  // ulOptReq
+							   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+							   ULONG					   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(PdrgpdrgpcrInput()->Size() > child_index);
@@ -247,8 +247,8 @@ gpos::Ref<CRewindabilitySpec>
 CPhysicalUnionAll::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   CRewindabilitySpec *prsRequired,
 							   ULONG child_index,
-							   CDrvdPropArray *,  // pdrgpdpCtxt
-							   ULONG			  // ulOptReq
+							   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+							   ULONG					   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(PdrgpdrgpcrInput()->Size() > child_index);
@@ -267,7 +267,7 @@ CPhysicalUnionAll::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalUnionAll::PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								gpos::Ref<CCTEReq> pcter, ULONG child_index,
-								CDrvdPropArray *pdrgpdpCtxt,
+								gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 								ULONG  //ulOptReq
 ) const
 {

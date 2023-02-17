@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CEnfdOrder.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/COrderSpec.h"
@@ -208,8 +209,9 @@ COptimizationContext::FOptimize(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-COptimizationContext::FEqualContextIds(COptimizationContextArray *pdrgpocFst,
-									   COptimizationContextArray *pdrgpocSnd)
+COptimizationContext::FEqualContextIds(
+	gpos::Ref<COptimizationContextArray> pdrgpocFst,
+	gpos::Ref<COptimizationContextArray> pdrgpocSnd)
 {
 	if (nullptr == pdrgpocFst || nullptr == pdrgpocSnd)
 	{

@@ -253,12 +253,11 @@ CPhysicalSequenceProject::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CPhysicalSequenceProject::PcrsRequired(CMemoryPool *mp,
-									   CExpressionHandle &exprhdl,
-									   gpos::Ref<CColRefSet> pcrsRequired,
-									   ULONG child_index,
-									   CDrvdPropArray *,  // pdrgpdpCtxt
-									   ULONG			  // ulOptReq
+CPhysicalSequenceProject::PcrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CColRefSet> pcrsRequired, ULONG child_index,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 )
 {
 	GPOS_ASSERT(
@@ -294,8 +293,8 @@ CPhysicalSequenceProject::PosRequired(CMemoryPool *,		// mp
 										  child_index
 #endif	// GPOS_DEBUG
 									  ,
-									  CDrvdPropArray *,	 // pdrgpdpCtxt
-									  ULONG				 // ulOptReq
+									  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+									  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -318,8 +317,8 @@ CPhysicalSequenceProject::PdsRequired(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl,
 									  gpos::Ref<CDistributionSpec> pdsRequired,
 									  ULONG child_index,
-									  CDrvdPropArray *,	 // pdrgpdpCtxt
-									  ULONG				 // ulOptReq
+									  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+									  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -368,8 +367,8 @@ CPhysicalSequenceProject::PrsRequired(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl,
 									  CRewindabilitySpec *prsRequired,
 									  ULONG child_index,
-									  CDrvdPropArray *,	 // pdrgpdpCtxt
-									  ULONG				 // ulOptReq
+									  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+									  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -386,16 +385,17 @@ CPhysicalSequenceProject::PrsRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEReq>
-CPhysicalSequenceProject::PcteRequired(CMemoryPool *,		 //mp,
-									   CExpressionHandle &,	 //exprhdl,
-									   gpos::Ref<CCTEReq> pcter,
-									   ULONG
+CPhysicalSequenceProject::PcteRequired(
+	CMemoryPool *,		  //mp,
+	CExpressionHandle &,  //exprhdl,
+	gpos::Ref<CCTEReq> pcter,
+	ULONG
 #ifdef GPOS_DEBUG
-										   child_index
+		child_index
 #endif
-									   ,
-									   CDrvdPropArray *,  //pdrgpdpCtxt,
-									   ULONG			  //ulOptReq
+	,
+	gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt,
+	ULONG						//ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

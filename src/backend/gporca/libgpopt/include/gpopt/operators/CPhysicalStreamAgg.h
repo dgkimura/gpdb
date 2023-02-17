@@ -94,8 +94,8 @@ public:
 	gpos::Ref<COrderSpec>
 	PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				COrderSpec *posRequired, ULONG child_index,
-				CDrvdPropArray *,  //pdrgpdpCtxt,
-				ULONG			   //ulOptReq
+				gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt,
+				ULONG						//ulOptReq
 	) const override
 	{
 		return PosRequiredStreamAgg(mp, exprhdl, posRequired, child_index,

@@ -65,7 +65,8 @@ CPhysicalRightOuterHashJoin::~CPhysicalRightOuterHashJoin() = default;
 gpos::Ref<CEnfdDistribution>
 CPhysicalRightOuterHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 gpos::Ref<CReqdPropPlan> prppInput,
-								 ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+								 ULONG child_index,
+								 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 								 ULONG ulOptReq)
 {
 	// create the following requests:

@@ -322,8 +322,9 @@ public:
 						  ULONG ulSearchStages);
 
 	// compare array of contexts based on context ids
-	static BOOL FEqualContextIds(COptimizationContextArray *pdrgpocFst,
-								 COptimizationContextArray *pdrgpocSnd);
+	static BOOL FEqualContextIds(
+		gpos::Ref<COptimizationContextArray> pdrgpocFst,
+		gpos::Ref<COptimizationContextArray> pdrgpocSnd);
 
 	// compute required properties to CTE producer based on plan properties of CTE consumer
 	static gpos::Ref<CReqdPropPlan> PrppCTEProducer(

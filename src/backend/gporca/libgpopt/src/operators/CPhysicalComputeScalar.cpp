@@ -94,8 +94,8 @@ CPhysicalComputeScalar::PcrsRequired(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
 									 gpos::Ref<CColRefSet> pcrsRequired,
 									 ULONG child_index,
-									 CDrvdPropArray *,	// pdrgpdpCtxt
-									 ULONG				// ulOptReq
+									 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+									 ULONG						 // ulOptReq
 )
 {
 	GPOS_ASSERT(
@@ -122,8 +122,8 @@ CPhysicalComputeScalar::PcrsRequired(CMemoryPool *mp,
 gpos::Ref<COrderSpec>
 CPhysicalComputeScalar::PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									COrderSpec *posRequired, ULONG child_index,
-									CDrvdPropArray *,  // pdrgpdpCtxt
-									ULONG			   // ulOptReq
+									gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+									ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -158,7 +158,7 @@ gpos::Ref<CDistributionSpec>
 CPhysicalComputeScalar::PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									gpos::Ref<CDistributionSpec> pdsRequired,
 									ULONG child_index,
-									CDrvdPropArray *,  // pdrgpdpCtxt
+									gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
 									ULONG ulOptReq) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -258,8 +258,8 @@ gpos::Ref<CRewindabilitySpec>
 CPhysicalComputeScalar::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 									CRewindabilitySpec *prsRequired,
 									ULONG child_index,
-									CDrvdPropArray *,  // pdrgpdpCtxt
-									ULONG			   // ulOptReq
+									gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+									ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -284,8 +284,8 @@ CPhysicalComputeScalar::PcteRequired(CMemoryPool *,		   //mp,
 										 child_index
 #endif
 									 ,
-									 CDrvdPropArray *,	//pdrgpdpCtxt,
-									 ULONG				//ulOptReq
+									 gpos::Ref<CDrvdPropArray>,	 //pdrgpdpCtxt,
+									 ULONG						 //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

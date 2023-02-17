@@ -241,9 +241,9 @@ CGroupExpression::SetOptimizationLevel()
 //
 //---------------------------------------------------------------------------
 BOOL
-CGroupExpression::FValidContext(CMemoryPool *mp,
-								gpos::Ref<COptimizationContext> poc,
-								COptimizationContextArray *pdrgpocChild)
+CGroupExpression::FValidContext(
+	CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
+	gpos::Ref<COptimizationContextArray> pdrgpocChild)
 {
 	GPOS_ASSERT(m_pop->FPhysical());
 
@@ -295,8 +295,9 @@ CGroupExpression::SetGroup(gpos::Ref<CGroup> pgroup)
 //
 //---------------------------------------------------------------------------
 BOOL
-CGroupExpression::FCostContextExists(gpos::Ref<COptimizationContext> poc,
-									 COptimizationContextArray *pdrgpoc)
+CGroupExpression::FCostContextExists(
+	gpos::Ref<COptimizationContext> poc,
+	gpos::Ref<COptimizationContextArray> pdrgpoc)
 {
 	GPOS_ASSERT(nullptr != poc);
 
@@ -417,7 +418,7 @@ CGroupExpression::PccInsertBest(gpos::Ref<CCostContext> pcc)
 gpos::Ref<CCostContext>
 CGroupExpression::PccComputeCost(
 	CMemoryPool *mp, gpos::Ref<COptimizationContext> poc, ULONG ulOptReq,
-	COptimizationContextArray *pdrgpoc,	 // array of child contexts
+	gpos::Ref<COptimizationContextArray> pdrgpoc,  // array of child contexts
 	BOOL fPruned,  // is created cost context pruned based on cost bound
 	CCost
 		costLowerBound	// lower bound on the cost of plan carried by cost context
@@ -571,7 +572,7 @@ CGroupExpression::CostCompute(CMemoryPool *mp, gpos::Ref<CCostContext> pcc)
 	GPOS_ASSERT(nullptr != pcc);
 
 	// prepare cost array
-	COptimizationContextArray *pdrgpoc = pcc->Pdrgpoc();
+	gpos::Ref<COptimizationContextArray> pdrgpoc = pcc->Pdrgpoc();
 	gpos::Ref<CCostArray> pdrgpcostChildren = GPOS_NEW(mp) CCostArray(mp);
 	const ULONG length = pdrgpoc->Size();
 	for (ULONG ul = 0; ul < length; ul++)

@@ -104,8 +104,8 @@ gpos::Ref<CColRefSet>
 CPhysicalLimit::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::Ref<CColRefSet> pcrsRequired,
 							 ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+							 ULONG						 // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -138,8 +138,8 @@ CPhysicalLimit::PosRequired(CMemoryPool *,		  // mp
 								child_index
 #endif	// GPOS_DEBUG
 							,
-							CDrvdPropArray *,  // pdrgpdpCtxt
-							ULONG			   // ulOptReq
+							gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+							ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -155,7 +155,7 @@ CPhysicalLimit::PosRequired(CMemoryPool *,		  // mp
 gpos::Ref<CDistributionSpec>
 CPhysicalLimit::PdsRequired(CMemoryPool *, CExpressionHandle &,
 							gpos::Ref<CDistributionSpec>, ULONG,
-							CDrvdPropArray *, ULONG) const
+							gpos::Ref<CDrvdPropArray>, ULONG) const
 {
 	// FIXME: this method will (and should) _never_ be called
 	// sweep through all 38 overrides of PdsRequired and switch to Ped()
@@ -168,8 +168,8 @@ CPhysicalLimit::PdsRequired(CMemoryPool *, CExpressionHandle &,
 gpos::Ref<CEnfdDistribution>
 CPhysicalLimit::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 					gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
-					CDrvdPropArray *,  // pdrgpdpCtxt
-					ULONG			   // ulDistrReq
+					gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+					ULONG						// ulDistrReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -249,8 +249,8 @@ CPhysicalLimit::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CRewindabilitySpec>
 CPhysicalLimit::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							CRewindabilitySpec *prsRequired, ULONG child_index,
-							CDrvdPropArray *,  // pdrgpdpCtxt
-							ULONG			   // ulOptReq
+							gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+							ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -288,8 +288,8 @@ CPhysicalLimit::PcteRequired(CMemoryPool *,		   //mp,
 								 child_index
 #endif
 							 ,
-							 CDrvdPropArray *,	//pdrgpdpCtxt,
-							 ULONG				//ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 //pdrgpdpCtxt,
+							 ULONG						 //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

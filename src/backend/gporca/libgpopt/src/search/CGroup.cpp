@@ -1128,8 +1128,7 @@ CGroup::RecursiveBuildTreeMap(
 	CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
 	gpos::Ref<CCostContext> pccParent,
 	gpos::Ref<CGroupExpression> pgexprCurrent, ULONG child_index,
-	CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan,
-			 CCostContext::HashValue, CCostContext::Equals> *ptmap)
+	CTreeMap<CCostContext::HashValue, CCostContext::Equals> *ptmap)
 {
 	GPOS_ASSERT(pgexprCurrent->Pop()->FPhysical());
 	GPOS_ASSERT(nullptr != ptmap);
@@ -1159,7 +1158,7 @@ CGroup::RecursiveBuildTreeMap(
 			ptmap->Insert(pccParent, child_index, pccCurrent);
 		}
 
-		COptimizationContextArray *pdrgpoc = pccCurrent->Pdrgpoc();
+		gpos::Ref<COptimizationContextArray> pdrgpoc = pccCurrent->Pdrgpoc();
 		if (nullptr != pdrgpoc)
 		{
 			// process children recursively
@@ -1202,8 +1201,7 @@ CGroup::BuildTreeMap(
 	gpos::Ref<CCostContext> pccParent,	  // NULL if we are in the Root group
 	ULONG
 		child_index,  // index used for treating group as child of parent context
-	CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan,
-			 CCostContext::HashValue, CCostContext::Equals>
+	CTreeMap<CCostContext::HashValue, CCostContext::Equals>
 		*ptmap	// map structure
 )
 {

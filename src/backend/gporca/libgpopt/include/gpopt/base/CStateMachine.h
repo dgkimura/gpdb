@@ -128,7 +128,7 @@ private:
 
 	// retrieve all states -- enum might have 'holes'
 	void
-	States(EsetStates *peset) const
+	States(gpos::Ref<EsetStates> peset) const
 	{
 		for (ULONG ul = 0; ul < tenumstateSentinel; ul++)
 		{
@@ -139,7 +139,7 @@ private:
 	// determine all possible transitions between 2 given states
 	void
 	Transitions(TEnumState tenumstateOld, TEnumState tenumstateNew,
-				EsetEvents *peset) const
+				gpos::Ref<EsetEvents> peset) const
 	{
 		TEnumEvent tenumevent =
 			m_rgrgtenumeventTransitions[tenumstateOld][tenumstateNew];
@@ -212,12 +212,12 @@ private:
 	Unreachable(const CStateMachine *, TEnumState tenumstateSource,
 				TEnumState tenumstateSink, TEnumEvent, void *pvContext)
 	{
-		EsetStates &eset = *(EsetStates *) pvContext;
+		EsetStates *eset = (EsetStates *) pvContext;
 
 		if (tenumstateSource != tenumstateSink)
 		{
 			// reachable -- remove from set of unreachables
-			(void) eset.ExchangeClear(tenumstateSink);
+			(void) eset->ExchangeClear(tenumstateSink);
 		}
 	}
 #endif	// GPOS_DEBUG
@@ -432,7 +432,7 @@ public:
 		gpos::Ref<EsetStates> peset = GPOS_NEW(mp) EsetStates(mp);
 		States(peset);
 
-		Walk(mp, Unreachable, peset);
+		Walk(mp, Unreachable, peset.get());
 
 		// store remaining states in output array
 		EsetStatesIter esetIter(*peset);
@@ -457,7 +457,7 @@ public:
 		gpos::Ref<EsetStates> peset = GPOS_NEW(mp) EsetStates(mp);
 		States(peset);
 
-		Walk(mp, Unreachable, peset);
+		Walk(mp, Unreachable, peset.get());
 
 		// print all unreachable nodes using BOXes
 		EsetStatesIter esetIter(*peset);

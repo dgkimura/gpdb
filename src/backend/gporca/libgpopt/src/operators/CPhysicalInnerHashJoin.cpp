@@ -293,7 +293,7 @@ CPhysicalInnerHashJoin::PppsRequired(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
 									 CPartitionPropagationSpec *pppsRequired,
 									 ULONG child_index,
-									 CDrvdPropArray *pdrgpdpCtxt,
+									 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									 ULONG ulOptReq) const
 {
 	GPOS_ASSERT(nullptr != pppsRequired);

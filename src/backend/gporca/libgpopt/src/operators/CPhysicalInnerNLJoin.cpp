@@ -74,12 +74,12 @@ CPhysicalInnerNLJoin::~CPhysicalInnerNLJoin() = default;
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysicalInnerNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
-								  CExpressionHandle &exprhdl GPOS_UNUSED,
-								  gpos::Ref<CDistributionSpec>,	 //pdsRequired,
-								  ULONG child_index GPOS_UNUSED,
-								  CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
-								  ULONG	 // ulOptReq
+CPhysicalInnerNLJoin::PdsRequired(
+	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
+	gpos::Ref<CDistributionSpec>,  //pdsRequired,
+	ULONG child_index GPOS_UNUSED,
+	gpos::Ref<CDrvdPropArray> pdrgpdpCtxt GPOS_UNUSED,
+	ULONG  // ulOptReq
 ) const
 {
 	GPOS_RAISE(
@@ -92,7 +92,7 @@ CPhysicalInnerNLJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 gpos::Ref<CEnfdDistribution>
 CPhysicalInnerNLJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						  gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
-						  CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+						  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());

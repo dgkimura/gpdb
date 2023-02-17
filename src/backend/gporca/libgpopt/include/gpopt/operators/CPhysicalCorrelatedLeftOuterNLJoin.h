@@ -90,7 +90,7 @@ public:
 	gpos::Ref<CEnfdDistribution>
 	Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) override
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) override
 	{
 		return PedCorrelatedJoin(mp, exprhdl, prppInput, child_index,
 								 pdrgpdpCtxt, ulOptReq);
@@ -102,7 +102,7 @@ public:
 				CExpressionHandle &,		   // exprhdl,
 				gpos::Ref<CDistributionSpec>,  // pdsRequired,
 				ULONG,						   // child_index,
-				CDrvdPropArray *,			   // pdrgpdpCtxt,
+				gpos::Ref<CDrvdPropArray>,	   // pdrgpdpCtxt,
 				ULONG						   //ulOptReq
 	) const override
 	{
@@ -117,18 +117,19 @@ public:
 	gpos::Ref<CRewindabilitySpec>
 	PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				CRewindabilitySpec *prsRequired, ULONG child_index,
-				CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override
+				gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
+				ULONG ulOptReq) const override
 	{
 		return PrsRequiredCorrelatedJoin(mp, exprhdl, prsRequired, child_index,
 										 pdrgpdpCtxt, ulOptReq);
 	}
 
 	// distribution matching type
-	CEnfdDistribution::EDistributionMatching
-	Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
-		ULONG,					   // child_index
-		CDrvdPropArray *,		   //pdrgpdpCtxt
-		ULONG					   // ulOptReq
+	CEnfdDistribution::EDistributionMatching Edm(
+		gpos::Ref<CReqdPropPlan>,	// prppInput
+		ULONG,						// child_index
+		gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt
+		ULONG						// ulOptReq
 		) override
 	{
 		return CEnfdDistribution::EdmSatisfy;

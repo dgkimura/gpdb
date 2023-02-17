@@ -108,15 +108,16 @@ private:
 			&exprhdlPlan,  // handle to compute required plan properties
 		CExpressionHandle
 			&exprhdlRel,  // handle to compute required relational properties
-		CDrvdPropArray
-			*pdrgpdpChildren,  // derived plan properties of optimized children
+		gpos::Ref<CDrvdPropArray>
+			pdrgpdpChildren,  // derived plan properties of optimized children
 		IStatisticsArray *pdrgpstatCurrentCtxt, ULONG child_index,
 		ULONG ulOptReq);
 
 	// optimize child group and return best cost context satisfying required properties
 	gpos::Ref<CCostContext> PccOptimizeChild(
 		CExpressionHandle &exprhdl, CExpressionHandle &exprhdlRel,
-		gpos::Ref<COptimizationContext> pocOrigin, CDrvdPropArray *pdrgpdp,
+		gpos::Ref<COptimizationContext> pocOrigin,
+		gpos::Ref<CDrvdPropArray> pdrgpdp,
 		IStatisticsArray *pdrgpstatCurrentCtxt, ULONG child_index,
 		ULONG ulOptReq);
 
@@ -176,7 +177,8 @@ private:
 	void SamplePlans();
 
 	// check if all children were successfully optimized
-	static BOOL FChildrenOptimized(COptimizationContextArray *pdrgpoc);
+	static BOOL FChildrenOptimized(
+		gpos::Ref<COptimizationContextArray> pdrgpoc);
 
 	// check if ayn of the given property enforcing types prohibits enforcement
 	static BOOL FProhibited(CEnfdProp::EPropEnforcingType epetOrder,
@@ -273,7 +275,7 @@ public:
 	// return false if it's impossible for the operator to satisfy one or more
 	BOOL FCheckEnfdProps(CMemoryPool *mp, gpos::Ref<CGroupExpression> pgexpr,
 						 gpos::Ref<COptimizationContext> poc, ULONG ulOptReq,
-						 COptimizationContextArray *pdrgpoc);
+						 gpos::Ref<COptimizationContextArray> pdrgpoc);
 
 #ifdef GPOS_DEBUG
 	// apply all exploration xforms

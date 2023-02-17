@@ -97,8 +97,8 @@ gpos::Ref<CColRefSet>
 CPhysicalJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							gpos::Ref<CColRefSet> pcrsRequired,
 							ULONG child_index,
-							CDrvdPropArray *,  // pdrgpdpCtxt
-							ULONG			   // ulOptReq
+							gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+							ULONG						// ulOptReq
 )
 {
 	GPOS_ASSERT(
@@ -120,7 +120,7 @@ CPhysicalJoin::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CCTEReq>
 CPhysicalJoin::PcteRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							gpos::Ref<CCTEReq> pcter, ULONG child_index,
-							CDrvdPropArray *pdrgpdpCtxt,
+							gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 							ULONG  //ulOptReq
 ) const
 {
@@ -227,7 +227,7 @@ CPhysicalJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 						   CExpressionHandle &exprhdl GPOS_UNUSED,
 						   gpos::Ref<CDistributionSpec>,  //pdsRequired,
 						   ULONG child_index GPOS_UNUSED,
-						   CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+						   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt GPOS_UNUSED,
 						   ULONG  // ulOptReq
 ) const
 {
@@ -240,7 +240,7 @@ CPhysicalJoin::PdsRequired(CMemoryPool *mp GPOS_UNUSED,
 gpos::Ref<CEnfdDistribution>
 CPhysicalJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				   gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
-				   CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq)
+				   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulDistrReq)
 {
 	GPOS_ASSERT(2 > child_index);
 
@@ -865,7 +865,7 @@ CPhysicalJoin::PrsRequiredCorrelatedJoin(CMemoryPool *mp,
 										 CExpressionHandle &exprhdl,
 										 CRewindabilitySpec *prsRequired,
 										 ULONG child_index,
-										 CDrvdPropArray *pdrgpdpCtxt,
+										 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 										 ULONG	// ulOptReq
 )
 {
@@ -899,7 +899,8 @@ CPhysicalJoin::PrsRequiredCorrelatedJoin(CMemoryPool *mp,
 gpos::Ref<CEnfdDistribution>
 CPhysicalJoin::PedCorrelatedJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								 gpos::Ref<CReqdPropPlan> prppInput,
-								 ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+								 ULONG child_index,
+								 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 								 ULONG ulOptReq)
 {
 	GPOS_ASSERT(3 == exprhdl.Arity());
@@ -958,7 +959,7 @@ CPhysicalJoin::PedCorrelatedJoin(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //---------------------------------------------------------------------------
 CEnfdDistribution::EDistributionMatching
 CPhysicalJoin::Edm(gpos::Ref<CReqdPropPlan>,  // prppInput
-				   ULONG child_index, CDrvdPropArray *pdrgpdpCtxt,
+				   ULONG child_index, gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 				   ULONG  // ulOptReq
 )
 {

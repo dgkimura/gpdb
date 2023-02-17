@@ -93,7 +93,7 @@ public:
 	gpos::Ref<CPartitionPropagationSpec> PppsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		CPartitionPropagationSpec *pppsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	gpos::Ref<CPartitionPropagationSpec> PppsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl) const override;

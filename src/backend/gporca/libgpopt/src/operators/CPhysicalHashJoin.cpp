@@ -171,8 +171,8 @@ CPhysicalHashJoin::PosRequired(CMemoryPool *mp,
 								   child_index
 #endif	// GPOS_DEBUG
 							   ,
-							   CDrvdPropArray *,  // pdrgpdpCtxt
-							   ULONG			  // ulOptReq
+							   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+							   ULONG					   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(
@@ -197,8 +197,8 @@ gpos::Ref<CRewindabilitySpec>
 CPhysicalHashJoin::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							   CRewindabilitySpec *prsRequired,
 							   ULONG child_index,
-							   CDrvdPropArray *,  // pdrgpdpCtxt
-							   ULONG			  // ulOptReq
+							   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+							   ULONG					   // ulOptReq
 ) const
 {
 	GPOS_ASSERT(
@@ -412,7 +412,7 @@ CPhysicalHashJoin::PdsRequiredSingleton(
 	CMemoryPool *mp,
 	CExpressionHandle &,		   // exprhdl
 	gpos::Ref<CDistributionSpec>,  // pdsInput
-	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt) const
+	ULONG child_index, gpos::Ref<CDrvdPropArray> pdrgpdpCtxt) const
 {
 	if (FFirstChildToOptimize(child_index))
 	{
@@ -468,7 +468,7 @@ CPhysicalHashJoin::PdsRequiredReplicate(CMemoryPool *mp,
 										CExpressionHandle &exprhdl,
 										gpos::Ref<CDistributionSpec> pdsInput,
 										ULONG child_index,
-										CDrvdPropArray *pdrgpdpCtxt,
+										gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 										ULONG ulOptReq,
 										gpos::Ref<CReqdPropPlan> prppInput)
 {
@@ -539,8 +539,8 @@ gpos::Ref<CDistributionSpecHashed>
 CPhysicalHashJoin::PdshashedPassThru(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::Ref<CDistributionSpecHashed> pdshashedInput,
-	ULONG,			   // child_index
-	CDrvdPropArray *,  // pdrgpdpCtxt
+	ULONG,						// child_index
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
 	ULONG ulOptReq GPOS_UNUSED)
 {
 	GPOS_ASSERT(nullptr != pdshashedInput);
@@ -616,7 +616,8 @@ gpos::Ref<CDistributionSpec>
 CPhysicalHashJoin::PdsRequiredRedistribute(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::Ref<CDistributionSpec>,  // pdsInput
-	ULONG child_index, CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const
+	ULONG child_index, gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
+	ULONG ulOptReq) const
 {
 	if (FFirstChildToOptimize(child_index))
 	{
@@ -692,7 +693,8 @@ gpos::Ref<CDistributionSpec>
 CPhysicalHashJoin::PdsRequired(
 	CMemoryPool *mp GPOS_UNUSED, CExpressionHandle &exprhdl GPOS_UNUSED,
 	gpos::Ref<CDistributionSpec> pdsInput GPOS_UNUSED,
-	ULONG child_index GPOS_UNUSED, CDrvdPropArray *pdrgpdpCtxt GPOS_UNUSED,
+	ULONG child_index GPOS_UNUSED,
+	gpos::Ref<CDrvdPropArray> pdrgpdpCtxt GPOS_UNUSED,
 	ULONG ulOptReq
 		GPOS_UNUSED	 // identifies which optimization request should be created
 ) const
@@ -706,7 +708,7 @@ CPhysicalHashJoin::PdsRequired(
 gpos::Ref<CEnfdDistribution>
 CPhysicalHashJoin::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 					   gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
-					   CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq)
+					   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq)
 {
 	GPOS_ASSERT(2 > child_index);
 	GPOS_ASSERT(ulOptReq < UlDistrRequests());

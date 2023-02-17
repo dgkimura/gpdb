@@ -32,9 +32,9 @@ using namespace gpopt;
 //
 //---------------------------------------------------------------------------
 BOOL
-CPhysicalMotion::FValidContext(CMemoryPool *,
-							   gpos::Ref<COptimizationContext> poc,
-							   COptimizationContextArray *pdrgpocChild) const
+CPhysicalMotion::FValidContext(
+	CMemoryPool *, gpos::Ref<COptimizationContext> poc,
+	gpos::Ref<COptimizationContextArray> pdrgpocChild) const
 {
 	GPOS_ASSERT(nullptr != pdrgpocChild);
 	GPOS_ASSERT(1 == pdrgpocChild->Size());
@@ -81,8 +81,8 @@ CPhysicalMotion::PdsRequired(CMemoryPool *mp,
 								 child_index
 #endif	// GPOS_DEBUG
 							 ,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+							 ULONG						 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -165,8 +165,8 @@ CPhysicalMotion::PrsRequired(CMemoryPool *mp,
 								 child_index
 #endif	// GPOS_DEBUG
 							 ,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+							 ULONG						 // ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -181,7 +181,7 @@ CPhysicalMotion::PrsRequired(CMemoryPool *mp,
 gpos::Ref<CPartitionPropagationSpec>
 CPhysicalMotion::PppsRequired(CMemoryPool *mp, CExpressionHandle &,
 							  CPartitionPropagationSpec *, ULONG,
-							  CDrvdPropArray *, ULONG) const
+							  gpos::Ref<CDrvdPropArray>, ULONG) const
 {
 	// A motion is a hard barrier for partition propagation since it executes in a
 	// different slice; and thus it cannot require this property from its child
@@ -205,8 +205,8 @@ CPhysicalMotion::PcteRequired(CMemoryPool *,		//mp,
 								  child_index
 #endif
 							  ,
-							  CDrvdPropArray *,	 //pdrgpdpCtxt,
-							  ULONG				 //ulOptReq
+							  gpos::Ref<CDrvdPropArray>,  //pdrgpdpCtxt,
+							  ULONG						  //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

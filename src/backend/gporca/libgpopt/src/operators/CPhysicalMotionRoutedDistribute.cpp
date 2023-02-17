@@ -89,8 +89,8 @@ gpos::Ref<CColRefSet>
 CPhysicalMotionRoutedDistribute::PcrsRequired(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	gpos::Ref<CColRefSet> pcrsRequired, ULONG child_index,
-	CDrvdPropArray *,  // pdrgpdpCtxt
-	ULONG			   // ulOptReq
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -149,16 +149,17 @@ CPhysicalMotionRoutedDistribute::EpetOrder(CExpressionHandle &,	 // exprhdl
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-CPhysicalMotionRoutedDistribute::PosRequired(CMemoryPool *mp,
-											 CExpressionHandle &,  // exprhdl
-											 COrderSpec *,		   //posInput
-											 ULONG
+CPhysicalMotionRoutedDistribute::PosRequired(
+	CMemoryPool *mp,
+	CExpressionHandle &,  // exprhdl
+	COrderSpec *,		  //posInput
+	ULONG
 #ifdef GPOS_DEBUG
-												 child_index
+		child_index
 #endif	// GPOS_DEBUG
-											 ,
-											 CDrvdPropArray *,	// pdrgpdpCtxt
-											 ULONG				// ulOptReq
+	,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

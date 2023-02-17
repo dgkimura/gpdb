@@ -76,8 +76,8 @@ public:
 	gpos::Ref<CColRefSet>
 	PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				 gpos::Ref<CColRefSet> pcrsRequired, ULONG child_index,
-				 CDrvdPropArray *,	//pdrgpdpCtxt,
-				 ULONG				//ulOptReq
+				 gpos::Ref<CDrvdPropArray>,	 //pdrgpdpCtxt,
+				 ULONG						 //ulOptReq
 				 ) override
 	{
 		return PcrsRequiredAgg(mp, exprhdl, pcrsRequired, child_index,
@@ -88,8 +88,8 @@ public:
 	gpos::Ref<COrderSpec>
 	PosRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				COrderSpec *posRequired, ULONG child_index,
-				CDrvdPropArray *,  //pdrgpdpCtxt,
-				ULONG			   //ulOptReq
+				gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt,
+				ULONG						//ulOptReq
 	) const override
 	{
 		return PosRequiredStreamAgg(mp, exprhdl, posRequired, child_index,
@@ -100,7 +100,7 @@ public:
 	gpos::Ref<CDistributionSpec>
 	PdsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 				gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
-				CDrvdPropArray *,  //pdrgpdpCtxt,
+				gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt,
 				ULONG ulOptReq) const override
 	{
 		return PdsRequiredAgg(mp, exprhdl, pdsRequired, child_index, ulOptReq,

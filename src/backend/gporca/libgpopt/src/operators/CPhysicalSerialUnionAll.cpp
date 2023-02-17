@@ -73,7 +73,7 @@ CPhysicalSerialUnionAll::PdsRequired(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
 									 gpos::Ref<CDistributionSpec> pdsRequired,
 									 ULONG child_index,
-									 CDrvdPropArray *pdrgpdpCtxt,
+									 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									 ULONG ulOptReq) const
 {
 	GPOS_ASSERT(nullptr != PdrgpdrgpcrInput());

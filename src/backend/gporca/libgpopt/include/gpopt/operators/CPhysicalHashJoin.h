@@ -60,7 +60,7 @@ protected:
 	gpos::Ref<CDistributionSpec> PdsRequiredRedistribute(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const;
 
 	// create the set of redistribute requests to send to first hash join child
 	void CreateHashRedistributeRequests(CMemoryPool *mp);
@@ -70,7 +70,7 @@ private:
 	gpos::Ref<CDistributionSpec> PdsRequiredReplicate(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq,
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq,
 		gpos::Ref<CReqdPropPlan> prppInput);
 
 	// create a child hashed distribution request based on input hashed distribution,
@@ -78,7 +78,7 @@ private:
 	static gpos::Ref<CDistributionSpecHashed> PdshashedPassThru(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpecHashed> pdshashedInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq);
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq);
 
 	// check whether a hash key is nullable
 	BOOL FNullableHashKey(ULONG ulKey, gpos::Ref<CColRefSet> pcrsNotNullInner,
@@ -94,7 +94,7 @@ protected:
 	gpos::Ref<CDistributionSpec> PdsRequiredSingleton(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt) const;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt) const;
 
 	// check whether the hash keys from one child are nullable
 	BOOL FNullableHashKeys(gpos::Ref<CColRefSet> pcrsNotNullInner,
@@ -144,28 +144,26 @@ public:
 	gpos::Ref<COrderSpec> PosRequired(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl,
 									  COrderSpec *posInput, ULONG child_index,
-									  CDrvdPropArray *pdrgpdpCtxt,
+									  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									  ULONG ulOptReq) const override;
 
 	// compute required rewindability of the n-th child
-	gpos::Ref<CRewindabilitySpec> PrsRequired(CMemoryPool *mp,
-											  CExpressionHandle &exprhdl,
-											  CRewindabilitySpec *prsRequired,
-											  ULONG child_index,
-											  CDrvdPropArray *pdrgpdpCtxt,
-											  ULONG ulOptReq) const override;
+	gpos::Ref<CRewindabilitySpec> PrsRequired(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		CRewindabilitySpec *prsRequired, ULONG child_index,
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	// compute required distribution of the n-th child
 	gpos::Ref<CDistributionSpec> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	gpos::Ref<CEnfdDistribution> Ped(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
 									 gpos::Ref<CReqdPropPlan> prppInput,
 									 ULONG child_index,
-									 CDrvdPropArray *pdrgpdpCtxt,
+									 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									 ULONG ulDistrReq) override;
 
 	//-------------------------------------------------------------------------------------

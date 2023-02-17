@@ -160,7 +160,7 @@ public:
 	}
 
 	// accessor of child optimization contexts array
-	COptimizationContextArray *
+	gpos::Ref<COptimizationContextArray>
 	Pdrgpoc() const
 	{
 		return m_pdrgpoc.get();
@@ -236,7 +236,7 @@ public:
 
 	// set child contexts
 	void
-	SetChildContexts(COptimizationContextArray *pdrgpoc)
+	SetChildContexts(gpos::Ref<COptimizationContextArray> pdrgpoc)
 	{
 		GPOS_ASSERT(nullptr == m_pdrgpoc);
 		GPOS_ASSERT(nullptr != pdrgpoc);

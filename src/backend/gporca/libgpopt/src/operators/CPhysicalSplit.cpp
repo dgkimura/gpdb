@@ -89,8 +89,8 @@ CPhysicalSplit::PosRequired(CMemoryPool *mp,
 								child_index
 #endif	// GPOS_DEBUG
 							,
-							CDrvdPropArray *,  // pdrgpdpCtxt
-							ULONG			   // ulOptReq
+							gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+							ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -155,8 +155,8 @@ CPhysicalSplit::PcrsRequired(CMemoryPool *mp,
 								 child_index
 #endif	// GPOS_DEBUG
 							 ,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+							 ULONG						 // ulOptReq
 )
 {
 	GPOS_ASSERT(0 == child_index);
@@ -186,8 +186,8 @@ CPhysicalSplit::PdsRequired(CMemoryPool *mp,
 								child_index
 #endif	// GPOS_DEBUG
 							,
-							CDrvdPropArray *,  // pdrgpdpCtxt
-							ULONG			   // ulOptReq
+							gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+							ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -206,8 +206,8 @@ CPhysicalSplit::PdsRequired(CMemoryPool *mp,
 gpos::Ref<CRewindabilitySpec>
 CPhysicalSplit::PrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							CRewindabilitySpec *prsRequired, ULONG child_index,
-							CDrvdPropArray *,  // pdrgpdpCtxt
-							ULONG			   // ulOptReq
+							gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+							ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -232,8 +232,8 @@ CPhysicalSplit::PcteRequired(CMemoryPool *,		   //mp,
 								 child_index
 #endif
 							 ,
-							 CDrvdPropArray *,	//pdrgpdpCtxt,
-							 ULONG				//ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 //pdrgpdpCtxt,
+							 ULONG						 //ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);

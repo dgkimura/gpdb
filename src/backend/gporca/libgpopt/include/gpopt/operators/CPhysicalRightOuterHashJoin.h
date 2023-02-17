@@ -78,7 +78,7 @@ public:
 									 CExpressionHandle &exprhdl,
 									 gpos::Ref<CReqdPropPlan> prppInput,
 									 ULONG child_index,
-									 CDrvdPropArray *pdrgpdpCtxt,
+									 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									 ULONG ulOptReq) override;
 
 };	// class CPhysicalRightOuterHashJoin

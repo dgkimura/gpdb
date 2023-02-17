@@ -29,8 +29,7 @@ class CMemoProxy;
 class COptimizationContext;
 
 // memo tree map definition
-using MemoTreeMap = CTreeMap<CCostContext, CExpression, CDrvdPropCtxtPlan,
-							 CCostContext::HashValue, CCostContext::Equals>;
+using MemoTreeMap = CTreeMap;
 
 using namespace gpos;
 

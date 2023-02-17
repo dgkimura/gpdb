@@ -662,7 +662,7 @@ CPhysical::PcterPushThru(gpos::Ref<CCTEReq> pcter)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEMap>
-CPhysical::PcmCombine(CMemoryPool *mp, CDrvdPropArray *pdrgpdpCtxt)
+CPhysical::PcmCombine(CMemoryPool *mp, gpos::Ref<CDrvdPropArray> pdrgpdpCtxt)
 {
 	GPOS_ASSERT(nullptr != pdrgpdpCtxt);
 
@@ -695,7 +695,7 @@ CPhysical::PcmCombine(CMemoryPool *mp, CDrvdPropArray *pdrgpdpCtxt)
 gpos::Ref<CCTEReq>
 CPhysical::PcterNAry(CMemoryPool *mp, CExpressionHandle &exprhdl,
 					 gpos::Ref<CCTEReq> pcter, ULONG child_index,
-					 CDrvdPropArray *pdrgpdpCtxt) const
+					 gpos::Ref<CDrvdPropArray> pdrgpdpCtxt) const
 {
 	GPOS_ASSERT(nullptr != pcter);
 
@@ -959,22 +959,22 @@ CPhysical::FUnaryUsesDefinedColumns(gpos::Ref<CColRefSet> pcrs,
 	return !pcrs->IsDisjoint(exprhdl.DeriveDefinedColumns(1));
 }
 
-CEnfdDistribution::EDistributionMatching
-CPhysical::Edm(gpos::Ref<CReqdPropPlan>, ULONG, CDrvdPropArray *, ULONG)
+CEnfdDistribution::EDistributionMatching CPhysical::Edm(
+	gpos::Ref<CReqdPropPlan>, ULONG, gpos::Ref<CDrvdPropArray>, ULONG)
 {
 	// by default, request distribution satisfaction
 	return CEnfdDistribution::EdmSatisfy;
 }
 
-CEnfdOrder::EOrderMatching
-CPhysical::Eom(gpos::Ref<CReqdPropPlan>, ULONG, CDrvdPropArray *, ULONG)
+CEnfdOrder::EOrderMatching CPhysical::Eom(gpos::Ref<CReqdPropPlan>, ULONG,
+										  gpos::Ref<CDrvdPropArray>, ULONG)
 {
 	// request satisfaction by default
 	return CEnfdOrder::EomSatisfy;
 }
 
-CEnfdRewindability::ERewindabilityMatching
-CPhysical::Erm(gpos::Ref<CReqdPropPlan>, ULONG, CDrvdPropArray *, ULONG)
+CEnfdRewindability::ERewindabilityMatching CPhysical::Erm(
+	gpos::Ref<CReqdPropPlan>, ULONG, gpos::Ref<CDrvdPropArray>, ULONG)
 {
 	// request satisfaction by default
 	return CEnfdRewindability::ErmSatisfy;
@@ -983,7 +983,7 @@ CPhysical::Erm(gpos::Ref<CReqdPropPlan>, ULONG, CDrvdPropArray *, ULONG)
 gpos::Ref<CEnfdDistribution>
 CPhysical::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 			   gpos::Ref<CReqdPropPlan> prppInput, ULONG child_index,
-			   CDrvdPropArray *pdrgpdpCtxt, ULONG ulDistrReq)
+			   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulDistrReq)
 {
 	return GPOS_NEW(mp) CEnfdDistribution(
 		PdsRequired(mp, exprhdl, prppInput->Ped()->PdsRequired(), child_index,
@@ -995,7 +995,8 @@ CPhysical::Ped(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CPartitionPropagationSpec>
 CPhysical::PppsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 						CPartitionPropagationSpec *pppsRequired,
-						ULONG child_index, CDrvdPropArray *, ULONG) const
+						ULONG child_index, gpos::Ref<CDrvdPropArray>,
+						ULONG) const
 {
 	// pass through consumer<x> requests to the appropriate child.
 	// do not pass through any propagator<x> requests

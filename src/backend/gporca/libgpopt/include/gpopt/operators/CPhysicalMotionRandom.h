@@ -83,14 +83,14 @@ public:
 									   CExpressionHandle &exprhdl,
 									   gpos::Ref<CColRefSet> pcrsInput,
 									   ULONG child_index,
-									   CDrvdPropArray *pdrgpdpCtxt,
+									   gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									   ULONG ulOptReq) override;
 
 	// compute required sort order of the n-th child
 	gpos::Ref<COrderSpec> PosRequired(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl,
 									  COrderSpec *posInput, ULONG child_index,
-									  CDrvdPropArray *pdrgpdpCtxt,
+									  gpos::Ref<CDrvdPropArray> pdrgpdpCtxt,
 									  ULONG ulOptReq) const override;
 
 	// check if required columns are included in output columns

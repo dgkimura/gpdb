@@ -106,12 +106,11 @@ CPhysicalPartitionSelector::HashValue() const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CPhysicalPartitionSelector::PcrsRequired(CMemoryPool *mp,
-										 CExpressionHandle &exprhdl,
-										 gpos::Ref<CColRefSet> pcrsInput,
-										 ULONG child_index,
-										 CDrvdPropArray *,	// pdrgpdpCtxt
-										 ULONG				// ulOptReq
+CPhysicalPartitionSelector::PcrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CColRefSet> pcrsInput, ULONG child_index,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 )
 {
 	GPOS_ASSERT(
@@ -134,12 +133,11 @@ CPhysicalPartitionSelector::PcrsRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-CPhysicalPartitionSelector::PosRequired(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										COrderSpec *posRequired,
-										ULONG child_index,
-										CDrvdPropArray *,  // pdrgpdpCtxt
-										ULONG			   // ulOptReq
+CPhysicalPartitionSelector::PosRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl, COrderSpec *posRequired,
+	ULONG child_index,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -156,12 +154,11 @@ CPhysicalPartitionSelector::PosRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysicalPartitionSelector::PdsRequired(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										gpos::Ref<CDistributionSpec> pdsInput,
-										ULONG child_index,
-										CDrvdPropArray *,  // pdrgpdpCtxt
-										ULONG			   // ulOptReq
+CPhysicalPartitionSelector::PdsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CDistributionSpec> pdsInput, ULONG child_index,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -189,12 +186,11 @@ CPhysicalPartitionSelector::PdsRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CRewindabilitySpec>
-CPhysicalPartitionSelector::PrsRequired(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										CRewindabilitySpec *prsRequired,
-										ULONG child_index,
-										CDrvdPropArray *,  // pdrgpdpCtxt
-										ULONG			   // ulOptReq
+CPhysicalPartitionSelector::PrsRequired(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	CRewindabilitySpec *prsRequired, ULONG child_index,
+	gpos::Ref<CDrvdPropArray>,	// pdrgpdpCtxt
+	ULONG						// ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -211,16 +207,17 @@ CPhysicalPartitionSelector::PrsRequired(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEReq>
-CPhysicalPartitionSelector::PcteRequired(CMemoryPool *,		   //mp,
-										 CExpressionHandle &,  //exprhdl,
-										 gpos::Ref<CCTEReq> pcter,
-										 ULONG
+CPhysicalPartitionSelector::PcteRequired(
+	CMemoryPool *,		  //mp,
+	CExpressionHandle &,  //exprhdl,
+	gpos::Ref<CCTEReq> pcter,
+	ULONG
 #ifdef GPOS_DEBUG
-											 child_index
+		child_index
 #endif
-										 ,
-										 CDrvdPropArray *,	//pdrgpdpCtxt,
-										 ULONG				//ulOptReq
+	,
+	gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt,
+	ULONG						//ulOptReq
 ) const
 {
 	GPOS_ASSERT(0 == child_index);
@@ -231,7 +228,7 @@ gpos::Ref<CPartitionPropagationSpec>
 CPhysicalPartitionSelector::PppsRequired(
 	CMemoryPool *mp, CExpressionHandle &,
 	CPartitionPropagationSpec *pppsRequired,
-	ULONG child_index GPOS_ASSERTS_ONLY, CDrvdPropArray *, ULONG) const
+	ULONG child_index GPOS_ASSERTS_ONLY, gpos::Ref<CDrvdPropArray>, ULONG) const
 {
 	GPOS_ASSERT(child_index == 0);
 

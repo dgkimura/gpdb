@@ -31,13 +31,13 @@ public:
 	gpos::Ref<CDistributionSpec> PdsRequired(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CDistributionSpec> pdsRequired, ULONG child_index,
-		CDrvdPropArray *pdrgpdpCtxt, ULONG ulOptReq) const override;
+		gpos::Ref<CDrvdPropArray> pdrgpdpCtxt, ULONG ulOptReq) const override;
 
 	CEnfdDistribution::EDistributionMatching Edm(
-		gpos::Ref<CReqdPropPlan>,  // prppInput
-		ULONG,					   // child_index
-		CDrvdPropArray *,		   //pdrgpdpCtxt
-		ULONG					   // ulOptReq
+		gpos::Ref<CReqdPropPlan>,	// prppInput
+		ULONG,						// child_index
+		gpos::Ref<CDrvdPropArray>,	//pdrgpdpCtxt
+		ULONG						// ulOptReq
 		) override;
 
 	~CPhysicalParallelUnionAll() override;

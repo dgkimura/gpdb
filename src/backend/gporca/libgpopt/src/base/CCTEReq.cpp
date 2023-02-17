@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/search/CGroupExpression.h"
 
@@ -197,7 +198,7 @@ CCTEReq::Insert(ULONG ulCteId, CCTEMap::ECteType ect, BOOL fRequired,
 //
 //---------------------------------------------------------------------------
 void
-CCTEReq::InsertConsumer(ULONG id, CDrvdPropArray *pdrgpdpCtxt)
+CCTEReq::InsertConsumer(ULONG id, gpos::Ref<CDrvdPropArray> pdrgpdpCtxt)
 {
 	ULONG ulProducerId = gpos::ulong_max;
 	gpos::Ref<CDrvdPropPlan> pdpplan =
@@ -372,7 +373,7 @@ CCTEReq::PcterUnresolved(CMemoryPool *mp, gpos::Ref<CCTEMap> pcm)
 gpos::Ref<CCTEReq>
 CCTEReq::PcterUnresolvedSequence(
 	CMemoryPool *mp, gpos::Ref<CCTEMap> pcm,
-	CDrvdPropArray *
+	gpos::Ref<CDrvdPropArray>
 		pdrgpdpCtxt	 // context contains derived plan properties of producer tree
 )
 {

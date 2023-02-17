@@ -65,12 +65,12 @@ CPhysicalCTEConsumer::~CPhysicalCTEConsumer()
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
-CPhysicalCTEConsumer::PcrsRequired(CMemoryPool *,		   // mp,
-								   CExpressionHandle &,	   // exprhdl,
-								   gpos::Ref<CColRefSet>,  // pcrsRequired,
-								   ULONG,				   // child_index,
-								   CDrvdPropArray *,	   // pdrgpdpCtxt
-								   ULONG				   // ulOptReq
+CPhysicalCTEConsumer::PcrsRequired(CMemoryPool *,			   // mp,
+								   CExpressionHandle &,		   // exprhdl,
+								   gpos::Ref<CColRefSet>,	   // pcrsRequired,
+								   ULONG,					   // child_index,
+								   gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+								   ULONG					   // ulOptReq
 )
 {
 	GPOS_ASSERT(!"CPhysicalCTEConsumer has no relational children");
@@ -86,12 +86,12 @@ CPhysicalCTEConsumer::PcrsRequired(CMemoryPool *,		   // mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-CPhysicalCTEConsumer::PosRequired(CMemoryPool *,		// mp,
-								  CExpressionHandle &,	// exprhdl,
-								  COrderSpec *,			// posRequired,
-								  ULONG,				// child_index,
-								  CDrvdPropArray *,		// pdrgpdpCtxt
-								  ULONG					// ulOptReq
+CPhysicalCTEConsumer::PosRequired(CMemoryPool *,			  // mp,
+								  CExpressionHandle &,		  // exprhdl,
+								  COrderSpec *,				  // posRequired,
+								  ULONG,					  // child_index,
+								  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+								  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalCTEConsumer has no relational children");
@@ -111,7 +111,7 @@ CPhysicalCTEConsumer::PdsRequired(CMemoryPool *,				 // mp,
 								  CExpressionHandle &,			 // exprhdl,
 								  gpos::Ref<CDistributionSpec>,	 // pdsRequired,
 								  ULONG,						 //child_index
-								  CDrvdPropArray *,				 // pdrgpdpCtxt
+								  gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
 								  ULONG							 // ulOptReq
 ) const
 {
@@ -128,12 +128,12 @@ CPhysicalCTEConsumer::PdsRequired(CMemoryPool *,				 // mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CRewindabilitySpec>
-CPhysicalCTEConsumer::PrsRequired(CMemoryPool *,		 // mp,
-								  CExpressionHandle &,	 // exprhdl,
-								  CRewindabilitySpec *,	 // prsRequired,
-								  ULONG,				 // child_index,
-								  CDrvdPropArray *,		 // pdrgpdpCtxt
-								  ULONG					 // ulOptReq
+CPhysicalCTEConsumer::PrsRequired(CMemoryPool *,			  // mp,
+								  CExpressionHandle &,		  // exprhdl,
+								  CRewindabilitySpec *,		  // prsRequired,
+								  ULONG,					  // child_index,
+								  gpos::Ref<CDrvdPropArray>,  // pdrgpdpCtxt
+								  ULONG						  // ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalCTEConsumer has no relational children");
@@ -149,12 +149,12 @@ CPhysicalCTEConsumer::PrsRequired(CMemoryPool *,		 // mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CCTEReq>
-CPhysicalCTEConsumer::PcteRequired(CMemoryPool *,		 //mp,
-								   CExpressionHandle &,	 //exprhdl,
-								   gpos::Ref<CCTEReq>,	 //pcter,
-								   ULONG,				 //child_index,
-								   CDrvdPropArray *,	 //pdrgpdpCtxt,
-								   ULONG				 //ulOptReq
+CPhysicalCTEConsumer::PcteRequired(CMemoryPool *,			   //mp,
+								   CExpressionHandle &,		   //exprhdl,
+								   gpos::Ref<CCTEReq>,		   //pcter,
+								   ULONG,					   //child_index,
+								   gpos::Ref<CDrvdPropArray>,  //pdrgpdpCtxt,
+								   ULONG					   //ulOptReq
 ) const
 {
 	GPOS_ASSERT(!"CPhysicalCTEConsumer has no relational children");

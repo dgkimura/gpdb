@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSet.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/engine/CEngine.h"
@@ -92,8 +93,8 @@ CReqdPropRelational::~CReqdPropRelational()
 void
 CReqdPropRelational::Compute(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::Ref<CReqdProp> prpInput, ULONG child_index,
-							 CDrvdPropArray *,	// pdrgpdpCtxt
-							 ULONG				// ulOptReq
+							 gpos::Ref<CDrvdPropArray>,	 // pdrgpdpCtxt
+							 ULONG						 // ulOptReq
 )
 {
 	GPOS_CHECK_ABORT;
