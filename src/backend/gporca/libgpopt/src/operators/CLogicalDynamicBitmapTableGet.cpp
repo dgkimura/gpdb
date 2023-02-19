@@ -22,6 +22,7 @@
 #include "gpopt/metadata/CPartConstraint.h"
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CExpressionHandle.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXform.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 

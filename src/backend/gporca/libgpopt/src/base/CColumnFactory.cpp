@@ -20,6 +20,7 @@
 
 #include "gpopt/base/CColRefComputed.h"
 #include "gpopt/base/CColRefTable.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CScalarProjectElement.h"
 #include "gpopt/search/CGroupExpression.h"

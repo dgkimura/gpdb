@@ -14,6 +14,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/string/CWStringConst.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/base/IDatum.h"
 #include "naucrates/dxl/xml/dxltokens.h"

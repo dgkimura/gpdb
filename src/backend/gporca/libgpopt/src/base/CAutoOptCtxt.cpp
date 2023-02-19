@@ -14,10 +14,12 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/cost/ICostModel.h"
 #include "gpopt/eval/CConstExprEvaluatorDefault.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
 #include "gpopt/search/CGroupExpression.h"
+
 
 using namespace gpopt;
 

@@ -26,6 +26,7 @@
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalDynamicGet.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CFilterStatsProcessor.h"
 #include "naucrates/statistics/CStatistics.h"
 #include "naucrates/statistics/CStatsPredUtils.h"

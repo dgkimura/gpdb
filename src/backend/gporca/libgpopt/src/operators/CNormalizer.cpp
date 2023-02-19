@@ -30,6 +30,7 @@
 #include "gpopt/operators/CScalarNAryJoinPredList.h"
 #include "gpopt/operators/CScalarProjectElement.h"
 #include "gpopt/operators/CScalarProjectList.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

@@ -21,6 +21,7 @@
 #include "gpopt/operators/CPhysicalCorrelatedInnerNLJoin.h"
 #include "gpopt/operators/CPhysicalCorrelatedLeftOuterNLJoin.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

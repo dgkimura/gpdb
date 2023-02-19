@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerXform.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXform.h"
 #include "gpopt/xforms/CXformFactory.h"

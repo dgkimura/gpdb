@@ -275,8 +275,11 @@ operator<<(IOstream &os, const CConstraint &cnstr)
 
 // hash map mapping ULONG -> CConstraint
 using UlongToConstraintMap =
-	CHashMap<ULONG, CConstraint, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<CConstraint>>;
+	//CHashMap<ULONG, CConstraint, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	//		 CleanupDelete<ULONG>, CleanupRelease<CConstraint>>;
+	gpos::UnorderedMap<const ULONG *, gpos::Ref<CConstraint>,
+					   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+					   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 }  // namespace gpopt
 
 #endif	// !GPOPT_CConstraint_H

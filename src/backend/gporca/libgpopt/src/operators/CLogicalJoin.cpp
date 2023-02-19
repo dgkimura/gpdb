@@ -19,6 +19,7 @@
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CJoinStatsProcessor.h"
 
 using namespace gpopt;

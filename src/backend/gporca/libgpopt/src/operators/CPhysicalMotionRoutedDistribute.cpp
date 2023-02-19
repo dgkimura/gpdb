@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/operators/CExpressionHandle.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

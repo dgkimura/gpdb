@@ -18,6 +18,7 @@
 #include "gpopt/base/CDrvdPropScalar.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CExpressionHandle.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/IMDTypeInt4.h"
 
 using namespace gpopt;

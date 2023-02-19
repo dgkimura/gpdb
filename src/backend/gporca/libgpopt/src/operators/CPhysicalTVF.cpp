@@ -21,6 +21,7 @@
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/metadata/CName.h"
 #include "gpopt/operators/CExpressionHandle.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -52,7 +53,7 @@ CPhysicalTVF::CPhysicalTVF(CMemoryPool *mp, gpos::Ref<IMDId> mdid_func,
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
 	if (m_func_mdid->IsValid())
 	{
-		m_pmdfunc = md_accessor->RetrieveFunc(m_func_mdid.get());
+		m_pmdfunc = md_accessor->RetrieveFunc(m_func_mdid);
 	}
 	else
 	{

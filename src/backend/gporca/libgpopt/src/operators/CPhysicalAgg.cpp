@@ -22,6 +22,7 @@
 #include "gpopt/base/CDistributionSpecStrictSingleton.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CExpressionHandle.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformUtils.h"
 
 using namespace gpopt;

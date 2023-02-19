@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/base/IComparator.h"
 #include "gpopt/operators/CPredicateUtils.h"

@@ -34,6 +34,7 @@
 #include "gpopt/search/CGroupExpression.h"
 
 
+
 using namespace gpopt;
 
 //---------------------------------------------------------------------------

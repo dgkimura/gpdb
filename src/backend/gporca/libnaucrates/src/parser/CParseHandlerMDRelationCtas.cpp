@@ -12,6 +12,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerMDRelationCtas.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLCtasStorageOptions.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"

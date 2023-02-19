@@ -14,6 +14,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/task/CWorker.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"

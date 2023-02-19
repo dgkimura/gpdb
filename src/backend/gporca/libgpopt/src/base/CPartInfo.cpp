@@ -15,9 +15,11 @@
 #include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CPartConstraint.h"
 #include "gpopt/search/CGroupExpression.h"
+
 
 using namespace gpopt;
 

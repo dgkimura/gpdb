@@ -16,6 +16,7 @@
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CExpressionHandle.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CUnionAllStatsProcessor.h"
 
 using namespace gpopt;

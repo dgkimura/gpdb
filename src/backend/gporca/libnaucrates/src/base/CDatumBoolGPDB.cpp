@@ -16,6 +16,7 @@
 #include "gpos/string/CWStringDynamic.h"
 
 #include "gpopt/base/CAutoOptCtxt.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/gpdb_types.h"

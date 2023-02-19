@@ -7,8 +7,10 @@
 
 #include "gpopt/base/CDistributionSpecNonSingleton.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/operators/CPhysicalMotionBroadcast.h"
 #include "gpopt/search/CGroupExpression.h"
+
 
 using namespace gpopt;
 

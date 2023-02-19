@@ -25,6 +25,7 @@
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/operators/CScalarConst.h"
 #include "gpopt/operators/CScalarIdent.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

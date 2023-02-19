@@ -14,9 +14,11 @@
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/engine/CEnumeratorConfig.h"
 #include "gpopt/engine/CStatisticsConfig.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 
 using namespace gpos;

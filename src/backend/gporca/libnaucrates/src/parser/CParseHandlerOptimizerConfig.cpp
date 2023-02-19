@@ -15,6 +15,7 @@
 #include "gpos/common/CBitSet.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CWindowOids.h"
 #include "gpopt/cost/ICostModel.h"
 #include "gpopt/engine/CEnumeratorConfig.h"

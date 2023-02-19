@@ -14,8 +14,10 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/search/CGroupExpression.h"
+
 
 using namespace gpopt;
 

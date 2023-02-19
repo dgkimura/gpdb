@@ -16,6 +16,7 @@
 
 #include "gpopt/base/CCTEReq.h"
 #include "gpopt/base/CColRefSetIter.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CQueryContext.h"
 #include "gpopt/operators/CExpressionPreprocessor.h"
 #include "gpopt/operators/CLogicalCTEConsumer.h"

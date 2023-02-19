@@ -17,6 +17,7 @@
 #include "gpos/task/CWorker.h"
 
 #include "gpopt/base/CColRefSet.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/CPartInfo.h"
 #include "gpopt/base/CReqdPropPlan.h"

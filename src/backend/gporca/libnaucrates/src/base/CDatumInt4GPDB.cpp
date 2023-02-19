@@ -16,6 +16,7 @@
 #include "gpos/string/CWStringDynamic.h"
 
 #include "gpopt/base/CAutoOptCtxt.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/gpdb_types.h"
@@ -39,7 +40,7 @@ CDatumInt4GPDB::CDatumInt4GPDB(CSystemId sysid, INT val, BOOL is_null)
 	: m_mdid(nullptr), m_val(val), m_is_null(is_null)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
-	gpos::Ref<IMDId> mdid = dynamic_cast<const CMDTypeInt4GPDB *>(
+	gpos::Ref<IMDId> mdid = gpos::dyn_cast<CMDTypeInt4GPDB>(
 								md_accessor->PtMDType<IMDTypeInt4>(sysid))
 								->MDId();
 	;

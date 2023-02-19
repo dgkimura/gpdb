@@ -21,6 +21,7 @@
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/IMDTypeBool.h"
 
 using namespace gpopt;

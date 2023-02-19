@@ -17,6 +17,7 @@
 
 #include "gpos/memory/CAutoMemoryPool.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
 #include "naucrates/dxl/xml/CDXLMemoryManager.h"

@@ -17,6 +17,7 @@
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CExpressionHandle.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CStatsPredUtils.h"
 
 using namespace gpopt;

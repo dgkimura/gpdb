@@ -16,8 +16,10 @@
 #include "gpos/error/CAutoTrace.h"
 
 #include "gpopt/base/CColRefSet.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/search/CGroupExpression.h"
+
 
 using namespace gpopt;
 

@@ -24,6 +24,7 @@
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/operators/CScalarCmp.h"
 #include "gpopt/operators/CScalarIsDistinctFrom.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/IMDScalarOp.h"
 
 using namespace gpopt;

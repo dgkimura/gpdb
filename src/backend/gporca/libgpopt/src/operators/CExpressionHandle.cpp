@@ -35,6 +35,7 @@
 #include "gpopt/operators/CPattern.h"
 #include "gpopt/operators/CPhysicalCTEConsumer.h"
 #include "gpopt/operators/CPhysicalScan.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
 using namespace gpnaucrates;

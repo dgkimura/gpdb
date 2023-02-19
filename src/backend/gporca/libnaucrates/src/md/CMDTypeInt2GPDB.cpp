@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/base/CDatumInt2GPDB.h"
 #include "naucrates/dxl/CDXLUtils.h"

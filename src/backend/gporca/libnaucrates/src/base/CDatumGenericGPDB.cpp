@@ -16,6 +16,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/search/CGroupExpression.h"

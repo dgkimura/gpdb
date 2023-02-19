@@ -19,6 +19,7 @@
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CLogicalUnionAll.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

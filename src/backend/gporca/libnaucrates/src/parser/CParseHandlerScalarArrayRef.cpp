@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarArrayRef.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarArrayRef.h"

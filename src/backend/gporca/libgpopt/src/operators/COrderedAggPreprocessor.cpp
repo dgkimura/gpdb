@@ -29,6 +29,7 @@
 #include "gpopt/operators/CScalarSortGroupClause.h"
 #include "gpopt/operators/CScalarValuesList.h"
 #include "gpopt/operators/CScalarWindowFunc.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformUtils.h"
 
 using namespace gpopt;
@@ -477,7 +478,7 @@ COrderedAggPreprocessor::CreateCTE(CMemoryPool *mp,
 	gpos::Ref<CColRefArray> pdrgpcrChildOutput = pcrsChildOutput->Pdrgpcr(mp);
 
 	// create a CTE producer based on SeqPrj child expression
-	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	const ULONG ulCTEId = pcteinfo->next_id();
 	gpos::Ref<CExpression> pexprCTEProd = CXformUtils::PexprAddCTEProducer(
 		mp, ulCTEId, pdrgpcrChildOutput.get(), pexprChild);

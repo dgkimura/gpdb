@@ -12,6 +12,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerLogicalLimit.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLLogicalLimit.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"

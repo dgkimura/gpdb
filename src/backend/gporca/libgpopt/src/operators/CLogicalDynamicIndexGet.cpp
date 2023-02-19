@@ -24,6 +24,7 @@
 #include "gpopt/metadata/CPartConstraint.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
 using namespace gpopt;

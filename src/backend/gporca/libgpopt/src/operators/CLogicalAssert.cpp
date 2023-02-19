@@ -20,6 +20,7 @@
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPatternTree.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
 using namespace gpopt;

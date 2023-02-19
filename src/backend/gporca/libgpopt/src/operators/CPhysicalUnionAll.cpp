@@ -10,6 +10,7 @@
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CHashedDistributions.h"
 #include "gpopt/operators/CScalarIdent.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -557,8 +558,7 @@ CPhysicalUnionAll::PdshashedDerive(CMemoryPool *mp,
 				ulChild);
 			// match mapped column positions of current child with outer child
 			equi_hash_spec_matches =
-				(nullptr != pdrgpulChild) &&
-				Equals(pdrgpulOuter.get(), pdrgpulChild.get());
+				(nullptr != pdrgpulChild) && Equals(pdrgpulOuter, pdrgpulChild);
 			;
 			pdsChildHashed = pdsChildHashed->PdshashedEquiv();
 		}

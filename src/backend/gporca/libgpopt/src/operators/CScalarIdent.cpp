@@ -18,6 +18,7 @@
 #include "gpopt/base/CColRefTable.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CScalarFunc.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;

@@ -293,7 +293,7 @@ COptimizer::PdxlnOptimize(
 			gpos::Ref<CExpression> pexprTranslated = dxltr.PexprTranslateQuery(
 				query, query_output_dxlnode_array, cte_producers);
 			GPOS_CHECK_ABORT;
-			gpdxl::gpos::Ref<ULongPtrArray> pdrgpul =
+			gpos::Ref<gpdxl::ULongPtrArray> pdrgpul =
 				dxltr.PdrgpulOutputColRefs();
 			gpmd::CMDNameArray *pdrgpmdname = dxltr.Pdrgpmdname();
 

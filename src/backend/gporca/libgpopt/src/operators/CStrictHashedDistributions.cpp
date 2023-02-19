@@ -7,6 +7,7 @@
 
 #include "gpopt/base/CDistributionSpecStrictRandom.h"
 #include "gpopt/base/CUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

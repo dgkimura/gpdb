@@ -20,6 +20,7 @@
 #include "gpopt/mdcache/CMDAccessorUtils.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CScalarFunc.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/IMDAggregate.h"
 #include "naucrates/md/IMDFunction.h"
 

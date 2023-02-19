@@ -22,6 +22,7 @@
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CTableDescriptor.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 using namespace gpos;

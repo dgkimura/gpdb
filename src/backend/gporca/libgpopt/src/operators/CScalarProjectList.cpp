@@ -19,6 +19,7 @@
 #include "gpopt/base/CDrvdPropScalar.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CScalarWindowFunc.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformUtils.h"
 #include "naucrates/md/CMDTypeInt4GPDB.h"
 

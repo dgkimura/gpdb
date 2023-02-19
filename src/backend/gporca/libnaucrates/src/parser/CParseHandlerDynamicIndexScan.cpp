@@ -17,6 +17,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerDynamicIndexScan.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"
@@ -28,7 +29,6 @@
 #include "naucrates/dxl/parser/CParseHandlerScalarOp.h"
 #include "naucrates/dxl/parser/CParseHandlerTableDescr.h"
 #include "naucrates/dxl/parser/CParseHandlerUtils.h"
-
 using namespace gpdxl;
 
 XERCES_CPP_NAMESPACE_USE

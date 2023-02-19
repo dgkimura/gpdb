@@ -16,6 +16,7 @@
 
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CExpressionHandle.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformUtils.h"
 
 using namespace gpopt;

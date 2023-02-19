@@ -6,11 +6,13 @@
 #include "gpos/common/CAutoRef.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/base/DatumLess.h"
 #include "gpopt/operators/COperator.h"
 #include "gpopt/operators/CScalarConst.h"
 #include "gpopt/search/CGroupExpression.h"
+
 
 using namespace gpopt;
 

@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CScalar.h"
 #include "gpopt/operators/CScalarProjectElement.h"

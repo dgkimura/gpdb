@@ -11,6 +11,7 @@
 
 #include "naucrates/dxl/parser/CParseHandlerScalarPartBoundInclusion.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/operators/CDXLScalarPartBoundInclusion.h"

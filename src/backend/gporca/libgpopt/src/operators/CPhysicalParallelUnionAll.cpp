@@ -11,6 +11,7 @@
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CStrictHashedDistributions.h"
+#include "gpopt/search/CGroupExpression.h"
 
 namespace gpopt
 {

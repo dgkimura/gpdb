@@ -35,6 +35,7 @@
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/operators/CScalarIdent.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/IMDCheckConstraint.h"
 #include "naucrates/md/IMDColumn.h"
 #include "naucrates/md/IMDIndex.h"

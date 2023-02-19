@@ -19,6 +19,7 @@
 #include "gpopt/base/CPartInfo.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;

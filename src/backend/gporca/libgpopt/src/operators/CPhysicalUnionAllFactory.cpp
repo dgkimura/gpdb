@@ -10,6 +10,7 @@
 #include "gpopt/exception.h"
 #include "gpopt/operators/CPhysicalParallelUnionAll.h"
 #include "gpopt/operators/CPhysicalSerialUnionAll.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformUtils.h"
 
 namespace gpopt

@@ -30,6 +30,7 @@
 #include "gpopt/exception.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CScalarIdent.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

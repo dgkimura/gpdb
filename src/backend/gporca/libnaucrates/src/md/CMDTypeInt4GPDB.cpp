@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/string/CWStringDynamic.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/base/CDatumInt4GPDB.h"
 #include "naucrates/dxl/CDXLUtils.h"
@@ -115,7 +116,7 @@ CMDTypeInt4GPDB::CreateInt4Datum(CMemoryPool *mp, INT value, BOOL is_null) const
 gpos::Ref<IMDId>
 CMDTypeInt4GPDB::MDId() const
 {
-	return m_mdid.get();
+	return m_mdid;
 }
 
 gpos::Ref<IMDId>

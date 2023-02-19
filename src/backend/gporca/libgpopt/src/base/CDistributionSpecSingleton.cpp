@@ -14,6 +14,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecHashed.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CPhysicalMotionGather.h"
 #include "gpopt/search/CGroupExpression.h"

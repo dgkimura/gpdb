@@ -18,6 +18,7 @@
 #include "gpopt/base/CDistributionSpecRandom.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CExpressionHandle.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/search/CMemo.h"
 
 using namespace gpopt;

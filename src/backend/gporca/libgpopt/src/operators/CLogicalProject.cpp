@@ -24,6 +24,7 @@
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CScalarIdent.h"
 #include "gpopt/operators/CScalarProjectElement.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 using namespace gpnaucrates;

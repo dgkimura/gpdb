@@ -31,6 +31,7 @@
 #include "gpopt/operators/CScalarCmp.h"
 #include "gpopt/operators/CScalarFunc.h"
 #include "gpopt/operators/CScalarIdent.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/md/CMDArrayCoerceCastGPDB.h"
 #include "naucrates/md/CMDIdGPDB.h"
@@ -124,8 +125,8 @@ CPredicateUtils::FComparison(gpos::Ref<CExpression> pexpr,
 BOOL
 CPredicateUtils::FComparison(
 	gpos::Ref<CExpression> pexpr, CColRef *colref,
-	CColRefSet
-		*pcrsAllowedRefs  // other column references allowed in the comparison
+	gpos::Ref<CColRefSet>
+		pcrsAllowedRefs	 // other column references allowed in the comparison
 )
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -163,8 +164,8 @@ CPredicateUtils::FComparison(
 BOOL
 CPredicateUtils::FRangeComparison(
 	gpos::Ref<CExpression> pexpr, CColRef *colref,
-	CColRefSet
-		*pcrsAllowedRefs,  // other column references allowed in the comparison
+	gpos::Ref<CColRefSet>
+		pcrsAllowedRefs,  // other column references allowed in the comparison
 	BOOL allowNotEqualPreds)
 {
 	if (!FComparison(pexpr, colref, pcrsAllowedRefs))
@@ -180,8 +181,8 @@ CPredicateUtils::FRangeComparison(
 BOOL
 CPredicateUtils::FIdentCompareOuterRefExprIgnoreCast(
 	gpos::Ref<CExpression> pexpr,
-	CColRefSet
-		*pcrsOuterRefs,	 // other column references allowed in the comparison
+	gpos::Ref<CColRefSet>
+		pcrsOuterRefs,	// other column references allowed in the comparison
 	CColRef **localColRef)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -1473,7 +1474,7 @@ CPredicateUtils::PdrgpexprAppendConjunctsDedup(
 
 	gpos::Ref<CExpressionArray> pdrgpexprConjuncts =
 		PdrgpexprConjuncts(mp, pexpr);
-	CUtils::AddRefAppend(pdrgpexprConjuncts.get(), pdrgpexpr);
+	CUtils::AddRefAppend(pdrgpexprConjuncts.get(), pdrgpexpr.get());
 
 	gpos::Ref<CExpressionArray> pdrgpexprNew =
 		CUtils::PdrgpexprDedup(mp, pdrgpexprConjuncts.get());
@@ -2611,7 +2612,7 @@ CPredicateUtils::FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
 	GPOS_ASSERT(nullptr != pexprPred);
 	GPOS_ASSERT(nullptr != pmdindex);
 
-	const gpos::Ref<IMDScalarOp> pmdobjScCmp = nullptr;
+	gpos::Ref<IMDScalarOp> pmdobjScCmp = nullptr;
 	if (COperator::EopScalarCmp == pexprPred->Pop()->Eopid())
 	{
 		gpos::Ref<CScalarCmp> popScCmp =
@@ -2900,8 +2901,7 @@ CPredicateUtils::FBitmapLookupSupportedPredicateOrConjunct(
 BOOL
 CPredicateUtils::FBuiltInComparisonIsVeryStrict(gpos::Ref<IMDId> mdid)
 {
-	const gpos::Ref<CMDIdGPDB> const pmdidGPDB =
-		gpos::dyn_cast<CMDIdGPDB>(mdid);
+	const gpos::Ref<CMDIdGPDB> pmdidGPDB = gpos::dyn_cast<CMDIdGPDB>(mdid);
 
 	GPOS_ASSERT(nullptr != pmdidGPDB);
 

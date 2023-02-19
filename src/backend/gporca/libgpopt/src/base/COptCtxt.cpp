@@ -16,6 +16,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CDefaultComparator.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/cost/ICostModel.h"
 #include "gpopt/eval/IConstExprEvaluator.h"
 #include "gpopt/optimizer/COptimizerConfig.h"

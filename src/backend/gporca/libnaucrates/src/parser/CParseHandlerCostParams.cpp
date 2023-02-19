@@ -13,6 +13,7 @@
 #include "naucrates/dxl/parser/CParseHandlerCostParams.h"
 
 #include "gpdbcost/CCostModelParamsGPDB.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/parser/CParseHandlerCostParam.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"

@@ -29,6 +29,7 @@
 #include "gpos/task/CWorker.h"
 
 #include "gpopt/base/CAutoOptCtxt.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/cost/ICostModel.h"
 #include "gpopt/engine/CEngine.h"
 #include "gpopt/engine/CEnumeratorConfig.h"
@@ -39,6 +40,7 @@
 #include "gpopt/minidump/CMiniDumperDXL.h"
 #include "gpopt/optimizer/COptimizer.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/translate/CTranslatorDXLToExpr.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/parser/CParseHandlerDXL.h"
