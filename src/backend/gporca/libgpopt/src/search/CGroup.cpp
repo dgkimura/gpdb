@@ -258,7 +258,7 @@ CGroup::CleanupContexts()
 	{
 		CAutoSuspendAbort asa;
 
-		gpos::Ref<COptimizationContext> poc = nullptr;
+		COptimizationContext *poc = nullptr;
 		ShtIter shtit(m_sht);
 
 		while (nullptr != poc || shtit.Advance())
@@ -395,11 +395,11 @@ CGroup::PocLookupBest(CMemoryPool *mp, ULONG ulSearchStages,
 //		Lookup a context by id
 //
 //---------------------------------------------------------------------------
-gpos::Ref<COptimizationContext>
+COptimizationContext *
 CGroup::Ppoc(ULONG id) const
 {
-	gpos::Ref<COptimizationContext> poc = nullptr;
-	ShtIter shtit(const_cast<gpos::Ref<CGroup> >(this)->m_sht);
+	COptimizationContext *poc = nullptr;
+	ShtIter shtit(const_cast<CGroup *>(this)->m_sht);
 	while (shtit.Advance())
 	{
 		{
@@ -431,15 +431,15 @@ CGroup::PocInsert(gpos::Ref<COptimizationContext> poc)
 {
 	ShtAcc shta(Sht(), *poc);
 
-	gpos::Ref<COptimizationContext> pocFound = shta.Find();
+	COptimizationContext *pocFound = shta.Find();
 	if (nullptr == pocFound)
 	{
 		poc->SetId((ULONG) UlpIncOptCtxts());
-		shta.Insert(poc);
+		shta.Insert(poc.get());
 		return poc;
 	}
 
-	return pocFound;
+	return pocFound->SharedFromThis();
 }
 
 
@@ -608,7 +608,7 @@ CGroup::HashValue() const
 void
 CGroup::Insert(gpos::Ref<CGroupExpression> pgexpr)
 {
-	m_listGExprs.Append(pgexpr);
+	m_listGExprs.Append(pgexpr.get());
 	gpos::Ref<COperator> pop = pgexpr->Pop();
 	if (pop->FLogical())
 	{
@@ -645,10 +645,10 @@ CGroup::Insert(gpos::Ref<CGroupExpression> pgexpr)
 void
 CGroup::MoveDuplicateGExpr(gpos::Ref<CGroupExpression> pgexpr)
 {
-	m_listGExprs.Remove(pgexpr);
+	m_listGExprs.Remove(pgexpr.get());
 	m_ulGExprs--;
 
-	m_listDupGExprs.Append(pgexpr);
+	m_listDupGExprs.Append(pgexpr.get());
 }
 
 
@@ -724,7 +724,7 @@ CGroup::PgexprFirst()
 gpos::Ref<CGroupExpression>
 CGroup::PgexprNext(gpos::Ref<CGroupExpression> pgexpr)
 {
-	return m_listGExprs.Next(pgexpr);
+	return m_listGExprs.Next(pgexpr.get());
 }
 
 
@@ -1124,11 +1124,11 @@ CGroup::CreateDummyCostContext()
 //
 //---------------------------------------------------------------------------
 void
-CGroup::RecursiveBuildTreeMap(
-	CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
-	gpos::Ref<CCostContext> pccParent,
-	gpos::Ref<CGroupExpression> pgexprCurrent, ULONG child_index,
-	CTreeMap<CCostContext::HashValue, CCostContext::Equals> *ptmap)
+CGroup::RecursiveBuildTreeMap(CMemoryPool *mp,
+							  gpos::Ref<COptimizationContext> poc,
+							  gpos::Ref<CCostContext> pccParent,
+							  gpos::Ref<CGroupExpression> pgexprCurrent,
+							  ULONG child_index, CTreeMap *ptmap)
 {
 	GPOS_ASSERT(pgexprCurrent->Pop()->FPhysical());
 	GPOS_ASSERT(nullptr != ptmap);
@@ -1201,8 +1201,7 @@ CGroup::BuildTreeMap(
 	gpos::Ref<CCostContext> pccParent,	  // NULL if we are in the Root group
 	ULONG
 		child_index,  // index used for treating group as child of parent context
-	CTreeMap<CCostContext::HashValue, CCostContext::Equals>
-		*ptmap	// map structure
+	CTreeMap *ptmap	  // map structure
 )
 {
 	GPOS_CHECK_STACK_SIZE;
@@ -1812,7 +1811,7 @@ CGroup::ResetGroupState()
 	while (nullptr != pgexpr)
 	{
 		pgexpr->ResetState();
-		pgexpr = m_listGExprs.Next(pgexpr);
+		pgexpr = m_listGExprs.Next(pgexpr.get());
 
 		GPOS_CHECK_ABORT;
 	}
@@ -2064,7 +2063,7 @@ CGroup::OsPrint(IOstream &os) const
 	while (nullptr != pgexpr)
 	{
 		(void) pgexpr->OsPrintWithPrefix(os, szPrefix);
-		pgexpr = m_listGExprs.Next(pgexpr);
+		pgexpr = m_listGExprs.Next(pgexpr.get());
 
 		GPOS_CHECK_ABORT;
 	}
@@ -2091,7 +2090,7 @@ CGroup::CostLowerBound(CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput)
 	GPOS_ASSERT(nullptr != prppInput);
 	GPOS_ASSERT(!FScalar());
 
-	CCost *pcostLowerBound = m_pcostmap->Find(prppInput);
+	const CCost *pcostLowerBound = m_pcostmap->Find(prppInput.get());
 	if (nullptr != pcostLowerBound)
 	{
 		return *pcostLowerBound;

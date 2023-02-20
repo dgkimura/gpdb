@@ -51,7 +51,7 @@ using ReqdPropPlanToCostMap =
 	//		 CReqdPropPlan::FEqualForCostBounding,
 	//		 CleanupRelease<CReqdPropPlan>, CleanupDelete<CCost>>;
 	gpos::UnorderedMap<
-		const gpos::Ref<CReqdPropPlan>, CCost,
+		const gpos::Ref<CReqdPropPlan>, const CCost *,
 		gpos::RefHash<CReqdPropPlan, CReqdPropPlan::UlHashForCostBounding>,
 		gpos::RefEq<CReqdPropPlan, CReqdPropPlan::FEqualForCostBounding>>;
 
@@ -532,7 +532,7 @@ public:
 		CMemoryPool *mp, ULONG ulSearchStages, gpos::Ref<CReqdPropPlan> prpp);
 
 	// find a context by id
-	gpos::Ref<COptimizationContext> Ppoc(ULONG id) const;
+	COptimizationContext *Ppoc(ULONG id) const;
 
 	// insert given context into contexts hash table
 	gpos::Ref<COptimizationContext> PocInsert(

@@ -185,21 +185,21 @@ public:
 	gpos::Ref<CReqdPropPlan>
 	Prpp() const
 	{
-		return m_prpp.get();
+		return m_prpp;
 	}
 
 	// required relatoinal properties accessor
 	gpos::Ref<CReqdPropRelational>
 	GetReqdRelationalProps() const
 	{
-		return m_prprel.get();
+		return m_prprel;
 	}
 
 	// stats of previously optimized expressions
 	gpos::Ref<IStatisticsArray>
 	Pdrgpstat() const
 	{
-		return m_pdrgpstatCtxt.get();
+		return m_pdrgpstatCtxt;
 	}
 
 	// search stage index accessor

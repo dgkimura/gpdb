@@ -1366,7 +1366,7 @@ CEngine::DbgPrintExpr(int group_no, int context_no)
 		gpos::Ref<CGroup> top_group = m_pmemo->Pgroup(group_no);
 		if (nullptr != top_group)
 		{
-			gpos::Ref<COptimizationContext> poc = top_group->Ppoc(context_no);
+			COptimizationContext *poc = top_group->Ppoc(context_no);
 
 			if (nullptr != poc)
 			{

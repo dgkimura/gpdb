@@ -150,7 +150,7 @@ COptimizationContext::FEqualForStats(
 
 	return pocLeft->GetReqdRelationalProps()->PcrsStat()->Equals(
 			   pocRight->GetReqdRelationalProps()->PcrsStat()) &&
-		   pocLeft->Pdrgpstat()->Equals(pocRight->Pdrgpstat());
+		   pocLeft->Pdrgpstat()->Equals(pocRight->Pdrgpstat().get());
 }
 
 
