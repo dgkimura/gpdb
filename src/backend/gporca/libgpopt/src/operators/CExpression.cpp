@@ -1196,6 +1196,26 @@ CExpression::UlHashDedup(const gpos::Ref<CExpression> pexpr)
 	return ulHash;
 }
 
+BOOL
+Equals(const gpos::Ref<CExpression> lhs, const gpos::Ref<CExpression> rhs)
+{
+	if (lhs->Arity() != rhs->Arity() || HashValue(lhs) != HashValue(rhs))
+	{
+		return false;
+	}
+
+	const ULONG arity = lhs->Arity();
+	for (ULONG ul = 0; ul < arity; ul++)
+	{
+		if (!Equals((*lhs)[ul], (*rhs)[ul]))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CExpression::PexprRehydrate

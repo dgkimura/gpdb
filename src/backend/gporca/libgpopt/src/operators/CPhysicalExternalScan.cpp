@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpecRandom.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/metadata/CName.h"
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CExpressionHandle.h"

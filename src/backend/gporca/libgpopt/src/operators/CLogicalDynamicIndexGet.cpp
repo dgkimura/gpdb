@@ -18,6 +18,7 @@
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CColRefTable.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CName.h"
@@ -119,7 +120,8 @@ CLogicalDynamicIndexGet::HashValue() const
 BOOL
 CLogicalDynamicIndexGet::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchDynamicIndex(this, pop);
+	return CUtils::FMatchDynamicIndex(
+		const_cast<CLogicalDynamicIndexGet *>(this), pop);
 }
 
 //---------------------------------------------------------------------------

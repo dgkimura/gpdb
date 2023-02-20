@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/search/CGroupExpression.h"
@@ -119,7 +120,7 @@ CPhysicalIndexScan::HashValue() const
 BOOL
 CPhysicalIndexScan::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchIndex(this, pop);
+	return CUtils::FMatchIndex(const_cast<CPhysicalIndexScan *>(this), pop);
 }
 
 //---------------------------------------------------------------------------

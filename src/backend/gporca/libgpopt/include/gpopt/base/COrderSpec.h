@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/Ref.h"
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRef.h"
@@ -21,10 +22,21 @@
 #include "gpopt/base/CPropSpec.h"
 #include "naucrates/md/IMDId.h"
 
+namespace gpos
+{
+// ugh... forward declare
+template <class T>
+class Vector;
+
+template <class T>
+class Ref;
+}  // namespace gpos
+
 namespace gpopt
 {
 // type definition of corresponding dynamic pointer array
 class COrderSpec;
+
 using COrderSpecArray = gpos::Vector<gpos::Ref<COrderSpec>>;
 
 using namespace gpos;

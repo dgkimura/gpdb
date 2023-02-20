@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CDrvdPropRelational.h"
 #include "gpopt/base/CReqdPropRelational.h"
 #include "gpopt/operators/CExpression.h"

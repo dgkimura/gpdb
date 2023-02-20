@@ -18,6 +18,7 @@
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CDistributionSpecRandom.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CName.h"
 #include "gpopt/metadata/CTableDescriptor.h"
@@ -60,7 +61,8 @@ CPhysicalDynamicTableScan::CPhysicalDynamicTableScan(
 BOOL
 CPhysicalDynamicTableScan::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchDynamicScan(this, pop);
+	return CUtils::FMatchDynamicScan(
+		const_cast<CPhysicalDynamicTableScan *>(this), pop);
 }
 
 //---------------------------------------------------------------------------

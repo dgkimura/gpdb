@@ -38,15 +38,22 @@ class CExpressionPreprocessor
 private:
 	// map CTE id to collected predicates
 	using CTEPredsMap =
-		CHashMap<ULONG, CExpressionArray, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CExpressionArray>>;
+		//CHashMap<ULONG, CExpressionArray, gpos::HashValue<ULONG>,
+		//		 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//		 CleanupRelease<CExpressionArray>>;
+		gpos::UnorderedMap<const ULONG *, gpos::Ref<CExpressionArray>,
+						   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+						   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 	// iterator for map of CTE id to collected predicates
 	using CTEPredsMapIter =
-		CHashMapIter<ULONG, CExpressionArray, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupRelease<CExpressionArray>>;
+		//CHashMapIter<ULONG, CExpressionArray, gpos::HashValue<ULONG>,
+		//			 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//			 CleanupRelease<CExpressionArray>>;
+		gpos::UnorderedMap<
+			const ULONG *, gpos::Ref<CExpressionArray>,
+			gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+			gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 	// generate a conjunction of equality predicates between the columns in the given set
 	static gpos::Ref<CExpression> PexprConjEqualityPredicates(
@@ -165,7 +172,7 @@ private:
 	// collect CTE predicates from consumers
 	static void CollectCTEPredicates(CMemoryPool *mp,
 									 gpos::Ref<CExpression> pexpr,
-									 CTEPredsMap *phm);
+									 gpos::Ref<CTEPredsMap> phm);
 
 	// imply new predicates on LOJ's inner child based on constraints derived from LOJ's outer child and join predicate
 	static gpos::Ref<CExpression> PexprWithImpliedPredsOnLOJInnerChild(

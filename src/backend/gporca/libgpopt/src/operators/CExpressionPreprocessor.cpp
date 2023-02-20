@@ -20,6 +20,7 @@
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CColRefTable.h"
 #include "gpopt/base/CConstraintInterval.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/exception.h"
@@ -451,7 +452,7 @@ CExpressionPreprocessor::PexprRemoveSuperfluousDistinctInDQA(
 	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (COperator::EopLogicalGbAgg == pop->Eopid())
 	{
-		const gpos::Ref<CExpression> const pexprProjectList = (*pexpr)[1];
+		const gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 		GPOS_ASSERT(COperator::EopScalarProjectList ==
 					pexprProjectList->Pop()->Eopid());
 		const ULONG arity = pexprProjectList->Arity();
@@ -1990,7 +1991,7 @@ CExpressionPreprocessor::PexprRemoveUnusedCTEs(CMemoryPool *mp,
 void
 CExpressionPreprocessor::CollectCTEPredicates(CMemoryPool *mp,
 											  gpos::Ref<CExpression> pexpr,
-											  CTEPredsMap *phm)
+											  gpos::Ref<CTEPredsMap> phm)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -2049,7 +2050,7 @@ CExpressionPreprocessor::AddPredsToCTEProducers(CMemoryPool *mp,
 	gpos::Ref<CTEPredsMap> phm = GPOS_NEW(mp) CTEPredsMap(mp);
 	CollectCTEPredicates(mp, pexpr, phm);
 
-	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	CTEPredsMapIter mi(phm.get());
 	while (mi.Advance())
 	{
@@ -2059,8 +2060,7 @@ CExpressionPreprocessor::AddPredsToCTEProducers(CMemoryPool *mp,
 		GPOS_ASSERT(nullptr != pexprProducer);
 
 		ULONG ulConsumers = pcteinfo->UlConsumers(ulCTEId);
-		gpos::Ref<CExpressionArray> pdrgpexpr =
-			const_cast<gpos::Ref<CExpressionArray> >(mi.Value());
+		gpos::Ref<CExpressionArray> pdrgpexpr = mi.Value();
 
 		// skip the propagation of predicate contains volatile function e.g. random() (value change within a scan)
 		if (CPredicateUtils::FContainsVolatileFunction(pdrgpexpr))

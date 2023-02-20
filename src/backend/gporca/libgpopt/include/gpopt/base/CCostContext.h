@@ -198,7 +198,7 @@ public:
 	gpos::Ref<IStatistics>
 	Pstats() const
 	{
-		return m_pstats.get();
+		return m_pstats;
 	}
 
 	// check if we need to derive stats for this context

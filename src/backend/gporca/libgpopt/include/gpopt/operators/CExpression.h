@@ -186,7 +186,7 @@ public:
 	gpos::Ref<CExpressionArray>
 	PdrgPexpr() const
 	{
-		return m_pdrgpexpr.get();
+		return m_pdrgpexpr;
 	}
 
 	// accessor for origin group expression
@@ -289,6 +289,9 @@ public:
 
 	// static hash function
 	static ULONG UlHashDedup(const gpos::Ref<CExpression> pexpr);
+
+	static BOOL Equals(const gpos::Ref<CExpression> lhs,
+					   const gpos::Ref<CExpression> rhs);
 
 	// rehydrate expression from a given cost context and child expressions
 	static gpos::Ref<CExpression> PexprRehydrate(

@@ -22,6 +22,7 @@
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CColRefTable.h"
 #include "gpopt/base/CConstraintInterval.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/exception.h"
 #include "gpopt/mdcache/CMDAccessor.h"
@@ -102,7 +103,7 @@ CExpressionUtils::AppendChildren(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 
 	gpos::Ref<CExpressionArray> pdrgpexprChildren =
 		PdrgpexprUnnestChildren(mp, pexpr);
-	CUtils::AddRefAppend(pdrgpexpr, pdrgpexprChildren.get());
+	CUtils::AddRefAppend(pdrgpexpr.get(), pdrgpexprChildren.get());
 	;
 }
 

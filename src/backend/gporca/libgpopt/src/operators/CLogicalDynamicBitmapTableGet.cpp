@@ -19,6 +19,7 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/metadata/CPartConstraint.h"
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -107,7 +108,8 @@ CLogicalDynamicBitmapTableGet::HashValue() const
 BOOL
 CLogicalDynamicBitmapTableGet::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchDynamicBitmapScan(this, pop);
+	return CUtils::FMatchDynamicBitmapScan(
+		const_cast<CLogicalDynamicBitmapTableGet *>(this), pop);
 }
 
 

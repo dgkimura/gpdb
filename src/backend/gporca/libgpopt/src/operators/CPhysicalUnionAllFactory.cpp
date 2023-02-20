@@ -7,6 +7,7 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/exception.h"
 #include "gpopt/operators/CPhysicalParallelUnionAll.h"
 #include "gpopt/operators/CPhysicalSerialUnionAll.h"

@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/cost/ICostModel.h"
@@ -122,7 +123,8 @@ CPhysicalDynamicIndexScan::HashValue() const
 BOOL
 CPhysicalDynamicIndexScan::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchDynamicIndex(this, pop);
+	return CUtils::FMatchDynamicIndex(
+		const_cast<CPhysicalDynamicIndexScan *>(this), pop);
 }
 
 //---------------------------------------------------------------------------

@@ -65,13 +65,13 @@ public:
 	}
 
 	// conversion function
-	static CPatternNode *
+	static gpos::Ref<CPatternNode>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(COperator::EopPatternNode == pop->Eopid());
 
-		return static_cast<CPatternNode *>(pop);
+		return gpos::dyn_cast<CPatternNode>(pop);
 	}
 
 	// ident accessors

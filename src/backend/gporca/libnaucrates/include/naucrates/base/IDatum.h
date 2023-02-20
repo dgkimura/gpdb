@@ -30,8 +30,11 @@ class IDatum;
 
 // hash map mapping ULONG -> Datum
 using UlongToIDatumMap =
-	CHashMap<ULONG, IDatum, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<IDatum>>;
+	//CHashMap<ULONG, IDatum, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	//		 CleanupDelete<ULONG>, CleanupRelease<IDatum>>;
+	gpos::UnorderedMap<const ULONG *, gpos::Ref<IDatum>,
+					   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+					   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 //---------------------------------------------------------------------------
 //	@class:

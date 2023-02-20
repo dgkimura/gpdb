@@ -20,6 +20,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpec.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CName.h"
 #include "gpopt/metadata/CPartConstraint.h"
@@ -65,7 +66,8 @@ CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan(
 BOOL
 CPhysicalDynamicBitmapTableScan::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchDynamicBitmapScan(this, pop);
+	return CUtils::FMatchDynamicBitmapScan(
+		const_cast<CPhysicalDynamicBitmapTableScan *>(this), pop);
 }
 
 //---------------------------------------------------------------------------

@@ -20,6 +20,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CDistributionSpec.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CTableDescriptor.h"
 #include "gpopt/search/CGroupExpression.h"
@@ -77,7 +78,8 @@ CPhysicalBitmapTableScan::HashValue() const
 BOOL
 CPhysicalBitmapTableScan::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchBitmapScan(this, pop);
+	return CUtils::FMatchBitmapScan(
+		const_cast<CPhysicalBitmapTableScan *>(this), pop);
 }
 
 

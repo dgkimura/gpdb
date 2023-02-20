@@ -45,21 +45,31 @@ class CExpressionFactorizer
 private:
 	// map expression to a count, used in factorization
 	using ExprMap =
-		CHashMap<CExpression, ULONG, CExpression::HashValue, CUtils::Equals,
-				 CleanupRelease<CExpression>, CleanupDelete<ULONG>>;
+		//CHashMap<CExpression, ULONG, CExpression::HashValue, CUtils::Equals,
+		//		 CleanupRelease<CExpression>, CleanupDelete<ULONG>>;
+		gpos::UnorderedMap<const gpos::Ref<CExpression>, ULONG *,
+						   gpos::RefHash<CExpression, CExpression::HashValue>,
+						   gpos::RefEq<CExpression, CExpression::Equals>>;
 
 	// map operators to an array of expression arrays, corresponding to
 	// a disjunction of expressions on columns created by that operator
 	using SourceToArrayPosMap =
-		CHashMap<ULONG, CExpressionArrays, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CExpressionArrays>>;
+		//CHashMap<ULONG, CExpressionArrays, gpos::HashValue<ULONG>,
+		//		 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//		 CleanupRelease<CExpressionArrays>>;
+		gpos::UnorderedMap<const ULONG *, gpos::Ref<CExpressionArrays>,
+						   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+						   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 	// iterator for map of operator to disjunctive form representation
 	using SourceToArrayPosMapIter =
-		CHashMapIter<ULONG, CExpressionArrays, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupRelease<CExpressionArrays>>;
+		//CHashMapIter<ULONG, CExpressionArrays, gpos::HashValue<ULONG>,
+		//			 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
+		//			 CleanupRelease<CExpressionArrays>>;
+		gpos::UnorderedMap<
+			const ULONG *, gpos::Ref<CExpressionArrays>,
+			gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+			gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 	// map columns to an array of expression arrays, corresponding to
 	// a disjunction of expressions using that column

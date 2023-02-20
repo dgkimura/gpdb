@@ -102,7 +102,7 @@ CExpressionHandle::FStatsDerived() const
 	gpos::Ref<IStatistics> stats = nullptr;
 	if (nullptr != m_pexpr)
 	{
-		stats = const_cast<gpos::Ref<IStatistics> >(m_pexpr->Pstats());
+		stats = m_pexpr->Pstats();
 	}
 	else
 	{
@@ -128,8 +128,7 @@ CExpressionHandle::FStatsDerived() const
 		gpos::Ref<IStatistics> child_stats = nullptr;
 		if (nullptr != m_pexpr)
 		{
-			child_stats =
-				const_cast<gpos::Ref<IStatistics> >((*m_pexpr)[ul]->Pstats());
+			child_stats = (*m_pexpr)[ul]->Pstats();
 		}
 		else
 		{
@@ -168,7 +167,7 @@ CExpressionHandle::CopyStats()
 	gpos::Ref<IStatistics> stats = nullptr;
 	if (nullptr != m_pexpr)
 	{
-		stats = const_cast<gpos::Ref<IStatistics> >(m_pexpr->Pstats());
+		stats = m_pexpr->Pstats();
 	}
 	else
 	{
@@ -191,8 +190,7 @@ CExpressionHandle::CopyStats()
 		gpos::Ref<IStatistics> child_stats = nullptr;
 		if (nullptr != m_pexpr)
 		{
-			child_stats =
-				const_cast<gpos::Ref<IStatistics> >((*m_pexpr)[ul]->Pstats());
+			child_stats = (*m_pexpr)[ul]->Pstats();
 		}
 		else
 		{
@@ -352,7 +350,7 @@ CExpressionHandle::PdrgpstatOuterRefs(
 	if (gpos::ulong_max != ulStartIndex)
 	{
 		// copy stats starting from index of outer-most stats object referenced by child
-		CUtils::AddRefAppend(pdrgpstatResult.get(), statistics_array,
+		CUtils::AddRefAppend(pdrgpstatResult.get(), statistics_array.get(),
 							 ulStartIndex);
 	}
 
@@ -430,7 +428,7 @@ CExpressionHandle::DeriveStats(gpos::Ref<IStatisticsArray> stats_ctxt,
 	// copy input context
 	gpos::Ref<IStatisticsArray> pdrgpstatCurrentCtxt =
 		GPOS_NEW(m_mp) IStatisticsArray(m_mp);
-	CUtils::AddRefAppend(pdrgpstatCurrentCtxt.get(), stats_ctxt);
+	CUtils::AddRefAppend(pdrgpstatCurrentCtxt.get(), stats_ctxt.get());
 
 	// create array of children stats
 	m_pdrgpstat = GPOS_NEW(m_mp) IStatisticsArray(m_mp);
@@ -1082,7 +1080,7 @@ CExpressionHandle::Pstats(ULONG child_index) const
 {
 	GPOS_ASSERT(child_index < m_pdrgpstat->Size());
 
-	return (*m_pdrgpstat)[child_index].get();
+	return (*m_pdrgpstat)[child_index];
 }
 
 
@@ -1749,7 +1747,7 @@ CExpressionHandle::Pdp() const
 gpos::Ref<IStatistics>
 CExpressionHandle::Pstats()
 {
-	return m_pstats.get();
+	return m_pstats;
 }
 
 // The below functions use on-demand property derivation

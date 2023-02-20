@@ -16,6 +16,7 @@
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/base/CColRefSet.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CDrvdPropScalar.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CScalarWindowFunc.h"

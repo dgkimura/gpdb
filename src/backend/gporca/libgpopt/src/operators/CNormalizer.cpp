@@ -15,6 +15,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CLogical.h"
@@ -1334,7 +1335,7 @@ CNormalizer::PexprPullUpAndCombineProjects(
 		;
 
 		CUtils::AddRefAppend(pdrgpexprPrElPullUp.get(),
-							 pexprPrLOld->PdrgPexpr());
+							 pexprPrLOld->PdrgPexpr().get());
 		;
 		gpos::Ref<CExpression> pexprPrjList =
 			GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp),
@@ -1394,8 +1395,8 @@ gpos::Ref<CExpression>
 CNormalizer::PexprPullUpProjectElements(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 	gpos::Ref<CColRefSet> pcrsUsed, gpos::Ref<CColRefSet> pcrsOutput,
-	CExpressionArray
-		*pdrgpexprPrElPullUp  // output: the pulled-up project elements
+	gpos::Ref<CExpressionArray>
+		pdrgpexprPrElPullUp	 // output: the pulled-up project elements
 )
 {
 	GPOS_ASSERT(nullptr != pexpr);

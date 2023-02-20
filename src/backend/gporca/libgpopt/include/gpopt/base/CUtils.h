@@ -1334,7 +1334,7 @@ CUtils::FMatchIndex(T *pop1, gpos::Ref<COperator> pop2)
 		return false;
 	}
 
-	T *popIndex = gpos::dyn_cast<T>(pop2);
+	T *popIndex = gpos::dyn_cast<T>(pop2).get();
 
 	return pop1->UlOriginOpId() == popIndex->UlOriginOpId() &&
 		   pop1->Ptabdesc()->MDId()->Equals(popIndex->Ptabdesc()->MDId()) &&
@@ -1359,7 +1359,7 @@ CUtils::FMatchDynamicIndex(T *pop1, gpos::Ref<COperator> pop2)
 		return false;
 	}
 
-	T *popIndex2 = gpos::dyn_cast<T>(pop2);
+	T *popIndex2 = gpos::dyn_cast<T>(pop2).get();
 
 	// match if the index descriptors are identical
 	// we will compare MDIds, so both indexes should be partial or non-partial.
@@ -1394,7 +1394,7 @@ CUtils::FMatchDynamicScan(T *pop1, gpos::Ref<COperator> pop2)
 		return false;
 	}
 
-	T *popScan2 = gpos::dyn_cast<T>(pop2);
+	T *popScan2 = gpos::dyn_cast<T>(pop2).get();
 
 	// match if the table descriptors are identical
 	// Possible improvement:
@@ -1424,7 +1424,7 @@ CUtils::FMatchDynamicBitmapScan(T *pop1, gpos::Ref<COperator> pop2)
 		return false;
 	}
 
-	T *popDynamicBitmapScan2 = gpos::dyn_cast<T>(pop2);
+	T *popDynamicBitmapScan2 = gpos::dyn_cast<T>(pop2).get();
 
 	return pop1->UlOriginOpId() == popDynamicBitmapScan2->UlOriginOpId() &&
 		   FMatchDynamicScan(
@@ -1450,7 +1450,7 @@ CUtils::FMatchBitmapScan(T *pop1, gpos::Ref<COperator> pop2)
 		return false;
 	}
 
-	T *popScan2 = gpos::dyn_cast<T>(pop2);
+	T *popScan2 = gpos::dyn_cast<T>(pop2).get();
 
 	return pop1->UlOriginOpId() == popScan2->UlOriginOpId() &&
 		   pop1->Ptabdesc()->MDId()->Equals(popScan2->Ptabdesc()->MDId()) &&

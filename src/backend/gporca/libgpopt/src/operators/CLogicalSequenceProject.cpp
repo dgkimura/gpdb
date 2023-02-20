@@ -18,6 +18,7 @@
 #include "gpopt/base/CDistributionSpec.h"
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CExpressionHandle.h"
@@ -199,8 +200,7 @@ CLogicalSequenceProject::SetHasFrameSpecs(CMemoryPool *mp)
 	if (0 == ulFrameSpecs)
 	{
 		// if no frame specs are given, we add one empty frame
-		gpos::Ref<CWindowFrame> pwf =
-			const_cast<gpos::Ref<CWindowFrame> >(CWindowFrame::PwfEmpty(mp));
+		gpos::Ref<CWindowFrame> pwf = CWindowFrame::PwfEmpty(mp);
 		;
 		m_pdrgpwf->Append(pwf);
 	}
