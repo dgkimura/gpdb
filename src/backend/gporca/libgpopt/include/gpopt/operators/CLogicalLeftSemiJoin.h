@@ -102,7 +102,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// promise level for stat derivation
 	EStatPromise

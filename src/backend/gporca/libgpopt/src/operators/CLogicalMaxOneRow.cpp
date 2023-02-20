@@ -95,7 +95,7 @@ CLogicalMaxOneRow::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalMaxOneRow::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								IStatisticsArray *	// stats_ctxt
+								gpos::Ref<IStatisticsArray>	 // stats_ctxt
 ) const
 {
 	// no more than one row can be produced by operator, scale down input statistics accordingly

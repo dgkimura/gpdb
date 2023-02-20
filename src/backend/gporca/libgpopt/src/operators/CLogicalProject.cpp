@@ -346,7 +346,7 @@ CLogicalProject::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalProject::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							  IStatisticsArray *  // stats_ctxt
+							  gpos::Ref<IStatisticsArray>  // stats_ctxt
 ) const
 {
 	gpos::Ref<UlongToIDatumMap> phmuldatum = GPOS_NEW(mp) UlongToIDatumMap(mp);

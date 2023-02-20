@@ -190,7 +190,7 @@ CLogicalUnionAll::PstatsDeriveUnionAll(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalUnionAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   IStatisticsArray *  // not used
+							   gpos::Ref<IStatisticsArray>	// not used
 ) const
 {
 	GPOS_ASSERT(EspNone < Esp(exprhdl));

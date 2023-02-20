@@ -311,7 +311,7 @@ CLogicalRowTrigger::PxfsCandidates(CMemoryPool *mp) const
 gpos::Ref<IStatistics>
 CLogicalRowTrigger::PstatsDerive(CMemoryPool *,	 // mp,
 								 CExpressionHandle &exprhdl,
-								 IStatisticsArray *	 // not used
+								 gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	return PstatsPassThruOuter(exprhdl);

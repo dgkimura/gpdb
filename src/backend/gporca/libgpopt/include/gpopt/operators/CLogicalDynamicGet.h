@@ -159,7 +159,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// derive stats from base table using filters on partition and/or index columns
 	gpos::Ref<IStatistics> PstatsDeriveFilter(

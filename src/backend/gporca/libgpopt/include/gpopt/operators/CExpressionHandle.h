@@ -86,7 +86,7 @@ private:
 
 	// return an array of stats objects starting from the first stats object referenced by child
 	gpos::Ref<IStatisticsArray> PdrgpstatOuterRefs(
-		IStatisticsArray *statistics_array, ULONG child_index);
+		gpos::Ref<IStatisticsArray> statistics_array, ULONG child_index);
 
 	// check if stats are derived for attached expression and its children
 	BOOL FStatsDerived() const;
@@ -98,7 +98,7 @@ private:
 	BOOL FAttachedToLeafPattern() const;
 
 	// stat derivation at root operator where handle is attached
-	void DeriveRootStats(IStatisticsArray *stats_ctxt);
+	void DeriveRootStats(gpos::Ref<IStatisticsArray> stats_ctxt);
 
 public:
 	CExpressionHandle(const CExpressionHandle &) = delete;
@@ -122,7 +122,7 @@ public:
 	void DeriveProps(gpos::Ref<CDrvdPropCtxt> pdpctxt);
 
 	// recursive stats derivation
-	void DeriveStats(IStatisticsArray *stats_ctxt,
+	void DeriveStats(gpos::Ref<IStatisticsArray> stats_ctxt,
 					 BOOL fComputeRootStats = true);
 
 	// stats derivation for attached cost context
@@ -131,7 +131,7 @@ public:
 	// stats derivation using given properties and context
 	void DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 					 gpos::Ref<CReqdPropRelational> prprel,
-					 IStatisticsArray *stats_ctxt) const;
+					 gpos::Ref<IStatisticsArray> stats_ctxt) const;
 
 	// derive the properties of the plan carried by attached cost context,
 	// using default CDrvdPropCtxtPlan

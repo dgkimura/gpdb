@@ -124,10 +124,9 @@ CJoinStatsProcessor::JoinHistograms(
 
 //	derive statistics for the given join's predicate(s)
 gpos::Ref<IStatistics>
-CJoinStatsProcessor::CalcAllJoinStats(CMemoryPool *mp,
-									  IStatisticsArray *statistics_array,
-									  gpos::Ref<CExpression> expr,
-									  gpos::Ref<COperator> pop)
+CJoinStatsProcessor::CalcAllJoinStats(
+	CMemoryPool *mp, gpos::Ref<IStatisticsArray> statistics_array,
+	gpos::Ref<CExpression> expr, gpos::Ref<COperator> pop)
 {
 	GPOS_ASSERT(nullptr != expr);
 	GPOS_ASSERT(nullptr != statistics_array);
@@ -537,7 +536,7 @@ CJoinStatsProcessor::JoinStatsAreEmpty(
 gpos::Ref<IStatistics>
 CJoinStatsProcessor::DeriveJoinStats(CMemoryPool *mp,
 									 CExpressionHandle &exprhdl,
-									 IStatisticsArray *stats_ctxt)
+									 gpos::Ref<IStatisticsArray> stats_ctxt)
 {
 	GPOS_ASSERT(CLogical::EspNone <
 				gpos::dyn_cast<CLogical>(exprhdl.Pop())->Esp(exprhdl));
@@ -661,7 +660,7 @@ CJoinStatsProcessor::DeriveStatsWithOuterRefs(
 		expr,  // scalar condition to be used for stats derivation
 	gpos::Ref<IStatistics>
 		stats,	// statistics object of the attached expression
-	IStatisticsArray *
+	gpos::Ref<IStatisticsArray>
 		all_outer_stats	 // array of stats objects where outer references are defined
 )
 {

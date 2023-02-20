@@ -54,7 +54,7 @@ public:
 	Matches(gpos::Ref<COperator> pop) const override
 	{
 		return Eopid() == pop->Eopid() &&
-			   m_match == static_cast<CPatternNode *>(pop)->m_match;
+			   m_match == static_cast<CPatternNode *>(pop.get())->m_match;
 	}
 
 	// check if operator is a pattern leaf

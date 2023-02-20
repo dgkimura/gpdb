@@ -180,9 +180,9 @@ CLogicalBitmapTableGet::DerivePropertyConstraint(
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CLogicalBitmapTableGet::PstatsDerive(CMemoryPool *mp,
-									 CExpressionHandle &exprhdl,
-									 IStatisticsArray *stats_ctxt) const
+CLogicalBitmapTableGet::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	return CStatisticsUtils::DeriveStatsForBitmapTableGet(mp, exprhdl,
 														  stats_ctxt);

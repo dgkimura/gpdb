@@ -915,7 +915,8 @@ CEngine::PocChild(
 		&exprhdlRel,  // handle to compute required relational properties
 	gpos::Ref<CDrvdPropArray>
 		pdrgpdpChildren,  // derived plan properties of optimized children
-	IStatisticsArray *pdrgpstatCurrentCtxt, ULONG child_index, ULONG ulOptReq)
+	gpos::Ref<IStatisticsArray> pdrgpstatCurrentCtxt, ULONG child_index,
+	ULONG ulOptReq)
 {
 	GPOS_ASSERT(exprhdlPlan.Pgexpr() == pgexpr);
 	GPOS_ASSERT(nullptr != pocOrigin);
@@ -931,7 +932,7 @@ CEngine::PocChild(
 	// use current stats for optimizing current child
 	gpos::Ref<IStatisticsArray> stats_ctxt =
 		GPOS_NEW(m_mp) IStatisticsArray(m_mp);
-	CUtils::AddRefAppend(stats_ctxt.get(), pdrgpstatCurrentCtxt);
+	CUtils::AddRefAppend(stats_ctxt.get(), pdrgpstatCurrentCtxt.get());
 
 	// compute required relational properties
 	gpos::Ref<CReqdPropRelational> prprel = nullptr;
@@ -971,8 +972,9 @@ CEngine::PccOptimizeChild(
 	CExpressionHandle &exprhdlRel,
 	gpos::Ref<COptimizationContext>
 		pocOrigin,	// optimization context of parent operator
-	gpos::Ref<CDrvdPropArray> pdrgpdp, IStatisticsArray *pdrgpstatCurrentCtxt,
-	ULONG child_index, ULONG ulOptReq)
+	gpos::Ref<CDrvdPropArray> pdrgpdp,
+	gpos::Ref<IStatisticsArray> pdrgpstatCurrentCtxt, ULONG child_index,
+	ULONG ulOptReq)
 {
 	gpos::Ref<CGroupExpression> pgexpr = exprhdl.Pgexpr();
 	gpos::Ref<CGroup> pgroupChild = (*exprhdl.Pgexpr())[child_index];
@@ -1055,7 +1057,8 @@ CEngine::PdrgpocOptimizeChildren(
 	// initialize current stats context with input stats context
 	gpos::Ref<IStatisticsArray> pdrgpstatCurrentCtxt =
 		GPOS_NEW(m_mp) IStatisticsArray(m_mp);
-	CUtils::AddRefAppend(pdrgpstatCurrentCtxt.get(), pocOrigin->Pdrgpstat());
+	CUtils::AddRefAppend(pdrgpstatCurrentCtxt.get(),
+						 pocOrigin->Pdrgpstat().get());
 
 	// initialize required relational properties computation
 	CExpressionHandle exprhdlRel(m_mp);

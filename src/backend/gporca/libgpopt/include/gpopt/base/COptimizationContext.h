@@ -196,7 +196,7 @@ public:
 	}
 
 	// stats of previously optimized expressions
-	IStatisticsArray *
+	gpos::Ref<IStatisticsArray>
 	Pdrgpstat() const
 	{
 		return m_pdrgpstatCtxt.get();

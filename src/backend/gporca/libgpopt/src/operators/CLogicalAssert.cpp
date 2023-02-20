@@ -165,7 +165,7 @@ CLogicalAssert::DeriveMaxCard(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalAssert::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 IStatisticsArray *	 // not used
+							 gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	CMaxCard maxcard = gpos::dyn_cast<CLogicalAssert>(exprhdl.Pop())

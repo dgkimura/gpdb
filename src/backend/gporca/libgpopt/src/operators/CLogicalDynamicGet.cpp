@@ -262,7 +262,7 @@ CLogicalDynamicGet::OsPrint(IOstream &os) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalDynamicGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 IStatisticsArray *	 // not used
+								 gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	gpos::Ref<CReqdPropRelational> prprel =

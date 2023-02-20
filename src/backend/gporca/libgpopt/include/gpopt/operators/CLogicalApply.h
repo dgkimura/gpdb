@@ -109,7 +109,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics>
 	PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-				 IStatisticsArray *	 // stats_ctxt
+				 gpos::Ref<IStatisticsArray>  // stats_ctxt
 	) const override
 	{
 		// we should use stats from the corresponding Join tree if decorrelation succeeds

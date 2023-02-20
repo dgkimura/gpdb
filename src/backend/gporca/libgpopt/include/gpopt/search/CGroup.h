@@ -299,8 +299,8 @@ private:
 	static CLogical::EStatPromise EspDerive(
 		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 		gpos::Ref<CGroupExpression> pgexpr,
-		gpos::Ref<CReqdPropRelational> prprel, IStatisticsArray *stats_ctxt,
-		BOOL fDeriveChildStats);
+		gpos::Ref<CReqdPropRelational> prprel,
+		gpos::Ref<IStatisticsArray> stats_ctxt, BOOL fDeriveChildStats);
 
 	// reset computed stats
 	void ResetStats();
@@ -328,7 +328,7 @@ private:
 	gpos::Ref<CGroupExpression> PgexprBestPromise(
 		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 		gpos::Ref<CReqdPropRelational> prprelInput,
-		IStatisticsArray *stats_ctxt);
+		gpos::Ref<IStatisticsArray> stats_ctxt);
 
 public:
 	CGroup(const CGroup &) = delete;
@@ -575,7 +575,8 @@ public:
 	// derive statistics recursively on group
 	gpos::Ref<IStatistics> PstatsRecursiveDerive(
 		CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
-		gpos::Ref<CReqdPropRelational> prprel, IStatisticsArray *stats_ctxt);
+		gpos::Ref<CReqdPropRelational> prprel,
+		gpos::Ref<IStatisticsArray> stats_ctxt);
 
 	// find group expression with best stats promise and the same given children
 	gpos::Ref<CGroupExpression> PgexprBestPromise(

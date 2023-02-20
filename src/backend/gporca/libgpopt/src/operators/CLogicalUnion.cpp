@@ -145,7 +145,7 @@ CLogicalUnion::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalUnion::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							IStatisticsArray *	// not used
+							gpos::Ref<IStatisticsArray>	 // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);

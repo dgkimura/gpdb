@@ -86,7 +86,7 @@ CLogicalIndexApply::Matches(gpos::Ref<COperator> pop) const
 
 gpos::Ref<IStatistics>
 CLogicalIndexApply::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 IStatisticsArray *	 // stats_ctxt
+								 gpos::Ref<IStatisticsArray>  // stats_ctxt
 ) const
 {
 	GPOS_ASSERT(EspNone < Esp(exprhdl));

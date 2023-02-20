@@ -233,7 +233,7 @@ public:
 
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(gpos::Ref<CReqdPropRelational> prprel,
-										IStatisticsArray *stats_ctxt);
+										gpos::Ref<IStatisticsArray> stats_ctxt);
 
 	// reset a derived property
 	void ResetDerivedProperty(CDrvdProp::EPropType ept);

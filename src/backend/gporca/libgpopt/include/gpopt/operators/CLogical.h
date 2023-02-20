@@ -267,7 +267,7 @@ public:
 	// derive statistics
 	virtual gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const = 0;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const = 0;
 
 	// promise level for stat derivation
 	virtual EStatPromise Esp(CExpressionHandle &) const = 0;

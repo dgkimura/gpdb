@@ -148,7 +148,7 @@ CLogicalSelect::DeriveMaxCard(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalSelect::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							 IStatisticsArray *stats_ctxt) const
+							 gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);
 	gpos::Ref<IStatistics> child_stats = exprhdl.Pstats(0);

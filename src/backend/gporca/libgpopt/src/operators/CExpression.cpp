@@ -537,7 +537,7 @@ CExpression::PdpDerive(
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CExpression::PstatsDerive(gpos::Ref<CReqdPropRelational> prprel,
-						  IStatisticsArray *stats_ctxt)
+						  gpos::Ref<IStatisticsArray> stats_ctxt)
 {
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != prprel);

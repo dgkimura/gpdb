@@ -219,9 +219,9 @@ CLogicalDynamicIndexGet::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 
 gpos::Ref<IStatistics>
-CLogicalDynamicIndexGet::PstatsDerive(CMemoryPool *mp,
-									  CExpressionHandle &exprhdl,
-									  IStatisticsArray *stats_ctxt) const
+CLogicalDynamicIndexGet::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	return CStatisticsUtils::DeriveStatsForIndexGet(mp, exprhdl, stats_ctxt);
 }

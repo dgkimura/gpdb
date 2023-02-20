@@ -318,7 +318,7 @@ CLogicalTVF::DeriveMaxCard(CMemoryPool *,		// mp
 
 gpos::Ref<IStatistics>
 CLogicalTVF::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  IStatisticsArray *  // stats_ctxt
+						  gpos::Ref<IStatisticsArray>  // stats_ctxt
 ) const
 {
 	CDouble rows(1.0);

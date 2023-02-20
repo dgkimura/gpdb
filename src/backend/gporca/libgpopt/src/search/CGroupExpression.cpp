@@ -1002,7 +1002,7 @@ gpos::Ref<IStatistics>
 CGroupExpression::PstatsRecursiveDerive(CMemoryPool *,	// pmpLocal
 										CMemoryPool *pmpGlobal,
 										gpos::Ref<CReqdPropRelational> prprel,
-										IStatisticsArray *stats_ctxt,
+										gpos::Ref<IStatisticsArray> stats_ctxt,
 										BOOL fComputeRootStats)
 {
 	GPOS_ASSERT(!Pgroup()->FScalar());

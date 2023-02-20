@@ -227,12 +227,12 @@ public:
 	// derive statistics of (dynamic) index-get
 	static gpos::Ref<IStatistics> DeriveStatsForIndexGet(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_contexts);
+		gpos::Ref<IStatisticsArray> stats_contexts);
 
 	// derive statistics of bitmap table-get
 	static gpos::Ref<IStatistics> DeriveStatsForBitmapTableGet(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_contexts);
+		gpos::Ref<IStatisticsArray> stats_contexts);
 
 	// compute the cumulative number of distinct values (NDV) of the group by operator
 	// from the array of NDV of the individual grouping columns

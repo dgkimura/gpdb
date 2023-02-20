@@ -317,8 +317,8 @@ CExpressionHandle::DeriveProps(gpos::Ref<CDrvdPropCtxt> pdpctxt)
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatisticsArray>
-CExpressionHandle::PdrgpstatOuterRefs(IStatisticsArray *statistics_array,
-									  ULONG child_index)
+CExpressionHandle::PdrgpstatOuterRefs(
+	gpos::Ref<IStatisticsArray> statistics_array, ULONG child_index)
 {
 	GPOS_ASSERT(nullptr != statistics_array);
 	GPOS_ASSERT(child_index < Arity());
@@ -383,7 +383,7 @@ CExpressionHandle::FAttachedToLeafPattern() const
 //
 //---------------------------------------------------------------------------
 void
-CExpressionHandle::DeriveRootStats(IStatisticsArray *stats_ctxt)
+CExpressionHandle::DeriveRootStats(gpos::Ref<IStatisticsArray> stats_ctxt)
 {
 	GPOS_ASSERT(nullptr == m_pstats);
 
@@ -419,7 +419,7 @@ CExpressionHandle::DeriveRootStats(IStatisticsArray *stats_ctxt)
 //
 //---------------------------------------------------------------------------
 void
-CExpressionHandle::DeriveStats(IStatisticsArray *stats_ctxt,
+CExpressionHandle::DeriveStats(gpos::Ref<IStatisticsArray> stats_ctxt,
 							   BOOL fComputeRootStats)
 {
 	GPOS_ASSERT(nullptr != stats_ctxt);
@@ -621,7 +621,7 @@ CExpressionHandle::DeriveCostContextStats()
 void
 CExpressionHandle::DeriveStats(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 							   gpos::Ref<CReqdPropRelational> prprel,
-							   IStatisticsArray *stats_ctxt) const
+							   gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	gpos::Ref<CReqdPropRelational> prprelNew = prprel;
 	if (nullptr == prprelNew)

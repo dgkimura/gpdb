@@ -330,7 +330,7 @@ CLogicalGet::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-						  IStatisticsArray *  // not used
+						  gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	// requesting stats on distribution columns to estimate data skew

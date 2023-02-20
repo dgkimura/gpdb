@@ -167,10 +167,10 @@ CPhysicalDynamicIndexScan::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CPhysicalDynamicIndexScan::PstatsDerive(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										gpos::Ref<CReqdPropPlan> prpplan,
-										IStatisticsArray *stats_ctxt) const
+CPhysicalDynamicIndexScan::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CReqdPropPlan> prpplan,
+	gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	GPOS_ASSERT(nullptr != prpplan);
 

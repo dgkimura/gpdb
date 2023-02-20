@@ -383,7 +383,7 @@ CLogicalSequenceProject::PxfsCandidates(CMemoryPool *mp) const
 gpos::Ref<IStatistics>
 CLogicalSequenceProject::PstatsDerive(CMemoryPool *mp,
 									  CExpressionHandle &exprhdl,
-									  IStatisticsArray *  // stats_ctxt
+									  gpos::Ref<IStatisticsArray>  // stats_ctxt
 ) const
 {
 	return PstatsDeriveProject(mp, exprhdl);

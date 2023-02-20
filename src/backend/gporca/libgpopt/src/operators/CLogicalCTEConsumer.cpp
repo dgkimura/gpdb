@@ -405,9 +405,10 @@ CLogicalCTEConsumer::DerivePropertyConstraint(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CLogicalCTEConsumer::PstatsDerive(CMemoryPool *mp,
-								  CExpressionHandle &,	//exprhdl,
-								  IStatisticsArray *	// statistics_array
+CLogicalCTEConsumer::PstatsDerive(
+	CMemoryPool *mp,
+	CExpressionHandle &,		 //exprhdl,
+	gpos::Ref<IStatisticsArray>	 // statistics_array
 ) const
 {
 	gpos::Ref<CExpression> pexprProducer =

@@ -75,7 +75,7 @@ public:
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CReqdPropPlan> prpplan,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// conversion function
 	static gpos::Ref<CPhysicalDynamicBitmapTableScan>

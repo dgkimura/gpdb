@@ -317,7 +317,7 @@ CLogicalDML::PxfsCandidates(CMemoryPool *mp) const
 gpos::Ref<IStatistics>
 CLogicalDML::PstatsDerive(CMemoryPool *,  // mp,
 						  CExpressionHandle &exprhdl,
-						  IStatisticsArray *  // not used
+						  gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	return PstatsPassThruOuter(exprhdl);

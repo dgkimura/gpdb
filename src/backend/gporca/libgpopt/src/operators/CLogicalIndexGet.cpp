@@ -271,7 +271,7 @@ CLogicalIndexGet::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalIndexGet::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							   IStatisticsArray *stats_ctxt) const
+							   gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	return CStatisticsUtils::DeriveStatsForIndexGet(mp, exprhdl, stats_ctxt);
 }

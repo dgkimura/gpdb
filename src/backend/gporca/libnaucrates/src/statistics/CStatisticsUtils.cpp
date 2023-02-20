@@ -1147,9 +1147,9 @@ CStatisticsUtils::DeriveStatsForDynamicScan(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CStatisticsUtils::DeriveStatsForIndexGet(CMemoryPool *mp,
-										 CExpressionHandle &expr_handle,
-										 IStatisticsArray *stats_contexts)
+CStatisticsUtils::DeriveStatsForIndexGet(
+	CMemoryPool *mp, CExpressionHandle &expr_handle,
+	gpos::Ref<IStatisticsArray> stats_contexts)
 {
 	COperator::EOperatorId operator_id = expr_handle.Pop()->Eopid();
 	GPOS_ASSERT(CLogical::EopLogicalIndexGet == operator_id ||
@@ -1223,9 +1223,9 @@ CStatisticsUtils::DeriveStatsForIndexGet(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CStatisticsUtils::DeriveStatsForBitmapTableGet(CMemoryPool *mp,
-											   CExpressionHandle &expr_handle,
-											   IStatisticsArray *stats_contexts)
+CStatisticsUtils::DeriveStatsForBitmapTableGet(
+	CMemoryPool *mp, CExpressionHandle &expr_handle,
+	gpos::Ref<IStatisticsArray> stats_contexts)
 {
 	GPOS_ASSERT(CLogical::EopLogicalBitmapTableGet ==
 					expr_handle.Pop()->Eopid() ||

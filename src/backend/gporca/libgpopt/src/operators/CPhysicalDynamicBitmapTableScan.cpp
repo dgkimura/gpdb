@@ -79,7 +79,8 @@ CPhysicalDynamicBitmapTableScan::Matches(gpos::Ref<COperator> pop) const
 gpos::Ref<IStatistics>
 CPhysicalDynamicBitmapTableScan::PstatsDerive(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
-	gpos::Ref<CReqdPropPlan> prpplan, IStatisticsArray *stats_ctxt) const
+	gpos::Ref<CReqdPropPlan> prpplan,
+	gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	GPOS_ASSERT(nullptr != prpplan);
 

@@ -243,7 +243,7 @@ CLogicalSplit::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalSplit::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							IStatisticsArray *	// not used
+							gpos::Ref<IStatisticsArray>	 // not used
 ) const
 {
 	// split returns double the number of tuples coming from its child

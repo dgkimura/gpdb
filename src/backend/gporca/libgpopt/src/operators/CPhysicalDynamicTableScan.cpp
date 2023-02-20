@@ -72,10 +72,10 @@ CPhysicalDynamicTableScan::Matches(gpos::Ref<COperator> pop) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CPhysicalDynamicTableScan::PstatsDerive(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										gpos::Ref<CReqdPropPlan> prpplan,
-										IStatisticsArray *	// stats_ctxt
+CPhysicalDynamicTableScan::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<CReqdPropPlan> prpplan,
+	gpos::Ref<IStatisticsArray>	 // stats_ctxt
 ) const
 {
 	GPOS_ASSERT(nullptr != prpplan);

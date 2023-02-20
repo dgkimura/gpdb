@@ -660,7 +660,7 @@ CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-							IStatisticsArray *	// not used
+							gpos::Ref<IStatisticsArray>	 // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);

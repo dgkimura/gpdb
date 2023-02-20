@@ -151,9 +151,9 @@ CLogicalDynamicBitmapTableGet::DeriveOuterReferences(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
-CLogicalDynamicBitmapTableGet::PstatsDerive(CMemoryPool *mp,
-											CExpressionHandle &exprhdl,
-											IStatisticsArray *stats_ctxt) const
+CLogicalDynamicBitmapTableGet::PstatsDerive(
+	CMemoryPool *mp, CExpressionHandle &exprhdl,
+	gpos::Ref<IStatisticsArray> stats_ctxt) const
 {
 	return CStatisticsUtils::DeriveStatsForBitmapTableGet(mp, exprhdl,
 														  stats_ctxt);

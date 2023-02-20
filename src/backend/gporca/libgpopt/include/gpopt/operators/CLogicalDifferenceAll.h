@@ -108,7 +108,7 @@ public:
 	// derive statistics
 	gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
-		IStatisticsArray *stats_ctxt) const override;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const override;
 
 	// conversion function
 	static gpos::Ref<CLogicalDifferenceAll>

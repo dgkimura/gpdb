@@ -131,7 +131,7 @@ CLogicalDifferenceAll::DeriveKeyCollection(CMemoryPool *,		// mp,
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalDifferenceAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-									IStatisticsArray *	// not used
+									gpos::Ref<IStatisticsArray>	 // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);

@@ -126,7 +126,7 @@ public:
 	gpos::Ref<IStatistics>
 	PstatsDerive(CMemoryPool *,	 //mp,
 				 CExpressionHandle &exprhdl,
-				 IStatisticsArray *	 //stats_ctxt
+				 gpos::Ref<IStatisticsArray>  //stats_ctxt
 	) const override
 	{
 		// pass through stats from last child

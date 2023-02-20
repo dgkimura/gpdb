@@ -166,9 +166,9 @@ public:
 	}
 
 	// derive statistics
-	gpos::Ref<IStatistics> PstatsDerive(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										IStatisticsArray *	// stats_ctxt
+	gpos::Ref<IStatistics> PstatsDerive(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<IStatisticsArray>	 // stats_ctxt
 	) const override;
 
 

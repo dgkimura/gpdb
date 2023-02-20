@@ -1399,7 +1399,8 @@ CLogical::EStatPromise
 CGroup::EspDerive(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 				  gpos::Ref<CGroupExpression> pgexpr,
 				  gpos::Ref<CReqdPropRelational> prprel,
-				  IStatisticsArray *stats_ctxt, BOOL fDeriveChildStats)
+				  gpos::Ref<IStatisticsArray> stats_ctxt,
+				  BOOL fDeriveChildStats)
 {
 	GPOS_ASSERT(pgexpr->Pop()->FLogical());
 
@@ -1448,7 +1449,7 @@ CGroup::EspDerive(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 gpos::Ref<IStatistics>
 CGroup::PstatsRecursiveDerive(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 							  gpos::Ref<CReqdPropRelational> prprel,
-							  IStatisticsArray *stats_ctxt)
+							  gpos::Ref<IStatisticsArray> stats_ctxt)
 {
 	GPOS_CHECK_STACK_SIZE;
 
@@ -1597,7 +1598,7 @@ CGroup::PgexprBestPromise(CMemoryPool *mp,
 gpos::Ref<CGroupExpression>
 CGroup::PgexprBestPromise(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 						  gpos::Ref<CReqdPropRelational> prprelInput,
-						  IStatisticsArray *stats_ctxt)
+						  gpos::Ref<IStatisticsArray> stats_ctxt)
 {
 	gpos::Ref<CGroupExpression> pgexprBest = nullptr;
 	CLogical::EStatPromise espBest = CLogical::EspNone;

@@ -199,7 +199,7 @@ CLogicalIntersectAll::PstatsDerive(
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalIntersectAll::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								   IStatisticsArray *  // not used
+								   gpos::Ref<IStatisticsArray>	// not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);

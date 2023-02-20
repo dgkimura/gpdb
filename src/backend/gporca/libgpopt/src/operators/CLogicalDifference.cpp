@@ -132,7 +132,7 @@ CLogicalDifference::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalDifference::PstatsDerive(CMemoryPool *mp, CExpressionHandle &exprhdl,
-								 IStatisticsArray *	 // not used
+								 gpos::Ref<IStatisticsArray>  // not used
 ) const
 {
 	GPOS_ASSERT(Esp(exprhdl) > EspNone);

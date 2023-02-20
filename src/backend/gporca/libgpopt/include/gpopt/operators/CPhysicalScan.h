@@ -261,7 +261,7 @@ public:
 	virtual gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<CReqdPropPlan> prpplan,
-		IStatisticsArray *stats_ctxt) const = 0;
+		gpos::Ref<IStatisticsArray> stats_ctxt) const = 0;
 
 	// conversion function
 	static gpos::Ref<CPhysicalScan> PopConvert(gpos::Ref<COperator> pop);

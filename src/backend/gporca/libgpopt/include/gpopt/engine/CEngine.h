@@ -110,7 +110,7 @@ private:
 			&exprhdlRel,  // handle to compute required relational properties
 		gpos::Ref<CDrvdPropArray>
 			pdrgpdpChildren,  // derived plan properties of optimized children
-		IStatisticsArray *pdrgpstatCurrentCtxt, ULONG child_index,
+		gpos::Ref<IStatisticsArray> pdrgpstatCurrentCtxt, ULONG child_index,
 		ULONG ulOptReq);
 
 	// optimize child group and return best cost context satisfying required properties
@@ -118,7 +118,7 @@ private:
 		CExpressionHandle &exprhdl, CExpressionHandle &exprhdlRel,
 		gpos::Ref<COptimizationContext> pocOrigin,
 		gpos::Ref<CDrvdPropArray> pdrgpdp,
-		IStatisticsArray *pdrgpstatCurrentCtxt, ULONG child_index,
+		gpos::Ref<IStatisticsArray> pdrgpstatCurrentCtxt, ULONG child_index,
 		ULONG ulOptReq);
 
 	// optimize child groups of a given group expression
