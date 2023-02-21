@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/memory/CMemoryPoolManager.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/engine/CEngine.h"
 #include "gpopt/search/CScheduler.h"
 

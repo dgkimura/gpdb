@@ -276,7 +276,10 @@ CEngine::InsertExpressionChildren(gpos::Ref<CExpression> pexpr,
 				PgroupInsert(nullptr /*pgroupTarget*/, (*pexpr)[i], exfidOrigin,
 							 pgexprOrigin, true /*fIntermediate*/);
 		}
-		pdrgpgroupChildren->Append(pgroupChild);
+		// FIXME: KIMURA: This is okay because even though pgroupChild is
+		// locally scoped, it piggybacked from a legit reference to CGroup.
+		// Also, CGroupArray does not own references...
+		pdrgpgroupChildren->Append(pgroupChild.get());
 	}
 }
 

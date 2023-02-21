@@ -13,6 +13,7 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/operators/CLogical.h"
 #include "gpopt/search/CGroupExpression.h"
 #include "gpopt/search/CJobFactory.h"

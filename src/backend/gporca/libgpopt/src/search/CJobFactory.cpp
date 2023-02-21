@@ -15,6 +15,7 @@
 #include "gpos/task/CAutoSuspendAbort.h"
 #include "gpos/task/CWorker.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/search/CGroupExpression.h"
 
 

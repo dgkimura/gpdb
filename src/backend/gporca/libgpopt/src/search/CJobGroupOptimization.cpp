@@ -13,6 +13,7 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/engine/CEngine.h"
 #include "gpopt/search/CGroup.h"
 #include "gpopt/search/CGroupExpression.h"
@@ -138,9 +139,9 @@ CJobGroupOptimization::~CJobGroupOptimization() = default;
 void
 CJobGroupOptimization::Init(
 	gpos::Ref<CGroup> pgroup,
-	CGroupExpression
-		*pgexprOrigin,	// group expression that triggered optimization job,
-						// NULL if this is the Root group
+	gpos::Ref<CGroupExpression>
+		pgexprOrigin,  // group expression that triggered optimization job,
+					   // NULL if this is the Root group
 	gpos::Ref<COptimizationContext> poc)
 {
 	GPOS_ASSERT(nullptr != poc);

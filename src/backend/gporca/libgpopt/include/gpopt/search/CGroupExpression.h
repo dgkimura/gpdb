@@ -82,9 +82,12 @@ private:
 
 	// map of partial plans to their costs
 	using PartialPlanToCostMap =
-		CHashMap<CPartialPlan, CCost, CPartialPlan::HashValue,
-				 CPartialPlan::Equals, CleanupRelease<CPartialPlan>,
-				 CleanupDelete<CCost>>;
+		//CHashMap<CPartialPlan, CCost, CPartialPlan::HashValue,
+		//		 CPartialPlan::Equals, CleanupRelease<CPartialPlan>,
+		//		 CleanupDelete<CCost>>;
+		gpos::UnorderedMap<const gpos::Ref<CPartialPlan>, CCost *,
+						   gpos::RefHash<CPartialPlan, CPartialPlan::HashValue>,
+						   gpos::RefEq<CPartialPlan, CPartialPlan::Equals>>;
 
 
 	// expression id

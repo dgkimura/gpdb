@@ -42,8 +42,7 @@ class CExpression;
 
 // type definitions
 // array of groups
-//using CGroupArray = CDynamicPtrArray<CGroup, CleanupNULL>;
-using CGroupArray = gpos::Vector<gpos::Ref<CGroup>>;
+using CGroupArray = CDynamicPtrArray<CGroup, CleanupNULL>;
 
 // map required plan props to cost lower bound of corresponding plan
 using ReqdPropPlanToCostMap =

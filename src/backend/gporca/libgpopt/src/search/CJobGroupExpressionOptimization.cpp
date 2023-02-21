@@ -301,7 +301,8 @@ CJobGroupExpressionOptimization::InitChildGroupsOptimization(
 	// initialize stats context with input stats context
 	m_pdrgpstatCurrentCtxt = GPOS_NEW(psc->GetGlobalMemoryPool())
 		IStatisticsArray(psc->GetGlobalMemoryPool());
-	CUtils::AddRefAppend(m_pdrgpstatCurrentCtxt.get(), m_poc->Pdrgpstat());
+	CUtils::AddRefAppend(m_pdrgpstatCurrentCtxt.get(),
+						 m_poc->Pdrgpstat().get());
 }
 
 

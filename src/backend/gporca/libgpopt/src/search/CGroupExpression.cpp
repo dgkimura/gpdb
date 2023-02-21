@@ -19,6 +19,7 @@
 #include "gpos/task/CAutoSuspendAbort.h"
 #include "gpos/task/CWorker.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/COptimizationContext.h"
 #include "gpopt/base/CUtils.h"
@@ -139,7 +140,7 @@ CGroupExpression::CleanupContexts()
 				ShtAccIter shtitacc(shtit);
 				if (nullptr != (pcc = shtitacc.Value()))
 				{
-					shtitacc.Remove(pcc);
+					shtitacc.Remove(pcc.get());
 				}
 			}
 		}
@@ -319,7 +320,7 @@ CGroupExpression::FCostContextExists(
 
 		{
 			ShtAcc shta(Sht(), poc);
-			pccFound = shta.Next(pccFound);
+			pccFound = shta.Next(pccFound.get());
 		}
 	}
 
@@ -340,13 +341,13 @@ CGroupExpression::PccRemove(gpos::Ref<COptimizationContext> poc, ULONG ulOptReq)
 {
 	GPOS_ASSERT(nullptr != poc);
 	ShtAcc shta(Sht(), poc);
-	gpos::Ref<CCostContext> pccFound = shta.Find();
+	CCostContext *pccFound = shta.Find();
 	while (nullptr != pccFound)
 	{
 		if (ulOptReq == pccFound->UlOptReq())
 		{
 			shta.Remove(pccFound);
-			return pccFound;
+			return pccFound->SharedFromThis();
 		}
 
 		pccFound = shta.Next(pccFound);
@@ -506,8 +507,8 @@ CGroupExpression::CostLowerBound(CMemoryPool *mp,
 	{
 		;
 	}
-	gpos::Ref<CPartialPlan> ppp =
-		GPOS_NEW(mp) CPartialPlan(this, prppInput, pccChild, child_index);
+	gpos::Ref<CPartialPlan> ppp = GPOS_NEW(mp)
+		CPartialPlan(SharedFromThis(), prppInput, pccChild, child_index);
 	CCost *pcostLowerBound = m_ppartialplancostmap->Find(ppp.get());
 	if (nullptr != pcostLowerBound)
 	{
@@ -621,12 +622,12 @@ CGroupExpression::PccLookup(gpos::Ref<COptimizationContext> poc, ULONG ulOptReq)
 	GPOS_ASSERT(nullptr != poc);
 
 	ShtAcc shta(Sht(), poc);
-	gpos::Ref<CCostContext> pccFound = shta.Find();
+	CCostContext *pccFound = shta.Find();
 	while (nullptr != pccFound)
 	{
 		if (ulOptReq == pccFound->UlOptReq())
 		{
-			return pccFound;
+			return pccFound->SharedFromThis();
 		}
 
 		pccFound = shta.Next(pccFound);
@@ -651,7 +652,7 @@ CGroupExpression::PdrgpccLookupAll(CMemoryPool *mp,
 	GPOS_ASSERT(nullptr != poc);
 	gpos::Ref<CCostContextArray> pdrgpcc = GPOS_NEW(mp) CCostContextArray(mp);
 
-	gpos::Ref<CCostContext> pccFound = nullptr;
+	CCostContext *pccFound = nullptr;
 	BOOL fValid = false;
 	{
 		ShtAcc shta(Sht(), poc);
@@ -666,7 +667,7 @@ CGroupExpression::PdrgpccLookupAll(CMemoryPool *mp,
 		if (fValid)
 		{
 			;
-			pdrgpcc->Append(pccFound);
+			pdrgpcc->Append(pccFound->SharedFromThis());
 		}
 
 		{
@@ -698,18 +699,18 @@ CGroupExpression::PccInsert(gpos::Ref<CCostContext> pcc)
 	gpos::Ref<COptimizationContext> const poc = pcc->Poc();
 	ShtAcc shta(Sht(), poc);
 
-	gpos::Ref<CCostContext> pccFound = shta.Find();
+	CCostContext *pccFound = shta.Find();
 	while (nullptr != pccFound)
 	{
 		if (CCostContext::Equals(*pcc, *pccFound))
 		{
-			return pccFound;
+			return pccFound->SharedFromThis();
 		}
 		pccFound = shta.Next(pccFound);
 	}
 	GPOS_ASSERT(nullptr == pccFound);
 
-	shta.Insert(pcc);
+	shta.Insert(pcc.get());
 	return pcc;
 }
 
@@ -1080,8 +1081,8 @@ CGroupExpression::OsPrintCostContexts(IOstream &os, const CHAR *szPrefix) const
 	{
 		// print cost contexts
 		os << szPrefix << szPrefix << "Cost Ctxts:" << std::endl;
-		gpos::Ref<CCostContext> pcc = nullptr;
-		ShtIter shtit(const_cast<gpos::Ref<CGroupExpression> >(this)->Sht());
+		CCostContext *pcc = nullptr;
+		ShtIter shtit(const_cast<CGroupExpression *>(this)->Sht());
 		while (shtit.Advance())
 		{
 			{
