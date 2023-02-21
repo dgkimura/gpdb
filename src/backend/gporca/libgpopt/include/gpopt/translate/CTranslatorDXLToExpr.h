@@ -52,13 +52,20 @@ using namespace gpdxl;
 
 // hash maps
 using UlongToExprArrayMap =
-	CHashMap<ULONG, CExpressionArray, gpos::HashValue<ULONG>,
-			 gpos::Equals<ULONG>, CleanupDelete<ULONG>, CleanupNULL>;
+	//CHashMap<ULONG, CExpressionArray, gpos::HashValue<ULONG>,
+	//		 gpos::Equals<ULONG>, CleanupDelete<ULONG>, CleanupNULL>;
+	gpos::UnorderedMap<const ULONG *, gpos::Ref<CExpressionArray>,
+					   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+					   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 // iterator
 using UlongToExprArrayMapIter =
-	CHashMapIter<ULONG, CExpressionArray, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>, CleanupNULL>;
+	//CHashMapIter<ULONG, CExpressionArray, gpos::HashValue<ULONG>,
+	//			 gpos::Equals<ULONG>, CleanupDelete<ULONG>, CleanupNULL>;
+	gpos::UnorderedMap<
+		const ULONG *, gpos::Ref<CExpressionArray>,
+		gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+		gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>::LegacyIterator;
 
 
 //---------------------------------------------------------------------------
@@ -412,7 +419,7 @@ private:
 	// construct the mapping between the DXL ColId and CColRef
 	void ConstructDXLColId2ColRefMapping(
 		const CDXLColDescrArray *dxl_col_descr_array,
-		const CColRefArray *colref_array);
+		const gpos::Ref<CColRefArray> colref_array);
 
 	void MarkUnknownColsAsUnused();
 
@@ -437,7 +444,7 @@ public:
 
 	// translate a dxl scalar expression
 	gpos::Ref<CExpression> PexprTranslateScalar(
-		const gpos::Ref<CDXLNode> dxlnode, CColRefArray *colref_array,
+		const gpos::Ref<CDXLNode> dxlnode, gpos::Ref<CColRefArray> colref_array,
 		gpos::Ref<ULongPtrArray> colids = nullptr);
 
 	// return the array of query output column reference id

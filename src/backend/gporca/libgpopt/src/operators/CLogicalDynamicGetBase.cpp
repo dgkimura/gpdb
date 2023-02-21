@@ -230,7 +230,7 @@ CLogicalDynamicGetBase::DerivePartitionInfo(CMemoryPool *mp,
 // partition's table descr by matching column names
 gpos::Ref<ColRefToUlongMapArray>
 CLogicalDynamicGetBase::ConstructRootColMappingPerPart(
-	CMemoryPool *mp, CColRefArray *root_cols,
+	CMemoryPool *mp, gpos::Ref<CColRefArray> root_cols,
 	gpos::Ref<IMdIdArray> partition_mdids)
 {
 	CMDAccessor *mda = COptCtxt::PoctxtFromTLS()->Pmda();

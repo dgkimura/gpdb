@@ -154,7 +154,7 @@ CLogicalUnionAll::PstatsDeriveUnionAll(CMemoryPool *mp,
 	GPOS_ASSERT(COperator::EopLogicalUnionAll == exprhdl.Pop()->Eopid() ||
 				COperator::EopLogicalUnion == exprhdl.Pop()->Eopid());
 
-	CColRefArray *pdrgpcrOutput =
+	gpos::Ref<CColRefArray> pdrgpcrOutput =
 		gpos::dyn_cast<CLogicalSetOp>(exprhdl.Pop())->PdrgpcrOutput();
 	CColRef2dArray *pdrgpdrgpcrInput =
 		gpos::dyn_cast<CLogicalSetOp>(exprhdl.Pop())->PdrgpdrgpcrInput();

@@ -145,7 +145,7 @@ CXformSplitGbAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 	;
 	gpos::Ref<CColRefArray> pdrgpcrGlobal = colref_array;
 
-	CColRefArray *pdrgpcrMinimal = popAgg->PdrgpcrMinimal();
+	gpos::Ref<CColRefArray> pdrgpcrMinimal = popAgg->PdrgpcrMinimal();
 	if (nullptr != pdrgpcrMinimal)
 	{
 		// addref minimal grouping columns twice to be used in local and global aggregate

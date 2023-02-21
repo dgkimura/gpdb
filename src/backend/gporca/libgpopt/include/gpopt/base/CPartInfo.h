@@ -153,8 +153,8 @@ public:
 
 	// return a new part info object with an additional set of remapped keys
 	gpos::Ref<CPartInfo> PpartinfoWithRemappedKeys(
-		CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
-		CColRefArray *pdrgpcrDest) const;
+		CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrSrc,
+		gpos::Ref<CColRefArray> pdrgpcrDest) const;
 
 	// print
 	IOstream &OsPrint(IOstream &) const;

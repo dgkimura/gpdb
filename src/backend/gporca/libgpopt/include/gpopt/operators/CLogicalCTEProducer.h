@@ -73,7 +73,7 @@ public:
 	}
 
 	// cte columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	Pdrgpcr() const
 	{
 		return m_pdrgpcr.get();

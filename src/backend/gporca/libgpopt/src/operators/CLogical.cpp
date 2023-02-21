@@ -116,7 +116,8 @@ CLogical::PdrgpcrCreateMapping(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRef2dArray>
-CLogical::PdrgpdrgpcrCreatePartCols(CMemoryPool *mp, CColRefArray *colref_array,
+CLogical::PdrgpdrgpcrCreatePartCols(CMemoryPool *mp,
+									gpos::Ref<CColRefArray> colref_array,
 									const gpos::Ref<ULongPtrArray> pdrgpulPart)
 {
 	GPOS_ASSERT(nullptr != colref_array && "Output columns cannot be NULL");
@@ -149,7 +150,7 @@ CLogical::PdrgpdrgpcrCreatePartCols(CMemoryPool *mp, CColRefArray *colref_array,
 
 gpos::Ref<COrderSpec>
 CLogical::PosFromIndex(CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
-					   CColRefArray *colref_array,
+					   gpos::Ref<CColRefArray> colref_array,
 					   const gpos::Ref<CTableDescriptor> ptabdesc)
 {
 	// compute the order spec after getting the current position of the index key
@@ -364,7 +365,7 @@ CLogical::PkcCombineKeys(CMemoryPool *mp, CExpressionHandle &exprhdl)
 //---------------------------------------------------------------------------
 gpos::Ref<CKeyCollection>
 CLogical::PkcKeysBaseTable(CMemoryPool *mp, const CBitSetArray *pdrgpbsKeys,
-						   const CColRefArray *pdrgpcrOutput)
+						   const gpos::Ref<CColRefArray> pdrgpcrOutput)
 {
 	const ULONG ulKeys = pdrgpbsKeys->Size();
 
@@ -687,7 +688,7 @@ CLogical::PpcDeriveConstraintFromPredicates(CMemoryPool *mp,
 gpos::Ref<CPropConstraint>
 CLogical::PpcDeriveConstraintFromTable(
 	CMemoryPool *mp, const gpos::Ref<CTableDescriptor> ptabdesc,
-	const CColRefArray *pdrgpcrOutput)
+	const gpos::Ref<CColRefArray> pdrgpcrOutput)
 {
 	gpos::Ref<CColRefSetArray> pdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
 
@@ -792,7 +793,7 @@ gpos::Ref<CPropConstraint>
 CLogical::PpcDeriveConstraintFromTableWithPredicates(
 	CMemoryPool *mp, CExpressionHandle &exprhdl,
 	const gpos::Ref<CTableDescriptor> ptabdesc,
-	const CColRefArray *pdrgpcrOutput)
+	const gpos::Ref<CColRefArray> pdrgpcrOutput)
 {
 	gpos::Ref<CConstraintArray> pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
 	gpos::Ref<CPropConstraint> ppcTable =
@@ -1328,7 +1329,7 @@ CLogical::PtabdescFromTableGet(gpos::Ref<COperator> pop)
 //		Extract the output columns from a logical get or dynamic get operator
 //
 //---------------------------------------------------------------------------
-CColRefArray *
+gpos::Ref<CColRefArray>
 CLogical::PdrgpcrOutputFromLogicalGet(gpos::Ref<CLogical> pop)
 {
 	GPOS_ASSERT(nullptr != pop);
@@ -1376,7 +1377,7 @@ CLogical::NameFromLogicalGet(gpos::Ref<CLogical> pop)
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefSet>
 CLogical::PcrsDist(CMemoryPool *mp, const gpos::Ref<CTableDescriptor> ptabdesc,
-				   const CColRefArray *pdrgpcrOutput)
+				   const gpos::Ref<CColRefArray> pdrgpcrOutput)
 {
 	GPOS_ASSERT(nullptr != ptabdesc);
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);

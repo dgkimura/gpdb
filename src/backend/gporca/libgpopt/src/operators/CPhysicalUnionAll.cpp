@@ -84,7 +84,8 @@ CPhysicalUnionAll::CPhysicalUnionAll(CMemoryPool *mp,
 	const ULONG arity = m_pdrgpdrgpcrInput->Size();
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
-		CColRefArray *colref_array = (*m_pdrgpdrgpcrInput)[ulChild].get();
+		gpos::Ref<CColRefArray> colref_array =
+			(*m_pdrgpdrgpcrInput)[ulChild].get();
 		m_pdrgpcrsInput->Append(GPOS_NEW(mp) CColRefSet(mp, colref_array));
 	}
 	PopulateDistrSpecs(mp, m_pdrgpcrOutput.get(), m_pdrgpdrgpcrInput.get());
@@ -92,7 +93,7 @@ CPhysicalUnionAll::CPhysicalUnionAll(CMemoryPool *mp,
 
 void
 CPhysicalUnionAll::PopulateDistrSpecs(CMemoryPool *mp,
-									  CColRefArray *pdrgpcrOutput,
+									  gpos::Ref<CColRefArray> pdrgpcrOutput,
 									  CColRef2dArray *pdrgpdrgpcrInput)
 {
 	gpos::Ref<CDistributionSpecArray> pdrgpds =
@@ -101,7 +102,8 @@ CPhysicalUnionAll::PopulateDistrSpecs(CMemoryPool *mp,
 	const ULONG arity = pdrgpdrgpcrInput->Size();
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
-		CColRefArray *colref_array = (*pdrgpdrgpcrInput)[ulChild].get();
+		gpos::Ref<CColRefArray> colref_array =
+			(*pdrgpdrgpcrInput)[ulChild].get();
 		gpos::Ref<CExpressionArray> pdrgpexpr =
 			GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)
@@ -140,7 +142,7 @@ CPhysicalUnionAll::~CPhysicalUnionAll()
 }
 
 // accessor of output column array
-CColRefArray *
+gpos::Ref<CColRefArray>
 CPhysicalUnionAll::PdrgpcrOutput() const
 {
 	return m_pdrgpcrOutput.get();
@@ -181,7 +183,7 @@ CPhysicalUnionAll::Matches(gpos::Ref<COperator> pop) const
 		gpos::Ref<CPhysicalUnionAll> popUnionAll =
 			gpos::dyn_cast<CPhysicalUnionAll>(pop);
 
-		return PdrgpcrOutput()->Equals(popUnionAll->PdrgpcrOutput());
+		return PdrgpcrOutput()->Equals(popUnionAll->PdrgpcrOutput().get());
 	}
 
 	return false;
@@ -626,7 +628,8 @@ CPhysicalUnionAll::PdshashedPassThru(
 {
 	gpos::Ref<CExpressionArray> pdrgpexprRequired =
 		pdshashedRequired->Pdrgpexpr();
-	CColRefArray *pdrgpcrChild = (*PdrgpdrgpcrInput())[child_index].get();
+	gpos::Ref<CColRefArray> pdrgpcrChild =
+		(*PdrgpdrgpcrInput())[child_index].get();
 	const ULONG ulExprs = pdrgpexprRequired->Size();
 	const ULONG ulOutputCols = PdrgpcrOutput()->Size();
 
@@ -777,7 +780,8 @@ CPhysicalUnionAll::PdrgpulMap(CMemoryPool *mp,
 {
 	GPOS_ASSERT(nullptr != pdrgpexpr);
 
-	CColRefArray *colref_array = (*PdrgpdrgpcrInput())[child_index].get();
+	gpos::Ref<CColRefArray> colref_array =
+		(*PdrgpdrgpcrInput())[child_index].get();
 	const ULONG ulExprs = pdrgpexpr->Size();
 	const ULONG num_cols = colref_array->Size();
 	gpos::Ref<ULongPtrArray> pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
@@ -815,9 +819,10 @@ CPhysicalUnionAll::MapOutputColRefsToInput(CMemoryPool *mp,
 										   ULONG child_index)
 {
 	gpos::Ref<CColRefSet> result = GPOS_NEW(mp) CColRefSet(mp);
-	CColRefArray *all_outcols = m_pdrgpcrOutput.get();
+	gpos::Ref<CColRefArray> all_outcols = m_pdrgpcrOutput.get();
 	ULONG total_num_cols = all_outcols->Size();
-	CColRefArray *in_colref_array = (*PdrgpdrgpcrInput())[child_index].get();
+	gpos::Ref<CColRefArray> in_colref_array =
+		(*PdrgpdrgpcrInput())[child_index].get();
 	CColRefSetIter iter(*out_col_refs);
 	while (iter.Advance())
 	{

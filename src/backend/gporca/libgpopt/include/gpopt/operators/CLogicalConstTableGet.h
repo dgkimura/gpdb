@@ -43,7 +43,7 @@ private:
 
 	// construct column descriptors from column references
 	static gpos::Ref<CColumnDescriptorArray> PdrgpcoldescMapping(
-		CMemoryPool *mp, CColRefArray *colref_array);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 public:
 	CLogicalConstTableGet(const CLogicalConstTableGet &) = delete;
@@ -91,7 +91,7 @@ public:
 	}
 
 	// accessors
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput.get();

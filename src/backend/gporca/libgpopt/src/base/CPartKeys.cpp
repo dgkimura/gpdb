@@ -65,7 +65,7 @@ CColRef *
 CPartKeys::PcrKey(ULONG ulLevel) const
 {
 	GPOS_ASSERT(ulLevel < m_num_of_part_levels);
-	CColRefArray *colref_array = (*m_pdrgpdrgpcr)[ulLevel].get();
+	gpos::Ref<CColRefArray> colref_array = (*m_pdrgpdrgpcr)[ulLevel].get();
 	return (*colref_array)[0];
 }
 
@@ -108,7 +108,7 @@ CPartKeys::PpartkeysCopy(CMemoryPool *mp)
 	const ULONG length = m_pdrgpdrgpcr->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		CColRefArray *colref_array = (*m_pdrgpdrgpcr)[ul].get();
+		gpos::Ref<CColRefArray> colref_array = (*m_pdrgpdrgpcr)[ul].get();
 		gpos::Ref<CColRefArray> pdrgpcrCopy = GPOS_NEW(mp) CColRefArray(mp);
 		const ULONG num_cols = colref_array->Size();
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)

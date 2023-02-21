@@ -165,7 +165,8 @@ CKeyCollection::FKey(const gpos::Ref<CColRefSet> pcrs,
 //
 //---------------------------------------------------------------------------
 BOOL
-CKeyCollection::FKey(CMemoryPool *mp, const CColRefArray *colref_array) const
+CKeyCollection::FKey(CMemoryPool *mp,
+					 const gpos::Ref<CColRefArray> colref_array) const
 {
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(colref_array);
@@ -187,7 +188,7 @@ CKeyCollection::FKey(CMemoryPool *mp, const CColRefArray *colref_array) const
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefArray>
 CKeyCollection::PdrgpcrTrim(CMemoryPool *mp,
-							const CColRefArray *colref_array) const
+							const gpos::Ref<CColRefArray> colref_array) const
 {
 	gpos::Ref<CColRefArray> pdrgpcrTrim = nullptr;
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);

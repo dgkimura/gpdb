@@ -81,7 +81,7 @@ public:
 	}
 
 	// array of output column references
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput.get();

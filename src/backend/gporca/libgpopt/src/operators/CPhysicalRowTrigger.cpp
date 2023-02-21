@@ -339,8 +339,8 @@ CPhysicalRowTrigger::Matches(gpos::Ref<COperator> pop) const
 	gpos::Ref<CPhysicalRowTrigger> popRowTrigger =
 		gpos::dyn_cast<CPhysicalRowTrigger>(pop);
 
-	CColRefArray *pdrgpcrOld = popRowTrigger->PdrgpcrOld();
-	CColRefArray *pdrgpcrNew = popRowTrigger->PdrgpcrNew();
+	gpos::Ref<CColRefArray> pdrgpcrOld = popRowTrigger->PdrgpcrOld();
+	gpos::Ref<CColRefArray> pdrgpcrNew = popRowTrigger->PdrgpcrNew();
 
 	return m_rel_mdid->Equals(popRowTrigger->GetRelMdId()) &&
 		   m_type == popRowTrigger->GetType() &&

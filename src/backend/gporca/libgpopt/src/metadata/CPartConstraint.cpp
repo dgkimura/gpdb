@@ -548,7 +548,7 @@ CPartConstraint::PpartcnstrCopyWithRemappedColumns(
 
 	for (ULONG ul = 0; ul < m_num_of_part_levels; ul++)
 	{
-		CColRefArray *colref_array = (*m_pdrgpdrgpcr)[ul].get();
+		gpos::Ref<CColRefArray> colref_array = (*m_pdrgpdrgpcr)[ul].get();
 		gpos::Ref<CColRefArray> pdrgpcrMapped =
 			CUtils::PdrgpcrRemap(mp, colref_array, colref_mapping, must_exist);
 		pdrgpdrgpcr->Append(pdrgpcrMapped);

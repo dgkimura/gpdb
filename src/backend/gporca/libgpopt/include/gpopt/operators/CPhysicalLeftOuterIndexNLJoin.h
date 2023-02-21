@@ -57,7 +57,7 @@ public:
 	BOOL Matches(gpos::Ref<COperator> pop) const override;
 
 	// outer column references accessor
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgPcrOuterRefs() const
 	{
 		return m_pdrgpcrOuterRefs.get();

@@ -83,7 +83,7 @@ public:
 	}
 
 	// output columns
-	virtual CColRefArray *
+	virtual gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput.get();

@@ -56,11 +56,12 @@ public:
 	BOOL FKey(const gpos::Ref<CColRefSet> pcrs, BOOL fExactMatch = true) const;
 
 	// check if an array of columns constitutes a key
-	BOOL FKey(CMemoryPool *mp, const CColRefArray *colref_array) const;
+	BOOL FKey(CMemoryPool *mp,
+			  const gpos::Ref<CColRefArray> colref_array) const;
 
 	// trim off non-key columns
-	gpos::Ref<CColRefArray> PdrgpcrTrim(CMemoryPool *mp,
-										const CColRefArray *colref_array) const;
+	gpos::Ref<CColRefArray> PdrgpcrTrim(
+		CMemoryPool *mp, const gpos::Ref<CColRefArray> colref_array) const;
 
 	// extract a key
 	gpos::Ref<CColRefArray> PdrgpcrKey(CMemoryPool *mp) const;

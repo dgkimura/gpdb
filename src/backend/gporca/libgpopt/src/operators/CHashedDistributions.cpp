@@ -10,16 +10,17 @@
 #include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
-CHashedDistributions::CHashedDistributions(CMemoryPool *mp,
-										   CColRefArray *pdrgpcrOutput,
-										   CColRef2dArray *pdrgpdrgpcrInput)
+CHashedDistributions::CHashedDistributions(
+	CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOutput,
+	CColRef2dArray *pdrgpdrgpcrInput)
 	: CDistributionSpecArray(mp)
 {
 	const ULONG num_cols = pdrgpcrOutput->Size();
 	const ULONG arity = pdrgpdrgpcrInput->Size();
 	for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 	{
-		CColRefArray *colref_array = (*pdrgpdrgpcrInput)[ulChild].get();
+		gpos::Ref<CColRefArray> colref_array =
+			(*pdrgpdrgpcrInput)[ulChild].get();
 		gpos::Ref<CExpressionArray> pdrgpexpr =
 			GPOS_NEW(mp) CExpressionArray(mp);
 		for (ULONG ulCol = 0; ulCol < num_cols; ulCol++)

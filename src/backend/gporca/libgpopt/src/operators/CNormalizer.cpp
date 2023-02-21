@@ -791,7 +791,7 @@ CNormalizer::PushThruSetOp(CMemoryPool *mp, gpos::Ref<CExpression> pexprSetOp,
 
 	gpos::Ref<CLogicalSetOp> popSetOp =
 		gpos::dyn_cast<CLogicalSetOp>(pexprSetOp->Pop());
-	CColRefArray *pdrgpcrOutput = popSetOp->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popSetOp->PdrgpcrOutput();
 	gpos::Ref<CColRefSet> pcrsOutput =
 		GPOS_NEW(mp) CColRefSet(mp, pdrgpcrOutput);
 	CColRef2dArray *pdrgpdrgpcrInput = popSetOp->PdrgpdrgpcrInput();
@@ -801,7 +801,7 @@ CNormalizer::PushThruSetOp(CMemoryPool *mp, gpos::Ref<CExpression> pexprSetOp,
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		gpos::Ref<CExpression> pexprChild = (*pexprSetOp)[ul];
-		CColRefArray *pdrgpcrChild = (*pdrgpdrgpcrInput)[ul].get();
+		gpos::Ref<CColRefArray> pdrgpcrChild = (*pdrgpdrgpcrInput)[ul].get();
 		gpos::Ref<CColRefSet> pcrsChild =
 			GPOS_NEW(mp) CColRefSet(mp, pdrgpcrChild);
 

@@ -261,7 +261,7 @@ COrderedAggPreprocessor::SplitPrjList(
 			// expression copy by passing must_exist as false
 			gpos::Ref<CColRefArray> pdrgpcrChildOutput =
 				pexprPCConsumer->DeriveOutputColumns()->Pdrgpcr(mp);
-			CColRefArray *pdrgpcrConsumerOutput =
+			gpos::Ref<CColRefArray> pdrgpcrConsumerOutput =
 				gpos::dyn_cast<CLogicalCTEConsumer>(
 					pexprRemappedPCConsumer->Pop())
 					->Pdrgpcr();

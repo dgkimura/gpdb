@@ -109,14 +109,14 @@ public:
 	}
 
 	// return the array of output column references
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgPcr() const
 	{
 		return m_pdrgpcr.get();
 	}
 
 	// system columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrSystemCols() const
 	{
 		return m_pdrgpcrSystemCols.get();

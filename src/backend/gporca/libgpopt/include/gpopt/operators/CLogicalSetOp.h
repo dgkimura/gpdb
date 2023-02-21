@@ -94,7 +94,7 @@ public:
 	const CHAR *SzId() const override = 0;
 
 	// accessor of output column array
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		GPOS_ASSERT(nullptr != m_pdrgpcrOutput);

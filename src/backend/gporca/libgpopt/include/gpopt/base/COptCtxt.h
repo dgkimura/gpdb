@@ -282,7 +282,7 @@ public:
 	}
 
 	// required system columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrSystemCols() const
 	{
 		return m_pdrgpcrSystemCols.get();
@@ -302,7 +302,7 @@ public:
 
 	// set required system columns
 	void
-	SetReqdSystemCols(CColRefArray *pdrgpcrSystemCols)
+	SetReqdSystemCols(gpos::Ref<CColRefArray> pdrgpcrSystemCols)
 	{
 		GPOS_ASSERT(nullptr != pdrgpcrSystemCols);
 

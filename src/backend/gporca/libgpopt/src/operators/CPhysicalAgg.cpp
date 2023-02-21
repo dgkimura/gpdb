@@ -39,7 +39,8 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalAgg::CPhysicalAgg(
 	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
-	CColRefArray *pdrgpcrMinimal,  // minimal grouping columns based on FD's
+	gpos::Ref<CColRefArray>
+		pdrgpcrMinimal,	 // minimal grouping columns based on FD's
 	COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
 	gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,
 	BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
@@ -180,7 +181,8 @@ CPhysicalAgg::PcrsRequired(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CColRefSet>
 CPhysicalAgg::PcrsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							  gpos::Ref<CColRefSet> pcrsRequired,
-							  ULONG child_index, CColRefArray *pdrgpcrGrp)
+							  ULONG child_index,
+							  gpos::Ref<CColRefArray> pdrgpcrGrp)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrGrp);
 	GPOS_ASSERT(
@@ -212,8 +214,8 @@ gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::Ref<CDistributionSpec> pdsInput,
 							 ULONG child_index, ULONG ulOptReq,
-							 CColRefArray *pdrgpcgGrp,
-							 CColRefArray *pdrgpcrGrpMinimal) const
+							 gpos::Ref<CColRefArray> pdrgpcgGrp,
+							 gpos::Ref<CColRefArray> pdrgpcrGrpMinimal) const
 {
 	GPOS_ASSERT(0 == child_index);
 
@@ -277,7 +279,8 @@ CPhysicalAgg::PdsRequiredAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpec>
-CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp, CColRefArray *colref_array)
+CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp,
+							   gpos::Ref<CColRefArray> colref_array)
 {
 	GPOS_ASSERT(nullptr != colref_array);
 
@@ -306,8 +309,9 @@ CPhysicalAgg::PdsMaximalHashed(CMemoryPool *mp, CColRefArray *colref_array)
 gpos::Ref<CDistributionSpec>
 CPhysicalAgg::PdsRequiredGlobalAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 								   gpos::Ref<CDistributionSpec> pdsInput,
-								   ULONG child_index, CColRefArray *pdrgpcrGrp,
-								   CColRefArray *pdrgpcrGrpMinimal,
+								   ULONG child_index,
+								   gpos::Ref<CColRefArray> pdrgpcrGrp,
+								   gpos::Ref<CColRefArray> pdrgpcrGrpMinimal,
 								   ULONG ulOptReq) const
 {
 	GPOS_ASSERT(FGlobal());

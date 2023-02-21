@@ -165,7 +165,7 @@ CLogicalConstTableGet::Matches(gpos::Ref<COperator> pop) const
 	// match if column descriptors, const values and output columns are identical
 	return m_pdrgpcoldesc->Equals(popCTG->Pdrgpcoldesc()) &&
 		   m_pdrgpdrgpdatum->Equals(popCTG->Pdrgpdrgpdatum()) &&
-		   m_pdrgpcrOutput->Equals(popCTG->PdrgpcrOutput());
+		   m_pdrgpcrOutput->Equals(popCTG->PdrgpcrOutput().get());
 }
 
 //---------------------------------------------------------------------------
@@ -276,7 +276,7 @@ CLogicalConstTableGet::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<CColumnDescriptorArray>
 CLogicalConstTableGet::PdrgpcoldescMapping(CMemoryPool *mp,
-										   CColRefArray *colref_array)
+										   gpos::Ref<CColRefArray> colref_array)
 {
 	GPOS_ASSERT(nullptr != colref_array);
 	gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc =

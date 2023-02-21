@@ -60,7 +60,7 @@ public:
 	}
 
 	// outer column references accessor
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgPcrOuterRefs() const
 	{
 		return m_pdrgpcrOuterRefs.get();

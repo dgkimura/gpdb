@@ -60,8 +60,8 @@ CColRefSet::CColRefSet(CMemoryPool *mp, CColRefSet &bs) : CBitSet(mp, bs)
 //		ctor, copy from col refs array
 //
 //---------------------------------------------------------------------------
-CColRefSet::CColRefSet(CMemoryPool *mp, const CColRefArray *colref_array,
-					   ULONG size)
+CColRefSet::CColRefSet(CMemoryPool *mp,
+					   const gpos::Ref<CColRefArray> colref_array, ULONG size)
 	: CBitSet(mp, size)
 {
 	Include(colref_array);
@@ -152,7 +152,7 @@ CColRefSet::Include(const CColRef *colref)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Include(const CColRefArray *colref_array)
+CColRefSet::Include(const gpos::Ref<CColRefArray> colref_array)
 {
 	ULONG length = colref_array->Size();
 	for (ULONG i = 0; i < length; i++)
@@ -224,7 +224,7 @@ CColRefSet::Exclude(const gpos::Ref<CColRefSet> pcrs)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Exclude(const CColRefArray *colref_array)
+CColRefSet::Exclude(const gpos::Ref<CColRefArray> colref_array)
 {
 	for (ULONG i = 0; i < colref_array->Size(); i++)
 	{
@@ -261,8 +261,8 @@ CColRefSet::Replace(const CColRef *pcrOut, const CColRef *pcrIn)
 //
 //---------------------------------------------------------------------------
 void
-CColRefSet::Replace(const CColRefArray *pdrgpcrOut,
-					const CColRefArray *pdrgpcrIn)
+CColRefSet::Replace(const gpos::Ref<CColRefArray> pdrgpcrOut,
+					const gpos::Ref<CColRefArray> pdrgpcrIn)
 {
 	const ULONG length = pdrgpcrOut->Size();
 	GPOS_ASSERT(length == pdrgpcrIn->Size());

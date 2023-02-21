@@ -73,7 +73,7 @@ protected:
 
 	// initialize the array of partition columns
 	static gpos::Ref<CColRef2dArray> PdrgpdrgpcrCreatePartCols(
-		CMemoryPool *mp, CColRefArray *colref_array,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 		const gpos::Ref<ULongPtrArray> pdrgpulPart);
 
 	// derive dummy statistics
@@ -122,7 +122,7 @@ protected:
 	// helper function for computing the keys in a base relation
 	static gpos::Ref<CKeyCollection> PkcKeysBaseTable(
 		CMemoryPool *mp, const CBitSetArray *pdrgpbsKeys,
-		const CColRefArray *pdrgpcrOutput);
+		const gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// helper for the common case of passing through partition consumer info
 	static gpos::Ref<CPartInfo> PpartinfoPassThruOuter(
@@ -135,14 +135,14 @@ protected:
 	// derive constraint property from a table/index get
 	static gpos::Ref<CPropConstraint> PpcDeriveConstraintFromTable(
 		CMemoryPool *mp, const gpos::Ref<CTableDescriptor> ptabdesc,
-		const CColRefArray *pdrgpcrOutput);
+		const gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// derive constraint property from a table/index get with predicates
 	static gpos::Ref<CPropConstraint>
 	PpcDeriveConstraintFromTableWithPredicates(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		const gpos::Ref<CTableDescriptor> ptabdesc,
-		const CColRefArray *pdrgpcrOutput);
+		const gpos::Ref<CColRefArray> pdrgpcrOutput);
 
 	// shorthand to addref and pass through constraint from a given child
 	static gpos::Ref<CPropConstraint> PpcDeriveConstraintPassThru(
@@ -163,7 +163,8 @@ protected:
 	// compute order spec based on an index
 	static gpos::Ref<COrderSpec> PosFromIndex(
 		CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
-		CColRefArray *colref_array, const gpos::Ref<CTableDescriptor> ptabdesc);
+		gpos::Ref<CColRefArray> colref_array,
+		const gpos::Ref<CTableDescriptor> ptabdesc);
 
 	// derive function properties using data access property of scalar child
 	static gpos::Ref<CFunctionProp> PfpDeriveFromScalar(
@@ -337,10 +338,12 @@ public:
 		gpos::Ref<COperator> pop);
 
 	// returns the output columns for selected operator
-	static CColRefArray *PoutputColsFromTableGet(gpos::Ref<COperator> pop);
+	static gpos::Ref<CColRefArray> PoutputColsFromTableGet(
+		gpos::Ref<COperator> pop);
 
 	// extract the output columns descriptor from a logical get or dynamic get operator
-	static CColRefArray *PdrgpcrOutputFromLogicalGet(gpos::Ref<CLogical> pop);
+	static gpos::Ref<CColRefArray> PdrgpcrOutputFromLogicalGet(
+		gpos::Ref<CLogical> pop);
 
 	// extract the table name from a logical get or dynamic get operator
 	static const CName &NameFromLogicalGet(gpos::Ref<CLogical> pop);
@@ -348,7 +351,7 @@ public:
 	// return the set of distribution columns
 	static gpos::Ref<CColRefSet> PcrsDist(
 		CMemoryPool *mp, const gpos::Ref<CTableDescriptor> ptabdesc,
-		const CColRefArray *colref_array);
+		const gpos::Ref<CColRefArray> colref_array);
 
 	// derive constraint property when expression has relational children and predicates
 	static gpos::Ref<CPropConstraint> PpcDeriveConstraintFromPredicates(

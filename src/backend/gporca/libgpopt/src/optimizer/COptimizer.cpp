@@ -455,8 +455,8 @@ COptimizer::PexprOptimize(CMemoryPool *mp, CQueryContext *pqc,
 gpos::Ref<CDXLNode>
 COptimizer::CreateDXLNode(CMemoryPool *mp, CMDAccessor *md_accessor,
 						  gpos::Ref<CExpression> pexpr,
-						  CColRefArray *colref_array, CMDNameArray *pdrgpmdname,
-						  ULONG ulHosts)
+						  gpos::Ref<CColRefArray> colref_array,
+						  CMDNameArray *pdrgpmdname, ULONG ulHosts)
 {
 	GPOS_ASSERT(0 < ulHosts);
 	gpos::Ref<IntPtrArray> pdrgpiHosts = GPOS_NEW(mp) IntPtrArray(mp);

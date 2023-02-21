@@ -19,6 +19,7 @@
 #include "gpopt/base/CConstraintDisjunction.h"
 #include "gpopt/base/CConstraintInterval.h"
 #include "gpopt/base/CConstraintNegation.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/exception.h"
 #include "gpopt/mdcache/CMDAccessorUtils.h"
@@ -647,8 +648,8 @@ CTranslatorExprToDXLUtils::FScalarConstTrue(CMDAccessor *md_accessor,
 			md_accessor->RetrieveType(pdxlopConst->GetDatumVal()->MDId());
 		if (IMDType::EtiBool == pmdtype->GetDatumType())
 		{
-			gpos::Ref<CDXLDatumBool> dxl_datum = gpos::dyn_cast<CDXLDatumBool>(
-				const_cast<gpos::Ref<CDXLDatum> >(pdxlopConst->GetDatumVal()));
+			gpos::Ref<CDXLDatumBool> dxl_datum =
+				gpos::dyn_cast<CDXLDatumBool>(pdxlopConst->GetDatumVal());
 
 			return (!dxl_datum->IsNull() && dxl_datum->GetValue());
 		}
@@ -679,8 +680,8 @@ CTranslatorExprToDXLUtils::FScalarConstFalse(CMDAccessor *md_accessor,
 			md_accessor->RetrieveType(pdxlopConst->GetDatumVal()->MDId());
 		if (IMDType::EtiBool == pmdtype->GetDatumType())
 		{
-			gpos::Ref<CDXLDatumBool> dxl_datum = gpos::dyn_cast<CDXLDatumBool>(
-				const_cast<gpos::Ref<CDXLDatum> >(pdxlopConst->GetDatumVal()));
+			gpos::Ref<CDXLDatumBool> dxl_datum =
+				gpos::dyn_cast<CDXLDatumBool>(pdxlopConst->GetDatumVal());
 			return (!dxl_datum->IsNull() && !dxl_datum->GetValue());
 		}
 	}
@@ -758,7 +759,7 @@ CTranslatorExprToDXLUtils::PdxlnPrLPartitionSelector(
 		// add to it the Oid column
 		if (nullptr == pcrOid)
 		{
-			const gpos::Ref<IMDTypeOi> pmdtype =
+			const gpos::Ref<IMDTypeOid> pmdtype =
 				md_accessor->PtMDType<IMDTypeOid>();
 			pcrOid = col_factory->PcrCreate(pmdtype, default_type_modifier);
 		}
@@ -980,7 +981,7 @@ CTranslatorExprToDXLUtils::PdxlnIdent(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 gpos::Ref<IDatumArray>
 CTranslatorExprToDXLUtils::PdrgpdatumNulls(CMemoryPool *mp,
-										   CColRefArray *colref_array)
+										   gpos::Ref<CColRefArray> colref_array)
 {
 	gpos::Ref<IDatumArray> pdrgpdatum = GPOS_NEW(mp) IDatumArray(mp);
 
@@ -1007,8 +1008,8 @@ CTranslatorExprToDXLUtils::PdrgpdatumNulls(CMemoryPool *mp,
 //
 //---------------------------------------------------------------------------
 BOOL
-CTranslatorExprToDXLUtils::FProjectListMatch(gpos::Ref<CDXLNode> pdxlnPrL,
-											 CColRefArray *colref_array)
+CTranslatorExprToDXLUtils::FProjectListMatch(
+	gpos::Ref<CDXLNode> pdxlnPrL, gpos::Ref<CColRefArray> colref_array)
 {
 	GPOS_ASSERT(nullptr != pdxlnPrL);
 	GPOS_ASSERT(nullptr != colref_array);
@@ -1049,10 +1050,9 @@ CTranslatorExprToDXLUtils::FProjectListMatch(gpos::Ref<CDXLNode> pdxlnPrL,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CColRefArray>
-CTranslatorExprToDXLUtils::PdrgpcrMapColumns(CMemoryPool *mp,
-											 CColRefArray *pdrgpcrInput,
-											 ColRefToUlongMap *phmcrul,
-											 CColRefArray *pdrgpcrMapDest)
+CTranslatorExprToDXLUtils::PdrgpcrMapColumns(
+	CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrInput,
+	ColRefToUlongMap *phmcrul, gpos::Ref<CColRefArray> pdrgpcrMapDest)
 {
 	GPOS_ASSERT(nullptr != phmcrul);
 	GPOS_ASSERT(nullptr != pdrgpcrMapDest);
@@ -1202,7 +1202,7 @@ CTranslatorExprToDXLUtils::PdxlnCombineBoolean(
 //---------------------------------------------------------------------------
 gpos::Ref<ColRefToUlongMap>
 CTranslatorExprToDXLUtils::PhmcrulColIndex(CMemoryPool *mp,
-										   CColRefArray *colref_array)
+										   gpos::Ref<CColRefArray> colref_array)
 {
 	gpos::Ref<ColRefToUlongMap> phmcrul = GPOS_NEW(mp) ColRefToUlongMap(mp);
 
@@ -1257,7 +1257,8 @@ CTranslatorExprToDXLUtils::SetStats(CMemoryPool *mp, CMDAccessor *md_accessor,
 void
 CTranslatorExprToDXLUtils::SetDirectDispatchInfo(
 	CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CDXLNode> dxlnode,
-	gpos::Ref<CExpression> pexpr, CDistributionSpecArray *pdrgpdsBaseTables)
+	gpos::Ref<CExpression> pexpr,
+	gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables)
 {
 	GPOS_ASSERT(nullptr != dxlnode);
 	GPOS_ASSERT(nullptr != pexpr);

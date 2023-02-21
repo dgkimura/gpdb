@@ -14,7 +14,9 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/mdcache/CMDAccessorUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/base/IDatumInt4.h"
 #include "naucrates/base/IDatumInt8.h"
 #include "naucrates/dxl/operators/CDXLScalarFuncExpr.h"

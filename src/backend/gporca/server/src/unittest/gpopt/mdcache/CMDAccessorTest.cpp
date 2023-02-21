@@ -248,7 +248,7 @@ CMDAccessorTest::EresUnittest_Datum()
 	GPOS_ASSERT(false == pdatumBool->GetValue());
 
 	// create an OID datum
-	const gpos::Ref<IMDTypeOi> pmdtypeoid =
+	const gpos::Ref<IMDTypeOid> pmdtypeoid =
 		mda.PtMDType<IMDTypeOid>(CTestUtils::m_sysidDefault);
 	gpos::Ref<IDatumOid> pdatumOid =
 		pmdtypeoid->CreateOidDatum(mp, 20, false /* is_null */);

@@ -36,20 +36,18 @@ private:
 	gpos::Ref<CColRefSet> m_pcrsMinimalGrpCols;
 
 	// construct order spec on grouping column so that it covers required order spec
-	static gpos::Ref<COrderSpec> PosCovering(CMemoryPool *mp,
-											 COrderSpec *posRequired,
-											 CColRefArray *pdrgpcrGrp);
+	static gpos::Ref<COrderSpec> PosCovering(
+		CMemoryPool *mp, COrderSpec *posRequired,
+		gpos::Ref<CColRefArray> pdrgpcrGrp);
 
 protected:
 	// compute required sort columns of the n-th child
-	gpos::Ref<COrderSpec> PosRequiredStreamAgg(CMemoryPool *mp,
-											   CExpressionHandle &exprhdl,
-											   COrderSpec *posRequired,
-											   ULONG child_index,
-											   CColRefArray *pdrgpcrGrp) const;
+	gpos::Ref<COrderSpec> PosRequiredStreamAgg(
+		CMemoryPool *mp, CExpressionHandle &exprhdl, COrderSpec *posRequired,
+		ULONG child_index, gpos::Ref<CColRefArray> pdrgpcrGrp) const;
 
 	// initialize the order spec using the given array of columns
-	void InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder);
+	void InitOrderSpec(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOrder);
 
 public:
 	CPhysicalStreamAgg(const CPhysicalStreamAgg &) = delete;
@@ -57,7 +55,8 @@ public:
 	// ctor
 	CPhysicalStreamAgg(
 		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
-		CColRefArray *pdrgpcrMinimal,  // minimal grouping columns based on FD's
+		gpos::Ref<CColRefArray>
+			pdrgpcrMinimal,	 // minimal grouping columns based on FD's
 		COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
 		gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,
 		BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,

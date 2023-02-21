@@ -62,7 +62,7 @@ public:
 	}
 
 	// inner column references accessor
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgPcrInner() const
 	{
 		return m_pdrgpcrInner.get();

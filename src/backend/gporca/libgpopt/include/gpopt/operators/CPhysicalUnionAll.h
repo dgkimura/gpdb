@@ -29,7 +29,8 @@ private:
 	// array of child hashed distributions -- used locally for distribution derivation
 	gpos::Ref<CDistributionSpecArray> m_pdrgpds;
 
-	void PopulateDistrSpecs(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
+	void PopulateDistrSpecs(CMemoryPool *mp,
+							gpos::Ref<CColRefArray> pdrgpcrOutput,
 							CColRef2dArray *pdrgpdrgpcrInput);
 
 	// map given array of scalar ident expressions to positions of UnionAll input columns in the given child;
@@ -85,7 +86,7 @@ public:
 	BOOL FInputOrderSensitive() const override;
 
 	// accessor of output column array
-	CColRefArray *PdrgpcrOutput() const;
+	gpos::Ref<CColRefArray> PdrgpcrOutput() const;
 
 	// accessor of input column array
 	CColRef2dArray *PdrgpdrgpcrInput() const;

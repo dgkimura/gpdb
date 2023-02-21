@@ -140,7 +140,7 @@ CXformSplitDQA::Transform(gpos::Ref<CXformContext> pxfctxt,
 		pexprRelational = pexprChildProject;
 	}
 
-	CColRefArray *grouping_colref_array =
+	gpos::Ref<CColRefArray> grouping_colref_array =
 		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop())->Pdrgpcr();
 	BOOL fScalarDQA = (grouping_colref_array == nullptr ||
 					   grouping_colref_array->Size() == 0);
@@ -230,14 +230,14 @@ gpos::Ref<CExpression>
 CXformSplitDQA::PexprSplitIntoLocalDQAGlobalAgg(
 	CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
 	gpos::Ref<CExpression> pexpr, gpos::Ref<CExpression> pexprRelational,
-	ExprToColRefMap *phmexprcr, CColRefArray *pdrgpcrArgDQA,
+	ExprToColRefMap *phmexprcr, gpos::Ref<CColRefArray> pdrgpcrArgDQA,
 	CLogicalGbAgg::EAggStage aggStage)
 {
 	gpos::Ref<CExpression> pexprPrL = (*pexpr)[1];
 
 	gpos::Ref<CLogicalGbAgg> popAgg =
 		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
-	CColRefArray *pdrgpcrGlobal = popAgg->Pdrgpcr();
+	gpos::Ref<CColRefArray> pdrgpcrGlobal = popAgg->Pdrgpcr();
 
 	// array of project elements for the local, intermediate and global aggregate operator
 	gpos::Ref<CExpressionArray> pdrgpexprPrElFirstStage =
@@ -389,14 +389,14 @@ CXformSplitDQA::PexprSplitHelper(CMemoryPool *mp, CColumnFactory *col_factory,
 								 gpos::Ref<CExpression> pexpr,
 								 gpos::Ref<CExpression> pexprRelational,
 								 ExprToColRefMap *phmexprcr,
-								 CColRefArray *pdrgpcrArgDQA,
+								 gpos::Ref<CColRefArray> pdrgpcrArgDQA,
 								 CLogicalGbAgg::EAggStage aggStage)
 {
 	gpos::Ref<CExpression> pexprPrL = (*pexpr)[1];
 
 	gpos::Ref<CLogicalGbAgg> popAgg =
 		gpos::dyn_cast<CLogicalGbAgg>(pexpr->Pop());
-	CColRefArray *pdrgpcrGlobal = popAgg->Pdrgpcr();
+	gpos::Ref<CColRefArray> pdrgpcrGlobal = popAgg->Pdrgpcr();
 
 	// array of project elements for the local (first), intermediate
 	// (second) and global (third) aggregate operator
@@ -718,9 +718,9 @@ CXformSplitDQA::PexprMultiLevelAggregation(
 	gpos::Ref<CExpressionArray> pdrgpexprPrElFirstStage,
 	gpos::Ref<CExpressionArray> pdrgpexprPrElSecondStage,
 	gpos::Ref<CExpressionArray> pdrgpexprPrElThirdStage,
-	CColRefArray *pdrgpcrArgDQA, CColRefArray *pdrgpcrLastStage,
-	BOOL fSplit2LevelsOnly, BOOL fAddDistinctColToLocalGb,
-	CLogicalGbAgg::EAggStage aggStage)
+	gpos::Ref<CColRefArray> pdrgpcrArgDQA,
+	gpos::Ref<CColRefArray> pdrgpcrLastStage, BOOL fSplit2LevelsOnly,
+	BOOL fAddDistinctColToLocalGb, CLogicalGbAgg::EAggStage aggStage)
 {
 	GPOS_ASSERT(nullptr != pexprRelational);
 	GPOS_ASSERT(nullptr != pdrgpexprPrElFirstStage);

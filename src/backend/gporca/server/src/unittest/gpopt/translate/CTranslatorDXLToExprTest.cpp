@@ -409,7 +409,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQuery()
 
 
 		// the output column references from the logical get
-		CColRefArray *colref_array = popGet->PdrgpcrOutput();
+		gpos::Ref<CColRefArray> colref_array = popGet->PdrgpcrOutput();
 
 		GPOS_ASSERT(nullptr != colref_array && 2 == colref_array->Size());
 
@@ -464,7 +464,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithConst()
 			gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
 
 		// the output column references from the logical get
-		CColRefArray *colref_array = popGet->PdrgpcrOutput();
+		gpos::Ref<CColRefArray> colref_array = popGet->PdrgpcrOutput();
 		GPOS_ASSERT(nullptr != colref_array && 2 == colref_array->Size());
 
 		CColRef *pcrLeft = (*colref_array)[0];
@@ -512,7 +512,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithConstInList()
 			gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
 
 		// the output column references from the logical get
-		CColRefArray *colref_array = popGet->PdrgpcrOutput();
+		gpos::Ref<CColRefArray> colref_array = popGet->PdrgpcrOutput();
 		GPOS_ASSERT(nullptr != colref_array && 2 == colref_array->Size());
 
 		CColRef *colref = (*colref_array)[0];
@@ -585,7 +585,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithBoolExpr()
 			gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
 
 		// the output column references from the logical get
-		CColRefArray *colref_array = popGet->PdrgpcrOutput();
+		gpos::Ref<CColRefArray> colref_array = popGet->PdrgpcrOutput();
 
 		GPOS_ASSERT(nullptr != colref_array && 2 == colref_array->Size());
 
@@ -656,7 +656,7 @@ CTranslatorDXLToExprTest::EresUnittest_SelectQueryWithScalarOp()
 			gpos::dyn_cast<CLogicalGet>(pexprLgGet->Pop());
 
 		// the output column references from the logical get
-		CColRefArray *colref_array = popGet->PdrgpcrOutput();
+		gpos::Ref<CColRefArray> colref_array = popGet->PdrgpcrOutput();
 
 		GPOS_ASSERT(nullptr != colref_array && 2 == colref_array->Size());
 

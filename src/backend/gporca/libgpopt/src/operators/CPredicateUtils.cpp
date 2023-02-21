@@ -1010,8 +1010,8 @@ CPredicateUtils::FINDF(gpos::Ref<CExpression> pexpr)
 // generate a conjunction of INDF expressions between corresponding columns in the given arrays
 gpos::Ref<CExpression>
 CPredicateUtils::PexprINDFConjunction(CMemoryPool *mp,
-									  CColRefArray *pdrgpcrFirst,
-									  CColRefArray *pdrgpcrSecond)
+									  gpos::Ref<CColRefArray> pdrgpcrFirst,
+									  gpos::Ref<CColRefArray> pdrgpcrSecond)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrFirst);
 	GPOS_ASSERT(nullptr != pdrgpcrSecond);
@@ -1870,7 +1870,7 @@ CPredicateUtils::PexprIndexLookupKeyOnLeft(CMemoryPool *mp,
 										   CMDAccessor *md_accessor,
 										   gpos::Ref<CExpression> pexprScalar,
 										   const gpos::Ref<IMDIndex> pmdindex,
-										   CColRefArray *pdrgpcrIndex,
+										   gpos::Ref<CColRefArray> pdrgpcrIndex,
 										   gpos::Ref<CColRefSet> outer_refs)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
@@ -1926,12 +1926,10 @@ CPredicateUtils::PexprIndexLookupKeyOnLeft(CMemoryPool *mp,
 
 // helper to create index lookup comparison predicate with index key on right side
 gpos::Ref<CExpression>
-CPredicateUtils::PexprIndexLookupKeyOnRight(CMemoryPool *mp,
-											CMDAccessor *md_accessor,
-											gpos::Ref<CExpression> pexprScalar,
-											const gpos::Ref<IMDIndex> pmdindex,
-											CColRefArray *pdrgpcrIndex,
-											gpos::Ref<CColRefSet> outer_refs)
+CPredicateUtils::PexprIndexLookupKeyOnRight(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	gpos::Ref<CExpression> pexprScalar, const gpos::Ref<IMDIndex> pmdindex,
+	gpos::Ref<CColRefArray> pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs)
 {
 	GPOS_ASSERT(nullptr != pexprScalar);
 
@@ -1974,7 +1972,7 @@ gpos::Ref<CExpression>
 CPredicateUtils::PexprIndexLookup(CMemoryPool *mp, CMDAccessor *md_accessor,
 								  gpos::Ref<CExpression> pexprScalar,
 								  const gpos::Ref<IMDIndex> pmdindex,
-								  CColRefArray *pdrgpcrIndex,
+								  gpos::Ref<CColRefArray> pdrgpcrIndex,
 								  gpos::Ref<CColRefSet> outer_refs,
 								  BOOL allowArrayCmpForBTreeIndexes)
 {
@@ -2036,7 +2034,7 @@ void
 CPredicateUtils::ExtractIndexPredicates(
 	CMemoryPool *mp, CMDAccessor *md_accessor,
 	gpos::Ref<CExpressionArray> pdrgpexprPredicate,
-	const gpos::Ref<IMDIndex> pmdindex, CColRefArray *pdrgpcrIndex,
+	const gpos::Ref<IMDIndex> pmdindex, gpos::Ref<CColRefArray> pdrgpcrIndex,
 	gpos::Ref<CExpressionArray> pdrgpexprIndex,
 	gpos::Ref<CExpressionArray> pdrgpexprResidual,
 	gpos::Ref<CColRefSet>
@@ -2584,7 +2582,7 @@ CPredicateUtils::FNotIdent(gpos::Ref<CExpression> pexpr)
 BOOL
 CPredicateUtils::FCompatiblePredicates(
 	gpos::Ref<CExpressionArray> pdrgpexprPred,
-	const gpos::Ref<IMDIndex> pmdindex, CColRefArray *pdrgpcrIndex,
+	const gpos::Ref<IMDIndex> pmdindex, gpos::Ref<CColRefArray> pdrgpcrIndex,
 	CMDAccessor *md_accessor)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprPred);
@@ -2607,7 +2605,7 @@ CPredicateUtils::FCompatiblePredicates(
 BOOL
 CPredicateUtils::FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
 										   const gpos::Ref<IMDIndex> pmdindex,
-										   CColRefArray *pdrgpcrIndex,
+										   gpos::Ref<CColRefArray> pdrgpcrIndex,
 										   CMDAccessor *md_accessor)
 {
 	GPOS_ASSERT(nullptr != pexprPred);
@@ -2779,11 +2777,12 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll(
 	// may have different size or order or both. We need to ensure that the new
 	// n-ary setop has the right order of the input columns from its grand children
 	CColRef2dArray *pdrgpdrgpcrInput = pop->PdrgpdrgpcrInput();
-	CColRefArray *pdrgpcrInputExpected = (*pdrgpdrgpcrInput)[child_index].get();
+	gpos::Ref<CColRefArray> pdrgpcrInputExpected =
+		(*pdrgpdrgpcrInput)[child_index].get();
 
 	const ULONG num_cols = pdrgpcrInputExpected->Size();
 
-	CColRefArray *pdrgpcrOuputChild = popChild->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOuputChild = popChild->PdrgpcrOutput();
 	GPOS_ASSERT(num_cols <= pdrgpcrOuputChild->Size());
 
 	gpos::Ref<ULongPtrArray> pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
@@ -2809,7 +2808,7 @@ CPredicateUtils::CollectGrandChildrenUnionUnionAll(
 		pdrgpexprResult->Append(pexprGrandchild);
 
 		// collect the correct input columns
-		CColRefArray *pdrgpcrOld = (*pdrgdrgpcrChild)[ul].get();
+		gpos::Ref<CColRefArray> pdrgpcrOld = (*pdrgdrgpcrChild)[ul].get();
 		gpos::Ref<CColRefArray> pdrgpcrNew = GPOS_NEW(mp) CColRefArray(mp);
 		for (ULONG ulColIdx = 0; ulColIdx < num_cols; ulColIdx++)
 		{

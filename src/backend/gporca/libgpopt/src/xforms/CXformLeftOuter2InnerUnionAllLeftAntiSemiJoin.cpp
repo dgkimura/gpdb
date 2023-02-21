@@ -331,10 +331,11 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::FValidInnerExpr(
 gpos::Ref<CExpression>
 CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::
 	PexprLeftAntiSemiJoinWithInnerGroupBy(
-		CMemoryPool *mp, CColRefArray *pdrgpcrOuter,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOuter,
 		gpos::Ref<CColRefArray> pdrgpcrOuterCopy,
 		gpos::Ref<CColRefSet> pcrsScalar, gpos::Ref<CColRefSet> pcrsInner,
-		CColRefArray *pdrgpcrJoinOutput, ULONG ulCTEJoinId, ULONG ulCTEOuterId)
+		gpos::Ref<CColRefArray> pdrgpcrJoinOutput, ULONG ulCTEJoinId,
+		ULONG ulCTEOuterId)
 {
 	// compute the original outer keys and their correspondent keys on the two branches
 	// of the LASJ
@@ -402,10 +403,10 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprProjectOverLeftAntiSemiJoin(
-	CMemoryPool *mp, CColRefArray *pdrgpcrOuter,
+	CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOuter,
 	gpos::Ref<CColRefSet> pcrsScalar, gpos::Ref<CColRefSet> pcrsInner,
-	CColRefArray *pdrgpcrJoinOutput, ULONG ulCTEJoinId, ULONG ulCTEOuterId,
-	gpos::Ref<CColRefArray> *ppdrgpcrProjectOutput)
+	gpos::Ref<CColRefArray> pdrgpcrJoinOutput, ULONG ulCTEJoinId,
+	ULONG ulCTEOuterId, gpos::Ref<CColRefArray> *ppdrgpcrProjectOutput)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrOuter);
 	GPOS_ASSERT(nullptr != pcrsScalar);

@@ -79,12 +79,14 @@ private:
 	// on top of the given child expression
 	static gpos::Ref<CExpression> PexprAssertNotNull(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprChild,
-		gpos::Ref<CTableDescriptor> ptabdesc, CColRefArray *colref_array);
+		gpos::Ref<CTableDescriptor> ptabdesc,
+		gpos::Ref<CColRefArray> colref_array);
 
 	// create a logical assert for the check constraints on the given table
 	static gpos::Ref<CExpression> PexprAssertCheckConstraints(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprChild,
-		gpos::Ref<CTableDescriptor> ptabdesc, CColRefArray *colref_array);
+		gpos::Ref<CTableDescriptor> ptabdesc,
+		gpos::Ref<CColRefArray> colref_array);
 
 	// helper for extracting foreign key
 	static gpos::Ref<CColRefSet> PcrsFKey(CMemoryPool *mp,
@@ -95,14 +97,14 @@ private:
 	// return the set of columns from the given array of columns which appear
 	// in the index included / key columns
 	static gpos::Ref<CColRefSet> PcrsIndexColumns(
-		CMemoryPool *mp, CColRefArray *colref_array,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 		const gpos::Ref<IMDIndex> pmdindex, const gpos::Ref<IMDRelation> pmdrel,
 		EIndexCols eic);
 
 	// return the ordered array of columns from the given array of columns which appear
 	// in the index included / key columns
 	static gpos::Ref<CColRefArray> PdrgpcrIndexColumns(
-		CMemoryPool *mp, CColRefArray *colref_array,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 		const gpos::Ref<IMDIndex> pmdindex, const gpos::Ref<IMDRelation> pmdrel,
 		EIndexCols eic);
 
@@ -239,9 +241,9 @@ private:
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprOriginalPred,
 		gpos::Ref<CExpression> pexprPred, gpos::Ref<CTableDescriptor> ptabdesc,
-		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
-		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
-		gpos::Ref<CExpression> *ppexprRecheck,
+		const gpos::Ref<IMDRelation> pmdrel,
+		gpos::Ref<CColRefArray> pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
+		gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CExpression> *ppexprRecheck,
 		gpos::Ref<CExpression> *ppexprResidual);
 
 	// compute the residual predicate for a bitmap table scan
@@ -256,8 +258,9 @@ private:
 	static gpos::Ref<CExpression> PexprBitmapSelectBestIndex(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprPred, gpos::Ref<CTableDescriptor> ptabdesc,
-		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
-		gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CColRefSet> pcrsOuterRefs,
+		const gpos::Ref<IMDRelation> pmdrel,
+		gpos::Ref<CColRefArray> pdrgpcrOutput, gpos::Ref<CColRefSet> pcrsReqd,
+		gpos::Ref<CColRefSet> pcrsOuterRefs,
 		gpos::Ref<CExpression> *ppexprRecheck,
 		gpos::Ref<CExpression> *ppexprResidual, BOOL alsoConsiderBTreeIndexes);
 
@@ -364,7 +367,7 @@ public:
 	static gpos::Ref<CExpression> PexprRowTrigger(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprChild,
 		CLogicalDML::EDMLOperator edmlop, gpos::Ref<IMDId> rel_mdid,
-		BOOL fBefore, CColRefArray *colref_array);
+		BOOL fBefore, gpos::Ref<CColRefArray> colref_array);
 
 	// construct a trigger expression on top of the given expression
 	static gpos::Ref<CExpression> PexprRowTrigger(
@@ -378,13 +381,14 @@ public:
 	// from the given column array
 	static gpos::Ref<CExpression> PexprLogicalPartitionSelector(
 		CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
-		CColRefArray *colref_array, gpos::Ref<CExpression> pexprChild);
+		gpos::Ref<CColRefArray> colref_array,
+		gpos::Ref<CExpression> pexprChild);
 
 	// return partition filter expressions given a table
 	// descriptor and the given column references
 	static gpos::Ref<CExpressionArray> PdrgpexprPartEqFilters(
 		CMemoryPool *mp, gpos::Ref<CTableDescriptor> ptabdesc,
-		CColRefArray *pdrgpcrSource);
+		gpos::Ref<CColRefArray> pdrgpcrSource);
 
 	// helper for creating Agg expression equivalent to quantified subquery
 	static void QuantifiedToAgg(CMemoryPool *mp,
@@ -401,7 +405,8 @@ public:
 	// create a logical assert for the check constraints on the given table
 	static gpos::Ref<CExpression> PexprAssertConstraints(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprChild,
-		gpos::Ref<CTableDescriptor> ptabdesc, CColRefArray *colref_array);
+		gpos::Ref<CTableDescriptor> ptabdesc,
+		gpos::Ref<CColRefArray> colref_array);
 
 	// return true if stats derivation is needed for this xform
 	static BOOL FDeriveStatsBeforeXform(gpos::Ref<CXform> pxform);
@@ -423,21 +428,21 @@ public:
 	// return the array of key columns from the given array of columns which appear
 	// in the index key columns
 	static gpos::Ref<CColRefArray> PdrgpcrIndexKeys(
-		CMemoryPool *mp, CColRefArray *colref_array,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 		const gpos::Ref<IMDIndex> pmdindex,
 		const gpos::Ref<IMDRelation> pmdrel);
 
 	// return the set of key columns from the given array of columns which appear
 	// in the index key columns
 	static gpos::Ref<CColRefSet> PcrsIndexKeys(
-		CMemoryPool *mp, CColRefArray *colref_array,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 		const gpos::Ref<IMDIndex> pmdindex,
 		const gpos::Ref<IMDRelation> pmdrel);
 
 	// return the set of key columns from the given array of columns which appear
 	// in the index included columns
 	static gpos::Ref<CColRefSet> PcrsIndexIncludedCols(
-		CMemoryPool *mp, CColRefArray *colref_array,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 		const gpos::Ref<IMDIndex> pmdindex,
 		const gpos::Ref<IMDRelation> pmdrel);
 
@@ -445,9 +450,9 @@ public:
 	// expression columns
 	static BOOL FIndexApplicable(
 		CMemoryPool *mp, const gpos::Ref<IMDIndex> pmdindex,
-		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
-		gpos::Ref<CColRefSet> pcrsReqd, gpos::Ref<CColRefSet> pcrsScalar,
-		IMDIndex::EmdindexType emdindtype,
+		const gpos::Ref<IMDRelation> pmdrel,
+		gpos::Ref<CColRefArray> pdrgpcrOutput, gpos::Ref<CColRefSet> pcrsReqd,
+		gpos::Ref<CColRefSet> pcrsScalar, IMDIndex::EmdindexType emdindtype,
 		IMDIndex::EmdindexType altindtype = IMDIndex::EmdindSentinel);
 
 	// check whether a CTE should be inlined
@@ -463,7 +468,7 @@ public:
 	// create a logical sequence project with a "row_number" window function
 	static gpos::Ref<CExpression> PexprWindowWithRowNumber(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprWindowChild,
-		CColRefArray *pdrgpcrInput);
+		gpos::Ref<CColRefArray> pdrgpcrInput);
 
 	// generate a logical Assert expression that errors out when more than one row is generated
 	static gpos::Ref<CExpression> PexprAssertOneRow(
@@ -471,7 +476,7 @@ public:
 
 	// helper for adding CTE producer to global CTE info structure
 	static gpos::Ref<CExpression> PexprAddCTEProducer(
-		CMemoryPool *mp, ULONG ulCTEId, CColRefArray *colref_array,
+		CMemoryPool *mp, ULONG ulCTEId, gpos::Ref<CColRefArray> colref_array,
 		gpos::Ref<CExpression> pexpr);
 
 	// does transformation generate an Apply expression
@@ -508,9 +513,10 @@ public:
 		gpos::Ref<CExpression> pexprOriginalPred,
 		gpos::Ref<CExpressionArray> pdrgpexpr,
 		gpos::Ref<CTableDescriptor> ptabdesc,
-		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
-		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
-		BOOL fConjunction, gpos::Ref<CExpression> *ppexprRecheck,
+		const gpos::Ref<IMDRelation> pmdrel,
+		gpos::Ref<CColRefArray> pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
+		gpos::Ref<CColRefSet> pcrsReqd, BOOL fConjunction,
+		gpos::Ref<CExpression> *ppexprRecheck,
 		gpos::Ref<CExpression> *ppexprResidual, BOOL isAPartialPredicate);
 
 	// construct a bitmap bool op given the left and right bitmap access
@@ -527,9 +533,10 @@ public:
 		gpos::Ref<CExpression> pexprOriginalPred,
 		gpos::Ref<CExpressionArray> pdrgpexprPreds,
 		gpos::Ref<CTableDescriptor> ptabdesc,
-		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
-		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
-		BOOL fConjunction, gpos::Ref<CExpressionArray> pdrgpexprBitmap,
+		const gpos::Ref<IMDRelation> pmdrel,
+		gpos::Ref<CColRefArray> pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
+		gpos::Ref<CColRefSet> pcrsReqd, BOOL fConjunction,
+		gpos::Ref<CExpressionArray> pdrgpexprBitmap,
 		gpos::Ref<CExpressionArray> pdrgpexprRecheck,
 		gpos::Ref<CExpressionArray> pdrgpexprResidual,
 		BOOL isAPartialPredicate);
@@ -538,8 +545,9 @@ public:
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprOriginalPred,
 		gpos::Ref<CExpression> pexprPred, gpos::Ref<CTableDescriptor> ptabdesc,
-		const gpos::Ref<IMDRelation> pmdrel, CColRefArray *pdrgpcrOutput,
-		gpos::Ref<CColRefSet> outer_refs, gpos::Ref<CColRefSet> pcrsReqd,
+		const gpos::Ref<IMDRelation> pmdrel,
+		gpos::Ref<CColRefArray> pdrgpcrOutput, gpos::Ref<CColRefSet> outer_refs,
+		gpos::Ref<CColRefSet> pcrsReqd,
 		gpos::Ref<CExpression> *pexprBitmapResult,
 		gpos::Ref<CExpression> *pexprRecheckResult,
 		gpos::Ref<CExpressionArray> pdrgpexprResidualResult,
@@ -565,8 +573,10 @@ public:
 	// remap the expression from the old columns to the new ones
 	static gpos::Ref<CExpression> PexprRemapColumns(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprScalar,
-		CColRefArray *pdrgpcrA, CColRefArray *pdrgpcrRemappedA,
-		CColRefArray *pdrgpcrB, CColRefArray *pdrgpcrRemappedB);
+		gpos::Ref<CColRefArray> pdrgpcrA,
+		gpos::Ref<CColRefArray> pdrgpcrRemappedA,
+		gpos::Ref<CColRefArray> pdrgpcrB,
+		gpos::Ref<CColRefArray> pdrgpcrRemappedB);
 
 	// create a new CTE consumer for the given CTE id
 	static gpos::Ref<CExpression> PexprCTEConsumer(
@@ -578,7 +588,7 @@ public:
 	// e.g., colref_array = {col1, col2, col3}, pdrgpulIndexesOfRefs = {2, 1}
 	// the result will be {col3, col2}
 	static gpos::Ref<CColRefArray> PdrgpcrReorderedSubsequence(
-		CMemoryPool *mp, CColRefArray *colref_array,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 		gpos::Ref<ULongPtrArray> pdrgpulIndexesOfRefs);
 
 	// check if given xform is an Agg splitting xform

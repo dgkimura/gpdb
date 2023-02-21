@@ -74,7 +74,7 @@ public:
 	// the scalar expression of the part constraint
 	gpos::Ref<CExpression> GetPartConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CColRefArray *colref_array) const override;
+		gpos::Ref<CColRefArray> colref_array) const override;
 
 	// included default partitions
 	gpos::Ref<ULongPtrArray> GetDefaultPartsArray() const override;

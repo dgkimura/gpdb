@@ -93,7 +93,7 @@ public:
 	gpos::Ref<IMDId> GetFirstColTypeMdId() const;
 
 	// outer references
-	const CDXLColRefArray *
+	const gpos::Ref<CDXLColRefArray>
 	GetDxlOuterColRefsArray() const
 	{
 		return m_dxl_colref_array.get();

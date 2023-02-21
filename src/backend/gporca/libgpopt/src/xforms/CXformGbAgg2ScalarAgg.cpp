@@ -96,7 +96,7 @@ CXformGbAgg2ScalarAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 	;
 	;
 
-	CColRefArray *pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
+	gpos::Ref<CColRefArray> pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
 	if (pdrgpcrArgDQA != nullptr && 0 != pdrgpcrArgDQA->Size())
 	{
 		;

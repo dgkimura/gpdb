@@ -73,7 +73,7 @@ public:
 	}
 
 	// columns to delete
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	Pdrgpcr() const
 	{
 		return m_pdrgpcr.get();

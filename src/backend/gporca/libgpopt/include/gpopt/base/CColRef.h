@@ -159,12 +159,12 @@ public:
 	}
 
 	// extract array of colids from array of colrefs
-	static gpos::Ref<ULongPtrArray> Pdrgpul(CMemoryPool *mp,
-											CColRefArray *colref_array);
+	static gpos::Ref<ULongPtrArray> Pdrgpul(
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// check if the the array of column references are equal
-	static BOOL Equals(const CColRefArray *pdrgpcr1,
-					   const CColRefArray *pdrgpcr2);
+	static BOOL Equals(const gpos::Ref<CColRefArray> pdrgpcr1,
+					   const gpos::Ref<CColRefArray> pdrgpcr2);
 
 	// check if the the array of column reference arrays are equal
 	static BOOL Equals(const CColRef2dArray *pdrgdrgpcr1,

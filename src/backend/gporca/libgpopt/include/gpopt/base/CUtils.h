@@ -300,7 +300,7 @@ public:
 	// generate a GbAgg with sum(col) expressions for all columns in the given array
 	static gpos::Ref<CExpression> PexprGbAggSum(
 		CMemoryPool *mp, gpos::Ref<CExpression> pexprLogical,
-		CColRefArray *pdrgpcrSum);
+		gpos::Ref<CColRefArray> pdrgpcrSum);
 
 	// generate a count(col) expression
 	static gpos::Ref<CExpression> PexprCount(CMemoryPool *mp,
@@ -349,15 +349,15 @@ public:
 	// generate a projection of NULL constants
 	// to the map 'colref_mapping', and add the mappings to the colref_mapping map if not NULL
 	static gpos::Ref<CExpression> PexprLogicalProjectNulls(
-		CMemoryPool *mp, CColRefArray *colref_array,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 		gpos::Ref<CExpression> pexpr,
 		gpos::Ref<UlongToColRefMap> colref_mapping = nullptr);
 
 	// construct a project list using the given columns and datums
 	// store the mapping in the colref_mapping map if not NULL
 	static gpos::Ref<CExpression> PexprScalarProjListConst(
-		CMemoryPool *mp, CColRefArray *colref_array, IDatumArray *pdrgpdatum,
-		gpos::Ref<UlongToColRefMap> colref_mapping);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+		IDatumArray *pdrgpdatum, gpos::Ref<UlongToColRefMap> colref_mapping);
 
 	// generate a project expression
 	static gpos::Ref<CExpression> PexprAddProjection(
@@ -514,7 +514,7 @@ public:
 
 	// column reference array print helper
 	static IOstream &OsPrintDrgPcr(IOstream &os,
-								   const CColRefArray *colref_array,
+								   const gpos::Ref<CColRefArray> colref_array,
 								   ULONG = gpos::ulong_max);
 
 	//-------------------------------------------------------------------
@@ -549,7 +549,7 @@ public:
 	// return a copy of the given array of columns, excluding the columns
 	// in the given colrefset
 	static gpos::Ref<CColRefArray> PdrgpcrExcludeColumns(
-		CMemoryPool *mp, CColRefArray *pdrgpcrOriginal,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrOriginal,
 		gpos::Ref<CColRefSet> pcrsExcluded);
 
 	//-------------------------------------------------------------------
@@ -803,7 +803,7 @@ public:
 	static BOOL FInnerUsesExternalColsOnly(CExpressionHandle &exprhdl);
 
 	// check if comparison operators are available for the given columns
-	static BOOL FComparisonPossible(CColRefArray *colref_array,
+	static BOOL FComparisonPossible(gpos::Ref<CColRefArray> colref_array,
 									IMDType::ECmpType cmp_type);
 
 	static ULONG UlCountOperator(const gpos::Ref<CExpression> pexpr,
@@ -811,10 +811,10 @@ public:
 
 	// return the max subset of redistributable columns for the given columns
 	static gpos::Ref<CColRefArray> PdrgpcrRedistributableSubset(
-		CMemoryPool *mp, CColRefArray *colref_array);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// check if hashing is possible for the given columns
-	static BOOL IsHashable(CColRefArray *colref_array);
+	static BOOL IsHashable(gpos::Ref<CColRefArray> colref_array);
 
 	// check if the given operator is a logical DML operator
 	static BOOL FLogicalDML(gpos::Ref<COperator> pop);
@@ -827,8 +827,8 @@ public:
 	static CColRef *PcrFromProjElem(gpos::Ref<CExpression> pexprPrEl);
 
 	// construct an array of colids from the given array of column references
-	static gpos::Ref<ULongPtrArray> Pdrgpul(CMemoryPool *mp,
-											const CColRefArray *colref_array);
+	static gpos::Ref<ULongPtrArray> Pdrgpul(
+		CMemoryPool *mp, const gpos::Ref<CColRefArray> colref_array);
 
 	// generate a timestamp-based file name
 	static void GenerateFileName(CHAR *buf, const CHAR *szPrefix,
@@ -849,13 +849,13 @@ public:
 	// create an array of column references corresponding to the given array
 	// and based on the given mapping
 	static gpos::Ref<CColRefArray> PdrgpcrRemap(
-		CMemoryPool *mp, CColRefArray *colref_array,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 		gpos::Ref<UlongToColRefMap> colref_mapping, BOOL must_exist);
 
 	// create an array of column references corresponding to the given array
 	// and based on the given mapping and create new colrefs if necessary
 	static gpos::Ref<CColRefArray> PdrgpcrRemapAndCreate(
-		CMemoryPool *mp, CColRefArray *colref_array,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 		gpos::Ref<UlongToColRefMap> colref_mapping);
 
 	// create an array of column arrays corresponding to the given array
@@ -870,33 +870,35 @@ public:
 		gpos::Ref<UlongToColRefMap> colref_mapping);
 
 	// create ColRef->ColRef mapping using the given ColRef arrays
-	static gpos::Ref<UlongToColRefMap> PhmulcrMapping(CMemoryPool *mp,
-													  CColRefArray *pdrgpcrFrom,
-													  CColRefArray *pdrgpcrTo);
+	static gpos::Ref<UlongToColRefMap> PhmulcrMapping(
+		CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrFrom,
+		gpos::Ref<CColRefArray> pdrgpcrTo);
 
 	// add col ID->ColRef mappings to the given hashmap based on the
 	// given ColRef arrays
 	static void AddColumnMapping(CMemoryPool *mp,
 								 gpos::Ref<UlongToColRefMap> colref_mapping,
-								 CColRefArray *pdrgpcrFrom,
-								 CColRefArray *pdrgpcrTo);
+								 gpos::Ref<CColRefArray> pdrgpcrFrom,
+								 gpos::Ref<CColRefArray> pdrgpcrTo);
 
 	// create a copy of the array of column references
-	static gpos::Ref<CColRefArray> PdrgpcrExactCopy(CMemoryPool *mp,
-													CColRefArray *colref_array);
+	static gpos::Ref<CColRefArray> PdrgpcrExactCopy(
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// create an array of new column references with the same names and
 	// types as the given column references.
 	// if the passed map is not null, mappings from old to copied variables are added to it
 	static gpos::Ref<CColRefArray> PdrgpcrCopy(
-		CMemoryPool *mp, CColRefArray *colref_array, BOOL fAllComputed = false,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+		BOOL fAllComputed = false,
 		gpos::Ref<UlongToColRefMap> colref_mapping = nullptr);
 
 	// equality check between two arrays of column refs. Inputs can be NULL
-	static BOOL Equals(CColRefArray *pdrgpcrFst, CColRefArray *pdrgpcrSnd);
+	static BOOL Equals(gpos::Ref<CColRefArray> pdrgpcrFst,
+					   gpos::Ref<CColRefArray> pdrgpcrSnd);
 
 	// compute hash value for an array of column references
-	static ULONG UlHashColArray(const CColRefArray *colref_array,
+	static ULONG UlHashColArray(const gpos::Ref<CColRefArray> colref_array,
 								const ULONG ulMaxCols = 5);
 
 	// return the set of column reference from the CTE Producer corresponding to the
@@ -911,7 +913,7 @@ public:
 		CMemoryPool *mp, CColRef2dArray *pdrgpdrgpcrInput);
 
 	// check whether a colref array contains repeated items
-	static BOOL FHasDuplicates(const CColRefArray *colref_array);
+	static BOOL FHasDuplicates(const gpos::Ref<CColRefArray> colref_array);
 
 	// cast the input expression to the destination mdid
 	static gpos::Ref<CExpression> PexprCast(CMemoryPool *mp,
@@ -927,7 +929,7 @@ public:
 	// construct an array of scalar ident expressions from the given array
 	// of column references
 	static gpos::Ref<CExpressionArray> PdrgpexprScalarIdents(
-		CMemoryPool *mp, CColRefArray *colref_array);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// return the columns from the scalar ident expressions in the given array
 	static gpos::Ref<CColRefSet> PcrsExtractColumns(
@@ -944,8 +946,9 @@ public:
 	static gpos::Ref<CExpression> PexprLogicalCTGDummy(CMemoryPool *mp);
 
 	// map a column from source array to destination array based on position
-	static CColRef *PcrMap(CColRef *pcrSource, CColRefArray *pdrgpcrSource,
-						   CColRefArray *pdrgpcrTarget);
+	static CColRef *PcrMap(CColRef *pcrSource,
+						   gpos::Ref<CColRefArray> pdrgpcrSource,
+						   gpos::Ref<CColRefArray> pdrgpcrTarget);
 
 	//	return index of the set containing given column
 	static ULONG UlPcrIndexContainingSet(gpos::Ref<CColRefSetArray> pdrgpcrs,

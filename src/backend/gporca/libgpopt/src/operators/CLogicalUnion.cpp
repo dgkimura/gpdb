@@ -51,7 +51,7 @@ CLogicalUnion::CLogicalUnion(CMemoryPool *mp,
 	: CLogicalSetOp(mp, std::move(pdrgpcrOutput), std::move(pdrgpdrgpcrInput))
 {
 #ifdef GPOS_DEBUG
-	CColRefArray *pdrgpcrInput = (*pdrgpdrgpcrInput)[0].get();
+	gpos::Ref<CColRefArray> pdrgpcrInput = (*pdrgpdrgpcrInput)[0].get();
 	const ULONG num_cols = pdrgpcrOutput->Size();
 	GPOS_ASSERT(num_cols == pdrgpcrInput->Size());
 

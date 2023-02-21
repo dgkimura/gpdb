@@ -211,7 +211,7 @@ CDXLPhysicalNLJoin::NestParamsExists() const
 	return m_nest_params_exists;
 }
 
-CDXLColRefArray *
+gpos::Ref<CDXLColRefArray>
 CDXLPhysicalNLJoin::GetNestLoopParamsColRefs() const
 {
 	return m_nest_params_col_refs.get();

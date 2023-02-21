@@ -126,7 +126,7 @@ CColRef::OsPrint(IOstream &os) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<ULongPtrArray>
-CColRef::Pdrgpul(CMemoryPool *mp, CColRefArray *colref_array)
+CColRef::Pdrgpul(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array)
 {
 	gpos::Ref<ULongPtrArray> pdrgpul = GPOS_NEW(mp) ULongPtrArray(mp);
 	const ULONG length = colref_array->Size();
@@ -148,14 +148,15 @@ CColRef::Pdrgpul(CMemoryPool *mp, CColRefArray *colref_array)
 //
 //---------------------------------------------------------------------------
 BOOL
-CColRef::Equals(const CColRefArray *pdrgpcr1, const CColRefArray *pdrgpcr2)
+CColRef::Equals(const gpos::Ref<CColRefArray> pdrgpcr1,
+				const gpos::Ref<CColRefArray> pdrgpcr2)
 {
 	if (nullptr == pdrgpcr1 || nullptr == pdrgpcr2)
 	{
 		return (nullptr == pdrgpcr1 && nullptr == pdrgpcr2);
 	}
 
-	return pdrgpcr1->Equals(pdrgpcr2);
+	return pdrgpcr1->Equals(pdrgpcr2.get());
 }
 
 // check if the the array of column references are equal. Note that since we have unique

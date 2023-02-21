@@ -94,7 +94,7 @@ CXformSplitGbAggDedup::Transform(gpos::Ref<CXformContext> pxfctxt,
 	;
 	;
 
-	CColRefArray *pdrgpcrMinimal = popAggDedup->PdrgpcrMinimal();
+	gpos::Ref<CColRefArray> pdrgpcrMinimal = popAggDedup->PdrgpcrMinimal();
 	if (nullptr != pdrgpcrMinimal)
 	{
 		;

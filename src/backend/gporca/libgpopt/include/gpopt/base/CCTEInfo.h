@@ -173,7 +173,7 @@ private:
 		}
 
 		// add given columns to consumers column map
-		void AddConsumerCols(CColRefArray *colref_array);
+		void AddConsumerCols(gpos::Ref<CColRefArray> colref_array);
 
 		// return position of given consumer column in consumer output
 		ULONG UlConsumerColPos(CColRef *colref);
@@ -299,7 +299,7 @@ public:
 	void MapComputedToUsedCols(CColumnFactory *col_factory) const;
 
 	// add given columns to consumers column map
-	void AddConsumerCols(ULONG ulCTEId, CColRefArray *colref_array);
+	void AddConsumerCols(ULONG ulCTEId, gpos::Ref<CColRefArray> colref_array);
 
 	// return position of given consumer column in consumer output
 	ULONG UlConsumerColPos(ULONG ulCTEId, CColRef *colref);
@@ -307,7 +307,7 @@ public:
 	// return a map from Id's of consumer columns in the given column set to their corresponding producer columns
 	gpos::Ref<UlongToColRefMap> PhmulcrConsumerToProducer(
 		CMemoryPool *mp, ULONG ulCTEId, gpos::Ref<CColRefSet> pcrs,
-		CColRefArray *pdrgpcrProducer);
+		gpos::Ref<CColRefArray> pdrgpcrProducer);
 
 };	// CCTEInfo
 }  // namespace gpopt

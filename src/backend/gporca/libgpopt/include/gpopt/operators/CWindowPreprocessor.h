@@ -54,7 +54,8 @@ private:
 						  gpos::Ref<CExpression> *ppexprSecondConsumer);
 
 	// extract grouping columns from given expression
-	static CColRefArray *PdrgpcrGrpCols(gpos::Ref<CExpression> pexprJoinDQAs);
+	static gpos::Ref<CColRefArray> PdrgpcrGrpCols(
+		gpos::Ref<CExpression> pexprJoinDQAs);
 
 	// transform sequence project expression into an inner join expression
 	static gpos::Ref<CExpression> PexprSeqPrj2Join(

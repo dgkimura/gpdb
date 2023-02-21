@@ -34,7 +34,7 @@ public:
 
 	// ctor
 	CPhysicalHashAgg(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
-					 CColRefArray *pdrgpcrMinimal,
+					 gpos::Ref<CColRefArray> pdrgpcrMinimal,
 					 COperator::EGbAggType egbaggtype,
 					 BOOL fGeneratesDuplicates,
 					 gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,

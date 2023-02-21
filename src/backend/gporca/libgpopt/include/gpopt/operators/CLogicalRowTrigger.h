@@ -93,14 +93,14 @@ public:
 	}
 
 	// old columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrOld() const
 	{
 		return m_pdrgpcrOld.get();
 	}
 
 	// new columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrNew() const
 	{
 		return m_pdrgpcrNew.get();

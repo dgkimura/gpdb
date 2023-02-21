@@ -221,8 +221,8 @@ private:
 												  gpos::Ref<CExpression> expr);
 
 	static gpos::Ref<CConstraint> PcnstrFromChildPartition(
-		const gpos::Ref<IMDRelation> partrel, CColRefArray *pdrgpcrOutput,
-		ColRefToUlongMap *col_mapping);
+		const gpos::Ref<IMDRelation> partrel,
+		gpos::Ref<CColRefArray> pdrgpcrOutput, ColRefToUlongMap *col_mapping);
 
 	// swap logical select over logical project
 	static gpos::Ref<CExpression> PexprTransposeSelectAndProject(

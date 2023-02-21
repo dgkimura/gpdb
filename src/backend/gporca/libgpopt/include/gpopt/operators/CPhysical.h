@@ -337,7 +337,7 @@ public:
 	// compute distribution spec from the table descriptor
 	static gpos::Ref<CDistributionSpec> PdsCompute(
 		CMemoryPool *mp, const gpos::Ref<CTableDescriptor> ptabdesc,
-		CColRefArray *pdrgpcrOutput, CColRef *gp_segment_id);
+		gpos::Ref<CColRefArray> pdrgpcrOutput, CColRef *gp_segment_id);
 
 	// compute required sort order of the n-th child
 	virtual gpos::Ref<COrderSpec> PosRequired(

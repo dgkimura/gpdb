@@ -167,7 +167,7 @@ public:
 	// check whether a project list has the same columns in the given array
 	// and in the same order
 	static BOOL FProjectListMatch(gpos::Ref<CDXLNode> pdxlnPrL,
-								  CColRefArray *colref_array);
+								  gpos::Ref<CColRefArray> colref_array);
 
 	// create a project list by creating references to the columns of the given
 	// project list of the child node
@@ -208,13 +208,13 @@ public:
 		const CColRef *colref);
 
 	// construct an array of NULL datums for a given array of columns
-	static gpos::Ref<IDatumArray> PdrgpdatumNulls(CMemoryPool *mp,
-												  CColRefArray *colref_array);
+	static gpos::Ref<IDatumArray> PdrgpdatumNulls(
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// map an array of columns to a new array of columns
 	static gpos::Ref<CColRefArray> PdrgpcrMapColumns(
-		CMemoryPool *mp, CColRefArray *pdrgpcrInput, ColRefToUlongMap *phmcrul,
-		CColRefArray *pdrgpcrMapDest);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrInput,
+		ColRefToUlongMap *phmcrul, gpos::Ref<CColRefArray> pdrgpcrMapDest);
 
 	// combine two boolean expressions using the given boolean operator
 	static gpos::Ref<CDXLNode> PdxlnCombineBoolean(
@@ -235,7 +235,7 @@ public:
 	// build hashmap based on a column array, where the key is the column
 	// and the value is the index of that column in the array
 	static gpos::Ref<ColRefToUlongMap> PhmcrulColIndex(
-		CMemoryPool *mp, CColRefArray *colref_array);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array);
 
 	// set statistics of the operator
 	static void SetStats(CMemoryPool *mp, CMDAccessor *md_accessor,
@@ -246,7 +246,7 @@ public:
 	static void SetDirectDispatchInfo(
 		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CDXLNode> dxlnode,
 		gpos::Ref<CExpression> pexpr,
-		CDistributionSpecArray *pdrgpdsBaseTables);
+		gpos::Ref<CDistributionSpecArray> pdrgpdsBaseTables);
 
 	// is the aggregate a local hash aggregate that is safe to stream
 	static BOOL FLocalHashAggStreamSafe(gpos::Ref<CExpression> pexprAgg);

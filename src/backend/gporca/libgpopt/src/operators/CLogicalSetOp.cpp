@@ -219,7 +219,7 @@ CLogicalSetOp::DerivePartitionInfo(CMemoryPool *mp,
 		gpos::Ref<CPartInfo> ppartinfoChild = exprhdl.DerivePartitionInfo(ul);
 		GPOS_ASSERT(nullptr != ppartinfoChild);
 
-		CColRefArray *pdrgpcrInput = (*m_pdrgpdrgpcrInput)[ul].get();
+		gpos::Ref<CColRefArray> pdrgpcrInput = (*m_pdrgpdrgpcrInput)[ul].get();
 		GPOS_ASSERT(pdrgpcrInput->Size() == m_pdrgpcrOutput->Size());
 
 		gpos::Ref<CPartInfo> ppartinfoRemapped =
@@ -257,7 +257,7 @@ CLogicalSetOp::Matches(gpos::Ref<COperator> pop) const
 	const ULONG arity = pdrgpdrgpcrInput->Size();
 
 	if (arity != m_pdrgpdrgpcrInput->Size() ||
-		!m_pdrgpcrOutput->Equals(popSetOp->PdrgpcrOutput()))
+		!m_pdrgpcrOutput->Equals(popSetOp->PdrgpcrOutput().get()))
 	{
 		return false;
 	}

@@ -94,7 +94,7 @@ CCTEInfo::CCTEInfoEntry::~CCTEInfoEntry()
 //
 //---------------------------------------------------------------------------
 void
-CCTEInfo::CCTEInfoEntry::AddConsumerCols(CColRefArray *colref_array)
+CCTEInfo::CCTEInfoEntry::AddConsumerCols(gpos::Ref<CColRefArray> colref_array)
 {
 	GPOS_ASSERT(nullptr != colref_array);
 
@@ -560,7 +560,7 @@ CCTEInfo::MapComputedToUsedCols(CColumnFactory *col_factory) const
 //
 //---------------------------------------------------------------------------
 void
-CCTEInfo::AddConsumerCols(ULONG ulCTEId, CColRefArray *colref_array)
+CCTEInfo::AddConsumerCols(ULONG ulCTEId, gpos::Ref<CColRefArray> colref_array)
 {
 	GPOS_ASSERT(nullptr != colref_array);
 
@@ -688,8 +688,8 @@ CCTEInfo::MarkUnusedCTEs()
 gpos::Ref<UlongToColRefMap>
 CCTEInfo::PhmulcrConsumerToProducer(
 	CMemoryPool *mp, ULONG ulCTEId,
-	gpos::Ref<CColRefSet> pcrs,	   // set of columns to check
-	CColRefArray *pdrgpcrProducer  // producer columns
+	gpos::Ref<CColRefSet> pcrs,				 // set of columns to check
+	gpos::Ref<CColRefArray> pdrgpcrProducer	 // producer columns
 )
 {
 	GPOS_ASSERT(nullptr != pcrs);

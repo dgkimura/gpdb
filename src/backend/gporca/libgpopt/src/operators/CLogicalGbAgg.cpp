@@ -390,7 +390,7 @@ CLogicalGbAgg::PcrsStat(CMemoryPool *mp, CExpressionHandle &exprhdl,
 gpos::Ref<CColRefSet>
 CLogicalGbAgg::PcrsStatGbAgg(CMemoryPool *mp, CExpressionHandle &exprhdl,
 							 gpos::Ref<CColRefSet> pcrsInput, ULONG child_index,
-							 CColRefArray *pdrgpcrGrp) const
+							 gpos::Ref<CColRefArray> pdrgpcrGrp) const
 {
 	GPOS_ASSERT(nullptr != pdrgpcrGrp);
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
@@ -625,7 +625,7 @@ CLogicalGbAgg::PxfsCandidates(CMemoryPool *mp) const
 //---------------------------------------------------------------------------
 gpos::Ref<IStatistics>
 CLogicalGbAgg::PstatsDerive(CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
-							CColRefArray *pdrgpcrGroupingCols,
+							gpos::Ref<CColRefArray> pdrgpcrGroupingCols,
 							gpos::Ref<ULongPtrArray> pdrgpulComputedCols,
 							gpos::Ref<CBitSet> keys)
 {

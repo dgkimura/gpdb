@@ -86,7 +86,7 @@ CXformGet2TableScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CTableDescriptor> ptabdesc = popGet->Ptabdesc();
 	;
 
-	CColRefArray *pdrgpcrOutput = popGet->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popGet->PdrgpcrOutput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 
 	;

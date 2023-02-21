@@ -112,7 +112,7 @@ public:
 	}
 
 	// accessors
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput.get();

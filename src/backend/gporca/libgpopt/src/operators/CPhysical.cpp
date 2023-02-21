@@ -256,7 +256,8 @@ CPhysical::CReqdColsRequest::Equals(const gpos::Ref<CReqdColsRequest> prcrFst,
 gpos::Ref<CDistributionSpec>
 CPhysical::PdsCompute(CMemoryPool *mp,
 					  const gpos::Ref<CTableDescriptor> ptabdesc,
-					  CColRefArray *pdrgpcrOutput, CColRef *pcr_segment_id)
+					  gpos::Ref<CColRefArray> pdrgpcrOutput,
+					  CColRef *pcr_segment_id)
 {
 	gpos::Ref<CDistributionSpec> pds = nullptr;
 

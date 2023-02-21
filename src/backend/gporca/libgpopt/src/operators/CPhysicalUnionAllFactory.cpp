@@ -25,7 +25,8 @@ CPhysicalUnionAllFactory::CPhysicalUnionAllFactory(
 gpos::Ref<CPhysicalUnionAll>
 CPhysicalUnionAllFactory::PopPhysicalUnionAll(CMemoryPool *mp, BOOL fParallel)
 {
-	CColRefArray *pdrgpcrOutput = m_popLogicalUnionAll->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput =
+		m_popLogicalUnionAll->PdrgpcrOutput();
 	CColRef2dArray *pdrgpdrgpcrInput = m_popLogicalUnionAll->PdrgpdrgpcrInput();
 
 	// TODO:  May 2nd 2012; support compatible types

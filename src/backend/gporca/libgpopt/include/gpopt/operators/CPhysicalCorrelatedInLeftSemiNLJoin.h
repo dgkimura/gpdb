@@ -155,7 +155,7 @@ public:
 	}
 
 	// return required inner columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgPcrInner() const override
 	{
 		return m_pdrgpcrInner.get();

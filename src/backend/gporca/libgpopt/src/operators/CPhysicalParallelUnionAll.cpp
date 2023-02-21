@@ -59,7 +59,7 @@ CPhysicalParallelUnionAll::PdsRequired(CMemoryPool *mp, CExpressionHandle &,
 	}
 	else
 	{
-		CColRefArray *pdrgpcrChildInputColumns =
+		gpos::Ref<CColRefArray> pdrgpcrChildInputColumns =
 			(*PdrgpdrgpcrInput())[child_index].get();
 		gpos::Ref<CExpressionArray> pdrgpexprFakeRequestedColumns =
 			GPOS_NEW(mp) CExpressionArray(mp);

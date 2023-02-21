@@ -95,14 +95,14 @@ public:
 	}
 
 	// deletion columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrDelete() const
 	{
 		return m_pdrgpcrDelete.get();
 	}
 
 	// insertion columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrInsert() const
 	{
 		return m_pdrgpcrInsert.get();

@@ -81,7 +81,8 @@ public:
 		{
 			return m_pdrgpcrInner->Equals(
 				gpos::dyn_cast<CPhysicalCorrelatedLeftOuterNLJoin>(pop)
-					->PdrgPcrInner());
+					->PdrgPcrInner()
+					.get());
 		}
 
 		return false;
@@ -143,7 +144,7 @@ public:
 	}
 
 	// return required inner columns
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgPcrInner() const override
 	{
 		return m_pdrgpcrInner.get();

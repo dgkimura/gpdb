@@ -69,7 +69,7 @@ public:
 	~CParseHandlerNLJIndexParamList() override;
 
 	// return param column references
-	CDXLColRefArray *
+	gpos::Ref<CDXLColRefArray>
 	GetNLParamsColRefs() const
 	{
 		return m_nest_params_colrefs_array.get();

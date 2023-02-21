@@ -105,8 +105,8 @@ public:
 		gpos::Ref<CLogicalSetOp> popSetOp =
 			gpos::dyn_cast<CLogicalSetOp>(pexprSetOp->Pop());
 
-		CColRefArray *pdrgpcrGb = popGbAgg->Pdrgpcr();
-		CColRefArray *pdrgpcrOutput = popSetOp->PdrgpcrOutput();
+		gpos::Ref<CColRefArray> pdrgpcrGb = popGbAgg->Pdrgpcr();
+		gpos::Ref<CColRefArray> pdrgpcrOutput = popSetOp->PdrgpcrOutput();
 		gpos::Ref<CColRefSet> pcrsOutput =
 			GPOS_NEW(mp) CColRefSet(mp, pdrgpcrOutput);
 		CColRef2dArray *pdrgpdrgpcrInput = popSetOp->PdrgpdrgpcrInput();
@@ -121,7 +121,8 @@ public:
 		for (ULONG ulChild = 0; ulChild < arity; ulChild++)
 		{
 			gpos::Ref<CExpression> pexprChild = (*pexprSetOp)[ulChild];
-			CColRefArray *pdrgpcrChild = (*pdrgpdrgpcrInput)[ulChild].get();
+			gpos::Ref<CColRefArray> pdrgpcrChild =
+				(*pdrgpdrgpcrInput)[ulChild].get();
 			gpos::Ref<CColRefSet> pcrsChild =
 				GPOS_NEW(mp) CColRefSet(mp, pdrgpcrChild);
 

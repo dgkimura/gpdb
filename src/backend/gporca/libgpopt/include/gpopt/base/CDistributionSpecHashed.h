@@ -191,7 +191,8 @@ public:
 
 	// return a hashed distribution on the maximal hashable subset of given columns
 	static gpos::Ref<CDistributionSpecHashed> PdshashedMaximal(
-		CMemoryPool *mp, CColRefArray *colref_array, BOOL fNullsColocated);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
+		BOOL fNullsColocated);
 
 	// conversion function
 	static gpos::Ref<CDistributionSpecHashed>

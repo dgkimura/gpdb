@@ -884,7 +884,7 @@ CSubqueryHandler::FCreateGrpCols(
 			return false;
 		}
 
-		CColRefArray *pdrgpcrSystemCols =
+		gpos::Ref<CColRefArray> pdrgpcrSystemCols =
 			COptCtxt::PoctxtFromTLS()->PdrgpcrSystemCols();
 		if (nullptr != pdrgpcrSystemCols && 0 < pdrgpcrSystemCols->Size())
 		{

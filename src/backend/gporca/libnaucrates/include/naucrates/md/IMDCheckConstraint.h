@@ -53,7 +53,7 @@ public:
 	// the scalar expression of the check constraint
 	virtual gpos::Ref<CExpression> GetCheckConstraintExpr(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
-		CColRefArray *colref_array) const = 0;
+		gpos::Ref<CColRefArray> colref_array) const = 0;
 };
 }  // namespace gpmd
 

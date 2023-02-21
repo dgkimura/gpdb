@@ -64,9 +64,9 @@ CMDPartConstraintGPDB::~CMDPartConstraintGPDB()
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CMDPartConstraintGPDB::GetPartConstraintExpr(CMemoryPool *mp,
-											 CMDAccessor *md_accessor,
-											 CColRefArray *colref_array) const
+CMDPartConstraintGPDB::GetPartConstraintExpr(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	gpos::Ref<CColRefArray> colref_array) const
 {
 	GPOS_ASSERT(nullptr != colref_array);
 

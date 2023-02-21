@@ -168,7 +168,7 @@ CXformSimplifyGbAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CExpression> pexprRelational = (*pexpr)[0];
 	gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 
-	CColRefArray *colref_array = popAgg->Pdrgpcr();
+	gpos::Ref<CColRefArray> colref_array = popAgg->Pdrgpcr();
 	gpos::Ref<CColRefSet> pcrsGrpCols = GPOS_NEW(mp) CColRefSet(mp);
 	pcrsGrpCols->Include(colref_array);
 

@@ -38,9 +38,9 @@ public:
 	// ctor
 	CPhysicalHashAggDeduplicate(
 		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
-		CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
-		gpos::Ref<CColRefArray> pdrgpcrKeys, BOOL fGeneratesDuplicates,
-		BOOL fMultiStage, BOOL isAggFromSplitDQA,
+		gpos::Ref<CColRefArray> pdrgpcrMinimal,
+		COperator::EGbAggType egbaggtype, gpos::Ref<CColRefArray> pdrgpcrKeys,
+		BOOL fGeneratesDuplicates, BOOL fMultiStage, BOOL isAggFromSplitDQA,
 		CLogicalGbAgg::EAggStage aggStage, BOOL should_enforce_distribution);
 
 	// dtor
@@ -62,7 +62,7 @@ public:
 	}
 
 	// array of keys from the join's child
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrKeys() const
 	{
 		return m_pdrgpcrKeys.get();

@@ -45,22 +45,22 @@ private:
 		gpos::Ref<CExpressionArray> pdrgpexprPrElFirstStage,
 		gpos::Ref<CExpressionArray> pdrgpexprPrElSecondStage,
 		gpos::Ref<CExpressionArray> pdrgpexprPrElThirdStage,
-		CColRefArray *pdrgpcrArgDQA, CColRefArray *pdrgpcrLastStage,
-		BOOL fSplit2LevelsOnly, BOOL fAddDistinctColToLocalGb,
-		CLogicalGbAgg::EAggStage aggStage);
+		gpos::Ref<CColRefArray> pdrgpcrArgDQA,
+		gpos::Ref<CColRefArray> pdrgpcrLastStage, BOOL fSplit2LevelsOnly,
+		BOOL fAddDistinctColToLocalGb, CLogicalGbAgg::EAggStage aggStage);
 
 	// split DQA into a local DQA and global non-DQA aggregate function
 	static gpos::Ref<CExpression> PexprSplitIntoLocalDQAGlobalAgg(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexpr, gpos::Ref<CExpression> pexprRelational,
-		ExprToColRefMap *phmexprcr, CColRefArray *pdrgpcrArgDQA,
+		ExprToColRefMap *phmexprcr, gpos::Ref<CColRefArray> pdrgpcrArgDQA,
 		CLogicalGbAgg::EAggStage aggStage);
 
 	// helper function to split DQA
 	static gpos::Ref<CExpression> PexprSplitHelper(
 		CMemoryPool *mp, CColumnFactory *col_factory, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexpr, gpos::Ref<CExpression> pexprRelational,
-		ExprToColRefMap *phmexprcr, CColRefArray *pdrgpcrArgDQA,
+		ExprToColRefMap *phmexprcr, gpos::Ref<CColRefArray> pdrgpcrArgDQA,
 		CLogicalGbAgg::EAggStage aggStage);
 
 	// given a scalar aggregate generate the local, intermediate and global

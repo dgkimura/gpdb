@@ -35,7 +35,8 @@ public:
 	// ctor
 	CPhysicalScalarAgg(
 		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
-		CColRefArray *pdrgpcrMinimal,  // minimal grouping columns based on FD's
+		gpos::Ref<CColRefArray>
+			pdrgpcrMinimal,	 // minimal grouping columns based on FD's
 		COperator::EGbAggType egbaggtype, BOOL fGeneratesDuplicates,
 		gpos::Ref<CColRefArray> pdrgpcrArgDQA, BOOL fMultiStage,
 		BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,

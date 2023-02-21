@@ -84,7 +84,7 @@ public:
 	}
 
 	// return required inner columns -- overloaded by correlated join children
-	virtual CColRefArray *
+	virtual gpos::Ref<CColRefArray>
 	PdrgPcrInner() const
 	{
 		return nullptr;

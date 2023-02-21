@@ -603,7 +603,7 @@ CExpressionPreprocessor::PexprRemoveSuperfluousOuterRefs(
 						mp, pdrgpcrMinimal.get(), outer_refs);
 				}
 
-				CColRefArray *pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
+				gpos::Ref<CColRefArray> pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
 				if (nullptr != pdrgpcrArgDQA)
 				{
 					;
@@ -2326,7 +2326,7 @@ CExpressionPreprocessor::PexprPruneProjListProjectOrGbAgg(
 			GPOS_ASSERT(COperator::EopLogicalGbAgg == pop->Eopid());
 
 			gpos::Ref<CExpression> pexprProjectListNew = nullptr;
-			CColRefArray *pdrgpcrGroupingCols =
+			gpos::Ref<CColRefArray> pdrgpcrGroupingCols =
 				gpos::dyn_cast<CLogicalGbAgg>(pop)->Pdrgpcr();
 			if (0 < pdrgpcrGroupingCols->Size())
 			{
@@ -2742,7 +2742,7 @@ CExpressionPreprocessor::PrunePartitions(CMemoryPool *mp,
 // partition.
 gpos::Ref<CConstraint>
 CExpressionPreprocessor::PcnstrFromChildPartition(
-	const gpos::Ref<IMDRelation> partrel, CColRefArray *pdrgpcrOutput,
+	const gpos::Ref<IMDRelation> partrel, gpos::Ref<CColRefArray> pdrgpcrOutput,
 	ColRefToUlongMap *root_col_mapping)
 {
 	CMDAccessor *md_accessor = COptCtxt::PoctxtFromTLS()->Pmda();
@@ -3027,8 +3027,8 @@ CExpressionPreprocessor::ConvertSplitUpdateToInPlaceUpdate(
 	}
 	gpos::Ref<CLogicalUpdate> popUpdate = gpos::dyn_cast<CLogicalUpdate>(pop);
 	gpos::Ref<CTableDescriptor> tabdesc = popUpdate->Ptabdesc();
-	CColRefArray *pdrgpcrInsert = popUpdate->PdrgpcrInsert();
-	CColRefArray *pdrgpcrDelete = popUpdate->PdrgpcrDelete();
+	gpos::Ref<CColRefArray> pdrgpcrInsert = popUpdate->PdrgpcrInsert();
+	gpos::Ref<CColRefArray> pdrgpcrDelete = popUpdate->PdrgpcrDelete();
 	const ULONG num_cols = pdrgpcrInsert->Size();
 	BOOL split_update = false;
 	gpos::Ref<CColRefArray> ppartColRefs = GPOS_NEW(mp) CColRefArray(mp);

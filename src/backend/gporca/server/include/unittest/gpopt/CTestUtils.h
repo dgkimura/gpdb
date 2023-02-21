@@ -507,7 +507,7 @@ public:
 	// generate a query context from an array of required column references
 	static CQueryContext *PqcGenerate(CMemoryPool *mp,
 									  gpos::Ref<CExpression> pexpr,
-									  CColRefArray *colref_array);
+									  gpos::Ref<CColRefArray> colref_array);
 
 	// generate a dummy query context for testing
 	static CQueryContext *PqcGenerate(CMemoryPool *mp,
@@ -782,7 +782,7 @@ CTestUtils::PexprJoinPartitioned(CMemoryPool *mp, BOOL fOuterPartitioned)
 
 	GPOS_ASSERT(pdrgpdrgpcr != nullptr);
 	GPOS_ASSERT(0 < pdrgpdrgpcr->Size());
-	CColRefArray *colref_array = (*pdrgpdrgpcr)[0].get();
+	gpos::Ref<CColRefArray> colref_array = (*pdrgpdrgpcr)[0].get();
 	GPOS_ASSERT(1 == colref_array->Size());
 	CColRef *pcrPartKey = (*colref_array)[0];
 

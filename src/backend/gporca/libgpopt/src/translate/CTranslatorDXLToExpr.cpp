@@ -21,6 +21,7 @@
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/CColumnFactory.h"
 #include "gpopt/base/CDistributionSpecAny.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CEnfdDistribution.h"
 #include "gpopt/base/CEnfdOrder.h"
 #include "gpopt/base/CUtils.h"
@@ -370,7 +371,7 @@ CTranslatorDXLToExpr::PexprTranslateQuery(
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
 CTranslatorDXLToExpr::PexprTranslateScalar(const gpos::Ref<CDXLNode> dxlnode,
-										   CColRefArray *colref_array,
+										   gpos::Ref<CColRefArray> colref_array,
 										   gpos::Ref<ULongPtrArray> pdrgpul)
 {
 	GPOS_ASSERT_IMP(nullptr != pdrgpul, nullptr != colref_array);
@@ -595,7 +596,7 @@ CTranslatorDXLToExpr::PexprLogicalGet(const gpos::Ref<CDXLNode> dxlnode)
 	// create a logical get or dynamic get operator
 	CName *pname = GPOS_NEW(m_mp) CName(m_mp, CName(&strAlias));
 	gpos::Ref<CLogical> popGet = nullptr;
-	CColRefArray *colref_array = nullptr;
+	gpos::Ref<CColRefArray> colref_array = nullptr;
 
 	const gpos::Ref<IMDRelation> pmdrel =
 		m_pmda->RetrieveRel(table_descr->MDId());
@@ -792,8 +793,7 @@ CTranslatorDXLToExpr::PexprCastPrjElem(gpos::Ref<IMDId> pmdidSource,
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
 		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
-			const_cast<gpos::Ref<CMDArrayCoerceCastGPDB> >(
-				gpos::cast<CMDArrayCoerceCastGPDB>(pmdcast));
+			gpos::dyn_cast<CMDArrayCoerceCastGPDB>(pmdcast);
 		pexprCast = GPOS_NEW(m_mp) CExpression(
 			m_mp,
 			GPOS_NEW(m_mp) CScalarArrayCoerceExpr(
@@ -1125,7 +1125,7 @@ CTranslatorDXLToExpr::Pdrgpcr(const CDXLColDescrArray *dxl_col_descr_array)
 void
 CTranslatorDXLToExpr::ConstructDXLColId2ColRefMapping(
 	const CDXLColDescrArray *dxl_col_descr_array,
-	const CColRefArray *colref_array)
+	const gpos::Ref<CColRefArray> colref_array)
 {
 	GPOS_ASSERT(nullptr != dxl_col_descr_array);
 	GPOS_ASSERT(nullptr != colref_array);
@@ -1357,11 +1357,11 @@ CTranslatorDXLToExpr::PexprLogicalCTEConsumer(const gpos::Ref<CDXLNode> dxlnode)
 		pdxlopCTEConsumer->GetOutputColIdsArray();
 
 	// create new col refs
-	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	gpos::Ref<CExpression> pexprProducer = pcteinfo->PexprCTEProducer(id);
 	GPOS_ASSERT(nullptr != pexprProducer);
 
-	CColRefArray *pdrgpcrProducer =
+	gpos::Ref<CColRefArray> pdrgpcrProducer =
 		gpos::dyn_cast<CLogicalCTEProducer>(pexprProducer->Pop())->Pdrgpcr();
 	gpos::Ref<CColRefArray> pdrgpcrConsumer =
 		CUtils::PdrgpcrCopy(m_mp, pdrgpcrProducer);
@@ -1776,7 +1776,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const gpos::Ref<CDXLNode> dxlnode)
 
 			// add the created project element to the project list of the window node
 			ULONG ulSpecPos = pdxlopWindowRef->GetWindSpecPos();
-			const gpos::Ref<CExpressionArray> pdrgpexpr =
+			gpos::Ref<CExpressionArray> pdrgpexpr =
 				phmulpdrgpexpr->Find(&ulSpecPos);
 			if (nullptr == pdrgpexpr)
 			{
@@ -1789,8 +1789,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const gpos::Ref<CDXLNode> dxlnode)
 			}
 			else
 			{
-				const_cast<gpos::Ref<CExpressionArray> >(pdrgpexpr)->Append(
-					pexprProjElem);
+				pdrgpexpr->Append(pexprProjElem);
 			}
 		}
 	}
@@ -1808,8 +1807,8 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const gpos::Ref<CDXLNode> dxlnode)
 		GPOS_ASSERT(nullptr != pdrgpexpr);
 		gpos::Ref<CScalarProjectList> popPrL =
 			GPOS_NEW(m_mp) CScalarProjectList(m_mp);
-		gpos::Ref<CExpression> pexprProjList = GPOS_NEW(m_mp) CExpression(
-			m_mp, popPrL, const_cast<gpos::Ref<CExpressionArray> >(pdrgpexpr));
+		gpos::Ref<CExpression> pexprProjList =
+			GPOS_NEW(m_mp) CExpression(m_mp, popPrL, pdrgpexpr);
 
 		gpos::Ref<CColRefArray> colref_array =
 			PdrgpcrPartitionByCol(pdxlws->GetPartitionByColIdArray());
@@ -1850,8 +1849,7 @@ CTranslatorDXLToExpr::PexprLogicalSeqPr(const gpos::Ref<CDXLNode> dxlnode)
 		else
 		{
 			// create an empty frame
-			pwf = const_cast<gpos::Ref<CWindowFrame> >(
-				CWindowFrame::PwfEmpty(m_mp));
+			pwf = CWindowFrame::PwfEmpty(m_mp);
 			;
 		}
 		pdrgpwf->Append(pwf);
@@ -3027,8 +3025,7 @@ CTranslatorDXLToExpr::PexprScalarFunc(const gpos::Ref<CDXLNode> pdxlnFunc)
 		if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 		{
 			gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
-				const_cast<gpos::Ref<CMDArrayCoerceCastGPDB> >(
-					gpos::cast<CMDArrayCoerceCastGPDB>(pmdcast));
+				gpos::dyn_cast<CMDArrayCoerceCastGPDB>(pmdcast);
 			pop = GPOS_NEW(m_mp) CScalarArrayCoerceExpr(
 				m_mp, parrayCoerceCast->GetCastFuncMdId(), mdid_return_type,
 				parrayCoerceCast->TypeModifier(),
@@ -3761,8 +3758,7 @@ CTranslatorDXLToExpr::PexprScalarCast(const gpos::Ref<CDXLNode> pdxlnCast)
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
 		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
-			const_cast<gpos::Ref<CMDArrayCoerceCastGPDB> >(
-				gpos::cast<CMDArrayCoerceCastGPDB>(pmdcast));
+			gpos::dyn_cast<CMDArrayCoerceCastGPDB>(pmdcast);
 		pexpr = GPOS_NEW(m_mp) CExpression(
 			m_mp,
 			GPOS_NEW(m_mp) CScalarArrayCoerceExpr(

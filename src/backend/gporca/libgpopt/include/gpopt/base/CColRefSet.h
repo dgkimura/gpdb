@@ -73,7 +73,7 @@ public:
 	explicit CColRefSet(CMemoryPool *mp, CColRefSet &);
 
 	// ctor, copy from col refs array
-	CColRefSet(CMemoryPool *mp, const CColRefArray *colref_array,
+	CColRefSet(CMemoryPool *mp, const gpos::Ref<CColRefArray> colref_array,
 			   ULONG ulSizeBits = GPOPT_COLREFSET_SIZE);
 
 	// dtor
@@ -92,7 +92,7 @@ public:
 	void Include(const CColRef *colref);
 
 	// include column array
-	void Include(const CColRefArray *colref_array);
+	void Include(const gpos::Ref<CColRefArray> colref_array);
 
 	// include column set
 	void Include(const gpos::Ref<CColRefSet> pcrs);
@@ -101,7 +101,7 @@ public:
 	void Exclude(const CColRef *colref);
 
 	// remove column array
-	void Exclude(const CColRefArray *colref_array);
+	void Exclude(const gpos::Ref<CColRefArray> colref_array);
 
 	// remove column set
 	void Exclude(const gpos::Ref<CColRefSet> pcrs);
@@ -110,7 +110,8 @@ public:
 	void Replace(const CColRef *pcrOut, const CColRef *pcrIn);
 
 	// replace column array with another column array
-	void Replace(const CColRefArray *pdrgpcrOut, const CColRefArray *pdrgpcrIn);
+	void Replace(const gpos::Ref<CColRefArray> pdrgpcrOut,
+				 const gpos::Ref<CColRefArray> pdrgpcrIn);
 
 	// check if the current colrefset is a subset of any of the colrefsets
 	// in the given array

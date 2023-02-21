@@ -89,7 +89,7 @@ CXformDynamicIndexGet2DynamicIndexScan::Transform(
 	gpos::Ref<CIndexDescriptor> pindexdesc = popIndexGet->Pindexdesc();
 	;
 
-	CColRefArray *pdrgpcrOutput = popIndexGet->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popIndexGet->PdrgpcrOutput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 	;
 

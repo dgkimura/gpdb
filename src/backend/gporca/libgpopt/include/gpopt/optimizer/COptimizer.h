@@ -57,7 +57,8 @@ private:
 	// translate an optimizer expression into a DXL tree
 	static gpos::Ref<CDXLNode> CreateDXLNode(
 		CMemoryPool *mp, CMDAccessor *md_accessor, gpos::Ref<CExpression> pexpr,
-		CColRefArray *colref_array, CMDNameArray *pdrgpmdname, ULONG ulHosts);
+		gpos::Ref<CColRefArray> colref_array, CMDNameArray *pdrgpmdname,
+		ULONG ulHosts);
 
 	// helper function to print query expression
 	static void PrintQuery(CMemoryPool *mp,

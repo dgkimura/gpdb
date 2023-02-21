@@ -37,7 +37,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalStreamAgg::CPhysicalStreamAgg(
 	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
-	CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	gpos::Ref<CColRefArray> pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
 	BOOL fGeneratesDuplicates, gpos::Ref<CColRefArray> pdrgpcrArgDQA,
 	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
 	BOOL should_enforce_distribution)
@@ -60,7 +60,8 @@ CPhysicalStreamAgg::CPhysicalStreamAgg(
 //
 //---------------------------------------------------------------------------
 void
-CPhysicalStreamAgg::InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder)
+CPhysicalStreamAgg::InitOrderSpec(CMemoryPool *mp,
+								  gpos::Ref<CColRefArray> pdrgpcrOrder)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrOrder);
 
@@ -109,7 +110,7 @@ CPhysicalStreamAgg::~CPhysicalStreamAgg()
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
 CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
-								CColRefArray *pdrgpcrGrp)
+								gpos::Ref<CColRefArray> pdrgpcrGrp)
 {
 	GPOS_ASSERT(nullptr != posRequired);
 
@@ -169,15 +170,14 @@ CPhysicalStreamAgg::PosCovering(CMemoryPool *mp, COrderSpec *posRequired,
 //
 //---------------------------------------------------------------------------
 gpos::Ref<COrderSpec>
-CPhysicalStreamAgg::PosRequiredStreamAgg(CMemoryPool *mp,
-										 CExpressionHandle &exprhdl,
-										 COrderSpec *posRequired,
-										 ULONG
+CPhysicalStreamAgg::PosRequiredStreamAgg(
+	CMemoryPool *mp, CExpressionHandle &exprhdl, COrderSpec *posRequired,
+	ULONG
 #ifdef GPOS_DEBUG
-											 child_index
+		child_index
 #endif	// GPOS_DEBUG
-										 ,
-										 CColRefArray *pdrgpcrGrp) const
+	,
+	gpos::Ref<CColRefArray> pdrgpcrGrp) const
 {
 	GPOS_ASSERT(0 == child_index);
 

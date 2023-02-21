@@ -111,7 +111,7 @@ CXformImplementTVF::Transform(gpos::Ref<CXformContext> pxfctxt,
 	gpos::Ref<CColumnDescriptorArray> pdrgpcoldesc = popTVF->Pdrgpcoldesc();
 	;
 
-	CColRefArray *pdrgpcrOutput = popTVF->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popTVF->PdrgpcrOutput();
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);
 	pcrs->Include(pdrgpcrOutput);
 

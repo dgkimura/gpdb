@@ -82,7 +82,7 @@ public:
 	}
 
 	// array of keys from the join's child that needs to be deduped
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrKeys() const
 	{
 		return m_pdrgpcrKeys.get();

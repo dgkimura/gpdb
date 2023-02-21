@@ -69,7 +69,7 @@ public:
 	~CParseHandlerScalarSubPlanParamList() override;
 
 	// return param column references
-	CDXLColRefArray *
+	gpos::Ref<CDXLColRefArray>
 	GetDXLColRefArray() const
 	{
 		return m_dxl_colref_array.get();

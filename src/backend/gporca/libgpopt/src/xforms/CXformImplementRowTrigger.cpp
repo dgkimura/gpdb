@@ -81,13 +81,13 @@ CXformImplementRowTrigger::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	INT type = popRowTrigger->GetType();
 
-	CColRefArray *pdrgpcrOld = popRowTrigger->PdrgpcrOld();
+	gpos::Ref<CColRefArray> pdrgpcrOld = popRowTrigger->PdrgpcrOld();
 	if (nullptr != pdrgpcrOld)
 	{
 		;
 	}
 
-	CColRefArray *pdrgpcrNew = popRowTrigger->PdrgpcrNew();
+	gpos::Ref<CColRefArray> pdrgpcrNew = popRowTrigger->PdrgpcrNew();
 	if (nullptr != pdrgpcrNew)
 	{
 		;

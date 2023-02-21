@@ -67,7 +67,7 @@ protected:
 	// Construct a mapping from each column in root table to an index in each
 	// child partition's table descr by matching column names$
 	static gpos::Ref<ColRefToUlongMapArray> ConstructRootColMappingPerPart(
-		CMemoryPool *mp, CColRefArray *root_cols,
+		CMemoryPool *mp, gpos::Ref<CColRefArray> root_cols,
 		gpos::Ref<IMdIdArray> partition_mdids);
 
 public:
@@ -88,7 +88,7 @@ public:
 	~CLogicalDynamicGetBase() override;
 
 	// accessors
-	virtual CColRefArray *
+	virtual gpos::Ref<CColRefArray>
 	PdrgpcrOutput() const
 	{
 		return m_pdrgpcrOutput.get();

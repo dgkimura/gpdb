@@ -164,7 +164,7 @@ CXformTest::EresUnittest_ApplyXforms_CTE()
 
 	pdrgpexpr->Append(pexprProducer);
 
-	CColRefArray *pdrgpcrProducer =
+	gpos::Ref<CColRefArray> pdrgpcrProducer =
 		gpos::dyn_cast<CLogicalCTEProducer>(pexprProducer->Pop())->Pdrgpcr();
 	gpos::Ref<CColRefArray> pdrgpcrConsumer =
 		CUtils::PdrgpcrCopy(mp, pdrgpcrProducer);

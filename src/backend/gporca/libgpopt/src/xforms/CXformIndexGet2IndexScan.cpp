@@ -101,7 +101,7 @@ CXformIndexGet2IndexScan::Transform(gpos::Ref<CXformContext> pxfctxt,
 	;
 	;
 
-	CColRefArray *pdrgpcrOutput = pop->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = pop->PdrgpcrOutput();
 	GPOS_ASSERT(nullptr != pdrgpcrOutput);
 	;
 

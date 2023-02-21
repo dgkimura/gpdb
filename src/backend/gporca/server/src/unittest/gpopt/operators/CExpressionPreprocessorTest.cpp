@@ -1724,8 +1724,8 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessOuterJoin()
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CExpressionPreprocessorTest::PexprCreateConjunction(CMemoryPool *mp,
-													CColRefArray *colref_array)
+CExpressionPreprocessorTest::PexprCreateConjunction(
+	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array)
 {
 	GPOS_ASSERT(nullptr != colref_array);
 

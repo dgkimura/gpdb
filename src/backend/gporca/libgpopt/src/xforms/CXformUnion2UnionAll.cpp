@@ -61,7 +61,7 @@ CXformUnion2UnionAll::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// extract components
 	gpos::Ref<CLogicalUnion> popUnion =
 		gpos::dyn_cast<CLogicalUnion>(pexpr->Pop());
-	CColRefArray *pdrgpcrOutput = popUnion->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popUnion->PdrgpcrOutput();
 	CColRef2dArray *pdrgpdrgpcrInput = popUnion->PdrgpdrgpcrInput();
 
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);

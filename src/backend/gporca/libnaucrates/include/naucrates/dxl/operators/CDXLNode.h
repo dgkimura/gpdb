@@ -35,8 +35,11 @@ using CDXLNodeArray = gpos::Vector<gpos::Ref<CDXLNode>>;
 using OidArray = CDynamicPtrArray<OID, CleanupDelete>;
 
 using IdToCDXLNodeMap =
-	CHashMap<ULONG, CDXLNode, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<CDXLNode>>;
+	//CHashMap<ULONG, CDXLNode, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
+	//		 CleanupDelete<ULONG>, CleanupRelease<CDXLNode>>;
+	gpos::UnorderedMap<const ULONG *, gpos::Ref<CDXLNode>,
+					   gpos::PtrHash<ULONG, HashPtr<ULONG>>,
+					   gpos::PtrEqual<ULONG, gpos::Equals<ULONG>>>;
 
 //---------------------------------------------------------------------------
 //	@class:

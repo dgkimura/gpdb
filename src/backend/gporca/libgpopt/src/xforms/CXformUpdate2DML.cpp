@@ -85,8 +85,8 @@ CXformUpdate2DML::Transform(gpos::Ref<CXformContext> pxfctxt,
 	// extract components for alternative
 
 	gpos::Ref<CTableDescriptor> ptabdesc = popUpdate->Ptabdesc();
-	CColRefArray *pdrgpcrDelete = popUpdate->PdrgpcrDelete();
-	CColRefArray *pdrgpcrInsert = popUpdate->PdrgpcrInsert();
+	gpos::Ref<CColRefArray> pdrgpcrDelete = popUpdate->PdrgpcrDelete();
+	gpos::Ref<CColRefArray> pdrgpcrInsert = popUpdate->PdrgpcrInsert();
 	CColRef *pcrCtid = popUpdate->PcrCtid();
 	CColRef *pcrSegmentId = popUpdate->PcrSegmentId();
 	BOOL fSplit = popUpdate->FSplit();

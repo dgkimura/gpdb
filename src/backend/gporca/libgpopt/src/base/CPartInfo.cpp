@@ -303,8 +303,9 @@ CPartInfo::PdrgppartkeysByScanId(ULONG scan_id) const
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CPartInfo>
-CPartInfo::PpartinfoWithRemappedKeys(CMemoryPool *mp, CColRefArray *pdrgpcrSrc,
-									 CColRefArray *pdrgpcrDest) const
+CPartInfo::PpartinfoWithRemappedKeys(CMemoryPool *mp,
+									 gpos::Ref<CColRefArray> pdrgpcrSrc,
+									 gpos::Ref<CColRefArray> pdrgpcrDest) const
 {
 	GPOS_ASSERT(nullptr != pdrgpcrSrc);
 	GPOS_ASSERT(nullptr != pdrgpcrDest);

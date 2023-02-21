@@ -664,7 +664,7 @@ CDistributionSpecHashed::Equals(
 //---------------------------------------------------------------------------
 gpos::Ref<CDistributionSpecHashed>
 CDistributionSpecHashed::PdshashedMaximal(CMemoryPool *mp,
-										  CColRefArray *colref_array,
+										  gpos::Ref<CColRefArray> colref_array,
 										  BOOL fNullsColocated)
 {
 	GPOS_ASSERT(nullptr != colref_array);

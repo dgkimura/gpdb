@@ -210,7 +210,7 @@ CExpressionTest::EresUnittest_SimpleOps()
 			gpos::dyn_cast<CLogicalGet>(pexpr->Pop());
 		gpos::Ref<CLogicalDynamicGetBase> popDynGet =
 			gpos::dyn_cast<CLogicalDynamicGetBase>(pexpr->Pop());
-		CColRefArray *colrefs = nullptr;
+		gpos::Ref<CColRefArray> colrefs = nullptr;
 
 		if (nullptr != popGet)
 		{

@@ -73,13 +73,13 @@ private:
 	static gpos::Ref<CExpression> PexprIndexLookupKeyOnLeft(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprScalar, const gpos::Ref<IMDIndex> pmdindex,
-		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
+		gpos::Ref<CColRefArray> pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
 
 	// helper to create index lookup comparison predicate with index key on right side
 	static gpos::Ref<CExpression> PexprIndexLookupKeyOnRight(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexprScalar, const gpos::Ref<IMDIndex> pmdindex,
-		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
+		gpos::Ref<CColRefArray> pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs);
 
 	// for all columns that appear in the given expression and are members
 	// of the given set, replace these columns with NULL constants
@@ -157,8 +157,8 @@ public:
 
 	// generate a conjunction of INDF expressions between corresponding columns in the given arrays
 	static gpos::Ref<CExpression> PexprINDFConjunction(
-		CMemoryPool *mp, CColRefArray *pdrgpcrFirst,
-		CColRefArray *pdrgpcrSecond);
+		CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrFirst,
+		gpos::Ref<CColRefArray> pdrgpcrSecond);
 
 	// is the given expression of the form (col CMP/IS DISTINCT/IS NOT DISTINCT FROM constant)
 	// either the constant or the column can be casted
@@ -404,7 +404,8 @@ public:
 	static void ExtractIndexPredicates(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpressionArray> pdrgpexprPredicate,
-		const gpos::Ref<IMDIndex> pmdindex, CColRefArray *pdrgpcrIndex,
+		const gpos::Ref<IMDIndex> pmdindex,
+		gpos::Ref<CColRefArray> pdrgpcrIndex,
 		gpos::Ref<CExpressionArray> pdrgpexprIndex,
 		gpos::Ref<CExpressionArray> pdrgpexprResidual,
 		gpos::Ref<CColRefSet> pcrsAcceptedOuterRefs =
@@ -440,7 +441,7 @@ public:
 	static gpos::Ref<CExpression> PexprIndexLookup(
 		CMemoryPool *mp, CMDAccessor *md_accessor,
 		gpos::Ref<CExpression> pexpPred, const gpos::Ref<IMDIndex> pmdindex,
-		CColRefArray *pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs,
+		gpos::Ref<CColRefArray> pdrgpcrIndex, gpos::Ref<CColRefSet> outer_refs,
 		BOOL allowArrayCmpForBTreeIndexes);
 
 	// split given scalar expression into two conjunctions; without and with outer references
@@ -469,13 +470,13 @@ public:
 	// returns true iff the given predicate pexprPred is compatible with the given index pmdindex
 	static BOOL FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
 										  const gpos::Ref<IMDIndex> pmdindex,
-										  CColRefArray *pdrgpcrIndex,
+										  gpos::Ref<CColRefArray> pdrgpcrIndex,
 										  CMDAccessor *md_accessor);
 
 	// returns true iff all predicates in the given array are compatible with the given index
 	static BOOL FCompatiblePredicates(gpos::Ref<CExpressionArray> pdrgpexprPred,
 									  const gpos::Ref<IMDIndex> pmdindex,
-									  CColRefArray *pdrgpcrIndex,
+									  gpos::Ref<CColRefArray> pdrgpcrIndex,
 									  CMDAccessor *md_accessor);
 
 	// check if the expensive CNF conversion is beneficial in finding predicate for hash join

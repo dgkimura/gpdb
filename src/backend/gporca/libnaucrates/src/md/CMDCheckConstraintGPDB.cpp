@@ -75,9 +75,9 @@ CMDCheckConstraintGPDB::~CMDCheckConstraintGPDB()
 //
 //---------------------------------------------------------------------------
 gpos::Ref<CExpression>
-CMDCheckConstraintGPDB::GetCheckConstraintExpr(CMemoryPool *mp,
-											   CMDAccessor *md_accessor,
-											   CColRefArray *colref_array) const
+CMDCheckConstraintGPDB::GetCheckConstraintExpr(
+	CMemoryPool *mp, CMDAccessor *md_accessor,
+	gpos::Ref<CColRefArray> colref_array) const
 {
 	GPOS_ASSERT(nullptr != colref_array);
 

@@ -32,7 +32,7 @@ using namespace gpopt;
 //---------------------------------------------------------------------------
 CPhysicalStreamAggDeduplicate::CPhysicalStreamAggDeduplicate(
 	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
-	CColRefArray *pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
+	gpos::Ref<CColRefArray> pdrgpcrMinimal, COperator::EGbAggType egbaggtype,
 	gpos::Ref<CColRefArray> pdrgpcrKeys, BOOL fGeneratesDuplicates,
 	BOOL fMultiStage, BOOL isAggFromSplitDQA, CLogicalGbAgg::EAggStage aggStage,
 	BOOL should_enforce_distribution)

@@ -828,7 +828,8 @@ CTranslatorDXLToScalar::TranslateDXLScalarSubplanToScalar(
 		dxlop->GetDxlTestExpr(), slink, colid_var, dxlop->FOuterParam(),
 		&param_ids);
 
-	const CDXLColRefArray *outer_refs = dxlop->GetDxlOuterColRefsArray();
+	const gpos::Ref<CDXLColRefArray> outer_refs =
+		dxlop->GetDxlOuterColRefsArray();
 
 	const ULONG len = outer_refs->Size();
 
@@ -1095,7 +1096,7 @@ CTranslatorDXLToScalar::TranslateDXLSubplanTestExprToScalar(
 void
 CTranslatorDXLToScalar::TranslateSubplanParams(
 	SubPlan *subplan, CDXLTranslateContext *dxl_translator_ctxt,
-	const CDXLColRefArray *outer_refs, CMappingColIdVar *colid_var)
+	const gpos::Ref<CDXLColRefArray> outer_refs, CMappingColIdVar *colid_var)
 {
 	GPOS_ASSERT(nullptr != subplan);
 	GPOS_ASSERT(nullptr != dxl_translator_ctxt);

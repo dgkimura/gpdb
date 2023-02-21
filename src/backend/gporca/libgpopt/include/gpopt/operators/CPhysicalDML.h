@@ -155,7 +155,7 @@ public:
 	}
 
 	// source columns
-	virtual CColRefArray *
+	virtual gpos::Ref<CColRefArray>
 	PdrgpcrSource() const
 	{
 		return m_pdrgpcrSource.get();

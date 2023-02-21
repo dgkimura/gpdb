@@ -71,7 +71,7 @@ CXformGbAgg2HashAgg::Exfp(CExpressionHandle &exprhdl) const
 {
 	gpos::Ref<CLogicalGbAgg> popAgg =
 		gpos::dyn_cast<CLogicalGbAgg>(exprhdl.Pop());
-	CColRefArray *colref_array = popAgg->Pdrgpcr();
+	gpos::Ref<CColRefArray> colref_array = popAgg->Pdrgpcr();
 	if (0 == colref_array->Size() || exprhdl.DeriveHasSubquery(1) ||
 		!CUtils::FComparisonPossible(colref_array, IMDType::EcmptEq) ||
 		!CUtils::IsHashable(colref_array))
@@ -124,7 +124,7 @@ CXformGbAgg2HashAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 	;
 	;
 
-	CColRefArray *pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
+	gpos::Ref<CColRefArray> pdrgpcrArgDQA = popAgg->PdrgpcrArgDQA();
 	if (pdrgpcrArgDQA != nullptr && 0 != pdrgpcrArgDQA->Size())
 	{
 		GPOS_ASSERT(nullptr != pdrgpcrArgDQA);

@@ -70,7 +70,7 @@ CXformDifference2LeftAntiSemiJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	gpos::Ref<CLogicalDifference> popDifference =
 		gpos::dyn_cast<CLogicalDifference>(pexpr->Pop());
-	CColRefArray *pdrgpcrOutput = popDifference->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> pdrgpcrOutput = popDifference->PdrgpcrOutput();
 	CColRef2dArray *pdrgpdrgpcrInput = popDifference->PdrgpdrgpcrInput();
 
 	// generate the scalar condition for the left anti-semi join

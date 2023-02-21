@@ -115,14 +115,14 @@ CLogicalApply::Matches(gpos::Ref<COperator> pop) const
 {
 	if (pop->Eopid() == Eopid())
 	{
-		CColRefArray *pdrgpcrInner =
+		gpos::Ref<CColRefArray> pdrgpcrInner =
 			gpos::dyn_cast<CLogicalApply>(pop)->PdrgPcrInner();
 		if (nullptr == m_pdrgpcrInner || nullptr == pdrgpcrInner)
 		{
 			return (nullptr == m_pdrgpcrInner && nullptr == pdrgpcrInner);
 		}
 
-		return m_pdrgpcrInner->Equals(pdrgpcrInner);
+		return m_pdrgpcrInner->Equals(pdrgpcrInner.get());
 	}
 
 	return false;

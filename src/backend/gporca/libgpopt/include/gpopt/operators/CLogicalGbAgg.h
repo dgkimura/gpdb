@@ -42,11 +42,10 @@ protected:
 	gpos::Ref<CColRefArray> m_pdrgpcrArgDQA;
 
 	// compute required stats columns for a GbAgg
-	gpos::Ref<CColRefSet> PcrsStatGbAgg(CMemoryPool *mp,
-										CExpressionHandle &exprhdl,
-										gpos::Ref<CColRefSet> pcrsInput,
-										ULONG child_index,
-										CColRefArray *pdrgpcrGrp) const;
+	gpos::Ref<CColRefSet> PcrsStatGbAgg(
+		CMemoryPool *mp, CExpressionHandle &exprhdl,
+		gpos::Ref<CColRefSet> pcrsInput, ULONG child_index,
+		gpos::Ref<CColRefArray> pdrgpcrGrp) const;
 
 public:
 	CLogicalGbAgg(const CLogicalGbAgg &) = delete;
@@ -140,14 +139,14 @@ public:
 	ULONG HashValue() const override;
 
 	// grouping columns accessor
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	Pdrgpcr() const
 	{
 		return m_pdrgpcr.get();
 	}
 
 	// array of columns used in distinct qualified aggregates (DQA)
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrArgDQA() const
 	{
 		return m_pdrgpcrArgDQA.get();
@@ -168,7 +167,7 @@ public:
 	}
 
 	// minimal grouping columns accessor
-	CColRefArray *
+	gpos::Ref<CColRefArray>
 	PdrgpcrMinimal() const
 	{
 		return m_pdrgpcrMinimal.get();
@@ -257,7 +256,7 @@ public:
 	// derive statistics
 	static gpos::Ref<IStatistics> PstatsDerive(
 		CMemoryPool *mp, gpos::Ref<IStatistics> child_stats,
-		CColRefArray *pdrgpcrGroupingCols,
+		gpos::Ref<CColRefArray> pdrgpcrGroupingCols,
 		gpos::Ref<ULongPtrArray> pdrgpulComputedCols, gpos::Ref<CBitSet> keys);
 
 	// print group by aggregate type

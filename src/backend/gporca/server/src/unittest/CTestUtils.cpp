@@ -316,7 +316,7 @@ CTestUtils::PexprLogicalGet(CMemoryPool *mp,
 
 	gpos::Ref<CExpression> result = GPOS_NEW(mp) CExpression(mp, pop);
 
-	CColRefArray *arr = pop->PdrgpcrOutput();
+	gpos::Ref<CColRefArray> arr = pop->PdrgpcrOutput();
 	for (ULONG ul = 0; ul < arr->Size(); ul++)
 	{
 		CColRef *ref = (*arr)[ul];
@@ -578,7 +578,7 @@ CTestUtils::PexprLogicalSelectPartitioned(CMemoryPool *mp)
 
 	GPOS_ASSERT(pdrgpdrgpcr != nullptr);
 	GPOS_ASSERT(0 < pdrgpdrgpcr->Size());
-	CColRefArray *colref_array = (*pdrgpdrgpcr)[0].get();
+	gpos::Ref<CColRefArray> colref_array = (*pdrgpdrgpcr)[0].get();
 	GPOS_ASSERT(1 == colref_array->Size());
 	CColRef *pcrPartKey = (*colref_array)[0];
 
@@ -2176,7 +2176,7 @@ CTestUtils::PexprCTETree(CMemoryPool *mp)
 
 	pdrgpexpr->Append(pexprProducer);
 
-	CColRefArray *pdrgpcrProducer =
+	gpos::Ref<CColRefArray> pdrgpcrProducer =
 		gpos::dyn_cast<CLogicalCTEProducer>(pexprProducer->Pop())->Pdrgpcr();
 	gpos::Ref<CColRefArray> pdrgpcrConsumer =
 		CUtils::PdrgpcrCopy(mp, pdrgpcrProducer);
@@ -2274,7 +2274,7 @@ CTestUtils::PexprLogicalUnion(CMemoryPool *mp, ULONG ulDepth)
 			gpos::Ref<CExpression> pexprInput =
 				PexprLogicalUnion(mp, ulDepth - 1);
 			gpos::Ref<COperator> pop = pexprInput->Pop();
-			CColRefArray *colref_array = nullptr;
+			gpos::Ref<CColRefArray> colref_array = nullptr;
 
 			if (pop->Eopid() == COperator::EopLogicalGet)
 			{
@@ -2297,7 +2297,7 @@ CTestUtils::PexprLogicalUnion(CMemoryPool *mp, ULONG ulDepth)
 		}
 
 		// remap columns of first input
-		CColRefArray *pdrgpcrInput = (*pdrgpdrgpcrInput)[0].get();
+		gpos::Ref<CColRefArray> pdrgpcrInput = (*pdrgpdrgpcrInput)[0].get();
 		ULONG num_cols = pdrgpcrInput->Size();
 		gpos::Ref<CColRefArray> pdrgpcrOutput =
 			GPOS_NEW(mp) CColRefArray(mp, num_cols);
@@ -2541,7 +2541,7 @@ CTestUtils::PexprLogicalNAryJoin(CMemoryPool *mp, CWStringConst *pstrRel,
 //---------------------------------------------------------------------------
 CQueryContext *
 CTestUtils::PqcGenerate(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
-						CColRefArray *colref_array)
+						gpos::Ref<CColRefArray> colref_array)
 {
 	// generate required columns
 	gpos::Ref<CColRefSet> pcrs = GPOS_NEW(mp) CColRefSet(mp);

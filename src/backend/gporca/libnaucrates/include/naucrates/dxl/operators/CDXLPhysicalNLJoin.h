@@ -87,7 +87,7 @@ public:
 	void SetNestLoopParamsColRefs(
 		gpos::Ref<CDXLColRefArray> nest_params_col_refs);
 
-	CDXLColRefArray *GetNestLoopParamsColRefs() const;
+	gpos::Ref<CDXLColRefArray> GetNestLoopParamsColRefs() const;
 
 	// conversion function
 	static gpos::Ref<CDXLPhysicalNLJoin>

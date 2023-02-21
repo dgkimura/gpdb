@@ -272,7 +272,7 @@ CWindowPreprocessor::CreateCTE(CMemoryPool *mp,
 //		whose inner child is a GbAgg expression
 //
 //---------------------------------------------------------------------------
-CColRefArray *
+gpos::Ref<CColRefArray>
 CWindowPreprocessor::PdrgpcrGrpCols(gpos::Ref<CExpression> pexpr)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -344,7 +344,7 @@ CWindowPreprocessor::PexprSeqPrj2Join(CMemoryPool *mp,
 	// to match requested columns upstream, we have to re-use the same computed
 	// columns that define the aggregates, we avoid recreating new columns during
 	// expression copy by passing must_exist as false
-	CColRefArray *pdrgpcrConsumerOutput =
+	gpos::Ref<CColRefArray> pdrgpcrConsumerOutput =
 		gpos::dyn_cast<CLogicalCTEConsumer>(pexprGbAggConsumer->Pop())
 			->Pdrgpcr();
 	gpos::Ref<UlongToColRefMap> colref_mapping = CUtils::PhmulcrMapping(
@@ -388,7 +388,8 @@ CWindowPreprocessor::PexprSeqPrj2Join(CMemoryPool *mp,
 	};
 
 	// extract grouping columns from created join expression
-	CColRefArray *pdrgpcrGrpCols = PdrgpcrGrpCols(pexprJoinDQAs.get());
+	gpos::Ref<CColRefArray> pdrgpcrGrpCols =
+		PdrgpcrGrpCols(pexprJoinDQAs.get());
 
 	// create final join condition
 	gpos::Ref<CExpression> pexprJoinCondition = nullptr;
