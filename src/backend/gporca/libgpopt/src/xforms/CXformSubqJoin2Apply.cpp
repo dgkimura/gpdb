@@ -14,12 +14,14 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/operators/CLogicalInnerJoin.h"
 #include "gpopt/operators/CLogicalNAryJoin.h"
 #include "gpopt/operators/CNormalizer.h"
 #include "gpopt/operators/CPatternLeaf.h"
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/operators/CScalarProjectElement.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CSubqueryHandler.h"
 #include "gpopt/xforms/CXformUtils.h"
 
@@ -83,8 +85,8 @@ void
 CXformSubqJoin2Apply::CollectSubqueries(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 	gpos::Ref<CColRefSetArray> pdrgpcrs,
-	CExpressionArrays
-		*pdrgpdrgpexprSubqs	 // array-of-arrays indexed on join child index.
+	gpos::Ref<CExpressionArrays>
+		pdrgpdrgpexprSubqs	// array-of-arrays indexed on join child index.
 	//  i^{th} entry is an array corresponding to subqueries collected for join child #i
 )
 {
@@ -288,7 +290,7 @@ CXformSubqJoin2Apply::PexprSubqueryPushDown(CMemoryPool *mp,
 	// replace subqueries in the original scalar expression with
 	// scalar identifiers based on constructed map
 	gpos::Ref<CExpression> pexprNewScalar =
-		PexprReplaceSubqueries(mp, pexprScalar, phmexprcr);
+		PexprReplaceSubqueries(mp, pexprScalar, phmexprcr.get());
 
 	;
 	;
@@ -323,7 +325,7 @@ CXformSubqJoin2Apply::Transform(gpos::Ref<CXformContext> pxfctxt,
 								BOOL fEnforceCorrelatedApply) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();

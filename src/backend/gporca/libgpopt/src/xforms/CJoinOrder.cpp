@@ -19,11 +19,13 @@
 #include "gpos/string/CWStringDynamic.h"
 
 #include "gpopt/base/CColRefSetIter.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CDrvdPropScalar.h"
 #include "gpopt/operators/CLogicalInnerJoin.h"
 #include "gpopt/operators/CLogicalJoin.h"
 #include "gpopt/operators/CLogicalLeftOuterJoin.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;
@@ -643,7 +645,7 @@ CJoinOrder::OsPrint(IOstream &os) const
 	os << "Components: " << m_ulComps << std::endl;
 	for (ULONG ul = 0; ul < m_ulComps; ul++)
 	{
-		os << (void *) m_rgpcomp[ul] << " - " << std::endl;
+		os << (void *) m_rgpcomp[ul].get() << " - " << std::endl;
 		m_rgpcomp[ul]->OsPrint(os);
 	}
 

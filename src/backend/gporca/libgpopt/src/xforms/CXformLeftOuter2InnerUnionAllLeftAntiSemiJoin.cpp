@@ -37,6 +37,7 @@
 #include "gpos/memory/CAutoMemoryPool.h"
 
 #include "gpopt/base/CColRefSetIter.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CLogicalCTEAnchor.h"
 #include "gpopt/operators/CLogicalGbAgg.h"
@@ -46,6 +47,7 @@
 #include "gpopt/operators/CLogicalUnionAll.h"
 #include "gpopt/operators/CPatternTree.h"
 #include "gpopt/operators/CScalarProjectList.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformUtils.h"
 #include "naucrates/traceflags/traceflags.h"
 
@@ -209,7 +211,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::Transform(
 	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -423,7 +425,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprProjectOverLeftAntiSemiJoin(
 			pdrgpcrJoinOutput, ulCTEJoinId, ulCTEOuterId);
 
 	gpos::Ref<ULongPtrArray> pdrgpulIndexesOfOuter =
-		pdrgpcrJoinOutput->IndexesOfSubsequence(pdrgpcrOuter);
+		pdrgpcrJoinOutput->IndexesOfSubsequence(pdrgpcrOuter.get());
 	GPOS_ASSERT(nullptr != pdrgpulIndexesOfOuter);
 
 	gpos::Ref<UlongToColRefMap> colref_mapping =

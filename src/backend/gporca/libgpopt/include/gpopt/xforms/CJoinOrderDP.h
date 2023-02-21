@@ -102,8 +102,11 @@ private:
 
 	// hash map from expression to cost of best join order
 	using ExpressionToCostMap =
-		CHashMap<CExpression, CDouble, CExpression::HashValue, CUtils::Equals,
-				 CleanupRelease<CExpression>, CleanupDelete<CDouble>>;
+		//CHashMap<CExpression, CDouble, CExpression::HashValue, CUtils::Equals,
+		//		 CleanupRelease<CExpression>, CleanupDelete<CDouble>>;
+		gpos::UnorderedMap<const gpos::Ref<CExpression>, CDouble *,
+						   gpos::RefHash<CExpression, CExpression::HashValue>,
+						   gpos::RefEq<CExpression, CUtils::Equals>>;
 
 	// lookup table for links
 	gpos::Ref<ComponentPairToExpressionMap> m_phmcomplink;

@@ -14,9 +14,11 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/operators/CLogicalSelect.h"
 #include "gpopt/operators/COperator.h"
 #include "gpopt/operators/CPatternLeaf.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/search/CGroupProxy.h"
 #include "gpopt/xforms/CXformUtils.h"
 

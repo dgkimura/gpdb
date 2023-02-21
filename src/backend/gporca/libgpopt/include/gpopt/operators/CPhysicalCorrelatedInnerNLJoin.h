@@ -81,7 +81,8 @@ public:
 		{
 			return m_pdrgpcrInner->Equals(
 				gpos::dyn_cast<CPhysicalCorrelatedInnerNLJoin>(pop)
-					->PdrgPcrInner());
+					->PdrgPcrInner()
+					.get());
 		}
 
 		return false;

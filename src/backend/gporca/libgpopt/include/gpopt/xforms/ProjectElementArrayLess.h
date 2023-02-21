@@ -16,8 +16,6 @@ struct ProjectElementArrayLess
 {
 	bool operator()(const gpos::Ref<CExpressionArray> a,
 					const gpos::Ref<CExpressionArray> b) const;
-	bool operator()(const gpos::Ref<CExpressionArray> &a,
-					const gpos::Ref<CExpressionArray> &b) const;
 };
 }  // namespace gpopt
 

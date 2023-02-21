@@ -13,6 +13,8 @@
 #include "gpos/common/owner.h"
 #include "gpos/memory/CMemoryPoolManager.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/xforms.h"
 
 using namespace gpopt;
@@ -111,7 +113,7 @@ CXformFactory::Add(gpos::Ref<CXform> pxform)
 		m_phmszxform->Insert(szXformName, pxform);
 	GPOS_ASSERT(fInserted);
 
-	CXformSet *xform_set = m_pxfsExploration;
+	gpos::Ref<CXformSet> xform_set = m_pxfsExploration;
 	if (pxform->FImplementation())
 	{
 		xform_set = m_pxfsImplementation;

@@ -14,11 +14,13 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/operators/CExpressionHandle.h"
 #include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CLogicalSequenceProject.h"
 #include "gpopt/operators/CNormalizer.h"
 #include "gpopt/operators/COperator.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CSubqueryHandler.h"
 
 
@@ -185,7 +187,7 @@ CXformSubqueryUnnest::Transform(gpos::Ref<CXformContext> pxfctxt,
 								gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	Transform(pxfctxt, pxfres, pexpr, false /*fEnforceCorrelatedApply*/);

@@ -14,10 +14,12 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalCTEAnchor.h"
 #include "gpopt/operators/CLogicalSelect.h"
 #include "gpopt/operators/CPatternLeaf.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformUtils.h"
 
 using namespace gpopt;
@@ -52,7 +54,7 @@ CXform::EXformPromise
 CXformCTEAnchor2TrivialSelect::Exfp(CExpressionHandle &exprhdl) const
 {
 	ULONG id = gpos::dyn_cast<CLogicalCTEAnchor>(exprhdl.Pop())->Id();
-	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	const ULONG ulConsumers = pcteinfo->UlConsumers(id);
 	GPOS_ASSERT(0 < ulConsumers);
 
@@ -79,7 +81,7 @@ CXformCTEAnchor2TrivialSelect::Transform(gpos::Ref<CXformContext> pxfctxt,
 										 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	// ExfExpandFullOuterJoin converts a LogicalFullJoin to a CTE with a UnionAll

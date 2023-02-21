@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/engine/CHint.h"
@@ -23,6 +24,7 @@
 #include "gpopt/operators/CPatternMultiTree.h"
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CJoinOrderDP.h"
 #include "gpopt/xforms/CXformUtils.h"
 
@@ -76,7 +78,7 @@ CXformExpandNAryJoinDP::Exfp(CExpressionHandle &exprhdl) const
 		return CXform::ExfpNone;
 	}
 
-	return CXformUtils::ExfpExpandJoinOrder(exprhdl, this);
+	return CXformUtils::ExfpExpandJoinOrder(exprhdl, SharedFromThis());
 }
 
 
@@ -96,7 +98,7 @@ CXformExpandNAryJoinDP::Transform(gpos::Ref<CXformContext> pxfctxt,
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
 	GPOS_ASSERT(nullptr != pxfres);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();

@@ -10,10 +10,12 @@
 #include "gpos/common/CAutoRef.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/operators/CLogicalApply.h"
 #include "gpopt/operators/CLogicalDynamicGet.h"
 #include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CLogicalGet.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpmd;
 using namespace gpopt;
@@ -108,7 +110,7 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 										gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -167,9 +169,9 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	// info on the get node (a get node or a dynamic get)
 	gpos::Ref<CTableDescriptor> ptabdescInner = nullptr;
-	const gpos::Ref<CColRefSet> distributionCols = nullptr;
+	gpos::Ref<CColRefSet> distributionCols = nullptr;
 	gpos::Ref<CLogicalDynamicGet> popDynamicGet = nullptr;
-	CAutoRef<CColRefSet> groupingColsToCheck;
+	gpos::Ref<CColRefSet> groupingColsToCheck;
 
 	// walk down the right child tree, accepting some unary operators
 	// like project and GbAgg and select, until we find a logical get
@@ -243,7 +245,6 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 							// if there are multiple groupbys, then check the intersection of their grouping cols
 							groupingCols->Intersection(
 								groupingColsToCheck.get());
-							CRefCount::SafeRelease(groupingColsToCheck.get());
 							groupingColsToCheck = groupingCols;
 
 							if (0 == groupingCols->Size())

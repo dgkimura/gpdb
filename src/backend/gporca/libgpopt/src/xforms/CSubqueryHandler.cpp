@@ -29,6 +29,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSetIter.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/exception.h"
 #include "gpopt/operators/CLogicalConstTableGet.h"
@@ -53,6 +54,7 @@
 #include "gpopt/operators/CScalarSubqueryAll.h"
 #include "gpopt/operators/CScalarSubqueryAny.h"
 #include "gpopt/operators/CScalarSubqueryQuantified.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformUtils.h"
 #include "naucrates/md/IMDScalarOp.h"
 #include "naucrates/md/IMDTypeBool.h"
@@ -746,7 +748,7 @@ CSubqueryHandler::FCreateOuterApplyForScalarSubquery(
 		CUtils::PexprLogicalApply<CLogicalLeftOuterApply>(
 			mp, pexprOuter, pexprInner, colref, popSubquery->Eopid());
 
-	const gpos::Ref<CLogicalGbAgg> pgbAgg = nullptr;
+	gpos::Ref<CLogicalGbAgg> pgbAgg = nullptr;
 	BOOL fHasCountAggMatchingColumn =
 		CUtils::FHasCountAggMatchingColumn((*pexprSubquery)[0], colref, pgbAgg);
 

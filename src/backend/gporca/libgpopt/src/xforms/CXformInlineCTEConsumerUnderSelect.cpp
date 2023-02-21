@@ -14,11 +14,13 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalCTEConsumer.h"
 #include "gpopt/operators/CLogicalSelect.h"
 #include "gpopt/operators/CNormalizer.h"
 #include "gpopt/operators/CPatternTree.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformUtils.h"
 
 using namespace gpopt;
@@ -73,7 +75,7 @@ CXformInlineCTEConsumerUnderSelect::Transform(
 	gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	gpos::Ref<CExpression> pexprConsumer = (*pexpr)[0];
@@ -82,7 +84,7 @@ CXformInlineCTEConsumerUnderSelect::Transform(
 	gpos::Ref<CLogicalCTEConsumer> popConsumer =
 		gpos::dyn_cast<CLogicalCTEConsumer>(pexprConsumer->Pop());
 	ULONG id = popConsumer->UlCTEId();
-	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	// only continue if inlining is enabled or if this CTE has only 1 consumer
 	if (!pcteinfo->FEnableInlining() && 1 < pcteinfo->UlConsumers(id))
 	{

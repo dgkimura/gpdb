@@ -13,8 +13,10 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/operators/CLogicalSequenceProject.h"
 #include "gpopt/operators/CPatternLeaf.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

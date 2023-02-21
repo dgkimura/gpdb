@@ -18,6 +18,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CDrvdPropScalar.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/exception.h"
@@ -25,6 +26,7 @@
 #include "gpopt/operators/CNormalizer.h"
 #include "gpopt/operators/CPatternLeaf.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

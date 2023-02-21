@@ -18,6 +18,7 @@
 #include "gpos/common/owner.h"
 #include "gpos/error/CAutoTrace.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CDrvdPropScalar.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
@@ -31,6 +32,7 @@
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/operators/CScalarNAryJoinPredList.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/CMDIdRelStats.h"
 #include "naucrates/md/IMDRelStats.h"
 #include "naucrates/statistics/CJoinStatsProcessor.h"
@@ -817,11 +819,11 @@ CJoinOrderDPv2::RecursivelyMarkEdgesAsUsed(gpos::Ref<CExpression> expr)
 	else
 	{
 		GPOS_ASSERT(expr->Pop()->FScalar());
-		const gpos::Ref<SEdge> edge = m_expression_to_edge_map->Find(expr);
+		gpos::Ref<SEdge> edge = m_expression_to_edge_map->Find(expr);
 		if (nullptr != edge)
 		{
 			// we found the edge belonging to this expression, terminate the recursion
-			const_cast<gpos::Ref<SEdge> >(edge)->m_fUsed = true;
+			edge->m_fUsed = true;
 			return;
 		}
 
@@ -1207,7 +1209,7 @@ CJoinOrderDPv2::GreedySearchJoinOrders(ULONG left_level, JoinOrderPropType algo)
 //		not consume refcounts from <levelInfo> or <stats_expr_info>.
 //
 //---------------------------------------------------------------------------
-CJoinOrderDPv2::gpos::Ref<SGroupInfo>
+gpos::Ref<CJoinOrderDPv2::SGroupInfo>
 CJoinOrderDPv2::LookupOrCreateGroupInfo(
 	gpos::Ref<SLevelInfo> levelInfo, gpos::Ref<CBitSet> atoms,
 	gpos::Ref<SExpressionInfo> stats_expr_info)

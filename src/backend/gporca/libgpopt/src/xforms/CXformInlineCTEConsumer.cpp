@@ -14,8 +14,10 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalCTEConsumer.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformUtils.h"
 
 using namespace gpopt;
@@ -49,7 +51,7 @@ CXformInlineCTEConsumer::Exfp(CExpressionHandle &exprhdl) const
 {
 	const ULONG id =
 		gpos::dyn_cast<CLogicalCTEConsumer>(exprhdl.Pop())->UlCTEId();
-	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 
 	if ((pcteinfo->FEnableInlining() || 1 == pcteinfo->UlConsumers(id)) &&
 		CXformUtils::FInlinableCTE(id))
@@ -78,7 +80,7 @@ CXformInlineCTEConsumer::Transform(gpos::Ref<CXformContext>
 								   gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	// inline the consumer

@@ -19,6 +19,7 @@
 
 #include "gpopt/base/CConstraintConjunction.h"
 #include "gpopt/base/CConstraintNegation.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/exception.h"
@@ -205,7 +206,7 @@ CXformUtils::ExfpExpandJoinOrder(CExpressionHandle &exprhdl,
 BOOL
 CXformUtils::FInlinableCTE(ULONG ulCTEId)
 {
-	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	gpos::Ref<CExpression> pexprProducer = pcteinfo->PexprCTEProducer(ulCTEId);
 	GPOS_ASSERT(nullptr != pexprProducer);
 	gpos::Ref<CFunctionProp> pfp = pexprProducer->DeriveFunctionProperties();
@@ -2539,7 +2540,7 @@ CXformUtils::PexprAddCTEProducer(CMemoryPool *mp, ULONG ulCTEId,
 		GPOS_NEW(mp) CLogicalCTEProducer(mp, ulCTEId, std::move(pdrgpcrProd)),
 		std::move(pexprRemapped));
 
-	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 	pcteinfo->AddCTEProducer(pexprProducer.get());
 	;
 
@@ -4119,8 +4120,7 @@ CXformUtils::PdrgpdrgpexprSortedPrjElemsArray(
 	while (hmexprdrgpexpriter.Advance())
 	{
 		gpos::Ref<CExpressionArray> pdrgpexprPrjElems =
-			const_cast<gpos::Ref<CExpressionArray> >(
-				hmexprdrgpexpriter.Value());
+			hmexprdrgpexpriter.Value();
 		;
 		pdrgpdrgpexprPrjElems->Append(pdrgpexprPrjElems);
 	}
@@ -4204,7 +4204,7 @@ CXformUtils::PexprGbAggOnCTEConsumer2Join(CMemoryPool *mp,
 		gpos::dyn_cast<CLogicalCTEConsumer>(pexprCTEConsumer->Pop());
 	const ULONG ulCTEId = popConsumer->UlCTEId();
 	gpos::Ref<CColRefArray> pdrgpcrConsumerOutput = popConsumer->Pdrgpcr();
-	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 
 	gpos::Ref<CExpression> pexprLastGbAgg = nullptr;
 	gpos::Ref<CColRefArray> pdrgpcrLastGrpCols = nullptr;

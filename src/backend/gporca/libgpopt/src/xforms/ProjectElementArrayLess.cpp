@@ -8,7 +8,9 @@
 #include "gpos/common/Casting.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/operators/CScalarProjectElement.h"
+#include "gpopt/search/CGroupExpression.h"
 
 namespace gpopt
 {
@@ -24,12 +26,5 @@ ProjectElementArrayLess::operator()(const gpos::Ref<CExpressionArray> a,
 		gpos::cast<CScalarProjectElement>(pexprPrjElemSnd->Pop())->Pcr()->Id();
 
 	return ulIdFst < ulIdSnd;
-}
-
-bool
-ProjectElementArrayLess::operator()(const gpos::Ref<CExpressionArray> &a,
-									const gpos::Ref<CExpressionArray> &b) const
-{
-	return operator()(a.get(), b.get());
 }
 }  // namespace gpopt

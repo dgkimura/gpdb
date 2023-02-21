@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CUtils.h"
 #include "gpopt/xforms/CXformSubqueryUnnest.h"
 
 namespace gpopt
@@ -34,8 +35,8 @@ private:
 	// hash map between expression and a column reference
 	using ExprToColRefMap =
 		gpos::UnorderedMap<gpos::Ref<CExpression>, CColRef *,
-						   gpos::RefHash<CExpression, HashPtr<CExpression>>,
-						   gpos::RefEq<CExpression, EqualPtr<CExpression>>>;
+						   gpos::RefHash<CExpression, CExpression::HashValue>,
+						   gpos::RefEq<CExpression, CUtils::Equals>>;
 
 	// helper to transform function
 	void Transform(gpos::Ref<CXformContext> pxfctxt,

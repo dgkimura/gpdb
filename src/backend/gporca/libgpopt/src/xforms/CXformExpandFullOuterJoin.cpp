@@ -14,12 +14,14 @@
 #include "gpos/base.h"
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalCTEAnchor.h"
 #include "gpopt/operators/CLogicalCTEConsumer.h"
 #include "gpopt/operators/CLogicalFullOuterJoin.h"
 #include "gpopt/operators/CLogicalUnionAll.h"
 #include "gpopt/operators/CPatternTree.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformUtils.h"
 
 using namespace gpopt;
@@ -92,7 +94,7 @@ CXformExpandFullOuterJoin::Transform(gpos::Ref<CXformContext> pxfctxt,
 									 gpos::Ref<CExpression> pexpr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, pexpr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), pexpr));
 	GPOS_ASSERT(FCheckPattern(pexpr));
 
 	CMemoryPool *mp = pxfctxt->Pmp();
@@ -200,7 +202,7 @@ CXformExpandFullOuterJoin::PexprLogicalJoinOverCTEs(
 
 	gpos::Ref<CExpressionArray> pdrgpexprChildren =
 		GPOS_NEW(mp) CExpressionArray(mp);
-	Cgpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
+	gpos::Ref<CCTEInfo> pcteinfo = COptCtxt::PoctxtFromTLS()->Pcteinfo();
 
 	gpos::Ref<CLogicalCTEConsumer> popConsumerLeft = GPOS_NEW(mp)
 		CLogicalCTEConsumer(mp, ulLeftCTEId, std::move(pdrgpcrLeft));

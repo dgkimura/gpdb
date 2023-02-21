@@ -19,6 +19,7 @@
 #include "gpos/common/owner.h"
 
 #include "gpopt/base/CColRefSetIter.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CLogicalGbAgg.h"
 #include "gpopt/operators/CLogicalInnerJoin.h"
@@ -26,6 +27,7 @@
 #include "gpopt/operators/CScalarProjectElement.h"
 #include "gpopt/operators/CScalarProjectList.h"
 #include "gpopt/operators/CScalarValuesList.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/xforms/CXformExploration.h"
 #include "gpopt/xforms/CXformUtils.h"
 #include "naucrates/md/CMDScalarOpGPDB.h"
@@ -82,7 +84,7 @@ CXformEagerAgg::Transform(gpos::Ref<CXformContext> pxfctxt,
 						  gpos::Ref<CExpression> agg_expr) const
 {
 	GPOS_ASSERT(nullptr != pxfctxt);
-	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), this, agg_expr));
+	GPOS_ASSERT(FPromising(pxfctxt->Pmp(), SharedFromThis(), agg_expr));
 	GPOS_ASSERT(FCheckPattern(agg_expr));
 
 	/* no-op if the transform cannot be applied */
@@ -258,8 +260,8 @@ CXformEagerAgg::CanApplyTransform(gpos::Ref<CExpression> gb_agg_expr)
 void
 CXformEagerAgg::PopulateLowerUpperProjectList(
 	CMemoryPool *mp,  // memory pool
-	CExpression
-		*orig_proj_list,  // project list of the original global aggregate
+	gpos::Ref<CExpression>
+		orig_proj_list,	 // project list of the original global aggregate
 	gpos::Ref<CExpression>
 		*lower_proj_list,  // project list of the new lower aggregate
 	gpos::Ref<CExpression>
