@@ -90,7 +90,7 @@ CLogicalExternalGet::Matches(gpos::Ref<COperator> pop) const
 		gpos::dyn_cast<CLogicalExternalGet>(pop);
 
 	return Ptabdesc() == popGet->Ptabdesc() &&
-		   PdrgpcrOutput()->Equals(popGet->PdrgpcrOutput());
+		   PdrgpcrOutput()->Equals(popGet->PdrgpcrOutput().get());
 }
 
 //---------------------------------------------------------------------------

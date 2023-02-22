@@ -47,13 +47,6 @@ BOOL CConstraint::m_fTrue(true);
 // initialize constant false
 BOOL CConstraint::m_fFalse(false);
 
-BOOL
-CConstraintEquals(const gpos::Ref<CConstraint> lhs,
-				  const gpos::Ref<CConstraint> rhs)
-{
-	return lhs->Equals(rhs) && rhs->Equals(lhs);
-}
-
 //---------------------------------------------------------------------------
 //	@function:
 //		CConstraint::CConstraint
@@ -978,7 +971,7 @@ CConstraint::Contains(gpos::Ref<CConstraint> pcnstr)
 	}
 
 	// check if we have computed this containment query before
-	BOOL *pfContains = m_phmcontain->Find(pcnstr);
+	BOOL *pfContains = m_phmcontain->Find(pcnstr.get());
 	if (nullptr != pfContains)
 	{
 		return *pfContains;
@@ -1013,7 +1006,7 @@ CConstraint::Contains(gpos::Ref<CConstraint> pcnstr)
 
 	// insert containment query into the local map
 	BOOL fSuccess GPOS_ASSERTS_ONLY =
-		m_phmcontain->Insert(pcnstr, PfVal(fContains));
+		m_phmcontain->Insert(pcnstr.get(), PfVal(fContains));
 	GPOS_ASSERT(fSuccess);
 
 	return fContains;

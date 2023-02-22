@@ -278,8 +278,6 @@ CMCVTest::EresUnittest_MergeHistMCV()
 		GPOS_DELETE(pstrOutput);
 		;
 		;
-		GPOS_DELETE(phistMCV);
-		GPOS_DELETE(phistHist);
 		;
 
 		if (GPOS_OK != eres)

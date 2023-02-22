@@ -274,7 +274,7 @@ CLogicalCTEConsumer::Matches(gpos::Ref<COperator> pop) const
 		gpos::dyn_cast<CLogicalCTEConsumer>(pop);
 
 	return m_id == popCTEConsumer->UlCTEId() &&
-		   m_pdrgpcr->Equals(popCTEConsumer->Pdrgpcr());
+		   m_pdrgpcr->Equals(popCTEConsumer->Pdrgpcr().get());
 }
 
 //---------------------------------------------------------------------------

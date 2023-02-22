@@ -1183,12 +1183,13 @@ CExpressionTest::EresCheckCachedReqdCols(CMemoryPool *mp,
 		// if this is not the case, then we have re-computed the same set of columns and test should fail
 		if (pcrsChildReqd != exprhdl.Prpp(ul)->PcrsRequired())
 		{
-			CAutoTrace at(mp);
-			at.Os() << "\nExpression: \n" << *pexprChild;
-			at.Os() << "\nCached cols: " << pcrsChildReqd << " : "
-					<< *pcrsChildReqd;
-			at.Os() << "\nComputed cols: " << exprhdl.Prpp(ul)->PcrsRequired()
-					<< " : " << *exprhdl.Prpp(ul)->PcrsRequired();
+			// KIMURA FIXME
+			//CAutoTrace at(mp);
+			//at.Os() << "\nExpression: \n" << *pexprChild;
+			//at.Os() << "\nCached cols: " << pcrsChildReqd << " : "
+			//		<< *pcrsChildReqd;
+			//at.Os() << "\nComputed cols: " << exprhdl.Prpp(ul)->PcrsRequired()
+			//		<< " : " << *exprhdl.Prpp(ul)->PcrsRequired();
 
 			eres = GPOS_FAILED;
 			continue;

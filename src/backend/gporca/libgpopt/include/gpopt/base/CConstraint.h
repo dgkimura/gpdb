@@ -38,16 +38,13 @@ using ColRefToConstraintArrayMap =
 					   gpos::PtrHash<CColRef, CColRef::HashValue>,
 					   gpos::PtrEqual<CColRef, CColRef::Equals>>;
 
-BOOL CConstraintEquals(const gpos::Ref<CConstraint> lhs,
-					   const gpos::Ref<CConstraint> rhs);
-
 // mapping CConstraint -> BOOL to cache previous containment queries,
 // we use pointer equality here for fast map lookup -- since we do shallow comparison, we do not take ownership
 // of pointer values
-using ConstraintContainmentMap =
-	gpos::UnorderedMap<const gpos::Ref<CConstraint>, BOOL *,
-					   gpos::RefHash<CConstraint, gpos::HashRef<CConstraint>>,
-					   gpos::RefEq<CConstraint, CConstraintEquals>>;
+using ConstraintContainmentMap = gpos::UnorderedMap<
+	const CConstraint *, BOOL *,
+	gpos::PtrHash<CConstraint, gpos::HashPtr<CConstraint>>,
+	gpos::PtrEqual<CConstraint, gpos::EqualPtr<CConstraint>>>;
 
 //---------------------------------------------------------------------------
 //	@class:

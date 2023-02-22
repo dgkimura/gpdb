@@ -160,18 +160,6 @@ CHistogramTest::EresUnittest_CHistogramInt4()
 	;
 	;
 	;
-	GPOS_DELETE(histogram);
-	GPOS_DELETE(phist0);
-	GPOS_DELETE(histogram1);
-	GPOS_DELETE(histogram2);
-	GPOS_DELETE(phist3);
-	GPOS_DELETE(phist4);
-	GPOS_DELETE(phist5);
-	GPOS_DELETE(phist6);
-	GPOS_DELETE(phist7);
-	GPOS_DELETE(phist8);
-	GPOS_DELETE(phist9);
-	GPOS_DELETE(phist10);
 
 	return GPOS_OK;
 }
@@ -205,8 +193,6 @@ CHistogramTest::EresUnittest_CHistogramBool()
 
 	// clean up
 	;
-	GPOS_DELETE(histogram);
-	GPOS_DELETE(histogram1);
 
 	return GPOS_OK;
 }
@@ -233,10 +219,6 @@ CHistogramTest::EresUnittest_CHistogramValid()
 	// original histogram
 	gpos::Ref<CHistogram> histogram =
 		GPOS_NEW(mp) CHistogram(mp, histogram_buckets);
-
-	// create an auto object
-	CAutoP<CHistogram> ahist;
-	ahist = histogram;
 
 	{
 		CAutoTrace at(mp);
@@ -323,9 +305,6 @@ CHistogramTest::EresUnittest_Skew()
 		histogram2->OsPrint(at.Os());
 	}
 
-	GPOS_DELETE(histogram1);
-	GPOS_DELETE(histogram2);
-
 	return GPOS_OK;
 }
 
@@ -379,10 +358,6 @@ CHistogramTest::EresUnittest_MergeUnion()
 	}
 
 	GPOS_ASSERT(output_rows1 == output_rows2);
-	GPOS_DELETE(histogram1);
-	GPOS_DELETE(histogram2);
-	GPOS_DELETE(result1);
-	GPOS_DELETE(result2);
 
 	return GPOS_OK;
 }
@@ -434,10 +409,6 @@ CHistogramTest::EresUnittest_MergeUnionDoubleLessThanEpsilon()
 		result1->OsPrint(at.Os());
 		at.Os() << "Result 1: " << output_rows1 << std::endl;
 	}
-
-	GPOS_DELETE(histogram1);
-	GPOS_DELETE(histogram2);
-	GPOS_DELETE(result1);
 
 	return GPOS_OK;
 }

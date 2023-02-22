@@ -263,6 +263,19 @@ public:
 		return is_equal;
 	}
 
+	BOOL
+	Equals(const gpos::Ref<CDynamicPtrArray<T, CleanupFn>> arr) const
+	{
+		BOOL is_equal = (Size() == arr->Size());
+
+		for (ULONG i = 0; i < m_size && is_equal; i++)
+		{
+			is_equal = (m_elems[i] == arr->m_elems[i]);
+		}
+
+		return is_equal;
+	}
+
 	// lookup object
 	T *
 	Find(const T *elem) const

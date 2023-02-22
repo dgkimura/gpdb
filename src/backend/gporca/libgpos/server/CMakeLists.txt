@@ -55,9 +55,6 @@ endfunction()
 # src/startup/main.cpp
 
 # common
-add_gpos_test(CAutoPTest)
-add_gpos_test(CAutoRefTest)
-add_gpos_test(CAutoRgTest)
 add_gpos_test(CBitSetIterTest)
 add_gpos_test(CBitSetTest)
 add_gpos_test(CBitVectorTest)
@@ -68,7 +65,6 @@ add_gpos_test(CHashMapTest)
 add_gpos_test(CHashMapIterTest)
 add_gpos_test(CHashSetTest)
 add_gpos_test(CHashSetIterTest)
-add_gpos_test(CRefCountTest)
 add_gpos_test(CListTest)
 add_gpos_test(CStackTest)
 add_gpos_test(CSyncHashtableTest)

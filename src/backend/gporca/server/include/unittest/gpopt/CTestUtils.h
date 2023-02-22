@@ -17,6 +17,7 @@
 #include "gpopt/base/CAutoOptCtxt.h"
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/CConstraintInterval.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CQueryContext.h"
 #include "gpopt/base/CRange.h"
 #include "gpopt/engine/CEnumeratorConfig.h"
@@ -87,7 +88,7 @@ using gpmd::CMDIdGPDB;
 // forward declarations
 class IConstExprEvaluator;
 
-using CExpressionJoinsArray = CDynamicPtrArray<CExpression, CleanupNULL>;
+using CExpressionJoinsArray = gpos::Vector<gpos::Ref<CExpression>>;
 
 using FnDXLPlanChecker = BOOL(gpos::Ref<CDXLNode>);
 

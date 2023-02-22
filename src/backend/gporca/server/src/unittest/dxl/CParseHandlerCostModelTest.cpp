@@ -22,6 +22,8 @@
 
 #include "gpdbcost/CCostModelGPDB.h"
 #include "gpdbcost/CCostModelParamsGPDB.h"
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CCostModelConfigSerializer.h"
 #include "naucrates/dxl/parser/CParseHandlerCostModel.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"

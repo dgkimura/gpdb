@@ -120,7 +120,7 @@ CBindingTest::EresUnittest_Basic()
 		pdxlmd->GetQueryDXLRoot(), pdxlmd->PdrgpdxlnQueryOutput(),
 		pdxlmd->GetCTEProducerDXLArray());
 
-	gpdxl::gpos::Ref<ULongPtrArray> pdrgul = pdxltr->PdrgpulOutputColRefs();
+	gpos::Ref<gpdxl::ULongPtrArray> pdrgul = pdxltr->PdrgpulOutputColRefs();
 	gpmd::CMDNameArray *pdrgpmdname = pdxltr->Pdrgpmdname();
 
 	CQueryContext *pqc = CQueryContext::PqcGenerate(

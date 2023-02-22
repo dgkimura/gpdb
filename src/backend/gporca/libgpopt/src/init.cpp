@@ -16,6 +16,7 @@
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/task/CWorker.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/exception.h"
 #include "gpopt/mdcache/CMDCache.h"
 #include "gpopt/search/CGroupExpression.h"

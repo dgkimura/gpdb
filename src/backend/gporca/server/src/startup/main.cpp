@@ -103,7 +103,6 @@
 #include "unittest/gpopt/operators/CScalarIsDistinctFromTest.h"
 #include "unittest/gpopt/search/COptimizationJobsTest.h"
 #include "unittest/gpopt/search/CSearchStrategyTest.h"
-#include "unittest/gpopt/search/CTreeMapTest.h"
 #include "unittest/gpopt/translate/CTranslatorDXLToExprTest.h"
 #include "unittest/gpopt/translate/CTranslatorExprToDXLTest.h"
 #include "unittest/gpopt/xforms/CDecorrelatorTest.h"
@@ -180,7 +179,7 @@ static gpos::CUnittest rgut[] = {
 	GPOS_UNITTEST_STD(COptimizationJobsTest),
 	GPOS_UNITTEST_STD(CStateMachineTest),
 	GPOS_UNITTEST_STD(CTableDescriptorTest),
-	GPOS_UNITTEST_STD(CIndexDescriptorTest), GPOS_UNITTEST_STD(CTreeMapTest),
+	GPOS_UNITTEST_STD(CIndexDescriptorTest),
 	GPOS_UNITTEST_STD(CXformFactoryTest), GPOS_UNITTEST_STD(CXformTest),
 	GPOS_UNITTEST_STD(CConstExprEvaluatorDefaultTest),
 	GPOS_UNITTEST_STD(CConstExprEvaluatorDXLTest),

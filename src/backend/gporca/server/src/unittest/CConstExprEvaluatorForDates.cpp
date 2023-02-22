@@ -19,8 +19,10 @@
 
 #include "gpos/common/owner.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CScalarCmp.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/base/IDatum.h"
 #include "naucrates/md/CMDIdGPDB.h"
 #include "naucrates/md/IMDType.h"

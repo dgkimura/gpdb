@@ -1197,7 +1197,8 @@ CExpression::UlHashDedup(const gpos::Ref<CExpression> pexpr)
 }
 
 BOOL
-Equals(const gpos::Ref<CExpression> lhs, const gpos::Ref<CExpression> rhs)
+CExpression::Equals(const gpos::Ref<CExpression> lhs,
+					const gpos::Ref<CExpression> rhs)
 {
 	if (lhs->Arity() != rhs->Arity() || HashValue(lhs) != HashValue(rhs))
 	{
@@ -1207,7 +1208,7 @@ Equals(const gpos::Ref<CExpression> lhs, const gpos::Ref<CExpression> rhs)
 	const ULONG arity = lhs->Arity();
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
-		if (!Equals((*lhs)[ul], (*rhs)[ul]))
+		if (!CExpression::Equals((*lhs)[ul], (*rhs)[ul]))
 		{
 			return false;
 		}

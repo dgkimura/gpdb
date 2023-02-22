@@ -175,7 +175,6 @@ CJoinCardinalityTest::EresUnittest_JoinNDVRemain()
 			eres = GPOS_FAILED;
 		}
 
-		GPOS_DELETE(join_histogram);
 	}
 	// clean up
 	;

@@ -163,7 +163,7 @@ CLogicalCTEProducer::Matches(gpos::Ref<COperator> pop) const
 		gpos::dyn_cast<CLogicalCTEProducer>(pop);
 
 	return m_id == popCTEProducer->UlCTEId() &&
-		   m_pdrgpcr->Equals(popCTEProducer->Pdrgpcr());
+		   m_pdrgpcr->Equals(popCTEProducer->Pdrgpcr().get());
 }
 
 //---------------------------------------------------------------------------

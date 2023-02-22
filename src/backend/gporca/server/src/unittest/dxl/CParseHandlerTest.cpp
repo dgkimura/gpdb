@@ -490,8 +490,7 @@ CParseHandlerTest::EresParseAndSerializeQuery(CMemoryPool *mp,
 
 	oss << "Serializing parsed tree" << std::endl;
 
-	gpos::Ref<CDXLNode> root_dxlnode =
-		const_cast<gpos::Ref<CDXLNode> >(pq2dxlresult->CreateDXLNode());
+	gpos::Ref<CDXLNode> root_dxlnode = pq2dxlresult->CreateDXLNode();
 	CDXLNodeArray *dxl_array =
 		const_cast<CDXLNodeArray *>(pq2dxlresult->GetOutputColumnsDXLArray());
 	CDXLNodeArray *cte_producers =

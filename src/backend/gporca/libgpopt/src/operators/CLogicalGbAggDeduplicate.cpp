@@ -210,7 +210,7 @@ CLogicalGbAggDeduplicate::Matches(gpos::Ref<COperator> pop) const
 	}
 
 	return popAgg->Egbaggtype() == Egbaggtype() &&
-		   Pdrgpcr()->Equals(popAgg->Pdrgpcr()) &&
+		   Pdrgpcr()->Equals(popAgg->Pdrgpcr().get()) &&
 		   m_pdrgpcrKeys->Equals(popAgg->PdrgpcrKeys()) &&
 		   CColRef::Equals(PdrgpcrMinimal(), popAgg->PdrgpcrMinimal());
 }

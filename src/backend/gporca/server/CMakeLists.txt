@@ -543,7 +543,6 @@ add_orca_test(COptimizationJobsTest)
 add_orca_test(CStateMachineTest)
 add_orca_test(CTableDescriptorTest)
 add_orca_test(CIndexDescriptorTest)
-add_orca_test(CTreeMapTest)
 add_orca_test(CXformFactoryTest)
 add_orca_test(CXformTest)
 

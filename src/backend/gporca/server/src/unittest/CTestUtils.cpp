@@ -1449,7 +1449,7 @@ CTestUtils::PexprNAryJoinOnLeftOuterJoin(CMemoryPool *mp)
 
 	// copy NAry-Join children
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
-	CUtils::AddRefAppend(pdrgpexpr.get(), pexprNAryJoin->PdrgPexpr());
+	CUtils::AddRefAppend(pdrgpexpr.get(), pexprNAryJoin->PdrgPexpr().get());
 
 	// generate LOJ expression
 	gpos::Ref<CExpression> pexprLOJOuterChild = PexprLogicalGet(mp);

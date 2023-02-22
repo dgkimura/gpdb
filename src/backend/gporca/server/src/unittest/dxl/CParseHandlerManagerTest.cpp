@@ -20,6 +20,8 @@
 #include "gpos/task/CAutoTraceFlag.h"
 #include "gpos/test/CUnittest.h"
 
+#include "gpopt/base/CDrvdPropCtxtPlan.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/operators/CDXLPhysicalTableScan.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"

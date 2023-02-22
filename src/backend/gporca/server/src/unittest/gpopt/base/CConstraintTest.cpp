@@ -1091,7 +1091,6 @@ CConstraintTest::EresUnittest_CIntervalFromScalarBoolOp(
 	PrintConstraint(mp, pciAnd.get());
 
 	;
-	(void);
 
 	// OR
 	pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);

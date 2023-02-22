@@ -88,7 +88,7 @@ CConstExprEvaluatorDefaultTest::EresUnittest()
 #ifdef GPOS_DEBUG
 		gpos::Ref<CExpression> pexprResult =
 			pceevaldefault->PexprEval(pexprIsNull.get());
-		gpopt::gpos::Ref<CScalarNullTest> pscalarnulltest =
+		gpos::Ref<gpopt::CScalarNullTest> pscalarnulltest =
 			gpos::dyn_cast<CScalarNullTest>(pexprIsNull->Pop());
 		GPOS_ASSERT(pscalarnulltest->Matches(pexprResult->Pop()));
 		;

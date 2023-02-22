@@ -50,7 +50,7 @@ const INT CConstExprEvaluatorDXLTest::m_iDefaultEvalValue = 300;
 //---------------------------------------------------------------------------
 gpos::Ref<gpdxl::CDXLNode>
 CConstExprEvaluatorDXLTest::CDummyConstDXLNodeEvaluator::EvaluateExpr(
-	const gpdxl::gpos::Ref<CDXLNode> /*pdxlnExpr*/
+	const gpos::Ref<gpdxl::CDXLNode> /*pdxlnExpr*/
 )
 {
 	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = m_pmda->PtMDType<IMDTypeInt4>();

@@ -455,7 +455,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 		&m_ulTestCounterPreferIndexJoinToHashJoin,
 		1,	// ulSessionId
 		1,	// ulCmdId
-		FHasIndexJoin, pdrgpcpUnlimited);
+		FHasIndexJoin, pdrgpcpUnlimited.get());
 	;
 
 	if (GPOS_OK != eres)
@@ -480,7 +480,7 @@ CICGTest::EresUnittest_PreferHashJoinVersusIndexJoinWhenRiskIsHigh()
 		&m_ulTestCounterPreferHashJoinToIndexJoin,
 		1,	// ulSessionId
 		1,	// ulCmdId
-		FHasNoIndexJoin, pdrgpcpNoIndexJoin);
+		FHasNoIndexJoin, pdrgpcpNoIndexJoin.get());
 	;
 
 	return eres;
