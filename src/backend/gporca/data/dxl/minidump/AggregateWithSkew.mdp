@@ -678,7 +678,7 @@ group by b;
               <dxl:Ident ColId="1" ColName="b" TypeMdid="0.23.1.0"/>
             </dxl:ProjElem>
             <dxl:ProjElem ColId="10" Alias="count">
-              <dxl:AggFunc AggMdid="0.2147.1.0" AggDistinct="false" AggStage="Normal" AggKind="n" >
+              <dxl:AggFunc AggMdid="0.2147.1.0" AggDistinct="false" AggStage="Normal" AggKind="n">
                 <dxl:ValuesList ParamType="aggargs">
                   <dxl:Ident ColId="0" ColName="a" TypeMdid="0.23.1.0"/>
                 </dxl:ValuesList>
@@ -708,7 +708,7 @@ group by b;
                 <dxl:Ident ColId="1" ColName="b" TypeMdid="0.23.1.0"/>
               </dxl:HashExpr>
             </dxl:HashExprList>
-            <dxl:Aggregate AggregationStrategy="Hashed" StreamSafe="true">
+            <dxl:Aggregate AggregationStrategy="Hashed" StreamSafe="false">
               <dxl:Properties>
                 <dxl:Cost StartupCost="0" TotalCost="715.260000" Rows="2000000.000000" Width="8"/>
               </dxl:Properties>
