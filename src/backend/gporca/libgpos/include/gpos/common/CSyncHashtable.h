@@ -132,6 +132,7 @@ private:
 		return k;
 	}
 
+public:
 	// key validity check
 	BOOL
 	IsValid(const K &key) const

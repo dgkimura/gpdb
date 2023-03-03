@@ -11,6 +11,11 @@
 //		* keeps track of all worker pools
 //---------------------------------------------------------------------------
 
+extern "C" {
+#include <unistd.h>
+#include "utils/elog.h"
+}
+
 #include "gpos/memory/CMemoryPoolManager.h"
 
 #include "gpos/base.h"
@@ -87,8 +92,15 @@ CMemoryPoolManager::CreateMemoryPool()
 		// HERE BE DRAGONS
 		// See comment in CCache::InsertEntry
 		const ULONG_PTR hashKey = mp->GetHashKey();
+		if (!((*m_ht_all_pools).IsValid(hashKey)))
+		{
+			elog(WARNING, "zzzzz %d", getpid());
+			bool b = true;
+			while (b) { }
+		}
 		MemoryPoolKeyAccessor acc(*m_ht_all_pools, hashKey);
 		acc.Insert(mp);
+
 	}
 
 	return mp;
