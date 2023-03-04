@@ -49,8 +49,8 @@ CDXLPhysicalPartitionSelector::CDXLPhysicalPartitionSelector(
 //---------------------------------------------------------------------------
 CDXLPhysicalPartitionSelector::~CDXLPhysicalPartitionSelector()
 {
-	CRefCount::SafeRelease(m_parts);
-	CRefCount::SafeRelease(m_rel_mdid);
+	SafeRelease(m_parts);
+	SafeRelease(m_rel_mdid);
 }
 
 //---------------------------------------------------------------------------

@@ -64,7 +64,7 @@ public:
 	~CScalarOp() override
 	{
 		m_mdid_op->Release();
-		CRefCount::SafeRelease(m_return_type_mdid);
+		SafeRelease(m_return_type_mdid);
 		GPOS_DELETE(m_pstrOp);
 	}
 

@@ -46,7 +46,7 @@ CCTEReq::CCTEReqEntry::CCTEReqEntry(ULONG id, CCTEMap::ECteType ect,
 //---------------------------------------------------------------------------
 CCTEReq::CCTEReqEntry::~CCTEReqEntry()
 {
-	CRefCount::SafeRelease(m_pdpplan);
+	SafeRelease(m_pdpplan);
 }
 
 //---------------------------------------------------------------------------

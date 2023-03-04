@@ -68,7 +68,7 @@ CMDFunctionGPDB::~CMDFunctionGPDB()
 {
 	m_mdid->Release();
 	m_mdid_type_result->Release();
-	CRefCount::SafeRelease(m_mdid_types_array);
+	SafeRelease(m_mdid_types_array);
 	GPOS_DELETE(m_mdname);
 	GPOS_DELETE(m_dxl_str);
 }

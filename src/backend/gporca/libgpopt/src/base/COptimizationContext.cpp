@@ -48,9 +48,9 @@ const OPTCTXT_PTR COptimizationContext::m_pocInvalid = nullptr;
 //---------------------------------------------------------------------------
 COptimizationContext::~COptimizationContext()
 {
-	CRefCount::SafeRelease(m_prpp);
-	CRefCount::SafeRelease(m_prprel);
-	CRefCount::SafeRelease(m_pdrgpstatCtxt);
+	SafeRelease(m_prpp);
+	SafeRelease(m_prprel);
+	SafeRelease(m_pdrgpstatCtxt);
 }
 
 

@@ -74,20 +74,20 @@ CParseHandlerDXL::CParseHandlerDXL(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerDXL::~CParseHandlerDXL()
 {
-	CRefCount::SafeRelease(m_trace_flags_bitset);
-	CRefCount::SafeRelease(m_optimizer_config);
-	CRefCount::SafeRelease(m_mdrequest);
-	CRefCount::SafeRelease(m_query_dxl_root);
-	CRefCount::SafeRelease(m_output_colums_dxl_array);
-	CRefCount::SafeRelease(m_cte_producers);
-	CRefCount::SafeRelease(m_plan_dxl_root);
-	CRefCount::SafeRelease(m_mdid_cached_obj_array);
-	CRefCount::SafeRelease(m_mdid_array);
-	CRefCount::SafeRelease(m_scalar_expr_dxl);
-	CRefCount::SafeRelease(m_system_id_array);
-	CRefCount::SafeRelease(m_dxl_stats_derived_rel_array);
-	CRefCount::SafeRelease(m_search_stage_array);
-	CRefCount::SafeRelease(m_cost_model_params);
+	SafeRelease(m_trace_flags_bitset);
+	SafeRelease(m_optimizer_config);
+	SafeRelease(m_mdrequest);
+	SafeRelease(m_query_dxl_root);
+	SafeRelease(m_output_colums_dxl_array);
+	SafeRelease(m_cte_producers);
+	SafeRelease(m_plan_dxl_root);
+	SafeRelease(m_mdid_cached_obj_array);
+	SafeRelease(m_mdid_array);
+	SafeRelease(m_scalar_expr_dxl);
+	SafeRelease(m_system_id_array);
+	SafeRelease(m_dxl_stats_derived_rel_array);
+	SafeRelease(m_search_stage_array);
+	SafeRelease(m_cost_model_params);
 }
 
 //---------------------------------------------------------------------------

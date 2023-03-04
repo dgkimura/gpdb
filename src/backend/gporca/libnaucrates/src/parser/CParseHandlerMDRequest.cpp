@@ -44,8 +44,8 @@ CParseHandlerMDRequest::CParseHandlerMDRequest(
 //---------------------------------------------------------------------------
 CParseHandlerMDRequest::~CParseHandlerMDRequest()
 {
-	CRefCount::SafeRelease(m_mdid_array);
-	CRefCount::SafeRelease(m_mdtype_request_array);
+	SafeRelease(m_mdid_array);
+	SafeRelease(m_mdtype_request_array);
 }
 
 

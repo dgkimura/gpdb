@@ -76,7 +76,7 @@ CJoinOrder::SComponent::~SComponent()
 {
 	m_pbs->Release();
 	m_edge_set->Release();
-	CRefCount::SafeRelease(m_pexpr);
+	SafeRelease(m_pexpr);
 }
 
 //---------------------------------------------------------------------------

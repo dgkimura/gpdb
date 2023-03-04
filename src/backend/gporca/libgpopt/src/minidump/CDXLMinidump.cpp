@@ -62,14 +62,14 @@ CDXLMinidump::CDXLMinidump(CBitSet *pbs, COptimizerConfig *optimizer_config,
 CDXLMinidump::~CDXLMinidump()
 {
 	// some of the structures may be NULL as they are not included in the minidump
-	CRefCount::SafeRelease(m_pbs);
-	CRefCount::SafeRelease(m_optimizer_config);
-	CRefCount::SafeRelease(m_query_dxl_root);
-	CRefCount::SafeRelease(m_query_output);
-	CRefCount::SafeRelease(m_cte_producers);
-	CRefCount::SafeRelease(m_plan_dxl_root);
-	CRefCount::SafeRelease(m_mdid_cached_obj_array);
-	CRefCount::SafeRelease(m_system_id_array);
+	SafeRelease(m_pbs);
+	SafeRelease(m_optimizer_config);
+	SafeRelease(m_query_dxl_root);
+	SafeRelease(m_query_output);
+	SafeRelease(m_cte_producers);
+	SafeRelease(m_plan_dxl_root);
+	SafeRelease(m_mdid_cached_obj_array);
+	SafeRelease(m_system_id_array);
 }
 
 //---------------------------------------------------------------------------

@@ -57,7 +57,7 @@ CDXLTableDescr::~CDXLTableDescr()
 {
 	m_mdid->Release();
 	GPOS_DELETE(m_mdname);
-	CRefCount::SafeRelease(m_dxl_column_descr_array);
+	SafeRelease(m_dxl_column_descr_array);
 }
 
 
@@ -136,7 +136,7 @@ CDXLTableDescr::LockMode() const
 void
 CDXLTableDescr::SetColumnDescriptors(CDXLColDescrArray *dxl_column_descr_array)
 {
-	CRefCount::SafeRelease(m_dxl_column_descr_array);
+	SafeRelease(m_dxl_column_descr_array);
 	m_dxl_column_descr_array = dxl_column_descr_array;
 }
 

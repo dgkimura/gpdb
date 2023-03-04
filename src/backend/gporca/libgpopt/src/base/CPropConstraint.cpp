@@ -49,8 +49,8 @@ CPropConstraint::CPropConstraint(CMemoryPool *mp, CColRefSetArray *pdrgpcrs,
 CPropConstraint::~CPropConstraint()
 {
 	m_pdrgpcrs->Release();
-	CRefCount::SafeRelease(m_phmcrcrs);
-	CRefCount::SafeRelease(m_pcnstr);
+	SafeRelease(m_phmcrcrs);
+	SafeRelease(m_pcnstr);
 }
 
 //---------------------------------------------------------------------------
@@ -156,7 +156,7 @@ CPropConstraint::PexprScalarMappedFromEquivCols(
 			constraintsForOuterRefs->m_pcnstr->Pcnstr(mp, pcrsEquiv);
 	}
 	pcrsEquiv->Release();
-	CRefCount::SafeRelease(equivOuterRefs);
+	SafeRelease(equivOuterRefs);
 
 	// combine local and outer ref constraints, if we have any, into pcnstr
 	if (nullptr == pcnstr && nullptr == pcnstrFromOuterRefs)

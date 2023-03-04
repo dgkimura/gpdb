@@ -49,7 +49,7 @@ using COptimizationContextArray =
 //		Optimization context
 //
 //---------------------------------------------------------------------------
-class COptimizationContext : public CRefCount,
+class COptimizationContext : public CRefCount<COptimizationContext>,
 							 public DbgPrintMixin<COptimizationContext>
 {
 public:

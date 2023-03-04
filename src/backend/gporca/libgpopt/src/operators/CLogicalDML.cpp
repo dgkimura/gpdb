@@ -98,9 +98,9 @@ CLogicalDML::CLogicalDML(CMemoryPool *mp, EDMLOperator edmlop,
 //---------------------------------------------------------------------------
 CLogicalDML::~CLogicalDML()
 {
-	CRefCount::SafeRelease(m_ptabdesc);
-	CRefCount::SafeRelease(m_pdrgpcrSource);
-	CRefCount::SafeRelease(m_pbsModified);
+	SafeRelease(m_ptabdesc);
+	SafeRelease(m_pdrgpcrSource);
+	SafeRelease(m_pbsModified);
 }
 
 //---------------------------------------------------------------------------

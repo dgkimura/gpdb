@@ -35,7 +35,7 @@ using namespace gpos;
 //		Abstract class for retrieving metadata from an external location.
 //
 //---------------------------------------------------------------------------
-class IMDProvider : public CRefCount
+class IMDProvider : public CRefCount<IMDProvider>
 {
 protected:
 	// return the mdid for the requested type

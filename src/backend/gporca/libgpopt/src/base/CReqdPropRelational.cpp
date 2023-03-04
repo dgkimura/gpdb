@@ -58,7 +58,7 @@ CReqdPropRelational::CReqdPropRelational(CColRefSet *pcrs) : m_pcrsStat(pcrs)
 //---------------------------------------------------------------------------
 CReqdPropRelational::~CReqdPropRelational()
 {
-	CRefCount::SafeRelease(m_pcrsStat);
+	SafeRelease(m_pcrsStat);
 }
 
 //---------------------------------------------------------------------------

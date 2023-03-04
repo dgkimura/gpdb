@@ -60,7 +60,7 @@ CPhysicalStreamAgg::InitOrderSpec(CMemoryPool *mp, CColRefArray *pdrgpcrOrder)
 {
 	GPOS_ASSERT(nullptr != pdrgpcrOrder);
 
-	CRefCount::SafeRelease(m_pos);
+	SafeRelease(m_pos);
 	m_pos = GPOS_NEW(mp) COrderSpec(mp);
 	const ULONG size = pdrgpcrOrder->Size();
 	for (ULONG ul = 0; ul < size; ul++)

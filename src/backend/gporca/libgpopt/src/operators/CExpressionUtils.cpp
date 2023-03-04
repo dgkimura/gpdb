@@ -346,7 +346,7 @@ CExpressionUtils::GetPropConstraintFromSubquery(CMemoryPool *mp,
 
 	if (nullptr == pcnstr)
 	{
-		CRefCount::SafeRelease(colRefSetArray);
+		SafeRelease(colRefSetArray);
 		return nullptr;
 	}
 	return GPOS_NEW(mp) CPropConstraint(mp, colRefSetArray, pcnstr);

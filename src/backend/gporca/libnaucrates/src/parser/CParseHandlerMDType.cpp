@@ -82,8 +82,8 @@ CParseHandlerMDType::CParseHandlerMDType(
 CParseHandlerMDType::~CParseHandlerMDType()
 {
 	m_mdid->Release();
-	CRefCount::SafeRelease(m_distr_opfamily);
-	CRefCount::SafeRelease(m_legacy_distr_opfamily);
+	SafeRelease(m_distr_opfamily);
+	SafeRelease(m_legacy_distr_opfamily);
 	m_mdid_eq_op->Release();
 	m_mdid_neq_op->Release();
 	m_mdid_lt_op->Release();
@@ -97,7 +97,7 @@ CParseHandlerMDType::~CParseHandlerMDType()
 	m_mdid_avg_op->Release();
 	m_mdid_sum_op->Release();
 	m_mdid_count_op->Release();
-	CRefCount::SafeRelease(m_mdid_base_rel);
+	SafeRelease(m_mdid_base_rel);
 }
 
 //---------------------------------------------------------------------------

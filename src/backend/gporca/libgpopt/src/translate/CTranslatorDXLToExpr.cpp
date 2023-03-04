@@ -194,8 +194,8 @@ CTranslatorDXLToExpr::~CTranslatorDXLToExpr()
 {
 	m_phmulcr->Release();
 	m_phmululCTE->Release();
-	CRefCount::SafeRelease(m_pdrgpulOutputColRefs);
-	CRefCount::SafeRelease(m_pdrgpmdname);
+	SafeRelease(m_pdrgpulOutputColRefs);
+	SafeRelease(m_pdrgpmdname);
 }
 
 //---------------------------------------------------------------------------

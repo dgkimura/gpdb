@@ -170,7 +170,7 @@ CPartInfo::CPartInfo(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CPartInfo::~CPartInfo()
 {
-	CRefCount::SafeRelease(m_pdrgppartentries);
+	SafeRelease(m_pdrgppartentries);
 }
 
 //---------------------------------------------------------------------------

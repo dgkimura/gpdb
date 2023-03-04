@@ -47,7 +47,7 @@ CParseHandlerPartitionSelector::CParseHandlerPartitionSelector(
 
 CParseHandlerPartitionSelector::~CParseHandlerPartitionSelector()
 {
-	CRefCount::SafeRelease(m_rel_mdid);
+	SafeRelease(m_rel_mdid);
 }
 //---------------------------------------------------------------------------
 //	@function:

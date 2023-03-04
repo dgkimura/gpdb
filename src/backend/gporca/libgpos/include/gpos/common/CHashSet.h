@@ -43,7 +43,7 @@ class CHashSetIter;
 //---------------------------------------------------------------------------
 template <class T, ULONG (*HashFn)(const T *),
 		  BOOL (*EqFn)(const T *, const T *), void (*CleanupFn)(T *)>
-class CHashSet : public CRefCount
+class CHashSet : public CRefCount<CHashSet<T, HashFn, EqFn, CleanupFn>>
 {
 	// fwd declaration
 	friend class CHashSetIter<T, HashFn, EqFn, CleanupFn>;

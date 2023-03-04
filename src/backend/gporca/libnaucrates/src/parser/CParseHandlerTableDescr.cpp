@@ -48,7 +48,7 @@ CParseHandlerTableDescr::CParseHandlerTableDescr(
 //---------------------------------------------------------------------------
 CParseHandlerTableDescr::~CParseHandlerTableDescr()
 {
-	CRefCount::SafeRelease(m_dxl_table_descr);
+	SafeRelease(m_dxl_table_descr);
 }
 
 //---------------------------------------------------------------------------

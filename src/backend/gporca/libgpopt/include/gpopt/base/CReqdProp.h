@@ -65,7 +65,7 @@ using CReqdPropArray = CDynamicPtrArray<CReqdProp, CleanupRelease>;
 //		children.
 //
 //---------------------------------------------------------------------------
-class CReqdProp : public CRefCount, public DbgPrintMixin<CReqdProp>
+class CReqdProp : public CRefCount<CReqdProp>, public DbgPrintMixin<CReqdProp>
 {
 public:
 	// types of required properties

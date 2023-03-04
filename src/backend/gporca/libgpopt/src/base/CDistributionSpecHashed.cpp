@@ -96,9 +96,9 @@ CDistributionSpecHashed::CDistributionSpecHashed(
 CDistributionSpecHashed::~CDistributionSpecHashed()
 {
 	m_pdrgpexpr->Release();
-	CRefCount::SafeRelease(m_pdshashedEquiv);
-	CRefCount::SafeRelease(m_equiv_hash_exprs);
-	CRefCount::SafeRelease(m_opfamilies);
+	SafeRelease(m_pdshashedEquiv);
+	SafeRelease(m_equiv_hash_exprs);
+	SafeRelease(m_opfamilies);
 }
 
 void
@@ -805,7 +805,7 @@ CDistributionSpecHashed::ComputeEquivHashExprs(
 						equiv_distribution_exprs->Append(
 							equiv_distribution_expr);
 					}
-					CRefCount::SafeRelease(original_predicate_expr);
+					SafeRelease(original_predicate_expr);
 				}
 			}
 			equiv_distribution_all_exprs->Append(equiv_distribution_exprs);

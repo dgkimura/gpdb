@@ -71,12 +71,12 @@ CReqdPropPlan::CReqdPropPlan(CColRefSet *pcrs, CEnfdOrder *peo,
 //---------------------------------------------------------------------------
 CReqdPropPlan::~CReqdPropPlan()
 {
-	CRefCount::SafeRelease(m_pcrs);
-	CRefCount::SafeRelease(m_peo);
-	CRefCount::SafeRelease(m_ped);
-	CRefCount::SafeRelease(m_per);
-	CRefCount::SafeRelease(m_pepp);
-	CRefCount::SafeRelease(m_pcter);
+	SafeRelease(m_pcrs);
+	SafeRelease(m_peo);
+	SafeRelease(m_ped);
+	SafeRelease(m_per);
+	SafeRelease(m_pepp);
+	SafeRelease(m_pcter);
 }
 
 

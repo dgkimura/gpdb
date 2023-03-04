@@ -31,7 +31,7 @@ CParseHandlerWindowOids::CParseHandlerWindowOids(
 
 CParseHandlerWindowOids::~CParseHandlerWindowOids()
 {
-	CRefCount::SafeRelease(m_window_oids);
+	SafeRelease(m_window_oids);
 }
 
 void

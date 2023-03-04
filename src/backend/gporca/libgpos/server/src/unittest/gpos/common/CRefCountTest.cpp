@@ -61,7 +61,7 @@ CRefCountTest::EresUnittest_CountUpAndDown()
 	CMemoryPool *mp = amp.Pmp();
 
 	// blank ref count object
-	CRefCount *pref = GPOS_NEW(mp) CRefCount;
+	CRefCount<INT> *pref = GPOS_NEW(mp) CRefCount<INT>;
 
 	// add counts
 	for (ULONG i = 0; i < 10; i++)
@@ -138,7 +138,7 @@ CRefCountTest::EresUnittest_DeletableObjects()
 GPOS_RESULT
 CRefCountTest::EresUnittest_Stack()
 {
-	CRefCount ref;
+	CRefCount<INT> ref;
 
 	// does not reach this line
 	return GPOS_FAILED;
@@ -162,7 +162,7 @@ CRefCountTest::EresUnittest_Check()
 	CMemoryPool *mp = amp.Pmp();
 
 	BYTE *rgb = GPOS_NEW_ARRAY(mp, BYTE, 128);
-	CRefCount *pref = (CRefCount *) rgb;
+	CRefCount<BYTE> *pref = (CRefCount<BYTE> *) rgb;
 
 	GPOS_DELETE_ARRAY(rgb);
 

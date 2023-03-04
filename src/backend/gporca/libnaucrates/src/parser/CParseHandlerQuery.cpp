@@ -58,9 +58,9 @@ CParseHandlerQuery::CParseHandlerQuery(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerQuery::~CParseHandlerQuery()
 {
-	CRefCount::SafeRelease(m_dxl_node);
-	CRefCount::SafeRelease(m_output_colums_dxl_array);
-	CRefCount::SafeRelease(m_cte_producers);
+	SafeRelease(m_dxl_node);
+	SafeRelease(m_output_colums_dxl_array);
+	SafeRelease(m_cte_producers);
 }
 
 //---------------------------------------------------------------------------

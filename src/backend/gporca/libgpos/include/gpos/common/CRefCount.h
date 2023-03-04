@@ -16,6 +16,7 @@
 
 #include "gpos/assert.h"
 #include "gpos/common/CHeapObject.h"
+#include "gpos/common/Ref.h"
 #include "gpos/error/CException.h"
 #include "gpos/task/ITask.h"
 #include "gpos/types.h"
@@ -35,6 +36,7 @@ namespace gpos
 //		Basic reference counting
 //
 //---------------------------------------------------------------------------
+template <class T>
 class CRefCount : public CHeapObject
 {
 private:
@@ -116,17 +118,24 @@ public:
 		}
 	}
 
-	// safe version of Release -- handles NULL pointers
-	static void
-	SafeRelease(CRefCount *rc)
+	Ref<T>
+	SharedFromThis() const
 	{
-		if (nullptr != rc)
-		{
-			rc->Release();
-		}
+		Ref<T> ref(dynamic_cast<T *>(const_cast<CRefCount *>(this)));
+		return ref;
 	}
 
 };	// class CRefCount
+
+template <class T>
+static void
+SafeRelease(T *rc)
+{
+	if (nullptr != rc)
+	{
+		rc->Release();
+	}
+}
 }  // namespace gpos
 
 #endif	// !GPOS_CRefCount_H

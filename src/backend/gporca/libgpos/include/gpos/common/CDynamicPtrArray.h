@@ -54,7 +54,9 @@ template <class T>
 inline void
 CleanupRelease(T *elem)
 {
-	(dynamic_cast<CRefCount *>(elem))->Release();
+	// (dynamic_cast<CRefCount *>(elem))->Release();
+	// TODO: Ensure this calls CRefCount::Release()...
+	elem->Release();
 }
 
 // commonly used array types
@@ -82,7 +84,7 @@ using CharPtrArray = CDynamicPtrArray<CHAR, CleanupDelete>;
 //
 //---------------------------------------------------------------------------
 template <class T, void (*CleanupFn)(T *)>
-class CDynamicPtrArray : public CRefCount
+class CDynamicPtrArray : public CRefCount<CDynamicPtrArray<T, CleanupFn>>
 {
 private:
 	// memory pool

@@ -53,7 +53,7 @@ public:
 	//		Struct to capture edge
 	//
 	//---------------------------------------------------------------------------
-	struct SEdge : public CRefCount, public DbgPrintMixin<SEdge>
+	struct SEdge : public CRefCount<SEdge>, public DbgPrintMixin<SEdge>
 	{
 		// cover of edge
 		CBitSet *m_pbs;
@@ -90,7 +90,8 @@ public:
 	//		Struct to capture component
 	//
 	//---------------------------------------------------------------------------
-	struct SComponent : public CRefCount, public DbgPrintMixin<SComponent>
+	struct SComponent : public CRefCount<SComponent>,
+						public DbgPrintMixin<SComponent>
 	{
 		// cover
 		CBitSet *m_pbs;

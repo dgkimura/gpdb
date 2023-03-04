@@ -32,7 +32,7 @@ class CTreeMapTest
 	using CNodeArray = CDynamicPtrArray<CNode, CleanupRelease<CNode>>;
 
 	// struct for resulting trees
-	class CNode : public CRefCount
+	class CNode : public CRefCount<CNode>
 	{
 	private:
 		// element number

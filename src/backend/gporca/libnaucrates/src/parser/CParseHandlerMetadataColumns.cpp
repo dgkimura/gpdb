@@ -48,7 +48,7 @@ CParseHandlerMetadataColumns::CParseHandlerMetadataColumns(
 //---------------------------------------------------------------------------
 CParseHandlerMetadataColumns::~CParseHandlerMetadataColumns()
 {
-	CRefCount::SafeRelease(m_md_col_array);
+	SafeRelease(m_md_col_array);
 }
 
 //---------------------------------------------------------------------------

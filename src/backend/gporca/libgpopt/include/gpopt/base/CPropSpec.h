@@ -31,7 +31,7 @@ class CReqdPropPlan;
 //		Property specification
 //
 //---------------------------------------------------------------------------
-class CPropSpec : public CRefCount, public DbgPrintMixin<CPropSpec>
+class CPropSpec : public CRefCount<CPropSpec>, public DbgPrintMixin<CPropSpec>
 {
 public:
 	// property type

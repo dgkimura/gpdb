@@ -114,13 +114,13 @@ CEngine::~CEngine()
 	// we can save time in optimized build by skipping all de-allocations here,
 	// we still have all de-llocations enabled in debug-build to detect any possible leaks
 	GPOS_DELETE(m_pmemo);
-	CRefCount::SafeRelease(m_xforms);
+	SafeRelease(m_xforms);
 	m_pdrgpulpXformCalls->Release();
 	m_pdrgpulpXformTimes->Release();
 	m_pdrgpulpXformBindings->Release();
 	m_pdrgpulpXformResults->Release();
 	m_pexprEnforcerPattern->Release();
-	CRefCount::SafeRelease(m_search_stage_array);
+	SafeRelease(m_search_stage_array);
 }
 
 
@@ -1157,7 +1157,7 @@ CEngine::OptimizeGroupExpression(CGroupExpression *pgexpr,
 				}
 			}
 
-			CRefCount::SafeRelease(pdrgpoc);
+			SafeRelease(pdrgpoc);
 		}
 
 		GPOS_CHECK_ABORT;

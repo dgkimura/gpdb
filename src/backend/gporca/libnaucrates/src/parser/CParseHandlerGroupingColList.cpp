@@ -48,7 +48,7 @@ CParseHandlerGroupingColList::CParseHandlerGroupingColList(
 //---------------------------------------------------------------------------
 CParseHandlerGroupingColList::~CParseHandlerGroupingColList()
 {
-	CRefCount::SafeRelease(m_grouping_colids_array);
+	SafeRelease(m_grouping_colids_array);
 }
 
 //---------------------------------------------------------------------------

@@ -59,7 +59,7 @@ CSearchStage::CSearchStage(CXformSet *xform_set, ULONG ulTimeThreshold,
 CSearchStage::~CSearchStage()
 {
 	m_xforms->Release();
-	CRefCount::SafeRelease(m_pexprBest);
+	SafeRelease(m_pexprBest);
 }
 
 

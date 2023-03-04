@@ -131,7 +131,7 @@ CPhysicalUnionAll::~CPhysicalUnionAll()
 	m_pdrgpcrOutput->Release();
 	m_pdrgpdrgpcrInput->Release();
 	m_pdrgpcrsInput->Release();
-	CRefCount::SafeRelease(m_pdrgpds);
+	SafeRelease(m_pdrgpds);
 }
 
 // accessor of output column array
@@ -551,7 +551,7 @@ CPhysicalUnionAll::PdshashedDerive(CMemoryPool *mp,
 			// match mapped column positions of current child with outer child
 			equi_hash_spec_matches =
 				(nullptr != pdrgpulChild) && Equals(pdrgpulOuter, pdrgpulChild);
-			CRefCount::SafeRelease(pdrgpulChild);
+			SafeRelease(pdrgpulChild);
 			pdsChildHashed = pdsChildHashed->PdshashedEquiv();
 		}
 		fSuccess = equi_hash_spec_matches;

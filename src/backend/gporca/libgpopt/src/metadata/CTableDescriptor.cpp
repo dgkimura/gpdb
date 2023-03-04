@@ -84,7 +84,7 @@ CTableDescriptor::~CTableDescriptor()
 	m_pdrgpcoldescDist->Release();
 	m_pdrgpulPart->Release();
 	m_pdrgpbsKeys->Release();
-	CRefCount::SafeRelease(m_distr_opfamilies);
+	SafeRelease(m_distr_opfamilies);
 }
 
 

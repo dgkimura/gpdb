@@ -49,8 +49,8 @@ CDXLPhysicalAppend::CDXLPhysicalAppend(CMemoryPool *mp, BOOL fIsTarget,
 
 CDXLPhysicalAppend::~CDXLPhysicalAppend()
 {
-	CRefCount::SafeRelease(m_dxl_table_descr);
-	CRefCount::SafeRelease(m_selector_ids);
+	SafeRelease(m_dxl_table_descr);
+	SafeRelease(m_selector_ids);
 }
 
 //---------------------------------------------------------------------------

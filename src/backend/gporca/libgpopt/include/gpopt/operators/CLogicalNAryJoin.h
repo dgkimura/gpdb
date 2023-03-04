@@ -53,7 +53,7 @@ public:
 	// dtor
 	~CLogicalNAryJoin() override
 	{
-		CRefCount::SafeRelease(m_lojChildPredIndexes);
+		SafeRelease(m_lojChildPredIndexes);
 	}
 
 	// ident accessors

@@ -98,12 +98,12 @@ CLogicalIndexGet::CLogicalIndexGet(CMemoryPool *mp, const IMDIndex *pmdindex,
 //---------------------------------------------------------------------------
 CLogicalIndexGet::~CLogicalIndexGet()
 {
-	CRefCount::SafeRelease(m_ptabdesc);
-	CRefCount::SafeRelease(m_pindexdesc);
-	CRefCount::SafeRelease(m_pdrgpcrOutput);
-	CRefCount::SafeRelease(m_pcrsOutput);
-	CRefCount::SafeRelease(m_pos);
-	CRefCount::SafeRelease(m_pcrsDist);
+	SafeRelease(m_ptabdesc);
+	SafeRelease(m_pindexdesc);
+	SafeRelease(m_pdrgpcrOutput);
+	SafeRelease(m_pcrsOutput);
+	SafeRelease(m_pos);
+	SafeRelease(m_pcrsDist);
 
 	GPOS_DELETE(m_pnameAlias);
 }

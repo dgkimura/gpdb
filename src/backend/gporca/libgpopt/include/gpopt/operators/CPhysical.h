@@ -77,7 +77,7 @@ private:
 	//		Representation of incoming column requests during optimization
 	//
 	//---------------------------------------------------------------------------
-	class CReqdColsRequest : public CRefCount
+	class CReqdColsRequest : public CRefCount<CReqdColsRequest>
 	{
 	private:
 		// incoming required columns
@@ -293,8 +293,8 @@ public:
 	// dtor
 	~CPhysical() override
 	{
-		CRefCount::SafeRelease(m_phmrcr);
-		CRefCount::SafeRelease(m_pdrgpulpOptReqsExpanded);
+		SafeRelease(m_phmrcr);
+		SafeRelease(m_pdrgpulpOptReqsExpanded);
 	}
 
 	// helper to compute skew estimate based on given stats and distribution spec

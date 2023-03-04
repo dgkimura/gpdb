@@ -129,8 +129,8 @@ CRange::CRange(const IComparator *pcomp, IMDType::ECmpType cmp_type,
 CRange::~CRange()
 {
 	m_mdid->Release();
-	CRefCount::SafeRelease(m_pdatumLeft);
-	CRefCount::SafeRelease(m_pdatumRight);
+	SafeRelease(m_pdatumLeft);
+	SafeRelease(m_pdatumRight);
 }
 
 //---------------------------------------------------------------------------

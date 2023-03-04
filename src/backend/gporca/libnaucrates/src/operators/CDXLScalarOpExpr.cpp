@@ -51,7 +51,7 @@ CDXLScalarOpExpr::CDXLScalarOpExpr(CMemoryPool *mp, IMDId *mdid_op,
 CDXLScalarOpExpr::~CDXLScalarOpExpr()
 {
 	m_mdid->Release();
-	CRefCount::SafeRelease(m_return_type_mdid);
+	SafeRelease(m_return_type_mdid);
 	GPOS_DELETE(m_str_opname);
 }
 

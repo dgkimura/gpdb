@@ -103,10 +103,10 @@ public:
 	~CScalarAggFunc() override
 	{
 		m_pmdidAggFunc->Release();
-		CRefCount::SafeRelease(m_pmdidResolvedRetType);
-		CRefCount::SafeRelease(m_return_type_mdid);
+		SafeRelease(m_pmdidResolvedRetType);
+		SafeRelease(m_return_type_mdid);
 		GPOS_DELETE(m_pstrAggFunc);
-		CRefCount::SafeRelease(m_argtypes);
+		SafeRelease(m_argtypes);
 	}
 
 

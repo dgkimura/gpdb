@@ -131,12 +131,12 @@ CLogicalDynamicGetBase::CLogicalDynamicGetBase(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CLogicalDynamicGetBase::~CLogicalDynamicGetBase()
 {
-	CRefCount::SafeRelease(m_ptabdesc);
-	CRefCount::SafeRelease(m_pdrgpcrOutput);
-	CRefCount::SafeRelease(m_pdrgpdrgpcrPart);
-	CRefCount::SafeRelease(m_partition_mdids);
-	CRefCount::SafeRelease(m_root_col_mapping_per_part);
-	CRefCount::SafeRelease(m_pcrsDist);
+	SafeRelease(m_ptabdesc);
+	SafeRelease(m_pdrgpcrOutput);
+	SafeRelease(m_pdrgpdrgpcrPart);
+	SafeRelease(m_partition_mdids);
+	SafeRelease(m_root_col_mapping_per_part);
+	SafeRelease(m_pcrsDist);
 
 	GPOS_DELETE(m_pnameAlias);
 }

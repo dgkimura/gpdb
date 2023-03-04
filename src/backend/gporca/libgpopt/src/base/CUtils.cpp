@@ -1526,7 +1526,7 @@ CUtils::PdrgpexprDedup(CMemoryPool *mp, CExpressionArray *pdrgpexpr)
 					pexprComm->AddRef();
 				}
 			}
-			CRefCount::SafeRelease(pexprComm);
+			SafeRelease(pexprComm);
 		}
 	}
 

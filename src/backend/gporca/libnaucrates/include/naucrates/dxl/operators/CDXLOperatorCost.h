@@ -30,7 +30,7 @@ class CXMLSerializer;
 //		Class for representing costs of physical operators in the DXL tree
 //
 //---------------------------------------------------------------------------
-class CDXLOperatorCost : public CRefCount
+class CDXLOperatorCost : public CRefCount<CDXLOperatorCost>
 {
 private:
 	// cost expended before fetching any tuples

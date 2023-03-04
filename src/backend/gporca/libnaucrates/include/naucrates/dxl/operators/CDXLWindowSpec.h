@@ -33,7 +33,7 @@ using namespace gpmd;
 //		representation of the logical query tree
 //
 //---------------------------------------------------------------------------
-class CDXLWindowSpec : public CRefCount
+class CDXLWindowSpec : public CRefCount<CDXLWindowSpec>
 {
 private:
 	// memory pool;

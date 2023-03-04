@@ -55,7 +55,7 @@ CParseHandlerCostModel::CParseHandlerCostModel(
 //---------------------------------------------------------------------------
 CParseHandlerCostModel::~CParseHandlerCostModel()
 {
-	CRefCount::SafeRelease(m_cost_model);
+	SafeRelease(m_cost_model);
 	GPOS_DELETE(m_parse_handler_cost_params);
 }
 

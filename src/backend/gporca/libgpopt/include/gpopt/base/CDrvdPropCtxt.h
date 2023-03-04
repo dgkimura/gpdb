@@ -37,7 +37,7 @@ using CDrvdPropCtxtArray = CDynamicPtrArray<CDrvdPropCtxt, CleanupRelease>;
 //		property derivation
 //
 //---------------------------------------------------------------------------
-class CDrvdPropCtxt : public CRefCount
+class CDrvdPropCtxt : public CRefCount<CDrvdPropCtxt>
 {
 private:
 protected:

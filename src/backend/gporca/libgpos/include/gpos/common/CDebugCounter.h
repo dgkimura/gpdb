@@ -131,7 +131,7 @@ class CDebugCounter
 	};
 
 	// a key that identifies a counter for a given query
-	struct SDebugCounterKey : public CRefCount
+	struct SDebugCounterKey : public CRefCount<SDebugCounterKey>
 	{
 		SDebugCounterKey(const char *counter_name)
 			: m_counter_name(counter_name)
@@ -153,7 +153,7 @@ class CDebugCounter
 	};
 
 	// a counter value (a union of all possible counter types)
-	struct SDebugCounterValue : public CRefCount
+	struct SDebugCounterValue : public CRefCount<SDebugCounterValue>
 	{
 		SDebugCounterValue(ECounterType typ)
 			: m_type(typ),

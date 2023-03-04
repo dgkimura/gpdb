@@ -58,8 +58,8 @@ CDXLWindowSpec::CDXLWindowSpec(CMemoryPool *mp,
 CDXLWindowSpec::~CDXLWindowSpec()
 {
 	m_partition_by_colid_array->Release();
-	CRefCount::SafeRelease(m_window_frame);
-	CRefCount::SafeRelease(m_sort_col_list_dxlnode);
+	SafeRelease(m_window_frame);
+	SafeRelease(m_sort_col_list_dxlnode);
 	GPOS_DELETE(m_mdname);
 }
 
