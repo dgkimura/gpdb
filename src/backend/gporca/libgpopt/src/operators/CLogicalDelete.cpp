@@ -76,8 +76,8 @@ CLogicalDelete::CLogicalDelete(CMemoryPool *mp, CTableDescriptor *ptabdesc,
 //---------------------------------------------------------------------------
 CLogicalDelete::~CLogicalDelete()
 {
-	CRefCount::SafeRelease(m_ptabdesc);
-	CRefCount::SafeRelease(m_pdrgpcr);
+	SafeRelease(m_ptabdesc);
+	SafeRelease(m_pdrgpcr);
 }
 
 //---------------------------------------------------------------------------

@@ -77,7 +77,7 @@ CLogicalLimit::CLogicalLimit(CMemoryPool *mp, COrderSpec *pos, BOOL fGlobal,
 //---------------------------------------------------------------------------
 CLogicalLimit::~CLogicalLimit()
 {
-	CRefCount::SafeRelease(m_pos);
+	SafeRelease(m_pos);
 }
 
 

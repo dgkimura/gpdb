@@ -46,7 +46,7 @@ CParseHandlerCost::CParseHandlerCost(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerCost::~CParseHandlerCost()
 {
-	CRefCount::SafeRelease(m_operator_cost_dxl);
+	SafeRelease(m_operator_cost_dxl);
 }
 
 //---------------------------------------------------------------------------

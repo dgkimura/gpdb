@@ -36,7 +36,7 @@ CPhysicalLeftOuterIndexNLJoin::CPhysicalLeftOuterIndexNLJoin(
 CPhysicalLeftOuterIndexNLJoin::~CPhysicalLeftOuterIndexNLJoin()
 {
 	m_pdrgpcrOuterRefs->Release();
-	CRefCount::SafeRelease(m_origJoinPred);
+	SafeRelease(m_origJoinPred);
 }
 
 

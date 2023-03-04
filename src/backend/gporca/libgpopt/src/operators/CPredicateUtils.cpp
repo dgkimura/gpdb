@@ -690,8 +690,8 @@ CPredicateUtils::PexprConjDisj(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
 		if (FReducible(pexpr, fConjunction))
 		{
 			// a False (True) conjunct (disjunct) yields the whole conjunction (disjunction) False (True)
-			CRefCount::SafeRelease(pdrgpexpr);
-			CRefCount::SafeRelease(pdrgpexprFinal);
+			SafeRelease(pdrgpexpr);
+			SafeRelease(pdrgpexprFinal);
 
 			return CUtils::PexprScalarConstBool(mp, !fConjunction /*fValue*/);
 		}
@@ -700,7 +700,7 @@ CPredicateUtils::PexprConjDisj(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
 		pexpr->AddRef();
 		pdrgpexprFinal->Append(pexpr);
 	}
-	CRefCount::SafeRelease(pdrgpexpr);
+	SafeRelease(pdrgpexpr);
 
 	// assemble result
 	CExpression *pexprResult = nullptr;
@@ -719,7 +719,7 @@ CPredicateUtils::PexprConjDisj(CMemoryPool *mp, CExpressionArray *pdrgpexpr,
 	}
 
 	pexprResult = CUtils::PexprScalarConstBool(mp, fConjunction /*fValue*/);
-	CRefCount::SafeRelease(pdrgpexprFinal);
+	SafeRelease(pdrgpexprFinal);
 
 	return pexprResult;
 }
@@ -1379,7 +1379,7 @@ CPredicateUtils::PexprPartPruningPredicate(
 		CColRefSet *pcrsUsed = CUtils::PcrsExtractColumns(mp, pdrgpexprResult);
 		GPOS_ASSERT_IMP(pdrgpexprResult->Size() > 0,
 						pcrsUsed->FMember(pcrPartKey));
-		CRefCount::SafeRelease(pcrsUsed);
+		SafeRelease(pcrsUsed);
 #endif
 		// pexprCol is a redundent "IS NOT NULL" expr. Ignore it
 		pexprCol = nullptr;
@@ -1568,7 +1568,7 @@ CPredicateUtils::PexprExtractPredicatesOnPartKeys(
 		pcnstr =
 			CConstraint::PcnstrFromScalarExpr(mp, pexprScalar, &pdrgpcrsChild);
 	}
-	CRefCount::SafeRelease(pdrgpcrsChild);
+	SafeRelease(pdrgpcrsChild);
 
 
 	// check if expanded scalar leads to a contradiction in computed constraint
@@ -1605,7 +1605,7 @@ CPredicateUtils::PexprExtractPredicatesOnPartKeys(
 		CExpression *pexprCmp = PexprPartPruningPredicate(
 			mp, pdrgpexprConjuncts, colref, pexprCol, pcrsAllowedRefs,
 			isKnownToBeListPartitioned /* allowNotEqualPreds */);
-		CRefCount::SafeRelease(pexprCol);
+		SafeRelease(pexprCol);
 		GPOS_ASSERT_IMP(
 			nullptr != pexprCmp &&
 				COperator::EopScalarCmp == pexprCmp->Pop()->Eopid(),
@@ -1618,11 +1618,11 @@ CPredicateUtils::PexprExtractPredicatesOnPartKeys(
 			pexprCmp->AddRef();
 			pdrgpexpr->Append(pexprCmp);
 		}
-		CRefCount::SafeRelease(pexprCmp);
+		SafeRelease(pexprCmp);
 	}
 
 	pdrgpexprConjuncts->Release();
-	CRefCount::SafeRelease(pcnstr);
+	SafeRelease(pcnstr);
 
 	if (0 == pdrgpexpr->Size())
 	{
@@ -1651,7 +1651,7 @@ CPredicateUtils::PexprPredicateCol(CMemoryPool *mp, CConstraint *pcnstr,
 		pexprCol->AddRef();
 	}
 
-	CRefCount::SafeRelease(pcnstrCol);
+	SafeRelease(pcnstrCol);
 
 	return pexprCol;
 }
@@ -2300,7 +2300,7 @@ CPredicateUtils::PexprRemoveImpliedConjuncts(CMemoryPool *mp,
 		CColRefSetArray *pdrgpcrsConj = nullptr;
 		CConstraint *pcnstr =
 			CConstraint::PcnstrFromScalarExpr(mp, pexprConj, &pdrgpcrsConj);
-		CRefCount::SafeRelease(pcnstr);
+		SafeRelease(pcnstr);
 		if (nullptr != pdrgpcrsConj)
 		{
 			CColRefSetArray *pdrgpcrsMerged =

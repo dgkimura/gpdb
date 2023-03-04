@@ -82,8 +82,8 @@ CLogicalSplit::CLogicalSplit(CMemoryPool *mp, CColRefArray *pdrgpcrDelete,
 //---------------------------------------------------------------------------
 CLogicalSplit::~CLogicalSplit()
 {
-	CRefCount::SafeRelease(m_pdrgpcrDelete);
-	CRefCount::SafeRelease(m_pdrgpcrInsert);
+	SafeRelease(m_pdrgpcrDelete);
+	SafeRelease(m_pdrgpcrInsert);
 }
 
 //---------------------------------------------------------------------------

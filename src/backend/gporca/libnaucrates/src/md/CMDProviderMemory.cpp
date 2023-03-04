@@ -133,7 +133,7 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 //---------------------------------------------------------------------------
 CMDProviderMemory::~CMDProviderMemory()
 {
-	CRefCount::SafeRelease(m_mdmap);
+	SafeRelease(m_mdmap);
 }
 
 //---------------------------------------------------------------------------

@@ -31,7 +31,7 @@ using namespace gpmd;
 //		column descriptor;
 //
 //---------------------------------------------------------------------------
-class CColumnDescriptor : public CRefCount,
+class CColumnDescriptor : public CRefCount<CColumnDescriptor>,
 						  public DbgPrintMixin<CColumnDescriptor>
 {
 private:

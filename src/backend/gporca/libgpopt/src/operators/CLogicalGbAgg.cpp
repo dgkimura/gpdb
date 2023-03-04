@@ -242,9 +242,9 @@ CLogicalGbAgg::CLogicalGbAgg(CMemoryPool *mp, CColRefArray *colref_array,
 CLogicalGbAgg::~CLogicalGbAgg()
 {
 	// safe release -- to allow for instances used in patterns
-	CRefCount::SafeRelease(m_pdrgpcr);
-	CRefCount::SafeRelease(m_pdrgpcrMinimal);
-	CRefCount::SafeRelease(m_pdrgpcrArgDQA);
+	SafeRelease(m_pdrgpcr);
+	SafeRelease(m_pdrgpcrMinimal);
+	SafeRelease(m_pdrgpcrArgDQA);
 }
 
 //---------------------------------------------------------------------------

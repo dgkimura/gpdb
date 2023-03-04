@@ -34,7 +34,7 @@ using namespace gpmd;
 //		Statistics configurations
 //
 //---------------------------------------------------------------------------
-class CStatisticsConfig : public CRefCount
+class CStatisticsConfig : public CRefCount<CStatisticsConfig>
 {
 private:
 	// shared memory pool

@@ -106,9 +106,9 @@ CLogicalSequenceProject::CLogicalSequenceProject(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CLogicalSequenceProject::~CLogicalSequenceProject()
 {
-	CRefCount::SafeRelease(m_pds);
-	CRefCount::SafeRelease(m_pdrgpos);
-	CRefCount::SafeRelease(m_pdrgpwf);
+	SafeRelease(m_pds);
+	SafeRelease(m_pdrgpos);
+	SafeRelease(m_pdrgpwf);
 }
 
 //---------------------------------------------------------------------------

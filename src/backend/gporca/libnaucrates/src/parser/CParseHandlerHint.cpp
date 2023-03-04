@@ -49,7 +49,7 @@ CParseHandlerHint::CParseHandlerHint(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CParseHandlerHint::~CParseHandlerHint()
 {
-	CRefCount::SafeRelease(m_hint);
+	SafeRelease(m_hint);
 }
 
 //---------------------------------------------------------------------------

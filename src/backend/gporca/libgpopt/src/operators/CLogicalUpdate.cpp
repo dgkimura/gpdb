@@ -84,9 +84,9 @@ CLogicalUpdate::CLogicalUpdate(CMemoryPool *mp, CTableDescriptor *ptabdesc,
 //---------------------------------------------------------------------------
 CLogicalUpdate::~CLogicalUpdate()
 {
-	CRefCount::SafeRelease(m_ptabdesc);
-	CRefCount::SafeRelease(m_pdrgpcrDelete);
-	CRefCount::SafeRelease(m_pdrgpcrInsert);
+	SafeRelease(m_ptabdesc);
+	SafeRelease(m_pdrgpcrDelete);
+	SafeRelease(m_pdrgpcrInsert);
 }
 
 //---------------------------------------------------------------------------

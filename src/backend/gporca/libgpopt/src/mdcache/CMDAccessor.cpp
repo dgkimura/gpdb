@@ -169,7 +169,7 @@ CMDAccessor::SMDProviderElem::SMDProviderElem(CSystemId sysid,
 //---------------------------------------------------------------------------
 CMDAccessor::SMDProviderElem::~SMDProviderElem()
 {
-	CRefCount::SafeRelease(m_pmdp);
+	SafeRelease(m_pmdp);
 }
 
 //---------------------------------------------------------------------------

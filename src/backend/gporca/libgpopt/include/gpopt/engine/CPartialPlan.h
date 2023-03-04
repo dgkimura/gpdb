@@ -39,7 +39,7 @@ class CCostContext;
 //		Description of partial plans created during optimization
 //
 //---------------------------------------------------------------------------
-class CPartialPlan : public CRefCount
+class CPartialPlan : public CRefCount<CPartialPlan>
 {
 private:
 	// root group expression

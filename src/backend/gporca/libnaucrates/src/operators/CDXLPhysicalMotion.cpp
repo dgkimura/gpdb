@@ -33,8 +33,8 @@ CDXLPhysicalMotion::CDXLPhysicalMotion(CMemoryPool *mp)
 
 CDXLPhysicalMotion::~CDXLPhysicalMotion()
 {
-	CRefCount::SafeRelease(m_input_segids_array);
-	CRefCount::SafeRelease(m_output_segids_array);
+	SafeRelease(m_input_segids_array);
+	SafeRelease(m_output_segids_array);
 }
 
 //---------------------------------------------------------------------------

@@ -45,8 +45,8 @@ CLogicalIndexApply::CLogicalIndexApply(CMemoryPool *mp,
 
 CLogicalIndexApply::~CLogicalIndexApply()
 {
-	CRefCount::SafeRelease(m_pdrgpcrOuterRefs);
-	CRefCount::SafeRelease(m_origJoinPred);
+	SafeRelease(m_pdrgpcrOuterRefs);
+	SafeRelease(m_origJoinPred);
 }
 
 
@@ -125,7 +125,7 @@ CLogicalIndexApply::PopCopyWithRemappedColumns(CMemoryPool *mp,
 
 	result = GPOS_NEW(mp) CLogicalIndexApply(mp, colref_array, m_fOuterJoin,
 											 remapped_orig_join_pred);
-	CRefCount::SafeRelease(remapped_orig_join_pred);
+	SafeRelease(remapped_orig_join_pred);
 
 	return result;
 }

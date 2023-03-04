@@ -28,7 +28,7 @@ using namespace gpos;
 //		Class for representing DXL window key
 //
 //---------------------------------------------------------------------------
-class CDXLWindowKey : public CRefCount
+class CDXLWindowKey : public CRefCount<CDXLWindowKey>
 {
 private:
 	// window frame associated with the window key

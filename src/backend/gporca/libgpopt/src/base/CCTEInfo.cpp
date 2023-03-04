@@ -179,8 +179,8 @@ CCTEInfo::CCTEInfo(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CCTEInfo::~CCTEInfo()
 {
-	CRefCount::SafeRelease(m_phmulcteinfoentry);
-	CRefCount::SafeRelease(m_phmulprodconsmap);
+	SafeRelease(m_phmulcteinfoentry);
+	SafeRelease(m_phmulprodconsmap);
 }
 
 

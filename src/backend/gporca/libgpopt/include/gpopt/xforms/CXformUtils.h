@@ -698,7 +698,7 @@ CXformUtils::ImplementHashJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 			// no reason to try to do the same again
 			pdrgpexprOuter->Release();
 			pdrgpexprInner->Release();
-			CRefCount::SafeRelease(join_opfamilies);
+			SafeRelease(join_opfamilies);
 		}
 		else
 		{
@@ -793,7 +793,7 @@ CXformUtils::ImplementHashJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 		// clean up
 		pdrgpexprOuter->Release();
 		pdrgpexprInner->Release();
-		CRefCount::SafeRelease(join_opfamilies);
+		SafeRelease(join_opfamilies);
 	}
 
 	pexprResult->Release();
@@ -831,7 +831,7 @@ CXformUtils::ImplementMergeJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 			// no reason to try to do the same again
 			pdrgpexprOuter->Release();
 			pdrgpexprInner->Release();
-			CRefCount::SafeRelease(join_opfamilies);
+			SafeRelease(join_opfamilies);
 		}
 		else
 		{
@@ -897,7 +897,7 @@ CXformUtils::ImplementMergeJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 			pdrgpexpr->Release();
 			pdrgpexprOuter->Release();
 			pdrgpexprInner->Release();
-			CRefCount::SafeRelease(join_opfamilies);
+			SafeRelease(join_opfamilies);
 			return;
 		}
 	}
@@ -929,7 +929,7 @@ CXformUtils::ImplementMergeJoin(CXformContext *pxfctxt, CXformResult *pxfres,
 		pdrgpexprOuter->Release();
 		pdrgpexprInner->Release();
 	}
-	CRefCount::SafeRelease(join_opfamilies);
+	SafeRelease(join_opfamilies);
 
 	pexprResult->Release();
 }

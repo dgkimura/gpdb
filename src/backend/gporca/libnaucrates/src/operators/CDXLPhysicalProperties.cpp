@@ -38,7 +38,7 @@ CDXLPhysicalProperties::CDXLPhysicalProperties(CDXLOperatorCost *cost)
 //---------------------------------------------------------------------------
 CDXLPhysicalProperties::~CDXLPhysicalProperties()
 {
-	CRefCount::SafeRelease(m_operator_cost_dxl);
+	SafeRelease(m_operator_cost_dxl);
 }
 
 //---------------------------------------------------------------------------

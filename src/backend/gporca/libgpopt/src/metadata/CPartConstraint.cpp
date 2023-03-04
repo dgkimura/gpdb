@@ -123,10 +123,10 @@ CPartConstraint::CPartConstraint(BOOL fUninterpreted)
 //---------------------------------------------------------------------------
 CPartConstraint::~CPartConstraint()
 {
-	CRefCount::SafeRelease(m_phmulcnstr);
-	CRefCount::SafeRelease(m_pbsDefaultParts);
-	CRefCount::SafeRelease(m_pdrgpdrgpcr);
-	CRefCount::SafeRelease(m_pcnstrCombined);
+	SafeRelease(m_phmulcnstr);
+	SafeRelease(m_pbsDefaultParts);
+	SafeRelease(m_pdrgpdrgpcr);
+	SafeRelease(m_pcnstrCombined);
 }
 
 //---------------------------------------------------------------------------

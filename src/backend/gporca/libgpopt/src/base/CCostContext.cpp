@@ -89,12 +89,12 @@ CCostContext::CCostContext(CMemoryPool *mp, COptimizationContext *poc,
 //---------------------------------------------------------------------------
 CCostContext::~CCostContext()
 {
-	CRefCount::SafeRelease(m_pgexpr);
-	CRefCount::SafeRelease(m_pgexprForStats);
-	CRefCount::SafeRelease(m_poc);
-	CRefCount::SafeRelease(m_pdrgpoc);
-	CRefCount::SafeRelease(m_pdpplan);
-	CRefCount::SafeRelease(m_pstats);
+	SafeRelease(m_pgexpr);
+	SafeRelease(m_pgexprForStats);
+	SafeRelease(m_poc);
+	SafeRelease(m_pdrgpoc);
+	SafeRelease(m_pdpplan);
+	SafeRelease(m_pstats);
 }
 
 

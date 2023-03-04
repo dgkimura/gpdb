@@ -1126,7 +1126,7 @@ CStatisticsUtils::DeriveStatsForDynamicScan(CMemoryPool *mp,
 		left_semi_join_stats = stats_after_join_filter;
 	}
 
-	CRefCount::SafeRelease(unsupported_pred_stats);
+	SafeRelease(unsupported_pred_stats);
 	output_colrefs->Release();
 	outer_refs->Release();
 	join_preds_stats->Release();

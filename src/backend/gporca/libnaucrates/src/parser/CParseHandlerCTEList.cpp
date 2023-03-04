@@ -45,7 +45,7 @@ CParseHandlerCTEList::CParseHandlerCTEList(
 //---------------------------------------------------------------------------
 CParseHandlerCTEList::~CParseHandlerCTEList()
 {
-	CRefCount::SafeRelease(m_dxl_array);
+	SafeRelease(m_dxl_array);
 }
 
 //---------------------------------------------------------------------------

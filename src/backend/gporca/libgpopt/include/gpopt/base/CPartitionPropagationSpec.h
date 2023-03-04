@@ -41,7 +41,7 @@ public:
 	};
 
 private:
-	struct SPartPropSpecInfo : public CRefCount
+	struct SPartPropSpecInfo : public CRefCount<SPartPropSpecInfo>
 	{
 		// scan id of the DynamicScan
 		ULONG m_scan_id;
@@ -71,8 +71,8 @@ private:
 		~SPartPropSpecInfo() override
 		{
 			m_root_rel_mdid->Release();
-			CRefCount::SafeRelease(m_selector_ids);
-			CRefCount::SafeRelease(m_filter_expr);
+			SafeRelease(m_selector_ids);
+			SafeRelease(m_filter_expr);
 		}
 
 		// hash function

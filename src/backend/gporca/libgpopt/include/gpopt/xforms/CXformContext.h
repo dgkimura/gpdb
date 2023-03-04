@@ -28,7 +28,7 @@ using namespace gpos;
 //		context container
 //
 //---------------------------------------------------------------------------
-class CXformContext : public CRefCount
+class CXformContext : public CRefCount<CXformContext>
 {
 private:
 	// Memory pool

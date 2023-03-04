@@ -48,7 +48,7 @@ CParseHandlerEnumeratorConfig::CParseHandlerEnumeratorConfig(
 //---------------------------------------------------------------------------
 CParseHandlerEnumeratorConfig::~CParseHandlerEnumeratorConfig()
 {
-	CRefCount::SafeRelease(m_enumerator_cfg);
+	SafeRelease(m_enumerator_cfg);
 }
 
 //---------------------------------------------------------------------------

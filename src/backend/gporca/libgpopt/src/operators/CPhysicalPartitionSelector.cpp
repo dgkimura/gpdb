@@ -55,7 +55,7 @@ CPhysicalPartitionSelector::CPhysicalPartitionSelector(CMemoryPool *mp,
 CPhysicalPartitionSelector::~CPhysicalPartitionSelector()
 {
 	m_mdid->Release();
-	CRefCount::SafeRelease(m_filter_expr);
+	SafeRelease(m_filter_expr);
 }
 
 //---------------------------------------------------------------------------

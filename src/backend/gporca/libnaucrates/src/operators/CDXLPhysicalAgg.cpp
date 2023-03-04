@@ -47,7 +47,7 @@ CDXLPhysicalAgg::CDXLPhysicalAgg(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLPhysicalAgg::~CDXLPhysicalAgg()
 {
-	CRefCount::SafeRelease(m_grouping_colids_array);
+	SafeRelease(m_grouping_colids_array);
 }
 
 

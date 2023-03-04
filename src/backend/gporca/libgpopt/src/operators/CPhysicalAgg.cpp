@@ -138,7 +138,7 @@ CPhysicalAgg::~CPhysicalAgg()
 {
 	m_pdrgpcr->Release();
 	m_pdrgpcrMinimal->Release();
-	CRefCount::SafeRelease(m_pdrgpcrArgDQA);
+	SafeRelease(m_pdrgpcrArgDQA);
 }
 
 

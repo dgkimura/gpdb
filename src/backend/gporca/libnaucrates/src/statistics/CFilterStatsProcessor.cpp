@@ -626,7 +626,7 @@ CFilterStatsProcessor::MakeHistHashMapDisjFilter(
 			previous_colid = colid;
 		}
 
-		CRefCount::SafeRelease(child_histograms);
+		SafeRelease(child_histograms);
 	}
 
 	// process the result and scaling factor of the last predicate

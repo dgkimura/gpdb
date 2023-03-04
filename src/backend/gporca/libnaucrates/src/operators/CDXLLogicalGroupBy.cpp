@@ -55,7 +55,7 @@ CDXLLogicalGroupBy::CDXLLogicalGroupBy(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLLogicalGroupBy::~CDXLLogicalGroupBy()
 {
-	CRefCount::SafeRelease(m_grouping_colid_array);
+	SafeRelease(m_grouping_colid_array);
 }
 
 //---------------------------------------------------------------------------

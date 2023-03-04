@@ -90,7 +90,7 @@ CLogicalNAryJoin::DeriveMaxCard(CMemoryPool *mp,
 				pexprScalarChild->Release();
 				return CMaxCard(0 /*ull*/);
 			}
-			CRefCount::SafeRelease(pexprScalarChild);
+			SafeRelease(pexprScalarChild);
 		}
 		else
 		{
@@ -186,7 +186,7 @@ CLogicalNAryJoin::DerivePropertyConstraint(CMemoryPool *mp,
 		}
 
 		trueInnerJoinPreds->Release();
-		CRefCount::SafeRelease(equivClassesFromInnerJoinPreds);
+		SafeRelease(equivClassesFromInnerJoinPreds);
 	}
 
 	CConstraint *pcnstrNew = CConstraint::PcnstrConjunction(mp, constraints);

@@ -34,7 +34,7 @@ using CPartKeysArray = CDynamicPtrArray<CPartKeys, CleanupRelease>;
 //		A collection of partitioning keys for a partitioned table
 //
 //---------------------------------------------------------------------------
-class CPartKeys : public CRefCount, public DbgPrintMixin<CPartKeys>
+class CPartKeys : public CRefCount<CPartKeys>, public DbgPrintMixin<CPartKeys>
 {
 private:
 	// partitioning keys

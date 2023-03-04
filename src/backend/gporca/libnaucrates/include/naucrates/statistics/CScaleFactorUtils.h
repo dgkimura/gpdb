@@ -54,7 +54,7 @@ public:
 
 		~SJoinCondition()
 		{
-			CRefCount::SafeRelease(m_oid_pair);
+			SafeRelease(m_oid_pair);
 		}
 
 		// We hash/compare the pointer rather than the contents of the IMdId, as we want to discern between different instances of IMdIds.

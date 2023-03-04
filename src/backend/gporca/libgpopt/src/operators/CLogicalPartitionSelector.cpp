@@ -61,8 +61,8 @@ CLogicalPartitionSelector::CLogicalPartitionSelector(
 //---------------------------------------------------------------------------
 CLogicalPartitionSelector::~CLogicalPartitionSelector()
 {
-	CRefCount::SafeRelease(m_mdid);
-	CRefCount::SafeRelease(m_pdrgpexprFilters);
+	SafeRelease(m_mdid);
+	SafeRelease(m_pdrgpexprFilters);
 }
 
 //---------------------------------------------------------------------------

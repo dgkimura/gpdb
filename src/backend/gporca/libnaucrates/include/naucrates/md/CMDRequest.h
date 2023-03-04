@@ -35,7 +35,7 @@ using namespace gpos;
 //		Class for representing MD requests
 //
 //--------------------------------------------------------------------------
-class CMDRequest : public CRefCount
+class CMDRequest : public CRefCount<CMDRequest>
 {
 public:
 	// fwd decl

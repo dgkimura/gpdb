@@ -49,7 +49,7 @@ CParseHandlerStatisticsConfig::CParseHandlerStatisticsConfig(
 //---------------------------------------------------------------------------
 CParseHandlerStatisticsConfig::~CParseHandlerStatisticsConfig()
 {
-	CRefCount::SafeRelease(m_stats_conf);
+	SafeRelease(m_stats_conf);
 }
 
 //---------------------------------------------------------------------------

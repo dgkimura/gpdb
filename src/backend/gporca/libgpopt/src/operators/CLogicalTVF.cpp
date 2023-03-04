@@ -127,10 +127,10 @@ CLogicalTVF::CLogicalTVF(CMemoryPool *mp, IMDId *mdid_func,
 //---------------------------------------------------------------------------
 CLogicalTVF::~CLogicalTVF()
 {
-	CRefCount::SafeRelease(m_func_mdid);
-	CRefCount::SafeRelease(m_return_type_mdid);
-	CRefCount::SafeRelease(m_pdrgpcoldesc);
-	CRefCount::SafeRelease(m_pdrgpcrOutput);
+	SafeRelease(m_func_mdid);
+	SafeRelease(m_return_type_mdid);
+	SafeRelease(m_pdrgpcoldesc);
+	SafeRelease(m_pdrgpcrOutput);
 	GPOS_DELETE(m_pstr);
 }
 

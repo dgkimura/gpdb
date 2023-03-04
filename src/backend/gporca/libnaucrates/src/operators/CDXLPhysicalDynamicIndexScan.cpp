@@ -56,7 +56,7 @@ CDXLPhysicalDynamicIndexScan::~CDXLPhysicalDynamicIndexScan()
 	m_dxl_index_descr->Release();
 	m_dxl_table_descr->Release();
 	m_part_mdids->Release();
-	CRefCount::SafeRelease(m_selector_ids);
+	SafeRelease(m_selector_ids);
 }
 
 //---------------------------------------------------------------------------

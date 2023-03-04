@@ -62,7 +62,7 @@ CLogicalApply::CLogicalApply(CMemoryPool *mp, CColRefArray *pdrgpcrInner,
 //---------------------------------------------------------------------------
 CLogicalApply::~CLogicalApply()
 {
-	CRefCount::SafeRelease(m_pdrgpcrInner);
+	SafeRelease(m_pdrgpcrInner);
 }
 
 

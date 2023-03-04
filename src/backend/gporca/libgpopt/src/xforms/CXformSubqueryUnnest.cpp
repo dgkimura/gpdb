@@ -85,8 +85,8 @@ CXformSubqueryUnnest::PexprSubqueryUnnest(CMemoryPool *mp, CExpression *pexpr,
 	if (!sh.FProcess(pexprOuter, pexprScalar, esqctxt, &pexprNewOuter,
 					 &pexprResidualScalar))
 	{
-		CRefCount::SafeRelease(pexprNewOuter);
-		CRefCount::SafeRelease(pexprResidualScalar);
+		SafeRelease(pexprNewOuter);
+		SafeRelease(pexprResidualScalar);
 
 		return nullptr;
 	}

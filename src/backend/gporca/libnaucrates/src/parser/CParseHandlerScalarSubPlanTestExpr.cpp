@@ -46,7 +46,7 @@ CParseHandlerScalarSubPlanTestExpr::CParseHandlerScalarSubPlanTestExpr(
 //---------------------------------------------------------------------------
 CParseHandlerScalarSubPlanTestExpr::~CParseHandlerScalarSubPlanTestExpr()
 {
-	CRefCount::SafeRelease(m_dxl_test_expr);
+	SafeRelease(m_dxl_test_expr);
 }
 
 //---------------------------------------------------------------------------

@@ -29,7 +29,8 @@ using namespace gpmd;
 //		Representation of function properties
 //
 //---------------------------------------------------------------------------
-class CFunctionProp : public CRefCount, public DbgPrintMixin<CFunctionProp>
+class CFunctionProp : public CRefCount<CFunctionProp>,
+					  public DbgPrintMixin<CFunctionProp>
 {
 private:
 	// function stability

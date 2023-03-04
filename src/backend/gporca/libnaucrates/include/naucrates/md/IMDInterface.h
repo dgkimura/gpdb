@@ -29,7 +29,7 @@ using namespace gpos;
 //		Base interface for metadata-related objects
 //
 //---------------------------------------------------------------------------
-class IMDInterface : public CRefCount
+class IMDInterface : public CRefCount<IMDInterface>
 {
 public:
 	~IMDInterface() override = default;

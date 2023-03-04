@@ -60,7 +60,7 @@ CEnfdDistribution::CEnfdDistribution(CDistributionSpec *pds,
 //---------------------------------------------------------------------------
 CEnfdDistribution::~CEnfdDistribution()
 {
-	CRefCount::SafeRelease(m_pds);
+	SafeRelease(m_pds);
 }
 
 

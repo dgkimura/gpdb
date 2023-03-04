@@ -77,8 +77,8 @@ CLogicalBitmapTableGet::CLogicalBitmapTableGet(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CLogicalBitmapTableGet::~CLogicalBitmapTableGet()
 {
-	CRefCount::SafeRelease(m_ptabdesc);
-	CRefCount::SafeRelease(m_pdrgpcrOutput);
+	SafeRelease(m_ptabdesc);
+	SafeRelease(m_pdrgpcrOutput);
 
 	GPOS_DELETE(m_pnameTableAlias);
 }

@@ -63,8 +63,8 @@ CLogicalInsert::CLogicalInsert(CMemoryPool *mp, CTableDescriptor *ptabdesc,
 //---------------------------------------------------------------------------
 CLogicalInsert::~CLogicalInsert()
 {
-	CRefCount::SafeRelease(m_ptabdesc);
-	CRefCount::SafeRelease(m_pdrgpcrSource);
+	SafeRelease(m_ptabdesc);
+	SafeRelease(m_pdrgpcrSource);
 }
 
 //---------------------------------------------------------------------------

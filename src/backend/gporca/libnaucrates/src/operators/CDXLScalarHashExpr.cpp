@@ -42,7 +42,7 @@ CDXLScalarHashExpr::CDXLScalarHashExpr(CMemoryPool *mp, IMDId *opfamily)
 //---------------------------------------------------------------------------
 CDXLScalarHashExpr::~CDXLScalarHashExpr()
 {
-	CRefCount::SafeRelease(m_mdid_opfamily);
+	SafeRelease(m_mdid_opfamily);
 }
 
 //---------------------------------------------------------------------------

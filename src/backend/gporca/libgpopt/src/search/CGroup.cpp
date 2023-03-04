@@ -67,8 +67,8 @@ CGroup::SContextLink::SContextLink(CCostContext *pccParent, ULONG child_index,
 //---------------------------------------------------------------------------
 CGroup::SContextLink::~SContextLink()
 {
-	CRefCount::SafeRelease(m_pccParent);
-	CRefCount::SafeRelease(m_poc);
+	SafeRelease(m_pccParent);
+	SafeRelease(m_poc);
 }
 
 
@@ -200,13 +200,13 @@ CGroup::CGroup(CMemoryPool *mp, BOOL fScalar)
 //---------------------------------------------------------------------------
 CGroup::~CGroup()
 {
-	CRefCount::SafeRelease(m_pdrgpexprJoinKeysOuter);
-	CRefCount::SafeRelease(m_pdrgpexprJoinKeysInner);
-	CRefCount::SafeRelease(m_join_opfamilies);
-	CRefCount::SafeRelease(m_pdp);
-	CRefCount::SafeRelease(m_pexprScalarRep);
-	CRefCount::SafeRelease(m_pccDummy);
-	CRefCount::SafeRelease(m_pstats);
+	SafeRelease(m_pdrgpexprJoinKeysOuter);
+	SafeRelease(m_pdrgpexprJoinKeysInner);
+	SafeRelease(m_join_opfamilies);
+	SafeRelease(m_pdp);
+	SafeRelease(m_pexprScalarRep);
+	SafeRelease(m_pccDummy);
+	SafeRelease(m_pstats);
 	m_plinkmap->Release();
 	m_pstatsmap->Release();
 	m_pcostmap->Release();
@@ -258,7 +258,7 @@ CGroup::CleanupContexts()
 
 		while (nullptr != poc || shtit.Advance())
 		{
-			CRefCount::SafeRelease(poc);
+			SafeRelease(poc);
 
 			// iter's accessor scope
 			{
@@ -1418,7 +1418,7 @@ CGroup::EspDerive(CMemoryPool *pmpLocal, CMemoryPool *pmpGlobal,
 		IStatistics *stats = pgexpr->PstatsRecursiveDerive(
 			pmpLocal, pmpGlobal, prprel, stats_ctxt,
 			false /*fComputeRootStats*/);
-		CRefCount::SafeRelease(stats);
+		SafeRelease(stats);
 	}
 
 	return esp;
@@ -1856,7 +1856,7 @@ CGroup::ResetStats()
 		stats = m_pstats;
 		m_pstats = nullptr;
 	}
-	CRefCount::SafeRelease(stats);
+	SafeRelease(stats);
 	stats = nullptr;
 }
 

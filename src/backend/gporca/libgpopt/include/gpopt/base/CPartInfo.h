@@ -38,7 +38,7 @@ class CPartConstraint;
 //		Derived partition information at the logical level
 //
 //---------------------------------------------------------------------------
-class CPartInfo : public CRefCount, public DbgPrintMixin<CPartInfo>
+class CPartInfo : public CRefCount<CPartInfo>, public DbgPrintMixin<CPartInfo>
 {
 private:
 	//---------------------------------------------------------------------------
@@ -49,7 +49,7 @@ private:
 	//		A single entry of the CPartInfo
 	//
 	//---------------------------------------------------------------------------
-	class CPartInfoEntry : public CRefCount,
+	class CPartInfoEntry : public CRefCount<CPartInfoEntry>,
 						   public DbgPrintMixin<CPartInfoEntry>
 	{
 	private:

@@ -45,7 +45,7 @@ CParseHandlerScalarExpr::CParseHandlerScalarExpr(
 //---------------------------------------------------------------------------
 CParseHandlerScalarExpr::~CParseHandlerScalarExpr()
 {
-	CRefCount::SafeRelease(m_dxl_node);
+	SafeRelease(m_dxl_node);
 }
 
 //---------------------------------------------------------------------------

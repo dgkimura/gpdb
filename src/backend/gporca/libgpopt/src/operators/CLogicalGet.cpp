@@ -120,10 +120,10 @@ CLogicalGet::CLogicalGet(CMemoryPool *mp, const CName *pnameAlias,
 //---------------------------------------------------------------------------
 CLogicalGet::~CLogicalGet()
 {
-	CRefCount::SafeRelease(m_ptabdesc);
-	CRefCount::SafeRelease(m_pdrgpcrOutput);
-	CRefCount::SafeRelease(m_pdrgpdrgpcrPart);
-	CRefCount::SafeRelease(m_pcrsDist);
+	SafeRelease(m_ptabdesc);
+	SafeRelease(m_pdrgpcrOutput);
+	SafeRelease(m_pdrgpdrgpcrPart);
+	SafeRelease(m_pcrsDist);
 
 	GPOS_DELETE(m_pnameAlias);
 }

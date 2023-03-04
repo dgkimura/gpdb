@@ -283,12 +283,12 @@ CExpression::~CExpression()
 	{
 		CAutoSuspendAbort asa;
 
-		CRefCount::SafeRelease(m_pdprel);
-		CRefCount::SafeRelease(m_pstats);
-		CRefCount::SafeRelease(m_prpp);
-		CRefCount::SafeRelease(m_pdpplan);
-		CRefCount::SafeRelease(m_pdpscalar);
-		CRefCount::SafeRelease(m_pdrgpexpr);
+		SafeRelease(m_pdprel);
+		SafeRelease(m_pstats);
+		SafeRelease(m_prpp);
+		SafeRelease(m_pdpplan);
+		SafeRelease(m_pdpscalar);
+		SafeRelease(m_pdrgpexpr);
 
 		m_pop->Release();
 	}
@@ -640,15 +640,15 @@ CExpression::ResetDerivedProperty(CDrvdProp::EPropType ept)
 	switch (ept)
 	{
 		case CDrvdProp::EptRelational:
-			CRefCount::SafeRelease(m_pdprel);
+			SafeRelease(m_pdprel);
 			m_pdprel = GPOS_NEW(m_mp) CDrvdPropRelational(m_mp);
 			break;
 		case CDrvdProp::EptPlan:
-			CRefCount::SafeRelease(m_pdpplan);
+			SafeRelease(m_pdpplan);
 			m_pdpplan = nullptr;
 			break;
 		case CDrvdProp::EptScalar:
-			CRefCount::SafeRelease(m_pdpscalar);
+			SafeRelease(m_pdpscalar);
 			m_pdpscalar = GPOS_NEW(m_mp) CDrvdPropScalar(m_mp);
 			break;
 		default:
@@ -704,7 +704,7 @@ CExpression::ResetStats()
 	GPOS_CHECK_STACK_SIZE;
 
 	// reset stats on self
-	CRefCount::SafeRelease(m_pstats);
+	SafeRelease(m_pstats);
 	m_pstats = nullptr;
 
 	const ULONG arity = Arity();
