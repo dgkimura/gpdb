@@ -35,7 +35,7 @@ CDXLProperties::CDXLProperties() = default;
 //---------------------------------------------------------------------------
 CDXLProperties::~CDXLProperties()
 {
-	CRefCount::SafeRelease(m_dxl_stats_derived_relation);
+	SafeRelease(m_dxl_stats_derived_relation);
 }
 
 //---------------------------------------------------------------------------

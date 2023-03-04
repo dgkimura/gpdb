@@ -69,7 +69,7 @@ CTaskContext::CTaskContext(CMemoryPool *mp, const CTaskContext &task_ctxt)
 //---------------------------------------------------------------------------
 CTaskContext::~CTaskContext()
 {
-	CRefCount::SafeRelease(m_bitset);
+	SafeRelease(m_bitset);
 }
 
 

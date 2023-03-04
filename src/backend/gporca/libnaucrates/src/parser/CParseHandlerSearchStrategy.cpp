@@ -47,7 +47,7 @@ CParseHandlerSearchStrategy::CParseHandlerSearchStrategy(
 //---------------------------------------------------------------------------
 CParseHandlerSearchStrategy::~CParseHandlerSearchStrategy()
 {
-	CRefCount::SafeRelease(m_search_stage_array);
+	SafeRelease(m_search_stage_array);
 }
 
 

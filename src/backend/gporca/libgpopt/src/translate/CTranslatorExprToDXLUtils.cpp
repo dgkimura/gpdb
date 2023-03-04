@@ -872,7 +872,7 @@ CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfoRandDist(
 			mp, md_accessor, pcrDistrCol, pcnstrDistrCol);
 	}
 
-	CRefCount::SafeRelease(pcnstrDistrCol);
+	SafeRelease(pcnstrDistrCol);
 
 	if (nullptr == pdrgpdrgpdxldatum)
 	{
@@ -927,7 +927,7 @@ CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfo(
 
 		CDXLDatum *dxl_datum = PdxldatumFromPointConstraint(
 			mp, md_accessor, pcrDistrCol, pcnstrDistrCol);
-		CRefCount::SafeRelease(pcnstrDistrCol);
+		SafeRelease(pcnstrDistrCol);
 
 		if (nullptr != dxl_datum &&
 			FDirectDispatchable(md_accessor, pcrDistrCol, dxl_datum))
@@ -936,7 +936,7 @@ CTranslatorExprToDXLUtils::GetDXLDirectDispatchInfo(
 		}
 		else
 		{
-			CRefCount::SafeRelease(dxl_datum);
+			SafeRelease(dxl_datum);
 
 			fSuccess = false;
 			break;
@@ -1028,7 +1028,7 @@ CTranslatorExprToDXLUtils::PdxlddinfoSingleDistrKey(CMemoryPool *mp,
 			mp, md_accessor, pcrDistrCol, pcnstrDistrCol);
 	}
 
-	CRefCount::SafeRelease(pcnstrDistrCol);
+	SafeRelease(pcnstrDistrCol);
 
 	if (nullptr == pdrgpdrgpdxldatum)
 	{

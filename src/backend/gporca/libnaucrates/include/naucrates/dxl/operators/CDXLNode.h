@@ -46,7 +46,7 @@ using IdToCDXLNodeMap =
 //		Each node specifies an operator at that node, and has an array of children nodes.
 //
 //---------------------------------------------------------------------------
-class CDXLNode : public CRefCount
+class CDXLNode : public CRefCount<CDXLNode>
 {
 private:
 	// dxl tree operator class

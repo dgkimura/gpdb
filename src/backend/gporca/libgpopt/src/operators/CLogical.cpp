@@ -636,7 +636,7 @@ CLogical::PpcDeriveConstraintFromPredicates(CMemoryPool *mp,
 				pdrgpcrs->Release();
 				pdrgpcrs = pdrgpcrsMerged;
 			}
-			CRefCount::SafeRelease(pdrgpcrsChild);
+			SafeRelease(pdrgpcrsChild);
 		}
 		else
 		{
@@ -757,7 +757,7 @@ CLogical::PpcDeriveConstraintFromTable(CMemoryPool *mp,
 			pdrgpcrs->Release();
 			pdrgpcrs = pdrgpcrsMerged;
 		}
-		CRefCount::SafeRelease(pdrgpcrsChild);
+		SafeRelease(pdrgpcrsChild);
 		pexprCheckConstraint->Release();
 	}
 

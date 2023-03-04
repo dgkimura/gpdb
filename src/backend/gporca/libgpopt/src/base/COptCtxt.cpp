@@ -85,8 +85,8 @@ COptCtxt::~COptCtxt()
 	m_pceeval->Release();
 	m_pcteinfo->Release();
 	m_optimizer_config->Release();
-	CRefCount::SafeRelease(m_pdrgpcrSystemCols);
-	CRefCount::SafeRelease(m_direct_dispatchable_filters);
+	SafeRelease(m_pdrgpcrSystemCols);
+	SafeRelease(m_direct_dispatchable_filters);
 	m_scanid_to_part_map->Release();
 	m_part_selector_info->Release();
 }

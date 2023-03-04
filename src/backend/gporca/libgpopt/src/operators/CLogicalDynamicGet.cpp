@@ -99,8 +99,8 @@ CLogicalDynamicGet::CLogicalDynamicGet(CMemoryPool *mp, const CName *pnameAlias,
 //---------------------------------------------------------------------------
 CLogicalDynamicGet::~CLogicalDynamicGet()
 {
-	CRefCount::SafeRelease(m_partition_cnstrs_disj);
-	CRefCount::SafeRelease(m_foreign_server_mdids);
+	SafeRelease(m_partition_cnstrs_disj);
+	SafeRelease(m_foreign_server_mdids);
 }
 
 //---------------------------------------------------------------------------

@@ -49,7 +49,7 @@ CParseHandlerColDescr::CParseHandlerColDescr(
 
 CParseHandlerColDescr::~CParseHandlerColDescr()
 {
-	CRefCount::SafeRelease(m_dxl_column_descr_array);
+	SafeRelease(m_dxl_column_descr_array);
 }
 
 //---------------------------------------------------------------------------

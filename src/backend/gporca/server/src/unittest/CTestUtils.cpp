@@ -185,7 +185,7 @@ CTestUtils::DestroyMDProvider()
 {
 	GPOS_ASSERT(nullptr != m_mp);
 
-	CRefCount::SafeRelease(m_pmdpf);
+	SafeRelease(m_pmdpf);
 
 	// release local memory pool
 	CMemoryPoolManager::GetMemoryPoolMgr()->Destroy(m_mp);

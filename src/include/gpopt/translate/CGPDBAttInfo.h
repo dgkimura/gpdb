@@ -34,7 +34,7 @@ using namespace gpos;
 //		Class to uniquely identify a column in GPDB
 //
 //---------------------------------------------------------------------------
-class CGPDBAttInfo : public CRefCount
+class CGPDBAttInfo : public CRefCount<CGPDBAttInfo>
 {
 private:
 	// query level number

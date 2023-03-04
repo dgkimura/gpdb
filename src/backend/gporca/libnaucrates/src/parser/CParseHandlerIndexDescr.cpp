@@ -53,7 +53,7 @@ CParseHandlerIndexDescr::CParseHandlerIndexDescr(
 //---------------------------------------------------------------------------
 CParseHandlerIndexDescr::~CParseHandlerIndexDescr()
 {
-	CRefCount::SafeRelease(m_dxl_index_descr);
+	SafeRelease(m_dxl_index_descr);
 }
 
 //---------------------------------------------------------------------------

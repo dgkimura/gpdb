@@ -36,7 +36,7 @@ using namespace gpmd;
 //		Class representing DXL derived column statistics
 //
 //---------------------------------------------------------------------------
-class CDXLStatsDerivedColumn : public CRefCount
+class CDXLStatsDerivedColumn : public CRefCount<CDXLStatsDerivedColumn>
 {
 private:
 	// column identifier

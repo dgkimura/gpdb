@@ -50,7 +50,7 @@ static const INT default_type_modifier = -1;
 //		Abstract class for representing metadata objects ids
 //
 //---------------------------------------------------------------------------
-class IMDId : public CRefCount, public DbgPrintMixin<IMDId>
+class IMDId : public CRefCount<IMDId>, public DbgPrintMixin<IMDId>
 {
 private:
 	// number of deletion locks -- each MDAccessor adds a new deletion lock if it uses

@@ -58,12 +58,12 @@ CDrvdPropScalar::CDrvdPropScalar(CMemoryPool *mp)
 //---------------------------------------------------------------------------
 CDrvdPropScalar::~CDrvdPropScalar()
 {
-	CRefCount::SafeRelease(m_is_prop_derived);
-	CRefCount::SafeRelease(m_pcrsDefined);
-	CRefCount::SafeRelease(m_pcrsSetReturningFunction);
-	CRefCount::SafeRelease(m_pcrsUsed);
-	CRefCount::SafeRelease(m_ppartinfo);
-	CRefCount::SafeRelease(m_pfp);
+	SafeRelease(m_is_prop_derived);
+	SafeRelease(m_pcrsDefined);
+	SafeRelease(m_pcrsSetReturningFunction);
+	SafeRelease(m_pcrsUsed);
+	SafeRelease(m_ppartinfo);
+	SafeRelease(m_pfp);
 }
 
 

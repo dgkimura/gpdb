@@ -119,7 +119,7 @@ CTreeMapTest::CNode::CNode(CMemoryPool *,  // mp
 //---------------------------------------------------------------------------
 CTreeMapTest::CNode::~CNode()
 {
-	CRefCount::SafeRelease(m_pdrgpnd);
+	SafeRelease(m_pdrgpnd);
 }
 
 
@@ -409,16 +409,16 @@ CTreeMapTest::EresUnittest_Memo()
 					GPOS_RESET_EX;
 				}
 				GPOS_CATCH_END;
-				CRefCount::SafeRelease(pexprAlt);
-				CRefCount::SafeRelease(pdpctxtplan);
+				SafeRelease(pexprAlt);
+				SafeRelease(pdpctxtplan);
 			}
 		}
 	}
 
 	// clean up
-	CRefCount::SafeRelease(pexprPlan);
+	SafeRelease(pexprPlan);
 	GPOS_DELETE(pqc);
-	CRefCount::SafeRelease(pexpr);
+	SafeRelease(pexpr);
 	GPOS_DELETE(peng);
 
 	return GPOS_OK;

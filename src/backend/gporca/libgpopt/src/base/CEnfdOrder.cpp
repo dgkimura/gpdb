@@ -50,7 +50,7 @@ CEnfdOrder::CEnfdOrder(COrderSpec *pos, EOrderMatching eom)
 //---------------------------------------------------------------------------
 CEnfdOrder::~CEnfdOrder()
 {
-	CRefCount::SafeRelease(m_pos);
+	SafeRelease(m_pos);
 }
 
 

@@ -47,7 +47,7 @@ CParseHandlerMetadataIdList::CParseHandlerMetadataIdList(
 //---------------------------------------------------------------------------
 CParseHandlerMetadataIdList::~CParseHandlerMetadataIdList()
 {
-	CRefCount::SafeRelease(m_mdid_array);
+	SafeRelease(m_mdid_array);
 }
 
 

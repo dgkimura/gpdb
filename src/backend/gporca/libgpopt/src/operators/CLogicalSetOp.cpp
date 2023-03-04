@@ -98,10 +98,10 @@ CLogicalSetOp::CLogicalSetOp(CMemoryPool *mp, CColRefArray *pdrgpcrOutput,
 //---------------------------------------------------------------------------
 CLogicalSetOp::~CLogicalSetOp()
 {
-	CRefCount::SafeRelease(m_pdrgpcrOutput);
-	CRefCount::SafeRelease(m_pdrgpdrgpcrInput);
-	CRefCount::SafeRelease(m_pcrsOutput);
-	CRefCount::SafeRelease(m_pdrgpcrsInput);
+	SafeRelease(m_pdrgpcrOutput);
+	SafeRelease(m_pdrgpdrgpcrInput);
+	SafeRelease(m_pcrsOutput);
+	SafeRelease(m_pdrgpcrsInput);
 }
 
 

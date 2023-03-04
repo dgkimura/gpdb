@@ -38,7 +38,7 @@ using CDXLColDescrArray = CDynamicPtrArray<CDXLColDescr, CleanupRelease>;
 //		Class for representing column descriptors in DXL operators
 //
 //---------------------------------------------------------------------------
-class CDXLColDescr : public CRefCount
+class CDXLColDescr : public CRefCount<CDXLColDescr>
 {
 private:
 	// name

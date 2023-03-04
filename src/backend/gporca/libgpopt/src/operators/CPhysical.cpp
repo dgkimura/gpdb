@@ -92,7 +92,7 @@ CPhysical::UpdateOptRequests(ULONG ulPropIndex, ULONG ulRequests)
 	const ULONG ulRewindRequests = UlRewindRequests();
 	const ULONG ulPartPropagateRequests = UlPartPropagateRequests();
 
-	CRefCount::SafeRelease(m_pdrgpulpOptReqsExpanded);
+	SafeRelease(m_pdrgpulpOptReqsExpanded);
 	m_pdrgpulpOptReqsExpanded = nullptr;
 	m_pdrgpulpOptReqsExpanded = GPOS_NEW(m_mp) UlongPtrArray(m_mp);
 	for (ULONG ulOrder = 0; ulOrder < ulOrderRequests; ulOrder++)

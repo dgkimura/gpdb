@@ -45,11 +45,11 @@ CDrvdPropPlan::CDrvdPropPlan() = default;
 //---------------------------------------------------------------------------
 CDrvdPropPlan::~CDrvdPropPlan()
 {
-	CRefCount::SafeRelease(m_pos);
-	CRefCount::SafeRelease(m_pds);
-	CRefCount::SafeRelease(m_prs);
-	CRefCount::SafeRelease(m_ppps);
-	CRefCount::SafeRelease(m_pcm);
+	SafeRelease(m_pos);
+	SafeRelease(m_pds);
+	SafeRelease(m_prs);
+	SafeRelease(m_ppps);
+	SafeRelease(m_pcm);
 }
 
 

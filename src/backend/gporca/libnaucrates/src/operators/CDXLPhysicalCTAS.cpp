@@ -77,7 +77,7 @@ CDXLPhysicalCTAS::~CDXLPhysicalCTAS()
 	GPOS_DELETE(m_mdname_rel);
 	m_col_descr_array->Release();
 	m_dxl_ctas_storage_option->Release();
-	CRefCount::SafeRelease(m_distr_column_pos_array);
+	SafeRelease(m_distr_column_pos_array);
 	m_src_colids_array->Release();
 	m_vartypemod_array->Release();
 	m_distr_opclasses->Release();

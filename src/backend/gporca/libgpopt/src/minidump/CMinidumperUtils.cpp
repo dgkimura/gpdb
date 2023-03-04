@@ -334,8 +334,8 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 		// reset trace flags
 		ResetTraceflags(pbsEnabled, pbsDisabled);
 
-		CRefCount::SafeRelease(pbsEnabled);
-		CRefCount::SafeRelease(pbsDisabled);
+		SafeRelease(pbsEnabled);
+		SafeRelease(pbsDisabled);
 
 		GPOS_RETHROW(ex);
 	}
@@ -345,8 +345,8 @@ CMinidumperUtils::PdxlnExecuteMinidump(
 	ResetTraceflags(pbsEnabled, pbsDisabled);
 
 	// clean up
-	CRefCount::SafeRelease(pbsEnabled);
-	CRefCount::SafeRelease(pbsDisabled);
+	SafeRelease(pbsEnabled);
+	SafeRelease(pbsDisabled);
 
 	GPOS_CHECK_ABORT;
 

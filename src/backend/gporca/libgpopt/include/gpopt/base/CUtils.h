@@ -1195,7 +1195,7 @@ CUtils::AddRefAppend(CDynamicPtrArray<T, CleanupFn> *pdrgptOutput,
 	for (ULONG ul = ulStart; ul < size; ul++)
 	{
 		T *pt = (*pdrgptInput)[ul];
-		CRefCount *prc = dynamic_cast<CRefCount *>(pt);
+		CRefCount<T> *prc = dynamic_cast<CRefCount<T> *>(pt);
 		prc->AddRef();
 		pdrgptOutput->Append(pt);
 	}

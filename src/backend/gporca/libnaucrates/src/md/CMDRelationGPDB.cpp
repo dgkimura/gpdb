@@ -129,20 +129,20 @@ CMDRelationGPDB::~CMDRelationGPDB()
 	GPOS_DELETE(m_dxl_str);
 	m_mdid->Release();
 	m_md_col_array->Release();
-	CRefCount::SafeRelease(m_distr_col_array);
-	CRefCount::SafeRelease(m_distr_opfamilies);
-	CRefCount::SafeRelease(m_partition_oids);
-	CRefCount::SafeRelease(m_partition_cols_array);
-	CRefCount::SafeRelease(m_str_part_types_array);
-	CRefCount::SafeRelease(m_keyset_array);
+	SafeRelease(m_distr_col_array);
+	SafeRelease(m_distr_opfamilies);
+	SafeRelease(m_partition_oids);
+	SafeRelease(m_partition_cols_array);
+	SafeRelease(m_str_part_types_array);
+	SafeRelease(m_keyset_array);
 	m_mdindex_info_array->Release();
 	m_mdid_check_constraint_array->Release();
 	m_col_width_array->Release();
-	CRefCount::SafeRelease(m_foreign_server);
-	CRefCount::SafeRelease(m_mdpart_constraint);
-	CRefCount::SafeRelease(m_colpos_nondrop_colpos_map);
-	CRefCount::SafeRelease(m_attrno_nondrop_col_pos_map);
-	CRefCount::SafeRelease(m_nondrop_col_pos_array);
+	SafeRelease(m_foreign_server);
+	SafeRelease(m_mdpart_constraint);
+	SafeRelease(m_colpos_nondrop_colpos_map);
+	SafeRelease(m_attrno_nondrop_col_pos_map);
+	SafeRelease(m_nondrop_col_pos_array);
 }
 
 //---------------------------------------------------------------------------

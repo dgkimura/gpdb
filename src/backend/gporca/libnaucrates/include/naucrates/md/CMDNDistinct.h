@@ -29,7 +29,7 @@ using namespace gpos;
 using namespace gpdxl;
 
 
-class CMDNDistinct : public CRefCount
+class CMDNDistinct : public CRefCount<CMDNDistinct>
 {
 private:
 	// memory pool

@@ -113,7 +113,7 @@ CConstExprEvaluatorDXLTest::EresUnittest_NonScalar()
 
 	// this call should raise an exception
 	CExpression *pexprResult = pceeval->PexprEval(pexprGet);
-	CRefCount::SafeRelease(pexprResult);
+	SafeRelease(pexprResult);
 	pexprGet->Release();
 	pceeval->Release();
 
@@ -146,7 +146,7 @@ CConstExprEvaluatorDXLTest::EresUnittest_NestedSubquery()
 
 	// this call should raise an exception
 	CExpression *pexprResult = pceeval->PexprEval(pexprPredicate);
-	CRefCount::SafeRelease(pexprResult);
+	SafeRelease(pexprResult);
 	pexprSelect->Release();
 	pceeval->Release();
 
@@ -184,7 +184,7 @@ CConstExprEvaluatorDXLTest::EresUnittest_ScalarContainingVariables()
 
 	// this call should raise an exception
 	CExpression *pexprResult = pceeval->PexprEval(pexprFunCall);
-	CRefCount::SafeRelease(pexprResult);
+	SafeRelease(pexprResult);
 	pexprFunCall->Release();
 	pceeval->Release();
 

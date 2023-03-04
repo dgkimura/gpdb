@@ -34,7 +34,7 @@ using namespace gpos;
 using namespace gpdxl;
 
 
-class CMDExtStatsInfo : public CRefCount
+class CMDExtStatsInfo : public CRefCount<CMDExtStatsInfo>
 {
 public:
 	enum Estattype

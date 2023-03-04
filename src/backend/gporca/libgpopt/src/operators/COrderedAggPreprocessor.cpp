@@ -356,8 +356,8 @@ COrderedAggPreprocessor::SplitPrjList(
 			pdrgpexprOtherPrEl->Append(pexprNewPrjElem);
 		}
 	}
-	CRefCount::SafeRelease(colref_array);
-	CRefCount::SafeRelease(pdrgpexprSortClauseArray);
+	SafeRelease(colref_array);
+	SafeRelease(pdrgpexprSortClauseArray);
 	*ppdrgpexprOrderedAggsPrEl = pdrgpexprOrderedAggsPrEl;
 	*ppdrgpexprOtherPrEl = pdrgpexprOtherPrEl;
 }

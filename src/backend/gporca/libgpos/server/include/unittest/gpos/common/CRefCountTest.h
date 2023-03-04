@@ -35,7 +35,7 @@ private:
 	//		Local class for testing deletable/undeletable objects
 	//
 	//---------------------------------------------------------------------------
-	class CDeletableTest : public CRefCount
+	class CDeletableTest : public CRefCount<CDeletableTest>
 	{
 	private:
 		// is calling object's destructor allowed?

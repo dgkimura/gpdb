@@ -61,7 +61,7 @@ CJoinOrderMinCard::CJoinOrderMinCard(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CJoinOrderMinCard::~CJoinOrderMinCard()
 {
-	CRefCount::SafeRelease(m_pcompResult);
+	SafeRelease(m_pcompResult);
 }
 
 //---------------------------------------------------------------------------
@@ -112,7 +112,7 @@ CJoinOrderMinCard::PexprExpand()
 				pcompBest = pcompCurrent;
 				dMinRows = rows;
 				pcompTemp->AddRef();
-				CRefCount::SafeRelease(pcompBestResult);
+				SafeRelease(pcompBestResult);
 				pcompBestResult = pcompTemp;
 			}
 			pcompTemp->Release();

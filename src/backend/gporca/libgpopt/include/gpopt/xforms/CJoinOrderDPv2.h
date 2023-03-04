@@ -207,7 +207,7 @@ private:
 	// description of an expression in the DP environment
 	// left and right child of join expressions point to
 	// child groups + expressions
-	struct SExpressionInfo : public CRefCount
+	struct SExpressionInfo : public CRefCount<SExpressionInfo>
 	{
 		// the expression
 		CExpression *m_expr;
@@ -273,7 +273,7 @@ private:
 		~SExpressionInfo() override
 		{
 			m_expr->Release();
-			CRefCount::SafeRelease(m_contain_PS);
+			SafeRelease(m_contain_PS);
 		}
 
 		// cost (use -1 for greedy solutions to ensure we keep all of them)
@@ -313,7 +313,7 @@ private:
 	//		Struct containing a bitset, representing a group, its best expression, and cost
 	//
 	//---------------------------------------------------------------------------
-	struct SGroupInfo : public CRefCount
+	struct SGroupInfo : public CRefCount<SGroupInfo>
 	{
 		// the set of atoms, this uniquely identifies the group
 		CBitSet *m_atoms;
@@ -352,7 +352,7 @@ private:
 		CDynamicPtrArray<SGroupInfo, CleanupRelease<SGroupInfo>>;
 
 	// info for a join level, the set of all groups representing <m_level>-way joins
-	struct SLevelInfo : public CRefCount
+	struct SLevelInfo : public CRefCount<SLevelInfo>
 	{
 		ULONG m_level;
 		SGroupInfoArray *m_groups;
@@ -366,7 +366,7 @@ private:
 		~SLevelInfo() override
 		{
 			m_groups->Release();
-			CRefCount::SafeRelease(m_top_k_groups);
+			SafeRelease(m_top_k_groups);
 		}
 	};
 

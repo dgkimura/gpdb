@@ -29,7 +29,7 @@ using namespace gpmd;
 //		Class for representing index descriptors in a DXL index scan node.
 //
 //---------------------------------------------------------------------------
-class CDXLIndexDescr : public CRefCount
+class CDXLIndexDescr : public CRefCount<CDXLIndexDescr>
 {
 private:
 	// id and version information for the table

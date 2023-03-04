@@ -234,10 +234,10 @@ CTranslatorExprToDXL::CTranslatorExprToDXL(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CTranslatorExprToDXL::~CTranslatorExprToDXL()
 {
-	CRefCount::SafeRelease(m_pdrgpiSegments);
+	SafeRelease(m_pdrgpiSegments);
 	m_phmcrdxln->Release();
 	m_phmcrdxlnIndexLookup->Release();
-	CRefCount::SafeRelease(m_pdpplan);
+	SafeRelease(m_pdpplan);
 }
 
 //---------------------------------------------------------------------------
@@ -5216,7 +5216,7 @@ CTranslatorExprToDXL::GetDXLDirectDispatchInfo(CExpression *pexprDML)
 	CConstraint *pcnstrDistrCol = ppc->Pcnstr()->Pcnstr(m_mp, pcrDistrCol);
 	if (!CPredicateUtils::FConstColumn(pcnstrDistrCol, pcrDistrCol))
 	{
-		CRefCount::SafeRelease(pcnstrDistrCol);
+		SafeRelease(pcnstrDistrCol);
 		return nullptr;
 	}
 

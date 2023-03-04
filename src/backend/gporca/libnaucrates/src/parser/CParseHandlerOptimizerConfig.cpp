@@ -63,8 +63,8 @@ CParseHandlerOptimizerConfig::CParseHandlerOptimizerConfig(
 //---------------------------------------------------------------------------
 CParseHandlerOptimizerConfig::~CParseHandlerOptimizerConfig()
 {
-	CRefCount::SafeRelease(m_pbs);
-	CRefCount::SafeRelease(m_optimizer_config);
+	SafeRelease(m_pbs);
+	SafeRelease(m_optimizer_config);
 }
 
 //---------------------------------------------------------------------------

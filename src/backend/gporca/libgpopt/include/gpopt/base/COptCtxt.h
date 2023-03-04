@@ -301,7 +301,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != pdrgpcrSystemCols);
 
-		CRefCount::SafeRelease(m_pdrgpcrSystemCols);
+		SafeRelease(m_pdrgpcrSystemCols);
 		m_pdrgpcrSystemCols = pdrgpcrSystemCols;
 	}
 

@@ -540,7 +540,7 @@ CXformUtils::PexprPushGbBelowJoin(CMemoryPool *mp, CExpression *pexpr)
 										   pcrsUsed, pcrsFKey);
 
 	// cleanup
-	CRefCount::SafeRelease(pcrsFKey);
+	SafeRelease(pcrsFKey);
 	pcrsScalarFromOuter->Release();
 
 	if (!fCanPush)
@@ -2660,7 +2660,7 @@ CXformUtils::ComputeBitmapTableScanResidualPredicate(
 		// the whole predicate rather than just k < 100:
 		// ik1 = 1 or (ik2=2 and k<100)
 		pexprOriginalPred->AddRef();
-		CRefCount::SafeRelease(*ppexprResidual);
+		SafeRelease(*ppexprResidual);
 		*ppexprResidual = pexprOriginalPred;
 		return;
 	}
@@ -2942,7 +2942,7 @@ CXformUtils::PexprBitmapSelectBestIndex(
 				  (bestNumResiduals == numResiduals &&
 				   bestNumIndexCols > numIndexCols))))
 			{
-				CRefCount::SafeRelease((*ppexprResidual));
+				SafeRelease((*ppexprResidual));
 				pdrgpexprResidual->AddRef();
 				(*ppexprResidual) = CPredicateUtils::PexprConjDisj(
 					mp, pdrgpexprResidual, true /* fConjunction */);
@@ -2960,7 +2960,7 @@ CXformUtils::PexprBitmapSelectBestIndex(
 				bestNumResiduals = numResiduals;
 				bestNumIndexCols = numIndexCols;
 				pdrgpexprIndex->AddRef();
-				CRefCount::SafeRelease(pexprIndexFinal);
+				SafeRelease(pexprIndexFinal);
 				pexprIndexFinal =
 					CPredicateUtils::PexprConjunction(mp, pdrgpexprIndex);
 			}
@@ -3153,7 +3153,7 @@ CXformUtils::CreateBitmapIndexProbesWithOrWithoutPredBreakdown(
 			}
 		}
 
-		CRefCount::SafeRelease(pexprPred);
+		SafeRelease(pexprPred);
 
 		if (nullptr != pexprBitmapLocal)
 		{
@@ -3202,8 +3202,8 @@ CXformUtils::CreateBitmapIndexProbesWithOrWithoutPredBreakdown(
 	}
 
 	// cleanup
-	CRefCount::SafeRelease(pdrgpexprBitmapTemp);
-	CRefCount::SafeRelease(pdrgpexprRecheckTemp);
+	SafeRelease(pdrgpexprBitmapTemp);
+	SafeRelease(pdrgpexprRecheckTemp);
 }
 
 // combine the individual bitmap access paths to form a bitmap bool op expression

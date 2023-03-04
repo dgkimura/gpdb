@@ -816,7 +816,7 @@ CExpressionPreprocessor::PexprConvert2In(
 
 			pexprPostCollapse->AddRef();
 			pdrgpexprRemainder->Append(pexprPostCollapse);
-			CRefCount::SafeRelease(colref_array);
+			SafeRelease(colref_array);
 		}
 		else
 		{
@@ -1725,7 +1725,7 @@ CExpressionPreprocessor::PexprWithImpliedPredsOnLOJInnerChild(
 		pexprSelect->Release();
 		pexprInner = pexprInnerNormalized;
 	}
-	CRefCount::SafeRelease(pexprPred);
+	SafeRelease(pexprPred);
 
 	// recursively process inner child
 	CExpression *pexprNewInner =
@@ -2812,7 +2812,7 @@ CExpressionPreprocessor::PrunePartitions(CMemoryPool *mp, CExpression *expr)
 		CConstraint *pred_cnstr = CConstraint::PcnstrFromScalarExpr(
 			mp, filter_pred, &pdrgpcrsChild, false /* infer_nulls_as*/,
 			IMDIndex::EmdindBtree);
-		CRefCount::SafeRelease(pdrgpcrsChild);
+		SafeRelease(pdrgpcrsChild);
 
 		IMdIdArray *selected_partition_mdids = GPOS_NEW(mp) IMdIdArray(mp);
 		CConstraintArray *selected_partition_cnstrs =
@@ -2862,9 +2862,9 @@ CExpressionPreprocessor::PrunePartitions(CMemoryPool *mp, CExpression *expr)
 					selected_partition_cnstrs->Append(rel_cnstr);
 				}
 			}
-			CRefCount::SafeRelease(pcnstr);
+			SafeRelease(pcnstr);
 		}
-		CRefCount::SafeRelease(pred_cnstr);
+		SafeRelease(pred_cnstr);
 
 		if (selected_partition_mdids->Size() == 0)
 		{
@@ -2967,8 +2967,8 @@ CExpressionPreprocessor::PcnstrFromChildPartition(
 	cnstr = CConstraint::PcnstrFromScalarExpr(
 		mp, part_constraint_expr, &pdrgpcrsChild, true /* infer_nulls_as */,
 		IMDIndex::EmdindBtree);
-	CRefCount::SafeRelease(part_constraint_expr);
-	CRefCount::SafeRelease(pdrgpcrsChild);
+	SafeRelease(part_constraint_expr);
+	SafeRelease(pdrgpcrsChild);
 	GPOS_ASSERT(cnstr);
 	return cnstr;
 }

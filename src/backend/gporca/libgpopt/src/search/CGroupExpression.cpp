@@ -103,7 +103,7 @@ CGroupExpression::~CGroupExpression()
 		m_pop->Release();
 		m_pdrgpgroup->Release();
 
-		CRefCount::SafeRelease(m_pdrgpgroupSorted);
+		SafeRelease(m_pdrgpgroupSorted);
 		m_ppartialplancostmap->Release();
 	}
 }

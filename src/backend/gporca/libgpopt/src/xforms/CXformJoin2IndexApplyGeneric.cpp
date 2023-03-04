@@ -238,7 +238,7 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 							// if there are multiple groupbys, then check the intersection of their grouping cols
 							groupingCols->Intersection(
 								groupingColsToCheck.Value());
-							CRefCount::SafeRelease(groupingColsToCheck.Value());
+							SafeRelease(groupingColsToCheck.Value());
 							groupingColsToCheck = groupingCols;
 
 							if (0 == groupingCols->Size())
@@ -345,5 +345,5 @@ CXformJoin2IndexApplyGeneric::Transform(CXformContext *pxfctxt,
 		(m_generateBitmapPlans ? IMDIndex::EmdindBitmap
 							   : IMDIndex::EmdindBtree));
 
-	CRefCount::SafeRelease(pexprAllPredicates);
+	SafeRelease(pexprAllPredicates);
 }

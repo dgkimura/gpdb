@@ -76,10 +76,10 @@ CLogicalCTEConsumer::CLogicalCTEConsumer(CMemoryPool *mp, ULONG id,
 //---------------------------------------------------------------------------
 CLogicalCTEConsumer::~CLogicalCTEConsumer()
 {
-	CRefCount::SafeRelease(m_pdrgpcr);
-	CRefCount::SafeRelease(m_pexprInlined);
-	CRefCount::SafeRelease(m_phmulcr);
-	CRefCount::SafeRelease(m_pcrsOutput);
+	SafeRelease(m_pdrgpcr);
+	SafeRelease(m_pexprInlined);
+	SafeRelease(m_phmulcr);
+	SafeRelease(m_pcrsOutput);
 }
 
 //---------------------------------------------------------------------------

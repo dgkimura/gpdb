@@ -75,7 +75,7 @@ using IntToUlongMap =
 //		Abstract statistics API
 //
 //---------------------------------------------------------------------------
-class IStatistics : public CRefCount
+class IStatistics : public CRefCount<IStatistics>
 {
 private:
 public:

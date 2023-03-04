@@ -56,7 +56,7 @@ CPartialPlan::CPartialPlan(CGroupExpression *pgexpr, CReqdPropPlan *prpp,
 CPartialPlan::~CPartialPlan()
 {
 	m_prpp->Release();
-	CRefCount::SafeRelease(m_pccChild);
+	SafeRelease(m_pccChild);
 }
 
 //---------------------------------------------------------------------------

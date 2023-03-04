@@ -242,10 +242,10 @@ CJobGroupExpressionOptimization::Init(CGroupExpression *pgexpr,
 void
 CJobGroupExpressionOptimization::Cleanup()
 {
-	CRefCount::SafeRelease(m_pdrgpoc);
-	CRefCount::SafeRelease(m_pdrgpstatCurrentCtxt);
-	CRefCount::SafeRelease(m_pdrgpdp);
-	CRefCount::SafeRelease(m_prppCTEProducer);
+	SafeRelease(m_pdrgpoc);
+	SafeRelease(m_pdrgpstatCurrentCtxt);
+	SafeRelease(m_pdrgpdp);
+	SafeRelease(m_prppCTEProducer);
 	GPOS_DELETE(m_pexprhdlPlan);
 	GPOS_DELETE(m_pexprhdlRel);
 }

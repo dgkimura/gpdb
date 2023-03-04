@@ -497,7 +497,7 @@ CJoinOrderDP::PexprBestJoinOrderDP(CBitSet *pbs	 // set of elements to be joined
 				{
 					// this is the first solution, or we found a better solution
 					dMinCost = dCost;
-					CRefCount::SafeRelease(pexprResult);
+					SafeRelease(pexprResult);
 					pexprJoin->AddRef();
 					pexprResult = pexprJoin;
 				}

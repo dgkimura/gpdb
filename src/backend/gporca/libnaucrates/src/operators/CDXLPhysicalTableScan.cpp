@@ -57,7 +57,7 @@ CDXLPhysicalTableScan::CDXLPhysicalTableScan(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CDXLPhysicalTableScan::~CDXLPhysicalTableScan()
 {
-	CRefCount::SafeRelease(m_dxl_table_descr);
+	SafeRelease(m_dxl_table_descr);
 }
 
 

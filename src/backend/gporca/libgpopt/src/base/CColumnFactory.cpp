@@ -61,7 +61,7 @@ CColumnFactory::CColumnFactory()
 //---------------------------------------------------------------------------
 CColumnFactory::~CColumnFactory()
 {
-	CRefCount::SafeRelease(m_phmcrcrs);
+	SafeRelease(m_phmcrcrs);
 
 	// dealloc hash table
 	m_sht.Cleanup();

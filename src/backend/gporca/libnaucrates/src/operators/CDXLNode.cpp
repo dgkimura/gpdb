@@ -155,9 +155,9 @@ CDXLNode::CDXLNode(CDXLOperator *dxl_op, CDXLNodeArray *dxl_array)
 CDXLNode::~CDXLNode()
 {
 	m_dxl_array->Release();
-	CRefCount::SafeRelease(m_dxl_op);
-	CRefCount::SafeRelease(m_dxl_properties);
-	CRefCount::SafeRelease(m_direct_dispatch_info);
+	SafeRelease(m_dxl_op);
+	SafeRelease(m_dxl_properties);
+	SafeRelease(m_direct_dispatch_info);
 }
 
 //---------------------------------------------------------------------------

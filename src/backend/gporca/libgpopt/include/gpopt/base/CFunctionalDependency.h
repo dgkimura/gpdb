@@ -37,7 +37,7 @@ using namespace gpos;
 //		Functional dependency representation
 //
 //---------------------------------------------------------------------------
-class CFunctionalDependency : public CRefCount,
+class CFunctionalDependency : public CRefCount<CFunctionalDependency>,
 							  public DbgPrintMixin<CFunctionalDependency>
 {
 private:

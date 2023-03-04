@@ -53,7 +53,7 @@ CParseHandlerMetadataColumn::CParseHandlerMetadataColumn(
 //---------------------------------------------------------------------------
 CParseHandlerMetadataColumn::~CParseHandlerMetadataColumn()
 {
-	CRefCount::SafeRelease(m_mdcol);
+	SafeRelease(m_mdcol);
 }
 
 //---------------------------------------------------------------------------

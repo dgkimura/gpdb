@@ -31,7 +31,7 @@ using namespace gpos;
 using namespace gpdxl;
 
 
-class CMDDependency : public CRefCount
+class CMDDependency : public CRefCount<CMDDependency>
 {
 private:
 	// memory pool

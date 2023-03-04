@@ -62,8 +62,8 @@ CLogicalCTEProducer::CLogicalCTEProducer(CMemoryPool *mp, ULONG id,
 //---------------------------------------------------------------------------
 CLogicalCTEProducer::~CLogicalCTEProducer()
 {
-	CRefCount::SafeRelease(m_pdrgpcr);
-	CRefCount::SafeRelease(m_pcrsOutput);
+	SafeRelease(m_pdrgpcr);
+	SafeRelease(m_pcrsOutput);
 }
 
 //---------------------------------------------------------------------------

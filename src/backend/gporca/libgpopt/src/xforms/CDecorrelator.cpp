@@ -613,7 +613,7 @@ CDecorrelator::FProcessJoin(CMemoryPool *mp, CExpression *pexpr,
 	else
 	{
 		pdrgpexpr->Release();
-		CRefCount::SafeRelease(pexprPredicate);
+		SafeRelease(pexprPredicate);
 	}
 
 	return fSuccess;

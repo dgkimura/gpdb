@@ -60,7 +60,7 @@ CJoinOrderGreedy::CJoinOrderGreedy(CMemoryPool *pmp,
 //---------------------------------------------------------------------------
 CJoinOrderGreedy::~CJoinOrderGreedy()
 {
-	CRefCount::SafeRelease(m_pcompResult);
+	SafeRelease(m_pcompResult);
 }
 
 
@@ -102,7 +102,7 @@ CJoinOrderGreedy::GetStartingJoins()
 				ul2Counter = ul2;
 				dMinRows = dRows;
 				compTemp->AddRef();
-				CRefCount::SafeRelease(pcompBest);
+				SafeRelease(pcompBest);
 				pcompBest = compTemp;
 			}
 			compTemp->Release();
@@ -247,7 +247,7 @@ CJoinOrderGreedy::PickBestJoin(CBitSet *candidate_comp_set)
 			best_comp_idx = iter.Bit();
 			pcompBestComponent = pcompCurrent;
 			pcompTemp->AddRef();
-			CRefCount::SafeRelease(pcompBest);
+			SafeRelease(pcompBest);
 			pcompBest = pcompTemp;
 		}
 		pcompTemp->Release();

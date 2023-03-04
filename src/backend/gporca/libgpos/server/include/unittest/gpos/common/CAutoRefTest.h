@@ -28,7 +28,7 @@ namespace gpos
 class CAutoRefTest
 {
 public:
-	class CElem : public CRefCount
+	class CElem : public CRefCount<CElem>
 	{
 	public:
 		CElem(ULONG ul) : m_ul(ul)

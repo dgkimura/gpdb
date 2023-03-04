@@ -113,9 +113,9 @@ CLogicalConstTableGet::CLogicalConstTableGet(CMemoryPool *mp,
 //---------------------------------------------------------------------------
 CLogicalConstTableGet::~CLogicalConstTableGet()
 {
-	CRefCount::SafeRelease(m_pdrgpcoldesc);
-	CRefCount::SafeRelease(m_pdrgpdrgpdatum);
-	CRefCount::SafeRelease(m_pdrgpcrOutput);
+	SafeRelease(m_pdrgpcoldesc);
+	SafeRelease(m_pdrgpdrgpdatum);
+	SafeRelease(m_pdrgpcrOutput);
 }
 
 //---------------------------------------------------------------------------

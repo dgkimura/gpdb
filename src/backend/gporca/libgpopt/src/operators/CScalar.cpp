@@ -319,7 +319,7 @@ CScalar::EberEvaluate(CMemoryPool *mp, CExpression *pexprScalar)
 	}
 
 	EBoolEvalResult eber = PopConvert(pop)->Eber(pdrgpulChildren);
-	CRefCount::SafeRelease(pdrgpulChildren);
+	SafeRelease(pdrgpulChildren);
 
 	return eber;
 }

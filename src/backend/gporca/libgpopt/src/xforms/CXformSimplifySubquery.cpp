@@ -181,7 +181,7 @@ CXformSimplifySubquery::FSimplifySubqueryRecursive(
 		}
 		else
 		{
-			CRefCount::SafeRelease(pexprChild);
+			SafeRelease(pexprChild);
 		}
 	}
 
@@ -257,7 +257,7 @@ CXformSimplifySubquery::FSimplifySubquery(CMemoryPool *mp,
 	if (!FSimplifySubqueryRecursive(mp, pexprScalar, &pexprNewScalar,
 									pfnsimplify, pfnmatch))
 	{
-		CRefCount::SafeRelease(pexprNewScalar);
+		SafeRelease(pexprNewScalar);
 		return nullptr;
 	}
 

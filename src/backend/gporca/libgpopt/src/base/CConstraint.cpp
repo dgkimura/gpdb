@@ -71,7 +71,7 @@ CConstraint::CConstraint(CMemoryPool *mp, CColRefSet *pcrsUsed)
 //---------------------------------------------------------------------------
 CConstraint::~CConstraint()
 {
-	CRefCount::SafeRelease(m_pexprScalar);
+	SafeRelease(m_pexprScalar);
 	m_pcrsUsed->Release();
 	m_phmcontain->Release();
 }
@@ -559,8 +559,8 @@ CConstraint::PcnstrFromScalarBoolOp(
 			mp, (*pexpr)[ul], &pdrgpcrsChild, infer_nulls_as, access_method);
 		if (nullptr == pcnstrChild || pcnstrChild->IsConstraintUnbounded())
 		{
-			CRefCount::SafeRelease(pcnstrChild);
-			CRefCount::SafeRelease(pdrgpcrsChild);
+			SafeRelease(pcnstrChild);
+			SafeRelease(pdrgpcrsChild);
 			if (CPredicateUtils::FOr(pexpr))
 			{
 				pdrgpcnstr->Release();
@@ -646,14 +646,14 @@ CConstraint::PcnstrFromExistsAnySubquery(CMemoryPool *mp, CExpression *pexpr,
 		CColRefSet *equivOutRefs = ppc->PcrsEquivClass(colref);
 		if (equivOutRefs == nullptr || equivOutRefs->Size() == 0)
 		{
-			CRefCount::SafeRelease(equivOutRefs);
+			SafeRelease(equivOutRefs);
 			continue;
 		}
 		CConstraint *cnstr4Outer = ppc->Pcnstr()->Pcnstr(mp, equivOutRefs);
 		if (cnstr4Outer == nullptr || cnstr4Outer->IsConstraintUnbounded())
 		{
-			CRefCount::SafeRelease(equivOutRefs);
-			CRefCount::SafeRelease(cnstr4Outer);
+			SafeRelease(equivOutRefs);
+			SafeRelease(cnstr4Outer);
 			continue;
 		}
 
@@ -1041,7 +1041,7 @@ CConstraint::Contains(CConstraint *pcnstr)
 		pciThis->Release();
 		pciOther->Release();
 		pcnstrColThis->Release();
-		CRefCount::SafeRelease(pcnstrColOther);
+		SafeRelease(pcnstrColOther);
 	}
 
 	// insert containment query into the local map

@@ -81,8 +81,8 @@ CPhysicalHashJoin::~CPhysicalHashJoin()
 {
 	m_pdrgpexprOuterKeys->Release();
 	m_pdrgpexprInnerKeys->Release();
-	CRefCount::SafeRelease(m_hash_opfamilies);
-	CRefCount::SafeRelease(m_pdrgpdsRedistributeRequests);
+	SafeRelease(m_hash_opfamilies);
+	SafeRelease(m_pdrgpdsRedistributeRequests);
 }
 
 //---------------------------------------------------------------------------
@@ -380,7 +380,7 @@ CPhysicalHashJoin::PdshashedMatching(
 		pdrgpexpr->Release();
 		if (nullptr != pdshashed->PdshashedEquiv())
 		{
-			CRefCount::SafeRelease(opfamilies);
+			SafeRelease(opfamilies);
 			// try again using the equivalent hashed distribution
 			return PdshashedMatching(mp, pdshashed->PdshashedEquiv(),
 									 ulSourceChild);

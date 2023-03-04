@@ -46,7 +46,8 @@ using UlongToPartConstraintMapIter =
 //		metadata abstraction for tables
 //
 //---------------------------------------------------------------------------
-class CPartConstraint : public CRefCount, public DbgPrintMixin<CPartConstraint>
+class CPartConstraint : public CRefCount<CPartConstraint>,
+						public DbgPrintMixin<CPartConstraint>
 {
 private:
 	// constraints for different levels

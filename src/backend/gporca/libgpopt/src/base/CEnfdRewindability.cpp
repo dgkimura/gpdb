@@ -52,7 +52,7 @@ CEnfdRewindability::CEnfdRewindability(CRewindabilitySpec *prs,
 //---------------------------------------------------------------------------
 CEnfdRewindability::~CEnfdRewindability()
 {
-	CRefCount::SafeRelease(m_prs);
+	SafeRelease(m_prs);
 }
 
 

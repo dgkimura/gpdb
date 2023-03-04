@@ -609,12 +609,12 @@ COptTasks::OptimizeTask(void *ptr)
 	GPOS_CATCH_EX(ex)
 	{
 		ResetTraceflags(enabled_trace_flags, disabled_trace_flags);
-		CRefCount::SafeRelease(rel_stats);
-		CRefCount::SafeRelease(col_stats);
-		CRefCount::SafeRelease(enabled_trace_flags);
-		CRefCount::SafeRelease(disabled_trace_flags);
-		CRefCount::SafeRelease(trace_flags);
-		CRefCount::SafeRelease(plan_dxl);
+		SafeRelease(rel_stats);
+		SafeRelease(col_stats);
+		SafeRelease(enabled_trace_flags);
+		SafeRelease(disabled_trace_flags);
+		SafeRelease(trace_flags);
+		SafeRelease(plan_dxl);
 		CMDCache::Shutdown();
 
 		IErrorContext *errctxt = CTask::Self()->GetErrCtxt();
@@ -630,9 +630,9 @@ COptTasks::OptimizeTask(void *ptr)
 
 	// cleanup
 	ResetTraceflags(enabled_trace_flags, disabled_trace_flags);
-	CRefCount::SafeRelease(enabled_trace_flags);
-	CRefCount::SafeRelease(disabled_trace_flags);
-	CRefCount::SafeRelease(trace_flags);
+	SafeRelease(enabled_trace_flags);
+	SafeRelease(disabled_trace_flags);
+	SafeRelease(trace_flags);
 	if (!optimizer_metadata_caching)
 	{
 		CMDCache::Shutdown();

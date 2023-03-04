@@ -143,7 +143,7 @@ CConstraintConjunction::Pcnstr(CMemoryPool *mp, const CColRef *colref)
 		CConstraint *pcnstrCol = (*pdrgpcnstrCol)[ul]->Pcnstr(mp, colref);
 		if (nullptr == pcnstrCol || pcnstrCol->IsConstraintUnbounded())
 		{
-			CRefCount::SafeRelease(pcnstrCol);
+			SafeRelease(pcnstrCol);
 			continue;
 		}
 		pdrgpcnstr->Append(pcnstrCol);
