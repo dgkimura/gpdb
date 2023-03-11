@@ -321,7 +321,7 @@ CColumnFactory::Destroy(CColRef *colref)
 		shtacc.Remove(pcrFound);
 	}
 
-	GPOS_DELETE(colref);
+	colref->Release();
 }
 
 
