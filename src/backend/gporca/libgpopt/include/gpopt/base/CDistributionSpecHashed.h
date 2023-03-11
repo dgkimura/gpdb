@@ -199,18 +199,6 @@ public:
 		return pdsHashed;
 	}
 
-	// conversion function: const argument
-	static const CDistributionSpecHashed *
-	PdsConvert(const CDistributionSpec *pds)
-	{
-		GPOS_ASSERT(nullptr != pds);
-		const CDistributionSpecHashed *pdsHashed =
-			dynamic_cast<const CDistributionSpecHashed *>(pds);
-		GPOS_ASSERT(nullptr != pdsHashed);
-
-		return pdsHashed;
-	}
-
 	CExpressionArrays *
 	HashSpecEquivExprs() const
 	{
