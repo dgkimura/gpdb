@@ -49,7 +49,7 @@ private:
 	// 		a specific context (e.g. inside the main query, inside another CTE, etc.)
 	//
 	//-------------------------------------------------------------------
-	struct SConsumerCounter
+	struct SConsumerCounter : public CRefCount<SConsumerCounter>
 	{
 	private:
 		// consumer ID

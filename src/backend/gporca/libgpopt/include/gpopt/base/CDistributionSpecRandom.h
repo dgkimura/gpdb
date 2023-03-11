@@ -133,16 +133,6 @@ public:
 		return dynamic_cast<CDistributionSpecRandom *>(pds);
 	}
 
-	// conversion function: const argument
-	static const CDistributionSpecRandom *
-	PdsConvert(const CDistributionSpec *pds)
-	{
-		GPOS_ASSERT(nullptr != pds);
-		GPOS_ASSERT(EdtRandom == pds->Edt());
-
-		return dynamic_cast<const CDistributionSpecRandom *>(pds);
-	}
-
 };	// class CDistributionSpecRandom
 
 }  // namespace gpopt

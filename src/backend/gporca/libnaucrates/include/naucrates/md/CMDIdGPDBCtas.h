@@ -74,15 +74,6 @@ public:
 
 		return dynamic_cast<const CMDIdGPDBCtas *>(mdid);
 	}
-
-	// non-const converter
-	static CMDIdGPDBCtas *
-	CastMdid(IMDId *mdid)
-	{
-		GPOS_ASSERT(nullptr != mdid && EmdidGPDBCtas == mdid->MdidType());
-
-		return dynamic_cast<CMDIdGPDBCtas *>(mdid);
-	}
 };
 
 }  // namespace gpmd

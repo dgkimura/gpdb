@@ -131,15 +131,6 @@ public:
 		return dynamic_cast<const CMDIdGPDB *>(mdid);
 	}
 
-	// non-const converter
-	static CMDIdGPDB *
-	CastMdid(IMDId *mdid)
-	{
-		GPOS_ASSERT(nullptr != mdid);
-
-		return dynamic_cast<CMDIdGPDB *>(mdid);
-	}
-
 	IMDId *
 	Copy(CMemoryPool *mp) const override
 	{
