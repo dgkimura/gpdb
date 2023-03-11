@@ -12,6 +12,7 @@
 #define GPOS_CTaskLocalStorageObject_H
 
 #include "gpos/base.h"
+#include "gpos/common/CRefCount.h"
 #include "gpos/task/CTaskLocalStorage.h"
 
 namespace gpos
@@ -25,7 +26,7 @@ namespace gpos
 //		hash function;
 //
 //---------------------------------------------------------------------------
-class CTaskLocalStorageObject
+class CTaskLocalStorageObject : public CRefCount<CTaskLocalStorageObject>
 {
 private:
 public:

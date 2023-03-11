@@ -118,15 +118,6 @@ public:
 		return dynamic_cast<const CMDIdCast *>(mdid);
 	}
 
-	// non-const converter
-	static CMDIdCast *
-	CastMdid(IMDId *mdid)
-	{
-		GPOS_ASSERT(nullptr != mdid && EmdidCastFunc == mdid->MdidType());
-
-		return dynamic_cast<CMDIdCast *>(mdid);
-	}
-
 	// make a copy in the given memory pool
 	IMDId *
 	Copy(CMemoryPool *mp) const override

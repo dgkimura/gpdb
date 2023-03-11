@@ -42,7 +42,7 @@ protected:
 	//		bit vector + offset + link
 	//
 	//---------------------------------------------------------------------------
-	class CBitSetLink
+	class CBitSetLink : public CRefCount<CBitSetLink>
 	{
 	private:
 		// offset
