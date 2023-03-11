@@ -236,14 +236,14 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
 	CWStringConst str(GPOS_WSZ_LIT("date_col"));
 	CName name(mp, &str);
-	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
+	gpos::Ref<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
 		pmdtype, default_type_modifier, name));
 
 	// create a date interval: ['01-01-2012', '01-21-2012')
 	CWStringDynamic pstrLowerDate1(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate1(mp, wszInternalRepresentationFor2012_01_21);
 	CConstraintInterval *pciFirst = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate1,
 		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
 		&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
 		CRange::EriExcluded);
@@ -252,7 +252,7 @@ CPartConstraintTest::EresUnittest_DateIntervals()
 	CWStringDynamic pstrLowerDate2(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate2(mp, wszInternalRepresentationFor2012_01_22);
 	CConstraintInterval *pciSecond = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate2,
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate2,
 		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
 		&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
 		CRange::EriExcluded);

@@ -1307,7 +1307,7 @@ CConstraintTest::EresUnittest_NegativeTests()
 	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_text);
 	CWStringConst str(GPOS_WSZ_LIT("text_col"));
 	CName name(mp, &str);
-	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
+	gpos::Ref<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
 		pmdtype, default_type_modifier, name));
 
 	// create a text interval: ['baz', 'foobar')
@@ -1320,7 +1320,7 @@ CConstraintTest::EresUnittest_NegativeTests()
 
 	// 'text' is not a constrainable type, so the interval construction should assert-fail
 	CConstraintInterval *pciFirst = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_text, colref.Value(), pstrLower1.Value(),
+		mp, &mda, CMDIdGPDB::m_mdid_text, colref.get(), pstrLower1.Value(),
 		lLower1, CRange::EriIncluded, pstrUpper1.Value(), lUpper1,
 		CRange::EriExcluded);
 	PrintConstraint(mp, pciFirst);
@@ -1362,14 +1362,14 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	const IMDType *pmdtype = mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
 	CWStringConst str(GPOS_WSZ_LIT("date_col"));
 	CName name(mp, &str);
-	CAutoP<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
+	gpos::Ref<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
 		pmdtype, default_type_modifier, name));
 
 	// create a date interval: ['01-01-2012', '01-21-2012')
 	CWStringDynamic pstrLowerDate1(mp, wszInternalRepresentationFor2012_01_01);
 	CWStringDynamic pstrUpperDate1(mp, wszInternalRepresentationFor2012_01_21);
 	CConstraintInterval *pciFirst = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate1,
 		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
 		&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
 		CRange::EriExcluded);
@@ -1379,7 +1379,7 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	CWStringDynamic pstrLowerDate2(mp, wszInternalRepresentationFor2012_01_02);
 	CWStringDynamic pstrUpperDate2(mp, wszInternalRepresentationFor2012_01_22);
 	CConstraintInterval *pciSecond = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate2,
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate2,
 		lInternalRepresentationFor2012_01_02, CRange::EriIncluded,
 		&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
 		CRange::EriExcluded);
@@ -1389,7 +1389,7 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	CConstraintInterval *pciIntersect = pciFirst->PciIntersect(mp, pciSecond);
 	PrintConstraint(mp, pciIntersect);
 	CConstraintInterval *pciIntersectExpected = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate2,
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate2,
 		lInternalRepresentationFor2012_01_02, CRange::EriIncluded,
 		&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
 		CRange::EriExcluded);
@@ -1399,7 +1399,7 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	CConstraintInterval *pciUnion = pciFirst->PciUnion(mp, pciSecond);
 	PrintConstraint(mp, pciUnion);
 	CConstraintInterval *pciUnionExpected = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate1,
 		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
 		&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
 		CRange::EriExcluded);
@@ -1409,7 +1409,7 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	CConstraintInterval *pciDiff1 = pciFirst->PciDifference(mp, pciSecond);
 	PrintConstraint(mp, pciDiff1);
 	CConstraintInterval *pciDiff1Expected = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate1,
 		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
 		&pstrLowerDate2, lInternalRepresentationFor2012_01_02,
 		CRange::EriExcluded);
@@ -1419,7 +1419,7 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	CConstraintInterval *pciDiff2 = pciSecond->PciDifference(mp, pciFirst);
 	PrintConstraint(mp, pciDiff2);
 	CConstraintInterval *pciDiff2Expected = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrUpperDate1,
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrUpperDate1,
 		lInternalRepresentationFor2012_01_21, CRange::EriIncluded,
 		&pstrUpperDate2, lInternalRepresentationFor2012_01_22,
 		CRange::EriExcluded);
@@ -1436,7 +1436,7 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	// equality
 	// create a third interval identical to the first
 	CConstraintInterval *pciThird = CTestUtils::PciGenericInterval(
-		mp, &mda, CMDIdGPDB::m_mdid_date, colref.Value(), &pstrLowerDate1,
+		mp, &mda, CMDIdGPDB::m_mdid_date, colref.get(), &pstrLowerDate1,
 		lInternalRepresentationFor2012_01_01, CRange::EriIncluded,
 		&pstrUpperDate1, lInternalRepresentationFor2012_01_21,
 		CRange::EriExcluded);

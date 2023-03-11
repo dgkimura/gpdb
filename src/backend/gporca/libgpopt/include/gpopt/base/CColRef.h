@@ -51,7 +51,7 @@ using UlongToColRefMapIter =
 //		factory object
 //
 //---------------------------------------------------------------------------
-class CColRef : public gpos::DbgPrintMixin<CColRef>
+class CColRef : public CRefCount<CColRef>, public gpos::DbgPrintMixin<CColRef>
 {
 public:
 	enum EUsedStatus
