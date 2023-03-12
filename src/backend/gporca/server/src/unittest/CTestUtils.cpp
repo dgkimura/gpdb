@@ -1763,7 +1763,7 @@ CTestUtils::PexprConstTableGet(CMemoryPool *mp, ULONG ulElements)
 		gpos::Ref<IDatumInt4> datum =
 			pmdtypeint4->CreateInt4Datum(mp, ul, false /* is_null */);
 		gpos::Ref<IDatumArray> pdrgpdatum = GPOS_NEW(mp) IDatumArray(mp);
-		pdrgpdatum->Appendgpos::dyn_cast<IDatum>(datum);
+		pdrgpdatum->Append(gpos::dyn_cast<IDatum>(datum));
 		pdrgpdrgpdatum->Append(pdrgpdatum);
 	}
 	gpos::Ref<CLogicalConstTableGet> popConstTableGet =
@@ -3939,7 +3939,7 @@ CTestUtils::CreateGenericDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 
-	GPOS_ASSERT(!mdid_type->Equals(&CMDIdGPDB::m_mdid_numeric));
+	GPOS_ASSERT(!mdid_type->Equals(CMDIdGPDB::m_mdid_numeric));
 	const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(mdid_type);
 	ULONG ulbaSize = 0;
 	BYTE *data =
@@ -3986,7 +3986,7 @@ CTestUtils::CreateDoubleDatum(CMemoryPool *mp, CMDAccessor *md_accessor,
 {
 	GPOS_ASSERT(nullptr != md_accessor);
 
-	GPOS_ASSERT(!mdid_type->Equals(&CMDIdGPDB::m_mdid_numeric));
+	GPOS_ASSERT(!mdid_type->Equals(CMDIdGPDB::m_mdid_numeric));
 	const gpos::Ref<IMDType> pmdtype = md_accessor->RetrieveType(mdid_type);
 	ULONG ulbaSize = 0;
 	CWStringDynamic *pstrW =

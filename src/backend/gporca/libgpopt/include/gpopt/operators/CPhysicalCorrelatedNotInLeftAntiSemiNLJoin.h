@@ -138,14 +138,14 @@ public:
 	}
 
 	// conversion function
-	static CPhysicalCorrelatedNotInLeftAntiSemiNLJoin *
+	static gpos::Ref<CPhysicalCorrelatedNotInLeftAntiSemiNLJoin>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalCorrelatedNotInLeftAntiSemiNLJoin ==
 					pop->Eopid());
 
-		return dynamic_cast<CPhysicalCorrelatedNotInLeftAntiSemiNLJoin *>(pop);
+		return gpos::dyn_cast<CPhysicalCorrelatedNotInLeftAntiSemiNLJoin>(pop);
 	}
 
 	// return true if operator is a correlated NL Join

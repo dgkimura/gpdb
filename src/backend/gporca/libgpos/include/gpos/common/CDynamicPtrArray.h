@@ -13,6 +13,8 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/Ref.h"
+#include "gpos/common/Vector.h"
 #include "gpos/common/clibwrapper.h"
 
 namespace gpos
@@ -399,6 +401,7 @@ public:
 	}
 
 };	// class CDynamicPtrArray
+
 }  // namespace gpos
 
 #endif	// !GPOS_CDynamicPtrArray_H

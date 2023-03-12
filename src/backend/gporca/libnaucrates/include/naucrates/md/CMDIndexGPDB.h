@@ -16,6 +16,7 @@
 
 #include "gpos/base.h"
 
+#include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/md/IMDIndex.h"
 #include "naucrates/md/IMDPartConstraint.h"
 
@@ -66,7 +67,7 @@ private:
 	gpos::Ref<IMdIdArray> m_mdid_opfamilies_array;
 
 	// DXL for object
-	const CWStringDynamic *m_dxl_str;
+	mutable CWStringDynamic *m_dxl_str{nullptr};
 
 	// Child index oids
 	gpos::Ref<IMdIdArray> m_child_index_oids;
@@ -123,6 +124,12 @@ public:
 	const CWStringDynamic *
 	GetStrRepr() const override
 	{
+		if (nullptr == m_dxl_str)
+		{
+			m_dxl_str = CDXLUtils::SerializeMDObj(
+				m_mp, gpos::dyn_cast<IMDCacheObject>(SharedFromThis()),
+				false /*fSerializeHeader*/, false /*indentation*/);
+		}
 		return m_dxl_str;
 	}
 

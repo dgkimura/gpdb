@@ -24,6 +24,7 @@
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/exception.h"
 #include "gpopt/mdcache/CMDAccessorUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/exception.h"
 #include "naucrates/md/CMDIdCast.h"
@@ -480,7 +481,7 @@ CMDAccessor::GetImdObj(gpos::Ref<IMDId> mdid, IMDCacheObject::Emdtype mdtype)
 		timerLookup.Restart();
 	}
 
-	const gpos::Ref<IMDCacheObject> pimdobj = nullptr;
+	gpos::Ref<IMDCacheObject> pimdobj = nullptr;
 
 	// first, try to locate object in local hashtable
 	{
@@ -701,14 +702,13 @@ CMDAccessor::RetrieveType(CSystemId sysid, IMDType::ETypeInfo type_info)
 {
 	GPOS_ASSERT(IMDType::EtiGeneric != type_info);
 	gpos::Ref<IMDProvider> pmdp = Pmdp(sysid);
-	CAutoRef<IMDId> a_pmdid;
-	a_pmdid = pmdp->MDId(m_mp, sysid, type_info);
+	gpos::Ref<IMDId> a_pmdid = pmdp->MDId(m_mp, sysid, type_info);
 	const gpos::Ref<IMDCacheObject> pmdobj =
-		GetImdObj(a_pmdid.Value(), IMDCacheObject::EmdtType);
+		GetImdObj(a_pmdid, IMDCacheObject::EmdtType);
 	if (IMDCacheObject::EmdtType != pmdobj->MDType())
 	{
 		GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryNotFound,
-				   a_pmdid.Value()->GetBuffer());
+				   a_pmdid->GetBuffer());
 	}
 
 	return gpos::dyn_cast<IMDType>(pmdobj);
@@ -945,12 +945,12 @@ CMDAccessor::Pmdcast(gpos::Ref<IMDId> mdid_src, gpos::Ref<IMDId> mdid_dest)
 
 
 
-	CAutoP<IMDId> a_pmdidCast;
+	gpos::Ref<IMDId> a_pmdidCast;
 	a_pmdidCast = GPOS_NEW(m_mp) CMDIdCast(CMDIdGPDB::CastMdid(mdid_src),
 										   CMDIdGPDB::CastMdid(mdid_dest));
 
 	const gpos::Ref<IMDCacheObject> pmdobj =
-		GetImdObj(a_pmdidCast.Value(), IMDCacheObject::EmdtCastFunc);
+		GetImdObj(a_pmdidCast, IMDCacheObject::EmdtCastFunc);
 
 	if (IMDCacheObject::EmdtCastFunc != pmdobj->MDType())
 	{
@@ -980,13 +980,13 @@ CMDAccessor::Pmdsccmp(gpos::Ref<IMDId> left_mdid, gpos::Ref<IMDId> right_mdid,
 
 
 
-	CAutoP<IMDId> a_pmdidScCmp;
+	gpos::Ref<IMDId> a_pmdidScCmp;
 	a_pmdidScCmp =
 		GPOS_NEW(m_mp) CMDIdScCmp(CMDIdGPDB::CastMdid(left_mdid),
 								  CMDIdGPDB::CastMdid(right_mdid), cmp_type);
 
 	const gpos::Ref<IMDCacheObject> pmdobj =
-		GetImdObj(a_pmdidScCmp.Value(), IMDCacheObject::EmdtScCmp);
+		GetImdObj(a_pmdidScCmp, IMDCacheObject::EmdtScCmp);
 
 	if (IMDCacheObject::EmdtScCmp != pmdobj->MDType())
 	{

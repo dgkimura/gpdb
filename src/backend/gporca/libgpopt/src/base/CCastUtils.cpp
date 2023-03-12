@@ -20,6 +20,7 @@
 #include "gpopt/operators/CScalarArrayCoerceExpr.h"
 #include "gpopt/operators/CScalarCast.h"
 #include "gpopt/operators/CScalarIdent.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/CMDArrayCoerceCastGPDB.h"
 #include "naucrates/md/IMDCast.h"
 #include "naucrates/md/IMDIndex.h"
@@ -133,7 +134,7 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
 		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
-			(gpos::Ref<CMDArrayCoerceCastGPDB>) pmdcast;
+			gpos::cast<CMDArrayCoerceCastGPDB>(pmdcast);
 		pexpr = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CScalarArrayCoerceExpr(
@@ -333,7 +334,7 @@ CCastUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
 		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
-			(gpos::Ref<CMDArrayCoerceCastGPDB>) pmdcast;
+			gpos::cast<CMDArrayCoerceCastGPDB>(pmdcast);
 		pexprCast = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CScalarArrayCoerceExpr(

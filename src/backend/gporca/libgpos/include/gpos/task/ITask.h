@@ -50,9 +50,6 @@ public:
 	// ctor
 	ITask() = default;
 
-	// dtor
-	virtual ~ITask() = default;
-
 	// accessor for memory pool, e.g. used for allocating task parameters in
 	virtual CMemoryPool *Pmp() const = 0;
 

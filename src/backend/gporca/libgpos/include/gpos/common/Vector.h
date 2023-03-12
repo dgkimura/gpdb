@@ -17,12 +17,13 @@ template <class T>
 class Vector : public CRefCount<Vector<T>>
 {
 	gpos::vector<T> v_;
+	CMemoryPool *m_mp;
 
 public:
 	// ctor
 	explicit Vector(CMemoryPool *mp, ULONG min_size GPOS_UNUSED = 4,
 					ULONG expansion_factor GPOS_UNUSED = 10)
-		: v_(mp)
+		: v_(mp), m_mp(mp)
 	{
 	}
 
@@ -162,6 +163,75 @@ public:
 	{
 		return v_.end();
 	}
+
+	// FIXME: TODO KIMURA Odd that this is Ref instead of value
+	void
+	AppendArray(gpos::Ref<Vector<T>> other)
+	{
+		v_.insert(v_.end(), other->begin(), other->end());
+	}
+
+	ULONG
+	IndexOf(const T elem)
+	{
+		for (ULONG ul = 0; ul < v_.size(); ul++)
+		{
+			if (v_[ul] == elem)
+			{
+				return ul;
+			}
+		}
+
+		return gpos::ulong_max;
+	}
+
+	void
+	Remove(const T elem)
+	{
+		v_.erase(v_.begin() + IndexOf(elem));
+	}
+
+	using ULongVector = gpos::Vector<ULONG>;
+
+	gpos::Ref<ULongVector>
+	IndexesOfSubsequence(gpos::Ref<gpos::Vector<T>> subsequence)
+	{
+		GPOS_ASSERT(nullptr != subsequence);
+
+		ULONG subsequence_length = subsequence->Size();
+		gpos::Ref<ULongVector> indexes = GPOS_NEW(m_mp) ULongVector(m_mp);
+
+		for (ULONG ul1 = 0; ul1 < subsequence_length; ul1++)
+		{
+			T elem = (*subsequence)[ul1];
+			ULONG index = IndexOf(elem);
+			if (gpos::ulong_max == index)
+			{
+				// not found
+				return nullptr;
+			}
+
+			indexes->Append(index);
+		}
+		return indexes;
+	}
+
+	gpos::Ref<gpos::Vector<T>>
+	CreateReducedArray(gpos::Ref<ULongVector> indexes_to_choose)
+	{
+		gpos::Ref<gpos::Vector<T>> result =
+			GPOS_NEW(m_mp) gpos::Vector<T>(m_mp);
+		ULONG list_size = indexes_to_choose->Size();
+
+		for (ULONG i = 0; i < list_size; i++)
+		{
+			result->Append((*this)[(*indexes_to_choose)[i]]);
+		}
+		return result;
+	}
 };
+
+using ULongVector = gpos::Vector<ULONG>;
+
 }  // namespace gpos
 #endif	// GPOS_Vector_H

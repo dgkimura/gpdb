@@ -14,6 +14,7 @@
 #include "gpopt/base/CColRefSet.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CPhysicalSort.h"
+#include "gpopt/search/CGroupExpression.h"
 
 #ifdef GPOS_DEBUG
 #include "gpos/error/CAutoTrace.h"
@@ -155,7 +156,8 @@ COrderSpec::Matches(const gpos::Ref<COrderSpec> pos) const
 	BOOL fMatch =
 		m_pdrgpoe->Size() == pos->m_pdrgpoe->Size() && FSatisfies(pos);
 
-	GPOS_ASSERT_IMP(fMatch, pos->FSatisfies(this));
+	GPOS_ASSERT_IMP(
+		fMatch, pos->FSatisfies(gpos::dyn_cast<COrderSpec>(SharedFromThis())));
 
 	return fMatch;
 }
@@ -212,8 +214,11 @@ COrderSpec::AppendEnforcers(CMemoryPool *mp,
 
 
 
-	gpos::Ref<CExpression> pexprSort = GPOS_NEW(mp)
-		CExpression(mp, GPOS_NEW(mp) CPhysicalSort(mp, this), pexpr);
+	gpos::Ref<CExpression> pexprSort = GPOS_NEW(mp) CExpression(
+		mp,
+		GPOS_NEW(mp)
+			CPhysicalSort(mp, gpos::dyn_cast<COrderSpec>(SharedFromThis())),
+		pexpr);
 	pdrgpexpr->Append(pexprSort);
 }
 
@@ -235,8 +240,7 @@ COrderSpec::HashValue() const
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		COrderExpression *poe = (*m_pdrgpoe)[ul];
-		ulHash =
-			gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(poe->Pcr()));
+		ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(poe->Pcr()));
 	}
 
 	return ulHash;
@@ -267,7 +271,7 @@ COrderSpec::PosCopyWithRemappedColumns(
 
 		const gpos::Ref<CColRef> colref = poe->Pcr();
 		ULONG id = colref->Id();
-		gpos::Ref<CColRef> pcrMapped = colref_mapping->Find(&id);
+		gpos::Ref<CColRef> pcrMapped = colref_mapping->Find(id);
 		if (nullptr == pcrMapped)
 		{
 			if (must_exist)
@@ -277,12 +281,12 @@ COrderSpec::PosCopyWithRemappedColumns(
 				pcrMapped = col_factory->PcrCopy(colref);
 
 				BOOL result GPOS_ASSERTS_ONLY =
-					colref_mapping->Insert(GPOS_NEW(mp) ULONG(id), pcrMapped);
+					colref_mapping->Insert(id, pcrMapped);
 				GPOS_ASSERT(result);
 			}
 			else
 			{
-				pcrMapped = const_cast<gpos::Ref<CColRef> >(colref);
+				pcrMapped = colref;
 			}
 		}
 

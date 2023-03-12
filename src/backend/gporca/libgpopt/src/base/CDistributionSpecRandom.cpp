@@ -73,7 +73,7 @@ CDistributionSpecRandom::Matches(const gpos::Ref<CDistributionSpec> pds) const
 		// If one gp_segment_id is null and the other is not, it doesn't match
 		// If both gp_segment_ids are not null, they match iff they are equal
 		const gpos::Ref<CDistributionSpecRouted> pdsRouted =
-			static_cast<const gpos::Ref<CDistributionSpecRouted> >(pds);
+			gpos::dyn_cast<CDistributionSpecRouted>(pds);
 		GPOS_ASSERT(pdsRouted != nullptr);
 
 		const BOOL localNull = m_gp_segment_id == nullptr;
@@ -91,7 +91,7 @@ CDistributionSpecRandom::Matches(const gpos::Ref<CDistributionSpec> pds) const
 	else if (pds->Edt() == CDistributionSpec::EdtRandom)
 	{
 		const gpos::Ref<CDistributionSpecRandom> pdsRandom =
-			static_cast<const gpos::Ref<CDistributionSpecRandom> >(pds);
+			gpos::dyn_cast<CDistributionSpecRandom>(pds);
 
 		return pdsRandom->IsDuplicateSensitive() == m_is_duplicate_sensitive;
 	}

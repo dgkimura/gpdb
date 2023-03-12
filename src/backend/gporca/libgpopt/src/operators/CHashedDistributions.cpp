@@ -4,6 +4,7 @@
 #include "gpopt/operators/CHashedDistributions.h"
 
 #include "gpopt/base/CUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 CHashedDistributions::CHashedDistributions(

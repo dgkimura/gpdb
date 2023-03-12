@@ -265,7 +265,7 @@ CJobGroupExpressionOptimization::InitChildGroupsOptimization(
 	// initialize required plan properties computation
 	m_pexprhdlPlan = GPOS_NEW(psc->GetGlobalMemoryPool())
 		CExpressionHandle(psc->GetGlobalMemoryPool());
-	m_pexprhdlPlan->Attach(m_pgexpr);
+	m_pexprhdlPlan->Attach(m_pgexpr.Lock());
 	if (0 < m_ulArity)
 	{
 		m_ulChildIndex = m_pexprhdlPlan->UlFirstOptimizedChildIndex();
@@ -278,7 +278,7 @@ CJobGroupExpressionOptimization::InitChildGroupsOptimization(
 		CExpressionHandle(psc->GetGlobalMemoryPool());
 	gpos::Ref<CGroupExpression> pgexprForStats =
 		m_pgexpr->Pgroup()->PgexprBestPromise(psc->GetGlobalMemoryPool(),
-											  m_pgexpr);
+											  m_pgexpr.Lock());
 	if (nullptr != pgexprForStats)
 	{
 		m_pexprhdlRel->Attach(pgexprForStats);
@@ -314,7 +314,7 @@ CJobGroupExpressionOptimization::EevtInitialize(CSchedulerContext *psc,
 	CJobGroupExpressionOptimization *pjgeo = PjConvert(pjOwner);
 
 	CExpressionHandle exprhdl(psc->GetGlobalMemoryPool());
-	exprhdl.Attach(pjgeo->m_pgexpr);
+	exprhdl.Attach(pjgeo->m_pgexpr.Lock());
 	exprhdl.DeriveProps(nullptr /*pdpctxt*/);
 	if (!psc->Peng()->FCheckReqdProps(exprhdl, pjgeo->m_poc->Prpp(),
 									  pjgeo->m_ulOptReq))
@@ -325,11 +325,11 @@ CJobGroupExpressionOptimization::EevtInitialize(CSchedulerContext *psc,
 	// check if job can be early terminated without optimizing any child
 	CCost costLowerBound(GPOPT_INVALID_COST);
 	if (psc->Peng()->FSafeToPrune(
-			pjgeo->m_pgexpr, pjgeo->m_poc->Prpp(), nullptr /*pccChild*/,
+			pjgeo->m_pgexpr.Lock(), pjgeo->m_poc->Prpp(), nullptr /*pccChild*/,
 			gpos::ulong_max /*child_index*/, &costLowerBound))
 	{
 		(void) pjgeo->m_pgexpr->PccComputeCost(
-			psc->GetGlobalMemoryPool(), pjgeo->m_poc, pjgeo->m_ulOptReq,
+			psc->GetGlobalMemoryPool(), pjgeo->m_poc.Lock(), pjgeo->m_ulOptReq,
 			nullptr /*pdrgpoc*/, true /*fPruned*/, costLowerBound);
 		return eevFinalized;
 	}
@@ -378,13 +378,13 @@ CJobGroupExpressionOptimization::DerivePrevChildProps(CSchedulerContext *psc)
 
 	// check if job can be early terminated after previous children have been optimized
 	CCost costLowerBound(GPOPT_INVALID_COST);
-	if (psc->Peng()->FSafeToPrune(m_pgexpr, m_poc->Prpp(), pccChildBest,
+	if (psc->Peng()->FSafeToPrune(m_pgexpr.Lock(), m_poc->Prpp(), pccChildBest,
 								  ulPrevChildIndex, &costLowerBound))
 	{
 		// failed to optimize child due to cost bounding
-		(void) m_pgexpr->PccComputeCost(psc->GetGlobalMemoryPool(), m_poc,
-										m_ulOptReq, nullptr /*pdrgpoc*/,
-										true /*fPruned*/, costLowerBound);
+		(void) m_pgexpr->PccComputeCost(
+			psc->GetGlobalMemoryPool(), m_poc.Lock(), m_ulOptReq,
+			nullptr /*pdrgpoc*/, true /*fPruned*/, costLowerBound);
 		m_fChildOptimizationFailed = true;
 		return;
 	}
@@ -502,7 +502,7 @@ CJobGroupExpressionOptimization::ScheduleChildGroupsJobs(CSchedulerContext *psc)
 								 m_pexprhdlPlan->Prpp(m_ulChildIndex), prprel,
 								 stats_ctxt, psc->Peng()->UlCurrSearchStage());
 
-	if (pgroupChild == m_pgexpr->Pgroup() && pocChild->Matches(m_poc))
+	if (pgroupChild == m_pgexpr->Pgroup() && pocChild->Matches(m_poc.Lock()))
 	{
 		// this is to prevent deadlocks, child context cannot be the same as parent context
 		m_fChildOptimizationFailed = true;
@@ -511,8 +511,8 @@ CJobGroupExpressionOptimization::ScheduleChildGroupsJobs(CSchedulerContext *psc)
 		return;
 	}
 
-	CJobGroupOptimization::ScheduleJob(psc, pgroupChild, m_pgexpr, pocChild,
-									   this);
+	CJobGroupOptimization::ScheduleJob(psc, pgroupChild, m_pgexpr.Lock(),
+									   pocChild, this);
 
 
 	// advance to next child
@@ -577,7 +577,7 @@ CJobGroupExpressionOptimization::EevtAddEnforcers(CSchedulerContext *psc,
 
 	// enforce physical properties
 	BOOL fCheckEnfdProps = psc->Peng()->FCheckEnfdProps(
-		psc->GetGlobalMemoryPool(), pjgeo->m_pgexpr, pjgeo->m_poc,
+		psc->GetGlobalMemoryPool(), pjgeo->m_pgexpr.Lock(), pjgeo->m_poc.Lock(),
 		pjgeo->m_ulOptReq, pjgeo->m_pdrgpoc);
 	if (fCheckEnfdProps)
 	{
@@ -621,8 +621,8 @@ CJobGroupExpressionOptimization::EevtOptimizeSelf(CSchedulerContext *psc,
 	}
 
 	// compute group expression cost under current context
-	gpos::Ref<COptimizationContext> poc = pjgeo->m_poc;
-	gpos::Ref<CGroupExpression> pgexpr = pjgeo->m_pgexpr;
+	gpos::Ref<COptimizationContext> poc = pjgeo->m_poc.Lock();
+	gpos::Ref<CGroupExpression> pgexpr = pjgeo->m_pgexpr.Lock();
 	gpos::Ref<COptimizationContextArray> pdrgpoc = pjgeo->m_pdrgpoc;
 	ULONG ulOptReq = pjgeo->m_ulOptReq;
 

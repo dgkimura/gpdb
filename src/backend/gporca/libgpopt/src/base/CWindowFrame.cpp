@@ -13,6 +13,7 @@
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CScalarIdent.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;
@@ -39,9 +40,6 @@ const CHAR rgszFrameExclusionStrategy[][20] = {"None", "Nulls", "Current",
 											   "MatchingOthers", "Ties"};
 GPOS_CPL_ASSERT(CWindowFrame::EfesSentinel ==
 				GPOS_ARRAY_SIZE(rgszFrameExclusionStrategy));
-
-// empty window frame
-const CWindowFrame CWindowFrame::m_wfEmpty;
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -181,9 +179,9 @@ CWindowFrame::PwfCopyWithRemappedColumns(
 	CMemoryPool *mp, gpos::Ref<UlongToColRefMap> colref_mapping,
 	BOOL must_exist)
 {
-	if (this == &m_wfEmpty)
+	if (m_wfEmpty)
 	{
-		return this;
+		return SharedFromThis();
 	}
 
 	gpos::Ref<CExpression> pexprLeading = nullptr;
@@ -217,7 +215,7 @@ CWindowFrame::PwfCopyWithRemappedColumns(
 IOstream &
 CWindowFrame::OsPrint(IOstream &os) const
 {
-	if (this == &m_wfEmpty)
+	if (m_wfEmpty)
 	{
 		os << "EMPTY FRAME";
 		return os;

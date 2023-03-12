@@ -17,6 +17,7 @@
 #include "gpopt/base/CConstraintConjunction.h"
 #include "gpopt/base/CConstraintNegation.h"
 #include "gpopt/base/CUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -69,8 +70,7 @@ CPartConstraint::CPartConstraint(CMemoryPool *mp, gpos::Ref<CConstraint> pcnstr,
 	GPOS_ASSERT_IMP(is_unbounded, fDefaultPartition);
 
 	m_phmulcnstr = GPOS_NEW(mp) UlongToConstraintMap(mp);
-	BOOL result GPOS_ASSERTS_ONLY =
-		m_phmulcnstr->Insert(GPOS_NEW(mp) ULONG(0 /*ulLevel*/), pcnstr);
+	BOOL result GPOS_ASSERTS_ONLY = m_phmulcnstr->Insert(0 /*ulLevel*/, pcnstr);
 	GPOS_ASSERT(result);
 
 	gpos::Ref<CColRefSet> pcrsUsed = pcnstr->PcrsUsed();
@@ -140,7 +140,7 @@ CPartConstraint::PcnstrBuildCombined(CMemoryPool *mp)
 	gpos::Ref<CConstraintArray> pdrgpcnstr = GPOS_NEW(mp) CConstraintArray(mp);
 	for (ULONG ul = 0; ul < m_num_of_part_levels; ul++)
 	{
-		gpos::Ref<CConstraint> pcnstr = m_phmulcnstr->Find(&ul);
+		gpos::Ref<CConstraint> pcnstr = m_phmulcnstr->Find(ul);
 		if (nullptr != pcnstr)
 		{
 			pdrgpcnstr->Append(pcnstr);
@@ -237,8 +237,8 @@ CPartConstraint::FEqualConstrMaps(gpos::Ref<UlongToConstraintMap> phmulcnstrFst,
 
 	for (ULONG ul = 0; ul < ulLevels; ul++)
 	{
-		gpos::Ref<CConstraint> pcnstrFst = phmulcnstrFst->Find(&ul);
-		gpos::Ref<CConstraint> pcnstrSnd = phmulcnstrSnd->Find(&ul);
+		gpos::Ref<CConstraint> pcnstrFst = phmulcnstrFst->Find(ul);
+		gpos::Ref<CConstraint> pcnstrSnd = phmulcnstrSnd->Find(ul);
 
 		if ((nullptr == pcnstrFst || nullptr == pcnstrSnd) &&
 			pcnstrFst != pcnstrSnd)
@@ -268,7 +268,7 @@ CPartConstraint::Pcnstr(ULONG ulLevel) const
 {
 	GPOS_ASSERT(!m_fUninterpreted &&
 				"Calling Pcnstr on uninterpreted partition constraint");
-	return m_phmulcnstr->Find(&ulLevel);
+	return m_phmulcnstr->Find(ulLevel);
 }
 
 //---------------------------------------------------------------------------
@@ -449,8 +449,7 @@ CPartConstraint::PpartcnstrRemaining(CMemoryPool *mp,
 	gpos::Ref<CConstraint> pcnstrRemaining =
 		PcnstrRemaining(mp, pcnstrCurrent, pcnstrOther);
 
-	BOOL result GPOS_ASSERTS_ONLY =
-		phmulcnstr->Insert(GPOS_NEW(mp) ULONG(0), pcnstrRemaining);
+	BOOL result GPOS_ASSERTS_ONLY = phmulcnstr->Insert(0, pcnstrRemaining);
 	GPOS_ASSERT(result);
 
 	if (IsDefaultPartition(0 /*ulLevel*/) &&
@@ -465,8 +464,7 @@ CPartConstraint::PpartcnstrRemaining(CMemoryPool *mp,
 		gpos::Ref<CConstraint> pcnstrLevel = Pcnstr(ul);
 		if (nullptr != pcnstrLevel)
 		{
-			BOOL result GPOS_ASSERTS_ONLY =
-				phmulcnstr->Insert(GPOS_NEW(mp) ULONG(ul), pcnstrLevel);
+			BOOL result GPOS_ASSERTS_ONLY = phmulcnstr->Insert(ul, pcnstrLevel);
 			GPOS_ASSERT(result);
 		}
 
@@ -550,7 +548,7 @@ CPartConstraint::PpartcnstrCopyWithRemappedColumns(
 				pcnstr->PcnstrCopyWithRemappedColumns(mp, colref_mapping,
 													  must_exist);
 			BOOL result GPOS_ASSERTS_ONLY =
-				phmulcnstr->Insert(GPOS_NEW(mp) ULONG(ul), pcnstrRemapped);
+				phmulcnstr->Insert(ul, pcnstrRemapped);
 			GPOS_ASSERT(result);
 		}
 	}
@@ -682,8 +680,7 @@ CPartConstraint::PpartcnstrDisjunction(CMemoryPool *mp,
 		gpos::Ref<CConstraint> pcnstrFst = ppartcnstrFst->Pcnstr(ul);
 
 
-		BOOL result GPOS_ASSERTS_ONLY =
-			phmulcnstr->Insert(GPOS_NEW(mp) ULONG(ul), pcnstrFst);
+		BOOL result GPOS_ASSERTS_ONLY = phmulcnstr->Insert(ul, pcnstrFst);
 		GPOS_ASSERT(result);
 
 		if (ppartcnstrFst->IsDefaultPartition(ul))
@@ -708,7 +705,7 @@ CPartConstraint::PpartcnstrDisjunction(CMemoryPool *mp,
 		CConstraint::PcnstrDisjunction(mp, pdrgpcnstrCombined);
 	GPOS_ASSERT(nullptr != pcnstrDisj);
 	BOOL result GPOS_ASSERTS_ONLY =
-		phmulcnstr->Insert(GPOS_NEW(mp) ULONG(ulLevels - 1), pcnstrDisj);
+		phmulcnstr->Insert(ulLevels - 1, pcnstrDisj);
 	GPOS_ASSERT(result);
 
 	if (ppartcnstrFst->IsDefaultPartition(ulLevels - 1) ||
@@ -744,8 +741,7 @@ CPartConstraint::CopyPartConstraints(
 	while (pcmi.Advance())
 	{
 		ULONG ulKey = *(pcmi.Key());
-		gpos::Ref<CPartConstraint> ppartcnstrSource =
-			const_cast<gpos::Ref<CPartConstraint> >(pcmi.Value());
+		gpos::Ref<CPartConstraint> ppartcnstrSource = pcmi.Value();
 
 		gpos::Ref<CPartConstraint> ppartcnstrDest =
 			ppartcnstrmapDest->Find(&ulKey);

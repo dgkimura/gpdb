@@ -89,28 +89,24 @@ private:
 
 	// hash map from component to best join order
 	using BitSetToExpressionMap =
-		CHashMap<CBitSet, CExpression, UlHashBitSet, FEqualBitSet,
-				 CleanupRelease<CBitSet>, CleanupRelease<CExpression>>;
+		gpos::UnorderedMap<gpos::Ref<CBitSet>, gpos::Ref<CExpression>>;
 
 	// hash map from component pair to connecting edges
 	using ComponentPairToExpressionMap =
-		CHashMap<SComponentPair, CExpression, SComponentPair::HashValue,
-				 SComponentPair::Equals, CleanupRelease<SComponentPair>,
-				 CleanupRelease<CExpression>>;
+		gpos::UnorderedMap<gpos::Ref<SComponentPair>, gpos::Ref<CExpression>>;
 
 	// hash map from expression to cost of best join order
 	using ExpressionToCostMap =
-		CHashMap<CExpression, CDouble, CExpression::HashValue, CUtils::Equals,
-				 CleanupRelease<CExpression>, CleanupDelete<CDouble>>;
+		gpos::UnorderedMap<gpos::Ref<CExpression>, gpos::Ref<WrapperCDouble>>;
 
 	// lookup table for links
-	ComponentPairToExpressionMap *m_phmcomplink;
+	gpos::Ref<ComponentPairToExpressionMap> m_phmcomplink;
 
 	// dynamic programming table
-	BitSetToExpressionMap *m_phmbsexpr;
+	gpos::Ref<BitSetToExpressionMap> m_phmbsexpr;
 
 	// map of expressions to its cost
-	ExpressionToCostMap *m_phmexprcost;
+	gpos::Ref<ExpressionToCostMap> m_phmexprcost;
 
 	// array of top-k join expression
 	gpos::Ref<CExpressionArray> m_pdrgpexprTopKOrders;

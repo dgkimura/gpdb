@@ -18,6 +18,7 @@
 #include "gpos/string/CWStringDynamic.h"
 #include "gpos/task/CAutoTraceFlag.h"
 
+#include "gpopt/base/CDrvdPropCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/eval/CConstExprEvaluatorDefault.h"
 #include "gpopt/mdcache/CAutoMDAccessor.h"
@@ -2339,7 +2340,7 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessConvert2InPredicate()
 	CAutoOptCtxt aoc(mp, &mda, nullptr /*pceeval*/,
 					 CTestUtils::GetCostModel(mp));
 
-	CAutoRef<CExpression> apexprGet(
+	gpos::Ref<CExpression> apexprGet(
 		CTestUtils::PexprLogicalGet(mp));  // useful for colref
 	gpos::Ref<COperator> popGet = apexprGet->Pop();
 
@@ -2356,23 +2357,22 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessConvert2InPredicate()
 								 CUtils::PexprScalarConstInt4(mp, 2 /*val*/)),
 		CUtils::PexprScalarEqCmp(mp, pcrLeft, pcrLeft));
 
-	CAutoRef<CExpression> apexprGetWithChildren(
+	gpos::Ref<CExpression> apexprGetWithChildren(
 		GPOS_NEW(mp) CExpression(mp, popGet, pexprDisjunct));
 
-	GPOS_ASSERT(3 == CUtils::UlCountOperator(apexprGetWithChildren.Value(),
+	GPOS_ASSERT(3 == CUtils::UlCountOperator(apexprGetWithChildren,
 											 COperator::EopScalarCmp));
 
-	CAutoRef<CExpression> apexprConvert(
-		CExpressionPreprocessor::PexprConvert2In(
-			mp, apexprGetWithChildren.Value()));
+	gpos::Ref<CExpression> apexprConvert(
+		CExpressionPreprocessor::PexprConvert2In(mp, apexprGetWithChildren));
 
-	GPOS_ASSERT(1 == CUtils::UlCountOperator(apexprConvert.Value(),
+	GPOS_ASSERT(1 == CUtils::UlCountOperator(apexprConvert,
 											 COperator::EopScalarArrayCmp));
-	GPOS_ASSERT(1 == CUtils::UlCountOperator(apexprConvert.Value(),
-											 COperator::EopScalarCmp));
+	GPOS_ASSERT(
+		1 == CUtils::UlCountOperator(apexprConvert, COperator::EopScalarCmp));
 	// the OR node should not be removed because there should be an array expression and
 	// a scalar identity comparison
-	GPOS_ASSERT(1 == CUtils::UlCountOperator(apexprConvert.Value(),
+	GPOS_ASSERT(1 == CUtils::UlCountOperator(apexprConvert,
 											 COperator::EopScalarBoolOp));
 
 	return GPOS_OK;
@@ -2460,44 +2460,42 @@ CExpressionPreprocessorTest::EresUnittest_PreProcessConvertArrayWithEquals()
 					 CTestUtils::GetCostModel(mp));
 
 	// test the IN OR Eq variant
-	CAutoRef<CExpression> apexprInConvertable(
+	gpos::Ref<CExpression> apexprInConvertable(
 		PexprCreateConvertableArray(mp, true));
-	CAutoRef<CExpression> apexprInConverted(
-		CExpressionPreprocessor::PexprConvert2In(mp,
-												 apexprInConvertable.Value()));
+	gpos::Ref<CExpression> apexprInConverted(
+		CExpressionPreprocessor::PexprConvert2In(mp, apexprInConvertable));
 
-	GPOS_RTL_ASSERT(0 == CUtils::UlCountOperator(apexprInConverted.Value(),
+	GPOS_RTL_ASSERT(0 == CUtils::UlCountOperator(apexprInConverted,
 												 COperator::EopScalarCmp));
-	GPOS_RTL_ASSERT(7 == CUtils::UlCountOperator(apexprInConverted.Value(),
+	GPOS_RTL_ASSERT(7 == CUtils::UlCountOperator(apexprInConverted,
 												 COperator::EopScalarConst));
-	GPOS_RTL_ASSERT(1 == CUtils::UlCountOperator(apexprInConverted.Value(),
+	GPOS_RTL_ASSERT(1 == CUtils::UlCountOperator(apexprInConverted,
 												 COperator::EopScalarArrayCmp));
 
 	gpos::Ref<CExpression> pexprArrayInCmp =
 		CTestUtils::PexprFindFirstExpressionWithOpId(
-			apexprInConverted.Value(), COperator::EopScalarArrayCmp);
+			apexprInConverted, COperator::EopScalarArrayCmp);
 	GPOS_ASSERT(nullptr != pexprArrayInCmp);
 	gpos::Ref<CScalarArrayCmp> popCmpInArray =
 		CScalarArrayCmp::PopConvert(pexprArrayInCmp->Pop());
 	GPOS_RTL_ASSERT(CScalarArrayCmp::EarrcmpAny == popCmpInArray->Earrcmpt());
 
 	// test the NOT IN OR NEq variant
-	CAutoRef<CExpression> apexprNotInConvertable(
+	gpos::Ref<CExpression> apexprNotInConvertable(
 		PexprCreateConvertableArray(mp, false));
-	CAutoRef<CExpression> apexprNotInConverted(
-		CExpressionPreprocessor::PexprConvert2In(
-			mp, apexprNotInConvertable.Value()));
+	gpos::Ref<CExpression> apexprNotInConverted(
+		CExpressionPreprocessor::PexprConvert2In(mp, apexprNotInConvertable));
 
-	GPOS_RTL_ASSERT(0 == CUtils::UlCountOperator(apexprNotInConverted.Value(),
+	GPOS_RTL_ASSERT(0 == CUtils::UlCountOperator(apexprNotInConverted,
 												 COperator::EopScalarCmp));
-	GPOS_RTL_ASSERT(7 == CUtils::UlCountOperator(apexprNotInConverted.Value(),
+	GPOS_RTL_ASSERT(7 == CUtils::UlCountOperator(apexprNotInConverted,
 												 COperator::EopScalarConst));
-	GPOS_RTL_ASSERT(1 == CUtils::UlCountOperator(apexprNotInConverted.Value(),
+	GPOS_RTL_ASSERT(1 == CUtils::UlCountOperator(apexprNotInConverted,
 												 COperator::EopScalarArrayCmp));
 
 	gpos::Ref<CExpression> pexprArrayCmpNotIn =
 		CTestUtils::PexprFindFirstExpressionWithOpId(
-			apexprNotInConverted.Value(), COperator::EopScalarArrayCmp);
+			apexprNotInConverted, COperator::EopScalarArrayCmp);
 	GPOS_ASSERT(nullptr != pexprArrayCmpNotIn);
 	gpos::Ref<CScalarArrayCmp> popCmpNotInArray =
 		CScalarArrayCmp::PopConvert(pexprArrayCmpNotIn->Pop());
@@ -2538,12 +2536,12 @@ CExpressionPreprocessorTest::
 	CAutoOptCtxt aoc(mp, &mda, nullptr /*pceeval*/,
 					 CTestUtils::GetCostModel(mp));
 
-	CAutoRef<CExpression> apexprGet(CTestUtils::PexprLogicalGet(mp));
+	gpos::Ref<CExpression> apexprGet(CTestUtils::PexprLogicalGet(mp));
 	gpos::Ref<COperator> popGet = apexprGet->Pop();
 
 
 	// get a column ref from the outermost Get expression
-	CAutoRef<CColRefArray> apdrgpcr(
+	gpos::Ref<CColRefArray> apdrgpcr(
 		apexprGet->DeriveOutputColumns()->Pdrgpcr(mp));
 	GPOS_ASSERT(1 < apdrgpcr->Size());
 	gpos::Ref<CColRef> pcrLeft = (*apdrgpcr)[0];
@@ -2575,20 +2573,19 @@ CExpressionPreprocessorTest::
 						mp, pcrLeft, CUtils::PexprScalarConstInt4(mp, 2)),
 					pexprConjunct);
 
-	CAutoRef<CExpression> apexprGetWithChildren(
+	gpos::Ref<CExpression> apexprGetWithChildren(
 		GPOS_NEW(mp) CExpression(mp, popGet, pexprDisjunct));
 
-	GPOS_ASSERT(5 == CUtils::UlCountOperator(apexprGetWithChildren.Value(),
+	GPOS_ASSERT(5 == CUtils::UlCountOperator(apexprGetWithChildren,
 											 COperator::EopScalarCmp));
 
-	CAutoRef<CExpression> apexprConvert(
-		CExpressionPreprocessor::PexprConvert2In(
-			mp, apexprGetWithChildren.Value()));
+	gpos::Ref<CExpression> apexprConvert(
+		CExpressionPreprocessor::PexprConvert2In(mp, apexprGetWithChildren));
 
-	GPOS_ASSERT(2 == CUtils::UlCountOperator(apexprConvert.Value(),
+	GPOS_ASSERT(2 == CUtils::UlCountOperator(apexprConvert,
 											 COperator::EopScalarArrayCmp));
-	GPOS_ASSERT(1 == CUtils::UlCountOperator(apexprConvert.Value(),
-											 COperator::EopScalarCmp));
+	GPOS_ASSERT(
+		1 == CUtils::UlCountOperator(apexprConvert, COperator::EopScalarCmp));
 
 	return GPOS_OK;
 }

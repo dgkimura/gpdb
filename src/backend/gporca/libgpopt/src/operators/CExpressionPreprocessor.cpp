@@ -19,6 +19,7 @@
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CColRefTable.h"
 #include "gpopt/base/CConstraintInterval.h"
+#include "gpopt/base/CDrvdPropCtxt.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/exception.h"
@@ -449,7 +450,7 @@ CExpressionPreprocessor::PexprRemoveSuperfluousDistinctInDQA(
 	gpos::Ref<COperator> pop = pexpr->Pop();
 	if (COperator::EopLogicalGbAgg == pop->Eopid())
 	{
-		const gpos::Ref<CExpression> const pexprProjectList = (*pexpr)[1];
+		const gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 		GPOS_ASSERT(COperator::EopScalarProjectList ==
 					pexprProjectList->Pop()->Eopid());
 		const ULONG arity = pexprProjectList->Arity();
@@ -820,10 +821,10 @@ CExpressionPreprocessor::PexprConvert2In(
 
 			CAutoRef<CExpression> apexprPreCollapse(
 				GPOS_NEW(mp) CExpression(mp, pop, pdrgpexprCollapse));
-			CAutoRef<CConstraint> apcnst(CConstraint::PcnstrFromScalarExpr(
+			gpos::Ref<CConstraint> apcnst(CConstraint::PcnstrFromScalarExpr(
 				mp, apexprPreCollapse.Value(), &colref_array));
 
-			GPOS_ASSERT(nullptr != apcnst.Value());
+			GPOS_ASSERT(nullptr != apcnst);
 			gpos::Ref<CExpression> pexprPostCollapse = apcnst->PexprScalar(mp);
 
 
@@ -2273,8 +2274,7 @@ CExpressionPreprocessor::AddPredsToCTEProducers(CMemoryPool *mp,
 		GPOS_ASSERT(nullptr != pexprProducer);
 
 		ULONG ulConsumers = pcteinfo->UlConsumers(ulCTEId);
-		gpos::Ref<CExpressionArray> pdrgpexpr =
-			const_cast<gpos::Ref<CExpressionArray> >(mi.Value());
+		gpos::Ref<CExpressionArray> pdrgpexpr = mi.Value();
 
 		// skip the propagation of predicate contains volatile function e.g. random() (value change within a scan)
 		if (CPredicateUtils::FContainsVolatileFunction(pdrgpexpr))
@@ -2611,7 +2611,7 @@ CExpressionPreprocessor::PexprReorderScalarCmpChildren(
 		if (CUtils::FScalarConst(pexprLeft) && CUtils::FScalarIdent(pexprRight))
 		{
 			gpos::Ref<CScalarCmp> popScalarCmpCommuted =
-				(gpos::dyn_cast<CScalarCmp> > (pop)) - PopCommutedOp(mp);
+				(gpos::dyn_cast<CScalarCmp>(pop))->PopCommutedOp(mp);
 			if (popScalarCmpCommuted)
 			{
 				return GPOS_NEW(mp) CExpression(mp, popScalarCmpCommuted,
@@ -2975,9 +2975,9 @@ CExpressionPreprocessor::PcnstrFromChildPartition(
 	for (ULONG ul = 0; ul < pdrgpcrOutput->Size(); ++ul)
 	{
 		gpos::Ref<CColRef> colref = (*pdrgpcrOutput)[ul];
-		ULONG *colid = root_col_mapping->Find(colref);
+		gpos::Ref<UlongRef> colid = root_col_mapping->Find(colref);
 		GPOS_ASSERT(nullptr != colid);
-		mapped_colids->Append(GPOS_NEW(mp) ULONG(*colid));
+		mapped_colids->Append(GPOS_NEW(mp) ULONG(colid->value()));
 	}
 
 	CTranslatorDXLToExpr dxltr(mp, md_accessor);
@@ -3265,7 +3265,8 @@ CExpressionPreprocessor::ConvertSplitUpdateToInPlaceUpdate(
 		// Checking if column is either distribution or partition key.
 		if (pcrInsert != pcrDelete &&
 			(pcrDelete->IsDistCol() ||
-			 ppartColRefs->Find(pcrInsert) != nullptr))
+			 std::find(ppartColRefs->begin(), ppartColRefs->end(), pcrInsert) !=
+				 ppartColRefs->end()))
 		{
 			split_update = true;
 			break;

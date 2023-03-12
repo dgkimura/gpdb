@@ -139,12 +139,10 @@ private:
 
 	// map of incoming required columns request to computed column sets
 	using ReqdColsReqToColRefSetMap =
-		CHashMap<CReqdColsRequest, CColRefSet, CReqdColsRequest::HashValue,
-				 CReqdColsRequest::Equals, CleanupRelease<CReqdColsRequest>,
-				 CleanupRelease<CColRefSet>>;
+		gpos::UnorderedMap<gpos::Ref<CReqdColsRequest>, gpos::Ref<CColRefSet>>;
 
 	// hash map of child columns requests
-	ReqdColsReqToColRefSetMap *m_phmrcr;
+	gpos::Ref<ReqdColsReqToColRefSetMap> m_phmrcr;
 
 	// given an optimization context, the elements in this array represent is the
 	// number of requests that operator will create for its child,

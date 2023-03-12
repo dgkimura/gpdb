@@ -69,7 +69,7 @@ CCostContext::CCostContext(CMemoryPool *mp, gpos::Ref<COptimizationContext> poc,
 		!CPhysical::PopConvert(m_pgexpr->Pop())->FPassThruStats())
 	{
 		gpos::Ref<CGroupExpression> pgexprForStats =
-			m_pgexpr->Pgroup()->PgexprBestPromise(m_mp, m_pgexpr);
+			m_pgexpr->Pgroup()->PgexprBestPromise(m_mp, m_pgexpr.Lock());
 		if (nullptr != pgexprForStats)
 		{
 			m_pgexprForStats = pgexprForStats;
@@ -314,13 +314,12 @@ CCostContext::IsValid(CMemoryPool *mp)
 void
 CCostContext::BreakCostTiesForJoinPlans(
 	const gpos::Ref<CCostContext> pccFst, const gpos::Ref<CCostContext> pccSnd,
-	CONST_COSTCTXT_PTR *ppccPrefered,  // output: preferred cost context
+	CONST_COSTCTXT_PTR &ppccPrefered,  // output: preferred cost context
 	BOOL *pfTiesResolved  // output: if true, tie resolution has succeeded
 )
 {
 	GPOS_ASSERT(nullptr != pccFst);
 	GPOS_ASSERT(nullptr != pccSnd);
-	GPOS_ASSERT(nullptr != ppccPrefered);
 	GPOS_ASSERT(nullptr != pfTiesResolved);
 	GPOS_ASSERT(*(pccFst->Poc()) == *(pccSnd->Poc()));
 	GPOS_ASSERT(estCosted == pccFst->Est());
@@ -337,7 +336,7 @@ CCostContext::BreakCostTiesForJoinPlans(
 	// to have more reliable statistics on this side
 
 	*pfTiesResolved = false;
-	*ppccPrefered = nullptr;
+	ppccPrefered = nullptr;
 	CDouble dRowsOuterFst =
 		(*pccFst->Pdrgpoc())[0]->PccBest()->Pstats()->Rows();
 	CDouble dRowsInnerFst =
@@ -374,11 +373,11 @@ CCostContext::BreakCostTiesForJoinPlans(
 									->GetJoinDepth();
 	if (ulInnerJoinDepthFst < ulOuterJoinDepthFst)
 	{
-		*ppccPrefered = pccFst;
+		ppccPrefered = pccFst;
 	}
 	else
 	{
-		*ppccPrefered = pccSnd;
+		ppccPrefered = pccSnd;
 	}
 }
 
@@ -415,7 +414,7 @@ CCostContext::FBetterThan(const gpos::Ref<CCostContext> pcc) const
 			// for 2-stage vs 2-stage or 3-stage vs 3-stage, we let costing decide.
 			// single stage agg do not get optimized when multi-stage aggs are present,
 			// refer to COptimizationContext::FOptimizeAgg.
-			if (IsTwoStageScalarDQACostCtxt(this) &&
+			if (IsTwoStageScalarDQACostCtxt(SharedFromThis()) &&
 				IsThreeStageScalarDQACostCtxt(pcc))
 			{
 				return false;
@@ -423,7 +422,7 @@ CCostContext::FBetterThan(const gpos::Ref<CCostContext> pcc) const
 			// if the comparison is between 3-stage agg and 2-stage scalar DQA aggs generated from CXformSplitDQA,
 			// always mark 3-stage agg as having the better cost context.
 			// note: CXformSplitDQA will never generate a mix of scalar and non-scalar DQAs.
-			if (IsThreeStageScalarDQACostCtxt(this) &&
+			if (IsThreeStageScalarDQACostCtxt(SharedFromThis()) &&
 				IsTwoStageScalarDQACostCtxt(pcc))
 			{
 				return true;
@@ -470,10 +469,11 @@ CCostContext::FBetterThan(const gpos::Ref<CCostContext> pcc) const
 	{
 		CONST_COSTCTXT_PTR pccPrefered = nullptr;
 		BOOL fSuccess = false;
-		BreakCostTiesForJoinPlans(this, pcc, &pccPrefered, &fSuccess);
+		BreakCostTiesForJoinPlans(SharedFromThis(), pcc, pccPrefered,
+								  &fSuccess);
 		if (fSuccess)
 		{
-			return (this == pccPrefered);
+			return (SharedFromThis() == pccPrefered);
 		}
 	}
 

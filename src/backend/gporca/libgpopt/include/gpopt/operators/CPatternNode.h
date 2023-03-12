@@ -53,7 +53,7 @@ public:
 	Matches(gpos::Ref<COperator> pop) const override
 	{
 		return Eopid() == pop->Eopid() &&
-			   m_match == static_cast<gpos::Ref<CPatternNode> >(pop)->m_match;
+			   m_match == gpos::dyn_cast<CPatternNode>(pop)->m_match;
 	}
 
 	// check if operator is a pattern leaf
@@ -70,7 +70,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(COperator::EopPatternNode == pop->Eopid());
 
-		return static_cast<gpos::Ref<CPatternNode> >(pop);
+		return gpos::dyn_cast<CPatternNode>(pop);
 	}
 
 	// ident accessors

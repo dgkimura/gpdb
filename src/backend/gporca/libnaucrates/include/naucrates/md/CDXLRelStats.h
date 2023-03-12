@@ -58,7 +58,7 @@ private:
 	BOOL m_empty;
 
 	// DXL string for object
-	CWStringDynamic *m_dxl_str;
+	mutable CWStringDynamic *m_dxl_str{nullptr};
 
 	// number of blocks (not always up to-to-date)
 	ULONG m_relpages;

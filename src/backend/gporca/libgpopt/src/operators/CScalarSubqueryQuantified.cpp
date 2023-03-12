@@ -121,7 +121,7 @@ CScalarSubqueryQuantified::HashValue() const
 	return gpos::CombineHashes(
 		COperator::HashValue(),
 		gpos::CombineHashes(m_scalar_op_mdid->HashValue(),
-							gpos::HashPtr<CColRef>(m_pcr)));
+							CColRef::HashValue(m_pcr)));
 }
 
 

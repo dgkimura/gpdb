@@ -43,9 +43,6 @@ CMDCheckConstraintGPDB::CMDCheckConstraintGPDB(CMemoryPool *mp,
 	GPOS_ASSERT(rel_mdid->IsValid());
 	GPOS_ASSERT(nullptr != mdname);
 	GPOS_ASSERT(nullptr != dxlnode);
-
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -59,7 +56,10 @@ CMDCheckConstraintGPDB::CMDCheckConstraintGPDB(CMemoryPool *mp,
 CMDCheckConstraintGPDB::~CMDCheckConstraintGPDB()
 {
 	GPOS_DELETE(m_mdname);
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 //---------------------------------------------------------------------------

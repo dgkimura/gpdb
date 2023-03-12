@@ -199,7 +199,7 @@ private:
 
 	// used to keep track of adjacent stats buckets and how similar
 	// they are in terms of distribution
-	struct SAdjBucketBoundary
+	struct SAdjBucketBoundary : CRefCount<SAdjBucketBoundary>
 	{
 		// boundary_index 0 refers to boundary between b[0] and b[1]
 		ULONG m_boundary_index;
@@ -223,8 +223,7 @@ private:
 			return DCost();
 		}
 	};
-	using SAdjBucketBoundaryArray =
-		CDynamicPtrArray<SAdjBucketBoundary, CleanupDelete<SAdjBucketBoundary>>;
+	using SAdjBucketBoundaryArray = gpos::Vector<gpos::Ref<SAdjBucketBoundary>>;
 
 public:
 	CHistogram &operator=(const CHistogram &) = delete;

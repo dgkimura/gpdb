@@ -18,6 +18,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CRefCount.h"
+#include "gpos/common/UnorderedMap.h"
 
 namespace gpos
 {
@@ -155,6 +156,9 @@ private:
 		for (ULONG i = 0; i < m_filled_chains->Size(); i++)
 		{
 			// release each hash chain
+			// KIMURA: FIXME TODO: I *think* this is okay becase all ref'd
+			//         objects whould use gpos::UnorderedMap
+			GPOS_DELETE(m_chains[*(*m_filled_chains)[i]]);
 		}
 		m_size = 0;
 		m_filled_chains->Clear();
@@ -202,6 +206,7 @@ public:
 		Clear();
 
 		GPOS_DELETE_ARRAY(m_chains);
+		GPOS_DELETE(m_keys);
 	}
 
 	// insert an element if key is not yet present

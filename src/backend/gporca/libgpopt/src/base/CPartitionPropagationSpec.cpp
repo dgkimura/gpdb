@@ -97,7 +97,7 @@ CPartitionPropagationSpec::Equals(
 	{
 		const gpos::Ref<SPartPropSpecInfo> info = hmulpi.Value();
 		const gpos::Ref<SPartPropSpecInfo> info_other = hmulpi_other.Value();
-		if (!info->Equals(info_other))
+		if (!info->Equals(info_other->SharedFromThis()))
 		{
 			return false;
 		}
@@ -113,7 +113,7 @@ CPartitionPropagationSpec::FindPartPropSpecInfo(ULONG scan_id) const
 		return nullptr;
 	}
 
-	gpos::Ref<SPartPropSpecInfo> info = m_part_prop_spec_infos->Find(&scan_id);
+	gpos::Ref<SPartPropSpecInfo> info = m_part_prop_spec_infos->Find(scan_id);
 	GPOS_RTL_ASSERT(info != nullptr);
 
 	return info;
@@ -172,7 +172,7 @@ CPartitionPropagationSpec::Insert(ULONG scan_id, EPartPropSpecInfoType type,
 	// a case of consecutive propagator, consumer request
 	// cannot happen, as the PPSRequired() is called for a given child index
 	// and the child index decide if we will add propagator/consumer
-	m_part_prop_spec_infos->Insert(GPOS_NEW(mp) ULONG(scan_id), info);
+	m_part_prop_spec_infos->Insert(scan_id, info);
 }
 
 void
@@ -188,8 +188,7 @@ CPartitionPropagationSpec::InsertAll(gpos::Ref<CPartitionPropagationSpec> pps)
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		gpos::Ref<SPartPropSpecInfo> other_info =
-			const_cast<gpos::Ref<SPartPropSpecInfo> >(hmulpi.Value());
+		gpos::Ref<SPartPropSpecInfo> other_info = hmulpi.Value();
 
 		gpos::Ref<SPartPropSpecInfo> found_info =
 			FindPartPropSpecInfo(other_info->m_scan_id);
@@ -220,8 +219,7 @@ CPartitionPropagationSpec::InsertAllowedConsumers(
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		gpos::Ref<SPartPropSpecInfo> other_info =
-			const_cast<gpos::Ref<SPartPropSpecInfo> >(hmulpi.Value());
+		gpos::Ref<SPartPropSpecInfo> other_info = hmulpi.Value();
 
 		// only process allowed_scan_ids ...
 		if (allowed_scan_ids != nullptr &&
@@ -266,8 +264,7 @@ CPartitionPropagationSpec::InsertAllExcept(
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		gpos::Ref<SPartPropSpecInfo> other_info =
-			const_cast<gpos::Ref<SPartPropSpecInfo> >(hmulpi.Value());
+		gpos::Ref<SPartPropSpecInfo> other_info = hmulpi.Value();
 
 		if (other_info->m_scan_id == scan_id)
 		{
@@ -302,8 +299,7 @@ CPartitionPropagationSpec::InsertAllResolve(
 	UlongToSPartPropSpecInfoMapIter hmulpi(pps->m_part_prop_spec_infos);
 	while (hmulpi.Advance())
 	{
-		gpos::Ref<SPartPropSpecInfo> other_info =
-			const_cast<gpos::Ref<SPartPropSpecInfo> >(hmulpi.Value());
+		gpos::Ref<SPartPropSpecInfo> other_info = hmulpi.Value();
 
 		gpos::Ref<SPartPropSpecInfo> found_info =
 			FindPartPropSpecInfo(other_info->m_scan_id);

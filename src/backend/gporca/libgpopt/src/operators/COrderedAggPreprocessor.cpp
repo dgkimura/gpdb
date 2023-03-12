@@ -92,7 +92,7 @@ COrderedAggPreprocessor::SplitPrjList(
 			if (nullptr == pdrgpexprSortClauseArray)
 			{
 				colref_array = GPOS_NEW(mp) CColRefArray(mp);
-				colref_array->Append(const_cast<gpos::Ref<CColRef> >(colref));
+				colref_array->Append(colref);
 				pdrgpexprSortClauseArray = GPOS_NEW(mp) CExpressionArray(mp);
 
 				pdrgpexprSortClauseArray->Append(pexprSortGroupClause);
@@ -143,9 +143,8 @@ COrderedAggPreprocessor::SplitPrjList(
 													   EaggfuncIndexArgs])[3]);
 
 						gpos::Ref<CExpression> pexprNewAggFunc = PexprFinalAgg(
-							mp, pexprAggFunc, pcrPrjElem,
-							const_cast<gpos::Ref<CColRef> >(total_count_colref),
-							const_cast<gpos::Ref<CColRef> >(peer_count_colref));
+							mp, pexprAggFunc, pcrPrjElem, total_count_colref,
+							peer_count_colref);
 						gpos::Ref<CExpression> pexprAddPrjElem =
 							CUtils::PexprScalarProjectElement(mp, pcrPrjElem,
 															  pexprNewAggFunc);
@@ -174,8 +173,7 @@ COrderedAggPreprocessor::SplitPrjList(
 				}
 				if (!skip)
 				{
-					colref_array->Append(
-						const_cast<gpos::Ref<CColRef> >(colref));
+					colref_array->Append(colref);
 
 					pdrgpexprSortClauseArray->Append(pexprSortGroupClause);
 				}
@@ -219,7 +217,7 @@ COrderedAggPreprocessor::SplitPrjList(
 				GPOS_NEW(mp) CExpression(
 					mp, GPOS_NEW(mp) CScalarProjectList(mp), pexprNewPrjElem);
 			gpos::Ref<CColRefArray> pc = GPOS_NEW(mp) CColRefArray(mp);
-			pc->Append(const_cast<gpos::Ref<CColRef> >(colref));
+			pc->Append(colref);
 
 			gpos::Ref<CExpression> pexprPeerCountAgg =
 				CUtils::PexprLogicalGbAggGlobal(mp, pc, (*pexprInputAggPrj)[0],

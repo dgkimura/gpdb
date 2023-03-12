@@ -285,7 +285,7 @@ CJoinOrderDPv2::DeriveStats(gpos::Ref<CExpression> pexpr)
 //		expressions with given properties
 //
 //---------------------------------------------------------------------------
-CJoinOrderDPv2gpos::Ref<::SExpressionInfo>
+gpos::Ref<CJoinOrderDPv2::SExpressionInfo>
 CJoinOrderDPv2::GetJoinExprForProperties(
 	gpos::Ref<SGroupInfo> left_child, gpos::Ref<SGroupInfo> right_child,
 	SExpressionProperties &required_properties)
@@ -312,7 +312,7 @@ CJoinOrderDPv2::GetJoinExprForProperties(
 //		Build a CExpression joining the two given sets from given expressions
 //
 //---------------------------------------------------------------------------
-CJoinOrderDPv2gpos::Ref<::SExpressionInfo>
+gpos::Ref<CJoinOrderDPv2::SExpressionInfo>
 CJoinOrderDPv2::GetJoinExpr(const SGroupAndExpression &left_child_expr,
 							const SGroupAndExpression &right_child_expr,
 							SExpressionProperties &result_properties)
@@ -808,7 +808,7 @@ CJoinOrderDPv2::RecursivelyMarkEdgesAsUsed(gpos::Ref<CExpression> expr)
 		if (nullptr != edge)
 		{
 			// we found the edge belonging to this expression, terminate the recursion
-			const_cast<gpos::Ref<SEdge>>(edge)->m_fUsed = true;
+			edge->m_fUsed = true;
 			return;
 		}
 
@@ -1194,7 +1194,7 @@ CJoinOrderDPv2::GreedySearchJoinOrders(ULONG left_level, JoinOrderPropType algo)
 //		not consume refcounts from <levelInfo> or <stats_expr_info>.
 //
 //---------------------------------------------------------------------------
-CJoinOrderDPv2gpos::Ref<::SGroupInfo>
+gpos::Ref<CJoinOrderDPv2::SGroupInfo>
 CJoinOrderDPv2::LookupOrCreateGroupInfo(
 	gpos::Ref<SLevelInfo> levelInfo, gpos::Ref<CBitSet> atoms,
 	gpos::Ref<SExpressionInfo> stats_expr_info)

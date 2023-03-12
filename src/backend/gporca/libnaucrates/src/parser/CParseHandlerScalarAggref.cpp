@@ -57,8 +57,8 @@ CParseHandlerScalarAggref::StartElement(const XMLCh *const element_uri,
 	{
 		// parse and create scalar AggRef
 		gpos::Ref<CDXLScalarAggref> dxl_op =
-			(gpos::Ref<CDXLScalarAggref>) CDXLOperatorFactory::MakeDXLAggFunc(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+			gpos::cast<CDXLScalarAggref>(CDXLOperatorFactory::MakeDXLAggFunc(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 		// construct node from the created scalar AggRef
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);

@@ -16,6 +16,7 @@
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/metadata/CPartConstraint.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

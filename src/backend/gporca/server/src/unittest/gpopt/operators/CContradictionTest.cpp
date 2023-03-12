@@ -13,6 +13,7 @@
 #include "gpos/io/COstreamString.h"
 #include "gpos/string/CWStringDynamic.h"
 
+#include "gpopt/base/CDrvdPropCtxt.h"
 #include "gpopt/eval/CConstExprEvaluatorDefault.h"
 #include "gpopt/operators/CLogicalInnerApply.h"
 #include "gpopt/operators/CLogicalInnerJoin.h"

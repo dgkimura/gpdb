@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CAutoRef.h"
 #include "gpos/common/CBitSetIter.h"
+#include "gpos/common/Ref.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 #include "gpos/test/CUnittest.h"
 
@@ -106,7 +107,7 @@ CBitSetIterTest::EresUnittest_Uninitialized()
 
 	CAutoRef<CBitSet> a_pbs;
 	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
-	a_pbs = pbs;
+	a_pbs = pbs.get();
 
 	CBitSetIter bsi(*pbs);
 
@@ -134,7 +135,7 @@ CBitSetIterTest::EresUnittest_Overrun()
 
 	ULONG vector_size = 32;
 
-	CAutoRef<CBitSet> a_pbs;
+	gpos::Ref<CBitSet> a_pbs;
 	gpos::Ref<CBitSet> pbs = GPOS_NEW(mp) CBitSet(mp, vector_size);
 	a_pbs = pbs;
 

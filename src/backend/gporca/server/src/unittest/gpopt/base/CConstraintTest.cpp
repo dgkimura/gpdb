@@ -20,6 +20,7 @@
 #include "gpos/task/CAutoTraceFlag.h"
 
 #include "gpopt/base/CDefaultComparator.h"
+#include "gpopt/base/CDrvdPropCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/eval/CConstExprEvaluatorDefault.h"
 #include "gpopt/exception.h"
@@ -1284,7 +1285,7 @@ CConstraintTest::EresUnittest_NegativeTests()
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
 	const gpos::Ref<IMDType> pmdtype =
-		mda.RetrieveType(&CMDIdGPDB::m_mdid_text);
+		mda.RetrieveType(GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_text));
 	CWStringConst str(GPOS_WSZ_LIT("text_col"));
 	CName name(mp, &str);
 	gpos::Ref<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(
@@ -1340,7 +1341,7 @@ CConstraintTest::EresUnittest_ConstraintsOnDates()
 	GPOS_ASSERT(nullptr != COptCtxt::PoctxtFromTLS()->Pcomp());
 
 	const gpos::Ref<IMDType> pmdtype =
-		mda.RetrieveType(&CMDIdGPDB::m_mdid_date);
+		mda.RetrieveType(GPOS_NEW(mp) CMDIdGPDB(CMDIdGPDB::m_mdid_date));
 	CWStringConst str(GPOS_WSZ_LIT("date_col"));
 	CName name(mp, &str);
 	gpos::Ref<CColRef> colref(COptCtxt::PoctxtFromTLS()->Pcf()->PcrCreate(

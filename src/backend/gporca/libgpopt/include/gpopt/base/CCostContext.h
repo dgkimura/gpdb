@@ -41,7 +41,8 @@ using CCostContextArray = gpos::Vector<gpos::Ref<CCostContext>>;
 using COSTCTXT_PTR = gpos::Ref<CCostContext>;
 
 // cost context pointer definition
-using CONST_COSTCTXT_PTR = const gpos::Ref<CCostContext>;
+// FIXME:KIMURA const fakenews
+using CONST_COSTCTXT_PTR = gpos::Ref<CCostContext>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -77,7 +78,7 @@ private:
 	EState m_estate;
 
 	// back pointer to owner group expression
-	gpos::Ref<CGroupExpression> m_pgexpr;
+	gpos::WeakRef<CGroupExpression> m_pgexpr;
 
 	// group expression to be used stats derivation during costing
 	gpos::Ref<CGroupExpression> m_pgexprForStats;
@@ -109,7 +110,7 @@ private:
 	// if tie-resolution succeeded, store a pointer to preferred cost context in output argument
 	static void BreakCostTiesForJoinPlans(const gpos::Ref<CCostContext> pccFst,
 										  const gpos::Ref<CCostContext> pccSnd,
-										  CONST_COSTCTXT_PTR *ppccPrefered,
+										  CONST_COSTCTXT_PTR &ppccPrefered,
 										  BOOL *pfTiesResolved);
 
 public:
@@ -183,7 +184,7 @@ public:
 	gpos::Ref<CGroupExpression>
 	Pgexpr() const
 	{
-		return m_pgexpr;
+		return m_pgexpr.Lock();
 	}
 
 	// group expression for stats derivation
@@ -286,6 +287,12 @@ public:
 		return Equals(*pccLeft, *pccRight);
 	}
 
+	static BOOL
+	Equals(const CCostContext *pccLeft, const CCostContext *pccRight)
+	{
+		return Equals(*pccLeft, *pccRight);
+	}
+
 	// hash function
 	static ULONG
 	HashValue(const CCostContext &cc)
@@ -298,6 +305,12 @@ public:
 	HashValue(const gpos::Ref<CCostContext> pcc)
 	{
 		return HashValue(*pcc);
+	}
+
+	static ULONG
+	HashValue(const CCostContext *pcc)
+	{
+		return COptimizationContext::HashValue(*(pcc->Poc()));
 	}
 
 	// debug print

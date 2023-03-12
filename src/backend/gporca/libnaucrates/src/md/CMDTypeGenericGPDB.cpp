@@ -14,6 +14,7 @@
 #include "gpos/string/CWStringDynamic.h"
 
 #include "gpopt/base/COptCtxt.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/base/CDatumGenericGPDB.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLDatumGeneric.h"
@@ -94,8 +95,6 @@ CMDTypeGenericGPDB::CMDTypeGenericGPDB(
 {
 	GPOS_ASSERT_IMP(m_is_fixed_length, 0 < m_length);
 	GPOS_ASSERT_IMP(!m_is_fixed_length, 0 > m_gpdb_length);
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 
 
 	m_datum_null = GPOS_NEW(m_mp) CDatumGenericGPDB(
@@ -114,7 +113,10 @@ CMDTypeGenericGPDB::CMDTypeGenericGPDB(
 CMDTypeGenericGPDB::~CMDTypeGenericGPDB()
 {
 	GPOS_DELETE(m_mdname);
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 
@@ -232,8 +234,8 @@ gpos::Ref<IDatum>
 CMDTypeGenericGPDB::GetDatumForDXLConstVal(
 	const gpos::Ref<CDXLScalarConstValue> dxl_op) const
 {
-	gpos::Ref<CDXLDatumGeneric> dxl_datum = CDXLDatumGeneric::Cast(
-		const_cast<gpos::Ref<CDXLDatum> >(dxl_op->GetDatumVal()));
+	gpos::Ref<CDXLDatumGeneric> dxl_datum =
+		gpos::dyn_cast<CDXLDatumGeneric>(dxl_op->GetDatumVal());
 	GPOS_ASSERT(nullptr != dxl_op);
 
 	LINT lint_value = 0;
@@ -267,7 +269,7 @@ CMDTypeGenericGPDB::GetDatumForDXLDatum(
 	CMemoryPool *mp, const gpos::Ref<CDXLDatum> dxl_datum) const
 {
 	gpos::Ref<CDXLDatumGeneric> dxl_datum_generic =
-		CDXLDatumGeneric::Cast(const_cast<gpos::Ref<CDXLDatum> >(dxl_datum));
+		gpos::dyn_cast<CDXLDatumGeneric>(dxl_datum);
 
 	LINT lint_value = 0;
 	if (dxl_datum_generic->IsDatumMappableToLINT())
@@ -463,8 +465,8 @@ BOOL
 CMDTypeGenericGPDB::HasByte2IntMapping(const gpos::Ref<IMDType> mdtype)
 {
 	gpos::Ref<IMDId> mdid = mdtype->MDId();
-	return mdtype->IsTextRelated() || mdid->Equals(&CMDIdGPDB::m_mdid_uuid) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_cash) ||
+	return mdtype->IsTextRelated() || mdid->Equals(CMDIdGPDB::m_mdid_uuid) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_cash) ||
 		   IsTimeRelatedTypeMappableToLint(mdid);
 }
 
@@ -491,9 +493,9 @@ CMDTypeGenericGPDB::CreateGenericNullDatum(CMemoryPool *mp,
 BOOL
 CMDTypeGenericGPDB::HasByte2DoubleMapping(const gpos::Ref<IMDId> mdid)
 {
-	return mdid->Equals(&CMDIdGPDB::m_mdid_numeric) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_float4) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_float8) ||
+	return mdid->Equals(CMDIdGPDB::m_mdid_numeric) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_float4) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_float8) ||
 		   IsTimeRelatedTypeMappableToDouble(mdid) ||
 		   IsNetworkRelatedType(mdid);
 }
@@ -508,15 +510,15 @@ CMDTypeGenericGPDB::HasByte2DoubleMapping(const gpos::Ref<IMDId> mdid)
 BOOL
 CMDTypeGenericGPDB::IsTimeRelatedType(const gpos::Ref<IMDId> mdid)
 {
-	return mdid->Equals(&CMDIdGPDB::m_mdid_date) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_time) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_timeTz) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_timestamp) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_timestampTz) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_abs_time) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_relative_time) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_interval) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_time_interval);
+	return mdid->Equals(CMDIdGPDB::m_mdid_date) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_time) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_timeTz) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_timestamp) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_timestampTz) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_abs_time) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_relative_time) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_interval) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_time_interval);
 }
 
 //---------------------------------------------------------------------------
@@ -529,9 +531,9 @@ CMDTypeGenericGPDB::IsTimeRelatedType(const gpos::Ref<IMDId> mdid)
 BOOL
 CMDTypeGenericGPDB::IsNetworkRelatedType(const gpos::Ref<IMDId> mdid)
 {
-	return mdid->Equals(&CMDIdGPDB::m_mdid_inet) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_cidr) ||
-		   mdid->Equals(&CMDIdGPDB::m_mdid_macaddr);
+	return mdid->Equals(CMDIdGPDB::m_mdid_inet) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_cidr) ||
+		   mdid->Equals(CMDIdGPDB::m_mdid_macaddr);
 }
 
 gpos::Ref<IMDId>

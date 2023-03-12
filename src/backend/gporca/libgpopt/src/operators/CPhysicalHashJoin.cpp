@@ -948,11 +948,10 @@ CPhysicalHashJoin::CreateOptRequests(CMemoryPool *mp)
 	// some cases, but can create better alternatives to DPE, so
 	// we also generate this additional request for expressions that originated
 	// from CXformExpandNAryJoinGreedy.
-	gpos::Ref<CPhysicalJoin> physical_join =
-		gpos::dyn_cast<CPhysicalJoin>(this);
 	if ((GPOPT_FDISABLED_XFORM(CXform::ExfExpandNAryJoinDP) &&
 		 GPOPT_FDISABLED_XFORM(CXform::ExfExpandNAryJoinDPv2)) ||
-		physical_join->OriginXform() == CXform::ExfExpandNAryJoinGreedy)
+		dynamic_cast<CPhysicalJoin *>(this)->OriginXform() ==
+			CXform::ExfExpandNAryJoinGreedy)
 	{
 		SetPartPropagateRequests(2);
 	}

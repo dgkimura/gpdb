@@ -143,7 +143,7 @@ CJobGroupExploration::Init(gpos::Ref<CGroup> pgroup)
 BOOL
 CJobGroupExploration::FScheduleGroupExpressions(CSchedulerContext *psc)
 {
-	gpos::Ref<CGroupExpression> pgexprLast = m_pgexprLastScheduled;
+	gpos::Ref<CGroupExpression> pgexprLast = m_pgexprLastScheduled.Lock();
 
 	// iterate on expressions and schedule them as needed
 	gpos::Ref<CGroupExpression> pgexpr = PgexprFirstUnsched();
@@ -185,7 +185,7 @@ CJobGroupExploration::EevtStartExploration(CSchedulerContext *,	 //psc
 {
 	// get a job pointer
 	CJobGroupExploration *pjge = PjConvert(pjOwner);
-	gpos::Ref<CGroup> pgroup = pjge->m_pgroup;
+	gpos::Ref<CGroup> pgroup = pjge->m_pgroup.Lock();
 
 	// move group to exploration state
 	{

@@ -32,8 +32,7 @@ using COperatorArray = gpos::Vector<gpos::Ref<COperator>>;
 
 // hash map mapping CColRef -> CColRef
 using ColRefToColRefMap =
-	CHashMap<CColRef, CColRef, CColRef::HashValue, CColRef::Equals,
-			 CleanupNULL<CColRef>, CleanupNULL<CColRef>>;
+	gpos::UnorderedMap<gpos::Ref<CColRef>, gpos::Ref<CColRef>>;
 
 //---------------------------------------------------------------------------
 //	@class:

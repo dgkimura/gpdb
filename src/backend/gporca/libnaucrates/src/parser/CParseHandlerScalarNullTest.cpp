@@ -79,9 +79,9 @@ CParseHandlerScalarNullTest::StartElement(const XMLCh *const,  // element_uri,
 		}
 
 		// parse and create scalar NullTest
-		gpos::Ref<CDXLScalarNullTest> dxl_op = (gpos::Ref<CDXLScalarNullTest>)
-			CDXLOperatorFactory::MakeDXLNullTest(
-				m_parse_handler_mgr->GetDXLMemoryManager(), is_null);
+		gpos::Ref<CDXLScalarNullTest> dxl_op =
+			gpos::cast<CDXLScalarNullTest>(CDXLOperatorFactory::MakeDXLNullTest(
+				m_parse_handler_mgr->GetDXLMemoryManager(), is_null));
 
 		// construct node from the created child node
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);

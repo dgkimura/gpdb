@@ -26,6 +26,7 @@
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/operators/CExpressionUtils.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/IMDFunction.h"
 #include "naucrates/md/IMDScalarOp.h"
 #include "naucrates/md/IMDType.h"
@@ -101,8 +102,8 @@ CExpressionFactorizer::AddFactor(CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 #endif	// GPOS_DEBUG
 )
 {
-	ULONG *pul = pexprmapFactors->Find(pexpr);
-	GPOS_ASSERT_IMP(nullptr != pul, ulDisjuncts == *pul);
+	gpos::Ref<UlongRef> pul = pexprmapFactors->Find(pexpr);
+	GPOS_ASSERT_IMP(nullptr != pul, ulDisjuncts == pul->value());
 
 	if (nullptr != pul)
 	{
@@ -176,23 +177,24 @@ CExpressionFactorizer::PexprmapFactors(CMemoryPool *mp,
 		for (ULONG ulInner = 0; ulInner < size; ulInner++)
 		{
 			gpos::Ref<CExpression> pexprConj = (*pdrgpexpr)[ulInner];
-			ULONG *pul = pexprmapGlobal->Find(pexprConj);
+			gpos::Ref<UlongRef> pul = pexprmapGlobal->Find(pexprConj);
 			if (nullptr == pul)
 			{
-				(void) pexprmapGlobal->Insert(pexprConj, GPOS_NEW(mp) ULONG(1));
+				(void) pexprmapGlobal->Insert(pexprConj,
+											  GPOS_NEW(mp) UlongRef(1));
 			}
 			else
 			{
-				(*pul)++;
+				(pul->value())++;
 			}
 
 			pul = pexprmapGlobal->Find(pexprConj);
-			if (*pul == ulDisjuncts)
+			if (pul->value() == ulDisjuncts)
 			{
 				// reached the count of initial disjuncts, add expression to factors map
 
-				(void) pexprmapFactors->Insert(pexprConj,
-											   GPOS_NEW(mp) ULONG(ulDisjuncts));
+				(void) pexprmapFactors->Insert(
+					pexprConj, GPOS_NEW(mp) UlongRef(ulDisjuncts));
 			}
 		}
 	}
@@ -445,8 +447,7 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId(
 	BOOL fAllowNewSources, ULONG ulOpSourceId)
 {
 	GPOS_ASSERT(nullptr != psrc2array);
-	gpos::Ref<CExpressionArrays> pdrgpdrgpexpr =
-		psrc2array->Find(&ulOpSourceId);
+	gpos::Ref<CExpressionArrays> pdrgpdrgpexpr = psrc2array->Find(ulOpSourceId);
 
 	// if there is no entry, we start recording expressions that will become disjuncts
 	// corresponding to the source operator we are considering
@@ -463,7 +464,7 @@ CExpressionFactorizer::PdrgPdrgpexprDisjunctArrayForSourceId(
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
 #endif	// GPOS_DEBUG
-			psrc2array->Insert(GPOS_NEW(mp) ULONG(ulOpSourceId), pdrgpdrgpexpr);
+			psrc2array->Insert(ulOpSourceId, pdrgpdrgpexpr);
 		GPOS_ASSERT(fInserted);
 	}
 

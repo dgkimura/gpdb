@@ -17,6 +17,7 @@
 #include "gpos/base.h"
 
 #include "naucrates/base/IDatumInt2.h"
+#include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/md/CGPDBTypeHelper.h"
 #include "naucrates/md/IMDTypeInt2.h"
 
@@ -100,7 +101,7 @@ private:
 	gpos::Ref<IMDId> m_mdid_count;
 
 	// DXL for object
-	const CWStringDynamic *m_dxl_str;
+	mutable CWStringDynamic *m_dxl_str{nullptr};
 
 	// type name and type
 	static CWStringConst m_str;
@@ -126,6 +127,12 @@ public:
 	const CWStringDynamic *
 	GetStrRepr() const override
 	{
+		if (nullptr == m_dxl_str)
+		{
+			m_dxl_str = CDXLUtils::SerializeMDObj(
+				m_mp, gpos::dyn_cast<IMDCacheObject>(SharedFromThis()),
+				false /*fSerializeHeader*/, false /*indentation*/);
+		}
 		return m_dxl_str;
 	}
 

@@ -127,8 +127,8 @@ CJobTransformation::EevtTransform(CSchedulerContext *psc, CJob *pjOwner)
 	CJobTransformation *pjt = PjConvert(pjOwner);
 	CMemoryPool *pmpGlobal = psc->GetGlobalMemoryPool();
 	CMemoryPool *pmpLocal = psc->PmpLocal();
-	gpos::Ref<CGroupExpression> pgexpr = pjt->m_pgexpr;
-	gpos::Ref<CXform> pxform = pjt->m_xform;
+	gpos::Ref<CGroupExpression> pgexpr = pjt->m_pgexpr.Lock();
+	gpos::Ref<CXform> pxform = pjt->m_xform.Lock();
 
 	// insert transformation results to memo
 	gpos::Ref<CXformResult> pxfres =

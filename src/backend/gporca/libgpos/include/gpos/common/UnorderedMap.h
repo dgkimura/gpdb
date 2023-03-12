@@ -44,7 +44,7 @@ public:
 	BOOL
 	Insert(K key, T t)
 	{
-		return unordered_map_.emplace(std::move(key), std::move(t)).second;
+		return unordered_map_.emplace(key, t).second;
 	}
 
 	// This method is only retained for backwards compatibility.
@@ -90,10 +90,18 @@ public:
 		return unordered_map_.size();
 	}
 
+	void
+	Clear() noexcept
+	{
+		unordered_map_.clear();
+	}
+
 	class LegacyIterator
 	{
 		const_iterator iterator_;
 		const const_iterator end_;
+		// KIMURA:FIXME:TODO: This is hack because legacy iterator starts at index 1...
+		bool active{false};
 
 	public:
 		LegacyIterator(const gpos::Ref<UnorderedMap> map)
@@ -104,24 +112,24 @@ public:
 		bool
 		Advance()
 		{
-			if (iterator_ == end_)
+			if (active)
 			{
-				return false;
+				++iterator_;
 			}
-			++iterator_;
-			return true;
+			active = iterator_ != end_;
+			return iterator_ != end_;
 		}
 
 		const K &
 		Key() const
 		{
-			return std::prev(iterator_)->first;
+			return iterator_->first;
 		}
 
 		const T &
 		Value() const
 		{
-			return std::prev(iterator_)->second;
+			return iterator_->second;
 		}
 	};
 };

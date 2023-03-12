@@ -62,7 +62,7 @@ private:
 	gpos::Ref<CGroupExpression> m_pgexpr;
 
 	// attached cost context
-	gpos::Ref<CCostContext> m_pcc;
+	gpos::WeakRef<CCostContext> m_pcc;
 
 	// derived plan properties of the gexpr attached by a CostContext under
 	// the default CDrvdPropCtxtPlan. See DerivePlanPropsForCostContext()
@@ -81,7 +81,7 @@ private:
 	gpos::Ref<IStatisticsArray> m_pdrgpstat;
 
 	// array of children's required properties
-	CReqdPropArray *m_pdrgprp;
+	gpos::Ref<CReqdPropArray> m_pdrgprp;
 
 	// return an array of stats objects starting from the first stats object referenced by child
 	gpos::Ref<IStatisticsArray> PdrgpstatOuterRefs(

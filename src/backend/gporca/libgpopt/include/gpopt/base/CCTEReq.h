@@ -113,15 +113,11 @@ private:
 
 	// map CTE id to CTE Req entry
 	using UlongToCTEReqEntryMap =
-		CHashMap<ULONG, CCTEReqEntry, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CCTEReqEntry>>;
+		gpos::UnorderedMap<ULONG, gpos::Ref<CCTEReqEntry>>;
 
 	// map iterator
 	using UlongToCTEReqEntryMapIter =
-		CHashMapIter<ULONG, CCTEReqEntry, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupRelease<CCTEReqEntry>>;
+		gpos::UnorderedMap<ULONG, gpos::Ref<CCTEReqEntry>>::LegacyIterator;
 
 	// memory pool
 	CMemoryPool *m_mp;

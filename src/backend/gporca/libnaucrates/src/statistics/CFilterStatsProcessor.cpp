@@ -814,7 +814,10 @@ CFilterStatsProcessor::MakeHistArrayCmpAnyFilter(
 	gpos::Ref<CPointArray> points = pred_stats->GetPoints();
 	if (points->Size() > 1)
 	{
-		points->Sort(&CUtils::CPointCmp);
+		points->Sort(
+			[](const gpos::Ref<CPoint> &p1, const gpos::Ref<CPoint> &p2) {
+				return p1->IsLessThan(p2);
+			});
 	}
 
 	gpos::Ref<CPointArray> deduped_points = GPOS_NEW(mp) CPointArray(mp);

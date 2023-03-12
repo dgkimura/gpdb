@@ -202,9 +202,9 @@ CExpressionTest::EresUnittest_SimpleOps()
 		gpos::Ref<CExpression> pexpr = rgpf[i](mp);
 
 		gpos::Ref<CLogicalGet> popGet =
-			gpos::dyn_cast<CLogicalGet> > (pexpr - Pop());
+			gpos::dyn_cast<CLogicalGet>(pexpr->Pop());
 		gpos::Ref<CLogicalDynamicGetBase> popDynGet =
-			gpos::dyn_cast<CLogicalDynamicGetBase> > (pexpr - Pop());
+			gpos::dyn_cast<CLogicalDynamicGetBase>(pexpr->Pop());
 		gpos::Ref<CColRefArray> colrefs = nullptr;
 
 		if (nullptr != popGet)
@@ -249,8 +249,7 @@ CExpressionTest::EresUnittest_SimpleOps()
 		gpos::Ref<UlongToColRefMap> colref_mapping =
 			GPOS_NEW(mp) UlongToColRefMap(mp);
 
-		BOOL result = colref_mapping->Insert(GPOS_NEW(mp) ULONG(pcrOld->Id()),
-											 new_colref);
+		BOOL result = colref_mapping->Insert(pcrOld->Id(), new_colref);
 		GPOS_ASSERT(result);
 		gpos::Ref<CExpression> pexprCopy = pexpr->PexprCopyWithRemappedColumns(
 			mp, colref_mapping, true /*must_exist*/);
@@ -1124,14 +1123,15 @@ CExpressionTest::EresCheckCachedReqdCols(CMemoryPool *mp,
 
 		// check if cached columns pointer is the same as computed columns pointer,
 		// if this is not the case, then we have re-computed the same set of columns and test should fail
-		if (pcrsChildReqd != exprhdl.Prpp(ul)->PcrsRequired())
+		if (!pcrsChildReqd->Equals(exprhdl.Prpp(ul)->PcrsRequired()))
 		{
 			CAutoTrace at(mp);
 			at.Os() << "\nExpression: \n" << *pexprChild;
-			at.Os() << "\nCached cols: " << pcrsChildReqd << " : "
+			at.Os() << "\nCached cols: " << pcrsChildReqd.get() << " : "
 					<< *pcrsChildReqd;
-			at.Os() << "\nComputed cols: " << exprhdl.Prpp(ul)->PcrsRequired()
-					<< " : " << *exprhdl.Prpp(ul)->PcrsRequired();
+			at.Os() << "\nComputed cols: "
+					<< exprhdl.Prpp(ul)->PcrsRequired().get() << " : "
+					<< *exprhdl.Prpp(ul)->PcrsRequired();
 
 			eres = GPOS_FAILED;
 			continue;

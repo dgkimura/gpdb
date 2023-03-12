@@ -308,8 +308,8 @@ public:
 	static void ComputeCardUpperBounds(
 		CMemoryPool *mp,  // memory pool
 		const gpos::Ref<CStatistics> input_stats,
-		CStatistics
-			*output_stats,	  // output statistics object that is to be updated
+		gpos::Ref<CStatistics>
+			output_stats,	  // output statistics object that is to be updated
 		CDouble rows_output,  // estimated output cardinality of the operator
 		CStatistics::ECardBoundingMethod
 			card_bounding_method  // technique used to estimate max source cardinality in the output stats object

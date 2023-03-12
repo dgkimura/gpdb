@@ -17,6 +17,7 @@
 #include "gpopt/base/CUtils.h"
 #include "gpopt/base/IComparator.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/IMDScalarOp.h"
 
 using namespace gpopt;

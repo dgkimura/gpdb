@@ -61,7 +61,8 @@ CPhysicalDynamicBitmapTableScan::CPhysicalDynamicBitmapTableScan(
 BOOL
 CPhysicalDynamicBitmapTableScan::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchDynamicBitmapScan(this, pop);
+	return CUtils::FMatchDynamicBitmapScan(
+		gpos::dyn_cast<CPhysicalDynamicBitmapTableScan>(SharedFromThis()), pop);
 }
 
 //---------------------------------------------------------------------------

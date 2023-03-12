@@ -29,13 +29,10 @@ using CColRefSetArray = gpos::Vector<gpos::Ref<CColRefSet>>;
 
 // hash map mapping CColRef -> CColRefSet
 using ColRefToColRefSetMap =
-	CHashMap<CColRef, CColRefSet, CColRef::HashValue, CColRef::Equals,
-			 CleanupNULL<CColRef>, CleanupRelease<CColRefSet>>;
+	gpos::UnorderedMap<gpos::Ref<CColRef>, gpos::Ref<CColRefSet>>;
 
 // hash map mapping INT -> CColRef
-using IntToColRefMap =
-	CHashMap<INT, CColRef, gpos::HashValue<INT>, gpos::Equals<INT>,
-			 CleanupDelete<INT>, CleanupNULL<CColRef>>;
+using IntToColRefMap = gpos::UnorderedMap<INT, gpos::Ref<CColRef>>;
 
 //---------------------------------------------------------------------------
 //	@class:

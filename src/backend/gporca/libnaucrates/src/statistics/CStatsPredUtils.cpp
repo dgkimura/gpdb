@@ -355,13 +355,10 @@ CStatsPredUtils::IsJoinPredSupportedForStatsEstimation(
 	gpos::Ref<CColRefSetArray>
 		output_col_refsets,	 // array of output columns of join's relational inputs
 	BOOL is_semi_or_anti_join, CStatsPred::EStatsCmpType *stats_pred_cmp_type,
-	const gpos::Ref<CColRef> *col_ref_outer,
-	const gpos::Ref<CColRef> *col_ref_inner)
+	gpos::Ref<CColRef> &col_ref_outer, gpos::Ref<CColRef> &col_ref_inner)
 {
-	GPOS_ASSERT(nullptr != col_ref_outer);
-	GPOS_ASSERT(nullptr != col_ref_inner);
-	GPOS_ASSERT(nullptr == *col_ref_outer);
-	GPOS_ASSERT(nullptr == *col_ref_inner);
+	GPOS_ASSERT(nullptr == col_ref_outer);
+	GPOS_ASSERT(nullptr == col_ref_inner);
 	gpos::Ref<COperator> expr_op = expr->Pop();
 
 	BOOL is_INDF = CPredicateUtils::FINDF(expr);
@@ -372,8 +369,8 @@ CStatsPredUtils::IsJoinPredSupportedForStatsEstimation(
 	gpos::Ref<CExpression> expr_right = nullptr;
 
 	// initialize output parameters
-	*col_ref_inner = nullptr;
-	*col_ref_outer = nullptr;
+	col_ref_inner = nullptr;
+	col_ref_outer = nullptr;
 
 	if (!is_scalar_cmp && !is_INDF && !is_IDF)
 	{
@@ -424,12 +421,12 @@ CStatsPredUtils::IsJoinPredSupportedForStatsEstimation(
 
 	// check whether left or right expressions are simple columns or casts
 	// of simple columns
-	(*col_ref_outer) =
+	(col_ref_outer) =
 		CCastUtils::PcrExtractFromScIdOrCastScId(assigned_expr_outer);
-	(*col_ref_inner) =
+	(col_ref_inner) =
 		CCastUtils::PcrExtractFromScIdOrCastScId(assigned_expr_inner);
 
-	if (nullptr != *col_ref_outer && nullptr != *col_ref_inner)
+	if (nullptr != col_ref_outer && nullptr != col_ref_inner)
 	{
 		// a simple predicate of the form col1 <op> col2 (casts are allowed)
 		return true;
@@ -445,10 +442,10 @@ CStatsPredUtils::IsJoinPredSupportedForStatsEstimation(
 	if (*stats_pred_cmp_type == CStatsPred::EstatscmptEq)
 	{
 		BOOL outer_is_ndv_preserving =
-			(nullptr != *col_ref_outer ||
+			(nullptr != col_ref_outer ||
 			 CUtils::IsExprNDVPreserving(assigned_expr_outer, col_ref_outer));
 		BOOL inner_is_ndv_preserving =
-			(nullptr != *col_ref_inner ||
+			(nullptr != col_ref_inner ||
 			 CUtils::IsExprNDVPreserving(assigned_expr_inner, col_ref_inner));
 
 		if (!outer_is_ndv_preserving && !inner_is_ndv_preserving)
@@ -1290,13 +1287,13 @@ CStatsPredUtils::ExtractJoinStatsFromJoinPred(
 		return nullptr;
 	}
 
-	const gpos::Ref<CColRef> col_ref_outer = nullptr;
-	const gpos::Ref<CColRef> col_ref_inner = nullptr;
+	gpos::Ref<CColRef> col_ref_outer = nullptr;
+	gpos::Ref<CColRef> col_ref_inner = nullptr;
 	CStatsPred::EStatsCmpType stats_cmp_type = CStatsPred::EstatscmptOther;
 
 	BOOL fSupportedScIdentComparison = IsJoinPredSupportedForStatsEstimation(
 		join_pred_expr, output_col_refsets, is_semi_or_anti_join,
-		&stats_cmp_type, &col_ref_outer, &col_ref_inner);
+		&stats_cmp_type, col_ref_outer, col_ref_inner);
 	if (fSupportedScIdentComparison &&
 		CStatsPred::EstatscmptOther != stats_cmp_type)
 	{

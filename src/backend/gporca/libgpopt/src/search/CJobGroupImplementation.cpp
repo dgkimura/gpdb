@@ -147,7 +147,7 @@ CJobGroupImplementation::Init(gpos::Ref<CGroup> pgroup)
 BOOL
 CJobGroupImplementation::FScheduleGroupExpressions(CSchedulerContext *psc)
 {
-	gpos::Ref<CGroupExpression> pgexprLast = m_pgexprLastScheduled;
+	gpos::Ref<CGroupExpression> pgexprLast = m_pgexprLastScheduled.Lock();
 
 	// iterate on expression and schedule them as needed
 	gpos::Ref<CGroupExpression> pgexpr = PgexprFirstUnsched();
@@ -190,7 +190,7 @@ CJobGroupImplementation::EevtStartImplementation(CSchedulerContext *psc,
 {
 	// get a job pointer
 	CJobGroupImplementation *pjgi = PjConvert(pjOwner);
-	gpos::Ref<CGroup> pgroup = pjgi->m_pgroup;
+	gpos::Ref<CGroup> pgroup = pjgi->m_pgroup.Lock();
 
 	if (!pgroup->FExplored())
 	{

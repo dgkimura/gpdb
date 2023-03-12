@@ -12,6 +12,7 @@
 #define GPOPT_CJobGroup_H
 
 #include "gpos/base.h"
+#include "gpos/common/Ref.h"
 
 #include "gpopt/search/CJob.h"
 
@@ -36,10 +37,10 @@ class CJobGroup : public CJob
 private:
 protected:
 	// target group
-	gpos::Ref<CGroup> m_pgroup{nullptr};
+	gpos::WeakRef<CGroup> m_pgroup{nullptr};
 
 	// last scheduled group expression
-	gpos::Ref<CGroupExpression> m_pgexprLastScheduled;
+	gpos::WeakRef<CGroupExpression> m_pgexprLastScheduled;
 
 	// ctor
 	CJobGroup() = default;

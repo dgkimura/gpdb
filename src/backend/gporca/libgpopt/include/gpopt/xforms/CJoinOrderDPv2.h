@@ -300,8 +300,7 @@ private:
 		}
 	};
 
-	using SExpressionInfoArray =
-		CDynamicPtrArray<SExpressionInfo, CleanupRelease<SExpressionInfo>>;
+	using SExpressionInfoArray = gpos::Vector<gpos::Ref<SExpressionInfo>>;
 
 	//---------------------------------------------------------------------------
 	//	@struct:
@@ -317,7 +316,7 @@ private:
 		gpos::Ref<CBitSet> m_atoms;
 		// infos of the best (lowest cost) expressions (so far, if at the current level)
 		// for each interesting property
-		SExpressionInfoArray *m_best_expr_info_array;
+		gpos::Ref<SExpressionInfoArray> m_best_expr_info_array;
 		CDouble m_cardinality;
 		CDouble m_lowest_expr_cost;
 
@@ -344,8 +343,7 @@ private:
 	};
 
 	// dynamic array of SGroupInfo, where each index represents an alternative group of a given level k
-	using SGroupInfoArray =
-		CDynamicPtrArray<SGroupInfo, CleanupRelease<SGroupInfo>>;
+	using SGroupInfoArray = gpos::Vector<gpos::Ref<SGroupInfo>>;
 
 	// info for a join level, the set of all groups representing <m_level>-way joins
 	struct SLevelInfo : public CRefCount<SLevelInfo>
@@ -385,25 +383,22 @@ private:
 	}
 
 	using ExpressionToEdgeMap =
-		CHashMap<CExpression, SEdge, CExpression::HashValue, CUtils::Equals,
-				 CleanupRelease<CExpression>, CleanupRelease<SEdge>>;
+		gpos::UnorderedMap<gpos::Ref<CExpression>, gpos::Ref<SEdge>>;
 
 	// dynamic array of SGroupInfos
 	using BitSetToGroupInfoMap =
-		CHashMap<CBitSet, SGroupInfo, UlHashBitSet, FEqualBitSet,
-				 CleanupRelease<CBitSet>, CleanupRelease<SGroupInfo>>;
+		gpos::UnorderedMap<gpos::Ref<CBitSet>, gpos::Ref<SGroupInfo>>;
 
 	// iterator over group infos in a level
 	using BitSetToGroupInfoMapIter =
-		CHashMapIter<CBitSet, SGroupInfo, UlHashBitSet, FEqualBitSet,
-					 CleanupRelease<CBitSet>, CleanupRelease<SGroupInfo>>;
+		gpos::UnorderedMap<gpos::Ref<CBitSet>, gpos::Ref<SGroupInfo>>;
 
 	// dynamic array of SLevelInfos, where each index represents the level
-	using DPv2Levels = CDynamicPtrArray<SLevelInfo, CleanupRelease<SLevelInfo>>;
+	using DPv2Levels = gpos::Vector<gpos::Ref<SLevelInfo>>;
 
 	// an array of an array of groups, organized by level at the first array dimension,
 	// main data structure for dynamic programming
-	DPv2Levels *m_join_levels;
+	gpos::Ref<DPv2Levels> m_join_levels;
 
 	// map to find the associated edge in the join graph from a join predicate
 	gpos::Ref<ExpressionToEdgeMap> m_expression_to_edge_map;

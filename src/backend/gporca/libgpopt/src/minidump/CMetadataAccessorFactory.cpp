@@ -15,22 +15,22 @@ CMetadataAccessorFactory::CMetadataAccessorFactory(CMemoryPool *mp,
 												   const CHAR *file_name)
 {
 	// set up MD providers
-	CAutoRef<CMDProviderMemory> apmdp(GPOS_NEW(mp)
-										  CMDProviderMemory(mp, file_name));
+	gpos::Ref<CMDProviderMemory> apmdp(GPOS_NEW(mp)
+										   CMDProviderMemory(mp, file_name));
 	const gpos::Ref<CSystemIdArray> pdrgpsysid = pdxlmd->GetSysidPtrArray();
-	CAutoRef<CMDProviderArray> apdrgpmdp(GPOS_NEW(mp) CMDProviderArray(mp));
+	gpos::Ref<CMDProviderArray> apdrgpmdp(GPOS_NEW(mp) CMDProviderArray(mp));
 
 	// ensure there is at least ONE system id
 
-	apdrgpmdp->Append(apmdp.Value());
+	apdrgpmdp->Append(apmdp);
 
 	for (ULONG ul = 1; ul < pdrgpsysid->Size(); ul++)
 	{
-		apdrgpmdp->Append(apmdp.Value());
+		apdrgpmdp->Append(apmdp);
 	}
 
-	m_apmda = GPOS_NEW(mp) CMDAccessor(
-		mp, CMDCache::Pcache(), pdxlmd->GetSysidPtrArray(), apdrgpmdp.Value());
+	m_apmda = GPOS_NEW(mp) CMDAccessor(mp, CMDCache::Pcache(),
+									   pdxlmd->GetSysidPtrArray(), apdrgpmdp);
 }
 
 CMDAccessor *

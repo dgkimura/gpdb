@@ -52,7 +52,7 @@ private:
 	CMDName *m_mdname;
 
 	// DXL string for object
-	CWStringDynamic *m_dxl_str;
+	mutable CWStringDynamic *m_dxl_str{nullptr};
 
 	gpos::Ref<CMDExtStatsInfoArray> m_extstats_info_array;
 

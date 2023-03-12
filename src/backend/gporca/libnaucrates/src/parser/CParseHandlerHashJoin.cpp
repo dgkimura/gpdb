@@ -67,8 +67,8 @@ CParseHandlerHashJoin::StartElement(const XMLCh *const,	 // element_uri,
 
 	// parse and create Hash join operator
 	m_dxl_op =
-		(gpos::Ref<CDXLPhysicalHashJoin>) CDXLOperatorFactory::MakeDXLHashJoin(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+		gpos::cast<CDXLPhysicalHashJoin>(CDXLOperatorFactory::MakeDXLHashJoin(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance

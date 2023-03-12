@@ -67,8 +67,8 @@ CParseHandlerAgg::StartElement(const XMLCh *const,	// element_uri,
 	}
 
 	// parse and create group by operator
-	m_dxl_op = (gpos::Ref<CDXLPhysicalAgg>) CDXLOperatorFactory::MakeDXLAgg(
-		m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+	m_dxl_op = gpos::cast<CDXLPhysicalAgg>(CDXLOperatorFactory::MakeDXLAgg(
+		m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance

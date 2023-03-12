@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CCTEMap.h"
 #include "gpopt/base/CDrvdPropPlan.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;
@@ -64,15 +65,13 @@ CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 	UlongToDrvdPropPlanMapIter hmulpdpiter(m_phmulpdpCTEs);
 	while (hmulpdpiter.Advance())
 	{
-		ULONG id = *(hmulpdpiter.Key());
-		gpos::Ref<CDrvdPropPlan> pdpplan =
-			const_cast<gpos::Ref<CDrvdPropPlan> >(hmulpdpiter.Value());
+		ULONG id = hmulpdpiter.Key();
+		gpos::Ref<CDrvdPropPlan> pdpplan = hmulpdpiter.Value();
 
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
 #endif	// GPOS_DEBUG
-			pdpctxtplan->m_phmulpdpCTEs->Insert(GPOS_NEW(m_mp) ULONG(id),
-												pdpplan);
+			pdpctxtplan->m_phmulpdpCTEs->Insert(id, pdpplan);
 		GPOS_ASSERT(fInserted);
 	}
 
@@ -109,8 +108,8 @@ CDrvdPropCtxtPlan::AddProps(gpos::Ref<CDrvdProp> pdp)
 
 	if (m_fUpdateCTEMap)
 	{
-		BOOL fInserted GPOS_ASSERTS_ONLY = m_phmulpdpCTEs->Insert(
-			GPOS_NEW(m_mp) ULONG(ulProducerId), pdpplanProducer);
+		BOOL fInserted GPOS_ASSERTS_ONLY =
+			m_phmulpdpCTEs->Insert(ulProducerId, pdpplanProducer);
 		GPOS_ASSERT(fInserted);
 	}
 }
@@ -131,9 +130,8 @@ CDrvdPropCtxtPlan::OsPrint(IOstream &os) const
 	UlongToDrvdPropPlanMapIter hmulpdpiter(m_phmulpdpCTEs);
 	while (hmulpdpiter.Advance())
 	{
-		ULONG id = *(hmulpdpiter.Key());
-		gpos::Ref<CDrvdPropPlan> pdpplan =
-			const_cast<gpos::Ref<CDrvdPropPlan> >(hmulpdpiter.Value());
+		ULONG id = hmulpdpiter.Key();
+		gpos::Ref<CDrvdPropPlan> pdpplan = hmulpdpiter.Value();
 
 		os << id << "-->" << *pdpplan << std::endl;
 	}
@@ -155,7 +153,7 @@ CDrvdPropCtxtPlan::PdpplanCTEProducer(ULONG ulCTEId) const
 {
 	GPOS_ASSERT(nullptr != m_phmulpdpCTEs);
 
-	return m_phmulpdpCTEs->Find(&ulCTEId);
+	return m_phmulpdpCTEs->Find(ulCTEId);
 }
 
 
@@ -174,8 +172,7 @@ CDrvdPropCtxtPlan::CopyCTEProducerProps(gpos::Ref<CDrvdPropPlan> pdpplan,
 	GPOS_ASSERT(nullptr != pdpplan);
 
 
-	BOOL fInserted GPOS_ASSERTS_ONLY =
-		m_phmulpdpCTEs->Insert(GPOS_NEW(m_mp) ULONG(ulCTEId), pdpplan);
+	BOOL fInserted GPOS_ASSERTS_ONLY = m_phmulpdpCTEs->Insert(ulCTEId, pdpplan);
 	GPOS_ASSERT(fInserted);
 }
 // EOF

@@ -33,6 +33,7 @@
 #include "gpopt/engine/CStatisticsConfig.h"
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/base/CQueryToDXLResult.h"
 #include "naucrates/dxl/parser/CParseHandlerDXL.h"
 #include "naucrates/dxl/parser/CParseHandlerDummy.h"

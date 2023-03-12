@@ -279,8 +279,7 @@ COptimizationContext::FOptimizeSort(
 
 	gpos::Ref<CPhysicalSort> pop = CPhysicalSort::PopConvert(pgexprSort->Pop());
 
-	return poc->Prpp()->Peo()->FCompatible(
-		const_cast<gpos::Ref<COrderSpec> >(pop->Pos()));
+	return poc->Prpp()->Peo()->FCompatible(pop->Pos());
 }
 
 

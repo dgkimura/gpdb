@@ -11,7 +11,6 @@
 
 #include "naucrates/md/CMDRelationCtasGPDB.h"
 
-#include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLCtasStorageOptions.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 
@@ -86,8 +85,6 @@ CMDRelationCtasGPDB::CMDRelationCtasGPDB(
 
 		m_col_width_array->Append(GPOS_NEW(mp) CDouble(mdcol->Length()));
 	}
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -102,7 +99,10 @@ CMDRelationCtasGPDB::~CMDRelationCtasGPDB()
 {
 	GPOS_DELETE(m_mdname_schema);
 	GPOS_DELETE(m_mdname);
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 //---------------------------------------------------------------------------

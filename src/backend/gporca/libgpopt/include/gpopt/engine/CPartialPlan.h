@@ -43,7 +43,7 @@ class CPartialPlan : public CRefCount<CPartialPlan>
 {
 private:
 	// root group expression
-	gpos::Ref<CGroupExpression> m_pgexpr;
+	gpos::WeakRef<CGroupExpression> m_pgexpr;
 
 	// required plan properties of root operator
 	gpos::Ref<CReqdPropPlan> m_prpp;
@@ -75,7 +75,7 @@ public:
 	gpos::Ref<CGroupExpression>
 	Pgexpr() const
 	{
-		return m_pgexpr;
+		return m_pgexpr.Lock();
 	}
 
 	// plan properties accessor

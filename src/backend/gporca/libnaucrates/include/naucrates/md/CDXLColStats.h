@@ -70,7 +70,7 @@ private:
 	BOOL m_is_col_stats_missing;
 
 	// DXL string for object
-	CWStringDynamic *m_dxl_str;
+	mutable CWStringDynamic *m_dxl_str{nullptr};
 
 public:
 	CDXLColStats(const CDXLColStats &) = delete;

@@ -13,6 +13,7 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/base/CDrvdPropCtxt.h"
 #include "gpopt/operators/CExpressionHandle.h"
 
 

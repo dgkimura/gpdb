@@ -30,9 +30,7 @@ namespace gpopt
 using namespace gpos;
 
 // hash maps ULONG -> array of ULONGs
-using UlongToBitSetMap =
-	CHashMap<ULONG, CBitSet, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<CBitSet>>;
+using UlongToBitSetMap = gpos::UnorderedMap<ULONG, gpos::Ref<CBitSet>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -112,14 +110,14 @@ private:
 	// making an assumption about the order the scan vs partition selector
 	// is translated, and would also need information from the append's
 	// child dxl nodes.
-	UlongToBitSetMap *m_scanid_to_part_map;
+	gpos::Ref<UlongToBitSetMap> m_scanid_to_part_map;
 
 	// unique id per partition selector in the memo
 	ULONG m_selector_id_counter;
 
 	// detailed info (filter expr, stats etc) per partition selector
 	// (required by CDynamicPhysicalScan for recomputing statistics for DPE)
-	SPartSelectorInfo *m_part_selector_info;
+	gpos::Ref<SPartSelectorInfo> m_part_selector_info;
 
 public:
 	COptCtxt(COptCtxt &) = delete;
@@ -288,7 +286,7 @@ public:
 	gpos::Ref<CBitSet>
 	GetPartitionsForScanId(ULONG scanid)
 	{
-		return m_scanid_to_part_map->Find(&scanid);
+		return m_scanid_to_part_map->Find(scanid);
 	}
 
 	BOOL AddPartSelectorInfo(ULONG selector_id, SPartSelectorInfoEntry *entry);
@@ -315,7 +313,7 @@ public:
 	inline static gpos::Ref<COptCtxt>
 	PoctxtFromTLS()
 	{
-		return reinterpret_cast<gpos::Ref<COptCtxt>>(
+		return gpos::dyn_cast<COptCtxt>(
 			ITask::Self()->GetTls().Get(CTaskLocalStorage::EtlsidxOptCtxt));
 	}
 

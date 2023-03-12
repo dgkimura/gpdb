@@ -534,7 +534,7 @@ CPhysicalAgg::HashValue() const
 	for (ULONG ul = 0; ul < arity; ul++)
 	{
 		gpos::Ref<CColRef> colref = (*m_pdrgpcr)[ul];
-		ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(colref));
+		ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(colref));
 	}
 
 	ulHash = gpos::CombineHashes(ulHash, gpos::HashValue<ULONG>(&ulGbaggtype));

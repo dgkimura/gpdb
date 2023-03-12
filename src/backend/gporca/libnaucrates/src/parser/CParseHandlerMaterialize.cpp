@@ -62,9 +62,9 @@ CParseHandlerMaterialize::StartElement(const XMLCh *const,	//element_uri,
 		GPOS_ASSERT(this->Length() == 0 &&
 					"No handlers should have been added yet");
 
-		m_dxl_op = (gpos::Ref<CDXLPhysicalMaterialize>)
+		m_dxl_op = gpos::cast<CDXLPhysicalMaterialize>(
 			CDXLOperatorFactory::MakeDXLMaterialize(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 		// parse handler for child node
 		CParseHandlerBase *child_parse_handler =

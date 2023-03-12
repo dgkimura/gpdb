@@ -284,9 +284,9 @@ public:
 							 gpos::Ref<CColRef> *ppcrCount);
 
 	// check if given expression has count matching the given column, returns the Logical GroupBy Agg above
-	static BOOL FHasCountAggMatchingColumn(
-		const gpos::Ref<CExpression> pexpr, const gpos::Ref<CColRef> colref,
-		const gpos::Ref<CLogicalGbAgg> *ppgbAgg);
+	static BOOL FHasCountAggMatchingColumn(const gpos::Ref<CExpression> pexpr,
+										   const gpos::Ref<CColRef> colref,
+										   gpos::Ref<CLogicalGbAgg> &ppgbAgg);
 
 	// generate a GbAgg with count(*) and sum(col) over the given expression
 	static gpos::Ref<CExpression> PexprCountStarAndSum(
@@ -561,6 +561,10 @@ public:
 	template <class T, void (*CleanupFn)(T *)>
 	static void AddRefAppend(CDynamicPtrArray<T, CleanupFn> *pdrgptOutput,
 							 CDynamicPtrArray<T, CleanupFn> *pdrgptInput,
+							 ULONG ulStart = 0);
+	template <class T>
+	static void AddRefAppend(gpos::Ref<gpos::Vector<gpos::Ref<T>>> pdrgptOutput,
+							 gpos::Ref<gpos::Vector<gpos::Ref<T>>> pdrgptInput,
 							 ULONG ulStart = 0);
 
 	// check for existence of subqueries
@@ -960,23 +964,25 @@ public:
 
 	// match function between index get/scan operators
 	template <class T>
-	static BOOL FMatchIndex(T *pop1, gpos::Ref<COperator> pop2);
+	static BOOL FMatchIndex(gpos::Ref<T> pop1, gpos::Ref<COperator> pop2);
 
 	// match function between dynamic index get/scan operators
 	template <class T>
-	static BOOL FMatchDynamicIndex(T *pop1, gpos::Ref<COperator> pop2);
+	static BOOL FMatchDynamicIndex(gpos::Ref<T> pop1,
+								   gpos::Ref<COperator> pop2);
 
 	// match function between dynamic get/scan operators
 	template <class T>
-	static BOOL FMatchDynamicScan(T *pop1, gpos::Ref<COperator> pop2);
+	static BOOL FMatchDynamicScan(gpos::Ref<T> pop1, gpos::Ref<COperator> pop2);
 
 	// match function between dynamic bitmap get/scan operators
 	template <class T>
-	static BOOL FMatchDynamicBitmapScan(T *pop1, gpos::Ref<COperator> pop2);
+	static BOOL FMatchDynamicBitmapScan(gpos::Ref<T> pop1,
+										gpos::Ref<COperator> pop2);
 
 	// match function between bitmap get/scan operators
 	template <class T>
-	static BOOL FMatchBitmapScan(T *pop1, gpos::Ref<COperator> pop2);
+	static BOOL FMatchBitmapScan(gpos::Ref<T> pop1, gpos::Ref<COperator> pop2);
 
 	// compares two Idatums, useful for sorting functions
 	static INT IDatumCmp(const void *val1, const void *val2);
@@ -1015,9 +1021,8 @@ public:
 								   gpos::Ref<CExpression> pexpr);
 
 	// is this scalar expression an NDV-preserving function (used for join stats derivation)
-	static BOOL IsExprNDVPreserving(
-		gpos::Ref<CExpression> pexpr,
-		const gpos::Ref<CColRef> *underlying_colref);
+	static BOOL IsExprNDVPreserving(gpos::Ref<CExpression> pexpr,
+									gpos::Ref<CColRef> &underlying_colref);
 
 	// search the given array of predicates for predicates with equality or IS NOT
 	// DISTINCT FROM operators that has one side equal to the given expression
@@ -1055,9 +1060,30 @@ public:
 	static BOOL FScalarConstOrBinaryCoercible(gpos::Ref<CExpression> pexpr);
 };	// class CUtils
 
+struct cexpression_equal_to
+	: public std::binary_function<gpos::Ref<CExpression>,
+								  gpos::Ref<CExpression>, bool>
+{
+	bool
+	operator()(const gpos::Ref<CExpression> &lhs,
+			   const gpos::Ref<CExpression> &rhs) const
+	{
+		return CUtils::Equals(lhs, rhs);
+	}
+};
+
+struct cexpression_hash
+{
+	int
+	operator()(const gpos::Ref<CExpression> &obj) const
+	{
+		return CExpression::UlHashDedup(obj);
+	}
+};
+
 // hash set from expressions
-using ExprHashSet = CHashSet<CExpression, CExpression::UlHashDedup,
-							 CUtils::Equals, CleanupRelease<CExpression>>;
+using ExprHashSet = gpos::UnorderedSet<gpos::Ref<CExpression>, cexpression_hash,
+									   cexpression_equal_to>;
 
 
 //---------------------------------------------------------------------------
@@ -1138,7 +1164,7 @@ CUtils::PexprLogicalApply(CMemoryPool *mp, gpos::Ref<CExpression> pexprLeft,
 	}
 
 	gpos::Ref<CColRefArray> colref_array = GPOS_NEW(mp) CColRefArray(mp);
-	colref_array->Append(const_cast<gpos::Ref<CColRef>>(pcrInner));
+	colref_array->Append(pcrInner);
 	return GPOS_NEW(mp)
 		CExpression(mp, GPOS_NEW(mp) T(mp, colref_array, eopidOriginSubq),
 					pexprLeft, pexprRight, pexprScalar);
@@ -1255,6 +1281,27 @@ CUtils::AddRefAppend(CDynamicPtrArray<T, CleanupFn> *pdrgptOutput,
 		T *pt = (*pdrgptInput)[ul];
 		CRefCount<T> *prc = dynamic_cast<CRefCount<T> *>(pt);
 
+		prc->AddRef();
+		pdrgptOutput->Append(pt);
+	}
+}
+
+template <class T>
+void
+CUtils::AddRefAppend(gpos::Ref<gpos::Vector<gpos::Ref<T>>> pdrgptOutput,
+					 gpos::Ref<gpos::Vector<gpos::Ref<T>>> pdrgptInput,
+					 ULONG ulStart)
+{
+	GPOS_ASSERT(nullptr != pdrgptOutput);
+	GPOS_ASSERT(nullptr != pdrgptInput);
+
+	const ULONG size = pdrgptInput->Size();
+	GPOS_ASSERT_IMP(0 < size, ulStart < size);
+
+	for (ULONG ul = ulStart; ul < size; ul++)
+	{
+		gpos::Ref<T> pt = (*pdrgptInput)[ul];
+
 		pdrgptOutput->Append(pt);
 	}
 }
@@ -1301,14 +1348,14 @@ CUtils::FScalarConstInt(gpos::Ref<CExpression> pexpr)
 //---------------------------------------------------------------------------
 template <class T>
 BOOL
-CUtils::FMatchIndex(T *pop1, gpos::Ref<COperator> pop2)
+CUtils::FMatchIndex(gpos::Ref<T> pop1, gpos::Ref<COperator> pop2)
 {
 	if (pop1->Eopid() != pop2->Eopid())
 	{
 		return false;
 	}
 
-	T *popIndex = T::PopConvert(pop2);
+	gpos::Ref<T> popIndex = gpos::dyn_cast<T>(pop2);
 
 	return pop1->UlOriginOpId() == popIndex->UlOriginOpId() &&
 		   pop1->Ptabdesc()->MDId()->Equals(popIndex->Ptabdesc()->MDId()) &&
@@ -1326,14 +1373,14 @@ CUtils::FMatchIndex(T *pop1, gpos::Ref<COperator> pop2)
 //---------------------------------------------------------------------------
 template <class T>
 BOOL
-CUtils::FMatchDynamicIndex(T *pop1, gpos::Ref<COperator> pop2)
+CUtils::FMatchDynamicIndex(gpos::Ref<T> pop1, gpos::Ref<COperator> pop2)
 {
 	if (pop1->Eopid() != pop2->Eopid())
 	{
 		return false;
 	}
 
-	T *popIndex2 = T::PopConvert(pop2);
+	gpos::Ref<T> popIndex2 = gpos::dyn_cast<T>(pop2);
 
 	// match if the index descriptors are identical
 	// we will compare MDIds, so both indexes should be partial or non-partial.
@@ -1361,14 +1408,14 @@ CUtils::FMatchDynamicIndex(T *pop1, gpos::Ref<COperator> pop2)
 //---------------------------------------------------------------------------
 template <class T>
 BOOL
-CUtils::FMatchDynamicScan(T *pop1, gpos::Ref<COperator> pop2)
+CUtils::FMatchDynamicScan(gpos::Ref<T> pop1, gpos::Ref<COperator> pop2)
 {
 	if (pop1->Eopid() != pop2->Eopid())
 	{
 		return false;
 	}
 
-	T *popScan2 = T::PopConvert(pop2);
+	gpos::Ref<T> popScan2 = gpos::dyn_cast<T>(pop2);
 
 	// match if the table descriptors are identical
 	return pop1->ScanId() == popScan2->ScanId() &&
@@ -1387,14 +1434,14 @@ CUtils::FMatchDynamicScan(T *pop1, gpos::Ref<COperator> pop2)
 //---------------------------------------------------------------------------
 template <class T>
 BOOL
-CUtils::FMatchDynamicBitmapScan(T *pop1, gpos::Ref<COperator> pop2)
+CUtils::FMatchDynamicBitmapScan(gpos::Ref<T> pop1, gpos::Ref<COperator> pop2)
 {
 	if (pop1->Eopid() != pop2->Eopid())
 	{
 		return false;
 	}
 
-	T *popDynamicBitmapScan2 = T::PopConvert(pop2);
+	gpos::Ref<T> popDynamicBitmapScan2 = gpos::dyn_cast<T>(pop2);
 
 	return pop1->UlOriginOpId() == popDynamicBitmapScan2->UlOriginOpId() &&
 		   FMatchDynamicScan(
@@ -1413,14 +1460,14 @@ CUtils::FMatchDynamicBitmapScan(T *pop1, gpos::Ref<COperator> pop2)
 //---------------------------------------------------------------------------
 template <class T>
 BOOL
-CUtils::FMatchBitmapScan(T *pop1, gpos::Ref<COperator> pop2)
+CUtils::FMatchBitmapScan(gpos::Ref<T> pop1, gpos::Ref<COperator> pop2)
 {
 	if (pop1->Eopid() != pop2->Eopid())
 	{
 		return false;
 	}
 
-	T *popScan2 = T::PopConvert(pop2);
+	gpos::Ref<T> popScan2 = gpos::dyn_cast<T>(pop2);
 
 	return pop1->UlOriginOpId() == popScan2->UlOriginOpId() &&
 		   pop1->Ptabdesc()->MDId()->Equals(popScan2->Ptabdesc()->MDId()) &&

@@ -403,7 +403,12 @@ CJoinStatsProcessor::SetResultingJoinStats(
 
 			mdid_pair->Append(mdid_outer);
 			mdid_pair->Append(mdid_inner);
-			mdid_pair->Sort();
+			mdid_pair->Sort(
+				[](const gpos::Ref<IMDId> &lhs, const gpos::Ref<IMDId> &rhs) {
+					return lhs->MdidType() != rhs->MdidType()
+							   ? lhs->MdidType() < rhs->MdidType()
+							   : wcscmp(lhs->GetBuffer(), rhs->GetBuffer()) < 0;
+				});
 
 			if (colref_outer->IsDistCol() && colref_inner->IsDistCol())
 			{

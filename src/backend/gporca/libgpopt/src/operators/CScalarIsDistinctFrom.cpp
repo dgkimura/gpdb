@@ -13,6 +13,7 @@
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/mdcache/CMDAccessorUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 using namespace gpmd;

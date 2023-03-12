@@ -45,9 +45,6 @@ CMDAggregateGPDB::CMDAggregateGPDB(
 	  m_is_repsafe(is_repsafe)
 {
 	GPOS_ASSERT(mdid->IsValid());
-
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -61,7 +58,10 @@ CMDAggregateGPDB::CMDAggregateGPDB(
 CMDAggregateGPDB::~CMDAggregateGPDB()
 {
 	GPOS_DELETE(m_mdname);
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 //---------------------------------------------------------------------------

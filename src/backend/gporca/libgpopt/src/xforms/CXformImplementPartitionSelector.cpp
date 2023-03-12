@@ -15,6 +15,7 @@
 
 #include "gpopt/operators/CLogicalPartitionSelector.h"
 #include "gpopt/operators/CPatternLeaf.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

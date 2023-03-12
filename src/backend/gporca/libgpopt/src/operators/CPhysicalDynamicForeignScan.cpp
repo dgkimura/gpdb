@@ -78,7 +78,9 @@ CPhysicalDynamicForeignScan::Matches(gpos::Ref<COperator> pop) const
 
 	gpos::Ref<CPhysicalDynamicForeignScan> popForeignScan =
 		CPhysicalDynamicForeignScan::PopConvert(pop);
-	return CUtils::FMatchDynamicScan(this, pop) &&
+	return CUtils::FMatchDynamicScan(
+			   gpos::dyn_cast<CPhysicalDynamicForeignScan>(SharedFromThis()),
+			   pop) &&
 		   m_foreign_server_oid == popForeignScan->GetForeignServerOid();
 }
 

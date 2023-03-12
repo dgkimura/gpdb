@@ -531,7 +531,7 @@ public:
 	template <typename T, void (*CleanupFn)(T *),
 			  T ValueFromXmlstr(CDXLMemoryManager *, const XMLCh *, Edxltoken,
 								Edxltoken)>
-	static CDynamicPtrArray<T, CleanupFn> *ExtractIntsToArray(
+	static gpos::Ref<CDynamicPtrArray<T, CleanupFn>> ExtractIntsToArray(
 		CDXLMemoryManager *dxl_memory_manager, const XMLCh *xmlszUl,
 		Edxltoken target_attr, Edxltoken target_elem);
 
@@ -659,7 +659,7 @@ public:
 template <typename T, void (*CleanupFn)(T *),
 		  T ValueFromXmlstr(CDXLMemoryManager *, const XMLCh *, Edxltoken,
 							Edxltoken)>
-CDynamicPtrArray<T, CleanupFn> *
+gpos::Ref<CDynamicPtrArray<T, CleanupFn>>
 CDXLOperatorFactory::ExtractIntsToArray(CDXLMemoryManager *dxl_memory_manager,
 										const XMLCh *mdid_list_xml,
 										Edxltoken target_attr,

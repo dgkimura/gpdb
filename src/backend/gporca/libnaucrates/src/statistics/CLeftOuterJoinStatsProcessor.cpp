@@ -11,6 +11,7 @@
 
 #include "naucrates/statistics/CLeftOuterJoinStatsProcessor.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
 using namespace gpmd;

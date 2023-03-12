@@ -34,21 +34,16 @@ using CConstraintArray = gpos::Vector<gpos::Ref<CConstraint>>;
 
 // hash map mapping CColRef -> CConstraintArray
 using ColRefToConstraintArrayMap =
-	CHashMap<CColRef, CConstraintArray, CColRef::HashValue, CColRef::Equals,
-			 CleanupNULL<CColRef>, CleanupRelease<CConstraintArray>>;
+	gpos::UnorderedMap<gpos::Ref<CColRef>, gpos::Ref<CConstraintArray>>;
 
 // mapping CConstraint -> BOOL to cache previous containment queries,
 // we use pointer equality here for fast map lookup -- since we do shallow comparison, we do not take ownership
 // of pointer values
 using ConstraintContainmentMap =
-	CHashMap<CConstraint, BOOL, gpos::HashPtr<CConstraint>,
-			 gpos::EqualPtr<CConstraint>, CleanupNULL<CConstraint>,
-			 CleanupNULL<BOOL>>;
+	gpos::UnorderedMap<gpos::Ref<CConstraint>, BOOL *>;
 
 // hash map mapping ULONG -> CConstraint
-using UlongToConstraintMap =
-	CHashMap<ULONG, CConstraint, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<CConstraint>>;
+using UlongToConstraintMap = gpos::UnorderedMap<ULONG, gpos::Ref<CConstraint>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -72,7 +67,7 @@ public:
 
 private:
 	// containment map
-	ConstraintContainmentMap *m_phmcontain;
+	gpos::Ref<ConstraintContainmentMap> m_phmcontain;
 
 	// constant true
 	static BOOL m_fTrue;

@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/common/CMainArgs.h"
 #include "gpos/common/CStackObject.h"
+#include "gpos/common/Ref.h"
 #include "gpos/task/ITask.h"
 
 // helper macros
@@ -182,7 +183,7 @@ public:
 
 	// driver routine; returns the number of failed tests
 	// (0 if all specified tests succeeded)
-	static ULONG Driver(gpos::Ref<CBitVector> pbv);
+	static ULONG Driver(CBitVector &pbv);
 
 	// driver routine parsing input arguments; returns the
 	// number of failed tests (0 if all specified tests

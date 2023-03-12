@@ -131,9 +131,8 @@ CLogicalUpdate::HashValue() const
 		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrDelete));
 	ulHash =
 		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrInsert));
-	ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrCtid));
-	ulHash =
-		gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrSegmentId));
+	ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(m_pcrCtid));
+	ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(m_pcrSegmentId));
 
 	return ulHash;
 }

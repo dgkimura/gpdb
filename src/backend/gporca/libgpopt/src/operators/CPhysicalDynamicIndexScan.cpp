@@ -117,7 +117,8 @@ CPhysicalDynamicIndexScan::HashValue() const
 BOOL
 CPhysicalDynamicIndexScan::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchDynamicIndex(this, pop);
+	return CUtils::FMatchDynamicIndex(
+		gpos::dyn_cast<CPhysicalDynamicIndexScan>(SharedFromThis()), pop);
 }
 
 //---------------------------------------------------------------------------

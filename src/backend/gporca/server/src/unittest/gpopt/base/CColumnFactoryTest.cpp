@@ -67,7 +67,7 @@ CColumnFactoryTest::EresUnittest_Basic()
 
 	const gpos::Ref<IMDTypeInt4> pmdtypeint4 = mda.PtMDType<IMDTypeInt4>();
 
-	CColumnFactory cf;
+	CColumnFactory cf(mp);
 
 	// typed colref
 	gpos::Ref<CColRef> pcrOne =

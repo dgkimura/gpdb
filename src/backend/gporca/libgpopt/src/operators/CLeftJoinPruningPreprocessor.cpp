@@ -15,6 +15,7 @@
 #include "gpopt/operators/CPredicateUtils.h"
 #include "gpopt/operators/CScalarSubquery.h"
 #include "gpopt/operators/CScalarSubqueryQuantified.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;
@@ -357,7 +358,7 @@ CLeftJoinPruningPreprocessor::PexprJoinPruningScalarSubquery(
 
 	gpos::Ref<CExpressionArray> pdrgpexpr = GPOS_NEW(mp) CExpressionArray(mp);
 	gpos::Ref<CColRefSet> subquery_colrefset = GPOS_NEW(mp) CColRefSet(mp);
-	const gpos::Ref<CColRef> subquery_colref = nullptr;
+	gpos::Ref<CColRef> subquery_colref = nullptr;
 	if (COperator::EopScalarSubquery == pexprScalar->Pop()->Eopid())
 	{
 		gpos::Ref<CScalarSubquery> subquery_pop =

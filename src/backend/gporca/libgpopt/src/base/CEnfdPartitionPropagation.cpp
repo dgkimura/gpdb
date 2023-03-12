@@ -16,6 +16,7 @@
 #include "gpopt/base/CReqdPropPlan.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CPhysical.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -82,7 +83,9 @@ CEnfdPartitionPropagation::Epet(CExpressionHandle &exprhdl,
 {
 	if (fPropagationReqd)
 	{
-		return popPhysical->EpetPartitionPropagation(exprhdl, this);
+		return popPhysical->EpetPartitionPropagation(
+			exprhdl,
+			gpos::dyn_cast<CEnfdPartitionPropagation>(SharedFromThis()));
 	}
 
 	return EpetUnnecessary;

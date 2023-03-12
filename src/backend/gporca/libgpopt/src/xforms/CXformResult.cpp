@@ -13,6 +13,8 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/search/CGroupExpression.h"
+
 using namespace gpopt;
 
 FORCE_GENERATE_DBGSTR(CXformResult);

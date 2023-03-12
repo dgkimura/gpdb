@@ -20,6 +20,7 @@
 
 #include "gpos/common/CBitSet.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/CMDExtStatsInfo.h"
 #include "naucrates/statistics/CFilterStatsProcessor.h"
 
@@ -415,7 +416,7 @@ CExtendedStatsProcessor::ApplyCorrelatedStatsToNDistinctCalculation(
 {
 	int nmatches;
 	OID statOid = InvalidOid;
-	const gpos::Ref<IMDExtStats> stats;
+	gpos::Ref<IMDExtStats> stats;
 	gpos::Ref<CBitSet> attnums = nullptr;
 	gpos::Ref<CBitSet> matched = nullptr;
 

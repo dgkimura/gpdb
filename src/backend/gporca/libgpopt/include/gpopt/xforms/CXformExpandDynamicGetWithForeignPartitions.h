@@ -23,7 +23,7 @@ namespace gpopt
 {
 using namespace gpos;
 
-struct SForeignServer
+struct SForeignServer : public CRefCount<SForeignServer>
 {
 	ULONG m_foreign_server_oid;
 
@@ -36,30 +36,28 @@ struct SForeignServer
 	}
 };
 
-static ULONG
-UlHashSForeignServer(const SForeignServer *fs)
-{
-	return fs->m_foreign_server_oid;
-}
-
-static BOOL
-FEqualSForeignServer(const SForeignServer *fs1, const SForeignServer *fs2)
-{
-	return fs1->m_foreign_server_oid == fs2->m_foreign_server_oid &&
-		   fs1->m_is_coordinator_only == fs2->m_is_coordinator_only;
-}
+//KIMURA:TODO:FIXME
+//static ULONG
+//UlHashSForeignServer(const gpos::Ref<SForeignServer> fs)
+//{
+//	return fs->m_foreign_server_oid;
+//}
+//
+//static BOOL
+//FEqualSForeignServer(const gpos::Ref<SForeignServer> fs1, const gpos::Ref<SForeignServer> fs2)
+//{
+//	return fs1->m_foreign_server_oid == fs2->m_foreign_server_oid &&
+//		   fs1->m_is_master_only == fs2->m_is_master_only;
+//}
 
 // hash maps ULONG -> array of ULONGs
 using SForeignServerToIMdIdArrayMap =
-	CHashMap<SForeignServer, IMdIdArray, UlHashSForeignServer,
-			 FEqualSForeignServer, CleanupDelete<SForeignServer>,
-			 CleanupRelease<IMdIdArray>>;
+	gpos::UnorderedMap<gpos::Ref<SForeignServer>, gpos::Ref<IMdIdArray>>;
 
 // iterator
 using SForeignServerToIMdIdArrayMapIter =
-	CHashMapIter<SForeignServer, IMdIdArray, UlHashSForeignServer,
-				 FEqualSForeignServer, CleanupDelete<SForeignServer>,
-				 CleanupRelease<IMdIdArray>>;
+	gpos::UnorderedMap<gpos::Ref<SForeignServer>,
+					   gpos::Ref<IMdIdArray>>::LegacyIterator;
 
 //---------------------------------------------------------------------------
 //	@class:

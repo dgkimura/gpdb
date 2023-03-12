@@ -110,7 +110,7 @@ public:
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopPhysicalDynamicForeignScan == pop->Eopid());
 
-		return reinterpret_cast<gpos::Ref<CPhysicalDynamicForeignScan> >(pop);
+		return gpos::dyn_cast<CPhysicalDynamicForeignScan>(pop);
 	}
 
 	gpos::Ref<CPartitionPropagationSpec> PppsDerive(

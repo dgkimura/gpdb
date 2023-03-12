@@ -89,21 +89,15 @@ private:
 
 	// hash map mapping ULONG -> SConsumerCounter
 	using UlongToConsumerCounterMap =
-		CHashMap<ULONG, SConsumerCounter, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupDelete<SConsumerCounter>>;
+		gpos::UnorderedMap<ULONG, gpos::Ref<SConsumerCounter>>;
 
 	// map iterator
 	using UlongToConsumerCounterMapIter =
-		CHashMapIter<ULONG, SConsumerCounter, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupDelete<SConsumerCounter>>;
+		gpos::UnorderedMap<ULONG, gpos::Ref<SConsumerCounter>>::LegacyIterator;
 
 	// hash map mapping ULONG -> UlongToConsumerCounterMap: maps from CTE producer ID to all consumers inside this CTE
 	using UlongToProducerConsumerMap =
-		CHashMap<ULONG, UlongToConsumerCounterMap, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<UlongToConsumerCounterMap>>;
+		gpos::UnorderedMap<ULONG, gpos::Ref<UlongToConsumerCounterMap>>;
 
 	//-------------------------------------------------------------------
 	//	@struct:
@@ -171,21 +165,17 @@ private:
 
 	// hash maps mapping ULONG -> CCTEInfoEntry
 	using UlongToCTEInfoEntryMap =
-		CHashMap<ULONG, CCTEInfoEntry, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CCTEInfoEntry>>;
+		gpos::UnorderedMap<ULONG, gpos::Ref<CCTEInfoEntry>>;
 
 	// map iterator
 	using UlongToCTEInfoEntryMapIter =
-		CHashMapIter<ULONG, CCTEInfoEntry, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupRelease<CCTEInfoEntry>>;
+		gpos::UnorderedMap<ULONG, gpos::Ref<CCTEInfoEntry>>::LegacyIterator;
 
 	// memory pool
 	CMemoryPool *m_mp;
 
 	// mapping from cte producer id -> cte info entry
-	UlongToCTEInfoEntryMap *m_phmulcteinfoentry;
+	gpos::Ref<UlongToCTEInfoEntryMap> m_phmulcteinfoentry;
 
 	// next available CTE Id
 	ULONG m_ulNextCTEId;
@@ -194,7 +184,7 @@ private:
 	BOOL m_fEnableInlining;
 
 	// consumers inside each cte/main query
-	UlongToProducerConsumerMap *m_phmulprodconsmap;
+	gpos::Ref<UlongToProducerConsumerMap> m_phmulprodconsmap;
 
 	// initialize default statistics for a given CTE Producer
 	void InitDefaultStats(gpos::Ref<CExpression> pexprCTEProducer);

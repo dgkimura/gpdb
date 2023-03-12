@@ -25,6 +25,7 @@
 #include "gpopt/operators/CScalarArray.h"
 #include "gpopt/operators/CScalarIdent.h"
 #include "gpopt/operators/CScalarIsDistinctFrom.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/IMDScalarOp.h"
 
 using namespace gpopt;
@@ -126,7 +127,7 @@ CConstraintInterval::GetConstraintOnSegmentId() const
 {
 	if (FConstraintOnSegmentId())
 	{
-		return (gpos::Ref<CConstraint>) this;
+		return gpos::cast<CConstraint>(SharedFromThis());
 	}
 
 	return nullptr;
@@ -267,8 +268,8 @@ CConstraintInterval::PcnstrIntervalFromScalarArrayCmp(
 	}
 
 	const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
-	gpos::CAutoRef<CDatumSortedSet> apdatumsortedset(
-		GPOS_NEW(mp) CDatumSortedSet(mp, pexprArray, pcomp));
+	gpos::Ref<CDatumSortedSet> apdatumsortedset =
+		GPOS_NEW(mp) CDatumSortedSet(mp, pexprArray, pcomp);
 	// construct ranges representing IN or NOT IN
 	gpos::Ref<CRangeArray> prgrng = GPOS_NEW(mp) CRangeArray(mp);
 
@@ -1023,7 +1024,7 @@ CConstraintInterval::Pcnstr(CMemoryPool *,	//mp,
 {
 	if (m_pcr == colref)
 	{
-		return this;
+		return SharedFromThis();
 	}
 
 	return nullptr;
@@ -1043,7 +1044,7 @@ CConstraintInterval::Pcnstr(CMemoryPool *,	//mp,
 {
 	if (pcrs->FMember(m_pcr))
 	{
-		return this;
+		return SharedFromThis();
 	}
 
 	return nullptr;
@@ -1256,7 +1257,8 @@ CConstraintInterval::FContainsInterval(CMemoryPool *mp,
 		return false;
 	}
 
-	gpos::Ref<CConstraintInterval> pciDiff = pci->PciDifference(mp, this);
+	gpos::Ref<CConstraintInterval> pciDiff = pci->PciDifference(
+		mp, gpos::dyn_cast<CConstraintInterval>(SharedFromThis()));
 
 	// if the difference is empty, then this interval contains the given one
 	BOOL fContains = pciDiff->FContradiction();
@@ -1362,8 +1364,8 @@ CConstraintInterval::PciComplement(CMemoryPool *mp)
 	gpos::Ref<CConstraintInterval> pciUniversal =
 		PciUnbounded(mp, m_pcr, true /*fIncludesNull*/);
 
-	gpos::Ref<CConstraintInterval> pciComp =
-		pciUniversal->PciDifference(mp, this);
+	gpos::Ref<CConstraintInterval> pciComp = pciUniversal->PciDifference(
+		mp, gpos::dyn_cast<CConstraintInterval>(SharedFromThis()));
 
 
 	return pciComp;

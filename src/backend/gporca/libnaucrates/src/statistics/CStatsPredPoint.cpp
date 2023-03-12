@@ -83,7 +83,7 @@ CStatsPredPoint::PreprocessDatum(CMemoryPool *mp,
 	}
 
 	const gpos::Ref<CColRefTable> colref_table =
-		CColRefTable::PcrConvert(const_cast<gpos::Ref<CColRef> >(colref));
+		CColRefTable::PcrConvert(colref);
 
 	return datum->MakePaddedDatum(mp, colref_table->Width());
 }

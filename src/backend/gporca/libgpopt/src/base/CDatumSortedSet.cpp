@@ -8,6 +8,7 @@
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/COperator.h"
 #include "gpopt/operators/CScalarConst.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -21,7 +22,7 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp,
 	const ULONG ulArrayExprArity = CUtils::UlScalarArrayArity(pexprArray);
 	GPOS_ASSERT(0 < ulArrayExprArity);
 
-	gpos::CAutoRef<IDatumArray> aprngdatum(GPOS_NEW(mp) IDatumArray(mp));
+	gpos::Ref<IDatumArray> aprngdatum = GPOS_NEW(mp) IDatumArray(mp);
 	for (ULONG ul = 0; ul < ulArrayExprArity; ul++)
 	{
 		gpos::Ref<CScalarConst> popScConst =
@@ -36,7 +37,11 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp,
 			aprngdatum->Append(datum);
 		}
 	}
-	aprngdatum->Sort(&CUtils::IDatumCmp);
+	aprngdatum->Sort(
+		[](const gpos::Ref<IDatum> &lhs, const gpos::Ref<IDatum> &rhs) {
+			const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
+			return pcomp->IsLessThan(lhs, rhs);
+		});
 
 	// de-duplicate
 	const ULONG ulRangeArrayArity = aprngdatum->Size();

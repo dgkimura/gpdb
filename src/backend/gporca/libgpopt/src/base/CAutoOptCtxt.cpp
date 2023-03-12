@@ -16,6 +16,7 @@
 #include "gpopt/cost/ICostModel.h"
 #include "gpopt/eval/CConstExprEvaluatorDefault.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -92,8 +93,6 @@ CAutoOptCtxt::~CAutoOptCtxt()
 	gpos::Ref<CTaskLocalStorageObject> ptlsobj =
 		ITask::Self()->GetTls().Get(CTaskLocalStorage::EtlsidxOptCtxt);
 	ITask::Self()->GetTls().Remove(ptlsobj);
-
-	GPOS_DELETE(ptlsobj);
 }
 
 // EOF

@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CReqdPropPlan.h"
 #include "gpopt/operators/CPhysicalSpool.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;
@@ -113,7 +114,8 @@ CEnfdRewindability::Epet(CExpressionHandle &exprhdl,
 {
 	if (fRewindabilityReqd)
 	{
-		return popPhysical->EpetRewindability(exprhdl, this);
+		return popPhysical->EpetRewindability(
+			exprhdl, gpos::dyn_cast<CEnfdRewindability>(SharedFromThis()));
 	}
 
 	return EpetUnnecessary;

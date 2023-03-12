@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 
 #include "gpopt/base/CCTEReq.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -66,8 +67,7 @@ CCTEMap::Insert(ULONG ulCteId, ECteType ect, gpos::Ref<CDrvdPropPlan> pdpplan)
 
 	gpos::Ref<CCTEMapEntry> pcme =
 		GPOS_NEW(m_mp) CCTEMapEntry(ulCteId, ect, pdpplan);
-	BOOL fSuccess GPOS_ASSERTS_ONLY =
-		m_phmcm->Insert(GPOS_NEW(m_mp) ULONG(ulCteId), pcme);
+	BOOL fSuccess GPOS_ASSERTS_ONLY = m_phmcm->Insert(ulCteId, pcme);
 	GPOS_ASSERT(fSuccess);
 }
 
@@ -175,7 +175,7 @@ CCTEMap::AddUnresolved(const CCTEMap &cmFirst, const CCTEMap &cmSecond,
 gpos::Ref<CCTEMap::CCTEMapEntry>
 CCTEMap::PcmeLookup(ULONG ulCteId) const
 {
-	return m_phmcm->Find(&ulCteId);
+	return m_phmcm->Find(ulCteId);
 }
 
 //---------------------------------------------------------------------------
@@ -371,8 +371,7 @@ CCTEMap::OsPrint(IOstream &os) const
 	UlongToCTEMapEntryMapIter hmcmi(m_phmcm);
 	while (hmcmi.Advance())
 	{
-		gpos::Ref<CCTEMapEntry> pcme =
-			const_cast<gpos::Ref<CCTEMapEntry> >(hmcmi.Value());
+		gpos::Ref<CCTEMapEntry> pcme = hmcmi.Value();
 		pcme->OsPrint(os);
 		os << " ";
 	}

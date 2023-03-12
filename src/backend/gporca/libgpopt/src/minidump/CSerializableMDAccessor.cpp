@@ -16,6 +16,7 @@
 #include "gpos/task/CTask.h"
 
 #include "gpopt/mdcache/CMDAccessor.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/xml/CDXLSections.h"
 
 using namespace gpos;

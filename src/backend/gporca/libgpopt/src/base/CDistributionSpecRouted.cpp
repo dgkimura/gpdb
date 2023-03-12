@@ -16,6 +16,7 @@
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CPhysicalMotionBroadcast.h"
 #include "gpopt/operators/CPhysicalMotionRoutedDistribute.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/traceflags/traceflags.h"
 
 
@@ -90,7 +91,7 @@ CDistributionSpecRouted::PdsCopyWithRemappedColumns(
 	BOOL must_exist)
 {
 	ULONG id = m_pcrSegmentId->Id();
-	gpos::Ref<CColRef> pcrSegmentId = colref_mapping->Find(&id);
+	gpos::Ref<CColRef> pcrSegmentId = colref_mapping->Find(id);
 	if (nullptr == pcrSegmentId)
 	{
 		if (must_exist)
@@ -100,7 +101,7 @@ CDistributionSpecRouted::PdsCopyWithRemappedColumns(
 			pcrSegmentId = col_factory->PcrCopy(m_pcrSegmentId);
 
 			BOOL result GPOS_ASSERTS_ONLY =
-				colref_mapping->Insert(GPOS_NEW(mp) ULONG(id), pcrSegmentId);
+				colref_mapping->Insert(id, pcrSegmentId);
 			GPOS_ASSERT(result);
 		}
 		else
@@ -167,7 +168,7 @@ ULONG
 CDistributionSpecRouted::HashValue() const
 {
 	return gpos::CombineHashes((ULONG) Edt(),
-							   gpos::HashPtr<CColRef>(m_pcrSegmentId));
+							   CColRef::HashValue(m_pcrSegmentId));
 }
 
 

@@ -3,6 +3,7 @@
 
 #include "gpopt/base/CDistributionSpecUniversal.h"
 
+#include "gpopt/search/CGroupExpression.h"
 namespace gpopt
 {
 gpopt::CDistributionSpecUniversal::CDistributionSpecUniversal() = default;

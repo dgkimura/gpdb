@@ -207,7 +207,7 @@ private:
 	Unreachable(const CStateMachine *, TEnumState tenumstateSource,
 				TEnumState tenumstateSink, TEnumEvent, void *pvContext)
 	{
-		EsetStates &eset = *(gpos::Ref<EsetStates>) pvContext;
+		EsetStates &eset = *(EsetStates *) pvContext;
 
 		if (tenumstateSource != tenumstateSink)
 		{
@@ -427,7 +427,7 @@ public:
 		gpos::Ref<EsetStates> peset = GPOS_NEW(mp) EsetStates(mp);
 		States(peset);
 
-		Walk(mp, Unreachable, peset);
+		Walk(mp, Unreachable, peset.get());
 
 		// store remaining states in output array
 		EsetStatesIter esetIter(*peset);
@@ -451,7 +451,7 @@ public:
 		gpos::Ref<EsetStates> peset = GPOS_NEW(mp) EsetStates(mp);
 		States(peset);
 
-		Walk(mp, Unreachable, peset);
+		Walk(mp, Unreachable, peset.get());
 
 		// print all unreachable nodes using BOXes
 		EsetStatesIter esetIter(*peset);

@@ -45,15 +45,16 @@ class CMemo : public gpos::DbgPrintMixin<CMemo>
 {
 private:
 	// definition of hash table key accessor
-	using ShtAcc =
-		CSyncHashtableAccessByKey<CGroupExpression, CGroupExpression>;
 
 	// definition of hash table iterator
-	using ShtIter = CSyncHashtableIter<CGroupExpression, CGroupExpression>;
-
-	// definition of hash table iterator accessor
-	using ShtAccIter =
-		CSyncHashtableAccessByIter<CGroupExpression, CGroupExpression>;
+	using Sht =
+		gpos::UnorderedMap<gpos::Ref<CGroupExpression>,
+						   gpos::Ref<CGroupExpression>, cgroupexpression_hash,
+						   cgroupexpression_equal_to>;
+	using ShtIter =
+		gpos::UnorderedMap<gpos::Ref<CGroupExpression>,
+						   gpos::Ref<CGroupExpression>, cgroupexpression_hash,
+						   cgroupexpression_equal_to>::LegacyIterator;
 
 	// memory pool
 	CMemoryPool *m_mp;
@@ -71,12 +72,10 @@ private:
 	MemoTreeMap *m_pmemotmap;
 
 	// list of groups
-	CSyncList<CGroup> m_listGroups;
+	gpos::Vector<gpos::Ref<CGroup>> m_listGroups;
 
 	// hashtable of all group expressions
-	CSyncHashtable<CGroupExpression,  // entry
-				   CGroupExpression>
-		m_sht;
+	gpos::Ref<Sht> m_sht;
 
 	// add new group
 	void Add(gpos::Ref<CGroup> pgroup, gpos::Ref<CExpression> pexprOrigin);

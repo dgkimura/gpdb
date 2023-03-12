@@ -342,7 +342,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::
 
 	gpos::Ref<CColRefArray> pdrgpcrConsumer2Output =
 		CUtils::PdrgpcrCopy(mp, pdrgpcrJoinOutput);
-	gpos::Ref<ULongPtrArray> pdrgpulIndexesOfOuterInGby =
+	gpos::Ref<ULongVector> pdrgpulIndexesOfOuterInGby =
 		pdrgpcrJoinOutput->IndexesOfSubsequence(pdrgpcrOuterKeys);
 
 	GPOS_ASSERT(nullptr != pdrgpulIndexesOfOuterInGby);
@@ -357,7 +357,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::
 		CXformUtils::PexprCTEConsumer(mp, ulCTEJoinId, pdrgpcrConsumer2Output),
 		GPOS_NEW(mp) CExpression(mp, GPOS_NEW(mp) CScalarProjectList(mp)));
 
-	gpos::Ref<ULongPtrArray> pdrgpulIndexesOfOuterKeys =
+	gpos::Ref<ULongVector> pdrgpulIndexesOfOuterKeys =
 		pdrgpcrOuter->IndexesOfSubsequence(pdrgpcrOuterKeys);
 	GPOS_ASSERT(nullptr != pdrgpulIndexesOfOuterKeys);
 	gpos::Ref<CColRefArray> pdrgpcrKeysInOuterCopy =
@@ -412,7 +412,7 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprProjectOverLeftAntiSemiJoin(
 			mp, pdrgpcrOuter, pdrgpcrOuterCopy, pcrsScalar, pcrsInner,
 			pdrgpcrJoinOutput, ulCTEJoinId, ulCTEOuterId);
 
-	gpos::Ref<ULongPtrArray> pdrgpulIndexesOfOuter =
+	gpos::Ref<ULongVector> pdrgpulIndexesOfOuter =
 		pdrgpcrJoinOutput->IndexesOfSubsequence(pdrgpcrOuter);
 	GPOS_ASSERT(nullptr != pdrgpulIndexesOfOuter);
 
@@ -422,10 +422,10 @@ CXformLeftOuter2InnerUnionAllLeftAntiSemiJoin::PexprProjectOverLeftAntiSemiJoin(
 
 	for (ULONG ul = 0; ul < ulOuterCopyLength; ++ul)
 	{
-		ULONG ulOrigIndex = *(*pdrgpulIndexesOfOuter)[ul];
+		ULONG ulOrigIndex = (*pdrgpulIndexesOfOuter)[ul];
 		gpos::Ref<CColRef> pcrOriginal = (*pdrgpcrJoinOutput)[ulOrigIndex];
-		BOOL fInserted GPOS_ASSERTS_ONLY = colref_mapping->Insert(
-			GPOS_NEW(mp) ULONG(pcrOriginal->Id()), (*pdrgpcrOuterCopy)[ul]);
+		BOOL fInserted GPOS_ASSERTS_ONLY =
+			colref_mapping->Insert(pcrOriginal->Id(), (*pdrgpcrOuterCopy)[ul]);
 		GPOS_ASSERT(fInserted);
 	}
 

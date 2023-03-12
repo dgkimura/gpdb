@@ -76,7 +76,7 @@ private:
 	JSM m_jsm;
 
 	// optimization context of the job
-	gpos::Ref<COptimizationContext> m_poc;
+	gpos::WeakRef<COptimizationContext> m_poc;
 
 	// optimization request number
 	ULONG m_ulOptReq;

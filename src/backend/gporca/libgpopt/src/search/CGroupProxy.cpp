@@ -30,7 +30,7 @@ using namespace gpopt;
 //		Ctor
 //
 //---------------------------------------------------------------------------
-CGroupProxy::CGroupProxy(gpos::Ref<CGroup> pgroup) : m_pgroup(pgroup)
+CGroupProxy::CGroupProxy(gpos::WeakRef<CGroup> pgroup) : m_pgroup(pgroup)
 {
 	GPOS_ASSERT(nullptr != pgroup);
 }
@@ -58,7 +58,7 @@ CGroupProxy::~CGroupProxy() = default;
 void
 CGroupProxy::Insert(gpos::Ref<CGroupExpression> pgexpr)
 {
-	pgexpr->Init(m_pgroup, m_pgroup->m_ulGExprs++);
+	pgexpr->Init(m_pgroup.Lock(), m_pgroup->m_ulGExprs++);
 
 	GPOS_ASSERT(pgexpr->Pgroup() == m_pgroup);
 

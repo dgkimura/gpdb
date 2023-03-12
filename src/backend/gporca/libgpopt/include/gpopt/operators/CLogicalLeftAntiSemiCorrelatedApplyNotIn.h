@@ -92,13 +92,13 @@ public:
 		BOOL must_exist) override;
 
 	// conversion function
-	static CLogicalLeftAntiSemiCorrelatedApplyNotIn *
+	static gpos::Ref<CLogicalLeftAntiSemiCorrelatedApplyNotIn>
 	PopConvert(gpos::Ref<COperator> pop)
 	{
 		GPOS_ASSERT(nullptr != pop);
 		GPOS_ASSERT(EopLogicalLeftAntiSemiCorrelatedApplyNotIn == pop->Eopid());
 
-		return dynamic_cast<CLogicalLeftAntiSemiCorrelatedApplyNotIn *>(pop);
+		return gpos::dyn_cast<CLogicalLeftAntiSemiCorrelatedApplyNotIn>(pop);
 	}
 
 };	// class CLogicalLeftAntiSemiCorrelatedApplyNotIn

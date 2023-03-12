@@ -80,10 +80,10 @@ CParseHandlerScalarBoolExpr::StartElement(const XMLCh *const element_uri,
 
 			// parse and create scalar BoolExpr
 			gpos::Ref<CDXLScalarBoolExpr> dxl_op =
-				(gpos::Ref<CDXLScalarBoolExpr>)
+				gpos::cast<CDXLScalarBoolExpr>(
 					CDXLOperatorFactory::MakeDXLBoolExpr(
 						m_parse_handler_mgr->GetDXLMemoryManager(),
-						m_dxl_bool_type);
+						m_dxl_bool_type));
 
 			// construct node from the created child nodes
 			m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);

@@ -118,9 +118,8 @@ CLogicalDelete::HashValue() const
 	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(),
 									   m_ptabdesc->MDId()->HashValue());
 	ulHash = gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcr));
-	ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrCtid));
-	ulHash =
-		gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrSegmentId));
+	ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(m_pcrCtid));
+	ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(m_pcrSegmentId));
 
 	return ulHash;
 }

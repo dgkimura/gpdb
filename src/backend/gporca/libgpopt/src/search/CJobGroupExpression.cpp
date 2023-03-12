@@ -62,7 +62,7 @@ CJobGroupExpression::ScheduleTransformations(CSchedulerContext *psc,
 	while (xsi.Advance())
 	{
 		gpos::Ref<CXform> pxform = CXformFactory::Pxff()->Pxf(xsi.TBit());
-		CJobTransformation::ScheduleJob(psc, m_pgexpr, pxform, this);
+		CJobTransformation::ScheduleJob(psc, m_pgexpr.Lock(), pxform, this);
 	}
 }
 

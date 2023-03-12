@@ -13,6 +13,8 @@
 
 #include "gpos/base.h"
 
+#include "gpopt/search/CGroupExpression.h"
+
 #ifdef GPOS_DEBUG
 #include "gpos/error/CAutoTrace.h"
 
@@ -151,7 +153,7 @@ CColRef::Equals(const gpos::Ref<CColRefArray> pdrgpcr1,
 		return (nullptr == pdrgpcr1 && nullptr == pdrgpcr2);
 	}
 
-	return pdrgpcr1->Equals(pdrgpcr2);
+	return pdrgpcr1->Equals(pdrgpcr2->SharedFromThis());
 }
 
 // check if the the array of column references are equal. Note that since we have unique

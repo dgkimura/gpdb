@@ -101,6 +101,13 @@ public:
 	// equality check
 	virtual BOOL Equals(const gpos::Ref<IMDId> mdid) const = 0;
 
+	virtual BOOL
+	Equals(const IMDId &mdid) const
+	{
+		// KIMURA:FIXME:TODO: Is it presumptuous to assume this is a shared pointer?
+		return mdid.Equals(SharedFromThis());
+	}
+
 	// computes the hash value for the metadata id
 	virtual ULONG HashValue() const = 0;
 
@@ -178,12 +185,10 @@ public:
 using IMdIdArray = gpos::Vector<gpos::Ref<IMDId>>;
 
 // hash set for mdid
-using MdidHashSet =
-	CHashSet<IMDId, IMDId::MDIdHash, IMDId::MDIdCompare, CleanupRelease<IMDId>>;
+using MdidHashSet = gpos::UnorderedSet<gpos::Ref<IMDId>>;
 
 // iterator over the hash set for column id information for missing statistics
-using MdidHashSetIter = CHashSetIter<IMDId, IMDId::MDIdHash, IMDId::MDIdCompare,
-									 CleanupRelease<IMDId>>;
+using MdidHashSetIter = gpos::UnorderedSet<gpos::Ref<IMDId>>::LegacyIterator;
 
 }  // namespace gpmd
 

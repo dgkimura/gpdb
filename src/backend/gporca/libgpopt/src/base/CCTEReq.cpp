@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 
 #include "gpopt/base/COptCtxt.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -170,8 +171,7 @@ CCTEReq::Insert(ULONG ulCteId, CCTEMap::ECteType ect, BOOL fRequired,
 	GPOS_ASSERT(CCTEMap::EctSentinel > ect);
 	gpos::Ref<CCTEReqEntry> pcre =
 		GPOS_NEW(m_mp) CCTEReqEntry(ulCteId, ect, fRequired, pdpplan);
-	BOOL fSuccess GPOS_ASSERTS_ONLY =
-		m_phmcter->Insert(GPOS_NEW(m_mp) ULONG(ulCteId), pcre);
+	BOOL fSuccess GPOS_ASSERTS_ONLY = m_phmcter->Insert(ulCteId, pcre);
 	GPOS_ASSERT(fSuccess);
 	if (fRequired)
 	{
@@ -214,7 +214,7 @@ CCTEReq::InsertConsumer(ULONG id, gpos::Ref<CDrvdPropArray> pdrgpdpCtxt)
 gpos::Ref<CCTEReq::CCTEReqEntry>
 CCTEReq::PcreLookup(ULONG ulCteId) const
 {
-	return m_phmcter->Find(&ulCteId);
+	return m_phmcter->Find(ulCteId);
 }
 
 //---------------------------------------------------------------------------
@@ -414,7 +414,7 @@ CCTEReq::PcterUnresolvedSequence(
 	// if something is in pcm and not in the requirments, it has to be a producer
 	// in which case, add the corresponding consumer as unresolved
 	gpos::Ref<ULongPtrArray> pdrgpulProducers =
-		pcm->PdrgpulAdditionalProducers(mp, this);
+		pcm->PdrgpulAdditionalProducers(mp, SharedFromThis());
 	const ULONG length = pdrgpulProducers->Size();
 	for (ULONG ul = 0; ul < length; ul++)
 	{
@@ -489,8 +489,7 @@ CCTEReq::OsPrint(IOstream &os) const
 	UlongToCTEReqEntryMapIter hmcri(m_phmcter);
 	while (hmcri.Advance())
 	{
-		gpos::Ref<CCTEReqEntry> pcre =
-			const_cast<gpos::Ref<CCTEReqEntry> >(hmcri.Value());
+		gpos::Ref<CCTEReqEntry> pcre = hmcri.Value();
 		pcre->OsPrint(os);
 	}
 

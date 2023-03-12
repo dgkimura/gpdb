@@ -86,7 +86,7 @@ private:
 	gpos::Ref<CDrvdPropScalar> m_pdpscalar;
 
 	// group reference to Memo
-	gpos::Ref<CGroupExpression> m_pgexpr;
+	gpos::WeakRef<CGroupExpression> m_pgexpr;
 
 	// cost of physical expression node when copied out of the memo
 	CCost m_cost;
@@ -188,7 +188,7 @@ public:
 	gpos::Ref<CGroupExpression>
 	Pgexpr() const
 	{
-		return m_pgexpr;
+		return m_pgexpr.Lock();
 	}
 
 	// accessor for computed required plan props
@@ -331,15 +331,11 @@ operator<<(IOstream &os, CExpression &expr)
 }
 
 // hash map from ULONG to expression
-using UlongToExprMap =
-	CHashMap<ULONG, CExpression, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<CExpression>>;
+using UlongToExprMap = gpos::UnorderedMap<ULONG *, gpos::Ref<CExpression>>;
 
 // map iterator
 using UlongToExprMapIter =
-	CHashMapIter<ULONG, CExpression, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CExpression>>;
+	gpos::UnorderedMap<ULONG *, gpos::Ref<CExpression>>::LegacyIterator;
 
 REF_PTR_ADDREF_RELEASE_INLINE_DEF(CExpression);
 

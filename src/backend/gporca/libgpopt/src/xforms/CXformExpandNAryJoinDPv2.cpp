@@ -60,7 +60,7 @@ CXformExpandNAryJoinDPv2::CXformExpandNAryJoinDPv2(CMemoryPool *mp)
 CXform::EXformPromise
 CXformExpandNAryJoinDPv2::Exfp(CExpressionHandle &exprhdl) const
 {
-	return CXformUtils::ExfpExpandJoinOrder(exprhdl, this);
+	return CXformUtils::ExfpExpandJoinOrder(exprhdl, SharedFromThis());
 }
 
 

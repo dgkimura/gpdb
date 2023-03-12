@@ -257,8 +257,8 @@ CXformEagerAgg::CanApplyTransform(gpos::Ref<CExpression> gb_agg_expr)
 void
 CXformEagerAgg::PopulateLowerUpperProjectList(
 	CMemoryPool *mp,  // memory pool
-	CExpression
-		*orig_proj_list,  // project list of the original global aggregate
+	gpos::Ref<CExpression>
+		orig_proj_list,	 // project list of the original global aggregate
 	gpos::Ref<CExpression>
 		*lower_proj_list,  // project list of the new lower aggregate
 	gpos::Ref<CExpression>

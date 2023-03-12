@@ -142,8 +142,7 @@ CXformExpandDynamicGetWithForeignPartitions::Transform(
 			else
 			{
 				// array for foreign server already exists in map, just append
-				(const_cast<gpos::Ref<IMdIdArray> >(foreign_server))
-					->Append(partMdid);
+				foreign_server->Append(partMdid);
 			}
 		}
 	}
@@ -190,14 +189,12 @@ CXformExpandDynamicGetWithForeignPartitions::Transform(
 	// foreign server using the mdid array
 	SForeignServerToIMdIdArrayMapIter map_iter(
 		foreign_server_to_part_oid_array_map);
-	BOOL no_union_all =
-		foreign_server_to_part_oid_array_map->GetKeys()->Size() == 1 &&
-		non_foreign_parts_size == 0;
+	BOOL no_union_all = foreign_server_to_part_oid_array_map->Size() == 1 &&
+						non_foreign_parts_size == 0;
 	while (map_iter.Advance())
 	{
-		SForeignServer foreign_server = *(map_iter.Key());
-		gpos::Ref<IMdIdArray> part_oid_array =
-			const_cast<gpos::Ref<IMdIdArray> >(map_iter.Value());
+		gpos::Ref<SForeignServer> foreign_server = map_iter.Key();
+		gpos::Ref<IMdIdArray> part_oid_array = map_iter.Value();
 
 
 
@@ -217,8 +214,8 @@ CXformExpandDynamicGetWithForeignPartitions::Transform(
 			CLogicalDynamicForeignGet(mp, new_alias, popGet->Ptabdesc(),
 									  popGet->ScanId(), pdrgpcrNew,
 									  popGet->PdrgpdrgpcrPart(), part_oid_array,
-									  foreign_server.m_foreign_server_oid,
-									  foreign_server.m_is_coordinator_only);
+									  foreign_server->m_foreign_server_oid,
+									  foreign_server->m_is_coordinator_only);
 		gpos::Ref<CExpression> pexprDynamicForeignGet =
 			GPOS_NEW(mp) CExpression(mp, dynamicForeignGet);
 

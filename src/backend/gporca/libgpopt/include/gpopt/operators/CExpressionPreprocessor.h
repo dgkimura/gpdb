@@ -28,8 +28,7 @@ namespace gpopt
 using namespace gpos;
 
 using ExprToConstantMap =
-	CHashMap<CExpression, CExpression, CExpression::HashValue, CUtils::Equals,
-			 CleanupRelease<CExpression>, CleanupRelease<CExpression>>;
+	gpos::UnorderedMap<gpos::Ref<CExpression>, gpos::Ref<CExpression>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -44,15 +43,12 @@ class CExpressionPreprocessor
 private:
 	// map CTE id to collected predicates
 	using CTEPredsMap =
-		CHashMap<ULONG, CExpressionArray, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CExpressionArray>>;
+		gpos::UnorderedMap<ULONG *, gpos::Ref<CExpressionArray>>;
 
 	// iterator for map of CTE id to collected predicates
 	using CTEPredsMapIter =
-		CHashMapIter<ULONG, CExpressionArray, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupRelease<CExpressionArray>>;
+		gpos::UnorderedMap<ULONG *,
+						   gpos::Ref<CExpressionArray>>::LegacyIterator;
 
 	// generate a conjunction of equality predicates between the columns in the given set
 	static gpos::Ref<CExpression> PexprConjEqualityPredicates(

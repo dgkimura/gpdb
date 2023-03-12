@@ -67,9 +67,9 @@ CParseHandlerRoutedMotion::StartElement(const XMLCh *const,	 // element_uri,
 				   str->GetBuffer());
 	}
 
-	m_dxl_op = (gpos::Ref<CDXLPhysicalRoutedDistributeMotion>)
+	m_dxl_op = gpos::cast<CDXLPhysicalRoutedDistributeMotion>(
 		CDXLOperatorFactory::MakeDXLRoutedMotion(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance

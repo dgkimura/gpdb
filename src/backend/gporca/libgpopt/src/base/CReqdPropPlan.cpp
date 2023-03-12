@@ -326,7 +326,7 @@ CReqdPropPlan::FSatisfied(const gpos::Ref<CDrvdPropRelational> pdprel,
 	GPOS_ASSERT(pdprel->IsComplete());
 
 	// first, check satisfiability of relational properties
-	if (!pdprel->FSatisfies(this))
+	if (!pdprel->FSatisfies(gpos::dyn_cast<CReqdPropPlan>(SharedFromThis())))
 	{
 		return false;
 	}
@@ -345,7 +345,7 @@ CReqdPropPlan::FSatisfied(const gpos::Ref<CDrvdPropRelational> pdprel,
 	}
 
 	// otherwise, check satisfiability of all plan properties
-	return pdpplan->FSatisfies(this);
+	return pdpplan->FSatisfies(gpos::dyn_cast<CReqdPropPlan>(SharedFromThis()));
 }
 
 //---------------------------------------------------------------------------
@@ -366,7 +366,7 @@ CReqdPropPlan::FCompatible(CExpressionHandle &exprhdl,
 	GPOS_ASSERT(nullptr != pdprel);
 
 	// first, check satisfiability of relational properties, including required columns
-	if (!pdprel->FSatisfies(this))
+	if (!pdprel->FSatisfies(gpos::dyn_cast<CReqdPropPlan>(SharedFromThis())))
 	{
 		return false;
 	}
@@ -458,7 +458,7 @@ CReqdPropPlan::OsPrint(IOstream &os) const
 	os << "], req partition propagation: [";
 	if (nullptr != m_pepp)
 	{
-		os << GetPrintablePtr(m_pepp);
+		os << GetPrintablePtr(m_pepp.get());
 	}
 	os << "]";
 

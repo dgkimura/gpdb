@@ -80,7 +80,8 @@ public:
 		gpos::Ref<CExpression> pexprLeft = (*pexpr)[0];
 		gpos::Ref<CExpression> pexprRight = (*pexpr)[1];
 		gpos::Ref<CExpression> pexprScalar = (*pexpr)[2];
-		TLogicalApply *popApply = TLogicalApply::PopConvert(pexpr->Pop());
+		gpos::Ref<TLogicalApply> popApply =
+			TLogicalApply::PopConvert(pexpr->Pop());
 		gpos::Ref<CColRefArray> colref_array = popApply->PdrgPcrInner();
 
 

@@ -44,7 +44,7 @@ private:
 
 protected:
 	// target group expression
-	gpos::Ref<CGroupExpression> m_pgexpr{nullptr};
+	gpos::WeakRef<CGroupExpression> m_pgexpr{nullptr};
 
 	// ctor
 	CJobGroupExpression() = default;

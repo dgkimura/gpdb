@@ -43,15 +43,12 @@ class CTableDescriptor;
 
 // map of expression to array of expressions
 using ExprToExprArrayMap =
-	CHashMap<CExpression, CExpressionArray, CExpression::HashValue,
-			 CUtils::Equals, CleanupRelease<CExpression>,
-			 CleanupRelease<CExpressionArray>>;
+	gpos::UnorderedMap<gpos::Ref<CExpression>, gpos::Ref<CExpressionArray>>;
 
 // iterator of map of expression to array of expressions
 using ExprToExprArrayMapIter =
-	CHashMapIter<CExpression, CExpressionArray, CExpression::HashValue,
-				 CUtils::Equals, CleanupRelease<CExpression>,
-				 CleanupRelease<CExpressionArray>>;
+	gpos::UnorderedMap<gpos::Ref<CExpression>,
+					   gpos::Ref<CExpressionArray>>::LegacyIterator;
 
 // array of array of expressions
 using CExpressionArrays = gpos::Vector<gpos::Ref<CExpressionArray>>;
@@ -554,7 +551,7 @@ public:
 	// the result will be {col3, col2}
 	static gpos::Ref<CColRefArray> PdrgpcrReorderedSubsequence(
 		CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
-		gpos::Ref<ULongPtrArray> pdrgpulIndexesOfRefs);
+		gpos::Ref<ULongVector> pdrgpulIndexesOfRefs);
 
 	// check if given xform is an Agg splitting xform
 	static BOOL FSplitAggXform(CXform::EXformId exfid);

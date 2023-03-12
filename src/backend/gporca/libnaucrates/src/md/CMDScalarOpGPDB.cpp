@@ -55,8 +55,6 @@ CMDScalarOpGPDB::CMDScalarOpGPDB(
 	  m_is_ndv_preserving(is_ndv_preserving)
 {
 	GPOS_ASSERT(nullptr != mdid_opfamilies_array);
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 
@@ -71,7 +69,10 @@ CMDScalarOpGPDB::CMDScalarOpGPDB(
 CMDScalarOpGPDB::~CMDScalarOpGPDB()
 {
 	GPOS_DELETE(m_mdname);
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 //---------------------------------------------------------------------------

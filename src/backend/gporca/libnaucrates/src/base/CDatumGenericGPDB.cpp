@@ -17,6 +17,7 @@
 
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/mdcache/CMDAccessor.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/CMDIdGPDB.h"
 #include "naucrates/md/IMDType.h"
 #include "naucrates/statistics/CScaleFactorUtils.h"
@@ -397,7 +398,7 @@ CDatumGenericGPDB::MakeCopyOfValue(CMemoryPool *mp, ULONG *dest_length) const
 BOOL
 CDatumGenericGPDB::NeedsPadding() const
 {
-	return MDId()->Equals(&CMDIdGPDB::m_mdid_bpchar);
+	return MDId()->Equals(CMDIdGPDB::m_mdid_bpchar);
 }
 
 //---------------------------------------------------------------------------

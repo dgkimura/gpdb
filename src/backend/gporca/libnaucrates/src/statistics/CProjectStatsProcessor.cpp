@@ -12,6 +12,7 @@
 #include "naucrates/statistics/CProjectStatsProcessor.h"
 
 #include "gpopt/base/COptCtxt.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
 using namespace gpopt;
@@ -52,7 +53,7 @@ CProjectStatsProcessor::CalcProjStats(
 			BOOL is_well_defined = false;
 			if (nullptr != datum_map)
 			{
-				gpos::Ref<IDatum> datum = datum_map->Find(&colid);
+				gpos::Ref<IDatum> datum = datum_map->Find(colid);
 				if (nullptr != datum)
 				{
 					is_well_defined = true;

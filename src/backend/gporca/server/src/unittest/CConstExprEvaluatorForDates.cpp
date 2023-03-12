@@ -19,6 +19,7 @@
 
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CScalarCmp.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/base/IDatum.h"
 #include "naucrates/md/CMDIdGPDB.h"
 #include "naucrates/md/IMDType.h"
@@ -46,18 +47,17 @@ CConstExprEvaluatorForDates::PexprEval(gpos::Ref<CExpression> pexpr)
 	GPOS_ASSERT(COperator::EopScalarConst == (*pexpr)[1]->Pop()->Eopid());
 
 	gpos::Ref<CScalarConst> popScalarLeft =
-		gpos::dyn_cast<CScalarConst> > ((*pexpr)[0] - Pop());
+		gpos::dyn_cast<CScalarConst>((*pexpr)[0]->Pop());
 
 	GPOS_ASSERT(
 		CMDIdGPDB::m_mdid_date.Equals(popScalarLeft->GetDatum()->MDId()));
 	gpos::Ref<CScalarConst> popScalarRight =
-		gpos::dyn_cast<CScalarConst> > ((*pexpr)[1] - Pop());
+		gpos::dyn_cast<CScalarConst>((*pexpr)[1]->Pop());
 
 	GPOS_ASSERT(
 		CMDIdGPDB::m_mdid_date.Equals(popScalarRight->GetDatum()->MDId()));
 
-	gpos::Ref<CScalarCmp> popScCmp =
-		gpos::dyn_cast<CScalarCmp> > (pexpr - Pop());
+	gpos::Ref<CScalarCmp> popScCmp = gpos::dyn_cast<CScalarCmp>(pexpr->Pop());
 	LINT dLeft = popScalarLeft->GetDatum()->GetLINTMapping();
 	LINT dRight = popScalarRight->GetDatum()->GetLINTMapping();
 	BOOL result = false;

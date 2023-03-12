@@ -81,26 +81,25 @@ CStatisticsUtils::NextPoint(CMemoryPool *mp, CMDAccessor *md_accessor,
 		if (mdtype->GetDatumType() == IMDType::EtiInt2)
 		{
 			SINT sValue =
-				(SINT)(gpos::dyn_cast<IDatumInt2> > (datum_old) -Value() + 1);
+				(SINT)(gpos::dyn_cast<IDatumInt2>(datum_old)->Value() + 1);
 			datum_new = gpos::dyn_cast<IMDTypeInt2>(mdtype)->CreateInt2Datum(
 				mp, sValue, false);
 		}
 		else if (mdtype->GetDatumType() == IMDType::EtiInt4)
 		{
-			INT iValue = gpos::dyn_cast<IDatumInt4> > (datum_old) -Value() + 1;
+			INT iValue = gpos::dyn_cast<IDatumInt4>(datum_old)->Value() + 1;
 			datum_new = gpos::dyn_cast<IMDTypeInt4>(mdtype)->CreateInt4Datum(
 				mp, iValue, false);
 		}
 		else if (mdtype->GetDatumType() == IMDType::EtiInt8)
 		{
-			LINT value = gpos::dyn_cast<IDatumInt8> > (datum_old) -Value() + 1;
+			LINT value = gpos::dyn_cast<IDatumInt8>(datum_old)->Value() + 1;
 			datum_new = gpos::dyn_cast<IMDTypeInt8>(mdtype)->CreateInt8Datum(
 				mp, value, false);
 		}
 		else
 		{
-			OID oidValue =
-				gpos::dyn_cast<IDatumOid> > (datum_old) -OidValue() + 1;
+			OID oidValue = gpos::dyn_cast<IDatumOid>(datum_old)->OidValue() + 1;
 			datum_new = gpos::dyn_cast<IMDTypeOid>(mdtype)->CreateOidDatum(
 				mp, oidValue, false);
 		}
@@ -1291,7 +1290,7 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 			const ULONG upper_bound_ndv_idx =
 				stats->GetIndexUpperBoundNDVs(grouping_colref);
 			const gpos::Ref<ULongPtrArray> ndv_colid =
-				grp_colid_upper_bound_ndv_idx_map->Find(&upper_bound_ndv_idx);
+				grp_colid_upper_bound_ndv_idx_map->Find(upper_bound_ndv_idx);
 			if (nullptr == ndv_colid)
 			{
 				gpos::Ref<ULongPtrArray> colids_new =
@@ -1299,13 +1298,12 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 				colids_new->Append(GPOS_NEW(mp) ULONG(colid));
 				BOOL fres GPOS_ASSERTS_ONLY =
 					grp_colid_upper_bound_ndv_idx_map->Insert(
-						GPOS_NEW(mp) ULONG(upper_bound_ndv_idx), colids_new);
+						upper_bound_ndv_idx, colids_new);
 				GPOS_ASSERT(fres);
 			}
 			else
 			{
-				(const_cast<gpos::Ref<ULongPtrArray> >(ndv_colid))
-					->Append(GPOS_NEW(mp) ULONG(colid));
+				ndv_colid->Append(GPOS_NEW(mp) ULONG(colid));
 			}
 		}
 	}
@@ -1324,8 +1322,8 @@ CStatisticsUtils::GetGrpColIdToUpperBoundNDVIdxMap(
 void
 CStatisticsUtils::AddNdvForAllGrpCols(
 	CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
-	const ULongPtrArray
-		*grouping_columns,	// array of grouping column ids from a source
+	const gpos::Ref<ULongPtrArray>
+		grouping_columns,  // array of grouping column ids from a source
 	gpos::Ref<CDoubleArray> output_ndvs	 // output array of ndvs
 )
 {
@@ -1377,8 +1375,7 @@ CStatisticsUtils::ExtractNDVForGrpCols(
 	GPOS_ASSERT(nullptr != stats);
 	GPOS_ASSERT(nullptr != grp_cols_refset);
 
-	gpos::Ref<CStatistics> input_stats =
-		CStatistics::CastStats(const_cast<gpos::Ref<IStatistics> >(stats));
+	gpos::Ref<CStatistics> input_stats = gpos::dyn_cast<CStatistics>(stats);
 
 	gpos::Ref<CDoubleArray> ndvs = GPOS_NEW(mp) CDoubleArray(mp);
 
@@ -1388,7 +1385,7 @@ CStatisticsUtils::ExtractNDVForGrpCols(
 	UlongToUlongPtrArrayMapIter map_iter(grp_colid_upper_bound_ndv_idx_map);
 	while (map_iter.Advance())
 	{
-		ULONG source_id = *(map_iter.Key());
+		ULONG source_id = map_iter.Key();
 		const gpos::Ref<ULongPtrArray> src_grouping_cols = map_iter.Value();
 
 		if (gpos::ulong_max == source_id)
@@ -1880,8 +1877,8 @@ CStatisticsUtils::AddWidthInfo(CMemoryPool *mp,
 void
 CStatisticsUtils::ComputeCardUpperBounds(
 	CMemoryPool *mp, const gpos::Ref<CStatistics> input_stats,
-	CStatistics
-		*output_stats,	  // output statistics object that is to be updated
+	gpos::Ref<CStatistics>
+		output_stats,	  // output statistics object that is to be updated
 	CDouble rows_output,  // estimated output cardinality of the operator
 	CStatistics::ECardBoundingMethod
 		card_bounding_method  // technique used to estimate max source cardinality in the output stats object

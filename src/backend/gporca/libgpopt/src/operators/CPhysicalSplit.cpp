@@ -390,10 +390,9 @@ CPhysicalSplit::HashValue() const
 {
 	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(),
 									   CUtils::UlHashColArray(m_pdrgpcrInsert));
-	ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrCtid));
-	ulHash =
-		gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrSegmentId));
-	ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrAction));
+	ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(m_pcrCtid));
+	ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(m_pcrSegmentId));
+	ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(m_pcrAction));
 
 	return ulHash;
 }

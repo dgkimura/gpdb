@@ -3,6 +3,7 @@
 
 #include "gpopt/base/CDistributionSpecStrictHashed.h"
 
+#include "gpopt/search/CGroupExpression.h"
 namespace gpopt
 {
 CDistributionSpecStrictHashed::CDistributionSpecStrictHashed(

@@ -589,7 +589,8 @@ CDistributionSpecHashed::Matches(const gpos::Ref<CDistributionSpec> pds) const
 	}
 
 	if (nullptr != pdshashed->PdshashedEquiv() &&
-		pdshashed->PdshashedEquiv()->Matches(this))
+		pdshashed->PdshashedEquiv()->Matches(
+			gpos::dyn_cast<CDistributionSpec>(SharedFromThis())))
 	{
 		return true;
 	}
@@ -697,7 +698,8 @@ CDistributionSpecHashed::IsCoveredBy(
 	const gpos::Ref<CExpressionArray> dist_cols_expr_array) const
 {
 	BOOL covers = false;
-	const gpos::Ref<CDistributionSpecHashed> pds = this;
+	gpos::Ref<CDistributionSpecHashed> pds =
+		dyn_cast<CDistributionSpecHashed>(SharedFromThis());
 	while (pds && !covers)
 	{
 		covers = CUtils::Contains(dist_cols_expr_array, pds->Pdrgpexpr());
@@ -993,11 +995,11 @@ CDistributionSpecHashed::Combine(CMemoryPool *mp,
 {
 	if (nullptr == other_spec)
 	{
-		return this;
+		return gpos::dyn_cast<CDistributionSpecHashed>(SharedFromThis());
 	}
 
 	gpos::Ref<CDistributionSpecHashed> combined_spec = other_spec->Copy(mp);
-	gpos::Ref<CDistributionSpecHashed> prev = nullptr, *next = nullptr;
+	gpos::Ref<CDistributionSpecHashed> prev = nullptr, next = nullptr;
 
 	while (nullptr != combined_spec)
 	{

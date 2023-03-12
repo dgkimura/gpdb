@@ -97,7 +97,7 @@ private:
 	gpos::Ref<CColRefSet> m_pcrsUsed{nullptr};
 
 	// singelton empty frame -- used with any unspecified window function frame
-	static const CWindowFrame m_wfEmpty;
+	BOOL m_wfEmpty{false};
 
 	// in_range function for startOffset
 	OID m_start_in_range_func;
@@ -211,14 +211,16 @@ public:
 	static BOOL
 	IsEmpty(gpos::Ref<CWindowFrame> pwf)
 	{
-		return pwf == &m_wfEmpty;
+		return pwf->m_wfEmpty;
 	}
 
 	// return pointer to singleton empty window frame
 	static const gpos::Ref<CWindowFrame>
-	PwfEmpty()
+	PwfEmpty(CMemoryPool *mp)
 	{
-		return &m_wfEmpty;
+		gpos::Ref<CWindowFrame> pwfempty = GPOS_NEW(mp) CWindowFrame();
+		pwfempty->m_wfEmpty = true;
+		return pwfempty;
 	}
 
 	OID

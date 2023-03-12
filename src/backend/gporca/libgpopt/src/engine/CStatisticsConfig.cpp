@@ -100,8 +100,8 @@ CStatisticsConfig::CollectMissingStatsColumns(gpos::Ref<IMdIdArray> pdrgmdid)
 	MdidHashSetIter hsiter(m_phsmdidcolinfo);
 	while (hsiter.Advance())
 	{
-		gpos::Ref<CMDIdColStats> mdid_col_stats = CMDIdColStats::CastMdid(
-			const_cast<gpos::Ref<IMDId> >(hsiter.Get()));
+		gpos::Ref<CMDIdColStats> mdid_col_stats =
+			CMDIdColStats::CastMdid(hsiter.Get());
 
 		pdrgmdid->Append(mdid_col_stats);
 	}

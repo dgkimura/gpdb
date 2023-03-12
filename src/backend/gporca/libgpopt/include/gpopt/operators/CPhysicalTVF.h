@@ -39,7 +39,7 @@ private:
 	CWStringConst *m_pstr;
 
 	// MD cache info
-	const gpos::Ref<IMDFunction> m_pmdfunc;
+	gpos::Ref<IMDFunction> m_pmdfunc;
 
 	// array of column descriptors: the schema of the function result
 	gpos::Ref<CColumnDescriptorArray> m_pdrgpcoldesc;

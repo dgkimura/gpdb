@@ -176,13 +176,13 @@ CJoinOrderDP::AddJoinOrder(gpos::Ref<CExpression> pexprJoin, CDouble dCost)
 		for (INT ul = 0; ul < ulResults; ul++)
 		{
 			gpos::Ref<CExpression> pexpr = (*m_pdrgpexprTopKOrders)[ul];
-			CDouble *pd = m_phmexprcost->Find(pexpr);
+			gpos::Ref<WrapperCDouble> pd = m_phmexprcost->Find(pexpr);
 			GPOS_ASSERT(nullptr != pd);
 
-			if (dmaxCost < *pd && dCost < *pd)
+			if (dmaxCost < pd->value() && dCost < pd->value())
 			{
 				// found a worse expression
-				dmaxCost = *pd;
+				dmaxCost = pd->value();
 				fAddJoinOrder = true;
 				iReplacePos = ul;
 			}
@@ -378,7 +378,7 @@ CJoinOrderDP::InsertExpressionCost(
 
 
 	BOOL fInserted GPOS_ASSERTS_ONLY =
-		m_phmexprcost->Insert(pexpr, GPOS_NEW(m_mp) CDouble(dCost));
+		m_phmexprcost->Insert(pexpr, GPOS_NEW(m_mp) WrapperCDouble(dCost));
 	GPOS_ASSERT(fInserted);
 }
 
@@ -602,11 +602,11 @@ CJoinOrderDP::DCost(gpos::Ref<CExpression> pexpr)
 	GPOS_CHECK_STACK_SIZE;
 	GPOS_ASSERT(nullptr != pexpr);
 
-	CDouble *pd = m_phmexprcost->Find(pexpr);
+	gpos::Ref<WrapperCDouble> pd = m_phmexprcost->Find(pexpr);
 	if (nullptr != pd)
 	{
 		// stop recursion if cost was already cashed
-		return *pd;
+		return pd->value();
 	}
 
 	CDouble dCost(0.0);
@@ -926,14 +926,14 @@ IOstream &
 CJoinOrderDP::OsPrint(IOstream &os) const
 {
 	// increase GPOS_LOG_MESSAGE_BUFFER_SIZE in file ILogger.h if the output of this method gets truncated
-	CHashMapIter<CBitSet, CExpression, UlHashBitSet, FEqualBitSet,
-				 CleanupRelease<CBitSet>, CleanupRelease<CExpression> >
+	gpos::UnorderedMap<gpos::Ref<CBitSet>,
+					   gpos::Ref<CExpression>>::LegacyIterator
 		bitset_to_expr_map_iterator(m_phmbsexpr);
 	CPrintPrefix pref(nullptr, "      ");
 
 	while (bitset_to_expr_map_iterator.Advance())
 	{
-		CDouble *cost =
+		gpos::Ref<WrapperCDouble> cost =
 			m_phmexprcost->Find(bitset_to_expr_map_iterator.Value());
 
 		os << "Bitset: ";
@@ -941,7 +941,7 @@ CJoinOrderDP::OsPrint(IOstream &os) const
 		os << std::endl;
 		if (nullptr != cost)
 		{
-			os << "Cost: " << *cost << std::endl;
+			os << "Cost: " << cost->value() << std::endl;
 		}
 		else
 		{
@@ -953,12 +953,13 @@ CJoinOrderDP::OsPrint(IOstream &os) const
 
 	for (ULONG k = 0; k < m_pdrgpexprTopKOrders->Size(); k++)
 	{
-		CDouble *cost = m_phmexprcost->Find((*m_pdrgpexprTopKOrders)[k]);
+		gpos::Ref<WrapperCDouble> cost =
+			m_phmexprcost->Find((*m_pdrgpexprTopKOrders)[k]);
 
 		os << "Best top-level expression [" << k << "]: " << std::endl;
 		if (nullptr != cost)
 		{
-			os << "Cost: " << *cost << std::endl;
+			os << "Cost: " << cost->value() << std::endl;
 		}
 		else
 		{

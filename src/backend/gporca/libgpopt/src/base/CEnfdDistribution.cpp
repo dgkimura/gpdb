@@ -159,7 +159,8 @@ CEnfdDistribution::Epet(CExpressionHandle &exprhdl,
 		// has the same number of outer references.
 		// 3. The following logic ensures that *none* of the group expressions
 		// will add a motion into this group.
-		EPropEnforcingType epet = popPhysical->EpetDistribution(exprhdl, this);
+		EPropEnforcingType epet = popPhysical->EpetDistribution(
+			exprhdl, gpos::dyn_cast<CEnfdDistribution>(SharedFromThis()));
 		if (FEnforce(epet) && exprhdl.HasOuterRefs())
 		{
 			// disallow plans with outer references below motion operator

@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 
 #include "gpopt/operators/CLogicalTVF.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
