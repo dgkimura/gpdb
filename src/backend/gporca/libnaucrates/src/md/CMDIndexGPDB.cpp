@@ -66,9 +66,6 @@ CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 	GPOS_ASSERT_IMP(IMDIndex::EmdindBitmap == index_type,
 					nullptr != mdid_item_type && mdid_item_type->IsValid());
 	GPOS_ASSERT(nullptr != mdid_opfamilies_array);
-
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -82,7 +79,10 @@ CMDIndexGPDB::CMDIndexGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 CMDIndexGPDB::~CMDIndexGPDB()
 {
 	GPOS_DELETE(m_mdname);
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 //---------------------------------------------------------------------------

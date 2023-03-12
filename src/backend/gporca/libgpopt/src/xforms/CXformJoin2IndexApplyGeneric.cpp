@@ -164,9 +164,9 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 
 	// info on the get node (a get node or a dynamic get)
 	gpos::Ref<CTableDescriptor> ptabdescInner = nullptr;
-	const gpos::Ref<CColRefSet> distributionCols = nullptr;
+	gpos::Ref<CColRefSet> distributionCols = nullptr;
 	gpos::Ref<CLogicalDynamicGet> popDynamicGet = nullptr;
-	CAutoRef<CColRefSet> groupingColsToCheck;
+	gpos::Ref<CColRefSet> groupingColsToCheck;
 
 	// walk down the right child tree, accepting some unary operators
 	// like project and GbAgg and select, until we find a logical get
@@ -238,8 +238,7 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 								CColRefSet(mp, grbyAggOp->Pdrgpcr());
 
 							// if there are multiple groupbys, then check the intersection of their grouping cols
-							groupingCols->Intersection(
-								groupingColsToCheck.Value());
+							groupingCols->Intersection(groupingColsToCheck);
 
 							groupingColsToCheck = groupingCols;
 
@@ -270,7 +269,7 @@ CXformJoin2IndexApplyGeneric::Transform(gpos::Ref<CXformContext> pxfctxt,
 				distributionCols = popGet->PcrsDist();
 				pexprGet = pexprCurrInnerChild;
 
-				if (nullptr != groupingColsToCheck.Value() &&
+				if (nullptr != groupingColsToCheck &&
 					!groupingColsToCheck->ContainsAll(distributionCols))
 				{
 					// the grouping columns are not a superset of the distribution columns

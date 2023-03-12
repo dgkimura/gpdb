@@ -30,6 +30,7 @@
 #include "gpopt/operators/CScalarCmp.h"
 #include "gpopt/operators/CScalarFunc.h"
 #include "gpopt/operators/CScalarIdent.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/md/CMDArrayCoerceCastGPDB.h"
 #include "naucrates/md/CMDIdGPDB.h"
@@ -123,8 +124,8 @@ CPredicateUtils::FComparison(gpos::Ref<CExpression> pexpr,
 BOOL
 CPredicateUtils::FComparison(
 	gpos::Ref<CExpression> pexpr, gpos::Ref<CColRef> colref,
-	CColRefSet
-		*pcrsAllowedRefs  // other column references allowed in the comparison
+	gpos::Ref<CColRefSet>
+		pcrsAllowedRefs	 // other column references allowed in the comparison
 )
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -157,8 +158,8 @@ CPredicateUtils::FComparison(
 BOOL
 CPredicateUtils::FIdentCompareOuterRefExprIgnoreCast(
 	gpos::Ref<CExpression> pexpr,
-	CColRefSet
-		*pcrsOuterRefs,	 // other column references allowed in the comparison
+	gpos::Ref<CColRefSet>
+		pcrsOuterRefs,	// other column references allowed in the comparison
 	gpos::Ref<CColRef> *localColRef)
 {
 	GPOS_ASSERT(nullptr != pexpr);
@@ -863,8 +864,7 @@ CPredicateUtils::FSelfComparison(gpos::Ref<CExpression> pexpr,
 			return false;
 		}
 
-		gpos::Ref<CColRef> colref = const_cast<gpos::Ref<CColRef> >(
-			CScalarIdent::PopConvert(popLeft)->Pcr());
+		gpos::Ref<CColRef> colref = CScalarIdent::PopConvert(popLeft)->Pcr();
 
 		return CColRef::EcrtTable == colref->Ecrt() &&
 			   !CColRefTable::PcrConvert(colref)->IsNullable();
@@ -2531,7 +2531,7 @@ CPredicateUtils::FCompatibleIndexPredicate(gpos::Ref<CExpression> pexprPred,
 	GPOS_ASSERT(nullptr != pexprPred);
 	GPOS_ASSERT(nullptr != pmdindex);
 
-	const gpos::Ref<IMDScalarOp> pmdobjScCmp = nullptr;
+	gpos::Ref<IMDScalarOp> pmdobjScCmp = nullptr;
 	if (COperator::EopScalarCmp == pexprPred->Pop()->Eopid())
 	{
 		gpos::Ref<CScalarCmp> popScCmp =
@@ -2819,7 +2819,7 @@ CPredicateUtils::FBitmapLookupSupportedPredicateOrConjunct(
 BOOL
 CPredicateUtils::FBuiltInComparisonIsVeryStrict(gpos::Ref<IMDId> mdid)
 {
-	const gpos::Ref<CMDIdGPDB> const pmdidGPDB = CMDIdGPDB::CastMdid(mdid);
+	const gpos::Ref<CMDIdGPDB> pmdidGPDB = CMDIdGPDB::CastMdid(mdid);
 
 	GPOS_ASSERT(nullptr != pmdidGPDB);
 

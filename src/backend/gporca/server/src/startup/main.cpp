@@ -374,7 +374,7 @@ PvExec(void *pv)
 		GPOS_ASSERT(fUnittest);
 		if (!bv.IsEmpty())
 		{
-			tests_failed = CUnittest::Driver(&bv);
+			tests_failed = CUnittest::Driver(bv);
 		}
 		else
 		{

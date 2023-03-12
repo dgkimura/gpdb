@@ -17,6 +17,7 @@
 #include "gpopt/base/CConstraintConjunction.h"
 #include "gpopt/base/CConstraintNegation.h"
 #include "gpopt/base/CUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -741,8 +742,7 @@ CPartConstraint::CopyPartConstraints(
 	while (pcmi.Advance())
 	{
 		ULONG ulKey = *(pcmi.Key());
-		gpos::Ref<CPartConstraint> ppartcnstrSource =
-			const_cast<gpos::Ref<CPartConstraint> >(pcmi.Value());
+		gpos::Ref<CPartConstraint> ppartcnstrSource = pcmi.Value();
 
 		gpos::Ref<CPartConstraint> ppartcnstrDest =
 			ppartcnstrmapDest->Find(&ulKey);

@@ -253,7 +253,7 @@ CLogicalDynamicGetBase::ConstructRootColMappingPerPart(
 				{
 					// Found the corresponding column in the child partition
 					// Save the index in the mapping
-					mapping->Insert(root_colref, GPOS_NEW(mp) ULONG(idx));
+					mapping->Insert(root_colref, GPOS_NEW(mp) UlongRef(idx));
 					found_mapping = true;
 					break;
 				}

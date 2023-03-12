@@ -19,8 +19,7 @@
 namespace gpopt
 {
 using ExprPredToExprPredPartMap =
-	CHashMap<CExpression, CExpression, CExpression::HashValue, CUtils::Equals,
-			 CleanupRelease<CExpression>, CleanupRelease<CExpression>>;
+	gpos::UnorderedMap<gpos::Ref<CExpression>, gpos::Ref<CExpression>>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -33,7 +32,7 @@ using ExprPredToExprPredPartMap =
 class CLogicalSelect : public CLogicalUnary
 {
 private:
-	ExprPredToExprPredPartMap *m_phmPexprPartPred;
+	gpos::Ref<ExprPredToExprPredPartMap> m_phmPexprPartPred;
 
 	// table descriptor
 	gpos::Ref<CTableDescriptor> m_ptabdesc;

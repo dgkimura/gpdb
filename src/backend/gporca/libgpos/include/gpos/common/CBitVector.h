@@ -12,6 +12,8 @@
 #define GPOS_CBitVector_H
 
 #include "gpos/base.h"
+#include "gpos/common/CRefCount.h"
+#include "gpos/common/Ref.h"
 
 namespace gpos
 {
@@ -23,7 +25,7 @@ namespace gpos
 //		Bit vector based on ULLONG elements
 //
 //---------------------------------------------------------------------------
-class CBitVector
+class CBitVector : public CRefCount<CBitVector>
 {
 private:
 	// size in bits

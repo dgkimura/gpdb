@@ -114,7 +114,8 @@ CLogicalDynamicIndexGet::HashValue() const
 BOOL
 CLogicalDynamicIndexGet::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchDynamicIndex(this, pop);
+	return CUtils::FMatchDynamicIndex(
+		gpos::dyn_cast<CLogicalDynamicIndexGet>(SharedFromThis()), pop);
 }
 
 //---------------------------------------------------------------------------

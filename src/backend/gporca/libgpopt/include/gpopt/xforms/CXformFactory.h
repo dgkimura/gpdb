@@ -19,6 +19,7 @@ namespace gpopt
 {
 using namespace gpos;
 
+
 //---------------------------------------------------------------------------
 //	@class:
 //		CXformFactory
@@ -32,8 +33,7 @@ class CXformFactory
 private:
 	// definition of hash map to maintain mappings
 	using XformNameToXformMap =
-		CHashMap<CHAR, CXform, gpos::HashValue<CHAR>, CXform::FEqualIds,
-				 CleanupDeleteArray<CHAR>, CleanupNULL<CXform>>;
+		gpos::UnorderedMap<std::string, gpos::Ref<CXform>>;
 
 	// memory pool
 	CMemoryPool *m_mp;

@@ -129,8 +129,8 @@ CLogicalConstTableGet::HashValue() const
 	ULONG ulHash = gpos::CombineHashes(
 		COperator::HashValue(),
 		gpos::CombineHashes(
-			gpos::HashPtr<CColumnDescriptorArray>(m_pdrgpcoldesc),
-			gpos::HashPtr<IDatum2dArray>(m_pdrgpdrgpdatum)));
+			gpos::HashPtr<CColumnDescriptorArray>(m_pdrgpcoldesc.get()),
+			gpos::HashPtr<IDatum2dArray>(m_pdrgpdrgpdatum.get())));
 	ulHash =
 		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrOutput));
 

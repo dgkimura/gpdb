@@ -18,6 +18,7 @@
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/mdcache/CMDAccessor.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/xml/CDXLSections.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"

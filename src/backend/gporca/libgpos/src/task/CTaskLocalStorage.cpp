@@ -26,6 +26,10 @@ using HashTableAccessor = CSyncHashtableAccessByKey<CTaskLocalStorageObject,
 const CTaskLocalStorage::Etlsidx CTaskLocalStorage::m_invalid_idx =
 	EtlsidxInvalid;
 
+CTaskLocalStorage::CTaskLocalStorage(CMemoryPool *mp) : m_hash_table(mp)
+{
+}
+
 
 //---------------------------------------------------------------------------
 //	@function:
@@ -46,18 +50,10 @@ CTaskLocalStorage::~CTaskLocalStorage() = default;
 //
 //---------------------------------------------------------------------------
 void
-CTaskLocalStorage::Reset(CMemoryPool *mp)
+CTaskLocalStorage::Reset(CMemoryPool *)
 {
 	// destroy old
-	m_hash_table.Cleanup();
-
-	// realloc
-	m_hash_table.Init(mp,
-					  128,	// number of hashbuckets
-					  GPOS_OFFSET(CTaskLocalStorageObject, m_link),
-					  GPOS_OFFSET(CTaskLocalStorageObject, m_etlsidx),
-					  &(CTaskLocalStorage::m_invalid_idx),
-					  CTaskLocalStorage::HashIdx, CTaskLocalStorage::Equals);
+	m_hash_table.Clear();
 }
 
 
@@ -76,13 +72,12 @@ CTaskLocalStorage::Store(gpos::Ref<CTaskLocalStorageObject> obj)
 
 #ifdef GPOS_DEBUG
 	{
-		HashTableAccessor HashTableAccessor(m_hash_table, obj->idx());
-		GPOS_ASSERT(nullptr == HashTableAccessor.Find() &&
+		GPOS_ASSERT(nullptr == m_hash_table.Find(obj->idx()) &&
 					"Duplicate TLS object key");
 	}
 #endif	// GPOS_DEBUG
 
-	m_hash_table.Insert(obj);
+	m_hash_table.Insert(obj->idx(), obj);
 }
 
 
@@ -97,8 +92,7 @@ CTaskLocalStorage::Store(gpos::Ref<CTaskLocalStorageObject> obj)
 gpos::Ref<CTaskLocalStorageObject>
 CTaskLocalStorage::Get(CTaskLocalStorage::Etlsidx idx)
 {
-	HashTableAccessor HashTableAccessor(m_hash_table, idx);
-	return HashTableAccessor.Find();
+	return m_hash_table.Find(idx);
 }
 
 
@@ -116,11 +110,10 @@ CTaskLocalStorage::Remove(gpos::Ref<CTaskLocalStorageObject> obj)
 	GPOS_ASSERT(nullptr != obj);
 
 	// lookup object
-	HashTableAccessor HashTableAccessor(m_hash_table, obj->idx());
-	GPOS_ASSERT(nullptr != HashTableAccessor.Find() &&
+	GPOS_ASSERT(nullptr != m_hash_table.Find(obj->idx()) &&
 				"Object not found in TLS");
 
-	HashTableAccessor.Remove(obj);
+	m_hash_table.Delete(obj->idx());
 }
 
 // EOF

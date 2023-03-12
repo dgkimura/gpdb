@@ -72,10 +72,6 @@ CMDTypeBoolGPDB::CMDTypeBoolGPDB(CMemoryPool *mp) : m_mp(mp)
 	m_mdid_count =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_BOOL_AGG_COUNT);
 
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
-
-
 
 	GPOS_ASSERT(GPDB_BOOL_OID == CMDIdGPDB::CastMdid(m_mdid)->Oid());
 	m_datum_null = GPOS_NEW(mp)
@@ -92,7 +88,10 @@ CMDTypeBoolGPDB::CMDTypeBoolGPDB(CMemoryPool *mp) : m_mp(mp)
 //---------------------------------------------------------------------------
 CMDTypeBoolGPDB::~CMDTypeBoolGPDB()
 {
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -239,8 +238,8 @@ gpos::Ref<IDatum>
 CMDTypeBoolGPDB::GetDatumForDXLConstVal(
 	const gpos::Ref<CDXLScalarConstValue> dxl_op) const
 {
-	gpos::Ref<CDXLDatumBool> dxl_datum = CDXLDatumBool::Cast(
-		const_cast<gpos::Ref<CDXLDatum> >(dxl_op->GetDatumVal()));
+	gpos::Ref<CDXLDatumBool> dxl_datum =
+		gpos::dyn_cast<CDXLDatumBool>(dxl_op->GetDatumVal());
 
 	return GPOS_NEW(m_mp) CDatumBoolGPDB(m_mdid->Sysid(), dxl_datum->GetValue(),
 										 dxl_datum->IsNull());
@@ -259,7 +258,7 @@ CMDTypeBoolGPDB::GetDatumForDXLDatum(CMemoryPool *mp,
 									 const gpos::Ref<CDXLDatum> dxl_datum) const
 {
 	gpos::Ref<CDXLDatumBool> dxl_datum_bool =
-		CDXLDatumBool::Cast(const_cast<gpos::Ref<CDXLDatum> >(dxl_datum));
+		gpos::dyn_cast<CDXLDatumBool>(dxl_datum);
 	BOOL value = dxl_datum_bool->GetValue();
 	BOOL is_null = dxl_datum_bool->IsNull();
 

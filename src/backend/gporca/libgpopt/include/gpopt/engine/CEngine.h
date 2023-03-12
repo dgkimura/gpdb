@@ -102,14 +102,14 @@ private:
 	// create optimization context for child group
 	gpos::Ref<COptimizationContext> PocChild(
 		gpos::Ref<CGroupExpression> pgexpr,	 // parent expression
-		COptimizationContext
-			*pocOrigin,	 // optimization context of parent operator
+		gpos::Ref<COptimizationContext>
+			pocOrigin,	// optimization context of parent operator
 		CExpressionHandle
 			&exprhdlPlan,  // handle to compute required plan properties
 		CExpressionHandle
 			&exprhdlRel,  // handle to compute required relational properties
-		CDrvdPropArray
-			*pdrgpdpChildren,  // derived plan properties of optimized children
+		gpos::Ref<CDrvdPropArray>
+			pdrgpdpChildren,  // derived plan properties of optimized children
 		gpos::Ref<IStatisticsArray> pdrgpstatCurrentCtxt, ULONG child_index,
 		ULONG ulOptReq);
 
@@ -144,7 +144,7 @@ private:
 	// insert children of the given expression to memo, and
 	// copy the resulting groups to the given group array
 	void InsertExpressionChildren(gpos::Ref<CExpression> pexpr,
-								  gpos::Ref<CGroupArray> pdrgpgroupChildren,
+								  gpos::Ref<CGroupArrayWeak> pdrgpgroupChildren,
 								  CXform::EXformId exfidOrigin,
 								  gpos::Ref<CGroupExpression> pgexprOrigin);
 
@@ -235,7 +235,7 @@ public:
 
 	// check if a group is the root one
 	BOOL
-	FRoot(gpos::Ref<CGroup> pgroup) const
+	FRoot(gpos::WeakRef<CGroup> pgroup) const
 	{
 		return (PgroupRoot() == pgroup);
 	}

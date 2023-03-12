@@ -41,7 +41,7 @@ class CRefCount : public CHeapObject
 {
 private:
 	// reference counter -- first in class to be in sync with Check()
-	ULONG_PTR m_refs{1};
+	ULONG_PTR m_refs{0};
 
 #ifdef GPOS_DEBUG
 	// sanity check to detect deleted memory

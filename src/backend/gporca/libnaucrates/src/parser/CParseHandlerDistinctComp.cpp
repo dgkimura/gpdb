@@ -63,9 +63,9 @@ CParseHandlerDistinctComp::StartElement(const XMLCh *const,	 // element_uri,
 	}
 
 	// parse and create distinct operator
-	m_dxl_op = (gpos::Ref<CDXLScalarDistinctComp>)
+	m_dxl_op = gpos::cast<CDXLScalarDistinctComp>(
 		CDXLOperatorFactory::MakeDXLDistinctCmp(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 	// create and activate the parse handler for the children nodes in reverse
 	// order of their expected appearance

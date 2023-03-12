@@ -57,7 +57,7 @@ CXformExpandNAryJoinMinCard::CXformExpandNAryJoinMinCard(CMemoryPool *mp)
 CXform::EXformPromise
 CXformExpandNAryJoinMinCard::Exfp(CExpressionHandle &exprhdl) const
 {
-	return CXformUtils::ExfpExpandJoinOrder(exprhdl, this);
+	return CXformUtils::ExfpExpandJoinOrder(exprhdl, SharedFromThis());
 }
 
 

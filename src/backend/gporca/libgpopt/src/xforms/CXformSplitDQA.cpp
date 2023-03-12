@@ -675,8 +675,7 @@ CXformSplitDQA::PcrAggFuncArgument(
 
 	if (COperator::EopScalarIdent == pexprArg->Pop()->Eopid())
 	{
-		return (const_cast<gpos::Ref<CColRef> >(
-			CScalarIdent::PopConvert(pexprArg->Pop())->Pcr()));
+		return CScalarIdent::PopConvert(pexprArg->Pop())->Pcr();
 	}
 
 	gpos::Ref<CScalar> popScalar = CScalar::PopConvert(pexprArg->Pop());

@@ -178,14 +178,14 @@ public:
 	const gpos::Ref<ULongPtrArray>
 	PdrgpulPart() const
 	{
-		return m_pdrgpulPart;
+		return m_pdrgpulPart.get();
 	}
 
 	// array of key sets
 	const gpos::Ref<CBitSetArray>
 	PdrgpbsKeys() const
 	{
-		return m_pdrgpbsKeys;
+		return m_pdrgpbsKeys.get();
 	}
 
 

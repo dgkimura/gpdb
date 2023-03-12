@@ -29,14 +29,11 @@ using namespace gpos;
 
 // hash map from CTE id to corresponding producer plan properties
 using UlongToDrvdPropPlanMap =
-	CHashMap<ULONG, CDrvdPropPlan, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<CDrvdPropPlan>>;
+	gpos::UnorderedMap<ULONG *, gpos::Ref<CDrvdPropPlan>>;
 
 // iterator for plan properties map
 using UlongToDrvdPropPlanMapIter =
-	CHashMapIter<ULONG, CDrvdPropPlan, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CDrvdPropPlan>>;
+	gpos::UnorderedMap<ULONG *, gpos::Ref<CDrvdPropPlan>>::LegacyIterator;
 
 // forward declaration
 class CCTEReq;
@@ -148,15 +145,11 @@ private:
 
 	// map CTE id to CTE map entry
 	using UlongToCTEMapEntryMap =
-		CHashMap<ULONG, CCTEMapEntry, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CCTEMapEntry>>;
+		gpos::UnorderedMap<ULONG *, gpos::Ref<CCTEMapEntry>>;
 
 	// map iterator
 	using UlongToCTEMapEntryMapIter =
-		CHashMapIter<ULONG, CCTEMapEntry, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupRelease<CCTEMapEntry>>;
+		gpos::UnorderedMap<ULONG *, gpos::Ref<CCTEMapEntry>>::LegacyIterator;
 
 	// memory pool
 	CMemoryPool *m_mp;

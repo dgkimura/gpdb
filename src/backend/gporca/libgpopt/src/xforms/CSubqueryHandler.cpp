@@ -740,9 +740,9 @@ CSubqueryHandler::FCreateOuterApplyForScalarSubquery(
 		CUtils::PexprLogicalApply<CLogicalLeftOuterApply>(
 			mp, pexprOuter, pexprInner, colref, popSubquery->Eopid());
 
-	const gpos::Ref<CLogicalGbAgg> pgbAgg = nullptr;
-	BOOL fHasCountAggMatchingColumn = CUtils::FHasCountAggMatchingColumn(
-		(*pexprSubquery)[0], colref, &pgbAgg);
+	gpos::Ref<CLogicalGbAgg> pgbAgg = nullptr;
+	BOOL fHasCountAggMatchingColumn =
+		CUtils::FHasCountAggMatchingColumn((*pexprSubquery)[0], colref, pgbAgg);
 
 	if (!fHasCountAggMatchingColumn)
 	{
@@ -1124,7 +1124,7 @@ CSubqueryHandler::FCreateOuterApplyForExistOrQuant(
 	gpos::Ref<CExpression> pexprPrjList = (*pexprPrjInner)[1];
 	gpos::Ref<CColRef> colref =
 		CScalarProjectElement::PopConvert((*pexprPrjList)[0]->Pop())->Pcr();
-	const gpos::Ref<CColRef> pcrSubquery = colref;
+	gpos::Ref<CColRef> pcrSubquery = colref;
 
 
 	if (!fExistential)
@@ -1233,8 +1233,7 @@ CSubqueryHandler::FCreateCorrelatedApplyForQuantifiedSubquery(
 	gpos::Ref<CExpression> pexprInner = (*pexprSubquery)[0];
 	gpos::Ref<CScalarSubqueryQuantified> popSubquery =
 		CScalarSubqueryQuantified::PopConvert(pexprSubquery->Pop());
-	gpos::Ref<CColRef> colref =
-		const_cast<gpos::Ref<CColRef> >(popSubquery->Pcr());
+	gpos::Ref<CColRef> colref = popSubquery->Pcr();
 
 	// If subq is SubqueryAll and scalar child is a subquery then it must be
 	// treated in "Value" context. For example:

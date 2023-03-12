@@ -93,7 +93,7 @@ CPhysicalIndexOnlyScan::HashValue() const
 	ULONG ulHash = gpos::CombineHashes(
 		COperator::HashValue(),
 		gpos::CombineHashes(m_pindexdesc->MDId()->HashValue(),
-							gpos::HashPtr<CTableDescriptor>(m_ptabdesc)));
+							gpos::HashPtr<CTableDescriptor>(m_ptabdesc.get())));
 	ulHash =
 		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrOutput));
 
@@ -112,7 +112,8 @@ CPhysicalIndexOnlyScan::HashValue() const
 BOOL
 CPhysicalIndexOnlyScan::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchIndex(this, pop);
+	return CUtils::FMatchIndex(
+		gpos::dyn_cast<CPhysicalIndexOnlyScan>(SharedFromThis()), pop);
 }
 
 //---------------------------------------------------------------------------

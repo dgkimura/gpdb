@@ -82,8 +82,8 @@ void
 CXformSubqJoin2Apply::CollectSubqueries(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 	gpos::Ref<CColRefSetArray> pdrgpcrs,
-	CExpressionArrays
-		*pdrgpdrgpexprSubqs	 // array-of-arrays indexed on join child index.
+	gpos::Ref<CExpressionArrays>
+		pdrgpdrgpexprSubqs	// array-of-arrays indexed on join child index.
 	//  i^{th} entry is an array corresponding to subqueries collected for join child #i
 )
 {

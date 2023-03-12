@@ -34,6 +34,7 @@ CAutoTaskProxy::CAutoTaskProxy(CMemoryPool *mp, CWorkerPoolManager *pwpm,
 	m_list.Init(GPOS_OFFSET(CTask, m_proxy_link));
 
 	// register new ATP to worker pool
+	m_pwpm->AddRef();
 }
 
 
@@ -72,11 +73,12 @@ CAutoTaskProxy::~CAutoTaskProxy()
 void
 CAutoTaskProxy::DestroyAll()
 {
+	//KIMURA:FIXME:TODO raises assert reading alloc header type...
 	// iterate task list
-	while (!m_list.IsEmpty())
-	{
-		Destroy(m_list.First());
-	}
+	//while (!m_list.IsEmpty())
+	//{
+	//	Destroy(m_list.First());
+	//}
 }
 
 

@@ -26,6 +26,25 @@ namespace gpmd
 using namespace gpos;
 using namespace gpnaucrates;
 
+struct mdid_equal_to
+	: public std::binary_function<gpos::Ref<IMDId>, gpos::Ref<IMDId>, bool>
+{
+	bool
+	operator()(const gpos::Ref<IMDId> &lhs, const gpos::Ref<IMDId> &rhs) const
+	{
+		return lhs->Equals(rhs);
+	}
+};
+
+struct mdid_hash
+{
+	int
+	operator()(const gpos::Ref<IMDId> &obj) const
+	{
+		return obj->HashValue();
+	}
+};
+
 //---------------------------------------------------------------------------
 //	@class:
 //		CMDProviderMemory
@@ -39,11 +58,11 @@ class CMDProviderMemory : public IMDProvider
 protected:
 	// hash map of serialized MD objects indexed by their MD id
 	using MDIdToSerializedMDIdMap =
-		CHashMap<IMDId, CWStringDynamic, IMDId::MDIdHash, IMDId::MDIdCompare,
-				 CleanupRelease, CleanupDelete>;
+		gpos::UnorderedMap<gpos::Ref<IMDId>, CWStringDynamic *, mdid_hash,
+						   mdid_equal_to>;
 
 	// metadata objects indexed by their metadata id
-	MDIdToSerializedMDIdMap *m_mdmap;
+	gpos::Ref<MDIdToSerializedMDIdMap> m_mdmap;
 
 	// load MD objects in the hash map
 	void LoadMetadataObjectsFromArray(

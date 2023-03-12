@@ -75,7 +75,7 @@ CXformExpandNAryJoinDP::Exfp(CExpressionHandle &exprhdl) const
 		return CXform::ExfpNone;
 	}
 
-	return CXformUtils::ExfpExpandJoinOrder(exprhdl, this);
+	return CXformUtils::ExfpExpandJoinOrder(exprhdl, SharedFromThis());
 }
 
 

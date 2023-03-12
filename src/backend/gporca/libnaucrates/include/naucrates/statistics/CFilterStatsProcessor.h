@@ -91,8 +91,8 @@ public:
 	static gpos::Ref<IStatistics> MakeStatsFilterForScalarExpr(
 		CMemoryPool *mp, CExpressionHandle &exprhdl,
 		gpos::Ref<IStatistics> child_stats,
-		CExpression
-			*local_scalar_expr,	 // filter expression on local columns only
+		gpos::Ref<CExpression>
+			local_scalar_expr,	// filter expression on local columns only
 		gpos::Ref<CExpression>
 			outer_refs_scalar_expr,	 // filter expression involving outer references
 		gpos::Ref<IStatisticsArray> all_outer_stats);

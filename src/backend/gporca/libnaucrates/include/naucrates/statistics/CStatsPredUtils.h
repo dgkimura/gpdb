@@ -150,8 +150,7 @@ private:
 			output_col_refsets,	 // array of output columns of join's relational inputs
 		BOOL is_semi_or_anti_join,
 		CStatsPred::EStatsCmpType *stats_pred_cmp_type,
-		const gpos::Ref<CColRef> *col_ref_outer,
-		const gpos::Ref<CColRef> *col_ref_inner);
+		gpos::Ref<CColRef> &col_ref_outer, gpos::Ref<CColRef> &col_ref_inner);
 
 	// find out which input expression refers only to the inner table and which
 	// refers only to the outer table, and return accordingly

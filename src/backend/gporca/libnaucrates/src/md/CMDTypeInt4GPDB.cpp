@@ -71,9 +71,6 @@ CMDTypeInt4GPDB::CMDTypeInt4GPDB(CMemoryPool *mp) : m_mp(mp)
 	m_mdid_count =
 		GPOS_NEW(mp) CMDIdGPDB(IMDId::EmdidGeneral, GPDB_INT4_AGG_COUNT);
 
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
-
 	GPOS_ASSERT(GPDB_INT4_OID == CMDIdGPDB::CastMdid(m_mdid)->Oid());
 
 	m_datum_null =
@@ -90,7 +87,10 @@ CMDTypeInt4GPDB::CMDTypeInt4GPDB(CMemoryPool *mp) : m_mp(mp)
 //---------------------------------------------------------------------------
 CMDTypeInt4GPDB::~CMDTypeInt4GPDB()
 {
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -234,8 +234,8 @@ gpos::Ref<IDatum>
 CMDTypeInt4GPDB::GetDatumForDXLConstVal(
 	const gpos::Ref<CDXLScalarConstValue> dxl_op) const
 {
-	gpos::Ref<CDXLDatumInt4> dxl_datum = CDXLDatumInt4::Cast(
-		const_cast<gpos::Ref<CDXLDatum> >(dxl_op->GetDatumVal()));
+	gpos::Ref<CDXLDatumInt4> dxl_datum =
+		gpos::dyn_cast<CDXLDatumInt4>(dxl_op->GetDatumVal());
 
 	return GPOS_NEW(m_mp) CDatumInt4GPDB(m_mdid->Sysid(), dxl_datum->Value(),
 										 dxl_datum->IsNull());
@@ -254,7 +254,7 @@ CMDTypeInt4GPDB::GetDatumForDXLDatum(CMemoryPool *mp,
 									 const gpos::Ref<CDXLDatum> dxl_datum) const
 {
 	gpos::Ref<CDXLDatumInt4> int4_dxl_datum =
-		CDXLDatumInt4::Cast(const_cast<gpos::Ref<CDXLDatum> >(dxl_datum));
+		gpos::dyn_cast<CDXLDatumInt4>(dxl_datum);
 	INT val = int4_dxl_datum->Value();
 	BOOL is_null = int4_dxl_datum->IsNull();
 

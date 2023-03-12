@@ -303,7 +303,8 @@ CBitVector::Equals(const gpos::Ref<CBitVector> vec) const
 	// compare all components
 	if (0 == clib::Memcmp(m_vec, vec->m_vec, m_len * BYTES_PER_UNIT))
 	{
-		GPOS_ASSERT(this->ContainsAll(vec) && vec->ContainsAll(this));
+		GPOS_ASSERT(this->ContainsAll(vec) &&
+					vec->ContainsAll(SharedFromThis()));
 		return true;
 	}
 

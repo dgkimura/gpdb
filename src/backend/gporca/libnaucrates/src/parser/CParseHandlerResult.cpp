@@ -58,8 +58,8 @@ CParseHandlerResult::SetupInitialHandlers()
 				"No handlers should have been added yet");
 
 	m_dxl_op =
-		(gpos::Ref<CDXLPhysicalResult>) CDXLOperatorFactory::MakeDXLResult(
-			m_parse_handler_mgr->GetDXLMemoryManager());
+		gpos::cast<CDXLPhysicalResult>(CDXLOperatorFactory::MakeDXLResult(
+			m_parse_handler_mgr->GetDXLMemoryManager()));
 
 	// parse handler for the one-time filter
 	CParseHandlerBase *one_time_filter_parse_handler =

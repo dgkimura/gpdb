@@ -62,8 +62,8 @@ public:
 		static ULONG
 		HashValue(const gpos::Ref<IMdIdArray> oid_pair)
 		{
-			return CombineHashes(gpos::HashPtr<IMDId>((*oid_pair)[0]),
-								 gpos::HashPtr<IMDId>((*oid_pair)[1]));
+			return CombineHashes((*oid_pair)[0]->HashValue(),
+								 (*oid_pair)[1]->HashValue());
 		}
 
 		static BOOL
@@ -78,14 +78,11 @@ public:
 	using SJoinConditionArray = CDynamicPtrArray<SJoinCondition, CleanupDelete>;
 
 	using OIDPairToScaleFactorArrayMap =
-		CHashMap<IMdIdArray, CDoubleArray, SJoinCondition::HashValue,
-				 SJoinCondition::Equals, CleanupRelease<IMdIdArray>,
-				 CleanupRelease<CDoubleArray>>;
+		gpos::UnorderedMap<gpos::Ref<IMdIdArray>, gpos::Ref<CDoubleArray>>;
 
 	using OIDPairToScaleFactorArrayMapIter =
-		CHashMapIter<IMdIdArray, CDoubleArray, SJoinCondition::HashValue,
-					 SJoinCondition::Equals, CleanupRelease<IMdIdArray>,
-					 CleanupRelease<CDoubleArray>>;
+		gpos::UnorderedMap<gpos::Ref<IMdIdArray>,
+						   gpos::Ref<CDoubleArray>>::LegacyIterator;
 
 	// generate the hashmap of scale factors grouped by pred tables, also produces array of complex join preds
 	static OIDPairToScaleFactorArrayMap *GenerateScaleFactorMap(

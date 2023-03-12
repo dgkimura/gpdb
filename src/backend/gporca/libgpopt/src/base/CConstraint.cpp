@@ -31,6 +31,7 @@
 #include "gpopt/operators/CScalarCmp.h"
 #include "gpopt/operators/CScalarIdent.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/IMDScalarOp.h"
 #include "naucrates/md/IMDType.h"
 
@@ -415,7 +416,7 @@ CConstraint::PcnstrFromScalarCmp(
 		(CUtils::FScalarIdent(pexprRight) ||
 		 CCastUtils::FBinaryCoercibleCastedScId(pexprRight)))
 	{
-		gpos::Ref<CScalarIdent> popScIdLeft, *popScIdRight;
+		gpos::Ref<CScalarIdent> popScIdLeft, popScIdRight;
 		if (CUtils::FScalarIdent(pexprLeft))
 		{
 			// col1 = ...
@@ -489,12 +490,10 @@ CConstraint::PcnstrFromScalarCmp(
 
 		BOOL pcrLeftIncludesNull =
 			infer_nulls_as && CColRef::EcrtTable == pcrLeft->Ecrt() &&
-			CColRefTable::PcrConvert(const_cast<gpos::Ref<CColRef> >(pcrLeft))
-				->IsNullable();
+			CColRefTable::PcrConvert(pcrLeft)->IsNullable();
 		BOOL pcrRightIncludesNull =
 			infer_nulls_as && CColRef::EcrtTable == pcrRight->Ecrt() &&
-			CColRefTable::PcrConvert(const_cast<gpos::Ref<CColRef> >(pcrRight))
-				->IsNullable();
+			CColRefTable::PcrConvert(pcrRight)->IsNullable();
 
 		*ppdrgpcrs = GPOS_NEW(mp) CColRefSetArray(mp);
 		BOOL checkEquality = CPredicateUtils::IsEqualityOp(pexpr) &&
@@ -805,13 +804,13 @@ CConstraint::PdrgpcnstrFlatten(CMemoryPool *mp,
 		if (EctConjunction == ectChild && EctConjunction == ect)
 		{
 			gpos::Ref<CConstraintConjunction> pcconj =
-				(gpos::Ref<CConstraintConjunction>) pcnstrChild;
+				gpos::cast<CConstraintConjunction>(pcnstrChild);
 			CUtils::AddRefAppend(pdrgpcnstrNew, pcconj->Pdrgpcnstr());
 		}
 		else if (EctDisjunction == ectChild && EctDisjunction == ect)
 		{
 			gpos::Ref<CConstraintDisjunction> pcdisj =
-				(gpos::Ref<CConstraintDisjunction>) pcnstrChild;
+				gpos::cast<CConstraintDisjunction>(pcnstrChild);
 			CUtils::AddRefAppend(pdrgpcnstrNew, pcdisj->Pdrgpcnstr());
 		}
 		else
@@ -842,8 +841,8 @@ CConstraint::PdrgpcnstrDeduplicate(CMemoryPool *mp,
 	gpos::Ref<CConstraintArray> pdrgpcnstrNew =
 		GPOS_NEW(mp) CConstraintArray(mp);
 
-	CAutoRef<CColRefSet> pcrsDeduped(GPOS_NEW(mp) CColRefSet(mp));
-	CAutoRef<IColConstraintsMapper> arccm;
+	gpos::Ref<CColRefSet> pcrsDeduped(GPOS_NEW(mp) CColRefSet(mp));
+	gpos::Ref<IColConstraintsMapper> arccm;
 
 	const ULONG length = pdrgpcnstr->Size();
 

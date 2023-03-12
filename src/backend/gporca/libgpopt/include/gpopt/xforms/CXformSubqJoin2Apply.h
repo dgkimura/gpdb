@@ -32,9 +32,7 @@ class CXformSubqJoin2Apply : public CXformSubqueryUnnest
 private:
 	// hash map between expression and a column reference
 	using ExprToColRefMap =
-		CHashMap<CExpression, CColRef, HashPtr<CExpression>,
-				 EqualPtr<CExpression>, CleanupRelease<CExpression>,
-				 CleanupNULL<CColRef>>;
+		gpos::UnorderedMap<gpos::Ref<CExpression>, gpos::Ref<CColRef>>;
 
 	// helper to transform function
 	void Transform(gpos::Ref<CXformContext> pxfctxt,

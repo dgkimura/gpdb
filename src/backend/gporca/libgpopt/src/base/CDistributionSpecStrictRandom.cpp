@@ -3,6 +3,7 @@
 
 #include "gpopt/base/CDistributionSpecStrictRandom.h"
 
+#include "gpopt/search/CGroupExpression.h"
 using namespace gpopt;
 
 CDistributionSpecStrictRandom::CDistributionSpecStrictRandom() = default;

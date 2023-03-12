@@ -26,7 +26,7 @@ template <class A, class E>
 class CKHeap : public CRefCount<CKHeap<A, E>>
 {
 private:
-	A *m_topk;
+	gpos::Ref<A> m_topk;
 	CMemoryPool *m_mp;
 	ULONG m_k;
 	BOOL m_is_heapified;
@@ -141,7 +141,7 @@ public:
 	}
 
 	void
-	Insert(E *elem)
+	Insert(gpos::Ref<E> elem)
 	{
 		GPOS_ASSERT(nullptr != elem);
 		// since the cost may change as we find more expressions in the group,
@@ -158,7 +158,7 @@ public:
 	}
 
 	// remove the next of the top k elements, sorted ascending by cost
-	E *
+	gpos::Ref<E>
 	RemoveBestElement()
 	{
 		if (0 == m_topk->Size() || m_k <= m_num_returned)
@@ -172,7 +172,7 @@ public:
 	}
 
 	// remove the next best element, without the top k limit
-	E *
+	gpos::Ref<E>
 	RemoveNextElement()
 	{
 		if (0 == m_topk->Size())
@@ -191,7 +191,7 @@ public:
 		m_topk->Swap(0, m_topk->Size() - 1);
 
 		// now remove the new last element, which is the real root
-		E *result = m_topk->RemoveLast();
+		gpos::Ref<E> result = m_topk->RemoveLast();
 
 		// then push the new first element down to the correct place
 		HeapifyDown(0);

@@ -54,7 +54,7 @@ private:
 	ULONG m_aul{0};
 
 	// hash table
-	CSyncHashtable<CColRef, ULONG> m_sht;
+	gpos::UnorderedMap<ULONG, gpos::Ref<CColRef>> m_sht;
 
 	// implementation of factory methods
 	gpos::Ref<CColRef> PcrCreate(const gpos::Ref<IMDType> pmdtype,
@@ -69,7 +69,7 @@ public:
 	CColumnFactory(const CColumnFactory &) = delete;
 
 	// ctor
-	CColumnFactory();
+	CColumnFactory(CMemoryPool *mp);
 
 	// dtor
 	~CColumnFactory();

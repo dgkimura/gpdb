@@ -352,16 +352,16 @@ CPhysicalDML::HashValue() const
 {
 	ULONG ulHash = gpos::CombineHashes(COperator::HashValue(),
 									   m_ptabdesc->MDId()->HashValue());
-	ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrAction));
+	ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(m_pcrAction));
 	ulHash =
 		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrSource));
 
 	if (CLogicalDML::EdmlDelete == m_edmlop ||
 		CLogicalDML::EdmlUpdate == m_edmlop)
 	{
-		ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrCtid));
+		ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(m_pcrCtid));
 		ulHash =
-			gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(m_pcrSegmentId));
+			gpos::CombineHashes(ulHash, CColRef::HashValue(m_pcrSegmentId));
 	}
 
 	return ulHash;

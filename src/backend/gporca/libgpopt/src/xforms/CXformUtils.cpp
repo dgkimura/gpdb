@@ -251,10 +251,10 @@ CXformUtils::PcrsFKey(
 			continue;
 		}
 
-		gpos::Ref<CColRef> pcrFst = const_cast<gpos::Ref<CColRef> >(
-			CScalarIdent::PopConvert((*pexprConjunct)[0]->Pop())->Pcr());
-		gpos::Ref<CColRef> pcrSnd = const_cast<gpos::Ref<CColRef> >(
-			CScalarIdent::PopConvert((*pexprConjunct)[1]->Pop())->Pcr());
+		gpos::Ref<CColRef> pcrFst =
+			CScalarIdent::PopConvert((*pexprConjunct)[0]->Pop())->Pcr();
+		gpos::Ref<CColRef> pcrSnd =
+			CScalarIdent::PopConvert((*pexprConjunct)[1]->Pop())->Pcr();
 		if (pcrsKey->FMember(pcrFst) && prcsOutput->FMember(pcrSnd))
 		{
 			pcrsKeyParts->Include(pcrFst);
@@ -3100,8 +3100,8 @@ CXformUtils::CreateBitmapIndexProbesWithOrWithoutPredBreakdown(
 	gpos::Ref<CExpressionArray> pdrgpexprResidualResult,
 	BOOL isAPartialPredicate)
 {
-	gpos::Ref<CExpression> pexprRecheckLocal, *pexprResidualLocal,
-		*pexprBitmapLocal;
+	gpos::Ref<CExpression> pexprRecheckLocal, pexprResidualLocal,
+		pexprBitmapLocal;
 
 	BOOL retryIndexLookupWithResidual = false;
 
@@ -3588,7 +3588,7 @@ CXformUtils::PexprCTEConsumer(CMemoryPool *mp, ULONG ulCTEId,
 gpos::Ref<CColRefArray>
 CXformUtils::PdrgpcrReorderedSubsequence(
 	CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
-	gpos::Ref<ULongPtrArray> pdrgpulIndexesOfRefs)
+	gpos::Ref<ULongVector> pdrgpulIndexesOfRefs)
 {
 	GPOS_ASSERT(nullptr != colref_array);
 	GPOS_ASSERT(nullptr != pdrgpulIndexesOfRefs);
@@ -3600,7 +3600,7 @@ CXformUtils::PdrgpcrReorderedSubsequence(
 		GPOS_NEW(mp) CColRefArray(mp);
 	for (ULONG ul = 0; ul < length; ul++)
 	{
-		ULONG ulPos = *(*pdrgpulIndexesOfRefs)[ul];
+		ULONG ulPos = (*pdrgpulIndexesOfRefs)[ul];
 		GPOS_ASSERT(ulPos < colref_array->Size());
 		pdrgpcrNewSubsequence->Append((*colref_array)[ulPos]);
 	}
@@ -3834,12 +3834,34 @@ CXformUtils::PdrgpdrgpexprSortedPrjElemsArray(
 	while (hmexprdrgpexpriter.Advance())
 	{
 		gpos::Ref<CExpressionArray> pdrgpexprPrjElems =
-			const_cast<gpos::Ref<CExpressionArray> >(
-				hmexprdrgpexpriter.Value());
+			hmexprdrgpexpriter.Value();
 
 		pdrgpdrgpexprPrjElems->Append(pdrgpexprPrjElems);
 	}
-	pdrgpdrgpexprPrjElems->Sort(ICmpPrjElemsArr);
+	pdrgpdrgpexprPrjElems->Sort([](const gpos::Ref<CExpressionArray> &lhs,
+								   const gpos::Ref<CExpressionArray> &rhs) {
+		gpos::Ref<CExpression> pexprPrjElemFst = (*lhs)[0];
+		gpos::Ref<CExpression> pexprPrjElemSnd = (*rhs)[0];
+		ULONG ulIdFst =
+			CScalarProjectElement::PopConvert(pexprPrjElemFst->Pop())
+				->Pcr()
+				->Id();
+		ULONG ulIdSnd =
+			CScalarProjectElement::PopConvert(pexprPrjElemSnd->Pop())
+				->Pcr()
+				->Id();
+		if (ulIdFst < ulIdSnd)
+		{
+			return -1;
+		}
+
+		if (ulIdFst > ulIdSnd)
+		{
+			return 1;
+		}
+
+		return 0;
+	});
 
 	return pdrgpdrgpexprPrjElems;
 }

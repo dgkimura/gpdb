@@ -67,23 +67,26 @@ public:
 	};
 
 	// type definition of cost context hash table
-	using ShtCC = CSyncHashtable<CCostContext, OPTCTXT_PTR>;
+	using ShtCC = gpos::UnorderedMap<OPTCTXT_PTR, gpos::Ref<CCostContext>,
+									 coptimizationcontext_hash,
+									 coptimizationcontext_equal_to>;
 
 private:
 	// definition of context hash table accessor
 	using ShtAcc = CSyncHashtableAccessByKey<CCostContext, OPTCTXT_PTR>;
 
 	// definition of context hash table iter
-	using ShtIter = CSyncHashtableIter<CCostContext, OPTCTXT_PTR>;
+	using ShtIter =
+		gpos::UnorderedMap<OPTCTXT_PTR, gpos::Ref<CCostContext>,
+						   coptimizationcontext_hash,
+						   coptimizationcontext_equal_to>::LegacyIterator;
 
 	// definition of context hash table iter accessor
 	using ShtAccIter = CSyncHashtableAccessByIter<CCostContext, OPTCTXT_PTR>;
 
 	// map of partial plans to their costs
 	using PartialPlanToCostMap =
-		CHashMap<CPartialPlan, CCost, CPartialPlan::HashValue,
-				 CPartialPlan::Equals, CleanupRelease<CPartialPlan>,
-				 CleanupDelete<CCost>>;
+		gpos::UnorderedMap<gpos::Ref<CPartialPlan>, CCost *>;
 
 
 	// expression id
@@ -96,14 +99,14 @@ private:
 	gpos::Ref<COperator> m_pop{nullptr};
 
 	// array of child groups
-	gpos::Ref<CGroupArray> m_pdrgpgroup{nullptr};
+	gpos::Ref<CGroupArrayWeak> m_pdrgpgroup{nullptr};
 
 	// sorted array of children groups for faster comparison
 	// of order-insensitive operators
-	gpos::Ref<CGroupArray> m_pdrgpgroupSorted{nullptr};
+	gpos::Ref<CGroupArrayWeak> m_pdrgpgroupSorted{nullptr};
 
 	// back pointer to group
-	gpos::Ref<CGroup> m_pgroup{nullptr};
+	gpos::WeakRef<CGroup> m_pgroup{nullptr};
 
 	// id of xform that generated group expression
 	CXform::EXformId m_exfidOrigin{CXform::ExfInvalid};
@@ -128,7 +131,7 @@ private:
 	ECircularDependency m_ecirculardependency;
 
 	// hashtable of cost contexts
-	ShtCC m_sht;
+	mutable gpos::Ref<ShtCC> m_sht;
 
 	// set group back pointer
 	void SetGroup(gpos::Ref<CGroup> pgroup);
@@ -178,7 +181,8 @@ public:
 
 	// ctor
 	CGroupExpression(CMemoryPool *mp, gpos::Ref<COperator> pop,
-					 gpos::Ref<CGroupArray> pdrgpgroup, CXform::EXformId exfid,
+					 gpos::Ref<CGroupArrayWeak> pdrgpgroup,
+					 CXform::EXformId exfid,
 					 gpos::Ref<CGroupExpression> pgexprOrigin,
 					 BOOL fIntermediate);
 
@@ -242,7 +246,7 @@ public:
 	{
 		GPOS_ASSERT(nullptr != m_pdrgpgroup);
 
-		gpos::Ref<CGroup> pgroup = (*m_pdrgpgroup)[ulPos];
+		gpos::WeakRef<CGroup> pgroup = (*m_pdrgpgroup)[ulPos];
 
 		// during optimization, the operator returns the duplicate group;
 		// in exploration and implementation the group may contain
@@ -252,7 +256,7 @@ public:
 			GPOS_ASSERT(pgroup->FDuplicateGroup());
 			return pgroup->PgroupDuplicate();
 		}
-		return pgroup;
+		return pgroup.Lock();
 	};
 
 	// arity function
@@ -280,7 +284,7 @@ public:
 	gpos::Ref<CGroup>
 	Pgroup() const
 	{
-		return m_pgroup;
+		return m_pgroup.Lock();
 	}
 
 	// origin xform
@@ -298,8 +302,8 @@ public:
 	}
 
 	// cost contexts hash table accessor
-	ShtCC &
-	Sht()
+	gpos::Ref<ShtCC>
+	Sht() const
 	{
 		return m_sht;
 	}
@@ -312,6 +316,12 @@ public:
 	}
 
 	// equality function for hash table
+	static BOOL
+	Equals(const gpos::Ref<CGroupExpression> &gexprLeft,
+		   const gpos::Ref<CGroupExpression> &gexprRight)
+	{
+		return gexprLeft->Matches(gexprRight);
+	}
 	static BOOL
 	Equals(const CGroupExpression &gexprLeft,
 		   const CGroupExpression &gexprRight)
@@ -335,7 +345,7 @@ public:
 
 	// static hash function for operator and group references
 	static ULONG HashValue(gpos::Ref<COperator> pop,
-						   gpos::Ref<CGroupArray> drgpgroup);
+						   gpos::Ref<CGroupArrayWeak> drgpgroup);
 
 	// static hash function for group expression
 	static ULONG HashValue(const CGroupExpression &);
@@ -368,7 +378,7 @@ public:
 	// check if transition to the given state is completed
 	BOOL FTransitioned(EState estate) const;
 
-	gpos::Ref<CGroupArray>
+	gpos::Ref<CGroupArrayWeak>
 	Pdrgpgroup() const
 	{
 		return m_pdrgpgroup;
@@ -406,6 +416,27 @@ public:
 
 	virtual BOOL ContainsCircularDependencies();
 };	// class CGroupExpression
+
+struct cgroupexpression_equal_to
+	: public std::binary_function<gpos::Ref<CGroupExpression>,
+								  gpos::Ref<CGroupExpression>, bool>
+{
+	bool
+	operator()(const gpos::Ref<CGroupExpression> &lhs,
+			   const gpos::Ref<CGroupExpression> &rhs) const
+	{
+		return CGroupExpression::Equals(lhs.get(), rhs.get());
+	}
+};
+
+struct cgroupexpression_hash
+{
+	int
+	operator()(const gpos::Ref<CGroupExpression> &obj) const
+	{
+		return obj->HashValue();
+	}
+};
 
 }  // namespace gpopt
 

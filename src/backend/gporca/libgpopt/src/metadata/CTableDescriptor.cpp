@@ -19,6 +19,7 @@
 #include "gpopt/base/CDistributionSpecSingleton.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/exception.h"
 #include "naucrates/md/IMDIndex.h"
 
@@ -272,7 +273,8 @@ CTableDescriptor::OsPrint(IOstream &os) const
 {
 	m_name.OsPrint(os);
 	os << ": (";
-	CUtils::OsPrintDrgPcoldesc(os, m_pdrgpcoldesc, m_pdrgpcoldesc->Size());
+	CUtils::OsPrintDrgPcoldesc(os, m_pdrgpcoldesc.get(),
+							   m_pdrgpcoldesc->Size());
 	os << ")";
 	return os;
 }

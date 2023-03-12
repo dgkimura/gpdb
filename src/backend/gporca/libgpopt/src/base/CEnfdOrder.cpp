@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CReqdPropPlan.h"
 #include "gpopt/operators/CPhysicalSort.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;
@@ -109,7 +110,8 @@ CEnfdOrder::Epet(CExpressionHandle &exprhdl, gpos::Ref<CPhysical> popPhysical,
 {
 	if (fOrderReqd)
 	{
-		return popPhysical->EpetOrder(exprhdl, this);
+		return popPhysical->EpetOrder(
+			exprhdl, gpos::dyn_cast<CEnfdOrder>(SharedFromThis()));
 	}
 	return EpetUnnecessary;
 }

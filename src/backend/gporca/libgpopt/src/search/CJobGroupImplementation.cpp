@@ -190,7 +190,7 @@ CJobGroupImplementation::EevtStartImplementation(CSchedulerContext *psc,
 {
 	// get a job pointer
 	CJobGroupImplementation *pjgi = PjConvert(pjOwner);
-	gpos::Ref<CGroup> pgroup = pjgi->m_pgroup;
+	gpos::Ref<CGroup> pgroup = pjgi->m_pgroup.Lock();
 
 	if (!pgroup->FExplored())
 	{

@@ -41,7 +41,8 @@ using CCostContextArray = gpos::Vector<gpos::Ref<CCostContext>>;
 using COSTCTXT_PTR = gpos::Ref<CCostContext>;
 
 // cost context pointer definition
-using CONST_COSTCTXT_PTR = const gpos::Ref<CCostContext>;
+// FIXME:KIMURA const fakenews
+using CONST_COSTCTXT_PTR = gpos::Ref<CCostContext>;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -109,14 +110,14 @@ private:
 	// if tie-resolution succeeded, store a pointer to preferred cost context in output argument
 	static void BreakCostTiesForJoinPlans(const gpos::Ref<CCostContext> pccFst,
 										  const gpos::Ref<CCostContext> pccSnd,
-										  CONST_COSTCTXT_PTR *ppccPrefered,
+										  CONST_COSTCTXT_PTR &ppccPrefered,
 										  BOOL *pfTiesResolved);
 
 public:
 	CCostContext(const CCostContext &) = delete;
 
 	// main optimization context
-	gpos::Ref<COptimizationContext> m_poc;
+	gpos::WeakRef<COptimizationContext> m_poc;
 
 	// link for cost context hash table in CGroupExpression
 	SLink m_link;
@@ -132,7 +133,7 @@ public:
 	gpos::Ref<COptimizationContext>
 	Poc() const
 	{
-		return m_poc;
+		return m_poc.Lock();
 	}
 
 	// accessor of optimization request number
@@ -286,6 +287,12 @@ public:
 		return Equals(*pccLeft, *pccRight);
 	}
 
+	static BOOL
+	Equals(const CCostContext *pccLeft, const CCostContext *pccRight)
+	{
+		return Equals(*pccLeft, *pccRight);
+	}
+
 	// hash function
 	static ULONG
 	HashValue(const CCostContext &cc)
@@ -298,6 +305,12 @@ public:
 	HashValue(const gpos::Ref<CCostContext> pcc)
 	{
 		return HashValue(*pcc);
+	}
+
+	static ULONG
+	HashValue(const CCostContext *pcc)
+	{
+		return HashValue(pcc);
 	}
 
 	// debug print

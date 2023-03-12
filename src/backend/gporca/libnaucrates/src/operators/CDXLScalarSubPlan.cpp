@@ -15,6 +15,7 @@
 #include "gpos/string/CWStringDynamic.h"
 
 #include "gpopt/base/COptCtxt.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLNode.h"
 #include "naucrates/dxl/xml/CXMLSerializer.h"
 

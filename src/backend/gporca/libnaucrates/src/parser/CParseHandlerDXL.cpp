@@ -14,6 +14,7 @@
 #include "gpos/task/CWorker.h"
 
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/operators/CDXLOperatorFactory.h"
 #include "naucrates/dxl/parser/CParseHandlerCostParams.h"
 #include "naucrates/dxl/parser/CParseHandlerFactory.h"

@@ -16,6 +16,7 @@
 #include "gpopt/base/CAutoOptCtxt.h"
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CColumnFactory.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -310,7 +311,7 @@ CColRefSet::Phmicr(CMemoryPool *mp) const
 	CColRefSetIter crsi(*this);
 	while (crsi.Advance())
 	{
-		phmicr->Insert(GPOS_NEW(mp) INT(crsi.Pcr()->Id()), crsi.Pcr());
+		phmicr->Insert(crsi.Pcr()->Id(), crsi.Pcr());
 	}
 
 	return phmicr;
@@ -338,8 +339,7 @@ CColRefSet::HashValue()
 	for (ULONG i = 0; i < length; i++)
 	{
 		(void) crsi.Advance();
-		ulHash =
-			gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(crsi.Pcr()));
+		ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(crsi.Pcr()));
 	}
 
 	return ulHash;

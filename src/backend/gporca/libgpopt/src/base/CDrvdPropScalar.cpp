@@ -242,7 +242,7 @@ CDrvdPropScalar::DeriveSetReturningFunctionColumns(CExpressionHandle &exprhdl)
 			if (DeriveHasNonScalarFunction(exprhdl))
 			{
 				gpos::Ref<CScalarProjectElement> pspeProject =
-					(gpos::Ref<CScalarProjectElement>) (exprhdl.Pop());
+					gpos::cast<CScalarProjectElement>((exprhdl.Pop()));
 				m_pcrsSetReturningFunction->Include(pspeProject->Pcr());
 			}
 		}

@@ -11,6 +11,7 @@
 
 #include "naucrates/statistics/CStatsPredConj.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CStatisticsUtils.h"
 
 using namespace gpnaucrates;
@@ -63,7 +64,10 @@ CStatsPredConj::Sort() const
 	if (1 < GetNumPreds())
 	{
 		// sort the filters on column ids
-		m_conj_pred_stats_array->Sort(CStatsPred::StatsPredSortCmpFunc);
+		m_conj_pred_stats_array->Sort([](const gpos::Ref<CStatsPred> &lhs,
+										 const gpos::Ref<CStatsPred> &rhs) {
+			return (INT) lhs->GetColId() - (INT) rhs->GetColId();
+		});
 	}
 }
 

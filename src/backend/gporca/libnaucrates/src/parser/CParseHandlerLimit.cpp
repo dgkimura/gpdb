@@ -60,8 +60,8 @@ CParseHandlerLimit::StartElement(const XMLCh *const,  // element_uri,
 	{
 		// parse and create Limit operator
 		m_dxl_op =
-			(gpos::Ref<CDXLPhysicalLimit>) CDXLOperatorFactory::MakeDXLLimit(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+			gpos::cast<CDXLPhysicalLimit>(CDXLOperatorFactory::MakeDXLLimit(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, m_dxl_op);
 
 		// create and activate the parse handler for the children nodes in reverse

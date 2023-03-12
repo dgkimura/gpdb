@@ -60,8 +60,8 @@ CParseHandlerScalarOpExpr::StartElement(const XMLCh *const element_uri,
 	{
 		// parse and create scalar OpExpr
 		gpos::Ref<CDXLScalarOpExpr> dxl_op =
-			(gpos::Ref<CDXLScalarOpExpr>) CDXLOperatorFactory::MakeDXLOpExpr(
-				m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+			gpos::cast<CDXLScalarOpExpr>(CDXLOperatorFactory::MakeDXLOpExpr(
+				m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 
 		// construct node from the created child nodes
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);

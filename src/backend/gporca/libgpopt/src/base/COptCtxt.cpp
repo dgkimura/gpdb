@@ -18,6 +18,7 @@
 #include "gpopt/cost/ICostModel.h"
 #include "gpopt/eval/IConstExprEvaluator.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/traceflags/traceflags.h"
 
 
@@ -103,7 +104,7 @@ COptCtxt::PoctxtCreate(CMemoryPool *mp, CMDAccessor *md_accessor,
 
 	// CONSIDER:  - 1/5/09; allocate column factory out of given mem pool
 	// instead of having it create its own;
-	CColumnFactory *col_factory = GPOS_NEW(mp) CColumnFactory;
+	CColumnFactory *col_factory = GPOS_NEW(mp) CColumnFactory(mp);
 
 	gpos::Ref<COptCtxt> poctxt = nullptr;
 	{

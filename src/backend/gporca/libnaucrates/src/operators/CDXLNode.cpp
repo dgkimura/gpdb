@@ -219,7 +219,7 @@ CDXLNode::SerializeToDXL(CXMLSerializer *xml_serializer) const
 {
 	if (nullptr != m_dxl_op)
 	{
-		m_dxl_op->SerializeToDXL(xml_serializer, this);
+		m_dxl_op->SerializeToDXL(xml_serializer, SharedFromThis());
 	}
 
 	if (nullptr != m_direct_dispatch_info &&

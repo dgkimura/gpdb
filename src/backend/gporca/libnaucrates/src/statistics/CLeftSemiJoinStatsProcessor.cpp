@@ -11,6 +11,7 @@
 
 #include "naucrates/statistics/CLeftSemiJoinStatsProcessor.h"
 
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/statistics/CGroupByStatsProcessor.h"
 
 using namespace gpopt;

@@ -15,6 +15,7 @@
 
 #include "gpopt/operators/CLogicalConstTableGet.h"
 #include "gpopt/operators/CPhysicalConstTableGet.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 

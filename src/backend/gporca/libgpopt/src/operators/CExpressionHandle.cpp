@@ -93,7 +93,7 @@ CExpressionHandle::FStatsDerived() const
 	gpos::Ref<IStatistics> stats = nullptr;
 	if (nullptr != m_pexpr)
 	{
-		stats = const_cast<gpos::Ref<IStatistics> >(m_pexpr->Pstats());
+		stats = gpos::dyn_cast<IStatistics>(m_pexpr->Pstats());
 	}
 	else
 	{
@@ -119,8 +119,7 @@ CExpressionHandle::FStatsDerived() const
 		gpos::Ref<IStatistics> child_stats = nullptr;
 		if (nullptr != m_pexpr)
 		{
-			child_stats =
-				const_cast<gpos::Ref<IStatistics> >((*m_pexpr)[ul]->Pstats());
+			child_stats = gpos::dyn_cast<IStatistics>((*m_pexpr)[ul]->Pstats());
 		}
 		else
 		{
@@ -159,7 +158,7 @@ CExpressionHandle::CopyStats()
 	gpos::Ref<IStatistics> stats = nullptr;
 	if (nullptr != m_pexpr)
 	{
-		stats = const_cast<gpos::Ref<IStatistics> >(m_pexpr->Pstats());
+		stats = gpos::dyn_cast<IStatistics>(m_pexpr->Pstats());
 	}
 	else
 	{
@@ -182,8 +181,7 @@ CExpressionHandle::CopyStats()
 		gpos::Ref<IStatistics> child_stats = nullptr;
 		if (nullptr != m_pexpr)
 		{
-			child_stats =
-				const_cast<gpos::Ref<IStatistics> >((*m_pexpr)[ul]->Pstats());
+			child_stats = gpos::dyn_cast<IStatistics>((*m_pexpr)[ul]->Pstats());
 		}
 		else
 		{

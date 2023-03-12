@@ -8,6 +8,7 @@
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/COperator.h"
 #include "gpopt/operators/CScalarConst.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -36,7 +37,20 @@ CDatumSortedSet::CDatumSortedSet(CMemoryPool *mp,
 			aprngdatum->Append(datum);
 		}
 	}
-	aprngdatum->Sort(&CUtils::IDatumCmp);
+	aprngdatum->Sort(
+		[](const gpos::Ref<IDatum> &lhs, const gpos::Ref<IDatum> &rhs) {
+			const IComparator *pcomp = COptCtxt::PoctxtFromTLS()->Pcomp();
+			if (pcomp->Equals(lhs, rhs))
+			{
+				return 0;
+			}
+			else if (pcomp->IsLessThan(lhs, rhs))
+			{
+				return -1;
+			}
+
+			return 1;
+		});
 
 	// de-duplicate
 	const ULONG ulRangeArrayArity = aprngdatum->Size();

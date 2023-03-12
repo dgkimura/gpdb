@@ -18,6 +18,7 @@
 
 #include "gpopt/base/CColRef.h"
 #include "gpopt/base/COptCtxt.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/operators/CDXLScalarConstValue.h"
 #include "naucrates/statistics/CLeftAntiSemiJoinStatsProcessor.h"
@@ -1688,7 +1689,7 @@ CHistogram::CombineBuckets(CMemoryPool *mp, gpos::Ref<CBucketArray> buckets,
 
 			// we give equal weight to the information contributed by
 			// freq/ndv and freq/width
-			SAdjBucketBoundary *elem =
+			gpos::Ref<SAdjBucketBoundary> elem =
 				GPOS_NEW(mp) SAdjBucketBoundary(ul, factor1 + factor2);
 			boundary_factors->Insert(elem);
 		}
@@ -1698,12 +1699,11 @@ CHistogram::CombineBuckets(CMemoryPool *mp, gpos::Ref<CBucketArray> buckets,
 	// that need to be removed in a BitSet. This allows us to check each boundary
 	// as we walk the bucket array sequentially.
 	gpos::Ref<CBitSet> indexes_to_merge = GPOS_NEW(mp) CBitSet(mp);
-	SAdjBucketBoundary *candidate_to_remove;
+	gpos::Ref<SAdjBucketBoundary> candidate_to_remove;
 	while (nullptr !=
 		   (candidate_to_remove = boundary_factors->RemoveBestElement()))
 	{
 		indexes_to_merge->ExchangeSet(candidate_to_remove->m_boundary_index);
-		GPOS_DELETE(candidate_to_remove);
 	}
 
 	// go through the bucket array and combine buckets as necessary

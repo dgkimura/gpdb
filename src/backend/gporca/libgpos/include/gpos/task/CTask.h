@@ -128,7 +128,7 @@ public:
 	CTask(const CTask &) = delete;
 
 	// dtor
-	~CTask() override;
+	~CTask();
 
 	// accessor for memory pool, e.g. used for allocating task parameters in
 	CMemoryPool *

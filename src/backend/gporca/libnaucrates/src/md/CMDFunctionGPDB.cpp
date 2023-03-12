@@ -53,8 +53,6 @@ CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 	GPOS_ASSERT(EfdaSentinel > func_data_access);
 
 	InitDXLTokenArrays();
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -68,7 +66,10 @@ CMDFunctionGPDB::CMDFunctionGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 CMDFunctionGPDB::~CMDFunctionGPDB()
 {
 	GPOS_DELETE(m_mdname);
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 //---------------------------------------------------------------------------

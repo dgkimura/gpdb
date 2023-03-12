@@ -81,7 +81,7 @@ private:
 	gpos::Ref<IStatisticsArray> m_pdrgpstat;
 
 	// array of children's required properties
-	CReqdPropArray *m_pdrgprp;
+	gpos::Ref<CReqdPropArray> m_pdrgprp;
 
 	// return an array of stats objects starting from the first stats object referenced by child
 	gpos::Ref<IStatisticsArray> PdrgpstatOuterRefs(

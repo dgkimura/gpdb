@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 #include "gpos/memory/CAutoMemoryPool.h"
 
+#include "gpopt/base/CDrvdPropCtxt.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/operators/CLogical.h"
@@ -1377,8 +1378,8 @@ gpos::Ref<CExpression>
 CNormalizer::PexprPullUpProjectElements(
 	CMemoryPool *mp, gpos::Ref<CExpression> pexpr,
 	gpos::Ref<CColRefSet> pcrsUsed, gpos::Ref<CColRefSet> pcrsOutput,
-	CExpressionArray
-		*pdrgpexprPrElPullUp  // output: the pulled-up project elements
+	gpos::Ref<CExpressionArray>
+		pdrgpexprPrElPullUp	 // output: the pulled-up project elements
 )
 {
 	GPOS_ASSERT(nullptr != pexpr);

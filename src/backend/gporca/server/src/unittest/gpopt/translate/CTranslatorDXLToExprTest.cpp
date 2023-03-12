@@ -235,7 +235,7 @@ class GetBuilder
 	CMemoryPool *m_mp;
 	gpos::Ref<CTableDescriptor> m_ptabdesc;
 	CWStringConst m_strTableName;
-	const gpos::Ref<IMDTypeInt4> m_pmdtypeint4;
+	gpos::Ref<IMDTypeInt4> m_pmdtypeint4;
 
 public:
 	GetBuilder(CMemoryPool *mp, CWStringConst strTableName, OID oidTableOid)
@@ -809,10 +809,10 @@ CTranslatorDXLToExprTest::EresUnittest_MetadataColumnMapping()
 
 	CAutoOptCtxt aoc(mp, factory.Pmda(), nullptr, CTestUtils::GetCostModel(mp));
 
-	CAutoRef<CExpression> apExpr(
+	gpos::Ref<CExpression> apExpr(
 		CTranslatorDXLToExprTest::Pexpr(mp, szQueryDroppedColumn));
 
-	gpos::Ref<CLogicalGet> pActualGet = (gpos::Ref<CLogicalGet>) apExpr->Pop();
+	gpos::Ref<CLogicalGet> pActualGet = gpos::cast<CLogicalGet>(apExpr->Pop());
 	gpos::Ref<CColumnDescriptorArray> pDrgColDesc =
 		pActualGet->Ptabdesc()->Pdrgpcoldesc();
 	gpos::Ref<CColumnDescriptor> pColDesc = (*pDrgColDesc)[0];

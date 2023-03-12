@@ -136,9 +136,9 @@ CJobGroupOptimization::~CJobGroupOptimization() = default;
 void
 CJobGroupOptimization::Init(
 	gpos::Ref<CGroup> pgroup,
-	CGroupExpression
-		*pgexprOrigin,	// group expression that triggered optimization job,
-						// NULL if this is the Root group
+	gpos::Ref<CGroupExpression>
+		pgexprOrigin,  // group expression that triggered optimization job,
+					   // NULL if this is the Root group
 	gpos::Ref<COptimizationContext> poc)
 {
 	GPOS_ASSERT(nullptr != poc);
@@ -194,7 +194,7 @@ CJobGroupOptimization::FScheduleGroupExpressions(CSchedulerContext *psc)
 		// we consider only group expressions matching current optimization level,
 		// other group expressions will be optimized when damping current
 		// optimization level
-		if (psc->Peng()->FOptimizeChild(m_pgexprOrigin, pgexpr, m_poc,
+		if (psc->Peng()->FOptimizeChild(m_pgexprOrigin, pgexpr, m_poc.Lock(),
 										EolCurrent()))
 		{
 			const ULONG ulOptRequests =
@@ -202,8 +202,8 @@ CJobGroupOptimization::FScheduleGroupExpressions(CSchedulerContext *psc)
 			for (ULONG ul = 0; ul < ulOptRequests; ul++)
 			{
 				// schedule an optimization job for each request
-				CJobGroupExpressionOptimization::ScheduleJob(psc, pgexpr, m_poc,
-															 ul, this);
+				CJobGroupExpressionOptimization::ScheduleJob(
+					psc, pgexpr, m_poc.Lock(), ul, this);
 			}
 		}
 		pgexprLast = pgexpr;
@@ -238,7 +238,7 @@ CJobGroupOptimization::EevtStartOptimization(CSchedulerContext *psc,
 {
 	// get a job pointer
 	CJobGroupOptimization *pjgo = PjConvert(pjOwner);
-	gpos::Ref<CGroup> pgroup = pjgo->m_pgroup;
+	gpos::Ref<CGroup> pgroup = pjgo->m_pgroup.Lock();
 	GPOS_ASSERT(COptimizationContext::estUnoptimized == pjgo->m_poc->Est() &&
 				"Group is already optimized under this context");
 

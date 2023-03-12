@@ -83,7 +83,7 @@ private:
 			if (m_selector_ids)
 			{
 				ulHash = gpos::CombineHashes(
-					ulHash, gpos::HashPtr<CBitSet>(m_selector_ids));
+					ulHash, gpos::HashPtr<CBitSet>(m_selector_ids.get()));
 			}
 			if (m_filter_expr)
 			{
@@ -107,14 +107,11 @@ private:
 
 	// partition required/derived info, sorted by scanid
 	using UlongToSPartPropSpecInfoMap =
-		CHashMap<ULONG, SPartPropSpecInfo, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<SPartPropSpecInfo>>;
+		gpos::UnorderedMap<ULONG *, gpos::Ref<SPartPropSpecInfo>>;
 
 	using UlongToSPartPropSpecInfoMapIter =
-		CHashMapIter<ULONG, SPartPropSpecInfo, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupRelease<SPartPropSpecInfo>>;
+		gpos::UnorderedMap<ULONG *,
+						   gpos::Ref<SPartPropSpecInfo>>::LegacyIterator;
 
 	gpos::Ref<UlongToSPartPropSpecInfoMap> m_part_prop_spec_infos = nullptr;
 

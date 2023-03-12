@@ -369,8 +369,8 @@ public:
 	// construct a statistics object for the columns of the given relation
 	gpos::Ref<IStatistics> Pstats(
 		CMemoryPool *mp, gpos::Ref<IMDId> rel_mdid,
-		CColRefSet
-			*pcrsHist,	// set of column references for which stats are needed
+		gpos::Ref<CColRefSet>
+			pcrsHist,  // set of column references for which stats are needed
 		gpos::Ref<CColRefSet>
 			pcrsWidth,	// set of column references for which the widths are needed
 		gpos::Ref<CStatisticsConfig> stats_config = nullptr);

@@ -43,8 +43,6 @@ CDXLRelStats::CDXLRelStats(CMemoryPool *mp,
 	  m_relallvisible(relallvisible)
 {
 	GPOS_ASSERT(rel_stats_mdid->IsValid());
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -58,7 +56,10 @@ CDXLRelStats::CDXLRelStats(CMemoryPool *mp,
 CDXLRelStats::~CDXLRelStats()
 {
 	GPOS_DELETE(m_mdname);
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -100,6 +101,12 @@ CDXLRelStats::Mdname() const
 const CWStringDynamic *
 CDXLRelStats::GetStrRepr() const
 {
+	if (nullptr == m_dxl_str)
+	{
+		m_dxl_str = CDXLUtils::SerializeMDObj(
+			m_mp, gpos::dyn_cast<IMDCacheObject>(SharedFromThis()),
+			false /*fSerializeHeader*/, false /*indentation*/);
+	}
 	return m_dxl_str;
 }
 

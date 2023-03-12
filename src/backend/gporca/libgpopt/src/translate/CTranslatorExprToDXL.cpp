@@ -24,6 +24,7 @@
 #include "gpopt/base/CCastUtils.h"
 #include "gpopt/base/CColRefSetIter.h"
 #include "gpopt/base/CConstraintInterval.h"
+#include "gpopt/base/CDrvdPropCtxt.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/cost/ICostModel.h"
@@ -2410,7 +2411,7 @@ CTranslatorExprToDXL::PdxlnAppend(
 			reqd_col_array->Append((*pdrgpcrOutputAll)[c]);
 		}
 	}
-	gpos::Ref<ULongPtrArray> reqd_col_positions =
+	gpos::Ref<ULongVector> reqd_col_positions =
 		pdrgpcrOutputAll->IndexesOfSubsequence(reqd_col_array);
 	gpos::Ref<CColRefArray> requiredOutput =
 		pdrgpcrOutputAll->CreateReducedArray(reqd_col_positions);
@@ -2870,7 +2871,7 @@ CTranslatorExprToDXL::PdxlnAggregateDedup(
 				COperator::EopPhysicalHashAggDeduplicate == op_id);
 
 	EdxlAggStrategy dxl_agg_strategy = EdxlaggstrategySentinel;
-	const gpos::Ref<CColRefArray> pdrgpcrGroupingCols = nullptr;
+	gpos::Ref<CColRefArray> pdrgpcrGroupingCols = nullptr;
 	gpos::Ref<CColRefSet> pcrsKeys = GPOS_NEW(m_mp) CColRefSet(m_mp);
 
 	if (COperator::EopPhysicalStreamAggDeduplicate == op_id)
@@ -3383,7 +3384,7 @@ CTranslatorExprToDXL::PdxlnRestrictResult(gpos::Ref<CDXLNode> dxlnode,
 				CDXLScalarProjElem::Cast(child_dxlnode->GetOperator());
 
 			const INT colid = pdxlPrjElem->Id();
-			gpos::Ref<CColRef> colref = phmicr->Find(&colid);
+			gpos::Ref<CColRef> colref = phmicr->Find(colid);
 			if (colref)
 			{
 				// create a new project element that simply points to required column,
@@ -3725,8 +3726,8 @@ CTranslatorExprToDXL::PdxlnExistentialSubplan(
 	pdxlnSubPlan->AddChild(inner_dxlnode);
 
 	// add to hashmap
-	BOOL fRes GPOS_ASSERTS_ONLY = m_phmcrdxln->Insert(
-		const_cast<gpos::Ref<CColRef> >((*pdrgpcrInner)[0]), pdxlnSubPlan);
+	BOOL fRes GPOS_ASSERTS_ONLY =
+		m_phmcrdxln->Insert((*pdrgpcrInner)[0], pdxlnSubPlan);
 	GPOS_ASSERT(fRes);
 
 	return pdxlnSubPlan;
@@ -3938,8 +3939,7 @@ CTranslatorExprToDXL::BuildDxlnSubPlan(gpos::Ref<CDXLNode> pdxlnRelChild,
 	pdxlnSubPlan->AddChild(pdxlnRelChild);
 
 	// add to hashmap
-	BOOL fRes GPOS_ASSERTS_ONLY = m_phmcrdxln->Insert(
-		const_cast<gpos::Ref<CColRef> >(colref), pdxlnSubPlan);
+	BOOL fRes GPOS_ASSERTS_ONLY = m_phmcrdxln->Insert(colref, pdxlnSubPlan);
 	GPOS_ASSERT(fRes);
 }
 
@@ -5126,8 +5126,8 @@ CTranslatorExprToDXL::PdxlnCTAS(
 	gpos::Ref<CExpression> pexprChild = (*pexpr)[0];
 	gpos::Ref<CTableDescriptor> ptabdesc = popDML->Ptabdesc();
 	gpos::Ref<CColRefArray> pdrgpcrSource = popDML->PdrgpcrSource();
-	gpos::Ref<CMDRelationCtasGPDB> pmdrel =
-		(gpos::Ref<CMDRelationCtasGPDB>) m_pmda->RetrieveRel(ptabdesc->MDId());
+	gpos::Ref<CMDRelationCtasGPDB> pmdrel = gpos::dyn_cast<CMDRelationCtasGPDB>(
+		m_pmda->RetrieveRel(ptabdesc->MDId()));
 
 	gpos::Ref<CDXLNode> child_dxlnode = CreateDXLNode(
 		pexprChild, pdrgpcrSource, pdrgpdsBaseTables, pulNonGatherMotions,
@@ -5186,10 +5186,6 @@ CTranslatorExprToDXL::PdxlnCTAS(
 		mdname_schema = GPOS_NEW(m_mp)
 			CMDName(m_mp, pmdrel->GetMdNameSchema()->GetMDName());
 	}
-
-	gpos::Ref<IMdIdArray> distr_opclasses = pmdrel->GetDistrOpClasses();
-
-
 
 	gpos::Ref<CDXLPhysicalCTAS> pdxlopCTAS = GPOS_NEW(m_mp) CDXLPhysicalCTAS(
 		m_mp, mdname_schema,
@@ -5628,7 +5624,7 @@ CTranslatorExprToDXL::PdxlnScId(gpos::Ref<CExpression> pexprIdent)
 
 	gpos::Ref<CScalarIdent> popScId =
 		CScalarIdent::PopConvert(pexprIdent->Pop());
-	gpos::Ref<CColRef> colref = const_cast<gpos::Ref<CColRef> >(popScId->Pcr());
+	gpos::Ref<CColRef> colref = popScId->Pcr();
 
 	return CTranslatorExprToDXLUtils::PdxlnIdent(
 		m_mp, m_phmcrdxln, m_phmcrdxlnIndexLookup, m_phmcrulPartColId, colref);
@@ -6914,9 +6910,9 @@ CTranslatorExprToDXL::PdxlnProjListForChildPart(
 		for (ULONG i = 0; i < colref_array->Size(); ++i)
 		{
 			gpos::Ref<CColRef> cr = (*colref_array)[i];
-			ULONG *idx = root_col_mapping->Find(cr);
+			gpos::Ref<UlongRef> idx = root_col_mapping->Find(cr);
 			GPOS_ASSERT(nullptr != idx);
-			gpos::Ref<CColRef> mapped_cr = (*part_colrefs)[*idx];
+			gpos::Ref<CColRef> mapped_cr = (*part_colrefs)[idx->value()];
 			mapped_colrefs->Append(mapped_cr);
 			pcrs->Include(mapped_cr);
 		}
@@ -6926,9 +6922,9 @@ CTranslatorExprToDXL::PdxlnProjListForChildPart(
 	while (crsi.Advance())
 	{
 		gpos::Ref<CColRef> cr = crsi.Pcr();
-		ULONG *idx = root_col_mapping->Find(cr);
+		gpos::Ref<UlongRef> idx = root_col_mapping->Find(cr);
 		GPOS_ASSERT(nullptr != idx);
-		gpos::Ref<CColRef> mapped_cr = (*part_colrefs)[*idx];
+		gpos::Ref<CColRef> mapped_cr = (*part_colrefs)[idx->value()];
 		if (!pcrs->FMember(mapped_cr))
 		{
 			mapped_colrefs->Append(mapped_cr);
@@ -6965,11 +6961,12 @@ CTranslatorExprToDXL::PdxlnCondForChildPart(
 	for (ULONG i = 0; i < root_colrefs->Size(); ++i)
 	{
 		gpos::Ref<CColRef> cr = (*root_colrefs)[i];
-		ULONG *idx = root_col_mapping->Find(cr);
+		gpos::Ref<UlongRef> idx = root_col_mapping->Find(cr);
 		GPOS_ASSERT(nullptr != idx);
 
-		gpos::Ref<CColRef> mapped_cr = (*part_colrefs)[*idx];
-		m_phmcrulPartColId->Insert(cr, GPOS_NEW(m_mp) ULONG(mapped_cr->Id()));
+		gpos::Ref<CColRef> mapped_cr = (*part_colrefs)[idx->value()];
+		m_phmcrulPartColId->Insert(cr,
+								   GPOS_NEW(m_mp) UlongRef(mapped_cr->Id()));
 	}
 
 	gpos::Ref<CDXLNode> pdxlnCond = nullptr;
@@ -7073,11 +7070,9 @@ CTranslatorExprToDXL::PdxlnProjList(const gpos::Ref<CExpression> pexprProjList,
 	}
 
 	// translate computed column expressions into DXL and index them on their col ids
-	CHashMap<ULONG, CDXLNode, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>,
-			 CleanupRelease<CDXLNode> > *phmComputedColumns = GPOS_NEW(m_mp)
-		CHashMap<ULONG, CDXLNode, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-				 CleanupDelete<ULONG>, CleanupRelease<CDXLNode> >(m_mp);
+	gpos::Ref<gpos::UnorderedMap<ULONG *, gpos::Ref<CDXLNode>>>
+		phmComputedColumns = GPOS_NEW(m_mp)
+			gpos::UnorderedMap<ULONG *, gpos::Ref<CDXLNode>>(m_mp);
 
 	for (ULONG ul = 0; nullptr != pexprProjList && ul < pexprProjList->Arity();
 		 ul++)

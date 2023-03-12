@@ -62,8 +62,8 @@ CParseHandlerSortCol::StartElement(const XMLCh *const,	// element_uri,
 
 	// parse and create sort col operator
 	gpos::Ref<CDXLScalarSortCol> dxl_op =
-		(gpos::Ref<CDXLScalarSortCol>) CDXLOperatorFactory::MakeDXLSortCol(
-			m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+		gpos::cast<CDXLScalarSortCol>(CDXLOperatorFactory::MakeDXLSortCol(
+			m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 }
 

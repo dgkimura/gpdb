@@ -48,7 +48,7 @@ InsertGroupIntoMemo(CMemo *pmemo, CMemoryPool *mp)
 	gpos::Ref<CExpression> pexprGet = CTestUtils::PexprLogicalGet(mp);
 
 	gpos::Ref<CGroupExpression> pgexpr = GPOS_NEW(mp)
-		CGroupExpression(mp, pexprGet->Pop(), GPOS_NEW(mp) CGroupArray(mp),
+		CGroupExpression(mp, pexprGet->Pop(), GPOS_NEW(mp) CGroupArrayWeak(mp),
 						 CXform::ExfInvalid /*exfidOrigin*/,
 						 nullptr /*pgexprOrigin*/, false /*fIntermediate*/);
 

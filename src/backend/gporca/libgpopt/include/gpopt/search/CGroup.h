@@ -41,13 +41,12 @@ class CExpression;
 
 // type definitions
 // array of groups
-using CGroupArray = CDynamicPtrArray<CGroup, CleanupNULL>;
+using CGroupArray = gpos::Vector<gpos::Ref<CGroup>>;
+using CGroupArrayWeak = gpos::Vector<gpos::WeakRef<CGroup>>;
 
 // map required plan props to cost lower bound of corresponding plan
 using ReqdPropPlanToCostMap =
-	CHashMap<CReqdPropPlan, CCost, CReqdPropPlan::UlHashForCostBounding,
-			 CReqdPropPlan::FEqualForCostBounding,
-			 CleanupRelease<CReqdPropPlan>, CleanupDelete<CCost>>;
+	gpos::UnorderedMap<gpos::Ref<CReqdPropPlan>, CCost *>;
 
 // optimization levels in ascending order,
 // under a given optimization context, group expressions in higher levels
@@ -75,7 +74,9 @@ class CGroup : public CRefCount<CGroup>, public DbgPrintMixin<CGroup>
 
 public:
 	// type definition of optimization context hash table
-	using ShtOC = CSyncHashtable<COptimizationContext, COptimizationContext>;
+	using ShtOC = gpos::UnorderedMap<
+		gpos::Ref<COptimizationContext>, gpos::Ref<COptimizationContext>,
+		coptimizationcontext_hash, coptimizationcontext_equal_to>;
 
 	// states of a group
 	enum EState
@@ -98,7 +99,10 @@ public:
 private:
 	// definition of hash table iter
 	using ShtIter =
-		CSyncHashtableIter<COptimizationContext, COptimizationContext>;
+		gpos::UnorderedMap<gpos::Ref<COptimizationContext>,
+						   gpos::Ref<COptimizationContext>,
+						   coptimizationcontext_hash,
+						   coptimizationcontext_equal_to>::LegacyIterator;
 
 	// definition of hash table iter accessor
 	using ShtAccIter =
@@ -152,10 +156,9 @@ private:
 							 CleanupDelete<BOOL>>;
 
 	// map of computed stats objects during costing
-	using OptCtxtToIStatisticsMap = CHashMap<
-		COptimizationContext, IStatistics, COptimizationContext::UlHashForStats,
-		COptimizationContext::FEqualForStats,
-		CleanupRelease<COptimizationContext>, CleanupRelease<IStatistics>>;
+	using OptCtxtToIStatisticsMap =
+		gpos::UnorderedMap<gpos::Ref<COptimizationContext>,
+						   gpos::Ref<IStatistics>>;
 
 	// memory pool
 	CMemoryPool *m_mp;
@@ -176,10 +179,10 @@ private:
 	gpos::Ref<IMdIdArray> m_join_opfamilies;
 
 	// list of group expressions
-	CList<CGroupExpression> m_listGExprs;
+	gpos::Vector<gpos::Ref<CGroupExpression>> m_listGExprs;
 
 	// list of duplicate group expressions identified by group merge
-	CList<CGroupExpression> m_listDupGExprs;
+	gpos::Vector<gpos::Ref<CGroupExpression>> m_listDupGExprs;
 
 	// group derived properties
 	gpos::Ref<CDrvdProp> m_pdp;
@@ -207,7 +210,7 @@ private:
 	gpos::Ref<OptCtxtToIStatisticsMap> m_pstatsmap;
 
 	// hashtable of optimization contexts
-	ShtOC m_sht;
+	gpos::Ref<ShtOC> m_sht;
 
 	// number of group expressions
 	ULONG m_ulGExprs;
@@ -423,7 +426,7 @@ public:
 	}
 
 	// optimization contexts hash table accessor
-	ShtOC &
+	gpos::Ref<ShtOC>
 	Sht()
 	{
 		return m_sht;
@@ -596,12 +599,12 @@ public:
 	CCost CostLowerBound(CMemoryPool *mp, gpos::Ref<CReqdPropPlan> prppInput);
 
 	// matching of pairs of arrays of groups
-	static BOOL FMatchGroups(gpos::Ref<CGroupArray> pdrgpgroupFst,
-							 gpos::Ref<CGroupArray> pdrgpgroupSnd);
+	static BOOL FMatchGroups(gpos::Ref<CGroupArrayWeak> pdrgpgroupFst,
+							 gpos::Ref<CGroupArrayWeak> pdrgpgroupSnd);
 
 	// matching of pairs of arrays of groups while skipping scalar groups
-	static BOOL FMatchNonScalarGroups(gpos::Ref<CGroupArray> pdrgpgroupFst,
-									  gpos::Ref<CGroupArray> pdrgpgroupSnd);
+	static BOOL FMatchNonScalarGroups(gpos::Ref<CGroupArrayWeak> pdrgpgroupFst,
+									  gpos::Ref<CGroupArrayWeak> pdrgpgroupSnd);
 
 	// determine if a pair of groups are duplicates
 	static BOOL FDuplicateGroups(gpos::Ref<CGroup> pgroupFst,

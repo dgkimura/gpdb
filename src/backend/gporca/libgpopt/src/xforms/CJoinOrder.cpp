@@ -624,7 +624,7 @@ CJoinOrder::OsPrint(IOstream &os) const
 	os << "Components: " << m_ulComps << std::endl;
 	for (ULONG ul = 0; ul < m_ulComps; ul++)
 	{
-		os << (void *) m_rgpcomp[ul] << " - " << std::endl;
+		os << (void *) m_rgpcomp[ul].get() << " - " << std::endl;
 		m_rgpcomp[ul]->OsPrint(os);
 	}
 

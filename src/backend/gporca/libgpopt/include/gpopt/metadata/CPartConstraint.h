@@ -28,15 +28,11 @@ class CPartConstraint;
 
 // hash maps of part constraints indexed by part index id
 using UlongToPartConstraintMap =
-	CHashMap<ULONG, CPartConstraint, gpos::HashValue<ULONG>,
-			 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-			 CleanupRelease<CPartConstraint>>;
+	gpos::UnorderedMap<ULONG *, gpos::Ref<CPartConstraint>>;
 
 // map iterator
 using UlongToPartConstraintMapIter =
-	CHashMapIter<ULONG, CPartConstraint, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CPartConstraint>>;
+	gpos::UnorderedMap<ULONG *, gpos::Ref<CPartConstraint>>::LegacyIterator;
 
 //---------------------------------------------------------------------------
 //	@class:

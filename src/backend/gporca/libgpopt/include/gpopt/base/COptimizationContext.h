@@ -74,7 +74,7 @@ private:
 	ULONG m_id{GPOPT_INVALID_OPTCTXT_ID};
 
 	// back pointer to owner group, used for debugging
-	gpos::Ref<CGroup> m_pgroup{nullptr};
+	gpos::WeakRef<CGroup> m_pgroup{nullptr};
 
 	// required plan properties
 	gpos::Ref<CReqdPropPlan> m_prpp{nullptr};
@@ -141,8 +141,8 @@ public:
 		gpos::Ref<CReqdPropPlan> prpp,
 		gpos::Ref<CReqdPropRelational>
 			prprel,	 // required relational props -- used during stats derivation
-		IStatisticsArray
-			*stats_ctxt,  // stats of previously optimized expressions
+		gpos::Ref<IStatisticsArray>
+			stats_ctxt,	 // stats of previously optimized expressions
 		ULONG ulSearchStageIndex)
 		: m_mp(mp),
 		  m_pgroup(pgroup),
@@ -177,7 +177,7 @@ public:
 	gpos::Ref<CGroup>
 	Pgroup() const
 	{
-		return m_pgroup;
+		return m_pgroup.Lock();
 	}
 
 	// required plan properties accessor
@@ -346,6 +346,27 @@ public:
 	static const OPTCTXT_PTR m_pocInvalid;
 
 };	// class COptimizationContext
+
+struct coptimizationcontext_equal_to
+	: public std::binary_function<gpos::Ref<COptimizationContext>,
+								  gpos::Ref<COptimizationContext>, bool>
+{
+	bool
+	operator()(const gpos::Ref<COptimizationContext> &lhs,
+			   const gpos::Ref<COptimizationContext> &rhs) const
+	{
+		return COptimizationContext::Equals(lhs, rhs);
+	}
+};
+
+struct coptimizationcontext_hash
+{
+	int
+	operator()(const gpos::Ref<COptimizationContext> &obj) const
+	{
+		return COptimizationContext::UlHashForStats(obj);
+	}
+};
 }  // namespace gpopt
 
 

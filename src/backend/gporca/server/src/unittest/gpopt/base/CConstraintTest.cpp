@@ -20,6 +20,7 @@
 #include "gpos/task/CAutoTraceFlag.h"
 
 #include "gpopt/base/CDefaultComparator.h"
+#include "gpopt/base/CDrvdPropCtxt.h"
 #include "gpopt/base/CUtils.h"
 #include "gpopt/eval/CConstExprEvaluatorDefault.h"
 #include "gpopt/exception.h"

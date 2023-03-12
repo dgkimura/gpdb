@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CDistributionSpecHashed.h"
 #include "gpopt/base/CUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;

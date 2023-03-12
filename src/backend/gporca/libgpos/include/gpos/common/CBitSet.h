@@ -16,6 +16,7 @@
 #include "gpos/common/CDynamicPtrArray.h"
 #include "gpos/common/CList.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/Vector.h"
 
 
 namespace gpos
@@ -97,8 +98,7 @@ protected:
 	CBitSet(const CBitSet &);
 
 	// find link with offset less or equal to given value
-	gpos::Ref<CBitSetLink> FindLinkByOffset(
-		ULONG, gpos::Ref<CBitSetLink> = nullptr) const;
+	CBitSetLink *FindLinkByOffset(ULONG, CBitSetLink * = nullptr) const;
 
 	// reset set
 	void Clear();
@@ -140,6 +140,7 @@ public:
 
 	// equality
 	BOOL Equals(const gpos::Ref<CBitSet>) const;
+	BOOL Equals(const CBitSet *) const;
 
 	// disjoint
 	BOOL IsDisjoint(const gpos::Ref<CBitSet>) const;

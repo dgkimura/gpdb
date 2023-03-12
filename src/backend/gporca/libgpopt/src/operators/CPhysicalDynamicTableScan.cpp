@@ -57,7 +57,8 @@ CPhysicalDynamicTableScan::CPhysicalDynamicTableScan(
 BOOL
 CPhysicalDynamicTableScan::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchDynamicScan(this, pop);
+	return CUtils::FMatchDynamicScan(
+		gpos::dyn_cast<CPhysicalDynamicTableScan>(SharedFromThis()), pop);
 }
 
 //---------------------------------------------------------------------------

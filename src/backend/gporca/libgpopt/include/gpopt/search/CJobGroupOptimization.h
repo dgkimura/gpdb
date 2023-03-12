@@ -74,7 +74,7 @@ private:
 	gpos::Ref<CGroupExpression> m_pgexprOrigin;
 
 	// optimization context of the job
-	gpos::Ref<COptimizationContext> m_poc;
+	gpos::WeakRef<COptimizationContext> m_poc;
 
 	// current optimization level of group expressions
 	EOptimizationLevel m_eolCurrent;

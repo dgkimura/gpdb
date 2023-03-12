@@ -13,6 +13,7 @@
 #include "gpopt/translate/CTranslatorDXLToExprUtils.h"
 
 #include "gpopt/mdcache/CMDAccessorUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/base/IDatumInt4.h"
 #include "naucrates/base/IDatumInt8.h"
 #include "naucrates/dxl/operators/CDXLScalarFuncExpr.h"
@@ -237,7 +238,7 @@ CTranslatorDXLToExprUtils::Pdrgpcr(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < colids->Size(); ul++)
 	{
 		ULONG *pulColId = (*colids)[ul];
-		gpos::Ref<CColRef> colref = colref_mapping->Find(pulColId);
+		gpos::Ref<CColRef> colref = colref_mapping->Find(*pulColId);
 		colref->MarkAsUsed();
 		GPOS_ASSERT(nullptr != colref);
 

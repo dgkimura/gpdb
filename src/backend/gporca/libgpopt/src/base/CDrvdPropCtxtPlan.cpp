@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CCTEMap.h"
 #include "gpopt/base/CDrvdPropPlan.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;
@@ -65,8 +66,7 @@ CDrvdPropCtxtPlan::PdpctxtCopy(CMemoryPool *mp) const
 	while (hmulpdpiter.Advance())
 	{
 		ULONG id = *(hmulpdpiter.Key());
-		gpos::Ref<CDrvdPropPlan> pdpplan =
-			const_cast<gpos::Ref<CDrvdPropPlan> >(hmulpdpiter.Value());
+		gpos::Ref<CDrvdPropPlan> pdpplan = hmulpdpiter.Value();
 
 #ifdef GPOS_DEBUG
 		BOOL fInserted =
@@ -132,8 +132,7 @@ CDrvdPropCtxtPlan::OsPrint(IOstream &os) const
 	while (hmulpdpiter.Advance())
 	{
 		ULONG id = *(hmulpdpiter.Key());
-		gpos::Ref<CDrvdPropPlan> pdpplan =
-			const_cast<gpos::Ref<CDrvdPropPlan> >(hmulpdpiter.Value());
+		gpos::Ref<CDrvdPropPlan> pdpplan = hmulpdpiter.Value();
 
 		os << id << "-->" << *pdpplan << std::endl;
 	}

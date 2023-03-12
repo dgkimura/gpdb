@@ -199,9 +199,9 @@ CParseHandlerScalarSubPlan::EndElement(const XMLCh *const,	// element_uri,
 	{
 	}
 	gpos::Ref<CDXLScalarSubPlan> dxl_op =
-		(gpos::Ref<CDXLScalarSubPlan>) CDXLOperatorFactory::MakeDXLSubPlan(
+		gpos::cast<CDXLScalarSubPlan>(CDXLOperatorFactory::MakeDXLSubPlan(
 			m_parse_handler_mgr->GetDXLMemoryManager(), m_mdid_first_col,
-			dxl_colref_array, m_dxl_subplan_type, dxl_subplan_test_expr);
+			dxl_colref_array, m_dxl_subplan_type, dxl_subplan_test_expr));
 
 	m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 

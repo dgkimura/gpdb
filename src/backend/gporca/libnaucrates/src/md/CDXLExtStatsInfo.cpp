@@ -32,14 +32,15 @@ CDXLExtStatsInfo::CDXLExtStatsInfo(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 	  m_extstats_info_array(extstats_info_array)
 {
 	GPOS_ASSERT(mdid->IsValid());
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 CDXLExtStatsInfo::~CDXLExtStatsInfo()
 {
 	GPOS_DELETE(m_mdname);
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -81,6 +82,12 @@ CDXLExtStatsInfo::Mdname() const
 const CWStringDynamic *
 CDXLExtStatsInfo::GetStrRepr() const
 {
+	if (nullptr == m_dxl_str)
+	{
+		m_dxl_str = CDXLUtils::SerializeMDObj(
+			m_mp, gpos::dyn_cast<IMDCacheObject>(SharedFromThis()),
+			false /*fSerializeHeader*/, false /*indentation*/);
+	}
 	return m_dxl_str;
 }
 
@@ -133,7 +140,7 @@ CDXLExtStatsInfo::CreateDXLDummyExtStatsInfo(CMemoryPool *mp,
 	str = GPOS_NEW(mp) CWStringDynamic(mp, mdid->GetBuffer());
 	CAutoP<CMDName> mdname;
 	mdname = GPOS_NEW(mp) CMDName(mp, str.Value());
-	CAutoRef<CDXLExtStatsInfo> ext_stats_info_dxl;
+	gpos::Ref<CDXLExtStatsInfo> ext_stats_info_dxl;
 
 	CMDExtStatsInfoArray *extstats_info_array =
 		GPOS_NEW(mp) CMDExtStatsInfoArray(mp);
@@ -141,7 +148,7 @@ CDXLExtStatsInfo::CreateDXLDummyExtStatsInfo(CMemoryPool *mp,
 	ext_stats_info_dxl = GPOS_NEW(mp)
 		CDXLExtStatsInfo(mp, mdid, mdname.Value(), extstats_info_array);
 	mdname.Reset();
-	return ext_stats_info_dxl.Reset();
+	return ext_stats_info_dxl;
 }
 
 // EOF

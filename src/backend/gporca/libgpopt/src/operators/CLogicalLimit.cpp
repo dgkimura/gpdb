@@ -204,7 +204,7 @@ CLogicalLimit::DeriveMaxCard(CMemoryPool *,	 // mp
 		gpos::Ref<CScalarConst> popScalarConst =
 			CScalarConst::PopConvert(pexprCount->Pop());
 		gpos::Ref<IDatumInt8> pdatumInt8 =
-			gpos::dyn_cast<IDatumInt8> > (popScalarConst - GetDatum());
+			gpos::dyn_cast<IDatumInt8>(popScalarConst->GetDatum());
 
 		return CMaxCard(pdatumInt8->Value());
 	}

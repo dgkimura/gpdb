@@ -17,9 +17,6 @@
 
 // test headers
 
-#include "unittest/gpos/common/CAutoPTest.h"
-#include "unittest/gpos/common/CAutoRefTest.h"
-#include "unittest/gpos/common/CAutoRgTest.h"
 #include "unittest/gpos/common/CBitSetIterTest.h"
 #include "unittest/gpos/common/CBitSetTest.h"
 #include "unittest/gpos/common/CBitVectorTest.h"
@@ -31,7 +28,6 @@
 #include "unittest/gpos/common/CHashSetIterTest.h"
 #include "unittest/gpos/common/CHashSetTest.h"
 #include "unittest/gpos/common/CListTest.h"
-#include "unittest/gpos/common/CRefCountTest.h"
 #include "unittest/gpos/common/CStackTest.h"
 #include "unittest/gpos/common/CSyncHashtableTest.h"
 #include "unittest/gpos/common/CSyncListTest.h"
@@ -58,9 +54,6 @@ using namespace gpos;
 // static array of all known unittest routines
 static gpos::CUnittest rgut[] = {
 	// common
-	GPOS_UNITTEST_STD(CAutoPTest),
-	GPOS_UNITTEST_STD(CAutoRefTest),
-	GPOS_UNITTEST_STD(CAutoRgTest),
 	GPOS_UNITTEST_STD(CBitSetIterTest),
 	GPOS_UNITTEST_STD(CBitSetTest),
 	GPOS_UNITTEST_STD(CBitVectorTest),
@@ -71,7 +64,6 @@ static gpos::CUnittest rgut[] = {
 	GPOS_UNITTEST_STD(CHashMapIterTest),
 	GPOS_UNITTEST_STD(CHashSetTest),
 	GPOS_UNITTEST_STD(CHashSetIterTest),
-	GPOS_UNITTEST_STD(CRefCountTest),
 	GPOS_UNITTEST_STD(CListTest),
 	GPOS_UNITTEST_STD(CStackTest),
 	GPOS_UNITTEST_STD(CSyncHashtableTest),

@@ -14,6 +14,7 @@
 #include "gpos/base.h"
 
 #include "gpopt/base/CCTEReq.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -371,8 +372,7 @@ CCTEMap::OsPrint(IOstream &os) const
 	UlongToCTEMapEntryMapIter hmcmi(m_phmcm);
 	while (hmcmi.Advance())
 	{
-		gpos::Ref<CCTEMapEntry> pcme =
-			const_cast<gpos::Ref<CCTEMapEntry> >(hmcmi.Value());
+		gpos::Ref<CCTEMapEntry> pcme = hmcmi.Value();
 		pcme->OsPrint(os);
 		os << " ";
 	}

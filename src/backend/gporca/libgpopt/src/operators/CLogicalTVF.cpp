@@ -149,7 +149,7 @@ CLogicalTVF::HashValue() const
 			m_func_mdid->HashValue(),
 			gpos::CombineHashes(
 				m_return_type_mdid->HashValue(),
-				gpos::HashPtr<CColumnDescriptorArray>(m_pdrgpcoldesc))));
+				gpos::HashPtr<CColumnDescriptorArray>(m_pdrgpcoldesc.get()))));
 
 	ulHash =
 		gpos::CombineHashes(ulHash, CUtils::UlHashColArray(m_pdrgpcrOutput));

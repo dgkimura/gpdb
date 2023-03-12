@@ -43,35 +43,27 @@ class CExpressionFactorizer
 {
 private:
 	// map expression to a count, used in factorization
-	using ExprMap =
-		CHashMap<CExpression, ULONG, CExpression::HashValue, CUtils::Equals,
-				 CleanupRelease<CExpression>, CleanupDelete<ULONG>>;
+	using ExprMap = gpos::UnorderedMap<gpos::Ref<CExpression>, ULONG *>;
 
 	// map operators to an array of expression arrays, corresponding to
 	// a disjunction of expressions on columns created by that operator
 	using SourceToArrayPosMap =
-		CHashMap<ULONG, CExpressionArrays, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<CExpressionArrays>>;
+		gpos::UnorderedMap<ULONG *, gpos::Ref<CExpressionArrays>>;
 
 	// iterator for map of operator to disjunctive form representation
 	using SourceToArrayPosMapIter =
-		CHashMapIter<ULONG, CExpressionArrays, gpos::HashValue<ULONG>,
-					 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-					 CleanupRelease<CExpressionArrays>>;
+		gpos::UnorderedMap<ULONG *,
+						   gpos::Ref<CExpressionArrays>>::LegacyIterator;
 
 	// map columns to an array of expression arrays, corresponding to
 	// a disjunction of expressions using that column
 	using ColumnToArrayPosMap =
-		CHashMap<CColRef, CExpressionArrays, gpos::HashPtr<CColRef>,
-				 gpos::EqualPtr<CColRef>, CleanupNULL<CColRef>,
-				 CleanupRelease<CExpressionArrays>>;
+		gpos::UnorderedMap<gpos::Ref<CColRef>, gpos::Ref<CExpressionArrays>>;
 
 	// iterator for map of column to disjunctive form representation
 	using ColumnToArrayPosMapIter =
-		CHashMapIter<CColRef, CExpressionArrays, gpos::HashPtr<CColRef>,
-					 gpos::EqualPtr<CColRef>, CleanupNULL<CColRef>,
-					 CleanupRelease<CExpressionArrays>>;
+		gpos::UnorderedMap<gpos::Ref<CColRef>,
+						   gpos::Ref<CExpressionArrays>>::LegacyIterator;
 
 	using PexprProcessDisj = gpos::Ref<CExpression> (*)(CMemoryPool *,
 														gpos::Ref<CExpression>,

@@ -134,7 +134,8 @@ CLogicalDynamicGet::HashValue() const
 BOOL
 CLogicalDynamicGet::Matches(gpos::Ref<COperator> pop) const
 {
-	return CUtils::FMatchDynamicScan(this, pop);
+	return CUtils::FMatchDynamicScan(
+		gpos::dyn_cast<CLogicalDynamicGet>(SharedFromThis()), pop);
 }
 
 //---------------------------------------------------------------------------

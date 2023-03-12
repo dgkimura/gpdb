@@ -16,6 +16,7 @@
 #include "gpos/common/CHashMap.h"
 #include "gpos/common/CList.h"
 #include "gpos/common/DbgPrintMixin.h"
+#include "gpos/common/RefWrapper.h"
 
 #include "gpopt/metadata/CName.h"
 #include "naucrates/md/IMDType.h"
@@ -33,13 +34,10 @@ using CColRefArray = gpos::Vector<gpos::Ref<CColRef>>;
 using CColRef2dArray = gpos::Vector<gpos::Ref<CColRefArray>>;
 
 // hash map mapping ULONG -> CColRef
-using UlongToColRefMap =
-	CHashMap<ULONG, CColRef, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupNULL<CColRef>>;
+using UlongToColRefMap = gpos::UnorderedMap<ULONG, gpos::Ref<CColRef>>;
 // iterator
 using UlongToColRefMapIter =
-	CHashMapIter<ULONG, CColRef, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-				 CleanupDelete<ULONG>, CleanupNULL<CColRef>>;
+	gpos::UnorderedMap<ULONG, gpos::Ref<CColRef>>::LegacyIterator;
 
 //---------------------------------------------------------------------------
 //	@class:
@@ -240,8 +238,7 @@ operator<<(IOstream &os, CColRef &cr)
 
 // hash map: CColRef -> ULONG
 using ColRefToUlongMap =
-	CHashMap<CColRef, ULONG, CColRef::HashValue, gpos::Equals<CColRef>,
-			 CleanupNULL<CColRef>, CleanupDelete<ULONG>>;
+	gpos::UnorderedMap<gpos::Ref<CColRef>, gpos::Ref<gpos::UlongRef>>;
 
 using ColRefToUlongMapArray = gpos::Vector<gpos::Ref<ColRefToUlongMap>>;
 

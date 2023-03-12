@@ -13,7 +13,9 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CDouble.h"
+#include "gpos/common/Casting.h"
 
+#include "gpopt/engine/CStatisticsConfig.h"
 #include "naucrates/statistics/CStatsPred.h"
 
 namespace gpnaucrates

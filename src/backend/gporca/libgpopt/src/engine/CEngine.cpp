@@ -209,8 +209,8 @@ CEngine::Init(CQueryContext *pqc,
 //---------------------------------------------------------------------------
 void
 CEngine::AddEnforcers(
-	CGroupExpression
-		*pgexpr,  // belongs to group where we need to add enforcers
+	gpos::Ref<CGroupExpression>
+		pgexpr,	 // belongs to group where we need to add enforcers
 	gpos::Ref<CExpressionArray> pdrgpexprEnforcers)
 {
 	GPOS_ASSERT(nullptr != pdrgpexprEnforcers);
@@ -241,7 +241,7 @@ CEngine::AddEnforcers(
 //---------------------------------------------------------------------------
 void
 CEngine::InsertExpressionChildren(gpos::Ref<CExpression> pexpr,
-								  gpos::Ref<CGroupArray> pdrgpgroupChildren,
+								  gpos::Ref<CGroupArrayWeak> pdrgpgroupChildren,
 								  CXform::EXformId exfidOrigin,
 								  gpos::Ref<CGroupExpression> pgexprOrigin)
 {
@@ -314,8 +314,8 @@ CEngine::PgroupInsert(gpos::Ref<CGroup> pgroupTarget,
 	GPOS_ASSERT_IMP(nullptr != pgroupOrigin, nullptr == pgroupTarget);
 
 	// insert expression's children to memo by recursive call
-	gpos::Ref<CGroupArray> pdrgpgroupChildren =
-		GPOS_NEW(m_mp) CGroupArray(m_mp, pexpr->Arity());
+	gpos::Ref<CGroupArrayWeak> pdrgpgroupChildren =
+		GPOS_NEW(m_mp) CGroupArrayWeak(m_mp, pexpr->Arity());
 	InsertExpressionChildren(pexpr, pdrgpgroupChildren, exfidOrigin,
 							 pgexprOrigin);
 
@@ -903,8 +903,8 @@ CEngine::PocChild(
 		&exprhdlPlan,  // handle to compute required plan properties
 	CExpressionHandle
 		&exprhdlRel,  // handle to compute required relational properties
-	CDrvdPropArray
-		*pdrgpdpChildren,  // derived plan properties of optimized children
+	gpos::Ref<CDrvdPropArray>
+		pdrgpdpChildren,  // derived plan properties of optimized children
 	gpos::Ref<IStatisticsArray> pdrgpstatCurrentCtxt, ULONG child_index,
 	ULONG ulOptReq)
 {
@@ -1755,8 +1755,9 @@ CEngine::PexprUnrank(ULLONG plan_id)
 	// because we are doing a DFS traversal of the TreeMap.
 	gpos::Ref<CDrvdPropCtxtPlan> pdpctxtplan =
 		GPOS_NEW(m_mp) CDrvdPropCtxtPlan(m_mp, false /*fUpdateCTEMap*/);
+	// FIXME: TODO KIMURA confirm who owns pdpctxtplan...
 	gpos::Ref<CExpression> pexpr =
-		Pmemotmap()->PrUnrank(m_mp, pdpctxtplan, plan_id);
+		Pmemotmap()->PrUnrank(m_mp, pdpctxtplan.get(), plan_id);
 
 
 #ifdef GPOS_DEBUG

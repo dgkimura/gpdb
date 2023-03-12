@@ -122,7 +122,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// components of order spec
-	COrderExpressionArray *m_pdrgpoe;
+	gpos::Ref<COrderExpressionArray> m_pdrgpoe;
 
 	// extract columns from order spec into the given column set
 	void ExtractCols(gpos::Ref<CColRefSet> pcrs) const;

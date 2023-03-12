@@ -14,6 +14,7 @@
 
 #include "gpos/base.h"
 
+#include "naucrates/dxl/CDXLUtils.h"
 #include "naucrates/dxl/gpdb_types.h"
 #include "naucrates/md/CGPDBTypeHelper.h"
 #include "naucrates/md/CMDIdGPDB.h"
@@ -56,7 +57,7 @@ private:
 	CMemoryPool *m_mp;
 
 	// DXL for object
-	const CWStringDynamic *m_dxl_str;
+	mutable CWStringDynamic *m_dxl_str{nullptr};
 
 	// metadata id
 	gpos::Ref<IMDId> m_mdid;
@@ -169,6 +170,12 @@ public:
 	const CWStringDynamic *
 	GetStrRepr() const override
 	{
+		if (nullptr == m_dxl_str)
+		{
+			m_dxl_str = CDXLUtils::SerializeMDObj(
+				m_mp, gpos::dyn_cast<IMDCacheObject>(SharedFromThis()),
+				false /*fSerializeHeader*/, false /*indentation*/);
+		}
 		return m_dxl_str;
 	}
 
@@ -335,7 +342,7 @@ public:
 	static inline BOOL
 	IsTimeRelatedTypeMappableToLint(const gpos::Ref<IMDId> mdid)
 	{
-		return mdid->Equals(&CMDIdGPDB::m_mdid_date);
+		return mdid->Equals(CMDIdGPDB::m_mdid_date);
 	}
 
 	// is this a network-related type

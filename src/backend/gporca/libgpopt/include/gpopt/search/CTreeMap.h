@@ -50,10 +50,11 @@ class CTreeMap
 	using DrgPt = CDynamicPtrArray<T, CleanupNULL>;
 
 	// array of result pointers (results owned by the tree we unrank)
-	using DrgPr = CDynamicPtrArray<R, CleanupRelease<R>>;
+	using DrgPr = gpos::Vector<gpos::Ref<R>>;
 
 	// generic rehydrate function
-	using PrFn = R *(*) (CMemoryPool *, T *, DrgPr *, U *);
+	using PrFn = gpos::Ref<R> (*)(CMemoryPool *, gpos::Ref<T>, gpos::Ref<DrgPr>,
+								  gpos::Ref<U>);
 
 private:
 	// fwd declaration
@@ -61,7 +62,7 @@ private:
 
 	// arrays of internal nodes
 	using CTreeNodeArray = CDynamicPtrArray<CTreeNode, CleanupNULL>;
-	using CTreeNode2dArray = gpos::Vector<gpos::Ref<CTreeNodeArray>>;
+	using CTreeNode2dArray = CDynamicPtrArray<CTreeNodeArray, CleanupRelease>;
 
 	//---------------------------------------------------------------------------
 	//	@class:
@@ -183,7 +184,7 @@ private:
 		}
 
 		// rehydrate tree
-		R *
+		gpos::Ref<R>
 		PrUnrank(CMemoryPool *mp, PrFn prfn, U *pU, ULONG ulChild,
 				 ULLONG ullRank)
 		{
@@ -317,12 +318,12 @@ private:
 		}
 
 		// unrank tree of a given rank with a given rehydrate function
-		R *
+		gpos::Ref<R>
 		PrUnrank(CMemoryPool *mp, PrFn prfn, U *pU, ULLONG ullRank)
 		{
 			GPOS_CHECK_STACK_SIZE;
 
-			R *pr = nullptr;
+			gpos::Ref<R> pr = nullptr;
 
 			if (0 == this->m_ul)
 			{
@@ -531,7 +532,7 @@ public:
 	}
 
 	// unrank a specific tree
-	R *
+	gpos::Ref<R>
 	PrUnrank(CMemoryPool *mp, U *pU, ULLONG ullRank) const
 	{
 		return m_ptnRoot->PrUnrank(mp, m_prfn, pU, ullRank);

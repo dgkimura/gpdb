@@ -36,7 +36,7 @@ class CGroupProxy
 {
 private:
 	// group we're operating on
-	gpos::Ref<CGroup> m_pgroup;
+	gpos::WeakRef<CGroup> m_pgroup;
 
 	// skip group expressions starting from the given expression;
 	gpos::Ref<CGroupExpression> PgexprSkip(
@@ -44,7 +44,7 @@ private:
 
 public:
 	// ctor
-	explicit CGroupProxy(gpos::Ref<CGroup> pgroup);
+	explicit CGroupProxy(gpos::WeakRef<CGroup> pgroup);
 
 	// dtor
 	~CGroupProxy();

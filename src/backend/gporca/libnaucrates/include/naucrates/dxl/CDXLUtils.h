@@ -247,6 +247,9 @@ public:
 	template <typename T, void (*CleanupFn)(T *)>
 	static CWStringDynamic *Serialize(
 		CMemoryPool *mp, const CDynamicPtrArray<T, CleanupFn> *arr);
+	template <typename T, void (*CleanupFn)(T *)>
+	static CWStringDynamic *Serialize(
+		CMemoryPool *mp, const gpos::Ref<CDynamicPtrArray<T, CleanupFn>> arr);
 
 	// serialize a list of lists of integers into a comma-separate string
 	static CWStringDynamic *Serialize(CMemoryPool *mp,
@@ -283,6 +286,14 @@ public:
 };
 
 // serialize a list of integers into a comma-separate string
+template <typename T, void (*CleanupFn)(T *)>
+CWStringDynamic *
+CDXLUtils::Serialize(
+	CMemoryPool *mp,
+	const gpos::Ref<CDynamicPtrArray<T, CleanupFn>> dynamic_ptr_array)
+{
+	return Serialize(mp, dynamic_ptr_array.get());
+}
 template <typename T, void (*CleanupFn)(T *)>
 CWStringDynamic *
 CDXLUtils::Serialize(CMemoryPool *mp,

@@ -25,6 +25,7 @@
 #include "gpopt/operators/CScalarArray.h"
 #include "gpopt/operators/CScalarIdent.h"
 #include "gpopt/operators/CScalarIsDistinctFrom.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/IMDScalarOp.h"
 
 using namespace gpopt;
@@ -126,7 +127,7 @@ CConstraintInterval::GetConstraintOnSegmentId() const
 {
 	if (FConstraintOnSegmentId())
 	{
-		return (gpos::Ref<CConstraint>) this;
+		return gpos::cast<CConstraint>(SharedFromThis());
 	}
 
 	return nullptr;
@@ -456,7 +457,7 @@ CConstraintInterval::PciIntervalFromScalarCmp(CMemoryPool *mp,
 	// Currently we support expression of the form
 	//         (column relop const)
 	//         (const reolop column)
-	gpos::Ref<CExpression> pexprIdent, *pexprConst;
+	gpos::Ref<CExpression> pexprIdent, pexprConst;
 	if (CPredicateUtils::FCompareIdentToConst(pexpr, pexprIdent, pexprConst))
 	{
 		// column
@@ -1327,8 +1328,8 @@ CConstraintInterval::PciComplement(CMemoryPool *mp)
 	gpos::Ref<CConstraintInterval> pciUniversal =
 		PciUnbounded(mp, m_pcr, true /*fIncludesNull*/);
 
-	gpos::Ref<CConstraintInterval> pciComp =
-		pciUniversal->PciDifference(mp, this);
+	gpos::Ref<CConstraintInterval> pciComp = pciUniversal->PciDifference(
+		mp, gpos::dyn_cast<CConstraintInterval>(SharedFromThis()));
 
 
 	return pciComp;

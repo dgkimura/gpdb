@@ -18,6 +18,8 @@
 
 #include "gpos/base.h"
 #include "gpos/common/CSyncHashtable.h"
+#include "gpos/common/Ref.h"
+#include "gpos/common/UnorderedMap.h"
 
 namespace gpos
 {
@@ -48,7 +50,7 @@ public:
 	};
 
 	// ctor
-	CTaskLocalStorage() = default;
+	CTaskLocalStorage(CMemoryPool *mp);
 
 	// dtor
 	~CTaskLocalStorage();
@@ -84,7 +86,8 @@ public:
 
 private:
 	// hash table
-	CSyncHashtable<CTaskLocalStorageObject, Etlsidx> m_hash_table;
+	gpos::UnorderedMap<Etlsidx, gpos::Ref<CTaskLocalStorageObject>>
+		m_hash_table;
 
 };	// class CTaskLocalStorage
 }  // namespace gpos

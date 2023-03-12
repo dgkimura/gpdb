@@ -171,6 +171,162 @@ public:
 };
 
 template <class T>
+class WeakRef
+{
+	T *p_;
+
+	void
+	AddRef() noexcept
+	{
+		if (p_)
+			RefPtrInfo<T>::AddRef(p_);
+	}
+
+	void
+	Release() noexcept(noexcept(RefPtrInfo<T>::AddRef(p_)))
+	{
+		if (p_)
+			RefPtrInfo<T>::Release(p_);
+	}
+
+	template <class U>
+	friend class Ref;  // for swap and move
+
+public:
+	WeakRef(T *p = nullptr) noexcept : p_(p)
+	{
+	}
+	~WeakRef()
+	{
+	}
+
+	WeakRef(const Ref<T> &other) noexcept : p_(other.get())
+	{
+	}
+
+	WeakRef(const WeakRef<T> &other) noexcept : p_(other.get())
+	{
+	}
+
+	template <class U,
+			  class = std::enable_if_t<std::is_convertible<U *, T *>::value>>
+	WeakRef(const Ref<U> &other) noexcept : p_(other.get())
+	{
+	}
+
+	template <class U,
+			  class = std::enable_if_t<std::is_convertible<U *, T *>::value>>
+	WeakRef(WeakRef<U> &&other) noexcept : p_(std::exchange(other.p_, nullptr))
+	{
+	}
+
+	friend void
+	swap(WeakRef &lhs, WeakRef &rhs) noexcept
+	{
+		std::swap(lhs.p_, rhs.p_);
+	}
+
+	WeakRef &
+	operator=(WeakRef other) noexcept
+	{
+		swap(*this, other);
+		return *this;
+	}
+
+	explicit operator bool() const noexcept
+	{
+		return p_;
+	}
+
+	T *
+	operator->() const noexcept
+	{
+		return p_;
+	}
+
+	bool
+	operator!=(const WeakRef &other) const noexcept
+	{
+		return p_ != other.p_;
+	}
+
+	bool
+	operator==(const WeakRef &other) const noexcept
+	{
+		return p_ == other.p_;
+	}
+
+	Ref<T>
+	Lock() const noexcept
+	{
+		// KIMURA:TODO:FIXME really this should check that object is still
+		// there. But control block is embedded in object making this not
+		// possible yet...
+		return Ref<T>(p_);
+	}
+
+	T &
+	operator*() const noexcept
+	{
+		return *p_;
+	}
+
+	friend bool
+	operator!=(const WeakRef &ref, const T *other) noexcept
+	{
+		return ref.p_ != other;
+	}
+
+	friend bool
+	operator==(const WeakRef &ref, const T *other) noexcept
+	{
+		return ref.p_ == other;
+	}
+
+	friend bool
+	operator!=(const T *other, const WeakRef &ref) noexcept
+	{
+		return ref != other;
+	}
+
+	friend bool
+	operator==(const T *other, const WeakRef &ref) noexcept
+	{
+		return ref == other;
+	}
+
+	friend bool
+	operator!=(const WeakRef &ref, const Ref<T> &other) noexcept
+	{
+		return ref.p_ != other.get();
+	}
+
+	friend bool
+	operator==(const WeakRef &ref, const Ref<T> &other) noexcept
+	{
+		return ref.p_ == other.get();
+	}
+
+	friend bool
+	operator!=(const Ref<T> &other, const WeakRef &ref) noexcept
+	{
+		return ref != other.get();
+	}
+
+	friend bool
+	operator==(const Ref<T> &other, const WeakRef &ref) noexcept
+	{
+		return ref == other.get();
+	}
+
+	T *
+	get() const noexcept
+	{
+		return p_;
+	}
+};
+
+template <class T>
 Ref<T>
 RefFromNew(T *p) noexcept
 {

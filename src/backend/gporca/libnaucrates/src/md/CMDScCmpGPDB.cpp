@@ -46,9 +46,6 @@ CMDScCmpGPDB::CMDScCmpGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 	GPOS_ASSERT(m_mdid_right->IsValid());
 	GPOS_ASSERT(m_mdid_op->IsValid());
 	GPOS_ASSERT(IMDType::EcmptOther != m_comparision_type);
-
-	m_dxl_str = CDXLUtils::SerializeMDObj(
-		m_mp, this, false /*fSerializeHeader*/, false /*indentation*/);
 }
 
 //---------------------------------------------------------------------------
@@ -62,7 +59,10 @@ CMDScCmpGPDB::CMDScCmpGPDB(CMemoryPool *mp, gpos::Ref<IMDId> mdid,
 CMDScCmpGPDB::~CMDScCmpGPDB()
 {
 	GPOS_DELETE(m_mdname);
-	GPOS_DELETE(m_dxl_str);
+	if (m_dxl_str)
+	{
+		GPOS_DELETE(m_dxl_str);
+	}
 }
 
 

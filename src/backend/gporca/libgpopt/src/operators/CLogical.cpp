@@ -1355,7 +1355,7 @@ CLogical::PcrsDist(CMemoryPool *mp, const gpos::Ref<CTableDescriptor> ptabdesc,
 		gpos::Ref<CColumnDescriptor> pcoldesc = (*pdrgpcoldesc)[ul];
 		gpos::Ref<CColRef> colref = (*pdrgpcrOutput)[ul];
 
-		phmicr->Insert(GPOS_NEW(mp) INT(pcoldesc->AttrNum()), colref);
+		phmicr->Insert(pcoldesc->AttrNum(), colref);
 	}
 
 	gpos::Ref<CColRefSet> pcrsDist = GPOS_NEW(mp) CColRefSet(mp);
@@ -1364,7 +1364,7 @@ CLogical::PcrsDist(CMemoryPool *mp, const gpos::Ref<CTableDescriptor> ptabdesc,
 	{
 		gpos::Ref<CColumnDescriptor> pcoldesc = (*pdrgpcoldescDist)[ul2];
 		const INT attno = pcoldesc->AttrNum();
-		gpos::Ref<CColRef> pcrMapped = phmicr->Find(&attno);
+		gpos::Ref<CColRef> pcrMapped = phmicr->Find(attno);
 		GPOS_ASSERT(nullptr != pcrMapped);
 		pcrsDist->Include(pcrMapped);
 	}

@@ -1763,7 +1763,7 @@ CTestUtils::PexprConstTableGet(CMemoryPool *mp, ULONG ulElements)
 		gpos::Ref<IDatumInt4> datum =
 			pmdtypeint4->CreateInt4Datum(mp, ul, false /* is_null */);
 		gpos::Ref<IDatumArray> pdrgpdatum = GPOS_NEW(mp) IDatumArray(mp);
-		pdrgpdatum->Appendgpos::dyn_cast<IDatum>(datum);
+		pdrgpdatum->Append(gpos::dyn_cast<IDatum>(datum));
 		pdrgpdrgpdatum->Append(pdrgpdatum);
 	}
 	gpos::Ref<CLogicalConstTableGet> popConstTableGet =

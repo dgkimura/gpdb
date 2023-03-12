@@ -17,6 +17,7 @@
 #include "gpopt/base/CColRefTable.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/operators/CScalarFunc.h"
+#include "gpopt/search/CGroupExpression.h"
 
 
 using namespace gpopt;
@@ -34,7 +35,7 @@ ULONG
 CScalarIdent::HashValue() const
 {
 	return gpos::CombineHashes(COperator::HashValue(),
-							   gpos::HashPtr<CColRef>(m_pcr));
+							   CColRef::HashValue(m_pcr));
 }
 
 
@@ -90,7 +91,7 @@ CScalarIdent::PopCopyWithRemappedColumns(
 	BOOL must_exist)
 {
 	ULONG id = m_pcr->Id();
-	gpos::Ref<CColRef> colref = colref_mapping->Find(&id);
+	gpos::Ref<CColRef> colref = colref_mapping->Find(id);
 	if (nullptr == colref)
 	{
 		if (must_exist)
@@ -100,13 +101,12 @@ CScalarIdent::PopCopyWithRemappedColumns(
 
 			colref = col_factory->PcrCopy(m_pcr);
 
-			BOOL result GPOS_ASSERTS_ONLY =
-				colref_mapping->Insert(GPOS_NEW(mp) ULONG(id), colref);
+			BOOL result GPOS_ASSERTS_ONLY = colref_mapping->Insert(id, colref);
 			GPOS_ASSERT(result);
 		}
 		else
 		{
-			colref = const_cast<gpos::Ref<CColRef> >(m_pcr);
+			colref = m_pcr;
 		}
 	}
 

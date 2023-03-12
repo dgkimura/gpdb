@@ -6,6 +6,7 @@
 #include "gpopt/base/CDistributionSpecNonSingleton.h"
 #include "gpopt/base/CDistributionSpecSingleton.h"
 #include "gpopt/operators/CPhysicalMotionBroadcast.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -82,8 +83,7 @@ CDistributionSpecReplicated::FSatisfies(
 		{
 			// a replicated distribution satisfies the non-singleton
 			// distribution, only if allowed by non-singleton distribution object
-			return CDistributionSpecNonSingleton::PdsConvert(
-					   const_cast<gpos::Ref<CDistributionSpec> >(pdss))
+			return CDistributionSpecNonSingleton::PdsConvert(pdss)
 				->FAllowReplicated();
 		}
 

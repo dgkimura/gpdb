@@ -57,9 +57,9 @@ CParseHandlerScalarLimitCount::StartElement(
 	{
 		// parse and create scalar limit count
 		gpos::Ref<CDXLScalarLimitCount> dxl_op =
-			(gpos::Ref<CDXLScalarLimitCount>)
+			gpos::cast<CDXLScalarLimitCount>(
 				CDXLOperatorFactory::MakeDXLLimitCount(
-					m_parse_handler_mgr->GetDXLMemoryManager(), attrs);
+					m_parse_handler_mgr->GetDXLMemoryManager(), attrs));
 		m_dxl_node = GPOS_NEW(m_mp) CDXLNode(m_mp, dxl_op);
 	}
 	else

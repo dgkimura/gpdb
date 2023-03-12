@@ -161,8 +161,8 @@ CTranslatorExprToDXLUtils::FScalarConstTrue(CMDAccessor *md_accessor,
 			md_accessor->RetrieveType(pdxlopConst->GetDatumVal()->MDId());
 		if (IMDType::EtiBool == pmdtype->GetDatumType())
 		{
-			gpos::Ref<CDXLDatumBool> dxl_datum = CDXLDatumBool::Cast(
-				const_cast<gpos::Ref<CDXLDatum> >(pdxlopConst->GetDatumVal()));
+			gpos::Ref<CDXLDatumBool> dxl_datum =
+				gpos::dyn_cast<CDXLDatumBool>(pdxlopConst->GetDatumVal());
 
 			return (!dxl_datum->IsNull() && dxl_datum->GetValue());
 		}
@@ -193,8 +193,8 @@ CTranslatorExprToDXLUtils::FScalarConstFalse(CMDAccessor *md_accessor,
 			md_accessor->RetrieveType(pdxlopConst->GetDatumVal()->MDId());
 		if (IMDType::EtiBool == pmdtype->GetDatumType())
 		{
-			gpos::Ref<CDXLDatumBool> dxl_datum = CDXLDatumBool::Cast(
-				const_cast<gpos::Ref<CDXLDatum> >(pdxlopConst->GetDatumVal()));
+			gpos::Ref<CDXLDatumBool> dxl_datum =
+				gpos::dyn_cast<CDXLDatumBool>(pdxlopConst->GetDatumVal());
 			return (!dxl_datum->IsNull() && !dxl_datum->GetValue());
 		}
 	}
@@ -390,7 +390,7 @@ CTranslatorExprToDXLUtils::PdxlnIdent(
 	{
 		// if colref doesn't exist in partition mapping, then this scalar ident
 		// is an outer ref, and we must look it up in the index outer-ref mapping
-		ULONG *pul = phmcrulPartColId->Find(colref);
+		gpos::Ref<UlongRef> pul = phmcrulPartColId->Find(colref);
 		if (nullptr == pul)
 		{
 			gpos::Ref<CDXLNode> pdxlnIdent = phmcrdxlnIndexLookup->Find(colref);
@@ -401,7 +401,7 @@ CTranslatorExprToDXLUtils::PdxlnIdent(
 		// the colref does exist in the partition mapping, it is therefore NOT
 		// an outer ref, and we should create a dxl node
 		GPOS_ASSERT(nullptr != pul);
-		colid = *pul;
+		colid = pul->value();
 	}
 	else
 	{
@@ -529,11 +529,11 @@ CTranslatorExprToDXLUtils::PdrgpcrMapColumns(
 		gpos::Ref<CColRef> colref = (*pdrgpcrInput)[ul];
 
 		// get column index from hashmap
-		ULONG *pul = phmcrul->Find(colref);
+		gpos::Ref<UlongRef> pul = phmcrul->Find(colref);
 		GPOS_ASSERT(nullptr != pul);
 
 		// add corresponding column from dest array
-		pdrgpcrNew->Append((*pdrgpcrMapDest)[*pul]);
+		pdrgpcrNew->Append((*pdrgpcrMapDest)[pul->value()]);
 	}
 
 	return pdrgpcrNew;
@@ -670,7 +670,7 @@ CTranslatorExprToDXLUtils::PhmcrulColIndex(CMemoryPool *mp,
 	for (ULONG ul = 0; ul < length; ul++)
 	{
 		gpos::Ref<CColRef> colref = (*colref_array)[ul];
-		ULONG *pul = GPOS_NEW(mp) ULONG(ul);
+		gpos::Ref<UlongRef> pul = GPOS_NEW(mp) UlongRef(ul);
 
 		// add to hashmap
 #ifdef GPOS_DEBUG
@@ -981,7 +981,7 @@ CTranslatorExprToDXLUtils::PdxlddinfoSingleDistrKey(
 		return nullptr;
 	}
 
-	const gpos::Ref<CColRef> pcrDistrCol =
+	gpos::Ref<CColRef> pcrDistrCol =
 		CScalarIdent::PopConvert(pexprHashed->Pop())->Pcr();
 
 	BOOL useRawValues = false;
@@ -1082,8 +1082,8 @@ CTranslatorExprToDXLUtils::FDirectDispatchable(
 		// then since a cast is possible and
 		// cast is binary coercible, we go ahead with direct dispatch
 
-		const gpos::Ref<IMDCast> pmdcast_datumToDistrCol;
-		const gpos::Ref<IMDCast> pmdcast_distrColToDatum;
+		gpos::Ref<IMDCast> pmdcast_datumToDistrCol;
+		gpos::Ref<IMDCast> pmdcast_distrColToDatum;
 
 		// Checking if cast exist from datum to distribution column
 		GPOS_TRY

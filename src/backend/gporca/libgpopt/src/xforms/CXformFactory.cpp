@@ -99,11 +99,9 @@ CXformFactory::Add(gpos::Ref<CXform> pxform)
 
 	// create name -> xform mapping
 	ULONG length = clib::Strlen(pxform->SzId());
-	CHAR *szXformName = GPOS_NEW_ARRAY(m_mp, CHAR, length + 1);
-	clib::Strncpy(szXformName, pxform->SzId(), length + 1);
+	std::string xformName(pxform->SzId(), pxform->SzId() + length);
 
-	BOOL fInserted GPOS_ASSERTS_ONLY =
-		m_phmszxform->Insert(szXformName, pxform);
+	BOOL fInserted GPOS_ASSERTS_ONLY = m_phmszxform->Insert(xformName, pxform);
 	GPOS_ASSERT(fInserted);
 
 	gpos::Ref<CXformSet> xform_set = m_pxfsExploration;

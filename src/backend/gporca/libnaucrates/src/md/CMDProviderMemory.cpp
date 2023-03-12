@@ -87,9 +87,7 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 	GPOS_ASSERT(nullptr != mdcache_obj_array);
 
 	// load metadata objects from the file
-	CAutoRef<MDIdToSerializedMDIdMap> md_map;
 	m_mdmap = GPOS_NEW(mp) MDIdToSerializedMDIdMap(mp);
-	md_map = m_mdmap;
 
 	const ULONG size = mdcache_obj_array->Size();
 
@@ -100,9 +98,6 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 
 		gpos::Ref<IMDCacheObject> mdcache_obj = (*mdcache_obj_array)[ul];
 		gpos::Ref<IMDId> mdid_key = mdcache_obj->MDId();
-
-		CAutoRef<IMDId> mdid_key_autoref;
-		mdid_key_autoref = mdid_key;
 
 		CAutoP<CWStringDynamic> str;
 		str = CDXLUtils::SerializeMDObj(
@@ -115,12 +110,8 @@ CMDProviderMemory::LoadMetadataObjectsFromArray(
 			GPOS_RAISE(gpdxl::ExmaMD, gpdxl::ExmiMDCacheEntryDuplicate,
 					   mdid_key->GetBuffer());
 		}
-		(void) mdid_key_autoref.Reset();
 		(void) str.Reset();
 	}
-
-	// safely completed loading
-	(void) md_map.Reset();
 }
 
 //---------------------------------------------------------------------------
@@ -166,10 +157,10 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 		{
 			case IMDId::EmdidRelStats:
 			{
-				CAutoRef<CDXLRelStats> a_pdxlrelstats;
+				gpos::Ref<CDXLRelStats> a_pdxlrelstats;
 				a_pdxlrelstats = CDXLRelStats::CreateDXLDummyRelStats(mp, mdid);
 				a_pstrResult = CDXLUtils::SerializeMDObj(
-					mp, a_pdxlrelstats.Value(), true /*fSerializeHeaders*/,
+					mp, a_pdxlrelstats, true /*fSerializeHeaders*/,
 					false /*findent*/);
 				break;
 			}
@@ -180,23 +171,23 @@ CMDProviderMemory::GetMDObjDXLStr(CMemoryPool *mp,
 				CAutoP<CMDName> a_pmdname;
 				a_pmdname = GPOS_NEW(mp) CMDName(mp, a_pstr.Value());
 
-				CAutoRef<CDXLColStats> a_pdxlcolstats;
+				gpos::Ref<CDXLColStats> a_pdxlcolstats;
 				a_pdxlcolstats = CDXLColStats::CreateDXLDummyColStats(
 					mp, mdid, a_pmdname.Value(),
 					CStatistics::DefaultColumnWidth /* width */);
 				a_pmdname.Reset();
 				a_pstrResult = CDXLUtils::SerializeMDObj(
-					mp, a_pdxlcolstats.Value(), true /*fSerializeHeaders*/,
+					mp, a_pdxlcolstats, true /*fSerializeHeaders*/,
 					false /*findent*/);
 				break;
 			}
 			case IMDId::EmdidExtStatsInfo:
 			{
-				CAutoRef<CDXLExtStatsInfo> a_pdxlrelstats;
+				gpos::Ref<CDXLExtStatsInfo> a_pdxlrelstats;
 				a_pdxlrelstats =
 					CDXLExtStatsInfo::CreateDXLDummyExtStatsInfo(mp, mdid);
 				a_pstrResult = CDXLUtils::SerializeMDObj(
-					mp, a_pdxlrelstats.Value(), true /*fSerializeHeaders*/,
+					mp, a_pdxlrelstats, true /*fSerializeHeaders*/,
 					false /*findent*/);
 				break;
 			}

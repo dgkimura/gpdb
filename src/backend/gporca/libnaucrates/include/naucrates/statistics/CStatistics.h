@@ -44,14 +44,11 @@ using UlongToIntMap =
 
 // hash maps ULONG -> array of ULONGs
 using UlongToUlongPtrArrayMap =
-	CHashMap<ULONG, ULongPtrArray, gpos::HashValue<ULONG>, gpos::Equals<ULONG>,
-			 CleanupDelete<ULONG>, CleanupRelease<ULongPtrArray>>;
+	gpos::UnorderedMap<ULONG, gpos::Ref<ULongPtrArray>>;
 
 // iterator
 using UlongToUlongPtrArrayMapIter =
-	CHashMapIter<ULONG, ULongPtrArray, gpos::HashValue<ULONG>,
-				 gpos::Equals<ULONG>, CleanupDelete<ULONG>,
-				 CleanupRelease<ULongPtrArray>>;
+	gpos::UnorderedMap<ULONG, gpos::Ref<ULongPtrArray>>::LegacyIterator;
 
 //---------------------------------------------------------------------------
 //	@class:

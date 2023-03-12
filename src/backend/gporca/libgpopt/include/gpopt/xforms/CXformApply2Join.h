@@ -76,7 +76,7 @@ private:
 
 		gpos::Ref<CExpression> pexprResult = nullptr;
 
-		TApply *popApply = TApply::PopConvert(pexprApply->Pop());
+		gpos::Ref<TApply> popApply = TApply::PopConvert(pexprApply->Pop());
 		gpos::Ref<CColRefArray> colref_array = popApply->PdrgPcrInner();
 		GPOS_ASSERT(nullptr != colref_array);
 		GPOS_ASSERT(1 == colref_array->Size());

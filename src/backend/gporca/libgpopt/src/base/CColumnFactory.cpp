@@ -21,6 +21,7 @@
 #include "gpopt/base/CColRefTable.h"
 #include "gpopt/operators/CExpression.h"
 #include "gpopt/operators/CScalarProjectElement.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "naucrates/md/CMDIdGPDB.h"
 
 using namespace gpopt;
@@ -36,18 +37,8 @@ using namespace gpmd;
 //		ctor
 //
 //---------------------------------------------------------------------------
-CColumnFactory::CColumnFactory()
+CColumnFactory::CColumnFactory(CMemoryPool *mp) : m_mp(mp), m_sht(m_mp)
 {
-	CAutoMemoryPool amp;
-	m_mp = amp.Pmp();
-
-	// initialize hash table
-	m_sht.Init(m_mp, GPOPT_COLFACTORY_HT_BUCKETS, GPOS_OFFSET(CColRef, m_link),
-			   GPOS_OFFSET(CColRef, m_id), &(CColRef::m_ulInvalid),
-			   CColRef::HashValue, CColRef::Equals);
-
-	// now it's safe to detach the auto pool
-	(void) amp.Detach();
 }
 
 
@@ -61,12 +52,6 @@ CColumnFactory::CColumnFactory()
 //---------------------------------------------------------------------------
 CColumnFactory::~CColumnFactory()
 {
-	// dealloc hash table
-	m_sht.Cleanup();
-
-	// destroy mem pool
-	CMemoryPoolManager *pmpm = CMemoryPoolManager::GetMemoryPoolMgr();
-	pmpm->Destroy(m_mp);
 }
 
 //---------------------------------------------------------------------------
@@ -144,14 +129,13 @@ CColumnFactory::PcrCreate(const gpos::Ref<IMDType> pmdtype, INT type_modifier,
 	gpos::Ref<CColRef> colref =
 		GPOS_NEW(m_mp) CColRefComputed(pmdtype, type_modifier, id, pnameCopy);
 	(void) a_pnameCopy.Reset();
-	CAutoP<CColRef> a_pcr(colref);
 
 	// ensure uniqueness
-	GPOS_ASSERT(nullptr == LookupColRef(id));
-	m_sht.Insert(colref);
+	GPOS_ASSERT(nullptr == m_sht.Find(id));
+	m_sht.Insert(id, colref);
 	colref->MarkAsUsed();
 
-	return a_pcr.Reset();
+	return colref;
 }
 
 
@@ -176,11 +160,10 @@ CColumnFactory::PcrCreate(const gpos::Ref<CColumnDescriptor> pcoldesc, ULONG id,
 	gpos::Ref<CColRef> colref =
 		GPOS_NEW(m_mp) CColRefTable(pcoldesc, id, pnameCopy, ulOpSource);
 	(void) a_pnameCopy.Reset();
-	CAutoP<CColRef> a_pcr(colref);
 
 	// ensure uniqueness
-	GPOS_ASSERT(nullptr == LookupColRef(id));
-	m_sht.Insert(colref);
+	GPOS_ASSERT(nullptr == m_sht.Find(id));
+	m_sht.Insert(id, colref);
 	if (mark_as_used)
 	{
 		colref->MarkAsUsed();
@@ -190,7 +173,7 @@ CColumnFactory::PcrCreate(const gpos::Ref<CColumnDescriptor> pcoldesc, ULONG id,
 		colref->SetMdidTable(mdid_table);
 	}
 
-	return a_pcr.Reset();
+	return colref;
 }
 
 
@@ -217,15 +200,14 @@ CColumnFactory::PcrCreate(const gpos::Ref<IMDType> pmdtype, INT type_modifier,
 		CColRefTable(pmdtype, type_modifier, attno, is_nullable, id, pnameCopy,
 					 ulOpSource, isDistCol, ulWidth);
 	(void) a_pnameCopy.Reset();
-	CAutoP<CColRef> a_pcr(colref);
 
 	// ensure uniqueness
-	GPOS_ASSERT(nullptr == LookupColRef(id));
-	m_sht.Insert(colref);
+	GPOS_ASSERT(nullptr == m_sht.Find(id));
+	m_sht.Insert(id, colref);
 	colref->MarkAsUsed();
 	colref->SetMdidTable(mdid_table);
 
-	return a_pcr.Reset();
+	return colref;
 }
 
 //---------------------------------------------------------------------------
@@ -265,8 +247,7 @@ CColumnFactory::PcrCopy(const gpos::Ref<CColRef> colref)
 
 	GPOS_ASSERT(CColRef::EcrtTable == colref->Ecrt());
 	ULONG id = m_aul++;
-	gpos::Ref<CColRefTable> pcrTable =
-		CColRefTable::PcrConvert(const_cast<gpos::Ref<CColRef> >(colref));
+	gpos::Ref<CColRefTable> pcrTable = CColRefTable::PcrConvert(colref);
 
 	return PcrCreate(colref->RetrieveType(), colref->TypeModifier(),
 					 colref->GetMdidTable(), pcrTable->AttrNum(),
@@ -285,9 +266,7 @@ CColumnFactory::PcrCopy(const gpos::Ref<CColRef> colref)
 gpos::Ref<CColRef>
 CColumnFactory::LookupColRef(ULONG id)
 {
-	CSyncHashtableAccessByKey<CColRef, ULONG> shtacc(m_sht, id);
-
-	gpos::Ref<CColRef> colref = shtacc.Find();
+	gpos::Ref<CColRef> colref = m_sht.Find(id);
 
 	return colref;
 }
@@ -308,16 +287,7 @@ CColumnFactory::Destroy(gpos::Ref<CColRef> colref)
 
 	ULONG id = colref->m_id;
 
-	{
-		// scope for the hash table accessor
-		CSyncHashtableAccessByKey<CColRef, ULONG> shtacc(m_sht, id);
-
-		gpos::Ref<CColRef> pcrFound = shtacc.Find();
-		GPOS_ASSERT(colref == pcrFound);
-
-		// unlink from hashtable
-		shtacc.Remove(pcrFound);
-	}
+	GPOS_ASSERT(m_sht.Delete(id));
 }
 
 

@@ -15,6 +15,7 @@
 
 #include "gpopt/base/CConstraintInterval.h"
 #include "gpopt/operators/CPredicateUtils.h"
+#include "gpopt/search/CGroupExpression.h"
 
 using namespace gpopt;
 
@@ -144,13 +145,13 @@ CConstraintNegation::PexprScalar(CMemoryPool *mp)
 		if (EctNegation == ect)
 		{
 			gpos::Ref<CConstraintNegation> pcn =
-				(gpos::Ref<CConstraintNegation>) m_pcnstr;
+				gpos::cast<CConstraintNegation>(m_pcnstr);
 			m_pexprScalar = pcn->PcnstrChild()->PexprScalar(mp);
 		}
 		else if (EctInterval == ect)
 		{
 			gpos::Ref<CConstraintInterval> pci =
-				(gpos::Ref<CConstraintInterval>) m_pcnstr;
+				gpos::cast<CConstraintInterval>(m_pcnstr);
 			gpos::Ref<CConstraintInterval> pciComp = pci->PciComplement(mp);
 			m_pexprScalar = pciComp->PexprScalar(mp);
 		}

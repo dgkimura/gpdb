@@ -86,7 +86,7 @@ using gpmd::CMDIdGPDB;
 // forward declarations
 class IConstExprEvaluator;
 
-using CExpressionJoinsArray = CDynamicPtrArray<CExpression, CleanupNULL>;
+using CExpressionJoinsArray = gpos::Vector<gpos::Ref<CExpression>>;
 
 using FnDXLPlanChecker = BOOL(gpos::Ref<CDXLNode>);
 

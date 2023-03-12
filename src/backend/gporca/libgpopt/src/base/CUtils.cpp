@@ -23,6 +23,7 @@
 #include "gpopt/base/CColRefTable.h"
 #include "gpopt/base/CConstraintInterval.h"
 #include "gpopt/base/CDistributionSpecRandom.h"
+#include "gpopt/base/CDrvdPropCtxt.h"
 #include "gpopt/base/CKeyCollection.h"
 #include "gpopt/base/COptCtxt.h"
 #include "gpopt/exception.h"
@@ -62,6 +63,7 @@
 #include "gpopt/operators/CScalarProjectList.h"
 #include "gpopt/operators/CScalarValuesList.h"
 #include "gpopt/optimizer/COptimizerConfig.h"
+#include "gpopt/search/CGroupExpression.h"
 #include "gpopt/search/CMemo.h"
 #include "gpopt/translate/CTranslatorExprToDXLUtils.h"
 #include "naucrates/base/IDatumBool.h"
@@ -97,9 +99,10 @@ static WCHAR wszBuffer[ulBufferCapacity];
 
 // global wrapper for debug print of expression
 void
-PrintExpr(void *pv)
+PrintExpr(void *pv GPOS_UNUSED)
 {
-	gpopt::CUtils::PrintExpression((gpos::Ref<gpopt::CExpression>) pv);
+	//KIMURA:FIXME. Why does this error in Casting isa_impl?
+	//gpopt::CUtils::PrintExpression(gpos::cast<gpopt::CExpression>(pv));
 }
 
 // debug print expression
@@ -115,7 +118,7 @@ CUtils::PrintExpression(gpos::Ref<CExpression> pexpr)
 	}
 	else
 	{
-		oss << std::endl << pexpr << std::endl << *pexpr << std::endl;
+		oss << std::endl << pexpr.get() << std::endl << *pexpr << std::endl;
 	}
 
 	GPOS_TRACE(str.GetBuffer());
@@ -1147,7 +1150,7 @@ CUtils::FCorrelatedNLJoin(gpos::Ref<COperator> pop)
 	BOOL fCorrelatedNLJ = false;
 	if (FNLJoin(pop))
 	{
-		fCorrelatedNLJ = gpos::dyn_cast<CPhysicalNLJoin> > (pop) -FCorrelated();
+		fCorrelatedNLJ = gpos::dyn_cast<CPhysicalNLJoin>(pop)->FCorrelated();
 	}
 
 	return fCorrelatedNLJ;
@@ -1428,11 +1431,11 @@ CUtils::FScalarConstIntZero(gpos::Ref<CExpression> pexprOffset)
 	switch (datum->GetDatumType())
 	{
 		case IMDType::EtiInt2:
-			return (0 == gpos::dyn_cast<IDatumInt2> > (datum) -Value());
+			return (0 == gpos::dyn_cast<IDatumInt2>(datum)->Value());
 		case IMDType::EtiInt4:
-			return (0 == gpos::dyn_cast<IDatumInt4> > (datum) -Value());
+			return (0 == gpos::dyn_cast<IDatumInt4>(datum)->Value());
 		case IMDType::EtiInt8:
-			return (0 == gpos::dyn_cast<IDatumInt8> > (datum) -Value());
+			return (0 == gpos::dyn_cast<IDatumInt8>(datum)->Value());
 		default:
 			return false;
 	}
@@ -1843,7 +1846,7 @@ CUtils::PexprScalarConstNull(CMemoryPool *mp, const gpos::Ref<IMDType> typ,
 		case IMDType::EtiInt2:
 		{
 			const gpos::Ref<IMDTypeInt2> pmdtypeint2 =
-				static_cast<const gpos::Ref<IMDTypeInt2> >(typ);
+				gpos::dyn_cast<IMDTypeInt2>(typ);
 			datum = pmdtypeint2->CreateInt2Datum(mp, 0, true);
 		}
 		break;
@@ -1851,7 +1854,7 @@ CUtils::PexprScalarConstNull(CMemoryPool *mp, const gpos::Ref<IMDType> typ,
 		case IMDType::EtiInt4:
 		{
 			const gpos::Ref<IMDTypeInt4> pmdtypeint4 =
-				static_cast<const gpos::Ref<IMDTypeInt4> >(typ);
+				gpos::dyn_cast<IMDTypeInt4>(typ);
 			datum = pmdtypeint4->CreateInt4Datum(mp, 0, true);
 		}
 		break;
@@ -1859,7 +1862,7 @@ CUtils::PexprScalarConstNull(CMemoryPool *mp, const gpos::Ref<IMDType> typ,
 		case IMDType::EtiInt8:
 		{
 			const gpos::Ref<IMDTypeInt8> pmdtypeint8 =
-				static_cast<const gpos::Ref<IMDTypeInt8> >(typ);
+				gpos::dyn_cast<IMDTypeInt8>(typ);
 			datum = pmdtypeint8->CreateInt8Datum(mp, 0, true);
 		}
 		break;
@@ -1867,7 +1870,7 @@ CUtils::PexprScalarConstNull(CMemoryPool *mp, const gpos::Ref<IMDType> typ,
 		case IMDType::EtiBool:
 		{
 			const gpos::Ref<IMDTypeBool> pmdtypebool =
-				static_cast<const gpos::Ref<IMDTypeBool> >(typ);
+				gpos::dyn_cast<IMDTypeBool>(typ);
 			datum = pmdtypebool->CreateBoolDatum(mp, false, true);
 		}
 		break;
@@ -1875,7 +1878,7 @@ CUtils::PexprScalarConstNull(CMemoryPool *mp, const gpos::Ref<IMDType> typ,
 		case IMDType::EtiOid:
 		{
 			const gpos::Ref<IMDTypeOid> pmdtypeoid =
-				static_cast<const gpos::Ref<IMDTypeOid> >(typ);
+				gpos::dyn_cast<IMDTypeOid>(typ);
 			datum = pmdtypeoid->CreateOidDatum(mp, 0, true);
 		}
 		break;
@@ -1883,7 +1886,7 @@ CUtils::PexprScalarConstNull(CMemoryPool *mp, const gpos::Ref<IMDType> typ,
 		case IMDType::EtiGeneric:
 		{
 			const gpos::Ref<IMDTypeGeneric> pmdtypegeneric =
-				static_cast<const gpos::Ref<IMDTypeGeneric> >(typ);
+				gpos::dyn_cast<IMDTypeGeneric>(typ);
 			datum = pmdtypegeneric->CreateGenericNullDatum(mp, type_modifier);
 		}
 		break;
@@ -2156,13 +2159,13 @@ FCountAggMatchingColumn(gpos::Ref<CExpression> pexprPrjElem,
 BOOL
 CUtils::FHasCountAggMatchingColumn(const gpos::Ref<CExpression> pexpr,
 								   const gpos::Ref<CColRef> colref,
-								   const gpos::Ref<CLogicalGbAgg> *ppgbAgg)
+								   gpos::Ref<CLogicalGbAgg> &ppgbAgg)
 {
 	gpos::Ref<COperator> pop = pexpr->Pop();
 	// base case, we have a logical agg operator
 	if (COperator::EopLogicalGbAgg == pop->Eopid())
 	{
-		const gpos::Ref<CExpression> const pexprProjectList = (*pexpr)[1];
+		const gpos::Ref<CExpression> pexprProjectList = (*pexpr)[1];
 		GPOS_ASSERT(COperator::EopScalarProjectList ==
 					pexprProjectList->Pop()->Eopid());
 		const ULONG arity = pexprProjectList->Arity();
@@ -2173,7 +2176,7 @@ CUtils::FHasCountAggMatchingColumn(const gpos::Ref<CExpression> pexpr,
 			{
 				const gpos::Ref<CLogicalGbAgg> pgbAgg =
 					CLogicalGbAgg::PopConvert(pop);
-				*ppgbAgg = pgbAgg;
+				ppgbAgg = pgbAgg;
 				return true;
 			}
 		}
@@ -2451,8 +2454,8 @@ CUtils::PexprScalarProjListConst(CMemoryPool *mp,
 			colref->RetrieveType(), colref->TypeModifier(), colref->Name());
 		if (nullptr != colref_mapping)
 		{
-			BOOL fInserted GPOS_ASSERTS_ONLY = colref_mapping->Insert(
-				GPOS_NEW(mp) ULONG(colref->Id()), new_colref);
+			BOOL fInserted GPOS_ASSERTS_ONLY =
+				colref_mapping->Insert(colref->Id(), new_colref);
 			GPOS_ASSERT(fInserted);
 		}
 
@@ -3566,7 +3569,7 @@ CUtils::PcrRemap(const gpos::Ref<CColRef> colref,
 	GPOS_ASSERT(nullptr != colref_mapping);
 
 	ULONG id = colref->Id();
-	gpos::Ref<CColRef> pcrMapped = colref_mapping->Find(&id);
+	gpos::Ref<CColRef> pcrMapped = colref_mapping->Find(id);
 
 	if (nullptr != pcrMapped)
 	{
@@ -3575,7 +3578,7 @@ CUtils::PcrRemap(const gpos::Ref<CColRef> colref,
 	}
 
 	GPOS_ASSERT(!must_exist && "Column does not exist in hashmap");
-	return const_cast<gpos::Ref<CColRef> >(colref);
+	return colref;
 }
 
 // create a new colrefset corresponding to the given colrefset and based on the given mapping
@@ -3644,14 +3647,14 @@ CUtils::PdrgpcrRemapAndCreate(CMemoryPool *mp,
 	{
 		gpos::Ref<CColRef> colref = (*colref_array)[ul];
 		ULONG id = colref->Id();
-		gpos::Ref<CColRef> pcrMapped = colref_mapping->Find(&id);
+		gpos::Ref<CColRef> pcrMapped = colref_mapping->Find(id);
 		if (nullptr == pcrMapped)
 		{
 			// not found in hashmap, so create a new colref and add to hashmap
 			pcrMapped = col_factory->PcrCopy(colref);
 
 			BOOL result GPOS_ASSERTS_ONLY =
-				colref_mapping->Insert(GPOS_NEW(mp) ULONG(id), pcrMapped);
+				colref_mapping->Insert(id, pcrMapped);
 			GPOS_ASSERT(result);
 		}
 
@@ -3723,7 +3726,7 @@ CUtils::PhmulcrMapping(CMemoryPool *mp, gpos::Ref<CColRefArray> pdrgpcrFrom,
 
 // add col ID->ColRef mappings to the given hashmap based on the given ColRef arrays
 void
-CUtils::AddColumnMapping(CMemoryPool *mp,
+CUtils::AddColumnMapping(CMemoryPool *mp GPOS_UNUSED,
 						 gpos::Ref<UlongToColRefMap> colref_mapping,
 						 gpos::Ref<CColRefArray> pdrgpcrFrom,
 						 gpos::Ref<CColRefArray> pdrgpcrTo)
@@ -3745,13 +3748,13 @@ CUtils::AddColumnMapping(CMemoryPool *mp,
 #ifdef GPOS_DEBUG
 		BOOL result = false;
 #endif	// GPOS_DEBUG
-		gpos::Ref<CColRef> pcrExist = colref_mapping->Find(&ulFromId);
+		gpos::Ref<CColRef> pcrExist = colref_mapping->Find(ulFromId);
 		if (nullptr == pcrExist)
 		{
 #ifdef GPOS_DEBUG
 			result =
 #endif	// GPOS_DEBUG
-				colref_mapping->Insert(GPOS_NEW(mp) ULONG(ulFromId), pcrTo);
+				colref_mapping->Insert(ulFromId, pcrTo);
 			GPOS_ASSERT(result);
 		}
 		else
@@ -3759,7 +3762,7 @@ CUtils::AddColumnMapping(CMemoryPool *mp,
 #ifdef GPOS_DEBUG
 			result =
 #endif	// GPOS_DEBUG
-				colref_mapping->Replace(&ulFromId, pcrTo);
+				colref_mapping->Replace(ulFromId, pcrTo);
 		}
 		GPOS_ASSERT(result);
 	}
@@ -3811,8 +3814,8 @@ CUtils::PdrgpcrCopy(CMemoryPool *mp, gpos::Ref<CColRefArray> colref_array,
 		pdrgpcrNew->Append(new_colref);
 		if (nullptr != colref_mapping)
 		{
-			BOOL fInserted GPOS_ASSERTS_ONLY = colref_mapping->Insert(
-				GPOS_NEW(mp) ULONG(colref->Id()), new_colref);
+			BOOL fInserted GPOS_ASSERTS_ONLY =
+				colref_mapping->Insert(colref->Id(), new_colref);
 			GPOS_ASSERT(fInserted);
 		}
 	}
@@ -3844,7 +3847,7 @@ CUtils::UlHashColArray(const gpos::Ref<CColRefArray> colref_array,
 	for (ULONG ul = 0; ul < length && ul < ulMaxCols; ul++)
 	{
 		gpos::Ref<CColRef> colref = (*colref_array)[ul];
-		ulHash = gpos::CombineHashes(ulHash, gpos::HashPtr<CColRef>(colref));
+		ulHash = gpos::CombineHashes(ulHash, CColRef::HashValue(colref));
 	}
 
 	return ulHash;
@@ -3949,7 +3952,7 @@ CUtils::PexprCast(CMemoryPool *mp, CMDAccessor *md_accessor,
 	if (pmdcast->GetMDPathType() == IMDCast::EmdtArrayCoerce)
 	{
 		gpos::Ref<CMDArrayCoerceCastGPDB> parrayCoerceCast =
-			(gpos::Ref<CMDArrayCoerceCastGPDB>) pmdcast;
+			gpos::dyn_cast<CMDArrayCoerceCastGPDB>(pmdcast);
 		pexprCast = GPOS_NEW(mp) CExpression(
 			mp,
 			GPOS_NEW(mp) CScalarArrayCoerceExpr(
@@ -4812,11 +4815,11 @@ CUtils::IsHashJoinPossible(CMemoryPool *mp, gpos::Ref<CExpression> pexpr)
 // functions plus casts. If so, return the corresponding CColRef.
 BOOL
 CUtils::IsExprNDVPreserving(gpos::Ref<CExpression> pexpr,
-							const gpos::Ref<CColRef> *underlying_colref)
+							gpos::Ref<CColRef> &underlying_colref)
 {
 	gpos::Ref<CExpression> curr_expr = pexpr;
 
-	*underlying_colref = nullptr;
+	underlying_colref = nullptr;
 
 	// go down the expression tree, visiting the child containing a scalar ident until
 	// we found the ident or until we found a non-NDV-preserving function (at which point there
@@ -4833,7 +4836,7 @@ CUtils::IsExprNDVPreserving(gpos::Ref<CExpression> pexpr,
 				// we reached the bottom of the expression, return the ColRef
 				gpos::Ref<CScalarIdent> cr = CScalarIdent::PopConvert(pop);
 
-				*underlying_colref = cr->Pcr();
+				underlying_colref = cr->Pcr();
 				GPOS_ASSERT(1 == pexpr->DeriveUsedColumns()->Size());
 				return true;
 			}
@@ -4933,7 +4936,7 @@ CUtils::PexprMatchEqualityOrINDF(
 	for (ULONG ul = 0; ul < ulSize; ul++)
 	{
 		gpos::Ref<CExpression> pexprPred = (*pdrgpexpr)[ul];
-		gpos::Ref<CExpression> pexprPredOuter, *pexprPredInner;
+		gpos::Ref<CExpression> pexprPredOuter, pexprPredInner;
 
 
 		if (CPredicateUtils::IsEqualityOp(pexprPred))

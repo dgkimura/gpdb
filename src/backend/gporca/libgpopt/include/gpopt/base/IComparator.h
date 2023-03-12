@@ -19,6 +19,7 @@
 #define GPOPT_IComparator_H
 
 #include "gpos/base.h"
+#include "gpos/common/Ref.h"
 
 namespace gpnaucrates
 {
