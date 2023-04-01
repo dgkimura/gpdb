@@ -127,6 +127,14 @@ git grep -l 'CCostArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:
 git grep -l 'UlongToDrvdPropPlanMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?UlongToDrvdPropPlanMap \*/gpos::Ref<\1UlongToDrvdPropPlanMap> /g'
 git grep -l 'COptimizationContextArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?COptimizationContextArray \*/gpos::Ref<\1COptimizationContextArray> /g'
 git grep -l 'CDrvdPropArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CDrvdPropArray \*/gpos::Ref<\1CDrvdPropArray> /g'
+git grep -l 'ExprHashSet \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?ExprHashSet \*/gpos::Ref<\1ExprHashSet> /g'
+git grep -l 'CMDNameArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CMDNameArray \*/gpos::Ref<\1CMDNameArray> /g'
+git grep -l 'CDynamicPtrArray<T, CleanupNULL> \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CDynamicPtrArray<T, CleanupNULL> \*/gpos::Ref<\1CDynamicPtrArray<T, CleanupNULL>> /g'
+git grep -l 'LinkMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?LinkMap \*/gpos::Ref<\1LinkMap> /g'
+git grep -l 'OptCtxtToIStatisticsMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?OptCtxtToIStatisticsMap \*/gpos::Ref<\1OptCtxtToIStatisticsMap> /g'
+git grep -l 'ReqdPropPlanToCostMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?ReqdPropPlanToCostMap \*/gpos::Ref<\1ReqdPropPlanToCostMap> /g'
+git grep -l 'PartialPlanToCostMap \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?PartialPlanToCostMap \*/gpos::Ref<\1PartialPlanToCostMap> /g'
+git grep -l 'CSearchStageArray \*' -- '*.cpp' -- '*.h' | xargs sed -ie 's/\b\([[:alpha:]]*::\)\?CSearchStageArray \*/gpos::Ref<\1CSearchStageArray> /g'
 
 ls src/backend/gporca/libgpopt/src/search/CGroup.cpp | xargs sed -ie 's/CGroupProxy gp(this)/CGroupProxy gp(SharedFromThis())/'
 
